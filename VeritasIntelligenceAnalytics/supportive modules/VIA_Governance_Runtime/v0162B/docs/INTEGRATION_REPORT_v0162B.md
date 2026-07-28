@@ -111,7 +111,14 @@ Per contract these are **not** claimed automatically:
   launch all execute there.
 - **Canonical promotion** — any sandbox repair candidate is written under the
   run directory only; writing back into VRN / VDF / VAP canonical trees
-  requires the separate hash-locked, operator-reviewed transaction.
+  requires the separate hash-locked, operator-reviewed transaction, now
+  implemented as `bin/Invoke-VIA-Promotion-Transaction-v0162B.ps1`
+  (operator review → exact-hash gate on canonical **and** sandbox copies →
+  backup with recorded hash → tamper-evident hash-chain ledger under
+  `promotion/promotion_chain.json`). Default invocation is review-only;
+  promotion happens only for explicitly `-Approve`d items, with `-DryRun`
+  rehearsal. Verified: dry-run no-write, two-file promotion with chain seal,
+  independent chain-hash recomputation, and refusal on canonical drift.
 
 ## 6. 部署 · Deployment onto the workstation
 
