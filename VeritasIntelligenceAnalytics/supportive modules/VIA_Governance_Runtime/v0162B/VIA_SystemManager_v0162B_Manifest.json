@@ -1,10 +1,10 @@
 {
   "artifacts": [
     {
-      "bytes": 102143,
+      "bytes": 102697,
       "filename": "bin/Invoke-VIA-SystemManager-AllInOne-v0162B.ps1",
-      "role": "single corrected System Manager PowerShell (integration build R1, reconstructed from audit copies)",
-      "sha256": "6c8b513fb79d6ad22a58732cfc05d0a6abc4417749f7dd0f4bfc7d25b082e59d"
+      "role": "single corrected System Manager PowerShell (integration build R2, reconstructed from audit copies)",
+      "sha256": "ae3bdbd553ef876675e151390a7008d51b07a5aed3cd40b6c29cea224b82c114"
     },
     {
       "bytes": 27525,
@@ -21,14 +21,14 @@
     {
       "bytes": 1539,
       "filename": "../../../StartVIASystemManager.ps1",
-      "role": "daily one-paste entrypoint, exact-SHA gate re-locked to integration build R1",
-      "sha256": "37e97407081d573e2b3fe8eca02585c100d5fcd53000db913b203a2751a8e0a4"
+      "role": "daily one-paste entrypoint, exact-SHA gate re-locked to integration build R2",
+      "sha256": "7ceefc2bf1eff26a44b02d089f8269c71a7f2abc71cb6cc8413feebd1c8601e4"
     },
     {
       "bytes": 1539,
       "filename": "../../../StartVIAUnified.ps1",
-      "role": "daily one-paste entrypoint, exact-SHA gate re-locked to integration build R1 (byte-identical to StartVIASystemManager.ps1)",
-      "sha256": "37e97407081d573e2b3fe8eca02585c100d5fcd53000db913b203a2751a8e0a4"
+      "role": "daily one-paste entrypoint, exact-SHA gate re-locked to integration build R2 (byte-identical to StartVIASystemManager.ps1)",
+      "sha256": "7ceefc2bf1eff26a44b02d089f8269c71a7f2abc71cb6cc8413feebd1c8601e4"
     }
   ],
   "governance": {
@@ -41,11 +41,12 @@
     "ui_only_switch": "-UiOnly"
   },
   "integration": {
-    "build": "R1",
+    "build": "R2",
     "completed_at": "2026-07-28",
     "note": "The original 143477-byte AllInOne (sha256 e6155465203591fd34d800a0901099bddf537f2aae04277281a752e2aff48127) was not present in the supplied artifact set. It was reconstructed from the byte-verified audit engine and UI preview using the v0162B repair contract (single-quoted literal here-strings only, placeholder-replacement daily-launcher template, post-generation AST validation, exact-SHA asset verification). Both daily entrypoints were re-locked to the reconstructed launcher's SHA-256.",
     "previous_allinone_sha256": "e6155465203591fd34d800a0901099bddf537f2aae04277281a752e2aff48127",
-    "reconstructed_allinone_sha256": "6c8b513fb79d6ad22a58732cfc05d0a6abc4417749f7dd0f4bfc7d25b082e59d",
+    "r2_fix": "First Windows runtime user test (2026-07-28 15:34, py 3.13.7) exposed an argument-quoting defect: Start-Process joined array arguments without quoting, so the engine path containing spaces ('supportive modules') was split and Python failed with Errno 2. R2 quotes every whitespace-containing argument explicitly and passes one command line. Both daily entrypoints re-locked to the R2 launcher SHA.",
+    "reconstructed_allinone_sha256": "ae3bdbd553ef876675e151390a7008d51b07a5aed3cd40b6c29cea224b82c114",
     "subsystem_anchors": [
       "functional modules/VRN/VRN_Subsystem_Manifest.json",
       "functional modules/VDF/VDF_Subsystem_Manifest.json"

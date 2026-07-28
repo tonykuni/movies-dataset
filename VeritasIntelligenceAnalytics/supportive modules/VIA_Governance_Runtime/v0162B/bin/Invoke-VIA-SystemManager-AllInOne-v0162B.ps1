@@ -1848,11 +1848,24 @@ function Invoke-VIAEngine {
     $stdoutLog = Join-Path -Path $logDir -ChildPath 'engine_stdout.log'
     $stderrLog = Join-Path -Path $logDir -ChildPath 'engine_stderr.log'
 
-    $argumentList = @($Python.Prefix) + @($EnginePath, '--config', $configPath)
+    # Windows paths contain spaces ("supportive modules"); Start-Process joins
+    # array arguments without quoting, so every argument is quoted explicitly
+    # and passed as one command line.
+    $rawArguments = @($Python.Prefix) + @($EnginePath, '--config', $configPath)
+    $quotedArguments = foreach ($argument in $rawArguments) {
+        if ($argument -match '\s') {
+            '"' + $argument + '"'
+        }
+        else {
+            $argument
+        }
+    }
+    $argumentLine = [string]::Join(' ', @($quotedArguments))
     Write-VIAStageLog -Message 'A18: starting engine as detached non-blocking worker process.' -Color Cyan
+    Write-VIAStageLog -Message ('ENGINE CMD : ' + $Python.Path + ' ' + $argumentLine) -Color DarkCyan
     $process = Start-Process `
         -FilePath $Python.Path `
-        -ArgumentList $argumentList `
+        -ArgumentList $argumentLine `
         -WorkingDirectory $RunDir `
         -WindowStyle Hidden `
         -RedirectStandardOutput $stdoutLog `

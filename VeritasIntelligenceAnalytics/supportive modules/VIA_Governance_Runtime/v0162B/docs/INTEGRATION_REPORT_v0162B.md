@@ -1,6 +1,13 @@
 # VIA 整體系統整合收尾報告 · System Integration Completion Report
-**v0162B · Integration Build R1 · 2026-07-28**
+**v0162B · Integration Build R2 · 2026-07-28**
 **Scope 範圍: supportive modules / VRN / VDF**
+
+> **R2 修正 · R2 fix (2026-07-28)** — 第一次 Windows 使用者實測(py 3.13.7)
+> 暴露出參數引號缺陷:`Start-Process` 以陣列傳遞引數時不加引號,含空格的
+> 引擎路徑(`supportive modules`)在空格處被切斷,Python 以 Errno 2 失敗。
+> R2 對所有含空白的引數明確加上引號並以單一命令列傳遞;兩個每日啟動器
+> 已重新鎖定至 R2 啟動器 SHA(`ae3bdbd5…`,102,697 bytes)。引號行為已在
+> PowerShell 7.4.6 以含空格路徑實測驗證。
 
 ## 1. 結論 · Outcome
 
@@ -32,7 +39,7 @@ Verified against the manifest before integration:
 ## 3. 整合作業 · Integration work
 
 1. **AllInOne reconstruction** (`bin/Invoke-VIA-SystemManager-AllInOne-v0162B.ps1`,
-   102,143 bytes, sha256 `6c8b513f…82e59d`), built strictly to the v0162B
+   102,697 bytes, sha256 `ae3bdbd5…82c114` (R2)), built strictly to the v0162B
    repair contract:
    - single-quoted literal here-strings only — zero expandable here-strings
      (the v0162A root cause), verified by token scan;
@@ -47,8 +54,8 @@ Verified against the manifest before integration:
      register-all/import-approved-only.
 2. **SHA gate re-lock**: both `StartVIASystemManager.ps1` and
    `StartVIAUnified.ps1` regenerated from the same template, now gating on the
-   reconstructed launcher's SHA (`6c8b513f…`). Entrypoints remain
-   byte-identical to each other (sha256 `37e97407…`).
+   reconstructed launcher's SHA (`ae3bdbd5…`). Entrypoints remain
+   byte-identical to each other (sha256 `7ceefc2b…`).
 3. **VRN / VDF integration anchors**: `functional modules/VRN` and
    `functional modules/VDF` now carry subsystem manifests registering the
    discovery roots and governance gates (enabled=false draft intake for VRN,
