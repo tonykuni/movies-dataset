@@ -1,6 +1,18 @@
 # VIA 整體系統整合收尾報告 · System Integration Completion Report
-**v0162B · Integration Build R2 · 2026-07-28**
-**Scope 範圍: supportive modules / VRN / VDF**
+**v0162B · Integration Build R2 + VAP · 2026-07-28**
+**Scope 範圍: supportive modules / VRN / VDF / VAP**
+
+> **VAP 整合 · VAP integration (2026-07-28)** — VAP anchor
+> (`functional modules/VAP/VAP_Subsystem_Manifest.json`) 註冊完成,並收入
+> 兩件 canonical 產物:Chart & Layout Spec ONE 獨立規範套件
+> (`spec/`,sha256 `dc416087…`,8,132,473 bytes;VISUAL LOCK 線粗 1 ·
+> 透明度 0.75 · 軸距 2/2.5/5/10 已寫入 anchor 治理)與 Intelligence
+> Platform v0162C UI 預覽(`ui/`,sha256 `377f7f09…`,91,026 bytes)。
+> 引擎 v0162B 原生探索 VAP root(SYSTEM_MANAGER_CONTRACT 已含 VAP),
+> 三輪實跑重新執行:subsystems = VRN / VDF / VAP / SUPPORTIVE,
+> 15 files analyzed · 15 GREEN · 0 YELLOW · 0 RED · 0 Hydra · 56 functions,
+> 閘門仍為 GREEN。兩個 VAP HTML 帶 UTF-8 BOM,引擎僅於 sandbox 產生
+> 正規化候選(CANDIDATE_ONLY_NO_CANONICAL_MUTATION),canonical 未動。
 
 > **R2 修正 · R2 fix (2026-07-28)** — 第一次 Windows 使用者實測(py 3.13.7)
 > 暴露出參數引號缺陷:`Start-Process` 以陣列傳遞引數時不加引號,含空格的
