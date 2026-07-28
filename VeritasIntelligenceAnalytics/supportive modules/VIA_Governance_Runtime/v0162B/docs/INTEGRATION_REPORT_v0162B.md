@@ -2,7 +2,8 @@
 **v0162B · Integration Build R2 + VAP · 2026-07-28**
 **Scope 範圍: supportive modules / VRN / VDF / VAP**
 
-> **VAP 整合 · VAP integration (2026-07-28)** — VAP anchor
+> **VAP 整合 · VAP integration (2026-07-28)** — VAP(**VeritasAutoPlot**,
+> VIA 視覺功能管理:icons / templates / 繪圖)anchor
 > (`functional modules/VAP/VAP_Subsystem_Manifest.json`) 註冊完成,並收入
 > 兩件 canonical 產物:Chart & Layout Spec ONE 獨立規範套件
 > (`spec/`,sha256 `dc416087…`,8,132,473 bytes;VISUAL LOCK 線粗 1 ·
