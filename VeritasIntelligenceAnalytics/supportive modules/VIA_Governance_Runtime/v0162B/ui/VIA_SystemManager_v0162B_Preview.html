@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=3,user-scalable=yes">
+<title>VIA · Unified Workbench</title>
+
+<style>
+:root{
+ --bg:#f5f4f0;--paper:#fff;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--up:#c96b5a;--down:#5a9e6f;--blue:#4c78a8;--teal:#439a9a;
+ --am:#c4943a;--vi:#7a6daa;--sidebar:#f8f7f3;
+ --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%)
+}
+*{box-sizing:border-box;margin:0;padding:0}html,body{min-height:100%}
+body{background:#f5f4f0;color:#33403f;font:10px/1.45 "Microsoft JhengHei","Segoe UI",Arial,sans-serif}
+.topbar{position:fixed;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#4c78a8,#439a9a,#7fae6f,#c9b05a,#c96b5a,#a05a86);z-index:100}
+.sidebar{position:fixed;top:4px;left:0;bottom:0;width:244px;background:#f8f7f3;border-right:1px solid #dbd9d3;padding:17px 13px;overflow:auto;z-index:60}
+.brand{padding:3px 6px 14px;border-bottom:2px solid #1e1d1a}
+.brand .k{font:700 7.5px Consolas,monospace;letter-spacing:1.4px;color:#6b6860;text-transform:uppercase}
+.brand h2{margin-top:7px;font-size:17px;line-height:1.15;color:#1e1d1a}.brand h2 span{color:#439a9a}
+.brand p{margin-top:5px;font-size:9px;color:#6b6860}
+.group{margin-top:16px}.groupTitle{margin:0 6px 5px;font:700 7px Consolas,monospace;color:#9c9890;letter-spacing:1.1px;text-transform:uppercase}
+.nav button{display:block;width:100%;text-align:left;margin-bottom:3px;border:1px solid transparent;border-radius:4px;background:transparent;color:#33403f;padding:7px 8px;font:700 8px Consolas,monospace;cursor:pointer}
+.nav button:hover{background:#fff;border-color:#dbd9d3}.nav button.active{background:#1e1d1a;color:#fff;border-color:#1e1d1a}
+.nav .n{display:inline-block;min-width:23px;color:#9c9890}.nav button.active .n{color:#fff}
+.sideMetrics{margin-top:15px;border-top:1px solid #dbd9d3;padding-top:10px}.sm{display:flex;justify-content:space-between;gap:7px;padding:4px 3px;border-bottom:1px solid #ecebe6}
+.sm .k{font:700 7px Consolas,monospace;color:#6b6860}.sm .v{max-width:125px;text-align:right;overflow-wrap:anywhere;font:700 7.5px Consolas,monospace;color:#1e1d1a}
+.workspace{margin-left:244px;min-height:100vh}.inner{max-width:1380px;margin:0 auto;padding:0 20px 52px}
+header{padding:20px 0 8px;margin-bottom:10px;border-bottom:2px solid #1e1d1a}
+.kicker{font:700 9px Consolas,monospace;letter-spacing:2px;color:#6b6860;text-transform:uppercase;margin-bottom:6px}
+h1{font-size:19px;line-height:1.2;color:#1e1d1a}h1 span{color:#439a9a}.sub{margin-top:5px;color:#6b6860;font-size:9.5px}
+.page{display:none}.page.active{display:block}
+.hero{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 3px}.card{background:#fff;border:1px solid #dbd9d3;border-radius:5px;padding:9px 13px;min-width:115px}
+.card .v{font-size:17px;font-weight:800;color:#1e1d1a;line-height:1;overflow-wrap:anywhere}.card .l{font:600 7px Consolas,monospace;color:#6b6860;text-transform:uppercase;margin-top:4px}
+h2{font-size:12.5px;color:#1e1d1a;margin:22px 0 7px;padding-bottom:5px;border-bottom:1px solid #dbd9d3}
+h2 .en{font:600 7.5px Consolas,monospace;color:#9c9890;letter-spacing:.8px;margin-left:7px;text-transform:uppercase}
+.panel{background:#fff;border:1px solid #dbd9d3;border-radius:6px;padding:12px 14px;margin-top:9px}
+.homePanel{border-left:3px solid #439a9a}.vrnPanel{border-left:3px solid #c96b5a}.vdfPanel{border-left:3px solid #4c78a8}
+.matrixPanel{border-left:3px solid #7a6daa}.riskPanel{border-left:3px solid #c4943a}.registryPanel{border-left:3px solid #5a9e6f}.logPanel{border-left:3px solid #1e1d1a}
+.columns{display:flex;gap:11px;align-items:flex-start}.mainColumn{flex:1;min-width:0}.asideColumn{width:360px;min-width:320px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.full{grid-column:1/3}.field{border-bottom:1px solid #ecebe6;padding:7px 0}
+label{display:block;font:700 7.5px Consolas,monospace;color:#6b6860;text-transform:uppercase;margin-bottom:4px}
+.row{display:flex;align-items:center;gap:5px}input[type=text],input[type=number],select{width:100%;border:1px solid #dbd9d3;border-radius:4px;padding:6px 8px;background:#fafaf8;color:#33403f;font:500 9px Consolas,monospace}
+input:focus,select:focus{outline:1px solid #439a9a;border-color:#439a9a}.check{display:flex;align-items:center;gap:6px;min-height:27px}
+button{border:1px solid #dbd9d3;border-radius:4px;padding:6px 9px;background:#fff;color:#33403f;font:700 7.5px Consolas,monospace;cursor:pointer}
+button:hover{background:#fafaf8}button.primary{color:#fff;background:#439a9a;border-color:#439a9a}button.vrn{color:#fff;background:#c96b5a;border-color:#c96b5a}
+button.vdf{color:#fff;background:#4c78a8;border-color:#4c78a8}button.all{color:#fff;background:#1e1d1a;border-color:#1e1d1a}button:disabled{opacity:.45}
+.actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}.hint{color:#6b6860;font-size:8.5px;margin-top:4px}
+.drop{border:1px dashed #9c9890;border-radius:5px;background:#fafaf8;padding:15px;text-align:center;color:#6b6860}
+.drop.active{border-color:#439a9a;background:#eef7f5}.drop b{display:block;color:#1e1d1a;font-size:10.5px}.drop span{display:block;margin-top:3px;font-size:8.5px}
+.queue{margin-top:9px;border:1px solid #dbd9d3;border-radius:4px;max-height:330px;overflow:auto}.queueItem{display:flex;justify-content:space-between;gap:8px;padding:6px 8px;border-bottom:1px solid #ecebe6;font:500 8px Consolas,monospace}
+.progressOuter{height:9px;background:#ecebe6;border-radius:3px;overflow:hidden;margin-top:11px}.progressInner{height:100%;width:0%;background:linear-gradient(90deg,#4c78a8,#439a9a,#7fae6f,#c9b05a,#c96b5a,#a05a86)}
+.status{display:grid;grid-template-columns:118px 1fr;gap:4px 9px;margin-top:10px}.k{font:700 7.5px Consolas,monospace;color:#6b6860;text-transform:uppercase}.code{font-family:Consolas,monospace;overflow-wrap:anywhere}
+.pill{display:inline-block;font:700 7px Consolas,monospace;color:#fff;border-radius:3px;padding:2px 6px}.ok{background:#5a9e6f}.warn{background:#c4943a}.bad{background:#c96b5a}.mut{background:#9c9890}
+.frameWrap{margin-top:9px;border:1px solid #dbd9d3;background:#fafaf8;min-height:650px}.frameWrap iframe{display:block;width:100%;height:650px;border:0;background:#fff}
+.empty{padding:80px 20px;text-align:center;color:#6b6860}.empty b{display:block;color:#1e1d1a;font-size:13px;margin-bottom:5px}
+.viewerTop{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap}.viewerPath{color:#6b6860;font:500 8px Consolas,monospace;overflow-wrap:anywhere;margin-top:5px}
+.registryGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.registryCard{border:1px solid #dbd9d3;border-radius:5px;background:#fafaf8;padding:10px;min-height:78px}
+.registryCard .l{font:700 7px Consolas,monospace;color:#6b6860;text-transform:uppercase}.registryCard .v{margin-top:6px;color:#1e1d1a;font:700 9px/1.4 Consolas,monospace;overflow-wrap:anywhere}
+.log{background:#f8f8f5;color:#33403f;border:1px solid #dbd9d3;border-radius:4px;padding:9px;min-height:520px;max-height:700px;overflow:auto;white-space:pre-wrap;font:500 8px/1.5 Consolas,monospace}
+.accelGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.accel{border:1px solid #dbd9d3;border-radius:4px;padding:8px;background:#fafaf8}.accel b{display:block;color:#1e1d1a;font:700 8px Consolas,monospace}.accel span{display:block;color:#6b6860;font-size:8px;margin-top:3px}
+.footer{margin-top:13px;color:#9c9890;font:500 7.5px Consolas,monospace}
+@media(max-width:1050px){.sidebar{width:205px}.workspace{margin-left:205px}.columns{display:block}.asideColumn{width:auto;min-width:0}.grid{grid-template-columns:1fr}.full{grid-column:auto}.registryGrid,.accelGrid{grid-template-columns:1fr 1fr}}
+
+/* VIA v0162B · proportional bilingual responsive lock */
+html{-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
+body{
+ font-family:"Microsoft JhengHei","Segoe UI",Arial,sans-serif!important;
+ font-size:clamp(15px,1.05vw,17px)!important;
+ line-height:1.62!important;
+ letter-spacing:.006em
+}
+.sidebar{width:clamp(220px,17vw,248px)!important;padding:17px 13px!important}
+.workspace{margin-left:clamp(220px,17vw,248px)!important}
+.inner{max-width:1380px!important;padding:0 clamp(14px,2vw,24px) 48px!important}
+.brand h2{font-size:clamp(24px,2vw,29px)!important;font-weight:800!important}
+.brand p{font-size:clamp(12px,.95vw,14px)!important;font-weight:500!important}
+.kicker{font-size:clamp(11px,.85vw,13px)!important;font-weight:600!important}
+h1{font-size:clamp(27px,3vw,36px)!important;font-weight:800!important;line-height:1.2!important}
+.sub{font-size:clamp(14px,1vw,16px)!important;font-weight:500!important}
+h2{font-size:clamp(20px,1.8vw,24px)!important;font-weight:800!important}
+h2 .en{font-size:clamp(11px,.85vw,13px)!important;font-weight:500!important}
+.hero{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:9px!important}
+.card{min-width:0!important;padding:12px 14px!important}
+.card .v{font-size:clamp(23px,2.2vw,29px)!important;font-weight:700!important}
+.card .l{font-size:clamp(10.5px,.82vw,12px)!important;font-weight:600!important}
+.nav button{font-size:clamp(12px,.95vw,14px)!important;min-height:43px!important;font-weight:600!important}
+.nav button.active{font-weight:800!important}
+.panel{padding:clamp(14px,1.5vw,18px)!important}
+label{font-size:clamp(12px,.9vw,14px)!important;font-weight:700!important}
+input[type=text],input[type=number],select{font-size:clamp(15px,1vw,17px)!important;min-height:44px!important}
+button{font-size:clamp(14px,.95vw,16px)!important;min-height:44px!important;font-weight:700!important}
+.hint,.queueItem,.viewerPath,.registryCard .v{font-size:clamp(13px,.92vw,15px)!important;line-height:1.58!important}
+.k,.registryCard .l{font-size:clamp(11px,.8vw,13px)!important;font-weight:700!important}
+.code,.log{font-size:clamp(13px,.92vw,15px)!important;line-height:1.65!important}
+.registryGrid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+.registryCard{min-width:0!important}.registryCard .v{overflow-wrap:anywhere!important;word-break:break-word!important}
+.page.active{min-height:0!important}
+@keyframes viaFadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+@keyframes viaShimmer{from{left:-45%}to{left:110%}}
+@keyframes viaPulse{0%,100%{box-shadow:0 0 0 0 rgba(196,148,58,.10)}50%{box-shadow:0 0 0 6px rgba(196,148,58,.08)}}
+.page.active{animation:viaFadeUp .26s ease-out both}
+.panel,.card,.registryCard,.accel,.nav button,button,input,select{transition:transform .16s ease,box-shadow .18s ease,border-color .18s ease,background-color .18s ease}
+.panel:hover,.card:hover,.registryCard:hover,.accel:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(30,29,26,.08)}
+button:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(30,29,26,.11)}
+button:active{transform:scale(.985)}
+.progressInner{position:relative!important;overflow:hidden!important;transition:width .45s cubic-bezier(.2,.8,.2,1)!important}
+.progressInner:after{content:"";position:absolute;top:0;bottom:0;width:38%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.62),transparent);animation:viaShimmer 1.25s linear infinite}
+.pill.warn{animation:viaPulse 1.8s ease-in-out infinite}
+@media(max-width:1050px){
+ .hero{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+ .registryGrid,.accelGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:760px){
+ body{font-size:18px!important;line-height:1.68!important}
+ .sidebar{position:relative!important;top:auto!important;bottom:auto!important;width:100%!important;max-height:none!important;border-right:0!important;border-bottom:1px solid #dbd9d3!important}
+ .workspace{margin-left:0!important}.inner{padding:0 12px 36px!important}
+ .nav{display:grid!important;grid-template-columns:1fr 1fr!important;gap:7px!important}
+ .nav button{font-size:15px!important;min-height:50px!important;margin:0!important}
+ .sideMetrics{display:grid!important;grid-template-columns:1fr 1fr!important}
+ .hero{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .columns{display:block!important}.asideColumn{width:auto!important;min-width:0!important}.grid{grid-template-columns:1fr!important}
+ .actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:9px!important}
+ .actions button{font-size:16px!important;min-height:50px!important;width:100%!important}
+ input[type=text],input[type=number],select{font-size:18px!important;min-height:50px!important}
+ .registryGrid,.accelGrid{grid-template-columns:1fr!important}
+ .panel:hover,.card:hover,.registryCard:hover,.accel:hover{transform:none;box-shadow:none}
+}
+@media(max-width:430px){.nav,.hero,.actions,.sideMetrics{grid-template-columns:1fr!important}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+</style>
+<script>
+function byId(id){
+ return document.getElementById(id);
+}
+function switchPage(name){
+ var names=[
+  "home","vrn","vdf","basic","financial",
+  "matrix","risk","registry","deploy","logs"
+ ];
+ for(var i=0;i<names.length;i++){
+  var page=names[i];
+  byId("page-"+page).className=
+   "page"+(page===name?" active":"");
+  byId("nav-"+page).className=
+   page===name?"active":"";
+ }
+}
+window.onload=function(){
+ switchPage("home");
+};
+</script>
+</head>
+<body>
+<div class="topbar"></div>
+<aside class="sidebar">
+<div class="brand"><div class="k">VERITAS INTELLIGENCE ANALYTICS</div><h2>Unified <span>Workbench</span></h2><p>VRN · VDF · VAP · Others · v0162B</p></div>
+<div class="group"><div class="groupTitle">Operations</div><div class="nav">
+<button id="nav-home" onclick="switchPage('home')"><span class="n">01</span>HOME · LAUNCH</button>
+<button id="nav-vrn" onclick="switchPage('vrn')"><span class="n">02</span>VRN INPUT</button>
+<button id="nav-vdf" onclick="switchPage('vdf')"><span class="n">03</span>VDF INPUT</button>
+<button id="nav-basic" onclick="switchPage('basic')"><span class="n">04</span>BASIC INFO</button>
+<button id="nav-financial" onclick="switchPage('financial')"><span class="n">05</span>FINANCIAL DATA</button>
+</div></div>
+<div class="group"><div class="groupTitle">Governance Matrix</div><div class="nav">
+<button id="nav-matrix" onclick="switchPage('matrix')"><span class="n">06</span>3-ROUND MATRIX</button>
+<button id="nav-risk" onclick="switchPage('risk')"><span class="n">07</span>HYDRA / SSOT</button>
+<button id="nav-registry" onclick="switchPage('registry')"><span class="n">08</span>REGISTRY</button>
+<button id="nav-deploy" onclick="switchPage('deploy')"><span class="n">09</span>DEPLOYMENT</button>
+<button id="nav-logs" onclick="switchPage('logs')"><span class="n">10</span>EXECUTION LOGS</button>
+</div></div>
+<div class="sideMetrics">
+<div class="sm"><div class="k">STATE</div><div id="sideState" class="v">READY</div></div>
+<div class="sm"><div class="k">PROGRESS</div><div id="sideProgress" class="v">0%</div></div>
+<div class="sm"><div class="k">VRN FILES</div><div id="sideVrn" class="v">0</div></div>
+<div class="sm"><div class="k">VDF FILES</div><div id="sideVdf" class="v">0</div></div>
+<div class="sm"><div class="k">GATE</div><div id="sideGate" class="v">—</div></div>
+</div>
+<div style="margin-top:13px"><button style="width:100%" onclick="window.close()">CLOSE WORKBENCH</button></div>
+</aside>
+<div class="workspace"><div class="inner">
+<header><div class="kicker">AUTOMATIC SANDBOX TEST & REPAIR · 20 ACCELERATORS · THREE ROUNDS</div><h1 id="pageTitle">統一首頁 · 啟動與摘要</h1><p id="pageSubtitle" class="sub">Unified launch, progress and 20 accelerators</p></header>
+
+<section id="page-home" class="page active">
+<div class="hero">
+<div class="card"><div id="summaryProgress" class="v">0%</div><div class="l">PROGRESS</div></div>
+<div class="card"><div id="summaryRound" class="v">0/3</div><div class="l">ROUND</div></div>
+<div class="card"><div id="files" class="v">—</div><div class="l">FILES</div></div>
+<div class="card"><div id="green" class="v" style="color:#5a9e6f">—</div><div class="l">GREEN</div></div>
+<div class="card"><div id="yellow" class="v" style="color:#c4943a">—</div><div class="l">YELLOW</div></div>
+<div class="card"><div id="red" class="v" style="color:#c96b5a">—</div><div class="l">RED</div></div>
+<div class="card"><div id="hydra" class="v">—</div><div class="l">HYDRA</div></div>
+<div class="card"><div id="repairs" class="v">—</div><div class="l">SANDBOX CANDIDATES</div></div>
+<div class="card" style="min-width:285px"><div id="summaryGate" class="v" style="font:700 8px/1.3 Consolas,monospace">—</div><div class="l">LATEST GATE</div></div>
+</div>
+<div class="columns">
+<div class="mainColumn">
+<h2>Unified Runtime <span class="en">one PowerShell · one HTML UI</span></h2>
+<div class="panel homePanel"><div class="grid">
+<div class="field full"><label>Base · VIA 母系統</label><div class="row"><input id="base" type="text"><button onclick="browseFolder('base')">WINDOWS SEARCH</button></div></div>
+<div class="field full"><label>Python Engine</label><div class="row"><input id="python" type="text"><button onclick="browseFile('python')">SEARCH</button></div></div>
+<div class="field"><label>Timeout Seconds</label><input id="timeout" type="number" min="60" max="86400" step="60"></div>
+<div class="field"><label>Sandbox Auto-Fix</label><div class="check"><input id="autoFix" type="checkbox"><span>只修 sandbox copy</span></div></div>
+<div class="field"><label>Open Matrix HTML</label><div class="check"><input id="openHtml" type="checkbox"><span>完成後開啟報告</span></div></div>
+<div class="field"><label>Canonical Mutation</label><div class="check"><span class="pill bad">BLOCKED</span><span>需另行 hash-locked promotion</span></div></div>
+</div></div>
+<h2>20 Accelerators <span class="en">all enabled with explicit implementation mode</span></h2>
+<div class="accelGrid">
+<div class="accel"><b>A01–A05</b><span>AST · semantic tags · Hydra · topology · sandbox</span></div>
+<div class="accel"><b>A06–A10</b><span>repair suggestions · 3 rounds · SSOT · matrix · clustering</span></div>
+<div class="accel"><b>A11–A15</b><span>complexity · multi-system · rollback · regression · repair order</span></div>
+<div class="accel"><b>A16–A20</b><span>progress · narration · non-blocking · engines · runtime deploy</span></div>
+</div>
+</div>
+<div class="asideColumn">
+<h2>One-Click Actions <span class="en">non-blocking workers</span></h2>
+<div class="panel homePanel">
+<div class="actions">
+<button id="runAll" class="all" onclick="startAction('ALL')">LAUNCH ALL</button>
+<button id="runAnalysis" class="primary" onclick="startAction('UNIFIED')">3-ROUND ANALYSIS</button>
+<button id="runVrn" class="vrn" onclick="startAction('VRN')">RUN VRN</button>
+<button id="runVdf" class="vdf" onclick="startAction('VDF')">RUN VDF</button>
+<button id="openRun" disabled onclick="openPath(this)">OPEN RUNDIR</button>
+</div>
+<div class="progressOuter"><div id="bar" class="progressInner"></div></div>
+<div class="hint" style="margin:0 0 10px"><b>AUTO MODE · 自動模式：</b>本啟動器預設在 UI 載入後自動執行 LAUNCH ALL；使用 <span class="code">-UiOnly</span> 可只開啟介面。</div>
+<div class="status">
+<div class="k">STATE</div><div id="state"><span class="pill mut">READY</span></div>
+<div class="k">NARRATION</div><div id="narration">等待操作。</div>
+<div class="k">VRN GATE</div><div id="vrnGate" class="code">—</div>
+<div class="k">VDF GATE</div><div id="vdfGate" class="code">—</div>
+<div class="k">RUNDIR</div><div id="runDirPath" class="code">—</div>
+</div>
+</div>
+</div></div>
+</section>
+
+<section id="page-vrn" class="page"><h2>VRN Research Intake <span class="en">reports + manifest + disabled drafts</span></h2>
+<div class="panel vrnPanel"><div class="grid">
+<div class="field full"><label>VRN Input</label><div class="row"><input id="vrnInput" type="text"><button onclick="browseFolder('vrnInput')">SEARCH</button></div></div>
+<div class="field full"><label>VRN Manifest</label><div class="row"><input id="vrnManifest" type="text"><button onclick="browseFile('vrnManifest')">SEARCH</button></div></div>
+</div>
+<div id="vrnDrop" class="drop"><b>拖曳投資研究報告</b><span>PDF / Word / Excel / HTML / JSON / TXT</span></div>
+<div class="actions"><button onclick="addSources('vrn')">SELECT REPORTS</button><button onclick="addFolder('vrn')">SELECT FOLDER</button><button onclick="vrnSources=[];renderQueues()">CLEAR</button><span id="vrnCount" class="pill mut">0</span></div>
+<div id="vrnQueue" class="queue"></div><div class="hint">VRN 延續 v0159/v0156 治理：新增資料只產生 enabled=false draft，不自動 promotion。</div></div></section>
+
+<section id="page-vdf" class="page"><h2>VDF Data Forge <span class="en">data sources + market facts</span></h2>
+<div class="panel vdfPanel"><div class="grid">
+<div class="field full"><label>VDF Input</label><div class="row"><input id="vdfInput" type="text"><button onclick="browseFolder('vdfInput')">SEARCH</button></div></div>
+<div class="field"><label>Start Date</label><input id="startDate" type="text" placeholder="yyyy-mm-dd"></div>
+<div class="field"><label>End Date</label><input id="endDate" type="text" placeholder="blank = open"></div>
+<div class="field full"><label>Universe / Tickers</label><input id="universe" type="text" value="DEFAULT"></div>
+<div class="field"><label>Update Mode</label><select id="updateMode"><option>Incremental</option><option>Refresh</option><option>ValidateOnly</option><option>DryRun</option></select></div>
+</div>
+<div id="vdfDrop" class="drop"><b>拖曳 VDF 資料來源</b><span>CSV / Excel / JSON / Parquet / DuckDB / SQLite</span></div>
+<div class="actions"><button onclick="addSources('vdf')">SELECT DATA FILES</button><button onclick="addFolder('vdf')">SELECT FOLDER</button><button onclick="vdfSources=[];renderQueues()">CLEAR</button><span id="vdfCount" class="pill mut">0</span></div>
+<div id="vdfQueue" class="queue"></div></div></section>
+
+<section id="page-basic" class="page"><h2>Basic Info <span class="en">VDF primary output</span></h2><div class="panel vdfPanel"><div class="viewerTop"><div><span class="pill" style="background:#4c78a8">BASIC INFO</span><div id="basicPath" class="viewerPath"></div></div><div class="actions"><button onclick="loadView('basic')">RELOAD</button><button onclick="openView('basic')">OPEN EXTERNAL</button></div></div><div class="frameWrap"><div id="basicEmpty" class="empty"><b>尚未找到 Basic Info HTML</b>執行 VDF 或 Launch All 後自動更新。</div><iframe id="basicFrame" style="display:none"></iframe></div></div></section>
+<section id="page-financial" class="page"><h2>Financial Data <span class="en">VDF primary output</span></h2><div class="panel matrixPanel"><div class="viewerTop"><div><span class="pill" style="background:#7a6daa">FINANCIAL DATA</span><div id="financialPath" class="viewerPath"></div></div><div class="actions"><button onclick="loadView('financial')">RELOAD</button><button onclick="openView('financial')">OPEN EXTERNAL</button></div></div><div class="frameWrap"><div id="financialEmpty" class="empty"><b>尚未找到 Financial Data HTML</b>執行 VDF 或 Launch All 後自動更新。</div><iframe id="financialFrame" style="display:none"></iframe></div></div></section>
+
+<section id="page-matrix" class="page"><h2>Three-Round HTML Matrix <span class="en">small font · auto layout · wrap</span></h2><div class="panel matrixPanel"><div class="viewerTop"><div><span class="pill" style="background:#7a6daa">MATRIX</span><div id="matrixPath" class="viewerPath"></div></div><div class="actions"><button onclick="loadView('matrix')">RELOAD</button><button onclick="openView('matrix')">OPEN EXTERNAL</button></div></div><div class="frameWrap"><div id="matrixEmpty" class="empty"><b>尚未執行三輪分析</b>按首頁 3-ROUND ANALYSIS 或 LAUNCH ALL。</div><iframe id="matrixFrame" style="display:none"></iframe></div></div></section>
+<section id="page-risk" class="page"><h2>Hydra / SSOT Matrix <span class="en">risk and authority alignment</span></h2><div class="panel riskPanel"><div class="hero"><div class="card"><div id="ssot" class="v">—</div><div class="l">SSOT GROUPS</div></div><div class="card"><div id="hydra2" class="v">see report</div><div class="l">HYDRA DETAILS</div></div></div><div class="viewerTop"><div><div id="riskPath" class="viewerPath"></div></div><div class="actions"><button onclick="loadView('risk')">RELOAD</button><button onclick="openView('risk')">OPEN EXTERNAL</button></div></div><div class="frameWrap"><div id="riskEmpty" class="empty"><b>Hydra / SSOT 尚未產生</b>三輪分析完成後顯示。</div><iframe id="riskFrame" style="display:none"></iframe></div></div></section>
+
+<section id="page-registry" class="page"><h2>Registry <span class="en">MODULE / ENGINE / FUNCTION-LIB / OTHERS</span></h2><div class="panel registryPanel">
+<div class="registryGrid">
+<div class="registryCard"><div class="l">LIBRARIES · 函式庫</div><div id="libraryRegistry" class="v">—</div></div>
+<div class="registryCard"><div class="l">FUNCTIONS · 函式／類別</div><div id="functionRegistry" class="v">—</div></div>
+<div class="registryCard"><div class="l">SUPPORTIVE MODULES · 支援模組</div><div id="supportiveRegistry" class="v">—</div></div>
+<div class="registryCard"><div class="l">SSOT · 單一事實來源</div><div id="ssotRegistry" class="v">—</div></div>
+<div class="registryCard"><div class="l">VRN REPORT</div><div id="vrnReport" class="v">—</div></div>
+<div class="registryCard"><div class="l">FILES</div><div id="files2" class="v">See matrix</div></div>
+<div class="registryCard"><div class="l">IMPORT POLICY</div><div class="v">REGISTER ALL / IMPORT APPROVED</div></div>
+</div><div class="hint">所有函式庫皆建立 inventory；不盲目 import 或執行未知模組。功能擴充以 sandbox candidate 與 extension matrix 呈現。</div></div></section>
+
+<section id="page-deploy" class="page"><h2>Deployment <span class="en">runtime automatic · canonical review-only</span></h2><div class="panel registryPanel">
+<div class="registryGrid">
+<div class="registryCard"><div class="l">RUNTIME DEPLOYMENT</div><div class="v">AUTOMATIC</div></div>
+<div class="registryCard"><div class="l">CANONICAL MUTATION</div><div class="v" style="color:#c96b5a">BLOCKED</div></div>
+<div class="registryCard"><div class="l">REPAIR CANDIDATES</div><div id="repairs2" class="v">See summary</div></div>
+<div class="registryCard"><div class="l">DEPLOYMENT MANIFEST</div><div id="deploymentManifest" class="v">—</div></div>
+</div><div class="hint">沙盒修正通過回歸後只列為 deployment candidate；真正寫回 VRN/VDF/VAP canonical 必須另開單程序、exact-hash、backup、hash-chain transaction。</div></div></section>
+
+<section id="page-logs" class="page"><h2>Execution Logs <span class="en">dynamic status narration</span></h2><div class="panel logPanel"><div class="actions"><button onclick="byId('log').innerText='VIA Unified Workbench ready.'">CLEAR DISPLAY</button></div><div id="log" class="log">VIA Unified Workbench ready.</div></div></section>
+<div class="footer">VIA Unified Workbench v0162B · one PowerShell · one HTML U/I · exactly three rounds · sandbox repair only · runtime auto-deploy · 理</div>
+</div></div>
+</body></html>

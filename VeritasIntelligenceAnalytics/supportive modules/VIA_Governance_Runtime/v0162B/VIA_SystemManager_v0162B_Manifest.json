@@ -1,0 +1,95 @@
+{
+  "artifacts": [
+    {
+      "bytes": 102697,
+      "filename": "bin/Invoke-VIA-SystemManager-AllInOne-v0162B.ps1",
+      "role": "single corrected System Manager PowerShell (integration build R2, reconstructed from audit copies)",
+      "sha256": "ae3bdbd553ef876675e151390a7008d51b07a5aed3cd40b6c29cea224b82c114"
+    },
+    {
+      "bytes": 27525,
+      "filename": "ui/VIA_SystemManager_v0162B_Preview.html",
+      "role": "browser-safe UI preview",
+      "sha256": "4f653c4ac04df2612364804cfca5a203c868cecffdeb8bbfbf0635cbd1064152"
+    },
+    {
+      "bytes": 56185,
+      "filename": "engine/via_system_manager_engine_v0162B.py",
+      "role": "audit copy of embedded Python engine",
+      "sha256": "4d6c983761bf2a09b9cea423813d0aafb393c5a639559e531eb20a3ab0dd4426"
+    },
+    {
+      "bytes": 1539,
+      "filename": "../../../StartVIASystemManager.ps1",
+      "role": "daily one-paste entrypoint, exact-SHA gate re-locked to integration build R2",
+      "sha256": "7ceefc2bf1eff26a44b02d089f8269c71a7f2abc71cb6cc8413feebd1c8601e4"
+    },
+    {
+      "bytes": 9315,
+      "filename": "bin/Invoke-VIA-Promotion-Transaction-v0162B.ps1",
+      "role": "canonical promotion transaction · the separate hash-locked operator-reviewed path required by the VRN/VDF/VAP promotion gates (operator review → exact-hash gate → backup → hash-chain ledger)",
+      "sha256": "74e3407e3cd48d4bdc189016510ebea6f9d4a82b2bb90e560b488a82cec1db01"
+    },
+    {
+      "bytes": 1539,
+      "filename": "../../../StartVIAUnified.ps1",
+      "role": "daily one-paste entrypoint, exact-SHA gate re-locked to integration build R2 (byte-identical to StartVIASystemManager.ps1)",
+      "sha256": "7ceefc2bf1eff26a44b02d089f8269c71a7f2abc71cb6cc8413feebd1c8601e4"
+    }
+  ],
+  "governance": {
+    "blind_import_all": false,
+    "default_mode": "AUTO_LAUNCH_ALL",
+    "network_install": false,
+    "project_canonical_mutation": false,
+    "sandbox_repair_only": true,
+    "stop_process": false,
+    "ui_only_switch": "-UiOnly"
+  },
+  "integration": {
+    "build": "R2",
+    "completed_at": "2026-07-28",
+    "note": "The original 143477-byte AllInOne (sha256 e6155465203591fd34d800a0901099bddf537f2aae04277281a752e2aff48127) was not present in the supplied artifact set. It was reconstructed from the byte-verified audit engine and UI preview using the v0162B repair contract (single-quoted literal here-strings only, placeholder-replacement daily-launcher template, post-generation AST validation, exact-SHA asset verification). Both daily entrypoints were re-locked to the reconstructed launcher's SHA-256.",
+    "previous_allinone_sha256": "e6155465203591fd34d800a0901099bddf537f2aae04277281a752e2aff48127",
+    "r2_fix": "First Windows runtime user test (2026-07-28 15:34, py 3.13.7) exposed an argument-quoting defect: Start-Process joined array arguments without quoting, so the engine path containing spaces ('supportive modules') was split and Python failed with Errno 2. R2 quotes every whitespace-containing argument explicitly and passes one command line. Both daily entrypoints re-locked to the R2 launcher SHA.",
+    "reconstructed_allinone_sha256": "ae3bdbd553ef876675e151390a7008d51b07a5aed3cd40b6c29cea224b82c114",
+    "subsystem_anchors": [
+      "functional modules/VRN/VRN_Subsystem_Manifest.json",
+      "functional modules/VDF/VDF_Subsystem_Manifest.json",
+      "functional modules/VAP/VAP_Subsystem_Manifest.json"
+    ],
+    "vap_integration": {
+      "completed_at": "2026-07-28",
+      "subsystem_name": "VeritasAutoPlot (VAP) · VIA visual function management: icons / templates / plotting",
+      "note": "VAP anchor registered with supplied canonical artifacts: Chart & Layout Spec ONE standalone suite (sha256 dc416087f0b8ee2ad44dc08d7efbfb26a42de5c2db068891c5c4d7339a88dd4f, 8132473 bytes) and Intelligence Platform v0162C UI preview (sha256 377f7f0904d9832a26269714585b29846c4fed2c2f17f129a40d4475b9da9909, 91026 bytes). Visual lock governance (line width 1, opacity 0.75, axis steps 2/2.5/5/10) recorded in the anchor. Engine v0162B discovers the root natively (SYSTEM_MANAGER_CONTRACT subsystems already include VAP); live three-round run re-executed with VAP present.",
+      "artifacts": [
+        "functional modules/VAP/spec/VIA_Chart_Layout_Spec_ONE_Standalone.html",
+        "functional modules/VAP/ui/VIA_Intelligence_Platform_v0162C.html"
+      ]
+    }
+  },
+  "observed_failure": "Generated Start-VIA-SystemManager.ps1 failed Microsoft PowerShell AST validation.",
+  "qa": {
+    "embedded_asset_roundtrip": "PASS (engine and workbench here-strings materialize byte-identical; qa/evidence/powershell_ast_qa_results.json)",
+    "embedded_hta_javascript_node_check": "PASS (node --check on preview script blocks)",
+    "embedded_python_compile": "PASS (python3.11 py_compile)",
+    "engine_three_round_run": "PASS · gate UNIFIED_SANDBOX_GREEN_RUNTIME_DEPLOYED_NO_CANONICAL_MUTATION (qa/evidence/engine_run_final_summary.json)",
+    "expandable_here_string_scan": "PASS (0 expandable here-strings; v0162A root cause remains absent)",
+    "materialized_daily_launcher_structural_scan": "PASS",
+    "powerShell_structural_scan": "PASS",
+    "windows_generated_daily_ast": "PASS on PowerShell 7.4.6 Microsoft parser (Linux); re-runs inside Install-VIAEntrypoints with detailed parse-error output on Windows.",
+    "windows_main_ast": "PASS on PowerShell 7.4.6 Microsoft parser (Linux); re-runs in the supplied exact-SHA one-paste gate on Windows.",
+    "windows_runtime_user_test": "REQUIRED"
+  },
+  "repair": {
+    "daily_and_compatibility_launchers_share_validated_template": true,
+    "expandable_daily_here_string_removed": true,
+    "generated_ast_error_details_enabled": true,
+    "literal_template_enabled": true,
+    "placeholder_replacement_enabled": true,
+    "safe_single_quoted_path_literals": true
+  },
+  "repair_from": "v0162A",
+  "root_cause": "The daily launcher was generated by an expandable double-quoted here-string containing nested PowerShell escape characters and continuation backticks.",
+  "version": "v0162B"
+}
