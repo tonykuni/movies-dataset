@@ -44,9 +44,9 @@ TOKENS = {
     "bg": "#f5f4f0", "surface": "#ffffff", "paper2": "#fafaf8",
     "border": "#dbd9d3", "soft": "#ecebe6",
     "ink": "#1e1d1a", "ink2": "#33403f", "muted": "#6b6860", "muted2": "#9c9890",
-    "left": "#4c78a8",   # 左軸系列 · blue (spec token --blue)
-    "right": "#c4943a",  # 右軸系列 · amber (spec token --am; blue×amber ΔE 24.8,
-                         # CVD-safe — teal was too close to blue at ΔE 10.9)
+    "left": "#4c78a8",   # 左軸系列 · spec token --blue(依規範原配色)
+    "right": "#439a9a",  # 右軸系列 · spec token --teal(依規範原配色;藍青分離度
+                         # 偏低 ΔE 10.9,以「不同圖形 + 軸染色 + 直接標值」補償)
 }
 LINE_WIDTH = 1        # VISUAL LOCK 線粗 1
 FILL_OPACITY = 0.75   # VISUAL LOCK 透明度 0.75
