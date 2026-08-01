@@ -4,15 +4,45 @@
 
 ```
 VeritasStorageOptimizer/
+├── VeritasStorageOptimizer_AllInOne.ps1   # ★ 單一 PowerShell 整併版 (見下節)
 ├── veritas_gui.py            # 單檔 GUI 主程式:stdlib http.server 後端 + 內嵌動畫前端
 ├── engine/
 │   ├── veritas_cleaner.py    # Python 引擎 (僅標準庫)
 │   └── veritas_cleaner.js    # Node.js 引擎 (Node v18+, 零 npm 套件)
 ├── tests/
-│   └── e2e_apitest.js        # 零相依 e2e 測試:啟動真實後端、驗證完整 API 契約
+│   ├── e2e_apitest.js        # 零相依 e2e:Python GUI 後端完整 API 契約 (35 assertions)
+│   ├── e2e_ps_usertest.js    # 零相依 e2e:pwsh AIO 後端 + 三引擎 + 實刪 (47 assertions)
+│   └── ps_lint.py            # PS7 靜態分析 (here-string / 括號平衡 / LL 規則)
 ├── logs/                     # append-only 活動日誌 + 每次執行的稽核日誌 (git 忽略)
 └── README.md
 ```
+
+## ★ 單一 PowerShell 整併版 (All-In-One)
+
+`VeritasStorageOptimizer_AllInOne.ps1` 將**全部功能整併為一個檔案**(PS 7.0+,零外部模組):
+原生 PowerShell 清理引擎(2-Pass Hash + 串流 MD5)、HttpListener 後端、內嵌動畫 HTML 前端、
+內嵌 Self-Test,並在 `engine/` 腳本存在時自動掛載 Python / Node.js 為可切換子引擎。
+
+```powershell
+# GUI 模式:於 127.0.0.1:8868 啟動並開啟瀏覽器
+pwsh -File VeritasStorageOptimizer_AllInOne.ps1
+
+# 自訂連接埠 / 不開瀏覽器
+pwsh -File VeritasStorageOptimizer_AllInOne.ps1 -Port 9000 -NoBrowser
+
+# 無頭 CLI 模式:Dry-Run(加 -Execute 才實體刪除)
+pwsh -File VeritasStorageOptimizer_AllInOne.ps1 -Dir D:\Downloads -MaxMB 500
+pwsh -File VeritasStorageOptimizer_AllInOne.ps1 -Dir D:\Downloads -MaxMB 500 -Execute
+
+# 內嵌自我測試 (28 assertions)
+pwsh -File VeritasStorageOptimizer_AllInOne.ps1 -SelfTest
+```
+
+測試鏈(全部通過):`tests/ps_lint.py` 靜態分析 0 錯誤 → pwsh AST 解析 0 錯誤 →
+`-SelfTest` 28/28 → `tests/e2e_ps_usertest.js` 真實後端 47/47(三引擎 Dry-Run、
+防護 Guard、實體刪除、巢狀空目錄連鎖清除、404 / shutdown 契約)。
+
+執行期間單檔即可運作(Python / Node 未安裝時自動停用對應子引擎,原生 PS 引擎永遠可用)。
 
 ## 核心架構 (2026 Storage Architecture)
 
