@@ -128,6 +128,8 @@ def parse_engine_output(stdout: str) -> dict:
 
 def run_engine(engine: str, target: str, max_mb: float, execute: bool) -> dict:
     started = time.monotonic()
+    if not max_mb > 0:  # server-side guard; never trust the front-end alone
+        return {"ok": False, "error": "大檔閾值必須為正數 (MB)"}
     env = get_env_snapshot()
     if engine == "node" and not env["Node"]:
         return {"ok": False, "error": "系統未偵測到 node,請改用 Python 引擎"}
@@ -137,7 +139,7 @@ def run_engine(engine: str, target: str, max_mb: float, execute: bool) -> dict:
         return {"ok": False, "error": reason}
 
     LOG_DIR.mkdir(exist_ok=True)
-    stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    stamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     audit = LOG_DIR / f"veritas_audit_{engine}_{stamp}.log"
     target_path = str(Path(target).expanduser().resolve())
 

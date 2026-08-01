@@ -86,6 +86,16 @@ function Get-StreamHash {
 }
 
 # ---- Native PS cleaning engine ------------------------------------------------
+function Test-ReparsePoint {
+    # Symlinks / junctions are never traversed: following them can loop
+    # forever or escape the target directory and delete outside files.
+    param([string]$Path)
+    try {
+        $attr = [System.IO.File]::GetAttributes($Path)
+        return (($attr -band [System.IO.FileAttributes]::ReparsePoint) -ne 0)
+    } catch { return $true }
+}
+
 function Get-EmptyDirectories {
     # Lightweight directory-only walk (no file stat, no hashing).
     # Returns currently-empty directories, deepest paths first.
@@ -99,6 +109,7 @@ function Get-EmptyDirectories {
             foreach ($s in [System.IO.Directory]::EnumerateDirectories($d)) {
                 $name = [System.IO.Path]::GetFileName($s)
                 if ($script:ProtectedDirs -contains $name) { continue }
+                if (Test-ReparsePoint -Path $s) { continue }
                 $stack.Push($s)
                 $dirs.Add($s)
             }
@@ -132,6 +143,7 @@ function Invoke-VeritasScan {
             foreach ($s in [System.IO.Directory]::EnumerateDirectories($d)) {
                 $name = [System.IO.Path]::GetFileName($s)
                 if ($script:ProtectedDirs -contains $name) { continue }
+                if (Test-ReparsePoint -Path $s) { continue }
                 $stack.Push($s)
             }
         } catch {}
@@ -248,13 +260,16 @@ function Get-EnvSnapshot {
 function Invoke-VeritasRun {
     param([string]$Engine, [string]$Target, [double]$MaxMBIn, [bool]$Live)
     $sw = [System.Diagnostics.Stopwatch]::StartNew()
+    if ($MaxMBIn -le 0 -or [double]::IsNaN($MaxMBIn)) {
+        return [pscustomobject]@{ ok = $false; error = '大檔閾值必須為正數 (MB)' }
+    }
     $reason = Test-RefusedTarget -Path $Target
     if ($reason) {
         Write-Log ('REFUSED target=' + $Target + ' reason=' + $reason) 'WARN'
         return [pscustomobject]@{ ok = $false; error = $reason }
     }
     $full = [System.IO.Path]::GetFullPath($Target)
-    $stamp = Get-Date -Format 'yyyyMMdd_HHmmss'
+    $stamp = Get-Date -Format 'yyyyMMdd_HHmmss_fff'
     $audit = Join-Path $script:LogDir ('veritas_audit_{0}_{1}.log' -f $Engine, $stamp)
     Write-Log ('RUN engine={0} execute={1} maxMB={2} target={3}' -f $Engine, $Live, $MaxMBIn, $full)
 
@@ -652,7 +667,8 @@ try {
                     if ([string]::IsNullOrWhiteSpace($bodyTxt)) { $bodyTxt = '{}' }
                     $req = $bodyTxt | ConvertFrom-Json
                     $engineName = if ($req.engine) { [string]$req.engine } else { 'ps' }
-                    $maxIn = if ($req.maxMB) { [double]$req.maxMB } else { $MaxMB }
+                    $maxIn = $MaxMB
+                    if ($null -ne $req.PSObject.Properties['maxMB']) { $maxIn = [double]$req.maxMB }
                     $out = Invoke-VeritasRun -Engine $engineName -Target ([string]$req.dir) -MaxMBIn $maxIn -Live ([bool]$req.execute)
                     Send-Response -Ctx $ctx -Body ($out | ConvertTo-Json -Depth 6 -Compress)
                     break

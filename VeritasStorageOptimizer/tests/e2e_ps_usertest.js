@@ -115,6 +115,65 @@ function buildSandbox(root) {
     ok('live run kept protected .git content', fs.existsSync(path.join(sandLive, '.git', 'protected.tmp')));
     ok('live run removed empty dir', !fs.existsSync(path.join(sandLive, 'sub', 'empty_dir')));
 
+    // ---- hardening: invalid threshold rejected server-side ----------------------
+    const sandZero = buildSandbox(fs.mkdtempSync(path.join(root, 'zero_')));
+    const zero = await api('/api/run', { dir: sandZero, maxMB: 0, engine: 'ps', execute: true });
+    ok('maxMB=0 rejected server-side', zero.json.ok === false);
+    ok('maxMB=0 deleted nothing', fs.existsSync(path.join(sandZero, 'keep.txt')) && fs.existsSync(path.join(sandZero, 'junk.tmp')));
+
+    // ---- hardening: unicode + spaces in file names --------------------------------
+    const uniRoot = fs.mkdtempSync(path.join(root, 'uni_'));
+    const uniSand = path.join(uniRoot, 'sand');
+    fs.mkdirSync(uniSand, { recursive: true });
+    fs.writeFileSync(path.join(uniSand, '暫存 檔案.tmp'), '中文暫存');
+    fs.writeFileSync(path.join(uniSand, "quote'name.txt"), 'keep');
+    const uni = await api('/api/run', { dir: uniSand, maxMB: 200, engine: 'ps', execute: false });
+    ok('unicode temp file marked', uni.json.ok === true && uni.json.items.some(i => i.path.includes('暫存 檔案.tmp')));
+    ok('unicode run leaves files intact', fs.existsSync(path.join(uniSand, '暫存 檔案.tmp')));
+
+    // ---- hardening: single-item result keeps JSON array shape ---------------------
+    ok('single-item items is a JSON array', Array.isArray(uni.json.items) && uni.json.items.length === 1);
+    ok('empty emptyDirs is a JSON array', Array.isArray(uni.json.emptyDirs) && uni.json.emptyDirs.length === 0);
+
+    // ---- hardening: symlink cycle + escape containment -----------------------------
+    let symlinksOk = true;
+    const symRoot = fs.mkdtempSync(path.join(root, 'sym_'));
+    const symTarget = path.join(symRoot, 'target');
+    const outside = path.join(symRoot, 'outside');
+    fs.mkdirSync(path.join(symTarget, 'sub'), { recursive: true });
+    fs.mkdirSync(outside, { recursive: true });
+    fs.writeFileSync(path.join(outside, 'victim.tmp'), 'outside data');
+    fs.writeFileSync(path.join(symTarget, 'inside.tmp'), 'inside data');
+    try {
+      fs.symlinkSync(outside, path.join(symTarget, 'link_out'), 'dir');
+      fs.symlinkSync(symTarget, path.join(symTarget, 'sub', 'loop'), 'dir');
+    } catch (e) { symlinksOk = false; }
+    if (symlinksOk) {
+      const sym = await api('/api/run', { dir: symTarget, maxMB: 200, engine: 'ps', execute: false });
+      ok('symlink tree scan completes (no cycle hang)', sym.json && sym.json.ok === true);
+      ok('symlink scan never escapes target', !sym.json.items.some(i => i.path.includes('outside') || i.path.includes('link_out') || i.path.includes('loop')));
+      const symLive = await api('/api/run', { dir: symTarget, maxMB: 200, engine: 'ps', execute: true });
+      ok('symlink live run ok', symLive.json.ok === true);
+      ok('outside file untouched after live run', fs.existsSync(path.join(outside, 'victim.tmp')));
+      ok('inside temp file removed', !fs.existsSync(path.join(symTarget, 'inside.tmp')));
+    } else {
+      console.log('  [SKIP] symlink tests (no symlink privilege on this OS)');
+    }
+
+    // ---- hardening: scale correctness (many files, exact duplicate count) ----------
+    const bigRoot = fs.mkdtempSync(path.join(root, 'big_'));
+    const bigSand = path.join(bigRoot, 'sand');
+    fs.mkdirSync(bigSand, { recursive: true });
+    for (let i = 0; i < 100; i++) {
+      const payload = Buffer.alloc(2048 + i, i % 251);   // unique size per pair
+      fs.writeFileSync(path.join(bigSand, `file_${i}_a.dat`), payload);
+      fs.writeFileSync(path.join(bigSand, `file_${i}_b.dat`), payload);
+      fs.writeFileSync(path.join(bigSand, `noise_${i}.txt`), Buffer.alloc(2048 + i, (i + 1) % 251));
+    }
+    const big = await api('/api/run', { dir: bigSand, maxMB: 200, engine: 'ps', execute: false });
+    const dupCount = big.json.items.filter(i => /Duplicate of/.test(i.reason)).length;
+    ok('scale: exactly 100 duplicates detected in 300 files', big.json.ok === true && dupCount === 100 && big.json.totalFiles === 100);
+
     // ---- 404 + graceful shutdown ------------------------------------------------
     const r404 = await fetch(ORIGIN + '/nope');
     ok('unknown route returns 404', r404.status === 404);

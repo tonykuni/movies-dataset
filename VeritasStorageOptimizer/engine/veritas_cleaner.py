@@ -162,5 +162,7 @@ if __name__ == "__main__":
                         help="Perform live deletion (Defaults to Dry-Run if omitted)")
 
     args = parser.parse_args()
+    if not args.max_mb > 0:
+        parser.error("--max-mb must be a positive number")
     execute_cleanup(target_dir=args.dir, size_threshold_mb=args.max_mb,
                     dry_run=not args.execute, log_file=args.log)

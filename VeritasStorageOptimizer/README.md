@@ -10,8 +10,8 @@ VeritasStorageOptimizer/
 │   ├── veritas_cleaner.py    # Python 引擎 (僅標準庫)
 │   └── veritas_cleaner.js    # Node.js 引擎 (Node v18+, 零 npm 套件)
 ├── tests/
-│   ├── e2e_apitest.js        # 零相依 e2e:Python GUI 後端完整 API 契約 (35 assertions)
-│   ├── e2e_ps_usertest.js    # 零相依 e2e:pwsh AIO 後端 + 三引擎 + 實刪 (47 assertions)
+│   ├── e2e_apitest.js        # 零相依 e2e:Python GUI 後端完整 API 契約 (42 assertions)
+│   ├── e2e_ps_usertest.js    # 零相依 e2e:pwsh AIO 後端 + 三引擎 + 實刪 (59 assertions)
 │   └── ps_lint.py            # PS7 靜態分析 (here-string / 括號平衡 / LL 規則)
 ├── logs/                     # append-only 活動日誌 + 每次執行的稽核日誌 (git 忽略)
 └── README.md
@@ -39,8 +39,18 @@ pwsh -File VeritasStorageOptimizer_AllInOne.ps1 -SelfTest
 ```
 
 測試鏈(全部通過):`tests/ps_lint.py` 靜態分析 0 錯誤 → pwsh AST 解析 0 錯誤 →
-`-SelfTest` 28/28 → `tests/e2e_ps_usertest.js` 真實後端 47/47(三引擎 Dry-Run、
-防護 Guard、實體刪除、巢狀空目錄連鎖清除、404 / shutdown 契約)。
+`-SelfTest` 28/28 → `tests/e2e_ps_usertest.js` 真實後端 59/59(三引擎 Dry-Run、
+防護 Guard、實體刪除、巢狀空目錄連鎖清除、Unicode 檔名、symlink 循環/逃逸圍堵、
+非法閾值伺服器端拒絕、單元素 JSON 陣列形狀、300 檔案規模化精確重複比對、
+404 / shutdown 契約)。
+
+安全強化(第二輪 DEBUG 循環修正):
+
+- **Symlink 圍堵** — 目錄遍歷一律不跟隨 symlink / junction(ReparsePoint),
+  杜絕循環懸掛與「逃逸出目標範圍刪除外部檔案」
+- **閾值伺服器端驗證** — `maxMB <= 0` 一律拒絕(前端、後端、引擎 CLI 三層);
+  並修正 PS 後端 `maxMB: 0` 因 falsy 判斷被靜默改回預設值的缺陷
+- **稽核檔名毫秒級時戳** — 同秒內多次執行不再互相覆寫
 
 執行期間單檔即可運作(Python / Node 未安裝時自動停用對應子引擎,原生 PS 引擎永遠可用)。
 

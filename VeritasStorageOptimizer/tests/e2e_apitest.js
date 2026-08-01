@@ -109,6 +109,43 @@ function buildSandbox() {
     ok('live run kept protected .git content', fs.existsSync(path.join(sand, '.git', 'protected.tmp')));
     ok('live run removed empty dir', !fs.existsSync(path.join(sand, 'sub', 'empty_dir')));
 
+    // ---- hardening: invalid threshold rejected server-side ---------------------
+    const zeroDir = fs.mkdtempSync(path.join(root, 'zero_'));
+    fs.writeFileSync(path.join(zeroDir, 'keep.txt'), 'x');
+    const zero = await api('/api/run', { dir: zeroDir, maxMB: 0, engine: 'python', execute: true });
+    ok('maxMB=0 rejected server-side', zero.json.ok === false);
+    ok('maxMB=0 deleted nothing', fs.existsSync(path.join(zeroDir, 'keep.txt')));
+
+    // ---- hardening: unicode + spaces in file names -------------------------------
+    const uniDir = fs.mkdtempSync(path.join(root, 'uni_'));
+    fs.writeFileSync(path.join(uniDir, '暫存 檔案.tmp'), '中文暫存');
+    const uni = await api('/api/run', { dir: uniDir, maxMB: 200, engine: 'python', execute: false });
+    ok('unicode temp file marked', uni.json.ok === true && uni.json.items.some(i => i.path.includes('暫存 檔案.tmp')));
+
+    // ---- hardening: symlinked dirs are never followed ------------------------------
+    let symlinksOk = true;
+    const symRoot = fs.mkdtempSync(path.join(root, 'sym_'));
+    const symTarget = path.join(symRoot, 'target');
+    const outside = path.join(symRoot, 'outside');
+    fs.mkdirSync(path.join(symTarget, 'sub'), { recursive: true });
+    fs.mkdirSync(outside, { recursive: true });
+    fs.writeFileSync(path.join(outside, 'victim.tmp'), 'outside data');
+    try {
+      fs.symlinkSync(outside, path.join(symTarget, 'link_out'), 'dir');
+      fs.symlinkSync(symTarget, path.join(symTarget, 'sub', 'loop'), 'dir');
+    } catch (e) { symlinksOk = false; }
+    if (symlinksOk) {
+      for (const engine of ['python', 'node']) {
+        if (engine === 'node' && !env.json.Node) continue;
+        const sym = await api('/api/run', { dir: symTarget, maxMB: 200, engine, execute: true });
+        ok(`[${engine}] symlink scan completes without escaping`,
+          sym.json.ok === true && !sym.json.items.some(i => i.path.includes('outside') || i.path.includes('link_out')));
+        ok(`[${engine}] outside file untouched after live run`, fs.existsSync(path.join(outside, 'victim.tmp')));
+      }
+    } else {
+      console.log('  [SKIP] symlink tests (no symlink privilege on this OS)');
+    }
+
     // ---- 404 path -------------------------------------------------------------
     const r404 = await fetch(ORIGIN + '/nope');
     ok('unknown route returns 404', r404.status === 404);
