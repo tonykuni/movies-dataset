@@ -5,7 +5,7 @@ Reads the VDF-produced analytical database (<Base>/functional modules/VDF/db or
 <Base>/VDF/db · CSV / TSV / JSON / SQLite) and renders dual-axis comparison
 charts as fully self-contained HTML+SVG, following Chart & Layout Spec ONE:
 
-  VISUAL LOCK · 線粗 1 · 透明度 0.75 · 軸距 1/2/2.5/5/10 nice steps
+  Chart Library Builder unified spec: 線粗 1 · 折線 0.9 · 填色 0.4 · 軸距 2/2.5/5/10 × 5 刻度 · via combo 色序
 
 Pairing contract 配對規約 (per operator requirement):
   一個資料一個軸 — exactly one series per axis;
@@ -44,13 +44,17 @@ TOKENS = {
     "bg": "#f5f4f0", "surface": "#ffffff", "paper2": "#fafaf8",
     "border": "#dbd9d3", "soft": "#ecebe6",
     "ink": "#1e1d1a", "ink2": "#33403f", "muted": "#6b6860", "muted2": "#9c9890",
-    "left": "#4c78a8",   # 左軸系列 · spec token --blue(依規範原配色)
-    "right": "#439a9a",  # 右軸系列 · spec token --teal(依規範原配色;藍青分離度
-                         # 偏低 ΔE 10.9,以「不同圖形 + 軸染色 + 直接標值」補償)
+    # Chart Library Builder 統一色序(VIA combo,固定順序,只增不減):
+    # ["#c96b5a","#c4943a","#5a9e6f","#439a9a","#4c78a8","#7a6daa"]
+    "left": "#c96b5a",   # 系列 1 · via combo C[0]
+    "right": "#c4943a",  # 系列 2 · via combo C[1]
 }
-LINE_WIDTH = 1        # VISUAL LOCK 線粗 1
-FILL_OPACITY = 0.75   # VISUAL LOCK 透明度 0.75
-NICE_STEPS = (1.0, 2.0, 2.5, 5.0, 10.0)  # VISUAL LOCK 軸距
+# Chart Library Builder 統一預設(unified spec store · vap_chartlib_v1):
+LINE_WIDTH = 1        # lineWidth default 1
+LINE_OPACITY = 0.9    # lineOpacity default 0.9(折線)
+FILL_OPACITY = 0.4    # fillOpacity default 0.4(底部填色 / 雙軸柱)
+NICE_STEPS = (1.0, 2.0, 2.5, 5.0, 10.0)  # 間隔值為 2/2.5/5/10 之倍數
+AXIS_INTERVALS = 4    # 左右軸各 5 刻度 · 4 間隔(builder ax() 規則)
 
 DB_SUFFIXES = {".csv", ".tsv", ".json", ".sqlite", ".sqlite3", ".db"}
 EXCLUDED_DIRS = {".git", "__pycache__", "node_modules", "venv", "staging",
@@ -235,22 +239,25 @@ def x_column(rows: list[dict], preferred: str | None = None) -> str | None:
 
 # ------------------------------------------------------------------ axis math
 def nice_ticks(low: float, high: float, target: int = 5) -> list[float]:
-    """Ticks on the VISUAL LOCK step ladder 1/2/2.5/5/10 × 10^k."""
+    """Builder ax() rule: exactly AXIS_INTERVALS+1 ticks, step on the
+    1/2/2.5/5/10 ladder, domain covering the data extremes."""
     if high <= low:
         high = low + 1.0
-    span = high - low
-    raw = span / max(1, target)
-    magnitude = 10.0 ** math.floor(math.log10(raw))
-    step = magnitude * 10.0
-    for candidate in NICE_STEPS:
-        if candidate * magnitude >= raw:
-            step = candidate * magnitude
+
+    def ladder(raw: float) -> float:
+        magnitude = 10.0 ** math.floor(math.log10(raw))
+        for candidate in NICE_STEPS:
+            if candidate * magnitude >= raw:
+                return candidate * magnitude
+        return magnitude * 10.0
+
+    step = ladder((high - low) / AXIS_INTERVALS)
+    while True:  # 首刻度貼齊 step 網格後仍須涵蓋極值,否則升一級
+        first = math.floor(low / step) * step
+        if first + step * AXIS_INTERVALS >= high:
             break
-    first = math.floor(low / step) * step
-    ticks = [round(first, 10)]
-    while ticks[-1] < high:  # 軸域必須完整涵蓋資料極值,不得截斷
-        ticks.append(round(ticks[-1] + step, 10))
-    return ticks
+        step = ladder(step * 1.0001)
+    return [round(first + step * k, 10) for k in range(AXIS_INTERVALS + 1)]
 
 
 def format_tick(value: float) -> str:
@@ -278,9 +285,24 @@ def _scale(value: float, low: float, high: float, px_low: float, px_high: float)
     return px_low + (value - low) / (high - low) * (px_high - px_low)
 
 
+def chart_code(left_form: str, right_form: str) -> str:
+    """Chart Library Builder registry code for the pairing."""
+    if "area" in (left_form, right_form):
+        return "VAP-CH-11"  # 雙軸 底色面積×對比折線 Dual Area×Line
+    if "bar" in (left_form, right_form):
+        return "VAP-CH-12"  # 條+線 雙軸 Bar × Line
+    return "VAP-CH-11"      # 雙折線視為 CH-11 家族(第二線虛線)
+
+
 def render_chart_svg(labels: list[str], left_values: list[float], right_values: list[float],
                      left_name: str, right_name: str,
                      left_form: str, right_form: str) -> str:
+    """Dual-axis chart per Chart Library Builder ax()/dbarline()/dline() rules:
+    shared 5-tick / 4-interval grid on both axes, frame rect, grid #ecebe6,
+    left tick labels #9c9890 / right #33403f, series colors via-combo C0/C1,
+    bar fill 0.4 · area fill 0.4×0.55 · line width 1 opacity 0.9, second
+    line dashed when both series are lines, colored end labels with
+    collision push (≥11px)."""
     width, height = 960, 420
     pad_left, pad_right, pad_top, pad_bottom = 64, 64, 20, 46
     plot_w = width - pad_left - pad_right
@@ -312,66 +334,79 @@ def render_chart_svg(labels: list[str], left_values: list[float], right_values: 
     parts: list[str] = []
     parts.append(f'<svg viewBox="0 0 {width} {height}" xmlns="http://www.w3.org/2000/svg" '
                  f'font-family="Microsoft JhengHei,Segoe UI,system-ui,sans-serif" font-size="11">')
-    # recessive grid from the left axis only
-    for tick in left_ticks:
-        y = y_left(tick)
+    # shared grid: both axes have the same 5 tick positions (builder ax rule)
+    for k in range(AXIS_INTERVALS + 1):
+        y = pad_top + plot_h - plot_h * k / AXIS_INTERVALS
         parts.append(f'<line x1="{pad_left}" y1="{y:.1f}" x2="{width - pad_right}" y2="{y:.1f}" '
                      f'stroke="{TOKENS["soft"]}" stroke-width="1"/>')
+    # frame(builder default frame=true)
+    parts.append(f'<rect x="{pad_left}" y="{pad_top}" width="{plot_w}" height="{plot_h}" '
+                 f'fill="none" stroke="{TOKENS["border"]}" stroke-width="1"/>')
+
     # marks -------------------------------------------------------------
-    def series_marks(values, form, color, y_of, baseline_value, side_shift):
+    both_lines = left_form == "line" and right_form == "line"
+
+    def series_marks(values, form, color, y_of, dashed):
         out = []
         slot = plot_w / max(1, count)
-        bar_w = max(2.0, slot * 0.42)
         if form == "bar":
-            base_y = y_of(max(min(baseline_value, max(values)), min(min(values), baseline_value)))
-            base_y = y_of(0.0) if min(values) <= 0 <= max(values) or min(values) >= 0 else y_of(baseline_value)
+            bar_w = max(2.0, slot * 0.8 / 2)  # builder: slot*0.8, halved for dual density
+            base_y = y_of(0.0)
             for i, value in enumerate(values):
-                x = x_center(i) + side_shift
                 top = min(y_of(value), base_y)
                 bar_h = max(1.0, abs(y_of(value) - base_y))
-                out.append(f'<rect x="{x - bar_w / 2:.1f}" y="{top:.1f}" width="{bar_w:.1f}" '
-                           f'height="{bar_h:.1f}" rx="1.5" fill="{color}" fill-opacity="{FILL_OPACITY}"/>')
+                out.append(f'<rect x="{x_center(i) - bar_w / 2:.1f}" y="{top:.1f}" '
+                           f'width="{bar_w:.1f}" height="{bar_h:.1f}" fill="{color}" '
+                           f'fill-opacity="{FILL_OPACITY}"/>')
             return out
-        points = " ".join(f"{x_center(i) + side_shift:.1f},{y_of(v):.1f}" for i, v in enumerate(values))
+        points = " ".join(f"{x_center(i):.1f},{y_of(v):.1f}" for i, v in enumerate(values))
         if form == "area":
             floor = y_of(max(min(values), 0.0) if min(values) >= 0 else 0.0)
-            first_x = x_center(0) + side_shift
-            last_x = x_center(count - 1) + side_shift
-            out.append(f'<polygon points="{first_x:.1f},{floor:.1f} {points} {last_x:.1f},{floor:.1f}" '
-                       f'fill="{color}" fill-opacity="{FILL_OPACITY * 0.4:.2f}"/>')
+            out.append(f'<polygon points="{x_center(0):.1f},{floor:.1f} {points} '
+                       f'{x_center(count - 1):.1f},{floor:.1f}" fill="{color}" '
+                       f'fill-opacity="{FILL_OPACITY * 0.55:.2f}"/>')
+        dash = ' stroke-dasharray="5 3"' if dashed else ""
         out.append(f'<polyline points="{points}" fill="none" stroke="{color}" '
-                   f'stroke-width="{LINE_WIDTH}" stroke-opacity="{FILL_OPACITY}" '
+                   f'stroke-width="{LINE_WIDTH}" stroke-opacity="{LINE_OPACITY}"{dash} '
                    f'stroke-linejoin="round" stroke-linecap="round"/>')
         for i, value in enumerate(values):
-            out.append(f'<circle cx="{x_center(i) + side_shift:.1f}" cy="{y_of(value):.1f}" r="1.6" '
+            out.append(f'<circle cx="{x_center(i):.1f}" cy="{y_of(value):.1f}" r="1.6" '
                        f'fill="{color}"/>')
         return out
 
-    parts.extend(series_marks(left_values, left_form, TOKENS["left"], y_left, 0.0, 0.0))
-    parts.extend(series_marks(right_values, right_form, TOKENS["right"], y_right, 0.0, 0.0))
+    parts.extend(series_marks(left_values, left_form, TOKENS["left"], y_left, False))
+    parts.extend(series_marks(right_values, right_form, TOKENS["right"], y_right, both_lines))
 
-    # axes --------------------------------------------------------------
-    parts.append(f'<line x1="{pad_left}" y1="{pad_top}" x2="{pad_left}" y2="{pad_top + plot_h}" '
-                 f'stroke="{TOKENS["left"]}" stroke-width="{LINE_WIDTH}"/>')
-    parts.append(f'<line x1="{width - pad_right}" y1="{pad_top}" x2="{width - pad_right}" '
-                 f'y2="{pad_top + plot_h}" stroke="{TOKENS["right"]}" stroke-width="{LINE_WIDTH}"/>')
-    for tick in left_ticks:
-        parts.append(f'<text x="{pad_left - 6}" y="{y_left(tick) + 3.5:.1f}" text-anchor="end" '
-                     f'fill="{TOKENS["left"]}">{_esc(format_tick(tick))}</text>')
-    for tick in right_ticks:
-        parts.append(f'<text x="{width - pad_right + 6}" y="{y_right(tick) + 3.5:.1f}" '
-                     f'text-anchor="start" fill="{TOKENS["right"]}">{_esc(format_tick(tick))}</text>')
+    # tick labels: left #9c9890 · right #33403f, unified decimals (builder ax)
+    for k in range(AXIS_INTERVALS + 1):
+        y = pad_top + plot_h - plot_h * k / AXIS_INTERVALS
+        parts.append(f'<text x="{pad_left - 5}" y="{y + 2.8:.1f}" text-anchor="end" '
+                     f'fill="{TOKENS["muted2"]}" font-family="Consolas,monospace" font-size="10">'
+                     f'{_esc(format_tick(left_ticks[k]))}</text>')
+        parts.append(f'<text x="{width - pad_right + 5}" y="{y + 2.8:.1f}" text-anchor="start" '
+                     f'fill="{TOKENS["ink2"]}" font-family="Consolas,monospace" font-size="10">'
+                     f'{_esc(format_tick(right_ticks[k]))}</text>')
     # x labels (thinned)
     label_every = max(1, math.ceil(count / 10))
     for i in range(0, count, label_every):
+        parts.append(f'<line x1="{x_center(i):.1f}" y1="{pad_top + plot_h}" x2="{x_center(i):.1f}" '
+                     f'y2="{pad_top + plot_h + 3}" stroke="#c4c0b8" stroke-width="1"/>')
         parts.append(f'<text x="{x_center(i):.1f}" y="{pad_top + plot_h + 16}" text-anchor="middle" '
                      f'fill="{TOKENS["muted"]}">{_esc(labels[i])}</text>')
-    # direct end labels 直接標示末值
-    parts.append(f'<text x="{x_center(count - 1) - 4:.1f}" y="{y_left(left_values[-1]) - 6:.1f}" '
-                 f'text-anchor="end" font-weight="700" fill="{TOKENS["left"]}">'
+    # colored end labels with collision push ≥11px (builder rule)
+    y_a = y_left(left_values[-1]) - 6
+    y_b = y_right(right_values[-1]) - 6
+    if abs(y_a - y_b) < 11:
+        push = (11 - abs(y_a - y_b)) / 2
+        if y_a < y_b:
+            y_a, y_b = y_a - push, y_b + push
+        else:
+            y_a, y_b = y_a + push, y_b - push
+    parts.append(f'<text x="{x_center(count - 1) - 4:.1f}" y="{y_a:.1f}" text-anchor="end" '
+                 f'font-weight="700" fill="{TOKENS["left"]}">'
                  f'{_esc(format_tick(left_values[-1]))}</text>')
-    parts.append(f'<text x="{x_center(count - 1) + 4:.1f}" y="{y_right(right_values[-1]) - 6:.1f}" '
-                 f'text-anchor="start" font-weight="700" fill="{TOKENS["right"]}">'
+    parts.append(f'<text x="{x_center(count - 1) + 4:.1f}" y="{y_b:.1f}" text-anchor="start" '
+                 f'font-weight="700" fill="{TOKENS["right"]}">'
                  f'{_esc(format_tick(right_values[-1]))}</text>')
     # hover layer -------------------------------------------------------
     slot = plot_w / max(1, count)
@@ -391,6 +426,7 @@ def render_chart_svg(labels: list[str], left_values: list[float], right_values: 
 def render_page(title: str, subtitle: str, svg: str, left_name: str, right_name: str,
                 left_form: str, right_form: str, source: str) -> str:
     form_zh = {"bar": "柱狀 BAR", "line": "折線 LINE", "area": "面積 AREA"}
+    code = chart_code(left_form, right_form)
     return f"""<!DOCTYPE html>
 <html lang="zh-Hant"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -417,8 +453,8 @@ display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}}
 <span><span class="sw" style="background:var(--right)"></span><b>{_esc(right_name)}</b> · 右軸 RIGHT · {form_zh[right_form]}</span>
 </div>
 {svg}
-<div class="foot"><span>SOURCE · VDF DB · {_esc(source)}</span>
-<span>VIA · VeritasAutoPlot {VERSION} · 🔒 VISUAL LOCK 線粗 {LINE_WIDTH} · 透明度 {FILL_OPACITY} · 軸距 1/2/2.5/5/10</span></div>
+<div class="foot"><span>SOURCE · VDF DB · {_esc(source)} · {code}</span>
+<span>VIA · VeritasAutoPlot {VERSION} · 🔒 UNIFIED SPEC 線粗 {LINE_WIDTH} · 折線 {LINE_OPACITY} · 填色 {FILL_OPACITY} · 軸距 2/2.5/5/10 × 5 刻度 · via combo</span></div>
 </div></body></html>
 """
 
@@ -534,7 +570,7 @@ kbd{font:700 var(--fs-lbl) var(--mono);border:1px solid var(--line);border-botto
   <div><span class="mk">Tables</span><span class="mv" id="ssTables">0</span></div>
   <div><span class="mk">Pairs</span><span class="mv" id="ssPairs">0</span></div>
   <div><span class="mk">State</span><span class="mv" style="color:var(--green)">READY</span></div>
-  <div><span class="mk">Lock</span><span class="mv">🔒 1 · 0.75</span></div>
+  <div><span class="mk">Lock</span><span class="mv">🔒 1 · .9/.4</span></div>
  </div>
 </aside>
 <div class="main">
@@ -596,18 +632,21 @@ kbd{font:700 var(--fs-lbl) var(--mono);border:1px solid var(--line);border-botto
     <h3>視覺鎖 <span>VISUAL LOCK</span></h3>
     <div class="lockrow">
      <span class="badge">線粗 LINE WIDTH · 1</span>
-     <span class="badge">透明度 OPACITY · 0.75</span>
-     <span class="badge">軸距 AXIS STEPS · 1 / 2 / 2.5 / 5 / 10</span>
-     <span class="badge">軸域涵蓋極值 DOMAIN COVERS EXTREMES</span>
+     <span class="badge">折線透明 LINE OPACITY · 0.9</span>
+     <span class="badge">填色透明 FILL OPACITY · 0.4</span>
+     <span class="badge">軸距 STEPS · 2 / 2.5 / 5 / 10 倍數</span>
+     <span class="badge">左右軸 5 刻度 · 4 間隔</span>
+     <span class="badge">外框 FRAME · ON</span>
     </div>
-    <div class="hint">權威來源 Authority:VIA · 繪圖版面規範 ONE · Chart &amp; Layout Spec ONE(spec/,SHA-256 登錄於 VAP anchor)</div>
+    <div class="hint">權威來源 Authority:VAP 最佳圖庫建構器 Chart Library Builder(統一位置 unified spec store · 28 圖型註冊 VAP-CH-01…28)+ Chart &amp; Layout Spec ONE;皆 SHA-256 登錄於 VAP anchor</div>
    </div>
    <div class="panel">
     <h3>配對規約 <span>Pairing Contract</span></h3>
     <table><thead><tr><th>項目 Item</th><th>規定 Rule</th></tr></thead><tbody>
      <tr><td>軸 Axes</td><td>一個資料一個軸;左軸 × 右軸,共用 X,相互比較</td></tr>
      <tr><td>圖形 Forms</td><td>兩系列必用不同圖形(柱 / 線 / 面積);相同選擇會被強制錯開</td></tr>
-     <tr><td>色票 Colors</td><td><span class="sw" style="background:var(--blue)"></span>左軸 --blue #4c78a8 · <span class="sw" style="background:var(--teal)"></span>右軸 --teal #3d8f8f(規範原配色)</td></tr>
+     <tr><td>色票 Colors</td><td><span class="sw" style="background:#c96b5a"></span>系列1 #c96b5a · <span class="sw" style="background:#c4943a"></span>系列2 #c4943a(VIA combo 固定色序,Chart Library Builder 統一預設)</td></tr>
+     <tr><td>圖型編號 Codes</td><td>柱×線 = VAP-CH-12 · 面積×線 = VAP-CH-11(雙折線時第二線虛線)</td></tr>
      <tr><td>清晰 Clarity</td><td>軸刻度染系列色 · 圖例 · 末值直標 · 懸停讀值 · 淡灰格線</td></tr>
      <tr><td>治理 Governance</td><td>VDF 資料庫唯讀;產出僅寫入 &lt;Base&gt;/VAP/output</td></tr>
     </tbody></table>
@@ -621,8 +660,8 @@ kbd{font:700 var(--fs-lbl) var(--mono);border:1px solid var(--line);border-botto
 </div>
 <script>
 const CATALOG = __CATALOG__;
-const LOCK = {lw:1, op:0.75, steps:[1,2,2.5,5,10]};
-const COLORS = {left:'#4c78a8', right:'#3d8f8f', soft:'#ebe9e3', mut:'#6b6860', mut2:'#9c9890'};
+const LOCK = {lw:1, lineOp:0.9, fillOp:0.4, steps:[1,2,2.5,5,10], intervals:4};
+const COLORS = {left:'#c96b5a', right:'#c4943a', soft:'#ebe9e3', frame:'#dbd9d3', ink2:'#33403f', mut:'#6b6860', mut2:'#9c9890'};
 const PAGES = ['home','pair','gallery','spec'];
 const TITLES = {home:['平台總覽','Overview','資料目錄與繪圖入口 · Data catalog and plotting entry'],
  pair:['配對繪圖','Pair Plot','雙軸互比 · 一個資料一個軸 · Dual-axis comparison'],
@@ -641,13 +680,14 @@ document.addEventListener('keydown',e=>{
  const cur=PAGES.findIndex(p=>document.getElementById('page-'+p).classList.contains('on'));
  switchPage(PAGES[(cur+(e.key===']'?1:PAGES.length-1))%PAGES.length]);
 });
+function ladder(raw){const mag=Math.pow(10,Math.floor(Math.log10(raw)));
+ for(const c of LOCK.steps){if(c*mag>=raw)return c*mag;}return mag*10;}
 function niceTicks(lo,hi){
  if(hi<=lo)hi=lo+1;
- const raw=(hi-lo)/5, mag=Math.pow(10,Math.floor(Math.log10(raw)));
- let step=mag*10;
- for(const c of LOCK.steps){if(c*mag>=raw){step=c*mag;break;}}
- const t=[Math.floor(lo/step)*step];
- while(t[t.length-1]<hi)t.push(+(t[t.length-1]+step).toPrecision(12));
+ let step=ladder((hi-lo)/LOCK.intervals);
+ let first=Math.floor(lo/step)*step;
+ while(first+step*LOCK.intervals<hi){step=ladder(step*1.0001);first=Math.floor(lo/step)*step;}
+ const t=[];for(let k=0;k<=LOCK.intervals;k++)t.push(+(first+step*k).toPrecision(12));
  return t;
 }
 function fmt(v){
@@ -662,6 +702,7 @@ function fmt(v){
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function drawChart(labels,lv,rv,lname,rname,lform,rform,compact){
  if(lform===rform)rform=lform!=='line'?'line':'bar';
+ const bothLines=lform==='line'&&rform==='line';
  const W=960,H=compact?300:420,PL=64,PR=64,PT=18,PB=44,pw=W-PL-PR,ph=H-PT-PB,n=labels.length;
  function dom(vals,zero){let lo=Math.min(...vals),hi=Math.max(...vals);
   if(zero){lo=Math.min(lo,0);hi=Math.max(hi,0);}if(lo===hi){lo-=1;hi+=1;}
@@ -670,27 +711,31 @@ function drawChart(labels,lv,rv,lname,rname,lform,rform,compact){
  const yl=v=>PT+ph-(v-L.lo)/(L.hi-L.lo)*ph, yr=v=>PT+ph-(v-R.lo)/(R.hi-R.lo)*ph;
  const slot=pw/Math.max(1,n), xc=i=>PL+slot*i+slot/2;
  let s='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" font-family="Microsoft JhengHei,Segoe UI,sans-serif" font-size="11">';
- for(const t of L.t)s+='<line x1="'+PL+'" y1="'+yl(t)+'" x2="'+(W-PR)+'" y2="'+yl(t)+'" stroke="'+COLORS.soft+'"/>';
- function marks(vals,form,color,yof){
-  let o='';const bw=Math.max(2,slot*0.42);
-  if(form==='bar'){const base=yof(0);
+ for(let k=0;k<=LOCK.intervals;k++){const yy=PT+ph-ph*k/LOCK.intervals;
+  s+='<line x1="'+PL+'" y1="'+yy+'" x2="'+(W-PR)+'" y2="'+yy+'" stroke="'+COLORS.soft+'"/>';}
+ s+='<rect x="'+PL+'" y="'+PT+'" width="'+pw+'" height="'+ph+'" fill="none" stroke="'+COLORS.frame+'"/>';
+ function marks(vals,form,color,yof,dashed){
+  let o='';
+  if(form==='bar'){const bw=Math.max(2,slot*0.8/2),base=yof(0);
    for(let i=0;i<n;i++){const top=Math.min(yof(vals[i]),base),h=Math.max(1,Math.abs(yof(vals[i])-base));
-    o+='<rect x="'+(xc(i)-bw/2)+'" y="'+top+'" width="'+bw+'" height="'+h+'" rx="1.5" fill="'+color+'" fill-opacity="'+LOCK.op+'"/>';}
+    o+='<rect x="'+(xc(i)-bw/2)+'" y="'+top+'" width="'+bw+'" height="'+h+'" fill="'+color+'" fill-opacity="'+LOCK.fillOp+'"/>';}
    return o;}
   const pts=vals.map((v,i)=>xc(i)+','+yof(v)).join(' ');
-  if(form==='area'){o+='<polygon points="'+xc(0)+','+yof(Math.max(Math.min(...vals),0))+' '+pts+' '+xc(n-1)+','+yof(Math.max(Math.min(...vals),0))+'" fill="'+color+'" fill-opacity="'+(LOCK.op*0.4).toFixed(2)+'"/>';}
-  o+='<polyline points="'+pts+'" fill="none" stroke="'+color+'" stroke-width="'+LOCK.lw+'" stroke-opacity="'+LOCK.op+'" stroke-linejoin="round" stroke-linecap="round"/>';
+  if(form==='area'){o+='<polygon points="'+xc(0)+','+yof(Math.max(Math.min(...vals),0))+' '+pts+' '+xc(n-1)+','+yof(Math.max(Math.min(...vals),0))+'" fill="'+color+'" fill-opacity="'+(LOCK.fillOp*0.55).toFixed(2)+'"/>';}
+  o+='<polyline points="'+pts+'" fill="none" stroke="'+color+'" stroke-width="'+LOCK.lw+'" stroke-opacity="'+LOCK.lineOp+'"'+(dashed?' stroke-dasharray="5 3"':'')+' stroke-linejoin="round" stroke-linecap="round"/>';
   for(let i=0;i<n;i++)o+='<circle cx="'+xc(i)+'" cy="'+yof(vals[i])+'" r="1.6" fill="'+color+'"/>';
   return o;}
- s+=marks(lv,lform,COLORS.left,yl)+marks(rv,rform,COLORS.right,yr);
- s+='<line x1="'+PL+'" y1="'+PT+'" x2="'+PL+'" y2="'+(PT+ph)+'" stroke="'+COLORS.left+'" stroke-width="'+LOCK.lw+'"/>';
- s+='<line x1="'+(W-PR)+'" y1="'+PT+'" x2="'+(W-PR)+'" y2="'+(PT+ph)+'" stroke="'+COLORS.right+'" stroke-width="'+LOCK.lw+'"/>';
- for(const t of L.t)s+='<text x="'+(PL-6)+'" y="'+(yl(t)+3.5)+'" text-anchor="end" fill="'+COLORS.left+'">'+fmt(t)+'</text>';
- for(const t of R.t)s+='<text x="'+(W-PR+6)+'" y="'+(yr(t)+3.5)+'" text-anchor="start" fill="'+COLORS.right+'">'+fmt(t)+'</text>';
+ s+=marks(lv,lform,COLORS.left,yl,false)+marks(rv,rform,COLORS.right,yr,bothLines);
+ for(let k=0;k<=LOCK.intervals;k++){const yy=PT+ph-ph*k/LOCK.intervals;
+  s+='<text x="'+(PL-5)+'" y="'+(yy+2.8)+'" text-anchor="end" fill="'+COLORS.mut2+'" font-family="Consolas,monospace" font-size="10">'+fmt(L.t[k])+'</text>';
+  s+='<text x="'+(W-PR+5)+'" y="'+(yy+2.8)+'" text-anchor="start" fill="'+COLORS.ink2+'" font-family="Consolas,monospace" font-size="10">'+fmt(R.t[k])+'</text>';}
  const ev=Math.max(1,Math.ceil(n/(compact?6:10)));
- for(let i=0;i<n;i+=ev)s+='<text x="'+xc(i)+'" y="'+(PT+ph+16)+'" text-anchor="middle" fill="'+COLORS.mut+'">'+esc(labels[i])+'</text>';
- s+='<text x="'+(xc(n-1)-4)+'" y="'+(yl(lv[n-1])-6)+'" text-anchor="end" font-weight="700" fill="'+COLORS.left+'">'+fmt(lv[n-1])+'</text>';
- s+='<text x="'+(xc(n-1)+4)+'" y="'+(yr(rv[n-1])-6)+'" text-anchor="start" font-weight="700" fill="'+COLORS.right+'">'+fmt(rv[n-1])+'</text>';
+ for(let i=0;i<n;i+=ev){s+='<line x1="'+xc(i)+'" y1="'+(PT+ph)+'" x2="'+xc(i)+'" y2="'+(PT+ph+3)+'" stroke="#c4c0b8"/>';
+  s+='<text x="'+xc(i)+'" y="'+(PT+ph+16)+'" text-anchor="middle" fill="'+COLORS.mut+'">'+esc(labels[i])+'</text>';}
+ let yA=yl(lv[n-1])-6,yB=yr(rv[n-1])-6;
+ if(Math.abs(yA-yB)<11){const push=(11-Math.abs(yA-yB))/2;if(yA<yB){yA-=push;yB+=push;}else{yA+=push;yB-=push;}}
+ s+='<text x="'+(xc(n-1)-4)+'" y="'+yA+'" text-anchor="end" font-weight="700" fill="'+COLORS.left+'">'+fmt(lv[n-1])+'</text>';
+ s+='<text x="'+(xc(n-1)+4)+'" y="'+yB+'" text-anchor="start" font-weight="700" fill="'+COLORS.right+'">'+fmt(rv[n-1])+'</text>';
  for(let i=0;i<n;i++){
   s+='<g class="hv" data-i="'+i+'"><rect x="'+(PL+slot*i)+'" y="'+PT+'" width="'+slot+'" height="'+ph+'" fill="transparent"/>'
    +'<line class="ch" x1="'+xc(i)+'" y1="'+PT+'" x2="'+xc(i)+'" y2="'+(PT+ph)+'" stroke="'+COLORS.mut2+'" stroke-dasharray="3 3" opacity="0"/></g>';}

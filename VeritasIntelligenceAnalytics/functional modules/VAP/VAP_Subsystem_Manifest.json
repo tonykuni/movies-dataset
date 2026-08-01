@@ -8,8 +8,14 @@
     {
       "filename": "engine/via_autoplot_engine_v001.py",
       "role": "VeritasAutoPlot plotting engine v001 · reads the VDF analytical database (CSV/TSV/JSON/SQLite under <Base>/functional modules/VDF/db or <Base>/VDF/db) and renders dual-axis comparison charts as self-contained HTML+SVG (zero dependencies); --ui emits the interactive AutoPlot Workbench (v0162C platform format: sidebar nav, bilingual zh/en, header meta, cards, gallery, live dual-axis pairing)",
-      "bytes": 50078,
-      "sha256": "aea940b057871141da7ae1c93bf30282fe8001248dd4ae88964899d5b1923db6"
+      "bytes": 52844,
+      "sha256": "dec9fb9362e18a80996b6a550e140cb02f7e5cce5d6a013a99acd44ad5b66d03"
+    },
+    {
+      "filename": "spec/VIA_VAP_Chart_Library_Builder.html",
+      "role": "VAP 最佳圖庫建構器 Chart Library Builder · unified spec store (vap_chartlib_v1): 28-chart registry VAP-CH-01…28, unified defaults (via combo palette, lineWidth 1, lineOpacity 0.9, fillOpacity 0.4, frame/grid on, 5-tick dual axes), SSOT regex rules, Seaborn combos",
+      "bytes": 77338,
+      "sha256": "cc255176340aa5becf2409d6f3fe20ff3fb9ad6094f26687894e7c6de23bcdd3"
     },
     {
       "filename": "spec/VIA_Chart_Layout_Spec_ONE_Standalone.html",
@@ -27,14 +33,18 @@
   "governance": {
     "visual_lock": {
       "line_width": 1,
-      "opacity": 0.75,
+      "line_opacity": 0.9,
+      "fill_opacity": 0.4,
       "axis_steps": [
         2,
         2.5,
         5,
         10
       ],
-      "policy": "Chart & Layout Spec ONE visual lock is normative for all VIA chart output; deviations require a spec revision, not per-chart overrides."
+      "axis_ticks_per_axis": 5,
+      "frame": true,
+      "grid": true,
+      "policy": "Chart Library Builder unified defaults are normative; per-chart override only via the builder store, never ad-hoc."
     },
     "spec_policy": "Spec suite is REVIEW-ONLY reference material; charts and layouts must conform to the locked spec.",
     "pairing_contract": {
@@ -44,10 +54,10 @@
         "right": "line"
       },
       "series_colors": {
-        "left": "#4c78a8",
-        "right": "#439a9a"
+        "left": "#c96b5a",
+        "right": "#c4943a"
       },
-      "series_color_note": "Spec token palette verbatim per operator directive (--blue / --teal). Known conflict, recorded for operator review: blue x teal normal-vision separation dE 10.9 (< 15 guideline; amber --am would give 24.8). Mitigated by the mandatory mark-form difference, per-series tinted axes, and direct end labels, so identity is never colour-alone.",
+      "series_color_note": "Chart Library Builder via-combo fixed order C[0]/C[1] (#c96b5a red, #c4943a amber), per the unified spec store. Supersedes the earlier blue x teal assignment.",
       "clarity": [
         "tinted axis per series",
         "legend",
@@ -56,7 +66,9 @@
         "recessive grid",
         "axis domain must fully cover data extremes"
       ],
-      "output_policy": "Products are written under <Base>/VAP/output only; VDF database and canonical trees are read-only to the engine."
+      "output_policy": "Products are written under <Base>/VAP/output only; VDF database and canonical trees are read-only to the engine.",
+      "defaults_source": "spec/VIA_VAP_Chart_Library_Builder.html DEFAULTS: lineWidth 1, lineOpacity 0.9, fillOpacity 0.4, frame true, grid true, 5 ticks / 4 intervals per axis, steps on the 2/2.5/5/10 ladder",
+      "recorded_conflict": "Spec ONE headline visual lock says 透明度 0.75; the Chart Library Builder unified store specifies lineOpacity 0.9 + fillOpacity 0.4. The builder (統一位置 single source with per-chart override) is adopted; noted for operator review."
     },
     "promotion_gate": "OPERATOR_REVIEW_AND_SEPARATE_HASH_LOCKED_TRANSACTION_REQUIRED",
     "canonical_mutation_by_system_manager": false,
