@@ -13,8 +13,7 @@ $B = 'claude/via-system-integration-completion-k2lf85'
 if (-not (Get-Command git  -ErrorAction SilentlyContinue)) { winget install --id Git.Git -e --accept-source-agreements --accept-package-agreements }
 if (-not (Get-Command pwsh -ErrorAction SilentlyContinue)) { winget install --id Microsoft.PowerShell -e --accept-source-agreements --accept-package-agreements }
 $env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User')
-if (Test-Path "$R\.git") { git -C $R fetch origin $B; git -C $R checkout $B; git -C $R pull origin $B }
-else { git clone --branch $B https://github.com/tonykuni/movies-dataset.git $R }
+if (Test-Path "$R\.git") { git -C $R fetch origin $B; git -C $R checkout $B; git -C $R pull origin $B } else { git clone --branch $B https://github.com/tonykuni/movies-dataset.git $R }
 pwsh -NoProfile -ExecutionPolicy Bypass -File "$R\VIA.ps1"
 ```
 

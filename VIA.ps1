@@ -13,9 +13,9 @@ VIA · 統一主控 · One PowerShell to integrate all (repo-resident edition)
   if (-not (Get-Command git  -ErrorAction SilentlyContinue)) { winget install --id Git.Git -e --accept-source-agreements --accept-package-agreements }
   if (-not (Get-Command pwsh -ErrorAction SilentlyContinue)) { winget install --id Microsoft.PowerShell -e --accept-source-agreements --accept-package-agreements }
   $env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User')
-  if (Test-Path "$R\.git") { git -C $R fetch origin $B; git -C $R checkout $B; git -C $R pull origin $B }
-  else { git clone --branch $B https://github.com/tonykuni/movies-dataset.git $R }
+  if (Test-Path "$R\.git") { git -C $R fetch origin $B; git -C $R checkout $B; git -C $R pull origin $B } else { git clone --branch $B https://github.com/tonykuni/movies-dataset.git $R }
   pwsh -NoProfile -ExecutionPolicy Bypass -File "$R\VIA.ps1"
+  (if/else 必須同一行——互動視窗逐行執行,拆行的 else 會被當成獨立指令而報錯)
 
 動作(-Do,可多選,預設 StartAll):
   StartAll  ★六流程整合:Sync → QA → UI(AutoPlot 工作台)→ Launch(三輪全景
@@ -25,11 +25,15 @@ VIA · 統一主控 · One PowerShell to integrate all (repo-resident edition)
   QA        套件 AST + roundtrip 驗證
   UI        產生並開啟 AutoPlot Workbench(v0162C 格式)
   Plot      VeritasAutoPlot CLI(-PlotArgs '--list' / '--auto' / '--table t --left a --right b')
+  Clean     清掉舊的 runtime run_* 目錄(保留最新 -KeepRuns 個,預設 2)
   Launch    SHA 閘門 + AST 閘門 → AllInOne 三輪分析
+            (Launch 前自動 Clean + 磁碟空間閘門:剩餘空間 < -MinFreeGB 即擋下,
+            避免引擎跑到一半 [Errno 28] No space left on device)
   Promote   canonical 晉升單程序(需 -RunDir;-ApprovePromotion / -PromoteDryRun)
 
 參數:-Base(預設 C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics)、
-      -UiOnly、-NoOpenHtml、-PlotArgs、-RunDir、-ApprovePromotion、-PromoteDryRun
+      -UiOnly、-NoOpenHtml、-PlotArgs、-RunDir、-ApprovePromotion、-PromoteDryRun、
+      -KeepRuns(預設 2)、-MinFreeGB(預設 2)
 #>
 [CmdletBinding()]
 param(
@@ -40,7 +44,9 @@ param(
     [string]$PlotArgs = '--list',
     [string]$RunDir = '',
     [string[]]$ApprovePromotion = @(),
-    [switch]$PromoteDryRun
+    [switch]$PromoteDryRun,
+    [int]$KeepRuns = 2,
+    [double]$MinFreeGB = 2.0
 )
 
 Set-StrictMode -Version Latest
@@ -110,6 +116,10 @@ function Sync-VIA {
     # into earlier checkouts, breaking SHA gates and QA roundtrips. With
     # .gitattributes (-text) in place, force a clean re-checkout.
     git -C $RepoPath config core.autocrlf false
+    # Self-heal: a locally modified .gitattributes would silently drop the
+    # -text EOL lock, so restore it to repo authority before re-checkout.
+    git -C $RepoPath checkout HEAD -- .gitattributes
+    if ($LASTEXITCODE -ne 0) { throw 'git checkout of .gitattributes failed.' }
     $packageWorktree = Join-Path -Path $RepoPath -ChildPath $PackageName
     if (Test-Path -LiteralPath $packageWorktree) {
         Remove-Item -LiteralPath $packageWorktree -Recurse -Force
@@ -170,9 +180,49 @@ function Invoke-VIAPlot {
     }
 }
 
+function Clear-VIARuntime {
+    Write-Host ''
+    Write-VIALog -Message ('CLEAN → runtime run_* dirs (keep newest ' + $KeepRuns + ')') -Color Cyan
+    $runtimeRoot = ConvertTo-VIATarget -Root $Base -Relative 'supportive modules/VIA_Governance_Runtime/v0162B/runtime'
+    if (-not (Test-Path -LiteralPath $runtimeRoot -PathType Container)) {
+        Write-VIALog -Message 'OK  no runtime directory yet — nothing to clean' -Color Green
+        return
+    }
+    $runs = @(Get-ChildItem -LiteralPath $runtimeRoot -Directory -Filter 'run_*' | Sort-Object -Property Name -Descending)
+    $stale = @($runs | Select-Object -Skip $KeepRuns)
+    if ($stale.Count -eq 0) {
+        Write-VIALog -Message ('OK  ' + $runs.Count + ' run dir(s) present, none beyond keep window') -Color Green
+        return
+    }
+    $freedBytes = [long]0
+    foreach ($dir in $stale) {
+        $size = [long]0
+        $measured = Get-ChildItem -LiteralPath $dir.FullName -Recurse -File -ErrorAction SilentlyContinue |
+            Measure-Object -Property Length -Sum
+        if ($null -ne $measured -and $null -ne $measured.Sum) { $size = [long]$measured.Sum }
+        Remove-Item -LiteralPath $dir.FullName -Recurse -Force
+        $freedBytes += $size
+        Write-VIALog -Message ('DEL ' + $dir.Name + ' (' + [Math]::Round($size / 1MB, 1) + ' MB)') -Color DarkGray
+    }
+    Write-VIALog -Message ('CLEAN COMPLETE : freed ' + [Math]::Round($freedBytes / 1MB, 1) + ' MB · kept ' + ($runs.Count - $stale.Count) + ' newest run(s)') -Color Cyan
+}
+
+function Test-VIAFreeSpace {
+    $root = [System.IO.Path]::GetPathRoot([System.IO.Path]::GetFullPath($Base))
+    $drive = [System.IO.DriveInfo]::new($root)
+    $freeGB = [Math]::Round($drive.AvailableFreeSpace / 1GB, 2)
+    if ($freeGB -lt $MinFreeGB) {
+        throw ('Free-space gate: only ' + $freeGB + ' GB free on ' + $root + ' but the engine needs >= ' + $MinFreeGB +
+            ' GB for sandbox/runtime writes ([Errno 28] guard). 磁碟空間不足:請先清空間(資源回收筒 / Downloads / %TEMP%,或 -Do Clean -KeepRuns 0),再重跑;或以 -MinFreeGB 調整門檻。')
+    }
+    Write-VIALog -Message ('OK  free-space gate : ' + $freeGB + ' GB free on ' + $root) -Color Green
+}
+
 function Invoke-VIALaunch {
     Write-Host ''
-    Write-VIALog -Message 'LAUNCH → exact-SHA gate + AST gate + AllInOne 三輪全景(VRN/VDF/VAP/SUPPORTIVE)' -Color Cyan
+    Write-VIALog -Message 'LAUNCH → clean + space gate + exact-SHA gate + AST gate + AllInOne 三輪全景(VRN/VDF/VAP/SUPPORTIVE)' -Color Cyan
+    Clear-VIARuntime
+    Test-VIAFreeSpace
     $allInOne = ConvertTo-VIATarget -Root $Base -Relative $AllInOneRelative
     $repoCopy = ConvertTo-VIATarget -Root (Join-Path -Path $RepoPath -ChildPath $PackageName) -Relative $AllInOneRelative
     if (-not (Test-Path -LiteralPath $allInOne -PathType Leaf)) {
@@ -219,7 +269,7 @@ function Invoke-VIAPromote {
 Write-Host ''
 Write-Host 'VIA · MASTER (repo edition) · VRN / VDF / VAP / SUPPORTIVE' -ForegroundColor Cyan
 
-$ValidActions = @('StartAll', 'Sync', 'Install', 'QA', 'UI', 'Plot', 'Launch', 'Promote')
+$ValidActions = @('StartAll', 'Sync', 'Install', 'QA', 'UI', 'Plot', 'Clean', 'Launch', 'Promote')
 $requested = [System.Collections.Generic.List[string]]::new()
 foreach ($raw in $Do) {
     foreach ($piece in ([string]$raw).Split(',')) {
@@ -252,6 +302,7 @@ foreach ($action in $plan) {
         'QA' { Invoke-VIAQa }
         'UI' { Open-VIAWorkbench }
         'Plot' { Invoke-VIAPlot }
+        'Clean' { Clear-VIARuntime }
         'Launch' { Invoke-VIALaunch }
         'Promote' { Invoke-VIAPromote }
     }
