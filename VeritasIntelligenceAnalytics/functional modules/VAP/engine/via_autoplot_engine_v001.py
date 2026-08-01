@@ -423,6 +423,384 @@ display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}}
 """
 
 
+# ------------------------------------------------------------- workbench UI
+WORKBENCH_TEMPLATE = r"""<!DOCTYPE html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA · VeritasAutoPlot 工作台 · AutoPlot Workbench v001</title>
+<style>
+:root{
+ --bg:#f2f1ec; --paper:#fff; --paper2:#fbfaf7;
+ --ink:#1b1a17; --ink2:#3a3f3e; --mut:#6b6860; --mut2:#9c9890;
+ --line:#dcdad3; --line2:#ebe9e3;
+ --teal:#3d8f8f; --blue:#4c78a8; --violet:#7a6daa; --amber:#bf8f33; --green:#4f9465; --red:#c4634f;
+ --r:8px; --r-sm:5px;
+ --fs-h2:clamp(17px,1.45vw,21px); --fs-h3:clamp(14px,1.08vw,15.5px);
+ --fs-metric:clamp(20px,1.85vw,27px); --fs-body:clamp(12.5px,.86vw,13.5px);
+ --fs-sm:clamp(11.5px,.78vw,12.5px); --fs-xs:clamp(10px,.68vw,11px); --fs-lbl:clamp(9.5px,.62vw,10.5px);
+ --sb:clamp(232px,18vw,268px);
+ --shadow:0 1px 2px rgba(27,26,23,.04),0 8px 24px -12px rgba(27,26,23,.14);
+ --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+ --sans:"Microsoft JhengHei","Segoe UI",system-ui,Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink2);font-family:var(--sans);font-size:var(--fs-body);line-height:1.62;display:flex;overflow:hidden}
+.sidebar{flex:none;width:var(--sb);height:100vh;background:var(--paper);border-right:1px solid var(--line);display:flex;flex-direction:column}
+.brand{padding:18px 16px 12px;border-bottom:1px solid var(--line2)}
+.brand .k{font:700 var(--fs-lbl) var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mut2)}
+.brand h2{font-size:var(--fs-h2);color:var(--ink);line-height:1.25;margin-top:4px}
+.brand h2 span{display:block;font-size:var(--fs-xs);font-weight:400;color:var(--mut)}
+.brand p{font:600 var(--fs-lbl) var(--mono);color:var(--teal);margin-top:6px;letter-spacing:.06em}
+.navScroll{flex:1;overflow-y:auto;padding:10px 10px 14px}
+.groupTitle{font:700 var(--fs-lbl) var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mut2);padding:12px 8px 5px}
+.nav button{display:flex;align-items:center;gap:9px;width:100%;text-align:left;border:1px solid transparent;background:none;
+ border-radius:var(--r-sm);padding:7px 9px;font-family:var(--sans);font-size:var(--fs-sm);color:var(--ink2);cursor:pointer}
+.nav button:hover{background:var(--paper2);border-color:var(--line2)}
+.nav button.on{background:var(--ink);color:#fff}
+.nav button.on .n{color:#fff;opacity:.7}
+.nav .n{font:700 var(--fs-lbl) var(--mono);color:var(--mut2);width:18px;flex:none}
+.nav .en{display:block;font-size:var(--fs-xs);opacity:.65}
+.sideStats{border-top:1px solid var(--line2);padding:10px 16px;display:grid;grid-template-columns:1fr 1fr;gap:6px 10px}
+.sideStats .mk{font:700 var(--fs-lbl) var(--mono);letter-spacing:.08em;color:var(--mut2);text-transform:uppercase;display:block}
+.sideStats .mv{font:700 var(--fs-sm) var(--mono);color:var(--ink)}
+.main{flex:1;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+header{padding:18px 26px 12px;border-bottom:1px solid var(--line);background:var(--paper2);display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.kicker{font:700 var(--fs-lbl) var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--teal)}
+header h1{font-size:var(--fs-h2);color:var(--ink);margin-top:2px}
+header h1 span{font-size:var(--fs-xs);font-weight:400;color:var(--mut);margin-left:8px}
+.sub{font-size:var(--fs-sm);color:var(--mut)}
+.headMeta{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.headMeta .mk{font:700 var(--fs-lbl) var(--mono);letter-spacing:.08em;color:var(--mut2);text-transform:uppercase;display:block}
+.headMeta .mv{font:700 var(--fs-sm) var(--mono);color:var(--ink)}
+.pages{flex:1;padding:18px 26px 30px}
+.page{display:none}
+.page.on{display:block}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.card{display:flex;flex-direction:column;justify-content:space-between;min-height:78px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 13px;min-width:0}
+.card .v{font:700 var(--fs-metric) var(--mono);color:var(--ink)}
+.card .l{font:700 var(--fs-lbl) var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut2)}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:15px 18px;margin-bottom:16px}
+.panel h3{font-size:var(--fs-h3);color:var(--ink)}
+.panel h3 span{font-size:var(--fs-xs);font-weight:400;color:var(--mut);margin-left:7px}
+.panel .hint{font-size:var(--fs-xs);color:var(--mut);margin:2px 0 10px}
+table{width:100%;border-collapse:collapse;font-size:var(--fs-sm)}
+th{font:700 var(--fs-lbl) var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--mut2);text-align:left;
+ border-bottom:1px solid var(--line);padding:5px 8px}
+td{border-bottom:1px solid var(--line2);padding:6px 8px;vertical-align:top;word-break:break-word}
+.mono{font-family:var(--mono)}
+.ctrl{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
+.ctrl label{display:block;font:700 var(--fs-lbl) var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut2);margin-bottom:3px}
+.ctrl select,.ctrl button{font-family:var(--sans);font-size:var(--fs-sm);color:var(--ink2);background:var(--paper2);
+ border:1px solid var(--line);border-radius:var(--r-sm);padding:6px 9px;cursor:pointer}
+.ctrl .go{background:var(--ink);color:#fff;font-weight:700;border-color:var(--ink);padding:6px 16px}
+.ctrl .swap{font-family:var(--mono)}
+.legend{display:flex;gap:18px;font-size:var(--fs-sm);margin:4px 0 2px}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+svg{width:100%;height:auto;display:block}
+.hv:hover .ch{opacity:1}
+.readout{font:600 var(--fs-xs) var(--mono);color:var(--mut);min-height:18px;margin-top:4px}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px}
+.gcell{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 12px;cursor:pointer}
+.gcell:hover{border-color:var(--teal)}
+.gcell .t{font-size:var(--fs-sm);font-weight:700;color:var(--ink)}
+.gcell .s{font-size:var(--fs-xs);color:var(--mut);margin-bottom:4px}
+.lockrow{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+.badge{font:700 var(--fs-lbl) var(--mono);letter-spacing:.06em;border:1px solid var(--line);border-radius:var(--r-sm);
+ background:var(--paper2);color:var(--ink2);padding:3px 9px}
+footer{border-top:1px solid var(--line);padding:8px 26px;font-size:var(--fs-xs);color:var(--mut);background:var(--paper2);
+ display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+kbd{font:700 var(--fs-lbl) var(--mono);border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;background:var(--paper)}
+</style></head><body>
+<aside class="sidebar">
+ <div class="brand">
+  <div class="k"><span>Veritas Intelligence Analytics</span></div>
+  <h2>自動繪圖工作台<br><span>AutoPlot Workbench</span></h2>
+  <p>VAP · VeritasAutoPlot · v001</p>
+ </div>
+ <div class="navScroll">
+  <div class="groupTitle">繪圖 Plotting</div>
+  <div class="nav">
+   <button id="nav-home" onclick="switchPage('home')"><span class="n">01</span><span>平台總覽<span class="en">OVERVIEW</span></span></button>
+   <button id="nav-pair" onclick="switchPage('pair')"><span class="n">02</span><span>配對繪圖<span class="en">PAIR PLOT</span></span></button>
+   <button id="nav-gallery" onclick="switchPage('gallery')"><span class="n">03</span><span>圖庫 <span class="en">GALLERY</span></span></button>
+  </div>
+  <div class="groupTitle">治理 Governance</div>
+  <div class="nav">
+   <button id="nav-spec" onclick="switchPage('spec')"><span class="n">04</span><span>繪圖規範<span class="en">SPEC · VISUAL LOCK</span></span></button>
+  </div>
+ </div>
+ <div class="sideStats">
+  <div><span class="mk">Tables</span><span class="mv" id="ssTables">0</span></div>
+  <div><span class="mk">Pairs</span><span class="mv" id="ssPairs">0</span></div>
+  <div><span class="mk">State</span><span class="mv" style="color:var(--green)">READY</span></div>
+  <div><span class="mk">Lock</span><span class="mv">🔒 1 · 0.75</span></div>
+ </div>
+</aside>
+<div class="main">
+ <header>
+  <div>
+   <div class="kicker">VDF 資料庫 → 雙軸互比 → 規範圖表 · VISUAL LOCK</div>
+   <h1 id="pageTitle">平台總覽 <span>Overview</span></h1>
+   <p id="pageSubtitle" class="sub">資料目錄與繪圖入口 · Data catalog and plotting entry</p>
+  </div>
+  <div class="headMeta">
+   <div><span class="mk">建置 Build</span><span class="mv">VAP v001</span></div>
+   <div><span class="mk">資料表 Tables</span><span class="mv" id="hmTables">0</span></div>
+   <div><span class="mk">規範 Spec</span><span class="mv">ONE 🔒</span></div>
+  </div>
+ </header>
+ <div class="pages">
+  <section class="page" id="page-home">
+   <div class="cards">
+    <div class="card"><div class="v" id="cTables">0</div><div class="l">資料表 Tables</div></div>
+    <div class="card"><div class="v" id="cRows">0</div><div class="l">資料列 Rows</div></div>
+    <div class="card"><div class="v" id="cCols">0</div><div class="l">數值欄 Numeric</div></div>
+    <div class="card"><div class="v" id="cPairs">0</div><div class="l">可配對 Pairs</div></div>
+   </div>
+   <div class="panel">
+    <h3>VDF 資料目錄 <span>Data Catalog</span></h3>
+    <div class="hint">來源 Source:VDF 分析資料庫(CSV / TSV / JSON / SQLite)· 唯讀 READ-ONLY</div>
+    <table><thead><tr><th>資料表 Table</th><th>列數 Rows</th><th>X 軸</th><th>數值欄 Numeric Columns</th><th>來源 Origin</th></tr></thead>
+    <tbody id="catalogBody"></tbody></table>
+   </div>
+  </section>
+  <section class="page" id="page-pair">
+   <div class="panel">
+    <h3>雙軸互比設定 <span>Dual-Axis Pairing</span></h3>
+    <div class="hint">配對規約:一個資料一個軸 · 兩軸互比 · 兩系列必用不同圖形 · 顯示清楚</div>
+    <div class="ctrl">
+     <div><label>資料表 Table</label><select id="selTable"></select></div>
+     <div><label>X 軸</label><select id="selX"></select></div>
+     <div><label>左軸 Left</label><select id="selLeft"></select></div>
+     <div><label>左圖形 Form</label><select id="selLeftForm"><option value="bar">柱狀 BAR</option><option value="line">折線 LINE</option><option value="area">面積 AREA</option></select></div>
+     <div><label>右軸 Right</label><select id="selRight"></select></div>
+     <div><label>右圖形 Form</label><select id="selRightForm"><option value="line">折線 LINE</option><option value="bar">柱狀 BAR</option><option value="area">面積 AREA</option></select></div>
+     <button class="swap" onclick="swapAxes()" title="左右互換">⇄ 互換</button>
+     <button class="go" onclick="renderPair()">繪製 RENDER</button>
+    </div>
+    <div class="legend" id="pairLegend"></div>
+    <div id="pairChart"></div>
+    <div class="readout" id="pairReadout">滑鼠移入圖面可讀值 · hover for readout</div>
+   </div>
+  </section>
+  <section class="page" id="page-gallery">
+   <div class="panel">
+    <h3>全配對圖庫 <span>Auto-Pair Gallery</span></h3>
+    <div class="hint">每一組數值欄配對一張縮圖;點擊載入「02 配對繪圖」細看 · click to open in PAIR PLOT</div>
+    <div class="gallery" id="galleryGrid"></div>
+   </div>
+  </section>
+  <section class="page" id="page-spec">
+   <div class="panel">
+    <h3>視覺鎖 <span>VISUAL LOCK</span></h3>
+    <div class="lockrow">
+     <span class="badge">線粗 LINE WIDTH · 1</span>
+     <span class="badge">透明度 OPACITY · 0.75</span>
+     <span class="badge">軸距 AXIS STEPS · 1 / 2 / 2.5 / 5 / 10</span>
+     <span class="badge">軸域涵蓋極值 DOMAIN COVERS EXTREMES</span>
+    </div>
+    <div class="hint">權威來源 Authority:VIA · 繪圖版面規範 ONE · Chart &amp; Layout Spec ONE(spec/,SHA-256 登錄於 VAP anchor)</div>
+   </div>
+   <div class="panel">
+    <h3>配對規約 <span>Pairing Contract</span></h3>
+    <table><thead><tr><th>項目 Item</th><th>規定 Rule</th></tr></thead><tbody>
+     <tr><td>軸 Axes</td><td>一個資料一個軸;左軸 × 右軸,共用 X,相互比較</td></tr>
+     <tr><td>圖形 Forms</td><td>兩系列必用不同圖形(柱 / 線 / 面積);相同選擇會被強制錯開</td></tr>
+     <tr><td>色票 Colors</td><td><span class="sw" style="background:var(--blue)"></span>左軸 --blue #4c78a8 · <span class="sw" style="background:var(--teal)"></span>右軸 --teal #3d8f8f(規範原配色)</td></tr>
+     <tr><td>清晰 Clarity</td><td>軸刻度染系列色 · 圖例 · 末值直標 · 懸停讀值 · 淡灰格線</td></tr>
+     <tr><td>治理 Governance</td><td>VDF 資料庫唯讀;產出僅寫入 &lt;Base&gt;/VAP/output</td></tr>
+    </tbody></table>
+   </div>
+  </section>
+ </div>
+ <footer>
+  <span>VIA · VeritasAutoPlot v001 · 🔒 VISUAL LOCK 線粗 1 · 透明度 0.75 · 軸距 1/2/2.5/5/10</span>
+  <span>鍵盤:<kbd>[</kbd> / <kbd>]</kbd> 切換頁面</span>
+ </footer>
+</div>
+<script>
+const CATALOG = __CATALOG__;
+const LOCK = {lw:1, op:0.75, steps:[1,2,2.5,5,10]};
+const COLORS = {left:'#4c78a8', right:'#3d8f8f', soft:'#ebe9e3', mut:'#6b6860', mut2:'#9c9890'};
+const PAGES = ['home','pair','gallery','spec'];
+const TITLES = {home:['平台總覽','Overview','資料目錄與繪圖入口 · Data catalog and plotting entry'],
+ pair:['配對繪圖','Pair Plot','雙軸互比 · 一個資料一個軸 · Dual-axis comparison'],
+ gallery:['圖庫','Gallery','全配對縮圖 · All numeric pairs at a glance'],
+ spec:['繪圖規範','Spec · Visual Lock','權威定義與配對規約 · Authority and pairing contract']};
+function switchPage(p){
+ PAGES.forEach(q=>{document.getElementById('page-'+q).classList.toggle('on',q===p);
+  document.getElementById('nav-'+q).classList.toggle('on',q===p);});
+ const t=TITLES[p];
+ document.getElementById('pageTitle').innerHTML=t[0]+' <span>'+t[1]+'</span>';
+ document.getElementById('pageSubtitle').textContent=t[2];
+ try{localStorage.setItem('vap_wb_page',p);}catch(e){}
+}
+document.addEventListener('keydown',e=>{
+ if(e.key!=='['&&e.key!==']')return;
+ const cur=PAGES.findIndex(p=>document.getElementById('page-'+p).classList.contains('on'));
+ switchPage(PAGES[(cur+(e.key===']'?1:PAGES.length-1))%PAGES.length]);
+});
+function niceTicks(lo,hi){
+ if(hi<=lo)hi=lo+1;
+ const raw=(hi-lo)/5, mag=Math.pow(10,Math.floor(Math.log10(raw)));
+ let step=mag*10;
+ for(const c of LOCK.steps){if(c*mag>=raw){step=c*mag;break;}}
+ const t=[Math.floor(lo/step)*step];
+ while(t[t.length-1]<hi)t.push(+(t[t.length-1]+step).toPrecision(12));
+ return t;
+}
+function fmt(v){
+ if(v===0)return'0';
+ const a=Math.abs(v);
+ if(a>=1e9)return(v/1e9).toPrecision(4).replace(/\.?0+$/,'')+'B';
+ if(a>=1e6)return(v/1e6).toPrecision(4).replace(/\.?0+$/,'')+'M';
+ if(a>=1e4)return(v/1e3).toPrecision(4).replace(/\.?0+$/,'')+'K';
+ if(a>=100)return v.toLocaleString(undefined,{maximumFractionDigits:0});
+ return String(+v.toPrecision(6));
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function drawChart(labels,lv,rv,lname,rname,lform,rform,compact){
+ if(lform===rform)rform=lform!=='line'?'line':'bar';
+ const W=960,H=compact?300:420,PL=64,PR=64,PT=18,PB=44,pw=W-PL-PR,ph=H-PT-PB,n=labels.length;
+ function dom(vals,zero){let lo=Math.min(...vals),hi=Math.max(...vals);
+  if(zero){lo=Math.min(lo,0);hi=Math.max(hi,0);}if(lo===hi){lo-=1;hi+=1;}
+  const t=niceTicks(lo,hi);return{lo:t[0],hi:t[t.length-1],t:t};}
+ const L=dom(lv,lform!=='line'),R=dom(rv,rform!=='line');
+ const yl=v=>PT+ph-(v-L.lo)/(L.hi-L.lo)*ph, yr=v=>PT+ph-(v-R.lo)/(R.hi-R.lo)*ph;
+ const slot=pw/Math.max(1,n), xc=i=>PL+slot*i+slot/2;
+ let s='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" font-family="Microsoft JhengHei,Segoe UI,sans-serif" font-size="11">';
+ for(const t of L.t)s+='<line x1="'+PL+'" y1="'+yl(t)+'" x2="'+(W-PR)+'" y2="'+yl(t)+'" stroke="'+COLORS.soft+'"/>';
+ function marks(vals,form,color,yof){
+  let o='';const bw=Math.max(2,slot*0.42);
+  if(form==='bar'){const base=yof(0);
+   for(let i=0;i<n;i++){const top=Math.min(yof(vals[i]),base),h=Math.max(1,Math.abs(yof(vals[i])-base));
+    o+='<rect x="'+(xc(i)-bw/2)+'" y="'+top+'" width="'+bw+'" height="'+h+'" rx="1.5" fill="'+color+'" fill-opacity="'+LOCK.op+'"/>';}
+   return o;}
+  const pts=vals.map((v,i)=>xc(i)+','+yof(v)).join(' ');
+  if(form==='area'){o+='<polygon points="'+xc(0)+','+yof(Math.max(Math.min(...vals),0))+' '+pts+' '+xc(n-1)+','+yof(Math.max(Math.min(...vals),0))+'" fill="'+color+'" fill-opacity="'+(LOCK.op*0.4).toFixed(2)+'"/>';}
+  o+='<polyline points="'+pts+'" fill="none" stroke="'+color+'" stroke-width="'+LOCK.lw+'" stroke-opacity="'+LOCK.op+'" stroke-linejoin="round" stroke-linecap="round"/>';
+  for(let i=0;i<n;i++)o+='<circle cx="'+xc(i)+'" cy="'+yof(vals[i])+'" r="1.6" fill="'+color+'"/>';
+  return o;}
+ s+=marks(lv,lform,COLORS.left,yl)+marks(rv,rform,COLORS.right,yr);
+ s+='<line x1="'+PL+'" y1="'+PT+'" x2="'+PL+'" y2="'+(PT+ph)+'" stroke="'+COLORS.left+'" stroke-width="'+LOCK.lw+'"/>';
+ s+='<line x1="'+(W-PR)+'" y1="'+PT+'" x2="'+(W-PR)+'" y2="'+(PT+ph)+'" stroke="'+COLORS.right+'" stroke-width="'+LOCK.lw+'"/>';
+ for(const t of L.t)s+='<text x="'+(PL-6)+'" y="'+(yl(t)+3.5)+'" text-anchor="end" fill="'+COLORS.left+'">'+fmt(t)+'</text>';
+ for(const t of R.t)s+='<text x="'+(W-PR+6)+'" y="'+(yr(t)+3.5)+'" text-anchor="start" fill="'+COLORS.right+'">'+fmt(t)+'</text>';
+ const ev=Math.max(1,Math.ceil(n/(compact?6:10)));
+ for(let i=0;i<n;i+=ev)s+='<text x="'+xc(i)+'" y="'+(PT+ph+16)+'" text-anchor="middle" fill="'+COLORS.mut+'">'+esc(labels[i])+'</text>';
+ s+='<text x="'+(xc(n-1)-4)+'" y="'+(yl(lv[n-1])-6)+'" text-anchor="end" font-weight="700" fill="'+COLORS.left+'">'+fmt(lv[n-1])+'</text>';
+ s+='<text x="'+(xc(n-1)+4)+'" y="'+(yr(rv[n-1])-6)+'" text-anchor="start" font-weight="700" fill="'+COLORS.right+'">'+fmt(rv[n-1])+'</text>';
+ for(let i=0;i<n;i++){
+  s+='<g class="hv" data-i="'+i+'"><rect x="'+(PL+slot*i)+'" y="'+PT+'" width="'+slot+'" height="'+ph+'" fill="transparent"/>'
+   +'<line class="ch" x1="'+xc(i)+'" y1="'+PT+'" x2="'+xc(i)+'" y2="'+(PT+ph)+'" stroke="'+COLORS.mut2+'" stroke-dasharray="3 3" opacity="0"/></g>';}
+ s+='</svg>';
+ return s;
+}
+function tableByName(name){return CATALOG.find(t=>t.name===name);}
+function fillSelect(sel,opts,val){sel.innerHTML=opts.map(o=>'<option'+(o===val?' selected':'')+'>'+esc(o)+'</option>').join('');}
+function onTableChange(){
+ const t=tableByName(document.getElementById('selTable').value);if(!t)return;
+ fillSelect(document.getElementById('selX'),t.all_columns,t.x);
+ fillSelect(document.getElementById('selLeft'),t.numeric,t.numeric[0]);
+ fillSelect(document.getElementById('selRight'),t.numeric,t.numeric[1]||t.numeric[0]);
+}
+function swapAxes(){
+ const l=document.getElementById('selLeft'),r=document.getElementById('selRight');
+ const tmp=l.value;l.value=r.value;r.value=tmp;renderPair();
+}
+function seriesOf(t,xcol,col){
+ const pts=[];
+ for(let i=0;i<t.rows.length;i++){
+  const x=t.rows[i][xcol],v=parseFloat(String(t.rows[i][col]).replace(/,/g,''));
+  if(x!==undefined&&x!==null&&String(x).length&&isFinite(v))pts.push([String(x),v]);}
+ return pts;
+}
+function renderPair(){
+ const t=tableByName(document.getElementById('selTable').value);if(!t)return;
+ const xcol=document.getElementById('selX').value,
+  ln=document.getElementById('selLeft').value, rn=document.getElementById('selRight').value,
+  lf=document.getElementById('selLeftForm').value, rf=document.getElementById('selRightForm').value;
+ const lp=seriesOf(t,xcol,ln), rp=seriesOf(t,xcol,rn);
+ const keys=lp.map(p=>p[0]).filter(k=>rp.some(q=>q[0]===k));
+ const labels=keys, lv=keys.map(k=>lp.find(p=>p[0]===k)[1]), rv=keys.map(k=>rp.find(p=>p[0]===k)[1]);
+ if(labels.length<3){document.getElementById('pairChart').innerHTML='<div class="hint">資料點不足(&lt;3)· not enough complete points</div>';return;}
+ const fz={bar:'柱狀 BAR',line:'折線 LINE',area:'面積 AREA'};
+ document.getElementById('pairLegend').innerHTML=
+  '<span><span class="sw" style="background:'+COLORS.left+'"></span><b>'+esc(ln)+'</b> · 左軸 LEFT · '+fz[lf]+'</span>'
+ +'<span><span class="sw" style="background:'+COLORS.right+'"></span><b>'+esc(rn)+'</b> · 右軸 RIGHT · '+fz[rf===lf?(lf!=='line'?'line':'bar'):rf]+'</span>';
+ document.getElementById('pairChart').innerHTML=drawChart(labels,lv,rv,ln,rn,lf,rf,false);
+ document.querySelectorAll('#pairChart .hv').forEach(g=>{
+  g.addEventListener('mousemove',()=>{const i=+g.dataset.i;
+   document.getElementById('pairReadout').textContent=labels[i]+' · '+ln+' '+fmt(lv[i])+' · '+rn+' '+fmt(rv[i]);});});
+}
+function openInPair(tname,l,r){
+ fillSelect(document.getElementById('selTable'),CATALOG.map(t=>t.name),tname);
+ onTableChange();
+ document.getElementById('selLeft').value=l;document.getElementById('selRight').value=r;
+ switchPage('pair');renderPair();
+}
+function boot(){
+ let rows=0,cols=0,pairs=0;
+ const cbody=document.getElementById('catalogBody'),grid=document.getElementById('galleryGrid');
+ for(const t of CATALOG){
+  rows+=t.rows.length;cols+=t.numeric.length;
+  pairs+=t.numeric.length*(t.numeric.length-1)/2;
+  cbody.innerHTML+='<tr><td class="mono"><b>'+esc(t.name)+'</b></td><td class="mono">'+t.rows.length+'</td><td class="mono">'+esc(t.x)+'</td><td>'+t.numeric.map(esc).join(' · ')+'</td><td class="mono">'+esc(t.origin)+'</td></tr>';
+  for(let i=0;i<t.numeric.length;i++)for(let j=i+1;j<t.numeric.length;j++){
+   const l=t.numeric[i],r=t.numeric[j];
+   const lp=seriesOf(t,t.x,l),rp=seriesOf(t,t.x,r);
+   const keys=lp.map(p=>p[0]).filter(k=>rp.some(q=>q[0]===k));
+   if(keys.length<3)continue;
+   const cell=document.createElement('div');cell.className='gcell';
+   cell.innerHTML='<div class="t">'+esc(l)+' × '+esc(r)+'</div><div class="s">'+esc(t.name)+' · '+keys.length+' pts</div>'
+    +drawChart(keys,keys.map(k=>lp.find(p=>p[0]===k)[1]),keys.map(k=>rp.find(p=>p[0]===k)[1]),l,r,'bar','line',true);
+   cell.onclick=()=>openInPair(t.name,l,r);
+   grid.appendChild(cell);}}
+ document.getElementById('cTables').textContent=CATALOG.length;
+ document.getElementById('cRows').textContent=rows;
+ document.getElementById('cCols').textContent=cols;
+ document.getElementById('cPairs').textContent=pairs;
+ document.getElementById('ssTables').textContent=CATALOG.length;
+ document.getElementById('ssPairs').textContent=pairs;
+ document.getElementById('hmTables').textContent=CATALOG.length;
+ if(CATALOG.length){fillSelect(document.getElementById('selTable'),CATALOG.map(t=>t.name),CATALOG[0].name);
+  document.getElementById('selTable').addEventListener('change',onTableChange);
+  onTableChange();renderPair();}
+ let p='home';try{p=localStorage.getItem('vap_wb_page')||'home';}catch(e){}
+ switchPage(PAGES.includes(p)?p:'home');
+}
+boot();
+</script></body></html>
+"""
+
+MAX_UI_ROWS = 800
+
+
+def write_workbench(catalog: list[tuple[str, list[dict], str]], out_dir: Path) -> Path:
+    """--ui: emit the interactive AutoPlot Workbench (v0162C platform format)."""
+    payload = []
+    for name, rows, origin in catalog:
+        numerics = numeric_columns(rows)
+        x_name = x_column(rows)
+        trimmed = rows[:MAX_UI_ROWS]
+        if len(rows) > MAX_UI_ROWS:
+            log(f"UI  {name}: embedding first {MAX_UI_ROWS} of {len(rows)} rows")
+        payload.append({
+            "name": name, "origin": origin, "x": x_name,
+            "all_columns": list(rows[0].keys()) if rows else [],
+            "numeric": numerics,
+            "rows": [{k: row.get(k) for k in ([x_name] if x_name else []) + numerics}
+                     for row in trimmed],
+        })
+    page = WORKBENCH_TEMPLATE.replace("__CATALOG__", json.dumps(payload, ensure_ascii=False))
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path = out_dir / "VAP_Workbench.html"
+    out_path.write_text(page, encoding="utf-8")
+    log(f"WORKBENCH {out_path}")
+    return out_path
+
+
 # ----------------------------------------------------------------- pipelines
 def build_pair_chart(rows: list[dict], table: str, x_name: str, left_name: str,
                      right_name: str, left_form: str, right_form: str,
@@ -489,6 +867,8 @@ def main() -> int:
                         help="explicit data file or folder (repeatable); overrides auto-discovery")
     parser.add_argument("--demo", action="store_true",
                         help="write a sample dataset into VDF/db first (demo_tw_stock_monthly.csv)")
+    parser.add_argument("--ui", action="store_true",
+                        help="emit the interactive AutoPlot Workbench (v0162C platform format)")
     args = parser.parse_args()
 
     base = Path(args.base).resolve()
@@ -514,7 +894,14 @@ def main() -> int:
         except Exception as exc:  # noqa: BLE001 — corrupt source must not kill the run
             log(f"WARN cannot read {path.name}: {exc}")
 
-    if args.list or (not args.auto and not (args.table and args.left and args.right)):
+    if args.ui:
+        workbench = write_workbench(catalog, out_dir)
+        log(f"DONE workbench → {workbench}")
+        if not (args.auto or (args.table and args.left and args.right)):
+            return 0
+
+    if args.list or (not args.auto and not args.ui
+                     and not (args.table and args.left and args.right)):
         log(f"{len(catalog)} table(s) discovered:")
         for name, rows, rel in catalog:
             numerics = numeric_columns(rows)
