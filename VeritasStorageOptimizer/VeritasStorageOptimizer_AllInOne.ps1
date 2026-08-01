@@ -61,6 +61,9 @@ $script:ProtectedDirs  = @('.git', '.svn', '.venv', 'node_modules', 'site-packag
 # ~no space, yet near-empty twins are often structural (__init__.py, .gitkeep,
 # 1-byte stdout stubs) and removing "duplicates" across projects breaks them.
 $script:DupMinBytes    = 1024
+# User-placed marker: any directory containing this file is off-limits to
+# every strategy, letting users pin "do not touch" zones inside a scan.
+$script:ProtectMarker  = '.veritas_protect'
 
 if (-not (Test-Path -LiteralPath $script:LogDir)) { New-Item -ItemType Directory -Path $script:LogDir -Force | Out-Null }
 
@@ -83,6 +86,7 @@ function Test-RefusedTarget {
         $attr = [System.IO.File]::GetAttributes($full)
         if (($attr -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) { return '拒絕:目標本身為符號連結 (Symlink/Junction)' }
     } catch { return '路徑屬性無法讀取' }
+    if (Test-Path -LiteralPath (Join-Path $full $script:ProtectMarker) -PathType Leaf) { return ('拒絕:目標受 {0} 保護標記鎖定' -f $script:ProtectMarker) }
     $root = [System.IO.Path]::GetPathRoot($full)
     $norm = $full.TrimEnd([System.IO.Path]::DirectorySeparatorChar)
     if ($norm -eq $root.TrimEnd([System.IO.Path]::DirectorySeparatorChar)) { return '拒絕:不可對檔案系統根目錄執行' }
@@ -129,13 +133,15 @@ function Test-ReparsePoint {
 }
 
 function Test-SkippedDir {
-    # Protected names, reparse points, and Python virtual environments
-    # (marked by pyvenv.cfg - venvs share thousands of identical package
-    # files, so cross-venv dedup would gut every env after the first).
+    # Protected names, reparse points, Python virtual environments (marked
+    # by pyvenv.cfg - venvs share thousands of identical package files, so
+    # cross-venv dedup would gut every env after the first), and user
+    # protect-marker zones (.veritas_protect).
     param([string]$Path)
     if ($script:ProtectedDirs -contains [System.IO.Path]::GetFileName($Path)) { return $true }
     if (Test-ReparsePoint -Path $Path) { return $true }
     if (Test-Path -LiteralPath (Join-Path $Path 'pyvenv.cfg') -PathType Leaf) { return $true }
+    if (Test-Path -LiteralPath (Join-Path $Path $script:ProtectMarker) -PathType Leaf) { return $true }
     return $false
 }
 
@@ -467,7 +473,7 @@ font-size:13px;opacity:0;transform:translateY(16px);transition:.35s;z-index:9}.t
       <button id="engJs" onclick="setEngine('node')">Node.js</button>
     </div>
   </div>
-  <div class="muted">保護名單:.git / .svn / .venv / node_modules / site-packages / $RECYCLE.BIN / System Volume Information 與所有 Python 虛擬環境(偵測 pyvenv.cfg)一律跳過;根目錄與家目錄上層一律拒絕;小於 1 KB 的檔案不列入重複比對(保護 __init__.py / .gitkeep 等結構檔)。</div>
+  <div class="muted">保護名單:.git / .svn / .venv / node_modules / site-packages / $RECYCLE.BIN / System Volume Information 與所有 Python 虛擬環境(偵測 pyvenv.cfg)一律跳過;在資料夾內放置空檔案 <b>.veritas_protect</b> 可將該區整個鎖定不掃不刪;根目錄與家目錄上層一律拒絕;小於 1 KB 的檔案不列入重複比對(保護 __init__.py / .gitkeep 等結構檔)。</div>
 </div>
 
 <div class="card"><h2>執行</h2>
@@ -605,6 +611,9 @@ function Invoke-SelfTest {
     New-Item -ItemType Directory -Path (Join-Path $sand 'fake_env') -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $sand 'fake_env/pyvenv.cfg') -Value 'home = /usr'
     Set-Content -LiteralPath (Join-Path $sand 'fake_env/venvjunk.tmp') -Value 'venv temp'
+    New-Item -ItemType Directory -Path (Join-Path $sand 'keepzone') -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $sand 'keepzone/.veritas_protect') -Value ''
+    Set-Content -LiteralPath (Join-Path $sand 'keepzone/zonejunk.tmp') -Value 'zone temp'
     New-Item -ItemType Directory -Path (Join-Path $sand 'nest/inner') -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $sand 'nest/inner/only.tmp') -Value 'cascade me'
 
@@ -625,6 +634,8 @@ function Invoke-SelfTest {
     Add-Test 'Dry-run ignores tiny duplicates' (@($dry.items | Where-Object { $_.path.Contains('stub_') }).Count -eq 0)
     Add-Test 'Dry-run skips protected .git'   (-not (@($dry.items | Where-Object { $_.path.Contains('.git') }).Count -gt 0))
     Add-Test 'Dry-run skips python venv'      (@($dry.items | Where-Object { $_.path.Contains('fake_env') }).Count -eq 0)
+    Add-Test 'Dry-run skips protect-marker zone' (@($dry.items | Where-Object { $_.path.Contains('keepzone') }).Count -eq 0)
+    Add-Test 'Guard rejects protect-marked target' ((Test-RefusedTarget -Path (Join-Path $sand 'keepzone')) -ne '')
     Add-Test 'Dry-run counts empty dir'       ($dry.emptyDirs.Count -ge 1)
     Add-Test 'Dry-run deletes nothing'        ((Test-Path -LiteralPath (Join-Path $sand 'junk.tmp')) -and (Test-Path -LiteralPath (Join-Path $sand 'bigfile.bin')))
     Add-Test 'Dry-run audit log written'      (Test-Path -LiteralPath $dry.logPath)
@@ -638,6 +649,7 @@ function Invoke-SelfTest {
     Add-Test 'Execute keeps normal file'      (Test-Path -LiteralPath (Join-Path $sand 'keep.txt'))
     Add-Test 'Execute keeps protected .git'   (Test-Path -LiteralPath (Join-Path $sand '.git/protected.tmp'))
     Add-Test 'Execute keeps venv content'     (Test-Path -LiteralPath (Join-Path $sand 'fake_env/venvjunk.tmp'))
+    Add-Test 'Execute keeps protect-marker zone' (Test-Path -LiteralPath (Join-Path $sand 'keepzone/zonejunk.tmp'))
     Add-Test 'Execute removes empty dir'      (-not (Test-Path -LiteralPath (Join-Path $sand 'sub/empty_dir')))
     Add-Test 'Execute cascades nested empties' (-not (Test-Path -LiteralPath (Join-Path $sand 'nest')))
 

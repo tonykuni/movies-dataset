@@ -13,12 +13,19 @@ const PROTECTED_DIRS = new Set(['.git', '.svn', '.venv', 'node_modules', 'site-p
 // while near-empty twins (__init__.py, .gitkeep, stdout stubs) are structural.
 const DUP_MIN_BYTES = 1024;
 
-// Protected names plus Python virtual environments (pyvenv.cfg marker):
-// venvs share thousands of identical package files, so cross-venv dedup
-// would gut every env after the first-scanned one.
+// User-placed marker: any directory containing this file is off-limits to
+// every strategy, letting users pin "do not touch" zones inside a scan.
+const PROTECT_MARKER = '.veritas_protect';
+
+// Protected names, Python virtual environments (pyvenv.cfg marker), and
+// user-protected zones: venvs share thousands of identical package files,
+// so cross-venv dedup would gut every env after the first-scanned one.
 function isSkippedDir(fullPath, name) {
     if (PROTECTED_DIRS.has(name)) return true;
-    try { return fs.existsSync(path.join(fullPath, 'pyvenv.cfg')); } catch (err) { return true; }
+    try {
+        return fs.existsSync(path.join(fullPath, 'pyvenv.cfg'))
+            || fs.existsSync(path.join(fullPath, PROTECT_MARKER));
+    } catch (err) { return true; }
 }
 
 function formatSize(bytes) {
@@ -55,6 +62,10 @@ async function scanDirectory(dirPath, sizeThresholdMB, executeLive = false, logF
     }
     if (!targetStats.isDirectory()) {
         console.error(`[Error] Target '${dirPath}' is not a directory.`);
+        process.exit(1);
+    }
+    if (fs.existsSync(path.join(absoluteTarget, PROTECT_MARKER))) {
+        console.error(`[Error] Target is locked by a ${PROTECT_MARKER} marker.`);
         process.exit(1);
     }
 

@@ -72,6 +72,9 @@ function buildSandbox() {
   fs.mkdirSync(path.join(sand, 'fake_env'), { recursive: true });
   fs.writeFileSync(path.join(sand, 'fake_env', 'pyvenv.cfg'), 'home = /usr');
   fs.writeFileSync(path.join(sand, 'fake_env', 'venvjunk.tmp'), 'venv temp');
+  fs.mkdirSync(path.join(sand, 'keepzone'), { recursive: true });
+  fs.writeFileSync(path.join(sand, 'keepzone', '.veritas_protect'), '');
+  fs.writeFileSync(path.join(sand, 'keepzone', 'zonejunk.tmp'), 'zone temp');
   return { root, sand };
 }
 
@@ -113,6 +116,7 @@ function buildSandbox() {
       ok(`[${engine}] tiny 1-byte twins not marked`, !(d.json.items || []).some(i => /stub_[ab]\.txt/.test(i.path)));
       ok(`[${engine}] skips protected .git`, !(d.json.items || []).some(i => i.path.includes('.git')));
       ok(`[${engine}] skips python venv (pyvenv.cfg)`, !(d.json.items || []).some(i => i.path.includes('fake_env')));
+      ok(`[${engine}] skips .veritas_protect zone`, !(d.json.items || []).some(i => i.path.includes('keepzone')));
       ok(`[${engine}] reports freed size`, /MB/.test(d.json.freedHuman));
       ok(`[${engine}] audit log written`, d.json.logPath && fs.existsSync(d.json.logPath));
       ok(`[${engine}] dry-run deletes nothing`, fs.existsSync(path.join(sand, 'junk.tmp')) && fs.existsSync(path.join(sand, 'bigfile.bin')));
@@ -137,6 +141,7 @@ function buildSandbox() {
     ok('live run kept tiny twin stubs', fs.existsSync(path.join(sand, 'stub_a.txt')) && fs.existsSync(path.join(sand, 'stub_b.txt')));
     ok('live run kept protected .git content', fs.existsSync(path.join(sand, '.git', 'protected.tmp')));
     ok('live run kept venv content', fs.existsSync(path.join(sand, 'fake_env', 'venvjunk.tmp')));
+    ok('live run kept .veritas_protect zone', fs.existsSync(path.join(sand, 'keepzone', 'zonejunk.tmp')));
     ok('live run removed empty dir', !fs.existsSync(path.join(sand, 'sub', 'empty_dir')));
 
     // ---- hardening: invalid threshold rejected server-side ---------------------

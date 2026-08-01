@@ -15,17 +15,19 @@ from datetime import datetime
 TEMP_EXTENSIONS = {".tmp", ".log", ".cache", ".bak", ".old", ".temp", ".swp", ".dmp"}
 PROTECTED_DIRS = {".git", ".svn", ".venv", "node_modules", "site-packages", "$RECYCLE.BIN", "System Volume Information"}
 DUP_MIN_BYTES = 1024  # 重複比對的最小檔案容量門檻
+PROTECT_MARKER = ".veritas_protect"  # 使用者放置的「此區不可動」標記檔
 
 
 def is_skipped_dir(parent: str, name: str) -> bool:
-    """保護名單、symlink,以及任何含 pyvenv.cfg 的 Python 虛擬環境一律跳過:
-    各 venv 內含成千上萬相同的套件檔案,跨 venv 去重會毀掉第一個以外的環境。"""
+    """保護名單、symlink、含 pyvenv.cfg 的 Python 虛擬環境,以及含
+    .veritas_protect 標記的使用者保護區一律跳過:各 venv 內含成千上萬
+    相同的套件檔案,跨 venv 去重會毀掉第一個以外的環境。"""
     if name in PROTECTED_DIRS:
         return True
     dir_path = Path(parent) / name
     if dir_path.is_symlink():
         return True
-    return (dir_path / "pyvenv.cfg").is_file()
+    return (dir_path / "pyvenv.cfg").is_file() or (dir_path / PROTECT_MARKER).is_file()
 
 
 def calculate_hash_stream(file_path: Path, chunk_size: int = 65536) -> str:
@@ -72,6 +74,9 @@ def execute_cleanup(target_dir: str, size_threshold_mb: float, dry_run: bool = T
     target_path = Path(target_dir).resolve()
     if not target_path.exists() or not target_path.is_dir():
         print(f"[Error] Target directory '{target_dir}' does not exist.")
+        sys.exit(1)
+    if (target_path / PROTECT_MARKER).is_file():
+        print(f"[Error] Target is locked by a {PROTECT_MARKER} marker.")
         sys.exit(1)
 
     print(f"=== Starting Scan: {target_path} (Mode: {'DRY-RUN' if dry_run else 'EXECUTE'}) ===", flush=True)
