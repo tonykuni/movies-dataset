@@ -11,8 +11,8 @@ Pairing contract 配對規約 (per operator requirement):
   一個資料一個軸 — exactly one series per axis;
   相互比較這兩個軸 — left axis vs right axis over a shared X;
   用不同的圖形來表示 — the two series always use two different mark forms
-  (default: left bars, right line), and clarity is enforced: each axis is
-  tinted to its series colour, legend + direct end labels + hover readout.
+  (default: left bars, right line), and clarity is enforced: grey/ink axis
+  tick labels (builder ax rule), legend + direct end labels + hover readout.
 
 Zero third-party dependencies. Outputs are products, written under --out
 (default <Base>/VAP/output); canonical trees are never touched.
@@ -240,7 +240,7 @@ def x_column(rows: list[dict], preferred: str | None = None) -> str | None:
 # ------------------------------------------------------------------ axis math
 def nice_ticks(low: float, high: float, target: int = 5) -> list[float]:
     """Builder ax() rule: exactly AXIS_INTERVALS+1 ticks, step on the
-    1/2/2.5/5/10 ladder, domain covering the data extremes."""
+    2/2.5/5/10 ladder (decade multiples), domain covering the data extremes."""
     if high <= low:
         high = low + 1.0
 
@@ -654,7 +654,7 @@ kbd{font:700 var(--fs-lbl) var(--mono);border:1px solid var(--line);border-botto
   </section>
  </div>
  <footer>
-  <span>VIA · VeritasAutoPlot v001 · 🔒 VISUAL LOCK 線粗 1 · 透明度 0.75 · 軸距 1/2/2.5/5/10</span>
+  <span>VIA · VeritasAutoPlot v001 · 🔒 VISUAL LOCK 線粗 1 · 折線 0.9 · 填色 0.4 · 軸距 2/2.5/5/10</span>
   <span>鍵盤:<kbd>[</kbd> / <kbd>]</kbd> 切換頁面</span>
  </footer>
 </div>

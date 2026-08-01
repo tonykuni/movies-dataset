@@ -11,19 +11,27 @@ subsystems in this order:
 | Others | every other directory under `functional modules/` and `module/` |
 | Supportive | `supportive modules/` |
 
-`VRN/` and `VDF/` here contain **integration anchors only** — a subsystem
-manifest that registers the discovery root and its governance gates. The real
-canonical trees live on the operator workstation under the same paths and are
-never modified by the System Manager (sandbox repair candidates only;
-promotion requires a separate hash-locked, operator-reviewed transaction).
+`VRN/` here contains an **integration anchor only** — a subsystem manifest
+that registers the discovery root and its governance gates. `VDF/` carries its
+anchor manifest plus one canonical artifact, `ui/VIA_VDF_v4.3_Cockpit.html`
+(VDF v4.3 Management Cockpit, SHA-256 registered in
+`VDF_Subsystem_Manifest.json`). The real canonical trees live on the operator
+workstation under the same paths and are never modified by the System Manager
+(sandbox repair candidates only; promotion requires a separate hash-locked,
+operator-reviewed transaction).
 
 `VAP/` (**VeritasAutoPlot** — VIA 視覺功能管理:icons / templates / 繪圖)
 carries its anchor manifest **plus the supplied canonical artifacts**:
+`spec/VIA_VAP_Chart_Library_Builder.html` (最佳圖庫建構器 — the unified spec
+store and **normative source of the visual lock**: 線粗 1 · 折線透明度 0.9 ·
+填色 0.4 · 軸距 2/2.5/5/10 × 5 刻度 · via combo 色序),
 `spec/VIA_Chart_Layout_Spec_ONE_Standalone.html` (Chart & Layout Spec ONE —
-規範 · 套用圖庫 · 實例, visual lock 線粗 1 · 透明度 0.75 · 軸距 2/2.5/5/10) and
+規範 · 套用圖庫 · 實例;its headline 透明度 0.75 is superseded by the builder
+store, per the anchor's `recorded_conflict`),
 `ui/VIA_Intelligence_Platform_v0162C.html` (Intelligence Platform v0162C UI
-preview declaring the VRN / VDF / VAP module set). Both are SHA-256 registered
-in `VAP_Subsystem_Manifest.json` and are REVIEW-ONLY under the same
+preview declaring the VRN / VDF / VAP module set) and
+`ui/VIA_VAP_System.html` (Veritas Process Nexus System UI). All are SHA-256
+registered in `VAP_Subsystem_Manifest.json` and are REVIEW-ONLY under the same
 no-canonical-mutation governance.
 
 `VAP/engine/via_autoplot_engine_v001.py` is the VeritasAutoPlot plotting

@@ -7,7 +7,9 @@
 > (`functional modules/VAP/VAP_Subsystem_Manifest.json`) 註冊完成,並收入
 > 兩件 canonical 產物:Chart & Layout Spec ONE 獨立規範套件
 > (`spec/`,sha256 `dc416087…`,8,132,473 bytes;VISUAL LOCK 線粗 1 ·
-> 透明度 0.75 · 軸距 2/2.5/5/10 已寫入 anchor 治理)與 Intelligence
+> 透明度 0.75 · 軸距 2/2.5/5/10 已寫入 anchor 治理 — **2026-08-01 更新**:
+> 透明度改依 Chart Library Builder 統一 store:折線 0.9 · 填色 0.4,
+> 見 VAP anchor `recorded_conflict`)與 Intelligence
 > Platform v0162C UI 預覽(`ui/`,sha256 `377f7f09…`,91,026 bytes)。
 > 引擎 v0162B 原生探索 VAP root(SYSTEM_MANAGER_CONTRACT 已含 VAP),
 > 三輪實跑重新執行:subsystems = VRN / VDF / VAP / SUPPORTIVE,
