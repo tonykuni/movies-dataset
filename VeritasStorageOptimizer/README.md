@@ -34,23 +34,44 @@ pwsh -File VeritasStorageOptimizer_AllInOne.ps1 -Port 9000 -NoBrowser
 pwsh -File VeritasStorageOptimizer_AllInOne.ps1 -Dir D:\Downloads -MaxMB 500
 pwsh -File VeritasStorageOptimizer_AllInOne.ps1 -Dir D:\Downloads -MaxMB 500 -Execute
 
-# 內嵌自我測試 (28 assertions)
+# 內嵌自我測試 (29 assertions)
 pwsh -File VeritasStorageOptimizer_AllInOne.ps1 -SelfTest
+
+# ★ 一鍵全專案測試鏈:靜態分析 + PS 自測 + Python 自測 + 兩套 e2e
+pwsh -File VeritasStorageOptimizer_AllInOne.ps1 -TestAll
 ```
 
-測試鏈(全部通過):`tests/ps_lint.py` 靜態分析 0 錯誤 → pwsh AST 解析 0 錯誤 →
-`-SelfTest` 28/28 → `tests/e2e_ps_usertest.js` 真實後端 59/59(三引擎 Dry-Run、
-防護 Guard、實體刪除、巢狀空目錄連鎖清除、Unicode 檔名、symlink 循環/逃逸圍堵、
-非法閾值伺服器端拒絕、單元素 JSON 陣列形狀、300 檔案規模化精確重複比對、
-404 / shutdown 契約)。
+在 Windows 上也可直接用內建的 Windows PowerShell 執行(`powershell -File ...`):
+偵測到 5.x 時會自動改以 `pwsh` 7+ 重新啟動並轉傳所有參數;未安裝 pwsh 則顯示
+安裝指引後結束。
+
+測試鏈(`-TestAll` 一鍵執行,全部通過):`tests/ps_lint.py` 靜態分析 0 錯誤 →
+pwsh AST 解析 0 錯誤 → `-SelfTest` 29/29 → `veritas_gui.py --self-test` 17/17 →
+`tests/e2e_apitest.js` 42/42 → `tests/e2e_ps_usertest.js` 真實後端 59/59
+(三引擎 Dry-Run、防護 Guard、實體刪除、巢狀空目錄連鎖清除、Unicode 檔名、
+symlink 循環/逃逸圍堵、非法閾值伺服器端拒絕、單元素 JSON 陣列形狀、
+300 檔案規模化精確重複比對、404 / shutdown 契約)。缺少對應直譯器的套件
+標示 SKIP,不會靜默跳過。
 
 安全強化(第二輪 DEBUG 循環修正):
 
 - **Symlink 圍堵** — 目錄遍歷一律不跟隨 symlink / junction(ReparsePoint),
-  杜絕循環懸掛與「逃逸出目標範圍刪除外部檔案」
+  杜絕循環懸掛與「逃逸出目標範圍刪除外部檔案」;目標路徑本身為 symlink 時
+  由 Guard 直接拒絕
 - **閾值伺服器端驗證** — `maxMB <= 0` 一律拒絕(前端、後端、引擎 CLI 三層);
   並修正 PS 後端 `maxMB: 0` 因 falsy 判斷被靜默改回預設值的缺陷
 - **稽核檔名毫秒級時戳** — 同秒內多次執行不再互相覆寫
+
+環境韌性(第三輪強化):
+
+- **Windows PowerShell 5.x 自動接軌** — 以 `powershell -File` 啟動時自動改用
+  `pwsh` 7+ 重新啟動(含 `-ExecutionPolicy Bypass`,參數完整轉傳)
+- **連接埠衝突自動遞補** — 指定埠被占用時自動往上探測最多 20 個埠,
+  前端 HTML 的埠 Token 以實際綁定埠重新替換,並寫入 WARN 日誌
+- **HttpListener ACL 後援** — 部分 Windows 非系統管理員環境拒絕 `127.0.0.1`
+  前綴但豁免 `localhost`;每個埠先試 `127.0.0.1` 再自動改試 `localhost`
+- **回應式關閉** — 請求迴圈改用 `GetContextAsync` + 短逾時輪詢,
+  Ctrl+C 與 `/api/shutdown` 均可即時停止,不再卡在阻塞式 `GetContext`
 
 執行期間單檔即可運作(Python / Node 未安裝時自動停用對應子引擎,原生 PS 引擎永遠可用)。
 
@@ -104,8 +125,8 @@ python veritas_gui.py --no-browser        # 不自動開啟瀏覽器
 # 內嵌自我測試 (17 assertions):Token 替換、防護 Guard、輸出解析、沙盒 Dry-Run/Execute 往返
 python veritas_gui.py --self-test
 
-# 零相依 e2e 測試 (35 assertions):啟動真實後端,驗證前端頁面、/api/env、
-# 雙引擎 Dry-Run、防護 Guard、實體刪除與 404 契約
+# 零相依 e2e 測試 (42 assertions):啟動真實後端,驗證前端頁面、/api/env、
+# 雙引擎 Dry-Run、防護 Guard、實體刪除、symlink 圍堵與 404 契約
 node tests/e2e_apitest.js
 ```
 

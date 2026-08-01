@@ -1,11 +1,11 @@
-#requires -Version 7.0
 param(
     [int]$Port = 8868,
     [double]$MaxMB = 200,
     [string]$Dir = '',
     [switch]$Execute,
     [switch]$NoBrowser,
-    [switch]$SelfTest
+    [switch]$SelfTest,
+    [switch]$TestAll
 )
 
 # ============================================================================
@@ -13,14 +13,38 @@ param(
 #  EMBEDDED single-file system: native PS cleaning engine + HttpListener
 #  backend + animated HTML front-end. Consolidates the Python / Node.js
 #  engines as optional sub-engines when their scripts sit next to this file.
-#  Dry-Run by default. Root / home-ancestor targets always refused.
-#  Self-contained, append-only log, inline self-test (-SelfTest).
+#  Dry-Run by default. Root / home-ancestor / symlinked targets always refused.
+#  Self-contained, append-only log, inline self-test (-SelfTest), full
+#  project test chain (-TestAll). Windows PowerShell 5.x auto-relaunches
+#  under pwsh 7+; busy ports probe upward; 127.0.0.1 ACL-denied hosts fall
+#  back to localhost.
 #  PS7 rules honored: param() top, no block comments, ProcessStartInfo
 #  (no Start-Job / no -Args splat), single-quote here-string + .Replace(),
 #  [IO.File]::WriteAllText, -f only inside parentheses.
 # ============================================================================
 
 $ErrorActionPreference = 'Continue'
+
+# ---- PowerShell 5.x bootstrap: relaunch under pwsh 7+ ------------------------
+# Everything below needs PS7 runtime APIs (ProcessStartInfo.ArgumentList,
+# GetContextAsync); this gate is the only code Windows PowerShell executes.
+if ($PSVersionTable.PSVersion.Major -lt 7) {
+    $pwshCmd = Get-Command 'pwsh' -ErrorAction SilentlyContinue
+    if ($pwshCmd) {
+        Write-Host ('[Veritas] PowerShell ' + $PSVersionTable.PSVersion + ' detected - relaunching under pwsh 7+ ...')
+        $fwd = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $PSCommandPath, '-Port', [string]$Port, '-MaxMB', [string]$MaxMB)
+        if ($Dir)       { $fwd += @('-Dir', $Dir) }
+        if ($Execute)   { $fwd += '-Execute' }
+        if ($NoBrowser) { $fwd += '-NoBrowser' }
+        if ($SelfTest)  { $fwd += '-SelfTest' }
+        if ($TestAll)   { $fwd += '-TestAll' }
+        & $pwshCmd.Source @fwd
+        exit $LASTEXITCODE
+    }
+    Write-Host '[Veritas] PowerShell 7+ (pwsh) is required but was not found on PATH.'
+    Write-Host '[Veritas] Install: winget install Microsoft.PowerShell  (or https://aka.ms/powershell)'
+    exit 9
+}
 
 # ---- Config / paths --------------------------------------------------------
 $script:Base = $PSScriptRoot
@@ -51,6 +75,10 @@ function Test-RefusedTarget {
     if ([string]::IsNullOrWhiteSpace($Path)) { return '目標路徑為空' }
     try { $full = [System.IO.Path]::GetFullPath($Path) } catch { return '路徑無法解析' }
     if (-not (Test-Path -LiteralPath $full -PathType Container)) { return '目標資料夾不存在' }
+    try {
+        $attr = [System.IO.File]::GetAttributes($full)
+        if (($attr -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) { return '拒絕:目標本身為符號連結 (Symlink/Junction)' }
+    } catch { return '路徑屬性無法讀取' }
     $root = [System.IO.Path]::GetPathRoot($full)
     $norm = $full.TrimEnd([System.IO.Path]::DirectorySeparatorChar)
     if ($norm -eq $root.TrimEnd([System.IO.Path]::DirectorySeparatorChar)) { return '拒絕:不可對檔案系統根目錄執行' }
@@ -566,6 +594,12 @@ function Invoke-SelfTest {
 
     Add-Test 'Guard accepts sandbox subdir'   ((Test-RefusedTarget -Path $sand) -eq '')
 
+    $linkProbe = Join-Path $sand 'link_probe'
+    $symPriv = $true
+    try { New-Item -ItemType SymbolicLink -Path $linkProbe -Target (Join-Path $sand 'sub') -ErrorAction Stop | Out-Null } catch { $symPriv = $false }
+    if ($symPriv) { Add-Test 'Guard rejects symlinked target' ((Test-RefusedTarget -Path $linkProbe) -ne '') }
+    else          { Write-Host '  [SKIP] Guard rejects symlinked target (no symlink privilege)' -ForegroundColor Yellow }
+
     $dry = Invoke-VeritasRun -Engine 'ps' -Target $sand -MaxMBIn 2 -Live $false
     Add-Test 'Dry-run engine ok'              ([bool]$dry.ok)
     $reasons = @($dry.items | ForEach-Object { $_.reason }) -join '|'
@@ -604,6 +638,73 @@ function Invoke-SelfTest {
 
 if ($SelfTest) { $ok = Invoke-SelfTest; if ($ok) { exit 0 } else { exit 1 } }
 
+# ============================================================================
+#  FULL TEST CHAIN  (-TestAll): every suite in the project with one command.
+#  Suites whose interpreter is missing are SKIPped, never silently dropped.
+# ============================================================================
+function Invoke-TestChain {
+    Write-Host ''
+    Write-Host '== Veritas AIO  Full Test Chain ==' -ForegroundColor Cyan
+    $envSnap = Get-EnvSnapshot
+    $suites = [System.Collections.Generic.List[object]]::new()
+    function Add-Suite { param([string]$Name, [string]$State, [string]$Detail = '') $suites.Add([pscustomobject]@{ Name = $Name; State = $State; Detail = $Detail }) }
+    function Invoke-Suite {
+        param([string]$Name, [string]$Exe, [string[]]$ArgsList, [int]$TimeoutSec)
+        Write-Host ''
+        Write-Host ('-- ' + $Name + ' --') -ForegroundColor Cyan
+        $r = Invoke-SubProc -Exe $Exe -ArgsList $ArgsList -TimeoutSec $TimeoutSec
+        if ($r.Out) { Write-Host $r.Out.TrimEnd() }
+        if ($r.Err) { Write-Host $r.Err.TrimEnd() -ForegroundColor Yellow }
+        $state = 'FAIL'
+        if ($r.Ok) { $state = 'PASS' }
+        Add-Suite $Name $state ('exit ' + $r.Code)
+    }
+
+    $lintPath   = Join-Path $script:Base 'tests/ps_lint.py'
+    $guiPath    = Join-Path $script:Base 'veritas_gui.py'
+    $apiTest    = Join-Path $script:Base 'tests/e2e_apitest.js'
+    $psTest     = Join-Path $script:Base 'tests/e2e_ps_usertest.js'
+
+    if ($envSnap.Python -and (Test-Path -LiteralPath $lintPath)) {
+        Invoke-Suite 'PS static lint (tests/ps_lint.py)' $envSnap.Python @($lintPath, $PSCommandPath) 120
+    } else { Add-Suite 'PS static lint (tests/ps_lint.py)' 'SKIP' 'python or lint script missing' }
+
+    Write-Host ''
+    Write-Host '-- PS embedded self-test (-SelfTest) --' -ForegroundColor Cyan
+    $selfState = 'FAIL'
+    if (Invoke-SelfTest) { $selfState = 'PASS' }
+    Add-Suite 'PS embedded self-test (-SelfTest)' $selfState
+
+    if ($envSnap.Python -and (Test-Path -LiteralPath $guiPath)) {
+        Invoke-Suite 'Python GUI self-test (veritas_gui.py --self-test)' $envSnap.Python @($guiPath, '--self-test') 300
+    } else { Add-Suite 'Python GUI self-test' 'SKIP' 'python or veritas_gui.py missing' }
+
+    if ($envSnap.Node -and $envSnap.Python -and (Test-Path -LiteralPath $apiTest)) {
+        Invoke-Suite 'Python GUI e2e (tests/e2e_apitest.js)' $envSnap.Node @($apiTest) 900
+    } else { Add-Suite 'Python GUI e2e (tests/e2e_apitest.js)' 'SKIP' 'node / python / test script missing' }
+
+    if ($envSnap.Node -and (Test-Path -LiteralPath $psTest)) {
+        Invoke-Suite 'PS AIO server e2e (tests/e2e_ps_usertest.js)' $envSnap.Node @($psTest) 900
+    } else { Add-Suite 'PS AIO server e2e (tests/e2e_ps_usertest.js)' 'SKIP' 'node or test script missing' }
+
+    Write-Host ''
+    Write-Host '== Test Chain Summary ==' -ForegroundColor Cyan
+    foreach ($s in $suites) {
+        $color = 'Yellow'
+        if ($s.State -eq 'PASS') { $color = 'Green' }
+        if ($s.State -eq 'FAIL') { $color = 'Red' }
+        $line = ('  [{0}] {1}' -f $s.State, $s.Name)
+        if ($s.Detail) { $line = ($line + '  (' + $s.Detail + ')') }
+        Write-Host $line -ForegroundColor $color
+    }
+    $failed = @($suites | Where-Object { $_.State -eq 'FAIL' }).Count
+    $ranOk  = @($suites | Where-Object { $_.State -eq 'PASS' }).Count
+    Write-Log ('TESTCHAIN pass={0} fail={1} skip={2}' -f $ranOk, $failed, (@($suites | Where-Object { $_.State -eq 'SKIP' }).Count))
+    return ($failed -eq 0)
+}
+
+if ($TestAll) { $ok = Invoke-TestChain; if ($ok) { exit 0 } else { exit 1 } }
+
 # ---- Headless CLI mode (-Dir) ------------------------------------------------
 if ($Dir) {
     $res = Invoke-VeritasRun -Engine 'ps' -Target $Dir -MaxMBIn $MaxMB -Live $Execute.IsPresent
@@ -638,10 +739,31 @@ function Send-Response {
     $Ctx.Response.OutputStream.Close()
 }
 
-$listener = [System.Net.HttpListener]::new()
-$prefix = ('http://127.0.0.1:{0}/' -f $Port)
-$listener.Prefixes.Add($prefix)
-try { $listener.Start() } catch { Write-Log ('HttpListener start failed (port busy?): ' + $_.Exception.Message) 'ERROR'; throw }
+# Port busy -> probe the next 20 ports. Some Windows setups ACL-deny the
+# 127.0.0.1 prefix for non-admin users while exempting localhost, so each
+# port tries 127.0.0.1 first and falls back to localhost.
+$listener = $null; $prefix = ''; $boundPort = $Port; $lastBindErr = ''
+foreach ($cand in ($Port..($Port + 20))) {
+    foreach ($bindHost in @('127.0.0.1', 'localhost')) {
+        $probe = [System.Net.HttpListener]::new()
+        $probe.Prefixes.Add(('http://{0}:{1}/' -f $bindHost, $cand))
+        try {
+            $probe.Start()
+            $listener = $probe; $boundPort = $cand
+            $prefix = ('http://{0}:{1}/' -f $bindHost, $cand)
+            break
+        } catch { $lastBindErr = $_.Exception.Message; try { $probe.Close() } catch {} }
+    }
+    if ($listener) { break }
+}
+if (-not $listener) {
+    Write-Log (('HttpListener start failed on ports {0}-{1}: {2}' -f $Port, ($Port + 20), $lastBindErr)) 'ERROR'
+    throw ('無法啟動後端(埠 {0}-{1} 皆不可用):{2}' -f $Port, ($Port + 20), $lastBindErr)
+}
+if ($boundPort -ne $Port) {
+    Write-Log (('Port {0} busy - fell back to {1}' -f $Port, $boundPort)) 'WARN'
+    $script:HtmlBody = $htmlTpl.Replace('__PORT__', [string]$boundPort).Replace('__MAXMB__', [string]$MaxMB).Replace('__LOGPATH__', $script:LogFile)
+}
 Write-Log ('Backend listening: ' + $prefix)
 if (-not $NoBrowser) { try { Start-Process $prefix } catch {} }
 
@@ -651,9 +773,17 @@ Write-Host '==> Ctrl+C in this window to stop the server.' -ForegroundColor Yell
 Write-Host ''
 
 try {
+    # Async accept with short waits keeps Ctrl+C responsive and lets
+    # /api/shutdown exit the loop promptly instead of blocking in GetContext.
+    $pendingCtx = $null
     while ($listener.IsListening -and -not $script:Stop) {
         $ctx = $null
-        try { $ctx = $listener.GetContext() } catch { break }
+        try {
+            if (-not $pendingCtx) { $pendingCtx = $listener.GetContextAsync() }
+            if (-not $pendingCtx.Wait(250)) { continue }
+            $ctx = $pendingCtx.Result
+            $pendingCtx = $null
+        } catch { break }
         if (-not $ctx) { continue }
         $path = $ctx.Request.Url.AbsolutePath
         try {
