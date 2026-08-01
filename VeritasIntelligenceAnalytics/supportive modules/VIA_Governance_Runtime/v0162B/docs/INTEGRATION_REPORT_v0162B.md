@@ -1,6 +1,26 @@
 # VIA 整體系統整合收尾報告 · System Integration Completion Report
-**v0162B · Integration Build R3 + VAP · 2026-08-01**
+**v0162B · Integration Build R4 + VAP · 2026-08-01**
 **Scope 範圍: supportive modules / VRN / VDF / VAP**
+
+> **R4 修正 · R4 fix (2026-08-01)** — 乾淨全量實跑(先 `Clean -KeepRuns 0`,
+> `run_20260801_133914`:8,782 檔 / 21 RED / 483 Hydra)的 RED 分診證明
+> 其餘發現全在 canonical 樹,分三類:(1) **16 個 VRN 註冊表 JSON** 僅因
+> 字串值含未跳脫控制字元而無法通過嚴格解析——R4 新增決定性沙盒修復
+> (`strict=False` 寬鬆解析 → 嚴格重新序列化 → 往返驗證;
+> `JSON_CONTROL_CHARACTER_ESCAPE`,僅產生候選、canonical 不動,晉升走
+> Promote 交易)。(2) **`iconforge_console_data.json` 1.99 GB** 使
+> `json.loads` 發生 MemoryError——R4 加入 64 MiB 內容分析守門:超大檔仍
+> 列冊與雜湊,但跳過內容解析(`metrics.content_analysis =
+> SKIPPED_LARGE_FILE`)。(3) **317 個 RED Hydra** 幾乎全是
+> `_vdf_envs/*/Lib/site-packages` 的第三方套件與 `VAP/ASSETS/SCOPE_COPY`
+> 快照樹——R4 比照 `venv`/`received_duplicates` 排除 `_vdf_envs`、
+> `site-packages`、`scope_copy`。剩餘**真實缺陷**:4 份位元組相同、語法
+> 損壞的 `Invoke-VIA-VRN-OneClick-Sidebar-v0159.ps1`(v0161D / v0162 /
+> v0162A / v0162B 的 `child/`)——需操作者決定封存或修復,不可自動修。
+> 實測:含全部三類問題的種子 base 三輪實跑——控制字元 JSON 前 RED 後
+> GREEN(沙盒候選)、超大檔 GREEN 跳過(閾值兩側單元驗證)、排除規則
+> 零殘留零 Hydra、僅壞 ps1 維持 RED。兩個每日啟動器重新鎖定 R4 SHA
+> (`da26caaf…`,107,399 bytes)。
 
 > **R3 修正 · R3 fix (2026-08-01)** — 第一次全量 Windows 全景實跑(8,782 檔)
 > 卡在 `ROUND_REVIEW_REQUIRED_RED_ERRORS_REMAIN`:RED 在三輪間 20↔21 震盪、
@@ -69,8 +89,8 @@ Verified against the manifest before integration:
 ## 3. 整合作業 · Integration work
 
 1. **AllInOne reconstruction** (`bin/Invoke-VIA-SystemManager-AllInOne-v0162B.ps1`,
-   102,697 bytes, sha256 `ae3bdbd5…82c114` (R2); current build R3 is
-   103,521 bytes, sha256 `455a7b22…10627f`), built strictly to the v0162B
+   102,697 bytes, sha256 `ae3bdbd5…82c114` (R2); current build R4 is
+   107,399 bytes, sha256 `da26caaf…c84046`), built strictly to the v0162B
    repair contract:
    - single-quoted literal here-strings only — zero expandable here-strings
      (the v0162A root cause), verified by token scan;
@@ -85,9 +105,9 @@ Verified against the manifest before integration:
      register-all/import-approved-only.
 2. **SHA gate re-lock**: both `StartVIASystemManager.ps1` and
    `StartVIAUnified.ps1` regenerated from the same template, now gating on the
-   reconstructed launcher's SHA (R2 `ae3bdbd5…`; re-locked to R3
-   `455a7b22…` on 2026-08-01). Entrypoints remain byte-identical to each
-   other (R2 sha256 `7ceefc2b…`; R3 sha256 `f99a10b2…`).
+   reconstructed launcher's SHA (R2 `ae3bdbd5…`; re-locked to R4
+   `da26caaf…` on 2026-08-01). Entrypoints remain byte-identical to each
+   other (R2 sha256 `7ceefc2b…`; R4 sha256 `955a9090…`).
 3. **VRN / VDF integration anchors**: `functional modules/VRN` and
    `functional modules/VDF` now carry subsystem manifests registering the
    discovery roots and governance gates (enabled=false draft intake for VRN,
@@ -105,7 +125,7 @@ Verified against the manifest before integration:
 | Both daily entrypoints AST | PASS |
 | Generated-launcher AST (template output) | PASS |
 | Expandable here-string token scan | PASS (0 found) |
-| Embedded engine roundtrip → sha `0cf9725c…` (R3) | PASS |
+| Embedded engine roundtrip → sha `fba0e3d4…` (R4) | PASS |
 | Embedded workbench roundtrip → sha `4f653c4a…` | PASS |
 | Entrypoint template roundtrip (byte-exact vs shipped) | PASS |
 | Python engine `py_compile` (3.11) | PASS |

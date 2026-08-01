@@ -46,4 +46,6 @@ zero dependencies, honouring the visual lock. Usage:
 `backup*`, `staging`, `received_duplicates` 不列入分析;引擎自身的 runtime
 root(`supportive modules/VIA_Governance_Runtime/v0162B/runtime`,即所有
 `run_*` 目錄)自 R3 起也排除——先前 run 的 sandbox 副本與崩潰殘骸不再被
-重新分析。
+重新分析。R4 起再排除 `_vdf_envs`(內嵌 Python 環境)、`site-packages`
+(第三方套件)與 `scope_copy`(快照副本樹);超過 64 MiB 的檔案仍列冊
+與雜湊,但跳過內容解析(資料檔不再因 MemoryError 誤判 RED)。

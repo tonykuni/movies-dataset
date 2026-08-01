@@ -39,7 +39,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $Script:VIAVersion = 'v0162B'
-$Script:EngineExpectedSHA = '0cf9725c2b2f1d520a604731631caaf00659d7b91b1c4f681061dc10ed58a206'
+$Script:EngineExpectedSHA = 'fba0e3d4ef436ced8055cba235a53eb67df2ad2e127c414b7e801a5320a75ff2'
 $Script:WorkbenchExpectedSHA = '4f653c4ac04df2612364804cfca5a203c868cecffdeb8bbfbf0635cbd1064152'
 
 # --------------------------------------------------------------------------
@@ -74,9 +74,17 @@ EXCLUDED_PARTS = {
     ".git", "__pycache__", "node_modules", ".venv", "venv",
     "cache", "caches", "archive", "archives", "backup", "backups",
     "staging", "received_duplicates",
+    # R4: embedded Python environments and vendored third-party packages are
+    # not project code; snapshot copy trees (SCOPE_COPY) duplicate canonical
+    # files and only produce Hydra/SSOT noise and duplicate RED findings.
+    "_vdf_envs", "site-packages", "scope_copy",
 }
 MAX_FILES = 25000
 MAX_SAFE_FIXES_PER_ROUND = 400
+# R4: content parsing loads whole files into memory; multi-GB data files
+# (e.g. console dumps) must be inventoried but not parsed - a MemoryError
+# is an engine limitation, not a defect in the file.
+MAX_CONTENT_ANALYSIS_BYTES = 64 * 1024 * 1024
 
 ACCELERATORS = [
     ("A01", "AST 精準解析", "PowerShell Parser + Python ast + JSON/HTML parsers"),
@@ -500,6 +508,9 @@ def analyze_inventory(
                 "kind": "READ_ERROR", "severity": "RED",
                 "message": row["read_error"], "line": None, "column": None,
             })
+        elif (row.get("bytes") or 0) > MAX_CONTENT_ANALYSIS_BYTES:
+            metrics["content_analysis"] = "SKIPPED_LARGE_FILE"
+            metrics["content_analysis_limit_bytes"] = MAX_CONTENT_ANALYSIS_BYTES
         elif analyzed.exists():
             ext = row["extension"]
             if ext in {".ps1", ".psm1", ".psd1"}:
@@ -536,7 +547,8 @@ def analyze_inventory(
                         "message": f"{type(exc).__name__}: {exc}", "line": None, "column": None,
                     })
 
-        if analyzed.exists() and row["extension"] in TEXT_EXTENSIONS:
+        if (analyzed.exists() and row["extension"] in TEXT_EXTENSIONS
+                and (row.get("bytes") or 0) <= MAX_CONTENT_ANALYSIS_BYTES):
             try:
                 text, enc = read_text(analyzed)
                 metrics.setdefault("encoding", enc)
@@ -597,12 +609,78 @@ def safe_repair(
     round_number: int,
 ) -> list[dict[str, Any]]:
     repairs: list[dict[str, Any]] = []
+
+    # R4: RED JSON whose only defect is raw control characters inside string
+    # values (strict JSON forbids them; lenient parsers accept them). The data
+    # itself is intact, so a candidate can be produced deterministically:
+    # parse leniently (strict=False), re-serialize strictly, verify the
+    # candidate round-trips. Sandbox only - canonical stays untouched.
+    json_candidates = [
+        row for row in matrix
+        if row["state"] == "RED"
+        and row["extension"] in {".json", ".jsonl"}
+        and row["issues"]
+        and all(
+            issue.get("kind") == "JSON_PARSE"
+            and "Invalid control character" in str(issue.get("message", ""))
+            for issue in row["issues"]
+        )
+        and Path(row["path"]).is_file()
+    ][:MAX_SAFE_FIXES_PER_ROUND]
+
+    for row in json_candidates:
+        source = Path(overlay.get(row["path"], row["path"]))
+        original_path = Path(row["path"])
+        try:
+            try:
+                relative = original_path.resolve().relative_to(base.resolve())
+            except ValueError:
+                relative = Path(row["subsystem"]) / row["relative_path"]
+            destination = sandbox_root / f"round_{round_number}" / relative
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            text, encoding = read_text(source)
+            if row["extension"] == ".jsonl":
+                values = [json.loads(line, strict=False) for line in text.splitlines() if line.strip()]
+                new_text = "\n".join(json.dumps(v, ensure_ascii=False) for v in values) + "\n"
+            else:
+                new_text = json.dumps(json.loads(text, strict=False), ensure_ascii=False, indent=2) + "\n"
+            json.loads(new_text)
+            before = sha256_file(source)
+            write_text_atomic(destination, new_text)
+            after = sha256_file(destination)
+            overlay[str(original_path)] = str(destination)
+            repairs.append({
+                "round": round_number,
+                "subsystem": row["subsystem"],
+                "category": row["category"],
+                "original_path": str(original_path),
+                "sandbox_path": str(destination),
+                "original_sha256": before,
+                "sandbox_sha256": after,
+                "changed": before != after,
+                "repair_type": "JSON_CONTROL_CHARACTER_ESCAPE",
+                "original_encoding": encoding,
+                "promotion_state": "CANDIDATE_ONLY_NO_CANONICAL_MUTATION",
+            })
+        except Exception as exc:
+            repairs.append({
+                "round": round_number,
+                "subsystem": row["subsystem"],
+                "category": row["category"],
+                "original_path": row["path"],
+                "sandbox_path": "",
+                "changed": False,
+                "repair_type": "JSON_CONTROL_CHARACTER_ESCAPE_FAILED",
+                "error": f"{type(exc).__name__}: {exc}",
+                "promotion_state": "REVIEW_REQUIRED",
+            })
+
     candidates = [
         row for row in matrix
         if row["classification"] == "PARALLEL_FIXABLE"
         and row["extension"] in TEXT_EXTENSIONS
         and Path(row["path"]).is_file()
-    ][:MAX_SAFE_FIXES_PER_ROUND]
+    ][:max(0, MAX_SAFE_FIXES_PER_ROUND - len(json_candidates))]
 
     for row in candidates:
         source = Path(overlay.get(row["path"], row["path"]))
