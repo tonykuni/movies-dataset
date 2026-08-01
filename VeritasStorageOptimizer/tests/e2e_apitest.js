@@ -7,11 +7,31 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { spawn } = require('child_process');
+const { spawn, spawnSync } = require('child_process');
 
 const APP_DIR = path.resolve(__dirname, '..');
 const GUI = path.join(APP_DIR, 'veritas_gui.py');
-const PY = process.env.PYTHON || 'python3';
+
+// Windows ships the interpreter as `python` / `py`, Unix as `python3`;
+// probe with --version so Store alias stubs (which fail it) are skipped.
+function findPython() {
+  if (process.env.PYTHON) return process.env.PYTHON;
+  const candidates = os.platform() === 'win32'
+    ? ['python', 'py', 'python3']
+    : ['python3', 'python'];
+  for (const c of candidates) {
+    try {
+      if (spawnSync(c, ['--version'], { stdio: 'ignore' }).status === 0) return c;
+    } catch (e) {}
+  }
+  return null;
+}
+const PY = findPython();
+if (!PY) {
+  console.log('  [FAIL] no working Python interpreter found (tried python/py/python3; set PYTHON env var)');
+  console.log('-- 0/1 PASS --');
+  process.exit(1);
+}
 const PORT = 8871;
 const ORIGIN = 'http://127.0.0.1:' + PORT;
 
@@ -53,6 +73,7 @@ function buildSandbox() {
 (async () => {
   const server = spawn(PY, [GUI, '--port', String(PORT), '--no-browser'], { cwd: APP_DIR });
   let serverLog = '';
+  server.on('error', e => { serverLog += 'spawn failed: ' + e.message + '\n'; });
   server.stdout.on('data', d => serverLog += d);
   server.stderr.on('data', d => serverLog += d);
   const { root, sand } = buildSandbox();
