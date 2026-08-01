@@ -7,6 +7,16 @@ VIA · 統一主控 · One PowerShell to integrate all (repo-resident edition)
 日常一鍵(整合啟動 VRN / VDF / VAP / 支援性工具):
   pwsh -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\movies-dataset\VIA.ps1"
 
+零開始一鍵(還沒有 repo / git / pwsh 也行——開任何 PowerShell 視窗貼整段):
+  $R = "$HOME\Downloads\movies-dataset"
+  $B = 'claude/via-system-integration-completion-k2lf85'
+  if (-not (Get-Command git  -ErrorAction SilentlyContinue)) { winget install --id Git.Git -e --accept-source-agreements --accept-package-agreements }
+  if (-not (Get-Command pwsh -ErrorAction SilentlyContinue)) { winget install --id Microsoft.PowerShell -e --accept-source-agreements --accept-package-agreements }
+  $env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User')
+  if (Test-Path "$R\.git") { git -C $R fetch origin $B; git -C $R checkout $B; git -C $R pull origin $B }
+  else { git clone --branch $B https://github.com/tonykuni/movies-dataset.git $R }
+  pwsh -NoProfile -ExecutionPolicy Bypass -File "$R\VIA.ps1"
+
 動作(-Do,可多選,預設 StartAll):
   StartAll  ★六流程整合:Sync → QA → UI(AutoPlot 工作台)→ Launch(三輪全景
             分析,涵蓋 VRN / VDF / VAP / SUPPORTIVE,20 加速器,結束開矩陣)
