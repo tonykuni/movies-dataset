@@ -71,9 +71,7 @@ def _excluded(path: Path) -> bool:
     return False
 
 
-def discover_db_files(base: Path) -> list[Path]:
-    roots = [base / "functional modules" / "VDF" / "db", base / "VDF" / "db",
-             base / "functional modules" / "VeritasDataForge" / "db"]
+def _scan_roots(roots: list[Path]) -> list[Path]:
     found: list[Path] = []
     for root in roots:
         if not root.is_dir():
@@ -82,6 +80,54 @@ def discover_db_files(base: Path) -> list[Path]:
             if path.is_file() and path.suffix.lower() in DB_SUFFIXES and not _excluded(path):
                 found.append(path)
     return found
+
+
+def discover_db_files(base: Path, extra: list[str] | None = None) -> list[Path]:
+    # 1) explicit --db paths win (files or directories, anywhere on disk)
+    if extra:
+        found: list[Path] = []
+        for raw in extra:
+            path = Path(raw).expanduser().resolve()
+            if path.is_file() and path.suffix.lower() in DB_SUFFIXES:
+                found.append(path)
+            elif path.is_dir():
+                found.extend(_scan_roots([path]))
+            else:
+                log(f"WARN --db path not found or unsupported: {raw}")
+        return found
+    # 2) canonical db roots
+    db_roots = [base / "functional modules" / "VDF" / "db", base / "VDF" / "db",
+                base / "functional modules" / "VeritasDataForge" / "db"]
+    found = _scan_roots(db_roots)
+    if found:
+        return found
+    # 3) fallback: whole VDF trees (data may not live in a db/ subfolder yet)
+    fallback = _scan_roots([base / "functional modules" / "VDF", base / "VDF",
+                            base / "functional modules" / "VeritasDataForge"])
+    if fallback:
+        log("NOTE data found outside VDF/db — using whole-VDF fallback scan")
+    return fallback
+
+
+def write_demo_db(base: Path) -> Path:
+    """--demo: create a small sample VDF dataset so charts work immediately."""
+    import random
+    random.seed(42)
+    db_dir = base / "functional modules" / "VDF" / "db"
+    db_dir.mkdir(parents=True, exist_ok=True)
+    demo_csv = db_dir / "demo_tw_stock_monthly.csv"
+    price = 580.0
+    with demo_csv.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=["date", "close", "volume", "foreign_net"])
+        writer.writeheader()
+        for month in range(1, 25):
+            year, mon = 2024 + (month - 1) // 12, (month - 1) % 12 + 1
+            price *= 1 + random.uniform(-0.06, 0.08)
+            writer.writerow({"date": f"{year}-{mon:02d}", "close": round(price, 1),
+                             "volume": int(random.uniform(18, 55) * 1e6),
+                             "foreign_net": round(random.uniform(-8, 12), 2)})
+    log(f"DEMO dataset written: {demo_csv}")
+    return demo_csv
 
 
 def _rows_from_csv(path: Path) -> list[dict]:
@@ -439,20 +485,32 @@ def main() -> int:
                         help="auto-generate charts for numeric column pairs")
     parser.add_argument("--max-charts", type=int, default=12)
     parser.add_argument("--out", help="output dir (default <Base>/VAP/output)")
+    parser.add_argument("--db", action="append",
+                        help="explicit data file or folder (repeatable); overrides auto-discovery")
+    parser.add_argument("--demo", action="store_true",
+                        help="write a sample dataset into VDF/db first (demo_tw_stock_monthly.csv)")
     args = parser.parse_args()
 
     base = Path(args.base).resolve()
     out_dir = Path(args.out).resolve() if args.out else base / "VAP" / "output"
-    files = discover_db_files(base)
+    if args.demo:
+        write_demo_db(base)
+    files = discover_db_files(base, args.db)
     if not files:
-        log("no VDF database files found under <Base>/functional modules/VDF/db or <Base>/VDF/db")
+        log("no VDF database files found. Options: put CSV/TSV/JSON/SQLite under "
+            "<Base>/functional modules/VDF/db, point at data with --db <file-or-folder>, "
+            "or run with --demo for a sample dataset")
         return 2
     catalog: list[tuple[str, list[dict], str]] = []
     for path in files:
         try:
+            try:
+                origin = str(path.relative_to(base))
+            except ValueError:  # --db source outside Base
+                origin = str(path)
             for name, rows in load_tables(path):
                 if rows:
-                    catalog.append((name, rows, str(path.relative_to(base))))
+                    catalog.append((name, rows, origin))
         except Exception as exc:  # noqa: BLE001 — corrupt source must not kill the run
             log(f"WARN cannot read {path.name}: {exc}")
 
