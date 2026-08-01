@@ -6,6 +6,12 @@
   "discovery_root": "functional modules/VAP",
   "artifacts": [
     {
+      "filename": "engine/via_autoplot_engine_v001.py",
+      "role": "VeritasAutoPlot plotting engine v001 · reads the VDF analytical database (CSV/TSV/JSON/SQLite under <Base>/functional modules/VDF/db or <Base>/VDF/db) and renders dual-axis comparison charts as self-contained HTML+SVG (zero dependencies)",
+      "bytes": 25587,
+      "sha256": "59f8fdc5716bf24538aee29e951512cb63dd71c4687ee0d7064aa69960cd87af"
+    },
+    {
       "filename": "spec/VIA_Chart_Layout_Spec_ONE_Standalone.html",
       "role": "Chart & Layout Spec ONE · standalone spec suite (規範 · 套用圖庫 · 實例), self-contained with embedded assets",
       "bytes": 8132473,
@@ -22,17 +28,48 @@
     "visual_lock": {
       "line_width": 1,
       "opacity": 0.75,
-      "axis_steps": [2, 2.5, 5, 10],
+      "axis_steps": [
+        2,
+        2.5,
+        5,
+        10
+      ],
       "policy": "Chart & Layout Spec ONE visual lock is normative for all VIA chart output; deviations require a spec revision, not per-chart overrides."
     },
     "spec_policy": "Spec suite is REVIEW-ONLY reference material; charts and layouts must conform to the locked spec.",
+    "pairing_contract": {
+      "rule": "one series per axis · left axis vs right axis over a shared X · the two series always use two different mark forms",
+      "default_forms": {
+        "left": "bar",
+        "right": "line"
+      },
+      "series_colors": {
+        "left": "#4c78a8",
+        "right": "#439a9a"
+      },
+      "series_color_note": "Spec token palette verbatim per operator directive (--blue / --teal). Known conflict, recorded for operator review: blue x teal normal-vision separation dE 10.9 (< 15 guideline; amber --am would give 24.8). Mitigated by the mandatory mark-form difference, per-series tinted axes, and direct end labels, so identity is never colour-alone.",
+      "clarity": [
+        "tinted axis per series",
+        "legend",
+        "direct end labels",
+        "hover readout",
+        "recessive grid",
+        "axis domain must fully cover data extremes"
+      ],
+      "output_policy": "Products are written under <Base>/VAP/output only; VDF database and canonical trees are read-only to the engine."
+    },
     "promotion_gate": "OPERATOR_REVIEW_AND_SEPARATE_HASH_LOCKED_TRANSACTION_REQUIRED",
     "canonical_mutation_by_system_manager": false,
     "sandbox_repair_only": true
   },
   "system_manager": {
     "version": "v0162B",
-    "analyzed_sections": ["MODULE", "ENGINE", "FUNCTION-LIB", "OTHERS"],
+    "analyzed_sections": [
+      "MODULE",
+      "ENGINE",
+      "FUNCTION-LIB",
+      "OTHERS"
+    ],
     "round_limit": 3
   }
 }

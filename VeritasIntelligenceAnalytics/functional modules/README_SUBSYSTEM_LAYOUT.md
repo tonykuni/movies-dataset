@@ -26,5 +26,13 @@ preview declaring the VRN / VDF / VAP module set). Both are SHA-256 registered
 in `VAP_Subsystem_Manifest.json` and are REVIEW-ONLY under the same
 no-canonical-mutation governance.
 
+`VAP/engine/via_autoplot_engine_v001.py` is the VeritasAutoPlot plotting
+engine: it reads the VDF analytical database (CSV / TSV / JSON / SQLite under
+`VDF/db`) and renders **dual-axis comparison charts**(一個資料一個軸,兩軸互比,
+兩系列必用不同圖形)as self-contained HTML+SVG under `<Base>/VAP/output`,
+zero dependencies, honouring the visual lock. Usage:
+`python engine/via_autoplot_engine_v001.py --base <Base> --list | --auto |
+--table <t> --left <col> --right <col> [--left-form bar|line|area]`.
+
 排除規則：`.git`, `__pycache__`, `node_modules`, `venv`, `cache*`, `archive*`,
 `backup*`, `staging`, `received_duplicates` 不列入分析。
