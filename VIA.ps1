@@ -96,6 +96,17 @@ function Sync-VIA {
     }
     git -C $RepoPath pull origin $FeatureBranch
     if ($LASTEXITCODE -ne 0) { throw 'git pull failed — check network/credentials, then re-run.' }
+    # Byte-exact re-materialization: Windows autocrlf may have smudged CRLF
+    # into earlier checkouts, breaking SHA gates and QA roundtrips. With
+    # .gitattributes (-text) in place, force a clean re-checkout.
+    git -C $RepoPath config core.autocrlf false
+    $packageWorktree = Join-Path -Path $RepoPath -ChildPath $PackageName
+    if (Test-Path -LiteralPath $packageWorktree) {
+        Remove-Item -LiteralPath $packageWorktree -Recurse -Force
+    }
+    git -C $RepoPath checkout HEAD -- $PackageName
+    if ($LASTEXITCODE -ne 0) { throw 'git checkout of package failed.' }
+    Write-VIALog -Message 'OK  package re-materialized byte-exact (LF locked by .gitattributes)' -Color Green
     Install-VIAPackage
     Write-VIALog -Message 'SYNC COMPLETE' -Color Cyan
 }
