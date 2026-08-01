@@ -66,6 +66,8 @@ function buildSandbox() {
   fs.writeFileSync(path.join(sand, 'orig.dat'), Buffer.alloc(51200, 1));
   fs.writeFileSync(path.join(sand, 'sub', 'copy.dat'), Buffer.alloc(51200, 1));
   fs.writeFileSync(path.join(sand, 'keep.txt'), 'keep me');
+  fs.writeFileSync(path.join(sand, 'stub_a.txt'), '\n');
+  fs.writeFileSync(path.join(sand, 'stub_b.txt'), '\n');
   fs.writeFileSync(path.join(sand, '.git', 'protected.tmp'), 'protected');
   return { root, sand };
 }
@@ -105,6 +107,7 @@ function buildSandbox() {
       ok(`[${engine}] marks temp file`, /Temp File/.test(reasons));
       ok(`[${engine}] marks oversize file`, /Over/.test(reasons));
       ok(`[${engine}] marks duplicate`, /Duplicate of/.test(reasons));
+      ok(`[${engine}] tiny 1-byte twins not marked`, !(d.json.items || []).some(i => /stub_[ab]\.txt/.test(i.path)));
       ok(`[${engine}] skips protected .git`, !(d.json.items || []).some(i => i.path.includes('.git')));
       ok(`[${engine}] reports freed size`, /MB/.test(d.json.freedHuman));
       ok(`[${engine}] audit log written`, d.json.logPath && fs.existsSync(d.json.logPath));
@@ -127,6 +130,7 @@ function buildSandbox() {
     const dupSurvivors = ['orig.dat', path.join('sub', 'copy.dat')].filter(f => fs.existsSync(path.join(sand, f)));
     ok('live run kept exactly one duplicate copy', dupSurvivors.length === 1);
     ok('live run kept normal file', fs.existsSync(path.join(sand, 'keep.txt')));
+    ok('live run kept tiny twin stubs', fs.existsSync(path.join(sand, 'stub_a.txt')) && fs.existsSync(path.join(sand, 'stub_b.txt')));
     ok('live run kept protected .git content', fs.existsSync(path.join(sand, '.git', 'protected.tmp')));
     ok('live run removed empty dir', !fs.existsSync(path.join(sand, 'sub', 'empty_dir')));
 

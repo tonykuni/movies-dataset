@@ -14,6 +14,7 @@ from datetime import datetime
 # 預設保護名單與暫存檔檔名標籤
 TEMP_EXTENSIONS = {".tmp", ".log", ".cache", ".bak", ".old", ".temp", ".swp", ".dmp"}
 PROTECTED_DIRS = {".git", ".svn", ".venv", "node_modules", "$RECYCLE.BIN", "System Volume Information"}
+DUP_MIN_BYTES = 1024  # 重複比對的最小檔案容量門檻
 
 
 def calculate_hash_stream(file_path: Path, chunk_size: int = 65536) -> str:
@@ -94,7 +95,9 @@ def execute_cleanup(target_dir: str, size_threshold_mb: float, dry_run: bool = T
                 continue
 
             # 策略 3: 為重複檔案比對收集「檔案大小相同的群組」
-            if file_size > 0:
+            # 小於 DUP_MIN_BYTES 的檔案不列入:刪除近乎零容量的「重複檔」
+            # 釋放不了空間,卻常是 __init__.py / .gitkeep 等結構性檔案
+            if file_size >= DUP_MIN_BYTES:
                 size_groups.setdefault(file_size, []).append(file_path)
 
     # Pass 2: 針對容量相同的候選群組進行 Hash 比對

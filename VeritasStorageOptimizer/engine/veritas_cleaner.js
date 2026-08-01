@@ -9,6 +9,9 @@ const crypto = require('crypto');
 
 const TEMP_EXTENSIONS = new Set(['.tmp', '.log', '.cache', '.bak', '.old', '.temp', '.swp', '.dmp']);
 const PROTECTED_DIRS = new Set(['.git', '.svn', '.venv', 'node_modules', '$RECYCLE.BIN', 'System Volume Information']);
+// Files below this size never enter duplicate detection: freeing ~0 bytes,
+// while near-empty twins (__init__.py, .gitkeep, stdout stubs) are structural.
+const DUP_MIN_BYTES = 1024;
 
 function formatSize(bytes) {
     const units = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -86,7 +89,7 @@ async function scanDirectory(dirPath, sizeThresholdMB, executeLive = false, logF
                         continue;
                     }
                     // 3. 收集相同容量者待驗證 Hash
-                    if (stats.size > 0) {
+                    if (stats.size >= DUP_MIN_BYTES) {
                         if (!sizeGroups.has(stats.size)) {
                             sizeGroups.set(stats.size, []);
                         }

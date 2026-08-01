@@ -57,6 +57,10 @@ $script:Stop       = $false
 
 $script:TempExtensions = @('.tmp', '.log', '.cache', '.bak', '.old', '.temp', '.swp', '.dmp')
 $script:ProtectedDirs  = @('.git', '.svn', '.venv', 'node_modules', '$RECYCLE.BIN', 'System Volume Information')
+# Files below this size never enter duplicate detection: deleting them frees
+# ~no space, yet near-empty twins are often structural (__init__.py, .gitkeep,
+# 1-byte stdout stubs) and removing "duplicates" across projects breaks them.
+$script:DupMinBytes    = 1024
 
 if (-not (Test-Path -LiteralPath $script:LogDir)) { New-Item -ItemType Directory -Path $script:LogDir -Force | Out-Null }
 
@@ -190,7 +194,7 @@ function Invoke-VeritasScan {
                     $freed += $fi.Length
                     continue
                 }
-                if ($fi.Length -gt 0) {
+                if ($fi.Length -ge $script:DupMinBytes) {
                     if (-not $groups.Contains($fi.Length)) { $groups[$fi.Length] = [System.Collections.Generic.List[string]]::new() }
                     $groups[$fi.Length].Add($f)
                 }
@@ -456,7 +460,7 @@ font-size:13px;opacity:0;transform:translateY(16px);transition:.35s;z-index:9}.t
       <button id="engJs" onclick="setEngine('node')">Node.js</button>
     </div>
   </div>
-  <div class="muted">保護名單:.git / .svn / .venv / node_modules / $RECYCLE.BIN / System Volume Information 一律跳過;根目錄與家目錄上層一律拒絕。</div>
+  <div class="muted">保護名單:.git / .svn / .venv / node_modules / $RECYCLE.BIN / System Volume Information 一律跳過;根目錄與家目錄上層一律拒絕;小於 1 KB 的檔案不列入重複比對(保護 __init__.py / .gitkeep 等結構檔)。</div>
 </div>
 
 <div class="card"><h2>執行</h2>
@@ -588,6 +592,8 @@ function Invoke-SelfTest {
     [System.IO.File]::WriteAllBytes((Join-Path $sand 'orig.dat'), $dupBytes)
     [System.IO.File]::WriteAllBytes((Join-Path $sand 'sub/copy.dat'), $dupBytes)
     Set-Content -LiteralPath (Join-Path $sand 'keep.txt') -Value 'keep me'
+    [System.IO.File]::WriteAllBytes((Join-Path $sand 'stub_a.txt'), [byte[]]@(10))
+    [System.IO.File]::WriteAllBytes((Join-Path $sand 'stub_b.txt'), [byte[]]@(10))
     Set-Content -LiteralPath (Join-Path $sand '.git/protected.tmp') -Value 'protected'
     New-Item -ItemType Directory -Path (Join-Path $sand 'nest/inner') -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $sand 'nest/inner/only.tmp') -Value 'cascade me'
@@ -606,6 +612,7 @@ function Invoke-SelfTest {
     Add-Test 'Dry-run marks temp file'        ($reasons.Contains('Temp File'))
     Add-Test 'Dry-run marks oversize file'    ($reasons.Contains('Over Limit'))
     Add-Test 'Dry-run marks duplicate'        ($reasons.Contains('Duplicate of'))
+    Add-Test 'Dry-run ignores tiny duplicates' (@($dry.items | Where-Object { $_.path.Contains('stub_') }).Count -eq 0)
     Add-Test 'Dry-run skips protected .git'   (-not (@($dry.items | Where-Object { $_.path.Contains('.git') }).Count -gt 0))
     Add-Test 'Dry-run counts empty dir'       ($dry.emptyDirs.Count -ge 1)
     Add-Test 'Dry-run deletes nothing'        ((Test-Path -LiteralPath (Join-Path $sand 'junk.tmp')) -and (Test-Path -LiteralPath (Join-Path $sand 'bigfile.bin')))
