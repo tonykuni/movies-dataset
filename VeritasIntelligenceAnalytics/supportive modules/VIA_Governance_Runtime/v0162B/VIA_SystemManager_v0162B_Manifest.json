@@ -1,10 +1,10 @@
 {
   "artifacts": [
     {
-      "bytes": 102697,
+      "bytes": 103521,
       "filename": "bin/Invoke-VIA-SystemManager-AllInOne-v0162B.ps1",
-      "role": "single corrected System Manager PowerShell (integration build R2, reconstructed from audit copies)",
-      "sha256": "ae3bdbd553ef876675e151390a7008d51b07a5aed3cd40b6c29cea224b82c114"
+      "role": "single corrected System Manager PowerShell (integration build R3, runtime self-exclusion)",
+      "sha256": "455a7b2264aa4d52417df700abeab51857d09421a220d63b1c4238c42810627f"
     },
     {
       "bytes": 27525,
@@ -13,16 +13,22 @@
       "sha256": "4f653c4ac04df2612364804cfca5a203c868cecffdeb8bbfbf0635cbd1064152"
     },
     {
-      "bytes": 56185,
+      "bytes": 57009,
       "filename": "engine/via_system_manager_engine_v0162B.py",
-      "role": "audit copy of embedded Python engine",
-      "sha256": "4d6c983761bf2a09b9cea423813d0aafb393c5a639559e531eb20a3ab0dd4426"
+      "role": "audit copy of embedded Python engine (R3: own runtime root excluded from inventory)",
+      "sha256": "0cf9725c2b2f1d520a604731631caaf00659d7b91b1c4f681061dc10ed58a206"
+    },
+    {
+      "bytes": 8339,
+      "filename": "qa/via_red_triage_v001.py",
+      "role": "read-only RED triage: distills any run directory into a paste-sized Markdown report (RED files + parser messages, round trend, top Hydra, SSOT multi-version groups); driven by VIA.ps1 -Do Report",
+      "sha256": "e9d5bd92b4f0a516a84091351fba31477782cc6422fbaf42e88298846eff5e65"
     },
     {
       "bytes": 1539,
       "filename": "../../../StartVIASystemManager.ps1",
-      "role": "daily one-paste entrypoint, exact-SHA gate re-locked to integration build R2",
-      "sha256": "7ceefc2bf1eff26a44b02d089f8269c71a7f2abc71cb6cc8413feebd1c8601e4"
+      "role": "daily one-paste entrypoint, exact-SHA gate re-locked to integration build R3",
+      "sha256": "f99a10b2cc950333bb0fb5dc687a40ecbb4cdc6bb6183dd65bb604014298b11f"
     },
     {
       "bytes": 9315,
@@ -33,8 +39,8 @@
     {
       "bytes": 1539,
       "filename": "../../../StartVIAUnified.ps1",
-      "role": "daily one-paste entrypoint, exact-SHA gate re-locked to integration build R2 (byte-identical to StartVIASystemManager.ps1)",
-      "sha256": "7ceefc2bf1eff26a44b02d089f8269c71a7f2abc71cb6cc8413feebd1c8601e4"
+      "role": "daily one-paste entrypoint, exact-SHA gate re-locked to integration build R3 (byte-identical to StartVIASystemManager.ps1)",
+      "sha256": "f99a10b2cc950333bb0fb5dc687a40ecbb4cdc6bb6183dd65bb604014298b11f"
     }
   ],
   "governance": {
@@ -47,8 +53,9 @@
     "ui_only_switch": "-UiOnly"
   },
   "integration": {
-    "build": "R2",
-    "completed_at": "2026-07-28",
+    "build": "R3",
+    "completed_at": "2026-08-01",
+    "r3_fix": "First full-scale Windows panoramic run (2026-08-01, 8782 files) ended ROUND_REVIEW_REQUIRED_RED_ERRORS_REMAIN with the RED count oscillating 20-21 across rounds and 483 Hydra / 1640 SSOT groups. Root cause: the inventory walked the engine's own runtime root (supportive modules/.../v0162B/runtime), re-analyzing prior runs' sandbox copies, evidence files and the truncated corpses left by the earlier [Errno 28] disk-full crash - RED errors no sandbox repair can converge, plus duplicate-basename Hydra/SSOT noise. R3 excludes the engine's own runtime root (run_dir parent) from inventory. Companion: qa/via_red_triage_v001.py + VIA.ps1 -Do Report distill any run (including pre-R3 runs) into a paste-sized RED triage Markdown. Verified live: a base seeded with a corrupt old run_* directory (invalid JSON + Python syntax error + duplicate engine basename) gates UNIFIED_SANDBOX_GREEN with zero runtime-polluted inventory rows. Both daily entrypoints re-locked to the R3 launcher SHA.",
     "note": "The original 143477-byte AllInOne (sha256 e6155465203591fd34d800a0901099bddf537f2aae04277281a752e2aff48127) was not present in the supplied artifact set. It was reconstructed from the byte-verified audit engine and UI preview using the v0162B repair contract (single-quoted literal here-strings only, placeholder-replacement daily-launcher template, post-generation AST validation, exact-SHA asset verification). Both daily entrypoints were re-locked to the reconstructed launcher's SHA-256.",
     "previous_allinone_sha256": "e6155465203591fd34d800a0901099bddf537f2aae04277281a752e2aff48127",
     "r2_fix": "First Windows runtime user test (2026-07-28 15:34, py 3.13.7) exposed an argument-quoting defect: Start-Process joined array arguments without quoting, so the engine path containing spaces ('supportive modules') was split and Python failed with Errno 2. R2 quotes every whitespace-containing argument explicitly and passes one command line. Both daily entrypoints re-locked to the R2 launcher SHA.",

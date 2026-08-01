@@ -43,4 +43,7 @@ zero dependencies, honouring the visual lock. Usage:
 --table <t> --left <col> --right <col> [--left-form bar|line|area]`.
 
 排除規則：`.git`, `__pycache__`, `node_modules`, `venv`, `cache*`, `archive*`,
-`backup*`, `staging`, `received_duplicates` 不列入分析。
+`backup*`, `staging`, `received_duplicates` 不列入分析;引擎自身的 runtime
+root(`supportive modules/VIA_Governance_Runtime/v0162B/runtime`,即所有
+`run_*` 目錄)自 R3 起也排除——先前 run 的 sandbox 副本與崩潰殘骸不再被
+重新分析。

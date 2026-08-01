@@ -39,7 +39,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $Script:VIAVersion = 'v0162B'
-$Script:EngineExpectedSHA = '4d6c983761bf2a09b9cea423813d0aafb393c5a639559e531eb20a3ab0dd4426'
+$Script:EngineExpectedSHA = '0cf9725c2b2f1d520a604731631caaf00659d7b91b1c4f681061dc10ed58a206'
 $Script:WorkbenchExpectedSHA = '4f653c4ac04df2612364804cfca5a203c868cecffdeb8bbfbf0635cbd1064152'
 
 # --------------------------------------------------------------------------
@@ -237,16 +237,35 @@ def classify_file(path: Path) -> str:
     return "OTHERS"
 
 
-def inventory_files(subsystems: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def inventory_files(
+    subsystems: list[dict[str, Any]],
+    excluded_roots: Iterable[Path] = (),
+) -> list[dict[str, Any]]:
+    # excluded_roots: the engine's own runtime root (run_* dirs). Without this
+    # the engine re-analyzes prior runs' sandbox copies and evidence — and any
+    # truncated corpse a crashed run left behind — inflating file/Hydra/SSOT
+    # counts and holding RED errors that no repair can ever converge.
+    excluded_prefixes = tuple(norm(Path(r).resolve()) + "/" for r in excluded_roots)
+
+    def under_excluded_root(path: Path) -> bool:
+        return norm(path.resolve()).startswith(excluded_prefixes) if excluded_prefixes else False
+
     rows: list[dict[str, Any]] = []
     seen: set[str] = set()
     for subsystem in subsystems:
         root = Path(subsystem["root"])
         for current, dirs, files in os.walk(root):
-            dirs[:] = [d for d in dirs if d.lower() not in EXCLUDED_PARTS and not d.startswith(".git")]
+            dirs[:] = [
+                d for d in dirs
+                if d.lower() not in EXCLUDED_PARTS
+                and not d.startswith(".git")
+                and not under_excluded_root(Path(current) / d)
+            ]
             for name in sorted(files):
                 path = Path(current) / name
                 if path.suffix.lower() not in ALLOWED_EXTENSIONS or is_excluded(path):
+                    continue
+                if under_excluded_root(path):
                     continue
                 key = norm(path.resolve())
                 if key in seen:
@@ -1141,7 +1160,7 @@ def run(config: dict[str, Any]) -> dict[str, Any]:
     write_json_atomic(run_dir / "evidence" / "subsystems.json", subsystems)
 
     update_status(status_path, "RUNNING", 7, "A12: inventorying VRN, VDF, VAP and other projects.")
-    inventory = inventory_files(subsystems)
+    inventory = inventory_files(subsystems, excluded_roots=[run_dir.parent])
     write_json_atomic(run_dir / "registry" / "file_inventory.json", inventory)
 
     update_status(status_path, "RUNNING", 12, "A20: registering Python packages and PowerShell modules.")

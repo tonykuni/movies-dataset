@@ -26,6 +26,9 @@ VIA · 統一主控 · One PowerShell to integrate all (repo-resident edition)
   UI        產生並開啟 AutoPlot Workbench(v0162C 格式)
   Plot      VeritasAutoPlot CLI(-PlotArgs '--list' / '--auto' / '--table t --left a --right b')
   Clean     清掉舊的 runtime run_* 目錄(保留最新 -KeepRuns 個,預設 2)
+  Report    RED 錯誤分診:把最新一次 run(或 -RunDir 指定)濃縮成小型 Markdown
+            (每個 RED 檔案 + 解析器訊息 + 三輪趨勢 + Hydra/SSOT 重點,
+            可直接貼回對話;唯讀,不動 canonical)
   Launch    SHA 閘門 + AST 閘門 → AllInOne 三輪分析
             (Launch 前自動 Clean + 磁碟空間閘門:剩餘空間 < -MinFreeGB 即擋下,
             避免引擎跑到一半 [Errno 28] No space left on device)
@@ -60,6 +63,7 @@ $QaRelative = 'supportive modules/VIA_Governance_Runtime/v0162B/qa/Invoke-VIA-QA
 $QaOutRelative = 'supportive modules/VIA_Governance_Runtime/v0162B/qa/evidence/master_qa_results.json'
 $PromoteToolRelative = 'supportive modules/VIA_Governance_Runtime/v0162B/bin/Invoke-VIA-Promotion-Transaction-v0162B.ps1'
 $AutoPlotRelative = 'functional modules/VAP/engine/via_autoplot_engine_v001.py'
+$TriageRelative = 'supportive modules/VIA_Governance_Runtime/v0162B/qa/via_red_triage_v001.py'
 
 function Write-VIALog {
     param([Parameter(Mandatory)][string]$Message, [string]$Color = 'Gray')
@@ -207,6 +211,23 @@ function Clear-VIARuntime {
     Write-VIALog -Message ('CLEAN COMPLETE : freed ' + [Math]::Round($freedBytes / 1MB, 1) + ' MB · kept ' + ($runs.Count - $stale.Count) + ' newest run(s)') -Color Cyan
 }
 
+function Invoke-VIAReport {
+    Write-Host ''
+    Write-VIALog -Message 'REPORT → RED triage of the newest engine run (paste-sized Markdown)' -Color Cyan
+    $triage = ConvertTo-VIATarget -Root $Base -Relative $TriageRelative
+    if (-not (Test-Path -LiteralPath $triage -PathType Leaf)) {
+        # Base copy may predate this tool; the repo copy works identically (read-only).
+        $triage = ConvertTo-VIATarget -Root (Join-Path -Path $RepoPath -ChildPath $PackageName) -Relative $TriageRelative
+    }
+    if (-not (Test-Path -LiteralPath $triage -PathType Leaf)) {
+        throw ('Triage tool missing: ' + $triage + '. Run -Do Sync first.')
+    }
+    $arguments = @($triage, '--base', $Base)
+    if (-not [string]::IsNullOrWhiteSpace($RunDir)) { $arguments += @('--run', $RunDir) }
+    Invoke-VIAPy -Arguments $arguments
+    Write-VIALog -Message 'REPORT COMPLETE : paste the Markdown above back into the conversation for diagnosis' -Color Cyan
+}
+
 function Test-VIAFreeSpace {
     $root = [System.IO.Path]::GetPathRoot([System.IO.Path]::GetFullPath($Base))
     $drive = [System.IO.DriveInfo]::new($root)
@@ -269,7 +290,7 @@ function Invoke-VIAPromote {
 Write-Host ''
 Write-Host 'VIA · MASTER (repo edition) · VRN / VDF / VAP / SUPPORTIVE' -ForegroundColor Cyan
 
-$ValidActions = @('StartAll', 'Sync', 'Install', 'QA', 'UI', 'Plot', 'Clean', 'Launch', 'Promote')
+$ValidActions = @('StartAll', 'Sync', 'Install', 'QA', 'UI', 'Plot', 'Clean', 'Launch', 'Report', 'Promote')
 $requested = [System.Collections.Generic.List[string]]::new()
 foreach ($raw in $Do) {
     foreach ($piece in ([string]$raw).Split(',')) {
@@ -304,6 +325,7 @@ foreach ($action in $plan) {
         'Plot' { Invoke-VIAPlot }
         'Clean' { Clear-VIARuntime }
         'Launch' { Invoke-VIALaunch }
+        'Report' { Invoke-VIAReport }
         'Promote' { Invoke-VIAPromote }
     }
 }

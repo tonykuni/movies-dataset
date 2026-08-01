@@ -24,7 +24,10 @@ pwsh -NoProfile -ExecutionPolicy Bypass -File "$HOME\Downloads\movies-dataset\VI
 ```
 
 See the header of [`VIA.ps1`](VIA.ps1) for all actions
-(`StartAll` / `Sync` / `Install` / `QA` / `UI` / `Plot` / `Launch` / `Promote`).
+(`StartAll` / `Sync` / `Install` / `QA` / `UI` / `Plot` / `Clean` / `Launch` /
+`Report` / `Promote`). If a run ends with RED errors, run
+`VIA.ps1 -Do Report` — it prints a small paste-sized triage of every RED file
+so it can be shared and diagnosed directly.
 
 A simple Streamlit app showing movie data from [The Movie Database (TMDB)](https://www.kaggle.com/datasets/tmdb/tmdb-movie-metadata). 
 

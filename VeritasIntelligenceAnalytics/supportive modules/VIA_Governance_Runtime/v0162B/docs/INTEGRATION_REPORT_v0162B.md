@@ -1,6 +1,21 @@
 # VIA 整體系統整合收尾報告 · System Integration Completion Report
-**v0162B · Integration Build R2 + VAP · 2026-07-28**
+**v0162B · Integration Build R3 + VAP · 2026-08-01**
 **Scope 範圍: supportive modules / VRN / VDF / VAP**
+
+> **R3 修正 · R3 fix (2026-08-01)** — 第一次全量 Windows 全景實跑(8,782 檔)
+> 卡在 `ROUND_REVIEW_REQUIRED_RED_ERRORS_REMAIN`:RED 在三輪間 20↔21 震盪、
+> 483 Hydra、1,640 SSOT 群組。根因:inventory 會走進引擎**自己的 runtime
+> root**(`supportive modules/…/v0162B/runtime`),把先前 run 的 sandbox
+> 副本、evidence 檔、以及更早 `[Errno 28]` 磁碟滿崩潰留下的截斷殘骸全部
+> 重新分析——這類 RED 沙盒修復永遠無法收斂,重複檔名又灌爆 Hydra/SSOT。
+> R3 起 inventory 排除引擎自身 runtime root(run_dir 上層)。配套新增
+> `qa/via_red_triage_v001.py` + `VIA.ps1 -Do Report`:把任何一次 run
+> (含 R3 之前的舊 run)濃縮成可直接貼回對話的 RED 分診 Markdown
+> (每個 RED 檔 + 解析器訊息 + 三輪趨勢 + Hydra/SSOT 重點)。實測:
+> 在含毒 run_*(壞 JSON + Python 語法錯誤 + 重複引擎檔名)的 base 上
+> 三輪實跑,inventory 零 runtime 污染、閘門
+> `UNIFIED_SANDBOX_GREEN_RUNTIME_DEPLOYED_NO_CANONICAL_MUTATION`。
+> 兩個每日啟動器重新鎖定至 R3 啟動器 SHA(`455a7b22…`,103,521 bytes)。
 
 > **VAP 整合 · VAP integration (2026-07-28)** — VAP(**VeritasAutoPlot**,
 > VIA 視覺功能管理:icons / templates / 繪圖)anchor
@@ -54,7 +69,8 @@ Verified against the manifest before integration:
 ## 3. 整合作業 · Integration work
 
 1. **AllInOne reconstruction** (`bin/Invoke-VIA-SystemManager-AllInOne-v0162B.ps1`,
-   102,697 bytes, sha256 `ae3bdbd5…82c114` (R2)), built strictly to the v0162B
+   102,697 bytes, sha256 `ae3bdbd5…82c114` (R2); current build R3 is
+   103,521 bytes, sha256 `455a7b22…10627f`), built strictly to the v0162B
    repair contract:
    - single-quoted literal here-strings only — zero expandable here-strings
      (the v0162A root cause), verified by token scan;
@@ -69,8 +85,9 @@ Verified against the manifest before integration:
      register-all/import-approved-only.
 2. **SHA gate re-lock**: both `StartVIASystemManager.ps1` and
    `StartVIAUnified.ps1` regenerated from the same template, now gating on the
-   reconstructed launcher's SHA (`ae3bdbd5…`). Entrypoints remain
-   byte-identical to each other (sha256 `7ceefc2b…`).
+   reconstructed launcher's SHA (R2 `ae3bdbd5…`; re-locked to R3
+   `455a7b22…` on 2026-08-01). Entrypoints remain byte-identical to each
+   other (R2 sha256 `7ceefc2b…`; R3 sha256 `f99a10b2…`).
 3. **VRN / VDF integration anchors**: `functional modules/VRN` and
    `functional modules/VDF` now carry subsystem manifests registering the
    discovery roots and governance gates (enabled=false draft intake for VRN,
@@ -88,7 +105,7 @@ Verified against the manifest before integration:
 | Both daily entrypoints AST | PASS |
 | Generated-launcher AST (template output) | PASS |
 | Expandable here-string token scan | PASS (0 found) |
-| Embedded engine roundtrip → sha `4d6c9837…` | PASS |
+| Embedded engine roundtrip → sha `0cf9725c…` (R3) | PASS |
 | Embedded workbench roundtrip → sha `4f653c4a…` | PASS |
 | Entrypoint template roundtrip (byte-exact vs shipped) | PASS |
 | Python engine `py_compile` (3.11) | PASS |
