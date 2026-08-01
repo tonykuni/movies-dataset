@@ -56,7 +56,7 @@ $script:JsEngine   = Join-Path $script:Base 'engine/veritas_cleaner.js'
 $script:Stop       = $false
 
 $script:TempExtensions = @('.tmp', '.log', '.cache', '.bak', '.old', '.temp', '.swp', '.dmp')
-$script:ProtectedDirs  = @('.git', '.svn', '.venv', 'node_modules', '$RECYCLE.BIN', 'System Volume Information')
+$script:ProtectedDirs  = @('.git', '.svn', '.venv', 'node_modules', 'site-packages', '$RECYCLE.BIN', 'System Volume Information')
 # Files below this size never enter duplicate detection: deleting them frees
 # ~no space, yet near-empty twins are often structural (__init__.py, .gitkeep,
 # 1-byte stdout stubs) and removing "duplicates" across projects breaks them.
@@ -128,6 +128,17 @@ function Test-ReparsePoint {
     } catch { return $true }
 }
 
+function Test-SkippedDir {
+    # Protected names, reparse points, and Python virtual environments
+    # (marked by pyvenv.cfg - venvs share thousands of identical package
+    # files, so cross-venv dedup would gut every env after the first).
+    param([string]$Path)
+    if ($script:ProtectedDirs -contains [System.IO.Path]::GetFileName($Path)) { return $true }
+    if (Test-ReparsePoint -Path $Path) { return $true }
+    if (Test-Path -LiteralPath (Join-Path $Path 'pyvenv.cfg') -PathType Leaf) { return $true }
+    return $false
+}
+
 function Get-EmptyDirectories {
     # Lightweight directory-only walk (no file stat, no hashing).
     # Returns currently-empty directories, deepest paths first.
@@ -139,9 +150,7 @@ function Get-EmptyDirectories {
         $d = $stack.Pop()
         try {
             foreach ($s in [System.IO.Directory]::EnumerateDirectories($d)) {
-                $name = [System.IO.Path]::GetFileName($s)
-                if ($script:ProtectedDirs -contains $name) { continue }
-                if (Test-ReparsePoint -Path $s) { continue }
+                if (Test-SkippedDir -Path $s) { continue }
                 $stack.Push($s)
                 $dirs.Add($s)
             }
@@ -173,9 +182,7 @@ function Invoke-VeritasScan {
         $d = $stack.Pop()
         try {
             foreach ($s in [System.IO.Directory]::EnumerateDirectories($d)) {
-                $name = [System.IO.Path]::GetFileName($s)
-                if ($script:ProtectedDirs -contains $name) { continue }
-                if (Test-ReparsePoint -Path $s) { continue }
+                if (Test-SkippedDir -Path $s) { continue }
                 $stack.Push($s)
             }
         } catch {}
@@ -460,7 +467,7 @@ font-size:13px;opacity:0;transform:translateY(16px);transition:.35s;z-index:9}.t
       <button id="engJs" onclick="setEngine('node')">Node.js</button>
     </div>
   </div>
-  <div class="muted">保護名單:.git / .svn / .venv / node_modules / $RECYCLE.BIN / System Volume Information 一律跳過;根目錄與家目錄上層一律拒絕;小於 1 KB 的檔案不列入重複比對(保護 __init__.py / .gitkeep 等結構檔)。</div>
+  <div class="muted">保護名單:.git / .svn / .venv / node_modules / site-packages / $RECYCLE.BIN / System Volume Information 與所有 Python 虛擬環境(偵測 pyvenv.cfg)一律跳過;根目錄與家目錄上層一律拒絕;小於 1 KB 的檔案不列入重複比對(保護 __init__.py / .gitkeep 等結構檔)。</div>
 </div>
 
 <div class="card"><h2>執行</h2>
@@ -595,6 +602,9 @@ function Invoke-SelfTest {
     [System.IO.File]::WriteAllBytes((Join-Path $sand 'stub_a.txt'), [byte[]]@(10))
     [System.IO.File]::WriteAllBytes((Join-Path $sand 'stub_b.txt'), [byte[]]@(10))
     Set-Content -LiteralPath (Join-Path $sand '.git/protected.tmp') -Value 'protected'
+    New-Item -ItemType Directory -Path (Join-Path $sand 'fake_env') -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $sand 'fake_env/pyvenv.cfg') -Value 'home = /usr'
+    Set-Content -LiteralPath (Join-Path $sand 'fake_env/venvjunk.tmp') -Value 'venv temp'
     New-Item -ItemType Directory -Path (Join-Path $sand 'nest/inner') -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $sand 'nest/inner/only.tmp') -Value 'cascade me'
 
@@ -614,6 +624,7 @@ function Invoke-SelfTest {
     Add-Test 'Dry-run marks duplicate'        ($reasons.Contains('Duplicate of'))
     Add-Test 'Dry-run ignores tiny duplicates' (@($dry.items | Where-Object { $_.path.Contains('stub_') }).Count -eq 0)
     Add-Test 'Dry-run skips protected .git'   (-not (@($dry.items | Where-Object { $_.path.Contains('.git') }).Count -gt 0))
+    Add-Test 'Dry-run skips python venv'      (@($dry.items | Where-Object { $_.path.Contains('fake_env') }).Count -eq 0)
     Add-Test 'Dry-run counts empty dir'       ($dry.emptyDirs.Count -ge 1)
     Add-Test 'Dry-run deletes nothing'        ((Test-Path -LiteralPath (Join-Path $sand 'junk.tmp')) -and (Test-Path -LiteralPath (Join-Path $sand 'bigfile.bin')))
     Add-Test 'Dry-run audit log written'      (Test-Path -LiteralPath $dry.logPath)
@@ -626,6 +637,7 @@ function Invoke-SelfTest {
     Add-Test 'Execute keeps one duplicate'    (@($survivors).Count -eq 1)
     Add-Test 'Execute keeps normal file'      (Test-Path -LiteralPath (Join-Path $sand 'keep.txt'))
     Add-Test 'Execute keeps protected .git'   (Test-Path -LiteralPath (Join-Path $sand '.git/protected.tmp'))
+    Add-Test 'Execute keeps venv content'     (Test-Path -LiteralPath (Join-Path $sand 'fake_env/venvjunk.tmp'))
     Add-Test 'Execute removes empty dir'      (-not (Test-Path -LiteralPath (Join-Path $sand 'sub/empty_dir')))
     Add-Test 'Execute cascades nested empties' (-not (Test-Path -LiteralPath (Join-Path $sand 'nest')))
 

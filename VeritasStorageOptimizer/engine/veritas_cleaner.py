@@ -13,8 +13,19 @@ from datetime import datetime
 
 # 預設保護名單與暫存檔檔名標籤
 TEMP_EXTENSIONS = {".tmp", ".log", ".cache", ".bak", ".old", ".temp", ".swp", ".dmp"}
-PROTECTED_DIRS = {".git", ".svn", ".venv", "node_modules", "$RECYCLE.BIN", "System Volume Information"}
+PROTECTED_DIRS = {".git", ".svn", ".venv", "node_modules", "site-packages", "$RECYCLE.BIN", "System Volume Information"}
 DUP_MIN_BYTES = 1024  # 重複比對的最小檔案容量門檻
+
+
+def is_skipped_dir(parent: str, name: str) -> bool:
+    """保護名單、symlink,以及任何含 pyvenv.cfg 的 Python 虛擬環境一律跳過:
+    各 venv 內含成千上萬相同的套件檔案,跨 venv 去重會毀掉第一個以外的環境。"""
+    if name in PROTECTED_DIRS:
+        return True
+    dir_path = Path(parent) / name
+    if dir_path.is_symlink():
+        return True
+    return (dir_path / "pyvenv.cfg").is_file()
 
 
 def calculate_hash_stream(file_path: Path, chunk_size: int = 65536) -> str:
@@ -44,7 +55,7 @@ def clean_empty_directories(target_path: Path, dry_run: bool = True) -> list:
     for root, dirs, _ in os.walk(target_path, topdown=False):
         for d in dirs:
             dir_path = Path(root) / d
-            if dir_path.name in PROTECTED_DIRS:
+            if is_skipped_dir(root, d):
                 continue
             try:
                 if not any(dir_path.iterdir()):
@@ -71,8 +82,8 @@ def execute_cleanup(target_dir: str, size_threshold_mb: float, dry_run: bool = T
 
     # Pass 1: 遍歷檔案與處理暫存檔 / 超大檔案
     for root, dirs, files in os.walk(target_path):
-        # 排除保護目錄
-        dirs[:] = [d for d in dirs if d not in PROTECTED_DIRS]
+        # 排除保護目錄 / symlink / Python 虛擬環境
+        dirs[:] = [d for d in dirs if not is_skipped_dir(root, d)]
 
         for file in files:
             file_path = Path(root) / file

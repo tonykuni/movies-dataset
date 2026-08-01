@@ -10,8 +10,8 @@ VeritasStorageOptimizer/
 │   ├── veritas_cleaner.py    # Python 引擎 (僅標準庫)
 │   └── veritas_cleaner.js    # Node.js 引擎 (Node v18+, 零 npm 套件)
 ├── tests/
-│   ├── e2e_apitest.js        # 零相依 e2e:Python GUI 後端完整 API 契約 (45 assertions)
-│   ├── e2e_ps_usertest.js    # 零相依 e2e:pwsh AIO 後端 + 三引擎 + 實刪 (63 assertions)
+│   ├── e2e_apitest.js        # 零相依 e2e:Python GUI 後端完整 API 契約 (48 assertions)
+│   ├── e2e_ps_usertest.js    # 零相依 e2e:pwsh AIO 後端 + 三引擎 + 實刪 (67 assertions)
 │   └── ps_lint.py            # PS7 靜態分析 (here-string / 括號平衡 / LL 規則)
 ├── logs/                     # append-only 活動日誌 + 每次執行的稽核日誌 (git 忽略)
 └── README.md
@@ -34,7 +34,7 @@ pwsh -File VeritasStorageOptimizer_AllInOne.ps1 -Port 9000 -NoBrowser
 pwsh -File VeritasStorageOptimizer_AllInOne.ps1 -Dir D:\Downloads -MaxMB 500
 pwsh -File VeritasStorageOptimizer_AllInOne.ps1 -Dir D:\Downloads -MaxMB 500 -Execute
 
-# 內嵌自我測試 (30 assertions)
+# 內嵌自我測試 (32 assertions)
 pwsh -File VeritasStorageOptimizer_AllInOne.ps1 -SelfTest
 
 # ★ 一鍵全專案測試鏈:靜態分析 + PS 自測 + Python 自測 + 兩套 e2e
@@ -46,8 +46,8 @@ pwsh -File VeritasStorageOptimizer_AllInOne.ps1 -TestAll
 安裝指引後結束。
 
 測試鏈(`-TestAll` 一鍵執行,全部通過):`tests/ps_lint.py` 靜態分析 0 錯誤 →
-pwsh AST 解析 0 錯誤 → `-SelfTest` 30/30 → `veritas_gui.py --self-test` 17/17 →
-`tests/e2e_apitest.js` 45/45 → `tests/e2e_ps_usertest.js` 真實後端 63/63
+pwsh AST 解析 0 錯誤 → `-SelfTest` 32/32 → `veritas_gui.py --self-test` 17/17 →
+`tests/e2e_apitest.js` 48/48 → `tests/e2e_ps_usertest.js` 真實後端 67/67
 (三引擎 Dry-Run、防護 Guard、實體刪除、巢狀空目錄連鎖清除、Unicode 檔名、
 symlink 循環/逃逸圍堵、非法閾值伺服器端拒絕、單元素 JSON 陣列形狀、
 300 檔案規模化精確重複比對、404 / shutdown 契約)。缺少對應直譯器的套件
@@ -82,7 +82,7 @@ symlink 循環/逃逸圍堵、非法閾值伺服器端拒絕、單元素 JSON �
 | 二階段重複檔案比對 (2-Pass Hash Filtering) | 僅對「檔案大小相同」的候選群組計算 MD5,避免無謂 I/O |
 | 串流分頁雜湊 (Streaming Chunk Hashing) | 固定 64 KB Chunk / Stream 讀取,數 GB 大檔也不會 OOM |
 | 預設安全試執行 (Dry-Run Safety Mode) | 預設僅輸出預計刪除清單與可釋放容量;實體刪除需顯式切換模式 + 前端二次確認 |
-| 關鍵系統路徑過濾 (System Protection) | 引擎跳過 `.git` `.svn` `.venv` `node_modules` `$RECYCLE.BIN` `System Volume Information`;GUI 後端另拒絕根目錄、家目錄與其上層 |
+| 關鍵系統路徑過濾 (System Protection) | 引擎跳過 `.git` `.svn` `.venv` `node_modules` `site-packages` `$RECYCLE.BIN` `System Volume Information`,以及**任何含 `pyvenv.cfg` 的 Python 虛擬環境**(各 venv 內含大量相同套件檔,跨 venv 去重會毀掉環境);GUI 後端另拒絕根目錄、家目錄與其上層 |
 | 稽核日誌 (Audit Trail) | GUI 活動採 append-only 日誌;每次掃描/清理各產生獨立稽核檔 |
 
 清理策略(兩引擎一致):
@@ -127,7 +127,7 @@ python veritas_gui.py --no-browser        # 不自動開啟瀏覽器
 # 內嵌自我測試 (17 assertions):Token 替換、防護 Guard、輸出解析、沙盒 Dry-Run/Execute 往返
 python veritas_gui.py --self-test
 
-# 零相依 e2e 測試 (45 assertions):啟動真實後端,驗證前端頁面、/api/env、
+# 零相依 e2e 測試 (48 assertions):啟動真實後端,驗證前端頁面、/api/env、
 # 雙引擎 Dry-Run、防護 Guard、實體刪除、symlink 圍堵與 404 契約
 node tests/e2e_apitest.js
 ```

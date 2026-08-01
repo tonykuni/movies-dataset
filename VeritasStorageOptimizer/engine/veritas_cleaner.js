@@ -8,10 +8,18 @@ const path = require('path');
 const crypto = require('crypto');
 
 const TEMP_EXTENSIONS = new Set(['.tmp', '.log', '.cache', '.bak', '.old', '.temp', '.swp', '.dmp']);
-const PROTECTED_DIRS = new Set(['.git', '.svn', '.venv', 'node_modules', '$RECYCLE.BIN', 'System Volume Information']);
+const PROTECTED_DIRS = new Set(['.git', '.svn', '.venv', 'node_modules', 'site-packages', '$RECYCLE.BIN', 'System Volume Information']);
 // Files below this size never enter duplicate detection: freeing ~0 bytes,
 // while near-empty twins (__init__.py, .gitkeep, stdout stubs) are structural.
 const DUP_MIN_BYTES = 1024;
+
+// Protected names plus Python virtual environments (pyvenv.cfg marker):
+// venvs share thousands of identical package files, so cross-venv dedup
+// would gut every env after the first-scanned one.
+function isSkippedDir(fullPath, name) {
+    if (PROTECTED_DIRS.has(name)) return true;
+    try { return fs.existsSync(path.join(fullPath, 'pyvenv.cfg')); } catch (err) { return true; }
+}
 
 function formatSize(bytes) {
     const units = ['B', 'KB', 'MB', 'GB', 'TB'];
@@ -69,7 +77,7 @@ async function scanDirectory(dirPath, sizeThresholdMB, executeLive = false, logF
         for (const entry of entries) {
             const fullPath = path.join(currentDir, entry.name);
             if (entry.isDirectory()) {
-                if (!PROTECTED_DIRS.has(entry.name)) {
+                if (!isSkippedDir(fullPath, entry.name)) {
                     walkSync(fullPath);
                 }
             } else if (entry.isFile()) {
