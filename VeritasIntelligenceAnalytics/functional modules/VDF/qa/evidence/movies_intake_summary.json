@@ -1,0 +1,60 @@
+{
+  "engine": "vdf_movies_intake_v001",
+  "mode": "Refresh",
+  "source_dir": "/home/user/movies-dataset/data",
+  "sources": {
+    "movies_genres_summary.csv": {
+      "sha256": "4b543608f524c86ae2d69d10c75f4e8e51ccd6b73bcc30211b819b0977591881",
+      "rows": 1008
+    },
+    "movie_metadata.csv": {
+      "sha256": "ee65e153a601b2fe6ff4f4db87cabf715d304635bb7a662a0f7fd6db21c621bc",
+      "rows": 5043
+    },
+    "tmdb_5000_movies.csv": {
+      "sha256": "1e0584a8dd374120e4ed4f2b81f0d2bd0eb95a554708e4a350d00ed5c46d2825",
+      "rows": 4803
+    }
+  },
+  "tables": {
+    "movies_genres_summary": {
+      "rows": 1008,
+      "columns": [
+        "year",
+        "gross",
+        "popularity",
+        "imdb_score",
+        "vote_average",
+        "genre"
+      ]
+    },
+    "yearly_box_office": {
+      "rows": 91,
+      "columns": [
+        "title_year",
+        "movie_count",
+        "total_gross",
+        "total_budget",
+        "avg_imdb_score",
+        "avg_duration"
+      ]
+    },
+    "yearly_tmdb": {
+      "rows": 90,
+      "columns": [
+        "year",
+        "movie_count",
+        "total_revenue",
+        "total_budget",
+        "avg_popularity",
+        "avg_vote_average"
+      ]
+    }
+  },
+  "database": {
+    "path": "/home/user/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/db/movies_dataset.sqlite",
+    "sha256": "5fa50aa2c7358c44689e48e8aaa764d0c694e3930eedfd44a2c5da110cadd631",
+    "bytes": 77824
+  },
+  "gate": "GREEN_REFRESH_DB_WRITTEN"
+}
