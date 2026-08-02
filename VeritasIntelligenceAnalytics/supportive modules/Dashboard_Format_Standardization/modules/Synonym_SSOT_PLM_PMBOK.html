@@ -1,0 +1,161 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · 同義字展開 → 唯一 SSOT · PLM + PMBOK 同步</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--blue:#4c78a8;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--vi:#7a6daa;
+ --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg)}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5}
+.wrap{max-width:1240px;margin:0 auto;padding:0 22px 60px}
+.bar{position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50}
+header{padding:20px 0 9px;margin-bottom:10px;border-bottom:2px solid var(--ink)}
+.kicker{font:700 10px 'DM Mono',monospace;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px}
+h1{font:800 19px/1.2 'Syne',sans-serif;color:var(--ink)}h1 span{color:var(--up)}
+.sub{margin-top:6px;font:400 10.5px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:1010px}.sub b{color:var(--ink2)}
+.gov{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#1e1d1a;border-radius:3px;padding:7px 14px;margin:12px 0}
+.gov .lk{font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase}
+.gov .pill{font:600 7.5px 'DM Mono',monospace;color:#cfcabf}
+.gov .ver{margin-left:auto;font:700 8px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:2px 8px}
+.note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--am);border-radius:3px;padding:8px 14px;margin-bottom:14px;font:500 9px/1.6 'DM Mono',monospace;color:var(--mut)}.note b{color:var(--ink2)}
+h2{font:800 13px 'Syne',sans-serif;color:var(--ink);margin:22px 0 4px;padding-bottom:5px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:8px}
+h2 .en{font:600 8px 'DM Mono',monospace;color:var(--mut2);letter-spacing:1px;text-transform:uppercase}
+.scards{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0 4px}
+.sc{background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:9px 14px;min-width:96px}
+.sc .v{font:800 20px 'Syne',sans-serif;line-height:1}.sc .l{font:600 8px 'DM Mono',monospace;color:var(--mut);text-transform:uppercase;letter-spacing:.6px;margin-top:4px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:0;overflow:hidden;margin-top:12px}
+.hd2{font:800 11px 'Syne',sans-serif;padding:10px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.resolver{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:14px}
+.resolver input{font:500 14px 'DM Mono',monospace;padding:8px 11px;border:1px solid var(--line);border-radius:3px;width:260px}
+.arrow{font:700 16px 'DM Mono',monospace;color:var(--mut2)}
+.canonbox{font:800 15px 'Syne',sans-serif;color:#fff;background:var(--teal);border-radius:4px;padding:8px 14px}
+.canonbox.none{background:var(--up)}
+.synchips{display:flex;gap:5px;flex-wrap:wrap;padding:0 14px 12px}
+.chip{font:600 9px 'DM Mono',monospace;background:var(--soft);border-radius:3px;padding:2px 8px;color:var(--ink2)}
+table{width:100%;border-collapse:collapse;font:500 10px 'DM Mono',monospace}
+th{font:700 8px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.5px;color:var(--mut);text-align:left;padding:7px 8px;border-bottom:2px solid var(--ink);background:var(--paper2)}
+td{padding:5px 8px;border-bottom:1px solid var(--soft);vertical-align:top}
+tr:hover td{background:var(--paper2)}
+.cid{font:700 9px 'DM Mono',monospace;color:var(--blue)}
+.nm{font:600 11px 'Noto Sans TC',sans-serif;color:var(--ink)}
+.dom{font:700 7px 'DM Mono',monospace;color:#fff;border-radius:3px;padding:1px 6px}
+.d-core{background:#1e1d1a}.d-plm{background:#4c78a8}.d-pmbok{background:#439a9a}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}@media(max-width:860px){.grid2{grid-template-columns:1fr}}
+.mapc{display:flex;justify-content:space-between;padding:5px 14px;border-bottom:1px solid var(--soft);font:500 10px 'Noto Sans TC',sans-serif;align-items:center}
+.mapc .to{font:600 8.5px 'DM Mono',monospace;color:var(--teal)}
+.life{display:flex;gap:4px;padding:12px 14px}
+.lf{flex:1;border-radius:4px;padding:7px 9px;color:#fff;font:600 9px 'Noto Sans TC',sans-serif;text-align:center}
+.proc{display:flex;gap:4px;padding:0 14px 12px;flex-wrap:wrap}
+.pr{font:600 9px 'Noto Sans TC',sans-serif;background:var(--soft);border-radius:3px;padding:4px 9px;color:var(--ink2)}
+.btn{font:700 8.5px 'DM Mono',monospace;cursor:pointer;border:1px solid var(--ink);background:transparent;color:var(--ink);border-radius:3px;padding:6px 11px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:11px 14px;border-top:1px solid var(--line);align-items:center}
+.tk{font:500 9px 'DM Mono',monospace;color:var(--mut)}
+.pdf{position:fixed;top:12px;right:14px;z-index:999;background:var(--ink);color:#fff;border:none;border-radius:5px;padding:7px 13px;font:700 9px 'DM Mono',monospace;cursor:pointer}
+@media print{@page{size:A4;margin:10mm}.pdf,.toolbar{display:none!important}}
+</style></head><body>
+<div class="bar"></div><button class="pdf" onclick="window.print()">⤓ PDF</button>
+<div class="wrap">
+<header>
+ <div class="kicker">VERITAS INTELLIGENCE · 同義字增量展開 → 唯一 SSOT 基準 · PLM + PMBOK SYNCED</div>
+ <h1>同義字展開 <span>→</span> 唯一 SSOT · PLM + PMBOK 同步</h1>
+ <p class="sub">跨系統/語言的說法（SAP、PLM、PMBOK、MS Project、中英）全部<b>增量展開為同義字</b>，但收斂到<b>唯一 canonical 基準</b>。加同義字 append-only；改指別的基準需<b>宣告</b>才可。PLM（EBOM/MBOM、ECO/ECN、版次、生命週期）與 PMBOK（10 知識領域 + 5 流程群組）已同步錨定。</p>
+</header>
+<div class="gov"><span class="lk">🔒 UNIQUE SSOT BASELINE</span><span class="pill">synonym expand · only-add</span>
+ <span class="pill">PLM synced</span><span class="pill">PMBOK synced</span><span class="ver" id="ver">ALIGNED · 0 缺口</span></div>
+<div class="note">📐 <b>唯一基準</b>：一個概念只有一個 canonical；ECO=AENR=工程變更單=Engineering Change Order 全指向 <b>SSOT-CHANGE</b>。試在下方輸入任一術語即時解析。</div>
+
+<div class="scards" id="scards"></div>
+
+<h2>同義字解析器 <span class="en">Resolve any term → unique canonical</span></h2>
+<div class="card"><div class="resolver">
+ <input id="q" placeholder="輸入術語：ECO / AENR / EBOM / Task / 排程 / Schedule...">
+ <span class="arrow">→</span><span class="canonbox" id="out">—</span>
+</div><div class="synchips" id="syns"></div></div>
+
+<h2>唯一 SSOT 基準登錄 <span class="en">Canonical Registry · synonyms</span></h2>
+<div class="card"><table><thead><tr><th>Canonical</th><th>名稱</th><th>域</th><th>同義字（增量展開）</th></tr></thead><tbody id="reg"></tbody></table>
+<div class="toolbar"><button class="btn" id="expReg">匯出同義字 SSOT CSV</button><span class="tk" id="regStat"></span></div></div>
+
+<div class="grid2">
+ <div class="card"><div class="hd2">PLM 同步 <span class="en">→ canonical</span></div>
+  <div class="life" id="life"></div>
+  <div id="plm"></div></div>
+ <div class="card"><div class="hd2">PMBOK 同步 <span class="en">10 areas · 5 process</span></div>
+  <div id="pmbok"></div>
+  <div class="proc" id="proc"></div></div>
+</div>
+
+<div class="card"><div class="hd2">MS Project 概念 → canonical</div><div id="msmap"></div></div>
+</div>
+<script>
+const D={"registry": [{"canonical": "SSOT-BOM", "name": "物料清單 BOM", "domain": "core", "synonyms": ["bill of materials", "bom", "cs01", "ebom", "ebom 工程 bom", "mbom", "mbom 製造 bom", "ssot-bom", "stückliste", "料表", "物料清單 bom"]}, {"canonical": "SSOT-ITEM", "name": "料號 Item", "domain": "core", "synonyms": ["cpn", "item master", "item master 料號主檔", "material", "mpn", "part number", "ssot-item", "品號", "料號", "料號 item"]}, {"canonical": "SSOT-CHANGE", "name": "工程變更 Change", "domain": "plm", "synonyms": ["aenr", "change number", "ecn", "eco", "eco 工程變更單", "ecr", "ecr 工程變更請求", "engineering change order", "ssot-change", "工程變更 change", "工程變更單"]}, {"canonical": "SSOT-REVISION", "name": "版次 Revision", "domain": "plm", "synonyms": ["rev", "revision", "revision 版次控制", "ssot-revision", "version", "修訂", "改版", "版次", "版次 revision"]}, {"canonical": "SSOT-LIFECYCLE", "name": "生命週期 Lifecycle", "domain": "plm", "synonyms": ["active", "deprecated", "eol", "lifecycle", "lifecycle state", "phase-out", "plm", "ssot-lifecycle", "生命週期", "生命週期 lifecycle"]}, {"canonical": "SSOT-SCHEDULE", "name": "時程 Schedule", "domain": "pmbok", "synonyms": ["gantt", "predecessor", "schedule", "schedule management", "schedule 時程管理", "ssot-schedule", "task", "timeline", "排程", "時程", "時程 schedule", "甘特", "進度"]}, {"canonical": "SSOT-SCOPE", "name": "範疇 Scope", "domain": "pmbok", "synonyms": ["scope", "scope management", "scope 範疇管理", "ssot-scope", "wbs", "work breakdown", "工作分解", "範疇", "範疇 scope"]}, {"canonical": "SSOT-COST", "name": "成本 Cost", "domain": "pmbok", "synonyms": ["budget", "cost", "cost management", "cost roll-up", "cost 成本管理", "ssot-cost", "成本", "成本 cost", "預算"]}, {"canonical": "SSOT-RESOURCE", "name": "資源 Resource", "domain": "pmbok", "synonyms": ["assignment", "resource", "resource management", "resource 資源管理", "ssot-resource", "人力", "指派", "資源", "資源 resource"]}, {"canonical": "SSOT-RISK", "name": "風險 Risk", "domain": "pmbok", "synonyms": ["risk", "risk management", "risk register", "risk 風險管理", "ssot-risk", "風險", "風險 risk", "風險登錄"]}, {"canonical": "SSOT-QUALITY", "name": "品質 Quality", "domain": "pmbok", "synonyms": ["qa", "quality", "quality management", "quality 品質管理", "ssot-quality", "品質", "品質 quality", "良率"]}, {"canonical": "SSOT-STAKEHOLDER", "name": "利害關係人 Stakeholder", "domain": "pmbok", "synonyms": ["ssot-stakeholder", "stakeholder", "stakeholder management", "stakeholder 利害關係人管理", "利害關係人", "利害關係人 stakeholder", "干係人"]}, {"canonical": "SSOT-INTEGRATION", "name": "整合 Integration", "domain": "pmbok", "synonyms": ["baseline", "change control", "integration", "integration management", "integration 整合管理", "ssot-integration", "整合", "整合 integration"]}, {"canonical": "SSOT-PROCUREMENT", "name": "採購 Procurement", "domain": "pmbok", "synonyms": ["aml", "avl", "procurement", "procurement management", "procurement 採購管理", "ssot-procurement", "採購", "採購 procurement"]}, {"canonical": "SSOT-COMMS", "name": "溝通 Communications", "domain": "pmbok", "synonyms": ["communications", "communications management", "communications 溝通管理", "reporting", "ssot-comms", "溝通", "溝通 communications"]}], "plm": {"PLM-BOM-E": {"name": "EBOM 工程 BOM", "canon": "SSOT-BOM", "note": "研發視角，依設計結構（電路/機構）"}, "PLM-BOM-M": {"name": "MBOM 製造 BOM", "canon": "SSOT-BOM", "note": "生產視角，含製程/替代料/包裝"}, "PLM-ECO": {"name": "ECO 工程變更單", "canon": "SSOT-CHANGE", "note": "核准後的變更；SAP=AENR/Change Number"}, "PLM-ECR": {"name": "ECR 工程變更請求", "canon": "SSOT-CHANGE", "note": "變更提案，核准後轉 ECO"}, "PLM-REV": {"name": "Revision 版次控制", "canon": "SSOT-REVISION", "note": "只增不減：A→B→C，舊版存歷史"}, "PLM-ITEM": {"name": "Item Master 料號主檔", "canon": "SSOT-ITEM", "note": "CPN 廠內料號 + AML/AVL 供應商對應"}, "PLM-STATE": {"name": "Lifecycle State", "canon": "SSOT-LIFECYCLE", "note": "Active / EOL / Deprecated"}}, "plm_life": ["Development 開發", "Growth 成長", "Maturity 成熟", "Decline 衰退/EOL"], "pmbok": {"PMBOK-INT": {"name": "Integration 整合管理", "canon": "SSOT-INTEGRATION"}, "PMBOK-SCO": {"name": "Scope 範疇管理", "canon": "SSOT-SCOPE"}, "PMBOK-SCH": {"name": "Schedule 時程管理", "canon": "SSOT-SCHEDULE"}, "PMBOK-CST": {"name": "Cost 成本管理", "canon": "SSOT-COST"}, "PMBOK-QUA": {"name": "Quality 品質管理", "canon": "SSOT-QUALITY"}, "PMBOK-RES": {"name": "Resource 資源管理", "canon": "SSOT-RESOURCE"}, "PMBOK-COM": {"name": "Communications 溝通管理", "canon": "SSOT-COMMS"}, "PMBOK-RSK": {"name": "Risk 風險管理", "canon": "SSOT-RISK"}, "PMBOK-PRO": {"name": "Procurement 採購管理", "canon": "SSOT-PROCUREMENT"}, "PMBOK-STK": {"name": "Stakeholder 利害關係人管理", "canon": "SSOT-STAKEHOLDER"}}, "pmbok_proc": ["Initiating 起始", "Planning 規劃", "Executing 執行", "Monitoring & Controlling 監控", "Closing 結束"], "msmap": {"Task": "SSOT-SCHEDULE", "Timeline": "SSOT-SCHEDULE", "Predecessor": "SSOT-SCHEDULE", "Resource": "SSOT-RESOURCE", "Assignment": "SSOT-RESOURCE", "Cost": "SSOT-COST", "Baseline": "SSOT-INTEGRATION", "WBS": "SSOT-SCOPE"}};
+const $=id=>document.getElementById(id);
+// 建同義字反查
+const SYN={}; D.registry.forEach(r=>{r.synonyms.forEach(t=>SYN[t]=r.canonical);SYN[r.canonical.toLowerCase()]=r.canonical;SYN[r.name.toLowerCase()]=r.canonical;});
+const NAME={}; D.registry.forEach(r=>NAME[r.canonical]=r.name);
+function resolve(t){return SYN[(t||"").trim().toLowerCase()]||null;}
+
+$("scards").innerHTML=`<div class="sc"><div class="v">${D.registry.length}</div><div class="l">唯一基準</div></div>
+ <div class="sc"><div class="v">${Object.keys(SYN).length}</div><div class="l">同義字</div></div>
+ <div class="sc"><div class="v">${Object.keys(D.plm).length}</div><div class="l">PLM 概念</div></div>
+ <div class="sc"><div class="v">${Object.keys(D.pmbok).length}</div><div class="l">PMBOK 領域</div></div>
+ <div class="sc"><div class="v">${Object.keys(D.msmap).length}</div><div class="l">MSProject 對映</div></div>`;
+
+function doResolve(){const c=resolve($("q").value);const o=$("out");
+ if(c){o.textContent=c+" · "+NAME[c];o.className="canonbox";const r=D.registry.find(x=>x.canonical===c);
+  $("syns").innerHTML=(r?r.synonyms:[]).map(t=>`<span class="chip">${t}</span>`).join("");}
+ else{o.textContent="無對應（可增量新增）";o.className="canonbox none";$("syns").innerHTML="";}}
+$("q").addEventListener("input",doResolve);$("q").value="ECO";doResolve();
+
+$("reg").innerHTML=D.registry.map(r=>`<tr><td class="cid">${r.canonical}</td><td class="nm">${r.name}</td>
+ <td><span class="dom d-${r.domain}">${r.domain}</span></td>
+ <td>${r.synonyms.map(t=>`<span class="chip">${t}</span>`).join(" ")}</td></tr>`).join("");
+$("regStat").textContent=`${D.registry.length} 唯一基準 · ${Object.keys(SYN).length} 同義字 · append-only`;
+
+const lc=["#4c78a8","#5a9e6f","#c4943a","#c96b5a"];
+$("life").innerHTML=D.plm_life.map((x,i)=>`<div class="lf" style="background:${lc[i]}">${x}</div>`).join("");
+$("plm").innerHTML=Object.entries(D.plm).map(([c,m])=>`<div class="mapc"><span><b class="cid">${c}</b> ${m.name}</span><span class="to">→ ${m.canon}</span></div>`).join("");
+$("pmbok").innerHTML=Object.entries(D.pmbok).map(([c,m])=>`<div class="mapc"><span><b class="cid">${c}</b> ${m.name}</span><span class="to">→ ${m.canon}</span></div>`).join("");
+$("proc").innerHTML=D.pmbok_proc.map(p=>`<span class="pr">${p}</span>`).join("");
+$("msmap").innerHTML=Object.entries(D.msmap).map(([k,v])=>`<div class="mapc"><span>${k}</span><span class="to">→ ${v} · ${NAME[v]||""}</span></div>`).join("");
+
+$("expReg").onclick=()=>{let o="Canonical,Name,Domain,Synonym\n";D.registry.forEach(r=>r.synonyms.forEach(t=>o+=`${r.canonical},"${r.name}",${r.domain},"${t}"\n`));
+ const b=new Blob(["\ufeff"+o],{type:"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="VIA_Synonym_SSOT.csv";a.click();};
+</script><script>
+(function(){
+ function cellText(td){var el=td.querySelector('input,select,textarea');
+  var v=el?(el.value||''):td.textContent;return (v||'').trim().replace(/\|/g,'\\|').replace(/\s+/g,' ');}
+ function tableToMd(tbl){
+  var heads=tbl.tHead?Array.prototype.slice.call(tbl.tHead.rows):[];
+  var body=tbl.tBodies.length?Array.prototype.slice.call(tbl.tBodies[0].rows):Array.prototype.slice.call(tbl.rows);
+  var hRow=heads.length?heads[heads.length-1]:body.shift();
+  if(!hRow)return '';
+  var cols=Array.prototype.map.call(hRow.cells,cellText);
+  var out='| '+cols.join(' | ')+' |\n| '+cols.map(function(){return '---';}).join(' | ')+' |\n';
+  body.forEach(function(tr){out+='| '+Array.prototype.map.call(tr.cells,cellText).join(' | ')+' |\n';});
+  return out;
+ }
+ window.exportPageMarkdown=function(){
+  var title=document.querySelector('h1')?document.querySelector('h1').innerText.trim():'VIA';
+  var kick=document.querySelector('.kicker')?document.querySelector('.kicker').innerText.trim():'';
+  var md='# '+title+'\n\n';
+  if(kick)md+='> '+kick+'\n\n';
+  md+='_匯出 '+new Date().toISOString().slice(0,19).replace('T',' ')+' · VIA · append-only_\n\n';
+  var nodes=document.querySelectorAll('h2, table');
+  Array.prototype.forEach.call(nodes,function(n){
+   if(n.tagName==='H2'){md+='\n## '+n.innerText.trim().replace(/\s+/g,' ')+'\n\n';}
+   else{var t=tableToMd(n);if(t)md+=t+'\n';}
+  });
+  var blob=new Blob([md],{type:'text/markdown'});var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=(title.replace(/[^\w\u4e00-\u9fff]+/g,'_').slice(0,40)||'VIA')+'.md';a.click();
+ };
+ // 加 MD 按鈕（在 PDF 左側）— 立即掛載（腳本在 body 尾端）
+ function addBtn(){if(document.getElementById('viaMdBtn'))return;var b=document.createElement('button');
+  b.id='viaMdBtn';b.textContent='\u2913 MD';b.className='pdf';b.style.right='66px';
+  b.onclick=window.exportPageMarkdown;document.body.appendChild(b);}
+ if(document.body)addBtn();else window.addEventListener('DOMContentLoaded',addBtn);
+})();
+</script>
+</body></html>

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f4f0; --bg2:#e5e3df; --paper:#ffffff; --paper2:#fafaf8;
+    --ink:#1e1d1a; --ink2:#33403f; --mut:#6b6860; --mut2:#9c9890;
+    --line:#dbd9d3; --soft:#ecebe6;
+    --blue:#4c78a8; --grey:#9c9890; --teal:#439a9a;
+    --up:#c96b5a; --down:#5a9e6f; --am:#c4943a; --co:#c96b5a; --vi:#7a6daa; --gn:#5a9e6f; --ro:#b05580;
+    --accent:#439a9a;
+    --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);}
+  body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  ::selection{background:rgba(67,154,154,.22);}
+  input[type=range]{accent-color:var(--accent);height:4px;}
+</style>
+<style>@media print{@page{size:A4;margin:11mm}html,body{background:#fff !important}.__pdfbtn{display:none !important}*{box-shadow:none !important}[style*="position:sticky"]{position:static !important}[style*="overflow-y:auto"],[style*="overflow:auto"],[style*="overflow-x:auto"]{overflow:visible !important;max-height:none !important}table,section,.brk{break-inside:avoid}}</style>
+<script>window.addEventListener('load',function(){if(document.getElementById('__pdfbtn'))return;var b=document.createElement('div');b.id='__pdfbtn';b.className='__pdfbtn';b.innerHTML='<img src="assets/pdf-icon.png" alt="PDF" style="width:30px;height:30px;display:block">';b.title='A4 PDF';b.style.cssText='position:fixed;top:12px;right:14px;z-index:99999;background:transparent;border:none;padding:0;font:700 10px monospace;letter-spacing:.5px;cursor:pointer;';b.onclick=function(){window.print()};document.body.appendChild(b);});</script>
+</helmet>
+
+<div ref="{{ rootRef }}" style="max-width:1320px;margin:0 auto;padding:0 20px 44px;">
+
+  <div style="position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50;"></div>
+
+  <header style="position:relative;padding:22px 0 10px;margin-bottom:11px;border-bottom:2px solid var(--ink);">
+    <div style="font:700 10px 'DM Mono',monospace;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:8px;">VERITAS INTELLIGENCE ANALYTICS · PARAMETERS CONTROL · SSOT</div>
+    <h1 style="font:800 18px/1.2 'Syne',sans-serif;color:var(--ink);">參數<span style="color:var(--up);">總控台</span> — 一處集中所有可調參數</h1>
+    <p style="margin-top:5px;font:400 10.5px/1.5 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:880px;">整合歷次討論的全部參數：配色 · 字嗓 · 版型 · 圖表/直條/折線/技術分析 · 地圖 · 走勢 · 數字格式 · 自動最佳化 · 分析門檻。即時預覽，匯出 <span style="font-family:'DM Mono',monospace;">VIA_UIUX_Spec.json</span>，自動存檔。</p>
+  </header>
+
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#1e1d1a;border-radius:3px;padding:6px 13px;margin-bottom:8px;">
+    <span style="display:inline-flex;align-items:center;gap:6px;font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase;">🔒 VISUAL LOCK · 全格式鎖定</span>
+    <span style="display:inline-flex;align-items:center;gap:4px;font:500 8px 'DM Mono',monospace;color:#cfcabf;">色票
+      <span style="width:11px;height:11px;border-radius:2px;background:#4c78a8;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#439a9a;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#9c9890;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#c96b5a;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#5a9e6f;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#f5f4f0;border:1px solid #555;"></span>
+    </span>
+    <span style="font:500 8px 'DM Mono',monospace;color:#8a948f;">字體 Syne / DM Sans / DM Mono</span>
+    <span style="font:500 8px 'DM Mono',monospace;color:#8a948f;">漲紅跌綠 · 千分位 · 熱力色階</span>
+    <span style="margin-left:auto;font:700 8px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:2px 8px;">v1.0 · LOCKED 2026-06-22</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;background:#fff;border:1px solid #dbd9d3;border-left:3px solid #439a9a;border-radius:3px;padding:6px 13px;margin-bottom:12px;">
+    <span style="font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;">🛰 資料請求 · VDF ENGINES</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">TWSE→rest</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#c4943a;border-radius:3px;padding:1px 6px;">SITCA→parse</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">MOPS→parse</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">yfinance→pyproc</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#c0584e;border-radius:3px;padding:1px 6px;">FactSet→keyed</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">FRED→keyed</span>
+    <span style="margin-left:auto;font:500 8px 'DM Mono',monospace;color:#9c9890;">request.json → VDF 擷取 → 雙重驗算 → Parquet → JSON</span>
+  </div>
+
+  <details data-contract="1" style="margin-bottom:12px;border:1px solid #dbd9d3;border-left:3px solid #1e1d1a;border-radius:3px;background:#fbfaf7;overflow:hidden;">
+    <summary style="cursor:pointer;user-select:none;padding:6px 13px;font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;list-style:none;">📜 引擎連接合約 · request.json（點擊展開 · 可選取複製）</summary>
+    <pre style="margin:0;padding:10px 13px;background:#1e1d1a;color:#cfe3d6;font:500 9px/1.55 'DM Mono',monospace;white-space:pre;overflow-x:auto;">{
+  "request": "parameters_control",
+  "asof": "2026-06-22",
+  "universe": { "market": "TW", "exchange": ["TWSE","TPEX"] },
+  "sources": ["TWSE","TPEX","SITCA","MOPS","yfinance","FactSet","FRED"],
+  "engines": { "TWSE":"rest","TPEX":"rest","SITCA":"parse","MOPS":"parse","yfinance":"pyproc","FactSet":"keyed","FRED":"keyed" },
+  "range": { "start":"1996-01-01","end":"latest" },
+  "verify": "double_identity",
+  "db_discover": { "folder":"D:\\VDF\\databases\\","recursive":true,"match":["*.parquet","*.duckdb","*.db","*.csv"] },
+  "sink": { "parquet":"vdf/parameters_control/","export":"parameters_control.json" }
+}</pre>
+    <div style="padding:6px 13px;font:400 8px 'DM Sans','Noto Sans TC',sans-serif;color:#9c9890;">本檔即以此合約向 VDF 引擎請求 → 依 engines 分流(rest/parse/pyproc/keyed) → 雙重恆等驗算 → 落地 Parquet → 匯出 <b style="color:#6b6860;">parameters_control.json</b> 覆蓋本頁資料源。</div>
+  </details>
+
+  <div style="display:grid;grid-template-columns:1fr 352px;gap:11px;align-items:start;">
+
+    <!-- LEFT · controls -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;align-content:start;">
+      <sc-for list="{{ groups }}" as="g" hint-placeholder-count="12">
+        <div style="border:1px solid var(--line);border-left:3px solid {{ g.color }};border-radius:2px;overflow:hidden;background:var(--paper);align-self:start;">
+          <div style="display:flex;align-items:center;gap:6px;padding:5px 9px;border-bottom:1px solid var(--line);background:var(--paper2);">
+            <span style="font:700 11px 'DM Mono',monospace;color:{{ g.color }};">{{ g.icon }}</span>
+            <span style="font:700 10.5px 'Syne',sans-serif;color:var(--ink);letter-spacing:.01em;">{{ g.title }}</span>
+            <span style="font:500 8px 'DM Mono',monospace;color:var(--mut);background:var(--soft);padding:1px 6px;border-radius:2px;margin-left:auto;">{{ g.en }}</span>
+          </div>
+          <div style="padding:2px 9px 6px;">
+            <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="4">
+              <div style="padding:5px 0;border-bottom:1px solid var(--soft);">
+                <div style="display:flex;align-items:baseline;gap:7px;margin-bottom:4px;">
+                  <span style="font:600 9.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">{{ it.label }}</span>
+                  <span style="font:500 8px 'DM Mono',monospace;color:var(--mut2);">{{ it.sub }}</span>
+                  <span style="margin-left:auto;font:600 10px 'DM Mono',monospace;color:var(--accent);">{{ it.disp }}</span>
+                </div>
+                <sc-if value="{{ it.isColor }}">
+                  <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                    <sc-for list="{{ it.swatches }}" as="s" hint-placeholder-count="6">
+                      <span onClick="{{ s.pick }}" title="{{ s.c }}" style="width:19px;height:19px;border-radius:3px;cursor:pointer;background:{{ s.c }};{{ s.selCss }}"></span>
+                    </sc-for>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ it.isSeg }}">
+                  <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                    <sc-for list="{{ it.segs }}" as="o" hint-placeholder-count="3">
+                      <span onClick="{{ o.pick }}" style="font:700 9px 'DM Mono',monospace;padding:3px 8px;border-radius:3px;cursor:pointer;user-select:none;{{ o.selCss }}">{{ o.label }}</span>
+                    </sc-for>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ it.isSelect }}">
+                  <select onChange="{{ it.onSelect }}" value="{{ it.value }}" style="font:500 9.5px 'DM Mono',monospace;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:3px 6px;width:100%;">
+                    <sc-for list="{{ it.opts }}" as="o" hint-placeholder-count="4"><option value="{{ o }}">{{ o }}</option></sc-for>
+                  </select>
+                </sc-if>
+                <sc-if value="{{ it.isSlider }}">
+                  <input type="range" min="{{ it.min }}" max="{{ it.max }}" step="{{ it.step }}" value="{{ it.value }}" onInput="{{ it.onRange }}" style="width:100%;">
+                </sc-if>
+                <sc-if value="{{ it.isToggle }}">
+                  <div onClick="{{ it.onToggle }}" style="width:36px;height:19px;border-radius:10px;cursor:pointer;position:relative;transition:background .15s;{{ it.trackCss }}">
+                    <span style="position:absolute;top:2px;width:15px;height:15px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:left .15s;{{ it.knobCss }}"></span>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <!-- RIGHT · live preview + export (sticky) -->
+    <div style="position:sticky;top:16px;">
+      <div style="border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--paper);box-shadow:0 2px 8px rgba(31,42,42,.07);margin-bottom:9px;">
+        <div style="font:700 10px 'DM Mono',monospace;letter-spacing:.5px;color:#fff;background:var(--ink);padding:6px 11px;">即時預覽 LIVE PREVIEW</div>
+        <div style="padding:10px;">
+
+          <!-- header sample -->
+          <div style="border:1px solid var(--line);border-radius:7px;padding:9px 11px;margin-bottom:10px;{{ prevHeadCss }}">
+            <div style="font:700 8px 'DM Mono',monospace;letter-spacing:1.6px;color:var(--mut);text-transform:uppercase;">VIA · {{ headerVariant }}</div>
+            <div style="font:800 14px 'Syne',sans-serif;color:var(--ink);">儀表板<span style="color:var(--accent);">標準</span></div>
+          </div>
+
+          <!-- swatch row -->
+          <div style="display:flex;gap:5px;margin-bottom:11px;">
+            <sc-for list="{{ prevSwatches }}" as="s" hint-placeholder-count="6">
+              <div style="flex:1;height:22px;border-radius:4px;background:{{ s }};"></div>
+            </sc-for>
+          </div>
+
+          <!-- mini chart -->
+          <div style="font:600 9px 'DM Mono',monospace;color:var(--mut);margin-bottom:4px;">直條 α{{ p.barOpacity }} · 邊框{{ p.barBorderW }} · 線寬{{ p.lineWidth }} · 面積α{{ p.areaFill }}</div>
+          <svg viewBox="0 0 400 130" width="100%" height="118" style="display:block;background:var(--paper2);border:1px solid var(--line);border-radius:6px;margin-bottom:11px;">
+            <polygon points="{{ prevAreaPts }}" fill="{{ prevAreaFill }}"></polygon>
+            <sc-for list="{{ prevBars }}" as="b" hint-placeholder-count="12">
+              <rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.w }}" height="{{ b.h }}" fill="{{ b.fill }}" stroke="{{ b.stroke }}" stroke-width="{{ b.sw }}" rx="1"></rect>
+            </sc-for>
+            <polyline points="{{ prevLinePts }}" fill="none" stroke="{{ prevLineColor }}" stroke-width="{{ p.lineWidth }}" stroke-linejoin="round"></polyline>
+            <sc-for list="{{ prevMarkers }}" as="m" hint-placeholder-count="6">
+              <circle cx="{{ m.x }}" cy="{{ m.y }}" r="2.4" fill="{{ prevLineColor }}"></circle>
+            </sc-for>
+          </svg>
+
+          <!-- sample table -->
+          <table style="width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:6px;overflow:hidden;">
+            <thead><tr>
+              <th style="background:var(--soft);color:var(--ink);text-align:left;padding:{{ prevTpad }};font:700 9px 'Syne',sans-serif;border-bottom:1px solid var(--line);">標的</th>
+              <th style="background:var(--soft);color:var(--ink);text-align:{{ p.numAlign }};padding:{{ prevTpad }};font:700 9px 'Syne',sans-serif;border-bottom:1px solid var(--line);">數值</th>
+              <th style="background:var(--soft);color:var(--ink);text-align:{{ p.numAlign }};padding:{{ prevTpad }};font:700 9px 'Syne',sans-serif;border-bottom:1px solid var(--line);">漲跌%</th>
+            </tr></thead>
+            <tbody>
+              <sc-for list="{{ prevRows }}" as="r" hint-placeholder-count="3">
+                <tr style="background:{{ r.bg }};">
+                  <td style="padding:{{ prevTpad }};border-top:1px solid var(--soft);font:600 {{ prevTfs }} 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">{{ r.name }}</td>
+                  <td style="padding:{{ prevTpad }};border-top:1px solid var(--soft);text-align:{{ p.numAlign }};font:500 {{ prevTfs }} 'DM Mono',monospace;color:var(--ink);font-variant-numeric:tabular-nums;">{{ r.val }}</td>
+                  <td style="padding:{{ prevTpad }};border-top:1px solid var(--soft);text-align:{{ p.numAlign }};font:500 {{ prevTfs }} 'DM Mono',monospace;font-variant-numeric:tabular-nums;{{ r.chgCss }}">{{ r.chg }}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+
+        </div>
+      </div>
+
+      <!-- export -->
+      <div style="border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--paper);box-shadow:0 1px 2px rgba(31,42,42,.05);">
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 11px;border-bottom:1px solid var(--line);">
+          <span style="font:700 11px 'Syne',sans-serif;color:var(--ink);">VIA_UIUX_Spec.json</span>
+          <span style="font:500 9px 'DM Mono',monospace;color:var(--mut);">{{ paramCount }} 參數</span>
+          <button onClick="{{ copyJson }}" style="margin-left:auto;font:600 10px 'DM Sans';background:var(--accent);color:#fff;border:none;border-radius:6px;padding:4px 11px;cursor:pointer;">{{ copyLabel }}</button>
+          <button onClick="{{ resetAll }}" style="font:600 10px 'DM Sans';background:var(--soft);color:var(--mut);border:1px solid var(--line);border-radius:6px;padding:4px 11px;cursor:pointer;">重設</button>
+        </div>
+        <pre style="margin:0;padding:9px 11px;font:500 9px/1.5 'DM Mono',monospace;color:var(--ink2);background:var(--paper2);max-height:200px;overflow:auto;white-space:pre;">{{ jsonOut }}</pre>
+      </div>
+    </div>
+
+  </div>
+
+    <!-- EVENT MATRIX (full-width) -->
+    <div style="border:1px solid var(--line);border-left:3px solid var(--ro);border-radius:2px;overflow:hidden;background:var(--paper);margin-top:11px;">
+      <div style="display:flex;align-items:center;gap:8px;padding:6px 11px;border-bottom:1px solid var(--line);background:var(--paper2);">
+        <span style="font:700 11px 'Syne',sans-serif;color:var(--ink);">📅 事件矩陣 Event Matrix</span>
+        <span style="font:500 8.5px 'DM Mono',monospace;color:var(--mut);">事件 × 市場衝擊 · 視窗 ±{{ p.eventWindow }}d</span>
+        <span style="margin-left:auto;display:inline-flex;gap:6px;font:600 8px 'DM Mono',monospace;">
+          <span style="color:#fff;background:var(--gn);border-radius:6px;padding:1px 7px;">低</span>
+          <span style="color:#fff;background:var(--am);border-radius:6px;padding:1px 7px;">中</span>
+          <span style="color:#fff;background:var(--co);border-radius:6px;padding:1px 7px;">高</span>
+        </span>
+      </div>
+      <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:separate;border-spacing:0;min-width:680px;">
+        <thead><tr>
+          <th style="text-align:left;padding:5px 10px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);position:sticky;left:0;">事件 Event</th>
+          <th style="text-align:center;padding:5px 8px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">日期</th>
+          <sc-for list="{{ evCols }}" as="c" hint-placeholder-count="5">
+            <th style="text-align:center;padding:5px 8px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">{{ c }}</th>
+          </sc-for>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ evRows }}" as="e" hint-placeholder-count="8">
+            <tr style="background:{{ e.bg }};">
+              <td style="padding:5px 10px;border-top:1px solid var(--soft);font:600 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);position:sticky;left:0;background:{{ e.bg }};"><span style="font-size:10px;">{{ e.icon }}</span> {{ e.name }}</td>
+              <td style="padding:5px 8px;border-top:1px solid var(--soft);text-align:center;font:500 8.5px 'DM Mono',monospace;color:var(--mut);white-space:nowrap;">{{ e.date }}</td>
+              <sc-for list="{{ e.cells }}" as="x" hint-placeholder-count="5">
+                <td title="{{ x.tip }}" style="border-top:1px solid var(--soft);text-align:center;font:700 8.5px 'DM Mono',monospace;color:{{ x.fg }};background:{{ x.bg }};cursor:default;">{{ x.t }}</td>
+              </sc-for>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+  <footer style="margin-top:22px;border-top:1px solid var(--line);padding-top:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font:500 10px 'DM Mono',monospace;color:var(--mut);">
+    <span style="font-weight:700;letter-spacing:1.3px;color:var(--ink);">VERITAS INTELLIGENCE ANALYTICS</span>
+    <span>Parameters Control · Visual Lock SSOT · 自動存檔 localStorage</span>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{ &quot;$preview&quot;: { &quot;width&quot;: 1320, &quot;height&quot;: 980 } }">
+class Component extends DCLogic {
+  // ---- parameter definitions (grouped, in order) ----
+  DEF() {
+    return {
+      // 配色
+      accent:       { g: '配色', label: '強調色 Accent', type: 'color', opts: ['#439a9a', '#4c78a8', '#5a9e6f', '#c4943a', '#7a6daa', '#c96b5a'], def: '#439a9a' },
+      chartPalette: { g: '配色', label: '圖表色盤', type: 'seg', opts: ['lock', 'extended'], labels: { lock: '鎖定三色', extended: '延伸強調' }, def: 'lock' },
+      // 字嗓
+      fontPairing:  { g: '字嗓', label: '字體配對', type: 'select', opts: ['Syne · DM Sans · DM Mono', 'Cormorant · Noto Serif TC · DM Mono'], def: 'Syne · DM Sans · DM Mono' },
+      baseScale:    { g: '字嗓', label: '字級比例', type: 'slider', min: 0.85, max: 1.2, step: 0.05, unit: '×', def: 1 },
+      // 版型
+      headerVariant:{ g: '版型', label: 'Header 變體', type: 'seg', opts: ['spec', 'seal', 'minimal'], def: 'spec' },
+      density:      { g: '版型', label: '密度 Density', type: 'seg', opts: ['comfortable', 'compact'], labels: { comfortable: '舒適', compact: '緊湊' }, def: 'comfortable' },
+      maxWidth:     { g: '版型', label: '最大寬度', type: 'slider', min: 1180, max: 1600, step: 20, unit: 'px', def: 1480 },
+      freezeTabs:   { g: '版型', label: '凍結分頁列', type: 'toggle', def: true },
+      leftNav:      { g: '版型', label: '隱藏式左側導覽', type: 'toggle', def: true },
+      gridCols:     { g: '版型', label: '網格欄數', type: 'seg', opts: ['6', '12'], def: '12' },
+      // 圖表-全域
+      stdW:         { g: '圖表·全域', label: '標準寬', type: 'slider', min: 800, max: 1920, step: 20, unit: 'px', def: 1000 },
+      stdH:         { g: '圖表·全域', label: '標準高', type: 'slider', min: 480, max: 1080, step: 20, unit: 'px', def: 560 },
+      hovermode:    { g: '圖表·全域', label: 'Hover 模式', type: 'seg', opts: ['x unified', 'closest'], def: 'x unified' },
+      niceTicks:    { g: '圖表·全域', label: 'Nice ticks 2/2.5/5/10', type: 'toggle', def: true },
+      equalAxis:    { g: '圖表·全域', label: '雙軸間隔數相同', type: 'toggle', def: true },
+      // 直條
+      barOpacity:   { g: '直條 Bars', label: '填色透明度', type: 'slider', min: 0.2, max: 1, step: 0.05, unit: '', def: 0.75 },
+      barBorderW:   { g: '直條 Bars', label: '邊框寬', type: 'slider', min: 0, max: 2, step: 0.1, unit: '', def: 0.8 },
+      bargap:       { g: '直條 Bars', label: '條間距 bargap', type: 'slider', min: 0, max: 0.6, step: 0.02, unit: '', def: 0.1 },
+      // 折線/面積
+      lineWidth:    { g: '折線·面積', label: '折線寬', type: 'slider', min: 0.5, max: 3, step: 0.1, unit: '', def: 1.6 },
+      areaFill:     { g: '折線·面積', label: '面積填色透明度', type: 'slider', min: 0, max: 1, step: 0.05, unit: '', def: 0.75 },
+      markers:      { g: '折線·面積', label: '顯示資料點', type: 'toggle', def: false },
+      // 技術分析 TA-Lib
+      taPreset:     { g: '技術分析 TA-Lib', label: 'TA-Lib 版本', type: 'select', opts: ['0.6.8', '0.4.x'], def: '0.6.8' },
+      bbPeriod:     { g: '技術分析 TA-Lib', label: 'BBANDS 週期', type: 'slider', min: 10, max: 30, step: 1, unit: 'd', def: 20 },
+      bbStd:        { g: '技術分析 TA-Lib', label: 'BBANDS 標準差', type: 'slider', min: 1, max: 3, step: 0.5, unit: 'σ', def: 2 },
+      smaPreset:    { g: '技術分析 TA-Lib', label: 'SMA 組', type: 'select', opts: ['5/10/20/60/120/240', '5/20/60', '20/60/120/240'], def: '5/10/20/60/120/240' },
+      emaToggle:    { g: '技術分析 TA-Lib', label: 'EMA 疊加', type: 'toggle', def: false },
+      macdFast:     { g: '技術分析 TA-Lib', label: 'MACD 快線', type: 'slider', min: 5, max: 20, step: 1, unit: '', def: 12 },
+      macdSlow:     { g: '技術分析 TA-Lib', label: 'MACD 慢線', type: 'slider', min: 20, max: 40, step: 1, unit: '', def: 26 },
+      macdSignal:   { g: '技術分析 TA-Lib', label: 'MACD 訊號', type: 'slider', min: 5, max: 15, step: 1, unit: '', def: 9 },
+      rsiPeriod:    { g: '技術分析 TA-Lib', label: 'RSI 週期', type: 'slider', min: 5, max: 30, step: 1, unit: 'd', def: 14 },
+      kdK:          { g: '技術分析 TA-Lib', label: 'STOCH %K', type: 'slider', min: 5, max: 21, step: 1, unit: '', def: 9 },
+      kdD:          { g: '技術分析 TA-Lib', label: 'STOCH %D', type: 'slider', min: 2, max: 9, step: 1, unit: '', def: 3 },
+      atrPeriod:    { g: '技術分析 TA-Lib', label: 'ATR 週期', type: 'slider', min: 5, max: 30, step: 1, unit: 'd', def: 14 },
+      adxPeriod:    { g: '技術分析 TA-Lib', label: 'ADX 週期', type: 'slider', min: 7, max: 30, step: 1, unit: 'd', def: 14 },
+      obvToggle:    { g: '技術分析 TA-Lib', label: 'OBV 能量潮', type: 'toggle', def: false },
+      volMaWidth:   { g: '技術分析 TA-Lib', label: '量MA 線寬', type: 'slider', min: 0.4, max: 1.5, step: 0.1, unit: '', def: 0.8 },
+      volMaOpacity: { g: '技術分析 TA-Lib', label: '量MA 透明度', type: 'slider', min: 0.4, max: 1, step: 0.05, unit: '', def: 0.8 },
+      // 事件矩陣
+      eventWindow:  { g: '事件矩陣 Events', label: '事件視窗 ±日', type: 'slider', min: 0, max: 10, step: 1, unit: 'd', def: 3 },
+      eventColor:   { g: '事件矩陣 Events', label: '風險色階', type: 'seg', opts: ['gyr', 'mono'], labels: { gyr: 'G/Y/R', mono: '單色深淺' }, def: 'gyr' },
+      eventTooltip: { g: '事件矩陣 Events', label: 'Hover 提示', type: 'toggle', def: true },
+      // 地圖
+      mapProjection:{ g: '地圖 Map', label: '投影', type: 'seg', opts: ['flat', 'globe'], labels: { flat: '平攤', globe: '地球' }, def: 'flat' },
+      markerSize:   { g: '地圖 Map', label: '標記大小', type: 'slider', min: 3, max: 14, step: 0.5, unit: 'px', def: 6 },
+      labelSize:    { g: '地圖 Map', label: '標籤字級', type: 'slider', min: 5, max: 12, step: 0.5, unit: 'px', def: 7 },
+      insetOpacity: { g: '地圖 Map', label: '走勢小圖底透明', type: 'slider', min: 0.2, max: 1, step: 0.05, unit: '', def: 0.5 },
+      // 走勢
+      defaultTF:    { g: '走勢 Trend', label: '預設時間框', type: 'select', opts: ['當日', '5D', '10D', '20D', '60D', '120D', '240D'], def: '60D' },
+      trendMode:    { g: '走勢 Trend', label: '走勢型態', type: 'seg', opts: ['line', 'stack'], labels: { line: '折線', stack: '堆疊' }, def: 'line' },
+      trendFill:    { g: '走勢 Trend', label: '走勢填色透明', type: 'slider', min: 0, max: 1, step: 0.05, unit: '', def: 0.75 },
+      // 數字格式
+      thousands:    { g: '數字格式', label: '千分位', type: 'toggle', def: true },
+      decimalsPct:  { g: '數字格式', label: '百分比小數位', type: 'slider', min: 0, max: 3, step: 1, unit: '位', def: 1 },
+      decimalsGen:  { g: '數字格式', label: '一般小數位', type: 'slider', min: 0, max: 3, step: 1, unit: '位', def: 2 },
+      numAlign:     { g: '數字格式', label: '數字對齊', type: 'seg', opts: ['center', 'right'], labels: { center: '置中', right: '靠右' }, def: 'right' },
+      // 自動最佳化
+      aoptEnable:   { g: '自動最佳化 AOpt', label: '啟用字級自動適配', type: 'toggle', def: true },
+      aoptMin:      { g: '自動最佳化 AOpt', label: '最小字級', type: 'slider', min: 6, max: 16, step: 1, unit: 'px', def: 9 },
+      aoptMax:      { g: '自動最佳化 AOpt', label: '最大字級', type: 'slider', min: 18, max: 56, step: 1, unit: 'px', def: 46 },
+      aoptIters:    { g: '自動最佳化 AOpt', label: '二分搜尋次數', type: 'slider', min: 4, max: 10, step: 1, unit: '', def: 6 },
+      // 分析門檻
+      hotness:      { g: '分析門檻', label: 'Hotness 門檻', type: 'slider', min: 0, max: 1, step: 0.05, unit: '', def: 0.4 },
+      leadGap:      { g: '分析門檻', label: 'Lead gap 門檻', type: 'slider', min: 0, max: 1, step: 0.05, unit: '', def: 0.5 },
+    };
+  }
+  GROUP_META() {
+    return {
+      '配色': ['🎨', 'colors'], '字嗓': ['🔤', 'type'], '版型': ['🧱', 'layout'],
+      '圖表·全域': ['📊', 'chart global'], '直條 Bars': ['📶', 'bars'], '折線·面積': ['📈', 'lines'],
+      '技術分析 TA-Lib': ['🕯️', 'ta-lib'], '事件矩陣 Events': ['📅', 'events'], '地圖 Map': ['🗺️', 'map'], '走勢 Trend': ['💹', 'trend'],
+      '數字格式': ['🔢', 'number'], '自動最佳化 AOpt': ['🪄', 'autofit'], '分析門檻': ['🎚️', 'thresholds'],
+    };
+  }
+  GROUP_COLOR() {
+    return { '配色': 'var(--co)', '字嗓': 'var(--vi)', '版型': 'var(--blue)', '圖表·全域': 'var(--teal)',
+      '直條 Bars': 'var(--am)', '折線·面積': 'var(--gn)', '技術分析 TA-Lib': 'var(--co)', '事件矩陣 Events': 'var(--ro)', '地圖 Map': 'var(--blue)',
+      '走勢 Trend': 'var(--teal)', '數字格式': 'var(--vi)', '自動最佳化 AOpt': 'var(--am)', '分析門檻': 'var(--ro)' };
+  }
+
+  state = { params: {}, copied: false };
+
+  componentDidMount() {
+    try { const raw = localStorage.getItem('via_params_console'); if (raw) this.setState({ params: JSON.parse(raw) }); } catch (e) {}
+  }
+  componentDidUpdate() {
+    try { localStorage.setItem('via_params_console', JSON.stringify(this._merged())); } catch (e) {}
+  }
+  _defaults() { const d = this.DEF(), o = {}; for (const k in d) o[k] = d[k].def; return o; }
+  _merged() { return { ...this._defaults(), ...this.state.params }; }
+  _set(k, v) { this.setState(s => ({ params: { ...s.params, [k]: v }, copied: false })); }
+
+  _hexRgb(hex) {
+    const m = (hex || '').replace('#', ''); if (m.length < 6) return '67,154,154';
+    const n = parseInt(m, 16); return ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255);
+  }
+  _fmt(n, pct, p) {
+    const dec = pct ? p.decimalsPct : p.decimalsGen;
+    let s = Number(n).toLocaleString(p.thousands ? 'en-US' : 'fullwide', { minimumFractionDigits: dec, maximumFractionDigits: dec, useGrouping: !!p.thousands });
+    return s;
+  }
+
+  renderVals() {
+    const DEF = this.DEF(), GM = this.GROUP_META(), GC = this.GROUP_COLOR();
+    const p = this._merged();
+    const set = (k, v) => () => this._set(k, v);
+    const segLabel = (def, o) => (def.labels && def.labels[o]) || o;
+
+    // build grouped items
+    const order = [];
+    for (const k in DEF) { if (order.indexOf(DEF[k].g) < 0) order.push(DEF[k].g); }
+    const groups = order.map(gname => {
+      const items = Object.keys(DEF).filter(k => DEF[k].g === gname).map(k => {
+        const d = DEF[k], v = p[k];
+        const base = { key: k, label: d.label, sub: d.unit && d.type === 'slider' ? '' : '',
+          isColor: d.type === 'color', isSeg: d.type === 'seg', isSelect: d.type === 'select', isSlider: d.type === 'slider', isToggle: d.type === 'toggle' };
+        if (d.type === 'color') {
+          base.disp = v;
+          base.swatches = d.opts.map(c => ({ c, pick: set(k, c), selCss: c === v ? 'box-shadow:0 0 0 2px var(--ink);' : 'box-shadow:inset 0 0 0 1px rgba(0,0,0,.1);' }));
+        } else if (d.type === 'seg') {
+          base.disp = segLabel(d, v);
+          base.segs = d.opts.map(o => ({ label: segLabel(d, o), pick: set(k, o), selCss: o === v ? 'background:var(--ink);color:#fff;' : 'background:var(--soft);color:var(--mut);' }));
+        } else if (d.type === 'select') {
+          base.disp = ''; base.value = v; base.opts = d.opts; base.onSelect = e => this._set(k, e.target.value);
+        } else if (d.type === 'slider') {
+          base.disp = v + (d.unit || ''); base.value = v; base.min = d.min; base.max = d.max; base.step = d.step;
+          base.onRange = e => this._set(k, +e.target.value);
+        } else if (d.type === 'toggle') {
+          base.disp = v ? 'ON' : 'OFF'; base.onToggle = () => this._set(k, !v);
+          base.trackCss = 'background:' + (v ? 'var(--accent)' : 'var(--mut2)') + ';';
+          base.knobCss = 'left:' + (v ? '22px' : '2px') + ';';
+        }
+        return base;
+      });
+      return { title: gname, icon: GM[gname][0], en: GM[gname][1], color: GC[gname], items };
+    });
+
+    // ---- live preview ----
+    const accentRgb = this._hexRgb(p.accent);
+    const W = 400, H = 130, n = 12, slot = W / n, bw = slot * (1 - p.bargap);
+    const rng = (() => { let s = 7; return () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; }; })();
+    const vals = []; for (let i = 0; i < n; i++) vals.push((rng() - 0.42) * 1.6);
+    const maxA = Math.max(...vals.map(Math.abs)) || 1, mid = H / 2;
+    const prevBars = vals.map((v, i) => {
+      const h = Math.abs(v) / maxA * (H / 2 - 12), up = v >= 0;
+      return { x: (i * slot + (slot - bw) / 2).toFixed(1), y: (up ? mid - h : mid).toFixed(1), w: bw.toFixed(1), h: h.toFixed(1),
+        fill: 'rgba(' + (up ? '201,107,90' : '90,158,111') + ',' + p.barOpacity + ')',
+        stroke: up ? '#c96b5a' : '#5a9e6f', sw: p.barBorderW };
+    });
+    const lineY = []; let lv = H * 0.34;
+    const linePtsArr = vals.map((v, i) => { lv += (rng() - 0.5) * 16; lv = Math.max(12, Math.min(H - 12, lv)); lineY.push(lv); return (i * slot + slot / 2).toFixed(1) + ',' + lv.toFixed(1); });
+    const prevLinePts = linePtsArr.join(' ');
+    const prevAreaPts = '0,' + H + ' ' + prevLinePts + ' ' + W + ',' + H;
+    const prevMarkers = p.markers ? lineY.map((y, i) => ({ x: (i * slot + slot / 2).toFixed(1), y: y.toFixed(1) })) : [];
+
+    // sample table rows w/ number format
+    const rawRows = [['台積電 2330', 1184.5, 1.34], ['加權指數', 23150.27, -0.82], ['S&P 500', 6234.5, 0.45]];
+    const prevRows = rawRows.map((r, i) => ({ name: r[0], val: this._fmt(r[1], false, p),
+      chg: (r[2] > 0 ? '+' : '') + this._fmt(r[2], true, p) + '%',
+      chgCss: r[2] > 0 ? 'color:var(--up);' : 'color:var(--down);', bg: i % 2 ? '#f6f4ef' : 'var(--paper)' }));
+
+    // event matrix: events × market impact, risk-colored per eventColor mode
+    const evCols = ['台股', '美股', '債券', '匯率', '黃金'];
+    const win = p.eventWindow;
+    const RC = lv => {
+      if (p.eventColor === 'mono') { const a = lv === 3 ? 0.85 : lv === 2 ? 0.5 : 0.2; return { bg: 'rgba(176,85,128,' + a + ')', fg: lv === 1 ? 'var(--ink2)' : '#fff' }; }
+      return lv === 3 ? { bg: 'var(--co)', fg: '#fff' } : lv === 2 ? { bg: 'var(--am)', fg: '#fff' } : { bg: 'var(--soft)', fg: 'var(--mut2)' };
+    };
+    const evTip = on => on ? '' : null;
+    const ev = (icon, name, date, cells) => ({ icon, name, date, _cells: cells });
+    const evRaw = [
+      ev('🏛️', 'FOMC 利率決議', '06/18', [2, 3, 3, 3, 2]),
+      ev('📊', '美 CPI', '06/12', [2, 3, 3, 2, 2]),
+      ev('💼', '美 非農 NFP', '07/03', [2, 3, 2, 2, 1]),
+      ev('🇹🇼', '台股 MSCI 調整', '06/24', [3, 1, 1, 2, 1]),
+      ev('🧾', '台積電法說', '07/17', [3, 2, 1, 1, 1]),
+      ev('💰', '台股除息旺季', '07/01', [3, 1, 1, 1, 1]),
+      ev('📈', '台股月營收公布', '07/10', [3, 1, 1, 1, 1]),
+      ev('⚙️', '美股期權到期 OPEX', '06/20', [2, 3, 1, 2, 2]),
+    ];
+    const evRows = evRaw.map((e, i) => ({
+      icon: e.icon, name: e.name, date: e.date, bg: i % 2 ? '#f6f4ef' : 'var(--paper)',
+      cells: e._cells.map((lv, j) => {
+        const c = RC(lv);
+        return { t: lv === 3 ? '高' : lv === 2 ? '中' : '低', bg: c.bg, fg: c.fg,
+          tip: p.eventTooltip ? (e.name + ' → ' + evCols[j] + '：' + (lv === 3 ? '高衝擊' : lv === 2 ? '中衝擊' : '低衝擊') + '（視窗 ±' + win + 'd）') : '' };
+      }),
+    }));
+
+    const dense = p.density === 'compact';
+    const prevHeadStyles = { spec: 'border-left:none;border-bottom:2px solid var(--ink);border-radius:0;',
+      seal: 'border-left:3px solid var(--up);', minimal: 'background:var(--paper2);' };
+
+    const jsonOut = JSON.stringify(p, null, 2);
+
+    return {
+      rootRef: el => { this.root = el; if (el) el.style.setProperty('--accent', p.accent); },
+      groups, p,
+      evCols, evRows,
+      headerVariant: p.headerVariant,
+      prevHeadCss: prevHeadStyles[p.headerVariant] || '',
+      prevSwatches: ['#4c78a8', '#9c9890', '#439a9a', '#c96b5a', '#5a9e6f', p.accent],
+      prevBars, prevLinePts, prevAreaPts, prevMarkers, prevRows,
+      prevLineColor: p.accent, prevAreaFill: 'rgba(' + accentRgb + ',' + p.areaFill + ')',
+      prevTpad: dense ? '4px 7px' : '6px 9px', prevTfs: dense ? '9px' : '10px',
+      paramCount: Object.keys(DEF).length, jsonOut,
+      copyLabel: this.state.copied ? '已複製 ✓' : '複製 JSON',
+      copyJson: () => { try { navigator.clipboard.writeText(jsonOut); } catch (e) {} this.setState({ copied: true }); },
+      resetAll: () => this.setState({ params: {}, copied: false }),
+    };
+  }
+}
+</script>
+</body>
+</html>

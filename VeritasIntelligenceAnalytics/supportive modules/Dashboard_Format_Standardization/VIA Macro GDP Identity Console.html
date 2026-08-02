@@ -1,0 +1,186 @@
+<!DOCTYPE html><html lang="zh-TW"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA Macro · Regional GDP Identity Console v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--bg1:#edecea;--bg2:#e5e3df;--sf:#fff;--sf2:#fafaf8;--bd:#dbd9d3;--bd2:#ccc9c1;
+--bl:#4c78a8;--bl-l:#d0e1f0;--tl:#439a9a;--tl-l:#c8e6e6;--gn:#5a9e6f;--gn-l:#cde8d5;
+--am:#c4943a;--am-l:#f5e2b8;--co:#c96b5a;--co-l:#f5d0c8;--vi:#7a6daa;--vi-l:#dcd8f0;
+--i0:#1e1d1a;--i1:#3d3c38;--i2:#6b6860;--i3:#9c9890;--i4:#c4c0b8;
+--up:#c0392b;--dn:#2e7d52;--yoy:#2e7d52;
+--mo:'DM Mono',monospace;--sa:'DM Sans',system-ui,sans-serif;--display:var(--sa);
+--r:5px;--r2:8px;--r3:12px;--sh:0 1px 3px rgba(0,0,0,.06);--sh2:0 4px 16px rgba(0,0,0,.10);--ease:cubic-bezier(.22,.68,0,1.2);}
+*{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
+body{font-family:var(--sa);background:var(--bg);color:var(--i0);font-size:11.5px;line-height:1.55;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
+.w{max-width:1340px;margin:0 auto;padding:10px 16px}
+.hdr{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r3);padding:12px 16px;margin-bottom:8px;position:relative;overflow:hidden;display:flex;align-items:center;gap:14px;box-shadow:var(--sh2)}
+.hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--bl),var(--tl),var(--vi),var(--am),var(--co),var(--gn));animation:hs 8s linear infinite;background-size:200% 100%}
+@keyframes hs{0%{background-position:0%}100%{background-position:200%}}
+.logo-wrap{width:42px;height:42px;flex-shrink:0;background:linear-gradient(135deg,#1e3a5f,var(--vi));border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--mo);font-weight:500;font-size:13px;box-shadow:0 2px 8px rgba(76,120,168,.35)}
+.hdr-titles{flex:1}.hdr-title{font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:-.5px}.hdr-title span{color:var(--bl)}
+.hdr-sub{font-size:9px;color:var(--i3);font-family:var(--mo);margin-top:2px}
+.lockbadge{font-family:var(--mo);font-size:9px;text-align:right;color:var(--i2);line-height:1.7}
+.up{color:var(--up)}.dn{color:var(--dn)}.fl{color:var(--i3)}
+.pt{display:flex;gap:2px;padding:0 2px;overflow-x:auto}.pt::-webkit-scrollbar{height:0}
+.pt button{padding:9px 20px;border:1px solid var(--bd);border-radius:var(--r2) var(--r2) 0 0;border-bottom:2px solid transparent;background:var(--bg1);color:var(--i2);font:600 11px var(--sa);cursor:pointer;transition:.15s;white-space:nowrap}
+.pt button.on{background:var(--sf);color:var(--bl);border-bottom-color:var(--bl);box-shadow:0 -2px 8px rgba(76,120,168,.08)}
+.pt button:hover:not(.on){background:var(--bg2)}
+.pg{display:none;background:var(--sf);border:1px solid var(--bd);border-radius:0 var(--r2) var(--r2) var(--r2);padding:16px;animation:pgin .18s var(--ease)}.pg.on{display:block}
+@keyframes pgin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.period{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:10px;font-family:var(--mo);font-size:9.5px}
+.period .pd{background:var(--bl-l);color:var(--bl);padding:2px 9px;border-radius:10px;font-weight:500}
+.period .sr{color:var(--i3)}
+.hero{background:linear-gradient(135deg,var(--sf2),var(--sf));border:1px solid var(--bd);border-radius:var(--r3);padding:18px 20px;margin-bottom:14px;box-shadow:var(--sh)}
+.hero-eq{font-family:var(--mo);font-size:11px;color:var(--i3);margin-bottom:14px;text-align:center}
+.hero-eq b{color:var(--i1);font-weight:500}
+.hero-row{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap;justify-content:center}
+.op{display:flex;align-items:center;font-family:var(--mo);font-size:24px;color:var(--i3);font-weight:300}
+.term{border:1px solid var(--bd);border-radius:var(--r2);background:var(--sf);padding:12px 16px;min-width:122px;text-align:center;position:relative;overflow:hidden}
+.term::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--tc)}
+.term.lhs{background:linear-gradient(135deg,#1e3a5f,#2d4a6f);color:#fff;border:none;min-width:200px}.term.lhs::before{display:none}
+.term .sym{font-family:var(--mo);font-size:22px;font-weight:500;color:var(--tc)}
+.term.lhs .sym{color:#fff;font-size:13px;font-weight:400}
+.term .zh{font-size:9.5px;color:var(--i3);margin:3px 0 6px}.term.lhs .zh{color:#b9c7d6}
+.term .v{font-family:var(--mo);font-size:18px;font-weight:500;color:var(--i0);line-height:1.1}.term.lhs .v{color:#fff;font-size:24px}
+.term .sh{font-family:var(--mo);font-size:10px;margin-top:4px;color:var(--i2)}
+.ar{font-weight:700}
+.term.nx{min-width:158px}
+.nx-inner{display:flex;align-items:center;justify-content:center;gap:7px;font-family:var(--mo);font-size:10px;color:var(--i2);margin-top:4px}
+.nx-inner .xv{color:var(--gn)}.nx-inner .mv{color:var(--co)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:8px;margin-bottom:14px}
+.cc{border:1px solid var(--bd);border-radius:var(--r2);overflow:hidden;background:var(--sf)}
+.cc-h{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--bd);background:var(--sf2);border-left:3px solid var(--tc)}
+.cc-sym{font-family:var(--mo);font-size:15px;font-weight:500;color:var(--tc);min-width:20px;text-align:center}
+.cc-tt{flex:1}.cc-tt .n{font-weight:600;font-size:11px}.cc-tt .s{font-family:var(--mo);font-size:8.5px;color:var(--i3)}
+.cc-v{font-family:var(--mo);font-size:13px;font-weight:500;text-align:right}
+.cc-b{padding:4px 0}
+.sub{display:flex;align-items:center;gap:8px;padding:5px 12px;border-bottom:1px solid var(--bg1);font-size:10px}.sub:last-child{border-bottom:none}.sub:hover{background:rgba(76,120,168,.04)}
+.sub .ar{font-size:11px;width:14px;text-align:center}.sub .sn{flex:1;color:var(--i1)}
+.sub .src{font-family:var(--mo);font-size:8px;color:var(--bl);background:var(--bl-l);padding:0 5px;border-radius:8px;white-space:nowrap;max-width:210px;overflow:hidden;text-overflow:ellipsis}
+.nxsplit{display:flex;align-items:center;gap:6px;padding:4px 12px;font-family:var(--mo);font-size:8.5px;color:var(--i3);background:var(--sf2)}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
+@media(max-width:760px){.charts{grid-template-columns:1fr}}
+.ch{border:1px solid var(--bd);border-radius:var(--r2);background:var(--sf);padding:10px 12px}
+.ch-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+.ch-t{font-weight:600;font-size:11px}.ch-s{font-family:var(--mo);font-size:8px;color:var(--i3)}
+.ch-leg{display:flex;gap:10px;font-family:var(--mo);font-size:8.5px;color:var(--i2);margin-bottom:4px;flex-wrap:wrap}
+.ch-leg i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:3px;vertical-align:-1px}
+.ch svg{width:100%;height:auto;display:block}
+.fc{border:1px solid var(--bd);border-radius:var(--r2);overflow:hidden;margin-top:8px}
+.fc-h{padding:7px 12px;border-bottom:1px solid var(--bd);background:var(--sf2);font-weight:600;font-size:11px}
+.fc-h .smpl{float:right;font-family:var(--mo);font-size:8px;color:var(--am);background:var(--am-l);padding:1px 7px;border-radius:8px;font-weight:400}
+.fc table{width:100%;border-collapse:collapse;font-size:10px}
+.fc td{padding:5px 12px;border-bottom:1px solid var(--bg1)}.fc tr:last-child td{border-bottom:none}
+.fc .inst{font-weight:600}.fc .scope{font-family:var(--mo);font-size:8.5px;color:var(--vi);background:var(--vi-l);padding:0 6px;border-radius:8px}
+.fc .val{font-family:var(--mo);font-weight:500;color:var(--bl);text-align:right}.fc .rel{font-family:var(--mo);font-size:8.5px;color:var(--i3);text-align:right}
+.ft{font-family:var(--mo);font-size:8.5px;color:var(--i3);padding:12px 2px 8px;border-top:1px solid var(--bd);margin-top:12px;line-height:1.7}
+</style></head><body><div class="w">
+<div class="hdr"><div class="logo-wrap">M</div><div class="hdr-titles">
+<div class="hdr-title">VIA <span>Macro · GDP 恆等式 Console</span> <span style="color:var(--i3);font-size:11px;font-weight:400">v2</span></div>
+<div class="hdr-sub" id="sub"></div></div>
+<div class="lockbadge"><span><b class="up">▲ UP=RED</b> · <b class="dn">▼ DOWN=GREEN</b></span><br><span style="color:var(--am)">數值/趨勢 SAMPLE</span></div></div>
+<div class="pt" id="tabs"></div><div id="pages"></div><div class="ft" id="ft"></div></div>
+<script>
+const D={"title": "VIA Macro · Regional GDP-Identity Console", "version": "v1", "anchor": "AST-PS-MOD-VIA-MACRO-GDP-ID-001", "identity": "Real GDP × (1 + π) = C + I + G + ( X − M )", "lock": "Visual Lock v1 · UP=RED ▲ / DOWN=GREEN ▼ (台式反向)", "data_note": "結構比重=真實知識;趨勢箭頭與數值=SAMPLE 示意,接 registry live 後置換 · 圖表(PMI/季度GDP/年增/預估值)均為 SAMPLE,機構與發布節奏為真", "regions": {"US": {"name": "美國 United States", "ccy": "USD", "u": "tn", "nom": 29.0, "real": 23.5, "infl": 2.5, "comps": [{"k": "C", "zh": "民間消費 Consumption", "val": 19.7, "share": 68, "t": "up", "color": "bl", "subs": [{"n": "PCE 個人消費", "via": "pce_total", "src": "FRED PCEC / BEA", "t": "up"}, {"n": "零售銷售", "via": "retail_sales", "src": "FRED RSAFS / akshare", "t": "up"}, {"n": "密大消費信心", "via": "umich_sentiment", "src": "FRED UMCSENT / ak", "t": "dn"}, {"n": "平均時薪(所得)", "via": "avg_hourly_wage", "src": "FRED CES0500000003", "t": "up"}]}, {"k": "I", "zh": "民間投資 Investment", "val": 5.2, "share": 18, "t": "dn", "color": "tl", "subs": [{"n": "民間國內投資", "via": "gpdi", "src": "FRED GPDI", "t": "dn"}, {"n": "耐久財訂單", "via": "durable_orders", "src": "FRED DGORDER / ak", "t": "dn"}, {"n": "核心資本財訂單", "via": "core_capex_orders", "src": "FRED NEWORDER / ak factory", "t": "fl"}, {"n": "建築許可/開工", "via": "building_permits", "src": "FRED PERMIT/HOUST", "t": "dn"}]}, {"k": "G", "zh": "政府支出 Government", "val": 4.9, "share": 17, "t": "up", "color": "vi", "subs": [{"n": "聯邦支出", "via": "fed_outlays", "src": "FRED FGEXPND / Treasury", "t": "up"}, {"n": "國防/非國防", "via": "gov_defense", "src": "FRED FDEFX", "t": "up"}, {"n": "聯邦收入", "via": "fed_receipts", "src": "FRED FGRECPT", "t": "up"}]}, {"k": "X", "zh": "出口 Exports", "val": 3.1, "share": 11, "t": "up", "color": "gn", "subs": [{"n": "商品+服務出口", "via": "exports", "src": "BEA EXPGS / Census", "t": "up"}]}, {"k": "M", "zh": "進口 Imports", "val": 3.9, "share": -14, "t": "up", "color": "co", "subs": [{"n": "商品+服務進口", "via": "imports", "src": "BEA IMPGS / Census", "t": "up"}]}], "period": "1Q26 季調年化", "gdp_src": "BEA NIPA (advance) · FRED", "pmi_src": "ISM · akshare macro_usa_ism_pmi/ism_non_pmi (金十鏡像)", "pmi": {"lab": ["Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"], "mfg": [48.5, 49.0, 48.2, 49.3, 50.1, 49.6, 50.4, 50.9, 50.3, 49.8, 50.6, 51.2], "nm": [52.1, 51.4, 52.6, 52.0, 53.1, 52.4, 53.8, 53.0, 52.5, 52.9, 53.4, 53.7]}, "fc": [["Atlanta Fed GDPNow", "2Q26", "+2.3%", "每週更新 · 末值 BEA 7/30"], ["NY Fed Nowcast", "2Q26", "+1.9%", "每週五"], ["IMF WEO", "2026 年度", "+1.8%", "4 月/10 月"], ["Blue Chip 共識", "2026 年度", "+2.0%", "月度"]], "gdp_q": [{"q": "1Q25", "C": 18.7, "I": 4.9, "G": 4.7, "NX": -0.8, "yoy": 2.4}, {"q": "2Q25", "C": 19.0, "I": 5.0, "G": 4.7, "NX": -0.8, "yoy": 2.1}, {"q": "3Q25", "C": 19.3, "I": 5.1, "G": 4.8, "NX": -0.8, "yoy": 2.6}, {"q": "4Q25", "C": 19.5, "I": 5.1, "G": 4.9, "NX": -0.8, "yoy": 2.5}, {"q": "1Q26", "C": 19.7, "I": 5.2, "G": 4.9, "NX": -0.8, "yoy": 2.3}]}, "EU": {"name": "歐元區 Eurozone", "ccy": "EUR", "u": "tn", "nom": 15.0, "real": 13.4, "infl": 2.4, "comps": [{"k": "C", "zh": "民間消費", "val": 7.8, "share": 52, "t": "up", "color": "bl", "subs": [{"n": "零售銷售", "via": "ea_retail", "src": "Eurostat", "t": "up"}, {"n": "消費信心(ESI)", "via": "ea_esi", "src": "EU Commission", "t": "dn"}, {"n": "HICP 物價", "via": "ea_hicp", "src": "Eurostat / ak macro_euro_cpi_yoy", "t": "up"}]}, {"k": "I", "zh": "固定資本形成 GFCF", "val": 3.3, "share": 22, "t": "dn", "color": "tl", "subs": [{"n": "GFCF", "via": "ea_gfcf", "src": "Eurostat", "t": "dn"}, {"n": "工業新訂單", "via": "ea_orders", "src": "Eurostat", "t": "dn"}, {"n": "ifo/ZEW 景氣", "via": "ea_ifo", "src": "ifo / ZEW", "t": "dn"}]}, {"k": "G", "zh": "政府支出", "val": 3.2, "share": 21, "t": "up", "color": "vi", "subs": [{"n": "政府消費", "via": "ea_gov", "src": "Eurostat", "t": "up"}, {"n": "赤字/GDP(Maastricht)", "via": "ea_deficit", "src": "Eurostat", "t": "up"}]}, {"k": "X", "zh": "出口", "val": 6.9, "share": 46, "t": "fl", "color": "gn", "subs": [{"n": "出口", "via": "ea_exports", "src": "Eurostat", "t": "fl"}]}, {"k": "M", "zh": "進口", "val": 6.2, "share": -41, "t": "fl", "color": "co", "subs": [{"n": "進口", "via": "ea_imports", "src": "Eurostat", "t": "up"}]}], "period": "1Q26 (QoQ 年化)", "gdp_src": "Eurostat flash (t+30d) · ECB SDW", "pmi_src": "HCOB/S&P Global Eurozone PMI", "pmi": {"lab": ["Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"], "mfg": [45.8, 46.4, 45.9, 46.7, 47.3, 47.0, 48.1, 48.6, 49.0, 49.4, 49.1, 49.8], "nm": [51.2, 50.6, 51.0, 50.4, 51.3, 50.9, 51.6, 51.1, 51.5, 52.0, 51.7, 52.2]}, "fc": [["ECB SPF", "2026 年度", "+1.2%", "季度"], ["EU Commission", "2026 年度", "+1.4%", "春/秋季預測"], ["Eurostat flash", "1Q26", "+0.3% QoQ", "t+30 天"], ["IMF WEO", "2026 年度", "+1.1%", "4 月/10 月"]], "gdp_q": [{"q": "1Q25", "C": 7.4, "I": 3.1, "G": 3.0, "NX": 0.7, "yoy": 0.8}, {"q": "2Q25", "C": 7.5, "I": 3.2, "G": 3.1, "NX": 0.7, "yoy": 1.0}, {"q": "3Q25", "C": 7.6, "I": 3.2, "G": 3.1, "NX": 0.7, "yoy": 1.2}, {"q": "4Q25", "C": 7.7, "I": 3.3, "G": 3.2, "NX": 0.7, "yoy": 1.3}, {"q": "1Q26", "C": 7.8, "I": 3.3, "G": 3.2, "NX": 0.7, "yoy": 1.1}]}, "JP": {"name": "日本 Japan", "ccy": "JPY", "u": "兆¥", "nom": 605, "real": 560, "infl": 2.7, "comps": [{"k": "C", "zh": "民間消費", "val": 327, "share": 54, "t": "up", "color": "bl", "subs": [{"n": "家計消費", "via": "jp_cons", "src": "Cabinet Office", "t": "up"}, {"n": "零售/百貨", "via": "jp_retail", "src": "METI", "t": "up"}, {"n": "全國 CPI", "via": "jp_cpi", "src": "MIC / ak", "t": "up"}]}, {"k": "I", "zh": "民間投資", "val": 157, "share": 26, "t": "up", "color": "tl", "subs": [{"n": "機械受注(領先)", "via": "jp_machine", "src": "Cabinet Office", "t": "up"}, {"n": "民間設備投資", "via": "jp_capex", "src": "Cabinet Office", "t": "up"}, {"n": "住宅着工", "via": "jp_housing", "src": "MLIT", "t": "dn"}]}, {"k": "G", "zh": "政府支出", "val": 127, "share": 21, "t": "fl", "color": "vi", "subs": [{"n": "政府消費", "via": "jp_gov", "src": "Cabinet Office", "t": "fl"}, {"n": "基礎收支", "via": "jp_primary", "src": "MOF", "t": "up"}]}, {"k": "X", "zh": "出口", "val": 133, "share": 22, "t": "up", "color": "gn", "subs": [{"n": "出口", "via": "jp_exports", "src": "MOF", "t": "up"}]}, {"k": "M", "zh": "進口", "val": 139, "share": -23, "t": "up", "color": "co", "subs": [{"n": "進口", "via": "jp_imports", "src": "MOF", "t": "up"}]}], "period": "1Q26 (QoQ 年化)", "gdp_src": "Cabinet Office QE (1次速報) · ESRI", "pmi_src": "au Jibun Bank (S&P Global) Japan PMI", "pmi": {"lab": ["Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"], "mfg": [50.1, 49.6, 49.8, 50.2, 49.9, 50.5, 50.3, 50.8, 51.0, 50.6, 51.2, 51.4], "nm": [53.4, 53.0, 53.6, 52.8, 53.2, 53.9, 53.5, 53.1, 53.7, 54.0, 53.6, 54.2]}, "fc": [["BOJ 展望報告", "2026 年度", "+0.9%", "1/4/7/10 月"], ["Cabinet Office QE", "1Q26", "+0.4% QoQ", "t+6 週(速報)"], ["JCER 共識", "2026 年度", "+1.0%", "月度"], ["IMF WEO", "2026 年度", "+0.8%", "4 月/10 月"]], "gdp_q": [{"q": "1Q25", "C": 310.6, "I": 149.2, "G": 120.6, "NX": -5.7, "yoy": 1.1}, {"q": "2Q25", "C": 315.6, "I": 151.5, "G": 122.6, "NX": -5.8, "yoy": 0.7}, {"q": "3Q25", "C": 320.5, "I": 153.9, "G": 124.5, "NX": -5.9, "yoy": 1.0}, {"q": "4Q25", "C": 323.7, "I": 155.4, "G": 125.7, "NX": -5.9, "yoy": 0.9}, {"q": "1Q26", "C": 327.0, "I": 157.0, "G": 127.0, "NX": -6.0, "yoy": 0.8}]}, "CN": {"name": "中國 China", "ccy": "CNY", "u": "兆¥", "nom": 134, "real": 129, "infl": 0.3, "comps": [{"k": "C", "zh": "居民消費", "val": 51, "share": 38, "t": "up", "color": "bl", "subs": [{"n": "社會消費品零售", "via": "cn_retail", "src": "NBS / ak macro_china_consumer_goods_retail", "t": "up"}, {"n": "CPI", "via": "cn_cpi", "src": "NBS / ak macro_china_cpi", "t": "fl"}, {"n": "城鎮失業率", "via": "cn_unemp", "src": "NBS / ak macro_china_urban_unemployment", "t": "up"}]}, {"k": "I", "zh": "資本形成", "val": 56, "share": 42, "t": "dn", "color": "tl", "subs": [{"n": "固定資產投資 FAI", "via": "cn_fai", "src": "NBS / ak macro_china_gdzctz", "t": "dn"}, {"n": "房地產投資", "via": "cn_realestate", "src": "NBS / ak macro_china_real_estate", "t": "dn"}, {"n": "社融(信用脈衝)", "via": "cn_tsf", "src": "PBOC / ak macro_china_shrzgm", "t": "fl"}]}, {"k": "G", "zh": "政府支出", "val": 23, "share": 17, "t": "up", "color": "vi", "subs": [{"n": "一般公共預算支出", "via": "cn_fiscal", "src": "MOF", "t": "up"}, {"n": "LPR 1Y/5Y", "via": "cn_lpr", "src": "PBOC / ak macro_china_lpr", "t": "dn"}]}, {"k": "X", "zh": "出口", "val": 32, "share": 24, "t": "up", "color": "gn", "subs": [{"n": "出口(海關)", "via": "cn_exports", "src": "海關 / ak macro_china_exports_yoy", "t": "up"}]}, {"k": "M", "zh": "進口", "val": 28, "share": -21, "t": "fl", "color": "co", "subs": [{"n": "進口(海關)", "via": "cn_imports", "src": "海關 / ak macro_china_imports_yoy", "t": "fl"}]}], "period": "1Q26 累計同比", "gdp_src": "NBS · akshare macro_china_gdp_yearly", "pmi_src": "NBS 官方 + Caixin(akshare macro_china_pmi / cx_pmi_yearly)", "pmi": {"lab": ["Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"], "mfg": [49.5, 49.4, 49.1, 49.8, 50.1, 50.3, 50.5, 49.1, 50.2, 50.4, 49.6, 50.0], "nm": [50.2, 50.1, 50.3, 50.0, 50.6, 50.8, 52.2, 50.7, 50.4, 50.8, 50.2, 50.5]}, "fc": [["NBS / 兩會目標", "2026 年度", "約 +5.0%", "3 月政府工作報告"], ["IMF WEO", "2026 年度", "+4.5%", "4 月/10 月"], ["World Bank", "2026 年度", "+4.3%", "半年度"], ["NBS 季度 GDP", "1Q26", "發布 t+~15 天", "4 月中"]], "gdp_q": [{"q": "1Q25", "C": 48.4, "I": 53.2, "G": 21.8, "NX": 3.8, "yoy": 5.2}, {"q": "2Q25", "C": 49.2, "I": 54.0, "G": 22.2, "NX": 3.9, "yoy": 5.0}, {"q": "3Q25", "C": 50.0, "I": 54.9, "G": 22.5, "NX": 3.9, "yoy": 4.8}, {"q": "4Q25", "C": 50.5, "I": 55.4, "G": 22.8, "NX": 4.0, "yoy": 4.6}, {"q": "1Q26", "C": 51.0, "I": 56.0, "G": 23.0, "NX": 4.0, "yoy": 4.9}]}, "TW": {"name": "台灣 Taiwan", "ccy": "TWD", "u": "兆NT$", "nom": 25.0, "real": 23.0, "infl": 2.0, "comps": [{"k": "C", "zh": "民間消費", "val": 11.8, "share": 47, "t": "up", "color": "bl", "subs": [{"n": "零售/批發", "via": "tw_retail", "src": "經濟部 MOEA", "t": "up"}, {"n": "CPI / 核心", "via": "tw_cpi", "src": "主計總處 DGBAS", "t": "up"}, {"n": "失業率", "via": "tw_unemp", "src": "DGBAS", "t": "dn"}]}, {"k": "I", "zh": "固定投資", "val": 6.3, "share": 25, "t": "up", "color": "tl", "subs": [{"n": "外銷訂單(領先)", "via": "tw_orders", "src": "MOEA 外銷訂單", "t": "up"}, {"n": "半導體/設備投資", "via": "tw_capex", "src": "MOEA", "t": "up"}, {"n": "工業生產指數", "via": "tw_ip", "src": "MOEA", "t": "up"}]}, {"k": "G", "zh": "政府支出", "val": 3.5, "share": 14, "t": "fl", "color": "vi", "subs": [{"n": "中央政府歲出", "via": "tw_gov", "src": "財政部 MOF", "t": "fl"}, {"n": "重貼現率", "via": "tw_rate", "src": "央行 CBC", "t": "fl"}]}, {"k": "X", "zh": "出口", "val": 14.0, "share": 56, "t": "up", "color": "gn", "subs": [{"n": "出口(海關)", "via": "tw_exports", "src": "財政部 MOF", "t": "up"}]}, {"k": "M", "zh": "進口", "val": 10.6, "share": -42, "t": "up", "color": "co", "subs": [{"n": "進口(海關)", "via": "tw_imports", "src": "財政部 MOF", "t": "up"}]}], "period": "1Q26 概估", "gdp_src": "主計總處 DGBAS (概估/初步統計)", "pmi_src": "中經院 CIER 製造業 PMI / 非製造業 NMI", "pmi": {"lab": ["Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"], "mfg": [51.0, 50.4, 51.6, 52.0, 53.1, 52.6, 53.4, 52.8, 53.0, 53.6, 54.1, 54.3], "nm": [52.5, 52.0, 52.8, 52.2, 53.0, 52.6, 53.2, 52.9, 53.4, 53.8, 53.5, 54.0]}, "fc": [["主計總處 DGBAS", "2026 年度", "+3.1%", "2/5/8/11 月"], ["中經院 CIER", "2026 年度", "+3.0%", "季度"], ["台經院 TIER", "2026 年度", "+2.9%", "季度"], ["DGBAS 1Q26 概估", "1Q26", "發布 4 月底", "t+~25 天"]], "gdp_q": [{"q": "1Q25", "C": 11.2, "I": 6.0, "G": 3.3, "NX": 3.2, "yoy": 3.4}, {"q": "2Q25", "C": 11.4, "I": 6.1, "G": 3.4, "NX": 3.3, "yoy": 3.0}, {"q": "3Q25", "C": 11.6, "I": 6.2, "G": 3.4, "NX": 3.3, "yoy": 3.6}, {"q": "4Q25", "C": 11.7, "I": 6.2, "G": 3.5, "NX": 3.4, "yoy": 3.2}, {"q": "1Q26", "C": 11.8, "I": 6.3, "G": 3.5, "NX": 3.4, "yoy": 3.1}]}}, "chart_note": "左圖:製造業(藍)+非製造業(青)PMI,50=榮枯線 · 右圖:季度GDP堆疊(左軸 C/I/G/NX 貢獻)+年增率(右軸,綠線)"}, R=D.regions;
+const A=t=>`<span class="ar ${t}">${t==='up'?'▲':t==='dn'?'▼':'▬'}</span>`;
+document.getElementById('sub').textContent=D.title+' '+D.version+' · 恆等式: '+D.identity;
+document.getElementById('ft').innerHTML='恆等式 '+D.identity+' · '+D.lock+'<br>'+D.chart_note+'<br>⚠ '+D.data_note;
+const tabs=document.getElementById('tabs'),pages=document.getElementById('pages');
+Object.entries(R).forEach(([code,r],i)=>{
+ const b=document.createElement('button');if(i===0)b.className='on';
+ b.textContent=code+' '+r.name.split(' ')[0];b.onclick=()=>sw(b,'pg'+code);tabs.appendChild(b);
+ const pg=document.createElement('div');pg.className='pg'+(i===0?' on':'');pg.id='pg'+code;pg.innerHTML=render(code,r);pages.appendChild(pg);
+ drawCharts(code,r);});
+function sw(btn,id){document.querySelectorAll('#tabs button').forEach(b=>b.classList.remove('on'));document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));btn.classList.add('on');document.getElementById(id).classList.add('on');window.scrollTo({top:0,behavior:'smooth'});}
+function fmt(v,r){return (v<0?'−':'')+r.ccy+' '+Math.abs(v)+r.u;}
+function get(r,k){return r.comps.find(c=>c.k===k);}
+function render(code,r){
+ const X=get(r,'X'),M=get(r,'M'),NX=+(X.val-M.val).toFixed(1),nxsh=X.share+M.share,nt=NX>=0?'up':'dn';
+ let h=`<div class="period"><span class="pd">期別 ${r.period}</span><span class="sr">資料來源:GDP ${r.gdp_src}　·　PMI ${r.pmi_src}</span></div>`;
+ // hero
+ h+=`<div class="hero"><div class="hero-eq"><b>Real GDP × (1 + π)</b> = C + I + G + ( X − M )　|　${r.name}　名目 ≈ 實質 ${r.ccy} ${r.real}${r.u} × (1+${r.infl}%)</div><div class="hero-row">
+  <div class="term lhs"><div class="sym">Real GDP × (1+π)</div><div class="zh">名目 GDP Nominal · ${r.period}</div><div class="v">${r.ccy} ${r.nom}${r.u}</div><div class="sh" style="color:#b9c7d6">π=${r.infl}% ${A('up')}</div></div><div class="op">=</div>`;
+ ['C','I','G'].forEach((k,i)=>{const c=get(r,k);
+   h+=`<div class="term" style="--tc:var(--${c.color})"><div class="sym">${k}</div><div class="zh">${c.zh}</div><div class="v">${fmt(c.val,r)}</div><div class="sh">${c.share}% ${A(c.t)}</div></div><div class="op">+</div>`;});
+ h+=`<div class="term nx" style="--tc:var(--am)"><div class="sym" style="font-size:15px">( X − M )</div><div class="zh">淨出口 Net Exports</div><div class="v">${(NX<0?'−':'')+r.ccy+' '+Math.abs(NX)+r.u}</div><div class="sh">${nxsh}% ${A(nt)}</div>
+   <div class="nx-inner"><span class="xv">X ${X.val} ${A(X.t)}</span><span>−</span><span class="mv">M ${M.val} ${A(M.t)}</span></div></div></div></div>`;
+ // component cards: C/I/G + merged NX
+ h+='<div class="grid">';
+ ['C','I','G'].forEach(k=>{const c=get(r,k);
+   h+=`<div class="cc"><div class="cc-h" style="--tc:var(--${c.color})"><div class="cc-sym">${k}</div><div class="cc-tt"><div class="n">${c.zh}</div><div class="s">${c.share}% of GDP</div></div><div class="cc-v">${fmt(c.val,r)} ${A(c.t)}</div></div><div class="cc-b">`;
+   c.subs.forEach(x=>h+=`<div class="sub">${A(x.t)}<span class="sn">${x.n}</span><span class="src" title="${x.src}">${x.src}</span></div>`);
+   h+='</div></div>';});
+ // merged NX card (出口+進口 一格)
+ h+=`<div class="cc"><div class="cc-h" style="--tc:var(--am)"><div class="cc-sym">±</div><div class="cc-tt"><div class="n">淨出口 (X − M)</div><div class="s">${nxsh}% of GDP</div></div><div class="cc-v">${(NX<0?'−':'')+r.ccy+' '+Math.abs(NX)+r.u} ${A(nt)}</div></div>
+   <div class="nxsplit"><span style="color:var(--gn)">▸ 出口 X ${fmt(X.val,r)} ${A(X.t)}</span></div><div class="cc-b">`;
+ X.subs.forEach(x=>h+=`<div class="sub">${A(x.t)}<span class="sn">${x.n}</span><span class="src" title="${x.src}">${x.src}</span></div>`);
+ h+=`</div><div class="nxsplit"><span style="color:var(--co)">▸ 進口 M ${fmt(M.val,r)} ${A(M.t)}</span></div><div class="cc-b">`;
+ M.subs.forEach(x=>h+=`<div class="sub">${A(x.t)}<span class="sn">${x.n}</span><span class="src" title="${x.src}">${x.src}</span></div>`);
+ h+='</div></div></div>';
+ // charts row
+ h+=`<div class="charts">
+  <div class="ch"><div class="ch-h"><span class="ch-t">製造業 + 非製造業 PMI</span><span class="ch-s">${r.pmi_src.split('·')[0]}</span></div>
+   <div class="ch-leg"><span><i style="background:var(--bl)"></i>製造業</span><span><i style="background:var(--tl)"></i>非製造業</span><span style="color:var(--i3)">— — 50 榮枯線</span></div>
+   <svg id="pmi-${code}" viewBox="0 0 380 200"></svg></div>
+  <div class="ch"><div class="ch-h"><span class="ch-t">季度 GDP 堆疊 + 年增率</span><span class="ch-s">${r.gdp_src.split('·')[0]}</span></div>
+   <div class="ch-leg"><span><i style="background:var(--bl)"></i>C</span><span><i style="background:var(--tl)"></i>I</span><span><i style="background:var(--vi)"></i>G</span><span><i style="background:var(--am)"></i>NX</span><span style="color:var(--yoy)">— 年增%(右軸)</span></div>
+   <svg id="gdp-${code}" viewBox="0 0 380 200"></svg></div></div>`;
+ // forecasts
+ h+=`<div class="fc"><div class="fc-h">後續 GDP 年增率預估 — 機構 · 預估值 · 發布<span class="smpl">預估值 SAMPLE</span></div><table>`;
+ r.fc.forEach(f=>h+=`<tr><td class="inst">${f[0]}</td><td><span class="scope">${f[1]}</span></td><td class="val">${f[2]}</td><td class="rel">${f[3]}</td></tr>`);
+ h+='</table></div>';
+ return h;}
+
+// ── SVG charts (hand-rolled, lock palette) ──
+function NS(t,a){const e=document.createElementNS('http://www.w3.org/2000/svg',t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+function cssv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function drawCharts(code,r){drawPMI(code,r);drawGDP(code,r);}
+function drawPMI(code,r){
+ const svg=document.getElementById('pmi-'+code);if(!svg)return;
+ const W=380,H=200,L=30,Rr=8,T=8,B=24,pw=W-L-Rr,ph=H-T-B;
+ const lab=r.pmi.lab,mfg=r.pmi.mfg,nm=r.pmi.nm,all=mfg.concat(nm);
+ let lo=Math.min(...all,50),hi=Math.max(...all,50);lo=Math.floor(lo-1);hi=Math.ceil(hi+1);
+ const X=i=>L+pw*i/(lab.length-1),Y=v=>T+ph*(hi-v)/(hi-lo);
+ [46,48,50,52,54].forEach(t=>{if(t<lo||t>hi)return;svg.append(NS('line',{x1:L,x2:W-Rr,y1:Y(t),y2:Y(t),stroke:cssv('--bg1'),'stroke-width':1}));
+   svg.append(txt(L-4,Y(t)+3,t,'end',8,'--i3'));});
+ svg.append(NS('line',{x1:L,x2:W-Rr,y1:Y(50),y2:Y(50),stroke:cssv('--i3'),'stroke-width':1,'stroke-dasharray':'3 3'}));
+ lab.forEach((l,i)=>{if(i%2)return;svg.append(txt(X(i),H-8,l,'middle',7.5,'--i3'));});
+ svg.append(poly(mfg.map((v,i)=>[X(i),Y(v)]),'--bl',1.8));
+ svg.append(poly(nm.map((v,i)=>[X(i),Y(v)]),'--tl',1.8));
+ [['--bl',mfg],['--tl',nm]].forEach(([c,a])=>{const i=a.length-1;svg.append(NS('circle',{cx:X(i),cy:Y(a[i]),r:2.6,fill:cssv(c)}));
+   svg.append(txt(X(i)-3,Y(a[i])-5,a[i].toFixed(1),'end',8.5,c));});
+}
+function drawGDP(code,r){
+ const svg=document.getElementById('gdp-'+code);if(!svg)return;
+ const W=380,H=200,L=34,Rr=30,T=10,B=22,pw=W-L-Rr,ph=H-T-B;
+ const q=r.gdp_q,n=q.length,bw=pw/n*0.56;
+ let top=0,bot=0;q.forEach(d=>{const pos=d.C+d.I+d.G+Math.max(d.NX,0);top=Math.max(top,pos);bot=Math.min(bot,Math.min(d.NX,0));});
+ top=top*1.08;const span=top-bot||1;
+ const cx=i=>L+pw*(i+0.5)/n, Y=v=>T+ph*(top-v)/span, y0=Y(0);
+ // left axis ticks
+ for(let t=0;t<=4;t++){const v=top*t/4,yy=Y(v);svg.append(NS('line',{x1:L,x2:W-Rr,y1:yy,y2:yy,stroke:cssv('--bg1'),'stroke-width':1}));svg.append(txt(L-4,yy+3,Math.round(v),'end',7.5,'--i3'));}
+ // right axis YoY scale
+ const ys=q.map(d=>d.yoy);let ylo=Math.min(...ys,0),yhi=Math.max(...ys);ylo=Math.floor(ylo-0.5);yhi=Math.ceil(yhi+0.5);
+ const YY=v=>T+ph*(yhi-v)/((yhi-ylo)||1);
+ for(let t=0;t<=3;t++){const v=ylo+(yhi-ylo)*t/3;svg.append(txt(W-Rr+4,YY(v)+3,v.toFixed(0)+'%','start',7.5,'--yoy'));}
+ const segs=[['C','--bl'],['I','--tl'],['G','--vi']];
+ q.forEach((d,i)=>{let acc=0;const x=cx(i)-bw/2;
+   segs.forEach(([k,c])=>{const v=d[k];svg.append(NS('rect',{x:x,y:Y(acc+v),width:bw,height:Math.max(0,Y(acc)-Y(acc+v)),fill:cssv(c),opacity:.92}));acc+=v;});
+   // NX (above if +, below 0 if -)
+   if(d.NX>=0){svg.append(NS('rect',{x:x,y:Y(acc+d.NX),width:bw,height:Math.max(0,Y(acc)-Y(acc+d.NX)),fill:cssv('--am'),opacity:.92}));}
+   else{svg.append(NS('rect',{x:x,y:y0,width:bw,height:Math.max(0,Y(d.NX)-y0),fill:cssv('--am'),opacity:.55}));}
+   svg.append(txt(cx(i),H-7,d.q,'middle',7.5,'--i3'));});
+ // zero line
+ svg.append(NS('line',{x1:L,x2:W-Rr,y1:y0,y2:y0,stroke:cssv('--bd2'),'stroke-width':1}));
+ // YoY line (green, right axis)
+ svg.append(poly(q.map((d,i)=>[cx(i),YY(d.yoy)]),'--yoy',2));
+ q.forEach((d,i)=>{svg.append(NS('circle',{cx:cx(i),cy:YY(d.yoy),r:2.6,fill:cssv('--yoy')}));
+   svg.append(txt(cx(i),YY(d.yoy)-5,d.yoy.toFixed(1),'middle',8,'--yoy'));});
+}
+function txt(x,y,t,anchor,size,col){return NS('text',{x:x,y:y,'text-anchor':anchor,'font-size':size,fill:cssv(col),'font-family':cssv('--mo')}),(()=>{const e=NS('text',{x:x,y:y,'text-anchor':anchor,'font-size':size,fill:cssv(col),'font-family':"DM Mono, monospace"});e.textContent=t;return e;})();}
+function poly(pts,col,w){return NS('polyline',{points:pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' '),fill:'none',stroke:cssv(col),'stroke-width':w,'stroke-linejoin':'round','stroke-linecap':'round'});}
+document.addEventListener('keydown',e=>{const b=[...document.querySelectorAll('#tabs button')],c=b.findIndex(x=>x.classList.contains('on'));
+ if(e.key==='ArrowRight')b[(c+1)%b.length]?.click();else if(e.key==='ArrowLeft')b[(c-1+b.length)%b.length]?.click();else if(e.key>='1'&&e.key<='5')b[+e.key-1]?.click();});
+</script></body></html>

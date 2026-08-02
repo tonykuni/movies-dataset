@@ -1,0 +1,54 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · 全球資金流動 整合 Console</title>
+<style>
+:root{--bg:#f5f4f0;--sf:#fff;--bd:#dbd9d3;--ink:#1e1d1a;--ink2:#6b6860;--gr:#9c9890;
+--up:#c96b5a;--dn:#5a9e6f;--bl:#4c78a8;--tl:#439a9a;--seal:#b5291a;}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Sans CJK TC","Noto Sans TC","DM Sans",system-ui,sans-serif;display:flex;flex-direction:column}
+header{background:var(--ink);color:#fff;padding:10px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header .brand{font-weight:800;font-size:16px;letter-spacing:.3px}
+header .brand b{color:var(--up)}
+header .meta{font-size:11px;color:#bdb9b0;margin-left:auto}
+.tabs{display:flex;gap:4px;background:var(--ink);padding:0 12px 10px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tab{flex:0 0 auto;background:#2a2926;color:#cfccc4;border:1px solid #3a3833;border-radius:9px;padding:8px 14px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:1px;transition:.12s;min-width:96px}
+.tab .zh{font-size:13px;font-weight:800}
+.tab .en{font-size:9px;letter-spacing:.5px;text-transform:uppercase;color:#8a877f}
+.tab:hover{background:#343230}
+.tab.on{background:var(--up);color:#fff;border-color:var(--up)}
+.tab.on .en{color:#ffd9cf}
+.hint{font-size:11px;color:var(--ink2);padding:7px 18px;background:var(--sf);border-bottom:1px solid var(--bd)}
+.stage{flex:1;position:relative;background:var(--bg)}
+.vw{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--bg);display:none}
+.vw.on{display:block}
+.spin{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--gr);font-size:13px;pointer-events:none}
+</style></head><body>
+<header>
+  <span class="brand">VIA · <b>全球資金流動</b> 整合 Console</span>
+  <span class="meta" id="meta">八視圖整合 · 各視圖保留完整互動</span>
+</header>
+<div class="tabs" id="tabs"><button class="tab on" data-i="0" data-src="world_flow.html"><span class="zh">世界資金流</span><span class="en">World Flow</span></button><button class="tab" data-i="1" data-src="tier_flow.html"><span class="zh">風險層級流</span><span class="en">Tier Flow</span></button><button class="tab" data-i="2" data-src="cumulative_flow.html"><span class="zh">累積淨流</span><span class="en">Cumulative</span></button><button class="tab" data-i="3" data-src="perf_trend.html"><span class="zh">正規化走勢</span><span class="en">Normalized</span></button><button class="tab" data-i="4" data-src="global_map_sim.html"><span class="zh">情境模擬</span><span class="en">Scenario Sim</span></button><button class="tab" data-i="5" data-src="via_flowsim.html"><span class="zh">商品終端</span><span class="en">Instrument Term</span></button><button class="tab" data-i="6" data-src="flow_monitor.html"><span class="zh">族群監控</span><span class="en">Monitor</span></button><button class="tab" data-i="7" data-src="etf_console.html"><span class="zh">台股主動式ETF</span><span class="en">Active ETF</span></button></div>
+<div class="hint" id="hint"></div>
+<div class="stage" id="stage">
+  <div class="spin" id="spin">載入中…</div>
+  <iframe class="vw" id="vw0" src="world_flow.html" title="World Flow" loading="lazy"></iframe><iframe class="vw" id="vw1" data-src="tier_flow.html" title="Tier Flow" loading="lazy"></iframe><iframe class="vw" id="vw2" data-src="cumulative_flow.html" title="Cumulative" loading="lazy"></iframe><iframe class="vw" id="vw3" data-src="perf_trend.html" title="Normalized" loading="lazy"></iframe><iframe class="vw" id="vw4" data-src="global_map_sim.html" title="Scenario Sim" loading="lazy"></iframe><iframe class="vw" id="vw5" data-src="via_flowsim.html" title="Instrument Term" loading="lazy"></iframe><iframe class="vw" id="vw6" data-src="flow_monitor.html" title="Monitor" loading="lazy"></iframe><iframe class="vw" id="vw7" data-src="etf_console.html" title="Active ETF" loading="lazy"></iframe>
+</div>
+<script>
+const HINTS=["全球地圖每日 FIS 動畫","T1→T4 風險階梯動畫","各層累積淨流 + RISK−SAFE 價差","S&P/TWII/主題/族群 基準=100","方向·強度·累積·評價 時間模擬","WTI/Brent/黃金/台指期/DXY 即時模擬","採用項目 + 族群方向強度走勢","25 檔主動式台股 ETF · 持股成本 · 目標價空間 · 三大法人"];
+const tabs=[...document.querySelectorAll(".tab")];
+const frames=[...document.querySelectorAll(".vw")];
+const spin=document.getElementById("spin"), hint=document.getElementById("hint");
+function show(i){
+  tabs.forEach((t,k)=>t.classList.toggle("on",k===i));
+  frames.forEach((f,k)=>f.classList.toggle("on",k===i));
+  const f=frames[i];
+  if(!f.src && f.dataset.src){ spin.style.display="flex"; f.src=f.dataset.src;
+    f.addEventListener("load",()=>{spin.style.display="none";},{once:true}); }
+  else spin.style.display="none";
+  hint.textContent=HINTS[i]||"";
+}
+tabs.forEach((t,i)=>t.onclick=()=>show(i));
+frames[0].addEventListener("load",()=>{spin.style.display="none";},{once:true});
+show(0);
+</script></body></html>

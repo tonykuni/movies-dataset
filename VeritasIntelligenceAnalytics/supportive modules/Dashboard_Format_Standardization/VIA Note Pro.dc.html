@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --bg2:#f7f6f3; --paper2:#f7f6f3; --sidebar:#fbfaf8; --paper:#ffffff;
+    --ink:#1e1d1a; --ink2:#37352f; --mut:#787268; --mut2:#9b9690;
+    --line:#eceae4; --soft:#f1efea; --hover:#f1efe9;
+    --blue:#4c78a8; --teal:#439a9a; --up:#c96b5a; --down:#5a9e6f; --am:#c4943a; --co:#c96b5a; --vi:#7a6daa; --gn:#5a9e6f;
+    --accent:#439a9a;
+    --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);height:100%;}
+  body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:12.5px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  [contenteditable]{outline:none;}
+  [contenteditable][data-empty]:empty:before{content:attr(data-empty);color:var(--mut2);pointer-events:none;}
+  ::selection{background:rgba(67,154,154,.20);}
+  select{appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='6'><path d='M0 0l4 6 4-6z' fill='%239b9690'/></svg>");background-repeat:no-repeat;background-position:right 6px center;padding-right:18px !important;cursor:pointer;color:var(--ink2);}
+  select:focus{outline:1px solid var(--accent);}
+  .blk:hover .blk-handle{opacity:1;}
+  .blk-handle{transition:opacity .12s,background .12s;border-radius:4px;}
+  .blk-handle:hover{background:var(--hover);}
+</style>
+<style>@media print{@page{size:A4;margin:11mm}html,body{background:#fff !important}.__pdfbtn{display:none !important}*{box-shadow:none !important}[style*="position:sticky"]{position:static !important}[style*="overflow-y:auto"],[style*="overflow:auto"],[style*="overflow-x:auto"]{overflow:visible !important;max-height:none !important}table,section,.brk{break-inside:avoid}}</style>
+<script>window.addEventListener('load',function(){if(document.getElementById('__pdfbtn'))return;var b=document.createElement('div');b.id='__pdfbtn';b.className='__pdfbtn';b.innerHTML='<img src="assets/pdf-icon.png" alt="PDF" style="width:30px;height:30px;display:block">';b.title='A4 PDF';b.style.cssText='position:fixed;top:12px;right:14px;z-index:99999;background:transparent;border:none;padding:0;font:700 10px monospace;letter-spacing:.5px;cursor:pointer;';b.onclick=function(){window.print()};document.body.appendChild(b);});</script>
+</helmet>
+
+<div ref="{{ rootRef }}" style="display:flex;height:100vh;overflow:hidden;background:var(--bg);">
+
+  <!-- SIDEBAR -->
+  <sc-if value="{{ sbOpen }}">
+  <aside style="width:200px;flex:none;background:var(--sidebar);border-right:1px solid var(--line);display:flex;flex-direction:column;height:100%;">
+    <div style="height:4px;background:var(--reson);"></div>
+    <div style="padding:14px 14px 10px;display:flex;align-items:center;gap:9px;">
+      <img src="assets/via-logo.ico" alt="VIA" style="width:40px;height:40px;border-radius:7px;object-fit:contain;flex:none;image-rendering:-webkit-optimize-contrast;" />
+      <div style="line-height:1.2;"><div style="font:800 12px 'Syne',sans-serif;color:var(--ink);">VIS Smart Asset Mgmt</div><div style="font:600 8px 'DM Mono',monospace;color:var(--mut);letter-spacing:.3px;">VERITAS INTELLIGENCE</div><div style="font:500 7.5px 'DM Mono',monospace;color:var(--mut2);letter-spacing:.3px;">NOTION-BASED · AUTO-CODE</div></div>
+    </div>
+    <div style="padding:2px 12px 8px;">
+      <input value="{{ query }}" onInput="{{ onSearch }}" placeholder="🔍 搜尋筆記…" style="width:100%;font:500 12.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:6px 10px;" />
+    </div>
+    <div style="flex:1;overflow-y:auto;padding:2px 8px 8px;">
+      <div style="font:700 10px 'DM Mono',monospace;letter-spacing:1px;color:var(--mut2);text-transform:uppercase;padding:8px 8px 5px;">頁面 Pages</div>
+      <sc-for list="{{ pages }}" as="p" hint-placeholder-count="4">
+        <div onClick="{{ p.open }}" style="display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;cursor:pointer;user-select:none;margin-bottom:1px;{{ p.activeCss }}">
+          <span style="font-size:15px;line-height:1;">{{ p.icon }}</span>
+          <span style="flex:1;font:600 11px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ p.title }}</span>
+          <span onClick="{{ p.del }}" class="blk-handle" style="opacity:0;font-size:13px;color:var(--mut2);padding:0 2px;">🗑</span>
+        </div>
+      </sc-for>
+      <div onClick="{{ addPage }}" style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;user-select:none;color:var(--mut);margin-top:3px;">
+        <span style="font-size:14px;">＋</span><span style="font:600 12.5px 'DM Sans','Noto Sans TC',sans-serif;">新增頁面</span>
+      </div>
+    </div>
+    <div style="border-top:1px solid var(--line);padding:9px 14px;font:500 9px 'DM Mono',monospace;color:var(--mut2);display:flex;justify-content:space-between;align-items:center;">
+      <span>{{ pageCount }} 頁 · {{ blockCount }} 區塊</span><span onClick="{{ toggleSb }}" style="cursor:pointer;user-select:none;font-weight:700;color:var(--mut);">« 收合</span>
+    </div>
+  </aside>
+  </sc-if>
+
+  <!-- MAIN -->
+  <main style="flex:1;height:100%;background:var(--bg);position:relative;display:flex;flex-direction:{{ splitDir }};overflow:hidden;">
+    <sc-if value="{{ sbClosed }}">
+      <span onClick="{{ toggleSb }}" title="展開側欄" style="position:fixed;left:10px;top:12px;z-index:40;font:700 12px 'DM Mono',monospace;color:var(--mut);background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:4px 9px;cursor:pointer;user-select:none;box-shadow:0 1px 3px rgba(31,42,42,.1);">☰</span>
+    </sc-if>
+    <div style="position:fixed;right:14px;top:12px;z-index:40;display:flex;gap:3px;background:var(--paper);border:1px solid var(--line);border-radius:7px;padding:3px;box-shadow:0 1px 3px rgba(31,42,42,.1);">
+      <span onClick="{{ saveNow }}" title="立即儲存 (Ctrl/⌘+S)" style="font:700 10px 'DM Mono',monospace;cursor:pointer;user-select:none;border-radius:5px;padding:3px 9px;{{ saveCss }}">{{ saveLabel }}</span>
+      <span style="width:1px;background:var(--line);margin:1px 2px;"></span>
+      <span onClick="{{ split1 }}" title="單欄" style="font:700 10px 'DM Mono',monospace;cursor:pointer;user-select:none;border-radius:5px;padding:3px 8px;{{ s1Css }}">▭</span>
+      <span onClick="{{ splitLR }}" title="左右分割" style="font:700 10px 'DM Mono',monospace;cursor:pointer;user-select:none;border-radius:5px;padding:3px 8px;{{ sLRCss }}">▥</span>
+      <span onClick="{{ splitTB }}" title="上下分割" style="font:700 10px 'DM Mono',monospace;cursor:pointer;user-select:none;border-radius:5px;padding:3px 8px;{{ sTBCss }}">▤</span>
+    </div>
+    <div style="flex:1;min-width:0;min-height:0;overflow-y:auto;position:relative;">
+    <div style="max-width:{{ paneMax }};margin:0 auto;padding:0 0 200px;">
+      <!-- cover banner -->
+      <sc-if value="{{ hasCover }}">
+        <div style="position:sticky;top:0;z-index:7;width:100%;height:{{ coverH }};overflow:hidden;background:#1e1d1a;box-shadow:0 6px 10px -8px rgba(31,42,42,.3);">
+          <div style="position:absolute;top:0;left:0;right:0;height:4px;background:var(--reson);z-index:3;"></div>
+          <div style="position:absolute;inset:0;background-image:url('{{ coverImg }}');background-size:{{ coverZoom }};background-position:50% {{ coverPos }};background-repeat:no-repeat;"></div>
+          <div style="position:absolute;left:0;right:0;bottom:0;height:62%;background:linear-gradient(to top,rgba(20,24,20,.78),rgba(20,24,20,0));"></div>
+          <div style="position:absolute;left:0;right:0;bottom:0;max-width:1180px;margin:0 auto;padding:0 26px 16px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:3px;">
+              <span onClick="{{ cycleIcon }}" title="點擊更換圖示" style="font-size:30px;line-height:1;cursor:pointer;user-select:none;filter:drop-shadow(0 1px 3px rgba(0,0,0,.5));">{{ activeIcon }}</span>
+            </div>
+            <div ref="{{ titleRef }}" contenteditable="true" data-empty="無標題" onInput="{{ onTitle }}" onKeyDown="{{ onTitleKey }}" style="font:800 24px/1.2 'Syne',sans-serif;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.55);padding:2px 0;"></div>
+            <div style="font:500 9.5px 'DM Mono',monospace;color:rgba(255,255,255,.88);text-shadow:0 1px 4px rgba(0,0,0,.5);margin-top:2px;">{{ activeMeta }}</div>
+          </div>
+          <div style="position:absolute;right:12px;bottom:10px;display:flex;align-items:center;gap:6px;background:rgba(30,29,26,.62);backdrop-filter:blur(4px);border-radius:7px;padding:5px 9px;">
+            <span style="font:600 8.5px 'DM Mono',monospace;color:#fff;">縮放</span>
+            <input type="range" min="100" max="240" step="5" value="{{ coverZoomN }}" onInput="{{ onZoom }}" style="width:84px;accent-color:#fff;" />
+            <span style="font:600 8.5px 'DM Mono',monospace;color:#fff;">位置</span>
+            <input type="range" min="0" max="100" step="2" value="{{ coverPosN }}" onInput="{{ onPos }}" style="width:84px;accent-color:#fff;" />
+            <span onClick="{{ changeCover }}" title="更換封面" style="font:700 9px 'DM Mono',monospace;color:#fff;cursor:pointer;user-select:none;padding-left:3px;">⇄</span>
+            <span onClick="{{ removeCover }}" title="移除封面" style="font:700 9px 'DM Mono',monospace;color:#fff;cursor:pointer;user-select:none;padding-left:3px;">✕</span>
+          </div>
+        </div>
+      </sc-if>
+      <div style="max-width:1320px;margin:0 auto;padding:{{ headPad }} 16px 0;">
+      <sc-if value="{{ noCover }}">
+      <!-- page icon + title (frozen) -->
+      <div style="position:sticky;top:0;z-index:6;background:var(--bg);box-shadow:0 6px 8px -8px rgba(31,42,42,.28);">
+      <div style="height:4px;background:var(--reson);border-radius:2px;"></div>
+      <div style="padding-top:8px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:3px;">
+        <span onClick="{{ cycleIcon }}" title="點擊更換圖示" style="font-size:28px;line-height:1;cursor:pointer;user-select:none;">{{ activeIcon }}</span>
+        <span onClick="{{ addCover }}" style="font:600 9.5px 'DM Mono',monospace;color:var(--mut);cursor:pointer;user-select:none;border:1px solid var(--line);border-radius:6px;padding:3px 9px;">🖼 加入封面</span>
+      </div>
+      <div ref="{{ titleRef }}" contenteditable="true" data-empty="無標題" onInput="{{ onTitle }}" onKeyDown="{{ onTitleKey }}" style="font:800 23px/1.2 'Syne',sans-serif;color:var(--ink);margin-bottom:3px;padding:2px 0;"></div>
+      <div style="font:500 9.5px 'DM Mono',monospace;color:var(--mut2);margin-bottom:0;border-bottom:1px solid var(--line);padding-bottom:9px;">{{ activeMeta }}</div>
+      </div>
+      </div>
+      <div style="height:14px;"></div>
+      </sc-if>
+
+      <!-- blocks -->
+      <div ref="{{ blocksRef }}" style="{{ blocksGridCss }}">
+        <sc-for list="{{ blocks }}" as="b" hint-placeholder-count="5">
+          <div class="blk" data-bid="{{ b.id }}" style="display:flex;align-items:flex-start;gap:4px;margin:1px 0;position:relative;{{ b.cellCss }}">
+            <span class="blk-handle" onClick="{{ b.addAfter }}" style="opacity:0;flex:none;width:18px;text-align:center;font-size:15px;color:var(--mut2);cursor:pointer;user-select:none;line-height:1.7;transition:opacity .12s;">＋</span>
+            <div style="flex:1;min-width:0;{{ b.wrapCss }}">
+              <sc-if value="{{ b.isDivider }}">
+                <div style="height:1px;background:var(--line);width:100%;margin:9px 0;"></div>
+              </sc-if>
+              <sc-if value="{{ b.isCode }}">
+                <div style="display:flex;align-items:center;gap:6px;padding:5px 9px;border-bottom:1px solid var(--line);background:#eef2f2;flex-wrap:wrap;">
+                  <span onClick="{{ b.toggleCollapse }}" title="收合 / 展開" style="font:700 10px 'DM Mono',monospace;color:var(--mut);cursor:pointer;user-select:none;flex:none;">{{ b.caret }}</span>
+                  <sc-if value="{{ b.promptNo }}"><span style="font:700 9px 'DM Mono',monospace;color:#fff;background:var(--am);border-radius:4px;padding:2px 7px;flex:none;">{{ b.promptNo }}</span></sc-if>
+                  <input value="{{ b.prog }}" onInput="{{ b.onProg }}" placeholder="名稱／說明" style="font:600 9.5px 'DM Mono',monospace;color:var(--ink2);background:#fff;border:1px solid var(--line);border-radius:4px;padding:2px 7px;flex:1;min-width:90px;" />
+                  <input value="{{ b.ver }}" onInput="{{ b.onVer }}" placeholder="v1.0" style="font:600 9.5px 'DM Mono',monospace;color:var(--accent);background:#fff;border:1px solid var(--line);border-radius:4px;padding:2px 6px;width:54px;" />
+                  <select onChange="{{ b.onLang }}" value="" style="font:600 9px 'DM Mono',monospace;color:var(--mut);background:#fff;border:1px solid var(--line);border-radius:4px;padding:2px 4px;">
+                    <option value="">＋語言</option>
+                    <sc-for list="{{ b.langOpts }}" as="o" hint-placeholder-count="6"><option value="{{ o }}">{{ o }}</option></sc-for>
+                  </select>
+                  <sc-for list="{{ b.langTags }}" as="t" hint-placeholder-count="2">
+                    <span onClick="{{ t.remove }}" style="font:600 8px 'DM Mono',monospace;color:#fff;background:var(--teal);border-radius:3px;padding:1px 6px;cursor:pointer;flex:none;">{{ t.name }} ×</span>
+                  </sc-for>
+                  <span style="font:500 8px 'DM Mono',monospace;color:var(--mut2);flex:none;">{{ b.savedAt }} · 備份{{ b.backups }}</span>
+                  <span onClick="{{ b.copy }}" title="複製" style="margin-left:auto;font:700 9px 'DM Mono',monospace;color:#fff;background:var(--ink);border-radius:4px;padding:3px 9px;cursor:pointer;user-select:none;flex:none;">{{ b.copyLabel }}</span>
+                </div>
+              </sc-if>
+              <sc-if value="{{ b.hasMarker }}"><span onClick="{{ b.toggleDone }}" style="flex:none;user-select:none;{{ b.markerCss }}">{{ b.marker }}</span></sc-if>
+              <sc-if value="{{ b.bodyShown }}">
+              <div contenteditable="true" data-bid="{{ b.id }}" data-empty="{{ b.placeholder }}" onInput="{{ b.onInput }}" onKeyDown="{{ b.onKey }}" style="flex:1;min-width:0;{{ b.css }}"></div>
+              </sc-if>
+              <sc-if value="{{ b.collapsedPreview }}">
+              <div onClick="{{ b.toggleCollapse }}" title="展開" style="padding:6px 10px;font:400 10.5px/1.5 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);cursor:pointer;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">{{ b.preview }}</div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex;align-items:center;gap:5px;margin-top:11px;flex-wrap:wrap;padding:7px 9px;border:1px dashed var(--line);border-radius:8px;background:var(--paper2);">
+        <span style="font:700 9px 'DM Mono',monospace;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-right:3px;">＋ 一鍵新增</span>
+        <sc-for list="{{ quickAdd }}" as="q" hint-placeholder-count="7">
+          <span onClick="{{ q.go }}" title="{{ q.tip }}" style="display:inline-flex;align-items:center;gap:4px;font:600 10px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:4px 9px;cursor:pointer;user-select:none;">
+            <span style="font-size:12px;">{{ q.icon }}</span>{{ q.label }}
+          </span>
+        </sc-for>
+      </div>
+      </div>
+    </div>
+    </div>
+    <sc-if value="{{ isSplit }}">
+      <div style="{{ dividerCss }}background:var(--line);flex:none;"></div>
+      <div style="flex:1;min-width:0;min-height:0;overflow-y:auto;background:var(--paper2);">
+        <div style="max-width:760px;margin:0 auto;padding:24px 26px 120px;">
+          <div style="font:700 9px 'DM Mono',monospace;letter-spacing:1px;color:var(--mut2);text-transform:uppercase;margin-bottom:10px;">伴讀預覽 · COMPANION (唯讀)</div>
+          {{ companionEl }}
+        </div>
+      </div>
+    </sc-if>
+  </main>
+
+  <!-- SLASH MENU -->
+  <sc-if value="{{ slashOpen }}">
+    <div ref="{{ slashRef }}" style="position:fixed;z-index:80;background:var(--paper);border:1px solid var(--line);border-radius:9px;box-shadow:0 10px 32px rgba(31,42,42,.18);padding:6px;width:230px;{{ slashPos }}">
+      <div style="font:700 9px 'DM Mono',monospace;letter-spacing:.8px;color:var(--mut2);text-transform:uppercase;padding:5px 8px 4px;">區塊類型 BLOCKS</div>
+      <sc-for list="{{ slashItems }}" as="s" hint-placeholder-count="7">
+        <div onClick="{{ s.pick }}" style="display:flex;align-items:center;gap:9px;padding:6px 8px;border-radius:6px;cursor:pointer;user-select:none;{{ s.hoverCss }}">
+          <span style="width:24px;height:24px;flex:none;border:1px solid var(--line);border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:13px;background:var(--bg2);">{{ s.icon }}</span>
+          <div style="line-height:1.2;"><div style="font:600 12.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">{{ s.label }}</div><div style="font:400 10px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut2);">{{ s.desc }}</div></div>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <!-- BANNER LIBRARY -->
+  <sc-if value="{{ bannerOpen }}">
+    <div onClick="{{ closeBanner }}" style="position:fixed;inset:0;z-index:90;background:rgba(20,24,20,.4);display:flex;align-items:center;justify-content:center;">
+      <div style="background:var(--paper);border:1px solid var(--line);border-radius:12px;box-shadow:0 16px 48px rgba(31,42,42,.28);padding:16px;width:680px;max-width:92vw;max-height:84vh;overflow-y:auto;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+          <span style="font:800 13px 'Syne',sans-serif;color:var(--ink);">🖼 封面圖庫 Banner Library</span>
+          <span style="font:500 9px 'DM Mono',monospace;color:var(--mut2);">邏輯編號 BNR-類別-序號</span>
+          <span onClick="{{ closeBanner }}" style="margin-left:auto;font:700 12px 'DM Mono',monospace;color:var(--mut);cursor:pointer;user-select:none;">✕</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <sc-for list="{{ banners }}" as="b" hint-placeholder-count="8">
+            <div onClick="{{ b.pick }}" style="border:1px solid var(--line);border-radius:8px;overflow:hidden;cursor:pointer;background:var(--paper2);">
+              <div style="width:100%;height:96px;background-image:url('{{ b.src }}');background-size:cover;background-position:center;"></div>
+              <div style="padding:6px 9px;">
+                <div style="font:700 9px 'DM Mono',monospace;color:var(--accent);">{{ b.code }}</div>
+                <div style="font:600 10px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">{{ b.name }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font:400 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut2);margin-top:11px;">點擊任一圖即套用為封面。新圖上傳後依邏輯編號（BNR-類別-序號）自動入庫。</div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{ &quot;$preview&quot;: { &quot;width&quot;: 1100, &quot;height&quot;: 760 } }">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.LS = 'via_note_pro_v7';
+    this.state = { docs: this._load(), active: 0, query: '', slash: null, sbOpen: true, split: null };
+  }
+  _load() {
+    try { const raw = localStorage.getItem(this.LS); if (raw) { const d = JSON.parse(raw); if (d && d.length) return d; } } catch (e) {}
+    return this._seed();
+  }
+  _seed() {
+    const uid = () => 'b' + Math.random().toString(36).slice(2, 9);
+    return [
+      { icon: '💬', title: 'Prompt Management', meta: '', grid: true, blocks: [
+        { id: uid(), type: 'prompt', text: '【元規定 · Prompt 生成器 Meta-Prompt v1.1】\n你是嚴謹的 Prompt 架構師。將我口語化的需求，轉成一份結構化、可重現、AI 易懂的 Prompt。嚴格依下列規格：\n\n■ 必含九段（缺一不可，用標題分隔）：\n① 角色 Role：指派專業身分、視角、語氣基準。\n② 目標 Objective：單一可驗證成果；一句話講清「做完長怎樣」。\n③ 脈絡 Context：輸入資料、領域知識、前置假設、時間/版本錨。\n④ 步驟 Steps：分點、可依序執行、必要時標明先後相依。\n⑤ 推理要求 Reasoning：是否需逐步思考、列依據、引用來源。\n⑥ 輸出格式 Output：指定結構（JSON schema / 表格欄位 / 條列），附 1 個最小範例。\n⑦ 約束 Constraints：禁止項、邊界、字數、不可杜撰、需標不確定性。\n⑧ 品質準則 Quality：正確性 > 完整性 > 簡潔；數字加單位與千分位。\n⑨ 自我驗證 Verify：完成前自檢清單（是否符合②⑥⑦？是否有臆測？）。\n\n■ 多語言規則：\n· 保留原文專有名詞（人名/機構/代碼）不翻譯。\n· 中英混排時術語首見標英文，其後可用中文。\n· 程式碼一律以 ``` 圍欄並標語言（```python / ```sql…），逐字保留 — 不改寫、不翻譯、不轉換語言、不重排。\n· 若需跨語言轉譯，須在 Steps 明確指示來源→目標語言，否則預設保真。\n\n■ 變數佔位：可調參數以 {{VAR}} 標示，並在末尾列「變數說明」表。\n\n■ 輸出順序：先「PROMPT 正文」（可整段複製貼給 AI），再「使用說明」與「變數說明」。\n\n現在請依此規格，把我接下來的需求生成為一份完整 Prompt。', lang: 'Markdown', prog: 'meta_prompt_generator', ver: 'v1.1.0', savedAt: '存於 08:55' },
+        { id: uid(), type: 'prompt', text: '從 broker PDF 擷取：分析師、券商、評等、目標價、報告日。\nTW_TICKER 不可竄改；目標價 NEVER overwrite。', lang: 'Markdown', prog: 'report_parser', ver: 'v0.9.1', savedAt: '存於 09:05' },
+        { id: uid(), type: 'prompt', text: 'SSOT 同義字解析：輸入欄位別名（中/英/API），輸出正規欄位 + 公式 + 驗算。', lang: 'Markdown', prog: 'ssot_synonym', ver: 'v2.0.0', savedAt: '存於 09:10' },
+        { id: uid(), type: 'prompt', text: '【元規定 · Prompt 生成器 Meta-Prompt v1.1】\n你是嚴謹的 Prompt 架構師。將我口語化的需求，轉成一份結構化、可重現、AI 易懂的 Prompt。嚴格依下列規格：\n\n■ 必含九段：①角色 ②目標(可驗證) ③脈絡(時間/版本錨) ④步驟(相依) ⑤推理要求 ⑥輸出格式(JSON/表格+最小範例) ⑦約束(不可杜撰/標不確定) ⑧品質準則(正確>完整>簡潔,數字加單位千分位) ⑨自我驗證清單。\n■ 多語言：保留專有名詞;程式碼用 ``` 圍欄標語言、逐字保真不轉換;需轉譯才明示來源→目標。\n■ 變數以 {{VAR}} 標示,末尾附變數說明表。\n■ 輸出:先 PROMPT 正文(可整段複製),再使用說明+變數說明。\n\n👉 貼上你的需求,我依此生成完整 Prompt。', lang: 'Markdown', prog: '空白範本 · 待啟動', ver: 'v0', savedAt: '未存' },
+      ] },
+      { icon: '🗂️', title: 'SSOT Management', meta: '', blocks: [
+        { id: uid(), type: 'h2', text: 'SSOT 管理計畫' },
+        { id: uid(), type: 'bullet', text: 'Ticker 規則：TW_TICKER / yfinance / Bloomberg 三碼前四位一致' },
+        { id: uid(), type: 'bullet', text: '日期標準化：跑資料前一律轉 YYYY-MM-DD' },
+        { id: uid(), type: 'bullet', text: '同義字引擎：中/英/API 別名 → 正規欄位' },
+        { id: uid(), type: 'code', text: 'TW_TICKER = ^[1-9][0-9]{3}$', lang: 'Python', prog: 'ssot_rules', ver: 'v2.0.0' },
+      ] },
+      { icon: '📊', title: '研究筆記 · S&P 評價', meta: '', blocks: [
+        { id: uid(), type: 'h2', text: '核心結論' },
+        { id: uid(), type: 'callout', text: '評價方向向下：CAPE 40、ERP≈0；短期崩盤非基準。' },
+        { id: uid(), type: 'todo', text: '更新 Bogle 分解表', done: true },
+        { id: uid(), type: 'text', text: '估值是放大器，不是觸發器。' },
+      ] },
+      { icon: '🛠️', title: 'VeritasIntelligenceAnalytics 開發進度及項目管理', meta: '', blocks: [
+        { id: uid(), type: 'h2', text: '開發進度總覽' },
+        { id: uid(), type: 'callout', text: 'VIA 平台模組化開發 · 三軌並行：分析引擎 / 視覺化 / SSOT 治理。整體進度約 68%。' },
+        { id: uid(), type: 'h3', text: '① 分析引擎 Analysis Engine' },
+        { id: uid(), type: 'todo', text: '族群自動分類（hotness × leadership）', done: true },
+        { id: uid(), type: 'todo', text: '2026 風險引擎 v10（觸發 × 脆弱）', done: true },
+        { id: uid(), type: 'todo', text: 'DXY 多因子模型', done: true },
+        { id: uid(), type: 'todo', text: '接 yfinance / FRED 即時資料', done: false },
+        { id: uid(), type: 'h3', text: '② 視覺化 Visualization' },
+        { id: uid(), type: 'todo', text: '儀表板標準化（Visual Lock / VRN 扁平）', done: true },
+        { id: uid(), type: 'todo', text: '事件時間軸矩陣（1929→2025）', done: true },
+        { id: uid(), type: 'todo', text: '全球指數地圖 + 族群輪動', done: true },
+        { id: uid(), type: 'todo', text: 'K線 + BB + SMA + 法人堆疊', done: false },
+        { id: uid(), type: 'h3', text: '③ SSOT 治理 Governance' },
+        { id: uid(), type: 'todo', text: 'Regex / 同義字 / 代碼三碼', done: true },
+        { id: uid(), type: 'todo', text: '財報欄位 + 雙重驗算', done: true },
+        { id: uid(), type: 'todo', text: 'Parquet 增量備份落地', done: false },
+        { id: uid(), type: 'h3', text: '問題清單 Issues' },
+        { id: uid(), type: 'bullet', text: '🔴 即時資料源未接（沙箱無外網）— 待本機腳本' },
+        { id: uid(), type: 'bullet', text: '🟡 K線族群個股圖三面板待補' },
+        { id: uid(), type: 'code', text: 'Round 0/1/2/3 · Matrix: function × language × stage · GREEN/YELLOW/RED', lang: 'PowerShell', prog: 'progress_matrix', ver: 'v1.0' },
+      ] },
+      { icon: '💡', title: 'IDEA Management', meta: '', grid: true, blocks: [
+        { id: uid(), type: 'prompt', text: '構想：把族群輪動 + 原物料領先指標串成單一「資金流向羅盤」儀表板。', lang: 'Markdown', prog: 'idea_compass', ver: 'v0.1', savedAt: '未存' },
+        { id: uid(), type: 'prompt', text: '構想：Prompt 版本 A/B 測試框架，自動比對輸出品質並記分。', lang: 'Markdown', prog: 'idea_abtest', ver: 'v0.1', savedAt: '未存' },
+        { id: uid(), type: 'prompt', text: '構想：以惡魔驗證（正反四攻擊）自動稽核每份研究結論的存活度。', lang: 'Markdown', prog: 'idea_devil', ver: 'v0.1', savedAt: '未存' },
+        { id: uid(), type: 'prompt', text: '【元規定 · Prompt 生成器 Meta-Prompt v1.1】\n你是嚴謹的 Prompt 架構師。把我口語化的需求轉成結構化、AI 易懂的 Prompt：①角色 ②目標 ③脈絡 ④步驟 ⑤推理 ⑥輸出格式(範例) ⑦約束 ⑧品質 ⑨自我驗證。程式碼 ``` 圍欄保真不轉換;變數 {{VAR}} 並附說明。先給正文再給說明。\n\n👉 貼上你的需求生成完整 Prompt。', lang: 'Markdown', prog: '空白範本 · 待啟動', ver: 'v0', savedAt: '未存' },
+      ] },
+    ];
+  }
+  _seedOld() {
+    const uid = () => 'b' + Math.random().toString(36).slice(2, 9);
+    return [
+      { icon: '🧠', title: '族群分類方法', meta: '', blocks: [
+        { id: uid(), type: 'h2', text: 'hotness × leadership' },
+        { id: uid(), type: 'bullet', text: '熱門度 = 量能 + 法人淨買 + 融資 z 分數' },
+        { id: uid(), type: 'bullet', text: '領先性 = CCF 負 lag（Leader 先動）' },
+        { id: uid(), type: 'code', text: 'risk = trigger * fragility_mult * (1 + 0.08*struct)' },
+      ] },
+      { icon: '🗒️', title: '快速筆記', meta: '', blocks: [
+        { id: uid(), type: 'text', text: '輸入「/」叫出區塊選單 — 標題、待辦、清單、引用、程式碼…' },
+      ] },
+    ];
+  }
+  _save() { try { localStorage.setItem(this.LS, JSON.stringify(this.state.docs)); } catch (e) {} }
+  _saveNow() { this._save(); this._saved = true; this.forceUpdate(); clearTimeout(this._savedT); this._savedT = setTimeout(() => { this._saved = false; this.forceUpdate(); }, 1600); }
+  _uid() { return 'b' + Math.random().toString(36).slice(2, 9); }
+  _now() { const d = new Date(); return '存於 ' + String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+  _companion(doc) {
+    const E = React.createElement;
+    const sty = {
+      h1: { font: "800 19px 'Syne',sans-serif", color: '#1e1d1a', margin: '10px 0 4px' },
+      h2: { font: "800 15.5px 'Syne',sans-serif", color: '#1e1d1a', margin: '8px 0 3px' },
+      h3: { font: "700 13px 'Syne',sans-serif", color: '#1e1d1a', margin: '6px 0 3px' },
+      text: { font: "400 12.5px/1.6 'DM Sans',sans-serif", color: '#33403f', margin: '2px 0' },
+      bullet: { font: "400 12.5px/1.6 'DM Sans',sans-serif", color: '#33403f', margin: '2px 0' },
+      todo: { font: "400 12.5px/1.6 'DM Sans',sans-serif", color: '#33403f', margin: '2px 0' },
+      quote: { font: "500 12.5px/1.6 'DM Sans',sans-serif", color: '#6b6860', fontStyle: 'italic', borderLeft: '3px solid #1e1d1a', paddingLeft: '11px', margin: '4px 0' },
+      callout: { font: "400 12px/1.55 'DM Sans',sans-serif", color: '#33403f', background: '#f1efea', border: '1px solid #eceae4', borderRadius: '7px', padding: '8px 12px', margin: '4px 0' },
+      code: { font: "500 12px/1.55 'DM Mono',monospace", color: '#2f6f6f', background: '#f6f8f8', border: '1px solid #eceae4', borderRadius: '7px', padding: '9px 13px', whiteSpace: 'pre-wrap', margin: '4px 0' },
+    };
+    const pre = { bullet: '•  ', todo: (b) => b.done ? '☑  ' : '☐  ', callout: '💡  ' };
+    const kids = (doc.blocks || []).map((b, i) => {
+      let t = b.text || '';
+      if (b.type === 'bullet') t = '•  ' + t;
+      else if (b.type === 'todo') t = (b.done ? '☑  ' : '☐  ') + t;
+      else if (b.type === 'callout') t = '💡  ' + t;
+      return E('div', { key: i, style: sty[b.type] || sty.text }, t || '\u00a0');
+    });
+    return E('div', {}, E('div', { style: { font: "800 20px 'Syne',sans-serif", color: '#1e1d1a', marginBottom: '8px' } }, doc.title || '無標題'), kids);
+  }
+  _assetCode(i, doc) {
+    const t = (doc.title || '').toLowerCase();
+    const cat = /ssot/.test(t) ? 'SSOT' : /prompt/.test(t) ? 'PRMT' : /code|程式|api/.test(t) ? 'CODE' : /研究|report|分析/.test(t) ? 'RSCH' : 'ASSET';
+    return 'SAM-' + cat + '-' + String(i + 1).padStart(3, '0');
+  }
+
+  componentDidMount() { this._syncDom(); this._kd = (e) => { if ((e.ctrlKey || e.metaKey) && (e.key === 's' || e.key === 'S')) { e.preventDefault(); this._saveNow(); } }; window.addEventListener('keydown', this._kd); }
+  componentWillUnmount() { if (this._kd) window.removeEventListener('keydown', this._kd); }
+  componentDidUpdate() { this._syncDom(); }
+  // push model text into contenteditable nodes without clobbering caret while typing
+  _syncDom() {
+    const doc = this.state.docs[this.state.active]; if (!doc) return;
+    if (this.titleEl && document.activeElement !== this.titleEl) this.titleEl.textContent = doc.title || '';
+    if (this.blocksEl) {
+      doc.blocks.forEach(b => {
+        const el = this.blocksEl.querySelector('[contenteditable][data-bid="' + b.id + '"]');
+        if (el && document.activeElement !== el && el.textContent !== b.text) el.textContent = b.text || '';
+      });
+    }
+  }
+
+  _blockCss(type) {
+    const base = 'min-height:1.4em;padding:2px 2px;line-height:1.55;';
+    const map = {
+      text: "font:400 11.5px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);",
+      h1: "font:800 17px/1.22 'Syne',sans-serif;color:var(--ink);padding-top:7px;",
+      h2: "font:800 14px/1.28 'Syne',sans-serif;color:var(--ink);padding-top:5px;",
+      h3: "font:700 12px/1.28 'Syne',sans-serif;color:var(--ink);padding-top:3px;",
+      bullet: "font:400 11.5px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);",
+      numbered: "font:400 11.5px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);",
+      todo: "font:400 11.5px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);",
+      quote: "font:500 11.5px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);font-style:italic;",
+      callout: "font:400 11px/1.5 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);",
+      code: "font:500 11px/1.5 'DM Mono',monospace;color:#2f6f6f;white-space:pre-wrap;",
+      prompt: "font:400 11.5px/1.58 'DM Sans','Noto Sans TC',sans-serif;color:#33403f;white-space:pre-wrap;",
+    };
+    return base + (map[type] || map.text);
+  }
+  _wrapCss(b) {
+    if (b.type === 'callout') return 'background:var(--bg2);border:1px solid var(--line);border-left:3px solid var(--am);border-radius:7px;padding:8px 12px;display:flex;gap:8px;';
+    if (b.type === 'code') return 'background:#f6f8f8;border:1px solid var(--line);border-radius:7px;overflow:hidden;flex-direction:column;display:flex;';
+    if (b.type === 'prompt') return 'background:#fbf7ef;border:1px solid var(--line);border-left:3px solid var(--am);border-radius:7px;overflow:hidden;flex-direction:column;display:flex;';
+    if (b.type === 'quote') return 'border-left:3px solid var(--ink);padding-left:13px;';
+    if (b.type === 'bullet') return 'display:flex;gap:9px;align-items:flex-start;';
+    if (b.type === 'numbered') return 'display:flex;gap:8px;align-items:flex-start;';
+    if (b.type === 'todo') return 'display:flex;gap:9px;align-items:flex-start;';
+    return '';
+  }
+  _prefix(b) {
+    if (b.type === 'callout') return '💡 ';
+    if (b.type === 'bullet') return '•  ';
+    if (b.type === 'todo') return b.done ? '☑ ' : '☐ ';
+    return '';
+  }
+
+  _setText(id, text) {
+    const doc = this.state.docs[this.state.active];
+    const b = doc.blocks.find(x => x.id === id); if (b) { b.text = text; this._save(); }
+    // detect "/" to open slash
+    if (text === '/' ) this._openSlash(id);
+    else if (this.state.slash && this.state.slash.id === id && !text.startsWith('/')) this.setState({ slash: null });
+  }
+  _openSlash(id) {
+    const el = this.blocksEl && this.blocksEl.querySelector('[contenteditable][data-bid="' + id + '"]');
+    let pos = 'left:300px;top:300px;';
+    if (el) { const r = el.getBoundingClientRect(); pos = 'left:' + Math.round(r.left) + 'px;top:' + Math.round(r.bottom + 6) + 'px;'; }
+    this.setState({ slash: { id, pos } });
+  }
+  _applyType(id, type) {
+    const doc = this.state.docs[this.state.active];
+    const b = doc.blocks.find(x => x.id === id);
+    if (b) { b.type = type; if (b.text === '/') b.text = ''; if (type === 'todo' && b.done == null) b.done = false; }
+    this._save();
+    this.setState({ slash: null });
+    setTimeout(() => { const el = this.blocksEl && this.blocksEl.querySelector('[contenteditable][data-bid="' + id + '"]'); if (el) { el.textContent = b.text || ''; el.focus(); } }, 0);
+  }
+  _addBlock(afterId) {
+    const doc = this.state.docs[this.state.active];
+    const nb = { id: this._uid(), type: 'text', text: '' };
+    if (afterId == null) doc.blocks.push(nb);
+    else { const i = doc.blocks.findIndex(x => x.id === afterId); doc.blocks.splice(i + 1, 0, nb); }
+    this._save(); this.forceUpdate();
+    setTimeout(() => { const el = this.blocksEl && this.blocksEl.querySelector('[contenteditable][data-bid="' + nb.id + '"]'); if (el) el.focus(); }, 0);
+  }
+  _removeBlock(id) {
+    const doc = this.state.docs[this.state.active];
+    const i = doc.blocks.findIndex(x => x.id === id);
+    if (i < 0 || doc.blocks.length <= 1) return;
+    const prev = doc.blocks[i - 1];
+    doc.blocks.splice(i, 1); this._save(); this.forceUpdate();
+    if (prev) setTimeout(() => { const el = this.blocksEl && this.blocksEl.querySelector('[contenteditable][data-bid="' + prev.id + '"]'); if (el) { el.focus(); const r = document.createRange(); r.selectNodeContents(el); r.collapse(false); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); } }, 0);
+  }
+  _onBlockKey(id, e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); if (this.state.slash) return; this._addBlock(id); }
+    else if (e.key === 'Backspace') {
+      const el = e.target; if ((el.textContent || '') === '') { e.preventDefault(); this._removeBlock(id); }
+    } else if (e.key === 'Escape' && this.state.slash) { this.setState({ slash: null }); }
+  }
+
+  renderVals() {
+    const docs = this.state.docs, ai = this.state.active, doc = docs[ai] || docs[0];
+    const q = (this.state.query || '').toLowerCase();
+    const icons = ['📄', '📊', '🧠', '🗒️', '📈', '💡', '🔬', '🗂️', '⭐', '🚀'];
+
+    const pages = docs.map((d, i) => ({
+      icon: d.icon || '📄', title: d.title || '無標題',
+      activeCss: i === ai ? 'background:var(--hover);' : '',
+      hidden: q && !((d.title || '').toLowerCase().includes(q) || d.blocks.some(b => (b.text || '').toLowerCase().includes(q))),
+      open: () => this.setState({ active: i, slash: null }),
+      del: (e) => { if (e && e.stopPropagation) e.stopPropagation(); if (docs.length <= 1) return; const nd = docs.slice(); nd.splice(i, 1); this.setState({ docs: nd, active: Math.max(0, ai >= i ? ai - 1 : ai) }, () => this._save()); this._save(); },
+    })).filter(p => !p.hidden);
+
+    let _pno = 0;
+    let _num = 0;
+    const blocks = doc.blocks.map((b, _i) => {
+      let mk = this._marker(b);
+      if (b.type === 'numbered') { _num++; mk = { m: _num + '.', css: "font:700 12px/1.7 'DM Mono',monospace;color:var(--mut);min-width:17px;text-align:right;" }; } else { _num = 0; }
+      const done = b.type === 'todo' && b.done;
+      if (b.type === 'prompt') _pno++;
+      const isCode = b.type === 'code' || b.type === 'prompt';
+      const isPrompt = b.type === 'prompt';
+      if (b.text !== undefined && b._lastText !== undefined && b._lastText !== b.text) { b.backups = (b.backups || 0) + 1; }
+      b._lastText = b.text;
+      return {
+        id: b.id, placeholder: b.type && b.type.startsWith('h') ? '標題' : (isPrompt ? 'Prompt 內文… 可貼整段給 AI' : "輸入文字，或「/」插入區塊"),
+        css: this._blockCss(b.type) + (done ? 'text-decoration:line-through;color:var(--mut2);' : '') + (isCode ? 'padding:9px 13px;' : ''), wrapCss: this._wrapCss(b),
+        isCode, lang: b.lang || (isPrompt ? 'Markdown' : 'Python'), langOpts: ['Markdown', 'Python', 'JavaScript', 'TypeScript', 'PowerShell', 'SQL', 'R', 'Bash', 'C++', 'Go', 'Rust', 'HTML', 'JSON', 'YAML'],
+        prog: b.prog || '', ver: b.ver || '', savedAt: b.savedAt || '未存',
+        backups: b.backups || 0,
+        caret: (b.collapsed === undefined ? isPrompt : b.collapsed) ? '▸' : '▾', bodyShown: b.type === 'divider' ? false : !(b.collapsed === undefined ? isPrompt : b.collapsed),
+        collapsedPreview: isPrompt && (b.collapsed === undefined ? isPrompt : b.collapsed), preview: b.text || '（空白 Prompt — 貼上規範後生成）',
+        cellCss: (doc.grid && _i >= 2) ? 'border-top:2px solid var(--line);padding-top:9px;margin-top:5px;' : '',
+        isDivider: b.type === 'divider',
+        toggleCollapse: () => { b.collapsed = !(b.collapsed === undefined ? isPrompt : b.collapsed); this._save(); this.forceUpdate(); },
+        langTags: (b.langs || (b.lang ? [b.lang] : [])).map(L => ({ name: L, remove: () => { b.langs = (b.langs || [b.lang]).filter(x => x !== L); this._save(); this.forceUpdate(); } })),
+        copyLabel: this._copied === b.id ? '✓ 已複製' : (isPrompt ? '⧉ 複製給 AI' : '⧉ 複製'),
+        promptNo: isPrompt ? ('PROMPT ' + String(_pno).padStart(2, '0')) : '',
+        onLang: e => { const v = e.target.value; if (!v) return; const arr = b.langs || (b.lang ? [b.lang] : []); if (arr.indexOf(v) < 0) arr.push(v); b.langs = arr; b.lang = arr[0]; b.savedAt = this._now(); b.backups = (b.backups || 0) + 1; this._save(); this.forceUpdate(); },
+        onProg: e => { b.prog = e.target.value; b.savedAt = this._now(); b.backups = (b.backups || 0) + 1; this._save(); },
+        onVer: e => { b.ver = e.target.value; b.savedAt = this._now(); this._save(); },
+        copy: () => { try { navigator.clipboard.writeText(b.text || ''); } catch (e) {} this._copied = b.id; this.forceUpdate(); setTimeout(() => { this._copied = null; this.forceUpdate(); }, 1200); },
+        hasMarker: !!(mk && mk.m), marker: mk ? mk.m : '', markerCss: mk ? mk.css : '',
+        toggleDone: () => { if (b.type === 'todo') { b.done = !b.done; this._save(); this.forceUpdate(); } },
+        onInput: (e) => this._setText(b.id, e.target.textContent),
+        onKey: (e) => this._onBlockKey(b.id, e),
+        addAfter: () => this._addBlock(b.id),
+      };
+    });
+
+    const slashDefs = [
+      ['text', '📝', '文字', '純文字段落'], ['h1', 'H₁', '標題 1', '大標題'], ['h2', 'H₂', '標題 2', '中標題'],
+      ['h3', 'H₃', '標題 3', '小標題'], ['bullet', '•', '項目清單', '無序清單'], ['todo', '☑', '待辦', '核取清單'],
+      ['quote', '❝', '引用', '引述區塊'], ['callout', '💡', '標註', '強調框'], ['code', '‹›', '程式碼', '等寬程式區塊'],
+      ['numbered', '1.', '編號清單', '有序清單'], ['divider', '―', '分隔線', '水平分隔線'],
+      ['prompt', '✦', 'Prompt', '可複製給 AI 的 Prompt 架構'],
+    ];
+    const slashItems = slashDefs.map(s => ({ icon: s[1], label: s[2], desc: s[3],
+      hoverCss: '', pick: () => this.state.slash && this._applyType(this.state.slash.id, s[0]) }));
+
+    const blockCount = docs.reduce((a, d) => a + d.blocks.length, 0);
+
+    return {
+      rootRef: el => { this.root = el; },
+      titleRef: el => { this.titleEl = el; if (el && document.activeElement !== el) el.textContent = doc.title || ''; },
+      blocksRef: el => { this.blocksEl = el; },
+      slashRef: el => { this.slashEl = el; },
+      pages, blocks, slashItems,
+      activeIcon: doc.icon || '📄',
+      activeTitleText: doc.title || '無標題',
+      activeMeta: this._assetCode(ai, doc) + ' · ' + doc.blocks.length + ' 區塊 · 自動編碼 · localStorage 自動儲存',
+      hasCover: !!doc.cover, noCover: !doc.cover, coverImg: doc.cover || 'assets/banners/BNR-FOREST-001.jpg', coverH: '180px',
+      coverZoom: ((doc.coverZoom || 100)) + '% auto', coverZoomN: doc.coverZoom || 100,
+      coverPos: (doc.coverPos == null ? 50 : doc.coverPos) + '%', coverPosN: doc.coverPos == null ? 50 : doc.coverPos,
+      headPad: doc.cover ? '14px' : '34px',
+      addCover: () => this.setState({ bannerPick: true }),
+      changeCover: () => this.setState({ bannerPick: true }),
+      bannerOpen: !!this.state.bannerPick, closeBanner: () => this.setState({ bannerPick: false }),
+      banners: [
+        ['BNR-FOREST-001', '陝光森林 Sunbeam Forest', 'assets/banners/BNR-FOREST-001.jpg'],
+        ['BNR-FOREST-002', '霧林 Misty Pines', 'assets/banners/BNR-FOREST-002.jpg'],
+        ['BNR-GREENHOUSE-001', '溫室植物 Greenhouse', 'assets/banners/BNR-GREENHOUSE-001.jpg'],
+        ['BNR-GREENHOUSE-002', '溫室窗 Glasshouse', 'assets/banners/BNR-GREENHOUSE-002.jpg'],
+        ['BNR-WINDOW-001', '花窗 Window & Blooms', 'assets/banners/BNR-WINDOW-001.jpg'],
+        ['BNR-CAFE-001', '海邊書店 Seaside Cafe', 'assets/banners/BNR-CAFE-001.jpg'],
+        ['BNR-SHOP-001', '夜景小店 Night Shop', 'assets/banners/BNR-SHOP-001.jpg'],
+        ['BNR-STUDIO-001', '植物工作室 Plant Studio', 'assets/banners/BNR-STUDIO-001.jpg'],
+      ].map(b => ({ code: b[0], name: b[1], src: b[2], pick: () => { doc.cover = b[2]; if (doc.coverZoom == null) doc.coverZoom = 100; if (doc.coverPos == null) doc.coverPos = 50; this._save(); this.setState({ bannerPick: false }); } })),
+      removeCover: () => { doc.cover = null; this._save(); this.forceUpdate(); },
+      onZoom: e => { doc.coverZoom = +e.target.value; this._save(); this.forceUpdate(); },
+      onPos: e => { doc.coverPos = +e.target.value; this._save(); this.forceUpdate(); },
+      pageCount: docs.length, blockCount,
+      sbOpen: this.state.sbOpen, sbClosed: !this.state.sbOpen, toggleSb: () => this.setState(s => ({ sbOpen: !s.sbOpen })),
+      splitDir: this.state.split === 'tb' ? 'column' : 'row',
+      isSplit: this.state.split === 'lr' || this.state.split === 'tb',
+      paneMax: this.state.split ? '100%' : '1320px',
+      dividerCss: this.state.split === 'tb' ? 'height:1px;width:100%;' : 'width:1px;height:100%;',
+      split1: () => this.setState({ split: null }), splitLR: () => this.setState({ split: 'lr' }), splitTB: () => this.setState({ split: 'tb' }),
+      s1Css: !this.state.split ? 'background:var(--ink);color:#fff;' : 'color:var(--mut);',
+      sLRCss: this.state.split === 'lr' ? 'background:var(--ink);color:#fff;' : 'color:var(--mut);',
+      sTBCss: this.state.split === 'tb' ? 'background:var(--ink);color:#fff;' : 'color:var(--mut);',
+      companionEl: this._companion(doc),
+      blocksGridCss: doc.grid ? 'display:grid;grid-template-columns:1fr 1fr;gap:4px;align-items:start;' : '',
+      addBlk: () => { const nb = { id: this._uid(), type: doc.grid ? 'prompt' : 'text', text: '', lang: 'Markdown', prog: '', ver: 'v0', savedAt: '未存' }; doc.blocks.push(nb); this._save(); this.forceUpdate(); },
+      quickAdd: [
+        ['text', '📝', '文字', '純文字段落'], ['h2', 'H', '標題', '中標題'], ['bullet', '•', '清單', '項目清單'],
+        ['todo', '☑', '待辦', '核取清單'], ['callout', '💡', '標註', '強調框'], ['prompt', '✦', 'Prompt', 'AI Prompt 卡'], ['code', '‹›', '程式', '程式碼區塊'],
+        ['numbered', '1.', '編號', '有序清單'], ['divider', '―', '分隔', '水平分隔線'],
+      ].map(q => ({ icon: q[1], label: q[2], tip: q[3], go: () => {
+        const nb = { id: this._uid(), type: q[0], text: '', done: q[0] === 'todo' ? false : undefined, lang: 'Markdown', prog: '', ver: 'v0', savedAt: '未存' };
+        doc.blocks.push(nb); this._save(); this.forceUpdate();
+        setTimeout(() => { const el = this.blocksEl && this.blocksEl.querySelector('[contenteditable][data-bid="' + nb.id + '"]'); if (el) el.focus(); }, 30);
+      } })),
+      query: this.state.query, onSearch: e => this.setState({ query: e.target.value }),
+      onTitle: e => { doc.title = e.target.textContent; this._save(); },
+      onTitleKey: e => { if (e.key === 'Enter') { e.preventDefault(); if (doc.blocks[0]) { const el = this.blocksEl.querySelector('[contenteditable][data-bid="' + doc.blocks[0].id + '"]'); if (el) el.focus(); } } },
+      cycleIcon: () => { const cur = icons.indexOf(doc.icon); doc.icon = icons[(cur + 1) % icons.length]; this._save(); this.forceUpdate(); },
+      addPage: () => { const nd = this.state.docs.slice(); nd.push({ icon: '📄', title: '', meta: '', blocks: [{ id: this._uid(), type: 'text', text: '' }] }); this.setState({ docs: nd, active: nd.length - 1, slash: null }, () => this._save()); this._save(); },
+      slashOpen: !!this.state.slash, slashPos: this.state.slash ? this.state.slash.pos : '',
+      saveNow: () => this._saveNow(),
+      saveLabel: this._saved ? '✓ 已儲存' : '💾 儲存',
+      saveCss: this._saved ? 'background:var(--gn);color:#fff;' : 'color:var(--mut);',
+    };
+  }
+  _marker(b) {
+    if (b.type === 'callout') return { m: '\u{1F4A1}', css: 'font-size:16px;line-height:1.6;' };
+    if (b.type === 'bullet') return { m: '\u2022', css: "font:700 17px/1.5 'DM Sans',sans-serif;color:var(--mut);" };
+    if (b.type === 'todo') return { m: b.done ? '\u2611' : '\u2610', css: "font:600 16px/1.6 'DM Mono',monospace;cursor:pointer;color:" + (b.done ? 'var(--gn)' : 'var(--mut2)') + ';' };
+    return null;
+  }
+  _prefixCss(b) { return ''; }
+}
+</script>
+</body>
+</html>

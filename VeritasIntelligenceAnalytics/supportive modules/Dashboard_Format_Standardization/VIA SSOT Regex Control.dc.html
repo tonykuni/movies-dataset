@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f4f0; --bg2:#e5e3df; --paper:#ffffff; --paper2:#fafaf8;
+    --ink:#1e1d1a; --ink2:#33403f; --mut:#6b6860; --mut2:#9c9890;
+    --line:#dbd9d3; --soft:#ecebe6;
+    --blue:#4c78a8; --grey:#9c9890; --teal:#439a9a;
+    --up:#c96b5a; --down:#5a9e6f; --am:#c4943a; --co:#c96b5a; --vi:#7a6daa; --gn:#5a9e6f; --ro:#b05580;
+    --green:#2d8659; --amber:#c4943a; --red:#b85450; --accent:#439a9a;
+    --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);}
+  body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  ::selection{background:rgba(67,154,154,.22);}
+</style>
+<style>@media print{@page{size:A4;margin:11mm}html,body{background:#fff !important}.__pdfbtn{display:none !important}*{box-shadow:none !important}[style*="position:sticky"]{position:static !important}[style*="overflow-y:auto"],[style*="overflow:auto"],[style*="overflow-x:auto"]{overflow:visible !important;max-height:none !important}table,section,.brk{break-inside:avoid}}</style>
+<script>window.addEventListener('load',function(){if(document.getElementById('__pdfbtn'))return;var b=document.createElement('div');b.id='__pdfbtn';b.className='__pdfbtn';b.innerHTML='<img src="assets/pdf-icon.png" alt="PDF" style="width:30px;height:30px;display:block">';b.title='A4 PDF';b.style.cssText='position:fixed;top:12px;right:14px;z-index:99999;background:transparent;border:none;padding:0;font:700 10px monospace;letter-spacing:.5px;cursor:pointer;';b.onclick=function(){window.print()};document.body.appendChild(b);});</script>
+</helmet>
+
+<div ref="{{ rootRef }}" style="max-width:1280px;margin:0 auto;padding:0 22px 46px;">
+
+  <div style="position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50;"></div>
+
+  <header style="position:relative;padding:22px 0 10px;margin-bottom:12px;border-bottom:2px solid var(--ink);">
+    <div style="font:700 10px 'DM Mono',monospace;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px;">VERITAS INTELLIGENCE ANALYTICS · SSOT · REGEX CONTROL</div>
+    <h1 style="font:800 18px/1.2 'Syne',sans-serif;color:var(--ink);">正則規則<span style="color:var(--up);">總控</span> — Ticker / Date / Filename 解析鎖定</h1>
+    <p style="margin-top:5px;font:400 10.5px/1.5 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:880px;">SSOT 正規化契約：TW_TICKER / yfinance / Bloomberg / 檔名 token 解析。可即時測試任意輸入或檔名 → 看命中、分類與衝突政策。鎖定項<b style="color:var(--ink2);">不可變更</b>，編輯僅留於本登錄。</p>
+  </header>
+
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#1e1d1a;border-radius:3px;padding:6px 13px;margin-bottom:8px;">
+    <span style="display:inline-flex;align-items:center;gap:6px;font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase;">🔒 VISUAL LOCK · 全格式鎖定</span>
+    <span style="display:inline-flex;align-items:center;gap:4px;font:500 8px 'DM Mono',monospace;color:#cfcabf;">色票
+      <span style="width:11px;height:11px;border-radius:2px;background:#4c78a8;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#439a9a;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#9c9890;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#c96b5a;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#5a9e6f;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#f5f4f0;border:1px solid #555;"></span>
+    </span>
+    <span style="font:500 8px 'DM Mono',monospace;color:#8a948f;">字體 Syne / DM Sans / DM Mono</span>
+    <span style="font:500 8px 'DM Mono',monospace;color:#8a948f;">漲紅跌綠 · 千分位 · 熱力色階</span>
+    <span style="margin-left:auto;font:700 8px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:2px 8px;">v1.0 · LOCKED 2026-06-22</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;background:#fff;border:1px solid #dbd9d3;border-left:3px solid #439a9a;border-radius:3px;padding:6px 13px;margin-bottom:12px;">
+    <span style="font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;">🛰 資料請求 · VDF ENGINES</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">TWSE→rest</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#c4943a;border-radius:3px;padding:1px 6px;">SITCA→parse</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">MOPS→parse</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">yfinance→pyproc</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#c0584e;border-radius:3px;padding:1px 6px;">FactSet→keyed</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">FRED→keyed</span>
+    <span style="margin-left:auto;font:500 8px 'DM Mono',monospace;color:#9c9890;">request.json → VDF 擷取 → 雙重驗算 → Parquet → JSON</span>
+  </div>
+
+  <details data-contract="1" style="margin-bottom:12px;border:1px solid #dbd9d3;border-left:3px solid #1e1d1a;border-radius:3px;background:#fbfaf7;overflow:hidden;">
+    <summary style="cursor:pointer;user-select:none;padding:6px 13px;font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;list-style:none;">📜 引擎連接合約 · request.json（點擊展開 · 可選取複製）</summary>
+    <pre style="margin:0;padding:10px 13px;background:#1e1d1a;color:#cfe3d6;font:500 9px/1.55 'DM Mono',monospace;white-space:pre;overflow-x:auto;">{
+  "request": "ssot_regex_control",
+  "asof": "2026-06-22",
+  "universe": { "market": "TW", "exchange": ["TWSE","TPEX"] },
+  "sources": ["TWSE","TPEX","SITCA","MOPS","yfinance","FactSet","FRED"],
+  "engines": { "TWSE":"rest","TPEX":"rest","SITCA":"parse","MOPS":"parse","yfinance":"pyproc","FactSet":"keyed","FRED":"keyed" },
+  "range": { "start":"1996-01-01","end":"latest" },
+  "verify": "double_identity",
+  "db_discover": { "folder":"D:\\VDF\\databases\\","recursive":true,"match":["*.parquet","*.duckdb","*.db","*.csv"] },
+  "sink": { "parquet":"vdf/ssot_regex_control/","export":"ssot_regex_control.json" }
+}</pre>
+    <div style="padding:6px 13px;font:400 8px 'DM Sans','Noto Sans TC',sans-serif;color:#9c9890;">本檔即以此合約向 VDF 引擎請求 → 依 engines 分流(rest/parse/pyproc/keyed) → 雙重恆等驗算 → 落地 Parquet → 匯出 <b style="color:#6b6860;">ssot_regex_control.json</b> 覆蓋本頁資料源。</div>
+  </details>
+
+  <div style="display:grid;grid-template-columns:1fr 380px;gap:12px;align-items:start;">
+
+    <!-- LEFT · regex registry -->
+    <div>
+      <sc-for list="{{ rules }}" as="r" hint-placeholder-count="6">
+        <div style="border:1px solid var(--line);border-left:3px solid {{ r.color }};border-radius:2px;overflow:hidden;background:var(--paper);margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 11px;border-bottom:1px solid var(--line);background:var(--paper2);">
+            <span style="font:700 11px 'Syne',sans-serif;color:var(--ink);">{{ r.name }}</span>
+            <span style="font:500 8.5px 'DM Mono',monospace;color:var(--mut);">P{{ r.priority }}</span>
+            <span style="margin-left:auto;font:700 8px 'DM Mono',monospace;color:#fff;background:{{ r.lockCss }};padding:2px 7px;border-radius:2px;">{{ r.lockLabel }}</span>
+          </div>
+          <div style="padding:8px 11px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+              <span style="font:600 9px 'DM Mono',monospace;color:var(--mut);min-width:54px;">PATTERN</span>
+              <code style="flex:1;font:500 11px 'DM Mono',monospace;color:var(--co);background:var(--paper2);border:1px solid var(--line);border-radius:3px;padding:3px 7px;overflow:auto;white-space:nowrap;">{{ r.pattern }}</code>
+              <span onClick="{{ r.useTest }}" style="font:600 9px 'DM Mono',monospace;color:var(--accent);cursor:pointer;user-select:none;white-space:nowrap;">▸ 測試</span>
+            </div>
+            <div style="font:400 9.5px/1.5 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">{{ r.def }}</div>
+            <sc-if value="{{ r.hasNote }}">
+              <div style="font:400 9px/1.45 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);margin-top:3px;padding-left:9px;border-left:2px solid var(--soft);">{{ r.note }}</div>
+            </sc-if>
+            <sc-if value="{{ r.hasMap }}">
+              <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;">
+                <sc-for list="{{ r.maps }}" as="m" hint-placeholder-count="3">
+                  <span style="font:500 8.5px 'DM Mono',monospace;color:var(--ink2);background:var(--soft);border-radius:2px;padding:2px 7px;">{{ m }}</span>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-for>
+
+      <!-- filename parser priority chain -->
+      <div style="border:1px solid var(--line);border-left:3px solid var(--vi);border-radius:2px;overflow:hidden;background:var(--paper);">
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 11px;border-bottom:1px solid var(--line);background:var(--paper2);">
+          <span style="font:700 11px 'Syne',sans-serif;color:var(--ink);">檔名 Token 解析優先序</span>
+          <span style="margin-left:auto;font:700 8px 'DM Mono',monospace;color:#fff;background:var(--green);padding:2px 7px;border-radius:2px;">LOCKED</span>
+        </div>
+        <table style="width:100%;border-collapse:separate;border-spacing:0;">
+          <thead><tr>
+            <th style="text-align:center;padding:5px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">序</th>
+            <th style="text-align:left;padding:5px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">Type</th>
+            <th style="text-align:left;padding:5px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">Rule</th>
+            <th style="text-align:left;padding:5px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">註記</th>
+          </tr></thead>
+          <tbody>
+            <sc-for list="{{ tokens }}" as="t" hint-placeholder-count="5">
+              <tr style="background:{{ t.bg }};">
+                <td style="padding:4px 9px;border-top:1px solid var(--soft);text-align:center;font:600 10px 'DM Mono',monospace;color:var(--vi);">{{ t.priority }}</td>
+                <td style="padding:4px 9px;border-top:1px solid var(--soft);"><span style="font:700 8px 'DM Mono',monospace;color:#fff;background:var(--blue);border-radius:2px;padding:1px 6px;">{{ t.type }}</span></td>
+                <td style="padding:4px 9px;border-top:1px solid var(--soft);font:500 9px 'DM Mono',monospace;color:var(--co);">{{ t.rule }}</td>
+                <td style="padding:4px 9px;border-top:1px solid var(--soft);font:400 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">{{ t.note }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- broker list -->
+      <div style="border:1px solid var(--line);border-left:3px solid var(--blue);border-radius:2px;overflow:hidden;background:var(--paper);margin-top:8px;">
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 11px;border-bottom:1px solid var(--line);background:var(--paper2);">
+          <span style="font:700 11px 'Syne',sans-serif;color:var(--ink);">券商字典 Broker List</span>
+          <span style="margin-left:auto;font:600 8.5px 'DM Mono',monospace;color:var(--mut);background:var(--soft);padding:1px 7px;border-radius:2px;">正規化映射</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;padding:9px 11px;">
+          <sc-for list="{{ brokers }}" as="b" hint-placeholder-count="16">
+            <span style="font:500 9px 'DM Mono',monospace;color:var(--ink2);background:var(--soft);border-radius:2px;padding:2px 7px;">{{ b }}</span>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- rating + financial side by side -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">
+        <div style="border:1px solid var(--line);border-left:3px solid var(--co);border-radius:2px;overflow:hidden;background:var(--paper);">
+          <div style="padding:6px 11px;border-bottom:1px solid var(--line);background:var(--paper2);font:700 11px 'Syne',sans-serif;color:var(--ink);">評等字典 Rating</div>
+          <table style="width:100%;border-collapse:separate;border-spacing:0;">
+            <thead><tr>
+              <th style="text-align:left;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">評等</th>
+              <th style="text-align:center;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">方向</th>
+              <th style="text-align:center;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">分</th>
+            </tr></thead>
+            <tbody>
+              <sc-for list="{{ ratings }}" as="r" hint-placeholder-count="5">
+                <tr style="background:{{ r.bg }};">
+                  <td style="padding:4px 9px;border-top:1px solid var(--soft);font:600 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">{{ r.label }}</td>
+                  <td style="padding:4px 9px;border-top:1px solid var(--soft);text-align:center;"><span style="font:700 8px 'DM Mono',monospace;color:#fff;background:{{ r.color }};border-radius:2px;padding:1px 6px;">{{ r.dir }}</span></td>
+                  <td style="padding:4px 9px;border-top:1px solid var(--soft);text-align:center;font:600 9.5px 'DM Mono',monospace;color:var(--ink);">{{ r.score }}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+        <div style="border:1px solid var(--line);border-left:3px solid var(--ro);border-radius:2px;overflow:hidden;background:var(--paper);">
+          <div style="padding:6px 11px;border-bottom:1px solid var(--line);background:var(--paper2);font:700 11px 'Syne',sans-serif;color:var(--ink);">分析師欄位 Analyst</div>
+          <table style="width:100%;border-collapse:separate;border-spacing:0;">
+            <tbody>
+              <sc-for list="{{ analystFields }}" as="a" hint-placeholder-count="7">
+                <tr style="background:{{ a.bg }};">
+                  <td style="padding:4px 9px;border-top:1px solid var(--soft);font:600 9px 'DM Mono',monospace;color:var(--ink);white-space:nowrap;">{{ a.field }}</td>
+                  <td style="padding:4px 9px;border-top:1px solid var(--soft);font:400 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">{{ a.rule }}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- source field map -->
+      <div style="border:1px solid var(--line);border-left:3px solid var(--blue);border-radius:2px;overflow:hidden;background:var(--paper);margin-top:8px;">
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 11px;border-bottom:1px solid var(--line);background:var(--paper2);">
+          <span style="font:700 11px 'Syne',sans-serif;color:var(--ink);">資料來源欄位對照 Source Field Map</span>
+          <span style="margin-left:auto;font:600 8.5px 'DM Mono',monospace;color:var(--mut);background:var(--soft);padding:1px 7px;border-radius:2px;">TWSE · TPEX · MOPS · yfinance · 券商</span>
+        </div>
+        <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:separate;border-spacing:0;min-width:560px;">
+          <thead><tr>
+            <th style="text-align:left;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">正規欄位</th>
+            <th style="text-align:left;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">TWSE</th>
+            <th style="text-align:left;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">TPEX</th>
+            <th style="text-align:left;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">MOPS</th>
+            <th style="text-align:left;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">yfinance</th>
+            <th style="text-align:left;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">券商報告</th>
+          </tr></thead>
+          <tbody>
+            <sc-for list="{{ srcMap }}" as="m" hint-placeholder-count="10">
+              <tr style="background:{{ m.bg }};">
+                <td style="padding:4px 9px;border-top:1px solid var(--soft);font:600 8.5px 'DM Mono',monospace;color:var(--co);white-space:nowrap;">{{ m.key }}</td>
+                <td style="padding:4px 9px;border-top:1px solid var(--soft);font:400 8.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">{{ m.twse }}</td>
+                <td style="padding:4px 9px;border-top:1px solid var(--soft);font:400 8.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">{{ m.tpex }}</td>
+                <td style="padding:4px 9px;border-top:1px solid var(--soft);font:400 8.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">{{ m.mops }}</td>
+                <td style="padding:4px 9px;border-top:1px solid var(--soft);font:500 8px 'DM Mono',monospace;color:var(--gn);">{{ m.yf }}</td>
+                <td style="padding:4px 9px;border-top:1px solid var(--soft);font:400 8.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">{{ m.rpt }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+        </div>
+      </div>
+
+      <!-- accounting/financial synonym engine -->
+      <div style="border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:2px;overflow:hidden;background:var(--paper);margin-top:8px;">
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 11px;border-bottom:1px solid var(--line);background:var(--paper2);">
+          <span style="font:700 11px 'Syne',sans-serif;color:var(--ink);">會計/財務 同義字 Synonym Engine</span>
+          <span style="margin-left:auto;font:600 8.5px 'DM Mono',monospace;color:var(--mut);background:var(--soft);padding:1px 7px;border-radius:2px;">中/英/API 別名 → 正規欄位</span>
+        </div>
+        <table style="width:100%;border-collapse:separate;border-spacing:0;">
+          <thead><tr>
+            <th style="text-align:left;padding:5px 10px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">正規欄位</th>
+            <th style="text-align:left;padding:5px 10px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">同義字 regex</th>
+            <th style="text-align:left;padding:5px 10px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">計算 / 驗算</th>
+          </tr></thead>
+          <tbody>
+            <sc-for list="{{ syn }}" as="s" hint-placeholder-count="17">
+              <tr style="background:{{ s.bg }};">
+                <td style="padding:4px 10px;border-top:1px solid var(--soft);vertical-align:top;"><span style="font:600 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">{{ s.canon }}</span> <span style="font:500 7.5px 'DM Mono',monospace;color:var(--mut2);">{{ s.cat }}</span></td>
+                <td style="padding:4px 10px;border-top:1px solid var(--soft);vertical-align:top;"><code style="font:500 8px 'DM Mono',monospace;color:var(--co);word-break:break-all;">{{ s.pattern }}</code></td>
+                <td style="padding:4px 10px;border-top:1px solid var(--soft);vertical-align:top;"><span style="font:500 8.5px 'DM Mono',monospace;color:var(--ink);">{{ s.formula }}</span><br><span style="font:400 8px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">{{ s.verify }}</span></td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- valuation methods list -->
+      <div style="border:1px solid var(--line);border-left:3px solid var(--co);border-radius:2px;overflow:hidden;background:var(--paper);margin-top:8px;">
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 11px;border-bottom:1px solid var(--line);background:var(--paper2);">
+          <span style="font:700 11px 'Syne',sans-serif;color:var(--ink);">估值方法 Valuation Methods</span>
+          <span style="margin-left:auto;font:600 8.5px 'DM Mono',monospace;color:var(--mut);background:var(--soft);padding:1px 7px;border-radius:2px;">中/英 · 公式</span>
+        </div>
+        <table style="width:100%;border-collapse:separate;border-spacing:0;">
+          <thead><tr>
+            <th style="text-align:left;padding:5px 10px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">中文</th>
+            <th style="text-align:left;padding:5px 10px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">English</th>
+            <th style="text-align:left;padding:5px 10px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">公式</th>
+            <th style="text-align:center;padding:5px 10px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">類</th>
+          </tr></thead>
+          <tbody>
+            <sc-for list="{{ valMethods }}" as="v" hint-placeholder-count="14">
+              <tr style="background:{{ v.bg }};">
+                <td style="padding:4px 10px;border-top:1px solid var(--soft);font:600 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">{{ v.zh }}</td>
+                <td style="padding:4px 10px;border-top:1px solid var(--soft);font:500 9px 'DM Mono',monospace;color:var(--ink);">{{ v.en }}</td>
+                <td style="padding:4px 10px;border-top:1px solid var(--soft);font:500 8.5px 'DM Mono',monospace;color:var(--mut);">{{ v.formula }}</td>
+                <td style="padding:4px 10px;border-top:1px solid var(--soft);text-align:center;"><span style="font:700 8px 'DM Mono',monospace;color:#fff;background:{{ v.clsCss }};border-radius:2px;padding:1px 6px;">{{ v.cls }}</span></td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- valuation close-price rule -->
+      <div style="border:1px solid var(--line);border-left:3px solid var(--am);border-radius:2px;background:var(--paper);padding:8px 11px;margin-top:8px;font:400 9.5px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">
+        <b style="color:var(--ink);">評價分析 · 取價規則：</b>最新數據 → 用<b style="color:var(--co);">最新收盤 latest Close</b>；報告上的數值 → 用<b style="color:var(--co);">報告日期「前一個交易日」收盤 prior-trading-day Close</b>（避免用到報告當日盤中/未定價）。PE / PB / EV/EBITDA / 殖利率皆依此取價。
+      </div>
+
+      <!-- double cross-check verification -->
+      <div style="border:1px solid var(--line);border-left:3px solid var(--vi);border-radius:2px;overflow:hidden;background:var(--paper);margin-top:8px;">
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 11px;border-bottom:1px solid var(--line);background:var(--paper2);">
+          <span style="font:700 11px 'Syne',sans-serif;color:var(--ink);">雙重驗算 Cross-Check</span>
+          <span style="margin-left:auto;font:600 8.5px 'DM Mono',monospace;color:var(--mut);background:var(--soft);padding:1px 7px;border-radius:2px;">每值 2 加減 + 2 除法</span>
+        </div>
+        <table style="width:100%;border-collapse:separate;border-spacing:0;">
+          <thead><tr>
+            <th style="text-align:left;padding:5px 10px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">值</th>
+            <th style="text-align:left;padding:5px 10px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">加減驗算 ×2</th>
+            <th style="text-align:left;padding:5px 10px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">除法驗算 ×2</th>
+          </tr></thead>
+          <tbody>
+            <tr style="background:var(--paper);"><td style="padding:4px 10px;border-top:1px solid var(--soft);font:600 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">營收 Revenue</td><td style="padding:4px 10px;border-top:1px solid var(--soft);font:500 8.5px 'DM Mono',monospace;color:var(--ink);">毛利 + 營業成本 ; Σ各季營收</td><td style="padding:4px 10px;border-top:1px solid var(--soft);font:500 8.5px 'DM Mono',monospace;color:var(--ink);">毛利 ÷ 毛利率 ; 每股營收 ÷? × 股數</td></tr>
+            <tr style="background:#f6f4ef;"><td style="padding:4px 10px;border-top:1px solid var(--soft);font:600 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">毛利 Gross Profit</td><td style="padding:4px 10px;border-top:1px solid var(--soft);font:500 8.5px 'DM Mono',monospace;color:var(--ink);">營收 − 營業成本 ; 營業利益 + 營業費用</td><td style="padding:4px 10px;border-top:1px solid var(--soft);font:500 8.5px 'DM Mono',monospace;color:var(--ink);">毛利率 × 營收 ; 營收 × (1−成本率)</td></tr>
+            <tr style="background:var(--paper);"><td style="padding:4px 10px;border-top:1px solid var(--soft);font:600 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">營業利益 OpInc</td><td style="padding:4px 10px;border-top:1px solid var(--soft);font:500 8.5px 'DM Mono',monospace;color:var(--ink);">毛利 − 營業費用 ; 稅前 − 業外損益</td><td style="padding:4px 10px;border-top:1px solid var(--soft);font:500 8.5px 'DM Mono',monospace;color:var(--ink);">營業利益率 × 營收 ; EBIT 對齊</td></tr>
+            <tr style="background:#f6f4ef;"><td style="padding:4px 10px;border-top:1px solid var(--soft);font:600 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">淨利 Net Income</td><td style="padding:4px 10px;border-top:1px solid var(--soft);font:500 8.5px 'DM Mono',monospace;color:var(--ink);">稅前淨利 − 所得稅 ; 營業利益 + 業外 − 稅</td><td style="padding:4px 10px;border-top:1px solid var(--soft);font:500 8.5px 'DM Mono',monospace;color:var(--ink);">淨利率 × 營收 ; ROE × 平均權益</td></tr>
+            <tr style="background:var(--paper);"><td style="padding:4px 10px;border-top:1px solid var(--soft);font:600 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">EPS</td><td style="padding:4px 10px;border-top:1px solid var(--soft);font:500 8.5px 'DM Mono',monospace;color:var(--ink);">Σ各季EPS ; 期初+成長額</td><td style="padding:4px 10px;border-top:1px solid var(--soft);font:500 8.5px 'DM Mono',monospace;color:var(--ink);">淨利 ÷ 加權股數 ; BVPS × ROE</td></tr>
+            <tr style="background:#f6f4ef;"><td style="padding:4px 10px;border-top:1px solid var(--soft);font:600 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">總資產 Assets</td><td style="padding:4px 10px;border-top:1px solid var(--soft);font:500 8.5px 'DM Mono',monospace;color:var(--ink);">總負債 + 股東權益 ; 流動 + 非流動</td><td style="padding:4px 10px;border-top:1px solid var(--soft);font:500 8.5px 'DM Mono',monospace;color:var(--ink);">營收 ÷ 資產周轉 ; 淨利 ÷ ROA</td></tr>
+            <tr style="background:var(--paper);"><td style="padding:4px 10px;border-top:1px solid var(--soft);font:600 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">FCF</td><td style="padding:4px 10px;border-top:1px solid var(--soft);font:500 8.5px 'DM Mono',monospace;color:var(--ink);">CFO − CapEx ; 淨利 + 折舊 − ΔWC − CapEx</td><td style="padding:4px 10px;border-top:1px solid var(--soft);font:500 8.5px 'DM Mono',monospace;color:var(--ink);">FCF/股 × 股數 ; FCF 殖利率 × 市值</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- financial data + verification -->
+      <div style="border:1px solid var(--line);border-left:3px solid var(--gn);border-radius:2px;overflow:hidden;background:var(--paper);margin-top:8px;">
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 11px;border-bottom:1px solid var(--line);background:var(--paper2);">
+          <span style="font:700 11px 'Syne',sans-serif;color:var(--ink);">財務數據 · 驗證方法</span>
+          <span style="margin-left:auto;font:600 8.5px 'DM Mono',monospace;color:var(--mut);background:var(--soft);padding:1px 7px;border-radius:2px;">multi-source verify</span>
+        </div>
+        <table style="width:100%;border-collapse:separate;border-spacing:0;">
+          <thead><tr>
+            <th style="text-align:left;padding:5px 10px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">欄位</th>
+            <th style="text-align:left;padding:5px 10px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">P1 來源</th>
+            <th style="text-align:left;padding:5px 10px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">驗證方法</th>
+          </tr></thead>
+          <tbody>
+            <sc-for list="{{ finFields }}" as="f" hint-placeholder-count="8">
+              <tr style="background:{{ f.bg }};">
+                <td style="padding:4px 10px;border-top:1px solid var(--soft);font:600 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">{{ f.field }}</td>
+                <td style="padding:4px 10px;border-top:1px solid var(--soft);font:500 9px 'DM Mono',monospace;color:var(--blue);">{{ f.src }}</td>
+                <td style="padding:4px 10px;border-top:1px solid var(--soft);font:400 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">{{ f.verify }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RIGHT · live tester (sticky) -->
+    <div style="position:sticky;top:14px;">
+      <div style="border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--paper);box-shadow:0 2px 8px rgba(31,42,42,.07);margin-bottom:10px;">
+        <div style="font:700 10px 'DM Mono',monospace;letter-spacing:.5px;color:#fff;background:var(--ink);padding:6px 11px;">即時測試 REGEX TESTER</div>
+        <div style="padding:11px;">
+          <div style="font:600 9px 'DM Mono',monospace;color:var(--mut);margin-bottom:4px;">測試對象 · {{ activeName }}</div>
+          <code style="display:block;font:500 10px 'DM Mono',monospace;color:var(--co);background:var(--paper2);border:1px solid var(--line);border-radius:3px;padding:5px 8px;margin-bottom:9px;overflow:auto;white-space:nowrap;">{{ activePattern }}</code>
+
+          <div style="font:600 9px 'DM Mono',monospace;color:var(--mut);margin-bottom:4px;">檔案位置輸入 · 拖曳 / 手動貼上</div>
+          <div onDrop="{{ onDrop }}" onDragOver="{{ onDragOver }}" onDragLeave="{{ onDragLeave }}" style="border:1.5px dashed var(--line);border-radius:4px;padding:9px;text-align:center;margin-bottom:7px;transition:background .12s;{{ dropCss }}">
+            <div style="font:600 9.5px 'DM Mono',monospace;color:var(--mut);">⤓ 拖曳檔案到此（讀檔名 → 解析）</div>
+            <div style="font:400 8px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut2);margin-top:2px;">WINDOW I/O · 或下方手動貼上檔名 / 路徑 / 字串</div>
+            <sc-if value="{{ hasDrop }}"><div style="font:600 9px 'DM Mono',monospace;color:var(--accent);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">📄 {{ dropName }}</div></sc-if>
+          </div>
+          <input value="{{ testInput }}" onInput="{{ onInput }}" placeholder="2330 · 20250822 · 2330_20250822_TWSE.pdf" style="width:100%;font:500 11px 'DM Mono',monospace;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:6px 8px;margin-bottom:9px;">
+
+          <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:3px;margin-bottom:9px;{{ resultBoxCss }}">
+            <span style="font:800 14px 'DM Mono',monospace;color:#fff;">{{ resultIcon }}</span>
+            <div>
+              <div style="font:700 11px 'Syne',sans-serif;color:#fff;">{{ resultLabel }}</div>
+              <div style="font:500 8.5px 'DM Mono',monospace;color:rgba(255,255,255,.85);">{{ resultSub }}</div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:7px;padding:5px 9px;border-radius:3px;margin-bottom:9px;{{ synHitCss }}">
+            <span style="font:700 8px 'DM Mono',monospace;color:#fff;">同義字</span>
+            <span style="font:600 9.5px 'DM Mono',monospace;color:#fff;">{{ synHitLabel }}</span>
+          </div>
+          <div style="font:600 9px 'DM Mono',monospace;color:var(--mut);margin-bottom:5px;">檔名 Token 分類結果</div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <sc-for list="{{ tokenHits }}" as="h" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:7px;padding:4px 8px;background:var(--paper2);border:1px solid var(--line);border-radius:3px;">
+                <span style="font:700 8px 'DM Mono',monospace;color:#fff;background:{{ h.color }};border-radius:2px;padding:1px 6px;">{{ h.type }}</span>
+                <span style="font:600 10px 'DM Mono',monospace;color:var(--ink);">{{ h.token }}</span>
+                <span style="margin-left:auto;font:500 8.5px 'DM Mono',monospace;color:var(--mut);">{{ h.detail }}</span>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noHits }}">
+              <div style="font:400 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut2);padding:3px 2px;">無 token 命中。</div>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+
+      <div style="border:1px solid var(--line);border-left:3px solid var(--am);border-radius:3px;background:var(--paper);padding:9px 11px;font:400 9.5px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">
+        <b style="color:var(--ink);">衝突政策：</b>檔名 / PDF / VDF 宇宙不一致 → <span style="color:var(--amber);font-weight:700;">YELLOW_REVIEW</span>。<br><b style="color:var(--ink);">禁止：</b>因 yfinance 抓不到就竄改 TW_TICKER；僅可 fallback / 標記複查。
+      </div>
+    </div>
+
+  </div>
+
+  <footer style="margin-top:20px;border-top:1px solid var(--line);padding-top:11px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font:500 10px 'DM Mono',monospace;color:var(--mut);">
+    <span style="font-weight:700;letter-spacing:1.3px;color:var(--ink);">VERITAS INTELLIGENCE ANALYTICS</span>
+    <span>SSOT · Regex Control · immutable · append-only</span>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{ &quot;$preview&quot;: { &quot;width&quot;: 1280, &quot;height&quot;: 880 } }">
+class Component extends DCLogic {
+  state = { input: '2330_20250822_TWSE.pdf', active: 'tw_ticker', dragging: false };
+
+  _rules() {
+    return [
+      { id: 'tw_ticker', name: 'TW_TICKER', pattern: '^[1-9][0-9]{3}$', priority: 3, color: 'var(--co)',
+        def: '四位數字、首位非 0（台股原始代碼）。同一報告三碼前四位必相同。', note: 'TW_TICKER = 共同核心；YFINANCE / BLOOMBERG 皆由此四碼衍生。2021–2030 需語境判定。',
+        maps: ['核心 → XXXX', '→ XXXX.TW/.TWO', '→ XXXX TT'], locked: true },
+      { id: 'date8', name: 'DATE8 西元日期', pattern: '^(19|20)[0-9]{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])$', priority: 1, color: 'var(--blue)',
+        def: 'YYYYMMDD 八位日期（最高優先，先排除）。', note: '例：20250822 是日期，不是代號。', maps: [], locked: true },
+      { id: 'roc_date', name: 'ROC 民國日期', pattern: '^(0?[0-9]{2,3})(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])$', priority: 2, color: 'var(--teal)',
+        def: '民國年/月/日 → 轉西元。', note: 'ROC 年 + 1911 = 西元年。', maps: [], locked: true },
+      { id: 'yf_tw', name: 'TW_YFINANCE_TICKER', pattern: '^[1-9][0-9]{3}\\.(TW|TWO)$', priority: 4, color: 'var(--gn)',
+        def: '前四碼 = TW_TICKER；上市 .TW / 上櫃 .TWO；unknown 兩者都試。', note: '驗證用，禁止反寫覆蓋 TW_TICKER。前四碼須與 TW_TICKER 一致。', maps: ['XXXX.TW', 'XXXX.TWO'], locked: true },
+      { id: 'bbg', name: 'TW_BLOOMBERG_TICKER', pattern: '^[1-9][0-9]{3}\\sTT$', priority: 5, color: 'var(--vi)',
+        def: '前四碼 = TW_TICKER + " TT"。', note: '前四碼須與 TW_TICKER 一致（同報告三碼共用核心）。', maps: ['XXXX TT'], locked: true },
+      { id: 'report_date', name: '報告日期 Report Date', pattern: '\\b(19|20)[0-9]{2}[-/.](0[1-9]|1[0-2])[-/.](0[1-9]|[12][0-9]|3[01])\\b', priority: 6, color: 'var(--teal)',
+        def: '報告數據跟隨此日期（broker PDF 內文日期 = 數據時點錨）。', note: '報告日早於資料時點 → 標記過時複查。', maps: [], locked: true },
+      { id: 'iso_date', name: '日期顯示 YYYY-MM-DD', pattern: '^(19|20)\\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$', priority: 7, color: 'var(--blue)',
+        def: '顯式顯示一律 YYYY-MM-DD；年份補零四位。', note: '跑資料前先把 YYMMDD / 民國 / FY / 季 全部正規化成標準再運算。', maps: ['250312 → 2025-03-12', 'FY25e → 2025'], locked: true },
+      { id: 'ym', name: '年月 YYYY-MM', pattern: '^(19|20)\\d{2}-(0[1-9]|1[0-2])$', priority: 8, color: 'var(--teal)',
+        def: '月資料顯示 YYYY-MM；季資料顯示 1Q23。', note: '月→YYYY-MM；季→nQyy（如 1Q23）；日→YYYY-MM-DD。', maps: ['2025Q1 → 1Q25', '2023-01 → YYYY-MM'], locked: true },
+      { id: 'target_price', name: '目標價 Target Price', pattern: '(?:目標價|TP|Target)\\D{0,4}([0-9]{1,4}(?:\\.[0-9]{1,2})?)', priority: 7, color: 'var(--co)',
+        def: '擷取目標價數字。', note: 'NEVER overwritten；yfinance 共識僅供對照。', maps: [], locked: true },
+      { id: 'email', name: 'E-mail', pattern: '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$', priority: 8, color: 'var(--blue)',
+        def: '分析師聯絡信箱。', note: '', maps: [], locked: false },
+      { id: 'tel', name: '電話 Tel', pattern: '^(\\+886-?|0)[2-9][0-9]{7,8}$', priority: 9, color: 'var(--gn)',
+        def: '券商/分析師電話（台灣）。', note: '行動 09xxxxxxxx；市話 0[2-8]。', maps: [], locked: false },
+      { id: 'date6', name: '短日期 YYMMDD', pattern: '^[0-9]{6}$', priority: 10, color: 'var(--teal)',
+        def: '六位 → 20YYMMDD（250312 → 20250312）。', note: '與 ROC 六碼衝突時西元優先（25→2025）；補世紀後交 DATE8 驗證。', maps: [], locked: true },
+      { id: 'fy', name: '會計年度 FY', pattern: 'FY\\s?\\d{2,4}[eEfF]?', priority: 11, color: 'var(--am)',
+        def: 'FY25e / FY2025 → 2025（e=估計、f=預測）。', note: '去 FY 前綴、補世紀、去 e/f 標記 → 純年。', maps: ['FY25e → 2025', 'FY2025 → 2025'], locked: true },
+      { id: 'quarter', name: '季別 Quarter', pattern: '((20)?\\d{2}\\s?Q[1-4]|[1-4]Q\\s?(20)?\\d{2})', priority: 12, color: 'var(--vi)',
+        def: '2025Q1 / 25Q1 / 1Q25 / 1Q2025 → 正規 1Q25。', note: '統一輸出 nQyy（季在前、兩位年）。', maps: ['2025Q1 → 1Q25', '1Q2025 → 1Q25'], locked: true },
+      { id: 'email_parse', name: '信箱結構 Name@Broker', pattern: '^([A-Za-z][A-Za-z.\\-]+)@([A-Za-z0-9.\\-]+\\.[A-Za-z]{2,})$', priority: 13, color: 'var(--blue)',
+        def: '@前 = 英文姓名（分析師）· @後 = 券商網域（broker）。', note: 'first.last@broker.com → Analyst 名 + Broker 字典反查網域。', maps: [], locked: false },
+      { id: 'name_en', name: '英文姓名 EN Name', pattern: '^[A-Z][a-z]+(?:[\\s.\\-][A-Z][a-z]*\\.?){1,2}$', priority: 14, color: 'var(--ro)',
+        def: 'First Last / First M. Last（分析師英文姓名）。', note: 'email @前亦常為 first.last；對應 Analyst 欄位。', maps: ['John Smith', 'Mei-Ling Chen'], locked: false },
+      { id: 'name_zh', name: '中文姓名 ZH Name', pattern: '^[\\u4e00-\\u9fa5]{2,4}$', priority: 15, color: 'var(--vi)',
+        def: '2–4 個中文字（分析師中文姓名）。', note: '複姓如「歐陽」可達 4 字；對應 Analyst 欄位。', maps: ['陳美玲', '歐陽志明'], locked: false },
+      { id: 'htmlencode', name: 'HtmlEncode 編碼', pattern: '[System.Net.WebUtility]::HtmlEncode', priority: 6, color: 'var(--am)',
+        def: '所有寫入 HTML 的文字一律經此編碼（PowerShell）。', note: 'UTF-8 no-BOM 輸出。', maps: [], locked: true },
+    ];
+  }
+  _tokens() {
+    return [
+      { type: 'date8', rule: 'YYYYMMDD', priority: 1, note: 'e.g. 20250822 是日期，非代號。' },
+      { type: 'roc_date', rule: 'ROC 年/月/日', priority: 2, note: '轉西元。' },
+      { type: 'ticker4', rule: '^[1-9][0-9]{3}$', priority: 3, note: '2021-2030 需語境檢查。' },
+      { type: 'broker', rule: 'broker alias dictionary', priority: 4, note: '券商別名字典。' },
+    ];
+  }
+
+  _classifyToken(tok) {
+    if (/^(19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])$/.test(tok)) return { type: 'date8', color: 'var(--blue)', detail: '西元日期' };
+    if (/^\d{6,7}$/.test(tok)) { const roc = +tok.slice(0, tok.length - 4); if (roc >= 80 && roc <= 199) return { type: 'roc_date', color: 'var(--teal)', detail: '民國 ' + roc + ' → ' + (roc + 1911) }; }
+    if (/^[1-9]\d{3}$/.test(tok)) {
+      const yr = +tok;
+      if (yr >= 2021 && yr <= 2030) return { type: 'ticker4?', color: 'var(--am)', detail: '⚠ 與年份衝突·需語境' };
+      return { type: 'ticker4', color: 'var(--co)', detail: 'TW_TICKER' };
+    }
+    return null;
+  }
+
+  renderVals() {
+    const rules = this._rules();
+    const active = rules.find(r => r.id === this.state.active) || rules[0];
+    const input = this.state.input || '';
+
+    const r2 = rules.map(r => ({
+      name: r.name, pattern: r.pattern, priority: r.priority, color: r.color, def: r.def,
+      note: r.note, hasNote: !!r.note, maps: r.maps, hasMap: r.maps.length > 0,
+      lockLabel: r.locked ? 'LOCKED' : 'EDIT', lockCss: r.locked ? 'var(--green)' : 'var(--mut2)',
+      useTest: () => this.setState({ active: r.id }),
+    }));
+    const tokens = this._tokens().map((t, i) => ({ ...t, bg: i % 2 ? '#f6f4ef' : 'var(--paper)' }));
+
+    const brokers = ['摩根士丹利 MS', '高盛 GS', '摩根大通 JPM', '瑞銀 UBS', '美銀 BofA', '野村 Nomura', '花旗 Citi', '麥格理 MQ', '瑞信 CS', '德意志 DB', '巴克萊 Barclays', '凱基 KGI·kgi', '元大 Yuanta·yuanta', '富邦 Fubon·fubon', '群益 Capital·capital', '統一 PSC·pscnet', '國泰 Cathay·cathaysec', '永豐金 SinoPac·sinopac', '中信 CTBC·ctbcsec', '日盛 Jih Sun', '兆豐 Mega', '第一金 FirstCapital', '華南永昌 Entrust', '台新 Taishin'];
+    const ratings = [
+      ['Buy / 買進', '正向', '5', 'var(--up)'], ['Overweight / 加碼', '正向', '4', 'var(--up)'],
+      ['Neutral / 中立 / Hold', '中性', '3', 'var(--am)'], ['Underweight / 減碼', '負向', '2', 'var(--down)'],
+      ['Sell / 賣出 / Reduce', '負向', '1', 'var(--down)'],
+    ].map((r, i) => ({ label: r[0], dir: r[1], score: r[2], color: r[3], bg: i % 2 ? '#f6f4ef' : 'var(--paper)' }));
+    const finFields = [
+      ['基本每股盈餘 Basic EPS', '稅後淨利 ÷ 加權平均流通股數', '財報 vs 市場預估'],
+      ['稀釋每股盈餘 Diluted EPS', '計入可轉債/選擇權等潛在稀釋', '財報 vs Basic 差異檢查'],
+      ['本益比 PE', 'price ÷ EPS(TTM)', '標明 Basic/Diluted · 自算 vs yf'],
+      ['ROA', '稅後淨利 ÷ 平均資產', '資產 = (期初+期末)/2'],
+      ['ROE', '稅後淨利 ÷ 平均股東權益', '權益 = (期初+期末)/2'],
+      ['資產周轉 Asset Turnover', '營收 ÷ 平均資產', '平均 = (期初+期末)/2'],
+      ['營收 Revenue', '月營收 MOPS / 公司', 'MOPS 法說 vs yfinance'],
+      ['毛利率 GM%', '財報', '財報交叉'],
+      ['目標價 TP', 'broker PDF', 'NEVER overwrite · yf 共識參考'],
+      ['評等 Rating', 'broker PDF', 'rating 字典映射'],
+      ['股利 Dividend', '公司公告 / TWSE', '除息日對齊'],
+    ].map((r, i) => ({ field: r[0], src: r[1], verify: r[2], bg: i % 2 ? '#f6f4ef' : 'var(--paper)' }));
+    const analystFields = [
+      ['Analyst', '分析師姓名', 'broker PDF'], ['Broker', '所屬券商', '券商字典正規化'],
+      ['Coverage', '涵蓋標的', 'TW_TICKER'], ['Rating', '評等', 'rating 字典'],
+      ['Target Price', '目標價', '數字擷取 · 不覆蓋'], ['Report Date', '報告日', 'date regex 錨'],
+      ['E-mail / Tel', '聯絡方式', 'email / tel regex'],
+    ].map((r, i) => ({ field: r[0], desc: r[1], rule: r[2], bg: i % 2 ? '#f6f4ef' : 'var(--paper)' }));
+
+    // 會計/財務 同義字引擎 — canonical → synonyms(regex) → formula/verify
+    const syn = [
+      ['REVENUE', '營業收入 Revenue', '營業收入|營收|合併營收|總營收|Operating\\s*Revenue|Total\\s*Revenue|Net\\s*Sales|Top\\s*Line|revenue|totalRevenue', '損益', '—', '月營收 MOPS vs 財報 vs yfinance'],
+      ['COGS', '營業成本 Cost of Revenue', '營業成本|銷貨成本|直接成本|COGS|Cost\\s*of\\s*(Revenue|Goods\\s*Sold)|costOfRevenue', '損益', '—', '財報交叉'],
+      ['GROSS_PROFIT', '營業毛利 Gross Profit', '營業毛利|毛利額?|Gross\\s*Profit|grossProfit', '損益', '營收 − 營業成本', '自算 vs 財報'],
+      ['NET_INCOME', '本期純益 Net Income', '本期純益|稅後淨利|淨利|純益|Net\\s*Income|Net\\s*Profit|Earnings|netIncome', '損益', '—', '財報 vs 市場預估'],
+      ['PRETAX_S', '稅前純益 Pre-tax Income', '稅前純益|稅前(淨)?益|稅前淨利|Pre.?tax\\s*(Income|Profit)|EBT|pretaxIncome', '損益表', '營業利益 + 業外損益', '財報交叉'],
+      ['NONOP', '業外損益 Non-operating', '業外損益|營業外(收入|支出|損益)|Non.?operating\\s*(Income|Items?|Profit)?|nonOperating', '損益表', '稅前純益 − 營業利益', '財報交叉'],
+      ['FX_PL', '匯兌損益 FX Gain/Loss', '匯兌損益|兌換損益|外幣兌換(損益)?|匯損|匯益|(Foreign\\s*Exchange|FX)\\s*(Gain|Loss|Gain/Loss)?', '損益表', '業外損益之一', '財報附註交叉'],
+      ['SH_EQUITY', '股東權益 Equity', '股東權益(總額)?|權益合計|淨值|Shareholders.?\\s*Equity|totalEquity', '資產負債', '—', '財報交叉'],
+      ['BASIC_EPS', '基本每股盈餘 Basic EPS', 'Basic\\s*EPS|基本每股盈餘|基本EPS|EPS\\s*\\(\\s*Basic\\s*\\)|EPSb|basicEPS', '每股', '淨利 ÷ 加權平均股數', '財報 vs 預估'],
+      ['DILUTED_EPS', '稀釋每股盈餘 Diluted EPS', 'Diluted\\s*EPS|稀釋每股盈餘|稀釋後?EPS|完全稀釋每股盈餘|dilutedEPS', '每股', '淨利 ÷ (加權股數 + 稀釋證券)', 'vs Basic 差異檢查'],
+      ['BVPS', '每股淨值 BVPS', '每股淨值|每股帳面價值|每股股東權益|BVPS|bookValue', '每股', '股東權益 ÷ 流通股數', '財報交叉'],
+      ['ROE', '股東權益報酬率 ROE', 'ROE|權益報酬率|淨值報酬率|股東權益(收益|報酬)率|returnOnEquity', '獲利能力', '淨利 ÷ 平均股東權益 ×100%', '權益=(期初+期末)/2'],
+      ['ROA', '資產報酬率 ROA', 'ROA|資產報酬率|總資產報酬率|returnOnAssets', '獲利能力', '淨利 ÷ 平均總資產 ×100%', '資產=(期初+期末)/2'],
+      ['ASSET_TO', '資產周轉率 Asset Turnover', '資產周轉率?|Asset\\s*Turnover|總資產周轉', '營運能力', '營收 ÷ 平均總資產', '平均=(期初+期末)/2'],
+      ['GM', '毛利率 Gross Margin', '毛利率|營業毛利率|毛利潤率|Gross\\s*(Profit\\s*)?Margin|grossMargin', '獲利能力', '毛利 ÷ 營收 ×100%', '自算'],
+      ['OPM', '營業利益率 Operating Margin', '營業利益率|營業淨利率|營運利益率|EBIT\\s*Margin|operatingMargin', '獲利能力', '營業利益 ÷ 營收 ×100%', '自算'],
+      ['NM', '淨利率 Net Margin', '淨利率|稅後淨利率|純益率|Net\\s*(Profit\\s*)?Margin|netMargin', '獲利能力', '淨利 ÷ 營收 ×100%', '自算'],
+      ['DE', '負債權益比 D/E', '負債權益比|負債比率?|Debt.?to.?Equity|D/E', '償債能力', '總負債 ÷ 股東權益', '財報交叉'],
+      ['PS', '股價營收比 P/S', '股價營收比|市價營收比|P/?S(\\s*Ratio)?|PSR|priceToSales', '估值', '市值 ÷ 年營收', '自算 vs yf'],
+      ['WAS', '加權平均股數 WAS', '加權平均股數|Weighted\\s*Average\\s*Shares', '股數', 'Σ 各期股數 × 時間權重', '財報'],
+      ['DPS', '每股股利 Dividend Per Share', '每股股利|每股(現金)?股息|現金股利|配息|Dividend\\s*Per\\s*Share|DPS|dividendRate', '每股', '股利總額 ÷ 流通股數', '公司公告 / TWSE 除息'],
+      ['DIV_PAID', '股利發放總額 Dividends Paid', '股利發放(總額)?|發放(現金)?股利|配發股利|Dividends?\\s*Paid|dividendsPaid', '現金流量表', 'DPS × 流通股數', '現金流量(籌資) 交叉'],
+      ['OP_INCOME', '營業利益 Operating Income', '營業利益|營業淨利|Operating\\s*Income|EBIT|operatingIncome', '損益表', '毛利 − 營業費用', '財報交叉'],
+      ['OPEX', '營業費用 OpEx', '營業費用|管銷研費用|Operating\\s*Expenses?|opEx', '損益表', '銷管 + 研發', '財報交叉'],
+      ['PRETAX', '稅前淨利 Pre-tax Income', '稅前淨利|稅前(純)?益|Pre.?tax\\s*Income|EBT|pretaxIncome', '損益表', '營業利益 + 業外損益', '財報交叉'],
+      ['TOTAL_ASSETS', '總資產 Total Assets', '總資產|資產總(額|計)|Total\\s*Assets|totalAssets', '資產負債表', '流動 + 非流動資產', '= 負債 + 權益'],
+      ['TOTAL_LIAB', '總負債 Total Liabilities', '總負債|負債總(額|計)|Total\\s*Liabilities|totalLiab', '資產負債表', '流動 + 非流動負債', '= 資產 − 權益'],
+      ['CFO', '營業現金流 CFO', '營業(活動)?現金流(量)?|Operating\\s*Cash\\s*Flow|CFO|operatingCashflow', '現金流量表', '淨利 + 折舊攤提 ± 營運資金', '現金流量表'],
+      ['CFI', '投資現金流 CFI', '投資(活動)?現金流(量)?|Investing\\s*Cash\\s*Flow|CFI', '現金流量表', '— ', '現金流量表'],
+      ['CFF', '籌資現金流 CFF', '籌資(活動)?現金流(量)?|Financing\\s*Cash\\s*Flow|CFF', '現金流量表', '— ', '現金流量表'],
+      ['CAPEX', '資本支出 CapEx', '資本支出|Capital\\s*Expenditures?|CapEx|capitalExpenditures', '現金流量表', '購置固定資產', '現金流量表'],
+      ['FCF', '自由現金流 FCF', '自由現金流(量)?|Free\\s*Cash\\s*Flow|FCF|freeCashflow', '現金流量表', 'CFO − CapEx', '自算'],
+      ['PE', '本益比 P/E', '本益比|P/?E(\\s*Ratio)?|priceToEarnings|peRatio', '評價', 'Price ÷ EPS', 'close 規則 · 自算 vs yf'],
+      ['PB', '股價淨值比 P/B', '股價淨值比|P/?B(\\s*Ratio)?|priceToBook', '評價', 'Price ÷ BVPS', 'close 規則 · 自算'],
+      ['EV_EBITDA', 'EV/EBITDA', 'EV\\s*/\\s*EBITDA|企業價值倍數', '評價', '(市值+淨負債) ÷ EBITDA', '自算'],
+      ['DIV_YIELD', '股息殖利率 Dividend Yield', '殖利率|股息殖利率|Dividend\\s*Yield|dividendYield', '評價', 'DPS ÷ Price', 'close 規則'],
+    ].map((r, i) => ({ key: r[0], canon: r[1], pattern: r[2], cat: r[3], formula: r[4], verify: r[5], bg: i % 2 ? '#f6f4ef' : 'var(--paper)' }));
+
+    const valMethods = [
+      ['本益比法', 'P/E Multiple', '目標價 = 目標PE × EPS', '相對'],
+      ['股價淨值比法', 'P/B Multiple', '目標價 = 目標PB × BVPS', '相對'],
+      ['企業價值倍數', 'EV/EBITDA', 'EV = 目標倍數 × EBITDA → 推每股', '相對'],
+      ['股價營收比法', 'P/S Multiple', '目標價 = 目標PS × 每股營收', '相對'],
+      ['本益成長比', 'PEG', 'PE ÷ EPS 成長率（≈1 合理）', '相對'],
+      ['現金流量折現', 'DCF', 'Σ FCF/(1+WACC)^t + 終值', '絕對'],
+      ['股利折現模型', 'DDM / Gordon', 'P = D₁ ÷ (r − g)', '絕對'],
+      ['自由現金流折現', 'FCFF / FCFE', '折現自由現金流', '絕對'],
+      ['剩餘收益模型', 'Residual Income', 'BV + Σ 超額收益折現', '絕對'],
+      ['股息殖利率法', 'Dividend Yield', 'P = DPS ÷ 目標殖利率', '收益'],
+      ['自由現金流殖利率', 'FCF Yield', 'FCF/股 ÷ 目標殖利率', '收益'],
+      ['分類加總法', 'SOTP', 'Σ 各事業別估值', '絕對'],
+      ['重置成本法', 'Replacement Cost', '資產重置價值', '資產'],
+      ['清算價值法', 'Liquidation Value', '可變現淨資產', '資產'],
+    ].map((r, i) => ({ zh: r[0], en: r[1], formula: r[2], cls: r[3],
+      clsCss: r[3] === '相對' ? 'var(--blue)' : r[3] === '絕對' ? 'var(--co)' : r[3] === '收益' ? 'var(--gn)' : 'var(--am)',
+      bg: i % 2 ? '#f6f4ef' : 'var(--paper)' }));
+
+    // 資料來源欄位對照 — canonical → TWSE / TPEX / MOPS / yfinance / broker report 用詞
+    const srcMap = [
+      ['REVENUE', '營收', '營業收入淨額', '營業收入', '當月營收 / 營業收入淨額', 'totalRevenue', 'Revenue / Sales / Top-line'],
+      ['NET_INCOME', '淨利', '本期淨利（淨損）', '稅後淨利', '本期淨利歸屬母公司', 'netIncome', 'Net Profit / Earnings'],
+      ['BASIC_EPS', 'EPS', '基本每股盈餘', '基本每股盈餘', '基本每股盈餘(元)', 'trailingEps', 'Basic EPS / Reported EPS'],
+      ['DILUTED_EPS', '稀釋EPS', '稀釋每股盈餘', '稀釋每股盈餘', '稀釋每股盈餘(元)', '—', 'Diluted EPS / FD EPS'],
+      ['GM', '毛利率', '營業毛利率', '營業毛利率', '毛利率(%)', 'grossMargins', 'Gross Margin / GPM'],
+      ['ROE', 'ROE', '權益報酬率', '股東權益報酬率', 'ROE(%)', 'returnOnEquity', 'ROE'],
+      ['TOTAL_ASSETS', '總資產', '資產總額', '資產總計', '資產總額', 'totalAssets', 'Total Assets'],
+      ['DPS', '股利', '每股現金股利', '現金股利', '每股配發現金(元)', 'dividendRate', 'DPS / Cash Dividend'],
+      ['PE', '本益比', '本益比', '本益比', '本益比(倍)', 'trailingPE', 'P/E / PER'],
+      ['PB', '股價淨值比', '股價淨值比', '股價淨值比', '股價淨值比(倍)', 'priceToBook', 'P/B / PBR'],
+    ].map((r, i) => ({ key: r[0], twse: r[1], tpex: r[2], mops: r[3], broker: r[4], yf: r[5], rpt: r[6], bg: i % 2 ? '#f6f4ef' : 'var(--paper)' }));
+
+    // synonym resolver: does the test input map to a canonical field?
+    const synHit = (() => {
+      const s = (input || '').trim(); if (!s) return null;
+      for (const r of syn) { try { if (new RegExp('^(?:' + r.pattern + ')$', 'i').test(s) || new RegExp('(?:' + r.pattern + ')', 'i').test(s)) return r; } catch (e) {} }
+      return null;
+    })();
+
+    // live test against active pattern (guard invalid regex)
+    let ok = false, err = false;
+    try { ok = new RegExp(active.pattern).test(input.trim()); }
+    catch (e) { err = active.id === 'htmlencode' ? false : true; }
+    if (active.id === 'htmlencode') { ok = /[<>&"']/.test(input); }
+
+    const resultLabel = err ? 'PATTERN 非 JS 正則' : (ok ? '命中 MATCH' : '未命中 NO MATCH');
+    const resultBoxCss = err ? 'background:var(--mut2);' : (ok ? 'background:var(--green);' : 'background:var(--red);');
+    const resultIcon = err ? '�limited' : (ok ? '✓' : '✕');
+
+    // filename token split + classify
+    const parts = input.split(/[_\-.\s]+/).filter(Boolean);
+    const tokenHits = [];
+    parts.forEach(pt => { const c = this._classifyToken(pt); if (c) tokenHits.push({ token: pt, type: c.type, color: c.color, detail: c.detail }); });
+
+    return {
+      rootRef: el => { this.root = el; },
+      rules: r2, tokens, brokers, ratings, finFields, analystFields, syn, valMethods, srcMap,
+      synHitLabel: synHit ? ('→ ' + synHit.canon + (synHit.formula !== '—' ? '  ·  ' + synHit.formula : '')) : '無同義字命中',
+      synHitCss: synHit ? 'background:var(--teal);' : 'background:var(--mut2);',
+      activeName: active.name, activePattern: active.pattern,
+      testInput: input, onInput: e => this.setState({ input: e.target.value }),
+      onDrop: e => { e.preventDefault(); const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (f) this.setState({ input: f.name, dragging: false }); else this.setState({ dragging: false }); },
+      onDragOver: e => { e.preventDefault(); if (!this.state.dragging) this.setState({ dragging: true }); },
+      onDragLeave: e => { e.preventDefault(); this.setState({ dragging: false }); },
+      dropCss: this.state.dragging ? 'background:rgba(67,154,154,.1);border-color:var(--accent);' : '',
+      hasDrop: /\.(pdf|html?|csv|xlsx?|json|txt)$/i.test(input),
+      dropName: input,
+      resultLabel, resultBoxCss, resultIcon: ok && !err ? '✓' : (err ? '≈' : '✕'),
+      resultSub: '對象 ' + active.name + (err ? ' · 僅示意（PS 函式非 JS regex）' : ''),
+      tokenHits, noHits: tokenHits.length === 0,
+    };
+  }
+}
+</script>
+</body>
+</html>

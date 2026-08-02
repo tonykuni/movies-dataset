@@ -1,0 +1,226 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · 產業智慧中樞 · BOM/成本 × 動能催化 × SSOT × 供應鏈/客戶/同業</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--blue:#4c78a8;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--vi:#7a6daa;
+ --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg)}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5}
+.wrap{max-width:1360px;margin:0 auto;padding:0 22px 60px}
+.bar{position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50}
+header{margin:14px 0 10px}
+.masthead{display:flex;gap:14px;align-items:stretch;flex-wrap:wrap;border:1px solid var(--line);border-top:2px solid var(--ink);border-radius:6px;overflow:hidden;background:var(--paper)}
+.mh-left{flex:1 1 540px;min-width:280px;padding:14px 18px}
+.mh-right{flex:1 1 320px;min-width:250px;background:#1e1d1a;padding:13px 16px;display:flex;flex-direction:column;gap:9px;justify-content:flex-end}
+.kicker{font:700 9px 'DM Mono',monospace;letter-spacing:1.6px;color:var(--mut);text-transform:uppercase;margin-bottom:7px;line-height:1.4}
+h1{font:800 18px/1.16 'Syne',sans-serif;color:var(--ink)}h1 span{color:var(--up)}
+.sub{margin-top:7px;font:400 10px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:840px}.sub b{color:var(--ink2)}
+.gov{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.gov .lk{font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase}
+.gov .ver{margin-left:auto;font:700 8px 'DM Mono',monospace;color:#1e1d1a;background:#c4943a;border-radius:3px;padding:2px 8px}
+.rlab{font:700 7.5px 'DM Mono',monospace;letter-spacing:1.4px;color:#8a867d;text-transform:uppercase;border-bottom:1px solid #34322c;padding-bottom:6px}
+.params{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:#34322c;border:1px solid #34322c;border-radius:4px;overflow:hidden}
+.pcell{background:#26251f;padding:7px 4px;text-align:center}
+.pcell .pn{font:800 14px 'DM Mono',monospace;color:#fff;font-variant-numeric:tabular-nums;line-height:1}
+.pcell .pk{font:600 6px 'DM Mono',monospace;letter-spacing:.3px;color:#a49f92;text-transform:uppercase;margin-top:4px}
+.tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.tab{font:700 10.5px 'DM Sans','Noto Sans TC',sans-serif;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--mut);border-radius:3px;padding:7px 11px}
+.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.tab.star{border-color:var(--up);color:var(--up)}.tab.star.on{background:var(--up);color:#fff;border-color:var(--up)}
+.tab.eng{border-color:var(--vi);color:var(--vi)}.tab.eng.on{background:var(--vi);color:#fff;border-color:var(--vi)}
+.sec{display:none}.sec.on{display:block}
+h2{font:800 13px 'Syne',sans-serif;color:var(--ink);margin:16px 0 4px;padding-bottom:5px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:8px}
+h2 .en{font:600 8px 'DM Mono',monospace;color:var(--mut2);letter-spacing:1px;text-transform:uppercase}
+h2 .rc{margin-left:auto;font:700 8px 'DM Mono',monospace;color:var(--vi)}
+.note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--am);border-radius:3px;padding:8px 14px;margin-bottom:12px;font:500 9px/1.6 'DM Mono',monospace;color:var(--mut)}.note b{color:var(--ink2)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-top:12px}
+.hd2{font:800 11px 'Syne',sans-serif;padding:10px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;color:var(--ink)}
+table{width:100%;border-collapse:collapse;font:500 10px 'DM Mono',monospace}
+th{font:700 8px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.3px;color:var(--mut);text-align:left;padding:7px 8px;border-bottom:2px solid var(--ink);background:var(--paper2)}
+td{padding:7px 8px;border-bottom:1px solid var(--soft);vertical-align:middle}tr:hover td{background:var(--paper2)}
+.nm{font:700 10px 'Noto Sans TC',sans-serif;color:var(--ink)}
+.subframe{width:100%;border:0;display:block;background:var(--bg);height:1500px}
+.framenav{display:flex;gap:5px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--paper2)}
+.fbtn{font:700 9px 'DM Mono','Noto Sans TC',monospace;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--mut);border-radius:3px;padding:5px 10px}
+.fbtn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+/* momentum */
+.mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:11px;padding:12px 14px}
+.mcard{border:1px solid var(--line);border-radius:6px;padding:12px 13px;position:relative;overflow:hidden}
+.mcard.hot{border-top:3px solid var(--up)}.mcard.warm{border-top:3px solid var(--am)}.mcard.cool{border-top:3px solid var(--down)}
+.mcard .mt{font:800 12px 'Noto Sans TC',sans-serif;color:var(--ink)}
+.mcard .me{font:600 7.5px 'DM Mono',monospace;color:var(--mut2);text-transform:uppercase;letter-spacing:.4px;margin:2px 0 8px}
+.mcard .desc{font:500 9.5px/1.55 'Noto Sans TC',sans-serif;color:var(--ink2)}
+.scorebar{display:flex;align-items:center;gap:8px;margin-top:9px}
+.stk{flex:1;height:8px;border-radius:4px;background:var(--soft);overflow:hidden}
+.sfill{height:100%;border-radius:4px}
+.sval{font:700 11px 'DM Mono',monospace;color:var(--ink);min-width:30px;text-align:right}
+.dir{font:700 8px 'DM Mono',monospace;padding:1px 6px;border-radius:3px}.d-up{background:#f7ecea;color:var(--up)}.d-flat{background:#f1efe8;color:var(--mut)}
+.conf{font:700 7px 'DM Mono',monospace;color:#fff;border-radius:2px;padding:1px 5px;margin-left:5px}.cA{background:var(--down)}.cB{background:var(--teal)}.cC{background:var(--am)}.cD{background:var(--mut2)}
+.cat-row td:first-child{white-space:nowrap}
+.tl{font:700 8px 'DM Mono',monospace;border-radius:3px;padding:1px 6px}.tl-now{background:#f7ecea;color:var(--up)}.tl-q{background:#eef3f7;color:var(--blue)}.tl-y{background:#f1efe8;color:var(--mut)}
+.imp{font:700 9px 'DM Mono',monospace}.imp-h{color:var(--up)}.imp-m{color:var(--am)}.imp-l{color:var(--mut)}
+.dict{font:600 8px 'DM Mono',monospace;border-radius:3px;padding:1px 6px}.d-cust{background:#eef3f7;color:var(--blue)}.d-pot{background:#f3eefa;color:var(--vi)}.d-ven{background:#eef5ef;color:var(--down)}
+.chip{font:600 8.5px 'Noto Sans TC',sans-serif;background:var(--soft);border-radius:3px;padding:1px 7px;color:var(--ink2);display:inline-block;margin:1px}
+.grp{font:700 7px 'DM Mono',monospace;color:#fff;border-radius:3px;padding:1px 5px}.g-TH{background:var(--up)}.g-PW{background:var(--blue)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:11px 14px;border-top:1px solid var(--line);align-items:center}
+.btn{font:700 8.5px 'DM Mono',monospace;cursor:pointer;border:1px solid var(--ink);background:transparent;color:var(--ink);border-radius:3px;padding:6px 11px}
+.tk{font:500 9px 'DM Mono',monospace;color:var(--mut)}
+.pdf{position:fixed;top:12px;right:14px;z-index:999;background:var(--ink);color:#fff;border:none;border-radius:5px;padding:7px 13px;font:700 9px 'DM Mono',monospace;cursor:pointer}
+@media print{@page{size:A4 landscape;margin:8mm}.pdf,.tabs,.toolbar,.framenav{display:none!important}.sec{display:block!important}}
+</style></head><body>
+<div class="bar"></div><button class="pdf" onclick="window.print()">⤓ PDF</button>
+<div class="wrap">
+<header>
+ <div class="masthead">
+  <div class="mh-left">
+   <div class="kicker">VERITAS INTELLIGENCE ANALYTICS · INDUSTRY INTELLIGENCE HUB · BOM/COST × MOMENTUM/CATALYST × SSOT × VENDOR/CUSTOMER/PEERS</div>
+   <h1>產業智慧中樞 <span>·</span> BOM/成本 × 動能催化 × SSOT × 供應鏈/客戶/同業</h1>
+   <p class="sub">以 <b>PSU/Thermal Solution</b> 為核心,整合 <b>成本化 BOM/單位成本</b>、<b>產業動能與催化拆解</b>、<b>VIA Evolving SSOT 引擎</b>、<b>供應商/客戶/潛在客戶/同業字典</b>。外部標準(SAP/MSP/PMBOK)僅對齊、VIA 編碼為主、只增不減;每筆估值附信心層級 A–D 與來源。示意資料,非投資建議。</p>
+  </div>
+  <div class="mh-right">
+   <div class="gov"><span class="lk">🔒 SSOT-LOCKED · VIA-CODED · APPEND-ONLY</span><span class="ver">HUB v0100</span></div>
+   <div class="rlab">諸元鎖定 · Locked Registry</div>
+   <div class="params" id="params"></div>
+  </div>
+ </div>
+</header>
+<div class="note">📐 六分頁:① <b>產業動能與催化</b>(原生分析) ② BOM/成本分析 ③ 財報/評價 ④ 供應商/客戶/同業字典 ⑤ SSOT 引擎 ⑥ 行業360/登錄。① 為原生拆解;②–⑥ 整合既有模板。信心層級:A 揭露 · B 可推導 · C 三角驗證 · D 模型假設。</div>
+<div class="tabs" id="tabs"></div>
+
+<!-- ① MOMENTUM & CATALYST (native) -->
+<div class="sec on" id="sec-mom">
+ <h2>① 產業動能與催化拆解 <span class="en">Industry Momentum &amp; Catalyst Breakdown</span></h2>
+ <div class="note">動能＝結構性需求驅動(方向+強度+信心);催化＝近期可觀察事件(時點+影響)。分數 0–100 為 VIA 綜合評分(基本面×滲透率×能見度),非投資建議。</div>
+ <div class="card"><div class="hd2">結構性動能驅動 · Structural Momentum Drivers<span class="tk" id="momCnt"></span></div>
+  <div class="mgrid" id="momGrid"></div>
+ </div>
+ <div class="card"><div class="hd2">近期催化事件 · Catalyst Calendar</div>
+  <div style="overflow-x:auto"><table><thead><tr><th>催化事件</th><th>時點</th><th>影響族群</th><th>影響</th><th>受惠標的</th><th>信心</th></tr></thead><tbody id="catRows"></tbody></table></div>
+  <div class="toolbar"><button class="btn" id="expCat">⤓ 匯出催化 CSV</button><span class="tk">時點:NOW 進行中 · Q 本季/次季 · Y 年度。影響=對族群 ASP/出貨的邊際拉動。</span></div>
+ </div>
+</div>
+
+<!-- ② BOM/COST -->
+<div class="sec" id="sec-bom">
+ <h2>② BOM / 成本分析 <span class="en">BOM &amp; Cost Analysis</span></h2>
+ <div class="card" style="padding:0"><div class="framenav" id="nav-bom"></div><iframe class="subframe" id="frame-bom" title="BOM Cost"></iframe></div>
+</div>
+
+<!-- ③ FINANCIALS -->
+<div class="sec" id="sec-fin">
+ <h2>③ 財報 / 評價 <span class="en">Financials &amp; Valuation</span></h2>
+ <div class="card" style="padding:0"><div class="framenav" id="nav-fin"></div><iframe class="subframe" id="frame-fin" title="Financials"></iframe></div>
+</div>
+
+<!-- ④ VENDOR/CUSTOMER/PEERS (native dict) -->
+<div class="sec" id="sec-dict">
+ <h2>④ 供應商 / 客戶 / 潛在客戶 / 同業字典 <span class="en">Vendor · Customer · Peers Dictionary</span><span class="rc" id="dictCnt"></span></h2>
+ <div class="note">字典為 SSOT canonical:供應商對齊 SAP MM、客戶對齊 SD。潛在客戶=同族群客戶重疊之機率推論(附依據)。每筆附信心層級。</div>
+ <div class="card"><div class="hd2">字典矩陣<span style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn" id="dAll">全部</button><button class="btn" id="dVen">供應商</button><button class="btn" id="dCust">客戶</button><button class="btn" id="dPot">潛在客戶</button></span></div>
+  <div style="overflow-x:auto"><table><thead><tr><th>實體</th><th>類別</th><th>地區</th><th>品項/關係</th><th>關聯 PSU/Thermal</th><th>信心</th></tr></thead><tbody id="dictRows"></tbody></table></div>
+  <div class="toolbar"><button class="btn" id="expDict">⤓ 匯出字典 CSV</button><span class="tk" id="dictNote"></span></div>
+ </div>
+ <div class="card" style="padding:0"><div class="hd2">行業360 · 客戶/成本/供應鏈情報(整合)</div><iframe class="subframe" id="frame-360" title="Industry360" style="height:1400px"></iframe></div>
+</div>
+
+<!-- ⑤ SSOT ENGINE -->
+<div class="sec" id="sec-ssot">
+ <h2>⑤ VIA Evolving SSOT 引擎 <span class="en">Registry × Coding × Lock</span></h2>
+ <div class="card" style="padding:0"><div class="framenav" id="nav-ssot"></div><iframe class="subframe" id="frame-ssot" title="SSOT Engine"></iframe></div>
+</div>
+
+<!-- ⑥ REGISTRY / SUPERBOM -->
+<div class="sec" id="sec-reg">
+ <h2>⑥ 登錄 / Super BOM <span class="en">Registry &amp; SAP Super BOM</span></h2>
+ <div class="card" style="padding:0"><div class="framenav" id="nav-reg"></div><iframe class="subframe" id="frame-reg" title="Registry"></iframe></div>
+</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+
+// ===== ① Momentum drivers =====
+const MOM=[
+ {t:"AI 伺服器資本支出超循環",e:"AI capex supercycle",cls:"hot",score:95,dir:"↑ 強",dcls:"d-up",conf:"A",desc:"雲端四雄 + NVIDIA 平台迭代,伺服器電源與散熱需求同步放量,為所有子族群的母動能。"},
+ {t:"液冷滲透率加速",e:"Liquid cooling adoption",cls:"hot",score:92,dir:"↑ 強",dcls:"d-up",conf:"B",desc:"水冷佔比 2024<1% → 2025 8%(Q3 11%);GB200/GB300 NVL72 液冷標配,拉動冷板/CDU/Manifold。"},
+ {t:"800V/HVDC 電源架構轉換",e:"800V HVDC transition",cls:"hot",score:88,dir:"↑ 強",dcls:"d-up",conf:"B",desc:"機櫃功率密度上升,電源架構由 54V 轉 800V HVDC,Power Shelf/SST 價值量提升。"},
+ {t:"均熱片 ASP 提升",e:"Heat spreader ASP up",cls:"warm",score:82,dir:"↑ 強",dcls:"d-up",conf:"B",desc:"VR200 世代均熱片 ASP 約 3x;Lid/MLCP 微通道蓋板單價與含金量同步上行。"},
+ {t:"機櫃功率密度上升",e:"Rack power density",cls:"warm",score:80,dir:"↑ 強",dcls:"d-up",conf:"B",desc:"單櫃由 ~40kW 邁向 100–130kW,直接拉動 CDU 容量與冷板面積需求。"},
+ {t:"兩相/浸沒式液冷導入",e:"Two-phase / immersion",cls:"cool",score:58,dir:"↑ 中",dcls:"d-up",conf:"C",desc:"下一世代散熱,+15% 效率但仍研發/試量;中長期選擇權,近期營收貢獻有限。"},
+ {t:"產能開出 (越南/泰國)",e:"Capacity ramp",cls:"warm",score:78,dir:"↑ 強",dcls:"d-up",conf:"A",desc:"奇鋐越南 12 廠、台達泰國散熱新產能 2026Q1 投產;冷板月產能 20→100 萬組。"},
+ {t:"銅/材料成本波動",e:"Copper cost risk",cls:"cool",score:45,dir:"→ 平",dcls:"d-flat",conf:"C",desc:"銅價與匯率影響散熱毛利;可由垂直整合與 ASP 轉嫁部分抵銷,列為反向風險因子。"}
+];
+function renderMom(){$("momGrid").innerHTML=MOM.map(m=>`<div class="mcard ${m.cls}"><div class="mt">${m.t}</div><div class="me">${m.e}</div><div class="desc">${m.desc}</div><div class="scorebar"><span class="dir ${m.dcls}">${m.dir}</span><div class="stk"><div class="sfill" style="width:${m.score}%;background:${m.cls==='hot'?'var(--up)':m.cls==='warm'?'var(--am)':'var(--down)'}"></div></div><span class="sval">${m.score}</span><span class="conf c${m.conf}">${m.conf}</span></div></div>`).join("");
+ $("momCnt").textContent=MOM.length+" 動能因子";}
+
+// ===== ① Catalysts =====
+const CAT=[
+ ["GB300 量產爬坡","NOW","tl-now","散熱+電源","高","imp-h","奇鋐/雙鴻/台達電/健策","A"],
+ ["雲端四雄 capex 上修","NOW","tl-now","電源+散熱","高","imp-h","全族群","A"],
+ ["奇鋐越南12廠/台達泰國投產","Q","tl-q","散熱","高","imp-h","奇鋐/台達電","A"],
+ ["季度法說會","Q","tl-q","電源+散熱","中","imp-m","全族群","A"],
+ ["Computex / OCP Summit","Q","tl-q","散熱+電源","中","imp-m","液冷/電源族群","B"],
+ ["NVIDIA GTC 平台發表","Q","tl-q","散熱+電源","高","imp-h","NVL 供應鏈","B"],
+ ["800V HVDC 標準落地","Y","tl-y","電源","高","imp-h","台達電/光寶科/Vicor","C"],
+ ["兩相/浸沒式液冷客戶認證","Y","tl-y","散熱","中","imp-m","奇鋐/雙鴻/ZutaCore","C"],
+ ["均熱片新世代 (VR300) 導入","Y","tl-y","散熱","高","imp-h","健策/雙鴻","C"]
+];
+function renderCat(){$("catRows").innerHTML=CAT.map(c=>`<tr class="cat-row"><td class="nm">${c[0]}</td><td><span class="tl ${c[2]}">${c[1]}</span></td><td class="tk">${c[3]}</td><td class="imp ${c[5]}">${c[4]}</td><td class="tk">${c[6]}</td><td><span class="conf c${c[7]}">${c[7]}</span></td></tr>`).join("");}
+$("expCat").onclick=()=>{let o="Catalyst,Timing,Group,Impact,Beneficiaries,Confidence\n";CAT.forEach(c=>o+=`"${c[0]}",${c[1]},"${c[3]}",${c[4]},"${c[6]}",${c[7]}\n`);const b=new Blob(["\ufeff"+o],{type:"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="VIA_Catalysts.csv";a.click();};
+
+// ===== ④ Dictionary =====
+const DICT=[
+ // vendors
+ ["台光電 2383","供應商","d-ven","台灣","CCL/銅箔基板","台達電/光寶科","A"],
+ ["國巨 2327","供應商","d-ven","台灣","MLCC/被動元件","台達電/康舒","A"],
+ ["Wieland","供應商","d-ven","德國","銅材/合金","奇鋐/健策","B"],
+ ["Infineon","供應商","d-ven","德國","MOSFET/IGBT","台達電/光寶科","A"],
+ ["3M","供應商","d-ven","美國","TIM/浸沒液","液冷族群","B"],
+ ["日本電產 Nidec","供應商","d-ven","日本","風扇馬達","散熱模組族群","A"],
+ // customers
+ ["NVIDIA","客戶","d-cust","美國","GPU 平台/液冷方案","台達電/奇鋐/雙鴻/健策","A"],
+ ["Microsoft Azure","客戶","d-cust","美國","資料中心電力/液冷","台達電/Vertiv/奇鋐","A"],
+ ["鴻海 Foxconn","客戶","d-cust","台灣","AI 伺服器整機","台達電/奇鋐/雙鴻","A"],
+ ["廣達 Quanta","客戶","d-cust","台灣","AI 伺服器/液冷","奇鋐/雙鴻/健策","A"],
+ ["Supermicro","客戶","d-cust","美國","伺服器/液冷","奇鋐/雙鴻/台達電","A"],
+ ["AMD","客戶","d-cust","美國","均熱片/Lid","健策/雙鴻","B"],
+ // potential
+ ["Google TPU","潛在客戶","d-pot","美國","自研 ASIC 液冷(同族群重疊)","奇鋐/雙鴻(推論)","C"],
+ ["Amazon Trainium","潛在客戶","d-pot","美國","自研晶片散熱/電源","台達電/奇鋐(推論)","C"],
+ ["Tesla Dojo","潛在客戶","d-pot","美國","高密度運算散熱","液冷族群(推論)","D"],
+ ["xAI Colossus","潛在客戶","d-pot","美國","大型叢集電力/液冷","台達電/Vertiv(推論)","C"]
+];
+let df="all";
+const dcat={all:null,ven:"供應商",cust:"客戶",pot:"潛在客戶"};
+function renderDict(){const rows=DICT.filter(d=>df==="all"||d[1]===dcat[df]);
+ $("dictRows").innerHTML=rows.map(d=>`<tr><td class="nm">${d[0]}</td><td><span class="dict ${d[2]}">${d[1]}</span></td><td class="tk">${d[3]}</td><td class="tk">${d[4]}</td><td class="tk" style="color:var(--vi)">${d[5]}</td><td><span class="conf c${d[6]}">${d[6]}</span></td></tr>`).join("");
+ $("dictCnt").textContent=rows.length+" / "+DICT.length+" 筆";$("dictNote").textContent="供應商 "+DICT.filter(d=>d[1]==='供應商').length+" · 客戶 "+DICT.filter(d=>d[1]==='客戶').length+" · 潛在 "+DICT.filter(d=>d[1]==='潛在客戶').length;}
+$("dAll").onclick=()=>{df="all";renderDict();};$("dVen").onclick=()=>{df="ven";renderDict();};$("dCust").onclick=()=>{df="cust";renderDict();};$("dPot").onclick=()=>{df="pot";renderDict();};
+$("expDict").onclick=()=>{let o="Entity,Category,Region,Item,PSU_Thermal_Link,Confidence\n";DICT.forEach(d=>o+=`"${d[0]}","${d[1]}","${d[3]}","${d[4]}","${d[5]}",${d[6]}\n`);const b=new Blob(["\ufeff"+o],{type:"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="VIA_Vendor_Customer_Dict.csv";a.click();};
+
+// ===== params =====
+function renderParams(){$("params").innerHTML=[["動能",MOM.length],["催化",CAT.length],["字典",DICT.length],["同業","29"],["信心","A–D"]].map(p=>`<div class="pcell"><div class="pn">${p[1]}</div><div class="pk">${p[0]}</div></div>`).join("");}
+
+// ===== embedded frames (lazy) =====
+const FRAMES={
+ bom:{el:"frame-bom",nav:"nav-bom",loaded:false,items:[["BOM/ASP/單位成本","VIA BOM ASP Unit-Cost Analyst.html"],["行業 BOM 專業","modules/Industry_BOM_Pro.html"],["製程設備資本","VIA Capex Process Equipment Analysis.html"]]},
+ fin:{el:"frame-fin",nav:"nav-fin",loaded:false,items:[["財務報表","modules/Financial_Statements.html"],["整合平台 Forward 評價","modules/Integrated_Platform.html"]]},
+ ssot:{el:"frame-ssot",nav:"nav-ssot",loaded:false,items:[["SSOT Super Engine","VIA Evolving SSOT Super Engine.html"],["PSU/Thermal SSOT","modules/PSU_Thermal_SSOT.html"]]},
+ reg:{el:"frame-reg",nav:"nav-reg",loaded:false,items:[["Power/Thermal 登錄","modules/PowerThermal_Registry.html"],["SAP Super BOM","modules/PowerThermal_SAP_SuperBOM_v2.html"]]}
+};
+function buildNav(key){const F=FRAMES[key];$(F.nav).innerHTML=F.items.map((it,i)=>`<span class="fbtn ${i===0?'on':''}" data-i="${i}">${it[0]}</span>`).join("");
+ $(F.nav).querySelectorAll(".fbtn").forEach(b=>b.onclick=()=>{const i=+b.dataset.i;$(F.nav).querySelectorAll(".fbtn").forEach(x=>x.classList.toggle("on",+x.dataset.i===i));$(F.el).setAttribute("src",F.items[i][1]);});}
+function loadFrame(key){const F=FRAMES[key];if(F.loaded)return;buildNav(key);$(F.el).setAttribute("src",F.items[0][1]);F.loaded=true;}
+function load360(){var f=$("frame-360");if(!f.getAttribute("src"))f.setAttribute("src","modules/Industry360_Suite.html");}
+
+// ===== tabs =====
+const TABS=[["mom","① 產業動能與催化","star"],["bom","② BOM/成本",""],["fin","③ 財報/評價",""],["dict","④ 供應商/客戶/同業",""],["ssot","⑤ SSOT 引擎","eng"],["reg","⑥ 登錄/SuperBOM",""]];
+let cur="mom";
+$("tabs").innerHTML=TABS.map(([id,n,c])=>`<div class="tab ${c} ${id===cur?'on':''}" data-id="${id}">${n}</div>`).join("");
+$("tabs").querySelectorAll(".tab").forEach(t=>t.onclick=()=>{cur=t.dataset.id;$("tabs").querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x.dataset.id===cur));document.querySelectorAll(".sec").forEach(s=>s.classList.toggle("on",s.id==="sec-"+cur));
+ if(FRAMES[cur])loadFrame(cur);if(cur==="dict")load360();});
+
+renderMom();renderCat();renderDict();renderParams();
+</script>
+</body></html>

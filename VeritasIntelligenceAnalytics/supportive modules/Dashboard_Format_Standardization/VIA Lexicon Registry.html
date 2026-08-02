@@ -1,0 +1,146 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · 同義字×REGEX×LIST×DICT 集體管理 · Lexicon Registry</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--blue:#4c78a8;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--vi:#7a6daa;
+ --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg)}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:12px;line-height:1.5}
+.wrap{max-width:1360px;margin:0 auto;padding:26px 22px 60px}
+.pdf{position:fixed;top:12px;right:14px;z-index:999;background:var(--ink);color:#fff;border:none;border-radius:5px;padding:7px 13px;font:700 9px 'DM Mono',monospace;cursor:pointer}
+@media print{.pdf,#xnav{display:none!important}}
+.bar{position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50}
+header{padding:0 0 8px;margin-bottom:10px}
+.kicker{font:700 10px 'DM Mono',monospace;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px}
+h1{font:800 21px/1.2 'Syne','Noto Sans TC',sans-serif;color:var(--ink);display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+h1::before{content:"";display:inline-block;width:5px;height:22px;background:var(--vi);border-radius:2px;transform:translateY(3px);margin-right:2px}
+h1 span{color:var(--ink)}
+.sub{margin-top:6px;font:400 10.5px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:1060px}
+.toolrow{display:flex;gap:7px;align-items:center;padding:10px 0;flex-wrap:wrap}
+.toolrow input[type=text]{flex:1;min-width:200px;font:600 10.5px 'DM Mono','Noto Sans TC',monospace;border:1px solid var(--line);border-radius:5px;padding:7px 10px;background:var(--paper);color:var(--ink)}
+.toolrow select{font:700 10px 'DM Mono','Noto Sans TC',monospace;border:1px solid var(--line);border-radius:5px;padding:7px 10px;background:var(--paper);color:var(--ink)}
+.btn{font:700 8.5px 'DM Mono',monospace;cursor:pointer;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:4px;padding:7px 11px}
+.btn.o{background:transparent;color:var(--ink)}
+table{width:100%;border-collapse:collapse;background:var(--paper);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+th{font:700 9px 'DM Mono',monospace;letter-spacing:.4px;text-transform:uppercase;color:var(--mut);background:var(--paper2);border-bottom:2px solid var(--ink);padding:8px 12px;text-align:left}
+td{font:500 10px 'DM Mono','Noto Sans TC',monospace;color:var(--ink2);border-bottom:1px solid var(--soft);padding:7px 10px;vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--paper2)}
+td .code{color:var(--vi);font-weight:700;white-space:nowrap}
+td .kind{display:inline-block;font:700 7px 'DM Mono',monospace;border-radius:3px;padding:2px 6px;color:#fff;white-space:nowrap}
+td .lk{color:var(--up);font-weight:700}
+.note{font:500 8.5px/1.6 'DM Mono',monospace;color:var(--mut);background:var(--paper);border:1px solid var(--soft);border-left:3px solid var(--vi);border-radius:4px;padding:8px 12px;margin:8px 0}
+.note b{color:var(--ink2)}
+.addrow{display:grid;grid-template-columns:110px 1fr 1fr 1fr auto;gap:7px;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:10px;margin:8px 0}
+.addrow select,.addrow input{font:600 10px 'DM Mono','Noto Sans TC',monospace;border:1px solid var(--line);border-radius:4px;padding:6px 8px;background:var(--paper2);color:var(--ink)}
+@media(max-width:900px){.addrow{grid-template-columns:1fr 1fr}}
+</style></head><body>
+<div class="bar"></div>
+<button class="pdf" onclick="window.print()">⤴ PDF</button>
+<div class="wrap">
+<header>
+ <div class="kicker">VERITAS INTELLIGENCE ANALYTICS · LEXICON REGISTRY · VIA-M-LEX · SYNONYM × REGEX × LIST × DICT · APPEND-ONLY</div>
+ <h1>同義字 × REGEX × LIST × DICT <span>·</span> 集體管理</h1>
+ <p class="sub">單一登錄簿整併:同義字引擎(VSE)對映、SSOT REGEX 驗證規則、改名地圖(vpns_rename_map)、清單 LIST 與字典 DICT。已去重;只增不減;每筆自動編號(FNV-1a);SAP / MS Project 原碼鎖定 align-only,智慧化對照在 VIA 方。新增項寫入 localStorage(via_lex_v1)與內建基準合併顯示。</p>
+ <nav id="xnav" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:9px">
+  <a data-b="VIA Master Console.html" href="VIA Master Console.html" style="font:700 8.5px 'DM Mono',monospace;color:var(--ink2);border:1px solid var(--line);border-radius:4px;padding:4px 8px;text-decoration:none;background:var(--paper2)">🎛 主控台</a>
+  <a data-b="VIA Intelligence Asset Management Platform.html" href="VIA Intelligence Asset Management Platform.html" title="?tab=&q= 自動帶入目前搜尋" style="font:700 8.5px 'DM Mono',monospace;color:var(--ink2);border:1px solid var(--line);border-radius:4px;padding:4px 8px;text-decoration:none;background:var(--paper2)">🧱 智慧資產 IAMP</a>
+  <a data-b="VIA Auto-Coder.html" href="VIA Auto-Coder.html" title="?type=&name=&gen=1" style="font:700 8.5px 'DM Mono',monospace;color:var(--ink2);border:1px solid var(--line);border-radius:4px;padding:4px 8px;text-decoration:none;background:var(--paper2)">⚙ 自動編號器</a>
+  <a data-b="VIA VAP Chart Library Builder.html" href="VIA VAP Chart Library Builder.html" title="?cat=&q= 自動帶入目前搜尋" style="font:700 8.5px 'DM Mono',monospace;color:var(--ink2);border:1px solid var(--line);border-radius:4px;padding:4px 8px;text-decoration:none;background:var(--paper2)">📊 圖庫建構器</a>
+ </nav>
+</header>
+<div class="toolrow">
+ <input type="text" id="q" placeholder="🔍 搜尋 詞彙/規則/代碼…">
+ <select id="kf"><option value="">所有種類</option><option value="SYN">SYN 同義字</option><option value="RGX">RGX 正則</option><option value="REN">REN 改名</option><option value="LST">LST 清單</option><option value="DCT">DCT 字典</option></select>
+ <button class="btn o" id="expJ">⤓ JSON</button>
+</div>
+<div class="addrow">
+ <select id="aKind"><option value="SYN">SYN 同義字</option><option value="RGX">RGX 正則</option><option value="REN">REN 改名</option><option value="LST">LST 清單</option><option value="DCT">DCT 字典</option></select>
+ <input id="aFrom" placeholder="來源詞 / 鍵 / 規則名">
+ <input id="aTo" placeholder="目標詞 / 值 / pattern">
+ <input id="aNote" placeholder="備註(對齊來源等)">
+ <button class="btn" id="aAdd">＋ 登錄(只增不減)</button>
+</div>
+<div id="view"></div>
+<div class="note">🔒 <b>治理</b> — SAP CODE/T-CODE(SE38/GRAL/SALV…)與 MSP 代碼為外部既有系統,鎖定不改;對映只在 VIA 側。REGEX 規則與 VAP 圖庫 SSOT 檢查同源(持續演化自動增加)。改名地圖依 VPNS 流程:plan dry-run → apply 需 APPROVE token。</div>
+</div>
+<script>
+function fnv(s){let h=0x811c9dc5;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=(h*0x01000193)>>>0;}return h.toString(16).padStart(8,"0").slice(-6).toUpperCase();}
+const KCOLOR={SYN:"#439a9a",RGX:"#7a6daa",REN:"#c4943a",LST:"#4c78a8",DCT:"#33403f"};
+// 內建基準(已去重 · 只增不減)
+const BASE=[
+ ["SYN","BOM","物料清單 Bill of Materials","SAP PLM 對齊",1],
+ ["SYN","WBS","工作分解結構","PMBOK/MSP 對齊",1],
+ ["SYN","Milestone","里程碑","PMBOK/MSP 對齊",1],
+ ["SYN","ALV","LIST_VIEWER 清單檢視","SAP SALV · 鎖定",1],
+ ["SYN","目標價","Target Price / TP","yfinance/FactSet consensus",0],
+ ["SYN","稀釋每股盈餘","Diluted EPS","yfinance/FactSet consensus",0],
+ ["SYN","上漲/下跌","紅/綠(台股慣例)","VAP DATARULES",0],
+ ["RGX","palette","^(via|deep|set2|tab10|paired)$","VAP SSOT 設定驗證",0],
+ ["RGX","lineWidth","^(0\\.5|[1-5](\\.5)?|6)$","VAP SSOT · 0.5–6 step .5",0],
+ ["RGX","fillOpacity","^(0(\\.\\d{1,2})?|1(\\.0{1,2})?)$","VAP SSOT · 0–1",0],
+ ["RGX","dateMode","^(normalized|start|end|now)$","VAP 日期軸模式",0],
+ ["RGX","smallMultiples","^[1-4]x[1-6]$","VAP 個別小圖 列x欄",0],
+ ["RGX","VIA 模組碼","^VIA-M-[A-Z0-9]{3,12}$","主控台編碼格式",0],
+ ["RGX","VAP 圖型碼","^VAP-CH-\\d{2}$","圖庫編碼格式",0],
+ ["REN","def_FooBar","def_foo_bar","vpns_rename_map.SAMPLE · dry-run→APPROVE",0],
+ ["LST","資料庫清單","TWSE·TPEX·SITCA·MOPS·yfinance·FactSet·FRED·EPFR·HKEX","VDF 契約",0],
+ ["LST","經濟區清單","美·歐·日·中·台·東南亞·南亞·中東·澳","全球總經 9 區",0],
+ ["LST","Seaborn 組合","via·deep·Set2·tab10·Paired","圖庫調色",0],
+ ["LST","SAP T-CODE","SE38·GRAL·SALV","鎖定 align-only",1],
+ ["LST","SAP PLM T-CODE","CS01·CS02·CS03·MM01·MM02·MM03·CC01","BOM/物料主檔/工程變更 · 鎖定",1],
+ ["LST","SAP 功能模組","MM·PP·SD·CO·FI·FA","鎖定 align-only",1],
+ ["SYN","SAP MM","物料管理 Materials Management","T-CODE MM01·ME21N·MIGO · 鎖定",1],
+ ["SYN","SAP PP","生產規劃 Production Planning","T-CODE CO01·MD04·CS01 · 鎖定",1],
+ ["SYN","SAP SD","銷售與配銷 Sales & Distribution","T-CODE VA01·VL01N·VF01 · 鎖定",1],
+ ["SYN","SAP CO","管理會計 Controlling","T-CODE KS01·KP06·CK11N · 鎖定",1],
+ ["SYN","SAP FI","財務會計 Financial Accounting","T-CODE FB01·FS00·F-02 · 鎖定",1],
+ ["SYN","SAP FA (FI-AA)","固定資產 Asset Accounting","T-CODE AS01·AFAB·AW01N · 鎖定",1],
+ ["SYN","SAP SCM","供應鏈管理 Supply Chain Management","APO/IBP · 鎖定",1],
+ ["SYN","Material Master","物料主檔","SAP MM01–MM03 · 鎖定",1],
+ ["SYN","ECO/ECN","工程變更通知 Engineering Change","SAP CC01 · PLM 變更管理",1],
+ ["SYN","Routing","工藝路線 · 途程","SAP PLM 對齊",1],
+ ["SYN","TA-Lib","技術分析函式庫 Technical Analysis Library","指標以 ADJ PRICE 計算 · MA/RSI/MACD/BB/KD",0],
+ ["SYN","ADJ PRICE","調整後價格(除權息/拆分還原)","股票/指數全欄位一律使用 · TA-Lib 輸入",0],
+ ["SYN","PSU","電源供應器 Power Supply Unit","PSU×Thermal 主題",0],
+ ["SYN","Thermal Solution","散熱方案(氣冷/液冷/VC)","PSU×Thermal 主題",0],
+ ["SYN","TDP","熱設計功耗 Thermal Design Power","PSU×Thermal 主題",0],
+ ["SYN","VRM","電壓調節模組 Voltage Regulator Module","PSU×Thermal 主題",0],
+ ["LST","商品×匯率×波動 Tickers","BRENT(BZ=F·現貨LCO) · WTI(CL=F·現貨WTI) · 黃金GC=F · 白銀SI=F · 鉑金PL=F · 銅HG=F · 大宗農工原料 · DXY · USDTWD=X · EURUSD=X · JPY=X · ^VIX · BDI(波羅的海乾散裝) · ^TWII · ^NTX(待確認:NASDAQ ^NDX?)","現貨+期貨並列 · ADJ 規則適用",0],
+ ["LST","PSU×Thermal 模組","ChipAnalysis v2·Super BOM·AllInOne","VIA-M-CHIP/SUPERBOM/AIO",0],
+ ["DCT","因子字典","factor_dict_matrix","uploads/factor_dict_matrix-aee4ee50.html",0],
+ ["DCT","圖表規格字典","chartspec_registry","uploads/chartspec_registry.json",0],
+ ["DCT","TIER 字典","SYS·SUB·ENG·MOD·CLS·FN·LIB·TOOL·ENV·KNW","IAMP 層級",0]
+].map(r=>({kind:r[0],from:r[1],to:r[2],note:r[3],lock:!!r[4],code:"VIA-R-"+r[0]+"-"+fnv(r[0]+"|"+r[1]),base:true}));
+const KEY="via_lex_v1";
+let USER=[];try{USER=JSON.parse(localStorage.getItem(KEY))||[];}catch(e){}
+const $=s=>document.querySelector(s);
+let Q="",KF="";
+function all(){ // 合併+去重(kind+from 為鍵 · 使用者新增不覆蓋基準)
+ const seen={};const out=[];[...BASE,...USER].forEach(e=>{const k=e.kind+"|"+e.from;if(seen[k])return;seen[k]=1;out.push(e);});return out;}
+function render(){const list=all().filter(e=>(!KF||e.kind===KF)&&(!Q||(e.from+" "+e.to+" "+e.note+" "+e.code).toLowerCase().includes(Q)));
+ $("#view").innerHTML='<table><thead><tr><th style="width:140px">編號 Code</th><th style="width:52px">種類</th><th style="width:220px">鍵 / 來源詞</th><th>值 / 目標 / Pattern</th><th style="width:230px">備註 · 對齊</th><th style="width:46px">鎖定</th></tr></thead><tbody>'+
+  (list.map(e=>'<tr><td><span class="code">'+e.code+'</span></td><td><span class="kind" style="background:'+KCOLOR[e.kind]+'">'+e.kind+'</span></td><td><b>'+e.from+'</b></td><td>'+e.to+'</td><td style="color:var(--mut)">'+e.note+'</td><td>'+(e.lock?'<span class="lk">🔒</span>':'—')+'</td></tr>').join("")||'<tr><td colspan="6" style="color:var(--mut2)">無符合項目</td></tr>')+
+  '</tbody></table>';}
+$("#q").oninput=e=>{Q=e.target.value.trim().toLowerCase();render();updNav();};
+$("#kf").onchange=e=>{KF=e.target.value;render();};
+$("#aAdd").onclick=()=>{const kind=$("#aKind").value,from=$("#aFrom").value.trim(),to=$("#aTo").value.trim();
+ if(!from||!to)return;
+ if(all().some(e=>e.kind===kind&&e.from===from))return alert("已存在(去重):"+kind+" · "+from);
+ USER.push({kind,from,to,note:$("#aNote").value.trim()||"使用者登錄",lock:false,code:"VIA-R-"+kind+"-"+fnv(kind+"|"+from)});
+ localStorage.setItem(KEY,JSON.stringify(USER));
+ $("#aFrom").value="";$("#aTo").value="";$("#aNote").value="";render();};
+$("#expJ").onclick=()=>{const b=new Blob([JSON.stringify({meta:{name:"via_lexicon_registry",code:"VIA-M-LEX",policy:"append-only · dedupe(kind+key)",sap_msp:"locked align-only"},entries:all()},null,2)],{type:"application/json"});
+ const u=document.createElement("a");u.href=URL.createObjectURL(b);u.download="VIA_Lexicon_Registry.json";u.click();};
+render();
+// 頁面自動連結 · URL 參數可選(?kind=SYN|RGX|REN|LST|DCT&q=…)
+const P=new URLSearchParams(location.search);
+if(P.get("kind")&&KCOLOR[P.get("kind")]){KF=P.get("kind");$("#kf").value=KF;}
+if(P.get("q")){Q=P.get("q").toLowerCase();$("#q").value=P.get("q");}
+if(P.get("kind")||P.get("q"))render();
+function updNav(){document.querySelectorAll("#xnav a[data-b]").forEach(a=>{const u=new URL(a.dataset.b,location.href);if(Q)u.searchParams.set("q",Q);a.href=u.href;});}
+updNav();
+</script>
+</body></html>

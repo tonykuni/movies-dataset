@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<!-- ================================================================
+     VIA_P2_GlobalFlow.html
+     VeritasIntelligenceAnalytics · P2 Global Flow
+     Visual Lock: VPN v35 (Syne / DM Sans / DM Mono · #f5f4f0)
+     Data: VDF v4 (D-series · DuckDB)
+     ANC-A through ANC-G (7 anchors)
+     Focus: 跨市場資金流 · 國別 ETF · 殖利率變動 · Sector rotation · 股債商品輪動
+     ================================================================ -->
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA · P2 Global Flow</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@400;500;600;700&display=swap');
+:root{
+  --bg:#f5f4f0;--bg1:#edecea;--bg2:#e5e3df;--sf:#fff;--sf2:#fafaf8;
+  --bd:#dbd9d3;--bd2:#ccc9c1;
+  --bl:#4c78a8;--bl-l:#d0e1f0;
+  --tl:#439a9a;--tl-l:#c8e6e6;
+  --gn:#5a9e6f;--gn-l:#cde8d5;
+  --am:#c4943a;--am-l:#f5e2b8;
+  --co:#c96b5a;--co-l:#f5d0c8;
+  --vi:#7a6daa;--vi-l:#dcd8f0;
+  --ro:#b05580;
+  --i0:#1e1d1a;--i1:#3d3c38;--i2:#6b6860;--i3:#9c9890;--i4:#c4c0b8;
+  --mo:'DM Mono',monospace;--sa:'DM Sans',system-ui,sans-serif;--hf:'Syne',system-ui,sans-serif;
+  --r:5px;--r2:8px;--r3:12px;
+  --sh:0 1px 3px rgba(0,0,0,.06);--sh2:0 4px 12px rgba(0,0,0,.08);
+  --up:#c96b5a;--up-l:#f5d0c8;--dn:#5a9e6f;--dn-l:#cde8d5;--flat:#9c9890;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sa);background:var(--bg);color:var(--i0);font-size:11px;line-height:1.55}
+.w{max-width:1600px;margin:0 auto;padding:10px 14px}
+
+/* HEADER */
+.hdr{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r3);padding:14px 16px;margin-bottom:8px;position:relative;overflow:hidden;display:flex;align-items:center;gap:12px}
+.hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--bl),var(--tl),var(--vi),var(--am),var(--co))}
+.hdr .h-icon{width:38px;height:38px;border-radius:var(--r2);background:linear-gradient(135deg,var(--vi),var(--co));display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--hf);font-weight:800;font-size:16px;flex-shrink:0}
+.h1t{font-size:18px;font-weight:700;letter-spacing:-.5px;font-family:var(--hf)}
+.h1t span{color:var(--vi)}
+.h2t{color:var(--i3);font-size:10px;margin-top:1px;font-family:var(--mo)}
+.hdr .h-meta{margin-left:auto;display:flex;gap:8px;align-items:center}
+.live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gn);box-shadow:0 0 0 3px rgba(90,158,111,.18);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(90,158,111,.18)}50%{box-shadow:0 0 0 5px rgba(90,158,111,.05)}}
+.hdr .h-stamp{font-family:var(--mo);font-size:9.5px;color:var(--i2)}
+
+/* PAGE TABS */
+.pt{display:flex;gap:2px;margin-bottom:8px}
+.pt button{padding:8px 18px;border:1px solid var(--bd);border-radius:var(--r2) var(--r2) 0 0;background:var(--bg1);color:var(--i2);font:600 11px var(--sa);cursor:pointer;border-bottom:2px solid transparent;transition:.15s}
+.pt button.on{background:var(--sf);color:var(--bl);border-bottom-color:var(--bl);box-shadow:var(--sh)}
+.pt button:hover:not(.on){background:var(--bg2);color:var(--i1)}
+
+/* SUMMARY STRIP (P2 has 6 metrics — risk on/off + global flow indicators) */
+.sg{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-bottom:8px}
+@media(max-width:900px){.sg{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){.sg{grid-template-columns:repeat(2,1fr)}}
+.sc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:8px 10px;transition:.2s;border-left:3px solid var(--bd2)}
+.sc:hover{border-color:var(--bl);box-shadow:var(--sh)}
+.sc.on  {border-left-color:var(--up)}
+.sc.off {border-left-color:var(--dn)}
+.sc.bl  {border-left-color:var(--bl)}
+.sc.am  {border-left-color:var(--am)}
+.sc.vi  {border-left-color:var(--vi)}
+.sc .l{font-size:8.5px;color:var(--i3);text-transform:uppercase;letter-spacing:.5px;font-weight:600;font-family:var(--mo)}
+.sc .v{font-size:14px;font-weight:700;font-family:var(--mo);letter-spacing:-.3px;margin-top:2px}
+.sc .c{font-size:9px;font-family:var(--mo);font-weight:500;margin-top:1px;color:var(--i2)}
+.up-c{color:var(--up)}.dn-c{color:var(--dn)}.flat-c{color:var(--flat)}
+.bl-c{color:var(--bl)}.vi-c{color:var(--vi)}.am-c{color:var(--am)}
+
+/* GRID LAYOUTS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.g2-wide{display:grid;grid-template-columns:1.4fr 1fr;gap:8px;margin-bottom:8px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+@media(max-width:1100px){.g2,.g2-wide,.g3{grid-template-columns:1fr}}
+
+/* CARDS */
+.cd{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);overflow:hidden;transition:.15s}
+.cd:hover{box-shadow:var(--sh)}
+.cd-h{display:flex;align-items:center;gap:6px;padding:7px 10px;border-bottom:1px solid var(--bd);background:var(--sf2)}
+.cd-i{width:22px;height:22px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:var(--mo);flex-shrink:0;color:#fff}
+.cd-i.bl{background:var(--bl)}.cd-i.tl{background:var(--tl)}.cd-i.vi{background:var(--vi)}
+.cd-i.am{background:var(--am)}.cd-i.co{background:var(--co)}.cd-i.gn{background:var(--gn)}
+.cd-i.ro{background:var(--ro)}
+.cd-t{font-weight:600;font-size:11px;flex:1}
+.cd-s{font-family:var(--mo);font-size:9px;color:var(--i3);padding:1px 6px;background:var(--bg1);border-radius:10px}
+.cd-b{padding:10px 12px}
+
+/* TIME CHIPS */
+.row-tabs{display:inline-flex;border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;margin-left:auto}
+.row-tabs button{font:500 8.5px var(--mo);padding:1px 6px;background:var(--sf);border:none;border-right:1px solid var(--bd);color:var(--i2);cursor:pointer;min-width:22px;line-height:1.4;letter-spacing:.5px}
+.row-tabs button:last-child{border-right:none}
+.row-tabs button.on{background:var(--bl);color:#fff;font-weight:700}
+.row-tabs button:hover:not(.on){background:var(--bg1);color:var(--bl)}
+
+/* CHART */
+.chart-box{width:100%;position:relative}
+.chart-box svg{width:100%;display:block}
+.axis-tick{font-size:9px;fill:var(--i3);font-family:var(--mo);font-variant-numeric:tabular-nums}
+.axis-label{font-size:9.5px;fill:var(--i2);font-family:var(--mo);font-weight:600}
+.grid-line{stroke:var(--bd);stroke-width:.4;stroke-dasharray:2,3}
+
+/* COUNTRY ROW (ETF flow strip) */
+.cn-row{display:grid;grid-template-columns:54px 1fr 70px 70px;gap:8px;align-items:center;padding:5px 4px;border-bottom:1px dashed var(--bd);font-size:10.5px}
+.cn-row:last-child{border-bottom:none}
+.cn-flag{display:inline-flex;align-items:center;gap:4px;font-family:var(--mo);font-weight:700;font-size:10px;color:var(--i1)}
+.cn-flag .dot{width:6px;height:6px;border-radius:50%}
+.cn-track{height:14px;background:var(--bg1);border-radius:2px;position:relative;overflow:hidden}
+.cn-fill{position:absolute;top:0;height:100%}
+.cn-fill.in {left:50%;background:var(--up)}
+.cn-fill.out{right:50%;background:var(--dn)}
+.cn-mid{position:absolute;left:50%;top:0;height:100%;width:1px;background:var(--bd2)}
+.cn-val{font-family:var(--mo);font-weight:700;text-align:right}
+.cn-pct{font-family:var(--mo);font-size:9.5px;text-align:right}
+
+/* SECTOR HEATMAP (5 columns: 1D 5D 1M 3M YTD) */
+.heat{display:grid;grid-template-columns:64px repeat(5,1fr);gap:2px;font-size:10px}
+.heat .lab{padding:5px 6px;color:var(--i1);font-family:var(--mo);font-size:10px;display:flex;align-items:center;gap:4px}
+.heat .h-cell{padding:5px 4px;border-radius:3px;text-align:center;font-family:var(--mo);font-weight:700;font-size:10.5px;letter-spacing:-.2px}
+.heat .h-head{font-size:8.5px;color:var(--i3);text-align:center;padding:4px;letter-spacing:.4px;text-transform:uppercase;font-family:var(--mo);font-weight:600}
+
+/* SECTOR DOT */
+.s-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+/* BADGES */
+.bd-tag{display:inline-block;padding:1px 5px;border-radius:3px;font-family:var(--mo);font-size:8.5px;font-weight:700;letter-spacing:.3px}
+.bd-tag.tw{background:var(--co-l);color:var(--co)}
+.bd-tag.us{background:var(--bl-l);color:var(--bl)}
+.bd-tag.dm{background:var(--vi-l);color:var(--vi)}
+.bd-tag.em{background:var(--am-l);color:var(--am)}
+.bd-tag.cn{background:var(--gn-l);color:var(--gn)}
+.bd-tag.eu{background:var(--tl-l);color:var(--tl)}
+
+/* TABLE */
+.mx{width:100%;border-collapse:collapse;font-size:10.5px}
+.mx th{background:var(--bg1);padding:5px 7px;text-align:left;font-weight:600;color:var(--i2);border-bottom:1.5px solid var(--bd);font-family:var(--mo);font-size:8.5px;letter-spacing:.3px;text-transform:uppercase}
+.mx th.r{text-align:right}
+.mx td{padding:4px 7px;border-bottom:1px solid var(--bd);vertical-align:middle}
+.mx td.r{text-align:right;font-family:var(--mo);font-weight:600}
+.mx tr:last-child td{border-bottom:none}
+.mx tr:hover td{background:rgba(76,120,168,.04)}
+.mx .nm{font-weight:600;color:var(--i0)}
+.mx .sym{color:var(--i3);font-size:9.5px;margin-left:4px;font-family:var(--mo)}
+
+/* IO CARD */
+.io-c{background:var(--sf2);border:1px solid var(--bd);border-radius:var(--r);padding:6px 8px;border-left:3px solid var(--bd2)}
+.io-c.up{border-left-color:var(--up)}
+.io-c.dn{border-left-color:var(--dn)}
+.io-c.bl{border-left-color:var(--bl)}
+.io-l{font-size:8.5px;color:var(--i3);text-transform:uppercase;letter-spacing:.4px;font-weight:600;font-family:var(--mo)}
+.io-v{font-size:14px;font-weight:700;font-family:var(--mo);margin:1px 0;letter-spacing:-.2px}
+.io-s{font-size:9px;color:var(--i2);font-family:var(--mo)}
+
+/* RISK GAUGE BAR */
+.gauge{height:18px;background:linear-gradient(90deg,var(--gn) 0%,var(--gn-l) 25%,var(--am-l) 50%,var(--co-l) 75%,var(--co) 100%);border-radius:var(--r);position:relative;margin:8px 0}
+.gauge .needle{position:absolute;top:-3px;width:2px;height:24px;background:var(--i0);border-radius:1px;transition:left .3s}
+.gauge .label-row{display:flex;justify-content:space-between;font-family:var(--mo);font-size:8.5px;color:var(--i3);margin-top:3px;letter-spacing:.3px;text-transform:uppercase}
+
+/* YIELD CHANGE BARS */
+.yc-row{display:grid;grid-template-columns:42px 1fr 56px;align-items:center;gap:8px;padding:4px 0;font-size:10.5px;border-bottom:1px dashed var(--bd)}
+.yc-row:last-child{border-bottom:none}
+.yc-mat{font-family:var(--mo);font-weight:700;color:var(--i1);font-size:10px}
+.yc-track{height:14px;background:var(--bg1);border-radius:2px;position:relative;overflow:hidden}
+.yc-fill{position:absolute;top:0;height:100%}
+.yc-fill.up  {left:50%;background:var(--up);opacity:.85}
+.yc-fill.dn{right:50%;background:var(--dn);opacity:.85}
+.yc-mid{position:absolute;left:50%;top:0;height:100%;width:1px;background:var(--bd2)}
+.yc-val{font-family:var(--mo);font-weight:700;text-align:right;font-size:10px}
+
+/* FOOTER */
+.foot{display:flex;justify-content:space-between;align-items:center;font-size:9px;color:var(--i3);letter-spacing:.4px;text-transform:uppercase;padding:8px 4px 4px;gap:10px;flex-wrap:wrap;font-family:var(--mo)}
+.foot .src{color:var(--i2)}
+.foot .anc-tag{display:inline-block;padding:1px 6px;border-radius:3px;font-family:var(--mo);font-size:8.5px;font-weight:700;background:var(--vi-l);color:var(--vi);letter-spacing:.4px}
+
+</style>
+</head>
+<body>
+<div class="w">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="h-icon">P2</div>
+  <div>
+    <div class="h1t">VeritasIntelligenceAnalytics <span>· P2 Global Flow</span></div>
+    <div class="h2t">Cross-market capital flow · risk on/off · 國別 ETF · sector rotation</div>
+  </div>
+  <div class="h-meta">
+    <span class="live-dot"></span>
+    <span class="h-stamp">2026-04-25 18:30 TPE</span>
+  </div>
+</div>
+
+<!-- PAGE TABS -->
+<div class="pt">
+  <button>P1 · Overview</button>
+  <button class="on">P2 · Global Flow</button>
+  <button>P3 · Asset Matrix</button>
+  <button>P4 · Rates &amp; FX</button>
+  <button>P5 · Commodities</button>
+  <button>P6 · Events</button>
+  <button>P7 · TW Focus</button>
+</div>
+
+<!-- ANC-A · 6-METRIC SUMMARY (risk gauges + breadth) -->
+<div class="sg">
+  <div class="sc on">
+    <div class="l">Risk On/Off</div>
+    <div class="v up-c">RISK ON</div>
+    <div class="c">vol↓ · 高Beta↑</div>
+  </div>
+  <div class="sc bl">
+    <div class="l">SPY/TLT 比</div>
+    <div class="v">5.42</div>
+    <div class="c up-c">+1.8% · 股強債弱</div>
+  </div>
+  <div class="sc on">
+    <div class="l">DM vs EM</div>
+    <div class="v up-c">+1.4%</div>
+    <div class="c">EFA 領先 EEM</div>
+  </div>
+  <div class="sc am">
+    <div class="l">高收益債利差</div>
+    <div class="v">312 bps</div>
+    <div class="c dn-c">-8 bps · 信用收斂</div>
+  </div>
+  <div class="sc vi">
+    <div class="l">DXY 美元指數</div>
+    <div class="v">103.42</div>
+    <div class="c">+0.08% · 區間整理</div>
+  </div>
+  <div class="sc on">
+    <div class="l">Adv-Decl 線</div>
+    <div class="v up-c">+486</div>
+    <div class="c">寬度健康</div>
+  </div>
+</div>
+
+<!-- ANC-B · COUNTRY ETF FLOW + ANC-C · RISK GAUGES -->
+<div class="g2-wide">
+
+  <!-- ANC-B Country ETF Flow -->
+  <div class="cd">
+    <div class="cd-h">
+      <div class="cd-i bl">①</div>
+      <div class="cd-t">國別 ETF · 5 日資金流向</div>
+      <div class="cd-s">% 變動</div>
+      <div class="row-tabs" id="cn-tabs">
+        <button data-w="1D">1D</button>
+        <button data-w="5D" class="on">5D</button>
+        <button data-w="1M">1M</button>
+        <button data-w="3M">3M</button>
+        <button data-w="YTD">YTD</button>
+      </div>
+    </div>
+    <div class="cd-b" style="padding:6px 10px">
+      <div id="country-flow"></div>
+    </div>
+  </div>
+
+  <!-- ANC-C Risk Gauges -->
+  <div class="cd">
+    <div class="cd-h">
+      <div class="cd-i co">②</div>
+      <div class="cd-t">風險偏好量表</div>
+      <div class="cd-s">composite</div>
+    </div>
+    <div class="cd-b">
+
+      <div class="io-l" style="margin-bottom:2px">VIX · 隱含波動率</div>
+      <div class="gauge"><div class="needle" id="g-vix" style="left:18%"></div></div>
+      <div class="gauge" style="margin-top:-4px"></div>
+      <div style="display:flex;justify-content:space-between;font-family:var(--mo);font-size:8.5px;color:var(--i3);margin-top:-12px">
+        <span>10</span><span>15</span><span>20</span><span>30</span><span>40+</span>
+      </div>
+      <div style="font-family:var(--mo);font-size:10px;color:var(--i1);text-align:center;margin-top:4px">
+        <span style="color:var(--gn);font-weight:700">14.86</span> · 低波動
+      </div>
+
+      <div class="io-l" style="margin:14px 0 2px">Put/Call 比 (CBOE)</div>
+      <div class="gauge"><div class="needle" id="g-pc" style="left:36%"></div></div>
+      <div style="display:flex;justify-content:space-between;font-family:var(--mo);font-size:8.5px;color:var(--i3);margin-top:3px">
+        <span>0.5</span><span>0.8</span><span>1.0</span><span>1.2</span><span>1.5</span>
+      </div>
+      <div style="font-family:var(--mo);font-size:10px;color:var(--i1);text-align:center;margin-top:2px">
+        <span style="color:var(--gn);font-weight:700">0.72</span> · 偏多
+      </div>
+
+      <div class="io-l" style="margin:14px 0 2px">High Yield 信用利差</div>
+      <div class="gauge"><div class="needle" id="g-hy" style="left:24%"></div></div>
+      <div style="display:flex;justify-content:space-between;font-family:var(--mo);font-size:8.5px;color:var(--i3);margin-top:3px">
+        <span>250</span><span>300</span><span>400</span><span>500</span><span>700+</span>
+      </div>
+      <div style="font-family:var(--mo);font-size:10px;color:var(--i1);text-align:center;margin-top:2px">
+        <span style="color:var(--gn);font-weight:700">312 bps</span> · 信用健康
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ANC-D · S&P 11 SECTOR HEATMAP + ANC-E · TW SECTOR -->
+<div class="g2">
+
+  <div class="cd">
+    <div class="cd-h">
+      <div class="cd-i vi">③</div>
+      <div class="cd-t">美股 11 類股報酬</div>
+      <div class="cd-s">SPDR sector</div>
+    </div>
+    <div class="cd-b" style="padding:8px 10px">
+      <div class="heat">
+        <div></div>
+        <div class="h-head">1D</div><div class="h-head">5D</div><div class="h-head">1M</div><div class="h-head">3M</div><div class="h-head">YTD</div>
+
+        <div class="lab"><span class="s-dot" style="background:var(--vi)"></span>XLK 科技</div>
+        <div class="h-cell" data-v="0.8"></div><div class="h-cell" data-v="2.4"></div><div class="h-cell" data-v="6.8"></div><div class="h-cell" data-v="14.2"></div><div class="h-cell" data-v="28.4"></div>
+
+        <div class="lab"><span class="s-dot" style="background:var(--co)"></span>XLY 非必需</div>
+        <div class="h-cell" data-v="0.4"></div><div class="h-cell" data-v="1.2"></div><div class="h-cell" data-v="4.6"></div><div class="h-cell" data-v="10.8"></div><div class="h-cell" data-v="18.2"></div>
+
+        <div class="lab"><span class="s-dot" style="background:var(--bl)"></span>XLF 金融</div>
+        <div class="h-cell" data-v="0.6"></div><div class="h-cell" data-v="1.8"></div><div class="h-cell" data-v="3.4"></div><div class="h-cell" data-v="8.2"></div><div class="h-cell" data-v="14.6"></div>
+
+        <div class="lab"><span class="s-dot" style="background:var(--am)"></span>XLE 能源</div>
+        <div class="h-cell" data-v="-0.4"></div><div class="h-cell" data-v="-1.8"></div><div class="h-cell" data-v="-2.6"></div><div class="h-cell" data-v="2.4"></div><div class="h-cell" data-v="6.8"></div>
+
+        <div class="lab"><span class="s-dot" style="background:var(--tl)"></span>XLV 醫療</div>
+        <div class="h-cell" data-v="0.2"></div><div class="h-cell" data-v="0.8"></div><div class="h-cell" data-v="2.2"></div><div class="h-cell" data-v="5.4"></div><div class="h-cell" data-v="9.4"></div>
+
+        <div class="lab"><span class="s-dot" style="background:var(--gn)"></span>XLI 工業</div>
+        <div class="h-cell" data-v="0.5"></div><div class="h-cell" data-v="1.4"></div><div class="h-cell" data-v="3.8"></div><div class="h-cell" data-v="8.6"></div><div class="h-cell" data-v="13.4"></div>
+
+        <div class="lab"><span class="s-dot" style="background:var(--ro)"></span>XLP 必需</div>
+        <div class="h-cell" data-v="0.1"></div><div class="h-cell" data-v="0.4"></div><div class="h-cell" data-v="1.2"></div><div class="h-cell" data-v="3.8"></div><div class="h-cell" data-v="6.2"></div>
+
+        <div class="lab"><span class="s-dot" style="background:var(--vi)"></span>XLU 公用</div>
+        <div class="h-cell" data-v="-0.2"></div><div class="h-cell" data-v="-0.6"></div><div class="h-cell" data-v="0.8"></div><div class="h-cell" data-v="4.2"></div><div class="h-cell" data-v="7.8"></div>
+
+        <div class="lab"><span class="s-dot" style="background:var(--co)"></span>XLB 原料</div>
+        <div class="h-cell" data-v="0.3"></div><div class="h-cell" data-v="0.6"></div><div class="h-cell" data-v="1.6"></div><div class="h-cell" data-v="4.4"></div><div class="h-cell" data-v="8.6"></div>
+
+        <div class="lab"><span class="s-dot" style="background:var(--bl)"></span>XLRE 不動產</div>
+        <div class="h-cell" data-v="0.0"></div><div class="h-cell" data-v="-0.4"></div><div class="h-cell" data-v="0.4"></div><div class="h-cell" data-v="3.2"></div><div class="h-cell" data-v="5.4"></div>
+
+        <div class="lab"><span class="s-dot" style="background:var(--tl)"></span>XLC 通訊</div>
+        <div class="h-cell" data-v="0.7"></div><div class="h-cell" data-v="2.0"></div><div class="h-cell" data-v="5.4"></div><div class="h-cell" data-v="11.8"></div><div class="h-cell" data-v="22.4"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cd">
+    <div class="cd-h">
+      <div class="cd-i co">④</div>
+      <div class="cd-t">台股 8 大類股</div>
+      <div class="cd-s">TSE sector</div>
+    </div>
+    <div class="cd-b" style="padding:8px 10px">
+      <div class="heat">
+        <div></div>
+        <div class="h-head">1D</div><div class="h-head">5D</div><div class="h-head">1M</div><div class="h-head">3M</div><div class="h-head">YTD</div>
+
+        <div class="lab"><span class="s-dot" style="background:var(--co)"></span>半導體</div>
+        <div class="h-cell" data-v="1.4"></div><div class="h-cell" data-v="4.2"></div><div class="h-cell" data-v="8.8"></div><div class="h-cell" data-v="18.4"></div><div class="h-cell" data-v="32.6"></div>
+
+        <div class="lab"><span class="s-dot" style="background:var(--vi)"></span>電子零組</div>
+        <div class="h-cell" data-v="0.8"></div><div class="h-cell" data-v="2.6"></div><div class="h-cell" data-v="5.4"></div><div class="h-cell" data-v="12.8"></div><div class="h-cell" data-v="22.4"></div>
+
+        <div class="lab"><span class="s-dot" style="background:var(--bl)"></span>金融</div>
+        <div class="h-cell" data-v="0.4"></div><div class="h-cell" data-v="1.2"></div><div class="h-cell" data-v="3.2"></div><div class="h-cell" data-v="7.6"></div><div class="h-cell" data-v="11.2"></div>
+
+        <div class="lab"><span class="s-dot" style="background:var(--gn)"></span>傳產</div>
+        <div class="h-cell" data-v="-0.2"></div><div class="h-cell" data-v="-0.6"></div><div class="h-cell" data-v="-1.4"></div><div class="h-cell" data-v="2.8"></div><div class="h-cell" data-v="4.6"></div>
+
+        <div class="lab"><span class="s-dot" style="background:var(--am)"></span>航運</div>
+        <div class="h-cell" data-v="-0.6"></div><div class="h-cell" data-v="-2.4"></div><div class="h-cell" data-v="-3.8"></div><div class="h-cell" data-v="-1.2"></div><div class="h-cell" data-v="3.4"></div>
+
+        <div class="lab"><span class="s-dot" style="background:var(--tl)"></span>生技醫療</div>
+        <div class="h-cell" data-v="0.6"></div><div class="h-cell" data-v="1.8"></div><div class="h-cell" data-v="4.2"></div><div class="h-cell" data-v="9.6"></div><div class="h-cell" data-v="14.2"></div>
+
+        <div class="lab"><span class="s-dot" style="background:var(--ro)"></span>觀光餐飲</div>
+        <div class="h-cell" data-v="0.2"></div><div class="h-cell" data-v="0.4"></div><div class="h-cell" data-v="1.6"></div><div class="h-cell" data-v="4.4"></div><div class="h-cell" data-v="6.8"></div>
+
+        <div class="lab"><span class="s-dot" style="background:var(--co)"></span>資產營建</div>
+        <div class="h-cell" data-v="0.3"></div><div class="h-cell" data-v="0.8"></div><div class="h-cell" data-v="2.2"></div><div class="h-cell" data-v="5.6"></div><div class="h-cell" data-v="9.4"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ANC-F · YIELD CURVE CHANGE + STOCK/BOND ROTATION -->
+<div class="g3">
+
+  <div class="cd">
+    <div class="cd-h">
+      <div class="cd-i tl">⑤</div>
+      <div class="cd-t">UST 殖利率變動</div>
+      <div class="cd-s">5D bps</div>
+    </div>
+    <div class="cd-b">
+      <div class="yc-row">
+        <span class="yc-mat">3M</span>
+        <div class="yc-track"><div class="yc-fill dn" style="width:8%"></div><div class="yc-mid"></div></div>
+        <span class="yc-val dn-c">-4 bps</span>
+      </div>
+      <div class="yc-row">
+        <span class="yc-mat">6M</span>
+        <div class="yc-track"><div class="yc-fill dn" style="width:6%"></div><div class="yc-mid"></div></div>
+        <span class="yc-val dn-c">-3 bps</span>
+      </div>
+      <div class="yc-row">
+        <span class="yc-mat">2Y</span>
+        <div class="yc-track"><div class="yc-fill up" style="width:4%"></div><div class="yc-mid"></div></div>
+        <span class="yc-val up-c">+2 bps</span>
+      </div>
+      <div class="yc-row">
+        <span class="yc-mat">5Y</span>
+        <div class="yc-track"><div class="yc-fill up" style="width:18%"></div><div class="yc-mid"></div></div>
+        <span class="yc-val up-c">+9 bps</span>
+      </div>
+      <div class="yc-row">
+        <span class="yc-mat">10Y</span>
+        <div class="yc-track"><div class="yc-fill up" style="width:24%"></div><div class="yc-mid"></div></div>
+        <span class="yc-val up-c">+12 bps</span>
+      </div>
+      <div class="yc-row">
+        <span class="yc-mat">30Y</span>
+        <div class="yc-track"><div class="yc-fill up" style="width:30%"></div><div class="yc-mid"></div></div>
+        <span class="yc-val up-c">+15 bps</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px">
+        <div class="io-c up"><div class="io-l">2s10s</div><div class="io-v">+24</div><div class="io-s">bps · 趨陡</div></div>
+        <div class="io-c bl"><div class="io-l">5s30s</div><div class="io-v">+46</div><div class="io-s">bps · 趨陡</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cd">
+    <div class="cd-h">
+      <div class="cd-i am">⑥</div>
+      <div class="cd-t">股債商品輪動</div>
+      <div class="cd-s">5D ratio</div>
+    </div>
+    <div class="cd-b">
+      <div class="chart-box" id="rotation-chart" style="height:140px"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:8px">
+        <div class="io-c up"><div class="io-l">SPY / TLT</div><div class="io-v up-c">+1.8%</div><div class="io-s">股 &gt; 債</div></div>
+        <div class="io-c dn"><div class="io-l">GLD / SPY</div><div class="io-v dn-c">-0.6%</div><div class="io-s">商品弱</div></div>
+        <div class="io-c up"><div class="io-l">QQQ / SPY</div><div class="io-v up-c">+0.4%</div><div class="io-s">科技領先</div></div>
+        <div class="io-c dn"><div class="io-l">RSP / SPY</div><div class="io-v dn-c">-0.3%</div><div class="io-s">大型股強</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cd">
+    <div class="cd-h">
+      <div class="cd-i ro">⑦</div>
+      <div class="cd-t">主要 ETF 5D 流向</div>
+      <div class="cd-s">est. flow</div>
+    </div>
+    <div class="cd-b" style="padding:6px 8px">
+      <table class="mx">
+        <thead><tr><th>ETF</th><th class="r">區域</th><th class="r">5D 流量</th></tr></thead>
+        <tbody>
+          <tr><td><span class="nm">SPY</span><span class="sym">標普</span></td><td class="r"><span class="bd-tag us">US</span></td><td class="r up-c">+82.4 億</td></tr>
+          <tr><td><span class="nm">QQQ</span><span class="sym">那斯達克</span></td><td class="r"><span class="bd-tag us">US</span></td><td class="r up-c">+46.8 億</td></tr>
+          <tr><td><span class="nm">EFA</span><span class="sym">已開發</span></td><td class="r"><span class="bd-tag dm">DM</span></td><td class="r up-c">+18.2 億</td></tr>
+          <tr><td><span class="nm">EEM</span><span class="sym">新興</span></td><td class="r"><span class="bd-tag em">EM</span></td><td class="r dn-c">-12.4 億</td></tr>
+          <tr><td><span class="nm">TLT</span><span class="sym">長債</span></td><td class="r"><span class="bd-tag us">US</span></td><td class="r dn-c">-24.6 億</td></tr>
+          <tr><td><span class="nm">GLD</span><span class="sym">黃金</span></td><td class="r"><span class="bd-tag us">US</span></td><td class="r up-c">+8.6 億</td></tr>
+          <tr><td><span class="nm">FXI</span><span class="sym">中國</span></td><td class="r"><span class="bd-tag cn">CN</span></td><td class="r dn-c">-6.2 億</td></tr>
+          <tr><td><span class="nm">EWT</span><span class="sym">台灣</span></td><td class="r"><span class="bd-tag tw">TW</span></td><td class="r up-c">+4.8 億</td></tr>
+          <tr><td><span class="nm">EWJ</span><span class="sym">日本</span></td><td class="r"><span class="bd-tag dm">DM</span></td><td class="r up-c">+3.2 億</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ANC-G · GLOBAL CAPITAL FLOW SUMMARY (full-width signal panel) -->
+<div class="cd" style="margin-bottom:8px">
+  <div class="cd-h">
+    <div class="cd-i gn">⑧</div>
+    <div class="cd-t">綜合資金流訊號 · global capital flow scorecard</div>
+    <div class="cd-s">multi-window</div>
+  </div>
+  <div class="cd-b">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+      <div class="io-c up">
+        <div class="io-l">股票 vs 債券</div>
+        <div class="io-v up-c">+82</div>
+        <div class="io-s">股強(滿分 ±100)</div>
+      </div>
+      <div class="io-c up">
+        <div class="io-l">DM vs EM</div>
+        <div class="io-v up-c">+46</div>
+        <div class="io-s">已開發領先</div>
+      </div>
+      <div class="io-c dn">
+        <div class="io-l">商品 vs 美元</div>
+        <div class="io-v dn-c">-12</div>
+        <div class="io-s">美元偏強</div>
+      </div>
+      <div class="io-c up">
+        <div class="io-l">高 Beta vs 低 Beta</div>
+        <div class="io-v up-c">+58</div>
+        <div class="io-s">攻勢明顯</div>
+      </div>
+    </div>
+    <div style="background:var(--bg1);border-radius:var(--r);padding:8px 10px;margin-top:10px;font-size:10.5px;line-height:1.6;color:var(--i1)">
+      <strong style="color:var(--vi);font-family:var(--hf)">綜合判讀</strong> ·
+      <span style="color:var(--up);font-weight:700">RISK ON</span>
+      環境延續 — 資金由防禦類股(公用 / 必需消費)流向科技 + 通訊 + 非必需消費,DM 領先 EM,
+      但 EM 指數內部分化(台股強 / 中港弱),殖利率曲線於長端走陡顯示市場 price-in
+      聯準會降息延後但仍未轉鷹。<span style="color:var(--am);font-weight:700">注意</span>:VIX 14.86 為 6 個月低位,
+      若任何外生事件(關稅 / 地緣 / 業績不如預期)觸發,反彈空間有限,需警覺空頭回補後的賣壓。
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="foot">
+  <div class="src">
+    sources: VDF_D2_YFinanceEngine · VDF_D2_FREDEngine · VDF_D2_GlobalUniverseEngine · VDF_D5_DuckDB
+  </div>
+  <div>
+    <span class="anc-tag">ANC-A</span>
+    <span class="anc-tag">ANC-B</span>
+    <span class="anc-tag">ANC-C</span>
+    <span class="anc-tag">ANC-D</span>
+    <span class="anc-tag">ANC-E</span>
+    <span class="anc-tag">ANC-F</span>
+    <span class="anc-tag">ANC-G</span>
+    P2 · GLOBAL FLOW
+  </div>
+</div>
+
+</div>
+
+<script>
+(function(){
+  const NS = "http://www.w3.org/2000/svg";
+  const COL = { co:"#c96b5a", bl:"#4c78a8", vi:"#7a6daa", gn:"#5a9e6f", am:"#c4943a", tl:"#439a9a", ro:"#b05580" };
+
+  // ── ① Country ETF Flow ────────────────────────────────────
+  const COUNTRY_DATA = {
+    "1D":  [
+      { name:"US",     etf:"SPY",  region:"us",  flow:+0.42 },
+      { name:"Tech",   etf:"QQQ",  region:"us",  flow:+0.55 },
+      { name:"Japan",  etf:"EWJ",  region:"dm",  flow:+0.82 },
+      { name:"Europe", etf:"EFA",  region:"dm",  flow:+0.18 },
+      { name:"EM",     etf:"EEM",  region:"em",  flow:-0.24 },
+      { name:"China",  etf:"FXI",  region:"cn",  flow:-0.66 },
+      { name:"Taiwan", etf:"EWT",  region:"tw",  flow:+0.84 },
+      { name:"Korea",  etf:"EWY",  region:"em",  flow:-0.42 },
+      { name:"India",  etf:"INDA", region:"em",  flow:+0.18 },
+    ],
+    "5D":  [
+      { name:"US",     etf:"SPY",  region:"us",  flow:+1.84 },
+      { name:"Tech",   etf:"QQQ",  region:"us",  flow:+2.42 },
+      { name:"Japan",  etf:"EWJ",  region:"dm",  flow:+3.18 },
+      { name:"Europe", etf:"EFA",  region:"dm",  flow:+0.86 },
+      { name:"EM",     etf:"EEM",  region:"em",  flow:-1.24 },
+      { name:"China",  etf:"FXI",  region:"cn",  flow:-2.18 },
+      { name:"Taiwan", etf:"EWT",  region:"tw",  flow:+2.86 },
+      { name:"Korea",  etf:"EWY",  region:"em",  flow:-1.84 },
+      { name:"India",  etf:"INDA", region:"em",  flow:+0.42 },
+    ],
+    "1M":  [
+      { name:"US",     etf:"SPY",  region:"us",  flow:+4.62 },
+      { name:"Tech",   etf:"QQQ",  region:"us",  flow:+6.84 },
+      { name:"Japan",  etf:"EWJ",  region:"dm",  flow:+5.42 },
+      { name:"Europe", etf:"EFA",  region:"dm",  flow:+2.18 },
+      { name:"EM",     etf:"EEM",  region:"em",  flow:-2.84 },
+      { name:"China",  etf:"FXI",  region:"cn",  flow:-4.62 },
+      { name:"Taiwan", etf:"EWT",  region:"tw",  flow:+5.86 },
+      { name:"Korea",  etf:"EWY",  region:"em",  flow:-3.42 },
+      { name:"India",  etf:"INDA", region:"em",  flow:+1.84 },
+    ],
+    "3M":  [
+      { name:"US",     etf:"SPY",  region:"us",  flow:+8.42 },
+      { name:"Tech",   etf:"QQQ",  region:"us",  flow:+12.86 },
+      { name:"Japan",  etf:"EWJ",  region:"dm",  flow:+7.84 },
+      { name:"Europe", etf:"EFA",  region:"dm",  flow:+4.62 },
+      { name:"EM",     etf:"EEM",  region:"em",  flow:-3.84 },
+      { name:"China",  etf:"FXI",  region:"cn",  flow:-6.42 },
+      { name:"Taiwan", etf:"EWT",  region:"tw",  flow:+11.42 },
+      { name:"Korea",  etf:"EWY",  region:"em",  flow:-4.86 },
+      { name:"India",  etf:"INDA", region:"em",  flow:+3.42 },
+    ],
+    "YTD": [
+      { name:"US",     etf:"SPY",  region:"us",  flow:+14.6 },
+      { name:"Tech",   etf:"QQQ",  region:"us",  flow:+22.4 },
+      { name:"Japan",  etf:"EWJ",  region:"dm",  flow:+12.2 },
+      { name:"Europe", etf:"EFA",  region:"dm",  flow:+8.4 },
+      { name:"EM",     etf:"EEM",  region:"em",  flow:-2.6 },
+      { name:"China",  etf:"FXI",  region:"cn",  flow:-8.4 },
+      { name:"Taiwan", etf:"EWT",  region:"tw",  flow:+18.6 },
+      { name:"Korea",  etf:"EWY",  region:"em",  flow:-7.4 },
+      { name:"India",  etf:"INDA", region:"em",  flow:+6.8 },
+    ],
+  };
+  const REGION_DOT = { us:"#4c78a8", dm:"#7a6daa", em:"#c4943a", cn:"#5a9e6f", tw:"#c96b5a" };
+
+  function renderCountry(window){
+    const host = document.getElementById("country-flow");
+    host.innerHTML = "";
+    const data = COUNTRY_DATA[window];
+    const maxAbs = Math.max(...data.map(d => Math.abs(d.flow)));
+    data.forEach(d => {
+      const row = document.createElement("div");
+      row.className = "cn-row";
+      const pct = (Math.abs(d.flow)/maxAbs * 50);  // 50% = half of bar (since centered)
+      row.innerHTML = `
+        <div class="cn-flag"><span class="dot" style="background:${REGION_DOT[d.region]}"></span>${d.etf}</div>
+        <div class="cn-track">
+          <div class="cn-fill ${d.flow >= 0 ? 'in' : 'out'}" style="width:${pct.toFixed(1)}%"></div>
+          <div class="cn-mid"></div>
+        </div>
+        <div class="cn-val ${d.flow >= 0 ? 'up-c' : 'dn-c'}">${d.flow >= 0 ? '+' : ''}${d.flow.toFixed(2)}%</div>
+        <div class="cn-pct" style="color:var(--i3)">${d.name}</div>
+      `;
+      host.appendChild(row);
+    });
+  }
+
+  document.querySelectorAll("#cn-tabs button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#cn-tabs button").forEach(b => b.classList.remove("on"));
+      btn.classList.add("on");
+      renderCountry(btn.dataset.w);
+    });
+  });
+
+  // ── ③ ④ Heatmap colors ───────────────────────────────────
+  function colorReturn(v){
+    const a = Math.abs(v);
+    if(v > 0){
+      const t = Math.min(1, a/30);
+      const r = Math.round(245 - 124*t);
+      const g = Math.round(208 - 100*t);
+      const b = Math.round(200 - 110*t);
+      return { bg:`rgb(${r},${g},${b})`, fg: t>0.5 ? "rgba(255,255,255,.95)" : "var(--co)" };
+    }
+    if(v < 0){
+      const t = Math.min(1, a/10);
+      const r = Math.round(205 - 115*t);
+      const g = Math.round(232 - 74*t);
+      const b = Math.round(213 - 102*t);
+      return { bg:`rgb(${r},${g},${b})`, fg: t>0.5 ? "rgba(255,255,255,.95)" : "var(--gn)" };
+    }
+    return { bg:"#ebe9e3", fg:"var(--i2)" };
+  }
+  document.querySelectorAll(".h-cell").forEach(c => {
+    const v = parseFloat(c.dataset.v);
+    const {bg,fg} = colorReturn(v);
+    c.style.background = bg;
+    c.style.color = fg;
+    c.textContent = (v>=0?"+":"")+v.toFixed(1);
+  });
+
+  // ── ⑥ Rotation chart (4 ratios over 3M) ──────────────────
+  function drawRotation(){
+    const host = document.getElementById("rotation-chart");
+    const W=300, H=140, pad={t:10,r:14,b:22,l:36};
+    const ratios = [
+      { name:"SPY/TLT", c:COL.co, d:gen(60,[100,101.2,102.6,103.8,101.8]) },
+      { name:"QQQ/SPY", c:COL.bl, d:gen(60,[100,100.4,101.0,100.8,100.4]) },
+      { name:"GLD/SPY", c:COL.am, d:gen(60,[100,99.6,99.2,99.4,99.4]) },
+    ];
+    const allVals = ratios.flatMap(r=>r.d);
+    const lo = Math.min(...allVals)*0.998;
+    const hi = Math.max(...allVals)*1.002;
+    const n = ratios[0].d.length;
+    const xOf = i => pad.l + (i/(n-1))*(W-pad.l-pad.r);
+    const yOf = v => pad.t + (hi-v)/(hi-lo)*(H-pad.t-pad.b);
+
+    const svg = document.createElementNS(NS,"svg");
+    svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+    svg.setAttribute("preserveAspectRatio","xMidYMid meet");
+
+    // Y grid (3 ticks)
+    [lo, (lo+hi)/2, hi].forEach(v => {
+      const y = yOf(v);
+      const ln = document.createElementNS(NS,"line");
+      ln.setAttribute("x1",pad.l);ln.setAttribute("x2",W-pad.r);
+      ln.setAttribute("y1",y);ln.setAttribute("y2",y);
+      ln.setAttribute("class","grid-line");svg.appendChild(ln);
+      const t = document.createElementNS(NS,"text");
+      t.setAttribute("x",pad.l-4);t.setAttribute("y",y+3);
+      t.setAttribute("text-anchor","end");t.setAttribute("class","axis-tick");
+      t.textContent = v.toFixed(1);svg.appendChild(t);
+    });
+
+    // 100 baseline
+    const zY = yOf(100);
+    const z = document.createElementNS(NS,"line");
+    z.setAttribute("x1",pad.l);z.setAttribute("x2",W-pad.r);
+    z.setAttribute("y1",zY);z.setAttribute("y2",zY);
+    z.setAttribute("stroke","#9c9890");z.setAttribute("stroke-width",".7");
+    z.setAttribute("stroke-dasharray","3,2");
+    svg.appendChild(z);
+
+    ratios.forEach(s => {
+      const pts = s.d.map((v,i) => xOf(i)+","+yOf(v));
+      const pl = document.createElementNS(NS,"polyline");
+      pl.setAttribute("fill","none");pl.setAttribute("stroke",s.c);
+      pl.setAttribute("stroke-width","1.3");pl.setAttribute("stroke-linejoin","round");
+      pl.setAttribute("points",pts.join(" "));
+      svg.appendChild(pl);
+      const endX = xOf(n-1), endY = yOf(s.d[n-1]);
+      const dot = document.createElementNS(NS,"circle");
+      dot.setAttribute("cx",endX);dot.setAttribute("cy",endY);
+      dot.setAttribute("r","2.4");dot.setAttribute("fill",s.c);
+      svg.appendChild(dot);
+    });
+
+    // X axis labels
+    ["3M ago","2M","1M","now"].forEach((lab, i) => {
+      const x = pad.l + (i/3)*(W-pad.l-pad.r);
+      const t = document.createElementNS(NS,"text");
+      t.setAttribute("x",x);t.setAttribute("y",H-pad.b+12);
+      t.setAttribute("text-anchor","middle");t.setAttribute("class","axis-tick");
+      t.textContent = lab;svg.appendChild(t);
+    });
+
+    // Legend bottom
+    const legY = H - 4;
+    let lx = pad.l;
+    ratios.forEach(s => {
+      const sw = document.createElementNS(NS,"rect");
+      sw.setAttribute("x",lx);sw.setAttribute("y",legY-7);
+      sw.setAttribute("width",8);sw.setAttribute("height",2);
+      sw.setAttribute("fill",s.c);svg.appendChild(sw);
+      const t = document.createElementNS(NS,"text");
+      t.setAttribute("x",lx+11);t.setAttribute("y",legY-3);
+      t.setAttribute("class","axis-tick");
+      t.textContent = s.name;svg.appendChild(t);
+      lx += 70;
+    });
+
+    host.innerHTML = "";
+    host.appendChild(svg);
+  }
+
+  function gen(n, anchors){
+    const out = [];
+    const seg = (n-1)/(anchors.length-1);
+    for(let i=0; i<n; i++){
+      const segIdx = Math.min(anchors.length-2, Math.floor(i/seg));
+      const t = (i - segIdx*seg) / seg;
+      const v = anchors[segIdx] + (anchors[segIdx+1] - anchors[segIdx]) * t;
+      const noise = Math.sin(i*0.7+segIdx)*0.15 + Math.cos(i*1.3)*0.10;
+      out.push(Math.round((v + noise)*100)/100);
+    }
+    out[n-1] = anchors[anchors.length-1];
+    return out;
+  }
+
+  // Initial
+  renderCountry("5D");
+  drawRotation();
+})();
+</script>
+</body>
+</html>

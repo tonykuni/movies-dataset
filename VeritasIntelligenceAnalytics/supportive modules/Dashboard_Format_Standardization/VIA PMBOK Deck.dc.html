@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#1e1d1a;height:100%}
+</style>
+</helmet>
+<x-import component-from-global-scope="deck-stage" from="./deck-stage.js" width="1920" height="1080" hint-size="100%,100%">
+
+<section data-label="01 Title" data-speaker-notes="開場:本簡報說明 PMBOK 第七版之原則導向框架,以及 VIA 平台如何以 align-only 策略對齊 PMBOK/MSP/SAP,原碼鎖定、智慧對照在我方。" style="background:#f5f4f0;font-family:'DM Sans','Noto Sans TC',sans-serif;color:#33403f;display:flex;flex-direction:column;justify-content:center;padding:0 140px">
+ <div style="position:absolute;top:0;left:0;right:0;height:14px;background:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%)"></div>
+ <div style="font:700 26px 'DM Mono',monospace;letter-spacing:6px;color:#6b6860;text-transform:uppercase;margin-bottom:36px">VERITAS INTELLIGENCE ANALYTICS · GOVERNANCE BRIEFING</div>
+ <h1 style="margin:0;font:800 118px/1.08 'Syne','Noto Sans TC',sans-serif;color:#1e1d1a"><span>PMBOK × VIA</span></h1>
+ <h2 style="margin:18px 0 0;font:900 64px/1.2 'Noto Sans TC',sans-serif;color:#c96b5a">對齊治理 · Align-only Governance</h2>
+ <p style="margin:44px 0 0;font:400 34px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:#6b6860;max-width:1250px">PMBOK 第七版原則導向框架,與 VIA 平台治理體系的對照與整合</p>
+ <div style="position:absolute;bottom:80px;left:140px;font:500 26px 'DM Mono',monospace;color:#9c9890">2026.07 · VIA-M-PMBOKDECK</div>
+</section>
+
+<section data-label="02 簡報架構" data-speaker-notes="議程:先講 PMBOK 7 的轉向,再看 12 原則與 8 績效域,最後三段講 VIA 如何對齊。" style="background:#f5f4f0;font-family:'DM Sans','Noto Sans TC',sans-serif;color:#33403f;display:flex;flex-direction:column;padding:100px 140px 80px">
+ <div style="font:700 24px 'DM Mono',monospace;letter-spacing:5px;color:#6b6860;text-transform:uppercase;margin-bottom:20px">AGENDA</div>
+ <h2 style="margin:0 0 64px;font:800 76px/1.15 'Syne','Noto Sans TC',sans-serif;color:#1e1d1a">簡報架構</h2>
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px 60px">
+  <div style="display:flex;gap:26px;align-items:baseline;border-bottom:2px solid #dbd9d3;padding-bottom:24px"><span style="font:800 44px 'DM Mono',monospace;color:#c96b5a">01</span><span style="font:700 38px 'Noto Sans TC',sans-serif;color:#1e1d1a">PMBOK 第七版的轉向</span></div>
+  <div style="display:flex;gap:26px;align-items:baseline;border-bottom:2px solid #dbd9d3;padding-bottom:24px"><span style="font:800 44px 'DM Mono',monospace;color:#c4943a">02</span><span style="font:700 38px 'Noto Sans TC',sans-serif;color:#1e1d1a">十二項專案管理原則</span></div>
+  <div style="display:flex;gap:26px;align-items:baseline;border-bottom:2px solid #dbd9d3;padding-bottom:24px"><span style="font:800 44px 'DM Mono',monospace;color:#5a9e6f">03</span><span style="font:700 38px 'Noto Sans TC',sans-serif;color:#1e1d1a">八大績效領域</span></div>
+  <div style="display:flex;gap:26px;align-items:baseline;border-bottom:2px solid #dbd9d3;padding-bottom:24px"><span style="font:800 44px 'DM Mono',monospace;color:#439a9a">04</span><span style="font:700 38px 'Noto Sans TC',sans-serif;color:#1e1d1a">開發方式與生命週期</span></div>
+  <div style="display:flex;gap:26px;align-items:baseline;border-bottom:2px solid #dbd9d3;padding-bottom:24px"><span style="font:800 44px 'DM Mono',monospace;color:#4c78a8">05</span><span style="font:700 38px 'Noto Sans TC',sans-serif;color:#1e1d1a">VIA 對齊策略 · Align-only</span></div>
+  <div style="display:flex;gap:26px;align-items:baseline;border-bottom:2px solid #dbd9d3;padding-bottom:24px"><span style="font:800 44px 'DM Mono',monospace;color:#7a6daa">06</span><span style="font:700 38px 'Noto Sans TC',sans-serif;color:#1e1d1a">績效領域 × VIA 模組對照</span></div>
+ </div>
+</section>
+
+<section data-label="03 PMBOK 轉向" data-speaker-notes="第六版以流程為本(49 流程、10 知識領域、ITTO);第七版轉為原則導向與價值交付:12 原則 + 8 績效域,搭配量身打造與模型/方法/工件。" style="background:#f5f4f0;font-family:'DM Sans','Noto Sans TC',sans-serif;color:#33403f;display:flex;flex-direction:column;padding:100px 140px 80px">
+ <div style="font:700 24px 'DM Mono',monospace;letter-spacing:5px;color:#6b6860;text-transform:uppercase;margin-bottom:20px">SECTION 01</div>
+ <h2 style="margin:0 0 60px;font:800 76px/1.15 'Syne','Noto Sans TC',sans-serif;color:#1e1d1a">PMBOK 第七版的轉向</h2>
+ <div style="display:grid;grid-template-columns:1fr 120px 1fr;gap:0;align-items:stretch">
+  <div style="background:#fff;border:2px solid #dbd9d3;border-radius:14px;padding:52px 56px">
+   <div style="font:700 26px 'DM Mono',monospace;color:#9c9890;letter-spacing:3px;margin-bottom:26px">PMBOK 6TH · 2017</div>
+   <div style="font:900 54px/1.25 'Noto Sans TC',sans-serif;color:#33403f;margin-bottom:36px">流程導向</div>
+   <div style="display:flex;flex-direction:column;gap:20px">
+    <div style="font:500 32px 'Noto Sans TC',sans-serif;color:#6b6860"><b style="color:#1e1d1a">49</b> 項流程</div>
+    <div style="font:500 32px 'Noto Sans TC',sans-serif;color:#6b6860"><b style="color:#1e1d1a">10</b> 大知識領域</div>
+    <div style="font:500 32px 'Noto Sans TC',sans-serif;color:#6b6860"><b style="color:#1e1d1a">5</b> 大流程群組 · ITTO</div>
+   </div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:center;font:800 60px 'DM Mono',monospace;color:#c96b5a">→</div>
+  <div style="background:#1e1d1a;border-radius:14px;padding:52px 56px">
+   <div style="font:700 26px 'DM Mono',monospace;color:#a49f92;letter-spacing:3px;margin-bottom:26px">PMBOK 7TH · 2021</div>
+   <div style="font:900 54px/1.25 'Noto Sans TC',sans-serif;color:#fff;margin-bottom:36px">原則導向 · 價值交付</div>
+   <div style="display:flex;flex-direction:column;gap:20px">
+    <div style="font:500 32px 'Noto Sans TC',sans-serif;color:#cfcabd"><b style="color:#e39a8f">12</b> 項專案管理原則</div>
+    <div style="font:500 32px 'Noto Sans TC',sans-serif;color:#cfcabd"><b style="color:#e39a8f">8</b> 大績效領域</div>
+    <div style="font:500 32px 'Noto Sans TC',sans-serif;color:#cfcabd">量身打造 + 模型/方法/工件</div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section data-label="04 十二項原則" data-speaker-notes="12 原則是行為準則,不是流程。逐一唸過,強調管家精神、系統思考、量身打造、變革,後面會對到 VIA 治理。" style="background:#f5f4f0;font-family:'DM Sans','Noto Sans TC',sans-serif;color:#33403f;display:flex;flex-direction:column;padding:100px 140px 80px">
+ <div style="font:700 24px 'DM Mono',monospace;letter-spacing:5px;color:#6b6860;text-transform:uppercase;margin-bottom:20px">SECTION 02</div>
+ <h2 style="margin:0 0 56px;font:800 76px/1.15 'Syne','Noto Sans TC',sans-serif;color:#1e1d1a">十二項專案管理原則</h2>
+ <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:22px">
+  <div style="background:#fff;border:1px solid #dbd9d3;border-top:6px solid #c96b5a;border-radius:10px;padding:28px 30px"><div style="font:700 24px 'DM Mono',monospace;color:#9c9890;margin-bottom:10px">01 STEWARDSHIP</div><div style="font:700 32px 'Noto Sans TC',sans-serif;color:#1e1d1a">管家精神</div></div>
+  <div style="background:#fff;border:1px solid #dbd9d3;border-top:6px solid #c4943a;border-radius:10px;padding:28px 30px"><div style="font:700 24px 'DM Mono',monospace;color:#9c9890;margin-bottom:10px">02 TEAM</div><div style="font:700 32px 'Noto Sans TC',sans-serif;color:#1e1d1a">協作團隊</div></div>
+  <div style="background:#fff;border:1px solid #dbd9d3;border-top:6px solid #5a9e6f;border-radius:10px;padding:28px 30px"><div style="font:700 24px 'DM Mono',monospace;color:#9c9890;margin-bottom:10px">03 STAKEHOLDERS</div><div style="font:700 32px 'Noto Sans TC',sans-serif;color:#1e1d1a">利害關係人</div></div>
+  <div style="background:#fff;border:1px solid #dbd9d3;border-top:6px solid #439a9a;border-radius:10px;padding:28px 30px"><div style="font:700 24px 'DM Mono',monospace;color:#9c9890;margin-bottom:10px">04 VALUE</div><div style="font:700 32px 'Noto Sans TC',sans-serif;color:#1e1d1a">聚焦價值</div></div>
+  <div style="background:#fff;border:1px solid #dbd9d3;border-top:6px solid #4c78a8;border-radius:10px;padding:28px 30px"><div style="font:700 24px 'DM Mono',monospace;color:#9c9890;margin-bottom:10px">05 SYSTEMS THINKING</div><div style="font:700 32px 'Noto Sans TC',sans-serif;color:#1e1d1a">系統思考</div></div>
+  <div style="background:#fff;border:1px solid #dbd9d3;border-top:6px solid #7a6daa;border-radius:10px;padding:28px 30px"><div style="font:700 24px 'DM Mono',monospace;color:#9c9890;margin-bottom:10px">06 LEADERSHIP</div><div style="font:700 32px 'Noto Sans TC',sans-serif;color:#1e1d1a">領導行為</div></div>
+  <div style="background:#fff;border:1px solid #dbd9d3;border-top:6px solid #c96b5a;border-radius:10px;padding:28px 30px"><div style="font:700 24px 'DM Mono',monospace;color:#9c9890;margin-bottom:10px">07 TAILORING</div><div style="font:700 32px 'Noto Sans TC',sans-serif;color:#1e1d1a">量身打造</div></div>
+  <div style="background:#fff;border:1px solid #dbd9d3;border-top:6px solid #c4943a;border-radius:10px;padding:28px 30px"><div style="font:700 24px 'DM Mono',monospace;color:#9c9890;margin-bottom:10px">08 QUALITY</div><div style="font:700 32px 'Noto Sans TC',sans-serif;color:#1e1d1a">品質內建</div></div>
+  <div style="background:#fff;border:1px solid #dbd9d3;border-top:6px solid #5a9e6f;border-radius:10px;padding:28px 30px"><div style="font:700 24px 'DM Mono',monospace;color:#9c9890;margin-bottom:10px">09 COMPLEXITY</div><div style="font:700 32px 'Noto Sans TC',sans-serif;color:#1e1d1a">駕馭複雜性</div></div>
+  <div style="background:#fff;border:1px solid #dbd9d3;border-top:6px solid #439a9a;border-radius:10px;padding:28px 30px"><div style="font:700 24px 'DM Mono',monospace;color:#9c9890;margin-bottom:10px">10 RISK</div><div style="font:700 32px 'Noto Sans TC',sans-serif;color:#1e1d1a">回應風險</div></div>
+  <div style="background:#fff;border:1px solid #dbd9d3;border-top:6px solid #4c78a8;border-radius:10px;padding:28px 30px"><div style="font:700 24px 'DM Mono',monospace;color:#9c9890;margin-bottom:10px">11 ADAPTABILITY</div><div style="font:700 32px 'Noto Sans TC',sans-serif;color:#1e1d1a">調適與韌性</div></div>
+  <div style="background:#fff;border:1px solid #dbd9d3;border-top:6px solid #7a6daa;border-radius:10px;padding:28px 30px"><div style="font:700 24px 'DM Mono',monospace;color:#9c9890;margin-bottom:10px">12 CHANGE</div><div style="font:700 32px 'Noto Sans TC',sans-serif;color:#1e1d1a">促成變革</div></div>
+ </div>
+</section>
+
+<section data-label="05 八大績效領域" data-speaker-notes="8 績效域彼此互動、不可分割;每一域後面都會對到 VIA 的一個具體模組。" style="background:#1e1d1a;font-family:'DM Sans','Noto Sans TC',sans-serif;color:#cfcabd;display:flex;flex-direction:column;padding:100px 140px 80px">
+ <div style="font:700 24px 'DM Mono',monospace;letter-spacing:5px;color:#a49f92;text-transform:uppercase;margin-bottom:20px">SECTION 03</div>
+ <h2 style="margin:0 0 56px;font:800 76px/1.15 'Syne','Noto Sans TC',sans-serif;color:#fff">八大績效領域</h2>
+ <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:24px">
+  <div style="background:#26251f;border:1px solid #3c3a33;border-radius:12px;padding:36px 34px"><div style="font:800 46px 'DM Mono',monospace;color:#c96b5a;margin-bottom:14px">1</div><div style="font:700 34px 'Noto Sans TC',sans-serif;color:#fff;margin-bottom:10px">利害關係人</div><div style="font:500 24px 'DM Mono',monospace;color:#a49f92">STAKEHOLDER</div></div>
+  <div style="background:#26251f;border:1px solid #3c3a33;border-radius:12px;padding:36px 34px"><div style="font:800 46px 'DM Mono',monospace;color:#c4943a;margin-bottom:14px">2</div><div style="font:700 34px 'Noto Sans TC',sans-serif;color:#fff;margin-bottom:10px">團隊</div><div style="font:500 24px 'DM Mono',monospace;color:#a49f92">TEAM</div></div>
+  <div style="background:#26251f;border:1px solid #3c3a33;border-radius:12px;padding:36px 34px"><div style="font:800 46px 'DM Mono',monospace;color:#5a9e6f;margin-bottom:14px">3</div><div style="font:700 34px 'Noto Sans TC',sans-serif;color:#fff;margin-bottom:10px">開發方式與生命週期</div><div style="font:500 24px 'DM Mono',monospace;color:#a49f92">DEV APPROACH</div></div>
+  <div style="background:#26251f;border:1px solid #3c3a33;border-radius:12px;padding:36px 34px"><div style="font:800 46px 'DM Mono',monospace;color:#439a9a;margin-bottom:14px">4</div><div style="font:700 34px 'Noto Sans TC',sans-serif;color:#fff;margin-bottom:10px">規劃</div><div style="font:500 24px 'DM Mono',monospace;color:#a49f92">PLANNING</div></div>
+  <div style="background:#26251f;border:1px solid #3c3a33;border-radius:12px;padding:36px 34px"><div style="font:800 46px 'DM Mono',monospace;color:#4c78a8;margin-bottom:14px">5</div><div style="font:700 34px 'Noto Sans TC',sans-serif;color:#fff;margin-bottom:10px">專案工作</div><div style="font:500 24px 'DM Mono',monospace;color:#a49f92">PROJECT WORK</div></div>
+  <div style="background:#26251f;border:1px solid #3c3a33;border-radius:12px;padding:36px 34px"><div style="font:800 46px 'DM Mono',monospace;color:#7a6daa;margin-bottom:14px">6</div><div style="font:700 34px 'Noto Sans TC',sans-serif;color:#fff;margin-bottom:10px">交付</div><div style="font:500 24px 'DM Mono',monospace;color:#a49f92">DELIVERY</div></div>
+  <div style="background:#26251f;border:1px solid #3c3a33;border-radius:12px;padding:36px 34px"><div style="font:800 46px 'DM Mono',monospace;color:#c96b5a;margin-bottom:14px">7</div><div style="font:700 34px 'Noto Sans TC',sans-serif;color:#fff;margin-bottom:10px">量測</div><div style="font:500 24px 'DM Mono',monospace;color:#a49f92">MEASUREMENT</div></div>
+  <div style="background:#26251f;border:1px solid #3c3a33;border-radius:12px;padding:36px 34px"><div style="font:800 46px 'DM Mono',monospace;color:#c4943a;margin-bottom:14px">8</div><div style="font:700 34px 'Noto Sans TC',sans-serif;color:#fff;margin-bottom:10px">不確定性</div><div style="font:500 24px 'DM Mono',monospace;color:#a49f92">UNCERTAINTY</div></div>
+ </div>
+</section>
+
+<section data-label="06 開發方式" data-speaker-notes="開發方式是光譜:預測式(需求穩定、變更成本高)→ 混合 → 調適式(高不確定、快速迭代)。量身打造原則決定落點。" style="background:#f5f4f0;font-family:'DM Sans','Noto Sans TC',sans-serif;color:#33403f;display:flex;flex-direction:column;padding:100px 140px 80px">
+ <div style="font:700 24px 'DM Mono',monospace;letter-spacing:5px;color:#6b6860;text-transform:uppercase;margin-bottom:20px">SECTION 04</div>
+ <h2 style="margin:0 0 64px;font:800 76px/1.15 'Syne','Noto Sans TC',sans-serif;color:#1e1d1a">開發方式與生命週期</h2>
+ <div style="height:16px;border-radius:8px;background:linear-gradient(90deg,#4c78a8,#c4943a,#c96b5a);margin-bottom:44px"></div>
+ <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px">
+  <div style="background:#fff;border:2px solid #dbd9d3;border-radius:14px;padding:44px 46px">
+   <div style="font:900 44px 'Noto Sans TC',sans-serif;color:#4c78a8;margin-bottom:18px">預測式</div>
+   <div style="font:700 24px 'DM Mono',monospace;color:#9c9890;letter-spacing:2px;margin-bottom:24px">PREDICTIVE · WATERFALL</div>
+   <p style="margin:0;font:500 30px/1.65 'Noto Sans TC',sans-serif;color:#6b6860">需求明確、變更成本高。範疇先固定,依基準計畫執行。</p>
+  </div>
+  <div style="background:#fff;border:2px solid #dbd9d3;border-radius:14px;padding:44px 46px">
+   <div style="font:900 44px 'Noto Sans TC',sans-serif;color:#c4943a;margin-bottom:18px">混合式</div>
+   <div style="font:700 24px 'DM Mono',monospace;color:#9c9890;letter-spacing:2px;margin-bottom:24px">HYBRID</div>
+   <p style="margin:0;font:500 30px/1.65 'Noto Sans TC',sans-serif;color:#6b6860">穩定部分預測式、不確定部分迭代。多數企業實務落點。</p>
+  </div>
+  <div style="background:#fff;border:2px solid #dbd9d3;border-radius:14px;padding:44px 46px">
+   <div style="font:900 44px 'Noto Sans TC',sans-serif;color:#c96b5a;margin-bottom:18px">調適式</div>
+   <div style="font:700 24px 'DM Mono',monospace;color:#9c9890;letter-spacing:2px;margin-bottom:24px">ADAPTIVE · AGILE</div>
+   <p style="margin:0;font:500 30px/1.65 'Noto Sans TC',sans-serif;color:#6b6860">高不確定性、快速回饋。短迭代、頻繁交付與再排序。</p>
+  </div>
+ </div>
+</section>
+
+<section data-label="07 VIA 對齊策略" data-speaker-notes="核心政策:外部標準(PMBOK/MSP/SAP)原碼與詞彙鎖定不改,VIA 只做對照(align-only);智慧化對照放在我方 — Lexicon 同義字、MSP 同步、自動編號可追溯。" style="background:#f5f4f0;font-family:'DM Sans','Noto Sans TC',sans-serif;color:#33403f;display:flex;flex-direction:column;padding:100px 140px 80px">
+ <div style="font:700 24px 'DM Mono',monospace;letter-spacing:5px;color:#6b6860;text-transform:uppercase;margin-bottom:20px">SECTION 05</div>
+ <h2 style="margin:0 0 64px;font:800 76px/1.15 'Syne','Noto Sans TC',sans-serif;color:#1e1d1a">VIA 對齊策略 · Align-only</h2>
+ <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px">
+  <div style="background:#1e1d1a;border-radius:14px;padding:46px 48px">
+   <div style="font:700 26px 'DM Mono',monospace;color:#e39a8f;letter-spacing:2px;margin-bottom:22px">原碼鎖定</div>
+   <p style="margin:0;font:500 31px/1.65 'Noto Sans TC',sans-serif;color:#cfcabd">PMBOK 詞彙、MSP 欄位、SAP CODE/T-CODE 一律不改,尊重既有系統。</p>
+  </div>
+  <div style="background:#1e1d1a;border-radius:14px;padding:46px 48px">
+   <div style="font:700 26px 'DM Mono',monospace;color:#e39a8f;letter-spacing:2px;margin-bottom:22px">對照在我方</div>
+   <p style="margin:0;font:500 31px/1.65 'Noto Sans TC',sans-serif;color:#cfcabd">同義字引擎 + 詞彙登錄(WBS、Milestone、BOM…)建立 VIA 側智慧對照。</p>
+  </div>
+  <div style="background:#1e1d1a;border-radius:14px;padding:46px 48px">
+   <div style="font:700 26px 'DM Mono',monospace;color:#e39a8f;letter-spacing:2px;margin-bottom:22px">可追溯編碼</div>
+   <p style="margin:0;font:500 31px/1.65 'Noto Sans TC',sans-serif;color:#cfcabd">FNV-1a 自動編號、只增不減登錄簿,每一筆對照可重算、可稽核。</p>
+  </div>
+ </div>
+ <div style="margin-top:52px;display:flex;gap:40px;align-items:center;background:#fff;border:2px solid #dbd9d3;border-radius:14px;padding:34px 48px">
+  <span style="font:700 30px 'DM Mono',monospace;color:#7a6daa">VIA-M-LEX</span>
+  <span style="font:700 30px 'DM Mono',monospace;color:#7a6daa">VIA-M-SYNONYM</span>
+  <span style="font:700 30px 'DM Mono',monospace;color:#7a6daa">VIA-M-MSPSYNC</span>
+  <span style="font:700 30px 'DM Mono',monospace;color:#7a6daa">VIA-M-ACODER</span>
+  <span style="font:500 28px 'Noto Sans TC',sans-serif;color:#6b6860;margin-left:auto">對齊模組群</span>
+ </div>
+</section>
+
+<section data-label="07b SAP×PLM 對照" data-speaker-notes="SAP 側:T-CODE 與術語原碼鎖定(SE38/GRAL、SALV、CS 系列 BOM、MM 物料主檔、CC 工程變更);PLM 詞彙經同義字引擎對照;全部對照收斂於 SSOT,VIA 側可追溯。" style="background:#f5f4f0;font-family:'DM Sans','Noto Sans TC',sans-serif;color:#33403f;display:flex;flex-direction:column;padding:100px 140px 80px">
+ <div style="font:700 24px 'DM Mono',monospace;letter-spacing:5px;color:#6b6860;text-transform:uppercase;margin-bottom:20px">SECTION 05 · ALIGN-ONLY</div>
+ <h2 style="margin:0 0 52px;font:800 76px/1.15 'Syne','Noto Sans TC',sans-serif;color:#1e1d1a">SAP CODE × 術語 × PLM 對照</h2>
+ <table style="width:100%;border-collapse:collapse;background:#fff;border:2px solid #dbd9d3;border-radius:12px;overflow:hidden">
+  <thead><tr>
+   <th style="font:700 26px 'DM Mono',monospace;color:#6b6860;background:#fafaf8;border-bottom:2px solid #dbd9d3;padding:20px 32px;text-align:left;letter-spacing:2px">SAP T-CODE 🔒</th>
+   <th style="font:700 26px 'DM Mono',monospace;color:#6b6860;background:#fafaf8;border-bottom:2px solid #dbd9d3;padding:20px 32px;text-align:left;letter-spacing:2px">SAP 術語 🔒</th>
+   <th style="font:700 26px 'DM Mono',monospace;color:#6b6860;background:#fafaf8;border-bottom:2px solid #dbd9d3;padding:20px 32px;text-align:left;letter-spacing:2px">PLM 對應</th>
+   <th style="font:700 26px 'DM Mono',monospace;color:#6b6860;background:#fafaf8;border-bottom:2px solid #dbd9d3;padding:20px 32px;text-align:left;letter-spacing:2px">VIA 側 SSOT</th>
+  </tr></thead>
+  <tbody>
+   <tr><td style="font:700 28px 'DM Mono',monospace;color:#1e1d1a;border-bottom:1px solid #ecebe6;padding:18px 32px">SE38 / GRAL</td><td style="font:500 28px 'Noto Sans TC',sans-serif;color:#33403f;border-bottom:1px solid #ecebe6;padding:18px 32px">GRAPH_MATRIX 圖形矩陣</td><td style="font:500 28px 'Noto Sans TC',sans-serif;color:#6b6860;border-bottom:1px solid #ecebe6;padding:18px 32px">視覺化規格</td><td style="font:700 26px 'DM Mono',monospace;color:#7a6daa;border-bottom:1px solid #ecebe6;padding:18px 32px">VAP-CH-01..25</td></tr>
+   <tr><td style="font:700 28px 'DM Mono',monospace;color:#1e1d1a;border-bottom:1px solid #ecebe6;padding:18px 32px">SALV</td><td style="font:500 28px 'Noto Sans TC',sans-serif;color:#33403f;border-bottom:1px solid #ecebe6;padding:18px 32px">LIST_VIEWER (ALV) 清單</td><td style="font:500 28px 'Noto Sans TC',sans-serif;color:#6b6860;border-bottom:1px solid #ecebe6;padding:18px 32px">報表檢視</td><td style="font:700 26px 'DM Mono',monospace;color:#7a6daa;border-bottom:1px solid #ecebe6;padding:18px 32px">VAP-CH-03/04/07</td></tr>
+   <tr><td style="font:700 28px 'DM Mono',monospace;color:#1e1d1a;border-bottom:1px solid #ecebe6;padding:18px 32px">CS01–CS03</td><td style="font:500 28px 'Noto Sans TC',sans-serif;color:#33403f;border-bottom:1px solid #ecebe6;padding:18px 32px">BOM 物料清單</td><td style="font:500 28px 'Noto Sans TC',sans-serif;color:#6b6860;border-bottom:1px solid #ecebe6;padding:18px 32px">PLM BOM 結構</td><td style="font:700 26px 'DM Mono',monospace;color:#7a6daa;border-bottom:1px solid #ecebe6;padding:18px 32px">VIA-M-SUPERBOM</td></tr>
+   <tr><td style="font:700 28px 'DM Mono',monospace;color:#1e1d1a;border-bottom:1px solid #ecebe6;padding:18px 32px">MM01–MM03</td><td style="font:500 28px 'Noto Sans TC',sans-serif;color:#33403f;border-bottom:1px solid #ecebe6;padding:18px 32px">Material Master 物料主檔</td><td style="font:500 28px 'Noto Sans TC',sans-serif;color:#6b6860;border-bottom:1px solid #ecebe6;padding:18px 32px">料號 · 命名治理</td><td style="font:700 26px 'DM Mono',monospace;color:#7a6daa;border-bottom:1px solid #ecebe6;padding:18px 32px">VIA-M-VPNS</td></tr>
+   <tr><td style="font:700 28px 'DM Mono',monospace;color:#1e1d1a;border-bottom:1px solid #ecebe6;padding:18px 32px">CC01</td><td style="font:500 28px 'Noto Sans TC',sans-serif;color:#33403f;border-bottom:1px solid #ecebe6;padding:18px 32px">ECM / ECO 工程變更</td><td style="font:500 28px 'Noto Sans TC',sans-serif;color:#6b6860;border-bottom:1px solid #ecebe6;padding:18px 32px">變更管理</td><td style="font:700 26px 'DM Mono',monospace;color:#7a6daa;border-bottom:1px solid #ecebe6;padding:18px 32px">只增不減 Append-only</td></tr>
+   <tr><td style="font:700 28px 'DM Mono',monospace;color:#1e1d1a;padding:18px 32px">—</td><td style="font:500 28px 'Noto Sans TC',sans-serif;color:#33403f;padding:18px 32px">WBS · Milestone · 術語庫</td><td style="font:500 28px 'Noto Sans TC',sans-serif;color:#6b6860;padding:18px 32px">PMBOK / PLM 詞彙</td><td style="font:700 26px 'DM Mono',monospace;color:#7a6daa;padding:18px 32px">VIA-M-LEX 同義字對照</td></tr>
+  </tbody>
+ </table>
+ <p style="margin:36px 0 0;font:500 28px/1.6 'Noto Sans TC',sans-serif;color:#6b6860">🔒 SAP CODE / T-CODE / 術語鎖定不改 · PLM 詞彙經同義字引擎對照 · 全部收斂單一真相源(SSOT),VIA 側可追溯</p>
+</section>
+
+<section data-label="08 對照表" data-speaker-notes="每個績效域對到一個 VIA 模組與編碼:規劃對 MSP 同步、量測對 VAP 圖庫、不確定性對 VRN 風險引擎等。" style="background:#f5f4f0;font-family:'DM Sans','Noto Sans TC',sans-serif;color:#33403f;display:flex;flex-direction:column;padding:100px 140px 80px">
+ <div style="font:700 24px 'DM Mono',monospace;letter-spacing:5px;color:#6b6860;text-transform:uppercase;margin-bottom:20px">SECTION 06</div>
+ <h2 style="margin:0 0 52px;font:800 76px/1.15 'Syne','Noto Sans TC',sans-serif;color:#1e1d1a">績效領域 × VIA 模組對照</h2>
+ <table style="width:100%;border-collapse:collapse;background:#fff;border:2px solid #dbd9d3;border-radius:12px;overflow:hidden">
+  <thead><tr>
+   <th style="font:700 26px 'DM Mono',monospace;color:#6b6860;background:#fafaf8;border-bottom:2px solid #dbd9d3;padding:22px 34px;text-align:left;letter-spacing:2px">PMBOK 績效領域</th>
+   <th style="font:700 26px 'DM Mono',monospace;color:#6b6860;background:#fafaf8;border-bottom:2px solid #dbd9d3;padding:22px 34px;text-align:left;letter-spacing:2px">VIA 模組</th>
+   <th style="font:700 26px 'DM Mono',monospace;color:#6b6860;background:#fafaf8;border-bottom:2px solid #dbd9d3;padding:22px 34px;text-align:left;letter-spacing:2px">編碼</th>
+  </tr></thead>
+  <tbody>
+   <tr><td style="font:700 30px 'Noto Sans TC',sans-serif;color:#1e1d1a;border-bottom:1px solid #ecebe6;padding:20px 34px">利害關係人</td><td style="font:500 30px 'Noto Sans TC',sans-serif;color:#33403f;border-bottom:1px solid #ecebe6;padding:20px 34px">簡報 / 週報體系</td><td style="font:700 28px 'DM Mono',monospace;color:#7a6daa;border-bottom:1px solid #ecebe6;padding:20px 34px">VIA-M-BRIEF</td></tr>
+   <tr><td style="font:700 30px 'Noto Sans TC',sans-serif;color:#1e1d1a;border-bottom:1px solid #ecebe6;padding:20px 34px">團隊 · 知識</td><td style="font:500 30px 'Noto Sans TC',sans-serif;color:#33403f;border-bottom:1px solid #ecebe6;padding:20px 34px">筆記終極版</td><td style="font:700 28px 'DM Mono',monospace;color:#7a6daa;border-bottom:1px solid #ecebe6;padding:20px 34px">VIA-M-NOTEULT</td></tr>
+   <tr><td style="font:700 30px 'Noto Sans TC',sans-serif;color:#1e1d1a;border-bottom:1px solid #ecebe6;padding:20px 34px">開發方式與生命週期</td><td style="font:500 30px 'Noto Sans TC',sans-serif;color:#33403f;border-bottom:1px solid #ecebe6;padding:20px 34px">智慧資產管理平台</td><td style="font:700 28px 'DM Mono',monospace;color:#7a6daa;border-bottom:1px solid #ecebe6;padding:20px 34px">VIA-M-IAMP</td></tr>
+   <tr><td style="font:700 30px 'Noto Sans TC',sans-serif;color:#1e1d1a;border-bottom:1px solid #ecebe6;padding:20px 34px">規劃</td><td style="font:500 30px 'Noto Sans TC',sans-serif;color:#33403f;border-bottom:1px solid #ecebe6;padding:20px 34px">MS Project 同步</td><td style="font:700 28px 'DM Mono',monospace;color:#7a6daa;border-bottom:1px solid #ecebe6;padding:20px 34px">VIA-M-MSPSYNC</td></tr>
+   <tr><td style="font:700 30px 'Noto Sans TC',sans-serif;color:#1e1d1a;border-bottom:1px solid #ecebe6;padding:20px 34px">專案工作</td><td style="font:500 30px 'Noto Sans TC',sans-serif;color:#33403f;border-bottom:1px solid #ecebe6;padding:20px 34px">營運優化器</td><td style="font:700 28px 'DM Mono',monospace;color:#7a6daa;border-bottom:1px solid #ecebe6;padding:20px 34px">VIA-M-VOO</td></tr>
+   <tr><td style="font:700 30px 'Noto Sans TC',sans-serif;color:#1e1d1a;border-bottom:1px solid #ecebe6;padding:20px 34px">交付</td><td style="font:500 30px 'Noto Sans TC',sans-serif;color:#33403f;border-bottom:1px solid #ecebe6;padding:20px 34px">每週報告</td><td style="font:700 28px 'DM Mono',monospace;color:#7a6daa;border-bottom:1px solid #ecebe6;padding:20px 34px">VIA-M-WKREP</td></tr>
+   <tr><td style="font:700 30px 'Noto Sans TC',sans-serif;color:#1e1d1a;border-bottom:1px solid #ecebe6;padding:20px 34px">量測</td><td style="font:500 30px 'Noto Sans TC',sans-serif;color:#33403f;border-bottom:1px solid #ecebe6;padding:20px 34px">VAP 圖庫建構器</td><td style="font:700 28px 'DM Mono',monospace;color:#7a6daa;border-bottom:1px solid #ecebe6;padding:20px 34px">VIA-M-VAPLIB</td></tr>
+   <tr><td style="font:700 30px 'Noto Sans TC',sans-serif;color:#1e1d1a;padding:20px 34px">不確定性</td><td style="font:500 30px 'Noto Sans TC',sans-serif;color:#33403f;padding:20px 34px">VRN 風險引擎</td><td style="font:700 28px 'DM Mono',monospace;color:#7a6daa;padding:20px 34px">VIA-M-VRN</td></tr>
+  </tbody>
+ </table>
+</section>
+
+<section data-label="09 治理原則對應" data-speaker-notes="PMBOK 原則直接映到 VIA 治理機制:系統思考=SSOT、量身打造=DEFAULT+覆寫、變革=只增不減、品質=REGEX 檢查、風險=VRN、管家精神=可追溯編碼。" style="background:#1e1d1a;font-family:'DM Sans','Noto Sans TC',sans-serif;color:#cfcabd;display:flex;flex-direction:column;padding:100px 140px 80px">
+ <div style="font:700 24px 'DM Mono',monospace;letter-spacing:5px;color:#a49f92;text-transform:uppercase;margin-bottom:20px">GOVERNANCE MAPPING</div>
+ <h2 style="margin:0 0 56px;font:800 76px/1.15 'Syne','Noto Sans TC',sans-serif;color:#fff">治理原則對應</h2>
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px 32px">
+  <div style="display:flex;align-items:center;gap:28px;background:#26251f;border:1px solid #3c3a33;border-radius:12px;padding:28px 36px"><span style="font:700 32px 'Noto Sans TC',sans-serif;color:#fff;min-width:280px">系統思考</span><span style="font:800 30px 'DM Mono',monospace;color:#c96b5a">→</span><span style="font:500 30px 'Noto Sans TC',sans-serif;color:#cfcabd">SSOT 單一真相源</span></div>
+  <div style="display:flex;align-items:center;gap:28px;background:#26251f;border:1px solid #3c3a33;border-radius:12px;padding:28px 36px"><span style="font:700 32px 'Noto Sans TC',sans-serif;color:#fff;min-width:280px">量身打造</span><span style="font:800 30px 'DM Mono',monospace;color:#c96b5a">→</span><span style="font:500 30px 'Noto Sans TC',sans-serif;color:#cfcabd">DEFAULT 值 + 單獨覆寫</span></div>
+  <div style="display:flex;align-items:center;gap:28px;background:#26251f;border:1px solid #3c3a33;border-radius:12px;padding:28px 36px"><span style="font:700 32px 'Noto Sans TC',sans-serif;color:#fff;min-width:280px">促成變革</span><span style="font:800 30px 'DM Mono',monospace;color:#c96b5a">→</span><span style="font:500 30px 'Noto Sans TC',sans-serif;color:#cfcabd">只增不減 Append-only</span></div>
+  <div style="display:flex;align-items:center;gap:28px;background:#26251f;border:1px solid #3c3a33;border-radius:12px;padding:28px 36px"><span style="font:700 32px 'Noto Sans TC',sans-serif;color:#fff;min-width:280px">品質內建</span><span style="font:800 30px 'DM Mono',monospace;color:#c96b5a">→</span><span style="font:500 30px 'Noto Sans TC',sans-serif;color:#cfcabd">REGEX 對照檢查 · 自動增加</span></div>
+  <div style="display:flex;align-items:center;gap:28px;background:#26251f;border:1px solid #3c3a33;border-radius:12px;padding:28px 36px"><span style="font:700 32px 'Noto Sans TC',sans-serif;color:#fff;min-width:280px">回應風險</span><span style="font:800 30px 'DM Mono',monospace;color:#c96b5a">→</span><span style="font:500 30px 'Noto Sans TC',sans-serif;color:#cfcabd">VRN 風險引擎 · 因子×權重</span></div>
+  <div style="display:flex;align-items:center;gap:28px;background:#26251f;border:1px solid #3c3a33;border-radius:12px;padding:28px 36px"><span style="font:700 32px 'Noto Sans TC',sans-serif;color:#fff;min-width:280px">管家精神</span><span style="font:800 30px 'DM Mono',monospace;color:#c96b5a">→</span><span style="font:500 30px 'Noto Sans TC',sans-serif;color:#cfcabd">FNV-1a 可追溯編碼 · 稽核</span></div>
+ </div>
+</section>
+
+<section data-label="10 結語" data-speaker-notes="收尾:三個下一步 — 詞彙登錄補齊 PMBOK 全詞彙、MSP 同步落地排程欄位、量測域接 VAP 圖庫標準圖型。" style="background:#f5f4f0;font-family:'DM Sans','Noto Sans TC',sans-serif;color:#33403f;display:flex;flex-direction:column;justify-content:center;padding:0 140px">
+ <div style="position:absolute;top:0;left:0;right:0;height:14px;background:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%)"></div>
+ <div style="font:700 24px 'DM Mono',monospace;letter-spacing:5px;color:#6b6860;text-transform:uppercase;margin-bottom:24px">NEXT STEPS</div>
+ <h2 style="margin:0 0 64px;font:800 84px/1.15 'Syne','Noto Sans TC',sans-serif;color:#1e1d1a">結語與下一步</h2>
+ <div style="display:flex;flex-direction:column;gap:30px;max-width:1300px">
+  <div style="display:flex;gap:30px;align-items:baseline"><span style="font:800 40px 'DM Mono',monospace;color:#c96b5a">1</span><span style="font:500 36px/1.5 'Noto Sans TC',sans-serif;color:#33403f">詞彙登錄補齊 PMBOK 第七版全詞彙(SYN · 原碼鎖定)</span></div>
+  <div style="display:flex;gap:30px;align-items:baseline"><span style="font:800 40px 'DM Mono',monospace;color:#c4943a">2</span><span style="font:500 36px/1.5 'Noto Sans TC',sans-serif;color:#33403f">MS Project 同步落地排程欄位對照(WBS · Milestone)</span></div>
+  <div style="display:flex;gap:30px;align-items:baseline"><span style="font:800 40px 'DM Mono',monospace;color:#5a9e6f">3</span><span style="font:500 36px/1.5 'Noto Sans TC',sans-serif;color:#33403f">量測績效域接上 VAP 標準圖庫(25 圖型 · SSOT 規格)</span></div>
+ </div>
+ <div style="position:absolute;bottom:80px;left:140px;font:500 26px 'DM Mono',monospace;color:#9c9890">VERITAS INTELLIGENCE ANALYTICS · ALIGN-ONLY · APPEND-ONLY</div>
+</section>
+
+</x-import>
+
+</x-dc>
+</body>
+</html>

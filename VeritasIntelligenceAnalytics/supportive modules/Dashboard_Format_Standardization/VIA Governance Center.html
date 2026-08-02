@@ -1,0 +1,162 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · 治理中心 · Governance & Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--blue:#4c78a8;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--vi:#7a6daa;}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg)}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:12px;line-height:1.5}
+.wrap{max-width:1560px;margin:0 auto;padding:26px 26px 60px}
+h1{font:800 21px/1.2 'Syne','Noto Sans TC',sans-serif;color:var(--ink);display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+h1::before{content:"";display:inline-block;width:5px;height:22px;background:var(--vi);border-radius:2px;transform:translateY(3px);margin-right:2px}
+h1 .flow{font:500 10px 'DM Mono',monospace;color:var(--mut2)}
+.tabs{display:flex;gap:26px;margin:20px 0 0;border-bottom:2px solid var(--soft)}
+.tab{font:700 12px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);padding:9px 2px 11px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;letter-spacing:.3px}
+.tab.on{color:var(--vi);border-bottom-color:var(--vi)}
+.tab:hover:not(.on){color:var(--ink)}
+.sec{display:none;padding-top:18px}.sec.on{display:block}
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:20px}
+.stat{background:var(--paper);border:1px solid var(--soft);border-radius:10px;padding:14px 18px;box-shadow:0 1px 3px rgba(31,42,42,.05)}
+.stat .k{font:500 10px 'DM Mono',monospace;color:var(--mut)}
+.stat .v{font:800 26px 'Syne',sans-serif;color:var(--ink);margin:2px 0}
+.stat .e{font:500 10px 'DM Mono',monospace;color:var(--mut2)}
+/* kanban */
+.board{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:26px}
+.col{background:var(--paper);border:1px solid var(--soft);border-radius:12px;padding:12px 14px;box-shadow:0 1px 3px rgba(31,42,42,.05)}
+.col .ch{display:flex;justify-content:space-between;align-items:center;font:700 12px 'Noto Sans TC',sans-serif;padding:2px 2px 10px;border-bottom:1px solid var(--soft);margin-bottom:11px}
+.col .ch .n{font:700 12px 'DM Mono',monospace;color:var(--mut)}
+.c-plan .ch span:first-child{color:var(--mut)}.c-dev .ch span:first-child{color:var(--blue)}.c-test .ch span:first-child{color:var(--am)}.c-done .ch span:first-child{color:var(--down)}
+.card{background:var(--paper);border:1px solid var(--soft);border-left:4px solid var(--mut2);border-radius:8px;padding:11px 13px;margin-bottom:10px;box-shadow:0 1px 2px rgba(31,42,42,.05)}
+.c-dev .card{border-left-color:var(--blue)}.c-test .card{border-left-color:var(--am)}.c-done .card{border-left-color:var(--down)}
+.card .t{font:700 12.5px 'Noto Sans TC',sans-serif;color:var(--ink)}
+.card .row{display:flex;justify-content:space-between;align-items:center;margin:5px 0 6px}
+.card .own{font:700 9.5px 'DM Mono',monospace;color:var(--mut)}
+.card .pc{font:700 10.5px 'DM Mono',monospace;color:var(--ink2)}
+.track{height:7px;background:var(--soft);border-radius:4px;overflow:hidden}
+.track i{display:block;height:100%;border-radius:4px}
+.c-plan .track i{background:var(--mut2)}.c-dev .track i{background:var(--blue)}.c-test .track i{background:var(--am)}.c-done .track i{background:var(--down)}
+/* lower grid */
+.lower{display:grid;grid-template-columns:1fr 1.1fr;gap:16px}
+@media(max-width:980px){.lower{grid-template-columns:1fr}}
+.panel{background:var(--paper);border:1px solid var(--soft);border-radius:12px;box-shadow:0 1px 3px rgba(31,42,42,.05);overflow:hidden}
+.panel .ph{display:flex;justify-content:space-between;align-items:baseline;padding:14px 18px 12px;border-bottom:1px solid var(--soft)}
+.panel .ph b{font:800 14px 'Syne','Noto Sans TC',sans-serif;color:var(--ink)}
+.panel .ph span{font:500 9.5px 'DM Mono',monospace;color:var(--mut2)}
+.subs{padding:6px 0}
+.sub{display:flex;align-items:center;gap:12px;padding:11px 18px;border-bottom:1px solid var(--paper2)}
+.sub:last-child{border-bottom:none}
+.badge{flex:none;font:800 9.5px 'DM Mono',monospace;color:#fff;border-radius:7px;padding:6px 9px;min-width:44px;text-align:center}
+.sub .nm{font:600 12px 'DM Mono','Noto Sans TC',monospace;color:var(--ink2)}
+.sub .st{margin-left:auto;font:600 10.5px 'DM Mono',monospace;display:flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%}
+.on1{color:var(--down)}.on1 .dot{background:#5fcf80;box-shadow:0 0 5px #5fcf80}
+.stg{color:var(--mut2)}.stg .dot{background:var(--mut2)}
+.log{padding:13px 18px;font:500 11px/2 'DM Mono',monospace;color:var(--ink2)}
+.log .ts{color:var(--mut2)}
+.log b{font-weight:700}
+.lg-render{color:var(--blue)}.lg-data{color:var(--teal)}.lg-sync{color:var(--vi)}.lg-fusion{color:var(--am)}.lg-macro{color:var(--up)}
+/* generic tables for other tabs */
+table{width:100%;border-collapse:collapse;font:500 11px 'DM Mono','Noto Sans TC',monospace}
+th{font:700 9px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.4px;color:var(--mut);text-align:left;padding:8px 12px;border-bottom:2px solid var(--ink);background:var(--paper2)}
+td{padding:7px 12px;border-bottom:1px solid var(--soft)}
+tr:hover td{background:var(--paper2)}
+.chip{font:600 9px 'DM Mono',monospace;background:var(--soft);border-radius:3px;padding:1px 7px;color:var(--ink2)}
+.pdf{position:fixed;top:12px;right:14px;z-index:999;background:var(--ink);color:#fff;border:none;border-radius:5px;padding:7px 13px;font:700 9px 'DM Mono',monospace;cursor:pointer}
+@media print{@page{size:A4 landscape;margin:8mm}.pdf,.tabs{display:none!important}.sec{display:block!important}}
+</style></head><body>
+<button class="pdf" onclick="window.print()">⤓ PDF</button>
+<div class="wrap">
+<h1>治理中心 · Governance &amp; Management <span class="flow">kanban · 規劃 → 開發 → 測試 → 完成</span></h1>
+<div class="tabs" id="tabs"></div>
+<div id="stage"></div>
+</div>
+<script>
+const SUBS=[
+ ["VIA","母系統 Master","online","#1e1d1a"],
+ ["VAP","AutoPlot 視覺化","online","#4c78a8"],
+ ["VRN","Report Nova","staging","#439a9a"],
+ ["VDF","Data Fusion","online","#5a9e6f"],
+ ["VPN","Pipeline Net","staging","#c4943a"],
+ ["VSE","Synonym Engine","online","#7a6daa"]
+];
+const PROJ={
+ plan:[["Equity 因子權重 prompt","VAP",20],["VDF gap MDL104/303","VDF",15]],
+ dev:[["VAP 53-engine 圖型 prompt","VAP",70],["ETF Matrix 排名邏輯","VAP",60],["Panoramic Augmenter v3","VSE",45]],
+ test:[["Master Console 文案/架構","SYS",88],["Cockpit JSONL schema","SYS",80]],
+ done:[["SSOT 別名擴充 +76","VSE",100],["Visual Lock v2 rollout","SYS",100]]
+};
+const ACT=[
+ ["09:14","RENDER","lg-render","Active-ETF Matrix · 18 panels · exit 0 (12.4s)"],
+ ["09:01","DATA","lg-data","gsheet active_etf_seed synced · 25 ETF"],
+ ["08:30","SYNC","lg-sync","OneDrive data_dict ✓ · 41 series"],
+ ["07:55","FUSION","lg-fusion","VDF CentralHub · multi-source cross-check 96%"],
+ ["06:00","MACRO","lg-macro","FRED DGS10/CPI refreshed"]
+];
+const GOV=[
+ ["APPEND-ONLY 只增不減","全系統輸出/註冊政策","LOCKED"],
+ ["SSOT 單一真相源","VIA 自研編碼為唯一主碼","LOCKED"],
+ ["SAP / MSP / PMBOK","外部標準僅對齊不改寫","LOCKED"],
+ ["VIA-M-‹HASH› 編碼","FNV-1a 6-hex 決定性模組碼","LOCKED"],
+ ["信心層級 A–D","A 揭露 · B 可推導 · C 三角驗證 · D 模型假設","LOCKED"],
+ ["Visual Lock","漲紅跌綠 · 圓形國旗 · 折線下方 0.5 填色 · 線寬 1","v2"],
+ ["審核後套用","review_before_apply=true · dry-run 先行","LOCKED"],
+ ["時區/格式","Asia/Taipei · YYYY/MM/DD · utf-8","LOCKED"]
+];
+const AUX=[
+ ["VRN SSOT 數據總清單","VIA-M-VRNSSOT","4 份 SSOT 合約通用展開"],
+ ["SSOT Super Engine","VIA-M-SSOTENG","中樞註冊×編碼"],
+ ["SSOT 視覺維護","VIA-M-SSOTVM","Visual Maintainer"],
+ ["SSOT Regex 控制","VIA-M-REGEX","Regex Control"],
+ ["MS Project 同步","VIA-M-MSPSYNC","Schedule × BOM Sync"],
+ ["同義字 PLM/PMBOK","VIA-M-SYNONYM","Synonym → SSOT"],
+ ["參數控制","VIA-M-PARAMS","Parameters Control"],
+ ["資料 API 註冊","VIA-M-API","Data API Registry"],
+ ["資料來源矩陣","VIA-M-DSM","Data Source Matrix"],
+ ["VPNS 命名空間","VIA-M-VPNS","Namespace UI"],
+ ["筆記專業版","VIA-M-NOTE","Note Pro"]
+];
+const FUNC=[
+ ["總經盤勢","7 模組","分區×主題 · 美國矩陣 · GDP恆等式 · 全球指標(9區) · 殖利率 · 美元匯率"],
+ ["市場","16 模組","資金流(監控/地圖/指數) · 共振 · ETF(主動/矩陣/快照) · 風險引擎 · 分組分類"],
+ ["產業族群個股","13 模組","產業中樞 · BOM/成本 · PSU/Thermal · VDF · VAP · 行業360"],
+ ["財務估值","5 模組","族群指數評價 · 估值終端 · 雙源估值 · 整合平台 · 財務報表"],
+ ["規範 · 參考","9 模組","繪圖規範 · 儀表板標準 · 圖表庫 · 母版 · 系統參數規格"],
+ ["報告 · 簡報","9 模組","VIA 簡報 · 週報 · VRN 矩陣報告 · 投資一覽 · 策略報告"]
+];
+const $=s=>document.querySelector(s);
+const TABS=[["ssot","SSOT 治理"],["aux","輔助模組"],["func","功能模組"],["prompt","PROMPT 專案"]];
+function statCards(){
+ const total=Object.values(PROJ).flat().length;
+ const cs=[["專案",total,"total"],["進行中",PROJ.dev.length,"active"],["測試",PROJ.test.length,"testing"],["完成",PROJ.done.length,"done"],["規劃",PROJ.plan.length,"planning"],["本週更新",5,"this week"]];
+ return '<div class="stats">'+cs.map(c=>'<div class="stat"><div class="k">'+c[0]+'</div><div class="v">'+c[1]+'</div><div class="e">'+c[2]+'</div></div>').join("")+'</div>';
+}
+function kanban(){
+ const cols=[["plan","規劃","c-plan"],["dev","開發","c-dev"],["test","測試","c-test"],["done","完成","c-done"]];
+ return '<div class="board">'+cols.map(c=>'<div class="col '+c[2]+'"><div class="ch"><span>'+c[1]+'</span><span class="n">'+PROJ[c[0]].length+'</span></div>'+
+  PROJ[c[0]].map(p=>'<div class="card"><div class="t">'+p[0]+'</div><div class="row"><span class="own">'+p[1]+'</span><span class="pc">'+p[2]+'%</span></div><div class="track"><i style="width:'+p[2]+'%"></i></div></div>').join("")+'</div>').join("")+'</div>';
+}
+function lower(){
+ return '<div class="lower"><div class="panel"><div class="ph"><b>子系統狀態 · Subsystems</b><span>CMD-ID · SSOT</span></div><div class="subs">'+
+  SUBS.map(s=>'<div class="sub"><span class="badge" style="background:'+s[3]+'">'+s[0]+'</span><span class="nm">'+s[1]+'</span><span class="st '+(s[2]==="online"?"on1":"stg")+'"><span class="dot"></span>'+s[2]+'</span></div>').join("")+
+  '</div></div><div class="panel"><div class="ph"><b>近期事件 · Recent Activity</b><span>cockpit JSONL</span></div><div class="log">'+
+  ACT.map(a=>'<div><span class="ts">['+a[0]+']</span> <b class="'+a[2]+'">'+a[1]+'</b> '+a[3]+'</div>').join("")+'</div></div></div>';
+}
+function tbl(head,rows){return '<div class="panel" style="margin-top:4px"><table><thead><tr>'+head.map(h=>'<th>'+h+'</th>').join("")+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map((c,i)=>'<td'+(i===0?' style="font-weight:700;color:var(--ink)"':'')+'>'+c+'</td>').join("")+'</tr>').join("")+'</tbody></table></div>';}
+const SECS={
+ prompt:()=>statCards()+kanban()+lower(),
+ ssot:()=>'<div class="stats">'+[["治理項",GOV.length,"locked"],["子系統",SUBS.length,"CMD-ID"],["別名擴充","+76","VSE"],["Visual Lock","v2","rollout"]].map(c=>'<div class="stat"><div class="k">'+c[0]+'</div><div class="v">'+c[1]+'</div><div class="e">'+c[2]+'</div></div>').join("")+'</div>'+tbl(["治理諸元","說明","狀態"],GOV.map(g=>[g[0],g[1],'<span class="chip">'+g[2]+'</span>'])),
+ aux:()=>tbl(["輔助模組","VIA 碼","內容"],AUX.map(a=>[a[0],'<span class="chip">'+a[1]+'</span>',a[2]])),
+ func:()=>tbl(["功能類別","規模","涵蓋"],FUNC)
+};
+$("#tabs").innerHTML=TABS.map(t=>'<div class="tab" data-id="'+t[0]+'">'+t[1]+'</div>').join("");
+document.querySelectorAll(".tab").forEach(el=>el.onclick=()=>{
+ document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t===el));
+ $("#stage").innerHTML='<div class="sec on">'+SECS[el.dataset.id]()+'</div>';
+ if(history.replaceState)history.replaceState(null,"","#"+el.dataset.id);
+});
+const init=(location.hash||"").replace("#","");
+(document.querySelector('.tab[data-id="'+(SECS[init]?init:"prompt")+'"]')).click();
+</script>
+</body></html>

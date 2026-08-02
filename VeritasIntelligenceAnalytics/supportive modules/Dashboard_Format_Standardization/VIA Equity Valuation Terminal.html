@@ -1,0 +1,257 @@
+<!DOCTYPE html><html lang="zh-TW"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>VIA · Equity Valuation Terminal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--bg1:#edecea;--bg2:#e5e3df;--sf:#fff;--sf2:#fafaf8;--bd:#dbd9d3;--bd2:#ccc9c1;
+--bl:#4c78a8;--bl-l:#d0e1f0;--tl:#439a9a;--tl-l:#c8e6e6;--gn:#5a9e6f;--gn-l:#cde8d5;
+--am:#c4943a;--am-l:#f5e2b8;--co:#c96b5a;--co-l:#f5d0c8;--vi:#7a6daa;--vi-l:#dcd8f0;
+--i0:#1e1d1a;--i1:#3d3c38;--i2:#6b6860;--i3:#9c9890;--i4:#c4c0b8;--up:#c0392b;--dn:#2e7d52;
+--mo:'DM Mono',monospace;--sa:'DM Sans',system-ui,sans-serif;
+--r:5px;--r2:8px;--r3:12px;--sh:0 1px 3px rgba(0,0,0,.06);--sh2:0 4px 16px rgba(0,0,0,.10);}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sa);background:var(--bg);color:var(--i0);font-size:11.5px;line-height:1.5;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
+.w{max-width:1620px;margin:0 auto;padding:10px 16px}
+.hdr{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r3);padding:11px 16px;margin-bottom:8px;position:relative;overflow:hidden;display:flex;align-items:center;gap:14px;box-shadow:var(--sh2)}
+.hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--bl),var(--tl),var(--vi),var(--am),var(--co),var(--gn));background-size:200% 100%;animation:hs 8s linear infinite}
+@keyframes hs{0%{background-position:0%}100%{background-position:200%}}
+.logo-wrap{width:42px;height:42px;flex-shrink:0;background:linear-gradient(135deg,#1e3a5f,var(--vi));border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--mo);font-size:11px;box-shadow:0 2px 8px rgba(76,120,168,.35)}
+.hdr-titles{flex:1}.hdr-title{font-family:var(--sa);font-size:16px;font-weight:700}.hdr-title span{color:var(--bl)}
+.hdr-sub{font-size:9px;color:var(--i3);font-family:var(--mo);margin-top:2px}
+.px{font-family:var(--mo);text-align:right}.px .v{font-size:20px;font-weight:600;color:var(--up)}.px .l{font-size:8px;color:var(--i3)}
+/* toolbar */
+.tb{display:flex;gap:5px;align-items:center;flex-wrap:wrap;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:7px 10px;margin-bottom:8px;box-shadow:var(--sh)}
+.tb .grp{display:flex;gap:4px;align-items:center}
+.tb .sep{width:1px;height:20px;background:var(--bd);margin:0 4px}
+.tb button{font-family:var(--mo);font-size:10px;font-weight:500;padding:4px 10px;border-radius:var(--r);border:1px solid var(--bd);background:var(--sf);color:var(--i2);cursor:pointer;transition:.12s}
+.tb button.lbl{color:var(--i3);cursor:default;background:var(--bg1)}
+.tb button.ma.on{background:var(--bl);color:#fff;border-color:var(--bl)}
+.tb button.ema.on{background:var(--sf);color:var(--bl);border-color:var(--bl);box-shadow:inset 0 0 0 1px var(--bl)}
+.tb button.bb.on{background:var(--vi);color:#fff;border-color:var(--vi)}
+.tb button.ytm.on{background:var(--co);color:#fff;border-color:var(--co)}
+.tb button:hover{filter:brightness(.97)}
+/* layout */
+.term{display:grid;grid-template-columns:1fr;gap:8px;align-items:stretch}
+@media(max-width:1000px){.term{grid-template-columns:1fr}}
+.leftcol{display:flex;flex-direction:column;gap:6px;min-width:0}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:8px 10px;box-shadow:var(--sh)}
+.card-t{font-weight:600;font-size:10.5px;margin-bottom:3px;display:flex;justify-content:space-between}
+.card-t .s{font-family:var(--mo);font-size:8px;color:var(--i3)}
+.card svg{width:100%;height:auto;display:block}
+/* fundamentals trend row */
+.funds{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px}
+@media(max-width:1200px){.funds{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.funds{grid-template-columns:1fr}}
+.fund{background:var(--sf2);border:1px solid var(--bd);border-radius:var(--r);padding:6px 8px}
+.fund .fl{font-size:9.5px;font-weight:600;color:var(--i1);margin-bottom:1px;display:flex;justify-content:space-between}
+.fund .fl span{font-family:var(--mo);font-size:7.5px;color:var(--i3);font-weight:400}
+.fund svg{width:100%;height:auto;display:block}
+.rightcol-inner{height:100%;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:10px;box-shadow:var(--sh);display:flex;flex-direction:column}
+.rightcol-inner .ttl{font-weight:600;font-size:10.5px;margin-bottom:2px}
+.rightcol-inner .sb{font-family:var(--mo);font-size:8px;color:var(--i3);margin-bottom:6px}
+.spec-svg{flex:1;width:100%}
+/* tables */
+.tables{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:900px){.tables{grid-template-columns:1fr}}
+.tbl{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);overflow:hidden;box-shadow:var(--sh)}
+.tbl-h{padding:7px 12px;background:var(--sf2);border-bottom:1px solid var(--bd);border-left:3px solid var(--tc);font-weight:700;font-size:11px;font-family:var(--sa)}
+.tbl-h .sm{float:right;font-family:var(--mo);font-size:8px;color:var(--am);background:var(--am-l);padding:1px 7px;border-radius:8px;font-weight:400}
+table{width:100%;border-collapse:collapse;font-size:10px}
+th{background:var(--bg1);text-align:right;font-weight:600;color:var(--i2);padding:4px 10px;border-bottom:2px solid var(--bd);font-family:var(--mo);font-size:9px}
+th:first-child{text-align:left}
+td{padding:4px 10px;border-bottom:1px solid var(--bg1);text-align:right;font-family:var(--mo)}
+td:first-child{text-align:left;font-family:var(--sa);color:var(--i1)}
+tr:hover td{background:rgba(76,120,168,.04)}
+.full{grid-column:1/-1}
+.pe-tbl td.hi{color:var(--up);font-weight:600}
+.ft{font-family:var(--mo);font-size:8.5px;color:var(--i3);padding:12px 2px 8px;border-top:1px solid var(--bd);margin-top:10px;line-height:1.7}
+</style></head><body><div class="w">
+<div class="hdr"><div class="logo-wrap">EQ</div><div class="hdr-titles">
+<div class="hdr-title" id="nm"></div><div class="hdr-sub" id="sub"></div></div>
+<div class="px"><div class="v" id="adj"></div><div class="l">adj close · YFinance</div></div></div>
+
+<div class="tb" id="tb"></div>
+
+<div class="term">
+ <div class="leftcol">
+  <div class="card"><div class="card-t"><span>K線 + 均線/通道</span><span class="s" id="ohlcinfo"></span></div><svg id="c-main" viewBox="0 0 900 300"></svg></div>
+  <div class="card"><div class="card-t"><span>成交量 Volume</span><span class="s">上紅下綠</span></div><svg id="c-vol" viewBox="0 0 900 90"></svg></div>
+  <div class="card"><div class="card-t"><span>Forward PE Band</span><span class="s">price = PE × 2026E EPS</span></div><svg id="c-pe" viewBox="0 0 900 150"></svg></div>
+  <div class="card"><div class="card-t"><span>PB Band</span><span class="s">price = PB × BVPS</span></div><svg id="c-pb" viewBox="0 0 900 150"></svg></div>
+ </div>
+</div>
+
+<div class="card" style="margin-top:8px"><div class="card-t"><span>基本面趨勢 Fundamentals</span><span class="s">2023–2026E 年度財報 · 共識展望 · SAMPLE</span></div>
+<div class="funds">
+ <div class="fund"><div class="fl"><span style="color:var(--i1)">營收 &amp; 淨利</span><span>$B</span></div><svg id="f-rev" viewBox="0 0 320 150"></svg></div>
+ <div class="fund"><div class="fl"><span style="color:var(--i1)">稀釋EPS 趨勢</span><span>$ · 含共識</span></div><svg id="f-eps" viewBox="0 0 320 150"></svg></div>
+ <div class="fund"><div class="fl"><span style="color:var(--i1)">獲利能力</span><span>%</span></div><svg id="f-prof" viewBox="0 0 320 150"></svg></div>
+ <div class="fund"><div class="fl"><span style="color:var(--i1)">每股股利 &amp; 殖利率</span><span>$ / %</span></div><svg id="f-div" viewBox="0 0 320 150"></svg></div>
+</div></div>
+
+<div class="tables">
+ <div class="tbl full"><div class="tbl-h" style="--tc:var(--bl)">Forward PER (adj close ÷ 共識稀釋EPS)<span class="sm">FactSet · SAMPLE</span></div>
+   <table class="pe-tbl" id="t-pe"></table></div>
+ <div class="tbl"><div class="tbl-h" style="--tc:var(--co)">損益表 Income (年度)</div><table id="t-inc"></table></div>
+ <div class="tbl"><div class="tbl-h" style="--tc:var(--tl)">資產負債 Balance (年度)</div><table id="t-bal"></table></div>
+ <div class="tbl"><div class="tbl-h" style="--tc:var(--gn)">現金流量 Cash Flow (年度)</div><table id="t-cf"></table></div>
+ <div class="tbl"><div class="tbl-h" style="--tc:var(--am)">比率分析 Ratios</div><table id="t-ratio"></table></div>
+ <div class="tbl"><div class="tbl-h" style="--tc:var(--vi)">每股分析 Per-Share</div><table id="t-ps"></table></div>
+ <div class="tbl"><div class="tbl-h" style="--tc:var(--bl)">評價分析 Valuation (adj close)</div><table id="t-val"></table></div>
+</div>
+<div class="ft" id="ft"></div></div>
+<script>
+const D={"title": "VIA · Equity Valuation Terminal", "version": "v1", "anchor": "AST-PS-MOD-VIA-EQUITY-001", "ticker": "ACME · 範例 SAMPLE", "name": "ACME Semiconductor (SAMPLE)", "ccy": "USD", "src": "Price/OHLCV: yfinance · Consensus EPS/目標價: FactSet", "window": "1995-01-01~最新(此範例顯示近 130 日)", "lock": "Visual Lock v1 · UP=RED ▲ / DOWN=GREEN ▼ · 光譜:綠(低/下)→黃→紅(高/上)", "note": "結構/版面/公式為真;OHLC/共識/財報數值=SAMPLE。Forward PE=adj_close÷共識稀釋EPS。光譜A=目標價$、B=隱含fwdPE×(=A÷2026EPS,故低/均/中/高垂直同位、刻度不同)", "ohlc": [{"d": "2025-11-03", "o": 180.0, "h": 188.7, "l": 179.5, "c": 187.0, "v": 26170773}, {"d": "2025-11-04", "o": 187.0, "h": 187.9, "l": 183.3, "c": 184.2, "v": 27304887}, {"d": "2025-11-05", "o": 184.2, "h": 187.1, "l": 183.9, "c": 185.4, "v": 35585565}, {"d": "2025-11-06", "o": 185.4, "h": 186.9, "l": 185.0, "c": 186.8, "v": 20909082}, {"d": "2025-11-07", "o": 186.8, "h": 187.0, "l": 181.3, "c": 181.6, "v": 29866758}, {"d": "2025-11-10", "o": 181.6, "h": 184.6, "l": 180.4, "c": 182.6, "v": 19836305}, {"d": "2025-11-11", "o": 182.6, "h": 185.9, "l": 182.5, "c": 185.6, "v": 21298900}, {"d": "2025-11-12", "o": 185.6, "h": 186.6, "l": 181.1, "c": 181.4, "v": 30724558}, {"d": "2025-11-13", "o": 181.4, "h": 181.8, "l": 174.9, "c": 176.4, "v": 23889886}, {"d": "2025-11-14", "o": 176.4, "h": 177.2, "l": 174.6, "c": 175.2, "v": 33574416}, {"d": "2025-11-17", "o": 175.2, "h": 177.0, "l": 174.6, "c": 176.1, "v": 30098786}, {"d": "2025-11-18", "o": 176.1, "h": 178.9, "l": 173.4, "c": 178.6, "v": 22267190}, {"d": "2025-11-19", "o": 178.6, "h": 180.0, "l": 176.8, "c": 177.2, "v": 33795162}, {"d": "2025-11-20", "o": 177.2, "h": 179.9, "l": 177.1, "c": 177.9, "v": 31327680}, {"d": "2025-11-21", "o": 177.9, "h": 181.5, "l": 177.4, "c": 179.0, "v": 23454749}, {"d": "2025-11-24", "o": 179.0, "h": 180.0, "l": 169.0, "c": 172.2, "v": 18712843}, {"d": "2025-11-25", "o": 172.2, "h": 180.4, "l": 170.7, "c": 176.6, "v": 30499611}, {"d": "2025-11-26", "o": 176.6, "h": 182.8, "l": 174.9, "c": 182.4, "v": 10565163}, {"d": "2025-11-27", "o": 182.4, "h": 188.8, "l": 177.8, "c": 185.1, "v": 22990216}, {"d": "2025-11-28", "o": 185.1, "h": 186.6, "l": 183.6, "c": 185.2, "v": 26908979}, {"d": "2025-12-01", "o": 185.2, "h": 186.3, "l": 184.1, "c": 185.7, "v": 28983274}, {"d": "2025-12-02", "o": 185.7, "h": 194.5, "l": 185.5, "c": 192.9, "v": 31197643}, {"d": "2025-12-03", "o": 192.9, "h": 193.1, "l": 188.2, "c": 191.1, "v": 24529319}, {"d": "2025-12-04", "o": 191.1, "h": 192.7, "l": 189.6, "c": 191.1, "v": 23570853}, {"d": "2025-12-05", "o": 191.1, "h": 193.9, "l": 186.1, "c": 187.4, "v": 14309576}, {"d": "2025-12-08", "o": 187.4, "h": 188.9, "l": 185.2, "c": 186.2, "v": 15661454}, {"d": "2025-12-09", "o": 186.2, "h": 187.1, "l": 184.3, "c": 184.8, "v": 34897854}, {"d": "2025-12-10", "o": 184.8, "h": 187.4, "l": 181.9, "c": 185.4, "v": 23955972}, {"d": "2025-12-11", "o": 185.4, "h": 190.4, "l": 184.4, "c": 189.0, "v": 35784375}, {"d": "2025-12-12", "o": 189.0, "h": 191.3, "l": 188.4, "c": 190.3, "v": 27150617}, {"d": "2025-12-15", "o": 190.3, "h": 191.0, "l": 186.5, "c": 186.7, "v": 36940839}, {"d": "2025-12-16", "o": 186.7, "h": 187.0, "l": 183.3, "c": 183.3, "v": 27390082}, {"d": "2025-12-17", "o": 183.3, "h": 185.3, "l": 177.3, "c": 179.3, "v": 38946186}, {"d": "2025-12-18", "o": 179.3, "h": 183.1, "l": 178.5, "c": 180.8, "v": 34772538}, {"d": "2025-12-19", "o": 180.8, "h": 181.1, "l": 179.1, "c": 179.7, "v": 20390689}, {"d": "2025-12-22", "o": 179.7, "h": 181.5, "l": 176.4, "c": 178.3, "v": 25058100}, {"d": "2025-12-23", "o": 178.3, "h": 181.5, "l": 173.5, "c": 176.3, "v": 35396856}, {"d": "2025-12-24", "o": 176.3, "h": 180.3, "l": 175.9, "c": 178.8, "v": 17678174}, {"d": "2025-12-25", "o": 178.8, "h": 179.6, "l": 176.2, "c": 176.8, "v": 33878634}, {"d": "2025-12-26", "o": 176.8, "h": 180.6, "l": 173.4, "c": 174.2, "v": 33822626}, {"d": "2025-12-29", "o": 174.2, "h": 175.7, "l": 167.1, "c": 169.2, "v": 29238629}, {"d": "2025-12-30", "o": 169.2, "h": 170.4, "l": 168.2, "c": 169.1, "v": 30601551}, {"d": "2025-12-31", "o": 169.1, "h": 172.2, "l": 167.9, "c": 168.6, "v": 27947459}, {"d": "2026-01-01", "o": 168.6, "h": 168.8, "l": 165.5, "c": 167.1, "v": 24951717}, {"d": "2026-01-02", "o": 167.1, "h": 169.7, "l": 166.4, "c": 168.7, "v": 23745133}, {"d": "2026-01-05", "o": 168.7, "h": 173.5, "l": 165.9, "c": 173.3, "v": 31365174}, {"d": "2026-01-06", "o": 173.3, "h": 174.8, "l": 171.0, "c": 172.8, "v": 38623835}, {"d": "2026-01-07", "o": 172.8, "h": 178.7, "l": 170.9, "c": 177.3, "v": 34433650}, {"d": "2026-01-08", "o": 177.3, "h": 177.9, "l": 175.0, "c": 177.0, "v": 22812619}, {"d": "2026-01-09", "o": 177.0, "h": 185.1, "l": 176.1, "c": 181.3, "v": 25661169}, {"d": "2026-01-12", "o": 181.3, "h": 185.9, "l": 179.6, "c": 185.7, "v": 36712740}, {"d": "2026-01-13", "o": 185.7, "h": 186.2, "l": 178.3, "c": 180.8, "v": 22899050}, {"d": "2026-01-14", "o": 180.8, "h": 184.7, "l": 179.6, "c": 182.7, "v": 24616787}, {"d": "2026-01-15", "o": 182.7, "h": 184.2, "l": 182.0, "c": 183.7, "v": 24278121}, {"d": "2026-01-16", "o": 183.7, "h": 184.3, "l": 179.8, "c": 181.2, "v": 22098098}, {"d": "2026-01-19", "o": 181.2, "h": 184.7, "l": 179.7, "c": 183.4, "v": 35750258}, {"d": "2026-01-20", "o": 183.4, "h": 187.0, "l": 181.9, "c": 183.2, "v": 41514021}, {"d": "2026-01-21", "o": 183.2, "h": 192.7, "l": 182.1, "c": 192.2, "v": 32966623}, {"d": "2026-01-22", "o": 192.2, "h": 196.1, "l": 190.7, "c": 193.1, "v": 29724712}, {"d": "2026-01-23", "o": 193.1, "h": 195.8, "l": 191.2, "c": 192.3, "v": 26947264}, {"d": "2026-01-26", "o": 192.3, "h": 192.6, "l": 190.7, "c": 191.4, "v": 34771064}, {"d": "2026-01-27", "o": 191.4, "h": 195.2, "l": 190.3, "c": 193.3, "v": 30695350}, {"d": "2026-01-28", "o": 193.3, "h": 195.5, "l": 190.4, "c": 191.4, "v": 29450363}, {"d": "2026-01-29", "o": 191.4, "h": 195.1, "l": 189.4, "c": 193.2, "v": 26240943}, {"d": "2026-01-30", "o": 193.2, "h": 194.4, "l": 188.0, "c": 190.8, "v": 18131227}, {"d": "2026-02-02", "o": 190.8, "h": 195.7, "l": 190.3, "c": 195.4, "v": 29068966}, {"d": "2026-02-03", "o": 195.4, "h": 198.5, "l": 195.0, "c": 197.2, "v": 29616278}, {"d": "2026-02-04", "o": 197.2, "h": 200.6, "l": 194.6, "c": 200.3, "v": 26181838}, {"d": "2026-02-05", "o": 200.3, "h": 202.6, "l": 198.9, "c": 199.0, "v": 32210722}, {"d": "2026-02-06", "o": 199.0, "h": 199.4, "l": 196.5, "c": 198.1, "v": 23577333}, {"d": "2026-02-09", "o": 198.1, "h": 198.3, "l": 194.9, "c": 196.5, "v": 31266078}, {"d": "2026-02-10", "o": 196.5, "h": 201.1, "l": 195.7, "c": 199.3, "v": 37072261}, {"d": "2026-02-11", "o": 199.3, "h": 201.5, "l": 198.2, "c": 199.3, "v": 27085023}, {"d": "2026-02-12", "o": 199.3, "h": 202.9, "l": 194.0, "c": 194.2, "v": 33686829}, {"d": "2026-02-13", "o": 194.2, "h": 194.3, "l": 189.8, "c": 190.1, "v": 22335040}, {"d": "2026-02-16", "o": 190.1, "h": 190.9, "l": 189.6, "c": 190.8, "v": 19199728}, {"d": "2026-02-17", "o": 190.8, "h": 192.8, "l": 189.3, "c": 192.3, "v": 12244713}, {"d": "2026-02-18", "o": 192.3, "h": 192.9, "l": 187.7, "c": 191.5, "v": 19180218}, {"d": "2026-02-19", "o": 191.5, "h": 198.0, "l": 190.9, "c": 196.0, "v": 29378019}, {"d": "2026-02-20", "o": 196.0, "h": 199.9, "l": 193.9, "c": 197.4, "v": 25369713}, {"d": "2026-02-23", "o": 197.4, "h": 197.5, "l": 190.4, "c": 194.9, "v": 18328058}, {"d": "2026-02-24", "o": 194.9, "h": 197.5, "l": 190.0, "c": 190.9, "v": 38791395}, {"d": "2026-02-25", "o": 190.9, "h": 191.5, "l": 190.3, "c": 190.7, "v": 24060378}, {"d": "2026-02-26", "o": 190.7, "h": 191.5, "l": 190.3, "c": 190.9, "v": 24690865}, {"d": "2026-02-27", "o": 190.9, "h": 190.9, "l": 189.9, "c": 190.9, "v": 17003818}, {"d": "2026-03-02", "o": 190.9, "h": 191.8, "l": 186.4, "c": 187.1, "v": 18492264}, {"d": "2026-03-03", "o": 187.1, "h": 192.9, "l": 185.8, "c": 190.7, "v": 35363097}, {"d": "2026-03-04", "o": 190.7, "h": 191.0, "l": 181.1, "c": 183.8, "v": 35030296}, {"d": "2026-03-05", "o": 183.8, "h": 187.0, "l": 182.8, "c": 186.3, "v": 19543045}, {"d": "2026-03-06", "o": 186.3, "h": 188.3, "l": 185.3, "c": 187.3, "v": 16242106}, {"d": "2026-03-09", "o": 187.3, "h": 189.1, "l": 183.5, "c": 188.4, "v": 18465606}, {"d": "2026-03-10", "o": 188.4, "h": 189.5, "l": 182.9, "c": 185.8, "v": 27450181}, {"d": "2026-03-11", "o": 185.8, "h": 186.1, "l": 178.7, "c": 181.8, "v": 19019669}, {"d": "2026-03-12", "o": 181.8, "h": 186.6, "l": 181.6, "c": 183.7, "v": 37428931}, {"d": "2026-03-13", "o": 183.7, "h": 188.2, "l": 180.3, "c": 185.9, "v": 23363667}, {"d": "2026-03-16", "o": 185.9, "h": 189.9, "l": 185.3, "c": 188.6, "v": 31696969}, {"d": "2026-03-17", "o": 188.6, "h": 188.6, "l": 179.3, "c": 179.4, "v": 24822477}, {"d": "2026-03-18", "o": 179.4, "h": 180.9, "l": 178.0, "c": 179.4, "v": 22870394}, {"d": "2026-03-19", "o": 179.4, "h": 183.3, "l": 179.4, "c": 181.6, "v": 29957019}, {"d": "2026-03-20", "o": 181.6, "h": 184.3, "l": 172.9, "c": 173.4, "v": 16723451}, {"d": "2026-03-23", "o": 173.4, "h": 177.4, "l": 171.6, "c": 175.7, "v": 19046517}, {"d": "2026-03-24", "o": 175.7, "h": 175.9, "l": 173.6, "c": 174.7, "v": 25586990}, {"d": "2026-03-25", "o": 174.7, "h": 176.5, "l": 174.2, "c": 174.4, "v": 21751794}, {"d": "2026-03-26", "o": 174.4, "h": 178.2, "l": 171.6, "c": 177.2, "v": 29554771}, {"d": "2026-03-27", "o": 177.2, "h": 178.6, "l": 171.5, "c": 173.3, "v": 35973628}, {"d": "2026-03-30", "o": 173.3, "h": 179.3, "l": 173.0, "c": 176.4, "v": 27475032}, {"d": "2026-03-31", "o": 176.4, "h": 182.0, "l": 176.1, "c": 179.9, "v": 24898021}, {"d": "2026-04-01", "o": 179.9, "h": 182.6, "l": 176.4, "c": 179.3, "v": 15153586}, {"d": "2026-04-02", "o": 179.3, "h": 184.3, "l": 178.5, "c": 183.6, "v": 26229732}, {"d": "2026-04-03", "o": 183.6, "h": 185.4, "l": 178.5, "c": 182.4, "v": 25543292}, {"d": "2026-04-06", "o": 182.4, "h": 184.1, "l": 176.7, "c": 179.5, "v": 16340042}, {"d": "2026-04-07", "o": 179.5, "h": 181.0, "l": 173.9, "c": 175.2, "v": 23819082}, {"d": "2026-04-08", "o": 175.2, "h": 176.0, "l": 172.8, "c": 174.3, "v": 28433779}, {"d": "2026-04-09", "o": 174.3, "h": 174.9, "l": 172.4, "c": 173.9, "v": 28592948}, {"d": "2026-04-10", "o": 173.9, "h": 180.1, "l": 172.3, "c": 178.9, "v": 16321664}, {"d": "2026-04-13", "o": 178.9, "h": 179.7, "l": 177.8, "c": 178.7, "v": 24801687}, {"d": "2026-04-14", "o": 178.7, "h": 182.2, "l": 177.8, "c": 182.0, "v": 24551235}, {"d": "2026-04-15", "o": 182.0, "h": 187.1, "l": 181.6, "c": 185.8, "v": 22959158}, {"d": "2026-04-16", "o": 185.8, "h": 195.5, "l": 184.1, "c": 193.6, "v": 9761985}, {"d": "2026-04-17", "o": 193.6, "h": 195.5, "l": 193.2, "c": 195.4, "v": 16499810}, {"d": "2026-04-20", "o": 195.4, "h": 196.8, "l": 193.1, "c": 195.1, "v": 25493761}, {"d": "2026-04-21", "o": 195.1, "h": 196.2, "l": 194.1, "c": 195.8, "v": 32298943}, {"d": "2026-04-22", "o": 195.8, "h": 197.0, "l": 195.0, "c": 196.2, "v": 29310433}, {"d": "2026-04-23", "o": 196.2, "h": 199.9, "l": 195.2, "c": 198.8, "v": 23100597}, {"d": "2026-04-24", "o": 198.8, "h": 204.1, "l": 197.8, "c": 202.7, "v": 35907735}, {"d": "2026-04-27", "o": 202.7, "h": 204.5, "l": 202.5, "c": 202.7, "v": 18321719}, {"d": "2026-04-28", "o": 202.7, "h": 208.2, "l": 200.5, "c": 206.0, "v": 21256307}, {"d": "2026-04-29", "o": 206.0, "h": 207.8, "l": 204.9, "c": 205.3, "v": 15852782}, {"d": "2026-04-30", "o": 205.3, "h": 208.3, "l": 203.7, "c": 204.6, "v": 20205018}, {"d": "2026-05-01", "o": 204.6, "h": 204.9, "l": 201.5, "c": 204.0, "v": 29592052}], "adj_close": 204.0, "yopen": 187.0, "eps": {"2026": {"mean": 9.2, "median": 9.0}, "2027": {"mean": 10.8, "median": 10.5}, "2028": {"mean": 12.3, "median": 12.0}}, "targets": {"low": 150, "mean": 205, "median": 200, "high": 260, "current": 204.0}, "bvps": 46.0, "peband": {"epsFwd": 9.2, "mult": [14, 18, 22, 26]}, "pbband": {"bvps": 46.0, "mult": [2, 3, 4, 5]}, "yrs": ["2023", "2024", "2025", "2026E"], "income": [["營收 Revenue", [68.5, 76.2, 84.9, 93.1]], ["毛利 Gross Profit", [36.3, 41.9, 47.5, 53.0]], ["營業利益 Op Income", [26.1, 30.8, 35.6, 40.2]], ["稅後淨利 Net Income", [22.4, 26.9, 31.2, 35.4]], ["稀釋EPS Diluted EPS", [6.8, 7.9, 8.4, 9.2]]], "balance": [["總資產 Assets", [145.2, 162.4, 181.0, 198.5]], ["總負債 Liabilities", [58.1, 62.3, 66.0, 68.2]], ["股東權益 Equity", [87.1, 100.1, 115.0, 130.3]], ["每股淨值 BVPS", [33.5, 38.2, 43.1, 46.0]]], "cashflow": [["營業現金流 CFO", [31.2, 35.8, 40.1, 44.6]], ["資本支出 CapEx", [-18.5, -21.0, -23.4, -25.0]], ["自由現金流 FCF", [12.7, 14.8, 16.7, 19.6]], ["股利 Dividends", [-7.1, -8.0, -9.2, -10.3]]], "ratios": [["毛利率 %", [53.0, 55.0, 55.9, 56.9]], ["營業利益率 %", [38.1, 40.4, 41.9, 43.2]], ["淨利率 %", [32.7, 35.3, 36.7, 38.0]], ["ROE %", [25.7, 26.9, 27.1, 27.2]], ["ROA %", [15.4, 16.6, 17.2, 17.8]], ["負債比 %", [40.0, 38.4, 36.5, 34.4]], ["流動比 %", [210, 225, 238, 245]]], "pershare": [["稀釋EPS", [6.8, 7.9, 8.4, 9.2]], ["每股淨值 BVPS", [33.5, 38.2, 43.1, 46.0]], ["每股營收 SPS", [20.8, 22.9, 25.4, 27.5]], ["每股自由現金流 FCFPS", [3.9, 4.4, 5.0, 5.7]], ["每股股利 DPS", [2.2, 2.4, 2.8, 3.1]]], "valuation": [["本益比 PE (adj close)", [26.8, 23.0, 21.7, 19.8]], ["股價淨值比 PB", [5.4, 4.8, 4.2, 4.0]], ["股價營收比 PS", [8.7, 7.9, 7.2, 6.6]], ["EV/EBITDA", [18.2, 16.1, 14.8, 13.6]], ["股息殖利率 %", [1.2, 1.3, 1.5, 1.7]], ["PEG", [1.8, 1.6, 1.5, 1.4]]]},O=D.ohlc,C=O.map(b=>b.c);
+document.getElementById('nm').innerHTML=D.name+' <span>'+D.ticker+'</span>';
+document.getElementById('sub').textContent=D.anchor+' · '+D.src+' · 窗 '+D.window;
+document.getElementById('adj').textContent=D.ccy+' '+D.adj_close;
+document.getElementById('ft').innerHTML=D.note+'<br>'+D.lock;
+
+// ── toolbar ──
+const MAS=[5,10,20,60,120,240];
+const MACOL={5:'--co',10:'--am',20:'--bl',60:'--gn',120:'--vi',240:'--tl'};
+const active={ma:new Set([20,60]),ema:new Set(),bb:true,ytm:false};
+const tb=document.getElementById('tb');
+function btn(cls,txt,on){return `<button class="${cls}${on?' on':''}">${txt}</button>`;}
+let html='<div class="grp"><button class="lbl">SMA</button>'+MAS.map(n=>btn('ma','MA '+n,active.ma.has(n))).join('')+'</div><div class="sep"></div>';
+html+='<div class="grp"><button class="lbl">EMA</button>'+MAS.slice(1).map(n=>btn('ema','EMA '+n,active.ema.has(n))).join('')+'</div><div class="sep"></div>';
+html+='<div class="grp">'+btn('bb','BB(20,2)',active.bb)+btn('ytm','YTM',active.ytm)+'</div>';
+tb.innerHTML=html;
+tb.querySelectorAll('button:not(.lbl)').forEach(b=>{b.onclick=()=>{
+  const t=b.textContent;
+  if(t.startsWith('MA ')){const n=+t.slice(3);active.ma.has(n)?active.ma.delete(n):active.ma.add(n);}
+  else if(t.startsWith('EMA ')){const n=+t.slice(4);active.ema.has(n)?active.ema.delete(n):active.ema.add(n);}
+  else if(t.startsWith('BB'))active.bb=!active.bb;
+  else if(t==='YTM')active.ytm=!active.ytm;
+  b.classList.toggle('on');drawMain();};});
+
+// ── SVG helpers ──
+function NS(t,a){const e=document.createElementNS('http://www.w3.org/2000/svg',t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+function cv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function T(s,x,y,t,an,sz,col){const e=NS('text',{x,y,'text-anchor':an,'font-size':sz,fill:cv(col),'font-family':'DM Mono, monospace'});e.textContent=t;s.append(e);}
+function PL(s,p,c,w,d){const a={points:p.map(q=>q[0].toFixed(1)+','+q[1].toFixed(1)).join(' '),fill:'none',stroke:cv(c),'stroke-width':w,'stroke-linejoin':'round'};if(d)a['stroke-dasharray']=d;s.append(NS('polyline',a));}
+function sma(a,n){return a.map((_,i)=>i<n-1?null:a.slice(i-n+1,i+1).reduce((x,y)=>x+y,0)/n);}
+function ema(a,n){const k=2/(n+1);let p=a[0];return a.map((v,i)=>{p=i?v*k+p*(1-k):v;return i<n-1?null:p;});}
+function std(a,n){return a.map((_,i)=>{if(i<n-1)return null;const s=a.slice(i-n+1,i+1),m=s.reduce((x,y)=>x+y,0)/n;return Math.sqrt(s.reduce((x,y)=>x+(y-m)*(y-m),0)/n);});}
+
+function drawMain(){const s=document.getElementById('c-main');s.innerHTML='';
+ const W=900,H=300,L=42,R=10,Tp=8,B=20,pw=W-L-R,ph=H-Tp-B,n=O.length;
+ let lo=Math.min(...O.map(b=>b.l)),hi=Math.max(...O.map(b=>b.h));
+ if(active.bb){const sd=std(C,20),m=sma(C,20);for(let i=0;i<n;i++)if(m[i]!=null){hi=Math.max(hi,m[i]+2*sd[i]);lo=Math.min(lo,m[i]-2*sd[i]);}}
+ const pad=(hi-lo)*0.05;lo-=pad;hi+=pad;
+ const X=i=>L+pw*(i+0.5)/n,Y=v=>Tp+ph*(hi-v)/(hi-lo),bw=Math.max(1.5,pw/n*0.62);
+ for(let g=0;g<=4;g++){const v=lo+(hi-lo)*g/4;s.append(NS('line',{x1:L,x2:W-R,y1:Y(v),y2:Y(v),stroke:cv('--bg1')}));T(s,L-4,Y(v)+3,v.toFixed(0),'end',8,'--i3');}
+ O.forEach((b,i)=>{if(i%21===0)T(s,X(i),H-6,b.d.slice(2),'middle',7.5,'--i3');});
+ // BB
+ if(active.bb){const sd=std(C,20),m=sma(C,20);const up=[],dn=[];for(let i=0;i<n;i++)if(m[i]!=null){up.push([X(i),Y(m[i]+2*sd[i])]);dn.push([X(i),Y(m[i]-2*sd[i])]);}
+   s.append(NS('polygon',{points:up.concat(dn.reverse()).map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' '),fill:cv('--vi'),opacity:.08}));
+   PL(s,up,'--vi',1,'3 2');PL(s,dn.reverse(),'--vi',1,'3 2');
+   PL(s,m.map((v,i)=>v==null?null:[X(i),Y(v)]).filter(Boolean),'--vi',1,'');}
+ // YTM (year-open ref)
+ if(active.ytm){s.append(NS('line',{x1:L,x2:W-R,y1:Y(D.yopen),y2:Y(D.yopen),stroke:cv('--co'),'stroke-width':1.2,'stroke-dasharray':'5 3'}));T(s,W-R,Y(D.yopen)-3,'YTM '+D.yopen,'end',8,'--co');}
+ // candles
+ O.forEach((b,i)=>{const col=b.c>=b.o?'--up':'--dn';s.append(NS('line',{x1:X(i),x2:X(i),y1:Y(b.h),y2:Y(b.l),stroke:cv(col),'stroke-width':1}));
+   const y1=Y(Math.max(b.o,b.c)),y2=Y(Math.min(b.o,b.c));s.append(NS('rect',{x:X(i)-bw/2,y:y1,width:bw,height:Math.max(1,y2-y1),fill:cv(col)}));});
+ // MA / EMA overlays
+ active.ma.forEach(nn=>{const m=sma(C,nn);PL(s,m.map((v,i)=>v==null?null:[X(i),Y(v)]).filter(Boolean),MACOL[nn],1.4,'');});
+ active.ema.forEach(nn=>{const m=ema(C,nn);PL(s,m.map((v,i)=>v==null?null:[X(i),Y(v)]).filter(Boolean),MACOL[nn],1.2,'4 2');});
+ // legend
+ let lx=L+2;const leg=s;[...active.ma].sort((a,b)=>a-b).forEach(nn=>{T(leg,lx,Tp+8,'MA'+nn,'start',8,MACOL[nn]);lx+=34;});
+ document.getElementById('ohlcinfo').textContent='O'+O[n-1].o+' H'+O[n-1].h+' L'+O[n-1].l+' C'+O[n-1].c;
+}
+function drawVol(){const s=document.getElementById('c-vol'),W=900,H=90,L=42,R=10,Tp=6,B=14,pw=W-L-R,ph=H-Tp-B,n=O.length;
+ const vmax=Math.max(...O.map(b=>b.v)),X=i=>L+pw*(i+0.5)/n,bw=Math.max(1.5,pw/n*0.62);
+ O.forEach((b,i)=>{const col=b.c>=b.o?'--up':'--dn',h=ph*b.v/vmax;s.append(NS('rect',{x:X(i)-bw/2,y:Tp+ph-h,width:bw,height:h,fill:cv(col),opacity:.7}));});
+ T(s,L-4,Tp+8,(vmax/1e6).toFixed(0)+'M','end',8,'--i3');
+}
+function bandChart(id,mults,base,label){const s=document.getElementById(id),W=900,H=150,L=42,R=46,Tp=8,B=18,pw=W-L-R,ph=H-Tp-B,n=O.length;
+ const lines=mults.map(m=>m*base);let lo=Math.min(...C,...lines),hi=Math.max(...C,...lines);const pad=(hi-lo)*0.06;lo-=pad;hi+=pad;
+ const X=i=>L+pw*(i+0.5)/n,Y=v=>Tp+ph*(hi-v)/(hi-lo);
+ const cols=['--gn','--tl','--am','--co'];
+ mults.forEach((m,k)=>{const y=Y(m*base);s.append(NS('line',{x1:L,x2:W-R,y1:y,y2:y,stroke:cv(cols[k]||'--i3'),'stroke-width':1,'stroke-dasharray':'4 3',opacity:.8}));T(s,W-R+3,y+3,label+' '+m+'x',' start'.trim(),8,cols[k]||'--i3');T(s,W-R+3,y+11,(m*base).toFixed(0),'start',7.5,'--i3');});
+ PL(s,C.map((v,i)=>[X(i),Y(v)]),'--i0',1.6);
+ s.append(NS('circle',{cx:X(n-1),cy:Y(C[n-1]),r:2.6,fill:cv('--up')}));
+ O.forEach((b,i)=>{if(i%21===0)T(s,X(i),H-5,b.d.slice(2),'middle',7,'--i3');});
+}
+function drawSpec(){const s=document.getElementById('c-spec');s.innerHTML='';
+ const W=270,H=720,Tp=24,B=24,ph=H-Tp-B,t=D.targets,eps=D.eps['2026'].mean;
+ const lo=t.low,hi=t.high,Y=v=>Tp+ph*(hi-v)/(hi-lo);
+ // gradient defs
+ const defs=NS('defs',{});['gA','gB'].forEach(id=>{const g=NS('linearGradient',{id,x1:0,y1:0,x2:0,y2:1});
+   [['0%','--co'],['50%','--am'],['100%','--gn']].forEach(([o,c])=>g.append(NS('stop',{offset:o,'stop-color':cv(c)})));defs.append(g);});
+ s.append(defs);
+ const bw=78,ax=30,bx=W-30-bw;
+ s.append(NS('rect',{x:ax,y:Tp,width:bw,height:ph,fill:'url(#gA)',opacity:.75,rx:4}));
+ s.append(NS('rect',{x:bx,y:Tp,width:bw,height:ph,fill:'url(#gB)',opacity:.75,rx:4}));
+ T(s,ax+bw/2,16,'目標價 $','middle',9,'--i1');T(s,bx+bw/2,16,'fwd PE ×','middle',9,'--i1');
+ // shared marker lines (low/mean/median/high垂直同位)
+ const marks=[['high',t.high,'高'],['mean',t.mean,'均'],['median',t.median,'中'],['low',t.low,'低']];
+ marks.forEach(([k,v,zh])=>{const y=Y(v);s.append(NS('line',{x1:ax-6,x2:bx+bw+6,y1:y,y2:y,stroke:cv('--i2'),'stroke-width':1,'stroke-dasharray':'3 2',opacity:.6}));
+   T(s,ax-8,y+3,'$'+v,'end',8.5,'--i1');T(s,bx+bw+8,y+3,(v/eps).toFixed(1)+'x','start',8.5,'--i1');
+   T(s,ax+bw/2,y-3,zh,'middle',7.5,'--i2');});
+ // current price marker (both bars)
+ const yc=Y(t.current);[ax,bx].forEach(x=>{s.append(NS('line',{x1:x-4,x2:x+bw+4,y1:yc,y2:yc,stroke:cv('--bl'),'stroke-width':2}));});
+ T(s,(ax+bx+bw)/2,yc-4,'現價 $'+t.current+' · '+(t.current/eps).toFixed(1)+'x','middle',8.5,'--bl');
+ T(s,W/2,H-8,'場度不同·四點垂直同位','middle',7.5,'--i3');
+}
+// ── fundamentals trend mini-charts ──
+function gid(i){return document.getElementById(i);}
+function fLeg(s,x,y,col,txt){s.append(NS('rect',{x,y:y-6,width:7,height:7,rx:1,fill:cv(col)}));T(s,x+10,y,txt,'start',7,'--i2');}
+function fGrid(s,W,H,L,R,Tp,B,lo,hi,labels,dec){const ph=H-Tp-B,pw=W-L-R;
+ for(let g=0;g<=3;g++){const v=lo+(hi-lo)*g/3,y=Tp+ph*(hi-v)/(hi-lo);
+  s.append(NS('line',{x1:L,x2:W-R,y1:y,y2:y,stroke:cv('--bg1')}));
+  T(s,L-3,y+3,v.toFixed(dec),'end',7,'--i3');}
+ labels.forEach((lb,i)=>T(s,L+pw*(i+0.5)/labels.length,H-6,lb,'middle',7,'--i3'));
+ return {ph,pw,X:i=>L+pw*(i+0.5)/labels.length,Y:v=>Tp+ph*(hi-v)/(hi-lo)};}
+
+function drawRev(){const s=gid('f-rev');s.innerHTML='';const W=320,H=150,L=28,R=12,Tp=18,B=18;
+ const yl=['23','24','25','26E'],rev=D.income[0][1],net=D.income[3][1];
+ const hi=Math.max(...rev)*1.16,G=fGrid(s,W,H,L,R,Tp,B,0,hi,yl,0),base=G.Y(0),bw=G.pw/yl.length*0.26;
+ yl.forEach((y,i)=>{const cx=G.X(i),yr=G.Y(rev[i]),yn=G.Y(net[i]);
+  s.append(NS('rect',{x:cx-bw-1,y:yr,width:bw,height:base-yr,rx:1,fill:cv('--bl')}));
+  s.append(NS('rect',{x:cx+1,y:yn,width:bw,height:base-yn,rx:1,fill:cv('--gn')}));
+  T(s,cx-bw/2-1,yr-2,rev[i].toFixed(0),'middle',6.5,'--bl');});
+ fLeg(s,L,Tp-7,'--bl','營收');fLeg(s,L+44,Tp-7,'--gn','淨利 $B');}
+
+function drawEPS(){const s=gid('f-eps');s.innerHTML='';const W=320,H=150,L=24,R=10,Tp=18,B=18;
+ const yl=['23','24','25','26E','27E','28E'],v=D.pershare[0][1].concat([D.eps['2027'].mean,D.eps['2028'].mean]);
+ const hi=Math.max(...v)*1.18,G=fGrid(s,W,H,L,R,Tp,B,0,hi,yl,0),base=G.Y(0),bw=G.pw/yl.length*0.5;
+ yl.forEach((y,i)=>{const cx=G.X(i),yy=G.Y(v[i]),est=i>=3;
+  s.append(NS('rect',{x:cx-bw/2,y:yy,width:bw,height:base-yy,rx:1,fill:cv(est?'--vi-l':'--vi'),stroke:est?cv('--vi'):'none','stroke-width':est?1:0}));
+  T(s,cx,yy-2,v[i].toFixed(1),'middle',6.5,est?'--vi':'--i1');});
+ fLeg(s,L,Tp-7,'--vi','實際');fLeg(s,L+42,Tp-7,'--vi-l','共識E');}
+
+function drawProf(){const s=gid('f-prof');s.innerHTML='';const W=320,H=150,L=26,R=10,Tp=20,B=18;
+ const yl=['23','24','25','26E'],R0=D.ratios,series=[[R0[0][1],'--tl','毛利率'],[R0[1][1],'--am','營益率'],[R0[2][1],'--co','淨利率'],[R0[3][1],'--bl','ROE']];
+ let lo=99,hi=0;series.forEach(([a])=>{lo=Math.min(lo,...a);hi=Math.max(hi,...a);});const pad=(hi-lo)*0.14;lo-=pad;hi+=pad;
+ const G=fGrid(s,W,H,L,R,Tp,B,lo,hi,yl,0);
+ series.forEach(([a,c])=>{PL(s,a.map((x,i)=>[G.X(i),G.Y(x)]),c,1.5);a.forEach((x,i)=>s.append(NS('circle',{cx:G.X(i),cy:G.Y(x),r:1.8,fill:cv(c)})));});
+ series.forEach(([a,c,nm],k)=>fLeg(s,L+k*70,Tp-9,c,nm));}
+
+function drawDiv(){const s=gid('f-div');s.innerHTML='';const W=320,H=150,L=26,R=30,Tp=18,B=18;
+ const yl=['23','24','25','26E'],dps=D.pershare[4][1],yld=D.valuation[4][1];
+ const hi=Math.max(...dps)*1.3,G=fGrid(s,W,H,L,R,Tp,B,0,hi,yl,1),base=G.Y(0),bw=G.pw/yl.length*0.42;
+ yl.forEach((y,i)=>{const cx=G.X(i),yy=G.Y(dps[i]);s.append(NS('rect',{x:cx-bw/2,y:yy,width:bw,height:base-yy,rx:1,fill:cv('--am')}));
+  T(s,cx,yy-2,dps[i].toFixed(1),'middle',6.5,'--am');});
+ const yhi=Math.max(...yld)*1.5,Yy=v=>Tp+(H-Tp-B)*(yhi-v)/yhi;
+ PL(s,yld.map((x,i)=>[G.X(i),Yy(x)]),'--co',1.6);
+ yld.forEach((x,i)=>s.append(NS('circle',{cx:G.X(i),cy:Yy(x),r:2,fill:cv('--co')})));
+ for(let g=0;g<=3;g++){const v=yhi*g/3;T(s,W-R+4,Yy(v)+3,v.toFixed(1)+'%','start',6.5,'--co');}
+ fLeg(s,L,Tp-7,'--am','每股股利');fLeg(s,L+58,Tp-7,'--co','殖利率%');}
+
+// tables
+function rows(id,data,yrs){const t=document.getElementById(id);t.innerHTML='<thead><tr><th>項目</th>'+yrs.map(y=>'<th>'+y+'</th>').join('')+'</tr></thead><tbody>'+
+ data.map(([n,vals])=>'<tr><td>'+n+'</td>'+vals.map(v=>'<td>'+v+'</td>').join('')+'</tr>').join('')+'</tbody>';}
+function peTable(){const t=document.getElementById('t-pe'),a=D.adj_close,e=D.eps;
+ const ys=['2026','2027','2028'];
+ t.innerHTML='<thead><tr><th>年度</th><th>mean EPS</th><th>median EPS</th><th>adj close</th><th>fwd PE(mean)</th><th>fwd PE(median)</th></tr></thead><tbody>'+
+  ys.map(y=>{const m=e[y].mean,md=e[y].median;return '<tr><td>'+y+'E</td><td>'+m+'</td><td>'+md+'</td><td>'+a+'</td><td class="hi">'+(a/m).toFixed(1)+'x</td><td class="hi">'+(a/md).toFixed(1)+'x</td></tr>';}).join('')+'</tbody>';}
+
+drawMain();drawVol();bandChart('c-pe',D.peband.mult,D.peband.epsFwd,'PE');bandChart('c-pb',D.pbband.mult,D.pbband.bvps,'PB');drawSpec();
+drawRev();drawEPS();drawProf();drawDiv();
+peTable();
+rows('t-inc',D.income,D.yrs);rows('t-bal',D.balance,D.yrs);rows('t-cf',D.cashflow,D.yrs);
+rows('t-ratio',D.ratios,D.yrs);rows('t-ps',D.pershare,D.yrs);rows('t-val',D.valuation,D.yrs);
+window.addEventListener('resize',()=>{drawMain();});
+</script></body></html>

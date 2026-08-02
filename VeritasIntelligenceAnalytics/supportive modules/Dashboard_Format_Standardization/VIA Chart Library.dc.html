@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+<style>
+  :root{
+    --bg:#f5f4f0; --paper:#fff; --paper2:#fafaf8; --ink:#1e1d1a; --ink2:#33403f; --mut:#6b6860; --mut2:#9c9890;
+    --line:#dbd9d3; --soft:#ecebe6; --accent:#439a9a; --blue:#4c78a8; --teal:#439a9a;
+    --up:#c96b5a; --down:#5a9e6f; --am:#c4943a; --co:#c96b5a; --vi:#7a6daa; --gn:#5a9e6f; --ro:#b05580;
+    --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);}
+  body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  ::selection{background:rgba(67,154,154,.22);}
+  @media print{@page{size:A4;margin:11mm}.__pdfbtn{display:none!important}}
+</style>
+</helmet>
+
+<div ref="{{ rootRef }}" style="max-width:1340px;margin:0 auto;padding:0 22px 46px;">
+  <div style="position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50;"></div>
+
+  <header style="position:relative;padding:22px 0 10px;margin-bottom:12px;border-bottom:2px solid var(--ink);">
+    <div style="font:700 10px 'DM Mono',monospace;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px;">VERITAS INTELLIGENCE ANALYTICS · CHART LIBRARY</div>
+    <h1 style="font:800 18px/1.2 'Syne',sans-serif;color:var(--ink);">圖庫 <span style="color:var(--up);">Chart Library</span> · 全頁面圖表隨取即用</h1>
+    <p style="margin-top:5px;font:400 10.5px/1.5 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:980px;">整合各檔案/頁面所用圖型,統一規範(紅漲綠跌、面積透明度、雙軸、堆疊),每張可直接複製規格沿用。點分類篩選。</p>
+  </header>
+
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#1e1d1a;border-radius:3px;padding:6px 13px;margin-bottom:8px;">
+    <span style="display:inline-flex;align-items:center;gap:6px;font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase;">🔒 VISUAL LOCK · 全格式鎖定</span>
+    <span style="display:inline-flex;align-items:center;gap:4px;font:500 8px 'DM Mono',monospace;color:#cfcabf;">色票
+      <span style="width:11px;height:11px;border-radius:2px;background:#4c78a8;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#439a9a;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#9c9890;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#c96b5a;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#5a9e6f;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#f5f4f0;border:1px solid #555;"></span>
+    </span>
+    <span style="font:500 8px 'DM Mono',monospace;color:#8a948f;">字體 Syne / DM Sans / DM Mono</span>
+    <span style="font:500 8px 'DM Mono',monospace;color:#8a948f;">漲紅跌綠 · 千分位 · 熱力色階</span>
+    <span style="margin-left:auto;font:700 8px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:2px 8px;">v1.0 · LOCKED 2026-06-22</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;background:#fff;border:1px solid #dbd9d3;border-left:3px solid #439a9a;border-radius:3px;padding:6px 13px;margin-bottom:12px;">
+    <span style="font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;">🛰 資料請求 · VDF ENGINES</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">TWSE→rest</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#c4943a;border-radius:3px;padding:1px 6px;">SITCA→parse</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">MOPS→parse</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">yfinance→pyproc</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#c0584e;border-radius:3px;padding:1px 6px;">FactSet→keyed</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">FRED→keyed</span>
+    <span style="margin-left:auto;font:500 8px 'DM Mono',monospace;color:#9c9890;">request.json → VDF 擷取 → 雙重驗算 → Parquet → JSON</span>
+  </div>
+
+  <details data-contract="1" style="margin-bottom:12px;border:1px solid #dbd9d3;border-left:3px solid #1e1d1a;border-radius:3px;background:#fbfaf7;overflow:hidden;">
+    <summary style="cursor:pointer;user-select:none;padding:6px 13px;font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;list-style:none;">📜 引擎連接合約 · request.json（點擊展開 · 可選取複製）</summary>
+    <pre style="margin:0;padding:10px 13px;background:#1e1d1a;color:#cfe3d6;font:500 9px/1.55 'DM Mono',monospace;white-space:pre;overflow-x:auto;">{
+  "request": "chart_library",
+  "asof": "2026-06-22",
+  "universe": { "market": "TW", "exchange": ["TWSE","TPEX"] },
+  "sources": ["TWSE","TPEX","SITCA","MOPS","yfinance","FactSet","FRED"],
+  "engines": { "TWSE":"rest","TPEX":"rest","SITCA":"parse","MOPS":"parse","yfinance":"pyproc","FactSet":"keyed","FRED":"keyed" },
+  "range": { "start":"1996-01-01","end":"latest" },
+  "verify": "double_identity",
+  "db_discover": { "folder":"D:\\VDF\\databases\\","recursive":true,"match":["*.parquet","*.duckdb","*.db","*.csv"] },
+  "sink": { "parquet":"vdf/chart_library/","export":"chart_library.json" }
+}</pre>
+    <div style="padding:6px 13px;font:400 8px 'DM Sans','Noto Sans TC',sans-serif;color:#9c9890;">本檔即以此合約向 VDF 引擎請求 → 依 engines 分流(rest/parse/pyproc/keyed) → 雙重恆等驗算 → 落地 Parquet → 匯出 <b style="color:#6b6860;">chart_library.json</b> 覆蓋本頁資料源。</div>
+  </details>
+
+  <!-- category filter -->
+  <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;">
+    <sc-for list="{{ cats }}" as="c" hint-placeholder-count="6">
+      <span onClick="{{ c.go }}" style="font:700 10px 'DM Mono',monospace;padding:4px 11px;border-radius:7px;cursor:pointer;user-select:none;{{ c.css }}">{{ c.label }}</span>
+    </sc-for>
+  </div>
+
+  <!-- seaborn palette selector -->
+  <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:14px;">
+    <span style="font:700 9px 'DM Mono',monospace;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;">Seaborn 色盤</span>
+    <sc-for list="{{ palOpts }}" as="p" hint-placeholder-count="6">
+      <span onClick="{{ p.go }}" style="display:inline-flex;align-items:center;gap:5px;border-radius:6px;padding:3px 7px 3px 5px;cursor:pointer;user-select:none;background:var(--paper);{{ p.css }}">
+        <span style="display:inline-flex;">
+          <sc-for list="{{ p.cols }}" as="c" hint-placeholder-count="6"><span style="width:11px;height:13px;background:{{ c }};"></span></sc-for>
+        </span>
+        <span style="font:600 9px 'DM Mono',monospace;color:var(--ink2);">{{ p.label }}</span>
+        <span style="font:500 7px 'DM Mono',monospace;color:#fff;background:{{ p.kindCss }};border-radius:2px;padding:0 4px;">{{ p.kind }}</span>
+      </span>
+    </sc-for>
+  </div>
+
+  <!-- consolidated spec + JSON schema -->
+  <div style="border:1px solid var(--line);border-left:3px solid var(--ink);border-radius:3px;background:var(--paper);margin-bottom:14px;overflow:hidden;">
+    <div onClick="{{ toggleSpec }}" style="display:flex;align-items:center;gap:8px;padding:7px 12px;background:var(--paper2);cursor:pointer;user-select:none;">
+      <span style="font:700 11px 'Syne',sans-serif;color:var(--ink);">📐 視覺規範總則 + 圖表 JSON 參數契約</span>
+      <span style="font:500 8px 'DM Mono',monospace;color:var(--mut2);">選項化 · 文字化 · 原始碼化</span>
+      <span style="margin-left:auto;font:600 10px 'DM Mono',monospace;color:var(--mut);">{{ specCaret }}</span>
+    </div>
+    <sc-if value="{{ specOpen }}">
+    <div style="padding:11px 14px;display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+      <div>
+        <div style="font:700 10px 'Syne',sans-serif;color:var(--ink);margin-bottom:6px;">規範總則（文字化）</div>
+        <table style="width:100%;border-collapse:separate;border-spacing:0;">
+          <sc-for list="{{ specRows }}" as="s" hint-placeholder-count="8">
+            <tr style="background:{{ s.bg }};">
+              <td style="padding:3px 9px;border-top:1px solid var(--soft);font:600 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);white-space:nowrap;vertical-align:top;">{{ s.k }}</td>
+              <td style="padding:3px 9px;border-top:1px solid var(--soft);font:400 9px 'DM Mono',monospace;color:var(--mut);">{{ s.v }}</td>
+            </tr>
+          </sc-for>
+        </table>
+      </div>
+      <div>
+        <div style="font:700 10px 'Syne',sans-serif;color:var(--ink);margin-bottom:6px;">圖表參數 JSON 契約（單一可增減）</div>
+        <pre style="margin:0;padding:10px 12px;font:500 9px/1.5 'DM Mono',monospace;color:var(--ink2);background:var(--paper2);border:1px solid var(--line);border-radius:5px;max-height:300px;overflow:auto;white-space:pre;">{{ schemaJson }}</pre>
+      </div>
+    </div>
+    <div style="padding:0 14px 11px;font:400 9px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);"><b style="color:var(--ink);">矩陣化對接：</b>每張圖以 <span style="font-family:'DM Mono',monospace;">CL-NN</span> 編號註冊 → UI 確立後以「圖編號 × 參數 JSON × 資料來源」三欄矩陣化，指令層只需引用編號 + 覆寫差異參數即可生成。<b style="color:var(--ink);">欄寬：</b>同 header 的堆疊表自動對齊最寬欄、單一資料源 JSON 自動整合。</div>
+    </sc-if>
+  </div>
+
+  <!-- chart grid -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:12px;">
+    <sc-for list="{{ charts }}" as="ch" hint-placeholder-count="12">
+      <div style="border:1px solid var(--line);border-left:3px solid {{ ch.color }};border-radius:3px;overflow:hidden;background:var(--paper);box-shadow:0 1px 2px rgba(31,42,42,.04);">
+        <div style="display:flex;align-items:center;gap:7px;padding:6px 11px;border-bottom:1px solid var(--line);background:var(--paper2);">
+          <span style="font:700 8px 'DM Mono',monospace;color:#fff;background:var(--ink);border-radius:2px;padding:1px 6px;">{{ ch.num }}</span>
+          <span style="font:700 11px 'Syne',sans-serif;color:var(--ink);">{{ ch.title }}</span>
+          <span style="font:500 8px 'DM Mono',monospace;color:var(--mut2);">{{ ch.kind }}</span>
+          <span style="margin-left:auto;font:600 8px 'DM Mono',monospace;color:#fff;background:{{ ch.color }};border-radius:2px;padding:1px 7px;">{{ ch.cat }}</span>
+        </div>
+        <div ref="{{ ch.ref }}" style="width:100%;height:200px;"></div>
+        <div style="padding:6px 11px;border-top:1px solid var(--soft);font:400 8.5px/1.5 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">{{ ch.note }}<br><span style="font:500 8px 'DM Mono',monospace;color:var(--mut2);">來源：{{ ch.src }}</span></div>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- coverage matrix: file × chart-type -->
+  <h2 style="font:800 14px 'Syne',sans-serif;color:var(--ink);margin:26px 0 10px;padding-bottom:8px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px;">📋 頁面圖表覆蓋矩陣<span style="font:600 8px 'DM Mono',monospace;color:var(--mut2);margin-left:auto;">各檔 × 圖型 · ✓已用 ·空=未用</span></h2>
+  <div style="border:1px solid var(--line);border-radius:3px;overflow:hidden;background:var(--paper);overflow-x:auto;">
+    <table style="width:100%;border-collapse:separate;border-spacing:0;min-width:760px;">
+      <thead><tr>
+        <th style="text-align:left;padding:6px 10px;font:700 8px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);position:sticky;left:0;">檔案 / 圖型</th>
+        <sc-for list="{{ covCols }}" as="c" hint-placeholder-count="9">
+          <th style="text-align:center;padding:6px 5px;font:700 7.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);white-space:nowrap;">{{ c }}</th>
+        </sc-for>
+      </tr></thead>
+      <tbody>
+        <sc-for list="{{ covRows }}" as="r" hint-placeholder-count="10">
+          <tr style="background:{{ r.bg }};">
+            <td style="padding:5px 10px;border-top:1px solid var(--soft);font:600 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);white-space:nowrap;">{{ r.file }}</td>
+            <sc-for list="{{ r.cells }}" as="x" hint-placeholder-count="9">
+              <td style="border-top:1px solid var(--soft);text-align:center;font:700 10px 'DM Mono',monospace;color:{{ x.c }};">{{ x.t }}</td>
+            </sc-for>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+  </div>
+  <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:3px;padding:9px 13px;margin-top:10px;font:400 9.5px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">{{ covNote }}</div>
+
+  <footer style="margin-top:22px;border-top:1px solid var(--line);padding-top:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font:500 10px 'DM Mono',monospace;color:var(--mut);">
+    <span style="font-weight:700;letter-spacing:1.3px;color:var(--ink);">VERITAS INTELLIGENCE ANALYTICS</span>
+    <span>Chart Library · {{ count }} 圖型 · Visual Lock</span>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{ &quot;$preview&quot;: { &quot;width&quot;: 1340, &quot;height&quot;: 880 } }">
+class Component extends DCLogic {
+  state = { cat: 'all', palette: 'visualLock', specOpen: false };
+
+  _palettes() {
+    return {
+      visualLock: { label: 'Visual Lock', kind: 'qual', cols: ['#4c78a8', '#c96b5a', '#7a6daa', '#c4943a', '#439a9a', '#5a9e6f'] },
+      deep: { label: 'deep', kind: 'qual', cols: ['#4c78a8', '#e45756', '#f58518', '#72b7b2', '#54a24b', '#b279a2'] },
+      set2: { label: 'Set2', kind: 'qual', cols: ['#66c2a5', '#fc8d62', '#8da0cb', '#e78ac3', '#a6d854', '#ffd92f'] },
+      tab10: { label: 'tab10', kind: 'qual', cols: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'] },
+      paired: { label: 'Paired', kind: 'qual', cols: ['#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#e31a1c', '#fdbf6f', '#ff7f00'] },
+      muted: { label: 'muted', kind: 'qual', cols: ['#4878cf', '#ee854a', '#6acc64', '#d65f5f', '#956cb4', '#8c613c'] },
+      colorblind: { label: 'colorblind', kind: 'qual', cols: ['#0173b2', '#de8f05', '#029e73', '#d55e00', '#cc78bc', '#ca9161'] },
+      pastel: { label: 'pastel', kind: 'qual', cols: ['#a1c9f4', '#ffb482', '#8de5a1', '#ff9f9b', '#d0bbff', '#debb9b'] },
+      bright: { label: 'bright', kind: 'qual', cols: ['#023eff', '#ff7c00', '#1ac938', '#e8000b', '#8b2be2', '#9f4800'] },
+      husl: { label: 'husl', kind: 'qual', cols: ['#f67088', '#ce8f31', '#96a331', '#32b166', '#38a8c5', '#a48cf4'] },
+      rocket: { label: 'rocket', kind: 'seq', cols: ['#03051a', '#340f3c', '#6b1f6a', '#a33262', '#d2544b', '#f48c3c', '#fdc96b', '#fef0b6'] },
+      mako: { label: 'mako', kind: 'seq', cols: ['#0b0405', '#1e2a4a', '#245f6e', '#2c9178', '#4cbf8e', '#9adab9', '#d5ede7', '#f3faf8'] },
+      blues: { label: 'Blues', kind: 'seq', cols: ['#f7fbff', '#c6dbef', '#9ecae1', '#6baed6', '#3182bd', '#08519c'] },
+      rdbu: { label: 'RdBu 雙向', kind: 'div', cols: ['#b2182b', '#ef8a62', '#fddbc7', '#d1e5f0', '#67a9cf', '#2166ac'] },
+    };
+  }
+  _seq() { return { co: '#c96b5a', up: '#c96b5a', down: '#5a9e6f' }; }
+
+  _rng(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+  _days(n) { const o = []; const d = new Date(2025, 0, 2); let c = 0; while (o.length < n) { d.setDate(d.getDate() + 1); const w = d.getDay(); if (w !== 0 && w !== 6) { o.push(d.toISOString().slice(5, 10)); c++; } } return o; }
+
+  _catalog() {
+    return [
+      { id: 'candle', title: '日K + BB + SMA 5/10/20/60/120/240 + 量', kind: 'candlestick', cat: '技術', color: 'var(--co)', src: 'Dashboard Standard §6', note: 'ADJ OHLC · BB(20,2) · SMA 5/10/20/60/120/240 · 量價同框(量透明0.75)。' },
+      { id: 'area', title: '指數走勢面積線', kind: 'area-line', cat: '技術', color: 'var(--co)', src: 'Dashboard 地圖走勢 / 週報', note: '折線與面積同色系(漲紅跌綠) · 面積透明度0.6 · 期初虛線基準 · 末點標記。' },
+      { id: 'stack', title: '同色系堆疊面積', kind: 'stacked-area', cat: '技術', color: 'var(--co)', src: 'Resonance Stack / 地圖堆疊', note: '大型/中型/小型同色系堆疊 · alpha 0.6/0.42/0.26 由深到淺 · 可切換折線/堆疊。' },
+      { id: 'multiline', title: '多指數歸一化折線', kind: 'multi-line', cat: '技術', color: 'var(--blue)', src: 'Grouping 族群輪動', note: 'Base 100 歸一 · 端點標籤 · 點圖例開關 · 軸自動重縮放。' },
+      { id: 'instbar', title: '三大法人買賣超堆疊', kind: 'stacked-bar', cat: '籌碼', color: 'var(--vi)', src: 'Chip Analysis / Resonance', note: '外資(深藍)/投信(珊瑚紅)/自營(紫) 三色高對比 · 買超實色/賣超0.45 · 投信中的主動式ETF以紅色細框透明底框出(同色堆疊不另闢圖)。' },
+      { id: 'dual', title: '維持率/券資比雙軸', kind: 'dual-axis', cat: '籌碼', color: 'var(--teal)', src: 'Chip Analysis 資券', note: '左軸維持率 · 右軸券資比 · 130% 追繳警戒虛線。' },
+      { id: 'heat', title: '相關係數熱力圖', kind: 'heatmap', cat: '統計', color: 'var(--am)', src: 'Grouping 相關 / Chip 熱力', note: '對角=群內凝聚 · RYG 漸層 · 偵測低相關 Laggard · cophenetic 一致。' },
+      { id: 'bar2', title: '財政收支分類別堆疊條', kind: 'stacked-bar', cat: '總經', color: 'var(--ro)', src: 'Market Risk 財政', note: '收入正向上/支出按類別負向下 · 無框堆疊 · 右軸餘額折線與軸交疊透明0.7。' },
+      { id: 'geo', title: '世界指數地圖', kind: 'scattergeo', cat: '地圖', color: 'var(--blue)', src: 'Dashboard §10 地圖', note: '標記色=漲紅跌綠 · 大小=|漲跌| · 區域縮放 · 點選載入走勢。' },
+      { id: 'waterfall', title: 'DXY 瀑布分解', kind: 'waterfall', cat: '總經', color: 'var(--am)', src: 'USD FX 模型', note: '基準→因子貢獻(β×z)→模型→實際 · 紅升綠貶。' },
+      { id: 'gauge', title: '風險量表 / 狀態燈', kind: 'gauge', cat: '風險', color: 'var(--co)', src: 'Risk Engine / 狀態盤', note: '三色燈(綠安全/黃留意/紅警戒) · 觸發×脆弱。' },
+      { id: 'ridgeline', title: '多序列脊線堆疊', kind: 'ridgeline', cat: '技術', color: 'var(--vi)', src: 'Resonance 向下堆疊', note: '單邊不重疊向下堆疊 · 共用標尺 · 各序列獨立基線。' },
+    ];
+  }
+
+  componentDidMount() { this._drawAll(); }
+  componentDidUpdate() { this._drawAll(); }
+  _drawAll() {
+    if (!window.Plotly) return;
+    const FONT = { family: 'DM Mono, monospace', size: 9, color: '#33403f' };
+    const base = { autosize: true, margin: { l: 34, r: 10, t: 6, b: 22 }, paper_bgcolor: '#fff', plot_bgcolor: '#fff', font: FONT, showlegend: false };
+    const cfg = { displayModeBar: false, responsive: true };
+    const cat = this.state.cat;
+    const pal = this._palettes()[this.state.palette] || this._palettes().visualLock;
+    const list = this._catalog().filter(c => cat === 'all' || c.cat === cat);
+    list.forEach((c, ci) => {
+      const el = this['_el_' + c.id]; if (!el) return;
+      const r = this._rng(c.id.length * 17 + 3);
+      const N = 60, x = this._days(N);
+      const walk = (b, v) => { const a = [b]; let p = b; for (let i = 1; i < N; i++) { p = p * (1 + (r() - 0.5) * v); a.push(+p.toFixed(2)); } return a; };
+      const xc = { type: 'category', tickmode: 'array', tickvals: x.filter((_, i) => i % 20 === 0), showgrid: false, linecolor: '#dbd9d3', tickfont: { size: 8 } };
+      const yc = { gridcolor: '#ecebe6', tickfont: { size: 8 }, zeroline: false };
+      let data, layout = { ...base, xaxis: xc, yaxis: yc };
+      if (c.id === 'candle') {
+        const close = walk(100, 0.03); const open = close.map((v, i) => i ? close[i - 1] : v * 0.99);
+        const high = close.map((v, i) => Math.max(v, open[i]) * (1 + r() * 0.012)); const low = close.map((v, i) => Math.min(v, open[i]) * (1 - r() * 0.012));
+        const smaC = { 5: '#c4943a', 10: '#dd8452', 20: '#5a9e6f', 60: '#439a9a', 120: '#4c78a8', 240: '#7a6daa' };
+        // BB(20,2)
+        const mid = this._sma(close, 20);
+        const std20 = close.map((_, i) => { if (i < 19) return null; let s = 0, m = mid[i]; for (let k = i - 19; k <= i; k++) s += (close[k] - m) * (close[k] - m); return Math.sqrt(s / 20); });
+        const bbU = mid.map((m, i) => m == null ? null : +(m + 2 * std20[i]).toFixed(2));
+        const bbL = mid.map((m, i) => m == null ? null : +(m - 2 * std20[i]).toFixed(2));
+        data = [
+          { x, y: bbL, type: 'scatter', mode: 'lines', line: { width: 0, color: 'rgba(76,120,168,0)' }, hoverinfo: 'skip' },
+          { x, y: bbU, name: 'BB(20,2)', type: 'scatter', mode: 'lines', line: { width: 0.8, color: 'rgba(76,120,168,0.32)' }, fill: 'tonexty', fillcolor: 'rgba(76,120,168,0.07)', hoverinfo: 'skip' },
+          { x, open, high, low, close, type: 'candlestick', whiskerwidth: 0.4, increasing: { line: { color: '#c96b5a', width: 1 }, fillcolor: 'rgba(201,107,90,0.65)' }, decreasing: { line: { color: '#5a9e6f', width: 1 }, fillcolor: 'rgba(90,158,111,0.65)' } },
+          ...[5, 10, 20, 60, 120, 240].map(w => ({ x, y: this._sma(close, w), type: 'scatter', mode: 'lines', line: { color: smaC[w], width: w >= 60 ? 1.2 : 0.8 } }))];
+        layout.xaxis.rangeslider = { visible: false };
+      } else if (c.id === 'area') {
+        const p = walk(100, 0.022); const up = p[N - 1] >= p[0]; const rgb = up ? '201,107,90' : '90,158,111';
+        data = [{ x, y: p, type: 'scatter', mode: 'lines', line: { color: 'rgb(' + rgb + ')', width: 1.7, shape: 'spline' }, fill: 'tozeroy', fillcolor: 'rgba(' + rgb + ',0.6)' }];
+        layout.yaxis.range = [Math.min(...p) * 0.97, Math.max(...p) * 1.02];
+      } else if (c.id === 'stack' || c.id === 'ridgeline') {
+        const rgb = '201,107,90'; const al = [0.6, 0.42, 0.26];
+        data = ['大型', '中型', '小型'].map((lb, k) => ({ x, y: walk(40 - k * 8, 0.03), type: 'scatter', mode: 'lines', stackgroup: c.id === 'stack' ? 'a' : undefined, line: { color: 'rgba(' + rgb + ',' + (al[k] + 0.25) + ')', width: 1 }, fill: c.id === 'stack' ? undefined : 'tozeroy', fillcolor: 'rgba(' + rgb + ',' + al[k] + ')' }));
+      } else if (c.id === 'multiline') {
+        const cols = pal.cols;
+        data = cols.slice(0, 5).map((co, k) => { const w = walk(100, 0.02 + k * 0.004); return { x, y: w, type: 'scatter', mode: 'lines', line: { color: co, width: 1.4 } }; });
+      } else if (c.id === 'instbar') {
+        // 三色取自選定 seaborn 色盤前三色,高對比;買超實色,賣超同色@0.5
+        const hex2rgb = h => { const n = parseInt(h.slice(1), 16); return (n >> 16) + ',' + ((n >> 8) & 255) + ',' + (n & 255); };
+        const co = pal.cols.slice(0, 3);
+        const ys = ['外資', '投信', '自營'].map(() => x.map(() => +((r() - 0.5) * 200).toFixed(0)));
+        data = ['外資', '投信', '自營'].map((lb, k) => ({ x, y: ys[k], name: lb, type: 'bar', marker: { color: ys[k].map(v => v >= 0 ? co[k] : 'rgba(' + hex2rgb(co[k]) + ',0.5)') } }));
+        // 投信中的主動式ETF：紅色細框透明底,框出投信買超的一部分(不另闢圖)
+        const etf = ys[1].map(v => v > 0 ? +(v * (0.35 + r() * 0.3)).toFixed(0) : 0);
+        data.push({ x, y: etf, name: '其中主動式ETF', type: 'bar', marker: { color: 'rgba(0,0,0,0)', line: { color: '#9F1D1D', width: 1.3 } }, offsetgroup: '投信', base: 0 });
+        layout.barmode = 'relative';
+      } else if (c.id === 'dual') {
+        data = [{ x, y: walk(165, 0.01), type: 'scatter', mode: 'lines', line: { color: '#439a9a', width: 1.4 } },
+          { x, y: walk(35, 0.02), type: 'scatter', mode: 'lines', yaxis: 'y2', line: { color: '#c4943a', width: 1.4 } }];
+        layout.yaxis2 = { overlaying: 'y', side: 'right', gridcolor: 'rgba(0,0,0,0)', tickfont: { size: 8 } };
+        layout.shapes = [{ type: 'line', xref: 'paper', x0: 0, x1: 1, y0: 130, y1: 130, line: { color: '#c96b5a', width: 1, dash: 'dash' } }];
+      } else if (c.id === 'heat') {
+        const L = ['半導', 'AI', '航運', '金融', '鋼鐵']; const z = L.map((_, i) => L.map((__, j) => i === j ? 1 : +(0.15 + r() * 0.7).toFixed(2)));
+        data = [{ z, x: L, y: L, type: 'heatmap', colorscale: [[0, '#5a9e6f'], [0.5, '#e9e5dc'], [1, '#c96b5a']], showscale: false }];
+        layout.margin = { l: 40, r: 10, t: 6, b: 28 };
+      } else if (c.id === 'bar2') {
+        // 收入與支出皆「分類別堆疊」:收入類別正向上、支出類別負向下;零軸居中;右軸餘額折線(交疊透明0.7)
+        const Nq = 10, qx = []; for (let i = 0; i < Nq; i++) qx.push('Q' + (i + 1));
+        const revCats = [['稅收', '#2d8659'], ['關稅', '#5fb98a'], ['其他收入', '#a5d6b8']];
+        const expCats = [['社安', '#4c78a8'], ['國防', '#7a6daa'], ['淨利息', '#c96b5a'], ['其他支出', '#c4943a']];
+        const rv = revCats.map(() => qx.map(() => +(r() * 22 + 12).toFixed(1)));
+        const ev = expCats.map(() => qx.map(() => -(r() * 18 + 8).toFixed(1)));
+        data = [];
+        revCats.forEach((ct, k) => data.push({ x: qx, y: rv[k], name: ct[0], type: 'bar', marker: { color: ct[1], line: { width: 0 } }, legendgroup: 'rev' }));
+        expCats.forEach((ct, k) => data.push({ x: qx, y: ev[k].map(Number), name: ct[0], type: 'bar', marker: { color: ct[1], line: { width: 0 } }, legendgroup: 'exp' }));
+        const bal = qx.map((_, i) => rv.reduce((s, _c, k) => s + rv[k][i], 0) + ev.reduce((s, _c, k) => s + Number(ev[k][i]), 0));
+        data.push({ x: qx, y: bal, name: '餘額', type: 'scatter', mode: 'lines+markers', yaxis: 'y2', line: { color: 'rgba(124,58,237,0.7)', width: 2 }, marker: { size: 4, color: 'rgba(124,58,237,0.7)' } });
+        layout.barmode = 'relative';
+        layout.xaxis = { type: 'category', showgrid: false, linecolor: '#dbd9d3', tickfont: { size: 8 } };
+        layout.yaxis = { gridcolor: '#ecebe6', zeroline: true, zerolinecolor: '#9c9890', zerolinewidth: 1.2, tickfont: { size: 8 } };
+        layout.yaxis2 = { overlaying: 'y', side: 'right', gridcolor: 'rgba(0,0,0,0)', tickfont: { size: 8 } };
+        layout.margin = { l: 34, r: 30, t: 6, b: 22 };
+      } else if (c.id === 'geo') {
+        data = [{ type: 'scattergeo', lon: [121.5, 139.7, -74, 0, 116], lat: [25, 35.7, 40.7, 51.5, 39.9], mode: 'markers', marker: { size: [12, 10, 14, 9, 11], color: [1.2, -0.6, 0.8, -0.3, 1.5], colorscale: [[0, '#5a9e6f'], [0.5, '#e9e5dc'], [1, '#c96b5a']], cmin: -2, cmax: 2 } }];
+        layout = { ...base, geo: { projection: { type: 'natural earth' }, showland: true, landcolor: '#eceae3', showocean: true, oceancolor: '#eef3f4', bgcolor: '#fff', showframe: false, coastlinecolor: '#cfc9ba' }, margin: { l: 0, r: 0, t: 0, b: 0 } };
+      } else if (c.id === 'waterfall') {
+        data = [{ type: 'waterfall', x: ['基準', '利差', '成長', '通膨', '赤字', '模型'], y: [100, 3.1, 1.5, 0.4, -2.1, 0], measure: ['absolute', 'relative', 'relative', 'relative', 'relative', 'total'], increasing: { marker: { color: '#c96b5a' } }, decreasing: { marker: { color: '#5a9e6f' } }, totals: { marker: { color: '#4c78a8' } }, connector: { line: { color: '#cfc9ba' } } }];
+        layout.xaxis = { tickfont: { size: 7.5 } };
+      } else if (c.id === 'gauge') {
+        data = [{ type: 'indicator', mode: 'gauge+number', value: 0.33, number: { font: { size: 20 } }, gauge: { axis: { range: [0, 1], tickfont: { size: 7 } }, bar: { color: '#c4943a' }, steps: [{ range: [0, 0.33], color: 'rgba(90,158,111,0.4)' }, { range: [0.33, 0.66], color: 'rgba(196,148,58,0.4)' }, { range: [0.66, 1], color: 'rgba(201,107,90,0.4)' }] } }];
+        layout = { ...base, margin: { l: 20, r: 20, t: 10, b: 6 } };
+      }
+      window.Plotly.react(el, data, layout, cfg);
+    });
+  }
+  _sma(a, w) { return a.map((_, i) => { if (i < w - 1) return null; let s = 0; for (let k = i - w + 1; k <= i; k++) s += a[k]; return +(s / w).toFixed(2); }); }
+
+  renderVals() {
+    const cat = this.state.cat;
+    const catDefs = [['all', '全部'], ['技術', '📈 技術'], ['籌碼', '💰 籌碼'], ['統計', '🔗 統計'], ['總經', '🌐 總經'], ['地圖', '🗺️ 地圖'], ['風險', '⚠️ 風險']];
+    const cats = catDefs.map(c => ({ label: c[1], go: () => this.setState({ cat: c[0] }), css: cat === c[0] ? 'background:var(--ink);color:#fff;' : 'background:var(--soft);color:var(--mut);' }));
+    const all = this._catalog();
+    const numOf = {}; all.forEach((c, i) => { numOf[c.id] = 'CL-' + String(i + 1).padStart(2, '0'); });
+    const charts = all.filter(c => cat === 'all' || c.cat === cat).map(c => ({
+      title: c.title, kind: c.kind, cat: c.cat, color: c.color, note: c.note, src: c.src, num: numOf[c.id],
+      ref: el => { this['_el_' + c.id] = el; if (el && window.Plotly) requestAnimationFrame(() => this._drawAll()); },
+    }));
+    const pals = this._palettes();
+    const kindC = { qual: 'var(--blue)', seq: 'var(--teal)', div: 'var(--co)' };
+    const palOpts = Object.keys(pals).map(k => ({ label: pals[k].label, cols: pals[k].cols, kind: pals[k].kind, kindCss: kindC[pals[k].kind] || 'var(--mut2)', go: () => this.setState({ palette: k }),
+      css: this.state.palette === k ? 'border:2px solid var(--ink);' : 'border:1px solid var(--line);' }));
+    const specRows = [
+      ['品牌三色', '#4c78a8 藍 · #9c9890 灰 · #439a9a 青'],
+      ['台股漲跌', 'UP #c96b5a 紅漲 · DOWN #5a9e6f 綠跌'],
+      ['面積透明度', '折線下同色系 fill 0.6 · 量 0.75 · 雙軸交疊 0.7'],
+      ['標準尺寸', '1000×560 預設 · preserve aspect'],
+      ['數字格式', '千分位 · 報酬%一位 · 一般兩位 · 置中'],
+      ['字級', 'annot 6.5 · 刻度 8 · 標題 11 · 說明 9'],
+      ['字體', 'DM Mono(數) · DM Sans/Syne · Noto Serif TC'],
+      ['K線', 'ADJ OHLC · BB(20,2) · SMA 5/10/20/60/120/240'],
+      ['法人', '三色高對比 · 買超實色 · 賣超0.5 · ETF紅框'],
+      ['時間軸', '自動偵測 date · 交易日刻度'],
+    ].map((r, i) => ({ k: r[0], v: r[1], bg: i % 2 ? '#f6f4ef' : 'var(--paper)' }));
+    const schema = {
+      id: 'CL-NN', kind: 'candlestick|area|stacked|multi_line|heatmap|geo|waterfall|gauge',
+      size: { width: 1000, height: 560, preserveAspect: true },
+      palette: this.state.palette,
+      colors: { up: '#c96b5a', down: '#5a9e6f', fillAlpha: 0.6, volAlpha: 0.75, dualAlpha: 0.7 },
+      axes: { x: { type: 'date|category', tickfont: 8 }, yLeft: {}, yRight: { overlaying: 'y' } },
+      series: [{ field: 'close', type: 'line|bar|candlestick', color: 'auto', stackgroup: null }],
+      overlays: { bb: [20, 2], sma: [5, 10, 20, 60, 120, 240] },
+      source: 'yfinance|VDF|TWSE/TPEX|MOPS',
+    };
+    // 頁面圖表覆蓋矩陣
+    const covCols = ['日K', '面積線', '堆疊', '多線', '法人', '雙軸', '熱力', '雙向條', '地圖', '瀑布', '量表'];
+    const covData = [
+      ['Dashboard Standard', [1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 0]],
+      ['Chip Analysis', [0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0]],
+      ['Stock Grouping', [0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0]],
+      ['Commodities', [0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0]],
+      ['USD FX & Rates', [0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 0]],
+      ['Global Macro', [0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0]],
+      ['US Macro Pulse', [0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0]],
+      ['Taiwan Active ETF', [0, 1, 0, 1, 1, 0, 1, 0, 0, 0, 0]],
+      ['Event Timeline', [0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0]],
+      ['Risk Engine v10', [0, 0, 0, 1, 0, 1, 1, 1, 0, 1, 1]],
+      ['Market Risk Frame', [0, 0, 1, 1, 0, 1, 0, 1, 0, 1, 0]],
+      ['Weekly Report', [0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0]],
+    ];
+    const covRows = covData.map((d, i) => ({ file: d[0], bg: i % 2 ? '#f6f4ef' : 'var(--paper)',
+      cells: d[1].map(v => ({ t: v ? '✓' : '·', c: v ? 'var(--down)' : 'var(--mut2)' })) }));
+    const covNote = '本圖庫(CL 編號)為全頁面圖型的單一視覺管理範本。✓=該檔已採用對應圖型且套用統一規範(漲跌色/透明度/雙軸/堆疊)。空白=該檔目前未用該圖型(非缺漏,屬內容差異)。新頁面新增圖型時,先在此圖庫註冊 CL 編號→再於頁面引用,確保一致。';
+    return { rootRef: el => { this.root = el; }, cats, charts, count: all.length, palOpts, covCols, covRows, covNote,
+      specOpen: this.state.specOpen, specCaret: this.state.specOpen ? '▾' : '▸',
+      toggleSpec: () => this.setState(s => ({ specOpen: !s.specOpen })),
+      specRows, schemaJson: JSON.stringify(schema, null, 2) };
+  }
+}
+</script>
+</body>
+</html>

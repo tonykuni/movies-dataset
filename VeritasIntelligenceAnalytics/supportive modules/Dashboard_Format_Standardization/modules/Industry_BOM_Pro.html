@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Veritas Intelligence Analytics · 行業 BOM 專業分析儀表板</title>
+  <style>
+    :root{
+      --bg:#F9F9F6;
+      --surface:#FFFFFF;
+      --surface2:#F3F6F4;
+      --ink:#1F2933;
+      --muted:#6B7C78;
+      --line:#DFECEA;
+      --celadon:#DFECEA;
+      --sky:#AFCFCC;
+      --seal:#9F1D1D;
+      --ok:#166534;
+      --warn:#B7791F;
+      --fail:#B91C1C;
+      --blue:#2563EB;
+      --teal:#0F766E;
+      --amber:#D97706;
+      --purple:#7C3AED;
+      --shadow:0 18px 45px rgba(31,41,51,.09);
+      --radius:22px;
+      --mono:"SFMono-Regular","Cascadia Mono","Consolas",monospace;
+      --sans:Inter,"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(175,207,204,.45), transparent 28%),
+        radial-gradient(circle at 88% 12%, rgba(223,236,234,.75), transparent 30%),
+        linear-gradient(120deg, rgba(255,255,255,.45), rgba(249,249,246,.96));
+      color:var(--ink);
+      font-family:var(--sans);
+      line-height:1.5;
+    }
+    .wrap{max-width:1480px;margin:0 auto;padding:28px 30px 56px}
+    .topbar{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:18px;
+      align-items:start;
+      margin-bottom:18px;
+    }
+    .brand{
+      background:rgba(255,255,255,.72);
+      border:1px solid var(--line);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      padding:26px 28px;
+      position:relative;
+      overflow:hidden;
+    }
+    .brand:before{
+      content:"";
+      position:absolute;
+      inset:-80px auto auto -90px;
+      width:260px;height:260px;
+      background:rgba(159,29,29,.08);
+      transform:rotate(-7deg);
+      border-radius:38px;
+    }
+    .seal{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:44px;height:44px;
+      border-radius:13px;
+      background:var(--seal);
+      color:#fff;
+      font-weight:800;
+      font-size:24px;
+      box-shadow:0 10px 24px rgba(159,29,29,.22);
+      margin-right:12px;
+      vertical-align:middle;
+    }
+    h1{font-size:32px;letter-spacing:.2px;margin:0 0 6px}
+    .subtitle{font-size:15px;color:var(--muted);margin:4px 0}
+    .quote{font-size:14px;color:var(--seal);letter-spacing:.6px;margin-top:10px}
+    .control{
+      min-width:360px;
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      padding:20px;
+    }
+    .control label{display:block;font-size:12px;color:var(--muted);margin:0 0 7px;font-weight:700}
+    .control select,.control input{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px 13px;
+      font-size:14px;
+      outline:none;
+      background:#fff;
+      color:var(--ink);
+      margin-bottom:12px;
+    }
+    .pillrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:5px}
+    .pill{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:var(--surface2);
+      color:var(--muted);
+      font-family:var(--mono);
+    }
+    .grid{display:grid;gap:18px}
+    .grid.kpi{grid-template-columns:repeat(6,1fr);margin:18px 0}
+    .card{
+      background:rgba(255,255,255,.84);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+      overflow:hidden;
+    }
+    .card h2,.card h3{
+      margin:0 0 12px;
+      font-size:18px;
+      display:flex;
+      align-items:center;
+      gap:9px;
+    }
+    .card h2:before,.card h3:before{
+      content:"def";
+      font-family:var(--mono);
+      color:var(--seal);
+      font-size:12px;
+      border:1px solid rgba(159,29,29,.22);
+      background:rgba(159,29,29,.05);
+      border-radius:9px;
+      padding:3px 6px;
+    }
+    .kpi .card{padding:16px}
+    .kpi-title{font-size:12px;color:var(--muted);font-weight:800;margin-bottom:8px}
+    .kpi-value{font-size:26px;font-weight:850;letter-spacing:-.5px}
+    .kpi-note{font-size:12px;color:var(--muted);margin-top:7px;min-height:34px}
+    .delta{font-family:var(--mono);font-size:12px;margin-top:5px}
+    .up{color:var(--seal)} .down{color:var(--ok)} .flat{color:var(--muted)}
+    .two{grid-template-columns:1.08fr .92fr}
+    .three{grid-template-columns:1fr 1fr 1fr}
+    .span2{grid-column:span 2}
+    .chartbox{height:330px;position:relative}
+    .chartbox.tall{height:430px}
+    svg{width:100%;height:100%}
+    table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;overflow:hidden}
+    th{
+      text-align:left;
+      color:var(--muted);
+      font-size:12px;
+      background:var(--surface2);
+      border-top:1px solid var(--line);
+      border-bottom:1px solid var(--line);
+      padding:10px 9px;
+      position:sticky;top:0;
+      z-index:2;
+    }
+    th:first-child{border-left:1px solid var(--line);border-radius:12px 0 0 12px}
+    th:last-child{border-right:1px solid var(--line);border-radius:0 12px 12px 0}
+    td{padding:10px 9px;border-bottom:1px solid rgba(223,236,234,.78);vertical-align:top}
+    tr:hover td{background:rgba(223,236,234,.25)}
+    .num{text-align:right;font-family:var(--mono);white-space:nowrap}
+    .tag{
+      display:inline-block;
+      border-radius:999px;
+      padding:4px 8px;
+      font-size:11px;
+      font-weight:800;
+      border:1px solid var(--line);
+      white-space:nowrap;
+    }
+    .tag.ok{color:var(--ok);background:rgba(22,101,52,.06);border-color:rgba(22,101,52,.18)}
+    .tag.warn{color:var(--warn);background:rgba(183,121,31,.07);border-color:rgba(183,121,31,.18)}
+    .tag.fail{color:var(--fail);background:rgba(185,28,28,.07);border-color:rgba(185,28,28,.18)}
+    .tag.info{color:var(--blue);background:rgba(37,99,235,.06);border-color:rgba(37,99,235,.18)}
+    .scroll{max-height:420px;overflow:auto;padding-right:4px}
+    .method{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr 1fr;
+      gap:12px;
+      margin-top:10px;
+    }
+    .step{
+      background:linear-gradient(180deg,#fff,rgba(223,236,234,.34));
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:13px;
+    }
+    .step b{display:block;margin-bottom:6px}
+    .step p{margin:0;color:var(--muted);font-size:12px}
+    .matrix{
+      display:grid;
+      grid-template-columns:140px repeat(5,1fr);
+      gap:6px;
+      font-size:12px;
+    }
+    .matrix div{
+      border:1px solid var(--line);
+      border-radius:10px;
+      padding:9px 8px;
+      min-height:42px;
+      background:#fff;
+    }
+    .matrix .head{font-weight:800;background:var(--surface2);color:var(--muted)}
+    .risk-low{background:rgba(22,101,52,.08)!important;color:var(--ok)}
+    .risk-mid{background:rgba(183,121,31,.10)!important;color:var(--warn)}
+    .risk-high{background:rgba(185,28,28,.10)!important;color:var(--fail)}
+    .foot{
+      margin-top:18px;
+      color:var(--muted);
+      font-size:12px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .legend{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+    .dot{width:10px;height:10px;border-radius:999px;display:inline-block;background:var(--muted);margin-right:4px}
+    .mono{font-family:var(--mono)}
+    .small{font-size:12px;color:var(--muted)}
+    .noteBox{
+      border-left:4px solid var(--seal);
+      background:rgba(159,29,29,.035);
+      padding:11px 13px;
+      border-radius:12px;
+      color:var(--muted);
+      font-size:13px;
+      margin-top:10px;
+    }
+    @media (max-width:1180px){
+      .grid.kpi{grid-template-columns:repeat(3,1fr)}
+      .two,.three{grid-template-columns:1fr}
+      .span2{grid-column:auto}
+      .topbar{grid-template-columns:1fr}
+      .control{min-width:0}
+      .method{grid-template-columns:1fr 1fr}
+    }
+    @media (max-width:760px){
+      .wrap{padding:18px 14px 36px}
+      .grid.kpi{grid-template-columns:1fr 1fr}
+      h1{font-size:24px}
+      .method{grid-template-columns:1fr}
+      .matrix{grid-template-columns:1fr}
+      .matrix .head{display:none}
+    }
+    @media print{
+      body{background:#fff}
+      .control{display:none}
+      .card,.brand{box-shadow:none;break-inside:avoid}
+      .wrap{max-width:none}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <section class="topbar">
+      <div class="brand">
+        <h1><span class="seal">理</span>Veritas Intelligence Analytics · 行業 BOM 專業分析</h1>
+        <div class="subtitle">Industry BOM · Cost Structure · Supply Chain Risk · Margin Pool · Scenario Sensitivity</div>
+        <div class="subtitle">Macro · Industry · Equity · AI Research Intelligence Platform</div>
+        <div class="quote">判天地之美，析萬物之理｜從原料、零組件、模組、系統到終端需求，建立可追蹤、可驗證、可回測的產業 SSOT。</div>
+      </div>
+
+      <aside class="control">
+        <label>def 00 產業樣板</label>
+        <select id="industrySelect"></select>
+        <label>def 01 情境假設：成本通膨 / 需求強弱</label>
+        <input id="scenarioSlider" type="range" min="-20" max="20" value="0" />
+        <div class="pillrow">
+          <span class="pill" id="scenarioText">Base 0%</span>
+          <span class="pill">No CDN</span>
+          <span class="pill">SVG Native</span>
+          <span class="pill">JSON SSOT</span>
+        </div>
+      </aside>
+    </section>
+
+    <section class="grid kpi" id="kpiGrid"></section>
+
+    <section class="grid two">
+      <article class="card">
+        <h2>01 BOM 成本結構與 Tier 分層</h2>
+        <div class="scroll">
+          <table id="bomTable"></table>
+        </div>
+        <div class="noteBox">
+          def Read：BOM 不是只看成本占比，專業分析要同時看「價值占比、供應商集中度、替代難度、交期、報價權、良率風險、法規/地緣風險」。
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>02 成本占比 Donut</h2>
+        <div class="chartbox" id="donutChart"></div>
+        <div class="legend" id="donutLegend"></div>
+      </article>
+    </section>
+
+    <section class="grid two" style="margin-top:18px">
+      <article class="card">
+        <h2>03 價值鏈毛利池 / 議價權</h2>
+        <div class="chartbox tall" id="marginChart"></div>
+      </article>
+
+      <article class="card">
+        <h2>04 供應鏈風險熱區</h2>
+        <div class="matrix" id="riskMatrix"></div>
+      </article>
+    </section>
+
+    <section class="grid three" style="margin-top:18px">
+      <article class="card">
+        <h3>05 Waterfall：成本變動到毛利率</h3>
+        <div class="chartbox" id="waterfallChart"></div>
+      </article>
+
+      <article class="card">
+        <h3>06 供應商集中度 Top 10</h3>
+        <div class="scroll">
+          <table id="supplierTable"></table>
+        </div>
+      </article>
+
+      <article class="card">
+        <h3>07 敏感度雷達</h3>
+        <div class="chartbox" id="radarChart"></div>
+      </article>
+    </section>
+
+    <section class="grid two" style="margin-top:18px">
+      <article class="card">
+        <h2>08 分析方法論：從 Raw BOM 到 投資結論</h2>
+        <div class="method">
+          <div class="step"><b>def A · 拆 BOM</b><p>建立 L0/L1/L2/L3 層級，定義材料、零件、模組、系統、終端產品與替代料。</p></div>
+          <div class="step"><b>def B · 對成本</b><p>把單價、用量、良率、匯率、折舊、運費、關稅轉成同一成本基準。</p></div>
+          <div class="step"><b>def C · 看供需</b><p>追蹤產能、稼動率、交期、庫存週轉、客戶拉貨、供應商集中度。</p></div>
+          <div class="step"><b>def D · 連財務</b><p>轉成 ASP、COGS、毛利率、營業槓桿、EPS、Forward PER/PBR 情境。</p></div>
+          <div class="step"><b>def E · 驗證</b><p>用財報、法說、拆解報告、海關、通路報價、招標與新聞交叉驗證。</p></div>
+          <div class="step"><b>def F · 找 Alpha</b><p>尋找市場尚未定價的成本下降、缺料漲價、替代品滲透與毛利率拐點。</p></div>
+          <div class="step"><b>def G · 反論證</b><p>建立需求反轉、價格戰、技術替代、客戶砍單、法規限制與地緣風險。</p></div>
+          <div class="step"><b>def H · 回測</b><p>把 BOM 因子轉成訊號，回測報酬、波動、最大回撤、勝率與因子衰退。</p></div>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>09 研究結論模板</h2>
+        <div class="scroll">
+          <table id="conclusionTable"></table>
+        </div>
+      </article>
+    </section>
+
+    <section class="card" style="margin-top:18px">
+      <h2>10 專業版欄位字典 / SSOT Schema</h2>
+      <div class="scroll">
+        <table id="schemaTable"></table>
+      </div>
+    </section>
+
+    <div class="foot">
+      <div>def Generated：<span id="generatedAt"></span> · 本檔為單檔 HTML，可直接改上方 JSON 資料。</div>
+      <div class="mono">VIA_BOM_HTML_PRO_v1.0 · no external dependency · print-ready</div>
+    </div>
+  </div>
+
+<script>
+/* 
+def PARAMETERS_TOP
+def 修改重點 1：在 DATASETS 新增產業，或替換 components / suppliers / marginPool / riskRows。
+def 修改重點 2：component 欄位 costPct、criticality、substituteDifficulty、leadTimeWeeks 會同步驅動 KPI、表格與圖。
+def 修改重點 3：scenarioSlider 會模擬成本通膨或成本下降對毛利率與風險的影響。
+*/
+
+const COLORS = {
+  seal:"#9F1D1D", ok:"#166534", warn:"#B7791F", fail:"#B91C1C",
+  blue:"#2563EB", teal:"#0F766E", amber:"#D97706", purple:"#7C3AED",
+  sky:"#AFCFCC", celadon:"#DFECEA", ink:"#1F2933", muted:"#6B7C78"
+};
+
+const DATASETS = {
+  "AI 伺服器 / GPU Server": {
+    currency:"USD",
+    revenueBase: 100,
+    baseGm: 18.5,
+    components:[
+      {tier:"L1", module:"Accelerator Board", item:"GPU / AI Accelerator", costPct:38, valuePct:45, suppliers:"NVIDIA / AMD / ASIC", region:"US/TW/KR", criticality:98, substituteDifficulty:96, leadTimeWeeks:32, trend:"up", note:"最高報價權，決定整機 ASP 與供給瓶頸"},
+      {tier:"L1", module:"Memory", item:"HBM / DDR5", costPct:18, valuePct:21, suppliers:"SK hynix / Samsung / Micron", region:"KR/US/JP", criticality:92, substituteDifficulty:88, leadTimeWeeks:28, trend:"up", note:"HBM 供給與良率決定 AI server 放量速度"},
+      {tier:"L1", module:"Board", item:"PCB / HDI / ABF", costPct:9, valuePct:8, suppliers:"Unimicron / Nan Ya / Ibiden", region:"TW/JP/CN", criticality:84, substituteDifficulty:76, leadTimeWeeks:18, trend:"up", note:"高速材料與良率是關鍵"},
+      {tier:"L1", module:"Thermal", item:"Liquid Cooling / Cold Plate", costPct:8, valuePct:9, suppliers:"Auras / AVC / Delta", region:"TW/CN", criticality:82, substituteDifficulty:70, leadTimeWeeks:14, trend:"up", note:"功耗上升使水冷滲透率提升"},
+      {tier:"L1", module:"Power", item:"PSU / Power Shelf / VRM", costPct:7, valuePct:7, suppliers:"Delta / Lite-On / Chicony", region:"TW/CN", criticality:78, substituteDifficulty:68, leadTimeWeeks:12, trend:"flat", note:"電源效率與可靠度影響總持有成本"},
+      {tier:"L1", module:"Networking", item:"NIC / Switch / Retimer", costPct:6, valuePct:8, suppliers:"Broadcom / Marvell / NVIDIA", region:"US/TW", criticality:86, substituteDifficulty:82, leadTimeWeeks:20, trend:"up", note:"Cluster scale-out 時重要性上升"},
+      {tier:"L2", module:"Chassis", item:"Mechanics / Cable / Rack", costPct:5, valuePct:3, suppliers:"Foxconn / Quanta / Wistron", region:"TW/CN/MX", criticality:58, substituteDifficulty:44, leadTimeWeeks:8, trend:"flat", note:"供給彈性較高但受組裝地影響"},
+      {tier:"L2", module:"Storage", item:"SSD / Controller", costPct:4, valuePct:3, suppliers:"Samsung / Kioxia / Phison", region:"KR/JP/TW", criticality:60, substituteDifficulty:48, leadTimeWeeks:10, trend:"flat", note:"受 NAND 景氣循環影響"},
+      {tier:"L2", module:"Others", item:"Firmware / Test / Logistics", costPct:5, valuePct:4, suppliers:"ODM / EMS", region:"Global", criticality:66, substituteDifficulty:52, leadTimeWeeks:6, trend:"flat", note:"驗證與出貨流程影響交期"}
+    ],
+    suppliers:[
+      ["NVIDIA", "GPU/Networking", 38, "Very High", "高報價權，供給緊張時整機毛利承壓"],
+      ["SK hynix", "HBM", 10, "High", "HBM 產能與良率為重要變數"],
+      ["Samsung", "HBM/DDR/SSD", 8, "High", "記憶體循環與報價波動"],
+      ["Delta", "Power/Thermal", 6, "Medium", "AI 電源與散熱受惠"],
+      ["Unimicron", "PCB/ABF", 5, "Medium", "高階載板與高速板供需"]
+    ],
+    marginPool:[
+      ["GPU/IP", 65],["HBM", 35],["Networking IC", 42],["PCB/ABF", 24],["Thermal", 22],["Power", 18],["ODM Assembly", 7],["Channel", 5]
+    ],
+    riskRows:[
+      ["GPU 供給", "供給", 5, "配額、交期、客戶優先序"],["HBM 良率", "製程", 5, "良率不穩導致供貨延後"],["水冷導入", "技術", 4, "漏液、維修與標準化"],["出口管制", "政策", 4, "規格限制與區域禁售"],["客戶 CAPEX", "需求", 3, "雲端資本支出節奏"]
+    ]
+  },
+
+  "電動車 / EV Powertrain": {
+    currency:"USD",
+    revenueBase: 100,
+    baseGm: 21.0,
+    components:[
+      {tier:"L1", module:"Battery System", item:"Cell / Module / Pack", costPct:42, valuePct:38, suppliers:"CATL / BYD / LGES / Panasonic", region:"CN/KR/JP", criticality:96, substituteDifficulty:82, leadTimeWeeks:20, trend:"down", note:"電池成本決定整車價格競爭力"},
+      {tier:"L1", module:"Power Electronics", item:"Inverter / SiC / IGBT", costPct:12, valuePct:15, suppliers:"Infineon / ST / Rohm / BYD", region:"EU/JP/CN", criticality:86, substituteDifficulty:78, leadTimeWeeks:24, trend:"flat", note:"SiC 滲透提升效率但成本較高"},
+      {tier:"L1", module:"Motor", item:"E-Motor / Magnet", costPct:10, valuePct:10, suppliers:"Nidec / Bosch / Local", region:"JP/EU/CN", criticality:80, substituteDifficulty:70, leadTimeWeeks:16, trend:"flat", note:"稀土磁材供需與政策敏感"},
+      {tier:"L1", module:"Thermal", item:"Heat Pump / Battery Cooling", costPct:8, valuePct:9, suppliers:"Denso / Hanon / Sanhua", region:"JP/KR/CN", criticality:75, substituteDifficulty:62, leadTimeWeeks:12, trend:"up", note:"續航與快充提高熱管理價值"},
+      {tier:"L1", module:"ADAS", item:"Camera / Radar / Domain Controller", costPct:9, valuePct:13, suppliers:"Mobileye / Bosch / Valeo", region:"US/EU/CN", criticality:82, substituteDifficulty:76, leadTimeWeeks:18, trend:"up", note:"軟硬整合與法規驗證門檻高"},
+      {tier:"L2", module:"Chassis", item:"Suspension / Brake / Steering", costPct:9, valuePct:7, suppliers:"ZF / Brembo / Local", region:"EU/CN", criticality:64, substituteDifficulty:46, leadTimeWeeks:10, trend:"flat", note:"傳統零部件價格壓力高"},
+      {tier:"L2", module:"Interior", item:"Display / Seat / Wiring", costPct:6, valuePct:5, suppliers:"LGD / BOE / Lear", region:"KR/CN/US", criticality:55, substituteDifficulty:42, leadTimeWeeks:8, trend:"flat", note:"消費電子化，降本壓力大"},
+      {tier:"L2", module:"Others", item:"Assembly / Logistics / Warranty", costPct:4, valuePct:3, suppliers:"OEM", region:"Global", criticality:60, substituteDifficulty:50, leadTimeWeeks:6, trend:"flat", note:"保固與召回風險需納入"}
+    ],
+    suppliers:[
+      ["CATL", "Battery Cell", 20, "Very High", "電池價格與供應策略影響整車毛利"],
+      ["BYD", "Battery/Powertrain", 12, "High", "垂直整合造成競爭壓力"],
+      ["Infineon", "Power IC", 5, "Medium", "車規半導體週期與長約"],
+      ["Denso", "Thermal", 4, "Medium", "熱泵系統價值提升"],
+      ["Bosch", "ADAS/Chassis", 4, "Medium", "車規認證與平台黏著度"]
+    ],
+    marginPool:[
+      ["Battery Cell", 18],["Battery Materials", 16],["SiC/Power IC", 32],["ADAS Domain", 28],["Thermal", 19],["Motor", 14],["OEM Assembly", 9],["Dealer/Service", 6]
+    ],
+    riskRows:[
+      ["鋰價波動", "原料", 4, "碳酸鋰價格循環"],["價格戰", "競爭", 5, "整車降價壓縮供應鏈"],["SiC 良率", "製程", 4, "高壓平台良率與成本"],["補貼退坡", "政策", 3, "需求提前或延後"],["召回保固", "品質", 4, "安全問題損害毛利"]
+    ]
+  },
+
+  "半導體設備 / Advanced Packaging": {
+    currency:"USD",
+    revenueBase: 100,
+    baseGm: 35.0,
+    components:[
+      {tier:"L1", module:"Motion & Precision", item:"Stage / Linear Motor / Encoder", costPct:22, valuePct:24, suppliers:"ASML ecosystem / THK / Renishaw", region:"EU/JP", criticality:94, substituteDifficulty:90, leadTimeWeeks:36, trend:"up", note:"精密運動控制決定良率與 throughput"},
+      {tier:"L1", module:"Optics / Laser", item:"Lens / Laser / Illumination", costPct:18, valuePct:22, suppliers:"Zeiss / Coherent / Trumpf", region:"EU/US", criticality:96, substituteDifficulty:94, leadTimeWeeks:40, trend:"up", note:"最難替代，高技術壁壘"},
+      {tier:"L1", module:"Vacuum / Gas", item:"Pump / Valve / MFC", costPct:13, valuePct:12, suppliers:"Edwards / VAT / Horiba", region:"EU/JP", criticality:84, substituteDifficulty:74, leadTimeWeeks:26, trend:"flat", note:"可靠度與潔淨度要求高"},
+      {tier:"L1", module:"Metrology", item:"Sensor / Inspection / Camera", costPct:12, valuePct:15, suppliers:"KLA / Keyence / Hamamatsu", region:"US/JP", criticality:90, substituteDifficulty:84, leadTimeWeeks:30, trend:"up", note:"先進封裝提高檢測價值"},
+      {tier:"L1", module:"Control", item:"PLC / Industrial PC / Software", costPct:10, valuePct:12, suppliers:"Siemens / Beckhoff / Advantech", region:"EU/TW", criticality:78, substituteDifficulty:66, leadTimeWeeks:18, trend:"flat", note:"軟體與控制整合影響服務黏著度"},
+      {tier:"L2", module:"Chamber", item:"Ceramics / Coating / Metal Parts", costPct:11, valuePct:8, suppliers:"Ferrotec / Kyocera / Local", region:"JP/TW/CN", criticality:76, substituteDifficulty:64, leadTimeWeeks:20, trend:"flat", note:"材料與加工一致性重要"},
+      {tier:"L2", module:"Utilities", item:"Power / Thermal / Facility", costPct:8, valuePct:5, suppliers:"Local / Global", region:"Global", criticality:62, substituteDifficulty:46, leadTimeWeeks:12, trend:"flat", note:"供應商較多但規格驗證耗時"},
+      {tier:"L2", module:"Others", item:"Assembly / Service / Spare Parts", costPct:6, valuePct:2, suppliers:"OEM", region:"Global", criticality:58, substituteDifficulty:42, leadTimeWeeks:8, trend:"flat", note:"售後服務支撐長尾收入"}
+    ],
+    suppliers:[
+      ["Zeiss", "Optics", 12, "Very High", "極高替代難度"],
+      ["KLA", "Inspection", 8, "High", "量測檢測需求受先進節點驅動"],
+      ["VAT", "Vacuum Valve", 5, "Medium", "半導體真空閥門黏著度高"],
+      ["Edwards", "Vacuum Pump", 5, "Medium", "供貨穩定性與服務網絡"],
+      ["Siemens", "Control", 4, "Medium", "工控標準與安全認證"]
+    ],
+    marginPool:[
+      ["System OEM", 45],["Optics/Laser", 40],["Metrology", 38],["Precision Stage", 32],["Vacuum", 25],["Control Software", 28],["Chamber Parts", 18],["Service", 36]
+    ],
+    riskRows:[
+      ["出口管制", "政策", 5, "設備與零件出口限制"],["超長交期", "供給", 5, "關鍵件 lead time 30 週以上"],["客戶 CAPEX", "需求", 4, "晶圓廠擴產週期波動"],["良率認證", "技術", 4, "客戶驗證耗時"],["單一供應商", "集中度", 5, "精密光學與運動控制"]
+    ]
+  }
+};
+
+const SCHEMA_ROWS = [
+  ["FileID / IndustryID", "產業與資料批次唯一鍵", "Industry + Date + SourceHash", "避免不同版本 BOM 混用"],
+  ["BOM_Level", "L0/L1/L2/L3 階層", "L1=Module, L2=Component", "用於分層成本與替代路徑"],
+  ["CostPct", "成本占比", "0-100%", "直接驅動 COGS、毛利率敏感度"],
+  ["ValuePct", "價值/報價權占比", "0-100%", "高價值低成本通常是關鍵 Alpha 區"],
+  ["SupplierHHI", "供應商集中度", "0-10000", "衡量單一供應商風險"],
+  ["LeadTimeWeeks", "交期", "週", "缺料、漲價、拉貨放緩的先行指標"],
+  ["SubstituteDifficulty", "替代難度", "0-100", "越高越有報價權，但也越高風險"],
+  ["GrossMarginBridge", "毛利率橋接", "Base GM + Scenario", "把 BOM 變動連到財務模型"],
+  ["EvidenceScore", "證據強度", "0-100", "財報/法說/報價/拆解/通路交叉驗證"],
+  ["SignalTag", "投資訊號", "Bullish / Bearish / Neutral", "接回選股、回測與風控"]
+];
+
+function fmt(x, digits=1){ return Number(x).toFixed(digits); }
+function el(id){ return document.getElementById(id); }
+function clamp(x,min,max){ return Math.max(min, Math.min(max,x)); }
+
+function tagRisk(score){
+  if(score >= 85) return '<span class="tag fail">HIGH</span>';
+  if(score >= 70) return '<span class="tag warn">MED</span>';
+  return '<span class="tag ok">LOW</span>';
+}
+function tagTrend(t){
+  if(t === "up") return '<span class="up">▲ 上升</span>';
+  if(t === "down") return '<span class="down">▼ 下降</span>';
+  return '<span class="flat">→ 持平</span>';
+}
+function totalCost(data){ return data.components.reduce((s,d)=>s+d.costPct,0); }
+function weighted(data, key){
+  const c = totalCost(data);
+  return data.components.reduce((s,d)=>s+d.costPct*d[key],0) / c;
+}
+function adjustedGM(data, scenario){
+  const costInflationImpact = scenario * 0.42;
+  return data.baseGm - costInflationImpact;
+}
+function buildKpis(data, scenario){
+  const top = [...data.components].sort((a,b)=>b.costPct-a.costPct)[0];
+  const concentration = data.components.slice(0,3).reduce((s,d)=>s+d.costPct,0);
+  const gm = adjustedGM(data, scenario);
+  const avgRisk = weighted(data,"criticality")*0.55 + weighted(data,"substituteDifficulty")*0.45;
+  const longLead = data.components.filter(d=>d.leadTimeWeeks>=20).length;
+  const kpis = [
+    ["BOM Top 1 成本", `${top.item}`, `${fmt(top.costPct)}% of COGS · ${top.module}`],
+    ["Top 3 成本集中度", `${fmt(concentration)}%`, concentration>60?"高度集中，需拆供應商與替代料":"集中度可控但仍需追蹤"],
+    ["情境後毛利率", `${fmt(gm)}%`, scenario>0?"成本上行情境，毛利率承壓":"成本下降/基準情境"],
+    ["加權風險分數", `${fmt(avgRisk,0)}/100`, avgRisk>82?"紅區：供給與替代風險偏高":"風險中性或可控"],
+    ["長交期項目數", `${longLead}`, "Lead time ≥ 20 週的關鍵項"],
+    ["Alpha 觀察點", `${data.components.filter(d=>d.trend==="up").length}`, "成本/價值占比上升的模組"]
+  ];
+  el("kpiGrid").innerHTML = kpis.map((k,i)=>`
+    <div class="card">
+      <div class="kpi-title">${k[0]}</div>
+      <div class="kpi-value">${k[1]}</div>
+      <div class="kpi-note">${k[2]}</div>
+      <div class="delta ${i===2 && scenario>0 ? "up" : i===2 && scenario<0 ? "down" : "flat"}">${i===2 ? (scenario>=0?`▲ 成本情境 +${scenario}%`:`▼ 成本情境 ${scenario}%`) : "def metric"}</div>
+    </div>`).join("");
+}
+
+function makeTable(headers, rows){
+  return `<thead><tr>${headers.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</tbody>`;
+}
+function buildBomTable(data){
+  const rows = data.components.map(d=>[
+    `<span class="mono">${d.tier}</span>`,
+    d.module,
+    `<b>${d.item}</b><div class="small">${d.note}</div>`,
+    `<span class="num">${fmt(d.costPct)}%</span>`,
+    `<span class="num">${fmt(d.valuePct)}%</span>`,
+    tagRisk(d.criticality),
+    `<span class="num">${d.leadTimeWeeks}</span>`,
+    tagTrend(d.trend),
+    d.suppliers
+  ]);
+  el("bomTable").innerHTML = makeTable(["Tier","Module","Component","成本占比","價值占比","風險","交期週","趨勢","主要供應商"], rows);
+}
+function buildSupplierTable(data){
+  const rows = data.suppliers.map(s=>[
+    `<b>${s[0]}</b>`,
+    s[1],
+    `<span class="num">${fmt(s[2])}%</span>`,
+    s[3]==="Very High"?'<span class="tag fail">Very High</span>':s[3]==="High"?'<span class="tag warn">High</span>':'<span class="tag ok">Medium</span>',
+    s[4]
+  ]);
+  el("supplierTable").innerHTML = makeTable(["Supplier","Exposure","成本曝險","集中度","判讀"], rows);
+}
+function buildConclusionTable(data, scenario){
+  const gm = adjustedGM(data, scenario);
+  const topRisk = [...data.components].sort((a,b)=>(b.criticality+b.substituteDifficulty)-(a.criticality+a.substituteDifficulty))[0];
+  const topAlpha = [...data.components].sort((a,b)=>(b.valuePct-b.costPct)-(a.valuePct-a.costPct))[0];
+  const rows = [
+    ["核心結論", `${topAlpha.item} 是價值占比高於成本占比的潛在 Alpha 區；${topRisk.item} 是最大風險源。`],
+    ["正向情境", "成本下降、交期縮短、關鍵零組件擴產成功、終端需求優於預期，毛利率與出貨同時改善。"],
+    ["反向情境", "價格戰、客戶延後拉貨、關鍵料缺貨、出口管制、替代技術出現，會讓估值與毛利率同時修正。"],
+    ["追蹤指標", "報價、lead time、供應商法說、庫存週轉、客戶 CAPEX、海關進出口、通路交期、替代料認證進度。"],
+    ["投資連結", `情境後毛利率約 ${fmt(gm)}%；若 GM 連續兩季上修且風險分數下降，可提高權重，反之降低。`],
+    ["驗證要求", "至少三源交叉：公司財報/法說、產業報價/拆解、第三方供應鏈或海關資料。"]
+  ];
+  el("conclusionTable").innerHTML = makeTable(["項目","專業判讀"], rows);
+}
+function buildSchemaTable(){
+  el("schemaTable").innerHTML = makeTable(["欄位","定義","格式","用途"], SCHEMA_ROWS.map(r=>[r[0],r[1],r[2],r[3]]));
+}
+function buildRiskMatrix(data){
+  const cols = ["風險項","類別","分數","投資含義","對策"];
+  const mitigation = {
+    "供給":"建立第二供應商、追交期與擴產進度",
+    "製程":"追良率、認證、客訴與保固",
+    "技術":"拆 roadmap，驗證替代方案成熟度",
+    "政策":"建立國家/客戶/產品規格限制清單",
+    "需求":"追客戶 CAPEX、庫存與接單取消",
+    "原料":"建立商品價格與長約對照",
+    "競爭":"追 ASP、降價、補貼與份額",
+    "品質":"追召回、保固率、失效率",
+    "集中度":"拆供應商 HHI 與替代料"
+  };
+  let html = cols.map(c=>`<div class="head">${c}</div>`).join("");
+  data.riskRows.forEach(r=>{
+    const cls = r[2]>=5 ? "risk-high" : r[2]>=4 ? "risk-mid" : "risk-low";
+    html += `<div><b>${r[0]}</b></div><div>${r[1]}</div><div class="${cls} mono">${"●".repeat(r[2])}</div><div>${r[3]}</div><div>${mitigation[r[1]] || "建立觸發條件與週期性驗證"}</div>`;
+  });
+  el("riskMatrix").innerHTML = html;
+}
+
+function svgWrap(content, viewBox="0 0 640 320"){
+  return `<svg viewBox="${viewBox}" role="img" aria-label="chart">${content}</svg>`;
+}
+function polar(cx,cy,r,angle){
+  const a = (angle-90) * Math.PI / 180;
+  return [cx + r*Math.cos(a), cy + r*Math.sin(a)];
+}
+function arcPath(cx,cy,r,start,end){
+  const [x1,y1] = polar(cx,cy,r,end);
+  const [x2,y2] = polar(cx,cy,r,start);
+  const large = end-start <= 180 ? 0 : 1;
+  return `M ${x1} ${y1} A ${r} ${r} 0 ${large} 0 ${x2} ${y2}`;
+}
+function buildDonut(data){
+  const palette = [COLORS.seal,COLORS.blue,COLORS.teal,COLORS.amber,COLORS.purple,COLORS.ok,COLORS.warn,COLORS.sky,COLORS.muted];
+  let start = 0;
+  let paths = "";
+  data.components.forEach((d,i)=>{
+    const end = start + d.costPct/100*360;
+    paths += `<path d="${arcPath(160,160,104,start,end)}" stroke="${palette[i%palette.length]}" stroke-width="42" fill="none" stroke-linecap="butt"><title>${d.item}: ${d.costPct}%</title></path>`;
+    start=end;
+  });
+  const center = `<circle cx="160" cy="160" r="70" fill="#fff"/><text x="160" y="152" text-anchor="middle" font-size="28" font-weight="800" fill="${COLORS.ink}">100%</text><text x="160" y="178" text-anchor="middle" font-size="12" fill="${COLORS.muted}">BOM COGS</text>`;
+  const right = data.components.map((d,i)=>`
+    <g transform="translate(330 ${35+i*28})">
+      <rect x="0" y="-11" width="16" height="16" rx="4" fill="${palette[i%palette.length]}"/>
+      <text x="25" y="2" font-size="12" fill="${COLORS.ink}">${d.item}</text>
+      <text x="250" y="2" font-size="12" text-anchor="end" fill="${COLORS.muted}">${fmt(d.costPct)}%</text>
+    </g>`).join("");
+  el("donutChart").innerHTML = svgWrap(paths+center+right, "0 0 640 330");
+  el("donutLegend").innerHTML = data.components.slice(0,5).map((d,i)=>`<span><span class="dot" style="background:${palette[i]}"></span>${d.module}</span>`).join("");
+}
+function buildMarginChart(data){
+  const max = Math.max(...data.marginPool.map(d=>d[1]));
+  const rows = data.marginPool.map((d,i)=>{
+    const y = 35 + i*45;
+    const w = 440*d[1]/max;
+    const color = d[1]>=40?COLORS.seal:d[1]>=30?COLORS.blue:d[1]>=20?COLORS.teal:COLORS.warn;
+    return `<text x="18" y="${y+15}" font-size="12" fill="${COLORS.ink}">${d[0]}</text>
+      <rect x="170" y="${y}" width="${w}" height="24" rx="8" fill="${color}" opacity=".86"/>
+      <text x="${180+w}" y="${y+16}" font-size="12" fill="${COLORS.ink}">${d[1]}%</text>`;
+  }).join("");
+  const axis = `<line x1="170" y1="405" x2="610" y2="405" stroke="${COLORS.line}"/><text x="170" y="425" font-size="11" fill="${COLORS.muted}">低</text><text x="592" y="425" font-size="11" fill="${COLORS.muted}">高</text>`;
+  el("marginChart").innerHTML = svgWrap(rows+axis, "0 0 640 440");
+}
+function buildWaterfall(data, scenario){
+  const base = data.baseGm;
+  const effects = [
+    ["Base GM", base, "base"],
+    ["材料", -scenario*0.22, "effect"],
+    ["良率", -Math.max(scenario,0)*0.08, "effect"],
+    ["匯率/運費", -scenario*0.06, "effect"],
+    ["議價轉嫁", Math.max(scenario,0)*0.11, "effect"],
+    ["Adj GM", adjustedGM(data, scenario), "final"]
+  ];
+  const min = Math.min(0, ...effects.map(d=>d[1])) - 5;
+  const max = Math.max(...effects.map(d=>d[1]), base) + 8;
+  const scale = v => 250 - (v-min)/(max-min)*210;
+  let running = base;
+  let bars = "";
+  effects.forEach((d,i)=>{
+    const x = 55+i*95;
+    let y,h,color,label;
+    if(i===0 || i===effects.length-1){
+      y = scale(d[1]); h = scale(0)-scale(d[1]); color = i===0?COLORS.blue:COLORS.seal; label=d[1];
+    }else{
+      const next = running + d[1];
+      y = scale(Math.max(running,next));
+      h = Math.abs(scale(running)-scale(next));
+      color = d[1]>=0?COLORS.ok:COLORS.fail;
+      label=d[1];
+      running=next;
+    }
+    bars += `<rect x="${x}" y="${y}" width="46" height="${Math.max(h,2)}" rx="8" fill="${color}" opacity=".84"/>
+      <text x="${x+23}" y="${y-8}" text-anchor="middle" font-size="11" fill="${COLORS.ink}">${label>=0?"+":""}${fmt(label)}%</text>
+      <text x="${x+23}" y="292" text-anchor="middle" font-size="10" fill="${COLORS.muted}">${d[0]}</text>`;
+  });
+  const zero = `<line x1="35" x2="610" y1="${scale(0)}" y2="${scale(0)}" stroke="${COLORS.line}" stroke-width="1"/>`;
+  el("waterfallChart").innerHTML = svgWrap(zero+bars, "0 0 640 320");
+}
+function buildRadar(data){
+  const axes = [
+    ["成本集中", clamp(data.components.slice(0,3).reduce((s,d)=>s+d.costPct,0),0,100)],
+    ["替代難度", weighted(data,"substituteDifficulty")],
+    ["關鍵性", weighted(data,"criticality")],
+    ["長交期", clamp(weighted(data,"leadTimeWeeks")*3,0,100)],
+    ["價值占比", clamp(weighted(data,"valuePct")*1.15,0,100)]
+  ];
+  const cx=320, cy=160, r=105;
+  const pts = axes.map((a,i)=>{
+    const angle = -90 + i*360/axes.length;
+    const rr = r*a[1]/100;
+    const rad = angle*Math.PI/180;
+    return [cx+rr*Math.cos(rad), cy+rr*Math.sin(rad)];
+  });
+  const grid = [25,50,75,100].map(level=>{
+    const p = axes.map((a,i)=>{
+      const angle=-90+i*360/axes.length, rr=r*level/100, rad=angle*Math.PI/180;
+      return `${cx+rr*Math.cos(rad)},${cy+rr*Math.sin(rad)}`;
+    }).join(" ");
+    return `<polygon points="${p}" fill="none" stroke="${COLORS.line}" />`;
+  }).join("");
+  const lines = axes.map((a,i)=>{
+    const angle=-90+i*360/axes.length, rad=angle*Math.PI/180;
+    const x=cx+r*Math.cos(rad), y=cy+r*Math.sin(rad);
+    const lx=cx+(r+38)*Math.cos(rad), ly=cy+(r+30)*Math.sin(rad);
+    return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="${COLORS.line}"/>
+      <text x="${lx}" y="${ly}" font-size="11" text-anchor="middle" fill="${COLORS.muted}">${a[0]}</text>`;
+  }).join("");
+  const poly = `<polygon points="${pts.map(p=>p.join(",")).join(" ")}" fill="${COLORS.seal}" opacity=".17" stroke="${COLORS.seal}" stroke-width="3"/>`;
+  el("radarChart").innerHTML = svgWrap(grid+lines+poly, "0 0 640 320");
+}
+function refresh(){
+  const name = el("industrySelect").value;
+  const data = DATASETS[name];
+  const scenario = Number(el("scenarioSlider").value);
+  el("scenarioText").textContent = scenario === 0 ? "Base 0%" : (scenario > 0 ? `Cost Inflation +${scenario}%` : `Cost Deflation ${scenario}%`);
+  buildKpis(data, scenario);
+  buildBomTable(data);
+  buildSupplierTable(data);
+  buildConclusionTable(data, scenario);
+  buildSchemaTable();
+  buildRiskMatrix(data);
+  buildDonut(data);
+  buildMarginChart(data);
+  buildWaterfall(data, scenario);
+  buildRadar(data);
+}
+function init(){
+  el("industrySelect").innerHTML = Object.keys(DATASETS).map(k=>`<option value="${k}">${k}</option>`).join("");
+  el("industrySelect").addEventListener("change", refresh);
+  el("scenarioSlider").addEventListener("input", refresh);
+  el("generatedAt").textContent = new Date().toLocaleString("zh-TW", {hour12:false});
+  refresh();
+}
+init();
+</script>
+</body>
+</html>

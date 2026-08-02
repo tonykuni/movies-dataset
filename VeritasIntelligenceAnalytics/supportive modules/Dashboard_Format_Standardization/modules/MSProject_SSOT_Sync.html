@@ -1,0 +1,242 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · SSOT ↔ MS Project 同步 · SAP BOM 知識</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--blue:#4c78a8;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--vi:#7a6daa;
+ --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg)}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5}
+.wrap{max-width:1240px;margin:0 auto;padding:0 22px 60px}
+.bar{position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50}
+header{padding:20px 0 9px;margin-bottom:10px;border-bottom:2px solid var(--ink)}
+.kicker{font:700 10px 'DM Mono',monospace;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px}
+h1{font:800 19px/1.2 'Syne',sans-serif;color:var(--ink)}h1 span{color:var(--up)}
+.sub{margin-top:6px;font:400 10.5px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:1010px}.sub b{color:var(--ink2)}
+.gov{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#1e1d1a;border-radius:3px;padding:7px 14px;margin:12px 0}
+.gov .lk{font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase}
+.gov .pill{font:600 7.5px 'DM Mono',monospace;color:#cfcabf}
+.gov .ver{margin-left:auto;font:700 8px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:2px 8px}
+.gov .ver.no{background:#c96b5a}
+.note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--am);border-radius:3px;padding:8px 14px;margin-bottom:14px;font:500 9px/1.6 'DM Mono',monospace;color:var(--mut)}.note b{color:var(--ink2)}
+h2{font:800 13px 'Syne',sans-serif;color:var(--ink);margin:22px 0 4px;padding-bottom:5px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:8px}
+h2 .en{font:600 8px 'DM Mono',monospace;color:var(--mut2);letter-spacing:1px;text-transform:uppercase}
+.scards{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0 4px}
+.sc{background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:9px 14px;min-width:96px}
+.sc .v{font:800 20px 'Syne',sans-serif;line-height:1}.sc .l{font:600 8px 'DM Mono',monospace;color:var(--mut);text-transform:uppercase;letter-spacing:.6px;margin-top:4px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:0;overflow:hidden;margin-top:12px}
+.hd2{font:800 11px 'Syne',sans-serif;padding:10px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+table{width:100%;border-collapse:collapse;font:500 10px 'DM Mono',monospace}
+th{font:700 8px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.5px;color:var(--mut);text-align:left;padding:7px 8px;border-bottom:2px solid var(--ink);background:var(--paper2)}
+td{padding:5px 8px;border-bottom:1px solid var(--soft);vertical-align:middle}
+tr:hover td{background:var(--paper2)}
+.cellin{font-family:'DM Mono',monospace;border:none;background:transparent;width:100%;font-size:10px}
+.cellin:focus{outline:1px solid var(--blue)}
+.badge{font:700 7px 'DM Mono',monospace;color:#fff;border-radius:3px;padding:1px 6px}
+.b-add{background:#5a9e6f}.b-ver{background:#c4943a}.b-ok{background:#4c78a8}.b-cf{background:#c96b5a}
+.anchor{font:500 8.5px 'DM Mono',monospace;color:var(--vi)}
+.conf{background:#f7edeb;border-left:3px solid var(--up);padding:6px 12px;font:500 9.5px 'Noto Sans TC',sans-serif;color:var(--ink2);border-bottom:1px solid var(--soft)}
+.conf b{font-family:'DM Mono',monospace;color:var(--up)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}@media(max-width:860px){.grid2{grid-template-columns:1fr}}
+.qdv{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;padding:12px 14px}
+.qc{border:1px solid var(--line);border-radius:5px;padding:9px 11px;border-top:3px solid var(--teal)}
+.qc .k{font:800 18px 'Syne',sans-serif;color:var(--teal)}.qc .n{font:700 10px 'Noto Sans TC',sans-serif;color:var(--ink);margin:2px 0}
+.qc .d{font:400 9px 'Noto Sans TC',sans-serif;color:var(--mut)}
+.tc{display:flex;justify-content:space-between;padding:5px 14px;border-bottom:1px solid var(--soft);font:500 10px 'Noto Sans TC',sans-serif}
+.tc b{font-family:'DM Mono',monospace;color:var(--blue)}
+.flow{display:flex;gap:4px;padding:12px 14px;flex-wrap:wrap}
+.fl{flex:1;min-width:120px;border-radius:4px;padding:8px 10px;color:#fff;font:600 9px 'Noto Sans TC',sans-serif}
+.btn{font:700 8.5px 'DM Mono',monospace;cursor:pointer;border:1px solid var(--ink);background:transparent;color:var(--ink);border-radius:3px;padding:6px 11px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:11px 14px;border-top:1px solid var(--line);align-items:center}
+.tk{font:500 9px 'DM Mono',monospace;color:var(--mut)}
+.pdf{position:fixed;top:12px;right:14px;z-index:999;background:var(--ink);color:#fff;border:none;border-radius:5px;padding:7px 13px;font:700 9px 'DM Mono',monospace;cursor:pointer}
+@media print{@page{size:A4 landscape;margin:9mm}.pdf,.toolbar{display:none!important}}
+</style></head><body>
+<div class="bar"></div><button class="pdf" onclick="window.print()">⤓ PDF</button>
+<div class="wrap">
+<header>
+ <div class="kicker">VERITAS INTELLIGENCE · SSOT ↔ MS PROJECT SYNC · SAP BOM KNOWLEDGE</div>
+ <h1>SSOT ↔ MS Project 同步 <span>·</span> 排程 × BOM 對帳</h1>
+ <p class="sub">MS Project 任務對帳進 SSOT：錨點 <b>[Project-Task]</b>；內容變更 → <b>版本化(append-only)</b> 不覆寫；自動偵測 <b>排程死結 / 資源超載</b>；任務可橋接 <b>BOM 料號</b>（錨點 Part-Rev-State）。並內建 <b>SAP BOM 知識</b>（T-codes、替代選擇 Q/D/V、不展開條件）。verify-before-use。</p>
+</header>
+<div class="gov"><span class="lk">🔒 GOVERNED SYNC</span><span class="pill">append-only 版本化</span>
+ <span class="pill">[Project-Task] / [Part-Rev-State]</span><span class="pill">conflict-detect</span>
+ <span class="ver" id="ver">VERIFIED</span></div>
+<div class="note">📐 改下方任務表（開始/完成/前置/資源/料號）即時重新同步與偵錯。<b>排程死結</b>=後續早於前置完成；<b>資源超載</b>=同資源時段重疊。有硬衝突時閘門轉 UNVERIFIED。</div>
+
+<div class="scards" id="scards"></div>
+
+<h2>MS Project 任務 → SSOT 同步 <span class="en">Reconcile · versioned</span></h2>
+<div class="card"><div class="hd2">任務表（可編輯）<span class="tk">錨點 Project-Task · 變更即版本化</span></div>
+<table><thead><tr><th>任務</th><th>名稱</th><th>資源</th><th>開始</th><th>完成</th><th>%</th><th>前置</th><th>料號</th><th>狀態</th></tr></thead><tbody id="taskBody"></tbody></table>
+<div id="conflicts"></div>
+<div class="toolbar"><button class="btn" id="addT">＋ 加任務</button><button class="btn" id="reSync">重新同步</button>
+ <span class="tk" id="syncStat"></span></div></div>
+
+<div class="grid2">
+ <div class="card"><div class="hd2">任務 ↔ BOM 橋接 <span class="tk">Part-Rev-State</span></div>
+  <table><thead><tr><th>任務</th><th>料號</th><th>BOM 錨點</th></tr></thead><tbody id="linkBody"></tbody></table>
+  <div class="tc" style="border:none"><span>覆蓋率</span><b id="cov">—</b></div></div>
+ <div class="card"><div class="hd2">替代 BOM 選擇 <span class="en">MRP picks ONE · Q/D/V</span></div>
+  <div class="qdv" id="qdv"></div></div>
+</div>
+
+<h2>雙向回寫 · SSOT → MS Project <span class="en">Write-back · approval-gated · round-trip</span></h2>
+<div class="card"><div class="hd2">回寫集(核可閘門:衝突任務保留待核可)<span class="tk" id="wbStat"></span></div>
+<table><thead><tr><th>任務</th><th>名稱</th><th>回寫狀態</th></tr></thead><tbody id="wbBody"></tbody></table>
+<div class="toolbar"><button class="btn" id="dlXml">下載可匯入 MS Project XML</button>
+ <span class="tk" id="rtStat"></span></div></div>
+
+<h2>SAP BOM 知識（編入 SSOT）<span class="en">T-Codes · Not-Exploded</span></h2>
+<div class="grid2">
+ <div class="card"><div class="hd2">BOM T-Codes</div><div id="tcodes"></div></div>
+ <div class="card"><div class="hd2">BOM 何時「不展開」<span class="tk">4 條件</span></div><div class="flow" id="noexp"></div>
+  <div class="tc" style="border:none;color:var(--mut)">記憶鉤：Q 批量 · D 展開日 · V 生產版本 → MM02·MRP4 選 / CS03 查有效性 / C223 定義 PV</div></div>
+</div>
+</div>
+<script>
+const SAP={"tcodes": {"CS01": "Create BOM 建立 BOM", "CS02": "Change BOM 變更 BOM", "CS03": "Display BOM 顯示 BOM（檢查有效性）", "CS11": "BOM Explosion (Single Level) 單階展開", "CS12": "BOM Explosion (Multi Level) 多階展開", "CS13": "Display BOM with History 含歷史顯示", "CS14": "BOM Comparison BOM 比較", "CS15": "Where-Used List 反查用途（哪些父階用到此料）", "MM02": "Material Master 變更（MRP4 頁選 Q/D/V 選擇法）", "C223": "Define Production Version 定義生產版本"}, "alt": {"Q": {"name": "Order Quantity (Lot Size) 數量/批量", "cue": "生產多少？", "logic": "批量落在哪張 BOM 的數量區間 → 選那張", "field": "MM02 · MRP4 · Selection method"}, "D": {"name": "Explosion Date 展開日期", "cue": "何時生產？", "logic": "依計畫訂單日期，選當時有效的 BOM（標準包裝）", "field": "MM02 · MRP4 · Explosion date"}, "V": {"name": "Production Version 生產版本", "cue": "鎖定哪種生產方法？", "logic": "由生產版本綁定 BOM+途程（C223 定義）", "field": "C223 · Production Version"}}, "noexp": [{"stage": "無有效 BOM", "detail": "在需求展開日、或給定有效性參數下，沒有生效的 BOM"}, {"stage": "BOM 有刪除指示", "detail": "BOM 被標記刪除/停用指示（deletion indicator）"}, {"stage": "多 BOM 無適用替代", "detail": "多張 BOM 但沒有符合批量的替代 BOM"}, {"stage": "BOM 不符應用準則", "detail": "BOM usage 不符、展開日無有效替代、狀態不滿足需求"}], "sticky": {"Q": "Quantity 批量", "D": "Date 展開日", "V": "Version 生產版本"}};
+const $=id=>document.getElementById(id);
+let tasks=[
+ {project_id:"AI-RACK",task_id:"T1",name:"設計水冷板 CP-GB200",resource:"Alice",start:"2026-07-01",finish:"2026-07-10",pct:100,predecessors:"",part:"CP-GB200"},
+ {project_id:"AI-RACK",task_id:"T2",name:"打樣快接頭 QD-01",resource:"Bob",start:"2026-07-11",finish:"2026-07-20",pct:50,predecessors:"T1",part:"QD-01"},
+ {project_id:"AI-RACK",task_id:"T3",name:"組裝驗證",resource:"Alice",start:"2026-07-05",finish:"2026-07-15",pct:0,predecessors:"T2",part:""},
+];
+const bomParts=[{part:"CP-GB200",rev:"A",state:"Active"},{part:"QD-01",rev:"B",state:"Active"}];
+let SSOT={}, HIST=[];
+function sig(t){return [t.name,t.resource,t.start,t.finish,t.pct,t.predecessors,t.part].join("|");}
+function preds(t){return (t.predecessors||"").split(/[,\s]+/).filter(Boolean);}
+
+function detectConflicts(){
+ const byId={}; tasks.forEach(t=>byId[t.task_id]=t); const out=[];
+ tasks.forEach(t=>preds(t).forEach(pid=>{const p=byId[pid];if(p&&t.start&&p.finish&&t.start<p.finish)out.push({type:"schedule",task:t.task_id,detail:`開始 ${t.start} 早於前置 ${pid} 完成 ${p.finish}`});}));
+ const res={}; tasks.forEach(t=>{if(t.resource&&t.start&&t.finish){(res[t.resource]=res[t.resource]||[]).push(t);}});
+ Object.entries(res).forEach(([r,ts])=>{ts.sort((a,b)=>a.start<b.start?-1:1);for(let i=0;i<ts.length-1;i++)if(ts[i].finish>ts[i+1].start)out.push({type:"resource",task:ts[i+1].task_id,detail:`資源 ${r} 與 ${ts[i].task_id} 時段重疊(超載)`});});
+ return out;
+}
+function sync(){
+ const rep={added:[],versioned:[],unchanged:[]};
+ tasks.forEach(t=>{const a=t.project_id+"-"+t.task_id;const s=sig(t);const cur=SSOT[a];
+  if(!cur){SSOT[a]={sig:s,version:1};rep.added.push(a);}
+  else if(cur.sig!==s){HIST.push({anchor:a,version:cur.version});SSOT[a]={sig:s,version:cur.version+1};rep.versioned.push(a);}
+  else rep.unchanged.push(a);});
+ return rep;
+}
+function statusBadge(t){const a=t.project_id+"-"+t.task_id;const v=SSOT[a];if(!v)return'';return v.version>1?`<span class="badge b-ver">v${v.version}</span>`:`<span class="badge b-add">v1</span>`;}
+
+function render(){
+ const rep=sync(); const conf=detectConflicts();
+ $("taskBody").innerHTML=tasks.map((t,i)=>`<tr>
+  <td><span class="anchor">${t.project_id}-${t.task_id}</span></td>
+  <td><input class="cellin" style="width:150px" value="${t.name}" data-i="${i}" data-k="name"></td>
+  <td><input class="cellin" style="width:56px" value="${t.resource}" data-i="${i}" data-k="resource"></td>
+  <td><input class="cellin" style="width:82px" value="${t.start}" data-i="${i}" data-k="start"></td>
+  <td><input class="cellin" style="width:82px" value="${t.finish}" data-i="${i}" data-k="finish"></td>
+  <td><input class="cellin" style="width:32px" value="${t.pct}" data-i="${i}" data-k="pct"></td>
+  <td><input class="cellin" style="width:44px" value="${t.predecessors}" data-i="${i}" data-k="predecessors"></td>
+  <td><input class="cellin" style="width:70px" value="${t.part}" data-i="${i}" data-k="part"></td>
+  <td>${statusBadge(t)}</td></tr>`).join("");
+ $("taskBody").querySelectorAll(".cellin").forEach(el=>el.oninput=e=>{tasks[+e.target.dataset.i][e.target.dataset.k]=e.target.value;render();});
+ $("conflicts").innerHTML=conf.map(c=>`<div class="conf"><b>[${c.type==='schedule'?'排程死結':'資源超載'}] ${c.task}</b> ${c.detail}</div>`).join("");
+ $("ver").textContent=conf.length?"UNVERIFIED":"VERIFIED"; renderWriteback(conf); $("ver").className="ver"+(conf.length?" no":"");
+ $("syncStat").textContent=`新增 ${rep.added.length} · 版本化 ${rep.versioned.length} · 未變 ${rep.unchanged.length} · 歷史 ${HIST.length} · 衝突 ${conf.length}`;
+ // BOM 橋接
+ const parts=Object.fromEntries(bomParts.map(p=>[p.part,p])); let links=[];
+ tasks.forEach(t=>{let pid=t.part||Object.keys(parts).find(p=>t.name.includes(p));if(pid&&parts[pid])links.push({task:t.task_id,part:pid,anchor:`${pid}-${parts[pid].rev}-${parts[pid].state}`});});
+ $("linkBody").innerHTML=links.map(l=>`<tr><td>${l.task}</td><td>${l.part}</td><td class="anchor">${l.anchor}</td></tr>`).join("");
+ $("cov").textContent=(100*links.length/tasks.length).toFixed(0)+"%";
+ // scards
+ $("scards").innerHTML=`<div class="sc"><div class="v">${tasks.length}</div><div class="l">任務</div></div>
+  <div class="sc"><div class="v">${rep.versioned.length}</div><div class="l">版本化</div></div>
+  <div class="sc"><div class="v" style="color:${conf.length?'var(--up)':'var(--down)'}">${conf.length}</div><div class="l">衝突</div></div>
+  <div class="sc"><div class="v">${links.length}</div><div class="l">BOM 連結</div></div>
+  <div class="sc"><div class="v">${HIST.length}</div><div class="l">歷史(只增)</div></div>`;
+}
+
+// ── 雙向回寫 SSOT→MS Project ──
+function toMspXml(ts){
+ var uid={}; ts.forEach(function(t,i){uid[t.task_id]=i+1;});
+ var res={}; ts.forEach(function(t){if(t.resource)res[t.resource]=1;});
+ var rn=Object.keys(res); var ruid={}; rn.forEach(function(r,i){ruid[r]=i+1;});
+ var dt=function(v,tm){return v?(v.indexOf('T')>=0?v:v+'T'+tm):'';};
+ var x='<?xml version="1.0" encoding="UTF-8"?>\n<Project xmlns="http://schemas.microsoft.com/project">\n<Name>VIA_SSOT_Export</Name>\n<Tasks>\n';
+ ts.forEach(function(t,i){
+  x+='<Task><UID>'+(i+1)+'</UID><ID>'+(i+1)+'</ID><Name>'+t.name+'</Name><Active>1</Active>';
+  x+='<Start>'+dt(t.start,'08:00:00')+'</Start><Finish>'+dt(t.finish,'17:00:00')+'</Finish>';
+  x+='<PercentComplete>'+(t.pct||0)+'</PercentComplete><OutlineLevel>1</OutlineLevel>';
+  preds(t).forEach(function(p){if(uid[p])x+='<PredecessorLink><PredecessorUID>'+uid[p]+'</PredecessorUID><Type>1</Type></PredecessorLink>';});
+  x+='</Task>\n';
+ });
+ x+='</Tasks>\n<Resources>\n';
+ rn.forEach(function(r){x+='<Resource><UID>'+ruid[r]+'</UID><ID>'+ruid[r]+'</ID><Name>'+r+'</Name><Type>1</Type></Resource>\n';});
+ x+='</Resources>\n<Assignments>\n'; var au=1;
+ ts.forEach(function(t,i){if(t.resource&&ruid[t.resource]){x+='<Assignment><UID>'+(au++)+'</UID><TaskUID>'+(i+1)+'</TaskUID><ResourceUID>'+ruid[t.resource]+'</ResourceUID><Units>1</Units></Assignment>\n';}});
+ x+='</Assignments>\n</Project>';
+ return x;
+}
+var WB_XML='';
+function renderWriteback(conf){
+ var cset={}; conf.forEach(function(c){cset[c.task]=1;});
+ var wb=[], held=[];
+ tasks.forEach(function(t){ if(cset[t.task_id]) held.push(t); else wb.push(t); });
+ WB_XML=toMspXml(wb);
+ document.getElementById('wbBody').innerHTML=tasks.map(function(t){
+  var h=cset[t.task_id];
+  return '<tr><td class="anchor">'+t.project_id+'-'+t.task_id+'</td><td>'+t.name+'</td>'+
+   '<td>'+(h?'<span class="badge b-cf">保留·待核可</span>':'<span class="badge b-add">可回寫</span>')+'</td></tr>';
+ }).join('');
+ document.getElementById('wbStat').textContent='可回寫 '+wb.length+' · 保留 '+held.length;
+ document.getElementById('rtStat').textContent='已產生 '+wb.length+' 任務 XML · 核可閘門保護衝突任務';
+}
+document.getElementById('dlXml').onclick=function(){
+ var b=new Blob([WB_XML],{type:'application/xml'});var a=document.createElement('a');
+ a.href=URL.createObjectURL(b);a.download='VIA_SSOT_to_MSProject.xml';a.click();
+};
+
+$("addT").onclick=()=>{const n=tasks.length+1;tasks.push({project_id:"AI-RACK",task_id:"T"+n,name:"新任務",resource:"",start:"2026-07-01",finish:"2026-07-05",pct:0,predecessors:"",part:""});render();};
+$("reSync").onclick=render;
+
+// SAP 知識渲染
+$("qdv").innerHTML=Object.entries(SAP.alt).map(([k,v])=>`<div class="qc"><div class="k">${k}</div><div class="n">${v.name}</div><div class="d">${v.cue}<br>${v.logic}</div></div>`).join("");
+$("tcodes").innerHTML=Object.entries(SAP.tcodes).map(([c,d])=>`<div class="tc"><b>${c}</b><span>${d}</span></div>`).join("");
+const cols=["#4c78a8","#5a9e6f","#c4943a","#c96b5a"];
+$("noexp").innerHTML=SAP.noexp.map((n,i)=>`<div class="fl" style="background:${cols[i]}">${i+1}. ${n.stage}<div style="font-weight:400;font-size:8px;margin-top:3px;opacity:.9">${n.detail}</div></div>`).join("");
+render();
+</script><script>
+(function(){
+ function cellText(td){var el=td.querySelector('input,select,textarea');
+  var v=el?(el.value||''):td.textContent;return (v||'').trim().replace(/\|/g,'\\|').replace(/\s+/g,' ');}
+ function tableToMd(tbl){
+  var heads=tbl.tHead?Array.prototype.slice.call(tbl.tHead.rows):[];
+  var body=tbl.tBodies.length?Array.prototype.slice.call(tbl.tBodies[0].rows):Array.prototype.slice.call(tbl.rows);
+  var hRow=heads.length?heads[heads.length-1]:body.shift();
+  if(!hRow)return '';
+  var cols=Array.prototype.map.call(hRow.cells,cellText);
+  var out='| '+cols.join(' | ')+' |\n| '+cols.map(function(){return '---';}).join(' | ')+' |\n';
+  body.forEach(function(tr){out+='| '+Array.prototype.map.call(tr.cells,cellText).join(' | ')+' |\n';});
+  return out;
+ }
+ window.exportPageMarkdown=function(){
+  var title=document.querySelector('h1')?document.querySelector('h1').innerText.trim():'VIA';
+  var kick=document.querySelector('.kicker')?document.querySelector('.kicker').innerText.trim():'';
+  var md='# '+title+'\n\n';
+  if(kick)md+='> '+kick+'\n\n';
+  md+='_匯出 '+new Date().toISOString().slice(0,19).replace('T',' ')+' · VIA · append-only_\n\n';
+  var nodes=document.querySelectorAll('h2, table');
+  Array.prototype.forEach.call(nodes,function(n){
+   if(n.tagName==='H2'){md+='\n## '+n.innerText.trim().replace(/\s+/g,' ')+'\n\n';}
+   else{var t=tableToMd(n);if(t)md+=t+'\n';}
+  });
+  var blob=new Blob([md],{type:'text/markdown'});var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=(title.replace(/[^\w\u4e00-\u9fff]+/g,'_').slice(0,40)||'VIA')+'.md';a.click();
+ };
+ // 加 MD 按鈕（在 PDF 左側）— 立即掛載（腳本在 body 尾端）
+ function addBtn(){if(document.getElementById('viaMdBtn'))return;var b=document.createElement('button');
+  b.id='viaMdBtn';b.textContent='\u2913 MD';b.className='pdf';b.style.right='66px';
+  b.onclick=window.exportPageMarkdown;document.body.appendChild(b);}
+ if(document.body)addBtn();else window.addEventListener('DOMContentLoaded',addBtn);
+})();
+</script>
+</body></html>

@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f4f0; --bg2:#e5e3df; --paper:#ffffff; --paper2:#fafaf8;
+    --ink:#1e1d1a; --ink2:#33403f; --mut:#6b6860; --mut2:#9c9890;
+    --line:#dbd9d3; --soft:#ecebe6;
+    --blue:#4c78a8; --grey:#9c9890; --teal:#439a9a;
+    --up:#c96b5a; --down:#5a9e6f; --am:#c4943a; --co:#c96b5a; --vi:#7a6daa; --gn:#5a9e6f; --ro:#b05580;
+    --green:#2d8659; --amber:#c4943a; --red:#b85450; --accent:#439a9a;
+    --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);}
+  body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  ::selection{background:rgba(67,154,154,.22);}
+  @media print{@page{size:A4;margin:11mm}html,body{background:#fff !important}.__pdfbtn{display:none !important}*{box-shadow:none !important}[style*="position:sticky"]{position:static !important}[style*="overflow-y:auto"],[style*="overflow:auto"],[style*="overflow-x:auto"]{overflow:visible !important;max-height:none !important}table,section{break-inside:avoid}}
+</style>
+<script>window.addEventListener('load',function(){if(document.getElementById('__pdfbtn'))return;var b=document.createElement('div');b.id='__pdfbtn';b.className='__pdfbtn';b.innerHTML='<img src="assets/pdf-icon.png" alt="PDF" style="width:30px;height:30px;display:block">';b.style.cssText='position:fixed;top:12px;right:14px;z-index:99999;background:transparent;border:none;padding:0;cursor:pointer';b.onclick=function(){window.print()};document.body.appendChild(b);});</script>
+</helmet>
+
+<div ref="{{ rootRef }}" style="max-width:1320px;margin:0 auto;padding:0 22px 46px;">
+
+  <div style="position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50;"></div>
+
+  <div style="position:sticky;top:0;z-index:48;background:var(--bg);box-shadow:0 6px 12px -8px rgba(31,42,42,.3);">
+  <header style="position:relative;padding:18px 0 8px;margin-bottom:8px;border-bottom:2px solid var(--ink);">
+    <div style="font:700 10px 'DM Mono',monospace;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px;">VERITAS INTELLIGENCE ANALYTICS · 族群自動分類 + 代碼對照</div>
+    <h1 style="font:800 18px/1.2 'Syne',sans-serif;color:var(--ink);">族群分類 <span style="color:var(--up);">與代碼</span> · Stock Grouping &amp; Coding</h1>
+    <p style="margin-top:5px;font:400 10.5px/1.5 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:920px;">族群引擎以 <b style="color:var(--ink2);">hotness × leadership</b>（非勝率）將個股分為 Leader / Peer / Laggard；歸一類視為無效。代碼一律由 <b style="color:var(--ink2);">TW_TICKER</b> 四碼衍生 yfinance(.TW/.TWO) 與 Bloomberg(TT)。紅漲綠跌。</p>
+  </header>
+
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#1e1d1a;border-radius:3px;padding:6px 13px;margin-bottom:12px;">
+    <span style="display:inline-flex;align-items:center;gap:6px;font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase;">🔒 VISUAL LOCK · 全格式鎖定</span>
+    <span style="display:inline-flex;align-items:center;gap:4px;font:500 8px 'DM Mono',monospace;color:#cfcabf;">色票
+      <span style="width:11px;height:11px;border-radius:2px;background:#4c78a8;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#439a9a;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#9c9890;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#c96b5a;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#5a9e6f;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#f5f4f0;border:1px solid #555;"></span>
+    </span>
+    <span style="font:500 8px 'DM Mono',monospace;color:#8a948f;">字體 Syne / DM Sans / DM Mono</span>
+    <span style="font:500 8px 'DM Mono',monospace;color:#8a948f;">紅漲綠跌 · 千分位 · 熱力色階</span>
+    <span style="margin-left:auto;font:700 8px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:2px 8px;">v1.0 · LOCKED 2026-06-22</span>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;background:#fff;border:1px solid #dbd9d3;border-left:3px solid #439a9a;border-radius:3px;padding:6px 13px;margin-bottom:12px;">
+    <span style="font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;">🛰 資料請求 · VDF ENGINES</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">TWSE→rest</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#c4943a;border-radius:3px;padding:1px 6px;">SITCA→parse</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">MOPS→parse</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">yfinance→pyproc</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#c0584e;border-radius:3px;padding:1px 6px;">FactSet→keyed</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">FRED→keyed</span>
+    <span style="margin-left:auto;font:500 8px 'DM Mono',monospace;color:#9c9890;">request.json → VDF 擷取 → 雙重驗算 → Parquet → JSON</span>
+  </div>
+  <details data-contract="1" style="margin-bottom:12px;border:1px solid #dbd9d3;border-left:3px solid #1e1d1a;border-radius:3px;background:#fbfaf7;overflow:hidden;">
+    <summary style="cursor:pointer;user-select:none;padding:6px 13px;font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;list-style:none;">📜 引擎連接合約 · request.json（點擊展開 · 可選取複製）</summary>
+    <pre style="margin:0;padding:10px 13px;background:#1e1d1a;color:#cfe3d6;font:500 9px/1.55 'DM Mono',monospace;white-space:pre;overflow-x:auto;">{
+  "request": "stock_grouping_coding",
+  "asof": "2026-06-22",
+  "universe": { "market": "TW", "exchange": ["TWSE","TPEX"] },
+  "sources": ["TWSE","TPEX","SITCA","MOPS","yfinance","FactSet","FRED"],
+  "engines": { "TWSE":"rest","TPEX":"rest","SITCA":"parse","MOPS":"parse","yfinance":"pyproc","FactSet":"keyed","FRED":"keyed" },
+  "range": { "start":"1996-01-01","end":"latest" },
+  "verify": "double_identity",
+  "db_discover": { "folder":"D:\\VDF\\databases\\","recursive":true,"match":["*.parquet","*.duckdb","*.db","*.csv"] },
+  "sink": { "parquet":"vdf/stock_grouping_coding/","export":"stock_grouping_coding.json" }
+}</pre>
+    <div style="padding:6px 13px;font:400 8px 'DM Sans','Noto Sans TC',sans-serif;color:#9c9890;">本檔即以此合約向 VDF 引擎請求 → 依 engines 分流(rest/parse/pyproc/keyed) → 雙重恆等驗算 → 落地 Parquet → 匯出 <b style="color:#6b6860;">stock_grouping_coding.json</b> 覆蓋本頁資料源。</div>
+  </details>
+
+  <div style="display:flex;gap:4px;margin-bottom:0;border-bottom:1px solid var(--line);position:relative;background:var(--bg);padding-top:6px;">
+    <div onClick="{{ tabGroup }}" style="font:700 11px 'Syne',sans-serif;padding:7px 14px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;position:relative;top:1px;user-select:none;{{ tcGroup }}">🧬 族群分類矩陣</div>
+    <div onClick="{{ tabCode }}" style="font:700 11px 'Syne',sans-serif;padding:7px 14px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;position:relative;top:1px;user-select:none;{{ tcCode }}">🔣 代碼對照表</div>
+    <div onClick="{{ tabCorr }}" style="font:700 11px 'Syne',sans-serif;padding:7px 14px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;position:relative;top:1px;user-select:none;{{ tcCorr }}">🔗 相關熱力圖</div>
+    <div onClick="{{ tabLogic }}" style="font:700 11px 'Syne',sans-serif;padding:7px 14px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;position:relative;top:1px;user-select:none;{{ tcLogic }}">🧠 分類邏輯</div>
+    <div onClick="{{ tabRot }}" style="font:700 11px 'Syne',sans-serif;padding:7px 14px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;position:relative;top:1px;user-select:none;{{ tcRot }}">💧 族群輪動</div>
+    <div onClick="{{ tabPeers }}" style="font:700 11px 'Syne',sans-serif;padding:7px 14px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;position:relative;top:1px;user-select:none;{{ tcPeers }}">🌐 國際同業</div>
+    <div onClick="{{ tabAttr }}" style="font:700 11px 'Syne',sans-serif;padding:7px 14px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;position:relative;top:1px;user-select:none;{{ tcAttr }}">📐 個股屬性</div>
+    <div onClick="{{ tabRisk }}" style="font:700 11px 'Syne',sans-serif;padding:7px 14px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;position:relative;top:1px;user-select:none;{{ tcRisk }}">📉 風險指標</div>
+  </div>
+  </div>
+
+  <!-- summary scorecards -->
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:13px;">
+    <sc-for list="{{ scoreCards }}" as="s" hint-placeholder-count="5">
+      <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid {{ s.color }};border-radius:2px;padding:8px 11px;">
+        <div style="font:600 8.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);margin-bottom:2px;">{{ s.l }}</div>
+        <div style="font:500 18px 'DM Mono',monospace;color:var(--ink);">{{ s.v }}</div>
+        <div style="font:500 8px 'DM Mono',monospace;color:var(--mut2);margin-top:1px;">{{ s.s }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- ===== GROUPING MATRIX ===== -->
+  <sc-if value="{{ isGroup }}">
+  <div>
+
+    <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:11px;">
+      <span style="display:inline-flex;align-items:center;gap:6px;font:600 9.5px 'DM Mono',monospace;color:var(--mut);"><span style="width:11px;height:11px;border-radius:3px;background:var(--co);"></span>Leader 領頭</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;font:600 9.5px 'DM Mono',monospace;color:var(--mut);"><span style="width:11px;height:11px;border-radius:3px;background:var(--am);"></span>Peer 同行</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;font:600 9.5px 'DM Mono',monospace;color:var(--mut);"><span style="width:11px;height:11px;border-radius:3px;background:var(--mut2);"></span>Laggard 落後</span>
+      <span style="margin-left:auto;font:600 9px 'DM Mono',monospace;color:var(--mut2);">hotness 門檻 0.40 · lead gap 0.50 · PC1 凝聚清洗</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;margin-bottom:14px;">
+      <sc-for list="{{ groupCards }}" as="g" hint-placeholder-count="6">
+        <div style="border:1px solid var(--line);border-left:3px solid {{ g.color }};border-radius:2px;overflow:hidden;background:var(--paper);">
+          <div style="display:flex;align-items:center;gap:7px;padding:6px 11px;border-bottom:1px solid var(--line);background:var(--paper2);">
+            <span style="font:700 11px 'Syne',sans-serif;color:var(--ink);">{{ g.name }}</span>
+            <span style="font:500 8px 'DM Mono',monospace;color:var(--mut);">{{ g.en }}</span>
+            <span style="margin-left:auto;font:600 8px 'DM Mono',monospace;color:#fff;background:{{ g.cohCss }};border-radius:2px;padding:1px 7px;">凝聚 {{ g.cohesion }}</span>
+          </div>
+          <table style="width:100%;border-collapse:separate;border-spacing:0;">
+            <thead><tr>
+              <th style="text-align:left;padding:4px 10px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">個股</th>
+              <th style="text-align:center;padding:4px 6px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">分類</th>
+              <th style="text-align:center;padding:4px 6px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">熱門</th>
+              <th style="text-align:center;padding:4px 6px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">領先</th>
+              <th style="text-align:right;padding:4px 10px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">日%</th>
+            </tr></thead>
+            <tbody>
+              <sc-for list="{{ g.members }}" as="m" hint-placeholder-count="5">
+                <tr style="background:{{ m.bg }};">
+                  <td style="padding:4px 10px;border-top:1px solid var(--soft);font:600 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);white-space:nowrap;">{{ m.name }} <span style="font:500 8px 'DM Mono',monospace;color:var(--mut2);">{{ m.code }}</span></td>
+                  <td style="padding:4px 6px;border-top:1px solid var(--soft);text-align:center;"><span style="font:700 7.5px 'DM Mono',monospace;color:#fff;background:{{ m.clsCss }};border-radius:2px;padding:1px 6px;">{{ m.cls }}</span> <span style="font:600 7px 'DM Mono',monospace;color:var(--mut2);">{{ m.exclTag }}</span></td>
+                  <td style="padding:4px 6px;border-top:1px solid var(--soft);text-align:center;font:600 9px 'DM Mono',monospace;color:var(--ink);">{{ m.hot }}</td>
+                  <td style="padding:4px 6px;border-top:1px solid var(--soft);text-align:center;font:600 9px 'DM Mono',monospace;color:var(--ink);">{{ m.lead }}</td>
+                  <td style="padding:4px 10px;border-top:1px solid var(--soft);text-align:right;font:600 9px 'DM Mono',monospace;{{ m.chgCss }}">{{ m.chg }}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+          <div style="display:flex;align-items:center;gap:6px;padding:5px 10px;border-top:1px solid var(--line);background:var(--paper2);">
+            <span style="font:700 7px 'DM Mono',monospace;color:#fff;background:{{ g.color }};border-radius:2px;padding:1px 6px;flex:none;">國際龍頭</span>
+            <span style="font:600 8.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ g.leader }}</span>
+            <span style="font:500 8px 'DM Mono',monospace;color:var(--mut2);flex:none;">{{ g.leaderTk }}</span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:2px;padding:10px 13px;font:400 10.5px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);"><b style="color:var(--ink);">方法：</b>有效性＝<b style="color:var(--ink2);">hotness × leadership</b>（「大家都愛買最好的」），非 win-rate。熱門度＝真實量能＋法人淨買＋融資使用率 z 分數（門檻 0.40）；領先性＝CCF 領先（負 lag = 領先，lead gap 門檻 0.50）。Leader↔Laggard 無差別 → 歸一類。凝聚清洗：cohesion cleaning + 踢除脫隊股 + PC1 解釋變異。<b style="color:var(--co);">Laggard（網路提及但競爭力不佳/濫竽充數）一律收錄並標註，但不列入族群指數計算（族群指數＝Leader+Peer 之 Normalized ADJ Close 平均）。</b></div>
+
+  </div>
+  </sc-if>
+
+  <!-- ===== CODE MAP ===== -->
+  <sc-if value="{{ isCode }}">
+  <div>
+
+    <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:11px;font:600 9px 'DM Mono',monospace;color:var(--mut);">
+      <span style="background:rgba(201,107,90,.12);color:var(--co);padding:2px 8px;border-radius:2px;">TW_TICKER 核心四碼</span>
+      <span>→</span>
+      <span style="background:rgba(90,158,111,.14);color:var(--gn);padding:2px 8px;border-radius:2px;">YFINANCE .TW/.TWO</span>
+      <span>→</span>
+      <span style="background:rgba(122,109,170,.14);color:var(--vi);padding:2px 8px;border-radius:2px;">BLOOMBERG TT</span>
+      <span style="margin-left:auto;color:var(--mut2);">同一報告三碼前四位必相同 · 禁止反寫覆蓋</span>
+    </div>
+
+    <div style="border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper);overflow-x:auto;">
+      <table style="width:100%;border-collapse:separate;border-spacing:0;min-width:780px;">
+        <thead><tr>
+          <th style="text-align:left;padding:7px 11px;font:700 9px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">個股</th>
+          <th style="text-align:left;padding:7px 11px;font:700 9px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">TW_TICKER</th>
+          <th style="text-align:center;padding:7px 11px;font:700 9px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">市場</th>
+          <th style="text-align:left;padding:7px 11px;font:700 9px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">YFINANCE</th>
+          <th style="text-align:left;padding:7px 11px;font:700 9px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">BLOOMBERG</th>
+          <th style="text-align:left;padding:7px 11px;font:700 9px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">族群</th>
+          <th style="text-align:center;padding:7px 11px;font:700 9px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">分類</th>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ codeRows }}" as="r" hint-placeholder-count="12">
+            <tr style="background:{{ r.bg }};">
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);font:600 9.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);white-space:nowrap;">{{ r.name }}</td>
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);font:600 10px 'DM Mono',monospace;color:var(--co);">{{ r.tw }}</td>
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);text-align:center;"><span style="font:700 7.5px 'DM Mono',monospace;color:#fff;background:{{ r.mktCss }};border-radius:2px;padding:1px 6px;">{{ r.mkt }}</span></td>
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);font:500 9.5px 'DM Mono',monospace;color:var(--gn);">{{ r.yf }}</td>
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);font:500 9.5px 'DM Mono',monospace;color:var(--vi);">{{ r.bbg }}</td>
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);font:400 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">{{ r.group }}</td>
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);text-align:center;"><span style="font:700 7.5px 'DM Mono',monospace;color:#fff;background:{{ r.clsCss }};border-radius:2px;padding:1px 6px;">{{ r.cls }}</span></td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--blue);border-radius:2px;padding:10px 13px;margin-top:11px;font:400 10.5px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);"><b style="color:var(--ink);">代碼規則：</b>TWSE 上市 → <code style="font-family:'DM Mono',monospace;color:var(--gn);">XXXX.TW</code>；TPEX 上櫃 → <code style="font-family:'DM Mono',monospace;color:var(--gn);">XXXX.TWO</code>；Bloomberg → <code style="font-family:'DM Mono',monospace;color:var(--vi);">XXXX TT</code>。yfinance 抓不到僅可 fallback / 標記複查，<b style="color:var(--co);">不得竄改 TW_TICKER</b>。</div>
+
+  </div>
+  </sc-if>
+
+  <!-- ===== CORRELATION HEATMAP ===== -->
+  <sc-if value="{{ isCorr }}">
+  <div>
+
+    <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:11px;font:600 9px 'DM Mono',monospace;color:var(--mut);">
+      <span style="font-weight:700;color:var(--ink2);">族群相關矩陣</span>
+      <span style="background:rgba(67,154,154,.14);color:var(--teal);padding:2px 8px;border-radius:2px;">cophenetic 0.995</span>
+      <span style="background:rgba(76,120,168,.12);color:var(--blue);padding:2px 8px;border-radius:2px;">階層聚類一致</span>
+      <span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;">低
+        <span style="width:64px;height:9px;border-radius:2px;background:linear-gradient(90deg,#eef3f4,var(--teal),var(--co));display:inline-block;"></span>高</span>
+    </div>
+
+    <div style="border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper);overflow-x:auto;margin-bottom:14px;">
+      <table style="border-collapse:separate;border-spacing:0;width:100%;min-width:560px;">
+        <thead><tr>
+          <th style="padding:6px 9px;background:var(--soft);border-bottom:1px solid var(--line);"></th>
+          <sc-for list="{{ corrCols }}" as="c" hint-placeholder-count="6">
+            <th style="padding:6px 8px;font:700 8px 'Syne',sans-serif;color:var(--ink);background:var(--soft);border-bottom:1px solid var(--line);text-align:center;white-space:nowrap;">{{ c }}</th>
+          </sc-for>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ corrRows }}" as="r" hint-placeholder-count="6">
+            <tr>
+              <td style="padding:5px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);background:var(--soft);border-top:1px solid var(--line);white-space:nowrap;">{{ r.label }}</td>
+              <sc-for list="{{ r.cells }}" as="x" hint-placeholder-count="6">
+                <td title="{{ x.tip }}" style="border-top:1px solid #fff;border-left:1px solid #fff;text-align:center;font:600 8.5px 'DM Mono',monospace;color:{{ x.fg }};background:{{ x.bg }};min-width:54px;cursor:default;">{{ x.t }}</td>
+              </sc-for>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+
+    <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:2px;padding:10px 13px;font:400 10.5px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);"><b style="color:var(--ink);">解讀：</b>對角線=群內凝聚（高），離對角=跨族群連動。半導體↔AI 伺服器相關偏高（供應鏈連動），金融自成一格（低跨群相關）。<b style="color:var(--ink2);">cophenetic 0.995</b>：階層聚類樹狀圖與原始距離高度一致，切群結果穩定。<b style="color:var(--co);">亦用於偵測同群中與群相關度過低的 Laggard（濫竽充數）→ 標註不列入指數。</b></div>
+
+  </div>
+  </sc-if>
+
+  <!-- ===== CLASSIFICATION LOGIC PIPELINE ===== -->
+  <sc-if value="{{ isLogic }}">
+  <div>
+
+    <!-- pipeline flow -->
+    <div style="display:flex;align-items:stretch;gap:8px;flex-wrap:wrap;margin-bottom:13px;">
+      <sc-for list="{{ pipeline }}" as="s" hint-placeholder-count="4">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="border:1px solid var(--line);border-top:3px solid {{ s.color }};border-radius:2px;background:var(--paper);padding:9px 13px;min-width:150px;">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;"><span style="font:800 9px 'DM Mono',monospace;color:#fff;background:{{ s.color }};border-radius:2px;padding:1px 6px;">{{ s.n }}</span><span style="font:700 10.5px 'Syne',sans-serif;color:var(--ink);">{{ s.title }}</span></div>
+            <div style="font:400 9px/1.45 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">{{ s.desc }}</div>
+          </div>
+          <sc-if value="{{ s.arrow }}"><span style="font:500 16px 'DM Mono',monospace;color:var(--mut2);">→</span></sc-if>
+        </div>
+      </sc-for>
+    </div>
+
+    <!-- validation criteria -->
+    <div style="font:700 12px 'Syne',sans-serif;color:var(--ink);margin:4px 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">有效性驗證 · 三項檢定<span style="font:600 8px 'DM Mono',monospace;color:#fff;background:var(--co);border-radius:2px;padding:2px 8px;">≥2 項成立 = 分類有效</span></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:13px;">
+      <sc-for list="{{ criteria }}" as="c" hint-placeholder-count="3">
+        <div style="border:1px solid var(--line);border-left:3px solid {{ c.color }};border-radius:2px;background:var(--paper);padding:10px 13px;">
+          <div style="font:700 10.5px 'Syne',sans-serif;color:var(--ink);margin-bottom:2px;">{{ c.title }}</div>
+          <div style="font:500 8px 'DM Mono',monospace;color:var(--mut2);margin-bottom:6px;">{{ c.en }}</div>
+          <div style="font:400 9.5px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">{{ c.desc }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <!-- effectiveness table -->
+    <div style="font:700 12px 'Syne',sans-serif;color:var(--ink);margin:4px 0 8px;">分類有效性 · 逐族群驗收</div>
+    <div style="border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper);overflow-x:auto;margin-bottom:13px;">
+      <table style="width:100%;border-collapse:separate;border-spacing:0;min-width:680px;">
+        <thead><tr>
+          <th style="text-align:left;padding:6px 11px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">族群</th>
+          <th style="text-align:center;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">同步性</th>
+          <th style="text-align:center;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">領先性</th>
+          <th style="text-align:center;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">前瞻單調</th>
+          <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">Leader報酬</th>
+          <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">^TWII</th>
+          <th style="text-align:center;padding:6px 11px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">判定</th>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ effRows }}" as="e" hint-placeholder-count="7">
+            <tr style="background:{{ e.bg }};">
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);font:600 9.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);white-space:nowrap;">{{ e.name }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:center;font:700 10px 'DM Mono',monospace;{{ e.syncCss }}">{{ e.sync }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:center;font:700 10px 'DM Mono',monospace;{{ e.leadCss }}">{{ e.lead }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:center;font:700 10px 'DM Mono',monospace;{{ e.monoCss }}">{{ e.mono }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:600 9.5px 'DM Mono',monospace;{{ e.lrCss }}">{{ e.lr }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:500 9.5px 'DM Mono',monospace;color:var(--mut);">{{ e.tw }}</td>
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);text-align:center;"><span style="font:700 7.5px 'DM Mono',monospace;color:#fff;background:{{ e.verCss }};border-radius:2px;padding:1px 7px;">{{ e.verdict }}</span></td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- module contract -->
+    <div style="border:1px solid var(--line);border-left:3px solid var(--ink);border-radius:2px;background:var(--paper2);padding:10px 13px;font:400 10px/1.7 'DM Mono',monospace;color:var(--ink2);">
+      <div style="font:700 10px 'Syne',sans-serif;color:var(--ink);margin-bottom:5px;font-family:'Syne',sans-serif;">Module Contract · 跨模組整合介面 v1.0</div>
+      <div><b style="color:var(--co);">exports</b> → GroupClassification {`{ group, members[], leaders[], peers[], laggards[], cohesion, valid }`}</div>
+      <div><b style="color:var(--teal);">options</b> → benchmark 錨點(可選) · 無風險利率(可選) · 追蹤指標 = Leader(最敏感) | Leader+Peer</div>
+      <div><b style="color:var(--am);">清洗</b> → 脫隊股以相關係數踢除 · PC1 解釋變異 · cophenetic 0.995 階層一致</div>
+      <div style="color:var(--mut);margin-top:4px;">※ 真實資料須以 walk-forward 重跑；分類為「是否有區隔」之工程檢定，非投資建議。</div>
+    </div>
+
+  </div>
+  </sc-if>
+
+  <!-- ===== GROUP ROTATION ===== -->
+  <sc-if value="{{ isRot }}">
+  <div>
+
+    <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:11px;font:600 9px 'DM Mono',monospace;color:var(--mut);">
+      <span style="font-weight:700;color:var(--ink2);">族群指數 = Leader + Peer 之 Normalized ADJ Close 平均</span>
+      <span style="background:rgba(76,120,168,.12);color:var(--blue);padding:2px 8px;border-radius:2px;">Base 2025-01-01 = 100</span>
+      <span style="margin-left:auto;color:var(--mut2);">看資金在族群間輪動 · 紅漲綠跌</span>
+    </div>
+
+    <div style="border:1px solid var(--line);border-radius:2px;background:var(--paper);padding:12px 10px 8px;margin-bottom:13px;">
+      <div style="width:100%;overflow-x:auto;">{{ rotSvg }}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;padding:8px 6px 2px;border-top:1px solid var(--soft);margin-top:6px;">
+        <sc-for list="{{ rotLegend }}" as="l" hint-placeholder-count="7">
+          <span onClick="{{ l.toggle }}" style="display:inline-flex;align-items:center;gap:6px;font:600 9px 'DM Mono',monospace;cursor:pointer;user-select:none;{{ l.dimCss }}">
+            <span style="width:14px;height:3px;border-radius:2px;background:{{ l.color }};display:inline-block;"></span>{{ l.name }}
+            <span style="font-weight:700;{{ l.endCss }}">{{ l.end }}</span>
+          </span>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- rotation ranking -->
+    <div style="border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper);overflow-x:auto;">
+      <table style="width:100%;border-collapse:separate;border-spacing:0;min-width:560px;">
+        <thead><tr>
+          <th style="text-align:left;padding:6px 11px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">排名 · 族群指數</th>
+          <th style="text-align:center;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">成分(L+P)</th>
+          <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">當前指數</th>
+          <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">累計%</th>
+          <th style="text-align:right;padding:6px 11px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">近月動能</th>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ rotRank }}" as="r" hint-placeholder-count="7">
+            <tr style="background:{{ r.bg }};">
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);font:600 9.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);"><span style="display:inline-block;width:14px;height:3px;border-radius:2px;background:{{ r.color }};vertical-align:middle;margin-right:7px;"></span>{{ r.rank }}　{{ r.name }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:center;font:500 8.5px 'DM Mono',monospace;color:var(--mut);">{{ r.members }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:600 9.5px 'DM Mono',monospace;color:var(--ink);">{{ r.idx }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:600 9.5px 'DM Mono',monospace;{{ r.cumCss }}">{{ r.cum }}</td>
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);text-align:right;font:600 9.5px 'DM Mono',monospace;{{ r.momCss }}">{{ r.mom }}</td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+  </sc-if>
+
+  <!-- ===== INTERNATIONAL PEERS ===== -->
+  <sc-if value="{{ isPeers }}">
+  <div>
+
+    <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:11px;font:600 9px 'DM Mono',monospace;color:var(--mut);">
+      <span style="font-weight:700;color:var(--ink2);">國際前十大同業（限上市）</span>
+      <span style="background:rgba(67,154,154,.14);color:var(--teal);padding:2px 8px;border-radius:2px;">listed only · 未上市剔除</span>
+      <span style="margin-left:auto;color:var(--mut2);">台廠以族群色標記 · 交易所代碼</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;">
+      <sc-for list="{{ peerCards }}" as="g" hint-placeholder-count="10">
+        <div style="border:1px solid var(--line);border-left:3px solid {{ g.color }};border-radius:2px;overflow:hidden;background:var(--paper);">
+          <div style="display:flex;align-items:center;gap:7px;padding:6px 11px;border-bottom:1px solid var(--line);background:var(--paper2);">
+            <span style="font:700 11px 'Syne',sans-serif;color:var(--ink);">{{ g.name }}</span>
+            <span style="font:500 8px 'DM Mono',monospace;color:var(--mut);">{{ g.en }}</span>
+            <span style="margin-left:auto;font:600 8px 'DM Mono',monospace;color:var(--mut2);">Top {{ g.count }}</span>
+          </div>
+          <table style="width:100%;border-collapse:separate;border-spacing:0;">
+            <tbody>
+              <sc-for list="{{ g.peers }}" as="p" hint-placeholder-count="10">
+                <tr style="background:{{ p.bg }};">
+                  <td style="padding:4px 11px;border-top:1px solid var(--soft);text-align:right;font:600 9px 'DM Mono',monospace;color:var(--mut2);width:22px;">{{ p.rank }}</td>
+                  <td style="padding:4px 8px;border-top:1px solid var(--soft);font:600 9.5px 'DM Sans','Noto Sans TC',sans-serif;{{ p.nameCss }}">{{ p.name }}</td>
+                  <td style="padding:4px 11px;border-top:1px solid var(--soft);text-align:right;font:500 9px 'DM Mono',monospace;color:{{ p.tickCol }};white-space:nowrap;">{{ p.ticker }}</td>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--am);border-radius:2px;padding:10px 13px;margin-top:12px;font:400 10.5px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);"><b style="color:var(--ink);">規則：</b>僅列<b style="color:var(--ink2);">上市</b>同業；未上市（如 SpaceX、Boyd）標「—」剔除。台廠以族群色高亮，代碼含交易所（.TW/.T/.KS/.SS/.SZ/.HK/NYSE/Nasdaq…），可直接餵 yfinance。</div>
+
+  </div>
+  </sc-if>
+
+  <!-- ===== STOCK ATTRIBUTES ===== -->
+  <sc-if value="{{ isAttr }}">
+  <div>
+    <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:11px;font:600 9px 'DM Mono',monospace;color:var(--mut);">
+      <span style="font-weight:700;color:var(--ink2);">個股屬性</span>
+      <span style="background:rgba(201,107,90,.12);color:var(--co);padding:2px 8px;border-radius:2px;">大/中/小型股</span>
+      <span style="background:rgba(76,120,168,.12);color:var(--blue);padding:2px 8px;border-radius:2px;">外資/內資主導</span>
+      <span style="background:rgba(196,148,58,.16);color:var(--am);padding:2px 8px;border-radius:2px;">當沖比率</span>
+      <span style="margin-left:auto;color:var(--mut2);">市值級距 · 籌碼結構 · 投機度</span>
+    </div>
+    <div style="border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper);overflow-x:auto;">
+      <table style="width:100%;border-collapse:separate;border-spacing:0;min-width:720px;">
+        <thead><tr>
+          <th style="text-align:left;padding:6px 11px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">個股</th>
+          <th style="text-align:left;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">族群</th>
+          <th style="text-align:center;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">市值級距</th>
+          <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">市值(億)</th>
+          <th style="text-align:center;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">籌碼主導</th>
+          <th style="text-align:left;padding:6px 11px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);width:150px;">當沖比率</th>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ attrRows }}" as="r" hint-placeholder-count="12">
+            <tr style="background:{{ r.bg }};">
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);font:600 9.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);white-space:nowrap;">{{ r.name }} <span style="font:500 8px 'DM Mono',monospace;color:var(--mut2);">{{ r.code }}</span></td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);font:400 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">{{ r.group }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:center;"><span style="font:700 7.5px 'DM Mono',monospace;color:#fff;background:{{ r.capCss }};border-radius:2px;padding:1px 7px;">{{ r.cap }}</span></td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:600 9.5px 'DM Mono',monospace;color:var(--ink);font-variant-numeric:tabular-nums;">{{ r.mcap }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:center;"><span style="font:700 7.5px 'DM Mono',monospace;color:#fff;background:{{ r.ownCss }};border-radius:2px;padding:1px 7px;">{{ r.own }}</span></td>
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);">
+                <div style="display:flex;align-items:center;gap:7px;">
+                  <div style="flex:1;height:7px;background:var(--soft);border-radius:3px;overflow:hidden;"><div style="height:100%;width:{{ r.dtW }};background:{{ r.dtCss }};"></div></div>
+                  <span style="font:600 9px 'DM Mono',monospace;color:{{ r.dtCss }};min-width:30px;text-align:right;">{{ r.dt }}</span>
+                </div>
+              </td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+    <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:2px;padding:10px 13px;margin-top:11px;font:400 10px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);"><b style="color:var(--ink);">分級：</b>市值 <b style="color:var(--co);">大型 ≥3000億</b> / <b style="color:var(--am);">中型 500–3000億</b> / <b style="color:var(--mut2);">小型 &lt;500億</b>。<b style="color:var(--ink);">籌碼</b>：外資持股+買超主導 vs 內資(投信/自營/散戶)主導。<b style="color:var(--ink);">當沖比率</b>：當日沖銷成交占比，>40% 投機度高(紅)、20–40% 中(琥珀)、&lt;20% 低(綠)。</div>
+  </div>
+  </sc-if>
+
+  <!-- ===== RISK METRICS (2005~) ===== -->
+  <sc-if value="{{ isRisk }}">
+  <div>
+    <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:11px;font:600 9px 'DM Mono',monospace;color:var(--mut);">
+      <span style="font-weight:700;color:var(--ink2);">風險指標矩陣 · 2005~ adj close</span>
+      <span style="background:rgba(76,120,168,.12);color:var(--blue);padding:2px 8px;border-radius:2px;">Benchmark ^TWII</span>
+      <span style="background:rgba(67,154,154,.14);color:var(--teal);padding:2px 8px;border-radius:2px;">RF 台灣十年期公債 1.6%</span>
+      <span style="background:rgba(196,148,58,.16);color:var(--am);padding:2px 8px;border-radius:2px;">MaxDD · Beta · SD · Corr · Sharpe</span>
+    </div>
+    <div style="border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper);overflow-x:auto;margin-bottom:12px;">
+      <table style="width:100%;border-collapse:separate;border-spacing:0;min-width:820px;">
+        <thead><tr>
+          <th style="text-align:left;padding:6px 10px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);background:var(--soft);border-bottom:1px solid var(--line);">個股</th>
+          <th style="text-align:left;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);background:var(--soft);border-bottom:1px solid var(--line);">代碼</th>
+          <th style="text-align:left;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);background:var(--soft);border-bottom:1px solid var(--line);">族群</th>
+          <th style="text-align:left;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);background:var(--soft);border-bottom:1px solid var(--line);">分級</th>
+          <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);background:var(--soft);border-bottom:1px solid var(--line);">年化%</th>
+          <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);background:var(--soft);border-bottom:1px solid var(--line);">MaxDD%</th>
+          <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);background:var(--soft);border-bottom:1px solid var(--line);">Beta</th>
+          <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);background:var(--soft);border-bottom:1px solid var(--line);">SD%</th>
+          <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);background:var(--soft);border-bottom:1px solid var(--line);">Corr</th>
+          <th style="text-align:right;padding:6px 10px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);background:var(--soft);border-bottom:1px solid var(--line);">Sharpe</th>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ riskRows }}" as="r" hint-placeholder-count="20">
+            <tr style="background:{{ r.bg }};">
+              <td style="padding:5px 10px;border-top:1px solid var(--soft);font:600 9.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);white-space:nowrap;">{{ r.name }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);font:600 9px 'DM Mono',monospace;color:var(--blue);">{{ r.code }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);font:400 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);white-space:nowrap;">{{ r.group }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);"><span style="font:700 7.5px 'DM Mono',monospace;color:#fff;background:{{ r.tierCss }};border-radius:2px;padding:1px 6px;">{{ r.tier }}</span></td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:600 9px 'DM Mono',monospace;font-variant-numeric:tabular-nums;{{ r.annCss }}">{{ r.ann }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:600 9px 'DM Mono',monospace;color:var(--co);font-variant-numeric:tabular-nums;">{{ r.maxdd }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:500 9px 'DM Mono',monospace;color:var(--ink);font-variant-numeric:tabular-nums;">{{ r.beta }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:500 9px 'DM Mono',monospace;color:var(--ink);font-variant-numeric:tabular-nums;">{{ r.sd }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:600 9px 'DM Mono',monospace;color:var(--ink2);font-variant-numeric:tabular-nums;{{ r.corrHeat }}">{{ r.corr }}</td>
+              <td style="padding:5px 10px;border-top:1px solid var(--soft);text-align:right;font:600 9px 'DM Mono',monospace;font-variant-numeric:tabular-nums;{{ r.sharpeCss }}">{{ r.sharpe }}</td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+    <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:2px;padding:10px 13px;font:400 10.5px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);"><b style="color:var(--ink);">定義：</b>取 <b style="color:var(--ink2);">2005 起 adj close</b> 計算——<b>MaxDD</b> 最大回撤、<b>Beta</b>/<b>Corr</b> 對 <b style="color:var(--blue);">^TWII</b>、<b>SD</b> 年化標準差、<b>Sharpe</b>=(年化報酬−RF)/SD，RF=<b style="color:var(--teal);">台灣十年期公債殖利率 1.6%</b>。Sharpe≥1 綠、&lt;0 紅；Corr 熱力濃度=與大盤連動度。<b style="color:var(--co);">數值為確定性 SAMPLE</b>，接真實 adj close 即更新。</div>
+  </div>
+  </sc-if>
+
+  <footer style="margin-top:22px;border-top:1px solid var(--line);padding-top:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font:500 10px 'DM Mono',monospace;color:var(--mut);">
+    <span style="font-weight:700;letter-spacing:1.3px;color:var(--ink);">VERITAS INTELLIGENCE ANALYTICS</span>
+    <span>Stock Grouping &amp; Coding · Visual Lock SSOT</span>
+  </footer>
+
+</div>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#1e1d1a"/><circle cx="32" cy="38" r="13" fill="#c96b5a"/><circle cx="66" cy="36" r="11" fill="#4c78a8"/><circle cx="50" cy="66" r="12" fill="#439a9a"/><text x="50" y="92" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#fff" font-weight="700">族群</text></svg></template>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{ &quot;$preview&quot;: { &quot;width&quot;: 1320, &quot;height&quot;: 900 } }">
+class Component extends DCLogic {
+  state = { tab: 'group', rotHidden: {} };
+
+  _rng(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+
+  _data() {
+    // [name, tw, mkt(上市/上櫃), group, cls(L/P/G), hot, lead, chg]
+    return [
+      ['台積電', '2330', '上市', '半導體', 'L', 0.92, 0.88, 1.34],
+      ['聯發科', '2454', '上市', '半導體', 'P', 0.61, 0.54, 0.82],
+      ['聯電', '2303', '上市', '半導體', 'P', 0.48, 0.41, -0.45],
+      ['世界先進', '5347', '上櫃', '半導體', 'G', 0.22, 0.18, -1.12],
+      ['力積電', '6770', '上市', '半導體', 'G', 0.18, 0.12, -1.55],
+      ['鴻海', '2317', '上市', 'AI 伺服器', 'L', 0.85, 0.79, 2.10],
+      ['廣達', '2382', '上市', 'AI 伺服器', 'P', 0.64, 0.58, 1.42],
+      ['緯創', '3231', '上市', 'AI 伺服器', 'P', 0.52, 0.49, 0.95],
+      ['緯穎', '6669', '上市', 'AI 伺服器', 'L', 0.78, 0.71, 1.88],
+      ['技嘉', '2376', '上市', 'AI 伺服器', 'G', 0.31, 0.24, -0.62],
+      ['長榮', '2603', '上市', '貨櫃航運', 'L', 0.71, 0.66, 1.24],
+      ['陽明', '2609', '上市', '貨櫃航運', 'P', 0.55, 0.47, 0.88],
+      ['萬海', '2615', '上市', '貨櫃航運', 'G', 0.28, 0.21, -0.74],
+      ['富邦金', '2881', '上市', '金融', 'L', 0.58, 0.62, 0.42],
+      ['國泰金', '2882', '上市', '金融', 'P', 0.44, 0.48, 0.31],
+      ['兆豐金', '2886', '上市', '金融', 'P', 0.39, 0.42, 0.18],
+      ['玉山金', '2884', '上市', '金融', 'G', 0.24, 0.27, -0.22],
+      ['國巨', '2327', '上市', '被動元件', 'L', 0.69, 0.63, 1.05],
+      ['華新科', '2492', '上市', '被動元件', 'P', 0.47, 0.44, 0.36],
+      ['禾伸堂', '3026', '上櫃', '被動元件', 'G', 0.26, 0.19, -0.58],
+      ['大立光', '3008', '上市', '光學', 'L', 0.66, 0.71, 0.92],
+      ['玉晶光', '3406', '上市', '光學', 'P', 0.43, 0.46, 0.24],
+      ['亞光', '3019', '上市', '光學', 'G', 0.21, 0.17, -0.81],
+      ['上銀', '2049', '上市', '機器人', 'L', 0.74, 0.68, 1.62],
+      ['台達電', '2308', '上市', '機器人', 'P', 0.59, 0.55, 0.78],
+      ['所羅門', '2359', '上市', '機器人', 'P', 0.51, 0.48, 0.66],
+      ['直得', '1597', '上櫃', '機器人', 'G', 0.29, 0.22, -0.44],
+      ['雙鴻', '3324', '上市', '散熱', 'L', 0.81, 0.74, 1.78],
+      ['奇鋐', '3017', '上市', '散熱', 'L', 0.79, 0.71, 1.66],
+      ['建準', '2421', '上市', '散熱', 'P', 0.54, 0.49, 0.62],
+      ['泰碩', '3338', '上櫃', '散熱', 'G', 0.27, 0.2, -0.55],
+      ['新盛力', '4931', '上市', 'BBU 備援電池', 'L', 0.7, 0.64, 1.32],
+      ['AES-KY', '6781', '上市', 'BBU 備援電池', 'P', 0.56, 0.5, 0.74],
+      ['加百裕', '3323', '上市', 'BBU 備援電池', 'P', 0.48, 0.43, 0.41],
+      ['順達', '3211', '上市', 'BBU 備援電池', 'G', 0.25, 0.19, -0.62],
+      ['聯亞', '3081', '上櫃', 'CPO 共封裝光學', 'L', 0.76, 0.7, 1.54],
+      ['光聖', '6442', '上櫃', 'CPO 共封裝光學', 'P', 0.52, 0.47, 0.58],
+      ['上詮', '3363', '上市', 'CPO 共封裝光學', 'P', 0.46, 0.41, 0.33],
+      ['華星光', '4979', '上櫃', 'CPO 共封裝光學', 'G', 0.24, 0.18, -0.68],
+      ['昇達科', '3491', '上櫃', '低軌衛星', 'L', 0.72, 0.66, 1.41],
+      ['台揚', '2314', '上市', '低軌衛星', 'P', 0.5, 0.45, 0.47],
+      ['啟碁', '6285', '上市', '低軌衛星', 'P', 0.47, 0.42, 0.39],
+      ['同欣電', '6271', '上市', '低軌衛星', 'G', 0.23, 0.17, -0.71],
+      ['慧洋-KY', '2637', '上市', '散裝航運', 'L', 0.64, 0.59, 0.96],
+      ['裕民', '2606', '上市', '散裝航運', 'P', 0.49, 0.44, 0.42],
+      ['新興', '2605', '上市', '散裝航運', 'P', 0.43, 0.38, 0.28],
+      ['四維航', '5608', '上市', '散裝航運', 'G', 0.22, 0.16, -0.66],
+      ['長榮航', '2618', '上市', '航空', 'L', 0.63, 0.58, 0.88],
+      ['華航', '2610', '上市', '航空', 'P', 0.51, 0.46, 0.44],
+      ['星宇', '2646', '上市', '航空', 'G', 0.3, 0.24, -0.38],
+      ['中鋼', '2002', '上市', '鋼鐵', 'L', 0.55, 0.6, 0.34],
+      ['中鴻', '2014', '上市', '鋼鐵', 'P', 0.42, 0.45, 0.2],
+      ['燁輝', '2023', '上市', '鋼鐵', 'P', 0.38, 0.41, 0.14],
+      ['官田鋼', '2017', '上市', '鋼鐵', 'G', 0.23, 0.26, -0.31],
+      ['豐興', '2015', '上市', '條鋼', 'L', 0.58, 0.62, 0.46],
+      ['東和鋼鐵', '2006', '上市', '條鋼', 'P', 0.44, 0.47, 0.26],
+      ['威致', '2028', '上市', '條鋼', 'P', 0.36, 0.39, 0.12],
+      ['春雨', '2012', '上市', '條鋼', 'G', 0.24, 0.27, -0.28],
+      ['華城', '1519', '上市', '重電', 'L', 0.83, 0.76, 1.92],
+      ['士電', '1503', '上市', '重電', 'P', 0.57, 0.52, 0.71],
+      ['中興電', '1513', '上市', '重電', 'P', 0.5, 0.46, 0.48],
+      ['亞力', '1514', '上市', '重電', 'G', 0.26, 0.2, -0.5],
+      ['漢翔', '2634', '上市', '軍工航太', 'L', 0.68, 0.62, 1.18],
+      ['雷虎', '8033', '上市', '軍工航太', 'P', 0.49, 0.44, 0.4],
+      ['寶一', '8222', '上市', '軍工航太', 'P', 0.44, 0.39, 0.3],
+      ['千附', '8383', '上市', '軍工航太', 'G', 0.24, 0.18, -0.52],
+      ['欣興', '3037', '上市', 'ABF 載板', 'L', 0.75, 0.69, 1.46],
+      ['南電', '8046', '上市', 'ABF 載板', 'P', 0.56, 0.51, 0.6],
+      ['景碩', '3189', '上市', 'ABF 載板', 'P', 0.48, 0.43, 0.36],
+      ['大量', '3167', '上櫃', 'ABF 載板', 'G', 0.25, 0.19, -0.58],
+      ['南亞科', '2408', '上市', '記憶體', 'L', 0.69, 0.63, 1.22],
+      ['華邦電', '2344', '上市', '記憶體', 'P', 0.55, 0.5, 0.56],
+      ['旺宏', '2337', '上市', '記憶體', 'P', 0.49, 0.44, 0.38],
+      ['群聯', '8299', '上櫃', '記憶體', 'G', 0.31, 0.25, -0.34],
+      ['威剛', '3260', '上市', '記憶體', 'P', 0.45, 0.4, 0.3],
+      ['日月光投控', '3711', '上市', '半導體', 'L', 0.7, 0.64, 0.96],
+      ['環球晶', '6488', '上櫃', '半導體', 'P', 0.58, 0.52, 0.6],
+      ['英業達', '2356', '上市', 'AI 伺服器', 'P', 0.5, 0.45, 0.52],
+      ['勤誠', '8210', '上市', 'AI 伺服器', 'P', 0.47, 0.42, 0.44],
+      ['信昌電', '6173', '上櫃', '被動元件', 'P', 0.4, 0.36, 0.22],
+      ['先進光', '3362', '上市', '光學', 'P', 0.38, 0.34, 0.18],
+      ['亞德客-KY', '1590', '上市', '機器人', 'L', 0.67, 0.61, 0.84],
+      ['盟立', '2464', '上市', '機器人', 'P', 0.46, 0.41, 0.36],
+      ['波若威', '3163', '上櫃', 'CPO 共封裝光學', 'P', 0.44, 0.39, 0.31],
+      ['眾達-KY', '4977', '上櫃', 'CPO 共封裝光學', 'P', 0.42, 0.37, 0.28],
+      ['元山', '6275', '上櫃', '散熱', 'P', 0.45, 0.4, 0.34],
+      ['東元', '1504', '上市', '重電', 'P', 0.55, 0.5, 0.6],
+      ['大同', '2371', '上市', '重電', 'P', 0.48, 0.43, 0.42],
+      ['燁聯', '9957', '上市', '鋼鐵', 'P', 0.36, 0.39, 0.16],
+      ['盛餘', '2029', '上市', '鋼鐵', 'G', 0.25, 0.28, -0.24],
+      ['台光電', '2383', '上市', 'PCB', 'L', 0.74, 0.68, 1.28],
+      ['臻鼎-KY', '4958', '上市', 'PCB', 'L', 0.66, 0.6, 0.84],
+      ['健鼎', '3044', '上市', 'PCB', 'P', 0.52, 0.47, 0.5],
+      ['金像電', '2368', '上市', 'PCB', 'P', 0.55, 0.5, 0.72],
+      ['燿華', '2367', '上市', 'PCB', 'G', 0.27, 0.21, -0.4],
+      ['帆宣', '6196', '上市', '台積電擴廠', 'L', 0.72, 0.66, 1.16],
+      ['漢唐', '2404', '上市', '台積電擴廠', 'L', 0.7, 0.64, 1.04],
+      ['亞翔', '6139', '上市', '台積電擴廠', 'P', 0.54, 0.49, 0.58],
+      ['信紘科', '6667', '上櫃', '台積電擴廠', 'P', 0.5, 0.45, 0.46],
+      ['京鼎', '3413', '上櫃', '台積電擴廠', 'P', 0.52, 0.47, 0.54],
+      ['弘塑', '3131', '上櫃', '台積電擴廠', 'G', 0.3, 0.24, -0.3],
+      ['中航', '2612', '上市', '散裝航運', 'P', 0.46, 0.41, 0.38],
+      ['台航', '2617', '上市', '散裝航運', 'P', 0.42, 0.37, 0.26],
+      ['正德', '2641', '上市', '散裝航運', 'G', 0.24, 0.18, -0.5],
+      ['力致', '3483', '上市', '散熱', 'P', 0.5, 0.45, 0.48],
+      ['動力-KY', '6591', '上市', '散熱', 'P', 0.48, 0.43, 0.42],
+      ['廣運', '6125', '上市', '散熱', 'G', 0.28, 0.22, -0.38],
+      ['保瑞', '6472', '上櫃', '生技醫療', 'L', 0.72, 0.66, 1.34],
+      ['藥華藥', '6446', '上市', '生技醫療', 'L', 0.68, 0.62, 1.12],
+      ['美時', '1795', '上市', '生技醫療', 'P', 0.52, 0.47, 0.5],
+      ['智擎', '4162', '上櫃', '生技醫療', 'G', 0.26, 0.2, -0.52],
+      ['聯亞藥', '6562', '上櫃', '生技醫療', 'G', 0.22, 0.16, -0.66],
+      ['聯詠', '3034', '上市', 'IC設計', 'L', 0.74, 0.68, 1.18],
+      ['瑞昱', '2379', '上市', 'IC設計', 'P', 0.58, 0.53, 0.62],
+      ['矽力-KY', '6415', '上市', 'IC設計', 'P', 0.5, 0.45, 0.44],
+      ['敦泰', '3545', '上市', 'IC設計', 'G', 0.27, 0.21, -0.5],
+      ['台達電', '2308', '上市', '電源管理', 'L', 0.73, 0.67, 1.06],
+      ['台達電(光寶)', '2301', '上市', '電源管理', 'P', 0.55, 0.5, 0.58],
+      ['全漢', '3015', '上市', '電源管理', 'P', 0.47, 0.42, 0.4],
+      ['僑威', '5263', '上櫃', '電源管理', 'G', 0.25, 0.19, -0.48],
+    ];
+  }
+
+  _peers() {
+    // 國際前十大同業（上市）— group → [name, ticker(exch)]
+    return {
+      '半導體': [['NVIDIA', 'NVDA (Nasdaq)'], ['TSMC 台積電', '2330.TW'], ['Samsung', '005930.KS'], ['Intel', 'INTC (Nasdaq)'], ['Broadcom', 'AVGO (Nasdaq)'], ['ASML', 'ASML (Nasdaq)'], ['AMD', 'AMD (Nasdaq)'], ['Qualcomm', 'QCOM (Nasdaq)'], ['Texas Instr', 'TXN (Nasdaq)'], ['Applied Mat', 'AMAT (Nasdaq)'], ['Micron', 'MU (Nasdaq)'], ['SK Hynix', '000660.KS'], ['UMC 聯電', '2303.TW'], ['MediaTek 聯發科', '2454.TW'], ['ASE 日月光', '3711.TW']],
+      'AI 伺服器': [['Super Micro', 'SMCI (Nasdaq)'], ['Dell', 'DELL (NYSE)'], ['HPE', 'HPE (NYSE)'], ['Foxconn 鴻海', '2317.TW'], ['Quanta 廣達', '2382.TW'], ['Wiwynn 緯穎', '6669.TW'], ['Wistron 緯創', '3231.TW'], ['Lenovo', '0992.HK'], ['Inventec 英業達', '2356.TW'], ['Gigabyte 技嘉', '2376.TW'], ['Celestica', 'CLS (NYSE)'], ['Fabrinet', 'FN (NYSE)'], ['MiTAC 神達', '3706.TW'], ['Asustek 華碩', '2357.TW'], ['Cisco', 'CSCO (Nasdaq)']],
+      '金融': [['JPMorgan', 'JPM (NYSE)'], ['Bank of America', 'BAC (NYSE)'], ['HSBC', 'HSBA.L'], ['Mitsubishi UFJ', '8306.T'], ['ICBC', '601398.SS'], ['DBS', 'D05.SI'], ['Cathay FHC 國泰金', '2882.TW'], ['Fubon FHC 富邦金', '2881.TW'], ['CTBC 中信金', '2891.TW'], ['Mega FHC 兆豐金', '2886.TW']],
+      '光學': [['Largan 大立光', '3008.TW'], ['Sunny Optical', '2382.HK'], ['Sony', '6758.T'], ['Canon', '7751.T'], ['Genius 玉晶光', '3406.TW'], ['AAC Tech', '2018.HK'], ['Jahwa', '002456.SZ'], ['Cowell', '1415.HK'], ['Asia Optical 亞光', '3019.TW'], ['Zeiss/Carl Zeiss', 'AFX.DE']],
+      '機器人': [['ABB', 'ABBN.SW'], ['Fanuc', '6954.T'], ['Yaskawa', '6506.T'], ['KUKA/Midea', '000333.SZ'], ['Keyence', '6861.T'], ['Hiwin 上銀', '2049.TW'], ['Delta 台達電', '2308.TW'], ['Harmonic Drive', '6324.T'], ['Solomon 所羅門', '2359.TW'], ['Estun', '002747.SZ']],
+      '散熱': [['Vertiv', 'VRT (NYSE)'], ['Boyd（私有，剔除）', '—'], ['台達電', '2308.TW'], ['Nidec', '6594.T'], ['Sunon 建準', '2421.TW'], ['AVC 奇鋐', '3017.TW'], ['Auras 雙鴻', '3324.TW'], ['Sanyo Denki', '6516.T'], ['SPX Cooling/SPX', 'SPXC (NYSE)'], ['Modine', 'MOD (NYSE)']],
+      'BBU 備援電池': [['Vertiv', 'VRT (NYSE)'], ['Eaton', 'ETN (NYSE)'], ['Schneider Electric', 'SU.PA'], ['Delta 台達電', '2308.TW'], ['Samsung SDI', '006400.KS'], ['LG Energy', '373220.KS'], ['Panasonic', '6752.T'], ['EnerSys', 'ENS (NYSE)'], ['Simplo 順達', '3211.TW'], ['AES-KY', '6781.TW']],
+      'CPO 共封裝光學': [['Coherent', 'COHR (NYSE)'], ['Lumentum', 'LITE (Nasdaq)'], ['Marvell', 'MRVL (Nasdaq)'], ['Broadcom', 'AVGO (Nasdaq)'], ['InnoLight 中際旭創', '300308.SZ'], ['Eoptolink', '300502.SZ'], ['Accelink', '002281.SZ'], ['Fabrinet', 'FN (NYSE)'], ['Browave 上詮', '3363.TW'], ['LandMark 聯亞', '3081.TWO']],
+      '低軌衛星': [['SpaceX（未上市，剔除）', '—'], ['Globalstar', 'GSAT (NYSE)'], ['Iridium', 'IRDM (Nasdaq)'], ['Viasat', 'VSAT (Nasdaq)'], ['EchoStar', 'SATS (Nasdaq)'], ['Eutelsat OneWeb', 'ETL.PA'], ['MDA Space', 'MDA.TO'], ['Gilat', 'GILT (Nasdaq)'], ['Wistron NeWeb 啟碁', '6285.TW'], ['Sercomm', '5388.TW']],
+      '被動元件': [['Murata', '6981.T'], ['TDK', '6762.T'], ['Taiyo Yuden', '6976.T'], ['Samsung Electro-Mech', '009150.KS'], ['Yageo 國巨', '2327.TW'], ['Vishay', 'VSH (NYSE)'], ['KEMET/Yageo', '—'], ['Walsin 華新科', '2492.TW'], ['Nichicon', '6996.T'], ['Sunlord', '002138.SZ']],
+      '貨櫃航運': [['Maersk', 'MAERSK-B.CO'], ['Hapag-Lloyd', 'HLAG.DE'], ['COSCO Shipping', '601919.SS'], ['ZIM', 'ZIM (NYSE)'], ['Evergreen 長榮', '2603.TW'], ['Yang Ming 陽明', '2609.TW'], ['Wan Hai 萬海', '2615.TW'], ['HMM', '011200.KS'], ['OOIL', '0316.HK'], ['Matson', 'MATX (NYSE)']],
+      '散裝航運': [['Star Bulk', 'SBLK (Nasdaq)'], ['Golden Ocean', 'GOGL (Nasdaq)'], ['Genco', 'GNK (NYSE)'], ['Eagle Bulk/星散', '—'], ['Pacific Basin', '2343.HK'], ['Diana Shipping', 'DSX (NYSE)'], ['U-Ming 裕民', '2606.TW'], ['Wisdom 慧洋-KY', '2637.TW'], ['Sincere 新興', '2605.TW'], ['Safe Bulkers', 'SB (NYSE)']],
+      '航空': [['Delta Air Lines', 'DAL (NYSE)'], ['United Airlines', 'UAL (Nasdaq)'], ['Lufthansa', 'LHA.DE'], ['Singapore Airlines', 'C6L.SI'], ['ANA', '9202.T'], ['Cathay Pacific', '0293.HK'], ['Korean Air', '003490.KS'], ['China Airlines 華航', '2610.TW'], ['EVA Air 長榮航', '2618.TW'], ['Starlux 星宇', '2646.TW']],
+      '鋼鐵': [['ArcelorMittal', 'MT (NYSE)'], ['Nippon Steel', '5401.T'], ['POSCO', '005490.KS'], ['Nucor', 'NUE (NYSE)'], ['Baowu/Baosteel', '600019.SS'], ['JFE', '5411.T'], ['Steel Dynamics', 'STLD (Nasdaq)'], ['Hyundai Steel', '004020.KS'], ['China Steel 中鋼', '2002.TW'], ['ThyssenKrupp', 'TKA.DE']],
+      '條鋼': [['Nucor', 'NUE (NYSE)'], ['Steel Dynamics', 'STLD (Nasdaq)'], ['Commercial Metals', 'CMC (NYSE)'], ['Gerdau', 'GGB (NYSE)'], ['Hyundai Steel', '004020.KS'], ['Tokyo Steel', '5423.T'], ['Feng Hsin 豐興', '2015.TW'], ['Tung Ho 東和鋼鐵', '2006.TW'], ['Kyoei Steel', '5440.T'], ['Daido Steel', '5471.T']],
+      '重電': [['Schneider Electric', 'SU.PA'], ['ABB', 'ABBN.SW'], ['Siemens Energy', 'ENR.DE'], ['Eaton', 'ETN (NYSE)'], ['GE Vernova', 'GEV (NYSE)'], ['Hitachi Energy/Hitachi', '6501.T'], ['Mitsubishi Electric', '6503.T'], ['Hyundai Electric', '267260.KS'], ['Fortune 華城', '1519.TW'], ['Shihlin 士電', '1503.TW']],
+      '軍工航太': [['Lockheed Martin', 'LMT (NYSE)'], ['RTX', 'RTX (NYSE)'], ['Northrop Grumman', 'NOC (NYSE)'], ['General Dynamics', 'GD (NYSE)'], ['BAE Systems', 'BA.L'], ['Boeing', 'BA (NYSE)'], ['Airbus', 'AIR.PA'], ['Rheinmetall', 'RHM.DE'], ['AIDC 漢翔', '2634.TW'], ['Leonardo', 'LDO.MI']],
+      'ABF 載板': [['Ibiden', '4062.T'], ['Shinko Electric', '6967.T'], ['Unimicron 欣興', '3037.TW'], ['AT&S', 'ATS.VI'], ['Nan Ya PCB 南電', '8046.TW'], ['Kinsus 景碩', '3189.TW'], ['Daeduck', '353200.KS'], ['Semco 三星電機', '009150.KS'], ['Zhen Ding 臻鼎-KY', '4958.TW'], ['LG Innotek', '011070.KS']],
+      '記憶體': [['Samsung Electronics', '005930.KS'], ['SK Hynix', '000660.KS'], ['Micron', 'MU (Nasdaq)'], ['Kioxia', '285A.T'], ['Nanya Tech 南亞科', '2408.TW'], ['Winbond 華邦電', '2344.TW'], ['Macronix 旺宏', '2337.TW'], ['Phison 群聯', '8299.TWO'], ['Western Digital', 'WDC (Nasdaq)'], ['SanDisk', 'SNDK (Nasdaq)']],
+      '生技醫療': [['Eli Lilly', 'LLY (NYSE)'], ['Novo Nordisk', 'NVO (NYSE)'], ['Pfizer', 'PFE (NYSE)'], ['Merck', 'MRK (NYSE)'], ['Roche', 'ROG.SW'], ['AstraZeneca', 'AZN (Nasdaq)'], ['Bora 保瑞', '6472.TWO'], ['PharmaEssentia 藥華藥', '6446.TW'], ['Lotus 美時', '1795.TW'], ['Samsung Biologics', '207940.KS']],
+      'IC設計': [['NVIDIA', 'NVDA (Nasdaq)'], ['Broadcom', 'AVGO (Nasdaq)'], ['Qualcomm', 'QCOM (Nasdaq)'], ['MediaTek 聯發科', '2454.TW'], ['Novatek 聯詠', '3034.TW'], ['Realtek 瑞昱', '2379.TW'], ['Silergy 矽力-KY', '6415.TW'], ['Marvell', 'MRVL (Nasdaq)'], ['AMD', 'AMD (Nasdaq)'], ['Will Semi', '603501.SS']],
+      '電源管理': [['Texas Instruments', 'TXN (Nasdaq)'], ['Analog Devices', 'ADI (Nasdaq)'], ['Infineon', 'IFX.DE'], ['Monolithic Power', 'MPWR (Nasdaq)'], ['Delta 台達電', '2308.TW'], ['Lite-On 光寶科', '2301.TW'], ['FSP 全漢', '3015.TW'], ['Vicor', 'VICR (Nasdaq)'], ['ON Semi', 'ON (Nasdaq)'], ['Renesas', '6723.T']],
+      'PCB': [['Zhen Ding 臻鼎-KY', '4958.TW'], ['Unimicron 欣興', '3037.TW'], ['Ibiden', '4062.T'], ['Tripod 健鼎', '3044.TW'], ['EMC 台光電', '2383.TW'], ['Nan Ya PCB 南電', '8046.TW'], ['AT&S', 'ATS.VI'], ['GCE 金像電', '2368.TW'], ['Shennan Circuits', '002916.SZ'], ['TTM Technologies', 'TTMI (Nasdaq)']],
+      '台積電擴廠': [['Applied Materials', 'AMAT (Nasdaq)'], ['ASML', 'ASML (Nasdaq)'], ['Lam Research', 'LRCX (Nasdaq)'], ['Tokyo Electron', '8035.T'], ['Marketech 帆宣', '6196.TW'], ['Han Tang 漢唐', '2404.TW'], ['United Integrated 漢科/亞翔', '6139.TW'], ['King Yuan 京鼎', '3413.TWO'], ['Ebara', '6361.T'], ['Hermes-Epitek 弘塑', '3131.TWO']],
+    };
+  }
+
+  _classMeta() {
+    return {
+      L: { label: 'LEADER', css: 'var(--co)' },
+      P: { label: 'PEER', css: 'var(--am)' },
+      G: { label: 'LAGGARD', css: 'var(--mut2)' },
+    };
+  }
+
+  _attr(tw, cls, hot) {
+    // deterministic per-ticker attributes
+    const n = String(tw).split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+    const big = ['2330', '2317', '2454', '2308', '2881', '2882', '2891', '2886', '2884', '2603', '2002', '3008', '2327', '6669', '3037'];
+    const isBig = big.indexOf(tw) >= 0;
+    let cap, capCss, mcap;
+    if (isBig) { cap = '大型'; capCss = 'var(--co)'; mcap = (3000 + (n % 90) * 200).toLocaleString(); }
+    else if (cls === 'L' || cls === 'P') { cap = '中型'; capCss = 'var(--am)'; mcap = (500 + (n % 50) * 45).toLocaleString(); }
+    else { cap = '小型'; capCss = 'var(--mut2)'; mcap = (80 + (n % 40) * 10).toLocaleString(); }
+    // ownership: big or high-hotness → foreign-led; small → domestic-led; else mixed
+    let own, ownCss;
+    if (isBig || hot >= 0.7) { own = '外資主導'; ownCss = 'var(--blue)'; }
+    else if (cap === '小型') { own = '內資主導'; ownCss = 'var(--vi)'; }
+    else { own = (n % 2 ? '外資主導' : '內資主導'); ownCss = (n % 2 ? 'var(--blue)' : 'var(--vi)'); }
+    // day-trade ratio: small caps + low hotness tend higher; deterministic
+    let dt = 12 + (n % 45) + (cap === '小型' ? 12 : 0) - (isBig ? 8 : 0);
+    dt = Math.max(6, Math.min(62, dt));
+    const dtCss = dt >= 40 ? 'var(--co)' : dt >= 20 ? 'var(--am)' : 'var(--gn)';
+    return { cap, capCss, mcap, own, ownCss, dt: dt + '%', dtW: dt + '%', dtCss };
+  }
+
+  renderVals() {
+    const tab = this.state.tab;
+    const set = t => () => this.setState({ tab: t });
+    const tc = on => on
+      ? 'background:var(--bg);color:var(--ink);border-color:var(--ink);box-shadow:0 -2px 0 var(--accent) inset;'
+      : 'background:var(--soft);color:var(--mut);';
+    const CM = this._classMeta();
+    const data = this._data();
+    const sc = v => v >= 0 ? 'color:var(--up);' : 'color:var(--down);';
+    const sg = v => (v > 0 ? '+' : '') + v.toFixed(2) + '%';
+
+    // grouping matrix: bucket by group, ordered Leader→Peer→Laggard within
+    const order = [];
+    data.forEach(d => { if (order.indexOf(d[3]) < 0) order.push(d[3]); });
+    const palette = ['var(--co)', 'var(--blue)', 'var(--teal)', 'var(--vi)', 'var(--am)', 'var(--ro)', 'var(--gn)'];
+    const groupColors = { '半導體': 'var(--co)', 'AI 伺服器': 'var(--blue)', '貨櫃航運': 'var(--teal)', '金融': 'var(--vi)', '被動元件': 'var(--am)', '光學': 'var(--ro)', '機器人': 'var(--gn)', '散熱': 'var(--co)', 'BBU 備援電池': 'var(--blue)', 'CPO 共封裝光學': 'var(--teal)', '低軌衛星': 'var(--vi)', '散裝航運': 'var(--am)', '航空': 'var(--ro)', '鋼鐵': 'var(--gn)', '條鋼': 'var(--co)', '重電': 'var(--blue)', '軍工航太': 'var(--vi)', 'ABF 載板': 'var(--am)', '記憶體': 'var(--teal)', 'PCB': 'var(--ro)', '台積電擴廠': 'var(--co)', '生技醫療': 'var(--gn)', 'IC設計': 'var(--blue)', '電源管理': 'var(--vi)' };
+    const groupEn = { '半導體': 'semiconductor', 'AI 伺服器': 'ai server', '貨櫃航運': 'container ship', '金融': 'financials', '被動元件': 'passive comp', '光學': 'optics', '機器人': 'robotics', '散熱': 'cooling', 'BBU 備援電池': 'bbu', 'CPO 共封裝光學': 'cpo', '低軌衛星': 'leo sat', '散裝航運': 'dry bulk', '航空': 'airlines', '鋼鐵': 'steel', '條鋼': 'bar steel', '重電': 'heavy electric', '軍工航太': 'defense', 'ABF 載板': 'abf substrate', '記憶體': 'memory', 'PCB': 'pcb', '台積電擴廠': 'tsmc capex', '生技醫療': 'biotech', 'IC設計': 'ic design', '電源管理': 'power mgmt' };
+    const rank = { L: 0, P: 1, G: 2 };
+    const cohById = { '半導體': 0.91, 'AI 伺服器': 0.86, '貨櫃航運': 0.79, '金融': 0.83, '被動元件': 0.81, '光學': 0.77, '機器人': 0.84, '散熱': 0.88, 'BBU 備援電池': 0.82, 'CPO 共封裝光學': 0.85, '低軌衛星': 0.78, '散裝航運': 0.8, '航空': 0.82, '鋼鐵': 0.84, '條鋼': 0.86, '重電': 0.87, '軍工航太': 0.8, 'ABF 載板': 0.85, '記憶體': 0.83, 'PCB': 0.84, '台積電擴廠': 0.86, '生技醫療': 0.76, 'IC設計': 0.85, '電源管理': 0.83 };
+    const groupCards = order.map(gn => {
+      const members = data.filter(d => d[3] === gn).slice().sort((a, b) => rank[a[4]] - rank[b[4]])
+        .map((d, i) => ({
+          name: d[0], code: d[1] + (d[2] === '上市' ? '.TW' : '.TWO'),
+          cls: CM[d[4]].label, clsCss: CM[d[4]].css,
+          excl: d[4] === 'G', exclTag: d[4] === 'G' ? '✕指數' : '',
+          hot: d[5].toFixed(2), lead: d[6].toFixed(2),
+          chg: sg(d[7]), chgCss: sc(d[7]), bg: i % 2 ? '#f6f4ef' : 'var(--paper)',
+        }));
+      const coh = cohById[gn] || 0.8;
+      const pk = (this._peers()[gn] || []).find(p => p[1] !== '—') || ['—', ''];
+      return { name: gn, en: groupEn[gn] || '', color: groupColors[gn] || 'var(--mut2)',
+        cohesion: coh.toFixed(2), cohCss: coh >= 0.85 ? 'var(--gn)' : coh >= 0.78 ? 'var(--am)' : 'var(--co)',
+        leader: pk[0], leaderTk: pk[1],
+        members };
+    });
+
+    // code map rows
+    const mktCss = m => m === '上市' ? 'var(--blue)' : 'var(--teal)';
+    const codeRows = data.map((d, i) => ({
+      name: d[0], tw: d[1], mkt: m2(d[2]), mktCss: mktCss(d[2]),
+      yf: d[1] + (d[2] === '上市' ? '.TW' : '.TWO'), bbg: d[1] + ' TT',
+      group: d[3], cls: CM[d[4]].label, clsCss: CM[d[4]].css,
+      bg: i % 2 ? '#f6f4ef' : 'var(--paper)',
+    }));
+    function m2(m) { return m === '上市' ? 'TWSE' : 'TPEX'; }
+
+    // summary scorecards
+    const nLead = data.filter(d => d[4] === 'L').length;
+    const attrRows = data.map((d, i) => {
+      const a = this._attr(d[1], d[4], d[5]);
+      return { name: d[0], code: d[1] + (d[2] === '上市' ? '.TW' : '.TWO'), group: d[3],
+        cap: a.cap, capCss: a.capCss, mcap: a.mcap, own: a.own, ownCss: a.ownCss,
+        dt: a.dt, dtW: a.dtW, dtCss: a.dtCss, bg: i % 2 ? '#f6f4ef' : 'var(--paper)' };
+    });
+    const avgCoh = order.reduce((s, gn) => s + (cohById[gn] || 0.8), 0) / order.length;
+    const scoreCards = [
+      { l: '追蹤個股', v: data.length, s: 'tracked', color: 'var(--blue)' },
+      { l: '族群數', v: order.length, s: 'groups', color: 'var(--teal)' },
+      { l: 'Leader 數', v: nLead, s: 'leaders', color: 'var(--co)' },
+      { l: '平均凝聚', v: avgCoh.toFixed(2), s: 'cohesion', color: 'var(--am)' },
+      { l: 'cophenetic', v: '0.995', s: 'consistency', color: 'var(--gn)' },
+    ];
+
+    // group correlation matrix (symmetric, diagonal = within-group cohesion)
+    const corrCols = order.slice();
+    const baseCorr = {
+      '半導體': { 'AI 伺服器': 0.78, '航運': 0.21, '金融': 0.18, '被動元件': 0.62, '光學': 0.55, '機器人': 0.49 },
+      'AI 伺服器': { '航運': 0.28, '金融': 0.22, '被動元件': 0.58, '光學': 0.46, '機器人': 0.61 },
+      '航運': { '金融': 0.34, '被動元件': 0.19, '光學': 0.15, '機器人': 0.24 },
+      '金融': { '被動元件': 0.17, '光學': 0.14, '機器人': 0.2 },
+      '被動元件': { '光學': 0.51, '機器人': 0.44 },
+      '光學': { '機器人': 0.4 },
+    };
+    const getC = (a, b) => {
+      if (a === b) return cohById[a] || 0.8;
+      if (baseCorr[a] && baseCorr[a][b] != null) return baseCorr[a][b];
+      if (baseCorr[b] && baseCorr[b][a] != null) return baseCorr[b][a];
+      return 0.2;
+    };
+    const heat = v => {
+      // 0..1 → paper2 → teal → coral
+      if (v >= 0.66) { const t = (v - 0.66) / 0.34; return { bg: 'rgba(201,107,90,' + (0.35 + t * 0.5).toFixed(2) + ')', fg: '#fff' }; }
+      if (v >= 0.4) { const t = (v - 0.4) / 0.26; return { bg: 'rgba(67,154,154,' + (0.3 + t * 0.45).toFixed(2) + ')', fg: v > 0.55 ? '#fff' : 'var(--ink2)' }; }
+      return { bg: 'rgba(67,154,154,' + (v * 0.5).toFixed(2) + ')', fg: 'var(--ink2)' };
+    };
+    const corrRows = corrCols.map(a => ({
+      label: a,
+      cells: corrCols.map(b => { const v = getC(a, b); const h = heat(v); return { t: v.toFixed(2), bg: h.bg, fg: h.fg, tip: a + ' × ' + b + ' = ' + v.toFixed(3) }; }),
+    }));
+
+    // pipeline stages
+    const pipeline = [
+      { n: '1', title: '凝聚清洗', desc: '相關係數踢除脫隊股 · PC1 解釋變異 · 標準化', color: 'var(--blue)', arrow: true },
+      { n: '2', title: '熱門 × 領先', desc: 'hotness(量能+法人+融資 z) × leadership(CCF lead)', color: 'var(--am)', arrow: true },
+      { n: '3', title: 'L / P / G 分類', desc: '門檻 0.40 / 0.50 · Leader↔Laggard 無別→歸一', color: 'var(--co)', arrow: true },
+      { n: '4', title: '有效性驗證', desc: '同步性 / 領先性 / 前瞻單調性 ≥2 成立', color: 'var(--teal)', arrow: false },
+    ];
+    const criteria = [
+      { title: '同步性 Synchrony', en: 'contemporaneous corr', desc: '群內成員與 Leader 的同期相關足夠高（共同移動），確認群是「一起動」。', color: 'var(--blue)' },
+      { title: '領先性 Leadership', en: 'CCF lead (negative lag)', desc: 'Leader 對 Peer/Laggard 的交叉相關在負 lag 達峰（Leader 先動），lead gap ≥ 0.50。', color: 'var(--co)' },
+      { title: '前瞻單調性 Forward Monotonicity', en: 'forward-return ordering', desc: 'Leader→Peer→Laggard 的前瞻報酬呈單調遞減，分類具預測排序力。', color: 'var(--teal)' },
+    ];
+
+    // effectiveness per group (synthetic): pass flags + period returns vs ^TWII
+    const eff = {
+      '半導體': [1, 1, 1, 14.2, 8.6], 'AI 伺服器': [1, 1, 1, 18.9, 8.6], '貨櫃航運': [1, 1, 0, 11.4, 8.6],
+      '金融': [1, 0, 1, 6.2, 8.6], '被動元件': [1, 1, 0, 9.8, 8.6], '光學': [0, 1, 0, 5.1, 8.6], '機器人': [1, 1, 1, 13.6, 8.6],
+      '散熱': [1, 1, 1, 16.8, 8.6], 'BBU 備援電池': [1, 1, 0, 10.2, 8.6], 'CPO 共封裝光學': [1, 1, 1, 15.4, 8.6],
+      '低軌衛星': [1, 1, 0, 9.1, 8.6], '散裝航運': [1, 0, 1, 7.4, 8.6], '航空': [1, 0, 0, 5.8, 8.6], '鋼鐵': [1, 0, 1, 4.9, 8.6], '條鋼': [1, 1, 0, 6.6, 8.6],
+      '重電': [1, 1, 1, 17.6, 8.6], '軍工航太': [1, 1, 0, 10.8, 8.6], 'ABF 載板': [1, 1, 1, 12.9, 8.6], '記憶體': [1, 1, 0, 11.2, 8.6],
+      'PCB': [1, 1, 0, 12.2, 8.6], '台積電擴廠': [1, 1, 1, 15.8, 8.6],
+      '生技醫療': [1, 1, 0, 13.4, 8.6], 'IC設計': [1, 1, 1, 14.1, 8.6], '電源管理': [1, 1, 0, 10.6, 8.6],
+    };
+    const yn = v => v ? '✓' : '✕';
+    const ynCss = v => v ? 'color:var(--down);' : 'color:var(--co);';
+    const effRows = order.map((gn, i) => {
+      const e = eff[gn] || [0, 0, 0, 0, 8.6];
+      const pass = e[0] + e[1] + e[2];
+      const valid = pass >= 2;
+      const win = e[3] > e[4];
+      return { name: gn, sync: yn(e[0]), syncCss: ynCss(e[0]), lead: yn(e[1]), leadCss: ynCss(e[1]), mono: yn(e[2]), monoCss: ynCss(e[2]),
+        lr: '+' + e[3].toFixed(1) + '%', lrCss: win ? 'color:var(--up);' : 'color:var(--mut);', tw: '+' + e[4].toFixed(1) + '%',
+        verdict: valid ? '有效' : '無效', verCss: valid ? 'var(--gn)' : 'var(--mut2)', bg: i % 2 ? '#f6f4ef' : 'var(--paper)' };
+    });
+
+    // ===== group rotation: index = avg of Leader+Peer normalized ADJ closes, base 2025-01-01=100 =====
+    const groupHex = { '半導體': '#c96b5a', 'AI 伺服器': '#4c78a8', '航運': '#439a9a', '金融': '#7a6daa', '被動元件': '#c4943a', '光學': '#b05580', '機器人': '#5a9e6f' };
+    const NT = 13; // 2025-01 .. 2026-01 monthly
+    const months = []; for (let i = 0; i < NT; i++) { const m = ((i) % 12) + 1; const y = 2025 + Math.floor(i / 12); months.push(y + '-' + String(m).padStart(2, '0')); }
+    const hidden = this.state.rotHidden || {};
+    // per-group index series from avg of its Leader+Peer members' normalized adj-close walks
+    const series = order.map(gn => {
+      const mem = data.filter(d => d[3] === gn && (d[4] === 'L' || d[4] === 'P'));
+      const drift = (cohById[gn] || 0.8 - 0.5) * 0.9; // cohesion-linked tilt
+      const walks = mem.map(d => {
+        const r = this._rng(parseInt(d[1], 10) * 7 + 13);
+        const arr = [100]; let v = 100;
+        for (let t = 1; t < NT; t++) { const g = (d[4] === 'L' ? 1.6 : 0.8) + drift; v = v * (1 + (g + (r() - 0.5) * 9) / 100); arr.push(v); }
+        return arr;
+      });
+      const idx = []; for (let t = 0; t < NT; t++) { let s = 0; walks.forEach(w => s += w[t]); idx.push(walks.length ? s / walks.length : 100); }
+      return { name: gn, color: groupHex[gn] || '#9c9890', idx, members: mem.length };
+    });
+    // SVG geometry
+    const W = 920, Hh = 300, mL = 40, mR = 78, mT = 12, mB = 26;
+    const vis = series.filter(s => !hidden[s.name]);
+    let lo = 100, hi = 100; vis.forEach(s => s.idx.forEach(v => { if (v < lo) lo = v; if (v > hi) hi = v; }));
+    const pad = (hi - lo) * 0.08 || 5; lo -= pad; hi += pad;
+    const xAt = t => mL + (W - mL - mR) * (t / (NT - 1));
+    const yAt = v => mT + (Hh - mT - mB) * (1 - (v - lo) / (hi - lo));
+    const E = React.createElement;
+    const gridY = []; const step = (hi - lo) / 4;
+    for (let k = 0; k <= 4; k++) { const val = lo + step * k; const y = yAt(val); gridY.push(E('g', { key: 'gy' + k }, E('line', { x1: mL, x2: W - mR, y1: y, y2: y, stroke: k === 0 || Math.abs(val - 100) < step / 2 ? '#cfc9ba' : '#ecebe6', strokeWidth: 1, strokeDasharray: Math.abs(val - 100) < step / 2 ? '3 3' : '' }), E('text', { x: mL - 5, y: y + 3, 'text-anchor': 'end', fill: '#9c9890', style: { font: "500 8px 'DM Mono',monospace" } }, val.toFixed(0)))); }
+    // base100 dashed line
+    const base100 = (100 >= lo && 100 <= hi) ? E('line', { x1: mL, x2: W - mR, y1: yAt(100), y2: yAt(100), stroke: '#1e1d1a', strokeWidth: 1, strokeDasharray: '4 3', opacity: 0.45 }) : null;
+    const xticks = []; for (let t = 0; t < NT; t += 2) xticks.push(E('text', { key: 'xt' + t, x: xAt(t), y: Hh - 8, 'text-anchor': 'middle', fill: '#9c9890', style: { font: "500 8px 'DM Mono',monospace" } }, months[t].slice(2)));
+    const lines = vis.map(s => {
+      const d = s.idx.map((v, t) => (t ? 'L' : 'M') + xAt(t).toFixed(1) + ' ' + yAt(v).toFixed(1)).join(' ');
+      const last = s.idx[NT - 1];
+      return E('g', { key: s.name },
+        E('path', { d, fill: 'none', stroke: s.color, strokeWidth: 1.8, strokeLinejoin: 'round' }),
+        E('circle', { cx: xAt(NT - 1), cy: yAt(last), r: 2.6, fill: s.color }),
+        E('text', { x: W - mR + 5, y: yAt(last) + 3, fill: s.color, style: { font: "700 8.5px 'DM Mono',monospace" } }, s.name + ' ' + last.toFixed(0)));
+    });
+    const rotSvg = E('svg', { viewBox: '0 0 ' + W + ' ' + Hh, width: '100%', style: { minWidth: '760px', display: 'block' } }, gridY, base100, xticks, lines);
+
+    const sc2 = v => v >= 0 ? 'color:var(--up);' : 'color:var(--down);';
+    const rotLegend = series.map(s => {
+      const end = s.idx[NT - 1], dim = !!hidden[s.name];
+      return { name: s.name, color: s.color, end: end.toFixed(1), endCss: sc2(end - 100),
+        dimCss: dim ? 'opacity:0.35;' : '', toggle: () => this.setState(st => ({ rotHidden: { ...st.rotHidden, [s.name]: !st.rotHidden[s.name] } })) };
+    });
+    const rotRank = series.slice().sort((a, b) => b.idx[NT - 1] - a.idx[NT - 1]).map((s, i) => {
+      const end = s.idx[NT - 1], cum = end - 100, mom = (s.idx[NT - 1] / s.idx[NT - 2] - 1) * 100;
+      return { rank: '#' + (i + 1), name: s.name, color: s.color, members: s.members + ' 檔', idx: end.toFixed(1),
+        cum: (cum >= 0 ? '+' : '') + cum.toFixed(1) + '%', cumCss: sc2(cum), mom: (mom >= 0 ? '+' : '') + mom.toFixed(1) + '%', momCss: sc2(mom),
+        bg: i % 2 ? '#f6f4ef' : 'var(--paper)' };
+    });
+
+    // international peers (listed only)
+    const peers = this._peers();
+    const peerCards = order.filter(gn => peers[gn]).map(gn => ({
+      name: gn, en: groupEn[gn] || '', color: groupColors[gn] || 'var(--mut2)', count: peers[gn].length,
+      peers: peers[gn].map((p, i) => {
+        const tw = /\.TW/.test(p[1]);
+        return { rank: i + 1, name: p[0], ticker: p[1], bg: i % 2 ? '#f6f4ef' : 'var(--paper)',
+          nameCss: tw ? 'color:' + (groupColors[gn] || 'var(--ink2)') + ';' : 'color:var(--ink2);',
+          tickCol: p[1] === '—' ? 'var(--mut2)' : (tw ? (groupColors[gn] || 'var(--ink)') : 'var(--ink)') };
+      }),
+    }));
+
+    const RF_TW10Y = 1.6;
+    const tierName = { L: 'Leader', P: 'Peer', G: 'Laggard' };
+    const tierCss2 = { L: 'var(--co)', P: 'var(--blue)', G: 'var(--mut2)' };
+    const heatCorr = v => 'background:rgba(67,154,154,' + ((v - 0.35) / 0.55 * 0.5).toFixed(2) + ');';
+    const scR = v => v >= 0 ? 'color:var(--up);' : 'color:var(--down);';
+    const riskRows = this._data().map(d => {
+      const r = this._rng(parseInt(d[1], 10) * 13 + 7);
+      const beta = +(0.62 + r() * 1.18).toFixed(2);
+      const sd = +(18 + r() * 27).toFixed(1);
+      const corr = +(0.40 + r() * 0.45).toFixed(2);
+      const maxdd = +(-(12 + r() * 48)).toFixed(1);
+      const ann = +(d[7] * 6 + (r() - 0.4) * 22).toFixed(1);
+      const sharpe = +(((ann - RF_TW10Y) / sd)).toFixed(2);
+      return { name: d[0], code: d[1], group: d[3], tier: tierName[d[4]], tierCss: tierCss2[d[4]],
+        ann: (ann >= 0 ? '+' : '') + ann.toFixed(1), annCss: scR(ann),
+        maxdd: maxdd.toFixed(1), beta: beta.toFixed(2), sd: sd.toFixed(1), corr: corr.toFixed(2), corrHeat: heatCorr(corr),
+        sharpe: sharpe.toFixed(2), sharpeCss: sharpe >= 1 ? 'color:var(--gn);font-weight:700;' : sharpe >= 0 ? 'color:var(--ink);' : 'color:var(--co);' };
+    }).sort((a, b) => a.group < b.group ? -1 : a.group > b.group ? 1 : (parseFloat(b.sharpe) - parseFloat(a.sharpe)))
+      .map((x, i) => ({ ...x, bg: i % 2 ? '#f6f4ef' : 'var(--paper)' }));
+
+    return {
+      rootRef: el => { this.root = el; },
+      tabGroup: set('group'), tabCode: set('code'), tabCorr: set('corr'), tabLogic: set('logic'), tabRot: set('rot'), tabPeers: set('peers'), tabAttr: set('attr'), tabRisk: set('risk'),
+      tcGroup: tc(tab === 'group'), tcCode: tc(tab === 'code'), tcCorr: tc(tab === 'corr'), tcLogic: tc(tab === 'logic'), tcRot: tc(tab === 'rot'), tcPeers: tc(tab === 'peers'), tcAttr: tc(tab === 'attr'), tcRisk: tc(tab === 'risk'),
+      isGroup: tab === 'group', isCode: tab === 'code', isCorr: tab === 'corr', isLogic: tab === 'logic', isRot: tab === 'rot', isPeers: tab === 'peers', isAttr: tab === 'attr', isRisk: tab === 'risk',
+      riskRows,
+      groupCards, codeRows, scoreCards, corrCols, corrRows, pipeline, criteria, effRows,
+      rotSvg, rotLegend, rotRank, peerCards, attrRows,
+    };
+  }
+}
+</script>
+</body>
+</html>

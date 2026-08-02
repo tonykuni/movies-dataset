@@ -1,0 +1,117 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · 自動編號器 · Auto-Coder</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--blue:#4c78a8;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--vi:#7a6daa;
+ --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg)}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:12px;line-height:1.5}
+.wrap{max-width:1060px;margin:0 auto;padding:26px 22px 60px}
+.pdf{position:fixed;top:12px;right:14px;z-index:999;background:var(--ink);color:#fff;border:none;border-radius:5px;padding:7px 13px;font:700 9px 'DM Mono',monospace;cursor:pointer}
+@media print{.pdf,#xnav{display:none!important}}
+.bar{position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50}
+header{padding:0 0 8px;margin-bottom:14px}
+.kicker{font:700 10px 'DM Mono',monospace;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px}
+h1{font:800 21px/1.2 'Syne','Noto Sans TC',sans-serif;color:var(--ink);display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+h1::before{content:"";display:inline-block;width:5px;height:22px;background:var(--vi);border-radius:2px;transform:translateY(3px);margin-right:2px}
+h1 span{color:var(--ink)}
+.sub{margin-top:6px;font:400 10.5px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+@media(max-width:820px){.grid2{grid-template-columns:1fr}}
+.card{background:var(--paper);border:1px solid var(--soft);border-radius:12px;padding:14px 16px;box-shadow:0 1px 3px rgba(31,42,42,.05)}
+.card h2{font:800 12px 'Syne','Noto Sans TC',sans-serif;color:var(--ink);margin-bottom:10px}
+.fld{margin-bottom:11px}
+.fld label{display:block;font:700 8px 'DM Mono',monospace;letter-spacing:.5px;color:var(--mut);text-transform:uppercase;margin-bottom:4px}
+.fld input,.fld select,.fld textarea{width:100%;font:600 11px 'DM Mono','Noto Sans TC',monospace;border:1px solid var(--line);border-radius:4px;padding:7px 9px;background:var(--paper2);color:var(--ink)}
+.fld textarea{min-height:110px;resize:vertical}
+.btn{font:700 8.5px 'DM Mono',monospace;cursor:pointer;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:4px;padding:7px 11px}
+.btn.o{background:transparent;color:var(--ink)}
+.out{font:800 16px 'DM Mono',monospace;color:var(--vi);background:#f2effa;border:1px solid var(--vi);border-radius:5px;padding:10px 12px;margin-top:6px;word-break:break-all}
+.out.dup{color:var(--up);background:#fbeeec;border-color:var(--up)}
+table{width:100%;border-collapse:collapse;background:var(--paper);border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-top:8px}
+th{font:700 9px 'DM Mono',monospace;letter-spacing:.4px;text-transform:uppercase;color:var(--mut);background:var(--paper2);border-bottom:2px solid var(--ink);padding:8px 12px;text-align:left}
+td{font:500 9.5px 'DM Mono','Noto Sans TC',monospace;color:var(--ink2);border-bottom:1px solid var(--soft);padding:6px 9px}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--paper2)}
+td .code{color:var(--vi);font-weight:700}
+.note{font:500 8.5px/1.6 'DM Mono',monospace;color:var(--mut);background:var(--paper);border:1px solid var(--soft);border-left:3px solid var(--vi);border-radius:4px;padding:8px 12px;margin:12px 0}
+h3.sec{font:800 13px 'Syne','Noto Sans TC',sans-serif;color:var(--ink);margin:18px 0 6px;padding-bottom:5px;border-bottom:1px solid var(--line)}
+</style></head><body>
+<div class="bar"></div>
+<button class="pdf" onclick="window.print()">⤴ PDF</button>
+<div class="wrap">
+<header>
+ <div class="kicker">VERITAS INTELLIGENCE ANALYTICS · AUTO-CODER · VIA-M-ACODER · FNV-1A 6-HEX · APPEND-ONLY LOG</div>
+ <h1>VIA 自動編號器 <span>·</span> 一切諸元決定性編碼</h1>
+ <p class="sub">名稱+類型 → 決定性 FNV-1a 6-hex 主碼。同輸入永遠同碼、可重算;即時碰撞檢查;批次模式;產出全數寫入只增不減登錄簿(localStorage · via_acoder_log_v1),可匯出 CSV/JSON。</p>
+ <nav id="xnav" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:9px">
+  <a href="VIA Master Console.html" title="深連結 #模組id" style="font:700 8.5px 'DM Mono',monospace;color:var(--ink2);border:1px solid var(--line);border-radius:4px;padding:4px 8px;text-decoration:none;background:var(--paper2)">🎛 主控台</a>
+  <a href="VIA Intelligence Asset Management Platform.html" title="參數 ?tab=sys|mod|tool|hall|knw&q=…" style="font:700 8.5px 'DM Mono',monospace;color:var(--ink2);border:1px solid var(--line);border-radius:4px;padding:4px 8px;text-decoration:none;background:var(--paper2)">🧱 智慧資產 IAMP</a>
+  <a href="VIA Lexicon Registry.html" title="參數 ?kind=SYN|RGX|REN|LST|DCT&q=…" style="font:700 8.5px 'DM Mono',monospace;color:var(--ink2);border:1px solid var(--line);border-radius:4px;padding:4px 8px;text-decoration:none;background:var(--paper2)">📚 詞彙登錄</a>
+  <a href="VIA VAP Chart Library Builder.html" title="參數 ?cat=single|stack|indiv|dual|adv|rolling|fund&q=…" style="font:700 8.5px 'DM Mono',monospace;color:var(--ink2);border:1px solid var(--line);border-radius:4px;padding:4px 8px;text-decoration:none;background:var(--paper2)">📊 圖庫建構器</a>
+ </nav>
+</header>
+<div class="grid2">
+ <div class="card">
+  <h2>單筆編碼 Single</h2>
+  <div class="fld"><label>類型 Type(前綴)</label><select id="typ">
+   <option value="M">VIA-M(模組 Module)</option><option value="A">VIA-A(資產 Asset)</option>
+   <option value="CH">VAP-CH(圖型 Chart)</option><option value="D">VIA-D(資料集 Dataset)</option>
+   <option value="R">VIA-R(規則 Rule)</option><option value="T">VIA-T(工具 Tool)</option></select></div>
+  <div class="fld"><label>資產層級碼(僅 VIA-A)</label><select id="sub"><option value="">—</option><option>SYS</option><option>SUB</option><option>ENG</option><option>MOD</option><option>CLS</option><option>FN</option><option>LIB</option><option>TOOL</option><option>ENV</option><option>KNW</option></select></div>
+  <div class="fld"><label>名稱 Name</label><input id="nm" placeholder="e.g. Chart Library Builder"></div>
+  <button class="btn" id="gen">⚙ 產碼 + 登錄</button>
+  <div class="out" id="out" style="display:none"></div>
+ </div>
+ <div class="card">
+  <h2>批次編碼 Batch(一行一項)</h2>
+  <div class="fld"><label>清單(格式:名稱 或 類型|名稱)</label><textarea id="bat" placeholder="Chart Library Builder&#10;M|Weekly Report&#10;CH|Rolling Sharpe"></textarea></div>
+  <button class="btn" id="genB">⚙ 批次產碼 + 登錄</button>
+  <button class="btn o" id="expC">⤓ CSV</button>
+  <button class="btn o" id="expJ">⤓ JSON</button>
+  <div id="batOut" style="margin-top:8px;font:500 9px 'DM Mono',monospace;color:var(--mut)"></div>
+ </div>
+</div>
+<div class="note">🔒 <b>治理</b> — 決定性:同(類型+名稱)必得同碼,跨工具一致(與主控台/IAMP 同一 FNV-1a 演算法)。碰撞:6-hex 空間內即時比對登錄簿,若撞碼標紅並附既有項。登錄簿只增不減;SAP/MSP 既有 CODE/T-CODE 不經此編碼(align-only)。</div>
+<h3 class="sec">登錄簿 Registry Log(只增不減)<span id="cnt" style="font:700 8px 'DM Mono',monospace;color:var(--vi);margin-left:8px"></span></h3>
+<table><thead><tr><th style="width:170px">主碼 Code</th><th style="width:70px">類型</th><th>名稱</th><th style="width:150px">時間</th><th style="width:60px">狀態</th></tr></thead><tbody id="log"></tbody></table>
+</div>
+<script>
+function fnv(s){let h=0x811c9dc5;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=(h*0x01000193)>>>0;}return h.toString(16).padStart(8,"0").slice(-6).toUpperCase();}
+const PRE={M:"VIA-M",A:"VIA-A",CH:"VAP-CH",D:"VIA-D",R:"VIA-R",T:"VIA-T"};
+function makeCode(t,sub,name){const key=t+"|"+(sub||"")+"|"+name.trim();
+ return (t==="A"&&sub?PRE[t]+"-"+sub:PRE[t])+"-"+fnv(key);}
+const KEY="via_acoder_log_v1";
+let LOG=[];try{LOG=JSON.parse(localStorage.getItem(KEY))||[];}catch(e){}
+const $=s=>document.querySelector(s);
+function save(){localStorage.setItem(KEY,JSON.stringify(LOG));}
+function collide(code,name){return LOG.find(l=>l.code===code&&l.name!==name.trim());}
+function addLog(t,sub,name){const code=makeCode(t,sub,name);const dup=collide(code,name);
+ LOG.unshift({code,type:t+(sub?"/"+sub:""),name:name.trim(),at:new Date().toISOString().slice(0,16).replace("T"," "),dup:!!dup});
+ save();renderLog();return{code,dup};}
+function renderLog(){$("#cnt").textContent=LOG.length+" 筆";
+ $("#log").innerHTML=LOG.slice(0,200).map(l=>'<tr><td><span class="code">'+l.code+'</span></td><td>'+l.type+'</td><td>'+l.name+'</td><td>'+l.at+'</td><td>'+(l.dup?'<span style="color:var(--up);font-weight:700">⚠ 撞碼</span>':'<span style="color:var(--down);font-weight:700">✓</span>')+'</td></tr>').join("")||'<tr><td colspan="5" style="color:var(--mut2)">尚無登錄</td></tr>';}
+$("#gen").onclick=()=>{const nm=$("#nm").value.trim();if(!nm)return;
+ const r=addLog($("#typ").value,$("#sub").value,nm);
+ const o=$("#out");o.style.display="";o.className="out"+(r.dup?" dup":"");
+ o.textContent=r.code+(r.dup?"  ⚠ 撞碼:既有「"+r.dup.name+"」":"");};
+$("#genB").onclick=()=>{const lines=$("#bat").value.split("\n").map(l=>l.trim()).filter(Boolean);
+ let ok=0,dup=0;lines.forEach(l=>{const m=l.split("|");const t=m.length>1&&PRE[m[0].trim()]?m[0].trim():"M";const nm=(m.length>1?m.slice(1).join("|"):l).trim();
+  if(nm){const r=addLog(t,"",nm);r.dup?dup++:ok++;}});
+ $("#batOut").textContent="完成:"+ok+" 筆 ✓"+(dup?" · "+dup+" 筆 ⚠ 撞碼":"");};
+$("#expJ").onclick=()=>{const b=new Blob([JSON.stringify({meta:{name:"via_acoder_log",algo:"FNV-1a 6-hex",policy:"append-only"},log:LOG},null,2)],{type:"application/json"});
+ const u=document.createElement("a");u.href=URL.createObjectURL(b);u.download="VIA_AutoCoder_Log.json";u.click();};
+$("#expC").onclick=()=>{const esc=s=>'"'+String(s).replace(/"/g,'""')+'"';
+ const csv="code,type,name,at,dup\n"+LOG.map(l=>[l.code,l.type,l.name,l.at,l.dup?1:0].map(esc).join(",")).join("\n");
+ const b=new Blob(["\ufeff"+csv],{type:"text/csv"});const u=document.createElement("a");u.href=URL.createObjectURL(b);u.download="VIA_AutoCoder_Log.csv";u.click();};
+renderLog();
+// 頁面自動連結 · URL 參數可選(?type=M|A|CH|D|R|T&sub=&name=&gen=1)
+const P=new URLSearchParams(location.search);
+if(P.get("type")&&PRE[P.get("type")])$("#typ").value=P.get("type");
+if(P.get("sub"))$("#sub").value=P.get("sub");
+if(P.get("name"))$("#nm").value=P.get("name");
+if(P.get("gen")==="1"&&$("#nm").value)$("#gen").click();
+</script>
+</body></html>

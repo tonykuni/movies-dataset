@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&family=Noto+Serif+TC:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#070a14;--navy:#0d1426;--navy-2:#131d36;--panel:#172241;
+  --line:rgba(214,221,236,.12);--line-2:rgba(214,221,236,.07);
+  --paper:#e9e6dd;--paper-dim:#b9c0d0;--mute:#7d879d;
+  --seal:#c0392b;--seal-deep:#9a2b21;--gold:#c6a456;--teal:#3aa6a0;--blue:#5e8fcc;--r:3px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--paper);font-family:"DM Sans",-apple-system,"Noto Serif TC",sans-serif;font-size:12.8px;line-height:1.58;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden}
+.wrap{max-width:1240px;margin:0 auto;padding:0 28px}
+section{position:relative}
+.eyebrow{font-family:"DM Mono",monospace;font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:var(--seal);font-weight:500;display:flex;align-items:center;gap:11px}
+.eyebrow::before{content:"";width:22px;height:1px;background:var(--seal);opacity:.7}
+.eyebrow.gold{color:var(--gold)}.eyebrow.gold::before{background:var(--gold)}
+.eyebrow.teal{color:var(--teal)}.eyebrow.teal::before{background:var(--teal)}
+h2{font-family:"Syne",sans-serif;font-weight:700;font-size:clamp(21px,2.9vw,32px);line-height:1.08;letter-spacing:-.015em;margin:14px 0 5px}
+.h2-zh{font-family:"Noto Serif TC",serif;font-weight:600;font-size:clamp(14px,1.7vw,17px);color:var(--paper-dim);letter-spacing:.04em;margin-bottom:20px}
+.lead{font-family:"Cormorant Garamond",serif;font-size:clamp(15px,1.7vw,18px);line-height:1.5;color:var(--paper-dim);font-style:italic;max-width:62ch}
+p.body{color:var(--paper-dim);max-width:64ch}p.body+p.body{margin-top:11px}
+.zh{font-family:"Noto Serif TC",serif}.mono{font-family:"DM Mono",monospace}
+strong{color:var(--paper);font-weight:600}
+.crest{height:46px;width:auto;display:block;filter:drop-shadow(0 2px 7px rgba(0,0,0,.45))}
+.seal{flex:none;width:42px;height:42px;border-radius:var(--r);background:linear-gradient(135deg,var(--seal),var(--seal-deep));display:grid;place-items:center;font-family:"Noto Serif TC",serif;font-weight:700;font-size:22px;color:#f4ece2;box-shadow:0 6px 20px rgba(192,57,43,.32),inset 0 0 0 1px rgba(255,255,255,.14);position:relative}
+.seal::after{content:"";position:absolute;inset:4px;border:1px solid rgba(244,236,226,.32);border-radius:1px}
+.seal.sm{width:32px;height:32px;font-size:17px}
+.hero{background:radial-gradient(120% 80% at 78% -10%,rgba(94,143,204,.16),transparent 55%),radial-gradient(90% 70% at 8% 110%,rgba(58,166,160,.1),transparent 50%),linear-gradient(180deg,#070a14 0%,#0d1426 60%,#101a31 100%);border-bottom:1px solid var(--line);overflow:hidden}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:18px 0;border-bottom:1px solid var(--line-2)}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .mark{font-family:"Syne";font-weight:800;font-size:14px;letter-spacing:.02em}
+.brand .mark span{color:var(--seal)}
+.topmeta{font-family:"DM Mono";font-size:9.5px;letter-spacing:.18em;color:var(--mute);text-transform:uppercase}
+.hero-crest{position:absolute;left:-110px;top:54%;transform:translateY(-50%);height:380px;opacity:.035;pointer-events:none;filter:grayscale(1)}
+.hero-side-col{display:flex;flex-direction:column;gap:18px}
+.hero-emblem{display:flex;justify-content:center;align-items:center;padding:2px 0 4px}
+.hero-emblem img{height:172px;width:auto;filter:drop-shadow(0 12px 38px rgba(0,0,0,.6))}
+.hero-grid{display:grid;grid-template-columns:1.5fr .9fr;gap:46px;align-items:center;padding:62px 0 54px;position:relative;z-index:1}
+.hero h1{font-family:"Syne";font-weight:800;font-size:clamp(32px,5vw,56px);line-height:.98;letter-spacing:-.03em;margin:20px 0 12px}
+.hero h1 em{font-style:normal;color:var(--seal)}
+.hero .zh-h1{font-family:"Noto Serif TC";font-weight:600;font-size:clamp(16px,2.2vw,22px);color:var(--paper-dim);letter-spacing:.05em;margin-bottom:22px;line-height:1.4}
+.hero .sub{max-width:50ch;color:var(--paper-dim);font-size:13.5px}
+.hero .sub .zh{display:block;margin-top:8px;font-size:12.5px;color:var(--mute)}
+.hero-cta{display:flex;gap:12px;margin-top:26px;flex-wrap:wrap}
+.chip{font-family:"DM Mono";font-size:10.5px;letter-spacing:.04em;border:1px solid var(--line);border-radius:var(--r);padding:8px 13px;color:var(--paper-dim);background:rgba(23,34,65,.4)}
+.chip b{color:var(--seal);font-weight:500}
+.hero-side{border:1px solid var(--line);border-radius:var(--r);background:linear-gradient(180deg,rgba(23,34,65,.55),rgba(13,20,38,.4));padding:20px;position:relative}
+.hero-side .lbl{font-family:"DM Mono";font-size:9px;letter-spacing:.2em;color:var(--mute);text-transform:uppercase;margin-bottom:13px}
+.stk{display:flex;flex-direction:column;gap:7px}
+.stk .row{border:1px solid var(--line);border-radius:2px;padding:9px 12px;font-family:"DM Mono";font-size:10.5px;letter-spacing:.02em;display:flex;justify-content:space-between;align-items:center;background:rgba(7,10,20,.4)}
+.stk .row .t{color:var(--paper)}.stk .row .s{color:var(--mute);font-size:9px}
+.stk .row.app{border-color:rgba(192,57,43,.5);background:rgba(192,57,43,.08)}.stk .row.app .t{color:#f0c4bd}
+.stk .row.core{border-color:rgba(58,166,160,.4)}.stk .row.core .t{color:#a9ddd9}
+.stk .arrow{text-align:center;color:var(--mute);font-size:10px;font-family:"DM Mono";line-height:.6}.stk .arrow b{color:var(--seal)}
+.stats{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(7,10,20,.6)}
+.stats .wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat{padding:22px 22px;border-left:1px solid var(--line-2)}
+.stat:first-child{border-left:none;padding-left:0}
+.stat .n{font-family:"Syne";font-weight:700;font-size:23px;color:var(--paper);letter-spacing:-.01em}
+.stat .n em{font-style:normal;color:var(--seal)}
+.stat .k{font-family:"DM Mono";font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);margin-top:5px}
+.stat .d{font-size:11px;color:var(--paper-dim);margin-top:6px;line-height:1.45}
+.sec{padding:60px 0;border-bottom:1px solid var(--line)}
+.sec.navy{background:var(--navy)}.sec.navy2{background:var(--navy-2)}.sec.ink{background:var(--ink)}
+.origin{background:linear-gradient(180deg,#101a31,#0d1426)}
+.origin-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:50px;align-items:start}
+.origin .narr p{font-family:"Cormorant Garamond";font-size:16.5px;line-height:1.6;color:var(--paper-dim);margin-bottom:12px}
+.origin .narr p em{color:var(--paper);font-style:italic}
+.origin .narr .zh{font-family:"Noto Serif TC";font-size:12.5px;line-height:1.78;color:var(--mute);font-style:normal}
+.painlist{display:flex;flex-direction:column;gap:1px;background:var(--line-2);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.painlist .it{background:var(--navy);padding:13px 15px;display:flex;gap:13px;align-items:baseline}
+.painlist .it .x{font-family:"DM Mono";color:var(--seal);font-size:10.5px;flex:none;width:26px}
+.painlist .it .c{font-size:12px;color:var(--paper-dim)}.painlist .it .c b{color:var(--paper)}
+.painlist .it .c .zh{display:block;color:var(--mute);font-size:11px;margin-top:2px}
+.archhead{text-align:center;max-width:70ch;margin:0 auto 38px}.archhead .eyebrow{justify-content:center}
+.stack{display:flex;flex-direction:column;gap:0;position:relative}
+.layer{border:1px solid var(--line);border-radius:var(--r);background:linear-gradient(180deg,rgba(23,34,65,.5),rgba(13,20,38,.55));padding:17px 20px;position:relative}
+.layer+.gutter{height:34px;display:grid;place-items:center;position:relative}
+.gutter .pull{font-family:"DM Mono";font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);background:var(--ink);padding:0 12px;z-index:2}.gutter .pull b{color:var(--seal)}
+.gutter::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(var(--line),var(--seal),var(--line));opacity:.6}
+.gutter .cap{position:absolute;top:-1px;left:50%;transform:translateX(-50%);color:var(--seal);font-size:12px;line-height:1}
+.layer-top{display:flex;align-items:center;gap:13px;margin-bottom:13px}
+.layer-top .meta .k{font-family:"DM Mono";font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute)}
+.layer-top .meta .t{font-family:"Syne";font-weight:700;font-size:16px;letter-spacing:-.01em;margin-top:2px}
+.layer-top .meta .t .zh{font-family:"Noto Serif TC";font-weight:500;font-size:11.5px;color:var(--paper-dim);margin-left:8px}
+.mods{display:flex;flex-wrap:wrap;gap:6px}
+.mod{font-family:"DM Mono";font-size:10px;letter-spacing:.02em;border:1px solid var(--line);border-radius:2px;padding:6px 10px;color:var(--paper-dim);background:rgba(7,10,20,.45);white-space:nowrap}
+.mod b{color:var(--paper);font-weight:500}
+.layer.app{border-color:rgba(192,57,43,.45);background:linear-gradient(180deg,rgba(192,57,43,.1),rgba(13,20,38,.5))}
+.layer.app .mod{border-color:rgba(192,57,43,.3)}.layer.app .mod b{color:#f0c4bd}
+.layer.core .layer-top .meta .t{color:#bfe6e2}.layer.core .mod{border-color:rgba(58,166,160,.28)}
+.lnum{flex:none;width:38px;height:38px;border-radius:3px;border:1px solid var(--line);display:grid;place-items:center;font-family:"DM Mono";font-size:13px;font-weight:500;color:var(--paper-dim);background:rgba(7,10,20,.45);letter-spacing:.04em}
+.layer.app .lnum{border-color:rgba(192,57,43,.4);color:#f0c4bd;background:rgba(192,57,43,.08)}
+.layer.core .lnum{border-color:rgba(58,166,160,.38);color:#a9ddd9}
+.gal{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px}
+.appcard{border:1px solid var(--line);border-radius:var(--r);background:linear-gradient(180deg,rgba(23,34,65,.4),rgba(13,20,38,.3));overflow:hidden;transition:border-color .25s,transform .25s}
+.appcard:hover{border-color:rgba(94,143,204,.45);transform:translateY(-2px)}
+.appcard .screen{position:relative;width:100%;aspect-ratio:16/10;background:repeating-linear-gradient(135deg,rgba(255,255,255,.02) 0 9px,transparent 9px 18px),#0a0e1a;border-bottom:1px solid var(--line)}
+.appcard .screen image-slot{position:absolute;inset:0;width:100%;height:100%;display:block}
+image-slot::part(frame){background:#0a0e1a}
+image-slot::part(ring){border-color:rgba(214,221,236,.2)}
+image-slot::part(empty){color:rgba(185,192,208,.55)}
+.appcard .chrome{position:absolute;top:0;left:0;right:0;height:22px;background:rgba(7,10,20,.7);border-bottom:1px solid var(--line-2);display:flex;align-items:center;gap:5px;padding:0 9px;z-index:2;pointer-events:none}
+.appcard .chrome i{width:7px;height:7px;border-radius:50%;background:#2f3a52;display:block}
+.appcard .cap{padding:12px 14px}
+.appcard .cap .nm{font-family:"DM Mono";font-size:11.5px;color:var(--paper);letter-spacing:.01em}
+.appcard .cap .zh{font-family:"Noto Serif TC";font-size:11px;color:var(--mute);margin-top:3px}
+.bdg{display:inline-block;margin-top:9px;font-family:"DM Mono";font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border-radius:2px;border:1px solid var(--line);color:var(--paper-dim)}
+.bdg.analysis{color:var(--blue);border-color:rgba(94,143,204,.4)}
+.bdg.sim{color:var(--teal);border-color:rgba(58,166,160,.4)}
+.bdg.risk{color:var(--gold);border-color:rgba(198,164,86,.4)}
+.motto{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:15px;color:var(--gold);border-left:2px solid rgba(198,164,86,.5);padding-left:14px;margin:2px 0 20px;line-height:1.45}
+.motto .zh{display:block;font-family:"Noto Serif TC",serif;font-style:normal;font-size:12px;color:var(--paper-dim);margin-top:3px;letter-spacing:.04em}
+.tagline{margin-top:30px;padding-top:22px;border-top:1px solid var(--line);font-family:"Cormorant Garamond",serif;font-style:italic;font-size:clamp(17px,2.2vw,23px);color:var(--gold);line-height:1.4}
+.tagline span{display:block;font-family:"Noto Serif TC",serif;font-style:normal;font-size:14px;color:var(--paper-dim);margin-top:8px;letter-spacing:.08em}
+.domains{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 18px}
+.domains .dlbl{font-family:"DM Mono";font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);margin-right:2px}
+.dchip{font-family:"DM Mono";font-size:10px;color:var(--paper-dim);border:1px solid var(--line);border-radius:999px;padding:5px 11px;background:rgba(23,34,65,.4)}
+.dnote{font-family:"Noto Serif TC",serif;font-size:10.5px;color:var(--seal);margin-left:4px}
+.apphead{display:flex;align-items:center;gap:7px;padding:7px 11px;background:#0a0e1a;border-bottom:1px solid var(--line);overflow:hidden}
+.apphead .ab{font-family:"Syne";font-weight:800;font-size:10px;color:var(--paper);letter-spacing:.02em;flex:none}
+.apphead .ab::after{content:"·";margin-left:6px;color:var(--mute)}
+.apphead .an{font-family:"DM Sans";font-weight:700;font-size:11px;color:var(--ac);white-space:nowrap;flex:none}
+.apphead .adot{width:6px;height:6px;border-radius:50%;background:#3aa66f;box-shadow:0 0 6px #3aa66f;flex:none}
+.apphead .ata{font-family:"DM Mono";font-size:8px;color:var(--mute);border:1px solid var(--line-2);border-radius:4px;padding:2px 6px;white-space:nowrap;flex:none}
+.apphead .ata:first-of-type{margin-left:auto}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px;margin-top:8px}
+.card{border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;background:linear-gradient(180deg,rgba(23,34,65,.4),rgba(13,20,38,.3));transition:border-color .25s,transform .25s}
+.card:hover{border-color:rgba(192,57,43,.4);transform:translateY(-2px)}
+.card .nm{font-family:"DM Mono";font-size:12px;color:var(--paper);letter-spacing:.01em;display:flex;align-items:center;gap:9px}
+.card .nm .dot{width:6px;height:6px;border-radius:50%;background:var(--seal);flex:none}
+.card .ro{font-size:11.5px;color:var(--paper-dim);margin-top:8px}.card .ro .zh{display:block;color:var(--mute);font-size:11px;margin-top:3px}
+.tbl{width:100%;border-collapse:collapse;font-size:11.5px}
+.tbl th{text-align:left;font-family:"DM Mono";font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);font-weight:500;padding:10px 13px;border-bottom:1px solid var(--line)}
+.tbl td{padding:12px 13px;border-bottom:1px solid var(--line-2);vertical-align:top;color:var(--paper-dim)}
+.tbl td.a{font-family:"DM Mono";font-size:11px;color:var(--paper);white-space:nowrap}
+.tbl td.a span{display:block;color:var(--seal);font-size:9px;margin-top:3px;letter-spacing:.08em}
+.tbl tr:hover td{background:rgba(23,34,65,.35)}.tbl td b{color:var(--paper)}
+.wb-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center}
+.wb-def{border-left:2px solid var(--seal);padding-left:19px;margin:18px 0}
+.wb-def .en{font-family:"Cormorant Garamond";font-style:italic;font-size:16.5px;color:var(--paper);line-height:1.5}
+.wb-def .zh{font-family:"Noto Serif TC";font-size:12px;color:var(--paper-dim);margin-top:9px;line-height:1.78}
+.wb-flow{border:1px solid var(--line);border-radius:var(--r);background:rgba(7,10,20,.4);padding:19px}
+.wb-flow .lbl{font-family:"DM Mono";font-size:9px;letter-spacing:.2em;color:var(--mute);text-transform:uppercase;margin-bottom:13px}
+.flowstep{display:flex;gap:12px;align-items:flex-start;padding:8px 0}
+.flowstep .i{font-family:"DM Mono";font-size:9.5px;color:var(--seal);flex:none;width:20px;padding-top:2px}
+.flowstep .c{font-size:11.5px;color:var(--paper-dim)}
+.flowstep .c b{color:var(--paper);font-family:"DM Mono";font-size:11px;letter-spacing:.01em}
+.flowstep+.flowstep{border-top:1px solid var(--line-2)}.flowstep.hi .c b{color:var(--teal)}
+.maprow{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line-2)}
+.maprow .req{font-size:12px;color:var(--paper-dim)}
+.maprow .arr{color:var(--seal);font-family:"DM Mono";font-size:12px}
+.maprow .cap{font-family:"DM Mono";font-size:11px;color:var(--paper);text-align:right}
+.res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px}
+.res{border:1px solid var(--line);border-radius:var(--r);padding:15px 16px;background:rgba(23,34,65,.3)}
+.res .h{font-family:"DM Mono";font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.res .yes{font-size:11.5px;color:var(--paper-dim)}
+.res .no{font-size:10.5px;color:var(--mute);margin-top:7px;padding-top:7px;border-top:1px solid var(--line-2)}.res .no b{color:var(--seal-deep);font-weight:500}
+.road{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px}
+.rcard{border:1px solid var(--line);border-radius:var(--r);padding:20px;background:linear-gradient(180deg,rgba(23,34,65,.45),rgba(13,20,38,.3))}
+.rcard .x{font-family:"DM Mono";font-size:9.5px;letter-spacing:.16em;color:var(--seal)}
+.rcard h3{font-family:"Syne";font-weight:700;font-size:16px;margin:8px 0 4px;letter-spacing:-.01em}
+.rcard .zh{font-family:"Noto Serif TC";font-size:11.5px;color:var(--paper-dim);margin-bottom:11px}
+.rcard ul{list-style:none}
+.rcard li{font-family:"DM Mono";font-size:10.5px;color:var(--mute);padding:4px 0;border-bottom:1px solid var(--line-2)}.rcard li:last-child{border:none}
+.comm-grid{display:grid;grid-template-columns:1.04fr .96fr;gap:16px;margin-top:10px}
+.comm{border:1px solid var(--line);border-radius:var(--r);padding:22px 22px;position:relative;overflow:hidden}
+.comm .tag{font-family:"DM Mono";font-size:9px;letter-spacing:.16em;text-transform:uppercase;padding:5px 9px;border-radius:2px;display:inline-block;margin-bottom:13px}
+.comm h3{font-family:"Syne";font-weight:700;font-size:19px;letter-spacing:-.01em}
+.comm h3 .zh{font-family:"Noto Serif TC";font-weight:500;font-size:13px;color:var(--paper-dim);margin-left:9px}
+.comm .eq{font-family:"DM Mono";font-size:11px;color:var(--paper-dim);margin:9px 0 14px;letter-spacing:.01em}
+.comm ul{list-style:none;display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
+.comm li{font-size:11.5px;color:var(--paper-dim);padding-left:15px;position:relative}
+.comm li::before{content:"";position:absolute;left:0;top:7px;width:5px;height:5px;border-radius:1px}
+.comm p{font-size:11.5px;color:var(--mute);line-height:1.6;border-top:1px solid var(--line-2);padding-top:11px}
+.comm.sell{border-color:rgba(198,164,86,.5);background:linear-gradient(180deg,rgba(198,164,86,.09),rgba(13,20,38,.4));box-shadow:0 14px 44px rgba(198,164,86,.07)}
+.comm.sell .tag{background:rgba(198,164,86,.16);color:var(--gold)}
+.comm.sell li::before{background:var(--gold)}
+.comm.sell p{color:var(--paper-dim)}
+.comm.sell p b{color:var(--gold)}
+.comm.proof{background:linear-gradient(180deg,rgba(23,34,65,.4),rgba(13,20,38,.3))}
+.comm.proof .tag{background:rgba(125,135,157,.14);color:var(--mute)}
+.comm.proof h3{color:var(--paper-dim)}
+.comm.proof li::before{background:var(--mute)}
+.close{background:radial-gradient(80% 120% at 50% 0%,rgba(192,57,43,.12),transparent 55%),linear-gradient(180deg,#0d1426,#070a14);text-align:center;padding:80px 0;position:relative;overflow:hidden}
+.close-crest{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);height:360px;opacity:.08;filter:grayscale(1);pointer-events:none}
+.close .thesis{max-width:64ch;margin:0 auto;position:relative;z-index:1}
+.close .line{font-family:"Syne";font-weight:700;font-size:clamp(18px,2.7vw,27px);line-height:1.22;letter-spacing:-.015em;margin:5px 0}
+.close .line.dim{color:var(--mute)}.close .line .em{color:var(--seal)}
+.close .zh-close{font-family:"Noto Serif TC";font-size:13px;color:var(--paper-dim);margin-top:22px;line-height:1.85;letter-spacing:.03em}
+.footer{border-top:1px solid var(--line);padding:22px 0}
+.footer .f{font-family:"DM Mono";font-size:9.5px;letter-spacing:.14em;color:var(--mute);text-transform:uppercase}
+.pdfbtn{font-family:"DM Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--paper-dim);background:rgba(23,34,65,.5);border:1px solid var(--line);border-radius:var(--r);padding:9px 16px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:border-color .2s,color .2s}
+.pdfbtn:hover{border-color:rgba(198,164,86,.55);color:var(--gold)}
+.pdfbtn svg{width:13px;height:13px;flex:none}
+@media print{
+  html,body{background:#070a14!important}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .rv{opacity:1!important;transform:none!important}
+  .pdfbtn{display:none!important}
+  .appcard,.card,.res,.rcard,.comm,.layer,.painlist,.maprow,.flowstep,.stat,.tbl tr,.wb-flow,.origin-grid,.wb-grid{break-inside:avoid}
+  @page{margin:12mm}
+}
+.rv{opacity:0;transform:translateY(18px);transition:opacity .7s cubic-bezier(.2,.6,.2,1),transform .7s cubic-bezier(.2,.6,.2,1)}
+.rv.in{opacity:1;transform:none}
+@media(min-width:1180px){
+  .wrap{max-width:1300px;padding:0 36px}
+  .sec{padding:76px 0}
+  .hero-grid{gap:58px;padding:74px 0 64px}
+  .hero h1{font-size:clamp(40px,4.6vw,60px)}
+  .hero .sub{font-size:14px;max-width:52ch}
+  .gal{gap:18px}
+  .stat{padding:26px 26px}
+  .stat .n{font-size:25px}
+  .hero-emblem img{height:188px}
+}
+@media(min-width:861px) and (max-width:1024px){
+  .gal{grid-template-columns:repeat(2,1fr)}
+  .hero-grid{gap:30px}
+  .wrap{padding:0 24px}
+}
+@media(max-width:860px){
+  body{font-size:12.5px}.wrap{padding:0 18px}
+  .hero-grid{grid-template-columns:1fr;gap:26px;padding:40px 0 38px}.hero-side-col{order:2}.hero-emblem{padding:0}.hero-emblem img{height:112px}.hero-crest{display:none}
+  .stats .wrap{grid-template-columns:repeat(2,1fr)}
+  .stat{border-left:none;padding:18px 0}.stat:nth-child(odd){border-right:1px solid var(--line-2);padding-right:18px}.stat:nth-child(even){padding-left:18px}
+  .origin-grid,.wb-grid,.comm-grid{grid-template-columns:1fr;gap:28px}
+  .grid,.res-grid,.road,.gal{grid-template-columns:1fr}
+  .sec{padding:46px 0}.layer-top .meta .t .zh{display:block;margin:3px 0 0}
+  .maprow{grid-template-columns:1fr;gap:5px}.maprow .cap{text-align:left}.maprow .arr{display:none}
+  .tbl,.tbl tbody,.tbl tr,.tbl td{display:block;width:100%}.tbl thead{display:none}
+  .tbl tr{border:1px solid var(--line);border-radius:var(--r);margin-bottom:12px;padding:6px 0}
+  .tbl td{border:none;padding:7px 14px}.tbl td.a span{display:inline;margin-left:8px}
+  .topmeta{display:none}
+}
+@media(max-width:560px){
+  body{font-size:13px;line-height:1.6}
+  .wrap{padding:0 16px}
+  .topbar{padding:14px 0}.crest{height:40px}
+  .hero-grid{padding:34px 0 34px}
+  .hero h1{font-size:33px}
+  .hero-emblem img{height:96px}
+  .hero .sub{font-size:13.5px}
+  .stats .wrap{grid-template-columns:1fr}
+  .stat{padding:14px 0!important;border-left:none!important;border-right:none!important;border-top:1px solid var(--line-2)}
+  .stat:first-child{border-top:none}
+  .apphead .ata{display:none}.apphead .adot{margin-left:auto}
+  .sec{padding:40px 0}
+  .layer{padding:15px 16px}
+  .comm{padding:18px}
+  .stat .n{font-size:22px}
+}
+@media(prefers-reduced-motion:reduce){.rv{transition:none;opacity:1;transform:none}html{scroll-behavior:auto}}
+</style>
+<script src="image-slot.js"></script>
+</helmet>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <img class="crest" src="assets/veritas-crest.png" alt="Veritas crest">
+        <div class="mark">VERITAS<span>·</span>INTELLIGENCE<span>·</span>ANALYTICS</div>
+      </div>
+      <div class="topmeta">Investor Brief · 2026 · Confidential</div>
+    </div>
+    <img class="hero-crest" src="assets/veritas-crest.png" alt="">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">Veritas Intelligence Analytics · Infrastructure Services</div>
+        <h1>We sell the<br><em>engine room</em>.</h1>
+        <div class="motto">AI creates infinite possibilities. VIA accelerates them into reality.</div>
+        <p class="sub">Veritas Intelligence Analytics is an <strong>infrastructure service</strong> — the AI engine room that grows new, enterprise-grade applications across any domain in <strong>weeks, not years</strong>. The applications keep evolving; the infrastructure is the product.</p>
+        <div class="hero-cta">
+          <div class="chip"><b>Infrastructure Services</b> · the product</div>
+          <div class="chip">Applications · <b>evolving proof, not for sale</b></div>
+          <div class="chip">Append-only · <b>offline-degradable</b></div>
+        </div>
+      </div>
+      <div class="hero-side-col">
+        <div class="hero-emblem"><img src="assets/veritas-crest.png" alt="Veritas Intelligence Analytics crest"></div>
+        <aside class="hero-side">
+        <div class="lbl">Platform Stack</div>
+        <div class="stk">
+          <div class="row app"><span class="t">Veritas Workbench</span><span class="s">APPLICATION · demo</span></div>
+          <div class="arrow"><b>▲</b> enabled by</div>
+          <div class="row core"><span class="t">VDF · VRN · VAP</span><span class="s">FUNCTIONAL CORE</span></div>
+          <div class="arrow"><b>▲</b> pulled by VRN</div>
+          <div class="row"><span class="t">Celeritas · Aegis · SSOT · Env · Registry</span><span class="s">INFRASTRUCTURE · the product</span></div>
+        </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="stats">
+  <div class="wrap">
+    <div class="stat"><div class="n">~<em>0</em>%</div><div class="k">Error tolerance</div><div class="d">The near-zero standard VRN demanded — the forcing function that built the platform.</div></div>
+    <div class="stat"><div class="n"><em>3</em> · 10+</div><div class="k">Cores · Support modules</div><div class="d">VDF / VRN / VAP functional cores on a governed support-module fabric.</div></div>
+    <div class="stat"><div class="n">1 ctx</div><div class="k">Runtime bridge</div><div class="d">Env · Registry · SSOT · Aegis · Celeritas mounted to one shared execution context.</div></div>
+    <div class="stat"><div class="n">Append<em>-only</em></div><div class="k">Governance model</div><div class="d">Append-only, auditable, reversible — the platform never silently loses state.</div></div>
+  </div>
+</section>
+
+<section class="sec origin">
+  <div class="wrap">
+    <div class="origin-grid">
+      <div class="narr rv">
+        <div class="eyebrow gold">01 · Origin</div>
+        <h2>From a PM who<br>could not rest.</h2>
+        <div class="h2-zh">The origin — a weekend that could never switch off</div>
+        <p><em>The origin was not an AI product idea. It was a real operational burden.</em></p>
+        <p>A project manager at a leading electronic-components company — already running PM work — was asked to support a PLM rollout that had to coexist with legacy SAP and MS Project.</p>
+        <p>Every Monday meant a status briefing. Every weekend meant chasing data scattered across email, attachments, tables, charts, minutes, old systems and people's verbal accounts.</p>
+      </div>
+      <div class="rv">
+        <div class="painlist">
+          <div class="it"><div class="x">A</div><div class="c"><b>Multi-system coexistence</b> — SAP, MS Project &amp; a new PLM, none speaking the same language.</div></div>
+          <div class="it"><div class="x">B</div><div class="c"><b>Scattered evidence</b> across email, attachments, tables, charts and meeting notes.</div></div>
+          <div class="it"><div class="x">C</div><div class="c"><b>Manual weekly rework</b> — status rebuilt from zero, every single week.</div></div>
+          <div class="it"><div class="x">D</div><div class="c"><b>No automatic reconciliation</b> between PLM / SAP / MS Project.</div></div>
+          <div class="it"><div class="x">E</div><div class="c"><b>No traceable SSOT</b> — knowledge lived in human memory, not an auditable layer.</div></div>
+        </div>
+        <p class="lead" style="margin-top:22px">The real problem was never the report.<br>It was the absence of a governed single source of truth.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec ink">
+  <div class="wrap">
+    <div class="archhead rv">
+      <div class="eyebrow">02 · System Architecture</div>
+      <h2>One platform, three strata.</h2>
+      <div class="h2-zh">VIA is the enabling infrastructure · VDF / VRN / VAP are the functional core · Veritas Workbench is one application built on top</div>
+    </div>
+    <div class="stack rv">
+      <div class="layer app">
+        <div class="layer-top"><div class="lnum">03</div><div class="meta"><div class="k">03 · Application Workstation · demo case</div><div class="t">Veritas Workbench <span class="zh">Application</span></div></div></div>
+        <div class="mods"><div class="mod"><b>PLM</b> Automation</div><div class="mod"><b>Project</b> Management</div><div class="mod"><b>Auto-SSOT</b></div><div class="mod"><b>Process</b> Mining</div><div class="mod"><b>Weekly</b> Report</div><div class="mod"><b>Human-in-the-loop</b> Correction</div></div>
+      </div>
+      <div class="gutter"><span class="cap">▲</span><span class="pull">enabled by &nbsp;<b>VIA capabilities</b></span></div>
+      <div class="layer core">
+        <div class="layer-top"><div class="lnum">02</div><div class="meta"><div class="k">02 · Functional Core · commercializable</div><div class="t">VDF · VRN · VAP <span class="zh">Functional Core</span></div></div></div>
+        <div class="mods"><div class="mod"><b>VDF</b> · Data Forge — Bloomberg-grade investment data → verifiable database</div><div class="mod"><b>VRN</b> · Report Nova — reads hundreds of investment reports → accurate, effortless database</div><div class="mod"><b>VAP</b> · Analytics Panorama — Dashboard / Matrix / process visuals</div></div>
+      </div>
+      <div class="gutter"><span class="cap">▲</span><span class="pull">pulled by VRN's near-zero tolerance &nbsp;<b>· source pull</b></span></div>
+      <div class="layer">
+        <div class="layer-top"><div class="lnum">01</div><div class="meta"><div class="k">01 · Infrastructure · Support Modules · commercializable</div><div class="t">VIA Support Fabric <span class="zh">Support Fabric</span></div></div></div>
+        <div class="mods"><div class="mod"><b>VeritasCeleritas</b> — accelerator / xmap·xfetch·xbatch</div><div class="mod"><b>VeritasAegisNexus</b> — compliant acquisition / rate·robots·cache</div><div class="mod"><b>VIA_SSOT_Unified</b> — alias·synonym·asset</div><div class="mod"><b>VIA_EnvManager</b> — venv·libs·route·health</div><div class="mod"><b>VIA_RegistryCore</b> — append-only registry governance</div><div class="mod"><b>VIA_RuntimeBridge</b> — shared ctx, unified entry</div><div class="mod"><b>VIA_Prompt</b> — Prompt management</div><div class="mod"><b>VIA_Methodology</b> — methodology / counter-evidence / correction</div><div class="mod"><b>VIA_AssetMgmt</b> — smart assets / auto-numbering</div><div class="mod"><b>VIA_VisualGovernance</b> — visual spec / RYG matrix</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec navy">
+  <div class="wrap">
+    <div class="archhead rv" style="text-align:left;margin-bottom:28px">
+      <div class="eyebrow teal">03 · The Forcing Function</div>
+      <h2>VRN didn't use the platform.<br>VRN <em style="color:var(--seal);font-style:normal">forced</em> it into existence.</h2>
+      <div class="h2-zh">The real build order was reversed — VRN's demands forced the support modules and functional core into existence</div>
+    </div>
+    <p class="body rv" style="margin-bottom:24px;max-width:none">Parsing investment reports — PDF, OCR, tables, in-image data, semantic repair, financial figures — carries almost no margin for error. One wrong field, one missed table, one misread number, and every downstream valuation, risk model and decision is contaminated. That intolerance is what built the infrastructure.</p>
+    <div class="rv" style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th style="width:24%">Capability VRN forced out</th><th style="width:38%">Why it was non-negotiable</th><th>How it now powers Workbench</th></tr></thead>
+        <tbody>
+          <tr><td class="a">VeritasCeleritas<span>accelerator</span></td><td>OCR, imaging, table &amp; semantic repair plus mass validation are heavy.</td><td>Processes large volumes of email, attachments, tables and weekly-report data <b>at speed</b>.</td></tr>
+          <tr><td class="a">VeritasAegisNexus<span>network</span></td><td>Needed stable, compliant, auditable bulk data acquisition.</td><td>Connects authorized email, system exports &amp; enterprise sources with full <b>evidence trail</b>.</td></tr>
+          <tr><td class="a">VIA_SSOT_Unified<span>SSOT</span></td><td>Fields, aliases, abbreviations and house jargon had to be unified.</td><td>Builds <b>Auto-SSOT</b> and cross-system semantic mapping automatically.</td></tr>
+          <tr><td class="a">VIA_EnvManager<span>env</span></td><td>OCR / PDF / imaging / DB / AI stacks are brutally hard to keep stable.</td><td>New Workbench features deploy fast — never strangled by dependency conflicts.</td></tr>
+          <tr><td class="a">VIA_RegistryCore<span>registry</span></td><td>Growing tool count must be registered, classified, risk-tracked.</td><td>Keeps Workbench's modules from becoming an unmaintainable <b>nine-headed Hydra</b>.</td></tr>
+          <tr><td class="a">VAP · VisualGov<span>visual gov</span></td><td>Complex pipelines must be made visible to be trusted.</td><td>Generates process maps, status matrices and briefing-ready slides.</td></tr>
+          <tr><td class="a">Asset · Methodology<span>assets</span></td><td>Modules, prompts, templates, rules must stay traceable &amp; reusable.</td><td>Lets Workbench knowledge, corrections and methods <b>compound over time</b>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="sec navy2">
+  <div class="wrap">
+    <div class="archhead rv" style="text-align:left;margin-bottom:26px">
+      <div class="eyebrow">04 · The Enabler Layer</div>
+      <h2>Infrastructure as a moat.</h2>
+      <div class="h2-zh">The support modules were never built for any one application — yet they accelerate every new one</div>
+    </div>
+    <div class="grid rv">
+      <div class="card"><div class="nm"><span class="dot"></span>VeritasCeleritas</div><div class="ro">Hardware-aware speed: CPU / RAM / thread budgets, memory pools, parallel engines, cache, JSON/compression/hashing.</div></div>
+      <div class="card"><div class="nm"><span class="dot"></span>VeritasAegisNexus</div><div class="ro">Authorized-only acquisition: robots check, bounded timeout, offline mode, rate guard, risk blocking, cache.</div></div>
+      <div class="card"><div class="nm"><span class="dot"></span>VIA_SSOT_Unified</div><div class="ro">Corpus of regex / lists / synonyms / aliases with normalize · extract · contains · asset dump/load/patch.</div></div>
+      <div class="card"><div class="nm"><span class="dot"></span>VIA_EnvManager</div><div class="ro">Unified venv / libs / alias / route / health / conflicts / rebuild — append-only, offline-capable, non-destructive.</div></div>
+      <div class="card"><div class="nm"><span class="dot"></span>VIA_RegistryCore</div><div class="ro">Append-only registry governing module scan, register, resolve, route &amp; execution entry.</div></div>
+      <div class="card"><div class="nm"><span class="dot"></span>Prompt · Methodology · Asset</div><div class="ro">Prompt schemas, hypothesis/counter-evidence methodology, traceable asset IDs with correction history.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec ink">
+  <div class="wrap">
+    <div class="wb-grid">
+      <div class="rv">
+        <div class="eyebrow gold">05 · Example Application</div>
+        <h2>Veritas Workbench.</h2>
+        <div class="h2-zh">One application enabled by the infrastructure — domain apps keep evolving; this is proof of platform maturity, not the product</div>
+        <p class="body">It connects authorized communication, documents, legacy systems and project records into a traceable intelligence layer — turning <strong>text into data, tables into databases, workflows into process maps, corrections into knowledge</strong>, and weekly reporting into a governed human-in-the-loop cycle.</p>
+        <div class="wb-def">
+          <div class="en">An AI automation workstation for PLM, project management, Auto-SSOT and process mining — enabled by the VIA infrastructure layer.</div>
+        </div>
+        <div class="hero-cta">
+          <div class="chip"><b>Legacy-first</b> · respects existing systems</div>
+          <div class="chip"><b>Authorized-only</b> · no unauthorized scraping</div>
+          <div class="chip"><b>Evidence-first</b> · traceable conclusions</div>
+        </div>
+      </div>
+      <div class="wb-flow rv">
+        <div class="lbl">Human-in-the-loop Cycle</div>
+        <div class="flowstep"><div class="i">01</div><div class="c"><b>Authorized capture</b> — email · attachments · SAP / MS Project / PLM exports · local files</div></div>
+        <div class="flowstep"><div class="i">02</div><div class="c"><b>VRN-like parsing</b> — text repair · table reconstruction · in-image data · attachment routing</div></div>
+        <div class="flowstep"><div class="i">03</div><div class="c"><b>Auto-SSOT</b> — field unification · keyword corpus · jargon mapping · cross-system naming</div></div>
+        <div class="flowstep"><div class="i">04</div><div class="c"><b>Process mining</b> — flow reconstruction · bottlenecks · responsibility &amp; gap matrices</div></div>
+        <div class="flowstep hi"><div class="i">05</div><div class="c"><b>Human checkpoint</b> — review · expose uncertainty · list possible failure causes · correct</div></div>
+        <div class="flowstep"><div class="i">06</div><div class="c"><b>Report &amp; slides</b> — weekly report · pivots · charts · briefing draft</div></div>
+        <div class="flowstep hi"><div class="i">07</div><div class="c"><b>Learning ledger</b> — corrections written back to knowledge &amp; methodology — next week is sharper</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec navy">
+  <div class="wrap">
+    <div class="archhead rv" style="text-align:left;margin-bottom:24px">
+      <div class="eyebrow teal">06 · Velocity</div>
+      <h2>Why it ships fast.</h2>
+      <div class="h2-zh">Workbench ships fast not because the scope is small, but because VIA already solved the hardest layers</div>
+    </div>
+    <div class="rv">
+      <div class="maprow"><div class="req"><strong>Email &amp; attachment parsing</strong></div><div class="arr">→ already in</div><div class="cap">VRN parsing + VAP visual layer</div></div>
+      <div class="maprow"><div class="req"><strong>Auto-SSOT</strong></div><div class="arr">→ already in</div><div class="cap">SSOT_Unified + Registry + Asset Mgmt</div></div>
+      <div class="maprow"><div class="req"><strong>Fast processing on commodity hardware</strong></div><div class="arr">→ already in</div><div class="cap">VeritasCeleritas</div></div>
+      <div class="maprow"><div class="req"><strong>Authorized data acquisition</strong></div><div class="arr">→ already in</div><div class="cap">VeritasAegisNexus</div></div>
+      <div class="maprow"><div class="req"><strong>Stable local runtime</strong></div><div class="arr">→ already in</div><div class="cap">EnvManager + RuntimeBridge</div></div>
+      <div class="maprow"><div class="req"><strong>Reports, charts, pivots</strong></div><div class="arr">→ already in</div><div class="cap">VAP + Prompt + Methodology + VisualGov</div></div>
+      <div class="maprow"><div class="req"><strong>Process mining &amp; correction loop</strong></div><div class="arr">→ already in</div><div class="cap">Methodology + Knowledge Ledger + Matrix</div></div>
+    </div>
+    <p class="lead rv" style="margin-top:26px">From scratch, this is a multi-year enterprise build.<br>On VIA, the hardest layers were already done.</p>
+  </div>
+</section>
+
+<section class="sec navy2">
+  <div class="wrap">
+    <div class="archhead rv" style="text-align:left;margin-bottom:22px">
+      <div class="eyebrow gold">07 · Resilience Spec</div>
+      <h2>The "doomsday" test is a requirement,<br>not an incident.</h2>
+      <div class="h2-zh">Whole team gone, no network, no AI — not a disaster story, but a resilience standard</div>
+    </div>
+    <p class="body rv" style="margin-bottom:6px;max-width:none">Under degraded conditions — no network, no external AI, no clean handover — the system must not hallucinate certainty. It must degrade honestly into a deterministic rule engine.</p>
+    <div class="res-grid rv">
+      <div class="res"><div class="h">No Network</div><div class="yes">Use local cache, last-sync state &amp; offline SSOT for classification and reconciliation.</div><div class="no"><b>Never</b> claim it fetched fresh cloud data.</div></div>
+      <div class="res"><div class="h">No External AI</div><div class="yes">Fall back to a deterministic rule engine, template reports, fixed classifiers.</div><div class="no"><b>Never</b> let the whole system collapse.</div></div>
+      <div class="res"><div class="h">No Handover</div><div class="yes">Generate a handover pack: project list, responsibility / risk matrix, process map, gap list.</div><div class="no"><b>Never</b> pretend to know un-handed-over context.</div></div>
+    </div>
+    <p class="lead rv" style="margin-top:24px">If it still produces a conservative report, a risk matrix and a handover pack offline — it is no longer an assistant. It is operational infrastructure.</p>
+  </div>
+</section>
+
+<section class="sec navy">
+  <div class="wrap">
+    <div class="archhead rv" style="text-align:left;margin-bottom:24px">
+      <div class="eyebrow teal">08 · Built on VIA</div>
+      <h2>Same engine room. Many applications.</h2>
+      <div class="h2-zh">Analysis and simulation apps grown from one infrastructure — built to capture return and avoid risk (drop real screenshots to showcase)</div>
+    </div>
+    <div class="domains rv">
+      <span class="dlbl">Strategy domains served</span>
+      <span class="dchip">Macro</span><span class="dchip">Industry</span><span class="dchip">Valuation</span><span class="dchip">Technical</span><span class="dchip">Chip / Positioning</span><span class="dchip">Sentiment</span><span class="dchip">Game Theory</span>
+      <span class="dnote">Proprietary methodology &amp; rules withheld</span>
+    </div>
+    <div class="gal rv">
+      <div class="appcard">
+        <div class="apphead" style="--ac:#5e8fcc"><span class="ab">VIA</span><span class="an">Chip Analysis</span><span class="adot"></span><span class="ata">Sectors</span><span class="ata">Supply</span><span class="ata">Strength</span></div><div class="screen"><image-slot id="app-chip" shape="rect" placeholder="Drop a screenshot (optional)"></image-slot></div>
+        <div class="cap"><div class="nm">VIA Chip Analysis Platform</div><div class="zh">Semiconductor clusters · supply-chain strength</div><span class="bdg analysis">Analysis</span></div>
+      </div>
+      <div class="appcard">
+        <div class="apphead" style="--ac:#3aa6a0"><span class="ab">VIA</span><span class="an">Capital Flow</span><span class="adot"></span><span class="ata">World Flow</span><span class="ata">Scenario</span><span class="ata">Tiers</span></div><div class="screen"><image-slot id="app-map" shape="rect" placeholder="Drop a screenshot (optional)"></image-slot></div>
+        <div class="cap"><div class="nm">Global Capital-Flow Simulation</div><div class="zh">Global capital flows · scenario map</div><span class="bdg sim">Simulation</span></div>
+      </div>
+      <div class="appcard">
+        <div class="apphead" style="--ac:#5e8fcc"><span class="ab">VIA</span><span class="an">Cluster Map</span><span class="adot"></span><span class="ata">Sectors</span><span class="ata">Themes</span><span class="ata">Lead/Lag</span></div><div class="screen"><image-slot id="app-cluster" shape="rect" placeholder="Drop a screenshot (optional)"></image-slot></div>
+        <div class="cap"><div class="nm">Cluster Classification v1.1</div><div class="zh">Cluster refinement · investment-theme grouping</div><span class="bdg analysis">Analysis</span></div>
+      </div>
+      <div class="appcard">
+        <div class="apphead" style="--ac:#c6a456"><span class="ab">VIA</span><span class="an">Asset Gen</span><span class="adot"></span><span class="ata">Assets</span><span class="ata">IDs</span><span class="ata">Versions</span></div><div class="screen"><image-slot id="app-asset" shape="rect" placeholder="Drop a screenshot (optional)"></image-slot></div>
+        <div class="cap"><div class="nm">Intelligence Asset Generator</div><div class="zh">Smart-asset generation · dense pro UI</div><span class="bdg">Infra · Asset</span></div>
+      </div>
+      <div class="appcard">
+        <div class="apphead" style="--ac:#c6a456"><span class="ab">VIA</span><span class="an">Risk Weekly</span><span class="adot"></span><span class="ata">Risk Lights</span><span class="ata">Weekly</span><span class="ata">Matrix</span></div><div class="screen"><image-slot id="app-riskweekly" shape="rect" placeholder="Drop a screenshot (optional)"></image-slot></div>
+        <div class="cap"><div class="nm">Market Risk Weekly · VisualLock</div><div class="zh">Market risk weekly · risk visual-lock</div><span class="bdg risk">Risk</span></div>
+      </div>
+      <div class="appcard">
+        <div class="apphead" style="--ac:#d2706f"><span class="ab">VIA</span><span class="an">Risk Engine</span><span class="adot"></span><span class="ata">VaR</span><span class="ata">Stress</span><span class="ata">Cross-asset</span></div><div class="screen"><image-slot id="app-riskengine" shape="rect" placeholder="Drop a screenshot (optional)"></image-slot></div>
+        <div class="cap"><div class="nm">Integrated Risk Engine v13</div><div class="zh">Integrated risk engine · cross-asset linkage</div><span class="bdg risk">Risk</span></div>
+      </div>
+    </div>
+    <p class="body rv" style="margin-top:18px;color:var(--mute);max-width:none">Each screen is not a standalone product — it is an application generated fast on the same VIA infrastructure: analysis, simulation, risk, asset generation, all sharing the support engine and functional engine. <b style="color:var(--paper-dim)">They prove the foundation keeps producing tools that capture return and avoid risk for investors.</b></p>
+  </div>
+</section>
+
+<section class="sec ink">
+  <div class="wrap">
+    <div class="archhead rv" style="text-align:left;margin-bottom:26px">
+      <div class="eyebrow">09 · Next</div>
+      <h2>Three super-core upgrades.</h2>
+      <div class="h2-zh">Workbench is not the finish line — it triggers VIA's next upgrade phase</div>
+    </div>
+    <div class="road rv">
+      <div class="rcard"><div class="x">A · ASSET</div><h3>Smart Asset Management</h3><ul><li>AssetID · Version · Owner</li><li>Source · Dependency · Checksum</li><li>Usage history</li><li>Human-correction history</li></ul></div>
+      <div class="rcard"><div class="x">B · METHOD</div><h3>Methodology Mgmt</h3><ul><li>Hypothesis · counter-evidence</li><li>Reasoning path · sources</li><li>Possible failure modes</li><li>Decision basis · next improvement</li></ul></div>
+      <div class="rcard"><div class="x">C · PROMPT</div><h3>Prompt Management</h3><ul><li>PromptID · role · risk</li><li>Input / output schema</li><li>Validation rules</li><li>Revision &amp; feedback history</li></ul></div>
+    </div>
+    <p class="body rv" style="margin-top:22px;color:var(--mute)">These three turn Workbench from “helps you organize” into “helps you see clearly” — and form the methodology and execution hub of all of VIA.</p>
+  </div>
+</section>
+
+<section class="sec navy">
+  <div class="wrap">
+    <div class="archhead rv" style="text-align:left;margin-bottom:24px">
+      <div class="eyebrow gold">10 · Commercialization</div>
+      <h2>We sell <em style="color:var(--gold);font-style:normal">infrastructure services</em>, not applications.</h2>
+      <div class="h2-zh">The product is the Veritas Intelligence Analytics infrastructure service — evolving domain apps are never the SKU; the key is the infrastructure itself, not any single app</div>
+    </div>
+    <div class="comm-grid rv">
+      <div class="comm sell">
+        <div class="tag">The Product · for sale</div>
+        <h3>Infrastructure Services</h3>
+        <div class="eq">Support Engine &nbsp;+&nbsp; Functional Engine</div>
+        <ul>
+          <li>VIA Support Fabric — Celeritas · Aegis · SSOT · Env · Registry · Runtime</li>
+          <li>Functional Core — VDF · VRN · VAP</li>
+          <li>Delivered as a service: licensable · platform · repeatable</li>
+          <li>An AI-development foundation portable to any vertical</li>
+        </ul>
+        <p><b>This is the moat.</b> The real product is this infrastructure service — it forms any new application within weeks, and its value compounds with every project.</p>
+      </div>
+      <div class="comm proof">
+        <div class="tag">Not For Sale</div>
+        <h3>Evolving Applications</h3>
+        <div class="eq">Veritas Workbench · Finance · PLM · …any domain</div>
+        <ul>
+          <li>PLM · Project Mgmt · Auto-SSOT · Process Mining · Weekly Report</li>
+          <li>Financial analysis · valuation · risk · strategy · other verticals</li>
+          <li>Always evolving, replaceable — not a standardized product</li>
+          <li>Role: proof the infrastructure is mature enough to generate enterprise apps fast</li>
+        </ul>
+        <p>Applications change and get replaced; the underlying infrastructure does not. <b style="color:var(--paper)">The key is the infrastructure, not the apps.</b></p>
+      </div>
+    </div>
+    <p class="lead rv" style="margin-top:24px;max-width:none">Applications change. The infrastructure compounds.<br>That service layer — not any single app — is what you invest in.</p>
+  </div>
+</section>
+
+<section class="close">
+  <img class="close-crest" src="assets/veritas-crest.png" alt="">
+  <div class="wrap">
+    <div class="thesis rv">
+      <div class="line">We sell the <span class="em">infrastructure.</span></div>
+      <div class="line dim">Support engine + functional engine, delivered as a service.</div>
+      <div class="line">Applications across every domain are evolving proof —<br>never the product. The engine room is.</div>
+      <div class="tagline">AI creates infinite possibilities. VIA accelerates them into reality.</div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+    <div class="brand"><img class="crest" style="height:34px" src="assets/veritas-crest.png" alt="Veritas crest"><div class="mark" style="font-size:12px">VERITAS<span style="color:var(--seal)">·</span>INTELLIGENCE<span style="color:var(--seal)">·</span>ANALYTICS</div></div>
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap"><div class="f">AI Infrastructure Operating System · Taiwan · 2026</div><button id="pdfbtn" class="pdfbtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4"></path><path d="M5 21h14"></path></svg>Save as PDF</button></div>
+  </div>
+</footer></x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  componentDidMount(){
+    const run = () => {
+      const els = document.querySelectorAll('.rv');
+      if(!('IntersectionObserver' in window)){ els.forEach(e=>e.classList.add('in')); return; }
+      const io = new IntersectionObserver((es)=>{
+        es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+      },{threshold:.12, rootMargin:'0px 0px -8% 0px'});
+      els.forEach(el=>io.observe(el));
+    };
+    if(typeof requestAnimationFrame!=='undefined') requestAnimationFrame(()=>setTimeout(run,30)); else run();
+    const pb=document.getElementById('pdfbtn'); if(pb) pb.onclick=()=>{ window.print(); };
+  }
+}
+</script>
+</body>
+</html>

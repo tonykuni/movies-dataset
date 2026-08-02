@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;--line:#dbd9d3;--soft:#ecebe6;--accent:#439a9a;--blue:#4c78a8;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--co:#c96b5a;--vi:#7a6daa;--gn:#5a9e6f;--ro:#b05580;--reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);}
+  body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  *{scrollbar-width:thin;scrollbar-color:rgba(67,154,154,0.32) transparent;}
+  *::-webkit-scrollbar{width:7px;height:7px;}
+  *::-webkit-scrollbar-track{background:transparent;}
+  *::-webkit-scrollbar-thumb{background:rgba(67,154,154,0.28);border-radius:6px;border:2px solid transparent;background-clip:padding-box;}
+  *::-webkit-scrollbar-thumb:hover{background:rgba(67,154,154,0.55);background-clip:padding-box;}
+</style>
+<style>@media print{@page{size:A4 landscape;margin:8mm}html,body{background:#fff !important;-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}.__pdfbtn{display:none !important}*{box-shadow:none !important}[style*="position:sticky"]{position:static !important}[style*="overflow-y:auto"],[style*="overflow:auto"],[style*="overflow-x:auto"]{overflow:visible !important;max-height:none !important}table,section,.brk{break-inside:avoid}}</style>
+<script>window.addEventListener('load',function(){if(document.getElementById('__pdfbtn'))return;var b=document.createElement('div');b.id='__pdfbtn';b.className='__pdfbtn';b.innerHTML='<img src="assets/pdf-icon.png" alt="PDF" style="width:30px;height:30px;display:block">';b.title='A4 PDF';b.style.cssText='position:fixed;top:12px;right:14px;z-index:99999;background:transparent;border:none;padding:0;font:700 10px monospace;letter-spacing:.5px;cursor:pointer;';b.onclick=function(){window.print()};document.body.appendChild(b);});</script>
+</helmet>
+<div ref="{{ rootRef }}" style="max-width:1340px;margin:0 auto;padding:0 22px 46px;">
+  <div style="position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50;"></div>
+  <header style="position:relative;padding:22px 0 10px;margin-bottom:12px;border-bottom:2px solid var(--ink);">
+    <div style="font:700 10px 'DM Mono',monospace;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px;">VERITAS INTELLIGENCE ANALYTICS · 籌碼分析平台</div>
+    <h1 style="font:800 18px/1.2 'Syne',sans-serif;color:var(--ink);">籌碼分析 <span style="color:var(--up);">平台</span> · Chip Analysis</h1>
+    <p style="margin-top:5px;font:400 10.5px/1.5 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:980px;">三大法人 · 八大官股 · 主力分點 · 籌碼熱力圖 · 籌碼相關矩陣 · 資券變化。紅買綠賣（台股慣例）。</p>
+  </header>
+
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#1e1d1a;border-radius:3px;padding:6px 13px;margin-bottom:8px;">
+    <span style="display:inline-flex;align-items:center;gap:6px;font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase;">🔒 VISUAL LOCK · 全格式鎖定</span>
+    <span style="display:inline-flex;align-items:center;gap:4px;font:500 8px 'DM Mono',monospace;color:#cfcabf;">色票
+      <span style="width:11px;height:11px;border-radius:2px;background:#4c78a8;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#439a9a;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#9c9890;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#c96b5a;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#5a9e6f;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#f5f4f0;border:1px solid #555;"></span>
+    </span>
+    <span style="font:500 8px 'DM Mono',monospace;color:#8a948f;">字體 Syne / DM Sans / DM Mono</span>
+    <span style="font:500 8px 'DM Mono',monospace;color:#8a948f;">漲紅跌綠 · 千分位 · 熱力色階</span>
+    <span style="margin-left:auto;font:700 8px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:2px 8px;">v1.0 · LOCKED 2026-06-22</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;background:#fff;border:1px solid #dbd9d3;border-left:3px solid #439a9a;border-radius:3px;padding:6px 13px;margin-bottom:12px;">
+    <span style="font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;">🛰 資料請求 · VDF ENGINES</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">TWSE→rest</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#c4943a;border-radius:3px;padding:1px 6px;">SITCA→parse</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">MOPS→parse</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">yfinance→pyproc</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#c0584e;border-radius:3px;padding:1px 6px;">FactSet→keyed</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">FRED→keyed</span>
+    <span style="margin-left:auto;font:500 8px 'DM Mono',monospace;color:#9c9890;">request.json → VDF 擷取 → 雙重驗算 → Parquet → JSON</span>
+  </div>
+
+  <details data-contract="1" style="margin-bottom:12px;border:1px solid #dbd9d3;border-left:3px solid #1e1d1a;border-radius:3px;background:#fbfaf7;overflow:hidden;">
+    <summary style="cursor:pointer;user-select:none;padding:6px 13px;font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;list-style:none;">📜 引擎連接合約 · request.json（點擊展開 · 可選取複製）</summary>
+    <pre style="margin:0;padding:10px 13px;background:#1e1d1a;color:#cfe3d6;font:500 9px/1.55 'DM Mono',monospace;white-space:pre;overflow-x:auto;">{
+  "request": "chip_analysis_platform",
+  "asof": "2026-06-22",
+  "universe": { "market": "TW", "exchange": ["TWSE","TPEX"] },
+  "sources": ["TWSE","TPEX","SITCA","MOPS","yfinance","FactSet","FRED"],
+  "engines": { "TWSE":"rest","TPEX":"rest","SITCA":"parse","MOPS":"parse","yfinance":"pyproc","FactSet":"keyed","FRED":"keyed" },
+  "range": { "start":"1996-01-01","end":"latest" },
+  "verify": "double_identity",
+  "db_discover": { "folder":"D:\\VDF\\databases\\","recursive":true,"match":["*.parquet","*.duckdb","*.db","*.csv"] },
+  "sink": { "parquet":"vdf/chip_analysis_platform/","export":"chip_analysis_platform.json" }
+}</pre>
+    <div style="padding:6px 13px;font:400 8px 'DM Sans','Noto Sans TC',sans-serif;color:#9c9890;">本檔即以此合約向 VDF 引擎請求 → 依 engines 分流(rest/parse/pyproc/keyed) → 雙重恆等驗算 → 落地 Parquet → 匯出 <b style="color:#6b6860;">chip_analysis_platform.json</b> 覆蓋本頁資料源。</div>
+  </details>
+
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:13px;">
+    <sc-for list="{{ cards }}" as="s" hint-placeholder-count="5">
+      <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid {{ s.color }};border-radius:2px;padding:8px 11px;">
+        <div style="font:600 8.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);margin-bottom:2px;">{{ s.l }}</div>
+        <div style="font:500 16px 'DM Mono',monospace;color:var(--ink);">{{ s.v }}</div>
+        <div style="font:600 8px 'DM Mono',monospace;margin-top:1px;{{ s.css }}">{{ s.s }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display:flex;gap:4px;margin-bottom:13px;border-bottom:1px solid var(--line);flex-wrap:wrap;position:sticky;top:0;z-index:45;background:var(--bg);padding-top:6px;box-shadow:0 8px 10px -10px rgba(31,42,42,.45);">
+    <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5">
+      <div onClick="{{ t.go }}" style="font:700 11px 'Syne',sans-serif;padding:7px 13px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;position:relative;top:1px;user-select:none;{{ t.css }}">{{ t.label }}</div>
+    </sc-for>
+  </div>
+
+  <!-- INSTITUTIONAL / OFFICIAL / BROKER table -->
+  <sc-if value="{{ isFlow }}">
+  <div>
+    <div style="display:flex;gap:4px;margin-bottom:10px;">
+      <sc-for list="{{ subTabs }}" as="s" hint-placeholder-count="3">
+        <span onClick="{{ s.go }}" style="font:700 9.5px 'DM Mono',monospace;padding:4px 11px;border-radius:5px;cursor:pointer;user-select:none;{{ s.css }}">{{ s.label }}</span>
+      </sc-for>
+    </div>
+    <div style="border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper);overflow-x:auto;">
+      <table style="width:100%;border-collapse:separate;border-spacing:0;min-width:760px;">
+        <thead><tr>
+          <th style="text-align:left;padding:6px 11px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">{{ flowCol0 }}</th>
+          <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">買進</th>
+          <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">賣出</th>
+          <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">買賣超</th>
+          <th style="text-align:left;padding:6px 11px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);width:200px;">淨額方向</th>
+          <th style="text-align:right;padding:6px 11px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">連續</th>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ flowRows }}" as="r" hint-placeholder-count="8">
+            <tr style="background:{{ r.bg }};">
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);font:600 9.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);white-space:nowrap;">{{ r.name }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:500 9px 'DM Mono',monospace;color:var(--mut);font-variant-numeric:tabular-nums;">{{ r.buy }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:500 9px 'DM Mono',monospace;color:var(--mut);font-variant-numeric:tabular-nums;">{{ r.sell }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:700 9.5px 'DM Mono',monospace;{{ r.netCss }}">{{ r.net }}</td>
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);"><div style="position:relative;height:10px;"><div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line);"></div><div style="position:absolute;top:1px;height:8px;border-radius:2px;{{ r.barCss }}"></div></div></td>
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);text-align:right;font:600 9px 'DM Mono',monospace;color:{{ r.streakCss }};">{{ r.streak }}</td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- HEATMAP -->
+  <sc-if value="{{ isHeat }}">
+  <div>
+    <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:9px;font:600 9px 'DM Mono',monospace;color:var(--mut);">
+      <span style="font-weight:700;color:var(--ink2);">籌碼熱力圖 · 近 20 交易日</span>
+      <span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;">賣<span style="width:70px;height:9px;border-radius:2px;background:linear-gradient(90deg,var(--down),#e9e5dc,var(--up));display:inline-block;"></span>買</span>
+    </div>
+    <div style="border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper);overflow-x:auto;">
+      <table style="border-collapse:separate;border-spacing:0;width:100%;min-width:780px;">
+        <thead><tr>
+          <th style="text-align:left;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--ink);background:var(--soft);border-bottom:1px solid var(--line);position:sticky;left:0;">類別＼日</th>
+          <sc-for list="{{ heatDays }}" as="d" hint-placeholder-count="20"><th style="text-align:center;padding:5px 2px;font:600 7px 'DM Mono',monospace;color:var(--mut);background:var(--soft);border-bottom:1px solid var(--line);">{{ d }}</th></sc-for>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ heatRows }}" as="r" hint-placeholder-count="7">
+            <tr>
+              <td style="padding:4px 9px;font:700 8.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);background:var(--paper);border-top:1px solid var(--soft);white-space:nowrap;">{{ r.cat }}</td>
+              <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="20"><td title="{{ c.t }}" style="border-top:1px solid #fff;border-left:1px solid #fff;background:{{ c.bg }};min-width:26px;height:20px;"></td></sc-for>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- CORRELATION MATRIX -->
+  <sc-if value="{{ isCorr }}">
+  <div>
+    <div style="font:600 9px 'DM Mono',monospace;color:var(--mut);margin-bottom:9px;">籌碼相關矩陣 · 收盤價 vs 法人/資券/量（皮爾森 ρ，紅正綠負）</div>
+    <div style="border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper);overflow-x:auto;">
+      <table style="border-collapse:separate;border-spacing:0;width:100%;min-width:620px;">
+        <thead><tr>
+          <th style="padding:6px 8px;background:var(--soft);border-bottom:1px solid var(--line);"></th>
+          <sc-for list="{{ corrLabels }}" as="l" hint-placeholder-count="7"><th style="text-align:center;padding:6px 6px;font:700 7.5px 'Syne',sans-serif;color:var(--ink);background:var(--soft);border-bottom:1px solid var(--line);">{{ l }}</th></sc-for>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ corrRows }}" as="r" hint-placeholder-count="7">
+            <tr>
+              <td style="padding:5px 8px;font:700 8px 'Syne',sans-serif;color:var(--ink);background:var(--soft);border-top:1px solid var(--line);white-space:nowrap;">{{ r.label }}</td>
+              <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="7"><td style="border-top:1px solid #fff;text-align:center;font:600 8.5px 'DM Mono',monospace;color:{{ c.fg }};background:{{ c.bg }};min-width:54px;">{{ c.t }}</td></sc-for>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- MARGIN / SHORT -->
+  <sc-if value="{{ isMargin }}">
+  <div>
+    <div style="border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper);overflow-x:auto;">
+      <table style="width:100%;border-collapse:separate;border-spacing:0;min-width:760px;">
+        <thead><tr>
+          <th style="text-align:left;padding:6px 11px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">日期</th>
+          <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">融資餘額</th>
+          <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">資增減</th>
+          <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">融券餘額</th>
+          <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">券增減</th>
+          <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">資券比</th>
+          <th style="text-align:right;padding:6px 11px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">維持率</th>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ marginRows }}" as="r" hint-placeholder-count="10">
+            <tr style="background:{{ r.bg }};">
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);font:600 9px 'DM Mono',monospace;color:var(--ink2);white-space:nowrap;">{{ r.date }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:500 9px 'DM Mono',monospace;color:var(--ink);font-variant-numeric:tabular-nums;">{{ r.mBal }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:600 9px 'DM Mono',monospace;{{ r.mChgCss }}">{{ r.mChg }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:500 9px 'DM Mono',monospace;color:var(--ink);font-variant-numeric:tabular-nums;">{{ r.sBal }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:600 9px 'DM Mono',monospace;{{ r.sChgCss }}">{{ r.sChg }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:500 9px 'DM Mono',monospace;color:var(--mut);">{{ r.ratio }}</td>
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);text-align:right;font:600 9px 'DM Mono',monospace;{{ r.mtCss }}">{{ r.maint }}</td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+    <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--co);border-radius:2px;padding:9px 13px;margin-top:11px;font:400 10px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);"><b style="color:var(--ink);">維持率 130% 為追繳警戒線</b>（紅）。資券比 = 融券/融資；資增券減＝散戶偏多。</div>
+  </div>
+  </sc-if>
+
+  <!-- TDCC big holders -->
+  <sc-if value="{{ isHolder }}">
+  <div>
+    <div style="font:600 9px 'DM Mono',monospace;color:var(--mut);margin-bottom:9px;">集保大戶持股分級 · TDCC 股權分散（近 10 週，>400/>1000 張為大戶）</div>
+    <div style="border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper);overflow-x:auto;">
+      <table style="width:100%;border-collapse:separate;border-spacing:0;min-width:720px;">
+        <thead><tr>
+          <th style="text-align:left;padding:6px 11px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">持股級距</th>
+          <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">人數</th>
+          <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">持股%</th>
+          <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">週變動</th>
+          <th style="text-align:left;padding:6px 11px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);width:220px;">佔比</th>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ holderRows }}" as="r" hint-placeholder-count="6">
+            <tr style="background:{{ r.bg }};">
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);font:600 9.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);white-space:nowrap;">{{ r.tier }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:500 9px 'DM Mono',monospace;color:var(--mut);">{{ r.ppl }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:700 9.5px 'DM Mono',monospace;color:var(--ink);">{{ r.pct }}</td>
+              <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:600 9px 'DM Mono',monospace;{{ r.chgCss }}">{{ r.chg }}</td>
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);"><div style="height:8px;border-radius:3px;background:var(--soft);overflow:hidden;"><div style="height:100%;width:{{ r.w }};background:{{ r.color }};"></div></div></td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+    <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--vi);border-radius:2px;padding:9px 13px;margin-top:11px;font:400 10px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);"><b style="color:var(--ink);">大戶(>1000張)持股比上升</b>＝籌碼集中（偏多訊號）；散戶(<10張)增加＝籌碼分散。配合三大法人/主力分點交叉確認。</div>
+  </div>
+  </sc-if>
+
+  <!-- 基本面 fundamentals -->
+  <sc-if value="{{ isFund }}">
+  <div>
+    <div style="font:600 9px 'DM Mono',monospace;color:var(--mut);margin-bottom:9px;">基本面（整合自 ChipAnalysis 平台）· 營收/毛利率 · EPS · ROE/ROA · 股利</div>
+    <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:10px;margin-bottom:11px;">
+      <div style="border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper);">
+        <div style="padding:6px 11px;border-bottom:1px solid var(--line);background:var(--paper2);font:700 10.5px 'Syne',sans-serif;color:var(--ink);">營收 · 毛利率 · EPS（季）</div>
+        <table style="width:100%;border-collapse:separate;border-spacing:0;">
+          <thead><tr>
+            <th style="text-align:left;padding:5px 10px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">季別</th>
+            <th style="text-align:right;padding:5px 10px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">營收(億)</th>
+            <th style="text-align:right;padding:5px 10px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">毛利率%</th>
+            <th style="text-align:right;padding:5px 10px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">EPS</th>
+          </tr></thead>
+          <tbody>
+            <sc-for list="{{ fundRows }}" as="r" hint-placeholder-count="7">
+              <tr style="background:{{ r.bg }};">
+                <td style="padding:4px 10px;border-top:1px solid var(--soft);font:600 9px 'DM Mono',monospace;color:var(--ink2);">{{ r.q }}</td>
+                <td style="padding:4px 10px;border-top:1px solid var(--soft);text-align:right;font:500 9px 'DM Mono',monospace;color:var(--ink);font-variant-numeric:tabular-nums;">{{ r.rev }}</td>
+                <td style="padding:4px 10px;border-top:1px solid var(--soft);text-align:right;font:500 9px 'DM Mono',monospace;color:var(--up);">{{ r.gm }}</td>
+                <td style="padding:4px 10px;border-top:1px solid var(--soft);text-align:right;font:600 9px 'DM Mono',monospace;color:var(--ink);">{{ r.eps }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+      <div style="border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper);">
+        <div style="padding:6px 11px;border-bottom:1px solid var(--line);background:var(--paper2);font:700 10.5px 'Syne',sans-serif;color:var(--ink);">財務比率（最新季）</div>
+        <table style="width:100%;border-collapse:separate;border-spacing:0;">
+          <tbody>
+            <sc-for list="{{ ratioRows }}" as="r" hint-placeholder-count="6">
+              <tr style="background:{{ r.bg }};">
+                <td style="padding:5px 11px;border-top:1px solid var(--soft);font:600 9.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">{{ r.name }}</td>
+                <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:700 10px 'DM Mono',monospace;color:var(--ink);">{{ r.v }}</td>
+                <td style="padding:5px 11px;border-top:1px solid var(--soft);text-align:right;font:600 9px 'DM Mono',monospace;{{ r.chgCss }}">{{ r.chg }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div style="border:1px solid var(--line);border-left:3px solid var(--am);border-radius:2px;overflow:hidden;background:var(--paper);">
+      <div style="padding:6px 11px;border-bottom:1px solid var(--line);background:var(--paper2);font:700 10.5px 'Syne',sans-serif;color:var(--ink);">現金股利</div>
+      <table style="width:100%;border-collapse:separate;border-spacing:0;">
+        <thead><tr>
+          <th style="text-align:left;padding:5px 11px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">年度</th>
+          <th style="text-align:right;padding:5px 11px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">每股股利</th>
+          <th style="text-align:right;padding:5px 11px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">殖利率</th>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ divRows }}" as="r" hint-placeholder-count="4">
+            <tr style="background:{{ r.bg }};">
+              <td style="padding:4px 11px;border-top:1px solid var(--soft);font:600 9px 'DM Mono',monospace;color:var(--ink2);">{{ r.y }}</td>
+              <td style="padding:4px 11px;border-top:1px solid var(--soft);text-align:right;font:600 9px 'DM Mono',monospace;color:var(--co);">{{ r.dps }}</td>
+              <td style="padding:4px 11px;border-top:1px solid var(--soft);text-align:right;font:500 9px 'DM Mono',monospace;color:var(--mut);">{{ r.yld }}</td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- 主動式台股 ETF -->
+  <sc-if value="{{ isEtf }}">
+  <div>
+    <div style="font:600 9px 'DM Mono',monospace;color:var(--mut);margin-bottom:9px;">主動式台股 ETF · {{ etfCount }} 檔 · 總規模 {{ etfTotAum }} 億（整合自 Taiwan Active ETF Matrix）</div>
+    <div style="border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper);overflow-x:auto;">
+      <table style="width:100%;border-collapse:separate;border-spacing:0;min-width:680px;">
+        <thead><tr>
+          <th style="text-align:left;padding:6px 11px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">代號</th>
+          <th style="text-align:left;padding:6px 10px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">名稱</th>
+          <th style="text-align:left;padding:6px 10px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">投信</th>
+          <th style="text-align:center;padding:6px 8px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">風格</th>
+          <th style="text-align:right;padding:6px 10px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">規模(億)</th>
+          <th style="text-align:right;padding:6px 10px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">費用率</th>
+          <th style="text-align:right;padding:6px 10px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">報酬</th>
+          <th style="text-align:left;padding:6px 11px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">配息</th>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ etfRows }}" as="r" hint-placeholder-count="25">
+            <tr style="background:{{ r.bg }};">
+              <td style="padding:4px 11px;border-top:1px solid var(--soft);font:600 9px 'DM Mono',monospace;color:var(--co);">{{ r.code }}</td>
+              <td style="padding:4px 10px;border-top:1px solid var(--soft);font:600 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);white-space:nowrap;">{{ r.name }}</td>
+              <td style="padding:4px 10px;border-top:1px solid var(--soft);font:400 8.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);white-space:nowrap;">{{ r.mgr }}</td>
+              <td style="padding:4px 8px;border-top:1px solid var(--soft);text-align:center;"><span style="font:700 7.5px 'DM Mono',monospace;color:#fff;background:{{ r.styleCss }};border-radius:2px;padding:1px 6px;">{{ r.style }}</span></td>
+              <td style="padding:4px 10px;border-top:1px solid var(--soft);text-align:right;font:500 9px 'DM Mono',monospace;color:var(--ink);font-variant-numeric:tabular-nums;">{{ r.aum }}</td>
+              <td style="padding:4px 10px;border-top:1px solid var(--soft);text-align:right;font:500 9px 'DM Mono',monospace;color:var(--mut);">{{ r.fee }}</td>
+              <td style="padding:4px 10px;border-top:1px solid var(--soft);text-align:right;font:600 9px 'DM Mono',monospace;{{ r.retCss }}">{{ r.ret }}</td>
+              <td style="padding:4px 11px;border-top:1px solid var(--soft);font:400 8.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">{{ r.dist }}</td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+    <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:2px;padding:9px 13px;margin-top:10px;font:400 10px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">完整持股穿透、勾選加總持股、持股成本與目標價漲幅空間,見 <b style="color:var(--ink);">VIA Taiwan Active ETF Matrix</b> 專屬頁。</div>
+  </div>
+  </sc-if>
+
+  <footer style="margin-top:18px;border-top:1px solid var(--line);padding-top:11px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font:500 10px 'DM Mono',monospace;color:var(--mut);">
+    <span style="font-weight:700;letter-spacing:1.3px;color:var(--ink);">VERITAS INTELLIGENCE ANALYTICS</span>
+    <span>Chip Analysis Platform · Visual Lock SSOT</span>
+  </footer>
+</div>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#1e1d1a"/><rect x="22" y="50" width="12" height="26" fill="#c96b5a"/><rect x="44" y="38" width="12" height="38" fill="#4c78a8"/><rect x="66" y="44" width="12" height="32" fill="#439a9a"/><text x="50" y="92" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#fff" font-weight="700">籌碼</text></svg></template>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{ &quot;$preview&quot;: { &quot;width&quot;: 1340, &quot;height&quot;: 640 } }">
+class Component extends DCLogic {
+  state = { tab: 'flow', sub: 'inst' };
+  _rng(s){ s=s>>>0; return ()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
+  renderVals() {
+    const tab = this.state.tab, sub = this.state.sub;
+    const set = t => () => this.setState({ tab: t });
+    const tc = on => on ? 'background:var(--bg);color:var(--ink);border-color:var(--ink);box-shadow:0 -2px 0 var(--accent) inset;' : 'background:var(--soft);color:var(--mut);';
+    const tabs = [['flow','💰 法人/官股/主力'],['heat','🔥 籌碼熱力圖'],['corr','🔗 籌碼相關矩陣'],['margin','📊 資券變化'],['holder','🏦 集保大戶分級'],['fund','📈 基本面'],['etf','🏛️ 主動式ETF']]
+      .map(t => ({ label: t[1], go: set(t[0]), css: tc(tab === t[0]) }));
+    const sc = v => v >= 0 ? 'color:var(--up);' : 'color:var(--down);';
+    const sgn = v => (v >= 0 ? '+' : '') + Math.round(v).toLocaleString();
+
+    // sub tabs for flow
+    const subset = s => () => this.setState({ sub: s });
+    const subDef = [['inst','三大法人'],['gov','八大官股'],['broker','主力券商']];
+    const subTabs = subDef.map(s => ({ label: s[1], go: subset(s[0]), css: sub === s[0] ? 'background:var(--ink);color:#fff;' : 'background:var(--soft);color:var(--mut);' }));
+    const flowCol0 = sub === 'inst' ? '法人別' : sub === 'gov' ? '官股券商' : '主力分點';
+    const flowData = {
+      inst: [['外資', 8.4, 9.2, -0.8, -2], ['投信', 3.6, 1.1, 2.5, 5], ['自營商(自行)', 1.2, 0.9, 0.3, 1], ['自營商(避險)', 2.1, 2.4, -0.3, -1], ['三大法人合計', 15.3, 13.6, 1.7, 2]],
+      gov: [['台banks(8大官股)', 4.2, 2.1, 2.1, 3], ['兆豐證', 1.1, 0.6, 0.5, 2], ['第一金證', 0.8, 0.5, 0.3, 1], ['合庫證', 0.6, 0.7, -0.1, -1], ['土banks證', 0.5, 0.4, 0.1, 1]],
+      broker: [['美林', 3.8, 1.2, 2.6, 4], ['摩根士丹利', 2.1, 2.9, -0.8, -2], ['富邦-總公司', 1.6, 0.9, 0.7, 2], ['凱基-台北', 1.2, 1.5, -0.3, -1], ['元大-土城永寧', 0.9, 0.4, 0.5, 3]],
+    };
+    const fmax = 3;
+    const flowRows = (flowData[sub] || flowData.inst).map((r, i) => {
+      const net = r[3], mag = Math.min(50, Math.abs(net) / fmax * 50);
+      return { name: r[0], buy: (r[1]).toFixed(1) + '億', sell: (r[2]).toFixed(1) + '億',
+        net: (net >= 0 ? '+' : '') + net.toFixed(1) + '億', netCss: sc(net),
+        barCss: net >= 0 ? ('left:50%;width:' + mag + '%;background:var(--up);') : ('right:50%;width:' + mag + '%;background:var(--down);'),
+        streak: (r[4] >= 0 ? '買' : '賣') + Math.abs(r[4]) + '日', streakCss: r[4] >= 0 ? 'var(--up)' : 'var(--down)',
+        bg: i % 2 ? '#f6f4ef' : 'var(--paper)' };
+    });
+
+    // heatmap
+    const cats = ['外資', '投信', '自營', '八大官股', '主力券商', '融資', '融券'];
+    const heatDays = []; for (let i = 19; i >= 0; i--) heatDays.push(i === 0 ? '今' : '−' + i);
+    const heatColor = v => { const t = Math.max(-1, Math.min(1, v / 100)); if (t >= 0) { return 'rgba(201,107,90,' + (0.12 + t * 0.7).toFixed(2) + ')'; } return 'rgba(90,158,111,' + (0.12 + (-t) * 0.7).toFixed(2) + ')'; };
+    const hr = this._rng(77);
+    const heatRows = cats.map((cat, ci) => ({ cat, cells: heatDays.map((d, di) => { const v = (hr() - 0.45) * 200 * (ci === 5 || ci === 6 ? 0.6 : 1); return { bg: heatColor(v), t: cat + ' ' + d + ': ' + (v >= 0 ? '+' : '') + Math.round(v) }; }) }));
+
+    // correlation matrix
+    const corrLabels = ['收盤', '外資', '投信', '自營', '融資', '融券', '量'];
+    const cm = [
+      [1, 0.72, 0.54, 0.31, 0.38, -0.42, 0.61],
+      [0.72, 1, 0.46, 0.28, 0.33, -0.39, 0.58],
+      [0.54, 0.46, 1, 0.35, 0.29, -0.31, 0.44],
+      [0.31, 0.28, 0.35, 1, 0.22, -0.18, 0.36],
+      [0.38, 0.33, 0.29, 0.22, 1, -0.55, 0.49],
+      [-0.42, -0.39, -0.31, -0.18, -0.55, 1, -0.28],
+      [0.61, 0.58, 0.44, 0.36, 0.49, -0.28, 1],
+    ];
+    const cell = v => { const a = Math.abs(v); const bg = v >= 0 ? 'rgba(201,107,90,' + (0.1 + a * 0.65).toFixed(2) + ')' : 'rgba(90,158,111,' + (0.1 + a * 0.65).toFixed(2) + ')'; return { t: v.toFixed(2), bg, fg: a > 0.6 ? '#fff' : 'var(--ink2)' }; };
+    const corrRows = corrLabels.map((label, i) => ({ label, cells: cm[i].map(v => cell(v)) }));
+
+    // margin/short
+    const mr = this._rng(303); let mBal = 1820, sBal = 142;
+    const marginRows = []; const today = new Date('2026-06-21');
+    for (let i = 9; i >= 0; i--) {
+      const mChg = (mr() - 0.5) * 40, sChg = (mr() - 0.5) * 12;
+      mBal += mChg; sBal += sChg;
+      const d = new Date(today.getTime() - i * 86400000);
+      const maint = 158 - (mr() * 10);
+      marginRows.push({ date: d.toISOString().slice(5, 10).replace('-', '/'), mBal: Math.round(mBal).toLocaleString(),
+        mChg: sgn(mChg), mChgCss: sc(mChg), sBal: Math.round(sBal).toLocaleString(), sChg: sgn(sChg), sChgCss: sc(sChg),
+        ratio: (sBal / mBal * 100).toFixed(1) + '%', maint: maint.toFixed(0) + '%', mtCss: maint < 130 ? 'color:var(--co);' : 'color:var(--ink);' });
+    }
+    const marginRows2 = marginRows.map((r, i) => ({ ...r, bg: i % 2 ? '#f6f4ef' : 'var(--paper)' }));
+
+    const hcol = ['var(--mut2)', 'var(--blue)', 'var(--teal)', 'var(--am)', 'var(--co)', 'var(--vi)'];
+    const holderRaw = [['1–10 張(散戶)', '142,800', 18.4, -0.6], ['10–50 張', '24,600', 12.1, -0.2], ['50–100 張', '6,200', 9.8, 0.1], ['100–400 張', '3,400', 14.2, 0.3], ['400–1000 張', '880', 11.5, 0.5], ['>1000 張(大戶)', '420', 34.0, 0.9]];
+    const holderRows = holderRaw.map((r, i) => ({ tier: r[0], ppl: r[1], pct: r[2].toFixed(1) + '%', w: Math.min(100, r[2] / 34 * 100) + '%', color: hcol[i],
+      chg: (r[3] >= 0 ? '+' : '') + r[3].toFixed(1) + '%', chgCss: r[3] >= 0 ? 'color:var(--up);' : 'color:var(--down);', bg: i % 2 ? '#f6f4ef' : 'var(--paper)' }));
+
+    const fl = flowData.inst;
+    const cards = [
+      { l: '三大法人合計', v: '+1.7億', s: '連買 2 日', css: 'color:var(--up);', color: 'var(--co)' },
+      { l: '外資', v: '−0.8億', s: '連賣 2 日', css: 'color:var(--down);', color: 'var(--blue)' },
+      { l: '投信', v: '+2.5億', s: '連買 5 日', css: 'color:var(--up);', color: 'var(--teal)' },
+      { l: '大戶(>1000張)', v: '34.0%', s: '+0.9% 週 籌碼集中', css: 'color:var(--up);', color: 'var(--vi)' },
+      { l: '融資維持率', v: '156%', s: '> 130 安全', css: 'color:var(--gn);', color: 'var(--am)' },
+    ];
+
+    // 基本面 fundamentals (整合自 ChipAnalysis 平台缺漏圖表)
+    const fr = (q, rev, gm, eps) => ({ q, rev, gm, eps });
+    const fundRows = [
+      fr('2024Q1', '5,926', '53.1', '8.70'), fr('2024Q2', '6,735', '53.2', '9.56'),
+      fr('2024Q3', '7,597', '57.8', '12.54'), fr('2024Q4', '8,683', '59.0', '14.45'),
+      fr('2025Q1', '8,392', '58.8', '13.94'), fr('2025Q2', '9,335', '58.6', '15.36'),
+      fr('2025Q3', '9,898', '59.5', '17.44'),
+    ].map((r, i) => ({ ...r, bg: i % 2 ? '#f6f4ef' : 'var(--paper)' }));
+    const ratioRows = [
+      ['ROE', '27.8%', '+1.2pp', 'var(--up)'], ['ROA', '19.4%', '+0.8pp', 'var(--up)'],
+      ['毛利率', '59.5%', '+0.9pp', 'var(--up)'], ['營業利益率', '49.6%', '+0.7pp', 'var(--up)'],
+      ['淨利率', '43.1%', '+0.5pp', 'var(--up)'], ['負債比', '23.2%', '−0.6pp', 'var(--down)'],
+    ].map((r, i) => ({ name: r[0], v: r[1], chg: r[2], chgCss: 'color:' + r[3] + ';', bg: i % 2 ? '#f6f4ef' : 'var(--paper)' }));
+    const divRows = [
+      ['2022', '11.00', '2.5%'], ['2023', '11.00', '2.2%'], ['2024', '13.00', '2.0%'], ['2025e', '16.00', '2.1%'],
+    ].map((r, i) => ({ y: r[0], dps: r[1], yld: r[2], bg: i % 2 ? '#f6f4ef' : 'var(--paper)' }));
+
+    // 主動式台股 ETF（25 檔，整合自 Taiwan Active ETF Matrix）
+    const stC = { '成長': 'var(--co)', '優選': 'var(--blue)', '高息': 'var(--am)', '價值': 'var(--teal)', '科技': 'var(--vi)' };
+    const etfData = [
+      ['00981A','主動統一台股增長','統一投信','成長',285,'0.85%',18.4,'不配息'],['00982A','主動野村臺灣優選','野村投信','優選',246,'0.89%',15.2,'不配息'],
+      ['00980A','主動安聯台灣高息','安聯投信','高息',198,'0.90%',9.6,'季配'],['00983A','主動群益台灣強棒','群益投信','成長',164,'0.88%',16.8,'不配息'],
+      ['00984A','主動野村臺灣50','野村投信','優選',142,'0.85%',12.1,'不配息'],['00985A','主動富邦台灣成長','富邦投信','成長',128,'0.87%',14.3,'不配息'],
+      ['00986A','主動元大台灣價值','元大投信','價值',96,'0.86%',7.2,'半年配'],['00987A','主動中信台灣科技','中信投信','科技',88,'0.92%',21.5,'不配息'],
+      ['00988A','主動凱基台灣優勢','凱基投信','優選',74,'0.90%',11.4,'季配'],['00989A','主動第一金台股動能','第一金投信','成長',62,'0.88%',13.7,'不配息'],
+      ['00990A','主動兆豐台灣優選','兆豐投信','優選',58,'0.87%',10.8,'不配息'],['00991A','主動國泰台灣領航','國泰投信','成長',54,'0.89%',12.6,'不配息'],
+      ['00992A','主動台新台股創新','台新投信','科技',49,'0.91%',17.9,'不配息'],['00993A','主動永豐台灣優息','永豐投信','高息',44,'0.90%',8.4,'季配'],
+      ['00994A','主動日盛台灣精選','日盛投信','優選',38,'0.89%',11.2,'不配息'],['00995A','主動華南台股動力','華南永昌投信','成長',35,'0.88%',13.1,'不配息'],
+      ['00996A','主動復華台灣科技','復華投信','科技',33,'0.92%',19.3,'不配息'],['00997A','主動安聯台灣優質','安聯投信','價值',29,'0.87%',6.8,'半年配'],
+      ['00998A','主動街口台灣成長','街口投信','成長',26,'0.90%',14.6,'不配息'],['00999A','主動凱基台灣高息','凱基投信','高息',24,'0.90%',9.1,'季配'],
+      ['009A01','主動富邦台灣科技','富邦投信','科技',22,'0.91%',18.7,'不配息'],['009A02','主動群益台灣價值','群益投信','價值',19,'0.86%',7.5,'半年配'],
+      ['009A03','主動元大台股創新','元大投信','科技',17,'0.92%',20.1,'不配息'],['009A04','主動統一台灣優選','統一投信','優選',15,'0.88%',11.8,'不配息'],
+      ['009A05','主動野村台灣動能','野村投信','成長',13,'0.89%',12.9,'不配息'],
+    ];
+    const etfRows = etfData.map((d, i) => ({
+      code: d[0], name: d[1], mgr: d[2], style: d[3], styleCss: stC[d[3]] || 'var(--mut2)',
+      aum: d[4].toLocaleString(), fee: d[5], ret: (d[6] >= 0 ? '+' : '') + d[6].toFixed(1) + '%', retCss: d[6] >= 0 ? 'color:var(--up);' : 'color:var(--down);', dist: d[7],
+      bg: i % 2 ? '#f6f4ef' : 'var(--paper)',
+    }));
+    const etfTotAum = etfData.reduce((s, d) => s + d[4], 0);
+
+    return {
+      rootRef: el => { this.root = el; }, tabs, cards,
+      isFlow: tab === 'flow', isHeat: tab === 'heat', isCorr: tab === 'corr', isMargin: tab === 'margin', isHolder: tab === 'holder', isFund: tab === 'fund', isEtf: tab === 'etf',
+      subTabs, flowCol0, flowRows, heatDays, heatRows, corrLabels, corrRows, marginRows: marginRows2, holderRows,
+      fundRows, ratioRows, divRows,
+      etfRows, etfCount: etfData.length, etfTotAum: etfTotAum.toLocaleString(),
+    };
+  }
+}
+</script>
+</body>
+</html>

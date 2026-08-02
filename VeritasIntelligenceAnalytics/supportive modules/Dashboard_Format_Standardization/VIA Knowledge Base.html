@@ -1,0 +1,112 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · 知識體 · Knowledge Base(各階段增加項目登錄)</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--blue:#4c78a8;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--vi:#7a6daa;}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg)}html{scrollbar-gutter:stable}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:12px;line-height:1.5}
+.wrap{max-width:none;margin:0 auto;padding:20px 8px 60px}
+.pdf{position:fixed;top:12px;right:14px;z-index:999;background:var(--ink);color:#fff;border:none;border-radius:5px;padding:7px 13px;font:700 9px 'DM Mono',monospace;cursor:pointer}
+@media print{.pdf{display:none!important}}
+h1{font:800 21px/1.2 'Syne','Noto Sans TC',sans-serif;color:var(--ink);display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+h1::before{content:"";display:inline-block;width:5px;height:22px;background:var(--vi);border-radius:2px;transform:translateY(3px);margin-right:2px}
+h1 .flow{font:500 10px 'DM Mono',monospace;color:var(--mut2)}
+.toolrow{display:flex;gap:7px;align-items:center;padding:12px 0 4px}
+.toolrow input{flex:1;min-width:220px;font:600 11px 'DM Mono','Noto Sans TC',monospace;border:1px solid var(--line);border-radius:5px;padding:7px 10px;background:var(--paper);color:var(--ink)}
+.btn{font:700 9px 'DM Mono',monospace;cursor:pointer;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:4px;padding:7px 11px}
+.btn.o{background:transparent;color:var(--ink)}
+.phase{background:var(--paper);border:none;border-radius:12px;box-shadow:0 1px 3px rgba(31,42,42,.05);margin-top:14px;overflow:hidden}
+.ph{display:flex;gap:12px;align-items:baseline;padding:13px 18px 11px;border-bottom:1px solid var(--soft);cursor:pointer}
+.ph .st{font:800 10px 'DM Mono',monospace;color:#fff;background:var(--vi);border-radius:6px;padding:4px 9px;white-space:nowrap}
+.ph b{font:800 14px 'Syne','Noto Sans TC',sans-serif;color:var(--ink)}
+.ph .dt{font:500 9.5px 'DM Mono',monospace;color:var(--mut2)}
+.ph .n{margin-left:auto;font:700 10px 'DM Mono',monospace;color:var(--vi)}
+table{width:100%;border-collapse:collapse;font:500 11px 'DM Mono','Noto Sans TC',monospace}
+th{font:700 9px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.4px;color:var(--mut);text-align:left;padding:8px 14px;border-bottom:2px solid var(--ink);background:var(--paper2)}
+td{padding:7px 14px;border-bottom:1px solid var(--soft);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--paper2)}
+td .code{color:var(--vi);font-weight:700;white-space:nowrap}
+td .k{display:inline-block;font:700 7.5px 'DM Mono',monospace;border-radius:3px;padding:2px 6px;color:#fff;white-space:nowrap}
+.note{font:500 9.5px/1.7 'DM Mono',monospace;color:var(--mut);background:var(--paper);border:1px solid var(--soft);border-left:3px solid var(--vi);border-radius:4px;padding:9px 13px;margin:12px 0 0}
+.note b{color:var(--ink2)}
+</style></head><body>
+<button class="pdf" onclick="window.print()">⤓ PDF</button>
+<div class="wrap">
+<h1>知識體 · Knowledge Base <span class="flow">各階段增加項目 · 只增不減登錄 · 知識標準化 · VIA-M-KB</span></h1>
+<div class="toolrow"><input id="q" placeholder="🔍 搜尋 項目/編碼/階段…"><button class="btn o" id="expJ">⤓ JSON</button></div>
+<div id="view"></div>
+<div class="note">🔒 <b>治理</b> — 本知識體登錄每一階段之新增項目(模組/規則/工具/知識),對應 VIA CODE 與權威檔案;只增不減。點階段標題可摺疊/展開。新階段完成即追加登錄。</div>
+</div>
+<script>
+const KC={模組:"#4c78a8",規則:"#5a9e6f",工具:"#c96b5a",知識:"#c4943a",中樞:"#7a6daa"};
+const PHASES=[
+ {id:"P1",t:"階段一 · 主控台整合",dt:"2026.07 初",items:[
+  ["中樞","VIA Master Console 66+ 模組統一註冊","VIA-M-MASTER","VIA Master Console.html"],
+  ["規則","七類別架構(總經/市場/產業/財務/治理/參考/報告) · 深連結 · 搜尋","—","VIA Master Console.html"],
+  ["知識","全域諸元登錄 Global Parameter Registry(Administrator)","—","VIA Master Console.html"]]},
+ {id:"P2",t:"階段二 · VAP 圖庫與規則體系",dt:"2026.07 初",items:[
+  ["工具","VAP 最佳圖庫建構器 25 圖型(單軸/堆疊/個別/雙軸/進階/滾動/共識/回測)","VIA-M-VAPLIB","VIA VAP Chart Library Builder.html"],
+  ["規則","DATARULES 24+ 條:ADJ PRICE/SPLIT 量調整/軸刻度倍數/事件矩陣/日期軸/台美時差/共識 BENCHMARK 水平虛線 0.8/0.8/TA-Lib/圓形國旗","—","VIA VAP Chart Library Builder.html"],
+  ["規則","SSOT REGEX 驗證(自動增加) · 視覺鎖定 · 逐步鎖住 · DEFAULT+單獨覆寫","—","VIA VAP Chart Library Builder.html"],
+  ["知識","Seaborn 調色組合 · Plotly 對照表 · 資料庫清單(VDF)","—","VIA VAP Chart Library Builder.html"]]},
+ {id:"P3",t:"階段三 · 治理工具群",dt:"2026.07 初",items:[
+  ["中樞","智慧資產管理平台 IAMP(樂高化 · 自動編號 · 六分頁)","VIA-M-IAMP","VIA Intelligence Asset Management Platform.html"],
+  ["工具","自動編號器(FNV-1a 6-hex · 批次 · 撞碼檢查)","VIA-M-ACODER","VIA Auto-Coder.html"],
+  ["工具","詞彙登錄 LEX(SYN×RGX×REN×LST×DCT · SAP/MSP 鎖定)","VIA-M-LEX","VIA Lexicon Registry.html"],
+  ["知識","SAP 功能模組對照 MM/PP/SD/CO/FI/FA/SCM · PLM T-CODE · PMBOK 詞彙","—","VIA Lexicon Registry.html"],
+  ["知識","PMBOK×VIA 簡報(12 原則 · 8 績效域 · align-only)","VIA-M-PMBOKDECK","VIA PMBOK Deck.dc.html"]]},
+ {id:"P4",t:"階段四 · ONE 整合中樞",dt:"2026.07 上旬",items:[
+  ["中樞","SSOT ONE 總匯(零複本 live 聚合 · 涵蓋檢查)","VIA-M-SSOTONE","VIA SSOT One.html"],
+  ["中樞","總經一體 Economics ONE(9 模組)","VIA-M-ECONONE","VIA Economics One.html"],
+  ["中樞","BOM 一體 SAP BOM ONE(8 模組)","VIA-M-BOMONE","VIA BOM One.html"],
+  ["中樞","量價×財報一體(量價/資金流/財報/名單 四群 · 一頁式下排)","VIA-M-PVFONE","VIA PriceVolume Financials One.html"],
+  ["中樞","VIA ONE 全平台總入口(入口/ONE/治理/VAP/VRN/VDF/名單/市場/架構)","VIA-M-ONE","VIA ONE.html"]]},
+ {id:"P5",t:"階段五 · 名單×市場×架構",dt:"2026.07.02–03",items:[
+  ["模組","VENDOR×CUSTOMER LIST(SixPeer · 自動擷取 台達電/光寶科/康舒)","VIA-M-VENCUS","VIA Vendor Customer List.html"],
+  ["模組","BOM 成本主控台 · SuperBOM 財務模型 · 能力矩陣 · 同業驗證 · 商品因子基準","VIA-M-BOMCC…","uploads/*"],
+  ["知識","AI MARKET SIZE 建策卡 · PROMPT 庫 VPT · PMIS-Lite · SixPeer 路線圖 · UI Gap 矩陣","—","uploads/*"],
+  ["規則","三大報表/比率分析/每股分析 ?tab= 深連結 · 疊圖左軸兩位小數 · 打破格子全寬","—","modules/Financial_Statements.html"]]},
+ {id:"P6",t:"階段六 · 資金流自驗證系統 Flow System",dt:"2026.07.04",items:[
+  ["中樞","VIA-FlowSystem 主控 UI(三層 SOLID 驗證徽章 · RORO 單針 · per-ETF FIS 表)","VIA-M-FLOWSYS","uploads/index-bbf4d163.html"],
+  ["模組","資金流動監控 · 累積資金流 · 績效趨勢 · 層級資金流 · 資金流模擬器 · 世界資金流地圖 · 全球地圖時間模擬(7 視圖)","VIA-M-FLOWMON…WFLOW","uploads/*flow*.html"],
+  ["規則","三層驗證 SOLID:Pillar A 測量真值 × Pillar B 效力 G002~G009 × self-test 14 項;任一紅→NOT_SOLID","—","uploads/README-78a8dae6.md"],
+  ["規則","反證保證:synthetic α=0 必回 NOT_VALID(實測 0/24 過,G003 全數失敗)","—","uploads/README-78a8dae6.md"],
+  ["工具","單鍵啟動器 Activate-VIAFlowSystem.ps1(venv Auto-Locator · calibrate/run/ui/all)","VIA-T-FLOWPS1","uploads/Activate-VIAFlowSystem-ec7672ea.ps1"],
+  ["知識","真值來源:ICI 週度 · issuer/NAV 每日 · CFTC COT · AkShare 申贖;bridge schema daily_data.json","—","uploads/README-78a8dae6.md"]]},
+ {id:"P7",t:"階段七 · 產業模板×市場整合",dt:"2026.07.03–04",items:[
+  ["模組","PSU / Thermal Solutions 產業最強版模板(製程/設備/資本支出 · 泛用型去公司名)","VIA-M-PSUTH","VIA PSU Thermal Industry Template.html"],
+  ["模組","原物料×匯率×貴金屬×大宗物資(BRENT/WTI 現貨期貨 · VIX · BDI · ^NTX · ^TWII)","VIA-M-COMMOD","VIA Master Console.html#mkt"],
+  ["模組","ActiveETF 控制台(snapshot · Control/Deploy/MakeExe PS1 ×6 · PackList)","VIA-M-AETF","uploads/VIA_ActiveETF_Console_snapshot (1).html"],
+  ["模組","VIA NOTE ULTIMATE 筆記系統","VIA-M-NOTE","VIA Note Pro.dc.html"],
+  ["規則","K線 SMA/EMA/BB+Volume 預設套組 · 當日走勢下方成交量 · 堆疊時間軸對齊 · 軸間隔 2/2.5/5/10 倍數","—","VIA VAP Chart Library Builder.html"]]},
+ {id:"P8",t:"階段八 · 智慧擷取×探勘 TIO",dt:"2026.07.04",items:[
+  ["中樞","VPNS 命名空間 UI(輸入 16 格式 JSON/PY/PS1/CSV/Excel/PDF/Parquet/DuckDB/SQL… · 自動流程生成)","VIA-M-VPNS","VIA VPNS UI.html"],
+  ["工具","Outlook & Gmail 信件夾/文件/附件擷取修復驗證管線 · Live Log · 總結矩陣報告","VIA-T-MAIL","VIA VPNS UI.html"],
+  ["引擎","VIA SMART & EVOLVING SSOT ENGINES TIO:資料探勘×流程探勘×多格式多語言擷取×文字修復 各 Top-10(40 函式庫)","VIA-E-TIO","VIA VPNS UI.html"],
+  ["知識","SAP PP/SD/CO/FA · PLM PROMPT 對齊(align-only)","—","VIA Lexicon Registry.html"],
+  ["中樞","知識體 Knowledge Base 本頁(各階段只增不減登錄)","VIA-M-KB","VIA Knowledge Base.html"]]},
+ {id:"P9",t:"階段九 · Master Codex×同步整合",dt:"2026.07.04",items:[
+  ["知識","Master Codex v0500 功能引擎總覽與方法論總表(治理憲章 8 條 · BUILT/DESIGN/LOCAL-ONLY 誠實分級)","VIA-DOC-MASTER-CODEX","uploads/VIA_Master_Codex (3).md"],
+  ["模組","pmis_lite Python 套件 44/44 測試通過 [BUILT]","VIA-A-MOD-pmis_lite","uploads/VIA_Master_Codex (3).md"],
+  ["工具","PMIS ReadOnly SuperRegistry v0100(唯讀盤點 PS1)","VIA-T-PMISREG","uploads/VIA_PMIS_ReadOnly_SuperRegistry_v0100.ps1"],
+  ["規則","dedupe→newest 重指:整合平台(2) · MSProject 同步(3) · 同義字 SSOT · 電源散熱登錄 → 使用者編輯最新版","—","VIA Master Console.html"]]}
+];
+const $=s=>document.querySelector(s);
+let Q="";const OPEN={};PHASES.forEach(p=>OPEN[p.id]=true);
+function render(){
+ $("#view").innerHTML=PHASES.map(p=>{
+  const rows=p.items.filter(r=>!Q||r.join(" ").toLowerCase().includes(Q));
+  if(Q&&!rows.length)return "";
+  return '<div class="phase"><div class="ph" data-p="'+p.id+'"><span class="st">'+p.id+'</span><b>'+p.t+'</b><span class="dt">'+p.dt+'</span><span class="n">'+rows.length+' 項 '+(OPEN[p.id]?"▾":"▸")+'</span></div>'+
+   (OPEN[p.id]?'<table><thead><tr><th style="width:56px">類</th><th>增加項目</th><th style="width:150px">VIA CODE</th><th style="width:320px">權威檔案</th></tr></thead><tbody>'+
+   rows.map(r=>'<tr><td><span class="k" style="background:'+(KC[r[0]]||"#6b6860")+'">'+r[0]+'</span></td><td>'+r[1]+'</td><td><span class="code">'+r[2]+'</span></td><td style="color:var(--mut)">'+r[3]+'</td></tr>').join("")+'</tbody></table>':"")+'</div>';}).join("");
+ document.querySelectorAll(".ph").forEach(el=>el.onclick=()=>{OPEN[el.dataset.p]=!OPEN[el.dataset.p];render();});}
+$("#q").oninput=e=>{Q=e.target.value.trim().toLowerCase();render();};
+$("#expJ").onclick=()=>{const b=new Blob([JSON.stringify({meta:{name:"via_knowledge_base",code:"VIA-M-KB",policy:"append-only",exported_at:new Date().toISOString()},phases:PHASES},null,2)],{type:"application/json"});
+ const u=document.createElement("a");u.href=URL.createObjectURL(b);u.download="VIA_Knowledge_Base.json";u.click();};
+render();
+</script>
+</body></html>

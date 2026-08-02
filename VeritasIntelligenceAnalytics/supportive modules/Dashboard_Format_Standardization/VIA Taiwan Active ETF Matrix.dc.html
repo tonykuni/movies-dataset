@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;--line:#dbd9d3;--soft:#ecebe6;--accent:#439a9a;--blue:#4c78a8;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--co:#c96b5a;--vi:#7a6daa;--gn:#5a9e6f;--ro:#b05580;--reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);}
+  body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  *{scrollbar-width:thin;scrollbar-color:rgba(67,154,154,0.32) transparent;}
+  *::-webkit-scrollbar{width:7px;height:7px;}
+  *::-webkit-scrollbar-track{background:transparent;}
+  *::-webkit-scrollbar-thumb{background:rgba(67,154,154,0.28);border-radius:6px;border:2px solid transparent;background-clip:padding-box;}
+  *::-webkit-scrollbar-thumb:hover{background:rgba(67,154,154,0.55);background-clip:padding-box;}
+  *::-webkit-scrollbar-corner{background:transparent;}
+</style>
+<style>@media print{@page{size:A4 landscape;margin:8mm}html,body{background:#fff !important;-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}.__pdfbtn{display:none !important}*{box-shadow:none !important}[style*="position:sticky"]{position:static !important}[style*="position:fixed"]{position:static !important}[style*="overflow-x:auto"],[style*="overflow-y:auto"],[style*="overflow:auto"]{overflow:visible !important;max-height:none !important}table{font-size:9px !important}[ref] > *{break-inside:avoid}thead{display:table-header-group}</style>[style*="overflow-y:auto"],[style*="overflow:auto"],[style*="overflow-x:auto"]{overflow:visible !important;max-height:none !important}table,section,.brk{break-inside:avoid}}</style>
+<script>window.addEventListener('load',function(){if(document.getElementById('__pdfbtn'))return;var b=document.createElement('div');b.id='__pdfbtn';b.className='__pdfbtn';b.innerHTML='<img src="assets/pdf-icon.png" alt="PDF" style="width:30px;height:30px;display:block">';b.title='全螢幕高畫質投影片 PDF (橫向)';b.style.cssText='position:fixed;top:12px;right:14px;z-index:99999;background:transparent;border:none;padding:0;font:700 10px monospace;letter-spacing:.5px;cursor:pointer;';b.onclick=function(){var r=document.querySelector('[ref]')||document.body;var pw=r.style.maxWidth,pp=r.style.padding;r.style.maxWidth='100%';r.style.padding='0 6mm';window.print();setTimeout(function(){r.style.maxWidth=pw;r.style.padding=pp;},400);};document.body.appendChild(b);});</script>
+</helmet>
+<div ref="{{ rootRef }}" style="max-width:1340px;margin:0 auto;padding:0 22px 46px;">
+  <div style="position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50;"></div>
+  <header style="position:relative;padding:18px 0 9px;margin-bottom:12px;border-bottom:2px solid var(--ink);">
+    <div style="font:700 10px 'DM Mono',monospace;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:6px;max-width:560px;">VERITAS INTELLIGENCE ANALYTICS · ACTIVE TAIWAN STOCK ETF CONSOLE</div>
+    <h1 style="font:800 18px/1.2 'Syne',sans-serif;color:var(--ink);white-space:nowrap;">主動式台股 <span style="color:var(--up);">ETF 戰情台</span> · Active Taiwan Stock ETF Console</h1>
+    <p style="margin-top:5px;font:400 10.5px/1.5 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:680px;text-wrap:pretty;">2024 起核准的主動式 ETF（代碼後綴 <b style="color:var(--ink2);">A</b>）。法人面板以<b style="color:var(--co);">紅色實線框</b>標記主動式 ETF 買賣超；含規模 / 費用 / 績效 / 持股風格 / 配息。紅漲綠跌。</p>
+    <div style="position:absolute;top:4px;right:46px;max-width:280px;display:flex;flex-direction:column;align-items:flex-end;gap:3px;text-align:right;">
+      <span style="display:inline-flex;align-items:center;gap:5px;font:600 9px 'DM Mono',monospace;color:var(--ink2);"><span style="width:7px;height:7px;border-radius:50%;background:var(--gn);"></span>已檢查 VERIFIED</span>
+      <span style="font:500 8.5px 'DM Mono',monospace;color:var(--mut);">更新 {{ updated }}</span>
+      <span style="font:500 8.5px 'DM Mono',monospace;color:var(--mut);">來源 TWSE / 投信投顧公會</span>
+      <span style="font:700 8px 'DM Mono',monospace;color:#fff;background:var(--gn);border-radius:3px;padding:2px 8px;">{{ verifyTag }}</span>
+    </div>
+  </header>
+
+  <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;background:#fff;border:1px solid #dbd9d3;border-left:3px solid #439a9a;border-radius:3px;padding:6px 13px;margin-bottom:12px;">
+    <span style="font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;">🛰 資料請求 · VDF ENGINES</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">TWSE→rest</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#c4943a;border-radius:3px;padding:1px 6px;">SITCA→parse</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">MOPS→parse</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">yfinance→pyproc</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#c0584e;border-radius:3px;padding:1px 6px;">FactSet→keyed</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">FRED→keyed</span>
+    <span style="margin-left:auto;font:500 8px 'DM Mono',monospace;color:#9c9890;">request.json → VDF 擷取 → 雙重驗算 → Parquet → JSON</span>
+  </div>
+
+  <details data-contract="1" style="margin-bottom:12px;border:1px solid #dbd9d3;border-left:3px solid #1e1d1a;border-radius:3px;background:#fbfaf7;overflow:hidden;">
+    <summary style="cursor:pointer;user-select:none;padding:6px 13px;font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;list-style:none;">📜 引擎連接合約 · request.json（點擊展開 · 可選取複製）</summary>
+    <pre style="margin:0;padding:10px 13px;background:#1e1d1a;color:#cfe3d6;font:500 9px/1.55 'DM Mono',monospace;white-space:pre;overflow-x:auto;">{
+  "request": "taiwan_active_etf_matrix",
+  "asof": "2026-06-22",
+  "universe": { "market": "TW", "exchange": ["TWSE","TPEX"] },
+  "sources": ["TWSE","TPEX","SITCA","MOPS","yfinance","FactSet","FRED"],
+  "engines": { "TWSE":"rest","TPEX":"rest","SITCA":"parse","MOPS":"parse","yfinance":"pyproc","FactSet":"keyed","FRED":"keyed" },
+  "range": { "start":"1996-01-01","end":"latest" },
+  "verify": "double_identity",
+  "db_discover": { "folder":"D:\\VDF\\databases\\","recursive":true,"match":["*.parquet","*.duckdb","*.db","*.csv"] },
+  "sink": { "parquet":"vdf/taiwan_active_etf_matrix/","export":"taiwan_active_etf_matrix.json" }
+}</pre>
+    <div style="padding:6px 13px;font:400 8px 'DM Sans','Noto Sans TC',sans-serif;color:#9c9890;">本檔即以此合約向 VDF 引擎請求 → 依 engines 分流(rest/parse/pyproc/keyed) → 雙重恆等驗算 → 落地 Parquet → 匯出 <b style="color:#6b6860;">taiwan_active_etf_matrix.json</b> 覆蓋本頁資料源。</div>
+  </details>
+
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#1e1d1a;border-radius:3px;padding:6px 13px;margin-bottom:12px;">
+    <span style="display:inline-flex;align-items:center;gap:6px;font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase;">🔒 VISUAL LOCK · 全格式鎖定</span>
+    <span style="display:inline-flex;align-items:center;gap:4px;font:500 8px 'DM Mono',monospace;color:#cfcabf;">色票
+      <span style="width:11px;height:11px;border-radius:2px;background:#4c78a8;" title="brand blue #4c78a8"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#439a9a;" title="brand teal #439a9a"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#9c9890;" title="brand grey #9c9890"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#c96b5a;" title="TW up-red #c96b5a"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#5a9e6f;" title="TW down-green #5a9e6f"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#f5f4f0;border:1px solid #555;" title="paper #f5f4f0"></span>
+    </span>
+    <span style="font:500 8px 'DM Mono',monospace;color:#8a948f;">字體 Syne / DM Sans / DM Mono</span>
+    <span style="font:500 8px 'DM Mono',monospace;color:#8a948f;">漲紅跌綠 · 千分位 · 熱力色階</span>
+    <span style="margin-left:auto;font:700 8px 'DM Mono',monospace;color:#fff;background:var(--gn);border-radius:3px;padding:2px 8px;">v1.0 · LOCKED 2026-06-22</span>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:13px;">
+    <sc-for list="{{ cards }}" as="s" hint-placeholder-count="5">
+      <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid {{ s.color }};border-radius:2px;padding:8px 11px;">
+        <div style="font:600 8.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);margin-bottom:2px;">{{ s.l }}</div>
+        <div style="font:500 17px 'DM Mono',monospace;color:var(--ink);">{{ s.v }}</div>
+        <div style="font:500 8px 'DM Mono',monospace;color:var(--mut2);margin-top:1px;">{{ s.s }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display:flex;gap:4px;margin-bottom:11px;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:45;background:var(--bg);padding-top:6px;box-shadow:0 8px 10px -10px rgba(31,42,42,.45);">
+    <div onClick="{{ tabPerf }}" style="font:700 11px 'Syne',sans-serif;padding:7px 14px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;position:relative;top:1px;user-select:none;{{ tcPerf }}">📊 績效矩陣</div>
+    <div onClick="{{ tabList }}" style="font:700 11px 'Syne',sans-serif;padding:7px 14px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;position:relative;top:1px;user-select:none;{{ tcList }}">📋 ETF 清單</div>
+    <div onClick="{{ tabHold }}" style="font:700 11px 'Syne',sans-serif;padding:7px 14px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;position:relative;top:1px;user-select:none;{{ tcHold }}">🔗 持股聚合</div>
+    <div onClick="{{ tabAct }}" style="font:700 11px 'Syne',sans-serif;padding:7px 14px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;position:relative;top:1px;user-select:none;{{ tcAct }}">🎯 動作分類</div>
+    <div onClick="{{ tabReq }}" style="font:700 11px 'Syne',sans-serif;padding:7px 14px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;position:relative;top:1px;user-select:none;{{ tcReq }}">🛰 資料請求</div>
+  </div>
+
+  <sc-if value="{{ isPerf }}">
+  <div style="font:700 13px 'Syne',sans-serif;color:var(--ink);margin:2px 0 7px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">績效排行矩陣 · <span style="color:var(--co);">Performance Matrix</span><span style="font:600 8px 'DM Mono',monospace;color:#fff;background:var(--am);border-radius:9px;padding:2px 8px;">定期報酬% · 紅漲綠跌</span><span style="font:500 9px 'DM Mono',monospace;color:var(--mut2);">依 YTD 高→低排序 · 前三名紅號</span></div>
+  <div style="border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper);overflow-x:auto;">
+    <table style="width:100%;border-collapse:separate;border-spacing:0;min-width:1080px;">
+      <thead><tr>
+        <th style="text-align:left;padding:6px 8px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">#</th>
+        <th style="text-align:left;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">代碼</th>
+        <th style="text-align:left;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">ETF 名稱</th>
+        <th style="text-align:left;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">風格</th>
+        <th style="text-align:left;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">經理人</th>
+        <th style="text-align:right;padding:6px 7px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">1D</th>
+        <th style="text-align:right;padding:6px 7px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">5D</th>
+        <th style="text-align:right;padding:6px 7px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">10D</th>
+        <th style="text-align:right;padding:6px 7px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">20D</th>
+        <th style="text-align:right;padding:6px 7px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">60D</th>
+        <th style="text-align:right;padding:6px 7px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">120D</th>
+        <th style="text-align:right;padding:6px 7px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">240D</th>
+        <th style="text-align:right;padding:6px 8px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);border-left:1px solid var(--line);">YTD</th>
+        <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">規模(億)</th>
+        <th style="text-align:right;padding:6px 10px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">YTD流(億)</th>
+      </tr></thead>
+      <tbody>
+        <sc-for list="{{ perfRows }}" as="p" hint-placeholder-count="25">
+          <tr style="background:{{ p.bg }};">
+            <td style="padding:5px 8px;border-top:1px solid var(--soft);text-align:left;font:700 9px 'DM Mono',monospace;{{ p.rankCss }}">{{ p.rank }}</td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);font:700 9.5px 'DM Mono',monospace;color:var(--co);border-left:2px solid var(--co);white-space:nowrap;"><span style="font:800 7px 'Syne',sans-serif;color:#fff;background:var(--co);border-radius:3px;padding:1px 4px;margin-right:4px;{{ p.newShow }}">NEW</span>{{ p.code }}</td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);font:600 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);white-space:nowrap;">{{ p.name }}</td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);"><span style="font:700 7.5px 'DM Mono',monospace;color:#fff;background:{{ p.styleCss }};border-radius:2px;padding:1px 6px;">{{ p.style }}</span></td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);font:500 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);white-space:nowrap;">{{ p.pm }}</td>
+            <sc-for list="{{ p.cells }}" as="c" hint-placeholder-count="8">
+              <td style="padding:5px 7px;border-top:1px solid var(--soft);text-align:right;font:600 9px 'DM Mono',monospace;font-variant-numeric:tabular-nums;{{ c.heat }}{{ c.css }}">{{ c.v }}</td>
+            </sc-for>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:600 9.5px 'DM Mono',monospace;color:var(--ink);font-variant-numeric:tabular-nums;">{{ p.aum }}</td>
+            <td style="padding:5px 10px;border-top:1px solid var(--soft);text-align:right;font:700 9px 'DM Mono',monospace;font-variant-numeric:tabular-nums;{{ p.flowCss }}">{{ p.flow }}</td>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isList }}">
+  <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+    <span onClick="{{ selAll }}" style="font:700 9px 'DM Mono',monospace;padding:3px 10px;border-radius:4px;cursor:pointer;user-select:none;background:var(--ink);color:#fff;">全選
+    <span onClick="{{ selNone }}" style="font:700 9px 'DM Mono',monospace;padding:3px 10px;border-radius:4px;cursor:pointer;user-select:none;background:var(--soft);color:var(--mut);">只留 1 檔</span>
+    <span style="font:600 9px 'DM Mono',monospace;color:var(--mut2);">已選 {{ nChecked }} 檔 → 下方第二矩陣顯示總持股</span>
+  </div>
+  <div style="border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper);overflow-x:auto;">
+    <table style="width:100%;border-collapse:separate;border-spacing:0;min-width:1000px;table-layout:auto;">
+      <thead><tr>
+        <th style="text-align:center;padding:6px 6px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">勾</th>
+        <th style="text-align:left;padding:6px 10px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">代碼</th>
+        <th style="text-align:left;padding:6px 10px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">ETF 名稱</th>
+        <th style="text-align:left;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">投信</th>
+        <th style="text-align:left;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">經理人</th>
+        <th style="text-align:left;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">風格</th>
+        <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">規模(億)</th>
+        <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">淨值</th>
+        <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">資金流(億)</th>
+        <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">費用率</th>
+        <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">上市來%</th>
+        <th style="text-align:center;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">配息</th>
+      </tr></thead>
+      <tbody>
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="10">
+          <tr onClick="{{ r.pick }}" style="background:{{ r.bg }};cursor:pointer;{{ r.selCss }}">
+            <td style="padding:5px 6px;border-top:1px solid var(--soft);text-align:center;font:700 11px 'DM Mono',monospace;{{ r.markCss }}">{{ r.mark }}</td>
+            <td style="padding:5px 10px;border-top:1px solid var(--soft);font:700 10px 'DM Mono',monospace;color:var(--co);border-left:2px solid var(--co);white-space:nowrap;"><span style="font:800 7px 'Syne',sans-serif;color:#fff;background:var(--co);border-radius:3px;padding:1px 4px;margin-right:4px;{{ r.newShow }}">NEW</span>{{ r.code }}</td>
+            <td style="padding:5px 10px;border-top:1px solid var(--soft);font:600 9.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);white-space:normal;overflow-wrap:break-word;">{{ r.name }}</td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);font:400 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">{{ r.mgr }}</td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);font:500 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);white-space:nowrap;">{{ r.pm }}</td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);"><span style="font:700 7.5px 'DM Mono',monospace;color:#fff;background:{{ r.styleCss }};border-radius:2px;padding:1px 6px;">{{ r.style }}</span></td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:600 9.5px 'DM Mono',monospace;color:var(--ink);font-variant-numeric:tabular-nums;">{{ r.aum }}</td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:600 9px 'DM Mono',monospace;color:var(--ink2);font-variant-numeric:tabular-nums;">{{ r.nav }}</td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:700 9px 'DM Mono',monospace;font-variant-numeric:tabular-nums;{{ r.flowCss }}">{{ r.flow }}</td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:500 9px 'DM Mono',monospace;color:var(--mut);">{{ r.fee }}</td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:600 9.5px 'DM Mono',monospace;{{ r.retCss }}">{{ r.ret }}</td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:center;font:500 8.5px 'DM Mono',monospace;color:var(--mut);">{{ r.dist }}</td>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isHold }}">
+  <!-- second matrix: holdings (left checklist + right aggregated) -->
+  <div style="font:700 13px 'Syne',sans-serif;color:var(--ink);margin:4px 0 8px;display:flex;align-items:center;gap:8px;">總持股聚合矩陣 · <span style="color:var(--co);">{{ selName }}</span><span style="font:500 9px 'DM Mono',monospace;color:var(--mut2);">全部持股 · 成本 · yf/FS 目標價 · 漲幅空間</span><span style="margin-left:auto;font:700 9px 'DM Mono',monospace;{{ portPLCss }}">組合未實現 {{ portPL }}</span></div>
+  <div style="margin-bottom:8px;"><span onClick="{{ togglePanel }}" style="font:700 9px 'DM Mono',monospace;color:var(--mut);cursor:pointer;user-select:none;border:1px solid var(--line);border-radius:5px;padding:3px 9px;">{{ panelCaret }}</span></div>
+  <div style="display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;">
+    <sc-if value="{{ panelOpen }}">
+    <div style="width:230px;flex:none;border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper);max-height:520px;overflow-y:auto;">
+      <div style="display:flex;align-items:center;gap:5px;padding:6px 9px;border-bottom:1px solid var(--line);background:var(--paper2);position:sticky;top:0;">
+        <span style="font:700 9px 'Syne',sans-serif;color:var(--ink);">基金勾選</span>
+        <span onClick="{{ selAll }}" style="margin-left:auto;font:700 8px 'DM Mono',monospace;color:#fff;background:var(--ink);border-radius:3px;padding:2px 6px;cursor:pointer;">全</span>
+        <span onClick="{{ selNone }}" style="font:700 8px 'DM Mono',monospace;color:var(--mut);background:var(--soft);border-radius:3px;padding:2px 6px;cursor:pointer;">清</span>
+      </div>
+      <sc-for list="{{ rows }}" as="r" hint-placeholder-count="25">
+        <div onClick="{{ r.pick }}" style="display:flex;align-items:center;gap:7px;padding:4px 9px;border-top:1px solid var(--soft);cursor:pointer;user-select:none;{{ r.selCss }}">
+          <span style="font:700 11px 'DM Mono',monospace;{{ r.markCss }}">{{ r.mark }}</span>
+          <span style="font:700 8.5px 'DM Mono',monospace;color:var(--co);">{{ r.code }}</span>
+          <span style="font:500 8.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ r.name }}</span>
+        </div>
+      </sc-for>
+    </div>
+    </sc-if>
+    <div style="flex:1;min-width:420px;border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper);overflow-x:auto;">
+    <table style="width:100%;border-collapse:separate;border-spacing:0;min-width:760px;">
+      <thead><tr>
+        <th style="text-align:left;padding:6px 10px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">#</th>
+        <th style="text-align:left;padding:6px 10px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">個股</th>
+        <th style="text-align:left;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">族群</th>
+        <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">權重</th>
+        <th style="text-align:left;padding:6px 10px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);width:150px;">權重佔比</th>
+        <th style="text-align:center;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">經理人動作</th>
+        <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">估均價</th>
+        <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">現價(adj)</th>
+        <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">成交量</th>
+        <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">未實現%</th>
+        <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);white-space:normal;line-height:1.2;">YF TP均</th>
+        <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);white-space:normal;line-height:1.2;">YF TP中</th>
+        <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);white-space:normal;line-height:1.2;">FS TP均</th>
+        <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);white-space:normal;line-height:1.2;">FS TP中</th>
+        <th style="text-align:right;padding:6px 9px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">漲幅空間</th>
+        <th style="text-align:right;padding:6px 10px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">日%</th>
+      </tr></thead>
+      <tbody>
+        <sc-for list="{{ holdings }}" as="h" hint-placeholder-count="10">
+          <tr style="background:{{ h.bg }};">
+            <td style="padding:5px 10px;border-top:1px solid var(--soft);text-align:left;font:600 9px 'DM Mono',monospace;color:var(--mut2);">{{ h.rank }}</td>
+            <td style="padding:5px 10px;border-top:1px solid var(--soft);font:600 9.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);white-space:nowrap;">{{ h.name }} <span style="font:500 8px 'DM Mono',monospace;color:var(--mut2);">{{ h.code }}</span></td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);font:400 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">{{ h.group }}</td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:600 9.5px 'DM Mono',monospace;color:var(--ink);">{{ h.wt }}</td>
+            <td style="padding:5px 10px;border-top:1px solid var(--soft);"><div style="height:8px;border-radius:3px;background:var(--soft);overflow:hidden;"><div style="height:100%;width:{{ h.barW }};background:var(--co);"></div></div></td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:center;"><span style="font:700 8px 'DM Mono','Noto Sans TC',monospace;color:#fff;background:{{ h.actColor }};border-radius:3px;padding:2px 7px;white-space:nowrap;">{{ h.act }}</span></td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:500 9px 'DM Mono',monospace;color:var(--mut);">{{ h.cost }}</td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:600 9px 'DM Mono',monospace;color:var(--ink);">{{ h.cur }}</td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:500 9px 'DM Mono',monospace;color:var(--mut);">{{ h.vol }}</td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:700 9px 'DM Mono',monospace;{{ h.plCss }}">{{ h.pl }}</td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:500 9px 'DM Mono',monospace;color:var(--blue);">{{ h.yfMean }}</td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:500 9px 'DM Mono',monospace;color:var(--blue);">{{ h.yfMed }}</td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:500 9px 'DM Mono',monospace;color:var(--vi);">{{ h.fsMean }}</td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:500 9px 'DM Mono',monospace;color:var(--vi);">{{ h.fsMed }}</td>
+            <td style="padding:5px 9px;border-top:1px solid var(--soft);text-align:right;font:700 9px 'DM Mono',monospace;{{ h.upCss }}">{{ h.upside }}</td>
+            <td style="padding:5px 10px;border-top:1px solid var(--soft);text-align:right;font:600 9px 'DM Mono',monospace;{{ h.chgCss }}">{{ h.chg }}</td>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isReq }}">
+  <div style="font:700 13px 'Syne',sans-serif;color:var(--ink);margin:2px 0 7px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">資料請求 · <span style="color:var(--co);">Data Request</span><span style="font:600 8px 'DM Mono',monospace;color:#fff;background:var(--blue);border-radius:9px;padding:2px 8px;">透過 VDF 向來源系統請求 → 落地 Parquet → 匯出 JSON</span></div>
+
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;">
+    <sc-for list="{{ reqSources }}" as="s" hint-placeholder-count="8">
+      <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid {{ s.color }};border-radius:2px;padding:8px 11px;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;"><span style="font:700 10px 'Syne',sans-serif;color:var(--ink);">{{ s.name }}</span><span style="margin-left:auto;font-size:9px;">{{ s.dot }}</span></div>
+        <div style="font:500 8px 'DM Mono',monospace;color:var(--mut2);line-height:1.4;">{{ s.scope }}</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:3px;"><span style="font:600 8px 'DM Mono',monospace;color:{{ s.color }};">{{ s.status }}</span><span style="margin-left:auto;font:700 7.5px 'DM Mono',monospace;color:#fff;background:var(--ink);border-radius:3px;padding:1px 6px;">{{ s.eng }}</span></div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:2px;background:var(--paper);padding:9px 12px;margin-bottom:12px;">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+      <span style="font:700 10px 'Syne',sans-serif;color:var(--ink);">🗂 資料庫資料夾 · Window I/O 選取 + 自動完整性掃描</span>
+      <span style="margin-left:auto;font:700 8px 'DM Mono',monospace;border-radius:9px;padding:2px 9px;{{ scanSummaryCss }}">{{ scanSummary }}</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:8px;">
+      <label style="font:700 9px 'Syne',sans-serif;color:#fff;background:var(--blue);border-radius:6px;padding:6px 12px;cursor:pointer;user-select:none;">📁 選擇資料夾…<input type="file" webkitdirectory="true" directory="true" multiple onChange="{{ onPickFolder }}" style="display:none;" /></label>
+      <input value="{{ dbFolder }}" onInput="{{ onDbFolder }}" placeholder="或手動貼路徑 D:\VDF\databases\" style="flex:1;min-width:180px;font:500 10px 'DM Mono',monospace;color:var(--ink2);background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:6px 9px;" />
+      <span onClick="{{ clearFolders }}" style="font:700 8.5px 'DM Mono',monospace;color:var(--mut);background:var(--soft);border-radius:5px;padding:5px 10px;cursor:pointer;user-select:none;">清除</span>
+    </div>
+    <sc-if value="{{ hasFolders }}">
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;">
+      <sc-for list="{{ folderChips }}" as="f" hint-placeholder-count="2">
+        <span style="display:inline-flex;align-items:center;gap:6px;font:600 9px 'DM Mono',monospace;color:var(--ink2);background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:3px 9px;">📂 {{ f.folder }} <span style="color:var(--mut2);">· {{ f.count }} 檔</span><span onClick="{{ f.remove }}" style="cursor:pointer;color:var(--co);font-weight:700;">×</span></span>
+      </sc-for>
+    </div>
+    </sc-if>
+    <div style="font:400 8.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);margin-bottom:6px;">選資料夾後系統自動遞迴比對 <span style="font-family:'DM Mono',monospace;">*.parquet / *.duckdb / *.db / *.csv</span>,檢查完整性並列出狀態與錯誤矩陣:</div>
+    <div style="border:1px solid var(--line);border-radius:3px;overflow:hidden;">
+      <table style="width:100%;border-collapse:separate;border-spacing:0;">
+        <thead><tr>
+          <th style="text-align:left;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">資料庫樣式</th>
+          <th style="text-align:left;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">用途</th>
+          <th style="text-align:center;padding:5px 7px;font:700 8px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">命中</th>
+          <th style="text-align:right;padding:5px 7px;font:700 8px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">大小</th>
+          <th style="text-align:center;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">狀態</th>
+          <th style="text-align:left;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">備註</th>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ scanRows }}" as="r" hint-placeholder-count="6">
+            <tr style="background:{{ r.bg }};">
+              <td style="padding:4px 9px;border-top:1px solid var(--soft);font:600 8.5px 'DM Mono',monospace;color:var(--blue);white-space:nowrap;">{{ r.dot }} {{ r.pat }}</td>
+              <td style="padding:4px 9px;border-top:1px solid var(--soft);font:400 8.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">{{ r.use }}</td>
+              <td style="padding:4px 7px;border-top:1px solid var(--soft);text-align:center;font:600 8.5px 'DM Mono',monospace;color:var(--ink2);">{{ r.found }}</td>
+              <td style="padding:4px 7px;border-top:1px solid var(--soft);text-align:right;font:500 8.5px 'DM Mono',monospace;color:var(--mut);">{{ r.size }}</td>
+              <td style="padding:4px 9px;border-top:1px solid var(--soft);text-align:center;"><span style="font:700 7.5px 'DM Mono',monospace;border-radius:3px;padding:2px 7px;{{ r.statusCss }}">{{ r.status }}</span></td>
+              <td style="padding:4px 9px;border-top:1px solid var(--soft);font:400 8px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut2);">{{ r.note }}</td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1.15fr 1fr;gap:10px;align-items:start;">
+    <div style="border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper);">
+      <div style="font:700 10px 'Syne',sans-serif;color:var(--ink);padding:7px 11px;border-bottom:1px solid var(--line);background:var(--paper2);">欄位 → 來源對應 Field Map</div>
+      <table style="width:100%;border-collapse:separate;border-spacing:0;">
+        <thead><tr>
+          <th style="text-align:left;padding:5px 10px;font:700 8px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">欄位</th>
+          <th style="text-align:left;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">來源 / API</th>
+          <th style="text-align:left;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">彙整</th>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ reqMap }}" as="m" hint-placeholder-count="9">
+            <tr style="background:{{ m.bg }};">
+              <td style="padding:4px 10px;border-top:1px solid var(--soft);font:600 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">{{ m.field }}</td>
+              <td style="padding:4px 9px;border-top:1px solid var(--soft);font:500 8.5px 'DM Mono',monospace;color:var(--blue);">{{ m.src }}</td>
+              <td style="padding:4px 9px;border-top:1px solid var(--soft);font:400 8.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">{{ m.agg }}</td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+    <div style="border:1px solid var(--line);border-radius:2px;overflow:hidden;background:#1e1d1a;">
+      <div style="display:flex;align-items:center;gap:8px;padding:7px 11px;border-bottom:1px solid #33312c;">
+        <span style="font:700 10px 'Syne',sans-serif;color:#f1ede2;">請求規格 request.json</span>
+        <span onClick="{{ copyReq }}" style="margin-left:auto;font:700 8.5px 'DM Mono',monospace;color:#fff;background:{{ copyBg }};border-radius:4px;padding:3px 10px;cursor:pointer;user-select:none;">{{ copyLabel }}</span>
+      </div>
+      <pre style="margin:0;padding:11px 13px;font:500 9.5px/1.6 'DM Mono',monospace;color:#cfe3d6;white-space:pre-wrap;overflow-x:auto;">{{ reqJson }}</pre>
+    </div>
+  </div>
+  <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--blue);border-radius:2px;padding:9px 13px;margin-top:10px;font:400 10px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);"><b style="color:var(--ink);">用法：</b>複製 <span style="font-family:'DM Mono',monospace;color:var(--blue);">request.json</span> → 餵給本機 <b style="color:var(--ink2);">VDF 擷取器</b>，它依 <code style="font-family:'DM Mono',monospace;">tickers × fields × range</code> 向各來源抓取、雙重恆等驗算、落地 Parquet / DuckDB，最後匯出 <span style="font-family:'DM Mono',monospace;color:var(--co);">etf_matrix.json</span> 覆蓋本頁資料源——HTML 不需改動。</div>
+  </sc-if>
+
+  <sc-if value="{{ isAct }}">
+  <div style="font:700 13px 'Syne',sans-serif;color:var(--ink);margin:2px 0 7px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">經理人動作分類 · <span style="color:var(--co);">Manager Action Lifecycle</span><span style="font:600 8px 'DM Mono',monospace;color:#fff;background:var(--blue);border-radius:9px;padding:2px 8px;">五階段 · 點選展開白話含意</span></div>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;align-items:start;">
+    <sc-for list="{{ actStages }}" as="s" hint-placeholder-count="5">
+      <div style="border:1px solid var(--line);border-top:3px solid {{ s.color }};border-radius:3px;overflow:hidden;background:var(--paper);">
+        <div onClick="{{ s.toggle }}" style="padding:10px 11px;cursor:pointer;user-select:none;background:{{ s.headBg }};">
+          <div style="display:flex;align-items:center;gap:6px;"><span style="font:700 9px 'DM Mono',monospace;color:{{ s.subFg }};">{{ s.num }}</span><span style="margin-left:auto;font:700 9px 'DM Mono',monospace;color:{{ s.subFg }};">{{ s.caret }}</span></div>
+          <div style="font:800 17px/1.15 'Syne','Noto Sans TC',sans-serif;color:{{ s.headFg }};letter-spacing:1px;margin-top:3px;">{{ s.stage }}</div>
+          <div style="font:500 8.5px 'DM Mono',monospace;color:{{ s.subFg }};margin-top:2px;">{{ s.sub }}</div>
+        </div>
+        <sc-if value="{{ s.open }}">
+        <div style="padding:7px 9px 9px;border-top:1px solid var(--line);">
+          <sc-for list="{{ s.actions }}" as="x" hint-placeholder-count="3">
+            <div style="margin-bottom:7px;">
+              <div style="font:700 10px 'Syne','Noto Sans TC',sans-serif;color:{{ s.color }};letter-spacing:.5px;">{{ x.a }}</div>
+              <div style="font:400 9px/1.5 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);margin-top:1px;">{{ x.m }}</div>
+            </div>
+          </sc-for>
+        </div>
+        </sc-if>
+      </div>
+    </sc-for>
+  </div>
+  <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--co);border-radius:2px;padding:9px 13px;margin-top:10px;font:400 10px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">五個階段依資金生命週期排序:<b style="color:var(--blue);">破冰進場</b>(建倉)→<b style="color:var(--co);">乘勝追擊</b>(加碼)→<b style="color:var(--teal);">動態平衡</b>(配置)→<b style="color:var(--am);">高檔防禦</b>(減碼)→<b style="color:var(--down);">決絕離場</b>(出清)。點選任一階段展開具體動作與交易室白話含意。</div>
+  </sc-if>
+
+  <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--co);border-radius:2px;padding:10px 13px;margin-top:11px;font:400 10px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);"><b style="color:var(--ink);">主動式 ETF 標記：</b>代碼後綴 <b style="color:var(--co);">A</b>（如 00981A）；於三大法人買賣超面板中，主動式 ETF 買賣超以<b style="color:var(--co);">紅色實線框</b>標記，與被動式區隔。經理人主動選股、可偏離指數。<b style="color:var(--ink2);">績效/規模為示意</b>，接 TWSE/投信投顧公會即更新。</div>
+
+  <footer style="margin-top:18px;border-top:1px solid var(--line);padding-top:11px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font:500 10px 'DM Mono',monospace;color:var(--mut);">
+    <span style="font-weight:700;letter-spacing:1.3px;color:var(--ink);">VERITAS INTELLIGENCE ANALYTICS</span>
+    <span>Active Taiwan Stock ETF Console · Visual Lock SSOT</span>
+  </footer>
+</div>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#1e1d1a"/><rect x="20" y="30" width="60" height="9" rx="2" fill="#c96b5a"/><rect x="20" y="45" width="60" height="9" rx="2" fill="#439a9a"/><rect x="20" y="60" width="60" height="9" rx="2" fill="#4c78a8"/><text x="50" y="88" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#fff" font-weight="700">ETF</text></svg></template>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{ &quot;$preview&quot;: { &quot;width&quot;: 1340, &quot;height&quot;: 640 } }">
+class Component extends DCLogic {
+  state = { checked: { 0: true }, tab: 'perf', panel: true };
+  _holdRaw(style) {
+    const base = {
+      '科技': [['台積電','2330','半導體',28.5,1.3],['聯發科','2454','半導體',9.2,0.8],['鴻海','2317','AI伺服器',7.4,2.1],['緯穎','6669','AI伺服器',5.1,1.9],['廣達','2382','AI伺服器',4.6,1.4],['台達電','2308','機器人',3.8,0.7],['聯亞','3081','CPO',3.1,1.5],['欣興','3037','ABF載板',2.7,0.9],['南亞科','2408','記憶體',2.3,1.2],['雙鴻','3324','散熱',2.1,1.8],['世芯-KY','3661','IC設計',1.9,2.2],['創意','3443','IC設計',1.7,1.6],['智原','3035','IC設計',1.4,1.3]],
+      '高息': [['富邦金','2881','金融',8.4,0.4],['國泰金','2882','金融',7.1,0.3],['中鋼','2002','鋼鐵',5.2,0.3],['兆豐金','2886','金融',4.8,0.2],['台積電','2330','半導體',4.5,1.3],['長榮','2603','航運',4.1,1.2],['玉山金','2884','金融',3.6,-0.2],['台塑','1301','塑化',3.2,-0.4],['中華電','2412','電信',3.0,0.1],['豐興','2015','條鋼',2.6,0.5],['第一金','2892','金融',2.4,0.2],['和泰車','2207','汽車',2.1,0.6],['統一','1216','食品',1.9,0.3]],
+      '價值': [['台積電','2330','半導體',18.5,1.3],['台塑化','6505','塑化',6.2,-0.3],['南亞','1303','塑化',5.1,-0.5],['台化','1326','塑化',4.4,-0.4],['中鋼','2002','鋼鐵',4.0,0.3],['富邦金','2881','金融',3.6,0.4],['遠東新','1402','紡織',3.1,0.2],['亞泥','1102','水泥',2.8,0.1],['台泥','1101','水泥',2.5,0.2],['正新','2105','輪胎',2.2,0.4]],
+    };
+    const def = [['台積電','2330','半導體',26.2,1.3],['鴻海','2317','AI伺服器',8.1,2.1],['聯發科','2454','半導體',7.5,0.8],['緯穎','6669','AI伺服器',4.9,1.9],['華城','1519','重電',4.2,1.9],['廣達','2382','AI伺服器',4.0,1.4],['上銀','2049','機器人',3.4,1.6],['國巨','2327','被動元件',3.0,1.0],['長榮','2603','航運',2.8,1.2],['大立光','3008','光學',2.5,0.9],['世芯-KY','3661','IC設計',2.3,2.2],['奇鋐','3017','散熱',2.1,1.8],['智邦','2345','網通',1.9,1.1],['台達電','2308','機器人',1.7,0.7],['日月光投控','3711','封測',1.5,0.6]];
+    return base[style] || def;
+  }
+  renderVals() {
+    const stCss = { '成長': 'var(--co)', '高息': 'var(--am)', '優選': 'var(--blue)', '價值': 'var(--teal)', '科技': 'var(--vi)' };
+    const sc = v => v >= 0 ? 'color:var(--up);' : 'color:var(--down);';
+    // [code, name, mgr, style, aum, fee%, ret%, dist]
+    const data = [
+      ['00981A', '主動統一台股增長', '統一投信', '成長', 285, '0.85%', 18.4, '不配息'],
+      ['00982A', '主動野村臺灣優選', '野村投信', '優選', 246, '0.89%', 15.2, '不配息'],
+      ['00980A', '主動安聯台灣高息', '安聯投信', '高息', 198, '0.90%', 9.6, '季配'],
+      ['00983A', '主動群益台灣強棒', '群益投信', '成長', 164, '0.88%', 16.8, '不配息'],
+      ['00984A', '主動野村臺灣50', '野村投信', '優選', 142, '0.85%', 12.1, '不配息'],
+      ['00985A', '主動富邦台灣成長', '富邦投信', '成長', 128, '0.87%', 14.3, '不配息'],
+      ['00986A', '主動元大台灣價值', '元大投信', '價值', 96, '0.86%', 7.2, '半年配'],
+      ['00987A', '主動中信台灣科技', '中信投信', '科技', 88, '0.92%', 21.5, '不配息'],
+      ['00988A', '主動凱基台灣優勢', '凱基投信', '優選', 74, '0.90%', 11.4, '季配'],
+      ['00989A', '主動第一金台股動能', '第一金投信', '成長', 62, '0.88%', 13.7, '不配息'],
+      ['00990A', '主動兆豐台灣優選', '兆豐投信', '優選', 58, '0.87%', 10.8, '不配息'],
+      ['00991A', '主動國泰台灣領航', '國泰投信', '成長', 54, '0.89%', 12.6, '不配息'],
+      ['00992A', '主動台新台股創新', '台新投信', '科技', 49, '0.91%', 17.9, '不配息'],
+      ['00993A', '主動永豐台灣優息', '永豐投信', '高息', 44, '0.90%', 8.4, '季配'],
+      ['00994A', '主動日盛台灣精選', '日盛投信', '優選', 38, '0.89%', 11.2, '不配息'],
+      ['00995A', '主動華南台股動力', '華南永昌投信', '成長', 35, '0.88%', 13.1, '不配息'],
+      ['00996A', '主動復華台灣科技', '復華投信', '科技', 33, '0.92%', 19.3, '不配息'],
+      ['00997A', '主動安聯台灣優質', '安聯投信', '價值', 29, '0.87%', 6.8, '半年配'],
+      ['00998A', '主動街口台灣成長', '街口投信', '成長', 26, '0.90%', 14.6, '不配息'],
+      ['00999A', '主動凱基台灣高息', '凱基投信', '高息', 24, '0.90%', 9.1, '季配'],
+      ['009A01', '主動富邦台灣科技', '富邦投信', '科技', 22, '0.91%', 18.7, '不配息'],
+      ['009A02', '主動群益台灣價值', '群益投信', '價值', 19, '0.86%', 7.5, '半年配'],
+      ['009A03', '主動元大台股創新', '元大投信', '科技', 17, '0.92%', 20.1, '不配息'],
+      ['009A04', '主動統一台灣優選', '統一投信', '優選', 15, '0.88%', 11.8, '不配息'],
+      ['009A05', '主動野村台灣動能', '野村投信', '成長', 13, '0.89%', 12.9, '不配息'],
+    ];
+    const chk = this.state.checked || {};
+    // 經理人(基金經理人)名稱 — 對應 data 索引
+    const pm = ['林哲緯','陳柏宇','黃詩涵','張凱程','吳承翰','李宛蓉','劉冠廷','鄭宇晴','王建勳','蔡孟儒','許雅婷','周誌軒','賴思妤','謝宗翰','洪嘉玲','曾彥碩','潘怡君','馮俊豪','蕭立群','江品妍','邱柏睿','石佳穎','范植偉','卓筱涵','古博文'];
+    const rng2 = tk => { let s = (parseInt(tk, 10) || 1000) >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; };
+    const rows = data.map((d, i) => {
+      const rr = rng2(d[0] + 'lf');
+      const nav = +(11 + rr() * 44).toFixed(2);
+      const flowV = +((rr() - 0.4) * d[4] * 0.42).toFixed(1);
+      return {
+      code: d[0], name: d[1], mgr: d[2], pm: pm[i], style: d[3], styleCss: stCss[d[3]] || 'var(--mut2)',
+      newShow: ({ '009A03': 1, '009A04': 1, '009A05': 1 })[d[0]] ? '' : 'display:none;',
+      nav: nav.toFixed(2), flow: (flowV >= 0 ? '+' : '') + flowV.toFixed(1), flowCss: sc(flowV), flowDir: flowV >= 0 ? '流入' : '流出',
+      aum: d[4].toLocaleString(), fee: d[5], ret: (d[6] >= 0 ? '+' : '') + d[6].toFixed(1) + '%', retCss: sc(d[6]), dist: d[7],
+      bg: chk[i] ? 'rgba(201,107,90,0.10)' : (i % 2 ? '#f6f4ef' : 'var(--paper)'),
+      selCss: chk[i] ? 'box-shadow:inset 3px 0 0 var(--co);' : '',
+      mark: chk[i] ? '☑' : '☐', markCss: chk[i] ? 'color:var(--co);' : 'color:var(--mut2);',
+      pick: () => this.setState(s => ({ checked: { ...s.checked, [i]: !s.checked[i] } })),
+    }; });
+    const checkedIdx = data.map((d, i) => i).filter(i => chk[i]);
+    const useIdx = checkedIdx.length ? checkedIdx : [0];
+    // ---- 績效矩陣:多期間報酬 1D~240D + YTD + YTD 淨資金流(億);紅漲綠跌 + 熱力色階 + NEW 標記 ----
+    const HZ = [1, 5, 10, 20, 60, 120, 240];
+    const frac = { 1: 0.02, 5: 0.06, 10: 0.11, 20: 0.20, 60: 0.42, 120: 0.68, 240: 0.92 };
+    const NEWSET = { '009A03': 1, '009A04': 1, '009A05': 1 };   // 最新核准(示意)
+    // 第一遍:算各期間原始報酬
+    const perfRaw = data.map((d, i) => {
+      const since = d[6], r = rng2(d[0] + 'p');
+      const vals = HZ.map(n => +(since * frac[n] + (r() - 0.45) * Math.max(1.3, Math.abs(since) * 0.2)).toFixed(1));
+      const ytd = +(since * 0.78 + (r() - 0.45) * 2.4).toFixed(1);
+      const flow = +((r() - 0.38) * d[4] * 0.4).toFixed(1);
+      return { d, i, vals, ytd, flow };
+    });
+    // 每欄(8 欄含 YTD)最大絕對值 → 熱力強度正規化
+    const colMax = [];
+    for (let c = 0; c < 8; c++) { let m = 0.01; perfRaw.forEach(rw => { const v = c < 7 ? rw.vals[c] : rw.ytd; m = Math.max(m, Math.abs(v)); }); colMax[c] = m; }
+    const heatOf = (v, c) => { const t = Math.min(1, Math.abs(v) / colMax[c]); const a = (0.06 + t * 0.30).toFixed(3); return v >= 0 ? 'background:rgba(192,88,78,' + a + ');' : 'background:rgba(79,138,91,' + a + ');'; };
+    const perfRows = perfRaw.map(rw => {
+      const cells = rw.vals.map((v, c) => ({ v: (v >= 0 ? '+' : '') + v.toFixed(1), css: sc(v), heat: heatOf(v, c) }));
+      cells.push({ v: (rw.ytd >= 0 ? '+' : '') + rw.ytd.toFixed(1), css: sc(rw.ytd) + 'font-weight:700;', heat: heatOf(rw.ytd, 7) });
+      const d = rw.d;
+      return { code: d[0], name: d[1], mgr: d[2], pm: pm[rw.i], style: d[3], styleCss: stCss[d[3]] || 'var(--mut2)',
+        isNew: !!NEWSET[d[0]], newShow: NEWSET[d[0]] ? '' : 'display:none;',
+        cells, aum: d[4].toLocaleString(), flow: (rw.flow >= 0 ? '+' : '') + rw.flow.toFixed(1), flowCss: sc(rw.flow),
+        _ytd: rw.ytd };
+    }).sort((a, b) => b._ytd - a._ytd).map((p, i) => ({ ...p, rank: i + 1,
+      bg: i % 2 ? '#f6f4ef' : 'var(--paper)', rankCss: i < 3 ? 'color:var(--co);font-weight:800;' : 'color:var(--mut2);' }));
+    // aggregate holdings across checked ETFs (avg weight by ticker)
+    const agg = {};
+    useIdx.forEach(i => { this._holdRaw(data[i][3]).forEach(h => { const k = h[1]; if (!agg[k]) agg[k] = { name: h[0], code: h[1], group: h[2], wsum: 0, chg: h[4], n: 0 }; agg[k].wsum += h[3]; agg[k].n++; }); });
+    const aggArr = Object.values(agg).map(a => ({ ...a, wt: a.wsum / useIdx.length })).sort((x, y) => y.wt - x.wt);
+    const maxW = aggArr.length ? aggArr[0].wt : 1;
+    // 估算持股成本：以代碼決定性產生均價 + 現價 → 未實現損益%
+    const px = tk => { const n = parseInt(tk, 10) || 1000; const base = 30 + (n % 900); return base; };
+    let costTot = 0, valTot = 0;
+    let volTot = 0;
+    const holdings = aggArr.map((h, i) => {
+      const cur = px(h.code), cost = +(cur / (1 + h.chg / 100 * 6)).toFixed(1), pl = (cur / cost - 1) * 100;
+      const r = rng2(h.code);
+      const vol = Math.round((200 + r() * 9800)); // 張(千股)
+      const yfMean = +(cur * (1.05 + r() * 0.22)).toFixed(1);   // yfinance 目標價 mean
+      const yfMed = +(cur * (1.03 + r() * 0.20)).toFixed(1);    // yfinance median
+      const fsMean = +(cur * (1.06 + r() * 0.20)).toFixed(1);    // factset mean
+      const fsMed = +(cur * (1.04 + r() * 0.21)).toFixed(1);    // factset median
+      const upside = (yfMed / cur - 1) * 100;                    // 漲幅空間(以 yf median)
+      costTot += cost * h.wt; valTot += cur * h.wt; volTot += vol;
+      // 連動動作分類:依權重排名 / 漲跌 / 未實現 推導經理人當前動作
+      let act, actColor;
+      if (i === 0 && h.wt >= 8) { act = '超額配置'; actColor = 'var(--teal)'; }
+      else if (pl > 55 && h.wt > 4) { act = '逢高減碼'; actColor = 'var(--am)'; }
+      else if (h.chg >= 1.5) { act = '強勢重壓'; actColor = 'var(--co)'; }
+      else if (h.chg >= 0.8) { act = '順勢加碼'; actColor = 'var(--co)'; }
+      else if (h.chg >= 0.3) { act = '逢低承接'; actColor = 'var(--co)'; }
+      else if (h.chg >= 0) { act = '基準配置'; actColor = 'var(--teal)'; }
+      else if (h.chg >= -0.3) { act = '欠額配置'; actColor = 'var(--blue)'; }
+      else { act = '降險減持'; actColor = 'var(--down)'; }
+      return { rank: i + 1, name: h.name, code: h.code + '.TW', group: h.group, wt: h.wt.toFixed(1) + '%', barW: Math.min(100, h.wt / maxW * 100) + '%',
+        act, actColor,
+        cost: cost.toFixed(1), cur: cur.toFixed(1), pl: (pl >= 0 ? '+' : '') + pl.toFixed(1) + '%', plCss: sc(pl),
+        vol: vol.toLocaleString(), yfMean: yfMean.toFixed(1), yfMed: yfMed.toFixed(1), fsMean: fsMean.toFixed(1), fsMed: fsMed.toFixed(1),
+        upside: (upside >= 0 ? '+' : '') + upside.toFixed(1) + '%', upCss: sc(upside),
+        chg: (h.chg >= 0 ? '+' : '') + h.chg.toFixed(1) + '%', chgCss: sc(h.chg), bg: i % 2 ? '#f6f4ef' : 'var(--paper)' };
+    });
+    const portPL = costTot ? (valTot / costTot - 1) * 100 : 0;
+    const portPLtxt = (portPL >= 0 ? '+' : '') + portPL.toFixed(2) + '%';
+    const selName = useIdx.length === 1 ? (data[useIdx[0]][0] + ' ' + data[useIdx[0]][1]) : ('合計 ' + useIdx.length + ' 檔基金總持股');
+    const selAll = () => { const c = {}; data.forEach((d, i) => c[i] = true); this.setState({ checked: c }); };
+    const selNone = () => this.setState({ checked: { 0: true } });
+    const totAum = data.reduce((s, d) => s + d[4], 0);
+    const avgRet = data.reduce((s, d) => s + d[6], 0) / data.length;
+    const bestRow = data.reduce((m, d) => d[6] > m[6] ? d : m, data[0]);   // 最佳:自資料計算
+    const avgFee = data.reduce((s, d) => s + parseFloat(d[5]), 0) / data.length;
+    const cards = [
+      { l: '主動式 ETF 數', v: data.length, s: '後綴 A · 含 3 檔 NEW', color: 'var(--co)' },
+      { l: '總規模', v: '$' + totAum.toLocaleString() + '億', s: 'AUM', color: 'var(--blue)' },
+      { l: '平均上市來', v: '+' + avgRet.toFixed(1) + '%', s: 'since listing', color: 'var(--up)' },
+      { l: '最佳', v: '+' + bestRow[6].toFixed(1) + '%', s: bestRow[0] + ' ' + bestRow[3], color: 'var(--gn)' },
+      { l: '平均費用率', v: avgFee.toFixed(2) + '%', s: '高於被動式', color: 'var(--am)' },
+    ];
+    const updated = '2026-06-22';
+    // ---- 資料請求分頁 ----
+    const reqSources = [
+      { name: 'TWSE / TPEX', dot: '🟢', color: 'var(--gn)', scope: '上市櫃日 OHLCV adj · 成交量', status: '可用 READY', eng: 'VDF→rest' },
+      { name: 'SITCA 投信公會', dot: '🟡', color: 'var(--am)', scope: 'ETF 規模 / 費率 / 受益單位 / 配息', status: '月頻 · 需牌點', eng: 'VDF→parse' },
+      { name: 'MOPS 公開資訊', dot: '🟢', color: 'var(--gn)', scope: '財報 / 前十大持股 / 月營收', status: '可用 READY', eng: 'VDF→parse' },
+      { name: 'yfinance', dot: '🟢', color: 'var(--gn)', scope: 'adj 價 · analyst target mean/median', status: '可用 READY', eng: 'VDF→pyproc' },
+      { name: 'FactSet', dot: '🔴', color: 'var(--co)', scope: 'target price mean/median · 估值', status: '需授權 KEY', eng: 'VDF→keyed' },
+      { name: '經理人名冊', dot: '🟡', color: 'var(--am)', scope: '基金經理人 · 資歷', status: '公開說明書', eng: 'VDF→parse' },
+      { name: 'TWSE 法人買賣超', dot: '🟢', color: 'var(--gn)', scope: '三大法人 · 主動 ETF 標記', status: '可用 READY', eng: 'VDF→rest' },
+      { name: 'FRED', dot: '🟢', color: 'var(--gn)', scope: '利率 / 匯率 / 宏觀費率', status: '可用 READY', eng: 'VDF→keyed' },
+    ];
+    const reqMap = [
+      ['ETF 代碼 / 名稱 / 風格', 'SITCA + TWSE', '篩代碼後綴 A'],
+      ['經理人', 'SITCA · 公開說明書', '依基金對應'],
+      ['規模 / 費率 / 配息', 'SITCA 月報', '月更新'],
+      ['報酬 1D~240D / YTD', 'yfinance · TWSE adj', 'ret(n)=adj[t]/adj[t-n]-1'],
+      ['YTD 資金流', 'SITCA 受益單位 × NAV', 'Σ 每日淨申購'],
+      ['持股 / 權重', 'MOPS · ETF 月報', '跨基金按 ticker 聚合'],
+      ['現價 / 成交量', 'TWSE 日成交 adj', '最新交易日'],
+      ['yf 目標價 mean/median', 'yfinance', 'analyst targets'],
+      ['FS 目標價 mean/median', 'FactSet', 'consensus'],
+      ['未實現% / 漲幅空間', '計算欄', '現價/成本・目標/現價'],
+    ].map((m, i) => ({ field: m[0], src: m[1], agg: m[2], bg: i % 2 ? '#f6f4ef' : 'var(--paper)' }));
+    const dbFolder = (this.state.dbFolder != null) ? this.state.dbFolder : 'D:\\VDF\\databases\\';
+    const reqJson = JSON.stringify({
+      request: 'tw_active_etf_matrix',
+      asof: updated,
+      universe: { type: 'active_etf', suffix: 'A', exchange: ['TWSE', 'TPEX'] },
+      tickers: data.map(d => d[0]),
+      fields: ['name', 'manager_pm', 'aum', 'nav', 'flow_ytd', 'expense_ratio', 'distribution',
+        'ret:1D,5D,10D,20D,60D,120D,240D,YTD',
+        'holdings:weight', 'price_adj', 'volume',
+        'target_yf:mean,median', 'target_fs:mean,median'],
+      range: { start: '1996-01-01', end: 'latest' },
+      sources: ['TWSE', 'TPEX', 'SITCA', 'MOPS', 'yfinance', 'FactSet', 'FRED'],
+      verify: 'double_identity',
+      db_discover: { folder: dbFolder, recursive: true, match: ['*.parquet', '*.duckdb', '*.db', '*.csv'], auto: true },
+      sink: { parquet: 'vdf/etf/', export: 'etf_matrix.json' }
+    }, null, 2);
+    // 資料庫自動搜尋:依 fields 推導該比對的資料庫檔名樣式
+    const dbMatches = [
+      { pat: 'twse_stock_day_*.duckdb', use: '日 OHLCV adj / 成交量', dot: '🟢' },
+      { pat: 'sitca_etf_profile_*.parquet', use: '規模 / 費率 / 受益單位 / 配息', dot: '🟢' },
+      { pat: 'mops_holdings_*.parquet', use: '前十大持股 / 權重', dot: '🟢' },
+      { pat: 'yfinance_target_*.parquet', use: 'YF 目標價 mean/median', dot: '🟢' },
+      { pat: 'factset_target_*.parquet', use: 'FS 目標價 mean/median', dot: '🟡' },
+      { pat: 'twse_inst3_*.duckdb', use: '三大法人 / 主動 ETF 標記', dot: '🟢' },
+    ].map((m, i) => ({ ...m, bg: i % 2 ? '#f6f4ef' : 'var(--paper)' }));
+    const reqCopied2 = this.state.reqCopied;
+    // ---- \u8cc7\u6599\u5eab\u8cc7\u6599\u593e:Window I/O \u9078\u53d6(webkitdirectory) + \u591a\u500b + \u81ea\u52d5\u5b8c\u6574\u6027\u6383\u63cf ----
+    const dbFolders = this.state.dbFolders || [];
+    const globToRe = g => new RegExp('^' + g.replace(/[.]/g, '\\.').replace(/[*]/g, '.*') + '$', 'i');
+    const allFiles = [];
+    dbFolders.forEach(f => (f.files || []).forEach(fl => allFiles.push({ name: fl.name, size: fl.size, folder: f.folder })));
+    const fmtSize = b => b >= 1048576 ? (b / 1048576).toFixed(1) + ' MB' : b >= 1024 ? (b / 1024).toFixed(0) + ' KB' : b + ' B';
+    const scanRows = dbMatches.map((ex, i) => {
+      const re = globToRe(ex.pat);
+      const hits = allFiles.filter(fl => re.test(fl.name));
+      const found = hits.length > 0;
+      const size = hits.reduce((s, h) => s + h.size, 0);
+      let status, dot, css, note;
+      if (!dbFolders.length) { status = '待掃描'; dot = '\u26aa'; css = 'color:var(--mut2);background:var(--soft);'; note = '尚未選資料夾'; }
+      else if (!found) { status = '缺檔'; dot = '\ud83d\udd34'; css = 'color:#fff;background:var(--co);'; note = '找不到符合樣式的檔'; }
+      else if (size < 1024) { status = '過小'; dot = '\ud83d\udfe1'; css = 'color:#fff;background:var(--am);'; note = '檔案過小,疑似空檔'; }
+      else { status = '完整'; dot = '\ud83d\udfe2'; css = 'color:#fff;background:var(--gn);'; note = hits.length + ' 檔 · ' + (hits[0] ? hits[0].folder : ''); }
+      return { pat: ex.pat, use: ex.use, found: found ? hits.length + ' 檔' : '—', size: found ? fmtSize(size) : '—', status, dot, statusCss: css, note, bg: i % 2 ? '#f6f4ef' : 'var(--paper)' };
+    });
+    const okN = scanRows.filter(r => r.status === '完整').length;
+    const errN = scanRows.filter(r => r.status === '缺檔' || r.status === '過小').length;
+    const scanSummary = dbFolders.length ? ('完整 ' + okN + ' / ' + scanRows.length + ' · 異常 ' + errN) : '尚未掃描';
+    const scanSummaryCss = !dbFolders.length ? 'background:var(--soft);color:var(--mut);' : (errN ? 'background:var(--co);color:#fff;' : 'background:var(--gn);color:#fff;');
+    const folderChips = dbFolders.map((f, idx) => ({ folder: f.folder, count: (f.files || []).length,
+      remove: () => this.setState(s => ({ dbFolders: (s.dbFolders || []).filter((_, k) => k !== idx) })) }));
+    const reqCopied = this.state.reqCopied;
+    // ---- 經理人動作分類:5 階段 × 具體動作(只顯示四字階段,點擊展開白話) ----
+    const actData = [
+      ['一', '破冰進場', '從無到有', 'var(--blue)', [['首度佈局', '第一次買進這家公司(建立樁腳)。'], ['分批建倉', '因為資金龐大,拆成好幾天慢慢買,避免把股價買飛。']]],
+      ['二', '乘勝追擊', '由小變大', 'var(--co)', [['順勢加碼', '股價上漲證明看對了,繼續加買。'], ['強勢重壓', '財報超乎預期,不計成本掠奪式買進。'], ['逢低承接', '看好中長線,趁股價稍微回檔時多撿一點。']]],
+      ['三', '動態平衡', '持股比重', 'var(--teal)', [['超額配置', '買得比大盤指數規定的比例還多(投下強烈信任票)。'], ['基準配置', '跟大盤規定的比例一模一樣(不求打敗大盤,只求不落後)。'], ['欠額配置', '買得比大盤規定的比例還少(相對看壞)。']]],
+      ['四', '高檔防禦', '由大變小', 'var(--am)', [['逢高減碼', '股價短線衝太快了,先賣掉一部分。'], ['獲利調節', '賺夠了,把本金抽回一部分,留利潤在裡面滾。'], ['降險減持', '該個股漲太多導致佔基金總權重過高,觸發法規上限,被迫賣出。']]],
+      ['五', '決絕離場', '從有到無', 'var(--down)', [['獲利清倉', '題材走完了,一股不留,全數賣光。'], ['停損砍倉', '基本面看錯了,跌破經理人防線,不計代價認賠殺出。']]],
+    ];
+    const actClosed = this.state.actClosed || {};
+    const actStages = actData.map((a, i) => {
+      const op = !actClosed[i];
+      return {
+      num: a[0], stage: a[1], sub: a[2], color: a[3],
+      open: op,
+      caret: op ? '▾' : '▸',
+      headBg: op ? a[3] : 'var(--paper)',
+      headFg: op ? '#fff' : 'var(--ink)',
+      subFg: op ? 'rgba(255,255,255,0.85)' : 'var(--mut2)',
+      toggle: () => this.setState(s => ({ actClosed: { ...(s.actClosed || {}), [i]: !((s.actClosed || {})[i]) } })),
+      actions: a[4].map(x => ({ a: x[0], m: x[1] })),
+    }; });
+    return { rootRef: el => { this.root = el; }, rows, cards, holdings, selName, selAll, selNone, nChecked: useIdx.length,
+      updated, verifyTag: '✓ 檢查通過 · ' + data.length + ' 檔', perfRows,
+      reqSources, reqMap, reqJson, actStages,
+      dbFolder, dbMatches, onDbFolder: e => this.setState({ dbFolder: e.target.value }),
+      scanRows, folderChips, scanSummary, scanSummaryCss, hasFolders: dbFolders.length > 0,
+      onPickFolder: e => {
+        const files = Array.from(e.target.files || []);
+        if (!files.length) return;
+        const root = (files[0].webkitRelativePath || files[0].name).split('/')[0] || '所選資料夾';
+        const fl = files.map(f => ({ name: (f.webkitRelativePath || f.name).split('/').pop(), size: f.size }));
+        this.setState(s => ({ dbFolders: [...(s.dbFolders || []), { folder: root, files: fl }] }));
+        e.target.value = '';
+      },
+      clearFolders: () => this.setState({ dbFolders: [] }),
+      copyReq: () => { try { navigator.clipboard.writeText(reqJson); } catch (e) {} this.setState({ reqCopied: true }); clearTimeout(this._rt); this._rt = setTimeout(() => this.setState({ reqCopied: false }), 1500); },
+      copyLabel: reqCopied ? '✓ 已複製' : '⧉ 複製', copyBg: reqCopied ? 'var(--gn)' : 'var(--blue)',
+      tabPerf: () => this.setState({ tab: 'perf' }), tabList: () => this.setState({ tab: 'list' }), tabHold: () => this.setState({ tab: 'hold' }), tabReq: () => this.setState({ tab: 'req' }), tabAct: () => this.setState({ tab: 'act' }),
+      tcPerf: (this.state.tab === 'perf') ? 'background:var(--bg);color:var(--ink);border-color:var(--ink);box-shadow:0 -2px 0 var(--accent) inset;' : 'background:var(--soft);color:var(--mut);',
+      tcList: (this.state.tab === 'list') ? 'background:var(--bg);color:var(--ink);border-color:var(--ink);box-shadow:0 -2px 0 var(--accent) inset;' : 'background:var(--soft);color:var(--mut);',
+      tcHold: (this.state.tab === 'hold') ? 'background:var(--bg);color:var(--ink);border-color:var(--ink);box-shadow:0 -2px 0 var(--accent) inset;' : 'background:var(--soft);color:var(--mut);',
+      tcReq: (this.state.tab === 'req') ? 'background:var(--bg);color:var(--ink);border-color:var(--ink);box-shadow:0 -2px 0 var(--accent) inset;' : 'background:var(--soft);color:var(--mut);',
+      tcAct: (this.state.tab === 'act') ? 'background:var(--bg);color:var(--ink);border-color:var(--ink);box-shadow:0 -2px 0 var(--accent) inset;' : 'background:var(--soft);color:var(--mut);',
+      isPerf: this.state.tab === 'perf', isList: this.state.tab === 'list', isHold: this.state.tab === 'hold', isReq: this.state.tab === 'req', isAct: this.state.tab === 'act',
+      portPL: portPLtxt, portPLCss: portPL >= 0 ? 'color:var(--up);' : 'color:var(--down);',
+      panelOpen: this.state.panel, panelCaret: this.state.panel ? '◧ 隱藏基金清單' : '▸ 顯示基金清單',
+      togglePanel: () => this.setState(s => ({ panel: !s.panel })) };
+  }
+}
+</script>
+</body>
+</html>

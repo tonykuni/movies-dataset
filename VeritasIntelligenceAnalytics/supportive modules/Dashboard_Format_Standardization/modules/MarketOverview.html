@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<!-- ================================================================
+     VIA_P1_MarketOverview.html
+     VeritasIntelligenceAnalytics · P1 Market Overview
+     Visual Lock: VPN v35 (Syne / DM Sans / DM Mono · #f5f4f0)
+     Data: VDF v4 (D-series · DuckDB)
+     ANC-A through ANC-F (6 anchors)
+     ================================================================ -->
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA · P1 Market Overview</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@400;500;600;700&display=swap');
+:root{
+  --bg:#f5f4f0;--bg1:#edecea;--bg2:#e5e3df;--sf:#fff;--sf2:#fafaf8;
+  --bd:#dbd9d3;--bd2:#ccc9c1;
+  --bl:#4c78a8;--bl-l:#d0e1f0;
+  --tl:#439a9a;--tl-l:#c8e6e6;
+  --gn:#5a9e6f;--gn-l:#cde8d5;
+  --am:#c4943a;--am-l:#f5e2b8;
+  --co:#c96b5a;--co-l:#f5d0c8;
+  --vi:#7a6daa;--vi-l:#dcd8f0;
+  --ro:#b05580;
+  --i0:#1e1d1a;--i1:#3d3c38;--i2:#6b6860;--i3:#9c9890;--i4:#c4c0b8;
+  --mo:'DM Mono',monospace;--sa:'DM Sans',system-ui,sans-serif;--hf:'Syne',system-ui,sans-serif;
+  --r:5px;--r2:8px;--r3:12px;
+  --sh:0 1px 3px rgba(0,0,0,.06);--sh2:0 4px 12px rgba(0,0,0,.08);
+  /* TW convention: UP=red DOWN=green */
+  --up:#c96b5a;--up-l:#f5d0c8;--dn:#5a9e6f;--dn-l:#cde8d5;--flat:#9c9890;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sa);background:var(--bg);color:var(--i0);font-size:11px;line-height:1.55}
+.w{max-width:1600px;margin:0 auto;padding:10px 14px}
+
+/* HEADER */
+.hdr{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r3);padding:14px 16px;margin-bottom:8px;position:relative;overflow:hidden;display:flex;align-items:center;gap:12px}
+.hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--bl),var(--tl),var(--vi),var(--am),var(--co))}
+.hdr .h-icon{width:38px;height:38px;border-radius:var(--r2);background:linear-gradient(135deg,var(--bl),var(--vi));display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--hf);font-weight:800;font-size:16px;flex-shrink:0}
+.h1t{font-size:18px;font-weight:700;letter-spacing:-.5px;font-family:var(--hf)}
+.h1t span{color:var(--bl)}
+.h2t{color:var(--i3);font-size:10px;margin-top:1px;font-family:var(--mo)}
+.hdr .h-meta{margin-left:auto;display:flex;gap:8px;align-items:center}
+.live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gn);box-shadow:0 0 0 3px rgba(90,158,111,.18);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(90,158,111,.18)}50%{box-shadow:0 0 0 5px rgba(90,158,111,.05)}}
+.hdr .h-stamp{font-family:var(--mo);font-size:9.5px;color:var(--i2)}
+
+/* PAGE TABS */
+.pt{display:flex;gap:2px;margin-bottom:8px}
+.pt button{padding:8px 18px;border:1px solid var(--bd);border-radius:var(--r2) var(--r2) 0 0;background:var(--bg1);color:var(--i2);font:600 11px var(--sa);cursor:pointer;border-bottom:2px solid transparent;transition:.15s}
+.pt button.on{background:var(--sf);color:var(--bl);border-bottom-color:var(--bl);box-shadow:var(--sh)}
+.pt button:hover:not(.on){background:var(--bg2);color:var(--i1)}
+
+/* HERO STRIP */
+.sg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px}
+@media(max-width:900px){.sg{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:560px){.sg{grid-template-columns:repeat(2,1fr)}}
+.sc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:8px 10px;transition:.2s;border-left:3px solid var(--bd2)}
+.sc:hover{border-color:var(--bl);box-shadow:var(--sh);border-left-color:var(--bl)}
+.sc.up{border-left-color:var(--up)}
+.sc.dn{border-left-color:var(--dn)}
+.sc .l{font-size:8.5px;color:var(--i3);text-transform:uppercase;letter-spacing:.5px;font-weight:600;font-family:var(--mo)}
+.sc .v{font-size:15px;font-weight:700;font-family:var(--mo);letter-spacing:-.3px;margin-top:2px}
+.sc .c{font-size:9.5px;font-family:var(--mo);font-weight:500;margin-top:1px}
+.up-c{color:var(--up)}.dn-c{color:var(--dn)}.flat-c{color:var(--flat)}
+
+/* GRID LAYOUTS */
+.g2{display:grid;grid-template-columns:1.4fr 1fr;gap:8px;margin-bottom:8px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+@media(max-width:1100px){.g2,.g3{grid-template-columns:1fr}}
+
+/* CARDS */
+.cd{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);overflow:hidden;transition:.15s}
+.cd:hover{box-shadow:var(--sh)}
+.cd-h{display:flex;align-items:center;gap:6px;padding:7px 10px;border-bottom:1px solid var(--bd);background:var(--sf2)}
+.cd-i{width:22px;height:22px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:var(--mo);flex-shrink:0;color:#fff}
+.cd-i.bl{background:var(--bl)}
+.cd-i.tl{background:var(--tl)}
+.cd-i.vi{background:var(--vi)}
+.cd-i.am{background:var(--am)}
+.cd-i.co{background:var(--co)}
+.cd-i.gn{background:var(--gn)}
+.cd-t{font-weight:600;font-size:11px;flex:1}
+.cd-s{font-family:var(--mo);font-size:9px;color:var(--i3);padding:1px 6px;background:var(--bg1);border-radius:10px}
+.cd-b{padding:10px 12px}
+
+/* TIME CHIPS */
+.row-tabs{display:inline-flex;border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;margin-left:auto}
+.row-tabs button{font:500 8.5px var(--mo);padding:1px 6px;background:var(--sf);border:none;border-right:1px solid var(--bd);color:var(--i2);cursor:pointer;min-width:22px;line-height:1.4;letter-spacing:.5px}
+.row-tabs button:last-child{border-right:none}
+.row-tabs button.on{background:var(--bl);color:#fff;font-weight:700}
+.row-tabs button:hover:not(.on){background:var(--bg1);color:var(--bl)}
+
+/* CHART */
+.chart-box{width:100%;position:relative}
+.chart-box svg{width:100%;display:block}
+.axis-tick{font-size:9px;fill:var(--i3);font-family:var(--mo);font-variant-numeric:tabular-nums}
+.grid-line{stroke:var(--bd);stroke-width:.4;stroke-dasharray:2,3}
+
+/* LEGEND */
+.lg-row{display:flex;gap:14px;flex-wrap:wrap;padding-top:8px;font-size:9.5px;font-family:var(--mo)}
+.lg-row span{display:inline-flex;align-items:center;gap:4px}
+.lg-sw{display:inline-block;width:10px;height:2px}
+
+/* HEATMAP */
+.heat{display:grid;grid-template-columns:88px repeat(5,1fr);gap:2px;font-size:10px}
+.heat .lab{padding:5px 6px;color:var(--i1);display:flex;align-items:center;gap:5px;font-family:var(--mo);font-size:10px}
+.heat .h-cell{padding:6px 4px;border-radius:3px;text-align:center;font-family:var(--mo);font-weight:700;font-size:10.5px;letter-spacing:-.2px}
+.heat .h-head{font-size:8.5px;color:var(--i3);text-align:center;padding:4px;letter-spacing:.4px;text-transform:uppercase;font-family:var(--mo);font-weight:600}
+
+/* BADGES (region) */
+.bd{display:inline-block;padding:1px 5px;border-radius:3px;font-family:var(--mo);font-size:8.5px;font-weight:700;letter-spacing:.3px}
+.bd.tw{background:var(--co-l);color:var(--co)}
+.bd.us{background:var(--bl-l);color:var(--bl)}
+.bd.asia{background:var(--vi-l);color:var(--vi)}
+.bd.eu{background:var(--gn-l);color:var(--gn)}
+.bd.cn{background:var(--am-l);color:var(--am)}
+
+/* TABLE */
+.mx{width:100%;border-collapse:collapse;font-size:10.5px}
+.mx th{background:var(--bg1);padding:5px 7px;text-align:left;font-weight:600;color:var(--i2);border-bottom:1.5px solid var(--bd);font-family:var(--mo);font-size:8.5px;letter-spacing:.3px;text-transform:uppercase}
+.mx th.r{text-align:right}
+.mx td{padding:4px 7px;border-bottom:1px solid var(--bd);vertical-align:middle}
+.mx td.r{text-align:right;font-family:var(--mo);font-weight:600}
+.mx tr:last-child td{border-bottom:none}
+.mx tr:hover td{background:rgba(76,120,168,.04)}
+.mx .nm{font-weight:600;color:var(--i0)}
+.mx .sym{color:var(--i3);font-size:9.5px;margin-left:4px;font-family:var(--mo)}
+
+/* FLOW BARS */
+.flow-bar{display:grid;grid-template-columns:54px 1fr 64px;align-items:center;gap:8px;font-size:10.5px;padding:4px 0}
+.flow-bar .fl-lab{font-weight:600;color:var(--i1)}
+.flow-track{height:18px;background:var(--bg1);border-radius:3px;position:relative;overflow:hidden}
+.flow-fill{position:absolute;top:0;height:100%;transition:width .3s}
+.flow-fill.in{left:50%;background:var(--up);opacity:.85}
+.flow-fill.out{right:50%;background:var(--dn);opacity:.85}
+.flow-mid{position:absolute;left:50%;top:0;height:100%;width:1px;background:var(--bd2)}
+.flow-val{text-align:right;font-family:var(--mo);font-weight:700}
+
+/* IO CARDS */
+.io-c{background:var(--sf2);border:1px solid var(--bd);border-radius:var(--r);padding:6px 8px;border-left:3px solid var(--bd2)}
+.io-c.up{border-left-color:var(--up)}
+.io-c.dn{border-left-color:var(--dn)}
+.io-l{font-size:8.5px;color:var(--i3);text-transform:uppercase;letter-spacing:.4px;font-weight:600;font-family:var(--mo)}
+.io-v{font-size:14px;font-weight:700;font-family:var(--mo);margin:1px 0;letter-spacing:-.2px}
+.io-s{font-size:9px;color:var(--i2);font-family:var(--mo)}
+
+/* FOOTER */
+.foot{display:flex;justify-content:space-between;align-items:center;font-size:9px;color:var(--i3);letter-spacing:.4px;text-transform:uppercase;padding:8px 4px 4px;gap:10px;flex-wrap:wrap;font-family:var(--mo)}
+.foot .src{color:var(--i2)}
+.foot .anc-tag{display:inline-block;padding:1px 6px;border-radius:3px;font-family:var(--mo);font-size:8.5px;font-weight:700;background:var(--bl-l);color:var(--bl);letter-spacing:.4px}
+
+</style>
+</head>
+<body>
+<div class="w">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="h-icon">VIA</div>
+  <div>
+    <div class="h1t">VeritasIntelligenceAnalytics <span>· P1</span></div>
+    <div class="h2t">Smart Market Overview · DuckDB-backed · 4,428 rows</div>
+  </div>
+  <div class="h-meta">
+    <span class="live-dot"></span>
+    <span class="h-stamp">2026-04-25 18:30 TPE</span>
+  </div>
+</div>
+
+<!-- PAGE TABS -->
+<div class="pt">
+  <button class="on">P1 · Overview</button>
+  <button>P2 · Global Flow</button>
+  <button>P3 · Asset Matrix</button>
+  <button>P4 · Rates &amp; FX</button>
+  <button>P5 · Commodities</button>
+  <button>P6 · Events</button>
+  <button>P7 · TW Focus</button>
+</div>
+
+<!-- ANC-A · HERO STRIP -->
+<div class="sg">
+  <div class="sc up"><div class="l">^TWII</div><div class="v">22,847</div><div class="c up-c">+186 ▲ 0.82%</div></div>
+  <div class="sc up"><div class="l">^GSPC</div><div class="v">5,634</div><div class="c up-c">+24.4 ▲ 0.43%</div></div>
+  <div class="sc up"><div class="l">^NDX</div><div class="v">19,820</div><div class="c up-c">+108 ▲ 0.55%</div></div>
+  <div class="sc dn"><div class="l">^DJI</div><div class="v">42,168</div><div class="c dn-c">-42 ▼ 0.10%</div></div>
+  <div class="sc up"><div class="l">^N225</div><div class="v">38,492</div><div class="c up-c">+312 ▲ 0.82%</div></div>
+  <div class="sc dn"><div class="l">^VIX</div><div class="v">14.86</div><div class="c dn-c">-0.42 ▼ 2.74%</div></div>
+  <div class="sc"><div class="l">DXY</div><div class="v">103.42</div><div class="c flat-c">+0.08 · 0.08%</div></div>
+</div>
+
+<!-- ANC-B · NORMALIZED CHART + ANC-C · HEATMAP -->
+<div class="g2">
+
+  <div class="cd">
+    <div class="cd-h">
+      <div class="cd-i bl">①</div>
+      <div class="cd-t">全球股指 · normalized</div>
+      <div class="cd-s">YF · daily</div>
+      <div class="row-tabs" id="time-tabs">
+        <button data-w="1M">1M</button>
+        <button data-w="3M">3M</button>
+        <button data-w="6M">6M</button>
+        <button data-w="1Y" class="on">1Y</button>
+        <button data-w="YTD">YTD</button>
+      </div>
+    </div>
+    <div class="cd-b">
+      <div class="chart-box" id="norm-chart" style="height:230px"></div>
+      <div class="lg-row">
+        <span><span class="lg-sw" style="background:var(--co)"></span>^TWII +18.4%</span>
+        <span><span class="lg-sw" style="background:var(--bl)"></span>^GSPC +24.6%</span>
+        <span><span class="lg-sw" style="background:var(--vi)"></span>^N225 +12.2%</span>
+        <span><span class="lg-sw" style="background:var(--gn)"></span>^KS11 -7.6%</span>
+        <span><span class="lg-sw" style="background:var(--am)"></span>^HSI +3.4%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cd">
+    <div class="cd-h">
+      <div class="cd-i tl">②</div>
+      <div class="cd-t">區域熱圖 · 報酬</div>
+      <div class="cd-s">% return</div>
+    </div>
+    <div class="cd-b">
+      <div class="heat">
+        <div></div>
+        <div class="h-head">5D</div><div class="h-head">1M</div><div class="h-head">3M</div><div class="h-head">6M</div><div class="h-head">YTD</div>
+        <div class="lab"><span class="bd tw">TW</span> ^TWII</div>
+        <div class="h-cell" data-v="2.4"></div><div class="h-cell" data-v="4.8"></div><div class="h-cell" data-v="8.2"></div><div class="h-cell" data-v="14.6"></div><div class="h-cell" data-v="18.4"></div>
+        <div class="lab"><span class="bd us">US</span> ^GSPC</div>
+        <div class="h-cell" data-v="0.8"></div><div class="h-cell" data-v="2.2"></div><div class="h-cell" data-v="6.4"></div><div class="h-cell" data-v="14.8"></div><div class="h-cell" data-v="24.6"></div>
+        <div class="lab"><span class="bd us">US</span> ^NDX</div>
+        <div class="h-cell" data-v="1.4"></div><div class="h-cell" data-v="3.8"></div><div class="h-cell" data-v="9.2"></div><div class="h-cell" data-v="20.4"></div><div class="h-cell" data-v="32.4"></div>
+        <div class="lab"><span class="bd asia">JP</span> ^N225</div>
+        <div class="h-cell" data-v="1.8"></div><div class="h-cell" data-v="3.2"></div><div class="h-cell" data-v="4.6"></div><div class="h-cell" data-v="8.8"></div><div class="h-cell" data-v="12.2"></div>
+        <div class="lab"><span class="bd asia">KR</span> ^KS11</div>
+        <div class="h-cell" data-v="-0.6"></div><div class="h-cell" data-v="-1.4"></div><div class="h-cell" data-v="-3.8"></div><div class="h-cell" data-v="-5.2"></div><div class="h-cell" data-v="-7.6"></div>
+        <div class="lab"><span class="bd cn">HK</span> ^HSI</div>
+        <div class="h-cell" data-v="0.2"></div><div class="h-cell" data-v="-1.2"></div><div class="h-cell" data-v="1.4"></div><div class="h-cell" data-v="2.8"></div><div class="h-cell" data-v="3.4"></div>
+        <div class="lab"><span class="bd eu">DE</span> ^GDAXI</div>
+        <div class="h-cell" data-v="0.4"></div><div class="h-cell" data-v="1.8"></div><div class="h-cell" data-v="4.2"></div><div class="h-cell" data-v="9.6"></div><div class="h-cell" data-v="11.8"></div>
+        <div class="lab"><span class="bd eu">UK</span> ^FTSE</div>
+        <div class="h-cell" data-v="0.6"></div><div class="h-cell" data-v="2.4"></div><div class="h-cell" data-v="4.8"></div><div class="h-cell" data-v="7.2"></div><div class="h-cell" data-v="8.4"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ANC-D · YIELD CURVE + FX + COMMODITIES -->
+<div class="g3">
+
+  <div class="cd">
+    <div class="cd-h">
+      <div class="cd-i vi">③</div>
+      <div class="cd-t">UST 殖利率曲線</div>
+      <div class="cd-s">FRED</div>
+    </div>
+    <div class="cd-b">
+      <div class="chart-box" id="yc-chart" style="height:140px"></div>
+      <div style="display:flex;justify-content:space-between;font-family:var(--mo);font-size:9.5px;color:var(--i2);padding-top:6px;border-top:1px solid var(--bd);margin-top:6px">
+        <span>2s10s</span>
+        <span style="color:var(--up);font-weight:700">+24 bps</span>
+        <span>趨陡 ↗</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cd">
+    <div class="cd-h">
+      <div class="cd-i am">④</div>
+      <div class="cd-t">主要貨幣 vs USD</div>
+      <div class="cd-s">5D</div>
+    </div>
+    <div class="cd-b" style="padding:6px 8px">
+      <table class="mx">
+        <thead><tr><th>Pair</th><th class="r">Last</th><th class="r">5D %</th></tr></thead>
+        <tbody>
+          <tr><td><span class="nm">USD/TWD</span></td><td class="r">32.418</td><td class="r up-c">+0.32</td></tr>
+          <tr><td><span class="nm">USD/JPY</span></td><td class="r">154.22</td><td class="r up-c">+0.86</td></tr>
+          <tr><td><span class="nm">EUR/USD</span></td><td class="r">1.0838</td><td class="r dn-c">-0.42</td></tr>
+          <tr><td><span class="nm">GBP/USD</span></td><td class="r">1.2624</td><td class="r up-c">+0.18</td></tr>
+          <tr><td><span class="nm">USD/KRW</span></td><td class="r">1,442.6</td><td class="r up-c">+0.62</td></tr>
+          <tr><td><span class="nm">USD/CNY</span></td><td class="r">7.246</td><td class="r flat-c">+0.04</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="cd">
+    <div class="cd-h">
+      <div class="cd-i co">⑤</div>
+      <div class="cd-t">大宗商品</div>
+      <div class="cd-s">5D</div>
+    </div>
+    <div class="cd-b" style="padding:6px 8px">
+      <table class="mx">
+        <thead><tr><th>商品</th><th class="r">Last</th><th class="r">5D %</th></tr></thead>
+        <tbody>
+          <tr><td><span class="nm">黃金</span><span class="sym">GC=F</span></td><td class="r">2,486</td><td class="r up-c">+1.84</td></tr>
+          <tr><td><span class="nm">白銀</span><span class="sym">SI=F</span></td><td class="r">31.84</td><td class="r up-c">+2.62</td></tr>
+          <tr><td><span class="nm">布蘭特</span><span class="sym">BZ=F</span></td><td class="r">76.42</td><td class="r dn-c">-1.86</td></tr>
+          <tr><td><span class="nm">WTI</span><span class="sym">CL=F</span></td><td class="r">72.18</td><td class="r dn-c">-2.14</td></tr>
+          <tr><td><span class="nm">銅</span><span class="sym">HG=F</span></td><td class="r">4.382</td><td class="r up-c">+0.82</td></tr>
+          <tr><td><span class="nm">天然氣</span><span class="sym">NG=F</span></td><td class="r">3.084</td><td class="r dn-c">-3.42</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ANC-E · TW FOCUS -->
+<div class="cd" style="margin-bottom:8px">
+  <div class="cd-h">
+    <div class="cd-i co">⑥</div>
+    <div class="cd-t">台股焦點 · 三大法人 · 漲跌家數 · 外資 Top 5</div>
+    <div class="cd-s">2026-04-25</div>
+  </div>
+  <div class="cd-b">
+    <div class="g3" style="margin-bottom:0;gap:14px">
+
+      <div>
+        <div class="io-l" style="margin-bottom:7px">三大法人 · 億 TWD</div>
+        <div class="flow-bar"><span class="fl-lab">外資</span>
+          <div class="flow-track"><div class="flow-fill in" style="width:38%"></div><div class="flow-mid"></div></div>
+          <span class="flow-val up-c">+228.4</span></div>
+        <div class="flow-bar"><span class="fl-lab">投信</span>
+          <div class="flow-track"><div class="flow-fill out" style="width:6%"></div><div class="flow-mid"></div></div>
+          <span class="flow-val dn-c">-14.2</span></div>
+        <div class="flow-bar"><span class="fl-lab">自營</span>
+          <div class="flow-track"><div class="flow-fill in" style="width:12%"></div><div class="flow-mid"></div></div>
+          <span class="flow-val up-c">+36.8</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px">
+          <div class="io-c up"><div class="io-l">合計</div><div class="io-v up-c">+251.0</div><div class="io-s">億 TWD</div></div>
+          <div class="io-c up"><div class="io-l">5 日</div><div class="io-v up-c">+842.6</div><div class="io-s">億 TWD</div></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="io-l" style="margin-bottom:7px">市場寬度</div>
+        <div class="chart-box" id="adv-decl" style="height:90px"></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:8px">
+          <div class="io-c up"><div class="io-l">上漲</div><div class="io-v up-c">628</div><div class="io-s">家</div></div>
+          <div class="io-c dn"><div class="io-l">下跌</div><div class="io-v dn-c">242</div><div class="io-s">家</div></div>
+          <div class="io-c"><div class="io-l">平盤</div><div class="io-v">86</div><div class="io-s">家</div></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="io-l" style="margin-bottom:7px">外資 Top 5 買超</div>
+        <table class="mx">
+          <tbody>
+            <tr><td><span class="nm">2330</span><span class="sym">台積電</span></td><td class="r up-c">+18.4 億</td></tr>
+            <tr><td><span class="nm">2454</span><span class="sym">聯發科</span></td><td class="r up-c">+8.2 億</td></tr>
+            <tr><td><span class="nm">2317</span><span class="sym">鴻海</span></td><td class="r up-c">+6.8 億</td></tr>
+            <tr><td><span class="nm">2308</span><span class="sym">台達電</span></td><td class="r up-c">+4.6 億</td></tr>
+            <tr><td><span class="nm">3008</span><span class="sym">大立光</span></td><td class="r up-c">+3.2 億</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="foot">
+  <div class="src">
+    sources: VDF_D2_DataEngines · VDF_D2_FREDEngine · VDF_D2_YFinanceEngine · VDF_D2_GlobalUniverseEngine · VDF_D5_DuckDB
+  </div>
+  <div>
+    <span class="anc-tag">ANC-A</span>
+    <span class="anc-tag">ANC-B</span>
+    <span class="anc-tag">ANC-C</span>
+    <span class="anc-tag">ANC-D</span>
+    <span class="anc-tag">ANC-E</span>
+    P1 · MARKET OVERVIEW
+  </div>
+</div>
+
+</div>
+
+<script>
+(function(){
+  const NS = "http://www.w3.org/2000/svg";
+  const COL = { co:"#c96b5a", bl:"#4c78a8", vi:"#7a6daa", gn:"#5a9e6f", am:"#c4943a", tl:"#439a9a" };
+
+  // ── ① Normalized chart ────────────────────────────────────
+  const SERIES = {
+    "1M": [
+      { n:"^TWII", c:COL.co, d:gen(22,[0,0.5,1.2,2.4,3.5,4.8]) },
+      { n:"^GSPC", c:COL.bl, d:gen(22,[0,0.4,1.0,1.6,2.0,2.2]) },
+      { n:"^N225", c:COL.vi, d:gen(22,[0,0.6,1.4,2.2,2.8,3.2]) },
+      { n:"^KS11", c:COL.gn, d:gen(22,[0,-0.3,-0.7,-1.0,-1.2,-1.4]) },
+      { n:"^HSI",  c:COL.am, d:gen(22,[0,-0.2,-0.6,-1.0,-1.1,-1.2]) },
+    ],
+    "3M": [
+      { n:"^TWII", c:COL.co, d:gen(60,[0,2.5,5.0,6.8,8.2]) },
+      { n:"^GSPC", c:COL.bl, d:gen(60,[0,2,4,5.5,6.4]) },
+      { n:"^N225", c:COL.vi, d:gen(60,[0,1.5,2.8,3.8,4.6]) },
+      { n:"^KS11", c:COL.gn, d:gen(60,[0,-1,-2.2,-3.2,-3.8]) },
+      { n:"^HSI",  c:COL.am, d:gen(60,[0,0.4,0.9,1.2,1.4]) },
+    ],
+    "6M": [
+      { n:"^TWII", c:COL.co, d:gen(120,[0,4,8,12,14.6]) },
+      { n:"^GSPC", c:COL.bl, d:gen(120,[0,4,8,12,14.8]) },
+      { n:"^N225", c:COL.vi, d:gen(120,[0,2,4,7,8.8]) },
+      { n:"^KS11", c:COL.gn, d:gen(120,[0,-1.5,-3,-4.5,-5.2]) },
+      { n:"^HSI",  c:COL.am, d:gen(120,[0,0.5,1.5,2.4,2.8]) },
+    ],
+    "1Y": [
+      { n:"^TWII", c:COL.co, d:gen(240,[0,3,8,13,18.4]) },
+      { n:"^GSPC", c:COL.bl, d:gen(240,[0,5,12,19,24.6]) },
+      { n:"^N225", c:COL.vi, d:gen(240,[0,2,5,9,12.2]) },
+      { n:"^KS11", c:COL.gn, d:gen(240,[0,-2,-4,-6,-7.6]) },
+      { n:"^HSI",  c:COL.am, d:gen(240,[0,-1,1,2.5,3.4]) },
+    ],
+    "YTD": [
+      { n:"^TWII", c:COL.co, d:gen(82,[0,5,10,14,18.4]) },
+      { n:"^GSPC", c:COL.bl, d:gen(82,[0,6,12,18,24.6]) },
+      { n:"^N225", c:COL.vi, d:gen(82,[0,3,6,9,12.2]) },
+      { n:"^KS11", c:COL.gn, d:gen(82,[0,-2,-4,-5.5,-7.6]) },
+      { n:"^HSI",  c:COL.am, d:gen(82,[0,0.5,1.5,2.5,3.4]) },
+    ],
+  };
+
+  function gen(n, anchors){
+    const out = [];
+    const seg = (n-1)/(anchors.length-1);
+    for(let i=0; i<n; i++){
+      const segIdx = Math.min(anchors.length-2, Math.floor(i/seg));
+      const t = (i - segIdx*seg) / seg;
+      const v = anchors[segIdx] + (anchors[segIdx+1] - anchors[segIdx]) * t;
+      const noise = Math.sin(i*0.7+segIdx)*0.3 + Math.cos(i*1.3)*0.2;
+      out.push(Math.round((v + noise)*100)/100);
+    }
+    out[n-1] = anchors[anchors.length-1];
+    return out;
+  }
+
+  function drawNormChart(window){
+    const host = document.getElementById("norm-chart");
+    host.innerHTML = "";
+    const W=800, H=230, pad={t:14,r:50,b:22,l:40};
+    const series = SERIES[window];
+    const allVals = series.flatMap(s=>s.d);
+    const lo = Math.min(...allVals), hi = Math.max(...allVals);
+    const r = hi-lo;
+    const lo2 = lo - r*0.08, hi2 = hi + r*0.08;
+    const n = series[0].d.length;
+    const xOf = i => pad.l + (i/(n-1))*(W-pad.l-pad.r);
+    const yOf = v => pad.t + (hi2-v)/(hi2-lo2)*(H-pad.t-pad.b);
+
+    const svg = document.createElementNS(NS,"svg");
+    svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+    svg.setAttribute("preserveAspectRatio","xMidYMid meet");
+
+    // Grid
+    for(let i=0; i<=5; i++){
+      const v = lo2 + (hi2-lo2)*i/5;
+      const y = yOf(v);
+      const ln = document.createElementNS(NS,"line");
+      ln.setAttribute("x1",pad.l);ln.setAttribute("x2",W-pad.r);
+      ln.setAttribute("y1",y);ln.setAttribute("y2",y);
+      ln.setAttribute("class","grid-line");
+      svg.appendChild(ln);
+      const t = document.createElementNS(NS,"text");
+      t.setAttribute("x",pad.l-5);t.setAttribute("y",y+3);
+      t.setAttribute("text-anchor","end");t.setAttribute("class","axis-tick");
+      t.textContent = (v>=0?"+":"")+v.toFixed(0)+"%";
+      svg.appendChild(t);
+    }
+
+    // Zero line
+    const zY = yOf(0);
+    if(zY>=pad.t && zY<=H-pad.b){
+      const z = document.createElementNS(NS,"line");
+      z.setAttribute("x1",pad.l);z.setAttribute("x2",W-pad.r);
+      z.setAttribute("y1",zY);z.setAttribute("y2",zY);
+      z.setAttribute("stroke","#9c9890");z.setAttribute("stroke-width",".7");
+      svg.appendChild(z);
+    }
+
+    // Series
+    for(const s of series){
+      const pts = s.d.map((v,i) => xOf(i)+","+yOf(v));
+      const pl = document.createElementNS(NS,"polyline");
+      pl.setAttribute("fill","none");pl.setAttribute("stroke",s.c);
+      pl.setAttribute("stroke-width", s.n==="^TWII"?"1.8":"1.2");
+      pl.setAttribute("stroke-linejoin","round");
+      pl.setAttribute("points",pts.join(" "));
+      svg.appendChild(pl);
+
+      const endX = xOf(n-1), endY = yOf(s.d[n-1]);
+      const dot = document.createElementNS(NS,"circle");
+      dot.setAttribute("cx",endX);dot.setAttribute("cy",endY);
+      dot.setAttribute("r","2.6");dot.setAttribute("fill",s.c);
+      svg.appendChild(dot);
+
+      const lbl = document.createElementNS(NS,"text");
+      lbl.setAttribute("x",endX+5);lbl.setAttribute("y",endY+3);
+      lbl.setAttribute("class","axis-tick");lbl.setAttribute("fill",s.c);
+      lbl.setAttribute("font-size","9.5");lbl.setAttribute("font-weight","700");
+      lbl.textContent = (s.d[n-1]>=0?"+":"")+s.d[n-1].toFixed(1)+"%";
+      svg.appendChild(lbl);
+    }
+
+    host.appendChild(svg);
+  }
+
+  // ── ② Heatmap colors ──────────────────────────────────────
+  function colorReturn(v){
+    const a = Math.abs(v);
+    if(v > 0){
+      const t = Math.min(1, a/30);
+      const r = Math.round(245 - 124*t);
+      const g = Math.round(208 - 100*t);
+      const b = Math.round(200 - 110*t);
+      return { bg:`rgb(${r},${g},${b})`, fg: t>0.5 ? "rgba(255,255,255,.95)" : "var(--co)" };
+    }
+    if(v < 0){
+      const t = Math.min(1, a/10);
+      const r = Math.round(205 - 115*t);
+      const g = Math.round(232 - 74*t);
+      const b = Math.round(213 - 102*t);
+      return { bg:`rgb(${r},${g},${b})`, fg: t>0.5 ? "rgba(255,255,255,.95)" : "var(--gn)" };
+    }
+    return { bg:"#ebe9e3", fg:"var(--i2)" };
+  }
+  document.querySelectorAll(".h-cell").forEach(c => {
+    const v = parseFloat(c.dataset.v);
+    const {bg,fg} = colorReturn(v);
+    c.style.background = bg;
+    c.style.color = fg;
+    c.textContent = (v>=0?"+":"")+v.toFixed(1);
+  });
+
+  // ── ③ Yield curve ─────────────────────────────────────────
+  function drawYC(){
+    const host = document.getElementById("yc-chart");
+    const W=300, H=140, pad={t:12,r:14,b:24,l:34};
+    const points = [
+      {m:"1M",v:4.38},{m:"3M",v:4.32},{m:"6M",v:4.18},{m:"1Y",v:4.04},
+      {m:"2Y",v:3.92},{m:"5Y",v:3.96},{m:"10Y",v:4.16},{m:"30Y",v:4.42},
+    ];
+    const lo=3.85, hi=4.5;
+    const xOf = i => pad.l + (i/(points.length-1))*(W-pad.l-pad.r);
+    const yOf = v => pad.t + (hi-v)/(hi-lo)*(H-pad.t-pad.b);
+    const svg = document.createElementNS(NS,"svg");
+    svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+    svg.setAttribute("preserveAspectRatio","xMidYMid meet");
+
+    [3.9,4.0,4.1,4.2,4.3,4.4].forEach(v => {
+      const y = yOf(v);
+      const ln = document.createElementNS(NS,"line");
+      ln.setAttribute("x1",pad.l);ln.setAttribute("x2",W-pad.r);
+      ln.setAttribute("y1",y);ln.setAttribute("y2",y);
+      ln.setAttribute("class","grid-line");svg.appendChild(ln);
+      const t = document.createElementNS(NS,"text");
+      t.setAttribute("x",pad.l-4);t.setAttribute("y",y+3);
+      t.setAttribute("text-anchor","end");t.setAttribute("class","axis-tick");
+      t.textContent = v.toFixed(1)+"%";svg.appendChild(t);
+    });
+
+    // Filled area
+    const pts = points.map((p,i) => xOf(i)+","+yOf(p.v));
+    const area = document.createElementNS(NS,"polygon");
+    area.setAttribute("points",
+      pad.l+","+yOf(lo)+" "+pts.join(" ")+" "+(W-pad.r)+","+yOf(lo));
+    area.setAttribute("fill",COL.vi);
+    area.setAttribute("fill-opacity","0.10");
+    svg.appendChild(area);
+
+    // Line
+    const pl = document.createElementNS(NS,"polyline");
+    pl.setAttribute("fill","none");pl.setAttribute("stroke",COL.vi);
+    pl.setAttribute("stroke-width","1.8");pl.setAttribute("stroke-linejoin","round");
+    pl.setAttribute("points",pts.join(" "));
+    svg.appendChild(pl);
+
+    points.forEach((p,i) => {
+      const x = xOf(i), y = yOf(p.v);
+      const c = document.createElementNS(NS,"circle");
+      c.setAttribute("cx",x);c.setAttribute("cy",y);
+      c.setAttribute("r","2.4");c.setAttribute("fill",COL.vi);
+      svg.appendChild(c);
+      const t = document.createElementNS(NS,"text");
+      t.setAttribute("x",x);t.setAttribute("y",H-pad.b+12);
+      t.setAttribute("text-anchor","middle");t.setAttribute("class","axis-tick");
+      t.textContent = p.m;svg.appendChild(t);
+    });
+
+    host.appendChild(svg);
+  }
+
+  // ── ⑥ Adv-Decl mini bar ──────────────────────────────────
+  function drawAdvDecl(){
+    const host = document.getElementById("adv-decl");
+    const W=260, H=90, pad={t:8,r:6,b:18,l:6};
+    const data = [
+      {d:"4/21",up:542,dn:318},{d:"4/22",up:386,dn:488},
+      {d:"4/23",up:612,dn:256},{d:"4/24",up:588,dn:282},{d:"4/25",up:628,dn:242},
+    ];
+    const total = 956;
+    const xStep = (W-pad.l-pad.r)/data.length;
+    const yMid = pad.t + (H-pad.t-pad.b)/2;
+    const halfH = (H-pad.t-pad.b)/2;
+    const svg = document.createElementNS(NS,"svg");
+    svg.setAttribute("viewBox",`0 0 ${W} ${H}`);
+    svg.setAttribute("preserveAspectRatio","xMidYMid meet");
+
+    const mid = document.createElementNS(NS,"line");
+    mid.setAttribute("x1",pad.l);mid.setAttribute("x2",W-pad.r);
+    mid.setAttribute("y1",yMid);mid.setAttribute("y2",yMid);
+    mid.setAttribute("stroke","#ccc9c1");mid.setAttribute("stroke-width","0.6");
+    svg.appendChild(mid);
+
+    data.forEach((d,i) => {
+      const cx = pad.l + xStep*(i+0.5);
+      const bw = xStep*0.55;
+      const uH = (d.up/total)*halfH;
+      const uR = document.createElementNS(NS,"rect");
+      uR.setAttribute("x",cx-bw/2);uR.setAttribute("y",yMid-uH);
+      uR.setAttribute("width",bw);uR.setAttribute("height",uH);
+      uR.setAttribute("fill",COL.co);uR.setAttribute("opacity","0.85");
+      uR.setAttribute("rx","1");svg.appendChild(uR);
+      const dH = (d.dn/total)*halfH;
+      const dR = document.createElementNS(NS,"rect");
+      dR.setAttribute("x",cx-bw/2);dR.setAttribute("y",yMid);
+      dR.setAttribute("width",bw);dR.setAttribute("height",dH);
+      dR.setAttribute("fill",COL.gn);dR.setAttribute("opacity","0.85");
+      dR.setAttribute("rx","1");svg.appendChild(dR);
+      const t = document.createElementNS(NS,"text");
+      t.setAttribute("x",cx);t.setAttribute("y",H-3);
+      t.setAttribute("text-anchor","middle");t.setAttribute("class","axis-tick");
+      t.textContent = d.d;svg.appendChild(t);
+    });
+
+    host.appendChild(svg);
+  }
+
+  // ── Tabs ─────────────────────────────────────────────────
+  document.querySelectorAll("#time-tabs button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("#time-tabs button").forEach(b => b.classList.remove("on"));
+      btn.classList.add("on");
+      drawNormChart(btn.dataset.w);
+    });
+  });
+
+  // Initial
+  drawNormChart("1Y");
+  drawYC();
+  drawAdvDecl();
+})();
+</script>
+</body>
+</html>

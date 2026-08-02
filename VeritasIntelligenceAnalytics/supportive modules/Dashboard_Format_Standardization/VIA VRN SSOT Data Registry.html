@@ -1,0 +1,136 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · VRN SSOT 數據總清單 · Data Registry</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--blue:#4c78a8;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--vi:#7a6daa;
+ --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg)}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5}
+.wrap{max-width:1500px;margin:0 auto;padding:0 22px 60px}
+.bar{position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50}
+header{padding:20px 0 10px;margin-bottom:10px;border-bottom:2px solid var(--ink)}
+.kicker{font:700 10px 'DM Mono',monospace;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px}
+h1{font:800 19px/1.2 'Syne',sans-serif;color:var(--ink)}h1 span{color:var(--up)}
+.sub{margin-top:6px;font:400 10.5px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:980px}
+.gov{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#1e1d1a;border-radius:3px;padding:7px 14px;margin:12px 0}
+.gov .lk{font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase}
+.gov .st{margin-left:auto;font:700 8px 'DM Mono',monospace;color:#cfcabf}
+.scards{display:flex;gap:9px;flex-wrap:wrap;margin:0 0 12px}
+.sc{background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:9px 14px;min-width:110px}
+.sc .v{font:800 20px 'Syne',sans-serif;color:var(--ink);line-height:1}
+.sc .l{font:600 8px 'DM Mono',monospace;color:var(--mut);text-transform:uppercase;letter-spacing:.6px;margin-top:4px}
+.tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.tab{font:700 10.5px 'DM Sans','Noto Sans TC',sans-serif;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--mut);border-radius:3px;padding:7px 12px}
+.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+h2{font:800 13px 'Syne',sans-serif;color:var(--ink);margin:18px 0 4px;padding-bottom:5px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+h2 .en{font:600 8px 'DM Mono',monospace;color:var(--mut2);letter-spacing:1px;text-transform:uppercase}
+h2 .rc{margin-left:auto;font:700 8px 'DM Mono',monospace;color:var(--vi)}
+h3.tpath{font:700 9.5px 'DM Mono',monospace;color:var(--ink2);margin:13px 0 5px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+h3.tpath .cnt{font:700 7.5px 'DM Mono',monospace;color:#fff;background:var(--vi);border-radius:3px;padding:1px 6px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:5px;overflow:auto}
+table{width:100%;border-collapse:collapse;font:500 9.5px 'DM Mono','Noto Sans TC',monospace}
+th{font:700 7.5px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.3px;color:var(--mut);text-align:left;padding:6px 8px;border-bottom:2px solid var(--ink);background:var(--paper2);white-space:nowrap}
+td{padding:5px 8px;border-bottom:1px solid var(--soft);vertical-align:top;max-width:420px;overflow-wrap:anywhere}
+tr:hover td{background:var(--paper2)}
+td.k{font-weight:700;color:var(--ink);white-space:nowrap}
+.pill{font:600 8px 'DM Mono',monospace;background:var(--soft);border-radius:3px;padding:1px 6px;color:var(--ink2)}
+.ok{color:var(--down);font-weight:700}.bad{color:var(--up);font-weight:700}
+.note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--am);border-radius:3px;padding:8px 14px;margin:10px 0;font:500 9px/1.6 'DM Mono',monospace;color:var(--mut)}.note b{color:var(--ink2)}
+.err{background:#fbf2f0;border:1px solid var(--up);border-radius:3px;padding:10px 14px;font:600 10px 'DM Mono',monospace;color:var(--up);margin:10px 0}
+.pdf{position:fixed;top:12px;right:14px;z-index:999;background:var(--ink);color:#fff;border:none;border-radius:5px;padding:7px 13px;font:700 9px 'DM Mono',monospace;cursor:pointer}
+@media print{@page{size:A4 landscape;margin:8mm}.pdf,.tabs{display:none!important}.sec{display:block!important}}
+.sec{display:none}.sec.on{display:block}
+</style></head><body>
+<div class="bar"></div><button class="pdf" onclick="window.print()">⤓ PDF</button>
+<div class="wrap">
+<header>
+ <div class="kicker">VERITAS INTELLIGENCE ANALYTICS · VRN (VERITASREPORTNOVA) · SSOT DATA REGISTRY · APPEND-ONLY</div>
+ <h1>VRN SSOT 數據總清單 <span>·</span> 高度整合 · 各類都有表 · 不遺漏</h1>
+ <p class="sub">整合 <b>VRN_OUTPUTS_SSOT</b>、<b>REPORT_DATA_SSOT_INDEX</b>、<b>REPORT_BASIC_INFO_SSOT</b>、<b>REPORT_FINANCIAL_DATA_SSOT</b> 四份合約。通用遞迴展開:每個物件陣列→一張表、每組純量→鍵值表,保證零遺漏;同名 ID 自動去重標記。只增不減。</p>
+</header>
+<div class="gov"><span class="lk">🔒 SSOT-LOCKED · APPEND-ONLY · AUTO-EXPANDED</span><span class="st" id="stamp">載入中…</span></div>
+<div class="scards" id="scards"></div>
+<div class="tabs" id="tabs"></div>
+<div id="stage"></div>
+</div>
+<script>
+const FILES=[
+ {id:"outputs", t:"① 輸出合約 OUTPUTS", f:"uploads/VRN_OUTPUTS_SSOT_v0100.json"},
+ {id:"index", t:"② 資料索引 INDEX", f:"uploads/VRN_REPORT_DATA_SSOT_INDEX_v0100.json"},
+ {id:"basic", t:"③ 報告基本資訊 BASIC INFO", f:"uploads/VRN_REPORT_BASIC_INFO_SSOT_v0100.json"},
+ {id:"fin", t:"④ 財務資料 FINANCIAL DATA", f:"uploads/VRN_REPORT_FINANCIAL_DATA_SSOT_v0100.json"}
+];
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const isObj=v=>v&&typeof v==="object"&&!Array.isArray(v);
+const isScalar=v=>v===null||["string","number","boolean"].includes(typeof v);
+function fmtV(v){
+ if(v===null)return '<span class="pill">null</span>';
+ if(typeof v==="boolean")return v?'<span class="ok">✓ true</span>':'<span class="bad">✕ false</span>';
+ if(Array.isArray(v))return esc(v.join(" · "));
+ if(isObj(v))return '<span class="pill">'+esc(JSON.stringify(v)).slice(0,200)+'</span>';
+ return esc(v);
+}
+let TOTALS={tables:0,rows:0,dupes:0};
+const SEEN_IDS=new Map();
+// generic walker: arrays of objects → table; plain-scalar objects → kv table
+function walk(node, path, out){
+ if(Array.isArray(node)){
+  if(node.length&&node.every(isObj)){
+   // union of keys
+   const keys=[...new Set(node.flatMap(o=>Object.keys(o)))];
+   const scalarKeys=keys.filter(k=>node.some(o=>!isObj(o[k])||Array.isArray(o[k])===false)); // keep all keys; nested objects stringified
+   TOTALS.tables++;TOTALS.rows+=node.length;
+   let dupNote="";
+   const idKey=keys.find(k=>/(^|_)id$/i.test(k));
+   if(idKey){node.forEach(o=>{const idv=o[idKey];if(idv!=null){const prev=SEEN_IDS.get(idv);if(prev&&prev!==path){TOTALS.dupes++;dupNote='<span class="pill" style="background:#f7ecea;color:var(--up)">含跨表重複ID</span>';}else SEEN_IDS.set(idv,path);}});}
+   out.push('<h3 class="tpath">▦ '+esc(path)+' <span class="cnt">'+node.length+' 列</span>'+dupNote+'</h3><div class="card"><table><thead><tr>'+keys.map(k=>'<th>'+esc(k.replace(/^def_/,""))+'</th>').join("")+'</tr></thead><tbody>'+
+    node.map(o=>'<tr>'+keys.map(k=>'<td>'+(o[k]===undefined?'<span class="pill">—</span>':fmtV(o[k]))+'</td>').join("")+'</tr>').join("")+'</tbody></table></div>');
+   // recurse into nested arrays-of-objects inside rows
+   node.forEach((o,i)=>Object.entries(o).forEach(([k,v])=>{if(Array.isArray(v)&&v.length&&v.every(isObj))walk(v,path+"["+i+"]."+k.replace(/^def_/,""),out);}));
+  }else if(node.length){
+   TOTALS.tables++;TOTALS.rows+=node.length;
+   out.push('<h3 class="tpath">▤ '+esc(path)+' <span class="cnt">'+node.length+'</span></h3><div class="card"><table><tbody>'+node.map((v,i)=>'<tr><td class="k">'+i+'</td><td>'+fmtV(v)+'</td></tr>').join("")+'</tbody></table></div>');
+  }
+  return;
+ }
+ if(isObj(node)){
+  const scal=Object.entries(node).filter(([k,v])=>isScalar(v)||(Array.isArray(v)&&v.every(isScalar)));
+  const rest=Object.entries(node).filter(([k,v])=>!scal.some(s=>s[0]===k));
+  if(scal.length){
+   TOTALS.tables++;TOTALS.rows+=scal.length;
+   out.push('<h3 class="tpath">▧ '+esc(path)+' <span class="cnt">'+scal.length+' 項</span></h3><div class="card"><table><tbody>'+scal.map(([k,v])=>'<tr><td class="k">'+esc(k.replace(/^def_/,""))+'</td><td>'+fmtV(v)+'</td></tr>').join("")+'</tbody></table></div>');
+  }
+  rest.forEach(([k,v])=>walk(v,path+" › "+k.replace(/^def_/,""),out));
+ }
+}
+async function main(){
+ const stage=document.getElementById("stage");
+ let loaded=0,failed=[];
+ const tabs=document.getElementById("tabs");
+ for(const F of FILES){
+  const sec=document.createElement("div");sec.className="sec";sec.id="sec-"+F.id;stage.appendChild(sec);
+  const tab=document.createElement("div");tab.className="tab";tab.textContent=F.t;tab.onclick=()=>{document.querySelectorAll(".sec").forEach(s=>s.classList.remove("on"));document.querySelectorAll(".tab").forEach(t=>t.classList.remove("on"));sec.classList.add("on");tab.classList.add("on");};
+  tabs.appendChild(tab);
+  try{
+   const r=await fetch(encodeURI(F.f));if(!r.ok)throw new Error("HTTP "+r.status);
+   const j=await r.json();loaded++;
+   const out=['<h2>'+esc(F.t)+' <span class="en">'+esc(F.f.split("/").pop())+'</span><span class="rc">'+esc(j.def_schema||"")+' '+esc(j.def_schema_version||"")+'</span></h2>'];
+   walk(j,"root",out);
+   sec.innerHTML=out.join("");
+  }catch(e){failed.push(F.f);sec.innerHTML='<div class="err">✕ 無法載入 '+esc(F.f)+' — '+esc(e.message)+'</div>';}
+ }
+ document.querySelector(".tab").click();
+ document.getElementById("stamp").textContent="整合 "+loaded+"/"+FILES.length+" 份 SSOT"+(failed.length?(" · 失敗:"+failed.join(",")):" · 零遺漏展開完成");
+ document.getElementById("scards").innerHTML=[
+  [loaded+"/"+FILES.length,"SSOT 檔案"],
+  [TOTALS.tables,"表 · 各類都有"],
+  [TOTALS.rows,"資料列 · 不遺漏"],
+  [SEEN_IDS.size,"唯一 ID(已去重)"],
+  [TOTALS.dupes,"跨表重複標記"]
+ ].map(c=>'<div class="sc"><div class="v">'+c[0]+'</div><div class="l">'+c[1]+'</div></div>').join("");
+}
+main();
+</script>
+</body></html>
