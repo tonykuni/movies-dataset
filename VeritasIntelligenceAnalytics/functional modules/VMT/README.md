@@ -15,14 +15,27 @@ Outlook ──┐
 
 ## 快速開始
 
+### Windows / PowerShell（建議走啟動器）
+
+```powershell
+cd "VeritasIntelligenceAnalytics\functional modules\VMT"
+
+.\Start-VMT.ps1 -Demo           # 先看它打算做什麼（dry-run，不寫任何東西）
+.\Start-VMT.ps1 -Demo -Commit   # 確認無誤後才落帳
+.\Start-VMT.ps1 -Test           # 跑 35 項單元測試
+```
+
+`Start-VMT.ps1` 會自動找 Python（優先用專屬 venv `vmt_pm`，再 `py -3.11`，最後系統
+`python`），設好 `VMT_ROOT`，跑完自動開啟戰情總覽。
+
+> **Windows 上沒有 `python3` 這個指令**，是 `py` 或 `python`。直接呼叫引擎的話：
+> `py engines\vmt_pipeline.py --demo`
+
+### macOS / Linux
+
 ```bash
-# 1. 先看它「打算做什麼」（dry-run，不寫任何東西）
 python3 engines/vmt_pipeline.py --demo
-
-# 2. 確認無誤後才落帳
 python3 engines/vmt_pipeline.py --demo --commit
-
-# 3. 打開戰情總覽
 open $VMT_ROOT/reports/VMT_Dashboard.html
 ```
 

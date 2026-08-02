@@ -16,7 +16,8 @@
       "ollama": "本地 LLM 補位判讀 (HTTP, 無需 Python 套件); 無法連線時全程規則判讀"
     },
     "entrypoint": "engines/vmt_pipeline.py",
-    "workspace_env": "VMT_ROOT"
+    "workspace_env": "VMT_ROOT",
+    "entrypoint_windows": "Start-VMT.ps1 (PowerShell 7+)"
   },
   "artifacts": [
     {
@@ -90,6 +91,12 @@
       "role": "管線編排 · 收信 -> 判讀 -> 會議 -> 抽任務 -> 收回覆 -> SLA -> 信稿 -> 總覽",
       "bytes": 5819,
       "sha256": "c8a3a4c4a6e69ce3583c140e202b1e8fbc02ab52192b4971c9f3933cb823f721"
+    },
+    {
+      "filename": "Start-VMT.ps1",
+      "role": "唯讀 PowerShell 啟動器 · Python 自動偵測 (venv vmt_pm 優先) · 預設 dry-run · 不寫 DB / 不 Stop-Process",
+      "bytes": 10159,
+      "sha256": "a0d01a37580518c4261430800a0186fbf0923d75d2d75ddaa7f403da31d33407"
     }
   ],
   "ledgers": {
