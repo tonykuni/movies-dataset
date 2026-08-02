@@ -24,7 +24,9 @@ carries its anchor manifest **plus the supplied canonical artifacts**:
 `ui/VIA_Intelligence_Platform_v0162C.html` (Intelligence Platform v0162C UI
 preview declaring the VRN / VDF / VAP module set),
 `ui/VAP_Workbench_v009.html` (VeritasAutoPlot 工作台 — High-Resolution Export
-& Stack Composer v009, header 帶 `data-frozen-lock=HEADER_EQUAL_HEIGHT_LOCKED`)
+& Stack Composer v009, header 帶 `data-frozen-lock=HEADER_EQUAL_HEIGHT_LOCKED`),
+`ui/VAP_Workbench_v010.html` (v009 + 響應式陣列布局:桌機橫式/手機直式自動最
+佳化、等大 auto-fill GRID、拖曳式軸槽 Dock、現代微動畫;兩個視覺鎖均保持)
 and `spec/VIA_VAP_Spec_SSOT__Standalone.html` (VAP 規範 SSOT — Spec & Library
 JSON single source of truth). All are SHA-256 registered in
 `VAP_Subsystem_Manifest.json` and are REVIEW-ONLY under the same
