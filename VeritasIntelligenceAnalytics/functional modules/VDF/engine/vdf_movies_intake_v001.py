@@ -209,7 +209,11 @@ def forge(base: Path, source_dir: Path, mode: str) -> int:
     os.close(fd)
     tmp_path = Path(tmp_name)
     try:
-        with sqlite3.connect(tmp_path) as conn:
+        # sqlite3's context manager only manages the transaction — it does not
+        # close the connection, and Windows refuses os.replace while the file
+        # handle is open. Close explicitly before replacing.
+        conn = sqlite3.connect(tmp_path)
+        try:
             for table, (columns, rows) in tables.items():
                 column_sql = ", ".join(f'"{c}"' for c in columns)
                 placeholders = ", ".join("?" for _ in columns)
@@ -217,6 +221,8 @@ def forge(base: Path, source_dir: Path, mode: str) -> int:
                 conn.executemany(
                     f'INSERT INTO "{table}" ({column_sql}) VALUES ({placeholders})', rows)
             conn.commit()
+        finally:
+            conn.close()
         tmp_path.replace(db_path)
     except BaseException:
         tmp_path.unlink(missing_ok=True)
