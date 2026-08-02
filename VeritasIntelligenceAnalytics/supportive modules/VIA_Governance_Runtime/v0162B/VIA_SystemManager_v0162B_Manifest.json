@@ -1,103 +1,104 @@
 {
-  "artifacts": [
-    {
-      "bytes": 107399,
-      "filename": "bin/Invoke-VIA-SystemManager-AllInOne-v0162B.ps1",
-      "role": "single corrected System Manager PowerShell (integration build R4: runtime self-exclusion, env/copy-tree exclusions, large-file guard, JSON control-character sandbox repair)",
-      "sha256": "da26caaf308e85fcae1cfbd37361fdbe498f9339ab1199b16cd5abc6bcc84046"
-    },
-    {
-      "bytes": 27525,
-      "filename": "ui/VIA_SystemManager_v0162B_Preview.html",
-      "role": "browser-safe UI preview",
-      "sha256": "4f653c4ac04df2612364804cfca5a203c868cecffdeb8bbfbf0635cbd1064152"
-    },
-    {
-      "bytes": 60887,
-      "filename": "engine/via_system_manager_engine_v0162B.py",
-      "role": "audit copy of embedded Python engine (R4: own runtime root + _vdf_envs/site-packages/scope_copy excluded, >64MiB content-analysis guard, JSON control-character sandbox repair)",
-      "sha256": "fba0e3d4ef436ced8055cba235a53eb67df2ad2e127c414b7e801a5320a75ff2"
-    },
-    {
-      "bytes": 8339,
-      "filename": "qa/via_red_triage_v001.py",
-      "role": "read-only RED triage: distills any run directory into a paste-sized Markdown report (RED files + parser messages, round trend, top Hydra, SSOT multi-version groups); driven by VIA.ps1 -Do Report",
-      "sha256": "e9d5bd92b4f0a516a84091351fba31477782cc6422fbaf42e88298846eff5e65"
-    },
-    {
-      "bytes": 1539,
-      "filename": "../../../StartVIASystemManager.ps1",
-      "role": "daily one-paste entrypoint, exact-SHA gate re-locked to integration build R4",
-      "sha256": "955a909037b10b3c90c2d059de2b060eb390e09c178ae8692b053fcb4599fa14"
-    },
-    {
-      "bytes": 9315,
-      "filename": "bin/Invoke-VIA-Promotion-Transaction-v0162B.ps1",
-      "role": "canonical promotion transaction · the separate hash-locked operator-reviewed path required by the VRN/VDF/VAP promotion gates (operator review → exact-hash gate → backup → hash-chain ledger)",
-      "sha256": "74e3407e3cd48d4bdc189016510ebea6f9d4a82b2bb90e560b488a82cec1db01"
-    },
-    {
-      "bytes": 1539,
-      "filename": "../../../StartVIAUnified.ps1",
-      "role": "daily one-paste entrypoint, exact-SHA gate re-locked to integration build R4 (byte-identical to StartVIASystemManager.ps1)",
-      "sha256": "955a909037b10b3c90c2d059de2b060eb390e09c178ae8692b053fcb4599fa14"
-    }
+ "artifacts": [
+  {
+   "bytes": 109456,
+   "filename": "bin/Invoke-VIA-SystemManager-AllInOne-v0162B.ps1",
+   "role": "single corrected System Manager PowerShell (integration build R5: archive-scope Hydra classification - snapshot/report trees and VAP source-import staging no longer raise live Hydra risk)",
+   "sha256": "3707335b1ec911730305715bc1b14b5f43ec7d3903182b787e4e1c3314fb019a"
+  },
+  {
+   "bytes": 27525,
+   "filename": "ui/VIA_SystemManager_v0162B_Preview.html",
+   "role": "browser-safe UI preview",
+   "sha256": "4f653c4ac04df2612364804cfca5a203c868cecffdeb8bbfbf0635cbd1064152"
+  },
+  {
+   "bytes": 62944,
+   "filename": "engine/via_system_manager_engine_v0162B.py",
+   "role": "audit copy of embedded Python engine (R5: RUN_YYYYMMDD_HHMMSS snapshot trees and SOURCE_VAP_MODULE version folders classified as archive scope; Hydra risk scored on live copies only; gate and HYDRA count use non-GREEN rows)",
+   "sha256": "64b7424edb91f31d4df0484bd85ffc00a5e31fd331f362927a1a94b9eaf93c6f"
+  },
+  {
+   "bytes": 8339,
+   "filename": "qa/via_red_triage_v001.py",
+   "role": "read-only RED triage: distills any run directory into a paste-sized Markdown report (RED files + parser messages, round trend, top Hydra, SSOT multi-version groups); driven by VIA.ps1 -Do Report",
+   "sha256": "e9d5bd92b4f0a516a84091351fba31477782cc6422fbaf42e88298846eff5e65"
+  },
+  {
+   "bytes": 1539,
+   "filename": "../../../StartVIASystemManager.ps1",
+   "role": "daily one-paste entrypoint, exact-SHA gate re-locked to integration build R5",
+   "sha256": "f6c5c4732a8759e2621fec56a9793827ec87a1f03d8bbf31c0fb57fc98b9c34d"
+  },
+  {
+   "bytes": 9315,
+   "filename": "bin/Invoke-VIA-Promotion-Transaction-v0162B.ps1",
+   "role": "canonical promotion transaction · the separate hash-locked operator-reviewed path required by the VRN/VDF/VAP promotion gates (operator review → exact-hash gate → backup → hash-chain ledger)",
+   "sha256": "74e3407e3cd48d4bdc189016510ebea6f9d4a82b2bb90e560b488a82cec1db01"
+  },
+  {
+   "bytes": 1539,
+   "filename": "../../../StartVIAUnified.ps1",
+   "role": "daily one-paste entrypoint, exact-SHA gate re-locked to integration build R5 (byte-identical to StartVIASystemManager.ps1)",
+   "sha256": "f6c5c4732a8759e2621fec56a9793827ec87a1f03d8bbf31c0fb57fc98b9c34d"
+  }
+ ],
+ "governance": {
+  "blind_import_all": false,
+  "default_mode": "AUTO_LAUNCH_ALL",
+  "network_install": false,
+  "project_canonical_mutation": false,
+  "sandbox_repair_only": true,
+  "stop_process": false,
+  "ui_only_switch": "-UiOnly"
+ },
+ "integration": {
+  "build": "R5",
+  "completed_at": "2026-08-02",
+  "r4_fix": "RED triage of the first clean full-scale run (run_20260801_133914: user cleaned all run_* dirs first, still 8782 files / 21 RED / 483 Hydra) proved the remaining findings were canonical, in three classes. (1) 16 VRN registry JSONs fail strict parsing only because string values contain raw control characters - R4 adds a deterministic sandbox repair (lenient strict=False parse, strict re-serialize, round-trip verify; repair_type JSON_CONTROL_CHARACTER_ESCAPE, candidate-only). (2) supportive modules/ui_support/iconforge_console_data.json is 1.99 GB and json.loads dies with MemoryError - R4 adds a 64 MiB content-analysis guard: oversized files stay inventoried/hashed but content parsing is skipped (metrics.content_analysis=SKIPPED_LARGE_FILE). (3) 317 RED Hydra risks were vendored files under functional modules/VDF/_vdf_envs/*/Lib/site-packages plus a full snapshot tree under VAP/ASSETS/SCOPE_COPY - R4 excludes _vdf_envs, site-packages and scope_copy like venv/received_duplicates. Remaining genuine defect: 4 byte-identical, syntactically broken copies of Invoke-VIA-VRN-OneClick-Sidebar-v0159.ps1 (v0161D/v0162/v0162A/v0162B child dirs) - real breakage, operator decision (archive or repair), not auto-fixable. Verified live on a seeded base reproducing all classes: control-char JSON pre-RED then post-GREEN via sandbox candidate, oversized file GREEN-skipped (both threshold sides unit-tested), exclusions leave zero rows and zero Hydra, only the broken ps1 stays RED. Both daily entrypoints re-locked to the R4 launcher SHA.",
+  "r3_fix": "First full-scale Windows panoramic run (2026-08-01, 8782 files) ended ROUND_REVIEW_REQUIRED_RED_ERRORS_REMAIN with the RED count oscillating 20-21 across rounds and 483 Hydra / 1640 SSOT groups. Root cause: the inventory walked the engine's own runtime root (supportive modules/.../v0162B/runtime), re-analyzing prior runs' sandbox copies, evidence files and the truncated corpses left by the earlier [Errno 28] disk-full crash - RED errors no sandbox repair can converge, plus duplicate-basename Hydra/SSOT noise. R3 excludes the engine's own runtime root (run_dir parent) from inventory. Companion: qa/via_red_triage_v001.py + VIA.ps1 -Do Report distill any run (including pre-R3 runs) into a paste-sized RED triage Markdown. Verified live: a base seeded with a corrupt old run_* directory (invalid JSON + Python syntax error + duplicate engine basename) gates UNIFIED_SANDBOX_GREEN with zero runtime-polluted inventory rows. Both daily entrypoints re-locked to the R3 launcher SHA.",
+  "note": "The original 143477-byte AllInOne (sha256 e6155465203591fd34d800a0901099bddf537f2aae04277281a752e2aff48127) was not present in the supplied artifact set. It was reconstructed from the byte-verified audit engine and UI preview using the v0162B repair contract (single-quoted literal here-strings only, placeholder-replacement daily-launcher template, post-generation AST validation, exact-SHA asset verification). Both daily entrypoints were re-locked to the reconstructed launcher's SHA-256.",
+  "previous_allinone_sha256": "e6155465203591fd34d800a0901099bddf537f2aae04277281a752e2aff48127",
+  "r2_fix": "First Windows runtime user test (2026-07-28 15:34, py 3.13.7) exposed an argument-quoting defect: Start-Process joined array arguments without quoting, so the engine path containing spaces ('supportive modules') was split and Python failed with Errno 2. R2 quotes every whitespace-containing argument explicitly and passes one command line. Both daily entrypoints re-locked to the R2 launcher SHA.",
+  "reconstructed_allinone_sha256": "ae3bdbd553ef876675e151390a7008d51b07a5aed3cd40b6c29cea224b82c114",
+  "subsystem_anchors": [
+   "functional modules/VRN/VRN_Subsystem_Manifest.json",
+   "functional modules/VDF/VDF_Subsystem_Manifest.json",
+   "functional modules/VAP/VAP_Subsystem_Manifest.json"
   ],
-  "governance": {
-    "blind_import_all": false,
-    "default_mode": "AUTO_LAUNCH_ALL",
-    "network_install": false,
-    "project_canonical_mutation": false,
-    "sandbox_repair_only": true,
-    "stop_process": false,
-    "ui_only_switch": "-UiOnly"
+  "vap_integration": {
+   "completed_at": "2026-07-28",
+   "subsystem_name": "VeritasAutoPlot (VAP) · VIA visual function management: icons / templates / plotting",
+   "note": "VAP anchor registered with supplied canonical artifacts: Chart & Layout Spec ONE standalone suite (sha256 dc416087f0b8ee2ad44dc08d7efbfb26a42de5c2db068891c5c4d7339a88dd4f, 8132473 bytes) and Intelligence Platform v0162C UI preview (sha256 377f7f0904d9832a26269714585b29846c4fed2c2f17f129a40d4475b9da9909, 91026 bytes). Visual lock governance (line width 1, opacity 0.75, axis steps 2/2.5/5/10) recorded in the anchor at registration time; opacity since superseded by the Chart Library Builder unified store (lineOpacity 0.9, fillOpacity 0.4) per the anchor's recorded_conflict. Engine v0162B discovers the root natively (SYSTEM_MANAGER_CONTRACT subsystems already include VAP); live three-round run re-executed with VAP present.",
+   "artifacts": [
+    "functional modules/VAP/spec/VIA_Chart_Layout_Spec_ONE_Standalone.html",
+    "functional modules/VAP/ui/VIA_Intelligence_Platform_v0162C.html"
+   ]
   },
-  "integration": {
-    "build": "R4",
-    "completed_at": "2026-08-01",
-    "r4_fix": "RED triage of the first clean full-scale run (run_20260801_133914: user cleaned all run_* dirs first, still 8782 files / 21 RED / 483 Hydra) proved the remaining findings were canonical, in three classes. (1) 16 VRN registry JSONs fail strict parsing only because string values contain raw control characters - R4 adds a deterministic sandbox repair (lenient strict=False parse, strict re-serialize, round-trip verify; repair_type JSON_CONTROL_CHARACTER_ESCAPE, candidate-only). (2) supportive modules/ui_support/iconforge_console_data.json is 1.99 GB and json.loads dies with MemoryError - R4 adds a 64 MiB content-analysis guard: oversized files stay inventoried/hashed but content parsing is skipped (metrics.content_analysis=SKIPPED_LARGE_FILE). (3) 317 RED Hydra risks were vendored files under functional modules/VDF/_vdf_envs/*/Lib/site-packages plus a full snapshot tree under VAP/ASSETS/SCOPE_COPY - R4 excludes _vdf_envs, site-packages and scope_copy like venv/received_duplicates. Remaining genuine defect: 4 byte-identical, syntactically broken copies of Invoke-VIA-VRN-OneClick-Sidebar-v0159.ps1 (v0161D/v0162/v0162A/v0162B child dirs) - real breakage, operator decision (archive or repair), not auto-fixable. Verified live on a seeded base reproducing all classes: control-char JSON pre-RED then post-GREEN via sandbox candidate, oversized file GREEN-skipped (both threshold sides unit-tested), exclusions leave zero rows and zero Hydra, only the broken ps1 stays RED. Both daily entrypoints re-locked to the R4 launcher SHA.",
-    "r3_fix": "First full-scale Windows panoramic run (2026-08-01, 8782 files) ended ROUND_REVIEW_REQUIRED_RED_ERRORS_REMAIN with the RED count oscillating 20-21 across rounds and 483 Hydra / 1640 SSOT groups. Root cause: the inventory walked the engine's own runtime root (supportive modules/.../v0162B/runtime), re-analyzing prior runs' sandbox copies, evidence files and the truncated corpses left by the earlier [Errno 28] disk-full crash - RED errors no sandbox repair can converge, plus duplicate-basename Hydra/SSOT noise. R3 excludes the engine's own runtime root (run_dir parent) from inventory. Companion: qa/via_red_triage_v001.py + VIA.ps1 -Do Report distill any run (including pre-R3 runs) into a paste-sized RED triage Markdown. Verified live: a base seeded with a corrupt old run_* directory (invalid JSON + Python syntax error + duplicate engine basename) gates UNIFIED_SANDBOX_GREEN with zero runtime-polluted inventory rows. Both daily entrypoints re-locked to the R3 launcher SHA.",
-    "note": "The original 143477-byte AllInOne (sha256 e6155465203591fd34d800a0901099bddf537f2aae04277281a752e2aff48127) was not present in the supplied artifact set. It was reconstructed from the byte-verified audit engine and UI preview using the v0162B repair contract (single-quoted literal here-strings only, placeholder-replacement daily-launcher template, post-generation AST validation, exact-SHA asset verification). Both daily entrypoints were re-locked to the reconstructed launcher's SHA-256.",
-    "previous_allinone_sha256": "e6155465203591fd34d800a0901099bddf537f2aae04277281a752e2aff48127",
-    "r2_fix": "First Windows runtime user test (2026-07-28 15:34, py 3.13.7) exposed an argument-quoting defect: Start-Process joined array arguments without quoting, so the engine path containing spaces ('supportive modules') was split and Python failed with Errno 2. R2 quotes every whitespace-containing argument explicitly and passes one command line. Both daily entrypoints re-locked to the R2 launcher SHA.",
-    "reconstructed_allinone_sha256": "ae3bdbd553ef876675e151390a7008d51b07a5aed3cd40b6c29cea224b82c114",
-    "subsystem_anchors": [
-      "functional modules/VRN/VRN_Subsystem_Manifest.json",
-      "functional modules/VDF/VDF_Subsystem_Manifest.json",
-      "functional modules/VAP/VAP_Subsystem_Manifest.json"
-    ],
-    "vap_integration": {
-      "completed_at": "2026-07-28",
-      "subsystem_name": "VeritasAutoPlot (VAP) · VIA visual function management: icons / templates / plotting",
-      "note": "VAP anchor registered with supplied canonical artifacts: Chart & Layout Spec ONE standalone suite (sha256 dc416087f0b8ee2ad44dc08d7efbfb26a42de5c2db068891c5c4d7339a88dd4f, 8132473 bytes) and Intelligence Platform v0162C UI preview (sha256 377f7f0904d9832a26269714585b29846c4fed2c2f17f129a40d4475b9da9909, 91026 bytes). Visual lock governance (line width 1, opacity 0.75, axis steps 2/2.5/5/10) recorded in the anchor at registration time; opacity since superseded by the Chart Library Builder unified store (lineOpacity 0.9, fillOpacity 0.4) per the anchor's recorded_conflict. Engine v0162B discovers the root natively (SYSTEM_MANAGER_CONTRACT subsystems already include VAP); live three-round run re-executed with VAP present.",
-      "artifacts": [
-        "functional modules/VAP/spec/VIA_Chart_Layout_Spec_ONE_Standalone.html",
-        "functional modules/VAP/ui/VIA_Intelligence_Platform_v0162C.html"
-      ]
-    }
-  },
-  "observed_failure": "Generated Start-VIA-SystemManager.ps1 failed Microsoft PowerShell AST validation.",
-  "qa": {
-    "embedded_asset_roundtrip": "PASS (engine and workbench here-strings materialize byte-identical; qa/evidence/powershell_ast_qa_results.json)",
-    "embedded_hta_javascript_node_check": "PASS (node --check on preview script blocks)",
-    "embedded_python_compile": "PASS (python3.11 py_compile)",
-    "engine_three_round_run": "PASS · gate UNIFIED_SANDBOX_GREEN_RUNTIME_DEPLOYED_NO_CANONICAL_MUTATION (qa/evidence/engine_run_final_summary.json)",
-    "expandable_here_string_scan": "PASS (0 expandable here-strings; v0162A root cause remains absent)",
-    "materialized_daily_launcher_structural_scan": "PASS",
-    "powerShell_structural_scan": "PASS",
-    "windows_generated_daily_ast": "PASS on PowerShell 7.4.6 Microsoft parser (Linux); re-runs inside Install-VIAEntrypoints with detailed parse-error output on Windows.",
-    "windows_main_ast": "PASS on PowerShell 7.4.6 Microsoft parser (Linux); re-runs in the supplied exact-SHA one-paste gate on Windows.",
-    "windows_runtime_user_test": "REQUIRED"
-  },
-  "repair": {
-    "daily_and_compatibility_launchers_share_validated_template": true,
-    "expandable_daily_here_string_removed": true,
-    "generated_ast_error_details_enabled": true,
-    "literal_template_enabled": true,
-    "placeholder_replacement_enabled": true,
-    "safe_single_quoted_path_literals": true
-  },
-  "repair_from": "v0162A",
-  "root_cause": "The daily launcher was generated by an expandable double-quoted here-string containing nested PowerShell escape characters and continuation backticks.",
-  "version": "v0162B"
+  "r5_fix": "The operator user-test run that closed R4 (run of 2026-08-02 09:14: 7468 files / 0 RED / 0 YELLOW) left 317 Hydra rows, every one a DUPLICATE_BASENAME_DIFFERENT_HASH whose extra copies live in timestamped snapshot trees (RUN_YYYYMMDD_HHMMSS report archives, e.g. _via_safe_polyglot_optimizer RUN_* reports) or the VAP source-import staging area (SOURCE_VAP_MODULE version folders 1-13 and html_template). Those trees exist to preserve history, so differing hashes there are provenance, not runtime divergence. R5 scores Hydra risk only on copies outside archive scope; collisions confined to archive scope are kept visible as GREEN ARCHIVE_SNAPSHOT_DUPLICATE rows, and the overall gate plus the HYDRA summary count consider only non-GREEN rows. Detection itself (A03) stays fully enabled: two or more divergent copies outside archive scope still raise YELLOW/RED exactly as before."
+ },
+ "observed_failure": "Generated Start-VIA-SystemManager.ps1 failed Microsoft PowerShell AST validation.",
+ "qa": {
+  "embedded_asset_roundtrip": "PASS (engine and workbench here-strings materialize byte-identical; qa/evidence/powershell_ast_qa_results.json)",
+  "embedded_hta_javascript_node_check": "PASS (node --check on preview script blocks)",
+  "embedded_python_compile": "PASS (python3.11 py_compile)",
+  "engine_three_round_run": "PASS · gate UNIFIED_SANDBOX_GREEN_RUNTIME_DEPLOYED_NO_CANONICAL_MUTATION (qa/evidence/engine_run_final_summary.json)",
+  "expandable_here_string_scan": "PASS (0 expandable here-strings; v0162A root cause remains absent)",
+  "materialized_daily_launcher_structural_scan": "PASS",
+  "powerShell_structural_scan": "PASS",
+  "windows_generated_daily_ast": "PASS on PowerShell 7.4.6 Microsoft parser (Linux); re-runs inside Install-VIAEntrypoints with detailed parse-error output on Windows.",
+  "windows_main_ast": "PASS on PowerShell 7.4.6 Microsoft parser (Linux); re-runs in the supplied exact-SHA one-paste gate on Windows.",
+  "windows_runtime_user_test": "REQUIRED"
+ },
+ "repair": {
+  "daily_and_compatibility_launchers_share_validated_template": true,
+  "expandable_daily_here_string_removed": true,
+  "generated_ast_error_details_enabled": true,
+  "literal_template_enabled": true,
+  "placeholder_replacement_enabled": true,
+  "safe_single_quoted_path_literals": true
+ },
+ "repair_from": "v0162A",
+ "root_cause": "The daily launcher was generated by an expandable double-quoted here-string containing nested PowerShell escape characters and continuation backticks.",
+ "version": "v0162B"
 }

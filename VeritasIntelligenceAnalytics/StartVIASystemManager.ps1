@@ -3,7 +3,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $Launcher = 'C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\VIA_Governance_Runtime\v0162B\bin\Invoke-VIA-SystemManager-AllInOne-v0162B.ps1'
-$ExpectedSHA = 'da26caaf308e85fcae1cfbd37361fdbe498f9339ab1199b16cd5abc6bcc84046'
+$ExpectedSHA = '3707335b1ec911730305715bc1b14b5f43ec7d3903182b787e4e1c3314fb019a'
 $Base = 'C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics'
 
 if (-not (

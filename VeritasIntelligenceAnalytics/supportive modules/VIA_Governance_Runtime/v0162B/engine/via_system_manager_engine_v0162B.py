@@ -33,6 +33,17 @@ EXCLUDED_PARTS = {
 }
 MAX_FILES = 25000
 MAX_SAFE_FIXES_PER_ROUND = 400
+# R5: the user-test run that closed R4 came back 0 RED / 0 YELLOW with 317
+# Hydra rows left, every one a basename collision whose extra copies live in
+# timestamped snapshot trees (RUN_YYYYMMDD_HHMMSS report archives) or the VAP
+# source-import staging area (SOURCE_VAP_MODULE version folders). Those trees
+# exist to preserve history, so differing hashes there are provenance, not
+# divergence. Hydra risk is therefore scored only on copies that can still
+# fork at runtime (outside archive scope); collisions confined to archive
+# scope stay listed as GREEN ARCHIVE_SNAPSHOT_DUPLICATE rows for
+# transparency, and gating counts only non-GREEN Hydra rows.
+ARCHIVE_SCOPE_PATTERN = re.compile(r"^run_\d{8}[_-]\d{6}", re.IGNORECASE)
+ARCHIVE_SCOPE_PARTS = {"source_vap_module"}
 # R4: content parsing loads whole files into memory; multi-GB data files
 # (e.g. console dumps) must be inventoried but not parsed - a MemoryError
 # is an engine limitation, not a defect in the file.
@@ -718,25 +729,49 @@ def build_ssot_matrix(inventory: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return rows
 
 
+def is_archive_scope(path_text: str) -> bool:
+    # split on both separators so classification is host-OS independent
+    for part in re.split(r"[\\/]+", str(path_text)):
+        lowered = part.lower()
+        if lowered in ARCHIVE_SCOPE_PARTS or ARCHIVE_SCOPE_PATTERN.match(lowered):
+            return True
+    return False
+
+
 def build_hydra_matrix(inventory: list[dict[str, Any]], dependencies: dict[str, list[str]]) -> list[dict[str, Any]]:
     by_name: dict[str, list[dict[str, Any]]] = {}
     for row in inventory:
-        by_name.setdefault(Path(row["path"]).name.lower(), []).append(row)
+        basename = re.split(r"[\\/]+", str(row["path"]))[-1]
+        by_name.setdefault(basename.lower(), []).append(row)
     rows = []
     for name, values in sorted(by_name.items()):
         hashes = sorted({v["sha256"] for v in values if v["sha256"]})
         subsystems = sorted({v["subsystem"] for v in values})
         if len(values) > 1 and len(hashes) > 1:
-            score = min(100, 30 + len(values) * 8 + len(subsystems) * 10)
-            rows.append({
-                "risk": "DUPLICATE_BASENAME_DIFFERENT_HASH",
-                "name": name,
-                "score": score,
-                "state": "RED" if score >= 70 else "YELLOW",
-                "subsystems": subsystems,
-                "paths": [v["path"] for v in values],
-                "automatic_fix": False,
-            })
+            live = [v for v in values if not is_archive_scope(v["path"])]
+            live_hashes = sorted({v["sha256"] for v in live if v["sha256"]})
+            if len(live) > 1 and len(live_hashes) > 1:
+                live_subsystems = sorted({v["subsystem"] for v in live})
+                score = min(100, 30 + len(live) * 8 + len(live_subsystems) * 10)
+                rows.append({
+                    "risk": "DUPLICATE_BASENAME_DIFFERENT_HASH",
+                    "name": name,
+                    "score": score,
+                    "state": "RED" if score >= 70 else "YELLOW",
+                    "subsystems": live_subsystems,
+                    "paths": [v["path"] for v in live],
+                    "automatic_fix": False,
+                })
+            else:
+                rows.append({
+                    "risk": "ARCHIVE_SNAPSHOT_DUPLICATE",
+                    "name": name,
+                    "score": 0,
+                    "state": "GREEN",
+                    "subsystems": subsystems,
+                    "paths": [v["path"] for v in values],
+                    "automatic_fix": False,
+                })
     dep_target_counts: dict[str, int] = {}
     for deps in dependencies.values():
         for dep in deps:
@@ -1119,7 +1154,7 @@ def render_report(
             ("GREEN", summary.get("green", 0)),
             ("YELLOW", summary.get("yellow", 0)),
             ("RED", summary.get("red", 0)),
-            ("HYDRA", len(hydra)),
+            ("HYDRA", sum(1 for r in hydra if r.get("state") != "GREEN")),
             ("SSOT GROUPS", len(ssot)),
             ("REPAIRS", len(repairs)),
         ]
@@ -1315,9 +1350,10 @@ def run(config: dict[str, Any]) -> dict[str, Any]:
         all_repairs, accelerator_rows, round_summaries,
     )
 
+    active_hydra = [row for row in hydra if row.get("state") != "GREEN"]
     overall_gate = (
         "UNIFIED_SANDBOX_READY_REVIEW_ONLY_NO_CANONICAL_MUTATION"
-        if final_summary["red"] > 0 or hydra
+        if final_summary["red"] > 0 or active_hydra
         else "UNIFIED_SANDBOX_GREEN_RUNTIME_DEPLOYED_NO_CANONICAL_MUTATION"
     )
     result = {
@@ -1332,7 +1368,8 @@ def run(config: dict[str, Any]) -> dict[str, Any]:
             for number in (1, 2, 3)
         ],
         "summary": final_summary,
-        "hydra_count": len(hydra),
+        "hydra_count": len(active_hydra),
+        "hydra_archive_informational_count": len(hydra) - len(active_hydra),
         "ssot_group_count": len(ssot),
         "repair_candidate_count": len(all_repairs),
         "library_registry": str(run_dir / "registry" / "library_registry.json"),

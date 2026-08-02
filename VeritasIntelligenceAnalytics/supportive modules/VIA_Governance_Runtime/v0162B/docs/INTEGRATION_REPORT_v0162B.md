@@ -167,3 +167,33 @@ scripts at the base root, `supportive modules` and `functional modules`
 merged in place; existing VRN/VDF canonical content is untouched — the
 anchors only add one manifest file to each root). Then run
 `StartVIASystemManager.ps1` in PowerShell 7.
+
+## 7. R5 · 封存範疇九頭龍分級 · Archive-scope Hydra classification
+
+The operator user-test run of 2026-08-02 09:14 (the gate left open by R4)
+returned **7,468 files / 0 RED / 0 YELLOW** across all three rounds — but
+317 Hydra rows remained, every one a `DUPLICATE_BASENAME_DIFFERENT_HASH`
+whose extra copies live in trees that exist to preserve history:
+
+- timestamped snapshot/report archives (`RUN_YYYYMMDD_HHMMSS…`, e.g. the
+  `_via_safe_polyglot_optimizer` run reports and `audit_tools` copies), and
+- the VAP source-import staging area (`SOURCE_VAP_MODULE` version folders
+  `1`–`13` and `html_template`).
+
+Differing hashes there are provenance, not runtime divergence. R5 therefore:
+
+- scores Hydra risk **only on copies outside archive scope** (the ones that
+  can still fork at runtime);
+- keeps archive-only collisions visible as **GREEN
+  `ARCHIVE_SNAPSHOT_DUPLICATE`** rows — nothing is hidden, A03 detection
+  stays fully enabled, and two or more divergent copies outside archive
+  scope still raise YELLOW/RED exactly as before;
+- gates (`UNIFIED_SANDBOX_GREEN…` vs `…REVIEW_ONLY…`) and the HYDRA summary
+  count on **non-GREEN rows only**, and reports the informational remainder
+  as `hydra_archive_informational_count`.
+
+Verification: engine unit tests over the scorer (archive-only, mixed
+live/archive, live-divergent, byte-identical and fan-in cases), `py_compile`,
+embedded-engine SHA roundtrip, entrypoint template byte-roundtrip, and
+manifest exactness all PASS. `windows_runtime_user_test` remains the
+operator's explicit gate for this build.
