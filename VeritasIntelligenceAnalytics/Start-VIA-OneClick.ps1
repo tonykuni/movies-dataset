@@ -1,5 +1,5 @@
 #requires -Version 7.0
-param([switch]$Audit, [switch]$Panorama, [switch]$Polyglot, [switch]$VRN)
+param([switch]$Audit, [switch]$Panorama, [switch]$Polyglot, [switch]$VRN, [switch]$Tower)
 
 # ============================================================
 # def Start-VIA-OneClick · ONE POWERSHELL TO HANDLE ALL
@@ -87,6 +87,15 @@ if ($VRN) {
             & ([scriptblock]::Create($code))
         } catch { Write-Host "[WARN] $lane 中斷/失敗:$($_.Exception.Message) — 繼續其餘流程" -ForegroundColor Yellow }
     }
+}
+
+# ---------- 4.8) 可選:Control Tower(HTML 控制台,全部動作變按鈕) ----------
+if ($Tower) {
+    $towerPy = Join-Path $via 'supportive modules\VIA_Control_Tower\via_control_tower.py'
+    Write-Host "`n[RUN] VIA Control Tower → http://127.0.0.1:8765" -ForegroundColor Cyan
+    Start-Process $py -ArgumentList ('"' + $towerPy + '" --base "' + $via + '"') -WindowStyle Hidden
+    Start-Sleep -Seconds 2
+    Start-Process 'http://127.0.0.1:8765'
 }
 
 # ---------- 5) 摘要 ----------
