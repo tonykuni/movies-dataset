@@ -64,12 +64,16 @@ if ($Audit -or $Panorama -or $Polyglot) {
 }
 
 # ---------- 4.5) 可選:VRN 唯讀預檢(Lane2 IO 盤點 + Lane3 引擎能力) ----------
+# Lane 腳本第 13 行硬編了已不存在的 OneDrive 舊路徑;canonical 檔不可變更,
+# 故在記憶體中將 $RelatedPath 改址到 repo 的 VRN canonical tree 後執行。
 if ($VRN) {
     $vrnDir = Join-Path $fm 'VRN'
-    Write-Host "`n[RUN] VRN Lane2 IO Inventory(唯讀)" -ForegroundColor Cyan
-    & (Join-Path $vrnDir 'Start-VRN-Lane2-IOInventory.ps1')
-    Write-Host "`n[RUN] VRN Lane3 Engine Capability(唯讀)" -ForegroundColor Cyan
-    & (Join-Path $vrnDir 'Start-VRN-Lane3-EngineCapability.ps1')
+    foreach ($lane in 'Start-VRN-Lane2-IOInventory.ps1', 'Start-VRN-Lane3-EngineCapability.ps1') {
+        Write-Host "`n[RUN] VRN $lane(唯讀 · RelatedPath→repo)" -ForegroundColor Cyan
+        $code = Get-Content -Raw (Join-Path $vrnDir $lane)
+        $code = $code -replace '\$RelatedPath = ".*?"', ('$RelatedPath = "' + $vrnDir + '"')
+        & ([scriptblock]::Create($code))
+    }
 }
 
 # ---------- 5) 摘要 ----------
