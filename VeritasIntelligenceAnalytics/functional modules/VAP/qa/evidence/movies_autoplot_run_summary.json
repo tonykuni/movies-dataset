@@ -1,0 +1,40 @@
+{
+  "run": "movies-dataset end-to-end pipeline · VDF intake -> VAP AutoPlot",
+  "date": "2026-08-02",
+  "environment": "linux · python 3.11.15 · repo tree at branch claude/via-system-followup-tz7k9t",
+  "vdf_database": {
+    "path": "functional modules/VDF/db/movies_dataset.sqlite",
+    "sha256": "5fa50aa2c7358c44689e48e8aaa764d0c694e3930eedfd44a2c5da110cadd631",
+    "bytes": 77824,
+    "tables": {
+      "movies_genres_summary": 1008,
+      "yearly_box_office": 91,
+      "yearly_tmdb": 90
+    }
+  },
+  "autoplot": {
+    "engine": "functional modules/VAP/engine/via_autoplot_engine_v001.py",
+    "invocations": [
+      "--base <Base> --list  (3 tables discovered via canonical VDF/db root, no --db override)",
+      "--base <Base> --auto --max-charts 12",
+      "--base <Base> --table movies_dataset.yearly_box_office --left total_gross --right avg_imdb_score"
+    ],
+    "charts_rendered": 12,
+    "charts": [
+      "VAP_movies_dataset.movies_genres_summary__gross__vs__imdb_score.html",
+      "VAP_movies_dataset.movies_genres_summary__gross__vs__popularity.html",
+      "VAP_movies_dataset.movies_genres_summary__gross__vs__vote_average.html",
+      "VAP_movies_dataset.movies_genres_summary__imdb_score__vs__vote_average.html",
+      "VAP_movies_dataset.movies_genres_summary__popularity__vs__imdb_score.html",
+      "VAP_movies_dataset.movies_genres_summary__popularity__vs__vote_average.html",
+      "VAP_movies_dataset.yearly_box_office__movie_count__vs__avg_duration.html",
+      "VAP_movies_dataset.yearly_box_office__movie_count__vs__avg_imdb_score.html",
+      "VAP_movies_dataset.yearly_box_office__movie_count__vs__total_budget.html",
+      "VAP_movies_dataset.yearly_box_office__movie_count__vs__total_gross.html",
+      "VAP_movies_dataset.yearly_box_office__total_gross__vs__avg_imdb_score.html",
+      "VAP_movies_dataset.yearly_box_office__total_gross__vs__total_budget.html"
+    ],
+    "visual_verification": "chromium screenshot of total_gross vs avg_imdb_score chart: dual axes, bar+line forms, VISUAL LOCK footer, VDF DB source line all present"
+  },
+  "gate": "GREEN_PIPELINE_END_TO_END_PRODUCTS_ONLY_NO_CANONICAL_MUTATION"
+}

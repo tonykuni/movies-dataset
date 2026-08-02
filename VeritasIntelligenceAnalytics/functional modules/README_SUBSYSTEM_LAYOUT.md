@@ -34,5 +34,21 @@ zero dependencies, honouring the visual lock. Usage:
 `python engine/via_autoplot_engine_v001.py --base <Base> --list | --auto |
 --table <t> --left <col> --right <col> [--left-form bar|line|area]`.
 
+`VDF/engine/vdf_movies_intake_v001.py` is the VDF movies-dataset intake
+forge(電影資料集鍛造引擎): it reads the repository dataset
+(`<Repo>/data/*.csv` — movie_metadata / tmdb_5000_movies /
+movies_genres_summary)and materializes the VDF analytical database
+`VDF/db/movies_dataset.sqlite`(tables: `movies_genres_summary`,
+`yearly_box_office`, `yearly_tmdb` — year-keyed so AutoPlot auto-pairing
+works), zero dependencies, sources read-only, atomic Refresh. Usage:
+`python engine/vdf_movies_intake_v001.py --base <Base>
+[--mode Refresh|ValidateOnly|DryRun] [--source <dir>]`. Each Refresh writes
+`qa/evidence/movies_intake_summary.json`(source sha256 · row counts · gate).
+AutoPlot then discovers the database through its canonical `VDF/db` root with
+no `--db` override — end-to-end:
+`intake --mode Refresh` → `autoplot --auto`. The built database and chart
+outputs are **products**(git-ignored); only engines and QA evidence are
+tracked.
+
 排除規則：`.git`, `__pycache__`, `node_modules`, `venv`, `cache*`, `archive*`,
 `backup*`, `staging`, `received_duplicates` 不列入分析。
