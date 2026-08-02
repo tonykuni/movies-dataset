@@ -22,9 +22,15 @@ carries its anchor manifest **plus the supplied canonical artifacts**:
 `spec/VIA_Chart_Layout_Spec_ONE_Standalone.html` (Chart & Layout Spec ONE —
 規範 · 套用圖庫 · 實例, visual lock 線粗 1 · 透明度 0.75 · 軸距 2/2.5/5/10) and
 `ui/VIA_Intelligence_Platform_v0162C.html` (Intelligence Platform v0162C UI
-preview declaring the VRN / VDF / VAP module set). Both are SHA-256 registered
-in `VAP_Subsystem_Manifest.json` and are REVIEW-ONLY under the same
-no-canonical-mutation governance.
+preview declaring the VRN / VDF / VAP module set),
+`ui/VAP_Workbench_v009.html` (VeritasAutoPlot 工作台 — High-Resolution Export
+& Stack Composer v009, header 帶 `data-frozen-lock=HEADER_EQUAL_HEIGHT_LOCKED`)
+and `spec/VIA_VAP_Spec_SSOT__Standalone.html` (VAP 規範 SSOT — Spec & Library
+JSON single source of truth). All are SHA-256 registered in
+`VAP_Subsystem_Manifest.json` and are REVIEW-ONLY under the same
+no-canonical-mutation governance. A `header_visual_lock` gate is registered
+PENDING_DESIGN_SOURCE for the Veritas Header design (Claude Design project
+68463cc8); it activates once the design source file lands in the repo.
 
 `VAP/engine/via_autoplot_engine_v001.py` is the VeritasAutoPlot plotting
 engine: it reads the VDF analytical database (CSV / TSV / JSON / SQLite under
