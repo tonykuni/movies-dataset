@@ -44,22 +44,33 @@ Start-Process (Join-Path $fm 'VAP\ui\VAP_Workbench_v010.html')
 Start-Process (Join-Path $via 'VAP\output\index.html')
 
 # ---------- 4) 可選:Optimizer Suite(唯讀/無刪除,報告輸出到 $rpt) ----------
+# 每個工具各自包 try/catch:單一工具失敗或被中斷,不拖垮其餘工具鏈與摘要。
 if ($Audit -or $Panorama -or $Polyglot) {
     New-Item -ItemType Directory -Path $rpt -Force | Out-Null
     if ($Audit) {
         Write-Host "`n[RUN] TurboOptimizer v3.3 SafeAudit(無刪除)" -ForegroundColor Cyan
-        & (Join-Path $opt 'VIA_TurboOptimizer_v3.3_OneDrive_Coding_AISafeAudit.ps1') `
-            -OutputRoot (Join-Path $rpt '_disk_audit') -OpenReport
+        try {
+            & (Join-Path $opt 'VIA_TurboOptimizer_v3.3_OneDrive_Coding_AISafeAudit.ps1') `
+                -OutputRoot (Join-Path $rpt '_disk_audit') -OpenReport
+        } catch { Write-Host "[WARN] Audit 中斷/失敗:$($_.Exception.Message) — 繼續其餘流程" -ForegroundColor Yellow }
     }
     if ($Panorama) {
         Write-Host "`n[RUN] FirstSight Panorama Governance Matrix v0100(唯讀)" -ForegroundColor Cyan
-        & (Join-Path $opt 'Invoke-VIA-FirstSightPanorama-GovernanceMatrix-v0100.ps1') `
-            -BaseRoot $via -DownloadRoot (Join-Path $env:USERPROFILE 'Downloads')
+        try {
+            & (Join-Path $opt 'Invoke-VIA-FirstSightPanorama-GovernanceMatrix-v0100.ps1') `
+                -BaseRoot $via -DownloadRoot (Join-Path $env:USERPROFILE 'Downloads')
+        } catch { Write-Host "[WARN] Panorama 中斷/失敗:$($_.Exception.Message) — 繼續其餘流程" -ForegroundColor Yellow }
     }
     if ($Polyglot) {
-        Write-Host "`n[RUN] SafePolyglotOptimizer AIO v0102(僅報告)" -ForegroundColor Cyan
-        & (Join-Path $opt 'Invoke-VIA-SafePolyglotOptimizer-AIO-v0102.ps1') `
-            -SelfTest -OpenReport
+        Write-Host "`n[RUN] SafePolyglotOptimizer AIO v0102(僅報告 · 子檔取自 repo Standalone Package)" -ForegroundColor Cyan
+        $bundle = Join-Path $via 'supportive modules\VIA_Standalone_Package_v0102\_supportive_bundle\powershell'
+        try {
+            & (Join-Path $opt 'Invoke-VIA-SafePolyglotOptimizer-AIO-v0102.ps1') `
+                -SupportiveModulesRoot (Join-Path $via 'supportive modules') `
+                -NexusCorePath (Join-Path $bundle 'Invoke-VeritasNexusCore.ps1') `
+                -PolyglotPath  (Join-Path $bundle 'Invoke-VIA-PolyglotCheckTestRepair-v0101.ps1') `
+                -OutputRoot (Join-Path $rpt '_polyglot') -SelfTest -OpenReport
+        } catch { Write-Host "[WARN] Polyglot 中斷/失敗:$($_.Exception.Message) — 繼續其餘流程" -ForegroundColor Yellow }
     }
 }
 
@@ -70,9 +81,11 @@ if ($VRN) {
     $vrnDir = Join-Path $fm 'VRN'
     foreach ($lane in 'Start-VRN-Lane2-IOInventory.ps1', 'Start-VRN-Lane3-EngineCapability.ps1') {
         Write-Host "`n[RUN] VRN $lane(唯讀 · RelatedPath→repo)" -ForegroundColor Cyan
-        $code = Get-Content -Raw (Join-Path $vrnDir $lane)
-        $code = $code -replace '\$RelatedPath = ".*?"', ('$RelatedPath = "' + $vrnDir + '"')
-        & ([scriptblock]::Create($code))
+        try {
+            $code = Get-Content -Raw (Join-Path $vrnDir $lane)
+            $code = $code -replace '\$RelatedPath = ".*?"', ('$RelatedPath = "' + $vrnDir + '"')
+            & ([scriptblock]::Create($code))
+        } catch { Write-Host "[WARN] $lane 中斷/失敗:$($_.Exception.Message) — 繼續其餘流程" -ForegroundColor Yellow }
     }
 }
 
