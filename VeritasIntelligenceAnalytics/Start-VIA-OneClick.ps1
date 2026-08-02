@@ -1,5 +1,5 @@
 #requires -Version 7.0
-param([switch]$Audit, [switch]$Panorama, [switch]$Polyglot)
+param([switch]$Audit, [switch]$Panorama, [switch]$Polyglot, [switch]$VRN)
 
 # ============================================================
 # def Start-VIA-OneClick · ONE POWERSHELL TO HANDLE ALL
@@ -63,6 +63,15 @@ if ($Audit -or $Panorama -or $Polyglot) {
     }
 }
 
+# ---------- 4.5) 可選:VRN 唯讀預檢(Lane2 IO 盤點 + Lane3 引擎能力) ----------
+if ($VRN) {
+    $vrnDir = Join-Path $fm 'VRN'
+    Write-Host "`n[RUN] VRN Lane2 IO Inventory(唯讀)" -ForegroundColor Cyan
+    & (Join-Path $vrnDir 'Start-VRN-Lane2-IOInventory.ps1')
+    Write-Host "`n[RUN] VRN Lane3 Engine Capability(唯讀)" -ForegroundColor Cyan
+    & (Join-Path $vrnDir 'Start-VRN-Lane3-EngineCapability.ps1')
+}
+
 # ---------- 5) 摘要 ----------
 $db = Get-Item "$fm\VDF\db\movies_dataset.sqlite"
 $n  = (Get-ChildItem (Join-Path $via 'VAP\output\VAP_*.html')).Count
@@ -72,4 +81,5 @@ Write-Host ("資料庫   : {0} ({1} bytes)" -f $db.FullName, $db.Length)
 Write-Host ("圖表     : {0} 張 → {1}" -f $n, (Join-Path $via 'VAP\output'))
 Write-Host "工作台   : v010(響應式+拖曳)· v009 canonical 保留"
 Write-Host "Header鎖 : LOCKED · Optimizer Suite: AST 驗證 · 雜湊登記"
+Write-Host "VRN      : canonical tree in repo · 81 artifacts hash-locked(-VRN 跑預檢)"
 if ($Audit -or $Panorama -or $Polyglot) { Write-Host "工具報告 : $rpt" }

@@ -11,7 +11,18 @@ subsystems in this order:
 | Others | every other directory under `functional modules/` and `module/` |
 | Supportive | `supportive modules/` |
 
-`VRN/` and `VDF/` here contain **integration anchors only** — a subsystem
+`VRN/` now carries its **full canonical tree in-repo** (imported 2026-08-02
+from the operator workstation survivor copy): core pipeline `VRN_MDL001–008`
+(Converter → LayoutExtractor → TableRestorer → OCR table/text → Consolidator →
+APIDataFetcher → CrossValidator), VIS table-geometry reconstructors, 12 entry
+/ops PS1 (Invoke-VRN, Guarded-Entry v217, PURE-NOHANG v2192, MQ-NoOCR v222,
+Lane2/Lane3 preflights), SSOT store, freeze locks and staging evidence — 81
+artifacts hash-locked in `VRN_Subsystem_Manifest.json` (py_compile + AST
+validated; pip-vendor leaks quarantined under `_quarantine_pip_vendor/`).
+Engines still execute on the operator workstation (OCR runtime); Lane2/Lane3
+are read-only preflights reachable via `Start-VIA-OneClick.ps1 -VRN`.
+
+`VDF/` originally carried an **integration anchor only** — a subsystem
 manifest that registers the discovery root and its governance gates. The real
 canonical trees live on the operator workstation under the same paths and are
 never modified by the System Manager (sandbox repair candidates only;
