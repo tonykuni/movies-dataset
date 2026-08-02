@@ -28,9 +28,12 @@ preview declaring the VRN / VDF / VAP module set),
 and `spec/VIA_VAP_Spec_SSOT__Standalone.html` (VAP 規範 SSOT — Spec & Library
 JSON single source of truth). All are SHA-256 registered in
 `VAP_Subsystem_Manifest.json` and are REVIEW-ONLY under the same
-no-canonical-mutation governance. A `header_visual_lock` gate is registered
-PENDING_DESIGN_SOURCE for the Veritas Header design (Claude Design project
-68463cc8); it activates once the design source file lands in the repo.
+no-canonical-mutation governance. The `header_visual_lock` gate is **LOCKED**:
+the Veritas Header masthead 1d(鑑 · Veritas Auto Plot)from the design source
+(`spec/Veritas_Intelligence_Analytics_UI_Design_Source.html`, Claude Design
+project 68463cc8) is applied as the Workbench `#veritasMasthead` brand band —
+above, and without touching, the frozen functional header — with the canonical
+fragment hash-registered at `spec/Veritas_Header_Masthead_1d.html`.
 
 `VAP/engine/via_autoplot_engine_v001.py` is the VeritasAutoPlot plotting
 engine: it reads the VDF analytical database (CSV / TSV / JSON / SQLite under
