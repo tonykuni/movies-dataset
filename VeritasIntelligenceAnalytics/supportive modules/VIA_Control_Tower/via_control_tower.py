@@ -31,14 +31,20 @@ def find_pwsh() -> str | None:
     return shutil.which("pwsh") or shutil.which("powershell")
 
 
+DEFAULT_INTAKE = (Path(os.environ.get("USERPROFILE", str(Path.home())))
+                  / "Downloads" / "VeritasIntelligenceAnalytics"
+                  / "_vrn_research_report_incremental_intake_v0156")
+
+
 class Tower:
-    def __init__(self, base: Path):
+    def __init__(self, base: Path, intake: Path | None = None):
         self.base = base
         self.repo = base.parent
         self.fm = base / "functional modules"
         self.sm = base / "supportive modules"
         self.py = sys.executable
         self.rpt = Path(os.environ.get("USERPROFILE", str(Path.home()))) / "VIA_Reports"
+        self.intake = intake or DEFAULT_INTAKE
 
     # ------------------------------------------------------------- helpers
     def run(self, cmd: list[str], timeout: int = 1800) -> str:
@@ -73,6 +79,13 @@ class Tower:
         return code
 
     def auto_pdf(self) -> str | None:
+        # 1st priority: the v0156 incremental intake folder (newest PDF first)
+        if self.intake.is_dir():
+            pdfs = sorted(self.intake.rglob("*.pdf"),
+                          key=lambda p: p.stat().st_mtime, reverse=True)
+            if pdfs:
+                return str(pdfs[0])
+        # fallback: historical candidate path list
         cand = self.fm / "VRN" / "VRN-2_StockReportCandidatePaths.txt"
         if cand.is_file():
             for line in cand.read_text(encoding="utf-8", errors="replace").splitlines():
@@ -80,6 +93,27 @@ class Tower:
                 if p.lower().endswith(".pdf") and Path(p).is_file():
                     return p
         return None
+
+    def act_vrn_intake(self) -> str:
+        if not self.intake.is_dir():
+            return f"[TOWER] intake 資料夾不存在:{self.intake}"
+        files = [p for p in self.intake.rglob("*") if p.is_file()]
+        by_ext: dict[str, list[Path]] = {}
+        for p in files:
+            by_ext.setdefault(p.suffix.lower() or "(none)", []).append(p)
+        lines = [f"[TOWER] VRN intake v0156 盤點 · {self.intake}",
+                 f"total: {len(files)} files · "
+                 f"{round(sum(p.stat().st_size for p in files)/1048576, 1)} MB", ""]
+        for ext in sorted(by_ext, key=lambda e: -len(by_ext[e])):
+            group = by_ext[ext]
+            mb = round(sum(p.stat().st_size for p in group) / 1048576, 1)
+            lines.append(f"{ext:8s} {len(group):4d} files  {mb:8.1f} MB")
+        lines.append("")
+        lines.append("最新 15 份(VRN RUN 會自動選最新的 PDF):")
+        newest = sorted(files, key=lambda p: p.stat().st_mtime, reverse=True)[:15]
+        for p in newest:
+            lines.append(f"  {p.relative_to(self.intake)}")
+        return "\n".join(lines)
 
     # ------------------------------------------------------------- actions
     def act_vdf(self) -> str:
@@ -165,9 +199,10 @@ class Tower:
 ACTIONS = {
     "vdf": ("VDF Intake · Refresh", lambda t: t.act_vdf()),
     "autoplot": ("AutoPlot · 全配對繪圖", lambda t: t.act_autoplot()),
+    "vrn_intake": ("VRN · Intake v0156 盤點(唯讀)", lambda t: t.act_vrn_intake()),
     "vrn_probe": ("VRN · Guarded SAFE PROBE", lambda t: t.act_vrn_probe()),
     "vrn_lanes": ("VRN · Lane2+Lane3 預檢", lambda t: t.act_vrn_lanes()),
-    "vrn_run": ("VRN · 實彈 No-OCR Staging(自動選 PDF)", lambda t: t.act_vrn_run()),
+    "vrn_run": ("VRN · 實彈 No-OCR(自動選 intake 最新 PDF)", lambda t: t.act_vrn_run()),
     "audit": ("SafeAudit 磁碟稽核(無刪除)", lambda t: t.act_tool("audit")),
     "panorama": ("FirstSight 全景矩陣(唯讀)", lambda t: t.act_tool("panorama")),
     "polyglot": ("Polyglot AIO(僅報告)", lambda t: t.act_tool("polyglot")),
@@ -277,12 +312,14 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--base", default=str(Path(__file__).resolve().parents[2]))
     ap.add_argument("--port", type=int, default=8765)
+    ap.add_argument("--intake", default=None,
+                    help="VRN research-report intake dir (default: v0156 under Downloads)")
     args = ap.parse_args()
     base = Path(args.base).resolve()
     if not (base / "functional modules").is_dir():
         print(f"[TOWER] RED base invalid: {base}")
         return 2
-    Handler.tower = Tower(base)
+    Handler.tower = Tower(base, Path(args.intake).resolve() if args.intake else None)
     srv = ThreadingHTTPServer(("127.0.0.1", args.port), Handler)
     print(f"[TOWER] VIA Control Tower {VERSION} · http://127.0.0.1:{args.port} · base={base}")
     try:
