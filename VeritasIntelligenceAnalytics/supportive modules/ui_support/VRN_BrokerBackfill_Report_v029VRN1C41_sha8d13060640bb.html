@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VRN Broker Backfill Gate v029.1C.4.1</title>
+<style>
+:root{--sky:#d8f0ef;--ink:#1d3438;--muted:#657f82;--line:rgba(38,70,75,.16);--head:#edf8f6;--hover:rgba(216,240,239,.20);--ok:#0f766e;--warn:#b7791f;--fail:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Microsoft JhengHei","Segoe UI",Arial,sans-serif;background:linear-gradient(180deg,#fbfdfb,#f3f8f6);color:var(--ink);font-size:11px;line-height:1.28}
+header{position:sticky;top:0;z-index:80;padding:14px 26px 10px;background:rgba(251,253,251,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+h1{margin:0;font-size:18px;text-align:center;letter-spacing:.035em}
+.sub{text-align:center;color:var(--muted);font-size:10.5px;margin-top:4px}
+.wrap{padding:12px 22px 36px}
+.kpis{display:grid;grid-template-columns:repeat(9,minmax(92px,1fr));gap:8px;margin-bottom:12px}
+.card{border-radius:10px;padding:8px 10px;background:rgba(255,255,255,.82);border:1px solid var(--line);box-shadow:0 6px 16px rgba(30,52,56,.04)}
+.k{font-size:9.5px;color:var(--muted);letter-spacing:.07em}.v{font-size:16px;font-weight:750;margin-top:2px}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.fail{color:var(--fail)}
+section{margin-top:12px}
+h2{position:sticky;top:45px;z-index:70;margin:0 0 6px;padding:6px 9px;border:1px solid var(--line);border-left:4px solid var(--sky);border-radius:9px;background:rgba(250,253,252,.96);font-size:12px;text-align:center}
+table{width:100%;border-collapse:separate;border-spacing:0;table-layout:auto;background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:10px;overflow:clip}
+thead{position:sticky;top:76px;z-index:60}
+th{position:sticky;top:76px;z-index:61;background:var(--head);font-size:10px;font-weight:800;text-align:center;vertical-align:top;padding:5px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{font-size:10px;padding:4px 6px;border-bottom:1px solid var(--line);vertical-align:top;text-align:center;white-space:nowrap}
+td.via-left,td:has(code){text-align:left;white-space:normal;word-break:break-word;overflow-wrap:anywhere}
+tr:hover td{background:var(--hover)}
+code{font-family:Consolas,"Cascadia Mono",monospace;font-size:9.5px;white-space:normal;word-break:break-word}
+</style>
+</head>
+<body>
+<header>
+<h1>def VRN Broker Backfill Gate · v029.1C.4.1</h1>
+<div class="sub">Page-1 letterhead scan · text-safe broker list · no extraction rerun · provenance tracked · append-only</div>
+</header>
+<div class="wrap">
+<div class="kpis">
+<div class="card"><div class="k">Status</div><div class="v">VRN_1C41_BROKER_BACKFILL_READY_WITH_REVIEW</div></div>
+<div class="card"><div class="k">Risk</div><div class="v">MEDIUM</div></div>
+<div class="card"><div class="k">OK</div><div class="v ok">13</div></div>
+<div class="card"><div class="k">WARN</div><div class="v warn">2</div></div>
+<div class="card"><div class="k">FAIL</div><div class="v fail">0</div></div>
+<div class="card"><div class="k">Reports</div><div class="v">400</div></div>
+<div class="card"><div class="k">Before Missing</div><div class="v warn">33</div></div>
+<div class="card"><div class="k">Backfilled</div><div class="v ok">0</div></div>
+<div class="card"><div class="k">After Missing</div><div class="v">33</div></div>
+</div>
+
+<section><h2>def Broker Backfill Matrix</h2>
+<table>
+<thead><tr><th>Round</th><th>Layer</th><th>Name</th><th>Status</th><th>Risk</th><th>Class</th><th>Priority</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr></thead>
+<tbody><tr><td>Round0</td><td>POLICY</td><td>No Extraction Rerun</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>rerun_extraction</td><td>false</td><td>Read landed ReportText parquet only; no OCR re-run.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_BROKER_BACKFILL_GATE_v029VRN1C41_20260615_131852</code></td></tr>
+<tr><td>Round0</td><td>POLICY</td><td>Page-1 Only</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>scan_zone</td><td>page1</td><td>Scan letterhead zone only; ignore rival broker mentions in body.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_BROKER_BACKFILL_GATE_v029VRN1C41_20260615_131852</code></td></tr>
+<tr><td>Round0</td><td>POLICY</td><td>Text-Safe List</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>abbrev</td><td>excluded</td><td>Bare 2-letter abbreviations (MS/GS) excluded to stop false positives.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_BROKER_BACKFILL_GATE_v029VRN1C41_20260615_131852</code></td></tr>
+<tr><td>Round0</td><td>POLICY</td><td>Preserve No Guess</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>no_match</td><td>stay_blank</td><td>Rows with no safe match stay blank and remain in review.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_BROKER_BACKFILL_GATE_v029VRN1C41_20260615_131852</code></td></tr>
+<tr><td>Round0</td><td>POLICY</td><td>Append-Only</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>overwrite</td><td>false</td><td>Write NEW 1C.4 parquet; 1C.3 untouched.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_BROKER_BACKFILL_GATE_v029VRN1C41_20260615_131852</code></td></tr>
+<tr><td>Round1</td><td>INPUT</td><td>1C.3 Parquet Stage</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>inputs</td><td>2</td><td>BasicInfo + ReportText parquet located.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541\stage_parquet\VRN_ReportBasicInfo_StageFixed_v029VRN1C3.parquet</code></td></tr>
+<tr><td>Round1</td><td>ENGINE</td><td>pyarrow</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>pyarrow</td><td>available</td><td>pyarrow available.</td><td><code>C:\Python313\python.exe</code></td></tr>
+<tr><td>Round1</td><td>ENGINE</td><td>Broker Backfill Engine</td><td><b>OK_CREATED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>script</td><td>created</td><td>Backfill engine (page-1, text-safe) created.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_BROKER_BACKFILL_GATE_v029VRN1C41_20260615_131852\work\vrn_broker_backfill_v1c4.py</code></td></tr>
+<tr><td>Round2</td><td>BACKFILL</td><td>Python Broker Backfill</td><td><b>OK_DONE</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>exit</td><td>0</td><td>Broker backfill completed.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_BROKER_BACKFILL_GATE_v029VRN1C41_20260615_131852\runtime\VRN_BrokerBackfill_PythonRuntime_v029VRN1C41.json</code></td></tr>
+<tr><td>Round2</td><td>DIAGNOSE</td><td>ReportText Schema Resolve</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>key/page/text</td><td>report_id / page / text</td><td>Auto-detected ReportText columns (no hard-coded guess).</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541\stage_parquet\VRN_ReportText_StageFixed_v029VRN1C3.parquet</code></td></tr>
+<tr><td>Round2</td><td>DIAGNOSE</td><td>Join Coverage (blank-broker)</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>with/without_text</td><td>3 / 30</td><td>Of the blank-broker reports, how many have any ReportText rows.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_BROKER_BACKFILL_GATE_v029VRN1C41_20260615_131852\stage_parquet\VRN_ReportBasicInfo_StageFixed_v029VRN1C41.parquet</code></td></tr>
+<tr><td>Round2</td><td>VERIFY</td><td>Backfill Result</td><td><b>OK_FILLED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>before/filled/after</td><td>33/0/33</td><td>Broker backfilled from page-1 letterhead.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_BROKER_BACKFILL_GATE_v029VRN1C41_20260615_131852\stage_parquet\VRN_ReportBasicInfo_StageFixed_v029VRN1C41.parquet</code></td></tr>
+<tr><td>Round2</td><td>VERIFY</td><td>BasicInfo Row Count</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>rows</td><td>400</td><td>Row count preserved (append-only, no row drop).</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_BROKER_BACKFILL_GATE_v029VRN1C41_20260615_131852\stage_parquet\VRN_ReportBasicInfo_StageFixed_v029VRN1C41.parquet</code></td></tr>
+<tr><td>Round3</td><td>CLASSIFY</td><td>Broker Completeness</td><td><b>WARN_REVIEW_REQUIRED</b></td><td>MEDIUM</td><td>SEQUENTIAL_REQUIRED</td><td>P1</td><td>missing</td><td>33</td><td>Remaining blanks have no safe page-1 match; stay in review (no guessing).</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_BROKER_BACKFILL_GATE_v029VRN1C41_20260615_131852\stage_parquet\VRN_ReportBasicInfo_StageFixed_v029VRN1C41.parquet</code></td></tr>
+<tr><td>Round3</td><td>FINAL</td><td>VRN 1C.4 Broker Backfill</td><td><b>VRN_1C41_BROKER_BACKFILL_READY_WITH_REVIEW</b></td><td>MEDIUM</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>hard_blocks</td><td>0</td><td>Final broker backfill decision.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_BROKER_BACKFILL_GATE_v029VRN1C41_20260615_131852</code></td></tr></tbody>
+</table>
+</section>
+</div>
+<script>
+(function(){
+ const left=/(path|message|reason|action|issue|overflow|matched|路徑|訊息|原因|動作|問題)/i;
+ const path=/([A-Za-z]:\\|\\\\|\/|\.ps1|\.py|\.parquet|\.csv|\.json|\.html|\.txt|\.pdf|\.duckdb)/i;
+ function clean(t){return String(t||"").replace(/,/g,"").replace(/%/g,"").trim();}
+ function isnum(t){const s=clean(t);return !!s && /^[-+]?(\d+|\d*\.\d+)(e[-+]?\d+)?$/i.test(s) && Number.isFinite(Number(s));}
+ function fmt(t){const n=Number(clean(t));return Number.isFinite(n)?n.toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:2}):t;}
+ function heads(table){return Array.from(table.querySelectorAll("thead th")).map(x=>(x.textContent||"").trim());}
+ function process(table){const hs=heads(table);Array.from(table.querySelectorAll("th")).forEach(th=>{th.style.textAlign="center";th.style.verticalAlign="top";});Array.from(table.querySelectorAll("tbody tr")).forEach(row=>{Array.from(row.children).forEach((cell,i)=>{const h=hs[i]||"";const raw=(cell.textContent||"").trim();cell.style.verticalAlign="top";cell.style.textAlign="center";if(isnum(raw)){cell.textContent=fmt(raw);return;}if(left.test(h)||path.test(raw)||raw.length>=36||cell.querySelector("code")){cell.classList.add("via-left");}});});}
+ Array.from(document.querySelectorAll("table")).forEach(process);
+})();
+</script>
+</body>
+</html>

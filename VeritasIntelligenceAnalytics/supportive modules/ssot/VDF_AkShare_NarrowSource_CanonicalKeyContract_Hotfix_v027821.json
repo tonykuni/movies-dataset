@@ -1,0 +1,36 @@
+{
+  "generated_at": "2026-06-11T00:26:19.099450",
+  "status": "VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_BLOCKED",
+  "risk": "HIGH",
+  "source_scope": "v027.4 staging candidate CSV only",
+  "file_list_type": "array_of_objects",
+  "db_write_enabled": false,
+  "canonical_merge_enabled": false,
+  "canonical_family": "VDF_Global_Commodity",
+  "required_fields": [
+    "family",
+    "symbol",
+    "date",
+    "value",
+    "source"
+  ],
+  "primary_key": [
+    "family",
+    "symbol",
+    "date",
+    "source"
+  ],
+  "symbol_rule": "symbol is source-scoped: source::raw_symbol::value_col",
+  "date_rule": "use raw date; then vdf_seeded_at; then dry-run fallback date, still no DB write",
+  "value_rule": "value must be numeric from selected raw column",
+  "metrics": {
+    "source_files": 0,
+    "profile_columns": 0,
+    "selection_files": 0,
+    "preview_rows": 0,
+    "valid_rows": 0,
+    "invalid_after": 0,
+    "duplicate_after": 0
+  },
+  "next_step": "v027.8.3 dedup gate only; no DB write"
+}

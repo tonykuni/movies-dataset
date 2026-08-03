@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VDF AkShare Dedup + Invalid Quarantine Gate v027.8.3</title>
+<style>
+body{margin:0;background:#f7f4ed;color:#25312f;font-family:Arial,"Microsoft JhengHei",sans-serif}
+.wrap{max-width:1500px;margin:0 auto;padding:28px}
+.hero{border:1px solid #d8d0c3;border-radius:24px;background:#fffdf8;padding:26px;box-shadow:0 18px 50px rgba(30,40,36,.08)}
+h1{margin:0;font-size:28px}h2{margin-top:28px;font-size:20px}.sub{color:#6e7b78;margin-top:8px;line-height:1.7}
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(130px,1fr));gap:12px;margin-top:20px}
+.kpi{border:1px solid #d8d0c3;border-radius:18px;padding:14px;background:#fff}.kpi b{font-size:22px;display:block}.kpi span{font-size:12px;color:#6e7b78}
+.badge{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid #d8d0c3;background:#fff;margin-right:8px}
+.ok td{background:#f3fbf5}.warn td{background:#fff8e9}.bad td{background:#fff1f1}
+.mw{overflow:auto;border:1px solid #d8d0c3;border-radius:18px;background:#fff}
+table{border-collapse:collapse;width:100%;font-size:12px}
+th{position:sticky;top:0;background:#e8eee9;color:#20332f;z-index:1}
+th,td{border-bottom:1px solid #e8e1d6;padding:9px 10px;text-align:left;vertical-align:top;white-space:nowrap}
+td:nth-child(12),td:nth-child(13){white-space:normal;min-width:320px}
+pre{white-space:pre-wrap;background:#17211f;color:#e9fff8;padding:16px;border-radius:16px;overflow:auto}
+@media(max-width:900px){.kpis{grid-template-columns:1fr}.wrap{padding:14px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hero">
+<h1>VeritasDataForge · AkShare Dedup + Invalid Quarantine Gate v027.8.3</h1>
+<div class="sub">VERITAS INTELLIGENCE ANALYTICS<br>Dedup gate · invalid quarantine · no DATABASE write · no canonical merge</div>
+<p><span class="badge">Status: VDF_AKSHARE_DEDUP_GATE_READY_WITH_INVALID_QUARANTINE</span><span class="badge">Risk: MEDIUM</span><span class="badge">Recommendation: ALLOW_V02784_INVALID_MAPPING_REPAIR_GATE_NO_DB_WRITE</span></p>
+<div class="kpis">
+<div class="kpi"><b>11</b><span>OK</span></div>
+<div class="kpi"><b>2</b><span>WARN / REVIEW</span></div>
+<div class="kpi"><b>0</b><span>FAIL / BLOCK</span></div>
+<div class="kpi"><b>120</b><span>Valid rows</span></div>
+<div class="kpi"><b>30</b><span>Invalid quarantine</span></div>
+<div class="kpi"><b>0</b><span>Duplicate after</span></div>
+</div>
+</div>
+
+<h2>def Matrix</h2>
+<div class="mw">
+<table>
+<thead><tr><th>Round</th><th>Stage</th><th>Layer</th><th>Name</th><th>Status</th><th>Risk</th><th>FixClass</th><th>Priority</th><th>Mode</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr></thead>
+<tbody><tr class='ok'><td>Round0</td><td>BOOT</td><td>PROJECT_ROOT</td><td>VeritasIntelligenceAnalytics</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>DEDUP_QUARANTINE_ONLY</td><td>exists</td><td>true</td><td>Project root exists.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics</td></tr>
+<tr class='ok'><td>Round0</td><td>POLICY</td><td>NO_DB_WRITE</td><td>DATABASE</td><td>OK_POLICY_LOCKED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>DEDUP_QUARANTINE_ONLY</td><td>db_write_enabled</td><td>false</td><td>No DATABASE write.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF</td></tr>
+<tr class='ok'><td>Round0</td><td>POLICY</td><td>NO_CANONICAL_MERGE</td><td>Canonical Merge</td><td>OK_POLICY_LOCKED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>DEDUP_QUARANTINE_ONLY</td><td>canonical_merge_enabled</td><td>false</td><td>No canonical merge.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926</td></tr>
+<tr class='ok'><td>Round1</td><td>DISCOVERY</td><td>SOURCE_PREVIEW</td><td>v027.8.2.2 Preview CSV</td><td>OK_SOURCE_LOCKED</td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>DEDUP_QUARANTINE_ONLY</td><td>source_scope</td><td>v027.8.2.2_preview</td><td>Locked source to latest v027.8.2.2 preview CSV.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_FILELIST_CANONICALIZER_v027822_20260611_004445\preview\VDF_AkShare_NarrowSource_ContractDryRunPreview_Canonicalizer_v027822.csv</td></tr>
+<tr class='ok'><td>Round2</td><td>DEDUP_QUARANTINE</td><td>PYTHON_ENGINE</td><td>Execution</td><td>OK_EXECUTED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>DEDUP_QUARANTINE_ONLY</td><td>stdout</td><td>ok</td><td>{&quot;generated_at&quot;: &quot;2026-06-11T01:29:26.969712&quot;, &quot;status&quot;: &quot;VDF_AKSHARE_DEDUP_GATE_READY_WITH_INVALID_QUARANTINE&quot;, &quot;risk&quot;: &quot;MEDIUM&quot;, &quot;recommendation&quot;: &quot;ALLOW_V02784_INVALID_MAPPING_REPAIR_GATE_NO_DB_WRITE&quot;, &quot;metrics&quot;: {&quot;input_rows&quot;: 150, &quot;valid_rows&quot;: 120, &quot;invalid_quarantine_rows&quot;: 30, &quot;duplicate_rows&quot;: 0, &quot;deduped_valid_rows&quot;: 120, &quot;invalid_after&quot;: 30, &quot;duplicate_after&quot;: 0}, &quot;artifacts&quot;: {&quot;valid_csv&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\\preview\\VDF_AkShare_DedupGate_ValidRows_v02783.csv&quot;, &quot;invalid_quarantine_csv&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\\preview\\VDF_AkShare_DedupGate_InvalidQuarantineRows_v02783.csv&quot;, &quot;duplicate_csv&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\\preview\\VDF_AkShare_DedupGate_DuplicateRows_v02783.csv&quot;, &quot;deduped_valid_csv&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\\preview\\VDF_AkShare_DedupGate_DedupedValidRows_v02783.csv&quot;, &quot;deduped_valid_json&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\\preview\\VDF_AkShare_DedupGate_DedupedValidRows_v02783.json&quot;, &quot;rootcause_csv&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\\registry\\VDF_AkShare_DedupGate_InvalidRootCause_v02783.csv&quot;, &quot;dedup_audit_json&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\\registry\\VDF_AkShare_DedupGate_Audit_v02783.json&quot;, &quot;quarantine_plan_json&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\\plan\\VDF_AkShare_InvalidQuarantineRepairPlan_v02783.json&quot;, &quot;execution_gate_json&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\\plan\\VDF_AkShare_PostDedupExecutionGateReview_v02783.json&quot;}, &quot;next_step&quot;: &quot;v027.8.4 invalid mapping repair gate only; no DB write&quot;}
+</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\runtime\vdf_akshare_dedup_invalid_quarantine_gate_v02783.py</td></tr>
+<tr class='ok'><td>Round2</td><td>DEDUP_QUARANTINE</td><td>VALID_ROWS</td><td>Valid Rows</td><td>OK_VALID_PARTITIONED</td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>DEDUP_QUARANTINE_ONLY</td><td>valid_rows</td><td>120</td><td>Valid rows partitioned.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\preview\VDF_AkShare_DedupGate_ValidRows_v02783.csv</td></tr>
+<tr class='warn'><td>Round2</td><td>DEDUP_QUARANTINE</td><td>INVALID_ROWS</td><td>Invalid Quarantine</td><td>WARN_INVALID_QUARANTINED</td><td>MEDIUM</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>DEDUP_QUARANTINE_ONLY</td><td>invalid_after</td><td>30</td><td>Invalid rows quarantined; execution gate remains closed.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\preview\VDF_AkShare_DedupGate_InvalidQuarantineRows_v02783.csv</td></tr>
+<tr class='ok'><td>Round2</td><td>DEDUP_QUARANTINE</td><td>DUPLICATE_ROWS</td><td>Duplicate Rows</td><td>OK_ZERO_DUPLICATE</td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>DEDUP_QUARANTINE_ONLY</td><td>duplicate_after</td><td>0</td><td>No duplicate rows.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\preview\VDF_AkShare_DedupGate_DedupedValidRows_v02783.csv</td></tr>
+<tr class='ok'><td>Round3</td><td>CONSOLIDATE</td><td>DEDUP_AUDIT</td><td>Dedup Audit</td><td>OK_AUDIT_CREATED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>DEDUP_QUARANTINE_ONLY</td><td>audit</td><td>created</td><td>Dedup audit generated.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\registry\VDF_AkShare_DedupGate_Audit_v02783.json</td></tr>
+<tr class='ok'><td>Round3</td><td>CONSOLIDATE</td><td>EXECUTION_GATE</td><td>Execution Gate Review</td><td>OK_GATE_CREATED</td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P1</td><td>DEDUP_QUARANTINE_ONLY</td><td>gate</td><td>closed_or_review</td><td>Execution gate review generated; no DB write.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\plan\VDF_AkShare_PostDedupExecutionGateReview_v02783.json</td></tr>
+<tr class='ok'><td>Round3</td><td>CONSOLIDATE</td><td>LOCAL_FREE_LIBS</td><td>Top10 Local Free Libs</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>DEDUP_QUARANTINE_ONLY</td><td>rows</td><td>5</td><td>Top10 local free libs matrix generated.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\registry\VDF_Top10_LocalFreeLibs_DedupInvalidQuarantineGate_v02783.json</td></tr>
+<tr class='warn'><td>Round3</td><td>RESULT</td><td>READINESS</td><td>VDF_AKSHARE_DEDUP_GATE_READY_WITH_INVALID_QUARANTINE</td><td>WARN_REVIEW_READY</td><td>MEDIUM</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>DEDUP_QUARANTINE_ONLY</td><td>recommendation</td><td>ALLOW_V02784_INVALID_MAPPING_REPAIR_GATE_NO_DB_WRITE</td><td>v027.8.3 completed. No DB write. No canonical merge.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\runtime\vdf_akshare_dedup_invalid_quarantine_gate_result_v02783.json</td></tr>
+<tr class='ok'><td>Round3</td><td>POINTER</td><td>ACTIVE_POINTER</td><td>VDF_ACTIVE_POINTER.json</td><td>OK_UPDATED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>DEDUP_QUARANTINE_ONLY</td><td>update</td><td>complete</td><td>Active pointer updated with v027.8.3.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ACTIVE_POINTER.json</td></tr></tbody>
+</table>
+</div>
+
+<h2>def Output Paths</h2>
+<pre>
+RunRoot              : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926
+HTML                 : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\report\VDF_AkShare_DedupInvalidQuarantineGate_Report_v02783.html
+CSV Matrix           : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\registry\VDF_AkShare_DedupInvalidQuarantineGate_Matrix_v02783.csv
+JSON Matrix          : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\registry\VDF_AkShare_DedupInvalidQuarantineGate_Matrix_v02783.json
+Valid CSV            : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\preview\VDF_AkShare_DedupGate_ValidRows_v02783.csv
+Invalid Quarantine   : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\preview\VDF_AkShare_DedupGate_InvalidQuarantineRows_v02783.csv
+Duplicate CSV        : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\preview\VDF_AkShare_DedupGate_DuplicateRows_v02783.csv
+Deduped Valid CSV    : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\preview\VDF_AkShare_DedupGate_DedupedValidRows_v02783.csv
+Dedup Audit JSON     : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\registry\VDF_AkShare_DedupGate_Audit_v02783.json
+Quarantine Plan JSON : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\plan\VDF_AkShare_InvalidQuarantineRepairPlan_v02783.json
+Execution Gate JSON  : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\plan\VDF_AkShare_PostDedupExecutionGateReview_v02783.json
+Top10 Libs           : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\registry\VDF_Top10_LocalFreeLibs_DedupInvalidQuarantineGate_v02783.json
+Runtime Result       : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\runtime\vdf_akshare_dedup_invalid_quarantine_gate_result_v02783.json
+Active Pointer       : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ACTIVE_POINTER.json
+Transcript           : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_DEDUP_INVALID_QUARANTINE_GATE_v02783_20260611_012926\runtime\VDF_AkShare_DedupInvalidQuarantineGate_Transcript_v02783_20260611_012926.txt
+</pre>
+
+<h2>def Next Gate</h2>
+<pre>
+v027.8.4 invalid mapping repair gate only; no DB write
+
+Current:
+input_rows = 150
+valid_rows = 120
+invalid_after = 30
+duplicate_after = 0
+
+DB write = false
+Canonical merge = false
+</pre>
+</div>
+</body>
+</html>

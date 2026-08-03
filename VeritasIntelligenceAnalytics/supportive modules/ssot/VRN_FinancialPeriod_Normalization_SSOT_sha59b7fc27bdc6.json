@@ -1,0 +1,36 @@
+{
+  "generated_at": "2026-06-09 03:22:00",
+  "policy": "remove_prefix_suffix_from_period_tokens",
+  "rules": [
+    "trim leading wrappers",
+    "trim trailing wrappers",
+    "remove labels Period/期間/年度/季度/quarter/year/FY prefix when it is only a label",
+    "preserve core period token such as 1Q26E, 2025E, 2025F"
+  ],
+  "samples": [
+    {
+      "raw": "FY2025E",
+      "normalized": "2025E"
+    },
+    {
+      "raw": "2025F.",
+      "normalized": "2025F."
+    },
+    {
+      "raw": "(1Q26E)",
+      "normalized": "(1Q26E)"
+    },
+    {
+      "raw": "Period: 2026/03/31",
+      "normalized": "2026/03/31"
+    },
+    {
+      "raw": "季度：2Q25",
+      "normalized": "2Q25"
+    },
+    {
+      "raw": "年度 FY2024A",
+      "normalized": "2024A"
+    }
+  ]
+}

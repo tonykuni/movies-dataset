@@ -1,0 +1,2138 @@
+{
+  "meta": {
+    "ssot_id": "SSOT_20260617",
+    "name": "VIA VisualDesignOps / VDF / VRN Unified SSOT",
+    "schema_version": "1.0.0",
+    "content_version": "0.1.0",
+    "generated": "2026-06-17T00:00:00+08:00",
+    "mother_system": "VERITAS INTELLIGENCE ANALYTICS",
+    "supportive_subsystem": "VeritasNexusCore",
+    "rounds": 3,
+    "policy": {
+      "source_patch": "DISABLED_BY_DEFAULT",
+      "db_write": "DISABLED_IN_DRY_RUN",
+      "destructive_delete": "FORBIDDEN",
+      "freeze_zone": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules",
+      "first_layer_interface": "Invoke-VeritasNexusCore.ps1",
+      "maintenance_rule": "All edits write to the SSOT registry, never to source code.",
+      "keep_powershell_open": true,
+      "sha256_required": true
+    },
+    "integrity": {
+      "sha256_of_body": "4cd358dd6aec5185eb748695397a09a9aa80dd8fdfd8352375e4df2031c4d7fd",
+      "algo": "SHA256",
+      "canonical": "py_json_sorted_compact",
+      "note": "Hash of body (all keys except meta), json.dumps sort_keys, compact, utf-8. PowerShell Bump rewrites this with canonical=ps_file_raw_masked for PS round-trip verification."
+    }
+  },
+  "authority_tiers": [
+    {
+      "tier": "Operator",
+      "rank": 1,
+      "can_edit": [
+        "RUN_MODE",
+        "switches",
+        "operator_params"
+      ],
+      "note": "Day-to-day run controls."
+    },
+    {
+      "tier": "Maintainer",
+      "rank": 2,
+      "can_edit": [
+        "paths",
+        "formats",
+        "dates",
+        "workers"
+      ],
+      "note": "Infrastructure + format + path controls."
+    },
+    {
+      "tier": "Architect",
+      "rank": 3,
+      "can_edit": [
+        "protected_toggles",
+        "rounds"
+      ],
+      "note": "High-risk toggles, dual-confirmation required."
+    }
+  ],
+  "input_parameters": {
+    "paths": [
+      {
+        "key": "BASE_ROOT",
+        "default": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics",
+        "ui": "folder_picker",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "Single system root.",
+        "locked": false,
+        "value": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics"
+      },
+      {
+        "key": "SUPPORTIVE_MODULES_DIR",
+        "default": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules",
+        "ui": "folder_picker",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "NexusCore / PolyglotCheck / README.",
+        "locked": false,
+        "value": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules"
+      },
+      {
+        "key": "OUTPUT_ROOT",
+        "default": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_system_runs",
+        "ui": "folder_picker",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "All run output.",
+        "locked": false,
+        "value": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_system_runs"
+      },
+      {
+        "key": "VDF_ROOT",
+        "default": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\module\\VDF",
+        "ui": "folder_picker",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "VDF Python managers.",
+        "locked": false,
+        "value": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\module\\VDF"
+      },
+      {
+        "key": "VRN_ROOT",
+        "default": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\module\\VRN",
+        "ui": "folder_picker",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "VRN PDF pipeline.",
+        "locked": false,
+        "value": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\module\\VRN"
+      },
+      {
+        "key": "VETF_ROOT",
+        "default": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\module\\VETF",
+        "ui": "folder_picker",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "Active ETF subsystem.",
+        "locked": false,
+        "value": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\module\\VETF"
+      },
+      {
+        "key": "LOG_ROOT",
+        "default": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_system_runs\\logs",
+        "ui": "folder_picker",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "All logs.",
+        "locked": false,
+        "value": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_system_runs\\logs"
+      },
+      {
+        "key": "REPORT_ROOT",
+        "default": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_system_runs\\reports",
+        "ui": "folder_picker",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "HTML/CSV/JSON reports.",
+        "locked": false,
+        "value": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_system_runs\\reports"
+      },
+      {
+        "key": "CACHE_ROOT",
+        "default": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_system_runs\\cache",
+        "ui": "folder_picker",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "API/raw fetch cache.",
+        "locked": false,
+        "value": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_system_runs\\cache"
+      },
+      {
+        "key": "QUARANTINE_ROOT",
+        "default": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_system_runs\\quarantine",
+        "ui": "folder_picker",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "High-risk data isolation.",
+        "locked": false,
+        "value": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_system_runs\\quarantine"
+      }
+    ],
+    "run_mode": [
+      {
+        "key": "RUN_MODE",
+        "default": "dry_run",
+        "ui": "dropdown",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "dry_run / preview_fix / execute / user_test",
+        "locked": false,
+        "value": "dry_run",
+        "options": [
+          "dry_run",
+          "preview_fix",
+          "execute",
+          "user_test"
+        ]
+      },
+      {
+        "key": "ROUNDS",
+        "default": 3,
+        "ui": "badge",
+        "adjustable": false,
+        "authority": "Architect",
+        "note": "Panorama analysis max three rounds.",
+        "locked": false,
+        "value": 3
+      },
+      {
+        "key": "OPEN_HTML_REPORT",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "Auto-open HTML report each round.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "AUTO_DEPLOY_MISSING_LIBS",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "PowerShell fills missing deps.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "ALLOW_SOURCE_PATCH",
+        "default": false,
+        "ui": "protected_toggle",
+        "adjustable": true,
+        "authority": "Architect",
+        "note": "Write back to source. Dual confirm.",
+        "locked": false,
+        "value": false,
+        "protected": true
+      },
+      {
+        "key": "ALLOW_DB_WRITE",
+        "default": false,
+        "ui": "protected_toggle",
+        "adjustable": true,
+        "authority": "Architect",
+        "note": "Write to production DB. Dual confirm.",
+        "locked": false,
+        "value": false,
+        "protected": true
+      },
+      {
+        "key": "ALLOW_NETWORK_FETCH",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "Allow external fetch.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "ALLOW_PARALLEL_RUN",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "Run low-coupling flows in parallel.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "MAX_WORKERS",
+        "default": 8,
+        "ui": "number",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "Parallel worker count.",
+        "locked": false,
+        "value": 8
+      },
+      {
+        "key": "FAIL_FAST",
+        "default": false,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "Stop on first error.",
+        "locked": false,
+        "value": false
+      },
+      {
+        "key": "KEEP_POWERSHELL_OPEN",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "Do not close window after run.",
+        "locked": false,
+        "value": true
+      }
+    ],
+    "vdf_params": [
+      {
+        "key": "VDF_FETCH_TW_STOCK_DAILY",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "TW per-stock daily price/volume.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "VDF_FETCH_TW_INDEX_DAILY",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "TAIEX / OTC / sector indices.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "VDF_FETCH_TW_CHIPS",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "Institutional flow / margin.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "VDF_FETCH_MARKET_CAP",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "Market cap / shares / rank.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "VDF_FETCH_MACRO_US",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "US macro.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "VDF_FETCH_MACRO_GLOBAL",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "EU/CN/JP/ASEAN/AU.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "VDF_FETCH_ETF",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "ETF / Active ETF.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "VDF_START_DATE",
+        "default": "2005-01-01",
+        "ui": "date",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "Default history start.",
+        "locked": false,
+        "value": "2005-01-01"
+      },
+      {
+        "key": "VDF_END_DATE",
+        "default": "today",
+        "ui": "date",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "Default latest.",
+        "locked": false,
+        "value": "today"
+      },
+      {
+        "key": "VDF_PRICE_ADJUST_POLICY",
+        "default": "adj_close_primary",
+        "ui": "dropdown",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "Adj Close = return core.",
+        "locked": false,
+        "value": "adj_close_primary",
+        "options": [
+          "adj_close_primary",
+          "close_primary"
+        ]
+      },
+      {
+        "key": "VDF_OUTPUT_FORMATS",
+        "default": "parquet,duckdb,csv,json,html",
+        "ui": "checkbox",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "Multi-format output.",
+        "locked": false,
+        "value": "parquet,duckdb,csv,json,html"
+      }
+    ],
+    "vrn_params": [
+      {
+        "key": "VRN_INPUT_PDF_ROOT",
+        "default": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\input\\reports",
+        "ui": "folder_picker",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "Broker PDF source.",
+        "locked": false,
+        "value": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\input\\reports"
+      },
+      {
+        "key": "VRN_PARSE_FILENAME",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "Filename ticker/date/broker.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "VRN_PARSE_FIRST_PAGE",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "First-page BasicInfo.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "VRN_PARSE_TABLES",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "Table extraction.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "VRN_PARSE_FINANCIAL_DATA",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "Financial statement extraction.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "VRN_ENABLE_OCR",
+        "default": "auto",
+        "ui": "dropdown",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "off / auto / force",
+        "locked": false,
+        "value": "auto",
+        "options": [
+          "off",
+          "auto",
+          "force"
+        ]
+      },
+      {
+        "key": "VRN_ENABLE_QUARANTINE",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "Isolate noisy/suspect data.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "VRN_ALLOW_BROKER_VIEW_OVERWRITE",
+        "default": false,
+        "ui": "readonly",
+        "adjustable": false,
+        "authority": "Architect",
+        "note": "Rating/TP never overwritten.",
+        "locked": false,
+        "value": false,
+        "protected": true
+      },
+      {
+        "key": "VRN_OUTPUT_FORMATS",
+        "default": "parquet,csv,json,html",
+        "ui": "checkbox",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "Multi-format output.",
+        "locked": false,
+        "value": "parquet,csv,json,html"
+      },
+      {
+        "key": "VRN_REVIEW_THRESHOLD",
+        "default": "YELLOW",
+        "ui": "dropdown",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "YELLOW+ enters review.",
+        "locked": false,
+        "value": "YELLOW",
+        "options": [
+          "GREEN",
+          "YELLOW",
+          "RED"
+        ]
+      }
+    ]
+  },
+  "ticker_rules": {
+    "tw_ticker": {
+      "regex": "^[1-9][0-9]{3}$",
+      "definition": "Four digits, first digit not 0.",
+      "exclude_years": "2021-2030 in date context are not tickers (needs token context).",
+      "filename_priority": "Standalone four-digit token in filename wins, still excluding date fragments.",
+      "yfinance_map": {
+        "TWSE": "XXXX.TW",
+        "TPEX": "XXXX.TWO",
+        "unknown": "auto-test both"
+      },
+      "bloomberg_map": "XXXX TT (first four = TW_TICKER)",
+      "conflict_policy": "filename / PDF / VDF universe mismatch -> YELLOW_REVIEW",
+      "forbidden": "Never mutate TW_TICKER because yfinance missed it; only fallback / review."
+    },
+    "filename_tokens": [
+      {
+        "type": "date8",
+        "rule": "YYYYMMDD",
+        "priority": 1,
+        "note": "e.g. 20250822 is a date, not a ticker."
+      },
+      {
+        "type": "roc_date",
+        "rule": "ROC year/month/day",
+        "priority": 2,
+        "note": "Convert to Gregorian."
+      },
+      {
+        "type": "ticker4",
+        "rule": "^[1-9][0-9]{3}$",
+        "priority": 3,
+        "note": "2021-2030 needs context check."
+      },
+      {
+        "type": "broker",
+        "rule": "broker alias dictionary",
+        "priority": 4,
+        "note": "Citi / GS / Daiwa / local brokers."
+      },
+      {
+        "type": "company",
+        "rule": "ZH/EN name fragment",
+        "priority": 5,
+        "note": "Fuzzy match to VDF universe."
+      },
+      {
+        "type": "noise",
+        "rule": "init/buy/report/pdf",
+        "priority": 99,
+        "note": "Never enters primary columns."
+      }
+    ]
+  },
+  "vdf_contracts": {
+    "tw_stock_daily": [
+      {
+        "category": "Universe",
+        "item": "Ticker",
+        "scope": "All listed/OTC",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "local registry",
+        "frequency": "D/W",
+        "table": "vdf_tw_universe",
+        "validation": "4-digit ticker + market"
+      },
+      {
+        "category": "Universe",
+        "item": "Company name",
+        "scope": "All listed/OTC",
+        "p1_source": "TWSE/TPEX/MOPS",
+        "fallback": "local alias",
+        "frequency": "D/W",
+        "table": "vdf_tw_universe",
+        "validation": "ticker-name consistent"
+      },
+      {
+        "category": "Universe",
+        "item": "Market",
+        "scope": "TWSE/TPEX",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "auto-detect",
+        "frequency": "D",
+        "table": "vdf_tw_universe",
+        "validation": ".TW/.TWO test"
+      },
+      {
+        "category": "Price",
+        "item": "Open",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "yfinance",
+        "frequency": "D",
+        "table": "vdf_tw_price_daily",
+        "validation": "OHLC legality"
+      },
+      {
+        "category": "Price",
+        "item": "High",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "yfinance",
+        "frequency": "D",
+        "table": "vdf_tw_price_daily",
+        "validation": "High >= Low"
+      },
+      {
+        "category": "Price",
+        "item": "Low",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "yfinance",
+        "frequency": "D",
+        "table": "vdf_tw_price_daily",
+        "validation": "Low <= Close"
+      },
+      {
+        "category": "Price",
+        "item": "Close",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "yfinance",
+        "frequency": "D",
+        "table": "vdf_tw_price_daily",
+        "validation": "close non-negative"
+      },
+      {
+        "category": "Price",
+        "item": "Adj Close",
+        "scope": "All",
+        "p1_source": "yfinance/self-adjust",
+        "fallback": "TWSE+dividend",
+        "frequency": "D",
+        "table": "vdf_tw_price_adjusted",
+        "validation": "return recompute"
+      },
+      {
+        "category": "Volume",
+        "item": "Volume",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "yfinance",
+        "frequency": "D",
+        "table": "vdf_tw_volume_daily",
+        "validation": "non-negative"
+      },
+      {
+        "category": "Turnover",
+        "item": "Turnover value",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "Close x Volume",
+        "frequency": "D",
+        "table": "vdf_tw_turnover_daily",
+        "validation": "unit check"
+      },
+      {
+        "category": "MarketCap",
+        "item": "Market cap",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX/shares x close",
+        "fallback": "yfinance",
+        "frequency": "D/M",
+        "table": "vdf_tw_market_cap",
+        "validation": "rank sanity"
+      },
+      {
+        "category": "Shares",
+        "item": "Float/capital",
+        "scope": "All",
+        "p1_source": "MOPS/TWSE",
+        "fallback": "financials",
+        "frequency": "M/Q",
+        "table": "vdf_tw_shares",
+        "validation": "market cap bridge"
+      },
+      {
+        "category": "Returns",
+        "item": "1D/5D/20D/60D/120D/240D",
+        "scope": "All",
+        "p1_source": "Adj Close derived",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_return_matrix",
+        "validation": "Adj Close recompute"
+      },
+      {
+        "category": "Liquidity",
+        "item": "Turnover ratio",
+        "scope": "All",
+        "p1_source": "value/cap",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_liquidity",
+        "validation": "extreme review"
+      },
+      {
+        "category": "Limit",
+        "item": "Up/down limit",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "derived",
+        "frequency": "D",
+        "table": "vdf_tw_price_limit",
+        "validation": "return band check"
+      }
+    ],
+    "tw_chips": [
+      {
+        "category": "Institutional",
+        "item": "Foreign net shares",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_institutional_flow",
+        "validation": "sign/unit"
+      },
+      {
+        "category": "Institutional",
+        "item": "Trust net shares",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_institutional_flow",
+        "validation": "vs volume anomaly"
+      },
+      {
+        "category": "Institutional",
+        "item": "Dealer net shares",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_institutional_flow",
+        "validation": "unit consistent"
+      },
+      {
+        "category": "Institutional",
+        "item": "Foreign net value",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "close x shares",
+        "frequency": "D",
+        "table": "vdf_tw_institutional_value",
+        "validation": "value estimate match"
+      },
+      {
+        "category": "Margin",
+        "item": "Margin balance",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_margin_short",
+        "validation": "non-negative"
+      },
+      {
+        "category": "Margin",
+        "item": "Short balance",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_margin_short",
+        "validation": "non-negative"
+      },
+      {
+        "category": "Margin",
+        "item": "Margin delta",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "balance diff",
+        "frequency": "D",
+        "table": "vdf_tw_margin_short",
+        "validation": "delta bridge"
+      },
+      {
+        "category": "Lending",
+        "item": "SBL sell/balance",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_lending",
+        "validation": "unit/date"
+      },
+      {
+        "category": "Short",
+        "item": "Short ratio",
+        "scope": "All",
+        "p1_source": "short/SBL derived",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_short_pressure",
+        "validation": "ratio sanity"
+      }
+    ],
+    "tw_index": [
+      {
+        "category": "Index",
+        "item": "TAIEX OHLC",
+        "scope": "TAIEX",
+        "p1_source": "TWSE",
+        "fallback": "yfinance",
+        "frequency": "D",
+        "table": "vdf_tw_index_daily",
+        "validation": "TWSE vs yfinance"
+      },
+      {
+        "category": "Index",
+        "item": "OTC OHLC",
+        "scope": "OTC",
+        "p1_source": "TPEX",
+        "fallback": "yfinance",
+        "frequency": "D",
+        "table": "vdf_tw_index_daily",
+        "validation": "TPEX vs yfinance"
+      },
+      {
+        "category": "Index",
+        "item": "Index turnover/volume",
+        "scope": "TAIEX/OTC",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_index_turnover",
+        "validation": "market total"
+      },
+      {
+        "category": "Index",
+        "item": "Sector index",
+        "scope": "TWSE/TPEX sectors",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_sector_index",
+        "validation": "sector map"
+      },
+      {
+        "category": "MarketChips",
+        "item": "Market net flow",
+        "scope": "Index/OTC",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_market_chips",
+        "validation": "per-market sum"
+      },
+      {
+        "category": "Breadth",
+        "item": "Adv/Dec/flat counts",
+        "scope": "TWSE/TPEX",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "self-calc",
+        "frequency": "D",
+        "table": "vdf_tw_breadth",
+        "validation": "universe count"
+      },
+      {
+        "category": "Regime",
+        "item": "trend/risk/liquidity",
+        "scope": "Derived",
+        "p1_source": "price+breadth+chips",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_market_regime",
+        "validation": "rule validation"
+      }
+    ],
+    "etf_universe": [
+      {
+        "category": "Universe",
+        "item": "ETF ticker",
+        "scope": "TW ETF/Active",
+        "p1_source": "TWSE",
+        "fallback": "local registry",
+        "frequency": "D",
+        "table": "vdf_etf_universe",
+        "validation": "ticker check"
+      },
+      {
+        "category": "Universe",
+        "item": "ETF name",
+        "scope": "TW ETF",
+        "p1_source": "TWSE/issuer",
+        "fallback": "local registry",
+        "frequency": "D",
+        "table": "vdf_etf_universe",
+        "validation": "name match"
+      },
+      {
+        "category": "Universe",
+        "item": "ETF type",
+        "scope": "passive/active/bond/lev/inv",
+        "p1_source": "TWSE/issuer",
+        "fallback": "manual",
+        "frequency": "D/W",
+        "table": "vdf_etf_universe",
+        "validation": "type enum"
+      },
+      {
+        "category": "Universe",
+        "item": "Listing date",
+        "scope": "ETF",
+        "p1_source": "TWSE",
+        "fallback": "issuer",
+        "frequency": "W",
+        "table": "vdf_etf_universe",
+        "validation": "date"
+      },
+      {
+        "category": "Universe",
+        "item": "Manager/issuer",
+        "scope": "ETF",
+        "p1_source": "issuer/TWSE",
+        "fallback": "local registry",
+        "frequency": "W",
+        "table": "vdf_etf_universe",
+        "validation": "name"
+      },
+      {
+        "category": "Theme",
+        "item": "Theme/sector/strategy",
+        "scope": "ETF",
+        "p1_source": "holdings/issuer",
+        "fallback": "manual",
+        "frequency": "W/M",
+        "table": "vdf_etf_theme_map",
+        "validation": "mapping"
+      }
+    ],
+    "etf_daily": [
+      {
+        "category": "Price",
+        "item": "OHLC",
+        "scope": "Each ETF",
+        "p1_source": "TWSE",
+        "fallback": "yfinance",
+        "frequency": "D",
+        "table": "vdf_etf_price_daily",
+        "validation": "OHLC legal"
+      },
+      {
+        "category": "Price",
+        "item": "Close/Adj Close",
+        "scope": "Each ETF",
+        "p1_source": "TWSE/yfinance",
+        "fallback": "self-calc",
+        "frequency": "D",
+        "table": "vdf_etf_price_daily",
+        "validation": "return recompute"
+      },
+      {
+        "category": "Volume",
+        "item": "Volume",
+        "scope": "Each ETF",
+        "p1_source": "TWSE",
+        "fallback": "yfinance",
+        "frequency": "D",
+        "table": "vdf_etf_volume",
+        "validation": "non-negative"
+      },
+      {
+        "category": "Turnover",
+        "item": "Turnover value",
+        "scope": "Each ETF",
+        "p1_source": "TWSE",
+        "fallback": "close x volume",
+        "frequency": "D",
+        "table": "vdf_etf_turnover",
+        "validation": "unit check"
+      },
+      {
+        "category": "NAV",
+        "item": "NAV per unit",
+        "scope": "Each ETF",
+        "p1_source": "issuer/TWSE",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_etf_nav",
+        "validation": "premium/discount"
+      },
+      {
+        "category": "Units",
+        "item": "Units outstanding",
+        "scope": "Each ETF",
+        "p1_source": "issuer/TWSE",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_etf_units",
+        "validation": "AUM bridge"
+      },
+      {
+        "category": "AUM",
+        "item": "Net assets",
+        "scope": "Each ETF",
+        "p1_source": "issuer/TWSE",
+        "fallback": "NAV x units",
+        "frequency": "D",
+        "table": "vdf_etf_aum",
+        "validation": "AUM ~= NAV x units"
+      },
+      {
+        "category": "Flow",
+        "item": "Inflow/outflow",
+        "scope": "Each ETF",
+        "p1_source": "AUM/units derived",
+        "fallback": "issuer",
+        "frequency": "D",
+        "table": "vdf_etf_flow",
+        "validation": "flow bridge"
+      },
+      {
+        "category": "Premium",
+        "item": "Premium/discount",
+        "scope": "Each ETF",
+        "p1_source": "price/NAV derived",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_etf_premium",
+        "validation": "Close/NAV - 1"
+      },
+      {
+        "category": "Holdings",
+        "item": "Constituents/weight",
+        "scope": "Each ETF",
+        "p1_source": "issuer",
+        "fallback": "none",
+        "frequency": "D/W",
+        "table": "vdf_etf_holdings",
+        "validation": "weights ~= 100%"
+      },
+      {
+        "category": "Cash",
+        "item": "Cash position",
+        "scope": "Each ETF",
+        "p1_source": "issuer",
+        "fallback": "holdings residual",
+        "frequency": "D/W",
+        "table": "vdf_etf_holdings",
+        "validation": "holdings + cash"
+      },
+      {
+        "category": "Creation",
+        "item": "Create/redeem",
+        "scope": "Each ETF",
+        "p1_source": "issuer/TWSE",
+        "fallback": "units delta",
+        "frequency": "D",
+        "table": "vdf_etf_creation",
+        "validation": "units change"
+      }
+    ]
+  },
+  "macro_contracts": {
+    "us_leading": [
+      {
+        "layer": 1,
+        "category": "Leading",
+        "item": "Conference Board LEI",
+        "region": "US",
+        "sources": "FRED/Conference Board",
+        "frequency": "M",
+        "use": "leading cycle"
+      },
+      {
+        "layer": 1,
+        "category": "Leading",
+        "item": "ISM Manufacturing PMI",
+        "region": "US",
+        "sources": "ISM/FRED",
+        "frequency": "M",
+        "use": "mfg cycle"
+      },
+      {
+        "layer": 1,
+        "category": "Leading",
+        "item": "ISM Services PMI",
+        "region": "US",
+        "sources": "ISM/FRED",
+        "frequency": "M",
+        "use": "svc cycle"
+      },
+      {
+        "layer": 1,
+        "category": "Leading",
+        "item": "New Orders",
+        "region": "US",
+        "sources": "FRED/ISM",
+        "frequency": "M",
+        "use": "order momentum"
+      },
+      {
+        "layer": 1,
+        "category": "Leading",
+        "item": "Building Permits",
+        "region": "US",
+        "sources": "FRED",
+        "frequency": "M",
+        "use": "housing lead"
+      },
+      {
+        "layer": 1,
+        "category": "Leading",
+        "item": "Initial Jobless Claims",
+        "region": "US",
+        "sources": "FRED",
+        "frequency": "W",
+        "use": "labor turn"
+      },
+      {
+        "layer": 1,
+        "category": "Leading",
+        "item": "Yield Curve 10Y-2Y",
+        "region": "US",
+        "sources": "FRED",
+        "frequency": "D",
+        "use": "recession risk"
+      },
+      {
+        "layer": 1,
+        "category": "Leading",
+        "item": "Credit Spread",
+        "region": "US",
+        "sources": "FRED",
+        "frequency": "D",
+        "use": "credit stress"
+      },
+      {
+        "layer": 1,
+        "category": "Leading",
+        "item": "Consumer Sentiment",
+        "region": "US",
+        "sources": "FRED/UMich",
+        "frequency": "M",
+        "use": "consumer expectation"
+      },
+      {
+        "layer": 1,
+        "category": "Leading",
+        "item": "NFIB Small Business Optimism",
+        "region": "US",
+        "sources": "FRED/NFIB",
+        "frequency": "M",
+        "use": "small biz cycle"
+      }
+    ],
+    "us_inflation": [
+      {
+        "layer": 2,
+        "category": "CPI",
+        "item": "Headline CPI YoY/MoM",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "MoM->YoY bridge"
+      },
+      {
+        "layer": 2,
+        "category": "CPI",
+        "item": "Core CPI",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "ex food energy"
+      },
+      {
+        "layer": 2,
+        "category": "CPI",
+        "item": "Shelter CPI",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "sticky inflation"
+      },
+      {
+        "layer": 2,
+        "category": "CPI",
+        "item": "Rent / OER",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "housing inflation"
+      },
+      {
+        "layer": 2,
+        "category": "CPI",
+        "item": "Food CPI",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "sub-item"
+      },
+      {
+        "layer": 2,
+        "category": "CPI",
+        "item": "Energy CPI",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "oil pass-through"
+      },
+      {
+        "layer": 2,
+        "category": "PCE",
+        "item": "Core PCE",
+        "region": "US",
+        "sources": "BEA/FRED",
+        "frequency": "M",
+        "use": "Fed preferred"
+      },
+      {
+        "layer": 2,
+        "category": "PCE",
+        "item": "Headline PCE",
+        "region": "US",
+        "sources": "BEA/FRED",
+        "frequency": "M",
+        "use": "consumption inflation"
+      },
+      {
+        "layer": 2,
+        "category": "PPI",
+        "item": "Final Demand PPI",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "upstream price"
+      },
+      {
+        "layer": 2,
+        "category": "PPI",
+        "item": "Core PPI",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "ex food energy"
+      },
+      {
+        "layer": 2,
+        "category": "Wage",
+        "item": "Average Hourly Earnings",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "wage inflation"
+      }
+    ],
+    "us_employment": [
+      {
+        "layer": 2,
+        "category": "Payroll",
+        "item": "Nonfarm Payrolls",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "core jobs"
+      },
+      {
+        "layer": 2,
+        "category": "Payroll",
+        "item": "Private Payrolls",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "private momentum"
+      },
+      {
+        "layer": 2,
+        "category": "Payroll",
+        "item": "Government Payrolls",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "gov jobs"
+      },
+      {
+        "layer": 2,
+        "category": "Unemployment",
+        "item": "Unemployment Rate",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "u-rate"
+      },
+      {
+        "layer": 2,
+        "category": "Unemployment",
+        "item": "U-6 Underemployment",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "broad u-rate"
+      },
+      {
+        "layer": 2,
+        "category": "Participation",
+        "item": "Labor Force Participation",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "labor supply"
+      },
+      {
+        "layer": 2,
+        "category": "Hours",
+        "item": "Average Weekly Hours",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "demand"
+      },
+      {
+        "layer": 2,
+        "category": "Claims",
+        "item": "Initial Claims",
+        "region": "US",
+        "sources": "DOL/FRED",
+        "frequency": "W",
+        "use": "leading turn"
+      },
+      {
+        "layer": 2,
+        "category": "Claims",
+        "item": "Continuing Claims",
+        "region": "US",
+        "sources": "DOL/FRED",
+        "frequency": "W",
+        "use": "unemployment duration"
+      },
+      {
+        "layer": 2,
+        "category": "JOLTS",
+        "item": "Job Openings",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "demand"
+      },
+      {
+        "layer": 2,
+        "category": "JOLTS",
+        "item": "Quits Rate",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "worker confidence"
+      },
+      {
+        "layer": 2,
+        "category": "JOLTS",
+        "item": "Hires Rate",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "hiring"
+      },
+      {
+        "layer": 2,
+        "category": "JOLTS",
+        "item": "Layoffs Rate",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "layoffs"
+      },
+      {
+        "layer": 2,
+        "category": "ADP",
+        "item": "ADP Employment",
+        "region": "US",
+        "sources": "ADP",
+        "frequency": "M",
+        "use": "auxiliary"
+      }
+    ],
+    "us_fiscal_rates": [
+      {
+        "layer": 2,
+        "category": "Treasury",
+        "item": "3M/2Y/5Y/10Y/30Y yield",
+        "region": "US",
+        "sources": "FRED/Treasury",
+        "frequency": "D",
+        "use": "curve"
+      },
+      {
+        "layer": 2,
+        "category": "Treasury",
+        "item": "10Y-2Y / 10Y-3M spread",
+        "region": "US",
+        "sources": "FRED derived",
+        "frequency": "D",
+        "use": "recession signal"
+      },
+      {
+        "layer": 2,
+        "category": "Treasury",
+        "item": "Real Yield",
+        "region": "US",
+        "sources": "FRED/Treasury",
+        "frequency": "D",
+        "use": "real rate"
+      },
+      {
+        "layer": 2,
+        "category": "Treasury",
+        "item": "Breakeven Inflation",
+        "region": "US",
+        "sources": "FRED",
+        "frequency": "D",
+        "use": "inflation expectation"
+      },
+      {
+        "layer": 2,
+        "category": "Fed",
+        "item": "Fed Funds Target",
+        "region": "US",
+        "sources": "FRED",
+        "frequency": "D/meeting",
+        "use": "policy rate"
+      },
+      {
+        "layer": 2,
+        "category": "Fed",
+        "item": "Effective Fed Funds Rate",
+        "region": "US",
+        "sources": "FRED",
+        "frequency": "D",
+        "use": "actual rate"
+      },
+      {
+        "layer": 2,
+        "category": "Fed",
+        "item": "Balance Sheet Total Assets",
+        "region": "US",
+        "sources": "FRED",
+        "frequency": "W",
+        "use": "QE/QT"
+      },
+      {
+        "layer": 2,
+        "category": "Fed",
+        "item": "Reverse Repo",
+        "region": "US",
+        "sources": "FRED",
+        "frequency": "D",
+        "use": "liquidity"
+      },
+      {
+        "layer": 2,
+        "category": "Fed",
+        "item": "Bank Reserves",
+        "region": "US",
+        "sources": "FRED",
+        "frequency": "W",
+        "use": "bank liquidity"
+      },
+      {
+        "layer": 2,
+        "category": "Fiscal",
+        "item": "Federal Receipts",
+        "region": "US",
+        "sources": "Treasury/FRED",
+        "frequency": "M",
+        "use": "revenue"
+      },
+      {
+        "layer": 2,
+        "category": "Fiscal",
+        "item": "Federal Outlays",
+        "region": "US",
+        "sources": "Treasury/FRED",
+        "frequency": "M",
+        "use": "spending"
+      },
+      {
+        "layer": 2,
+        "category": "Fiscal",
+        "item": "Deficit / Surplus",
+        "region": "US",
+        "sources": "Treasury/FRED",
+        "frequency": "M",
+        "use": "deficit"
+      },
+      {
+        "layer": 2,
+        "category": "Debt",
+        "item": "Public Debt",
+        "region": "US",
+        "sources": "Treasury/FRED",
+        "frequency": "M/D",
+        "use": "debt load"
+      },
+      {
+        "layer": 2,
+        "category": "Debt",
+        "item": "Debt to GDP",
+        "region": "US",
+        "sources": "FRED",
+        "frequency": "Q",
+        "use": "long-term fiscal"
+      }
+    ]
+  },
+  "global_comparable_macro": {
+    "core_fields": [
+      "GDP",
+      "CPI",
+      "PPI",
+      "PMI Mfg",
+      "PMI Svc",
+      "Unemployment",
+      "Policy Rate",
+      "10Y Yield",
+      "FX",
+      "Equity Index",
+      "Exports/Imports",
+      "Industrial Production",
+      "Retail Sales",
+      "Credit/M2"
+    ],
+    "regions": {
+      "US": {
+        "policy": "Fed",
+        "10y": "UST 10Y",
+        "fx": "DXY",
+        "equity": "S&P/Nasdaq"
+      },
+      "EU": {
+        "policy": "ECB",
+        "10y": "DE/FR/IT 10Y",
+        "fx": "EURUSD",
+        "equity": "STOXX/DAX",
+        "special": [
+          "ECB deposit rate",
+          "IT-DE spread",
+          "natgas price",
+          "ZEW",
+          "Ifo"
+        ]
+      },
+      "CN": {
+        "policy": "PBOC/LPR/RRR",
+        "10y": "CN 10Y",
+        "fx": "USDCNY",
+        "equity": "CSI300/HSI",
+        "special": [
+          "TSF",
+          "M2",
+          "new RMB loans",
+          "LPR",
+          "RRR",
+          "property sales",
+          "exports",
+          "PPI"
+        ]
+      },
+      "JP": {
+        "policy": "BOJ",
+        "10y": "JGB 10Y",
+        "fx": "USDJPY",
+        "equity": "Nikkei/TOPIX",
+        "special": [
+          "BOJ policy rate",
+          "YCC/JGB 10Y",
+          "CPI ex fresh food",
+          "Tankan",
+          "JPY"
+        ]
+      },
+      "ASEAN": {
+        "policy": "per-central-bank",
+        "10y": "major 10Y",
+        "fx": "ASEAN FX",
+        "equity": "ASEAN indices",
+        "special": [
+          "VN/TH/ID/MY/SG PMI",
+          "FX",
+          "policy rate",
+          "exports"
+        ]
+      },
+      "AU": {
+        "policy": "RBA",
+        "10y": "AU 10Y",
+        "fx": "AUDUSD",
+        "equity": "ASX200",
+        "special": [
+          "RBA cash rate",
+          "iron ore exports",
+          "AUD",
+          "employment",
+          "CPI",
+          "terms of trade"
+        ]
+      }
+    }
+  },
+  "vrn_contracts": {
+    "basic_info": [
+      {
+        "field": "Report Date",
+        "p1_source": "broker PDF",
+        "validation_source": "filename date",
+        "rule": "PDF internal date wins"
+      },
+      {
+        "field": "Broker",
+        "p1_source": "broker PDF/filename",
+        "validation_source": "broker alias registry",
+        "rule": "alias normalize"
+      },
+      {
+        "field": "Analyst",
+        "p1_source": "broker PDF",
+        "validation_source": "signature block",
+        "rule": "nullable but flagged"
+      },
+      {
+        "field": "Ticker",
+        "p1_source": "filename/broker PDF",
+        "validation_source": "VDF universe",
+        "rule": "filename standalone 4-digit wins"
+      },
+      {
+        "field": "YFinance Ticker",
+        "p1_source": "derived",
+        "validation_source": "yfinance test",
+        "rule": ".TW/.TWO"
+      },
+      {
+        "field": "Bloomberg Ticker",
+        "p1_source": "derived/PDF",
+        "validation_source": "regex",
+        "rule": "XXXX TT"
+      },
+      {
+        "field": "Company Name",
+        "p1_source": "broker PDF",
+        "validation_source": "VDF universe",
+        "rule": "fuzzy match"
+      },
+      {
+        "field": "Rating",
+        "p1_source": "broker PDF",
+        "validation_source": "none",
+        "rule": "NEVER overwritten by external"
+      },
+      {
+        "field": "Target Price",
+        "p1_source": "broker PDF",
+        "validation_source": "yfinance consensus (reference only)",
+        "rule": "NEVER overwritten"
+      },
+      {
+        "field": "Last Adj Close",
+        "p1_source": "VDF",
+        "validation_source": "broker PDF quote",
+        "rule": "VDF is P1"
+      },
+      {
+        "field": "Last Data Date",
+        "p1_source": "VDF",
+        "validation_source": "report date",
+        "rule": "not unreasonably later than report"
+      },
+      {
+        "field": "Validation Status",
+        "p1_source": "system",
+        "validation_source": "all checks",
+        "rule": "GREEN/YELLOW/RED"
+      }
+    ],
+    "financial_data": [
+      {
+        "section": "IS",
+        "item": "Revenue",
+        "p1": "broker PDF",
+        "validation": "VDF actual/MOPS",
+        "rule": "forecast not overwritten"
+      },
+      {
+        "section": "IS",
+        "item": "Gross Profit",
+        "p1": "broker PDF",
+        "validation": "formula",
+        "rule": "Revenue - COGS"
+      },
+      {
+        "section": "IS",
+        "item": "Operating Income",
+        "p1": "broker PDF",
+        "validation": "formula",
+        "rule": "GP - Opex"
+      },
+      {
+        "section": "IS",
+        "item": "Net Income",
+        "p1": "broker PDF",
+        "validation": "formula",
+        "rule": "pretax - tax"
+      },
+      {
+        "section": "IS",
+        "item": "EPS",
+        "p1": "broker PDF",
+        "validation": "VDF actual/shares",
+        "rule": "NI / shares approx"
+      },
+      {
+        "section": "BS",
+        "item": "Cash",
+        "p1": "broker PDF",
+        "validation": "MOPS actual",
+        "rule": "actual/forecast separated"
+      },
+      {
+        "section": "BS",
+        "item": "Total Assets",
+        "p1": "broker PDF",
+        "validation": "formula",
+        "rule": "A = L + E"
+      },
+      {
+        "section": "BS",
+        "item": "Total Liabilities",
+        "p1": "broker PDF",
+        "validation": "formula",
+        "rule": "subtotal"
+      },
+      {
+        "section": "BS",
+        "item": "Equity",
+        "p1": "broker PDF",
+        "validation": "formula",
+        "rule": "A - L"
+      },
+      {
+        "section": "CF",
+        "item": "OCF",
+        "p1": "broker PDF",
+        "validation": "formula/MOPS",
+        "rule": "OCF vs NI"
+      },
+      {
+        "section": "CF",
+        "item": "CapEx",
+        "p1": "broker PDF",
+        "validation": "formula",
+        "rule": "sign convention"
+      },
+      {
+        "section": "CF",
+        "item": "FCF",
+        "p1": "broker PDF",
+        "validation": "formula",
+        "rule": "OCF - CapEx"
+      },
+      {
+        "section": "CF",
+        "item": "CFI / CFF",
+        "p1": "broker PDF",
+        "validation": "cash bridge",
+        "rule": "CFO + CFI + CFF"
+      }
+    ]
+  },
+  "validation_contract": [
+    {
+      "level": "L0",
+      "name": "File / path",
+      "vdf": "exists, non-empty",
+      "vrn": "PDF exists, page count",
+      "result": "PASS/FAIL"
+    },
+    {
+      "level": "L1",
+      "name": "Schema",
+      "vdf": "fields, types, keys",
+      "vrn": "BasicInfo/FinancialData fields",
+      "result": "PASS/FAIL"
+    },
+    {
+      "level": "L2",
+      "name": "Regex",
+      "vdf": "ticker/date/source code",
+      "vrn": "ticker/date/period",
+      "result": "PASS/REVIEW"
+    },
+    {
+      "level": "L3",
+      "name": "Source",
+      "vdf": "TWSE/TPEX/yfinance/FRED",
+      "vrn": "PDF engines",
+      "result": "confidence"
+    },
+    {
+      "level": "L4",
+      "name": "Formula",
+      "vdf": "return/market cap/ETF flow",
+      "vrn": "IS/BS/CF",
+      "result": "GREEN/YELLOW/RED"
+    },
+    {
+      "level": "L5",
+      "name": "Time Series",
+      "vdf": "missing/dup/jump",
+      "vrn": "report date/period",
+      "result": "REVIEW"
+    },
+    {
+      "level": "L6",
+      "name": "Cross-system",
+      "vdf": "VDF actual vs VRN quoted",
+      "vrn": "VRN forecast vs VDF actual",
+      "result": "diff flag"
+    },
+    {
+      "level": "L7",
+      "name": "Quarantine",
+      "vdf": "stale/outlier/missing",
+      "vrn": "OCR/footnote/1H/2H",
+      "result": "quarantine"
+    },
+    {
+      "level": "L8",
+      "name": "Human Review",
+      "vdf": "HTML Matrix",
+      "vrn": "HTML Matrix",
+      "result": "approve/hold"
+    },
+    {
+      "level": "L9",
+      "name": "Activation",
+      "vdf": "high risk = 0",
+      "vrn": "high risk = 0",
+      "result": "activate"
+    }
+  ],
+  "visual_lock": {
+    "tokens": {
+      "color": {
+        "primary": "#4c78a8",
+        "neutral": "#9c9890",
+        "accent": "#439a9a"
+      },
+      "font": {
+        "mono": "DM Mono",
+        "sans": "DM Sans",
+        "display": "Syne"
+      }
+    },
+    "lock_markers": [
+      "data-lock",
+      "data-locked",
+      "data-immutable",
+      "@lock",
+      "immutable",
+      "do not edit",
+      "不可改"
+    ],
+    "lock_layers": [
+      {
+        "layer": "Token Lock",
+        "scope": "color/font/brand CSS variables"
+      },
+      {
+        "layer": "Component Lock",
+        "scope": "e.g. locked Header becomes the template others must match"
+      },
+      {
+        "layer": "Template Lock",
+        "scope": "TPL-HEADER-LOCKED is platform standard; extend only, never break core"
+      }
+    ]
+  },
+  "component_taxonomy": [
+    {
+      "class": "header",
+      "use": "page head, brand bar, title/subtitle"
+    },
+    {
+      "class": "logo",
+      "use": "VIA logo, seal, mark, brand"
+    },
+    {
+      "class": "stats",
+      "use": "KPI strip, number cards"
+    },
+    {
+      "class": "tabs",
+      "use": "tab switch, module selector"
+    },
+    {
+      "class": "grid_matrix",
+      "use": "grids matrix, card matrix, module grid"
+    },
+    {
+      "class": "table",
+      "use": "registry table, data table"
+    },
+    {
+      "class": "button",
+      "use": "default/primary/danger button"
+    },
+    {
+      "class": "form",
+      "use": "input/select/textarea/filter bar"
+    },
+    {
+      "class": "modal",
+      "use": "popup, run dialog, settings"
+    },
+    {
+      "class": "command",
+      "use": "PowerShell command box, copy block"
+    },
+    {
+      "class": "log",
+      "use": "console log, event log"
+    },
+    {
+      "class": "footer",
+      "use": "footer / slogan"
+    },
+    {
+      "class": "image",
+      "use": "img/svg/canvas/seal/screenshot"
+    },
+    {
+      "class": "chart",
+      "use": "plot/chart/canvas/svg chart"
+    }
+  ],
+  "template_library": [
+    {
+      "id": "TPL-HEADER-LOCKED",
+      "required": [
+        "brand",
+        "title",
+        "subtitle",
+        "lock_marker"
+      ]
+    },
+    {
+      "id": "TPL-KPI-STRIP",
+      "required": [
+        "label",
+        "value",
+        "delta"
+      ]
+    },
+    {
+      "id": "TPL-GRID-MATRIX",
+      "required": [
+        "columns",
+        "gap",
+        "cardRadius",
+        "hover",
+        "deleteButton",
+        "addButton",
+        "sort",
+        "filter"
+      ]
+    },
+    {
+      "id": "TPL-TABS",
+      "required": [
+        "items",
+        "active",
+        "switch"
+      ]
+    },
+    {
+      "id": "TPL-TABLE",
+      "required": [
+        "columns",
+        "rows",
+        "sort"
+      ]
+    },
+    {
+      "id": "TPL-MODAL",
+      "required": [
+        "title",
+        "body",
+        "confirm",
+        "cancel"
+      ]
+    },
+    {
+      "id": "TPL-COMMAND",
+      "required": [
+        "command",
+        "copy"
+      ]
+    },
+    {
+      "id": "TPL-LOG",
+      "required": [
+        "lines",
+        "level"
+      ]
+    },
+    {
+      "id": "TPL-FOOTER",
+      "required": [
+        "text"
+      ]
+    },
+    {
+      "id": "TPL-FORM",
+      "required": [
+        "fields",
+        "submit"
+      ]
+    },
+    {
+      "id": "TPL-IMAGE-SPEC",
+      "required": [
+        "src",
+        "alt",
+        "size"
+      ]
+    },
+    {
+      "id": "TPL-CHART",
+      "required": [
+        "type",
+        "data",
+        "axes"
+      ]
+    }
+  ],
+  "html_ui_spec": {
+    "tabs": [
+      {
+        "id": "overview",
+        "title": "Overview",
+        "use": "system status, run mode, round, risk"
+      },
+      {
+        "id": "input_parameters",
+        "title": "Input Parameters",
+        "use": "all parameter matrices, edit by authority"
+      },
+      {
+        "id": "vdf_contracts",
+        "title": "VDF Dataset Contract",
+        "use": "TW / macro / ETF data contracts"
+      },
+      {
+        "id": "vrn_contracts",
+        "title": "VRN Dataset Contract",
+        "use": "PDF BasicInfo, FinancialData, table parser"
+      },
+      {
+        "id": "ticker_rules",
+        "title": "Ticker Rules",
+        "use": "TW_TICKER / yfinance / Bloomberg / filename parser"
+      },
+      {
+        "id": "macro_contracts",
+        "title": "Macro / Global",
+        "use": "US core + global comparable"
+      },
+      {
+        "id": "validation",
+        "title": "Validation Matrix",
+        "use": "L0-L9 validation states"
+      },
+      {
+        "id": "visual_lock",
+        "title": "VisualLock",
+        "use": "tokens, lock markers, lock layers, templates"
+      },
+      {
+        "id": "bridge",
+        "title": "Supportive Bridge",
+        "use": "NexusCore / PolyglotCheck / README existence + sha"
+      },
+      {
+        "id": "activation",
+        "title": "Activation Gate",
+        "use": "user-test / final activate"
+      }
+    ],
+    "principles": [
+      "Default shows the 10 most-used parameters; advanced collapsed.",
+      "Locked parameters are read-only.",
+      "High-risk toggles require dual confirmation.",
+      "Every run generates a run_id.",
+      "Each round auto-opens the HTML Matrix Report.",
+      "All edits write to the Parameter Registry, never to source code."
+    ]
+  },
+  "supportive_bridge": {
+    "mode": "read_heavy_dry_run",
+    "first_layer_interface": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules\\Invoke-VeritasNexusCore.ps1",
+    "modules": [
+      {
+        "role": "readme",
+        "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules\\Read_Me_VeritasNexusCore.md",
+        "suggested_command": null
+      },
+      {
+        "role": "nexus_core",
+        "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules\\Invoke-VeritasNexusCore.ps1",
+        "suggested_command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"<path>\" -Action Validate -OpenReport"
+      },
+      {
+        "role": "polyglot_check",
+        "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules\\Invoke-VIA-PolyglotCheckTestRepair-v0101.ps1",
+        "suggested_command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"<path>\""
+      }
+    ],
+    "rules": [
+      "Build bridge manifest + existence check + sha12 + suggested command only.",
+      "Do not execute supportive modules from the SSOT manager.",
+      "Do not write back to source HTML or frozen engines."
+    ]
+  }
+}

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VDF AkShare Narrow-Source Contract Dry-run Hotfix v027.8.2.1</title>
+<style>
+body{margin:0;background:#f7f4ed;color:#25312f;font-family:Arial,"Microsoft JhengHei",sans-serif}
+.wrap{max-width:1500px;margin:0 auto;padding:28px}
+.hero{border:1px solid #d8d0c3;border-radius:24px;background:#fffdf8;padding:26px;box-shadow:0 18px 50px rgba(30,40,36,.08)}
+h1{margin:0;font-size:28px}h2{margin-top:28px;font-size:20px}.sub{color:#6e7b78;margin-top:8px;line-height:1.7}
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(130px,1fr));gap:12px;margin-top:20px}
+.kpi{border:1px solid #d8d0c3;border-radius:18px;padding:14px;background:#fff}.kpi b{font-size:22px;display:block}.kpi span{font-size:12px;color:#6e7b78}
+.badge{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid #d8d0c3;background:#fff;margin-right:8px}
+.ok td{background:#f3fbf5}.warn td{background:#fff8e9}.bad td{background:#fff1f1}
+.mw{overflow:auto;border:1px solid #d8d0c3;border-radius:18px;background:#fff}
+table{border-collapse:collapse;width:100%;font-size:12px}
+th{position:sticky;top:0;background:#e8eee9;color:#20332f;z-index:1}
+th,td{border-bottom:1px solid #e8e1d6;padding:9px 10px;text-align:left;vertical-align:top;white-space:nowrap}
+td:nth-child(12),td:nth-child(13){white-space:normal;min-width:320px}
+pre{white-space:pre-wrap;background:#17211f;color:#e9fff8;padding:16px;border-radius:16px;overflow:auto}
+@media(max-width:900px){.kpis{grid-template-columns:1fr}.wrap{padding:14px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hero">
+<h1>VeritasDataForge · AkShare Narrow-Source Contract Dry-run Hotfix v027.8.2.1</h1>
+<div class="sub">VERITAS INTELLIGENCE ANALYTICS<br>Single-file JSON array fix · v027.4 staging source only · no DATABASE write · no canonical merge</div>
+<p><span class="badge">Status: VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_BLOCKED</span><span class="badge">Risk: HIGH</span><span class="badge">Recommendation: BLOCK_V02783_UNTIL_NARROW_SOURCE_VALUE_MAPPING_REVIEW</span></p>
+<div class="kpis">
+<div class="kpi"><b>14</b><span>OK</span></div>
+<div class="kpi"><b>1</b><span>WARN / REVIEW</span></div>
+<div class="kpi"><b>1</b><span>FAIL / BLOCK</span></div>
+<div class="kpi"><b>0</b><span>Preview rows</span></div>
+<div class="kpi"><b>0</b><span>Invalid after</span></div>
+<div class="kpi"><b>0</b><span>Duplicate after</span></div>
+</div>
+</div>
+
+<h2>def Hotfix</h2>
+<pre>
+Previous v027.8.2 problem:
+PowerShell wrote a single path as a JSON string.
+Python iterated that string as 196 characters.
+Result: source_files=196, preview_rows=0.
+
+v027.8.2.1 fix:
+File list is array-of-objects:
+[{path,name,size}, ...]
+
+DB write = false
+Canonical merge = false
+</pre>
+
+<h2>def Matrix</h2>
+<div class="mw">
+<table>
+<thead><tr><th>Round</th><th>Stage</th><th>Layer</th><th>Name</th><th>Status</th><th>Risk</th><th>FixClass</th><th>Priority</th><th>Mode</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr></thead>
+<tbody><tr class='ok'><td>Round0</td><td>BOOT</td><td>PROJECT_ROOT</td><td>VeritasIntelligenceAnalytics</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NARROW_SOURCE_HOTFIX_ONLY</td><td>exists</td><td>true</td><td>Project root exists.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics</td></tr>
+<tr class='ok'><td>Round0</td><td>HOTFIX</td><td>FILE_LIST_JSON</td><td>Single-file JSON Array</td><td>OK_HOTFIX_APPLIED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NARROW_SOURCE_HOTFIX_ONLY</td><td>bug</td><td>single_string_iterated_as_chars</td><td>Force JSON file list to array even when only one source file exists.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618</td></tr>
+<tr class='ok'><td>Round0</td><td>POLICY</td><td>NO_DB_WRITE</td><td>DATABASE</td><td>OK_POLICY_LOCKED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NARROW_SOURCE_HOTFIX_ONLY</td><td>db_write_enabled</td><td>false</td><td>No DATABASE write.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF</td></tr>
+<tr class='ok'><td>Round0</td><td>POLICY</td><td>NO_CANONICAL_MERGE</td><td>Canonical Merge</td><td>OK_POLICY_LOCKED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NARROW_SOURCE_HOTFIX_ONLY</td><td>canonical_merge_enabled</td><td>false</td><td>No canonical merge.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618</td></tr>
+<tr class='ok'><td>Round1</td><td>DISCOVERY</td><td>SOURCE_ROOT</td><td>VDF_AKSHARE_SMALL_SCOPE_CANDIDATE_SEED_STAGING_v0274_20260610_145643</td><td>OK_SOURCE_LOCKED</td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>NARROW_SOURCE_HOTFIX_ONLY</td><td>source_scope</td><td>v027.4_only</td><td>Locked source scope to v027.4 staging candidate only.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_SMALL_SCOPE_CANDIDATE_SEED_STAGING_v0274_20260610_145643</td></tr>
+<tr class='ok'><td>Round1</td><td>DISCOVERY</td><td>SOURCE_FILES</td><td>v027.4 staging CSV</td><td>OK</td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>NARROW_SOURCE_HOTFIX_ONLY</td><td>file_count</td><td>1</td><td>Only v027.4 staging source CSV files selected.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\registry\VDF_AkShare_NarrowSource_InputInventory_Hotfix_v027821.csv</td></tr>
+<tr class='ok'><td>Round1</td><td>DISCOVERY</td><td>FILE_LIST_JSON</td><td>Array Guard</td><td>OK_ARRAY_CONFIRMED</td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>NARROW_SOURCE_HOTFIX_ONLY</td><td>array_count</td><td>1</td><td>File list JSON confirmed as array of objects.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\runtime\vdf_akshare_v0274_source_file_list_hotfix_v027821.json</td></tr>
+<tr class='ok'><td>Round2</td><td>NARROW_DRYRUN_HOTFIX</td><td>PYTHON_ENGINE</td><td>vdf_akshare_narrow_source_contract_dryrun_hotfix_v027821.py</td><td>OK_SCRIPT_CREATED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NARROW_SOURCE_HOTFIX_ONLY</td><td>engine</td><td>python</td><td>Narrow-source hotfix Python engine written.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\runtime\vdf_akshare_narrow_source_contract_dryrun_hotfix_v027821.py</td></tr>
+<tr class='ok'><td>Round2</td><td>NARROW_DRYRUN_HOTFIX</td><td>PYTHON_ENGINE</td><td>Execution</td><td>OK_EXECUTED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NARROW_SOURCE_HOTFIX_ONLY</td><td>stdout</td><td>ok</td><td>{&quot;generated_at&quot;: &quot;2026-06-11T00:26:19.100551&quot;, &quot;status&quot;: &quot;VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_BLOCKED&quot;, &quot;risk&quot;: &quot;HIGH&quot;, &quot;recommendation&quot;: &quot;BLOCK_V02783_UNTIL_NARROW_SOURCE_VALUE_MAPPING_REVIEW&quot;, &quot;metrics&quot;: {&quot;source_files&quot;: 0, &quot;profile_columns&quot;: 0, &quot;selection_files&quot;: 0, &quot;preview_rows&quot;: 0, &quot;valid_rows&quot;: 0, &quot;invalid_after&quot;: 0, &quot;duplicate_after&quot;: 0}, &quot;artifacts&quot;: {&quot;profile_csv&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\\registry\\VDF_AkShare_NarrowSource_RawColumnProfile_Hotfix_v027821.csv&quot;, &quot;selection_csv&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\\registry\\VDF_AkShare_NarrowSource_RawColumnSelection_Hotfix_v027821.csv&quot;, &quot;preview_csv&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\\preview\\VDF_AkShare_NarrowSource_ContractDryRunPreview_Hotfix_v027821.csv&quot;, &quot;preview_json&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\\preview\\VDF_AkShare_NarrowSource_ContractDryRunPreview_Hotfix_v027821.json&quot;, &quot;invalid_csv&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\\preview\\VDF_AkShare_NarrowSource_InvalidRows_Hotfix_v027821.csv&quot;, &quot;duplicate_csv&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\\preview\\VDF_AkShare_NarrowSource_DuplicateRows_Hotfix_v027821.csv&quot;, &quot;rootcause_csv&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\\registry\\VDF_AkShare_NarrowSource_RootCause_Hotfix_v027821.csv&quot;, &quot;contract_json&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\\plan\\VDF_AkShare_NarrowSource_CanonicalKeyContract_Hotfix_v027821.json&quot;, &quot;execution_gate_json&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\\plan\\VDF_AkShare_NarrowSource_ExecutionGateReview_Hotfix_v027821.json&quot;}, &quot;next_step&quot;: &quot;v027.8.3 dedup gate only; no DB write&quot;}
+</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\runtime\vdf_akshare_narrow_source_contract_dryrun_hotfix_v027821.py</td></tr>
+<tr class='warn'><td>Round2</td><td>NARROW_DRYRUN_HOTFIX</td><td>PREVIEW</td><td>Narrow Contract Preview</td><td>OK_PREVIEW_CREATED</td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>NARROW_SOURCE_HOTFIX_ONLY</td><td>preview_rows</td><td>0</td><td>Narrow-source contract preview generated.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\preview\VDF_AkShare_NarrowSource_ContractDryRunPreview_Hotfix_v027821.csv</td></tr>
+<tr class='ok'><td>Round2</td><td>NARROW_DRYRUN_HOTFIX</td><td>INVALID_ROWS</td><td>Invalid Rows</td><td>OK_ZERO_INVALID</td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>NARROW_SOURCE_HOTFIX_ONLY</td><td>invalid_after</td><td>0</td><td>No invalid rows.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\preview\VDF_AkShare_NarrowSource_ContractDryRunPreview_Hotfix_v027821.csv</td></tr>
+<tr class='ok'><td>Round2</td><td>NARROW_DRYRUN_HOTFIX</td><td>DUPLICATE_ROWS</td><td>Duplicate Rows</td><td>OK_ZERO_DUPLICATE</td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>NARROW_SOURCE_HOTFIX_ONLY</td><td>duplicate_after</td><td>0</td><td>No duplicate rows.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\preview\VDF_AkShare_NarrowSource_ContractDryRunPreview_Hotfix_v027821.csv</td></tr>
+<tr class='ok'><td>Round3</td><td>CONSOLIDATE</td><td>ENV_HASH</td><td>Environment Hash Manifest</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>NARROW_SOURCE_HOTFIX_ONLY</td><td>files</td><td>5</td><td>Environment hash manifest created.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\registry\VDF_EnvironmentHashManifest_Hotfix_v027821.csv</td></tr>
+<tr class='ok'><td>Round3</td><td>CONSOLIDATE</td><td>LOCAL_FREE_LIBS</td><td>Top10 Local Free Libs</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>NARROW_SOURCE_HOTFIX_ONLY</td><td>rows</td><td>6</td><td>Top10 local free libs matrix generated.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\registry\VDF_Top10_LocalFreeLibs_NarrowSourceContractDryRun_Hotfix_v027821.json</td></tr>
+<tr class='bad'><td>Round3</td><td>RESULT</td><td>READINESS</td><td>VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_BLOCKED</td><td>BLOCKED</td><td>HIGH</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>NARROW_SOURCE_HOTFIX_ONLY</td><td>recommendation</td><td>BLOCK_V02783_UNTIL_NARROW_SOURCE_VALUE_MAPPING_REVIEW</td><td>v027.8.2.1 completed. No DB write. No canonical merge.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\runtime\vdf_akshare_narrow_source_contract_dryrun_hotfix_result_v027821.json</td></tr>
+<tr class='ok'><td>Round3</td><td>POINTER</td><td>ACTIVE_POINTER</td><td>VDF_ACTIVE_POINTER.json</td><td>OK_UPDATED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>NARROW_SOURCE_HOTFIX_ONLY</td><td>update</td><td>complete</td><td>Active pointer updated with v027.8.2.1.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ACTIVE_POINTER.json</td></tr></tbody>
+</table>
+</div>
+
+<h2>def Output Paths</h2>
+<pre>
+RunRoot          : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618
+HTML             : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\report\VDF_AkShare_NarrowSourceContractDryRun_Hotfix_Report_v027821.html
+CSV Matrix       : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\registry\VDF_AkShare_NarrowSourceContractDryRun_Hotfix_Matrix_v027821.csv
+JSON Matrix      : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\registry\VDF_AkShare_NarrowSourceContractDryRun_Hotfix_Matrix_v027821.json
+Input Inventory  : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\registry\VDF_AkShare_NarrowSource_InputInventory_Hotfix_v027821.csv
+Profile CSV      : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\registry\VDF_AkShare_NarrowSource_RawColumnProfile_Hotfix_v027821.csv
+Selection CSV    : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\registry\VDF_AkShare_NarrowSource_RawColumnSelection_Hotfix_v027821.csv
+Preview CSV      : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\preview\VDF_AkShare_NarrowSource_ContractDryRunPreview_Hotfix_v027821.csv
+Invalid CSV      : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\preview\VDF_AkShare_NarrowSource_InvalidRows_Hotfix_v027821.csv
+Duplicate CSV    : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\preview\VDF_AkShare_NarrowSource_DuplicateRows_Hotfix_v027821.csv
+RootCause CSV    : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\registry\VDF_AkShare_NarrowSource_RootCause_Hotfix_v027821.csv
+Contract JSON    : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\plan\VDF_AkShare_NarrowSource_CanonicalKeyContract_Hotfix_v027821.json
+Execution Gate   : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\plan\VDF_AkShare_NarrowSource_ExecutionGateReview_Hotfix_v027821.json
+Environment Hash : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\registry\VDF_EnvironmentHashManifest_Hotfix_v027821.csv
+Top10 Libs       : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\registry\VDF_Top10_LocalFreeLibs_NarrowSourceContractDryRun_Hotfix_v027821.json
+Runtime Result   : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\runtime\vdf_akshare_narrow_source_contract_dryrun_hotfix_result_v027821.json
+Active Pointer   : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ACTIVE_POINTER.json
+Transcript       : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_NARROW_SOURCE_CONTRACT_DRYRUN_HOTFIX_v027821_20260611_002618\runtime\VDF_AkShare_NarrowSourceContractDryRun_Hotfix_Transcript_v027821_20260611_002618.txt
+</pre>
+
+<h2>def Next Gate</h2>
+<pre>
+v027.8.3 dedup gate only; no DB write
+
+Still closed:
+DB write = false
+Canonical merge = false
+
+Before execution readiness:
+invalid_after must be 0
+duplicate_after must be 0
+
+Current:
+invalid_after = 0
+duplicate_after = 0
+</pre>
+</div>
+</body>
+</html>

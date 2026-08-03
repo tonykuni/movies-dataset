@@ -1,0 +1,606 @@
+{
+  "system_name": "VERITAS INTELLIGENCE ANALYTICS",
+  "subsystem": "VRN Financial Terms SSOT",
+  "generated_at": "2026-06-09 03:22:00",
+  "policy": "ADD_ONLY_MERGE_NO_DELETE",
+  "terms": [
+    {
+      "category": "FINANCIAL_DATA",
+      "canonical": "COST_OF_REVENUE",
+      "aliases": [
+        "直接成本",
+        "銷貨成本",
+        "營業成本",
+        "COGS",
+        "Cost of Goods Sold",
+        "Cost of Revenue",
+        "Cost of Sales"
+      ],
+      "regex": [
+        "(?i)\\bcogs\\b",
+        "(?i)\\bcost\\s+of\\s+(revenue|sales|goods\\s+sold)\\b",
+        "營業成本|銷貨成本|直接成本"
+      ],
+      "definition": "Cost directly tied to revenue.",
+      "formula": "",
+      "verification_rules": [
+        "Used to verify gross profit"
+      ]
+    },
+    {
+      "category": "FINANCIAL_DATA",
+      "canonical": "EBITDA",
+      "aliases": [
+        "稅前息前折舊攤銷前盈餘",
+        "EBITDA",
+        "EBITDA利潤"
+      ],
+      "regex": [
+        "(?i)\\bebitda\\b",
+        "稅前息前折舊攤銷前盈餘|EBITDA利潤"
+      ],
+      "definition": "EBITDA.",
+      "formula": "EBITDA = EBIT + D&A",
+      "verification_rules": [
+        "EV/EBITDA"
+      ]
+    },
+    {
+      "category": "FINANCIAL_DATA",
+      "canonical": "GROSS_PROFIT",
+      "aliases": [
+        "毛利",
+        "毛利淨額",
+        "營業毛利",
+        "總毛利",
+        "GP",
+        "Gross Income",
+        "Gross Profit"
+      ],
+      "regex": [
+        "(?i)\\bgp\\b",
+        "(?i)\\bgross\\s+profit\\b",
+        "營業毛利|毛利淨額|總毛利|毛利"
+      ],
+      "definition": "Revenue minus cost.",
+      "formula": "GrossProfit = Revenue - CostOfRevenue",
+      "verification_rules": [
+        "Cross-calc"
+      ]
+    },
+    {
+      "category": "FINANCIAL_DATA",
+      "canonical": "NET_INCOME",
+      "aliases": [
+        "本期純益",
+        "本期淨利",
+        "淨利",
+        "稅後盈餘",
+        "稅後淨利",
+        "歸屬母公司純益",
+        "Net Earnings",
+        "Net Income",
+        "Net Profit",
+        "PAT"
+      ],
+      "regex": [
+        "(?i)\\bnet\\s+(income|profit|earnings)\\b",
+        "(?i)\\bpat\\b",
+        "本期純益|本期淨利|稅後盈餘|稅後淨利|歸屬母公司純益|淨利"
+      ],
+      "definition": "Net income.",
+      "formula": "",
+      "verification_rules": [
+        "Used for EPS/ROE"
+      ]
+    },
+    {
+      "category": "FINANCIAL_DATA",
+      "canonical": "OPERATING_INCOME",
+      "aliases": [
+        "營利",
+        "營業利益",
+        "營業獲利",
+        "營運利益",
+        "EBIT",
+        "OP",
+        "Operating Income",
+        "Operating Profit"
+      ],
+      "regex": [
+        "(?i)\\bebit\\b",
+        "(?i)\\boperating\\s+(income|profit)\\b",
+        "營業利益|營業獲利|營運利益|營利"
+      ],
+      "definition": "Operating profit.",
+      "formula": "OperatingIncome = GrossProfit - OperatingExpenses",
+      "verification_rules": [
+        "Cross-calc"
+      ]
+    },
+    {
+      "category": "FINANCIAL_DATA",
+      "canonical": "REVENUE",
+      "aliases": [
+        "季營業收入",
+        "淨收入",
+        "銷售收入",
+        "營收",
+        "營業收入",
+        "總營收",
+        "Net Revenue",
+        "Operating Revenue",
+        "Revenue",
+        "Revenues",
+        "Sales",
+        "Total Revenue"
+      ],
+      "regex": [
+        "(?i)\\b(total\\s+)?revenue(s)?\\b",
+        "(?i)\\bsales\\b",
+        "營業收入|營收|銷售收入|淨收入|季營業收入"
+      ],
+      "definition": "Revenue / top line.",
+      "formula": "",
+      "verification_rules": [
+        "Revenue alias coverage"
+      ]
+    },
+    {
+      "category": "PER_SHARE",
+      "canonical": "BASIC_EPS",
+      "aliases": [
+        "每股盈餘",
+        "每股稅後盈餘",
+        "基本每股盈餘",
+        "基本EPS",
+        "Basic Earnings Per Share",
+        "Basic EPS",
+        "Earnings Per Share",
+        "EPS"
+      ],
+      "regex": [
+        "(?i)\\bbasic\\s+eps\\b",
+        "(?i)\\bearnings\\s+per\\s+share\\b",
+        "(?i)\\beps\\b",
+        "基本每股盈餘|每股盈餘|每股稅後盈餘|基本EPS"
+      ],
+      "definition": "Basic EPS.",
+      "formula": "BasicEPS = NetIncome / WeightedAverageShares",
+      "verification_rules": [
+        "EPS cross-calc"
+      ]
+    },
+    {
+      "category": "PER_SHARE",
+      "canonical": "BVPS",
+      "aliases": [
+        "每股股東權益",
+        "每股帳面價值",
+        "每股淨值",
+        "Book Value",
+        "Book Value Per Share",
+        "BVPS"
+      ],
+      "regex": [
+        "(?i)\\bbook\\s+value\\s+per\\s+share\\b",
+        "(?i)\\bbvps\\b",
+        "每股淨值|每股帳面價值|每股股東權益"
+      ],
+      "definition": "Book value per share.",
+      "formula": "BVPS = CommonEquity / OutstandingShares",
+      "verification_rules": [
+        "BVPS cross-calc"
+      ]
+    },
+    {
+      "category": "PER_SHARE",
+      "canonical": "DILUTED_EPS",
+      "aliases": [
+        "完全稀釋每股盈餘",
+        "稀釋每股盈餘",
+        "稀釋後EPS",
+        "Diluted Earnings Per Share",
+        "Diluted EPS",
+        "Fully Diluted EPS"
+      ],
+      "regex": [
+        "(?i)\\bdiluted\\s+earnings\\s+per\\s+share\\b",
+        "(?i)\\bdiluted\\s+eps\\b",
+        "稀釋每股盈餘|稀釋後EPS|完全稀釋每股盈餘"
+      ],
+      "definition": "Diluted EPS.",
+      "formula": "DilutedEPS <= BasicEPS",
+      "verification_rules": [
+        "Anti-dilution"
+      ]
+    },
+    {
+      "category": "PER_SHARE",
+      "canonical": "DPS",
+      "aliases": [
+        "每股股利",
+        "每股配息",
+        "每股現金股利",
+        "現金股息",
+        "Cash Dividend Per Share",
+        "Dividend",
+        "Dividend Per Share",
+        "DPS"
+      ],
+      "regex": [
+        "(?i)\\bdividend\\s+per\\s+share\\b",
+        "(?i)\\bdps\\b",
+        "每股現金股利|每股配息|現金股息|每股股利"
+      ],
+      "definition": "Dividend per share.",
+      "formula": "DPS = CashDividends / Shares",
+      "verification_rules": [
+        "Dividend cross-calc"
+      ]
+    },
+    {
+      "category": "PER_SHARE",
+      "canonical": "FCF_PER_SHARE",
+      "aliases": [
+        "每股自由現金流",
+        "每股自由現金流量",
+        "每股FCF",
+        "FCF Per Share",
+        "FCFPS",
+        "Free Cash Flow Per Share"
+      ],
+      "regex": [
+        "(?i)\\bfcf\\s+per\\s+share\\b",
+        "(?i)\\bfree\\s+cash\\s+flow\\s+per\\s+share\\b",
+        "每股自由現金流|每股FCF|每股自由現金流量"
+      ],
+      "definition": "FCF per share.",
+      "formula": "FCFPerShare = FCF / Shares",
+      "verification_rules": [
+        "FCF yield"
+      ]
+    },
+    {
+      "category": "RATIO",
+      "canonical": "GROSS_MARGIN",
+      "aliases": [
+        "毛利率",
+        "毛利率百分比",
+        "營業毛利率",
+        "GM",
+        "GP Margin",
+        "Gross Margin",
+        "Gross Profit Margin"
+      ],
+      "regex": [
+        "(?i)\\bgp\\s+margin\\b",
+        "(?i)\\bgross\\s+(profit\\s+)?margin\\b",
+        "毛利率|營業毛利率"
+      ],
+      "definition": "Gross margin.",
+      "formula": "GrossMargin = GrossProfit / Revenue",
+      "verification_rules": [
+        "A: Revenue-COGS / Revenue",
+        "B: GrossProfit / Revenue"
+      ]
+    },
+    {
+      "category": "RATIO",
+      "canonical": "NET_MARGIN",
+      "aliases": [
+        "淨利率",
+        "稅後淨利率",
+        "Net Margin",
+        "Net Profit Margin",
+        "NPM"
+      ],
+      "regex": [
+        "(?i)\\bnet\\s+(profit\\s+)?margin\\b",
+        "(?i)\\bnpm\\b",
+        "淨利率|稅後淨利率"
+      ],
+      "definition": "Net margin.",
+      "formula": "NetMargin = NetIncome / Revenue",
+      "verification_rules": [
+        "Cross-calc"
+      ]
+    },
+    {
+      "category": "RATIO",
+      "canonical": "OPERATING_MARGIN",
+      "aliases": [
+        "營利率",
+        "營業利益率",
+        "EBIT Margin",
+        "OP Margin",
+        "Operating Margin",
+        "Operating Profit Margin"
+      ],
+      "regex": [
+        "(?i)\\bebit\\s+margin\\b",
+        "(?i)\\bop\\s+margin\\b",
+        "(?i)\\boperating\\s+(profit\\s+)?margin\\b",
+        "營業利益率|營利率"
+      ],
+      "definition": "Operating margin.",
+      "formula": "OperatingMargin = OperatingIncome / Revenue",
+      "verification_rules": [
+        "Cross-calc"
+      ]
+    },
+    {
+      "category": "RATIO",
+      "canonical": "ROA",
+      "aliases": [
+        "資產報酬率",
+        "總資產報酬率",
+        "Return on Assets",
+        "ROA"
+      ],
+      "regex": [
+        "(?i)\\breturn\\s+on\\s+assets\\b",
+        "(?i)\\broa\\b",
+        "資產報酬率|總資產報酬率"
+      ],
+      "definition": "ROA.",
+      "formula": "ROA = NetIncome / AverageAssets",
+      "verification_rules": [
+        "Cross-calc"
+      ]
+    },
+    {
+      "category": "RATIO",
+      "canonical": "ROE",
+      "aliases": [
+        "股東權益報酬率",
+        "權益報酬率",
+        "Return on Equity",
+        "ROE"
+      ],
+      "regex": [
+        "(?i)\\breturn\\s+on\\s+equity\\b",
+        "(?i)\\broe\\b",
+        "股東權益報酬率|權益報酬率"
+      ],
+      "definition": "ROE.",
+      "formula": "ROE = NetIncome / AverageEquity",
+      "verification_rules": [
+        "Direct and DuPont"
+      ]
+    },
+    {
+      "category": "VALUATION_LATEST_ADJ_CLOSE",
+      "canonical": "DIVIDEND_YIELD",
+      "aliases": [
+        "股息殖利率",
+        "現金殖利率",
+        "殖利率",
+        "Cash Yield",
+        "Dividend Yield",
+        "DY",
+        "Yield"
+      ],
+      "regex": [
+        "(?i)\\bcash\\s+yield\\b",
+        "(?i)\\bdividend\\s+yield\\b",
+        "殖利率|股息殖利率|現金殖利率"
+      ],
+      "definition": "Dividend yield.",
+      "formula": "DividendYield = DPS / LatestAdjClose",
+      "verification_rules": [
+        "LatestAdjClose base"
+      ]
+    },
+    {
+      "category": "VALUATION_LATEST_ADJ_CLOSE",
+      "canonical": "EV_EBITDA",
+      "aliases": [
+        "企業價值倍數",
+        "Enterprise Value EBITDA",
+        "EV to EBITDA",
+        "EV/EBITDA"
+      ],
+      "regex": [
+        "(?i)\\benterprise\\s+value\\s+.*ebitda\\b",
+        "(?i)\\bev\\s*\\/\\s*ebitda\\b",
+        "企業價值倍數"
+      ],
+      "definition": "EV/EBITDA.",
+      "formula": "EVEBITDA = EnterpriseValue / EBITDA",
+      "verification_rules": [
+        "MarketCap from LatestAdjClose"
+      ]
+    },
+    {
+      "category": "VALUATION_LATEST_ADJ_CLOSE",
+      "canonical": "FCF_YIELD",
+      "aliases": [
+        "自由現金流殖利率",
+        "FCF Yield",
+        "FCF殖利率",
+        "Free Cash Flow Yield"
+      ],
+      "regex": [
+        "(?i)\\bfcf\\s+yield\\b",
+        "(?i)\\bfree\\s+cash\\s+flow\\s+yield\\b",
+        "自由現金流殖利率|FCF殖利率"
+      ],
+      "definition": "FCF yield.",
+      "formula": "FCFYield = FCFPerShare / LatestAdjClose",
+      "verification_rules": [
+        "LatestAdjClose base"
+      ]
+    },
+    {
+      "category": "VALUATION_LATEST_ADJ_CLOSE",
+      "canonical": "LATEST_ADJ_CLOSE",
+      "aliases": [
+        "收盤價",
+        "最新收盤價",
+        "最新股價",
+        "最新調整收盤價",
+        "調整後收盤價",
+        "Adj Close",
+        "Adjusted Close",
+        "Close Price",
+        "Last Price",
+        "Latest Adj Close",
+        "Latest Adjusted Close"
+      ],
+      "regex": [
+        "(?i)\\b(last|close)\\s+price\\b",
+        "(?i)\\b(latest\\s+)?adj(usted)?\\s+close\\b",
+        "(?i)\\badjusted\\s+close\\b",
+        "最新調整收盤價|調整後收盤價|最新收盤價|收盤價|最新股價"
+      ],
+      "definition": "Latest adjusted close price base.",
+      "formula": "",
+      "verification_rules": [
+        "Valuation base"
+      ]
+    },
+    {
+      "category": "VALUATION_LATEST_ADJ_CLOSE",
+      "canonical": "MARKET_CAP",
+      "aliases": [
+        "市值",
+        "市場價值",
+        "總市值",
+        "Market Cap",
+        "Market Capitalization",
+        "Mkt Cap"
+      ],
+      "regex": [
+        "(?i)\\bmarket\\s+cap(italization)?\\b",
+        "(?i)\\bmkt\\s+cap\\b",
+        "市值|總市值|市場價值"
+      ],
+      "definition": "Market cap.",
+      "formula": "MarketCap = LatestAdjClose * SharesOutstanding",
+      "verification_rules": [
+        "LatestAdjClose base"
+      ]
+    },
+    {
+      "category": "VALUATION_LATEST_ADJ_CLOSE",
+      "canonical": "PB_RATIO",
+      "aliases": [
+        "市淨率",
+        "股價淨值比",
+        "P/B",
+        "P/B Ratio",
+        "PB",
+        "PBR",
+        "Price Book",
+        "Price to Book"
+      ],
+      "regex": [
+        "(?i)\\bp\\/?b\\b",
+        "(?i)\\bpbr\\b",
+        "(?i)\\bprice\\s+to\\s+book\\b",
+        "股價淨值比|市淨率"
+      ],
+      "definition": "PB ratio.",
+      "formula": "PB = LatestAdjClose / BVPS",
+      "verification_rules": [
+        "LatestAdjClose base"
+      ]
+    },
+    {
+      "category": "VALUATION_LATEST_ADJ_CLOSE",
+      "canonical": "PE_RATIO",
+      "aliases": [
+        "市盈率",
+        "本益比",
+        "P/E",
+        "P/E Ratio",
+        "PE",
+        "PER",
+        "Price Earnings",
+        "Price to Earnings"
+      ],
+      "regex": [
+        "(?i)\\bp\\/?e\\b",
+        "(?i)\\bper\\b",
+        "(?i)\\bprice\\s+to\\s+earnings\\b",
+        "本益比|市盈率"
+      ],
+      "definition": "PE ratio.",
+      "formula": "PE = LatestAdjClose / EPS",
+      "verification_rules": [
+        "LatestAdjClose base"
+      ]
+    },
+    {
+      "category": "VALUATION_LATEST_ADJ_CLOSE",
+      "canonical": "PRICE_TARGET",
+      "aliases": [
+        "目標股價",
+        "目標價",
+        "合理價",
+        "評價目標",
+        "Price Target",
+        "PT",
+        "Target Price",
+        "TP"
+      ],
+      "regex": [
+        "(?i)\\b(price|target)\\s+(target|price)\\b",
+        "(?i)\\b(tp|pt)\\b",
+        "目標價|目標股價|合理價|評價目標"
+      ],
+      "definition": "Target price.",
+      "formula": "",
+      "verification_rules": [
+        "Upside check"
+      ]
+    },
+    {
+      "category": "VALUATION_LATEST_ADJ_CLOSE",
+      "canonical": "PS_RATIO",
+      "aliases": [
+        "市銷率",
+        "股價營收比",
+        "P/S",
+        "P/S Ratio",
+        "Price Sales",
+        "Price to Sales",
+        "PS"
+      ],
+      "regex": [
+        "(?i)\\bp\\/?s\\b",
+        "(?i)\\bprice\\s+to\\s+sales\\b",
+        "股價營收比|市銷率"
+      ],
+      "definition": "PS ratio.",
+      "formula": "PS = MarketCap / Revenue",
+      "verification_rules": [
+        "LatestAdjClose base"
+      ]
+    },
+    {
+      "category": "VALUATION_LATEST_ADJ_CLOSE",
+      "canonical": "UPSIDE_DOWNSIDE",
+      "aliases": [
+        "上行空間",
+        "下行空間",
+        "潛在報酬",
+        "隱含報酬",
+        "Downside",
+        "Implied Return",
+        "Potential Return",
+        "Upside"
+      ],
+      "regex": [
+        "(?i)\\b(upside|downside|potential\\s+return|implied\\s+return)\\b",
+        "上行空間|下行空間|潛在報酬|隱含報酬"
+      ],
+      "definition": "Implied return.",
+      "formula": "UpsideDownside = TargetPrice / LatestAdjClose - 1",
+      "verification_rules": [
+        "LatestAdjClose base"
+      ]
+    }
+  ]
+}

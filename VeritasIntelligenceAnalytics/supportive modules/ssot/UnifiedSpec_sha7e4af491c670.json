@@ -1,0 +1,115 @@
+{
+  "meta": {
+    "schema": "VIA.CodexNexus.UnifiedSpec",
+    "version": "v1.0",
+    "generated": "2026-06-17",
+    "engine": "UnifiedSpec",
+    "output": "UnifiedSpec.json",
+    "reads": "HTML/CSS/JS/JSON/YAML/MD",
+    "append_only": true,
+    "languages": [
+      "PowerShell",
+      "Python",
+      "JavaScript",
+      "HTML"
+    ]
+  },
+  "language_adapters": {
+    "FileInventory": {
+      "python": "pathlib.rglob",
+      "javascript": "File API",
+      "powershell": "Get-ChildItem -Recurse",
+      "html": "—"
+    },
+    "HTMLComponent": {
+      "python": "beautifulsoup4 / html.parser",
+      "javascript": "DOMParser",
+      "powershell": "—",
+      "html": "Inspector"
+    },
+    "CSSToken": {
+      "python": "tinycss2",
+      "javascript": "CSSStyleSheet",
+      "powershell": "—",
+      "html": "—"
+    },
+    "ScriptBehavior": {
+      "python": "ast / regex",
+      "javascript": "Acorn",
+      "powershell": "—",
+      "html": "—"
+    },
+    "ThreeBucket": {
+      "python": "VAP_TemplateIngestor",
+      "javascript": "—",
+      "powershell": "—",
+      "html": "—"
+    },
+    "JsonSpec": {
+      "python": "json / orjson",
+      "javascript": "JSON.parse",
+      "powershell": "ConvertFrom-Json",
+      "html": "—"
+    },
+    "Schema": {
+      "python": "pydantic",
+      "javascript": "Zod",
+      "powershell": "—",
+      "html": "—"
+    },
+    "Validation": {
+      "python": "jsonschema",
+      "javascript": "Ajv",
+      "powershell": "—",
+      "html": "—"
+    },
+    "MarkdownSpec": {
+      "python": "markdown-it-py",
+      "javascript": "markdown-it",
+      "powershell": "—",
+      "html": "render"
+    },
+    "PlainTextMap": {
+      "python": "ruamel.yaml / dict",
+      "javascript": "i18next",
+      "powershell": "—",
+      "html": "—"
+    }
+  },
+  "output_schema": {
+    "categories": [
+      "HEADER",
+      "LAYOUT",
+      "COLOR",
+      "TYPOGRAPHY",
+      "DIMENSION",
+      "INTERACTIVE",
+      "MARKER"
+    ],
+    "three_bucket": [
+      "function_links",
+      "parameter_links",
+      "html_ui"
+    ],
+    "item": {
+      "key": "str",
+      "value": "str",
+      "status": "LOCKED|EDITABLE",
+      "reason": "str"
+    },
+    "file_record": {
+      "file": "str",
+      "sha256": "str",
+      "kind": "UI_TEMPLATE|CHART_TEMPLATE|APP_CONSOLE|MATRIX_DASHBOARD",
+      "summary": {
+        "locked": "int",
+        "editable": "int"
+      }
+    }
+  },
+  "io": {
+    "input": "HTML 檔/資料夾",
+    "output": "UnifiedSpec.json",
+    "cmd": "Invoke-VeritasCodexNexus.ps1 -Mode Spec -Task ExtractAll"
+  }
+}

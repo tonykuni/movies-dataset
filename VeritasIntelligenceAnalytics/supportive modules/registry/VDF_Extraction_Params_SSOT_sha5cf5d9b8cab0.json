@@ -1,0 +1,189 @@
+{
+  "system": {
+    "name": "VeritasDataForge",
+    "code": "VDF",
+    "root": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\functional modules\\VDF",
+    "dict_root": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF",
+    "ssot_dir": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_ssot",
+    "database_dir": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\DATABASE",
+    "timezone": "Asia/Taipei",
+    "encoding_csv": "UTF8BOM",
+    "policy": "add_only; no_delete; no_Stop_Process; no_exit; parameters_in_SSOT_not_hardcoded"
+  },
+  "output": {
+    "required": [
+      "parquet"
+    ],
+    "optional": [
+      "duckdb",
+      "csv",
+      "json",
+      "google_sheet"
+    ],
+    "database_dir": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\DATABASE"
+  },
+  "sources": {
+    "twse": {
+      "enabled": true,
+      "purpose": "TW listed market data, prices, trading, company metadata"
+    },
+    "tpex": {
+      "enabled": true,
+      "purpose": "OTC market data, prices, trading, company metadata"
+    },
+    "mops": {
+      "enabled": true,
+      "purpose": "monthly revenue, financial statements, corporate actions"
+    },
+    "yfinance": {
+      "enabled": true,
+      "purpose": "adj close, volume, international tickers, ETF, commodities fallback"
+    },
+    "fred": {
+      "enabled": true,
+      "purpose": "macro time series"
+    },
+    "akshare": {
+      "enabled": true,
+      "purpose": "BDI, commodity, regional market fallback"
+    }
+  },
+  "validation": {
+    "ticker_regex": "^[0-9A-Z]{4,8}$",
+    "date_format": "yyyy-MM-dd",
+    "period_format": "yyyyQ[1-4]|yyyyMM|yyyy",
+    "required_outputs": [
+      "parquet"
+    ],
+    "fail_policy": "required_field_missing_or_invalid_json_or_invalid_schema",
+    "warn_policy": "optional_source_missing_or_duckdb_optional_missing"
+  },
+  "tables": [
+    {
+      "TableId": "VDF_TW_EquityUniverse",
+      "Category": "TW_STOCK_UNIVERSE",
+      "Source": "TWSE,TPEX",
+      "Frequency": "DAILY",
+      "Fields": "ticker,name,market,industry,isin,security_type,listed_date",
+      "Required": "ticker,name,market",
+      "Validation": "ticker_regex; name_not_null; market_in_TWSE_TPEX",
+      "Output": "parquet,duckdb,csv,json",
+      "Path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\DATABASE",
+      "Purpose": "建立台股上市櫃 universe，提供 VDF / VRN / VIA 共用 ticker master。"
+    },
+    {
+      "TableId": "VDF_TW_CompanyProfile",
+      "Category": "COMPANY_PROFILE",
+      "Source": "TWSE,TPEX,MOPS",
+      "Frequency": "MONTHLY",
+      "Fields": "ticker,name,chairman,general_manager,spokesperson,address,phone,website,industry",
+      "Required": "ticker,name",
+      "Validation": "ticker_regex; company_name_not_null",
+      "Output": "parquet,duckdb,csv,json",
+      "Path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\DATABASE",
+      "Purpose": "建立公司基本資料，供投資研究、產業分類與報告交叉驗證。"
+    },
+    {
+      "TableId": "VDF_TW_PriceDaily",
+      "Category": "PRICE_OHLCV",
+      "Source": "TWSE,TPEX,YFINANCE",
+      "Frequency": "DAILY",
+      "Fields": "ticker,date,open,high,low,close,adj_close,volume,turnover,return_1d,return_5d,return_20d,return_60d",
+      "Required": "ticker,date,close,volume",
+      "Validation": "date_iso; ohlc_numeric; high_ge_low; close_not_null",
+      "Output": "parquet,duckdb,csv,json",
+      "Path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\DATABASE",
+      "Purpose": "建立每日股價、成交量、報酬率資料庫。"
+    },
+    {
+      "TableId": "VDF_TW_MonthlyRevenue",
+      "Category": "MONTHLY_REVENUE",
+      "Source": "MOPS",
+      "Frequency": "MONTHLY",
+      "Fields": "ticker,yyyymm,revenue,mom,yoy,cum_revenue,cum_yoy",
+      "Required": "ticker,yyyymm,revenue",
+      "Validation": "yyyymm_regex; revenue_numeric",
+      "Output": "parquet,duckdb,csv,json",
+      "Path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\DATABASE",
+      "Purpose": "建立月營收資料，用於成長趨勢與營收驗證。"
+    },
+    {
+      "TableId": "VDF_TW_FinancialStatement",
+      "Category": "FINANCIAL_STATEMENT",
+      "Source": "MOPS",
+      "Frequency": "QUARTERLY",
+      "Fields": "ticker,period,revenue,gross_profit,op_income,net_income,eps,total_assets,total_liabilities,equity,cash_flow_ops",
+      "Required": "ticker,period",
+      "Validation": "period_regex; numeric_fields_nullable; eps_numeric",
+      "Output": "parquet,duckdb,csv,json",
+      "Path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\DATABASE",
+      "Purpose": "建立財報資料，支援基本面分析與 VRN report cross-check。"
+    },
+    {
+      "TableId": "VDF_TW_FlowChip",
+      "Category": "CHIP_FLOW",
+      "Source": "TWSE,TPEX",
+      "Frequency": "DAILY",
+      "Fields": "ticker,date,foreign_buy_sell,trust_buy_sell,dealer_buy_sell,margin_balance,short_balance,securities_lending",
+      "Required": "ticker,date",
+      "Validation": "date_iso; numeric_fields",
+      "Output": "parquet,duckdb,csv,json",
+      "Path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\DATABASE",
+      "Purpose": "建立籌碼資料，追蹤三大法人與信用交易。"
+    },
+    {
+      "TableId": "VDF_TW_DividendAction",
+      "Category": "DIVIDEND_CORPORATE_ACTION",
+      "Source": "TWSE,TPEX,MOPS",
+      "Frequency": "EVENT",
+      "Fields": "ticker,ex_date,cash_dividend,stock_dividend,yield,payout_ratio,record_date,payment_date",
+      "Required": "ticker,ex_date",
+      "Validation": "date_iso; dividend_numeric",
+      "Output": "parquet,duckdb,csv,json",
+      "Path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\DATABASE",
+      "Purpose": "建立股利、除權息與公司行動資料。"
+    },
+    {
+      "TableId": "VDF_TW_IndexETFTheme",
+      "Category": "INDEX_ETF_THEME",
+      "Source": "TWSE,TPEX,YFINANCE",
+      "Frequency": "DAILY",
+      "Fields": "code,date,name,close,volume,theme,constituents,weight",
+      "Required": "code,date,close",
+      "Validation": "code_not_null; date_iso; close_numeric",
+      "Output": "parquet,duckdb,csv,json",
+      "Path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\DATABASE",
+      "Purpose": "建立指數、ETF、主題與成分股資料。"
+    },
+    {
+      "TableId": "VDF_Global_MacroCommodity",
+      "Category": "GLOBAL_MACRO_COMMODITY",
+      "Source": "FRED,AKSHARE,YFINANCE",
+      "Frequency": "DAILY_WEEKLY",
+      "Fields": "symbol,date,value,source,unit,frequency,description",
+      "Required": "symbol,date,value,source",
+      "Validation": "symbol_not_null; date_iso; value_numeric",
+      "Output": "parquet,duckdb,csv,json",
+      "Path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\DATABASE",
+      "Purpose": "建立總經、商品、航運、利率、匯率與國際市場資料。"
+    }
+  ],
+  "supportive_tools_import": {
+    "VeritasAegisNexus": {
+      "role": "Protection, validation, hard-gate, risk guard",
+      "file": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules\\50_Protection_Acceleration\\VeritasAegisNexus.py",
+      "freeze_lock": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules\\50_Protection_Acceleration\\VeritasAegisNexus.py.freeze.lock.json",
+      "imported_to_vdf_ssot": true
+    },
+    "VeritasCeleritas": {
+      "role": "Acceleration, cache, batch IO, fetch optimization",
+      "file": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules\\50_Protection_Acceleration\\VeritasCeleritas.py",
+      "freeze_lock": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules\\50_Protection_Acceleration\\VeritasCeleritas.py.freeze.lock.json",
+      "imported_to_vdf_ssot": true
+    }
+  },
+  "output_database_scope_matrix": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_ssot\\VDF_OutputDatabase_DataScope_Matrix.json",
+  "data_scope_header_registry": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_ssot\\VDF_DataScope_HeaderRegistry_SSOT.json",
+  "data_scope_header_registry_matrix": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_ssot\\VDF_DataScope_HeaderRegistry_Matrix.json",
+  "three_round_tdo_latest_report": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_ssot\\_tdo\\VDF_THREE_ROUND_TDO_v013_20260609_205921\\report\\VDF_ThreeRound_TDO_Report_v013.html"
+}

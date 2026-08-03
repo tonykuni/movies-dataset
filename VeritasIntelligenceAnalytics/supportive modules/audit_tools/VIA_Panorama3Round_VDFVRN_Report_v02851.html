@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA Panorama 3-Round · VDF + VRN · v028.5.1</title>
+<style>
+body{margin:0;background:#f7f4ed;color:#25312f;font-family:Arial,"Microsoft JhengHei",sans-serif}
+.wrap{max-width:1600px;margin:0 auto;padding:28px}
+.hero{border:1px solid #d8d0c3;border-radius:24px;background:#fffdf8;padding:26px;box-shadow:0 18px 50px rgba(30,40,36,.08)}
+h1{margin:0;font-size:28px}
+h2{margin-top:28px;font-size:20px}
+.sub{color:#6e7b78;margin-top:8px;line-height:1.7}
+.kpis{display:grid;grid-template-columns:repeat(8,minmax(120px,1fr));gap:12px;margin-top:20px}
+.kpi{border:1px solid #d8d0c3;border-radius:18px;padding:14px;background:#fff}
+.kpi b{font-size:22px;display:block}
+.kpi span{font-size:12px;color:#6e7b78}
+.badge{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid #d8d0c3;background:#fff;margin-right:8px;margin-top:8px}
+.ok td{background:#f3fbf5}.warn td{background:#fff8e9}.bad td{background:#fff1f1}
+.mw{overflow:auto;border:1px solid #d8d0c3;border-radius:18px;background:#fff}
+table{border-collapse:collapse;width:100%;font-size:12px}
+th{position:sticky;top:0;background:#e8eee9;color:#20332f;z-index:1}
+th,td{border-bottom:1px solid #e8e1d6;padding:9px 10px;text-align:left;vertical-align:top;white-space:nowrap}
+td:nth-child(13),td:nth-child(14){white-space:normal;min-width:320px}
+pre{white-space:pre-wrap;background:#17211f;color:#e9fff8;padding:16px;border-radius:16px;overflow:auto}
+@media(max-width:900px){.kpis{grid-template-columns:1fr}.wrap{padding:14px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hero">
+<h1>Veritas Intelligence Analytics · Panorama 3-Round · VDF + VRN · v028.5.1</h1>
+<div class="sub">NexusCore control plane · VDF write governance + quarantine research · VRN ingestion/normalization/presentation · generated script AST repair · no DATABASE write · no canonical merge</div>
+<p><span class="badge">Status: VIA_PANORAMA3ROUND_VDF_VRN_REPAIR_BLOCKED</span><span class="badge">Risk: HIGH</span><span class="badge">Recommendation: BLOCK_V0286_UNTIL_REPAIRED_SCRIPT_DEFECTS_RESOLVED</span></p>
+<div class="kpis">
+<div class="kpi"><b>13</b><span>OK</span></div>
+<div class="kpi"><b>5</b><span>WARN / REVIEW</span></div>
+<div class="kpi"><b>3</b><span>FAIL / BLOCK</span></div>
+<div class="kpi"><b>19723</b><span>Files inventoried</span></div>
+<div class="kpi"><b>16</b><span>PS files scanned</span></div>
+<div class="kpi"><b>1</b><span>PS parse fail files</span></div>
+<div class="kpi"><b>1</b><span>Repair hard blocks</span></div>
+<div class="kpi"><b>5</b><span>VDF/VRN lanes</span></div>
+</div>
+</div>
+
+<h2>def Matrix</h2>
+<div class="mw">
+<table>
+<thead>
+<tr><th>Round</th><th>Project</th><th>Lane</th><th>Stage</th><th>Name</th><th>Status</th><th>Risk</th><th>FixClass</th><th>Priority</th><th>Mode</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr>
+</thead>
+<tbody><tr class='ok'><td>Round0</td><td>VIA</td><td>CONTROL_PLANE</td><td>BOOT</td><td>ProjectRoot</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>ANALYZE_ONLY</td><td>exists</td><td>true</td><td>Project root exists.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics</td></tr>
+<tr class='ok'><td>Round0</td><td>VIA</td><td>CONTROL_PLANE</td><td>POLICY</td><td>No DB Write</td><td>OK_POLICY_LOCKED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>ANALYZE_ONLY</td><td>db_write_enabled</td><td>false</td><td>This run never writes DATABASE.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</td></tr>
+<tr class='ok'><td>Round0</td><td>VIA</td><td>CONTROL_PLANE</td><td>POLICY</td><td>No Canonical Merge</td><td>OK_POLICY_LOCKED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>ANALYZE_ONLY</td><td>canonical_merge_enabled</td><td>false</td><td>This run never canonical-merges.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333</td></tr>
+<tr class='ok'><td>Round0</td><td>VIA</td><td>CONTROL_PLANE</td><td>POLICY</td><td>No Generated Script Execution</td><td>OK_POLICY_LOCKED</td><td>LOW</td><td>SEQUENTIAL_REQUIRED</td><td>P0</td><td>ANALYZE_REPAIR_ONLY</td><td>execute_generated_script</td><td>false</td><td>Generated write script is reviewed/repaired only, not executed.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333</td></tr>
+<tr class='ok'><td>Round0</td><td>VIA</td><td>CONTROL_PLANE</td><td>NEXUSCORE</td><td>Invoke-VeritasNexusCore.ps1</td><td>OK_FOUND</td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>CONTROL_PLANE_ONLY</td><td>exists</td><td>true</td><td>Supportive modules will be routed through NexusCore.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\Invoke-VeritasNexusCore.ps1</td></tr>
+<tr class='ok'><td>Round0</td><td>VIA</td><td>CONTROL_PLANE</td><td>INVENTORY</td><td>Repo File Inventory</td><td>OK_CREATED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>ANALYZE_ONLY</td><td>files</td><td>19723</td><td>Full repo file inventory created.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\registry\VIA_Panorama_FileInventory_v02851.csv</td></tr>
+<tr class='ok'><td>Round0</td><td>VIA</td><td>TOOLING</td><td>BOOTSTRAP</td><td>Tool Availability</td><td>OK_CREATED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>ANALYZE_ONLY</td><td>tools</td><td>11</td><td>Tool availability matrix generated.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\registry\VIA_Panorama_ToolAvailability_v02851.csv</td></tr>
+<tr class='warn'><td>Round0</td><td>VIA</td><td>TOOLING</td><td>INSTALL_PLAN</td><td>Guarded Tool Installer</td><td>WARN_PLAN_ONLY</td><td>MEDIUM</td><td>SEQUENTIAL_GATED</td><td>P1</td><td>PLAN_ONLY</td><td>install_executed_now</td><td>false</td><td>Generated guarded install plan only; no install executed.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\plan\VIA_ToolBundle_InstallPlan_GUARDED_NOT_RUN_v02851.json</td></tr>
+<tr class='warn'><td>Round1</td><td>VIA</td><td>PARALLEL_SAFE</td><td>AST_AUDIT</td><td>PowerShell AST Audit</td><td>WARN_PARSE_ERRORS_FOUND</td><td>MEDIUM</td><td>SEQUENTIAL_REQUIRED</td><td>P0</td><td>ANALYZE_ONLY</td><td>parse_fail_files</td><td>1</td><td>Some PowerShell files have parse errors; repair sequentially.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\registry\VIA_Panorama_PowerShellAstAudit_v02851.csv</td></tr>
+<tr class='ok'><td>Round1</td><td>VIA</td><td>PARALLEL_SAFE</td><td>HTML_AUDIT</td><td>HTML UI Report Audit</td><td>OK_CREATED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>ANALYZE_ONLY</td><td>html_files</td><td>476</td><td>HTML file audit matrix generated.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\registry\VIA_Panorama_HtmlAudit_v02851.csv</td></tr>
+<tr class='ok'><td>Round1</td><td>VIA</td><td>PARALLEL_SAFE</td><td>PYTHON_INVENTORY</td><td>Python File Inventory</td><td>OK_CREATED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>ANALYZE_ONLY</td><td>py_files</td><td>64</td><td>Python inventory generated.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\registry\VIA_Panorama_PythonInventory_v02851.csv</td></tr>
+<tr class='warn'><td>Round1</td><td>VIA</td><td>CONTROL_PLANE</td><td>LANE_PLAN</td><td>VDF/VRN Five Lane Plan</td><td>OK_PLAN_CREATED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>PLAN_ONLY</td><td>lanes</td><td>5</td><td>VDF two lanes and VRN three lanes plan generated.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\plan\VIA_VDF_VRN_5Lane_Plan_v02851.json</td></tr>
+<tr class='ok'><td>Round2</td><td>VDF</td><td>Write_Governance</td><td>SCRIPT_REPAIR</td><td>Original Script Backup</td><td>OK_BACKUP_CREATED</td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>REPAIR_ONLY</td><td>backup</td><td>created</td><td>Original generated script backed up.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\backup\Original_Invoke-VDF-AkShare-StagingWrite-GENERATED-NOT-RUN-v0285.ps1</td></tr>
+<tr class='bad'><td>Round2</td><td>VDF</td><td>Write_Governance</td><td>ORIGINAL_SCRIPT_REVIEW</td><td>Original Generated Script</td><td>WARN_ORIGINAL_PARSE_BLOCKED</td><td>MEDIUM</td><td>SEQUENTIAL_REQUIRED</td><td>P0</td><td>REPAIR_ONLY</td><td>parse_errors</td><td>2</td><td>Original generated script has parse errors; repaired copy generated.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\registry\VDF_AkShare_v02851_OriginalGeneratedScriptReview.csv</td></tr>
+<tr class='bad'><td>Round2</td><td>VDF</td><td>Write_Governance</td><td>REPAIRED_AST</td><td>Repaired Script AST</td><td>BLOCK_AST_PARSE_FAIL</td><td>HIGH</td><td>SEQUENTIAL_REQUIRED</td><td>P0</td><td>REPAIR_ONLY</td><td>parse_errors</td><td>2</td><td>The assignment expression is not valid. The input to an assignment operator must be an object that is able to accept assignments, such as a variable or a property. | The assignment expression is not valid. The input to an assignment operator must be an object that is able to accept assignments, such as a variable or a property.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\repair\Invoke-VDF-AkShare-StagingWrite-REPAIRED-NOT-RUN-v02851.ps1</td></tr>
+<tr class='ok'><td>Round2</td><td>VDF</td><td>Write_Governance</td><td>REPAIRED_FORBIDDEN</td><td>Forbidden Commands</td><td>OK_NONE_FOUND</td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>REPAIR_ONLY</td><td>commands</td><td>0</td><td>No forbidden commands in repaired script.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\repair\Invoke-VDF-AkShare-StagingWrite-REPAIRED-NOT-RUN-v02851.ps1</td></tr>
+<tr class='warn'><td>Round2</td><td>VDF</td><td>Write_Governance</td><td>REPAIRED_GUARDS</td><td>Guard Rails</td><td>OK_GUARDS_PRESENT</td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>REPAIR_ONLY</td><td>guards</td><td>present</td><td>Guard token, review-only path, disabled execution, and no-exit text are present.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\repair\Invoke-VDF-AkShare-StagingWrite-REPAIRED-NOT-RUN-v02851.ps1</td></tr>
+<tr class='bad'><td>Round3</td><td>VIA</td><td>CONSOLIDATE</td><td>RESULT</td><td>Repair Result</td><td>BLOCKED</td><td>HIGH</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>REPAIR_ONLY</td><td>recommendation</td><td>BLOCK_V0286_UNTIL_REPAIRED_SCRIPT_DEFECTS_RESOLVED</td><td>Three-round panorama repair completed.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\plan\VDF_AkShare_v02851_RepairedGeneratedScriptReview.json</td></tr>
+<tr class='ok'><td>Round3</td><td>VIA</td><td>CONSOLIDATE</td><td>LOCAL_FREE_LIBS</td><td>Top10 Local Free Libs</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>PLAN_ONLY</td><td>rows</td><td>5</td><td>Top10 tool matrix generated.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\registry\VIA_Top10_LocalFreeLibs_Panorama3Round_v02851.json</td></tr>
+<tr class='warn'><td>Round3</td><td>VIA</td><td>CONSOLIDATE</td><td>NEXT_GATE</td><td>v028.6 Next Gate Plan</td><td>OK_PLAN_CREATED</td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>PLAN_ONLY</td><td>next_step</td><td>repair repaired-script defects; no DB write</td><td>Next gate plan generated.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\plan\VIA_v0286_NextGatePlan_NO_DB_WRITE.json</td></tr>
+<tr class='ok'><td>Round3</td><td>VIA</td><td>CONSOLIDATE</td><td>POINTER</td><td>VDF_ACTIVE_POINTER.json</td><td>OK_UPDATED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>PLAN_ONLY</td><td>update</td><td>complete</td><td>Active pointer updated.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ACTIVE_POINTER.json</td></tr></tbody>
+</table>
+</div>
+
+<h2>def Output Paths</h2>
+<pre>
+RunRoot                  : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333
+HTML                     : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\report\VIA_Panorama3Round_VDFVRN_Report_v02851.html
+CSV Matrix               : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\registry\VIA_Panorama3Round_VDFVRN_Matrix_v02851.csv
+JSON Matrix              : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\registry\VIA_Panorama3Round_VDFVRN_Matrix_v02851.json
+Runtime Result           : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\runtime\via_panorama3round_vdf_vrn_result_v02851.json
+Inventory CSV            : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\registry\VIA_Panorama_FileInventory_v02851.csv
+PowerShell AST CSV       : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\registry\VIA_Panorama_PowerShellAstAudit_v02851.csv
+HTML Audit CSV           : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\registry\VIA_Panorama_HtmlAudit_v02851.csv
+Lane Plan JSON           : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\plan\VIA_VDF_VRN_5Lane_Plan_v02851.json
+Install Plan JSON        : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\plan\VIA_ToolBundle_InstallPlan_GUARDED_NOT_RUN_v02851.json
+Guarded Install Script   : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\plan\Invoke-VIA-ToolBundle-Install-GUARDED-NOT-RUN-v02851.ps1
+Original Script Review   : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\registry\VDF_AkShare_v02851_OriginalGeneratedScriptReview.csv
+Repaired Script          : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\repair\Invoke-VDF-AkShare-StagingWrite-REPAIRED-NOT-RUN-v02851.ps1
+Repaired Script SHA256   : F8B82A96E68A3E0BC89CA98713223D2C52E023DEE97A31FD238F63BDDC94CBBE
+Repaired Review JSON     : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\plan\VDF_AkShare_v02851_RepairedGeneratedScriptReview.json
+Next Gate JSON           : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\plan\VIA_v0286_NextGatePlan_NO_DB_WRITE.json
+Active Pointer           : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ACTIVE_POINTER.json
+Transcript               : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\runtime\VIA_Panorama3Round_VDFVRN_v02851_Transcript_20260611_104333.txt
+</pre>
+
+<h2>def Next Gate</h2>
+<pre>
+repair repaired-script defects; no DB write
+
+Policy:
+DB write = false
+Canonical merge = false
+Generated script executed now = false
+Destructive delete = false
+Stop-Process = false
+
+Recommended lane control:
+VDF lane 1 = Write Governance Lane / SEQUENTIAL_GATED
+VDF lane 2 = Quarantine Reduction Lane / PARALLEL_SAFE
+VRN lane 1 = Ingestion Lane / PARALLEL_SAFE
+VRN lane 2 = Normalization Lane / PARALLEL_SAFE
+VRN lane 3 = Presentation Lane / PARALLEL_SAFE
+</pre>
+</div>
+</body>
+</html>

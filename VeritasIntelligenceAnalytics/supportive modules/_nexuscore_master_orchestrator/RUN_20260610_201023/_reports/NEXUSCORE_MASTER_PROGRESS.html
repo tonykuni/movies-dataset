@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NexusCore Master Progress</title>
+<style>
+* { box-sizing: border-box; }
+body { font-family: "DM Sans", Arial, "Microsoft JhengHei", sans-serif; background:#0f172a; color:#e5e7eb; margin:0; padding:28px; }
+h1 { font-family: "Syne","DM Sans",sans-serif; font-size:23px; margin:0 0 4px; }
+.sub { color:#94a3b8; font-size:13px; margin-bottom:20px; }
+.grid { display:grid; grid-template-columns: repeat(4,1fr); gap:12px; margin-bottom:18px; }
+.kpi { background:#1e293b; border:1px solid #334155; border-radius:14px; padding:14px 16px; }
+.kpi .n { font-family:"DM Mono",Consolas,monospace; font-size:22px; font-weight:700; }
+.kpi .l { color:#94a3b8; font-size:12px; margin-top:2px; }
+.card { background:#1e293b; border:1px solid #334155; border-radius:16px; padding:18px 20px; margin-bottom:18px; }
+.card h2 { font-size:14px; margin:0 0 12px; color:#cbd5e1; letter-spacing:.05em; text-transform:uppercase; }
+.overall { background:#0f172a; border:1px solid #334155; border-radius:999px; height:24px; overflow:hidden; }
+.overall .ofill { height:100%; width:0; background:linear-gradient(90deg,#4c78a8,#439a9a); border-radius:999px; animation: ogrow 1.3s cubic-bezier(.2,.8,.2,1) forwards; }
+.stacked { display:flex; height:20px; border-radius:999px; overflow:hidden; background:#0f172a; border:1px solid #334155; }
+.seg { width:0; animation: grow 1.4s cubic-bezier(.2,.8,.2,1) forwards; }
+.step { margin:13px 0; }
+.step-head { display:flex; align-items:center; gap:10px; margin-bottom:6px; font-size:13px; }
+.step-name { font-family:"DM Mono",Consolas,monospace; color:#e2e8f0; }
+.step-ms { margin-left:auto; color:#94a3b8; font-size:12px; font-family:"DM Mono",Consolas,monospace; }
+.bar { background:#0f172a; border:1px solid #334155; border-radius:999px; height:10px; overflow:hidden; }
+.fill { height:100%; width:0; border-radius:999px; animation: grow 1.1s ease-out forwards; }
+.badge { display:inline-block; padding:2px 9px; border-radius:999px; font-size:11px; font-weight:700; }
+.badge.ok { background:rgba(67,154,154,.18); color:#5eead4; }
+.badge.warn { background:rgba(234,179,8,.18); color:#fde047; }
+.badge.fail { background:rgba(239,68,68,.18); color:#fca5a5; }
+@keyframes grow { to { width: var(--w); } }
+@keyframes ogrow { to { width: 100%; } }
+</style>
+</head>
+<body>
+<h1>NexusCore Master Orchestrator · 動態進度</h1>
+<div class="sub">Run 20260610_201023 · 單檔一鍵 · 加速掃描 · Install LOCKED</div>
+
+<div class="grid">
+  <div class="kpi"><div class="n">8</div><div class="l">Steps</div></div>
+  <div class="kpi"><div class="n" style="color:#5eead4">8</div><div class="l">OK</div></div>
+  <div class="kpi"><div class="n" style="color:#fca5a5">0</div><div class="l">Fail</div></div>
+  <div class="kpi"><div class="n">100<span style="font-size:13px;color:#94a3b8">%</span></div><div class="l">Progress</div></div>
+</div>
+
+<div class="card">
+  <h2>Overall Progress</h2>
+  <div class="overall"><div class="ofill"></div></div>
+</div>
+
+<div class="card">
+  <h2>Time Proportion (stacked)</h2>
+  <div class="stacked"><div class='seg' style='--w:0.45%;background:#4c78a8' title='BackupAndWriteActionRunner: 43 ms'></div><div class='seg' style='--w:25.31%;background:#439a9a' title='CreateFullRegistry: 2432 ms'></div><div class='seg' style='--w:0.37%;background:#9c9890' title='CreateHardGatePolicy: 36 ms'></div><div class='seg' style='--w:0.67%;background:#6b8fb5' title='CreateEnvPlan: 64 ms'></div><div class='seg' style='--w:0.46%;background:#5aa9a0' title='CreateAccelerationPlan: 44 ms'></div><div class='seg' style='--w:66.4%;background:#8aa0c0' title='RunSafeActions: 6380 ms'></div><div class='seg' style='--w:6.17%;background:#7fb3ab' title='DeepIntegrationProbe: 593 ms'></div><div class='seg' style='--w:0.17%;background:#b0aca6' title='FinalizeMasterReport: 16 ms'></div></div>
+</div>
+
+<div class="card">
+  <h2>Step Progress</h2>
+  <div class="step">
+  <div class="step-head">
+    <span class="step-name">BackupAndWriteActionRunner</span>
+    <span class="badge ok">PASS</span>
+    <span class="step-ms">43 ms</span>
+  </div>
+  <div class="bar"><div class="fill" style="--w:100%;background:#4c78a8"></div></div>
+</div><div class="step">
+  <div class="step-head">
+    <span class="step-name">CreateFullRegistry</span>
+    <span class="badge ok">PASS</span>
+    <span class="step-ms">2432 ms</span>
+  </div>
+  <div class="bar"><div class="fill" style="--w:100%;background:#439a9a"></div></div>
+</div><div class="step">
+  <div class="step-head">
+    <span class="step-name">CreateHardGatePolicy</span>
+    <span class="badge ok">PASS</span>
+    <span class="step-ms">36 ms</span>
+  </div>
+  <div class="bar"><div class="fill" style="--w:100%;background:#9c9890"></div></div>
+</div><div class="step">
+  <div class="step-head">
+    <span class="step-name">CreateEnvPlan</span>
+    <span class="badge ok">PASS</span>
+    <span class="step-ms">64 ms</span>
+  </div>
+  <div class="bar"><div class="fill" style="--w:100%;background:#6b8fb5"></div></div>
+</div><div class="step">
+  <div class="step-head">
+    <span class="step-name">CreateAccelerationPlan</span>
+    <span class="badge ok">PASS</span>
+    <span class="step-ms">44 ms</span>
+  </div>
+  <div class="bar"><div class="fill" style="--w:100%;background:#5aa9a0"></div></div>
+</div><div class="step">
+  <div class="step-head">
+    <span class="step-name">RunSafeActions</span>
+    <span class="badge ok">PASS</span>
+    <span class="step-ms">6380 ms</span>
+  </div>
+  <div class="bar"><div class="fill" style="--w:100%;background:#8aa0c0"></div></div>
+</div><div class="step">
+  <div class="step-head">
+    <span class="step-name">DeepIntegrationProbe</span>
+    <span class="badge ok">PASS</span>
+    <span class="step-ms">593 ms</span>
+  </div>
+  <div class="bar"><div class="fill" style="--w:100%;background:#7fb3ab"></div></div>
+</div><div class="step">
+  <div class="step-head">
+    <span class="step-name">FinalizeMasterReport</span>
+    <span class="badge ok">PASS</span>
+    <span class="step-ms">16 ms</span>
+  </div>
+  <div class="bar"><div class="fill" style="--w:100%;background:#b0aca6"></div></div>
+</div>
+</div>
+</body>
+</html>

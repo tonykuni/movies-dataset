@@ -1,0 +1,45 @@
+[
+  {
+    "rule_id": "TW_TICKER_4D_NONZERO",
+    "target": "tw_ticker",
+    "regex": "(?<!\\d)([1-9]\\d{3})(?!\\d)",
+    "definition": "台股四碼；第一碼不可為 0。",
+    "negative_guard": "若 token 是 2021~2030，先標 YEAR_AMBIGUOUS，不可直接當 ticker。",
+    "priority": "P0"
+  },
+  {
+    "rule_id": "TW_YFINANCE_TW",
+    "target": "tw_yfinance_ticker",
+    "regex": "(?<!\\d)([1-9]\\d{3})\\.TW\\b",
+    "definition": "上市 yfinance ticker = TW_TICKER + .TW",
+    "priority": "P0"
+  },
+  {
+    "rule_id": "TW_YFINANCE_TWO",
+    "target": "tw_yfinance_ticker_alt",
+    "regex": "(?<!\\d)([1-9]\\d{3})\\.TWO\\b",
+    "definition": "上櫃 yfinance ticker = TW_TICKER + .TWO",
+    "priority": "P0"
+  },
+  {
+    "rule_id": "TW_BLOOMBERG_TT",
+    "target": "tw_bloomberg_ticker",
+    "regex": "(?<!\\d)([1-9]\\d{3})\\s*TT\\b",
+    "definition": "Bloomberg 台股 ticker = TW_TICKER + TT",
+    "priority": "P0"
+  },
+  {
+    "rule_id": "FILENAME_TOKENIZER",
+    "target": "filename_token",
+    "regex": "[\\u4e00-\\u9fff]+|[A-Za-z]+|[1-9]\\d*",
+    "definition": "中英文標點符號與空白切開後，取連續中文、連續英文、連續數字 token，TRIM 後作候選。",
+    "priority": "P0"
+  },
+  {
+    "rule_id": "YEAR_AMBIGUOUS_2021_2030",
+    "target": "year_guard",
+    "regex": "(?<!\\d)(202[1-9]|2030)(?!\\d)",
+    "definition": "2021~2030 先視為年份候選；若同時符合 ticker，必須與第一頁代碼交叉驗證。",
+    "priority": "P0"
+  }
+]

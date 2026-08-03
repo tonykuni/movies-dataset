@@ -1,0 +1,31 @@
+{
+  "generated_at": "2026-06-11T03:11:52.951471",
+  "status": "VDF_AKSHARE_BACKUP_ROLLBACK_STAGING_PLAN_HOTFIX_READY",
+  "risk": "MEDIUM",
+  "title": "Full DATABASE backup plan before any future write",
+  "policy": {
+    "db_write_enabled": false,
+    "canonical_merge_enabled": false,
+    "actual_backup_execution": false,
+    "backup_plan_only": true
+  },
+  "steps": [
+    "Create timestamped DATABASE backup folder under dict/VDF/_backup.",
+    "Copy all existing DATABASE files into backup folder.",
+    "Hash every copied file.",
+    "Verify backup file count equals source file count.",
+    "Abort future write if backup hash manifest has any failure."
+  ],
+  "metrics": {
+    "candidate_rows": 121,
+    "insert_rows": 121,
+    "update_rows": 0,
+    "conflict_rows": 0,
+    "duplicate_quarantine_rows": 29,
+    "database_inventory_files": 76,
+    "db_write_enabled": false,
+    "canonical_merge_enabled": false,
+    "actual_write_allowed": false,
+    "empty_csv_hotfix_applied": true
+  }
+}

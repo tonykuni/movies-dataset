@@ -1,0 +1,64 @@
+﻿"Path","Pattern","LineNumber","OriginalRisk","RefinedClass","RefinedRisk","Reason","Action","LineText","Context"
+"C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\40_Environment_Health\VIA_EnvManager.py","pip install","909","HIGH","ENV_MUTATION_COMMAND_BUILDER","MEDIUM","Line builds install command text. It may be intentional EnvManager behavior, but should not auto-run under final active lock.","Keep blocked from automatic execution; require explicit user approval before any environment mutation.","commands.append(f'uv pip install --python ""{python_exe}"" {missing}')","905:         return commands
+906: 
+907:     if record.status == def_PARAM_STATUS_WARN and record.missing_core_libs:
+908:         missing = "" "".join(record.missing_core_libs[:12])
+909:         commands.append(f'uv pip install --python ""{python_exe}"" {missing}')
+910:         commands.append(f'""{python_exe}"" -m pip install {missing}')
+911: 
+912:     if record.status == def_PARAM_STATUS_REBUILD:
+913:         commands.append(f'# REBUILD SUGGESTION for {record.env_name}')"
+"C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\40_Environment_Health\VIA_EnvManager.py","pip install","910","HIGH","ENV_MUTATION_COMMAND_BUILDER","MEDIUM","Line builds install command text. It may be intentional EnvManager behavior, but should not auto-run under final active lock.","Keep blocked from automatic execution; require explicit user approval before any environment mutation.","commands.append(f'""{python_exe}"" -m pip install {missing}')","906: 
+907:     if record.status == def_PARAM_STATUS_WARN and record.missing_core_libs:
+908:         missing = "" "".join(record.missing_core_libs[:12])
+909:         commands.append(f'uv pip install --python ""{python_exe}"" {missing}')
+910:         commands.append(f'""{python_exe}"" -m pip install {missing}')
+911: 
+912:     if record.status == def_PARAM_STATUS_REBUILD:
+913:         commands.append(f'# REBUILD SUGGESTION for {record.env_name}')
+914:         commands.append(f'Remove-Item -LiteralPath ""{record.env_path}"" -Recurse -Force')"
+"C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\40_Environment_Health\VIA_EnvManager.py","pip install","916","HIGH","ENV_MUTATION_COMMAND_BUILDER","MEDIUM","Line builds install command text. It may be intentional EnvManager behavior, but should not auto-run under final active lock.","Keep blocked from automatic execution; require explicit user approval before any environment mutation.","commands.append(f'""{python_exe}"" -m pip install --upgrade pip setuptools wheel')","912:     if record.status == def_PARAM_STATUS_REBUILD:
+913:         commands.append(f'# REBUILD SUGGESTION for {record.env_name}')
+914:         commands.append(f'Remove-Item -LiteralPath ""{record.env_path}"" -Recurse -Force')
+915:         commands.append(f'python -m venv ""{record.env_path}""')
+916:         commands.append(f'""{python_exe}"" -m pip install --upgrade pip setuptools wheel')
+917: 
+918:     if record.status == def_PARAM_STATUS_BROKEN:
+919:         commands.append(f'# BROKEN ENV: {record.env_name}')
+920:         commands.append(f'python -m venv ""{record.env_path}""')"
+"C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\40_Environment_Health\VIA_EnvManager.py","pip install","934","HIGH","ENV_MUTATION_COMMAND_BUILDER","MEDIUM","Line builds install command text. It may be intentional EnvManager behavior, but should not auto-run under final active lock.","Keep blocked from automatic execution; require explicit user approval before any environment mutation.","powershell_commands.append(f'uv pip install --python ""{target_python}"" {package_expr}')","930:     powershell_commands = []
+931:     executable_commands: List[List[str]] = []
+932: 
+933:     if uv_cmd:
+934:         powershell_commands.append(f'uv pip install --python ""{target_python}"" {package_expr}')
+935:         powershell_commands.append(f'uv pip check --python ""{target_python}""')
+936:         executable_commands.append([uv_cmd, ""pip"", ""install"", ""--python"", target_python, package_expr])
+937:         executable_commands.append([uv_cmd, ""pip"", ""check"", ""--python"", target_python])
+938: "
+"C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\40_Environment_Health\VIA_EnvManager.py","pip install","939","HIGH","ENV_MUTATION_COMMAND_BUILDER","MEDIUM","Line builds install command text. It may be intentional EnvManager behavior, but should not auto-run under final active lock.","Keep blocked from automatic execution; require explicit user approval before any environment mutation.","powershell_commands.append(f'& ""{target_python}"" -m pip install {package_expr}')","935:         powershell_commands.append(f'uv pip check --python ""{target_python}""')
+936:         executable_commands.append([uv_cmd, ""pip"", ""install"", ""--python"", target_python, package_expr])
+937:         executable_commands.append([uv_cmd, ""pip"", ""check"", ""--python"", target_python])
+938: 
+939:     powershell_commands.append(f'& ""{target_python}"" -m pip install {package_expr}')
+940:     powershell_commands.append(f'& ""{target_python}"" -m pip check')
+941: 
+942:     python_commands = [
+943:         f'""{target_python}"" -m pip install {package_expr}',"
+"C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\40_Environment_Health\VIA_EnvManager.py","pip install","943","HIGH","ENV_MUTATION_COMMAND_BUILDER","MEDIUM","Line builds install command text. It may be intentional EnvManager behavior, but should not auto-run under final active lock.","Keep blocked from automatic execution; require explicit user approval before any environment mutation.","f'""{target_python}"" -m pip install {package_expr}',","939:     powershell_commands.append(f'& ""{target_python}"" -m pip install {package_expr}')
+940:     powershell_commands.append(f'& ""{target_python}"" -m pip check')
+941: 
+942:     python_commands = [
+943:         f'""{target_python}"" -m pip install {package_expr}',
+944:         f'""{target_python}"" -m pip check',
+945:     ]
+946:     executable_commands.append([target_python, ""-m"", ""pip"", ""install"", package_expr])
+947:     executable_commands.append([target_python, ""-m"", ""pip"", ""check""])"
+"C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\40_Environment_Health\VIA_EnvManager.py","pip install","964","HIGH","ENV_MUTATION_COMMAND_BUILDER","MEDIUM","Line builds install command text. It may be intentional EnvManager behavior, but should not auto-run under final active lock.","Keep blocked from automatic execution; require explicit user approval before any environment mutation.","commands.append(f'& ""{python_exe}"" -m pip install --upgrade pip setuptools wheel')","960:         f'Remove-Item -LiteralPath ""{env_path}"" -Recurse -Force',
+961:         f'python -m venv ""{env_path}""',
+962:     ]
+963:     if python_exe:
+964:         commands.append(f'& ""{python_exe}"" -m pip install --upgrade pip setuptools wheel')
+965:     return commands
+966: 
+967: 
+968: def def_build_command_plan(records: List[def_EnvHealthRecord]) -> Dict[str, Any]:"

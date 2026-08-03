@@ -1,0 +1,86 @@
+{
+  "generated_at": "2026-06-15T15:30:33.435769",
+  "version": "v029.VRN.1D",
+  "status": "VRN_1D_FINANCIALDATA_STAGING_READY",
+  "risk": "LOW",
+  "active_pointer": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\SSOT\\VRN_ACTIVE_STAGE_POINTER.json",
+  "basicinfo_parquet": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\StockReportBasicInfo.parquet",
+  "report_text_parquet": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541\\stage_parquet\\VRN_ReportText_StageFixed_v029VRN1C3.parquet",
+  "financial_alias_parquet": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\SSOT\\_runs\\VRN_UNIFIED_SSOT_BUILDER_v029SSOT1B_20260615_143918\\parquet\\VRN_FinancialAccountAliasSSOT_v029SSOT1B.parquet",
+  "validation_rules_parquet": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\SSOT\\_runs\\VRN_UNIFIED_SSOT_BUILDER_v029SSOT1B_20260615_143918\\parquet\\VRN_FinancialValidationRulesSSOT_v029SSOT1B.parquet",
+  "stage_financial_parquet": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\SSOT\\_runs\\VRN_FINANCIALDATA_STAGING_EXTRACTION_STORE_v029VRN1D_20260615_153021\\stage_parquet\\VRN_ReportFinancialData_Stage_v029VRN1D.parquet",
+  "stockreport_financialdata_parquet": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\StockReportFinancialData.parquet",
+  "duckdb_path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\VRN_StockReport.duckdb",
+  "json_role": "dataflow / runtime / control only",
+  "parquet_role": "truth source / payload",
+  "duckdb_role": "serving layer",
+  "canonical_allowed": false,
+  "counts": {
+    "basicinfo_rows": 400,
+    "reporttext_rows": 3878,
+    "scanned_text_rows": 3878,
+    "matched_text_rows": 1656,
+    "stage_financial_rows": 246,
+    "financial_total_rows": 246,
+    "alias_rows": 42
+  },
+  "tests": [
+    {
+      "name": "ReportText schema",
+      "status": "PASS",
+      "value": "text",
+      "message": "Auto-detected text column.",
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541\\stage_parquet\\VRN_ReportText_StageFixed_v029VRN1C3.parquet"
+    },
+    {
+      "name": "Financial alias rows",
+      "status": "PASS",
+      "value": "42",
+      "message": "FinancialAliasSSOT loaded.",
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\SSOT\\_runs\\VRN_UNIFIED_SSOT_BUILDER_v029SSOT1B_20260615_143918\\parquet\\VRN_FinancialAccountAliasSSOT_v029SSOT1B.parquet"
+    },
+    {
+      "name": "Text rows scanned",
+      "status": "PASS",
+      "value": "3878",
+      "message": "ReportText rows scanned.",
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541\\stage_parquet\\VRN_ReportText_StageFixed_v029VRN1C3.parquet"
+    },
+    {
+      "name": "Matched text rows",
+      "status": "PASS",
+      "value": "1656",
+      "message": "Rows matched by financial aliases.",
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541\\stage_parquet\\VRN_ReportText_StageFixed_v029VRN1C3.parquet"
+    },
+    {
+      "name": "Stage financial rows",
+      "status": "PASS",
+      "value": "246",
+      "message": "Stage financial rows extracted.",
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\SSOT\\_runs\\VRN_FINANCIALDATA_STAGING_EXTRACTION_STORE_v029VRN1D_20260615_153021\\stage_parquet\\VRN_ReportFinancialData_Stage_v029VRN1D.parquet"
+    },
+    {
+      "name": "Stage dedup",
+      "status": "PASS",
+      "value": "0",
+      "message": "Stage record_hash duplicates.",
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\SSOT\\_runs\\VRN_FINANCIALDATA_STAGING_EXTRACTION_STORE_v029VRN1D_20260615_153021\\stage_parquet\\VRN_ReportFinancialData_Stage_v029VRN1D.parquet"
+    },
+    {
+      "name": "Merged dedup",
+      "status": "PASS",
+      "value": "0",
+      "message": "Merged record_hash duplicates.",
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\StockReportFinancialData.parquet"
+    },
+    {
+      "name": "DuckDB financial count",
+      "status": "PASS",
+      "value": "246",
+      "message": "DuckDB FinancialData serving count.",
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\VRN_StockReport.duckdb"
+    }
+  ],
+  "next_step": "Run 1D.1 table-geometry extraction if you need higher FinancialData coverage; canonical remains blocked."
+}

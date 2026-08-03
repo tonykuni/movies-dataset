@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>VDF Extraction Params SSOT</title>
+<style>
+:root{
+  --bg:#f5f4f0;
+  --ink:#1e1d1a;
+  --muted:#7b786f;
+  --line:#d8d6cf;
+  --soft:#eef2f8;
+  --card:#ffffff;
+  --navy:#1e293b;
+  --blue:#31517a;
+  --green:#5a9e6f;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:Arial,"Microsoft JhengHei",sans-serif;
+  font-size:11px;
+  line-height:1.32;
+}
+.header{
+  padding:22px 28px 20px 28px;
+  background:linear-gradient(135deg,var(--navy),var(--blue));
+  color:white;
+  text-align:center;
+}
+.header h1{
+  margin:0;
+  font-size:25px;
+  line-height:1.1;
+  letter-spacing:.2px;
+}
+.line2{
+  margin-top:6px;
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:1.4px;
+}
+.line3{
+  margin-top:6px;
+  font-size:11.5px;
+  opacity:.9;
+}
+.wrap{
+  padding:18px 24px 24px 24px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(115px,1fr));
+  gap:10px;
+  margin-bottom:14px;
+}
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:10px 12px;
+  box-shadow:0 5px 16px rgba(16,24,40,.045);
+  min-height:58px;
+}
+.kpi{
+  font-size:23px;
+  font-weight:900;
+  font-family:Consolas,monospace;
+  line-height:1;
+  text-align:center;
+}
+.label{
+  color:var(--muted);
+  font-size:10.5px;
+  margin-top:5px;
+  text-align:center;
+}
+h2{
+  margin:14px 0 8px 0;
+  font-size:14px;
+  letter-spacing:.2px;
+}
+.lock{
+  font-family:Consolas,"Microsoft JhengHei",monospace;
+  white-space:pre-wrap;
+  background:#0b1020;
+  color:#dbeafe;
+  padding:12px 14px;
+  border-radius:10px;
+  line-height:1.38;
+  overflow:auto;
+  font-size:10.5px;
+  border:1px solid rgba(255,255,255,.08);
+}
+.mw{
+  max-height:760px;
+  overflow:auto;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:white;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  table-layout:auto;
+  background:white;
+}
+thead th{
+  position:sticky;
+  top:0;
+  z-index:2;
+  text-align:center;
+  vertical-align:top;
+  background:var(--soft);
+  color:#334155;
+  font-size:10.5px;
+  font-weight:900;
+  padding:7px 7px;
+  border-bottom:1px solid var(--line);
+  border-right:1px solid #e4e7ec;
+  white-space:normal;
+  line-height:1.2;
+}
+tbody td{
+  font-size:10.5px;
+  padding:6px 7px;
+  border-bottom:1px solid #edf0f4;
+  border-right:1px solid #edf0f4;
+  vertical-align:top;
+  word-break:break-word;
+  overflow-wrap:anywhere;
+  white-space:normal;
+}
+tbody tr:hover td{
+  background:#f8fafc;
+}
+.table-id{
+  border-left:4px solid var(--green);
+  font-weight:900;
+  font-family:Consolas,"Microsoft JhengHei",monospace;
+  color:#163b26;
+}
+.cell-short{
+  text-align:center;
+  vertical-align:top;
+}
+.cell-long{
+  text-align:left;
+  vertical-align:top;
+}
+.path{
+  font-family:Consolas,monospace;
+  font-size:9.5px;
+  color:#475467;
+  min-width:190px;
+  max-width:260px;
+}
+td:nth-child(1){min-width:150px}
+td:nth-child(2){min-width:120px}
+td:nth-child(3){min-width:90px}
+td:nth-child(4){min-width:80px}
+td:nth-child(5){min-width:230px;max-width:330px}
+td:nth-child(6){min-width:140px;max-width:210px}
+td:nth-child(7){min-width:170px;max-width:250px}
+td:nth-child(8){min-width:105px}
+td:nth-child(9){min-width:210px;max-width:320px}
+td:nth-child(10){min-width:190px;max-width:260px}
+.footer{
+  margin-top:12px;
+  color:#77746c;
+  font-size:10.5px;
+}
+@media print{
+  body{font-size:9.5px}
+  .header{padding:14px}
+  .wrap{padding:10px}
+  .grid{display:none}
+  .mw{max-height:none;overflow:visible}
+  thead th{position:static}
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>VeritasDataForge</h1>
+  <div class="line2">VERITAS INTELLIGENCE ANALYTICS</div>
+  <div class="line3">VDF Extraction Parameters SSOT · Field Matrix · Database Output Rules</div>
+</div>
+
+<div class="wrap">
+  <div class="grid">
+    <div class="card"><div class="kpi">9</div><div class="label">Extraction Tables</div></div>
+    <div class="card"><div class="kpi">6</div><div class="label">Data Sources</div></div>
+    <div class="card"><div class="kpi">4</div><div class="label">Output Formats</div></div>
+    <div class="card"><div class="kpi">1</div><div class="label">SSOT JSON</div></div>
+    <div class="card"><div class="kpi">LOW</div><div class="label">Risk</div></div>
+  </div>
+
+  <h2>def Parameter Location</h2>
+  <div class="lock">Parameter SSOT:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_ssot\VDF_Extraction_Params_SSOT.json
+
+Field Matrix CSV:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_ssot\VDF_Extraction_FieldMatrix.csv
+
+Field Matrix JSON:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_ssot\VDF_Extraction_FieldMatrix.json
+
+Database Output:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE
+
+Policy:
+def parameters in SSOT JSON
+def engine reads parameters
+def do not hard-code source / field / output rules in VDF modules
+def Parquet required
+def DuckDB / CSV / JSON optional but recommended
+def no exit
+def no Stop-Process
+def no destructive delete
+def no PowerShell H alias conflict
+def compact UI
+def trim text before rendering
+def header top-centered
+def long text top-left
+def short text top-centered
+def wrapped cells with auto-fit columns</div>
+
+  <h2>def VDF Extraction Field Matrix</h2>
+  <div class="mw">
+    <table>
+      <thead>
+        <tr>
+          <th>TableId</th>
+          <th>Category</th>
+          <th>Source</th>
+          <th>Frequency</th>
+          <th>Fields</th>
+          <th>Required</th>
+          <th>Validation</th>
+          <th>Output</th>
+          <th>Purpose</th>
+          <th>Path</th>
+        </tr>
+      </thead>
+      <tbody>
+<tr>
+<td class="cell-short table-id">VDF_TW_EquityUniverse</td>
+<td class="cell-short">TW_STOCK_UNIVERSE</td>
+<td class="cell-long">TWSE,TPEX</td>
+<td class="cell-short">DAILY</td>
+<td class="cell-long">ticker,name,market,industry,isin,security_type,listed_date</td>
+<td class="cell-long">ticker,name,market</td>
+<td class="cell-long">ticker_regex; name_not_null; market_in_TWSE_TPEX</td>
+<td class="cell-long">parquet,duckdb,csv,json</td>
+<td class="cell-long">建立台股上市櫃 universe，提供 VDF / VRN / VIA 共用 ticker master。</td>
+<td class="cell-long path">C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</td>
+</tr>
+<tr>
+<td class="cell-short table-id">VDF_TW_CompanyProfile</td>
+<td class="cell-short">COMPANY_PROFILE</td>
+<td class="cell-long">TWSE,TPEX,MOPS</td>
+<td class="cell-short">MONTHLY</td>
+<td class="cell-long">ticker,name,chairman,general_manager,spokesperson,address,phone,website,industry</td>
+<td class="cell-long">ticker,name</td>
+<td class="cell-long">ticker_regex; company_name_not_null</td>
+<td class="cell-long">parquet,duckdb,csv,json</td>
+<td class="cell-long">建立公司基本資料，供投資研究、產業分類與報告交叉驗證。</td>
+<td class="cell-long path">C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</td>
+</tr>
+<tr>
+<td class="cell-short table-id">VDF_TW_PriceDaily</td>
+<td class="cell-short">PRICE_OHLCV</td>
+<td class="cell-long">TWSE,TPEX,YFINANCE</td>
+<td class="cell-short">DAILY</td>
+<td class="cell-long">ticker,date,open,high,low,close,adj_close,volume,turnover,return_1d,return_5d,return_20d,return_60d</td>
+<td class="cell-long">ticker,date,close,volume</td>
+<td class="cell-long">date_iso; ohlc_numeric; high_ge_low; close_not_null</td>
+<td class="cell-long">parquet,duckdb,csv,json</td>
+<td class="cell-long">建立每日股價、成交量、報酬率資料庫。</td>
+<td class="cell-long path">C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</td>
+</tr>
+<tr>
+<td class="cell-short table-id">VDF_TW_MonthlyRevenue</td>
+<td class="cell-short">MONTHLY_REVENUE</td>
+<td class="cell-short">MOPS</td>
+<td class="cell-short">MONTHLY</td>
+<td class="cell-long">ticker,yyyymm,revenue,mom,yoy,cum_revenue,cum_yoy</td>
+<td class="cell-long">ticker,yyyymm,revenue</td>
+<td class="cell-long">yyyymm_regex; revenue_numeric</td>
+<td class="cell-long">parquet,duckdb,csv,json</td>
+<td class="cell-long">建立月營收資料，用於成長趨勢與營收驗證。</td>
+<td class="cell-long path">C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</td>
+</tr>
+<tr>
+<td class="cell-short table-id">VDF_TW_FinancialStatement</td>
+<td class="cell-short">FINANCIAL_STATEMENT</td>
+<td class="cell-short">MOPS</td>
+<td class="cell-short">QUARTERLY</td>
+<td class="cell-long">ticker,period,revenue,gross_profit,op_income,net_income,eps,total_assets,total_liabilities,equity,cash_flow_ops</td>
+<td class="cell-long">ticker,period</td>
+<td class="cell-long">period_regex; numeric_fields_nullable; eps_numeric</td>
+<td class="cell-long">parquet,duckdb,csv,json</td>
+<td class="cell-long">建立財報資料，支援基本面分析與 VRN report cross-check。</td>
+<td class="cell-long path">C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</td>
+</tr>
+<tr>
+<td class="cell-short table-id">VDF_TW_FlowChip</td>
+<td class="cell-short">CHIP_FLOW</td>
+<td class="cell-long">TWSE,TPEX</td>
+<td class="cell-short">DAILY</td>
+<td class="cell-long">ticker,date,foreign_buy_sell,trust_buy_sell,dealer_buy_sell,margin_balance,short_balance,securities_lending</td>
+<td class="cell-long">ticker,date</td>
+<td class="cell-long">date_iso; numeric_fields</td>
+<td class="cell-long">parquet,duckdb,csv,json</td>
+<td class="cell-long">建立籌碼資料，追蹤三大法人與信用交易。</td>
+<td class="cell-long path">C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</td>
+</tr>
+<tr>
+<td class="cell-short table-id">VDF_TW_DividendAction</td>
+<td class="cell-short">DIVIDEND_CORPORATE_ACTION</td>
+<td class="cell-long">TWSE,TPEX,MOPS</td>
+<td class="cell-short">EVENT</td>
+<td class="cell-long">ticker,ex_date,cash_dividend,stock_dividend,yield,payout_ratio,record_date,payment_date</td>
+<td class="cell-long">ticker,ex_date</td>
+<td class="cell-long">date_iso; dividend_numeric</td>
+<td class="cell-long">parquet,duckdb,csv,json</td>
+<td class="cell-long">建立股利、除權息與公司行動資料。</td>
+<td class="cell-long path">C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</td>
+</tr>
+<tr>
+<td class="cell-short table-id">VDF_TW_IndexETFTheme</td>
+<td class="cell-short">INDEX_ETF_THEME</td>
+<td class="cell-long">TWSE,TPEX,YFINANCE</td>
+<td class="cell-short">DAILY</td>
+<td class="cell-long">code,date,name,close,volume,theme,constituents,weight</td>
+<td class="cell-long">code,date,close</td>
+<td class="cell-long">code_not_null; date_iso; close_numeric</td>
+<td class="cell-long">parquet,duckdb,csv,json</td>
+<td class="cell-long">建立指數、ETF、主題與成分股資料。</td>
+<td class="cell-long path">C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</td>
+</tr>
+<tr>
+<td class="cell-short table-id">VDF_Global_MacroCommodity</td>
+<td class="cell-short">GLOBAL_MACRO_COMMODITY</td>
+<td class="cell-long">FRED,AKSHARE,YFINANCE</td>
+<td class="cell-short">DAILY_WEEKLY</td>
+<td class="cell-long">symbol,date,value,source,unit,frequency,description</td>
+<td class="cell-long">symbol,date,value,source</td>
+<td class="cell-long">symbol_not_null; date_iso; value_numeric</td>
+<td class="cell-long">parquet,duckdb,csv,json</td>
+<td class="cell-long">建立總經、商品、航運、利率、匯率與國際市場資料。</td>
+<td class="cell-long path">C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</td>
+</tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer">Veritas Intelligence Analytics │ VDF Extraction Parameters SSOT │ Generated 2026-06-09 20:39:26</div>
+</div>
+</body>
+</html>

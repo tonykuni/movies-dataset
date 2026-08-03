@@ -1,0 +1,79 @@
+# VeritasNexusCore
+# VERITAS INTELLIGENCE ANALYTICS
+# Unified Supportive Tooling, Runtime Governance, Registry, HardGate, and System Control Gateway.
+# Policy: This is the ONLY first-layer external interface file.
+# Generated: 2026-06-08 20:15:46
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
+
+$def_INTERFACE_ROOT = Split-Path -Parent $MyInvocation.MyCommand.Path
+
+function def_FindLatestFreezeReport {
+    $reportRoot = Join-Path $def_INTERFACE_ROOT "_freeze_reports"
+
+    if (-not (Test-Path -LiteralPath $reportRoot)) {
+        return $null
+    }
+
+    return Get-ChildItem -LiteralPath $reportRoot -Directory -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending |
+        Select-Object -First 1
+}
+
+function def_Show_VeritasNexusCore {
+    Write-Host ""
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "def VeritasNexusCore" -ForegroundColor Cyan
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "VERITAS INTELLIGENCE ANALYTICS"
+    Write-Host "Unified Supportive Tooling, Runtime Governance, Registry, HardGate, and System Control Gateway."
+    Write-Host ""
+    Write-Host "Root: $def_INTERFACE_ROOT"
+    Write-Host ""
+    Write-Host "Groups:"
+    Get-ChildItem -LiteralPath $def_INTERFACE_ROOT -Directory -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -match '^\d{2}_' } |
+        Sort-Object Name |
+        ForEach-Object { Write-Host "  def $($_.Name)" -ForegroundColor Green }
+
+    $latest = def_FindLatestFreezeReport
+
+    if ($null -ne $latest) {
+        $htmlCandidates = Get-ChildItem -LiteralPath $latest.FullName -File -Filter "*.html" -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+
+        $jsonCandidates = Get-ChildItem -LiteralPath $latest.FullName -File -Filter "*.json" -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+
+        Write-Host ""
+        Write-Host "Latest Report Folder:"
+        Write-Host "  $($latest.FullName)"
+
+        if ($null -ne $htmlCandidates) {
+            Write-Host "  HTML: $($htmlCandidates.FullName)"
+            Start-Process -FilePath $htmlCandidates.FullName | Out-Null
+        }
+
+        if ($null -ne $jsonCandidates) {
+            Write-Host "  JSON: $($jsonCandidates.FullName)"
+        }
+    }
+
+    Write-Host ""
+    Write-Host "PowerShell remains open. No exit. No Stop-Process." -ForegroundColor Cyan
+}
+
+try {
+    def_Show_VeritasNexusCore
+}
+catch {
+    Write-Host "[FATAL] $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "PowerShell remains open." -ForegroundColor Yellow
+}
+finally {
+    Write-Host "def Interface session remains open." -ForegroundColor Cyan
+}
+

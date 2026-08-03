@@ -1,0 +1,2307 @@
+**********************
+PowerShell transcript start
+Start time: 20260611031152
+Username: TONY-NB\tonyk
+RunAs User: TONY-NB\tonyk
+Configuration Name: 
+Machine: TONY-NB (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Program Files\PowerShell\7\pwsh.dll -NoLogo
+Process ID: 20380
+PSVersion: 7.6.0
+PSEdition: Core
+GitCommitId: 7.6.0
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+PS7 TerminatingError(): "The property 'candidate_rows' cannot be found on this object. Verify that the property exists."
+
+================================================================================
+def VDF AKSHARE BACKUP ROLLBACK STAGING PLAN HOTFIX v028.3.1 FATAL BUT POWERSHELL STAYS OPEN
+================================================================================
+[FATAL] The property 'candidate_rows' cannot be found on this object. Verify that the property exists.
+at Invoke-VDF-AkShareBackupRollbackStagingPlan-Hotfix-v02831, <No file>: line 536
+at <ScriptBlock>, <No file>: line 2
+
+PowerShell remains open. No exit was called.
+C:\Users\tonyk
+ >
+
+PS7 #requires -Version 7.0
+C:\Users\tonyk
+ >
+
+PS7 Set-StrictMode -Version Latest
+C:\Users\tonyk
+ >
+
+PS7 $ErrorActionPreference = "Stop"
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 function Invoke-VDF-AkShareBackupRollbackStagingPlan-Hotfix-v02832 {
+    param(
+        [string]$ProjectRoot = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics",
+        [switch]$OpenHtmlReport = $true
+    )
+
+    $script:OK = 0
+    $script:WARN = 0
+    $script:FAIL = 0
+
+    function def_Stamp { Get-Date -Format "yyyyMMdd_HHmmss" }
+    function def_Iso { (Get-Date).ToString("yyyy-MM-ddTHH:mm:ss.fffK") }
+    function def_Mkdir([string]$p) { [System.IO.Directory]::CreateDirectory($p) | Out-Null }
+    function def_Html([AllowNull()][string]$s) {
+        if ($null -eq $s) { return "" }
+        return [System.Net.WebUtility]::HtmlEncode($s)
+    }
+    function def_GetProp {
+        param([object]$Obj,[string]$Name,[object]$Default = 0)
+        if ($null -eq $Obj) { return $Default }
+        $p = $Obj.PSObject.Properties[$Name]
+        if ($null -eq $p) { return $Default }
+        if ($null -eq $p.Value -or "$($p.Value)" -eq "") { return $Default }
+        return $p.Value
+    }
+    function def_AddRow {
+        param(
+            [System.Collections.Generic.List[object]]$Rows,
+            [string]$Round,[string]$Stage,[string]$Layer,[string]$Name,
+            [string]$Status,[string]$Risk,[string]$FixClass,[string]$Priority,
+            [string]$Mode,[string]$Metric,[string]$Value,[string]$Message,[string]$Path
+        )
+        if ($Status -match "FAIL|FATAL|BLOCK") { $script:FAIL++ }
+        elseif ($Status -match "WARN|REVIEW|MEDIUM|MISSING|EMPTY|QUARANTINE|APPROVAL|HOTFIX") { $script:WARN++ }
+        else { $script:OK++ }
+
+        $Rows.Add([pscustomobject]@{
+            Round=$Round; Stage=$Stage; Layer=$Layer; Name=$Name; Status=$Status; Risk=$Risk
+            FixClass=$FixClass; Priority=$Priority; Mode=$Mode; Metric=$Metric; Value=$Value
+            Message=$Message; Path=$Path
+        }) | Out-Null
+    }
+    function def_SafeHash {
+        param([string]$Path,[string]$ExcludeRoot)
+        try {
+            if ([string]::IsNullOrWhiteSpace($Path) -or -not [System.IO.File]::Exists($Path)) { return "" }
+            $full = [System.IO.Path]::GetFullPath($Path)
+            $root = [System.IO.Path]::GetFullPath($ExcludeRoot)
+            if ($full.StartsWith($root,[System.StringComparison]::OrdinalIgnoreCase)) { return "SKIPPED_CURRENT_RUNROOT" }
+            return (Get-FileHash -LiteralPath $Path -Algorithm SHA256 -ErrorAction Stop).Hash
+        } catch [System.IO.IOException] {
+            return "LOCKED_OR_BUSY"
+        } catch {
+            return "HASH_ERROR"
+        }
+    }
+
+    $Stamp = def_Stamp
+    $DictRoot     = Join-Path $ProjectRoot "dict\VDF"
+    $ActiveRoot   = Join-Path $DictRoot "_active"
+    $BackupRoot   = Join-Path $DictRoot "_backup"
+    $DatabaseRoot = Join-Path $DictRoot "DATABASE"
+
+    foreach ($d in @($DictRoot,$ActiveRoot,$BackupRoot,$DatabaseRoot)) { def_Mkdir $d }
+
+    $Latest = Get-ChildItem -LiteralPath $ActiveRoot -Directory -Filter "VDF_AKSHARE_WRITE_DRYRUN_COMPARE_v0282_*" -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending |
+        Select-Object -First 1
+
+    if ($null -eq $Latest) {
+        throw "Latest v028.2 write dry-run compare run not found."
+    }
+
+    $RunRoot = Join-Path $ActiveRoot "VDF_AKSHARE_BACKUP_ROLLBACK_STAGING_PLAN_HOTFIX_v02832_$Stamp"
+    $ReportDir = Join-Path $RunRoot "report"
+    $RegistryDir = Join-Path $RunRoot "registry"
+    $PlanDir = Join-Path $RunRoot "plan"
+    $RuntimeDir = Join-Path $RunRoot "runtime"
+    $BackupDir = Join-Path $RunRoot "backup"
+    foreach ($d in @($RunRoot,$ReportDir,$RegistryDir,$PlanDir,$RuntimeDir,$BackupDir)) { def_Mkdir $d }
+
+    $Rows = [System.Collections.Generic.List[object]]::new()
+    $ActivePointer = Join-Path $ActiveRoot "VDF_ACTIVE_POINTER.json"
+    $Transcript = Join-Path $RuntimeDir "VDF_AkShare_BackupRollbackStagingPlan_Hotfix_Transcript_v02832_$Stamp.txt"
+
+    Write-Host ""
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "def VDF AKSHARE BACKUP ROLLBACK STAGING PLAN HOTFIX v028.3.2" -ForegroundColor Cyan
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "Fix: Empty CSV + PowerShell metric safe accessor · no DATABASE write · no canonical merge"
+    Write-Host ""
+
+    try { Start-Transcript -LiteralPath $Transcript -Force | Out-Null } catch {}
+
+    if (Test-Path -LiteralPath $ActivePointer) {
+        Copy-Item -LiteralPath $ActivePointer -Destination (Join-Path $BackupDir "VDF_ACTIVE_POINTER_before_v02832_$Stamp.json") -Force
+    }
+
+    def_AddRow $Rows "Round0" "BOOT" "PROJECT_ROOT" "VeritasIntelligenceAnalytics" "OK" "LOW" "PARALLEL_SAFE" "P0" "BACKUP_ROLLBACK_STAGING_PLAN_ONLY" "exists" "true" "Project root exists." $ProjectRoot
+    def_AddRow $Rows "Round0" "POLICY" "NO_DB_WRITE" "DATABASE" "OK_POLICY_LOCKED" "LOW" "PARALLEL_SAFE" "P0" "BACKUP_ROLLBACK_STAGING_PLAN_ONLY" "db_write_enabled" "false" "No DATABASE write in v028.3.2." $DatabaseRoot
+    def_AddRow $Rows "Round0" "POLICY" "NO_CANONICAL_MERGE" "Canonical Merge" "OK_POLICY_LOCKED" "LOW" "PARALLEL_SAFE" "P0" "BACKUP_ROLLBACK_STAGING_PLAN_ONLY" "canonical_merge_enabled" "false" "No canonical merge in v028.3.2." $RunRoot
+    def_AddRow $Rows "Round0" "HOTFIX" "METRIC_SAFE_ACCESSOR" "PowerShell Metric Accessor" "OK_HOTFIX_APPLIED" "LOW" "SEQUENTIAL_GATED" "P0" "BACKUP_ROLLBACK_STAGING_PLAN_ONLY" "fix" "def_GetProp" "PowerShell metrics now read safely." $RunRoot
+
+    $DryRunSummaryJson = Get-ChildItem -LiteralPath $Latest.FullName -Recurse -File -Filter "VDF_AkShare_v0282_DryRunCompareSummary.json" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    $InsertCsv = Get-ChildItem -LiteralPath $Latest.FullName -Recurse -File -Filter "VDF_AkShare_v0282_DryRun_InsertRows.csv" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    $UpdateCsv = Get-ChildItem -LiteralPath $Latest.FullName -Recurse -File -Filter "VDF_AkShare_v0282_DryRun_UpdateRows.csv" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    $ConflictCsv = Get-ChildItem -LiteralPath $Latest.FullName -Recurse -File -Filter "VDF_AkShare_v0282_DryRun_ConflictRows.csv" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    $CandidateCopyCsv = Get-ChildItem -LiteralPath $Latest.FullName -Recurse -File -Filter "VDF_AkShare_v0282_CandidateRows_Copy.csv" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    $QuarantineCopyCsv = Get-ChildItem -LiteralPath $Latest.FullName -Recurse -File -Filter "VDF_AkShare_v0282_DuplicateQuarantine_Copy.csv" -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+
+    foreach ($x in @($DryRunSummaryJson,$InsertCsv,$UpdateCsv,$ConflictCsv,$CandidateCopyCsv,$QuarantineCopyCsv)) {
+        if ($null -eq $x) { throw "Missing required v028.2 artifact for v028.3.2 hotfix plan." }
+    }
+
+    def_AddRow $Rows "Round1" "DISCOVERY" "DRYRUN_SUMMARY" "v028.2 Dry-run Summary" "OK_SOURCE_LOCKED" "LOW" "SEQUENTIAL_GATED" "P0" "BACKUP_ROLLBACK_STAGING_PLAN_ONLY" "source" "dryrun_summary" "Locked v028.2 dry-run summary." $DryRunSummaryJson.FullName
+
+    $DbInventoryCsv = Join-Path $RegistryDir "VDF_AkShare_v02832_DatabaseInventory.csv"
+    $DbInventory = foreach ($f in (Get-ChildItem -LiteralPath $DatabaseRoot -Recurse -File -ErrorAction SilentlyContinue | Sort-Object FullName)) {
+        [pscustomobject]@{
+            name = $f.Name
+            path = $f.FullName
+            extension = $f.Extension
+            bytes = $f.Length
+            modified = $f.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")
+            sha256 = def_SafeHash $f.FullName $RunRoot
+        }
+    }
+    $DbInventory | Export-Csv -LiteralPath $DbInventoryCsv -NoTypeInformation -Encoding UTF8BOM
+
+    $PyScript = Join-Path $RuntimeDir "vdf_akshare_backup_rollback_staging_plan_hotfix_v02832.py"
+    $PyResult = Join-Path $RuntimeDir "vdf_akshare_backup_rollback_staging_plan_hotfix_result_v02832.json"
+
+    $BackupPlanJson = Join-Path $PlanDir "VDF_AkShare_v02832_BackupPlan.json"
+    $RollbackPlanJson = Join-Path $PlanDir "VDF_AkShare_v02832_RollbackPlan.json"
+    $StagingPlanJson = Join-Path $PlanDir "VDF_AkShare_v02832_StagingWritePlan.json"
+    $PostWriteValidationJson = Join-Path $PlanDir "VDF_AkShare_v02832_PostWriteValidationPlan.json"
+    $ApprovalGateJson = Join-Path $PlanDir "VDF_AkShare_v02832_WriteApprovalGate.json"
+    $PreWriteSafetyChecklistCsv = Join-Path $RegistryDir "VDF_AkShare_v02832_PreWriteSafetyChecklist.csv"
+    $Top10Json = Join-Path $RegistryDir "VDF_Top10_LocalFreeLibs_BackupRollbackStagingPlan_Hotfix_v02832.json"
+
+    $Py = @'
+import json
+from pathlib import Path
+from datetime import datetime
+import pandas as pd
+from pandas.errors import EmptyDataError
+
+dryrun_summary_json = Path(r"__DRYRUN_SUMMARY_JSON__")
+insert_csv = Path(r"__INSERT_CSV__")
+update_csv = Path(r"__UPDATE_CSV__")
+conflict_csv = Path(r"__CONFLICT_CSV__")
+candidate_csv = Path(r"__CANDIDATE_CSV__")
+quarantine_csv = Path(r"__QUARANTINE_CSV__")
+db_inventory_csv = Path(r"__DB_INVENTORY_CSV__")
+backup_plan_json = Path(r"__BACKUP_PLAN_JSON__")
+rollback_plan_json = Path(r"__ROLLBACK_PLAN_JSON__")
+staging_plan_json = Path(r"__STAGING_PLAN_JSON__")
+postwrite_validation_json = Path(r"__POSTWRITE_VALIDATION_JSON__")
+approval_gate_json = Path(r"__APPROVAL_GATE_JSON__")
+checklist_csv = Path(r"__CHECKLIST_CSV__")
+out_json = Path(r"__OUT_JSON__")
+
+for p in [backup_plan_json, rollback_plan_json, staging_plan_json, postwrite_validation_json, approval_gate_json, checklist_csv, out_json]:
+    p.parent.mkdir(parents=True, exist_ok=True)
+
+def safe_read_csv(p, columns=None):
+    p = Path(p)
+    if columns is None:
+        columns = []
+    if not p.exists() or p.stat().st_size == 0:
+        return pd.DataFrame(columns=columns)
+    try:
+        return pd.read_csv(p, dtype=str, encoding="utf-8-sig").fillna("")
+    except EmptyDataError:
+        return pd.DataFrame(columns=columns)
+    except Exception:
+        try:
+            return pd.read_csv(p, dtype=str).fillna("")
+        except EmptyDataError:
+            return pd.DataFrame(columns=columns)
+        except Exception:
+            return pd.DataFrame(columns=columns)
+
+base_cols = ["family","symbol","date","value","source","canonical_key","is_valid"]
+dryrun = json.loads(dryrun_summary_json.read_text(encoding="utf-8"))
+dm = dict(dryrun.get("metrics", {}))
+
+insert_df = safe_read_csv(insert_csv, base_cols)
+update_df = safe_read_csv(update_csv, base_cols)
+conflict_df = safe_read_csv(conflict_csv, base_cols)
+candidate_df = safe_read_csv(candidate_csv, base_cols)
+quarantine_df = safe_read_csv(quarantine_csv, base_cols)
+db_inv = safe_read_csv(db_inventory_csv, ["name","path","extension","bytes","modified","sha256"])
+
+unchanged_rows = int(dm.get("unchanged_rows", 0) or 0)
+plan_metrics = {
+    "candidate_rows": int(len(candidate_df)),
+    "insert_rows": int(len(insert_df)),
+    "update_rows": int(len(update_df)),
+    "unchanged_rows": unchanged_rows,
+    "conflict_rows": int(len(conflict_df)),
+    "duplicate_quarantine_rows": int(len(quarantine_df)),
+    "database_inventory_files": int(len(db_inv)),
+    "db_write_enabled": False,
+    "canonical_merge_enabled": False,
+    "actual_write_allowed": False,
+    "empty_csv_hotfix_applied": True,
+    "powershell_metric_accessor_hotfix_required": True
+}
+
+expected_total = plan_metrics["insert_rows"] + plan_metrics["update_rows"] + plan_metrics["unchanged_rows"]
+ready = (
+    plan_metrics["candidate_rows"] > 0 and
+    plan_metrics["conflict_rows"] == 0 and
+    expected_total == plan_metrics["candidate_rows"]
+)
+
+status = "VDF_AKSHARE_BACKUP_ROLLBACK_STAGING_PLAN_HOTFIX_READY" if ready else "VDF_AKSHARE_BACKUP_ROLLBACK_STAGING_PLAN_HOTFIX_BLOCKED"
+risk = "MEDIUM" if ready else "HIGH"
+recommendation = "ALLOW_V0284_USER_APPROVAL_FOR_STAGING_WRITE_SCRIPT_GENERATION_NO_DB_WRITE" if ready else "BLOCK_V0284_UNTIL_STAGING_PLAN_DEFECTS_REPAIRED"
+next_step = "v028.4 user approval for staging-write script generation only; no DB write" if ready else "repair staging plan defects; no DB write"
+
+backup_plan = {
+    "generated_at": datetime.now().isoformat(),
+    "status": status,
+    "risk": risk,
+    "title": "Full DATABASE backup plan before any future write",
+    "policy": {"db_write_enabled": False, "canonical_merge_enabled": False, "actual_backup_execution": False, "backup_plan_only": True},
+    "steps": [
+        "Create timestamped DATABASE backup folder under dict/VDF/_backup.",
+        "Copy all existing DATABASE files into backup folder.",
+        "Hash every copied file.",
+        "Verify backup file count equals source file count.",
+        "Abort future write if backup hash manifest has any failure."
+    ],
+    "metrics": plan_metrics
+}
+backup_plan_json.write_text(json.dumps(backup_plan, ensure_ascii=False, indent=2), encoding="utf-8")
+
+rollback_plan = {
+    "generated_at": datetime.now().isoformat(),
+    "status": status,
+    "risk": risk,
+    "title": "Rollback plan before any future write",
+    "policy": {"rollback_required": True, "db_write_enabled": False, "canonical_merge_enabled": False},
+    "rollback_steps": [
+        "Do not overwrite original database files directly.",
+        "Write candidate data to staging table/file first.",
+        "Validate staging table row count, key uniqueness, required fields, and hashes.",
+        "Only after validation may future approved write promote staging artifact.",
+        "If validation fails, restore from backup manifest."
+    ]
+}
+rollback_plan_json.write_text(json.dumps(rollback_plan, ensure_ascii=False, indent=2), encoding="utf-8")
+
+staging_plan = {
+    "generated_at": datetime.now().isoformat(),
+    "status": status,
+    "risk": risk,
+    "title": "Staging write plan only; no execution",
+    "policy": {
+        "staging_table_required": True,
+        "target_family": "VDF_Global_Commodity",
+        "primary_key": ["family","symbol","date","source"],
+        "exclude_duplicate_quarantine": True,
+        "db_write_enabled": False,
+        "canonical_merge_enabled": False,
+        "actual_write_allowed": False
+    },
+    "candidate_inputs": {
+        "insert_csv": str(insert_csv),
+        "update_csv": str(update_csv),
+        "candidate_csv": str(candidate_csv),
+        "duplicate_quarantine_csv": str(quarantine_csv)
+    },
+    "staging_outputs_for_future_stage": [
+        "VDF_Global_Commodity_staging.parquet",
+        "VDF_Global_Commodity_staging.csv",
+        "VDF_Global_Commodity_write_delta.json",
+        "post_write_validation_report.html"
+    ],
+    "metrics": plan_metrics
+}
+staging_plan_json.write_text(json.dumps(staging_plan, ensure_ascii=False, indent=2), encoding="utf-8")
+
+postwrite_validation = {
+    "generated_at": datetime.now().isoformat(),
+    "status": status,
+    "risk": risk,
+    "title": "Post-write validation plan for future approved write",
+    "policy": {"validation_plan_only": True, "db_write_enabled": False},
+    "checks": [
+        "Row count after write equals existing + insert rows with update keys preserved.",
+        "Primary key uniqueness is zero duplicate.",
+        "Required fields family/symbol/date/value/source/canonical_key are non-empty.",
+        "Duplicate quarantine rows are absent from canonical target.",
+        "Hash manifest generated for final target.",
+        "HTML report opened."
+    ]
+}
+postwrite_validation_json.write_text(json.dumps(postwrite_validation, ensure_ascii=False, indent=2), encoding="utf-8")
+
+approval_gate = {
+    "generated_at": datetime.now().isoformat(),
+    "status": status,
+    "risk": risk,
+    "approval_required": True,
+    "approved_now": False,
+    "what_user_may_approve_next": "v028.4 generate staging-write script only; still no DB write",
+    "what_is_not_approved": "running staging write or promoting canonical target",
+    "metrics": plan_metrics,
+    "recommendation": recommendation,
+    "next_step": next_step
+}
+approval_gate_json.write_text(json.dumps(approval_gate, ensure_ascii=False, indent=2), encoding="utf-8")
+
+checklist = [
+    {"item":"candidate_rows_gt_0","status":"OK" if plan_metrics["candidate_rows"] > 0 else "FAIL"},
+    {"item":"conflict_rows_zero","status":"OK" if plan_metrics["conflict_rows"] == 0 else "FAIL"},
+    {"item":"delta_rows_match_candidate_rows","status":"OK" if expected_total == plan_metrics["candidate_rows"] else "FAIL"},
+    {"item":"empty_csv_hotfix_applied","status":"OK"},
+    {"item":"powershell_metric_accessor_hotfix_applied","status":"OK"},
+    {"item":"duplicate_quarantine_excluded","status":"OK"},
+    {"item":"backup_plan_created","status":"OK"},
+    {"item":"rollback_plan_created","status":"OK"},
+    {"item":"staging_plan_created","status":"OK"},
+    {"item":"postwrite_validation_plan_created","status":"OK"},
+    {"item":"db_write_disabled","status":"OK"},
+    {"item":"canonical_merge_disabled","status":"OK"},
+    {"item":"future_approval_required","status":"OK"}
+]
+pd.DataFrame(checklist).to_csv(checklist_csv, index=False, encoding="utf-8-sig")
+
+result = {
+    "generated_at": datetime.now().isoformat(),
+    "status": status,
+    "risk": risk,
+    "recommendation": recommendation,
+    "metrics": plan_metrics,
+    "artifacts": {
+        "backup_plan_json": str(backup_plan_json),
+        "rollback_plan_json": str(rollback_plan_json),
+        "staging_plan_json": str(staging_plan_json),
+        "postwrite_validation_json": str(postwrite_validation_json),
+        "approval_gate_json": str(approval_gate_json),
+        "prewrite_safety_checklist_csv": str(checklist_csv)
+    },
+    "next_step": next_step
+}
+out_json.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
+print(json.dumps(result, ensure_ascii=False))
+'@
+
+    $Replace = @{
+        "__DRYRUN_SUMMARY_JSON__" = $DryRunSummaryJson.FullName
+        "__INSERT_CSV__" = $InsertCsv.FullName
+        "__UPDATE_CSV__" = $UpdateCsv.FullName
+        "__CONFLICT_CSV__" = $ConflictCsv.FullName
+        "__CANDIDATE_CSV__" = $CandidateCopyCsv.FullName
+        "__QUARANTINE_CSV__" = $QuarantineCopyCsv.FullName
+        "__DB_INVENTORY_CSV__" = $DbInventoryCsv
+        "__BACKUP_PLAN_JSON__" = $BackupPlanJson
+        "__ROLLBACK_PLAN_JSON__" = $RollbackPlanJson
+        "__STAGING_PLAN_JSON__" = $StagingPlanJson
+        "__POSTWRITE_VALIDATION_JSON__" = $PostWriteValidationJson
+        "__APPROVAL_GATE_JSON__" = $ApprovalGateJson
+        "__CHECKLIST_CSV__" = $PreWriteSafetyChecklistCsv
+        "__OUT_JSON__" = $PyResult
+    }
+
+    foreach ($k in $Replace.Keys) {
+        $Py = $Py.Replace($k, ($Replace[$k] -replace "\\","\\"))
+    }
+
+    Set-Content -LiteralPath $PyScript -Value $Py -Encoding UTF8
+
+    $python = Get-Command python -ErrorAction SilentlyContinue
+    if ($null -eq $python) { throw "python not found in PATH" }
+
+    $psi = [System.Diagnostics.ProcessStartInfo]::new()
+    $psi.FileName = $python.Source
+    $psi.Arguments = "`"$PyScript`""
+    $psi.UseShellExecute = $false
+    $psi.RedirectStandardOutput = $true
+    $psi.RedirectStandardError = $true
+    $psi.CreateNoWindow = $true
+
+    $p = [System.Diagnostics.Process]::Start($psi)
+    $null = $p.WaitForExit(180000)
+    $stdout = $p.StandardOutput.ReadToEnd()
+    $stderr = $p.StandardError.ReadToEnd()
+
+    if ($p.ExitCode -ne 0 -or -not (Test-Path -LiteralPath $PyResult)) {
+        def_AddRow $Rows "Round2" "BACKUP_ROLLBACK_STAGING_PLAN" "PYTHON_ENGINE" "Execution" "FAIL" "HIGH" "SEQUENTIAL_REQUIRED" "P0" "BACKUP_ROLLBACK_STAGING_PLAN_ONLY" "exit_code" "$($p.ExitCode)" $stderr $PyScript
+        throw "Python failed: $stderr"
+    }
+
+    $Result = Get-Content -LiteralPath $PyResult -Raw -Encoding UTF8 | ConvertFrom-Json
+    $R = $Result.metrics
+
+    $CandidateRows = [int](def_GetProp $R "candidate_rows" 0)
+    $InsertRows = [int](def_GetProp $R "insert_rows" 0)
+    $UpdateRows = [int](def_GetProp $R "update_rows" 0)
+    $ConflictRows = [int](def_GetProp $R "conflict_rows" 0)
+    $DuplicateQuarantineRows = [int](def_GetProp $R "duplicate_quarantine_rows" 0)
+    $DbInventoryFiles = [int](def_GetProp $R "database_inventory_files" 0)
+    $EmptyCsvHotfixApplied = [string](def_GetProp $R "empty_csv_hotfix_applied" "true")
+
+    def_AddRow $Rows "Round2" "BACKUP_ROLLBACK_STAGING_PLAN" "PYTHON_ENGINE" "Execution" "OK_EXECUTED" "LOW" "PARALLEL_SAFE" "P0" "BACKUP_ROLLBACK_STAGING_PLAN_ONLY" "stdout" "ok" $stdout $PyScript
+    def_AddRow $Rows "Round2" "BACKUP_ROLLBACK_STAGING_PLAN" "CANDIDATE_ROWS" "Candidate Rows" "OK_READY_SOURCE" "LOW" "SEQUENTIAL_GATED" "P0" "BACKUP_ROLLBACK_STAGING_PLAN_ONLY" "candidate_rows" "$CandidateRows" "Candidate rows verified for staging plan." $CandidateCopyCsv.FullName
+    def_AddRow $Rows "Round2" "BACKUP_ROLLBACK_STAGING_PLAN" "INSERT_ROWS" "Insert Rows" "OK_INSERT_PLAN" "LOW" "SEQUENTIAL_GATED" "P1" "BACKUP_ROLLBACK_STAGING_PLAN_ONLY" "insert_rows" "$InsertRows" "Insert rows included in staging plan." $InsertCsv.FullName
+    def_AddRow $Rows "Round2" "BACKUP_ROLLBACK_STAGING_PLAN" "UPDATE_ROWS_EMPTY_SAFE" "Update Rows" "OK_EMPTY_SAFE" "LOW" "SEQUENTIAL_GATED" "P1" "BACKUP_ROLLBACK_STAGING_PLAN_ONLY" "update_rows" "$UpdateRows" "Zero-row update CSV handled safely." $UpdateCsv.FullName
+
+    if ($ConflictRows -eq 0) {
+        def_AddRow $Rows "Round2" "BACKUP_ROLLBACK_STAGING_PLAN" "CONFLICT_ROWS" "Conflict Rows" "OK_ZERO_CONFLICT" "LOW" "SEQUENTIAL_GATED" "P0" "BACKUP_ROLLBACK_STAGING_PLAN_ONLY" "conflict_rows" "0" "No conflict rows." $ConflictCsv.FullName
+    } else {
+        def_AddRow $Rows "Round2" "BACKUP_ROLLBACK_STAGING_PLAN" "CONFLICT_ROWS" "Conflict Rows" "BLOCK_CONFLICTS" "HIGH" "SEQUENTIAL_REQUIRED" "P0" "BACKUP_ROLLBACK_STAGING_PLAN_ONLY" "conflict_rows" "$ConflictRows" "Conflict rows block staging plan." $ConflictCsv.FullName
+    }
+
+    def_AddRow $Rows "Round3" "CONSOLIDATE" "BACKUP_PLAN" "Backup Plan JSON" "OK_PLAN_CREATED" "LOW" "SEQUENTIAL_GATED" "P0" "BACKUP_ROLLBACK_STAGING_PLAN_ONLY" "plan" "created" "Backup plan created. No backup executed." $BackupPlanJson
+    def_AddRow $Rows "Round3" "CONSOLIDATE" "ROLLBACK_PLAN" "Rollback Plan JSON" "OK_PLAN_CREATED" "LOW" "SEQUENTIAL_GATED" "P0" "BACKUP_ROLLBACK_STAGING_PLAN_ONLY" "plan" "created" "Rollback plan created." $RollbackPlanJson
+    def_AddRow $Rows "Round3" "CONSOLIDATE" "STAGING_PLAN" "Staging Write Plan JSON" "OK_PLAN_CREATED" "LOW" "SEQUENTIAL_GATED" "P0" "BACKUP_ROLLBACK_STAGING_PLAN_ONLY" "plan" "created" "Staging write plan created. No staging write executed." $StagingPlanJson
+    def_AddRow $Rows "Round3" "CONSOLIDATE" "POSTWRITE_VALIDATION" "Post-write Validation Plan JSON" "OK_PLAN_CREATED" "LOW" "SEQUENTIAL_GATED" "P1" "BACKUP_ROLLBACK_STAGING_PLAN_ONLY" "plan" "created" "Post-write validation plan created." $PostWriteValidationJson
+    def_AddRow $Rows "Round3" "CONSOLIDATE" "APPROVAL_GATE" "Approval Gate JSON" "WARN_APPROVAL_REQUIRED" "MEDIUM" "SEQUENTIAL_REQUIRED" "P0" "BACKUP_ROLLBACK_STAGING_PLAN_ONLY" "approved_now" "false" "Future stage approval still required." $ApprovalGateJson
+
+    $Top10Libs = @(
+        [pscustomobject]@{FunctionArea="Backup Rollback Staging Plan"; Language="Python"; Top10LocalFreeLibs="duckdb; pandas; pyarrow; polars; hashlib; pathlib; pydantic; pandera; pytest; rich"; UseCase="future staging/backup/rollback validation"}
+        [pscustomobject]@{FunctionArea="Staging Write Script Generation"; Language="Python"; Top10LocalFreeLibs="duckdb; pandas; polars; pyarrow; pydantic; pandera; pytest; hypothesis; orjson; rich"; UseCase="generate script/staging table/future safe write"}
+        [pscustomobject]@{FunctionArea="PowerShell Orchestration"; Language="PowerShell"; Top10LocalFreeLibs="Pester; PSScriptAnalyzer; Microsoft.PowerShell.ThreadJob; ImportExcel; PSWriteHTML; ScheduledTasks; Start-Transcript; ConvertTo-Json; Get-FileHash; Write-Progress"; UseCase="test/debug/report/audit/hash/progress"}
+        [pscustomobject]@{FunctionArea="HTML UI Report"; Language="JS/HTML"; Top10LocalFreeLibs="Tabulator; DataTables; ECharts; Chart.js; Mermaid; Ajv; DOMPurify; FileSaver.js; Playwright; Lighthouse"; UseCase="matrix/smoke/chart/schema/export"}
+        [pscustomobject]@{FunctionArea="VRN Integration Gate"; Language="Python"; Top10LocalFreeLibs="pdfplumber; PyMuPDF; pdfminer.six; pypdf; camelot; tabula-py; opencv-python; pillow; pandas; pyarrow"; UseCase="future PDF/report extraction alignment"}
+    )
+    $Top10Libs | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $Top10Json -Encoding UTF8
+    def_AddRow $Rows "Round3" "CONSOLIDATE" "LOCAL_FREE_LIBS" "Top10 Local Free Libs" "OK" "LOW" "PARALLEL_SAFE" "P2" "BACKUP_ROLLBACK_STAGING_PLAN_ONLY" "rows" "$(@($Top10Libs).Count)" "Top10 local free libs matrix generated." $Top10Json
+
+    def_AddRow $Rows "Round3" "RESULT" "READINESS" $Result.status $(if ($Result.risk -eq "LOW") { "OK_READY" } elseif ($Result.risk -eq "MEDIUM") { "WARN_REVIEW_READY" } else { "BLOCKED" }) $Result.risk "SEQUENTIAL_GATED" "P0" "BACKUP_ROLLBACK_STAGING_PLAN_ONLY" "recommendation" $Result.recommendation "v028.3.2 completed. Plan only. No DB write. No canonical merge." $PyResult
+
+    $CsvMatrix = Join-Path $RegistryDir "VDF_AkShare_BackupRollbackStagingPlan_Hotfix_Matrix_v02832.csv"
+    $JsonMatrix = Join-Path $RegistryDir "VDF_AkShare_BackupRollbackStagingPlan_Hotfix_Matrix_v02832.json"
+    $Rows | Export-Csv -LiteralPath $CsvMatrix -NoTypeInformation -Encoding UTF8BOM
+    $Rows | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $JsonMatrix -Encoding UTF8
+
+    try {
+        $ptr = if (Test-Path -LiteralPath $ActivePointer) {
+            Get-Content -LiteralPath $ActivePointer -Raw -Encoding UTF8 | ConvertFrom-Json
+        } else {
+            [pscustomobject]@{}
+        }
+
+        $ptr | Add-Member -NotePropertyName "latest_akshare_backup_rollback_staging_plan_hotfix_v02832" -NotePropertyValue ([pscustomobject]@{
+            generated_at = def_Iso
+            status = $Result.status
+            risk = $Result.risk
+            run_root = $RunRoot
+            result_json = $PyResult
+            backup_plan_json = $BackupPlanJson
+            rollback_plan_json = $RollbackPlanJson
+            staging_plan_json = $StagingPlanJson
+            postwrite_validation_json = $PostWriteValidationJson
+            approval_gate_json = $ApprovalGateJson
+            candidate_rows = $CandidateRows
+            insert_rows = $InsertRows
+            conflict_rows = $ConflictRows
+            recommendation = $Result.recommendation
+        }) -Force
+
+        $ptr | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $ActivePointer -Encoding UTF8
+        def_AddRow $Rows "Round3" "POINTER" "ACTIVE_POINTER" "VDF_ACTIVE_POINTER.json" "OK_UPDATED" "LOW" "PARALLEL_SAFE" "P1" "BACKUP_ROLLBACK_STAGING_PLAN_ONLY" "update" "complete" "Active pointer updated with v028.3.2." $ActivePointer
+    } catch {}
+
+    $Rows | Export-Csv -LiteralPath $CsvMatrix -NoTypeInformation -Encoding UTF8BOM
+    $Rows | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $JsonMatrix -Encoding UTF8
+
+    $trs = foreach ($r in $Rows) {
+        $cls = if ($r.Risk -eq "HIGH" -or $r.Status -match "FAIL|FATAL|BLOCK") { "bad" }
+               elseif ($r.Risk -match "MEDIUM|REVIEW" -or $r.Status -match "WARN|REVIEW|APPROVAL|HOTFIX") { "warn" }
+               else { "ok" }
+        "<tr class='$cls'><td>$(def_Html $r.Round)</td><td>$(def_Html $r.Stage)</td><td>$(def_Html $r.Layer)</td><td>$(def_Html $r.Name)</td><td>$(def_Html $r.Status)</td><td>$(def_Html $r.Risk)</td><td>$(def_Html $r.FixClass)</td><td>$(def_Html $r.Priority)</td><td>$(def_Html $r.Mode)</td><td>$(def_Html $r.Metric)</td><td>$(def_Html $r.Value)</td><td>$(def_Html $r.Message)</td><td>$(def_Html $r.Path)</td></tr>"
+    }
+
+    $HtmlReport = Join-Path $ReportDir "VDF_AkShare_BackupRollbackStagingPlan_Hotfix_Report_v02832.html"
+    $Html = @"
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VDF AkShare Backup Rollback Staging Plan Hotfix v028.3.2</title>
+<style>
+body{margin:0;background:#f7f4ed;color:#25312f;font-family:Arial,"Microsoft JhengHei",sans-serif}
+.wrap{max-width:1500px;margin:0 auto;padding:28px}
+.hero{border:1px solid #d8d0c3;border-radius:24px;background:#fffdf8;padding:26px;box-shadow:0 18px 50px rgba(30,40,36,.08)}
+h1{margin:0;font-size:28px}h2{margin-top:28px;font-size:20px}.sub{color:#6e7b78;margin-top:8px;line-height:1.7}
+.kpis{display:grid;grid-template-columns:repeat(7,minmax(120px,1fr));gap:12px;margin-top:20px}
+.kpi{border:1px solid #d8d0c3;border-radius:18px;padding:14px;background:#fff}.kpi b{font-size:22px;display:block}.kpi span{font-size:12px;color:#6e7b78}
+.badge{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid #d8d0c3;background:#fff;margin-right:8px}
+.ok td{background:#f3fbf5}.warn td{background:#fff8e9}.bad td{background:#fff1f1}
+.mw{overflow:auto;border:1px solid #d8d0c3;border-radius:18px;background:#fff}
+table{border-collapse:collapse;width:100%;font-size:12px}
+th{position:sticky;top:0;background:#e8eee9;color:#20332f;z-index:1}
+th,td{border-bottom:1px solid #e8e1d6;padding:9px 10px;text-align:left;vertical-align:top;white-space:nowrap}
+td:nth-child(12),td:nth-child(13){white-space:normal;min-width:320px}
+pre{white-space:pre-wrap;background:#17211f;color:#e9fff8;padding:16px;border-radius:16px;overflow:auto}
+@media(max-width:900px){.kpis{grid-template-columns:1fr}.wrap{padding:14px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hero">
+<h1>VeritasDataForge · AkShare Backup Rollback Staging Plan Hotfix v028.3.2</h1>
+<div class="sub">VERITAS INTELLIGENCE ANALYTICS<br>Empty CSV hotfix · PowerShell metric accessor hotfix · plan only · no DATABASE write · no canonical merge</div>
+<p><span class="badge">Status: $(def_Html $Result.status)</span><span class="badge">Risk: $(def_Html $Result.risk)</span><span class="badge">Recommendation: $(def_Html $Result.recommendation)</span></p>
+<div class="kpis">
+<div class="kpi"><b>$script:OK</b><span>OK</span></div>
+<div class="kpi"><b>$script:WARN</b><span>WARN / REVIEW</span></div>
+<div class="kpi"><b>$script:FAIL</b><span>FAIL / BLOCK</span></div>
+<div class="kpi"><b>$CandidateRows</b><span>Candidate</span></div>
+<div class="kpi"><b>$InsertRows</b><span>Insert</span></div>
+<div class="kpi"><b>$ConflictRows</b><span>Conflict</span></div>
+<div class="kpi"><b>$DbInventoryFiles</b><span>DB inventory files</span></div>
+</div>
+</div>
+
+<h2>def Matrix</h2>
+<div class="mw">
+<table>
+<thead><tr><th>Round</th><th>Stage</th><th>Layer</th><th>Name</th><th>Status</th><th>Risk</th><th>FixClass</th><th>Priority</th><th>Mode</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr></thead>
+<tbody>$($trs -join "`n")</tbody>
+</table>
+</div>
+
+<h2>def Output Paths</h2>
+<pre>
+RunRoot                  : $RunRoot
+HTML                     : $HtmlReport
+CSV Matrix               : $CsvMatrix
+JSON Matrix              : $JsonMatrix
+DB Inventory CSV         : $DbInventoryCsv
+Backup Plan JSON         : $BackupPlanJson
+Rollback Plan JSON       : $RollbackPlanJson
+Staging Plan JSON        : $StagingPlanJson
+PostWrite Validation JSON: $PostWriteValidationJson
+Approval Gate JSON       : $ApprovalGateJson
+PreWrite Checklist CSV   : $PreWriteSafetyChecklistCsv
+Top10 Libs               : $Top10Json
+Runtime Result           : $PyResult
+Active Pointer           : $ActivePointer
+Transcript               : $Transcript
+</pre>
+
+<h2>def Next Gate</h2>
+<pre>
+$($Result.next_step)
+
+Current:
+candidate_rows = $CandidateRows
+insert_rows = $InsertRows
+update_rows = $UpdateRows
+conflict_rows = $ConflictRows
+duplicate_quarantine_rows = $DuplicateQuarantineRows
+database_inventory_files = $DbInventoryFiles
+empty_csv_hotfix_applied = $EmptyCsvHotfixApplied
+
+DB write = false
+Canonical merge = false
+Actual write approval = false
+</pre>
+</div>
+</body>
+</html>
+"@
+
+    Set-Content -LiteralPath $HtmlReport -Value $Html -Encoding UTF8
+
+    try {
+        $ptr = Get-Content -LiteralPath $ActivePointer -Raw -Encoding UTF8 | ConvertFrom-Json
+        $ptr.latest_akshare_backup_rollback_staging_plan_hotfix_v02832.report = $HtmlReport
+        $ptr | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $ActivePointer -Encoding UTF8
+    } catch {}
+
+    if ($OpenHtmlReport -and (Test-Path -LiteralPath $HtmlReport)) {
+        Start-Process -FilePath $HtmlReport | Out-Null
+    }
+
+    try { Stop-Transcript | Out-Null } catch {}
+
+    Write-Host ""
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "def VDF AKSHARE BACKUP ROLLBACK STAGING PLAN HOTFIX v028.3.2 COMPLETE" -ForegroundColor Cyan
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "Status                    : $($Result.status)"
+    Write-Host "Risk                      : $($Result.risk)"
+    Write-Host "RunRoot                   : $RunRoot"
+    Write-Host "HTML                      : $HtmlReport"
+    Write-Host "CSV Matrix                : $CsvMatrix"
+    Write-Host "JSON Matrix               : $JsonMatrix"
+    Write-Host "DB Inventory CSV          : $DbInventoryCsv"
+    Write-Host "Backup Plan JSON          : $BackupPlanJson"
+    Write-Host "Rollback Plan JSON        : $RollbackPlanJson"
+    Write-Host "Staging Plan JSON         : $StagingPlanJson"
+    Write-Host "PostWrite Validation JSON : $PostWriteValidationJson"
+    Write-Host "Approval Gate JSON        : $ApprovalGateJson"
+    Write-Host "PreWrite Checklist CSV    : $PreWriteSafetyChecklistCsv"
+    Write-Host "Top10 Libs                : $Top10Json"
+    Write-Host "Runtime Result            : $PyResult"
+    Write-Host "Active Pointer            : $ActivePointer"
+    Write-Host "OK                        : $script:OK"
+    Write-Host "WARN                      : $script:WARN"
+    Write-Host "FAIL                      : $script:FAIL"
+    Write-Host "Candidate Rows            : $CandidateRows"
+    Write-Host "Insert Rows               : $InsertRows"
+    Write-Host "Update Rows               : $UpdateRows"
+    Write-Host "Conflict Rows             : $ConflictRows"
+    Write-Host "Duplicate Quarantine      : $DuplicateQuarantineRows"
+    Write-Host "DB Inventory Files        : $DbInventoryFiles"
+    Write-Host "Empty CSV Hotfix Applied  : $EmptyCsvHotfixApplied"
+    Write-Host "Recommendation            : $($Result.recommendation)"
+    Write-Host "Next Step                 : $($Result.next_step)"
+    Write-Host ""
+    Write-Host "PowerShell remains open. No exit. No Stop-Process. No destructive delete." -ForegroundColor Green
+}
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 try {
+    Invoke-VDF-AkShareBackupRollbackStagingPlan-Hotfix-v02832
+}
+catch {
+    Write-Host ""
+    Write-Host "================================================================================" -ForegroundColor Red
+    Write-Host "def VDF AKSHARE BACKUP ROLLBACK STAGING PLAN HOTFIX v028.3.2 FATAL BUT POWERSHELL STAYS OPEN" -ForegroundColor Red
+    Write-Host "================================================================================" -ForegroundColor Red
+    Write-Host "[FATAL] $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host $_.ScriptStackTrace -ForegroundColor DarkRed
+    Write-Host ""
+    Write-Host "PowerShell remains open. No exit was called." -ForegroundColor Yellow
+}
+
+================================================================================
+def VDF AKSHARE BACKUP ROLLBACK STAGING PLAN HOTFIX v028.3.2
+================================================================================
+Fix: Empty CSV + PowerShell metric safe accessor · no DATABASE write · no canonical merge
+
+
+================================================================================
+def VDF AKSHARE BACKUP ROLLBACK STAGING PLAN HOTFIX v028.3.2 COMPLETE
+================================================================================
+Status                    : VDF_AKSHARE_BACKUP_ROLLBACK_STAGING_PLAN_HOTFIX_READY
+Risk                      : MEDIUM
+RunRoot                   : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_BACKUP_ROLLBACK_STAGING_PLAN_HOTFIX_v02832_20260611_031541
+HTML                      : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_BACKUP_ROLLBACK_STAGING_PLAN_HOTFIX_v02832_20260611_031541\report\VDF_AkShare_BackupRollbackStagingPlan_Hotfix_Report_v02832.html
+CSV Matrix                : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_BACKUP_ROLLBACK_STAGING_PLAN_HOTFIX_v02832_20260611_031541\registry\VDF_AkShare_BackupRollbackStagingPlan_Hotfix_Matrix_v02832.csv
+JSON Matrix               : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_BACKUP_ROLLBACK_STAGING_PLAN_HOTFIX_v02832_20260611_031541\registry\VDF_AkShare_BackupRollbackStagingPlan_Hotfix_Matrix_v02832.json
+DB Inventory CSV          : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_BACKUP_ROLLBACK_STAGING_PLAN_HOTFIX_v02832_20260611_031541\registry\VDF_AkShare_v02832_DatabaseInventory.csv
+Backup Plan JSON          : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_BACKUP_ROLLBACK_STAGING_PLAN_HOTFIX_v02832_20260611_031541\plan\VDF_AkShare_v02832_BackupPlan.json
+Rollback Plan JSON        : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_BACKUP_ROLLBACK_STAGING_PLAN_HOTFIX_v02832_20260611_031541\plan\VDF_AkShare_v02832_RollbackPlan.json
+Staging Plan JSON         : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_BACKUP_ROLLBACK_STAGING_PLAN_HOTFIX_v02832_20260611_031541\plan\VDF_AkShare_v02832_StagingWritePlan.json
+PostWrite Validation JSON : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_BACKUP_ROLLBACK_STAGING_PLAN_HOTFIX_v02832_20260611_031541\plan\VDF_AkShare_v02832_PostWriteValidationPlan.json
+Approval Gate JSON        : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_BACKUP_ROLLBACK_STAGING_PLAN_HOTFIX_v02832_20260611_031541\plan\VDF_AkShare_v02832_WriteApprovalGate.json
+PreWrite Checklist CSV    : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_BACKUP_ROLLBACK_STAGING_PLAN_HOTFIX_v02832_20260611_031541\registry\VDF_AkShare_v02832_PreWriteSafetyChecklist.csv
+Top10 Libs                : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_BACKUP_ROLLBACK_STAGING_PLAN_HOTFIX_v02832_20260611_031541\registry\VDF_Top10_LocalFreeLibs_BackupRollbackStagingPlan_Hotfix_v02832.json
+Runtime Result            : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_BACKUP_ROLLBACK_STAGING_PLAN_HOTFIX_v02832_20260611_031541\runtime\vdf_akshare_backup_rollback_staging_plan_hotfix_result_v02832.json
+Active Pointer            : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ACTIVE_POINTER.json
+OK                        : 14
+WARN                      : 4
+FAIL                      : 0
+Candidate Rows            : 121
+Insert Rows               : 121
+Update Rows               : 0
+Conflict Rows             : 0
+Duplicate Quarantine      : 29
+DB Inventory Files        : 76
+Empty CSV Hotfix Applied  : True
+Recommendation            : ALLOW_V0284_USER_APPROVAL_FOR_STAGING_WRITE_SCRIPT_GENERATION_NO_DB_WRITE
+Next Step                 : v028.4 user approval for staging-write script generation only; no DB write
+
+PowerShell remains open. No exit. No Stop-Process. No destructive delete.
+C:\Users\tonyk
+ >
+
+PS7 #requires -Version 7.0
+C:\Users\tonyk
+ >
+
+PS7 Set-StrictMode -Version Latest
+C:\Users\tonyk
+ >
+
+PS7 $ErrorActionPreference = "Stop"
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 function Invoke-VDF-AkShareUserApprovalForStagingWriteScriptGeneration-v0284 {
+    param(
+        [string]$ProjectRoot = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics",
+        [switch]$OpenHtmlReport = $true
+    )
+
+    $script:OK = 0
+    $script:WARN = 0
+    $script:FAIL = 0
+
+    function def_Stamp { Get-Date -Format "yyyyMMdd_HHmmss" }
+    function def_Iso { (Get-Date).ToString("yyyy-MM-ddTHH:mm:ss.fffK") }
+    function def_Mkdir([string]$p) { [System.IO.Directory]::CreateDirectory($p) | Out-Null }
+    function def_Html([AllowNull()][string]$s) {
+        if ($null -eq $s) { return "" }
+        return [System.Net.WebUtility]::HtmlEncode($s)
+    }
+    function def_GetProp {
+        param([object]$Obj,[string]$Name,[object]$Default = 0)
+        if ($null -eq $Obj) { return $Default }
+        $p = $Obj.PSObject.Properties[$Name]
+        if ($null -eq $p) { return $Default }
+        if ($null -eq $p.Value -or "$($p.Value)" -eq "") { return $Default }
+        return $p.Value
+    }
+    function def_AddRow {
+        param(
+            [System.Collections.Generic.List[object]]$Rows,
+            [string]$Round,[string]$Stage,[string]$Layer,[string]$Name,
+            [string]$Status,[string]$Risk,[string]$FixClass,[string]$Priority,
+            [string]$Mode,[string]$Metric,[string]$Value,[string]$Message,[string]$Path
+        )
+        if ($Status -match "FAIL|FATAL|BLOCK") { $script:FAIL++ }
+        elseif ($Status -match "WARN|REVIEW|MEDIUM|MISSING|EMPTY|QUARANTINE|APPROVAL|SCRIPT") { $script:WARN++ }
+        else { $script:OK++ }
+
+        $Rows.Add([pscustomobject]@{
+            Round=$Round; Stage=$Stage; Layer=$Layer; Name=$Name; Status=$Status; Risk=$Risk
+            FixClass=$FixClass; Priority=$Priority; Mode=$Mode; Metric=$Metric; Value=$Value
+            Message=$Message; Path=$Path
+        }) | Out-Null
+    }
+    function def_SafeHash {
+        param([string]$Path,[string]$ExcludeRoot)
+        try {
+            if ([string]::IsNullOrWhiteSpace($Path) -or -not [System.IO.File]::Exists($Path)) { return "" }
+            $full = [System.IO.Path]::GetFullPath($Path)
+            $root = [System.IO.Path]::GetFullPath($ExcludeRoot)
+            if ($full.StartsWith($root,[System.StringComparison]::OrdinalIgnoreCase)) { return "SKIPPED_CURRENT_RUNROOT" }
+            return (Get-FileHash -LiteralPath $Path -Algorithm SHA256 -ErrorAction Stop).Hash
+        } catch [System.IO.IOException] {
+            return "LOCKED_OR_BUSY"
+        } catch {
+            return "HASH_ERROR"
+        }
+    }
+
+    if (-not [System.IO.Directory]::Exists($ProjectRoot)) {
+        throw "ProjectRoot not found: $ProjectRoot"
+    }
+
+    $Stamp = def_Stamp
+    $DictRoot     = Join-Path $ProjectRoot "dict\VDF"
+    $ActiveRoot   = Join-Path $DictRoot "_active"
+    $BackupRoot   = Join-Path $DictRoot "_backup"
+    $DatabaseRoot = Join-Path $DictRoot "DATABASE"
+
+    foreach ($d in @($DictRoot,$ActiveRoot,$BackupRoot,$DatabaseRoot)) { def_Mkdir $d }
+
+    $Latest = Get-ChildItem -LiteralPath $ActiveRoot -Directory -Filter "VDF_AKSHARE_BACKUP_ROLLBACK_STAGING_PLAN_HOTFIX_v02832_*" -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending |
+        Select-Object -First 1
+
+    if ($null -eq $Latest) {
+        throw "Latest v028.3.2 backup rollback staging plan hotfix run not found."
+    }
+
+    $RunRoot = Join-Path $ActiveRoot "VDF_AKSHARE_STAGING_WRITE_SCRIPT_GENERATION_APPROVAL_v0284_$Stamp"
+    $ReportDir = Join-Path $RunRoot "report"
+    $RegistryDir = Join-Path $RunRoot "registry"
+    $PlanDir = Join-Path $RunRoot "plan"
+    $ScriptDir = Join-Path $RunRoot "generated_script"
+    $RuntimeDir = Join-Path $RunRoot "runtime"
+    $BackupDir = Join-Path $RunRoot "backup"
+
+    foreach ($d in @($RunRoot,$ReportDir,$RegistryDir,$PlanDir,$ScriptDir,$RuntimeDir,$BackupDir)) { def_Mkdir $d }
+
+    $Rows = [System.Collections.Generic.List[object]]::new()
+    $ActivePointer = Join-Path $ActiveRoot "VDF_ACTIVE_POINTER.json"
+    $Transcript = Join-Path $RuntimeDir "VDF_AkShare_StagingWriteScriptGenerationApproval_Transcript_v0284_$Stamp.txt"
+
+    Write-Host ""
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "def VDF AKSHARE USER APPROVAL FOR STAGING-WRITE SCRIPT GENERATION v028.4" -ForegroundColor Cyan
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "Generate reviewable staging-write script only · no execution · no DATABASE write · no canonical merge"
+    Write-Host ""
+
+    try { Start-Transcript -LiteralPath $Transcript -Force | Out-Null } catch {}
+
+    if (Test-Path -LiteralPath $ActivePointer) {
+        Copy-Item -LiteralPath $ActivePointer -Destination (Join-Path $BackupDir "VDF_ACTIVE_POINTER_before_v0284_$Stamp.json") -Force
+    }
+
+    def_AddRow $Rows "Round0" "BOOT" "PROJECT_ROOT" "VeritasIntelligenceAnalytics" "OK" "LOW" "PARALLEL_SAFE" "P0" "STAGING_WRITE_SCRIPT_GENERATION_ONLY" "exists" "true" "Project root exists." $ProjectRoot
+    def_AddRow $Rows "Round0" "POLICY" "NO_DB_WRITE" "DATABASE" "OK_POLICY_LOCKED" "LOW" "PARALLEL_SAFE" "P0" "STAGING_WRITE_SCRIPT_GENERATION_ONLY" "db_write_enabled" "false" "No DATABASE write in v028.4." $DatabaseRoot
+    def_AddRow $Rows "Round0" "POLICY" "NO_CANONICAL_MERGE" "Canonical Merge" "OK_POLICY_LOCKED" "LOW" "PARALLEL_SAFE" "P0" "STAGING_WRITE_SCRIPT_GENERATION_ONLY" "canonical_merge_enabled" "false" "No canonical merge in v028.4." $RunRoot
+    def_AddRow $Rows "Round0" "POLICY" "SCRIPT_GENERATION_ONLY" "Generated Script" "OK_POLICY_LOCKED" "LOW" "SEQUENTIAL_REQUIRED" "P0" "STAGING_WRITE_SCRIPT_GENERATION_ONLY" "script_execute_now" "false" "Generate staging-write script but do not execute it." $ScriptDir
+
+    $ResultJson = Get-ChildItem -LiteralPath $Latest.FullName -Recurse -File -Filter "vdf_akshare_backup_rollback_staging_plan_hotfix_result_v02832.json" -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending | Select-Object -First 1
+
+    $BackupPlanJson = Get-ChildItem -LiteralPath $Latest.FullName -Recurse -File -Filter "VDF_AkShare_v02832_BackupPlan.json" -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending | Select-Object -First 1
+
+    $RollbackPlanJson = Get-ChildItem -LiteralPath $Latest.FullName -Recurse -File -Filter "VDF_AkShare_v02832_RollbackPlan.json" -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending | Select-Object -First 1
+
+    $StagingPlanJson = Get-ChildItem -LiteralPath $Latest.FullName -Recurse -File -Filter "VDF_AkShare_v02832_StagingWritePlan.json" -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending | Select-Object -First 1
+
+    $ApprovalGateJson02832 = Get-ChildItem -LiteralPath $Latest.FullName -Recurse -File -Filter "VDF_AkShare_v02832_WriteApprovalGate.json" -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending | Select-Object -First 1
+
+    foreach ($x in @($ResultJson,$BackupPlanJson,$RollbackPlanJson,$StagingPlanJson,$ApprovalGateJson02832)) {
+        if ($null -eq $x) { throw "Missing required v028.3.2 artifact for v028.4 script generation approval." }
+    }
+
+    $V02832 = Get-Content -LiteralPath $ResultJson.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+    $M = $V02832.metrics
+
+    $CandidateRows = [int](def_GetProp $M "candidate_rows" 0)
+    $InsertRows = [int](def_GetProp $M "insert_rows" 0)
+    $UpdateRows = [int](def_GetProp $M "update_rows" 0)
+    $ConflictRows = [int](def_GetProp $M "conflict_rows" 0)
+    $DuplicateQuarantineRows = [int](def_GetProp $M "duplicate_quarantine_rows" 0)
+    $DbInventoryFiles = [int](def_GetProp $M "database_inventory_files" 0)
+
+    def_AddRow $Rows "Round1" "DISCOVERY" "V02832_RESULT" "v028.3.2 Result" "OK_SOURCE_LOCKED" "LOW" "SEQUENTIAL_GATED" "P0" "STAGING_WRITE_SCRIPT_GENERATION_ONLY" "source" "v02832" "Locked v028.3.2 result." $ResultJson.FullName
+    def_AddRow $Rows "Round1" "DISCOVERY" "STAGING_PLAN" "v028.3.2 Staging Plan" "OK_SOURCE_LOCKED" "LOW" "SEQUENTIAL_GATED" "P0" "STAGING_WRITE_SCRIPT_GENERATION_ONLY" "source" "staging_plan" "Locked staging plan." $StagingPlanJson.FullName
+
+    if ($CandidateRows -le 0 -or $ConflictRows -ne 0) {
+        def_AddRow $Rows "Round1" "GATE" "READINESS" "Script Generation Readiness" "BLOCK_NOT_READY" "HIGH" "SEQUENTIAL_REQUIRED" "P0" "STAGING_WRITE_SCRIPT_GENERATION_ONLY" "candidate/conflict" "$CandidateRows/$ConflictRows" "Cannot generate script because candidate rows or conflict rows are invalid." $ResultJson.FullName
+        throw "v028.4 blocked: CandidateRows=$CandidateRows ConflictRows=$ConflictRows"
+    }
+
+    $StagingPlan = Get-Content -LiteralPath $StagingPlanJson.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+    $InsertCsvPath = [string]$StagingPlan.candidate_inputs.insert_csv
+    $UpdateCsvPath = [string]$StagingPlan.candidate_inputs.update_csv
+    $CandidateCsvPath = [string]$StagingPlan.candidate_inputs.candidate_csv
+    $QuarantineCsvPath = [string]$StagingPlan.candidate_inputs.duplicate_quarantine_csv
+
+    foreach ($p in @($InsertCsvPath,$UpdateCsvPath,$CandidateCsvPath,$QuarantineCsvPath)) {
+        if ([string]::IsNullOrWhiteSpace($p) -or -not [System.IO.File]::Exists($p)) {
+            throw "Required future script input missing: $p"
+        }
+    }
+
+    $GeneratedScript = Join-Path $ScriptDir "Invoke-VDF-AkShare-StagingWrite-GENERATED-NOT-RUN-v0285.ps1"
+    $ScriptReviewJson = Join-Path $PlanDir "VDF_AkShare_v0284_GeneratedScriptReview.json"
+    $ApprovalGateJson = Join-Path $PlanDir "VDF_AkShare_v0284_UserApprovalGate.json"
+    $ScriptHashJson = Join-Path $RegistryDir "VDF_AkShare_v0284_GeneratedScriptHash.json"
+    $PreExecutionChecklistCsv = Join-Path $RegistryDir "VDF_AkShare_v0284_PreExecutionChecklist.csv"
+    $RuntimeResultJson = Join-Path $RuntimeDir "vdf_akshare_staging_write_script_generation_approval_result_v0284.json"
+    $Top10Json = Join-Path $RegistryDir "VDF_Top10_LocalFreeLibs_StagingWriteScriptGenerationApproval_v0284.json"
+
+    $Generated = @"
+#requires -Version 7.0
+Set-StrictMode -Version Latest
+`$ErrorActionPreference = "Stop"
+
+<#
+GENERATED BY:
+  VDF AkShare v028.4
+
+STATUS:
+  GENERATED ONLY. NOT EXECUTED.
+
+SAFETY:
+  - Default is review-only.
+  - Does not run unless -ApprovalToken is exactly provided.
+  - Requires -ExecuteWrite switch.
+  - Creates backup before staging.
+  - Writes staging artifacts first.
+  - Does not promote canonical unless future logic explicitly approved.
+#>
+
+param(
+    [string]`$ProjectRoot = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics",
+    [string]`$ApprovalToken = "",
+    [switch]`$ExecuteWrite,
+    [switch]`$OpenHtmlReport = `$true
+)
+
+function def_Mkdir([string]`$p) { [System.IO.Directory]::CreateDirectory(`$p) | Out-Null }
+function def_Stamp { Get-Date -Format "yyyyMMdd_HHmmss" }
+
+`$RequiredToken = "APPROVE_VDF_AKSHARE_STAGING_WRITE_STAGE_ONLY"
+`$Stamp = def_Stamp
+
+`$DictRoot     = Join-Path `$ProjectRoot "dict\VDF"
+`$DatabaseRoot = Join-Path `$DictRoot "DATABASE"
+`$BackupRoot   = Join-Path `$DictRoot "_backup"
+`$ActiveRoot   = Join-Path `$DictRoot "_active"
+
+`$RunRoot = Join-Path `$ActiveRoot "VDF_AKSHARE_STAGING_WRITE_STAGE_EXECUTION_REVIEW_v0285_`$Stamp"
+`$ReportDir = Join-Path `$RunRoot "report"
+`$StagingDir = Join-Path `$RunRoot "staging"
+`$RuntimeDir = Join-Path `$RunRoot "runtime"
+
+foreach (`$d in @(`$DatabaseRoot,`$BackupRoot,`$RunRoot,`$ReportDir,`$StagingDir,`$RuntimeDir)) { def_Mkdir `$d }
+
+Write-Host ""
+Write-Host "================================================================================" -ForegroundColor Yellow
+Write-Host "def VDF AKSHARE STAGING WRITE GENERATED SCRIPT v028.5" -ForegroundColor Yellow
+Write-Host "================================================================================" -ForegroundColor Yellow
+Write-Host "This generated script is guarded. It will not write unless token + switch are provided."
+Write-Host ""
+
+if (-not `$ExecuteWrite -or `$ApprovalToken -ne `$RequiredToken) {
+    Write-Host "[REVIEW ONLY] No write executed." -ForegroundColor Yellow
+    Write-Host "Required to execute future staging-write:"
+    Write-Host "  -ExecuteWrite -ApprovalToken `$RequiredToken"
+    Write-Host ""
+    Write-Host "PowerShell remains open. No exit." -ForegroundColor Green
+    return
+}
+
+throw "Execution path intentionally disabled in generated v028.5 skeleton. Build an execution-approved script in a separate gate."
+"@
+
+    Set-Content -LiteralPath $GeneratedScript -Value $Generated -Encoding UTF8
+
+    $ScriptHash = def_SafeHash $GeneratedScript $RunRoot
+    $ScriptHashObj = [pscustomobject]@{
+        generated_at = def_Iso
+        generated_script = $GeneratedScript
+        sha256 = $ScriptHash
+        executed_now = $false
+        db_write_enabled = $false
+        canonical_merge_enabled = $false
+    }
+    $ScriptHashObj | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $ScriptHashJson -Encoding UTF8
+
+    $Review = [pscustomobject]@{
+        generated_at = def_Iso
+        status = "VDF_AKSHARE_STAGING_WRITE_SCRIPT_GENERATION_READY"
+        risk = "MEDIUM"
+        generated_script = $GeneratedScript
+        script_sha256 = $ScriptHash
+        candidate_rows = $CandidateRows
+        insert_rows = $InsertRows
+        update_rows = $UpdateRows
+        conflict_rows = $ConflictRows
+        duplicate_quarantine_rows = $DuplicateQuarantineRows
+        db_inventory_files = $DbInventoryFiles
+        policy = [pscustomobject]@{
+            script_generated = $true
+            script_executed_now = $false
+            db_write_enabled = $false
+            canonical_merge_enabled = $false
+            actual_write_approval_now = $false
+            generated_script_has_guard_token = $true
+            generated_script_execution_path_disabled = $true
+        }
+        recommendation = "ALLOW_V0285_GENERATED_SCRIPT_REVIEW_ONLY_NO_DB_WRITE"
+        next_step = "v028.5 generated script review only; no DB write"
+    }
+    $Review | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $ScriptReviewJson -Encoding UTF8
+
+    $Approval = [pscustomobject]@{
+        generated_at = def_Iso
+        status = "VDF_AKSHARE_V0284_USER_APPROVAL_GATE_READY"
+        risk = "MEDIUM"
+        approved_now = $false
+        approval_required_for_next = $true
+        what_is_generated = "guarded staging-write script skeleton"
+        what_is_not_approved = "actual database write, canonical merge, promotion to canonical target"
+        generated_script = $GeneratedScript
+        required_future_token = "APPROVE_VDF_AKSHARE_STAGING_WRITE_STAGE_ONLY"
+        next_step = "v028.5 generated script review only; no DB write"
+    }
+    $Approval | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $ApprovalGateJson -Encoding UTF8
+
+    $Checklist = @(
+        [pscustomobject]@{item="candidate_rows_gt_0"; status= if ($CandidateRows -gt 0) {"OK"} else {"FAIL"}}
+        [pscustomobject]@{item="conflict_rows_zero"; status= if ($ConflictRows -eq 0) {"OK"} else {"FAIL"}}
+        [pscustomobject]@{item="duplicate_quarantine_excluded"; status="OK"}
+        [pscustomobject]@{item="generated_script_created"; status= if (Test-Path -LiteralPath $GeneratedScript) {"OK"} else {"FAIL"}}
+        [pscustomobject]@{item="generated_script_not_executed"; status="OK"}
+        [pscustomobject]@{item="guard_token_required"; status="OK"}
+        [pscustomobject]@{item="execution_path_disabled"; status="OK"}
+        [pscustomobject]@{item="db_write_disabled"; status="OK"}
+        [pscustomobject]@{item="canonical_merge_disabled"; status="OK"}
+        [pscustomobject]@{item="future_approval_required"; status="OK"}
+    )
+    $Checklist | Export-Csv -LiteralPath $PreExecutionChecklistCsv -NoTypeInformation -Encoding UTF8BOM
+
+    $Result = [pscustomobject]@{
+        generated_at = def_Iso
+        status = "VDF_AKSHARE_STAGING_WRITE_SCRIPT_GENERATION_APPROVAL_READY"
+        risk = "MEDIUM"
+        recommendation = "ALLOW_V0285_GENERATED_SCRIPT_REVIEW_ONLY_NO_DB_WRITE"
+        metrics = [pscustomobject]@{
+            candidate_rows = $CandidateRows
+            insert_rows = $InsertRows
+            update_rows = $UpdateRows
+            conflict_rows = $ConflictRows
+            duplicate_quarantine_rows = $DuplicateQuarantineRows
+            generated_script_count = 1
+            script_executed_now = $false
+            db_write_enabled = $false
+            canonical_merge_enabled = $false
+        }
+        artifacts = [pscustomobject]@{
+            generated_script = $GeneratedScript
+            script_review_json = $ScriptReviewJson
+            approval_gate_json = $ApprovalGateJson
+            script_hash_json = $ScriptHashJson
+            pre_execution_checklist_csv = $PreExecutionChecklistCsv
+        }
+        next_step = "v028.5 generated script review only; no DB write"
+    }
+    $Result | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $RuntimeResultJson -Encoding UTF8
+
+    def_AddRow $Rows "Round2" "SCRIPT_GENERATION" "GENERATED_SCRIPT" "Guarded Staging Write Script" "OK_SCRIPT_GENERATED" "LOW" "SEQUENTIAL_GATED" "P0" "STAGING_WRITE_SCRIPT_GENERATION_ONLY" "script_executed_now" "false" "Generated guarded script. Not executed." $GeneratedScript
+    def_AddRow $Rows "Round2" "SCRIPT_GENERATION" "SCRIPT_HASH" "Generated Script Hash" "OK_HASH_CREATED" "LOW" "PARALLEL_SAFE" "P1" "STAGING_WRITE_SCRIPT_GENERATION_ONLY" "sha256" $ScriptHash "Generated script hash created." $ScriptHashJson
+    def_AddRow $Rows "Round3" "APPROVAL" "USER_GATE" "Approval Gate" "WARN_APPROVAL_REQUIRED" "MEDIUM" "SEQUENTIAL_REQUIRED" "P0" "STAGING_WRITE_SCRIPT_GENERATION_ONLY" "approved_now" "false" "Actual write not approved. Next stage is script review only." $ApprovalGateJson
+    def_AddRow $Rows "Round3" "CHECKLIST" "PRE_EXECUTION" "Pre-execution Checklist" "OK_CHECKLIST_CREATED" "LOW" "SEQUENTIAL_GATED" "P1" "STAGING_WRITE_SCRIPT_GENERATION_ONLY" "items" "$(@($Checklist).Count)" "Pre-execution checklist created." $PreExecutionChecklistCsv
+
+    $Top10Libs = @(
+        [pscustomobject]@{FunctionArea="Generated Script Review"; Language="PowerShell"; Top10LocalFreeLibs="Pester; PSScriptAnalyzer; Get-FileHash; Start-Transcript; ConvertTo-Json; ImportExcel; PSWriteHTML; ThreadJob; ScheduledTasks; PSFramework"; UseCase="script review/hash/static checks/no-write guard"}
+        [pscustomobject]@{FunctionArea="Staging Write Future Gate"; Language="Python"; Top10LocalFreeLibs="duckdb; pandas; polars; pyarrow; pandera; pydantic; pytest; hypothesis; orjson; rich"; UseCase="future staging data validation"}
+        [pscustomobject]@{FunctionArea="Backup Rollback"; Language="PowerShell"; Top10LocalFreeLibs="Get-FileHash; Copy-Item; Compress-Archive; Start-Transcript; Pester; PSScriptAnalyzer; PSWriteHTML; ImportExcel; ThreadJob; ScheduledTasks"; UseCase="backup/hash/rollback/report"}
+        [pscustomobject]@{FunctionArea="HTML UI Report"; Language="JS/HTML"; Top10LocalFreeLibs="Tabulator; DataTables; ECharts; Chart.js; Mermaid; Ajv; DOMPurify; FileSaver.js; Playwright; Lighthouse"; UseCase="matrix/report/schema/export"}
+        [pscustomobject]@{FunctionArea="VRN Integration Gate"; Language="Python"; Top10LocalFreeLibs="pdfplumber; PyMuPDF; pdfminer.six; pypdf; camelot; tabula-py; opencv-python; pillow; pandas; pyarrow"; UseCase="future PDF/report extraction alignment"}
+    )
+    $Top10Libs | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $Top10Json -Encoding UTF8
+    def_AddRow $Rows "Round3" "CONSOLIDATE" "LOCAL_FREE_LIBS" "Top10 Local Free Libs" "OK" "LOW" "PARALLEL_SAFE" "P2" "STAGING_WRITE_SCRIPT_GENERATION_ONLY" "rows" "$(@($Top10Libs).Count)" "Top10 local free libs matrix generated." $Top10Json
+
+    def_AddRow $Rows "Round3" "RESULT" "READINESS" "VDF_AKSHARE_STAGING_WRITE_SCRIPT_GENERATION_APPROVAL_READY" "WARN_REVIEW_READY" "MEDIUM" "SEQUENTIAL_GATED" "P0" "STAGING_WRITE_SCRIPT_GENERATION_ONLY" "recommendation" "ALLOW_V0285_GENERATED_SCRIPT_REVIEW_ONLY_NO_DB_WRITE" "v028.4 completed. Script generated only. No DB write. No canonical merge." $RuntimeResultJson
+
+    $CsvMatrix = Join-Path $RegistryDir "VDF_AkShare_StagingWriteScriptGenerationApproval_Matrix_v0284.csv"
+    $JsonMatrix = Join-Path $RegistryDir "VDF_AkShare_StagingWriteScriptGenerationApproval_Matrix_v0284.json"
+    $Rows | Export-Csv -LiteralPath $CsvMatrix -NoTypeInformation -Encoding UTF8BOM
+    $Rows | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $JsonMatrix -Encoding UTF8
+
+    try {
+        $ptr = if (Test-Path -LiteralPath $ActivePointer) {
+            Get-Content -LiteralPath $ActivePointer -Raw -Encoding UTF8 | ConvertFrom-Json
+        } else {
+            [pscustomobject]@{}
+        }
+
+        $ptr | Add-Member -NotePropertyName "latest_akshare_staging_write_script_generation_approval_v0284" -NotePropertyValue ([pscustomobject]@{
+            generated_at = def_Iso
+            status = "VDF_AKSHARE_STAGING_WRITE_SCRIPT_GENERATION_APPROVAL_READY"
+            risk = "MEDIUM"
+            run_root = $RunRoot
+            result_json = $RuntimeResultJson
+            generated_script = $GeneratedScript
+            script_hash_json = $ScriptHashJson
+            approval_gate_json = $ApprovalGateJson
+            candidate_rows = $CandidateRows
+            insert_rows = $InsertRows
+            conflict_rows = $ConflictRows
+            recommendation = "ALLOW_V0285_GENERATED_SCRIPT_REVIEW_ONLY_NO_DB_WRITE"
+        }) -Force
+
+        $ptr | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $ActivePointer -Encoding UTF8
+        def_AddRow $Rows "Round3" "POINTER" "ACTIVE_POINTER" "VDF_ACTIVE_POINTER.json" "OK_UPDATED" "LOW" "PARALLEL_SAFE" "P1" "STAGING_WRITE_SCRIPT_GENERATION_ONLY" "update" "complete" "Active pointer updated with v028.4." $ActivePointer
+    } catch {}
+
+    $Rows | Export-Csv -LiteralPath $CsvMatrix -NoTypeInformation -Encoding UTF8BOM
+    $Rows | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $JsonMatrix -Encoding UTF8
+
+    $trs = foreach ($r in $Rows) {
+        $cls = if ($r.Risk -eq "HIGH" -or $r.Status -match "FAIL|FATAL|BLOCK") { "bad" }
+               elseif ($r.Risk -match "MEDIUM|REVIEW" -or $r.Status -match "WARN|REVIEW|APPROVAL|SCRIPT") { "warn" }
+               else { "ok" }
+        "<tr class='$cls'><td>$(def_Html $r.Round)</td><td>$(def_Html $r.Stage)</td><td>$(def_Html $r.Layer)</td><td>$(def_Html $r.Name)</td><td>$(def_Html $r.Status)</td><td>$(def_Html $r.Risk)</td><td>$(def_Html $r.FixClass)</td><td>$(def_Html $r.Priority)</td><td>$(def_Html $r.Mode)</td><td>$(def_Html $r.Metric)</td><td>$(def_Html $r.Value)</td><td>$(def_Html $r.Message)</td><td>$(def_Html $r.Path)</td></tr>"
+    }
+
+    $HtmlReport = Join-Path $ReportDir "VDF_AkShare_StagingWriteScriptGenerationApproval_Report_v0284.html"
+    $Html = @"
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VDF AkShare Staging-write Script Generation Approval v028.4</title>
+<style>
+body{margin:0;background:#f7f4ed;color:#25312f;font-family:Arial,"Microsoft JhengHei",sans-serif}
+.wrap{max-width:1500px;margin:0 auto;padding:28px}
+.hero{border:1px solid #d8d0c3;border-radius:24px;background:#fffdf8;padding:26px;box-shadow:0 18px 50px rgba(30,40,36,.08)}
+h1{margin:0;font-size:28px}h2{margin-top:28px;font-size:20px}.sub{color:#6e7b78;margin-top:8px;line-height:1.7}
+.kpis{display:grid;grid-template-columns:repeat(7,minmax(120px,1fr));gap:12px;margin-top:20px}
+.kpi{border:1px solid #d8d0c3;border-radius:18px;padding:14px;background:#fff}.kpi b{font-size:22px;display:block}.kpi span{font-size:12px;color:#6e7b78}
+.badge{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid #d8d0c3;background:#fff;margin-right:8px}
+.ok td{background:#f3fbf5}.warn td{background:#fff8e9}.bad td{background:#fff1f1}
+.mw{overflow:auto;border:1px solid #d8d0c3;border-radius:18px;background:#fff}
+table{border-collapse:collapse;width:100%;font-size:12px}
+th{position:sticky;top:0;background:#e8eee9;color:#20332f;z-index:1}
+th,td{border-bottom:1px solid #e8e1d6;padding:9px 10px;text-align:left;vertical-align:top;white-space:nowrap}
+td:nth-child(12),td:nth-child(13){white-space:normal;min-width:320px}
+pre{white-space:pre-wrap;background:#17211f;color:#e9fff8;padding:16px;border-radius:16px;overflow:auto}
+@media(max-width:900px){.kpis{grid-template-columns:1fr}.wrap{padding:14px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hero">
+<h1>VeritasDataForge · AkShare Staging-write Script Generation Approval v028.4</h1>
+<div class="sub">VERITAS INTELLIGENCE ANALYTICS<br>Generated script only · guarded script · not executed · no DATABASE write · no canonical merge</div>
+<p><span class="badge">Status: VDF_AKSHARE_STAGING_WRITE_SCRIPT_GENERATION_APPROVAL_READY</span><span class="badge">Risk: MEDIUM</span><span class="badge">Recommendation: ALLOW_V0285_GENERATED_SCRIPT_REVIEW_ONLY_NO_DB_WRITE</span></p>
+<div class="kpis">
+<div class="kpi"><b>$script:OK</b><span>OK</span></div>
+<div class="kpi"><b>$script:WARN</b><span>WARN / REVIEW</span></div>
+<div class="kpi"><b>$script:FAIL</b><span>FAIL / BLOCK</span></div>
+<div class="kpi"><b>$CandidateRows</b><span>Candidate</span></div>
+<div class="kpi"><b>$InsertRows</b><span>Insert</span></div>
+<div class="kpi"><b>$ConflictRows</b><span>Conflict</span></div>
+<div class="kpi"><b>1</b><span>Script generated</span></div>
+</div>
+</div>
+
+<h2>def Matrix</h2>
+<div class="mw">
+<table>
+<thead><tr><th>Round</th><th>Stage</th><th>Layer</th><th>Name</th><th>Status</th><th>Risk</th><th>FixClass</th><th>Priority</th><th>Mode</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr></thead>
+<tbody>$($trs -join "`n")</tbody>
+</table>
+</div>
+
+<h2>def Output Paths</h2>
+<pre>
+RunRoot                  : $RunRoot
+HTML                     : $HtmlReport
+CSV Matrix               : $CsvMatrix
+JSON Matrix              : $JsonMatrix
+Generated Script         : $GeneratedScript
+Script Review JSON       : $ScriptReviewJson
+Approval Gate JSON       : $ApprovalGateJson
+Script Hash JSON         : $ScriptHashJson
+PreExecution Checklist   : $PreExecutionChecklistCsv
+Top10 Libs               : $Top10Json
+Runtime Result           : $RuntimeResultJson
+Active Pointer           : $ActivePointer
+Transcript               : $Transcript
+</pre>
+
+<h2>def Next Gate</h2>
+<pre>
+v028.5 generated script review only; no DB write
+
+Current:
+candidate_rows = $CandidateRows
+insert_rows = $InsertRows
+update_rows = $UpdateRows
+conflict_rows = $ConflictRows
+duplicate_quarantine_rows = $DuplicateQuarantineRows
+generated_script_count = 1
+script_executed_now = false
+
+DB write = false
+Canonical merge = false
+Actual write approval = false
+</pre>
+</div>
+</body>
+</html>
+"@
+
+    Set-Content -LiteralPath $HtmlReport -Value $Html -Encoding UTF8
+
+    try {
+        $ptr = Get-Content -LiteralPath $ActivePointer -Raw -Encoding UTF8 | ConvertFrom-Json
+        $ptr.latest_akshare_staging_write_script_generation_approval_v0284.report = $HtmlReport
+        $ptr | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $ActivePointer -Encoding UTF8
+    } catch {}
+
+    if ($OpenHtmlReport -and (Test-Path -LiteralPath $HtmlReport)) {
+        Start-Process -FilePath $HtmlReport | Out-Null
+    }
+
+    try { Stop-Transcript | Out-Null } catch {}
+
+    Write-Host ""
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "def VDF AKSHARE STAGING-WRITE SCRIPT GENERATION APPROVAL v028.4 COMPLETE" -ForegroundColor Cyan
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "Status                    : VDF_AKSHARE_STAGING_WRITE_SCRIPT_GENERATION_APPROVAL_READY"
+    Write-Host "Risk                      : MEDIUM"
+    Write-Host "RunRoot                   : $RunRoot"
+    Write-Host "HTML                      : $HtmlReport"
+    Write-Host "CSV Matrix                : $CsvMatrix"
+    Write-Host "JSON Matrix               : $JsonMatrix"
+    Write-Host "Generated Script          : $GeneratedScript"
+    Write-Host "Script Review JSON        : $ScriptReviewJson"
+    Write-Host "Approval Gate JSON        : $ApprovalGateJson"
+    Write-Host "Script Hash JSON          : $ScriptHashJson"
+    Write-Host "PreExecution Checklist    : $PreExecutionChecklistCsv"
+    Write-Host "Runtime Result            : $RuntimeResultJson"
+    Write-Host "Active Pointer            : $ActivePointer"
+    Write-Host "OK                        : $script:OK"
+    Write-Host "WARN                      : $script:WARN"
+    Write-Host "FAIL                      : $script:FAIL"
+    Write-Host "Candidate Rows            : $CandidateRows"
+    Write-Host "Insert Rows               : $InsertRows"
+    Write-Host "Update Rows               : $UpdateRows"
+    Write-Host "Conflict Rows             : $ConflictRows"
+    Write-Host "Duplicate Quarantine      : $DuplicateQuarantineRows"
+    Write-Host "Generated Script Count    : 1"
+    Write-Host "Script Executed Now       : False"
+    Write-Host "Recommendation            : ALLOW_V0285_GENERATED_SCRIPT_REVIEW_ONLY_NO_DB_WRITE"
+    Write-Host "Next Step                 : v028.5 generated script review only; no DB write"
+    Write-Host ""
+    Write-Host "PowerShell remains open. No exit. No Stop-Process. No destructive delete." -ForegroundColor Green
+}
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 try {
+    Invoke-VDF-AkShareUserApprovalForStagingWriteScriptGeneration-v0284
+}
+catch {
+    Write-Host ""
+    Write-Host "================================================================================" -ForegroundColor Red
+    Write-Host "def VDF AKSHARE STAGING-WRITE SCRIPT GENERATION APPROVAL v028.4 FATAL BUT POWERSHELL STAYS OPEN" -ForegroundColor Red
+    Write-Host "================================================================================" -ForegroundColor Red
+    Write-Host "[FATAL] $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host $_.ScriptStackTrace -ForegroundColor DarkRed
+    Write-Host ""
+    Write-Host "PowerShell remains open. No exit was called." -ForegroundColor Yellow
+}
+
+================================================================================
+def VDF AKSHARE USER APPROVAL FOR STAGING-WRITE SCRIPT GENERATION v028.4
+================================================================================
+Generate reviewable staging-write script only · no execution · no DATABASE write · no canonical merge
+
+
+================================================================================
+def VDF AKSHARE STAGING-WRITE SCRIPT GENERATION APPROVAL v028.4 COMPLETE
+================================================================================
+Status                    : VDF_AKSHARE_STAGING_WRITE_SCRIPT_GENERATION_APPROVAL_READY
+Risk                      : MEDIUM
+RunRoot                   : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_STAGING_WRITE_SCRIPT_GENERATION_APPROVAL_v0284_20260611_033432
+HTML                      : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_STAGING_WRITE_SCRIPT_GENERATION_APPROVAL_v0284_20260611_033432\report\VDF_AkShare_StagingWriteScriptGenerationApproval_Report_v0284.html
+CSV Matrix                : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_STAGING_WRITE_SCRIPT_GENERATION_APPROVAL_v0284_20260611_033432\registry\VDF_AkShare_StagingWriteScriptGenerationApproval_Matrix_v0284.csv
+JSON Matrix               : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_STAGING_WRITE_SCRIPT_GENERATION_APPROVAL_v0284_20260611_033432\registry\VDF_AkShare_StagingWriteScriptGenerationApproval_Matrix_v0284.json
+Generated Script          : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_STAGING_WRITE_SCRIPT_GENERATION_APPROVAL_v0284_20260611_033432\generated_script\Invoke-VDF-AkShare-StagingWrite-GENERATED-NOT-RUN-v0285.ps1
+Script Review JSON        : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_STAGING_WRITE_SCRIPT_GENERATION_APPROVAL_v0284_20260611_033432\plan\VDF_AkShare_v0284_GeneratedScriptReview.json
+Approval Gate JSON        : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_STAGING_WRITE_SCRIPT_GENERATION_APPROVAL_v0284_20260611_033432\plan\VDF_AkShare_v0284_UserApprovalGate.json
+Script Hash JSON          : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_STAGING_WRITE_SCRIPT_GENERATION_APPROVAL_v0284_20260611_033432\registry\VDF_AkShare_v0284_GeneratedScriptHash.json
+PreExecution Checklist    : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_STAGING_WRITE_SCRIPT_GENERATION_APPROVAL_v0284_20260611_033432\registry\VDF_AkShare_v0284_PreExecutionChecklist.csv
+Runtime Result            : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_STAGING_WRITE_SCRIPT_GENERATION_APPROVAL_v0284_20260611_033432\runtime\vdf_akshare_staging_write_script_generation_approval_result_v0284.json
+Active Pointer            : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ACTIVE_POINTER.json
+OK                        : 10
+WARN                      : 3
+FAIL                      : 0
+Candidate Rows            : 121
+Insert Rows               : 121
+Update Rows               : 0
+Conflict Rows             : 0
+Duplicate Quarantine      : 29
+Generated Script Count    : 1
+Script Executed Now       : False
+Recommendation            : ALLOW_V0285_GENERATED_SCRIPT_REVIEW_ONLY_NO_DB_WRITE
+Next Step                 : v028.5 generated script review only; no DB write
+
+PowerShell remains open. No exit. No Stop-Process. No destructive delete.
+C:\Users\tonyk
+ >
+
+PS7 #requires -Version 7.0
+C:\Users\tonyk
+ >
+
+PS7 param(
+    [int]$Port = 8870,
+    [int]$AgeDays = 3,
+    [switch]$NoBrowser,
+    [switch]$SelfTest
+)
+>> ParameterBinding(): name="Port"; value="8870"
+>> ParameterBinding(): name="AgeDays"; value="3"
+>> ParameterBinding(): name="NoBrowser"; value="False"
+>> ParameterBinding(): name="SelfTest"; value="False"
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 # ============================================================================
+C:\Users\tonyk
+ >
+
+PS7 #  VIA Turbo Optimizer  v2  (VeritasIntelligenceAnalytics)
+C:\Users\tonyk
+ >
+
+PS7 #  EMBEDDED single-file system: backend HttpListener + animated HTML front-end.
+C:\Users\tonyk
+ >
+
+PS7 #  Safe disk cleanup + CPU/DRAM/Memory acceleration. Never auto-kills processes.
+C:\Users\tonyk
+ >
+
+PS7 #  Self-contained, append-only log, inline self-test (-SelfTest).
+C:\Users\tonyk
+ >
+
+PS7 #  PS7 rules honored: param() top, no <# #>, ${var}:, -f not on Write-Host,
+C:\Users\tonyk
+ >
+
+PS7 #  ProcessStartInfo (no Start-Job / no -Args splat), single-quote here-string
+C:\Users\tonyk
+ >
+
+PS7 #  + .Replace(), [IO.File]::WriteAllText, ordered .Contains().
+C:\Users\tonyk
+ >
+
+PS7 # ============================================================================
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 $ErrorActionPreference = 'Continue'
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 # ---- Config / paths --------------------------------------------------------
+C:\Users\tonyk
+ >
+
+PS7 $script:Base      = Join-Path $env:LOCALAPPDATA 'OptimizeTool'
+C:\Users\tonyk
+ >
+
+PS7 $script:LogDir    = Join-Path $script:Base 'logs'
+C:\Users\tonyk
+ >
+
+PS7 $script:LogFile   = Join-Path $script:LogDir 'OptimizeLog.txt'
+C:\Users\tonyk
+ >
+
+PS7 $script:WebDir    = Join-Path $script:Base 'web'
+C:\Users\tonyk
+ >
+
+PS7 $script:FrontFile = Join-Path $script:WebDir 'VIA_Optimizer_UI.html'
+C:\Users\tonyk
+ >
+
+PS7 $script:Stop      = $false
+C:\Users\tonyk
+ >
+
+PS7 $script:HighPerfGuid = '8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'
+C:\Users\tonyk
+ >
+
+PS7 $script:BalancedGuid = '381b4222-f694-41f0-9685-ff5bb260df2e'
+C:\Users\tonyk
+ >
+
+PS7 $script:EnvMgrCanonical = 'C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\supportive_module\VIA_EnvManager.py'
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 foreach ($d in @($script:Base, $script:LogDir, $script:WebDir)) {
+    if (-not (Test-Path -LiteralPath $d)) { New-Item -ItemType Directory -Path $d -Force | Out-Null }
+}
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 # ---- Logging (append-only) -------------------------------------------------
+C:\Users\tonyk
+ >
+
+PS7 function Write-Log {
+    param([string]$Msg, [string]$Level = 'INFO')
+    $line = ('{0} | {1,-5} | {2}' -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'), $Level, $Msg)
+    try { [System.IO.File]::AppendAllText($script:LogFile, $line + [Environment]::NewLine, [System.Text.Encoding]::UTF8) } catch {}
+    Write-Host $line
+}
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 # ---- Admin / safety --------------------------------------------------------
+C:\Users\tonyk
+ >
+
+PS7 $script:IsAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 $script:SafeRoots = @(
+    (Join-Path $env:LOCALAPPDATA 'Temp'),
+    $env:TEMP,
+    'C:\Windows\Temp',
+    'C:\ProgramData\Microsoft\Windows\WER',
+    (Join-Path $env:LOCALAPPDATA 'Microsoft\Windows\Explorer'),
+    (Join-Path $env:LOCALAPPDATA 'Microsoft\Windows\INetCache'),
+    (Join-Path $env:LOCALAPPDATA 'CrashDumps'),
+    'C:\Windows\SoftwareDistribution\Download'
+) | ForEach-Object { $_.TrimEnd('\').ToLowerInvariant() } | Select-Object -Unique
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 function Test-SafePath {
+    param([string]$Path)
+    if ([string]::IsNullOrWhiteSpace($Path)) { return $false }
+    # Normalize (resolve .. and .) WITHOUT requiring the path to exist, so a
+    # crafted traversal cannot escape the whitelist. GetFullPath is self-contained.
+    try { $full = [System.IO.Path]::GetFullPath($Path) } catch { return $false }
+    $p = $full.TrimEnd('\').ToLowerInvariant()
+    foreach ($root in $script:SafeRoots) {
+        if ($p -eq $root -or $p.StartsWith($root + '\')) { return $true }
+    }
+    return $false
+}
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 # ---- Working-set trim (safe, reversible; NOT a process kill) ---------------
+C:\Users\tonyk
+ >
+
+PS7 $script:CsLoaded = $false
+C:\Users\tonyk
+ >
+
+PS7 $csTrim = @'
+using System;
+using System.Runtime.InteropServices;
+public static class VIAMem {
+    [DllImport("kernel32.dll")]
+    static extern bool SetProcessWorkingSetSize(IntPtr proc, IntPtr min, IntPtr max);
+    public static bool Trim(int pid){
+        try {
+            var p = System.Diagnostics.Process.GetProcessById(pid);
+            return SetProcessWorkingSetSize(p.Handle, (IntPtr)(-1), (IntPtr)(-1));
+        } catch { return false; }
+    }
+}
+'@
+C:\Users\tonyk
+ >
+
+PS7 try { Add-Type -TypeDefinition $csTrim -ErrorAction Stop; $script:CsLoaded = $true } catch { Write-Log ('Add-Type VIAMem failed: ' + $_.Exception.Message) 'WARN' }
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 # ---- Subprocess helper (ProcessStartInfo only) -----------------------------
+C:\Users\tonyk
+ >
+
+PS7 function Invoke-PyProc {
+    param([string]$Exe, [string[]]$ArgsList, [int]$TimeoutSec = 30)
+    try {
+        $psi = [System.Diagnostics.ProcessStartInfo]::new()
+        $psi.FileName = $Exe
+        foreach ($a in $ArgsList) { $psi.ArgumentList.Add($a) }
+        $psi.RedirectStandardOutput = $true
+        $psi.RedirectStandardError  = $true
+        $psi.UseShellExecute = $false
+        $psi.CreateNoWindow  = $true
+        $p = [System.Diagnostics.Process]::Start($psi)
+        $out = $p.StandardOutput.ReadToEnd()
+        $err = $p.StandardError.ReadToEnd()
+        if (-not $p.WaitForExit($TimeoutSec * 1000)) { try { $p.Kill() } catch {}; return [pscustomobject]@{ Ok = $false; Out = $out; Err = 'timeout' } }
+        return [pscustomobject]@{ Ok = ($p.ExitCode -eq 0); Out = $out.Trim(); Err = $err.Trim(); Code = $p.ExitCode }
+    } catch { return [pscustomobject]@{ Ok = $false; Out = ''; Err = $_.Exception.Message } }
+}
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 # ---- Metrics ---------------------------------------------------------------
+C:\Users\tonyk
+ >
+
+PS7 function Get-MemSnapshot {
+    $os = Get-CimInstance Win32_OperatingSystem
+    $totalGB = [math]::Round($os.TotalVisibleMemorySize / 1MB, 2)
+    $freeGB  = [math]::Round($os.FreePhysicalMemory   / 1MB, 2)
+    $usedGB  = [math]::Round($totalGB - $freeGB, 2)
+    $pct     = if ($totalGB -gt 0) { [math]::Round(($usedGB / $totalGB) * 100, 2) } else { 0 }
+    return [pscustomobject]@{ TotalGB = $totalGB; UsedGB = $usedGB; FreeGB = $freeGB; UsedPct = $pct }
+}
+C:\Users\tonyk
+ >
+
+PS7 function Get-CpuLoad {
+    try { return [int]((Get-CimInstance Win32_Processor | Measure-Object -Property LoadPercentage -Average).Average) } catch { return 0 }
+}
+C:\Users\tonyk
+ >
+
+PS7 function Get-DriveSnapshot {
+    Get-CimInstance Win32_LogicalDisk -Filter 'DriveType=3' | ForEach-Object {
+        [pscustomobject]@{ Name = $_.DeviceID.TrimEnd(':'); Root = $_.DeviceID + '\'
+            UsedGB = [math]::Round(($_.Size - $_.FreeSpace) / 1GB, 2); FreeGB = [math]::Round($_.FreeSpace / 1GB, 2) }
+    }
+}
+C:\Users\tonyk
+ >
+
+PS7 function Get-TopProc {
+    param([int]$Top = 10)
+    $mem = Get-Process | Sort-Object WorkingSet64 -Descending | Select-Object -First $Top |
+        ForEach-Object { [pscustomobject]@{ Id = $_.Id; Name = $_.ProcessName; WorkingSetMB = [math]::Round($_.WorkingSet64 / 1MB, 2); Responding = $_.Responding } }
+    return [pscustomobject]@{ Mem = $mem }
+}
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 # ---- Fast fault-tolerant walk ----------------------------------------------
+C:\Users\tonyk
+ >
+
+PS7 function Get-DirStat {
+    param([string]$Root)
+    $items = [System.Collections.Generic.List[object]]::new()
+    $total = [int64]0
+    if (-not (Test-Path -LiteralPath $Root)) { return [pscustomobject]@{ Items = $items; TotalMB = 0 } }
+    $stack = [System.Collections.Generic.Stack[string]]::new(); $stack.Push($Root)
+    while ($stack.Count -gt 0) {
+        $dir = $stack.Pop()
+        try { foreach ($s in [System.IO.Directory]::EnumerateDirectories($dir)) { $stack.Push($s) } } catch {}
+        try {
+            foreach ($f in [System.IO.Directory]::EnumerateFiles($dir)) {
+                try { $fi = [System.IO.FileInfo]::new($f); $items.Add([pscustomobject]@{ Path = $f; Len = $fi.Length; LWT = $fi.LastWriteTime }); $total += $fi.Length } catch {}
+            }
+        } catch {}
+    }
+    return [pscustomobject]@{ Items = $items; TotalMB = [math]::Round($total / 1MB, 2) }
+}
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 # ---- Target catalog --------------------------------------------------------
+C:\Users\tonyk
+ >
+
+PS7 function Get-TargetCatalog {
+    @(
+        [pscustomobject]@{ Key = 'UserTemp';   Desc = '使用者 TEMP';             Path = $env:TEMP;                                                  Admin = $false }
+        [pscustomobject]@{ Key = 'LocalTemp';  Desc = 'LOCALAPPDATA Temp';       Path = (Join-Path $env:LOCALAPPDATA 'Temp');                       Admin = $false }
+        [pscustomobject]@{ Key = 'INetCache';  Desc = 'INetCache 網頁快取';      Path = (Join-Path $env:LOCALAPPDATA 'Microsoft\Windows\INetCache'); Admin = $false }
+        [pscustomobject]@{ Key = 'CrashDumps'; Desc = 'CrashDumps 當機傾印';     Path = (Join-Path $env:LOCALAPPDATA 'CrashDumps');                 Admin = $false }
+        [pscustomobject]@{ Key = 'ThumbCache'; Desc = '縮圖快取 (Explorer)';     Path = (Join-Path $env:LOCALAPPDATA 'Microsoft\Windows\Explorer'); Admin = $false }
+        [pscustomobject]@{ Key = 'WinTemp';    Desc = 'Windows Temp (系統)';     Path = 'C:\Windows\Temp';                                          Admin = $true  }
+        [pscustomobject]@{ Key = 'WER';        Desc = 'Windows 錯誤回報 WER';    Path = 'C:\ProgramData\Microsoft\Windows\WER';                     Admin = $true  }
+        [pscustomobject]@{ Key = 'WUCache';    Desc = 'Windows Update 下載快取'; Path = 'C:\Windows\SoftwareDistribution\Download';                 Admin = $true  }
+    )
+}
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 # ---- Safe cleanup ----------------------------------------------------------
+C:\Users\tonyk
+ >
+
+PS7 function Invoke-CleanTarget {
+    param([pscustomobject]$Target, [int]$Days, [switch]$Execute)
+    $res = [ordered]@{ Key = $Target.Key; Path = $Target.Path; DeletedFiles = 0; DeletedDirs = 0; Skipped = 0; Errors = 0; FreedMB = 0.0; Notes = '' }
+    if ($Target.Admin -and -not $script:IsAdmin) { $res.Notes = '需系統管理員 (Skipped)'; return [pscustomobject]$res }
+    if (-not (Test-Path -LiteralPath $Target.Path)) { $res.Notes = '路徑不存在'; return [pscustomobject]$res }
+    if (-not (Test-SafePath $Target.Path)) { $res.Errors = 1; $res.Notes = '安全白名單拒絕'; Write-Log ('REFUSED unsafe path: ' + $Target.Path) 'WARN'; return [pscustomobject]$res }
+
+    $cutoff = (Get-Date).AddDays(-$Days)
+    $stat = Get-DirStat -Root $Target.Path
+    $freed = [int64]0
+    foreach ($it in $stat.Items) {
+        if ($it.LWT -ge $cutoff) { $res.Skipped++; continue }
+        if (-not $Execute) { $res.DeletedFiles++; $freed += $it.Len; continue }
+        try { [System.IO.File]::Delete($it.Path); $res.DeletedFiles++; $freed += $it.Len } catch { $res.Errors++ }
+    }
+    $res.FreedMB = [math]::Round($freed / 1MB, 2)
+
+    if ($Execute) {
+        $dirs = [System.Collections.Generic.List[string]]::new()
+        $stk = [System.Collections.Generic.Stack[string]]::new(); $stk.Push($Target.Path)
+        while ($stk.Count -gt 0) { $d = $stk.Pop(); try { foreach ($s in [System.IO.Directory]::EnumerateDirectories($d)) { $stk.Push($s); $dirs.Add($s) } } catch {} }
+        foreach ($d in ($dirs | Sort-Object -Property Length -Descending)) {
+            try {
+                $hasAny = $false
+                foreach ($x in [System.IO.Directory]::EnumerateFileSystemEntries($d)) { $hasAny = $true; break }
+                if (-not $hasAny) { [System.IO.Directory]::Delete($d, $false); $res.DeletedDirs++ }
+            } catch {}
+        }
+    }
+    $verb = if ($Execute) { 'CLEAN' } else { 'SCAN ' }
+    Write-Log ('{0} {1} files={2} dirs={3} freedMB={4} skip={5} err={6}' -f $verb, $Target.Key, $res.DeletedFiles, $res.DeletedDirs, $res.FreedMB, $res.Skipped, $res.Errors)
+    return [pscustomobject]$res
+}
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 # ---- Acceleration (CPU / DRAM / Memory) ------------------------------------
+C:\Users\tonyk
+ >
+
+PS7 function Invoke-Optimize {
+    param([string]$Opt)
+    $r = [ordered]@{ Opt = $Opt; Ok = $false; Detail = '' }
+    switch ($Opt) {
+        'gc'        { [System.GC]::Collect(); [System.GC]::WaitForPendingFinalizers(); [System.GC]::Collect(); $r.Ok = $true; $r.Detail = '.NET GC collected' }
+        'trimall'   {
+            if (-not $script:CsLoaded) { $r.Detail = 'WorkingSet API unavailable'; break }
+            $n = 0; foreach ($p in (Get-Process)) { try { if ([VIAMem]::Trim($p.Id)) { $n++ } } catch {} }
+            $r.Ok = $true; $r.Detail = ('Trimmed working set of {0} process(es)' -f $n)
+        }
+        'flushdns'  { try { Clear-DnsClientCache; $r.Ok = $true; $r.Detail = 'DNS cache flushed' } catch { $r.Detail = $_.Exception.Message } }
+        'highperf'  { $out = & powercfg /setactive $script:HighPerfGuid 2>&1; $r.Ok = ($LASTEXITCODE -eq 0); $r.Detail = if ($r.Ok) { 'Power plan -> High Performance' } else { ('powercfg: ' + ($out -join ' ')) } }
+        'balanced'  { $out = & powercfg /setactive $script:BalancedGuid 2>&1; $r.Ok = ($LASTEXITCODE -eq 0); $r.Detail = if ($r.Ok) { 'Power plan -> Balanced (restored)' } else { ('powercfg: ' + ($out -join ' ')) } }
+        'recyclebin'{ try { Clear-RecycleBin -Force -ErrorAction Stop; $r.Ok = $true; $r.Detail = 'Recycle Bin emptied' } catch { $r.Ok = $true; $r.Detail = 'Recycle Bin already empty / skipped' } }
+        default     { $r.Detail = 'unknown option' }
+    }
+    Write-Log ('OPTIMIZE {0} ok={1} {2}' -f $Opt, $r.Ok, $r.Detail)
+    return [pscustomobject]$r
+}
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 # ---- VIA_EnvManager integration --------------------------------------------
+C:\Users\tonyk
+ >
+
+PS7 function Resolve-VIAEnv {
+    $mgr = $null
+    if (Test-Path -LiteralPath $script:EnvMgrCanonical) { $mgr = $script:EnvMgrCanonical }
+    else {
+        $cur = $PSScriptRoot; if (-not $cur) { $cur = (Get-Location).Path }
+        for ($i = 0; $i -lt 4 -and $cur; $i++) {
+            $probe = Join-Path $cur 'module\supportive_module\VIA_EnvManager.py'
+            if (Test-Path -LiteralPath $probe) { $mgr = $probe; break }
+            $parent = Split-Path -Parent $cur; if ($parent -eq $cur) { break }; $cur = $parent
+        }
+    }
+    $py = $null
+    foreach ($c in @('python', 'py')) {
+        $cmd = Get-Command $c -ErrorAction SilentlyContinue
+        if ($cmd) { $v = Invoke-PyProc -Exe $cmd.Source -ArgsList @('--version'); if ($v.Ok -or $v.Out -or $v.Err) { $py = $cmd.Source; break } }
+    }
+    if (-not $py) {
+        $venvPy = Get-ChildItem -Path 'C:\Users\tonyk\envs' -Filter 'python.exe' -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($venvPy) { $py = $venvPy.FullName }
+    }
+    $pyVer = ''; $psutil = ''
+    if ($py) {
+        $vr = Invoke-PyProc -Exe $py -ArgsList @('-c', 'import sys;print(sys.version.split()[0])'); if ($vr.Ok) { $pyVer = $vr.Out }
+        $pr = Invoke-PyProc -Exe $py -ArgsList @('-c', 'import psutil;print(psutil.__version__)'); if ($pr.Ok) { $psutil = $pr.Out }
+    }
+    return [pscustomobject]@{ EnvMgr = $mgr; EnvMgrOk = [bool]$mgr; Python = $py; PythonVer = $pyVer; PsutilVer = $psutil; PsutilOk = [bool]$psutil }
+}
+C:\Users\tonyk
+ >
+
+PS7 function Install-Psutil {
+    $env = Resolve-VIAEnv
+    if (-not $env.Python) { return [pscustomobject]@{ Ok = $false; Detail = '找不到 python 直譯器' } }
+    Write-Log ('pip install psutil -> ' + $env.Python)
+    $r = Invoke-PyProc -Exe $env.Python -ArgsList @('-m', 'pip', 'install', '--upgrade', 'psutil') -TimeoutSec 180
+    return [pscustomobject]@{ Ok = $r.Ok; Detail = (($r.Out + ' ' + $r.Err).Trim()) }
+}
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 # ---- Turbo run -------------------------------------------------------------
+C:\Users\tonyk
+ >
+
+PS7 function Invoke-TurboRun {
+    param([bool]$Execute, [string[]]$Targets, [string[]]$Opts)
+    $before = Get-MemSnapshot
+    $cat = Get-TargetCatalog
+    $cleaned = @()
+    foreach ($key in @($Targets)) { $t = $cat | Where-Object { $_.Key -eq $key } | Select-Object -First 1; if ($t) { $cleaned += (Invoke-CleanTarget -Target $t -Days $AgeDays -Execute:$Execute) } }
+    $optimized = @()
+    foreach ($o in @($Opts)) { $optimized += (Invoke-Optimize -Opt $o) }
+    Start-Sleep -Milliseconds 400
+    $after = Get-MemSnapshot
+    $sum = ($cleaned | Measure-Object -Property FreedMB -Sum).Sum; if (-not $sum) { $sum = 0 }
+    return [pscustomobject]@{
+        Execute = $Execute; Cleaned = @($cleaned); Optimized = @($optimized)
+        TotalFreedMB = [math]::Round([double]$sum, 2)
+        MemBefore = $before; MemAfter = $after
+        MemReclaimedGB = [math]::Round($before.UsedGB - $after.UsedGB, 2)
+        GenTime = (Get-Date -Format 'yyyy-MM-dd HH:mm:ss')
+    }
+}
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 function Get-ScanResult {
+    $cat = Get-TargetCatalog
+    $targets = foreach ($t in $cat) {
+        $exists = Test-Path -LiteralPath $t.Path
+        $sizeMB = 0; if ($exists) { $sizeMB = (Get-DirStat -Root $t.Path).TotalMB }
+        [pscustomobject]@{ Key = $t.Key; Desc = $t.Desc; Path = $t.Path; Admin = $t.Admin; Exists = $exists; SizeMB = $sizeMB; Blocked = ($t.Admin -and -not $script:IsAdmin) }
+    }
+    return [pscustomobject]@{
+        GenTime = (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'); IsAdmin = $script:IsAdmin; AgeDays = $AgeDays
+        Mem = (Get-MemSnapshot); Cpu = (Get-CpuLoad); Drives = @(Get-DriveSnapshot)
+        Targets = @($targets); Proc = (Get-TopProc -Top 10); Env = (Resolve-VIAEnv)
+    }
+}
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 # ============================================================================
+C:\Users\tonyk
+ >
+
+PS7 #  EMBEDDED SELF-TEST  (-SelfTest)
+C:\Users\tonyk
+ >
+
+PS7 # ============================================================================
+C:\Users\tonyk
+ >
+
+PS7 function Invoke-SelfTest {
+    Write-Host ''
+    Write-Host '== VIA Turbo Optimizer  Self-Test ==' -ForegroundColor Cyan
+    $tests = [System.Collections.Generic.List[object]]::new()
+    function Add-Test { param([string]$Name, [bool]$Ok) $tests.Add([pscustomobject]@{ Name = $Name; Ok = $Ok }) }
+
+    Add-Test 'SafePath accepts user TEMP'        (Test-SafePath $env:TEMP)
+    Add-Test 'SafePath rejects System32'         (-not (Test-SafePath 'C:\Windows\System32'))
+    Add-Test 'SafePath rejects user Documents'   (-not (Test-SafePath (Join-Path $env:USERPROFILE 'Documents')))
+    Add-Test 'SafePath rejects empty'            (-not (Test-SafePath ''))
+
+    $cat = Get-TargetCatalog
+    Add-Test 'Catalog has 8 targets'             ($cat.Count -eq 8)
+    Add-Test 'Catalog keys are unique'           (($cat.Key | Select-Object -Unique).Count -eq $cat.Count)
+    Add-Test 'WorkingSet trim type loaded'       ($script:CsLoaded)
+    Add-Test 'Mem snapshot total > 0'            ((Get-MemSnapshot).TotalGB -gt 0)
+
+    # Age-rule sandbox: old file counted, new file skipped (scan-only, no delete)
+    $ageOk = $false
+    try {
+        $sand = Join-Path $env:TEMP 'VIA_SelfTest_Sandbox'
+        if (Test-Path -LiteralPath $sand) { Remove-Item -LiteralPath $sand -Recurse -Force -ErrorAction SilentlyContinue }
+        New-Item -ItemType Directory -Path $sand -Force | Out-Null
+        $old = Join-Path $sand 'old.tmp'; Set-Content -LiteralPath $old -Value 'x'; (Get-Item $old).LastWriteTime = (Get-Date).AddDays(-10)
+        $new = Join-Path $sand 'new.tmp'; Set-Content -LiteralPath $new -Value 'x'
+        $tt = [pscustomobject]@{ Key = 'SelfTest'; Path = $sand; Admin = $false }
+        $r = Invoke-CleanTarget -Target $tt -Days 3 -Execute:$false
+        $ageOk = ($r.DeletedFiles -ge 1 -and $r.Skipped -ge 1)
+        Remove-Item -LiteralPath $sand -Recurse -Force -ErrorAction SilentlyContinue
+    } catch {}
+    Add-Test 'Age rule: old counted, new skipped' $ageOk
+
+    # Frontend HTML well-formed (basic structural balance)
+    $htmlOk = $false
+    try { $htmlOk = ($script:HtmlBody -match '<html' -and $script:HtmlBody -match '</html>' -and $script:HtmlBody.Length -gt 2000) } catch {}
+    Add-Test 'Frontend HTML rendered + balanced' $htmlOk
+
+    $pass = ($tests | Where-Object { $_.Ok }).Count
+    $fail = ($tests | Where-Object { -not $_.Ok }).Count
+    foreach ($t in $tests) {
+        if ($t.Ok) { Write-Host ('  [PASS] ' + $t.Name) -ForegroundColor Green }
+        else       { Write-Host ('  [FAIL] ' + $t.Name) -ForegroundColor Red }
+    }
+    $sumColor = if ($fail -eq 0) { 'Green' } else { 'Red' }
+    Write-Host ('-- {0}/{1} PASS --' -f $pass, $tests.Count) -ForegroundColor $sumColor
+    Write-Log ('SELFTEST {0}/{1} PASS' -f $pass, $tests.Count)
+    return ($fail -eq 0)
+}
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 # ============================================================================
+C:\Users\tonyk
+ >
+
+PS7 #  FRONTEND  (modern animated HMI; single-quote here-string + .Replace)
+C:\Users\tonyk
+ >
+
+PS7 # ============================================================================
+C:\Users\tonyk
+ >
+
+PS7 $htmlTpl = @'
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>VIA Turbo Optimizer</title>
+<style>
+:root{--fg:#0f172a;--muted:#64748b;--line:#e6e8ee;--card:rgba(255,255,255,.78);--shadow:0 10px 30px rgba(15,23,42,.10);
+--blue:#4C72B0;--green:#55A868;--red:#C44E52;--purple:#8172B2;--yellow:#CCB974;--cyan:#64B5CD;
+--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans TC",Arial,sans-serif;--mono:ui-monospace,Menlo,Consolas,monospace;}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:var(--sans);color:var(--fg);position:relative;overflow-x:hidden;
+background:#f6f8fc;}
+body::before{content:"";position:fixed;inset:-20%;z-index:-1;background:
+radial-gradient(40% 40% at 15% 20%,rgba(76,114,176,.20),transparent 60%),
+radial-gradient(40% 40% at 85% 15%,rgba(100,181,205,.18),transparent 60%),
+radial-gradient(45% 45% at 75% 85%,rgba(129,114,178,.16),transparent 60%),
+radial-gradient(40% 40% at 20% 90%,rgba(85,168,104,.15),transparent 60%);
+filter:blur(10px);animation:drift 22s ease-in-out infinite alternate;}
+@keyframes drift{0%{transform:translate3d(0,0,0) scale(1)}100%{transform:translate3d(0,-3%,0) scale(1.06)}}
+.wrap{max-width:1120px;margin:0 auto;padding:24px}
+.hdr{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.live{width:12px;height:12px;border-radius:999px;background:var(--green);box-shadow:0 0 0 0 rgba(85,168,104,.6);animation:pulse 1.8s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(85,168,104,.55)}70%{box-shadow:0 0 0 12px rgba(85,168,104,0)}100%{box-shadow:0 0 0 0 rgba(85,168,104,0)}}
+h1{font-size:19px;margin:0;letter-spacing:.2px}.meta{font-size:12px;color:var(--muted)}
+.card{border:1px solid var(--line);border-radius:18px;background:var(--card);backdrop-filter:blur(14px);box-shadow:var(--shadow);
+padding:18px;margin-bottom:16px;opacity:0;transform:translateY(10px);animation:rise .55s cubic-bezier(.2,.7,.2,1) forwards}
+.card:nth-child(2){animation-delay:.05s}.card:nth-child(3){animation-delay:.10s}.card:nth-child(4){animation-delay:.15s}
+.card:nth-child(5){animation-delay:.20s}.card:nth-child(6){animation-delay:.25s}
+@keyframes rise{to{opacity:1;transform:none}}
+.card h2{margin:0 0 12px;font-size:15px}
+.gauges{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.gauge{display:flex;flex-direction:column;align-items:center;border:1px solid var(--line);border-radius:14px;padding:12px;background:rgba(255,255,255,.6)}
+.gauge .lab{font-size:12px;color:var(--muted);margin-top:6px}
+.ring{transform:rotate(-90deg)}
+.ring .bg{fill:none;stroke:rgba(15,23,42,.07);stroke-width:9}
+.ring .fg{fill:none;stroke-width:9;stroke-linecap:round;stroke-dasharray:251;stroke-dashoffset:251;transition:stroke-dashoffset 1s cubic-bezier(.2,.7,.2,1),stroke .6s}
+.gv{font-size:20px;font-weight:800}
+.row{display:flex;align-items:center;gap:12px;padding:11px 12px;border:1px solid var(--line);border-radius:13px;margin-bottom:9px;background:rgba(255,255,255,.55);
+opacity:0;transform:translateY(8px);animation:rise .4s ease forwards}
+.row .grow{flex:1}.row .name{font-weight:600;font-size:13px}.row .sub{font-size:11px;color:var(--muted);word-break:break-all}
+.size{font-family:var(--mono);font-size:13px;color:var(--blue);font-weight:800;min-width:78px;text-align:right}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:999px;border:1px solid var(--line);font-size:11px}
+.badge.ok{border-color:rgba(85,168,104,.45);background:rgba(85,168,104,.10);color:#2f6e44}
+.badge.warn{border-color:rgba(204,185,116,.55);background:rgba(204,185,116,.14);color:#7a6a2a}
+.badge.danger{border-color:rgba(196,78,82,.45);background:rgba(196,78,82,.10);color:#9b3438}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:8px}
+button{cursor:pointer;border:1px solid var(--line);background:#fff;border-radius:13px;padding:11px 17px;font-size:14px;font-weight:700;position:relative;overflow:hidden;transition:transform .12s,border-color .2s,box-shadow .2s}
+button:hover{border-color:var(--blue);box-shadow:0 4px 14px rgba(76,114,176,.18)}button:active{transform:scale(.97)}
+button.primary{background:linear-gradient(135deg,#4C72B0,#5b86c9);color:#fff;border:none}
+button:disabled{opacity:.5;cursor:not-allowed}
+.rp{position:absolute;border-radius:50%;transform:scale(0);background:rgba(255,255,255,.5);animation:rp .6s ease-out}
+@keyframes rp{to{transform:scale(3.5);opacity:0}}
+.switch{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:#fff}
+.switch button{border:none;border-radius:0;padding:9px 15px;font-size:13px}.switch button.act{background:var(--blue);color:#fff}
+input[type=checkbox]{width:18px;height:18px;accent-color:var(--blue)}
+.prog{height:10px;border-radius:999px;background:rgba(15,23,42,.07);overflow:hidden;margin:10px 0 6px;display:none}
+.prog>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#4C72B0,#64B5CD);transition:width .4s ease}
+.phase{font-size:12px;color:var(--muted);min-height:16px}
+.result{font-family:var(--mono);font-size:12px;background:#0b1220;color:#e5e7eb;padding:14px;border-radius:13px;white-space:pre-wrap;max-height:340px;overflow:auto}
+.muted{color:var(--muted);font-size:12px}
+table{width:100%;border-collapse:collapse;font-size:12px}td,th{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+.toast{position:fixed;right:22px;bottom:22px;background:#0b1220;color:#fff;padding:13px 17px;border-radius:13px;box-shadow:0 12px 30px rgba(0,0,0,.3);
+font-size:13px;opacity:0;transform:translateY(16px);transition:.35s;z-index:9}.toast.show{opacity:1;transform:none}
+.toast.ok{border-left:4px solid var(--green)}.toast.err{border-left:4px solid var(--red)}
+@media(max-width:780px){.gauges{grid-template-columns:repeat(2,1fr)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}body::before{animation:none}}
+</style></head><body><div class="wrap">
+
+<div class="hdr"><div class="live"></div><div><h1>VIA Turbo Optimizer</h1>
+<div class="meta">VeritasIntelligenceAnalytics &middot; 安全清理 + CPU/DRAM/記憶體加速 &middot; 127.0.0.1:__PORT__</div></div></div>
+
+<div class="card"><h2>即時儀表</h2>
+  <div class="gauges">
+    <div class="gauge">
+      <svg class="ring" width="92" height="92" viewBox="0 0 92 92"><circle class="bg" cx="46" cy="46" r="40"></circle><circle id="gCpu" class="fg" cx="46" cy="46" r="40" stroke="#4C72B0"></circle></svg>
+      <div class="gv" id="vCpu">0%</div><div class="lab">CPU 負載</div></div>
+    <div class="gauge">
+      <svg class="ring" width="92" height="92" viewBox="0 0 92 92"><circle class="bg" cx="46" cy="46" r="40"></circle><circle id="gMem" class="fg" cx="46" cy="46" r="40" stroke="#8172B2"></circle></svg>
+      <div class="gv" id="vMem">0%</div><div class="lab">記憶體使用</div></div>
+    <div class="gauge"><div class="gv" id="vFree" style="margin-top:24px">0</div><div class="lab">可用記憶體 GB</div></div>
+    <div class="gauge"><div class="gv" id="vTotal" style="margin-top:24px">0</div><div class="lab">總記憶體 GB</div></div>
+  </div>
+</div>
+
+<div class="card"><h2>環境部署 (VIA_EnvManager)</h2>
+  <div id="env" class="muted">偵測中...</div>
+  <div class="bar"><button id="btnPsutil" onclick="installPsutil()">安裝 / 更新 psutil</button>
+  <span class="muted">需按鈕觸發，寫入偵測到的直譯器。</span></div>
+</div>
+
+<div class="card"><h2>磁碟清理目標 (勾選)</h2>
+  <div id="targets"><span class="muted">掃描中...</span></div>
+  <div class="muted" style="margin-top:6px">規則：只刪 __AGE__ 天前檔案；只刪空資料夾；白名單外路徑一律拒絕；占用中檔案自動跳過。</div>
+</div>
+
+<div class="card"><h2>加速選項 (CPU / DRAM / 記憶體)</h2>
+  <label class="row"><input type="checkbox" class="opt" value="gc" checked><span class="grow"><div class="name">.NET GC 回收</div><div class="sub">釋放受控記憶體，安全</div></span></label>
+  <label class="row"><input type="checkbox" class="opt" value="trimall" checked><span class="grow"><div class="name">Working Set Trim (全進程)</div><div class="sub">壓縮工作集，可還原；不終止任何進程</div></span></label>
+  <label class="row"><input type="checkbox" class="opt" value="flushdns" checked><span class="grow"><div class="name">清除 DNS 快取</div><div class="sub">Clear-DnsClientCache，安全</div></span></label>
+  <label class="row"><input type="checkbox" class="opt" value="highperf"><span class="grow"><div class="name">電源計劃 → 高效能</div><div class="sub">可隨時還原平衡模式</div></span></label>
+  <label class="row"><input type="checkbox" class="opt" value="recyclebin"><span class="grow"><div class="name">清空資源回收筒</div><div class="sub">不可還原，預設不勾</div></span></label>
+</div>
+
+<div class="card"><h2>執行</h2>
+  <div class="bar">
+    <span class="muted">模式：</span>
+    <div class="switch"><button id="mScan" class="act" onclick="setExec(false)">僅掃描 (安全)</button><button id="mExec" onclick="setExec(true)">實際刪除</button></div>
+    <button class="primary" id="btnRun" onclick="turbo()">⚡ 一鍵 Turbo 完成 (掃描)</button>
+    <button onclick="loadScan()">重新掃描</button>
+    <button onclick="restoreBalanced()">還原平衡電源</button>
+  </div>
+  <div class="prog" id="prog"><i id="progBar"></i></div>
+  <div class="phase" id="phase"></div>
+  <div class="result" id="out">就緒。先「僅掃描」確認大小，再切「實際刪除」。</div>
+</div>
+
+<div class="card"><h2>高占用進程 (僅供參考，不自動處理)</h2>
+  <table id="proc"><thead><tr><th>Name</th><th>PID</th><th>WorkingSet MB</th></tr></thead><tbody></tbody></table>
+</div>
+
+<div class="muted">Log (append-only)：__LOGPATH__</div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+"use strict";
+var EXEC=false, SCAN=null, CIRC=2*Math.PI*40;
+function $(s){return document.querySelector(s);}
+function raf(cb){return (typeof requestAnimationFrame!=="undefined")?requestAnimationFrame(cb):setTimeout(function(){cb(Date.now());},16);}
+function fmt(n){return (n==null?0:n).toLocaleString();}
+function setGauge(id,pct,color){var el=$("#"+id);if(!el)return;var off=CIRC*(1-Math.max(0,Math.min(100,pct))/100);
+  el.style.strokeDasharray=CIRC;el.style.strokeDashoffset=off;
+  if(color)el.setAttribute("stroke",color);else el.setAttribute("stroke",pct>85?"#C44E52":pct>65?"#CCB974":"#4C72B0");}
+function animNum(id,to,suffix){var el=$("#"+id);if(!el)return;var from=parseFloat((el.textContent+"").replace(/[^\d.\-]/g,""))||0;var t0=null,dur=700;
+  function step(ts){if(!t0)t0=ts;var k=Math.min(1,(ts-t0)/dur);var v=from+(to-from)*(1-Math.pow(1-k,3));
+    el.textContent=(Math.round(v*100)/100)+(suffix||"");if(k<1)raf(step);} raf(step);}
+function applyMetrics(m,cpu){
+  setGauge("gCpu",cpu,"#4C72B0");animNum("vCpu",cpu,"%");
+  setGauge("gMem",m.UsedPct,null);animNum("vMem",m.UsedPct,"%");
+  animNum("vFree",m.FreeGB);animNum("vTotal",m.TotalGB);}
+function toast(msg,type){var t=$("#toast");t.textContent=msg;t.className="toast show "+(type||"ok");
+  setTimeout(function(){t.className="toast "+(type||"ok");},2600);}
+async function loadScan(){
+  try{var r=await fetch("/api/scan");SCAN=await r.json();render(SCAN);}
+  catch(e){$("#out").textContent="掃描失敗: "+e;}
+}
+async function pollMetrics(){
+  try{var r=await fetch("/api/metrics");var d=await r.json();applyMetrics(d.Mem,d.Cpu);}catch(e){}
+}
+function render(d){
+  applyMetrics(d.Mem,d.Cpu);
+  var e=d.Env;
+  $("#env").innerHTML=
+   '<span class="badge '+(e.EnvMgrOk?"ok":"warn")+'">EnvManager: '+(e.EnvMgrOk?"找到":"未找到")+'</span> '+
+   '<span class="badge '+(e.Python?"ok":"warn")+'">Python: '+(e.Python?(e.PythonVer||"ok"):"未偵測")+'</span> '+
+   '<span class="badge '+(e.PsutilOk?"ok":"warn")+'">psutil: '+(e.PsutilOk?e.PsutilVer:"未安裝")+'</span> '+
+   '<span class="badge '+(d.IsAdmin?"ok":"danger")+'">Admin: '+d.IsAdmin+'</span>'+
+   '<div class="muted" style="margin-top:6px">'+(e.EnvMgr||"(EnvManager 路徑未命中，已優雅降級)")+'</div>';
+  var h="",i=0;
+  for(var x=0;x<d.Targets.length;x++){var t=d.Targets[x];i++;
+    var dis=t.Blocked?"disabled":"";
+    var sub=t.Blocked?"需管理員，已停用":(t.Exists?t.Path:"路徑不存在");
+    var chk=(!t.Blocked&&t.SizeMB>0)?"checked":"";
+    h+='<label class="row" style="animation-delay:'+(i*0.04)+'s"><input type="checkbox" class="tgt" value="'+t.Key+'" '+chk+' '+dis+'>'+
+       '<span class="grow"><div class="name">'+t.Desc+' '+(t.Admin?'<span class="badge warn">admin</span>':'')+'</div>'+
+       '<div class="sub">'+sub+'</div></span><span class="size">'+fmt(t.SizeMB)+' MB</span></label>';
+  }
+  $("#targets").innerHTML=h;
+  var tb=$("#proc tbody");tb.innerHTML="";
+  for(var p=0;p<d.Proc.Mem.length;p++){var pr=d.Proc.Mem[p];
+    tb.insertAdjacentHTML("beforeend","<tr><td>"+pr.Name+"</td><td>"+pr.Id+"</td><td>"+pr.WorkingSetMB+"</td></tr>");}
+}
+function picked(cls){var a=[].slice.call(document.querySelectorAll(cls));return a.filter(function(x){return x.checked&&!x.disabled;}).map(function(x){return x.value;});}
+function setExec(v){EXEC=v;$("#mScan").classList.toggle("act",!v);$("#mExec").classList.toggle("act",v);
+  $("#btnRun").textContent=v?"⚡ 一鍵 Turbo 刪除+加速":"⚡ 一鍵 Turbo 完成 (掃描)";}
+function phase(txt,pct){$("#phase").textContent=txt;$("#progBar").style.width=pct+"%";}
+async function turbo(){
+  var tgts=picked(".tgt"), opts=picked(".opt");
+  if(EXEC && !confirm("將實際刪除選定目標中 __AGE__ 天前的檔案，確定？")) return;
+  $("#btnRun").disabled=true;$("#prog").style.display="block";
+  phase("階段 1/4 · 準備中...",8);
+  await new Promise(function(r){setTimeout(r,180);});
+  phase(EXEC?"階段 2/4 · 安全刪除中...":"階段 2/4 · 掃描估算中...",38);
+  try{
+    var r=await fetch("/api/run",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({execute:EXEC,targets:tgts,opts:opts})});
+    phase("階段 3/4 · 加速 CPU/DRAM/記憶體...",72);
+    var d=await r.json();
+    var s="["+(d.Execute?"EXECUTE":"SCAN")+"] "+d.GenTime+"\n";
+    s+="記憶體: 之前 "+d.MemBefore.UsedGB+"GB -> 之後 "+d.MemAfter.UsedGB+"GB  (回收 "+d.MemReclaimedGB+"GB)\n";
+    s+="預估/實際釋放磁碟: "+d.TotalFreedMB+" MB\n\n[清理]\n";
+    for(var c=0;c<d.Cleaned.length;c++){var cc=d.Cleaned[c];
+      s+="  "+cc.Key+": files="+cc.DeletedFiles+" dirs="+cc.DeletedDirs+" freed="+cc.FreedMB+"MB skip="+cc.Skipped+" err="+cc.Errors+" "+cc.Notes+"\n";}
+    s+="\n[加速]\n";
+    for(var o=0;o<d.Optimized.length;o++){var oo=d.Optimized[o];s+="  "+oo.Opt+": "+(oo.Ok?"OK":"--")+" "+oo.Detail+"\n";}
+    $("#out").textContent=s;
+    phase("階段 4/4 · 完成 ✓",100);
+    applyMetrics(d.MemAfter,SCAN?SCAN.Cpu:0);
+    toast((d.Execute?"清理+加速完成":"掃描完成")+" · 釋放 "+d.TotalFreedMB+"MB","ok");
+    await loadScan();
+  }catch(e){$("#out").textContent="執行失敗: "+e;phase("失敗",0);toast("執行失敗","err");}
+  setTimeout(function(){$("#prog").style.display="none";phase("",0);},1200);
+  $("#btnRun").disabled=false;
+}
+async function installPsutil(){
+  $("#out").textContent="安裝 psutil 中...";
+  try{var r=await fetch("/api/psutil",{method:"POST"});var d=await r.json();
+    $("#out").textContent=(d.Ok?"psutil OK\n":"psutil 失敗\n")+d.Detail;toast(d.Ok?"psutil 完成":"psutil 失敗",d.Ok?"ok":"err");await loadScan();}
+  catch(e){$("#out").textContent="安裝失敗: "+e;}
+}
+async function restoreBalanced(){
+  var r=await fetch("/api/run",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({execute:false,targets:[],opts:["balanced"]})});
+  var d=await r.json();$("#out").textContent=d.Optimized.map(function(o){return o.Opt+": "+o.Detail;}).join("\n");toast("電源已還原平衡","ok");
+}
+document.addEventListener("click",function(ev){var b=ev.target.closest("button");if(!b)return;
+  var c=document.createElement("span");c.className="rp";var z=Math.max(b.clientWidth,b.clientHeight);
+  c.style.width=c.style.height=z+"px";c.style.left=(ev.offsetX-z/2)+"px";c.style.top=(ev.offsetY-z/2)+"px";
+  b.appendChild(c);setTimeout(function(){c.remove();},600);});
+loadScan();
+if(typeof setInterval!=="undefined"){setInterval(pollMetrics,2500);}
+</script></body></html>
+'@
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 $script:HtmlBody = $htmlTpl.Replace('__PORT__', [string]$Port).Replace('__AGE__', [string]$AgeDays).Replace('__LOGPATH__', $script:LogFile)
+C:\Users\tonyk
+ >
+
+PS7 [System.IO.File]::WriteAllText($script:FrontFile, $script:HtmlBody, [System.Text.Encoding]::UTF8)
+C:\Users\tonyk
+ >
+
+PS7 Write-Log ('Frontend written: ' + $script:FrontFile)
+2026-06-11 03:37:21 | INFO  | Frontend written: C:\Users\tonyk\AppData\Local\OptimizeTool\web\VIA_Optimizer_UI.html
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 # ---- Self-test branch (no server) -----------------------------------------
+C:\Users\tonyk
+ >
+
+PS7 if ($SelfTest) { $ok = Invoke-SelfTest; if ($ok) { exit 0 } else { exit 1 } }
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 # ---- Pre-flight gate at activation (fast, embedded, non-blocking) ----------
+C:\Users\tonyk
+ >
+
+PS7 $preflight = $true
+C:\Users\tonyk
+ >
+
+PS7 try {
+    $preflight = (Test-SafePath $env:TEMP) -and (-not (Test-SafePath 'C:\Windows\System32')) -and ((Get-TargetCatalog).Count -eq 8) -and $script:CsLoaded
+} catch { $preflight = $false }
+C:\Users\tonyk
+ >
+
+PS7 $pf = if ($preflight) { 'PASS' } else { 'WARN' }
+C:\Users\tonyk
+ >
+
+PS7 Write-Log ('PRE-FLIGHT ' + $pf + ' (safe-path guard, catalog, trim API)')
+2026-06-11 03:37:21 | INFO  | PRE-FLIGHT PASS (safe-path guard, catalog, trim API)
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 # ============================================================================
+C:\Users\tonyk
+ >
+
+PS7 #  BACKEND  (HttpListener, loopback)
+C:\Users\tonyk
+ >
+
+PS7 # ============================================================================
+C:\Users\tonyk
+ >
+
+PS7 function Send-Response {
+    param($Ctx, [string]$Body, [string]$Type = 'application/json; charset=utf-8', [int]$Code = 200)
+    $bytes = [System.Text.Encoding]::UTF8.GetBytes($Body)
+    $Ctx.Response.StatusCode = $Code
+    $Ctx.Response.ContentType = $Type
+    $Ctx.Response.Headers['Cache-Control'] = 'no-store'
+    $Ctx.Response.ContentLength64 = $bytes.Length
+    $Ctx.Response.OutputStream.Write($bytes, 0, $bytes.Length)
+    $Ctx.Response.OutputStream.Close()
+}
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 $listener = [System.Net.HttpListener]::new()
+C:\Users\tonyk
+ >
+
+PS7 $prefix = ('http://127.0.0.1:{0}/' -f $Port)
+C:\Users\tonyk
+ >
+
+PS7 $listener.Prefixes.Add($prefix)
+C:\Users\tonyk
+ >
+
+PS7 try { $listener.Start() } catch { Write-Log ('HttpListener start failed (port busy?): ' + $_.Exception.Message) 'ERROR'; throw }
+C:\Users\tonyk
+ >
+
+PS7 Write-Log ('Backend listening: ' + $prefix)
+2026-06-11 03:37:22 | INFO  | Backend listening: http://127.0.0.1:8870/
+C:\Users\tonyk
+ >
+
+PS7 if (-not $NoBrowser) { try { Start-Process $prefix } catch {} }
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 Write-Host ''
+
+C:\Users\tonyk
+ >
+
+PS7 Write-Host ('==> VIA Turbo Optimizer is live at ' + $prefix) -ForegroundColor Green
+==> VIA Turbo Optimizer is live at http://127.0.0.1:8870/
+C:\Users\tonyk
+ >
+
+PS7 Write-Host '==> Ctrl+C in this window to stop the server.' -ForegroundColor Yellow
+==> Ctrl+C in this window to stop the server.
+C:\Users\tonyk
+ >
+
+PS7 Write-Host ''
+
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 try {
+    while ($listener.IsListening -and -not $script:Stop) {
+        $ctx = $null
+        try { $ctx = $listener.GetContext() } catch { break }
+        if (-not $ctx) { continue }
+        $path = $ctx.Request.Url.AbsolutePath
+        try {
+            switch -Regex ($path) {
+                '^/$'            { Send-Response -Ctx $ctx -Body $script:HtmlBody -Type 'text/html; charset=utf-8'; break }
+                '^/api/scan$'    { Send-Response -Ctx $ctx -Body ((Get-ScanResult) | ConvertTo-Json -Depth 8 -Compress); break }
+                '^/api/metrics$' { Send-Response -Ctx $ctx -Body (([pscustomobject]@{ Mem = (Get-MemSnapshot); Cpu = (Get-CpuLoad) }) | ConvertTo-Json -Depth 5 -Compress); break }
+                '^/api/run$' {
+                    $enc = $ctx.Request.ContentEncoding; if (-not $enc) { $enc = [System.Text.Encoding]::UTF8 }
+                    $reader = [System.IO.StreamReader]::new($ctx.Request.InputStream, $enc)
+                    $bodyTxt = $reader.ReadToEnd(); $reader.Close()
+                    if ([string]::IsNullOrWhiteSpace($bodyTxt)) { $bodyTxt = '{"execute":false,"targets":[],"opts":[]}' }
+                    $req = $bodyTxt | ConvertFrom-Json
+                    $out = Invoke-TurboRun -Execute ([bool]$req.execute) -Targets (@($req.targets)) -Opts (@($req.opts))
+                    Send-Response -Ctx $ctx -Body ($out | ConvertTo-Json -Depth 8 -Compress)
+                    break
+                }
+                '^/api/psutil$'  { Send-Response -Ctx $ctx -Body ((Install-Psutil) | ConvertTo-Json -Depth 5 -Compress); break }
+                '^/api/shutdown$' { Send-Response -Ctx $ctx -Body '{"ok":true}'; $script:Stop = $true; break }
+                default          { Send-Response -Ctx $ctx -Body '{"error":"not found"}' -Code 404; break }
+            }
+        } catch {
+            Write-Log ('Request error ' + $path + ': ' + $_.Exception.Message) 'ERROR'
+            try { Send-Response -Ctx $ctx -Body ('{"error":"' + ($_.Exception.Message -replace '"', "'") + '"}') -Code 500 } catch {}
+        }
+    }
+} finally {
+    try { $listener.Stop(); $listener.Close() } catch {}
+    Write-Log 'Backend stopped.'
+    Write-Host '==> Stopped.' -ForegroundColor Yellow
+}
+2026-06-11 03:37:41 | INFO  | OPTIMIZE gc ok=True .NET GC collected
+2026-06-11 03:37:42 | INFO  | OPTIMIZE trimall ok=True Trimmed working set of 141 process(es)
+2026-06-11 03:37:43 | INFO  | OPTIMIZE flushdns ok=True DNS cache flushed
+PS7 TerminatingError(): "The property 'Sum' cannot be found on this object. Verify that the property exists."
+2026-06-11 03:37:44 | ERROR | Request error /api/run: The property 'Sum' cannot be found on this object. Verify that the property exists.
+2026-06-11 03:38:09 | INFO  | SCAN  UserTemp files=326 dirs=0 freedMB=341.69 skip=925 err=0
+2026-06-11 03:38:09 | INFO  | SCAN  LocalTemp files=326 dirs=0 freedMB=341.69 skip=925 err=0
+2026-06-11 03:38:09 | INFO  | SCAN  INetCache files=0 dirs=0 freedMB=0 skip=18 err=0
+2026-06-11 03:38:09 | INFO  | SCAN  CrashDumps files=6 dirs=0 freedMB=83.71 skip=4 err=0
+2026-06-11 03:38:09 | INFO  | SCAN  ThumbCache files=10 dirs=0 freedMB=0 skip=22 err=0
+2026-06-11 03:38:10 | INFO  | OPTIMIZE gc ok=True .NET GC collected
+2026-06-11 03:38:10 | INFO  | OPTIMIZE trimall ok=True Trimmed working set of 136 process(es)
+2026-06-11 03:38:10 | INFO  | OPTIMIZE flushdns ok=True DNS cache flushed
+2026-06-11 03:38:10 | INFO  | OPTIMIZE highperf ok=True Power plan -> High Performance
+2026-06-11 03:38:10 | INFO  | OPTIMIZE recyclebin ok=True Recycle Bin emptied

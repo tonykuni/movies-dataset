@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>NexusCore Tool Matrix</title>
+<style>
+  body { font-family: "DM Sans", Arial, "Microsoft JhengHei", sans-serif; background: #f6f7fb; color: #111827; margin: 24px; }
+  h1 { margin-bottom: 4px; }
+  .card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 18px; margin: 16px 0; box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: #111827; color: #ffffff; padding: 8px; text-align: left; }
+  td { border-bottom: 1px solid #e5e7eb; padding: 8px; vertical-align: top; }
+  code { background: #f3f4f6; padding: 2px 5px; border-radius: 5px; font-family: "DM Mono", Consolas, monospace; }
+  .badge { display: inline-block; background: #eef2ff; color: #3730a3; padding: 4px 9px; border-radius: 999px; font-size: 12px; }
+</style>
+</head>
+<body>
+  <h1>Veritas NexusCore Tool Matrix</h1>
+  <p class="badge">Generated: 20260610_161210</p>
+  <div class="card">
+    <h2>Operating Principle</h2>
+    <p><code>Invoke-VeritasNexusCore.ps1</code> is the only approved entry. Aegis must gate Celeritas. Install requires Risk LOW.</p>
+  </div>
+  <div class="card">
+    <h2>Tool Matrix</h2>
+    <table>
+<colgroup><col/><col/><col/><col/><col/><col/><col/><col/><col/><col/><col/><col/><col/><col/><col/><col/><col/><col/><col/></colgroup>
+<tr><th>ToolID</th><th>ToolName</th><th>Layer</th><th>Role</th><th>Path</th><th>ToolType</th><th>Priority</th><th>TargetEnv</th><th>HardGateRequired</th><th>AllowDirectRun</th><th>RequiredBefore</th><th>RequiredAfter</th><th>Status</th><th>Risk</th><th>SizeBytes</th><th>ModifiedTime</th><th>Sha256</th><th>AIInstruction</th><th>EngineerInstruction</th></tr>
+<tr><td>VIA-NEXUS-L0-README</td><td>Read_Me_VeritasNexusCore</td><td>L0_SSOT_Documentation</td><td>Human and AI onboarding SSOT</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\Read_Me_VeritasNexusCore.md</td><td>markdown</td><td>0</td><td>document</td><td>False</td><td>False</td><td>All AI and engineer interpretation</td><td>Keep updated after every integration change</td><td>FOUND</td><td>LOW</td><td>11108</td><td>2026-06-08 20:22:08</td><td>E17A9D1312F6B730094C4D868156681CF7B7D49C53FA1B2226AB5C859F6B79F2</td><td>Read this first before suggesting any supportive module action.</td><td>Maintain this as the canonical onboarding and operating guide.</td></tr>
+<tr><td>VIA-NEXUS-L1-ENTRY</td><td>Invoke-VeritasNexusCore</td><td>L1_Control_Entry</td><td>Single PowerShell entry for all supportive modules</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\Invoke-VeritasNexusCore.ps1</td><td>powershell</td><td>0</td><td>PowerShell 7</td><td>False</td><td>True</td><td>All tool execution</td><td>Registry, HardGate, EnvManager, Celeritas, Reports</td><td>FOUND</td><td>LOW</td><td>2911</td><td>2026-06-08 20:15:46</td><td>D8741599A121F33A31A57C372BA86AA328D74F1C9BE5817AEB7682C1FFFC267C</td><td>Use this as the only approved entry. Do not call tools directly unless registry allows it.</td><td>Implement Action modes: ScanOnly, BuildRegistry, HardGate, EnvPlan, AccelerationPlan, DownloadOnly, Install, Validate, Matrix.</td></tr>
+<tr><td>VIA-NEXUS-L3-AEGIS</td><td>VeritasAegisNexus</td><td>L3_HardGate_Protection</td><td>Protection, network guard, environment risk gate</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\50_Protection_Acceleration\VeritasAegisNexus.py</td><td>python</td><td>1</td><td>via_core_312</td><td>False</td><td>False</td><td>Celeritas install or download execution</td><td>Registry build</td><td>FOUND</td><td>LOW</td><td>208495</td><td>2026-05-26 02:51:15</td><td>4A9443686A8F5DE076A9F69D4CD00FAB9576180D17F9FE03F9FF59A526BE4D7D</td><td>Use Aegis result to decide whether Install is allowed. Risk must be LOW.</td><td>Wire into NexusCore HardGate action. Output JSON, CSV, HTML reports.</td></tr>
+<tr><td>VIA-NEXUS-L5-CELERITAS</td><td>VeritasCeleritas</td><td>L5_Acceleration_InstallPlanner</td><td>Acceleration, cache, wheelhouse, retry, download and install planning</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\50_Protection_Acceleration\VeritasCeleritas.py</td><td>python</td><td>2</td><td>via_core_312</td><td>True</td><td>False</td><td>DownloadOnly or Install</td><td>Aegis Risk LOW or controlled DownloadOnly mode</td><td>FOUND</td><td>LOW</td><td>242127</td><td>2026-05-06 00:35:34</td><td>ECB06BE4BADB7CE648E275A4C35A1AC44759F155AB39A137F9FBBBB7A536A1D0</td><td>Never install directly. First request InstallPlan and check Aegis risk.</td><td>Wire into NexusCore AccelerationPlan and DownloadOnly actions. Install only when HardGate passes.</td></tr>
+</table>
+
+  </div>
+  <div class="card">
+    <h2>Required Flow</h2>
+    <pre>
+Read README -> Invoke NexusCore -> Build SSOT Registry
+-> Run Aegis HardGate -> Build EnvManager Plan
+-> Build Celeritas InstallPlan -> DownloadOnly
+-> Install only if Risk LOW -> Validate -> Matrix Report
+    </pre>
+  </div>
+</body>
+</html>

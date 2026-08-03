@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA Activation User-Test Gate v028.6.5</title>
+<style>
+:root{--sky:#d8f0ef;--ink:#1d3438;--muted:#657f82;--line:rgba(38,70,75,.16);--head:#edf8f6;--hover:rgba(216,240,239,.20);--ok:#0f766e;--warn:#b7791f;--fail:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Microsoft JhengHei","Segoe UI",Arial,sans-serif;background:linear-gradient(180deg,#fbfdfb,#f3f8f6);color:var(--ink);font-size:11px;line-height:1.28}
+header{position:sticky;top:0;z-index:80;padding:14px 26px 10px;background:rgba(251,253,251,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+h1{margin:0;font-size:18px;line-height:1.18;text-align:center;letter-spacing:.035em}
+.sub{margin-top:4px;color:var(--muted);font-size:10.5px;text-align:center}
+.wrap{padding:12px 22px 36px}
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(96px,1fr));gap:8px;margin-bottom:12px}
+.card{border-radius:10px;padding:8px 10px;background:rgba(255,255,255,.82);border:1px solid var(--line);box-shadow:0 6px 16px rgba(30,52,56,.04)}
+.k{font-size:9.5px;line-height:1.15;letter-spacing:.07em;color:var(--muted)}
+.v{font-size:16px;line-height:1.08;margin-top:2px;font-weight:750}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.fail{color:var(--fail)}
+section{margin-top:12px}
+h2{position:sticky;top:45px;z-index:70;margin:0 0 6px;padding:6px 9px;border:1px solid var(--line);border-left:4px solid var(--sky);border-radius:9px;background:rgba(250,253,252,.96);backdrop-filter:blur(8px);font-size:12px;line-height:1.15;text-align:center;letter-spacing:.045em}
+table{width:100%;border-collapse:separate;border-spacing:0;table-layout:auto;background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:10px;overflow:clip}
+thead{position:sticky;top:76px;z-index:60}
+th{position:sticky;top:76px;z-index:61;background:var(--head);color:#203b40;font-size:10px;line-height:1.12;font-weight:800;text-align:center;vertical-align:top;padding:5px 6px;border-bottom:1px solid var(--line);border-right:1px solid rgba(38,70,75,.10);white-space:nowrap}
+td{font-size:10px;line-height:1.18;padding:4px 6px;border-bottom:1px solid var(--line);border-right:1px solid rgba(38,70,75,.08);vertical-align:top;text-align:center;white-space:nowrap}
+td.via-left,td:has(code){text-align:left;white-space:normal;word-break:break-word;overflow-wrap:anywhere}
+tr:hover td{background:var(--hover)}
+code{font-family:Consolas,"Cascadia Mono",monospace;font-size:9.5px;line-height:1.18;word-break:break-word;overflow-wrap:anywhere;white-space:normal}
+</style>
+</head>
+<body>
+<header>
+  <h1>def VIA Activation User-Test Gate · v028.6.5</h1>
+  <div class="sub">Single True Exec Risk Guard · Remove-Item Safety Wrapper · Three-Round Validation</div>
+</header>
+<div class="wrap">
+  <div class="kpis">
+    <div class="card"><div class="k">Status</div><div class="v">READY_WITH_BLOCKS_REVIEW_REQUIRED</div></div>
+    <div class="card"><div class="k">Risk</div><div class="v">HIGH</div></div>
+    <div class="card"><div class="k">OK</div><div class="v ok">7</div></div>
+    <div class="card"><div class="k">WARN</div><div class="v warn">0</div></div>
+    <div class="card"><div class="k">FAIL</div><div class="v fail">2</div></div>
+    <div class="card"><div class="k">Remaining Exec Risk</div><div class="v warn">0</div></div>
+  </div>
+
+  <section>
+    <h2>def Matrix</h2>
+    <table>
+      <thead><tr><th>Round</th><th>Project</th><th>Lane</th><th>Stage</th><th>Name</th><th>Status</th><th>Risk</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr></thead>
+      <tbody><tr><td>Round0</td><td>VIA</td><td>CONTROL_PLANE</td><td>POLICY</td><td>No DB Write</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>db_write</td><td>false</td><td>This run never writes DATABASE.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</code></td></tr>
+<tr><td>Round0</td><td>VIA</td><td>CONTROL_PLANE</td><td>POLICY</td><td>No Canonical Merge</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>canonical_merge</td><td>false</td><td>This run never canonical-merges.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_ACTIVATION_USERTEST_GATE_v02865_20260611_114925</code></td></tr>
+<tr><td>Round0</td><td>VIA</td><td>CONTROL_PLANE</td><td>POLICY</td><td>No Delete Default</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>delete_default</td><td>false</td><td>Remove-Item will be blocked unless explicit switch and token are supplied.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_ACTIVATION_USERTEST_GATE_v02865_20260611_114925</code></td></tr>
+<tr><td>Round0</td><td>VIA</td><td>VALIDATION</td><td>PRE_AST</td><td>Target Pre AST</td><td><b>OK_PARSE</b></td><td>LOW</td><td>parse_errors</td><td>0</td><td>Target parses before patch.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\60_PowerShell_Entry_Internal\Invoke-VIA-ALL.ps1</code></td></tr>
+<tr><td>Round0</td><td>VIA</td><td>RISK</td><td>PRE_EXEC_RISK</td><td>Pre-patch Forbidden Commands</td><td><b>OK_CREATED</b></td><td>LOW</td><td>forbidden</td><td>1</td><td>Pre-patch forbidden command hits: Remove-Item</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\60_PowerShell_Entry_Internal\Invoke-VIA-ALL.ps1</code></td></tr>
+<tr><td>Round1</td><td>VIA</td><td>SAFE_PATCH</td><td>EXEC_RISK</td><td>Invoke-VIA-ALL.ps1 Remove-Item Guard</td><td><b>BLOCK_PATCH_PARSE_FAIL</b></td><td>HIGH</td><td>remaining_forbidden</td><td>0</td><td>L47:1 Unexpected attribute &#39;CmdletBinding&#39;. | L48:1 Unexpected token &#39;param&#39; in expression or statement. | L50:24 The assignment expression is not valid. The input to an assignment operator must be an object that is able to accept assignments, such as a variable or a property.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\60_PowerShell_Entry_Internal\Invoke-VIA-ALL.ps1</code></td></tr>
+<tr><td>Round2</td><td>VIA</td><td>VALIDATION</td><td>POST_AST</td><td>Target Post AST</td><td><b>BLOCK_PARSE_FAIL</b></td><td>HIGH</td><td>parse_errors</td><td>3</td><td>L47:1 Unexpected attribute &#39;CmdletBinding&#39;. | L48:1 Unexpected token &#39;param&#39; in expression or statement. | L50:24 The assignment expression is not valid. The input to an assignment operator must be an object that is able to accept assignments, such as a variable or a property.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\60_PowerShell_Entry_Internal\Invoke-VIA-ALL.ps1</code></td></tr>
+<tr><td>Round2</td><td>VIA</td><td>RISK</td><td>POST_EXEC_RISK</td><td>Post-patch Forbidden Commands</td><td><b>OK_NONE_FOUND</b></td><td>LOW</td><td>forbidden</td><td>0</td><td>No forbidden command remains in target AST.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\60_PowerShell_Entry_Internal\Invoke-VIA-ALL.ps1</code></td></tr>
+<tr><td>Round3</td><td>VIA</td><td>USER_TEST</td><td>GATE</td><td>Activation User-Test Gate</td><td><b>OK_PLAN_CREATED</b></td><td>HIGH</td><td>status</td><td>BLOCKED_PARSE_REVIEW_REQUIRED</td><td>Activation user-test gate created.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_ACTIVATION_USERTEST_GATE_v02865_20260611_114925</code></td></tr></tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>def Patch Result</h2>
+    <table>
+      <thead><tr><th>Path</th><th>Backup</th><th>Before Forbidden</th><th>After Forbidden</th><th>Status</th><th>Message</th></tr></thead>
+      <tbody><tr><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\60_PowerShell_Entry_Internal\Invoke-VIA-ALL.ps1</code></td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_ACTIVATION_USERTEST_GATE_v02865_20260611_114925\backup\Invoke-VIA-ALL.ps1.bak_20260611_114925</code></td><td>Remove-Item</td><td></td><td>BLOCK_PATCH_PARSE_FAIL</td><td>L47:1 Unexpected attribute &#39;CmdletBinding&#39;. | L48:1 Unexpected token &#39;param&#39; in expression or statement. | L50:24 The assignment expression is not valid. The input to an assignment operator must be an object that is able to accept assignments, such as a variable or a property.</td></tr></tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>def Remaining Executable Risk</h2>
+    <table>
+      <thead><tr><th>Command</th><th>Path</th><th>Action</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+</div>
+<script>
+(function(){
+  const leftHeaderPattern=/(path|message|backup|action|路徑|訊息|備份|動作)/i;
+  const pathTextPattern=/([A-Za-z]:\\|\\\\|\/|\.ps1|\.py|\.html|\.csv|\.json|\.parquet|\.duckdb|\.xlsx)/i;
+  function cleanNumberText(t){return String(t||"").replace(/,/g,"").replace(/%/g,"").trim();}
+  function isNumericText(t){const s=cleanNumberText(t);if(!s)return false;if(!/^[-+]?(\d+|\d*\.\d+)(e[-+]?\d+)?$/i.test(s))return false;return Number.isFinite(Number(s));}
+  function formatNumberText(t){const n=Number(cleanNumberText(t));if(!Number.isFinite(n))return t;return n.toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:1});}
+  function headers(table){return Array.from(table.querySelectorAll("thead th")).map(x=>(x.textContent||"").trim());}
+  function processTable(table){const hs=headers(table);Array.from(table.querySelectorAll("th")).forEach(th=>{th.style.textAlign="center";th.style.verticalAlign="top";});Array.from(table.querySelectorAll("tbody tr")).forEach(row=>{Array.from(row.children).forEach((cell,idx)=>{const h=hs[idx]||"";const raw=(cell.textContent||"").trim();cell.style.verticalAlign="top";cell.style.textAlign="center";if(isNumericText(raw)){cell.textContent=formatNumberText(raw);return;}if(leftHeaderPattern.test(h)||pathTextPattern.test(raw)||raw.length>=36||cell.querySelector("code")){cell.classList.add("via-left");}});});}
+  Array.from(document.querySelectorAll("table")).forEach(processTable);
+})();
+</script>
+</body>
+</html>

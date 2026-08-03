@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>VIA VRN/VDF Next Gate Integration Plan v031.7</title>
+<style>
+body{margin:0;background:#F9F9F6;color:#16211D;font-family:"Microsoft JhengHei",Arial,sans-serif;font-size:12px}
+.wrap{max-width:1500px;margin:0 auto;padding:24px}
+h1{font-size:20px;margin:0 0 6px;text-align:center}
+.sub{text-align:center;color:#66726B;margin-bottom:18px}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:14px}
+.card{border:1px solid rgba(42,64,55,.14);border-radius:14px;background:rgba(255,255,250,.80);padding:10px;min-height:64px}
+.k{font-size:10px;color:#66726B}.v{font-size:16px;font-weight:800;margin-top:4px;word-break:break-word}
+table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed;border:1px solid rgba(42,64,55,.14);border-radius:14px;overflow:hidden;background:white}
+th,td{padding:8px;border-bottom:1px solid rgba(42,64,55,.12);vertical-align:top;word-break:break-word;overflow-wrap:anywhere}
+th{background:#EAF2EC;text-align:left}
+td{line-height:1.45}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Veritas Intelligence Analytics · Next Gate Integration Plan</h1>
+<div class="sub">VDF_1A_FINISH_SEAL_REVIEW + VRN_1D2_VALIDATION + SSOT_SUPPLEMENT + POLICY_REVIEW · No canonical · No Stop-Process</div>
+
+<div class="kpis">
+<div class="card"><div class="k">Status</div><div class="v">VIA_VRN_VDF_CONTINUE_INTEGRATION_PLAN_READY</div></div>
+<div class="card"><div class="k">Risk</div><div class="v">MEDIUM</div></div>
+<div class="card"><div class="k">ActiveFail</div><div class="v">3</div></div>
+<div class="card"><div class="k">ArchiveFail</div><div class="v">42</div></div>
+<div class="card"><div class="k">VRN Rows</div><div class="v">29114</div></div>
+<div class="card"><div class="k">VDF Status</div><div class="v">DATA_READY_BUT_COMPLETION_SEAL_REVIEW</div></div>
+</div>
+
+<table>
+<thead>
+<tr><th>Gate</th><th>Mode</th><th>Reason</th><th>Action</th><th>Destructive</th></tr>
+</thead>
+<tbody>
+<tr>
+<td>VDF_1A_FINISH_SEAL_REVIEW</td>
+<td>SEQUENTIAL_REQUIRED</td>
+<td>VDF data ready but completion seal review remains.</td>
+<td>Audit final seal pointer, runtime JSON, daily health runtime, database inventory; generate finish seal candidate only.</td>
+<td>False</td>
+</tr>
+<tr>
+<td>VRN_1D2_VALIDATION</td>
+<td>PARALLEL_SAFE_THEN_SEQUENTIAL_REVIEW</td>
+<td>VRN financial rows ready; validate table-like expansion and exception review.</td>
+<td>Validate FinancialData parquet rows, duplicates, record_hash, account coverage, and exception matrix.</td>
+<td>False</td>
+</tr>
+<tr>
+<td>SSOT_SUPPLEMENT_REVIEW</td>
+<td>SEQUENTIAL_REQUIRED</td>
+<td>SSOT keys missing: base / vrn / vdf / supportive_modules / field_registry / broker_list.</td>
+<td>Merge supplement candidate into review copy only; no canonical overwrite.</td>
+<td>False</td>
+</tr>
+<tr>
+<td>POLICY_PATTERN_REVIEW</td>
+<td>SEQUENTIAL_REQUIRED</td>
+<td>Stop-Process and pip install patterns detected; must classify actual vs historical/archive usage.</td>
+<td>Classify policy patterns as active blocker / archive review / allowed comment; do not auto-delete.</td>
+<td>False</td>
+</tr>
+</tbody>
+</table>
+</div>
+</body>
+</html>

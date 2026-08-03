@@ -1,0 +1,42 @@
+[
+  {
+    "def_flow": "FLOW_01_SUPPORTIVE_TOOLS",
+    "def_scope": "SafePolyglot / NexusCore / PolyglotCheck / EnvManager / Aegis / Celeritas",
+    "def_input": "UsedTools_Staged + Supportive module scan",
+    "def_output": "supportive_toolbox_index + parameter bridge",
+    "def_parallel_policy": "Parallel-safe for scan; sequential for repair",
+    "def_next_action": "Build active pointer and invocation contract; do not execute repair yet"
+  },
+  {
+    "def_flow": "FLOW_02_FUNCTIONAL_MODULES",
+    "def_scope": "UnifiedSpec / CodexNexus / GovernanceRegistry / LayoutRegistry / VisualRegistry",
+    "def_input": "functional modules registry",
+    "def_output": "functional_contract_matrix",
+    "def_parallel_policy": "Read-only parallel scan",
+    "def_next_action": "Verify schema owners and registry consistency"
+  },
+  {
+    "def_flow": "FLOW_03_PARAMETERS_SSOT",
+    "def_scope": "Canonical parameter registry / P0/P1/P2/P3 split",
+    "def_input": "VIA_ParametersConsolidated_Registry + ConflictTriage",
+    "def_output": "SSOT candidate map + review queue",
+    "def_parallel_policy": "P3 noise parallel; P0 sequential",
+    "def_next_action": "Freeze P0 domain decisions before code mutation"
+  },
+  {
+    "def_flow": "FLOW_04_ENGINE_BRIDGE",
+    "def_scope": "VDF / VRN / VIA / VEF / VPF / VIS / VPL",
+    "def_input": "EngineMatrix",
+    "def_output": "engine_adapter_bridge_plan",
+    "def_parallel_policy": "Independent subsystem smoke tests only",
+    "def_next_action": "Create adapter shims, not direct canonical merge"
+  },
+  {
+    "def_flow": "FLOW_05_UI_CLOSEOUT",
+    "def_scope": "One Interface / VisualLock / HTML reports",
+    "def_input": "UI files + VisualRegistry + LayoutRegistry",
+    "def_output": "compact one-page matrix UI",
+    "def_parallel_policy": "Safe after data contract stable",
+    "def_next_action": "Apply small-font equal-height UI only after SSOT review"
+  }
+]

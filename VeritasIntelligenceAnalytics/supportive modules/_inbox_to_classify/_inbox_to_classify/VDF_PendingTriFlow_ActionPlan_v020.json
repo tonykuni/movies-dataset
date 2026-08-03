@@ -1,0 +1,76 @@
+{
+  "generated_at": "2026-06-09 22:50:20",
+  "status": "VDF_PENDING_TRIFLOW_ACTION_PLAN_READY",
+  "risk": "MEDIUM",
+  "version": "v020",
+  "purpose": "Track low-related or not-yet-integrated VDF flows separately from the core TriFlow.",
+  "current_core_state": {
+    "core_triflow_pointer": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_ACTIVE_TRIFLOW_POINTER.json",
+    "active_pointer": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_ACTIVE_POINTER.json",
+    "database_root": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\DATABASE",
+    "policy": "Core TriFlow remains frozen and should not be reopened for pending adapters."
+  },
+  "pending_flows": [
+    {
+      "Flow": "FLOW_D_TPEX_OFFICIAL",
+      "Name": "TPEX official adapter seed",
+      "Tables": [
+        "VDF_TW_EquityUniverse",
+        "VDF_TW_TradingStats",
+        "VDF_TW_IndexDaily"
+      ],
+      "CurrentState": "CAPABILITY_PROBED_ONLY",
+      "Risk": "MEDIUM",
+      "FixClass": "SEQUENTIAL_REQUIRED",
+      "Priority": "P1",
+      "NextAction": "Parse TPEX swagger paths, select 1-2 safe official endpoints, then seed only. Do not execute broad endpoint scan."
+    },
+    {
+      "Flow": "FLOW_E_MOPS_FINANCIAL",
+      "Name": "MOPS financial / monthly revenue adapter",
+      "Tables": [
+        "VDF_TW_MonthlyRevenue",
+        "VDF_TW_FinancialStatement",
+        "VDF_TW_FinancialRatio",
+        "VDF_TW_CompanyProfile"
+      ],
+      "CurrentState": "NOT_FETCHED",
+      "Risk": "HIGH",
+      "FixClass": "SEQUENTIAL_REQUIRED",
+      "Priority": "P1",
+      "NextAction": "Start with MonthlyRevenue seed only, then CompanyProfile, then FinancialStatement / FinancialRatio. No all-at-once fetch."
+    },
+    {
+      "Flow": "FLOW_F_FRED_AKSHARE_GLOBAL",
+      "Name": "FRED / AKShare global macro, commodity, freight",
+      "Tables": [
+        "VDF_Global_Macro",
+        "VDF_Global_Commodity",
+        "VDF_Global_Freight",
+        "VDF_Global_FXRate",
+        "VDF_RiskEventCalendar"
+      ],
+      "CurrentState": "PARTIAL_YFINANCE_SEED_ONLY",
+      "Risk": "MEDIUM",
+      "FixClass": "PARALLEL_SAFE_AFTER_CONFIG",
+      "Priority": "P2",
+      "NextAction": "Validate API key / local packages / symbol map first. FRED and AKShare can run in separate isolated adapter folders."
+    }
+  ],
+  "recommended_order": [
+    "v018.1 TWSE Official Seed Final Seal",
+    "v020.1 TPEX Swagger Path Selector only",
+    "v021 TPEX Official Seed small scope",
+    "v022 MOPS Monthly Revenue Seed only",
+    "v023 MOPS Company Profile Seed",
+    "v024 FRED/Akshare Global Adapter Probe",
+    "v025 FRED/Akshare Seed small scope"
+  ],
+  "hydra_risk_control": [
+    "Do not run TPEX + MOPS + FRED/Akshare real fetch in one step.",
+    "Do not mutate SSOT headers while fetching.",
+    "Each adapter must have backup-before-write.",
+    "Each adapter must end with final seal before the next adapter starts.",
+    "Core TriFlow v019.1 remains canonical and separate."
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "status": "MERGE_BLOCKED_UNTIL_CANONICAL_MAPPING_GATE",
+  "risk": "MEDIUM",
+  "allowed_to_merge_now": false,
+  "candidate_rows_total": 150,
+  "quarantine_count": 4,
+  "reason": "Candidate rows are staged and sealed, but raw AkShare columns need mapping to canonical VDF schema.",
+  "next_step": "v027.7 AkShare canonical mapping gate only; no DB write",
+  "items": [
+    {
+      "target_table": "VDF_Global_Commodity_AkShare_Candidate",
+      "status": "BLOCK_REAL_MERGE_UNTIL_MAPPING_GATE",
+      "risk": "MEDIUM",
+      "canonical_families": [
+        "VDF_Global_Commodity"
+      ],
+      "candidate_rows": 150,
+      "allowed_now": false,
+      "next_required_gate": "v027.7 canonical mapping gate only",
+      "message": "Do not merge raw AkShare candidate rows directly into canonical schema."
+    }
+  ]
+}

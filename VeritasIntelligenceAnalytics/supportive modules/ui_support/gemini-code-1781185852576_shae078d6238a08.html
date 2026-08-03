@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Veritas Intelligence Analytics</title>
+
+<meta name="vaos:anchor" content="AST-HTML-VIA-HOME-003">
+<meta name="vaos:lock" content="VisualLock-v3.1 · Ink Bamboo Resonance Grid · UP=RED ▲ / DOWN=GREEN ▼">
+<meta name="vaos:surface" content="home/dashboard/matrix/mother-system">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Noto+Serif+TC:wght@400;500;600&family=Noto+Sans+TC:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+
+<style>
+/* =============================================================================
+def_PARAM_THEME
+============================================================================= */
+:root {
+  --def-bg: #f7f4ec;
+  --def-paper: rgba(255,252,244,.72);
+  --def-paper-strong: rgba(255,252,244,.92);
+
+  --def-ink: #24231f;
+  --def-ink-soft: #68655d;
+  --def-ink-faint: #9d978b;
+  --def-line: rgba(93,86,72,.18);
+
+  /* 丹青色與朱砂印泥色 */
+  --def-dan: #b63a2f;
+  --def-dan-deep: #972d24;
+  --def-dan-soft: rgba(182,58,47,.08);
+  --def-qing: #2f6f68;
+  --def-qing-deep: #244d49;
+  --def-qing-soft: rgba(47,111,104,.16);
+  --def-daiqing: #40515a;
+
+  /* 山水色 */
+  --def-mountain-far: rgba(88,96,91,.13);
+  --def-mountain-near: rgba(62,74,66,.20);
+  --def-lake: rgba(154,181,178,.18);
+  --def-cloud: rgba(255,255,255,.56);
+
+  --def-green-down: #5a9e6f;
+  --def-red-up: #c96b5a;
+  --def-gold: #b89455;
+
+  --def-font-title: "Cormorant Garamond", "Noto Serif TC", serif;
+  --def-font-serif-tc: "Noto Serif TC", "PMingLiU", serif;
+  --def-font-ui: "Noto Sans TC", system-ui, sans-serif;
+  --def-font-mono: "DM Mono", monospace;
+
+  --def-radius-card: 14px;
+  --def-radius-module: 16px;
+  --def-shadow-card: 0 18px 38px rgba(38,34,26,.07);
+  --def-shadow-soft: 0 12px 28px rgba(38,34,26,.055);
+}
+
+/* =============================================================================
+def_BASE_RESET
+============================================================================= */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body.via-body {
+  margin: 0;
+  font-family: var(--def-font-ui);
+  background:
+    radial-gradient(circle at 12% 16%, rgba(47,111,104,.10), transparent 27%),
+    radial-gradient(circle at 78% 18%, rgba(154,181,178,.17), transparent 28%),
+    radial-gradient(circle at 78% 78%, rgba(255,255,255,.46), transparent 32%),
+    var(--def-bg);
+  color: var(--def-ink);
+  overflow-x: hidden;
+  font-size: 13px;
+  position: relative;
+}
+
+/* 水墨紙感 */
+body.via-body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -7;
+  background:
+    radial-gradient(ellipse at 20% 62%, rgba(36,77,73,.08), transparent 34%),
+    radial-gradient(ellipse at 56% 34%, rgba(47,111,104,.06), transparent 32%),
+    radial-gradient(ellipse at 88% 82%, rgba(36,35,31,.045), transparent 30%);
+  filter: blur(18px);
+  opacity: .86;
+}
+
+/* 竹逕斜線 */
+body.via-body::after {
+  content: "";
+  position: fixed;
+  left: -8vw;
+  top: 18vh;
+  width: 116vw;
+  height: 56vh;
+  pointer-events: none;
+  z-index: -6;
+  background:
+    linear-gradient(102deg, transparent 0 14%, rgba(36,77,73,.09) 14.2% 14.45%, transparent 14.8%),
+    linear-gradient(104deg, transparent 0 22%, rgba(36,77,73,.065) 22.2% 22.42%, transparent 22.8%),
+    linear-gradient(99deg, transparent 0 31%, rgba(36,77,73,.052) 31.2% 31.38%, transparent 31.7%),
+    linear-gradient(107deg, transparent 0 74%, rgba(36,77,73,.07) 74.2% 74.4%, transparent 74.8%),
+    linear-gradient(101deg, transparent 0 84%, rgba(36,77,73,.058) 84.2% 84.38%, transparent 84.7%);
+  transform: rotate(-5deg);
+  opacity: .68;
+}
+
+/* =============================================================================
+def_SPECTRUM_LOCK
+============================================================================= */
+.via-spectrum {
+  height: 2px;
+  width: 100%;
+  background: linear-gradient(90deg,#c96b5a,#c4943a,#d9c24e,#5a9e6f,#439a9a,#4c78a8,#7a6daa);
+  opacity: 0.56;
+}
+
+/* =============================================================================
+def_WATERCOLOR_ANIMATION_LAYER
+============================================================================= */
+.via-ink-stage {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -4;
+  overflow: hidden;
+}
+
+.via-ink {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(28px);
+  opacity: .20;
+  mix-blend-mode: multiply;
+  animation: defInkFloat 22s ease-in-out infinite alternate;
+}
+
+.via-ink.i1 { width: 280px; height: 110px; left: 7%; top: 26%; background: rgba(36,77,73,.16); transform: rotate(-16deg); }
+.via-ink.i2 { width: 240px; height: 94px; left: 38%; top: 14%; background: rgba(182,58,47,.08); animation-delay: -4s; transform: rotate(8deg); }
+.via-ink.i3 { width: 330px; height: 120px; right: 10%; top: 28%; background: rgba(154,181,178,.18); animation-delay: -8s; transform: rotate(-12deg); }
+.via-ink.i4 { width: 280px; height: 100px; left: 54%; bottom: 10%; background: rgba(47,111,104,.13); animation-delay: -10s; transform: rotate(12deg); }
+.via-ink.i5 { width: 180px; height: 70px; left: 16%; bottom: 18%; background: rgba(36,35,31,.07); animation-delay: -6s; transform: rotate(-9deg); }
+
+.via-cloud {
+  position: absolute;
+  right: 8%;
+  bottom: 9%;
+  width: 240px;
+  height: 58px;
+  border-radius: 999px;
+  background: var(--def-cloud);
+  filter: blur(14px);
+  opacity: .72;
+  animation: defCloudDrift 18s ease-in-out infinite alternate;
+}
+
+.via-cloud::before, .via-cloud::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  background: rgba(255,255,255,.62);
+  filter: blur(10px);
+}
+
+.via-cloud::before { width: 120px; height: 38px; left: 18px; top: -6px; }
+.via-cloud::after { width: 90px; height: 32px; right: 18px; top: 8px; }
+
+.via-hidden-poem {
+  position: absolute;
+  left: 15.5%;
+  top: 17%;
+  font-family: var(--def-font-serif-tc);
+  font-size: 13px;
+  line-height: 2.2;
+  letter-spacing: .22em;
+  color: rgba(36,77,73,.095);
+  writing-mode: vertical-rl;
+  transform: rotate(-2deg);
+  user-select: none;
+}
+
+.via-hidden-poem span {
+  display: block;
+  margin-left: 12px;
+}
+
+.via-landscape {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 230px;
+  pointer-events: none;
+  opacity: .72;
+}
+
+.mountain {
+  position: absolute;
+  bottom: 34px;
+  width: 320px;
+  height: 120px;
+  background: var(--def-mountain-far);
+  clip-path: polygon(0 100%, 18% 62%, 35% 78%, 52% 42%, 70% 75%, 88% 58%, 100% 100%);
+  filter: blur(8px);
+}
+
+.mountain.far.m1 { left: 6%; transform: scale(1.45); opacity: .30; }
+.mountain.far.m2 { right: 10%; transform: scale(1.65); opacity: .26; }
+.mountain.near.m3 { left: 38%; bottom: 22px; width: 360px; height: 130px; background: var(--def-mountain-near); filter: blur(6px); opacity: .30; }
+
+.lake-light {
+  position: absolute;
+  left: 18%;
+  right: 10%;
+  bottom: 24px;
+  height: 56px;
+  background:
+    linear-gradient(90deg, transparent, var(--def-lake), transparent),
+    repeating-linear-gradient(0deg, transparent 0 9px, rgba(47,111,104,.055) 10px 11px, transparent 12px 20px);
+  filter: blur(6px);
+  opacity: .70;
+}
+
+.boat {
+  position: absolute;
+  left: 42%;
+  bottom: 58px;
+  font-family: var(--def-font-serif-tc);
+  font-size: 50px;
+  line-height: 1;
+  color: rgba(36,35,31,.30);
+  transform: scaleX(2.8) rotate(-2deg);
+}
+
+@keyframes defInkFloat {
+  0%   { transform: translate3d(0,0,0) rotate(-10deg) scale(1); }
+  50%  { transform: translate3d(18px,-12px,0) rotate(-6deg) scale(1.04); }
+  100% { transform: translate3d(-10px,14px,0) rotate(3deg) scale(1.06); }
+}
+
+@keyframes defCloudDrift {
+  0%   { transform: translateX(0) translateY(0); opacity:.60; }
+  50%  { transform: translateX(-18px) translateY(-10px); opacity:.76; }
+  100% { transform: translateX(10px) translateY(-18px); opacity:.68; }
+}
+
+/* =============================================================================
+def_HEADER (Logo & Typography Optimization)
+============================================================================= */
+.via-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* 改為置中對齊，讓標誌與文字線條更穩固 */
+  padding: 32px 46px 24px;
+  border-bottom: 1px solid rgba(93,86,72,.12);
+  gap: 16px;
+  background: rgba(247,244,236,.66);
+  backdrop-filter: blur(10px);
+}
+
+.via-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 24px; /* 增加間距，給予印章呼吸空間 */
+  text-decoration: none;
+  color: inherit;
+}
+
+/* 核心優化：印章圖示濾鏡與陰影整合 */
+.via-seal-logo {
+  width: 76px;
+  height: 76px;
+  object-fit: contain;
+  flex: 0 0 auto;
+  /* 透過稍微調高對比與微調透明度，使其與暖白背景無縫融合 */
+  filter: 
+    contrast(1.05)
+    drop-shadow(0 4px 12px rgba(182,58,47,0.12))
+    drop-shadow(0 1px 2px rgba(36,35,31,0.05));
+  transition: transform 0.6s cubic-bezier(.22,1,.36,1);
+}
+
+.via-brand:hover .via-seal-logo {
+  transform: scale(1.03) rotate(-1deg);
+}
+
+.via-brand-lines {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.via-brand-line1 {
+  font-family: var(--def-font-title);
+  font-size: 32px; /* 微調放大，匹配印章的視覺重量 */
+  line-height: 1.0;
+  font-weight: 500;
+  letter-spacing: .02em;
+  color: #1a1a18;
+}
+
+.via-brand-line2 {
+  margin-top: 6px;
+  font-family: var(--def-font-title);
+  font-size: 13px;
+  line-height: 1.1;
+  letter-spacing: .06em;
+  color: var(--def-ink-soft);
+  text-transform: uppercase;
+}
+
+.via-brand-line3 {
+  margin-top: 8px;
+  font-family: var(--def-font-serif-tc);
+  font-size: 13px;
+  line-height: 1.15;
+  letter-spacing: .24em; /* 拓寬天地之美的文人氣質 */
+  color: var(--def-dan-deep); /* 改用深朱砂色，與印章色彩產生和諧呼應 */
+  font-weight: 500;
+}
+
+.via-head-right {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.via-lock {
+  font-family: var(--def-font-mono);
+  font-size: 8.5px;
+  letter-spacing: .05em;
+  border: 0;
+  border-left: 1px solid rgba(93,86,72,.22);
+  padding: 3px 0 3px 16px;
+  color: #656b67;
+  white-space: nowrap;
+}
+
+.via-lock .up { color: var(--def-red-up); }
+.via-lock .dn { color: var(--def-green-down); }
+
+.via-clock {
+  font-family: var(--def-font-mono);
+  font-size: 10px;
+  color: #3d3c38;
+}
+
+/* =============================================================================
+def_SIDE_INK_PANEL
+============================================================================= */
+.via-side-ink {
+  position: fixed;
+  left: 28px;
+  top: 168px;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.side-ink-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-width: 86px;
+  height: 28px;
+  padding-left: 14px;
+  font-family: var(--def-font-title);
+  font-size: 13px;
+  letter-spacing: .04em;
+  color: rgba(36,35,31,.68);
+  text-decoration: none;
+  transition: color .28s ease, transform .28s ease;
+}
+
+.side-ink-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: rgba(36,77,73,.34);
+  transform: translateY(-50%);
+}
+
+.side-ink-item::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 0;
+  height: 11px;
+  background: linear-gradient(90deg, rgba(47,111,104,.18), rgba(47,111,104,.06), transparent);
+  filter: blur(.2px);
+  transform: skewX(-18deg);
+  transition: width .36s ease;
+  z-index: -1;
+}
+
+.side-ink-item:hover, .side-ink-item.is-active {
+  color: var(--def-qing-deep);
+  transform: translateX(4px);
+}
+
+.side-ink-item:hover::after, .side-ink-item.is-active::after {
+  width: 100%;
+}
+
+/* =============================================================================
+def_MAIN
+============================================================================= */
+.via-main {
+  padding: 54px 64px 82px 150px;
+  position: relative;
+  z-index: 1;
+}
+
+/* =============================================================================
+def_HERO
+============================================================================= */
+.via-hero {
+  display: grid;
+  grid-template-columns: .86fr 1.44fr;
+  gap: 56px;
+  margin-bottom: 54px;
+  min-height: 180px;
+  position: relative;
+}
+
+.via-hero::before {
+  content: "";
+  position: absolute;
+  right: -78px;
+  top: -54px;
+  width: 290px;
+  height: 270px;
+  background: linear-gradient(135deg, rgba(184,148,85,.15), rgba(154,181,178,.10));
+  clip-path: polygon(9% 16%, 84% 0, 100% 68%, 38% 100%, 0 54%);
+  opacity: 0.46;
+  border: 1px solid rgba(184,148,85,.12);
+}
+
+.via-hero-text {
+  min-height: 160px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.via-hero-text .eyebrow {
+  font-family: var(--def-font-mono);
+  font-size: 8.5px;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: rgba(157,151,139,.72);
+  display: block;
+  margin-bottom: 16px;
+}
+
+.via-hero-text p {
+  font-family: var(--def-font-title);
+  font-size: 15px;
+  line-height: 1.8;
+  max-width: 420px;
+  margin: 0;
+  color: rgba(36,35,31,.70);
+}
+
+.via-hero-text p::before {
+  content: "研究天下大勢";
+  display: block;
+  margin-bottom: 16px;
+  font-family: var(--def-font-serif-tc);
+  font-size: 22px;
+  letter-spacing: .26em;
+  color: var(--def-qing-deep);
+}
+
+/* =============================================================================
+def_INTERACTIVE_CARDS
+============================================================================= */
+.via-hero-cards {
+  position: relative;
+  min-height: 222px;
+}
+
+.card, .module-card {
+  position: relative;
+  z-index: 1;
+  transition:
+    transform .95s cubic-bezier(.22,1,.36,1),
+    opacity .9s ease,
+    filter .9s ease,
+    box-shadow .6s ease,
+    background .35s ease,
+    border-color .35s ease;
+  will-change: transform, opacity, filter;
+}
+
+.card {
+  display: block;
+  background: var(--def-paper);
+  border: 1px solid var(--def-line);
+  border-radius: var(--def-radius-card);
+  padding: 16px 19px;
+  font-size: 12.5px;
+  color: inherit;
+  text-decoration: none;
+  backdrop-filter: blur(5px);
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  background: var(--def-paper-strong);
+  box-shadow: var(--def-shadow-card);
+  border-color: rgba(47,111,104,.24);
+}
+
+.card .k {
+  display: block;
+  font-family: var(--def-font-title);
+  font-size: 17px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  letter-spacing: .025em;
+}
+
+.card .s {
+  display: block;
+  font-size: 10.5px;
+  color: var(--def-ink-soft);
+  line-height: 1.65;
+}
+
+.card .go {
+  display: inline-block;
+  margin-top: 11px;
+  font-family: var(--def-font-mono);
+  font-size: 10px;
+  letter-spacing: .12em;
+  color: var(--def-qing-deep);
+  transition: transform .3s;
+}
+
+.card:hover .go {
+  transform: translateX(4px);
+}
+
+.card-main { width: 70%; border-left: 4px solid rgba(36,77,73,.44); }
+.card-offset-1 { position: absolute; top: 38px; right: 0; width: 60%; border-left: 4px solid rgba(184,148,85,.36); }
+.card-offset-2 { position: absolute; top: 118px; left: 12%; width: 55%; border-left: 4px solid rgba(47,111,104,.36); }
+
+/* =============================================================================
+def_MODULES
+============================================================================= */
+.via-modules {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 17px;
+  margin-bottom: 62px;
+}
+
+.module-card {
+  display: block;
+  background: rgba(255,252,244,.78);
+  border-radius: var(--def-radius-module);
+  border: 1px solid var(--def-line);
+  padding: 15px 17px;
+  font-size: 12.5px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.module-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--def-shadow-soft);
+  border-color: rgba(47,111,104,.22);
+  background: rgba(255,252,244,.92);
+}
+
+.module-card .k {
+  display: block;
+  font-family: var(--def-font-title);
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: .025em;
+}
+
+.module-card .s {
+  display: block;
+  font-size: 10.5px;
+  color: var(--def-ink-soft);
+  margin-top: 5px;
+  line-height: 1.55;
+}
+
+.offset-left { transform: translateX(-8px); }
+.offset-right { transform: translateX(10px) translateY(8px); }
+.offset-left:hover { transform: translateX(-8px) translateY(-3px); }
+.offset-right:hover { transform: translateX(10px) translateY(5px); }
+
+/* =============================================================================
+def_SYSTEM_MATRIX (Identity System Integration)
+============================================================================= */
+.via-system-matrix {
+  margin-top: 32px;
+  position: relative;
+}
+
+.via-system-title {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+  font-family: var(--def-font-title);
+  font-size: 13px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(36,35,31,.72);
+}
+
+.via-system-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(93,86,72,.16);
+}
+
+.via-system-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 17px;
+}
+
+.system-card {
+  display: grid;
+  grid-template-columns: 128px 1fr;
+  gap: 18px;
+  min-height: 164px;
+  padding: 18px;
+  background: rgba(255,252,244,.76);
+  border: 1px solid var(--def-line);
+  border-radius: var(--def-radius-module);
+  text-decoration: none;
+  color: inherit;
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform .95s cubic-bezier(.22,1,.36,1),
+    opacity .9s ease,
+    filter .9s ease,
+    box-shadow .6s ease,
+    background .35s ease,
+    border-color .35s ease;
+}
+
+.system-card:hover {
+  transform: translateY(-3px);
+  background: rgba(255,252,244,.92);
+  border-color: rgba(47,111,104,.22);
+  box-shadow: var(--def-shadow-soft);
+}
+
+/* 視覺優化：系統縮寫字體與線條微調 */
+.system-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--def-font-title);
+  font-size: 42px; /* 稍微縮小，讓排版更精緻 */
+  font-weight: 600;
+  letter-spacing: .02em;
+  color: var(--def-gold);
+  border-right: 1px solid rgba(93,86,72,.14);
+  position: relative;
+}
+
+.system-card:nth-child(2) .system-mark { color: var(--def-qing); }
+.system-card:nth-child(3) .system-mark { color: var(--def-daiqing); }
+
+/* 核心優化：將原本的靜態 CSS 印章，改造成高擬真的「子系統落款小章」 */
+.system-mark::after {
+  content: "理";
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  font-family: var(--def-font-serif-tc);
+  font-size: 10px;
+  font-weight: 600;
+  color: #a63127; /* 呼應主 Logo 的朱砂紅 */
+  background: rgba(182,58,47,0.03);
+  border: 1.5px solid rgba(166,49,39,0.75); /* 增加線條厚度，呈現手工刻印感 */
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(166,49,39,0.08);
+  opacity: 0.88;
+}
+
+.system-copy h3 {
+  margin: 2px 0 4px;
+  font-family: var(--def-font-title);
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: .025em;
+}
+
+.system-copy .line2 {
+  display: block;
+  margin-bottom: 10px;
+  font-family: var(--def-font-title);
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(36,35,31,.56);
+}
+
+.system-copy p {
+  margin: 0;
+  max-width: 310px;
+  font-size: 11px;
+  line-height: 1.65;
+  color: rgba(36,35,31,.68);
+}
+
+.system-copy .access {
+  display: inline-block;
+  margin-top: 14px;
+  font-family: var(--def-font-mono);
+  font-size: 10px;
+  color: var(--def-qing-deep);
+  letter-spacing: .08em;
+}
+
+/* =============================================================================
+def_FOCUS_MOTION_MODE
+============================================================================= */
+.via-focus-mode .card, .via-focus-mode .module-card, .via-focus-mode .system-card { cursor: pointer; }
+
+.card.is-dim, .module-card.is-dim, .system-card.is-dim {
+  transform: translate(var(--move-x, 0px), var(--move-y, 0px)) scale(.94) rotate(var(--rot, 0deg));
+  opacity: .24;
+  filter: blur(.3px) saturate(.82);
+  pointer-events: none;
+}
+
+.card.is-focus, .module-card.is-focus, .system-card.is-focus {
+  transform: translate(var(--focus-x, 0px), var(--focus-y, 0px)) scale(1.06);
+  opacity: 1;
+  z-index: 60;
+  box-shadow: 0 34px 80px rgba(38,34,26,.16);
+  background: rgba(255,252,244,.96);
+  border-color: rgba(36,77,73,.34);
+}
+
+.card.is-focus::after, .module-card.is-focus::after, .system-card.is-focus::after {
+  content: "再次點擊進入";
+  position: absolute;
+  right: 14px;
+  bottom: 10px;
+  font-size: 10px;
+  letter-spacing: .12em;
+  color: rgba(36,77,73,.72);
+  font-family: var(--def-font-mono);
+}
+
+.via-focus-hint {
+  position: fixed;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%);
+  padding: 8px 14px;
+  border: 1px solid rgba(36,77,73,.18);
+  border-radius: 999px;
+  background: rgba(255,252,244,.72);
+  color: rgba(36,35,31,.72);
+  backdrop-filter: blur(8px);
+  font-size: 10px;
+  letter-spacing: .12em;
+  font-family: var(--def-font-mono);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .45s ease;
+  z-index: 100;
+}
+
+.via-focus-mode .via-focus-hint { opacity: 1; }
+
+/* =============================================================================
+def_FOOTER_BAND
+============================================================================= */
+.via-footer-band {
+  position: relative;
+  margin-top: 44px;
+}
+
+.mountain-band {
+  height: 86px;
+  background:
+    radial-gradient(ellipse at 70% 18%, rgba(255,255,255,.70), transparent 30%),
+    linear-gradient(135deg, rgba(47,111,104,.15), rgba(154,181,178,.26));
+  clip-path: polygon(0 62%, 20% 42%, 45% 57%, 70% 35%, 100% 50%, 100% 100%, 0 100%);
+  opacity: 0.45;
+  position: relative;
+}
+
+.mountain-band::after {
+  content: "";
+  position: absolute;
+  right: 13%;
+  top: 7px;
+  width: 210px;
+  height: 42px;
+  border-radius: 999px;
+  background: var(--def-cloud);
+  filter: blur(12px);
+  opacity: .74;
+}
+
+.via-footer-text {
+  position: absolute;
+  right: 32px;
+  bottom: 10px;
+  font-family: var(--def-font-title);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  opacity: 0.68;
+}
+
+.via-footer-text .lock { color: var(--def-gold); opacity: 1; }
+
+/* =============================================================================
+def_RESPONSIVE_GUARD
+============================================================================= */
+@media (max-width: 1180px) {
+  .via-main { padding-right: 32px; }
+  .via-system-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 980px) {
+  .via-side-ink { display: none; }
+  .via-main { padding: 38px 28px 72px; }
+  .via-header { padding: 22px 26px 18px; }
+  .via-seal-logo { width: 66px; height: 66px; }
+  .via-brand-lines { min-height: 66px; }
+  .via-brand-line1 { font-size: 26px; }
+  .via-brand-line2, .via-brand-line3 { font-size: 12px; }
+  .via-hero { grid-template-columns: 1fr; gap: 28px; }
+  .via-modules { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .via-header { align-items: flex-start; flex-direction: column; padding: 24px 20px; }
+  .via-brand { gap: 16px; }
+  .via-seal-logo { width: 58px; height: 58px; }
+  .via-brand-lines { min-height: 58px; }
+  .via-brand-line1 { font-size: 22px; letter-spacing: .01em; }
+  .via-brand-line2 { font-size: 11px; }
+  .via-brand-line3 { font-size: 11px; letter-spacing: .16em; }
+  .via-head-right { width: 100%; justify-content: space-between; padding-top: 12px; }
+  .via-hero-cards { min-height: 0; }
+  .card-main, .card-offset-1, .card-offset-2 { position: static; width: 100%; margin-top: 14px; }
+  .via-modules { grid-template-columns: 1fr; }
+  .offset-left, .offset-right, .offset-left:hover, .offset-right:hover { transform: none; }
+  .system-card { grid-template-columns: 1fr; }
+  .system-mark { justify-content: flex-start; border-right: 0; border-bottom: 1px solid rgba(93,86,72,.14); padding-bottom: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card, .module-card, .system-card, .card .go, .via-ink, .via-cloud { transition: none; animation: none; }
+}
+
+:focus-visible {
+  outline: 2px solid var(--def-qing-deep);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+</style>
+</head>
+
+<body class="via-body">
+  <div class="via-spectrum"></div>
+
+  <div class="via-ink-stage" aria-hidden="true">
+    <span class="via-ink i1"></span>
+    <span class="via-ink i2"></span>
+    <span class="via-ink i3"></span>
+    <span class="via-ink i4"></span>
+    <span class="via-ink i5"></span>
+    <span class="via-cloud"></span>
+
+    <div class="via-hidden-poem" aria-hidden="true">
+      <span>夾道竹逕通幽處</span>
+      <span>忽逢桃花林</span>
+      <span>坐看雲起時</span>
+    </div>
+
+    <div class="via-landscape" aria-hidden="true">
+      <span class="mountain far m1"></span>
+      <span class="mountain far m2"></span>
+      <span class="mountain near m3"></span>
+      <span class="lake-light"></span>
+      <span class="boat">一</span>
+    </div>
+  </div>
+
+  <header class="via-header">
+    <a class="via-brand" href="#" aria-label="Veritas Intelligence Analytics Home">
+      <img class="via-seal-logo" src="ChatGPT Image 2026年6月10日 下午11_44_25 (2).png" alt="Veritas Intelligence Analytics Seal Logo">
+      <div class="via-brand-lines">
+        <div class="via-brand-line1">Veritas Intelligence Analytics</div>
+        <div class="via-brand-line2">AI-Augmented Investment Intelligence</div>
+        <div class="via-brand-line3">判天地之美，析萬物之理。</div>
+      </div>
+    </a>
+
+    <div class="via-head-right">
+      <span class="via-lock">
+        <span class="up">▲ UP=RED</span> · <span class="dn">▼ DOWN=GREEN</span>
+      </span>
+      <span class="via-clock" id="clock">—</span>
+    </div>
+  </header>
+
+  <aside class="via-side-ink" aria-label="VIA Navigation">
+    <a class="side-ink-item is-active" href="#">Home</a>
+    <a class="side-ink-item" href="VIA_Macro_Master_Template.html">Macro</a>
+    <a class="side-ink-item" href="VIA_Equity_Valuation_Terminal.html">Markets</a>
+    <a class="side-ink-item" href="DecisionStudio_Registry.html">Research</a>
+    <a class="side-ink-item" href="VIA_DataModule_Controller_v2.html">Library</a>
+  </aside>
+
+  <main class="via-main">
+    <section class="via-hero">
+      <div class="via-hero-text">
+        <span class="eyebrow">Vol. 01 / 2026 · Macro Research Platform</span>
+        <p>
+          A museum-like space for macroeconomic intelligence and investment research.
+          穿過幽徑，剔除雜訊，唯留本質。
+        </p>
+      </div>
+
+      <div class="via-hero-cards">
+        <a class="card card-main" href="VIA_Macro_GDP_Identity_Console.html">
+          <span class="k">今日總體概況</span>
+          <span class="s">GDP 恆等式 Console · C + I + G + (X − M) 即時拆解。</span>
+          <span class="go">開啟 →</span>
+        </a>
+
+        <a class="card card-offset-1" href="DecisionStudio_Registry.html">
+          <span class="k">研究主題入口</span>
+          <span class="s">Decision Studio · 研究題目與決策登錄。</span>
+          <span class="go">進入 →</span>
+        </a>
+
+        <a class="card card-offset-2" href="VIA_US_Macro_Template.html">
+          <span class="k">市場情緒 / 流動性</span>
+          <span class="s">淨流動性與風險情緒綜合觀測。</span>
+          <span class="go">觀測 →</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="via-modules">
+      <a class="module-card offset-left" href="VIA_Macro_Master_Template.html">
+        <span class="k">Macro Dashboard</span>
+        <span class="s">總體經濟主控台</span>
+      </a>
+
+      <a class="module-card" href="VIA_Macro_GDP_Identity_Console.html">
+        <span class="k">Country Monitor</span>
+        <span class="s">區域 GDP 恆等式監測</span>
+      </a>
+
+      <a class="module-card offset-right" href="VIA_Equity_Valuation_Terminal.html">
+        <span class="k">Factor Lab</span>
+        <span class="s">因子與估值終端</span>
+      </a>
+
+      <a class="module-card" href="DecisionStudio_Registry.html">
+        <span class="k">Scenario Studio</span>
+        <span class="s">情境推演與登錄</span>
+      </a>
+    </section>
+
+    <section class="via-system-matrix">
+      <div class="via-system-title">Veritas Intelligence Analytics System Matrix</div>
+
+      <div class="via-system-grid">
+        <a class="system-card" href="VIA_DataModule_Controller_v2.html">
+          <div class="system-mark">VDF</div>
+          <div class="system-copy">
+            <h3>VeritasDataForge</h3>
+            <span class="line2">VERITAS INTELLIGENCE ANALYTICS</span>
+            <p>A disciplined data forge for macro, market, corporate, and exchange intelligence.</p>
+            <span class="access">Access VDF →</span>
+          </div>
+        </a>
+
+        <a class="system-card" href="VRN_ReportNova_Console.html">
+          <div class="system-mark">VRN</div>
+          <div class="system-copy">
+            <h3>VeritasReportNova</h3>
+            <span class="line2">VERITAS INTELLIGENCE ANALYTICS</span>
+            <p>A document intelligence engine for investment reports, layout parsing, tables, OCR, and validation.</p>
+            <span class="access">Access VRN →</span>
+          </div>
+        </a>
+
+        <a class="system-card" href="VIA_ActiveETF_Cockpit.html">
+          <div class="system-mark">VETF</div>
+          <div class="system-copy">
+            <h3>Taiwan Active ETF at a Glance</h3>
+            <span class="line2">VERITAS INTELLIGENCE ANALYTICS</span>
+            <p>A daily snapshot of Taiwan active ETF flows, holdings, themes, market regime, and risk signals.</p>
+            <span class="access">Access VETF →</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="via-footer-band">
+      <div class="mountain-band"></div>
+      <div class="via-footer-text">
+        <span class="lock">DATA-LOCKED</span> · Veritas Intelligence Analytics · 研究天下大勢
+      </div>
+    </section>
+  </main>
+
+  <div class="via-focus-hint">CLICK BLANK AREA OR PRESS ESC TO RESET</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ===========================================================================
+  def_CLOCK (Taipei Standard Time Acceleration)
+  =========================================================================== */
+  var clock = document.getElementById("clock");
+
+  function defTickClock(){
+    try{
+      var s = new Date().toLocaleTimeString("zh-TW", {
+        hour12: false,
+        timeZone: "Asia/Taipei",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+      });
+      if(clock) { clock.textContent = "TPE " + s; }
+    }catch(e){
+      if(clock) { clock.textContent = ""; }
+    }
+  }
+
+  defTickClock();
+  setInterval(defTickClock, 1000);
+
+  /* ===========================================================================
+  def_FOCUS_INTERACTION (Sovereign Focus Engine)
+  =========================================================================== */
+  var targets = Array.prototype.slice.call(
+    document.querySelectorAll(".card, .module-card, .system-card")
+  );
+  var body = document.body;
+  var activeEl = null;
+
+  function defClearFocus(){
+    activeEl = null;
+    body.classList.remove("via-focus-mode");
+    targets.forEach(function(el){
+      el.classList.remove("is-focus", "is-dim");
+      el.style.removeProperty("--focus-x");
+      el.style.removeProperty("--focus-y");
+      el.style.removeProperty("--move-x");
+      el.style.removeProperty("--move-y");
+      el.style.removeProperty("--rot");
+    });
+  }
+
+  function defFocusElement(el){
+    defClearFocus();
+    activeEl = el;
+    body.classList.add("via-focus-mode");
+
+    var viewportCenterX = window.innerWidth / 2;
+    var viewportCenterY = window.innerHeight * 0.50;
+
+    var rect = el.getBoundingClientRect();
+    var elCenterX = rect.left + rect.width / 2;
+    var elCenterY = rect.top + rect.height / 2;
+
+    var focusX = viewportCenterX - elCenterX;
+    var focusY = viewportCenterY - elCenterY;
+
+    el.style.setProperty("--focus-x", focusX + "px");
+    el.style.setProperty("--focus-y", focusY + "px");
+    el.classList.add("is-focus");
+
+    targets.forEach(function(other, index){
+      if(other === el) { return; }
+      var r = other.getBoundingClientRect();
+      var ox = r.left + r.width / 2;
+      var oy = r.top + r.height / 2;
+
+      var dx = ox - elCenterX;
+      var dy = oy - elCenterY;
+
+      var len = Math.sqrt(dx * dx + dy * dy) || 1;
+      var push = 70 + (index % 3) * 16;
+
+      var moveX = (dx / len) * push;
+      var moveY = (dy / len) * push;
+
+      if(Math.abs(dx) < 40) { moveX += (index % 2 === 0 ? -36 : 36); }
+      if(Math.abs(dy) < 24) { moveY += (index % 2 === 0 ? -24 : 24); }
+
+      var rot = ((index % 2 === 0 ? -1 : 1) * (4 + index % 3)) + "deg";
+
+      other.style.setProperty("--move-x", moveX + "px");
+      other.style.setProperty("--move-y", moveY + "px");
+      other.style.setProperty("--rot", rot);
+      other.classList.add("is-dim");
+    });
+  }
+
+  targets.forEach(function(el){
+    el.addEventListener("click", function(ev){
+      if(activeEl !== el){
+        ev.preventDefault();
+        defFocusElement(el);
+        return;
+      }
+    });
+  });
+
+  document.addEventListener("click", function(ev){
+    var insideTarget = ev.target.closest(".card, .module-card, .system-card");
+    if(!insideTarget && activeEl){ defClearFocus(); }
+  });
+
+  document.addEventListener("keydown", function(ev){
+    if(ev.key === "Escape"){ defClearFocus(); }
+  });
+
+  window.addEventListener("resize", function(){
+    if(activeEl){ defFocusElement(activeEl); }
+  });
+})();
+</script>
+</body>
+</html>

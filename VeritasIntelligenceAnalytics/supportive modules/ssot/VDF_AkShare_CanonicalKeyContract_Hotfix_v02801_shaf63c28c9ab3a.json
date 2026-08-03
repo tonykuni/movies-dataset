@@ -1,0 +1,41 @@
+{
+  "generated_at": "2026-06-11T00:11:29.281+08:00",
+  "scope": "VDF_Global_Commodity_AkShare_Candidate",
+  "db_write_enabled": false,
+  "canonical_merge_enabled": false,
+  "canonical_family": "VDF_Global_Commodity",
+  "required_fields": [
+    "symbol",
+    "date",
+    "value",
+    "source"
+  ],
+  "recommended_fields": [
+    "family",
+    "unit",
+    "frequency",
+    "original_function",
+    "source_table",
+    "record_hash",
+    "seeded_at"
+  ],
+  "key_contract": {
+    "primary_key": [
+      "family",
+      "symbol",
+      "date",
+      "source"
+    ],
+    "invalid_gate": "invalid_after must equal 0 before canonical write",
+    "duplicate_gate": "duplicate_after must equal 0 before canonical write",
+    "value_rule": "value must be numeric after raw-column lineage mapping",
+    "date_rule": "date must be data-derived where available; seeded_at fallback must be quarantined or lower priority"
+  },
+  "stop_conditions": [
+    "invalid_after > 0",
+    "duplicate_after > 0",
+    "candidate scope expands beyond commodity without separate gate",
+    "canonical_merge_enabled = true without explicit future approval"
+  ],
+  "next_step": "v027.8.1.2 raw-column profile + canonical key contract gate"
+}

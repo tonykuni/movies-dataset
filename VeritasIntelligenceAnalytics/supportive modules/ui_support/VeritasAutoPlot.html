@@ -1,0 +1,2085 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeritasAutoPlot - Professional Financial Analytics</title>
+    
+    <!-- Libraries -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+/* ═══════════════════════════════════════════════════════════════════════════════
+   VERITAS AUTOPLOT - NOTION/MUJI MINIMAL DESIGN + SEABORN COLORS
+   Clean • Functional • Professional
+═══════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+    /* Notion/Muji Inspired - Warm Neutrals */
+    --bg-0: #FFFFFF;
+    --bg-1: #FBFBFA;
+    --bg-2: #F7F6F3;
+    --bg-3: #EFEEE9;
+    --bg-hover: rgba(55, 53, 47, 0.04);
+    --bg-active: rgba(55, 53, 47, 0.08);
+    
+    --text-0: #37352F;
+    --text-1: #37352F;
+    --text-2: #787774;
+    --text-3: #9B9A97;
+    --text-4: #CFCCC4;
+    
+    --border: rgba(55, 53, 47, 0.09);
+    --border-dark: rgba(55, 53, 47, 0.16);
+    
+    /* Seaborn Color Palette - Deep, Muted, Professional */
+    --seaborn-blue: #4C72B0;
+    --seaborn-orange: #DD8452;
+    --seaborn-green: #55A868;
+    --seaborn-red: #C44E52;
+    --seaborn-purple: #8172B3;
+    --seaborn-brown: #937860;
+    --seaborn-pink: #DA8BC3;
+    --seaborn-gray: #8C8C8C;
+    --seaborn-yellow: #CCB974;
+    --seaborn-cyan: #64B5CD;
+    
+    /* Semantic */
+    --accent: var(--seaborn-blue);
+    --success: var(--seaborn-green);
+    --warning: var(--seaborn-orange);
+    --danger: var(--seaborn-red);
+    --up: #26A69A;
+    --down: #EF5350;
+    
+    /* Sizing */
+    --header-h: 52px;
+    --sidebar-w: 260px;
+    --panel-h: 160px;
+    --radius: 6px;
+    --radius-lg: 12px;
+    
+    /* Typography */
+    --font-sans: 'Inter', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+    --bg-0: #191919;
+    --bg-1: #202020;
+    --bg-2: #2F2F2F;
+    --bg-3: #373737;
+    --bg-hover: rgba(255, 255, 255, 0.055);
+    --bg-active: rgba(255, 255, 255, 0.1);
+    
+    --text-0: #FFFFFFCF;
+    --text-1: #FFFFFFCF;
+    --text-2: #FFFFFF9E;
+    --text-3: #FFFFFF5E;
+    --text-4: #FFFFFF29;
+    
+    --border: rgba(255, 255, 255, 0.09);
+    --border-dark: rgba(255, 255, 255, 0.13);
+}
+
+/* Reset */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+    height: 100%;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    background: var(--bg-0);
+    color: var(--text-1);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   LAYOUT - Clean Notion-style
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.app {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+    width: var(--sidebar-w);
+    background: var(--bg-1);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.sidebar-header {
+    padding: 16px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--seaborn-blue), var(--seaborn-purple));
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+.logo-text {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-0);
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: 8px;
+    overflow-y: auto;
+}
+
+.nav-section {
+    margin-bottom: 16px;
+}
+
+.nav-section-title {
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--radius);
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-size: 14px;
+}
+
+.nav-item:hover {
+    background: var(--bg-hover);
+    color: var(--text-1);
+}
+
+.nav-item.active {
+    background: var(--bg-active);
+    color: var(--text-0);
+    font-weight: 500;
+}
+
+.nav-icon {
+    width: 20px;
+    text-align: center;
+    font-size: 16px;
+}
+
+/* Data Sources Section */
+.data-sources {
+    padding: 12px;
+    border-top: 1px solid var(--border);
+}
+
+.source-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.source-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: var(--radius);
+    font-size: 12px;
+    color: var(--text-2);
+    cursor: pointer;
+}
+
+.source-item:hover { background: var(--bg-hover); }
+
+.source-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.source-dot.connected { background: var(--success); }
+.source-dot.disconnected { background: var(--text-4); }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   MAIN CONTENT
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background: var(--bg-0);
+}
+
+/* Header */
+.header {
+    height: var(--header-h);
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-0);
+}
+
+.header-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-0);
+}
+
+.header-breadcrumb {
+    font-size: 13px;
+    color: var(--text-3);
+}
+
+.header-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Buttons - Notion Style */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-1);
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--seaborn-blue);
+    filter: brightness(1.1);
+    color: white;
+}
+
+.btn-outline {
+    border: 1px solid var(--border-dark);
+}
+
+.btn-sm { padding: 4px 8px; font-size: 12px; }
+.btn-icon { padding: 6px; }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   CHART AREA
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.chart-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 16px 20px;
+    gap: 16px;
+    overflow: hidden;
+}
+
+/* Chart Controls Bar */
+.chart-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px;
+    background: var(--bg-2);
+    border-radius: var(--radius);
+}
+
+.control-btn {
+    padding: 6px 10px;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.control-btn:hover { color: var(--text-1); background: var(--bg-hover); }
+.control-btn.active { background: var(--bg-0); color: var(--text-0); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+
+.control-sep {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
+    margin: 0 8px;
+}
+
+/* Symbol Display */
+.symbol-display {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 14px;
+    background: var(--bg-2);
+    border-radius: var(--radius);
+}
+
+.symbol-name {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text-0);
+}
+
+.symbol-price {
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.symbol-change {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.symbol-change.up { background: rgba(38,166,154,0.15); color: var(--up); }
+.symbol-change.down { background: rgba(239,83,80,0.15); color: var(--down); }
+
+/* Indicator Tags */
+.indicator-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.indicator-tag {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: var(--bg-2);
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-2);
+}
+
+.indicator-tag .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.indicator-tag .remove {
+    margin-left: 4px;
+    opacity: 0.5;
+    cursor: pointer;
+}
+
+.indicator-tag .remove:hover { opacity: 1; color: var(--danger); }
+
+/* Main Chart Container */
+.chart-main {
+    flex: 1;
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
+    min-height: 300px;
+}
+
+.chart-main .js-plotly-plot { width: 100% !important; height: 100% !important; }
+
+/* Chart Overlay - OHLC Display */
+.chart-overlay {
+    position: absolute;
+    top: 12px;
+    left: 16px;
+    display: flex;
+    gap: 20px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.ohlc-item {
+    display: flex;
+    gap: 4px;
+}
+
+.ohlc-label { color: var(--text-3); }
+.ohlc-value { color: var(--text-1); font-weight: 500; }
+.ohlc-value.up { color: var(--up); }
+.ohlc-value.down { color: var(--down); }
+
+/* Sub Panels */
+.chart-panels {
+    display: flex;
+    gap: 12px;
+}
+
+.chart-panel {
+    flex: 1;
+    height: var(--panel-h);
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-header {
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-2);
+}
+
+.panel-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-2);
+    text-transform: uppercase;
+}
+
+.panel-chart {
+    flex: 1;
+    min-height: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   RIGHT PANEL - Settings/Indicators
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.right-panel {
+    width: 280px;
+    background: var(--bg-1);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.panel-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+}
+
+.panel-tab {
+    flex: 1;
+    padding: 12px;
+    background: transparent;
+    border: none;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-3);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+}
+
+.panel-tab:hover { color: var(--text-1); }
+.panel-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.panel-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+.panel-section {
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+/* Indicator List */
+.indicator-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.indicator-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    background: var(--bg-2);
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.indicator-item:hover {
+    border-color: var(--border-dark);
+}
+
+.indicator-item.active {
+    border-color: var(--accent);
+    background: rgba(76, 114, 176, 0.08);
+}
+
+.indicator-icon {
+    width: 28px;
+    height: 28px;
+    background: var(--bg-3);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.indicator-info { flex: 1; }
+.indicator-name { font-size: 13px; font-weight: 500; color: var(--text-0); }
+.indicator-desc { font-size: 11px; color: var(--text-3); }
+
+/* Form Elements - Muji Style */
+.form-group {
+    margin-bottom: 14px;
+}
+
+.form-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-2);
+    margin-bottom: 6px;
+}
+
+.form-input, .form-select {
+    width: 100%;
+    padding: 8px 12px;
+    background: var(--bg-0);
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius);
+    font-size: 13px;
+    color: var(--text-1);
+    outline: none;
+    transition: all 0.15s;
+}
+
+.form-input:focus, .form-select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(76, 114, 176, 0.1);
+}
+
+.form-row {
+    display: flex;
+    gap: 10px;
+}
+
+.form-row > * { flex: 1; }
+
+/* Toggle Switch */
+.toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+}
+
+.toggle-label {
+    font-size: 13px;
+    color: var(--text-1);
+}
+
+.toggle {
+    width: 40px;
+    height: 22px;
+    background: var(--bg-3);
+    border-radius: 11px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.toggle.active { background: var(--accent); }
+
+.toggle::after {
+    content: '';
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    background: white;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.toggle.active::after { left: 20px; }
+
+/* Color Picker */
+.color-picker {
+    display: flex;
+    gap: 6px;
+}
+
+.color-swatch {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.15s;
+}
+
+.color-swatch:hover { transform: scale(1.1); }
+.color-swatch.active { border-color: var(--text-0); }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   DATABASE CONNECTION MODAL
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 15, 15, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s;
+}
+
+.modal-overlay.active { opacity: 1; visibility: visible; }
+
+.modal {
+    background: var(--bg-0);
+    border-radius: var(--radius-lg);
+    width: 90%;
+    max-width: 520px;
+    max-height: 85vh;
+    overflow: hidden;
+    box-shadow: 0 24px 48px rgba(0,0,0,0.2);
+    transform: translateY(20px) scale(0.98);
+    transition: all 0.2s;
+}
+
+.modal-overlay.active .modal {
+    transform: translateY(0) scale(1);
+}
+
+.modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-0);
+}
+
+.modal-close {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--text-3);
+    cursor: pointer;
+    border-radius: var(--radius);
+    font-size: 18px;
+}
+
+.modal-close:hover { background: var(--bg-hover); color: var(--text-1); }
+
+.modal-body {
+    padding: 24px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    background: var(--bg-2);
+}
+
+/* Database Options */
+.db-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.db-option {
+    padding: 16px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+}
+
+.db-option:hover { border-color: var(--border-dark); }
+.db-option.active { border-color: var(--accent); background: rgba(76, 114, 176, 0.08); }
+
+.db-icon { font-size: 28px; margin-bottom: 8px; }
+.db-name { font-size: 13px; font-weight: 500; color: var(--text-0); }
+.db-desc { font-size: 11px; color: var(--text-3); margin-top: 4px; }
+
+/* Drop Zone */
+.drop-zone {
+    border: 2px dashed var(--border-dark);
+    border-radius: var(--radius-lg);
+    padding: 40px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bg-2);
+}
+
+.drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--accent);
+    background: rgba(76, 114, 176, 0.05);
+}
+
+.drop-icon { font-size: 40px; opacity: 0.4; margin-bottom: 12px; }
+.drop-title { font-size: 14px; font-weight: 500; color: var(--text-1); }
+.drop-subtitle { font-size: 12px; color: var(--text-3); margin-top: 6px; }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   STATUS BAR
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.statusbar {
+    height: 28px;
+    background: var(--bg-1);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 20px;
+    font-size: 11px;
+    color: var(--text-3);
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--success);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.hidden { display: none !important; }
+.text-muted { color: var(--text-3); }
+
+/* Scrollbar - Minimal */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-dark); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-4); }
+
+/* Toast */
+.toast-container {
+    position: fixed;
+    bottom: 40px;
+    right: 20px;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.toast {
+    padding: 12px 16px;
+    background: var(--bg-0);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 13px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    animation: slideIn 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toast-icon { font-size: 16px; }
+.toast.success .toast-icon { color: var(--success); }
+.toast.error .toast-icon { color: var(--danger); }
+.toast.info .toast-icon { color: var(--accent); }
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(100%); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* Loading */
+.loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px;
+    color: var(--text-3);
+}
+
+.spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">VA</div>
+            <span class="logo-text">VeritasAutoPlot</span>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">分析</div>
+                <div class="nav-item active" data-view="chart">
+                    <span class="nav-icon">📈</span>
+                    <span>圖表分析</span>
+                </div>
+                <div class="nav-item" data-view="dashboard">
+                    <span class="nav-icon">📊</span>
+                    <span>儀表板</span>
+                </div>
+                <div class="nav-item" data-view="screener">
+                    <span class="nav-icon">🔍</span>
+                    <span>篩選器</span>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">工具</div>
+                <div class="nav-item" onclick="showModal('indicatorModal')">
+                    <span class="nav-icon">📐</span>
+                    <span>技術指標</span>
+                </div>
+                <div class="nav-item" onclick="showModal('drawingModal')">
+                    <span class="nav-icon">✏️</span>
+                    <span>繪圖工具</span>
+                </div>
+                <div class="nav-item" onclick="showModal('alertModal')">
+                    <span class="nav-icon">🔔</span>
+                    <span>警報設定</span>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-title">資料</div>
+                <div class="nav-item" onclick="showModal('dataModal')">
+                    <span class="nav-icon">📂</span>
+                    <span>匯入資料</span>
+                </div>
+                <div class="nav-item" onclick="showModal('dbModal')">
+                    <span class="nav-icon">🗄️</span>
+                    <span>資料庫連線</span>
+                </div>
+                <div class="nav-item" onclick="exportData()">
+                    <span class="nav-icon">📥</span>
+                    <span>匯出</span>
+                </div>
+            </div>
+        </nav>
+        
+        <!-- Data Sources -->
+        <div class="data-sources">
+            <div class="source-title">資料來源</div>
+            <div class="source-item" onclick="showModal('dbModal')">
+                <span class="source-dot disconnected" id="dbStatus"></span>
+                <span>PostgreSQL</span>
+            </div>
+            <div class="source-item">
+                <span class="source-dot disconnected"></span>
+                <span>REST API</span>
+            </div>
+            <div class="source-item">
+                <span class="source-dot disconnected"></span>
+                <span>WebSocket</span>
+            </div>
+        </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-title">圖表分析</div>
+            <span class="header-breadcrumb">/ 台股 / 2330.TW</span>
+            
+            <div class="header-actions">
+                <button class="btn" onclick="toggleTheme()">
+                    <span id="themeIcon">🌙</span>
+                </button>
+                <button class="btn btn-outline" onclick="resetChart()">↺ 重置</button>
+                <button class="btn btn-primary" onclick="loadDemo()">載入範例</button>
+            </div>
+        </header>
+        
+        <!-- Chart Wrapper -->
+        <div class="chart-wrapper">
+            <!-- Controls -->
+            <div class="chart-controls">
+                <!-- Symbol Display -->
+                <div class="symbol-display">
+                    <span class="symbol-name" id="symbolName">DEMO</span>
+                    <span class="symbol-price" id="symbolPrice">--</span>
+                    <span class="symbol-change up" id="symbolChange">+0.00%</span>
+                </div>
+                
+                <div class="control-sep"></div>
+                
+                <!-- Timeframe -->
+                <div class="control-group">
+                    <button class="control-btn" data-tf="1m">1m</button>
+                    <button class="control-btn" data-tf="5m">5m</button>
+                    <button class="control-btn" data-tf="15m">15m</button>
+                    <button class="control-btn" data-tf="1H">1H</button>
+                    <button class="control-btn" data-tf="4H">4H</button>
+                    <button class="control-btn active" data-tf="1D">1D</button>
+                    <button class="control-btn" data-tf="1W">1W</button>
+                </div>
+                
+                <div class="control-sep"></div>
+                
+                <!-- Chart Type -->
+                <div class="control-group">
+                    <button class="control-btn" data-type="candlestick" title="K線">🕯️</button>
+                    <button class="control-btn active" data-type="line" title="折線">📈</button>
+                    <button class="control-btn" data-type="area" title="面積">📉</button>
+                    <button class="control-btn" data-type="bar" title="柱狀">📊</button>
+                    <button class="control-btn" data-type="ohlc" title="OHLC">📋</button>
+                </div>
+                
+                <div class="control-sep"></div>
+                
+                <!-- Indicators Tags -->
+                <div class="indicator-tags" id="indicatorTags">
+                    <div class="indicator-tag">
+                        <span class="dot" style="background:var(--seaborn-orange)"></span>
+                        <span>SMA(20)</span>
+                        <span class="remove" onclick="removeIndicator('sma')">×</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Chart -->
+            <div class="chart-main" id="mainChart">
+                <div class="chart-overlay">
+                    <div class="ohlc-item"><span class="ohlc-label">O</span><span class="ohlc-value" id="ohlcO">--</span></div>
+                    <div class="ohlc-item"><span class="ohlc-label">H</span><span class="ohlc-value" id="ohlcH">--</span></div>
+                    <div class="ohlc-item"><span class="ohlc-label">L</span><span class="ohlc-value" id="ohlcL">--</span></div>
+                    <div class="ohlc-item"><span class="ohlc-label">C</span><span class="ohlc-value" id="ohlcC">--</span></div>
+                    <div class="ohlc-item"><span class="ohlc-label">Vol</span><span class="ohlc-value" id="ohlcV">--</span></div>
+                </div>
+            </div>
+            
+            <!-- Sub Panels -->
+            <div class="chart-panels">
+                <div class="chart-panel">
+                    <div class="panel-header">
+                        <span class="panel-title">Volume</span>
+                        <button class="btn btn-sm btn-icon">×</button>
+                    </div>
+                    <div class="panel-chart" id="volumeChart"></div>
+                </div>
+                <div class="chart-panel hidden" id="rsiPanel">
+                    <div class="panel-header">
+                        <span class="panel-title">RSI (14)</span>
+                        <button class="btn btn-sm btn-icon" onclick="hidePanel('rsiPanel')">×</button>
+                    </div>
+                    <div class="panel-chart" id="rsiChart"></div>
+                </div>
+                <div class="chart-panel hidden" id="macdPanel">
+                    <div class="panel-header">
+                        <span class="panel-title">MACD (12,26,9)</span>
+                        <button class="btn btn-sm btn-icon" onclick="hidePanel('macdPanel')">×</button>
+                    </div>
+                    <div class="panel-chart" id="macdChart"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Right Panel -->
+    <aside class="right-panel">
+        <div class="panel-tabs">
+            <button class="panel-tab active" data-panel="indicators">指標</button>
+            <button class="panel-tab" data-panel="style">樣式</button>
+            <button class="panel-tab" data-panel="data">資料</button>
+        </div>
+        
+        <div class="panel-content">
+            <!-- Indicators Panel -->
+            <div id="panelIndicators">
+                <div class="panel-section">
+                    <div class="section-title">趨勢指標</div>
+                    <div class="indicator-list">
+                        <div class="indicator-item active" data-ind="sma" onclick="toggleIndicator('sma')">
+                            <div class="indicator-icon">〰️</div>
+                            <div class="indicator-info">
+                                <div class="indicator-name">SMA</div>
+                                <div class="indicator-desc">簡單移動平均</div>
+                            </div>
+                        </div>
+                        <div class="indicator-item" data-ind="ema" onclick="toggleIndicator('ema')">
+                            <div class="indicator-icon">📈</div>
+                            <div class="indicator-info">
+                                <div class="indicator-name">EMA</div>
+                                <div class="indicator-desc">指數移動平均</div>
+                            </div>
+                        </div>
+                        <div class="indicator-item" data-ind="bollinger" onclick="toggleIndicator('bollinger')">
+                            <div class="indicator-icon">📊</div>
+                            <div class="indicator-info">
+                                <div class="indicator-name">Bollinger Bands</div>
+                                <div class="indicator-desc">布林通道</div>
+                            </div>
+                        </div>
+                        <div class="indicator-item" data-ind="vwap" onclick="toggleIndicator('vwap')">
+                            <div class="indicator-icon">💰</div>
+                            <div class="indicator-info">
+                                <div class="indicator-name">VWAP</div>
+                                <div class="indicator-desc">成交量加權均價</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="panel-section">
+                    <div class="section-title">動量指標</div>
+                    <div class="indicator-list">
+                        <div class="indicator-item" data-ind="rsi" onclick="toggleIndicator('rsi')">
+                            <div class="indicator-icon">📉</div>
+                            <div class="indicator-info">
+                                <div class="indicator-name">RSI</div>
+                                <div class="indicator-desc">相對強弱指標</div>
+                            </div>
+                        </div>
+                        <div class="indicator-item" data-ind="macd" onclick="toggleIndicator('macd')">
+                            <div class="indicator-icon">📶</div>
+                            <div class="indicator-info">
+                                <div class="indicator-name">MACD</div>
+                                <div class="indicator-desc">指數平滑異同移動平均</div>
+                            </div>
+                        </div>
+                        <div class="indicator-item" data-ind="stoch" onclick="toggleIndicator('stoch')">
+                            <div class="indicator-icon">⚡</div>
+                            <div class="indicator-info">
+                                <div class="indicator-name">Stochastic</div>
+                                <div class="indicator-desc">隨機指標 KD</div>
+                            </div>
+                        </div>
+                        <div class="indicator-item" data-ind="atr" onclick="toggleIndicator('atr')">
+                            <div class="indicator-icon">📏</div>
+                            <div class="indicator-info">
+                                <div class="indicator-name">ATR</div>
+                                <div class="indicator-desc">平均真實範圍</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Style Panel -->
+            <div id="panelStyle" class="hidden">
+                <div class="panel-section">
+                    <div class="section-title">主題</div>
+                    <div class="form-group">
+                        <select class="form-select" id="themeSelect" onchange="setTheme(this.value)">
+                            <option value="light">淺色模式</option>
+                            <option value="dark">深色模式</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="panel-section">
+                    <div class="section-title">顯示選項</div>
+                    <div class="toggle-row">
+                        <span class="toggle-label">網格線</span>
+                        <div class="toggle active" id="toggleGrid" onclick="toggleSetting('grid')"></div>
+                    </div>
+                    <div class="toggle-row">
+                        <span class="toggle-label">對數刻度</span>
+                        <div class="toggle" id="toggleLog" onclick="toggleSetting('log')"></div>
+                    </div>
+                    <div class="toggle-row">
+                        <span class="toggle-label">自動縮放</span>
+                        <div class="toggle active" id="toggleAuto" onclick="toggleSetting('auto')"></div>
+                    </div>
+                    <div class="toggle-row">
+                        <span class="toggle-label">十字準線</span>
+                        <div class="toggle active" id="toggleCross" onclick="toggleSetting('cross')"></div>
+                    </div>
+                </div>
+                
+                <div class="panel-section">
+                    <div class="section-title">K線顏色</div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">上漲</label>
+                            <input type="color" class="form-input" value="#26A69A" id="colorUp" onchange="updateColors()">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">下跌</label>
+                            <input type="color" class="form-input" value="#EF5350" id="colorDown" onchange="updateColors()">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="panel-section">
+                    <div class="section-title">Seaborn 配色</div>
+                    <div class="color-picker" id="seabornPalette">
+                        <!-- Generated by JS -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Data Panel -->
+            <div id="panelData" class="hidden">
+                <div class="panel-section">
+                    <div class="section-title">當前資料</div>
+                    <div class="form-group">
+                        <label class="form-label">資料點數</label>
+                        <input type="text" class="form-input" id="dataCount" value="0" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">時間範圍</label>
+                        <input type="text" class="form-input" id="dataRange" value="--" readonly>
+                    </div>
+                </div>
+                
+                <div class="panel-section">
+                    <div class="section-title">資料來源</div>
+                    <button class="btn btn-outline" style="width:100%;justify-content:center;" onclick="showModal('dataModal')">
+                        📂 匯入檔案
+                    </button>
+                    <button class="btn btn-outline" style="width:100%;justify-content:center;margin-top:8px;" onclick="showModal('dbModal')">
+                        🗄️ 資料庫連線
+                    </button>
+                </div>
+                
+                <div class="panel-section">
+                    <div class="section-title">匯出</div>
+                    <button class="btn btn-outline" style="width:100%;justify-content:center;" onclick="exportChart()">
+                        📥 匯出圖表 PNG
+                    </button>
+                    <button class="btn btn-outline" style="width:100%;justify-content:center;margin-top:8px;" onclick="exportCSV()">
+                        📄 匯出資料 CSV
+                    </button>
+                </div>
+            </div>
+        </div>
+    </aside>
+</div>
+
+<!-- Status Bar -->
+<div class="statusbar">
+    <div class="status-item">
+        <span class="status-dot"></span>
+        <span>Ready</span>
+    </div>
+    <div class="status-item" id="statusPoints">資料點: 0</div>
+    <div class="status-item" id="statusZoom">縮放: 100%</div>
+    <div class="status-item" style="margin-left:auto;">VeritasAutoPlot v3.0</div>
+</div>
+
+<!-- Database Connection Modal -->
+<div class="modal-overlay" id="dbModal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title">🗄️ 資料庫連線</div>
+            <button class="modal-close" onclick="closeModal('dbModal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="db-options">
+                <div class="db-option active" data-db="postgres">
+                    <div class="db-icon">🐘</div>
+                    <div class="db-name">PostgreSQL</div>
+                    <div class="db-desc">關聯式資料庫</div>
+                </div>
+                <div class="db-option" data-db="mysql">
+                    <div class="db-icon">🐬</div>
+                    <div class="db-name">MySQL</div>
+                    <div class="db-desc">關聯式資料庫</div>
+                </div>
+                <div class="db-option" data-db="sqlite">
+                    <div class="db-icon">📦</div>
+                    <div class="db-name">SQLite</div>
+                    <div class="db-desc">輕量級資料庫</div>
+                </div>
+                <div class="db-option" data-db="mongodb">
+                    <div class="db-icon">🍃</div>
+                    <div class="db-name">MongoDB</div>
+                    <div class="db-desc">文件資料庫</div>
+                </div>
+                <div class="db-option" data-db="api">
+                    <div class="db-icon">🌐</div>
+                    <div class="db-name">REST API</div>
+                    <div class="db-desc">HTTP 端點</div>
+                </div>
+                <div class="db-option" data-db="websocket">
+                    <div class="db-icon">⚡</div>
+                    <div class="db-name">WebSocket</div>
+                    <div class="db-desc">即時串流</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">連線字串 / URL</label>
+                <input type="text" class="form-input" id="dbConnStr" placeholder="postgresql://user:pass@host:5432/dbname">
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">資料表 / Collection</label>
+                    <input type="text" class="form-input" id="dbTable" placeholder="stock_prices">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">查詢條件</label>
+                    <input type="text" class="form-input" id="dbQuery" placeholder="symbol = '2330'">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">欄位對應</label>
+                <div class="form-row">
+                    <input type="text" class="form-input" placeholder="date" id="colDate">
+                    <input type="text" class="form-input" placeholder="open" id="colOpen">
+                    <input type="text" class="form-input" placeholder="high" id="colHigh">
+                    <input type="text" class="form-input" placeholder="low" id="colLow">
+                    <input type="text" class="form-input" placeholder="close" id="colClose">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" onclick="closeModal('dbModal')">取消</button>
+            <button class="btn btn-outline" onclick="testConnection()">測試連線</button>
+            <button class="btn btn-primary" onclick="connectDB()">連線</button>
+        </div>
+    </div>
+</div>
+
+<!-- Data Import Modal -->
+<div class="modal-overlay" id="dataModal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title">📂 匯入資料</div>
+            <button class="modal-close" onclick="closeModal('dataModal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="drop-zone" id="dropZone">
+                <div class="drop-icon">📁</div>
+                <div class="drop-title">拖放檔案至此</div>
+                <div class="drop-subtitle">支援 CSV, Excel (.xlsx), JSON, Parquet</div>
+            </div>
+            <input type="file" id="fileInput" accept=".csv,.xlsx,.xls,.json,.parquet" hidden>
+            
+            <div class="form-group" style="margin-top:16px;">
+                <label class="form-label">或貼上資料 (CSV 格式)</label>
+                <textarea class="form-input" id="pasteData" rows="4" placeholder="Date,Open,High,Low,Close,Volume
+2024-01-01,100,105,99,103,1000000"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn" onclick="closeModal('dataModal')">取消</button>
+            <button class="btn btn-primary" onclick="importPasted()">匯入</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// VERITAS AUTOPLOT - CORE ENGINE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const APP = {
+    data: null,
+    chartType: 'line',
+    timeframe: '1D',
+    theme: 'light',
+    indicators: new Set(['sma']),
+    settings: {
+        grid: true,
+        log: false,
+        auto: true,
+        cross: true,
+        colorUp: '#26A69A',
+        colorDown: '#EF5350'
+    },
+    db: {
+        type: 'postgres',
+        connected: false
+    }
+};
+
+// Seaborn Color Palette
+const SEABORN = {
+    deep: ['#4C72B0', '#DD8452', '#55A868', '#C44E52', '#8172B3', '#937860', '#DA8BC3', '#8C8C8C', '#CCB974', '#64B5CD'],
+    muted: ['#4878D0', '#EE854A', '#6ACC64', '#D65F5F', '#956CB4', '#8C613C', '#DC7EC0', '#797979', '#D5BB67', '#82C6E2'],
+    pastel: ['#A1C9F4', '#FFB482', '#8DE5A1', '#FF9F9B', '#D0BBFF', '#DEBB9B', '#FAB0E4', '#CFCFCF', '#FFFEA3', '#B9F2F0'],
+    colorblind: ['#0173B2', '#DE8F05', '#029E73', '#D55E00', '#CC78BC', '#CA9161', '#FBAFE4', '#949494', '#ECE133', '#56B4E9']
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INITIALIZATION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', () => {
+    initEventListeners();
+    initDropZone();
+    initSeabornPalette();
+    loadDemo();
+});
+
+function initEventListeners() {
+    // Timeframe buttons
+    document.querySelectorAll('[data-tf]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-tf]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            APP.timeframe = btn.dataset.tf;
+            toast('info', `時間週期: ${APP.timeframe}`);
+        });
+    });
+    
+    // Chart type buttons
+    document.querySelectorAll('[data-type]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('[data-type]').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            APP.chartType = btn.dataset.type;
+            renderChart();
+        });
+    });
+    
+    // Panel tabs
+    document.querySelectorAll('.panel-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            ['panelIndicators', 'panelStyle', 'panelData'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            
+            const panelMap = { indicators: 'panelIndicators', style: 'panelStyle', data: 'panelData' };
+            document.getElementById(panelMap[tab.dataset.panel]).classList.remove('hidden');
+        });
+    });
+    
+    // DB options
+    document.querySelectorAll('.db-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+            document.querySelectorAll('.db-option').forEach(o => o.classList.remove('active'));
+            opt.classList.add('active');
+            APP.db.type = opt.dataset.db;
+        });
+    });
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeAllModals();
+    });
+}
+
+function initDropZone() {
+    const dz = document.getElementById('dropZone');
+    const fi = document.getElementById('fileInput');
+    
+    ['dragenter', 'dragover'].forEach(ev => {
+        dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('dragover'); });
+    });
+    ['dragleave', 'drop'].forEach(ev => {
+        dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('dragover'); });
+    });
+    
+    dz.addEventListener('drop', e => {
+        if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+    });
+    
+    dz.addEventListener('click', () => fi.click());
+    fi.addEventListener('change', e => {
+        if (e.target.files.length) handleFile(e.target.files[0]);
+    });
+}
+
+function initSeabornPalette() {
+    const container = document.getElementById('seabornPalette');
+    SEABORN.deep.forEach((color, i) => {
+        const swatch = document.createElement('div');
+        swatch.className = 'color-swatch' + (i === 0 ? ' active' : '');
+        swatch.style.background = color;
+        swatch.title = color;
+        swatch.onclick = () => {
+            document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+            swatch.classList.add('active');
+            toast('info', `主色: ${color}`);
+        };
+        container.appendChild(swatch);
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// DATA HANDLING
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function loadDemo() {
+    const n = 150;
+    const data = { date: [], open: [], high: [], low: [], close: [], volume: [] };
+    let price = 500;
+    const now = new Date();
+    
+    for (let i = n; i >= 0; i--) {
+        const d = new Date(now);
+        d.setDate(d.getDate() - i);
+        
+        const change = (Math.random() - 0.48) * 8;
+        const vol = Math.random() * 2;
+        
+        const o = price;
+        const c = price + change;
+        const h = Math.max(o, c) + Math.random() * vol;
+        const l = Math.min(o, c) - Math.random() * vol;
+        const v = Math.floor(Math.random() * 5000000) + 1000000;
+        
+        data.date.push(d.toISOString().split('T')[0]);
+        data.open.push(+o.toFixed(2));
+        data.high.push(+h.toFixed(2));
+        data.low.push(+l.toFixed(2));
+        data.close.push(+c.toFixed(2));
+        data.volume.push(v);
+        
+        price = c;
+    }
+    
+    APP.data = data;
+    updateUI();
+    renderChart();
+    toast('success', `已載入 ${n+1} 筆範例資料`);
+}
+
+function handleFile(file) {
+    const ext = file.name.split('.').pop().toLowerCase();
+    
+    if (ext === 'csv') {
+        Papa.parse(file, {
+            header: true,
+            dynamicTyping: true,
+            complete: r => parseRows(r.data)
+        });
+    } else if (['xlsx', 'xls'].includes(ext)) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const wb = XLSX.read(e.target.result, { type: 'binary' });
+            const data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+            parseRows(data);
+        };
+        reader.readAsBinaryString(file);
+    } else if (ext === 'json') {
+        const reader = new FileReader();
+        reader.onload = e => {
+            try {
+                const json = JSON.parse(e.target.result);
+                parseRows(Array.isArray(json) ? json : json.data || []);
+            } catch { toast('error', 'JSON 格式錯誤'); }
+        };
+        reader.readAsText(file);
+    }
+    
+    closeModal('dataModal');
+}
+
+function parseRows(rows) {
+    const data = { date: [], open: [], high: [], low: [], close: [], volume: [] };
+    const colMap = {};
+    
+    if (!rows.length) return toast('error', '無資料');
+    
+    Object.keys(rows[0]).forEach(k => {
+        const kl = k.toLowerCase();
+        if (kl.includes('date') || kl.includes('time') || kl === 'd') colMap.date = k;
+        if (kl.includes('open') || kl === 'o') colMap.open = k;
+        if (kl.includes('high') || kl === 'h') colMap.high = k;
+        if (kl.includes('low') || kl === 'l') colMap.low = k;
+        if (kl.includes('close') || kl.includes('price') || kl === 'c') colMap.close = k;
+        if (kl.includes('vol') || kl === 'v') colMap.volume = k;
+    });
+    
+    rows.forEach(r => {
+        if (!r[colMap.date]) return;
+        data.date.push(r[colMap.date]);
+        data.open.push(parseFloat(r[colMap.open]) || 0);
+        data.high.push(parseFloat(r[colMap.high]) || 0);
+        data.low.push(parseFloat(r[colMap.low]) || 0);
+        data.close.push(parseFloat(r[colMap.close || colMap.open]) || 0);
+        data.volume.push(parseFloat(r[colMap.volume]) || 0);
+    });
+    
+    if (data.date.length) {
+        APP.data = data;
+        updateUI();
+        renderChart();
+        toast('success', `已載入 ${data.date.length} 筆資料`);
+    } else {
+        toast('error', '無法解析資料');
+    }
+}
+
+function importPasted() {
+    const text = document.getElementById('pasteData').value.trim();
+    if (!text) return;
+    
+    Papa.parse(text, {
+        header: true,
+        dynamicTyping: true,
+        complete: r => parseRows(r.data)
+    });
+    closeModal('dataModal');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// DATABASE CONNECTION (Simulated)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function testConnection() {
+    toast('info', '測試連線中...');
+    setTimeout(() => {
+        toast('success', '連線測試成功！');
+    }, 1000);
+}
+
+function connectDB() {
+    const connStr = document.getElementById('dbConnStr').value;
+    const table = document.getElementById('dbTable').value;
+    
+    if (!connStr) return toast('error', '請輸入連線字串');
+    
+    toast('info', `連接 ${APP.db.type}...`);
+    
+    // Simulate connection
+    setTimeout(() => {
+        APP.db.connected = true;
+        document.getElementById('dbStatus').classList.remove('disconnected');
+        document.getElementById('dbStatus').classList.add('connected');
+        toast('success', `已連接 ${APP.db.type}`);
+        closeModal('dbModal');
+        
+        // Load demo data as simulated DB result
+        loadDemo();
+    }, 1500);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CHART RENDERING
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function renderChart() {
+    if (!APP.data) return;
+    
+    const { date, open, high, low, close, volume } = APP.data;
+    const traces = [];
+    
+    // Main trace
+    if (APP.chartType === 'candlestick') {
+        traces.push({
+            type: 'candlestick',
+            x: date, open, high, low, close,
+            increasing: { line: { color: APP.settings.colorUp }, fillcolor: APP.settings.colorUp },
+            decreasing: { line: { color: APP.settings.colorDown }, fillcolor: APP.settings.colorDown },
+            name: 'OHLC'
+        });
+    } else if (APP.chartType === 'ohlc') {
+        traces.push({
+            type: 'ohlc',
+            x: date, open, high, low, close,
+            increasing: { line: { color: APP.settings.colorUp } },
+            decreasing: { line: { color: APP.settings.colorDown } },
+            name: 'OHLC'
+        });
+    } else if (APP.chartType === 'area') {
+        traces.push({
+            type: 'scatter', mode: 'lines', x: date, y: close,
+            fill: 'tozeroy', fillcolor: 'rgba(76,114,176,0.15)',
+            line: { color: SEABORN.deep[0], width: 2 },
+            name: 'Close'
+        });
+    } else if (APP.chartType === 'bar') {
+        traces.push({
+            type: 'bar', x: date, y: close,
+            marker: { color: close.map((c, i) => c >= open[i] ? APP.settings.colorUp : APP.settings.colorDown) },
+            name: 'Close'
+        });
+    } else {
+        traces.push({
+            type: 'scatter', mode: 'lines', x: date, y: close,
+            line: { color: SEABORN.deep[0], width: 2 },
+            name: 'Close'
+        });
+    }
+    
+    // Indicators
+    if (APP.indicators.has('sma')) {
+        traces.push({
+            type: 'scatter', mode: 'lines', x: date,
+            y: calcSMA(close, 20),
+            line: { color: SEABORN.deep[1], width: 1.5, dash: 'dot' },
+            name: 'SMA(20)'
+        });
+    }
+    
+    if (APP.indicators.has('ema')) {
+        traces.push({
+            type: 'scatter', mode: 'lines', x: date,
+            y: calcEMA(close, 20),
+            line: { color: SEABORN.deep[4], width: 1.5 },
+            name: 'EMA(20)'
+        });
+    }
+    
+    if (APP.indicators.has('bollinger')) {
+        const bb = calcBollinger(close, 20, 2);
+        traces.push(
+            { type: 'scatter', mode: 'lines', x: date, y: bb.upper, line: { color: SEABORN.deep[9], width: 1, dash: 'dot' }, name: 'BB Upper' },
+            { type: 'scatter', mode: 'lines', x: date, y: bb.middle, line: { color: SEABORN.deep[9], width: 1 }, name: 'BB Middle' },
+            { type: 'scatter', mode: 'lines', x: date, y: bb.lower, line: { color: SEABORN.deep[9], width: 1, dash: 'dot' }, name: 'BB Lower', fill: 'tonexty', fillcolor: 'rgba(100,181,205,0.1)' }
+        );
+    }
+    
+    if (APP.indicators.has('vwap')) {
+        traces.push({
+            type: 'scatter', mode: 'lines', x: date,
+            y: calcVWAP(close, volume),
+            line: { color: SEABORN.deep[5], width: 1.5 },
+            name: 'VWAP'
+        });
+    }
+    
+    const layout = {
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        margin: { t: 30, r: 60, b: 40, l: 60 },
+        font: { family: 'Inter, sans-serif', size: 11, color: getCSS('--text-2') },
+        xaxis: {
+            type: 'date',
+            gridcolor: APP.settings.grid ? getCSS('--border') : 'transparent',
+            linecolor: getCSS('--border'),
+            rangeslider: { visible: false },
+            showspikes: APP.settings.cross,
+            spikemode: 'across',
+            spikethickness: 1,
+            spikecolor: getCSS('--text-3')
+        },
+        yaxis: {
+            type: APP.settings.log ? 'log' : 'linear',
+            gridcolor: APP.settings.grid ? getCSS('--border') : 'transparent',
+            linecolor: getCSS('--border'),
+            side: 'right',
+            autorange: APP.settings.auto,
+            showspikes: APP.settings.cross,
+            spikemode: 'across',
+            spikethickness: 1,
+            spikecolor: getCSS('--text-3')
+        },
+        showlegend: true,
+        legend: { orientation: 'h', y: 1.05, x: 0, font: { size: 10 } },
+        hovermode: 'x unified',
+        dragmode: 'zoom'
+    };
+    
+    Plotly.newPlot('mainChart', traces, layout, { responsive: true, displayModeBar: true, displaylogo: false });
+    
+    // Volume
+    renderVolume();
+    
+    // RSI
+    if (APP.indicators.has('rsi')) {
+        document.getElementById('rsiPanel').classList.remove('hidden');
+        renderRSI();
+    } else {
+        document.getElementById('rsiPanel').classList.add('hidden');
+    }
+    
+    // MACD
+    if (APP.indicators.has('macd')) {
+        document.getElementById('macdPanel').classList.remove('hidden');
+        renderMACD();
+    } else {
+        document.getElementById('macdPanel').classList.add('hidden');
+    }
+    
+    // Hover event
+    document.getElementById('mainChart').on('plotly_hover', ev => {
+        if (ev.points?.length) updateOHLC(ev.points[0].pointIndex);
+    });
+}
+
+function renderVolume() {
+    if (!APP.data) return;
+    const { date, open, close, volume } = APP.data;
+    
+    Plotly.newPlot('volumeChart', [{
+        type: 'bar', x: date, y: volume,
+        marker: { color: close.map((c, i) => c >= open[i] ? APP.settings.colorUp : APP.settings.colorDown), opacity: 0.7 },
+        name: 'Volume'
+    }], {
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        margin: { t: 5, r: 60, b: 20, l: 60 },
+        xaxis: { visible: false },
+        yaxis: { gridcolor: getCSS('--border'), side: 'right', tickformat: '.2s' },
+        showlegend: false
+    }, { responsive: true, displayModeBar: false });
+}
+
+function renderRSI() {
+    if (!APP.data) return;
+    const { date, close } = APP.data;
+    const rsi = calcRSI(close, 14);
+    
+    Plotly.newPlot('rsiChart', [
+        { type: 'scatter', mode: 'lines', x: date, y: rsi, line: { color: SEABORN.deep[4], width: 1.5 }, name: 'RSI' },
+        { type: 'scatter', mode: 'lines', x: date, y: Array(date.length).fill(70), line: { color: 'rgba(196,78,82,0.4)', width: 1, dash: 'dot' } },
+        { type: 'scatter', mode: 'lines', x: date, y: Array(date.length).fill(30), line: { color: 'rgba(85,168,104,0.4)', width: 1, dash: 'dot' } }
+    ], {
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        margin: { t: 5, r: 60, b: 20, l: 60 },
+        xaxis: { visible: false },
+        yaxis: { range: [0, 100], side: 'right', gridcolor: getCSS('--border') },
+        showlegend: false
+    }, { responsive: true, displayModeBar: false });
+}
+
+function renderMACD() {
+    if (!APP.data) return;
+    const { date, close } = APP.data;
+    const { macd, signal, histogram } = calcMACD(close);
+    
+    Plotly.newPlot('macdChart', [
+        { type: 'bar', x: date, y: histogram, marker: { color: histogram.map(h => h >= 0 ? APP.settings.colorUp : APP.settings.colorDown) }, name: 'Histogram' },
+        { type: 'scatter', mode: 'lines', x: date, y: macd, line: { color: SEABORN.deep[0], width: 1.5 }, name: 'MACD' },
+        { type: 'scatter', mode: 'lines', x: date, y: signal, line: { color: SEABORN.deep[1], width: 1.5 }, name: 'Signal' }
+    ], {
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        margin: { t: 5, r: 60, b: 20, l: 60 },
+        xaxis: { visible: false },
+        yaxis: { side: 'right', gridcolor: getCSS('--border') },
+        showlegend: false
+    }, { responsive: true, displayModeBar: false });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TECHNICAL INDICATORS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function calcSMA(data, period) {
+    return data.map((_, i) => i < period - 1 ? null : data.slice(i - period + 1, i + 1).reduce((a, b) => a + b, 0) / period);
+}
+
+function calcEMA(data, period) {
+    const k = 2 / (period + 1);
+    const result = [data[0]];
+    for (let i = 1; i < data.length; i++) result.push(data[i] * k + result[i - 1] * (1 - k));
+    return result;
+}
+
+function calcBollinger(data, period = 20, stdDev = 2) {
+    const middle = calcSMA(data, period);
+    const upper = [], lower = [];
+    for (let i = 0; i < data.length; i++) {
+        if (i < period - 1) { upper.push(null); lower.push(null); continue; }
+        const slice = data.slice(i - period + 1, i + 1);
+        const mean = slice.reduce((a, b) => a + b, 0) / slice.length;
+        const std = Math.sqrt(slice.reduce((s, v) => s + (v - mean) ** 2, 0) / slice.length);
+        upper.push(mean + stdDev * std);
+        lower.push(mean - stdDev * std);
+    }
+    return { upper, middle, lower };
+}
+
+function calcVWAP(close, volume) {
+    let cumPV = 0, cumV = 0;
+    return close.map((c, i) => {
+        cumPV += c * volume[i];
+        cumV += volume[i];
+        return cumV ? cumPV / cumV : c;
+    });
+}
+
+function calcRSI(data, period = 14) {
+    const changes = data.slice(1).map((v, i) => v - data[i]);
+    const gains = changes.map(c => c > 0 ? c : 0);
+    const losses = changes.map(c => c < 0 ? -c : 0);
+    
+    let avgGain = gains.slice(0, period).reduce((a, b) => a + b, 0) / period;
+    let avgLoss = losses.slice(0, period).reduce((a, b) => a + b, 0) / period;
+    
+    const rsi = new Array(period + 1).fill(null);
+    for (let i = period; i < data.length; i++) {
+        avgGain = (avgGain * (period - 1) + gains[i - 1]) / period;
+        avgLoss = (avgLoss * (period - 1) + losses[i - 1]) / period;
+        rsi.push(avgLoss === 0 ? 100 : 100 - 100 / (1 + avgGain / avgLoss));
+    }
+    return rsi;
+}
+
+function calcMACD(data, fast = 12, slow = 26, signal = 9) {
+    const emaFast = calcEMA(data, fast);
+    const emaSlow = calcEMA(data, slow);
+    const macd = emaFast.map((v, i) => v - emaSlow[i]);
+    const signalLine = calcEMA(macd, signal);
+    const histogram = macd.map((v, i) => v - signalLine[i]);
+    return { macd, signal: signalLine, histogram };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// UI FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function updateUI() {
+    if (!APP.data) return;
+    const { date, close } = APP.data;
+    const last = close[close.length - 1];
+    const prev = close[close.length - 2] || last;
+    const change = (last - prev) / prev * 100;
+    
+    document.getElementById('symbolPrice').textContent = last.toFixed(2);
+    const changeEl = document.getElementById('symbolChange');
+    changeEl.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
+    changeEl.className = `symbol-change ${change >= 0 ? 'up' : 'down'}`;
+    
+    document.getElementById('statusPoints').textContent = `資料點: ${date.length}`;
+    document.getElementById('dataCount').value = date.length;
+    document.getElementById('dataRange').value = `${date[0]} ~ ${date[date.length - 1]}`;
+    
+    updateIndicatorTags();
+}
+
+function updateOHLC(idx) {
+    if (!APP.data) return;
+    const { open, high, low, close, volume } = APP.data;
+    const c = close[idx], o = open[idx];
+    
+    document.getElementById('ohlcO').textContent = o?.toFixed(2) || '--';
+    document.getElementById('ohlcH').textContent = high[idx]?.toFixed(2) || '--';
+    document.getElementById('ohlcL').textContent = low[idx]?.toFixed(2) || '--';
+    document.getElementById('ohlcC').textContent = c?.toFixed(2) || '--';
+    document.getElementById('ohlcV').textContent = volume[idx]?.toLocaleString() || '--';
+    document.getElementById('ohlcC').className = `ohlc-value ${c >= o ? 'up' : 'down'}`;
+}
+
+function updateIndicatorTags() {
+    const container = document.getElementById('indicatorTags');
+    container.innerHTML = '';
+    const colors = { sma: SEABORN.deep[1], ema: SEABORN.deep[4], bollinger: SEABORN.deep[9], vwap: SEABORN.deep[5], rsi: SEABORN.deep[4], macd: SEABORN.deep[0] };
+    
+    APP.indicators.forEach(ind => {
+        const tag = document.createElement('div');
+        tag.className = 'indicator-tag';
+        tag.innerHTML = `<span class="dot" style="background:${colors[ind] || SEABORN.deep[0]}"></span><span>${ind.toUpperCase()}</span><span class="remove" onclick="removeIndicator('${ind}')">×</span>`;
+        container.appendChild(tag);
+    });
+    
+    document.querySelectorAll('.indicator-item').forEach(item => {
+        item.classList.toggle('active', APP.indicators.has(item.dataset.ind));
+    });
+}
+
+function toggleIndicator(name) {
+    if (APP.indicators.has(name)) APP.indicators.delete(name);
+    else APP.indicators.add(name);
+    updateIndicatorTags();
+    renderChart();
+}
+
+function removeIndicator(name) {
+    APP.indicators.delete(name);
+    updateIndicatorTags();
+    renderChart();
+}
+
+function toggleSetting(key) {
+    APP.settings[key] = !APP.settings[key];
+    const map = { grid: 'toggleGrid', log: 'toggleLog', auto: 'toggleAuto', cross: 'toggleCross' };
+    document.getElementById(map[key]).classList.toggle('active', APP.settings[key]);
+    renderChart();
+}
+
+function updateColors() {
+    APP.settings.colorUp = document.getElementById('colorUp').value;
+    APP.settings.colorDown = document.getElementById('colorDown').value;
+    renderChart();
+}
+
+function hidePanel(id) {
+    document.getElementById(id).classList.add('hidden');
+    const indMap = { rsiPanel: 'rsi', macdPanel: 'macd' };
+    if (indMap[id]) {
+        APP.indicators.delete(indMap[id]);
+        updateIndicatorTags();
+    }
+}
+
+function resetChart() {
+    Plotly.relayout('mainChart', { 'xaxis.autorange': true, 'yaxis.autorange': true });
+    toast('info', '圖表已重置');
+}
+
+// Theme
+function toggleTheme() {
+    setTheme(APP.theme === 'light' ? 'dark' : 'light');
+}
+
+function setTheme(theme) {
+    APP.theme = theme;
+    document.documentElement.setAttribute('data-theme', theme);
+    document.getElementById('themeSelect').value = theme;
+    document.getElementById('themeIcon').textContent = theme === 'dark' ? '☀️' : '🌙';
+    renderChart();
+}
+
+// Export
+function exportChart() {
+    Plotly.downloadImage('mainChart', { format: 'png', width: 1920, height: 1080, filename: 'VeritasAutoPlot' });
+    toast('success', '圖表已匯出');
+}
+
+function exportCSV() {
+    if (!APP.data) return toast('error', '無資料');
+    const { date, open, high, low, close, volume } = APP.data;
+    let csv = 'Date,Open,High,Low,Close,Volume\n';
+    date.forEach((d, i) => csv += `${d},${open[i]},${high[i]},${low[i]},${close[i]},${volume[i]}\n`);
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'data.csv';
+    a.click();
+    toast('success', '資料已匯出');
+}
+
+function exportData() { exportCSV(); }
+
+// Modals
+function showModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function closeAllModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active')); }
+
+// Toast
+function toast(type, msg) {
+    const icons = { success: '✓', error: '✗', info: 'ℹ' };
+    const container = document.getElementById('toastContainer');
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.innerHTML = `<span class="toast-icon">${icons[type]}</span><span>${msg}</span>`;
+    container.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+}
+
+// Utility
+function getCSS(prop) {
+    return getComputedStyle(document.documentElement).getPropertyValue(prop).trim();
+}
+
+</script>
+</body>
+</html>

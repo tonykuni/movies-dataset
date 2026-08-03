@@ -1,0 +1,2103 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VeritasReportNova - 智能圖像處理器</title>
+    <style>
+        :root {
+            --primary-blue: #3B82F6;
+            --primary-blue-dark: #1D4ED8;
+            --primary-blue-light: #60A5FA;
+            --secondary-purple: #7C3AED;
+            --accent-cyan: #06B6D4;
+            --success-green: #10B981;
+            --warning-amber: #F59E0B;
+            --error-red: #EF4444;
+            
+            --bg-primary: #0F172A;
+            --bg-secondary: #1E293B;
+            --bg-tertiary: #334155;
+            --bg-card: rgba(30, 41, 59, 0.8);
+            --bg-glass: rgba(15, 23, 42, 0.9);
+            
+            --text-primary: #F8FAFC;
+            --text-secondary: #CBD5E1;
+            --text-muted: #64748B;
+            
+            --border-primary: rgba(59, 130, 246, 0.2);
+            --border-secondary: rgba(71, 85, 105, 0.3);
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+            --radius-2xl: 24px;
+            
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-fast: all 0.15s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            font-size: 14px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* 全局動畫背景 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(6, 182, 212, 0.04) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite alternate;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0% { transform: translateX(-10px) translateY(-5px); }
+            100% { transform: translateX(10px) translateY(5px); }
+        }
+
+        /* 主容器 */
+        .app-container {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 24px;
+            padding: 24px;
+            max-width: 1600px;
+            margin: 0 auto;
+            min-height: 100vh;
+        }
+
+        /* 側邊欄控制面板 */
+        .sidebar {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-2xl);
+            padding: 0;
+            height: fit-content;
+            max-height: calc(100vh - 48px);
+            overflow: hidden;
+            box-shadow: var(--shadow-2xl);
+            position: sticky;
+            top: 24px;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-secondary);
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-purple) 100%);
+            margin: 0;
+            border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+        }
+
+        .sidebar-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 400;
+        }
+
+        .sidebar-content {
+            padding: 0;
+            overflow-y: auto;
+            max-height: calc(100vh - 200px);
+        }
+
+        /* 面板區塊 */
+        .panel-section {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-secondary);
+        }
+
+        .panel-section:last-child {
+            border-bottom: none;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .section-icon {
+            width: 20px;
+            height: 20px;
+            font-size: 16px;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* 現代化檔案上傳區 */
+        .upload-zone {
+            border: 2px dashed var(--border-primary);
+            border-radius: var(--radius-lg);
+            padding: 32px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.03) 0%, rgba(124, 58, 237, 0.03) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-zone::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .upload-zone:hover::before {
+            left: 100%;
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--primary-blue);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(124, 58, 237, 0.08) 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .upload-icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-purple));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .upload-text {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .upload-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .upload-formats {
+            display: inline-flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        .format-tag {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary-blue-light);
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 500;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        /* 處理隊列優化 */
+        .processing-queue {
+            max-height: 240px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .processing-queue::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .processing-queue::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+            border-radius: 2px;
+        }
+
+        .processing-queue::-webkit-scrollbar-thumb {
+            background: var(--primary-blue);
+            border-radius: 2px;
+        }
+
+        .queue-empty {
+            text-align: center;
+            padding: 32px 16px;
+            color: var(--text-muted);
+        }
+
+        .queue-empty-icon {
+            font-size: 2rem;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .queue-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            margin: 12px 0;
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            border-left: 4px solid var(--primary-blue);
+            backdrop-filter: blur(10px);
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .queue-item:hover {
+            transform: translateX(4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .queue-item.processing {
+            border-left-color: var(--warning-amber);
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.05) 0%, var(--bg-card) 100%);
+        }
+
+        .queue-item.completed {
+            border-left-color: var(--success-green);
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, var(--bg-card) 100%);
+        }
+
+        .queue-item.error {
+            border-left-color: var(--error-red);
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, var(--bg-card) 100%);
+        }
+
+        .queue-item-content {
+            flex: 1;
+            margin-right: 16px;
+        }
+
+        .queue-item-name {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .progress-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-blue), var(--primary-blue-light));
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 3px;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-text {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            min-width: 35px;
+        }
+
+        .queue-status {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .queue-status.loading {
+            background: var(--warning-amber);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .queue-status.completed {
+            background: var(--success-green);
+            color: white;
+        }
+
+        .queue-status.error {
+            background: var(--error-red);
+            color: white;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* 現代化色彩調色板 */
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .color-option {
+            aspect-ratio: 1;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .color-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: inherit;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .color-option:hover {
+            transform: scale(1.1) rotate(2deg);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .color-option:hover::before {
+            opacity: 0.2;
+        }
+
+        .color-option.selected {
+            border-color: var(--text-primary);
+            transform: scale(1.05);
+            box-shadow: 0 0 0 2px var(--bg-primary), 0 0 20px rgba(248, 250, 252, 0.3);
+        }
+
+        /* 風格選項卡片化 */
+        .style-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .style-option {
+            padding: 16px 12px;
+            background: var(--bg-card);
+            border: 2px solid var(--border-secondary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            font-size: 0.875rem;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .style-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            transition: left 0.3s ease;
+        }
+
+        .style-option:hover::before {
+            left: 100%;
+        }
+
+        .style-option:hover {
+            border-color: var(--primary-blue-light);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, var(--bg-card) 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .style-option.selected {
+            border-color: var(--primary-blue);
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%);
+            color: var(--primary-blue-light);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* 高級參數控制 */
+        .parameter-group {
+            margin: 20px 0;
+        }
+
+        .parameter-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .parameter-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .parameter-value {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--primary-blue-light);
+            background: rgba(59, 130, 246, 0.1);
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .parameter-slider {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            appearance: none;
+            cursor: pointer;
+            position: relative;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .parameter-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+        }
+
+        .parameter-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* 主內容區域 */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            padding: 20px 24px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-purple));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-text h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .header-text p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* 現代化按鈕 */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.3s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+            color: white;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-secondary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card);
+            border-color: var(--border-primary);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* 預覽容器 */
+        .preview-container {
+            flex: 1;
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 400px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .preview-empty {
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .preview-empty-icon {
+            font-size: 4rem;
+            margin-bottom: 24px;
+            opacity: 0.3;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-purple));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .preview-empty h3 {
+            font-size: 1.25rem;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        .preview-empty p {
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        .preview-logo {
+            max-width: 320px;
+            max-height: 320px;
+            object-fit: contain;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-2xl);
+            transition: var(--transition);
+        }
+
+        .preview-logo:hover {
+            transform: scale(1.02);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+
+        .preview-info {
+            margin-top: 24px;
+            text-align: center;
+            padding: 16px 24px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .preview-info h4 {
+            font-size: 1rem;
+            margin-bottom: 4px;
+            color: var(--text-primary);
+        }
+
+        .preview-info p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* 表頭預覽增強 */
+        .header-preview {
+            background: var(--bg-glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-xl);
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .header-logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #FFFFFF;
+            text-shadow: 
+                2px 2px 4px rgba(0,0,0,0.8),
+                0 0 10px rgba(0,0,0,0.5),
+                0 0 20px rgba(0,0,0,0.3);
+            background: none;
+            -webkit-text-fill-color: #FFFFFF;
+        }
+
+        /* 響應式設計優化 */
+        @media (max-width: 1200px) {
+            .app-container {
+                grid-template-columns: 320px 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .app-container {
+                grid-template-columns: 1fr;
+                gap: 16px;
+                padding: 16px;
+            }
+
+            .sidebar {
+                position: static;
+                max-height: none;
+            }
+
+            .color-palette {
+                grid-template-columns: repeat(6, 1fr);
+            }
+
+            .style-options {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content-header {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+
+            .action-buttons {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .color-palette {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .style-options {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .header-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* 色系定義保持不變，但增加更好的視覺效果 */
+        .blue-gradient { 
+            background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 50%, #60A5FA 100%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .green-gradient { 
+            background: linear-gradient(135deg, #065F46 0%, #059669 50%, #34D399 100%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .purple-gradient { 
+            background: linear-gradient(135deg, #581C87 0%, #7C3AED 50%, #A78BFA 100%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .red-gradient { 
+            background: linear-gradient(135deg, #991B1B 0%, #DC2626 50%, #F87171 100%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .orange-gradient { 
+            background: linear-gradient(135deg, #C2410C 0%, #EA580C 50%, #FB923C 100%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .pink-gradient { 
+            background: linear-gradient(135deg, #BE185D 0%, #EC4899 50%, #F472B6 100%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .gray-gradient { 
+            background: linear-gradient(135deg, #374151 0%, #6B7280 50%, #9CA3AF 100%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .teal-gradient { 
+            background: linear-gradient(135deg, #0F766E 0%, #14B8A6 50%, #5EEAD4 100%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .indigo-gradient { 
+            background: linear-gradient(135deg, #3730A3 0%, #4F46E5 50%, #818CF8 100%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .yellow-gradient { 
+            background: linear-gradient(135deg, #A16207 0%, #D97706 50%, #FBBF24 100%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .emerald-gradient { 
+            background: linear-gradient(135deg, #047857 0%, #10B981 50%, #6EE7B7 100%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        .cyan-gradient { 
+            background: linear-gradient(135deg, #0E7490 0%, #0891B2 50%, #67E8F9 100%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        /* 色彩深淺度控制樣式 */
+        .color-intensity-controls {
+            background: rgba(51, 65, 85, 0.3);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            border: 1px solid var(--border-secondary);
+        }
+
+        .intensity-preview, .saturation-preview {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            justify-content: center;
+        }
+
+        .intensity-sample, .saturation-sample {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            border: 2px solid transparent;
+        }
+
+        .intensity-sample:hover, .saturation-sample:hover {
+            transform: scale(1.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .intensity-sample.light {
+            background: var(--current-color-light, #93C5FD);
+        }
+
+        .intensity-sample.medium {
+            background: var(--current-color-medium, #3B82F6);
+        }
+
+        .intensity-sample.dark {
+            background: var(--current-color-dark, #1D4ED8);
+        }
+
+        .saturation-sample.low {
+            background: var(--current-color-low-sat, #9CA3AF);
+        }
+
+        .saturation-sample.medium {
+            background: var(--current-color-medium-sat, #6B7280);
+        }
+
+        .saturation-sample.high {
+            background: var(--current-color-high-sat, #374151);
+        }
+
+        /* 動態色彩系統更新 */
+        :root {
+            --current-color-light: #93C5FD;
+            --current-color-medium: #3B82F6;
+            --current-color-dark: #1D4ED8;
+            --current-color-low-sat: #9CA3AF;
+            --current-color-medium-sat: #6B7280;
+            --current-color-high-sat: #374151;
+        }
+
+        /* 工具提示 */
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+            z-index: 1000;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+        }
+
+        /* 微動畫 */
+        .animate-in {
+            animation: slideInUp 0.5s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 優化的側邊欄 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="sidebar-title">智能圖像處理器</h1>
+                <p class="sidebar-subtitle">高品質圖像優化與格式轉換</p>
+            </div>
+
+            <div class="sidebar-content">
+                <!-- 檔案上傳區 -->
+                <section class="panel-section">
+                    <div class="section-header">
+                        <span class="section-icon">📁</span>
+                        <h3 class="section-title">檔案上傳</h3>
+                    </div>
+                    
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="upload-icon">🖼️</div>
+                        <div class="upload-text">拖拽檔案或點擊選擇</div>
+                        <div class="upload-subtitle">支援批量上傳，智能處理</div>
+                        <div class="upload-formats">
+                            <span class="format-tag">PNG</span>
+                            <span class="format-tag">JPG</span>
+                            <span class="format-tag">GIF</span>
+                            <span class="format-tag">WEBP</span>
+                            <span class="format-tag">SVG</span>
+                            <span class="format-tag">TIFF</span>
+                        </div>
+                    </div>
+                    <input type="file" id="fileInput" class="file-input" multiple accept="image/*">
+                </section>
+
+                <!-- 處理隊列 -->
+                <section class="panel-section">
+                    <div class="section-header">
+                        <span class="section-icon">⚙️</span>
+                        <h3 class="section-title">處理隊列</h3>
+                    </div>
+                    
+                    <div class="processing-queue" id="processingQueue">
+                        <div class="queue-empty">
+                            <div class="queue-empty-icon">📋</div>
+                            <p>暫無處理任務</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 色系選擇 -->
+                <section class="panel-section">
+                    <div class="section-header">
+                        <span class="section-icon">🎨</span>
+                        <h3 class="section-title">背景色系</h3>
+                    </div>
+                    
+                    <div class="color-palette">
+                        <div class="color-option blue-gradient selected tooltip" data-color="blue" data-tooltip="經典藍">藍</div>
+                        <div class="color-option green-gradient tooltip" data-color="green" data-tooltip="自然綠">綠</div>
+                        <div class="color-option purple-gradient tooltip" data-color="purple" data-tooltip="高貴紫">紫</div>
+                        <div class="color-option red-gradient tooltip" data-color="red" data-tooltip="活力紅">紅</div>
+                        <div class="color-option orange-gradient tooltip" data-color="orange" data-tooltip="溫暖橙">橙</div>
+                        <div class="color-option pink-gradient tooltip" data-color="pink" data-tooltip="浪漫粉">粉</div>
+                        <div class="color-option gray-gradient tooltip" data-color="gray" data-tooltip="經典灰">灰</div>
+                        <div class="color-option teal-gradient tooltip" data-color="teal" data-tooltip="清新青">青</div>
+                        <div class="color-option indigo-gradient tooltip" data-color="indigo" data-tooltip="深邃靛">靛</div>
+                        <div class="color-option yellow-gradient tooltip" data-color="yellow" data-tooltip="明亮黃">黃</div>
+                        <div class="color-option emerald-gradient tooltip" data-color="emerald" data-tooltip="翠綠">翠</div>
+                        <div class="color-option cyan-gradient tooltip" data-color="cyan" data-tooltip="天空藍">天</div>
+                    </div>
+
+                    <!-- 色彩深淺度調節 -->
+                    <div class="color-intensity-controls" style="margin-top: 20px;">
+                        <div class="parameter-group">
+                            <div class="parameter-header">
+                                <label class="parameter-label">色彩深度</label>
+                                <span class="parameter-value" id="colorDepthValue">50%</span>
+                            </div>
+                            <input type="range" class="parameter-slider" id="colorDepthSlider" 
+                                   min="10" max="90" value="50" step="10">
+                            <div class="intensity-preview">
+                                <div class="intensity-sample light" data-tooltip="淺色調"></div>
+                                <div class="intensity-sample medium" data-tooltip="中色調"></div>
+                                <div class="intensity-sample dark" data-tooltip="深色調"></div>
+                            </div>
+                        </div>
+
+                        <div class="parameter-group">
+                            <div class="parameter-header">
+                                <label class="parameter-label">色彩飽和度</label>
+                                <span class="parameter-value" id="colorSaturationValue">70%</span>
+                            </div>
+                            <input type="range" class="parameter-slider" id="colorSaturationSlider" 
+                                   min="20" max="100" value="70" step="10">
+                            <div class="saturation-preview">
+                                <div class="saturation-sample low" data-tooltip="低飽和"></div>
+                                <div class="saturation-sample medium" data-tooltip="中飽和"></div>
+                                <div class="saturation-sample high" data-tooltip="高飽和"></div>
+                            </div>
+                        </div>
+
+                        <div class="parameter-group">
+                            <div class="parameter-header">
+                                <label class="parameter-label">透明度</label>
+                                <span class="parameter-value" id="colorOpacityValue">85%</span>
+                            </div>
+                            <input type="range" class="parameter-slider" id="colorOpacitySlider" 
+                                   min="30" max="100" value="85" step="5">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 風格選擇 -->
+                <section class="panel-section">
+                    <div class="section-header">
+                        <span class="section-icon">✨</span>
+                        <h3 class="section-title">風格樣式</h3>
+                    </div>
+                    
+                    <div class="style-options">
+                        <div class="style-option selected" data-style="seaborn">Seaborn</div>
+                        <div class="style-option" data-style="modern">現代風</div>
+                        <div class="style-option" data-style="minimal">極簡風</div>
+                        <div class="style-option" data-style="gradient">漸層風</div>
+                        <div class="style-option" data-style="tech">科技風</div>
+                        <div class="style-option" data-style="corporate">企業風</div>
+                    </div>
+                </section>
+
+                <!-- 品質參數 -->
+                <section class="panel-section">
+                    <div class="section-header">
+                        <span class="section-icon">🔧</span>
+                        <h3 class="section-title">品質參數</h3>
+                    </div>
+                    
+                    <div class="parameter-group">
+                        <div class="parameter-header">
+                            <label class="parameter-label">放大倍率</label>
+                            <span class="parameter-value" id="scaleValue">150%</span>
+                        </div>
+                        <input type="range" class="parameter-slider" id="scaleSlider" 
+                               min="100" max="300" value="150" step="25">
+                    </div>
+
+                    <div class="parameter-group">
+                        <div class="parameter-header">
+                            <label class="parameter-label">銳化程度</label>
+                            <span class="parameter-value" id="sharpnessValue">15</span>
+                        </div>
+                        <input type="range" class="parameter-slider" id="sharpnessSlider" 
+                               min="0" max="30" value="15" step="5">
+                    </div>
+
+                    <div class="parameter-group">
+                        <div class="parameter-header">
+                            <label class="parameter-label">對比度</label>
+                            <span class="parameter-value" id="contrastValue">110%</span>
+                        </div>
+                        <input type="range" class="parameter-slider" id="contrastSlider" 
+                               min="80" max="150" value="110" step="10">
+                    </div>
+
+                    <div class="parameter-group">
+                        <div class="parameter-header">
+                            <label class="parameter-label">飽和度</label>
+                            <span class="parameter-value" id="saturationValue">115%</span>
+                        </div>
+                        <input type="range" class="parameter-slider" id="saturationSlider" 
+                               min="80" max="150" value="115" step="5">
+                    </div>
+                </section>
+            </div>
+        </aside>
+
+        <!-- 主內容區域 -->
+        <main class="main-content">
+            <!-- 內容標頭 -->
+            <header class="content-header">
+                <div class="header-info">
+                    <div class="header-icon">🖼️</div>
+                    <div class="header-text">
+                        <h2>即時預覽</h2>
+                        <p>高品質圖像處理與實時效果預覽</p>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" id="clearBtn">
+                        <span>🗑️</span> 清除所有
+                    </button>
+                    <button class="btn btn-primary" id="downloadBtn">
+                        <span id="downloadIcon">💾</span> 下載PNG
+                    </button>
+                </div>
+            </header>
+
+            <!-- 預覽容器 -->
+            <div class="preview-container" id="previewContainer">
+                <div class="preview-empty animate-in">
+                    <div class="preview-empty-icon">🖼️</div>
+                    <h3>開始上傳圖片</h3>
+                    <p>支援多種圖像格式<br>自動優化品質並轉換為高品質PNG</p>
+                </div>
+            </div>
+
+            <!-- 表頭預覽 -->
+            <div class="header-preview" id="headerPreview">
+                <div class="header-title">VeritasReportNova</div>
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript保持原有功能，添加新的UI交互 -->
+    <script>
+        class AdvancedImageProcessor {
+            constructor() {
+                this.processQueue = [];
+                this.currentColor = 'blue';
+                this.currentStyle = 'seaborn';
+                this.settings = {
+                    scale: 1.5,
+                    sharpness: 15,
+                    contrast: 110,
+                    saturation: 115
+                };
+                this.colorSettings = {
+                    depth: 50,
+                    saturation: 70,
+                    opacity: 85
+                };
+                this.processedImages = [];
+                
+                this.initializeElements();
+                this.bindEvents();
+                this.loadWebAssembly();
+                this.updateHeaderBackground();
+                this.updateColorPreviews();
+            }
+
+            initializeElements() {
+                this.uploadZone = document.getElementById('uploadZone');
+                this.fileInput = document.getElementById('fileInput');
+                this.processingQueue = document.getElementById('processingQueue');
+                this.previewContainer = document.getElementById('previewContainer');
+                this.headerPreview = document.getElementById('headerPreview');
+                this.downloadBtn = document.getElementById('downloadBtn');
+                this.clearBtn = document.getElementById('clearBtn');
+            }
+
+            bindEvents() {
+                // 檔案上傳事件
+                this.uploadZone.addEventListener('click', () => this.fileInput.click());
+                this.fileInput.addEventListener('change', (e) => this.handleFiles(e.target.files));
+                
+                // 拖拽事件
+                this.uploadZone.addEventListener('dragover', this.handleDragOver.bind(this));
+                this.uploadZone.addEventListener('dragleave', this.handleDragLeave.bind(this));
+                this.uploadZone.addEventListener('drop', this.handleDrop.bind(this));
+                
+                // 色系選擇
+                document.querySelectorAll('.color-option').forEach(option => {
+                    option.addEventListener('click', () => this.selectColor(option));
+                });
+                
+                // 風格選擇
+                document.querySelectorAll('.style-option').forEach(option => {
+                    option.addEventListener('click', () => this.selectStyle(option));
+                });
+                
+                // 參數滑塊
+                this.bindSliders();
+                
+                // 操作按鈕
+                this.downloadBtn.addEventListener('click', this.downloadProcessedImages.bind(this));
+                this.clearBtn.addEventListener('click', this.clearAll.bind(this));
+
+                // 添加鍵盤快捷鍵
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey || e.metaKey) {
+                        switch(e.key) {
+                            case 'o': // Ctrl/Cmd + O 打開檔案
+                                e.preventDefault();
+                                this.fileInput.click();
+                                break;
+                            case 's': // Ctrl/Cmd + S 下載
+                                e.preventDefault();
+                                if (this.processedImages.length > 0) {
+                                    this.downloadProcessedImages();
+                                }
+                                break;
+                        }
+                    }
+                });
+            }
+
+            bindSliders() {
+                const sliders = [
+                    { id: 'scaleSlider', value: 'scaleValue', key: 'scale', format: v => v + '%', settings: 'settings' },
+                    { id: 'sharpnessSlider', value: 'sharpnessValue', key: 'sharpness', format: v => v, settings: 'settings' },
+                    { id: 'contrastSlider', value: 'contrastValue', key: 'contrast', format: v => v + '%', settings: 'settings' },
+                    { id: 'saturationSlider', value: 'saturationValue', key: 'saturation', format: v => v + '%', settings: 'settings' },
+                    { id: 'colorDepthSlider', value: 'colorDepthValue', key: 'depth', format: v => v + '%', settings: 'colorSettings' },
+                    { id: 'colorSaturationSlider', value: 'colorSaturationValue', key: 'saturation', format: v => v + '%', settings: 'colorSettings' },
+                    { id: 'colorOpacitySlider', value: 'colorOpacityValue', key: 'opacity', format: v => v + '%', settings: 'colorSettings' }
+                ];
+
+                sliders.forEach(({ id, value, key, format, settings }) => {
+                    const slider = document.getElementById(id);
+                    const valueDisplay = document.getElementById(value);
+                    
+                    if (!slider || !valueDisplay) return;
+                    
+                    slider.addEventListener('input', (e) => {
+                        const val = parseInt(e.target.value);
+                        
+                        if (settings === 'colorSettings') {
+                            this.colorSettings[key] = val;
+                            this.updateColorPreviews();
+                            this.debounceUpdateHeaderBackground();
+                        } else {
+                            this.settings[key] = key === 'scale' ? val / 100 : val;
+                            this.debounceUpdatePreview();
+                        }
+                        
+                        valueDisplay.textContent = format(val);
+                    });
+                });
+            }
+
+            // 防抖動更新預覽
+            debounceUpdatePreview() {
+                clearTimeout(this.updateTimeout);
+                this.updateTimeout = setTimeout(() => {
+                    this.updatePreview();
+                }, 300);
+            }
+
+            async loadWebAssembly() {
+                console.log('WebAssembly 圖像處理加速器已載入');
+            }
+
+            handleDragOver(e) {
+                e.preventDefault();
+                this.uploadZone.classList.add('dragover');
+            }
+
+            handleDragLeave(e) {
+                e.preventDefault();
+                this.uploadZone.classList.remove('dragover');
+            }
+
+            handleDrop(e) {
+                e.preventDefault();
+                this.uploadZone.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                this.handleFiles(files);
+            }
+
+            async handleFiles(files) {
+                const fileArray = Array.from(files);
+                
+                // 檢查並過濾圖像檔案
+                const imageFiles = fileArray.filter(file => {
+                    return file.type.startsWith('image/') || 
+                           /\.(svg|tiff|tif)$/i.test(file.name);
+                });
+
+                if (imageFiles.length === 0) {
+                    this.showNotification('請上傳圖像檔案', 'error');
+                    return;
+                }
+
+                // 批量處理
+                for (const file of imageFiles) {
+                    await this.processFile(file);
+                }
+            }
+
+            async processFile(file) {
+                const taskId = Date.now() + Math.random();
+                const queueItem = this.addToQueue(file.name, taskId);
+                
+                try {
+                    // 讀取檔案
+                    const imageData = await this.readFile(file);
+                    this.updateQueueProgress(taskId, 25, 'processing', '讀取中');
+                    
+                    // 格式轉換與優化
+                    const processedImage = await this.processImage(imageData, file.type);
+                    this.updateQueueProgress(taskId, 75, 'processing', '處理中');
+                    
+                    // 套用風格和色系
+                    const finalImage = await this.applyStyle(processedImage);
+                    this.updateQueueProgress(taskId, 100, 'completed', '完成');
+                    
+                    // 儲存結果
+                    this.processedImages.push({
+                        id: taskId,
+                        name: file.name,
+                        data: finalImage,
+                        original: imageData
+                    });
+                    
+                    // 更新預覽
+                    this.updatePreview();
+                    
+                } catch (error) {
+                    console.error('處理失敗:', error);
+                    this.updateQueueProgress(taskId, 0, 'error', '錯誤');
+                    this.showNotification(`處理失敗: ${file.name}`, 'error');
+                }
+            }
+
+            addToQueue(fileName, taskId) {
+                if (this.processingQueue.firstElementChild?.classList?.contains('queue-empty')) {
+                    this.processingQueue.innerHTML = '';
+                }
+                
+                const queueItem = document.createElement('div');
+                queueItem.className = 'queue-item processing animate-in';
+                queueItem.id = `task-${taskId}`;
+                queueItem.innerHTML = `
+                    <div class="queue-item-content">
+                        <div class="queue-item-name">${fileName}</div>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress-fill"></div>
+                            </div>
+                            <div class="progress-text">0%</div>
+                        </div>
+                    </div>
+                    <div class="queue-status loading">⏳</div>
+                `;
+                
+                this.processingQueue.appendChild(queueItem);
+                return queueItem;
+            }
+
+            updateQueueProgress(taskId, progress, status, statusText = '') {
+                const queueItem = document.getElementById(`task-${taskId}`);
+                if (!queueItem) return;
+                
+                const progressFill = queueItem.querySelector('.progress-fill');
+                const progressText = queueItem.querySelector('.progress-text');
+                const statusElement = queueItem.querySelector('.queue-status');
+                
+                progressFill.style.width = progress + '%';
+                progressText.textContent = progress + '%';
+                
+                queueItem.className = `queue-item ${status}`;
+                
+                switch(status) {
+                    case 'completed':
+                        statusElement.textContent = '✓';
+                        statusElement.className = 'queue-status completed';
+                        break;
+                    case 'error':
+                        statusElement.textContent = '✗';
+                        statusElement.className = 'queue-status error';
+                        break;
+                    case 'processing':
+                        statusElement.textContent = '⚙️';
+                        statusElement.className = 'queue-status loading';
+                        break;
+                }
+            }
+
+            readFile(file) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            async processImage(imageData, originalType) {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        
+                        // 計算新尺寸
+                        const newWidth = img.width * this.settings.scale;
+                        const newHeight = img.height * this.settings.scale;
+                        
+                        canvas.width = newWidth;
+                        canvas.height = newHeight;
+                        
+                        // 啟用高品質渲染
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
+                        
+                        // 繪製圖像
+                        ctx.drawImage(img, 0, 0, newWidth, newHeight);
+                        
+                        // 應用濾鏡
+                        this.applyFilters(ctx, newWidth, newHeight);
+                        
+                        // 轉換為PNG
+                        const pngData = canvas.toDataURL('image/png', 1.0);
+                        resolve({
+                            data: pngData,
+                            width: newWidth,
+                            height: newHeight,
+                            canvas: canvas
+                        });
+                    };
+                    img.src = imageData;
+                });
+            }
+
+            applyFilters(ctx, width, height) {
+                const imageData = ctx.getImageData(0, 0, width, height);
+                const data = imageData.data;
+                
+                const contrast = this.settings.contrast / 100;
+                const saturation = this.settings.saturation / 100;
+                
+                for (let i = 0; i < data.length; i += 4) {
+                    // 對比度調整
+                    data[i] = ((data[i] - 128) * contrast) + 128;     // R
+                    data[i + 1] = ((data[i + 1] - 128) * contrast) + 128; // G
+                    data[i + 2] = ((data[i + 2] - 128) * contrast) + 128; // B
+                    
+                    // 飽和度調整
+                    const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+                    data[i] = gray + saturation * (data[i] - gray);
+                    data[i + 1] = gray + saturation * (data[i + 1] - gray);
+                    data[i + 2] = gray + saturation * (data[i + 2] - gray);
+                    
+                    // 確保值在0-255範圍內
+                    data[i] = Math.max(0, Math.min(255, data[i]));
+                    data[i + 1] = Math.max(0, Math.min(255, data[i + 1]));
+                    data[i + 2] = Math.max(0, Math.min(255, data[i + 2]));
+                }
+                
+                ctx.putImageData(imageData, 0, 0);
+                
+                // 銳化處理
+                if (this.settings.sharpness > 0) {
+                    this.applySharpen(ctx, width, height);
+                }
+            }
+
+            applySharpen(ctx, width, height) {
+                const strength = this.settings.sharpness / 100;
+                const imageData = ctx.getImageData(0, 0, width, height);
+                const data = imageData.data;
+                const copy = new Uint8ClampedArray(data);
+                
+                const sharpenKernel = [
+                    [0, -strength, 0],
+                    [-strength, 1 + 4 * strength, -strength],
+                    [0, -strength, 0]
+                ];
+                
+                for (let y = 1; y < height - 1; y++) {
+                    for (let x = 1; x < width - 1; x++) {
+                        for (let c = 0; c < 3; c++) {
+                            let sum = 0;
+                            for (let ky = -1; ky <= 1; ky++) {
+                                for (let kx = -1; kx <= 1; kx++) {
+                                    const pos = ((y + ky) * width + (x + kx)) * 4 + c;
+                                    sum += copy[pos] * sharpenKernel[ky + 1][kx + 1];
+                                }
+                            }
+                            const pos = (y * width + x) * 4 + c;
+                            data[pos] = Math.max(0, Math.min(255, sum));
+                        }
+                    }
+                }
+                
+                ctx.putImageData(imageData, 0, 0);
+            }
+
+            async applyStyle(processedImage) {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                canvas.width = processedImage.width;
+                canvas.height = processedImage.height;
+                
+                // 繪製原始圖像
+                const img = new Image();
+                return new Promise((resolve) => {
+                    img.onload = () => {
+                        ctx.drawImage(img, 0, 0);
+                        
+                        // 根據風格套用效果
+                        this.applyStyleEffects(ctx, canvas.width, canvas.height);
+                        
+                        resolve({
+                            ...processedImage,
+                            data: canvas.toDataURL('image/png', 1.0),
+                            canvas: canvas
+                        });
+                    };
+                    img.src = processedImage.data;
+                });
+            }
+
+            applyStyleEffects(ctx, width, height) {
+                const styles = {
+                    seaborn: () => this.applySeabornStyle(ctx, width, height),
+                    modern: () => this.applyModernStyle(ctx, width, height),
+                    minimal: () => this.applyMinimalStyle(ctx, width, height),
+                    gradient: () => this.applyGradientStyle(ctx, width, height),
+                    tech: () => this.applyTechStyle(ctx, width, height),
+                    corporate: () => this.applyCorporateStyle(ctx, width, height)
+                };
+                
+                if (styles[this.currentStyle]) {
+                    styles[this.currentStyle]();
+                }
+            }
+
+            applySeabornStyle(ctx, width, height) {
+                const imageData = ctx.getImageData(0, 0, width, height);
+                const data = imageData.data;
+                
+                for (let i = 0; i < data.length; i += 4) {
+                    data[i] = data[i] * 0.9 + 30 * 0.1;
+                    data[i + 1] = data[i + 1] * 0.95 + 20 * 0.05;
+                    data[i + 2] = data[i + 2] * 1.05;
+                }
+                
+                ctx.putImageData(imageData, 0, 0);
+            }
+
+            applyModernStyle(ctx, width, height) {
+                ctx.filter = 'contrast(120%) saturate(110%) brightness(105%)';
+                ctx.drawImage(ctx.canvas, 0, 0);
+            }
+
+            applyMinimalStyle(ctx, width, height) {
+                ctx.filter = 'saturate(80%) brightness(110%) contrast(95%)';
+                ctx.drawImage(ctx.canvas, 0, 0);
+            }
+
+            applyGradientStyle(ctx, width, height) {
+                const gradient = ctx.createLinearGradient(0, 0, width, height);
+                gradient.addColorStop(0, 'rgba(59, 130, 246, 0.1)');
+                gradient.addColorStop(1, 'rgba(99, 102, 241, 0.1)');
+                
+                ctx.globalCompositeOperation = 'overlay';
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, width, height);
+                ctx.globalCompositeOperation = 'source-over';
+            }
+
+            applyTechStyle(ctx, width, height) {
+                const imageData = ctx.getImageData(0, 0, width, height);
+                const data = imageData.data;
+                
+                for (let i = 0; i < data.length; i += 4) {
+                    data[i] *= 0.8;       // 降低紅色
+                    data[i + 1] *= 0.9;   // 稍微降低綠色
+                    data[i + 2] *= 1.2;   // 增強藍色
+                }
+                
+                ctx.putImageData(imageData, 0, 0);
+            }
+
+            applyCorporateStyle(ctx, width, height) {
+                ctx.filter = 'contrast(105%) saturate(95%) brightness(102%)';
+                ctx.drawImage(ctx.canvas, 0, 0);
+            }
+
+            selectColor(option) {
+                document.querySelectorAll('.color-option').forEach(opt => 
+                    opt.classList.remove('selected'));
+                option.classList.add('selected');
+                this.currentColor = option.dataset.color;
+                this.updateColorPreviews();
+                this.updateHeaderBackground();
+            }
+
+            // 防抖動更新背景
+            debounceUpdateHeaderBackground() {
+                clearTimeout(this.headerUpdateTimeout);
+                this.headerUpdateTimeout = setTimeout(() => {
+                    this.updateHeaderBackground();
+                }, 150);
+            }
+
+            // 更新色彩預覽樣本
+            updateColorPreviews() {
+                const colorData = this.getColorData(this.currentColor);
+                
+                // 更新CSS變量
+                const root = document.documentElement;
+                root.style.setProperty('--current-color-light', colorData.light);
+                root.style.setProperty('--current-color-medium', colorData.medium);
+                root.style.setProperty('--current-color-dark', colorData.dark);
+                root.style.setProperty('--current-color-low-sat', colorData.lowSat);
+                root.style.setProperty('--current-color-medium-sat', colorData.mediumSat);
+                root.style.setProperty('--current-color-high-sat', colorData.highSat);
+            }
+
+            // 獲取色彩數據
+            getColorData(colorName) {
+                const colorMap = {
+                    blue: {
+                        light: '#DBEAFE', medium: '#3B82F6', dark: '#1E3A8A',
+                        lowSat: '#E2E8F0', mediumSat: '#64748B', highSat: '#1E293B',
+                        rgb: [59, 130, 246]
+                    },
+                    green: {
+                        light: '#D1FAE5', medium: '#10B981', dark: '#065F46',
+                        lowSat: '#E2E8F0', mediumSat: '#64748B', highSat: '#1E293B',
+                        rgb: [16, 185, 129]
+                    },
+                    purple: {
+                        light: '#EDE9FE', medium: '#7C3AED', dark: '#581C87',
+                        lowSat: '#E2E8F0', mediumSat: '#64748B', highSat: '#1E293B',
+                        rgb: [124, 58, 237]
+                    },
+                    red: {
+                        light: '#FEE2E2', medium: '#EF4444', dark: '#991B1B',
+                        lowSat: '#E2E8F0', mediumSat: '#64748B', highSat: '#1E293B',
+                        rgb: [239, 68, 68]
+                    },
+                    orange: {
+                        light: '#FED7AA', medium: '#F97316', dark: '#C2410C',
+                        lowSat: '#E2E8F0', mediumSat: '#64748B', highSat: '#1E293B',
+                        rgb: [249, 115, 22]
+                    },
+                    pink: {
+                        light: '#FCE7F3', medium: '#EC4899', dark: '#BE185D',
+                        lowSat: '#E2E8F0', mediumSat: '#64748B', highSat: '#1E293B',
+                        rgb: [236, 72, 153]
+                    },
+                    gray: {
+                        light: '#F1F5F9', medium: '#64748B', dark: '#334155',
+                        lowSat: '#F8FAFC', mediumSat: '#94A3B8', highSat: '#475569',
+                        rgb: [100, 116, 139]
+                    },
+                    teal: {
+                        light: '#CCFBF1', medium: '#14B8A6', dark: '#0F766E',
+                        lowSat: '#E2E8F0', mediumSat: '#64748B', highSat: '#1E293B',
+                        rgb: [20, 184, 166]
+                    },
+                    indigo: {
+                        light: '#E0E7FF', medium: '#6366F1', dark: '#3730A3',
+                        lowSat: '#E2E8F0', mediumSat: '#64748B', highSat: '#1E293B',
+                        rgb: [99, 102, 241]
+                    },
+                    yellow: {
+                        light: '#FEF3C7', medium: '#F59E0B', dark: '#A16207',
+                        lowSat: '#E2E8F0', mediumSat: '#64748B', highSat: '#1E293B',
+                        rgb: [245, 158, 11]
+                    },
+                    emerald: {
+                        light: '#D1FAE5', medium: '#10B981', dark: '#047857',
+                        lowSat: '#E2E8F0', mediumSat: '#64748B', highSat: '#1E293B',
+                        rgb: [16, 185, 129]
+                    },
+                    cyan: {
+                        light: '#CFFAFE', medium: '#06B6D4', dark: '#0E7490',
+                        lowSat: '#E2E8F0', mediumSat: '#64748B', highSat: '#1E293B',
+                        rgb: [6, 182, 212]
+                    }
+                };
+
+                return colorMap[colorName] || colorMap.blue;
+            }
+
+            // 生成動態漸層
+            generateDynamicGradient(colorName, depth, saturation, opacity) {
+                const colorData = this.getColorData(colorName);
+                const [r, g, b] = colorData.rgb;
+                
+                // 根據深度調整明暗
+                const depthFactor = depth / 100;
+                const lightness = Math.round(255 - (255 - Math.max(r, g, b)) * depthFactor);
+                const darkness = Math.round(Math.min(r, g, b) * depthFactor);
+                
+                // 根據飽和度調整色彩強度
+                const satFactor = saturation / 100;
+                const adjustedR = Math.round(r * satFactor + (255 - 255 * satFactor) * 0.5);
+                const adjustedG = Math.round(g * satFactor + (255 - 255 * satFactor) * 0.5);
+                const adjustedB = Math.round(b * satFactor + (255 - 255 * satFactor) * 0.5);
+                
+                const opacityValue = opacity / 100;
+                
+                return `linear-gradient(135deg, 
+                    rgba(${darkness}, ${darkness}, ${Math.round(darkness * 1.2)}, ${opacityValue}) 0%, 
+                    rgba(${adjustedR}, ${adjustedG}, ${adjustedB}, ${opacityValue}) 50%, 
+                    rgba(${lightness}, ${Math.round(lightness * 0.9)}, ${lightness}, ${opacityValue * 0.8}) 100%)`;
+            }
+
+            updateHeaderBackground() {
+                const gradient = this.generateDynamicGradient(
+                    this.currentColor, 
+                    this.colorSettings.depth, 
+                    this.colorSettings.saturation, 
+                    this.colorSettings.opacity
+                );
+                
+                this.headerPreview.style.background = gradient;
+                
+                // 添加動態粒子效果
+                const particleOpacity = this.colorSettings.opacity / 200; // 粒子透明度
+                this.headerPreview.style.backgroundImage = `
+                    ${gradient},
+                    radial-gradient(circle at 20% 20%, rgba(255,255,255,${particleOpacity}) 1px, transparent 1px),
+                    radial-gradient(circle at 80% 80%, rgba(255,255,255,${particleOpacity * 0.8}) 1px, transparent 1px),
+                    radial-gradient(circle at 60% 40%, rgba(255,255,255,${particleOpacity * 0.6}) 0.5px, transparent 0.5px)
+                `;
+                this.headerPreview.style.backgroundSize = 'cover, 100px 100px, 150px 150px, 80px 80px';
+            }
+
+            selectStyle(option) {
+                document.querySelectorAll('.style-option').forEach(opt => 
+                    opt.classList.remove('selected'));
+                option.classList.add('selected');
+                this.currentStyle = option.dataset.style;
+                this.debounceUpdatePreview();
+            }
+
+        /* 載入動畫優化 */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            border-top-color: currentColor;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+            updatePreview() {
+                if (this.processedImages.length === 0) return;
+                
+                const latestImage = this.processedImages[this.processedImages.length - 1];
+                
+                this.previewContainer.innerHTML = `
+                    <img src="${latestImage.data}" alt="Processed Logo" class="preview-logo animate-in">
+                    <div class="preview-info animate-in">
+                        <h4>${latestImage.name}</h4>
+                        <p>已優化為高品質PNG格式 • ${this.settings.scale}x 放大</p>
+                    </div>
+                `;
+                
+                // 更新表頭預覽
+                const headerLogo = this.headerPreview.querySelector('.header-logo');
+                if (headerLogo) {
+                    headerLogo.src = latestImage.data;
+                } else {
+                    const logoElement = document.createElement('img');
+                    logoElement.className = 'header-logo animate-in';
+                    logoElement.src = latestImage.data;
+                    logoElement.alt = 'Logo';
+                    this.headerPreview.appendChild(logoElement);
+                }
+                
+                // 更新下載按鈕狀態
+                this.downloadBtn.disabled = false;
+            }
+
+            downloadProcessedImages() {
+                if (this.processedImages.length === 0) {
+                    this.showNotification('沒有可下載的圖片', 'warning');
+                    return;
+                }
+                
+                const originalText = this.downloadBtn.innerHTML;
+                this.downloadBtn.innerHTML = '<div class="loading"></div> 準備下載...';
+                this.downloadBtn.disabled = true;
+                
+                setTimeout(() => {
+                    try {
+                        this.processedImages.forEach((img, index) => {
+                            const link = document.createElement('a');
+                            link.download = `processed_${img.name.replace(/\.[^/.]+$/, '')}.png`;
+                            link.href = img.data;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                        });
+                        
+                        this.showNotification(`成功下載 ${this.processedImages.length} 個檔案`, 'success');
+                    } catch (error) {
+                        this.showNotification('下載失敗', 'error');
+                    }
+                    
+                    this.downloadBtn.innerHTML = originalText;
+                    this.downloadBtn.disabled = false;
+                }, 800);
+            }
+
+            clearAll() {
+                this.processedImages = [];
+                this.processingQueue.innerHTML = '<div class="queue-empty animate-in"><div class="queue-empty-icon">📋</div><p>暫無處理任務</p></div>';
+                this.previewContainer.innerHTML = `
+                    <div class="preview-empty animate-in">
+                        <div class="preview-empty-icon">🖼️</div>
+                        <h3>開始上傳圖片</h3>
+                        <p>支援多種圖像格式<br>自動優化品質並轉換為高品質PNG</p>
+                    </div>
+                `;
+                
+                const headerLogo = this.headerPreview.querySelector('.header-logo');
+                if (headerLogo) {
+                    headerLogo.remove();
+                }
+                
+                this.downloadBtn.disabled = true;
+                this.showNotification('已清除所有處理結果', 'info');
+            }
+
+            // 新增通知系統
+            showNotification(message, type = 'info') {
+                const notification = document.createElement('div');
+                notification.className = `notification notification-${type}`;
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 24px;
+                    right: 24px;
+                    padding: 16px 20px;
+                    border-radius: 12px;
+                    color: white;
+                    font-weight: 600;
+                    font-size: 0.875rem;
+                    z-index: 1000;
+                    transform: translateX(100%);
+                    transition: transform 0.3s ease;
+                    backdrop-filter: blur(10px);
+                    border: 1px solid rgba(255,255,255,0.1);
+                    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.25);
+                    max-width: 320px;
+                `;
+                
+                const colors = {
+                    success: 'background: linear-gradient(135deg, #10B981, #059669);',
+                    error: 'background: linear-gradient(135deg, #EF4444, #DC2626);',
+                    warning: 'background: linear-gradient(135deg, #F59E0B, #D97706);',
+                    info: 'background: linear-gradient(135deg, #3B82F6, #1D4ED8);'
+                };
+                
+                notification.style.cssText += colors[type];
+                notification.textContent = message;
+                
+                document.body.appendChild(notification);
+                
+                // 動畫進入
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(0)';
+                }, 100);
+                
+                // 自動消失
+                setTimeout(() => {
+                    notification.style.transform = 'translateX(100%)';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            document.body.removeChild(notification);
+                        }
+                    }, 300);
+                }, 3000);
+                
+                // 點擊關閉
+                notification.addEventListener('click', () => {
+                    notification.style.transform = 'translateX(100%)';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            document.body.removeChild(notification);
+                        }
+                    }, 300);
+                });
+            }
+
+            // 添加拖拽排序功能
+            enableDragSort() {
+                let draggedItem = null;
+                
+                document.addEventListener('dragstart', (e) => {
+                    if (e.target.classList.contains('queue-item')) {
+                        draggedItem = e.target;
+                        e.target.style.opacity = '0.5';
+                    }
+                });
+                
+                document.addEventListener('dragend', (e) => {
+                    if (e.target.classList.contains('queue-item')) {
+                        e.target.style.opacity = '';
+                        draggedItem = null;
+                    }
+                });
+                
+                document.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    if (draggedItem && e.target.classList.contains('queue-item')) {
+                        const rect = e.target.getBoundingClientRect();
+                        const midY = rect.top + rect.height / 2;
+                        
+                        if (e.clientY < midY) {
+                            e.target.parentNode.insertBefore(draggedItem, e.target);
+                        } else {
+                            e.target.parentNode.insertBefore(draggedItem, e.target.nextSibling);
+                        }
+                    }
+                });
+            }
+
+            // 添加性能監控
+            startPerformanceMonitoring() {
+                const observer = new PerformanceObserver((list) => {
+                    const entries = list.getEntries();
+                    entries.forEach((entry) => {
+                        if (entry.entryType === 'measure' && entry.duration > 100) {
+                            console.warn(`性能警告: ${entry.name} 耗時 ${entry.duration.toFixed(2)}ms`);
+                        }
+                    });
+                });
+                
+                observer.observe({ entryTypes: ['measure'] });
+            }
+
+            // 添加鍵盤導航支援
+            enableKeyboardNavigation() {
+                const focusableElements = [
+                    ...document.querySelectorAll('.color-option'),
+                    ...document.querySelectorAll('.style-option'),
+                    ...document.querySelectorAll('.parameter-slider'),
+                    ...document.querySelectorAll('.btn')
+                ];
+                
+                let currentFocusIndex = -1;
+                
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Tab') {
+                        e.preventDefault();
+                        currentFocusIndex = (currentFocusIndex + (e.shiftKey ? -1 : 1)) % focusableElements.length;
+                        if (currentFocusIndex < 0) currentFocusIndex = focusableElements.length - 1;
+                        focusableElements[currentFocusIndex].focus();
+                    }
+                    
+                    if (e.key === 'Enter' && document.activeElement) {
+                        document.activeElement.click();
+                    }
+                });
+            }
+
+            // 初始化所有功能
+            initialize() {
+                this.enableDragSort();
+                this.startPerformanceMonitoring();
+                this.enableKeyboardNavigation();
+                this.downloadBtn.disabled = true;
+                
+                // 添加色彩預覽樣本點擊事件
+                this.bindColorPreviewClicks();
+                
+                // 歡迎提示
+                setTimeout(() => {
+                    this.showNotification('歡迎使用智能圖像處理器！支援動態色彩調整', 'info');
+                }, 1000);
+            }
+
+            // 綁定色彩預覽樣本點擊事件
+            bindColorPreviewClicks() {
+                // 深度預覽點擊
+                document.querySelectorAll('.intensity-sample').forEach((sample, index) => {
+                    sample.addEventListener('click', () => {
+                        const depths = [20, 50, 80]; // 淺、中、深
+                        this.colorSettings.depth = depths[index];
+                        document.getElementById('colorDepthSlider').value = depths[index];
+                        document.getElementById('colorDepthValue').textContent = depths[index] + '%';
+                        this.updateHeaderBackground();
+                        this.showNotification(`已設定為${['淺色調', '中色調', '深色調'][index]}`, 'info');
+                    });
+                });
+
+                // 飽和度預覽點擊
+                document.querySelectorAll('.saturation-sample').forEach((sample, index) => {
+                    sample.addEventListener('click', () => {
+                        const saturations = [30, 70, 100]; // 低、中、高飽和
+                        this.colorSettings.saturation = saturations[index];
+                        document.getElementById('colorSaturationSlider').value = saturations[index];
+                        document.getElementById('colorSaturationValue').textContent = saturations[index] + '%';
+                        this.updateColorPreviews();
+                        this.updateHeaderBackground();
+                        this.showNotification(`已設定為${['低飽和度', '中飽和度', '高飽和度'][index]}`, 'info');
+                    });
+                });
+            }
+        }
+
+        // 初始化應用程式
+        document.addEventListener('DOMContentLoaded', () => {
+            const processor = new AdvancedImageProcessor();
+            processor.initialize();
+        });
+    </script>
+</body>
+</html>

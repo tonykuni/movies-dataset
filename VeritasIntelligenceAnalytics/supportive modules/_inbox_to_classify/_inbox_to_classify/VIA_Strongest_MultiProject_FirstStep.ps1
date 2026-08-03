@@ -1,0 +1,2 @@
+# VIA Strongest MultiProject First Step
+pwsh -NoProfile -ExecutionPolicy Bypass -File "" -Root "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics" -SupportiveDir "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules" -FunctionalRoot "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules" -CreateSandbox $True -RunToolDryProbe $True -RunUserSmokeTest $False -OpenReport $True

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA Final Operations Seal v028.7.6</title>
+<style>
+:root{--sky:#d8f0ef;--ink:#1d3438;--muted:#657f82;--line:rgba(38,70,75,.16);--head:#edf8f6;--hover:rgba(216,240,239,.20);--ok:#0f766e;--warn:#b7791f;--fail:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Microsoft JhengHei","Segoe UI",Arial,sans-serif;background:linear-gradient(180deg,#fbfdfb,#f3f8f6);color:var(--ink);font-size:11px;line-height:1.28}
+header{position:sticky;top:0;z-index:80;padding:14px 26px 10px;background:rgba(251,253,251,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+h1{margin:0;font-size:18px;text-align:center;letter-spacing:.035em}
+.sub{text-align:center;color:var(--muted);font-size:10.5px;margin-top:4px}
+.wrap{padding:12px 22px 36px}
+.kpis{display:grid;grid-template-columns:repeat(8,minmax(96px,1fr));gap:8px;margin-bottom:12px}
+.card{border-radius:10px;padding:8px 10px;background:rgba(255,255,255,.82);border:1px solid var(--line);box-shadow:0 6px 16px rgba(30,52,56,.04)}
+.k{font-size:9.5px;color:var(--muted);letter-spacing:.07em}.v{font-size:16px;font-weight:750;margin-top:2px}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.fail{color:var(--fail)}
+section{margin-top:12px}
+h2{position:sticky;top:45px;z-index:70;margin:0 0 6px;padding:6px 9px;border:1px solid var(--line);border-left:4px solid var(--sky);border-radius:9px;background:rgba(250,253,252,.96);font-size:12px;text-align:center}
+table{width:100%;border-collapse:separate;border-spacing:0;table-layout:auto;background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:10px;overflow:clip}
+thead{position:sticky;top:76px;z-index:60}
+th{position:sticky;top:76px;z-index:61;background:var(--head);font-size:10px;font-weight:800;text-align:center;vertical-align:top;padding:5px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{font-size:10px;padding:4px 6px;border-bottom:1px solid var(--line);vertical-align:top;text-align:center;white-space:nowrap}
+td.via-left,td:has(code){text-align:left;white-space:normal;word-break:break-word;overflow-wrap:anywhere}
+tr:hover td{background:var(--hover)}
+code{font-family:Consolas,"Cascadia Mono",monospace;font-size:9.5px;white-space:normal;word-break:break-word}
+</style>
+</head>
+<body>
+<header>
+<h1>def VIA Final Operations Seal · v028.7.6</h1>
+<div class="sub">VDF + VRN · Active Chain Clean · Six Read-Only Lanes Passed · Daily Health Ready · Scheduler Ready</div>
+</header>
+<div class="wrap">
+<div class="kpis">
+<div class="card"><div class="k">Status</div><div class="v">VIA_DUAL_PROJECT_OPERATIONS_SEALED_READY</div></div>
+<div class="card"><div class="k">Risk</div><div class="v">LOW</div></div>
+<div class="card"><div class="k">OK</div><div class="v ok">18</div></div>
+<div class="card"><div class="k">WARN</div><div class="v warn">1</div></div>
+<div class="card"><div class="k">FAIL</div><div class="v fail">0</div></div>
+<div class="card"><div class="k">Hard Blocks</div><div class="v fail">0</div></div>
+<div class="card"><div class="k">Smoke OK</div><div class="v ok">6</div></div>
+<div class="card"><div class="k">Task</div><div class="v">Ready</div></div>
+</div>
+
+<section><h2>def Final Seal Matrix</h2>
+<table>
+<thead><tr><th>Round</th><th>Lane</th><th>Stage</th><th>Name</th><th>Status</th><th>Risk</th><th>FixClass</th><th>Priority</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr></thead>
+<tbody><tr><td>Round0</td><td>CONTROL</td><td>POLICY</td><td>No DB Write</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>db_write</td><td>false</td><td>Final seal only. No production DB write.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics</code></td></tr>
+<tr><td>Round0</td><td>CONTROL</td><td>POLICY</td><td>No Source Repair</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>source_repair</td><td>false</td><td>No VDF / VRN source file modification.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics</code></td></tr>
+<tr><td>Round0</td><td>CONTROL</td><td>POLICY</td><td>No Extraction</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>extraction</td><td>false</td><td>No VRN extraction and no VDF canonical merge.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_FINAL_OPERATIONS_SEAL_v02876_20260611_230723</code></td></tr>
+<tr><td>Round0</td><td>CONTROL</td><td>POLICY</td><td>No Stop-Process</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>stop_process</td><td>false</td><td>No process kill.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_FINAL_OPERATIONS_SEAL_v02876_20260611_230723</code></td></tr>
+<tr><td>Round0</td><td>VDF</td><td>POINTER</td><td>Active Pointer</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>status</td><td>FINAL_PROMOTED_ACTIVE_POINTER_LOCKED</td><td>Active pointer is final promoted lock.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ACTIVE_POINTER.json</code></td></tr>
+<tr><td>Round0</td><td>VDF</td><td>POINTER</td><td>Frozen Pointer</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>status</td><td>FINAL_PROMOTED_ACTIVE_POINTER_LOCKED</td><td>Frozen pointer is final promoted lock.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_freeze\VDF_FINAL_ACTIVATION_SEAL_POINTER_v02868.json</code></td></tr>
+<tr><td>Round1</td><td>RUNTIME</td><td>LOCATE</td><td>ACTIVE_PATH_FILTER</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>runtime</td><td>v028712</td><td>Runtime found.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_ACTIVE_PATH_DEPENDENCY_FILTER_v028712_20260611_203308\runtime\VIA_ActivePathDependencyFilter_Runtime_v028712.json</code></td></tr>
+<tr><td>Round1</td><td>RUNTIME</td><td>LOCATE</td><td>DUAL_PROJECT_GATE</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>runtime</td><td>v02872</td><td>Runtime found.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_SAFE_PARALLEL_GATE_v02872_20260611_205436\runtime\VIA_DualProjectSafeParallelGate_Runtime_v02872.json</code></td></tr>
+<tr><td>Round1</td><td>RUNTIME</td><td>LOCATE</td><td>USER_TEST_CONSOLE</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>runtime</td><td>v028731</td><td>Runtime found.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_USERTEST_CONSOLE_HOTFIX_v028731_20260611_210904\runtime\VIA_DualProjectUserTestConsoleHotfix_Runtime_v028731.json</code></td></tr>
+<tr><td>Round1</td><td>RUNTIME</td><td>LOCATE</td><td>READONLY_LANE_SMOKE</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>runtime</td><td>v02874</td><td>Runtime found.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_READONLY_LANE_EXECUTION_SMOKE_TEST_v02874_20260611_211312\runtime\VIA_ReadOnlyLaneSmoke_Runtime_v02874.json</code></td></tr>
+<tr><td>Round1</td><td>RUNTIME</td><td>LOCATE</td><td>DAILY_HEALTH_MONITOR</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>runtime</td><td>v028754</td><td>Runtime found.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DAILY_HEALTH_NONTHROWING_MONITOR_v028754_20260611_225535\runtime\VIA_DailyHealthNonThrowingMonitor_Runtime_v028754.json</code></td></tr>
+<tr><td>Round1</td><td>ACTIVE_PATH</td><td>VERIFY</td><td>Active Dependency Path</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>active_blocks</td><td>0</td><td>Active dependency path clean; historical findings quarantined: 230.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_ACTIVE_PATH_DEPENDENCY_FILTER_v028712_20260611_203308\runtime\VIA_ActivePathDependencyFilter_Runtime_v028712.json</code></td></tr>
+<tr><td>Round1</td><td>DUAL_PROJECT</td><td>VERIFY</td><td>Safe Parallel Gate</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>safe_lanes</td><td>6</td><td>VDF / VRN six safe lanes verified.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_SAFE_PARALLEL_GATE_v02872_20260611_205436\runtime\VIA_DualProjectSafeParallelGate_Runtime_v02872.json</code></td></tr>
+<tr><td>Round1</td><td>USER_TEST</td><td>VERIFY</td><td>User-Test Console</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>commands</td><td>6</td><td>User-test console ready and parse clean.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_USERTEST_CONSOLE_HOTFIX_v028731_20260611_210904\runtime\VIA_DualProjectUserTestConsoleHotfix_Runtime_v028731.json</code></td></tr>
+<tr><td>Round1</td><td>SMOKE</td><td>VERIFY</td><td>Six Read-Only Lane Smoke</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>smoke_ok</td><td>6</td><td>All six read-only lanes exited 0.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_READONLY_LANE_EXECUTION_SMOKE_TEST_v02874_20260611_211312\runtime\VIA_ReadOnlyLaneSmoke_Runtime_v02874.json</code></td></tr>
+<tr><td>Round2</td><td>DAILY_HEALTH</td><td>VERIFY</td><td>Daily Health Monitor</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>task_state</td><td>Ready</td><td>Daily health monitor smoke passed and task is enabled.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DAILY_HEALTH_NONTHROWING_MONITOR_v028754_20260611_225535\runtime\VIA_DailyHealthNonThrowingMonitor_Runtime_v028754.json</code></td></tr>
+<tr><td>Round2</td><td>SCHEDULER</td><td>VERIFY</td><td>Windows Task Scheduler</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>state</td><td>Ready</td><td>Windows scheduled task exists and is enabled.</td><td><code>VIA Dual Project Daily Health</code></td></tr>
+<tr><td>Round2</td><td>ARTIFACTS</td><td>VERIFY</td><td>Required Artifacts</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>missing</td><td>0</td><td>All required sealed artifacts exist.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_FINAL_OPERATIONS_SEAL_v02876_20260611_230723</code></td></tr>
+<tr><td>Round3</td><td>FINAL</td><td>DECISION</td><td>Final Operations Seal</td><td><b>VIA_DUAL_PROJECT_OPERATIONS_SEALED_READY</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>hard_blocks</td><td>0</td><td>Final operations seal decision created.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_FINAL_OPERATIONS_SEAL_v02876_20260611_230723</code></td></tr></tbody>
+</table>
+</section>
+
+<section><h2>def Sealed Artifacts</h2>
+<table>
+<thead><tr><th>Role</th><th>Required</th><th>Exists</th><th>Kind</th><th>Bytes</th><th>Path</th></tr></thead>
+<tbody><tr><td>ACTIVE_PATH_FILTER</td><td>true</td><td>True</td><td>FILE</td><td>2299</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_ACTIVE_PATH_DEPENDENCY_FILTER_v028712_20260611_203308\runtime\VIA_ActivePathDependencyFilter_Runtime_v028712.json</code></td></tr>
+<tr><td>DUAL_PROJECT_GATE</td><td>true</td><td>True</td><td>FILE</td><td>2572</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_SAFE_PARALLEL_GATE_v02872_20260611_205436\runtime\VIA_DualProjectSafeParallelGate_Runtime_v02872.json</code></td></tr>
+<tr><td>USER_TEST_CONSOLE</td><td>true</td><td>True</td><td>FILE</td><td>2915</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_USERTEST_CONSOLE_HOTFIX_v028731_20260611_210904\runtime\VIA_DualProjectUserTestConsoleHotfix_Runtime_v028731.json</code></td></tr>
+<tr><td>READONLY_LANE_SMOKE</td><td>true</td><td>True</td><td>FILE</td><td>2563</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_READONLY_LANE_EXECUTION_SMOKE_TEST_v02874_20260611_211312\runtime\VIA_ReadOnlyLaneSmoke_Runtime_v02874.json</code></td></tr>
+<tr><td>DAILY_HEALTH_MONITOR</td><td>true</td><td>True</td><td>FILE</td><td>2582</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DAILY_HEALTH_NONTHROWING_MONITOR_v028754_20260611_225535\runtime\VIA_DailyHealthNonThrowingMonitor_Runtime_v028754.json</code></td></tr>
+<tr><td>ACTIVE_POINTER</td><td>true</td><td>True</td><td>FILE</td><td>2051</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ACTIVE_POINTER.json</code></td></tr>
+<tr><td>FROZEN_POINTER</td><td>true</td><td>True</td><td>FILE</td><td>2051</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_freeze\VDF_FINAL_ACTIVATION_SEAL_POINTER_v02868.json</code></td></tr>
+<tr><td>DAILY_HEALTH_SCRIPT</td><td>true</td><td>True</td><td>FILE</td><td>8722</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\tools\VIA_DualProjectDailyHealth\Invoke-VIA-DualProjectDailyHealth.ps1</code></td></tr>
+<tr><td>DAILY_HEALTH_LAUNCHER</td><td>true</td><td>True</td><td>FILE</td><td>850</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\tools\VIA_DualProjectDailyHealth\Start-VIA-DualProjectDailyHealth.ps1</code></td></tr>
+<tr><td>DAILY_HEALTH_SHORTCUT</td><td>false</td><td>True</td><td>FILE</td><td>1344</td><td><code>C:\Users\tonyk\OneDrive\Desktop\VIA Dual Project Daily Health.lnk</code></td></tr>
+<tr><td>USER_TEST_CONSOLE_SHORTCUT</td><td>false</td><td>True</td><td>FILE</td><td>1378</td><td><code>C:\Users\tonyk\OneDrive\Desktop\VIA Dual Project User-Test Console.lnk</code></td></tr>
+<tr><td>FINAL_SEAL_JSON</td><td>true</td><td>True</td><td>FILE</td><td>4274</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_FINAL_OPERATIONS_SEAL_v02876_20260611_230723\seal\VIA_FinalOperationsSeal_v02876.json</code></td></tr>
+<tr><td>FINAL_SEAL_POINTER</td><td>true</td><td>True</td><td>FILE</td><td>987</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_freeze\VIA_FINAL_OPERATIONS_SEAL_POINTER_v02876.json</code></td></tr>
+<tr><td>FINAL_RUNTIME_JSON</td><td>true</td><td>True</td><td>FILE</td><td>4274</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_FINAL_OPERATIONS_SEAL_v02876_20260611_230723\runtime\VIA_FinalOperationsSeal_Runtime_v02876.json</code></td></tr>
+<tr><td>FINAL_MATRIX_CSV</td><td>true</td><td>True</td><td>FILE</td><td>6392</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_FINAL_OPERATIONS_SEAL_v02876_20260611_230723\registry\VIA_FinalOperationsSeal_Matrix_v02876.csv</code></td></tr></tbody>
+</table>
+</section>
+</div>
+<script>
+(function(){
+ const left=/(path|message|role|runtime|seal|html|路徑|訊息|封存|報告)/i;
+ const path=/([A-Za-z]:\\|\\\\|\/|\.ps1|\.html|\.csv|\.json|\.txt|\.lnk)/i;
+ function clean(t){return String(t||"").replace(/,/g,"").replace(/%/g,"").trim();}
+ function isnum(t){const s=clean(t);return !!s && /^[-+]?(\d+|\d*\.\d+)(e[-+]?\d+)?$/i.test(s) && Number.isFinite(Number(s));}
+ function fmt(t){const n=Number(clean(t));return Number.isFinite(n)?n.toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:1}):t;}
+ function heads(table){return Array.from(table.querySelectorAll("thead th")).map(x=>(x.textContent||"").trim());}
+ function process(table){const hs=heads(table);Array.from(table.querySelectorAll("th")).forEach(th=>{th.style.textAlign="center";th.style.verticalAlign="top";});Array.from(table.querySelectorAll("tbody tr")).forEach(row=>{Array.from(row.children).forEach((cell,i)=>{const h=hs[i]||"";const raw=(cell.textContent||"").trim();cell.style.verticalAlign="top";cell.style.textAlign="center";if(isnum(raw)){cell.textContent=fmt(raw);return;}if(left.test(h)||path.test(raw)||raw.length>=36||cell.querySelector("code")){cell.classList.add("via-left");}});});}
+ Array.from(document.querySelectorAll("table")).forEach(process);
+})();
+</script>
+</body>
+</html>

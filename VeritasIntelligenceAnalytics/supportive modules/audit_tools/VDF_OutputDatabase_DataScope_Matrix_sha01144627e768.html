@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>VDF Supportive Tools + Data Scope Matrix</title>
+<style>
+body{margin:0;background:#f5f4f0;color:#1e1d1a;font-family:Arial,"Microsoft JhengHei",sans-serif;font-size:10.5px;line-height:1.32}
+.header{padding:22px 28px;background:linear-gradient(135deg,#1e293b,#31517a);color:white;text-align:center}
+.header h1{margin:0;font-size:25px}.line2{margin-top:6px;font-size:13px;font-weight:800;letter-spacing:1.4px}.line3{margin-top:6px;font-size:11.5px;opacity:.9}
+.wrap{padding:18px 24px}.grid{display:grid;grid-template-columns:repeat(7,minmax(105px,1fr));gap:10px;margin-bottom:14px}
+.card{background:white;border:1px solid #d8d6cf;border-radius:12px;padding:10px 12px;box-shadow:0 5px 16px rgba(16,24,40,.045)}
+.kpi{font-size:22px;font-weight:900;font-family:Consolas,monospace;text-align:center}.label{text-align:center;color:#7b786f;font-size:10.5px;margin-top:5px}
+.badge{display:inline-block;padding:7px 10px;border-radius:999px;font-weight:900}
+.badge.low{background:#cde8d5;color:#5a9e6f}.badge.high{background:#f5d0c8;color:#c96b5a}
+.lock{font-family:Consolas,"Microsoft JhengHei",monospace;white-space:pre-wrap;background:#0b1020;color:#dbeafe;padding:12px 14px;border-radius:10px;line-height:1.38;overflow:auto;font-size:10.5px}
+.mw{max-height:620px;overflow:auto;border:1px solid #d8d6cf;border-radius:12px;background:white;margin-bottom:16px}
+table{width:100%;border-collapse:collapse;table-layout:auto;background:white}
+thead th{position:sticky;top:0;z-index:2;text-align:center;vertical-align:top;background:#eef2f8;color:#334155;font-size:10.2px;font-weight:900;padding:7px;border-bottom:1px solid #d8d6cf;border-right:1px solid #e4e7ec}
+tbody td{font-size:10.2px;padding:6px 7px;border-bottom:1px solid #edf0f4;border-right:1px solid #edf0f4;vertical-align:top;word-break:break-word;overflow-wrap:anywhere;white-space:normal;text-align:center}
+tbody td.long, tbody td.path, tbody td.db{text-align:left}
+.db{font-family:Consolas,"Microsoft JhengHei",monospace;font-weight:800;border-left:4px solid #5a9e6f;min-width:260px;max-width:360px}
+.path{font-family:Consolas,monospace;font-size:9.4px;color:#475467;min-width:220px;max-width:330px}
+tr.ok td:first-child{border-left:4px solid #5a9e6f}tr.warn td:first-child{border-left:4px solid #c4943a}tr.fail td:first-child{border-left:4px solid #c96b5a}
+h2{font-size:14px;margin:14px 0 8px}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>VeritasDataForge</h1>
+<div class="line2">VERITAS INTELLIGENCE ANALYTICS</div>
+<div class="line3">Supportive Tools Import · Aegis / Celeritas · Output Database First Matrix</div>
+</div>
+<div class="wrap">
+<div class="grid">
+<div class="card"><div class="badge low">VDF_SUPPORTIVE_TOOLS_SCOPE_MATRIX_READY</div><div class="label">Risk LOW</div></div>
+<div class="card"><div class="kpi">10</div><div class="label">OK</div></div>
+<div class="card"><div class="kpi">0</div><div class="label">WARN</div></div>
+<div class="card"><div class="kpi">0</div><div class="label">FAIL</div></div>
+<div class="card"><div class="kpi">2</div><div class="label">Supportive Tools</div></div>
+<div class="card"><div class="kpi">9</div><div class="label">Output DB Groups</div></div>
+<div class="card"><div class="kpi">LOW</div><div class="label">Hydra Risk</div></div>
+</div>
+
+<h2>def Import Scope</h2>
+<div class="lock">Aegis:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\50_Protection_Acceleration\VeritasAegisNexus.py
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\50_Protection_Acceleration\VeritasAegisNexus.py.freeze.lock.json
+
+Celeritas:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\50_Protection_Acceleration\VeritasCeleritas.py
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\50_Protection_Acceleration\VeritasCeleritas.py.freeze.lock.json
+
+VDF SSOT:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_ssot\VDF_Extraction_Params_SSOT.json
+
+Output Scope Matrix:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_ssot\VDF_OutputDatabase_DataScope_Matrix.json
+
+Database Root:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE
+
+Policy:
+def output database is the first column
+def Aegis = protection / validation / hard-gate
+def Celeritas = acceleration / cache / batch IO
+def add-only SSOT import
+def no delete
+def no Stop-Process
+def no exit
+def do not mutate supportive tool source
+def do not mutate VDF engine</div>
+
+<h2>def Output Database · Data Subject / Scope Matrix</h2>
+<div class="mw">
+<table>
+<thead>
+<tr>
+<th>Output Database</th>
+<th>擷取主體</th>
+<th>擷取範圍</th>
+<th>來源</th>
+<th>頻率</th>
+<th>必要欄位</th>
+<th>驗證規則</th>
+<th>導入支援工具</th>
+<th>Database Root</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class='db'>VDF_TW_EquityUniverse.parquet / VDF_TW_EquityUniverse.duckdb / VDF_TW_EquityUniverse.csv / VDF_TW_EquityUniverse.json</td><td>台股上市櫃股票 Universe</td><td class='long'>ticker、公司名稱、市場別、產業別、ISIN、證券類型、上市櫃日期</td><td>TWSE,TPEX</td><td>DAILY</td><td class='long'>ticker,name,market</td><td class='long'>ticker_regex; name_not_null; market_in_TWSE_TPEX</td><td class='long'>VeritasAegisNexus: protection/validation; VeritasCeleritas: acceleration/cache</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</td></tr>
+<tr><td class='db'>VDF_TW_CompanyProfile.parquet / VDF_TW_CompanyProfile.duckdb / VDF_TW_CompanyProfile.csv / VDF_TW_CompanyProfile.json</td><td>公司基本資料</td><td class='long'>ticker、公司名稱、董事長、總經理、發言人、地址、電話、網站、產業別</td><td>TWSE,TPEX,MOPS</td><td>MONTHLY</td><td class='long'>ticker,name</td><td class='long'>ticker_regex; company_name_not_null</td><td class='long'>VeritasAegisNexus: schema/risk gate; VeritasCeleritas: batch IO acceleration</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</td></tr>
+<tr><td class='db'>VDF_TW_PriceDaily.parquet / VDF_TW_PriceDaily.duckdb / VDF_TW_PriceDaily.csv / VDF_TW_PriceDaily.json</td><td>每日股價與成交資料</td><td class='long'>ticker、date、open、high、low、close、adj_close、volume、turnover、return_1d/5d/20d/60d</td><td>TWSE,TPEX,YFINANCE</td><td>DAILY</td><td class='long'>ticker,date,close,volume</td><td class='long'>date_iso; ohlc_numeric; high_ge_low; close_not_null</td><td class='long'>VeritasAegisNexus: abnormal price guard; VeritasCeleritas: parallel fetch/cache</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</td></tr>
+<tr><td class='db'>VDF_TW_MonthlyRevenue.parquet / VDF_TW_MonthlyRevenue.duckdb / VDF_TW_MonthlyRevenue.csv / VDF_TW_MonthlyRevenue.json</td><td>月營收資料</td><td class='long'>ticker、yyyymm、revenue、MoM、YoY、累計營收、累計 YoY</td><td>MOPS</td><td>MONTHLY</td><td class='long'>ticker,yyyymm,revenue</td><td class='long'>yyyymm_regex; revenue_numeric</td><td class='long'>VeritasAegisNexus: period validation; VeritasCeleritas: incremental update</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</td></tr>
+<tr><td class='db'>VDF_TW_FinancialStatement.parquet / VDF_TW_FinancialStatement.duckdb / VDF_TW_FinancialStatement.csv / VDF_TW_FinancialStatement.json</td><td>財務報表資料</td><td class='long'>ticker、period、營收、毛利、營業利益、淨利、EPS、資產、負債、權益、營業現金流</td><td>MOPS</td><td>QUARTERLY</td><td class='long'>ticker,period</td><td class='long'>period_regex; numeric_fields_nullable; eps_numeric</td><td class='long'>VeritasAegisNexus: accounting rule guard; VeritasCeleritas: table transform acceleration</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</td></tr>
+<tr><td class='db'>VDF_TW_FlowChip.parquet / VDF_TW_FlowChip.duckdb / VDF_TW_FlowChip.csv / VDF_TW_FlowChip.json</td><td>籌碼與法人買賣超</td><td class='long'>ticker、date、外資、投信、自營商、融資、融券、借券</td><td>TWSE,TPEX</td><td>DAILY</td><td class='long'>ticker,date</td><td class='long'>date_iso; numeric_fields</td><td class='long'>VeritasAegisNexus: flow anomaly guard; VeritasCeleritas: multi-source merge acceleration</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</td></tr>
+<tr><td class='db'>VDF_TW_DividendAction.parquet / VDF_TW_DividendAction.duckdb / VDF_TW_DividendAction.csv / VDF_TW_DividendAction.json</td><td>股利與公司行動</td><td class='long'>ticker、ex_date、現金股利、股票股利、殖利率、配息率、基準日、發放日</td><td>TWSE,TPEX,MOPS</td><td>EVENT</td><td class='long'>ticker,ex_date</td><td class='long'>date_iso; dividend_numeric</td><td class='long'>VeritasAegisNexus: event consistency guard; VeritasCeleritas: event indexing</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</td></tr>
+<tr><td class='db'>VDF_TW_IndexETFTheme.parquet / VDF_TW_IndexETFTheme.duckdb / VDF_TW_IndexETFTheme.csv / VDF_TW_IndexETFTheme.json</td><td>指數、ETF、主題與成分股</td><td class='long'>code、date、name、close、volume、theme、constituents、weight</td><td>TWSE,TPEX,YFINANCE</td><td>DAILY</td><td class='long'>code,date,close</td><td class='long'>code_not_null; date_iso; close_numeric</td><td class='long'>VeritasAegisNexus: constituent weight guard; VeritasCeleritas: theme cache</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</td></tr>
+<tr><td class='db'>VDF_Global_MacroCommodity.parquet / VDF_Global_MacroCommodity.duckdb / VDF_Global_MacroCommodity.csv / VDF_Global_MacroCommodity.json</td><td>全球總經、商品、航運、利率、匯率</td><td class='long'>symbol、date、value、source、unit、frequency、description</td><td>FRED,AKSHARE,YFINANCE</td><td>DAILY_WEEKLY</td><td class='long'>symbol,date,value,source</td><td class='long'>symbol_not_null; date_iso; value_numeric</td><td class='long'>VeritasAegisNexus: source trust/risk guard; VeritasCeleritas: API fetch/cache acceleration</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2>def Supportive Tools Import Check Matrix</h2>
+<div class="mw">
+<table>
+<thead>
+<tr>
+<th>Layer</th><th>Name</th><th>Status</th><th>Risk</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th>
+</tr>
+</thead>
+<tbody>
+<tr class='ok'><td>VDF_SSOT</td><td>VDF_Extraction_Params_SSOT.json</td><td>OK</td><td>LOW</td><td>json_parse</td><td>ok</td><td>JSON parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_ssot\VDF_Extraction_Params_SSOT.json</td></tr>
+<tr class='ok'><td>SUPPORTIVE_TOOL</td><td>VeritasAegisNexus.py</td><td>OK</td><td>LOW</td><td>exists_sha256</td><td>4A9443686A8F5DE076A9F69D4CD00FAB9576180D17F9FE03F9FF59A526BE4D7D</td><td>File exists and hash generated.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\50_Protection_Acceleration\VeritasAegisNexus.py</td></tr>
+<tr class='ok'><td>SUPPORTIVE_TOOL_LOCK</td><td>VeritasAegisNexus.py.freeze.lock.json</td><td>OK</td><td>LOW</td><td>json_parse</td><td>ok</td><td>JSON parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\50_Protection_Acceleration\VeritasAegisNexus.py.freeze.lock.json</td></tr>
+<tr class='ok'><td>SUPPORTIVE_TOOL</td><td>VeritasCeleritas.py</td><td>OK</td><td>LOW</td><td>exists_sha256</td><td>ECB06BE4BADB7CE648E275A4C35A1AC44759F155AB39A137F9FBBBB7A536A1D0</td><td>File exists and hash generated.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\50_Protection_Acceleration\VeritasCeleritas.py</td></tr>
+<tr class='ok'><td>SUPPORTIVE_TOOL_LOCK</td><td>VeritasCeleritas.py.freeze.lock.json</td><td>OK</td><td>LOW</td><td>json_parse</td><td>ok</td><td>JSON parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\50_Protection_Acceleration\VeritasCeleritas.py.freeze.lock.json</td></tr>
+<tr class='ok'><td>PYTHON_COMPILE</td><td>VeritasAegisNexus.py</td><td>OK</td><td>LOW</td><td>py_compile</td><td>ok</td><td>Python compile OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\50_Protection_Acceleration\VeritasAegisNexus.py</td></tr>
+<tr class='ok'><td>PYTHON_COMPILE</td><td>VeritasCeleritas.py</td><td>OK</td><td>LOW</td><td>py_compile</td><td>ok</td><td>Python compile OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\50_Protection_Acceleration\VeritasCeleritas.py</td></tr>
+<tr class='ok'><td>SSOT_IMPORT</td><td>VDF_SupportiveTools_ImportManifest.json</td><td>OK</td><td>LOW</td><td>write</td><td>complete</td><td>Supportive tools import manifest written.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_ssot\VDF_SupportiveTools_ImportManifest.json</td></tr>
+<tr class='ok'><td>OUTPUT_SCOPE_MATRIX</td><td>VDF_OutputDatabase_DataScope_Matrix.json</td><td>OK</td><td>LOW</td><td>write</td><td>complete</td><td>Output database scope matrix written.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_ssot\VDF_OutputDatabase_DataScope_Matrix.json</td></tr>
+<tr class='ok'><td>VDF_SSOT_UPDATE</td><td>VDF_Extraction_Params_SSOT.json</td><td>OK</td><td>LOW</td><td>supportive_tools_import</td><td>updated</td><td>VDF SSOT updated with Aegis/Celeritas import references.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_ssot\VDF_Extraction_Params_SSOT.json</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</body>
+</html>

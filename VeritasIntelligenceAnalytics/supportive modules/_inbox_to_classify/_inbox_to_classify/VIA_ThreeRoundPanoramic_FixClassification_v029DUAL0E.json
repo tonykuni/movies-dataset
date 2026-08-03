@@ -1,0 +1,86 @@
+[
+  {
+    "Time": "2026-06-15T12:20:04.595+08:00",
+    "System": "VRN",
+    "Issue": "1C final gate runtime missing but staging output is complete",
+    "Class": "PARALLEL_SAFE_FINALIZATION",
+    "Risk": "LOW",
+    "Priority": "P0",
+    "Action": "Create stage seal/runtime from existing outputs only",
+    "Reason": "This is a wrapper finalization issue, not extraction failure.",
+    "NoGo": "Do not rerun extraction; do not write canonical.",
+    "Path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VRN_ALL_TURBO_QUALIFIED_STAGING_EXTRACTION_v029VRN1C_20260615_115316\\runtime\\VRN_StagingExtraction_Runtime_v029VRN1C.json"
+  },
+  {
+    "Time": "2026-06-15T12:20:04.596+08:00",
+    "System": "VRN",
+    "Issue": "Exception queue contains review rows",
+    "Class": "SEQUENTIAL_REQUIRED",
+    "Risk": "MEDIUM",
+    "Priority": "P1",
+    "Action": "Review exception types before canonical promotion",
+    "Reason": "Exceptions are normal at staging; they should feed dictionary/regex/account mapper later.",
+    "NoGo": "Do not auto-fix by source rewrite.",
+    "Path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VRN_ALL_TURBO_QUALIFIED_STAGING_EXTRACTION_v029VRN1C_20260615_115316\\stage\\VRN_ExceptionQueue_Stage_v029VRN1C.csv"
+  },
+  {
+    "Time": "2026-06-15T12:20:04.596+08:00",
+    "System": "VRN",
+    "Issue": "Identity fields missing or review-required rows exist",
+    "Class": "SEQUENTIAL_REQUIRED",
+    "Risk": "MEDIUM",
+    "Priority": "P1",
+    "Action": "Run identity review matrix before table/account mapping promotion",
+    "Reason": "Identity mismatch must be resolved sequentially.",
+    "NoGo": "Do not canonical merge.",
+    "Path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VRN_ALL_TURBO_QUALIFIED_STAGING_EXTRACTION_v029VRN1C_20260615_115316\\stage\\VRN_ReportBasicInfo_Stage_v029VRN1C.csv"
+  },
+  {
+    "Time": "2026-06-15T12:20:04.597+08:00",
+    "System": "VRN",
+    "Issue": "Duplicate report_id exists",
+    "Class": "SEQUENTIAL_REQUIRED",
+    "Risk": "MEDIUM",
+    "Priority": "P1",
+    "Action": "Regenerate report_id with stronger key in staging copy only",
+    "Reason": "Duplicate IDs can corrupt downstream joins.",
+    "NoGo": "Do not overwrite original stage until reviewed.",
+    "Path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VRN_ALL_TURBO_QUALIFIED_STAGING_EXTRACTION_v029VRN1C_20260615_115316\\stage\\VRN_ReportBasicInfo_Stage_v029VRN1C.csv"
+  },
+  {
+    "Time": "2026-06-15T12:20:04.597+08:00",
+    "System": "VDF",
+    "Issue": "VDF final output needs post-run audit",
+    "Class": "SEQUENTIAL_REQUIRED",
+    "Risk": "MEDIUM",
+    "Priority": "P1",
+    "Action": "Run VDF output audit after --once completes",
+    "Reason": "Need confirm E1/E3/E-series final output.",
+    "NoGo": "Do not rerun full pipeline until audit.",
+    "Path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics"
+  },
+  {
+    "Time": "2026-06-15T12:20:04.597+08:00",
+    "System": "VDF",
+    "Issue": "SuperAccel optional module missing",
+    "Class": "PARALLEL_SAFE_OPTIONAL",
+    "Risk": "LOW",
+    "Priority": "P3",
+    "Action": "Log as optional accelerator gap",
+    "Reason": "Main accelerators are ok: SSOT/Aegis/Celeritas true.",
+    "NoGo": "Do not block pipeline.",
+    "Path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics"
+  },
+  {
+    "Time": "2026-06-15T12:20:04.597+08:00",
+    "System": "VDF",
+    "Issue": "127.0.0.1 HTTPS warning",
+    "Class": "PARALLEL_SAFE_OPTIONAL",
+    "Risk": "LOW",
+    "Priority": "P3",
+    "Action": "Log warning only",
+    "Reason": "Local TLS warning is not a data failure.",
+    "NoGo": "Do not disable network logic globally.",
+    "Path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics"
+  }
+]

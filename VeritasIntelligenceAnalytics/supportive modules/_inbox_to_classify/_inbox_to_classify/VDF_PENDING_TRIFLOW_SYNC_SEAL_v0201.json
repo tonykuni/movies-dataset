@@ -1,0 +1,56 @@
+{
+  "generated_at": "2026-06-09 22:53:54",
+  "status": "VDF_PENDING_TRIFLOW_SYNC_SEAL_READY",
+  "risk": "MEDIUM",
+  "version": "v020.1",
+  "system": "VERITAS INTELLIGENCE ANALYTICS",
+  "subsystem": "VeritasDataForge",
+  "purpose": "Synchronize not-yet-related / low-related VDF flows into tracked pending state.",
+  "core_triflow_pointer": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_ACTIVE_TRIFLOW_POINTER.json",
+  "pending_triflow_pointer": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_PENDING_TRIFLOW_POINTER.json",
+  "active_pointer": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_ACTIVE_POINTER.json",
+  "database_root": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\DATABASE",
+  "pending_flows": [
+    {
+      "Flow": "FLOW_D_TPEX_OFFICIAL",
+      "Status": "TRACKED_PENDING_SEQUENTIAL",
+      "Risk": "MEDIUM",
+      "Priority": "P1",
+      "Reason": "TPEX swagger capability already probed; endpoint selection must be sequential.",
+      "NextStep": "v020.2 TPEX Swagger Path Selector; v021 TPEX small-scope seed."
+    },
+    {
+      "Flow": "FLOW_E_MOPS_FINANCIAL",
+      "Status": "TRACKED_PENDING_SEQUENTIAL",
+      "Risk": "HIGH",
+      "Priority": "P1",
+      "Reason": "MOPS financial data has higher schema and frequency risk; must start from MonthlyRevenue only.",
+      "NextStep": "v022 MOPS MonthlyRevenue seed; v023 CompanyProfile; later financial statements."
+    },
+    {
+      "Flow": "FLOW_F_FRED_AKSHARE_GLOBAL",
+      "Status": "TRACKED_PENDING_AFTER_CONFIG",
+      "Risk": "MEDIUM",
+      "Priority": "P2",
+      "Reason": "Global macro/commodity/freight requires API key/package/symbol-map check first.",
+      "NextStep": "v024 FRED/AkShare capability probe; v025 small-scope seed."
+    }
+  ],
+  "schema_tables": [
+    "VDF_TW_EquityUniverse",
+    "VDF_TW_TradingStats",
+    "VDF_TW_IndexDaily",
+    "VDF_TW_MonthlyRevenue",
+    "VDF_TW_FinancialStatement",
+    "VDF_TW_FinancialRatio",
+    "VDF_TW_CompanyProfile",
+    "VDF_Global_Macro",
+    "VDF_Global_Commodity",
+    "VDF_Global_Freight",
+    "VDF_Global_FXRate",
+    "VDF_RiskEventCalendar"
+  ],
+  "top10_libs": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_freeze\\VDF_PENDING_TRIFLOW_SYNC_SEAL_v0201_20260609_225354\\registry\\VDF_Top10_LocalFreeLibs_PendingTriFlowSyncSeal_v0201.json",
+  "html_report": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_freeze\\VDF_PENDING_TRIFLOW_SYNC_SEAL_v0201_20260609_225354\\report\\VDF_PendingTriFlow_SyncSeal_Report_v0201.html",
+  "policy": "Sync seal only. No fetch. No database rewrite. Pending flows are tracked but not activated."
+}

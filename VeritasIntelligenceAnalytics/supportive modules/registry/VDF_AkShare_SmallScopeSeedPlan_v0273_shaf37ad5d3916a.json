@@ -1,0 +1,213 @@
+{
+  "generated_at": "2026-06-10 14:44:13",
+  "policy": "Plan only. Use OK_SAMPLE only. Quarantine CALL_FAIL/TIMEOUT. No function call. No fetch. No DB write.",
+  "seed_plan_count": 6,
+  "categories": {
+    "BDI_FREIGHT": 1,
+    "IRON_ORE": 1,
+    "STEEL": 1,
+    "COMMODITY_FUTURES": 1,
+    "MACRO_CHINA": 2
+  },
+  "target_tables": {
+    "VDF_Global_Freight_AkShare_Candidate": 1,
+    "VDF_Global_Commodity_AkShare_Candidate": 3,
+    "VDF_Global_Macro_AkShare_Candidate": 2
+  },
+  "plan": [
+    {
+      "selected": true,
+      "stage": "v027.4_small_scope_seed_execute_later",
+      "mode": "SEED_PLAN_ONLY_NO_DB_WRITE",
+      "selected_category": "BDI_FREIGHT",
+      "function": "macro_china_freight_index",
+      "priority": "P0",
+      "target_table": "VDF_Global_Freight_AkShare_Candidate",
+      "canonical_family": "VDF_Global_Freight",
+      "symbol_hint": "BDI_OR_FREIGHT_INDEX",
+      "object_type": "DataFrame",
+      "sample_row_count_reported": 5000,
+      "sample_col_count_reported": 8,
+      "sample_payload_available": true,
+      "sample_max_1row": [
+        {
+          "截止日期": "2026-06-09",
+          "波罗的海好望角型船运价指数BCI": "4441.0",
+          "灵便型船综合运价指数BHMI": NaN,
+          "波罗的海超级大灵便型船BSI指数": "1614.0",
+          "波罗的海综合运价指数BDI": "2818.0",
+          "HRCI国际集装箱租船指数": NaN,
+          "油轮运价指数成品油运价指数BCTI": "1394.0",
+          "油轮运价指数原油运价指数BDTI": "2075.0"
+        }
+      ],
+      "future_policy": [
+        "v027.4 may call only these OK_SAMPLE functions.",
+        "v027.4 must write to staging first.",
+        "v027.4 must not overwrite canonical tables.",
+        "v027.4 must produce candidate CSV/JSON/Parquet only.",
+        "v027.5 must final-seal candidate before merge."
+      ],
+      "risk": "LOW",
+      "reason": "Function passed v027.2 sample-call gate."
+    },
+    {
+      "selected": true,
+      "stage": "v027.4_small_scope_seed_execute_later",
+      "mode": "SEED_PLAN_ONLY_NO_DB_WRITE",
+      "selected_category": "IRON_ORE",
+      "function": "futures_foreign_hist",
+      "priority": "P0",
+      "target_table": "VDF_Global_Commodity_AkShare_Candidate",
+      "canonical_family": "VDF_Global_Commodity",
+      "symbol_hint": "IRON_ORE",
+      "object_type": "DataFrame",
+      "sample_row_count_reported": 2537,
+      "sample_col_count_reported": 8,
+      "sample_payload_available": true,
+      "sample_max_1row": [
+        {
+          "date": "2016-06-10",
+          "open": "2072.0",
+          "high": "2090.0",
+          "low": "2054.0",
+          "close": "2088.5",
+          "volume": "2327",
+          "position": "0",
+          "s": "0.0"
+        }
+      ],
+      "future_policy": [
+        "v027.4 may call only these OK_SAMPLE functions.",
+        "v027.4 must write to staging first.",
+        "v027.4 must not overwrite canonical tables.",
+        "v027.4 must produce candidate CSV/JSON/Parquet only.",
+        "v027.5 must final-seal candidate before merge."
+      ],
+      "risk": "LOW",
+      "reason": "Function passed v027.2 sample-call gate."
+    },
+    {
+      "selected": true,
+      "stage": "v027.4_small_scope_seed_execute_later",
+      "mode": "SEED_PLAN_ONLY_NO_DB_WRITE",
+      "selected_category": "STEEL",
+      "function": "stock_hk_hot_rank_detail_em",
+      "priority": "P1",
+      "target_table": "VDF_Global_Commodity_AkShare_Candidate",
+      "canonical_family": "VDF_Global_Commodity",
+      "symbol_hint": "STEEL",
+      "object_type": "DataFrame",
+      "sample_row_count_reported": 120,
+      "sample_col_count_reported": 3,
+      "sample_payload_available": true,
+      "sample_max_1row": [
+        {
+          "时间": "2026-02-11",
+          "排名": "1",
+          "证券代码": "00700"
+        }
+      ],
+      "future_policy": [
+        "v027.4 may call only these OK_SAMPLE functions.",
+        "v027.4 must write to staging first.",
+        "v027.4 must not overwrite canonical tables.",
+        "v027.4 must produce candidate CSV/JSON/Parquet only.",
+        "v027.5 must final-seal candidate before merge."
+      ],
+      "risk": "LOW",
+      "reason": "Function passed v027.2 sample-call gate."
+    },
+    {
+      "selected": true,
+      "stage": "v027.4_small_scope_seed_execute_later",
+      "mode": "SEED_PLAN_ONLY_NO_DB_WRITE",
+      "selected_category": "COMMODITY_FUTURES",
+      "function": "futures_foreign_commodity_subscribe_exchange_symbol",
+      "priority": "P1",
+      "target_table": "VDF_Global_Commodity_AkShare_Candidate",
+      "canonical_family": "VDF_Global_Commodity",
+      "symbol_hint": "COMMODITY_FUTURES",
+      "object_type": "list",
+      "sample_row_count_reported": 30,
+      "sample_col_count_reported": 1,
+      "sample_payload_available": true,
+      "sample_max_1row": [
+        "FEF"
+      ],
+      "future_policy": [
+        "v027.4 may call only these OK_SAMPLE functions.",
+        "v027.4 must write to staging first.",
+        "v027.4 must not overwrite canonical tables.",
+        "v027.4 must produce candidate CSV/JSON/Parquet only.",
+        "v027.5 must final-seal candidate before merge."
+      ],
+      "risk": "LOW",
+      "reason": "Function passed v027.2 sample-call gate."
+    },
+    {
+      "selected": true,
+      "stage": "v027.4_small_scope_seed_execute_later",
+      "mode": "SEED_PLAN_ONLY_NO_DB_WRITE",
+      "selected_category": "MACRO_CHINA",
+      "function": "macro_canada_core_cpi_monthly",
+      "priority": "P2",
+      "target_table": "VDF_Global_Macro_AkShare_Candidate",
+      "canonical_family": "VDF_Global_Macro",
+      "symbol_hint": "CHINA_MACRO",
+      "object_type": "DataFrame",
+      "sample_row_count_reported": 220,
+      "sample_col_count_reported": 4,
+      "sample_payload_available": true,
+      "sample_max_1row": [
+        {
+          "时间": "2026年05月",
+          "前值": "0.2",
+          "现值": NaN,
+          "发布日期": "2026-06-22"
+        }
+      ],
+      "future_policy": [
+        "v027.4 may call only these OK_SAMPLE functions.",
+        "v027.4 must write to staging first.",
+        "v027.4 must not overwrite canonical tables.",
+        "v027.4 must produce candidate CSV/JSON/Parquet only.",
+        "v027.5 must final-seal candidate before merge."
+      ],
+      "risk": "LOW",
+      "reason": "Function passed v027.2 sample-call gate."
+    },
+    {
+      "selected": true,
+      "stage": "v027.4_small_scope_seed_execute_later",
+      "mode": "SEED_PLAN_ONLY_NO_DB_WRITE",
+      "selected_category": "MACRO_CHINA",
+      "function": "macro_uk_core_cpi_monthly",
+      "priority": "P2",
+      "target_table": "VDF_Global_Macro_AkShare_Candidate",
+      "canonical_family": "VDF_Global_Macro",
+      "symbol_hint": "CHINA_MACRO",
+      "object_type": "DataFrame",
+      "sample_row_count_reported": 221,
+      "sample_col_count_reported": 4,
+      "sample_payload_available": true,
+      "sample_max_1row": [
+        {
+          "时间": "2008年01月",
+          "前值": "0.6",
+          "现值": "-1.0",
+          "发布日期": "2008-02-16"
+        }
+      ],
+      "future_policy": [
+        "v027.4 may call only these OK_SAMPLE functions.",
+        "v027.4 must write to staging first.",
+        "v027.4 must not overwrite canonical tables.",
+        "v027.4 must produce candidate CSV/JSON/Parquet only.",
+        "v027.5 must final-seal candidate before merge."
+      ],
+      "risk": "LOW",
+      "reason": "Function passed v027.2 sample-call gate."
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+[
+  {
+    "OutputDatabase": "VDF_TW_EquityUniverse.parquet / VDF_TW_EquityUniverse.duckdb / VDF_TW_EquityUniverse.csv / VDF_TW_EquityUniverse.json",
+    "ExtractionSubject": "台股上市櫃股票 Universe",
+    "ExtractionScope": "ticker、公司名稱、市場別、產業別、ISIN、證券類型、上市櫃日期",
+    "Source": "TWSE,TPEX",
+    "Frequency": "DAILY",
+    "RequiredFields": "ticker,name,market",
+    "Validation": "ticker_regex; name_not_null; market_in_TWSE_TPEX",
+    "SupportiveTools": "VeritasAegisNexus: protection/validation; VeritasCeleritas: acceleration/cache",
+    "DatabaseRoot": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\DATABASE"
+  },
+  {
+    "OutputDatabase": "VDF_TW_CompanyProfile.parquet / VDF_TW_CompanyProfile.duckdb / VDF_TW_CompanyProfile.csv / VDF_TW_CompanyProfile.json",
+    "ExtractionSubject": "公司基本資料",
+    "ExtractionScope": "ticker、公司名稱、董事長、總經理、發言人、地址、電話、網站、產業別",
+    "Source": "TWSE,TPEX,MOPS",
+    "Frequency": "MONTHLY",
+    "RequiredFields": "ticker,name",
+    "Validation": "ticker_regex; company_name_not_null",
+    "SupportiveTools": "VeritasAegisNexus: schema/risk gate; VeritasCeleritas: batch IO acceleration",
+    "DatabaseRoot": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\DATABASE"
+  },
+  {
+    "OutputDatabase": "VDF_TW_PriceDaily.parquet / VDF_TW_PriceDaily.duckdb / VDF_TW_PriceDaily.csv / VDF_TW_PriceDaily.json",
+    "ExtractionSubject": "每日股價與成交資料",
+    "ExtractionScope": "ticker、date、open、high、low、close、adj_close、volume、turnover、return_1d/5d/20d/60d",
+    "Source": "TWSE,TPEX,YFINANCE",
+    "Frequency": "DAILY",
+    "RequiredFields": "ticker,date,close,volume",
+    "Validation": "date_iso; ohlc_numeric; high_ge_low; close_not_null",
+    "SupportiveTools": "VeritasAegisNexus: abnormal price guard; VeritasCeleritas: parallel fetch/cache",
+    "DatabaseRoot": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\DATABASE"
+  },
+  {
+    "OutputDatabase": "VDF_TW_MonthlyRevenue.parquet / VDF_TW_MonthlyRevenue.duckdb / VDF_TW_MonthlyRevenue.csv / VDF_TW_MonthlyRevenue.json",
+    "ExtractionSubject": "月營收資料",
+    "ExtractionScope": "ticker、yyyymm、revenue、MoM、YoY、累計營收、累計 YoY",
+    "Source": "MOPS",
+    "Frequency": "MONTHLY",
+    "RequiredFields": "ticker,yyyymm,revenue",
+    "Validation": "yyyymm_regex; revenue_numeric",
+    "SupportiveTools": "VeritasAegisNexus: period validation; VeritasCeleritas: incremental update",
+    "DatabaseRoot": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\DATABASE"
+  },
+  {
+    "OutputDatabase": "VDF_TW_FinancialStatement.parquet / VDF_TW_FinancialStatement.duckdb / VDF_TW_FinancialStatement.csv / VDF_TW_FinancialStatement.json",
+    "ExtractionSubject": "財務報表資料",
+    "ExtractionScope": "ticker、period、營收、毛利、營業利益、淨利、EPS、資產、負債、權益、營業現金流",
+    "Source": "MOPS",
+    "Frequency": "QUARTERLY",
+    "RequiredFields": "ticker,period",
+    "Validation": "period_regex; numeric_fields_nullable; eps_numeric",
+    "SupportiveTools": "VeritasAegisNexus: accounting rule guard; VeritasCeleritas: table transform acceleration",
+    "DatabaseRoot": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\DATABASE"
+  },
+  {
+    "OutputDatabase": "VDF_TW_FlowChip.parquet / VDF_TW_FlowChip.duckdb / VDF_TW_FlowChip.csv / VDF_TW_FlowChip.json",
+    "ExtractionSubject": "籌碼與法人買賣超",
+    "ExtractionScope": "ticker、date、外資、投信、自營商、融資、融券、借券",
+    "Source": "TWSE,TPEX",
+    "Frequency": "DAILY",
+    "RequiredFields": "ticker,date",
+    "Validation": "date_iso; numeric_fields",
+    "SupportiveTools": "VeritasAegisNexus: flow anomaly guard; VeritasCeleritas: multi-source merge acceleration",
+    "DatabaseRoot": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\DATABASE"
+  },
+  {
+    "OutputDatabase": "VDF_TW_DividendAction.parquet / VDF_TW_DividendAction.duckdb / VDF_TW_DividendAction.csv / VDF_TW_DividendAction.json",
+    "ExtractionSubject": "股利與公司行動",
+    "ExtractionScope": "ticker、ex_date、現金股利、股票股利、殖利率、配息率、基準日、發放日",
+    "Source": "TWSE,TPEX,MOPS",
+    "Frequency": "EVENT",
+    "RequiredFields": "ticker,ex_date",
+    "Validation": "date_iso; dividend_numeric",
+    "SupportiveTools": "VeritasAegisNexus: event consistency guard; VeritasCeleritas: event indexing",
+    "DatabaseRoot": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\DATABASE"
+  },
+  {
+    "OutputDatabase": "VDF_TW_IndexETFTheme.parquet / VDF_TW_IndexETFTheme.duckdb / VDF_TW_IndexETFTheme.csv / VDF_TW_IndexETFTheme.json",
+    "ExtractionSubject": "指數、ETF、主題與成分股",
+    "ExtractionScope": "code、date、name、close、volume、theme、constituents、weight",
+    "Source": "TWSE,TPEX,YFINANCE",
+    "Frequency": "DAILY",
+    "RequiredFields": "code,date,close",
+    "Validation": "code_not_null; date_iso; close_numeric",
+    "SupportiveTools": "VeritasAegisNexus: constituent weight guard; VeritasCeleritas: theme cache",
+    "DatabaseRoot": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\DATABASE"
+  },
+  {
+    "OutputDatabase": "VDF_Global_MacroCommodity.parquet / VDF_Global_MacroCommodity.duckdb / VDF_Global_MacroCommodity.csv / VDF_Global_MacroCommodity.json",
+    "ExtractionSubject": "全球總經、商品、航運、利率、匯率",
+    "ExtractionScope": "symbol、date、value、source、unit、frequency、description",
+    "Source": "FRED,AKSHARE,YFINANCE",
+    "Frequency": "DAILY_WEEKLY",
+    "RequiredFields": "symbol,date,value,source",
+    "Validation": "symbol_not_null; date_iso; value_numeric",
+    "SupportiveTools": "VeritasAegisNexus: source trust/risk guard; VeritasCeleritas: API fetch/cache acceleration",
+    "DatabaseRoot": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\DATABASE"
+  }
+]

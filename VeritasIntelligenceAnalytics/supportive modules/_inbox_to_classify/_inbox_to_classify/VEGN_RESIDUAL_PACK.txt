@@ -1,0 +1,106 @@
+VIA VEGN Residual Errors after bare-if fix  -  RUN 20260617_034132
+Residual parse errors: 98
+
+--- FIRST ERRORS (line:col  message) ---
+906:569  Missing closing '}' in statement block or type definition.
+906:570  The string is missing the terminator: ".
+906:648  Missing closing '}' in statement block or type definition.
+906:649  The string is missing the terminator: ".
+906:653  Missing closing ')' in subexpression.
+906:664  Missing closing ')' in subexpression.
+906:665  Missing closing ')' in expression.
+906:665  Missing ')' in method call.
+911:130  Missing closing '}' in statement block or type definition.
+911:131  The string is missing the terminator: ".
+911:137  Missing ')' in method call.
+911:137  Missing closing ')' in subexpression.
+911:272  Missing closing '}' in statement block or type definition.
+911:273  The string is missing the terminator: ".
+911:279  Missing closing ')' in subexpression.
+911:279  Missing ')' in method call.
+911:366  Missing closing '}' in statement block or type definition.
+911:367  The string is missing the terminator: ".
+911:373  Missing closing ')' in subexpression.
+911:373  Missing ')' in method call.
+911:489  Missing closing '}' in statement block or type definition.
+911:490  The string is missing the terminator: ".
+911:560  Missing closing '}' in statement block or type definition.
+911:561  The string is missing the terminator: ".
+911:565  Missing closing ')' in subexpression.
+911:576  Missing closing ')' in subexpression.
+911:577  Missing closing ')' in expression.
+911:577  Missing ')' in method call.
+911:684  Missing closing '}' in statement block or type definition.
+911:685  The string is missing the terminator: ".
+
+--- REGIONS AROUND FIRST 5 DISTINCT ERROR LINES ---
+
+=== line 906 ===
+     900 |             "<tr><td><b>$([System.Web.HttpUtility]::HtmlEncode($_.Name))</b></td><td>$([System.Web.HttpUtility]::HtmlEncode($_.Version))</td><td>$([System.Web.HttpUtility]::HtmlEncode($rt))</td><td><span class='bx er'>BASE_POLLUTED</span></td></tr>"
+     901 |         }) -join "`n"
+     902 |     } else { "<tr><td colspan='4' style='color:#5a9e6f'>✓ Base 無污染</td></tr>" }
+     903 | 
+     904 |     $envRows = @($EnvHealth | ForEach-Object {
+     905 |         $hc=if($_.health -eq 'OK'){'bx ok'}elseif($_.health -in @('DEGRADED','EMPTY')){'bx wn'}else{'bx er'}
+E>   906 |         "<tr><td><b>$([System.Web.HttpUtility]::HtmlEncode($_.name))</b></td><td style='font:9px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.py_version){$_.py_version}else{"—"})))</td><td>$(if($null -ne $_.pkg_count){$_.pkg_count}else{0})</td><td><span class='$hc'>$($_.health)</span></td><td>$(BxB $_.polluted)</td><td>$(BxB $_.conflict)</td><td>$(BxB $_.pip_check_ok)</td><td style='font:8px var(--mo);max-width:200px;overflow:hidden;text-overflow:ellipsis'>$([System.Web.HttpUtility]::HtmlEncode(($(if($null -ne $_.pip_note){$_.pip_note}else{""})).Substring(0,[Math]::Min(80,($(if($null -ne $_.pip_note){$_.pip_note}else{""})).Length))))</td></tr>"
+     907 |     }) -join "`n"
+     908 | 
+     909 |     $libRows = @($Classified | Select-Object -First 300 | ForEach-Object {
+     910 |         $rk=if($_.risk -eq 'HIGH'){'er'}elseif($_.risk -eq 'MEDIUM'){'wn'}else{'na'}
+     911 |         "<tr><td style='font:700 8px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.tool_id){$_.tool_id}else{""})))</td><td style='font:9px var(--mo);color:var(--tl)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.lib_code){$_.lib_code}else{""})))</td><td><b>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.name){$_.name}else{""})))</b></td><td style='font:9px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode(($(if($null -ne $_.spec){$_.spec}else{""})).Substring(0,[Math]::Min(28,($(if($null -ne $_.spec){$_.spec}else{""})).Length))))</td><td style='font:8px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.D1){$_.D1}else{""})))·$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.D5){$_.D5}else{""})))</td><td style='font:8px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode(($(if($null -ne $_.cluster){$_.cluster}else{""})).Replace('CL_','')))</td><td style='font:9px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.env_target){$_.env_target}else{""})))</td><td><span class='bx $rk'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.risk){$_.risk}else{"NONE"})))</span></td><td style='font:8px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode(($(if($null -ne $_.spec_file){$_.spec_file}else{""})).Split('\')[-1]))</td></tr>"
+
+=== line 911 ===
+     905 |         $hc=if($_.health -eq 'OK'){'bx ok'}elseif($_.health -in @('DEGRADED','EMPTY')){'bx wn'}else{'bx er'}
+     906 |         "<tr><td><b>$([System.Web.HttpUtility]::HtmlEncode($_.name))</b></td><td style='font:9px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.py_version){$_.py_version}else{"—"})))</td><td>$(if($null -ne $_.pkg_count){$_.pkg_count}else{0})</td><td><span class='$hc'>$($_.health)</span></td><td>$(BxB $_.polluted)</td><td>$(BxB $_.conflict)</td><td>$(BxB $_.pip_check_ok)</td><td style='font:8px var(--mo);max-width:200px;overflow:hidden;text-overflow:ellipsis'>$([System.Web.HttpUtility]::HtmlEncode(($(if($null -ne $_.pip_note){$_.pip_note}else{""})).Substring(0,[Math]::Min(80,($(if($null -ne $_.pip_note){$_.pip_note}else{""})).Length))))</td></tr>"
+     907 |     }) -join "`n"
+     908 | 
+     909 |     $libRows = @($Classified | Select-Object -First 300 | ForEach-Object {
+     910 |         $rk=if($_.risk -eq 'HIGH'){'er'}elseif($_.risk -eq 'MEDIUM'){'wn'}else{'na'}
+E>   911 |         "<tr><td style='font:700 8px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.tool_id){$_.tool_id}else{""})))</td><td style='font:9px var(--mo);color:var(--tl)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.lib_code){$_.lib_code}else{""})))</td><td><b>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.name){$_.name}else{""})))</b></td><td style='font:9px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode(($(if($null -ne $_.spec){$_.spec}else{""})).Substring(0,[Math]::Min(28,($(if($null -ne $_.spec){$_.spec}else{""})).Length))))</td><td style='font:8px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.D1){$_.D1}else{""})))·$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.D5){$_.D5}else{""})))</td><td style='font:8px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode(($(if($null -ne $_.cluster){$_.cluster}else{""})).Replace('CL_','')))</td><td style='font:9px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.env_target){$_.env_target}else{""})))</td><td><span class='bx $rk'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.risk){$_.risk}else{"NONE"})))</span></td><td style='font:8px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode(($(if($null -ne $_.spec_file){$_.spec_file}else{""})).Split('\')[-1]))</td></tr>"
+     912 |     }) -join "`n"
+     913 | 
+     914 |     $gapRows = @($Gap.missing | Select-Object -First 200 | ForEach-Object {
+     915 |         "<tr><td><b>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.name){$_.name}else{""})))</b></td><td style='font:9px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.spec){$_.spec}else{""})))</td><td>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.env_target){$_.env_target}else{""})))</td><td><span class='bx er'>NOT_INSTALLED</span></td><td>$(if($_.risk -in @('HIGH','MEDIUM')){"<span class='bx $(if($_.risk -eq 'HIGH'){'er'}else{'wn'})'>$($_.risk)</span>"}else{'—'})</td></tr>"
+     916 |     }) -join "`n"
+
+=== line 915 ===
+     909 |     $libRows = @($Classified | Select-Object -First 300 | ForEach-Object {
+     910 |         $rk=if($_.risk -eq 'HIGH'){'er'}elseif($_.risk -eq 'MEDIUM'){'wn'}else{'na'}
+     911 |         "<tr><td style='font:700 8px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.tool_id){$_.tool_id}else{""})))</td><td style='font:9px var(--mo);color:var(--tl)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.lib_code){$_.lib_code}else{""})))</td><td><b>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.name){$_.name}else{""})))</b></td><td style='font:9px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode(($(if($null -ne $_.spec){$_.spec}else{""})).Substring(0,[Math]::Min(28,($(if($null -ne $_.spec){$_.spec}else{""})).Length))))</td><td style='font:8px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.D1){$_.D1}else{""})))·$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.D5){$_.D5}else{""})))</td><td style='font:8px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode(($(if($null -ne $_.cluster){$_.cluster}else{""})).Replace('CL_','')))</td><td style='font:9px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.env_target){$_.env_target}else{""})))</td><td><span class='bx $rk'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.risk){$_.risk}else{"NONE"})))</span></td><td style='font:8px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode(($(if($null -ne $_.spec_file){$_.spec_file}else{""})).Split('\')[-1]))</td></tr>"
+     912 |     }) -join "`n"
+     913 | 
+     914 |     $gapRows = @($Gap.missing | Select-Object -First 200 | ForEach-Object {
+E>   915 |         "<tr><td><b>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.name){$_.name}else{""})))</b></td><td style='font:9px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.spec){$_.spec}else{""})))</td><td>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.env_target){$_.env_target}else{""})))</td><td><span class='bx er'>NOT_INSTALLED</span></td><td>$(if($_.risk -in @('HIGH','MEDIUM')){"<span class='bx $(if($_.risk -eq 'HIGH'){'er'}else{'wn'})'>$($_.risk)</span>"}else{'—'})</td></tr>"
+     916 |     }) -join "`n"
+     917 | 
+     918 |     $sbRows = @($Sandbox | ForEach-Object {
+     919 |         $uv=if($_.uv_compile -eq 'PASS'){"<span class='bd ok'>PASS</span>"}else{"<span class='bd er'>FAIL</span>"}
+     920 |         $pc=if($_.pip_check -eq 'PASS'){"<span class='bd ok'>OK</span>"}elseif($_.pip_check -eq 'SKIP'){"<span class='bd na'>SKIP</span>"}else{"<span class='bd wn'>WARN</span>"}
+
+=== line 931 ===
+     925 |         $errShort = if($_.uv_note){$_.uv_note.Substring(0,[Math]::Min(120,$_.uv_note.Length))}else{""}
+     926 |         "<tr><td><b>$([System.Web.HttpUtility]::HtmlEncode($(if($_.env_name){$_.env_name}else{''})))"+"</b></td><td>$uv</td><td>$pc</td><td>$pd</td><td>$pcc</td><td>$pkg</td><td>$rl</td><td>$($_.pkg_count)</td>"+"<td>$($_.elapsed_sec)</td><td style='font:8px var(--mo);max-width:200px'>$([System.Web.HttpUtility]::HtmlEncode($errShort))</td></tr>"
+     927 |     }) -join "`n"
+     928 | 
+     929 |     $planRows = @($Policy.install | ForEach-Object {
+     930 |         $sc=switch($_.status){'ALREADY_PRESENT'{'na'}'PLAN_ISOLATED'{'wn'}default{'ok'}}
+E>   931 |         "<tr><td><b>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.name){$_.name}else{""})))</b></td><td style='font:9px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.spec){$_.spec}else{""})))</td><td>$(if($_.risk -in @('HIGH','MEDIUM')){"<span class='bx $(if($_.risk -eq 'HIGH'){'er'}else{'wn'})'>$($_.risk)</span>"}else{'—'})</td><td style='font:9px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.env_target){$_.env_target}else{""})))</td><td><span class='bx $sc'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.status){$_.status}else{""})))</span></td><td class='w' style='font:8px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.action){$_.action}else{""})))</td></tr>"
+     932 |     }) -join "`n"
+     933 | 
+     934 |     $rbRows = @($Policy.rebuild | ForEach-Object {
+     935 |         "<tr><td><b>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.env_name){$_.env_name}else{""})))</b></td><td><span class='bx er'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.health){$_.health}else{""})))</span></td><td class='w' style='font:8px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.reason){$_.reason}else{""})))</td><td class='w' style='font:8px var(--mo);color:var(--tl)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.action){$_.action}else{""})))</td></tr>"
+     936 |     }) -join "`n"
+
+=== line 935 ===
+     929 |     $planRows = @($Policy.install | ForEach-Object {
+     930 |         $sc=switch($_.status){'ALREADY_PRESENT'{'na'}'PLAN_ISOLATED'{'wn'}default{'ok'}}
+     931 |         "<tr><td><b>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.name){$_.name}else{""})))</b></td><td style='font:9px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.spec){$_.spec}else{""})))</td><td>$(if($_.risk -in @('HIGH','MEDIUM')){"<span class='bx $(if($_.risk -eq 'HIGH'){'er'}else{'wn'})'>$($_.risk)</span>"}else{'—'})</td><td style='font:9px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.env_target){$_.env_target}else{""})))</td><td><span class='bx $sc'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.status){$_.status}else{""})))</span></td><td class='w' style='font:8px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.action){$_.action}else{""})))</td></tr>"
+     932 |     }) -join "`n"
+     933 | 
+     934 |     $rbRows = @($Policy.rebuild | ForEach-Object {
+E>   935 |         "<tr><td><b>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.env_name){$_.env_name}else{""})))</b></td><td><span class='bx er'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.health){$_.health}else{""})))</span></td><td class='w' style='font:8px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.reason){$_.reason}else{""})))</td><td class='w' style='font:8px var(--mo);color:var(--tl)'>$([System.Web.HttpUtility]::HtmlEncode($(if($null -ne $_.action){$_.action}else{""})))</td></tr>"
+     936 |     }) -join "`n"
+     937 | 
+     938 |     $riskRows = @($Gap.risk_libs | Select-Object -First 100 | ForEach-Object {
+     939 |         $rc=if($_.risk -eq 'HIGH'){'er'}elseif($_.risk -eq 'MEDIUM'){'wn'}else{'na'}
+     940 |         $in=if($_.installed){'<span class="bd ok">YES</span>'}else{'<span class="bd er">NO</span>'}

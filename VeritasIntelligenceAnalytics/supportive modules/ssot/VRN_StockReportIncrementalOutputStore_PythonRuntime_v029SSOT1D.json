@@ -1,0 +1,64 @@
+{
+  "generated_at": "2026-06-15T15:18:35.887372",
+  "status": "VRN_STOCKREPORT_INCREMENTAL_OUTPUT_READY_WITH_REVIEW",
+  "risk": "MEDIUM",
+  "hard_blocks": 0,
+  "warnings": 0,
+  "basicinfo_rows": 400,
+  "basicinfo_new_rows": 400,
+  "financialdata_rows": 0,
+  "financialdata_new_rows": 0,
+  "financial_pending_reason": "No existing FinancialData parquet candidate found. StockReportFinancialData schema created and waits for VRN 1D table extraction staging.",
+  "duckdb_status": "READY",
+  "duckdb_path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\VRN_StockReport.duckdb",
+  "basicinfo_parquet": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\StockReportBasicInfo.parquet",
+  "financialdata_parquet": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\StockReportFinancialData.parquet",
+  "dataflow_json": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\SSOT\\_runs\\VRN_STOCKREPORT_INCREMENTAL_OUTPUT_STORE_v029SSOT1D_20260615_151828\\runtime\\VRN_StockReport_Dataflow_v029SSOT1D.json",
+  "ssot_dedup_dir": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\_ssot_dedup",
+  "financial_candidates_count": 0,
+  "tests": [
+    {
+      "name": "Parquet BasicInfo Readback",
+      "status": "PASS",
+      "value": 400,
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\StockReportBasicInfo.parquet",
+      "message": "BasicInfo parquet readback count."
+    },
+    {
+      "name": "Parquet FinancialData Readback",
+      "status": "PASS",
+      "value": 0,
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\StockReportFinancialData.parquet",
+      "message": "FinancialData parquet readback count."
+    },
+    {
+      "name": "BasicInfo Incremental Dedup",
+      "status": "PASS",
+      "value": 0,
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\StockReportBasicInfo.parquet",
+      "message": "record_hash duplicates in BasicInfo."
+    },
+    {
+      "name": "FinancialData Incremental Dedup",
+      "status": "PASS",
+      "value": 0,
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\StockReportFinancialData.parquet",
+      "message": "record_hash duplicates in FinancialData."
+    },
+    {
+      "name": "DuckDB BasicInfo Count",
+      "status": "PASS",
+      "value": 400,
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\VRN_StockReport.duckdb",
+      "message": "DuckDB serving layer test."
+    },
+    {
+      "name": "DuckDB FinancialData Count",
+      "status": "PASS",
+      "value": 0,
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\VRN_StockReport.duckdb",
+      "message": "DuckDB serving layer test."
+    }
+  ],
+  "next_step": "Run VRN 1D table extraction staging to populate StockReportFinancialData if financial rows are pending. Do not canonical promote yet."
+}

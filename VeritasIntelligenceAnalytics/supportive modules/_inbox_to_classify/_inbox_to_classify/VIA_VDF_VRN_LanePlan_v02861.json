@@ -1,0 +1,43 @@
+{
+  "generated_at": "2026-06-11T11:20:51.127+08:00",
+  "status": "VIA_VDF_VRN_LANE_PLAN_READY",
+  "risk": "MEDIUM",
+  "project_root": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics",
+  "nexus_core": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules\\Invoke-VeritasNexusCore.ps1",
+  "policy": {
+    "db_write": false,
+    "canonical_merge": false,
+    "destructive_delete": false,
+    "stop_process": false,
+    "generated_script_execution": false
+  },
+  "vdf_lanes": [
+    {
+      "lane": "VDF_Write_Governance",
+      "mode": "SEQUENTIAL_GATED",
+      "reason": "DB write, canonical merge, schema mutation must not be parallelized."
+    },
+    {
+      "lane": "VDF_Quarantine_Reduction",
+      "mode": "PARALLEL_SAFE",
+      "reason": "Read-only classification, hash, report, audit can be parallel."
+    }
+  ],
+  "vrn_lanes": [
+    {
+      "lane": "VRN_Ingestion",
+      "mode": "PARALLEL_SAFE",
+      "reason": "Source manifest and extractor capability matrix."
+    },
+    {
+      "lane": "VRN_Normalization",
+      "mode": "PARALLEL_SAFE",
+      "reason": "Schema preview and entity traceability preview."
+    },
+    {
+      "lane": "VRN_Presentation",
+      "mode": "PARALLEL_SAFE",
+      "reason": "HTML UI/report audit."
+    }
+  ]
+}

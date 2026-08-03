@@ -1,0 +1,107 @@
+{
+  "meta": {
+    "schema": "VIA.CodexNexus.GovernanceRegistry",
+    "version": "v1.0",
+    "generated": "2026-06-17",
+    "engine": "GovernanceRegistry",
+    "output": "GovernanceRegistry.json",
+    "reads": "SSOT/Schema/Audit/Test/Snapshot",
+    "append_only": true,
+    "languages": [
+      "PowerShell",
+      "Python",
+      "JavaScript",
+      "HTML"
+    ]
+  },
+  "language_adapters": {
+    "Registry": {
+      "python": "pydantic",
+      "javascript": "JSON",
+      "powershell": "ConvertTo-Json",
+      "html": "—"
+    },
+    "SchemaCheck": {
+      "python": "jsonschema",
+      "javascript": "Ajv",
+      "powershell": "—",
+      "html": "—"
+    },
+    "AuditTrail": {
+      "python": "logging / loguru",
+      "javascript": "JSON log",
+      "powershell": "—",
+      "html": "—"
+    },
+    "Snapshot": {
+      "python": "shutil / hashlib",
+      "javascript": "—",
+      "powershell": "Copy-Item / Get-FileHash",
+      "html": "—"
+    },
+    "Diff": {
+      "python": "difflib",
+      "javascript": "jsdiff",
+      "powershell": "—",
+      "html": "—"
+    },
+    "PanoramaFix": {
+      "python": "—",
+      "javascript": "—",
+      "powershell": "—",
+      "html": "VVX_FixReport"
+    },
+    "TestUI": {
+      "python": "playwright",
+      "javascript": "Playwright",
+      "powershell": "—",
+      "html": "—"
+    },
+    "Lint": {
+      "python": "ruff / mypy",
+      "javascript": "ESLint",
+      "powershell": "ps_lint",
+      "html": "—"
+    },
+    "Report": {
+      "python": "jinja2 / weasyprint",
+      "javascript": "HTML",
+      "powershell": "HttpListener",
+      "html": "report"
+    },
+    "ReleaseGate": {
+      "python": "pytest",
+      "javascript": "npm scripts",
+      "powershell": "Pester",
+      "html": "—"
+    }
+  },
+  "conflict_priority": [
+    "SSOT",
+    "HQ",
+    "ERP",
+    "SAP",
+    "PM",
+    "Local"
+  ],
+  "panorama_audit": {
+    "rounds": "≤3",
+    "order": [
+      "可平行(獨立)",
+      "順序(共用路徑)",
+      "收尾"
+    ],
+    "hydra_safe": true,
+    "retest_each": true,
+    "early_stop": "FAIL=0"
+  },
+  "freeze": {
+    "method": "Check→Test→Register→Freeze",
+    "hash": "SHA256",
+    "non_destructive": true
+  },
+  "io": {
+    "output": "GovernanceRegistry.json",
+    "cmd": "Invoke-VeritasCodexNexus.ps1 -Mode Governance -Task BuildReport"
+  }
+}

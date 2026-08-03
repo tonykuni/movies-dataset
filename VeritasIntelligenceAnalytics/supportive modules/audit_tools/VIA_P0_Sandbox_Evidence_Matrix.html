@@ -1,0 +1,401 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>VIA P0 Sandbox + Evidence Studio</title>
+<style>
+:root{--blue:#4c78a8;--grey:#9c9890;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;}
+*{box-sizing:border-box}body{margin:0;background:#14161a;color:#e8e6e1;font-family:"DM Sans",system-ui,sans-serif;font-size:14px;line-height:1.5}
+.wrap{max-width:1500px;margin:0 auto;padding:24px}
+h1{font-family:"Syne","DM Sans",sans-serif;font-size:22px;margin:0 0 2px}
+.seal{color:var(--teal);font-weight:700;margin-right:8px}
+.sub{color:var(--grey);font-family:"DM Mono",ui-monospace,monospace;font-size:12px;margin-bottom:18px}
+.cards{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
+.card{background:#1d2026;border:1px solid #2a2e36;border-radius:10px;padding:12px 16px;min-width:120px}
+.card .k{color:var(--grey);font-size:11px;text-transform:uppercase;letter-spacing:.6px}
+.card .v{font-family:"DM Mono",monospace;font-size:24px;font-weight:600}
+h2{font-family:"Syne",sans-serif;font-size:15px;margin:26px 0 10px;color:var(--teal);border-left:3px solid var(--teal);padding-left:10px}
+table{width:100%;border-collapse:collapse;background:#1a1d23;border-radius:10px;overflow:hidden}
+th,td{text-align:left;padding:9px 11px;border-bottom:1px solid #25292f;vertical-align:top}
+th{background:#22262e;color:var(--grey);font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+td.num,th.num{font-family:"DM Mono",monospace;text-align:right;white-space:nowrap}
+td.fn{font-family:"DM Mono",monospace;color:#fff;white-space:nowrap}
+td.msg{max-width:760px}
+.pill{display:inline-block;padding:2px 8px;border-radius:20px;color:#10131a;font-weight:700;font-size:11px;font-family:"DM Mono",monospace}
+details summary{cursor:pointer;color:var(--blue);font-family:"DM Mono",monospace;font-size:11px;margin-top:6px}
+pre{background:#0f1116;border:1px solid #262a31;border-radius:8px;padding:10px;overflow:auto;font-family:"DM Mono",ui-monospace,monospace;font-size:12px;color:#cfd3da;white-space:pre}
+.foot{color:var(--grey);font-size:11px;font-family:"DM Mono",monospace;margin-top:26px}
+.hand{background:#1d2026;border:1px solid var(--teal);border-radius:10px;padding:14px 16px;margin:18px 0;font-family:"DM Mono",monospace;font-size:12px;color:#cfd3da}
+</style></head><body><div class="wrap">
+<h1><span class="seal">&#29702;</span>VIA P0 Sandbox + Evidence Studio</h1>
+<div class="sub">20260617_030830 &middot; append-only / sandbox / no original mutation &middot; 判天地之美，析萬物之理</div>
+<div class="cards"><div class="card"><div class="k">Targets</div><div class="v">6</div></div><div class="card"><div class="k">Found</div><div class="v">6</div></div><div class="card"><div class="k">Missing</div><div class="v" style="color:#9c9890">0</div></div><div class="card"><div class="k">Parse Clean</div><div class="v" style="color:#5a9e6f">0</div></div><div class="card"><div class="k">Parse Fail</div><div class="v" style="color:#c96b5a">6</div></div><div class="card"><div class="k">Sandbox</div><div class="v" style="font-size:13px;color:#439a9a">append-only</div></div></div>
+<div class="hand">Hand-off: open <b>EVIDENCE_PACK.txt</b> in this RUN folder and paste it back for the line-exact, parse=0-gated repair (Command #3). Originals were never touched; only sandbox copies + this report were written.</div>
+<h2>P0 Sandbox + Evidence Matrix</h2>
+<table><thead><tr><th class="num">#</th><th>File</th><th>Status</th><th class="num">Err</th><th class="num">First L:C</th><th class="num">Lines</th><th>Dup</th><th>First Message / Source Bands</th></tr></thead><tbody>
+<tr><td class="num">1</td><td class="fn">VIA_VEGN_Step1_v32.ps1</td><td><span class="pill" style="background:#c96b5a">PARSE_FAIL</span></td><td class="num">119</td><td class="num">869:24</td><td class="num">1338</td><td>G1</td><td class="msg">Missing closing &#39;}&#39; in statement block or type definition.<details open><summary>header band 1-12</summary><pre>       1 | #requires -Version 7
+       2 | &lt;#
+       3 | ================================================================================
+       4 | VIA_VEGN_Step1_v32.ps1
+       5 | VeritasIntelligenceAnalytics Environment Governance Nexus (VEGN)
+       6 | VERITAS INTELLIGENCE SYSTEM · Step 1 v3.2
+       7 | --------------------------------------------------------------------------------
+       8 | 執行：powershell -ExecutionPolicy Bypass -File &quot;.\VIA_VEGN_Step1_v32.ps1&quot;
+       9 | --------------------------------------------------------------------------------
+      10 | Phase 0  Bootstrap       工具定位（uv / python / pip）
+      11 | Phase 1  BaseGuardian    Base 污染偵測 + 追蹤 + 分流計畫（唯讀，不自動修改）
+      12 | Phase 2  EnvScan         via_* 環境健康審計</pre></details><details><summary>error band</summary><pre>     863 |     [void]$sb.AppendLine(&quot;- EnvRoot: $($CONFIG.EnvRoot)&quot;)
+     864 |     foreach ($e in $EnvHealth) { [void]$sb.AppendLine(&quot;- $($e.name): $($e.health) (Py=$($e.py_version) Pkgs=$($e.pkg_count))&quot;) }
+     865 |     return $sb.ToString()
+     866 | }
+     867 | 
+     868 | # ── PHASE 9: Export ───────────────────────────────────────────────────────────
+&gt;&gt;   869 | function Phase9-Export { param([array]$EnvHealth,[array]$Classified,[PSCustomObject]$Gap,[array]$Sandbox,[PSCustomObject]$Policy,[PSCustomObject]$BaseGuard,[string]$AiPrompt)
+     870 |     SP 95 &#39;Phase 9: 匯出報告&#39;
+     871 | 
+     872 |     # Freeze
+     873 |     if ($CONFIG.EnableDependencyFreeze) {
+     874 |         foreach ($env in $EnvHealth) {
+     875 |             if (-not $env.exists) { continue }</pre></details><details><summary>cascade band 850-965</summary><pre>  850 |         [void]$sb.AppendLine(&quot;## 建立缺失環境&quot;)
+  851 |         foreach ($env in $missEnv) { [void]$sb.AppendLine(&quot;- uv venv `&quot;$($CONFIG.EnvRoot)\$env`&quot; --python $($CONFIG.PreferredPy)&quot;) }
+  852 |         [void]$sb.AppendLine(&quot;&quot;)
+  853 |     }
+  854 |     if ($toInst.Count -gt 0) {
+  855 |         [void]$sb.AppendLine(&quot;## 套件安裝計劃（依環境分組）&quot;)
+  856 |         foreach ($grp in ($toInst | Group-Object env_target)) {
+  857 |             [void]$sb.AppendLine(&quot;### $($grp.Name)&quot;)
+  858 |             foreach ($p in $grp.Group) { [void]$sb.AppendLine(&quot;- $($p.spec)  [Risk=$($p.risk)]  [$($p.status)]&quot;) }
+  859 |         }
+  860 |         [void]$sb.AppendLine(&quot;&quot;)
+  861 |     }
+  862 |     [void]$sb.AppendLine(&quot;## 系統現況&quot;)
+  863 |     [void]$sb.AppendLine(&quot;- EnvRoot: $($CONFIG.EnvRoot)&quot;)
+  864 |     foreach ($e in $EnvHealth) { [void]$sb.AppendLine(&quot;- $($e.name): $($e.health) (Py=$($e.py_version) Pkgs=$($e.pkg_count))&quot;) }
+  865 |     return $sb.ToString()
+  866 | }
+  867 | 
+  868 | # ── PHASE 9: Export ───────────────────────────────────────────────────────────
+  869 | function Phase9-Export { param([array]$EnvHealth,[array]$Classified,[PSCustomObject]$Gap,[array]$Sandbox,[PSCustomObject]$Policy,[PSCustomObject]$BaseGuard,[string]$AiPrompt)
+  870 |     SP 95 &#39;Phase 9: 匯出報告&#39;
+  871 | 
+  872 |     # Freeze
+  873 |     if ($CONFIG.EnableDependencyFreeze) {
+  874 |         foreach ($env in $EnvHealth) {
+  875 |             if (-not $env.exists) { continue }
+  876 |             $py=GetPy -EnvName $env.name; if(-not $py){continue}
+  877 |             $out=Join-Path $FREEZE_DIR ($env.name+&#39;_freeze.txt&#39;)
+  878 |             $fr=RunProc -Exe $py -Args @(&#39;-m&#39;,&#39;pip&#39;,&#39;freeze&#39;) -To 120
+  879 |             [System.IO.File]::WriteAllText($out,$fr.StdOut,[System.Text.Encoding]::UTF8)
+  880 |         }
+  881 |         WL &quot;Freeze files → $FREEZE_DIR&quot; &#39;OK&#39; &#39;EXPORT&#39;
+  882 |     }
+  883 | 
+  884 |     # CSV
+  885 |     $EnvHealth | Select-Object name,exists,py_version,pkg_count,health,polluted,conflict,pip_check_ok |
+  886 |         Export-Csv $CSV_PATH -NoTypeInformation -Encoding UTF8
+  887 |     WL &quot;CSV → $CSV_PATH&quot; &#39;OK&#39; &#39;EXPORT&#39;
+  888 | 
+  889 |     # HTML
+  890 |     $escH = { param($s) [System.Web.HttpUtility]::HtmlEncode([string](if($null -ne $s){$s}else{&quot;&quot;})) }
+  891 |     function Bx { param($v,[string]$cls=&#39;&#39;)
+  892 |         $s=[string](if($v){$v}else{&quot;&quot;}); $c=if($cls){&quot;$cls&quot;}elseif($s -in @(&#39;OK&#39;,&#39;PASS&#39;,&#39;True&#39;)){&#39;ok&#39;}elseif($s -in @(&#39;FAIL&#39;,&#39;BROKEN&#39;,&#39;MISSING&#39;,&#39;EMPTY&#39;,&#39;DEGRADED&#39;,&#39;True&#39;) -and $s -ne &#39;True&#39;){&#39;er&#39;}elseif($s -in @(&#39;WARN&#39;,&#39;MEDIUM&#39;,&#39;DEGRADED&#39;)){&#39;wn&#39;}else{&#39;na&#39;}
+  893 |         &quot;&lt;span class=&#39;bx $c&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode($s))&lt;/span&gt;&quot;
+  894 |     }
+  895 |     function BxB { param($v) if($v){&quot;&lt;span class=&#39;bx er&#39;&gt;YES&lt;/span&gt;&quot;}else{&quot;&lt;span class=&#39;bx ok&#39;&gt;NO&lt;/span&gt;&quot;} }
+  896 | 
+  897 |     $pollRows = if ($BaseGuard -and @($BaseGuard.PollutedPy).Count -gt 0) {
+  898 |         @($BaseGuard.PollutedPy | ForEach-Object {
+  899 |             $rt=if($CONFIG.ViaRouteMap.ContainsKey($_.Name)){$CONFIG.ViaRouteMap[$_.Name]}else{&#39;UNKNOWN&#39;}
+  900 |             &quot;&lt;tr&gt;&lt;td&gt;&lt;b&gt;$([System.Web.HttpUtility]::HtmlEncode($_.Name))&lt;/b&gt;&lt;/td&gt;&lt;td&gt;$([System.Web.HttpUtility]::HtmlEncode($_.Version))&lt;/td&gt;&lt;td&gt;$([System.Web.HttpUtility]::HtmlEncode($rt))&lt;/td&gt;&lt;td&gt;&lt;span class=&#39;bx er&#39;&gt;BASE_POLLUTED&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&quot;
+  901 |         }) -join &quot;`n&quot;
+  902 |     } else { &quot;&lt;tr&gt;&lt;td colspan=&#39;4&#39; style=&#39;color:#5a9e6f&#39;&gt;✓ Base 無污染&lt;/td&gt;&lt;/tr&gt;&quot; }
+  903 | 
+  904 |     $envRows = @($EnvHealth | ForEach-Object {
+  905 |         $hc=if($_.health -eq &#39;OK&#39;){&#39;bx ok&#39;}elseif($_.health -in @(&#39;DEGRADED&#39;,&#39;EMPTY&#39;)){&#39;bx wn&#39;}else{&#39;bx er&#39;}
+  906 |         &quot;&lt;tr&gt;&lt;td&gt;&lt;b&gt;$([System.Web.HttpUtility]::HtmlEncode($_.name))&lt;/b&gt;&lt;/td&gt;&lt;td style=&#39;font:9px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.py_version){$_.py_version}else{&quot;—&quot;}))&lt;/td&gt;&lt;td&gt;$(if($null -ne $_.pkg_count){$_.pkg_count}else{0})&lt;/td&gt;&lt;td&gt;&lt;span class=&#39;$hc&#39;&gt;$($_.health)&lt;/span&gt;&lt;/td&gt;&lt;td&gt;$(BxB $_.polluted)&lt;/td&gt;&lt;td&gt;$(BxB $_.conflict)&lt;/td&gt;&lt;td&gt;$(BxB $_.pip_check_ok)&lt;/td&gt;&lt;td style=&#39;font:8px var(--mo);max-width:200px;overflow:hidden;text-overflow:ellipsis&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode((if($null -ne $_.pip_note){$_.pip_note}else{&quot;&quot;}).Substring(0,[Math]::Min(80,(if($null -ne $_.pip_note){$_.pip_note}else{&quot;&quot;}).Length))))&lt;/td&gt;&lt;/tr&gt;&quot;
+  907 |     }) -join &quot;`n&quot;
+  908 | 
+  909 |     $libRows = @($Classified | Select-Object -First 300 | ForEach-Object {
+  910 |         $rk=if($_.risk -eq &#39;HIGH&#39;){&#39;er&#39;}elseif($_.risk -eq &#39;MEDIUM&#39;){&#39;wn&#39;}else{&#39;na&#39;}
+  911 |         &quot;&lt;tr&gt;&lt;td style=&#39;font:700 8px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.tool_id){$_.tool_id}else{&quot;&quot;}))&lt;/td&gt;&lt;td style=&#39;font:9px var(--mo);color:var(--tl)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.lib_code){$_.lib_code}else{&quot;&quot;}))&lt;/td&gt;&lt;td&gt;&lt;b&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.name){$_.name}else{&quot;&quot;}))&lt;/b&gt;&lt;/td&gt;&lt;td style=&#39;font:9px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode((if($null -ne $_.spec){$_.spec}else{&quot;&quot;}).Substring(0,[Math]::Min(28,(if($null -ne $_.spec){$_.spec}else{&quot;&quot;}).Length))))&lt;/td&gt;&lt;td style=&#39;font:8px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.D1){$_.D1}else{&quot;&quot;}))·$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.D5){$_.D5}else{&quot;&quot;}))&lt;/td&gt;&lt;td style=&#39;font:8px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode((if($null -ne $_.cluster){$_.cluster}else{&quot;&quot;}).Replace(&#39;CL_&#39;,&#39;&#39;)))&lt;/td&gt;&lt;td style=&#39;font:9px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.env_target){$_.env_target}else{&quot;&quot;}))&lt;/td&gt;&lt;td&gt;&lt;span class=&#39;bx $rk&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.risk){$_.risk}else{&quot;NONE&quot;}))&lt;/span&gt;&lt;/td&gt;&lt;td style=&#39;font:8px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode((if($null -ne $_.spec_file){$_.spec_file}else{&quot;&quot;}).Split(&#39;\&#39;)[-1]))&lt;/td&gt;&lt;/tr&gt;&quot;
+  912 |     }) -join &quot;`n&quot;
+  913 | 
+  914 |     $gapRows = @($Gap.missing | Select-Object -First 200 | ForEach-Object {
+  915 |         &quot;&lt;tr&gt;&lt;td&gt;&lt;b&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.name){$_.name}else{&quot;&quot;}))&lt;/b&gt;&lt;/td&gt;&lt;td style=&#39;font:9px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.spec){$_.spec}else{&quot;&quot;}))&lt;/td&gt;&lt;td&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.env_target){$_.env_target}else{&quot;&quot;}))&lt;/td&gt;&lt;td&gt;&lt;span class=&#39;bx er&#39;&gt;NOT_INSTALLED&lt;/span&gt;&lt;/td&gt;&lt;td&gt;$(if($_.risk -in @(&#39;HIGH&#39;,&#39;MEDIUM&#39;)){&quot;&lt;span class=&#39;bx $(if($_.risk -eq &#39;HIGH&#39;){&#39;er&#39;}else{&#39;wn&#39;})&#39;&gt;$($_.risk)&lt;/span&gt;&quot;}else{&#39;—&#39;})&lt;/td&gt;&lt;/tr&gt;&quot;
+  916 |     }) -join &quot;`n&quot;
+  917 | 
+  918 |     $sbRows = @($Sandbox | ForEach-Object {
+  919 |         $uv=if($_.uv_compile -eq &#39;PASS&#39;){&quot;&lt;span class=&#39;bd ok&#39;&gt;PASS&lt;/span&gt;&quot;}else{&quot;&lt;span class=&#39;bd er&#39;&gt;FAIL&lt;/span&gt;&quot;}
+  920 |         $pc=if($_.pip_check -eq &#39;PASS&#39;){&quot;&lt;span class=&#39;bd ok&#39;&gt;OK&lt;/span&gt;&quot;}elseif($_.pip_check -eq &#39;SKIP&#39;){&quot;&lt;span class=&#39;bd na&#39;&gt;SKIP&lt;/span&gt;&quot;}else{&quot;&lt;span class=&#39;bd wn&#39;&gt;WARN&lt;/span&gt;&quot;}
+  921 |         $pd=if($_.pipdeptree -eq &#39;PASS&#39;){&quot;&lt;span class=&#39;bd ok&#39;&gt;OK&lt;/span&gt;&quot;}elseif($_.pipdeptree -eq &#39;SKIP&#39;){&quot;&lt;span class=&#39;bd na&#39;&gt;SKIP&lt;/span&gt;&quot;}else{&quot;&lt;span class=&#39;bd wn&#39;&gt;WARN&lt;/span&gt;&quot;}
+  922 |         $pcc=if($_.pip_compile -eq &#39;PASS&#39;){&quot;&lt;span class=&#39;bd ok&#39;&gt;OK&lt;/span&gt;&quot;}elseif($_.pip_compile -eq &#39;SKIP&#39;){&quot;&lt;span class=&#39;bd na&#39;&gt;SKIP&lt;/span&gt;&quot;}else{&quot;&lt;span class=&#39;bd wn&#39;&gt;WARN&lt;/span&gt;&quot;}
+  923 |         $pkg=if($_.packaging -eq &#39;PASS&#39;){&quot;&lt;span class=&#39;bd ok&#39;&gt;OK&lt;/span&gt;&quot;}elseif($_.packaging -eq &#39;SKIP&#39;){&quot;&lt;span class=&#39;bd na&#39;&gt;SKIP&lt;/span&gt;&quot;}else{&quot;&lt;span class=&#39;bd wn&#39;&gt;WARN&lt;/span&gt;&quot;}
+  924 |         $rl=if($_.resolvelib -eq &#39;PASS&#39;){&quot;&lt;span class=&#39;bd ok&#39;&gt;OK&lt;/span&gt;&quot;}elseif($_.resolvelib -eq &#39;SKIP&#39;){&quot;&lt;span class=&#39;bd na&#39;&gt;SKIP&lt;/span&gt;&quot;}else{&quot;&lt;span class=&#39;bd na&#39;&gt;MISS&lt;/span&gt;&quot;}
+  925 |         $errShort = if($_.uv_note){$_.uv_note.Substring(0,[Math]::Min(120,$_.uv_note.Length))}else{&quot;&quot;}
+  926 |         &quot;&lt;tr&gt;&lt;td&gt;&lt;b&gt;$([System.Web.HttpUtility]::HtmlEncode(if($_.env_name){$_.env_name}else{&#39;&#39;}))&quot;+&quot;&lt;/b&gt;&lt;/td&gt;&lt;td&gt;$uv&lt;/td&gt;&lt;td&gt;$pc&lt;/td&gt;&lt;td&gt;$pd&lt;/td&gt;&lt;td&gt;$pcc&lt;/td&gt;&lt;td&gt;$pkg&lt;/td&gt;&lt;td&gt;$rl&lt;/td&gt;&lt;td&gt;$($_.pkg_count)&lt;/td&gt;&quot;+&quot;&lt;td&gt;$($_.elapsed_sec)&lt;/td&gt;&lt;td style=&#39;font:8px var(--mo);max-width:200px&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode($errShort))&lt;/td&gt;&lt;/tr&gt;&quot;
+  927 |     }) -join &quot;`n&quot;
+  928 | 
+  929 |     $planRows = @($Policy.install | ForEach-Object {
+  930 |         $sc=switch($_.status){&#39;ALREADY_PRESENT&#39;{&#39;na&#39;}&#39;PLAN_ISOLATED&#39;{&#39;wn&#39;}default{&#39;ok&#39;}}
+  931 |         &quot;&lt;tr&gt;&lt;td&gt;&lt;b&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.name){$_.name}else{&quot;&quot;}))&lt;/b&gt;&lt;/td&gt;&lt;td style=&#39;font:9px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.spec){$_.spec}else{&quot;&quot;}))&lt;/td&gt;&lt;td&gt;$(if($_.risk -in @(&#39;HIGH&#39;,&#39;MEDIUM&#39;)){&quot;&lt;span class=&#39;bx $(if($_.risk -eq &#39;HIGH&#39;){&#39;er&#39;}else{&#39;wn&#39;})&#39;&gt;$($_.risk)&lt;/span&gt;&quot;}else{&#39;—&#39;})&lt;/td&gt;&lt;td style=&#39;font:9px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.env_target){$_.env_target}else{&quot;&quot;}))&lt;/td&gt;&lt;td&gt;&lt;span class=&#39;bx $sc&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.status){$_.status}else{&quot;&quot;}))&lt;/span&gt;&lt;/td&gt;&lt;td class=&#39;w&#39; style=&#39;font:8px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.action){$_.action}else{&quot;&quot;}))&lt;/td&gt;&lt;/tr&gt;&quot;
+  932 |     }) -join &quot;`n&quot;
+  933 | 
+  934 |     $rbRows = @($Policy.rebuild | ForEach-Object {
+  935 |         &quot;&lt;tr&gt;&lt;td&gt;&lt;b&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.env_name){$_.env_name}else{&quot;&quot;}))&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;span class=&#39;bx er&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.health){$_.health}else{&quot;&quot;}))&lt;/span&gt;&lt;/td&gt;&lt;td class=&#39;w&#39; style=&#39;font:8px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.reason){$_.reason}else{&quot;&quot;}))&lt;/td&gt;&lt;td class=&#39;w&#39; style=&#39;font:8px var(--mo);color:var(--tl)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.action){$_.action}else{&quot;&quot;}))&lt;/td&gt;&lt;/tr&gt;&quot;
+  936 |     }) -join &quot;`n&quot;
+  937 | 
+  938 |     $riskRows = @($Gap.risk_libs | Select-Object -First 100 | ForEach-Object {
+  939 |         $rc=if($_.risk -eq &#39;HIGH&#39;){&#39;er&#39;}elseif($_.risk -eq &#39;MEDIUM&#39;){&#39;wn&#39;}else{&#39;na&#39;}
+  940 |         $in=if($_.installed){&#39;&lt;span class=&quot;bd ok&quot;&gt;YES&lt;/span&gt;&#39;}else{&#39;&lt;span class=&quot;bd er&quot;&gt;NO&lt;/span&gt;&#39;}
+  941 |         $cr=if($_.correct_env){&#39;&lt;span class=&quot;bd ok&quot;&gt;YES&lt;/span&gt;&#39;}else{&#39;&lt;span class=&quot;bd na&quot;&gt;NO&lt;/span&gt;&#39;}
+  942 |         &quot;&lt;tr&gt;&lt;td&gt;&lt;b&gt;$([System.Web.HttpUtility]::HtmlEncode(if($_.name){$_.name}else{&#39;&#39;}))&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;span class=&#39;bd $rc&#39;&gt;$($_.risk)&lt;/span&gt;&lt;/td&gt;&lt;td style=&#39;font:9px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($_.env_target){$_.env_target}else{&#39;&#39;}))&lt;/td&gt;&lt;td&gt;$in&lt;/td&gt;&lt;td&gt;$cr&lt;/td&gt;&lt;/tr&gt;&quot;
+  943 |     }) -join &quot;`n&quot;
+  944 | 
+  945 |     $missEnvRows = @($Policy.missing_env | Select-Object -Unique | ForEach-Object {
+  946 |         $uvcmd = &quot;uv venv `&quot;$($CONFIG.EnvRoot)\$($_.env_name)`&quot; --python $($CONFIG.PreferredPy)&quot;
+  947 |         &quot;&lt;tr&gt;&lt;td&gt;&lt;b&gt;$([System.Web.HttpUtility]::HtmlEncode(if($_.env_name){$_.env_name}else{&#39;&#39;}))&lt;/b&gt;&lt;/td&gt;&lt;td&gt;$([System.Web.HttpUtility]::HtmlEncode(if($_.trigger){$_.trigger}else{&#39;&#39;}))&lt;/td&gt;&lt;td&gt;&lt;span class=&#39;bd $(if($_.risk -eq &#39;HIGH&#39;){&quot;er&quot;}elseif($_.risk -eq &#39;MEDIUM&#39;){&quot;wn&quot;}else{&quot;na&quot;})&#39;&gt;$($_.risk)&lt;/span&gt;&lt;/td&gt;&lt;td style=&#39;font:8px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode($uvcmd))&lt;/td&gt;&lt;/tr&gt;&quot;
+  948 |     }) -join &quot;`n&quot;
+  949 | 
+  950 | 
+  951 |     $planPendingCount = @($Policy.install | Where-Object { $_.status -ne &quot;ALREADY_PRESENT&quot; }).Count
+  952 |     $promptHtml = [System.Web.HttpUtility]::HtmlEncode(if($AiPrompt){$AiPrompt}else{&quot;（未生成）&quot;})
+  953 |     $sysN = [System.Web.HttpUtility]::HtmlEncode($CONFIG.SystemName)
+  954 |     $sysS = [System.Web.HttpUtility]::HtmlEncode($CONFIG.SystemSubtitle)
+  955 |     $mode = if($CONFIG.EnableAutoRepair){&#39;AUTO_REPAIR&#39;}else{&#39;READ_ONLY&#39;}
+  956 | 
+  957 |     $html = @&quot;
+  958 | &lt;!DOCTYPE html&gt;
+  959 | &lt;html lang=&quot;zh-TW&quot;&gt;
+  960 | &lt;head&gt;
+  961 | &lt;meta charset=&quot;utf-8&quot;&gt;
+  962 | &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;&gt;
+  963 | &lt;title&gt;VEGN Step 1 v3.2 — VIA Env Governance&lt;/title&gt;
+  964 | &lt;style&gt;
+  965 | @import url(&#39;https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&amp;family=DM+Mono:wght@300;400;500&amp;family=DM+Sans:wght@400;500;600;700&amp;display=swap&#39;);</pre></details></td></tr>
+<tr><td class="num">2</td><td class="fn">VIA_VEGN_Step1_v32.ps1</td><td><span class="pill" style="background:#c96b5a">PARSE_FAIL</span></td><td class="num">119</td><td class="num">869:24</td><td class="num">1338</td><td>G1</td><td class="msg">Missing closing &#39;}&#39; in statement block or type definition.<details open><summary>header band 1-12</summary><pre>       1 | #requires -Version 7
+       2 | &lt;#
+       3 | ================================================================================
+       4 | VIA_VEGN_Step1_v32.ps1
+       5 | VeritasIntelligenceAnalytics Environment Governance Nexus (VEGN)
+       6 | VERITAS INTELLIGENCE SYSTEM · Step 1 v3.2
+       7 | --------------------------------------------------------------------------------
+       8 | 執行：powershell -ExecutionPolicy Bypass -File &quot;.\VIA_VEGN_Step1_v32.ps1&quot;
+       9 | --------------------------------------------------------------------------------
+      10 | Phase 0  Bootstrap       工具定位（uv / python / pip）
+      11 | Phase 1  BaseGuardian    Base 污染偵測 + 追蹤 + 分流計畫（唯讀，不自動修改）
+      12 | Phase 2  EnvScan         via_* 環境健康審計</pre></details><details><summary>error band</summary><pre>     863 |     [void]$sb.AppendLine(&quot;- EnvRoot: $($CONFIG.EnvRoot)&quot;)
+     864 |     foreach ($e in $EnvHealth) { [void]$sb.AppendLine(&quot;- $($e.name): $($e.health) (Py=$($e.py_version) Pkgs=$($e.pkg_count))&quot;) }
+     865 |     return $sb.ToString()
+     866 | }
+     867 | 
+     868 | # ── PHASE 9: Export ───────────────────────────────────────────────────────────
+&gt;&gt;   869 | function Phase9-Export { param([array]$EnvHealth,[array]$Classified,[PSCustomObject]$Gap,[array]$Sandbox,[PSCustomObject]$Policy,[PSCustomObject]$BaseGuard,[string]$AiPrompt)
+     870 |     SP 95 &#39;Phase 9: 匯出報告&#39;
+     871 | 
+     872 |     # Freeze
+     873 |     if ($CONFIG.EnableDependencyFreeze) {
+     874 |         foreach ($env in $EnvHealth) {
+     875 |             if (-not $env.exists) { continue }</pre></details><details><summary>cascade band 850-965</summary><pre>  850 |         [void]$sb.AppendLine(&quot;## 建立缺失環境&quot;)
+  851 |         foreach ($env in $missEnv) { [void]$sb.AppendLine(&quot;- uv venv `&quot;$($CONFIG.EnvRoot)\$env`&quot; --python $($CONFIG.PreferredPy)&quot;) }
+  852 |         [void]$sb.AppendLine(&quot;&quot;)
+  853 |     }
+  854 |     if ($toInst.Count -gt 0) {
+  855 |         [void]$sb.AppendLine(&quot;## 套件安裝計劃（依環境分組）&quot;)
+  856 |         foreach ($grp in ($toInst | Group-Object env_target)) {
+  857 |             [void]$sb.AppendLine(&quot;### $($grp.Name)&quot;)
+  858 |             foreach ($p in $grp.Group) { [void]$sb.AppendLine(&quot;- $($p.spec)  [Risk=$($p.risk)]  [$($p.status)]&quot;) }
+  859 |         }
+  860 |         [void]$sb.AppendLine(&quot;&quot;)
+  861 |     }
+  862 |     [void]$sb.AppendLine(&quot;## 系統現況&quot;)
+  863 |     [void]$sb.AppendLine(&quot;- EnvRoot: $($CONFIG.EnvRoot)&quot;)
+  864 |     foreach ($e in $EnvHealth) { [void]$sb.AppendLine(&quot;- $($e.name): $($e.health) (Py=$($e.py_version) Pkgs=$($e.pkg_count))&quot;) }
+  865 |     return $sb.ToString()
+  866 | }
+  867 | 
+  868 | # ── PHASE 9: Export ───────────────────────────────────────────────────────────
+  869 | function Phase9-Export { param([array]$EnvHealth,[array]$Classified,[PSCustomObject]$Gap,[array]$Sandbox,[PSCustomObject]$Policy,[PSCustomObject]$BaseGuard,[string]$AiPrompt)
+  870 |     SP 95 &#39;Phase 9: 匯出報告&#39;
+  871 | 
+  872 |     # Freeze
+  873 |     if ($CONFIG.EnableDependencyFreeze) {
+  874 |         foreach ($env in $EnvHealth) {
+  875 |             if (-not $env.exists) { continue }
+  876 |             $py=GetPy -EnvName $env.name; if(-not $py){continue}
+  877 |             $out=Join-Path $FREEZE_DIR ($env.name+&#39;_freeze.txt&#39;)
+  878 |             $fr=RunProc -Exe $py -Args @(&#39;-m&#39;,&#39;pip&#39;,&#39;freeze&#39;) -To 120
+  879 |             [System.IO.File]::WriteAllText($out,$fr.StdOut,[System.Text.Encoding]::UTF8)
+  880 |         }
+  881 |         WL &quot;Freeze files → $FREEZE_DIR&quot; &#39;OK&#39; &#39;EXPORT&#39;
+  882 |     }
+  883 | 
+  884 |     # CSV
+  885 |     $EnvHealth | Select-Object name,exists,py_version,pkg_count,health,polluted,conflict,pip_check_ok |
+  886 |         Export-Csv $CSV_PATH -NoTypeInformation -Encoding UTF8
+  887 |     WL &quot;CSV → $CSV_PATH&quot; &#39;OK&#39; &#39;EXPORT&#39;
+  888 | 
+  889 |     # HTML
+  890 |     $escH = { param($s) [System.Web.HttpUtility]::HtmlEncode([string](if($null -ne $s){$s}else{&quot;&quot;})) }
+  891 |     function Bx { param($v,[string]$cls=&#39;&#39;)
+  892 |         $s=[string](if($v){$v}else{&quot;&quot;}); $c=if($cls){&quot;$cls&quot;}elseif($s -in @(&#39;OK&#39;,&#39;PASS&#39;,&#39;True&#39;)){&#39;ok&#39;}elseif($s -in @(&#39;FAIL&#39;,&#39;BROKEN&#39;,&#39;MISSING&#39;,&#39;EMPTY&#39;,&#39;DEGRADED&#39;,&#39;True&#39;) -and $s -ne &#39;True&#39;){&#39;er&#39;}elseif($s -in @(&#39;WARN&#39;,&#39;MEDIUM&#39;,&#39;DEGRADED&#39;)){&#39;wn&#39;}else{&#39;na&#39;}
+  893 |         &quot;&lt;span class=&#39;bx $c&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode($s))&lt;/span&gt;&quot;
+  894 |     }
+  895 |     function BxB { param($v) if($v){&quot;&lt;span class=&#39;bx er&#39;&gt;YES&lt;/span&gt;&quot;}else{&quot;&lt;span class=&#39;bx ok&#39;&gt;NO&lt;/span&gt;&quot;} }
+  896 | 
+  897 |     $pollRows = if ($BaseGuard -and @($BaseGuard.PollutedPy).Count -gt 0) {
+  898 |         @($BaseGuard.PollutedPy | ForEach-Object {
+  899 |             $rt=if($CONFIG.ViaRouteMap.ContainsKey($_.Name)){$CONFIG.ViaRouteMap[$_.Name]}else{&#39;UNKNOWN&#39;}
+  900 |             &quot;&lt;tr&gt;&lt;td&gt;&lt;b&gt;$([System.Web.HttpUtility]::HtmlEncode($_.Name))&lt;/b&gt;&lt;/td&gt;&lt;td&gt;$([System.Web.HttpUtility]::HtmlEncode($_.Version))&lt;/td&gt;&lt;td&gt;$([System.Web.HttpUtility]::HtmlEncode($rt))&lt;/td&gt;&lt;td&gt;&lt;span class=&#39;bx er&#39;&gt;BASE_POLLUTED&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&quot;
+  901 |         }) -join &quot;`n&quot;
+  902 |     } else { &quot;&lt;tr&gt;&lt;td colspan=&#39;4&#39; style=&#39;color:#5a9e6f&#39;&gt;✓ Base 無污染&lt;/td&gt;&lt;/tr&gt;&quot; }
+  903 | 
+  904 |     $envRows = @($EnvHealth | ForEach-Object {
+  905 |         $hc=if($_.health -eq &#39;OK&#39;){&#39;bx ok&#39;}elseif($_.health -in @(&#39;DEGRADED&#39;,&#39;EMPTY&#39;)){&#39;bx wn&#39;}else{&#39;bx er&#39;}
+  906 |         &quot;&lt;tr&gt;&lt;td&gt;&lt;b&gt;$([System.Web.HttpUtility]::HtmlEncode($_.name))&lt;/b&gt;&lt;/td&gt;&lt;td style=&#39;font:9px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.py_version){$_.py_version}else{&quot;—&quot;}))&lt;/td&gt;&lt;td&gt;$(if($null -ne $_.pkg_count){$_.pkg_count}else{0})&lt;/td&gt;&lt;td&gt;&lt;span class=&#39;$hc&#39;&gt;$($_.health)&lt;/span&gt;&lt;/td&gt;&lt;td&gt;$(BxB $_.polluted)&lt;/td&gt;&lt;td&gt;$(BxB $_.conflict)&lt;/td&gt;&lt;td&gt;$(BxB $_.pip_check_ok)&lt;/td&gt;&lt;td style=&#39;font:8px var(--mo);max-width:200px;overflow:hidden;text-overflow:ellipsis&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode((if($null -ne $_.pip_note){$_.pip_note}else{&quot;&quot;}).Substring(0,[Math]::Min(80,(if($null -ne $_.pip_note){$_.pip_note}else{&quot;&quot;}).Length))))&lt;/td&gt;&lt;/tr&gt;&quot;
+  907 |     }) -join &quot;`n&quot;
+  908 | 
+  909 |     $libRows = @($Classified | Select-Object -First 300 | ForEach-Object {
+  910 |         $rk=if($_.risk -eq &#39;HIGH&#39;){&#39;er&#39;}elseif($_.risk -eq &#39;MEDIUM&#39;){&#39;wn&#39;}else{&#39;na&#39;}
+  911 |         &quot;&lt;tr&gt;&lt;td style=&#39;font:700 8px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.tool_id){$_.tool_id}else{&quot;&quot;}))&lt;/td&gt;&lt;td style=&#39;font:9px var(--mo);color:var(--tl)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.lib_code){$_.lib_code}else{&quot;&quot;}))&lt;/td&gt;&lt;td&gt;&lt;b&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.name){$_.name}else{&quot;&quot;}))&lt;/b&gt;&lt;/td&gt;&lt;td style=&#39;font:9px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode((if($null -ne $_.spec){$_.spec}else{&quot;&quot;}).Substring(0,[Math]::Min(28,(if($null -ne $_.spec){$_.spec}else{&quot;&quot;}).Length))))&lt;/td&gt;&lt;td style=&#39;font:8px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.D1){$_.D1}else{&quot;&quot;}))·$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.D5){$_.D5}else{&quot;&quot;}))&lt;/td&gt;&lt;td style=&#39;font:8px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode((if($null -ne $_.cluster){$_.cluster}else{&quot;&quot;}).Replace(&#39;CL_&#39;,&#39;&#39;)))&lt;/td&gt;&lt;td style=&#39;font:9px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.env_target){$_.env_target}else{&quot;&quot;}))&lt;/td&gt;&lt;td&gt;&lt;span class=&#39;bx $rk&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.risk){$_.risk}else{&quot;NONE&quot;}))&lt;/span&gt;&lt;/td&gt;&lt;td style=&#39;font:8px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode((if($null -ne $_.spec_file){$_.spec_file}else{&quot;&quot;}).Split(&#39;\&#39;)[-1]))&lt;/td&gt;&lt;/tr&gt;&quot;
+  912 |     }) -join &quot;`n&quot;
+  913 | 
+  914 |     $gapRows = @($Gap.missing | Select-Object -First 200 | ForEach-Object {
+  915 |         &quot;&lt;tr&gt;&lt;td&gt;&lt;b&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.name){$_.name}else{&quot;&quot;}))&lt;/b&gt;&lt;/td&gt;&lt;td style=&#39;font:9px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.spec){$_.spec}else{&quot;&quot;}))&lt;/td&gt;&lt;td&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.env_target){$_.env_target}else{&quot;&quot;}))&lt;/td&gt;&lt;td&gt;&lt;span class=&#39;bx er&#39;&gt;NOT_INSTALLED&lt;/span&gt;&lt;/td&gt;&lt;td&gt;$(if($_.risk -in @(&#39;HIGH&#39;,&#39;MEDIUM&#39;)){&quot;&lt;span class=&#39;bx $(if($_.risk -eq &#39;HIGH&#39;){&#39;er&#39;}else{&#39;wn&#39;})&#39;&gt;$($_.risk)&lt;/span&gt;&quot;}else{&#39;—&#39;})&lt;/td&gt;&lt;/tr&gt;&quot;
+  916 |     }) -join &quot;`n&quot;
+  917 | 
+  918 |     $sbRows = @($Sandbox | ForEach-Object {
+  919 |         $uv=if($_.uv_compile -eq &#39;PASS&#39;){&quot;&lt;span class=&#39;bd ok&#39;&gt;PASS&lt;/span&gt;&quot;}else{&quot;&lt;span class=&#39;bd er&#39;&gt;FAIL&lt;/span&gt;&quot;}
+  920 |         $pc=if($_.pip_check -eq &#39;PASS&#39;){&quot;&lt;span class=&#39;bd ok&#39;&gt;OK&lt;/span&gt;&quot;}elseif($_.pip_check -eq &#39;SKIP&#39;){&quot;&lt;span class=&#39;bd na&#39;&gt;SKIP&lt;/span&gt;&quot;}else{&quot;&lt;span class=&#39;bd wn&#39;&gt;WARN&lt;/span&gt;&quot;}
+  921 |         $pd=if($_.pipdeptree -eq &#39;PASS&#39;){&quot;&lt;span class=&#39;bd ok&#39;&gt;OK&lt;/span&gt;&quot;}elseif($_.pipdeptree -eq &#39;SKIP&#39;){&quot;&lt;span class=&#39;bd na&#39;&gt;SKIP&lt;/span&gt;&quot;}else{&quot;&lt;span class=&#39;bd wn&#39;&gt;WARN&lt;/span&gt;&quot;}
+  922 |         $pcc=if($_.pip_compile -eq &#39;PASS&#39;){&quot;&lt;span class=&#39;bd ok&#39;&gt;OK&lt;/span&gt;&quot;}elseif($_.pip_compile -eq &#39;SKIP&#39;){&quot;&lt;span class=&#39;bd na&#39;&gt;SKIP&lt;/span&gt;&quot;}else{&quot;&lt;span class=&#39;bd wn&#39;&gt;WARN&lt;/span&gt;&quot;}
+  923 |         $pkg=if($_.packaging -eq &#39;PASS&#39;){&quot;&lt;span class=&#39;bd ok&#39;&gt;OK&lt;/span&gt;&quot;}elseif($_.packaging -eq &#39;SKIP&#39;){&quot;&lt;span class=&#39;bd na&#39;&gt;SKIP&lt;/span&gt;&quot;}else{&quot;&lt;span class=&#39;bd wn&#39;&gt;WARN&lt;/span&gt;&quot;}
+  924 |         $rl=if($_.resolvelib -eq &#39;PASS&#39;){&quot;&lt;span class=&#39;bd ok&#39;&gt;OK&lt;/span&gt;&quot;}elseif($_.resolvelib -eq &#39;SKIP&#39;){&quot;&lt;span class=&#39;bd na&#39;&gt;SKIP&lt;/span&gt;&quot;}else{&quot;&lt;span class=&#39;bd na&#39;&gt;MISS&lt;/span&gt;&quot;}
+  925 |         $errShort = if($_.uv_note){$_.uv_note.Substring(0,[Math]::Min(120,$_.uv_note.Length))}else{&quot;&quot;}
+  926 |         &quot;&lt;tr&gt;&lt;td&gt;&lt;b&gt;$([System.Web.HttpUtility]::HtmlEncode(if($_.env_name){$_.env_name}else{&#39;&#39;}))&quot;+&quot;&lt;/b&gt;&lt;/td&gt;&lt;td&gt;$uv&lt;/td&gt;&lt;td&gt;$pc&lt;/td&gt;&lt;td&gt;$pd&lt;/td&gt;&lt;td&gt;$pcc&lt;/td&gt;&lt;td&gt;$pkg&lt;/td&gt;&lt;td&gt;$rl&lt;/td&gt;&lt;td&gt;$($_.pkg_count)&lt;/td&gt;&quot;+&quot;&lt;td&gt;$($_.elapsed_sec)&lt;/td&gt;&lt;td style=&#39;font:8px var(--mo);max-width:200px&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode($errShort))&lt;/td&gt;&lt;/tr&gt;&quot;
+  927 |     }) -join &quot;`n&quot;
+  928 | 
+  929 |     $planRows = @($Policy.install | ForEach-Object {
+  930 |         $sc=switch($_.status){&#39;ALREADY_PRESENT&#39;{&#39;na&#39;}&#39;PLAN_ISOLATED&#39;{&#39;wn&#39;}default{&#39;ok&#39;}}
+  931 |         &quot;&lt;tr&gt;&lt;td&gt;&lt;b&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.name){$_.name}else{&quot;&quot;}))&lt;/b&gt;&lt;/td&gt;&lt;td style=&#39;font:9px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.spec){$_.spec}else{&quot;&quot;}))&lt;/td&gt;&lt;td&gt;$(if($_.risk -in @(&#39;HIGH&#39;,&#39;MEDIUM&#39;)){&quot;&lt;span class=&#39;bx $(if($_.risk -eq &#39;HIGH&#39;){&#39;er&#39;}else{&#39;wn&#39;})&#39;&gt;$($_.risk)&lt;/span&gt;&quot;}else{&#39;—&#39;})&lt;/td&gt;&lt;td style=&#39;font:9px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.env_target){$_.env_target}else{&quot;&quot;}))&lt;/td&gt;&lt;td&gt;&lt;span class=&#39;bx $sc&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.status){$_.status}else{&quot;&quot;}))&lt;/span&gt;&lt;/td&gt;&lt;td class=&#39;w&#39; style=&#39;font:8px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.action){$_.action}else{&quot;&quot;}))&lt;/td&gt;&lt;/tr&gt;&quot;
+  932 |     }) -join &quot;`n&quot;
+  933 | 
+  934 |     $rbRows = @($Policy.rebuild | ForEach-Object {
+  935 |         &quot;&lt;tr&gt;&lt;td&gt;&lt;b&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.env_name){$_.env_name}else{&quot;&quot;}))&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;span class=&#39;bx er&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.health){$_.health}else{&quot;&quot;}))&lt;/span&gt;&lt;/td&gt;&lt;td class=&#39;w&#39; style=&#39;font:8px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.reason){$_.reason}else{&quot;&quot;}))&lt;/td&gt;&lt;td class=&#39;w&#39; style=&#39;font:8px var(--mo);color:var(--tl)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.action){$_.action}else{&quot;&quot;}))&lt;/td&gt;&lt;/tr&gt;&quot;
+  936 |     }) -join &quot;`n&quot;
+  937 | 
+  938 |     $riskRows = @($Gap.risk_libs | Select-Object -First 100 | ForEach-Object {
+  939 |         $rc=if($_.risk -eq &#39;HIGH&#39;){&#39;er&#39;}elseif($_.risk -eq &#39;MEDIUM&#39;){&#39;wn&#39;}else{&#39;na&#39;}
+  940 |         $in=if($_.installed){&#39;&lt;span class=&quot;bd ok&quot;&gt;YES&lt;/span&gt;&#39;}else{&#39;&lt;span class=&quot;bd er&quot;&gt;NO&lt;/span&gt;&#39;}
+  941 |         $cr=if($_.correct_env){&#39;&lt;span class=&quot;bd ok&quot;&gt;YES&lt;/span&gt;&#39;}else{&#39;&lt;span class=&quot;bd na&quot;&gt;NO&lt;/span&gt;&#39;}
+  942 |         &quot;&lt;tr&gt;&lt;td&gt;&lt;b&gt;$([System.Web.HttpUtility]::HtmlEncode(if($_.name){$_.name}else{&#39;&#39;}))&lt;/b&gt;&lt;/td&gt;&lt;td&gt;&lt;span class=&#39;bd $rc&#39;&gt;$($_.risk)&lt;/span&gt;&lt;/td&gt;&lt;td style=&#39;font:9px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode(if($_.env_target){$_.env_target}else{&#39;&#39;}))&lt;/td&gt;&lt;td&gt;$in&lt;/td&gt;&lt;td&gt;$cr&lt;/td&gt;&lt;/tr&gt;&quot;
+  943 |     }) -join &quot;`n&quot;
+  944 | 
+  945 |     $missEnvRows = @($Policy.missing_env | Select-Object -Unique | ForEach-Object {
+  946 |         $uvcmd = &quot;uv venv `&quot;$($CONFIG.EnvRoot)\$($_.env_name)`&quot; --python $($CONFIG.PreferredPy)&quot;
+  947 |         &quot;&lt;tr&gt;&lt;td&gt;&lt;b&gt;$([System.Web.HttpUtility]::HtmlEncode(if($_.env_name){$_.env_name}else{&#39;&#39;}))&lt;/b&gt;&lt;/td&gt;&lt;td&gt;$([System.Web.HttpUtility]::HtmlEncode(if($_.trigger){$_.trigger}else{&#39;&#39;}))&lt;/td&gt;&lt;td&gt;&lt;span class=&#39;bd $(if($_.risk -eq &#39;HIGH&#39;){&quot;er&quot;}elseif($_.risk -eq &#39;MEDIUM&#39;){&quot;wn&quot;}else{&quot;na&quot;})&#39;&gt;$($_.risk)&lt;/span&gt;&lt;/td&gt;&lt;td style=&#39;font:8px var(--mo)&#39;&gt;$([System.Web.HttpUtility]::HtmlEncode($uvcmd))&lt;/td&gt;&lt;/tr&gt;&quot;
+  948 |     }) -join &quot;`n&quot;
+  949 | 
+  950 | 
+  951 |     $planPendingCount = @($Policy.install | Where-Object { $_.status -ne &quot;ALREADY_PRESENT&quot; }).Count
+  952 |     $promptHtml = [System.Web.HttpUtility]::HtmlEncode(if($AiPrompt){$AiPrompt}else{&quot;（未生成）&quot;})
+  953 |     $sysN = [System.Web.HttpUtility]::HtmlEncode($CONFIG.SystemName)
+  954 |     $sysS = [System.Web.HttpUtility]::HtmlEncode($CONFIG.SystemSubtitle)
+  955 |     $mode = if($CONFIG.EnableAutoRepair){&#39;AUTO_REPAIR&#39;}else{&#39;READ_ONLY&#39;}
+  956 | 
+  957 |     $html = @&quot;
+  958 | &lt;!DOCTYPE html&gt;
+  959 | &lt;html lang=&quot;zh-TW&quot;&gt;
+  960 | &lt;head&gt;
+  961 | &lt;meta charset=&quot;utf-8&quot;&gt;
+  962 | &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;&gt;
+  963 | &lt;title&gt;VEGN Step 1 v3.2 — VIA Env Governance&lt;/title&gt;
+  964 | &lt;style&gt;
+  965 | @import url(&#39;https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&amp;family=DM+Mono:wght@300;400;500&amp;family=DM+Sans:wght@400;500;600;700&amp;display=swap&#39;);</pre></details></td></tr>
+<tr><td class="num">3</td><td class="fn">Invoke-VIA-ActivationGateway-Hardened.ps1</td><td><span class="pill" style="background:#c96b5a">PARSE_FAIL</span></td><td class="num">1</td><td class="num">5:33</td><td class="num">107</td><td>G2</td><td class="msg">The assignment expression is not valid. The input to an assignment operator must be an object that is able to accept assignments, such as a variable or a property.<details open><summary>header band 1-12</summary><pre>       1 | #requires -Version 7.0
+       2 | $ErrorActionPreference = &quot;Stop&quot;
+       3 | 
+       4 | param(
+&gt;&gt;     5 |     [string]$UnifiedInputSSOT = &quot;C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\VIA_UnifiedInput_SSOT.json&quot;,
+       6 |     [string]$Action = &quot;status&quot;
+       7 | )
+       8 | 
+       9 | function def_ReadJson {
+      10 |     param([string]$Path)
+      11 |     if (-not [System.IO.File]::Exists($Path)) {
+      12 |         throw &quot;UnifiedInputSSOT missing: $Path&quot;</pre></details><details><summary>error band</summary><pre>       1 | #requires -Version 7.0
+       2 | $ErrorActionPreference = &quot;Stop&quot;
+       3 | 
+       4 | param(
+&gt;&gt;     5 |     [string]$UnifiedInputSSOT = &quot;C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\VIA_UnifiedInput_SSOT.json&quot;,
+       6 |     [string]$Action = &quot;status&quot;
+       7 | )
+       8 | 
+       9 | function def_ReadJson {
+      10 |     param([string]$Path)
+      11 |     if (-not [System.IO.File]::Exists($Path)) {</pre></details></td></tr>
+<tr><td class="num">4</td><td class="fn">Invoke-VIA-ActivationGateway-Stable.ps1</td><td><span class="pill" style="background:#c96b5a">PARSE_FAIL</span></td><td class="num">1</td><td class="num">5:33</td><td class="num">98</td><td>G3</td><td class="msg">The assignment expression is not valid. The input to an assignment operator must be an object that is able to accept assignments, such as a variable or a property.<details open><summary>header band 1-12</summary><pre>       1 | #requires -Version 7.0
+       2 | $ErrorActionPreference = &quot;Stop&quot;
+       3 | 
+       4 | param(
+&gt;&gt;     5 |     [string]$UnifiedInputSSOT = &quot;C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\VIA_UnifiedInput_SSOT.json&quot;,
+       6 |     [string]$Action = &quot;status&quot;
+       7 | )
+       8 | 
+       9 | function Get-JsonObject {
+      10 |     param([string]$Path)
+      11 |     if (-not [System.IO.File]::Exists($Path)) {
+      12 |         throw &quot;Unified input SSOT missing.&quot;</pre></details><details><summary>error band</summary><pre>       1 | #requires -Version 7.0
+       2 | $ErrorActionPreference = &quot;Stop&quot;
+       3 | 
+       4 | param(
+&gt;&gt;     5 |     [string]$UnifiedInputSSOT = &quot;C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\VIA_UnifiedInput_SSOT.json&quot;,
+       6 |     [string]$Action = &quot;status&quot;
+       7 | )
+       8 | 
+       9 | function Get-JsonObject {
+      10 |     param([string]$Path)
+      11 |     if (-not [System.IO.File]::Exists($Path)) {</pre></details></td></tr>
+<tr><td class="num">5</td><td class="fn">Invoke-VIA-ActivationGateway-InlineReady.ps1</td><td><span class="pill" style="background:#c96b5a">PARSE_FAIL</span></td><td class="num">1</td><td class="num">5:33</td><td class="num">28</td><td>G4</td><td class="msg">The assignment expression is not valid. The input to an assignment operator must be an object that is able to accept assignments, such as a variable or a property.<details open><summary>header band 1-12</summary><pre>       1 | #requires -Version 7.0
+       2 | $ErrorActionPreference = &quot;Stop&quot;
+       3 | 
+       4 | param(
+&gt;&gt;     5 |     [string]$UnifiedInputSSOT = &quot;C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\VIA_UnifiedInput_SSOT.json&quot;,
+       6 |     [string]$Action = &quot;status&quot;
+       7 | )
+       8 | 
+       9 | try {
+      10 |     if (-not [System.IO.File]::Exists($UnifiedInputSSOT)) {
+      11 |         throw &quot;UnifiedInputSSOT missing.&quot;
+      12 |     }</pre></details><details><summary>error band</summary><pre>       1 | #requires -Version 7.0
+       2 | $ErrorActionPreference = &quot;Stop&quot;
+       3 | 
+       4 | param(
+&gt;&gt;     5 |     [string]$UnifiedInputSSOT = &quot;C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\VIA_UnifiedInput_SSOT.json&quot;,
+       6 |     [string]$Action = &quot;status&quot;
+       7 | )
+       8 | 
+       9 | try {
+      10 |     if (-not [System.IO.File]::Exists($UnifiedInputSSOT)) {
+      11 |         throw &quot;UnifiedInputSSOT missing.&quot;</pre></details></td></tr>
+<tr><td class="num">6</td><td class="fn">Invoke-VIA-UnifiedInputGateway.ps1</td><td><span class="pill" style="background:#c96b5a">PARSE_FAIL</span></td><td class="num">1</td><td class="num">5:33</td><td class="num">65</td><td>G5</td><td class="msg">The assignment expression is not valid. The input to an assignment operator must be an object that is able to accept assignments, such as a variable or a property.<details open><summary>header band 1-12</summary><pre>       1 | #requires -Version 7.0
+       2 | $ErrorActionPreference = &quot;Stop&quot;
+       3 | 
+       4 | param(
+&gt;&gt;     5 |     [string]$UnifiedInputSSOT = &quot;C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\VIA_UnifiedInput_SSOT.json&quot;,
+       6 |     [string]$Action = &quot;status&quot;
+       7 | )
+       8 | 
+       9 | function def_ReadJson {
+      10 |     param([string]$Path)
+      11 |     if (-not [System.IO.File]::Exists($Path)) {
+      12 |         throw &quot;UnifiedInputSSOT missing: $Path&quot;</pre></details><details><summary>error band</summary><pre>       1 | #requires -Version 7.0
+       2 | $ErrorActionPreference = &quot;Stop&quot;
+       3 | 
+       4 | param(
+&gt;&gt;     5 |     [string]$UnifiedInputSSOT = &quot;C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\VIA_UnifiedInput_SSOT.json&quot;,
+       6 |     [string]$Action = &quot;status&quot;
+       7 | )
+       8 | 
+       9 | function def_ReadJson {
+      10 |     param([string]$Path)
+      11 |     if (-not [System.IO.File]::Exists($Path)) {</pre></details></td></tr>
+</tbody></table>
+<div class="foot">RUN_20260617_030830_VIA_P0_SANDBOX_REPAIR &middot; evidence gate only &middot; no autofix until parse=0.</div>
+</div></body></html>
