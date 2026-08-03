@@ -281,6 +281,71 @@ class Tower:
         if ok < len(checks):
             job.status = "error"
 
+    def act_tree_audit(self, job: Job):
+        """Downloads 樹 vs repo 總檢察(唯讀,背景執行,即時進度)。"""
+        import csv
+        import hashlib
+        dl = Path(os.environ.get("VIA_AUDIT_SRC",
+                                 str(Path.home() / "Downloads" / "VeritasIntelligenceAnalytics")))
+        if not dl.is_dir():
+            self.emit(job, f"[TOWER] 稽核來源不存在:{dl}")
+            return
+        skip = re.compile(r"__pycache__|[\\/]temp[\\/]|\.pyc$|\.bak$")
+        job.add(f"[AUDIT] 枚舉 {dl} …")
+        files = [p for p in dl.rglob("*") if p.is_file() and not skip.search(str(p))]
+        total = len(files)
+        job.add(f"[AUDIT] 待比對 {total} 檔(≤20MB 用 SHA256,大檔比大小)")
+        rows: list[tuple[str, float, str]] = []
+        def sha(p: Path) -> str:
+            h = hashlib.sha256()
+            with open(p, "rb") as fh:
+                for chunk in iter(lambda: fh.read(1 << 20), b""):
+                    h.update(chunk)
+            return h.hexdigest()
+        for i, p in enumerate(files, 1):
+            rel = p.relative_to(dl)
+            repo_p = self.base / rel
+            try:
+                if not repo_p.is_file():
+                    status = "NOT_IN_REPO"
+                elif p.stat().st_size > 20 * 1024 * 1024:
+                    status = ("IN_REPO_SAME_SIZE"
+                              if repo_p.stat().st_size == p.stat().st_size
+                              else "IN_REPO_DIFFERS")
+                else:
+                    status = ("IN_REPO_IDENTICAL" if sha(p) == sha(repo_p)
+                              else "IN_REPO_DIFFERS")
+            except OSError as exc:
+                status = f"READ_ERROR:{type(exc).__name__}"
+            rows.append((status, round(p.stat().st_size / 1048576, 2), str(rel)))
+            if i % 250 == 0 or i == total:
+                job.progress = int(i * 100 / max(total, 1))
+                job.add(f"[AUDIT] {i}/{total} …")
+        self.rpt.mkdir(parents=True, exist_ok=True)
+        out = self.rpt / "downloads_tree_audit.csv"
+        with open(out, "w", newline="", encoding="utf-8-sig") as fh:
+            w = csv.writer(fh)
+            w.writerow(["Status", "MB", "Rel"])
+            w.writerows(rows)
+        counts: dict[str, tuple[int, float]] = {}
+        for s, mb, _ in rows:
+            c, m = counts.get(s, (0, 0.0))
+            counts[s] = (c + 1, m + mb)
+        job.add("")
+        job.add("===== 總覽 =====")
+        for s in sorted(counts, key=lambda k: -counts[k][0]):
+            c, m = counts[s]
+            job.add(f"{s:20s} {c:6d} files {m:10.1f} MB")
+        job.add("")
+        job.add("===== NOT_IN_REPO 前 40 大 =====")
+        for s, mb, rel in sorted((r for r in rows if r[0] == "NOT_IN_REPO"),
+                                 key=lambda r: -r[1])[:40]:
+            job.add(f"{mb:9.2f} MB  {rel}")
+        job.add("")
+        job.add(f"[AUDIT] 完整清單:{out}")
+        job.progress = 100
+        job.status = "done"
+
     def act_tool(self, job: Job, name: str):
         opt = self.sm / "VIA_Optimizer_Suite"
         self.rpt.mkdir(parents=True, exist_ok=True)
@@ -334,6 +399,7 @@ ACTIONS = {
     "vrn_lanes": ("VRN · Lane2+Lane3 預檢", "act_vrn_lanes"),
     "vrn_run": ("VRN · 實彈 No-OCR(自動選最新 PDF)", "act_vrn_run"),
     "revival": ("VRN · 復健參數檢查(14 項)", "act_revival_check"),
+    "tree_audit": ("Downloads 樹總檢察(唯讀 · 背景)", "act_tree_audit"),
     "audit": ("SafeAudit 磁碟稽核(無刪除)", ("act_tool", "audit")),
     "panorama": ("FirstSight 全景矩陣(唯讀)", ("act_tool", "panorama")),
     "polyglot": ("Polyglot AIO(僅報告)", ("act_tool", "polyglot")),
