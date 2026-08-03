@@ -1,18 +1,14 @@
 #!/usr/bin/env python3
-"""VIA Control Tower v001 · 本機 HTML 控制台(zero dependencies).
+"""VIA Control Tower v002 · 本機 HTML 控制台(zero dependencies).
 
-Serves a local control panel (127.0.0.1 only) with one-click buttons for
-every VIA action: VDF intake, AutoPlot, VRN safe-probe / lanes / live run
-(auto-picks the first existing PDF from the candidate list — no manual
-path editing), and the Optimizer Suite tools. Each action runs in-process
-via subprocess and streams its captured output back to the page.
+v002:所有動作改為背景 job 執行(不卡斷 UI)、動態進度條與即時日誌輪詢、
+20 個 PS 指令加速器、VRN 復健參數檢查。只綁 127.0.0.1。
 
-Usage:  python via_control_tower.py [--base <VIA dir>] [--port 8765]
+Usage:  python via_control_tower.py [--base <VIA dir>] [--port 8765] [--intake <dir>]
 """
 from __future__ import annotations
 
 import argparse
-import html
 import json
 import os
 import re
@@ -21,15 +17,48 @@ import subprocess
 import sys
 import tempfile
 import threading
+import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-VERSION = "v001"
+VERSION = "v002"
 
 
 def find_pwsh() -> str | None:
     return shutil.which("pwsh") or shutil.which("powershell")
 
+
+# --------------------------------------------------------------------- jobs
+class Job:
+    def __init__(self, action: str, label: str):
+        self.id = uuid.uuid4().hex[:12]
+        self.action = action
+        self.label = label
+        self.status = "running"          # running | done | error
+        self.progress = -1               # -1 = indeterminate, else 0-100
+        self.lines: list[str] = []
+        self.lock = threading.Lock()
+
+    def add(self, line: str):
+        with self.lock:
+            self.lines.append(line)
+
+    def snapshot(self, since: int) -> dict:
+        with self.lock:
+            return {"id": self.id, "action": self.action, "label": self.label,
+                    "status": self.status, "progress": self.progress,
+                    "lines": self.lines[since:], "total": len(self.lines)}
+
+
+JOBS: dict[str, Job] = {}
+RUNNING_ACTIONS: set[str] = set()
+JOBS_LOCK = threading.Lock()
+
+# 進度啟發:動作 → (每行匹配樣式, 預估總步數)
+PROGRESS_HINTS = {
+    "vdf": (r"^\[VDF\] ", 9),
+    "autoplot": (r"^\[VAP\] ", 28),
+}
 
 DEFAULT_INTAKE = (Path(os.environ.get("USERPROFILE", str(Path.home())))
                   / "Downloads" / "VeritasIntelligenceAnalytics"
@@ -44,35 +73,54 @@ class Tower:
         self.sm = base / "supportive modules"
         self.py = sys.executable
         self.rpt = Path(os.environ.get("USERPROFILE", str(Path.home()))) / "VIA_Reports"
-        # priority: BASE 標準槽 VRN/input → 傳入覆蓋 → 歷史 v0156 位置
         self.intake = self.fm / "VRN" / "input"
         self.intake_fallback = intake or DEFAULT_INTAKE
 
-    # ------------------------------------------------------------- helpers
-    def run(self, cmd: list[str], timeout: int = 1800) -> str:
+    # ---------------------------------------------------------- exec into job
+    def stream(self, job: Job, cmd: list[str], timeout: int = 3600):
+        hint = PROGRESS_HINTS.get(job.action)
+        matched = 0
         try:
-            p = subprocess.run(cmd, capture_output=True, text=True,
-                               encoding="utf-8", errors="replace",
-                               cwd=self.repo, timeout=timeout)
-            out = (p.stdout or "") + (("\n[stderr]\n" + p.stderr) if p.stderr.strip() else "")
-            return out + f"\n[exit={p.returncode}]"
-        except Exception as exc:  # noqa: BLE001 — surfaced to the UI verbatim
-            return f"[TOWER-ERROR] {exc}"
+            p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                 text=True, encoding="utf-8", errors="replace",
+                                 cwd=self.repo, bufsize=1)
+            assert p.stdout is not None
+            for line in p.stdout:
+                line = line.rstrip("\n")
+                job.add(line)
+                if hint and re.search(hint[0], line):
+                    matched += 1
+                    job.progress = min(99, int(matched * 100 / hint[1]))
+            rc = p.wait(timeout=timeout)
+            job.progress = 100
+            job.status = "done" if rc == 0 else "error"
+            job.add(f"[exit={rc}]")
+        except Exception as exc:  # noqa: BLE001 — surfaced verbatim to the UI
+            job.status = "error"
+            job.add(f"[TOWER-ERROR] {exc}")
 
-    def run_pwsh_code(self, code: str, timeout: int = 1800) -> str:
+    def stream_pwsh_code(self, job: Job, code: str):
         pwsh = find_pwsh()
         if not pwsh:
-            return "[TOWER-ERROR] pwsh/powershell not found on PATH"
+            job.status = "error"
+            job.add("[TOWER-ERROR] pwsh/powershell not found on PATH")
+            return
         fd, tmp = tempfile.mkstemp(suffix=".ps1")
         os.close(fd)
         Path(tmp).write_text(code, encoding="utf-8-sig")
         try:
-            return self.run([pwsh, "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", tmp], timeout)
+            self.stream(job, [pwsh, "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", tmp])
         finally:
             try:
                 os.unlink(tmp)
             except OSError:
                 pass
+
+    def emit(self, job: Job, text: str):
+        for line in text.splitlines():
+            job.add(line)
+        job.progress = 100
+        job.status = "done"
 
     def patched(self, script: Path, replacements: dict[str, str]) -> str:
         code = script.read_text(encoding="utf-8", errors="replace")
@@ -80,6 +128,7 @@ class Tower:
             code = re.sub(pattern, value.replace("\\", "\\\\"), code, count=1)
         return code
 
+    # ---------------------------------------------------------- VRN intake
     def _intake_dir(self) -> Path | None:
         for d in (self.intake, self.intake_fallback):
             if d.is_dir() and any(p.is_file() and p.name != ".gitkeep" for p in d.rglob("*")):
@@ -87,80 +136,83 @@ class Tower:
         return self.intake if self.intake.is_dir() else None
 
     def auto_pdf(self) -> str | None:
-        # priority: BASE VRN/input → v0156 歷史位置 → 歷史候選清單
         for d in (self.intake, self.intake_fallback):
             if d.is_dir():
-                pdfs = sorted(d.rglob("*.pdf"),
-                              key=lambda p: p.stat().st_mtime, reverse=True)
+                pdfs = sorted(d.rglob("*.pdf"), key=lambda p: p.stat().st_mtime, reverse=True)
                 if pdfs:
                     return str(pdfs[0])
         cand = self.fm / "VRN" / "VRN-2_StockReportCandidatePaths.txt"
         if cand.is_file():
             for line in cand.read_text(encoding="utf-8", errors="replace").splitlines():
                 p = line.strip().strip('"')
-                if p.lower().endswith(".pdf") and Path(p).is_file():
-                    return p
+                try:
+                    if p.lower().endswith(".pdf") and Path(p).is_file():
+                        return p
+                except OSError:
+                    continue  # 跨平台/超長路徑等無效項,跳過
         return None
 
-    def act_vrn_intake(self) -> str:
+    # ---------------------------------------------------------- main actions
+    def act_vdf(self, job: Job):
+        self.stream(job, [self.py, str(self.fm / "VDF" / "engine" / "vdf_movies_intake_v001.py"),
+                          "--base", str(self.base), "--source", str(self.repo / "data"),
+                          "--mode", "Refresh"])
+
+    def act_autoplot(self, job: Job):
+        self.stream(job, [self.py, str(self.fm / "VAP" / "engine" / "via_autoplot_engine_v001.py"),
+                          "--base", str(self.base), "--auto", "--max-charts", "40"])
+
+    def act_vrn_intake(self, job: Job):
         d = self._intake_dir()
         if d is None:
-            return f"[TOWER] intake 資料夾不存在:{self.intake}"
+            self.emit(job, f"[TOWER] intake 資料夾不存在:{self.intake}")
+            return
         files = [p for p in d.rglob("*") if p.is_file() and p.name != ".gitkeep"]
-        self_note = ("(標準槽 BASE\\functional modules\\VRN\\input)" if d == self.intake
-                     else "(fallback:歷史 v0156 位置 — 建議搬入標準槽)")
-        return self._intake_report(d, files, self_note)
-
-    def _intake_report(self, d: Path, files: list[Path], note: str) -> str:
+        note = ("(標準槽 VRN\\input)" if d == self.intake
+                else "(fallback:歷史 v0156 — 建議搬入標準槽)")
         by_ext: dict[str, list[Path]] = {}
         for p in files:
             by_ext.setdefault(p.suffix.lower() or "(none)", []).append(p)
         lines = [f"[TOWER] VRN intake 盤點 · {d} {note}",
                  f"total: {len(files)} files · "
-                 f"{round(sum(p.stat().st_size for p in files)/1048576, 1)} MB", ""]
+                 f"{round(sum(p.stat().st_size for p in files) / 1048576, 1)} MB", ""]
         for ext in sorted(by_ext, key=lambda e: -len(by_ext[e])):
-            group = by_ext[ext]
-            mb = round(sum(p.stat().st_size for p in group) / 1048576, 1)
-            lines.append(f"{ext:8s} {len(group):4d} files  {mb:8.1f} MB")
-        lines.append("")
-        lines.append("最新 15 份(VRN RUN 會自動選最新的 PDF):")
-        newest = sorted(files, key=lambda p: p.stat().st_mtime, reverse=True)[:15]
-        for p in newest:
+            g = by_ext[ext]
+            lines.append(f"{ext:8s} {len(g):4d} files "
+                         f"{round(sum(p.stat().st_size for p in g) / 1048576, 1):8.1f} MB")
+        lines += ["", "最新 15 份(VRN RUN 自動選最新 PDF):"]
+        for p in sorted(files, key=lambda p: p.stat().st_mtime, reverse=True)[:15]:
             lines.append(f"  {p.relative_to(d)}")
-        return "\n".join(lines)
+        self.emit(job, "\n".join(lines))
 
-    # ------------------------------------------------------------- actions
-    def act_vdf(self) -> str:
-        return self.run([self.py, str(self.fm / "VDF" / "engine" / "vdf_movies_intake_v001.py"),
-                         "--base", str(self.base), "--source", str(self.repo / "data"),
-                         "--mode", "Refresh"])
-
-    def act_autoplot(self) -> str:
-        return self.run([self.py, str(self.fm / "VAP" / "engine" / "via_autoplot_engine_v001.py"),
-                         "--base", str(self.base), "--auto", "--max-charts", "40"])
-
-    def act_vrn_probe(self) -> str:
+    def act_vrn_probe(self, job: Job):
         pwsh = find_pwsh()
         if not pwsh:
-            return "[TOWER-ERROR] pwsh not found"
-        return self.run([pwsh, "-NoProfile", "-ExecutionPolicy", "Bypass",
-                         "-File", str(self.fm / "VRN" / "Invoke-VRN.ps1")])
+            self.emit(job, "[TOWER-ERROR] pwsh not found")
+            job.status = "error"
+            return
+        self.stream(job, [pwsh, "-NoProfile", "-ExecutionPolicy", "Bypass",
+                          "-File", str(self.fm / "VRN" / "Invoke-VRN.ps1")])
 
-    def act_vrn_lanes(self) -> str:
+    def act_vrn_lanes(self, job: Job):
         vrn = self.fm / "VRN"
-        out = []
         for lane in ("Start-VRN-Lane2-IOInventory.ps1", "Start-VRN-Lane3-EngineCapability.ps1"):
-            code = self.patched(vrn / lane,
-                                {r'\$RelatedPath = ".*?"': f'$RelatedPath = "{vrn}"'})
-            out.append(f"===== {lane} =====\n" + self.run_pwsh_code(code))
-        return "\n".join(out)
+            job.add(f"===== {lane} =====")
+            code = self.patched(vrn / lane, {r'\$RelatedPath = ".*?"': f'$RelatedPath = "{vrn}"'})
+            self.stream_pwsh_code(job, code)
+            if job.status == "error":
+                return
+            job.status = "running"
+        job.status = "done"
+        job.progress = 100
 
-    def act_vrn_run(self) -> str:
+    def act_vrn_run(self, job: Job):
         pdf = self.auto_pdf()
         if not pdf:
-            return ("[TOWER] 候選清單中找不到仍存在的 PDF。\n"
-                    "請把任一研報 PDF 路徑加入 functional modules/VRN/"
-                    "VRN-2_StockReportCandidatePaths.txt 後重按。")
+            self.emit(job, "[TOWER] intake 槽找不到 PDF — 把研報丟進 "
+                           "functional modules\\VRN\\input\\incoming 後重按。")
+            return
+        job.add(f"[TOWER] auto-picked PDF: {pdf}")
         cand = self.sm / "60_PowerShell_Entry_Internal" / "Invoke-VRN-MQ-NoOCR-Staging-v222.ps1"
         rules = self.sm / "70_VRN_Rules"
         code = self.patched(cand, {
@@ -170,15 +222,71 @@ class Tower:
                 f'$FallbackHelper = "{rules / "VIS_VRN_PDFTextLayerFallbackPlan_v0222.py"}"',
             r'\$TargetFile = ".*?"': f'$TargetFile = "{pdf}"',
         })
-        return f"[TOWER] auto-picked PDF: {pdf}\n\n" + self.run_pwsh_code(code)
+        self.stream_pwsh_code(job, code)
 
-    def act_tool(self, name: str) -> str:
+    def act_revival_check(self, job: Job):
+        """VRN 復健參數完整性檢查(唯讀)。"""
+        checks: list[tuple[str, bool, str]] = []
+
+        def add(name: str, ok: bool, detail: str = ""):
+            checks.append((name, ok, detail))
+
+        ssot = self.fm / "VRN" / "SSOT"
+        add("SSOT active pointer", (ssot / "VRN_ResearchReport_SSOT.active.json").is_file())
+        import hashlib
+        gen = ssot / "v2" / "generations" / \
+            "VRN_ResearchReport_SSOT.v2.records64.v0155.2f771c00c6dd8d6e.jsonl"
+        if gen.is_file():
+            h = hashlib.sha256(gen.read_bytes()).hexdigest()
+            add("SSOT canonical sha256", h.startswith("2f771c00"), h[:16])
+        else:
+            add("SSOT canonical sha256", False, "file missing")
+        add("runtime adapter (70_VRN_Rules)",
+            (self.sm / "70_VRN_Rules" / "VRN_ResearchReport_SSOT_v2_ReaderAdapter.py").is_file())
+        add("MQ-NoOCR candidate (60_)",
+            (self.sm / "60_PowerShell_Entry_Internal"
+             / "Invoke-VRN-MQ-NoOCR-Staging-v222.ps1").is_file())
+        for helper in ("VIS_VRN_BrokerAlias_Compatibility_v0222.py",
+                       "VIS_VRN_PDFTextLayerFallbackPlan_v0222.py"):
+            add(f"helper {helper}", (self.sm / "70_VRN_Rules" / helper).is_file())
+        add("intake 標準槽", self.intake.is_dir(), str(self.intake))
+        pdf = self.auto_pdf()
+        add("auto-pick PDF", pdf is not None, pdf or "無可用 PDF")
+        env_py = Path(os.environ.get("USERPROFILE", "")) / "envs" / "via_core_312" / \
+            "Scripts" / "python.exe"
+        add("via_core_312 env", env_py.is_file(), str(env_py))
+        if env_py.is_file():
+            mods = "pydantic,pdfminer,PIL,numpy,paddleocr,docling,marker,surya,tabula,playwright,weasyprint,win32com"
+            r = subprocess.run([str(env_py), "-c",
+                                "import importlib.util as u;"
+                                f"mods='{mods}'.split(',');"
+                                "missing=[m for m in mods if not u.find_spec(m)];"
+                                "print(','.join(missing) if missing else 'ALL')"],
+                               capture_output=True, text=True, timeout=120)
+            out = (r.stdout or "").strip()
+            add("12 OCR 依賴", out == "ALL", out)
+        add("regex 引擎件", (self.fm / "VRN" / "InvestmentRegexPattern_VALIDATED.py").is_file())
+        add("報告版面模板", (self.fm / "VRN" / "template"
+                             / "VDF_VRN_Integrated_ReportSSOT_AutoLayout_FINAL.html").is_file())
+        add("擷取矩陣 (VDF/template)", (self.fm / "VDF" / "template"
+                                        / "VIA_Extraction_Matrix_8.csv").is_file())
+        ok = sum(1 for _, o, _ in checks if o)
+        lines = [f"[TOWER] VRN 復健參數檢查 · {ok}/{len(checks)} PASS", ""]
+        for name, o, detail in checks:
+            lines.append(f"{'[OK]  ' if o else '[MISS]'} {name}" + (f" · {detail}" if detail else ""))
+        self.emit(job, "\n".join(lines))
+        if ok < len(checks):
+            job.status = "error"
+
+    def act_tool(self, job: Job, name: str):
         opt = self.sm / "VIA_Optimizer_Suite"
         self.rpt.mkdir(parents=True, exist_ok=True)
         bundle = self.sm / "VIA_Standalone_Package_v0102" / "_supportive_bundle" / "powershell"
         pwsh = find_pwsh()
         if not pwsh:
-            return "[TOWER-ERROR] pwsh not found"
+            self.emit(job, "[TOWER-ERROR] pwsh not found")
+            job.status = "error"
+            return
         cmds = {
             "audit": [pwsh, "-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
                       str(opt / "VIA_TurboOptimizer_v3.3_OneDrive_Coding_AISafeAudit.ps1"),
@@ -191,45 +299,76 @@ class Tower:
                          str(opt / "Invoke-VIA-SafePolyglotOptimizer-AIO-v0102.ps1"),
                          "-SupportiveModulesRoot", str(self.sm),
                          "-NexusCorePath", str(bundle / "Invoke-VeritasNexusCore.ps1"),
-                         "-PolyglotPath", str(bundle / "Invoke-VIA-PolyglotCheckTestRepair-v0101.ps1"),
+                         "-PolyglotPath",
+                         str(bundle / "Invoke-VIA-PolyglotCheckTestRepair-v0101.ps1"),
                          "-OutputRoot", str(self.rpt / "_polyglot"), "-SelfTest"],
         }
-        return self.run(cmds[name], timeout=3600)
+        self.stream(job, cmds[name])
 
-    def act_open(self, what: str) -> str:
-        targets = {
-            "workbench": self.fm / "VAP" / "ui" / "VAP_Workbench_v010.html",
-            "charts": self.base / "VAP" / "output" / "index.html",
-        }
+    def act_open(self, job: Job, what: str):
+        targets = {"workbench": self.fm / "VAP" / "ui" / "VAP_Workbench_v010.html",
+                   "charts": self.base / "VAP" / "output" / "index.html"}
         t = targets[what]
         if not t.exists():
-            return f"[TOWER] 檔案不存在(先跑 AutoPlot):{t}"
+            self.emit(job, f"[TOWER] 檔案不存在(先跑 AutoPlot):{t}")
+            return
         if hasattr(os, "startfile"):
             os.startfile(t)  # type: ignore[attr-defined]
-            return f"[TOWER] opened {t}"
-        return f"[TOWER] 請手動開啟:{t}"
+            self.emit(job, f"[TOWER] opened {t}")
+        else:
+            self.emit(job, f"[TOWER] 請手動開啟:{t}")
+
+    def act_accel(self, job: Job, code: str):
+        self.stream_pwsh_code(job, code)
 
 
+# ------------------------------------------------------------- 主要動作表
 ACTIONS = {
-    "vdf": ("VDF Intake · Refresh", lambda t: t.act_vdf()),
-    "autoplot": ("AutoPlot · 全配對繪圖", lambda t: t.act_autoplot()),
-    "vrn_intake": ("VRN · Intake v0156 盤點(唯讀)", lambda t: t.act_vrn_intake()),
-    "vrn_probe": ("VRN · Guarded SAFE PROBE", lambda t: t.act_vrn_probe()),
-    "vrn_lanes": ("VRN · Lane2+Lane3 預檢", lambda t: t.act_vrn_lanes()),
-    "vrn_run": ("VRN · 實彈 No-OCR(自動選 intake 最新 PDF)", lambda t: t.act_vrn_run()),
-    "audit": ("SafeAudit 磁碟稽核(無刪除)", lambda t: t.act_tool("audit")),
-    "panorama": ("FirstSight 全景矩陣(唯讀)", lambda t: t.act_tool("panorama")),
-    "polyglot": ("Polyglot AIO(僅報告)", lambda t: t.act_tool("polyglot")),
-    "open_workbench": ("開啟 Workbench v010", lambda t: t.act_open("workbench")),
-    "open_charts": ("開啟圖庫索引", lambda t: t.act_open("charts")),
+    "vdf": ("VDF Intake · Refresh", "act_vdf"),
+    "autoplot": ("AutoPlot · 全配對繪圖", "act_autoplot"),
+    "vrn_intake": ("VRN · Intake 盤點(唯讀)", "act_vrn_intake"),
+    "vrn_probe": ("VRN · Guarded SAFE PROBE", "act_vrn_probe"),
+    "vrn_lanes": ("VRN · Lane2+Lane3 預檢", "act_vrn_lanes"),
+    "vrn_run": ("VRN · 實彈 No-OCR(自動選最新 PDF)", "act_vrn_run"),
+    "revival": ("VRN · 復健參數檢查(14 項)", "act_revival_check"),
+    "audit": ("SafeAudit 磁碟稽核(無刪除)", ("act_tool", "audit")),
+    "panorama": ("FirstSight 全景矩陣(唯讀)", ("act_tool", "panorama")),
+    "polyglot": ("Polyglot AIO(僅報告)", ("act_tool", "polyglot")),
+    "open_workbench": ("開啟 Workbench v010", ("act_open", "workbench")),
+    "open_charts": ("開啟圖庫索引", ("act_open", "charts")),
 }
 
-PAGE = """<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
+# ------------------------------------------------------------- 20 個 PS 加速器
+# 全部唯讀或安全操作;各自背景 job 執行,不卡 UI。
+ACCELERATORS = {
+    "a01_git_status": ("Git 狀態", "Set-Location '{repo}'; git status -sb; git log --oneline -5"),
+    "a02_git_pull": ("Git 同步 main", "Set-Location '{repo}'; git checkout main; git pull origin main"),
+    "a03_disk_base": ("BASE 佔用", "Get-ChildItem '{base}' -Directory | ForEach-Object {{ [pscustomobject]@{{ Dir=$_.Name; MB=[math]::Round(((Get-ChildItem $_.FullName -Recurse -File -EA SilentlyContinue | Measure-Object Length -Sum).Sum)/1MB,1) }} }} | Sort-Object MB -Descending | Format-Table -AutoSize | Out-String"),
+    "a04_newest_reports": ("最新研報×10", "Get-ChildItem '{base}\\functional modules\\VRN\\input' -Recurse -File -Include *.pdf,*.docx -EA SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 10 Name,LastWriteTime,@{{N='MB';E={{[math]::Round($_.Length/1MB,2)}}}} | Format-Table -AutoSize | Out-String"),
+    "a05_clean_temp": ("清空 temp 槽", "foreach($m in 'VDF','VAP','VRN'){{ Get-ChildItem \"{base}\\functional modules\\$m\\temp\" -Exclude .gitkeep -EA SilentlyContinue | Remove-Item -Recurse -Force }}; 'temp cleaned'"),
+    "a06_chart_count": ("圖表統計", "$c=Get-ChildItem '{base}\\VAP\\output\\VAP_*.html' -EA SilentlyContinue; \"charts: $($c.Count)\"; $c | Select-Object -Last 5 -ExpandProperty Name"),
+    "a07_db_info": ("VDF 資料庫資訊", "Get-Item '{base}\\functional modules\\VDF\\db\\movies_dataset.sqlite' -EA SilentlyContinue | Select-Object Name,Length,LastWriteTime | Format-List | Out-String"),
+    "a08_qa_gate": ("VDF QA 閘門", "Get-Content '{base}\\functional modules\\VDF\\qa\\evidence\\movies_intake_summary.json' -Raw | ConvertFrom-Json | Select-Object gate,mode | Format-List | Out-String"),
+    "a09_ssot_head": ("SSOT 指標摘要", "Get-Content '{base}\\functional modules\\VRN\\SSOT\\VRN_ResearchReport_SSOT.active.json' -Raw | ConvertFrom-Json | Select-Object promotion_state,authority_generation,active_record_count,transaction_id | Format-List | Out-String"),
+    "a10_env_py": ("Python 環境", "& \"$env:USERPROFILE\\envs\\via_core_312\\Scripts\\python.exe\" --version; & \"$env:USERPROFILE\\envs\\via_core_312\\Scripts\\python.exe\" -m pip list --format=freeze | Measure-Object | ForEach-Object {{ \"packages: $($_.Count)\" }}"),
+    "a11_java": ("Java 版本", "java -version 2>&1 | Out-String"),
+    "a12_pwsh": ("PowerShell 版本", "$PSVersionTable.PSVersion.ToString()"),
+    "a13_open_input": ("開 VRN input", "Invoke-Item '{base}\\functional modules\\VRN\\input'; 'opened'"),
+    "a14_open_reports": ("開 VIA_Reports", "New-Item -ItemType Directory \"$env:USERPROFILE\\VIA_Reports\" -Force | Out-Null; Invoke-Item \"$env:USERPROFILE\\VIA_Reports\"; 'opened'"),
+    "a15_open_base": ("開 BASE 資料夾", "Invoke-Item '{base}'; 'opened'"),
+    "a16_manifests": ("Manifest 總覽", "Get-ChildItem '{base}' -Recurse -Filter '*Manifest*.json' -EA SilentlyContinue | Select-Object -First 20 @{{N='Path';E={{$_.FullName.Substring('{base}'.Length+1)}}}},@{{N='KB';E={{[math]::Round($_.Length/1KB,1)}}}} | Format-Table -AutoSize | Out-String"),
+    "a17_supportive_list": ("支援模組清單", "Get-ChildItem '{base}\\supportive modules' -Directory | Select-Object Name | Format-Table -AutoSize | Out-String"),
+    "a18_big_files": ("巨檔掃描 >45MB", "Get-ChildItem '{repo}' -Recurse -File -EA SilentlyContinue | Where-Object Length -gt 45MB | Select-Object @{{N='MB';E={{[math]::Round($_.Length/1MB,1)}}}},FullName | Sort-Object MB -Descending | Format-Table -AutoSize | Out-String"),
+    "a19_bak_scan": ("垃圾檔掃描 (.bak/.tmp)", "Get-ChildItem '{base}' -Recurse -File -Include *.bak,*.tmp -EA SilentlyContinue | Select-Object -First 30 FullName | Format-Table -AutoSize | Out-String"),
+    "a20_gate_all": ("全系統快速體檢", "Set-Location '{repo}'; \"branch: $(git branch --show-current)\"; \"charts: $((Get-ChildItem '{base}\\VAP\\output\\VAP_*.html' -EA SilentlyContinue).Count)\"; \"db: $((Get-Item '{base}\\functional modules\\VDF\\db\\movies_dataset.sqlite' -EA SilentlyContinue).Length) bytes\"; \"vrn input pdf: $((Get-ChildItem '{base}\\functional modules\\VRN\\input' -Recurse -Filter *.pdf -EA SilentlyContinue).Count)\"; \"reports dir: $env:USERPROFILE\\VIA_Reports\""),
+}
+
+PAGE = r"""<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>VIA · Control Tower __VER__</title>
 <style>
 :root{--bg:#f2f1ec;--paper:#fff;--ink:#1b1a17;--ink2:#3a3f3e;--mut:#6b6860;
- --line:#dcdad3;--seal:#9e2b25;--teal:#3d8f8f;--violet:#7a6daa;
+ --line:#dcdad3;--seal:#9e2b25;--teal:#3d8f8f;--violet:#7a6daa;--green:#4f9465;--red:#c4634f;
  --mono:"SFMono-Regular",Consolas,monospace;
  --sans:"Microsoft JhengHei","Segoe UI",system-ui,sans-serif}
 *{box-sizing:border-box;margin:0}
@@ -240,52 +379,86 @@ body{background:var(--bg);font-family:var(--sans);color:var(--ink);min-height:10
 .mast .wm{font-family:Georgia,serif;font-size:22px;letter-spacing:.1em;color:var(--ink2);white-space:nowrap}
 .mast .sub{font-family:var(--mono);font-size:8.5px;letter-spacing:.36em;color:var(--mut);text-transform:uppercase}
 .rule{height:1px;background:linear-gradient(to right,var(--violet) 0 34px,rgba(27,26,23,.14) 34px 100%)}
-main{max-width:1100px;margin:0 auto;padding:22px 20px 40px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-bottom:18px}
-button{display:flex;flex-direction:column;gap:4px;text-align:left;padding:13px 15px;background:var(--paper);
+main{max-width:1150px;margin:0 auto;padding:20px 20px 40px}
+h3{font:700 10.5px var(--mono);letter-spacing:.14em;color:var(--mut);text-transform:uppercase;margin:14px 0 8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:9px}
+.acc{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
+button{display:flex;flex-direction:column;gap:3px;text-align:left;padding:11px 13px;background:var(--paper);
  border:1px solid var(--line);border-radius:8px;cursor:pointer;font-family:var(--sans);
  transition:transform .15s,box-shadow .15s,border-color .15s}
 button:hover{transform:translateY(-2px);border-color:var(--teal);box-shadow:0 8px 24px -12px rgba(27,26,23,.25)}
 button:active{transform:scale(.97)}
-button.busy{opacity:.5;pointer-events:none}
-button .k{font:700 10px var(--mono);letter-spacing:.1em;color:var(--teal);text-transform:uppercase}
-button .t{font-size:13.5px;color:var(--ink)}
+button.busy{opacity:.45;pointer-events:none}
+button .k{font:700 9.5px var(--mono);letter-spacing:.09em;color:var(--teal);text-transform:uppercase}
+button .t{font-size:13px;color:var(--ink)}
 button.danger .k{color:var(--seal)}
-#log{background:#1b1a17;color:#e8e6df;border-radius:8px;padding:16px 18px;font:12px/1.6 var(--mono);
- white-space:pre-wrap;word-break:break-all;min-height:180px;max-height:55vh;overflow:auto}
+.acc button{padding:8px 10px}.acc button .t{font-size:12px}
+#bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:14px 0 6px}
+#fill{height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--violet));border-radius:3px;
+ transition:width .4s ease}
+#fill.indet{width:30%!important;animation:v2slide 1.2s ease-in-out infinite}
+@keyframes v2slide{0%{margin-left:-30%}100%{margin-left:100%}}
+#fill.err{background:var(--red)}
 #status{font:700 11px var(--mono);letter-spacing:.1em;color:var(--mut);margin:0 0 8px;text-transform:uppercase}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+#status.run{color:var(--teal)}#status.err{color:var(--red)}#status.ok{color:var(--green)}
+#log{background:#1b1a17;color:#e8e6df;border-radius:8px;padding:15px 17px;font:12px/1.55 var(--mono);
+ white-space:pre-wrap;word-break:break-all;min-height:160px;max-height:52vh;overflow:auto}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style></head><body>
 <div class="mast"><div class="seal">理</div>
  <div><div class="wm">VIA CONTROL TOWER</div>
- <div class="sub">Veritas Intelligence Analytics · one-click actions · 127.0.0.1 only</div></div></div>
+ <div class="sub">Veritas Intelligence Analytics · background jobs · live progress · 127.0.0.1</div></div></div>
 <div class="rule"></div>
 <main>
- <div class="grid" id="grid"></div>
+ <h3>主要動作 Main Actions</h3><div class="grid" id="grid"></div>
+ <h3>加速器 Accelerators ×20(背景執行 · 不卡斷)</h3><div class="acc" id="acc"></div>
+ <div id="bar"><div id="fill"></div></div>
  <p id="status">READY</p>
- <div id="log">按任意按鈕執行動作;輸出即時顯示於此。</div>
+ <div id="log">按任意按鈕啟動背景 job;進度與日誌即時更新,期間其他按鈕照常可用。</div>
 </main>
 <script>
-const ACTIONS = __ACTIONS__;
-const grid = document.getElementById('grid'), log = document.getElementById('log'),
-      status = document.getElementById('status');
-for (const [key, label] of Object.entries(ACTIONS)) {
-  const b = document.createElement('button');
-  if (key === 'vrn_run' || key === 'audit') b.classList.add('danger');
-  b.innerHTML = '<span class="k">' + key.replace('_',' ') + '</span><span class="t">' + label + '</span>';
-  b.onclick = async () => {
-    document.querySelectorAll('button').forEach(x => x.classList.add('busy'));
-    status.textContent = 'RUNNING · ' + label;
-    log.textContent = '[' + new Date().toLocaleTimeString() + '] ' + label + ' …\\n';
-    try {
-      const r = await fetch('/run/' + key, {method: 'POST'});
-      log.textContent += await r.text();
-    } catch (e) { log.textContent += '[FETCH-ERROR] ' + e; }
-    status.textContent = 'READY';
-    document.querySelectorAll('button').forEach(x => x.classList.remove('busy'));
-    log.scrollTop = log.scrollHeight;
-  };
-  grid.appendChild(b);
+const ACTIONS = __ACTIONS__, ACCEL = __ACCEL__;
+const grid=document.getElementById('grid'), acc=document.getElementById('acc'),
+      log=document.getElementById('log'), status=document.getElementById('status'),
+      fill=document.getElementById('fill');
+let watching=null, seen=0, timer=null;
+
+function mkBtn(host, key, label, danger, accel){
+  const b=document.createElement('button'); b.id='btn-'+key;
+  if(danger) b.classList.add('danger');
+  b.innerHTML='<span class="k">'+key.replace(/_/g,' ')+'</span><span class="t">'+label+'</span>';
+  b.onclick=()=>launch(key, label, accel);
+  host.appendChild(b);
+}
+for(const [k,v] of Object.entries(ACTIONS)) mkBtn(grid,k,v,(k==='vrn_run'||k==='audit'),false);
+for(const [k,v] of Object.entries(ACCEL))   mkBtn(acc,k,v,false,true);
+
+async function launch(key,label,accel){
+  const btn=document.getElementById('btn-'+key); btn.classList.add('busy');
+  const r=await fetch((accel?'/accel/':'/run/')+key,{method:'POST'});
+  if(!r.ok){ btn.classList.remove('busy'); log.textContent+='\n[ERROR] '+await r.text(); return; }
+  const {id}=await r.json();
+  watching=id; seen=0;
+  log.textContent='['+new Date().toLocaleTimeString()+'] '+label+' — job '+id+'\n';
+  status.textContent='RUNNING · '+label; status.className='run';
+  fill.classList.remove('err'); fill.classList.add('indet'); fill.style.width='30%';
+  if(!timer) timer=setInterval(poll,700);
+}
+async function poll(){
+  if(!watching) return;
+  const r=await fetch('/job/'+watching+'?since='+seen); if(!r.ok) return;
+  const j=await r.json();
+  if(j.lines.length){ log.textContent+=j.lines.join('\n')+'\n'; log.scrollTop=log.scrollHeight; }
+  seen=j.total;
+  if(j.progress>=0){ fill.classList.remove('indet'); fill.style.width=j.progress+'%'; }
+  if(j.status!=='running'){
+    document.getElementById('btn-'+j.action)?.classList.remove('busy');
+    status.textContent=(j.status==='done'?'DONE · ':'ERROR · ')+j.label;
+    status.className=(j.status==='done'?'ok':'err');
+    if(j.status!=='done') fill.classList.add('err');
+    fill.classList.remove('indet'); fill.style.width='100%';
+    watching=null;
+  }
 }
 </script></body></html>"""
 
@@ -293,41 +466,94 @@ for (const [key, label] of Object.entries(ACTIONS)) {
 class Handler(BaseHTTPRequestHandler):
     tower: Tower
 
-    def log_message(self, *_):  # quiet
+    def log_message(self, *_):
         pass
 
-    def _send(self, body: str, ctype: str = "text/plain; charset=utf-8", code: int = 200):
-        data = body.encode("utf-8")
+    def _json(self, obj, code=200):
+        data = json.dumps(obj, ensure_ascii=False).encode("utf-8")
         self.send_response(code)
-        self.send_header("Content-Type", ctype)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Length", str(len(data)))
+        self.end_headers()
+        self.wfile.write(data)
+
+    def _html(self, body: str):
+        data = body.encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
         self.send_header("Content-Length", str(len(data)))
         self.end_headers()
         self.wfile.write(data)
 
     def do_GET(self):
         if self.path in ("/", "/index.html"):
-            labels = {k: v[0] for k, v in ACTIONS.items()}
             page = (PAGE.replace("__VER__", VERSION)
-                        .replace("__ACTIONS__", json.dumps(labels, ensure_ascii=False)))
-            self._send(page, "text/html; charset=utf-8")
-        else:
-            self._send("not found", code=404)
+                    .replace("__ACTIONS__", json.dumps(
+                        {k: v[0] for k, v in ACTIONS.items()}, ensure_ascii=False))
+                    .replace("__ACCEL__", json.dumps(
+                        {k: v[0] for k, v in ACCELERATORS.items()}, ensure_ascii=False)))
+            self._html(page)
+            return
+        m = re.fullmatch(r"/job/([0-9a-f]+)(?:\?since=(\d+))?", self.path)
+        if m:
+            job = JOBS.get(m.group(1))
+            if not job:
+                self._json({"error": "unknown job"}, 404)
+                return
+            self._json(job.snapshot(int(m.group(2) or 0)))
+            return
+        self._json({"error": "not found"}, 404)
 
     def do_POST(self):
-        m = re.fullmatch(r"/run/([a-z_]+)", self.path)
-        if not m or m.group(1) not in ACTIONS:
-            self._send("unknown action", code=404)
+        m = re.fullmatch(r"/(run|accel)/([a-z0-9_]+)", self.path)
+        if not m:
+            self._json({"error": "bad path"}, 404)
             return
-        label, fn = ACTIONS[m.group(1)]
-        self._send(fn(self.tower))
+        kind, key = m.group(1), m.group(2)
+        table = ACTIONS if kind == "run" else ACCELERATORS
+        if key not in table:
+            self._json({"error": "unknown action"}, 404)
+            return
+        with JOBS_LOCK:
+            if key in RUNNING_ACTIONS:
+                self._json({"error": f"{key} already running"}, 409)
+                return
+            RUNNING_ACTIONS.add(key)
+        label = table[key][0]
+        job = Job(key, label)
+        JOBS[job.id] = job
+        t = self.tower
+
+        def work():
+            try:
+                if kind == "run":
+                    spec = ACTIONS[key][1]
+                    if isinstance(spec, tuple):
+                        getattr(t, spec[0])(job, spec[1])
+                    else:
+                        getattr(t, spec)(job)
+                else:
+                    code = ACCELERATORS[key][1].format(repo=t.repo, base=t.base)
+                    t.act_accel(job, code)
+                if job.status == "running":
+                    job.status = "done"
+                    job.progress = 100
+            except Exception as exc:  # noqa: BLE001
+                job.status = "error"
+                job.add(f"[TOWER-ERROR] {exc}")
+            finally:
+                with JOBS_LOCK:
+                    RUNNING_ACTIONS.discard(key)
+
+        threading.Thread(target=work, daemon=True).start()
+        self._json({"id": job.id})
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--base", default=str(Path(__file__).resolve().parents[2]))
     ap.add_argument("--port", type=int, default=8765)
-    ap.add_argument("--intake", default=None,
-                    help="VRN research-report intake dir (default: v0156 under Downloads)")
+    ap.add_argument("--intake", default=None)
     args = ap.parse_args()
     base = Path(args.base).resolve()
     if not (base / "functional modules").is_dir():
