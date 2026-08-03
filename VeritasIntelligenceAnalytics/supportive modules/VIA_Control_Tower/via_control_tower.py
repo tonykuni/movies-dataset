@@ -99,7 +99,7 @@ class Tower:
             job.status = "error"
             job.add(f"[TOWER-ERROR] {exc}")
 
-    def stream_pwsh_code(self, job: Job, code: str):
+    def stream_pwsh_code(self, job: Job, code: str, args: list[str] | None = None):
         pwsh = find_pwsh()
         if not pwsh:
             job.status = "error"
@@ -109,7 +109,9 @@ class Tower:
         os.close(fd)
         Path(tmp).write_text(code, encoding="utf-8-sig")
         try:
-            self.stream(job, [pwsh, "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", tmp])
+            cmd = [pwsh, "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass",
+                   "-File", tmp] + (args or [])
+            self.stream(job, cmd)
         finally:
             try:
                 os.unlink(tmp)
@@ -220,9 +222,10 @@ class Tower:
                 f'$BrokerHelper = "{rules / "VIS_VRN_BrokerAlias_Compatibility_v0222.py"}"',
             r'\$FallbackHelper\s*=\s*".*?"':
                 f'$FallbackHelper = "{rules / "VIS_VRN_PDFTextLayerFallbackPlan_v0222.py"}"',
-            r'\$TargetFile = ".*?"': f'$TargetFile = "{pdf}"',
         })
-        self.stream_pwsh_code(job, code)
+        # TargetFile 以參數傳入(候選腳本可能宣告為強制參數,不能靠改預設值);
+        # -NonInteractive 確保任何缺參都直接報錯而非停在互動提示。
+        self.stream_pwsh_code(job, code, ["-TargetFile", pdf])
 
     def act_revival_check(self, job: Job):
         """VRN 復健參數完整性檢查(唯讀)。"""
