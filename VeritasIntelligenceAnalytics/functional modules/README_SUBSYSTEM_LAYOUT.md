@@ -11,6 +11,14 @@ subsystems in this order:
 | Others | every other directory under `functional modules/` and `module/` |
 | Supportive | `supportive modules/` |
 
+**六槽標準佈局(2026-08-02 起)** — 每個 functional module 統一:
+`engine/`(程式,追蹤)· `input/`(輸入;VRN 的研報 PDF git-ignored)·
+`db/`(資料庫產品,ignored)· `template/`(模板數據,追蹤)·
+`temp/`(暫存,ignored,One-Click 啟動自動清)· `output/`(其他輸出,ignored)。
+既有慣例保留:VDF 來源仍讀 repo 根 `data/`;VAP 圖表仍寫 `<Base>/VAP/output`
+(治理已鎖)。VRN 研報輸入標準槽為 `VRN/input/incoming/`,Control Tower 的
+VRN RUN 優先掃此槽(fallback:Downloads v0156 歷史位置 → 候選清單)。
+
 `VRN/` now carries its **full canonical tree in-repo** (imported 2026-08-02
 from the operator workstation survivor copy): core pipeline `VRN_MDL001–008`
 (Converter → LayoutExtractor → TableRestorer → OCR table/text → Consolidator →

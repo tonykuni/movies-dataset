@@ -22,6 +22,11 @@ Set-Location $repo
 # ---------- 1) 收拾 + 同步(自動判斷 PR 合併與否) ----------
 git checkout -- "VeritasIntelligenceAnalytics/functional modules/VDF/qa/evidence/movies_intake_summary.json" 2>$null
 Get-ChildItem "$fm\VDF\db\movies_dataset_*.sqlite" -ErrorAction SilentlyContinue | Remove-Item -Force
+# 六槽標準:各模組 temp\ 啟動時自動清空(保留 .gitkeep)
+foreach ($m in 'VDF','VAP','VRN') {
+    Get-ChildItem "$fm\$m\temp" -Exclude '.gitkeep' -ErrorAction SilentlyContinue |
+        Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+}
 git fetch origin
 $onMain = git branch -r --contains "origin/$feat" 2>$null | Select-String 'origin/main'
 if ($onMain -or -not (git ls-remote --heads origin $feat)) {

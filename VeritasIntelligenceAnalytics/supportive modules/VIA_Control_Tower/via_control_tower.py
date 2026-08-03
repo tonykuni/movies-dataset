@@ -44,7 +44,9 @@ class Tower:
         self.sm = base / "supportive modules"
         self.py = sys.executable
         self.rpt = Path(os.environ.get("USERPROFILE", str(Path.home()))) / "VIA_Reports"
-        self.intake = intake or DEFAULT_INTAKE
+        # priority: BASE 標準槽 VRN/input → 傳入覆蓋 → 歷史 v0156 位置
+        self.intake = self.fm / "VRN" / "input"
+        self.intake_fallback = intake or DEFAULT_INTAKE
 
     # ------------------------------------------------------------- helpers
     def run(self, cmd: list[str], timeout: int = 1800) -> str:
@@ -78,14 +80,20 @@ class Tower:
             code = re.sub(pattern, value.replace("\\", "\\\\"), code, count=1)
         return code
 
+    def _intake_dir(self) -> Path | None:
+        for d in (self.intake, self.intake_fallback):
+            if d.is_dir() and any(p.is_file() and p.name != ".gitkeep" for p in d.rglob("*")):
+                return d
+        return self.intake if self.intake.is_dir() else None
+
     def auto_pdf(self) -> str | None:
-        # 1st priority: the v0156 incremental intake folder (newest PDF first)
-        if self.intake.is_dir():
-            pdfs = sorted(self.intake.rglob("*.pdf"),
-                          key=lambda p: p.stat().st_mtime, reverse=True)
-            if pdfs:
-                return str(pdfs[0])
-        # fallback: historical candidate path list
+        # priority: BASE VRN/input → v0156 歷史位置 → 歷史候選清單
+        for d in (self.intake, self.intake_fallback):
+            if d.is_dir():
+                pdfs = sorted(d.rglob("*.pdf"),
+                              key=lambda p: p.stat().st_mtime, reverse=True)
+                if pdfs:
+                    return str(pdfs[0])
         cand = self.fm / "VRN" / "VRN-2_StockReportCandidatePaths.txt"
         if cand.is_file():
             for line in cand.read_text(encoding="utf-8", errors="replace").splitlines():
@@ -95,13 +103,19 @@ class Tower:
         return None
 
     def act_vrn_intake(self) -> str:
-        if not self.intake.is_dir():
+        d = self._intake_dir()
+        if d is None:
             return f"[TOWER] intake 資料夾不存在:{self.intake}"
-        files = [p for p in self.intake.rglob("*") if p.is_file()]
+        files = [p for p in d.rglob("*") if p.is_file() and p.name != ".gitkeep"]
+        self_note = ("(標準槽 BASE\\functional modules\\VRN\\input)" if d == self.intake
+                     else "(fallback:歷史 v0156 位置 — 建議搬入標準槽)")
+        return self._intake_report(d, files, self_note)
+
+    def _intake_report(self, d: Path, files: list[Path], note: str) -> str:
         by_ext: dict[str, list[Path]] = {}
         for p in files:
             by_ext.setdefault(p.suffix.lower() or "(none)", []).append(p)
-        lines = [f"[TOWER] VRN intake v0156 盤點 · {self.intake}",
+        lines = [f"[TOWER] VRN intake 盤點 · {d} {note}",
                  f"total: {len(files)} files · "
                  f"{round(sum(p.stat().st_size for p in files)/1048576, 1)} MB", ""]
         for ext in sorted(by_ext, key=lambda e: -len(by_ext[e])):
@@ -112,7 +126,7 @@ class Tower:
         lines.append("最新 15 份(VRN RUN 會自動選最新的 PDF):")
         newest = sorted(files, key=lambda p: p.stat().st_mtime, reverse=True)[:15]
         for p in newest:
-            lines.append(f"  {p.relative_to(self.intake)}")
+            lines.append(f"  {p.relative_to(d)}")
         return "\n".join(lines)
 
     # ------------------------------------------------------------- actions
