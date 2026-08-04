@@ -1,0 +1,182 @@
+[
+  {
+    "name": "twstock",
+    "module": "twstock",
+    "purpose": "TWSE/TPEX 上市清單 + 即時/歷史價格 (LL: 5s/3req limit)",
+    "risk": "LOW",
+    "target_env_hint": "via_basic_tools",
+    "rationale": "Officially scrapes TWSE/TPEX; 補 yfinance 對小型 TPEX 股漏抓的場景 (3131,5903,4743 etc).",
+    "category": "TW_OFFICIAL"
+  },
+  {
+    "name": "FinMind",
+    "module": "FinMind.data",
+    "purpose": "台股全套 API (free tier, daily limit)",
+    "risk": "LOW",
+    "target_env_hint": "via_basic_tools",
+    "rationale": "Open-source TW data; 補 yfinance 拿不到的 2809 (京城銀行) 等冷門金融類.",
+    "category": "TW_OFFICIAL"
+  },
+  {
+    "name": "pandas-datareader",
+    "module": "pandas_datareader",
+    "purpose": "Stooq / 多 source 統一 reader",
+    "risk": "LOW",
+    "target_env_hint": "via_basic_tools",
+    "rationale": "Stooq 接口在 yfinance 2025-02 改版後成為 main fallback (deepcharts substack 推薦).",
+    "category": "TW_OFFICIAL"
+  },
+  {
+    "name": "yahooquery",
+    "module": "yahooquery",
+    "purpose": "Yahoo Finance 替代庫 (走 v10 quote API,不是 yfinance 的 v7)",
+    "risk": "LOW",
+    "target_env_hint": "via_basic_tools",
+    "rationale": "yfinance 2025-02 後常 404, yahooquery 走不同 endpoint, 部分情況可救.",
+    "category": "TW_OFFICIAL"
+  },
+  {
+    "name": "yahoofinancials",
+    "module": "yahoofinancials",
+    "purpose": "Yahoo 另一替代庫, 直接 scrape financialsdata page",
+    "risk": "LOW",
+    "target_env_hint": "via_basic_tools",
+    "rationale": "若 yfinance + yahooquery 都掛, 這個走 page-scrape 路徑.",
+    "category": "TW_OFFICIAL"
+  },
+  {
+    "name": "akshare",
+    "module": "akshare",
+    "purpose": "中港台多市場財經 (free, 中國 GitHub 維護)",
+    "risk": "MEDIUM",
+    "target_env_hint": "via_basic_tools",
+    "rationale": "對台股 TWSE 有專屬接口; 跟 yfinance 路徑完全獨立.",
+    "category": "TW_FINANCE"
+  },
+  {
+    "name": "mplfinance",
+    "module": "mplfinance",
+    "purpose": "OHLCV chart (no data fetch, 後端可視化)",
+    "risk": "LOW",
+    "target_env_hint": "via_plot_basic",
+    "rationale": "純畫圖, 套在拿到資料後做 visual sanity-check.",
+    "category": "TW_FINANCE"
+  },
+  {
+    "name": "stockstats",
+    "module": "stockstats",
+    "purpose": "技術指標 (RSI/MACD/BBands) 從 OHLCV df 計算",
+    "risk": "LOW",
+    "target_env_hint": "via_ds_light",
+    "rationale": "yfinance 拿不到 financials 時, 至少 OHLCV 可算指標當 fallback signal.",
+    "category": "TW_FINANCE"
+  },
+  {
+    "name": "tls-client",
+    "module": "tls_client",
+    "purpose": "TLS fingerprint 偽裝 (curl_cffi 補充)",
+    "risk": "MEDIUM",
+    "target_env_hint": "via_basic_tools",
+    "rationale": "yfinance Yahoo 2025-02 改版後加 TLS 檢測; curl_cffi 已有, 但 tls-client 是純 Go binding 更輕量.",
+    "category": "ANTI_SCRAPE"
+  },
+  {
+    "name": "httpx",
+    "module": "httpx",
+    "purpose": "modern async HTTP (HTTP/2 native)",
+    "risk": "LOW",
+    "target_env_hint": "via_basic_tools",
+    "rationale": "Aegis 已有 httpx_m 但可能沒裝; 對 TWSE/TPEX HTTPS endpoint 比 requests 穩.",
+    "category": "ANTI_SCRAPE"
+  },
+  {
+    "name": "h2",
+    "module": "h2",
+    "purpose": "HTTP/2 protocol library (httpx 後端)",
+    "risk": "LOW",
+    "target_env_hint": "via_basic_tools",
+    "rationale": "TWSE OpenAPI 走 HTTP/2; 若沒裝 httpx 會降回 HTTP/1.1, 慢.",
+    "category": "ANTI_SCRAPE"
+  },
+  {
+    "name": "brotli",
+    "module": "brotli",
+    "purpose": "Brotli compression (Yahoo/TWSE 都用)",
+    "risk": "LOW",
+    "target_env_hint": "via_basic_tools",
+    "rationale": "requests/httpx 預設沒 brotli, 對方拒提供壓縮會慢 3x.",
+    "category": "ANTI_SCRAPE"
+  },
+  {
+    "name": "parsel",
+    "module": "parsel",
+    "purpose": "XPath/CSS selectors (Scrapy 抽出來的, lxml 之上)",
+    "risk": "LOW",
+    "target_env_hint": "via_basic_tools",
+    "rationale": "MOPS 季報 HTML 結構巢狀深, parsel 比 BS4 簡潔.",
+    "category": "PARSE"
+  },
+  {
+    "name": "selectolax",
+    "module": "selectolax",
+    "purpose": "lexbor-backed HTML parser (10x faster than BS4)",
+    "risk": "LOW",
+    "target_env_hint": "via_basic_tools",
+    "rationale": "TWSE/MOPS scrape 量大時 BS4 慢, selectolax C-backed 快.",
+    "category": "PARSE"
+  },
+  {
+    "name": "html5lib",
+    "module": "html5lib",
+    "purpose": "WHATWG-compliant parser (容錯比 lxml 強)",
+    "risk": "LOW",
+    "target_env_hint": "via_basic_tools",
+    "rationale": "MOPS 偶有 malformed HTML, html5lib 容錯救命.",
+    "category": "PARSE"
+  },
+  {
+    "name": "requests-cache",
+    "module": "requests_cache",
+    "purpose": "HTTP layer cache (sqlite/redis backend)",
+    "risk": "LOW",
+    "target_env_hint": "via_basic_tools",
+    "rationale": "Aegis 已有 QuotaSaverCache, 但對 TWSE openapi response 還沒接; 加這個自動快取.",
+    "category": "CACHE"
+  },
+  {
+    "name": "diskcache",
+    "module": "diskcache",
+    "purpose": "pure-python disk cache, SQLite-backed",
+    "risk": "LOW",
+    "target_env_hint": "via_basic_tools",
+    "rationale": "已被 Aegis QuotaSaverCache 用, 但 v139G gap cache 也需要它.",
+    "category": "CACHE"
+  },
+  {
+    "name": "tenacity",
+    "module": "tenacity",
+    "purpose": "retry with exponential backoff + jitter",
+    "risk": "LOW",
+    "target_env_hint": "via_basic_tools",
+    "rationale": "比 ratelimit 細; 對 TWSE 5s/3req 限制要精準 backoff.",
+    "category": "CACHE"
+  },
+  {
+    "name": "ratelimit",
+    "module": "ratelimit",
+    "purpose": "function-level call rate limit decorator",
+    "risk": "LOW",
+    "target_env_hint": "via_basic_tools",
+    "rationale": "對 TWSE 的 5s/3req 限制必需 (twstock README 有提到).",
+    "category": "CACHE"
+  },
+  {
+    "name": "platformdirs",
+    "module": "platformdirs",
+    "purpose": "cross-platform user cache dir resolver",
+    "risk": "LOW",
+    "target_env_hint": "via_basic_tools",
+    "rationale": "gap cache 路徑要在 user appdata 而不是 cwd, platformdirs 統一處理.",
+    "category": "CACHE"
+  }
+]
