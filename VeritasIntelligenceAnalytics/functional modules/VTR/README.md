@@ -19,6 +19,8 @@ Best Solution Portfolio 定義了「要哪七大模組」；本目錄是它的**
 | `engine/vtr_py/` | **可執行的引擎**：骨架 + 步驟 1–2 + P0 遮罩（零第三方相依） |
 | `engine/tests/` | 49 個測試（單元・不變式・對抗・回歸・突變驗證） |
 | `config/vtr.json` | 兩版引擎共用的門檻與權重設定 |
+| `Invoke-VTR.ps1` | **單一 PowerShell 進入點**（operator workstation 用） |
+| `tools/build_manifest.py` | Manifest 重算工具（可重現的 hash-lock 輸入） |
 | `VTR_Subsystem_Manifest.json` | 子系統 anchor manifest（SHA-256 登錄、治理閘門） |
 
 ---
@@ -56,21 +58,44 @@ Best Solution Portfolio 定義了「要哪七大模組」；本目錄是它的**
 
 ## 立即可執行
 
-全部零第三方相依，clone 下來就能跑。
+全部零第三方相依（連 PowerShell 模組也不需要），clone 下來就能跑。
+
+### 一個指令處理全部 —— `Invoke-VTR.ps1`
+
+```powershell
+cd "VeritasIntelligenceAnalytics\functional modules\VTR"
+
+.\Invoke-VTR.ps1                                   # 全套驗證（Doctor+Lexicon+Test+Manifest）
+.\Invoke-VTR.ps1 -Action Doctor                    # 只檢查環境
+.\Invoke-VTR.ps1 -Action Restore -Path .\input\    # 批次修復整個資料夾
+.\Invoke-VTR.ps1 -Action Inspect -DocId MTG-001 -ShowReview
+.\Invoke-VTR.ps1 -Action Replay  -DocId MTG-001 -ToRev 1
+.\Invoke-VTR.ps1 -Action Manifest -Update          # 重算 hash-lock
+```
+
+退出碼：`0` 通過 · `2` 契約/schema · `3` SSOT 或 sentinel 違反 · `4` 改壞率 ·
+`5` manifest 不一致 · `10` 環境不符。可直接掛 CI 或排程。
+
+三個非顯而易見但必要的設計（都源自本 repo 踩過的坑）：
+
+| 決定 | 理由 |
+|---|---|
+| 不用 `Start-Process` | 本 repo 路徑含空白（`functional modules`），`ArgumentList` 會在空白處把參數拆開 —— git log 有兩次修這個 bug 的紀錄。改用 `& $exe @args`。 |
+| 強制 UTF-8（含 `PYTHONUTF8=1`） | 輸出含中文與遮罩符 `⟦⟧`；Windows 主控台預設 cp950 會變亂碼。 |
+| 檔案存成 **UTF-8 with BOM** | Windows PowerShell 5.1 對無 BOM 的檔案假設 ANSI，會把中文字串解析成亂碼。這是 5.1 相容性的硬性要求，不是風格選擇。 |
+
+### 直接呼叫 Python（Linux / macOS / CI）
 
 ```bash
 cd "VeritasIntelligenceAnalytics/functional modules/VTR"
 
-# 1. 詞庫驗證（exit 0/2/3）
-python3 lexicon/tools/validate_lexicon.py
+python3 lexicon/tools/validate_lexicon.py                    # 詞庫（exit 0/2/3）
+python3 tools/build_manifest.py                              # manifest（exit 0/5）
+cd engine && python3 -m unittest discover -s tests -t .      # 49 tests
 
-# 2. 引擎測試（49 tests）
-cd engine && python3 -m unittest discover -s tests -t .
-
-# 3. 對真實逐字稿跑 Preprocessing Pipeline
 python3 -m vtr_py.cli restore transcript.txt --doc-id MTG-001 --out ./out/
-python3 -m vtr_py.cli inspect ./out --review     # 看待裁決佇列
-python3 -m vtr_py.cli replay  ./out --to-rev 1   # 回滾到任一版本
+python3 -m vtr_py.cli inspect ./out --review                 # 看待裁決佇列
+python3 -m vtr_py.cli replay  ./out --to-rev 1               # 回滾到任一版本
 ```
 
 ### 實際輸出範例
@@ -123,6 +148,7 @@ VeritasAutoPlot在v0162B已經鎖定, 請在14:30前回覆tony@example.com
 | P0 PROTECT / UNPROTECT（pattern 規則） | ✅ |
 | Diff & Versioning（patch log · replay · 回滾） | ✅ |
 | CLI（restore / inspect / replay） | ✅ |
+| PowerShell 單一進入點 `Invoke-VTR.ps1` | ✅ |
 | P0 詞庫精確命中（接上 SSOT Lexicon） | ⬜ |
 | 步驟 3–8（標點／斷句／錯字／文法／專名／結構化） | ⬜ 需模型層 |
 | LLM 仲裁層 | ⬜ |

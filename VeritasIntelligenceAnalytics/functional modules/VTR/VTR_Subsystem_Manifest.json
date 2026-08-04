@@ -4,6 +4,7 @@
   "integration_state": "SPEC_REGISTERED_DETERMINISTIC_LAYER_IMPLEMENTED",
   "canonical_tree": "本 anchor 攜帶 VTR canonical 規格件（contracts/, config/, docs/, lexicon/）與確定性層引擎（engine/vtr_py：步驟 1–2 + P0 遮罩 + 版本重播）。步驟 3–8 需模型層，尚未實作 —— 見 README.md。",
   "discovery_root": "functional modules/VTR",
+  "entry_point": "Invoke-VTR.ps1",
   "artifacts": [
     {
       "filename": "contracts/vtr-document.schema.json",
@@ -60,10 +61,22 @@
       "sha256": "63993909966cd5b01c5073b870e8c2d1072e848e2d6ebc82695c8cce4c286abf"
     },
     {
+      "filename": "tools/build_manifest.py",
+      "role": "Manifest 重算工具（本檔）",
+      "bytes": 9546,
+      "sha256": "59898fdd198e46dd0009e5db744a47123a9c33e9e95b70ef27a1c9837aef8e1d"
+    },
+    {
+      "filename": "Invoke-VTR.ps1",
+      "role": "PowerShell 單一進入點 · operator workstation 用",
+      "bytes": 18390,
+      "sha256": "445bb1a94d5d90dd3f186f56ee98e727a86c301dbf39b300772a72319bd7921d"
+    },
+    {
       "filename": "README.md",
       "role": "VTR 子系統導覽",
-      "bytes": 6647,
-      "sha256": "2b13d7fba1b01efff19bb94bee94e6729efa27eca802f7c4a77c7a01c0ce2d70"
+      "bytes": 8389,
+      "sha256": "992db8300517e678999027b72b2d627c9a6fbaa3c2e1a95d6cb59ddd1b02464b"
     },
     {
       "filename": "engine/tests/__init__.py",
@@ -177,7 +190,8 @@
       "步驟 2 NORMALIZE",
       "P0 PROTECT / UNPROTECT（pattern 規則）",
       "Diff & Versioning（patch log / replay / 回滾）",
-      "CLI restore / inspect / replay"
+      "CLI restore / inspect / replay",
+      "PowerShell 單一進入點 Invoke-VTR.ps1"
     ],
     "not_implemented": [
       "P0 詞庫精確命中（待接 SSOT Lexicon）",
@@ -193,9 +207,10 @@
     "third_party_dependencies": "無。確定性層僅使用 Python 標準函式庫，可在未安裝任何套件的環境執行。"
   },
   "verification": {
+    "one_shot": "pwsh -File Invoke-VTR.ps1",
     "lexicon": "python3 lexicon/tools/validate_lexicon.py（exit 0/2/3）",
     "engine": "cd engine && python3 -m unittest discover -s tests -t .",
-    "tests": 49,
+    "manifest": "python3 tools/build_manifest.py（exit 0/5）",
     "test_categories": [
       "單元",
       "屬性/不變式",
