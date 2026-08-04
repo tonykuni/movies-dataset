@@ -90,6 +90,15 @@ class Workspace:
         return self.data / "triage.jsonl"
 
     @property
+    def projects_ledger(self) -> Path:
+        return self.data / "projects.jsonl"
+
+    @property
+    def workspace(self) -> Path:
+        """實體專案資料夾根目錄 (供 [PRJ-] 自動編碼掃描)。"""
+        return self.root / "workspace"
+
+    @property
     def quarantine_ledger(self) -> Path:
         return self.data / "quarantine.jsonl"
 
@@ -181,11 +190,83 @@ def read_jsonl(path: Path) -> list[dict]:
     return out
 
 
-def append_jsonl(path: Path, rec: dict) -> None:
+def append_jsonl(path: Path, rec: dict, durable: bool = True) -> None:
+    """
+    對 add-only 帳本追加一列。
+    durable=True 時強制 flush + fsync, 把作業系統快取真正落到實體磁碟 ——
+    追蹤信寄出後才崩潰、事件卻沒寫進去, 會讓狀態推導錯亂, 所以事件帳一定要 fsync。
+    整行 (含換行) 一次寫出, 崩潰最多留下一條半截行, 而 read_jsonl 本來就會跳過壞行。
+    """
     p = Path(path)
     p.parent.mkdir(parents=True, exist_ok=True)
+    line = json.dumps(rec, ensure_ascii=False) + "\n"
     with p.open("a", encoding="utf-8") as f:
-        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+        f.write(line)
+        if durable:
+            f.flush()
+            try:
+                os.fsync(f.fileno())
+            except OSError:
+                pass          # 某些網路磁碟不支援 fsync, 退化為一般 flush
+
+
+def atomic_write_text(path: Path, text: str, backups: int = 3) -> Path:
+    """
+    整檔覆寫的安全寫法 (給 config / 匯出視圖這類「非 add-only」的檔案)。
+    先寫 .tmp -> fsync -> os.replace 原子替換; 替換前先做滾動備份。
+    崩潰時: 要嘛舊檔完好, 要嘛新檔完整, 不會留下寫到一半的殘檔。
+    """
+    p = Path(path)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    if p.exists() and backups > 0:
+        rolling_backup(p, backups)
+    tmp = p.with_suffix(p.suffix + ".tmp")
+    with tmp.open("w", encoding="utf-8") as f:
+        f.write(text)
+        f.flush()
+        try:
+            os.fsync(f.fileno())
+        except OSError:
+            pass
+    os.replace(tmp, p)         # NTFS/POSIX 上為不可分割操作
+    return p
+
+
+def rolling_backup(path: Path, keep: int = 3) -> None:
+    """把現有檔案輪替為 <name>.bak1..bakN, 最舊的自然被擠掉。"""
+    p = Path(path)
+    if not p.exists():
+        return
+    for i in range(keep - 1, 0, -1):
+        older = p.with_name(f"{p.name}.bak{i}")
+        newer = p.with_name(f"{p.name}.bak{i + 1}")
+        if older.exists():
+            os.replace(older, newer)
+    try:
+        import shutil
+        shutil.copy2(p, p.with_name(f"{p.name}.bak1"))
+    except OSError:
+        pass
+
+
+def read_json_resilient(path: Path, default: Any = None) -> Any:
+    """
+    讀整份 JSON; 主檔損毀時自動往回找 .bak1..bakN 還原 (搭配 atomic_write_text 使用)。
+    這是「無資料庫」狀態檔的自我修復: 斷電毀了主檔, 下次讀取自動回血。
+    """
+    p = Path(path)
+    candidates = [p] + [p.with_name(f"{p.name}.bak{i}") for i in range(1, 5)]
+    for i, cand in enumerate(candidates):
+        if not cand.exists():
+            continue
+        try:
+            data = json.loads(cand.read_text(encoding="utf-8"))
+            if i > 0:                       # 從備份讀到 -> 回寫主檔
+                atomic_write_text(p, cand.read_text(encoding="utf-8"), backups=0)
+            return data
+        except (json.JSONDecodeError, OSError):
+            continue
+    return default
 
 
 # dry-run 的行程內暫存區 (key = 帳本絕對路徑)。

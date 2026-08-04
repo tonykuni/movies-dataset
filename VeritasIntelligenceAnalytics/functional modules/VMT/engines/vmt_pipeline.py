@@ -7,11 +7,12 @@
    1 收信      intake      來源只讀 -> mails.jsonl
    2 判讀      triage      意圖 / 緊急度 / 期限 / 歸案
    3 會議      minutes     逐字稿 -> 會議記錄 (可選, 有給 --transcript 才跑)
-   4 抽任務    extract     郵件 + 會議待辦 -> 任務台帳
-   5 收回覆    replies     先套用回覆, 再算 SLA —— 否則剛回覆完的人會被系統催一次
-   6 SLA       sla         逾期 / 升級 / 今日催辦排程
-   7 產信稿    composer    有限選項追蹤信 (預設只寫檔, 不寄)
-   8 總覽      dashboard   純讀推導的戰情頁
+   4 編碼      projects    workspace/ 資料夾 -> [PRJ-###] 自動編碼
+   5 抽任務    extract     郵件 + 會議待辦 -> 任務台帳 (掛上 [PRJ-###])
+   6 收回覆    replies     先套用回覆, 再算 SLA —— 否則剛回覆完的人會被系統催一次
+   7 SLA       sla         逾期 / 升級 / 今日催辦排程
+   8 產信稿    composer    有限選項追蹤信 (預設只寫檔, 不寄)
+   9 總覽      dashboard   純讀推導的戰情頁
 
  治理: 整條管線預設 dry-run。不加 --commit 時, 每個引擎都只產報告不落帳,
        因此可以放心先跑一次看它「打算做什麼」, 確認後再 --commit。
@@ -32,6 +33,7 @@ import vmt_extract_tasks  # noqa: E402
 import vmt_mail_composer  # noqa: E402
 import vmt_meeting_minutes  # noqa: E402
 import vmt_outlook_intake  # noqa: E402
+import vmt_projects  # noqa: E402
 import vmt_reply_parser  # noqa: E402
 import vmt_sla_engine  # noqa: E402
 from vmt_core import EngineResult, Workspace, banner, mode_label  # noqa: E402
@@ -54,6 +56,8 @@ def run(ws: Workspace, commit: bool = False, no_open: bool = True,
         results.append(vmt_meeting_minutes.run(ws, transcript, meeting_config,
                                                commit=commit, no_open=True))
 
+    # 先跑專案編碼, 抽任務時才能把待辦掛到對應的 [PRJ-###]
+    results.append(vmt_projects.run(ws, commit=commit, no_open=True))
     results.append(vmt_extract_tasks.run(ws, me, commit=commit, no_open=True))
     results.append(vmt_reply_parser.run(ws, commit=commit, no_open=True))
     results.append(vmt_sla_engine.run(ws, commit=commit, no_open=True, as_of=as_of))

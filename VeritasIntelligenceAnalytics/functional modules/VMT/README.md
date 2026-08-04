@@ -70,7 +70,8 @@ python3 engines/vmt_pipeline.py --transcript meeting.json \
 | `vmt_outlook_intake.py` | 收信（Outlook → 資料夾 → 範例三級降級），MD5 去重 | ✔ |
 | `vmt_ai_triage.py` | 意圖 / 緊急度 / 期限 / 歸案；規則優先、LLM 補位 | ✔ `--llm` |
 | `vmt_meeting_minutes.py` | 逐字稿 → 標主詞 → 標性質 → 會議記錄 + 完整性稽核 | ✔ |
-| `vmt_extract_tasks.py` | 郵件會話 + 會議待辦 → 任務候選（provenance 必填） | ✔ |
+| `vmt_projects.py` | `workspace/` 資料夾 → `[PRJ-###]` 自動編碼（只改名、不刪除） | ✔ |
+| `vmt_extract_tasks.py` | 郵件會話 + 會議待辦 → 任務候選（provenance + 專案編碼） | ✔ |
 | `vmt_task_ssot.py` | 工作台帳；宣告 add-only，狀態由事件 replay 推導 | ✔ |
 | `vmt_sla_engine.py` | 逾期推導、冪等升級、催辦排程 | ✔ `--as-of` |
 | `vmt_mail_composer.py` | 有限選項追蹤信；對外／自己／待指派三流分開 | ✔ `--draft` |
@@ -90,6 +91,7 @@ python3 engines/vmt_pipeline.py --transcript meeting.json \
 |---|---|
 | **來源只讀** | Outlook 全程唯讀：不標已讀、不搬移、不刪除、不回寫 |
 | **帳本 add-only** | 所有 `*.jsonl` 只 append，永不 UPDATE / DELETE |
+| **崩潰安全寫入** | 事件帳追加以 `fsync` 落地；整檔覆寫用原子寫入（`.tmp → os.replace`）+ 滾動備份，損毀主檔可從 `.bak` 自我修復 |
 | **狀態由事件推導** | 任務狀態、逾期與否一律 replay `events.jsonl`，沒有可變欄位 |
 | **預設 dry-run** | 不加 `--commit` 只產報告；報告頁首會顯著標示 DRY-RUN |
 | **冪等** | 郵件用 MD5、任務用來源指紋、隔離用 q_uid；重跑不長資料 |
@@ -131,9 +133,21 @@ dry-run          什麼都不寫
 | `mails.jsonl` | 已入帳郵件 | 內容 MD5 |
 | `triage.jsonl` | AI 判讀結果 | mail_uid + 引擎版本 |
 | `minutes.jsonl` | 會議記錄 + 標記逐字稿（證據） | minute_uid |
+| `projects.jsonl` | 專案宣告（資料夾自動編碼建檔） | `[PRJ-###]` |
 | `tasks.jsonl` | 任務宣告（**不含任何狀態欄位**） | 來源指紋 |
 | `events.jsonl` | 事件流 — 狀態的唯一真相 | — |
 | `quarantine.jsonl` | Q01 待人工 | q_uid |
+
+## 專案化管理（資料夾即 SSOT）
+
+在 `$VMT_ROOT/workspace/` 底下隨手建一個資料夾（例如「日本合資案」），
+`vmt_projects` 掃到後自動把它改名為 `[PRJ-001] 日本合資案` 並建檔。從此這個高辨識度的
+`[PRJ-001]` 成為郵件歸戶與任務歸屬的精準金鑰，取代模糊的中文名稱比對。
+
+- **只改名、不刪除**：只動最外層資料夾名稱，內容完全不碰
+- **add-only + 冪等**：已編碼資料夾、已建檔編碼一律略過，重跑不會重複編號
+- **dry-run**：只列「打算怎麼編碼」，不改任何資料夾、不寫帳本
+- 抽任務時，會議標題／議題或郵件主旨命中 `[PRJ-###]` 或專案名稱，任務自動掛上該編碼
 
 任務狀態機：`OPEN → ACK → IN_PROGRESS → DONE`，任一狀態可轉 `BLOCKED` / `CANCELLED`。
 `OVERDUE` **不是狀態欄位**，而是 `due < 基準日` 的推導結果——所以改 SLA 規則只要重跑，

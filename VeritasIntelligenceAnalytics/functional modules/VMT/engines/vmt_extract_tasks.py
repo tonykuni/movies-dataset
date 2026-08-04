@@ -33,6 +33,7 @@ from vmt_core import (  # noqa: E402
 )
 from vmt_lang import _ratio  # noqa: E402
 from vmt_ai_triage import load_triage  # noqa: E402
+from vmt_projects import resolve_project  # noqa: E402
 from vmt_task_ssot import UNKNOWN, build_task, create_tasks, load_tasks  # noqa: E402
 
 ENGINE = "vmt_extract_tasks"
@@ -89,7 +90,10 @@ def from_mails(ws: Workspace, me: str) -> list[dict]:
         dues = sorted(d for d in (g.get("due_date") for g in group) if d)
         urgency = max(int(g.get("urgency", 3)) for g in group)
         cues = ", ".join(dict.fromkeys(c for g in group for c in g.get("cues", [])))
-        out.append(build_task(
+        # 專案歸戶: 先看整條會話的主旨/內文有沒有 [PRJ-###] 或專案名稱
+        blob = " ".join("%s %s" % (g.get("subject", ""), g.get("summary", "")) for g in group)
+        project = resolve_project(blob, ws)
+        task = build_task(
             title=_clean_title(first.get("subject")),
             owner=me,
             requester=first.get("sender", ""),
@@ -99,7 +103,9 @@ def from_mails(ws: Workspace, me: str) -> list[dict]:
             case=first.get("case"),
             detail="來自 %s 的請求；同一會話 %d 封信；判讀 cue: %s"
                    % (first.get("sender", ""), len(group), cues[:80]),
-        ))
+        )
+        task["project"] = project
+        out.append(task)
     return out
 
 
@@ -109,8 +115,10 @@ def from_minutes(ws: Workspace, include_questions: bool = False) -> list[dict]:
         ref = m.get("minute_uid", "")
         title = m.get("title", "會議")
         base = dt.date.fromisoformat(m["date"]) if m.get("date") else dt.date.today()
+        # 會議標題／議題常帶專案名稱, 用來歸戶到 [PRJ-###]
+        project = resolve_project("%s %s" % (title, m.get("case") or ""), ws)
         for a in (m.get("records") or {}).get("actions", []):
-            out.append(build_task(
+            task = build_task(
                 title=clip(a.get("task"), 60),
                 owner=a.get("owner") or UNKNOWN,
                 requester=m.get("chair", ""),
@@ -120,7 +128,9 @@ def from_minutes(ws: Workspace, include_questions: bool = False) -> list[dict]:
                 case=m.get("case"),
                 detail="%s／議題「%s」；原文用語「%s」"
                        % (title, a.get("topic", ""), a.get("due_cue") or "未提期限"),
-            ))
+            )
+            task["project"] = resolve_project(a.get("topic") or "", ws) or project
+            out.append(task)
         if include_questions:
             for q in (m.get("records") or {}).get("questions", []):
                 out.append(build_task(

@@ -23,8 +23,8 @@
     {
       "filename": "engines/vmt_core.py",
       "role": "共用基座 · 工作區 / add-only 帳本 / 事件流 / Q01 隔離 / Visual Lock 報告",
-      "bytes": 18310,
-      "sha256": "584fa1f3d4262aa0e597782d91c60e4d0bc9eb92156b72519dd2df81eda69aa2"
+      "bytes": 21353,
+      "sha256": "9ea4ce130a4e9881aef9f221c692622295b66ca0ebf1e9d650745b59e39cf6e5"
     },
     {
       "filename": "engines/vmt_lang.py",
@@ -53,8 +53,14 @@
     {
       "filename": "engines/vmt_extract_tasks.py",
       "role": "任務抽取引擎 · 郵件會話 + 會議待辦 -> 任務候選 · provenance 必填",
-      "bytes": 10810,
-      "sha256": "5f6d8aab962d17e87f617b1901510594f6e5550fffc4ff2e28e8ec316c5d7ab2"
+      "bytes": 11414,
+      "sha256": "6e19ddc3611bc847633e9379aa1b8628a99ea847f05b3037a1f9a17f41765823"
+    },
+    {
+      "filename": "engines/vmt_projects.py",
+      "role": "專案自動編碼 · workspace 資料夾 -> [PRJ-###] · 只改名不刪除 · add-only 建檔 · 郵件/任務精準歸戶金鑰",
+      "bytes": 8986,
+      "sha256": "7cbeae9bf35bbdbd5869e5f7e0920b514e83bda778c9e1c2543337c08e38815d"
     },
     {
       "filename": "engines/vmt_task_ssot.py",
@@ -89,8 +95,8 @@
     {
       "filename": "engines/vmt_pipeline.py",
       "role": "管線編排 · 收信 -> 判讀 -> 會議 -> 抽任務 -> 收回覆 -> SLA -> 信稿 -> 總覽",
-      "bytes": 5819,
-      "sha256": "c8a3a4c4a6e69ce3583c140e202b1e8fbc02ab52192b4971c9f3933cb823f721"
+      "bytes": 6097,
+      "sha256": "4a0b79e8c296af99b1ca26e8280236cf24222d3b20d78f3814f1f53601bc5600"
     },
     {
       "filename": "Start-VMT.ps1",
@@ -105,7 +111,8 @@
     "data/minutes.jsonl": "會議記錄含標記逐字稿 (add-only, 冪等於 minute_uid)",
     "data/tasks.jsonl": "任務宣告 (add-only, 冪等於 fingerprint; 不含任何可變狀態欄位)",
     "data/events.jsonl": "事件流 — 所有狀態的唯一真相, 永不 UPDATE",
-    "data/quarantine.jsonl": "Q01 隔離帳 (低信心判讀 / 無法對應的回覆), 去重"
+    "data/quarantine.jsonl": "Q01 隔離帳 (低信心判讀 / 無法對應的回覆), 去重",
+    "data/projects.jsonl": "專案宣告 (add-only, 冪等於 [PRJ-###]; 資料夾自動編碼建檔)"
   },
   "governance": {
     "source_read_only": "Outlook 與逐字稿全程唯讀: 不標已讀、不搬移、不刪除、不回寫。",
@@ -124,7 +131,9 @@
     ],
     "promotion_gate": "OPERATOR_REVIEW_AND_SEPARATE_HASH_LOCKED_TRANSACTION_REQUIRED",
     "canonical_mutation_by_system_manager": false,
-    "sandbox_repair_only": true
+    "sandbox_repair_only": true,
+    "crash_safe_write": "事件帳追加以 fsync 落地; 整檔覆寫用原子寫入 (.tmp -> os.replace) 加滾動備份; 損毀主檔可從 .bak 自我修復。",
+    "folder_ssot": "workspace/ 資料夾即專案單一真相; 自動編碼只重新命名最外層資料夾, 內容完全不動、從不刪除。"
   },
   "interfaces": {
     "VMT_v1": "沿用既有 CASE-XX 案號規則與『有限選項回覆』郵件格式; 本引擎組自持 tasks.jsonl / events.jsonl, 不改寫 VMT v1 的 ssot.json。",
@@ -133,7 +142,7 @@
   "tests": {
     "path": "tests/test_vmt_engines.py",
     "runner": "python3 tests/test_vmt_engines.py",
-    "count": 35,
+    "count": 44,
     "coverage": [
       "治理紅線",
       "相對期限換算",
