@@ -21,7 +21,7 @@ import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-VERSION = "v002"
+VERSION = "v003"
 
 
 def find_pwsh() -> str | None:
@@ -30,10 +30,11 @@ def find_pwsh() -> str | None:
 
 # --------------------------------------------------------------------- jobs
 class Job:
-    def __init__(self, action: str, label: str):
+    def __init__(self, action: str, label: str, params: dict | None = None):
         self.id = uuid.uuid4().hex[:12]
         self.action = action
         self.label = label
+        self.params = params or {}
         self.status = "running"          # running | done | error
         self.progress = -1               # -1 = indeterminate, else 0-100
         self.lines: list[str] = []
@@ -156,13 +157,19 @@ class Tower:
 
     # ---------------------------------------------------------- main actions
     def act_vdf(self, job: Job):
+        mode = job.params.get("mode", "Refresh")
+        if mode not in ("Refresh", "ValidateOnly", "DryRun"):
+            mode = "Refresh"
         self.stream(job, [self.py, str(self.fm / "VDF" / "engine" / "vdf_movies_intake_v001.py"),
                           "--base", str(self.base), "--source", str(self.repo / "data"),
-                          "--mode", "Refresh"])
+                          "--mode", mode])
 
     def act_autoplot(self, job: Job):
+        mx = job.params.get("max", "40")
+        if mx not in ("12", "26", "40", "80"):
+            mx = "40"
         self.stream(job, [self.py, str(self.fm / "VAP" / "engine" / "via_autoplot_engine_v001.py"),
-                          "--base", str(self.base), "--auto", "--max-charts", "40"])
+                          "--base", str(self.base), "--auto", "--max-charts", mx])
 
     def act_vrn_intake(self, job: Job):
         d = self._intake_dir()
@@ -208,8 +215,74 @@ class Tower:
         job.status = "done"
         job.progress = 100
 
+    def list_pdfs(self) -> list[dict]:
+        out = []
+        for d in (self.intake, self.intake_fallback):
+            if d.is_dir():
+                for p in sorted(d.rglob("*.pdf"), key=lambda p: p.stat().st_mtime, reverse=True):
+                    out.append({"name": p.name, "path": str(p),
+                                "mb": round(p.stat().st_size / 1048576, 2)})
+                if out:
+                    break
+        return out[:64]
+
+    def matrix(self) -> list[dict]:
+        """整體狀況矩陣(快速唯讀檢查,紅黃綠燈)。"""
+        import hashlib
+        t: list[dict] = []
+
+        def add(group, name, state, detail=""):
+            t.append({"g": group, "n": name, "s": state, "d": str(detail)})
+
+        db = self.fm / "VDF" / "db" / "movies_dataset.sqlite"
+        add("VDF", "intake 引擎", "G" if (self.fm / "VDF" / "engine"
+            / "vdf_movies_intake_v001.py").is_file() else "R")
+        add("VDF", "分析資料庫", "G" if db.is_file() else "Y",
+            f"{db.stat().st_size} bytes" if db.is_file() else "未建(跑 VDF)")
+        ev = self.fm / "VDF" / "qa" / "evidence" / "movies_intake_summary.json"
+        gate = ""
+        if ev.is_file():
+            try:
+                gate = json.loads(ev.read_text(encoding="utf-8")).get("gate", "")
+            except Exception:  # noqa: BLE001
+                pass
+        add("VDF", "QA 閘門", "G" if gate.startswith("GREEN") else ("Y" if gate else "R"), gate or "無證據")
+        charts = len(list((self.base / "VAP" / "output").glob("VAP_*.html"))) \
+            if (self.base / "VAP" / "output").is_dir() else 0
+        add("VAP", "繪圖引擎", "G" if (self.fm / "VAP" / "engine"
+            / "via_autoplot_engine_v001.py").is_file() else "R")
+        add("VAP", "圖表產出", "G" if charts else "Y", f"{charts} 張")
+        add("VAP", "Workbench v010", "G" if (self.fm / "VAP" / "ui"
+            / "VAP_Workbench_v010.html").is_file() else "R")
+        add("VAP", "Header 視覺鎖", "G" if (self.fm / "VAP" / "spec"
+            / "Veritas_Header_Masthead_1d.html").is_file() else "R", "LOCKED")
+        gen = self.fm / "VRN" / "SSOT" / "v2" / "generations" / \
+            "VRN_ResearchReport_SSOT.v2.records64.v0155.2f771c00c6dd8d6e.jsonl"
+        chain = gen.is_file() and hashlib.sha256(gen.read_bytes()).hexdigest().startswith("2f771c00")
+        add("VRN", "SSOT 鏈", "G" if chain else "R", "全鏈雜湊吻合" if chain else "斷鏈")
+        add("VRN", "Reader Adapter", "G" if (self.sm / "70_VRN_Rules"
+            / "VRN_ResearchReport_SSOT_v2_ReaderAdapter.py").is_file() else "R")
+        pdfs = self.list_pdfs()
+        add("VRN", "研報 intake", "G" if pdfs else "Y", f"{len(pdfs)} 份 PDF")
+        add("VRN", "No-OCR 入口", "G" if (self.sm / "60_PowerShell_Entry_Internal"
+            / "Invoke-VRN-MQ-NoOCR-Staging-v222.ps1").is_file() else "R")
+        add("Runtime", "pwsh", "G" if find_pwsh() else "R")
+        add("Runtime", "java(tabula)", "G" if shutil.which("java") else "Y")
+        envp = Path(os.environ.get("USERPROFILE", "")) / "envs" / "via_core_312" / \
+            "Scripts" / "python.exe"
+        add("Runtime", "via_core_312", "G" if envp.is_file() else "Y",
+            "" if envp.is_file() else "本機才有")
+        inbox = self.sm / "_inbox_to_classify"
+        n_inbox = sum(1 for p in inbox.rglob("*") if p.is_file()) if inbox.is_dir() else 0
+        add("治理", "待分類箱", "G" if n_inbox == 0 else "Y", f"{n_inbox} 檔")
+        add("治理", "UNIT03 管線", "Y", "v0111R2 待跑 → v0112")
+        add("治理", "SSOT 獨立化", "Y", "FLOW-A DRAFT 待核准")
+        return t
+
     def act_vrn_run(self, job: Job):
-        pdf = self.auto_pdf()
+        pdf = job.params.get("pdf") or self.auto_pdf()
+        if pdf and not Path(pdf).is_file():
+            pdf = self.auto_pdf()
         if not pdf:
             self.emit(job, "[TOWER] intake 槽找不到 PDF — 把研報丟進 "
                            "functional modules\\VRN\\input\\incoming 後重按。")
@@ -630,86 +703,147 @@ ACCELERATORS = {
     "a20_gate_all": ("全系統快速體檢", "Set-Location '{repo}'; \"branch: $(git branch --show-current)\"; \"charts: $((Get-ChildItem '{base}\\VAP\\output\\VAP_*.html' -EA SilentlyContinue).Count)\"; \"db: $((Get-Item '{base}\\functional modules\\VDF\\db\\movies_dataset.sqlite' -EA SilentlyContinue).Length) bytes\"; \"vrn input pdf: $((Get-ChildItem '{base}\\functional modules\\VRN\\input' -Recurse -Filter *.pdf -EA SilentlyContinue).Count)\"; \"reports dir: $env:USERPROFILE\\VIA_Reports\""),
 }
 
+ARCH_SVG = r"""<svg viewBox="0 0 980 430" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+<defs><marker id="ar" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+<path d="M0 0L8 4L0 8z" fill="#6b6860"/></marker>
+<style>.bx{fill:#fff;stroke:#dcdad3;rx:8}.t{font:700 13px Georgia,serif;fill:#3a3f3e;letter-spacing:.08em}
+.s{font:9px Consolas,monospace;fill:#6b6860;letter-spacing:.06em}.io{font:600 9.5px Consolas,monospace;fill:#3d8f8f}
+.fl{stroke:#6b6860;stroke-width:1.2;fill:none;marker-end:url(#ar)}.seal{fill:#9e2b25}</style></defs>
+<rect class="bx" x="20" y="30" width="120" height="64"/><text class="t" x="80" y="56" text-anchor="middle">data/</text>
+<text class="s" x="80" y="74" text-anchor="middle">3× CSV 來源</text>
+<rect class="bx" x="200" y="20" width="160" height="84" stroke="#3d8f8f"/><text class="t" x="280" y="46" text-anchor="middle">VDF</text>
+<text class="s" x="280" y="62" text-anchor="middle">intake 引擎 v001</text>
+<text class="s" x="280" y="76" text-anchor="middle">IN: input/·data/ OUT: db/</text>
+<rect class="bx" x="420" y="30" width="120" height="64"/><text class="t" x="480" y="56" text-anchor="middle">db/</text>
+<text class="s" x="480" y="74" text-anchor="middle">movies_dataset.sqlite</text>
+<rect class="bx" x="600" y="20" width="160" height="84" stroke="#7a6daa"/><text class="t" x="680" y="46" text-anchor="middle">VAP</text>
+<text class="s" x="680" y="62" text-anchor="middle">AutoPlot + Workbench v010</text>
+<text class="s" x="680" y="76" text-anchor="middle">IN: db/ OUT: VAP/output/</text>
+<rect class="bx" x="820" y="30" width="140" height="64"/><text class="t" x="890" y="52" text-anchor="middle">output/</text>
+<text class="s" x="890" y="70" text-anchor="middle">26+ 圖表 · index.html</text>
+<path class="fl" d="M140 62H198"/><path class="fl" d="M360 62H418"/><path class="fl" d="M540 62H598"/><path class="fl" d="M760 62H818"/>
+<rect class="bx" x="20" y="170" width="120" height="64"/><text class="t" x="80" y="192" text-anchor="middle">input/</text>
+<text class="s" x="80" y="208" text-anchor="middle">incoming/ 64 份研報</text><text class="s" x="80" y="222" text-anchor="middle">PDF · DOCX · TXT</text>
+<rect class="bx" x="200" y="160" width="160" height="84" stroke="#c4634f"/><text class="t" x="280" y="184" text-anchor="middle">VRN</text>
+<text class="s" x="280" y="200" text-anchor="middle">MDL001–008 OCR 管線</text>
+<text class="s" x="280" y="214" text-anchor="middle">Guarded Entry · No-OCR v222</text>
+<text class="s" x="280" y="228" text-anchor="middle">IN: input/ OUT: db/·output/</text>
+<rect class="bx" x="420" y="170" width="120" height="64"/><text class="t" x="480" y="192" text-anchor="middle">SSOT</text>
+<text class="s" x="480" y="208" text-anchor="middle">指標鏈 · 64 records</text><text class="s" x="480" y="222" text-anchor="middle">雜湊鎖定</text>
+<rect class="bx" x="600" y="170" width="160" height="64"/><text class="t" x="680" y="192" text-anchor="middle">Reports</text>
+<text class="s" x="680" y="208" text-anchor="middle">ReportSSOT AutoLayout</text><text class="s" x="680" y="222" text-anchor="middle">template/ 版面鎖</text>
+<path class="fl" d="M140 202H198"/><path class="fl" d="M360 202H418"/><path class="fl" d="M540 202H598"/>
+<rect x="20" y="300" width="940" height="100" fill="#fbfaf7" stroke="#dcdad3" rx="8"/>
+<rect class="seal" x="40" y="322" width="40" height="40" rx="4"/><text x="60" y="350" text-anchor="middle" font-family="serif" font-size="22" fill="#f2f1ec">理</text>
+<text class="t" x="100" y="340">CONTROL TOWER v003</text>
+<text class="s" x="100" y="356">背景 jobs · 動態進度 · 12 主動作 + 6 收尾流程 + 20 加速器</text>
+<text class="io" x="100" y="374">Supportive:Optimizer Suite · Governance v0162B/C · 60_/70_ · Standalone Pkg · PMIS-Lite · Dashboard 標準</text>
+<path class="fl" d="M280 298V246" stroke-dasharray="4 3"/><path class="fl" d="M680 298V246" stroke-dasharray="4 3"/>
+<path class="fl" d="M480 298V236" stroke-dasharray="4 3"/><path class="fl" d="M680 298V106" stroke-dasharray="4 3"/>
+</svg>"""
+
 PAGE = r"""<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>VIA · Control Tower __VER__</title>
 <style>
-:root{--bg:#f2f1ec;--paper:#fff;--ink:#1b1a17;--ink2:#3a3f3e;--mut:#6b6860;
- --line:#dcdad3;--seal:#9e2b25;--teal:#3d8f8f;--violet:#7a6daa;--green:#4f9465;--red:#c4634f;
- --mono:"SFMono-Regular",Consolas,monospace;
- --sans:"Microsoft JhengHei","Segoe UI",system-ui,sans-serif}
+:root{--bg:#f2f1ec;--paper:#fff;--paper2:#fbfaf7;--ink:#1b1a17;--ink2:#3a3f3e;--mut:#6b6860;
+ --line:#dcdad3;--seal:#9e2b25;--teal:#3d8f8f;--violet:#7a6daa;--green:#4f9465;--red:#c4634f;--amber:#bf8f33;
+ --mono:"SFMono-Regular",Consolas,monospace;--sans:"Microsoft JhengHei","Segoe UI",system-ui,sans-serif}
 *{box-sizing:border-box;margin:0}
 body{background:var(--bg);font-family:var(--sans);color:var(--ink);min-height:100vh}
 .mast{background:#fff;display:flex;align-items:center;gap:21px;padding:11px 40px 10px}
-.mast .seal{width:46px;height:46px;background:var(--seal);color:#f2f1ec;display:flex;
- align-items:center;justify-content:center;font-family:serif;font-size:26px;border-radius:4px}
+.mast .seal{width:46px;height:46px;background:var(--seal);color:#f2f1ec;display:flex;align-items:center;justify-content:center;font-family:serif;font-size:26px;border-radius:4px}
 .mast .wm{font-family:Georgia,serif;font-size:22px;letter-spacing:.1em;color:var(--ink2);white-space:nowrap}
 .mast .sub{font-family:var(--mono);font-size:8.5px;letter-spacing:.36em;color:var(--mut);text-transform:uppercase}
 .rule{height:1px;background:linear-gradient(to right,var(--violet) 0 34px,rgba(27,26,23,.14) 34px 100%)}
-main{max-width:1150px;margin:0 auto;padding:20px 20px 40px}
+.tabs{display:flex;gap:2px;background:var(--paper2);padding:8px 20px 0;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs button{border:1px solid var(--line);border-bottom:none;background:var(--paper2);padding:9px 18px;border-radius:8px 8px 0 0;
+ cursor:pointer;font:600 12.5px var(--sans);color:var(--mut);transition:all .18s;white-space:nowrap}
+.tabs button.on{background:var(--paper);color:var(--ink);border-color:var(--teal);box-shadow:0 -2px 0 var(--teal) inset}
+.tabs button:hover{color:var(--teal)}
+main{max-width:1180px;margin:0 auto;padding:18px 20px 40px}
+.page{display:none;animation:pin .3s cubic-bezier(.2,.7,.3,1)}
+.page.on{display:block}
+@keyframes pin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 h3{font:700 10.5px var(--mono);letter-spacing:.14em;color:var(--mut);text-transform:uppercase;margin:14px 0 8px}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.tile{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px;animation:pin .35s both}
+.tile .lamp{width:12px;height:12px;border-radius:50%;flex:none}
+.tile.G .lamp{background:var(--green);box-shadow:0 0 6px rgba(79,148,101,.7);animation:pulse 2.4s infinite}
+.tile.Y .lamp{background:var(--amber);box-shadow:0 0 6px rgba(191,143,51,.7)}
+.tile.R .lamp{background:var(--red);box-shadow:0 0 6px rgba(196,99,79,.8);animation:pulse 1.1s infinite}
+@keyframes pulse{50%{opacity:.55}}
+.tile .tn{font-size:12.5px;color:var(--ink)}
+.tile .td{font:10px var(--mono);color:var(--mut)}
+.tile .tg{font:700 9px var(--mono);color:var(--teal);letter-spacing:.08em;text-transform:uppercase}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:10px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:9px;transition:transform .16s,box-shadow .16s}
+.card:hover{transform:translateY(-2px);box-shadow:0 10px 28px -14px rgba(27,26,23,.3)}
+.card h4{font:700 14px var(--sans);color:var(--ink)}
+.card .k{font:700 9.5px var(--mono);letter-spacing:.1em;text-transform:uppercase}
+.card select{padding:7px 9px;border:1px solid var(--line);border-radius:7px;background:var(--paper2);font:12px var(--sans);color:var(--ink);width:100%;cursor:pointer}
+.card .go{padding:9px;border:none;border-radius:8px;background:var(--teal);color:#fff;font:700 12.5px var(--sans);cursor:pointer;transition:transform .15s,filter .15s}
+.card .go:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.card .go:active{transform:scale(.97)}
+.card .go.danger{background:var(--seal)}
+.card .go.busy{opacity:.45;pointer-events:none}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:9px}
 .acc{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
-button{display:flex;flex-direction:column;gap:3px;text-align:left;padding:11px 13px;background:var(--paper);
- border:1px solid var(--line);border-radius:8px;cursor:pointer;font-family:var(--sans);
- transition:transform .15s,box-shadow .15s,border-color .15s}
-button:hover{transform:translateY(-2px);border-color:var(--teal);box-shadow:0 8px 24px -12px rgba(27,26,23,.25)}
-button:active{transform:scale(.97)}
-button.busy{opacity:.45;pointer-events:none}
-button .k{font:700 9.5px var(--mono);letter-spacing:.09em;color:var(--teal);text-transform:uppercase}
-button .t{font-size:13px;color:var(--ink)}
-button.danger .k{color:var(--seal)}
-.acc button{padding:8px 10px}.acc button .t{font-size:12px}
-#bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:14px 0 6px}
-#fill{height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--violet));border-radius:3px;
- transition:width .4s ease}
-#fill.indet{width:30%!important;animation:v2slide 1.2s ease-in-out infinite}
-@keyframes v2slide{0%{margin-left:-30%}100%{margin-left:100%}}
+button.act{display:flex;flex-direction:column;gap:3px;text-align:left;padding:11px 13px;background:var(--paper);border:1px solid var(--line);border-radius:8px;cursor:pointer;font-family:var(--sans);transition:transform .15s,box-shadow .15s,border-color .15s}
+button.act:hover{transform:translateY(-2px);border-color:var(--teal);box-shadow:0 8px 24px -12px rgba(27,26,23,.25)}
+button.act:active{transform:scale(.97)}
+button.act.busy{opacity:.45;pointer-events:none}
+button.act .k{font:700 9.5px var(--mono);letter-spacing:.09em;color:var(--teal);text-transform:uppercase}
+button.act .t{font-size:13px;color:var(--ink)}
+.dock{position:sticky;bottom:0;background:var(--bg);padding-top:10px}
+#bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:0 0 6px}
+#fill{height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--violet));border-radius:3px;transition:width .4s ease}
+#fill.indet{width:30%!important;animation:sl 1.2s ease-in-out infinite}
+@keyframes sl{0%{margin-left:-30%}100%{margin-left:100%}}
 #fill.err{background:var(--red)}
-#status{font:700 11px var(--mono);letter-spacing:.1em;color:var(--mut);margin:0 0 8px;text-transform:uppercase}
+#status{font:700 11px var(--mono);letter-spacing:.1em;color:var(--mut);margin:0 0 6px;text-transform:uppercase}
 #status.run{color:var(--teal)}#status.err{color:var(--red)}#status.ok{color:var(--green)}
-#log{background:#1b1a17;color:#e8e6df;border-radius:8px;padding:15px 17px;font:12px/1.55 var(--mono);
- white-space:pre-wrap;word-break:break-all;min-height:160px;max-height:52vh;overflow:auto}
+#log{background:#1b1a17;color:#e8e6df;border-radius:8px;padding:13px 16px;font:11.5px/1.5 var(--mono);white-space:pre-wrap;word-break:break-all;height:26vh;overflow:auto}
+.arch{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:18px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style></head><body>
 <div class="mast"><div class="seal">理</div>
  <div><div class="wm">VIA CONTROL TOWER</div>
- <div class="sub">Veritas Intelligence Analytics · background jobs · live progress · 127.0.0.1</div></div></div>
+ <div class="sub">Veritas Intelligence Analytics · matrix · launcher · flows · 127.0.0.1</div></div></div>
 <div class="rule"></div>
+<div class="tabs" id="tabs"></div>
 <main>
- <h3>主要動作 Main Actions</h3><div class="grid" id="grid"></div>
- <h3>加速器 Accelerators ×20(背景執行 · 不卡斷)</h3><div class="acc" id="acc"></div>
- <div id="bar"><div id="fill"></div></div>
- <p id="status">READY</p>
- <div id="log">按任意按鈕啟動背景 job;進度與日誌即時更新,期間其他按鈕照常可用。</div>
+ <div class="page" id="pg-matrix"><h3>整體狀況矩陣 System Matrix(自動載入 · 60s 自動刷新)</h3><div class="mgrid" id="matrix"></div></div>
+ <div class="page" id="pg-launch"><h3>子系統啟動平台 Launch Platform(預設值已填 · 下拉即改)</h3><div class="cards" id="launch"></div></div>
+ <div class="page" id="pg-arch"><h3>VIA 架構 · 輸入/輸出總覽</h3><div class="arch">__ARCH__</div></div>
+ <div class="page" id="pg-flows"><h3>六收尾流程(唯讀提案型 · 互不重疊)</h3><div class="grid" id="flows"></div></div>
+ <div class="page" id="pg-accel"><h3>加速器 ×20(背景 · 不卡斷)</h3><div class="acc" id="accels"></div></div>
+ <div class="dock"><div id="bar"><div id="fill"></div></div><p id="status">READY</p><div id="log">選擇分頁,按任意按鈕啟動背景 job;進度與日誌即時更新,期間其他按鈕照常可用。</div></div>
 </main>
 <script>
 const ACTIONS = __ACTIONS__, ACCEL = __ACCEL__;
-const grid=document.getElementById('grid'), acc=document.getElementById('acc'),
-      log=document.getElementById('log'), status=document.getElementById('status'),
-      fill=document.getElementById('fill');
-let watching=null, seen=0, timer=null;
-
-function mkBtn(host, key, label, danger, accel){
-  const b=document.createElement('button'); b.id='btn-'+key;
-  if(danger) b.classList.add('danger');
-  b.innerHTML='<span class="k">'+key.replace(/_/g,' ')+'</span><span class="t">'+label+'</span>';
-  b.onclick=()=>launch(key, label, accel);
-  host.appendChild(b);
+const TABS = [["pg-matrix","總覽矩陣"],["pg-launch","啟動平台"],["pg-arch","架構圖"],["pg-flows","收尾流程"],["pg-accel","加速器"]];
+const tabs=document.getElementById('tabs');
+for(const [id,label] of TABS){
+  const b=document.createElement('button'); b.textContent=label; b.dataset.pg=id;
+  b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));
+    document.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.id===id));};
+  tabs.appendChild(b);
 }
-for(const [k,v] of Object.entries(ACTIONS)) mkBtn(grid,k,v,(k==='vrn_run'||k==='audit'),false);
-for(const [k,v] of Object.entries(ACCEL))   mkBtn(acc,k,v,false,true);
-
-async function launch(key,label,accel){
-  const btn=document.getElementById('btn-'+key); btn.classList.add('busy');
-  const r=await fetch((accel?'/accel/':'/run/')+key,{method:'POST'});
+tabs.firstChild.click();
+const log=document.getElementById('log'), status=document.getElementById('status'), fill=document.getElementById('fill');
+let watching=null, seen=0, timer=null;
+function narrate(t){ status.textContent=t; }
+async function launch(url,label,btn){
+  btn.classList.add('busy');
+  const r=await fetch(url,{method:'POST'});
   if(!r.ok){ btn.classList.remove('busy'); log.textContent+='\n[ERROR] '+await r.text(); return; }
-  const {id}=await r.json();
-  watching=id; seen=0;
+  const {id}=await r.json(); watching=id; seen=0;
   log.textContent='['+new Date().toLocaleTimeString()+'] '+label+' — job '+id+'\n';
-  status.textContent='RUNNING · '+label; status.className='run';
-  fill.classList.remove('err'); fill.classList.add('indet'); fill.style.width='30%';
+  narrate('RUNNING · '+label); status.className='run';
+  fill.classList.remove('err'); fill.classList.add('indet');
   if(!timer) timer=setInterval(poll,700);
+  btn._watch=id;
 }
 async function poll(){
   if(!watching) return;
@@ -719,14 +853,53 @@ async function poll(){
   seen=j.total;
   if(j.progress>=0){ fill.classList.remove('indet'); fill.style.width=j.progress+'%'; }
   if(j.status!=='running'){
-    document.getElementById('btn-'+j.action)?.classList.remove('busy');
-    status.textContent=(j.status==='done'?'DONE · ':'ERROR · ')+j.label;
+    document.querySelectorAll('.busy').forEach(x=>{ if(x._watch===j.id||!x._watch) x.classList.remove('busy'); });
+    narrate((j.status==='done'?'DONE · ':'ERROR · ')+j.label);
     status.className=(j.status==='done'?'ok':'err');
     if(j.status!=='done') fill.classList.add('err');
     fill.classList.remove('indet'); fill.style.width='100%';
     watching=null;
+    if(j.action==='vdf'||j.action==='autoplot') refreshMatrix();
   }
 }
+// ---- 矩陣(自動完成)----
+async function refreshMatrix(){
+  const r=await fetch('/matrix'); if(!r.ok) return;
+  const tiles=await r.json(); const host=document.getElementById('matrix'); host.innerHTML='';
+  let i=0;
+  for(const t of tiles){
+    const d=document.createElement('div'); d.className='tile '+t.s; d.style.animationDelay=(i++*30)+'ms';
+    d.innerHTML='<span class="lamp"></span><span><span class="tg">'+t.g+'</span><br><span class="tn">'+t.n+'</span>'+(t.d?'<br><span class="td">'+t.d+'</span>':'')+'</span>';
+    host.appendChild(d);
+  }
+  const g=tiles.filter(t=>t.s==='G').length;
+  narrate('MATRIX · '+g+'/'+tiles.length+' GREEN');
+}
+refreshMatrix(); setInterval(refreshMatrix,60000);
+// ---- 啟動平台 ----
+async function buildLaunch(){
+  const host=document.getElementById('launch');
+  let pdfs=[]; try{ pdfs=await (await fetch('/pdfs')).json(); }catch(e){}
+  const pdfOpts=pdfs.map((p,i)=>'<option value="'+encodeURIComponent(p.path)+'"'+(i===0?' selected':'')+'>'+p.name+' ('+p.mb+'MB)</option>').join('')||'<option value="">(intake 無 PDF)</option>';
+  host.innerHTML=
+   '<div class="card"><span class="k" style="color:var(--teal)">VDF</span><h4>資料鍛造</h4><select id="vdfMode"><option selected>Refresh</option><option>ValidateOnly</option><option>DryRun</option></select><button class="go" onclick="launch(\'/run/vdf?mode=\'+document.getElementById(\'vdfMode\').value,\'VDF \'+document.getElementById(\'vdfMode\').value,this)">啟動 VDF</button></div>'
+  +'<div class="card"><span class="k" style="color:var(--violet)">VAP</span><h4>全配對繪圖</h4><select id="vapMax"><option>12</option><option>26</option><option selected>40</option><option>80</option></select><button class="go" onclick="launch(\'/run/autoplot?max=\'+document.getElementById(\'vapMax\').value,\'AutoPlot ×\'+document.getElementById(\'vapMax\').value,this)">啟動 AutoPlot</button><button class="go" style="background:var(--violet)" onclick="launch(\'/run/open_workbench\',\'開啟 Workbench\',this)">開 Workbench v010</button></div>'
+  +'<div class="card"><span class="k" style="color:var(--seal)">VRN</span><h4>研報處理</h4><select id="vrnPdf">'+pdfOpts+'</select><button class="go danger" onclick="launch(\'/run/vrn_run?pdf=\'+document.getElementById(\'vrnPdf\').value,\'VRN RUN\',this)">實彈 No-OCR</button><button class="go" onclick="launch(\'/run/vrn_probe\',\'SAFE PROBE\',this)">SAFE PROBE</button><button class="go" onclick="launch(\'/run/revival\',\'復健檢查\',this)">復健檢查</button></div>'
+  +'<div class="card"><span class="k" style="color:var(--amber)">TOOLS</span><h4>治理工具</h4><button class="go" onclick="launch(\'/run/audit\',\'SafeAudit\',this)">磁碟稽核</button><button class="go" onclick="launch(\'/run/panorama\',\'Panorama\',this)">全景矩陣</button><button class="go" onclick="launch(\'/run/polyglot\',\'Polyglot AIO\',this)">Polyglot AIO</button></div>';
+}
+buildLaunch();
+// ---- 流程 / 加速器按鈕 ----
+function mkAct(host,key,label,accel){
+  const b=document.createElement('button'); b.className='act'; b.id='btn-'+key;
+  b.innerHTML='<span class="k">'+key.replace(/_/g,' ')+'</span><span class="t">'+label+'</span>';
+  b.onclick=()=>launch((accel?'/accel/':'/run/')+key,label,b);
+  host.appendChild(b);
+}
+const flowHost=document.getElementById('flows'), accHost=document.getElementById('accels');
+for(const [k,v] of Object.entries(ACTIONS)){
+  if(k.startsWith('flow_')||k==='tree_audit'||k==='vrn_intake'||k==='vrn_lanes') mkAct(flowHost,k,v,false);
+}
+for(const [k,v] of Object.entries(ACCEL)) mkAct(accHost,k,v,true);
 </script></body></html>"""
 
 
@@ -755,11 +928,18 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path in ("/", "/index.html"):
             page = (PAGE.replace("__VER__", VERSION)
+                    .replace("__ARCH__", ARCH_SVG)
                     .replace("__ACTIONS__", json.dumps(
                         {k: v[0] for k, v in ACTIONS.items()}, ensure_ascii=False))
                     .replace("__ACCEL__", json.dumps(
                         {k: v[0] for k, v in ACCELERATORS.items()}, ensure_ascii=False)))
             self._html(page)
+            return
+        if self.path == "/matrix":
+            self._json(self.tower.matrix())
+            return
+        if self.path == "/pdfs":
+            self._json(self.tower.list_pdfs())
             return
         m = re.fullmatch(r"/job/([0-9a-f]+)(?:\?since=(\d+))?", self.path)
         if m:
@@ -772,7 +952,10 @@ class Handler(BaseHTTPRequestHandler):
         self._json({"error": "not found"}, 404)
 
     def do_POST(self):
-        m = re.fullmatch(r"/(run|accel)/([a-z0-9_]+)", self.path)
+        from urllib.parse import parse_qsl, unquote, urlparse
+        parsed = urlparse(self.path)
+        params = {k: unquote(v) for k, v in parse_qsl(parsed.query)}
+        m = re.fullmatch(r"/(run|accel)/([a-z0-9_]+)", parsed.path)
         if not m:
             self._json({"error": "bad path"}, 404)
             return
@@ -787,7 +970,7 @@ class Handler(BaseHTTPRequestHandler):
                 return
             RUNNING_ACTIONS.add(key)
         label = table[key][0]
-        job = Job(key, label)
+        job = Job(key, label, params)
         JOBS[job.id] = job
         t = self.tower
 
