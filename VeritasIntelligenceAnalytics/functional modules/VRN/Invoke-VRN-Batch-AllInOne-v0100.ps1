@@ -85,10 +85,11 @@ function Start-One($pdf, $patched, $runDir, $timeout) {
     Start-ThreadJob -ArgumentList $patched, $pdf.FullName, $log, $timeout -ScriptBlock {
         param($p, $f, $lg, $to)
         $sw2 = [Diagnostics.Stopwatch]::StartNew()
-        $proc = Start-Process pwsh -ArgumentList @("-NoProfile","-NonInteractive","-File",$p,"-TargetFile",$f) `
+        $proc = Start-Process pwsh -ArgumentList @("-NoProfile","-NonInteractive","-File","`"$p`"","-TargetFile","`"$f`"") `
                 -RedirectStandardOutput $lg -RedirectStandardError ($lg + ".err") -PassThru -WindowStyle Hidden
         if (-not $proc.WaitForExit($to * 1000)) { try { $proc.Kill($true) } catch {}; $timedOut = $true } else { $timedOut = $false }
         $tail = if (Test-Path $lg) { (Get-Content $lg -Tail 60) -join "`n" } else { "" }
+        if (Test-Path ($lg + ".err")) { $tail += "`n" + ((Get-Content ($lg + ".err") -Tail 20) -join "`n") }
         $alias = if ($tail -match '\[ALIAS\]\s*(.+)') { $Matches[1].Trim() } else { "" }
         $verdict = if ($timedOut) { "TIMEOUT" }
                    elseif ($tail -match 'NOOCR_STAGING_PLAN_READY') { "PLAN_READY" }
