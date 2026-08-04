@@ -1,0 +1,118 @@
+{
+  "schema_version": "vtr-lexicon/1.0",
+  "kind": "part_number",
+  "description": "料號詞庫 · 版本代號與料號。料號同時由 PROTECT 步驟的 pattern 規則捕捉（見 domain_term LEX-DOM-0010），本檔負責『已知料號』的 canonical 收斂與 ASR 錯誤形對應。",
+  "entries": [
+    {
+      "id": "LEX-PN-0001",
+      "canonical": "v0162B",
+      "aliases": [
+        { "surface": "V0162B", "type": "typo", "lang": "code" },
+        { "surface": "v0162 B", "type": "asr_error", "lang": "code" },
+        { "surface": "零一六二B", "type": "asr_error", "lang": "zh" },
+        { "surface": "版本 0162B", "type": "spoken", "lang": "mixed", "auto_correct": false }
+      ],
+      "lang": "code",
+      "status": "active",
+      "enabled": true,
+      "scope": ["project:VIA"],
+      "match_policy": { "case_sensitive": true },
+      "notes": "VIA Governance Runtime 版本。ASR 極易在字母前插入空白，導致標點恢復把 B 當成獨立句元。必遮罩。",
+      "provenance": {
+        "created_at": "2026-08-04T00:00:00Z",
+        "created_by": "operator",
+        "source": "migration",
+        "approved_at": "2026-08-04T00:00:00Z",
+        "approved_by": "operator",
+        "evidence_doc_id": null
+      }
+    },
+    {
+      "id": "LEX-PN-0002",
+      "canonical": "v0162C",
+      "aliases": [
+        { "surface": "V0162C", "type": "typo", "lang": "code" },
+        { "surface": "v0162 C", "type": "asr_error", "lang": "code" },
+        { "surface": "v0162 see", "type": "asr_error", "lang": "code" }
+      ],
+      "lang": "code",
+      "status": "active",
+      "enabled": true,
+      "scope": ["project:VIA"],
+      "match_policy": { "case_sensitive": true },
+      "notes": "Intelligence Platform UI 版本。英文 ASR 會把尾碼 C 轉成 see —— 這類同音字母錯誤只能靠 alias 明列。",
+      "provenance": {
+        "created_at": "2026-08-04T00:00:00Z",
+        "created_by": "operator",
+        "source": "migration",
+        "approved_at": "2026-08-04T00:00:00Z",
+        "approved_by": "operator",
+        "evidence_doc_id": null
+      }
+    },
+    {
+      "id": "LEX-PN-0003",
+      "canonical": "v0159",
+      "aliases": [
+        { "surface": "v 0159", "type": "asr_error", "lang": "code" },
+        { "surface": "零一五九", "type": "asr_error", "lang": "zh" }
+      ],
+      "lang": "code",
+      "status": "active",
+      "enabled": true,
+      "scope": ["project:VIA"],
+      "match_policy": { "case_sensitive": true },
+      "notes": "VRN intake policy 版本血緣。",
+      "provenance": {
+        "created_at": "2026-08-04T00:00:00Z",
+        "created_by": "operator",
+        "source": "migration",
+        "approved_at": "2026-08-04T00:00:00Z",
+        "approved_by": "operator",
+        "evidence_doc_id": null
+      }
+    },
+    {
+      "id": "LEX-PN-0004",
+      "canonical": "v0156",
+      "aliases": [
+        { "surface": "v 0156", "type": "asr_error", "lang": "code" }
+      ],
+      "lang": "code",
+      "status": "active",
+      "enabled": true,
+      "scope": ["project:VIA"],
+      "match_policy": { "case_sensitive": true },
+      "provenance": {
+        "created_at": "2026-08-04T00:00:00Z",
+        "created_by": "operator",
+        "source": "migration",
+        "approved_at": "2026-08-04T00:00:00Z",
+        "approved_by": "operator",
+        "evidence_doc_id": null
+      }
+    },
+    {
+      "id": "LEX-PN-0005",
+      "canonical": "<PART-NUMBER-TEMPLATE>",
+      "aliases": [
+        { "surface": "<口語唸法>", "type": "spoken", "lang": "mixed", "auto_correct": false },
+        { "surface": "<ASR 數字誤植形>", "type": "asr_error", "lang": "code" }
+      ],
+      "lang": "code",
+      "status": "draft",
+      "enabled": false,
+      "scope": ["global"],
+      "match_policy": { "exact_only": true, "case_sensitive": true },
+      "notes": "料號範本。所有料號一律 exact_only=true —— 料號的模糊比對是禁止的：把 A7X-2201 比對成 A7X-2021 是本引擎最嚴重的可能故障。未知料號由 PROTECT 的 pattern 規則遮罩並標記 unresolved_entity，交人工，絕不猜測。",
+      "provenance": {
+        "created_at": "2026-08-04T00:00:00Z",
+        "created_by": "operator",
+        "source": "operator",
+        "approved_at": null,
+        "approved_by": null,
+        "evidence_doc_id": null
+      }
+    }
+  ]
+}

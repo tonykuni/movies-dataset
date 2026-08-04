@@ -1,0 +1,123 @@
+{
+  "subsystem": "VTR",
+  "role": "DG-IN Meeting Transcript Restoration Engine · 中英文會議紀錄修復引擎（雙語混合修復架構 / 八步修復法 / SSOT Lexicon / 四大 Pipeline）",
+  "integration_state": "SPEC_AND_LEXICON_REGISTERED_ENGINE_NOT_YET_IMPLEMENTED",
+  "canonical_tree": "本 anchor 攜帶 VTR canonical 規格件（contracts/, docs/, lexicon/）並登錄探索根與治理閘門。引擎程式碼（vtr_py / @dg-in/vtr-js）尚未實作，見 README.md 的下一步。",
+  "discovery_root": "functional modules/VTR",
+  "artifacts": [
+    {
+      "filename": "contracts/vtr-document.schema.json",
+      "role": "Document 資料契約 · Python 版與 JavaScript 版共用的唯一 SSOT 結構",
+      "bytes": 9086,
+      "sha256": "769be8a0131092613ccf48b5fea3c2fce298c9a67a987652a001b815966517fc"
+    },
+    {
+      "filename": "docs/00_ARCHITECTURE.md",
+      "role": "完整修復引擎架構圖 · 三層架構 / 八步管線 / P0 遮罩 / 信心度閘門 / 四大 Pipeline",
+      "bytes": 14844,
+      "sha256": "944265306e810f4426e2f058fc6235d47d8260479b448c2c7f7b38aee9080b1c"
+    },
+    {
+      "filename": "docs/01_PYTHON_ENGINE_SPEC.md",
+      "role": "Python 版修復引擎規格書 · 權威實作（批次 / 模型層 / LLM 仲裁）",
+      "bytes": 19561,
+      "sha256": "59720fd53f152ca1bd0ce0824432a3471030c4e7dd6e3a6aa69aae172597fe15"
+    },
+    {
+      "filename": "docs/02_JAVASCRIPT_ENGINE_SPEC.md",
+      "role": "JavaScript 版修復引擎規格書 · 即時預覽 / 編輯器層 / 人工裁決 UI",
+      "bytes": 12716,
+      "sha256": "da20c793e60fe9c8bb8fa97dceca7b29b59ea037a3cae612416cd1dbfafd25b6"
+    },
+    {
+      "filename": "docs/03_SSOT_LEXICON_SPEC.md",
+      "role": "SSOT Lexicon 結構規格書 · 詞條結構 / 比對演算法 / 治理",
+      "bytes": 12357,
+      "sha256": "ea3c61db3d749aa9c8f2899a503fe1fcd87d71ed083f09ae79c78824c9154219"
+    },
+    {
+      "filename": "lexicon/schema/vtr-lexicon.schema.json",
+      "role": "Lexicon JSON Schema · 詞庫檔契約",
+      "bytes": 5900,
+      "sha256": "bc26a1f5074cc54362e9926ad35d5a8292bca1359d70a4af91d54114af6afb62"
+    },
+    {
+      "filename": "lexicon/lexicon.index.json",
+      "role": "Lexicon 索引 · 各詞庫檔 SHA-256 與統計（由驗證器產生）",
+      "bytes": 1926,
+      "sha256": "11354214397eef20519562bb6e205c9198e8dcb906804c19c79889fbe0cc35dd"
+    },
+    {
+      "filename": "lexicon/tools/validate_lexicon.py",
+      "role": "Lexicon 驗證器 / 索引產生器 · CI 掛載點",
+      "bytes": 15501,
+      "sha256": "63993909966cd5b01c5073b870e8c2d1072e848e2d6ebc82695c8cce4c286abf"
+    },
+    {
+      "filename": "README.md",
+      "role": "VTR 子系統導覽",
+      "bytes": 4620,
+      "sha256": "24e5424038f784031f8b3beefded2f7942074196b537044a31521001123d50bc"
+    }
+  ],
+  "lexicon": {
+    "totals": {
+      "entries": 29,
+      "enabled": 26,
+      "draft": 3,
+      "aliases": 74
+    },
+    "scopes": [
+      "global",
+      "project:VIA"
+    ],
+    "index_file": "lexicon/lexicon.index.json",
+    "validator": "lexicon/tools/validate_lexicon.py",
+    "validator_exit_codes": {
+      "0": "通過",
+      "2": "schema 錯誤",
+      "3": "SSOT 一致性錯誤"
+    }
+  },
+  "engine_contract": {
+    "document_schema": "contracts/vtr-document.schema.json",
+    "stages": [
+      "LANG_DETECT",
+      "NORMALIZE",
+      "PROTECT",
+      "PUNCTUATE",
+      "SEGMENT",
+      "SPELL",
+      "GRAMMAR",
+      "LEXICON",
+      "UNPROTECT",
+      "STRUCTURE"
+    ],
+    "confidence_gate": {
+      "auto": ">=0.85",
+      "review": "0.60-0.85",
+      "reject": "<0.60",
+      "llm_only_ceiling": 0.8
+    },
+    "rule_id_namespace": "VTR.<STAGE>.<rule>",
+    "cross_engine_rule": "Python 版與 JavaScript 版對同一規則必須使用同一 rule_id；Lexicon 比對分數差異須 < 0.01。"
+  },
+  "governance": {
+    "intake_policy": "新詞條一律 enabled=false 草稿（source=meeting_intake 強制 false）；啟用需 provenance.approved_by。由 validate_lexicon.py 強制。",
+    "restoration_policy": "引擎僅產生 candidate + patch log，不得直接改寫 canonical 逐字稿。單獨 LLM 判斷信心度上限 0.80，永遠進人工複核。",
+    "audit_chain": "append-only patch log；每筆改動可回答 source / rule_id / evidence / confidence。",
+    "promotion_gate": "OPERATOR_REVIEW_AND_SEPARATE_HASH_LOCKED_TRANSACTION_REQUIRED",
+    "canonical_mutation_by_system_manager": false,
+    "sandbox_repair_only": true
+  },
+  "system_manager": {
+    "version": "v0162B",
+    "analyzed_sections": [
+      "MODULE",
+      "ENGINE",
+      "FUNCTION-LIB",
+      "OTHERS"
+    ],
+    "round_limit": 3
+  }
+}
