@@ -22,6 +22,7 @@ pwsh -File "VeritasIntelligenceAnalytics\Install-VIA.ps1"     # 加 -AutoStart �
 | `via-tower` | 治理總控台 `http://127.0.0.1:8765`(桌面捷徑同此) |
 | `via-shim` | TickerRegex v0100 墊片入口:`via-shim -Target <檔> [-DryRun]` |
 | `via-sync` | repo 同步(fetch + merge claude 分支 + push main) |
+| `via-batch` | **VRN 批次**:incoming 全部 PDF 過 No-OCR 生產線(並行池、可續跑;`-Fresh` 全部重跑) |
 
 ## 系統架構
 
