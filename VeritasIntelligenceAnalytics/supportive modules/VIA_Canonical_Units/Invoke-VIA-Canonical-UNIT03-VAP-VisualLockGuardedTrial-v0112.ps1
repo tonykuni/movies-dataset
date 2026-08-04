@@ -38,6 +38,7 @@ Gate "G2 run-local copy" "PASS" $patched
 # GATE 3 - seven-site hash-locked replacement set, exact-count enforced
 $map = @(
     @{ o = "FILL_OPACITY = 0.4 ";                    n = "FILL_OPACITY = 0.75 ";                     expect = 1 },  # L55 constant
+    @{ o = "# fillOpacity default 0.4";              n = "# fillOpacity default 0.75";               expect = 1 },  # L55 trailing comment
     @{ o = [char]25240 + [char]32218 + " 0.9 " + [char]183 + " " + [char]22635 + [char]33394 + " 0.4"; n = [char]25240 + [char]32218 + " 0.9 " + [char]183 + " " + [char]22635 + [char]33394 + " 0.75"; expect = 2 },  # L8 docstring + L657 footer (折線 0.9 · 填色 0.4)
     @{ o = "bar fill 0.4 " + [char]183 + " area fill 0.4";  n = "bar fill 0.75 " + [char]183 + " area fill 0.75"; expect = 1 },  # L303
     @{ o = "1 " + [char]183 + " .9/.4";              n = "1 " + [char]183 + " .9/.75";               expect = 1 },  # L573 badge
@@ -57,7 +58,7 @@ foreach ($m in $map) {
 }
 if (-not $allOk) { throw "REPLACEMENT_COUNT_MISMATCH - patched candidate NOT written" }
 [IO.File]::WriteAllText($patched, $text, [Text.UTF8Encoding]::new($false))
-Gate "G3 write" "PASS" "seven-site patch applied to run-local copy only"
+Gate "G3 write" "PASS" "eight-site patch applied to run-local copy only"
 
 # GATE 4 - trial 1: interpreter syntax proof (py_compile)
 $py = @("C:\Users\tonyk\envs\via_core_312\Scripts\python.exe","py") |
