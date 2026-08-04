@@ -104,12 +104,12 @@ while ($queue.Count -or $jobs.Count) {
         $pdf = $queue.Dequeue(); $launched++
         $jobs[(Start-One $pdf $patched $runDir $TimeoutSec).Id] = $pdf
     }
-    $doneIds = @($jobs.Keys | Where-Object { (Get-Job -Id $_).State -ne "Running" })
+    $doneIds = @($jobs.Keys | Where-Object { (Get-Job -Id $_).State -in @("Completed","Failed","Stopped") })
     foreach ($id in $doneIds) {
         $pdf = $jobs[$id]; $jobs.Remove($id)
         $r = Receive-Job -Id $id -ErrorAction SilentlyContinue | Select-Object -First 1
         Remove-Job -Id $id -Force -ErrorAction SilentlyContinue
-        if (-not $r) { $r = [pscustomobject]@{ Verdict="FAIL"; Alias=""; Sec=0; Log="" } }
+        if (-not $r) { $r = [pscustomobject]@{ Verdict="JOBFAIL"; Alias=""; Sec=0; Log="" } }
         $row = [pscustomobject]@{
             Time = (Get-Date -Format "yyyy-MM-dd HH:mm:ss"); File = $pdf.Name
             Ticker = $tickMap[$pdf.Name]; Alias = $r.Alias; Verdict = $r.Verdict; Sec = $r.Sec; Run = $ts
