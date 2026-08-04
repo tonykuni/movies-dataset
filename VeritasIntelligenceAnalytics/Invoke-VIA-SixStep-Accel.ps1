@@ -1,6 +1,6 @@
 #requires -Version 7.0
 <# =====================================================================
- VIA SixStep Accel  -  stages A/B/C (closeout of the six-step plan)
+ VIA SixStep Accel  -  stages A/B/D/C (closeout of the six-step plan)
  20 accelerators - non-blocking - dynamic progress bars - hard timeouts
  A01 targeted roots            A11 single batched git add
  A02 blackhole-dir pruning     A12 push retry w/ backoff + autostash
@@ -20,8 +20,8 @@ $via  = $PSScriptRoot
 $rpt  = Join-Path $env:USERPROFILE "VIA_Reports"; New-Item -ItemType Directory -Force -Path $rpt | Out-Null
 $ts   = Get-Date -Format "yyyyMMdd_HHmmss"
 $log  = Join-Path $rpt "SixStep_Accel_$ts.txt"
-$R = [System.Collections.Generic.List[object]]::new()
-function Step($n,$s,$note){ $R.Add([pscustomobject]@{Step=$n;Status=$s;Note=$note}) }
+$RESULT = [System.Collections.Generic.List[object]]::new()
+function Step($n,$s,$note){ $RESULT.Add([pscustomobject]@{Step=$n;Status=$s;Note=$note}) }
 function Rec($t){ $t | Tee-Object -FilePath $log -Append | Out-Host }
 Push-Location $repo
 try {
@@ -32,8 +32,8 @@ $roots = @("$env:USERPROFILE\Downloads","$env:USERPROFILE\OneDrive","$env:USERPR
            "$env:USERPROFILE\Documents","C:\VIA","C:\VeritasIntelligenceAnalytics") | Where-Object { Test-Path $_ }
 $rxFile = '^(VRN_BROKER_LIST_v02|macro_dashboard.*\.py$|spec_tool\.py$|VDF_MDL001_TWUniverse_Verify|VDF_MDL003_SentimentMacroEngine|VDF_MDL005_TWStockFilter|VDF_MDL006_FinancialModel|VRN_MDL_SummaryPipelineBridge|VDF_RegistryLoader|VDF_CrossValidator|VIA_TW_Universe_Builder|VIA_Inject\.py$)'
 $rxSkip = '\\(\.git|AppData|envs|node_modules|__pycache__|\$Recycle|movies-dataset)\\'
-$jobs = foreach ($r in $roots) {
-  Start-ThreadJob -ArgumentList $r,$rxFile,$rxSkip -ScriptBlock {
+$jobs = foreach ($root_i in $roots) {
+  Start-ThreadJob -ArgumentList $root_i,$rxFile,$rxSkip -ScriptBlock {
     param($root,$rxF,$rxS)
     $hits = [System.Collections.Generic.List[string]]::new()
     try {
@@ -88,6 +88,42 @@ Rec "===== Stage B v0111R2 tail (full log: $u3log) ====="
 if (Test-Path $u3log) { Get-Content $u3log -Tail 30 | ForEach-Object { Rec $_ } } else { Rec "(no output log)" }
 Step "B v0111R2" "PASS" "elapsed=$([int]$swB.Elapsed.TotalSeconds)s log=$u3log"
 
+# ===== Stage D import recovered VDF/data-layer modules (hash-dedupe, append-only) =====
+$swD = [Diagnostics.Stopwatch]::StartNew()
+$dl = "$env:USERPROFILE\Downloads"
+$recover = @("VDF_MDL001_TWUniverse_Verify.py","VDF_MDL003_SentimentMacroEngine.py",
+             "VDF_MDL005_TWStockFilter.py","VDF_MDL006_FinancialModel.py",
+             "VIA_TW_Universe_Builder.py","VIA_Inject.py")
+$dstDir = Join-Path $via "functional modules\VDF\engine"
+New-Item -ItemType Directory -Force -Path $dstDir | Out-Null
+Rec "===== Stage D recovered-module import ====="
+foreach ($name in $recover) {
+  try {
+    $stem = [IO.Path]::GetFileNameWithoutExtension($name)
+    $cands = @()
+    foreach ($c in @("$dl\VeritasIntelligenceAnalytics\functional modules\VDF\$name", "$dl\$name")) {
+      if (Test-Path -LiteralPath $c) { $cands += Get-Item -LiteralPath $c }
+    }
+    $cands += @(Get-ChildItem -LiteralPath $dl -File -ErrorAction SilentlyContinue |
+      Where-Object { $_.Name -match ('^' + [regex]::Escape($stem) + ' \(\d+\)\.py$') })
+    if (-not $cands) { Rec "[MISS ] $name"; continue }
+    $hashes = @($cands | ForEach-Object { [pscustomobject]@{ F=$_; H=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash } })
+    $uniq = @($hashes.H | Select-Object -Unique)
+    $pick = if ($uniq.Count -eq 1) { $hashes[0] } else {
+      Rec "[VPICK] $name variants differ -> newest chosen"
+      $hashes | Sort-Object { $_.F.LastWriteTime } -Descending | Select-Object -First 1
+    }
+    $dst = Join-Path $dstDir $name
+    if ((Test-Path -LiteralPath $dst) -and ((Get-FileHash -LiteralPath $dst -Algorithm SHA256).Hash -eq $pick.H)) {
+      Rec "[SAME ] $name already in repo, identical"; continue
+    }
+    Copy-Item -LiteralPath $pick.F.FullName -Destination $dst -Force
+    git add -- "VeritasIntelligenceAnalytics/functional modules/VDF/engine/$name"
+    Rec "[IMPORT] $name  sha=$($pick.H.Substring(0,12))  from $($pick.F.FullName)"
+  } catch { Rec "[ERR  ] $name :: $($_.Exception.Message)" }
+}
+Step "D recover" "PASS" "6 modules processed, elapsed=$([int]$swD.Elapsed.TotalSeconds)s"
+
 # ===== Stage C allowlist import + push (A11-A13, A18-A19) =====
 $swC = [Diagnostics.Stopwatch]::StartNew()
 $allow = @(
@@ -109,7 +145,7 @@ $staged = @(git diff --cached --name-only)
 Rec "===== Stage C staged files ($($staged.Count)) ====="
 $staged | ForEach-Object { Rec "  + $_" }
 if ($staged.Count) {
-  git commit -m "Sixstep closeout: v141D6 governance records + ParametersConsolidated registry + VDF qa evidence (allowlist, append-only)" 2>&1 | Out-Host
+  git commit -m "Sixstep closeout: recovered VDF MDL001/003/005/006 + Universe_Builder + Inject, v141D6 governance records, ParametersConsolidated registry, VDF qa evidence (allowlist, append-only)" 2>&1 | Out-Host
 }
 $ok = $false
 foreach ($d in @(0,2,4,8,16)) {
@@ -125,7 +161,7 @@ Step "C import+push" $(if($ok){"PASS"}else{"WARN"}) "staged=$($staged.Count) pus
 }
 finally {
   Write-Host "`n==================== RESULT MATRIX ====================" -ForegroundColor Cyan
-  $R | Format-Table -AutoSize
+  $RESULT | Format-Table -AutoSize
   git log --oneline -3 | Out-Host
   Write-Host "[REPORT] $log" -ForegroundColor Cyan
   Pop-Location
