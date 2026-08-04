@@ -65,7 +65,7 @@ try {
 # ---- 4) prerequisites (check, then best-effort winget) ----
 $pre = @(
     @{ n = "git";    test = { Get-Command git -ErrorAction SilentlyContinue };    winget = "Git.Git" },
-    @{ n = "python", test = { (Get-Command py -ErrorAction SilentlyContinue) -or
+    @{ n = "python"; test = { (Get-Command py -ErrorAction SilentlyContinue) -or
                               (Test-Path "$env:USERPROFILE\envs\via_core_312\Scripts\python.exe") }; winget = "Python.Python.3.12" },
     @{ n = "java(tabula)"; test = { Get-Command java -ErrorAction SilentlyContinue }; winget = "EclipseAdoptium.Temurin.8.JRE" }
 )
