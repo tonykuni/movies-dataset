@@ -145,13 +145,21 @@ function Resolve-Python {
         $cmd = Get-Command $c.Exe -ErrorAction SilentlyContinue
         if ($null -eq $cmd) { continue }
         try {
-            $probe = @($c.Args) + @('-c', 'import sys; print("%d.%d" % sys.version_info[:2])')
-            $ver = & $c.Exe @probe 2>$null
-            if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($ver)) { continue }
-            $ver = ([string]$ver).Trim()
-            $parts = $ver.Split('.')
-            $major = [int] $parts[0]
-            $minor = [int] $parts[1]
+            # 探針的 -c 字串**不含雙引號、不含 %**。原本用
+            # 'print("%d.%d" % ...)' 在 Windows PowerShell 5.1 的原生參數引號
+            # 處理下會被拆壞（5.1 對傳給外部程式、含內嵌雙引號的引數有已知 bug；
+            # pwsh 7 的 PSNativeCommandArgumentPassing 已修正）。改用兩個獨立
+            # print，各印一個整數，完全避開特殊字元。
+            $code  = 'import sys;print(sys.version_info[0]);print(sys.version_info[1])'
+            $probe = @($c.Args) + @('-c', $code)
+            $out = & $c.Exe @probe 2>$null
+            if ($LASTEXITCODE -ne 0) { continue }
+            $nums = @($out) | ForEach-Object { ([string]$_).Trim() } |
+                    Where-Object { $_ -match '^\d+$' }
+            if ($nums.Count -lt 2) { continue }
+            $major = [int] $nums[0]
+            $minor = [int] $nums[1]
+            $ver = "$major.$minor"
             if ($major -lt 3 -or ($major -eq 3 -and $minor -lt 9)) {
                 Write-Warn2 "$($c.Exe) 版本為 $ver，需要 3.9 以上，略過"
                 continue
@@ -272,7 +280,6 @@ function Invoke-EngineTest {
 function Invoke-ManifestCheck {
     Write-Head 'Manifest 稽核'
 
-    # 先用純 PowerShell 逐檔比對 —— 不依賴 Python，也是 hash-lock 的獨立第二意見。
     $manifestPath = Join-Path $script:Root 'VTR_Subsystem_Manifest.json'
     if (-not (Test-Path -LiteralPath $manifestPath)) {
         Write-Fail 'VTR_Subsystem_Manifest.json 不存在'
@@ -280,41 +287,27 @@ function Invoke-ManifestCheck {
         return 5
     }
 
-    $manifest = Get-Content -LiteralPath $manifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
-    $drift = @()
-    foreach ($a in $manifest.artifacts) {
-        $rel = $a.filename -replace '/', [IO.Path]::DirectorySeparatorChar
-        $p = Join-Path $script:Root $rel
-        if (-not (Test-Path -LiteralPath $p)) { $drift += "$($a.filename)（不存在）"; continue }
-        $actual = (Get-FileHash -LiteralPath $p -Algorithm SHA256).Hash.ToLowerInvariant()
-        if ($actual -ne $a.sha256) { $drift += "$($a.filename)（內容已變更）" }
-    }
+    # 稽核交給 build_manifest.py（單一權威）。它以「正規化行尾後的內容」計算
+    # SHA-256，因此在 Windows(CRLF) 與 Linux(LF) 上結果一致。
+    #
+    # 這裡刻意**不**用純 PowerShell 的 Get-FileHash 逐檔比對：Get-FileHash 雜湊
+    # 原始位元組，會把 Git for Windows 在 checkout 時產生的 CRLF 當成不同內容，
+    # 在 Windows 上對每一個文字檔誤報「內容已變更」。維護兩套必須逐位元組相符
+    # 的雜湊實作本身也是缺陷來源，故收斂為一套。
+    # NEW / CHANGED / REMOVED 明細由 build_manifest.py 印到 stderr。
+    $manifestArgs = @('tools/build_manifest.py', '--quiet')
+    if ($Update) { $manifestArgs = @('tools/build_manifest.py', '--write') }
 
-    if ($drift.Count -gt 0) {
-        Write-Fail "$($drift.Count) 個 artifact 與 manifest 不符："
-        foreach ($d in $drift) { Write-Info $d }
-        if ($Update) {
-            Write-Info '重算 manifest…'
-            $code = Invoke-Py -Arguments @('tools/build_manifest.py', '--write')
-            Add-Result 'Manifest' $code '已重算'
-            return $code
-        }
+    $code = Invoke-Py -Arguments $manifestArgs
+
+    if ($code -eq 0) {
+        if ($Update) { Write-Ok 'manifest 已重算並寫回' }
+        else { Write-Ok 'artifact 內容雜湊全部相符' }
+    } elseif ($code -eq 5) {
+        Write-Fail 'manifest 與實際檔案不一致'
         Write-Info '加上 -Update 可重算（重算後需重新 commit）'
-        Add-Result 'Manifest' 5 "$($drift.Count) 個不符"
-        return 5
-    }
-
-    Write-Ok "$($manifest.artifacts.Count) 個 artifact 雜湊全部相符"
-
-    # 再讓 build_manifest.py 檢查登錄清單本身是否完整（例如新增了引擎檔案但未登錄）
-    $code = Invoke-Py -Arguments @('tools/build_manifest.py', '--quiet')
-    if ($code -eq 5) {
-        if ($Update) {
-            Write-Info 'manifest 登錄清單需要更新，重算中…'
-            $code = Invoke-Py -Arguments @('tools/build_manifest.py', '--write')
-        } else {
-            Write-Warn2 'manifest 登錄清單與實際檔案集合不同（加上 -Update 可重算）'
-        }
+    } else {
+        Write-Fail "build_manifest 非預期退出碼 $code"
     }
     Add-Result 'Manifest' $code
     return $code
@@ -339,11 +332,27 @@ function Invoke-Restore {
 
     if ([string]::IsNullOrWhiteSpace($Path)) {
         Write-Fail '需要 -Path（逐字稿檔案或資料夾）'
+        Write-Info '想先看範例：Run-VTR.cmd -Action Restore -Path .\samples\'
         Add-Result 'Restore' 1 '缺少 -Path'
         return 1
     }
 
-    $files = Get-TranscriptFiles -InputPath $Path
+    if (-not (Test-Path -LiteralPath $Path)) {
+        Write-Fail "找不到這個路徑：$Path"
+        $samples = Join-Path $script:Root 'samples'
+        if (Test-Path -LiteralPath $samples) {
+            Write-Info '想先看內建範例跑起來，執行：'
+            Write-Info '  Run-VTR.cmd -Action Restore -Path .\samples\'
+        } else {
+            Write-Info '請確認資料夾存在，或先自己建一個資料夾、把 .txt 逐字稿放進去。'
+        }
+        Add-Result 'Restore' 1 '路徑不存在'
+        return 1
+    }
+
+    # @() 強制陣列：函式 return 會把單元素陣列拆成純量，呼叫端不包 @() 就會
+    # 在只有一個逐字稿時，讓後面的 .Count 爆「property 'Count' cannot be found」。
+    $files = @(Get-TranscriptFiles -InputPath $Path)
     if ($files.Count -eq 0) {
         Write-Warn2 "$Path 底下沒有 .txt / .md / .log 檔案"
         Add-Result 'Restore' 0 '無輸入'

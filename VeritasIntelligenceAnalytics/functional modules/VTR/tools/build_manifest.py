@@ -43,12 +43,41 @@ SPEC_ARTIFACTS: tuple[tuple[str, str], ...] = (
     ("lexicon/tools/validate_lexicon.py", "Lexicon 驗證器 / 索引產生器 · CI 掛載點"),
     ("tools/build_manifest.py", "Manifest 重算工具（本檔）"),
     ("Invoke-VTR.ps1", "PowerShell 單一進入點 · operator workstation 用"),
+    ("Install-VTR.ps1", "一鍵安裝器 · 新電腦自動補齊 Python 並驗證"),
+    ("Install-VTR.cmd", "安裝器雙擊啟動器（略過執行原則、初學者用）"),
+    ("Run-VTR.cmd", "日常雙擊啟動器 · 執行完整檢查"),
+    ("samples/meeting-sample.txt", "內建範例逐字稿 · 讓範例指令一跑就成功"),
     ("README.md", "VTR 子系統導覽"),
 )
 
 
+def _canonical_bytes(raw: bytes) -> bytes:
+    """把檔案內容正規化成跨平台一致的位元組。
+
+    hash-lock 的意義是「內容身分」，而 Windows(CRLF) 與 Linux/Git(LF) 對同一份
+    文字檔會產生不同的位元組 —— 若直接雜湊原始位元組，同一份規格件在兩個平台上
+    的 SHA-256 就不同，manifest 在 Windows checkout 上會全體誤報「內容已變更」。
+
+    因此文字檔一律先把 CRLF 正規化為 LF 再雜湊；含 null byte 的二進位檔原樣雜湊
+    （不會被行尾正規化破壞）。git 自己也是這樣看待文字內容的。
+    UTF-8 BOM 不含 CR/LF，不受此正規化影響，維持逐位元組不變。
+    """
+    if b"\x00" in raw:
+        return raw
+    return raw.replace(b"\r\n", b"\n")
+
+
+def content_hash(path: Path) -> str:
+    return hashlib.sha256(_canonical_bytes(path.read_bytes())).hexdigest()
+
+
+def content_size(path: Path) -> int:
+    return len(_canonical_bytes(path.read_bytes()))
+
+
 def sha256_of(path: Path) -> str:
-    return hashlib.sha256(path.read_bytes()).hexdigest()
+    """保留供既有呼叫端使用；等同 content_hash（正規化後雜湊）。"""
+    return content_hash(path)
 
 
 def collect_artifacts() -> list[dict]:
@@ -58,18 +87,16 @@ def collect_artifacts() -> list[dict]:
         if not p.exists():
             print(f"WARN  登錄的檔案不存在，已跳過: {rel}", file=sys.stderr)
             continue
-        b = p.read_bytes()
         arts.append({"filename": rel, "role": role,
-                     "bytes": len(b), "sha256": hashlib.sha256(b).hexdigest()})
+                     "bytes": content_size(p), "sha256": content_hash(p)})
 
     # 引擎程式碼以萬用字元收集：新增 Stage 時不需要手動維護清單。
     for p in sorted((ROOT / "engine").rglob("*.py")):
         if "__pycache__" in p.parts:
             continue
         rel = p.relative_to(ROOT).as_posix()
-        b = p.read_bytes()
         arts.append({"filename": rel, "role": "引擎程式碼（確定性層）",
-                     "bytes": len(b), "sha256": hashlib.sha256(b).hexdigest()})
+                     "bytes": content_size(p), "sha256": content_hash(p)})
     return arts
 
 

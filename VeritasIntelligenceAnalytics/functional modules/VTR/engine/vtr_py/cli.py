@@ -33,6 +33,31 @@ def _load_doc(directory: Path) -> Document:
     return Document.from_json((directory / DOC_NAME).read_text(encoding="utf-8"))
 
 
+def _resolve_doc(directory: Path) -> "Document | None":
+    """讀取已修復文件；找不到或讀取失敗時印出中文指引並回傳 None。
+
+    beginner 常照範例打了一個還沒 restore 過的 doc-id —— 要給清楚的下一步，
+    而不是把 Python 的 FileNotFoundError 堆疊丟到他們臉上。
+    """
+    doc_path = directory / DOC_NAME
+    if not doc_path.exists():
+        print(f"找不到這份文件：{doc_path}", file=sys.stderr)
+        print("這個 doc-id 還沒有被修復過，所以沒有東西可以檢視或回滾。",
+              file=sys.stderr)
+        print("請先用 restore 產生它。想直接看範例跑起來的話：", file=sys.stderr)
+        print("  Run-VTR.cmd -Action Restore -Path .\\samples\\", file=sys.stderr)
+        print("畫面會顯示產生出來的 doc-id，再用那個 id 執行 inspect / replay。",
+              file=sys.stderr)
+        return None
+    try:
+        return _load_doc(directory)
+    except (OSError, ContractError, json.JSONDecodeError) as exc:
+        print(f"文件讀取失敗：{exc}", file=sys.stderr)
+        print("這份 document.json 可能損毀或不是 VTR 產生的。請重新 restore。",
+              file=sys.stderr)
+        return None
+
+
 def _save(doc: Document, out: Path) -> None:
     out.mkdir(parents=True, exist_ok=True)
     (out / DOC_NAME).write_text(doc.to_json(), encoding="utf-8")
@@ -96,7 +121,9 @@ def cmd_restore(args: argparse.Namespace) -> int:
 
 
 def cmd_replay(args: argparse.Namespace) -> int:
-    doc = _load_doc(Path(args.directory))
+    doc = _resolve_doc(Path(args.directory))
+    if doc is None:
+        return EXIT_CONTRACT
     try:
         out_doc = replay_to(doc, args.to_rev)
     except ReplayMismatch as exc:
@@ -109,7 +136,9 @@ def cmd_replay(args: argparse.Namespace) -> int:
 
 
 def cmd_inspect(args: argparse.Namespace) -> int:
-    doc = _load_doc(Path(args.directory))
+    doc = _resolve_doc(Path(args.directory))
+    if doc is None:
+        return EXIT_CONTRACT
     _summarize(doc)
     if args.review:
         print("\n待裁決佇列：")
