@@ -21,7 +21,7 @@ import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-VERSION = "v003"
+VERSION = "v004"
 
 
 def find_pwsh() -> str | None:
@@ -275,9 +275,36 @@ class Tower:
         inbox = self.sm / "_inbox_to_classify"
         n_inbox = sum(1 for p in inbox.rglob("*") if p.is_file()) if inbox.is_dir() else 0
         add("治理", "待分類箱", "G" if n_inbox == 0 else "Y", f"{n_inbox} 檔")
-        add("治理", "UNIT03 管線", "Y", "v0111R2 待跑 → v0112")
+        add("治理", "UNIT03 管線", "G", "v0109–v0113 全結案 · chartlib_v002 已晉升")
         add("治理", "SSOT 獨立化", "Y", "FLOW-A DRAFT 待核准")
+        tkr = self.sm / "ssot" / "VRN_TickerRegexSSOT_v0100.json"
+        tkr_ok = False
+        if tkr.is_file():
+            try:
+                tkr_ok = json.loads(tkr.read_text(encoding="utf-8")).get("status") == "ACTIVE"
+            except Exception:  # noqa: BLE001
+                pass
+        add("SSOT", "TickerRegex v0100", "G" if tkr_ok else "R",
+            "四碼首碼非零 · 消歧層" if tkr_ok else "未發行")
+        add("SSOT", "P2 墊片入口", "G" if ((self.sm / "70_VRN_Rules"
+            / "VIS_VRN_TickerRegexShim_v0100.py").is_file() and (self.fm / "VRN"
+            / "Invoke-VRN-Shimmed-Entry-v0100.ps1").is_file()) else "R", "opt-in")
+        add("VAP", "chartlib_v002", "G" if (self.fm / "VAP" / "engine"
+            / "via_autoplot_engine_chartlib_v002.py").is_file() else "Y", "UNIT03 晉升版")
+        add("VAP", "判定表 v002", "G" if (self.sm / "VIA_Canonical_Units"
+            / "VAP_VisualLock_Adjudication_Table_v002.json").is_file() else "Y", "方案A 分項閘")
         return t
+
+    def act_shim_dryrun(self, job: Job):
+        """TickerRegex v0100 墊片入口乾跑(正本不動,只驗證墊片副本)。"""
+        pwsh = find_pwsh()
+        if not pwsh:
+            self.emit(job, "[TOWER] 找不到 pwsh 7")
+            return
+        entry = self.fm / "VRN" / "Invoke-VRN-Shimmed-Entry-v0100.ps1"
+        target = self.fm / "VRN" / "VRN_MDL001_StockReportPipeline.py"
+        self.stream(job, [pwsh, "-NoProfile", "-NonInteractive", "-File", str(entry),
+                          "-Target", str(target), "-DryRun"])
 
     def act_vrn_run(self, job: Job):
         pdf = job.params.get("pdf") or self.auto_pdf()
@@ -664,6 +691,7 @@ ACTIONS = {
     "vrn_lanes": ("VRN · Lane2+Lane3 預檢", "act_vrn_lanes"),
     "vrn_run": ("VRN · 實彈 No-OCR(自動選最新 PDF)", "act_vrn_run"),
     "revival": ("VRN · 復健參數檢查(14 項)", "act_revival_check"),
+    "shim_dryrun": ("VRN · TickerRegex 墊片乾跑(v0100)", "act_shim_dryrun"),
     "tree_audit": ("Downloads 樹總檢察(唯讀 · 背景)", "act_tree_audit"),
     "flow_a_ssot": ("FLOW-A · SSOT 指標獨立化草案", "act_flow_a_ssot"),
     "flow_b_inbox": ("FLOW-B · 待分類箱提案(611檔)", "act_flow_b_inbox"),
@@ -735,7 +763,7 @@ ARCH_SVG = r"""<svg viewBox="0 0 980 430" xmlns="http://www.w3.org/2000/svg" sty
 <path class="fl" d="M140 202H198"/><path class="fl" d="M360 202H418"/><path class="fl" d="M540 202H598"/>
 <rect x="20" y="300" width="940" height="100" fill="#fbfaf7" stroke="#dcdad3" rx="8"/>
 <rect class="seal" x="40" y="322" width="40" height="40" rx="4"/><text x="60" y="350" text-anchor="middle" font-family="serif" font-size="22" fill="#f2f1ec">理</text>
-<text class="t" x="100" y="340">CONTROL TOWER v003</text>
+<text class="t" x="100" y="340">CONTROL TOWER v004</text>
 <text class="s" x="100" y="356">背景 jobs · 動態進度 · 12 主動作 + 6 收尾流程 + 20 加速器</text>
 <text class="io" x="100" y="374">Supportive:Optimizer Suite · Governance v0162B/C · 60_/70_ · Standalone Pkg · PMIS-Lite · Dashboard 標準</text>
 <path class="fl" d="M280 298V246" stroke-dasharray="4 3"/><path class="fl" d="M680 298V246" stroke-dasharray="4 3"/>
