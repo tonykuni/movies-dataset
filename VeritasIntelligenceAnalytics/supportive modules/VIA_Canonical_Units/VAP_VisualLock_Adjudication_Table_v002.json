@@ -1,0 +1,35 @@
+{
+  "schema_id": "VAP_VisualLock_Adjudication_Table",
+  "version": "v002",
+  "status": "ACTIVE",
+  "issued": "2026-08-04",
+  "operator_decision": "併軌方案 A(2026-08-04「ALL」核准):vap_spec 分項值為唯一視覺真相,UNIT03 判定由單值 0.75 升級為分項表",
+  "truth_source": "functional modules/VAP/spec/ssot/vap_spec.json",
+  "supersedes": { "version": "v001(implicit)", "rule": "blanket fill-opacity 0.75", "disposition": "retained for historical adjudications only" },
+  "gates": {
+    "line.width":                { "expect": 1,    "severity": "RED_ON_MISMATCH" },
+    "line.opacity":              { "expect": 0.9,  "severity": "RED_ON_MISMATCH", "note": "stroke-opacity 必須用 line.opacity,不得借用填色鎖" },
+    "fill.areaUnderLine":        { "expect": 0.75, "severity": "RED_ON_MISMATCH" },
+    "fill.areaUnderLineWithShadow": { "expect": 0.5, "severity": "YELLOW_ON_MISMATCH" },
+    "fill.barFace":              { "expect": 0.6,  "severity": "RED_ON_MISMATCH" },
+    "fill.barFaceDense":         { "expect": 0.8,  "severity": "YELLOW_ON_MISMATCH" },
+    "fill.eventBand":            { "expect": 0.3,  "severity": "YELLOW_ON_MISMATCH" },
+    "palette.locked":            { "expect": true, "severity": "RED_ON_MISMATCH" }
+  },
+  "separate_domains": {
+    "macro_dashboard_seaborn_bar": { "value": 0.8, "rule": "獨立域,與 VAP 鎖互不覆寫" }
+  },
+  "known_accepted_legacy": [
+    {
+      "artifact": "functional modules/VAP/engine/via_autoplot_engine_v001.py",
+      "issue": "L343 stroke-opacity 借用 FILL_OPACITY(0.75),不符 line.opacity 0.9",
+      "disposition": "ACCEPTED_UNTIL_NATURAL_UPGRADE - canonical never mutated in place; chartlib_v002 已符合(LINE_OPACITY=0.9)"
+    },
+    {
+      "artifact": "functional modules/VAP/engine/via_autoplot_engine_chartlib_v002.py",
+      "issue": "FILL_OPACITY 單值 0.75 同時餵柱面與區域(vap_spec 細則柱面應 0.6/0.8)",
+      "disposition": "YELLOW_TRACKED - 待 chartlib v003 自然升版時分項化"
+    }
+  ],
+  "unit03_integration": "v0113 之後的 UNIT03 掃描以本表為判定基準;v0109-v0113 歷史裁決依當時 v001 單值基準,不追溯改判"
+}

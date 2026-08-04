@@ -31,4 +31,4 @@
 ## 4. 待操作員核准事項
 
 - [x] 核准 P1:發行 v0100 SSOT JSON 並轉指針(2026-08-04 執行;凍結債務普查 106 檔入 audit_tools)
-- [ ] 核准 P2:對現役執行入口(Invoke-VRN 系)加 runtime 墊片(16 個候選已列普查,待排程)
+- [x] 核准 P2:2026-08-04「ALL」核准並交付——`VIS_VRN_TickerRegexShim_v0100.py`(單一 token 移除式墊片,含自檢)+ `Invoke-VRN-Shimmed-Entry-v0100.ps1`(opt-in 墊片啟動器:正本→run-local 墊片副本→執行副本);16 個候選正本一律不動,經墊片副本全數 py_compile 驗證

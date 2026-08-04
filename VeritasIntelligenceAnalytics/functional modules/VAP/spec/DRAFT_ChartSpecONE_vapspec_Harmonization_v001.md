@@ -1,6 +1,6 @@
-# DRAFT · Chart Spec ONE ↔ vap_spec 細粒度併軌案 v001
+# Chart Spec ONE ↔ vap_spec 細粒度併軌案 v001
 
-**狀態:草案(review_before_apply,未生效)** · 2026-08-04
+**狀態:方案 A 已核准並執行**(2026-08-04「ALL」)· 產物:`supportive modules/VIA_Canonical_Units/VAP_VisualLock_Adjudication_Table_v002.json`(ACTIVE 分項判定表);正本引擎 L343 列為 ACCEPTED_UNTIL_NATURAL_UPGRADE(chartlib_v002 已符 line.opacity 0.9);歷史裁決不追溯改判
 
 ## 1. 爭點:兩套鎖並存
 
