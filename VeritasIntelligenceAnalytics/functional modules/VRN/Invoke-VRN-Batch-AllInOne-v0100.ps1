@@ -34,7 +34,7 @@ try {
 # A03 - patch the candidate ONCE into a run-local copy (canonical untouched)
 $code = Get-Content -LiteralPath $cand -Raw -Encoding UTF8
 $code = $code -replace '\$BrokerHelper\s*=\s*".*?"',
-    ('$BrokerHelper = "' + (Join-Path $rules "VIS_VRN_BrokerAlias_Compatibility_v0222.py") + '"')
+    ('$BrokerHelper = "' + (Join-Path $rules "VIS_VRN_BrokerAlias_FullList_v0100.py") + '"')
 $code = $code -replace '\$FallbackHelper\s*=\s*".*?"',
     ('$FallbackHelper = "' + (Join-Path $rules "VIS_VRN_PDFTextLayerFallbackPlan_v0222.py") + '"')
 $patched = Join-Path $runDir "candidate_patched.RUNLOCAL.ps1"
