@@ -1,0 +1,186 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · 功能矩陣總表 v2 · 7 引擎整合</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--blue:#4c78a8;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--vi:#7a6daa;
+ --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg)}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5}
+.wrap{max-width:1300px;margin:0 auto;padding:0 22px 60px}
+.bar{position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50}
+header{padding:20px 0 9px;margin-bottom:10px;border-bottom:2px solid var(--ink)}
+.kicker{font:700 10px 'DM Mono',monospace;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px}
+h1{font:800 19px/1.2 'Syne',sans-serif;color:var(--ink)}h1 span{color:var(--up)}
+.sub{margin-top:6px;font:400 10.5px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:1020px}.sub b{color:var(--ink2)}
+.gov{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#1e1d1a;border-radius:3px;padding:7px 14px;margin:12px 0}
+.gov .lk{font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase}
+.gov .pill{font:600 7.5px 'DM Mono',monospace;color:#cfcabf}.gov .ver{margin-left:auto;font:700 8px 'DM Mono',monospace;color:#1e1d1a;background:#c4943a;border-radius:3px;padding:2px 8px}
+.note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--am);border-radius:3px;padding:8px 14px;margin-bottom:14px;font:500 9px/1.6 'DM Mono',monospace;color:var(--mut)}.note b{color:var(--ink2)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tab{font:700 11px 'DM Sans','Noto Sans TC',sans-serif;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--mut);border-radius:3px;padding:7px 13px}
+.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.sec{display:none}.sec.on{display:block}
+.scards{display:flex;gap:9px;flex-wrap:wrap;margin:4px 0}
+.sc{background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:9px 14px;min-width:96px}
+.sc .v{font:800 20px 'Syne',sans-serif;line-height:1}.sc .l{font:600 8px 'DM Mono',monospace;color:var(--mut);text-transform:uppercase;letter-spacing:.6px;margin-top:4px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:0;overflow:hidden;margin-top:12px}
+.hd2{font:800 11px 'Syne',sans-serif;padding:10px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.engcard{border:1px solid var(--line);border-radius:6px;margin:10px 0;overflow:hidden}
+.enghd{display:flex;align-items:center;gap:10px;padding:9px 14px;background:var(--ink);color:#fff}
+.enghd .nm{font:800 13px 'Syne',sans-serif}.enghd .ct{margin-left:auto;font:600 8px 'DM Mono',monospace;color:#cfcabf}
+.engbody{padding:8px 14px;display:flex;gap:6px;flex-wrap:wrap}
+.modchip{font:600 9px 'DM Mono',monospace;background:var(--soft);border-radius:3px;padding:2px 8px;color:var(--ink2)}
+.opchip{font:600 8px 'DM Mono',monospace;background:#eef3f7;border:1px solid #d6e2ec;border-radius:3px;padding:1px 7px;color:var(--blue)}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.fbtn{font:700 8px 'DM Mono',monospace;cursor:pointer;border:1px solid var(--line);background:var(--paper2);color:var(--mut);border-radius:3px;padding:4px 9px}
+.fbtn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+input.search{font:500 11px 'DM Mono',monospace;padding:6px 10px;border:1px solid var(--line);border-radius:3px;width:220px}
+.btn{font:700 8px 'DM Mono',monospace;cursor:pointer;border:1px solid var(--ink);background:transparent;color:var(--ink);border-radius:3px;padding:5px 10px}
+table{width:100%;border-collapse:collapse;font:500 10px 'DM Mono',monospace}
+th{font:700 8px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.5px;color:var(--mut);text-align:left;padding:7px 8px;border-bottom:2px solid var(--ink);background:var(--paper2);position:sticky;top:0}
+td{padding:5px 8px;border-bottom:1px solid var(--soft);vertical-align:top}tr:hover td{background:var(--paper2)}
+.mod{font:700 10px 'DM Mono',monospace;color:var(--blue)}
+.eng{font:700 7px 'DM Mono',monospace;color:#fff;border-radius:3px;padding:1px 6px;white-space:nowrap}
+.e0{background:#c96b5a}.e1{background:#4c78a8}.e2{background:#439a9a}.e3{background:#c4943a}.e4{background:#7a6daa}.e5{background:#5a9e6f}.e6{background:#6b6860}
+.fn{font:500 9px 'DM Mono',monospace;color:var(--ink2);background:var(--soft);border-radius:3px;padding:1px 6px;display:inline-block;margin:1px}
+.doc{font:400 9px 'Noto Sans TC',sans-serif;color:var(--mut)}
+.lib{font:600 8px 'DM Mono',monospace;color:var(--teal)}
+.cid{font:700 9px 'DM Mono',monospace;color:var(--blue)}
+.st{font:700 7px 'DM Mono',monospace;border-radius:3px;padding:1px 6px}.st-BUILT{background:#5a9e6f;color:#fff}.st-DESIGN{background:#c4943a;color:#fff}
+.bar2{height:9px;background:var(--teal);border-radius:2px;display:inline-block;vertical-align:middle}
+.pdf{position:fixed;top:12px;right:14px;z-index:999;background:var(--ink);color:#fff;border:none;border-radius:5px;padding:7px 13px;font:700 9px 'DM Mono',monospace;cursor:pointer}
+@media print{@page{size:A4 landscape;margin:9mm}.pdf,.tabs,.filters,.search,.btn{display:none!important}.sec{display:block!important}th{position:static!important}}
+</style></head><body>
+<div class="bar"></div><button class="pdf" onclick="window.print()">⤓ PDF</button>
+<div class="wrap">
+<header>
+ <div class="kicker">VERITAS INTELLIGENCE · CAPABILITY MATRIX v2 · 7 ENGINES · CONSOLIDATED</div>
+ <h1>功能矩陣總表 <span>·</span> 50 模組 → 7 引擎整合</h1>
+ <p class="sub">停止發散、轉為整合:<b>51 模組 / 197 函數</b> 收斂為 <b>7 大引擎</b>(擷取/歸一/同步/料表/財務/知識/治理),單一 <b>VIA()</b> 入口全操作。含 docstring 摘要、fan-in 相依、SSOT 基準、SAP/MSP 連接。只增不減:底層模組保留不動,僅加整合門面。</p>
+</header>
+<div class="gov"><span class="lk">🔒 CONSOLIDATED · AST-SCANNED</span><span class="pill">7 engines</span><span class="pill">51 modules</span>
+ <span class="pill">197 functions</span><span class="ver" id="ver">MATRIX v2</span></div>
+<div class="note">📐 分頁:① 7 引擎整合 ② 模組矩陣(依引擎篩選+docstring)③ 函數清單(可搜)④ 相依 fan-in ⑤ SSOT ⑥ SAP/MSP。CSV/JSON 可匯出。</div>
+<div class="tabs" id="tabs"></div>
+
+<div class="sec on" id="sec-eng">
+ <div class="scards" id="scards"></div>
+ <div id="engines"></div>
+</div>
+
+<div class="sec" id="sec-mx">
+ <div class="card"><div class="hd2">模組矩陣（依引擎）<span class="filters" id="filters"></span></div>
+  <table><thead><tr><th>Module</th><th>引擎</th><th>Functions · docstring</th><th>Lib</th></tr></thead><tbody id="mx"></tbody></table></div>
+</div>
+
+<div class="sec" id="sec-fn">
+ <div class="card"><div class="hd2">函數全清單 <span style="display:flex;gap:8px"><input class="search" id="fnSearch" placeholder="搜函數/模組/說明..."><button class="btn" id="expFn">匯出 CSV</button></span></div>
+  <table><thead><tr><th>Function</th><th>Module</th><th>說明 docstring</th></tr></thead><tbody id="fnList"></tbody></table></div>
+</div>
+
+<div class="sec" id="sec-dep">
+ <div class="card"><div class="hd2">相依 fan-in（被幾個模組依賴 = 支柱程度）</div>
+  <table><thead><tr><th>Module</th><th>Fan-in</th><th></th></tr></thead><tbody id="dep"></tbody></table></div>
+</div>
+
+<div class="sec" id="sec-ssot">
+ <div class="card"><div class="hd2">SSOT 唯一基準 · 15 canonicals</div>
+  <table><thead><tr><th>Canonical</th><th>名稱</th></tr></thead><tbody id="ssot"></tbody></table></div>
+</div>
+
+<div class="sec" id="sec-conn">
+ <div class="card"><div class="hd2">SAP / MS Project / PLM / PMBOK 連接</div>
+  <table><thead><tr><th>系統</th><th>錨點/機制</th><th>負責引擎</th><th>狀態</th></tr></thead><tbody id="conn"></tbody></table></div>
+</div>
+
+<div class="card"><div class="hd2">匯出<span></span></div><div style="padding:11px 14px;display:flex;gap:8px"><button class="btn" id="expJson">匯出矩陣 JSON</button><button class="btn" id="expCsv">匯出模組矩陣 CSV</button></div></div>
+</div>
+<script>
+const D={"engines": [{"engine": "IntakeEngine 擷取", "key": "intake", "modules": ["ingest_engine", "ingest_plus", "code_parse", "table_repair", "smart_asset", "adapters.*"], "ops": ["assets", "guarantee", "parse_code", "repair_table", "run"]}, {"engine": "SSOTEngine 歸一", "key": "ssot", "modules": ["ssot_synonyms", "plm_pmbok_ref", "autocode"], "ops": ["add_synonym", "autocode", "registry", "resolve"]}, {"engine": "SyncEngine 同步", "key": "sync", "modules": ["sync_ssot", "adapters.msproject", "adapters.plm"], "ops": ["bom_anchor", "conflicts", "link_bom", "ms_anchor", "sync"]}, {"engine": "BOMEngine 料表", "key": "bom", "modules": ["super_bom", "bom_template", "psu_taxonomy"], "ops": ["classify", "rollup", "taxonomy", "validate", "where_used"]}, {"engine": "FinanceEngine 財務", "key": "finance", "modules": ["fin_verify"], "ops": ["calibrate", "cost", "peers", "verify"]}, {"engine": "KnowledgeEngine 知識", "key": "knowledge", "modules": ["sap_bom_ref", "plm_pmbok_ref"], "ops": ["plm_concepts", "pmbok_areas", "select_bom", "tcode"]}, {"engine": "GovernanceEngine 治理", "key": "gov", "modules": ["module_scan", "completeness", "selfcheck"], "ops": ["import_order", "scan"]}], "rows": [{"module": "actions", "engine": "—", "classes": ["ActionItem"], "funcs": [{"name": "extract_actions", "doc": ""}], "n_func": 1, "libs": ["dataclasses"], "deps": []}, {"module": "attachments", "engine": "—", "classes": ["AttachmentResult"], "funcs": [{"name": "extract_attachment", "doc": ""}], "n_func": 1, "libs": ["PIL", "dataclasses", "docx", "openpyxl", "pdf2image", "pdfplumber", "pptx", "pytesseract"], "deps": ["encoding"]}, {"module": "autocode", "engine": "SSOTEngine 歸一", "classes": [], "funcs": [{"name": "identity_key", "doc": "身分碼：來自 標題+行為者（內容改了也不變）——穩定、可追溯。"}, {"name": "mint_universal_id", "doc": "AUTO CODING：領域無關通用編碼。同一筆永遠同碼。"}, {"name": "auto_ssot", "doc": "AUTO SSOT：零組態自我配置。不需事先知道產業。"}], "n_func": 3, "libs": ["stdlib"], "deps": ["classify", "keywords"]}, {"module": "autodetect", "engine": "—", "classes": [], "funcs": [{"name": "default_scan_roots", "doc": ""}, {"name": "probe", "doc": "偵測環境，回傳能力與發現的來源。"}, {"name": "verify_detection", "doc": "查核自動偵測能力：回報分類涵蓋、未歸類檔案、可疑遺漏。"}, {"name": "detection_markdown", "doc": ""}, {"name": "build_sources", "doc": "把偵測結果轉成 pipeline 能吃的 sources 清單（自動接上）。"}, {"name": "summarize", "doc": ""}], "n_func": 6, "libs": ["platform", "win32com"], "deps": []}, {"module": "bom_analysis", "engine": "—", "classes": [], "funcs": [{"name": "explode", "doc": "多階遞迴展開。回傳攤平清單，每列含 level/accumulated_qty/path。"}, {"name": "cost_rollup", "doc": "替代料決策 + 成本滾算。strategy: 'preference'(採購優先) 或 'low"}, {"name": "where_used", "doc": "反查：某料號被哪些父階直接使用。"}, {"name": "compliance_rollup", "doc": "RoHS 向上滾算：任一子件不合規 → 整機不合規。"}, {"name": "lead_time", "doc": "關鍵採購交期＝所有需求料件中最長單件 lead（平行採購假設）。"}, {"name": "analyze", "doc": "一次產出完整超詳細分析。"}], "n_func": 6, "libs": ["stdlib"], "deps": []}, {"module": "bom_template", "engine": "BOMEngine 料表", "classes": [], "funcs": [{"name": "classify_commodity", "doc": "依關鍵字把品項歸到品類（大類/子類）。找不到回 '未分類'。"}, {"name": "validate_bom", "doc": "回傳 {pass, issues, stats}。每個問題都有原因，缺必填就 FAIL。"}, {"name": "build_tree", "doc": "回傳 parent_pn -> [child rows]。頂層 parent 為 ''。"}, {"name": "where_used", "doc": "反查：某料件被哪些母件使用（含間接，往上追）。"}, {"name": "cost_rollup", "doc": "子件成本 × 用量 累計到母件。回傳 pn -> 累計成本。"}, {"name": "diff_bom", "doc": "比對兩版 BOM（給 ECN 用）：新增/刪除/用量變更。"}, {"name": "template_header", "doc": "回傳所有欄位（扁平），供產生 CSV/Excel 模板表頭。"}], "n_func": 7, "libs": ["stdlib"], "deps": []}, {"module": "classify", "engine": "—", "classes": [], "funcs": [{"name": "classify_all", "doc": "就地填入分類欄位；回傳 {dim: {kw, thread, fuzzy, unclassifi"}, {"name": "seed_buckets_from_data", "doc": "泛用自舉：分類桶從『來源已提供的值』自動長出來，不靠手刻。"}, {"name": "classify_record", "doc": ""}], "n_func": 3, "libs": ["stdlib"], "deps": []}, {"module": "code_parse", "engine": "IntakeEngine 擷取", "classes": [], "funcs": [{"name": "detect_language", "doc": ""}, {"name": "parse_structure", "doc": ""}], "n_func": 2, "libs": ["stdlib"], "deps": []}, {"module": "completeness", "engine": "GovernanceEngine 治理", "classes": ["SourceAudit", "CompletenessReport"], "funcs": [{"name": "categorize", "doc": ""}, {"name": "SourceAudit.failed", "doc": ""}, {"name": "SourceAudit.structural", "doc": ""}, {"name": "SourceAudit.recoverable", "doc": ""}, {"name": "SourceAudit.errors", "doc": ""}, {"name": "SourceAudit.denom", "doc": ""}, {"name": "SourceAudit.coverage_pct", "doc": ""}, {"name": "SourceAudit.unexplained_gap", "doc": ""}, {"name": "SourceAudit.status", "doc": ""}, {"name": "CompletenessReport.audit", "doc": ""}, {"name": "CompletenessReport.overall", "doc": ""}, {"name": "CompletenessReport.recoverable_items", "doc": ""}, {"name": "CompletenessReport.to_markdown", "doc": ""}], "n_func": 13, "libs": ["dataclasses"], "deps": []}, {"module": "encoding", "engine": "—", "classes": [], "funcs": [{"name": "detect_file_encoding", "doc": "偵測檔案編碼。先用 chardet，再用常見編碼實測回退。"}, {"name": "repair_mojibake", "doc": "修復常見『雙重解碼』亂碼，例如 utf-8 被當成 latin-1/cp1252 讀進來。"}], "n_func": 2, "libs": ["chardet"], "deps": []}, {"module": "feedback", "engine": "—", "classes": [], "funcs": [{"name": "record_feedback", "doc": "append-only 寫入一筆回饋（離線）。tag 為 D## 或 X##。"}, {"name": "summarize", "doc": "彙整回饋 → 最被讚/最被嫌的點 + 補強優先序。"}], "n_func": 2, "libs": ["stdlib"], "deps": []}, {"module": "fin_verify", "engine": "FinanceEngine 財務", "classes": [], "funcs": [{"name": "verify_report", "doc": "會計恆等式驗證。回傳 {usable, checks[]}；全部硬檢查過才 usable=Tru"}, {"name": "cost_structure", "doc": "單位變動成本 / 固定成本 → 貢獻邊際、損益兩平、安全邊際、營運槓桿。"}, {"name": "calibrate", "doc": "由下而上估算 vs 由上而下實際。回傳差異與是否在容忍內（努力趨近）。"}, {"name": "peer_table", "doc": "同業比較：每個指標排名 + 相對中位數。companies=[{name, <metric>:v"}], "n_func": 4, "libs": ["stdlib"], "deps": []}, {"module": "html_ui", "engine": "—", "classes": ["_TableFormParser"], "funcs": [{"name": "_TableFormParser.handle_starttag", "doc": ""}, {"name": "_TableFormParser.handle_endtag", "doc": ""}, {"name": "_TableFormParser.handle_data", "doc": ""}, {"name": "extract_tables", "doc": "回傳所有 <table>，每個為 list[list[cell]]（首列常為表頭）。"}, {"name": "tables_as_dicts", "doc": "把每個表格首列當表頭 → list[dict]，方便直接餵 apply_preset。"}, {"name": "extract_form_fields", "doc": "回傳所有表單控件：input/select/textarea 的 name/value/opti"}, {"name": "extract_data_attributes", "doc": "回傳所有 data-* 屬性（UI 參數，如 data-material-id）。"}, {"name": "extract_js_data", "doc": "抽 <script> 內的 JS 物件 / JSON 賦值（前端組態與資料）。"}, {"name": "read_html_ui", "doc": "一次抽完 HTML UI 的所有參數面向。"}], "n_func": 9, "libs": ["stdlib"], "deps": []}, {"module": "ingest_engine", "engine": "IntakeEngine 擷取", "classes": [], "funcs": [{"name": "detect_format", "doc": ""}, {"name": "extract_docx", "doc": "zip+XML 自解 Word：段落文字 + 表格 cell + 圖片標記。"}, {"name": "extract_xlsx", "doc": "zip+XML 自解 Excel：sharedStrings + 每個 sheet 的非空 ce"}, {"name": "extract_csv", "doc": ""}, {"name": "extract_text", "doc": ""}, {"name": "extract_image", "doc": ""}, {"name": "extract_any", "doc": ""}, {"name": "guarantee_report", "doc": ""}, {"name": "validate_correct", "doc": ""}, {"name": "dedup", "doc": ""}, {"name": "classify_units", "doc": ""}, {"name": "summarize", "doc": ""}, {"name": "run_ingest", "doc": ""}, {"name": "number_all", "doc": "不去重，逐筆給流水號（分別編號）。"}, {"name": "to_csv", "doc": "輸出 CSV，UTF-8-BOM（解決中文編碼問題）。"}], "n_func": 15, "libs": ["chardet"], "deps": ["autocode", "classify", "encoding", "numbering", "schema"]}, {"module": "ingest_plus", "engine": "IntakeEngine 擷取", "classes": [], "funcs": [{"name": "detect_format_plus", "doc": ""}, {"name": "extract_code", "doc": ""}, {"name": "extract_texty", "doc": ""}, {"name": "extract_any_plus", "doc": ""}, {"name": "doomsday_intake", "doc": "統一末日入口:擷取→修復→驗證幅度→讀懂→智慧資產庫→報告。"}], "n_func": 5, "libs": ["stdlib"], "deps": ["code_parse", "ingest_engine", "smart_asset", "table_repair"]}, {"module": "keywords", "engine": "—", "classes": [], "funcs": [{"name": "generate_keyword_candidates", "doc": "為某維度的各桶，從已分類事件挖鑑別性關鍵字候選。"}, {"name": "apply_approved", "doc": "把已核可的關鍵字寫回 classification（append-only，只增不減）。"}], "n_func": 2, "libs": ["stdlib"], "deps": []}, {"module": "mail_chain", "engine": "—", "classes": [], "funcs": [{"name": "build_mail_strategies", "doc": "依設定與環境組裝策略清單。fetchers 提供各方法的擷取函式(便於注入測試)。"}, {"name": "fetch_with_fallback", "doc": "跑備援鏈,回傳 (records, ChainResult)。records 為第一條成功的結果"}], "n_func": 2, "libs": ["win32com"], "deps": ["resilience"]}, {"module": "module_scan", "engine": "GovernanceEngine 治理", "classes": [], "funcs": [{"name": "scan_project", "doc": ""}, {"name": "import_guide", "doc": "產生導入指引：支援件先載、功能件後載，附建議 import 順序。"}], "n_func": 2, "libs": ["stdlib"], "deps": []}, {"module": "numbering", "engine": "—", "classes": [], "funcs": [{"name": "content_hash", "doc": "以內容算 SHA-1，取前段當穩定指紋。"}, {"name": "make_uid", "doc": ""}], "n_func": 2, "libs": ["stdlib"], "deps": []}, {"module": "panorama", "engine": "—", "classes": [], "funcs": [{"name": "build_panorama", "doc": ""}, {"name": "panorama_markdown", "doc": ""}], "n_func": 2, "libs": ["stdlib"], "deps": []}, {"module": "pipeline", "engine": "—", "classes": [], "funcs": [{"name": "run", "doc": ""}], "n_func": 1, "libs": ["pandas"], "deps": ["actions", "adapters", "attachments", "autodetect", "classify", "completeness", "keywords", "normalize", "numbering", "panorama", "schema", "slides", "stakeholders", "store", "textrepair"]}, {"module": "plm_pmbok_ref", "engine": "KnowledgeEngine 知識", "classes": [], "funcs": [{"name": "sync_frameworks", "doc": "把 PLM/PMBOK/MSProject 的每個概念，透過其 canonical 對齊到唯一 "}], "n_func": 1, "libs": ["stdlib"], "deps": []}, {"module": "presets", "engine": "—", "classes": [], "funcs": [{"name": "list_presets", "doc": ""}, {"name": "apply_preset", "doc": "把來源列(dict)依 preset 對照成 Record。原始單號進 source_ref（不"}], "n_func": 2, "libs": ["stdlib"], "deps": ["schema"]}, {"module": "process_mining", "engine": "—", "classes": [], "funcs": [{"name": "build_event_log", "doc": "records → 事件序列。每案(case)依時間排序的 activity 軌跡。"}, {"name": "discover_dfg", "doc": "directly-follows graph：edge (a→b) 的次數與平均耗時（天）。"}, {"name": "find_bottlenecks", "doc": "平均耗時最久的轉換 = 卡點。"}, {"name": "find_rework", "doc": "自我返工環(a→a) 與重複造訪(同案同階段出現多次)。"}, {"name": "check_conformance", "doc": "與行業標準序列對齊：抓偷跑(skip)與時空回溯(backward jump)。"}, {"name": "mine", "doc": "一次跑完流程探勘，回傳完整結果。"}, {"name": "render_svg", "doc": "把探勘結果畫成左→右分層流程圖（Visual Lock 風，離線 SVG）。"}], "n_func": 7, "libs": ["stdlib"], "deps": []}, {"module": "psu_taxonomy", "engine": "BOMEngine 料表", "classes": [], "funcs": [{"name": "build_psu_seed", "doc": "把行業骨架轉成分類種子（product/topic/component 三維），供 seed 冷"}, {"name": "coverage_summary", "doc": ""}], "n_func": 2, "libs": ["stdlib"], "deps": []}, {"module": "report_html", "engine": "—", "classes": [], "funcs": [{"name": "build_html", "doc": ""}], "n_func": 1, "libs": ["pandas"], "deps": []}, {"module": "resilience", "engine": "—", "classes": ["Strategy", "ChainResult"], "funcs": [{"name": "ChainResult.report", "doc": ""}, {"name": "run_chain", "doc": "依序嘗試策略；第一個產出有效結果者勝出。"}], "n_func": 2, "libs": ["dataclasses"], "deps": []}, {"module": "sap_bom_ref", "engine": "KnowledgeEngine 知識", "classes": [], "funcs": [{"name": "tcode", "doc": ""}, {"name": "select_bom_method", "doc": "依情況建議 Q/D/V。有生產版本→V；有批量區間→Q；否則→D。"}, {"name": "explode_blocked_reason", "doc": "判斷 BOM 是否會被展開；不展開時回傳阻擋原因。"}, {"name": "as_registry", "doc": "輸出成 SSOT 登錄列（append-only）。"}], "n_func": 4, "libs": ["stdlib"], "deps": []}, {"module": "schema", "engine": "—", "classes": ["Record"], "funcs": [{"name": "Record.to_dict", "doc": ""}], "n_func": 1, "libs": ["dataclasses"], "deps": []}, {"module": "self_train", "engine": "—", "classes": [], "funcs": [{"name": "train_round", "doc": "跑一輪：分類 → 產候選 → 套用核可的 → 回傳本輪成果。"}, {"name": "run_training", "doc": "多輪自我成長，記錄學習曲線。回傳每輪 rate + 最終詞庫。"}, {"name": "curve_markdown", "doc": "把學習曲線印成表，證明『越練越準』。"}], "n_func": 3, "libs": ["stdlib"], "deps": ["classify", "keywords"]}, {"module": "selfcheck", "engine": "GovernanceEngine 治理", "classes": ["Check"], "funcs": [{"name": "check_environment", "doc": "環境/相依檢查（永遠可跑，不需資料）。"}, {"name": "check_io", "doc": ""}, {"name": "check_data", "doc": "資料品質檢查（有跑過 pipeline 才檢）。"}, {"name": "run_selfcheck", "doc": ""}, {"name": "selfcheck_markdown", "doc": ""}], "n_func": 5, "libs": ["dataclasses", "importlib", "shutil"], "deps": []}, {"module": "slides", "engine": "—", "classes": [], "funcs": [{"name": "build_deck", "doc": ""}], "n_func": 1, "libs": ["pandas", "pptx"], "deps": []}, {"module": "smart_asset", "engine": "IntakeEngine 擷取", "classes": [], "funcs": [{"name": "extract_entities", "doc": ""}, {"name": "to_assets", "doc": "每個擷取單元 → 智慧資產記錄(型別化)。"}, {"name": "validate_assets", "doc": "擷取幅度 + 正確性驗證。"}, {"name": "build_asset_db", "doc": "組成智慧資產庫:schema + records + stats(可轉 Parquet/CSV/"}, {"name": "assets_to_csv", "doc": ""}], "n_func": 5, "libs": ["stdlib"], "deps": []}, {"module": "ssot_synonyms", "engine": "SSOTEngine 歸一", "classes": ["SynonymSSOT"], "funcs": [{"name": "SynonymSSOT.add_canonical", "doc": ""}, {"name": "SynonymSSOT.add_synonym", "doc": "增量加同義字。若已指向別的 canonical → 衝突（不覆寫，除非宣告）。"}, {"name": "SynonymSSOT.resolve", "doc": "任一術語 → 唯一 canonical（找不到回 None）。"}, {"name": "SynonymSSOT.expand", "doc": "canonical → 全部同義字。"}, {"name": "SynonymSSOT.registry", "doc": ""}, {"name": "build_default", "doc": ""}], "n_func": 6, "libs": ["stdlib"], "deps": []}, {"module": "stakeholders", "engine": "—", "classes": ["Stakeholder"], "funcs": [{"name": "Stakeholder.total", "doc": ""}, {"name": "build_registry", "doc": ""}], "n_func": 2, "libs": ["dataclasses"], "deps": []}, {"module": "store", "engine": "—", "classes": ["ParquetStore"], "funcs": [{"name": "ParquetStore.load", "doc": ""}, {"name": "ParquetStore.upsert", "doc": "增量寫入。回傳 {added, updated, total} 與 diff 明細。"}], "n_func": 2, "libs": ["pandas"], "deps": ["schema"]}, {"module": "super_bom", "engine": "BOMEngine 料表", "classes": [], "funcs": [{"name": "merged_commodity_taxonomy", "doc": "電子（通用）+ 散熱 兩套品類合併，供 super BOM 歸類。"}, {"name": "classify_commodity_super", "doc": "跨電子+散熱兩域歸類。找不到回 '未分類'。"}, {"name": "super_bom_header", "doc": ""}, {"name": "validate_super_bom", "doc": "先跑通用 BOM 驗證，再檢查三維必填。"}, {"name": "list_company_products", "doc": ""}, {"name": "coverage", "doc": ""}], "n_func": 6, "libs": ["stdlib"], "deps": ["bom_template"]}, {"module": "sync_ssot", "engine": "SyncEngine 同步", "classes": [], "funcs": [{"name": "ms_anchor", "doc": ""}, {"name": "bom_anchor", "doc": ""}, {"name": "sync_tasks", "doc": "把 MS Project 任務對帳進 SSOT。"}, {"name": "detect_conflicts", "doc": ""}, {"name": "link_task_bom", "doc": "把任務連到 BOM 料號：以任務 part 欄位或名稱含料號比對。"}], "n_func": 5, "libs": ["stdlib"], "deps": []}, {"module": "table_repair", "engine": "IntakeEngine 擷取", "classes": [], "funcs": [{"name": "sniff_delimiter", "doc": ""}, {"name": "parse_table", "doc": ""}, {"name": "repair_table", "doc": "把參差列補齊到眾數欄數、推斷表頭、合併明顯的續行。回報修復統計。"}, {"name": "delim_join", "doc": ""}], "n_func": 4, "libs": ["stdlib"], "deps": []}, {"module": "textrepair", "engine": "—", "classes": [], "funcs": [{"name": "clean_email_text", "doc": ""}], "n_func": 1, "libs": ["stdlib"], "deps": []}, {"module": "via_engines", "engine": "—", "classes": ["IntakeEngine", "SSOTEngine", "SyncEngine", "BOMEngine", "FinanceEngine", "KnowledgeEngine", "GovernanceEngine", "VIA"], "funcs": [{"name": "IntakeEngine.run", "doc": ""}, {"name": "IntakeEngine.parse_code", "doc": ""}, {"name": "IntakeEngine.repair_table", "doc": ""}, {"name": "IntakeEngine.assets", "doc": ""}, {"name": "IntakeEngine.guarantee", "doc": ""}, {"name": "SSOTEngine.resolve", "doc": ""}, {"name": "SSOTEngine.add_synonym", "doc": ""}, {"name": "SSOTEngine.registry", "doc": ""}, {"name": "SSOTEngine.autocode", "doc": ""}, {"name": "SyncEngine.sync", "doc": ""}, {"name": "SyncEngine.conflicts", "doc": ""}, {"name": "SyncEngine.link_bom", "doc": ""}, {"name": "SyncEngine.ms_anchor", "doc": ""}, {"name": "SyncEngine.bom_anchor", "doc": ""}, {"name": "BOMEngine.classify", "doc": ""}, {"name": "BOMEngine.taxonomy", "doc": ""}, {"name": "BOMEngine.validate", "doc": ""}, {"name": "BOMEngine.rollup", "doc": ""}, {"name": "BOMEngine.where_used", "doc": ""}, {"name": "FinanceEngine.verify", "doc": ""}, {"name": "FinanceEngine.cost", "doc": ""}, {"name": "FinanceEngine.calibrate", "doc": ""}, {"name": "FinanceEngine.peers", "doc": ""}, {"name": "KnowledgeEngine.tcode", "doc": ""}, {"name": "KnowledgeEngine.select_bom", "doc": ""}, {"name": "KnowledgeEngine.plm_concepts", "doc": ""}, {"name": "KnowledgeEngine.pmbok_areas", "doc": ""}, {"name": "GovernanceEngine.scan", "doc": ""}, {"name": "GovernanceEngine.import_order", "doc": ""}, {"name": "VIA.engines", "doc": "列出七大引擎與其整合的底層模組(供矩陣/文件用)。"}], "n_func": 30, "libs": ["stdlib"], "deps": ["autocode", "bom_template", "code_parse", "fin_verify", "ingest_engine", "ingest_plus", "module_scan", "plm_pmbok_ref", "sap_bom_ref", "smart_asset", "ssot_synonyms", "super_bom", "sync_ssot", "table_repair"]}, {"module": "adapters/base", "engine": "IntakeEngine 擷取", "classes": ["SourceAdapter"], "funcs": [{"name": "SourceAdapter.read", "doc": "讀取來源，產出統一格式的 Record。"}], "n_func": 1, "libs": ["stdlib"], "deps": ["schema"]}, {"module": "adapters/enterprise", "engine": "IntakeEngine 擷取", "classes": ["EnterpriseAdapter"], "funcs": [{"name": "EnterpriseAdapter.read", "doc": ""}], "n_func": 1, "libs": ["stdlib"], "deps": ["html_ui", "presets"]}, {"module": "adapters/excel_csv", "engine": "IntakeEngine 擷取", "classes": ["ExcelCsvAdapter"], "funcs": [{"name": "ExcelCsvAdapter.read", "doc": ""}], "n_func": 1, "libs": ["pandas"], "deps": ["encoding", "schema"]}, {"module": "adapters/jsonl_mail", "engine": "IntakeEngine 擷取", "classes": ["JsonlMailAdapter"], "funcs": [{"name": "JsonlMailAdapter.read", "doc": ""}], "n_func": 1, "libs": ["stdlib"], "deps": ["schema"]}, {"module": "adapters/mail_imap", "engine": "IntakeEngine 擷取", "classes": ["MailIMAPAdapter"], "funcs": [{"name": "message_to_record", "doc": "把一封郵件物件轉成統一 Record（純函式，可離線測試）。"}, {"name": "MailIMAPAdapter.available", "doc": ""}, {"name": "MailIMAPAdapter.fetch", "doc": "連線並自動讀取 → 產生 Record（generator，只增不減）。"}, {"name": "MailIMAPAdapter.read", "doc": "adapter 協定別名（pipeline 呼叫 read）。不可用時安靜略過。"}], "n_func": 4, "libs": ["imap_tools"], "deps": ["encoding", "schema", "textrepair"]}, {"module": "adapters/mail_oauth", "engine": "IntakeEngine 擷取", "classes": [], "funcs": [{"name": "fetch_gmail_oauth", "doc": "授權一次→存 refresh token→之後靜默讀。需 google-auth-oauthli"}, {"name": "fetch_m365_oauth", "doc": "授權一次（device/interactive）→ MSAL 快取 refresh token "}], "n_func": 2, "libs": ["google", "google_auth_oauthlib", "googleapiclient", "msal", "requests"], "deps": ["encoding", "schema", "textrepair"]}, {"module": "adapters/msproject", "engine": "IntakeEngine 擷取", "classes": ["MSProjectAdapter"], "funcs": [{"name": "MSProjectAdapter.read", "doc": ""}], "n_func": 1, "libs": ["stdlib"], "deps": ["schema"]}, {"module": "adapters/outlook_desktop", "engine": "IntakeEngine 擷取", "classes": ["OutlookDesktopAdapter"], "funcs": [{"name": "OutlookDesktopAdapter.available", "doc": ""}, {"name": "OutlookDesktopAdapter.read", "doc": ""}], "n_func": 2, "libs": ["win32com"], "deps": ["schema", "textrepair"]}, {"module": "adapters/plm", "engine": "IntakeEngine 擷取", "classes": ["PLMExportAdapter"], "funcs": [{"name": "PLMExportAdapter.read", "doc": ""}], "n_func": 1, "libs": ["pandas"], "deps": ["encoding", "schema"]}, {"module": "adapters/supplement", "engine": "IntakeEngine 擷取", "classes": ["SupplementAdapter"], "funcs": [{"name": "SupplementAdapter.available", "doc": ""}, {"name": "SupplementAdapter.fetch", "doc": "mode='record'：把每列補充當成一筆 source_type='supplement'"}, {"name": "enrich_records", "doc": "mode='enrich'：依 relate_to 鍵，把補充欄位附加到既有 Record（不覆"}], "n_func": 3, "libs": ["stdlib"], "deps": ["schema"]}], "fanin": {"encoding": 6, "classify": 4, "keywords": 3, "autocode": 2, "numbering": 2, "schema": 13, "code_parse": 2, "ingest_engine": 2, "smart_asset": 2, "table_repair": 2, "resilience": 1, "actions": 1, "adapters": 1, "attachments": 1, "autodetect": 1, "completeness": 1, "normalize": 1, "panorama": 1, "slides": 1, "stakeholders": 1, "store": 1, "textrepair": 4, "bom_template": 2, "fin_verify": 1, "ingest_plus": 1, "module_scan": 1, "plm_pmbok_ref": 1, "sap_bom_ref": 1, "ssot_synonyms": 1, "super_bom": 1, "sync_ssot": 1, "html_ui": 1, "presets": 1}, "ssot": [["SSOT-BOM", "物料清單"], ["SSOT-ITEM", "料號"], ["SSOT-CHANGE", "工程變更"], ["SSOT-REVISION", "版次"], ["SSOT-LIFECYCLE", "生命週期"], ["SSOT-SCHEDULE", "時程"], ["SSOT-SCOPE", "範疇"], ["SSOT-COST", "成本"], ["SSOT-RESOURCE", "資源"], ["SSOT-RISK", "風險"], ["SSOT-QUALITY", "品質"], ["SSOT-STAKEHOLDER", "利害關係人"], ["SSOT-INTEGRATION", "整合"], ["SSOT-PROCUREMENT", "採購"], ["SSOT-COMMS", "溝通"]], "conn": [{"sys": "MS Project", "anchor": "[Project-Task-Timestamp]", "engine": "SyncEngine", "status": "BUILT"}, {"sys": "SAP BOM", "anchor": "CS01-15 / Q-D-V", "engine": "KnowledgeEngine", "status": "BUILT"}, {"sys": "PLM", "anchor": "[Part-Rev-State]", "engine": "SSOTEngine/Sync", "status": "BUILT"}, {"sys": "PMBOK", "anchor": "10領域/5流程", "engine": "SSOTEngine", "status": "BUILT"}, {"sys": "SAP PP/MM/SD", "anchor": "Production Version/MRP/BAPI", "engine": "(design)", "status": "DESIGN"}, {"sys": "Super BOM", "anchor": "M01/M02/M03·CTE", "engine": "BOMEngine", "status": "BUILT (CTE:DESIGN)"}], "counts": {"modules": 51, "functions": 197, "engines": 7}};
+const $=id=>document.getElementById(id);
+const ENGKEY={};D.engines.forEach((e,i)=>ENGKEY[e.engine]=i);
+const engClass=e=>"e"+(ENGKEY[e]!=null?ENGKEY[e]:6);
+const TABS=[["eng","① 7 引擎"],["mx","② 模組矩陣"],["fn","③ 函數清單"],["dep","④ 相依 fan-in"],["ssot","⑤ SSOT"],["conn","⑥ SAP/MSP"]];
+let cur="eng";
+$("tabs").innerHTML=TABS.map(([id,n])=>`<div class="tab ${id===cur?'on':''}" data-id="${id}">${n}</div>`).join("");
+$("tabs").querySelectorAll(".tab").forEach(t=>t.onclick=()=>{cur=t.dataset.id;$("tabs").querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x.dataset.id===cur));document.querySelectorAll(".sec").forEach(s=>s.classList.toggle("on",s.id==="sec-"+cur));});
+
+$("scards").innerHTML=`<div class="sc"><div class="v" style="color:var(--up)">${D.counts.engines}</div><div class="l">引擎</div></div>
+ <div class="sc"><div class="v">${D.counts.modules}</div><div class="l">模組</div></div>
+ <div class="sc"><div class="v">${D.counts.functions}</div><div class="l">函數</div></div>
+ <div class="sc"><div class="v">${D.ssot.length}</div><div class="l">SSOT基準</div></div>
+ <div class="sc"><div class="v">${D.conn.length}</div><div class="l">系統連接</div></div>`;
+// 7 引擎卡
+$("engines").innerHTML=D.engines.map((e,i)=>{
+ const mods=D.rows.filter(r=>r.engine===e.engine);
+ const nf=mods.reduce((a,r)=>a+r.n_func,0);
+ return `<div class="engcard"><div class="enghd"><span class="eng e${i}">E${i+1}</span><span class="nm">${e.engine}</span><span class="ct">${e.modules.length} 底層模組 · ${nf} 函數 · ${e.ops.length} 對外操作</span></div>
+  <div class="engbody">${e.modules.map(m=>`<span class="modchip">${m}</span>`).join("")}</div>
+  <div class="engbody" style="border-top:1px solid var(--soft)">${e.ops.map(o=>`<span class="opchip">.${o}()</span>`).join("")}</div></div>`;
+}).join("");
+
+// 模組矩陣 + 篩選
+const ENGS=["ALL",...D.engines.map(e=>e.engine)];let flt="ALL";
+$("filters").innerHTML=ENGS.map(e=>`<span class="fbtn ${e===flt?'on':''}" data-e="${e}">${e==="ALL"?"全部":e.split(" ")[0]}</span>`).join("");
+$("filters").querySelectorAll(".fbtn").forEach(b=>b.onclick=()=>{flt=b.dataset.e;$("filters").querySelectorAll(".fbtn").forEach(x=>x.classList.toggle("on",x.dataset.e===flt));renderMx();});
+function renderMx(){const rows=D.rows.filter(r=>flt==="ALL"||r.engine===flt);
+ $("mx").innerHTML=rows.map(r=>`<tr><td class="mod">${r.module}</td><td><span class="eng ${engClass(r.engine)}">${r.engine.split(" ")[0]}</span></td>
+  <td>${r.funcs.slice(0,8).map(f=>`<span class="fn" title="${f.doc||''}">${f.name}</span>`).join("")}${r.funcs.length>8?`<span class="fn">+${r.funcs.length-8}</span>`:''}
+   ${r.funcs[0]&&r.funcs[0].doc?`<div class="doc">${r.funcs[0].doc}</div>`:''}</td>
+  <td class="lib">${r.libs.join(", ")}</td></tr>`).join("");}
+renderMx();
+
+// 函數清單
+const ALLFN=[];D.rows.forEach(r=>r.funcs.forEach(f=>ALLFN.push({fn:f.name,doc:f.doc,mod:r.module,eng:r.engine})));
+function renderFn(q){q=(q||"").toLowerCase();const rows=ALLFN.filter(x=>!q||x.fn.toLowerCase().includes(q)||x.mod.toLowerCase().includes(q)||(x.doc||"").toLowerCase().includes(q));
+ $("fnList").innerHTML=rows.map(x=>`<tr><td><span class="fn">${x.fn}</span></td><td class="mod">${x.mod}</td><td class="doc">${x.doc||'—'}</td></tr>`).join("");}
+$("fnSearch").oninput=e=>renderFn(e.target.value);renderFn("");
+
+// 相依 fan-in
+const fi=Object.entries(D.fanin).sort((a,b)=>b[1]-a[1]);const mx=fi.length?fi[0][1]:1;
+$("dep").innerHTML=fi.map(([m,c])=>`<tr><td class="mod">${m}</td><td>${c}</td><td><span class="bar2" style="width:${Math.round(160*c/mx)}px"></span></td></tr>`).join("");
+
+$("ssot").innerHTML=D.ssot.map(([c,n])=>`<tr><td class="cid">${c}</td><td style="font-family:'Noto Sans TC';font-weight:600">${n}</td></tr>`).join("");
+$("conn").innerHTML=D.conn.map(c=>`<tr><td style="font-weight:700">${c.sys}</td><td class="lib">${c.anchor}</td><td class="mod">${c.engine}</td><td><span class="st st-${c.status.startsWith('BUILT')?'BUILT':'DESIGN'}">${c.status}</span></td></tr>`).join("");
+
+function dl(name,txt,type){const b=new Blob(["\ufeff"+txt],{type:type||"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name;a.click();}
+$("expJson").onclick=()=>dl("VIA_Capability_Matrix.json",JSON.stringify(D,null,2),"application/json");
+$("expCsv").onclick=()=>{let o="Module,Engine,FunctionCount,Libs\n";D.rows.forEach(r=>o+=`${r.module},"${r.engine}",${r.n_func},"${r.libs.join(';')}"\n`);dl("VIA_Module_Matrix.csv",o);};
+$("expFn").onclick=()=>{let o="Function,Module,Engine,Doc\n";ALLFN.forEach(x=>o+=`${x.fn},${x.mod},"${x.eng}","${(x.doc||'').replace(/"/g,'')}"\n`);dl("VIA_Functions.csv",o);};
+</script><script>
+(function(){
+ function cellText(td){var el=td.querySelector('input,select,textarea');
+  var v=el?(el.value||''):td.textContent;return (v||'').trim().replace(/\|/g,'\\|').replace(/\s+/g,' ');}
+ function tableToMd(tbl){
+  var heads=tbl.tHead?Array.prototype.slice.call(tbl.tHead.rows):[];
+  var body=tbl.tBodies.length?Array.prototype.slice.call(tbl.tBodies[0].rows):Array.prototype.slice.call(tbl.rows);
+  var hRow=heads.length?heads[heads.length-1]:body.shift();
+  if(!hRow)return '';
+  var cols=Array.prototype.map.call(hRow.cells,cellText);
+  var out='| '+cols.join(' | ')+' |\n| '+cols.map(function(){return '---';}).join(' | ')+' |\n';
+  body.forEach(function(tr){out+='| '+Array.prototype.map.call(tr.cells,cellText).join(' | ')+' |\n';});
+  return out;
+ }
+ window.exportPageMarkdown=function(){
+  var title=document.querySelector('h1')?document.querySelector('h1').innerText.trim():'VIA';
+  var kick=document.querySelector('.kicker')?document.querySelector('.kicker').innerText.trim():'';
+  var md='# '+title+'\n\n';
+  if(kick)md+='> '+kick+'\n\n';
+  md+='_匯出 '+new Date().toISOString().slice(0,19).replace('T',' ')+' · VIA · append-only_\n\n';
+  var nodes=document.querySelectorAll('h2, table');
+  Array.prototype.forEach.call(nodes,function(n){
+   if(n.tagName==='H2'){md+='\n## '+n.innerText.trim().replace(/\s+/g,' ')+'\n\n';}
+   else{var t=tableToMd(n);if(t)md+=t+'\n';}
+  });
+  var blob=new Blob([md],{type:'text/markdown'});var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=(title.replace(/[^\w\u4e00-\u9fff]+/g,'_').slice(0,40)||'VIA')+'.md';a.click();
+ };
+ // 加 MD 按鈕（在 PDF 左側）
+ function addBtn(){if(document.getElementById('viaMdBtn'))return;var b=document.createElement('button');b.id='viaMdBtn';b.textContent='\u2913 MD';b.className='pdf';b.style.right='66px';b.onclick=window.exportPageMarkdown;document.body.appendChild(b);}
+ if(document.body)addBtn();else window.addEventListener('DOMContentLoaded',addBtn);
+})();
+</script>
+</body></html>

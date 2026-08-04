@@ -1,0 +1,270 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA 三大報表 · 比率 · 每股 · 評價</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--ink:#1e1d1a;--sub:#6b6a66;--blue:#4c78a8;--teal:#439a9a;
+ --up:#c96b5a;--down:#5a9e6f;--line:#dbd9d3;--panel:#efeee9}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"DM Sans",system-ui,sans-serif;font-size:13px}
+.wrap{max-width:1500px;margin:0 auto;padding:22px 18px 60px}
+h1{font-family:"Syne",sans-serif;font-weight:800;font-size:24px;letter-spacing:.5px;margin:0}
+.eyebrow{font-family:"DM Mono",monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--sub);margin-bottom:6px}
+.sub{color:var(--sub);font-size:12.5px;margin-top:4px}
+.strip{height:6px;border-radius:2px;margin:14px 0 18px;background:linear-gradient(90deg,#4c78a8,#439a9a,#7fae6f,#c9b05a,#c98a5a,#c96b5a,#a05a86)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tab{font-family:"DM Sans";font-size:12.5px;font-weight:600;cursor:pointer;border:1px solid var(--line);
+ background:var(--paper);color:var(--sub);border-radius:2px;padding:6px 12px}
+.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:3px;padding:0;overflow:hidden}
+.secttl{font-family:"Syne";font-weight:700;font-size:14px;padding:12px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;font-size:12px;min-width:100%}
+th,td{border-bottom:1px solid var(--line);padding:4px 8px;white-space:nowrap}
+th{font-family:"DM Mono",monospace;font-size:9.5px;letter-spacing:.5px;text-transform:uppercase;color:var(--sub);font-weight:500;text-align:right;background:var(--panel);position:sticky;top:0}
+th.l,td.l{text-align:left}
+.code{font-family:"DM Mono",monospace;font-size:10px;color:var(--blue)}
+td.num{font-family:"DM Mono",monospace;text-align:right}
+.calc td.num,tr.calc td{background:#faf9f6;font-weight:600}
+.cellin{font-family:"DM Mono",monospace;text-align:right;border:none;background:transparent;width:72px;font-size:12px}
+.cellin:focus{outline:1px solid var(--blue);background:#fff}
+.colY{background:#f2f5f8}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:12px 16px;border-top:1px solid var(--line);align-items:center}
+.btn{font-family:"DM Sans";font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:2px;padding:6px 12px}
+.btn.ghost{background:transparent;color:var(--ink)}
+.pill{display:inline-block;background:var(--panel);border:1px solid var(--line);border-radius:2px;padding:1px 7px;font-size:10.5px;font-family:"DM Mono",monospace;color:var(--sub)}
+.hint{font-size:11px;color:var(--sub);padding:0 16px 12px}
+.up{color:var(--up)}.down{color:var(--down)}
+.sec{display:none}.sec.on{display:block}
+</style></head><body><div class="wrap">
+<div class="eyebrow">VERITAS INTELLIGENCE · 總部管控編號 GOVERNED</div>
+<h1>三大報表 · 比率 · 每股 · 評價分析</h1>
+<div class="sub">單位 mn TWD · 年度＋季度時間軸 · 每一列皆掛 VIA 編號（總部管控）· 全部即時連動</div>
+<div class="strip"></div>
+<div class="tabs" id="tabs"></div>
+
+<div id="sections"></div>
+
+<div class="card" style="margin-top:16px"><div class="toolbar">
+ <button class="btn ghost" id="expJson">匯出 JSON</button>
+ <button class="btn ghost" id="expCsv">匯出 CSV（全表）</button>
+ <label class="btn ghost" style="display:inline-block">匯入 JSON<input type="file" id="impJson" accept=".json" style="display:none"></label>
+ <button class="btn ghost" id="expReg">匯出 VIA 編號登錄</button>
+ <span class="pill" id="stat">—</span>
+</div>
+<div class="hint">深色列＝系統計算（不可改）；白色數字欄＝可編輯輸入。年度欄底色較深。改任一輸入，比率/每股/評價全部即時重算。</div>
+</div>
+</div>
+
+<script>
+const COLS=["2023", "1Q24", "2Q24", "3Q24", "4Q24", "2024", "1Q25", "2Q25", "3Q25", "4Q25", "2025", "1Q26", "2Q26", "3Q26", "4Q26", "2026E", "2027E"], SEED={"2023": {"revenue": 40000, "cogs": 30000, "opex": 5000, "nonOp": 200, "tax": 900, "da": 1500, "cash": 8000, "ar": 9000, "inventory": 6000, "otherCA": 2000, "ppe": 12000, "otherNCA": 3000, "ap": 7000, "otherCL": 4000, "longDebt": 6000, "cfo": 4000, "cfi": -2000, "cff": -500, "shares": 300, "price": 200, "dps": 5}, "2024": {"revenue": 52000, "cogs": 38000, "opex": 6000, "nonOp": 300, "tax": 1500, "da": 1800, "cash": 10000, "ar": 11000, "inventory": 7000, "otherCA": 2500, "ppe": 14000, "otherNCA": 3500, "ap": 8500, "otherCL": 4500, "longDebt": 6500, "cfo": 5500, "cfi": -3000, "cff": -600, "shares": 300, "price": 350, "dps": 7}};
+const YEARCOL=c=>/^\d{4}E?$/.test(c);           // 年度欄
+const $=id=>document.getElementById(id);
+const num=n=>(isFinite(n)&&n!==null)?n.toLocaleString(undefined,{maximumFractionDigits:0}):"—";
+const pct=n=>isFinite(n)?(n*100).toFixed(1)+"%":"—";
+const x2=n=>isFinite(n)?n.toFixed(2):"—";
+
+// ---- 列定義（每列一個 VIA 編號）----
+const IS=[
+ {c:"VIA-IS-01",n:"營業收入 Revenue",k:"revenue",t:"in"},
+ {c:"VIA-IS-02",n:"營業成本 COGS",k:"cogs",t:"in"},
+ {c:"VIA-IS-03",n:"營業毛利 Gross Profit",k:"grossProfit",t:"calc",f:v=>v.revenue-v.cogs},
+ {c:"VIA-IS-04",n:"營業費用 OpEx",k:"opex",t:"in"},
+ {c:"VIA-IS-05",n:"營業利益 Operating Income",k:"opInc",t:"calc",f:v=>v.grossProfit-v.opex},
+ {c:"VIA-IS-06",n:"業外損益 Non-op",k:"nonOp",t:"in"},
+ {c:"VIA-IS-07",n:"稅前淨利 Pretax",k:"pretax",t:"calc",f:v=>v.opInc+v.nonOp},
+ {c:"VIA-IS-08",n:"所得稅 Tax",k:"tax",t:"in"},
+ {c:"VIA-IS-09",n:"稅後淨利 Net Income",k:"netInc",t:"calc",f:v=>v.pretax-v.tax},
+ {c:"VIA-IS-10",n:"折舊攤銷 D&A",k:"da",t:"in"},
+ {c:"VIA-IS-11",n:"EBITDA",k:"ebitda",t:"calc",f:v=>v.opInc+v.da},
+];
+const BS=[
+ {c:"VIA-BS-01",n:"現金及約當現金 Cash",k:"cash",t:"in"},
+ {c:"VIA-BS-02",n:"應收帳款 AR",k:"ar",t:"in"},
+ {c:"VIA-BS-03",n:"存貨 Inventory",k:"inventory",t:"in"},
+ {c:"VIA-BS-04",n:"其他流動資產",k:"otherCA",t:"in"},
+ {c:"VIA-BS-05",n:"流動資產合計 Current Assets",k:"ca",t:"calc",f:v=>v.cash+v.ar+v.inventory+v.otherCA},
+ {c:"VIA-BS-06",n:"不動產廠房設備 PP&E",k:"ppe",t:"in"},
+ {c:"VIA-BS-07",n:"其他非流動資產",k:"otherNCA",t:"in"},
+ {c:"VIA-BS-08",n:"資產總計 Total Assets",k:"ta",t:"calc",f:v=>v.ca+v.ppe+v.otherNCA},
+ {c:"VIA-BS-09",n:"應付帳款 AP",k:"ap",t:"in"},
+ {c:"VIA-BS-10",n:"其他流動負債",k:"otherCL",t:"in"},
+ {c:"VIA-BS-11",n:"流動負債合計 Current Liab",k:"cl",t:"calc",f:v=>v.ap+v.otherCL},
+ {c:"VIA-BS-12",n:"長期負債 Long-term Debt",k:"longDebt",t:"in"},
+ {c:"VIA-BS-13",n:"負債總計 Total Liab",k:"tl",t:"calc",f:v=>v.cl+v.longDebt},
+ {c:"VIA-BS-14",n:"股東權益 Equity",k:"equity",t:"calc",f:v=>v.ta-v.tl},
+];
+const CF=[
+ {c:"VIA-CF-01",n:"營業活動現金流 CFO",k:"cfo",t:"in"},
+ {c:"VIA-CF-02",n:"投資活動現金流 CFI",k:"cfi",t:"in"},
+ {c:"VIA-CF-03",n:"融資活動現金流 CFF",k:"cff",t:"in"},
+ {c:"VIA-CF-04",n:"淨現金流量 Net Cash Flow",k:"netCF",t:"calc",f:v=>v.cfo+v.cfi+v.cff},
+ {c:"VIA-CF-05",n:"自由現金流 FCF",k:"fcf",t:"calc",f:v=>v.cfo+v.cfi},
+];
+const MK=[
+ {c:"VIA-MK-01",n:"流通股數 Shares (mn)",k:"shares",t:"in"},
+ {c:"VIA-MK-02",n:"股價 Price (TWD)",k:"price",t:"in"},
+ {c:"VIA-MK-03",n:"每股股利 DPS (TWD)",k:"dps",t:"in"},
+];
+const RATIO=[
+ {c:"VIA-RA-01",n:"毛利率 Gross Margin",g:"獲利能力",f:v=>v.grossProfit/v.revenue,fmt:pct},
+ {c:"VIA-RA-02",n:"營益率 Operating Margin",g:"獲利能力",f:v=>v.opInc/v.revenue,fmt:pct},
+ {c:"VIA-RA-03",n:"淨利率 Net Margin",g:"獲利能力",f:v=>v.netInc/v.revenue,fmt:pct},
+ {c:"VIA-RA-04",n:"ROE 股東權益報酬率",g:"獲利能力",f:v=>v.netInc/v.equity,fmt:pct},
+ {c:"VIA-RA-05",n:"ROA 資產報酬率",g:"獲利能力",f:v=>v.netInc/v.ta,fmt:pct},
+ {c:"VIA-RA-06",n:"流動比率 Current Ratio",g:"償債能力",f:v=>v.ca/v.cl,fmt:x2},
+ {c:"VIA-RA-07",n:"負債比率 Debt Ratio",g:"償債能力",f:v=>v.tl/v.ta,fmt:pct},
+ {c:"VIA-RA-08",n:"存貨週轉 Inventory Turnover",g:"經營效率",f:v=>v.cogs/v.inventory,fmt:x2},
+ {c:"VIA-RA-09",n:"應收週轉 AR Turnover",g:"經營效率",f:v=>v.revenue/v.ar,fmt:x2},
+ {c:"VIA-RA-10",n:"總資產週轉 Asset Turnover",g:"經營效率",f:v=>v.revenue/v.ta,fmt:x2},
+ {c:"VIA-RA-11",n:"營收成長 Rev Growth",g:"成長性",f:(v,p)=>p&&p.revenue?(v.revenue-p.revenue)/p.revenue:NaN,fmt:pct},
+ {c:"VIA-RA-12",n:"淨利成長 NI Growth",g:"成長性",f:(v,p)=>p&&p.netInc?(v.netInc-p.netInc)/p.netInc:NaN,fmt:pct},
+];
+const PS=[
+ {c:"VIA-PS-01",n:"EPS 每股盈餘 (TWD)",f:v=>v.netInc/v.shares,fmt:x2},
+ {c:"VIA-PS-02",n:"BVPS 每股淨值 (TWD)",f:v=>v.equity/v.shares,fmt:x2},
+ {c:"VIA-PS-03",n:"CFPS 每股現金流 (TWD)",f:v=>v.cfo/v.shares,fmt:x2},
+ {c:"VIA-PS-04",n:"DPS 每股股利 (TWD)",f:v=>v.dps,fmt:x2},
+];
+const VAL=[
+ {c:"VIA-VAL-01",n:"PER 本益比",f:v=>v.price/(v.netInc/v.shares),fmt:x2},
+ {c:"VIA-VAL-02",n:"PBR 股價淨值比",f:v=>v.price/(v.equity/v.shares),fmt:x2},
+ {c:"VIA-VAL-03",n:"股利殖利率 Dividend Yield",f:v=>v.dps/v.price,fmt:pct},
+ {c:"VIA-VAL-04",n:"EV/EBITDA",f:v=>(v.price*v.shares+v.tl-v.cash)/v.ebitda,fmt:x2},
+];
+const STMTS={"損益表 IS":IS,"資產負債表 BS":BS,"現金流量表 CF":CF,"市場資料 Market":MK};
+const ALLROWS=[...IS,...BS,...CF,...MK];
+
+// ---- 狀態 ----
+let state={}; COLS.forEach(c=>state[c]=Object.assign({},SEED[c]||{}));
+
+function colValues(col,prev){
+ const v={}; ALLROWS.forEach(r=>{ if(r.t==="in") v[r.k]=parseFloat(state[col][r.k])||0; });
+ ALLROWS.forEach(r=>{ if(r.t==="calc") v[r.k]=r.f(v); });
+ return v;
+}
+function allValues(){
+ const out={}; let prev=null;
+ COLS.forEach(c=>{ const v=colValues(c,prev); out[c]=v; prev=v; });
+ return out;
+}
+
+function stmtTable(title,rows){
+ let h=`<div class="card"><div class="secttl">${title}<span class="pill">${rows.length} 列 · VIA 編號</span></div><div class="scroll"><table><thead><tr><th class="l">編號</th><th class="l">項目</th>`;
+ COLS.forEach(c=>h+=`<th class="${YEARCOL(c)?'colY':''}">${c}</th>`);
+ h+=`</tr></thead><tbody>`;
+ const V=allValues();
+ rows.forEach(r=>{
+  h+=`<tr class="${r.t==='calc'?'calc':''}"><td class="l code">${r.c}</td><td class="l">${r.n}</td>`;
+  COLS.forEach(c=>{
+   const yc=YEARCOL(c)?'colY':'';
+   if(r.t==="in"){
+    h+=`<td class="num ${yc}"><input class="cellin" data-col="${c}" data-k="${r.k}" value="${state[c][r.k]??''}"></td>`;
+   }else{
+    h+=`<td class="num ${yc}">${num(V[c][r.k])}</td>`;
+   }
+  });
+  h+=`</tr>`;
+ });
+ return h+`</tbody></table></div></div>`;
+}
+function analysisTable(title,rows,grouped){
+ let h=`<div class="card"><div class="secttl">${title}<span class="pill">${rows.length} 指標 · VIA 編號</span></div><div class="scroll"><table><thead><tr><th class="l">編號</th><th class="l">指標</th>`;
+ COLS.forEach(c=>h+=`<th class="${YEARCOL(c)?'colY':''}">${c}</th>`);
+ h+=`</tr></thead><tbody>`;
+ const V=allValues(); let lastG="";
+ rows.forEach(r=>{
+  if(grouped&&r.g&&r.g!==lastG){ lastG=r.g; h+=`<tr><td class="l" colspan="${COLS.length+2}" style="background:var(--panel);font-family:'DM Mono';font-size:10px;letter-spacing:1px;color:var(--sub)">${r.g}</td></tr>`; }
+  h+=`<tr><td class="l code">${r.c}</td><td class="l">${r.n}</td>`;
+  let prev=null;
+  COLS.forEach((c,i)=>{
+   const v=V[c]; const val=(r.f.length>=2)?r.f(v,prev):r.f(v);
+   h+=`<td class="num ${YEARCOL(c)?'colY':''}">${r.fmt?r.fmt(val):num(val)}</td>`;
+   prev=v;
+  });
+  h+=`</tr>`;
+ });
+ return h+`</tbody></table></div></div>`;
+}
+
+const SECS=[
+ {id:"is",name:"損益表",render:()=>stmtTable("損益表 Income Statement",IS)},
+ {id:"bs",name:"資產負債表",render:()=>stmtTable("資產負債表 Balance Sheet",BS)},
+ {id:"cf",name:"現金流量表",render:()=>stmtTable("現金流量表 Cash Flow",CF)},
+ {id:"mk",name:"市場資料",render:()=>stmtTable("市場資料 Market Data",MK)},
+ {id:"ra",name:"比率分析",render:()=>analysisTable("比率分析 Ratio Analysis",RATIO,true)},
+ {id:"ps",name:"每股分析",render:()=>analysisTable("每股分析 Per-Share",PS,false)},
+ {id:"val",name:"評價分析",render:()=>analysisTable("評價分析 Valuation",VAL,false)},
+];
+let cur="is";
+function renderTabs(){ $("tabs").innerHTML=SECS.map(s=>`<div class="tab ${s.id===cur?'on':''}" data-id="${s.id}">${s.name}</div>`).join(""); 
+ $("tabs").querySelectorAll(".tab").forEach(t=>t.onclick=()=>{cur=t.dataset.id;renderAll();}); }
+function renderAll(){
+ renderTabs();
+ $("sections").innerHTML=SECS.map(s=>`<div class="sec ${s.id===cur?'on':''}" id="sec-${s.id}">${s.render()}</div>`).join("");
+ $("sections").querySelectorAll(".cellin").forEach(el=>el.oninput=e=>{
+  state[e.target.dataset.col][e.target.dataset.k]=e.target.value; recomputeMarks();
+ });
+ const nCodes=IS.length+BS.length+CF.length+MK.length+RATIO.length+PS.length+VAL.length;
+ $("stat").textContent=`VIA 編號 ${nCodes} 項 · 期間 ${COLS.length} 欄`;
+}
+function recomputeMarks(){ // 只重繪目前分頁計算欄，避免游標跳走
+ const sec=SECS.find(s=>s.id===cur); const el=$("sec-"+cur);
+ if(["ra","ps","val","is","bs","cf"].includes(cur)){ el.innerHTML=sec.render();
+  el.querySelectorAll(".cellin").forEach(x=>x.oninput=e=>{state[e.target.dataset.col][e.target.dataset.k]=e.target.value;recomputeMarks();});
+ }
+}
+$("expJson").onclick=()=>dl("via_financials.json",JSON.stringify(state,null,2));
+$("expReg").onclick=()=>{
+ const reg=[...IS,...BS,...CF,...MK,...RATIO,...PS,...VAL].map(r=>`${r.c},"${r.n}"`).join("\n");
+ dl("VIA_registry.csv","\ufeffVIA_Code,Item\n"+reg);
+};
+$("expCsv").onclick=()=>{
+ const V=allValues(); const rows=[...IS,...BS,...CF,...MK];
+ let out="VIA_Code,Item,"+COLS.join(",")+"\n";
+ rows.forEach(r=>{ out+=`${r.c},"${r.n}",`+COLS.map(c=>V[c][r.k]??"").join(",")+"\n"; });
+ [["比率",RATIO],["每股",PS],["評價",VAL]].forEach(([g,rs])=>{
+  rs.forEach(r=>{ let prev=null; out+=`${r.c},"${r.n}",`+COLS.map(c=>{const v=V[c];const val=(r.f.length>=2)?r.f(v,prev):r.f(v);prev=v;return isFinite(val)?val.toFixed(4):"";}).join(",")+"\n"; });
+ });
+ dl("via_financials_full.csv","\ufeff"+out);
+};
+$("impJson").onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{state=JSON.parse(rd.result);renderAll();}catch(x){alert("JSON 讀取失敗");}};rd.readAsText(f);};
+function dl(name,txt){const b=new Blob([txt],{type:"text/plain"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name;a.click();}
+renderAll();
+</script><script>
+(function(){
+ function cellText(td){var el=td.querySelector('input,select,textarea');
+  var v=el?(el.value||''):td.textContent;return (v||'').trim().replace(/\|/g,'\\|').replace(/\s+/g,' ');}
+ function tableToMd(tbl){
+  var heads=tbl.tHead?Array.prototype.slice.call(tbl.tHead.rows):[];
+  var body=tbl.tBodies.length?Array.prototype.slice.call(tbl.tBodies[0].rows):Array.prototype.slice.call(tbl.rows);
+  var hRow=heads.length?heads[heads.length-1]:body.shift();
+  if(!hRow)return '';
+  var cols=Array.prototype.map.call(hRow.cells,cellText);
+  var out='| '+cols.join(' | ')+' |\n| '+cols.map(function(){return '---';}).join(' | ')+' |\n';
+  body.forEach(function(tr){out+='| '+Array.prototype.map.call(tr.cells,cellText).join(' | ')+' |\n';});
+  return out;
+ }
+ window.exportPageMarkdown=function(){
+  var title=document.querySelector('h1')?document.querySelector('h1').innerText.trim():'VIA';
+  var kick=document.querySelector('.kicker')?document.querySelector('.kicker').innerText.trim():'';
+  var md='# '+title+'\n\n';
+  if(kick)md+='> '+kick+'\n\n';
+  md+='_匯出 '+new Date().toISOString().slice(0,19).replace('T',' ')+' · VIA · append-only_\n\n';
+  var nodes=document.querySelectorAll('h2, table');
+  Array.prototype.forEach.call(nodes,function(n){
+   if(n.tagName==='H2'){md+='\n## '+n.innerText.trim().replace(/\s+/g,' ')+'\n\n';}
+   else{var t=tableToMd(n);if(t)md+=t+'\n';}
+  });
+  var blob=new Blob([md],{type:'text/markdown'});var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=(title.replace(/[^\w\u4e00-\u9fff]+/g,'_').slice(0,40)||'VIA')+'.md';a.click();
+ };
+ // 加 MD 按鈕（在 PDF 左側）— 立即掛載（腳本在 body 尾端）
+ function addBtn(){if(document.getElementById('viaMdBtn'))return;var b=document.createElement('button');
+  b.id='viaMdBtn';b.textContent='\u2913 MD';b.className='pdf';b.style.right='66px';
+  b.onclick=window.exportPageMarkdown;document.body.appendChild(b);}
+ if(document.body)addBtn();else window.addEventListener('DOMContentLoaded',addBtn);
+})();
+</script>
+</body></html>
