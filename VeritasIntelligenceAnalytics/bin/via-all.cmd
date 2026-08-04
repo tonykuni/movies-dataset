@@ -1,3 +1,3 @@
 @echo off
-rem VIA full stack: VDF + VAP + VRN + Tower + audits
-pwsh -NoProfile -File "%~dp0..\Start-VIA-OneClick.ps1" -VRN -Tower -Audit -Panorama -Polyglot %*
+rem VIA full interactive stack: VDF + VAP + VRN preflight + Tower (no long-running disk audits)
+pwsh -NoProfile -File "%~dp0..\Start-VIA-OneClick.ps1" -VRN -Tower %*
