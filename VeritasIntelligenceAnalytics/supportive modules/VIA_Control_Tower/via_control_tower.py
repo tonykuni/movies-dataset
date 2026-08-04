@@ -346,6 +346,198 @@ class Tower:
         job.progress = 100
         job.status = "done"
 
+    # ------------------------------------------------ 六收尾流程(唯讀提案型)
+    def _report_dir(self, name: str) -> Path:
+        d = self.rpt / name
+        d.mkdir(parents=True, exist_ok=True)
+        return d
+
+    def act_flow_a_ssot(self, job: Job):
+        """FLOW-A · SSOT 指標獨立化草案:絕對路徑→repo 對映驗證,產 DRAFT 不啟用。"""
+        import hashlib
+        ssot = self.fm / "VRN" / "SSOT"
+        ptr_path = ssot / "VRN_ResearchReport_SSOT.active.json"
+        d = json.loads(ptr_path.read_text(encoding="utf-8"))
+        dl_root = "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics"
+        draft, ok, bad = dict(d), 0, 0
+        for k, v in d.items():
+            if isinstance(v, str) and v.startswith(dl_root):
+                rel = v[len(dl_root) + 1:]
+                repo_p = self.base / rel.replace("\\", os.sep)
+                sha_key = k.replace("_path", "_sha256")
+                want = d.get(sha_key, "")
+                if repo_p.is_file():
+                    got = hashlib.sha256(repo_p.read_bytes()).hexdigest()
+                    match = (got == want) if want else True
+                    job.add(f"{'[OK]  ' if match else '[DRIFT]'} {k} → {rel}"
+                            + ("" if match else f" · repo={got[:12]} want={str(want)[:12]}"))
+                    ok += match
+                    bad += (not match)
+                    draft[k] = str(repo_p)
+                else:
+                    job.add(f"[MISS] {k} → repo 無此檔:{rel}")
+                    bad += 1
+        out = self._report_dir("_flow_a_ssot_reissue")
+        dst = out / "VRN_ResearchReport_SSOT.active.DRAFT.json"
+        draft["draft_note"] = ("DRAFT ONLY · repo-absolute paths · NOT ACTIVE · "
+                              "activation requires operator hash-locked transaction")
+        dst.write_text(json.dumps(draft, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        job.add("")
+        job.add(f"[FLOW-A] 對映驗證 OK={ok} 異常={bad} · DRAFT: {dst}")
+        job.add("[FLOW-A] 啟用步驟(需明確核准):以 DRAFT 覆蓋 active.json → SAFE PROBE 重驗 → commit")
+        self.emit(job, "")
+        if bad:
+            job.status = "error"
+
+    def act_flow_b_inbox(self, job: Job):
+        """FLOW-B · _inbox_to_classify 分類提案(唯讀)。"""
+        import csv
+        inbox = self.sm / "_inbox_to_classify"
+        if not inbox.is_dir():
+            self.emit(job, f"[FLOW-B] 無待分類箱:{inbox}")
+            return
+        rules = [(re.compile(r"VRN_MDL|VIS_VRN|vrn_", re.I), "functional modules/VRN"),
+                 (re.compile(r"vdf_|VDF_", re.I), "functional modules/VDF"),
+                 (re.compile(r"vap_|VAP_|autoplot", re.I), "functional modules/VAP"),
+                 (re.compile(r"\.ps1$|\.psm1$", re.I), "supportive modules/<ops>"),
+                 (re.compile(r"\.md$|\.txt$", re.I), "docs 層(原地或 docs/)"),
+                 (re.compile(r"\.json$|\.csv$", re.I), "registry/評估後歸位")]
+        rows = []
+        for p in sorted(inbox.rglob("*")):
+            if not p.is_file() or p.name == ".gitkeep":
+                continue
+            dest = next((t for rx, t in rules if rx.search(p.name)), "REVIEW_MANUAL")
+            rows.append((str(p.relative_to(inbox)), dest))
+        out = self._report_dir("_flow_b_inbox") / "inbox_classification_proposal.csv"
+        with open(out, "w", newline="", encoding="utf-8-sig") as fh:
+            w = csv.writer(fh)
+            w.writerow(["File", "ProposedSlot"])
+            w.writerows(rows)
+        counts: dict[str, int] = {}
+        for _, t in rows:
+            counts[t] = counts.get(t, 0) + 1
+        job.add(f"[FLOW-B] {len(rows)} 檔分類提案:")
+        for t, c in sorted(counts.items(), key=lambda x: -x[1]):
+            job.add(f"  {c:4d} → {t}")
+        self.emit(job, f"\n[FLOW-B] 提案 CSV:{out}(核准後我出搬移腳本)")
+
+    def act_flow_c_differs(self, job: Job):
+        """FLOW-C · DIFFERS 裁決提案:讀取總檢察 CSV,比 mtime 出建議。"""
+        import csv
+        src = self.rpt / "downloads_tree_audit.csv"
+        if not src.is_file():
+            self.emit(job, f"[FLOW-C] 找不到 {src} — 先跑 TREE AUDIT")
+            return
+        dl = Path(os.environ.get("VIA_AUDIT_SRC",
+                                 str(Path.home() / "Downloads" / "VeritasIntelligenceAnalytics")))
+        rows = []
+        with open(src, encoding="utf-8-sig") as fh:
+            for r in csv.DictReader(fh):
+                if r["Status"] != "IN_REPO_DIFFERS":
+                    continue
+                rel = r["Rel"]
+                a, b = dl / rel, self.base / rel
+                try:
+                    verdict = ("KEEP_REPO(repo較新)" if b.stat().st_mtime >= a.stat().st_mtime
+                               else "REVIEW(Downloads較新)")
+                except OSError:
+                    verdict = "READ_ERROR"
+                rows.append((rel, verdict, r["MB"]))
+        out = self._report_dir("_flow_c_differs") / "differs_adjudication_proposal.csv"
+        with open(out, "w", newline="", encoding="utf-8-sig") as fh:
+            w = csv.writer(fh)
+            w.writerow(["Rel", "Verdict", "MB"])
+            w.writerows(rows)
+        review = [r for r in rows if r[1].startswith("REVIEW")]
+        job.add(f"[FLOW-C] DIFFERS {len(rows)} 檔:KEEP_REPO {len(rows)-len(review)} · 待審(Downloads較新){len(review)}")
+        for rel, _, mb in review[:20]:
+            job.add(f"  REVIEW {mb:>8} MB  {rel}")
+        self.emit(job, f"\n[FLOW-C] 完整裁決表:{out}")
+
+    def act_flow_d_unit03(self, job: Job):
+        """FLOW-D · UNIT03 管線狀態(唯讀)。"""
+        lines = ["[FLOW-D] UNIT03 VAP 引擎候選管線狀態:"]
+        runs = sorted(self.rpt.glob("RUN_*_VIA_DOWNLOADS_UIUX_CLOSEOUT_AUDIT_*"),
+                      key=lambda p: p.stat().st_mtime, reverse=True)
+        if not runs:
+            self.emit(job, "[FLOW-D] 尚無 v0103 closeout audit run(在 VIA_Reports 下)")
+            return
+        run = runs[0]
+        lines.append(f"  audit run: {run.name}")
+        for stage, pat in [("v0110 裁決", "P0_UNIT03_VAP_VISUAL_SEMANTIC_ADJUDICATION_v0110_*"),
+                           ("v0111 修復提案", "P0_UNIT03_VAP_VISUAL_LOCK_REPAIR_PROPOSAL_v0111_*")]:
+            hits = sorted(run.glob(pat), key=lambda p: p.stat().st_mtime, reverse=True)
+            if not hits:
+                lines.append(f"  {stage}: ─ 未產出")
+                continue
+            gate = "?"
+            for j in hits[0].glob("*Summary.json"):
+                try:
+                    s = json.loads(j.read_text(encoding="utf-8"))
+                    g = s.get("gate", {})
+                    gate = f"{g.get('color', '?')} · {g.get('gate', '?')}" if isinstance(g, dict) else str(g)
+                except Exception:  # noqa: BLE001
+                    pass
+            lines.append(f"  {stage}: {hits[0].name} → {gate}")
+        lines.append("  下一步:v0111R2 → YELLOW 提案 → 核准 → v0112 兩輪守護測試 → write_workbench → 晉升審查")
+        self.emit(job, "\n".join(lines))
+
+    def act_flow_e_hydra(self, job: Job):
+        """FLOW-E · Hydra 淨化掃描:同名多處 → 相同=冗餘 / 相異=版本衝突。"""
+        import csv
+        import hashlib
+        groups: dict[str, list[Path]] = {}
+        for p in self.base.rglob("*"):
+            if (p.is_file() and p.suffix.lower() in (".py", ".ps1", ".psm1", ".html", ".js")
+                    and "__pycache__" not in str(p) and p.name != ".gitkeep"):
+                groups.setdefault(p.name, []).append(p)
+        rows, conflicts, redundant = [], 0, 0
+        for name, paths in sorted(groups.items()):
+            if len(paths) < 2:
+                continue
+            shas = {hashlib.sha256(p.read_bytes()).hexdigest() for p in paths}
+            kind = "REDUNDANT_COPY" if len(shas) == 1 else "VERSION_CONFLICT"
+            conflicts += (kind == "VERSION_CONFLICT")
+            redundant += (kind == "REDUNDANT_COPY")
+            for p in paths:
+                rows.append((name, kind, len(paths), len(shas), str(p.relative_to(self.base))))
+        out = self._report_dir("_flow_e_hydra") / "hydra_matrix.csv"
+        with open(out, "w", newline="", encoding="utf-8-sig") as fh:
+            w = csv.writer(fh)
+            w.writerow(["Name", "Kind", "Copies", "DistinctHashes", "Path"])
+            w.writerows(rows)
+        job.add(f"[FLOW-E] 多頭名單:版本衝突 {conflicts} 組(真 Hydra)· 冗餘拷貝 {redundant} 組")
+        shown = set()
+        for name, kind, copies, hashes, _ in rows:
+            if kind == "VERSION_CONFLICT" and name not in shown and len(shown) < 15:
+                shown.add(name)
+                job.add(f"  CONFLICT {name} ×{copies}({hashes} 版本)")
+        self.emit(job, f"\n[FLOW-E] 完整矩陣:{out}(衝突組需人審定 canonical;冗餘組可安全去重)")
+
+    def act_flow_f_data(self, job: Job):
+        """FLOW-F · 資料資產封存計畫(唯讀)。"""
+        dl = Path(os.environ.get("VIA_AUDIT_SRC",
+                                 str(Path.home() / "Downloads" / "VeritasIntelligenceAnalytics")))
+        lines = ["[FLOW-F] 本機資料資產封存計畫(不進 git):"]
+        targets = [("marketflow 資料湖", dl / "_via_marketflow_data"),
+                   ("ICON_FORGE 主控資料", dl / "functional modules" / "VAP" / "ICON_FORGE"),
+                   ("外部資料 vault", dl / "_viam_external_vault")]
+        total = 0.0
+        for label, p in targets:
+            if p.is_dir():
+                mb = sum(f.stat().st_size for f in p.rglob("*") if f.is_file()) / 1048576
+                total += mb
+                lines.append(f"  {label}: {mb:,.0f} MB · {p}")
+            else:
+                lines.append(f"  {label}: ─ 不存在")
+        big = [f for f in self.repo.rglob("*")
+               if f.is_file() and f.stat().st_size > 45 * 1048576 and ".git" not in f.parts]
+        lines.append(f"  repo 內本機巨檔(local-only): {len(big)} 檔")
+        for f in big[:10]:
+            lines.append(f"    {f.stat().st_size/1048576:,.0f} MB · {f.relative_to(self.repo)}")
+        lines.append(f"  合計約 {total:,.0f} MB → 建議:壓縮封存到外接碟/雲備份,git 不收")
+        self.emit(job, "\n".join(lines))
+
     def act_tool(self, job: Job, name: str):
         opt = self.sm / "VIA_Optimizer_Suite"
         self.rpt.mkdir(parents=True, exist_ok=True)
@@ -400,6 +592,12 @@ ACTIONS = {
     "vrn_run": ("VRN · 實彈 No-OCR(自動選最新 PDF)", "act_vrn_run"),
     "revival": ("VRN · 復健參數檢查(14 項)", "act_revival_check"),
     "tree_audit": ("Downloads 樹總檢察(唯讀 · 背景)", "act_tree_audit"),
+    "flow_a_ssot": ("FLOW-A · SSOT 指標獨立化草案", "act_flow_a_ssot"),
+    "flow_b_inbox": ("FLOW-B · 待分類箱提案(611檔)", "act_flow_b_inbox"),
+    "flow_c_differs": ("FLOW-C · DIFFERS 裁決提案", "act_flow_c_differs"),
+    "flow_d_unit03": ("FLOW-D · UNIT03 管線狀態", "act_flow_d_unit03"),
+    "flow_e_hydra": ("FLOW-E · Hydra 淨化掃描", "act_flow_e_hydra"),
+    "flow_f_data": ("FLOW-F · 資料資產封存計畫", "act_flow_f_data"),
     "audit": ("SafeAudit 磁碟稽核(無刪除)", ("act_tool", "audit")),
     "panorama": ("FirstSight 全景矩陣(唯讀)", ("act_tool", "panorama")),
     "polyglot": ("Polyglot AIO(僅報告)", ("act_tool", "polyglot")),
