@@ -1,3 +1,3 @@
 @echo off
-rem VIA Master Engine: VMT SuperBOM family orchestrator (graceful-skip on missing deps)
-py "%~dp0..\supportive modules\VIA_Master_Engine\via_master_engine.py" %*
+rem VIA Master Engine: VMT family orchestrator (colocated with its engines; graceful-skip on missing deps)
+py "%~dp0..\supportive modules\VMT_SuperBOM\via_master_engine.py" %*
