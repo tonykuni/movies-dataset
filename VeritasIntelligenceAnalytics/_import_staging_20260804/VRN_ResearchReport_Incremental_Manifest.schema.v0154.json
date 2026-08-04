@@ -1,0 +1,63 @@
+{
+  "$id": "VIA://VRN/ResearchReport/IncrementalManifest/v0154",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "action": {
+      "const": "APPEND_RECORD"
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "evidence": {
+      "additionalProperties": true,
+      "properties": {
+        "date_evidence_reference": {
+          "type": "string"
+        },
+        "date_evidence_type": {
+          "enum": [
+            "DIRECT_DOCUMENT_DATE",
+            "DIRECT_FILENAME_DATE",
+            "OPERATOR_OVERRIDE",
+            "CANDIDATE_ONLY",
+            "ABSENT"
+          ]
+        },
+        "operator_approved": {
+          "type": "boolean"
+        },
+        "operator_approved_record_id": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "date_evidence_type",
+        "date_evidence_reference",
+        "operator_approved"
+      ],
+      "type": "object"
+    },
+    "record": {
+      "description": "Complete active-v2 record excluding record_hash and previous_record_hash. v0154 validates this object against the active record JSON Schema.",
+      "type": "object"
+    },
+    "source_relative_path": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "source_sha256": {
+      "pattern": "^$|^[0-9a-fA-F]{64}$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "enabled",
+    "action",
+    "source_relative_path",
+    "evidence",
+    "record"
+  ],
+  "title": "VRN Research Report Incremental Manifest v0154",
+  "type": "object"
+}
