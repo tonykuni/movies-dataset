@@ -1,0 +1,332 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · 產業製程/設備/資本支出分析與發展架構 · PSU/Thermal 六雄 · 泛用模板</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--blue:#4c78a8;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--vi:#7a6daa;
+ --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg)}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5}
+.wrap{max-width:1340px;margin:0 auto;padding:0 22px 60px}
+.bar{position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50}
+/* ===== 視覺鎖定共用頁首:左識別 · 右治理/諸元 ===== */
+header{margin:14px 0 10px}
+.masthead{display:flex;gap:16px;align-items:stretch;flex-wrap:wrap;border:1px solid var(--line);border-top:2px solid var(--ink);border-radius:6px;overflow:hidden;background:var(--paper)}
+.mh-left{flex:1 1 560px;min-width:300px;padding:15px 18px 14px}
+.mh-right{flex:1 1 340px;min-width:260px;background:#1e1d1a;padding:14px 16px;display:flex;flex-direction:column;gap:10px;justify-content:flex-end}
+.kicker{font:700 9.5px 'DM Mono',monospace;letter-spacing:1.8px;color:var(--mut);text-transform:uppercase;margin-bottom:8px;line-height:1.4}
+h1{font:800 19px/1.18 'Syne',sans-serif;color:var(--ink)}h1 span{color:var(--up)}
+.sub{margin-top:8px;font:400 10.5px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut)}.sub b{color:var(--ink2)}
+.gov{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.gov .lk{font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase}
+.gov .ver{margin-left:auto;font:700 8px 'DM Mono',monospace;color:#1e1d1a;background:#c4943a;border-radius:3px;padding:2px 8px}
+.mh-right .rlab{font:700 7.5px 'DM Mono',monospace;letter-spacing:1.4px;color:#8a867d;text-transform:uppercase;border-bottom:1px solid #34322c;padding-bottom:6px}
+.params{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#34322c;border:1px solid #34322c;border-radius:4px;overflow:hidden}
+.pcell{background:#26251f;padding:7px 9px;text-align:center}
+.pcell .pn{font:800 15px 'DM Mono',monospace;color:#fff;font-variant-numeric:tabular-nums;line-height:1}
+.pcell .pk{font:600 6.5px 'DM Mono',monospace;letter-spacing:.5px;color:#a49f92;text-transform:uppercase;margin-top:4px}
+.mh-right .tags{display:flex;gap:5px;flex-wrap:wrap}
+.mh-right .tag{font:600 7px 'DM Mono',monospace;color:#cfcabf;border:1px solid #3c3a33;border-radius:3px;padding:2px 7px}
+.note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--am);border-radius:3px;padding:8px 14px;margin-bottom:12px;font:500 9px/1.6 'DM Mono',monospace;color:var(--mut)}.note b{color:var(--ink2)}
+.tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.tab{font:700 10.5px 'DM Sans','Noto Sans TC',sans-serif;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--mut);border-radius:3px;padding:7px 11px}
+.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}.tab.m{border-color:var(--vi);color:var(--vi)}.tab.m.on{background:var(--vi);color:#fff;border-color:var(--vi)}
+.sec{display:none}.sec.on{display:block}
+h2{font:800 13px 'Syne',sans-serif;color:var(--ink);margin:16px 0 4px;padding-bottom:5px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:8px}
+h2 .en{font:600 8px 'DM Mono',monospace;color:var(--mut2);letter-spacing:1px;text-transform:uppercase}
+/* 彈性卡片:內容少水平鋪滿 */
+.cogrid{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
+.co{flex:1 1 400px;background:var(--paper);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.co .ch{padding:9px 13px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.co .cn{font:800 12px 'Noto Sans TC',sans-serif;color:var(--ink)}
+.grp{font:700 7px 'DM Mono',monospace;color:#fff;border-radius:3px;padding:1px 6px}.g-TH{background:var(--up)}.g-PW{background:var(--blue)}
+.co .cc{font:700 8px 'DM Mono',monospace;color:var(--vi)}
+.co .cb{padding:9px 13px}
+.kv{display:flex;gap:8px;margin-bottom:6px}.kv .k{font:700 7.5px 'DM Mono',monospace;color:var(--mut);text-transform:uppercase;min-width:66px;flex:none;padding-top:2px}
+.kv .v{font:500 10px 'Noto Sans TC',sans-serif;color:var(--ink2)}
+.capex{font:700 11px 'DM Mono',monospace;color:var(--up)}
+.chips{display:flex;gap:4px;flex-wrap:wrap}.chip{font:600 8.5px 'Noto Sans TC',sans-serif;background:var(--soft);border-radius:3px;padding:1px 7px;color:var(--ink2)}
+.chip.eq{background:#eef3f7;color:var(--blue)}.chip.pr{background:#f7ecea;color:var(--up)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-top:12px}
+.hd2{font:800 11px 'Syne',sans-serif;padding:10px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+table{width:100%;border-collapse:collapse;font:500 10px 'DM Mono',monospace}
+th{font:700 8px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.4px;color:var(--mut);text-align:left;padding:7px 8px;border-bottom:2px solid var(--ink);background:var(--paper2)}
+td{padding:6px 8px;border-bottom:1px solid var(--soft);vertical-align:top}tr:hover td{background:var(--paper2)}
+.nm{font:700 11px 'Noto Sans TC',sans-serif;color:var(--ink)}.code{font:700 9px 'DM Mono',monospace;color:var(--vi)}.ext{font:600 8px 'DM Mono',monospace;color:var(--mut2)}
+.up{color:var(--up);font-weight:700}.num-c{text-align:right;font-variant-numeric:tabular-nums}
+.est{font:600 7px 'DM Mono',monospace;color:var(--am);border:1px solid var(--am);border-radius:3px;padding:0 4px}
+.flow{display:flex;gap:0;flex-wrap:wrap;padding:12px 14px}
+.fstep{flex:1;min-width:150px;border:1px solid var(--line);border-left:4px solid var(--teal);border-radius:4px;padding:9px 11px;margin:3px}
+.fstep .g{font:800 10px 'Noto Sans TC',sans-serif;color:var(--ink)}.fstep .m{font:600 8px 'DM Mono',monospace;color:var(--mut);margin-top:3px}
+.fstep .a{font:700 9px 'DM Mono',monospace;color:var(--up);margin-top:3px}.fstep .c{font:700 8px 'DM Mono',monospace;color:var(--vi);margin-top:3px}
+.step{border:1px solid var(--line);border-left:4px solid var(--vi);border-radius:5px;padding:11px 14px;margin-top:10px;background:var(--paper)}
+.step .st{font:800 11px 'Noto Sans TC',sans-serif;color:var(--ink)}.step .sg{font:600 9px 'Noto Sans TC',sans-serif;color:var(--mut);margin:3px 0 6px}
+.step .sp{font:500 9px/1.6 'DM Mono',monospace;color:var(--ink2);background:var(--paper2);border:1px solid var(--soft);border-radius:4px;padding:8px 10px;white-space:pre-wrap}
+.btn{font:700 8.5px 'DM Mono',monospace;cursor:pointer;border:1px solid var(--ink);background:transparent;color:var(--ink);border-radius:3px;padding:6px 11px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:11px 14px;border-top:1px solid var(--line);align-items:center}
+.tk{font:500 9px 'DM Mono',monospace;color:var(--mut)}
+.pdf{position:fixed;top:12px;right:14px;z-index:999;background:var(--ink);color:#fff;border:none;border-radius:5px;padding:7px 13px;font:700 9px 'DM Mono',monospace;cursor:pointer}
+@media print{@page{size:A4 landscape;margin:8mm}.pdf,.tabs,.toolbar{display:none!important}.sec{display:block!important}}
+</style></head><body>
+<div class="bar"></div><button class="pdf" onclick="window.print()">⤓ PDF</button>
+<div class="wrap">
+<header>
+ <div class="masthead">
+  <div class="mh-left">
+   <div class="kicker">VERITAS INTELLIGENCE · INDUSTRY PROCESS/EQUIPMENT/CAPEX ANALYSIS &amp; DEVELOPMENT ARCHITECTURE · PSU/THERMAL</div>
+   <h1>PSU/Thermal 六雄 · 泛用模板<br><span>產業製程/設備/資本支出分析與發展架構</span></h1>
+   <p class="sub">最強實例:<b>台達電/奇鋐/雙鴻/健策/康舒/光寶科</b> 的製程世代 × 關鍵設備 × 資本支出,再拆成<b>方法論泛用模板 + 三步驟 AI 客製</b>,可橫向擴張到任意族群。<b>SAP MM/PP/SD/CO/FA 僅作 SSOT 對齊,一切以 VIA 自研邏輯編碼為主</b>。資本支出為法說會公開資料,非投資建議。</p>
+  </div>
+  <div class="mh-right">
+   <div class="gov"><span class="lk">🔒 CONVERGED · VIA-CODED · SAP-ALIGN-ONLY</span><span class="ver">CPE v0100</span></div>
+   <div class="rlab">諸元鎖定 · Locked Parameters</div>
+   <div class="params" id="params"></div>
+   <div class="tags"><span class="tag">process×equip×capex</span><span class="tag">3-step AI custom</span><span class="tag">append-only</span></div>
+  </div>
+ </div>
+</header>
+<div class="note">📐 五分頁:① 六雄製程/設備/資本支出 ② 發展架構(5世代)③ 財務模型 ④ 方法論+三步驟AI客製 ⑤ SAP對齊+編碼。SAP 僅對齊、VIA 為主。EPS 券商估值 <span class="est">EST</span>。</div>
+<div class="tabs" id="tabs"></div>
+
+<div class="sec on" id="sec-co">
+ <h2>① 六雄:製程 × 設備 × 資本支出 <span class="en">Process × Equipment × Capex</span></h2>
+ <div class="cogrid" id="cogrid"></div>
+</div>
+
+<div class="sec" id="sec-dev">
+ <h2>② 發展架構:製程世代 × 設備 × 資本支出 <span class="en">Development architecture</span></h2>
+ <div class="card"><div class="flow" id="dev"></div></div>
+ <div class="note">資本支出驅動產能:奇鋐 320 億→水冷板月產能 20→100 萬組;台達電 ~500 億→泰國散熱新產能;健策→均熱片/MLCP。製程越晚代,ASP 與資本門檻越高。</div>
+</div>
+
+<div class="sec" id="sec-fin">
+ <h2>③ 財務模型(券商估值 EST · PER 可編輯)<span class="en">Financial model</span></h2>
+ <div class="card"><div class="hd2">估值試算<span style="display:flex;gap:6px;align-items:center"><span class="tk">套PER:</span><input class="btn" id="perIn" value="30" style="width:56px;text-align:right"><button class="btn" id="applyPer">套用</button></span></div>
+  <div style="overflow-x:auto"><table><thead><tr><th>公司</th><th>族群</th><th>EPS(券商)</th><th>PER</th><th>目標(EPS26×PER)</th><th>資本支出</th></tr></thead><tbody id="fin"></tbody></table></div>
+  <div class="toolbar"><span class="tk">EPS 為法說/券商公開估值;康舒/光寶科取歷史框架。目標價=EPS26×PER,非投資建議。</span></div></div>
+</div>
+
+<div class="sec" id="sec-mth">
+ <h2>④ 方法論泛用模板 + 三步驟 AI 客製 <span class="en">Methodology · 3-step AI customization</span></h2>
+ <div class="note">泛用型:此製程/設備/資本支出框架可套任意族群(記憶體/CoWoS/機器人…)。擴張只需在 via_params.json 新增(只增不減)+ 三步驟 AI Prompt + PowerShell 同步(核可制)。</div>
+ <div id="steps"></div>
+</div>
+
+<div class="sec" id="sec-sap">
+ <h2>⑤ SAP 對齊(僅 SSOT)+ 全站編碼 <span class="en">SAP align-only · VIA primary</span></h2>
+ <div class="card"><div class="hd2">SAP MM/PP/SD/CO/FA → SSOT(僅對齊,SAP 碼不動,VIA 為主)</div>
+  <table><thead><tr><th>SAP 模組</th><th>VIA SSOT</th><th>對齊說明</th></tr></thead><tbody id="sap"></tbody></table>
+  <div class="toolbar tk" id="sapNote"></div></div>
+ <div class="card"><div class="hd2">製程/設備 VIA 編碼(自研為主)<span class="tk" id="codeCnt"></span></div>
+  <div style="overflow-x:auto"><table><thead><tr><th>類型</th><th>公司</th><th>名稱</th><th>VIA 碼</th></tr></thead><tbody id="codes"></tbody></table></div>
+  <div class="toolbar"><button class="btn" id="expCsv">匯出編碼 CSV</button></div></div>
+</div>
+
+<div class="sec" id="sec-bom">
+ <h2>⑥ SAP Super BOM · 電源/散熱龍頭全模組對齊 <span class="en">Power/Thermal × SAP MM/PP/SD/SCM/CO/BOM/PLM</span></h2>
+ <div class="note">已整合 <b>電源/散熱龍頭 × SAP Super BOM</b> 模板(SAP 全模組對齊、五家產品、全球供應商/客戶、生產基地)。100% 尊重 SAP 既有用語、只對齊不改。</div>
+ <div class="card" style="padding:0"><iframe id="bomFrame" title="SAP Super BOM" style="width:100%;height:1500px;border:0;display:block;background:#f5f4f0"></iframe></div>
+</div>
+
+<div class="sec" id="sec-peer">
+ <h2>⑦ 全同業清單 · 國內外 · 上市/未上市 · AI 產品佔比 <span class="en">Peers · Listed/Unlisted · AI Revenue Mix</span></h2>
+ <div class="note">收斂 <b>PSU/Thermal Solution</b> 全球同業:電源(PW)·散熱(TH)。AI 佔比為公開法說/券商估算框架(示意),非投資建議。只增不減。</div>
+ <div class="card"><div class="hd2">同業矩陣<span style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><span class="tk" id="peerCnt"></span><button class="btn" id="fPW">電源 PW</button><button class="btn" id="fTH">散熱 TH</button><button class="btn" id="fAll">全部</button></span></div>
+  <div style="overflow-x:auto"><table><thead><tr><th>公司</th><th>三代號 本地/BBG/國際</th><th>地區</th><th>上市</th><th>族群分類 主›次</th><th>主力產品</th><th>AI%</th></tr></thead><tbody id="peerRows"></tbody></table></div>
+  <div class="toolbar"><button class="btn" id="expPeer">匯出同業 CSV</button><span class="tk">AI% 為示意框架;未上市以 — 表示。</span></div>
+ </div>
+</div>
+
+<div class="sec" id="sec-cust">
+ <h2>⑧ 全客戶清單 <span class="en">Customer List · aligned to SAP SD</span></h2>
+ <div class="note">供應鏈下游客戶(雲端/OEM/ODM/IC 設計),依對應電源/散熱供應商。公開資訊整理,對齊 SAP SD。</div>
+ <div class="card"><div style="overflow-x:auto"><table><thead><tr><th>客戶</th><th>類型</th><th>地區</th><th>採購項目</th><th>對應供應商</th></tr></thead><tbody id="custRows"></tbody></table></div>
+  <div class="toolbar"><button class="btn" id="expCust">匯出客戶 CSV</button><span class="tk" id="custCnt"></span></div></div>
+</div>
+
+<div class="sec" id="sec-sup">
+ <h2>⑨ 全供應商清單 <span class="en">Supplier List · aligned to SAP MM</span></h2>
+ <div class="note">上游材料/零組件/設備供應商,對齊 SAP MM。公開資訊整理。</div>
+ <div class="card"><div style="overflow-x:auto"><table><thead><tr><th>供應商</th><th>類型</th><th>地區</th><th>供應材料/零組件</th><th>供應對象</th></tr></thead><tbody id="supRows"></tbody></table></div>
+  <div class="toolbar"><button class="btn" id="expSup">匯出供應商 CSV</button><span class="tk" id="supCnt"></span></div></div>
+</div>
+
+</div>
+<script>
+const D={"companies": [{"name": "台達電 2308", "group": "電源", "capex": "2025~461億 → 2026 +8~10%(~500億)", "eps": "2025=23.14, 26E=46, 27E=63", "process": ["HVDC/800V電源架構", "液對氣Sidecar→CDU(門檻更高)", "SST固態變壓器", "SOFC燃料電池(85%效率)"], "equipment": ["SMT/電源模組產線", "液冷組裝線", "泰國散熱新產能(2026Q1投產)"], "bases": ["台灣", "泰國", "印度(26.7億3廠)", "美國", "中國"], "kpi": "水冷佔比2024<1%→2025 8%(Q3 11%)", "code": "VIA-CO-28E538", "capex_code": "VIA-CPX-8562F4"}, {"name": "奇鋐 3017", "group": "散熱", "capex": "2025 150億 + 2026 170億 = 320億", "eps": "2025=49.17, 26E=93.75", "process": ["擴散接合Diffusion Bonding", "微通道水冷板MCCP(試產)", "兩相式液冷(+15%效率)"], "equipment": ["水冷板產線 20→100萬組/月", "分歧管 1000→7000套/月", "機箱 40→60萬台/月", "越南12廠", "AI Agent智能工廠"], "bases": ["台灣", "越南(56萬㎡·逾13億美元)", "中國(武漢/東莞/深圳)"], "kpi": "2025營收+94.59% 毛利25.81% 營益19.73%", "code": "VIA-CO-B26A5F", "capex_code": "VIA-CPX-17C5F4"}, {"name": "雙鴻 3324", "group": "散熱", "capex": "台灣為主(法說公開)", "eps": "26E=54.15, 27E=77.16", "process": ["水冷板", "CDU冷卻液分配單元", "分歧管Manifold", "均熱片(供AMD)"], "equipment": ["液冷系統產線", "均熱片產線"], "bases": ["台灣"], "kpi": "液冷全套系統", "code": "VIA-CO-3DC07B", "capex_code": "VIA-CPX-4D6600"}, {"name": "健策 3653", "group": "散熱", "capex": "擴均熱片/MLCP產能", "eps": "26E=59.02, 27E=119.99", "process": ["均熱片Heat Spreader", "Lid/Stiffener", "MLCP微通道蓋板", "導線架Leadframe"], "equipment": ["沖壓+精密加工", "電鍍鍍金線", "MLCP微通道蝕刻"], "bases": ["台灣"], "kpi": "均熱片GM 40%+;VR200 ASP+3x", "code": "VIA-CO-ADDEA6", "capex_code": "VIA-CPX-8E3394"}, {"name": "康舒 6282", "group": "電源", "capex": "伺服器電源擴產", "eps": "框架(取歷史)", "process": ["伺服器電源PSU", "UPS不斷電", "工業電源"], "equipment": ["SMT貼片", "磁性元件繞線", "灌膠Potting", "老化測試Burn-in"], "bases": ["台灣", "中國"], "kpi": "AI電源受惠", "code": "VIA-CO-A7FF4E", "capex_code": "VIA-CPX-9AC662"}, {"name": "光寶科 2301", "group": "電源", "capex": "2026 110億", "eps": "2025淨利151億;框架", "process": ["11kW Power Shelf", "800V VDC", "SST固態變壓器"], "equipment": ["電源模組產線", "休士頓/美國擴產"], "bases": ["台灣", "中國", "美國"], "kpi": "2025營收1660億;AI佔比2026>30%", "code": "VIA-CO-61E98A", "capex_code": "VIA-CPX-40E8C9"}], "dev_arch": [{"gen": "氣冷 Air", "equip": "鋁擠型/CNC/鏟齒Skiving/回焊", "capex": "低", "asp": "低"}, {"gen": "單相水冷板 Single-phase", "equip": "CNC/真空硬焊/擴散接合", "capex": "中(奇鋐320億級)", "asp": "中"}, {"gen": "MCCP 微通道", "equip": "微通道加工/鍍金線", "capex": "中高", "asp": "中高"}, {"gen": "均熱片 Lid/MLCP", "equip": "沖壓/精密加工/微通道蝕刻/鍍金", "capex": "高(健策級)", "asp": "↑↑↑ 3~7x"}, {"gen": "兩相液冷 Two-phase", "equip": "兩相模組/幫浦/CDU", "capex": "高·研發中", "asp": "↑↑ 未來"}], "ai_3step": [{"step": "① 領域邊界注入", "goal": "鎖定新族群的製程/設備/資本支出特徵", "prompt": "[ROLE] VIA 產業分析架構師。[TASK] 在不改 SAP/MSP 欄位前提,定義 <族群> 的核心製程世代、關鍵設備、資本支出動因,對應 VIA 自研編碼(VIA-PRC/EQ/CPX)。僅輸出領域映射,先不編碼。"}, {"step": "② SSOT 資料管線", "goal": "把新族群資料接上 VIA SSOT(SAP 僅對齊)", "prompt": "[TASK] 建立資料管線:把 <族群> 的製程→設備→資本支出映射到 VIA SSOT;SAP MM/PP/SD/CO/FA 僅作對齊參照(不改)。定義券商/法說資料的擷取與品質閘門。"}, {"step": "③ Auto Coding + HTML", "goal": "自動編碼並生成平台", "prompt": "[TASK] 作為 VIA-ACG:為 <族群> 全實體生成決定性 VIA 碼(製程/設備/資本支出/公司),寫入 via_params.json(只增不減),並輸出 Visual Lock HTML 平台。核可制:未核可僅 dry-run。"}], "sap_align": {"note": "SAP 相關僅為對齊 SSOT 之用;一切以 VIA 自研邏輯編碼為主,SAP 碼不動", "modules": [{"sap": "MM 物料管理", "ssot": "SSOT-PROCUREMENT", "align": "供應商/採購/物料 → VIA 對齊"}, {"sap": "PP 生產規劃", "ssot": "SSOT-SCHEDULE", "align": "Routing/Work Center → VIA 製程/設備軸對齊"}, {"sap": "SD 銷售", "ssot": "SSOT-STAKEHOLDER", "align": "客戶/ASP → VIA 對齊"}, {"sap": "CO 成本", "ssot": "SSOT-COST", "align": "成本/資本支出 → VIA 資本支出軸對齊"}, {"sap": "FA/FI 財務", "ssot": "SSOT-FINANCE", "align": "財報/折舊 → VIA 財務模型對齊"}]}, "note": "資本支出/產能為券商法說會公開資料;VIA 自研編碼為主,SAP 僅對齊 SSOT", "proc_codes": [{"company": "台達電 2308", "name": "HVDC/800V電源架構", "code": "VIA-PRC-E6F4AB"}, {"company": "台達電 2308", "name": "液對氣Sidecar→CDU(門檻更高)", "code": "VIA-PRC-2A4E4E"}, {"company": "台達電 2308", "name": "SST固態變壓器", "code": "VIA-PRC-C71665"}, {"company": "台達電 2308", "name": "SOFC燃料電池(85%效率)", "code": "VIA-PRC-A9C27C"}, {"company": "奇鋐 3017", "name": "擴散接合Diffusion Bonding", "code": "VIA-PRC-0CD3B7"}, {"company": "奇鋐 3017", "name": "微通道水冷板MCCP(試產)", "code": "VIA-PRC-21B80F"}, {"company": "奇鋐 3017", "name": "兩相式液冷(+15%效率)", "code": "VIA-PRC-B79809"}, {"company": "雙鴻 3324", "name": "水冷板", "code": "VIA-PRC-C20827"}, {"company": "雙鴻 3324", "name": "CDU冷卻液分配單元", "code": "VIA-PRC-35C9C1"}, {"company": "雙鴻 3324", "name": "分歧管Manifold", "code": "VIA-PRC-9F1814"}, {"company": "雙鴻 3324", "name": "均熱片(供AMD)", "code": "VIA-PRC-C3828A"}, {"company": "健策 3653", "name": "均熱片Heat Spreader", "code": "VIA-PRC-1606ED"}, {"company": "健策 3653", "name": "Lid/Stiffener", "code": "VIA-PRC-EBADA7"}, {"company": "健策 3653", "name": "MLCP微通道蓋板", "code": "VIA-PRC-5B6636"}, {"company": "健策 3653", "name": "導線架Leadframe", "code": "VIA-PRC-7EB109"}, {"company": "康舒 6282", "name": "伺服器電源PSU", "code": "VIA-PRC-4EE161"}, {"company": "康舒 6282", "name": "UPS不斷電", "code": "VIA-PRC-2B5558"}, {"company": "康舒 6282", "name": "工業電源", "code": "VIA-PRC-35B38E"}, {"company": "光寶科 2301", "name": "11kW Power Shelf", "code": "VIA-PRC-ED1822"}, {"company": "光寶科 2301", "name": "800V VDC", "code": "VIA-PRC-37136B"}, {"company": "光寶科 2301", "name": "SST固態變壓器", "code": "VIA-PRC-C71665"}], "eq_codes": [{"company": "台達電 2308", "name": "SMT/電源模組產線", "code": "VIA-EQ-0E8803"}, {"company": "台達電 2308", "name": "液冷組裝線", "code": "VIA-EQ-B574C0"}, {"company": "台達電 2308", "name": "泰國散熱新產能(2026Q1投產)", "code": "VIA-EQ-14E628"}, {"company": "奇鋐 3017", "name": "水冷板產線 20→100萬組/月", "code": "VIA-EQ-D2DAFB"}, {"company": "奇鋐 3017", "name": "分歧管 1000→7000套/月", "code": "VIA-EQ-7F7EC8"}, {"company": "奇鋐 3017", "name": "機箱 40→60萬台/月", "code": "VIA-EQ-F4B30D"}, {"company": "奇鋐 3017", "name": "越南12廠", "code": "VIA-EQ-129482"}, {"company": "奇鋐 3017", "name": "AI Agent智能工廠", "code": "VIA-EQ-C850F6"}, {"company": "雙鴻 3324", "name": "液冷系統產線", "code": "VIA-EQ-0C768F"}, {"company": "雙鴻 3324", "name": "均熱片產線", "code": "VIA-EQ-C851CD"}, {"company": "健策 3653", "name": "沖壓+精密加工", "code": "VIA-EQ-D8CF23"}, {"company": "健策 3653", "name": "電鍍鍍金線", "code": "VIA-EQ-A23ABE"}, {"company": "健策 3653", "name": "MLCP微通道蝕刻", "code": "VIA-EQ-9DF14A"}, {"company": "康舒 6282", "name": "SMT貼片", "code": "VIA-EQ-566B34"}, {"company": "康舒 6282", "name": "磁性元件繞線", "code": "VIA-EQ-5987B0"}, {"company": "康舒 6282", "name": "灌膠Potting", "code": "VIA-EQ-58FB5F"}, {"company": "康舒 6282", "name": "老化測試Burn-in", "code": "VIA-EQ-B319C1"}, {"company": "光寶科 2301", "name": "電源模組產線", "code": "VIA-EQ-4F94BE"}, {"company": "光寶科 2301", "name": "休士頓/美國擴產", "code": "VIA-EQ-E05883"}]};
+const $=id=>document.getElementById(id);
+const gcls=g=>g.startsWith("散熱")?"TH":"PW";
+const TABS=[["co","① 六雄製程/設備/資本"],["dev","② 發展架構"],["fin","③ 財務模型"],["mth","④ 方法論+AI客製"],["sap","⑤ SAP對齊+編碼"],["bom","⑥ Super BOM"],["peer","⑦ 同業清單+AI%"],["cust","⑧ 客戶清單"],["sup","⑨ 供應商清單"]];
+let cur="co";
+// 諸元鎖定:自資料計算(參數邏輯,append-only)
+(function(){
+ const PAR=[["companies",D.companies.length,"六雄"],["proc",D.proc_codes.length,"製程碼"],["equip",D.eq_codes.length,"設備碼"],
+  ["gens",D.dev_arch.length,"製程世代"],["sap",D.sap_align.modules.length,"SAP對齊"],["codes",D.proc_codes.length+D.eq_codes.length,"VIA碼"]];
+ $("params").innerHTML=PAR.map(p=>`<div class="pcell"><div class="pn">${p[1]}</div><div class="pk">${p[2]}</div></div>`).join("");
+})();
+$("tabs").innerHTML=TABS.map(([id,n])=>`<div class="tab ${id==='mth'?'m':''} ${id===cur?'on':''}" data-id="${id}">${n}</div>`).join("");
+$("tabs").querySelectorAll(".tab").forEach(t=>t.onclick=()=>{cur=t.dataset.id;$("tabs").querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x.dataset.id===cur));document.querySelectorAll(".sec").forEach(s=>s.classList.toggle("on",s.id==="sec-"+cur));if(cur==="bom"){var bf=$("bomFrame");if(bf&&!bf.getAttribute("src"))bf.setAttribute("src","modules/PowerThermal_SAP_SuperBOM.html");}});
+
+// ① 六雄卡片(彈性水平鋪滿)
+$("cogrid").innerHTML=D.companies.map(c=>`<div class="co"><div class="ch"><span class="cn"><span class="grp g-${c.group==='散熱'?'TH':'PW'}">${c.group}</span> ${c.name}</span><span class="cc">${c.code}</span></div>
+ <div class="cb">
+  <div class="kv"><span class="k">資本支出</span><span class="v capex">${c.capex}</span></div>
+  <div class="kv"><span class="k">EPS</span><span class="v">${c.eps}</span></div>
+  <div class="kv"><span class="k">製程</span><span class="v"><span class="chips">${c.process.map(x=>`<span class="chip pr">${x}</span>`).join("")}</span></span></div>
+  <div class="kv"><span class="k">關鍵設備</span><span class="v"><span class="chips">${c.equipment.map(x=>`<span class="chip eq">${x}</span>`).join("")}</span></span></div>
+  <div class="kv"><span class="k">生產基地</span><span class="v"><span class="chips">${c.bases.map(x=>`<span class="chip">${x}</span>`).join("")}</span></span></div>
+  <div class="kv"><span class="k">關鍵指標</span><span class="v" style="color:var(--mut)">${c.kpi}</span></div>
+ </div></div>`).join("");
+
+// ② 發展架構
+$("dev").innerHTML=D.dev_arch.map(g=>`<div class="fstep"><div class="g">${g.gen}</div><div class="m">設備:${g.equip}</div><div class="a">ASP ${g.asp}</div><div class="c">資本支出 ${g.capex}</div></div>`).join("");
+
+// ③ 財務模型
+const FIN=[["台達電 2308","電源",23.14,46,63],["奇鋐 3017","散熱",49.17,93.75,null],["雙鴻 3324","散熱",null,54.15,77.16],
+ ["健策 3653","散熱",null,59.02,119.99],["康舒 6282","電源",null,null,null],["光寶科 2301","電源",null,null,null]];
+const CAPEX={"台達電 2308":"~500億","奇鋐 3017":"320億(2年)","雙鴻 3324":"台灣為主","健策 3653":"擴均熱片/MLCP","康舒 6282":"擴產","光寶科 2301":"110億"};
+let per=30;
+function renderFin(){$("fin").innerHTML=FIN.map(f=>{const t=f[3]?f[3]*per:null;
+ return `<tr><td class="nm">${f[0]}</td><td><span class="grp g-${f[1]==='散熱'?'TH':'PW'}">${f[1]}</span></td>
+  <td>25=${f[2]||'—'} · 26=${f[3]||'—'} ${f[3]?'<span class="est">EST</span>':''} · 27=${f[4]||'—'}</td>
+  <td class="num-c">${per}</td><td class="num-c up">${t?Math.round(t).toLocaleString():'—'}</td><td class="capex">${CAPEX[f[0]]}</td></tr>`;}).join("");}
+renderFin();
+$("applyPer").onclick=()=>{per=parseFloat($("perIn").value)||30;renderFin();};
+
+// ④ 方法論三步驟
+$("steps").innerHTML=D.ai_3step.map((s,i)=>`<div class="step"><div class="st">${s.step}</div><div class="sg">目標:${s.goal}</div><div class="sp">${s.prompt}</div></div>`).join("");
+
+// ⑤ SAP 對齊 + 編碼
+$("sap").innerHTML=D.sap_align.modules.map(m=>`<tr><td class="nm">${m.sap}</td><td class="code" style="color:var(--teal)">${m.ssot}</td><td style="font-family:'Noto Sans TC';color:var(--mut)">${m.align}</td></tr>`).join("");
+$("sapNote").textContent=D.sap_align.note;
+const allc=[...D.proc_codes.map(x=>["製程",x.company,x.name,x.code]),...D.eq_codes.map(x=>["設備",x.company,x.name,x.code])];
+$("codes").innerHTML=allc.map(c=>`<tr><td><span class="est" style="color:${c[0]==='製程'?'var(--up)':'var(--blue)'};border-color:${c[0]==='製程'?'var(--up)':'var(--blue)'}">${c[0]}</span></td><td class="tk">${c[1]}</td><td style="font-family:'Noto Sans TC'">${c[2]}</td><td class="code">${c[3]}</td></tr>`).join("");
+$("codeCnt").textContent=allc.length+" 碼";
+$("expCsv").onclick=()=>{let o="Type,Company,Name,VIA_Code\n";allc.forEach(c=>o+=`${c[0]},"${c[1]}","${c[2]}",${c[3]}\n`);const b=new Blob(["\ufeff"+o],{type:"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="VIA_CPE_Codes.csv";a.click();};
+
+// ⑦ 全同業清單 (國內外 · 上市/未上市 · 三代號 · 族群分類 · AI 佔比)
+// [name, local, bbg, intl, region, listing, mainGroup, subGroup, products, ai%]
+const PEERS=[
+ ["台達電","2308","2308 TT","2308.TW","台灣","上市","電源","伺服器電源/液冷","HVDC/Power Shelf/CDU","~30%"],
+ ["光寶科","2301","2301 TT","2301.TW","台灣","上市","電源","伺服器電源/Power Shelf","11kW Power Shelf/800V","~30%"],
+ ["康舒","6282","6282 TT","6282.TW","台灣","上市","電源","伺服器電源/UPS","PSU/UPS/工業電源","中"],
+ ["群電","6412","6412 TT","6412.TW","台灣","上市","電源","伺服器電源","伺服器/PC 電源","中"],
+ ["全漢","3015","3015 TT","3015.TW","台灣","上市","電源","伺服器電源","伺服器/工業電源","中"],
+ ["僑威","5305","5305 TT","5305.TWO","台灣","上櫃","電源","電源供應器","PSU","低"],
+ ["Vertiv","VRT","VRT US","VRT","美國","上市","電源","資料中心電力/液冷","電力+液冷一體方案","高"],
+ ["Vicor","VICR","VICR US","VICR","美國","上市","電源","高密度電源模組","NBM/垂直供電","高"],
+ ["Monolithic Power","MPWR","MPWR US","MPWR","美國","上市","電源","電源 IC","伺服器電源 IC","高"],
+ ["Schneider Electric","SU","SU FP","SBGSY","法國","上市","電源","資料中心電力/冷卻","電力管理/冷卻","中"],
+ ["Eaton","ETN","ETN US","ETN","美國","上市","電源","電力管理","資料中心電力","中"],
+ ["奇鋐","3017","3017 TT","3017.TW","台灣","上市","散熱","液冷系統","水冷板/CDU/機箱","~50%"],
+ ["雙鴻","3324","3324 TT","3324.TW","台灣","上市","散熱","液冷系統","水冷板/CDU/均熱片","~45%"],
+ ["健策","3653","3653 TT","3653.TW","台灣","上市","散熱","均熱片/Lid","均熱片/Lid/MLCP","~40%"],
+ ["建準","2421","2421 TT","2421.TW","台灣","上市","散熱","風扇/馬達","散熱風扇/馬達","中"],
+ ["力致","3483","3483 TT","3483.TW","台灣","上市","散熱","熱管/均熱板","散熱模組/均熱板","中"],
+ ["泰碩","3338","3338 TT","3338.TW","台灣","上市","散熱","熱管/均熱板","熱管/VC","中"],
+ ["元山","6275","6275 TT","6275.TWO","台灣","上櫃","散熱","散熱模組/水泵","水泵/散熱模組","中"],
+ ["高力","8996","8996 TT","8996.TW","台灣","上市","散熱","熱交換器","板式熱交換器/CDU","中"],
+ ["業強","6124","6124 TT","6124.TWO","台灣","上櫃","散熱","散熱模組","散熱模組","低"],
+ ["尼得科超眾","—","—","—","台灣","未上市","散熱","熱管/VC","熱管/均熱板(Nidec 併)","—"],
+ ["nVent","NVT","NVT US","NVT","美國","上市","散熱","液冷系統","液冷/機櫃熱管理","中"],
+ ["Asetek","ASTK","ASTK NO","ASTK.OL","丹麥","上市","散熱","液冷系統","DLC 液冷","中"],
+ ["Boyd Corporation","—","—","—","美國","未上市","散熱","液冷/TIM","液冷/熱介面","—"],
+ ["CoolIT Systems","—","—","—","加拿大","未上市","散熱","液冷系統","DLC 直接液冷","—"],
+ ["Motivair","—","—","—","美國","未上市","散熱","液冷系統","CDU/液冷","—"],
+ ["JetCool","—","—","—","美國","未上市","散熱","微射流液冷","微射流液冷","—"],
+ ["ZutaCore","—","—","—","以色列","未上市","散熱","兩相式液冷","兩相式液冷","—"],
+ ["LiquidStack","—","—","—","美國","未上市","散熱","浸沒式液冷","浸沒式液冷","—"]
+];
+let pf="all";
+function renderPeer(){
+ const rows=PEERS.filter(p=>pf==="all"||p[6]===(pf==="PW"?"電源":"散熱"));
+ const key=p=>p[6]+" › "+p[7];
+ const order=[];const seen={};rows.forEach(p=>{const k=key(p);if(!seen[k]){seen[k]=1;order.push(k);}});
+ let html="";order.forEach(k=>{
+  const grp=rows.filter(p=>key(p)===k);const th=grp[0][6]==="散熱";
+  html+=`<tr><td colspan="7" style="background:${th?'#fbf1ef':'#eef3f7'};padding:5px 9px;font:800 9.5px 'Noto Sans TC',sans-serif;color:${th?'var(--up)':'var(--blue)'}">▸ ${k} · ${grp.length} 家</td></tr>`;
+  grp.forEach(p=>{const hi=/高|~[45]/.test(p[9]);
+   html+=`<tr><td class="nm">${p[0]}</td><td><span class="mono">${p[1]}</span><div class="tk" style="font-size:7px">${p[2]} · ${p[3]}</div></td><td>${p[4]}</td><td><span class="est" style="color:${p[5]==='上市'?'var(--down)':p[5]==='上櫃'?'var(--teal)':'var(--mut2)'};border-color:${p[5]==='上市'?'var(--down)':p[5]==='上櫃'?'var(--teal)':'var(--mut2)'}">${p[5]}</span></td><td><span class="grp g-${th?'TH':'PW'}">${p[6]}</span> <span class="tk">${p[7]}</span></td><td class="tk">${p[8]}</td><td style="font-weight:700;color:${hi?'var(--up)':'var(--ink2)'}">${p[9]}</td></tr>`;});
+ });
+ $("peerRows").innerHTML=html;$("peerCnt").textContent=rows.length+" / "+PEERS.length+" 家";}
+renderPeer();
+$("fPW").onclick=()=>{pf="PW";renderPeer();};$("fTH").onclick=()=>{pf="TH";renderPeer();};$("fAll").onclick=()=>{pf="all";renderPeer();};
+$("expPeer").onclick=()=>{let o="Company,Local,Bloomberg,Intl,Region,Listing,MainGroup,SubGroup,Products,AI_Mix\n";PEERS.forEach(p=>o+=`"${p[0]}",${p[1]},${p[2]},${p[3]},"${p[4]}",${p[5]},"${p[6]}","${p[7]}","${p[8]}","${p[9]}"\n`);const b=new Blob(["\ufeff"+o],{type:"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="VIA_PSU_Thermal_Peers.csv";a.click();};
+
+// ⑧ 全客戶清單
+const CUST=[
+ ["NVIDIA","IC/平台","美國","GPU 伺服器電源/液冷方案","台達電/奇鋐/雙鴻/健策"],
+ ["AMD","IC","美國","均熱片/Lid/散熱","健策/雙鴻"],
+ ["Intel","IC","美國","電源/散熱","台達電/奇鋐"],
+ ["Microsoft Azure","雲端","美國","資料中心電力/液冷","台達電/Vertiv/奇鋐"],
+ ["Amazon AWS","雲端","美國","電源/液冷","台達電/光寶科"],
+ ["Google","雲端","美國","電力/冷卻","台達電/奇鋐"],
+ ["Meta","雲端","美國","電源/液冷","台達電/雙鴻"],
+ ["Dell","OEM","美國","伺服器電源/散熱","台達電/奇鋐/雙鴻"],
+ ["HPE","OEM","美國","伺服器電源/散熱","光寶科/奇鋐"],
+ ["Supermicro","OEM","美國","伺服器/液冷","奇鋐/雙鴻/台達電"],
+ ["鴻海 Foxconn","ODM","台灣","AI 伺服器整機/電源","台達電/奇鋐/雙鴻"],
+ ["廣達 Quanta","ODM","台灣","AI 伺服器/液冷","奇鋐/雙鴻/健策"],
+ ["緯創 Wistron","ODM","台灣","AI 伺服器","雙鴻/奇鋐"],
+ ["緯穎 Wiwynn","ODM","台灣","雲端伺服器/液冷","奇鋐/雙鴻"],
+ ["技嘉 Gigabyte","ODM","台灣","AI 伺服器","奇鋐/雙鴻"]
+];
+$("custRows").innerHTML=CUST.map(c=>`<tr><td class="nm">${c[0]}</td><td><span class="chip eq">${c[1]}</span></td><td>${c[2]}</td><td class="tk">${c[3]}</td><td class="tk" style="color:var(--vi)">${c[4]}</td></tr>`).join("");
+$("custCnt").textContent=CUST.length+" 客戶";
+$("expCust").onclick=()=>{let o="Customer,Type,Region,Items,Suppliers\n";CUST.forEach(c=>o+=`"${c[0]}","${c[1]}","${c[2]}","${c[3]}","${c[4]}"\n`);const b=new Blob(["\ufeff"+o],{type:"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="VIA_Customers.csv";a.click();};
+
+// ⑨ 全供應商清單
+const SUP=[
+ ["台光電 2383","材料","台灣","CCL/銅箔基板","台達電/光寶科"],
+ ["台燿 6274","材料","台灣","CCL","電源模組廠"],
+ ["南亞 1303","材料","台灣","銅箔/玻纖布","電源/散熱"],
+ ["國巨 2327","被動元件","台灣","MLCC/電阻","台達電/康舒"],
+ ["華新科 2492","被動元件","台灣","MLCC","電源廠"],
+ ["中鋼 2002","金屬","台灣","銅/鋁材","散熱模組"],
+ ["Wieland","金屬","德國","銅材/合金","奇鋐/健策"],
+ ["Infineon","功率半導體","德國","MOSFET/IGBT","台達電/光寶科"],
+ ["onsemi","功率半導體","美國","功率元件","電源廠"],
+ ["STMicro","功率半導體","歐洲","功率 IC","電源廠"],
+ ["3M","熱介面","美國","TIM/浸沒液","液冷廠"],
+ ["Honeywell","熱介面","美國","TIM/冷媒","散熱廠"],
+ ["日本電產 Nidec","馬達","日本","風扇馬達","散熱模組"],
+ ["Sunon 建準","風扇","台灣","散熱風扇","伺服器散熱"],
+ ["台達 DC/DC 內製","模組","台灣","電源模組(垂直整合)","台達電"]
+];
+$("supRows").innerHTML=SUP.map(s=>`<tr><td class="nm">${s[0]}</td><td><span class="chip pr">${s[1]}</span></td><td>${s[2]}</td><td class="tk">${s[3]}</td><td class="tk" style="color:var(--vi)">${s[4]}</td></tr>`).join("");
+$("supCnt").textContent=SUP.length+" 供應商";
+$("expSup").onclick=()=>{let o="Supplier,Type,Region,Materials,SuppliesTo\n";SUP.forEach(s=>o+=`"${s[0]}","${s[1]}","${s[2]}","${s[3]}","${s[4]}"\n`);const b=new Blob(["\ufeff"+o],{type:"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="VIA_Suppliers.csv";a.click();};
+</script><script>
+(function(){
+ function cellText(td){var el=td.querySelector('input,select,textarea');
+  var v=el?(el.value||''):td.textContent;return (v||'').trim().replace(/\|/g,'\\|').replace(/\s+/g,' ');}
+ function tableToMd(tbl){
+  var heads=tbl.tHead?Array.prototype.slice.call(tbl.tHead.rows):[];
+  var body=tbl.tBodies.length?Array.prototype.slice.call(tbl.tBodies[0].rows):Array.prototype.slice.call(tbl.rows);
+  var hRow=heads.length?heads[heads.length-1]:body.shift();
+  if(!hRow)return '';
+  var cols=Array.prototype.map.call(hRow.cells,cellText);
+  var out='| '+cols.join(' | ')+' |\n| '+cols.map(function(){return '---';}).join(' | ')+' |\n';
+  body.forEach(function(tr){out+='| '+Array.prototype.map.call(tr.cells,cellText).join(' | ')+' |\n';});
+  return out;
+ }
+ window.exportPageMarkdown=function(){
+  var title=document.querySelector('h1')?document.querySelector('h1').innerText.trim():'VIA';
+  var kick=document.querySelector('.kicker')?document.querySelector('.kicker').innerText.trim():'';
+  var md='# '+title+'\n\n';
+  if(kick)md+='> '+kick+'\n\n';
+  md+='_匯出 '+new Date().toISOString().slice(0,19).replace('T',' ')+' · VIA · append-only_\n\n';
+  var nodes=document.querySelectorAll('h2, table');
+  Array.prototype.forEach.call(nodes,function(n){
+   if(n.tagName==='H2'){md+='\n## '+n.innerText.trim().replace(/\s+/g,' ')+'\n\n';}
+   else{var t=tableToMd(n);if(t)md+=t+'\n';}
+  });
+  var blob=new Blob([md],{type:'text/markdown'});var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=(title.replace(/[^\w\u4e00-\u9fff]+/g,'_').slice(0,40)||'VIA')+'.md';a.click();
+ };
+ function addBtn(){if(document.getElementById('viaMdBtn'))return;var b=document.createElement('button');b.id='viaMdBtn';b.textContent='\u2913 MD';b.className='pdf';b.style.right='66px';b.onclick=window.exportPageMarkdown;document.body.appendChild(b);}
+ if(document.body)addBtn();else window.addEventListener('DOMContentLoaded',addBtn);
+})();
+</script>
+</body></html>

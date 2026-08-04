@@ -162,3 +162,39 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
+# VIA products (rebuilt on demand; engines + QA evidence are tracked instead)
+# VDF analytical database — rebuild with:
+#   python "VeritasIntelligenceAnalytics/functional modules/VDF/engine/vdf_movies_intake_v001.py" --base VeritasIntelligenceAnalytics
+VeritasIntelligenceAnalytics/functional modules/VDF/db/
+# VeritasAutoPlot chart output — rebuild with:
+#   python "VeritasIntelligenceAnalytics/functional modules/VAP/engine/via_autoplot_engine_v001.py" --base VeritasIntelligenceAnalytics --auto
+VeritasIntelligenceAnalytics/VAP/output/
+VeritasIntelligenceAnalytics/functional modules/VRN/__pycache__/
+
+# --- VIA standard six-slot layout (2026-08-02) ---
+VeritasIntelligenceAnalytics/functional modules/*/temp/*
+!VeritasIntelligenceAnalytics/functional modules/*/temp/.gitkeep
+VeritasIntelligenceAnalytics/functional modules/*/output/*
+!VeritasIntelligenceAnalytics/functional modules/*/output/.gitkeep
+VeritasIntelligenceAnalytics/functional modules/*/db/*
+!VeritasIntelligenceAnalytics/functional modules/*/db/.gitkeep
+VeritasIntelligenceAnalytics/functional modules/VRN/input/*
+!VeritasIntelligenceAnalytics/functional modules/VRN/input/.gitkeep
+!VeritasIntelligenceAnalytics/functional modules/VRN/input/incoming/
+VeritasIntelligenceAnalytics/functional modules/VRN/input/incoming/*
+!VeritasIntelligenceAnalytics/functional modules/VRN/input/incoming/.gitkeep
+
+# oversized artifacts stay local-only
+*.bak
+
+*.bak
+
+# v141D6 mega-records + ParametersConsolidated registry (66-149MB, exceed GitHub limits)
+# these stay local-only / external archive, never in git
+VeritasIntelligenceAnalytics/supportive modules/accelerator/VRN_MDL019_VRN_v141D6B_NoHang_Accelerator*BRIDGE*v141D6B*.json
+VeritasIntelligenceAnalytics/supportive modules/audit_tools/VRN_MDL070_VRN_v141D6_Extracted_Data_Full_Validation*GOVERNANCE*v141D6*.json
+VeritasIntelligenceAnalytics/supportive modules/registry/VIA_ParametersConsolidated_Registry.20260626_173927.dup.json
+VeritasIntelligenceAnalytics/supportive modules/registry/VIA_ParametersConsolidated_Registry.csv
+VeritasIntelligenceAnalytics/supportive modules/registry/VIA_ParametersConsolidated_Registry.json
+VeritasIntelligenceAnalytics/supportive modules/ui_support/iconforge_console_data.json

@@ -1,0 +1,90 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · 量價×財報一體 · Price-Volume × Financials ONE</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--vi:#7a6daa;--up:#c96b5a;--blue:#4c78a8;}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg);height:100%}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:12px;line-height:1.5;display:flex;flex-direction:column}
+.hd{padding:10px 6px 0}
+h1{font:800 21px/1.2 'Syne','Noto Sans TC',sans-serif;color:var(--ink);display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+h1::before{content:"";display:inline-block;width:5px;height:22px;background:var(--vi);border-radius:2px;transform:translateY(3px);margin-right:2px}
+h1 .flow{font:500 10px 'DM Mono',monospace;color:var(--mut2)}
+.tabs{display:flex;flex-direction:column;margin:12px 0 0;border-bottom:2px solid var(--soft)}
+.trow{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end}
+.trow+.trow{border-top:1px dashed var(--soft)}
+.gl{font:800 10px 'DM Mono',monospace;letter-spacing:1px;padding:0 2px 11px;text-transform:uppercase}
+.gl.pv{color:var(--up)}.gl.fs{color:var(--blue)}.gl.fl{color:#439a9a}.gl.ls{color:var(--vi)}
+.gl{min-width:74px}
+.tab{font:700 12px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);padding:9px 2px 11px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;letter-spacing:.3px;white-space:nowrap}
+.tab.on{color:var(--vi);border-bottom-color:var(--vi)}
+.tab:hover:not(.on){color:var(--ink)}
+.tab .no{font:700 9px 'DM Mono',monospace;color:var(--mut2);margin-right:5px}
+.meta{display:flex;gap:10px;align-items:center;padding:6px 6px;font:500 10px 'DM Mono',monospace;color:var(--mut)}
+.meta .code{color:var(--vi);font-weight:700}
+.meta .grp{font-weight:700}
+.meta a{margin-left:auto;font:700 9px 'DM Mono',monospace;color:var(--ink2);border:1px solid var(--line);border-radius:4px;padding:4px 8px;text-decoration:none;background:var(--paper2)}
+.stage{flex:1;min-height:0;padding:0}
+iframe{width:100%;height:100%;border:none;border-top:1px solid var(--line);border-radius:0;background:#fff}
+</style></head><body>
+<div class="hd">
+ <h1>量價 × 財報一體 <span class="flow">量價資訊 × 財務報表 · 資訊分類分列 · 零複本深連結 · VIA-M-PVFONE</span></h1>
+ <div class="tabs" id="tabs"></div>
+</div>
+<div class="meta"><span id="mGrp" class="grp"></span><span id="mCode" class="code"></span><span id="mFile"></span><a id="mOpen" href="#" target="_blank">↗ 開新視窗</a><a href="VIA Master Console.html">🎛 主控台</a><a href="VIA SSOT One.html">🔗 SSOT ONE</a><a href="VIA Economics One.html">📈 總經一體</a><a href="VIA BOM One.html">🧩 BOM 一體</a></div>
+<div class="stage"><iframe id="fr" title="pvf module"></iframe><div id="stk" style="display:none;overflow:auto;height:100%;background:#fff;border-top:1px solid var(--line)"></div></div>
+<script>
+// 量價 / 財報 兩類分列(依主控台註冊表 · 各原檔為權威)
+const MODS=[
+ {g:"量價", no:"▤", t:"一頁式 22·25·29·62(不分頁)", code:"PV-STACK", stack:["uploads/VIA_TW_Resonance_Stock_Stack_v4_6.html","VIA Weekly Resonance Matrix (standalone).html","uploads/VIA_Volume_Heatmap_Analytics.html","modules/MarketOverview.html"]},
+ {g:"量價", no:"22", t:"台股共振堆疊", code:"VIA-M-RESON", file:"uploads/VIA_TW_Resonance_Stock_Stack_v4_6.html"},
+ {g:"量價", no:"25", t:"每週共振矩陣", code:"VIA-M-WEEKRESON", file:"VIA Weekly Resonance Matrix (standalone).html"},
+ {g:"量價", no:"29", t:"成交量熱力圖", code:"VIA-M-VOLHEAT", file:"uploads/VIA_Volume_Heatmap_Analytics.html"},
+ {g:"量價", no:"62", t:"全球盤勢", code:"VIA-M-MKTOV", file:"modules/MarketOverview.html"},
+ {g:"資金流", no:"61", t:"全球資金流動", code:"VIA-M-GFLOW", file:"modules/GlobalFlow.html"},
+ {g:"資金流", no:"65", t:"資金流動監控", code:"VIA-M-FLOWMON", file:"uploads/flow_monitor-c2ff8be6.html"},
+ {g:"資金流", no:"66", t:"全球資金流時間模擬", code:"VIA-M-GMAP", file:"uploads/global_map_sim-ccd83260.html"},
+ {g:"資金流", no:"67", t:"指數資金流", code:"VIA-M-IDXFLOW", file:"uploads/indices_flow-721a4623.html"},
+ {g:"財報", no:"31", t:"族群指數評價", code:"VIA-M-IDXVAL", file:"modules/Hierarchy_Index_Valuation.html"},
+ {g:"財報", no:"32", t:"雙鴻估值 3324", code:"VIA-M-VALUE", file:"VIA Equity Valuation Terminal.html"},
+ {g:"財報", no:"36", t:"雙源估值", code:"VIA-M-DSV", file:"VIA Dual-Source Valuation.dc.html"},
+ {g:"財報", no:"37", t:"整合平台", code:"VIA-M-INTP", file:"uploads/VIA_Integrated_Platform-aff9e784.html"},
+ {g:"財報", no:"38", t:"三大報表", code:"VIA-M-FS", file:"modules/Financial_Statements.html?tab=is"},
+ {g:"財報", no:"38", t:"比率分析", code:"VIA-M-FS-RA", file:"modules/Financial_Statements.html?tab=ra"},
+ {g:"財報", no:"38", t:"每股分析", code:"VIA-M-FS-PS", file:"modules/Financial_Statements.html?tab=ps"},
+ {g:"財報", no:"1D", t:"SuperBOM 財務模型", code:"VIA-M-SBFIN", file:"uploads/SuperBOM_Financial_Model-a312c2f3.html"},
+ {g:"商品", no:"63", t:"商品儀表板", code:"VIA-M-COMM", file:"VIA Commodities Dashboard.dc.html"},
+ {g:"商品", no:"64", t:"全球原油市場 BRENT·WTI", code:"VIA-M-OIL", file:"uploads/VIS_Global_Crude_Oil_Market_v0111-8bce4ea4.html"},
+ {g:"商品", no:"1H", t:"商品因子基準", code:"VIA-M-CFB", file:"uploads/VIA_Commodity_Factor_Benchmark_v0100.html"},
+ {g:"名單", no:"1J", t:"VENDOR × CUSTOMER LIST", code:"VIA-M-VENCUS", file:"VIA Vendor Customer List.html"}
+];
+const $=s=>document.querySelector(s);
+let CUR=0;
+const P=new URLSearchParams(location.search);
+if(P.get("m")){const i=MODS.findIndex(e=>e.code===P.get("m")||e.no===P.get("m"));if(i>=0)CUR=i;}
+function render(){
+ let h="",lastG="";
+ const GC={"量價":"pv","資金流":"fl","財報":"fs","名單":"ls"};
+ MODS.forEach((e,i)=>{
+  if(e.g!==lastG){if(lastG)h+='</div>';lastG=e.g;h+='<div class="trow"><span class="gl '+(GC[e.g]||"pv")+'">▙ '+e.g+'</span>';}
+  h+='<div class="tab'+(i===CUR?" on":"")+'" data-i="'+i+'"><span class="no">'+e.no+'</span>'+e.t+'</div>';});
+ if(lastG)h+='</div>';
+ $("#tabs").innerHTML=h;
+ document.querySelectorAll(".tab").forEach(el=>el.onclick=()=>{CUR=+el.dataset.i;render();});
+ const e=MODS[CUR];
+ $("#mGrp").textContent="【"+e.g+"】";$("#mCode").textContent=e.code;$("#mFile").textContent=e.file||(e.stack?e.stack.length+" 模組下排":"");$("#mOpen").href=e.file||"#";
+ const fr=$("#fr"),stk=$("#stk");
+ if(e.stack){
+  fr.style.display="none";stk.style.display="";
+  if(stk.dataset.done!==e.code){stk.innerHTML=e.stack.map(f=>'<div style="font:700 10px \'DM Mono\',monospace;color:#6b6860;padding:8px 12px 4px">▾ '+f+'</div><iframe src="'+f+'" style="width:100%;height:92vh;border:none;border-top:1px solid #dbd9d3;background:#fff" title="stacked"></iframe>').join("");stk.dataset.done=e.code;}
+ }else{
+  stk.style.display="none";fr.style.display="";
+  const want=new URL(e.file,location.href).href;
+  if(fr.src!==want)fr.src=want;
+ }
+ try{history.replaceState(null,"","?m="+e.code);}catch(_){}
+}
+render();
+</script>
+</body></html>

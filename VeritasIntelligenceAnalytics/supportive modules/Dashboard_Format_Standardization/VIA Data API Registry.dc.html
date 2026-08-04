@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f4f0; --bg2:#e5e3df; --paper:#ffffff; --paper2:#fafaf8;
+    --ink:#1e1d1a; --ink2:#33403f; --mut:#6b6860; --mut2:#9c9890;
+    --line:#dbd9d3; --soft:#ecebe6;
+    --blue:#4c78a8; --grey:#9c9890; --teal:#439a9a;
+    --up:#c96b5a; --down:#5a9e6f; --am:#c4943a; --co:#c96b5a; --vi:#7a6daa; --gn:#5a9e6f; --ro:#b05580;
+    --green:#2d8659; --amber:#c4943a; --red:#b85450;
+    --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);}
+  body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  ::selection{background:rgba(67,154,154,.22);}
+  @keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+</style>
+<style>@media print{@page{size:A4;margin:11mm}html,body{background:#fff !important}.__pdfbtn{display:none !important}*{box-shadow:none !important}[style*="position:sticky"]{position:static !important}[style*="overflow-y:auto"],[style*="overflow:auto"],[style*="overflow-x:auto"]{overflow:visible !important;max-height:none !important}table,section,.brk{break-inside:avoid}}</style>
+<script>window.addEventListener('load',function(){if(document.getElementById('__pdfbtn'))return;var b=document.createElement('div');b.id='__pdfbtn';b.className='__pdfbtn';b.innerHTML='<img src="assets/pdf-icon.png" alt="PDF" style="width:30px;height:30px;display:block">';b.title='A4 PDF';b.style.cssText='position:fixed;top:12px;right:14px;z-index:99999;background:transparent;border:none;padding:0;font:700 10px monospace;letter-spacing:.5px;cursor:pointer;';b.onclick=function(){window.print()};document.body.appendChild(b);});</script>
+</helmet>
+
+<div ref="{{ rootRef }}" style="max-width:1320px;margin:0 auto;padding:0 26px 60px;">
+
+  <div style="position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50;"></div>
+
+  <header style="position:relative;padding:34px 0 16px;margin-bottom:16px;border-bottom:2px solid var(--ink);">
+    <div style="font:700 10px 'DM Mono',monospace;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:8px;">VERITAS INTELLIGENCE ANALYTICS · DATA & API REGISTRY · SSOT</div>
+    <h1 style="font:800 23px/1.24 'Syne',sans-serif;color:var(--ink);">資料·API <span style="color:var(--up);">來源矩陣</span> — 商品數據分類 · 模板需求 · 詳細狀況</h1>
+    <p style="margin-top:9px;font:400 12px/1.65 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:920px;">VRN · VDP · US Macro · Resonance · Yield 等模板所需資料與 API 全部蒐集，依商品/數據類別分類；每筆標註來源、消費模板、更新頻率、source_url 與整合狀態。原則：<b style="color:var(--ink2);">只增不減 (append-only) · 避免遺漏 (zero-omission)</b>。</p>
+  </header>
+
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#1e1d1a;border-radius:3px;padding:6px 13px;margin-bottom:8px;">
+    <span style="display:inline-flex;align-items:center;gap:6px;font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase;">🔒 VISUAL LOCK · 全格式鎖定</span>
+    <span style="display:inline-flex;align-items:center;gap:4px;font:500 8px 'DM Mono',monospace;color:#cfcabf;">色票
+      <span style="width:11px;height:11px;border-radius:2px;background:#4c78a8;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#439a9a;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#9c9890;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#c96b5a;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#5a9e6f;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#f5f4f0;border:1px solid #555;"></span>
+    </span>
+    <span style="font:500 8px 'DM Mono',monospace;color:#8a948f;">字體 Syne / DM Sans / DM Mono</span>
+    <span style="font:500 8px 'DM Mono',monospace;color:#8a948f;">漲紅跌綠 · 千分位 · 熱力色階</span>
+    <span style="margin-left:auto;font:700 8px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:2px 8px;">v1.0 · LOCKED 2026-06-22</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;background:#fff;border:1px solid #dbd9d3;border-left:3px solid #439a9a;border-radius:3px;padding:6px 13px;margin-bottom:12px;">
+    <span style="font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;">🛰 資料請求 · VDF ENGINES</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">TWSE→rest</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#c4943a;border-radius:3px;padding:1px 6px;">SITCA→parse</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">MOPS→parse</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">yfinance→pyproc</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#c0584e;border-radius:3px;padding:1px 6px;">FactSet→keyed</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">FRED→keyed</span>
+    <span style="margin-left:auto;font:500 8px 'DM Mono',monospace;color:#9c9890;">request.json → VDF 擷取 → 雙重驗算 → Parquet → JSON</span>
+  </div>
+
+  <details data-contract="1" style="margin-bottom:12px;border:1px solid #dbd9d3;border-left:3px solid #1e1d1a;border-radius:3px;background:#fbfaf7;overflow:hidden;">
+    <summary style="cursor:pointer;user-select:none;padding:6px 13px;font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;list-style:none;">📜 引擎連接合約 · request.json（點擊展開 · 可選取複製）</summary>
+    <pre style="margin:0;padding:10px 13px;background:#1e1d1a;color:#cfe3d6;font:500 9px/1.55 'DM Mono',monospace;white-space:pre;overflow-x:auto;">{
+  "request": "data_api_registry",
+  "asof": "2026-06-22",
+  "universe": { "market": "TW", "exchange": ["TWSE","TPEX"] },
+  "sources": ["TWSE","TPEX","SITCA","MOPS","yfinance","FactSet","FRED"],
+  "engines": { "TWSE":"rest","TPEX":"rest","SITCA":"parse","MOPS":"parse","yfinance":"pyproc","FactSet":"keyed","FRED":"keyed" },
+  "range": { "start":"1996-01-01","end":"latest" },
+  "verify": "double_identity",
+  "db_discover": { "folder":"D:\\VDF\\databases\\","recursive":true,"match":["*.parquet","*.duckdb","*.db","*.csv"] },
+  "sink": { "parquet":"vdf/data_api_registry/","export":"data_api_registry.json" }
+}</pre>
+    <div style="padding:6px 13px;font:400 8px 'DM Sans','Noto Sans TC',sans-serif;color:#9c9890;">本檔即以此合約向 VDF 引擎請求 → 依 engines 分流(rest/parse/pyproc/keyed) → 雙重恆等驗算 → 落地 Parquet → 匯出 <b style="color:#6b6860;">data_api_registry.json</b> 覆蓋本頁資料源。</div>
+  </details>
+
+  <!-- stat strip -->
+  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px;">
+    <sc-for list="{{ stats }}" as="s" hint-placeholder-count="6">
+      <div style="background:var(--paper);padding:10px 13px;border-left:3px solid {{ s.color }};border-radius:3px;box-shadow:0 1px 2px rgba(31,42,42,.04);">
+        <div style="font:600 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">{{ s.l }}</div>
+        <div style="font:500 18px 'DM Mono',monospace;color:var(--ink);">{{ s.v }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- tabs -->
+  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;border-bottom:1px solid var(--line);" role="tablist">
+    <div onClick="{{ tabMatrix }}" style="font:700 11.5px 'Syne',sans-serif;padding:8px 15px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:8px 8px 0 0;position:relative;top:1px;user-select:none;white-space:nowrap;{{ tcMatrix }}">🗂️ 來源矩陣</div>
+    <div onClick="{{ tabCoverage }}" style="font:700 11.5px 'Syne',sans-serif;padding:8px 15px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:8px 8px 0 0;position:relative;top:1px;user-select:none;white-space:nowrap;{{ tcCoverage }}">🧩 覆蓋矩陣</div>
+    <div onClick="{{ tabBacklog }}" style="font:700 11.5px 'Syne',sans-serif;padding:8px 15px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:8px 8px 0 0;position:relative;top:1px;user-select:none;white-space:nowrap;{{ tcBacklog }}">🔧 整合待辦 {{ backlogBadge }}</div>
+  </div>
+
+  <!-- ===== VIEW 1 · SOURCE MATRIX ===== -->
+  <sc-if value="{{ isMatrix }}" hint-placeholder-val="{{ true }}">
+  <div style="animation:fade .28s ease;">
+
+  <!-- controls -->
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+    <span style="font:600 10px 'DM Mono',monospace;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;">狀態篩選</span>
+    <span onClick="{{ fAll }}" style="font:700 10px 'DM Mono',monospace;padding:4px 11px;border-radius:7px;cursor:pointer;user-select:none;{{ fcAll }}">全部</span>
+    <span onClick="{{ fBuilt }}" style="font:700 10px 'DM Mono',monospace;padding:4px 11px;border-radius:7px;cursor:pointer;user-select:none;{{ fcBuilt }}">✓ 已接</span>
+    <span onClick="{{ fPart }}" style="font:700 10px 'DM Mono',monospace;padding:4px 11px;border-radius:7px;cursor:pointer;user-select:none;{{ fcPart }}">◑ 部分</span>
+    <span onClick="{{ fPend }}" style="font:700 10px 'DM Mono',monospace;padding:4px 11px;border-radius:7px;cursor:pointer;user-select:none;{{ fcPend }}">○ 待接</span>
+    <div style="margin-left:auto;display:flex;gap:13px;flex-wrap:wrap;font:500 9.5px 'DM Mono',monospace;color:var(--mut);">
+      <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--green);vertical-align:0;margin-right:4px;"></span>已接</span>
+      <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--amber);vertical-align:0;margin-right:4px;"></span>部分</span>
+      <span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--red);vertical-align:0;margin-right:4px;"></span>待接</span>
+    </div>
+  </div>
+
+  <!-- category matrix -->
+  <sc-for list="{{ cats }}" as="c" hint-placeholder-count="9">
+    <div style="border:1px solid var(--line);border-left:3px solid {{ c.color }};border-radius:2px;overflow:hidden;background:var(--paper);margin-bottom:7px;">
+      <div style="display:flex;align-items:center;gap:8px;padding:5px 11px;border-bottom:1px solid var(--line);background:var(--paper2);">
+        <span style="font:700 12px 'DM Mono',monospace;color:{{ c.color }};">{{ c.icon }}</span>
+        <span style="font:700 11px 'Syne',sans-serif;color:var(--ink);">{{ c.name }}</span>
+        <span style="font:500 8.5px 'DM Mono',monospace;color:var(--mut);">{{ c.en }}</span>
+        <span style="margin-left:auto;font:600 8.5px 'DM Mono',monospace;color:var(--mut);background:var(--soft);padding:1px 7px;border-radius:2px;">{{ c.count }}</span>
+      </div>
+      <table style="width:100%;border-collapse:separate;border-spacing:0;">
+        <thead><tr>
+          <th style="text-align:left;padding:5px 11px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">指標 / 欄位</th>
+          <th style="text-align:left;padding:5px 11px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">來源 API · series</th>
+          <th style="text-align:left;padding:5px 11px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">消費模板</th>
+          <th style="text-align:center;padding:5px 11px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">頻率</th>
+          <th style="text-align:center;padding:5px 11px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">URL</th>
+          <th style="text-align:center;padding:5px 11px;font:700 8.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">狀態</th>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ c.rows }}" as="r" hint-placeholder-count="4">
+            <tr style="background:{{ r.bg }};">
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);font:600 9.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);vertical-align:top;">{{ r.ind }}</td>
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);font:500 9px 'DM Mono',monospace;color:var(--blue);vertical-align:top;">{{ r.api }}</td>
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);vertical-align:top;">
+                <sc-for list="{{ r.tpls }}" as="t" hint-placeholder-count="2"><span style="display:inline-block;font:600 8px 'DM Mono',monospace;color:var(--ink2);background:var(--soft);border-radius:6px;padding:1px 6px;margin:0 3px 2px 0;">{{ t }}</span></sc-for>
+              </td>
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);text-align:center;font:500 9px 'DM Mono',monospace;color:var(--mut);vertical-align:top;white-space:nowrap;">{{ r.freq }}</td>
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);text-align:center;font:700 10px 'DM Mono',monospace;vertical-align:top;{{ r.urlCss }}">{{ r.url }}</td>
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);text-align:center;vertical-align:top;white-space:nowrap;"><span style="font:700 8.5px 'DM Mono',monospace;color:#fff;border-radius:8px;padding:2px 8px;background:{{ r.stCss }};">{{ r.st }}</span></td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+  </sc-for>
+  </div>
+  </sc-if>
+
+  <!-- ===== VIEW 2 · COVERAGE MATRIX (templates × categories) ===== -->
+  <sc-if value="{{ isCoverage }}">
+  <div style="animation:fade .28s ease;">
+    <div style="font:400 11.5px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);margin-bottom:11px;">每格 = 該模板在該類別消費的欄位數；顏色＝整合完整度（綠=全已接 · 琥珀=有部分/待接 · 空=未用）。一眼看出哪個模板還缺哪類資料。</div>
+    <div style="overflow-x:auto;border:1px solid var(--line);border-radius:9px;box-shadow:0 1px 2px rgba(31,42,42,.05);">
+    <table style="width:100%;border-collapse:separate;border-spacing:0;background:var(--paper);min-width:880px;">
+      <thead><tr>
+        <th style="position:sticky;left:0;background:var(--soft);color:var(--ink);text-align:left;padding:8px 11px;font:700 9.5px 'Syne',sans-serif;border-bottom:1px solid var(--line);z-index:2;">模板 ＼ 類別</th>
+        <sc-for list="{{ covCols }}" as="c" hint-placeholder-count="9">
+          <th style="background:var(--soft);color:var(--ink);text-align:center;padding:8px 6px;font:700 12px 'DM Mono',monospace;border-bottom:1px solid var(--line);" title="{{ c.name }}">{{ c.icon }}</th>
+        </sc-for>
+        <th style="background:var(--soft);color:var(--ink);text-align:center;padding:8px 9px;font:700 9.5px 'Syne',sans-serif;border-bottom:1px solid var(--line);">合計</th>
+      </tr></thead>
+      <tbody>
+        <sc-for list="{{ covRows }}" as="r" hint-placeholder-count="10">
+          <tr style="background:{{ r.bg }};">
+            <td style="position:sticky;left:0;background:{{ r.bg }};padding:6px 11px;border-top:1px solid var(--soft);font:700 10px 'DM Mono',monospace;color:var(--ink);white-space:nowrap;z-index:1;">{{ r.tpl }}</td>
+            <sc-for list="{{ r.cells }}" as="x" hint-placeholder-count="9">
+              <td style="border-top:1px solid var(--soft);text-align:center;font:700 10px 'DM Mono',monospace;color:{{ x.fg }};background:{{ x.cbg }};">{{ x.t }}</td>
+            </sc-for>
+            <td style="border-top:1px solid var(--soft);text-align:center;font:700 10px 'DM Mono',monospace;color:var(--ink);">{{ r.total }}</td>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+    </div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:9px;font:500 9.5px 'DM Mono',monospace;color:var(--mut);">
+      <span><span style="display:inline-block;width:11px;height:11px;border-radius:3px;background:rgba(45,134,89,.85);vertical-align:-1px;margin-right:4px;"></span>全已接</span>
+      <span><span style="display:inline-block;width:11px;height:11px;border-radius:3px;background:rgba(196,148,58,.7);vertical-align:-1px;margin-right:4px;"></span>含部分/待接</span>
+      <span><span style="display:inline-block;width:11px;height:11px;border-radius:3px;background:var(--soft);vertical-align:-1px;margin-right:4px;"></span>未使用</span>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===== VIEW 3 · INTEGRATION BACKLOG ===== -->
+  <sc-if value="{{ isBacklog }}">
+  <div style="animation:fade .28s ease;">
+    <div style="font:400 11.5px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);margin-bottom:11px;">尚未完成整合的資料源（◑ 部分 / ○ 待接），含來源、阻礙與下一步動作 — 依此「繼續整合」。</div>
+    <table style="width:100%;border-collapse:separate;border-spacing:0;background:var(--paper);border:1px solid var(--line);border-radius:9px;overflow:hidden;box-shadow:0 1px 2px rgba(31,42,42,.05);">
+      <thead><tr>
+        <th style="background:var(--soft);color:var(--ink);text-align:left;padding:8px 11px;font:700 9.5px 'Syne',sans-serif;border-bottom:1px solid var(--line);">類別</th>
+        <th style="background:var(--soft);color:var(--ink);text-align:left;padding:8px 11px;font:700 9.5px 'Syne',sans-serif;border-bottom:1px solid var(--line);">指標</th>
+        <th style="background:var(--soft);color:var(--ink);text-align:left;padding:8px 11px;font:700 9.5px 'Syne',sans-serif;border-bottom:1px solid var(--line);">來源 API</th>
+        <th style="background:var(--soft);color:var(--ink);text-align:left;padding:8px 11px;font:700 9.5px 'Syne',sans-serif;border-bottom:1px solid var(--line);">阻礙 / 下一步</th>
+        <th style="background:var(--soft);color:var(--ink);text-align:center;padding:8px 11px;font:700 9.5px 'Syne',sans-serif;border-bottom:1px solid var(--line);">狀態</th>
+      </tr></thead>
+      <tbody>
+        <sc-for list="{{ backlog }}" as="b" hint-placeholder-count="11">
+          <tr style="background:{{ b.bg }};">
+            <td style="padding:6px 11px;border-top:1px solid var(--soft);font:600 9px 'DM Mono',monospace;color:{{ b.catColor }};white-space:nowrap;vertical-align:top;">{{ b.cat }}</td>
+            <td style="padding:6px 11px;border-top:1px solid var(--soft);font:600 9.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);vertical-align:top;">{{ b.ind }}</td>
+            <td style="padding:6px 11px;border-top:1px solid var(--soft);font:500 9px 'DM Mono',monospace;color:var(--blue);vertical-align:top;">{{ b.api }}</td>
+            <td style="padding:6px 11px;border-top:1px solid var(--soft);font:400 9.5px/1.5 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);vertical-align:top;">{{ b.next }}</td>
+            <td style="padding:6px 11px;border-top:1px solid var(--soft);text-align:center;vertical-align:top;white-space:nowrap;"><span style="font:700 8.5px 'DM Mono',monospace;color:#fff;border-radius:8px;padding:2px 8px;background:{{ b.stCss }};">{{ b.st }}</span></td>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+  </div>
+  </sc-if>
+
+  <footer style="margin-top:24px;border-top:1px solid var(--line);padding-top:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font:500 10px 'DM Mono',monospace;color:var(--mut);">
+    <span style="font-weight:700;letter-spacing:1.3px;color:var(--ink);">VERITAS INTELLIGENCE ANALYTICS</span>
+    <span>Data & API Registry · SSOT · append-only · 只增不減 · 避免遺漏</span>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{ &quot;$preview&quot;: { &quot;width&quot;: 1320, &quot;height&quot;: 900 } }">
+class Component extends DCLogic {
+  state = { filter: 'all', tab: 'matrix' };
+
+  _CAT(icon, name, en, color, rows) { return { icon, name, en, color, rows }; }
+  // ind, api, tpls[], freq, url(bool), status, next(blocker/action)
+  _R(ind, api, tpls, freq, url, status, next) { return { ind, api, tpls, freq, url, status, next: next || '' }; }
+
+  _data() {
+    if (this._d) return this._d;
+    const T = {
+      VRN: 'VRN', VDP: 'VDP', RES: 'Resonance', UNI: 'Universe', INJ: 'Inject',
+      USM: 'US-Macro', YLD: 'Yield', P4B: 'US-Macro-2', SYS: 'Risk', SP5: 'SP500',
+    };
+    const cats = [
+      this._CAT('①', '台股價量 Equity OHLCV', 'price & volume', 'var(--co)', [
+        this._R('日 OHLCV (adj)', 'yfinance · TWSE OpenAPI', [T.VRN, T.RES, T.UNI], '日', true, 'built'),
+        this._R('成交量 / 量MA', 'TWSE STOCK_DAY', [T.VRN, T.RES], '日', true, 'built'),
+        this._R('股票宇宙 master', 'TWSE+TPEx OpenAPI', [T.UNI], '日', true, 'built'),
+        this._R('還原權值 adj factor', 'TWSE 除權息', [T.VRN, T.RES], '日', false, 'partial', '接 TWSE 除權息 API、回算 adj factor 並附 source_url'),
+      ]),
+      this._CAT('②', '法人 · 籌碼 Chips', 'institutional flow', 'var(--vi)', [
+        this._R('三大法人買賣超', 'TWSE T86 / TPEX', [T.RES, T.VRN], '日', true, 'built'),
+        this._R('融資融券餘額', 'TWSE MI_MARGN', [T.RES], '日', true, 'built'),
+        this._R('主動式 ETF 標記', '投信投顧 SITCA', [T.RES, T.VDP], '日', false, 'partial', '建立主動式 ETF 白名單、紅色實線框標記規則'),
+        this._R('借券賣出', 'TWSE TWT93U', [T.RES], '日', false, 'pending', '尚未接：抓 TWT93U 日報、併入籌碼面'),
+      ]),
+      this._CAT('③', 'ETF · 基金 Fund', 'NAV / AUM / flow', 'var(--teal)', [
+        this._R('NAV · 單位數', 'VDF Bridge → etf_real', [T.VDP, T.INJ], '日', true, 'built'),
+        this._R('AUM=NAV×Units', '自算 (Inject)', [T.VDP, T.INJ], '日', true, 'built'),
+        this._R('NetFlow=ΔUnits×NAV', '自算 (Inject)', [T.VDP, T.INJ], '日', true, 'built'),
+        this._R('持股明細 holdings', '投信公告 / 發行商', [T.VDP], '週', false, 'partial', '各發行商格式不一，需 parser 正規化到統一 schema'),
+      ]),
+      this._CAT('④', '美國總經 US Macro', 'GDP · PMI · CPI · jobs', 'var(--blue)', [
+        this._R('GDP / PCE / 投資', 'FRED GDPC1 · PCEC · GPDI', [T.USM], '季', true, 'built'),
+        this._R('PMI 製造/非製造', 'ISM · FRED MANEMP', [T.USM], '月', true, 'built'),
+        this._R('CPI / 核心 / PCE', 'FRED CPIAUCSL · PCEPILFE', [T.USM, T.SYS], '月', true, 'built'),
+        this._R('非農 / 失業 / 初領', 'FRED PAYEMS · UNRATE · ICSA', [T.USM, T.SYS], '月/週', true, 'built'),
+        this._R('零售 / 信心', 'FRED RSAFS · UMCSENT', [T.USM], '月', true, 'built'),
+      ]),
+      this._CAT('⑤', '利率 · 殖利率 Rates', 'yield curve & spreads', 'var(--am)', [
+        this._R('10Y / 2Y / 3M', 'FRED DGS10 · DGS2 · DGS3MO', [T.YLD, T.USM, T.SYS], '日', true, 'built'),
+        this._R('10Y-2Y / 10Y-3M 利差', 'FRED T10Y2Y · T10Y3M', [T.YLD, T.SYS], '日', true, 'built'),
+        this._R('Fed Funds / 實質利率', 'FRED DFF · REAINTRATREARAT10Y', [T.USM, T.P4B], '日', true, 'built'),
+        this._R('近遠期價差 fwd', 'Fed (Engstrom-Sharpe)', [T.SYS], '月', false, 'pending', '尚未接：實作 18m fwd 3M − 現行 3M 計算'),
+      ]),
+      this._CAT('⑥', '財政 · 國債 Fiscal/UST', 'treasury & holders', 'var(--ro)', [
+        this._R('財政現金流 TGA', 'Treasury DTS', [T.P4B], '日', true, 'built'),
+        this._R('月赤字 / 淨利息', 'Treasury MTS', [T.P4B], '月', true, 'built'),
+        this._R('UST 持有結構', 'FRED · TIC', [T.P4B], '月', true, 'built'),
+        this._R('外國持有 Top N', 'TIC (TICDATA)', [T.P4B], '月', true, 'built'),
+        this._R('Fed SOMA/RRP/TGA', 'FRED WALCL·RRPONTSYD·WTREGEN', [T.P4B], '週', true, 'built'),
+      ]),
+      this._CAT('⑦', '匯率 · 美元 FX/DXY', 'dollar multi-factor', 'var(--gn)', [
+        this._R('DXY 指數', 'yfinance DX-Y.NYB', [T.P4B], '日', true, 'built'),
+        this._R('G6 利差 / 通膨差', 'FRED + 各國央行', [T.P4B], '日', false, 'partial', '補齊 ECB/BOJ/BOE/BOC/SNB 2Y 與 CPI 串接'),
+        this._R('經常帳 / GDP', 'BEA NETFI', [T.P4B], '季', false, 'partial', '接 BEA API、對齊歐元區經常帳'),
+        this._R('8 因子分解', 'composite z-score', [T.P4B], '日', false, 'partial', '固定權重 → 滾動 24M 迴歸係數實證估計'),
+      ]),
+      this._CAT('⑧', '信用 · 波動 · 商品 Risk', 'credit · vol · commodity', 'var(--co)', [
+        this._R('HY / IG 信用利差', 'FRED BAMLH0A0HYM2', [T.SYS], '日', true, 'built'),
+        this._R('VIX / MOVE', 'FRED VIXCLS', [T.SYS], '日', true, 'built'),
+        this._R('油價 Brent/WTI', 'yfinance BZ=F · CL=F', [T.P4B, T.SYS], '日', true, 'built'),
+        this._R('金融情勢 NFCI', 'Chicago Fed NFCI', [T.SYS], '週', false, 'partial', '接 FRED NFCI 週序列、併入脆弱度合成'),
+      ]),
+      this._CAT('⑨', '估值 · 全球指數 Valuation', 'CAPE & global index', 'var(--blue)', [
+        this._R('CAPE / Fwd PE / ERP', 'multpl · Shiller', [T.SP5, T.SYS], '月', true, 'built'),
+        this._R('集中度 前10大%', 'S&P 成分計算', [T.SP5, T.SYS], '週', false, 'partial', '取成分權重、計算前10大佔比時序'),
+        this._R('全球主要指數', 'yfinance ^GSPC ^TWII …', [T.SP5, T.RES], '日', true, 'built'),
+        this._R('S&P500 EPS / breadth', 'I/B/E/S · 自算', [T.SP5], '週', false, 'pending', '尚未接：I/B/E/S 修正廣度授權 / 替代源'),
+      ]),
+    ];
+    this._d = cats;
+    return cats;
+  }
+
+  renderVals() {
+    const cats0 = this._data();
+    const f = this.state.filter;
+    const stColor = { built: 'var(--green)', partial: 'var(--amber)', pending: 'var(--red)' };
+    const stLabel = { built: '✓ 已接', partial: '◑ 部分', pending: '○ 待接' };
+
+    let nB = 0, nP = 0, nW = 0, nTotal = 0;
+    const tplSet = new Set(), apiSet = new Set();
+    cats0.forEach(c => c.rows.forEach(r => {
+      nTotal++; if (r.status === 'built') nB++; else if (r.status === 'partial') nP++; else nW++;
+      r.tpls.forEach(t => tplSet.add(t)); apiSet.add(r.api.split(' ')[0]);
+    }));
+
+    const cats = cats0.map(c => {
+      const rows0 = c.rows.filter(r => f === 'all' || r.status === f);
+      return {
+        icon: c.icon, name: c.name, en: c.en, color: c.color,
+        count: rows0.length + ' / ' + c.rows.length + ' 欄位',
+        rows: rows0.map((r, i) => ({
+          ind: r.ind, api: r.api, tpls: r.tpls, freq: r.freq,
+          url: r.url ? '✓' : '—', urlCss: r.url ? 'color:var(--down);' : 'color:var(--mut2);',
+          st: stLabel[r.status], stCss: stColor[r.status],
+          bg: i % 2 ? '#f6f4ef' : 'var(--paper)',
+        })),
+      };
+    }).filter(c => c.rows.length > 0);
+
+    const stats = [
+      { l: '資料類別', v: cats0.length, color: 'var(--blue)' },
+      { l: '欄位總數', v: nTotal, color: 'var(--teal)' },
+      { l: '已接', v: nB, color: 'var(--green)' },
+      { l: '部分', v: nP, color: 'var(--amber)' },
+      { l: '待接', v: nW, color: 'var(--red)' },
+      { l: '消費模板', v: tplSet.size, color: 'var(--vi)' },
+    ];
+
+    // ----- coverage matrix: templates × categories -----
+    const tplOrder = ['VRN', 'VDP', 'Resonance', 'Universe', 'Inject', 'US-Macro', 'Yield', 'US-Macro-2', 'Risk', 'SP500'];
+    const covCols = cats0.map(c => ({ icon: c.icon, name: c.name }));
+    const covRows = tplOrder.map((tpl, ri) => {
+      let total = 0;
+      const cells = cats0.map(c => {
+        const used = c.rows.filter(r => r.tpls.indexOf(tpl) >= 0);
+        total += used.length;
+        if (!used.length) return { t: '·', fg: 'var(--mut2)', cbg: 'var(--soft)' };
+        const allBuilt = used.every(r => r.status === 'built');
+        return { t: String(used.length),
+          fg: allBuilt ? '#fff' : '#fff',
+          cbg: allBuilt ? 'rgba(45,134,89,.85)' : 'rgba(196,148,58,.7)' };
+      });
+      return { tpl, cells, total, bg: ri % 2 ? '#f6f4ef' : 'var(--paper)' };
+    });
+
+    // ----- backlog: partial + pending -----
+    const catColorOf = {};
+    cats0.forEach(c => c.rows.forEach(() => {}));
+    let bgi = 0;
+    const backlog = [];
+    cats0.forEach(c => c.rows.forEach(r => {
+      if (r.status === 'built') return;
+      backlog.push({
+        cat: c.name.split(' ')[0], catColor: c.color, ind: r.ind, api: r.api,
+        next: r.next || (r.status === 'pending' ? '尚未接上 API' : '補齊欄位 / 驗證來源'),
+        st: stLabel[r.status], stCss: stColor[r.status], bg: bgi++ % 2 ? '#f6f4ef' : 'var(--paper)',
+      });
+    }));
+
+    const fc = on => on ? 'background:var(--ink);color:#fff;' : 'background:var(--soft);color:var(--mut);';
+    const tab = this.state.tab;
+    const tc = on => on ? 'background:var(--bg);color:var(--ink);border-color:var(--ink);box-shadow:0 -2px 0 var(--up) inset;' : 'background:var(--soft);color:var(--mut);';
+    return {
+      rootRef: el => { this.root = el; },
+      stats, cats, covCols, covRows, backlog,
+      backlogBadge: backlog.length,
+      isMatrix: tab === 'matrix', isCoverage: tab === 'coverage', isBacklog: tab === 'backlog',
+      tabMatrix: () => this.setState({ tab: 'matrix' }), tabCoverage: () => this.setState({ tab: 'coverage' }), tabBacklog: () => this.setState({ tab: 'backlog' }),
+      tcMatrix: tc(tab === 'matrix'), tcCoverage: tc(tab === 'coverage'), tcBacklog: tc(tab === 'backlog'),
+      fAll: () => this.setState({ filter: 'all' }), fBuilt: () => this.setState({ filter: 'built' }),
+      fPart: () => this.setState({ filter: 'partial' }), fPend: () => this.setState({ filter: 'pending' }),
+      fcAll: fc(f === 'all'), fcBuilt: fc(f === 'built'), fcPart: fc(f === 'partial'), fcPend: fc(f === 'pending'),
+    };
+  }
+}
+</script>
+</body>
+</html>

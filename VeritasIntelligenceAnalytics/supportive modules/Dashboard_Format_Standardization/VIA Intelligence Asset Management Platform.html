@@ -1,0 +1,251 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · 智慧資產管理平台 · Intelligence Asset Management Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--blue:#4c78a8;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--vi:#7a6daa;
+ --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg)}html{scrollbar-gutter:stable}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:12px;line-height:1.5}
+.wrap{max-width:1460px;margin:0 auto;padding:0 22px 60px}
+.hdr{position:sticky;top:0;z-index:40;background:var(--bg);padding-top:22px;box-shadow:0 6px 14px rgba(31,42,42,.05)}
+.pdf{position:fixed;top:12px;right:14px;z-index:999;background:var(--ink);color:#fff;border:none;border-radius:5px;padding:7px 13px;font:700 9px 'DM Mono',monospace;cursor:pointer}
+@media print{.pdf,.tabs,#xnav{display:none!important}}
+.bar{position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50}
+header{padding:0 0 8px;margin-bottom:10px}
+.kicker{font:700 10px 'DM Mono',monospace;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px}
+h1{font:800 21px/1.2 'Syne','Noto Sans TC',sans-serif;color:var(--ink);display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+h1::before{content:"";display:inline-block;width:5px;height:22px;background:var(--vi);border-radius:2px;transform:translateY(3px);margin-right:2px}
+h1 span{color:var(--ink)}
+.sub{margin-top:6px;font:400 10.5px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:1080px}
+.tabs{display:flex;gap:26px;flex-wrap:wrap;margin:4px 0 0;border-bottom:2px solid var(--soft);background:var(--bg)}
+.tab{font:700 12px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);padding:9px 2px 11px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;letter-spacing:.3px;white-space:nowrap;flex-shrink:0}
+.tab.on{color:var(--vi);border-bottom-color:var(--vi)}
+.tab:hover:not(.on){color:var(--ink)}
+.toolrow{display:flex;gap:7px;align-items:center;padding:10px 0;flex-wrap:wrap}
+.toolrow input{flex:1;min-width:200px;font:600 10.5px 'DM Mono','Noto Sans TC',monospace;border:1px solid var(--line);border-radius:5px;padding:7px 10px;background:var(--paper);color:var(--ink)}
+.btn{font:700 8.5px 'DM Mono',monospace;cursor:pointer;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:4px;padding:7px 11px}
+.btn.o{background:transparent;color:var(--ink)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:8px 0 14px}
+.kpi{background:var(--paper);border:1px solid var(--soft);border-radius:10px;padding:14px 18px;box-shadow:0 1px 3px rgba(31,42,42,.05)}
+.kpi .v{font:800 26px 'Syne',sans-serif;color:var(--ink);margin:2px 0}
+.kpi .k{font:500 10px 'DM Mono',monospace;color:var(--mut);margin-top:2px}
+h3.sec{font:800 13px 'Syne','Noto Sans TC',sans-serif;color:var(--ink);margin:16px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:baseline;position:sticky;top:var(--hdrh,120px);z-index:20;background:var(--bg)}
+h3.sec .en{font:600 8px 'DM Mono',monospace;color:var(--mut2);letter-spacing:1px;text-transform:uppercase}
+h3.sec .rc{margin-left:auto;font:700 8px 'DM Mono',monospace;color:var(--vi)}
+table{width:100%;border-collapse:collapse;background:var(--paper);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+th{font:700 9px 'DM Mono',monospace;letter-spacing:.4px;text-transform:uppercase;color:var(--mut);background:var(--paper2);border-bottom:2px solid var(--ink);padding:8px 12px;text-align:left}
+td{font:500 10px 'DM Mono','Noto Sans TC',monospace;color:var(--ink2);border-bottom:1px solid var(--soft);padding:7px 10px;vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--paper2)}
+td .code{color:var(--vi);font-weight:700;white-space:nowrap}
+td .tier{display:inline-block;font:700 7px 'DM Mono',monospace;border-radius:3px;padding:2px 6px;color:#fff;white-space:nowrap}
+.note{font:500 8.5px/1.6 'DM Mono',monospace;color:var(--mut);background:var(--paper);border:1px solid var(--soft);border-left:3px solid var(--vi);border-radius:4px;padding:8px 12px;margin:8px 0}
+.note b{color:var(--ink2)}
+.lego{display:inline-block;font:700 7px 'DM Mono',monospace;background:#f2effa;color:var(--vi);border:1px solid var(--vi);border-radius:3px;padding:1px 5px;margin-left:6px}
+</style></head><body>
+<div class="bar"></div>
+<button class="pdf" onclick="window.print()">⤴ PDF</button>
+<div class="wrap">
+<div class="hdr">
+<header>
+ <div class="kicker">VERITAS INTELLIGENCE ANALYTICS · INTELLIGENCE ASSET MANAGEMENT PLATFORM · VIA-M-IAMP · APPEND-ONLY</div>
+ <h1>智慧資產管理平台 <span>·</span> 樂高化 × 模塊化 × 自動編號</h1>
+ <p class="sub">全部智慧資產單一註冊表:程式 · 虛擬環境 · 工具 · 系統/子系統/引擎 · 模組 · CLASS · FUNCTION · LIB · 主題分析模館 · 知識標準。一切諸元自動編號(VIA-A-‹TYPE›-‹FNV-1a 6-hex›),只增不減,可搜尋、可篩選、可匯出 CSV/JSON。每項資產皆為可組合之標準積木(樂高化)。</p>
+ <nav id="xnav" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:9px">
+  <a href="VIA Master Console.html" style="font:700 8.5px 'DM Mono',monospace;color:var(--ink2);border:1px solid var(--line);border-radius:4px;padding:4px 8px;text-decoration:none;background:var(--paper2)">🎛 主控台</a>
+  <a href="VIA Auto-Coder.html" title="?type=&name=&gen=1" style="font:700 8.5px 'DM Mono',monospace;color:var(--ink2);border:1px solid var(--line);border-radius:4px;padding:4px 8px;text-decoration:none;background:var(--paper2)">⚙ 自動編號器</a>
+  <a href="VIA Lexicon Registry.html" title="?kind=&q=" style="font:700 8.5px 'DM Mono',monospace;color:var(--ink2);border:1px solid var(--line);border-radius:4px;padding:4px 8px;text-decoration:none;background:var(--paper2)">📚 詞彙登錄</a>
+  <a href="VIA VAP Chart Library Builder.html" title="?cat=&q=" style="font:700 8.5px 'DM Mono',monospace;color:var(--ink2);border:1px solid var(--line);border-radius:4px;padding:4px 8px;text-decoration:none;background:var(--paper2)">📊 圖庫建構器</a>
+ </nav>
+</header>
+<div class="tabs" id="tabs"></div>
+<div class="toolrow">
+ <input id="q" placeholder="🔍 搜尋 資產/類型/編碼/來源檔…">
+ <button class="btn o" id="expCsv">⤓ CSV</button>
+ <button class="btn o" id="expJson">⤓ JSON</button>
+</div>
+</div>
+<div class="kpis" id="kpis"></div>
+<div class="note" style="border-left-color:var(--am)">📝 <b>登錄模板 Registration Template</b> — 所有引擎/資產統一由此模板登錄:選層級 → 填名稱/中文/來源/說明 → 自動編號登錄(只增不減 · localStorage · via_iamp_user_v1)。</div>
+<div style="display:grid;grid-template-columns:110px 1fr 1fr 1fr 1fr auto;gap:7px;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:10px;margin:0 0 10px" id="regForm">
+ <select id="rT" style="font:600 10px 'DM Mono','Noto Sans TC',monospace;border:1px solid var(--line);border-radius:4px;padding:6px 8px;background:var(--paper2);color:var(--ink)"><option value="ENG">ENG 引擎</option><option value="SYS">SYS 系統</option><option value="SUB">SUB 子系統</option><option value="MOD">MOD 模組</option><option value="CLS">CLASS</option><option value="FN">FUNCTION</option><option value="LIB">LIB</option><option value="TOOL">TOOL 工具</option><option value="ENV">ENV 環境</option><option value="KNW">KNW 知識</option></select>
+ <input id="rN" placeholder="名稱 Name" style="font:600 10px 'DM Mono','Noto Sans TC',monospace;border:1px solid var(--line);border-radius:4px;padding:6px 8px;background:var(--paper2);color:var(--ink)">
+ <input id="rZ" placeholder="中文說明" style="font:600 10px 'DM Mono','Noto Sans TC',monospace;border:1px solid var(--line);border-radius:4px;padding:6px 8px;background:var(--paper2);color:var(--ink)">
+ <input id="rS" placeholder="來源檔 Source" style="font:600 10px 'DM Mono','Noto Sans TC',monospace;border:1px solid var(--line);border-radius:4px;padding:6px 8px;background:var(--paper2);color:var(--ink)">
+ <input id="rNo" placeholder="備註 Notes" style="font:600 10px 'DM Mono','Noto Sans TC',monospace;border:1px solid var(--line);border-radius:4px;padding:6px 8px;background:var(--paper2);color:var(--ink)">
+ <button class="btn" id="rAdd">＋ 登錄</button>
+</div>
+<div id="view"></div>
+<div class="note">🔒 <b>治理</b> — 只增不減 Append-only · 自動編號為唯一主碼(名稱+類型 → FNV-1a 6-hex,決定性、可重算、防碰撞) · SAP/MSP 對齊僅 align-only · 本平台為智慧資產之 SSOT,模組深連結至各工作檯。</div>
+</div>
+<script>
+// ── 自動編號:FNV-1a 6-hex(與 Master Console 同法) ──
+function fnv(s){let h=0x811c9dc5;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=(h*0x01000193)>>>0;}return h.toString(16).padStart(8,"0").slice(-6).toUpperCase();}
+const code=(type,name)=>"VIA-A-"+type+"-"+fnv(type+"|"+name);
+// ── 資產登錄(只增不減) ──
+const TIERS={SYS:["系統 System","#1e1d1a"],SUB:["子系統 Subsystem","#33403f"],ENG:["引擎 Engine","#7a6daa"],MOD:["模組 Module","#4c78a8"],CLS:["CLASS","#439a9a"],FN:["FUNCTION","#5a9e6f"],LIB:["LIB","#c4943a"],TOOL:["工具 Tool","#c96b5a"],ENV:["虛擬環境 Env","#6b6860"],KNW:["知識 Knowledge","#9c9890"]};
+const A=[];const reg=(type,name,zh,src,notes)=>A.push({type,name,zh,src:src||"—",notes:notes||"",code:code(type,name)});
+// ① 系統/子系統/引擎
+reg("SYS","VIA","Veritas Intelligence Analytics","VIA Master Console.html","母系統 · 66+ 模組");
+reg("SUB","VAP","VeritasAutoPlot 繪圖系統","VIA VAP Chart Library Builder.html","25 圖型 · 統一規格 SSOT");
+reg("SUB","VDF","Veritas DataFeed 資料契約","VIA Data Source Matrix.dc.html","TWSE/TPEX/MOPS/yfinance/FactSet/FRED…");
+reg("SUB","VRN","Veritas Risk Nexus 風險引擎","VIA VRN v139G Matrix Report.html","v139G · 因子×權重×矩陣");
+reg("SUB","VPNS","Veritas 命名空間","VIA VPNS UI.html","命名/改名地圖 rename map");
+reg("SUB","VSE","Veritas Synonym Engine 同義字","uploads/VeritasSynonymEngine_regex_addon_patched-7d90b205.html","REGEX 附加 · PLM/PMBOK 對齊");
+reg("SUB","VOO","Veritas Operation Optimizer 營運優化","uploads/VeritasOperationOptimizer_v1.0-58e0bcf6.html","v1.0 · 營運優化器");
+reg("SUB","VPT","Veritas Prompt Templates 提示詞 SSOT","uploads/SSOT_VPT_ingest-3c11252f.json","PROMPT · ingest 契約");
+reg("ENG","RiskEngine v10","整合風險引擎","uploads/2026_integrated_risk_engine_v10 (5)-7b0d216c.html","2026/2027 系統性風險");
+reg("ENG","FactorWeighting v3","因子權重引擎","uploads/2026_factor_weighting_v3.html","2026 因子加權");
+reg("ENG","voo_engine","VOO 核心引擎","uploads/voo_engine.js","JS · 營運優化核心");
+reg("ENG","SafePolyglotOptimizer","安全多語優化器","uploads/VIA_SafePolyglotOptimizer_v0103_README.md","v0103 · 靜態驗證");
+reg("ENG","SystemicRiskEngine 2026-2027","系統性風險引擎","uploads/2026_2027_systemic_risk_engine.html","跨年度系統性風險");
+reg("ENG","VSE RegexEngine","同義字正則引擎","uploads/VeritasSynonymEngine_regex_addon_patched-7d90b205.html","REGEX 附加 · patched");
+reg("ENG","VAP RenderEngine","圖庫渲染引擎","VIA VAP Chart Library Builder.html","SVG 預覽 · Plotly 生產對齊");
+reg("ENG","AutoCode Engine","自動編號引擎","VIA Auto-Coder.html","FNV-1a 6-hex · 碰撞檢查");
+// ② 模組/CLASS/FUNCTION/LIB
+reg("MOD","MasterConsole","主控台","VIA Master Console.html","66+ 模組註冊表 · 深連結");
+reg("MOD","GovernanceCenter","治理中心","VIA Governance Center.html","SSOT · 稽核 · 對齊");
+reg("MOD","ChartLibraryBuilder","VAP 圖庫建構器","VIA VAP Chart Library Builder.html","可勾選 · DEFAULT+覆寫");
+reg("MOD","GlobalMacro","全球總經指標","VIA Global Macro Indicators.dc.html","9 經濟區 · PMI/CPI/就業");
+reg("MOD","NotesUltimate","筆記終極版","uploads/VIA_Notes_Ultimate_1.html","知識筆記");
+reg("CLS","Component (DCLogic)","DC 邏輯類","*.dc.html","設計組件標準類");
+reg("CLS","VOO.Optimizer","優化器類","uploads/voo_engine.js","排程/資源優化");
+reg("FN","fnv1a6","自動編號雜湊","VIA Master Console.html","決定性 6-hex · 防碰撞");
+reg("FN","adjPrice","ADJ 價格換算","VAP 規則","全欄位 ADJ · SPLIT 反向調量");
+reg("FN","resample","頻率校正","VAP 規則","日×月自動重採樣(期末)");
+reg("FN","ffill1","空值遞補","VAP 規則","價格前一交易日 · 量不可遞補");
+reg("LIB","TA-Lib","技術分析函式庫 Technical Analysis","VIA VAP Chart Library Builder.html","指標一律以 ADJ PRICE 計算 · SPLIT 調整量");
+reg("LIB","Seaborn Combos","調色組合庫","uploads/seaborn_color_combos.html","deep/Set2/tab10/Paired+VIA");
+reg("LIB","ChartSpec Registry","圖表規格庫","uploads/chartspec_registry.json","VeritasAutoPlot 規格");
+reg("LIB","FactorDict","因子字典","uploads/factor_dict_matrix-aee4ee50.html","字典×矩陣");
+// ③ 支援工具(PowerShell 等)
+reg("TOOL","VOO_Launch.ps1","VOO 啟動器","uploads/VOO_Launch.ps1","PowerShell");
+reg("TOOL","ActiveETF_Control","主動式ETF控制","uploads/VIA_ActiveETF_Control.ps1","控制/部署");
+reg("TOOL","ActiveETF_Deploy","主動式ETF部署","uploads/VIA_ActiveETF_Deploy.ps1","部署");
+reg("TOOL","ActiveETF_MakeExe","主動式ETF打包EXE","uploads/VIA_ActiveETF_MakeExe.ps1","打包");
+reg("TOOL","ActiveETF_MakeLauncher","主動式ETF啟動器","uploads/VIA_ActiveETF_MakeLauncher.ps1","啟動器");
+reg("TOOL","ActiveETF_MakeSharePack","主動式ETF分享包","uploads/VIA_ActiveETF_MakeSharePack.ps1","分享包");
+reg("TOOL","ActiveETF_MakeShortcut","主動式ETF捷徑","uploads/VIA_ActiveETF_MakeShortcut.ps1","捷徑");
+reg("ENV","Browser Runtime","瀏覽器執行環境","—","HTML/JS · localStorage 持久化");
+reg("ENV","PowerShell Host","PS 執行環境","—","部署/啟動腳本宿主");
+// ④ 主題分析模館(依主控台類別)
+reg("MOD","主題館:總經盤勢","Macro Theme Hall","VIA Master Console.html#mac","總經模組群");
+reg("MOD","主題館:市場資金風險","Market Theme Hall","VIA Master Console.html#mkt","資金/風險/輪動/ETF");
+reg("MOD","主題館:產業族群個股","Industry Theme Hall","VIA Master Console.html#ind","產業鏈/BOM/晶片");
+reg("MOD","主題館:財務估值","Financial Theme Hall","VIA Master Console.html#fin","估值/共識");
+reg("MOD","主題館:報告簡報","Reports Theme Hall","VIA Master Console.html#rpt","週報/簡報/策略");
+reg("MOD","主題館:PSU×Thermal","PSU & Thermal Theme Hall","VIA Master Console.html#ind","電源×散熱 產業鏈專題");
+reg("MOD","ChipAnalysis Platform v2","PSU/Thermal 解析平台","uploads/VIA_ChipAnalysis_Platform_v2-5f1f08a0.html","族群強弱 · 個股定位");
+reg("MOD","SAP Super BOM","電源/散熱 BOM 對齊","modules/PowerThermal_SAP_SuperBOM_v2.html","SAP 全模組對齊 v2");
+reg("MOD","PSU/Thermal AllInOne","一體化儀表板","modules/PSU_Thermal_AllInOne.html","Auto SSOT · 評價連動");
+reg("MOD","主題館:PEERS","Peer Benchmark Hall","uploads/VIA_CostStructure_Peer_Verify.html","同業比較 · 成本結構驗證");
+reg("MOD","Capability Matrix","能力矩陣","uploads/VIA_Capability_Matrix (3)-0c8d3e99.html","PEERS × 能力比較");
+reg("MOD","Central Management","中央管理","uploads/VIA_Central_Management.html","集中管控");
+reg("MOD","BOM Cost Console","BOM 成本主控台","uploads/VIA_BOM_Cost_Console-0e9c2783.html","成本化 BOM");
+reg("MOD","SuperBOM Financial Model","SuperBOM 財務模型","uploads/SuperBOM_Financial_Model-a312c2f3.html","ASP×成本×毛利");
+reg("LIB","BOM Templates","BOM 標準模板(blank/sample)","uploads/BOM_Template_Sample.csv","CSV 標準格式");
+reg("TOOL","Run_VIS_HyperBOM","HyperBOM 一鍵執行","uploads/Run_VIS_HyperBOM_All_In_One (7).ps1","PowerShell · All-in-One v7");
+reg("TOOL","RegisterAll CrossAnalysis","下載註冊交叉分析","uploads/VIA_Downloads_RegisterAll_CrossAnalysis_ReadOnly_v20260702.ps1","read-only · manifest 20260702");
+reg("ENV","VIA IF P1","介面框架 P1 環境","uploads/via_if_config.json","via_if_config · README P1");
+reg("KNW","PROMPT Library","提示詞庫 VPT","uploads/SSOT_VPT_ingest-3c11252f.json","PROMPT 資產 · 只增不減");
+reg("KNW","AI Market Size","AI 市場規模基準","uploads/AUTO_SSOT_Sales_Battlecard.md","PEERS × 市場規模 · 建策");
+reg("KNW","Sales Battlecard 建策","銷售建策卡","uploads/AUTO_SSOT_Sales_Battlecard.md","AUTO SSOT · 建議策略");
+reg("KNW","PMIS-Lite PRO","專案管理資訊系統 Lite","uploads/PMIS-Lite_PRO_2026.md","2026 · UX 回饋併同");
+reg("KNW","PSU/Thermal Master Index","電源散熱主索引","uploads/PSU_Thermal_Master_Index-f48d1a60.md","介面內容規格併同");
+reg("KNW","AUTO CODING SSOT","自動編碼規範","uploads/VISWorkbench_AUTO_CODING_SSOT.md","VIS Workbench · 編碼準則");
+reg("KNW","BOM Template Plan","BOM 模板計畫","uploads/VISWorkbench_BOM_TEMPLATE_PLAN.md","VIS Workbench");
+reg("KNW","SixPeer Roadmap","供應商×元件×客戶 六同業路線圖","uploads/VIA_Supplier_Component_Customer_Roadmap_SixPeer_20260702.json","PEERS · 20260702");
+reg("KNW","UI Checklist × Gap Matrix","UI 完整檢核×差距矩陣","uploads/VIA_UI_COMPLETE_CHECKLIST_AND_GAP_MATRIX_v20260702.xlsx","v20260702");
+reg("MOD","Synonym SSOT PLM/PMBOK","同義字 SSOT(新版)","uploads/VIA_Synonym_SSOT_PLM_PMBOK-527152c0.html","使用者更新版");
+reg("MOD","BOM ONE Hub","BOM 一體整合","VIA BOM One.html","8 模組 · 零複本深連結");
+reg("MOD","Economics ONE Hub","總經一體整合","VIA Economics One.html","9 模組 · 零複本深連結");
+reg("MOD","PriceVolume×Financials ONE","量價×財報一體","VIA PriceVolume Financials One.html","量價/資金流/財報/名單 四群");
+reg("MOD","SSOT ONE Hub","單一真相源總匯","VIA SSOT One.html","live aggregation · 零複本");
+reg("MOD","Vendor Customer List","供應商×元件×客戶名單","VIA Vendor Customer List.html","SixPeer · 自動擷取快選");
+// ⑤ 知識標準化
+reg("KNW","DATARULES","資料搭配規則","VIA VAP Chart Library Builder.html","20+ 條 · 只增不減");
+reg("KNW","SSOT REGEX RULES","設定對照檢查","VIA VAP Chart Library Builder.html","自動增加 · 持續演化");
+reg("KNW","GDP 恆等式","總經恆等式","VIA Global Macro Indicators.dc.html","Y=C+I+G+NX · 領先/同步/落後");
+reg("KNW","台美時差規則","TW(t)↔US(t−1)","VAP 規則","相關/回測 lead-lag");
+reg("KNW","Rename Map","改名地圖","uploads/vpns_rename_map.SAMPLE-2401431e.json","VPNS 命名治理");
+reg("KNW","SAP 功能模組對照","MM·PP·SD·CO·FI·FA","VIA Lexicon Registry.html","T-CODE 鎖定 · align-only · 對照在 VIA 方");
+// 使用者登錄(只增不減 · 合併基準)
+const UKEY="via_iamp_user_v1";
+let UA=[];try{UA=JSON.parse(localStorage.getItem(UKEY))||[];}catch(e){}
+UA.forEach(u=>{if(!A.some(a=>a.type===u.type&&a.name===u.name))A.push(u);});
+// ⑥ 補登 REPLENISH 2026.07.04 — 審查後補齊(只增不減)
+reg("SUB","VIA-FlowSystem","資金流自驗證系統","uploads/index-bbf4d163.html","三層 SOLID · JSON SSOT · PS1 單鍵");
+reg("ENG","FIS Engine","資金流強度引擎","uploads/README-78a8dae6.md","FIS · 雙估計器 · RORO");
+reg("ENG","Calibration Loop","校準迴圈引擎","uploads/README-78a8dae6.md","G002~G009 gates · 反證 α=0→NOT_VALID");
+reg("ENG","TIO Take-In","多格式多語言擷取引擎","VIA VPNS UI.html","16 格式 · OCR · 編碼/語言偵測");
+reg("ENG","TIO Organize","文字修復整理引擎","VIA VPNS UI.html","ftfy/opencc/regex/jieba/rapidfuzz");
+reg("ENG","DataMining Engine","資料探勘引擎","VIA VPNS UI.html","sklearn/XGBoost/LightGBM Top-10");
+reg("ENG","ProcessMining Engine","流程探勘引擎","VIA VPNS UI.html","pm4py/networkx/DuckDB Top-10");
+reg("MOD","FlowSystem UI","資金流主控 UI","uploads/index-bbf4d163.html","SOLID 徽章 · per-ETF FIS 表");
+reg("MOD","World Flow Map","世界資金流地圖","uploads/world_flow-be4f2876.html","地圖×數據×走勢");
+reg("MOD","Flow Simulator","資金流模擬器","uploads/via_flowsim-7d372ca0.html","時間模擬");
+reg("MOD","ActiveETF Console","ActiveETF 控制台","uploads/VIA_ActiveETF_Console_snapshot (1).html","snapshot · PackList");
+reg("CLS","FlowValidator","三層驗證類","uploads/README-78a8dae6.md","Pillar A×B×self-test 14 項");
+reg("CLS","VSE SynonymEngine","同義字引擎類","uploads/VeritasSynonymEngine_regex_addon_patched-7d90b205.html","SYN×RGX 集體管理");
+reg("CLS","AutoCoder","自動編號類","VIA Auto-Coder.html","FNV-1a · 批次 · 撞碼");
+reg("FN","splitAdjustVolume","分割量調整","VAP 規則","STOCK SPLIT 量反向調整");
+reg("FN","axisStep","軸間隔合法化","VAP 規則","2/2.5/5/10 倍數 · 左右同格數");
+reg("FN","normalizeSeries","序列正規化","VAP 規則","Normalized/Start/End/Now 基準");
+reg("FN","maxDrawdown","區間最大回撤","VAP 規則","滑鼠框選→MAX/MIN/MAXDD/所需時間");
+reg("FN","basisCalc","現貨期貨基差","VAP 規則","spot−future · 標籤堆疊不重疊");
+reg("LIB","TIO Top-40","探勘×擷取×修復函式庫","VIA VPNS UI.html","4 引擎 × Top-10 = 40 libs");
+reg("LIB","pm4py","流程探勘核心","VIA VPNS UI.html","XES/DFG/Petri");
+reg("LIB","pdfplumber","PDF 擷取","VIA VPNS UI.html","文字+表格");
+reg("LIB","ftfy","亂碼修復","VIA VPNS UI.html","mojibake 修復");
+reg("LIB","rapidfuzz","模糊比對去重","VIA VPNS UI.html","去重檢查核心");
+reg("TOOL","Activate-VIAFlowSystem.ps1","FlowSystem 單鍵啟動","uploads/Activate-VIAFlowSystem-ec7672ea.ps1","calibrate/run/ui/all");
+reg("TOOL","ActiveETF PS1 ×6","控制/部署/打包工具組","uploads/VIA_ActiveETF_Control.ps1","Control/Deploy/MakeExe/Launcher/SharePack/Shortcut");
+reg("KNW","Knowledge Base 8 Phases","知識體各階段登錄","VIA Knowledge Base.html","P1~P8 · 只增不減");
+reg("KNW","真值來源清單","Flow 真值資料來源","uploads/README-78a8dae6.md","ICI/issuer NAV/CFTC COT/AkShare");
+reg("KNW","Master Codex v0500","功能引擎總覽與方法論總表","uploads/VIA_Master_Codex (3).md","VIA-DOC-MASTER-CODEX · BUILT/DESIGN/LOCAL-ONLY 誠實分級 · 治理憲章 8 條");
+reg("MOD","pmis_lite","PMIS Python 套件","uploads/VIA_Master_Codex (3).md","44/44 測試通過 · [BUILT]");
+reg("TOOL","PMIS ReadOnly SuperRegistry","唯讀超級註冊器 v0100","uploads/VIA_PMIS_ReadOnly_SuperRegistry_v0100.ps1","PowerShell · read-only 盤點");
+// ── UI ──
+const $=s=>document.querySelector(s);
+const TABS=[["all","① 資產總覽"],["sys","② 系統/子系統/引擎"],["mod","③ 模組/CLASS/FN/LIB"],["tool","④ 支援工具管理"],["hall","⑤ 主題分析模館"],["knw","⑥ 知識標準化"]];
+const TABF={all:a=>true,sys:a=>["SYS","SUB","ENG"].includes(a.type),mod:a=>["MOD","CLS","FN","LIB"].includes(a.type)&&!a.name.startsWith("主題館"),tool:a=>["TOOL","ENV"].includes(a.type),hall:a=>a.name.startsWith("主題館"),knw:a=>a.type==="KNW"};
+let TAB="all",Q="";
+function renderTabs(){$("#tabs").innerHTML=TABS.map(t=>'<div class="tab'+(TAB===t[0]?" on":"")+'" data-t="'+t[0]+'">'+t[1]+'</div>').join("");
+ document.querySelectorAll(".tab").forEach(el=>el.onclick=()=>{TAB=el.dataset.t;renderTabs();renderView();});}
+function renderKpis(){const by={};A.forEach(a=>by[a.type]=(by[a.type]||0)+1);
+ $("#kpis").innerHTML='<div class="kpi"><div class="v">'+A.length+'</div><div class="k">資產總數 Assets</div></div>'+
+  Object.entries(TIERS).map(([k,v])=>'<div class="kpi"><div class="v">'+(by[k]||0)+'</div><div class="k">'+v[0]+'</div></div>').join("");}
+function rows(list){return list.map(a=>{const t=TIERS[a.type];
+ return '<tr><td><span class="code">'+a.code+'</span></td><td><span class="tier" style="background:'+t[1]+'">'+a.type+'</span></td><td><b>'+a.name+'</b><br><span style="color:var(--mut)">'+a.zh+'</span></td><td>'+a.src+'</td><td>'+a.notes+'</td></tr>';}).join("");}
+function renderView(){const f=TABF[TAB];const list=A.filter(f).filter(a=>!Q||(a.name+" "+a.zh+" "+a.code+" "+a.type+" "+a.src).toLowerCase().includes(Q));
+ $("#view").innerHTML='<h3 class="sec">'+TABS.find(t=>t[0]===TAB)[1]+'<span class="en">registry</span><span class="rc">'+list.length+' 項</span></h3>'+
+  '<table><thead><tr><th style="width:150px">自動編號 Auto-Code</th><th style="width:56px">層級</th><th>資產 Asset</th><th style="width:260px">來源 Source</th><th>說明</th></tr></thead><tbody>'+
+  (rows(list)||'<tr><td colspan="5" style="color:var(--mut2)">無符合項目</td></tr>')+'</tbody></table>';}
+$("#q").oninput=e=>{Q=e.target.value.trim().toLowerCase();renderView();};
+$("#rAdd").onclick=()=>{const t=$("#rT").value,n=$("#rN").value.trim();if(!n)return;
+ if(A.some(a=>a.type===t&&a.name===n))return alert("已存在(去重):"+t+" · "+n);
+ const rec={type:t,name:n,zh:$("#rZ").value.trim()||n,src:$("#rS").value.trim()||"—",notes:$("#rNo").value.trim()||"使用者登錄",code:code(t,n)};
+ A.push(rec);UA.push(rec);localStorage.setItem(UKEY,JSON.stringify(UA));
+ $("#rN").value="";$("#rZ").value="";$("#rS").value="";$("#rNo").value="";
+ renderKpis();renderView();};
+$("#expJson").onclick=()=>{const b=new Blob([JSON.stringify({meta:{name:"via_iamp_registry",code:"VIA-M-IAMP",policy:"append-only",saved_at:new Date().toISOString()},assets:A},null,2)],{type:"application/json"});
+ const u=document.createElement("a");u.href=URL.createObjectURL(b);u.download="VIA_IAMP_Registry.json";u.click();};
+$("#expCsv").onclick=()=>{const esc=s=>'"'+String(s).replace(/"/g,'""')+'"';
+ const csv="code,type,name,zh,src,notes\n"+A.map(a=>[a.code,a.type,a.name,a.zh,a.src,a.notes].map(esc).join(",")).join("\n");
+ const b=new Blob(["\ufeff"+csv],{type:"text/csv"});const u=document.createElement("a");u.href=URL.createObjectURL(b);u.download="VIA_IAMP_Registry.csv";u.click();};
+// 碰撞檢查(決定性驗證)
+const seen={};let coll=0;A.forEach(a=>{if(seen[a.code])coll++;seen[a.code]=1;});
+if(coll)console.warn("IAMP code collisions:",coll);
+renderTabs();renderKpis();renderView();
+// 量測凍結區高度 → 區段標題瞬間固定於其下
+function setHdrH(){const hd=document.querySelector(".hdr");if(hd)document.documentElement.style.setProperty("--hdrh",hd.offsetHeight+"px");}
+window.addEventListener("resize",setHdrH);window.addEventListener("load",setHdrH);setHdrH();
+// URL 參數可選(?tab=all|sys|mod|tool|hall|knw&q=…)
+const P=new URLSearchParams(location.search);
+if(P.get("tab")&&TABF[P.get("tab")]){TAB=P.get("tab");renderTabs();}
+if(P.get("q")){Q=P.get("q").toLowerCase();$("#q").value=P.get("q");}
+if(P.get("tab")||P.get("q"))renderView();
+</script>
+</body></html>

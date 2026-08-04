@@ -1,0 +1,7 @@
+﻿layer,score,grade,evidence,gaps,next_action
+Asset Intelligence,100,A+ COMPLETE,asset_registry_v4 | plot_dna_registry | schema_intelligence_registry | assets>=100,NONE,保持 V4 asset registry；開始接 live data 對應 schema。
+Visual Governance,100,A+ COMPLETE,component_registry | visual_token_registry | visual tokens >= 1000 | components >= 100,NONE,建立 visual token normalization：統一 color/radius/shadow/font/grid 命名。
+Dashboard Composition,100,A+ COMPLETE,dashboard_blueprint_registry | generated_dashboard_registry | auto_dashboard_registry | generated dashboards >= 3,NONE,將 generated dashboard 由 placeholder 升級為 Plotly data-bound dashboard。
+Live Data Engine,70,B FOUNDATION_READY,live_data_source_registry | fetch_plan_registry | live_fetch_status_v6,live price data not active; EnableNetworkFetch remains disabled or data absent,重跑 V6，將 EnableNetworkFetch = $true，取得 yfinance 實價資料。 | 之後加入 TWSE/TPEX/FRED connector。
+Timeline Intelligence,100,A+ COMPLETE,timeline_alignment_registry | cross_asset_relation_registry | coaxis_policy_registry | alignment_policy_registry,NONE,將 timeline policy 套用到 actual fetched data，產生 NormalizedDate 實體資料。
+Quant Intelligence,78,B+ NEAR_READY,rolling_correlation_plan | lead_lag_plan | quant_factor_plan_v7 | quant_regime_plan_v7,quant calculation is plan-only due to missing live price data,先啟用 V6 live fetch，再重跑 V7，讓 rolling correlation / lead-lag 從 plan-only 轉為 calculated。

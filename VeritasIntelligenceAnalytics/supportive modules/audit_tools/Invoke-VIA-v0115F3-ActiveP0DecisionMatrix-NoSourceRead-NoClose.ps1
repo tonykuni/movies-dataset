@@ -1,0 +1,33 @@
+$ErrorActionPreference = "Stop"
+[Environment]::SetEnvironmentVariable("PYTHONINSPECT", $null, "Process")
+[Environment]::SetEnvironmentVariable("PYTHONSTARTUP", $null, "Process")
+$env:PYTHONUTF8 = "1"
+$env:PYTHONIOENCODING = "utf-8"
+$env:PYTHONNOUSERSITE = "1"
+$Base = "
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics
+"
+$ManagerPy = "
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\_via_governance_parameter_control\VIA_ActiveP0DecisionMatrix_v0115F3.py
+"
+$SourceRun = "
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_integration_v0115F2A_active_p0_context_sampling_regex_hotfix\RUN_20260623_124235_VIA_v0115F2A_ACTIVE_P0_CONTEXT_SAMPLING_REGEX_HOTFIX
+"
+$RunRoot = Join-Path $Base "_integration_v0115F3_active_p0_decision_matrix_only"
+$RunId = "RUN_{0}_VIA_v0115F3_ACTIVE_P0_DECISION_MATRIX_ONLY" -f (Get-Date -Format "yyyyMMdd_HHmmss")
+$RunDir = Join-Path $RunRoot $RunId
+New-Item -ItemType Directory -Path $RunDir -Force | Out-Null
+function FindPython {
+  $venv = Join-Path $Base "_envs\via_operation_optimizer_2026\Scripts\python.exe"
+  if (Test-Path -LiteralPath $venv) { return $venv }
+  foreach ($cmd in @("python","py")) { try { $null = & $cmd --version 2>$null; if ($LASTEXITCODE -eq 0 -or $?) { return $cmd } } catch {} }
+  throw "Python not found."
+}
+$Python = FindPython
+$ArgList = @($ManagerPy,"--source-run",$SourceRun,"--run-dir",$RunDir)
+if ($Python -eq "py") { & py -3 -I -X utf8 -B @ArgList } else { & $Python -I -X utf8 -B @ArgList }
+if ($LASTEXITCODE -ne 0) { throw "Python failed with exit code $LASTEXITCODE." }
+$Report = Join-Path $RunDir "report\VIA_v0115F3_ActiveP0_DecisionMatrix_OnePage.html"
+if (Test-Path -LiteralPath $Report) { Start-Process -FilePath $Report }
+Write-Host "[OK] ACTIVE_P0_DECISION_MATRIX_READY_REVIEW_ONLY" -ForegroundColor Green
+Write-Host "PowerShell remains open." -ForegroundColor Cyan

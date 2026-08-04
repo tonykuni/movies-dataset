@@ -1,0 +1,241 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA Equity Insight · PSU & Thermal SSOT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--bg2:#e5e3df;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--blue:#4c78a8;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--vi:#7a6daa;--gn:#5a9e6f;
+ --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg)}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1320px;margin:0 auto;padding:0 22px 60px}
+.bar{position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50}
+header{position:relative;padding:20px 0 9px;margin-bottom:10px;border-bottom:2px solid var(--ink)}
+.kicker{font:700 10px 'DM Mono',monospace;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px}
+h1{font:800 19px/1.2 'Syne',sans-serif;color:var(--ink)}h1 span{color:var(--up)}
+.sub{margin-top:6px;font:400 10.5px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:1000px}
+.sub b{color:var(--ink2)}
+.gov{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#1e1d1a;border-radius:3px;padding:7px 14px;margin:12px 0}
+.gov .lk{font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase}
+.gov .pill{font:600 7.5px 'DM Mono',monospace;color:#cfcabf}
+.gov .ver{margin-left:auto;font:700 8px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:2px 8px}
+.note{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:#fff;border:1px solid var(--line);border-left:3px solid var(--am);border-radius:3px;padding:8px 14px;margin-bottom:14px;font:500 9px/1.5 'DM Mono',monospace;color:var(--mut)}
+.note b{color:var(--ink2)}
+h2{font:800 13px 'Syne',sans-serif;color:var(--ink);margin:26px 0 4px;padding-bottom:5px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:8px}
+h2 .en{font:600 8px 'DM Mono',monospace;color:var(--mut2);letter-spacing:1px;text-transform:uppercase}
+.scards{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0 4px}
+.sc{background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:9px 14px;min-width:104px}
+.sc .v{font:800 21px 'Syne',sans-serif;line-height:1}
+.sc .l{font:600 8px 'DM Mono',monospace;color:var(--mut);text-transform:uppercase;letter-spacing:.6px;margin-top:4px}
+.decoder{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:13px 16px;margin-top:13px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.decoder input{font:500 13px 'DM Mono',monospace;padding:7px 10px;border:1px solid var(--line);border-radius:3px;width:220px}
+.decoder .out{display:flex;gap:8px;flex-wrap:wrap;flex:1}
+.chip{font:600 9px 'DM Mono',monospace;border-radius:3px;padding:3px 9px;background:var(--soft);color:var(--ink2)}
+.chip b{color:var(--up)}
+.subcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:9px;margin:12px 0}
+.subc{background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:9px 12px}
+.subc .c{font:700 11px 'DM Mono',monospace;color:var(--blue)}
+.subc .n{font:600 11px 'Noto Sans TC',sans-serif;color:var(--ink2);margin-top:2px}
+.subc .k{font:600 7.5px 'DM Mono',monospace;color:#fff;border-radius:10px;padding:2px 7px;float:right;background:var(--teal)}
+table{width:100%;border-collapse:collapse;margin-top:10px;font:500 10px 'DM Mono',monospace;background:var(--paper)}
+th{font:700 8px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.6px;color:var(--mut);text-align:left;padding:7px 9px;border-bottom:2px solid var(--ink);background:var(--paper2)}
+td{padding:6px 9px;border-bottom:1px solid var(--soft);vertical-align:top}
+tr:hover td{background:var(--paper2)}
+.nm{font:700 12px 'Noto Sans TC',sans-serif;color:var(--ink)}
+.tk{font:500 9.5px 'DM Mono',monospace;color:var(--mut)}
+.full{font:700 9.5px 'DM Mono',monospace;color:var(--blue)}
+.desc{font:400 10px 'Noto Sans TC',sans-serif;color:var(--ink2)}
+.newt{font:700 6.5px 'DM Mono',monospace;color:#fff;background:var(--teal);border-radius:2px;padding:1px 4px;letter-spacing:.4px;margin-left:5px}
+.loc{font:600 8px 'DM Mono',monospace;border-radius:3px;padding:1px 6px;background:var(--soft);color:var(--mut)}
+.rot{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:10px}
+.rotc{background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:9px 12px;border-left:3px solid var(--teal)}
+.rotc .rn{font:700 10px 'DM Mono',monospace;color:var(--ink2)}
+.rotc .rv{font:800 20px 'Syne',sans-serif;color:var(--teal)}
+.rotc .rl{font:500 8px 'DM Mono',monospace;color:var(--mut)}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:14px 16px;margin-top:13px}
+.panel.add{border-left:3px solid var(--teal)}.panel.err{border-left:3px solid var(--am)}
+.panel h3{font:800 11px 'Syne',sans-serif;color:var(--ink);margin-bottom:8px}
+.panel li{list-style:none;padding:6px 0;border-bottom:1px solid var(--soft);font:400 10.5px/1.55 'Noto Sans TC',sans-serif;color:var(--ink2)}
+.panel li:last-child{border-bottom:none}.panel li b{color:var(--co,#c96b5a);font-family:'DM Mono',monospace;font-size:10px}
+.btn{font:700 8.5px 'DM Mono',monospace;cursor:pointer;border:1px solid var(--ink);background:transparent;color:var(--ink);border-radius:3px;padding:5px 11px;margin-top:8px}
+.pdf{position:fixed;top:12px;right:14px;z-index:999;background:var(--ink);color:#fff;border:none;border-radius:5px;padding:7px 13px;font:700 9px 'DM Mono',monospace;cursor:pointer}
+@media print{@page{size:A4;margin:11mm}.pdf,.decoder input{display:none!important}th{position:static!important}}
+</style></head><body>
+<div class="bar"></div>
+<button class="pdf" onclick="window.print()">⤓ PDF</button>
+<div class="wrap">
+<header>
+ <div class="kicker">VERITAS INTELLIGENCE ANALYTICS · EQUITY INSIGHT · 族群輪動 × 多軸編號 SSOT</div>
+ <h1>PSU &amp; Thermal <span>SSOT</span> · 電源與散熱 · 族群輪動分析</h1>
+ <p class="sub">將散熱（<b>TH-000</b>）與電源（<b>PW-000</b>）兩大 AI 供應鏈族群，以 <b>族群→次編號→更次(個股)→趨勢→製程→生產基地</b> 六軸完全編號。每檔個股皆有唯一多軸代碼，可正查解碼。本 SSOT 遵 <b>append-only 只增不減</b>：保留原始編號、擴充新增個股與新次編號（如機櫃 TH-160）。代號經公開資料查證。<b>紅漲綠跌</b>。此為產業分類與研究，<b>非投資建議</b>。</p>
+</header>
+<div class="gov">
+ <span class="lk">🔒 總部管控 GOVERNED SSOT</span>
+ <span class="pill">append-only 只增不減</span>
+ <span class="pill">Module-Class-Function-Lib</span>
+ <span class="pill">verify-before-use</span>
+ <span class="pill">UTF-8 No-BOM</span>
+ <span class="ver">VERIFIED · 代號已查證</span>
+</div>
+<div class="note">📐 <b>六軸編號</b>：族群 TH/PW → 次編號（產品型態）→ 更次（個股序號）→ 趨勢 TR → 製程 PR → 生產基地 LOC。範例 <b>雙鴻</b>：TH-120-02 / TH-TR-01 / TH-PR-02 / TH-LOC-VN = 散熱→水冷板→氣轉液→擴散焊接→越南。</div>
+
+<div class="scards" id="scards"></div>
+
+<div class="decoder">
+ <div><div class="kicker" style="margin-bottom:5px">代碼解碼器 · 貼上任一段代碼</div>
+  <input id="dec" placeholder="TH-120-02 / TH-TR-01 / TH-PR-02 / TH-LOC-VN"></div>
+ <div class="out" id="decOut"></div>
+</div>
+
+<h2>散熱族群 TH-000 <span class="en">Thermal Management</span></h2>
+<div class="subcards" id="thSub"></div>
+<table><thead><tr><th>個股</th><th>代號</th><th>完整多軸碼</th><th>趨勢</th><th>製程</th><th>基地</th><th>定位</th></tr></thead><tbody id="thBody"></tbody></table>
+
+<h2>電源族群 PW-000 <span class="en">Power Supply</span></h2>
+<div class="subcards" id="pwSub"></div>
+<table><thead><tr><th>個股</th><th>代號</th><th>完整多軸碼</th><th>趨勢</th><th>製程</th><th>基地</th><th>定位</th></tr></thead><tbody id="pwBody"></tbody></table>
+
+<h2>族群輪動視圖 <span class="en">Rotation · by 次編號</span></h2>
+<div class="rot" id="rot"></div>
+
+<div class="panel add"><h3>▲ 本版 append-only 擴充（相對原始編號系統）</h3>
+ <ul id="addList"></ul></div>
+
+<div class="panel err"><h3>◆ 魔鬼代言人 · 勘誤與待確認</h3>
+ <ul>
+  <li><b>TH-120-03 健策</b>　健策主力為晶片級<b>均熱片(IHS/heat spreader)</b>，技術上更貼近 TH-110（均熱片）；原系統置於 TH-120（水冷板）。本 SSOT 依 append-only 保留原碼，此處標記供未來仲裁升版（v2）。</li>
+  <li><b>均熱片 vs 均溫板</b>　中文常混用：奇鋐 3D VC＝均溫板(Vapor Chamber)；健策＝均熱片(IHS)。英文財報請分辨 VC 與 Heat Spreader。</li>
+  <li><b>代號查證</b>　高力8996/勤誠8210/晟銘電3013/富世達6805/光寶2301/群電6412/海韻電6203/力致3483/動力6591 已經公開來源核對；財務數據仍須經驗證閘門後方可用。</li>
+ </ul></div>
+
+<div class="panel"><h3>編號登錄 · Registry</h3>
+ <button class="btn" id="expReg">匯出 VIA 編號登錄 CSV</button>
+ <button class="btn" id="expStk">匯出個股多軸碼 CSV</button>
+ <span class="tk" style="margin-left:8px">全部 UTF-8 (No BOM)；此為 SSOT 基線，可 append 擴充。</span></div>
+</div>
+
+<script>
+const D={"th_sub": {"TH-110": "氣冷/均熱片/導熱材料", "TH-120": "液冷水冷板 Cold Plate", "TH-130": "CDU 冷卻液分配單元", "TH-140": "高壓散熱風扇 Fan", "TH-150": "快接頭 QD/漏水偵測", "TH-160": "機櫃/水冷背門 Chassis"}, "pw_sub": {"PW-210": "伺服器電源模組 Power Module", "PW-220": "機櫃集中式電源架 Power Shelf", "PW-230": "消費/電競高瓦數電源", "PW-240": "工業/醫療/車用客製電源"}, "tr": {"TH-TR-01": "氣冷轉液冷 Air→Liquid", "TH-TR-02": "浸沒式 Immersion", "TH-TR-03": "車用熱管理 Automotive", "PW-TR-01": "高功率密度 Power Density", "PW-TR-02": "鈦金效率 80+ Titanium", "PW-TR-03": "微電網 Micro-Grid"}, "pr": {"TH-PR-01": "精密鍛造 Forging", "TH-PR-02": "擴散焊接 Diffusion Bonding", "TH-PR-03": "真空硬焊 Vacuum Brazing", "PW-PR-01": "第三代半導體 GaN/SiC", "PW-PR-02": "SMT 高密度封裝", "PW-PR-03": "SMART 數位控制 DSP"}, "loc": {"TW": "台灣", "CN": "中國", "VN": "越南", "TH": "泰國", "MX": "墨西哥"}, "stocks": [{"n": "奇鋐", "t": "3017", "fam": "TH", "code": "TH-110-01", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "VN", "desc": "3D VC 均熱片・水冷板龍頭・垂直整合", "new": false}, {"n": "雙鴻", "t": "3324", "fam": "TH", "code": "TH-120-02", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "VN", "desc": "水冷板/CDU・微水道加工・液冷轉型最快", "new": false}, {"n": "健策", "t": "3653", "fam": "TH", "code": "TH-120-03", "tr": "TH-TR-01", "pr": "TH-PR-01", "loc": "TW", "desc": "晶片級均熱片・全球市佔一・毛利含金量王", "new": false}, {"n": "高力", "t": "8996", "fam": "TH", "code": "TH-130-04", "tr": "TH-TR-01", "pr": "TH-PR-03", "loc": "TW", "desc": "CDU・真空硬焊・大型熱交換機櫃", "new": false}, {"n": "富世達", "t": "6805", "fam": "TH", "code": "TH-150-05", "tr": "TH-TR-01", "pr": "TH-PR-01", "loc": "TW", "desc": "快接頭・MIM 精密製程・零洩漏", "new": false}, {"n": "晟銘電", "t": "3013", "fam": "TH", "code": "TH-160-06", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "TW", "desc": "機櫃/水冷背門・一體化液冷機櫃", "new": true}, {"n": "勤誠", "t": "8210", "fam": "TH", "code": "TH-160-07", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "TW", "desc": "伺服器機殼・水冷機櫃基礎設施", "new": true}, {"n": "力致", "t": "3483", "fam": "TH", "code": "TH-140-08", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "TW", "desc": "高壓高轉速風扇・熱排交換", "new": true}, {"n": "動力-KY", "t": "6591", "fam": "TH", "code": "TH-140-09", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "TW", "desc": "伺服器高壓風扇", "new": true}, {"n": "建準", "t": "2421", "fam": "TH", "code": "TH-140-10", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "TW", "desc": "風扇/水泵/風扇背牆", "new": true}, {"n": "一詮", "t": "2486", "fam": "TH", "code": "TH-110-11", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "TW", "desc": "導線架轉 TPU 先進封裝散熱片", "new": true}, {"n": "邁科", "t": "6831", "fam": "TH", "code": "TH-120-12", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "TW", "desc": "美系 ASIC 熱解方案", "new": true}, {"n": "台達電", "t": "2308", "fam": "PW", "code": "PW-210-01", "tr": "PW-TR-01", "pr": "PW-PR-01", "loc": "TH", "desc": "Grid to Chip 電源+液冷一條龍・全球龍頭", "new": false}, {"n": "光寶科", "t": "2301", "fam": "PW", "code": "PW-220-02", "tr": "PW-TR-01", "pr": "PW-PR-01", "loc": "TH", "desc": "5.5kW/8kW ORv3・Power Shelf 率先出貨", "new": false}, {"n": "群電", "t": "6412", "fam": "PW", "code": "PW-220-03", "tr": "PW-TR-01", "pr": "PW-PR-02", "loc": "TW", "desc": "機架整合・低軌衛星地面站電源", "new": false}, {"n": "海韻電", "t": "6203", "fam": "PW", "code": "PW-230-04", "tr": "PW-TR-02", "pr": "PW-PR-02", "loc": "TW", "desc": "ATX 3.1/PCIe 5.1 原生模組化電源", "new": false}, {"n": "康舒", "t": "6282", "fam": "PW", "code": "PW-220-05", "tr": "PW-TR-01", "pr": "PW-PR-01", "loc": "TW", "desc": "33kW PowerShelf・金仁寶集團", "new": true}, {"n": "全漢", "t": "3015", "fam": "PW", "code": "PW-230-06", "tr": "PW-TR-02", "pr": "PW-PR-02", "loc": "TW", "desc": "電競/工業/PC 電源・防潮工業級", "new": true}, {"n": "曜越", "t": "3540", "fam": "PW", "code": "PW-230-07", "tr": "PW-TR-02", "pr": "PW-PR-02", "loc": "TW", "desc": "電競 RGB 電源周邊", "new": true}]};
+const $=id=>document.getElementById(id);
+const SUB=Object.assign({},D.th_sub,D.pw_sub);
+
+// scards
+const nTH=D.stocks.filter(s=>s.fam==="TH").length, nPW=D.stocks.filter(s=>s.fam==="PW").length;
+$("scards").innerHTML=`
+ <div class="sc"><div class="v">2</div><div class="l">族群 Family</div></div>
+ <div class="sc"><div class="v">${D.stocks.length}</div><div class="l">個股 Stocks</div></div>
+ <div class="sc"><div class="v">${Object.keys(SUB).length}</div><div class="l">次編號 Sub</div></div>
+ <div class="sc"><div class="v">6</div><div class="l">編號軸 Axes</div></div>
+ <div class="sc"><div class="v">${nTH}</div><div class="l">散熱 TH</div></div>
+ <div class="sc"><div class="v">${nPW}</div><div class="l">電源 PW</div></div>`;
+
+// 次編號卡
+function subCards(map,famStocks,el){
+ $(el).innerHTML=Object.entries(map).map(([c,n])=>{
+  const cnt=famStocks.filter(s=>s.code.startsWith(c)).length;
+  return `<div class="subc"><span class="k">${cnt}</span><div class="c">${c}</div><div class="n">${n}</div></div>`;
+ }).join("");
+}
+subCards(D.th_sub,D.stocks.filter(s=>s.fam==="TH"),"thSub");
+subCards(D.pw_sub,D.stocks.filter(s=>s.fam==="PW"),"pwSub");
+
+// 個股表
+function rows(fam,el){
+ $(el).innerHTML=D.stocks.filter(s=>s.fam===fam).map(s=>{
+  const full=`${s.code} / ${s.tr} / ${s.pr} / ${s.fam}-LOC-${s.loc}`;
+  return `<tr>
+   <td><span class="nm">${s.n}</span>${s.new?'<span class="newt">NEW</span>':''}</td>
+   <td class="tk">${s.t}</td>
+   <td class="full">${full}</td>
+   <td class="desc">${(D.tr[s.tr]||"").split(" ")[0]}</td>
+   <td class="desc">${(D.pr[s.pr]||"").split(" ")[0]}</td>
+   <td><span class="loc">${s.loc} ${D.loc[s.loc]||""}</span></td>
+   <td class="desc">${s.desc}</td></tr>`;
+ }).join("");
+}
+rows("TH","thBody"); rows("PW","pwBody");
+
+// 輪動：依次編號計數
+const rotMap={};
+D.stocks.forEach(s=>{const k=s.code.slice(0,6);rotMap[k]=(rotMap[k]||0)+1;});
+$("rot").innerHTML=Object.entries(rotMap).sort().map(([k,v])=>
+ `<div class="rotc"><div class="rn">${k}</div><div class="rv">${v}</div><div class="rl">${SUB[k]||""}</div></div>`).join("");
+
+// append 清單
+$("addList").innerHTML=D.stocks.filter(s=>s.new).map(s=>
+ `<li><b>${s.code}</b>　${s.n} (${s.t})　${s.desc}</li>`).join("")
+ +`<li><b>TH-160</b>　新增次編號「機櫃/水冷背門 Chassis」（原系統未列，本版 append）</li>`;
+
+// 解碼器
+function decode(){
+ const raw=$("dec").value.toUpperCase();
+ const parts=raw.split(/[\/,\s]+/).filter(Boolean);
+ const out=[];
+ parts.forEach(p=>{
+  let label="";
+  if(/^(TH|PW)-\d{3}-\d+$/.test(p)){const sub=p.slice(0,6);label=(p.startsWith("TH")?"散熱":"電源")+" → "+(SUB[sub]||"?")+" → 序號 "+p.split("-")[2];}
+  else if(D.tr[p])label="趨勢 "+D.tr[p];
+  else if(D.pr[p])label="製程 "+D.pr[p];
+  else if(/-LOC-/.test(p)){const c=p.split("-").pop();label="基地 "+c+" "+(D.loc[c]||"");}
+  else if(SUB[p])label="次編號 "+SUB[p];
+  else label="未知碼";
+  out.push(`<span class="chip"><b>${p}</b> ${label}</span>`);
+ });
+ $("decOut").innerHTML=out.join("")||'<span class="tk">貼上代碼即解碼各軸意義</span>';
+}
+$("dec").addEventListener("input",decode);
+$("dec").value="TH-120-02 / TH-TR-01 / TH-PR-02 / TH-LOC-VN"; decode();
+
+// 匯出
+function dl(name,txt){const b=new Blob(["\ufeff"+txt],{type:"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name;a.click();}
+$("expReg").onclick=()=>{
+ let out="Code,Type,Name\n";
+ Object.entries(SUB).forEach(([c,n])=>out+=`${c},次編號,"${n}"\n`);
+ Object.entries(D.tr).forEach(([c,n])=>out+=`${c},趨勢,"${n}"\n`);
+ Object.entries(D.pr).forEach(([c,n])=>out+=`${c},製程,"${n}"\n`);
+ Object.entries(D.loc).forEach(([c,n])=>out+=`LOC-${c},基地,"${n}"\n`);
+ dl("VIA_PSU_Thermal_Registry.csv",out);
+};
+$("expStk").onclick=()=>{
+ let out="Name,Ticker,Family,SubCode,Trend,Process,Location,FullCode\n";
+ D.stocks.forEach(s=>out+=`"${s.n}",${s.t},${s.fam},${s.code},${s.tr},${s.pr},${s.loc},"${s.code} / ${s.tr} / ${s.pr} / ${s.fam}-LOC-${s.loc}"\n`);
+ dl("VIA_PSU_Thermal_Stocks.csv",out);
+};
+</script><script>
+(function(){
+ function cellText(td){var el=td.querySelector('input,select,textarea');
+  var v=el?(el.value||''):td.textContent;return (v||'').trim().replace(/\|/g,'\\|').replace(/\s+/g,' ');}
+ function tableToMd(tbl){
+  var heads=tbl.tHead?Array.prototype.slice.call(tbl.tHead.rows):[];
+  var body=tbl.tBodies.length?Array.prototype.slice.call(tbl.tBodies[0].rows):Array.prototype.slice.call(tbl.rows);
+  var hRow=heads.length?heads[heads.length-1]:body.shift();
+  if(!hRow)return '';
+  var cols=Array.prototype.map.call(hRow.cells,cellText);
+  var out='| '+cols.join(' | ')+' |\n| '+cols.map(function(){return '---';}).join(' | ')+' |\n';
+  body.forEach(function(tr){out+='| '+Array.prototype.map.call(tr.cells,cellText).join(' | ')+' |\n';});
+  return out;
+ }
+ window.exportPageMarkdown=function(){
+  var title=document.querySelector('h1')?document.querySelector('h1').innerText.trim():'VIA';
+  var kick=document.querySelector('.kicker')?document.querySelector('.kicker').innerText.trim():'';
+  var md='# '+title+'\n\n';
+  if(kick)md+='> '+kick+'\n\n';
+  md+='_匯出 '+new Date().toISOString().slice(0,19).replace('T',' ')+' · VIA · append-only_\n\n';
+  var nodes=document.querySelectorAll('h2, table');
+  Array.prototype.forEach.call(nodes,function(n){
+   if(n.tagName==='H2'){md+='\n## '+n.innerText.trim().replace(/\s+/g,' ')+'\n\n';}
+   else{var t=tableToMd(n);if(t)md+=t+'\n';}
+  });
+  var blob=new Blob([md],{type:'text/markdown'});var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=(title.replace(/[^\w\u4e00-\u9fff]+/g,'_').slice(0,40)||'VIA')+'.md';a.click();
+ };
+ // 加 MD 按鈕（在 PDF 左側）— 立即掛載（腳本在 body 尾端）
+ function addBtn(){if(document.getElementById('viaMdBtn'))return;var b=document.createElement('button');
+  b.id='viaMdBtn';b.textContent='\u2913 MD';b.className='pdf';b.style.right='66px';
+  b.onclick=window.exportPageMarkdown;document.body.appendChild(b);}
+ if(document.body)addBtn();else window.addEventListener('DOMContentLoaded',addBtn);
+})();
+</script>
+</body></html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · BOM 一體 · SAP BOM ONE</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--vi:#7a6daa;}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg);height:100%}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:12px;line-height:1.5;display:flex;flex-direction:column}
+.hd{padding:14px 12px 0}
+h1{font:800 21px/1.2 'Syne','Noto Sans TC',sans-serif;color:var(--ink);display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+h1::before{content:"";display:inline-block;width:5px;height:22px;background:var(--vi);border-radius:2px;transform:translateY(3px);margin-right:2px}
+h1 .flow{font:500 10px 'DM Mono',monospace;color:var(--mut2)}
+.tabs{display:flex;gap:22px;flex-wrap:wrap;margin:12px 0 0;border-bottom:2px solid var(--soft)}
+.tab{font:700 12px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);padding:9px 2px 11px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;letter-spacing:.3px;white-space:nowrap}
+.tab.on{color:var(--vi);border-bottom-color:var(--vi)}
+.tab:hover:not(.on){color:var(--ink)}
+.tab .no{font:700 9px 'DM Mono',monospace;color:var(--mut2);margin-right:5px}
+.meta{display:flex;gap:10px;align-items:center;padding:8px 12px;font:500 10px 'DM Mono',monospace;color:var(--mut)}
+.meta .code{color:var(--vi);font-weight:700}
+.meta a{margin-left:auto;font:700 9px 'DM Mono',monospace;color:var(--ink2);border:1px solid var(--line);border-radius:4px;padding:4px 8px;text-decoration:none;background:var(--paper2)}
+.stage{flex:1;min-height:0;padding:0}
+iframe{width:100%;height:100%;border:none;border-top:1px solid var(--line);border-radius:0;background:#fff}
+</style></head><body>
+<div class="hd">
+ <h1>BOM 一體 · SAP BOM ONE <span class="flow">所有 SAP/BOM 模組 · 整合為一 · 零複本深連結 · VIA-M-BOMONE</span></h1>
+ <div class="tabs" id="tabs"></div>
+</div>
+<div class="meta"><span id="mCode" class="code"></span><span id="mFile"></span><a id="mOpen" href="#" target="_blank">↗ 開新視窗</a><a href="VIA Master Console.html">🎛 主控台</a><a href="VIA SSOT One.html">🔗 SSOT ONE</a><a href="VIA Economics One.html">📈 總經一體</a></div>
+<div class="stage"><iframe id="fr" title="bom module"></iframe></div>
+<script>
+// SAP/BOM 相關模組(依主控台註冊表 · 各原檔為權威)
+const BOM=[
+ {no:"13", t:"SAP Super BOM", code:"VIA-M-SUPERBOM", file:"modules/PowerThermal_SAP_SuperBOM_v2.html"},
+ {no:"1D", t:"SuperBOM 財務模型", code:"VIA-M-SBFIN", file:"uploads/SuperBOM_Financial_Model-a312c2f3.html"},
+ {no:"1E", t:"BOM 成本主控台", code:"VIA-M-BOMCC", file:"uploads/VIA_BOM_Cost_Console-0e9c2783.html"},
+ {no:"19", t:"BOM/ASP/單位成本", code:"VIA-M-BOMCOST", file:"VIA BOM ASP Unit-Cost Analyst.html"},
+ {no:"1A", t:"產業 BOM 專業版", code:"VIA-M-IBOM", file:"uploads/VIA_Industry_BOM_Professional_HTML-c3b1730a.html"},
+ {no:"14", t:"PSU/Thermal 一體", code:"VIA-M-AIO", file:"modules/PSU_Thermal_AllInOne.html"},
+ {no:"1C", t:"電源散熱登錄", code:"VIA-M-PTREG", file:"modules/PowerThermal_Registry.html"},
+ {no:"1G", t:"成本結構同業驗證", code:"VIA-M-PEERV", file:"uploads/VIA_CostStructure_Peer_Verify.html"}
+];
+const $=s=>document.querySelector(s);
+let CUR=0;
+const P=new URLSearchParams(location.search);
+if(P.get("m")){const i=BOM.findIndex(e=>e.code===P.get("m")||e.no===P.get("m"));if(i>=0)CUR=i;}
+function render(){
+ $("#tabs").innerHTML=BOM.map((e,i)=>'<div class="tab'+(i===CUR?" on":"")+'" data-i="'+i+'"><span class="no">'+e.no+'</span>'+e.t+'</div>').join("");
+ document.querySelectorAll(".tab").forEach(el=>el.onclick=()=>{CUR=+el.dataset.i;render();});
+ const e=BOM[CUR];
+ $("#mCode").textContent=e.code;$("#mFile").textContent=e.file;$("#mOpen").href=e.file;
+ const fr=$("#fr");const want=new URL(e.file,location.href).href;
+ if(fr.src!==want)fr.src=want;
+ try{history.replaceState(null,"","?m="+e.code);}catch(_){}
+}
+render();
+</script>
+</body></html>

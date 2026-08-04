@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style data-omelette-print-defaults>
+@media print {
+  h1, h2, h3, h4, h5, h6 { break-after: avoid; }
+  figure, table, pre, blockquote, img, svg, tr, [class~="card" i] { break-inside: avoid; }
+  img, svg { max-width: 100%; }
+  p { orphans: 3; widows: 3; }
+}
+</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&family=Noto+Serif+TC:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#070a14;--navy:#0d1426;--navy-2:#131d36;--panel:#172241;
+  --line:rgba(214,221,236,.12);--line-2:rgba(214,221,236,.07);
+  --paper:#e9e6dd;--paper-dim:#b9c0d0;--mute:#7d879d;
+  --seal:#c0392b;--seal-deep:#9a2b21;--gold:#c6a456;--teal:#3aa6a0;--blue:#5e8fcc;--r:3px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--paper);font-family:"DM Sans",-apple-system,"Noto Serif TC",sans-serif;font-size:12.8px;line-height:1.58;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden}
+.wrap{max-width:1240px;margin:0 auto;padding:0 28px}
+section{position:relative}
+.eyebrow{font-family:"DM Mono",monospace;font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:var(--seal);font-weight:500;display:flex;align-items:center;gap:11px}
+.eyebrow::before{content:"";width:22px;height:1px;background:var(--seal);opacity:.7}
+.eyebrow.gold{color:var(--gold)}.eyebrow.gold::before{background:var(--gold)}
+.eyebrow.teal{color:var(--teal)}.eyebrow.teal::before{background:var(--teal)}
+h2{font-family:"Syne",sans-serif;font-weight:700;font-size:clamp(21px,2.9vw,32px);line-height:1.08;letter-spacing:-.015em;margin:14px 0 5px}
+.h2-zh{font-family:"Noto Serif TC",serif;font-weight:600;font-size:clamp(14px,1.7vw,17px);color:var(--paper-dim);letter-spacing:.04em;margin-bottom:20px}
+.lead{font-family:"Cormorant Garamond",serif;font-size:clamp(15px,1.7vw,18px);line-height:1.5;color:var(--paper-dim);font-style:italic;max-width:62ch}
+p.body{color:var(--paper-dim);max-width:64ch}p.body+p.body{margin-top:11px}
+.zh{font-family:"Noto Serif TC",serif}.mono{font-family:"DM Mono",monospace}
+strong{color:var(--paper);font-weight:600}
+.crest{height:46px;width:auto;display:block;filter:drop-shadow(0 2px 7px rgba(0,0,0,.45))}
+.seal{flex:none;width:42px;height:42px;border-radius:var(--r);background:linear-gradient(135deg,var(--seal),var(--seal-deep));display:grid;place-items:center;font-family:"Noto Serif TC",serif;font-weight:700;font-size:22px;color:#f4ece2;box-shadow:0 6px 20px rgba(192,57,43,.32),inset 0 0 0 1px rgba(255,255,255,.14);position:relative}
+.seal::after{content:"";position:absolute;inset:4px;border:1px solid rgba(244,236,226,.32);border-radius:1px}
+.seal.sm{width:32px;height:32px;font-size:17px}
+.hero{background:radial-gradient(120% 80% at 78% -10%,rgba(94,143,204,.16),transparent 55%),radial-gradient(90% 70% at 8% 110%,rgba(58,166,160,.1),transparent 50%),linear-gradient(180deg,#070a14 0%,#0d1426 60%,#101a31 100%);border-bottom:1px solid var(--line);overflow:hidden}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:18px 0;border-bottom:1px solid var(--line-2)}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .mark{font-family:"Syne";font-weight:800;font-size:14px;letter-spacing:.02em}
+.brand .mark span{color:var(--seal)}
+.topmeta{font-family:"DM Mono";font-size:9.5px;letter-spacing:.18em;color:var(--mute);text-transform:uppercase}
+.hero-crest{position:absolute;left:-110px;top:54%;transform:translateY(-50%);height:380px;opacity:.035;pointer-events:none;filter:grayscale(1)}
+.hero-side-col{display:flex;flex-direction:column;gap:18px}
+.hero-emblem{display:flex;justify-content:center;align-items:center;padding:2px 0 4px}
+.hero-emblem img{height:172px;width:auto;filter:drop-shadow(0 12px 38px rgba(0,0,0,.6))}
+.hero-grid{display:grid;grid-template-columns:1.5fr .9fr;gap:46px;align-items:center;padding:62px 0 54px;position:relative;z-index:1}
+.hero h1{font-family:"Syne";font-weight:800;font-size:clamp(32px,5vw,56px);line-height:.98;letter-spacing:-.03em;margin:20px 0 12px}
+.hero h1 em{font-style:normal;color:var(--seal)}
+.hero .zh-h1{font-family:"Noto Serif TC";font-weight:600;font-size:clamp(16px,2.2vw,22px);color:var(--paper-dim);letter-spacing:.05em;margin-bottom:22px;line-height:1.4}
+.hero .sub{max-width:50ch;color:var(--paper-dim);font-size:13.5px}
+.hero .sub .zh{display:block;margin-top:8px;font-size:12.5px;color:var(--mute)}
+.hero-cta{display:flex;gap:12px;margin-top:26px;flex-wrap:wrap}
+.chip{font-family:"DM Mono";font-size:10.5px;letter-spacing:.04em;border:1px solid var(--line);border-radius:var(--r);padding:8px 13px;color:var(--paper-dim);background:rgba(23,34,65,.4)}
+.chip b{color:var(--seal);font-weight:500}
+.hero-side{border:1px solid var(--line);border-radius:var(--r);background:linear-gradient(180deg,rgba(23,34,65,.55),rgba(13,20,38,.4));padding:20px;position:relative}
+.hero-side .lbl{font-family:"DM Mono";font-size:9px;letter-spacing:.2em;color:var(--mute);text-transform:uppercase;margin-bottom:13px}
+.stk{display:flex;flex-direction:column;gap:7px}
+.stk .row{border:1px solid var(--line);border-radius:2px;padding:9px 12px;font-family:"DM Mono";font-size:10.5px;letter-spacing:.02em;display:flex;justify-content:space-between;align-items:center;background:rgba(7,10,20,.4)}
+.stk .row .t{color:var(--paper)}.stk .row .s{color:var(--mute);font-size:9px}
+.stk .row.app{border-color:rgba(192,57,43,.5);background:rgba(192,57,43,.08)}.stk .row.app .t{color:#f0c4bd}
+.stk .row.core{border-color:rgba(58,166,160,.4)}.stk .row.core .t{color:#a9ddd9}
+.stk .arrow{text-align:center;color:var(--mute);font-size:10px;font-family:"DM Mono";line-height:.6}.stk .arrow b{color:var(--seal)}
+.stats{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(7,10,20,.6)}
+.stats .wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
+.stat{padding:22px 22px;border-left:1px solid var(--line-2)}
+.stat:first-child{border-left:none;padding-left:0}
+.stat .n{font-family:"Syne";font-weight:700;font-size:23px;color:var(--paper);letter-spacing:-.01em}
+.stat .n em{font-style:normal;color:var(--seal)}
+.stat .k{font-family:"DM Mono";font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);margin-top:5px}
+.stat .d{font-size:11px;color:var(--paper-dim);margin-top:6px;line-height:1.45}
+.sec{padding:60px 0;border-bottom:1px solid var(--line)}
+.sec.navy{background:var(--navy)}.sec.navy2{background:var(--navy-2)}.sec.ink{background:var(--ink)}
+.origin{background:linear-gradient(180deg,#101a31,#0d1426)}
+.origin-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:50px;align-items:start}
+.origin .narr p{font-family:"Cormorant Garamond";font-size:16.5px;line-height:1.6;color:var(--paper-dim);margin-bottom:12px}
+.origin .narr p em{color:var(--paper);font-style:italic}
+.origin .narr .zh{font-family:"Noto Serif TC";font-size:12.5px;line-height:1.78;color:var(--mute);font-style:normal}
+.painlist{display:flex;flex-direction:column;gap:1px;background:var(--line-2);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.painlist .it{background:var(--navy);padding:13px 15px;display:flex;gap:13px;align-items:baseline}
+.painlist .it .x{font-family:"DM Mono";color:var(--seal);font-size:10.5px;flex:none;width:26px}
+.painlist .it .c{font-size:12px;color:var(--paper-dim)}.painlist .it .c b{color:var(--paper)}
+.painlist .it .c .zh{display:block;color:var(--mute);font-size:11px;margin-top:2px}
+.archhead{text-align:center;max-width:70ch;margin:0 auto 38px}.archhead .eyebrow{justify-content:center}
+.stack{display:flex;flex-direction:column;gap:0;position:relative}
+.layer{border:1px solid var(--line);border-radius:var(--r);background:linear-gradient(180deg,rgba(23,34,65,.5),rgba(13,20,38,.55));padding:17px 20px;position:relative}
+.layer+.gutter{height:34px;display:grid;place-items:center;position:relative}
+.gutter .pull{font-family:"DM Mono";font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);background:var(--ink);padding:0 12px;z-index:2}.gutter .pull b{color:var(--seal)}
+.gutter::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:linear-gradient(var(--line),var(--seal),var(--line));opacity:.6}
+.gutter .cap{position:absolute;top:-1px;left:50%;transform:translateX(-50%);color:var(--seal);font-size:12px;line-height:1}
+.layer-top{display:flex;align-items:center;gap:13px;margin-bottom:13px}
+.layer-top .meta .k{font-family:"DM Mono";font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute)}
+.layer-top .meta .t{font-family:"Syne";font-weight:700;font-size:16px;letter-spacing:-.01em;margin-top:2px}
+.layer-top .meta .t .zh{font-family:"Noto Serif TC";font-weight:500;font-size:11.5px;color:var(--paper-dim);margin-left:8px}
+.mods{display:flex;flex-wrap:wrap;gap:6px}
+.mod{font-family:"DM Mono";font-size:10px;letter-spacing:.02em;border:1px solid var(--line);border-radius:2px;padding:6px 10px;color:var(--paper-dim);background:rgba(7,10,20,.45);white-space:nowrap}
+.mod b{color:var(--paper);font-weight:500}
+.layer.app{border-color:rgba(192,57,43,.45);background:linear-gradient(180deg,rgba(192,57,43,.1),rgba(13,20,38,.5))}
+.layer.app .mod{border-color:rgba(192,57,43,.3)}.layer.app .mod b{color:#f0c4bd}
+.layer.core .layer-top .meta .t{color:#bfe6e2}.layer.core .mod{border-color:rgba(58,166,160,.28)}
+.lnum{flex:none;width:38px;height:38px;border-radius:3px;border:1px solid var(--line);display:grid;place-items:center;font-family:"DM Mono";font-size:13px;font-weight:500;color:var(--paper-dim);background:rgba(7,10,20,.45);letter-spacing:.04em}
+.layer.app .lnum{border-color:rgba(192,57,43,.4);color:#f0c4bd;background:rgba(192,57,43,.08)}
+.layer.core .lnum{border-color:rgba(58,166,160,.38);color:#a9ddd9}
+.gal{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px}
+.appcard{border:1px solid var(--line);border-radius:var(--r);background:linear-gradient(180deg,rgba(23,34,65,.4),rgba(13,20,38,.3));overflow:hidden;transition:border-color .25s,transform .25s}
+.appcard:hover{border-color:rgba(94,143,204,.45);transform:translateY(-2px)}
+.appcard .screen{position:relative;width:100%;aspect-ratio:4/3;background:repeating-linear-gradient(135deg,rgba(255,255,255,.02) 0 9px,transparent 9px 18px),#0a0e1a;border-bottom:1px solid var(--line)}
+.appcard .screen image-slot{position:absolute;inset:0;width:100%;height:100%;display:block}
+image-slot::part(frame){background:#0a0e1a}
+image-slot::part(ring){border-color:rgba(214,221,236,.2)}
+image-slot::part(empty){color:rgba(185,192,208,.55)}
+.appcard .screen.shot{aspect-ratio:auto;height:228px;overflow:auto;background:#0a0e1a}
+.appcard .screen.shot img{width:100%;height:auto;display:block}
+.appcard .screen.shot::-webkit-scrollbar{width:7px}
+.appcard .screen.shot::-webkit-scrollbar-thumb{background:rgba(214,221,236,.22);border-radius:4px}
+.appcard .chrome{position:absolute;top:0;left:0;right:0;height:22px;background:rgba(7,10,20,.7);border-bottom:1px solid var(--line-2);display:flex;align-items:center;gap:5px;padding:0 9px;z-index:2;pointer-events:none}
+.appcard .chrome i{width:7px;height:7px;border-radius:50%;background:#2f3a52;display:block}
+.appcard .cap{padding:12px 14px;min-height:74px;box-sizing:border-box}
+.appcard .cap .nm{font-family:"DM Mono";font-size:11.5px;color:var(--paper);letter-spacing:.01em}
+.appcard .cap .zh{font-family:"Noto Serif TC";font-size:11px;color:var(--mute);margin-top:3px}
+.bdg{display:inline-block;margin-top:9px;font-family:"DM Mono";font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;padding:3px 8px;border-radius:2px;border:1px solid var(--line);color:var(--paper-dim)}
+.bdg.analysis{color:var(--blue);border-color:rgba(94,143,204,.4)}
+.bdg.sim{color:var(--teal);border-color:rgba(58,166,160,.4)}
+.bdg.risk{color:var(--gold);border-color:rgba(198,164,86,.4)}
+.motto{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:15px;color:var(--gold);border-left:2px solid rgba(198,164,86,.5);padding-left:14px;margin:2px 0 20px;line-height:1.45}
+.motto .zh{display:block;font-family:"Noto Serif TC",serif;font-style:normal;font-size:12px;color:var(--paper-dim);margin-top:3px;letter-spacing:.04em}
+.tagline{margin-top:30px;padding-top:22px;border-top:1px solid var(--line);font-family:"Cormorant Garamond",serif;font-style:italic;font-size:clamp(17px,2.2vw,23px);color:var(--gold);line-height:1.4}
+.tagline span{display:block;font-family:"Noto Serif TC",serif;font-style:normal;font-size:14px;color:var(--paper-dim);margin-top:8px;letter-spacing:.08em}
+.domains{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 18px}
+.domains .dlbl{font-family:"DM Mono";font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);margin-right:2px}
+.dchip{font-family:"DM Mono";font-size:10px;color:var(--paper-dim);border:1px solid var(--line);border-radius:999px;padding:5px 11px;background:rgba(23,34,65,.4)}
+.dnote{font-family:"Noto Serif TC",serif;font-size:10.5px;color:var(--seal);margin-left:4px}
+.apphead{display:flex;align-items:center;gap:7px;padding:7px 11px;background:#0a0e1a;border-bottom:1px solid var(--line);overflow:hidden}
+.apphead .ab{font-family:"Syne";font-weight:800;font-size:10px;color:var(--paper);letter-spacing:.02em;flex:none}
+.apphead .ab::after{content:"·";margin-left:6px;color:var(--mute)}
+.apphead .an{font-family:"DM Sans";font-weight:700;font-size:11px;color:var(--ac);white-space:nowrap;flex:none}
+.apphead .adot{width:6px;height:6px;border-radius:50%;background:#3aa66f;box-shadow:0 0 6px #3aa66f;flex:none}
+.apphead .ata{font-family:"DM Mono";font-size:8px;color:var(--mute);border:1px solid var(--line-2);border-radius:4px;padding:2px 6px;white-space:nowrap;flex:none}
+.apphead .ata:first-of-type{margin-left:auto}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px;margin-top:8px}
+.card{border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;background:linear-gradient(180deg,rgba(23,34,65,.4),rgba(13,20,38,.3));transition:border-color .25s,transform .25s}
+.card:hover{border-color:rgba(192,57,43,.4);transform:translateY(-2px)}
+.card .nm{font-family:"DM Mono";font-size:12px;color:var(--paper);letter-spacing:.01em;display:flex;align-items:center;gap:9px}
+.card .nm .dot{width:6px;height:6px;border-radius:50%;background:var(--seal);flex:none}
+.card .ro{font-size:11.5px;color:var(--paper-dim);margin-top:8px}.card .ro .zh{display:block;color:var(--mute);font-size:11px;margin-top:3px}
+.tbl{width:100%;border-collapse:collapse;font-size:11.5px}
+.tbl th{text-align:left;font-family:"DM Mono";font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);font-weight:500;padding:10px 13px;border-bottom:1px solid var(--line)}
+.tbl td{padding:12px 13px;border-bottom:1px solid var(--line-2);vertical-align:top;color:var(--paper-dim)}
+.tbl td.a{font-family:"DM Mono";font-size:11px;color:var(--paper);white-space:nowrap}
+.tbl td.a span{display:block;color:var(--seal);font-size:9px;margin-top:3px;letter-spacing:.08em}
+.tbl tr:hover td{background:rgba(23,34,65,.35)}.tbl td b{color:var(--paper)}
+.wb-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center}
+.wb-def{border-left:2px solid var(--seal);padding-left:19px;margin:18px 0}
+.wb-def .en{font-family:"Cormorant Garamond";font-style:italic;font-size:16.5px;color:var(--paper);line-height:1.5}
+.wb-def .zh{font-family:"Noto Serif TC";font-size:12px;color:var(--paper-dim);margin-top:9px;line-height:1.78}
+.wb-flow{border:1px solid var(--line);border-radius:var(--r);background:rgba(7,10,20,.4);padding:19px}
+.wb-flow .lbl{font-family:"DM Mono";font-size:9px;letter-spacing:.2em;color:var(--mute);text-transform:uppercase;margin-bottom:13px}
+.flowstep{display:flex;gap:12px;align-items:flex-start;padding:8px 0}
+.flowstep .i{font-family:"DM Mono";font-size:9.5px;color:var(--seal);flex:none;width:20px;padding-top:2px}
+.flowstep .c{font-size:11.5px;color:var(--paper-dim)}
+.flowstep .c b{color:var(--paper);font-family:"DM Mono";font-size:11px;letter-spacing:.01em}
+.flowstep+.flowstep{border-top:1px solid var(--line-2)}.flowstep.hi .c b{color:var(--teal)}
+.maprow{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line-2)}
+.maprow .req{font-size:12px;color:var(--paper-dim)}
+.maprow .arr{color:var(--seal);font-family:"DM Mono";font-size:12px}
+.maprow .cap{font-family:"DM Mono";font-size:11px;color:var(--paper);text-align:right}
+.res-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:10px}
+.res{border:1px solid var(--line);border-radius:var(--r);padding:15px 16px;background:rgba(23,34,65,.3)}
+.res .h{font-family:"DM Mono";font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.res .yes{font-size:11.5px;color:var(--paper-dim)}
+.res .no{font-size:10.5px;color:var(--mute);margin-top:7px;padding-top:7px;border-top:1px solid var(--line-2)}.res .no b{color:var(--seal-deep);font-weight:500}
+.road{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px}
+.rcard{border:1px solid var(--line);border-radius:var(--r);padding:20px;background:linear-gradient(180deg,rgba(23,34,65,.45),rgba(13,20,38,.3))}
+.rcard .x{font-family:"DM Mono";font-size:9.5px;letter-spacing:.16em;color:var(--seal)}
+.rcard h3{font-family:"Syne";font-weight:700;font-size:16px;margin:8px 0 4px;letter-spacing:-.01em}
+.rcard .zh{font-family:"Noto Serif TC";font-size:11.5px;color:var(--paper-dim);margin-bottom:11px}
+.rcard ul{list-style:none}
+.rcard li{font-family:"DM Mono";font-size:10.5px;color:var(--mute);padding:4px 0;border-bottom:1px solid var(--line-2)}.rcard li:last-child{border:none}
+.comm-grid{display:grid;grid-template-columns:1.04fr .96fr;gap:16px;margin-top:10px}
+.comm{border:1px solid var(--line);border-radius:var(--r);padding:22px 22px;position:relative;overflow:hidden}
+.comm .tag{font-family:"DM Mono";font-size:9px;letter-spacing:.16em;text-transform:uppercase;padding:5px 9px;border-radius:2px;display:inline-block;margin-bottom:13px}
+.comm h3{font-family:"Syne";font-weight:700;font-size:19px;letter-spacing:-.01em}
+.comm h3 .zh{font-family:"Noto Serif TC";font-weight:500;font-size:13px;color:var(--paper-dim);margin-left:9px}
+.comm .eq{font-family:"DM Mono";font-size:11px;color:var(--paper-dim);margin:9px 0 14px;letter-spacing:.01em}
+.comm ul{list-style:none;display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
+.comm li{font-size:11.5px;color:var(--paper-dim);padding-left:15px;position:relative}
+.comm li::before{content:"";position:absolute;left:0;top:7px;width:5px;height:5px;border-radius:1px}
+.comm p{font-size:11.5px;color:var(--mute);line-height:1.6;border-top:1px solid var(--line-2);padding-top:11px}
+.comm.sell{border-color:rgba(198,164,86,.5);background:linear-gradient(180deg,rgba(198,164,86,.09),rgba(13,20,38,.4));box-shadow:0 14px 44px rgba(198,164,86,.07)}
+.comm.sell .tag{background:rgba(198,164,86,.16);color:var(--gold)}
+.comm.sell li::before{background:var(--gold)}
+.comm.sell p{color:var(--paper-dim)}
+.comm.sell p b{color:var(--gold)}
+.comm.proof{background:linear-gradient(180deg,rgba(23,34,65,.4),rgba(13,20,38,.3))}
+.comm.proof .tag{background:rgba(125,135,157,.14);color:var(--mute)}
+.comm.proof h3{color:var(--paper-dim)}
+.comm.proof li::before{background:var(--mute)}
+.close{background:radial-gradient(80% 120% at 50% 0%,rgba(192,57,43,.12),transparent 55%),linear-gradient(180deg,#0d1426,#070a14);text-align:center;padding:80px 0;position:relative;overflow:hidden}
+.close-crest{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);height:360px;opacity:.08;filter:grayscale(1);pointer-events:none}
+.close .thesis{max-width:64ch;margin:0 auto;position:relative;z-index:1}
+.close .line{font-family:"Syne";font-weight:700;font-size:clamp(18px,2.7vw,27px);line-height:1.22;letter-spacing:-.015em;margin:5px 0}
+.close .line.dim{color:var(--mute)}.close .line .em{color:var(--seal)}
+.close .zh-close{font-family:"Noto Serif TC";font-size:13px;color:var(--paper-dim);margin-top:22px;line-height:1.85;letter-spacing:.03em}
+.footer{border-top:1px solid var(--line);padding:22px 0}
+.footer .f{font-family:"DM Mono";font-size:9.5px;letter-spacing:.14em;color:var(--mute);text-transform:uppercase}
+.pdfbtn{font-family:"DM Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--paper-dim);background:rgba(23,34,65,.5);border:1px solid var(--line);border-radius:var(--r);padding:9px 16px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:border-color .2s,color .2s}
+.pdfbtn:hover{border-color:rgba(198,164,86,.55);color:var(--gold)}
+.pdfbtn svg{width:13px;height:13px;flex:none}
+@media print{
+  html,body{background:#070a14!important}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .rv{opacity:1!important;transform:none!important}
+  .pdfbtn{display:none!important}
+  .appcard,.card,.res,.rcard,.comm,.layer,.painlist,.maprow,.flowstep,.stat,.tbl tr,.wb-flow,.origin-grid,.wb-grid{break-inside:avoid}
+  .controlbar,.pnav,.footer{display:none!important}
+  .hero,.stats,.sec,.close{break-before:page}
+  .hero{break-before:avoid}
+  .sec,.stats,.hero,.close{border-bottom:0}
+  @page{size:landscape;margin:9mm}
+}
+.rv{opacity:0;transform:translateY(18px);transition:opacity .7s cubic-bezier(.2,.6,.2,1),transform .7s cubic-bezier(.2,.6,.2,1)}
+.rv.in{opacity:1;transform:none}
+.controlbar{position:sticky;top:0;z-index:40;background:rgba(7,10,20,.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.cb-wrap{max-width:1240px;margin:0 auto;padding:9px 28px;display:flex;align-items:center;gap:14px}
+.cb-brand{font-family:"Syne";font-weight:800;font-size:12px;letter-spacing:.04em;color:var(--paper)}
+.cb-brand i{color:var(--seal);font-style:normal;margin:0 1px}
+.cb-seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;margin-left:auto}
+.cb-seg button{appearance:none;background:transparent;border:0;color:var(--mute);font-family:"DM Mono",monospace;font-size:10px;letter-spacing:.06em;padding:6px 15px;cursor:pointer;transition:.15s}
+.cb-seg button.on{background:var(--paper);color:#0b0c0f;font-weight:600}
+.cb-present{appearance:none;border:1px solid rgba(198,164,86,.5);background:rgba(198,164,86,.1);color:var(--gold);font-family:"DM Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:7px 14px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.cb-present:hover{background:rgba(198,164,86,.2)}
+.cb-present svg{width:12px;height:12px;flex:none}
+body:not(.lang-en) .l-en{display:none}
+body.lang-en .l-zh{display:none!important}
+body.lang-en .zh,body.lang-en .h2-zh,body.lang-en .zh-h1,body.lang-en .zh-close{display:none!important}
+.pnav{display:none;position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:60;align-items:center;gap:8px;background:rgba(7,10,20,.82);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:999px;padding:6px 9px}
+.pnav button{appearance:none;background:transparent;border:0;color:var(--paper-dim);cursor:pointer;font:600 16px/1 "DM Sans",sans-serif;width:30px;height:30px;border-radius:50%;display:grid;place-items:center}
+.pnav button:hover{background:rgba(255,255,255,.08);color:var(--paper)}
+.pnav .pcount{font-family:"DM Mono",monospace;font-size:11px;color:var(--mute);min-width:52px;text-align:center}
+.pnav .pexit{color:var(--seal);font-size:13px}
+body.presenting{overflow:hidden}
+body.presenting .controlbar,body.presenting .footer,body.presenting .pdfbtn{display:none!important}
+body.presenting .pnav{display:flex}
+body.presenting .slide{position:fixed;inset:0;z-index:50;display:none;overflow:auto;background:var(--ink)}
+body.presenting .slide.active{display:block;animation:slin .45s ease}
+body.presenting .slide>.wrap{min-height:100vh;display:flex;flex-direction:column;justify-content:center;box-sizing:border-box;padding-top:56px;padding-bottom:74px}
+body.presenting .rv{opacity:1!important;transform:none!important}
+body.presenting .sec,body.presenting .hero,body.presenting .stats,body.presenting .close{border-bottom:0}
+@keyframes slin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.pslide-head,.pslide-foot{display:none}
+body.presenting .pslide-head{display:flex;position:fixed;top:0;left:0;right:0;z-index:55;align-items:center;gap:11px;padding:13px 26px;background:linear-gradient(180deg,rgba(7,10,20,.92),transparent);pointer-events:none}
+body.presenting .pslide-head img{height:30px;filter:drop-shadow(0 2px 5px rgba(0,0,0,.55))}
+body.presenting .pslide-head span.pbrand{font-family:"Syne";font-weight:800;font-size:12px;letter-spacing:.06em;color:var(--paper)}
+body.presenting .pslide-head i{color:var(--seal);font-style:normal;margin:0 1px}
+body.presenting .pslide-head .pslide-tag{margin-left:auto;font-family:"DM Mono",monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+body.presenting .pslide-foot{display:flex;position:fixed;bottom:0;left:0;right:0;z-index:55;justify-content:space-between;align-items:center;padding:12px 26px;background:linear-gradient(0deg,rgba(7,10,20,.92),transparent);pointer-events:none;font-family:"DM Mono",monospace;font-size:9.5px;letter-spacing:.1em;color:var(--mute)}
+body.presenting .pnav{bottom:50px}
+@media print{.controlbar,.pnav{display:none!important}}
+@media(min-width:1180px){
+  .wrap{max-width:1300px;padding:0 36px}
+  .sec{padding:76px 0}
+  .hero-grid{gap:58px;padding:74px 0 64px}
+  .hero h1{font-size:clamp(40px,4.6vw,60px)}
+  .hero .sub{font-size:14px;max-width:52ch}
+  .gal{gap:18px}
+  .stat{padding:26px 26px}
+  .stat .n{font-size:25px}
+  .hero-emblem img{height:188px}
+}
+@media(min-width:861px) and (max-width:1024px){
+  .gal{grid-template-columns:repeat(2,1fr)}
+  .hero-grid{gap:30px}
+  .wrap{padding:0 24px}
+}
+@media(max-width:860px){
+  body{font-size:12.5px}.wrap{padding:0 18px}
+  .hero-grid{grid-template-columns:1fr;gap:26px;padding:40px 0 38px}.hero-side-col{order:2}.hero-emblem{padding:0}.hero-emblem img{height:112px}.hero-crest{display:none}
+  .stats .wrap{grid-template-columns:repeat(2,1fr)}
+  .stat{border-left:none;padding:18px 0}.stat:nth-child(odd){border-right:1px solid var(--line-2);padding-right:18px}.stat:nth-child(even){padding-left:18px}
+  .origin-grid,.wb-grid,.comm-grid{grid-template-columns:1fr;gap:28px}
+  .grid,.res-grid,.road,.gal{grid-template-columns:1fr}
+  .sec{padding:46px 0}.layer-top .meta .t .zh{display:block;margin:3px 0 0}
+  .maprow{grid-template-columns:1fr;gap:5px}.maprow .cap{text-align:left}.maprow .arr{display:none}
+  .tbl,.tbl tbody,.tbl tr,.tbl td{display:block;width:100%}.tbl thead{display:none}
+  .tbl tr{border:1px solid var(--line);border-radius:var(--r);margin-bottom:12px;padding:6px 0}
+  .tbl td{border:none;padding:7px 14px}.tbl td.a span{display:inline;margin-left:8px}
+  .topmeta{display:none}
+}
+@media(max-width:560px){
+  body{font-size:13px;line-height:1.6}
+  .wrap{padding:0 16px}
+  .topbar{padding:14px 0}.crest{height:40px}
+  .hero-grid{padding:34px 0 34px}
+  .hero h1{font-size:33px}
+  .hero-emblem img{height:96px}
+  .hero .sub{font-size:13.5px}
+  .stats .wrap{grid-template-columns:1fr}
+  .stat{padding:14px 0!important;border-left:none!important;border-right:none!important;border-top:1px solid var(--line-2)}
+  .stat:first-child{border-top:none}
+  .apphead .ata{display:none}.apphead .adot{margin-left:auto}
+  .sec{padding:40px 0}
+  .layer{padding:15px 16px}
+  .comm{padding:18px}
+  .stat .n{font-size:22px}
+}
+@media(prefers-reduced-motion:reduce){.rv{transition:none;opacity:1;transform:none}html{scroll-behavior:auto}}
+</style>
+<script src="image-slot.js"></script>
+</helmet>
+
+<div class="controlbar"><div class="cb-wrap">
+  <span class="cb-brand">VERITAS<i>·</i>IA</span>
+  <div class="cb-seg" id="langseg"><button data-lang="zh" class="on">雙語</button><button data-lang="en">EN</button></div>
+  <button class="cb-present" id="presentBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 4 18 12 6 20 6 4"></polygon></svg>Present</button>
+</div></div>
+<header class="hero">
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <img class="crest" src="assets/veritas-crest.png" alt="Veritas crest">
+        <div class="mark">VERITAS<span>·</span>INTELLIGENCE<span>·</span>ANALYTICS</div>
+      </div>
+      <div class="topmeta">Investor Brief · 2026 · Confidential</div>
+    </div>
+    <img class="hero-crest" src="assets/veritas-crest.png" alt="">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">Veritas Intelligence Analytics · Infrastructure Services</div>
+        <h1>We sell the<br><em>engine room</em>.</h1>
+        <div class="zh-h1">持續快速演化增長的 AI 基礎設施引擎服務</div>
+        <div class="motto">AI creates infinite possibilities. VIA accelerates them into reality.<span class="zh">AI 創造無限可能，VIA 加速願景成真。</span></div>
+        <p class="sub">Veritas Intelligence Analytics is an <strong>infrastructure service</strong> — the AI engine room that grows new, enterprise-grade applications across any domain in <strong>weeks, not years</strong>. The applications keep evolving; the infrastructure is the product.<span class="zh">產品是基礎建設「服務」 — 各領域應用持續演進，但都不是銷售標的；關鍵與護城河，是基礎建設本身。</span></p>
+        <div class="hero-cta">
+          <div class="chip"><b>Infrastructure Services</b> · the product</div>
+          <div class="chip">Applications · <b>evolving proof, not for sale</b></div>
+          <div class="chip">Append-only · <b>offline-degradable</b></div>
+        </div>
+      </div>
+      <div class="hero-side-col">
+        <div class="hero-emblem"><img src="assets/veritas-crest.png" alt="Veritas Intelligence Analytics crest"></div>
+        <aside class="hero-side">
+        <div class="lbl">Platform Stack</div>
+        <div class="stk">
+          <div class="row app"><span class="t">Veritas Workbench</span><span class="s">APPLICATION<span class="l-zh"> · 示範</span></span></div>
+          <div class="arrow"><b>▲</b> enabled by</div>
+          <div class="row core"><span class="t">VDF · VRN · VAP</span><span class="s">FUNCTIONAL CORE</span></div>
+          <div class="arrow"><b>▲</b> pulled by VRN</div>
+          <div class="row"><span class="t">Celeritas · Aegis · SSOT · Env · Registry</span><span class="s">INFRASTRUCTURE · the product</span></div>
+        </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="stats">
+  <div class="wrap">
+    <div class="stat"><div class="n"><em>0.0</em>%</div><div class="k">Error tolerance</div><div class="d">The near-zero standard VRN demanded — the forcing function that built the platform.</div></div>
+    <div class="stat"><div class="n"><em>3</em> · 10+</div><div class="k">Cores · Support modules</div><div class="d">VDF / VRN / VAP functional cores on a governed support-module fabric.</div></div>
+    <div class="stat"><div class="n">1 ctx</div><div class="k">Runtime bridge</div><div class="d">Env · Registry · SSOT · Aegis · Celeritas mounted to one shared execution context.</div></div>
+    <div class="stat"><div class="n">Keep <em>evolving</em></div><div class="k">Governance model</div><div class="d">Append-only, auditable, reversible — the platform never silently loses state.</div></div>
+  </div>
+</section>
+
+<section class="sec origin">
+  <div class="wrap">
+    <div class="origin-grid">
+      <div class="narr rv">
+        <div class="eyebrow gold">01 · Origin</div>
+        <h2>From a PM who<br>could not rest.</h2>
+        <div class="h2-zh">源起：一個週末無法休息的場景</div>
+        <p><em>The origin was not an AI product idea. It was a real operational burden.</em></p>
+        <p>A project manager at a leading electronic-components company — already running PM work — was asked to support a PLM rollout that had to coexist with legacy SAP and MS Project.</p>
+        <p>Every Monday meant a status briefing. Every weekend meant chasing data scattered across email, attachments, tables, charts, minutes, old systems and people's verbal accounts.</p>
+        <p class="zh">家人在電子零組件龍頭工作，本職是 PM，又被加上 PLM 導入任務，還得與既有 SAP、MS Project 並存。每週一簡報，代表週末無法真正休息 — 因為資料散落在信件、附件、表格、圖、會議紀錄與舊系統裡。</p>
+      </div>
+      <div class="rv">
+        <div class="painlist">
+          <div class="it"><div class="x">A</div><div class="c"><b>Multi-system coexistence</b> — SAP, MS Project &amp; a new PLM, none speaking the same language.<span class="zh">多系統並存，語言、欄位、命名各自為政</span></div></div>
+          <div class="it"><div class="x">B</div><div class="c"><b>Scattered evidence</b> across email, attachments, tables, charts and meeting notes.<span class="zh">郵件、附件、表格、圖、紀錄四散</span></div></div>
+          <div class="it"><div class="x">C</div><div class="c"><b>Manual weekly rework</b> — status rebuilt from zero, every single week.<span class="zh">專案狀態靠人工整理，週週重工</span></div></div>
+          <div class="it"><div class="x">D</div><div class="c"><b>No automatic reconciliation</b> between PLM / SAP / MS Project.<span class="zh">系統之間缺乏自動對標</span></div></div>
+          <div class="it"><div class="x">E</div><div class="c"><b>No traceable SSOT</b> — knowledge lived in human memory, not an auditable layer.<span class="zh">知識存在腦中，而非可追蹤的真相源</span></div></div>
+        </div>
+        <p class="lead" style="margin-top:22px">The real problem was never the report.<br>It was the absence of a governed single source of truth.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec ink">
+  <div class="wrap">
+    <div class="archhead rv">
+      <div class="eyebrow">02 · System Architecture</div>
+      <h2>One platform, three strata.</h2>
+      <div class="h2-zh">VIA 是基礎建設賦能層 · VDF / VRN / VAP 是功能核心 · Veritas Workbench 是建立其上的應用工作站</div>
+    </div>
+    <div class="stack rv">
+      <div class="layer app">
+        <div class="layer-top"><div class="lnum">03</div><div class="meta"><div class="k">03 · Application Workstation<span class="l-zh"> · 示範案例</span><span class="l-en"> · demo case</span></div><div class="t">Veritas Workbench <span class="zh">應用工作站</span></div></div></div>
+        <div class="mods"><div class="mod"><b>PLM</b> Automation</div><div class="mod"><b>Project</b> Management</div><div class="mod"><b>Auto-SSOT</b></div><div class="mod"><b>Process</b> Mining</div><div class="mod"><b>Weekly</b> Report</div><div class="mod"><b>Human-in-the-loop</b> Correction</div></div>
+      </div>
+      <div class="gutter"><span class="cap">▲</span><span class="pull">enabled by &nbsp;<b>VIA capabilities</b></span></div>
+      <div class="layer core">
+        <div class="layer-top"><div class="lnum">02</div><div class="meta"><div class="k">02 · Functional Core<span class="l-zh"> · 可商品化</span><span class="l-en"> · commercializable</span></div><div class="t">VDF · VRN · VAP <span class="zh">功能建設核心</span></div></div></div>
+        <div class="mods"><div class="mod"><b>VDF</b> · Data Forge<span class="l-zh"> — 投資數據擷取（Bloomberg 級）→ 可驗證資料庫</span><span class="l-en"> — Bloomberg-grade investment data → verifiable database</span></div><div class="mod"><b>VRN</b> · Report Nova<span class="l-zh"> — 讀數百份投資報告 → 精準、輕鬆入庫</span><span class="l-en"> — reads hundreds of investment reports → accurate, effortless database</span></div><div class="mod"><b>VAP</b> · Analytics Panorama<span class="l-zh"> — Dashboard / Matrix / 流程視覺</span><span class="l-en"> — Dashboard / Matrix / process visuals</span></div></div>
+      </div>
+      <div class="gutter"><span class="cap">▲</span><span class="pull">pulled by VRN's near-zero tolerance &nbsp;<b><span class="l-zh">· 源頭拉動</span><span class="l-en">· source pull</span></b></span></div>
+      <div class="layer">
+        <div class="layer-top"><div class="lnum">01</div><div class="meta"><div class="k">01 · Infrastructure · Support Modules<span class="l-zh"> · 可商品化</span><span class="l-en"> · commercializable</span></div><div class="t">VIA Support Fabric <span class="zh">基礎建設支援模組</span></div></div></div>
+        <div class="mods"><div class="mod"><b>VeritasCeleritas</b><span class="l-zh"> — 加速器 / xmap·xfetch·xbatch</span><span class="l-en"> — accelerator / xmap·xfetch·xbatch</span></div><div class="mod"><b>VeritasAegisNexus</b><span class="l-zh"> — 合規擷取 / rate·robots·cache</span><span class="l-en"> — compliant acquisition / rate·robots·cache</span></div><div class="mod"><b>VIA_SSOT_Unified</b> — alias·synonym·asset</div><div class="mod"><b>VIA_EnvManager</b> — venv·libs·route·health</div><div class="mod"><b>VIA_RegistryCore</b><span class="l-zh"> — append-only 註冊治理</span><span class="l-en"> — append-only registry governance</span></div><div class="mod"><b>VIA_RuntimeBridge</b><span class="l-zh"> — 共享 ctx 統一入口</span><span class="l-en"> — shared ctx, unified entry</span></div><div class="mod"><b>VIA_Prompt</b><span class="l-zh"> — Prompt 管理</span><span class="l-en"> — Prompt management</span></div><div class="mod"><b>VIA_Methodology</b><span class="l-zh"> — 方法論 / 反證 / 校正</span><span class="l-en"> — methodology / counter-evidence / correction</span></div><div class="mod"><b>VIA_AssetMgmt</b><span class="l-zh"> — 智慧資產 / 自動編號</span><span class="l-en"> — smart assets / auto-numbering</span></div><div class="mod"><b>VIA_VisualGovernance</b><span class="l-zh"> — 視覺規格 / RYG 矩陣</span><span class="l-en"> — visual spec / RYG matrix</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec navy">
+  <div class="wrap">
+    <div class="archhead rv" style="text-align:left;margin-bottom:28px">
+      <div class="eyebrow teal">03 · The Forcing Function</div>
+      <h2>VRN didn't use the platform.<br>VRN <em style="color:var(--seal);font-style:normal">forced</em> it into existence.</h2>
+      <div class="h2-zh">真正的發展順序是反的 — VRN 的極高要求，逼出了 VIA 的支援模組與功能核心</div>
+    </div>
+    <p class="body rv" style="margin-bottom:24px;max-width:none">Parsing investment reports — PDF, OCR, tables, in-image data, semantic repair, financial figures — carries almost no margin for error. One wrong field, one missed table, one misread number, and every downstream valuation, risk model and decision is contaminated. That intolerance is what built the infrastructure. <span class="zh" style="color:var(--mute)">一個欄位錯，後續估值、風險、策略全被污染 — 容錯率近乎為零，正是這份嚴格逼出了整套地基。</span></p>
+    <div class="rv" style="overflow-x:auto">
+      <table class="tbl">
+        <thead><tr><th style="width:24%">Capability VRN forced out</th><th style="width:38%">Why it was non-negotiable</th><th>How it now powers Workbench</th></tr></thead>
+        <tbody>
+          <tr><td class="a">VeritasCeleritas<span class="l-zh">加速器</span><span class="l-en">accelerator</span></td><td>OCR, imaging, table &amp; semantic repair plus mass validation are heavy.</td><td>Processes large volumes of email, attachments, tables and weekly-report data <b>at speed</b>.</td></tr>
+          <tr><td class="a">VeritasAegisNexus<span class="l-zh">網路模組</span><span class="l-en">network</span></td><td>Needed stable, compliant, auditable bulk data acquisition.</td><td>Connects authorized email, system exports &amp; enterprise sources with full <b>evidence trail</b>.</td></tr>
+          <tr><td class="a">VIA_SSOT_Unified<span class="l-zh">真相源</span><span class="l-en">SSOT</span></td><td>Fields, aliases, abbreviations and house jargon had to be unified.</td><td>Builds <b>Auto-SSOT</b> and cross-system semantic mapping automatically.</td></tr>
+          <tr><td class="a">VIA_EnvManager<span class="l-zh">環境治理</span><span class="l-en">env</span></td><td>OCR / PDF / imaging / DB / AI stacks are brutally hard to keep stable.</td><td>New Workbench features deploy fast — never strangled by dependency conflicts.</td></tr>
+          <tr><td class="a">VIA_RegistryCore<span class="l-zh">註冊治理</span><span class="l-en">registry</span></td><td>Growing tool count must be registered, classified, risk-tracked.</td><td>Keeps Workbench's modules from becoming an unmaintainable <b>nine-headed Hydra</b>.</td></tr>
+          <tr><td class="a">VAP · VisualGov<span class="l-zh">視覺治理</span><span class="l-en">visual gov</span></td><td>Complex pipelines must be made visible to be trusted.</td><td>Generates process maps, status matrices and briefing-ready slides.</td></tr>
+          <tr><td class="a">Asset · Methodology<span class="l-zh">智慧資產</span><span class="l-en">assets</span></td><td>Modules, prompts, templates, rules must stay traceable &amp; reusable.</td><td>Lets Workbench knowledge, corrections and methods <b>compound over time</b>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="sec navy2">
+  <div class="wrap">
+    <div class="archhead rv" style="text-align:left;margin-bottom:26px">
+      <div class="eyebrow">04 · The Enabler Layer</div>
+      <h2>Infrastructure as a moat.</h2>
+      <div class="h2-zh">支援模組最初不是為應用而生，卻成為每個新應用的加速器</div>
+    </div>
+    <div class="grid rv">
+      <div class="card"><div class="nm"><span class="dot"></span>VeritasCeleritas</div><div class="ro">Hardware-aware speed: CPU / RAM / thread budgets, memory pools, parallel engines, cache, JSON/compression/hashing.<span class="zh">不是盲目加速，而是用硬體狀態與任務特性控制速度 — 讓普通電腦也能跑大型自動化。</span></div></div>
+      <div class="card"><div class="nm"><span class="dot"></span>VeritasAegisNexus</div><div class="ro">Authorized-only acquisition: robots check, bounded timeout, offline mode, rate guard, risk blocking, cache.<span class="zh">大量擷取不只是技術問題，而是合規與可審計問題 — 每次抓取都留下來源、權限、時間。</span></div></div>
+      <div class="card"><div class="nm"><span class="dot"></span>VIA_SSOT_Unified</div><div class="ro">Corpus of regex / lists / synonyms / aliases with normalize · extract · contains · asset dump/load/patch.<span class="zh">不只是字典 — 同時支援標準化、抽取、檢查、資產保存與還原，是 Auto-SSOT 的基礎。</span></div></div>
+      <div class="card"><div class="nm"><span class="dot"></span>VIA_EnvManager</div><div class="ro">Unified venv / libs / alias / route / health / conflicts / rebuild — append-only, offline-capable, non-destructive.<span class="zh">新增工具必須先經 EnvManager 決策 — 讓擴張在可控環境治理下進行，而非亂裝套件。</span></div></div>
+      <div class="card"><div class="nm"><span class="dot"></span>VIA_RegistryCore</div><div class="ro">Append-only registry governing module scan, register, resolve, route &amp; execution entry.<span class="zh">工具越多越不能靠記憶 — 集中治理，是避免系統變成九頭龍的關鍵。</span></div></div>
+      <div class="card"><div class="nm"><span class="dot"></span>Prompt · Methodology · Asset</div><div class="ro">Prompt schemas, hypothesis/counter-evidence methodology, traceable asset IDs with correction history.<span class="zh">AI 不能每次憑感覺輸出 — 固定分析邏輯、反證流程、人機校正全部成為可累積資產。</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec ink">
+  <div class="wrap">
+    <div class="wb-grid">
+      <div class="rv">
+        <div class="eyebrow gold">05 · Example Application</div>
+        <h2>Veritas Workbench.</h2>
+        <div class="h2-zh">由基礎建設賦能的應用範例之一 — 各領域應用持續演進，本身不是產品，只是平台成熟度的證明</div>
+        <p class="body">It connects authorized communication, documents, legacy systems and project records into a traceable intelligence layer — turning <strong>text into data, tables into databases, workflows into process maps, corrections into knowledge</strong>, and weekly reporting into a governed human-in-the-loop cycle.</p>
+        <div class="wb-def">
+          <div class="en">An AI automation workstation for PLM, project management, Auto-SSOT and process mining — enabled by the VIA infrastructure layer.</div>
+          <div class="zh">面向 PLM、專案管理、Auto-SSOT 與流程探勘的 AI 自動化工作站。不取代 SAP / MS Project / PLM，而是在尊重既有系統的前提下，負責同步、清理、分類、編號、驗證、視覺化與生成週報。</div>
+        </div>
+        <div class="hero-cta">
+          <div class="chip"><b>Legacy-first</b> · 尊重舊系統</div>
+          <div class="chip"><b>Authorized-only</b> · 不越權擷取</div>
+          <div class="chip"><b>Evidence-first</b> · 結論可追溯</div>
+        </div>
+      </div>
+      <div class="wb-flow rv">
+        <div class="lbl">Human-in-the-loop Cycle</div>
+        <div class="flowstep"><div class="i">01</div><div class="c"><b>Authorized capture</b> — email · attachments · SAP / MS Project / PLM exports · local files</div></div>
+        <div class="flowstep"><div class="i">02</div><div class="c"><b>VRN-like parsing</b> — text repair · table reconstruction · in-image data · attachment routing</div></div>
+        <div class="flowstep"><div class="i">03</div><div class="c"><b>Auto-SSOT</b> — field unification · keyword corpus · jargon mapping · cross-system naming</div></div>
+        <div class="flowstep"><div class="i">04</div><div class="c"><b>Process mining</b> — flow reconstruction · bottlenecks · responsibility &amp; gap matrices</div></div>
+        <div class="flowstep hi"><div class="i">05</div><div class="c"><b>Human checkpoint</b> — review · expose uncertainty · list possible failure causes · correct</div></div>
+        <div class="flowstep"><div class="i">06</div><div class="c"><b>Report &amp; slides</b> — weekly report · pivots · charts · briefing draft</div></div>
+        <div class="flowstep hi"><div class="i">07</div><div class="c"><b>Learning ledger</b> — corrections written back to knowledge &amp; methodology — next week is sharper</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec navy">
+  <div class="wrap">
+    <div class="archhead rv" style="text-align:left;margin-bottom:24px">
+      <div class="eyebrow teal">06 · Velocity</div>
+      <h2>Why it ships fast.</h2>
+      <div class="h2-zh">Workbench 快，不是因為需求簡單，而是因為 VIA 已先把最難的地基做好</div>
+    </div>
+    <div class="rv">
+      <div class="maprow"><div class="req"><strong>Email &amp; attachment parsing</strong><span class="l-zh"> · 信件附件解析</span></div><div class="arr">→ already in</div><div class="cap">VRN parsing + VAP visual layer</div></div>
+      <div class="maprow"><div class="req"><strong>Auto-SSOT</strong><span class="l-zh"> · 自動真相源</span></div><div class="arr">→ already in</div><div class="cap">SSOT_Unified + Registry + Asset Mgmt</div></div>
+      <div class="maprow"><div class="req"><strong>Fast processing on commodity hardware</strong><span class="l-zh"> · 普通電腦也跑得動</span></div><div class="arr">→ already in</div><div class="cap">VeritasCeleritas</div></div>
+      <div class="maprow"><div class="req"><strong>Authorized data acquisition</strong><span class="l-zh"> · 合規擷取</span></div><div class="arr">→ already in</div><div class="cap">VeritasAegisNexus</div></div>
+      <div class="maprow"><div class="req"><strong>Stable local runtime</strong><span class="l-zh"> · 穩定本機執行</span></div><div class="arr">→ already in</div><div class="cap">EnvManager + RuntimeBridge</div></div>
+      <div class="maprow"><div class="req"><strong>Reports, charts, pivots</strong><span class="l-zh"> · 週報圖表</span></div><div class="arr">→ already in</div><div class="cap">VAP + Prompt + Methodology + VisualGov</div></div>
+      <div class="maprow"><div class="req"><strong>Process mining &amp; correction loop</strong><span class="l-zh"> · 流程探勘與校正</span></div><div class="arr">→ already in</div><div class="cap">Methodology + Knowledge Ledger + Matrix</div></div>
+    </div>
+    <p class="lead rv" style="margin-top:26px">From scratch, this is a multi-year enterprise build.<br>On VIA, the hardest layers were already done.</p>
+  </div>
+</section>
+
+<section class="sec navy2">
+  <div class="wrap">
+    <div class="archhead rv" style="text-align:left;margin-bottom:22px">
+      <div class="eyebrow gold">07 · Resilience Spec</div>
+      <h2>The "doomsday" test is a requirement,<br>not an incident.</h2>
+      <div class="h2-zh">全團隊離職、無網路、無 AI — 這不是災難故事，而是系統韌性標準</div>
+    </div>
+    <p class="body rv" style="margin-bottom:6px;max-width:none">Under degraded conditions — no network, no external AI, no clean handover — the system must not hallucinate certainty. It must degrade honestly into a deterministic rule engine. <span class="zh" style="color:var(--mute)">真正的測試不是「還能不能幻想答案」，而是能否誠實產出可追蹤、可檢查、可接手的最低可用成果。</span></p>
+    <div class="res-grid rv">
+      <div class="res"><div class="h">No Network<span class="l-zh"> · 無網路</span></div><div class="yes">Use local cache, last-sync state &amp; offline SSOT for classification and reconciliation.</div><div class="no"><b>Never</b> claim it fetched fresh cloud data.</div></div>
+      <div class="res"><div class="h">No AI<span class="l-zh"> · 無 AI 支援</span></div><div class="yes">Fall back to a deterministic rule engine, template reports, fixed classifiers.</div><div class="no"><b>Never</b> let the whole system collapse.</div></div>
+      <div class="res"><div class="h">No Handover<span class="l-zh"> · 無交接</span></div><div class="yes">Generate a handover pack: project list, responsibility / risk matrix, process map, gap list.</div><div class="no"><b>Never</b> pretend to know un-handed-over context.</div></div>
+    </div>
+    <p class="lead rv" style="margin-top:24px">If it still produces a conservative report, a risk matrix and a handover pack offline — it is no longer an assistant. It is operational infrastructure.</p>
+  </div>
+</section>
+
+<section class="sec navy">
+  <div class="wrap">
+    <div class="archhead rv" style="text-align:left;margin-bottom:24px">
+      <div class="eyebrow teal">08 · Built on VIA</div>
+      <h2>Same engine room. Many applications.</h2>
+      <div class="h2-zh">同一套基礎建設長出的分析與模擬應用 — 為投資創造收益、規避風險</div>
+    </div>
+    <div class="domains rv">
+      <span class="dlbl">Strategy domains served</span>
+      <span class="dchip">Macro<span class="l-zh"> 總經</span></span><span class="dchip">Industry<span class="l-zh"> 產業</span></span><span class="dchip">Valuation<span class="l-zh"> 估值</span></span><span class="dchip">Technical<span class="l-zh"> 技術</span></span><span class="dchip">Chip<span class="l-zh"> 籌碼</span></span><span class="dchip">Sentiment<span class="l-zh"> 情緒</span></span><span class="dchip">Game Theory<span class="l-zh"> 博弈</span></span>
+      <span class="dnote"><span class="l-zh">內部方法論與規則為機密 · </span>proprietary logic withheld</span>
+    </div>
+    <div class="gal rv">
+      <div class="appcard">
+        <div class="apphead" style="--ac:#5e8fcc"><span class="ab">VIA</span><span class="an">Chip Analysis</span><span class="adot"></span><span class="ata">族群</span><span class="ata">供需</span><span class="ata">強弱</span></div><div class="screen shot"><img src="assets/shot-chip.png" alt="Chip Analysis"></div>
+        <div class="cap"><div class="nm">VIA Chip Analysis Platform</div><div class="zh">有效族群輪動模擬驗證</div><span class="bdg analysis">Analysis</span></div>
+      </div>
+      <div class="appcard">
+        <div class="apphead" style="--ac:#3aa6a0"><span class="ab">VIA</span><span class="an">Capital Flow</span><span class="adot"></span><span class="ata">世界資金流</span><span class="ata">情境模擬</span><span class="ata">風險層級</span></div><div class="screen shot"><img src="assets/shot-map.png" alt="Global Capital Flow"></div>
+        <div class="cap"><div class="nm">Global Capital-Flow Simulation</div><div class="zh">全球資金市場流動模擬驗證</div><span class="bdg sim">Simulation</span></div>
+      </div>
+      <div class="appcard">
+        <div class="apphead" style="--ac:#c6a456"><span class="ab">VIA</span><span class="an">Risk Weekly</span><span class="adot"></span><span class="ata">風險燈</span><span class="ata">週報</span><span class="ata">矩陣</span></div><div class="screen shot"><img src="assets/shot-risk.png" alt="Market Risk Weekly"></div>
+        <div class="cap"><div class="nm">Market Risk Weekly · VisualLock</div><div class="zh">市場風險週報自動生成，高自動化節省人力 AI 開支</div><span class="bdg risk">Risk</span></div>
+      </div>
+      <div class="appcard">
+        <div class="apphead" style="--ac:#d2706f"><span class="ab">VIA</span><span class="an">FlowSystem</span><span class="adot"></span><span class="ata">Asset</span><span class="ata">RORO</span><span class="ata">Risk</span></div><div class="screen shot"><img src="assets/shot-flow.png" alt="Global ETF Flow"></div>
+        <div class="cap"><div class="nm">VIA FlowSystem · ETF Direction &amp; Intensity</div><div class="zh">全球 ETF 資金流向 · 方向 × 強度 × 系統驗證</div><span class="bdg risk">Risk</span></div>
+      </div>
+      <div class="appcard">
+        <div class="apphead" style="--ac:#5e8fcc"><span class="ab">VIA</span><span class="an">Macro Board</span><span class="adot"></span><span class="ata">Equities</span><span class="ata">Rates</span><span class="ata">Macro</span></div><div class="screen shot"><img src="assets/shot-macro.png" alt="Macro Dashboard"></div>
+        <div class="cap"><div class="nm">VIA Macro Dashboard</div><div class="zh">總體經濟多面板 · YTD 正規化</div><span class="bdg analysis">Analysis</span></div>
+      </div>
+      <div class="appcard">
+        <div class="apphead" style="--ac:#c6a456"><span class="ab">VIA</span><span class="an">Decision Studio</span><span class="adot"></span><span class="ata">Registry</span><span class="ata">Spec</span><span class="ata">Build</span></div><div class="screen shot"><img src="assets/shot-studio.png" alt="Decision Studio"></div>
+        <div class="cap"><div class="nm">Veritas Decision Studio</div><div class="zh">功能/工具註冊 · 只增不減 Append-Only</div><span class="bdg">Infra · Registry</span></div>
+      </div>
+      <div class="appcard">
+        <div class="apphead" style="--ac:#5e8fcc"><span class="ab">VIA</span><span class="an">Platform</span><span class="adot"></span><span class="ata">Macro</span><span class="ata">Markets</span><span class="ata">Research</span></div><div class="screen shot"><img src="assets/shot-platform.png" alt="VIA Platform"></div>
+        <div class="cap"><div class="nm">VIA Research Platform</div><div class="zh">研究智慧平台 · 一字印譜系統</div><span class="bdg analysis">Platform</span></div>
+      </div>
+      <div class="appcard">
+        <div class="apphead" style="--ac:#c6a456"><span class="ab">VIA</span><span class="an">SSOT Maintainer</span><span class="adot"></span><span class="ata">Schema</span><span class="ata">Contract</span><span class="ata">Validate</span></div><div class="screen shot"><img src="assets/shot-ssot.png" alt="SSOT VisualMaintainer"></div>
+        <div class="cap"><div class="nm">SSOT VisualMaintainer</div><div class="zh">SSOT 視覺維運 · 契約與驗證治理</div><span class="bdg">Infra · Govern</span></div>
+      </div>
+    </div>
+    <p class="body rv" style="margin-top:18px;color:var(--mute);max-width:none"><span class="l-zh">每一個畫面都不是獨立產品，而是同一套 VIA 基礎建設快速生成的應用 — 分析、模擬、風險、資產生成，全部共用支援引擎與功能引擎。</span><span class="l-en">Each screen is not a standalone product — it is an application generated fast on the same VIA infrastructure: analysis, simulation, risk, asset generation, all sharing the support engine and functional engine. </span><b style="color:var(--paper-dim)"><span class="l-zh">它們證明地基能持續長出為投資創造收益、規避風險的工具。</span><span class="l-en">They prove the foundation keeps producing tools that capture return and avoid risk for investors.</span></b></p>
+  </div>
+</section>
+
+<section class="sec ink">
+  <div class="wrap">
+    <div class="archhead rv" style="text-align:left;margin-bottom:26px">
+      <div class="eyebrow">09 · Next</div>
+      <h2>Three super-core upgrades.</h2>
+      <div class="h2-zh">Workbench 不是終點，而是 VIA 下一階段升級的觸發器</div>
+    </div>
+    <div class="road rv">
+      <div class="rcard"><div class="x">A · ASSET</div><h3>Smart Asset Management</h3><div class="zh">智慧資產管理</div><ul><li>AssetID · Version · Owner</li><li>Source · Dependency · Checksum</li><li>Usage history</li><li>Human-correction history</li></ul></div>
+      <div class="rcard"><div class="x">B · METHOD</div><h3>Methodology Mgmt</h3><div class="zh">方法論管理</div><ul><li>Hypothesis · counter-evidence</li><li>Reasoning path · sources</li><li>Possible failure modes</li><li>Decision basis · next improvement</li></ul></div>
+      <div class="rcard"><div class="x">C · PROMPT</div><h3>Prompt Management</h3><div class="zh">Prompt 管理</div><ul><li>PromptID · role · risk</li><li>Input / output schema</li><li>Validation rules</li><li>Revision &amp; feedback history</li></ul></div>
+    </div>
+    <p class="body rv" style="margin-top:22px;color:var(--mute)">這三者讓 Workbench 從「幫忙整理」升級成「幫忙看清楚事情」 — 也是整個 VIA 的方法論與執行中樞。</p>
+  </div>
+</section>
+
+<section class="sec ink">
+  <div class="wrap">
+    <div class="archhead rv" style="text-align:left;margin-bottom:20px">
+      <div class="eyebrow teal">10 · Strategy Core</div>
+      <h2>Investment thinking, made verifiable.</h2>
+      <div class="h2-zh">Veritas Strategy Core — 把各類投資思維轉為可驗證流程（內部規則與訊號為機密，僅示意引擎拓慳）</div>
+    </div>
+    <div class="rv" style="border:1px solid var(--line);border-radius:var(--r);background:rgba(7,10,20,.4);padding:16px;overflow-x:auto">
+      <div style="display:flex;align-items:stretch;gap:6px;min-width:1140px">
+        <div style="flex:0 0 124px;border:1px solid var(--line);border-radius:12px;background:rgba(23,34,65,.42);padding:11px 12px"><div style="font:700 8px 'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--seal)">01 · Method</div><div style="font:700 12px 'DM Sans',sans-serif;color:#ece9e2;margin-top:5px">Methodology</div><div style="font:500 8.5px 'DM Mono',monospace;color:#7d879d;margin-top:3px">VIA_MethodologyEngine</div></div>
+        <div style="flex:0 0 auto;display:flex;align-items:center;color:#5f6b78;font:700 13px 'DM Mono',monospace">→</div>
+        <div style="flex:0 0 124px;border:1px solid var(--line);border-radius:12px;background:rgba(23,34,65,.42);padding:11px 12px"><div style="font:700 8px 'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--seal)">02 · Prompt</div><div style="font:700 12px 'DM Sans',sans-serif;color:#ece9e2;margin-top:5px">Prompt Engine</div><div style="font:500 8.5px 'DM Mono',monospace;color:#7d879d;margin-top:3px">VIA_PromptEngine</div></div>
+        <div style="flex:0 0 auto;display:flex;align-items:center;color:#5f6b78;font:700 13px 'DM Mono',monospace">→</div>
+        <div style="flex:0 0 124px;border:1px solid rgba(58,166,160,.3);border-radius:12px;background:rgba(58,166,160,.08);padding:11px 12px"><div style="font:700 8px 'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#6fc08a">03 · Data</div><div style="font:700 12px 'DM Sans',sans-serif;color:#ece9e2;margin-top:5px">VDF</div><div style="font:500 8.5px 'DM Mono',monospace;color:#7d879d;margin-top:3px">Data Forge</div></div>
+        <div style="flex:0 0 auto;display:flex;align-items:center;color:#5f6b78;font:700 13px 'DM Mono',monospace">→</div>
+        <div style="flex:0 0 124px;border:1px solid rgba(58,166,160,.3);border-radius:12px;background:rgba(58,166,160,.08);padding:11px 12px"><div style="font:700 8px 'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#6fc08a">04 · Document</div><div style="font:700 12px 'DM Sans',sans-serif;color:#ece9e2;margin-top:5px">VRN</div><div style="font:500 8.5px 'DM Mono',monospace;color:#7d879d;margin-top:3px">Report Nova</div></div>
+        <div style="flex:0 0 auto;display:flex;align-items:center;color:#5f6b78;font:700 13px 'DM Mono',monospace">→</div>
+        <div style="flex:0 0 124px;border:1px solid rgba(58,166,160,.3);border-radius:12px;background:rgba(58,166,160,.08);padding:11px 12px"><div style="font:700 8px 'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#6fc08a">05 · Visual</div><div style="font:700 12px 'DM Sans',sans-serif;color:#ece9e2;margin-top:5px">VAP</div><div style="font:500 8.5px 'DM Mono',monospace;color:#7d879d;margin-top:3px">Analytics Panorama</div></div>
+        <div style="flex:0 0 auto;display:flex;align-items:center;color:#5f6b78;font:700 13px 'DM Mono',monospace">→</div>
+        <div style="flex:0 0 124px;border:1px solid rgba(198,164,86,.34);border-radius:12px;background:rgba(198,164,86,.08);padding:11px 12px"><div style="font:700 8px 'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--gold)">06 · Gate</div><div style="font:700 12px 'DM Sans',sans-serif;color:#ece9e2;margin-top:5px">Risk Validation</div><div style="font:500 8.5px 'DM Mono',monospace;color:#7d879d;margin-top:3px">VeritasRiskValidationEngine</div></div>
+        <div style="flex:0 0 auto;display:flex;align-items:center;color:#5f6b78;font:700 13px 'DM Mono',monospace">→</div>
+        <div style="flex:0 0 124px;border:1px solid var(--line);border-radius:12px;background:rgba(23,34,65,.42);padding:11px 12px"><div style="font:700 8px 'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--seal)">07 · Rotation</div><div style="font:700 12px 'DM Sans',sans-serif;color:#ece9e2;margin-top:5px">Rotation Engine</div><div style="font:500 8.5px 'DM Mono',monospace;color:#7d879d;margin-top:3px">VeritasTaiwanRotationEngine</div></div>
+        <div style="flex:0 0 auto;display:flex;align-items:center;color:#5f6b78;font:700 13px 'DM Mono',monospace">→</div>
+        <div style="flex:0 0 124px;border:1px solid var(--line);border-radius:12px;background:rgba(23,34,65,.42);padding:11px 12px"><div style="font:700 8px 'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--seal)">08 · Intraday</div><div style="font:700 12px 'DM Sans',sans-serif;color:#ece9e2;margin-top:5px">Intraday Engine</div><div style="font:500 8.5px 'DM Mono',monospace;color:#7d879d;margin-top:3px">VeritasIntradayTradingEngine</div></div>
+        <div style="flex:0 0 auto;display:flex;align-items:center;color:#5f6b78;font:700 13px 'DM Mono',monospace">→</div>
+        <div style="flex:0 0 124px;border:1px solid var(--line);border-radius:12px;background:rgba(23,34,65,.42);padding:11px 12px"><div style="font:700 8px 'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--seal)">09 · Review</div><div style="font:700 12px 'DM Sans',sans-serif;color:#ece9e2;margin-top:5px">Lesson Ledger</div><div style="font:500 8.5px 'DM Mono',monospace;color:#7d879d;margin-top:3px">VIA_LessonLedger</div></div>
+      </div>
+    </div>
+    <div class="res-grid rv" style="margin-top:14px">
+      <div class="res"><div class="h">01 · Order</div><div class="yes">Methodology precedes strategy; risk-validation precedes trading; rotation precedes intraday.<span class="l-zh" style="display:block;color:var(--mute);margin-top:5px">方法論先於策略 · 風險驗證先於交易</span></div></div>
+      <div class="res"><div class="h">02 · Governance</div><div class="yes">Prompts are governed by methodology; every result writes back to the Lesson Ledger.<span class="l-zh" style="display:block;color:var(--mute);margin-top:5px">Prompt 受方法論管理 · 結果回寫 Lesson Ledger</span></div></div>
+      <div class="res"><div class="h">03 · Guardrail</div><div class="yes">The AI never issues a trade command — only risk-gated candidates.<span class="l-zh" style="display:block;color:var(--mute);margin-top:5px">AI 不下交易指令 · 只給通過風險闘門的候選</span></div></div>
+    </div>
+    <p class="lead rv" style="margin-top:20px;max-width:none">Veritas Strategy Core turns investment thinking into verifiable methodology — executed by the Prompt Engine, gated by Risk Validation — before it ever reaches the rotation and intraday engines.</p>
+  </div>
+</section>
+
+<section class="sec navy">
+  <div class="wrap">
+    <div class="archhead rv" style="text-align:left;margin-bottom:24px">
+      <div class="eyebrow gold">11 · Commercialization</div>
+      <h2>We sell <em style="color:var(--gold);font-style:normal">infrastructure services</em>, not applications.</h2>
+      <div class="h2-zh">產品是 Veritas Intelligence Analytics 基礎建設「服務」 — 各領域不斷演進的應用都不是銷售標的，關鍵在基礎建設本身，而非任何單一應用</div>
+    </div>
+    <div class="comm-grid rv">
+      <div class="comm sell">
+        <div class="tag">The Product<span class="l-zh"> · 銷售標的</span><span class="l-en"> · for sale</span></div>
+        <h3>Infrastructure Services <span class="zh">基礎建設服務</span></h3>
+        <div class="eq"><span class="l-zh">支援引擎 </span>Support Engine &nbsp;+&nbsp; <span class="l-zh">功能引擎 </span>Functional Engine</div>
+        <ul>
+          <li>VIA Support Fabric — Celeritas · Aegis · SSOT · Env · Registry · Runtime</li>
+          <li>Functional Core — VDF · VRN · VAP</li>
+          <li>Delivered as a service: licensable · platform · repeatable</li>
+          <li><span class="l-zh">可複製到任何垂直領域的 AI 開發地基</span><span class="l-en">An AI-development foundation portable to any vertical</span></li>
+        </ul>
+        <p><b>This is the moat.</b> <span class="l-zh">真正的產品是這套基礎建設服務 — 它讓任何新應用在數週內成形，價值隨每個專案複利累積。</span><span class="l-en">The real product is this infrastructure service — it forms any new application within weeks, and its value compounds with every project.</span></p>
+      </div>
+      <div class="comm proof">
+        <div class="tag">Not For Sale<span class="l-zh"> · 非銷售標的</span></div>
+        <h3>Evolving Applications <span class="zh">各領域應用</span></h3>
+        <div class="eq">Veritas Workbench · Finance · PLM · …any domain</div>
+        <ul>
+          <li><span class="l-zh">PLM · 專案管理 · Auto-SSOT · 流程探勘 · 週報</span><span class="l-en">PLM · Project Mgmt · Auto-SSOT · Process Mining · Weekly Report</span></li>
+          <li><span class="l-zh">金融分析 · 估值 · 風險 · 策略 · 其他垂直領域</span><span class="l-en">Financial analysis · valuation · risk · strategy · other verticals</span></li>
+          <li><span class="l-zh">持續演進、可被替換，而非標準化商品</span><span class="l-en">Always evolving, replaceable — not a standardized product</span></li>
+          <li><span class="l-zh">角色：證明基礎建設已成熟、能快速生成企業級應用</span><span class="l-en">Role: proof the infrastructure is mature enough to generate enterprise apps fast</span></li>
+        </ul>
+        <p><span class="l-zh">應用會變、會被取代；不變的是底層基礎建設。</span><span class="l-en">Applications change and get replaced; the underlying infrastructure does not. </span><b style="color:var(--paper)"><span class="l-zh">關鍵在基礎建設，而非應用。</span><span class="l-en">The key is the infrastructure, not the apps.</span></b></p>
+      </div>
+    </div>
+    <p class="lead rv" style="margin-top:24px;max-width:none">Applications change. The infrastructure compounds.<br>That service layer — not any single app — is what you invest in.</p>
+  </div>
+</section>
+
+<section class="close">
+  <img class="close-crest" src="assets/veritas-crest.png" alt="">
+  <div class="wrap">
+    <div class="thesis rv">
+      <div class="line">We sell the <span class="em">infrastructure.</span></div>
+      <div class="line dim">Supportive engines + functional engines,</div>
+      <div class="line">Applications across every domain are evolving proof —<br>never the product. The engine room is.</div>
+      <div class="zh-close">Veritas Intelligence Analytics 基礎建設服務（支援引擎 + 功能引擎）<br>各領域應用持續演進，但都不是銷售標的<br><span style="color:var(--mute)">關鍵與護城河，是基礎建設本身 — 而非任何單一應用。</span></div>
+      <div class="tagline">AI creates infinite possibilities. VIA accelerates them into reality.<span class="l-zh">AI 創造無限可能，VIA 加速願景成真。</span></div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+    <div class="brand"><img class="crest" style="height:34px" src="assets/veritas-crest.png" alt="Veritas crest"><div class="mark" style="font-size:12px">VERITAS<span style="color:var(--seal)">·</span>INTELLIGENCE<span style="color:var(--seal)">·</span>ANALYTICS</div></div>
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap"><div class="f">AI Infrastructure OS · 只增不減 · 補不足 · 持續優化 · Append-only · 2026</div><button id="pdfbtn" class="pdfbtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4"></path><path d="M5 21h14"></path></svg>匯出 PDF · Save as PDF</button></div>
+  </div>
+</footer>
+
+<div class="pnav"><button class="pprev" aria-label="previous">‹</button><span class="pcount">1 / 12</span><button class="pnext" aria-label="next">›</button><button class="pexit" aria-label="exit">✕</button></div>
+<div class="pslide-head"><img src="assets/veritas-crest.png" alt=""><span class="pbrand">VERITAS<i>·</i>INTELLIGENCE<i>·</i>ANALYTICS</span><span class="pslide-tag">Investor Brief · Confidential</span></div>
+<div class="pslide-foot"><span>AI Infrastructure OS · 只增不減補不足持續優化 · Append-only</span><span class="pslide-page">1 / 14</span></div></x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  componentDidMount(){
+    const run = () => {
+      const els = document.querySelectorAll('.rv');
+      if(!('IntersectionObserver' in window)){ els.forEach(e=>e.classList.add('in')); return; }
+      const io = new IntersectionObserver((es)=>{
+        es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+      },{threshold:.12, rootMargin:'0px 0px -8% 0px'});
+      els.forEach(el=>io.observe(el));
+    };
+    if(typeof requestAnimationFrame!=='undefined') requestAnimationFrame(()=>setTimeout(run,30)); else run();
+    const pb=document.getElementById('pdfbtn'); if(pb) pb.onclick=()=>{ window.print(); };
+    const setLang=(l)=>{document.body.classList.toggle('lang-en',l==='en');document.querySelectorAll('#langseg button').forEach(b=>b.classList.toggle('on',b.dataset.lang===l));try{localStorage.setItem('via_lang',l);}catch(e){}};
+    document.querySelectorAll('#langseg button').forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
+    let _lg='zh';try{_lg=localStorage.getItem('via_lang')||'zh';}catch(e){}setLang(_lg);
+    const slides=[...document.querySelectorAll('.hero, .stats, .sec, .close')];slides.forEach(s=>s.classList.add('slide'));
+    let pi=0;
+    const setCount=()=>{const t=(pi+1)+' / '+slides.length;const a=document.querySelector('.pcount');if(a)a.textContent=t;const b=document.querySelector('.pslide-page');if(b)b.textContent=t;};
+    const show=(i)=>{pi=Math.max(0,Math.min(slides.length-1,i));slides.forEach((s,k)=>s.classList.toggle('active',k===pi));if(slides[pi])slides[pi].scrollTop=0;setCount();};
+    const exitP=()=>{document.body.classList.remove('presenting');document.removeEventListener('keydown',onKey);if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(()=>{});};
+    const onKey=(e)=>{if(!document.body.classList.contains('presenting'))return;if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();show(pi+1);}else if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();show(pi-1);}else if(e.key==='Escape'){exitP();}};
+    const enterP=()=>{document.body.classList.add('presenting');show(0);document.addEventListener('keydown',onKey);const de=document.documentElement;if(de.requestFullscreen)de.requestFullscreen().catch(()=>{});};
+    const prB=document.getElementById('presentBtn');if(prB)prB.onclick=enterP;
+    document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&document.body.classList.contains('presenting'))exitP();});
+    const pn=document.querySelector('.pnav');if(pn){pn.querySelector('.pprev').onclick=()=>show(pi-1);pn.querySelector('.pnext').onclick=()=>show(pi+1);pn.querySelector('.pexit').onclick=exitP;}
+    window.viaGoto=(i)=>{document.body.classList.add('presenting');show(i);};window.viaExit=exitP;
+  }
+}
+</script>
+<script>
+(async () => {
+  if (!document.title || !document.title.trim()) document.title = "Veritas Intelligence Analytics Brief";
+  // Prepend so page-supplied @page / break rules (deck-stage's margin:0,
+  // author CSS) keep source-order precedence over the baseline.
+  const baseCss = document.createElement('style');
+  baseCss.textContent = "@media print {\n  figure, table { break-inside: avoid; }\n  *, *::before, *::after {\n    print-color-adjust: exact; -webkit-print-color-adjust: exact;\n    backdrop-filter: none !important; -webkit-backdrop-filter: none !important;\n    animation-delay: -99s !important; animation-duration: .001s !important;\n    animation-iteration-count: 1 !important; animation-fill-mode: both !important;\n    animation-play-state: running !important; transition-duration: 0s !important;\n  }\n}";
+  document.head.prepend(baseCss);
+  if (document.readyState === 'loading') {
+    await new Promise((r) => document.addEventListener('DOMContentLoaded', r, { once: true }));
+  }
+  let ds = document.querySelector('deck-stage');
+  // whenDefined never resolves when nothing registers the element, so only
+  // await it when a <deck-stage> tag exists (and race a timeout regardless).
+  if (ds && !customElements.get('deck-stage')) {
+    try {
+      await Promise.race([
+        customElements.whenDefined('deck-stage'),
+        new Promise((r) => setTimeout(r, 3000)),
+      ]);
+    } catch (e) {}
+    ds = document.querySelector('deck-stage');
+  }
+  // dc-runtime assigns window.DCLogic at init and mounts into #dc-root on
+  // DOMContentLoaded; settle on that subtree so React has rendered before
+  // print(). Non-DC pages fall through to weighing body.
+  const isDc = !ds && 'DCLogic' in window;
+  const settleRoot = ds || (isDc ? document.getElementById('dc-root') : null) || document.body;
+  if (settleRoot) {
+    // Weigh only content children — skip script/style/template so inline
+    // Babel/CSS doesn't register as stable "content" before the framework
+    // has mounted anything.
+    const MEDIA = 'img,svg,canvas,video,picture,iframe,embed,object';
+    const weigh = () => {
+      let text = 0, media = 0;
+      for (const c of settleRoot.children) {
+        const t = c.tagName;
+        if (t === 'SCRIPT' || t === 'STYLE' || t === 'TEMPLATE') continue;
+        text += (c.textContent || '').trim().length;
+        media += c.querySelectorAll(MEDIA).length + (c.matches(MEDIA) ? 1 : 0);
+      }
+      return text + media * 100;
+    };
+    // "Non-zero and stable" alone is not sufficient to mean rendered: generic
+    // body can carry a static shell while async main content is pending, and
+    // #dc-root can carry the root DC's static text while child refs are still
+    // .sc-placeholder boxes. Gate generic on readyState 'complete', and never
+    // accept stability while a dc-runtime placeholder is present.
+    const isGeneric = settleRoot === document.body;
+    const deadline = Date.now() + 15000;
+    let last = -1, stable = 0;
+    while (Date.now() < deadline) {
+      const n = weigh();
+      const ready =
+        (!isGeneric || document.readyState === 'complete') &&
+        !settleRoot.querySelector('.sc-placeholder');
+      if (n > 0 && n === last && ready) { if (++stable >= 2) break; } else { stable = 0; }
+      last = n;
+      await new Promise((r) => setTimeout(r, 250));
+    }
+  }
+  // Project support.js may predate runtime default-seeding; push via bridge.
+  if (isDc && window.__dcSetProps && window.__dcRootName) {
+    try {
+      const dpEl = document.querySelector('script[data-dc-script]');
+      const meta = JSON.parse((dpEl && dpEl.getAttribute('data-props')) || '{}');
+      const bag = {};
+      for (const k in meta)
+        if (k[0] !== '$' && meta[k] && meta[k].default !== undefined)
+          bag[k] = meta[k].default;
+      if (Object.keys(bag).length) {
+        window.__dcSetProps(window.__dcRootName(), bag);
+        await new Promise((r) => setTimeout(r, 50));
+      }
+    } catch (e) {}
+  }
+  // Reveal content gated on scroll or visibility before printing. Lazy <img>,
+  // IntersectionObserver fade-ins, and collapsed <details> don't render while
+  // off-screen, so a long page would print with them blank or closed. Open
+  // every <details>, force native-lazy images eager, and scroll the document
+  // through its full height to trip lazy-load + IO; then wait (bounded) for the
+  // newly-triggered images. Inert for deck-stage (slides aren't scroll-gated).
+  try {
+    for (const d of document.querySelectorAll('details')) d.open = true;
+    for (const img of document.querySelectorAll('img[loading="lazy"]'))
+      img.loading = 'eager';
+    const scroller = document.scrollingElement || document.documentElement;
+    const full = Math.max(scroller.scrollHeight, document.body.scrollHeight);
+    const step = window.innerHeight || 800;
+    for (let y = 0; y <= full; y += step) {
+      window.scrollTo(0, y);
+      await new Promise((r) => requestAnimationFrame(r));
+    }
+    window.scrollTo(0, 0);
+    await Promise.race([
+      Promise.all(
+        [...document.images].map((img) =>
+          img.complete
+            ? null
+            : new Promise((res) => {
+                img.addEventListener('load', res, { once: true });
+                img.addEventListener('error', res, { once: true });
+              })
+        )
+      ),
+      new Promise((r) => setTimeout(r, 4000)),
+    ]);
+  } catch (e) {}
+  try { await document.fonts.ready; } catch (e) {}
+  // Jump every animation to its end state so print() never captures a slide
+  // mid-entrance. Ordering matters: the 0s-transition style must be live
+  // BEFORE data-deck-active is set so attribute-keyed transitions don't
+  // start a (now-0s) run from the pre-active base.
+  const st = document.createElement('style');
+  st.textContent = '*,*::before,*::after{animation-delay:-99s !important;animation-duration:.001s !important;animation-iteration-count:1 !important;animation-fill-mode:both !important;animation-play-state:running !important;transition-duration:0s !important}';
+  document.head.appendChild(st);
+  for (const d of document.querySelectorAll('deck-stage')) {
+    for (const c of d.children) {
+      const t = c.tagName;
+      if (t === 'SCRIPT' || t === 'STYLE' || t === 'TEMPLATE') continue;
+      c.setAttribute('data-deck-active', '');
+    }
+  }
+  // Re-append deck-stage's @page last so no author @page can add a margin and
+  // spill each full-bleed slide onto two sheets. Backstop for old copies.
+  if (ds) {
+    let pg = document.getElementById('deck-stage-print-page');
+    if (!pg) {
+      pg = document.createElement('style');
+      pg.textContent = '@page{size:' + (+ds.getAttribute('width') || 1920) +
+        'px ' + (+ds.getAttribute('height') || 1080) + 'px;margin:0}';
+    }
+    document.body.appendChild(pg);
+  }
+  try {
+    const sweep = () => {
+      for (const a of document.getAnimations()) {
+        try { a.finish(); } catch (e) {
+          try { a.currentTime = (a.effect && a.effect.getComputedTiming().duration) || 0; a.pause(); } catch (e2) {}
+        }
+      }
+    };
+    sweep();
+    await new Promise((r) => requestAnimationFrame(r));
+    sweep();
+    await new Promise((r) => requestAnimationFrame(r));
+  } catch (e) {}
+  // Size the PDF page to the rendered design unless the file opted into
+  // standard paper via @page{size:letter|A4|…}. Decks own their own @page.
+  // Wrappers (body, …) lose padding+margin so the frame sits at (0,0); the
+  // frame itself loses only margin — its padding is INSIDE the measured
+  // rect and must stay, or content shifts and leaves a gap at bottom/right.
+  var __m = null;
+  try { __m = (() => {
+  var docEl = document.documentElement;
+  var doc = { width: docEl.scrollWidth, height: docEl.scrollHeight };
+
+  var ds = document.querySelector('deck-stage');
+  if (ds) {
+    var dw = Number(ds.getAttribute('width')) || 1920;
+    var dh = Number(ds.getAttribute('height')) || 1080;
+    var n = typeof ds.length === 'number' ? ds.length : ds.children.length;
+    var idx = typeof ds.index === 'number' ? ds.index : 0;
+    var frames = [];
+    for (var i = 0; i < n; i++) frames.push({ left: 0, top: 0, width: dw, height: dh });
+    return { kind: 'deck', doc: doc, frames: frames,
+      authored: frames.map(function(){return{width:true,height:true}}),
+      deck: { width: dw, height: dh, slideCount: n, index: idx },
+      signals: { paperPage: false, pxPage: false } };
+  }
+
+  var paperPage = false, pxPage = false;
+  var eachRule = function (fn) {
+    for (var s = 0; s < document.styleSheets.length; s++) {
+      var rs; try { rs = document.styleSheets[s].cssRules; } catch (e) { continue; }
+      for (var r = 0; r < rs.length; r++) {
+        fn(rs[r]);
+        if (rs[r].cssRules) for (var n = 0; n < rs[r].cssRules.length; n++) fn(rs[r].cssRules[n]);
+      }
+    }
+  };
+  eachRule(function (r) {
+    if (r.type !== 6) return;
+    var m = /\bsize\s*:\s*([^;}]+)/i.exec(r.cssText || '');
+    if (!m) return;
+    if (/\b(letter|a[3-5]|legal|ledger)\b/i.test(m[1])) paperPage = true;
+    if (/\d+(?:\.\d+)?px\b/i.test(m[1])) pxPage = true;
+  });
+  var signals = { paperPage: paperPage, pxPage: pxPage };
+
+  var pxVal = function (v) {
+    var m = /^(\d+(?:\.\d+)?)px$/.exec(v || ''); return m ? +m[1] : 0;
+  };
+  var authoredPx = function (el, prop) {
+    if (pxVal(el.style[prop])) return true;
+    var attr = el.getAttribute(prop);
+    if (attr && /^\d+$/.test(attr)) return true;
+    var hit = false;
+    eachRule(function (r) {
+      if (hit || r.type !== 1 || !r.style) return;
+      try { if (el.matches(r.selectorText) && pxVal(r.style[prop])) hit = true; } catch (e) {}
+    });
+    return hit;
+  };
+
+  var el = document.body, rootPxW = false;
+  for (;;) {
+    var kids = [];
+    for (var c = 0; c < el.children.length; c++) {
+      var t = el.children[c].tagName;
+      if (t !== 'SCRIPT' && t !== 'STYLE' && t !== 'TEMPLATE') kids.push(el.children[c]);
+    }
+    if (kids.length !== 1 || !(kids[0] instanceof HTMLElement)) break;
+    el.setAttribute('data-om-frame-wrap', '');
+    el = kids[0];
+    rootPxW = authoredPx(el, 'width');
+    if (rootPxW) break;
+  }
+  if (!rootPxW) rootPxW = authoredPx(el, 'width');
+
+  // @page{size:letter} alone is a flowing doc; with a px-width root it's a
+  // fixed sheet pretending to be paper — fall through and size to render.
+  if (paperPage && !rootPxW) {
+    return { kind: 'paper-doc', doc: doc, signals: signals,
+      frames: [{ left: 0, top: 0, width: doc.width, height: doc.height }],
+      authored: [{ width: false, height: false }] };
+  }
+
+  var sx = window.scrollX || 0, sy = window.scrollY || 0;
+  var rectOf = function (e) {
+    var r = e.getBoundingClientRect();
+    var oy; try { oy = getComputedStyle(e).overflowY; } catch (err) {}
+    var h = oy === 'visible' ? Math.max(r.height, e.scrollHeight || 0) : r.height;
+    return { left: r.left + sx, top: r.top + sy, width: r.width, height: h };
+  };
+
+  // Multi-frame: ≥2 visible non-fixed children, each with authored px width
+  // AND height, all within ±2px of each other. Off unless the page opts in
+  // via data-om-multi-frame on the stop element — guards against card grids
+  // and pricing tables that match the geometry but aren't separate canvases.
+  if (el.hasAttribute('data-om-multi-frame')) {
+    var cands = [];
+    for (var k = 0; k < el.children.length; k++) {
+      var ch = el.children[k];
+      var cs; try { cs = getComputedStyle(ch); } catch (e) { continue; }
+      if (cs.display === 'none' || cs.visibility === 'hidden' || cs.position === 'fixed') continue;
+      var rc = rectOf(ch);
+      if (rc.width < 2 || rc.height < 2) continue;
+      if (!authoredPx(ch, 'width') || !authoredPx(ch, 'height')) continue;
+      cands.push(rc);
+    }
+    if (cands.length >= 2) {
+      var w0 = cands[0].width, h0 = cands[0].height, ok = true;
+      for (var q = 1; q < cands.length; q++)
+        if (Math.abs(cands[q].width - w0) > 2 || Math.abs(cands[q].height - h0) > 2) ok = false;
+      if (ok) return { kind: 'multi-frame', doc: doc, signals: signals,
+        frames: cands, authored: cands.map(function(){return{width:true,height:true}}) };
+    }
+  }
+
+  el.setAttribute('data-om-frame', '');
+  return { kind: 'single-canvas', doc: doc, signals: signals,
+    frames: [rectOf(el)],
+    authored: [{ width: rootPxW, height: authoredPx(el, 'height') }] };
+})(); } catch (e) {}
+  var frame = null;
+  if (__m && __m.kind === 'single-canvas') {
+    var f = __m.frames && __m.frames[0];
+    if (f && f.width >= 200 && f.height >= 200) {
+      frame = f;
+      var fst = document.createElement('style');
+      fst.textContent = '@media print{@page{size:' + Math.ceil(f.width) + 'px ' +
+        Math.ceil(f.height) + 'px;margin:0}' +
+        'html,body,[data-om-frame-wrap]{padding:0!important;margin:0!important;background:none!important}' +
+        '[data-om-frame]{margin:0!important}}';
+      document.body.appendChild(fst);
+    }
+  }
+  // Relax break-inside on oversized elements. An element taller than a
+  // printable page can't honor break-inside: avoid — browsers either overflow
+  // it or push it whole to the next page, leaving a blank gap, then break it
+  // anyway at an arbitrary point. After the final layout (content revealed,
+  // animations jumped), find elements taller than a page that still compute
+  // break-inside: avoid and reset them to auto, so the browser breaks them at
+  // their children's boundaries instead (children keep their own avoid). PAGE_PX
+  // is a conservative portrait estimate at 96 CSS px/in — Letter/A4 usable
+  // height minus our 0.5in margins — so only clearly-oversized elements are
+  // touched and under-page elements still stay whole. Skipped for decks (slides
+  // are sized to the page) and for fixed-size canvases (frame set, or an author
+  // px-based @page) — runs as before for flowing docs on letter/A4.
+  try {
+    if (!ds && !frame && !(__m && __m.signals && __m.signals.pxPage)) {
+      const PAGE_PX = 1024;
+      // Our print defaults add a real @page margin only when the source has
+      // no @page of its own; computed style can't tell us (it reports screen
+      // media), so read the injected rule directly.
+      const defaults = document.querySelector('style[data-omelette-print-defaults]');
+      const pageInset = /@page\s*\{[^}]*margin/.test(defaults ? defaults.textContent || '' : '');
+      const SEL = 'section,article,figure,table,pre,blockquote,[class~="card" i],[class~="page" i],[class~="sheet" i]';
+      for (const el of document.body.querySelectorAll(SEL)) {
+        if (el instanceof HTMLElement && el.offsetHeight > PAGE_PX) {
+          el.setAttribute('data-om-oversized', '');
+          // Fake-paged docs simulate sheets with over-tall break-after:page
+          // boxes; honoring the break spills half-blank pages and ends a
+          // colored box mid-sheet. Flow them, and (only when we own the page
+          // inset) drop the redundant padding/background via the rule below.
+          const cs = getComputedStyle(el);
+          if (cs.breakAfter === 'page' || cs.pageBreakAfter === 'always') {
+            el.setAttribute('data-om-fakepage', '');
+          }
+        }
+      }
+      const ost = document.createElement('style');
+      ost.textContent = '@media print{' +
+        '[data-om-oversized]{break-inside:auto !important;page-break-inside:auto !important}' +
+        '[data-om-fakepage]{break-after:auto !important;page-break-after:auto !important}' +
+        (pageInset ? '[data-om-fakepage]{padding:0 !important;background:none !important}' : '') +
+        '}';
+      document.head.appendChild(ost);
+    }
+  } catch (e) {}
+  // macOS Preview renders Skia-PDF Luminosity soft-masks as opaque grey boxes;
+  // swap the CSS that triggers them for Preview-safe forms.
+  try {
+    for (const el of document.body.querySelectorAll('*')) {
+      const cs = getComputedStyle(el);
+
+      if (cs.boxShadow !== 'none' && cs.filter === 'none') {
+        const outs = [], kept = [];
+        for (const s of cs.boxShadow.split(/,(?![^(]*[)])/)) {
+          const t = s.trim();
+          const m = t.match(/^(rgba?[(][^)]+[)]) (-?[0-9.]+px) (-?[0-9.]+px) ([0-9.]+px) -?[0-9.]+px$/);
+          if (m && parseFloat(m[4]) > 0) outs.push('drop-shadow(' + m[2] + ' ' + m[3] + ' ' + m[4] + ' ' + m[1] + ')');
+          else kept.push(t);
+        }
+        if (outs.length) {
+          el.style.setProperty('filter', outs.join(' '), 'important');
+          el.style.setProperty('box-shadow', kept.join(', ') || 'none', 'important');
+        }
+      }
+
+      const mask = cs.maskImage && cs.maskImage !== 'none' ? cs.maskImage : cs.webkitMaskImage;
+      if (mask && mask !== 'none' && cs.filter === 'none') el.style.setProperty('filter', 'opacity(1)', 'important');
+    }
+  } catch (e) {}
+  setTimeout(() => { try { window.print(); } catch (e) {} }, 200);
+})();
+</script>
+</body>
+</html>

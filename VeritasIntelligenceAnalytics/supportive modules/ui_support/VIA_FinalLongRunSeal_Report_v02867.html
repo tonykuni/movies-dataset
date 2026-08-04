@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA Final LongRun Seal v028.6.7</title>
+<style>
+:root{--sky:#d8f0ef;--ink:#1d3438;--muted:#657f82;--line:rgba(38,70,75,.16);--head:#edf8f6;--hover:rgba(216,240,239,.20);--ok:#0f766e;--warn:#b7791f;--fail:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Microsoft JhengHei","Segoe UI",Arial,sans-serif;background:linear-gradient(180deg,#fbfdfb,#f3f8f6);color:var(--ink);font-size:11px;line-height:1.28}
+header{position:sticky;top:0;z-index:80;padding:14px 26px 10px;background:rgba(251,253,251,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+h1{margin:0;font-size:18px;text-align:center;letter-spacing:.035em}
+.sub{text-align:center;color:var(--muted);font-size:10.5px;margin-top:4px}
+.wrap{padding:12px 22px 36px}
+.kpis{display:grid;grid-template-columns:repeat(8,minmax(96px,1fr));gap:8px;margin-bottom:12px}
+.card{border-radius:10px;padding:8px 10px;background:rgba(255,255,255,.82);border:1px solid var(--line);box-shadow:0 6px 16px rgba(30,52,56,.04)}
+.k{font-size:9.5px;color:var(--muted);letter-spacing:.07em}.v{font-size:16px;font-weight:750;margin-top:2px}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.fail{color:var(--fail)}
+section{margin-top:12px}
+h2{position:sticky;top:45px;z-index:70;margin:0 0 6px;padding:6px 9px;border:1px solid var(--line);border-left:4px solid var(--sky);border-radius:9px;background:rgba(250,253,252,.96);font-size:12px;text-align:center}
+table{width:100%;border-collapse:separate;border-spacing:0;table-layout:auto;background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:10px;overflow:clip}
+thead{position:sticky;top:76px;z-index:60}
+th{position:sticky;top:76px;z-index:61;background:var(--head);font-size:10px;font-weight:800;text-align:center;vertical-align:top;padding:5px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{font-size:10px;padding:4px 6px;border-bottom:1px solid var(--line);vertical-align:top;text-align:center;white-space:nowrap}
+td.via-left,td:has(code){text-align:left;white-space:normal;word-break:break-word;overflow-wrap:anywhere}
+tr:hover td{background:var(--hover)}
+code{font-family:Consolas,"Cascadia Mono",monospace;font-size:9.5px;white-space:normal;word-break:break-word}
+</style>
+</head>
+<body>
+<header>
+<h1>def VIA Final LongRun Seal · v028.6.7</h1>
+<div class="sub">Three-Round LongRun Review · Supportive HardGate · No Stop-Process · No Network · No Parallel</div>
+</header>
+<div class="wrap">
+<div class="kpis">
+<div class="card"><div class="k">Status</div><div class="v">FINAL_ACTIVATION_SEAL_READY_WITH_LONGRUN_REVIEW</div></div>
+<div class="card"><div class="k">Risk</div><div class="v">LOW</div></div>
+<div class="card"><div class="k">OK</div><div class="v ok">0</div></div>
+<div class="card"><div class="k">WARN</div><div class="v warn">0</div></div>
+<div class="card"><div class="k">FAIL</div><div class="v fail">0</div></div>
+<div class="card"><div class="k">Parse</div><div class="v">0</div></div>
+<div class="card"><div class="k">Forbidden</div><div class="v">0</div></div>
+<div class="card"><div class="k">Supportive Blockers</div><div class="v">0</div></div>
+</div>
+
+<section><h2>def Matrix</h2>
+<table><thead><tr><th>Round</th><th>Lane</th><th>Stage</th><th>Name</th><th>Status</th><th>Risk</th><th>FixClass</th><th>Priority</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr></thead><tbody><tr><td>Round0</td><td>CONTROL</td><td>POLICY</td><td>No DB Write</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>db_write</td><td>false</td><td>No production DB write.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</code></td></tr>
+<tr><td>Round0</td><td>CONTROL</td><td>POLICY</td><td>No Canonical Merge</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>canonical_merge</td><td>false</td><td>No canonical merge.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_FINAL_LONGRUN_SEAL_v02867_20260611_123639</code></td></tr>
+<tr><td>Round0</td><td>CONTROL</td><td>POLICY</td><td>No Stop-Process</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>stop_process</td><td>false</td><td>PID health check only; no process kill.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_FINAL_LONGRUN_SEAL_v02867_20260611_123639</code></td></tr>
+<tr><td>Round0</td><td>CONTROL</td><td>POLICY</td><td>Network / Parallel Locked</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>network_parallel</td><td>false</td><td>Aegis network locked; Celeritas parallel locked.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_FINAL_LONGRUN_SEAL_v02867_20260611_123639</code></td></tr>
+<tr><td>Round0</td><td>SMOKE</td><td>RUNTIME</td><td>Latest v02866 Runtime</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>runtime</td><td>found</td><td>Latest smoke runtime found.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_ACTIVATION_SMOKE_TEST_v02866_20260611_121401\runtime\VIA_ActivationSmokeTest_Runtime_v02866.json</code></td></tr>
+<tr><td>Round1</td><td>VALIDATION</td><td>AST</td><td>Invoke-VIA-ALL.ps1 Parse</td><td><b>OK_PARSE</b></td><td>LOW</td><td>SEQUENTIAL_REQUIRED</td><td>P0</td><td>parse_errors</td><td>0</td><td>Target parses cleanly.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\60_PowerShell_Entry_Internal\Invoke-VIA-ALL.ps1</code></td></tr>
+<tr><td>Round1</td><td>RISK</td><td>AST_EXEC</td><td>Forbidden Commands</td><td><b>OK_NONE_FOUND</b></td><td>LOW</td><td>SEQUENTIAL_REQUIRED</td><td>P0</td><td>forbidden</td><td>0</td><td>No forbidden executable command.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\60_PowerShell_Entry_Internal\Invoke-VIA-ALL.ps1</code></td></tr>
+<tr><td>Round1</td><td>LONGRUN</td><td>PID</td><td>Smoke PID Alive</td><td><b>OK_LONGRUN_PID_ALIVE</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>alive</td><td>true</td><td>Timeout likely means long-running service candidate.</td><td><code>20920</code></td></tr>
+<tr><td>Round2</td><td>LONGRUN</td><td>STDERR</td><td>Smoke STDERR</td><td><b>OK_EMPTY_OR_NOT_WRITTEN</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>fatal</td><td>false</td><td>stderr empty or not flushed.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_ACTIVATION_SMOKE_TEST_v02866_20260611_121401\runtime\VIA_SmokeTest_stderr_v02866.txt</code></td></tr>
+<tr><td>Round2</td><td>LONGRUN</td><td>STDOUT</td><td>Smoke STDOUT</td><td><b>WARN_EMPTY_OR_NOT_WRITTEN</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>chars</td><td>0</td><td>stdout empty or not flushed.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_ACTIVATION_SMOKE_TEST_v02866_20260611_121401\runtime\VIA_SmokeTest_stdout_v02866.txt</code></td></tr>
+<tr><td>Round2</td><td>HARDGATE</td><td>SUPPORTIVE</td><td>Supportive Module HardGate</td><td><b>OK_HARD_PASS</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>blockers</td><td>0</td><td>All supportive modules pass register-only HardGate.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_FINAL_LONGRUN_SEAL_v02867_20260611_123639\registry\VIA_SupportiveHardGate_Audit_v02867.csv</code></td></tr>
+<tr><td>Round2</td><td>HARDGATE</td><td>PLAN</td><td>HardGate Integration Plan</td><td><b>OK_PLAN_CREATED</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>network_parallel</td><td>locked</td><td>Network=false; parallel=false.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_FINAL_LONGRUN_SEAL_v02867_20260611_123639\registry\VIA_HardGateIntegrationPlan_v02867.json</code></td></tr>
+<tr><td>Round3</td><td>FINAL</td><td>SEAL</td><td>Final Activation Seal</td><td><b>FINAL_ACTIVATION_SEAL_READY_WITH_LONGRUN_REVIEW</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>status</td><td>FINAL_ACTIVATION_SEAL_READY_WITH_LONGRUN_REVIEW</td><td>Final seal decision created.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_FINAL_LONGRUN_SEAL_v02867_20260611_123639</code></td></tr></tbody></table>
+</section>
+
+<section><h2>def Supportive HardGate</h2>
+<table><thead><tr><th>Name</th><th>Role</th><th>Exists</th><th>AST</th><th>Compile</th><th>Functions</th><th>Classes</th><th>Risk</th><th>HardGate</th><th>Recommendation</th><th>File</th><th>Error</th></tr></thead><tbody><tr><td>VIA_SSOT_Unified.py</td><td>SSOT_SCHEMA_REGISTRY</td><td>True</td><td>True</td><td>True</td><td>191</td><td>3</td><td>YELLOW</td><td>OK_REGISTER_ONLY</td><td>可接入，但需 hard gate。</td><td><code>C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\supportive_module\VIA_SSOT_Unified.py</code></td><td></td></tr>
+<tr><td>VIA_RegistryCore_v1.py</td><td>ASSET_REGISTRY</td><td>True</td><td>True</td><td>True</td><td>61</td><td>3</td><td>YELLOW</td><td>OK_REGISTER_ONLY</td><td>可接入，但需 hard gate。</td><td><code>C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\supportive_module\VIA_RegistryCore_v1.py</code></td><td></td></tr>
+<tr><td>VIA_Runtime_Bridge_All_in_One.py</td><td>RUNTIME_BRIDGE</td><td>True</td><td>True</td><td>True</td><td>45</td><td>1</td><td>GREEN</td><td>OK_REGISTER_ONLY</td><td>適合直接接 SSOT / registry。</td><td><code>C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\supportive_module\VIA_Runtime_Bridge_All_in_One.py</code></td><td></td></tr>
+<tr><td>VIA_EnvManager.py</td><td>ENV_HEALTH_GATE</td><td>True</td><td>True</td><td>True</td><td>88</td><td>7</td><td>YELLOW</td><td>OK_REGISTER_ONLY</td><td>可接入，但需 hard gate。</td><td><code>C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\supportive_module\VIA_EnvManager.py</code></td><td></td></tr>
+<tr><td>VIA_Panorama_AST_RuntimeInjector.py</td><td>AST_AUDIT_PLANNER</td><td>True</td><td>True</td><td>True</td><td>20</td><td>0</td><td>PLANNER_ONLY</td><td>OK_REGISTER_ONLY</td><td>只做 audit/planner，不自動 patch。</td><td><code>C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\supportive_module\VIA_Panorama_AST_RuntimeInjector.py</code></td><td></td></tr>
+<tr><td>VeritasCeleritas.py</td><td>ACCELERATOR_LOCKED_SAFE_ONLY</td><td>True</td><td>True</td><td>True</td><td>526</td><td>107</td><td>LOCKED_ACCELERATOR</td><td>OK_REGISTER_ONLY</td><td>先只用安全統計/裝飾器，不開並行。</td><td><code>C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\supportive_module\VeritasCeleritas.py</code></td><td></td></tr>
+<tr><td>VeritasAegisNexus.py</td><td>NETWORK_LOCKED_UNTIL_GATE</td><td>True</td><td>True</td><td>True</td><td>292</td><td>46</td><td>LOCKED_NETWORK</td><td>OK_REGISTER_ONLY</td><td>先只註冊，不啟用網路 I/O。</td><td><code>C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\supportive_module\VeritasAegisNexus.py</code></td><td></td></tr></tbody></table>
+</section>
+</div>
+<script>
+(function(){
+ const left=/(path|file|message|recommendation|error|路徑|檔案|訊息|建議|錯誤)/i;
+ const path=/([A-Za-z]:\\|\\\\|\/|\.ps1|\.py|\.html|\.csv|\.json|\.txt)/i;
+ function clean(t){return String(t||"").replace(/,/g,"").replace(/%/g,"").trim();}
+ function isnum(t){const s=clean(t);return !!s && /^[-+]?(\\d+|\\d*\\.\\d+)(e[-+]?\\d+)?$/i.test(s) && Number.isFinite(Number(s));}
+ function fmt(t){const n=Number(clean(t));return Number.isFinite(n)?n.toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:1}):t;}
+ function heads(table){return Array.from(table.querySelectorAll("thead th")).map(x=>(x.textContent||"").trim());}
+ function process(table){const hs=heads(table);Array.from(table.querySelectorAll("th")).forEach(th=>{th.style.textAlign="center";th.style.verticalAlign="top";});Array.from(table.querySelectorAll("tbody tr")).forEach(row=>{Array.from(row.children).forEach((cell,i)=>{const h=hs[i]||"";const raw=(cell.textContent||"").trim();cell.style.verticalAlign="top";cell.style.textAlign="center";if(isnum(raw)){cell.textContent=fmt(raw);return;}if(left.test(h)||path.test(raw)||raw.length>=36||cell.querySelector("code")){cell.classList.add("via-left");}});});}
+ Array.from(document.querySelectorAll("table")).forEach(process);
+})();
+</script>
+</body></html>

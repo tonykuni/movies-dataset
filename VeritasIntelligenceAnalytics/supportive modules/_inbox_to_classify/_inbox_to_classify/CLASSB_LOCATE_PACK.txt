@@ -1,0 +1,130 @@
+=========================================================
+ VIA P0 CLASS-B LOCATE PACK  -  RUN 20260617_031435
+ Paste this back for the line-exact brace repair (Command #4).
+=========================================================
+
+FILE: VIA_VEGN_Step1_v32.ps1   ERRORS=119
+FIRST UNCLOSED {{ at line: 0
+UNCLOSED OPENS: 
+EXTRA CLOSES  : 
+--- REGION ---
+     854 |     if ($toInst.Count -gt 0) {
+     855 |         [void]$sb.AppendLine("## 套件安裝計劃（依環境分組）")
+     856 |         foreach ($grp in ($toInst | Group-Object env_target)) {
+     857 |             [void]$sb.AppendLine("### $($grp.Name)")
+     858 |             foreach ($p in $grp.Group) { [void]$sb.AppendLine("- $($p.spec)  [Risk=$($p.risk)]  [$($p.status)]") }
+     859 |         }
+     860 |         [void]$sb.AppendLine("")
+     861 |     }
+     862 |     [void]$sb.AppendLine("## 系統現況")
+     863 |     [void]$sb.AppendLine("- EnvRoot: $($CONFIG.EnvRoot)")
+     864 |     foreach ($e in $EnvHealth) { [void]$sb.AppendLine("- $($e.name): $($e.health) (Py=$($e.py_version) Pkgs=$($e.pkg_count))") }
+     865 |     return $sb.ToString()
+     866 | }
+     867 | 
+     868 | # ── PHASE 9: Export ───────────────────────────────────────────────────────────
+*>   869 | function Phase9-Export { param([array]$EnvHealth,[array]$Classified,[PSCustomObject]$Gap,[array]$Sandbox,[PSCustomObject]$Policy,[PSCustomObject]$BaseGuard,[string]$AiPrompt)
+     870 |     SP 95 'Phase 9: 匯出報告'
+     871 | 
+     872 |     # Freeze
+     873 |     if ($CONFIG.EnableDependencyFreeze) {
+     874 |         foreach ($env in $EnvHealth) {
+     875 |             if (-not $env.exists) { continue }
+     876 |             $py=GetPy -EnvName $env.name; if(-not $py){continue}
+     877 |             $out=Join-Path $FREEZE_DIR ($env.name+'_freeze.txt')
+     878 |             $fr=RunProc -Exe $py -Args @('-m','pip','freeze') -To 120
+     879 |             [System.IO.File]::WriteAllText($out,$fr.StdOut,[System.Text.Encoding]::UTF8)
+     880 |         }
+     881 |         WL "Freeze files → $FREEZE_DIR" 'OK' 'EXPORT'
+     882 |     }
+     883 | 
+     884 |     # CSV
+     885 |     $EnvHealth | Select-Object name,exists,py_version,pkg_count,health,polluted,conflict,pip_check_ok |
+     886 |         Export-Csv $CSV_PATH -NoTypeInformation -Encoding UTF8
+     887 |     WL "CSV → $CSV_PATH" 'OK' 'EXPORT'
+     888 | 
+     889 |     # HTML
+     890 |     $escH = { param($s) [System.Web.HttpUtility]::HtmlEncode([string](if($null -ne $s){$s}else{""})) }
+     891 |     function Bx { param($v,[string]$cls='')
+     892 |         $s=[string](if($v){$v}else{""}); $c=if($cls){"$cls"}elseif($s -in @('OK','PASS','True')){'ok'}elseif($s -in @('FAIL','BROKEN','MISSING','EMPTY','DEGRADED','True') -and $s -ne 'True'){'er'}elseif($s -in @('WARN','MEDIUM','DEGRADED')){'wn'}else{'na'}
+     893 |         "<span class='bx $c'>$([System.Web.HttpUtility]::HtmlEncode($s))</span>"
+     894 |     }
+     895 |     function BxB { param($v) if($v){"<span class='bx er'>YES</span>"}else{"<span class='bx ok'>NO</span>"} }
+     896 | 
+     897 |     $pollRows = if ($BaseGuard -and @($BaseGuard.PollutedPy).Count -gt 0) {
+     898 |         @($BaseGuard.PollutedPy | ForEach-Object {
+     899 |             $rt=if($CONFIG.ViaRouteMap.ContainsKey($_.Name)){$CONFIG.ViaRouteMap[$_.Name]}else{'UNKNOWN'}
+     900 |             "<tr><td><b>$([System.Web.HttpUtility]::HtmlEncode($_.Name))</b></td><td>$([System.Web.HttpUtility]::HtmlEncode($_.Version))</td><td>$([System.Web.HttpUtility]::HtmlEncode($rt))</td><td><span class='bx er'>BASE_POLLUTED</span></td></tr>"
+     901 |         }) -join "`n"
+     902 |     } else { "<tr><td colspan='4' style='color:#5a9e6f'>✓ Base 無污染</td></tr>" }
+     903 | 
+     904 |     $envRows = @($EnvHealth | ForEach-Object {
+     905 |         $hc=if($_.health -eq 'OK'){'bx ok'}elseif($_.health -in @('DEGRADED','EMPTY')){'bx wn'}else{'bx er'}
+     906 |         "<tr><td><b>$([System.Web.HttpUtility]::HtmlEncode($_.name))</b></td><td style='font:9px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.py_version){$_.py_version}else{"—"}))</td><td>$(if($null -ne $_.pkg_count){$_.pkg_count}else{0})</td><td><span class='$hc'>$($_.health)</span></td><td>$(BxB $_.polluted)</td><td>$(BxB $_.conflict)</td><td>$(BxB $_.pip_check_ok)</td><td style='font:8px var(--mo);max-width:200px;overflow:hidden;text-overflow:ellipsis'>$([System.Web.HttpUtility]::HtmlEncode((if($null -ne $_.pip_note){$_.pip_note}else{""}).Substring(0,[Math]::Min(80,(if($null -ne $_.pip_note){$_.pip_note}else{""}).Length))))</td></tr>"
+     907 |     }) -join "`n"
+     908 | 
+     909 |     $libRows = @($Classified | Select-Object -First 300 | ForEach-Object {
+     910 |         $rk=if($_.risk -eq 'HIGH'){'er'}elseif($_.risk -eq 'MEDIUM'){'wn'}else{'na'}
+
+FILE: VIA_VEGN_Step1_v32.ps1   ERRORS=119
+FIRST UNCLOSED {{ at line: 0
+UNCLOSED OPENS: 
+EXTRA CLOSES  : 
+--- REGION ---
+     854 |     if ($toInst.Count -gt 0) {
+     855 |         [void]$sb.AppendLine("## 套件安裝計劃（依環境分組）")
+     856 |         foreach ($grp in ($toInst | Group-Object env_target)) {
+     857 |             [void]$sb.AppendLine("### $($grp.Name)")
+     858 |             foreach ($p in $grp.Group) { [void]$sb.AppendLine("- $($p.spec)  [Risk=$($p.risk)]  [$($p.status)]") }
+     859 |         }
+     860 |         [void]$sb.AppendLine("")
+     861 |     }
+     862 |     [void]$sb.AppendLine("## 系統現況")
+     863 |     [void]$sb.AppendLine("- EnvRoot: $($CONFIG.EnvRoot)")
+     864 |     foreach ($e in $EnvHealth) { [void]$sb.AppendLine("- $($e.name): $($e.health) (Py=$($e.py_version) Pkgs=$($e.pkg_count))") }
+     865 |     return $sb.ToString()
+     866 | }
+     867 | 
+     868 | # ── PHASE 9: Export ───────────────────────────────────────────────────────────
+*>   869 | function Phase9-Export { param([array]$EnvHealth,[array]$Classified,[PSCustomObject]$Gap,[array]$Sandbox,[PSCustomObject]$Policy,[PSCustomObject]$BaseGuard,[string]$AiPrompt)
+     870 |     SP 95 'Phase 9: 匯出報告'
+     871 | 
+     872 |     # Freeze
+     873 |     if ($CONFIG.EnableDependencyFreeze) {
+     874 |         foreach ($env in $EnvHealth) {
+     875 |             if (-not $env.exists) { continue }
+     876 |             $py=GetPy -EnvName $env.name; if(-not $py){continue}
+     877 |             $out=Join-Path $FREEZE_DIR ($env.name+'_freeze.txt')
+     878 |             $fr=RunProc -Exe $py -Args @('-m','pip','freeze') -To 120
+     879 |             [System.IO.File]::WriteAllText($out,$fr.StdOut,[System.Text.Encoding]::UTF8)
+     880 |         }
+     881 |         WL "Freeze files → $FREEZE_DIR" 'OK' 'EXPORT'
+     882 |     }
+     883 | 
+     884 |     # CSV
+     885 |     $EnvHealth | Select-Object name,exists,py_version,pkg_count,health,polluted,conflict,pip_check_ok |
+     886 |         Export-Csv $CSV_PATH -NoTypeInformation -Encoding UTF8
+     887 |     WL "CSV → $CSV_PATH" 'OK' 'EXPORT'
+     888 | 
+     889 |     # HTML
+     890 |     $escH = { param($s) [System.Web.HttpUtility]::HtmlEncode([string](if($null -ne $s){$s}else{""})) }
+     891 |     function Bx { param($v,[string]$cls='')
+     892 |         $s=[string](if($v){$v}else{""}); $c=if($cls){"$cls"}elseif($s -in @('OK','PASS','True')){'ok'}elseif($s -in @('FAIL','BROKEN','MISSING','EMPTY','DEGRADED','True') -and $s -ne 'True'){'er'}elseif($s -in @('WARN','MEDIUM','DEGRADED')){'wn'}else{'na'}
+     893 |         "<span class='bx $c'>$([System.Web.HttpUtility]::HtmlEncode($s))</span>"
+     894 |     }
+     895 |     function BxB { param($v) if($v){"<span class='bx er'>YES</span>"}else{"<span class='bx ok'>NO</span>"} }
+     896 | 
+     897 |     $pollRows = if ($BaseGuard -and @($BaseGuard.PollutedPy).Count -gt 0) {
+     898 |         @($BaseGuard.PollutedPy | ForEach-Object {
+     899 |             $rt=if($CONFIG.ViaRouteMap.ContainsKey($_.Name)){$CONFIG.ViaRouteMap[$_.Name]}else{'UNKNOWN'}
+     900 |             "<tr><td><b>$([System.Web.HttpUtility]::HtmlEncode($_.Name))</b></td><td>$([System.Web.HttpUtility]::HtmlEncode($_.Version))</td><td>$([System.Web.HttpUtility]::HtmlEncode($rt))</td><td><span class='bx er'>BASE_POLLUTED</span></td></tr>"
+     901 |         }) -join "`n"
+     902 |     } else { "<tr><td colspan='4' style='color:#5a9e6f'>✓ Base 無污染</td></tr>" }
+     903 | 
+     904 |     $envRows = @($EnvHealth | ForEach-Object {
+     905 |         $hc=if($_.health -eq 'OK'){'bx ok'}elseif($_.health -in @('DEGRADED','EMPTY')){'bx wn'}else{'bx er'}
+     906 |         "<tr><td><b>$([System.Web.HttpUtility]::HtmlEncode($_.name))</b></td><td style='font:9px var(--mo)'>$([System.Web.HttpUtility]::HtmlEncode(if($null -ne $_.py_version){$_.py_version}else{"—"}))</td><td>$(if($null -ne $_.pkg_count){$_.pkg_count}else{0})</td><td><span class='$hc'>$($_.health)</span></td><td>$(BxB $_.polluted)</td><td>$(BxB $_.conflict)</td><td>$(BxB $_.pip_check_ok)</td><td style='font:8px var(--mo);max-width:200px;overflow:hidden;text-overflow:ellipsis'>$([System.Web.HttpUtility]::HtmlEncode((if($null -ne $_.pip_note){$_.pip_note}else{""}).Substring(0,[Math]::Min(80,(if($null -ne $_.pip_note){$_.pip_note}else{""}).Length))))</td></tr>"
+     907 |     }) -join "`n"
+     908 | 
+     909 |     $libRows = @($Classified | Select-Object -First 300 | ForEach-Object {
+     910 |         $rk=if($_.risk -eq 'HIGH'){'er'}elseif($_.risk -eq 'MEDIUM'){'wn'}else{'na'}

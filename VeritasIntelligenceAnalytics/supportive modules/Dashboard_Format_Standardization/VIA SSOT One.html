@@ -1,0 +1,147 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · SSOT ONE · 單一真相源總匯</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--blue:#4c78a8;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--vi:#7a6daa;}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg)}html{scrollbar-gutter:stable}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:12px;line-height:1.5}
+.wrap{max-width:none;margin:0 auto;padding:0 10px 60px}
+.hdr{position:sticky;top:0;z-index:40;background:var(--bg);padding:16px 0 0;box-shadow:0 6px 14px rgba(31,42,42,.05)}
+.pdf{position:fixed;top:12px;right:14px;z-index:999;background:var(--ink);color:#fff;border:none;border-radius:5px;padding:7px 13px;font:700 9px 'DM Mono',monospace;cursor:pointer}
+@media print{.pdf,.tabs,#xnav{display:none!important}.sec{display:block!important}@page{size:A4 landscape;margin:8mm}}
+h1{font:800 21px/1.2 'Syne','Noto Sans TC',sans-serif;color:var(--ink);display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+h1::before{content:"";display:inline-block;width:5px;height:22px;background:var(--vi);border-radius:2px;transform:translateY(3px);margin-right:2px}
+h1 .flow{font:500 10px 'DM Mono',monospace;color:var(--mut2)}
+#xnav{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+#xnav a{font:700 8.5px 'DM Mono',monospace;color:var(--ink2);border:1px solid var(--line);border-radius:4px;padding:4px 8px;text-decoration:none;background:var(--paper2)}
+.tabs{display:flex;gap:26px;flex-wrap:wrap;margin:10px 0 0;border-bottom:2px solid var(--soft);background:var(--bg)}
+.tab{font:700 12px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);padding:9px 2px 11px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;letter-spacing:.3px;white-space:nowrap;flex-shrink:0}
+.tab.on{color:var(--vi);border-bottom-color:var(--vi)}
+.tab:hover:not(.on){color:var(--ink)}
+.toolrow{display:flex;gap:7px;align-items:center;padding:12px 0 4px;flex-wrap:wrap}
+.toolrow input{flex:1;min-width:220px;font:600 11px 'DM Mono','Noto Sans TC',monospace;border:1px solid var(--line);border-radius:5px;padding:7px 10px;background:var(--paper);color:var(--ink)}
+.btn{font:700 9px 'DM Mono',monospace;cursor:pointer;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:4px;padding:7px 11px}
+.btn.o{background:transparent;color:var(--ink)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:12px 0 6px}
+.stat{background:var(--paper);border:1px solid var(--soft);border-radius:10px;padding:14px 18px;box-shadow:0 1px 3px rgba(31,42,42,.05)}
+.stat .k{font:500 10px 'DM Mono',monospace;color:var(--mut)}
+.stat .v{font:800 26px 'Syne',sans-serif;color:var(--ink);margin:2px 0}
+.stat .e{font:500 10px 'DM Mono',monospace;color:var(--mut2)}
+.stat.err .v{color:var(--up)}
+table{width:100%;border-collapse:collapse;font:500 11px 'DM Mono','Noto Sans TC',monospace;background:var(--paper);border:none;border-radius:8px;overflow:hidden;margin-top:10px}
+th{font:700 9px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.4px;color:var(--mut);text-align:left;padding:8px 12px;border-bottom:2px solid var(--ink);background:var(--paper2)}
+td{padding:7px 12px;border-bottom:1px solid var(--soft);vertical-align:top}
+tr:hover td{background:var(--paper2)}
+td .code{color:var(--vi);font-weight:700;white-space:nowrap}
+td .src{font:600 9px 'DM Mono',monospace;background:var(--soft);border-radius:3px;padding:1px 7px;color:var(--ink2);white-space:nowrap}
+.note{font:500 9.5px/1.7 'DM Mono',monospace;color:var(--mut);background:var(--paper);border:1px solid var(--soft);border-left:3px solid var(--vi);border-radius:4px;padding:9px 13px;margin:12px 0}
+.note b{color:var(--ink2)}
+</style></head><body>
+<button class="pdf" onclick="window.print()">⤓ PDF</button>
+<div class="wrap">
+<div class="hdr">
+<h1>SSOT ONE · 單一真相源總匯 <span class="flow">live-aggregation · 讀取各源 · 不複製 · VIA-M-SSOTONE</span></h1>
+<nav id="xnav">
+ <a href="VIA Master Console.html">🎛 主控台</a>
+ <a href="VIA Intelligence Asset Management Platform.html">🧱 智慧資產 IAMP</a>
+ <a href="VIA Auto-Coder.html">⚙ 自動編號器</a>
+ <a href="VIA Lexicon Registry.html">📚 詞彙登錄</a>
+ <a href="VIA VAP Chart Library Builder.html">📊 圖庫建構器</a>
+ <a href="VIA Governance Center.html">🏛 治理中心</a>
+</nav>
+<div class="tabs" id="tabs"></div>
+</div>
+<div class="note">🔒 <b>整合原則</b> — SSOT 不是複製一份,而是<b>單一視圖讀取所有真相源</b>:本頁即時抓取各模組原始檔與 localStorage 儲存(圖庫設定 · 詞彙 · 資產 · 編號登錄),合併呈現、統一搜尋、一鍵匯出合併 JSON。各源仍為唯一權威;本頁零複本、永不失真。</div>
+<div class="toolrow"><input id="q" placeholder="🔍 全域搜尋 · 跨所有 SSOT 源…"><button class="btn o" id="expJ">⤓ 合併 JSON</button><button class="btn" id="rld">↻ 重新聚合</button></div>
+<div class="stats" id="stats"></div>
+<div id="view"></div>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+function fnv(s){let h=0x811c9dc5;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=(h*0x01000193)>>>0;}return h.toString(16).padStart(8,"0").slice(-6).toUpperCase();}
+// ── 聚合器:讀各源(fetch 原檔 + localStorage) ──
+const S={mods:[],rules:[],datarules:[],lex:[],assets:[],acoder:[],vapstore:null,errs:[]};
+function evalLit(src){try{return (new Function("return ("+src+")"))();}catch(e){return null;}}
+async function grab(url){const r=await fetch(url,{cache:"no-store"});if(!r.ok)throw new Error(url+" "+r.status);return r.text();}
+async function aggregate(){
+ S.mods=[];S.rules=[];S.datarules=[];S.lex=[];S.assets=[];S.acoder=[];S.errs=[];
+ // ① 主控台模組註冊表
+ try{const t=await grab("VIA Master Console.html");
+  const m=t.match(/const MODS=(\[[\s\S]*?\]);/);if(m){const v=evalLit(m[1]);if(v)S.mods=v;}
+ }catch(e){S.errs.push("主控台:"+e.message);}
+ // ② 圖庫 SSOT(DEFAULTS/RULES/DATARULES/圖型)
+ try{const t=await grab("VIA VAP Chart Library Builder.html");
+  const d=t.match(/const DATARULES=(\[[\s\S]*?\]);/);if(d){const v=evalLit(d[1]);if(v)S.datarules=v;}
+  const r=t.match(/const RULES=(\{[\s\S]*?\});\nfunction/);if(r){const v=evalLit(r[1]);if(v)S.rules=Object.entries(v).map(([k,o])=>({key:k,re:String(o.re),d:o.d}));}
+  const g=t.match(/const GROUPS=(\[[\s\S]*?\]);\nconst ALL=/);if(g){const v=evalLit(g[1]);if(v)S.charts=v.flatMap(x=>x.charts.map(c=>({g:x.t,t:c.t,code:c.code})));}
+ }catch(e){S.errs.push("圖庫:"+e.message);}
+ // ③ 詞彙登錄(內建基準 + 使用者)
+ try{const t=await grab("VIA Lexicon Registry.html");
+  const b=t.match(/const BASE=(\[[\s\S]*?\])\.map/);if(b){const v=evalLit(b[1]);if(v)S.lex=v.map(r=>({kind:r[0],from:r[1],to:r[2],note:r[3],lock:!!r[4]}));}
+ }catch(e){S.errs.push("詞彙:"+e.message);}
+ try{(JSON.parse(localStorage.getItem("via_lex_v1"))||[]).forEach(u=>{if(!S.lex.some(e=>e.kind===u.kind&&e.from===u.from))S.lex.push({kind:u.kind,from:u.from,to:u.to,note:(u.note||"")+" · 使用者",lock:false});});}catch(e){}
+ // ④ 智慧資產(reg() 呼叫 + 使用者)
+ try{const t=await grab("VIA Intelligence Asset Management Platform.html");
+  const re=/reg\("(\w+)","([^"]*)","([^"]*)","([^"]*)"(?:,"([^"]*)")?\)/g;let m2;
+  while((m2=re.exec(t)))S.assets.push({type:m2[1],name:m2[2],zh:m2[3],src:m2[4],notes:m2[5]||""});
+ }catch(e){S.errs.push("資產:"+e.message);}
+ try{(JSON.parse(localStorage.getItem("via_iamp_user_v1"))||[]).forEach(u=>{if(!S.assets.some(a=>a.type===u.type&&a.name===u.name))S.assets.push(u);});}catch(e){}
+ // ⑤ 編號登錄簿 + 圖庫使用者設定
+ try{S.acoder=JSON.parse(localStorage.getItem("via_acoder_log_v1"))||[];}catch(e){}
+ try{S.vapstore=JSON.parse(localStorage.getItem("vap_chartlib_v1"))||null;}catch(e){}
+ renderStats();renderView();
+}
+// ── UI ──
+const TABS=[["ov","總覽"],["mods","模組註冊"],["charts","圖型規格"],["rules","REGEX 規則"],["data","資料規則"],["lex","詞彙"],["assets","資產"],["log","編號登錄"]];
+let TAB="ov",Q="";
+function renderTabs(){$("#tabs").innerHTML=TABS.map(t=>'<div class="tab'+(TAB===t[0]?" on":"")+'" data-t="'+t[0]+'">'+t[1]+'</div>').join("");
+ document.querySelectorAll(".tab").forEach(el=>el.onclick=()=>{TAB=el.dataset.t;renderTabs();renderView();});}
+function renderStats(){
+ const st=[["模組 Modules",S.mods.length,"VIA Master Console"],["圖型 Charts",(S.charts||[]).length,"VAP Library"],["REGEX 規則",S.rules.length,"VAP SSOT"],["資料規則",S.datarules.length,"DATARULES"],["詞彙 Lexicon",S.lex.length,"LEX + user"],["資產 Assets",S.assets.length,"IAMP + user"],["編號登錄",S.acoder.length,"Auto-Coder log"]];
+ $("#stats").innerHTML=st.map(s=>'<div class="stat"><div class="k">'+s[0]+'</div><div class="v">'+s[1]+'</div><div class="e">'+s[2]+'</div></div>').join("")+
+  (S.errs.length?'<div class="stat err"><div class="k">來源錯誤</div><div class="v">'+S.errs.length+'</div><div class="e">'+S.errs.join(" · ")+'</div></div>':"");}
+const hit=s=>!Q||String(s).toLowerCase().includes(Q);
+function tbl(head,rows){return '<table><thead><tr>'+head.map(h=>'<th>'+h+'</th>').join("")+'</tr></thead><tbody>'+(rows.join("")||'<tr><td colspan="'+head.length+'" style="color:var(--mut2)">無符合項目</td></tr>')+'</tbody></table>';}
+function renderView(){
+ const v=$("#view");
+ if(TAB==="ov"){
+  const hay=JSON.stringify(S).toLowerCase();
+  const REQ=[["VIA CODE","via-m-"],["SUB SYSTEM",'"sub"'],["ENGINE",'"eng"'],["MODULE",'"mod"'],["CLASS",'"cls"'],["FUNCTION",'"fn"'],["LIB",'"lib"'],["PSU","psu"],["THERMAL SOLUTIONS","thermal"],["PEERS","peer"],["AI MARKET SIZE","ai 市場"],["PROMPT","prompt"],["VAP SSOT","vap"],["VRN","vrn"],["VDF","vdf"],["SAP MM/PP/SD/CO/FI/FA/SCM","sap mm"],["建策","建策"]];
+  const cov=REQ.map(r=>'<span style="font:600 9.5px \'DM Mono\',monospace;border:1px solid '+(hay.includes(r[1])?"var(--down)":"var(--up)")+';color:'+(hay.includes(r[1])?"var(--down)":"var(--up)")+';border-radius:4px;padding:2px 8px;margin:0 6px 6px 0;display:inline-block">'+(hay.includes(r[1])?"✓ ":"✕ ")+r[0]+'</span>').join("");
+  v.innerHTML='<div class="note"><b>涵蓋檢查 Coverage</b> — 必備諸元全數出現於各真相源(✓=已登錄) · 聚合日期 DATE <b>'+new Date().toISOString().slice(0,10)+'</b><br><br>'+cov+'</div>'+
+   '<div class="note"><b>聚合狀態</b> — 讀取 4 個原始檔 + 4 個 localStorage 儲存;搜尋與匯出跨全部。'+(S.vapstore?" 圖庫目前設定:調色 <b>"+(S.vapstore.defaults&&S.vapstore.defaults.palette)+"</b> · 已勾選 <b>"+((S.vapstore.selected||[]).length)+"</b> 圖型 · 鎖定 <b>"+(((S.vapstore.lock||{}).charts)||[]).length+"</b> 張。":"")+'</div>'+
+   tbl(["真相源 Source","類型","筆數","權威位置"],[
+    ["模組註冊表","registry",S.mods.length,"VIA Master Console.html · const MODS"],
+    ["圖型規格","spec",(S.charts||[]).length,"VIA VAP Chart Library Builder.html · GROUPS"],
+    ["REGEX 驗證規則","rules",S.rules.length,"VIA VAP Chart Library Builder.html · RULES"],
+    ["資料/搭配規則","rules",S.datarules.length,"VIA VAP Chart Library Builder.html · DATARULES"],
+    ["詞彙(SYN/RGX/REN/LST/DCT)","lexicon",S.lex.length,"VIA Lexicon Registry.html · BASE + via_lex_v1"],
+    ["智慧資產","assets",S.assets.length,"IAMP reg() + via_iamp_user_v1"],
+    ["編號登錄簿","log",S.acoder.length,"localStorage · via_acoder_log_v1"],
+    ["圖庫使用者設定","store",S.vapstore?1:0,"localStorage · vap_chartlib_v1"]
+   ].map(r=>'<tr><td><b>'+r[0]+'</b></td><td>'+r[1]+'</td><td>'+r[2]+'</td><td><span class="src">'+r[3]+'</span></td></tr>'));
+ }else if(TAB==="mods"){
+  v.innerHTML=tbl(["No","模組","EN","編碼","類別","檔案"],S.mods.filter(m=>hit(m.no+m.t+m.e+m.code+m.file)).map(m=>'<tr><td>'+m.no+'</td><td><b>'+m.t+'</b></td><td>'+m.e+'</td><td><span class="code">'+m.code+'</span></td><td>'+m.cat+'</td><td><span class="src">'+m.file+'</span></td></tr>'));
+ }else if(TAB==="charts"){
+  v.innerHTML=tbl(["編碼","圖型","分群"],(S.charts||[]).filter(c=>hit(c.code+c.t+c.g)).map(c=>'<tr><td><span class="code">'+c.code+'</span></td><td><b>'+c.t+'</b></td><td>'+c.g+'</td></tr>'));
+ }else if(TAB==="rules"){
+  v.innerHTML=tbl(["設定鍵","REGEX","說明"],S.rules.filter(r=>hit(r.key+r.re+r.d)).map(r=>'<tr><td><b>'+r.key+'</b></td><td><span class="code">'+r.re.replace(/</g,"&lt;")+'</span></td><td>'+r.d+'</td></tr>'));
+ }else if(TAB==="data"){
+  v.innerHTML=tbl(["#","資料/搭配規則(只增不減)"],S.datarules.filter(hit).map((r,i)=>'<tr><td>'+(i+1)+'</td><td>'+r+'</td></tr>'));
+ }else if(TAB==="lex"){
+  v.innerHTML=tbl(["VIA CODE","種類","鍵","值 / Pattern","備註","鎖定"],S.lex.filter(e=>hit(e.kind+e.from+e.to+e.note)).map(e=>'<tr><td><span class="code">VIA-R-'+e.kind+'-'+fnv(e.kind+"|"+e.from)+'</span></td><td>'+e.kind+'</td><td><b>'+e.from+'</b></td><td>'+String(e.to).replace(/</g,"&lt;")+'</td><td style="color:var(--mut)">'+e.note+'</td><td>'+(e.lock?"🔒":"—")+'</td></tr>'));
+ }else if(TAB==="assets"){
+  v.innerHTML=tbl(["VIA CODE","層級","名稱","中文","來源","備註"],S.assets.filter(a=>hit(a.type+a.name+a.zh+a.src)).map(a=>'<tr><td><span class="code">'+(a.code||("VIA-A-"+a.type+"-"+fnv(a.type+"|"+a.name)))+'</span></td><td>'+a.type+'</td><td><b>'+a.name+'</b></td><td>'+a.zh+'</td><td><span class="src">'+a.src+'</span></td><td style="color:var(--mut)">'+(a.notes||"")+'</td></tr>'));
+ }else if(TAB==="log"){
+  v.innerHTML=tbl(["主碼","類型","名稱","時間","狀態"],S.acoder.filter(l=>hit(l.code+l.type+l.name)).map(l=>'<tr><td><span class="code">'+l.code+'</span></td><td>'+l.type+'</td><td>'+l.name+'</td><td>'+l.at+'</td><td>'+(l.dup?"⚠ 撞碼":"✓")+'</td></tr>'));
+ }
+}
+$("#q").oninput=e=>{Q=e.target.value.trim().toLowerCase();renderView();};
+$("#rld").onclick=aggregate;
+$("#expJ").onclick=()=>{const b=new Blob([JSON.stringify({meta:{name:"via_ssot_one",code:"VIA-M-SSOTONE",policy:"live-aggregation · zero-copy",exported_at:new Date().toISOString()},sources:{modules:S.mods,charts:S.charts||[],regex_rules:S.rules,data_rules:S.datarules,lexicon:S.lex,assets:S.assets,acoder_log:S.acoder,vap_store:S.vapstore}},null,2)],{type:"application/json"});
+ const u=document.createElement("a");u.href=URL.createObjectURL(b);u.download="VIA_SSOT_ONE.json";u.click();};
+renderTabs();aggregate();
+</script>
+</body></html>

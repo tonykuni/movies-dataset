@@ -1,0 +1,92 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · ONE · 全平台整合總入口</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--blue:#4c78a8;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--vi:#7a6daa;}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg);height:100%}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:12px;line-height:1.5;display:flex;flex-direction:row}
+.side{width:236px;flex:none;overflow:auto;border-right:1px solid var(--line);padding:12px 10px 20px;background:var(--paper2)}
+.main{flex:1;min-width:0;display:flex;flex-direction:column;height:100vh}
+h1{font:800 15px/1.25 'Syne','Noto Sans TC',sans-serif;color:var(--ink);display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+h1::before{content:"";display:inline-block;width:5px;height:22px;background:var(--vi);border-radius:2px;transform:translateY(3px);margin-right:2px}
+h1 .flow{font:500 10px 'DM Mono',monospace;color:var(--mut2)}
+.tabs{display:flex;flex-direction:column;margin:10px 0 0;border-bottom:none}
+.trow{display:flex;flex-direction:column;gap:0;align-items:stretch;margin-bottom:10px}
+.trow+.trow{border-top:none}
+.gl{font:800 10px 'DM Mono',monospace;letter-spacing:1px;padding:6px 2px 4px;text-transform:uppercase;border-bottom:1px solid var(--soft);margin-bottom:2px}
+.gl.g1{color:var(--vi)}.gl.g2{color:var(--up)}.gl.g3{color:var(--blue)}.gl.g4{color:var(--teal)}.gl.g5{color:var(--am)}.gl.g6{color:var(--down)}.gl.g7{color:var(--mut)}
+.tab{font:700 12px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);padding:7px 8px;cursor:pointer;border-left:3px solid transparent;border-bottom:none;margin-bottom:0;letter-spacing:.3px;white-space:normal;border-radius:0 4px 4px 0}
+.tab.on{color:var(--vi);border-left-color:var(--vi);border-bottom-color:transparent;background:var(--paper)}
+.tab:hover:not(.on){color:var(--ink)}
+.tab .no{font:700 9px 'DM Mono',monospace;color:var(--mut2);margin-right:5px}
+.meta{display:flex;gap:10px;align-items:center;padding:6px 8px;font:500 10px 'DM Mono',monospace;color:var(--mut)}
+.meta .code{color:var(--vi);font-weight:700}
+.meta a{margin-left:auto;font:700 9px 'DM Mono',monospace;color:var(--ink2);border:1px solid var(--line);border-radius:4px;padding:4px 8px;text-decoration:none;background:var(--paper2)}
+.stage{flex:1;min-height:0}
+iframe{width:100%;height:100%;border:none;border-top:1px solid var(--line);background:#fff}
+</style></head><body>
+<div class="side">
+ <h1>VIA ONE <span class="flow">全平台整合 · VIA-M-ONE</span></h1>
+ <div class="tabs" id="tabs"></div>
+</div>
+<div class="main">
+<div class="meta"><span id="mCode" class="code"></span><span id="mFile"></span><a id="mOpen" href="#" target="_blank">↗ 開新視窗</a></div>
+<div class="stage"><iframe id="fr" title="via one"></iframe></div>
+</div>
+<script>
+// 全部整合:入口(主控台) → ONE 中樞 → 治理/SSOT → 工具 → 名單/簡報
+const ALL=[
+ {g:"入口", no:"00", t:"主控台 66+ 模組", code:"VIA-M-MASTER", file:"VIA Master Console.html"},
+ {g:"入口", no:"05", t:"治理中心", code:"VIA-M-GOVCTR", file:"VIA Governance Center.html"},
+ {g:"ONE", no:"09", t:"SSOT ONE 總匯", code:"VIA-M-SSOTONE", file:"VIA SSOT One.html"},
+ {g:"ONE", no:"47", t:"總經一體", code:"VIA-M-ECONONE", file:"VIA Economics One.html"},
+ {g:"ONE", no:"1I", t:"BOM 一體", code:"VIA-M-BOMONE", file:"VIA BOM One.html"},
+ {g:"ONE", no:"39", t:"量價×財報一體", code:"VIA-M-PVFONE", file:"VIA PriceVolume Financials One.html"},
+ {g:"ONE", no:"06", t:"智慧資產 IAMP", code:"VIA-M-IAMP", file:"VIA Intelligence Asset Management Platform.html"},
+ {g:"治理", no:"07", t:"自動編號器", code:"VIA-M-ACODER", file:"VIA Auto-Coder.html"},
+ {g:"治理", no:"08", t:"詞彙登錄 LEX", code:"VIA-M-LEX", file:"VIA Lexicon Registry.html"},
+ {g:"治理", no:"0D", t:"知識體 KB", code:"VIA-M-KB", file:"VIA Knowledge Base.html"},
+ {g:"治理", no:"0A", t:"中央管理", code:"VIA-M-CENTRAL", file:"uploads/VIA_Central_Management.html"},
+ {g:"VAP", no:"79", t:"圖庫建構器(主)", code:"VIA-M-VAPLIB", file:"VIA VAP Chart Library Builder.html"},
+ {g:"VAP", no:"17", t:"視覺全景", code:"VIA-M-VAP", file:"VIA VAP System.html"},
+ {g:"VAP", no:"71", t:"繪圖規範 v4", code:"VIA-M-CSPEC4", file:"VIA Dashboard Chart Spec v4.html"},
+ {g:"VRN", no:"84", t:"VRN 矩陣報告(主)", code:"VIA-M-VRN", file:"VIA VRN v139G Matrix Report.html"},
+ {g:"VRN", no:"59", t:"VRN SSOT 數據總清單", code:"VIA-M-VRNSSOT", file:"VIA VRN SSOT Data Registry.html"},
+ {g:"VRN", no:"33", t:"整合風險引擎 v10", code:"VIA-M-RISK", file:"VIA Risk Engine v10 EN.html"},
+ {g:"VDF", no:"16", t:"VDF 資料駕駛艙(主)", code:"VIA-M-VDF", file:"VIA VDF v4.3 Cockpit.html"},
+ {g:"VDF", no:"55", t:"資料 API 註冊", code:"VIA-M-API", file:"VIA Data API Registry.dc.html"},
+ {g:"VDF", no:"56", t:"資料來源矩陣", code:"VIA-M-DSM", file:"VIA Data Source Matrix.dc.html"},
+ {g:"名單", no:"1J", t:"VENDOR×CUSTOMER", code:"VIA-M-VENCUS", file:"VIA Vendor Customer List.html"},
+ {g:"名單", no:"8B", t:"PMBOK×VIA 簡報", code:"VIA-M-PMBOKDECK", file:"VIA PMBOK Deck.dc.html"},
+ {g:"市場", no:"AI", t:"AI MARKET SIZE 建策卡", code:"VIA-A-KNW-AIMKT", file:"uploads/AUTO_SSOT_Sales_Battlecard.md"},
+ {g:"市場", no:"1F", t:"能力矩陣 PEERS", code:"VIA-M-CAPMX", file:"uploads/VIA_Capability_Matrix (3)-0c8d3e99.html"},
+ {g:"市場", no:"1B", t:"行業360 情報套件", code:"VIA-M-I360", file:"uploads/VIA_Industry360_Intelligence_Suite_Professional-eb59a451.html"},
+ {g:"架構", no:"S1", t:"系統一頁總覽 v0200", code:"VIA-A-SYS-OVW", file:"uploads/VeritasIntelligenceAnalytics_OnePage_System_Overview_v0200.html"},
+ {g:"架構", no:"S2", t:"Workbench Enabler v0300", code:"VIA-A-SYS-WBE", file:"uploads/VeritasIntelligenceAnalytics_Workbench_Enabler_Overview_v0300 (3).html"},
+ {g:"架構", no:"78", t:"系統參數規格", code:"VIA-M-SYSSPEC", file:"uploads/spec-cdd2b3a0.html"},
+ {g:"架構", no:"37", t:"整合平台", code:"VIA-M-INTP", file:"uploads/VIA_Integrated_Platform-aff9e784.html"}
+];
+const GC={"入口":"g1","ONE":"g2","治理":"g3","VAP":"g4","VRN":"g5","VDF":"g6","名單":"g7","市場":"g2","架構":"g3"};
+const $=s=>document.querySelector(s);
+let CUR=0;
+const P=new URLSearchParams(location.search);
+if(P.get("m")){const i=ALL.findIndex(e=>e.code===P.get("m")||e.no===P.get("m"));if(i>=0)CUR=i;}
+function render(){
+ let h="",lastG="";
+ ALL.forEach((e,i)=>{
+  if(e.g!==lastG){if(lastG)h+='</div>';lastG=e.g;h+='<div class="trow"><span class="gl '+GC[e.g]+'">▙ '+e.g+'</span>';}
+  h+='<div class="tab'+(i===CUR?" on":"")+'" data-i="'+i+'"><span class="no">'+e.no+'</span>'+e.t+'</div>';});
+ if(lastG)h+='</div>';
+ $("#tabs").innerHTML=h;
+ document.querySelectorAll(".tab").forEach(el=>el.onclick=()=>{CUR=+el.dataset.i;render();});
+ const e=ALL[CUR];
+ $("#mCode").textContent=e.code;$("#mFile").textContent=e.file;$("#mOpen").href=e.file;
+ const fr=$("#fr");const want=new URL(e.file,location.href).href;
+ if(fr.src!==want)fr.src=want;
+ try{history.replaceState(null,"","?m="+e.code);}catch(_){}
+}
+render();
+</script>
+</body></html>

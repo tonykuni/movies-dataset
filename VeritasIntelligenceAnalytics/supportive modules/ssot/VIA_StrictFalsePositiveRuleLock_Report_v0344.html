@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>VIA Strict False-Positive Rule Lock v034.4</title>
+<style>
+:root{--ink:#16211D;--muted:#66726B;--line:rgba(42,64,55,.14);--ok:#26764F;--warn:#A96B13;--fail:#AE2E24;--dan:#B64236;--sky:#EAF2EC}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(135deg,#F9F9F6,#EFF5F0);color:var(--ink);font-family:"Noto Sans TC","Microsoft JhengHei",Arial,sans-serif;font-size:11px}
+.page{padding:12px;display:grid;gap:10px}
+.top,.panel,.kpi{border:1px solid var(--line);border-radius:16px;background:rgba(255,255,250,.92);box-shadow:0 8px 24px rgba(28,45,39,.08)}
+.top{padding:12px;display:grid;grid-template-columns:42px 1fr;gap:10px;align-items:center}
+.seal{width:38px;height:38px;border-radius:12px;background:var(--dan);color:white;font-weight:900;font-size:22px;display:flex;align-items:center;justify-content:center}
+h1{font-size:15px;margin:0}p{margin:3px 0 0;color:var(--muted)}
+.kpis{display:grid;grid-template-columns:repeat(8,minmax(105px,1fr));gap:8px}
+.kpi{padding:8px 10px}.kpi em{display:block;color:var(--muted);font-style:normal;font-size:9px}.kpi b{font-size:12px}
+.panel{overflow:hidden}.panel h2{font-size:11px;margin:0;padding:8px 10px;background:var(--sky);border-bottom:1px solid var(--line)}
+.shell{overflow:auto;max-height:54vh}
+table{width:100%;min-width:1250px;border-collapse:separate;border-spacing:0;table-layout:fixed}
+th{position:sticky;top:0;background:#EEF5F0;padding:5px;text-align:left;border-bottom:1px solid var(--line);z-index:2}
+td{height:54px;max-height:54px;padding:5px;border-bottom:1px solid rgba(47,70,61,.08);vertical-align:top;overflow:hidden}
+tr:hover td{height:130px;max-height:130px}
+.cellBox{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;word-break:break-word;line-height:1.25;white-space:pre-wrap}
+tr:hover .cellBox{-webkit-line-clamp:9}
+.path{font-family:Consolas,"Cascadia Mono",monospace}.num{text-align:right}
+.sok{color:var(--ok);font-weight:800}.swarn{color:var(--warn);font-weight:800}.sfail{color:var(--fail);font-weight:900}
+.footer{color:var(--muted);font-size:9px;display:grid;gap:4px}
+</style>
+</head>
+<body>
+<div class="page">
+<header class="top">
+  <div class="seal">理</div>
+  <div>
+    <h1>Veritas Intelligence Analytics · Strict False-Positive Rule Lock</h1>
+    <p>v034.4 · final consolidation · no source patch · scanner rule hardening · review-only</p>
+  </div>
+</header>
+
+<section class="kpis">
+<div class="kpi"><em>Status</em><b>VIA_STRICT_FALSE_POSITIVE_RULE_LOCK_READY_WITH_SPACE_PRESSURE</b></div>
+<div class="kpi"><em>Risk</em><b>HIGH</b></div>
+<div class="kpi"><em>Source Modified</em><b>False</b></div>
+<div class="kpi"><em>True Blockers</em><b>0</b></div>
+<div class="kpi"><em>False Positives</em><b>62</b></div>
+<div class="kpi"><em>Scanner Rules</em><b>6</b></div>
+<div class="kpi"><em>Disk Risk</em><b>HIGH</b></div>
+<div class="kpi"><em>Mode</em><b>REVIEW_ONLY</b></div>
+</section>
+
+<section class="panel"><h2>Drive Status</h2><div class="shell"><table><thead><tr><th>Drive</th><th>Root</th><th>Used</th><th>Free</th><th>Free %</th><th>Risk</th></tr></thead><tbody><tr><td>C</td><td>C:\</td><td>473.44 GB</td><td>2.17 GB</td><td>0.46%</td><td class='sfail'>HIGH</td></tr>
+<tr><td>Temp</td><td>C:\Users\tonyk\AppData\Local\Temp\</td><td>473.44 GB</td><td>2.17 GB</td><td>0.46%</td><td class='sfail'>HIGH</td></tr></tbody></table></div></section>
+<section class="panel"><h2>Strict Scanner Rule Matrix</h2><div class="shell"><table><thead><tr><th>RuleId</th><th>Status</th><th>Rule</th><th>Reason</th></tr></thead><tbody><tr><td><span class='cellBox path'>STRICT_CONFLICT_START</span></td><td><span class='cellBox'>LOCKED</span></td><td><span class='cellBox path'>^\s*&lt;&lt;&lt;&lt;&lt;&lt;&lt;\s+</span></td><td><span class='cellBox path'>Only line-start Git conflict start marker is valid.</span></td></tr>
+<tr><td><span class='cellBox path'>STRICT_CONFLICT_MID</span></td><td><span class='cellBox'>LOCKED</span></td><td><span class='cellBox path'>^\s*=======\s*$ only inside a detected conflict block</span></td><td><span class='cellBox path'>Standalone JS/HTML separator or transcript text is not enough.</span></td></tr>
+<tr><td><span class='cellBox path'>STRICT_CONFLICT_END</span></td><td><span class='cellBox'>LOCKED</span></td><td><span class='cellBox path'>^\s*&gt;&gt;&gt;&gt;&gt;&gt;&gt;\s+</span></td><td><span class='cellBox path'>Only line-start Git conflict end marker is valid.</span></td></tr>
+<tr><td><span class='cellBox path'>IGNORE_COMMENT_SEPARATOR</span></td><td><span class='cellBox'>LOCKED</span></td><td><span class='cellBox path'>^\s*//\s*=+\s*$</span></td><td><span class='cellBox path'>Normal JS/HTML section separator; not a merge conflict.</span></td></tr>
+<tr><td><span class='cellBox path'>IGNORE_RUNTIME_ARTIFACTS</span></td><td><span class='cellBox'>LOCKED</span></td><td><span class='cellBox path'>\runtime\|\stdout\|\report\|\registry\|\backup\|\staging\</span></td><td><span class='cellBox path'>Runtime/report/transcript artifacts may contain conflict words but are not active source blockers.</span></td></tr>
+<tr><td><span class='cellBox path'>SOURCE_BLOCKER_ONLY</span></td><td><span class='cellBox'>LOCKED</span></td><td><span class='cellBox path'>Only source files outside runtime/report/backup/staging can be blockers.</span></td><td><span class='cellBox path'>Avoid九頭龍風險：不修 log/report/transcript.</span></td></tr></tbody></table></div></section>
+<section class="panel"><h2>Evidence Matrix</h2><div class="shell"><table><thead><tr><th>Layer</th><th>Metric</th><th>Value</th><th>Path</th><th>Message</th></tr></thead><tbody><tr><td><span class='cellBox'>v034.2T.4</span></td><td><span class='cellBox'>Anchors</span></td><td><span class='cellBox path'>62</span></td><td><span class='cellBox path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_via_anchor_matrix_runs\RUN_20260616_204652_v0342T4_ULTRA_CROSS_ACCELERATOR\runtime\VIA_UltraCrossAnchorMatrix_Runtime_v0342T4.json</span></td><td><span class='cellBox path'>All FAIL/WARN rows were separated one finding = one row.</span></td></tr>
+<tr><td><span class='cellBox'>v034.2T.4</span></td><td><span class='cellBox'>True Source Blockers Before Verify</span></td><td><span class='cellBox path'>1</span></td><td><span class='cellBox path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_via_anchor_matrix_runs\RUN_20260616_204652_v0342T4_ULTRA_CROSS_ACCELERATOR\registry\VIA_UltraCrossAnchorMatrix_Anchors_v0342T4.csv</span></td><td><span class='cellBox path'>Only one source candidate existed before strict verification.</span></td></tr>
+<tr><td><span class='cellBox'>v034.2T.4</span></td><td><span class='cellBox'>Runtime Artifact Count</span></td><td><span class='cellBox path'>60</span></td><td><span class='cellBox path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_via_anchor_matrix_runs\RUN_20260616_204652_v0342T4_ULTRA_CROSS_ACCELERATOR\registry\VIA_UltraCrossAnchorMatrix_Anchors_v0342T4.csv</span></td><td><span class='cellBox path'>Most FAIL rows are runtime/log/report artifacts, not source blockers.</span></td></tr>
+<tr><td><span class='cellBox'>v034.3</span></td><td><span class='cellBox'>True Conflict Marker Rows</span></td><td><span class='cellBox path'>0</span></td><td><span class='cellBox path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_via_source_blocker_patch_runs\RUN_20260616_205028_v0343_TRUE_SOURCE_BLOCKER_VERIFY_SAFE_PATCH\runtime\VIA_TrueSourceBlockerVerify_Runtime_v0343.json</span></td><td><span class='cellBox path'>Strict marker verification found no true Git conflict marker.</span></td></tr>
+<tr><td><span class='cellBox'>v034.3</span></td><td><span class='cellBox'>True Conflict Blocks</span></td><td><span class='cellBox path'>0</span></td><td><span class='cellBox path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_via_source_blocker_patch_runs\RUN_20260616_205028_v0343_TRUE_SOURCE_BLOCKER_VERIFY_SAFE_PATCH\report\VIA_TrueSourceBlockerVerify_Report_v0343.html</span></td><td><span class='cellBox path'>No conflict block exists in the target source.</span></td></tr>
+<tr><td><span class='cellBox'>v034.3</span></td><td><span class='cellBox'>Source Modified</span></td><td><span class='cellBox path'>False</span></td><td><span class='cellBox path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\VDF_MDL501_DataModuleController.html</span></td><td><span class='cellBox path'>Source was not modified; original and post hash stayed identical.</span></td></tr>
+<tr><td><span class='cellBox'>Drive</span></td><td><span class='cellBox'>Disk Risk</span></td><td><span class='cellBox path'>HIGH</span></td><td><span class='cellBox path'>C:\</span></td><td><span class='cellBox path'>Space pressure remains the only HIGH operational risk.</span></td></tr></tbody></table></div></section>
+
+<footer class="footer">
+<span>判天地之美，析萬物之理。 Veritas Intelligence Analytics │ AI-Augmented Investment Intelligence</span>
+<span>Runtime: C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_via_false_positive_rule_lock_runs\RUN_20260616_205250_v0344_STRICT_FALSE_POSITIVE_RULE_LOCK\runtime\VIA_StrictFalsePositiveRuleLock_Runtime_v0344.json</span>
+</footer>
+</div>
+</body>
+</html>

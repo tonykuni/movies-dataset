@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA Post-Promote Integrity Audit v028.6.9</title>
+<style>
+:root{--sky:#d8f0ef;--ink:#1d3438;--muted:#657f82;--line:rgba(38,70,75,.16);--head:#edf8f6;--hover:rgba(216,240,239,.20);--ok:#0f766e;--warn:#b7791f;--fail:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Microsoft JhengHei","Segoe UI",Arial,sans-serif;background:linear-gradient(180deg,#fbfdfb,#f3f8f6);color:var(--ink);font-size:11px;line-height:1.28}
+header{position:sticky;top:0;z-index:80;padding:14px 26px 10px;background:rgba(251,253,251,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+h1{margin:0;font-size:18px;text-align:center;letter-spacing:.035em}
+.sub{text-align:center;color:var(--muted);font-size:10.5px;margin-top:4px}
+.wrap{padding:12px 22px 36px}
+.kpis{display:grid;grid-template-columns:repeat(7,minmax(96px,1fr));gap:8px;margin-bottom:12px}
+.card{border-radius:10px;padding:8px 10px;background:rgba(255,255,255,.82);border:1px solid var(--line);box-shadow:0 6px 16px rgba(30,52,56,.04)}
+.k{font-size:9.5px;color:var(--muted);letter-spacing:.07em}.v{font-size:16px;font-weight:750;margin-top:2px}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.fail{color:var(--fail)}
+section{margin-top:12px}
+h2{position:sticky;top:45px;z-index:70;margin:0 0 6px;padding:6px 9px;border:1px solid var(--line);border-left:4px solid var(--sky);border-radius:9px;background:rgba(250,253,252,.96);font-size:12px;text-align:center}
+table{width:100%;border-collapse:separate;border-spacing:0;table-layout:auto;background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:10px;overflow:clip}
+thead{position:sticky;top:76px;z-index:60}
+th{position:sticky;top:76px;z-index:61;background:var(--head);font-size:10px;font-weight:800;text-align:center;vertical-align:top;padding:5px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{font-size:10px;padding:4px 6px;border-bottom:1px solid var(--line);vertical-align:top;text-align:center;white-space:nowrap}
+td.via-left,td:has(code){text-align:left;white-space:normal;word-break:break-word;overflow-wrap:anywhere}
+tr:hover td{background:var(--hover)}
+code{font-family:Consolas,"Cascadia Mono",monospace;font-size:9.5px;white-space:normal;word-break:break-word}
+</style>
+</head>
+<body>
+<header>
+<h1>def VIA Post-Promote Integrity Audit · v028.6.9</h1>
+<div class="sub">Read-only Final Audit · Active Pointer · Frozen Pointer · Source Seal · Policy Check</div>
+</header>
+<div class="wrap">
+<div class="kpis">
+<div class="card"><div class="k">Status</div><div class="v">POST_PROMOTE_INTEGRITY_VERIFIED</div></div>
+<div class="card"><div class="k">Risk</div><div class="v">LOW</div></div>
+<div class="card"><div class="k">OK</div><div class="v ok">9</div></div>
+<div class="card"><div class="k">WARN</div><div class="v warn">1</div></div>
+<div class="card"><div class="k">FAIL</div><div class="v fail">0</div></div>
+<div class="card"><div class="k">Blockers</div><div class="v fail">0</div></div>
+<div class="card"><div class="k">Pointer Rewrite</div><div class="v">False</div></div>
+</div>
+
+<section>
+<h2>def Matrix</h2>
+<table>
+<thead><tr><th>Round</th><th>Lane</th><th>Stage</th><th>Name</th><th>Status</th><th>Risk</th><th>FixClass</th><th>Priority</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr></thead>
+<tbody><tr><td>Round0</td><td>CONTROL</td><td>POLICY</td><td>No DB Write</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>db_write</td><td>false</td><td>Read-only audit; no production DB write.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</code></td></tr>
+<tr><td>Round0</td><td>CONTROL</td><td>POLICY</td><td>No Pointer Rewrite</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>pointer_write</td><td>false</td><td>This run does not rewrite active or freeze pointer.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_POST_PROMOTE_INTEGRITY_AUDIT_v02869_20260611_124053</code></td></tr>
+<tr><td>Round0</td><td>CONTROL</td><td>POLICY</td><td>No Stop-Process</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>stop_process</td><td>false</td><td>No process state is touched.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_POST_PROMOTE_INTEGRITY_AUDIT_v02869_20260611_124053</code></td></tr>
+<tr><td>Round0</td><td>ANCHOR</td><td>RUNTIME</td><td>Latest v02868 Runtime</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>runtime</td><td>found</td><td>Latest v02868 promote runtime found.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_FINAL_PROMOTE_ACTIVE_POINTER_LOCK_v02868_20260611_123905\runtime\VIA_FinalPromote_Runtime_v02868.json</code></td></tr>
+<tr><td>Round1</td><td>POINTER</td><td>ACTIVE</td><td>Active Pointer Status</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>status</td><td>FINAL_PROMOTED_ACTIVE_POINTER_LOCKED</td><td>Active pointer is final promoted lock.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ACTIVE_POINTER.json</code></td></tr>
+<tr><td>Round1</td><td>POINTER</td><td>FREEZE</td><td>Frozen Pointer Status</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>status</td><td>FINAL_PROMOTED_ACTIVE_POINTER_LOCKED</td><td>Frozen pointer is final promoted lock.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_freeze\VDF_FINAL_ACTIVATION_SEAL_POINTER_v02868.json</code></td></tr>
+<tr><td>Round1</td><td>POINTER</td><td>CONSISTENCY</td><td>Active vs Frozen Source Runtime</td><td><b>OK_MATCHED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>matched</td><td>true</td><td>Active and frozen pointer source runtime match.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_FINAL_LONGRUN_SEAL_v02867_20260611_123639\runtime\VIA_FinalLongRunSeal_Runtime_v02867.json</code></td></tr>
+<tr><td>Round2</td><td>POLICY</td><td>PROMOTE_POLICY</td><td>Final Promote Policy</td><td><b>OK_POLICY_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>all_false</td><td>true</td><td>All destructive/network/parallel flags remain false.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ACTIVE_POINTER.json</code></td></tr>
+<tr><td>Round2</td><td>SEAL</td><td>SOURCE</td><td>Source Seal Health</td><td><b>OK_SOURCE_SEAL_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>verified</td><td>true</td><td>Source seal remains clean.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_FINAL_LONGRUN_SEAL_v02867_20260611_123639\runtime\VIA_FinalLongRunSeal_Runtime_v02867.json</code></td></tr>
+<tr><td>Round3</td><td>FINAL</td><td>AUDIT</td><td>Post-Promote Integrity Audit</td><td><b>POST_PROMOTE_INTEGRITY_VERIFIED</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>blockers</td><td>0</td><td>Post-promote integrity audit decision created.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_POST_PROMOTE_INTEGRITY_AUDIT_v02869_20260611_124053</code></td></tr></tbody>
+</table>
+</section>
+</div>
+<script>
+(function(){
+ const left=/(path|message|value|source|pointer|runtime|路徑|訊息|來源|指標)/i;
+ const path=/([A-Za-z]:\\|\\\\|\/|\.ps1|\.py|\.html|\.csv|\.json|\.txt)/i;
+ function clean(t){return String(t||"").replace(/,/g,"").replace(/%/g,"").trim();}
+ function isnum(t){const s=clean(t);return !!s && /^[-+]?(\\d+|\\d*\\.\\d+)(e[-+]?\\d+)?$/i.test(s) && Number.isFinite(Number(s));}
+ function fmt(t){const n=Number(clean(t));return Number.isFinite(n)?n.toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:1}):t;}
+ function heads(table){return Array.from(table.querySelectorAll("thead th")).map(x=>(x.textContent||"").trim());}
+ function process(table){const hs=heads(table);Array.from(table.querySelectorAll("th")).forEach(th=>{th.style.textAlign="center";th.style.verticalAlign="top";});Array.from(table.querySelectorAll("tbody tr")).forEach(row=>{Array.from(row.children).forEach((cell,i)=>{const h=hs[i]||"";const raw=(cell.textContent||"").trim();cell.style.verticalAlign="top";cell.style.textAlign="center";if(isnum(raw)){cell.textContent=fmt(raw);return;}if(left.test(h)||path.test(raw)||raw.length>=36||cell.querySelector("code")){cell.classList.add("via-left");}});});}
+ Array.from(document.querySelectorAll("table")).forEach(process);
+})();
+</script>
+</body>
+</html>

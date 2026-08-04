@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VRN StockReport Incremental Output Store v029.SSOT.1D</title>
+<style>
+:root{--sky:#d8f0ef;--ink:#1d3438;--muted:#657f82;--line:rgba(38,70,75,.16);--head:#edf8f6;--hover:rgba(216,240,239,.20);--ok:#0f766e;--warn:#b7791f;--fail:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Microsoft JhengHei","Segoe UI",Arial,sans-serif;background:linear-gradient(180deg,#fbfdfb,#f3f8f6);color:var(--ink);font-size:11px;line-height:1.28}
+header{position:sticky;top:0;z-index:80;padding:14px 26px 10px;background:rgba(251,253,251,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+h1{margin:0;font-size:18px;text-align:center;letter-spacing:.035em}
+.sub{text-align:center;color:var(--muted);font-size:10.5px;margin-top:4px}
+.wrap{padding:12px 22px 36px}
+.kpis{display:grid;grid-template-columns:repeat(8,minmax(96px,1fr));gap:8px;margin-bottom:12px}
+.card{border-radius:10px;padding:8px 10px;background:rgba(255,255,255,.82);border:1px solid var(--line);box-shadow:0 6px 16px rgba(30,52,56,.04)}
+.k{font-size:9.5px;color:var(--muted);letter-spacing:.07em}.v{font-size:16px;font-weight:750;margin-top:2px}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.fail{color:var(--fail)}
+section{margin-top:12px}
+h2{position:sticky;top:45px;z-index:70;margin:0 0 6px;padding:6px 9px;border:1px solid var(--line);border-left:4px solid var(--sky);border-radius:9px;background:rgba(250,253,252,.96);font-size:12px;text-align:center}
+table{width:100%;border-collapse:separate;border-spacing:0;table-layout:auto;background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:10px;overflow:clip}
+thead{position:sticky;top:76px;z-index:60}
+th{position:sticky;top:76px;z-index:61;background:var(--head);font-size:10px;font-weight:800;text-align:center;vertical-align:top;padding:5px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{font-size:10px;padding:4px 6px;border-bottom:1px solid var(--line);vertical-align:top;text-align:center;white-space:nowrap}
+td.via-left,td:has(code){text-align:left;white-space:normal;word-break:break-word;overflow-wrap:anywhere}
+tr:hover td{background:var(--hover)}
+code{font-family:Consolas,"Cascadia Mono",monospace;font-size:9.5px;white-space:normal;word-break:break-word}
+</style>
+</head>
+<body>
+<header>
+<h1>def VRN StockReport Incremental Output Store · v029.SSOT.1D</h1>
+<div class="sub">JSON dataflow · Parquet SSOT · DuckDB serving layer · incremental dedup · no extraction rerun · no canonical promotion</div>
+</header>
+<div class="wrap">
+<div class="kpis">
+<div class="card"><div class="k">Status</div><div class="v">VRN_STOCKREPORT_INCREMENTAL_OUTPUT_READY_WITH_REVIEW</div></div>
+<div class="card"><div class="k">Risk</div><div class="v">MEDIUM</div></div>
+<div class="card"><div class="k">OK</div><div class="v ok">35</div></div>
+<div class="card"><div class="k">WARN</div><div class="v warn">2</div></div>
+<div class="card"><div class="k">FAIL</div><div class="v fail">0</div></div>
+<div class="card"><div class="k">BasicInfo Rows</div><div class="v">400</div></div>
+<div class="card"><div class="k">Financial Rows</div><div class="v">0</div></div>
+<div class="card"><div class="k">DuckDB</div><div class="v">READY</div></div>
+</div>
+
+<section><h2>def Output Store Matrix</h2>
+<table>
+<thead><tr><th>Round</th><th>Layer</th><th>Name</th><th>Status</th><th>Risk</th><th>Class</th><th>Priority</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr></thead>
+<tbody><tr><td>Round0</td><td>POLICY</td><td>No Extraction Rerun</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>rerun</td><td>false</td><td>Use active pointer and existing parquet only.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_STOCKREPORT_INCREMENTAL_OUTPUT_STORE_v029SSOT1D_20260615_151828</code></td></tr>
+<tr><td>Round0</td><td>POLICY</td><td>No Canonical Promotion</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>canonical</td><td>false</td><td>Output store only; canonical remains blocked.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_STOCKREPORT_INCREMENTAL_OUTPUT_STORE_v029SSOT1D_20260615_151828</code></td></tr>
+<tr><td>Round0</td><td>POLICY</td><td>JSON Dataflow</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>control_plane</td><td>json</td><td>JSON stores manifest/runtime/dataflow only.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_STOCKREPORT_INCREMENTAL_OUTPUT_STORE_v029SSOT1D_20260615_151828\runtime</code></td></tr>
+<tr><td>Round0</td><td>POLICY</td><td>Parquet Truth Source</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>payload</td><td>parquet</td><td>StockReport parquet files are truth source.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\DATABASE</code></td></tr>
+<tr><td>Round0</td><td>POLICY</td><td>DuckDB Serving Layer</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>duckdb</td><td>True</td><td>DuckDB is rebuildable serving layer.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\DATABASE</code></td></tr>
+<tr><td>Round1</td><td>INPUT</td><td>VRN_ACTIVE_STAGE_POINTER.json</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>exists</td><td>true</td><td>Active pointer found.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\VRN_ACTIVE_STAGE_POINTER.json</code></td></tr>
+<tr><td>Round1</td><td>ENGINE</td><td>Python Stack</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>deps</td><td>pandas/pyarrow/duckdb</td><td>Python stack verified.</td><td><code>C:\Python313\python.exe</code></td></tr>
+<tr><td>Round1</td><td>EXTRA_SSOT</td><td>VIS_VRN_TickerFilenameSSOT_v0100.py</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>exists</td><td>true</td><td>Extra SSOT/supportive file found.</td><td><code>C:\Users\tonyk\Downloads\VIS_VRN_TickerFilenameSSOT_v0100.py</code></td></tr>
+<tr><td>Round1</td><td>EXTRA_SSOT</td><td>VRN_FINANCIAL_TRUST_POLISH_V044.ps1</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>exists</td><td>true</td><td>Extra SSOT/supportive file found.</td><td><code>C:\Users\tonyk\Downloads\VRN_FINANCIAL_TRUST_POLISH_V044.ps1</code></td></tr>
+<tr><td>Round1</td><td>EXTRA_SSOT</td><td>VRN_Incremental_StockReport_DB_AIO_v1.0.ps1</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>exists</td><td>true</td><td>Extra SSOT/supportive file found.</td><td><code>C:\Users\tonyk\Downloads\VRN_Incremental_StockReport_DB_AIO_v1.0.ps1</code></td></tr>
+<tr><td>Round1</td><td>EXTRA_SSOT</td><td>VRN_S05_FieldRegistry_v0102.md</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>exists</td><td>true</td><td>Extra SSOT/supportive file found.</td><td><code>C:\Users\tonyk\Downloads\VRN_S05_FieldRegistry_v0102.md</code></td></tr>
+<tr><td>Round1</td><td>EXTRA_SSOT</td><td>VRN_S05_FieldRegistry_v0102.json</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>exists</td><td>true</td><td>Extra SSOT/supportive file found.</td><td><code>C:\Users\tonyk\Downloads\VRN_S05_FieldRegistry_v0102.json</code></td></tr>
+<tr><td>Round1</td><td>EXTRA_SSOT</td><td>VRN_BROKER_LIST_v01.json</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>exists</td><td>true</td><td>Extra SSOT/supportive file found.</td><td><code>C:\Users\tonyk\Downloads\VRN_BROKER_LIST_v01.json</code></td></tr>
+<tr><td>Round1</td><td>EXTRA_SSOT</td><td>VRN_S05_FieldRegistry_v0101_Matrix.md</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>exists</td><td>true</td><td>Extra SSOT/supportive file found.</td><td><code>C:\Users\tonyk\Downloads\VRN_S05_FieldRegistry_v0101_Matrix.md</code></td></tr>
+<tr><td>Round1</td><td>EXTRA_SSOT</td><td>VRN_S05_FieldRegistry_v0101.json</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>exists</td><td>true</td><td>Extra SSOT/supportive file found.</td><td><code>C:\Users\tonyk\Downloads\VRN_S05_FieldRegistry_v0101.json</code></td></tr>
+<tr><td>Round1</td><td>EXTRA_SSOT</td><td>Read_Me_VeritasNexusCore.md</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>exists</td><td>true</td><td>Extra SSOT/supportive file found.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\Read_Me_VeritasNexusCore.md</code></td></tr>
+<tr><td>Round1</td><td>EXTRA_SSOT</td><td>Invoke-VeritasNexusCore.ps1</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>exists</td><td>true</td><td>Extra SSOT/supportive file found.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\Invoke-VeritasNexusCore.ps1</code></td></tr>
+<tr><td>Round1</td><td>EXTRA_SSOT</td><td>Invoke-VIA-PolyglotCheckTestRepair-v0101.ps1</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>exists</td><td>true</td><td>Extra SSOT/supportive file found.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\Invoke-VIA-PolyglotCheckTestRepair-v0101.ps1</code></td></tr>
+<tr><td>Round1</td><td>EXTRA_SSOT</td><td>VIS_VRN_FinancialSSOT_v0608.py</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>exists</td><td>true</td><td>Extra SSOT/supportive file found.</td><td><code>C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\supportive_module\VIS_VRN_FinancialSSOT_v0608.py</code></td></tr>
+<tr><td>Round1</td><td>EXTRA_SSOT</td><td>VIS_VRN_BrokerAlias_Extension_v0224.py</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>exists</td><td>true</td><td>Extra SSOT/supportive file found.</td><td><code>C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\supportive_module\VIS_VRN_BrokerAlias_Extension_v0224.py</code></td></tr>
+<tr><td>Round1</td><td>EXTRA_SSOT</td><td>VIS_VRN_BrokerAlias_Compatibility_v0222.py</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>exists</td><td>true</td><td>Extra SSOT/supportive file found.</td><td><code>C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\supportive_module\VIS_VRN_BrokerAlias_Compatibility_v0222.py</code></td></tr>
+<tr><td>Round1</td><td>EXTRA_SSOT</td><td>VIS_VRN_BasicInfoFinancialQualityRules_v0100.py</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>exists</td><td>true</td><td>Extra SSOT/supportive file found.</td><td><code>C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\supportive_module\VIS_VRN_BasicInfoFinancialQualityRules_v0100.py</code></td></tr>
+<tr><td>Round1</td><td>EXTRA_SSOT</td><td>VIS_VRN_FinancialRescueRules_v06126.py</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>exists</td><td>true</td><td>Extra SSOT/supportive file found.</td><td><code>C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\supportive_module\VIS_VRN_FinancialRescueRules_v06126.py</code></td></tr>
+<tr><td>Round2</td><td>ENGINE</td><td>StockReport Output Python Engine</td><td><b>OK_CREATED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>script</td><td>created</td><td>Python output builder created.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_STOCKREPORT_INCREMENTAL_OUTPUT_STORE_v029SSOT1D_20260615_151828\work\vrn_stockreport_incremental_output_store_v029ssot1d.py</code></td></tr>
+<tr><td>Round2</td><td>BUILD</td><td>StockReport Output Build</td><td><b>OK_BUILT</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>exit</td><td>0</td><td>StockReport output store built.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_STOCKREPORT_INCREMENTAL_OUTPUT_STORE_v029SSOT1D_20260615_151828\runtime\VRN_StockReportIncrementalOutputStore_PythonRuntime_v029SSOT1D.json</code></td></tr>
+<tr><td>Round2</td><td>TEST</td><td>Parquet BasicInfo Readback</td><td><b>OK_TESTED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>value</td><td>400</td><td>BasicInfo parquet readback count.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\DATABASE\StockReportBasicInfo.parquet</code></td></tr>
+<tr><td>Round2</td><td>TEST</td><td>Parquet FinancialData Readback</td><td><b>OK_TESTED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>value</td><td>0</td><td>FinancialData parquet readback count.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\DATABASE\StockReportFinancialData.parquet</code></td></tr>
+<tr><td>Round2</td><td>TEST</td><td>BasicInfo Incremental Dedup</td><td><b>OK_TESTED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>value</td><td>0</td><td>record_hash duplicates in BasicInfo.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\DATABASE\StockReportBasicInfo.parquet</code></td></tr>
+<tr><td>Round2</td><td>TEST</td><td>FinancialData Incremental Dedup</td><td><b>OK_TESTED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>value</td><td>0</td><td>record_hash duplicates in FinancialData.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\DATABASE\StockReportFinancialData.parquet</code></td></tr>
+<tr><td>Round2</td><td>TEST</td><td>DuckDB BasicInfo Count</td><td><b>OK_TESTED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>value</td><td>400</td><td>DuckDB serving layer test.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\DATABASE\VRN_StockReport.duckdb</code></td></tr>
+<tr><td>Round2</td><td>TEST</td><td>DuckDB FinancialData Count</td><td><b>OK_TESTED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>value</td><td>0</td><td>DuckDB serving layer test.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\DATABASE\VRN_StockReport.duckdb</code></td></tr>
+<tr><td>Round3</td><td>OUTPUT</td><td>StockReportBasicInfo.parquet</td><td><b>OK_WRITTEN</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>exists</td><td>true</td><td>Output file written.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\DATABASE\StockReportBasicInfo.parquet</code></td></tr>
+<tr><td>Round3</td><td>OUTPUT</td><td>StockReportFinancialData.parquet</td><td><b>OK_WRITTEN</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>exists</td><td>true</td><td>Output file written.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\DATABASE\StockReportFinancialData.parquet</code></td></tr>
+<tr><td>Round3</td><td>OUTPUT</td><td>VRN_StockReport_Dataflow_v029SSOT1D.json</td><td><b>OK_WRITTEN</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>exists</td><td>true</td><td>Output file written.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_STOCKREPORT_INCREMENTAL_OUTPUT_STORE_v029SSOT1D_20260615_151828\runtime\VRN_StockReport_Dataflow_v029SSOT1D.json</code></td></tr>
+<tr><td>Round3</td><td>OUTPUT</td><td>VRN_StockReport.duckdb</td><td><b>OK_WRITTEN</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>exists</td><td>true</td><td>DuckDB serving layer written.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\DATABASE\VRN_StockReport.duckdb</code></td></tr>
+<tr><td>Round3</td><td>READINESS</td><td>FinancialData Population</td><td><b>WARN_PENDING_1D</b></td><td>MEDIUM</td><td>SEQUENTIAL_REQUIRED</td><td>P1</td><td>rows</td><td>0</td><td>No existing FinancialData parquet candidate found. StockReportFinancialData schema created and waits for VRN 1D table extraction staging.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\DATABASE\StockReportFinancialData.parquet</code></td></tr>
+<tr><td>Round3</td><td>FINAL</td><td>StockReport Incremental Output Store</td><td><b>VRN_STOCKREPORT_INCREMENTAL_OUTPUT_READY_WITH_REVIEW</b></td><td>MEDIUM</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>hard_blocks</td><td>0</td><td>Final output-store decision.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_STOCKREPORT_INCREMENTAL_OUTPUT_STORE_v029SSOT1D_20260615_151828</code></td></tr></tbody>
+</table>
+</section>
+</div>
+<script>
+(function(){
+ const left=/(path|message|reason|action|issue|路徑|訊息|原因|動作|問題)/i;
+ const path=/([A-Za-z]:\\|\\\\|\/|\.ps1|\.py|\.parquet|\.csv|\.json|\.html|\.txt|\.pdf|\.duckdb)/i;
+ function clean(t){return String(t||"").replace(/,/g,"").replace(/%/g,"").trim();}
+ function isnum(t){const s=clean(t);return !!s && /^[-+]?(\d+|\d*\.\d+)(e[-+]?\d+)?$/i.test(s) && Number.isFinite(Number(s));}
+ function fmt(t){const n=Number(clean(t));return Number.isFinite(n)?n.toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:2}):t;}
+ function heads(table){return Array.from(table.querySelectorAll("thead th")).map(x=>(x.textContent||"").trim());}
+ function process(table){const hs=heads(table);Array.from(table.querySelectorAll("th")).forEach(th=>{th.style.textAlign="center";th.style.verticalAlign="top";});Array.from(table.querySelectorAll("tbody tr")).forEach(row=>{Array.from(row.children).forEach((cell,i)=>{const h=hs[i]||"";const raw=(cell.textContent||"").trim();cell.style.verticalAlign="top";cell.style.textAlign="center";if(isnum(raw)){cell.textContent=fmt(raw);return;}if(left.test(h)||path.test(raw)||raw.length>=36||cell.querySelector("code")){cell.classList.add("via-left");}});});}
+ Array.from(document.querySelectorAll("table")).forEach(process);
+})();
+</script>
+</body>
+</html>

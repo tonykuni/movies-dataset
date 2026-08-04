@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA · Data Module Controller v2.0 · Full Ecosystem</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f4f0;--bg1:#edecea;--bg2:#e5e3df;--sf:#fff;--sf2:#fafaf8;
+  --bd:#dbd9d3;--bd2:#ccc9c1;
+  --bl:#4c78a8;--bl-l:#d0e1f0;--tl:#439a9a;--tl-l:#c8e6e6;
+  --gn:#5a9e6f;--gn-l:#cde8d5;--am:#c4943a;--am-l:#f5e2b8;
+  --co:#c96b5a;--co-l:#f5d0c8;--vi:#7a6daa;--vi-l:#dcd8f0;
+  --i0:#1e1d1a;--i1:#3d3c38;--i2:#6b6860;--i3:#9c9890;--i4:#c4c0b8;
+  --mo:'DM Mono',monospace;--sa:'DM Sans',system-ui,sans-serif;
+  --display:'Syne',var(--sa);
+  --r:5px;--r2:8px;--r3:12px;
+  --sh:0 1px 3px rgba(0,0,0,.06);--sh2:0 4px 16px rgba(0,0,0,.10);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--sa);background:var(--bg);color:var(--i0);font-size:11.5px;line-height:1.5}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
+.w{max-width:1620px;margin:0 auto;padding:12px 16px}
+
+.hdr{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r3);padding:14px 18px;margin-bottom:12px;position:relative;overflow:hidden;display:flex;align-items:center;gap:14px;box-shadow:var(--sh2)}
+.hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--bl),var(--tl),var(--vi),var(--am),var(--co),var(--gn));animation:hs 8s linear infinite;background-size:200% 100%}
+@keyframes hs{0%{background-position:0%}100%{background-position:200%}}
+.logo{width:44px;height:44px;flex-shrink:0;background:linear-gradient(135deg,#1e3a5f,var(--vi));border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--mo);font-weight:500;font-size:14px}
+.hdr-t{flex:1}
+.hdr-title{font-family:var(--display);font-size:19px;font-weight:700;letter-spacing:-.5px}
+.hdr-title span{color:var(--bl)}
+.hdr-sub{font-size:9.5px;color:var(--i3);font-family:var(--mo);margin-top:3px}
+.hdr-r{font-family:var(--mo);font-size:9px;text-align:right;color:var(--i2);line-height:1.7}
+.live-dot{display:inline-block;width:6px;height:6px;background:var(--gn);border-radius:50%;margin-right:4px;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+.stats{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin-bottom:14px}
+.stat{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:8px 12px;box-shadow:var(--sh)}
+.stat-l{font-family:var(--mo);font-size:8.5px;color:var(--i3);text-transform:uppercase;letter-spacing:.05em}
+.stat-v{font-family:var(--mo);font-size:18px;font-weight:500;line-height:1.2}
+.stat-s{font-size:9px;color:var(--i2);margin-top:2px}
+
+.tabs{display:flex;gap:3px;margin-bottom:10px;border-bottom:2px solid var(--bd);padding-bottom:0;flex-wrap:wrap}
+.tab{padding:7px 12px;cursor:pointer;border:1px solid transparent;border-bottom:0;border-radius:var(--r2) var(--r2) 0 0;font-weight:500;color:var(--i2);font-size:10.5px;transition:.15s;display:flex;align-items:center;gap:5px}
+.tab:hover{background:var(--bg1);color:var(--i0)}
+.tab.active{background:var(--sf);color:var(--bl);border-color:var(--bd);border-bottom:2px solid var(--sf);margin-bottom:-2px;font-weight:600}
+.tab-id{font-family:var(--mo);font-size:8.5px;color:var(--i3);background:var(--bg2);padding:1px 5px;border-radius:8px}
+.tab.active .tab-id{background:var(--bl-l);color:var(--bl)}
+.tab-cnt{font-family:var(--mo);font-size:8.5px;color:var(--i3);background:var(--bg);padding:1px 5px;border-radius:8px;border:1px solid var(--bd)}
+
+.panel{background:var(--sf);border:1px solid var(--bd);border-radius:0 var(--r2) var(--r2) var(--r2);padding:16px;display:none;box-shadow:var(--sh)}
+.panel.active{display:block}
+.panel-h{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--bd)}
+.panel-info h2{font-family:var(--display);font-size:16px;font-weight:700;margin-bottom:4px}
+.panel-info p{font-size:10.5px;color:var(--i2);line-height:1.5}
+.panel-info .meta{font-family:var(--mo);font-size:9px;color:var(--i3);margin-top:4px}
+.panel-actions{display:flex;gap:6px;flex-shrink:0}
+
+.btn{padding:6px 12px;border:1px solid var(--bd);border-radius:var(--r);background:var(--sf);font-family:var(--sa);font-size:10.5px;font-weight:500;color:var(--i1);cursor:pointer;transition:.12s;display:inline-flex;align-items:center;gap:4px}
+.btn:hover{background:var(--bg1);border-color:var(--bd2)}
+.btn-p{background:var(--bl);color:#fff;border-color:var(--bl)}
+.btn-p:hover{background:#3d6188;border-color:#3d6188}
+.btn-g{background:var(--gn);color:#fff;border-color:var(--gn)}
+.btn-x{background:var(--bg2);color:var(--i2);padding:3px 8px;font-size:9px}
+.btn-x:hover{background:var(--co-l);color:var(--co)}
+
+.fb{display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap}
+.fb input,.fb select{padding:6px 10px;border:1px solid var(--bd);border-radius:var(--r);font-family:var(--sa);font-size:10.5px;background:var(--sf)}
+.fb input{flex:1;min-width:220px}
+.fb .chips{display:flex;gap:4px;flex-wrap:wrap}
+.chip{padding:3px 8px;border:1px solid var(--bd);border-radius:10px;font-size:9px;font-family:var(--mo);color:var(--i2);background:var(--sf2);cursor:pointer}
+.chip.on{background:var(--bl-l);color:var(--bl);border-color:var(--bl)}
+
+.tbl-wrap{border:1px solid var(--bd);border-radius:var(--r2);overflow:hidden;background:var(--sf)}
+.tbl{width:100%;border-collapse:collapse;font-size:10.5px}
+.tbl thead{background:var(--bg1);border-bottom:1px solid var(--bd)}
+.tbl th{padding:8px 10px;text-align:left;font-weight:600;color:var(--i1);font-size:10px;text-transform:uppercase;letter-spacing:.04em;font-family:var(--mo)}
+.tbl td{padding:6px 10px;border-bottom:1px solid var(--bd)}
+.tbl tr:hover td{background:var(--sf2)}
+.tbl .code{font-family:var(--mo);color:var(--bl);font-weight:500}
+.tbl .tag{display:inline-block;padding:1px 7px;border-radius:8px;font-family:var(--mo);font-size:8.5px;background:var(--bg2);color:var(--i2)}
+.tbl .tag.t-rates,.tbl .tag.t-twse{background:var(--bl-l);color:var(--bl)}
+.tbl .tag.t-inflation,.tbl .tag.t-tpex{background:var(--co-l);color:var(--co)}
+.tbl .tag.t-employment,.tbl .tag.t-us{background:var(--gn-l);color:var(--gn)}
+.tbl .tag.t-growth{background:var(--tl-l);color:var(--tl)}
+.tbl .tag.t-credit,.tbl .tag.t-futures{background:var(--am-l);color:var(--am)}
+.tbl .tag.t-fed,.tbl .tag.t-shipping{background:var(--vi-l);color:var(--vi)}
+.tbl .tag.t-macro{background:var(--tl-l);color:var(--tl)}
+.tbl .tag.t-stable{background:var(--gn-l);color:var(--gn)}
+.tbl .tag.t-production{background:var(--bl-l);color:var(--bl)}
+.tbl .tag.t-locked{background:var(--vi-l);color:var(--vi)}
+
+.add-row{background:var(--sf2);padding:10px 12px;border-top:2px solid var(--bd);display:flex;gap:6px;align-items:center}
+.add-row input{flex:1;padding:5px 8px;border:1px solid var(--bd);border-radius:var(--r);font-family:var(--mo);font-size:10px;background:var(--sf)}
+
+.eco-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-top:10px}
+.eco-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:12px;cursor:pointer;transition:.12s}
+.eco-card:hover{box-shadow:var(--sh2);border-color:var(--bl-l)}
+.eco-card h3{font-family:var(--display);font-size:13px;margin-bottom:4px}
+.eco-card .mid{font-family:var(--mo);font-size:9px;color:var(--bl);background:var(--bl-l);padding:1px 6px;border-radius:8px;display:inline-block;margin-bottom:6px}
+.eco-card .role{font-size:10.5px;color:var(--i2);margin-bottom:6px;line-height:1.5;min-height:32px}
+.eco-card .fmts{font-family:var(--mo);font-size:9px;color:var(--i3);margin-top:6px;display:flex;flex-wrap:wrap;gap:4px}
+.eco-card .fmt-pill{padding:1px 5px;border-radius:5px;background:var(--bg2)}
+.eco-card .fmt-pill.ok{background:var(--gn-l);color:var(--gn)}
+.eco-card.cat-act{border-left:3px solid var(--bl)}
+.eco-card.cat-leg{border-left:3px solid var(--am)}
+.eco-card.cat-vrn{border-left:3px solid var(--tl)}
+.eco-card.cat-sup{border-left:3px solid var(--vi)}
+.eco-card.cat-ctl{border-left:3px solid var(--co)}
+
+.log{margin-top:12px;background:#1e1d1a;color:#cde8d5;border-radius:var(--r2);padding:10px 14px;font-family:var(--mo);font-size:10px;line-height:1.6;max-height:200px;overflow-y:auto}
+.log .info{color:#4c78a8}.log .ok{color:#5a9e6f}.log .warn{color:#c4943a}.log .err{color:#c96b5a}
+.log .ts{color:#6b6860;margin-right:8px}
+
+.run-pop{position:fixed;inset:0;background:rgba(30,29,26,.55);display:none;align-items:center;justify-content:center;z-index:99}
+.run-pop.on{display:flex}
+.run-card{background:var(--sf);border-radius:var(--r3);padding:24px;max-width:560px;width:90%;box-shadow:0 16px 48px rgba(0,0,0,.25)}
+.run-card h3{font-family:var(--display);font-size:15px;margin-bottom:8px}
+.fmt-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.fmt-chip{padding:5px 12px;border:1px solid var(--bd);border-radius:var(--r);background:var(--sf2);cursor:pointer;font-size:10px;font-family:var(--mo);user-select:none}
+.fmt-chip.on{background:var(--bl);color:#fff;border-color:var(--bl)}
+.fmt-chip.req{opacity:.6;cursor:not-allowed}
+.cmd-box{background:#1e1d1a;color:#cde8d5;padding:10px;border-radius:var(--r);font-family:var(--mo);font-size:10px;margin-bottom:14px;word-break:break-all;line-height:1.6}
+.run-actions{display:flex;justify-content:flex-end;gap:6px}
+
+.ft{font-family:var(--mo);font-size:9px;color:var(--i3);padding:14px 4px 8px;border-top:1px solid var(--bd);margin-top:18px;text-align:center}
+</style>
+</head>
+<body>
+<div class="w">
+
+<div class="hdr">
+  <div class="logo">VIA</div>
+  <div class="hdr-t">
+    <div class="hdr-title">VIA · <span>Data Module Controller</span> · v2.0 Full Ecosystem</div>
+    <div class="hdr-sub">全 31 個資料擷取模組註冊中樞 · MDL001/002/003/005/006 + Legacy + VRN + Supportive · 多格式輸出 (Parquet/DuckDB/CSV/JSON/GSheet)</div>
+  </div>
+  <div class="hdr-r">
+    <div><span class="live-dot"></span>FULL ECOSYSTEM REGISTERED</div>
+    <div>31 modules · 32K+ lines</div>
+    <div id="lastEdit" style="color:var(--i3)">no changes</div>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="stat-l">Total Modules</div><div class="stat-v">31</div><div class="stat-s">5 categories</div></div>
+  <div class="stat"><div class="stat-l">VDF Active</div><div class="stat-v" style="color:var(--bl)">6</div><div class="stat-s">本期 session</div></div>
+  <div class="stat"><div class="stat-l">VDF Legacy</div><div class="stat-v" style="color:var(--am)">11</div><div class="stat-s">D2/E0-E4/Master</div></div>
+  <div class="stat"><div class="stat-l">VRN Active</div><div class="stat-v" style="color:var(--tl)">6</div><div class="stat-s">MDL004 + 010-014</div></div>
+  <div class="stat"><div class="stat-l">Supportive</div><div class="stat-v" style="color:var(--vi)">4</div><div class="stat-s">SSOT+Aegis+Cel+Super</div></div>
+  <div class="stat"><div class="stat-l">Control UI</div><div class="stat-v" style="color:var(--co)">4</div><div class="stat-s">Bridge+Server+2 HTML</div></div>
+  <div class="stat"><div class="stat-l">Output Formats</div><div class="stat-v">5</div><div class="stat-s">Parquet+DuckDB+CSV+JSON+GS</div></div>
+  <div class="stat"><div class="stat-l">Registry Items</div><div class="stat-v">280+</div><div class="stat-s">FRED 47+AK 13+TW...</div></div>
+</div>
+
+<div class="tabs" id="tabs">
+  <div class="tab active" data-mod="ecosystem"><span class="tab-id">📊</span> Ecosystem Overview <span class="tab-cnt" id="cnt-ecosystem">31</span></div>
+  <div class="tab" data-mod="mdl001"><span class="tab-id">MDL001</span> TW Equity <span class="tab-cnt" id="cnt-mdl001">15</span></div>
+  <div class="tab" data-mod="mdl002"><span class="tab-id">MDL002</span> YF Universe <span class="tab-cnt" id="cnt-mdl002">28</span></div>
+  <div class="tab" data-mod="mdl003-fred"><span class="tab-id">003-A</span> FRED <span class="tab-cnt" id="cnt-mdl003-fred">29</span></div>
+  <div class="tab" data-mod="mdl003-ak"><span class="tab-id">003-B</span> AKShare <span class="tab-cnt" id="cnt-mdl003-ak">13</span></div>
+  <div class="tab" data-mod="mdl003-sent"><span class="tab-id">003-C</span> Sentiment <span class="tab-cnt" id="cnt-mdl003-sent">3</span></div>
+  <div class="tab" data-mod="mdl005"><span class="tab-id">MDL005</span> Filter <span class="tab-cnt" id="cnt-mdl005">5</span></div>
+  <div class="tab" data-mod="mdl006"><span class="tab-id">MDL006</span> Financial <span class="tab-cnt" id="cnt-mdl006">5</span></div>
+</div>
+
+<div id="panels"></div>
+
+<div class="run-pop" id="runPop">
+  <div class="run-card">
+    <h3 id="runTitle">執行模組</h3>
+    <p style="font-size:11px;color:var(--i2);margin-bottom:14px">勾選輸出格式 (Parquet 必選),複製指令到 PowerShell 執行</p>
+    <div style="font-family:var(--mo);font-size:10px;color:var(--i2);margin-bottom:6px">輸出格式</div>
+    <div class="fmt-row" id="fmtRow">
+      <div class="fmt-chip on req" data-fmt="parquet">📦 Parquet</div>
+      <div class="fmt-chip on" data-fmt="duckdb">🦆 DuckDB</div>
+      <div class="fmt-chip on" data-fmt="csv">📄 CSV (utf-8-sig)</div>
+      <div class="fmt-chip on" data-fmt="json">📋 JSON</div>
+      <div class="fmt-chip" data-fmt="gsheet">📊 GSheet</div>
+    </div>
+    <div style="font-family:var(--mo);font-size:10px;color:var(--i2);margin-bottom:6px">PowerShell 指令</div>
+    <div class="cmd-box" id="cmdBox">python VDF_MDLxxx.py --no-pause</div>
+    <div class="run-actions">
+      <button class="btn" onclick="closeRunPop()">取消</button>
+      <button class="btn btn-p" onclick="copyCmd()">📋 複製</button>
+      <button class="btn btn-g" onclick="downloadConfig()">💾 下載 JSON 配置</button>
+    </div>
+  </div>
+</div>
+
+<div class="log" id="log">
+  <div><span class="ts">[init]</span><span class="ok">✓</span> VIA DataModule Controller v2.0 載入</div>
+  <div><span class="ts">[init]</span><span class="info">i</span> 全生態 31 個模組註冊完成 · 8 個 tab · localStorage 持久化</div>
+</div>
+
+<div class="ft">VIA Data Module Controller v2.0 · 全 31 個資料擷取模組 · 多格式輸出 (Parquet/DuckDB/CSV/JSON/GSheet)<br>Tab 切換 · 增刪查 · 一鍵產 PowerShell 指令 + 下載 JSON 配置</div>
+
+</div>
+
+<script>
+// ============================================================================
+// FULL ECOSYSTEM REGISTRY (31 modules)
+// ============================================================================
+const ECOSYSTEM = [
+  // VDF Active (本期 session 新建 6 個)
+  {id:"VDF-MDL001",     cat:"VDF Active", name:"TW Equity Engine",          role:"台股 TWSE/TPEX 全市場引擎",                    fmts:["parquet","csv"],                            lines:2263, status:"Production"},
+  {id:"VDF-MDL001-VRF", cat:"VDF Active", name:"TW Universe Verifier",      role:"SSOT regex 驗證 OpenAPI universe",            fmts:["parquet","csv","json"],                     lines:585,  status:"Production"},
+  {id:"VDF-MDL002",     cat:"VDF Active", name:"YFinance Universe",         role:"全宇宙 175 檔 · 19 群組",                      fmts:["parquet","csv"],                            lines:1802, status:"Production"},
+  {id:"VDF-MDL003",     cat:"VDF Active", name:"Sentiment + Macro",         role:"AAII+CNN+FRED 47+AKShare 13",                 fmts:["parquet","duckdb","csv","json","gsheet"],   lines:1466, status:"Production"},
+  {id:"VDF-MDL005",     cat:"VDF Active", name:"TW Stock Filter",           role:"Consensus + Upside + PER + DPS Yield",        fmts:["parquet","duckdb","csv","json","gsheet"],   lines:1003, status:"Production"},
+  {id:"VDF-MDL006",     cat:"VDF Active", name:"Financial Model",           role:"5y daily + 三大報表 + PE/PB Band Charts",      fmts:["parquet","duckdb","csv","json","html"],     lines:1385, status:"Production"},
+  // VDF Legacy (11 個)
+  {id:"VDF-D2-FRED",    cat:"VDF Legacy", name:"FRED Engine v2",            role:"FRED 300+ series registry",                   fmts:["csv","parquet"],                            lines:null, status:"Stable"},
+  {id:"VDF-D2-YF",      cat:"VDF Legacy", name:"YFinance Engine v2",        role:"YF 通用抓取 (price/financials)",               fmts:["csv","parquet"],                            lines:null, status:"Stable"},
+  {id:"VDF-D2-DATA",    cat:"VDF Legacy", name:"TW Data Engines v1",        role:"TWSE/TPEX/MOPS 直連",                          fmts:["csv","parquet"],                            lines:null, status:"Stable"},
+  {id:"VDF-D2-GLOBAL",  cat:"VDF Legacy", name:"Global Universe v2",        role:"全球指數+商品+BDI",                            fmts:["csv","parquet"],                            lines:null, status:"Stable"},
+  {id:"VDF-D2-INTG",    cat:"VDF Legacy", name:"Integrated Engine v21",     role:"TW 籌碼/三大法人/股票列表",                     fmts:["csv","parquet"],                            lines:null, status:"Stable"},
+  {id:"VDF-E0",         cat:"VDF Legacy", name:"E0 Code Registry",          role:"代號↔全名解析中樞 (9 類)",                     fmts:["json"],                                     lines:null, status:"Stable"},
+  {id:"VDF-E1",         cat:"VDF Legacy", name:"E1 Daily Fetcher",          role:"每日資訊一體 (價+籌碼)",                       fmts:["csv","json"],                               lines:null, status:"Stable"},
+  {id:"VDF-E2",         cat:"VDF Legacy", name:"E2 Quarterly Verifier",     role:"5 條對賬規則 (CUM3Q-CUM2Q=Q3)",                fmts:["csv","json"],                               lines:null, status:"Stable"},
+  {id:"VDF-E3",         cat:"VDF Legacy", name:"E3 AKShare Fetcher",        role:"AKShare 獨立 (CN 期貨/PMI/M2/BDI)",            fmts:["csv","json"],                               lines:null, status:"Stable"},
+  {id:"VDF-E4",         cat:"VDF Legacy", name:"E4 Macro Fetcher",          role:"FRED + 其他宏觀",                              fmts:["csv","json"],                               lines:null, status:"Stable"},
+  {id:"VDF-MASTER",     cat:"VDF Legacy", name:"MASTER Orchestrator",       role:"10-stage 循環",                                fmts:["html"],                                     lines:null, status:"Stable"},
+  // VRN Active (6 個)
+  {id:"VRN-MDL004",     cat:"VRN Active", name:"TW Stock Crawler",          role:"Cnyes Playwright + YF fallback",              fmts:["csv","json","parquet"],                     lines:1125, status:"Stable"},
+  {id:"VRN-MDL010",     cat:"VRN Active", name:"Code Registry",             role:"VRN 統一代號中樞 (73 項)",                     fmts:["csv","json"],                               lines:471,  status:"Stable"},
+  {id:"VRN-MDL011",     cat:"VRN Active", name:"Daily Fetcher",             role:"Aegis + Celeritas + YF fallback",             fmts:["csv","json"],                               lines:null, status:"Stable"},
+  {id:"VRN-MDL012",     cat:"VRN Active", name:"Quarterly Verifier",        role:"單季/累計/年度對賬",                           fmts:["csv","json"],                               lines:null, status:"Stable"},
+  {id:"VRN-MDL013",     cat:"VRN Active", name:"AKShare Fetcher",           role:"AKShare CN 期貨/宏觀",                         fmts:["csv","json"],                               lines:313,  status:"Stable"},
+  {id:"VRN-MDL014",     cat:"VRN Active", name:"Macro Fetcher",             role:"FRED + 其他宏觀",                              fmts:["csv","json"],                               lines:358,  status:"Stable"},
+  // Supportive (4 個)
+  {id:"SUP-SSOT",       cat:"Supportive", name:"VIA SSOT Unified",          role:"代號/欄位 normalize · 鎖定 TW_TICKER_REGEX",   fmts:["py"],                                       lines:null, status:"Locked SSOT"},
+  {id:"SUP-AEGIS",      cat:"Supportive", name:"Veritas Aegis Nexus",       role:"UA輪替 · rate-limit · robots",                 fmts:["py"],                                       lines:1811, status:"Stable"},
+  {id:"SUP-CELERITAS",  cat:"Supportive", name:"Veritas Celeritas",         role:"並行 + JIT (import 538ms, 1125×)",             fmts:["py"],                                       lines:null, status:"Stable"},
+  {id:"SUP-SUPER",      cat:"Supportive", name:"super_engine",              role:"環境 probe (available/installed)",             fmts:["py"],                                       lines:null, status:"Stable"},
+  // Control UI (4 個)
+  {id:"CTL-BRIDGE",     cat:"Control UI", name:"VRN Support Bridge",        role:"BRIDGE 單例 / aegis_* / celeritas_*",          fmts:["py"],                                       lines:null, status:"Stable"},
+  {id:"CTL-SERVER",     cat:"Control UI", name:"VRN Control Server",        role:"port 7788 · 14 engines schema",                fmts:["api"],                                      lines:null, status:"Stable"},
+  {id:"CTL-CENTER",     cat:"Control UI", name:"VRN Control Center",        role:"3-col UI · BASE+Bridge+timeline",              fmts:["html"],                                     lines:null, status:"Stable"},
+  {id:"CTL-DATAMOD",    cat:"Control UI", name:"VIA DataModule Controller", role:"本 UI · 全 31 模組總覽 + 增刪查",              fmts:["html"],                                     lines:728,  status:"Production"},
+];
+
+const REGISTRIES = {
+  mdl001: {
+    title:"VDF MDL001 — TW Equity Engine", desc:"台股全市場引擎",
+    meta:"Module ID: VDF-MDL001-TWE-001 · 2263 lines · 升級中支援 DuckDB/JSON/GSheet",
+    cmd:"python VDF_MDL001_TWEquityEngine.py",
+    cols:[{k:'code',label:'代號',w:80,type:'mono'},{k:'name',label:'名稱',w:160},{k:'market',label:'市場',w:60,tag:true},{k:'sector',label:'產業',w:100}],
+    items:[
+      {code:"2330",name:"台積電",   market:"TWSE",sector:"半導體"},
+      {code:"2317",name:"鴻海",     market:"TWSE",sector:"電子代工"},
+      {code:"2454",name:"聯發科",   market:"TWSE",sector:"IC設計"},
+      {code:"2308",name:"台達電",   market:"TWSE",sector:"電源"},
+      {code:"2382",name:"廣達",     market:"TWSE",sector:"電子代工"},
+      {code:"2891",name:"中信金",   market:"TWSE",sector:"金融"},
+      {code:"2412",name:"中華電",   market:"TWSE",sector:"電信"},
+      {code:"1301",name:"台塑",     market:"TWSE",sector:"石化"},
+      {code:"2603",name:"長榮",     market:"TWSE",sector:"航運"},
+      {code:"3008",name:"大立光",   market:"TWSE",sector:"光學"},
+      {code:"6415",name:"矽力-KY",  market:"TPEX",sector:"IC設計"},
+      {code:"3324",name:"雙鴻",     market:"TPEX",sector:"散熱"},
+      {code:"5483",name:"中美晶",   market:"TPEX",sector:"半導體"},
+      {code:"6488",name:"環球晶",   market:"TPEX",sector:"半導體"},
+      {code:"8069",name:"元太",     market:"TPEX",sector:"顯示器"},
+    ],
+    filters:[{k:'market',label:'市場',values:['TWSE','TPEX']}],
+    addFields:[{k:'code',ph:'2330'},{k:'name',ph:'台積電'},{k:'market',ph:'TWSE'},{k:'sector',ph:'半導體'}],
+  },
+  mdl002: {
+    title:"VDF MDL002 — YFinance Universe", desc:"175 檔 / 19 群組 / 8 asset class",
+    meta:"Module ID: VDF-MDL002-YFE-001 · 1802 lines · ETF 93+ 非ETF 82",
+    cmd:"python VDF_MDL002_YFinanceFetchingEngine.py",
+    cols:[{k:'ticker',label:'YF Ticker',w:100,type:'mono'},{k:'name',label:'名稱',w:180},{k:'group',label:'Group',w:160,tag:true},{k:'asset_class',label:'類別',w:80}],
+    items:[
+      {ticker:"^GSPC",name:"S&P 500",      group:"INDICES_US",   asset_class:"INDEX"},
+      {ticker:"^NDX",name:"Nasdaq 100",    group:"INDICES_US",   asset_class:"INDEX"},
+      {ticker:"^VIX",name:"VIX",           group:"INDICES_US",   asset_class:"INDEX"},
+      {ticker:"AAPL",name:"Apple",         group:"EQUITY_US",    asset_class:"EQUITY"},
+      {ticker:"NVDA",name:"NVIDIA",        group:"EQUITY_US",    asset_class:"EQUITY"},
+      {ticker:"TSM",name:"TSMC ADR",       group:"EQUITY_US",    asset_class:"EQUITY"},
+      {ticker:"SPY",name:"S&P 500 ETF",    group:"ETF_REGION_GLOBAL",asset_class:"ETF_A"},
+      {ticker:"QQQ",name:"Nasdaq 100 ETF", group:"ETF_REGION_GLOBAL",asset_class:"ETF_A"},
+      {ticker:"EWT",name:"iShares Taiwan", group:"ETF_REGION_GLOBAL",asset_class:"ETF_A"},
+      {ticker:"XLK",name:"科技 ETF",       group:"ETF_SECTOR_US",asset_class:"ETF_B"},
+      {ticker:"SMH",name:"半導體 VanEck",  group:"ETF_SECTOR_US",asset_class:"ETF_B"},
+      {ticker:"TLT",name:"20Y+ Treasury",  group:"ETF_BONDS",    asset_class:"ETF_C"},
+      {ticker:"HYG",name:"高收益債",        group:"ETF_BONDS",    asset_class:"ETF_C"},
+      {ticker:"0050.TW",name:"元大台灣50",   group:"ETF_TW_PASSIVE",asset_class:"ETF_F"},
+      {ticker:"0056.TW",name:"元大高股息",   group:"ETF_TW_PASSIVE",asset_class:"ETF_F"},
+      {ticker:"00878.TW",name:"國泰永續高股息",group:"ETF_TW_PASSIVE",asset_class:"ETF_F"},
+      {ticker:"00980A.TW",name:"主動野村臺灣優選",group:"ETF_TW_ACTIVE",asset_class:"ETF_G"},
+      {ticker:"00981A.TW",name:"主動統一台股增長",group:"ETF_TW_ACTIVE",asset_class:"ETF_G"},
+      {ticker:"00982A.TW",name:"主動群益台灣強棒",group:"ETF_TW_ACTIVE",asset_class:"ETF_G"},
+      {ticker:"00985A.TW",name:"主動野村台灣50",  group:"ETF_TW_ACTIVE",asset_class:"ETF_G"},
+      {ticker:"00991A.TW",name:"主動復華未來50",  group:"ETF_TW_ACTIVE",asset_class:"ETF_G"},
+      {ticker:"TWD=X",name:"USD/TWD",     group:"CURRENCIES",   asset_class:"FX"},
+      {ticker:"DX-Y.NYB",name:"DXY",      group:"CURRENCIES",   asset_class:"FX"},
+      {ticker:"GC=F",name:"黃金",          group:"COMMODITIES",  asset_class:"FUTURES"},
+      {ticker:"CL=F",name:"WTI 原油",      group:"COMMODITIES",  asset_class:"FUTURES"},
+      {ticker:"^TNX",name:"US 10Y Yield", group:"BONDS_YIELDS", asset_class:"YIELD"},
+      {ticker:"BTC-USD",name:"Bitcoin",   group:"CRYPTO",       asset_class:"CRYPTO"},
+      {ticker:"ETH-USD",name:"Ethereum",  group:"CRYPTO",       asset_class:"CRYPTO"},
+    ],
+    filters:[{k:'group',label:'Group',values:['INDICES_US','EQUITY_US','ETF_REGION_GLOBAL','ETF_SECTOR_US','ETF_BONDS','ETF_TW_PASSIVE','ETF_TW_ACTIVE','CURRENCIES','COMMODITIES','BONDS_YIELDS','CRYPTO']}],
+    addFields:[{k:'ticker',ph:'^GSPC'},{k:'name',ph:'S&P 500'},{k:'group',ph:'INDICES_US'},{k:'asset_class',ph:'INDEX'}],
+  },
+  'mdl003-fred': {
+    title:"VDF MDL003 — FRED Macro (47 series)", desc:"11 themes",
+    meta:"Module ID: VDF-MDL003-SME-001-A · FRED API key: 2d5ae8df...9c17",
+    cmd:"python VDF_MDL003_SentimentMacroEngine.py --fred",
+    cols:[{k:'via_code',label:'VIA Code',w:230,type:'mono'},{k:'fred_id',label:'FRED ID',w:130,type:'mono'},{k:'indicator',label:'指標',w:220},{k:'theme',label:'Theme',w:90,tag:true},{k:'freq',label:'頻',w:50}],
+    items:[
+      {via_code:"US.Rates.Fed.Effective",   fred_id:"DFF",     indicator:"Effective Fed Funds",   theme:"Rates",freq:"D"},
+      {via_code:"US.Rates.Treasury.10Y",    fred_id:"DGS10",   indicator:"10Y Treasury",          theme:"Rates",freq:"D"},
+      {via_code:"US.Rates.Spread.2s10s",    fred_id:"T10Y2Y",  indicator:"10Y-2Y Spread",         theme:"Rates",freq:"D"},
+      {via_code:"US.Rates.Spread.10Y3M",    fred_id:"T10Y3M",  indicator:"10Y-3M (recession)",    theme:"Rates",freq:"D"},
+      {via_code:"US.Prices.CPI.Headline",   fred_id:"CPIAUCSL",indicator:"Headline CPI",          theme:"Inflation",freq:"M"},
+      {via_code:"US.Prices.CPI.Core",       fred_id:"CPILFESL",indicator:"Core CPI",              theme:"Inflation",freq:"M"},
+      {via_code:"US.Prices.PCE.Core",       fred_id:"PCEPILFE",indicator:"Core PCE (Fed target)", theme:"Inflation",freq:"M"},
+      {via_code:"US.Employ.Payrolls",       fred_id:"PAYEMS",  indicator:"Nonfarm Payrolls",      theme:"Employment",freq:"M"},
+      {via_code:"US.Employ.UnemploymentRate",fred_id:"UNRATE", indicator:"Unemployment",          theme:"Employment",freq:"M"},
+      {via_code:"US.Employ.InitialClaims",  fred_id:"ICSA",    indicator:"Initial Jobless Claims",theme:"Employment",freq:"W"},
+      {via_code:"US.Growth.RealGDP",        fred_id:"GDPC1",   indicator:"Real GDP",              theme:"Growth",freq:"Q"},
+      {via_code:"US.Growth.IndProd",        fred_id:"INDPRO",  indicator:"Industrial Production", theme:"Growth",freq:"M"},
+      {via_code:"US.Credit.HY.OAS",         fred_id:"BAMLH0A0HYM2",indicator:"HY OAS Spread",     theme:"Credit",freq:"D"},
+      {via_code:"US.Credit.IG.OAS",         fred_id:"BAMLC0A0CM",indicator:"IG OAS Spread",       theme:"Credit",freq:"D"},
+      {via_code:"US.Fed.BalanceSheet",      fred_id:"WALCL",   indicator:"Fed Total Assets (QE)", theme:"Fed",freq:"W"},
+      {via_code:"US.FinCond.ChicagoFCI",    fred_id:"NFCI",    indicator:"Chicago Fed NFCI",      theme:"FinCond",freq:"W"},
+      {via_code:"US.Trade.DXY",             fred_id:"DTWEXBGS",indicator:"USD Broad Index",       theme:"FX",freq:"D"},
+      {via_code:"US.Housing.MortgageRate30Y",fred_id:"MORTGAGE30US",indicator:"30Y Mortgage Rate",theme:"Housing",freq:"W"},
+      {via_code:"US.Housing.CaseShiller",   fred_id:"CSUSHPISA",indicator:"Case-Shiller",         theme:"Housing",freq:"M"},
+      {via_code:"US.Commodity.WTI",         fred_id:"DCOILWTICO",indicator:"WTI Crude Oil",       theme:"Commodity",freq:"D"},
+      {via_code:"US.Commodity.Gold",        fred_id:"GOLDAMGBD228NLBM",indicator:"Gold London AM",theme:"Commodity",freq:"D"},
+      {via_code:"CN.PMI.Manufacturing",     fred_id:"CHNMFGPMI",indicator:"China Mfg PMI",        theme:"Global",freq:"M"},
+    ],
+    filters:[{k:'theme',label:'Theme',values:['Rates','Inflation','Employment','Growth','Credit','Fed','FinCond','Housing','Commodity','FX','Global']}],
+    addFields:[{k:'via_code',ph:'US.Custom.Foo'},{k:'fred_id',ph:'FRED_ID'},{k:'indicator',ph:'指標名'},{k:'theme',ph:'Rates'},{k:'freq',ph:'D'}],
+  },
+  'mdl003-ak': {
+    title:"VDF MDL003 — AKShare CN (13 codes)", desc:"期貨 9 · 航運 1 · 宏觀 3",
+    meta:"Module ID: VDF-MDL003-SME-001-B · AKShare lib",
+    cmd:"python VDF_MDL003_SentimentMacroEngine.py --akshare",
+    cols:[{k:'code',label:'Code',w:200,type:'mono'},{k:'name',label:'名稱',w:180},{k:'theme',label:'Theme',w:90,tag:true},{k:'sub_theme',label:'Sub',w:110},{k:'func',label:'AK Func',w:160,type:'mono'}],
+    items:[
+      {code:"cn_copper_continuous",name:"滬銅連續 CU0",theme:"Futures",sub_theme:"Base Metal",func:"futures_main_sina"},
+      {code:"cn_aluminum",         name:"滬鋁連續 AL0",theme:"Futures",sub_theme:"Base Metal",func:"futures_main_sina"},
+      {code:"cn_zinc",             name:"滬鋅連續 ZN0",theme:"Futures",sub_theme:"Base Metal",func:"futures_main_sina"},
+      {code:"cn_rebar_continuous", name:"螺紋鋼連續 RB0",theme:"Futures",sub_theme:"Steel",func:"futures_main_sina"},
+      {code:"cn_iron_ore",         name:"鐵礦石連續 I0",theme:"Futures",sub_theme:"Iron Ore",func:"futures_main_sina"},
+      {code:"cn_coking_coal",      name:"焦煤連續 JM0",theme:"Futures",sub_theme:"Coal",func:"futures_main_sina"},
+      {code:"cn_gold",             name:"滬金連續 AU0",theme:"Futures",sub_theme:"Precious",func:"futures_main_sina"},
+      {code:"cn_silver",           name:"滬銀連續 AG0",theme:"Futures",sub_theme:"Precious",func:"futures_main_sina"},
+      {code:"cn_crude_oil",        name:"上期所原油 SC0",theme:"Futures",sub_theme:"Energy",func:"futures_main_sina"},
+      {code:"cn_bdi",              name:"BDI 散裝航運",theme:"Shipping",sub_theme:"Dry Bulk",func:"shipping_bdi"},
+      {code:"cn_pmi_mfg",          name:"中國製造業 PMI",theme:"Macro",sub_theme:"PMI",func:"macro_china_pmi"},
+      {code:"cn_pmi_svc",          name:"中國非製 PMI",theme:"Macro",sub_theme:"PMI",func:"macro_china_non_man_pmi"},
+      {code:"cn_m2",               name:"中國 M2",theme:"Macro",sub_theme:"Money",func:"macro_china_m2_yearly"},
+    ],
+    filters:[{k:'theme',label:'Theme',values:['Futures','Shipping','Macro']}],
+    addFields:[{k:'code',ph:'cn_custom'},{k:'name',ph:'自訂'},{k:'theme',ph:'Futures'},{k:'sub_theme',ph:'?'},{k:'func',ph:'futures_main_sina'}],
+  },
+  'mdl003-sent': {
+    title:"VDF MDL003 — Sentiment (AAII + CNN)", desc:"固定端點, 無 registry items",
+    meta:"Module ID: VDF-MDL003-SME-001-C",
+    cmd:"python VDF_MDL003_SentimentMacroEngine.py --aaii --cnn",
+    cols:[{k:'source',label:'Source',w:120,type:'mono'},{k:'name',label:'名稱',w:200},{k:'freq',label:'頻',w:80,tag:true},{k:'endpoint',label:'Endpoint',w:280,type:'mono'},{k:'fields',label:'欄位',w:300}],
+    items:[
+      {source:"AAII",   name:"Sentiment Survey",freq:"Weekly",endpoint:"aaii.com/files/surveys/sentiment.xls",fields:"date · bullish · neutral · bearish · spread · ma8"},
+      {source:"CNN F&G",name:"Fear & Greed Main",freq:"Daily", endpoint:"production.dataviz.cnn.io/...",fields:"date · fear_greed_index (0-100) · rating"},
+      {source:"CNN F&G",name:"7 sub-indicators",freq:"Daily",  endpoint:"production.dataviz.cnn.io/...",fields:"momentum · strength · breadth · put_call · junk · vol · safe_haven"},
+    ],
+    filters:[],
+    addFields:[],
+    readonly:true,
+  },
+  mdl005: {
+    title:"VDF MDL005 — TW Stock Filter + Consensus", desc:"YF + FactSet (stub) Consensus + Upside + PER + DPS Yield",
+    meta:"Module ID: VDF-MDL005-FLT-001 · 1003 lines · 讀 MDL001 universe + EXTRA",
+    cmd:"python VDF_MDL005_TWStockFilter.py",
+    cols:[{k:'ticker',label:'Ticker',w:80,type:'mono'},{k:'name',label:'名稱',w:160},{k:'market',label:'市場',w:80,tag:true},{k:'role',label:'用途',w:200}],
+    items:[
+      {ticker:"2330",name:"台積電",  market:"TWSE",role:"TW 旗艦 · UNIVERSE PASS"},
+      {ticker:"3324",name:"雙鴻",   market:"TPEX",role:"散熱題材"},
+      {ticker:"NVDA",name:"NVIDIA", market:"US",  role:"EXTRA · AI 主軸"},
+      {ticker:"TSM", name:"TSMC ADR",market:"US", role:"EXTRA · TSMC ADR"},
+      {ticker:"AAPL",name:"Apple",  market:"US",  role:"EXTRA · 消費電子"},
+    ],
+    filters:[{k:'market',label:'市場',values:['TWSE','TPEX','US']}],
+    addFields:[{k:'ticker',ph:'2330 or NVDA'},{k:'name',ph:'名稱'},{k:'market',ph:'TWSE/TPEX/US'},{k:'role',ph:'用途'}],
+  },
+  mdl006: {
+    title:"VDF MDL006 — Financial Model + PE/PB Band", desc:"5y daily + 三大報表 × annual+quarterly · Forward PE Band · PB Band",
+    meta:"Module ID: VDF-MDL006-FM-001 · 1385 lines · 主資料源 YFinance",
+    cmd:"python VDF_MDL006_FinancialModel.py",
+    cols:[{k:'ticker',label:'Ticker',w:80,type:'mono'},{k:'name',label:'名稱',w:160},{k:'market',label:'市場',w:80,tag:true},{k:'has_charts',label:'PE/PB Chart',w:120}],
+    items:[
+      {ticker:"2330",name:"台積電",  market:"TWSE",has_charts:"✓ HTML"},
+      {ticker:"3324",name:"雙鴻",   market:"TPEX",has_charts:"✓ HTML"},
+      {ticker:"NVDA",name:"NVIDIA", market:"US",  has_charts:"✓ HTML"},
+      {ticker:"TSM", name:"TSMC ADR",market:"US", has_charts:"✓ HTML"},
+      {ticker:"AAPL",name:"Apple",  market:"US",  has_charts:"✓ HTML"},
+    ],
+    filters:[{k:'market',label:'市場',values:['TWSE','TPEX','US']}],
+    addFields:[{k:'ticker',ph:'2330 or NVDA'},{k:'name',ph:'名稱'},{k:'market',ph:'TWSE/TPEX/US'},{k:'has_charts',ph:'✓ HTML'}],
+  },
+};
+
+// ============================================================================
+let activeMod = 'ecosystem';
+let runMod = null;
+let selectedFmts = new Set(['parquet','duckdb','csv','json']);
+const LS_KEY = 'via_dmc_v2';
+
+function loadState(){
+  try{
+    const s = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+    Object.keys(s).forEach(m => {
+      if (REGISTRIES[m] && s[m].items) REGISTRIES[m].items = s[m].items;
+    });
+    log('info','localStorage 已載入');
+  }catch(e){ log('warn','localStorage 載入失敗'); }
+}
+function saveState(){
+  try{
+    const out = {};
+    Object.keys(REGISTRIES).forEach(m => { out[m] = { items: REGISTRIES[m].items }; });
+    localStorage.setItem(LS_KEY, JSON.stringify(out));
+    const le = document.getElementById('lastEdit'); if (le) le.textContent = 'saved ' + new Date().toLocaleTimeString();
+  }catch(e){ log('err','localStorage 寫入失敗'); }
+}
+
+function renderTabs(){
+  document.querySelectorAll('.tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.mod === activeMod);
+  });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  const ap = document.getElementById('panel-' + activeMod);
+  if (ap) ap.classList.add('active');
+}
+
+function renderEcosystemPanel(){
+  const root = document.getElementById('panels');
+  const panel = document.createElement('div');
+  panel.className = 'panel active';
+  panel.id = 'panel-ecosystem';
+  // 統計
+  const byCat = {};
+  ECOSYSTEM.forEach(m => { (byCat[m.cat] = byCat[m.cat] || []).push(m); });
+  const totLines = ECOSYSTEM.reduce((s,m)=>s+(m.lines||0),0);
+  const cards = ECOSYSTEM.map(m => {
+    const catCls = {'VDF Active':'cat-act','VDF Legacy':'cat-leg','VRN Active':'cat-vrn','Supportive':'cat-sup','Control UI':'cat-ctl'}[m.cat];
+    const pills = m.fmts.map(f => `<span class="fmt-pill ${['parquet','duckdb','csv','json','html','gsheet'].includes(f)?'ok':''}">${f}</span>`).join('');
+    return `<div class="eco-card ${catCls}">
+      <span class="mid">${m.id}</span>
+      <h3>${m.name}</h3>
+      <div class="role">${m.role}</div>
+      <div style="font-size:9px;color:var(--i3);font-family:var(--mo)">
+        ${m.lines? m.lines.toLocaleString()+' lines · ':''}<span class="tag t-${m.status.toLowerCase().replace(' ','')}">${m.status}</span>
+      </div>
+      <div class="fmts">${pills}</div>
+    </div>`;
+  }).join('');
+
+  panel.innerHTML = `
+    <div class="panel-h">
+      <div class="panel-info">
+        <h2>🌐 全生態總覽 · Full Ecosystem (${ECOSYSTEM.length} modules)</h2>
+        <p>VDF Active 6 · VDF Legacy 11 · VRN Active 6 · Supportive 4 · Control UI 4 · 總計 ${totLines.toLocaleString()}+ lines</p>
+        <div class="meta">Master Registry: 0-0-MasterRegistry/module_registry.parquet/csv/json + .duckdb</div>
+      </div>
+      <div class="panel-actions">
+        <button class="btn" onclick="exportAllJSON()">📥 匯出全 Registry JSON</button>
+      </div>
+    </div>
+    <div class="eco-grid">${cards}</div>
+  `;
+  root.appendChild(panel);
+}
+
+function renderRegPanel(mod){
+  const r = REGISTRIES[mod];
+  if (!r) return;
+  const root = document.getElementById('panels');
+  const panel = document.createElement('div');
+  panel.className = 'panel';
+  panel.id = 'panel-' + mod;
+
+  const filterHTML = r.filters.map(f => `
+    <div style="display:flex;align-items:center;gap:4px">
+      <span style="font-family:var(--mo);font-size:9px;color:var(--i3)">${f.label}:</span>
+      <div class="chips" data-fkey="${f.k}">
+        <div class="chip on" data-fval="">all</div>
+        ${f.values.map(v => `<div class="chip" data-fval="${v}">${v}</div>`).join('')}
+      </div>
+    </div>`).join('');
+
+  panel.innerHTML = `
+    <div class="panel-h">
+      <div class="panel-info">
+        <h2>${r.title}</h2>
+        <p>${r.desc}</p>
+        <div class="meta">${r.meta}</div>
+      </div>
+      <div class="panel-actions">
+        <button class="btn" onclick="exportJSON('${mod}')">📥 匯出 JSON</button>
+        <button class="btn" onclick="resetMod('${mod}')">↻ 重置</button>
+        <button class="btn btn-p" onclick="openRunPop('${mod}')">▶ 執行</button>
+      </div>
+    </div>
+    <div class="fb">
+      <input type="text" placeholder="🔍 搜尋..." data-search="${mod}">
+      ${filterHTML}
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr id="thead-${mod}"></tr></thead>
+        <tbody id="tbody-${mod}"></tbody>
+      </table>
+      ${r.readonly ? '' : `
+      <div class="add-row" id="addrow-${mod}">
+        ${r.addFields.map(f => `<input type="text" placeholder="${f.ph}" data-newkey="${f.k}">`).join('')}
+        <button class="btn btn-g" onclick="addItem('${mod}')">+ 新增</button>
+      </div>`}
+    </div>`;
+  root.appendChild(panel);
+
+  const searchEl = panel.querySelector(`[data-search="${mod}"]`);
+  if (searchEl) searchEl.addEventListener('input', () => renderTable(mod));
+  panel.querySelectorAll('.chips').forEach(cs => {
+    cs.addEventListener('click', e => {
+      if (e.target.classList.contains('chip')){
+        cs.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+        e.target.classList.add('on');
+        renderTable(mod);
+      }
+    });
+  });
+  renderTable(mod);
+}
+
+function renderTable(mod){
+  const r = REGISTRIES[mod];
+  if (!r) return;
+  const thead = document.getElementById('thead-'+mod);
+  const tbody = document.getElementById('tbody-'+mod);
+  if (!thead || !tbody) return;
+  thead.innerHTML = r.cols.map(c => `<th style="width:${c.w||100}px">${c.label}</th>`).join('') + (r.readonly ? '' : '<th style="width:60px">動作</th>');
+  const searchEl = document.querySelector(`[data-search="${mod}"]`);
+  const search = (searchEl ? searchEl.value : '').toLowerCase();
+  const fs = {};
+  document.querySelectorAll(`#panel-${mod} .chips`).forEach(cs => {
+    const on = cs.querySelector('.chip.on');
+    fs[cs.dataset.fkey] = on ? on.dataset.fval : '';
+  });
+  let visible = r.items.filter(it => {
+    if (search){
+      const txt = Object.values(it).join(' ').toLowerCase();
+      if (!txt.includes(search)) return false;
+    }
+    for (const fk in fs){ const fv = fs[fk]; if (fv && String(it[fk] || '') !== fv) return false; }
+    return true;
+  });
+  tbody.innerHTML = visible.map(it => {
+    const tds = r.cols.map(c => {
+      const v = it[c.k] || '';
+      if (c.type === 'mono') return `<td><span class="code">${v}</span></td>`;
+      if (c.tag) { const cls = 't-' + String(v).toLowerCase().replace(/[^a-z0-9]/g,''); return `<td><span class="tag ${cls}">${v}</span></td>`; }
+      return `<td>${v}</td>`;
+    }).join('');
+    const action = r.readonly ? '' : `<td><button class="btn btn-x" onclick="deleteItem('${mod}','${it[r.cols[0].k]}')">✕ 刪</button></td>`;
+    return `<tr>${tds}${action}</tr>`;
+  }).join('');
+  // Null-safe textContent
+  const elCnt = document.getElementById('cnt-'+mod);
+  if (elCnt) elCnt.textContent = r.items.length;
+}
+
+function deleteItem(mod, key){
+  const r = REGISTRIES[mod]; if (!r) return;
+  const fc = r.cols[0].k;
+  r.items = r.items.filter(it => String(it[fc]) !== String(key));
+  renderTable(mod); saveState();
+  log('warn',`[${mod}] 已刪 ${key}`);
+}
+function addItem(mod){
+  const r = REGISTRIES[mod]; if (!r) return;
+  const inputs = document.querySelectorAll(`#addrow-${mod} input`);
+  const nv = {};
+  inputs.forEach(inp => { nv[inp.dataset.newkey] = inp.value.trim(); });
+  if (!nv[r.cols[0].k]){ log('err','第一欄不可空'); return; }
+  if (r.items.some(it => String(it[r.cols[0].k]) === String(nv[r.cols[0].k]))){
+    log('err',`${nv[r.cols[0].k]} 已存在`); return;
+  }
+  r.items.push(nv);
+  inputs.forEach(inp => inp.value = '');
+  renderTable(mod); saveState();
+  log('ok',`[${mod}] 已新增 ${nv[r.cols[0].k]}`);
+}
+function resetMod(mod){
+  if (!confirm(`重置 ${mod}? 自訂項目將消失`)) return;
+  location.reload();
+}
+function exportJSON(mod){
+  const r = REGISTRIES[mod]; if (!r) return;
+  const blob = new Blob([JSON.stringify({module:mod, items:r.items, exported:new Date().toISOString()}, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `via_${mod}_config.json`; a.click();
+  URL.revokeObjectURL(url);
+  log('ok',`[${mod}] JSON 已下載 (${r.items.length} 項)`);
+}
+function exportAllJSON(){
+  const data = { exported: new Date().toISOString(), ecosystem: ECOSYSTEM, registries: REGISTRIES };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'via_master_registry_export.json'; a.click();
+  URL.revokeObjectURL(url);
+  log('ok',`全 Registry 已下載 (${ECOSYSTEM.length} 模組)`);
+}
+
+function openRunPop(mod){
+  runMod = mod;
+  const r = REGISTRIES[mod];
+  document.getElementById('runTitle').textContent = '執行 · ' + r.title.split(' — ')[1];
+  buildCmd();
+  document.getElementById('runPop').classList.add('on');
+}
+function closeRunPop(){ document.getElementById('runPop').classList.remove('on'); }
+function buildCmd(){
+  if (!runMod) return;
+  const r = REGISTRIES[runMod];
+  let cmd = r.cmd;
+  const ff = [];
+  if (!selectedFmts.has('duckdb')) ff.push('--no-duckdb');
+  if (!selectedFmts.has('csv'))    ff.push('--no-csv');
+  if (!selectedFmts.has('json'))   ff.push('--no-json');
+  if (selectedFmts.has('gsheet'))  ff.push('--gsheet');
+  if (ff.length) cmd += ' ' + ff.join(' ');
+  cmd += ' --no-pause';
+  const cb = document.getElementById('cmdBox'); if (cb) cb.textContent = cmd;
+}
+function copyCmd(){
+  const cb = document.getElementById('cmdBox'); if (!cb) return;
+  navigator.clipboard.writeText(cb.textContent).then(() => log('ok','已複製: ' + cb.textContent)).catch(() => log('err','複製失敗'));
+}
+function downloadConfig(){ if (runMod) exportJSON(runMod); }
+
+function log(level, msg){
+  const ts = new Date().toLocaleTimeString();
+  const icon = {ok:'✓',info:'i',warn:'⚠',err:'✕'}[level] || '·';
+  const cls = {ok:'ok',info:'info',warn:'warn',err:'err'}[level] || 'info';
+  const div = document.createElement('div');
+  div.innerHTML = `<span class="ts">[${ts}]</span><span class="${cls}">${icon}</span> ${msg}`;
+  const lg = document.getElementById('log');
+  if (lg){ lg.appendChild(div); lg.scrollTop = lg.scrollHeight; }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadState();
+  renderEcosystemPanel();
+  Object.keys(REGISTRIES).forEach(m => renderRegPanel(m));
+  renderTabs();
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => { activeMod = t.dataset.mod; renderTabs(); });
+  });
+  document.querySelectorAll('.fmt-chip').forEach(c => {
+    c.addEventListener('click', () => {
+      if (c.classList.contains('req')) return;
+      const f = c.dataset.fmt;
+      if (selectedFmts.has(f)) selectedFmts.delete(f); else selectedFmts.add(f);
+      c.classList.toggle('on');
+      buildCmd();
+    });
+  });
+  document.getElementById('runPop').addEventListener('click', e => { if (e.target.id === 'runPop') closeRunPop(); });
+  log('ok','介面就緒 · 8 個 tab · 點 Ecosystem Overview 看全 31 模組');
+});
+</script>
+</body>
+</html>

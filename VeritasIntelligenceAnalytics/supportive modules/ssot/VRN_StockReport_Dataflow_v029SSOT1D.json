@@ -1,0 +1,252 @@
+{
+  "generated_at": "2026-06-15T15:18:35.885868",
+  "version": "v029.SSOT.1D",
+  "status": "VRN_STOCKREPORT_INCREMENTAL_OUTPUT_READY_WITH_REVIEW",
+  "risk": "MEDIUM",
+  "json_role": "dataflow manifest / runtime / control-plane only",
+  "parquet_role": "truth source / payload storage",
+  "duckdb_role": "serving layer, rebuildable from parquet",
+  "active_pointer": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\SSOT\\VRN_ACTIVE_STAGE_POINTER.json",
+  "table_staging_allowed": true,
+  "canonical_allowed": false,
+  "basic_candidate": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VRN_BROKER_BACKFILL_GATE_v029VRN1C41_20260615_131852\\stage_parquet\\VRN_ReportBasicInfo_StageFixed_v029VRN1C41.parquet",
+  "text_candidate": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541\\stage_parquet\\VRN_ReportText_StageFixed_v029VRN1C3.parquet",
+  "financial_candidates": [],
+  "financial_pending_reason": "No existing FinancialData parquet candidate found. StockReportFinancialData schema created and waits for VRN 1D table extraction staging.",
+  "outputs": {
+    "StockReportBasicInfo.parquet": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\StockReportBasicInfo.parquet",
+    "StockReportFinancialData.parquet": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\StockReportFinancialData.parquet",
+    "VRN_StockReport.duckdb": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\VRN_StockReport.duckdb"
+  },
+  "counts": {
+    "basicinfo_new_rows": 400,
+    "basicinfo_total_rows": 400,
+    "financialdata_new_rows": 0,
+    "financialdata_total_rows": 0,
+    "ssot_dedup_tables": 8
+  },
+  "tests": [
+    {
+      "name": "Parquet BasicInfo Readback",
+      "status": "PASS",
+      "value": 400,
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\StockReportBasicInfo.parquet",
+      "message": "BasicInfo parquet readback count."
+    },
+    {
+      "name": "Parquet FinancialData Readback",
+      "status": "PASS",
+      "value": 0,
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\StockReportFinancialData.parquet",
+      "message": "FinancialData parquet readback count."
+    },
+    {
+      "name": "BasicInfo Incremental Dedup",
+      "status": "PASS",
+      "value": 0,
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\StockReportBasicInfo.parquet",
+      "message": "record_hash duplicates in BasicInfo."
+    },
+    {
+      "name": "FinancialData Incremental Dedup",
+      "status": "PASS",
+      "value": 0,
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\StockReportFinancialData.parquet",
+      "message": "record_hash duplicates in FinancialData."
+    },
+    {
+      "name": "DuckDB BasicInfo Count",
+      "status": "PASS",
+      "value": 400,
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\VRN_StockReport.duckdb",
+      "message": "DuckDB serving layer test."
+    },
+    {
+      "name": "DuckDB FinancialData Count",
+      "status": "PASS",
+      "value": 0,
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\VRN_StockReport.duckdb",
+      "message": "DuckDB serving layer test."
+    }
+  ],
+  "ssot_dedup_results": [
+    {
+      "name": "ticker_regex",
+      "status": "DEDUPED",
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\SSOT\\_runs\\VRN_UNIFIED_SSOT_BUILDER_v029SSOT1B_20260615_143918\\parquet\\VRN_TickerRegexSSOT_v029SSOT1B.parquet",
+      "out_path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\_ssot_dedup\\ticker_regex_dedup.parquet",
+      "rows_in": 6,
+      "rows_out": 6
+    },
+    {
+      "name": "date_regex",
+      "status": "DEDUPED",
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\SSOT\\_runs\\VRN_UNIFIED_SSOT_BUILDER_v029SSOT1B_20260615_143918\\parquet\\VRN_DatePeriodRegexSSOT_v029SSOT1B.parquet",
+      "out_path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\_ssot_dedup\\date_regex_dedup.parquet",
+      "rows_in": 6,
+      "rows_out": 6
+    },
+    {
+      "name": "rating_alias",
+      "status": "DEDUPED",
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\SSOT\\_runs\\VRN_UNIFIED_SSOT_BUILDER_v029SSOT1B_20260615_143918\\parquet\\VRN_RatingAliasSSOT_v029SSOT1B.parquet",
+      "out_path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\_ssot_dedup\\rating_alias_dedup.parquet",
+      "rows_in": 16,
+      "rows_out": 16
+    },
+    {
+      "name": "broker_alias",
+      "status": "DEDUPED",
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\SSOT\\_runs\\VRN_UNIFIED_SSOT_BUILDER_v029SSOT1B_20260615_143918\\parquet\\VRN_BrokerAliasSSOT_v029SSOT1B.parquet",
+      "out_path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\_ssot_dedup\\broker_alias_dedup.parquet",
+      "rows_in": 35,
+      "rows_out": 35
+    },
+    {
+      "name": "basic_def",
+      "status": "DEDUPED",
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\SSOT\\_runs\\VRN_UNIFIED_SSOT_BUILDER_v029SSOT1B_20260615_143918\\parquet\\VRN_BasicInfoDefinitionSSOT_v029SSOT1B.parquet",
+      "out_path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\_ssot_dedup\\basic_def_dedup.parquet",
+      "rows_in": 14,
+      "rows_out": 14
+    },
+    {
+      "name": "financial_alias",
+      "status": "DEDUPED",
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\SSOT\\_runs\\VRN_UNIFIED_SSOT_BUILDER_v029SSOT1B_20260615_143918\\parquet\\VRN_FinancialAccountAliasSSOT_v029SSOT1B.parquet",
+      "out_path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\_ssot_dedup\\financial_alias_dedup.parquet",
+      "rows_in": 42,
+      "rows_out": 42
+    },
+    {
+      "name": "validation_rules",
+      "status": "DEDUPED",
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\SSOT\\_runs\\VRN_UNIFIED_SSOT_BUILDER_v029SSOT1B_20260615_143918\\parquet\\VRN_FinancialValidationRulesSSOT_v029SSOT1B.parquet",
+      "out_path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\_ssot_dedup\\validation_rules_dedup.parquet",
+      "rows_in": 15,
+      "rows_out": 15
+    },
+    {
+      "name": "source_inventory",
+      "status": "DEDUPED",
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\SSOT\\_runs\\VRN_UNIFIED_SSOT_BUILDER_v029SSOT1B_20260615_143918\\parquet\\VRN_SSOT_SourceInventory_v029SSOT1B.parquet",
+      "out_path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VRN\\DATABASE\\_ssot_dedup\\source_inventory_dedup.parquet",
+      "rows_in": 589,
+      "rows_out": 589
+    }
+  ],
+  "extra_inventory": [
+    {
+      "path": "C:\\Users\\tonyk\\Downloads\\VIS_VRN_TickerFilenameSSOT_v0100.py",
+      "exists": true,
+      "name": "VIS_VRN_TickerFilenameSSOT_v0100.py",
+      "length": 6981,
+      "last_write_time": "2026-06-15T14:32:38"
+    },
+    {
+      "path": "C:\\Users\\tonyk\\Downloads\\VRN_FINANCIAL_TRUST_POLISH_V044.ps1",
+      "exists": true,
+      "name": "VRN_FINANCIAL_TRUST_POLISH_V044.ps1",
+      "length": 49573,
+      "last_write_time": "2026-06-15T15:07:12"
+    },
+    {
+      "path": "C:\\Users\\tonyk\\Downloads\\VRN_Incremental_StockReport_DB_AIO_v1.0.ps1",
+      "exists": true,
+      "name": "VRN_Incremental_StockReport_DB_AIO_v1.0.ps1",
+      "length": 38942,
+      "last_write_time": "2026-06-15T15:05:32"
+    },
+    {
+      "path": "C:\\Users\\tonyk\\Downloads\\VRN_S05_FieldRegistry_v0102.md",
+      "exists": true,
+      "name": "VRN_S05_FieldRegistry_v0102.md",
+      "length": 44843,
+      "last_write_time": "2026-06-15T15:04:40"
+    },
+    {
+      "path": "C:\\Users\\tonyk\\Downloads\\VRN_S05_FieldRegistry_v0102.json",
+      "exists": true,
+      "name": "VRN_S05_FieldRegistry_v0102.json",
+      "length": 207924,
+      "last_write_time": "2026-06-15T15:04:31"
+    },
+    {
+      "path": "C:\\Users\\tonyk\\Downloads\\VRN_BROKER_LIST_v01.json",
+      "exists": true,
+      "name": "VRN_BROKER_LIST_v01.json",
+      "length": 9438,
+      "last_write_time": "2026-06-15T15:02:09"
+    },
+    {
+      "path": "C:\\Users\\tonyk\\Downloads\\VRN_S05_FieldRegistry_v0101_Matrix.md",
+      "exists": true,
+      "name": "VRN_S05_FieldRegistry_v0101_Matrix.md",
+      "length": 14595,
+      "last_write_time": "2026-06-15T14:33:30"
+    },
+    {
+      "path": "C:\\Users\\tonyk\\Downloads\\VRN_S05_FieldRegistry_v0101.json",
+      "exists": true,
+      "name": "VRN_S05_FieldRegistry_v0101.json",
+      "length": 248154,
+      "last_write_time": "2026-06-15T14:33:29"
+    },
+    {
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules\\Read_Me_VeritasNexusCore.md",
+      "exists": true,
+      "name": "Read_Me_VeritasNexusCore.md",
+      "length": 11108,
+      "last_write_time": "2026-06-08T20:22:08"
+    },
+    {
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules\\Invoke-VeritasNexusCore.ps1",
+      "exists": true,
+      "name": "Invoke-VeritasNexusCore.ps1",
+      "length": 20693,
+      "last_write_time": "2026-06-10T20:15:03"
+    },
+    {
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules\\Invoke-VIA-PolyglotCheckTestRepair-v0101.ps1",
+      "exists": true,
+      "name": "Invoke-VIA-PolyglotCheckTestRepair-v0101.ps1",
+      "length": 49218,
+      "last_write_time": "2026-06-11T11:55:58"
+    },
+    {
+      "path": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\supportive_module\\VIS_VRN_FinancialSSOT_v0608.py",
+      "exists": true,
+      "name": "VIS_VRN_FinancialSSOT_v0608.py",
+      "length": 17050,
+      "last_write_time": "2026-05-26T16:35:47"
+    },
+    {
+      "path": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\supportive_module\\VIS_VRN_BrokerAlias_Extension_v0224.py",
+      "exists": true,
+      "name": "VIS_VRN_BrokerAlias_Extension_v0224.py",
+      "length": 4801,
+      "last_write_time": "2026-05-26T16:35:46"
+    },
+    {
+      "path": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\supportive_module\\VIS_VRN_BrokerAlias_Compatibility_v0222.py",
+      "exists": true,
+      "name": "VIS_VRN_BrokerAlias_Compatibility_v0222.py",
+      "length": 4922,
+      "last_write_time": "2026-05-26T16:35:46"
+    },
+    {
+      "path": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\supportive_module\\VIS_VRN_BasicInfoFinancialQualityRules_v0100.py",
+      "exists": true,
+      "name": "VIS_VRN_BasicInfoFinancialQualityRules_v0100.py",
+      "length": 10101,
+      "last_write_time": "2026-05-31T09:54:39"
+    },
+    {
+      "path": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\supportive_module\\VIS_VRN_FinancialRescueRules_v06126.py",
+      "exists": true,
+      "name": "VIS_VRN_FinancialRescueRules_v06126.py",
+      "length": 9644,
+      "last_write_time": "2026-05-26T16:35:46"
+    }
+  ]
+}

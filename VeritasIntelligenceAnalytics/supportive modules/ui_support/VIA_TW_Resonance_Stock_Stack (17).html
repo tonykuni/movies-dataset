@@ -1,0 +1,3364 @@
+<!doctype html>
+<!--
+================================================================================
+ VIA TEMPLATE · TW Resonance Stock Stack v3 · P7 visual lock
+================================================================================
+ ASSET_ID         : AST-HTML-TPL-VIA-305-003
+ DISPLAY          : SYS_VIA.MDL305.TPL-STK-RESONANCE-STACK
+ VERSION          : 3.0.0          STATUS : stable
+ LAYOUT_ID        : tw-stock-resonance-stack-v1
+ LANGUAGE         : HTML5 / CSS3 / Vanilla JS (ES2020) / Plotly 2.35
+ ANCHORS          : S07-HEAD / S07-STYLE / S07-TOPBAR / S07-SEL / S07-META
+                    S07-CTRL / S07-PANELS / S07-STAGE / S07-FOOT / S07-SCRIPT
+ LOCK ANCESTOR    : AST-HTML-TPL-VIA-P7-TWFOCUS  (P7 visual lock)
+                    AST-HTML-TPL-VIA-700-001    (T08 Watchlist)
+                    AST-HTML-TPL-VIA-800-001    (D01 Home)
+                    VAP_MultiCompare / VAP_NVDA_VDF / VAP_SMH_Flow
+                    VeritasAutoPlot v4.0 Charting Standards (PDF spec)
+ PATTERN PARENT   : T03_Candlestick_MA_BB_Vol · T05_VerticalStack · T06_Dashboard
+ FAMILY           : VIA_T03_T05_StockTA_Resonance
+
+ 14 PANELS (schema-driven):
+   FIXED (top, non-sortable):
+     ① price_main         Candlestick + MA(5/10/20/60/120/240) + BBands
+     ② volume             bars (TW inversion) + volume_MA20
+   SORTABLE / COLLAPSIBLE (drag handle on right):
+     ③ macd               line + signal + histogram
+     ④ rsi_kd             RSI(14) + %K + %D
+     ⑤ obv                line
+     ⑥ atr_natr           ATR + NATR
+     ⑦ inst_flow          foreign/trust/dealer/total net (pos/neg bar)
+     ⑧ inst_holding       foreign/trust/dealer holding %
+     ⑨ margin_credit      dual-axis: margin/short balance + ratios
+     ⑩ futures_position   left price + right net OI / long-short diff
+     ⑪ day_trading        left ratio + right value
+     ⑫ normalized_price   multi-line normalized to base date = 100
+     ⑬ risk_hv_dd         left HV20/HV60 + right drawdown area
+     ⑭ risk_beta_corr     dual-axis: beta_60 + corr_60
+
+ Compliance:
+   ✓ schema.json + runtime_state.json embedded as JS const (single-file deliverable)
+   ✓ shared X axis across all panels (matches:'x') with crosshair sync
+   ✓ TW color inversion (UP=RED / DOWN=GREEN), opacity 0.8 on bars
+   ✓ One asset per chart, ADJ-close for stocks
+   ✓ Forward-fill for holidays
+   ✓ Drag-reorder + collapse on non-fixed panels (panel handle UI)
+   ✓ Time presets (1D/5D/20D/60D/120D/240D/YTD) sync to all panels
+   ✓ Normalized date vertical guide + horizontal=100 guide
+   ✓ Anti-overlap: header / legend / data zones physically separated
+   ✓ Nice-numbers Y-tick computation (1/2/2.5/5 × 10^k)
+   ✓ Y-axis bounds data with headroom padding
+   ✓ Drag-select on price → recompute Max / Min / Max-Drawdown
+   ✓ Modebar hidden; doubleClick → reset
+
+ Runtime: window.VIA_STK_RES exposes schema, runtime, fns, heartbeat
+================================================================================
+-->
+<html lang="zh-Hant" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ─── ANCHOR[VIA:ANCHOR:S07-HEAD] ─────────────────────────────── -->
+<meta name="vaos-asset-id"          content="AST-HTML-TPL-VIA-305-003">
+<meta name="vaos-display"           content="SYS_VIA.MDL305.TPL-STK-RESONANCE-STACK">
+<meta name="vaos-version"           content="3.0.0">
+<meta name="vaos-status"            content="stable">
+<meta name="vaos-layout-id"         content="tw-stock-resonance-stack-v1">
+<meta name="vaos-family"            content="VIA_T03_T05_StockTA_Resonance">
+<meta name="vaos-lock-ancestor"     content="AST-HTML-TPL-VIA-P7-TWFOCUS,AST-HTML-TPL-VIA-700-001,AST-HTML-TPL-VIA-800-001,VAP_MultiCompare,VAP_NVDA_VDF,VAP_SMH_Flow">
+<meta name="vaos-pattern-parent"    content="T03_Candlestick_MA_BB_Vol,T05_VerticalStack,T06_Dashboard">
+<meta name="vaos-data-locked"       content="true">
+<meta name="vaos-chart-rules"       content="tw-inversion;one-asset-per-chart;axes-locked;modebar-hidden;forward-fill-holiday;adj-close-stocks;ta-lib-indicators;proportional-stack;anti-overlap;nice-numbers-ticks;data-bounding-with-padding;drag-select-max-min-dd;ma-composite;schema-runtime-dual-config;drag-reorder-panels;collapsible-panels;shared-x-axis;normalized-date-guides">
+<meta name="vaos-support-tools"     content="VIA_SSOT_Unified,VeritasAegisNexus,VeritasCeleritas,VIA_EnvManager,VIA_Panorama_AST_RuntimeInjector,VIA_RegistryCore_v1,VIA_Runtime_Bridge_All_in_One">
+<meta name="vaos-checksum"          content="stk-resonance-stack-14p-p7l-v3">
+
+<title>VIA · 台股共振堆疊圖 · TW Resonance Stock Stack v3</title>
+
+<!-- Plotly 2.35 (locked) · multi-CDN fallback -->
+<script>
+  // Load Plotly with cascading fallbacks. The page only renders after one succeeds.
+  window.__VIA_PLOTLY_SOURCES__ = [
+    "https://cdn.plot.ly/plotly-2.35.2.min.js",
+    "https://cdn.jsdelivr.net/npm/plotly.js-dist-min@2.35.2/plotly.min.js",
+    "https://unpkg.com/plotly.js-dist-min@2.35.2/plotly.min.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.2/plotly.min.js"
+  ];
+  window.__VIA_PLOTLY_READY__ = new Promise((resolve, reject) => {
+    let i = 0;
+    function tryNext(){
+      if (i >= window.__VIA_PLOTLY_SOURCES__.length){
+        reject(new Error("All Plotly CDNs failed. Check your network connection or whitelist plot.ly / jsdelivr / unpkg / cdnjs."));
+        return;
+      }
+      const url = window.__VIA_PLOTLY_SOURCES__[i++];
+      const s = document.createElement('script');
+      s.src = url; s.async = false; s.charset = 'utf-8';
+      s.onload  = () => { console.log('[VIA] Plotly loaded from', url); resolve(window.Plotly); };
+      s.onerror = () => { console.warn('[VIA] Plotly CDN failed:', url); tryNext(); };
+      document.head.appendChild(s);
+    }
+    tryNext();
+  });
+
+
+
+</script>
+
+<!-- P7-locked typography: Syne (display) / DM Sans (body) / DM Mono (numeric) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- ─── ANCHOR[VIA:ANCHOR:S07-STYLE] · P7 MUJI/Notion paper lock ── -->
+<style>
+:root{
+  /* P7 MUJI/Notion paper palette */
+  --bg:#f5f4f0; --bg1:#edecea; --bg2:#e5e3df; --sf:#fff; --sf2:#fafaf8;
+  --bd:#dbd9d3; --bd2:#ccc9c1;
+
+  /* VIA color tokens (Seaborn-aligned, P7-locked) */
+  --bl:#4c78a8; --bl-l:#d0e1f0;
+  --tl:#439a9a; --tl-l:#c8e6e6;
+  --gn:#5a9e6f; --gn-l:#cde8d5;
+  --am:#c4943a; --am-l:#f5e2b8;
+  --co:#c96b5a; --co-l:#f5d0c8;
+  --vi:#7a6daa; --vi-l:#dcd8f0;
+  --ro:#b05580; --ro-l:#ecd0e0;
+
+  /* MA palette (specific, locked in schema style_tokens) */
+  --ma5:#c4943a;    /* amber */
+  --ma10:#4c78a8;   /* blue */
+  --ma20:#5a9e6f;   /* green */
+  --ma60:#7a6daa;   /* violet */
+  --ma120:#c96b5a;  /* coral */
+  --ma240:#9c9890;  /* graphite */
+
+  --i0:#1e1d1a; --i1:#3d3c38; --i2:#6b6860; --i3:#9c9890; --i4:#c4c0b8;
+
+  --mo:'DM Mono',monospace;
+  --sa:'DM Sans',system-ui,sans-serif;
+  --hf:'Syne',system-ui,sans-serif;
+
+  --r:5px; --r2:8px; --r3:12px;
+  --sh:0 1px 3px rgba(0,0,0,.06);
+  --sh2:0 4px 12px rgba(0,0,0,.08);
+
+  /* TW inversion locked */
+  --up:#c96b5a;   /* RED  for up (TW convention) */
+  --dn:#5a9e6f;   /* GREEN for down */
+  --flat:#9c9890;
+  --up-soft:rgba(201,107,90,.14);
+  --dn-soft:rgba(90,158,111,.14);
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sa);background:var(--bg);color:var(--i0);font-size:11px;line-height:1.55;min-width:1280px}
+.w{max-width:1600px;margin:0 auto;padding:10px 14px}
+
+/* ─── HEADER (P7) ─────────────────────────────────────────── */
+.hdr{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r3);padding:14px 16px;margin-bottom:8px;position:relative;overflow:hidden;display:flex;align-items:center;gap:12px}
+.hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--co),var(--am),var(--vi),var(--bl),var(--tl))}
+.hdr .h-icon{width:38px;height:38px;border-radius:var(--r2);background:linear-gradient(135deg,var(--co),var(--am));display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--hf);font-weight:800;font-size:13px;flex-shrink:0;letter-spacing:-1px}
+.h1t{font-size:18px;font-weight:700;letter-spacing:-.5px;font-family:var(--hf)}
+.h1t span{color:var(--co)}
+.h2t{color:var(--i3);font-size:10px;margin-top:1px;font-family:var(--mo);letter-spacing:.3px}
+.hdr .h-meta{margin-left:auto;display:flex;gap:10px;align-items:center}
+.live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--gn);box-shadow:0 0 0 3px rgba(90,158,111,.18);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(90,158,111,.18)}50%{box-shadow:0 0 0 5px rgba(90,158,111,.05)}}
+.hdr .h-stamp{font-family:var(--mo);font-size:9.5px;color:var(--i2);letter-spacing:.2px}
+.data-lock-pill{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border:1px solid var(--bd);border-radius:14px;background:var(--bg1);font-family:var(--mo);font-size:9px;color:var(--am);font-weight:700;letter-spacing:.4px;text-transform:uppercase}
+.data-lock-pill::before{content:'';width:5px;height:5px;background:var(--am);border-radius:50%}
+
+/* ─── SELECTOR BAR ──────────────────────────────────────────── */
+.sel-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:10px 14px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);margin-bottom:8px;box-shadow:var(--sh)}
+.sel-bar .grp{display:flex;align-items:center;gap:6px}
+.sel-bar .lbl{font-family:var(--mo);font-size:9px;color:var(--i3);text-transform:uppercase;letter-spacing:.4px;font-weight:600}
+.sym-input{padding:6px 10px;border:1.5px solid var(--bd);border-radius:var(--r);font:700 13px var(--mo);color:var(--i0);background:var(--sf);outline:none;width:120px;letter-spacing:.5px}
+.sym-input:focus{border-color:var(--co);box-shadow:0 0 0 2px rgba(201,107,90,.1)}
+.fav-pill{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid var(--bd);border-radius:14px;background:var(--sf);cursor:pointer;font:600 11px var(--mo);color:var(--i1);transition:.12s;letter-spacing:.3px}
+.fav-pill:hover{border-color:var(--co);background:var(--co-l);color:var(--co)}
+.fav-pill.on{background:var(--co);color:#fff;border-color:var(--co)}
+.fav-pill .nm{font-weight:700}
+.fav-pill .name{font-family:var(--sa);font-size:9.5px;font-weight:500;opacity:.78}
+.fav-divider{width:1px;height:22px;background:var(--bd2)}
+.period-grp{margin-left:auto;display:flex;gap:3px;background:var(--bg1);padding:3px;border-radius:var(--r2)}
+.period-grp button{background:transparent;border:0;color:var(--i2);font-family:var(--mo);font-size:10px;letter-spacing:.4px;padding:5px 11px;cursor:pointer;border-radius:var(--r);font-weight:600;text-transform:uppercase}
+.period-grp button:hover{color:var(--i0)}
+.period-grp button.on{background:var(--sf);color:var(--co);box-shadow:var(--sh)}
+
+/* ─── KPI STRIP ─────────────────────────────────────────── */
+.sg{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-bottom:8px}
+.sc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:8px 10px;border-left:3px solid var(--bd2)}
+.sc.up{border-left-color:var(--up)}
+.sc.dn{border-left-color:var(--dn)}
+.sc.bl{border-left-color:var(--bl)}
+.sc.am{border-left-color:var(--am)}
+.sc.vi{border-left-color:var(--vi)}
+.sc.tl{border-left-color:var(--tl)}
+.sc.co{border-left-color:var(--co)}
+.sc.ro{border-left-color:var(--ro)}
+.sc .l{font-size:8.5px;color:var(--i3);text-transform:uppercase;letter-spacing:.4px;font-weight:600;font-family:var(--mo)}
+.sc .v{font-size:14px;font-weight:700;font-family:var(--mo);letter-spacing:-.2px;margin-top:2px}
+.sc .c{font-size:9px;font-family:var(--mo);font-weight:500;margin-top:1px}
+.up-c{color:var(--up)} .dn-c{color:var(--dn)} .flat-c{color:var(--flat)}
+
+/* ─── CARDS (P7 cd/cd-h/cd-b) ──────────────────────────────── */
+.cd{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);overflow:hidden;margin-bottom:8px;transition:.15s}
+.cd:hover{box-shadow:var(--sh)}
+.cd-h{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--bd);background:var(--sf2)}
+.cd-i{width:22px;height:22px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;font-family:var(--mo);flex-shrink:0;color:#fff}
+.cd-i.bl{background:var(--bl)} .cd-i.tl{background:var(--tl)} .cd-i.vi{background:var(--vi)}
+.cd-i.am{background:var(--am)} .cd-i.co{background:var(--co)} .cd-i.gn{background:var(--gn)} .cd-i.ro{background:var(--ro)}
+.cd-t{font-weight:700;font-size:11.5px;flex:1;font-family:var(--hf);letter-spacing:-.2px}
+.cd-s{font-family:var(--mo);font-size:9px;color:var(--i3);padding:1px 7px;background:var(--bg1);border-radius:10px;letter-spacing:.3px;text-transform:uppercase;font-weight:600}
+.cd-b{padding:10px 12px}
+
+/* ─── INDICATOR TOGGLE CHIPS (P7 vap-toggle) ───────────────── */
+.tog-bar{display:flex;flex-wrap:wrap;gap:4px;padding:8px 10px;background:var(--bg1);border-radius:var(--r);margin-bottom:6px;align-items:center}
+.tog-bar .lbl{font-family:var(--mo);font-size:9px;color:var(--i3);text-transform:uppercase;letter-spacing:.4px;font-weight:700;align-self:center;margin-right:4px}
+.tog{padding:4px 9px;border:1px solid var(--bd);border-radius:3px;background:var(--sf);cursor:pointer;font:500 9.5px var(--mo);color:var(--i2);transition:.12s;letter-spacing:.3px;user-select:none}
+.tog:hover{border-color:var(--co);color:var(--co)}
+.tog.on{background:var(--co);color:#fff;border-color:var(--co)}
+.tog.bl.on{background:var(--bl);border-color:var(--bl)}
+.tog.vi.on{background:var(--vi);border-color:var(--vi)}
+.tog.am.on{background:var(--am);border-color:var(--am)}
+.tog.gn.on{background:var(--gn);border-color:var(--gn)}
+.tog-sep{width:1px;height:18px;background:var(--bd2);margin:0 4px}
+
+.hint{display:inline-flex;align-items:center;gap:6px;padding:5px 9px;background:var(--bg1);border-radius:var(--r);font-size:10px;color:var(--i2);font-family:var(--sa)}
+.hint b{color:var(--co)}
+
+/* ─── PANEL CONTROL RAIL (sortable / collapsible chips) ────── */
+.panel-rail{display:flex;flex-wrap:wrap;gap:5px;padding:8px 10px;background:var(--bg1);border-radius:var(--r);margin-bottom:6px;align-items:center}
+.panel-rail .lbl{font-family:var(--mo);font-size:9px;text-transform:uppercase;letter-spacing:.4px;font-weight:700;align-self:center;margin-right:2px;padding:3px 7px;border-radius:8px;background:var(--sf);border:1px solid var(--bd)}
+.panel-rail .p-group{display:inline-flex;gap:4px;align-items:center;padding:2px 6px;border-radius:3px;flex-wrap:wrap}
+.p-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border:1px solid var(--bd);border-radius:14px;background:var(--sf);cursor:grab;font:500 10px var(--mo);color:var(--i1);transition:.12s;letter-spacing:.2px;user-select:none}
+.p-chip[draggable=true]:active{cursor:grabbing}
+.p-chip.locked{cursor:default;background:var(--bg2);color:var(--i3);border-style:dashed}
+.p-chip.collapsed{background:var(--bg2);color:var(--i3);text-decoration:line-through;text-decoration-color:var(--bd2)}
+.p-chip:hover:not(.locked){border-color:var(--vi);color:var(--vi)}
+.p-chip .grip{font-family:var(--mo);font-weight:700;opacity:.5;font-size:10px}
+.p-chip .idx{font-family:var(--mo);font-weight:700;font-size:9px;opacity:.6;background:var(--bg1);padding:0 5px;border-radius:8px;letter-spacing:0}
+.p-chip.dragover{outline:2px dashed var(--co);outline-offset:-2px}
+
+/* ─── CHART STAGE (2-col: split stack + right fundamentals 1x5) ─ */
+.stage-grid{display:grid;grid-template-columns:1fr 420px;gap:10px;align-items:flex-start}
+.chart-stack{display:flex;flex-direction:column;gap:4px;min-width:0}
+.chart-top-frozen{
+  width:100%; height:480px;
+  position:sticky; top:0; z-index:5;
+  background:#fff;
+  border-bottom:2px solid var(--bd);
+  box-shadow:0 4px 12px rgba(0,0,0,.04);
+}
+.chart-scroll-wrap{width:100%;min-height:400px}
+#chartBottom{width:100%;min-height:400px}
+.right-rail{position:sticky;top:8px;align-self:flex-start}
+
+/* ─── RIGHT COLUMN · sticky wrapper (fund cards + consensus) ─ */
+.right-col{position:sticky;top:0;align-self:flex-start;max-height:calc(100vh - 24px);overflow-y:auto;padding:4px 2px;display:flex;flex-direction:column;gap:10px}
+.right-col::-webkit-scrollbar{width:6px}
+.right-col::-webkit-scrollbar-thumb{background:#e0ddd6;border-radius:3px}
+
+/* ─── RIGHT FUNDAMENTALS DOCK · 1x5 vertical stack ─────────── */
+.fund-dock{display:grid;grid-template-columns:1fr;grid-auto-rows:200px;gap:8px}
+
+/* ─── ANALYST CONSENSUS CARD ──────────────────────────────── */
+.consensus-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.consensus-card:hover{box-shadow:var(--sh)}
+.con-h{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--bd);background:var(--bg1)}
+.con-h .ic{font:700 9px var(--mo);letter-spacing:.4px;padding:3px 7px;border-radius:5px;color:#fff;background:var(--ro)}
+.con-h .ti{font:700 12px var(--sa);color:var(--i0);flex:1}
+.con-h .src{font:500 9px var(--mo);color:var(--i3);text-transform:uppercase;letter-spacing:.4px}
+.con-b{padding:12px;display:flex;flex-direction:column;gap:12px}
+
+.con-mean{display:flex;align-items:baseline;gap:10px}
+.con-mean-lbl{font:600 10px var(--mo);color:var(--i3);text-transform:uppercase;letter-spacing:.3px;flex-shrink:0}
+.con-mean-v{font:700 22px var(--sa);color:var(--co);font-variant-numeric:tabular-nums;line-height:1}
+.con-mean-delta{font:600 10px var(--mo);color:var(--i2);margin-left:auto}
+.con-mean-delta.up{color:var(--up)} .con-mean-delta.dn{color:var(--dn)}
+
+.con-range{display:flex;flex-direction:column;gap:6px}
+.con-range-bar{position:relative;height:8px;border-radius:4px;background:#ecebe6;overflow:visible}
+.con-range-fill{position:absolute;top:0;bottom:0;background:linear-gradient(90deg, rgba(90,158,111,.45), rgba(196,148,58,.45), rgba(201,107,90,.45));border-radius:4px;left:0;right:0}
+.con-range-marker{position:absolute;top:50%;transform:translate(-50%,-50%);cursor:default}
+.con-range-marker.mean{width:2px;height:18px;background:var(--co);border-radius:1px;box-shadow:0 0 0 2px rgba(255,255,255,.85)}
+.con-range-marker.last{width:10px;height:10px;background:var(--i0);border:2px solid #fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.con-range-ends{display:flex;justify-content:space-between;font:600 10px var(--mo);color:var(--i2)}
+.con-range-ends .lab{color:var(--i3);font-size:8.5px;text-transform:uppercase;letter-spacing:.4px;margin-right:3px}
+
+.con-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.con-cell{background:var(--bg1);border-radius:var(--r);padding:8px 10px}
+.con-cell-lbl{font:600 9px var(--mo);color:var(--i3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px}
+.con-cell-v{font:700 14px var(--sa);color:var(--i0);font-variant-numeric:tabular-nums;line-height:1.1}
+
+.rec-pill{display:inline-block;font:700 10px var(--mo);text-transform:uppercase;letter-spacing:.4px;padding:3px 8px;border-radius:4px;background:#e8e6df;color:var(--i1)}
+.rec-pill.strongBuy{background:rgba(90,158,111,.18);color:var(--dn)}
+.rec-pill.buy      {background:rgba(67,154,154,.18);color:var(--tl)}
+.rec-pill.hold     {background:rgba(196,148,58,.18);color:var(--am)}
+.rec-pill.sell     {background:rgba(201,107,90,.18);color:var(--co)}
+.rec-pill.strongSell{background:rgba(201,107,90,.30);color:var(--co);font-weight:800}
+.fund-card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.fund-card:hover{box-shadow:var(--sh)}
+.fund-h{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--bd);background:var(--sf2);flex-shrink:0}
+.fund-h .ic{width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--mo);font-weight:700;font-size:9px;color:#fff;letter-spacing:-.5px;flex-shrink:0}
+.fund-h .ic.am{background:var(--am)} .fund-h .ic.co{background:var(--co)} .fund-h .ic.vi{background:var(--vi)} .fund-h .ic.tl{background:var(--tl)}
+.fund-h .ti{font:700 11px var(--hf);color:var(--i0);flex:1;letter-spacing:-.2px}
+.fund-h .badge-grow{display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border:1px solid var(--bd);border-radius:8px;background:var(--co-l);color:var(--co);font:700 8.5px var(--mo);letter-spacing:.3px;cursor:pointer;text-transform:uppercase}
+.fund-h .badge-grow.on{background:var(--co);color:#fff;border-color:var(--co)}
+.fund-h .badge-grow::before{content:'✓';font-size:9px}
+.fund-tog{display:inline-flex;gap:0;background:var(--bg1);padding:2px;border-radius:5px;font-family:var(--mo)}
+.fund-tog button{background:transparent;border:0;color:var(--i2);font-family:var(--mo);font-size:9px;letter-spacing:.3px;padding:3px 8px;cursor:pointer;border-radius:3px;font-weight:600;text-transform:uppercase}
+.fund-tog button:hover{color:var(--i0)}
+.fund-tog button.on{background:var(--sf);color:var(--co);box-shadow:var(--sh)}
+.fund-b{flex:1;min-height:0;padding:4px;display:flex;flex-direction:column}
+.fund-controls{display:flex;align-items:center;gap:6px;padding:4px 6px;flex-wrap:wrap}
+.fund-mount{flex:1;min-height:0;width:100%}
+
+/* panel header chip toggle (for inst_flow stack mode) */
+.panel-chip{display:inline-flex;gap:0;background:var(--bg1);padding:2px;border-radius:6px;font-family:var(--mo);position:absolute;top:6px;right:8px;z-index:5}
+.panel-chip button{background:transparent;border:0;color:var(--i2);font-family:var(--mo);font-size:9px;letter-spacing:.3px;padding:3px 9px;cursor:pointer;border-radius:3px;font-weight:600;text-transform:uppercase}
+.panel-chip button:hover{color:var(--i0)}
+.panel-chip button.on{background:var(--sf);color:var(--co);box-shadow:var(--sh)}
+
+/* ─── DRAG-SELECT READOUT (Max/Min/DD) ─────────────────────── */
+.range-readout{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px 10px;background:var(--bg1);border-radius:var(--r);margin-top:6px}
+.range-readout .rr{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:7px 10px;border-left:3px solid var(--bd2)}
+.range-readout .rr.win{border-left-color:var(--bl)}
+.range-readout .rr.mx{border-left-color:var(--up)}
+.range-readout .rr.mn{border-left-color:var(--dn)}
+.range-readout .rr.dd{border-left-color:var(--vi)}
+.range-readout .rr .l{font-family:var(--mo);font-size:8.5px;color:var(--i3);letter-spacing:.4px;text-transform:uppercase;font-weight:600}
+.range-readout .rr .v{font-family:var(--mo);font-size:13px;font-weight:700;color:var(--i0);margin-top:2px;letter-spacing:-.2px}
+.range-readout .rr .s{font-family:var(--mo);font-size:9px;color:var(--i2);margin-top:1px}
+
+/* ─── FOOTER (P7) ──────────────────────────────────────────── */
+.foot{display:flex;justify-content:space-between;align-items:center;font-size:9px;color:var(--i3);letter-spacing:.4px;text-transform:uppercase;padding:8px 4px 4px;gap:10px;flex-wrap:wrap;font-family:var(--mo)}
+.foot .src{color:var(--i2)}
+.foot .anc-tag{display:inline-block;padding:1px 6px;border-radius:3px;font-family:var(--mo);font-size:8.5px;font-weight:700;background:var(--co-l);color:var(--co);letter-spacing:.4px}
+.foot .vap-tag{display:inline-block;padding:1px 6px;border-radius:3px;font-family:var(--mo);font-size:8.5px;font-weight:700;background:linear-gradient(135deg,var(--co),var(--vi));color:#fff;letter-spacing:.4px}
+
+/* ===== VIA optimize: 上方壓縮 + 右欄小圖整理 ===== */
+.sg{gap:5px!important;margin-bottom:5px!important}
+.sc{padding:4px 8px!important;border-left-width:2px!important}
+.sc .l{font-size:7.5px!important;letter-spacing:.3px!important}
+.sc .v{font-size:12px!important;margin-top:1px!important}
+.sc .c{font-size:7.5px!important;margin-top:0!important}
+.tog{padding:3px 7px!important;font-size:9px!important}
+.tog-bar{padding:5px 8px!important;margin-bottom:5px!important;gap:3px!important}
+.panel-rail{padding:5px 8px!important;margin-bottom:5px!important}
+.cd{margin-bottom:6px!important}
+.cd-h{padding:5px 12px!important}
+.cd-b{padding:7px 10px!important}
+.sel-bar{padding:7px 14px!important;margin-bottom:6px!important}
+/* 右欄基本面小圖：卡頭精簡、控制鈕收緊、間距一致、降空白高度 */
+.right-col{gap:8px!important;padding:2px 2px!important}
+.fund-dock{grid-auto-rows:170px!important;gap:8px!important}
+.fund-h{padding:5px 10px!important;gap:6px!important}
+.fund-controls{padding:3px 8px 5px!important;gap:5px!important}
+.fund-tog{padding:1px!important}
+.fund-tog button{padding:2px 7px!important;font-size:8.5px!important}
+.fund-b{padding:3px 4px!important}
+.con-h{padding:6px 10px!important}
+
+/* VIA optimize#2: 右欄小圖拉高固定不重疊 + 共識 Spectrum 更活潑 */
+.fund-dock{grid-auto-rows:240px!important;gap:10px!important}
+.fund-card{min-height:240px!important}
+.con-range-bar{height:11px!important;border-radius:6px!important}
+.con-range-fill{background:linear-gradient(90deg,rgba(90,158,111,.85),rgba(196,148,58,.85),rgba(201,107,90,.9))!important}
+.con-mean-v{font-size:24px!important}
+
+/* VIA: 醒目個股識別（鉅亨網風格） */
+.stk-id{display:flex;flex-direction:column;justify-content:center;padding-right:14px;margin-right:6px;border-right:2px solid var(--bd)}
+.stk-nm{font:800 22px var(--hf);color:var(--i0);line-height:1.05;letter-spacing:-.3px}
+.stk-cd{font:600 11px var(--mo);color:var(--co);letter-spacing:.6px;margin-top:1px}
+
+/* VIA PEERS row */
+.peers-row{display:flex;align-items:stretch;gap:8px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:8px 10px;margin-bottom:8px}
+.peers-lbl{display:flex;flex-direction:column;justify-content:center;font:700 11px var(--mo);color:var(--i2);letter-spacing:1px;padding-right:8px;border-right:1px solid var(--bd)}
+.peers-lbl small{font:600 8px var(--mo);color:var(--i3);letter-spacing:.5px}
+.peers-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:8px;flex:1}
+.peer-card{position:relative;border:1px solid var(--bd);border-radius:var(--r);padding:6px 8px;overflow:hidden;cursor:pointer;background:var(--sf);transition:.12s}
+.peer-card:hover{box-shadow:var(--sh);transform:translateY(-1px)}
+.peer-spark{position:absolute;left:0;right:0;bottom:0;height:60%;opacity:.16;pointer-events:none}
+.peer-top{display:flex;justify-content:space-between;align-items:baseline;position:relative;z-index:1}
+.peer-nm{font:700 11px var(--hf);color:var(--i0)}
+.peer-cd{font:600 8.5px var(--mo);color:var(--i3);margin-left:4px}
+.peer-pct{font:700 11px var(--mo)}
+.peer-px{font:600 10px var(--mo);color:var(--i2);position:relative;z-index:1;margin-top:1px}
+.peers-add{align-self:center;width:64px;border:1px dashed var(--bd);border-radius:var(--r);background:var(--bg1);font:600 10px var(--mo);color:var(--i2);padding:5px 6px;text-align:center}
+</style>
+</head>
+
+<body>
+<div class="w">
+
+  <!-- ═══════════════════════════════════════════════════════════
+       ANCHOR[VIA:ANCHOR:S07-TOPBAR]
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="hdr">
+    <div class="h-icon">SR</div>
+    <div>
+      <div class="h1t">Equity <span>Insight</span></div>
+      <div class="h2t" style="font-weight:600;letter-spacing:1.4px;color:var(--i2)">VERITAS INTELLIGENCE ANALYTICS</div>
+      <div class="h2t">A single-stock view of trading, financial, ownership, valuation, technical, and risk signals.</div>
+    </div>
+    <div class="h-meta">
+      <span class="data-lock-pill">DATA-LOCKED · 305-003</span>
+      <span class="live-dot"></span>
+      <span class="h-stamp" id="hdr-stamp">2330.TW · TPE · loading…</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       ANCHOR[VIA:ANCHOR:S07-SEL]
+       [VAOS-FILL-SLOT:SLOT_SELECTOR]
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="sel-bar">
+    <div class="stk-id"><div class="stk-nm" id="stkName">台積電</div><div class="stk-cd" id="stkCode">2330.TW</div></div>
+    <div class="grp">
+      <span class="lbl">Symbol</span>
+      <input type="text" class="sym-input" id="symInput" value="2330.TW" maxlength="10">
+    </div>
+    <div class="fav-divider"></div>
+    <div class="grp" style="flex-wrap:wrap;gap:5px">
+      <span class="lbl">Favorites</span>
+      <span class="fav-pill on"  data-sym="2330.TW" data-name="台積電"><span class="nm">2330</span><span class="name">台積電</span></span>
+      <span class="fav-pill"     data-sym="2454.TW" data-name="聯發科"><span class="nm">2454</span><span class="name">聯發科</span></span>
+      <span class="fav-pill"     data-sym="2317.TW" data-name="鴻海"  ><span class="nm">2317</span><span class="name">鴻海</span></span>
+      <span class="fav-pill"     data-sym="2308.TW" data-name="台達電"><span class="nm">2308</span><span class="name">台達電</span></span>
+      <span class="fav-pill"     data-sym="3008.TW" data-name="大立光"><span class="nm">3008</span><span class="name">大立光</span></span>
+      <span class="fav-pill"     data-sym="2412.TW" data-name="中華電"><span class="nm">2412</span><span class="name">中華電</span></span>
+    </div>
+    <div class="period-grp" id="periodGrp">
+      <button data-p="20">20D</button>
+      <button data-p="60">60D</button>
+      <button data-p="120" class="on">120D</button>
+      <button data-p="240">240D</button>
+      <button data-p="500">2Y</button>
+    </div>
+  </div>
+  <!-- [VAOS-FILL-SLOT:SLOT_SELECTOR:END] -->
+
+  <!-- ═══════════════════════════════════════════════════════════
+       ANCHOR[VIA:ANCHOR:S07-META]
+       [VAOS-FILL-SLOT:SLOT_META_KPI]
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="sg" id="kpiStrip">
+    <div class="sc up"><div class="l">last (ADJ)</div><div class="v" id="kpi_last">—</div><div class="c" id="kpi_lastDate">—</div></div>
+    <div class="sc up"><div class="l">change</div><div class="v" id="kpi_chg">—</div><div class="c" id="kpi_chgPct">—</div></div>
+    <div class="sc bl"><div class="l">52w high</div><div class="v" id="kpi_52h">—</div><div class="c" id="kpi_52hd">distance</div></div>
+    <div class="sc bl"><div class="l">52w low</div><div class="v" id="kpi_52l">—</div><div class="c" id="kpi_52ld">distance</div></div>
+    <div class="sc vi"><div class="l">vs MA240</div><div class="v" id="kpi_ma240">—</div><div class="c">MA bias</div></div>
+    <div class="sc am"><div class="l">vol (last)</div><div class="v" id="kpi_vol">—</div><div class="c" id="kpi_volAvg">avg20</div></div>
+    <div class="sc co"><div class="l">RSI(14)</div><div class="v" id="kpi_rsi">—</div><div class="c" id="kpi_rsiTag">—</div></div>
+    <div class="sc tl"><div class="l">ATR(14)</div><div class="v" id="kpi_atr">—</div><div class="c" id="kpi_natr">NATR—</div></div>
+  </div>
+  <div class="sg" id="kpiStrip2">
+    <div class="sc bl"><div class="l">外資持股</div><div class="v" id="kpi_foreign">—</div><div class="c">latest %</div></div>
+    <div class="sc co"><div class="l">投信持股</div><div class="v" id="kpi_trust">—</div><div class="c">latest %</div></div>
+    <div class="sc am"><div class="l">當沖比</div><div class="v" id="kpi_daytrade">—</div><div class="c">latest %</div></div>
+    <div class="sc tl"><div class="l">維持率</div><div class="v" id="kpi_maint">—</div><div class="c">latest %</div></div>
+    <div class="sc vi"><div class="l">券資比</div><div class="v" id="kpi_smr">—</div><div class="c">latest %</div></div>
+    <div class="sc ro"><div class="l">drawdown</div><div class="v" id="kpi_dd">—</div><div class="c">latest %</div></div>
+    <div class="sc vi"><div class="l">Sharpe(60)</div><div class="v" id="kpi_sharpe">—</div><div class="c" id="kpi_sharpeRf">RF —</div></div>
+    <div class="sc gn"><div class="l">起始日期</div><div class="v" id="kpi_startDate" style="font-size:13px">—</div><div class="c">slice start</div></div>
+    <div class="sc gn"><div class="l">Normalized</div><div class="v" id="kpi_normDate" style="font-size:13px">—</div><div class="c">base date</div></div>
+  </div>
+  <!-- [VAOS-FILL-SLOT:SLOT_META_KPI:END] -->
+  <!-- VIA PEERS row (cnyes 同業風格·簡化·配色不同) -->
+  <div class="peers-row" id="peersRow">
+    <div class="peers-lbl">PEERS<small>同業</small></div>
+    <div class="peers-grid" id="peersGrid"></div>
+    <input class="peers-add" id="peersAdd" placeholder="+ 代碼" maxlength="10">
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════════════════════
+       ANCHOR[VIA:ANCHOR:S07-CTRL]
+       [VAOS-FILL-SLOT:SLOT_INDICATOR_TOGGLES]
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="cd">
+    <div class="cd-h">
+      <div class="cd-i co">FX</div>
+      <div class="cd-t">Indicator Controls</div>
+      <div class="cd-s">trace_preferences</div>
+    </div>
+    <div class="cd-b">
+      <div class="tog-bar">
+        <span class="lbl">SMA</span>
+        <span class="tog bl on" data-pref="price_main.show_MA5">MA 5</span>
+        <span class="tog bl on" data-pref="price_main.show_MA10">MA 10</span>
+        <span class="tog bl on" data-pref="price_main.show_MA20">MA 20</span>
+        <span class="tog bl on" data-pref="price_main.show_MA60">MA 60</span>
+        <span class="tog bl on" data-pref="price_main.show_MA120">MA 120</span>
+        <span class="tog bl on" data-pref="price_main.show_MA240">MA 240</span>
+        <span class="tog-sep"></span>
+        <span class="lbl">EMA</span>
+        <span class="tog am" data-pref="price_main.show_EMA10">EMA 10</span>
+        <span class="tog am" data-pref="price_main.show_EMA20">EMA 20</span>
+        <span class="tog am" data-pref="price_main.show_EMA60">EMA 60</span>
+        <span class="tog am" data-pref="price_main.show_EMA120">EMA 120</span>
+        <span class="tog am" data-pref="price_main.show_EMA240">EMA 240</span>
+        <span class="tog-sep"></span>
+        <span class="tog vi on" data-pref="price_main.show_BBANDS">BB(20,2)</span>
+        <span class="tog on"    data-pref="price_main.show_YTM">YTM</span>
+        <span class="tog on"    data-pref="price_main.show_normalized_guides">Norm guides</span>
+      </div>
+      <div class="tog-bar">
+        <span class="lbl">Normalized Date</span>
+        <input type="date" id="normDate" style="font:600 11px var(--mo);padding:4px 8px;border:1px solid var(--bd);border-radius:var(--r);color:var(--i0);background:var(--sf);outline:none">
+        <span class="tog-sep"></span>
+        <span class="lbl">Benchmark</span>
+        <select id="benchSel" style="font:600 11px var(--mo);padding:4px 8px;border:1px solid var(--bd);border-radius:var(--r);color:var(--i0);background:var(--sf);outline:none">
+          <option value="^TWII">^TWII · TAIEX</option>
+          <option value="^GSPC">^GSPC · S&amp;P 500</option>
+        </select>
+        <span class="tog-sep"></span>
+        <span class="lbl">Risk-Free</span>
+        <select id="rfSel" style="font:600 11px var(--mo);padding:4px 8px;border:1px solid var(--bd);border-radius:var(--r);color:var(--i0);background:var(--sf);outline:none">
+          <option value="TW10Y">台灣 10Y 公債</option>
+          <option value="US10Y">美國 10Y Treasury</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <!-- [VAOS-FILL-SLOT:SLOT_INDICATOR_TOGGLES:END] -->
+
+  <!-- ═══════════════════════════════════════════════════════════
+       ANCHOR[VIA:ANCHOR:S07-PANELS]
+       [VAOS-FILL-SLOT:SLOT_PANEL_RAIL]
+       Panel ordering / collapse rail — drag to reorder
+       (price_main & volume are LOCKED at top per schema)
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="cd">
+    <div class="cd-h">
+      <div class="cd-i vi">PR</div>
+      <div class="cd-t">Panel Rail · drag chips to reorder · click to collapse</div>
+      <div class="cd-s">runtime.panel_order</div>
+    </div>
+    <div class="cd-b">
+      <div class="panel-rail" id="panelRail">
+        <span class="lbl">Order →</span>
+        <!-- chips injected by JS from runtime.panel_order -->
+      </div>
+    </div>
+  </div>
+  <!-- [VAOS-FILL-SLOT:SLOT_PANEL_RAIL:END] -->
+
+  <!-- ═══════════════════════════════════════════════════════════
+       ANCHOR[VIA:ANCHOR:S07-STAGE]
+       [VAOS-FILL-SLOT:SLOT_CHART_STACK]
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="cd">
+    <div class="cd-h">
+      <div class="cd-i co">RS</div>
+      <div class="cd-t">Resonance Stack · 14 panels · shared X axis</div>
+      <div class="cd-s">drag-select on price → Max/Min/DD</div>
+    </div>
+    <div class="cd-b" style="padding:6px 4px">
+      <div class="stage-grid">
+        <div class="chart-stack">
+          <div id="chartTop" class="chart-top-frozen"></div>
+          <div id="chartScrollWrap" class="chart-scroll-wrap">
+            <div id="chartBottom"></div>
+          </div>
+        </div>
+        <div class="right-col" id="rightCol">
+        <div class="fund-dock" id="fundDock">
+          <!-- ① 營收 -->
+          <div class="fund-card" data-fund="revenue">
+            <div class="fund-h">
+              <span class="ic am">RV</span>
+              <span class="ti">營收</span>
+              <span class="badge-grow on" data-grow="revenue">成長率</span>
+            </div>
+            <div class="fund-controls">
+              <span class="fund-tog" data-bucket="revenue-period">
+                <button data-v="month" class="on">月</button>
+                <button data-v="quarter">季</button>
+                <button data-v="year">年</button>
+                <button data-v="l12">近12月</button>
+              </span>
+              <span class="fund-tog" data-bucket="revenue-mode">
+                <button data-v="single" class="on">單月</button>
+                <button data-v="cum">累計</button>
+              </span>
+            </div>
+            <div class="fund-b"><div class="fund-mount" id="fundRevenue"></div></div>
+          </div>
+
+          <!-- ② 利潤比率 -->
+          <div class="fund-card" data-fund="margin">
+            <div class="fund-h">
+              <span class="ic co">PM</span>
+              <span class="ti">利潤比率</span>
+            </div>
+            <div class="fund-controls">
+              <span class="fund-tog" data-bucket="margin-period">
+                <button data-v="quarter" class="on">季</button>
+                <button data-v="year">年</button>
+              </span>
+            </div>
+            <div class="fund-b"><div class="fund-mount" id="fundMargin"></div></div>
+          </div>
+
+          <!-- ③ Diluted EPS -->
+          <div class="fund-card" data-fund="eps">
+            <div class="fund-h">
+              <span class="ic vi">EP</span>
+              <span class="ti">Diluted EPS</span>
+              <span class="badge-grow on" data-grow="eps">成長率</span>
+            </div>
+            <div class="fund-controls">
+              <span class="fund-tog" data-bucket="eps-period">
+                <button data-v="quarter" class="on">季</button>
+                <button data-v="year">年</button>
+                <button data-v="l4q">近4季</button>
+              </span>
+              <span class="fund-tog" data-bucket="eps-mode">
+                <button data-v="single" class="on">單季</button>
+                <button data-v="cum">累計</button>
+              </span>
+            </div>
+            <div class="fund-b"><div class="fund-mount" id="fundEPS"></div></div>
+          </div>
+
+          <!-- ④ ROE & ROA -->
+          <div class="fund-card" data-fund="roe">
+            <div class="fund-h">
+              <span class="ic tl">RR</span>
+              <span class="ti">ROE & ROA</span>
+            </div>
+            <div class="fund-controls">
+              <span class="fund-tog" data-bucket="roe-period">
+                <button data-v="quarter" class="on">季</button>
+                <button data-v="year">年</button>
+              </span>
+            </div>
+            <div class="fund-b"><div class="fund-mount" id="fundROE"></div></div>
+          </div>
+
+          <!-- ⑤ DPS -->
+          <div class="fund-card" data-fund="dps">
+            <div class="fund-h">
+              <span class="ic gn">DP</span>
+              <span class="ti">DPS · 每股股利</span>
+              <span class="badge-grow on" data-grow="dps">成長率</span>
+            </div>
+            <div class="fund-controls">
+              <span class="fund-tog" data-bucket="dps-period">
+                <button data-v="year" class="on">年</button>
+              </span>
+              <span class="fund-tog" data-bucket="dps-mode">
+                <button data-v="single" class="on">單年</button>
+                <button data-v="cum">累計</button>
+              </span>
+            </div>
+            <div class="fund-b"><div class="fund-mount" id="fundDPS"></div></div>
+          </div>
+        </div>
+
+        <!-- ⑥ Analyst Consensus (yfinance .info) -->
+        <div class="consensus-card" id="consensusCard">
+          <div class="con-h">
+            <span class="ic ro">CN</span>
+            <span class="ti">Analyst Consensus</span>
+            <span class="src">yfinance .info</span>
+          </div>
+          <div class="con-b">
+            <div class="con-mean">
+              <div class="con-mean-lbl">目標均價</div>
+              <div class="con-mean-v" id="con_targetMean">—</div>
+              <div class="con-mean-delta" id="con_meanDelta">vs last —</div>
+            </div>
+            <div class="con-range">
+              <div class="con-range-bar">
+                <div class="con-range-fill" id="con_rangeFill"></div>
+                <div class="con-range-marker mean" id="con_meanMarker" title="目標均價"></div>
+                <div class="con-range-marker last" id="con_lastMarker" title="現價"></div>
+              </div>
+              <div class="con-range-ends">
+                <span><span class="lab">低</span> <span id="con_targetLow">—</span></span>
+                <span><span class="lab">高</span> <span id="con_targetHigh">—</span></span>
+              </div>
+            </div>
+            <div class="con-grid">
+              <div class="con-cell">
+                <div class="con-cell-lbl">分析師數</div>
+                <div class="con-cell-v" id="con_numAnalysts">—</div>
+              </div>
+              <div class="con-cell">
+                <div class="con-cell-lbl">共識評等</div>
+                <div class="con-cell-v" id="con_recMean">—</div>
+              </div>
+              <div class="con-cell" style="grid-column: 1 / -1">
+                <div class="con-cell-lbl">Rating</div>
+                <div class="con-cell-v"><span class="rec-pill" id="con_recKey">—</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="range-readout" id="rangeReadout">
+        <div class="rr win"><div class="l">window</div><div class="v" id="rr_win">—</div><div class="s" id="rr_winS">—</div></div>
+        <div class="rr mx"><div class="l">max (price)</div><div class="v" id="rr_max">—</div><div class="s" id="rr_maxDt">—</div></div>
+        <div class="rr mn"><div class="l">min (price)</div><div class="v" id="rr_min">—</div><div class="s" id="rr_minDt">—</div></div>
+        <div class="rr dd"><div class="l">max drawdown</div><div class="v" id="rr_dd">—</div><div class="s" id="rr_ddRange">peak → trough</div></div>
+      </div>
+    </div>
+  </div>
+  <!-- [VAOS-FILL-SLOT:SLOT_CHART_STACK:END] -->
+
+  <!-- ═══════════════════════════════════════════════════════════
+       ANCHOR[VIA:ANCHOR:S07-FOOT]
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="foot">
+    <div class="src">
+      <span class="vap-tag">VAP v4.0</span>
+      &nbsp;source · demo · forward-fill · ADJ close · TA-LIB defaults
+    </div>
+    <div>
+      <span class="anc-tag">S07</span>
+      &nbsp;14-panel resonance · shared-x · TW inversion · axes locked · modebar hidden
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════
+     ANCHOR[VIA:ANCHOR:S07-SCRIPT]
+     ════════════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ════════════════════════════════════════════════════════════════
+   0.  SCHEMA  (embedded — mirrors schema.json from spec)
+   ════════════════════════════════════════════════════════════════ */
+const SCHEMA = {
+  layout_meta: {
+    layout_id: "tw-stock-resonance-stack-v1",
+    layout_name: "TW Resonance Stock Stack",
+    version: "1.0.0",
+    market_type: "individual_stock",
+    timeframe_mode: "daily_swing",
+    timezone: "Asia/Taipei"
+  },
+  ui_rules: {
+    global_sync: {
+      shared_time_axis: true,
+      shared_crosshair: true,
+      shared_tooltip_date: true,
+      time_presets: ["1D","5D","20D","60D","120D","240D","YTD"]
+    },
+    panel_behavior: {
+      fixed_panels: ["price_main", "volume"],
+      sortable_panels: ["macd","rsi_kd","obv","atr_natr","normalized_price","dollar_vol_flow","pv_divergence","rs_flow","inst_flow_stacked","inst_flow_foreign","inst_flow_trust","inst_flow_dealer","inst_holding","margin_credit","day_trading","risk_hv_dd","risk_beta_corr","risk_sharpe"],
+      collapsible_panels: ["macd","rsi_kd","obv","atr_natr","normalized_price","dollar_vol_flow","pv_divergence","rs_flow","inst_flow_stacked","inst_flow_foreign","inst_flow_trust","inst_flow_dealer","inst_holding","margin_credit","day_trading","risk_hv_dd","risk_beta_corr","risk_sharpe"]
+    },
+    compact_layout: {
+      panel_gap_px: 4,
+      panel_inner_padding_px: 4,
+      header_height_px: 24,
+      axis_zone_minimized: true,
+      axis_title_enabled: false,
+      axis_tick_font_size_px: 9,
+      axis_label_font_size_px: 10
+    }
+  },
+  style_tokens: {
+    theme: { mode:"light", paper:"#fff", panel:"#fafaf8", grid:"rgba(30,29,26,0.06)", text:"#1e1d1a", text2:"#6b6860", text3:"#9c9890" },
+    price_colors: { up:"#c96b5a", down:"#5a9e6f" },
+    moving_average_colors: { MA5:"#c4943a", MA10:"#4c78a8", MA20:"#5a9e6f", MA60:"#7a6daa", MA120:"#c96b5a", MA240:"#9c9890" },
+    risk_colors: { ATR:"#c4943a", NATR:"#c96b5a", HV:"#7a6daa", Drawdown_line:"#9c9890", Drawdown_fill:"rgba(156,152,144,0.30)", Beta:"#4c78a8", Corr:"#439a9a" },
+    inst_colors: { foreign_net:"#4c78a8", trust_net:"#c96b5a", dealer_net:"#7a6daa", total_net:"#1e1d1a" },
+    series_colors: { TX:"#4c78a8", margin:"#c96b5a", short:"#7a6daa", ratio:"#c4943a", maint:"#439a9a", daytrade:"#c96b5a", dayval:"#c4943a" }
+  },
+  indicator_mapping: {
+    price_source_rules: { stock:"Adj Close", stock_etf:"Adj Close", commodity:"Close", index:"Close", fx:"Close", yield_proxy:"Close" },
+    normalized_price: { enabled:true, base_value:100, formula:"selected/base*100", guides:{horizontal_100:true, vertical_normalized_date:true} },
+    benchmark_defaults: { equity_benchmark:"^TWII", risk_free_proxy:"^TNX" }
+  },
+  height_unit: {
+    standard: 1.0,
+    spec_note: "STANDARD = price_main (K-line) at weight 1.0. All other panels at 0.3 of standard. Y-axis MUST bound data full min/max with 2% padding both sides."
+  },
+  panel_groups: [
+    { id:"FIXED", title:"K線 + Volume", color:"--co", locked:true,  description:"top-pinned, non-movable" },
+    { id:"TECH",  title:"技術分析",      color:"--bl", locked:false, description:"oscillators, smoothing, normalized" },
+    { id:"CHIPS", title:"籌碼",          color:"--vi", locked:false, description:"institutional flow, margin, futures, day-trade" },
+    { id:"RISK",  title:"風險",          color:"--am", locked:false, description:"volatility, drawdown, beta, correlation" }
+  ],
+  panel_definitions: [
+    { id:"price_main",       group:"FIXED", title:"PRICE MAIN",              fixed:true,  sortable:false, collapsible:false, height_weight:1.00, chart_type:"candlestick_overlay",            axes:{left:["candlestick","MA5","MA10","MA20","MA60","MA120","MA240","BBANDS"], right:[]} },
+    { id:"volume",           group:"FIXED", title:"VOLUME",                  fixed:true,  sortable:false, collapsible:false, height_weight:0.30, chart_type:"bar_plus_line",                  axes:{left:["volume","volume_MA20"], right:[]} },
+    { id:"macd",             group:"TECH",  title:"MACD(12,26,9)",           fixed:false, sortable:true,  collapsible:true,  height_weight:0.30, chart_type:"line_plus_histogram",            axes:{left:["MACD","MACD_signal","MACD_hist"], right:[]} },
+    { id:"rsi_kd",           group:"TECH",  title:"RSI(14) / KD(9,3,3)",     fixed:false, sortable:true,  collapsible:true,  height_weight:0.30, chart_type:"multi_line",                     axes:{left:["RSI","K","D"], right:[]} },
+    { id:"obv",              group:"TECH",  title:"OBV",                     fixed:false, sortable:true,  collapsible:true,  height_weight:0.30, chart_type:"line",                           axes:{left:["OBV"], right:[]} },
+    { id:"atr_natr",         group:"TECH",  title:"ATR / NATR",              fixed:false, sortable:true,  collapsible:true,  height_weight:0.30, chart_type:"line",                           axes:{left:["ATR","NATR"], right:[]} },
+    { id:"normalized_price", group:"TECH",  title:"Normalized Price (base=100)", fixed:false, sortable:true, collapsible:true, height_weight:0.30, chart_type:"multi_line_dual_group_optional", axes:{left:["normalized_stock","normalized_benchmark"], right:[]} },
+    { id:"dollar_vol_flow",  group:"TECH",  title:"Dollar Volume + 量倍 (M1)", fixed:false, sortable:true, collapsible:true, height_weight:0.30, chart_type:"dollar_vol_panel", axes:{left:["dollar_vol","dvol_ma20"], right:["dvol_ratio"]} },
+    { id:"pv_divergence",    group:"TECH",  title:"PV Divergence Signal (M2)", fixed:false, sortable:true, collapsible:true, height_weight:0.30, chart_type:"pv_signal_panel",  axes:{left:["pv_signal_code"], right:[]} },
+    { id:"rs_flow",          group:"TECH",  title:"RS Flow vs Benchmark (M3)", fixed:false, sortable:true, collapsible:true, height_weight:0.30, chart_type:"rs_flow_panel",    axes:{left:["rs_vs_bench","rs_ma10"], right:["rs_trend"]} },
+    { id:"inst_flow_stacked", group:"CHIPS", title:"三大法人買賣超 (堆疊)",  fixed:false, sortable:true,  collapsible:true,  height_weight:0.30, chart_type:"inst_stacked_bar", axes:{left:["foreign_net","trust_net","dealer_net"], right:[]} },
+    { id:"inst_flow_foreign", group:"CHIPS", title:"外資買賣超",            fixed:false, sortable:true,  collapsible:true,  height_weight:0.30, chart_type:"single_inst_bar", axes:{left:["foreign_net"], right:[]} },
+    { id:"inst_flow_trust",   group:"CHIPS", title:"投信買賣超",            fixed:false, sortable:true,  collapsible:true,  height_weight:0.30, chart_type:"single_inst_bar", axes:{left:["trust_net"], right:[]} },
+    { id:"inst_flow_dealer",  group:"CHIPS", title:"自營商買賣超",          fixed:false, sortable:true,  collapsible:true,  height_weight:0.30, chart_type:"single_inst_bar", axes:{left:["dealer_net"], right:[]} },
+    { id:"inst_holding",     group:"CHIPS", title:"法人持股率",              fixed:false, sortable:true,  collapsible:true,  height_weight:0.30, chart_type:"multi_line",                     axes:{left:["foreign_holding","trust_holding"], right:[]} },
+    { id:"margin_credit",    group:"CHIPS", title:"維持率 / 券資比",         fixed:false, sortable:true,  collapsible:true,  height_weight:0.30, chart_type:"dual_axis_multi_line",           axes:{left:["maintenance_ratio"], right:["short_margin_ratio"]} },
+    { id:"day_trading",      group:"CHIPS", title:"當沖比率 (%)",            fixed:false, sortable:true,  collapsible:true,  height_weight:0.30, chart_type:"left_line_right_bar",            axes:{left:["daytrade_ratio"], right:[]} },
+    { id:"risk_hv_dd",       group:"RISK",  title:"HV + Drawdown",           fixed:false, sortable:true,  collapsible:true,  height_weight:0.30, chart_type:"left_line_right_area",           axes:{left:["HV_20","HV_60"], right:["drawdown"]} },
+    { id:"risk_beta_corr",   group:"RISK",  title:"Beta(60) + Corr(60)",     fixed:false, sortable:true,  collapsible:true,  height_weight:0.30, chart_type:"dual_axis_line",                 axes:{left:["beta_60"], right:["corr_60"]} },
+    { id:"risk_sharpe",      group:"RISK",  title:"Sharpe Ratio (60d, ann.)",fixed:false, sortable:true,  collapsible:true,  height_weight:0.30, chart_type:"sharpe_line",                    axes:{left:["sharpe_60"], right:[]} }
+  ]
+};
+
+/* ════════════════════════════════════════════════════════════════
+   1.  RUNTIME STATE  (mirrors runtime_state.json; lives in memory)
+   ════════════════════════════════════════════════════════════════ */
+const RUNTIME = {
+  session_meta: { state_id: "runtime-stk-res-"+Date.now(), layout_id: "tw-stock-resonance-stack-v1", timezone: "Asia/Taipei" },
+  context: { ticker: "2330.TW", ticker_name: "台積電", benchmark: "^TWII", risk_free_proxy: "^TNX", market_tab: "individual_stock" },
+  view_state: { selected_time_preset: "120D", visible_date_range: { start: null, end: null }, normalized_date: null, crosshair_sync: true, tooltip_sync: true, auto_scroll_to_latest: true,
+    inst_flow_mode: "single",
+    benchmark: "^TWII",          // ^TWII | ^GSPC
+    risk_free:  "TW10Y",          // TW10Y | US10Y
+    fundamentals: {
+      revenue: { period: "month",   mode: "single", grow: true },
+      margin:  { period: "quarter" },
+      eps:     { period: "quarter", mode: "single", grow: true },
+      roe:     { period: "quarter" },
+      dps:     { period: "year",    mode: "single", grow: true }
+    }
+  },
+  panel_order: [
+    "price_main","volume",                                                                  // FIXED
+    "macd","rsi_kd","obv","atr_natr","normalized_price","dollar_vol_flow","pv_divergence","rs_flow",  // TECH
+    "inst_flow_stacked","inst_flow_foreign","inst_flow_trust","inst_flow_dealer",          // CHIPS (split)
+    "inst_holding","margin_credit","day_trading",                                           // CHIPS (rest)
+    "risk_hv_dd","risk_beta_corr","risk_sharpe"                                             // RISK
+  ],
+  panel_state: {
+    price_main:       { visible:true,  expanded:true,  height_weight_override:null },
+    volume:           { visible:true,  expanded:true,  height_weight_override:null },
+    macd:             { visible:true,  expanded:true,  height_weight_override:null },
+    rsi_kd:           { visible:true,  expanded:true,  height_weight_override:null },
+    obv:              { visible:true,  expanded:true,  height_weight_override:null },
+    atr_natr:         { visible:true,  expanded:true,  height_weight_override:null },
+    inst_flow_stacked: { visible:true,  expanded:true,  height_weight_override:null },
+    inst_flow_foreign: { visible:true,  expanded:true,  height_weight_override:null },
+    inst_flow_trust:   { visible:true,  expanded:true,  height_weight_override:null },
+    inst_flow_dealer:  { visible:true,  expanded:true,  height_weight_override:null },
+    inst_holding:     { visible:true,  expanded:true,  height_weight_override:null },
+    margin_credit:    { visible:true,  expanded:true,  height_weight_override:null },
+    day_trading:      { visible:true,  expanded:true,  height_weight_override:null },
+    normalized_price: { visible:true,  expanded:true,  height_weight_override:null },
+    dollar_vol_flow:  { visible:true,  expanded:true,  height_weight_override:null },
+    pv_divergence:    { visible:true,  expanded:true,  height_weight_override:null },
+    rs_flow:          { visible:true,  expanded:true,  height_weight_override:null },
+    risk_hv_dd:       { visible:true,  expanded:true,  height_weight_override:null },
+    risk_beta_corr:   { visible:true,  expanded:true,  height_weight_override:null },
+    risk_sharpe:      { visible:true,  expanded:true,  height_weight_override:null }
+  },
+  trace_preferences: {
+    price_main: {
+      show_MA5:true, show_MA10:true, show_MA20:true, show_MA60:true, show_MA120:true, show_MA240:true,
+      show_EMA10:false, show_EMA20:false, show_EMA60:false, show_EMA120:false, show_EMA240:false,
+      show_BBANDS:true, show_YTM:true, show_normalized_guides:true
+    },
+    normalized_price: { show_left_group:true, show_right_group:false, highlight_series:["2330.TW","^TWII"], legend_mode:"grouped" },
+    risk_hv_dd: { show_HV20:true, show_HV60:true, show_drawdown:true },
+    risk_beta_corr: { show_beta:true, show_corr:true }
+  },
+  interaction_state: { focused_panel_id:"price_main", hovered_date:null, dragging_panel_id:null, pinned_panels:["price_main","volume"] }
+};
+
+/* ════════════════════════════════════════════════════════════════
+   2.  RNG + demo data generator (500 business days, deterministic)
+   ════════════════════════════════════════════════════════════════ */
+function mulberry32(seed){
+  return function(){
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = seed;
+    t = Math.imul(t ^ t >>> 15, t | 1);
+    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function isBiz(d){ const w=d.getDay(); return w!==0 && w!==6; }
+function genOHLCV(n, seed, startPrice){
+  const rng = mulberry32(seed);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const dates = [];
+  let d = new Date(today);
+  while (dates.length < n){ if (isBiz(d)) dates.unshift(new Date(d)); d.setDate(d.getDate()-1); }
+  const out = { date:[], open:[], high:[], low:[], close:[], volume:[] };
+  let prev = startPrice;
+  for (let i=0;i<n;i++){
+    const drift = 0.0005;
+    const vol   = 0.018;
+    const shock = (rng()-0.5)*2;
+    const regime = (i%87===0) ? (rng()-0.5)*0.08 : 0;
+    const ret = drift + vol*shock + regime;
+    const close = +(prev*(1+ret)).toFixed(2);
+    const open  = +(prev*(1+(rng()-0.5)*0.008)).toFixed(2);
+    const hi    = +(Math.max(open,close)*(1+rng()*0.012)).toFixed(2);
+    const lo    = +(Math.min(open,close)*(1-rng()*0.012)).toFixed(2);
+    const v     = Math.round(15e6 + rng()*35e6 + Math.abs(ret)*2e9);
+    out.date.push(dates[i].toISOString().slice(0,10));
+    out.open.push(open); out.high.push(hi); out.low.push(lo); out.close.push(close); out.volume.push(v);
+    prev = close;
+  }
+  return out;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   3.  Indicator library (TA-LIB defaults)
+   ════════════════════════════════════════════════════════════════ */
+function ffill(a){ const o=a.slice(); for(let i=1;i<o.length;i++) if(o[i]==null||isNaN(o[i])) o[i]=o[i-1]; return o; }
+function SMA(s,p){ const o=new Array(s.length).fill(null); let sum=0; for(let i=0;i<s.length;i++){ sum+=s[i]; if(i>=p) sum-=s[i-p]; if(i>=p-1) o[i]=sum/p; } return o; }
+function EMA(s,p){ const o=new Array(s.length).fill(null); const k=2/(p+1); let prev=null; for(let i=0;i<s.length;i++){ if(i<p-1) continue; if(i===p-1){ let x=0; for(let j=0;j<p;j++) x+=s[j]; prev=x/p; o[i]=prev; } else { prev=s[i]*k+prev*(1-k); o[i]=prev; } } return o; }
+function STDDEV(s,p){ const o=new Array(s.length).fill(null); for(let i=p-1;i<s.length;i++){ let m=0; for(let j=i-p+1;j<=i;j++) m+=s[j]; m/=p; let v=0; for(let j=i-p+1;j<=i;j++) v+=(s[j]-m)**2; o[i]=Math.sqrt(v/p); } return o; }
+function BBANDS(s,p,k){ const m=SMA(s,p), sd=STDDEV(s,p); return { mid:m, up:m.map((v,i)=>v==null?null:v+k*sd[i]), lo:m.map((v,i)=>v==null?null:v-k*sd[i]) }; }
+function MACD(s,f,sl,sig){ const ef=EMA(s,f), es=EMA(s,sl); const macd=ef.map((v,i)=>(v==null||es[i]==null)?null:v-es[i]); const sa=new Array(s.length).fill(null); const k=2/(sig+1); let prev=null, c=0; for(let i=0;i<macd.length;i++){ if(macd[i]==null) continue; c++; if(c<sig) continue; if(c===sig){ let x=0; for(let j=i-sig+1;j<=i;j++) x+=macd[j]; prev=x/sig; sa[i]=prev; } else { prev=macd[i]*k+prev*(1-k); sa[i]=prev; } } return { macd, sig:sa, hist: macd.map((v,i)=>(v==null||sa[i]==null)?null:v-sa[i]) }; }
+function RSI(s,p){ const o=new Array(s.length).fill(null); let g=0,l=0; for(let i=1;i<s.length;i++){ const d=s[i]-s[i-1]; const x=d>0?d:0, y=d<0?-d:0; if(i<=p){ g+=x; l+=y; if(i===p){ g/=p; l/=p; o[i]=l===0?100:100-100/(1+g/l); } } else { g=(g*(p-1)+x)/p; l=(l*(p-1)+y)/p; o[i]=l===0?100:100-100/(1+g/l); } } return o; }
+function KD(h,l,c,kp,ksm,dsm){ const rsv=new Array(c.length).fill(null); for(let i=kp-1;i<c.length;i++){ let hh=-Infinity,ll=Infinity; for(let j=i-kp+1;j<=i;j++){ if(h[j]>hh) hh=h[j]; if(l[j]<ll) ll=l[j]; } rsv[i]=hh===ll?50:((c[i]-ll)/(hh-ll))*100; } const sn=(a,p)=>{ const o=new Array(a.length).fill(null); for(let i=0;i<a.length;i++){ let s=0,c2=0; for(let j=Math.max(0,i-p+1);j<=i;j++){ if(a[j]!=null){ s+=a[j]; c2++; } } if(c2===p) o[i]=s/p; } return o; }; const K=sn(rsv,ksm), D=sn(K,dsm); return {K,D}; }
+function OBV(c,v){ const o=new Array(c.length).fill(0); for(let i=1;i<c.length;i++){ o[i]= c[i]>c[i-1] ? o[i-1]+v[i] : c[i]<c[i-1] ? o[i-1]-v[i] : o[i-1]; } return o; }
+function ATR(h,l,c,p){ const tr=new Array(c.length).fill(null); for(let i=0;i<c.length;i++){ tr[i]= i===0 ? h[i]-l[i] : Math.max(h[i]-l[i], Math.abs(h[i]-c[i-1]), Math.abs(l[i]-c[i-1])); } const o=new Array(c.length).fill(null); let prev=null; for(let i=0;i<c.length;i++){ if(i===p-1){ let s=0; for(let j=0;j<p;j++) s+=tr[j]; prev=s/p; o[i]=prev; } else if(i>=p){ prev=(prev*(p-1)+tr[i])/p; o[i]=prev; } } return o; }
+
+/* ════════════════════════════════════════════════════════════════
+   4.  Build the full data dictionary
+   ════════════════════════════════════════════════════════════════ */
+let DATA_FULL = null;
+function _rawFor(sym, fb){try{if(window.VIA_REAL&&sym&&VIA_REAL[sym]){var R=VIA_REAL[sym];if(R.close&&R.close.length)return {date:R.date,open:R.open||R.close,high:R.high||R.close,low:R.low||R.close,close:R.close,volume:R.volume||R.close.map(function(){return 0;})};}}catch(e){}return fb;}
+function buildData(){
+  const raw = _rawFor((window.RUNTIME&&RUNTIME.context&&RUNTIME.context.ticker)||'2330.TW', genOHLCV(500, 20260520, 980));
+  const close = ffill(raw.close), high=ffill(raw.high), low=ffill(raw.low), open=ffill(raw.open), vol=ffill(raw.volume);
+  const adj = close;  // demo: ADJ ≡ close
+
+  // MA & BB
+  const ma5=SMA(adj,5), ma10=SMA(adj,10), ma20=SMA(adj,20), ma60=SMA(adj,60), ma120=SMA(adj,120), ma240=SMA(adj,240);
+  const ema10=EMA(adj,10), ema20=EMA(adj,20), ema60=EMA(adj,60), ema120=EMA(adj,120), ema240=EMA(adj,240);
+  const bb = BBANDS(adj,20,2);
+  const volMA20 = SMA(vol,20);
+
+  // YTM (year-to-date mean of ADJ)
+  const ytm = new Array(adj.length).fill(null);
+  let curY=null, s=0, c=0;
+  for(let i=0;i<adj.length;i++){ const y=raw.date[i].slice(0,4); if(y!==curY){ curY=y; s=0; c=0; } s+=adj[i]; c++; ytm[i]=s/c; }
+
+  // Oscillators
+  const macd = MACD(adj,12,26,9);
+  const rsi  = RSI(adj,14);
+  const kd   = KD(high,low,close,9,3,3);
+  const obv  = OBV(adj,vol);
+  const atr  = ATR(high,low,close,14);
+  const natr = atr.map((v,i)=>v==null?null:(v/adj[i])*100);
+
+  // Synthetic TW microstructure (deterministic)
+  const rng2 = mulberry32(31415926);
+  const n = adj.length;
+  const foreign_net = [], trust_net = [], dealer_net = [], total_net = [];
+  const foreign_holding=[], trust_holding=[], dealer_holding=[];
+  let fH=70, tH=5, dH=2;
+  for(let i=0;i<n;i++){
+    const fn = Math.round((rng2()-0.5)*30000);
+    const tn = Math.round((rng2()-0.5)*8000);
+    const dn = Math.round((rng2()-0.5)*5000);
+    foreign_net.push(fn); trust_net.push(tn); dealer_net.push(dn); total_net.push(fn+tn+dn);
+    fH += (rng2()-0.5)*0.15; tH += (rng2()-0.5)*0.05; dH += (rng2()-0.5)*0.03;
+    foreign_holding.push(+fH.toFixed(3)); trust_holding.push(+tH.toFixed(3)); dealer_holding.push(+dH.toFixed(3));
+  }
+  // Margin/short balances
+  const margin_balance=[], short_balance=[], short_margin_ratio=[], maintenance_ratio=[];
+  let mb=30000, sb=4500, smr=10, mr=155;
+  for(let i=0;i<n;i++){
+    mb += (rng2()-0.5)*120; sb += (rng2()-0.5)*55; smr += (rng2()-0.5)*0.18; mr += (rng2()-0.5)*0.45;
+    margin_balance.push(+mb.toFixed(0)); short_balance.push(+sb.toFixed(0));
+    short_margin_ratio.push(+smr.toFixed(2)); maintenance_ratio.push(+mr.toFixed(2));
+  }
+  // Futures + day trade
+  const taiex_or_tx_price=[], foreign_net_oi=[], foreign_long_short_diff=[];
+  let tx=21000, fnoi=0, flsd=0;
+  for(let i=0;i<n;i++){
+    tx += (rng2()-0.5)*80; fnoi += Math.round((rng2()-0.5)*2200); flsd += Math.round((rng2()-0.5)*1100);
+    taiex_or_tx_price.push(+tx.toFixed(2)); foreign_net_oi.push(fnoi); foreign_long_short_diff.push(flsd);
+  }
+  const daytrade_ratio=[], daytrade_value=[];
+  let dtr=22, dtv=120;
+  for(let i=0;i<n;i++){
+    dtr = Math.max(5, Math.min(70, dtr + (rng2()-0.5)*0.25));
+    dtv = Math.max(15, dtv + (rng2()-0.5)*4);
+    daytrade_ratio.push(+dtr.toFixed(2)); daytrade_value.push(+(dtv*1e8).toFixed(0));
+  }
+  // Normalized peer series — only main bench needed (^TWII default)
+  function synthSeries(seed, sigma, drift){
+    const r=mulberry32(seed); const out=[1000]; for(let i=1;i<n;i++){ out.push(out[i-1]*(1+drift+(r()-0.5)*sigma)); } return out;
+  }
+  const twiiRaw  = synthSeries(22222, 0.011, 0.00028);
+  const gspcRaw  = synthSeries(44444, 0.009, 0.00040);
+  const benchRaw = twiiRaw;  // legacy alias, used by HV/beta default at build time
+
+  // Risk-free rate yields (as %, monthly synthetic)
+  function synthYield(seed, base, vol){
+    const r=mulberry32(seed); const out=[base];
+    for(let i=1;i<n;i++){ out.push(Math.max(0.1, out[i-1] + (r()-0.5)*vol)); }
+    return out.map(x => +x.toFixed(3));
+  }
+  const tw10y = synthYield(55555, 1.45, 0.025);
+  const us10y = synthYield(66666, 4.20, 0.045);
+
+  // Drawdown of ADJ
+  const drawdown = new Array(n).fill(0);
+  let peak = adj[0];
+  for(let i=0;i<n;i++){ if(adj[i]>peak) peak=adj[i]; drawdown[i] = ((adj[i]-peak)/peak)*100; }
+
+  // Rolling HV — sample stdev (N-1) per industry convention, annualized
+  function HV(p){
+    const ret = adj.map((v,i)=> i===0?0:Math.log(v/adj[i-1]));
+    const o = new Array(n).fill(null);
+    for(let i=p;i<n;i++){
+      let m=0; for(let j=i-p+1;j<=i;j++) m+=ret[j]; m/=p;
+      let v=0; for(let j=i-p+1;j<=i;j++) v+=(ret[j]-m)**2;
+      o[i] = Math.sqrt(v/(p-1))*Math.sqrt(252)*100;
+    }
+    return o;
+  }
+  const HV_20 = HV(20), HV_60 = HV(60);
+
+  // Rolling Sharpe (60) — sample stdev, annualized, dynamic risk-free
+  // Computes two arrays (TW10Y-based + US10Y-based); render picks based on RUNTIME.view_state.risk_free
+  function SHARPE(p, rfSeries){
+    // rfSeries: annual yield in %. Convert to daily: (1+rf%)^(1/252) - 1 ≈ rf%/252
+    const ret = adj.map((v,i)=> i===0?0:Math.log(v/adj[i-1]));
+    const o = new Array(n).fill(null);
+    for(let i=p;i<n;i++){
+      let m=0; for(let j=i-p+1;j<=i;j++) m+=ret[j]; m/=p;
+      let v=0; for(let j=i-p+1;j<=i;j++) v+=(ret[j]-m)**2;
+      const sd = Math.sqrt(v/(p-1));
+      let rfWindow = 0;
+      for(let j=i-p+1;j<=i;j++) rfWindow += (rfSeries[j]||0);
+      rfWindow = (rfWindow/p) / 100 / 252;     // annual % → daily decimal
+      o[i] = sd === 0 ? null : ((m - rfWindow) / sd) * Math.sqrt(252);
+    }
+    return o;
+  }
+  const sharpe_60_TW = SHARPE(60, tw10y);
+  const sharpe_60_US = SHARPE(60, us10y);
+
+  // ───── ETF / Stock fund-flow methodology (per fund_flow_calculation_methodology.png) ─────
+  // TIER-1: dollar_vol = close × volume
+  // M1: dvol_ma5, dvol_ma20, dvol_ratio = dollar_vol / dvol_ma20
+  // M2: PV signal — ret_1d & vol_chg → INFLOW / OUTFLOW / NEUTRAL
+  // M3: rs_vs_bench, rs_ma10, rs_trend (stock vs ^TWII default)
+  const dollar_vol = adj.map((v,i)=> v * vol[i]);
+  function _sma(arr, p){
+    const o = new Array(arr.length).fill(null);
+    let s = 0;
+    for (let i=0;i<arr.length;i++){
+      s += arr[i];
+      if (i >= p) s -= arr[i-p];
+      if (i >= p-1) o[i] = s / p;
+    }
+    return o;
+  }
+  const dvol_ma5  = _sma(dollar_vol, 5);
+  const dvol_ma20 = _sma(dollar_vol, 20);
+  const dvol_ratio = dollar_vol.map((v,i)=> dvol_ma20[i] && dvol_ma20[i] > 0 ? +(v / dvol_ma20[i]).toFixed(3) : null);
+
+  // M2 — PV Divergence (-1=OUTFLOW, 0=NEUTRAL, +1=INFLOW)
+  const pv_signal_code = new Array(n).fill(0);
+  for (let i=1;i<n;i++){
+    const ret_1d = (adj[i] / adj[i-1]) - 1;
+    const vol_chg = vol[i-1] > 0 ? (vol[i] / vol[i-1]) - 1 : 0;
+    if (ret_1d > 0 && vol_chg > 0.2)      pv_signal_code[i] = +1;
+    else if (ret_1d < 0 && vol_chg > 0.2) pv_signal_code[i] = -1;
+    else                                   pv_signal_code[i] = 0;
+  }
+
+  // M3 — RS Flow (stock vs ^TWII benchmark)
+  const rs_vs_bench = adj.map((v,i)=> (twiiRaw[i] > 0 && twiiRaw[0] > 0) ? +((v / adj[0]) / (twiiRaw[i] / twiiRaw[0])).toFixed(4) : null);
+  const rs_ma10 = _sma(rs_vs_bench.map(v=>v||0), 10);
+  const rs_trend = rs_ma10.map((v,i)=> (i >= 5 && v != null && rs_ma10[i-5] != null) ? +(v - rs_ma10[i-5]).toFixed(4) : null);
+
+  // Beta/corr vs benchmark (60D rolling)
+  function ret1(a){ const r=new Array(a.length).fill(0); for(let i=1;i<a.length;i++) r[i]=a[i]/a[i-1]-1; return r; }
+  const r1 = ret1(adj), r2 = ret1(benchRaw);
+  function rollBetaCorr(p){
+    const beta=new Array(n).fill(null), corr=new Array(n).fill(null);
+    for(let i=p;i<n;i++){
+      let mx=0, my=0; for(let j=i-p+1;j<=i;j++){ mx+=r1[j]; my+=r2[j]; } mx/=p; my/=p;
+      let cov=0, vx=0, vy=0;
+      for(let j=i-p+1;j<=i;j++){ const dx=r1[j]-mx, dy=r2[j]-my; cov+=dx*dy; vx+=dx*dx; vy+=dy*dy; }
+      cov/=p; vx/=p; vy/=p;
+      beta[i] = vy===0 ? null : cov/vy;
+      corr[i] = (vx===0||vy===0) ? null : cov/Math.sqrt(vx*vy);
+    }
+    return { beta, corr };
+  }
+  const bc = rollBetaCorr(60);
+
+  return {
+    date: raw.date,
+    open, high, low, close, volume:vol, adj,
+    MA5:ma5, MA10:ma10, MA20:ma20, MA60:ma60, MA120:ma120, MA240:ma240,
+    EMA10:ema10, EMA20:ema20, EMA60:ema60, EMA120:ema120, EMA240:ema240,
+    BB_UP:bb.up, BB_MID:bb.mid, BB_LO:bb.lo,
+    YTM:ytm, volume_MA20:volMA20,
+    MACD:macd.macd, MACD_signal:macd.sig, MACD_hist:macd.hist,
+    RSI:rsi, K:kd.K, D:kd.D, OBV:obv, ATR:atr, NATR:natr,
+    foreign_net, trust_net, dealer_net, total_net,
+    foreign_holding, trust_holding, dealer_holding,
+    margin_balance, short_balance, short_margin_ratio, maintenance_ratio,
+    taiex_or_tx_price, foreign_net_oi, foreign_long_short_diff,
+    daytrade_ratio, daytrade_value,
+    _twiiRaw: twiiRaw, _gspcRaw: gspcRaw, _benchRaw: benchRaw,
+    _tw10y: tw10y, _us10y: us10y,
+    HV_20, HV_60, drawdown,
+    sharpe_60_TW, sharpe_60_US,
+    dollar_vol, dvol_ma5, dvol_ma20, dvol_ratio, pv_signal_code, rs_vs_bench, rs_ma10, rs_trend,
+    beta_60: bc.beta, corr_60: bc.corr,
+    // yfinance .info Analyst Consensus (synthetic demo)
+    info: (() => {
+      const last = adj[adj.length-1];
+      const mean = +(last * (1 + (rng2()-0.5) * 0.25)).toFixed(2);
+      const high = +(mean * (1 + 0.10 + rng2() * 0.10)).toFixed(2);
+      const low  = +(mean * (1 - 0.10 - rng2() * 0.10)).toFixed(2);
+      const recMean = +(1.5 + rng2() * 2.5).toFixed(2);  // 1.0-5.0
+      const keys = ['strongBuy','buy','hold','sell','strongSell'];
+      const recKey = keys[Math.min(4, Math.floor((recMean - 1) / 1.0))];
+      return {
+        targetMeanPrice:         mean,
+        targetHighPrice:         high,
+        targetLowPrice:          low,
+        numberOfAnalystOpinions: 14 + Math.floor(rng2() * 22),
+        recommendationMean:      recMean,
+        recommendationKey:       recKey
+      };
+    })()
+  };
+}
+
+/* normalize series helper (base date → 100) */
+function normalizeTo(series, baseIdx){
+  const base = series[baseIdx];
+  if (base == null || base === 0) return series.map(()=>null);
+  return series.map(v => v==null ? null : (v/base)*100);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   5.  Panel resolution (schema + runtime → ordered visible list)
+   ════════════════════════════════════════════════════════════════ */
+function resolvePanels(filter){
+  // filter: 'top' = K+Vol only (FIXED group), 'bottom' = everything else, undefined = all
+  const defs = {}; SCHEMA.panel_definitions.forEach(p => defs[p.id] = p);
+  const ordered = [];
+  RUNTIME.panel_order.forEach(pid => {
+    const def = defs[pid];
+    const state = RUNTIME.panel_state[pid] || {};
+    if (!def || state.visible === false) return;
+    if (filter === 'top'    && def.group !== 'FIXED') return;
+    if (filter === 'bottom' && def.group === 'FIXED') return;
+    ordered.push({ def, state });
+  });
+  return ordered;
+}
+function resolveHeights(panels){
+  const w = panels.map(({def,state}) => {
+    if (state.expanded === false) return 0.22;
+    const ov = state.height_weight_override;
+    return ov != null ? ov : def.height_weight;
+  });
+  const sum = w.reduce((a,b)=>a+b,0);
+  return w.map(x => x/sum);
+}
+function computeDomains(heights, gap){
+  // top-down stack: first panel at top of paper
+  const n = heights.length;
+  const totalGap = gap * (n-1);
+  const usable = 1 - totalGap;
+  const sizes = heights.map(h => h*usable);
+  const domains = [];
+  let top = 1;
+  for (let i=0;i<n;i++){
+    const bot = top - sizes[i];
+    domains.push([Math.max(0,bot), top]);
+    top = bot - gap;
+  }
+  return domains;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   6.  Trace factories
+   ════════════════════════════════════════════════════════════════ */
+function colorAdjust(c, alpha){
+  // hex #rrggbb → rgba
+  const r = parseInt(c.slice(1,3),16), g=parseInt(c.slice(3,5),16), b=parseInt(c.slice(5,7),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+// Render any 1-D series as line / area / bar based on dock-selected kind
+function kindTrace(x, y, col, name, xAxis, yAxis, kind, opts={}){
+  if (kind === 'bar' || kind === 'stack-bar'){
+    return {
+      type:'bar', x, y, name, xaxis:xAxis, yaxis:yAxis,
+      marker:{ color: col, opacity: opts.opacity ?? 0.8, line:{width:0} },
+      showlegend:false,
+      hovertemplate: `${name}: %{y:,.${opts.precision ?? 2}f}<extra></extra>`
+    };
+  }
+  if (kind === 'area'){
+    return {
+      type:'scatter', mode:'lines', x, y, name,
+      xaxis:xAxis, yaxis:yAxis,
+      line:{ color: col, width: opts.width || 1.2, dash: opts.dash || 'solid' },
+      fill:'tozeroy', fillcolor: colorAdjust(col, 0.16),
+      connectgaps:true, showlegend:false,
+      hovertemplate: `${name}: %{y:.${opts.precision ?? 2}f}<extra></extra>`
+    };
+  }
+  // default: line
+  return {
+    type:'scatter', mode:'lines', x, y, name,
+    xaxis:xAxis, yaxis:yAxis,
+    line:{ color: col, width: opts.width || 1.2, dash: opts.dash || 'solid' },
+    connectgaps:true, showlegend:false,
+    hovertemplate: `${name}: %{y:.${opts.precision ?? 2}f}<extra></extra>`,
+    fill: opts.fill || undefined,
+    fillcolor: opts.fillcolor || undefined
+  };
+}
+
+function lineTrace(x,y,col,name,xAxis,yAxis,opts={}){
+  return {
+    type:'scatter', mode:'lines', x, y, name,
+    xaxis:xAxis, yaxis:yAxis,
+    line:{ color: col, width: opts.width || 1.2, dash: opts.dash || 'solid' },
+    connectgaps:true, showlegend:false,
+    hovertemplate: `${name}: %{y:.${opts.precision ?? 2}f}<extra></extra>`,
+    fill: opts.fill || undefined,
+    fillcolor: opts.fillcolor || undefined
+  };
+}
+function barTrace(x,y,colors,name,xAxis,yAxis,opts={}){
+  return {
+    type:'bar', x, y, name, xaxis:xAxis, yaxis:yAxis,
+    marker:{ color: colors, opacity: opts.opacity ?? 0.8, line:{width:0} },
+    showlegend:false,
+    hovertemplate: `${name}: %{y:,.0f}<extra></extra>`
+  };
+}
+
+/* For each panel-id, return array of Plotly traces (+ shapes/annotations) */
+function buildPanelTraces(panel, D, xAxis, yAxis, yAxis2, S, R){
+  const x = D.date;
+  const t = SCHEMA.style_tokens;
+  const traces = [];
+  const shapes = [];
+
+  switch(panel.def.chart_type){
+
+    case 'candlestick_overlay': {
+      const pid = panel.def.id;
+      const prefs = R.trace_preferences.price_main;
+      // BB fill (under candle) — only if BB on
+      if (prefs.show_BBANDS && fieldOn(pid,'BBANDS')){
+        traces.push({
+          type:'scatter', mode:'lines',
+          x: x.concat(x.slice().reverse()),
+          y: D.BB_UP.concat(D.BB_LO.slice().reverse()),
+          xaxis:xAxis, yaxis:yAxis,
+          fill:'toself', fillcolor:'rgba(122,109,170,0.08)',
+          line:{width:0}, hoverinfo:'skip', showlegend:false, name:'BB area'
+        });
+      }
+      // Candlestick (always on)
+      if (fieldOn(pid,'candlestick')){
+        traces.push({
+          type:'candlestick', x, open:D.open, high:D.high, low:D.low, close:D.close,
+          increasing:{ line:{ color:t.price_colors.up, width:1.2 }, fillcolor: colorAdjust(t.price_colors.up, 0.85) },
+          decreasing:{ line:{ color:t.price_colors.down, width:1.2 }, fillcolor: colorAdjust(t.price_colors.down, 0.85) },
+          whiskerwidth: 0.4, xaxis:xAxis, yaxis:yAxis, showlegend:false, name:'OHLC',
+          hovertext: x.map((d,i)=>`${d}<br>O ${D.open[i]?.toFixed(2)}  H ${D.high[i]?.toFixed(2)}<br>L ${D.low[i]?.toFixed(2)}  C ${D.close[i]?.toFixed(2)}`),
+          hoverinfo:'text'
+        });
+      }
+      // SMAs
+      const maCfg = [
+        ['MA5',   prefs.show_MA5,   t.moving_average_colors.MA5,   1.0],
+        ['MA10',  prefs.show_MA10,  t.moving_average_colors.MA10,  1.0],
+        ['MA20',  prefs.show_MA20,  t.moving_average_colors.MA20,  1.2],
+        ['MA60',  prefs.show_MA60,  t.moving_average_colors.MA60,  1.4],
+        ['MA120', prefs.show_MA120, t.moving_average_colors.MA120, 1.4],
+        ['MA240', prefs.show_MA240, t.moving_average_colors.MA240, 1.6]
+      ];
+      maCfg.forEach(([k,on,col,w])=>{
+        if (on && fieldOn(pid,k)){
+          traces.push(kindTrace(x, D[k], col, k, xAxis, yAxis, fieldKind(pid,k,'line'), {width:w}));
+        }
+      });
+      // EMAs (per spec: Adj Close, periods [10,20,60,120,240], shift=0)
+      const emaCfg = [
+        ['EMA10',  prefs.show_EMA10,  t.moving_average_colors.MA10,  1.0],
+        ['EMA20',  prefs.show_EMA20,  t.moving_average_colors.MA20,  1.2],
+        ['EMA60',  prefs.show_EMA60,  t.moving_average_colors.MA60,  1.4],
+        ['EMA120', prefs.show_EMA120, t.moving_average_colors.MA120, 1.4],
+        ['EMA240', prefs.show_EMA240, t.moving_average_colors.MA240, 1.6]
+      ];
+      emaCfg.forEach(([k,on,col,w])=>{
+        if (on){
+          traces.push(kindTrace(x, D[k], col, k, xAxis, yAxis, 'line', {width:w, dash:'dot'}));
+        }
+      });
+      // BB lines (always lines)
+      if (prefs.show_BBANDS && fieldOn(pid,'BBANDS')){
+        traces.push(lineTrace(x, D.BB_UP, 'rgba(122,109,170,0.55)', 'BB up', xAxis, yAxis, {dash:'dot', width:1}));
+        traces.push(lineTrace(x, D.BB_MID,'rgba(122,109,170,0.55)', 'BB mid',xAxis, yAxis, {dash:'dot', width:1}));
+        traces.push(lineTrace(x, D.BB_LO, 'rgba(122,109,170,0.55)', 'BB lo', xAxis, yAxis, {dash:'dot', width:1}));
+      }
+      // YTM (kept as a global pref, no separate field row)
+      if (prefs.show_YTM){
+        traces.push(lineTrace(x, D.YTM, 'rgba(107,104,96,0.85)', 'YTM', xAxis, yAxis, {dash:'dash', width:1}));
+      }
+      break;
+    }
+
+    case 'bar_plus_line': {
+      const pid = panel.def.id;
+      // Per spec: volume bar color matches its candle body color
+      const cols = D.close.map((c,i)=> c >= D.open[i] ? t.price_colors.up : t.price_colors.down);
+      if (fieldOn(pid,'volume')){
+        const k = fieldKind(pid,'volume','bar');
+        if (k === 'bar'){
+          traces.push(barTrace(x, D.volume, cols, 'volume', xAxis, yAxis));
+        } else {
+          // area / line uses up-color globally; bar coloring not meaningful in line mode
+          traces.push(kindTrace(x, D.volume, t.price_colors.up, 'volume', xAxis, yAxis, k, {precision:0}));
+        }
+      }
+      if (fieldOn(pid,'volume_MA20')){
+        traces.push(kindTrace(x, D.volume_MA20, '#6b6860', 'vol MA20', xAxis, yAxis, fieldKind(pid,'volume_MA20','line'), {width:1, precision:0}));
+      }
+      break;
+    }
+
+    case 'line_plus_histogram': {
+      const pid = panel.def.id;
+      // MACD hist: per spec, ≥0 red / <0 green (TW inversion, fixed)
+      if (fieldOn(pid,'MACD_hist')){
+        const k = fieldKind(pid,'MACD_hist','bar');
+        if (k === 'bar'){
+          const histCol = D.MACD_hist.map(v => v==null ? 'rgba(0,0,0,0)' : (v>=0 ? t.price_colors.up : t.price_colors.down));
+          traces.push(barTrace(x, D.MACD_hist, histCol, 'MACD hist', xAxis, yAxis, {opacity:0.55}));
+        } else {
+          traces.push(kindTrace(x, D.MACD_hist, '#c96b5a', 'MACD hist', xAxis, yAxis, k, {precision:3}));
+        }
+      }
+      if (fieldOn(pid,'MACD')){
+        traces.push(kindTrace(x, D.MACD, '#4c78a8', 'MACD', xAxis, yAxis, fieldKind(pid,'MACD','line'), {width:1.3, precision:3}));
+      }
+      if (fieldOn(pid,'MACD_signal')){
+        traces.push(kindTrace(x, D.MACD_signal, '#c4943a', 'signal', xAxis, yAxis, fieldKind(pid,'MACD_signal','line'), {width:1.3, precision:3}));
+      }
+      shapes.push({ type:'line', xref:xAxis.replace('x','x'), yref:yAxis.replace('y','y'), x0:x[0], x1:x[x.length-1], y0:0, y1:0, line:{color:'rgba(0,0,0,0.18)', width:1}});
+      break;
+    }
+
+    case 'multi_line': {
+      const pid = panel.def.id;
+      if (pid === 'rsi_kd'){
+        if (fieldOn(pid,'RSI')) traces.push(kindTrace(x, D.RSI, '#439a9a', 'RSI(14)', xAxis, yAxis, fieldKind(pid,'RSI','line'), {width:1.4}));
+        if (fieldOn(pid,'K'))   traces.push(kindTrace(x, D.K,   '#c96b5a', '%K',      xAxis, yAxis, fieldKind(pid,'K','line'),   {width:1.2}));
+        if (fieldOn(pid,'D'))   traces.push(kindTrace(x, D.D,   '#4c78a8', '%D',      xAxis, yAxis, fieldKind(pid,'D','line'),   {width:1.2}));
+      } else if (pid === 'inst_holding'){
+        if (fieldOn(pid,'foreign_holding')) traces.push(kindTrace(x, D.foreign_holding, '#4c78a8', '外資持股%', xAxis, yAxis, fieldKind(pid,'foreign_holding','line'), {width:1.3, precision:2}));
+        if (fieldOn(pid,'trust_holding'))   traces.push(kindTrace(x, D.trust_holding,   '#c96b5a', '投信持股%', xAxis, yAxis, fieldKind(pid,'trust_holding','line'),   {width:1.3, precision:2}));
+      } else {
+        panel.def.axes.left.forEach((f,i)=>{
+          if (!fieldOn(pid,f)) return;
+          traces.push(kindTrace(x, D[f], ['#4c78a8','#c96b5a','#7a6daa','#c4943a'][i%4], f, xAxis, yAxis, fieldKind(pid,f,'line')));
+        });
+      }
+      break;
+    }
+
+    case 'line': {
+      const pid = panel.def.id;
+      if (pid === 'obv'){
+        if (fieldOn(pid,'OBV')){
+          const k = fieldKind(pid,'OBV','area');
+          if (k === 'area'){
+            traces.push(lineTrace(x, D.OBV, '#7a6daa', 'OBV', xAxis, yAxis, {width:1.3, precision:0, fill:'tozeroy', fillcolor:'rgba(122,109,170,0.10)'}));
+          } else {
+            traces.push(kindTrace(x, D.OBV, '#7a6daa', 'OBV', xAxis, yAxis, k, {width:1.3, precision:0}));
+          }
+        }
+      } else if (pid === 'atr_natr'){
+        if (fieldOn(pid,'ATR'))  traces.push(kindTrace(x, D.ATR,  '#c4943a', 'ATR(14)', xAxis, yAxis, fieldKind(pid,'ATR','line'),  {width:1.3}));
+        if (fieldOn(pid,'NATR')) traces.push(kindTrace(x, D.NATR, '#c96b5a', 'NATR(%)', xAxis, yAxis, fieldKind(pid,'NATR','line'), {width:1.2}));
+      } else {
+        panel.def.axes.left.forEach(f => {
+          if (!fieldOn(pid,f)) return;
+          traces.push(kindTrace(x, D[f], '#4c78a8', f, xAxis, yAxis, fieldKind(pid,f,'line')));
+        });
+      }
+      break;
+    }
+
+    case 'sharpe_line': {
+      // Dynamic Sharpe based on selected risk-free rate
+      const useUS = R.view_state.risk_free === 'US10Y';
+      const arr = useUS ? D.sharpe_60_US : D.sharpe_60_TW;
+      const rfLabel = useUS ? 'US10Y' : 'TW10Y';
+      // Color line conditionally by sign: green/red around zero
+      traces.push({
+        type:'scatter', mode:'lines', x, y:arr,
+        name:`Sharpe vs ${rfLabel}`, xaxis:xAxis, yaxis:yAxis,
+        line:{ color:'#7a6daa', width:1.4 },
+        fill:'tozeroy', fillcolor:'rgba(122,109,170,0.10)',
+        hovertemplate:`Sharpe (60d, ann., RF=${rfLabel}) %{y:.3f}<extra></extra>`,
+        showlegend:false
+      });
+      // Zero line dashed
+      shapes.push({ type:'line', xref:xAxis.replace('x','x'), yref:yAxis.replace('y','y'),
+                    x0:x[0], x1:x[x.length-1], y0:0, y1:0,
+                    line:{color:'rgba(0,0,0,0.30)', width:1, dash:'dot'}});
+      // Reference at +1 and +2 (typical thresholds)
+      shapes.push({ type:'line', xref:xAxis.replace('x','x'), yref:yAxis.replace('y','y'),
+                    x0:x[0], x1:x[x.length-1], y0:1, y1:1,
+                    line:{color:'rgba(90,158,111,0.35)', width:1, dash:'dot'}});
+      shapes.push({ type:'line', xref:xAxis.replace('x','x'), yref:yAxis.replace('y','y'),
+                    x0:x[0], x1:x[x.length-1], y0:2, y1:2,
+                    line:{color:'rgba(90,158,111,0.50)', width:1, dash:'dot'}});
+      break;
+    }
+
+    case 'dollar_vol_panel': {
+      // M1: Dollar Volume bars + 20-day MA line on LEFT axis; dvol_ratio line on RIGHT axis
+      // Bars colored by close direction: up = TW red, down = TW green; alpha 0.7
+      const colors = D.dollar_vol.map((v,i)=>{
+        if (v == null) return 'rgba(0,0,0,0)';
+        const up = i > 0 && D.adj[i] >= D.adj[i-1];
+        return up ? 'rgba(201,107,90,0.7)' : 'rgba(90,158,111,0.7)';
+      });
+      traces.push({
+        type:'bar', x, y:D.dollar_vol, name:'Dollar Vol', xaxis:xAxis, yaxis:yAxis,
+        marker:{ color: colors, line:{width:0} },
+        showlegend:false,
+        hovertemplate:'$Vol %{y:,.0f}<extra></extra>'
+      });
+      if (D.dvol_ma20){
+        traces.push({
+          type:'scatter', mode:'lines', x, y:D.dvol_ma20,
+          name:'MA20', xaxis:xAxis, yaxis:yAxis,
+          line:{ color:'#7a6daa', width:1.3, dash:'solid' },
+          showlegend:false,
+          hovertemplate:'MA20 $Vol %{y:,.0f}<extra></extra>'
+        });
+      }
+      // dvol_ratio on right axis with 2x reference line
+      traces.push({
+        type:'scatter', mode:'lines', x, y:D.dvol_ratio,
+        name:'量倍 (dvol/MA20)', xaxis:xAxis, yaxis:yAxis2,
+        line:{ color:'#c4943a', width:1.4 },
+        showlegend:false,
+        hovertemplate:'量倍 %{y:.2f}x<extra></extra>'
+      });
+      shapes.push({
+        type:'line', xref:xAxis.replace('x','x'), yref:yAxis2.replace('y','y'),
+        x0:x[0], x1:x[x.length-1], y0:2, y1:2,
+        line:{ color:'rgba(196,148,58,0.5)', width:1, dash:'dot' }
+      });
+      shapes.push({
+        type:'line', xref:xAxis.replace('x','x'), yref:yAxis2.replace('y','y'),
+        x0:x[0], x1:x[x.length-1], y0:1, y1:1,
+        line:{ color:'rgba(0,0,0,0.25)', width:1, dash:'dot' }
+      });
+      break;
+    }
+
+    case 'pv_signal_panel': {
+      // M2: PV Divergence — colored bars at ±1 / 0 per day
+      // +1 INFLOW (red ↑), -1 OUTFLOW (green ↓), 0 NEUTRAL (subtle gray)
+      const colors = D.pv_signal_code.map(v =>
+        v === 1  ? 'rgba(201,107,90,0.85)' :
+        v === -1 ? 'rgba(90,158,111,0.85)' :
+                   'rgba(160,155,145,0.30)'
+      );
+      const labels = D.pv_signal_code.map(v => v === 1 ? 'INFLOW' : v === -1 ? 'OUTFLOW' : 'NEUTRAL');
+      traces.push({
+        type:'bar', x, y:D.pv_signal_code, name:'PV Signal', xaxis:xAxis, yaxis:yAxis,
+        marker:{ color: colors, line:{width:0} },
+        customdata: labels,
+        showlegend:false,
+        hovertemplate:'%{customdata}<br>code %{y}<extra></extra>'
+      });
+      shapes.push({
+        type:'line', xref:xAxis.replace('x','x'), yref:yAxis.replace('y','y'),
+        x0:x[0], x1:x[x.length-1], y0:0, y1:0,
+        line:{ color:'rgba(0,0,0,0.30)', width:1 }
+      });
+      break;
+    }
+
+    case 'rs_flow_panel': {
+      // M3: RS Flow vs ^TWII benchmark
+      // LEFT: rs_vs_bench (raw ratio) + rs_ma10 (smoothed)
+      // RIGHT: rs_trend (MA10 momentum = rs_ma10 - rs_ma10.shift(5))
+      traces.push({
+        type:'scatter', mode:'lines', x, y:D.rs_vs_bench,
+        name:'RS vs ^TWII', xaxis:xAxis, yaxis:yAxis,
+        line:{ color:'#4c78a8', width:1.2 },
+        showlegend:false,
+        hovertemplate:'RS %{y:.4f}<extra></extra>'
+      });
+      traces.push({
+        type:'scatter', mode:'lines', x, y:D.rs_ma10,
+        name:'RS MA10', xaxis:xAxis, yaxis:yAxis,
+        line:{ color:'#1e1d1a', width:1.6 },
+        showlegend:false,
+        hovertemplate:'RS MA10 %{y:.4f}<extra></extra>'
+      });
+      // RS_trend on right axis (positive = rotating in; negative = rotating out)
+      const trendArr = D.rs_trend || [];
+      const trendColors = trendArr.map(v => v == null ? 'rgba(0,0,0,0)' : (v >= 0 ? 'rgba(201,107,90,0.6)' : 'rgba(90,158,111,0.6)'));
+      traces.push({
+        type:'bar', x, y:trendArr, name:'RS Trend (5d Δ MA10)',
+        xaxis:xAxis, yaxis:yAxis2,
+        marker:{ color: trendColors, line:{width:0} },
+        showlegend:false,
+        hovertemplate:'Δ MA10 %{y:.4f}<extra></extra>'
+      });
+      // Reference line at y=1 on LEFT (parity)
+      shapes.push({
+        type:'line', xref:xAxis.replace('x','x'), yref:yAxis.replace('y','y'),
+        x0:x[0], x1:x[x.length-1], y0:1, y1:1,
+        line:{ color:'rgba(0,0,0,0.25)', width:1, dash:'dot' }
+      });
+      // Zero on right axis
+      shapes.push({
+        type:'line', xref:xAxis.replace('x','x'), yref:yAxis2.replace('y','y'),
+        x0:x[0], x1:x[x.length-1], y0:0, y1:0,
+        line:{ color:'rgba(122,109,170,0.4)', width:1, dash:'dot' }
+      });
+      break;
+    }
+
+    case 'single_inst_bar': {
+      // One panel per inst type (foreign / trust / dealer).
+      // Color is UNIFIED across the three split panels AND the stacked summary:
+      //   外資 = #4c78a8 (bl), 投信 = #c96b5a (co), 自營 = #7a6daa (vi)
+      // Buy bars (positive) alpha=1.0; sell bars (negative) alpha=0.7.
+      const pid = panel.def.id;
+      const mode = R.view_state.inst_flow_mode || 'single';
+      const fieldByPid = {
+        'inst_flow_foreign': { key:'foreign_net', label:'外資',   rgb:'76,120,168' },   // #4c78a8
+        'inst_flow_trust':   { key:'trust_net',   label:'投信',   rgb:'201,107,90' },   // #c96b5a
+        'inst_flow_dealer':  { key:'dealer_net',  label:'自營',   rgb:'122,109,170' }   // #7a6daa
+      };
+      const spec = fieldByPid[pid];
+      if (!spec) break;
+
+      const colorize = (v) => v == null ? 'rgba(0,0,0,0)' : (v >= 0 ? `rgba(${spec.rgb},1.0)` : `rgba(${spec.rgb},0.7)`);
+
+      if (mode === 'cum'){
+        const wins = [
+          { label:'1日',  n:1  }, { label:'3日', n:3 }, { label:'5日', n:5 },
+          { label:'10日', n:10 }, { label:'1個月', n:22 }
+        ];
+        const lastIdx = D.date.length - 1;
+        const xCat = wins.map(w => w.label);
+        const sumLastN = (arr, n) => { let s = 0; for (let i = Math.max(0, lastIdx - n + 1); i <= lastIdx; i++) s += (arr[i] || 0); return s; };
+        const arrY = wins.map(w => sumLastN(D[spec.key], w.n));
+        const totY = wins.map(w => sumLastN(D.foreign_net, w.n) + sumLastN(D.trust_net, w.n) + sumLastN(D.dealer_net, w.n));
+        traces.push({
+          type:'bar', x:xCat, y:arrY, name:spec.label, xaxis:xAxis, yaxis:yAxis,
+          marker:{ color: arrY.map(colorize), line:{width:0} },
+          customdata: totY, showlegend:false,
+          hovertemplate: `${spec.label} %{y:,.0f}<br><span style="color:#999">三家合計 %{customdata:,.0f}</span><extra></extra>`
+        });
+      } else {
+        const arrY = D[spec.key];
+        const totArr = D.foreign_net.map((v,i)=> (v||0) + (D.trust_net[i]||0) + (D.dealer_net[i]||0));
+        traces.push({
+          type:'bar', x, y:arrY, name:spec.label, xaxis:xAxis, yaxis:yAxis,
+          marker:{ color: arrY.map(colorize), line:{width:0} },
+          customdata: totArr, showlegend:false,
+          hovertemplate: `${spec.label} %{y:,.0f}<br><span style="color:#999">三家合計 %{customdata:,.0f}</span><extra></extra>`
+        });
+      }
+      shapes.push({ type:'line', xref:xAxis.replace('x','x'), yref:yAxis.replace('y','y'), x0: (mode==='cum') ? -0.5 : x[0], x1: (mode==='cum') ? 4.5 : x[x.length-1], y0:0, y1:0, line:{color:'rgba(0,0,0,0.30)', width:1}});
+      break;
+    }
+
+    case 'inst_stacked_bar': {
+      // 三大法人合計 stacked bar — same colors as split panels, same alpha rule (buy=1.0, sell=0.7).
+      // Plotly's barmode:'relative' on the figure already handles +/- stacking.
+      const mode = R.view_state.inst_flow_mode || 'single';
+      const series = [
+        { key:'foreign_net', label:'外資', rgb:'76,120,168' },
+        { key:'trust_net',   label:'投信', rgb:'201,107,90' },
+        { key:'dealer_net',  label:'自營', rgb:'122,109,170' }
+      ];
+
+      const totDaily = D.foreign_net.map((v,i)=> (v||0) + (D.trust_net[i]||0) + (D.dealer_net[i]||0));
+
+      if (mode === 'cum'){
+        const wins = [
+          { label:'1日',  n:1  }, { label:'3日', n:3 }, { label:'5日', n:5 },
+          { label:'10日', n:10 }, { label:'1個月', n:22 }
+        ];
+        const lastIdx = D.date.length - 1;
+        const xCat = wins.map(w => w.label);
+        const sumLastN = (arr, n) => { let s = 0; for (let i = Math.max(0, lastIdx - n + 1); i <= lastIdx; i++) s += (arr[i] || 0); return s; };
+        const totY = wins.map(w => sumLastN(D.foreign_net, w.n) + sumLastN(D.trust_net, w.n) + sumLastN(D.dealer_net, w.n));
+        series.forEach((s, idx) => {
+          const arrY = wins.map(w => sumLastN(D[s.key], w.n));
+          const colorize = (v) => v == null ? 'rgba(0,0,0,0)' : (v >= 0 ? `rgba(${s.rgb},1.0)` : `rgba(${s.rgb},0.7)`);
+          const isLast = idx === series.length - 1;
+          traces.push({
+            type:'bar', x:xCat, y:arrY, name:s.label, xaxis:xAxis, yaxis:yAxis,
+            marker:{ color: arrY.map(colorize), line:{width:0} },
+            customdata: totY, showlegend:false,
+            hovertemplate: isLast
+              ? `${s.label} %{y:,.0f}<br><b>合計 %{customdata:,.0f}</b><extra></extra>`
+              : `${s.label} %{y:,.0f}<extra></extra>`
+          });
+        });
+      } else {
+        series.forEach((s, idx) => {
+          const arrY = D[s.key];
+          const colorize = (v) => v == null ? 'rgba(0,0,0,0)' : (v >= 0 ? `rgba(${s.rgb},1.0)` : `rgba(${s.rgb},0.7)`);
+          const isLast = idx === series.length - 1;
+          traces.push({
+            type:'bar', x, y:arrY, name:s.label, xaxis:xAxis, yaxis:yAxis,
+            marker:{ color: arrY.map(colorize), line:{width:0} },
+            customdata: totDaily, showlegend:false,
+            hovertemplate: isLast
+              ? `${s.label} %{y:,.0f}<br><b>合計 %{customdata:,.0f}</b><extra></extra>`
+              : `${s.label} %{y:,.0f}<extra></extra>`
+          });
+        });
+      }
+      shapes.push({ type:'line', xref:xAxis.replace('x','x'), yref:yAxis.replace('y','y'), x0: (mode==='cum') ? -0.5 : x[0], x1: (mode==='cum') ? 4.5 : x[x.length-1], y0:0, y1:0, line:{color:'rgba(0,0,0,0.30)', width:1}});
+      break;
+    }
+
+    case 'dual_axis_multi_line': {
+      const pid = panel.def.id;
+      // margin_credit per latest spec: left = 維持率, right = 券資比
+      if (fieldOn(pid,'maintenance_ratio'))  traces.push(kindTrace(x, D.maintenance_ratio,  '#439a9a', '維持率', xAxis, yAxis,  fieldKind(pid,'maintenance_ratio','line'),  {width:1.4, precision:2}));
+      if (fieldOn(pid,'short_margin_ratio')) traces.push(kindTrace(x, D.short_margin_ratio, '#c4943a', '券資比', xAxis, yAxis2, fieldKind(pid,'short_margin_ratio','line'), {width:1.4, precision:2}));
+      break;
+    }
+
+    case 'left_line_right_bar': {
+      const pid = panel.def.id;
+      if (pid === 'futures_position'){
+        if (fieldOn(pid,'taiex_or_tx_price')) traces.push(kindTrace(x, D.taiex_or_tx_price, '#4c78a8', 'TX 指數', xAxis, yAxis, fieldKind(pid,'taiex_or_tx_price','line'), {width:1.4}));
+        if (fieldOn(pid,'foreign_net_oi')){
+          const k = fieldKind(pid,'foreign_net_oi','bar');
+          if (k === 'bar'){
+            const c1 = D.foreign_net_oi.map(v => v==null?'rgba(0,0,0,0)' : (v>=0 ? t.price_colors.up : t.price_colors.down));
+            traces.push(barTrace(x, D.foreign_net_oi, c1, '外資未平倉', xAxis, yAxis2, {opacity:0.55}));
+          } else {
+            traces.push(kindTrace(x, D.foreign_net_oi, '#c96b5a', '外資未平倉', xAxis, yAxis2, k, {precision:0}));
+          }
+        }
+      } else if (pid === 'day_trading'){
+        // Per latest spec: only daytrade_ratio rendered, as bars on left axis.
+        if (fieldOn(pid,'daytrade_ratio')){
+          const cols = D.daytrade_ratio.map(()=>'#c4943a');
+          traces.push({
+            type:'bar', x, y:D.daytrade_ratio, name:'當沖比', xaxis:xAxis, yaxis:yAxis,
+            marker:{ color: cols, opacity:0.8, line:{width:0} },
+            showlegend:false,
+            hovertemplate:'當沖比 %{y:.2f}%<extra></extra>'
+          });
+        }
+      }
+      break;
+    }
+
+    case 'left_line_right_area': {
+      const pid = panel.def.id;
+      if (fieldOn(pid,'HV_20')) traces.push(kindTrace(x, D.HV_20, '#7a6daa', 'HV(20)', xAxis, yAxis, fieldKind(pid,'HV_20','line'), {width:1.3, precision:2}));
+      if (fieldOn(pid,'HV_60')) traces.push(kindTrace(x, D.HV_60, '#439a9a', 'HV(60)', xAxis, yAxis, fieldKind(pid,'HV_60','line'), {width:1.3, precision:2}));
+      if (fieldOn(pid,'drawdown')){
+        const k = fieldKind(pid,'drawdown','area');
+        if (k === 'area'){
+          traces.push({
+            type:'scatter', mode:'lines',
+            x, y:D.drawdown,
+            xaxis:xAxis, yaxis:yAxis2,
+            line:{color:'#9c9890', width:1.2},
+            fill:'tozeroy', fillcolor:'rgba(156,152,144,0.30)',
+            showlegend:false, name:'drawdown',
+            hovertemplate:'DD %{y:.2f}%<extra></extra>'
+          });
+        } else {
+          traces.push(kindTrace(x, D.drawdown, '#9c9890', 'drawdown', xAxis, yAxis2, k, {precision:2}));
+        }
+      }
+      break;
+    }
+
+    case 'dual_axis_line': {
+      const pid = panel.def.id;
+      // Recompute beta/corr against currently selected benchmark (default ^TWII)
+      const benchKey = R.view_state.benchmark === '^GSPC' ? '_gspcRaw' : '_twiiRaw';
+      const benchSeries = D[benchKey] || D._benchRaw;
+      // 60-day rolling beta/corr against bench
+      const p = 60;
+      const ret = (a) => { const r = new Array(a.length).fill(0); for (let i=1;i<a.length;i++) r[i] = a[i]/a[i-1]-1; return r; };
+      const r1 = ret(D.adj), r2 = ret(benchSeries);
+      const betaArr = new Array(D.adj.length).fill(null);
+      const corrArr = new Array(D.adj.length).fill(null);
+      for (let i=p;i<D.adj.length;i++){
+        let mx=0, my=0; for (let j=i-p+1;j<=i;j++){ mx+=r1[j]; my+=r2[j]; } mx/=p; my/=p;
+        let cov=0, vx=0, vy=0;
+        for (let j=i-p+1;j<=i;j++){ const dx=r1[j]-mx, dy=r2[j]-my; cov+=dx*dy; vx+=dx*dx; vy+=dy*dy; }
+        cov/=p; vx/=p; vy/=p;
+        betaArr[i] = vy===0 ? null : cov/vy;
+        corrArr[i] = (vx===0||vy===0) ? null : cov/Math.sqrt(vx*vy);
+      }
+      const benchLabel = R.view_state.benchmark === '^GSPC' ? '^GSPC' : '^TWII';
+      if (fieldOn(pid,'beta_60')) traces.push(kindTrace(x, betaArr, '#4c78a8', `beta vs ${benchLabel}`, xAxis, yAxis,  'line', {width:1.3, precision:3}));
+      if (fieldOn(pid,'corr_60')) traces.push(kindTrace(x, corrArr, '#439a9a', `corr vs ${benchLabel}`, xAxis, yAxis2, 'line', {width:1.3, precision:3}));
+      shapes.push({ type:'line', xref:xAxis.replace('x','x'), yref:yAxis.replace('y','y'), x0:x[0], x1:x[x.length-1], y0:1, y1:1, line:{color:'rgba(76,120,168,0.30)', width:1, dash:'dot'}});
+      break;
+    }
+
+    case 'multi_line_dual_group_optional': {
+      const pid = panel.def.id;
+      const baseIdx = D.date.indexOf(R.view_state.normalized_date) >= 0
+        ? D.date.indexOf(R.view_state.normalized_date)
+        : 0;
+      const n_stock = normalizeTo(D.adj, baseIdx);
+      const benchKey = R.view_state.benchmark === '^GSPC' ? '_gspcRaw' : '_twiiRaw';
+      const benchSeries = D[benchKey] || D._benchRaw;
+      const benchLabel = R.view_state.benchmark === '^GSPC' ? '^GSPC' : '^TWII';
+      const n_bench = normalizeTo(benchSeries, baseIdx);
+      traces.push(kindTrace(x, n_stock, '#1e1d1a', `${R.context.ticker}`, xAxis, yAxis, 'line', {width:1.6, precision:2}));
+      traces.push(kindTrace(x, n_bench, '#5a9e6f', benchLabel,            xAxis, yAxis, 'line', {width:1.3, precision:2}));
+      // Normalized guides
+      if (R.trace_preferences.price_main.show_normalized_guides){
+        shapes.push({ type:'line', xref:xAxis.replace('x','x'), yref:yAxis.replace('y','y'), x0:x[0], x1:x[x.length-1], y0:100, y1:100, line:{color:'rgba(0,0,0,0.22)', width:1, dash:'dot'}});
+        shapes.push({ type:'line', xref:xAxis.replace('x','x'), yref:'paper',
+          x0: D.date[baseIdx], x1: D.date[baseIdx],
+          y0: 0, y1: 1,
+          line:{color:'rgba(201,107,90,0.55)', width:1, dash:'dash'}
+        });
+      }
+      break;
+    }
+  }
+
+  return { traces, shapes };
+}
+
+/* ────────────────────────────────────────────────────────────────
+   Y-axis auto-bounding · per spec: cover full data min/max + 2% padding
+   Stacked bars (inst_flow) need positive-stack and negative-stack sums.
+   Returns [lo, hi] or null when no data.
+   ──────────────────────────────────────────────────────────────── */
+function _yPadRange(lo, hi){
+  if (lo == null || hi == null || !isFinite(lo) || !isFinite(hi)) return null;
+  if (lo === hi){ // flat series — synthesize a small symmetric band
+    const k = Math.abs(lo) > 0 ? Math.abs(lo) * 0.02 : 1;
+    return [lo - k, hi + k];
+  }
+  const span = hi - lo;
+  return [lo - span * 0.02, hi + span * 0.02];
+}
+
+function _rangeOfArrays(arrs){
+  let lo = +Infinity, hi = -Infinity;
+  for (const arr of arrs){
+    if (!arr) continue;
+    for (let i=0;i<arr.length;i++){
+      const v = arr[i];
+      if (v == null || isNaN(v)) continue;
+      if (v < lo) lo = v;
+      if (v > hi) hi = v;
+    }
+  }
+  return (lo === +Infinity) ? null : [lo, hi];
+}
+
+function _yRangeForPanel(panel, D, side){
+  // side: 'L' or 'R'
+  const pid = panel.def.id;
+  const fields = side === 'L' ? panel.def.axes.left : panel.def.axes.right;
+  if (!fields || !fields.length) return null;
+
+  // Special handling per panel
+  if (pid === 'price_main' && side === 'L'){
+    // Candle wicks + all MAs + BBands; include MA240 if present
+    const series = [D.high, D.low, D.MA5, D.MA10, D.MA20, D.MA60, D.MA120, D.MA240, D.EMA10, D.EMA20, D.EMA60, D.EMA120, D.EMA240, D.BB_UP, D.BB_LO, D.YTM];
+    return _yPadRange(...(_rangeOfArrays(series) || [0,1]));
+  }
+  if (pid === 'volume' && side === 'L'){
+    // Bars start from 0 → keep 0 inside the range
+    const r = _rangeOfArrays([D.volume, D.volume_MA20]);
+    if (!r) return null;
+    const padded = _yPadRange(0, r[1]);
+    return padded;
+  }
+  if (pid === 'rsi_kd'){
+    // Locked 0-100 (oscillator), keep as-is — no auto bound
+    return [0, 100];
+  }
+  // Split inst flow panels — single-series, both signs, daily mode only
+  if (['inst_flow_foreign','inst_flow_trust','inst_flow_dealer'].includes(pid) && side === 'L'){
+    if (RUNTIME.view_state.inst_flow_mode === 'cum') return null;  // Plotly category x — autorange OK
+    const keyMap = { inst_flow_foreign:'foreign_net', inst_flow_trust:'trust_net', inst_flow_dealer:'dealer_net' };
+    const arr = D[keyMap[pid]];
+    if (!arr) return null;
+    let lo = +Infinity, hi = -Infinity;
+    for (let i=0;i<arr.length;i++){
+      const v = arr[i]; if (v == null || isNaN(v)) continue;
+      if (v < lo) lo = v; if (v > hi) hi = v;
+    }
+    if (lo === +Infinity) return null;
+    return _yPadRange(Math.min(lo, 0), Math.max(hi, 0));
+  }
+
+  // Stacked summary panel — positive stack high + negative stack low
+  if (pid === 'inst_flow_stacked' && side === 'L'){
+    if (RUNTIME.view_state.inst_flow_mode === 'cum') return null;
+    const fn = D.foreign_net, tn = D.trust_net, dn = D.dealer_net;
+    if (!fn) return null;
+    let posMax = 0, negMin = 0;
+    for (let i=0;i<fn.length;i++){
+      let pos = 0, neg = 0;
+      [fn[i], tn[i], dn[i]].forEach(v => { if (v == null) return; if (v >= 0) pos += v; else neg += v; });
+      if (pos > posMax) posMax = pos;
+      if (neg < negMin) negMin = neg;
+    }
+    return _yPadRange(negMin, posMax);
+  }
+  if (pid === 'macd' && side === 'L'){
+    // MACD: line + signal + hist (hist swings both signs)
+    return _yPadRange(...(_rangeOfArrays([D.MACD, D.MACD_signal, D.MACD_hist]) || [0,1]));
+  }
+  // General: scan declared fields
+  const series = fields.map(f => D[f]).filter(Boolean);
+  // For normalized_price, include all 4 normalized series we synthesize at render time
+  // (those are computed in the trace builder; skip here and let Plotly's auto handle that case)
+  if (pid === 'risk_sharpe' && side === 'L'){
+    const useUS = RUNTIME.view_state.risk_free === 'US10Y';
+    const arr = useUS ? D.sharpe_60_US : D.sharpe_60_TW;
+    const r = _rangeOfArrays([arr]);
+    if (!r) return _yPadRange(-1, 3);
+    // ensure 0 line is visible (it's the key threshold)
+    const lo = Math.min(r[0], -0.2), hi = Math.max(r[1], 0.5);
+    return _yPadRange(lo, hi);
+  }
+
+  // Fund-flow methodology panels — Y range per panel
+  if (pid === 'dollar_vol_flow'){
+    if (side === 'L'){
+      const r = _rangeOfArrays([D.dollar_vol, D.dvol_ma20]);
+      if (!r) return null;
+      // bars from 0; keep 0 inside
+      return _yPadRange(0, r[1]);
+    } else {
+      const r = _rangeOfArrays([D.dvol_ratio]);
+      if (!r) return _yPadRange(0, 3);
+      return _yPadRange(0, Math.max(r[1], 2.2));   // ensure 2x reference visible
+    }
+  }
+  if (pid === 'pv_divergence' && side === 'L'){
+    return _yPadRange(-1.4, 1.4);  // signal codes ∈ {-1, 0, +1}
+  }
+  if (pid === 'rs_flow'){
+    if (side === 'L'){
+      const r = _rangeOfArrays([D.rs_vs_bench, D.rs_ma10]);
+      if (!r) return _yPadRange(0.7, 1.3);
+      return _yPadRange(Math.min(r[0], 1), Math.max(r[1], 1));   // keep parity (1.0) inside
+    } else {
+      const r = _rangeOfArrays([D.rs_trend]);
+      if (!r) return _yPadRange(-0.05, 0.05);
+      const lo = Math.min(r[0], 0), hi = Math.max(r[1], 0);
+      return _yPadRange(lo, hi);
+    }
+  }
+
+  if (pid === 'normalized_price'){
+    const baseIdx = D.date.indexOf(RUNTIME.view_state.normalized_date);
+    const base = baseIdx >= 0 ? baseIdx : 0;
+    const benchKey = RUNTIME.view_state.benchmark === '^GSPC' ? '_gspcRaw' : '_twiiRaw';
+    const benchSeries = D[benchKey] || D._benchRaw;
+    const norm = (arr) => arr ? arr.map(v => v == null ? null : (v / arr[base]) * 100) : null;
+    const r = _rangeOfArrays([norm(D.adj), norm(benchSeries)]);
+    return r ? _yPadRange(...r) : _yPadRange(95, 105);
+  }
+  const r = _rangeOfArrays(series);
+  return r ? _yPadRange(...r) : null;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   7.  Layout builder
+   ════════════════════════════════════════════════════════════════ */
+function buildFigure(slice, filter){
+  const panels = resolvePanels(filter);
+  const heights = resolveHeights(panels);
+  const domains = computeDomains(heights, 0.006);
+
+  const layout = {
+    paper_bgcolor: '#fff',
+    plot_bgcolor:  '#fafaf8',
+    font: { family:'DM Sans, system-ui, sans-serif', color:'#1e1d1a', size:11 },
+    margin: { l: 56, r: 74, t: 14, b: 36 },
+    showlegend: false,
+    barmode: 'relative',
+    hovermode: 'x unified',
+    hoverlabel: {
+      bgcolor:'rgba(255,255,255,0.96)',
+      bordercolor:'#dbd9d3',
+      font:{ family:'DM Mono', size:11, color:'#1e1d1a' }
+    },
+    dragmode: 'select',
+    selectdirection: 'h',
+    shapes: [],
+    annotations: []
+  };
+
+  const xBase = {
+    showgrid:true, gridcolor:'rgba(30,29,26,0.05)',
+    showline:false, zeroline:false,
+    ticks:'outside', ticklen:3,
+    tickfont:{ family:'DM Mono', size:9, color:'#6b6860' },
+    type:'date',
+    rangeslider:{ visible:false },
+    fixedrange:false   // PDF spec: allow horizontal drag-select on time axis
+  };
+  const yBase = {
+    showgrid:true, gridcolor:'rgba(30,29,26,0.06)',
+    showline:false, zeroline:false,
+    ticks:'outside', ticklen:3,
+    tickfont:{ family:'DM Mono', size:9, color:'#6b6860' },
+    fixedrange:true
+  };
+
+  const allTraces = [];
+
+  panels.forEach((panel, i) => {
+    const idx = i + 1;
+    const xKey = idx === 1 ? 'xaxis' : `xaxis${idx}`;
+    const yKey = idx === 1 ? 'yaxis' : `yaxis${idx}`;
+    const xRef = idx === 1 ? 'x'     : `x${idx}`;
+    const yRef = idx === 1 ? 'y'     : `y${idx}`;
+
+    const hasRight = panel.def.axes.right && panel.def.axes.right.length > 0;
+    const yRightKey = `yaxis${100+idx}`;  // separate index space for overlays
+    const yRightRef = `y${100+idx}`;
+
+    // X axis (primary panel has full settings; others match)
+    // Exception: inst_flow_* in cumulative mode uses category axis (1日/3日/5日/10日/1個月)
+    const isInstCum = (['inst_flow_stacked','inst_flow_foreign','inst_flow_trust','inst_flow_dealer'].includes(panel.def.id) && (RUNTIME.view_state.inst_flow_mode === 'cum'));
+    if (isInstCum){
+      layout[xKey] = {
+        showgrid:true, gridcolor:'rgba(30,29,26,0.05)',
+        showline:false, zeroline:false,
+        ticks:'outside', ticklen:3,
+        tickfont:{ family:'DM Mono', size:9, color:'#6b6860' },
+        type:'category',
+        domain: [0, 1],
+        anchor: yRef,
+        showticklabels: true,
+        fixedrange: true
+      };
+    } else {
+      layout[xKey] = Object.assign({}, xBase, {
+        domain: [0, 1],
+        anchor: yRef,
+        showticklabels: (i === panels.length - 1),
+        matches: idx === 1 ? undefined : 'x'
+      });
+    }
+
+    // Y axis (left) — auto-bound to data with 2% padding (no in-axis title)
+    const title = panel.def.title;
+    layout[yKey] = Object.assign({}, yBase, {
+      domain: domains[i],
+      anchor: xRef,
+      autorange: false
+    });
+    const leftRange = _yRangeForPanel(panel, slice, 'L');
+    if (leftRange){ layout[yKey].range = leftRange; }
+    // RSI / KD specific hard bound (overrides auto)
+    if (panel.def.id === 'rsi_kd'){ layout[yKey].range = [0,100]; }
+
+    if (hasRight){
+      layout[yRightKey] = Object.assign({}, yBase, {
+        domain: domains[i],
+        anchor: xRef,
+        overlaying: yRef,
+        side: 'right',
+        showgrid: false,
+        autorange: false
+      });
+      const rightRange = _yRangeForPanel(panel, slice, 'R');
+      if (rightRange){ layout[yRightKey].range = rightRange; }
+    }
+
+    // Panel title annotation (top-left of panel domain) — Anti-Overlap
+    layout.annotations.push({
+      xref:'paper', yref:'paper',
+      x: 0.002, y: domains[i][1] - 0.001,
+      xanchor:'left', yanchor:'top',
+      text: `<b>${(i+1).toString().padStart(2,'0')}</b>  ${panel.def.title}`,
+      font:{ family:'DM Mono', size:9.5, color:'#9c9890' },
+      showarrow:false,
+      bgcolor:'rgba(255,255,255,0.55)'
+    });
+
+    // Panel-specific guide lines for RSI / KD
+    if (panel.def.id === 'rsi_kd'){
+      [70,50,30].forEach(yv =>
+        layout.shapes.push({ type:'line', xref:'paper', yref:yRef, x0:0, x1:1, y0:yv, y1:yv,
+          line:{ color: yv===50 ? 'rgba(30,29,26,0.15)' : 'rgba(30,29,26,0.25)', width:1, dash: yv===50 ? 'solid':'dot' }})
+      );
+      [80,20].forEach(yv =>
+        layout.shapes.push({ type:'line', xref:'paper', yref:yRef, x0:0, x1:1, y0:yv, y1:yv,
+          line:{ color:'rgba(201,107,90,0.30)', width:1, dash:'dot' }})
+      );
+    }
+
+    // Build traces
+    const { traces, shapes } = buildPanelTraces(panel, slice, xRef, yRef, yRightRef, SCHEMA, RUNTIME);
+    traces.forEach(tr => allTraces.push(tr));
+    shapes.forEach(sh => layout.shapes.push(sh));
+  });
+
+  return { traces: allTraces, layout };
+}
+
+/* ════════════════════════════════════════════════════════════════
+   8.  Slice & render
+   ════════════════════════════════════════════════════════════════ */
+let CURRENT_WINDOW_DAYS = 120;
+
+function sliceData(D, windowDays){
+  const n = D.date.length;
+  const start = Math.max(0, n - windowDays);
+  const out = {};
+  Object.keys(D).forEach(k => { out[k] = Array.isArray(D[k]) ? D[k].slice(start) : D[k]; });
+  return out;
+}
+
+function _computeChartHeight(){
+  // STANDARD UNIT: weight=1.0 maps to 400px. Per current spec:
+  //   K線 (1.5) → 600px
+  //   其他 panel (0.5) → 200px
+  //   VOLUME (0.3) → 120px
+  const STANDARD_PX = 400;
+  const defs = {}; SCHEMA.panel_definitions.forEach(p => defs[p.id] = p);
+  let total = 24; // margin top+bottom
+  RUNTIME.panel_order.forEach(pid => {
+    const def = defs[pid]; if (!def) return;
+    const state = RUNTIME.panel_state[pid] || {};
+    if (state.visible === false) return;
+    const collapsed = state.expanded === false && def.collapsible;
+    if (collapsed){
+      total += 32;  // collapsed panel: header-only band
+    } else {
+      const w = (state.height_weight_override != null ? state.height_weight_override : def.height_weight);
+      total += Math.round(w * STANDARD_PX);
+    }
+  });
+  return Math.max(900, total);
+}
+
+function _computeBottomHeight(){
+  const STANDARD_PX = 400;
+  const defs = {}; SCHEMA.panel_definitions.forEach(p => defs[p.id] = p);
+  let total = 24;
+  RUNTIME.panel_order.forEach(pid => {
+    const def = defs[pid]; if (!def) return;
+    if (def.group === 'FIXED') return;   // top chart handles FIXED group
+    const state = RUNTIME.panel_state[pid] || {};
+    if (state.visible === false) return;
+    const collapsed = state.expanded === false && def.collapsible;
+    total += collapsed ? 32 : Math.round(((state.height_weight_override ?? def.height_weight)) * STANDARD_PX);
+  });
+  return Math.max(400, total);
+}
+
+// guard against feedback loops while syncing top↔bottom x-axes
+let _SYNCING = false;
+
+function _syncRangeBetweenCharts(srcEl, ev){
+  if (_SYNCING) return;
+  let r0 = ev['xaxis.range[0]'] || (ev['xaxis.range'] && ev['xaxis.range'][0]);
+  let r1 = ev['xaxis.range[1]'] || (ev['xaxis.range'] && ev['xaxis.range'][1]);
+  const isAuto = ev['xaxis.autorange'];
+  const top = document.getElementById('chartTop');
+  const bot = document.getElementById('chartBottom');
+  const target = (srcEl === top) ? bot : top;
+  if (!target || !target.layout) return;
+  _SYNCING = true;
+  try {
+    if (isAuto){
+      Plotly.relayout(target, { 'xaxis.autorange': true });
+    } else if (r0 && r1){
+      Plotly.relayout(target, { 'xaxis.range': [r0, r1] });
+    }
+  } finally {
+    setTimeout(() => { _SYNCING = false; }, 30);
+  }
+}
+
+function render(){
+  if (!DATA_FULL) return;
+  const slice = sliceData(DATA_FULL, CURRENT_WINDOW_DAYS);
+  if (!RUNTIME.view_state.normalized_date || slice.date.indexOf(RUNTIME.view_state.normalized_date) < 0){
+    RUNTIME.view_state.normalized_date = slice.date[0];
+    const dn = document.getElementById('normDate');
+    if (dn) dn.value = slice.date[0];
+  }
+
+  // === TOP: K + Volume (frozen at 480px) ===
+  const figTop = buildFigure(slice, 'top');
+  Plotly.react('chartTop', figTop.traces, figTop.layout, {
+    displayModeBar: false, responsive: true, scrollZoom: false, doubleClick: 'reset+autosize'
+  }).then(() => {
+    const top = document.getElementById('chartTop');
+    if (top && typeof top.on === 'function' && !top.__via_sync_bound){
+      top.on('plotly_relayout', (ev) => _syncRangeBetweenCharts(top, ev));
+      top.__via_sync_bound = true;
+    }
+  });
+
+  // === BOTTOM: TECH + CHIPS + RISK panels (scrollable) ===
+  const bot = document.getElementById('chartBottom');
+  if (bot){ bot.style.height = _computeBottomHeight() + 'px'; }
+  const figBot = buildFigure(slice, 'bottom');
+  Plotly.react('chartBottom', figBot.traces, figBot.layout, {
+    displayModeBar: false, responsive: true, scrollZoom: false, doubleClick: 'reset+autosize'
+  }).then(() => {
+    window._VIA_PIN.guideX = null;
+    window._VIA_PIN.hasRangePins = false;
+    bindRangeSelect(slice);
+    const botEl = document.getElementById('chartBottom');
+    if (botEl && typeof botEl.on === 'function' && !botEl.__via_sync_bound){
+      botEl.on('plotly_relayout', (ev) => _syncRangeBetweenCharts(botEl, ev));
+      botEl.__via_sync_bound = true;
+    }
+  });
+
+  updateKPI(slice);
+  updateRangeReadout(slice, 0, slice.date.length - 1);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   9.  KPI strip update
+   ════════════════════════════════════════════════════════════════ */
+function fmt(v, d=2){ return (v==null||isNaN(v)) ? '—' : Number(v).toFixed(d); }
+function fmtInt(v){ return v==null||isNaN(v) ? '—' : Number(v).toLocaleString('en-US'); }
+
+function updateKPI(D){
+  const n = D.date.length;
+  const last = D.close[n-1], prev = D.close[n-2];
+  const chg = last - prev, chgPct = (chg/prev)*100;
+  let hh=-Infinity, ll=Infinity;
+  const back = Math.min(252, n);
+  for (let i=n-back; i<n; i++){ if (D.high[i]>hh) hh=D.high[i]; if (D.low[i]<ll) ll=D.low[i]; }
+  const distH = ((last-hh)/hh)*100;
+  const distL = ((last-ll)/ll)*100;
+  const ma240 = D.MA240[n-1];
+  const dist240 = ma240 ? ((last-ma240)/ma240)*100 : null;
+  let vs=0; const kk=Math.min(20,n); for(let i=n-kk;i<n;i++) vs+=D.volume[i];
+  const volAvg20 = vs/kk;
+  const rsi = D.RSI[n-1];
+  const atr = D.ATR[n-1];
+  const natr = D.NATR[n-1];
+
+  const el = (id) => document.getElementById(id);
+  el('kpi_last').textContent     = fmt(last);
+  el('kpi_lastDate').textContent = D.date[n-1];
+  el('kpi_chg').textContent      = (chg>=0?'+':'') + fmt(chg);
+  el('kpi_chgPct').textContent   = (chgPct>=0?'+':'') + fmt(chgPct) + '%';
+  el('kpi_chg').className        = 'v '   + (chg>=0?'up-c':'dn-c');
+  el('kpi_chgPct').className     = 'c '   + (chg>=0?'up-c':'dn-c');
+  el('kpi_52h').textContent      = fmt(hh);
+  el('kpi_52hd').textContent     = (distH>=0?'+':'') + fmt(distH) + '%';
+  el('kpi_52l').textContent      = fmt(ll);
+  el('kpi_52ld').textContent     = (distL>=0?'+':'') + fmt(distL) + '%';
+  el('kpi_ma240').textContent    = dist240==null ? '—' : (dist240>=0?'+':'') + fmt(dist240) + '%';
+  el('kpi_ma240').className      = 'v ' + (dist240==null?'':dist240>=0?'up-c':'dn-c');
+  el('kpi_vol').textContent      = fmtInt(D.volume[n-1]);
+  el('kpi_volAvg').textContent   = 'avg20 ' + fmtInt(Math.round(volAvg20));
+  el('kpi_rsi').textContent      = fmt(rsi,1);
+  el('kpi_rsiTag').textContent   = rsi==null ? '—' : (rsi>=70?'OVERBOUGHT':rsi<=30?'OVERSOLD':'neutral');
+  el('kpi_rsiTag').className     = 'c ' + (rsi==null?'flat-c':rsi>=70?'up-c':rsi<=30?'dn-c':'flat-c');
+  el('kpi_atr').textContent      = fmt(atr,2);
+  el('kpi_natr').textContent     = 'NATR ' + fmt(natr,2) + '%';
+
+  // ── Row 2: latest chip values + dates ──
+  el('kpi_foreign').textContent  = fmt(D.foreign_holding[n-1], 2) + '%';
+  el('kpi_trust').textContent    = fmt(D.trust_holding[n-1], 2)   + '%';
+  el('kpi_daytrade').textContent = fmt(D.daytrade_ratio[n-1], 2)  + '%';
+  el('kpi_maint').textContent    = fmt(D.maintenance_ratio[n-1], 2) + '%';
+  el('kpi_smr').textContent      = fmt(D.short_margin_ratio[n-1], 2) + '%';
+  el('kpi_dd').textContent       = fmt(D.drawdown[n-1], 2) + '%';
+  el('kpi_dd').className         = 'v ' + (D.drawdown[n-1] < -5 ? 'dn-c' : 'flat-c');
+
+  // Sharpe(60, annualized) — last point of precomputed rolling series; switches with RF dropdown
+  const useUS = RUNTIME.view_state.risk_free === 'US10Y';
+  const sArr  = useUS ? D.sharpe_60_US : D.sharpe_60_TW;
+  const sharpeNow = sArr ? sArr[n-1] : null;
+  el('kpi_sharpe').textContent = fmt(sharpeNow, 2);
+  el('kpi_sharpe').className   = 'v ' + (sharpeNow == null ? 'flat-c' : sharpeNow >= 1 ? 'up-c' : sharpeNow < 0 ? 'dn-c' : 'flat-c');
+  el('kpi_sharpeRf').textContent = 'RF ' + (useUS ? 'US10Y' : 'TW10Y');
+
+  el('kpi_startDate').textContent = D.date[0];
+  el('kpi_normDate').textContent  = RUNTIME.view_state.normalized_date || '—';
+
+  document.getElementById('hdr-stamp').textContent =
+    `${RUNTIME.context.ticker} · ${RUNTIME.context.ticker_name} · last ${D.date[n-1]} TPE`;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   10. Range readout (Max / Min / Max-Drawdown in slice or selection)
+   ════════════════════════════════════════════════════════════════ */
+function computeWindowStats(D, i0, i1){
+  let mxV=-Infinity, mxI=i0, mnV=Infinity, mnI=i0;
+  for (let i=i0;i<=i1;i++){
+    if (D.high[i] > mxV){ mxV = D.high[i]; mxI = i; }
+    if (D.low[i]  < mnV){ mnV = D.low[i];  mnI = i; }
+  }
+  // max drawdown within window (peak→trough chronological)
+  let peak = D.adj[i0], peakI = i0, ddBest = 0, ddPeakI = i0, ddTroughI = i0;
+  for (let i=i0;i<=i1;i++){
+    if (D.adj[i] > peak){ peak = D.adj[i]; peakI = i; }
+    const dd = (D.adj[i] - peak) / peak;
+    if (dd < ddBest){ ddBest = dd; ddPeakI = peakI; ddTroughI = i; }
+  }
+  return { mxV, mxI, mnV, mnI, ddBest, ddPeakI, ddTroughI };
+}
+function updateRangeReadout(D, i0, i1){
+  const s = computeWindowStats(D, i0, i1);
+  const days = i1 - i0 + 1;
+  document.getElementById('rr_win').textContent  = days + ' days';
+  document.getElementById('rr_winS').textContent = `${D.date[i0]} → ${D.date[i1]}`;
+  document.getElementById('rr_max').textContent  = fmt(s.mxV);
+  document.getElementById('rr_maxDt').textContent= D.date[s.mxI];
+  document.getElementById('rr_min').textContent  = fmt(s.mnV);
+  document.getElementById('rr_minDt').textContent= D.date[s.mnI];
+  document.getElementById('rr_dd').textContent   = (s.ddBest*100).toFixed(2) + '%';
+  document.getElementById('rr_ddRange').textContent = `${D.date[s.ddPeakI]} → ${D.date[s.ddTroughI]}`;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   10. Range readout / interactions
+       (a) Left-click → vertical red dashed guide (paper-wide,
+           spans all 14 panels). Click again on the guide → clear.
+       (b) Left-drag select → annotate range Max / Min / Max-DD.
+           Click on either annotation → clear both.
+   ════════════════════════════════════════════════════════════════ */
+
+// runtime state for the pin overlays
+window._VIA_PIN = { guideX: null, hasRangePins: false };
+
+function _pinShapeGuide(xDate){
+  return {
+    type:'line',
+    xref:'x', yref:'paper',
+    x0:xDate, x1:xDate, y0:0, y1:1,
+    line:{ color:'rgba(255,0,0,0.9)', width:1, dash:'dash' },
+    layer:'above',
+    name:'__via_guide__'
+  };
+}
+
+function _pinAnnsRange(D, i0, i1){
+  // Resolve max/min in window using high/low (so wicks count).
+  let mxV=-Infinity, mxI=i0, mnV=Infinity, mnI=i0;
+  for (let i=i0;i<=i1;i++){
+    if (D.high[i] > mxV){ mxV = D.high[i]; mxI = i; }
+    if (D.low[i]  < mnV){ mnV = D.low[i];  mnI = i; }
+  }
+  // True max-drawdown trough in window (peak→trough chronological on adj-close)
+  let peak = D.adj[i0], ddBest = 0, ddPeakI = i0, ddTroughI = i0;
+  for (let i=i0;i<=i1;i++){
+    if (D.adj[i] > peak){ peak = D.adj[i]; }
+    const dd = (D.adj[i] - peak) / peak;
+    if (dd < ddBest){ ddBest = dd; ddTroughI = i; }
+  }
+  const ddPct = (ddBest*100).toFixed(2);
+
+  // Annotation: MAX (price high)
+  const aMax = {
+    xref:'x', yref:'y',
+    x: D.date[mxI], y: mxV,
+    text: `▲ MAX  ${mxV.toFixed(2)}<br><span style="font-size:9px">${D.date[mxI]}</span>`,
+    showarrow: true, arrowhead: 2, arrowsize: 1, arrowwidth: 1.2,
+    arrowcolor: 'rgba(201,107,90,0.9)',
+    ax: 0, ay: -36,
+    bgcolor: 'rgba(255,255,255,0.96)',
+    bordercolor: '#c96b5a', borderwidth: 1, borderpad: 5,
+    font: { family:'DM Mono', size:10, color:'#c96b5a' },
+    align:'left',
+    name: '__via_pin_max__',
+    captureevents: true
+  };
+  // Annotation: MIN (price low) + MAX-DD readout
+  const aMin = {
+    xref:'x', yref:'y',
+    x: D.date[mnI], y: mnV,
+    text: `▼ MIN  ${mnV.toFixed(2)}<br><span style="font-size:9px">${D.date[mnI]}  ·  Max DD ${ddPct}%</span>`,
+    showarrow: true, arrowhead: 2, arrowsize: 1, arrowwidth: 1.2,
+    arrowcolor: 'rgba(90,158,111,0.9)',
+    ax: 0, ay: 36,
+    bgcolor: 'rgba(255,255,255,0.96)',
+    bordercolor: '#5a9e6f', borderwidth: 1, borderpad: 5,
+    font: { family:'DM Mono', size:10, color:'#5a9e6f' },
+    align:'left',
+    name: '__via_pin_min__',
+    captureevents: true
+  };
+  // Additional troughI marker if it differs from low-point
+  const extras = [];
+  if (ddTroughI !== mnI){
+    extras.push({
+      xref:'x', yref:'y',
+      x: D.date[ddTroughI], y: D.adj[ddTroughI],
+      text: `◆ DD trough<br><span style="font-size:9px">${D.date[ddTroughI]}  ·  ${ddPct}%</span>`,
+      showarrow:true, arrowhead:2, arrowsize:1, arrowwidth:1.2,
+      arrowcolor:'rgba(122,109,170,0.9)',
+      ax:0, ay:24,
+      bgcolor:'rgba(255,255,255,0.96)',
+      bordercolor:'#7a6daa', borderwidth:1, borderpad:5,
+      font:{family:'DM Mono', size:10, color:'#7a6daa'},
+      align:'left',
+      name:'__via_pin_dd__',
+      captureevents:true
+    });
+  }
+  return [aMax, aMin, ...extras];
+}
+
+function _clearGuide(){
+  const mount = document.getElementById('chartBottom');
+  const lay = mount && mount.layout;
+  if (!lay || !Array.isArray(lay.shapes)) return;
+  const remaining = lay.shapes.filter(s => s && s.name !== '__via_guide__');
+  Plotly.relayout(mount, { shapes: remaining });
+  window._VIA_PIN.guideX = null;
+}
+
+function _clearRangePins(){
+  const mount = document.getElementById('chartBottom');
+  const lay = mount && mount.layout;
+  if (!lay || !Array.isArray(lay.annotations)) return;
+  const remaining = lay.annotations.filter(a =>
+    a && a.name !== '__via_pin_max__' && a.name !== '__via_pin_min__' && a.name !== '__via_pin_dd__'
+  );
+  Plotly.relayout(mount, { annotations: remaining });
+  window._VIA_PIN.hasRangePins = false;
+}
+
+// Resolve a screen-pixel X position to the nearest data date on primary x-axis
+function _pixelToNearestDate(D, mount, pixelX){
+  const gd = mount;
+  const xa = gd._fullLayout && gd._fullLayout.xaxis;
+  if (!xa) return null;
+  // Plotly conversion: pixel relative to plot area (we use _fullLayout xaxis.p2c)
+  const plotL = xa._offset || 0;
+  const local = pixelX - plotL;
+  let dateMs = xa.p2c(local);
+  // dateMs may be a number (ms since epoch) for a 'date' axis
+  let target = new Date(dateMs).toISOString().slice(0,10);
+  // snap to nearest available date in D.date
+  let lo = 0, hi = D.date.length - 1;
+  if (target <= D.date[0])  return D.date[0];
+  if (target >= D.date[hi]) return D.date[hi];
+  // linear scan is fine (≤500 elements)
+  let best = 0, bestDiff = Infinity;
+  for (let i=0;i<D.date.length;i++){
+    const diff = Math.abs(new Date(D.date[i]) - new Date(target));
+    if (diff < bestDiff){ bestDiff = diff; best = i; }
+  }
+  return D.date[best];
+}
+
+/* drag-select / relayout binding */
+function bindRangeSelect(D){
+  const mount = document.getElementById('chartBottom');
+  if (!mount || !mount.on) return;
+  // current D is provided fresh each render; update the closure shared via attribute
+  mount.__via_D = D;
+
+  // Re-bind only once. After first bind, the listeners use mount.__via_D for the latest slice.
+  if (mount.__via_bound) return;
+  mount.__via_bound = true;
+
+  let downX = null, downY = null, downTs = 0;
+  mount.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return;
+    downX = e.clientX; downY = e.clientY; downTs = Date.now();
+  }, true);
+
+  mount.addEventListener('mouseup', (e) => {
+    if (e.button !== 0) return;
+    if (downX == null) return;
+    const dx = Math.abs(e.clientX - downX);
+    const dy = Math.abs(e.clientY - downY);
+    const dt = Date.now() - downTs;
+    downX = downY = null;
+    if (dx > 5 || dy > 5) return;     // drag → handled by plotly_selected
+    if (dt > 800) return;             // long press → ignore
+
+    const Dnow = mount.__via_D;
+    if (!Dnow) return;
+    const rect = mount.getBoundingClientRect();
+    const xPixel = e.clientX - rect.left;
+
+    if (window._VIA_PIN.guideX){
+      _clearGuide();
+      return;
+    }
+    const dateAt = _pixelToNearestDate(Dnow, mount, xPixel);
+    if (!dateAt) return;
+    const lay = mount.layout || {};
+    const shapes = Array.isArray(lay.shapes) ? lay.shapes.slice() : [];
+    shapes.push(_pinShapeGuide(dateAt));
+    Plotly.relayout(mount, { shapes });
+    window._VIA_PIN.guideX = dateAt;
+  }, true);
+
+  mount.on('plotly_clickannotation', (ev) => {
+    const a = ev && ev.annotation;
+    if (!a || !a.name) return;
+    if (a.name === '__via_pin_max__' || a.name === '__via_pin_min__' || a.name === '__via_pin_dd__'){
+      _clearRangePins();
+    }
+  });
+
+  mount.on('plotly_relayout', (ev) => {
+    const Dnow = mount.__via_D; if (!Dnow) return;
+    let r0 = ev['xaxis.range[0]'] || (ev['xaxis.range'] && ev['xaxis.range'][0]);
+    let r1 = ev['xaxis.range[1]'] || (ev['xaxis.range'] && ev['xaxis.range'][1]);
+    if (r0 && r1){
+      const s0 = String(r0).slice(0,10), s1 = String(r1).slice(0,10);
+      let i0 = Dnow.date.findIndex(d => d >= s0);
+      let i1 = Dnow.date.findIndex(d => d >  s1) - 1;
+      if (i0 < 0) i0 = 0;
+      if (i1 < 0) i1 = Dnow.date.length - 1;
+      i0 = Math.max(0, i0); i1 = Math.min(Dnow.date.length-1, i1);
+      if (i1 > i0) updateRangeReadout(Dnow, i0, i1);
+    } else if (ev['xaxis.autorange']){
+      updateRangeReadout(Dnow, 0, Dnow.date.length - 1);
+      _clearRangePins();
+    }
+  });
+
+  mount.on('plotly_selected', (ev) => {
+    const Dnow = mount.__via_D; if (!Dnow) return;
+    if (!ev || !ev.range || !ev.range.x) return;
+    const [s0, s1] = ev.range.x.map(d => String(d).slice(0,10));
+    let i0 = Dnow.date.findIndex(d => d >= s0);
+    let i1 = Dnow.date.findIndex(d => d >  s1) - 1;
+    if (i0 < 0) i0 = 0;
+    if (i1 < 0) i1 = Dnow.date.length - 1;
+    if (i1 > i0){
+      updateRangeReadout(Dnow, i0, i1);
+      const newAnns = _pinAnnsRange(Dnow, i0, i1);
+      const lay = mount.layout || {};
+      const baseAnns = Array.isArray(lay.annotations)
+        ? lay.annotations.filter(a => a && a.name !== '__via_pin_max__' && a.name !== '__via_pin_min__' && a.name !== '__via_pin_dd__')
+        : [];
+      Plotly.relayout(mount, { annotations: baseAnns.concat(newAnns) });
+      window._VIA_PIN.hasRangePins = true;
+    }
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════
+   10a. (Removed) Left dock — replaced by right-side fundamentals.
+        Keep these as no-ops so existing render() calls do not break.
+   ════════════════════════════════════════════════════════════════ */
+function initDockState(){ RUNTIME.dock_state = {}; }
+function renderDock(){ /* no-op: dock was replaced by 2x2 fundamentals grid */ }
+function fieldOn(){ return true; }
+function fieldKind(_p, _f, def){ return def || 'line'; }
+
+/* ════════════════════════════════════════════════════════════════
+   11. Panel rail UI — grouped by group taxonomy
+       Groups: FIXED · TECH · CHIPS · RISK
+       Drag-and-drop is bounded inside the SAME group; FIXED is locked.
+   ════════════════════════════════════════════════════════════════ */
+function _groupOf(pid){
+  const def = SCHEMA.panel_definitions.find(p => p.id === pid);
+  return def ? def.group : "FIXED";
+}
+
+function renderPanelRail(){
+  const rail = document.getElementById('panelRail');
+  // Wipe inner contents — we rebuild the rail entirely each call.
+  rail.innerHTML = '';
+
+  // Build chips per group in the order dictated by panel_order
+  const groupedOrder = {};
+  SCHEMA.panel_groups.forEach(g => { groupedOrder[g.id] = []; });
+  RUNTIME.panel_order.forEach(pid => {
+    const g = _groupOf(pid);
+    if (groupedOrder[g]) groupedOrder[g].push(pid);
+  });
+
+  SCHEMA.panel_groups.forEach(group => {
+    const lbl = document.createElement('span');
+    lbl.className = 'lbl';
+    lbl.style.color = `var(${group.color})`;
+    lbl.textContent = group.title;
+    if (group.locked){
+      const lk = document.createElement('span');
+      lk.textContent = ' 🔒';
+      lk.style.fontSize = '8px';
+      lbl.appendChild(lk);
+    }
+    rail.appendChild(lbl);
+
+    const wrap = document.createElement('span');
+    wrap.className = 'p-group';
+    wrap.dataset.group = group.id;
+    wrap.style.cssText = 'display:inline-flex;gap:4px;padding:2px 6px;border-left:2px solid var('+group.color+');margin-right:8px;border-radius:3px';
+    rail.appendChild(wrap);
+
+    groupedOrder[group.id].forEach(pid => {
+      const def = SCHEMA.panel_definitions.find(p => p.id === pid);
+      const st  = RUNTIME.panel_state[pid] || {};
+      const locked = def.fixed === true || !def.sortable;
+      const collapsed = st.expanded === false;
+      const chip = document.createElement('span');
+      chip.className = 'p-chip' + (locked?' locked':'') + (collapsed?' collapsed':'');
+      chip.draggable = !locked;
+      chip.dataset.pid = pid;
+      chip.dataset.group = group.id;
+      const orderIdx = RUNTIME.panel_order.indexOf(pid) + 1;
+      chip.innerHTML = `<span class="idx">${orderIdx.toString().padStart(2,'0')}</span><span>${def.title}</span><span class="grip">${locked?'🔒':'⋮⋮'}</span>`;
+
+      if (!locked){
+        chip.addEventListener('dragstart', e => {
+          chip.style.opacity = '0.4';
+          e.dataTransfer.setData('text/plain', pid);
+          e.dataTransfer.setData('application/x-via-group', group.id);
+          e.dataTransfer.effectAllowed = 'move';
+        });
+        chip.addEventListener('dragend', () => {
+          chip.style.opacity = '';
+          document.querySelectorAll('.p-chip').forEach(c => c.classList.remove('dragover'));
+        });
+        chip.addEventListener('dragover', e => {
+          // Reject cross-group drops; allow only same-group reorder
+          if (chip.dataset.group !== group.id) return;
+          e.preventDefault();
+          chip.classList.add('dragover');
+        });
+        chip.addEventListener('dragleave', () => chip.classList.remove('dragover'));
+        chip.addEventListener('drop', e => {
+          e.preventDefault();
+          chip.classList.remove('dragover');
+          const fromPid = e.dataTransfer.getData('text/plain');
+          const fromGrp = _groupOf(fromPid);
+          const toPid   = pid;
+          const toGrp   = chip.dataset.group;
+          if (fromPid === toPid) return;
+          if (fromGrp !== toGrp) return;          // bounded inside group
+          // Reject if target group is locked (FIXED)
+          const tgt = SCHEMA.panel_groups.find(g => g.id === toGrp);
+          if (tgt && tgt.locked) return;
+          const order = RUNTIME.panel_order;
+          const fromI = order.indexOf(fromPid);
+          const toI = order.indexOf(toPid);
+          order.splice(fromI, 1);
+          order.splice(toI, 0, fromPid);
+          renderPanelRail();
+          renderDock();
+          render();
+        });
+        chip.addEventListener('click', () => {
+          if (def.collapsible){
+            st.expanded = !(st.expanded !== false);
+            renderPanelRail();
+            render();
+          }
+        });
+      }
+      wrap.appendChild(chip);
+    });
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════
+   12. Indicator toggle wiring
+   ════════════════════════════════════════════════════════════════ */
+function bindToggles(){
+  document.querySelectorAll('.tog[data-pref]').forEach(el => {
+    el.addEventListener('click', () => {
+      el.classList.toggle('on');
+      const [grp, key] = el.dataset.pref.split('.');
+      RUNTIME.trace_preferences[grp][key] = el.classList.contains('on');
+      render();
+    });
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════
+   13. Period switch
+   ════════════════════════════════════════════════════════════════ */
+function bindPeriod(){
+  document.querySelectorAll('#periodGrp button').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('#periodGrp button').forEach(x => x.classList.remove('on'));
+      b.classList.add('on');
+      CURRENT_WINDOW_DAYS = parseInt(b.dataset.p, 10);
+      render();
+    });
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════
+   14. Favorites + symbol input (cosmetic — demo data is static)
+   ════════════════════════════════════════════════════════════════ */
+function bindFavorites(){
+  document.querySelectorAll('.fav-pill').forEach(p => {
+    p.addEventListener('click', () => {
+      document.querySelectorAll('.fav-pill').forEach(x => x.classList.remove('on'));
+      p.classList.add('on');
+      RUNTIME.context.ticker      = p.dataset.sym;
+      RUNTIME.context.ticker_name = p.dataset.name;
+      document.getElementById('symInput').value = p.dataset.sym;
+      // Re-seed demo data so each favorite looks different
+      const seed = p.dataset.sym.split('').reduce((a,c)=>a*31+c.charCodeAt(0), 7);
+      const start = 200 + (Math.abs(seed) % 1500);
+      DATA_FULL = (() => {
+        const raw = _rawFor(p.dataset.sym, genOHLCV(500, Math.abs(seed)+1, start));
+        return _buildFromRaw(raw);
+      })();
+      FUND_DATA = genFundData(Math.abs(seed)+777);
+      render();
+      renderAllFund();
+    });
+  });
+}
+
+function _buildFromRaw(raw){
+  // Wraps the same logic as buildData but with caller-supplied OHLCV
+  const close = ffill(raw.close), high=ffill(raw.high), low=ffill(raw.low), open=ffill(raw.open), vol=ffill(raw.volume);
+  const adj = close;
+  const ma5=SMA(adj,5), ma10=SMA(adj,10), ma20=SMA(adj,20), ma60=SMA(adj,60), ma120=SMA(adj,120), ma240=SMA(adj,240);
+  const ema10=EMA(adj,10), ema20=EMA(adj,20), ema60=EMA(adj,60), ema120=EMA(adj,120), ema240=EMA(adj,240);
+  const bb = BBANDS(adj,20,2);
+  const volMA20 = SMA(vol,20);
+  const ytm = new Array(adj.length).fill(null);
+  let curY=null, s=0, c=0;
+  for(let i=0;i<adj.length;i++){ const y=raw.date[i].slice(0,4); if(y!==curY){ curY=y; s=0; c=0; } s+=adj[i]; c++; ytm[i]=s/c; }
+  const macd = MACD(adj,12,26,9);
+  const rsi  = RSI(adj,14);
+  const kd   = KD(high,low,close,9,3,3);
+  const obv  = OBV(adj,vol);
+  const atr  = ATR(high,low,close,14);
+  const natr = atr.map((v,i)=>v==null?null:(v/adj[i])*100);
+
+  const rng2 = mulberry32(31415926 + adj[0]);
+  const n = adj.length;
+  const foreign_net = [], trust_net = [], dealer_net = [], total_net = [];
+  const foreign_holding=[], trust_holding=[], dealer_holding=[];
+  let fH=70, tH=5, dH=2;
+  for(let i=0;i<n;i++){
+    const fn = Math.round((rng2()-0.5)*30000);
+    const tn = Math.round((rng2()-0.5)*8000);
+    const dn = Math.round((rng2()-0.5)*5000);
+    foreign_net.push(fn); trust_net.push(tn); dealer_net.push(dn); total_net.push(fn+tn+dn);
+    fH += (rng2()-0.5)*0.15; tH += (rng2()-0.5)*0.05; dH += (rng2()-0.5)*0.03;
+    foreign_holding.push(+fH.toFixed(3)); trust_holding.push(+tH.toFixed(3)); dealer_holding.push(+dH.toFixed(3));
+  }
+  const margin_balance=[], short_balance=[], short_margin_ratio=[], maintenance_ratio=[];
+  let mb=30000, sb=4500, smr=10, mr=155;
+  for(let i=0;i<n;i++){
+    mb += (rng2()-0.5)*120; sb += (rng2()-0.5)*55; smr += (rng2()-0.5)*0.18; mr += (rng2()-0.5)*0.45;
+    margin_balance.push(+mb.toFixed(0)); short_balance.push(+sb.toFixed(0));
+    short_margin_ratio.push(+smr.toFixed(2)); maintenance_ratio.push(+mr.toFixed(2));
+  }
+  const taiex_or_tx_price=[], foreign_net_oi=[], foreign_long_short_diff=[];
+  let tx=21000, fnoi=0, flsd=0;
+  for(let i=0;i<n;i++){
+    tx += (rng2()-0.5)*80; fnoi += Math.round((rng2()-0.5)*2200); flsd += Math.round((rng2()-0.5)*1100);
+    taiex_or_tx_price.push(+tx.toFixed(2)); foreign_net_oi.push(fnoi); foreign_long_short_diff.push(flsd);
+  }
+  const daytrade_ratio=[], daytrade_value=[];
+  let dtr=22, dtv=120;
+  for(let i=0;i<n;i++){
+    dtr = Math.max(5, Math.min(70, dtr + (rng2()-0.5)*0.25));
+    dtv = Math.max(15, dtv + (rng2()-0.5)*4);
+    daytrade_ratio.push(+dtr.toFixed(2)); daytrade_value.push(+(dtv*1e8).toFixed(0));
+  }
+  function synthSeries(seed, sigma, drift){
+    const r=mulberry32(seed); const out=[1000]; for(let i=1;i<n;i++){ out.push(out[i-1]*(1+drift+(r()-0.5)*sigma)); } return out;
+  }
+  const _twiiRaw  = synthSeries(22222 + adj[0], 0.011, 0.00028);
+  const _gspcRaw  = synthSeries(44444 + adj[0], 0.009, 0.00040);
+  const _benchRaw = _twiiRaw;
+  function synthYield(seed, base, vol){
+    const r=mulberry32(seed); const out=[base];
+    for(let i=1;i<n;i++){ out.push(Math.max(0.1, out[i-1] + (r()-0.5)*vol)); }
+    return out.map(x => +x.toFixed(3));
+  }
+  const _tw10y = synthYield(55555 + adj[0], 1.45, 0.025);
+  const _us10y = synthYield(66666 + adj[0], 4.20, 0.045);
+
+  const drawdown = new Array(n).fill(0);
+  let peak = adj[0];
+  for(let i=0;i<n;i++){ if(adj[i]>peak) peak=adj[i]; drawdown[i] = ((adj[i]-peak)/peak)*100; }
+  function HV(p){
+    const ret = adj.map((v,i)=> i===0?0:Math.log(v/adj[i-1]));
+    const o = new Array(n).fill(null);
+    for(let i=p;i<n;i++){
+      let m=0; for(let j=i-p+1;j<=i;j++) m+=ret[j]; m/=p;
+      let v=0; for(let j=i-p+1;j<=i;j++) v+=(ret[j]-m)**2;
+      o[i] = Math.sqrt(v/(p-1))*Math.sqrt(252)*100;
+    }
+    return o;
+  }
+  const HV_20 = HV(20), HV_60 = HV(60);
+  function SHARPE(p, rfSeries){
+    const ret = adj.map((v,i)=> i===0?0:Math.log(v/adj[i-1]));
+    const o = new Array(n).fill(null);
+    for(let i=p;i<n;i++){
+      let m=0; for(let j=i-p+1;j<=i;j++) m+=ret[j]; m/=p;
+      let v=0; for(let j=i-p+1;j<=i;j++) v+=(ret[j]-m)**2;
+      const sd = Math.sqrt(v/(p-1));
+      let rfWindow = 0;
+      for(let j=i-p+1;j<=i;j++) rfWindow += (rfSeries[j]||0);
+      rfWindow = (rfWindow/p) / 100 / 252;
+      o[i] = sd === 0 ? null : ((m - rfWindow) / sd) * Math.sqrt(252);
+    }
+    return o;
+  }
+  const sharpe_60_TW = SHARPE(60, _tw10y);
+  const sharpe_60_US = SHARPE(60, _us10y);
+
+  // Fund-flow derived (same logic as buildData, uses _twiiRaw)
+  const dollar_vol = adj.map((v,i)=> v * vol[i]);
+  function _sma(arr, p){
+    const o = new Array(arr.length).fill(null);
+    let s = 0;
+    for (let i=0;i<arr.length;i++){
+      s += arr[i];
+      if (i >= p) s -= arr[i-p];
+      if (i >= p-1) o[i] = s / p;
+    }
+    return o;
+  }
+  const dvol_ma5  = _sma(dollar_vol, 5);
+  const dvol_ma20 = _sma(dollar_vol, 20);
+  const dvol_ratio = dollar_vol.map((v,i)=> dvol_ma20[i] && dvol_ma20[i] > 0 ? +(v / dvol_ma20[i]).toFixed(3) : null);
+
+  const pv_signal_code = new Array(n).fill(0);
+  for (let i=1;i<n;i++){
+    const ret_1d = (adj[i] / adj[i-1]) - 1;
+    const vol_chg = vol[i-1] > 0 ? (vol[i] / vol[i-1]) - 1 : 0;
+    if (ret_1d > 0 && vol_chg > 0.2)      pv_signal_code[i] = +1;
+    else if (ret_1d < 0 && vol_chg > 0.2) pv_signal_code[i] = -1;
+    else                                   pv_signal_code[i] = 0;
+  }
+
+  const rs_vs_bench = adj.map((v,i)=> (_twiiRaw[i] > 0 && _twiiRaw[0] > 0) ? +((v / adj[0]) / (_twiiRaw[i] / _twiiRaw[0])).toFixed(4) : null);
+  const rs_ma10 = _sma(rs_vs_bench.map(v=>v||0), 10);
+  const rs_trend = rs_ma10.map((v,i)=> (i >= 5 && v != null && rs_ma10[i-5] != null) ? +(v - rs_ma10[i-5]).toFixed(4) : null);
+  function ret1(a){ const r=new Array(a.length).fill(0); for(let i=1;i<a.length;i++) r[i]=a[i]/a[i-1]-1; return r; }
+  const r1 = ret1(adj), r2 = ret1(_benchRaw);
+  function rollBetaCorr(p){
+    const beta=new Array(n).fill(null), corr=new Array(n).fill(null);
+    for(let i=p;i<n;i++){
+      let mx=0, my=0; for(let j=i-p+1;j<=i;j++){ mx+=r1[j]; my+=r2[j]; } mx/=p; my/=p;
+      let cov=0, vx=0, vy=0;
+      for(let j=i-p+1;j<=i;j++){ const dx=r1[j]-mx, dy=r2[j]-my; cov+=dx*dy; vx+=dx*dx; vy+=dy*dy; }
+      cov/=p; vx/=p; vy/=p;
+      beta[i] = vy===0 ? null : cov/vy;
+      corr[i] = (vx===0||vy===0) ? null : cov/Math.sqrt(vx*vy);
+    }
+    return { beta, corr };
+  }
+  const bc = rollBetaCorr(60);
+
+  return {
+    date: raw.date,
+    open, high, low, close, volume:vol, adj,
+    MA5:ma5, MA10:ma10, MA20:ma20, MA60:ma60, MA120:ma120, MA240:ma240,
+    EMA10:ema10, EMA20:ema20, EMA60:ema60, EMA120:ema120, EMA240:ema240,
+    BB_UP:bb.up, BB_MID:bb.mid, BB_LO:bb.lo,
+    YTM:ytm, volume_MA20:volMA20,
+    MACD:macd.macd, MACD_signal:macd.sig, MACD_hist:macd.hist,
+    RSI:rsi, K:kd.K, D:kd.D, OBV:obv, ATR:atr, NATR:natr,
+    foreign_net, trust_net, dealer_net, total_net,
+    foreign_holding, trust_holding, dealer_holding,
+    margin_balance, short_balance, short_margin_ratio, maintenance_ratio,
+    taiex_or_tx_price, foreign_net_oi, foreign_long_short_diff,
+    daytrade_ratio, daytrade_value,
+    _twiiRaw, _gspcRaw, _benchRaw,
+    _tw10y, _us10y,
+    HV_20, HV_60, drawdown,
+    sharpe_60_TW, sharpe_60_US,
+    dollar_vol, dvol_ma5, dvol_ma20, dvol_ratio, pv_signal_code, rs_vs_bench, rs_ma10, rs_trend,
+    beta_60: bc.beta, corr_60: bc.corr,
+    info: (() => {
+      const last = adj[adj.length-1];
+      const r = mulberry32(Math.floor(adj[0] * 1000) + 9999);
+      const mean = +(last * (1 + (r()-0.5) * 0.25)).toFixed(2);
+      const high = +(mean * (1 + 0.10 + r() * 0.10)).toFixed(2);
+      const low  = +(mean * (1 - 0.10 - r() * 0.10)).toFixed(2);
+      const recMean = +(1.5 + r() * 2.5).toFixed(2);
+      const keys = ['strongBuy','buy','hold','sell','strongSell'];
+      const recKey = keys[Math.min(4, Math.floor((recMean - 1) / 1.0))];
+      return {
+        targetMeanPrice:         mean,
+        targetHighPrice:         high,
+        targetLowPrice:          low,
+        numberOfAnalystOpinions: 14 + Math.floor(r() * 22),
+        recommendationMean:      recMean,
+        recommendationKey:       recKey
+      };
+    })()
+  };
+}
+
+/* normalized date input */
+function bindNormDate(){
+  const el = document.getElementById('normDate');
+  el.addEventListener('change', () => {
+    RUNTIME.view_state.normalized_date = el.value;
+    render();
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════
+   15. Runtime handshake
+   ════════════════════════════════════════════════════════════════ */
+window.VIA_STK_RES = {
+  asset_id: "AST-HTML-TPL-VIA-305-003",
+  family: "VIA_T03_T05_StockTA_Resonance",
+  layout_id: SCHEMA.layout_meta.layout_id,
+  version: SCHEMA.layout_meta.version,
+  slots: ["SLOT_SELECTOR","SLOT_META_KPI","SLOT_INDICATOR_TOGGLES","SLOT_PANEL_RAIL","SLOT_CHART_STACK"],
+  panels: SCHEMA.panel_definitions.map(p => p.id),
+  support_tools: [
+    "VIA_SSOT_Unified","VeritasAegisNexus","VeritasCeleritas",
+    "VIA_EnvManager","VIA_Panorama_AST_RuntimeInjector",
+    "VIA_RegistryCore_v1","VIA_Runtime_Bridge_All_in_One"
+  ],
+  schema: SCHEMA,
+  runtime: RUNTIME,
+  heartbeat: () => ({ status:"alive", ts: Date.now(), ticker: RUNTIME.context.ticker }),
+  recompute: () => render(),
+  setOrder: (order) => { RUNTIME.panel_order = order.slice(); renderPanelRail(); render(); },
+  setExpanded: (pid, on) => { RUNTIME.panel_state[pid].expanded = !!on; renderPanelRail(); render(); }
+};
+
+/* ════════════════════════════════════════════════════════════════
+   16. Boot
+   ════════════════════════════════════════════════════════════════ */
+function showFatalError(msg){
+  const mount = document.getElementById('chartBottom');
+  if (mount){
+    mount.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;
+                  background:#fff;border:1px dashed #dbd9d3;border-radius:8px;padding:32px;
+                  font-family:'DM Mono',monospace;color:#1e1d1a;text-align:center;gap:10px">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;color:#c96b5a;font-size:14px;letter-spacing:.3px">
+          PLOTLY LOAD FAILED
+        </div>
+        <div style="font-size:11px;color:#6b6860;max-width:560px;line-height:1.6">
+          ${msg}
+        </div>
+        <div style="font-size:10px;color:#9c9890;margin-top:6px;letter-spacing:.3px">
+          Sources tried (in order):<br>
+          ${window.__VIA_PLOTLY_SOURCES__.map(u=>`<code style="color:#c96b5a">${u}</code>`).join('<br>')}
+        </div>
+        <div style="font-size:10px;color:#9c9890;margin-top:8px">
+          If you are offline, save one of the URLs locally and replace the loader block in
+          ANCHOR[VIA:ANCHOR:S07-HEAD].
+        </div>
+      </div>`;
+  }
+  console.error('[VIA_STK_RES]', msg);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   17. Fundamentals (right-side 2x2 cards) — demo data + Plotly render
+       Cards: 營收 / 利潤比率 / EPS / ROE&ROA  (independent x-axis,
+              not synced to main stack time axis)
+   ════════════════════════════════════════════════════════════════ */
+let FUND_DATA = null;
+
+function genFundData(seed){
+  const rng = mulberry32(seed | 0);
+  const N = 60;        // months back
+  const NQ = 22;       // quarters back
+  const NY = 6;        // years back
+  const dateMonth = [];
+  const dateQuarter = [];
+  const dateYear = [];
+  const today = new Date(); today.setDate(1);
+  for (let i=N-1; i>=0; i--){
+    const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+    dateMonth.push(`${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}`);
+  }
+  for (let i=NQ-1; i>=0; i--){
+    const yr = today.getFullYear() - Math.floor(i/4);
+    const q  = ((today.getMonth() / 3 | 0) - (i % 4) + 4) % 4 + 1;
+    dateQuarter.push(`${yr - (q > ((today.getMonth()/3|0)+1) ? 1:0)}Q${q}`);
+  }
+  for (let i=NY-1; i>=0; i--){
+    dateYear.push(String(today.getFullYear() - i));
+  }
+
+  // Revenue (monthly · in 億元)
+  const revMonth = [];
+  let base = 2200;
+  for (let i=0;i<N;i++){
+    const trend = i * 18;
+    const season = Math.sin(i / 2.1) * 280;
+    const shock = (rng() - 0.5) * 280;
+    revMonth.push(+(base + trend + season + shock).toFixed(0));
+  }
+  // YoY
+  const revYoY = revMonth.map((v,i) => i < 12 ? null : +(((v / revMonth[i-12]) - 1) * 100).toFixed(2));
+
+  // Quarterly revenue (sum every 3)
+  const revQuarter = [];
+  for (let i=0;i<NQ;i++){
+    const start = N - (NQ - i) * 3;
+    let s = 0; for (let k=Math.max(0,start); k<Math.min(N,start+3); k++) s += revMonth[k];
+    revQuarter.push(s);
+  }
+  // Yearly
+  const revYear = [];
+  for (let i=0;i<NY;i++){
+    const start = N - (NY - i) * 12;
+    let s = 0; for (let k=Math.max(0,start); k<Math.min(N,start+12); k++) s += revMonth[k];
+    revYear.push(s);
+  }
+
+  // Margins (quarterly, %)
+  const grossMargin=[], opMargin=[], netMargin=[];
+  for (let i=0;i<NQ;i++){
+    const t = i / NQ;
+    const noise = (rng()-0.5)*3;
+    grossMargin.push(+(50 + t*18 + noise).toFixed(2));
+    opMargin.push(+(38 + t*22 + noise*0.8).toFixed(2));
+    netMargin.push(+(34 + t*18 + noise*0.7).toFixed(2));
+  }
+
+  // EPS (quarterly)
+  const epsQ = [];
+  let baseEPS = 7.5;
+  for (let i=0;i<NQ;i++){
+    const trend = i * 0.55;
+    const season = Math.sin(i / 1.7) * 2.2;
+    const shock = (rng()-0.5)*2;
+    epsQ.push(+(baseEPS + trend + season + shock).toFixed(2));
+  }
+  const epsQYoY = epsQ.map((v,i) => i < 4 ? null : +(((v / epsQ[i-4]) - 1) * 100).toFixed(2));
+  const epsYear = [];
+  for (let i=0;i<NY;i++){
+    const start = NQ - (NY - i) * 4;
+    let s = 0; for (let k=Math.max(0,start); k<Math.min(NQ,start+4); k++) s += epsQ[k];
+    epsYear.push(+s.toFixed(2));
+  }
+
+  // ROE / ROA (quarterly, %)
+  const roeQ=[], roaQ=[];
+  for (let i=0;i<NQ;i++){
+    const t = i / NQ;
+    const n = (rng()-0.5)*1.5;
+    roeQ.push(+(7 + t*7 + n).toFixed(2));
+    roaQ.push(+(4 + t*4 + n*0.6).toFixed(2));
+  }
+  const roeYear=[], roaYear=[];
+  for (let i=0;i<NY;i++){
+    const start = NQ - (NY - i) * 4;
+    let se=0, sa=0, c=0;
+    for (let k=Math.max(0,start); k<Math.min(NQ,start+4); k++){ se+=roeQ[k]; sa+=roaQ[k]; c++; }
+    roeYear.push(+(se/c).toFixed(2)); roaYear.push(+(sa/c).toFixed(2));
+  }
+
+  // DPS — dividend per share, annual default (TW pays once a year typically)
+  const dpsYear = [];
+  for (let i=0;i<NY;i++){
+    // Pay ratio ~0.6 of EPS-annual + noise
+    const noise = (rng()-0.5)*0.8;
+    dpsYear.push(+Math.max(0, epsYear[i] * 0.6 + noise).toFixed(2));
+  }
+  const dpsYoY = dpsYear.map((v,i) => i<1 ? null : +(((v/dpsYear[i-1])-1)*100).toFixed(2));
+
+  return {
+    dateMonth, dateQuarter, dateYear,
+    revMonth, revYoY, revQuarter, revYear,
+    grossMargin, opMargin, netMargin,
+    epsQ, epsQYoY, epsYear,
+    roeQ, roaQ, roeYear, roaYear,
+    dpsYear, dpsYoY
+  };
+}
+
+function _fundLayoutBase(useY2){
+  const L = {
+    paper_bgcolor:'#fff', plot_bgcolor:'#fff',
+    font:{ family:'DM Sans, system-ui, sans-serif', size:9.5, color:'#1e1d1a' },
+    margin:{ l:46, r:42, t:12, b:28 },
+    showlegend:false,
+    hovermode:'x unified',
+    hoverlabel:{ bgcolor:'rgba(255,255,255,0.96)', bordercolor:'#dbd9d3', font:{family:'DM Mono', size:10, color:'#1e1d1a'} },
+    dragmode:false,
+    xaxis:{ showgrid:false, gridcolor:'rgba(30,29,26,0.05)', tickfont:{family:'DM Mono', size:8.5, color:'#6b6860'}, ticks:'outside', ticklen:3, fixedrange:true, type:'category' },
+    yaxis:{ showgrid:true, gridcolor:'rgba(30,29,26,0.06)', tickfont:{family:'DM Mono', size:8.5, color:'#6b6860'}, ticks:'outside', ticklen:3, fixedrange:true, side:'left' }
+  };
+  if (useY2){
+    L.yaxis2 = { showgrid:false, tickfont:{family:'DM Mono', size:8.5, color:'#c96b5a'}, ticks:'outside', ticklen:3, fixedrange:true, overlaying:'y', side:'right', ticksuffix:'%' };
+    L.margin.r = 46;
+  }
+  return L;
+}
+
+function _fundCfg(){ return { displayModeBar:false, responsive:true, scrollZoom:false, doubleClick:false }; }
+
+function renderFundRevenue(){
+  const F = FUND_DATA;
+  const st = RUNTIME.view_state.fundamentals.revenue;
+  let x, y, yoy;
+  if (st.period === 'month' || st.period === 'l12'){
+    const n = st.period === 'l12' ? Math.min(12, F.dateMonth.length) : F.dateMonth.length;
+    const s = F.dateMonth.length - n;
+    x = F.dateMonth.slice(s); y = F.revMonth.slice(s); yoy = F.revYoY.slice(s);
+  } else if (st.period === 'quarter'){
+    x = F.dateQuarter.slice(); y = F.revQuarter.slice();
+    yoy = y.map((v,i)=> i<4?null:+(((v/y[i-4])-1)*100).toFixed(2));
+  } else {
+    x = F.dateYear.slice(); y = F.revYear.slice();
+    yoy = y.map((v,i)=> i<1?null:+(((v/y[i-1])-1)*100).toFixed(2));
+  }
+  if (st.mode === 'cum'){
+    let s=0; y = y.map(v=>{ s += v; return s; });
+  }
+  const traces = [
+    { type:'bar', x, y, name:'營收', marker:{color:'#c4943a', opacity:0.85, line:{width:0}}, hovertemplate:'營收 %{y:,.0f}<extra></extra>', yaxis:'y' }
+  ];
+  if (st.grow){
+    traces.push({ type:'scatter', mode:'lines+markers', x, y:yoy, name:'YoY', yaxis:'y2',
+                  line:{color:'#c96b5a', width:1.6}, marker:{color:'#c96b5a', size:4}, hovertemplate:'YoY %{y:.1f}%<extra></extra>' });
+  }
+  Plotly.react('fundRevenue', traces, _fundLayoutBase(!!st.grow), _fundCfg());
+}
+
+function renderFundMargin(){
+  const F = FUND_DATA;
+  const st = RUNTIME.view_state.fundamentals.margin;
+  let x, gm, om, nm;
+  if (st.period === 'year'){
+    x = F.dateYear.slice();
+    const ny = F.dateYear.length;
+    gm = []; om = []; nm = [];
+    for (let i=0;i<ny;i++){
+      const start = F.dateQuarter.length - (ny - i) * 4;
+      let sg=0, so=0, sn=0, c=0;
+      for (let k=Math.max(0,start); k<Math.min(F.dateQuarter.length,start+4); k++){
+        sg+=F.grossMargin[k]; so+=F.opMargin[k]; sn+=F.netMargin[k]; c++;
+      }
+      gm.push(+(sg/c).toFixed(2)); om.push(+(so/c).toFixed(2)); nm.push(+(sn/c).toFixed(2));
+    }
+  } else {
+    x = F.dateQuarter.slice(); gm = F.grossMargin.slice(); om = F.opMargin.slice(); nm = F.netMargin.slice();
+  }
+  const traces = [
+    { type:'scatter', mode:'lines+markers', x, y:gm, name:'毛利率', line:{color:'#c4943a', width:1.6}, marker:{color:'#c4943a', size:4}, hovertemplate:'毛利率 %{y:.2f}%<extra></extra>' },
+    { type:'scatter', mode:'lines+markers', x, y:om, name:'營益率', line:{color:'#c96b5a', width:1.6}, marker:{color:'#c96b5a', size:4}, hovertemplate:'營益率 %{y:.2f}%<extra></extra>' },
+    { type:'scatter', mode:'lines+markers', x, y:nm, name:'淨利率', line:{color:'#439a9a', width:1.6}, marker:{color:'#439a9a', size:4}, hovertemplate:'淨利率 %{y:.2f}%<extra></extra>' }
+  ];
+  const layout = _fundLayoutBase(false);
+  layout.yaxis.ticksuffix = '%';
+  Plotly.react('fundMargin', traces, layout, _fundCfg());
+}
+
+function renderFundEPS(){
+  const F = FUND_DATA;
+  const st = RUNTIME.view_state.fundamentals.eps;
+  let x, y, yoy;
+  if (st.period === 'l4q'){
+    const n = Math.min(4, F.dateQuarter.length);
+    const s = F.dateQuarter.length - n;
+    x = F.dateQuarter.slice(s); y = F.epsQ.slice(s); yoy = F.epsQYoY.slice(s);
+  } else if (st.period === 'year'){
+    x = F.dateYear.slice(); y = F.epsYear.slice();
+    yoy = y.map((v,i)=> i<1?null:+(((v/y[i-1])-1)*100).toFixed(2));
+  } else {
+    x = F.dateQuarter.slice(); y = F.epsQ.slice(); yoy = F.epsQYoY.slice();
+  }
+  if (st.mode === 'cum'){
+    let s=0; y = y.map(v=>{ s += v; return s; });
+  }
+  const traces = [
+    { type:'bar', x, y, name:'每股盈餘', marker:{color:'#c4943a', opacity:0.85, line:{width:0}}, hovertemplate:'EPS %{y:.2f}<extra></extra>', yaxis:'y' }
+  ];
+  if (st.grow){
+    traces.push({ type:'scatter', mode:'lines+markers', x, y:yoy, name:'YoY', yaxis:'y2',
+                  line:{color:'#c96b5a', width:1.6}, marker:{color:'#c96b5a', size:4}, hovertemplate:'YoY %{y:.1f}%<extra></extra>' });
+  }
+  Plotly.react('fundEPS', traces, _fundLayoutBase(!!st.grow), _fundCfg());
+}
+
+function renderFundROE(){
+  const F = FUND_DATA;
+  const st = RUNTIME.view_state.fundamentals.roe;
+  let x, roe, roa;
+  if (st.period === 'year'){
+    x = F.dateYear.slice(); roe = F.roeYear.slice(); roa = F.roaYear.slice();
+  } else {
+    x = F.dateQuarter.slice(); roe = F.roeQ.slice(); roa = F.roaQ.slice();
+  }
+  const traces = [
+    { type:'scatter', mode:'lines+markers', x, y:roe, name:'ROE', line:{color:'#c4943a', width:1.6}, marker:{color:'#c4943a', size:4}, hovertemplate:'ROE %{y:.2f}%<extra></extra>' },
+    { type:'scatter', mode:'lines+markers', x, y:roa, name:'ROA', line:{color:'#c96b5a', width:1.6}, marker:{color:'#c96b5a', size:4}, hovertemplate:'ROA %{y:.2f}%<extra></extra>' }
+  ];
+  const layout = _fundLayoutBase(false);
+  layout.yaxis.ticksuffix = '%';
+  Plotly.react('fundROE', traces, layout, _fundCfg());
+}
+
+function renderFundDPS(){
+  const F = FUND_DATA;
+  const st = RUNTIME.view_state.fundamentals.dps;
+  // DPS is yearly-only (annual dividend); period switch is a no-op visually
+  const x = F.dateYear.slice();
+  let y = F.dpsYear.slice();
+  const yoy = F.dpsYoY.slice();
+  if (st.mode === 'cum'){
+    let s=0; y = y.map(v=>{ s += v; return s; });
+  }
+  const traces = [
+    { type:'bar', x, y, name:'每股股利', marker:{color:'#5a9e6f', opacity:0.85, line:{width:0}}, hovertemplate:'DPS %{y:.2f}<extra></extra>', yaxis:'y' }
+  ];
+  if (st.grow){
+    traces.push({ type:'scatter', mode:'lines+markers', x, y:yoy, name:'YoY', yaxis:'y2',
+                  line:{color:'#c96b5a', width:1.6}, marker:{color:'#c96b5a', size:4}, hovertemplate:'YoY %{y:.1f}%<extra></extra>' });
+  }
+  Plotly.react('fundDPS', traces, _fundLayoutBase(!!st.grow), _fundCfg());
+}
+
+function updateConsensus(D){
+  const info = D && D.info;
+  if (!info) return;
+  const last = D.adj[D.adj.length-1];
+  const fmt = (v, d=2) => v==null ? '—' : Number(v).toFixed(d);
+  const fmtInt = (v) => v==null ? '—' : Number(v).toLocaleString('en-US');
+  const el = id => document.getElementById(id);
+
+  el('con_targetMean').textContent  = fmt(info.targetMeanPrice);
+  el('con_targetHigh').textContent  = fmt(info.targetHighPrice);
+  el('con_targetLow').textContent   = fmt(info.targetLowPrice);
+  el('con_numAnalysts').textContent = fmtInt(info.numberOfAnalystOpinions);
+  el('con_recMean').textContent     = fmt(info.recommendationMean, 2);
+
+  // recommendationKey pill — display as Title Case with space
+  const rec = info.recommendationKey || 'hold';
+  const pill = el('con_recKey');
+  // 'strongBuy' → 'Strong Buy', 'buy' → 'Buy', 'hold' → 'Hold'
+  const niceLabel = rec.replace(/([A-Z])/g, ' $1').trim().replace(/^./, c => c.toUpperCase());
+  pill.textContent = niceLabel;
+  pill.className = 'rec-pill ' + rec;
+
+  // Delta vs last
+  const delta = info.targetMeanPrice - last;
+  const dPct = (delta / last) * 100;
+  const deltaEl = el('con_meanDelta');
+  deltaEl.textContent = `vs last ${delta>=0?'+':''}${fmt(delta)} (${dPct>=0?'+':''}${fmt(dPct)}%)`;
+  deltaEl.className = 'con-mean-delta ' + (delta>=0 ? 'up' : 'dn');
+
+  // Range bar: position mean marker + last marker between low and high
+  const lo = info.targetLowPrice, hi = info.targetHighPrice;
+  const span = hi - lo;
+  if (span > 0){
+    const pct = (v) => Math.max(0, Math.min(100, ((v - lo) / span) * 100));
+    el('con_meanMarker').style.left = pct(info.targetMeanPrice) + '%';
+    el('con_lastMarker').style.left = pct(last) + '%';
+    // Adjust the fill to cover full bar (it's already 100%); could shade between markers
+    el('con_rangeFill').style.left = '0%';
+    el('con_rangeFill').style.right = '0%';
+  }
+}
+
+function renderAllFund(){
+  if (!FUND_DATA) return;
+  renderFundRevenue(); renderFundMargin(); renderFundEPS(); renderFundROE(); renderFundDPS();
+  if (DATA_FULL) updateConsensus(DATA_FULL);
+}
+
+function bindFundControls(){
+  // generic toggle group binder
+  document.querySelectorAll('.fund-tog').forEach(grp => {
+    const bucket = grp.dataset.bucket;  // e.g. "revenue-period"
+    grp.querySelectorAll('button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        grp.querySelectorAll('button').forEach(b => b.classList.remove('on'));
+        btn.classList.add('on');
+        const [card, key] = bucket.split('-');
+        RUNTIME.view_state.fundamentals[card][key] = btn.dataset.v;
+        renderAllFund();
+      });
+    });
+  });
+  // grow toggle
+  document.querySelectorAll('.badge-grow').forEach(b => {
+    b.addEventListener('click', () => {
+      const card = b.dataset.grow;
+      const cur = RUNTIME.view_state.fundamentals[card].grow !== false;
+      RUNTIME.view_state.fundamentals[card].grow = !cur;
+      b.classList.toggle('on', !cur);
+      renderAllFund();
+    });
+  });
+}
+
+/* inst_flow single/cum toggle (injected onto the chart-stack card header) */
+function injectInstFlowToggle(){
+  // Find the chart-stack card header (cd-h) and append a chip toggle for inst_flow mode
+  const stageCard = document.getElementById('chartBottom').closest('.cd');
+  if (!stageCard) return;
+  const head = stageCard.querySelector('.cd-h');
+  if (!head || head.querySelector('.inst-mode-chip')) return;
+  const wrap = document.createElement('span');
+  wrap.className = 'inst-mode-chip';
+  wrap.style.cssText = 'display:inline-flex;gap:0;background:var(--bg1);padding:2px;border-radius:6px;font-family:var(--mo);margin-left:auto';
+  wrap.innerHTML = `
+    <span style="padding:3px 7px;font:600 9px var(--mo);color:var(--i3);letter-spacing:.3px;align-self:center">三大法人</span>
+    <button data-mode="single" class="on" style="background:var(--sf);border:0;color:var(--co);font:600 9px var(--mo);padding:3px 9px;cursor:pointer;border-radius:3px;letter-spacing:.3px;text-transform:uppercase;box-shadow:var(--sh)">單日</button>
+    <button data-mode="cum" style="background:transparent;border:0;color:var(--i2);font:600 9px var(--mo);padding:3px 9px;cursor:pointer;border-radius:3px;letter-spacing:.3px;text-transform:uppercase">累積</button>
+  `;
+  // Replace the cd-s badge area
+  const sBadge = head.querySelector('.cd-s');
+  if (sBadge) sBadge.replaceWith(wrap); else head.appendChild(wrap);
+  wrap.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      wrap.querySelectorAll('button').forEach(b => {
+        b.classList.remove('on');
+        b.style.background = 'transparent'; b.style.color = 'var(--i2)'; b.style.boxShadow = 'none';
+      });
+      btn.classList.add('on');
+      btn.style.background = 'var(--sf)'; btn.style.color = 'var(--co)'; btn.style.boxShadow = 'var(--sh)';
+      RUNTIME.view_state.inst_flow_mode = btn.dataset.mode;
+      render();
+    });
+  });
+}
+
+function bindSymInput(){
+  const inp = document.getElementById('symInput');
+  inp.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    const v = inp.value.trim().toUpperCase();
+    if (!v) return;
+    document.querySelectorAll('.fav-pill').forEach(x => x.classList.toggle('on', x.dataset.sym === v));
+    RUNTIME.context.ticker = v;
+    RUNTIME.context.ticker_name = v;
+    const seed = v.split('').reduce((a,c)=>a*31+c.charCodeAt(0), 7);
+    const start = 200 + (Math.abs(seed) % 1500);
+    const raw = genOHLCV(500, Math.abs(seed)+1, start);
+    DATA_FULL = _buildFromRaw(raw);
+    FUND_DATA = genFundData(Math.abs(seed)+777);
+    render();
+    renderAllFund();
+  });
+}
+
+function bindBenchRfSelectors(){
+  const bench = document.getElementById('benchSel');
+  const rf    = document.getElementById('rfSel');
+  if (bench){
+    bench.value = RUNTIME.view_state.benchmark || '^TWII';
+    bench.addEventListener('change', e => {
+      RUNTIME.view_state.benchmark = e.target.value;
+      render();
+    });
+  }
+  if (rf){
+    rf.value = RUNTIME.view_state.risk_free || 'TW10Y';
+    rf.addEventListener('change', e => {
+      RUNTIME.view_state.risk_free = e.target.value;
+      render();   // Sharpe panel reacts to risk-free choice
+    });
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Wait for Plotly to be loaded by the fallback loader BEFORE doing anything
+  window.__VIA_PLOTLY_READY__.then(() => {
+    DATA_FULL = buildData();
+    FUND_DATA = genFundData(20260520);
+    // Default normalized date = ~60 days back from last
+    const n = DATA_FULL.date.length;
+    RUNTIME.view_state.normalized_date = DATA_FULL.date[Math.max(0, n - 90)];
+    const normInput = document.getElementById('normDate');
+    normInput.value = RUNTIME.view_state.normalized_date;
+    normInput.min   = DATA_FULL.date[0];
+    normInput.max   = DATA_FULL.date[n-1];
+
+    initDockState();
+    renderPanelRail();
+    renderDock();
+    bindToggles();
+    bindPeriod();
+    bindFavorites();
+    bindNormDate();
+    bindSymInput();
+    bindFundControls();
+    bindBenchRfSelectors();
+    render();
+    injectInstFlowToggle();
+    renderAllFund();
+
+    console.log('[VIA_STK_RES] booted ·', JSON.stringify(window.VIA_STK_RES.heartbeat()));
+  }).catch(err => {
+    showFatalError(err.message || String(err));
+  });
+});
+
+
+
+
+function setStockId(){try{var onp=document.querySelector('.fav-pill.on');var si=document.getElementById('symInput');var nm='',cd=si?si.value:'';
+ if(onp){var e=onp.querySelector('.name');if(e)nm=e.textContent.trim();if(onp.dataset&&onp.dataset.sym)cd=onp.dataset.sym;}
+ if(!nm)nm=cd;var n=document.getElementById('stkName'),d=document.getElementById('stkCode');
+ if(n&&n.textContent!==nm)n.textContent=nm;if(d&&d.textContent!==cd)d.textContent=cd;}catch(e){}}
+setStockId();setInterval(setStockId,500);
+
+(function(){
+ var PAL=["#4c72b0","#dd8452","#55a868","#c44e52","#8172b3","#937860","#2f9e6b","#c79a3a"];
+ var PEERS=[{c:"2303",n:"聯電"},{c:"5347",n:"世界先進"},{c:"6770",n:"力積電"},{c:"3034",n:"聯詠"},{c:"3711",n:"日月光"},{c:"2308",n:"台達電"}];
+ function rng(seed){return function(){seed=(seed*9301+49297)%233280;return seed/233280;};}
+ function spark(seed){var r=rng(seed),N=32,a=[100];for(var i=1;i<N;i++)a.push(a[i-1]*(1+(r()-0.48)*0.03));
+  var mn=Math.min.apply(0,a),mx=Math.max.apply(0,a),rg=(mx-mn)||1,W=120,H=34;
+  var pts=a.map(function(v,i){return [(i/(N-1))*W,H-((v-mn)/rg)*H]});
+  var d="M"+pts.map(function(p){return p[0].toFixed(1)+","+p[1].toFixed(1)}).join("L");
+  var area=d+"L"+W+","+H+"L0,"+H+"Z";var chg=(a[N-1]/a[0]-1)*100;return {d:d,area:area,chg:chg,last:a[N-1]};}
+ function render(){var g=document.getElementById('peersGrid');if(!g)return;g.innerHTML='';
+  PEERS.forEach(function(p,i){var col=PAL[i%PAL.length],sp=spark(p.c.split('').reduce(function(a,ch){return a*31+ch.charCodeAt(0)},7));
+   var up=sp.chg>=0,pc=up?'#d1453b':'#2f9e6b';
+   var px=(800+ (sp.last-100)*6).toFixed(2);
+   var el=document.createElement('div');el.className='peer-card';el.title=p.n+' '+p.c;
+   el.innerHTML='<svg class="peer-spark" viewBox="0 0 120 34" preserveAspectRatio="none"><path d="'+sp.area+'" fill="'+col+'"/><path d="'+sp.d+'" fill="none" stroke="'+col+'" stroke-width="1.4"/></svg>'
+    +'<div class="peer-top"><span><span class="peer-nm">'+p.n+'</span><span class="peer-cd">'+p.c+'</span></span><span class="peer-pct" style="color:'+pc+'">'+(up?'+':'')+sp.chg.toFixed(2)+'%</span></div>'
+    +'<div class="peer-px">'+px+'</div>';
+   el.onclick=function(){var si=document.getElementById('symInput');if(si){si.value=p.c+'.TW';si.dispatchEvent(new Event('change'));}};
+   g.appendChild(el);});}
+ var add=document.getElementById('peersAdd');
+ if(add)add.addEventListener('keyup',function(e){if(e.key==='Enter'&&add.value.trim()){var v=add.value.trim().replace('.TW','');PEERS.push({c:v,n:v});add.value='';render();}});
+ render();
+})();
+</script>
+</body>
+</html>

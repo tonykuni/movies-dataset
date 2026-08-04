@@ -1,0 +1,204 @@
+<!DOCTYPE html><html lang="zh-TW"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>VIA · US Macro Template v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--bg1:#edecea;--bg2:#e5e3df;--sf:#fff;--sf2:#fafaf8;--bd:#dbd9d3;--bd2:#ccc9c1;
+--bl:#4c78a8;--bl-l:#d0e1f0;--tl:#439a9a;--tl-l:#c8e6e6;--gn:#5a9e6f;--gn-l:#cde8d5;
+--am:#c4943a;--am-l:#f5e2b8;--co:#c96b5a;--co-l:#f5d0c8;--vi:#7a6daa;--vi-l:#dcd8f0;
+--i0:#1e1d1a;--i1:#3d3c38;--i2:#6b6860;--i3:#9c9890;--i4:#c4c0b8;--up:#c0392b;--dn:#2e7d52;
+/* seaborn deep combos */
+--sb0:#4C72B0;--sb1:#DD8452;--sb2:#55A868;--sb3:#C44E52;--sb4:#8172B3;--sb5:#937860;--sb6:#DA8BC3;--sb7:#8C8C8C;--sb8:#CCB974;--sb9:#64B5CD;
+--mo:'DM Mono',monospace;--sa:'DM Sans',system-ui,sans-serif;
+--r:5px;--r2:8px;--r3:12px;--sh:0 1px 3px rgba(0,0,0,.06);--sh2:0 4px 16px rgba(0,0,0,.10);}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sa);background:var(--bg);color:var(--i0);font-size:11.5px;line-height:1.5;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
+.w{max-width:1560px;margin:0 auto;padding:10px 16px}
+.hdr{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r3);padding:11px 16px;margin-bottom:8px;position:relative;overflow:hidden;display:flex;align-items:center;gap:14px;box-shadow:var(--sh2)}
+.hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--bl),var(--tl),var(--vi),var(--am),var(--co),var(--gn));background-size:200% 100%;animation:hs 8s linear infinite}
+@keyframes hs{0%{background-position:0%}100%{background-position:200%}}
+.logo-wrap{width:42px;height:42px;flex-shrink:0;background:linear-gradient(135deg,#1e3a5f,var(--vi));border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--mo);font-size:12px;box-shadow:0 2px 8px rgba(76,120,168,.35)}
+.hdr-titles{flex:1}.hdr-title{font-weight:700;font-size:16px}.hdr-title span{color:var(--bl)}
+.hdr-sub{font-size:9px;color:var(--i3);font-family:var(--mo);margin-top:2px}
+.hdr-r{font-family:var(--mo);font-size:8.5px;text-align:right;color:var(--i2);line-height:1.7}
+.winb{background:var(--gn-l);color:var(--gn);padding:2px 9px;border-radius:10px}
+.up{color:var(--up)}.dn{color:var(--dn)}.fl{color:var(--i3)}.ar{font-weight:700}
+.hero{background:linear-gradient(135deg,var(--sf2),var(--sf));border:1px solid var(--bd);border-radius:var(--r3);padding:14px 16px;margin-bottom:12px;box-shadow:var(--sh)}
+.hero-eq{font-family:var(--mo);font-size:10px;color:var(--i3);margin-bottom:10px;text-align:center}.hero-eq b{color:var(--i1)}
+.hero-row{display:flex;align-items:stretch;gap:7px;flex-wrap:wrap;justify-content:center}
+.op{display:flex;align-items:center;font-family:var(--mo);font-size:20px;color:var(--i3)}
+.term{border:1px solid var(--bd);border-radius:var(--r2);background:var(--sf);padding:9px 13px;min-width:108px;text-align:center;position:relative;overflow:hidden}
+.term::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--tc)}
+.term.lhs{background:linear-gradient(135deg,#1e3a5f,#2d4a6f);color:#fff;border:none;min-width:180px}.term.lhs::before{display:none}
+.term .sym{font-family:var(--mo);font-size:18px;font-weight:500;color:var(--tc)}.term.lhs .sym{color:#fff;font-size:11px}
+.term .zh{font-size:8.5px;color:var(--i3);margin:2px 0 4px}.term.lhs .zh{color:#b9c7d6}
+.term .v{font-family:var(--mo);font-size:15px;font-weight:500}.term.lhs .v{color:#fff;font-size:20px}
+.term .sh{font-family:var(--mo);font-size:9px;margin-top:2px;color:var(--i2)}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:8px;margin-bottom:12px}
+.cc{border:1px solid var(--bd);border-radius:var(--r2);overflow:hidden;background:var(--sf);box-shadow:var(--sh)}
+.cc-h{display:flex;align-items:center;gap:8px;padding:8px 11px;border-bottom:1px solid var(--bd);background:var(--sf2);border-left:3px solid var(--tc)}
+.cc-sym{font-family:var(--mo);font-size:15px;font-weight:500;color:var(--tc);min-width:18px;text-align:center}
+.cc-tt{flex:1}.cc-tt .n{font-weight:700;font-size:11px}.cc-tt .s{font-family:var(--mo);font-size:8px;color:var(--i3)}
+.cc-v{font-family:var(--mo);font-size:13px;font-weight:600;text-align:right}
+.subhd{font-family:var(--mo);font-size:8px;color:var(--i3);padding:4px 11px 2px;background:var(--sf2);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--bg1)}
+.subhd.x{color:var(--gn)}.subhd.m{color:var(--co)}
+/* 細項列高統一 */
+.row{padding:5px 11px;border-bottom:1px solid var(--bg1);min-height:40px;display:flex;flex-direction:column;justify-content:center}
+.row:last-child{border-bottom:none}.row:hover{background:rgba(76,120,168,.03)}
+.row-top{display:flex;align-items:center;gap:6px}
+.row-top .ar{font-size:10px;width:12px;text-align:center}
+.row-top .nm{flex:1;font-weight:600;font-size:10px}
+.row-top .vu{font-family:var(--mo);font-size:11px;font-weight:600;white-space:nowrap}
+.row-top .yy{font-family:var(--mo);font-size:9.5px;font-weight:600;min-width:52px;text-align:right}
+.row-bt{display:flex;align-items:center;gap:8px;margin-top:2px;font-family:var(--mo);font-size:8px;color:var(--i3);flex-wrap:wrap}
+.row-bt .src{color:var(--bl);background:var(--bl-l);padding:0 5px;border-radius:7px;margin-left:auto}
+.sec-t{font-family:var(--sa);font-weight:700;font-size:12px;margin:10px 0 6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-left:8px;border-left:4px solid;border-image:linear-gradient(180deg,var(--sb0),var(--sb3)) 1}
+.sec-t .sm{font-family:var(--mo);font-size:8px;color:var(--am);background:var(--am-l);padding:1px 7px;border-radius:8px;font-weight:400}
+.tg{display:inline-flex;gap:2px;margin-left:auto}
+.tg button{font-family:var(--mo);font-size:9px;padding:2px 9px;border:1px solid var(--bd);background:var(--sf);color:var(--i2);cursor:pointer;border-radius:var(--r)}
+.tg button.on{background:var(--bl);color:#fff;border-color:var(--bl)}
+.charts3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px}
+.charts4{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:6px}
+@media(max-width:1100px){.charts3,.charts4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.charts3,.charts4{grid-template-columns:1fr}}
+.ch{border:1px solid var(--bd);border-radius:var(--r2);background:var(--sf);padding:8px 10px;box-shadow:var(--sh)}
+.ch-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:1px}
+.ch-t{font-weight:600;font-size:10px}.ch-leg{display:flex;gap:6px;font-family:var(--mo);font-size:7px;color:var(--i2);margin-bottom:2px;flex-wrap:wrap}
+.ch-leg i{display:inline-block;width:8px;height:3px;border-radius:2px;margin-right:2px;vertical-align:1px}
+.ch svg{width:100%;height:auto;display:block;cursor:crosshair}
+.axhint{font-family:var(--mo);font-size:7px}
+/* matrix */
+.mwrap{margin-top:6px}
+.mblock{border:1px solid var(--bd);border-radius:var(--r2);overflow:hidden;background:var(--sf);margin-bottom:8px;box-shadow:var(--sh)}
+.mb-h{padding:6px 12px;font-weight:700;font-size:11.5px;font-family:var(--sa);color:#fff;background:linear-gradient(90deg,var(--cc),color-mix(in srgb,var(--cc) 55%,#ffffff))}
+.cells{display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:5px;padding:8px 10px}
+.cl{border:1px solid var(--bd);border-radius:var(--r);padding:5px 8px;background:var(--sf2)}
+.cl-t{display:flex;align-items:center;gap:5px}.cl-n{font-weight:600;font-size:9.5px;flex:1;line-height:1.15}
+.cl-v{font-family:var(--mo);font-size:12px;font-weight:600;margin-top:1px}.cl-v .ar{font-size:9px;margin-left:2px}.cl-v .yy{font-size:8.5px;margin-left:4px}
+.cl-s{font-family:var(--mo);font-size:7px;color:var(--i3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dot.g{background:var(--gn)}.dot.c{background:var(--tl)}.dot.y{background:var(--am)}.dot.r{background:var(--co)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-family:var(--mo);font-size:9px;color:var(--i2);margin:4px 0 8px;align-items:center}
+.ft{font-family:var(--mo);font-size:8.5px;color:var(--i3);padding:12px 2px 8px;border-top:1px solid var(--bd);margin-top:10px;line-height:1.7}
+</style></head><body><div class="w">
+<div class="hdr"><div class="logo-wrap">US</div><div class="hdr-titles">
+<div class="hdr-title">VIA · <span>US Macro Template</span> <span style="color:var(--i3);font-size:11px;font-weight:400">v3</span></div>
+<div class="hdr-sub" id="sub"></div></div>
+<div class="hdr-r"><span class="up">▲ UP=RED</span> · <span class="dn">▼ DOWN=GREEN</span><br><span class="winb" id="win"></span><br><span style="color:var(--am)">數值 SAMPLE</span></div></div>
+<div id="hero"></div>
+<div class="cgrid" id="cards"></div>
+<div class="sec-t">特別比較圖 Featured <span class="sm">SAMPLE · 雙軸 step∈{1,2,2.5,5}×10ⁿ · 滑鼠紅虛線</span></div>
+<div class="charts3">
+ <div class="ch"><div class="ch-h"><span class="ch-t">PMI 細項 + S&P500</span><span class="tg" id="tg-pmi"><button class="on" data-v="mfg">製造</button><button data-v="nmfg">非製造</button></span></div><div class="ch-leg" id="leg-pmi"></div><svg id="c-pmi" viewBox="0 0 460 210"></svg></div>
+ <div class="ch"><div class="ch-h"><span class="ch-t">CPI 細項 + GDP growth%</span><span class="tg" id="tg-cpi"><button class="on" data-v="cpi">CPI</button><button data-v="ppi">PPI</button></span></div><div class="ch-leg" id="leg-cpi"></div><svg id="c-cpi" viewBox="0 0 460 210"></svg></div>
+ <div class="ch"><div class="ch-h"><span class="ch-t">Real GDP/人 + 個人收入</span><span class="tg" id="tg-gpc"><button class="on" data-v="annual">年</button><button data-v="quarter">季</button></span></div><div class="ch-leg"><span><i style="background:var(--bl)"></i>GDP/人(左)</span><span style="color:var(--vi)">—個人收入(右)</span></div><svg id="c-gpc" viewBox="0 0 460 210"></svg></div>
+</div>
+<div class="sec-t">一行四圖</div>
+<div class="charts4">
+ <div class="ch"><div class="ch-t">零售值(左·長條)+年增(右)</div><div class="ch-leg"><span><i style="background:var(--bl)"></i>零售$bn</span><span style="color:var(--dn)">—年增%</span></div><svg id="c-ret" viewBox="0 0 340 180"></svg></div>
+ <div class="ch"><div class="ch-t">消費者信心</div><div class="ch-leg"><span><i style="background:var(--bl)"></i>UMich(左)</span><span style="color:var(--vi)">—ConfBoard(右)</span></div><svg id="c-conf" viewBox="0 0 340 180"></svg></div>
+ <div class="ch"><div class="ch-t">非農月增(左·長條)+失業率(右)</div><div class="ch-leg"><span><i style="background:var(--up)"></i>增↑</span><span><i style="background:var(--dn)"></i>增↓</span><span style="color:var(--am)">—失業%</span></div><svg id="c-nfp" viewBox="0 0 340 180"></svg></div>
+ <div class="ch"><div class="ch-t">各失業時間長短(折線)</div><div class="ch-leg"><span><i style="background:var(--sb2)"></i>&lt;5w</span><span><i style="background:var(--sb9)"></i>5-14</span><span><i style="background:var(--sb8)"></i>15-26</span><span><i style="background:var(--sb3)"></i>27w+</span></div><svg id="c-dur" viewBox="0 0 340 180"></svg></div>
+</div>
+<div class="sec-t">完整分類資料矩陣 Full Classification Matrix <span class="sm">11類 · 75 指標 · 註冊避免遺漏</span></div>
+<div class="legend" id="leg"></div>
+<div class="mwrap" id="matrix"></div>
+<div class="ft" id="ft"></div></div>
+<script>
+const D={"title": "VIA · US Macro Template", "version": "v2", "anchor": "AST-PS-MOD-VIA-MACRO-US-TPL-002", "ccy": "USD", "window": "1995-01-01~最新", "lock": "Visual Lock v1 · UP=RED ▲ / DOWN=GREEN ▼ · 基準線紅 α0.8 粗1 · 數字 千分位+2位/%/x", "identity": "Real GDP × (1+π) = C + I + G + ( X − M )", "nom": 29.0, "real": 23.5, "infl": 2.5, "note": "卡片 sub-row=方向箭頭+年增率±%(幅度)+單月+累計+單位+數值+來源 · 雙軸:間隔數同、step∈{1,2,2.5,5}×10ⁿ、界包資料 · 數值=SAMPLE", "comps": [{"k": "C", "zh": "民間消費 Consumption", "val": 19.7, "share": 68, "t": "up", "color": "bl", "subs": [{"n": "PCE 個人消費", "dir": "up", "yoy": 2.6, "mom": 18250, "cum": 19700, "unit": "USD bn", "val": 19700, "src": "FRED PCEC / BEA"}, {"n": "零售銷售", "dir": "up", "yoy": 3.5, "mom": 702.4, "cum": 8412, "unit": "USD bn", "val": 734.0, "src": "FRED RSAFS / akshare"}, {"n": "密大消費信心", "dir": "dn", "yoy": -4.2, "mom": 71.2, "cum": null, "unit": "index", "val": 71.2, "src": "FRED UMCSENT / ak"}, {"n": "平均時薪(所得)", "dir": "up", "yoy": 3.9, "mom": 35.6, "cum": null, "unit": "USD", "val": 35.6, "src": "FRED CES0500000003"}]}, {"k": "I", "zh": "民間投資 Investment", "val": 5.2, "share": 18, "t": "dn", "color": "tl", "subs": [{"n": "民間國內投資", "dir": "dn", "yoy": -1.8, "mom": 5200, "cum": 5200, "unit": "USD bn", "val": 5200, "src": "FRED GPDI"}, {"n": "耐久財訂單", "dir": "dn", "yoy": -2.1, "mom": 289.4, "cum": 2680, "unit": "USD bn", "val": 289.4, "src": "FRED DGORDER / ak"}, {"n": "核心資本財訂單", "dir": "fl", "yoy": 0.3, "mom": 74.2, "cum": 712, "unit": "USD bn", "val": 74.2, "src": "FRED NEWORDER / ak factory"}, {"n": "建築許可/開工", "dir": "dn", "yoy": -3.5, "mom": 1420, "cum": null, "unit": "k units", "val": 1420, "src": "FRED PERMIT/HOUST"}]}, {"k": "G", "zh": "政府支出 Government", "val": 4.9, "share": 17, "t": "up", "color": "vi", "subs": [{"n": "聯邦支出", "dir": "up", "yoy": 6.2, "mom": 567, "cum": 6800, "unit": "USD bn", "val": 567, "src": "FRED FGEXPND / Treasury"}, {"n": "國防/非國防", "dir": "up", "yoy": 4.1, "mom": 82.5, "cum": 990, "unit": "USD bn", "val": 82.5, "src": "FRED FDEFX"}, {"n": "聯邦收入", "dir": "up", "yoy": 5.4, "mom": 408, "cum": 4900, "unit": "USD bn", "val": 408, "src": "FRED FGRECPT"}]}, {"k": "X", "zh": "出口 Exports", "val": 3.1, "share": 11, "t": "up", "color": "gn", "subs": [{"n": "商品+服務出口", "dir": "up", "yoy": 2.9, "mom": 265.8, "cum": 3108, "unit": "USD bn", "val": 265.8, "src": "BEA EXPGS / Census"}]}, {"k": "M", "zh": "進口 Imports", "val": 3.9, "share": -14, "t": "up", "color": "co", "subs": [{"n": "商品+服務進口", "dir": "up", "yoy": 4.4, "mom": 338.2, "cum": 3920, "unit": "USD bn", "val": 338.2, "src": "BEA IMPGS / Census"}]}], "pmi": {"mfg": {"PMI": [49.7, 50.3, 50.3, 52.0, 52.0, 52.2, 52.0, 52.5, 51.7, 51.3, 50.0, 49.4], "新訂單": [47.4, 48.8, 48.1, 51.5, 51.0, 51.2, 51.6, 50.4, 50.3, 49.9, 47.7, 49.2], "生產": [50.1, 51.2, 50.8, 51.6, 53.4, 52.2, 52.2, 52.5, 52.6, 49.6, 51.6, 50.3], "就業": [49.0, 48.5, 49.7, 50.8, 50.2, 50.0, 50.0, 49.7, 50.1, 49.4, 48.6, 48.8], "供應商交期": [50.0, 50.3, 52.3, 51.2, 52.3, 51.7, 51.6, 51.7, 50.9, 50.6, 50.6, 50.3], "存貨": [47.4, 48.6, 47.4, 48.0, 49.1, 49.0, 49.3, 48.0, 48.4, 47.6, 46.4, 47.0], "物價支付": [52.8, 55.0, 54.7, 55.3, 57.2, 56.7, 55.6, 55.1, 53.5, 54.3, 53.1, 51.3]}, "nmfg": {"PMI": [51.1, 52.6, 53.1, 54.1, 53.4, 53.6, 54.2, 53.7, 53.7, 53.3, 51.7, 50.4], "商業活動": [53.0, 53.2, 54.2, 53.0, 54.6, 54.8, 54.4, 54.7, 54.2, 53.8, 53.9, 53.5], "新訂單": [53.3, 53.5, 54.0, 54.7, 54.9, 54.3, 54.9, 55.0, 53.6, 52.6, 53.1, 51.7], "就業": [49.7, 50.9, 50.8, 52.1, 51.9, 52.3, 52.8, 52.5, 51.5, 50.0, 50.5, 49.7], "供應商交期": [51.4, 52.0, 52.0, 52.2, 52.3, 52.4, 51.9, 52.3, 51.6, 50.9, 51.1, 51.5], "物價支付": [57.9, 57.3, 60.0, 59.6, 60.1, 59.3, 59.7, 60.1, 57.8, 58.1, 57.1, 55.5]}, "sp500": [5510, 5560, 5470, 5620, 5710, 5660, 5870, 5790, 5840, 5910, 5870, 5960]}, "cpi": {"cpi": {"CPI 全項": [2.9, 3.1, 3.0, 3.3, 3.0, 3.3, 3.2, 3.0, 2.7, 2.6, 2.2, 2.4], "核心": [3.2, 3.4, 3.5, 3.4, 3.4, 3.5, 3.4, 3.3, 3.0, 3.2, 2.9, 3.1], "食物": [2.2, 2.4, 2.7, 2.6, 2.5, 2.6, 2.6, 2.6, 2.7, 2.4, 2.2, 2.1], "能源": [-0.8, 1.8, 2.6, 2.7, 4.6, 3.3, 2.5, 3.9, 1.4, 0.8, -1.6, -0.1], "住房 Shelter": [4.6, 4.9, 5.1, 4.9, 4.7, 4.6, 4.9, 4.4, 4.4, 4.2, 3.4, 3.8], "服務": [4.2, 4.3, 4.3, 4.4, 4.2, 4.4, 4.2, 4.2, 4.3, 3.8, 3.5, 3.5]}, "ppi": {"PPI 全項": [2.0, 2.6, 3.1, 2.6, 2.9, 2.7, 2.9, 2.8, 2.6, 2.2, 1.6, 1.6], "核心": [2.7, 3.0, 2.7, 3.3, 3.0, 2.8, 3.3, 3.0, 2.7, 2.7, 2.6, 2.2], "商品": [2.5, 1.7, 2.9, 2.4, 1.9, 2.4, 2.3, 2.4, 1.1, 1.0, 1.2, 0.5], "服務": [2.9, 3.2, 3.0, 3.6, 3.2, 3.4, 3.2, 3.3, 3.0, 2.8, 2.8, 2.7]}, "gdpg": [2.4, 2.4, 2.1, 2.1, 2.6, 2.6, 2.5, 2.5, 2.3, 2.3, 2.3, 2.3]}, "gpc": {"annual": {"lab": ["2021", "2022", "2023", "2024", "2025", "2026E"], "pc": [64500, 64200, 65100, 66200, 67400, 68500], "inc": [51800, 52400, 53600, 55100, 56900, 58400]}, "quarter": {"lab": ["1Q25", "2Q25", "3Q25", "4Q25", "1Q26"], "pc": [66800, 67100, 67400, 67800, 68100], "inc": [56200, 56600, 57100, 57600, 58000]}}, "retail": {"lab": ["Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"], "lvl": [702, 705, 704, 709, 713, 718, 726, 719, 722, 728, 731, 734], "yoy": [2.1, 2.4, 2.0, 2.8, 3.0, 3.1, 3.6, 2.9, 3.0, 3.4, 3.5, 3.5]}, "conf": {"lab": ["Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"], "umich": [68.2, 66.4, 67.9, 70.1, 71.8, 71.0, 74.0, 71.7, 72.5, 72.9, 71.4, 71.2], "cb": [100.3, 98.7, 103.3, 98.7, 109.5, 112.8, 104.7, 105.6, 104.1, 104.0, 103.5, 104.3]}, "nfp": {"lab": ["Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"], "job": [185, 142, 89, 254, 36, 212, 256, 143, 151, 228, 177, 150], "ur": [4.1, 4.3, 4.2, 4.1, 4.1, 4.2, 4.1, 4.0, 4.1, 4.2, 4.2, 4.2]}, "dur": {"lab": ["Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"], "b1": [32.9, 34.3, 34.1, 34.6, 34.7, 34.6, 34.0, 34.6, 33.4, 33.2, 33.4, 32.8], "b2": [29.7, 30.2, 30.3, 31.2, 30.9, 31.0, 30.7, 30.6, 30.7, 29.8, 29.8, 29.3], "b3": [15.9, 15.9, 16.9, 16.3, 16.6, 17.0, 17.2, 16.9, 16.6, 16.8, 16.6, 16.6], "b4": [19.5, 18.8, 19.8, 20.2, 20.3, 20.5, 21.1, 20.7, 20.2, 20.6, 20.8, 20.5]}, "matrix": [{"cat": "物價 Prices", "color": "co", "items": [{"n": "CPI 全項", "unit": "%", "val": 2.9, "dir": "up", "yoy": 2.9, "src": "FRED CPIAUCSL / BLS", "l": "g"}, {"n": "核心 CPI", "unit": "%", "val": 3.2, "dir": "up", "yoy": 3.2, "src": "FRED CPILFESL", "l": "g"}, {"n": "PCE 物價", "unit": "%", "val": 2.5, "dir": "up", "yoy": 2.5, "src": "FRED PCEPI", "l": "g"}, {"n": "核心 PCE", "unit": "%", "val": 2.8, "dir": "up", "yoy": 2.8, "src": "FRED PCEPILFE", "l": "g"}, {"n": "PPI 全項", "unit": "%", "val": 2.4, "dir": "up", "yoy": 2.4, "src": "FRED PPIACO / BLS", "l": "g"}, {"n": "核心 PPI", "unit": "%", "val": 2.8, "dir": "up", "yoy": 2.8, "src": "FRED PPIFES", "l": "g"}, {"n": "CPI 能源", "unit": "%", "val": 1.5, "dir": "up", "yoy": 1.5, "src": "FRED CPIENGSL", "l": "g"}, {"n": "CPI 食物", "unit": "%", "val": 2.4, "dir": "up", "yoy": 2.4, "src": "FRED CPIUFDSL", "l": "g"}, {"n": "CPI 住房 Shelter", "unit": "%", "val": 4.6, "dir": "up", "yoy": 4.6, "src": "FRED CUSR0000SAH1", "l": "g"}, {"n": "平均時薪", "unit": "%", "val": 3.9, "dir": "up", "yoy": 3.9, "src": "FRED CES0500000003", "l": "g"}]}, {"cat": "勞動 Labor", "color": "bl", "items": [{"n": "非農就業 NFP", "unit": "k", "val": 150.0, "dir": "up", "yoy": 1.4, "src": "FRED PAYEMS / BLS", "l": "g"}, {"n": "失業率", "unit": "%", "val": 4.2, "dir": "up", "yoy": 0.1, "src": "FRED UNRATE", "l": "g"}, {"n": "勞動參與率", "unit": "%", "val": 62.5, "dir": "fl", "yoy": -0.1, "src": "FRED CIVPART", "l": "g"}, {"n": "初領失業金", "unit": "k", "val": 224.0, "dir": "up", "yoy": 2.0, "src": "FRED ICSA", "l": "g"}, {"n": "續領失業金", "unit": "k", "val": 1870.0, "dir": "up", "yoy": 1.5, "src": "FRED CCSA", "l": "g"}, {"n": "JOLTS 職缺", "unit": "mn", "val": 7.6, "dir": "dn", "yoy": -3.2, "src": "FRED JTSJOL", "l": "g"}, {"n": "ADP 民間就業", "unit": "k", "val": 146.0, "dir": "up", "yoy": 1.1, "src": "ADP / ak", "l": "c"}, {"n": "U6 廣義失業", "unit": "%", "val": 7.8, "dir": "up", "yoy": 0.2, "src": "FRED U6RATE", "l": "g"}, {"n": "職缺率", "unit": "%", "val": 4.5, "dir": "dn", "yoy": -0.3, "src": "FRED JTSJOR", "l": "g"}]}, {"cat": "景氣調查 Surveys", "color": "vi", "items": [{"n": "ISM 製造 PMI", "unit": "", "val": 51.2, "dir": "up", "yoy": 1.2, "src": "ISM / ak ism_pmi", "l": "c"}, {"n": "ISM 非製造 PMI", "unit": "", "val": 53.7, "dir": "up", "yoy": 0.8, "src": "ISM / ak ism_non_pmi", "l": "c"}, {"n": "Markit 製造 PMI", "unit": "", "val": 50.8, "dir": "up", "yoy": 0.5, "src": "S&P Global", "l": "y"}, {"n": "Markit 服務 PMI", "unit": "", "val": 53.1, "dir": "up", "yoy": 0.6, "src": "S&P Global", "l": "y"}, {"n": "費城聯儲指數", "unit": "", "val": 8.5, "dir": "up", "yoy": 3.0, "src": "FRED / Phil Fed", "l": "g"}, {"n": "紐約聯儲 Empire", "unit": "", "val": -2.4, "dir": "dn", "yoy": -1.5, "src": "FRED / NY Fed", "l": "g"}, {"n": "密大消費信心", "unit": "", "val": 71.2, "dir": "dn", "yoy": -4.2, "src": "FRED UMCSENT / ak", "l": "g"}, {"n": "CB 消費信心", "unit": "", "val": 104.3, "dir": "up", "yoy": 1.0, "src": "Conference Board", "l": "y"}, {"n": "NFIB 小企業", "unit": "", "val": 98.4, "dir": "up", "yoy": 0.9, "src": "NFIB", "l": "y"}]}, {"cat": "利率 Rates", "color": "am", "items": [{"n": "Fed Funds 上限", "unit": "%", "val": 4.5, "dir": "fl", "yoy": 0.0, "src": "FRED DFEDTARU", "l": "g"}, {"n": "UST 2Y", "unit": "%", "val": 4.05, "dir": "dn", "yoy": -0.2, "src": "FRED DGS2", "l": "g"}, {"n": "UST 10Y", "unit": "%", "val": 4.35, "dir": "up", "yoy": 0.1, "src": "FRED DGS10", "l": "g"}, {"n": "UST 30Y", "unit": "%", "val": 4.62, "dir": "up", "yoy": 0.1, "src": "FRED DGS30", "l": "g"}, {"n": "2s10s 利差", "unit": "bp", "val": 30.0, "dir": "up", "yoy": 18.0, "src": "FRED T10Y2Y", "l": "g"}, {"n": "10Y 實質利率", "unit": "%", "val": 1.95, "dir": "up", "yoy": 0.1, "src": "FRED DFII10", "l": "g"}, {"n": "SOFR", "unit": "%", "val": 4.38, "dir": "fl", "yoy": 0.0, "src": "FRED SOFR", "l": "g"}, {"n": "MOVE 指數", "unit": "", "val": 92.0, "dir": "dn", "yoy": -5.0, "src": "yfinance ^MOVE", "l": "c"}]}, {"cat": "Fed 政策 Fed", "color": "tl", "items": [{"n": "資產負債表", "unit": "$tn", "val": 6.8, "dir": "dn", "yoy": -4.0, "src": "FRED WALCL", "l": "g"}, {"n": "準備金", "unit": "$tn", "val": 3.2, "dir": "dn", "yoy": -2.0, "src": "FRED WRESBAL", "l": "g"}, {"n": "逆回購 RRP", "unit": "$bn", "val": 420.0, "dir": "dn", "yoy": -30.0, "src": "FRED RRPONTSYD", "l": "g"}, {"n": "M2 貨幣", "unit": "$tn", "val": 21.5, "dir": "up", "yoy": 2.5, "src": "FRED M2SL", "l": "g"}]}, {"cat": "財政 Fiscal", "color": "co", "items": [{"n": "聯邦支出", "unit": "$bn", "val": 567.0, "dir": "up", "yoy": 6.2, "src": "FRED FGEXPND / Treasury", "l": "g"}, {"n": "聯邦收入", "unit": "$bn", "val": 408.0, "dir": "up", "yoy": 5.4, "src": "FRED FGRECPT", "l": "g"}, {"n": "財政赤字(月)", "unit": "$bn", "val": -159.0, "dir": "up", "yoy": 8.0, "src": "Treasury MTS", "l": "y"}, {"n": "利息支出(年化)", "unit": "$bn", "val": 1100.0, "dir": "up", "yoy": 12.0, "src": "FRED A091RC1Q027SBEA", "l": "g"}, {"n": "公共債務/GDP", "unit": "%", "val": 122.0, "dir": "up", "yoy": 1.5, "src": "FRED GFDEGDQ188S", "l": "g"}]}, {"cat": "產出 Production", "color": "gn", "items": [{"n": "工業生產 IP", "unit": "", "val": 103.5, "dir": "up", "yoy": 0.8, "src": "FRED INDPRO", "l": "g"}, {"n": "產能利用率", "unit": "%", "val": 78.2, "dir": "fl", "yoy": -0.1, "src": "FRED TCU", "l": "g"}, {"n": "耐久財訂單", "unit": "$bn", "val": 289.4, "dir": "dn", "yoy": -2.1, "src": "FRED DGORDER / ak", "l": "g"}, {"n": "核心資本財訂單", "unit": "$bn", "val": 74.2, "dir": "fl", "yoy": 0.3, "src": "FRED NEWORDER", "l": "g"}, {"n": "製造業庫存", "unit": "$bn", "val": 812.0, "dir": "up", "yoy": 1.2, "src": "FRED BUSINV", "l": "g"}]}, {"cat": "房市 Housing", "color": "bl", "items": [{"n": "新屋開工", "unit": "k", "val": 1360.0, "dir": "dn", "yoy": -3.0, "src": "FRED HOUST", "l": "g"}, {"n": "營建許可", "unit": "k", "val": 1420.0, "dir": "dn", "yoy": -3.5, "src": "FRED PERMIT", "l": "g"}, {"n": "成屋銷售", "unit": "mn", "val": 4.15, "dir": "dn", "yoy": -2.0, "src": "FRED EXHOSLUSM495S", "l": "g"}, {"n": "新屋銷售", "unit": "k", "val": 680.0, "dir": "up", "yoy": 1.5, "src": "FRED HSN1F", "l": "g"}, {"n": "NAHB 信心", "unit": "", "val": 46.0, "dir": "dn", "yoy": -2.0, "src": "NAHB", "l": "y"}, {"n": "Case-Shiller", "unit": "%", "val": 4.2, "dir": "up", "yoy": 4.2, "src": "FRED CSUSHPINSA", "l": "g"}, {"n": "30Y 房貸利率", "unit": "%", "val": 6.85, "dir": "up", "yoy": 0.1, "src": "FRED MORTGAGE30US", "l": "g"}]}, {"cat": "消費 Consumption", "color": "vi", "items": [{"n": "零售銷售", "unit": "$bn", "val": 734.0, "dir": "up", "yoy": 3.5, "src": "FRED RSAFS / ak", "l": "g"}, {"n": "核心零售(控制組)", "unit": "$bn", "val": 512.0, "dir": "up", "yoy": 3.1, "src": "FRED RSFSXMV", "l": "g"}, {"n": "PCE 個人消費", "unit": "$bn", "val": 19700.0, "dir": "up", "yoy": 2.6, "src": "FRED PCEC", "l": "g"}, {"n": "個人收入", "unit": "$bn", "val": 24800.0, "dir": "up", "yoy": 4.0, "src": "FRED PI", "l": "g"}, {"n": "儲蓄率", "unit": "%", "val": 4.6, "dir": "dn", "yoy": -0.3, "src": "FRED PSAVERT", "l": "g"}]}, {"cat": "貿易 Trade", "color": "am", "items": [{"n": "商品+服務出口", "unit": "$bn", "val": 265.8, "dir": "up", "yoy": 2.9, "src": "BEA EXPGS / Census", "l": "g"}, {"n": "商品+服務進口", "unit": "$bn", "val": 338.2, "dir": "up", "yoy": 4.4, "src": "BEA IMPGS / Census", "l": "g"}, {"n": "貿易餘額", "unit": "$bn", "val": -72.4, "dir": "up", "yoy": 3.0, "src": "FRED BOPGSTB", "l": "g"}, {"n": "經常帳/GDP", "unit": "%", "val": -3.4, "dir": "dn", "yoy": -0.2, "src": "FRED IEABC", "l": "g"}, {"n": "美元指數 DXY", "unit": "", "val": 104.2, "dir": "up", "yoy": 0.5, "src": "yfinance DX-Y.NYB / ak", "l": "c"}]}, {"cat": "GDP 國民所得", "color": "gn", "items": [{"n": "實質 GDP 年增", "unit": "%", "val": 2.3, "dir": "up", "yoy": 2.3, "src": "FRED A191RL1Q225SBEA / BEA", "l": "g"}, {"n": "名目 GDP", "unit": "$tn", "val": 29.0, "dir": "up", "yoy": 4.8, "src": "FRED GDP", "l": "g"}, {"n": "GDP 平減指數", "unit": "%", "val": 2.5, "dir": "up", "yoy": 2.5, "src": "FRED GDPDEF", "l": "g"}, {"n": "實質 GDP/人", "unit": "$", "val": 68500.0, "dir": "up", "yoy": 1.6, "src": "FRED A939RX0Q048SBEA", "l": "g"}, {"n": "民間消費 C", "unit": "$tn", "val": 19.7, "dir": "up", "yoy": 2.6, "src": "FRED PCEC", "l": "g"}, {"n": "民間投資 I", "unit": "$tn", "val": 5.2, "dir": "dn", "yoy": -1.8, "src": "FRED GPDI", "l": "g"}, {"n": "政府支出 G", "unit": "$tn", "val": 4.9, "dir": "up", "yoy": 6.2, "src": "FRED GCE", "l": "g"}, {"n": "淨出口 NX", "unit": "$tn", "val": -0.8, "dir": "up", "yoy": 3.0, "src": "FRED NETEXP", "l": "g"}]}], "lights": {"g": "FRED/官方", "c": "yfinance/akshare", "y": "機構待接", "r": "缺口/質化"}};
+document.getElementById('sub').textContent=D.title+' v3 · '+D.anchor+' · '+D.identity;
+document.getElementById('win').textContent='資料窗 '+D.window;
+document.getElementById('ft').innerHTML=D.note+'<br>'+D.lock+' · seaborn 多線配色 · 滑鼠移動處紅虛線(α0.8 粗0.8)';
+function nf(n){if(n==null)return '—';return Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function pct(n){return (n>=0?'+':'')+nf(n)+'%';}
+const A=t=>`<span class="ar ${t}">${t==='up'?'▲':t==='dn'?'▼':'▬'}</span>`;
+function get(k){return D.comps.find(c=>c.k===k);}
+const SB=['--sb0','--sb1','--sb2','--sb3','--sb4','--sb5','--sb6','--sb9','--sb8','--sb7'];
+// hero
+(function(){const X=get('X'),M=get('M'),NX=+(X.val-M.val).toFixed(2),nxsh=X.share+M.share,nt=NX>=0?'up':'dn';
+ let h=`<div class="hero"><div class="hero-eq"><b>Real GDP × (1 + π)</b> = C + I + G + ( X − M )　|　名目 ≈ 實質 USD ${D.real}tn × (1+${D.infl}%)</div><div class="hero-row">
+  <div class="term lhs"><div class="sym">Real GDP × (1+π)</div><div class="zh">名目 GDP</div><div class="v">USD ${nf(D.nom)}tn</div><div class="sh" style="color:#b9c7d6">π=${D.infl}% ${A('up')}</div></div><div class="op">=</div>`;
+ ['C','I','G'].forEach(k=>{const c=get(k);h+=`<div class="term" style="--tc:var(--${c.color})"><div class="sym">${k}</div><div class="zh">${c.zh}</div><div class="v">USD ${nf(c.val)}tn</div><div class="sh">${c.share}% ${A(c.t)}</div></div><div class="op">+</div>`;});
+ h+=`<div class="term" style="--tc:var(--am)"><div class="sym" style="font-size:13px">(X−M)</div><div class="zh">淨出口</div><div class="v">${(NX<0?'−':'')}USD ${nf(Math.abs(NX))}tn</div><div class="sh">${nxsh}% ${A(nt)}</div></div></div></div>`;
+ document.getElementById('hero').innerHTML=h;})();
+// cards: C/I/G + merged 淨出口(出口/進口 一起)
+function rowHTML(s){const yc=s.yoy>=0?'up':'dn';
+ return `<div class="row"><div class="row-top">${A(s.dir)}<span class="nm">${s.n}</span><span class="vu">${nf(s.val)} ${s.unit}</span><span class="yy ${yc}">${pct(s.yoy)}</span></div>
+  <div class="row-bt"><span>單月 ${nf(s.mom)}</span><span>累計 ${nf(s.cum)}</span><span>單位 ${s.unit}</span><span class="src">${s.src}</span></div></div>`;}
+let cardsHTML=['C','I','G'].map(k=>{const c=get(k);
+ return `<div class="cc"><div class="cc-h" style="--tc:var(--${c.color})"><div class="cc-sym">${c.k}</div><div class="cc-tt"><div class="n">${c.zh}</div><div class="s">${c.share}% of GDP</div></div><div class="cc-v">USD ${nf(c.val)}tn ${A(c.t)}</div></div>${c.subs.map(rowHTML).join('')}</div>`;}).join('');
+// merged NX
+(function(){const X=get('X'),M=get('M'),NX=+(X.val-M.val).toFixed(2),nt=NX>=0?'up':'dn';
+ cardsHTML+=`<div class="cc"><div class="cc-h" style="--tc:var(--am)"><div class="cc-sym">±</div><div class="cc-tt"><div class="n">淨出口 (X − M)</div><div class="s">${X.share+M.share}% of GDP · 進出口放一起</div></div><div class="cc-v">${(NX<0?'−':'')}USD ${nf(Math.abs(NX))}tn ${A(nt)}</div></div>
+  <div class="subhd x">▸ 出口 X · USD ${nf(X.val)}tn ${A(X.t)}</div>${X.subs.map(rowHTML).join('')}
+  <div class="subhd m">▸ 進口 M · USD ${nf(M.val)}tn ${A(M.t)}</div>${M.subs.map(rowHTML).join('')}</div>`;})();
+document.getElementById('cards').innerHTML=cardsHTML;
+
+// ── SVG + nice scale + crosshair ──
+function NS(t,a){const e=document.createElementNS('http://www.w3.org/2000/svg',t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+function cv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim();}
+function TX(s,x,y,t,an,sz,col){const e=NS('text',{x,y,'text-anchor':an,'font-size':sz,fill:cv(col),'font-family':'DM Mono, monospace'});e.textContent=t;s.append(e);}
+function PL(s,p,c,w,d){const a={points:p.map(q=>q[0].toFixed(1)+','+q[1].toFixed(1)).join(' '),fill:'none',stroke:c[0]==='#'?c:cv(c),'stroke-width':w,'stroke-linejoin':'round'};if(d)a['stroke-dasharray']=d;s.append(NS('polyline',a));}
+function niceStep(range,n){const raw=range/n||1,mag=Math.pow(10,Math.floor(Math.log10(raw))),nm=raw/mag;const st=nm<=1?1:nm<=2?2:nm<=2.5?2.5:nm<=5?5:10;return st*mag;}
+function niceScale(min,max,n){if(min===max){min-=1;max+=1;}let step=niceStep(max-min,n),lo=Math.floor(min/step)*step,hi=lo+step*n;
+ while(hi<max){step=niceStep((max-lo)*1.0001,n);hi=lo+step*n;}return {lo,hi,step,n};}
+// crosshair (attach once per svg)
+const DIM={'c-pmi':[460,210],'c-cpi':[460,210],'c-gpc':[460,210],'c-ret':[340,180],'c-conf':[340,180],'c-nfp':[340,180],'c-dur':[340,180]};
+function attachXH(id){const svg=document.getElementById(id);if(svg.dataset.xh)return;svg.dataset.xh='1';
+ const [W,H]=DIM[id],L=34,R=36,Tp=10,B=20;
+ svg.addEventListener('mousemove',e=>{const r=svg.getBoundingClientRect();let vx=(e.clientX-r.left)/r.width*W;vx=Math.max(L,Math.min(W-R,vx));
+   let ln=svg.querySelector('.xhair');if(!ln){ln=NS('line',{class:'xhair',y1:Tp,y2:H-B,stroke:cv('--up'),'stroke-width':0.8,opacity:0.8,'stroke-dasharray':'4 2'});svg.append(ln);}
+   ln.setAttribute('x1',vx);ln.setAttribute('x2',vx);ln.setAttribute('y1',Tp);ln.setAttribute('y2',H-B);});
+ svg.addEventListener('mouseleave',()=>{const ln=svg.querySelector('.xhair');if(ln)ln.remove();});}
+// dual-axis multi-line; left ticks neutral, right ticks in right color (左右軸可識別)
+function dual(id,labels,leftLines,right,opt){opt=opt||{};const s=document.getElementById(id);
+ const xh=s.querySelector('.xhair');s.innerHTML='';
+ const [W,H]=DIM[id],L=34,R=36,Tp=10,B=20,pw=W-L-R,ph=H-Tp-B,n=5;
+ const lall=leftLines.flatMap(l=>l.data).filter(v=>v!=null);let lmin=Math.min(...lall),lmax=Math.max(...lall);
+ if(opt.benchmark!=null){lmin=Math.min(lmin,opt.benchmark);lmax=Math.max(lmax,opt.benchmark);}
+ const LS=niceScale(lmin,lmax,n),X=i=>L+pw*i/(labels.length-1),YL=v=>Tp+ph*(LS.hi-v)/(LS.hi-LS.lo);
+ let RS=null,YR=null;const rcol=opt.rcol||'--vi';
+ if(right){RS=niceScale(Math.min(...right.data),Math.max(...right.data),n);YR=v=>Tp+ph*(RS.hi-v)/(RS.hi-RS.lo);}
+ for(let t=0;t<=n;t++){const y=Tp+ph*t/n;s.append(NS('line',{x1:L,x2:W-R,y1:y,y2:y,stroke:cv('--bg1')}));
+   TX(s,L-3,y+3,nf(LS.hi-(LS.hi-LS.lo)*t/n),'end',6.5,'--i2');
+   if(RS)TX(s,W-R+3,y+3,nf(RS.hi-(RS.hi-RS.lo)*t/n),'start',6.5,rcol);}
+ // axis spines (identifiable: left dark, right colored)
+ s.append(NS('line',{x1:L,x2:L,y1:Tp,y2:H-B,stroke:cv('--i3'),'stroke-width':1}));
+ if(RS)s.append(NS('line',{x1:W-R,x2:W-R,y1:Tp,y2:H-B,stroke:cv(rcol),'stroke-width':1.2}));
+ labels.forEach((l,i)=>{if(i%3===0)TX(s,X(i),H-6,l,'middle',6.5,'--i3');});
+ if(opt.benchmark!=null){const y=YL(opt.benchmark);s.append(NS('line',{x1:L,x2:W-R,y1:y,y2:y,stroke:cv('--up'),'stroke-width':1,opacity:.8,'stroke-dasharray':'4 2'}));TX(s,L+2,y-2,'基準 '+opt.benchmark,'start',6.5,'--up');}
+ // left bars (opt.leftBars) else lines
+ if(opt.bars){const bw=pw/labels.length*0.6,y0=YL(Math.max(LS.lo,0));leftLines[0].data.forEach((v,i)=>{const x=X(i);s.append(NS('rect',{x:x-bw/2,y:Math.min(YL(v),y0),width:bw,height:Math.abs(YL(v)-y0),fill:cv(leftLines[0].col),opacity:.8}));});}
+ else leftLines.forEach((l,k)=>PL(s,l.data.map((v,i)=>v==null?null:[X(i),YL(v)]).filter(Boolean),l.col,1.5));
+ if(right){PL(s,right.data.map((v,i)=>[X(i),YR(v)]),rcol,2,opt.rdash||'');right.data.forEach((v,i)=>s.append(NS('circle',{cx:X(i),cy:YR(v),r:1.8,fill:cv(rcol)})));}
+ if(xh)s.append(xh);attachXH(id);}
+function legHTML(id,lines,rname,rcol){document.getElementById(id).innerHTML=lines.map(l=>`<span><i style="background:var(${l.col})"></i>${l.name}</span>`).join('')+(rname?`<span style="color:var(${rcol})">—${rname}(右)</span>`:'');}
+function drawPMI(v){const o=D.pmi[v],names=Object.keys(o),lines=names.map((nm,k)=>({name:nm,data:o[nm],col:SB[k%SB.length]}));
+ dual('c-pmi',D.nfp.lab,lines,{name:'S&P500',data:D.pmi.sp500},{benchmark:50,rcol:'--i0'});legHTML('leg-pmi',lines,'S&P500','--i0');}
+function drawCPI(v){const o=D.cpi[v],names=Object.keys(o),lines=names.map((nm,k)=>({name:nm,data:o[nm],col:SB[k%SB.length]}));
+ dual('c-cpi',D.nfp.lab,lines,{name:'GDP growth',data:D.cpi.gdpg},{rcol:'--co'});legHTML('leg-cpi',lines,'GDP growth%','--co');}
+function drawGPC(v){const o=D.gpc[v];dual('c-gpc',o.lab,[{name:'GDP/人',data:o.pc,col:'--bl'}],{name:'個人收入',data:o.inc},{rcol:'--vi'});}
+function drawRet(){dual('c-ret',D.retail.lab,[{name:'零售',data:D.retail.lvl,col:'--bl'}],{name:'年增',data:D.retail.yoy},{rcol:'--dn',bars:true});}
+function drawConf(){dual('c-conf',D.conf.lab,[{name:'UMich',data:D.conf.umich,col:'--bl'}],{name:'ConfBoard',data:D.conf.cb},{rcol:'--vi'});}
+function drawNFP(){const id='c-nfp',s=document.getElementById(id),xh=s.querySelector('.xhair');s.innerHTML='';const [W,H]=DIM[id],L=34,R=36,Tp=10,B=20,pw=W-L-R,ph=H-Tp-B,d=D.nfp,nn=d.lab.length,n=5;
+ const LS=niceScale(Math.min(...d.job,0),Math.max(...d.job),n),YL=v=>Tp+ph*(LS.hi-v)/(LS.hi-LS.lo),y0=YL(0),cx=i=>L+pw*(i+0.5)/nn,bw=pw/nn*0.6;
+ const RS=niceScale(Math.min(...d.ur)-0.2,Math.max(...d.ur)+0.2,n),YR=v=>Tp+ph*(RS.hi-v)/(RS.hi-RS.lo);
+ for(let t=0;t<=n;t++){const y=Tp+ph*t/n;s.append(NS('line',{x1:L,x2:W-R,y1:y,y2:y,stroke:cv('--bg1')}));TX(s,L-3,y+3,nf(LS.hi-(LS.hi-LS.lo)*t/n),'end',6.5,'--i2');TX(s,W-R+3,y+3,nf(RS.hi-(RS.hi-RS.lo)*t/n)+'%','start',6.5,'--am');}
+ s.append(NS('line',{x1:L,x2:L,y1:Tp,y2:H-B,stroke:cv('--i3'),'stroke-width':1}));s.append(NS('line',{x1:W-R,x2:W-R,y1:Tp,y2:H-B,stroke:cv('--am'),'stroke-width':1.2}));
+ d.job.forEach((v,i)=>{const col=i===0?'--bl':(v>=d.job[i-1]?'--up':'--dn');s.append(NS('rect',{x:cx(i)-bw/2,y:Math.min(YL(v),y0),width:bw,height:Math.abs(YL(v)-y0),fill:cv(col),opacity:.85}));if(i%3===0)TX(s,cx(i),H-6,d.lab[i],'middle',6.5,'--i3');});
+ PL(s,d.ur.map((v,i)=>[cx(i),YR(v)]),'--am',1.8);d.ur.forEach((v,i)=>s.append(NS('circle',{cx:cx(i),cy:YR(v),r:1.8,fill:cv('--am')})));
+ if(xh)s.append(xh);attachXH(id);}
+function drawDur(){const d=D.dur,lines=[{name:'<5w',data:d.b1,col:'--sb2'},{name:'5-14',data:d.b2,col:'--sb9'},{name:'15-26',data:d.b3,col:'--sb8'},{name:'27w+',data:d.b4,col:'--sb3'}];dual('c-dur',d.lab,lines,null,{});}
+// matrix
+document.getElementById('leg').innerHTML='燈號:'+Object.entries(D.lights).map(([k,v])=>`<span><span class="dot ${k}"></span>${v}</span>`).join('');
+document.getElementById('matrix').innerHTML=D.matrix.map(b=>{
+ const cells=b.items.map(c=>{const yc=c.yoy>=0?'up':'dn';
+  return `<div class="cl"><div class="cl-t"><span class="dot ${c.l}" title="${D.lights[c.l]}"></span><span class="cl-n">${c.n}</span></div>
+   <div class="cl-v">${nf(c.val)} ${c.unit} ${A(c.dir)}<span class="yy ${yc}">${pct(c.yoy)}</span></div><div class="cl-s" title="${c.src}">${c.src}</div></div>`;}).join('');
+ return `<div class="mblock"><div class="mb-h" style="--cc:var(--${b.color})">${b.cat}　<span style="font-weight:400;font-size:9px;opacity:.85">${b.items.length} 項</span></div><div class="cells">${cells}</div></div>`;}).join('');
+// toggles + init
+function tg(id,fn){const g=document.getElementById(id);g.querySelectorAll('button').forEach(b=>b.onclick=()=>{g.querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on');fn(b.dataset.v);});}
+tg('tg-pmi',drawPMI);tg('tg-cpi',drawCPI);tg('tg-gpc',drawGPC);
+drawPMI('mfg');drawCPI('cpi');drawGPC('annual');drawRet();drawConf();drawNFP();drawDur();
+</script></body></html>

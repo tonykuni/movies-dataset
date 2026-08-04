@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:#f5f4f0;}
+</style>
+</helmet>
+<div style="max-width:1180px;margin:0 auto;padding:20px 26px 34px;font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;color:#1e1d1a;">
+
+  <div style="height:4px;border-radius:3px;background:linear-gradient(90deg,#4c72b0,#55a868,#dd8452,#c44e52,#8172b3);margin-bottom:14px;"></div>
+
+  <!-- HEADER -->
+  <div style="width:96vw;position:relative;left:50%;transform:translateX(-50%);background:#fffdf8;border:1px solid #dbd9d3;border-radius:9px;padding:15px 18px 12px;margin-bottom:14px;box-shadow:0 1px 3px rgba(31,42,42,.05);">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;">
+      <div>
+        <div style="font:700 10px 'DM Mono',monospace;letter-spacing:2px;color:#6b6860;text-transform:uppercase;">Veritas Intelligence Analytics · Global Macro</div>
+        <h1 style="margin:5px 0 0;font:800 23px/1.2 'Syne',sans-serif;letter-spacing:.3px;">Global Investment at a Glance</h1>
+        <div style="margin-top:3px;font:600 12px 'Noto Sans TC',sans-serif;color:#6b6860;">全球主要股市一覽 · 區域指數即時走勢</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font:800 26px 'DM Mono',monospace;color:{{ breadthColor }};line-height:1;">{{ breadthLbl }}</div>
+        <div style="font:600 9px 'DM Mono',monospace;color:#9c9890;margin-top:4px;">市場廣度 · {{ breadthCountLbl }} 上漲</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:9px 16px;flex-wrap:wrap;align-items:center;border-top:1px solid #efece4;margin-top:13px;padding-top:9px;font:600 8.5px 'DM Mono',monospace;color:#9c9890;">
+      <span style="display:inline-flex;gap:5px;align-items:center;color:#5a9e6f;"><span style="width:7px;height:7px;border-radius:50%;background:#5fcf80;box-shadow:0 0 6px #5fcf80;"></span>LIVE SNAPSHOT</span>
+      <span>快照 <b style="color:#1e1d1a;">2026-06-26 21:00 TPE</b></span>
+      <span>涵蓋 <b style="color:#1e1d1a;">28 市場 · 38 指數</b></span>
+      <span>基準 <b style="color:#1e1d1a;">本地收盤價</b></span>
+      <span style="margin-left:auto;color:#b3afa5;">紅漲綠跌 · TW Convention</span>
+    </div>
+  </div>
+
+  <!-- TAB BAR -->
+  <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;">
+    <sc-for list="{{ tabBar }}" as="t" hint-placeholder-count="8">
+      <span onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</span>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{ isOverview }}" hint-placeholder-val="{{ true }}">
+  <!-- UNIFIED OVERVIEW CONSOLE (full-bleed single surface) -->
+  <div style="width:96vw;position:relative;left:50%;transform:translateX(-50%);background:#fffdf8;border:1px solid #dbd9d3;border-radius:9px;overflow:hidden;margin-bottom:13px;box-shadow:0 1px 3px rgba(31,42,42,.05);">
+    <!-- console header (shared title + toggles) -->
+    <div style="padding:11px 18px 10px;border-bottom:1px solid #e8e5dd;background:#faf8f1;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span style="width:11px;height:11px;border-radius:3px;background:#4c72b0;"></span>
+        <span style="font:700 14px 'Syne',sans-serif;">全球市場總覽 · Global Markets Console</span>
+        <span style="font:500 8.5px 'DM Mono',monospace;color:#9c9890;">地圖 · 區域指數 · 外匯 · 單一整合視圖</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <div style="display:flex;gap:11px;font:600 9px 'DM Mono',monospace;color:#6b6860;">
+          <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:50%;background:{{ upColor }};"></span>{{ upLbl }}</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:9px;height:9px;border-radius:50%;background:{{ dnColor }};"></span>{{ dnLbl }}</span>
+        </div>
+        <div style="display:flex;border:1px solid #d8d5cc;border-radius:7px;overflow:hidden;">
+          <span onClick="{{ setIdx }}" style="{{ idxBtnStyle }}">指數</span>
+          <span onClick="{{ setEtf }}" style="{{ etfBtnStyle }}">ETF</span>
+        </div>
+        <div style="display:flex;border:1px solid #d8d5cc;border-radius:7px;overflow:hidden;">
+          <span onClick="{{ setD1 }}" style="{{ d1BtnStyle }}">1D</span>
+          <span onClick="{{ setD5 }}" style="{{ d5BtnStyle }}">5D</span>
+        </div>
+      </div>
+    </div>
+    <!-- map section -->
+    <div style="padding:9px 18px 6px;border-bottom:1px solid #f0eee7;display:flex;align-items:center;gap:8px;background:#fffdf8;">
+      <span style="font:700 11px 'Syne',sans-serif;color:#1e1d1a;">全球股市地圖 · World Equity Map</span>
+      <span style="font:500 8px 'DM Mono',monospace;color:#9c9890;">泡泡大小＝漲跌幅度 · 顏色＝方向 · {{ metricFullLbl }}</span>
+    </div>
+    <div style="display:flex;justify-content:center;padding:6px 10px 2px;background:#fffdf8;"><div style="width:100%;max-width:1680px;">{{ map }}</div></div>
+    <div style="padding:8px 18px 11px;border-bottom:1px solid #e8e5dd;display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:#fffdf8;">
+      <span style="font:600 9px 'DM Mono',monospace;color:#9c9890;text-transform:uppercase;letter-spacing:1px;">{{ metricLbl }} 焦點</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;background:#fbeeec;border:1px solid #efd6d1;border-radius:20px;padding:3px 11px;font:600 11px 'DM Mono',monospace;color:#c0392b;">▲ 領漲 {{ gainName }} <b>{{ gainPctLbl }}</b></span>
+      <span style="display:inline-flex;align-items:center;gap:6px;background:#e9f1ec;border:1px solid #cfe2d6;border-radius:20px;padding:3px 11px;font:600 11px 'DM Mono',monospace;color:#1e8449;">▼ 領跌 {{ loseName }} <b>{{ losePctLbl }}</b></span>
+    </div>
+
+    <!-- regional indices section -->
+    <div style="padding:10px 18px 9px;border-bottom:1px solid #e8e5dd;background:#faf8f1;display:flex;align-items:center;gap:8px;">
+      <span style="width:10px;height:10px;border-radius:3px;background:#4c72b0;"></span>
+      <span style="font:700 13px 'Syne',sans-serif;">區域指數 · Regional Indices</span>
+      <span style="font:500 8.5px 'DM Mono',monospace;color:#9c9890;margin-left:auto;">三大區 · {{ metricLbl }}走勢與漲跌</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));">
+    <sc-for list="{{ groups }}" as="g" hint-placeholder-count="2">
+      <div style="border-right:1px solid #ece9e1;border-bottom:1px solid #ece9e1;">
+        <div style="padding:9px 14px 8px;border-bottom:1px solid #f0eee7;background:#fbfaf4;display:flex;align-items:center;gap:8px;">
+          <span style="width:10px;height:10px;border-radius:3px;background:{{ g.color }};"></span>
+          <span style="font:700 12.5px 'Syne',sans-serif;">{{ g.title }}</span>
+          <span style="font:500 8.5px 'DM Mono',monospace;color:#9c9890;margin-left:auto;">{{ g.sub }}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:minmax(0,1.5fr) 50px repeat(8,minmax(0,1fr));gap:4px;padding:7px 12px 4px;font:600 7.5px 'DM Mono',monospace;color:#b3afa5;text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid #f3f1ea;">
+          <span>指數 Index</span><span style="text-align:right;">最新</span><span style="text-align:right;">1D</span><span style="text-align:right;">3D</span><span style="text-align:right;">5D</span><span style="text-align:right;">10D</span><span style="text-align:right;">20D</span><span style="text-align:right;">60D</span><span style="text-align:right;">120D</span><span style="text-align:right;">240D</span>
+        </div>
+        <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="6">
+          <div style="display:grid;grid-template-columns:minmax(0,1.5fr) 50px repeat(8,minmax(0,1fr));gap:4px;padding:7px 12px;align-items:center;border-bottom:1px solid #f5f3ec;">
+            <div style="min-width:0;display:flex;align-items:center;gap:7px;">
+              <span style="flex:none;">{{ it.flagImg }}</span>
+              <div style="min-width:0;">
+                <div style="font:600 11px 'Noto Sans TC',sans-serif;color:#1e1d1a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ it.nameCn }}</div>
+                <div style="display:flex;align-items:center;gap:4px;margin-top:1px;">
+                  <span style="font:500 8px 'DM Sans',sans-serif;color:#8a867d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ it.nameEn }}</span>
+                  <span style="font:600 7px 'DM Mono',monospace;color:#b3afa5;flex:none;">{{ it.tk }}</span>
+                  <sc-if value="{{ it.isEtf }}" hint-placeholder-val="{{ true }}"><span style="font:700 6.5px 'DM Mono',monospace;color:#b07a3a;background:#f6ecdd;border:1px solid #e7d4b8;border-radius:3px;padding:0 3px;letter-spacing:.5px;flex:none;">ETF</span></sc-if>
+                </div>
+              </div>
+            </div>
+            <div style="text-align:right;font:600 10px 'DM Mono',monospace;color:#1e1d1a;">{{ it.lastLbl }}</div>
+            <sc-for list="{{ it.rets }}" as="r" hint-placeholder-count="8">
+              <div style="text-align:right;font:700 9.5px 'DM Mono',monospace;color:{{ r.col }};">{{ r.lbl }}</div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </sc-for>
+    </div>
+    <!-- FX section -->
+    <div style="padding:10px 18px 9px;border-top:1px solid #e8e5dd;border-bottom:1px solid #e8e5dd;background:#faf8f1;display:flex;align-items:center;gap:8px;">
+      <span style="width:10px;height:10px;border-radius:3px;background:#55a868;"></span>
+      <span style="font:700 12.5px 'Syne',sans-serif;">外匯 · Currencies &amp; US Dollar Index</span>
+      <span style="font:500 8.5px 'DM Mono',monospace;color:#9c9890;margin-left:auto;">報價對美元 · {{ metricLbl }}升貶 · 含 DXY</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;padding:13px 18px 15px;">
+      <sc-for list="{{ fx }}" as="f" hint-placeholder-count="12">
+        <div style="{{ f.tileStyle }}">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:6px;">
+            <span style="font:700 11px 'DM Mono',monospace;color:#1e1d1a;letter-spacing:.3px;">{{ f.pair }}</span>
+            <span style="font:600 8.5px 'Noto Sans TC',sans-serif;color:#a8a49b;">{{ f.name }}</span>
+          </div>
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:8px;">
+            <span style="font:700 16px 'DM Mono',monospace;color:#1e1d1a;line-height:1;">{{ f.rateLbl }}</span>
+            <span style="font:700 11px 'DM Mono',monospace;color:{{ f.col }};">{{ f.pctLbl }}</span>
+          </div>
+          <div style="display:flex;justify-content:flex-start;">{{ f.spark }}</div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="margin-top:13px;font:500 9px 'DM Mono',monospace;color:#b3afa5;text-align:center;">示意資料 · 指數以當地收盤價、匯率對美元報價計算 · 泡泡、匯率與排行依所選週期（1D／5D）即時更新</div>
+  </sc-if>
+
+  <!-- FLOW SIM PANEL (embedded VIA-FlowSystem outputs) -->
+  <sc-if value="{{ showFrame }}" hint-placeholder-val="{{ true }}">
+    <div style="width:96vw;position:relative;left:50%;transform:translateX(-50%);background:#fffdf8;border:1px solid #dbd9d3;border-radius:9px;overflow:hidden;box-shadow:0 1px 3px rgba(31,42,42,.05);">
+      <div style="padding:11px 16px 9px;border-bottom:1px solid #e8e5dd;background:#faf8f1;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div>
+          <div style="font:700 13px 'Syne','Noto Sans TC',sans-serif;">{{ activeTitle }}</div>
+          <div style="font:500 8.5px 'DM Mono',monospace;color:#9c9890;margin-top:2px;">{{ activeSub }}</div>
+        </div>
+        <a href="{{ activeSrc }}" target="_blank" style="font:600 9px 'DM Mono',monospace;color:#4c78a8;text-decoration:none;border:1px solid #cfd9e6;border-radius:6px;padding:4px 9px;background:#fff;white-space:nowrap;flex:none;">↗ 開新分頁</a>
+      </div>
+      <iframe src="{{ activeSrc }}" style="{{ activeFrameStyle }}"></iframe>
+    </div>
+    <div style="margin-top:13px;font:500 9px 'DM Mono',monospace;color:#b3afa5;text-align:center;">VIA-FlowSystem · 離線自含面板 · 資金流向與強度 FIS · 紅流入綠流出</div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1180,&quot;height&quot;:1000},&quot;defaultMetric&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;d1&quot;,&quot;d5&quot;],&quot;default&quot;:&quot;d1&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Display&quot;},&quot;colorConv&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;tw&quot;,&quot;intl&quot;],&quot;default&quot;:&quot;tw&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Display&quot;},&quot;showLabels&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Display&quot;}}">
+class Component extends DCLogic {
+  state = { metric: null, inst: null, tab: null, landPath: null };
+
+  componentDidMount() { this.loadMap(); }
+
+  async loadMap() {
+    try {
+      if (!window.topojson) {
+        await new Promise((res, rej) => {
+          const s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js';
+          s.onload = res; s.onerror = rej; document.head.appendChild(s);
+        });
+      }
+      const resp = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/land-110m.json');
+      const topo = await resp.json();
+      const geo = window.topojson.feature(topo, topo.objects.land);
+      this.setState({ landPath: this.geoToPath(geo) });
+    } catch (e) { /* offline → keep dot-mask fallback */ }
+  }
+
+  // equirectangular (plate carrée) at 1 unit/degree, matching marker transform: x=lon+180, y=88-lat
+  geoToPath(geo) {
+    const feats = geo.type === 'FeatureCollection' ? geo.features : [geo];
+    const ring = r => {
+      let s = '';
+      for (let i = 0; i < r.length; i++) {
+        const x = (r[i][0] + 180).toFixed(1), y = (88 - r[i][1]).toFixed(1);
+        s += (i ? 'L' : 'M') + x + ' ' + y;
+      }
+      return s + 'Z';
+    };
+    const poly = p => p.map(ring).join('');
+    let d = '';
+    feats.forEach(f => {
+      const g = f.geometry || f;
+      if (!g) return;
+      if (g.type === 'Polygon') d += poly(g.coordinates);
+      else if (g.type === 'MultiPolygon') g.coordinates.forEach(p => d += poly(p));
+    });
+    return d;
+  }
+
+  DATA() {
+    // name, tk(short), flag, region, last, d1%, d5%, lon, lat, onMap, dx, dy, anchor
+    return [
+      // ── Americas ──  (idx … + tradeable ETF proxy: etf ticker, etfCur, etfLast)
+      { name:'S&P 500',        tk:'SPX',  flag:'US', region:'Americas', last:5930,    d1:0.42,  d5:1.80,  lon:-74,   lat:40.7, onMap:1, dx:5,  dy:-1, anchor:'start', etf:'SPY',  etfCur:'USD', etfLast:590.20 },
+      { name:'Nasdaq 100',     tk:'NDX',  flag:'US', region:'Americas', last:21480,   d1:0.65,  d5:2.40,  onMap:0,  etf:'QQQ',  etfCur:'USD', etfLast:510.40 },
+      { name:'Dow Jones',      tk:'DJI',  flag:'US', region:'Americas', last:43210,   d1:0.18,  d5:0.90,  onMap:0,  etf:'DIA',  etfCur:'USD', etfLast:432.10 },
+      { name:'費城半導體',      tk:'SOX',  flag:'US', region:'Americas', last:5240,    d1:1.05,  d5:3.40,  onMap:0,  etf:'SOXX', etfCur:'USD', etfLast:235.60 },
+      { name:'S&P/TSX',        tk:'GSPTSE',flag:'CA',region:'Americas', last:24150,   d1:0.22,  d5:1.10,  lon:-79.4, lat:43.7, onMap:1, dx:-5, dy:-6, anchor:'end',   etf:'XIC',  etfCur:'CAD', etfLast:38.45 },
+      { name:'Bovespa',        tk:'IBOV', flag:'BR', region:'Americas', last:128400,  d1:-0.35, d5:-1.20, lon:-46.6, lat:-23.5,onMap:1, dx:5,  dy:2,  anchor:'start', etf:'EWZ',  etfCur:'USD', etfLast:28.30 },
+      { name:'IPC México',     tk:'MXX',  flag:'MX', region:'Americas', last:53800,   d1:-0.12, d5:0.40,  lon:-99,   lat:19.4, onMap:1, dx:-5, dy:4,  anchor:'end',   etf:'EWW',  etfCur:'USD', etfLast:57.90 },
+      { name:'Russell 2000',   tk:'RUT',  flag:'US', region:'Americas', last:2280,    d1:0.55,  d5:1.60,  onMap:0,  etf:'IWM',  etfCur:'USD', etfLast:227.80 },
+      { name:'Merval',         tk:'MERVAL',flag:'AR',region:'Americas', last:2150000, d1:-0.50, d5:2.10,  lon:-58.4, lat:-34.6,onMap:1, dx:5,  dy:3,  anchor:'start', etf:'ARGT', etfCur:'USD', etfLast:78.40 },
+      // ── EMEA ──
+      { name:'FTSE 100',       tk:'UKX',  flag:'UK', region:'EMEA', last:8420,    d1:0.30,  d5:0.70,  lon:-0.1,  lat:51.5, onMap:1, dx:-6, dy:-3, anchor:'end',   etf:'EWU',  etfCur:'USD', etfLast:38.10 },
+      { name:'DAX',            tk:'DAX',  flag:'DE', region:'EMEA', last:18650,   d1:0.55,  d5:1.50,  lon:8.7,   lat:50.1, onMap:1, dx:6,  dy:-3, anchor:'start', etf:'EWG',  etfCur:'USD', etfLast:33.20 },
+      { name:'CAC 40',         tk:'CAC',  flag:'FR', region:'EMEA', last:7720,    d1:0.10,  d5:0.30,  lon:2.3,   lat:48.9, onMap:1, dx:0,  dy:9,  anchor:'middle',etf:'EWQ',  etfCur:'USD', etfLast:42.05 },
+      { name:'Euro STOXX 600', tk:'SXXP', flag:'EU', region:'EMEA', last:520,     d1:0.28,  d5:0.90,  onMap:0,  etf:'VGK',  etfCur:'USD', etfLast:68.40 },
+      { name:'SMI',            tk:'SSMI', flag:'CH', region:'EMEA', last:12050,   d1:0.05,  d5:0.20,  onMap:0,  etf:'EWL',  etfCur:'USD', etfLast:46.15 },
+      { name:'MOEX',           tk:'IMOEX',flag:'RU', region:'EMEA', last:3180,    d1:-0.80, d5:-2.10, lon:37.6,  lat:55.7, onMap:1, dx:5,  dy:-2, anchor:'start', etf:'ERUS', etfCur:'USD', etfLast:5.40 },
+      { name:'Tadawul',        tk:'TASI', flag:'SA', region:'EMEA', last:11420,   d1:-0.20, d5:0.60,  lon:46.7,  lat:24.7, onMap:1, dx:0,  dy:9,  anchor:'middle',etf:'KSA',  etfCur:'USD', etfLast:37.80 },
+      { name:'IBEX 35',        tk:'IBEX', flag:'ES', region:'EMEA', last:11380,   d1:0.20,  d5:0.60,  onMap:0,  etf:'EWP',  etfCur:'USD', etfLast:34.20 },
+      { name:'FTSE MIB',       tk:'FTSEMIB',flag:'IT',region:'EMEA',last:34200,   d1:0.35,  d5:1.00,  onMap:0,  etf:'EWI',  etfCur:'USD', etfLast:42.60 },
+      { name:'AEX',            tk:'AEX',  flag:'NL', region:'EMEA', last:910,      d1:0.18,  d5:0.50,  onMap:0,  etf:'EWN',  etfCur:'USD', etfLast:54.30 },
+      { name:'JSE Top 40',     tk:'JTOPI',flag:'ZA', region:'EMEA', last:73500,   d1:-0.25, d5:0.80,  lon:28.0,  lat:-26.2,onMap:1, dx:0,  dy:9,  anchor:'middle',etf:'EZA',  etfCur:'USD', etfLast:43.10 },
+      // ── Asia-Pacific ──
+      { name:'Nikkei 225',     tk:'NKY',  flag:'JP', region:'APAC', last:39150,   d1:-0.45, d5:0.80,  lon:139.7, lat:35.7, onMap:1, dx:9,  dy:-4, anchor:'start', etf:'EWJ',  etfCur:'USD', etfLast:72.10 },
+      { name:'TOPIX',          tk:'TPX',  flag:'JP', region:'APAC', last:2760,    d1:-0.30, d5:0.60,  onMap:0,  etf:'1306', etfCur:'JPY', etfLast:2895 },
+      { name:'Hang Seng',      tk:'HSI',  flag:'HK', region:'APAC', last:18900,   d1:1.20,  d5:3.10,  lon:114.2, lat:22.3, onMap:1, dx:-7, dy:7,  anchor:'end',   etf:'2800', etfCur:'HKD', etfLast:18.96 },
+      { name:'SSE Composite',  tk:'SHCOMP',flag:'CN',region:'APAC', last:3050,    d1:0.60,  d5:1.40,  onMap:0,  etf:'GXC',  etfCur:'USD', etfLast:95.30 },
+      { name:'CSI 300',        tk:'CSI300',flag:'CN',region:'APAC', last:3560,    d1:0.70,  d5:1.60,  lon:121.5, lat:31.2, onMap:1, dx:-10,dy:-2, anchor:'end',   etf:'ASHR', etfCur:'USD', etfLast:28.05 },
+      { name:'TAIEX 加權',      tk:'TWSE', flag:'TW', region:'APAC', last:22800,   d1:0.90,  d5:2.20,  lon:121.5, lat:25.0, onMap:1, dx:9,  dy:5,  anchor:'start', etf:'0050', etfCur:'TWD', etfLast:190.50 },
+      { name:'櫃買指數 TPEx',   tk:'TPEX', flag:'TW', region:'APAC', last:245,     d1:0.75,  d5:1.90,  onMap:0,  etf:'006201',etfCur:'TWD',etfLast:22.40 },
+      { name:'KOSPI',          tk:'KOSPI',flag:'KR', region:'APAC', last:2720,    d1:0.40,  d5:1.00,  lon:127,   lat:37.5, onMap:1, dx:-9, dy:-7, anchor:'end',   etf:'EWY',  etfCur:'USD', etfLast:62.30 },
+      { name:'Nifty 50',       tk:'NIFTY',flag:'IN', region:'APAC', last:23850,   d1:0.22,  d5:0.80,  lon:72.8,  lat:19.1, onMap:1, dx:0,  dy:9,  anchor:'middle',etf:'INDA', etfCur:'USD', etfLast:52.10 },
+      { name:'Sensex',         tk:'SENSEX',flag:'IN',region:'APAC', last:78500,   d1:0.25,  d5:0.90,  onMap:0,  etf:'INDY', etfCur:'USD', etfLast:52.60 },
+      { name:'STI',            tk:'STI',  flag:'SG', region:'APAC', last:3420,    d1:0.15,  d5:0.50,  lon:103.8, lat:1.35, onMap:1, dx:0,  dy:9,  anchor:'middle',etf:'ES3',  etfCur:'SGD', etfLast:3.62 },
+      { name:'ASX 200',        tk:'AS51', flag:'AU', region:'APAC', last:7950,    d1:-0.10, d5:0.40,  lon:151.2, lat:-33.9,onMap:1, dx:5,  dy:2,  anchor:'start', etf:'STW',  etfCur:'AUD', etfLast:72.40 },
+      { name:'SET Index',      tk:'SET',  flag:'TH', region:'APAC', last:1310,    d1:0.30,  d5:0.70,  lon:100.5, lat:13.7, onMap:1, dx:-6, dy:5,  anchor:'end',   etf:'THD',  etfCur:'USD', etfLast:58.20 },
+      { name:'Jakarta JCI',    tk:'JCI',  flag:'ID', region:'APAC', last:7140,    d1:0.45,  d5:1.20,  lon:106.8, lat:-6.2, onMap:1, dx:0,  dy:9,  anchor:'middle',etf:'EIDO', etfCur:'USD', etfLast:21.40 },
+      { name:'FTSE KLCI',      tk:'KLCI', flag:'MY', region:'APAC', last:1610,    d1:0.12,  d5:0.40,  onMap:0,  etf:'EWM',  etfCur:'USD', etfLast:24.60 },
+      { name:'PSEi',           tk:'PSEI', flag:'PH', region:'APAC', last:6580,    d1:-0.20, d5:0.30,  onMap:0,  etf:'EPHE', etfCur:'USD', etfLast:24.10 },
+      { name:'VN-Index',       tk:'VNINDEX',flag:'VN',region:'APAC',last:1290,    d1:0.40,  d5:1.50,  onMap:0,  etf:'VNM',  etfCur:'USD', etfLast:13.80 },
+      { name:'NZX 50',         tk:'NZX50',flag:'NZ', region:'APAC', last:12650,   d1:-0.05, d5:0.30,  lon:174.8, lat:-41.3,onMap:1, dx:-6, dy:0,  anchor:'end',   etf:'ENZL', etfCur:'USD', etfLast:48.90 },
+    ];
+  }
+
+  // Major FX pairs (quoted vs USD) + US Dollar Index. dp = display decimals
+  FX() {
+    return [
+      { pair:'DXY',     name:'美元指數',  rate:104.20,  dp:2, d1:0.15,  d5:-0.40, hero:1 },
+      { pair:'EUR/USD', name:'歐元',      rate:1.0850,  dp:4, d1:-0.12, d5:0.30 },
+      { pair:'USD/JPY', name:'日圓',      rate:157.20,  dp:2, d1:0.25,  d5:0.80 },
+      { pair:'GBP/USD', name:'英鎊',      rate:1.2720,  dp:4, d1:0.10,  d5:0.20 },
+      { pair:'USD/CNY', name:'人民幣',    rate:7.2450,  dp:4, d1:-0.08, d5:-0.25 },
+      { pair:'USD/TWD', name:'新台幣',    rate:32.40,   dp:2, d1:-0.15, d5:-0.50 },
+      { pair:'USD/KRW', name:'韓元',      rate:1378.0,  dp:1, d1:0.20,  d5:0.60 },
+      { pair:'USD/HKD', name:'港元',      rate:7.8050,  dp:4, d1:0.01,  d5:0.03 },
+      { pair:'AUD/USD', name:'澳元',      rate:0.6680,  dp:4, d1:0.18,  d5:0.45 },
+      { pair:'USD/CAD', name:'加元',      rate:1.3650,  dp:4, d1:-0.10, d5:-0.30 },
+      { pair:'USD/INR', name:'印度盧比',  rate:83.50,   dp:2, d1:0.05,  d5:0.15 },
+      { pair:'USD/SGD', name:'新加坡元',  rate:1.3480,  dp:4, d1:-0.06, d5:-0.18 },
+    ];
+  }
+
+  // Coarse land mask as [row, colStart, colEnd] segments (equirectangular, 5° cells)
+  LAND() {
+    return [
+      [0,28,31],
+      [1,18,26],[1,27,32],[1,37,37],[1,56,58],
+      [2,16,26],[2,26,33],[2,50,66],
+      [3,6,9],[3,12,28],[3,26,34],[3,40,71],
+      [4,3,30],[4,28,34],[4,36,42],[4,42,71],
+      [5,2,9],[5,10,30],[5,30,33],[5,36,42],[5,42,71],
+      [6,2,8],[6,10,30],[6,34,44],[6,44,71],
+      [7,8,30],[7,33,46],[7,46,71],
+      [8,8,30],[8,35,71],
+      [9,12,28],[9,36,66],
+      [10,12,27],[10,36,66],
+      [11,13,26],[11,33,64],
+      [12,14,24],[12,33,63],
+      [13,15,22],[13,32,62],
+      [14,16,23],[14,31,63],
+      [15,17,22],[15,30,63],
+      [16,20,25],[16,29,63],
+      [17,21,28],[17,30,63],
+      [18,22,30],[18,30,66],
+      [19,22,31],[19,32,67],
+      [20,23,32],[20,33,45],[20,55,62],[20,65,68],
+      [21,24,33],[21,34,44],[21,47,48],[21,64,69],
+      [22,24,33],[22,36,44],[22,47,48],[22,62,69],
+      [23,24,32],[23,37,43],[23,47,47],[23,60,69],
+      [24,25,31],[24,38,42],[24,60,68],
+      [25,26,30],[25,39,41],[25,61,67],[25,70,70],
+      [26,26,30],[26,64,64],[26,69,70],
+      [27,27,29],[27,69,70],
+      [28,27,29],
+      [29,27,28],
+    ];
+  }
+
+  seedOf(tk) { let h = 0; for (let i = 0; i < tk.length; i++) h = (h * 31 + tk.charCodeAt(i)) >>> 0; return h || 1; }
+  prng(seed) { let s = seed % 2147483647; if (s <= 0) s += 2147483646; return () => (s = s * 16807 % 2147483647) / 2147483647; }
+
+  // n-point price path that starts at 0 and ends exactly at endPct, with deterministic intraperiod wiggle
+  series(tk, metric, endPct) {
+    const n = metric === 'd1' ? 26 : 22;
+    const rnd = this.prng(this.seedOf(tk) + (metric === 'd1' ? 7 : 53));
+    const raw = []; let v = 0;
+    for (let i = 0; i < n; i++) { v += rnd() - 0.5; raw.push(v); }
+    const b0 = raw[0], bN = raw[n - 1];
+    for (let i = 0; i < n; i++) raw[i] = raw[i] - b0 - (bN - b0) * (i / (n - 1)); // detrend → ends at 0
+    const wig = Math.abs(endPct) * 0.45 + 0.22;
+    const out = raw.map((r, i) => endPct * (i / (n - 1)) + r * wig);
+    out[0] = 0; out[n - 1] = endPct;
+    return out;
+  }
+
+  buildSpark(values, color) {
+    const W = 104, H = 28, p = 3;
+    const min = Math.min(...values, 0), max = Math.max(...values, 0);
+    const rng = (max - min) || 1;
+    const xs = i => p + (i / (values.length - 1)) * (W - 2 * p);
+    const ys = v => p + (1 - (v - min) / rng) * (H - 2 * p);
+    let d = '';
+    values.forEach((v, i) => d += (i ? 'L' : 'M') + xs(i).toFixed(1) + ' ' + ys(v).toFixed(1));
+    const area = d + 'L' + xs(values.length - 1).toFixed(1) + ' ' + (H - p).toFixed(1) + 'L' + xs(0).toFixed(1) + ' ' + (H - p).toFixed(1) + 'Z';
+    const zy = ys(0).toFixed(1);
+    const ex = xs(values.length - 1).toFixed(1), ey = ys(values[values.length - 1]).toFixed(1);
+    const svg = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="display:block;overflow:visible;">`
+      + `<line x1="${p}" y1="${zy}" x2="${W - p}" y2="${zy}" stroke="#d8d4ca" stroke-width="0.6" stroke-dasharray="2 2"/>`
+      + `<path d="${area}" fill="${color}" opacity="0.09"/>`
+      + `<path d="${d}" fill="none" stroke="${color}" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>`
+      + `<circle cx="${ex}" cy="${ey}" r="1.9" fill="${color}" stroke="#fffdf8" stroke-width="0.8"/>`
+      + `</svg>`;
+    return React.createElement('div', { dangerouslySetInnerHTML: { __html: svg } });
+  }
+
+  fmtNum(v) {
+    if (v >= 1000) return Math.round(v).toLocaleString('en-US');
+    return v.toLocaleString('en-US', { maximumFractionDigits: 0 });
+  }
+  pctLbl(p) { return (p >= 0 ? '+' : '') + p.toFixed(2) + '%'; }
+
+  // 8 cumulative returns (1/3/5/10/20/60/120/240 sessions) seeded per symbol; 1D = live pct
+  genRets(sym, pct, up, dn) {
+    const periods = [1, 3, 5, 10, 20, 60, 120, 240];
+    const rnd = this.prng(this.seedOf(sym) + 11);
+    const drift = (rnd() - 0.46) * 0.9;            // per-symbol trend bias
+    return periods.map((d, i) => {
+      let v;
+      if (d === 1) { v = pct; }
+      else { v = pct + drift * Math.sqrt(d) + (rnd() - 0.5) * Math.sqrt(d) * 1.15; }
+      const c = v >= 0 ? up : dn;
+      return { lbl: (v >= 0 ? '+' : '') + v.toFixed(1), col: c };
+    });
+  }
+
+  // unified ETF universe: every row carries region / risk-tier / product-class so one
+  // dataset re-groups under any lens (區域別 / 風險別 / 商品別 / 累計影響)
+  ETFUNI() {
+    return [
+      ['SPY','標普500','S&P 500','USD',592.4,0.42,1.80,'北美 N.America','T2','大盤股票 Broad Equity'],
+      ['QQQ','那斯達克100','Nasdaq 100','USD',510.4,0.65,2.40,'北美 N.America','T3','大盤股票 Broad Equity'],
+      ['DIA','道瓊工業','Dow Jones','USD',432.1,0.18,0.90,'北美 N.America','T2','大盤股票 Broad Equity'],
+      ['IWM','羅素2000','Russell 2000','USD',227.8,0.55,1.60,'北美 N.America','T3','大盤股票 Broad Equity'],
+      ['SOXX','費城半導體','PHLX Semiconductor','USD',235.6,1.05,3.40,'北美 N.America','T4','產業主題 Sector'],
+      ['XLK','科技類股','Tech Sector','USD',242.3,0.78,2.10,'北美 N.America','T3','產業主題 Sector'],
+      ['XLF','金融類股','Financials','USD',49.8,0.22,0.70,'北美 N.America','T2','產業主題 Sector'],
+      ['XLE','能源類股','Energy','USD',96.5,-0.65,-1.80,'北美 N.America','T3','產業主題 Sector'],
+      ['VGK','歐洲股票','FTSE Europe','USD',68.4,0.28,0.90,'歐非中東 EMEA','T2','大盤股票 Broad Equity'],
+      ['EWU','英國股票','UK Equity','USD',38.1,0.30,0.70,'歐非中東 EMEA','T2','大盤股票 Broad Equity'],
+      ['EWG','德國股票','Germany Equity','USD',33.2,0.55,1.50,'歐非中東 EMEA','T3','大盤股票 Broad Equity'],
+      ['EZA','南非股票','South Africa','USD',43.1,-0.25,0.80,'歐非中東 EMEA','T4','新興市場 EM Equity'],
+      ['EWJ','日本股票','Japan Equity','USD',74.2,0.36,1.20,'東亞 E.Asia','T2','大盤股票 Broad Equity'],
+      ['MCHI','中國股票','China Equity','USD',48.6,-0.42,-1.10,'東亞 E.Asia','T4','新興市場 EM Equity'],
+      ['EWT','台灣股票','Taiwan Equity','USD',58.9,0.50,1.90,'東亞 E.Asia','T3','新興市場 EM Equity'],
+      ['EWY','南韓股票','Korea Equity','USD',62.4,0.44,1.40,'東亞 E.Asia','T3','新興市場 EM Equity'],
+      ['INDA','印度股票','India Equity','USD',55.1,0.61,2.20,'南亞/東南亞 S/SE Asia','T3','新興市場 EM Equity'],
+      ['EWS','新加坡股票','Singapore','USD',24.8,0.20,0.55,'南亞/東南亞 S/SE Asia','T2','新興市場 EM Equity'],
+      ['EWA','澳洲股票','Australia','USD',26.3,0.18,0.60,'太平洋 Pacific','T2','大盤股票 Broad Equity'],
+      ['0050.TW','元大台灣50','Yuanta Taiwan 50','TWD',192.5,0.50,1.90,'東亞 E.Asia','T3','新興市場 EM Equity'],
+      ['GLD','黃金','Gold','USD',248.6,0.34,1.05,'全球 Global','T1','商品 Commodity'],
+      ['SLV','白銀','Silver','USD',30.2,0.55,1.80,'全球 Global','T3','商品 Commodity'],
+      ['USO','原油','Crude Oil','USD',82.4,-0.85,-2.40,'全球 Global','T4','商品 Commodity'],
+      ['DBA','農產品','Agriculture','USD',26.7,0.12,0.40,'全球 Global','T3','商品 Commodity'],
+      ['DBC','綜合商品','Broad Commodity','USD',23.9,-0.30,-0.90,'全球 Global','T3','商品 Commodity'],
+      ['TLT','美國長債','20Y+ Treasury','USD',92.8,-0.22,-0.80,'北美 N.America','T1','債券 Bond'],
+      ['IEF','美國中債','7-10Y Treasury','USD',95.4,-0.10,-0.35,'北美 N.America','T1','債券 Bond'],
+      ['LQD','投資級公司債','IG Corporate','USD',109.6,-0.08,-0.20,'北美 N.America','T2','債券 Bond'],
+      ['HYG','高收益債','High Yield','USD',79.3,0.10,0.30,'北美 N.America','T3','債券 Bond'],
+      ['BITO','比特幣期貨','Bitcoin Strategy','USD',28.6,2.10,5.40,'全球 Global','T4','加密 Crypto'],
+      ['TQQQ','三倍那斯達克','3x Nasdaq','USD',74.5,1.95,7.10,'北美 N.America','T4','槓桿 Leveraged'],
+    ];
+  }
+
+  buildEtfUniverse(metric, up, dn) {
+    const lens = this.state.etfLens ?? 'region';
+    const rows = this.ETFUNI().map(r => {
+      const [tk, cn, en, cur, last, d1, d5, region, risk, product] = r;
+      const pct = metric === 'd1' ? d1 : d5;
+      const c = pct >= 0 ? up : dn;
+      const rets = this.genRets(tk + cn, pct, up, dn);
+      const cum240 = parseFloat(rets[7].lbl);
+      return {
+        tk, cn, en, cur, region, risk, product,
+        lastLbl: last.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        pct, pctLbl: this.pctLbl(pct), pctCol: c, rets, cum240,
+      };
+    });
+
+    const lensKeys = {
+      region: { field: 'region', order: ['北美 N.America','歐非中東 EMEA','東亞 E.Asia','南亞/東南亞 S/SE Asia','太平洋 Pacific','全球 Global'], color: '#4c72b0' },
+      risk:   { field: 'risk',   order: ['T1','T2','T3','T4'], color: '#dd8452',
+                titleMap: { T1:'T1 主權/避險 Sovereign·Defensive', T2:'T2 核心配置 Core', T3:'T3 成長/週期 Growth·Cyclical', T4:'T4 高Beta/槓桿 High-Beta' } },
+      product:{ field: 'product',order: ['大盤股票 Broad Equity','新興市場 EM Equity','產業主題 Sector','商品 Commodity','債券 Bond','加密 Crypto','槓桿 Leveraged'], color: '#55a868' },
+    };
+
+    let groups = [];
+    let cumRanking = null;
+    if (lens === 'cumul') {
+      const sorted = [...rows].sort((a, b) => b.cum240 - a.cum240);
+      const maxAbs = Math.max(...sorted.map(r => Math.abs(r.cum240)), 1);
+      cumRanking = sorted.map(r => {
+        const pos = r.cum240 >= 0;
+        const w = (Math.abs(r.cum240) / maxAbs) * 50;
+        return {
+          tk: r.tk, cn: r.cn, product: r.product,
+          valLbl: (pos ? '+' : '') + r.cum240.toFixed(1) + '%',
+          col: pos ? up : dn,
+          barStyle: 'position:absolute;top:3px;bottom:3px;' + (pos
+            ? 'left:50%;width:' + w.toFixed(1) + '%;background:' + up + '22;border-right:2px solid ' + up + ';'
+            : 'right:50%;width:' + w.toFixed(1) + '%;background:' + dn + '22;border-left:2px solid ' + dn + ';'),
+        };
+      });
+    } else {
+      const cfg = lensKeys[lens];
+      groups = cfg.order.map(key => {
+        const items = rows.filter(r => r[cfg.field] === key);
+        if (!items.length) return null;
+        const avg = items.reduce((s, r) => s + r.pct, 0) / items.length;
+        return { title: (cfg.titleMap && cfg.titleMap[key]) || key, sub: items.length + ' 檔 · 均 ' + this.pctLbl(avg), color: cfg.color, items };
+      }).filter(Boolean);
+    }
+
+    const lensBtns = [
+      { k: 'region', lbl: '區域別' }, { k: 'risk', lbl: '風險別' },
+      { k: 'product', lbl: '商品別' }, { k: 'cumul', lbl: '累計影響' },
+    ].map(b => ({
+      lbl: b.lbl,
+      onClick: () => this.setState({ etfLens: b.k }),
+      style: 'padding:6px 15px;font:700 11px \'DM Sans\',\'Noto Sans TC\',sans-serif;cursor:pointer;white-space:nowrap;border:0;'
+        + (b.k === lens ? 'background:#1e1d1a;color:#fffdf8;' : 'background:#fffdf8;color:#6b6860;'),
+    }));
+
+    return { etfGroups: groups, etfCumRanking: cumRanking, etfLensBtns: lensBtns, etfIsCumul: lens === 'cumul' };
+  }
+
+  colors() {
+    const conv = this.props.colorConv ?? 'tw';
+    return conv === 'intl' ? { up: '#1e8449', dn: '#c0392b' } : { up: '#c0392b', dn: '#1e8449' };
+  }
+
+  NMMAP() {
+    return {
+      SPX:['標普 500','S&P 500'], NDX:['那斯達克 100','Nasdaq 100'], DJI:['道瓊工業','Dow Jones'],
+      SOX:['費城半導體','PHLX Semiconductor'], GSPTSE:['加拿大 S&P/TSX','S&P/TSX'], IBOV:['巴西 Bovespa','Bovespa'],
+      MXX:['墨西哥 IPC','IPC México'], RUT:['羅素 2000','Russell 2000'], MERVAL:['阿根廷 Merval','Merval'],
+      UKX:['英國富時 100','FTSE 100'], DAX:['德國 DAX','DAX'], CAC:['法國 CAC 40','CAC 40'],
+      SXXP:['泛歐 STOXX 600','Euro STOXX 600'], SSMI:['瑞士 SMI','SMI'], IMOEX:['俄羅斯 MOEX','MOEX'],
+      TASI:['沙烏地 Tadawul','Tadawul'], IBEX:['西班牙 IBEX 35','IBEX 35'], FTSEMIB:['義大利富時 MIB','FTSE MIB'],
+      AEX:['荷蘭 AEX','AEX'], JTOPI:['南非 Top 40','JSE Top 40'], NKY:['日經 225','Nikkei 225'],
+      TPX:['東證 TOPIX','TOPIX'], HSI:['恆生指數','Hang Seng'], SHCOMP:['上證綜指','SSE Composite'],
+      CSI300:['滬深 300','CSI 300'], TWSE:['台灣加權','TAIEX'], TPEX:['櫃買指數','TPEx'],
+      KOSPI:['韓國 KOSPI','KOSPI'], NIFTY:['印度 Nifty 50','Nifty 50'], SENSEX:['印度 Sensex','Sensex'],
+      STI:['新加坡海峽','STI'], AS51:['澳洲 ASX 200','ASX 200'], SET:['泰國 SET','SET Index'],
+      JCI:['印尼雅加達','Jakarta JCI'], KLCI:['馬來富時','FTSE KLCI'], PSEI:['菲律賓 PSEi','PSEi'],
+      VNINDEX:['越南 VN 指數','VN-Index'], NZX50:['紐西蘭 NZX 50','NZX 50']
+    };
+  }
+
+  buildMap(metric, up, dn, inst) {
+    const W = 360, H = 150;
+    const showLabels = this.props.showLabels ?? true;
+    let dots = '';
+    if (this.state.landPath) {
+      dots = `<path d="${this.state.landPath}" fill="#e2ded3" stroke="#c6c1b5" stroke-width="0.35" stroke-linejoin="round" stroke-linecap="round"/>`;
+    } else {
+      this.LAND().forEach(([row, c0, c1]) => {
+        for (let col = c0; col <= c1; col++) {
+          const x = (col * 5 + 2.5).toFixed(1), y = (row * 5 + 0.5).toFixed(1);
+          dots += `<circle cx="${x}" cy="${y}" r="0.95" fill="#d7d3c9"/>`;
+        }
+      });
+    }
+    let grat = '';
+    [60, 120, 180, 240, 300].forEach(x => grat += `<line x1="${x}" y1="2" x2="${x}" y2="${H - 2}" stroke="#edeae2" stroke-width="0.4"/>`);
+    [28, 58, 88, 118].forEach(y => grat += `<line x1="2" y1="${y}" x2="${W - 2}" y2="${y}" stroke="#edeae2" stroke-width="0.4"/>`);
+    let mk = '';
+    this.DATA().filter(m => m.onMap).forEach(m => {
+      const pct = metric === 'd1' ? m.d1 : m.d5;
+      const pos = pct >= 0, c = pos ? up : dn;
+      const mx = m.lon + 180, my = 88 - m.lat;
+      const r = (1.5 + Math.min(Math.abs(pct), 3.2) * 1.05);
+      mk += `<circle cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="${(r + 1.8).toFixed(1)}" fill="${c}" opacity="0.10"/>`;
+      mk += `<circle cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="${r.toFixed(1)}" fill="${c}" opacity="0.30"/>`;
+      mk += `<circle cx="${mx.toFixed(1)}" cy="${my.toFixed(1)}" r="1.35" fill="${c}" stroke="#fffdf8" stroke-width="0.5"/>`;
+      if (showLabels) {
+        const lx = mx + m.dx, ly = my + m.dy;
+        const cnName = (this.NMMAP()[m.tk] || [m.name])[0];
+        const sym = inst === 'etf' ? m.etf : m.tk;
+        const priceTxt = `${sym} ${(m.last >= 1000 ? Math.round(m.last).toLocaleString('en-US') : m.last.toFixed(2))}`;
+        const pctTxt = this.pctLbl(pct);
+        let tx, ta;
+        if (m.anchor === 'end') { tx = lx - 1.4; ta = 'end'; }
+        else if (m.anchor === 'middle') { tx = lx; ta = 'middle'; }
+        else { tx = lx + 1.4; ta = 'start'; }
+        if (Math.abs(m.dx) > 3 || Math.abs(m.dy) > 3)
+          mk += `<line x1="${mx.toFixed(1)}" y1="${my.toFixed(1)}" x2="${lx.toFixed(1)}" y2="${ly.toFixed(1)}" stroke="${c}" stroke-width="0.3" opacity="0.4"/>`;
+        // line 1: Chinese name
+        mk += `<text x="${tx.toFixed(1)}" y="${(ly - 3.6).toFixed(1)}" text-anchor="${ta}" font-family="Noto Sans TC,sans-serif" font-weight="700" font-size="3.5" fill="#1e1d1a" paint-order="stroke" stroke="#fffdf8" stroke-width="1.3" stroke-linejoin="round">${cnName}</text>`;
+        // line 2: ticker + price
+        mk += `<text x="${tx.toFixed(1)}" y="${(ly - 0.7).toFixed(1)}" text-anchor="${ta}" font-family="DM Mono,monospace" font-weight="600" font-size="3.2" fill="#3a3833" paint-order="stroke" stroke="#fffdf8" stroke-width="1.3" stroke-linejoin="round">${priceTxt}</text>`;
+        // line 3: pct change
+        mk += `<text x="${tx.toFixed(1)}" y="${(ly + 2.2).toFixed(1)}" text-anchor="${ta}" font-family="DM Mono,monospace" font-weight="700" font-size="3.4" fill="${c}" paint-order="stroke" stroke="#fffdf8" stroke-width="1.3" stroke-linejoin="round">${pctTxt}</text>`;
+        // line 4: mini trend sparkline
+        const ser = this.series(sym, metric, pct);
+        const sw = 13, sh = 3.2, sn = ser.length;
+        const smin = Math.min(...ser), smax = Math.max(...ser), srng = (smax - smin) || 1;
+        const sx0 = ta === 'end' ? lx - 1.4 - sw : (ta === 'middle' ? lx - sw / 2 : lx + 1.4);
+        const sy0 = ly + 3.0;
+        const pts = ser.map((v, i) => `${(sx0 + (i / (sn - 1)) * sw).toFixed(1)},${(sy0 + sh - ((v - smin) / srng) * sh).toFixed(1)}`).join(' ');
+        mk += `<polyline points="${pts}" fill="none" stroke="${c}" stroke-width="0.45" opacity="0.85" paint-order="stroke"/>`;
+      }
+    });
+    const svg = `<svg viewBox="14 0 346 150" width="100%" preserveAspectRatio="xMidYMid meet" style="display:block;">${grat}${dots}${mk}</svg>`;
+    return React.createElement('div', { dangerouslySetInnerHTML: { __html: svg } });
+  }
+
+  renderVals() {
+    const data = this.DATA();
+    const metric = this.state.metric ?? (this.props.defaultMetric ?? 'd1');
+    const inst = this.state.inst ?? 'idx';
+    const isEtf = inst === 'etf';
+    const { up, dn } = this.colors();
+    const val = m => metric === 'd1' ? m.d1 : m.d5;
+
+    // breadth
+    const adv = data.filter(d => val(d) >= 0).length;
+    const breadthPct = Math.round(adv / data.length * 100);
+
+    // top mover / laggard for selected metric
+    const sorted = [...data].sort((a, b) => val(b) - val(a));
+    const gain = sorted[0], lose = sorted[sorted.length - 1];
+
+    // circle-flags SVG (ISO 3166-1 alpha-2, lowercase; UK→gb)
+    const ISO = { UK:'gb' };
+    const flagSrc = code => 'https://hatscripts.github.io/circle-flags/flags/' + (ISO[code] || code.toLowerCase()) + '.svg';
+    const NM = this.NMMAP();
+
+    // groups
+    const eastAsia = ['JP', 'HK', 'CN', 'TW', 'KR'];
+    const order = [
+      { id: 'Americas', title: '美洲 Americas', sub: 'North · LatAm', color: '#4c72b0', match: d => d.region === 'Americas' },
+      { id: 'EMEA', title: '歐非中東 EMEA', sub: 'Europe · MEA', color: '#8172b3', match: d => d.region === 'EMEA' },
+      { id: 'EastAsia', title: '東亞 East Asia', sub: 'JP · CN · HK · TW · KR', color: '#dd8452', match: d => d.region === 'APAC' && eastAsia.indexOf(d.flag) >= 0 },
+      { id: 'SEAPac', title: '東南亞·太平洋 SE Asia · Pacific', sub: 'ASEAN · South · Oceania', color: '#c44e52', match: d => d.region === 'APAC' && eastAsia.indexOf(d.flag) < 0 },
+    ];
+    const groups = order.map(o => ({
+      title: o.title, sub: o.sub, color: o.color,
+      items: data.filter(o.match).map(d => {
+        const pct = val(d), c = pct >= 0 ? up : dn;
+        const sym = isEtf ? d.etf : d.tk;
+        const nm = NM[d.tk] || [d.name, d.name];
+        return {
+          name: d.name, tk: sym, flag: d.flag, isEtf,
+          flagImg: React.createElement('img', { src: flagSrc(d.flag), alt: '', style: { flex: 'none', width: '19px', height: '19px', borderRadius: '50%', display: 'block', boxShadow: '0 0 0 1px #e2ded3' } }),
+          nameCn: nm[0], nameEn: nm[1],
+          sub: isEtf ? (d.etf + ' · ' + d.etfCur) : (d.tk + ' · ' + d.flag),
+          lastLbl: isEtf ? d.etfLast.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : this.fmtNum(d.last),
+          spark: this.buildSpark(this.series(sym, metric, pct), c),
+          pctLbl: this.pctLbl(pct), pctCol: c,
+          rets: this.genRets(sym, pct, up, dn),
+        };
+      }),
+    }));
+
+    // FX tiles (driven by the same 1D/5D metric)
+    const fx = this.FX().map(f => {
+      const pct = metric === 'd1' ? f.d1 : f.d5;
+      const c = pct >= 0 ? up : dn;
+      return {
+        pair: f.pair, name: f.name, hero: !!f.hero,
+        rateLbl: f.rate.toLocaleString('en-US', { minimumFractionDigits: f.dp, maximumFractionDigits: f.dp }),
+        pctLbl: this.pctLbl(pct), col: c,
+        spark: this.buildSpark(this.series('FX' + f.pair, metric, pct), c),
+        tileStyle: 'border:1px solid ' + (f.hero ? '#d8cdb6' : '#e6e3db') + ';border-radius:8px;padding:9px 11px 7px;background:' + (f.hero ? '#fbf6ea' : '#fffdf8') + ';display:flex;flex-direction:column;gap:5px;',
+      };
+    });
+
+    // ── Tab bar + embedded flow-sim panels (VIA-FlowSystem outputs) ──
+    const tab = this.state.tab ?? 'overview';
+    const TABS = [
+      { key:'overview', label:'🌐 全球總覽' },
+      { key:'console',  label:'🧭 資金流整合 Console', src:'flow/flow_console.html', sub:'八視圖整合 · 世界流／層級／累積／走勢／情境／商品／監控／ETF · 各視圖保留完整互動', h:1060 },
+      { key:'mapsim',   label:'🗺️ 資金流情境地圖', src:'flow/global_map_sim.html', sub:'情境驅動 · 方向 × 時間 × 累積淨流', h:900 },
+      { key:'world',    label:'🌍 世界資金流動畫', src:'flow/world_flow.html', sub:'每日真實 FIS · 區域節點 · Plotly', h:820 },
+      { key:'tier',     label:'🪜 風險階梯流動', src:'flow/tier_flow.html', sub:'T1 主權 → T4 高Beta 資金遷移', h:820 },
+      { key:'perf',     label:'📈 正規化走勢', src:'flow/perf_trend.html', sub:'基準=100 · 主題／GICS 分類篩選', h:800 },
+      { key:'monitor',  label:'🛰️ 族群整合監控', src:'flow/flow_monitor.html', sub:'方向 · 強度 · 走勢 整合', h:860 },
+      { key:'cumul',    label:'📊 累積資金流', src:'flow/cumulative_flow.html', sub:'區間淨流 · 雙向發散排行', h:800 },
+      { key:'sim',      label:'🧪 模擬終端', src:'flow/via_flowsim.html', sub:'FlowSim Terminal · 互動模擬', h:880 },
+      { key:'etf',      label:'🇹🇼 台股主動式 ETF', src:'flow/etf_console.html', sub:'25 檔主動式台股 ETF · 持股成本 · 目標價空間 · 三大法人', h:1180 },
+    ];
+    const tabOn = 'display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:8px;font:700 12px \'DM Sans\',\'Noto Sans TC\',sans-serif;cursor:pointer;white-space:nowrap;background:#1e1d1a;color:#fffdf8;border:1px solid #1e1d1a;';
+    const tabOff = 'display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:8px;font:700 12px \'DM Sans\',\'Noto Sans TC\',sans-serif;cursor:pointer;white-space:nowrap;background:#fffdf8;color:#6b6860;border:1px solid #dbd9d3;';
+    const tabBar = TABS.map(t => ({ label: t.label, onClick: () => this.setState({ tab: t.key }), style: t.key === tab ? tabOn : tabOff }));
+    const active = TABS.find(t => t.key === tab) || TABS[0];
+
+    const onBtn = 'padding:5px 13px;font:700 11px \'DM Mono\',\'Noto Sans TC\',monospace;white-space:nowrap;cursor:pointer;background:#1e1d1a;color:#fffdf8;';
+    const offBtn = 'padding:5px 13px;font:700 11px \'DM Mono\',\'Noto Sans TC\',monospace;white-space:nowrap;cursor:pointer;background:#fffdf8;color:#9c9890;';
+
+    return {
+      map: this.buildMap(metric, up, dn, inst),
+      setIdx: () => this.setState({ inst: 'idx' }),
+      setEtf: () => this.setState({ inst: 'etf' }),
+      idxBtnStyle: !isEtf ? onBtn : offBtn,
+      etfBtnStyle: isEtf ? onBtn : offBtn,
+      metricLbl: metric === 'd1' ? '單日' : '五日',
+      metricFullLbl: metric === 'd1' ? '單日漲跌 1-Day Change' : '五日漲跌 5-Day Change',
+      upColor: up, dnColor: dn, upLbl: '上漲', dnLbl: '下跌',
+      setD1: () => this.setState({ metric: 'd1' }),
+      setD5: () => this.setState({ metric: 'd5' }),
+      d1BtnStyle: metric === 'd1' ? onBtn : offBtn,
+      d5BtnStyle: metric === 'd5' ? onBtn : offBtn,
+      breadthLbl: breadthPct + '%',
+      breadthColor: breadthPct >= 50 ? up : dn,
+      breadthCountLbl: adv + '/' + data.length,
+      gainName: gain.name, gainPctLbl: this.pctLbl(val(gain)),
+      loseName: lose.name, losePctLbl: this.pctLbl(val(lose)),
+      groups, fx,
+      tabBar, isOverview: tab === 'overview', showFrame: tab !== 'overview',
+      activeTitle: active.label, activeSub: active.sub || '', activeSrc: active.src || '',
+      activeFrameStyle: 'width:100%;height:max(520px, calc(' + (((active.h || 820) / 1180) * 96).toFixed(2) + 'vw));border:0;display:block;background:#fffdf8;',
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+{
+  "system": {
+    "name": "VIA-FlowSystem",
+    "version": "v0100",
+    "tz": "Asia/Taipei"
+  },
+  "intensity": {
+    "window": 63,
+    "min_obs": 20,
+    "kappa": 3.0,
+    "aum_floor": 50000000,
+    "winsor_z": 8.0,
+    "ewma_span": 5,
+    "inception_buffer": 20,
+    "split_detect": true,
+    "split_share_thresh": 0.25,
+    "split_offset_tol": 0.12
+  },
+  "aggregation": {
+    "min_tier": "B",
+    "roro_kappa": 40.0,
+    "flow_roles": [
+      "flow_signal",
+      "cash_parking"
+    ],
+    "gram_kappa": 60.0,
+    "gram_threshold": 0.05,
+    "weight_cap": 0.25
+  },
+  "validation": {
+    "horizons": [
+      1,
+      2,
+      3,
+      5,
+      10,
+      20
+    ],
+    "ls_top_frac": 0.2,
+    "ls_cost_bps": 8.0,
+    "primary_horizon": 5,
+    "gates": {
+      "ic_min": 0.03,
+      "icir_min": 0.3,
+      "t_min": 2.0,
+      "quantile_mono_min": 0.8,
+      "ls_sharpe_min": 0.5,
+      "null_ic_max": 0.015,
+      "oos_t_min": 1.5,
+      "lead_ratio_min": 0.3
+    },
+    "hac_lag": 5
+  },
+  "calibration": {
+    "grid": {
+      "window": [
+        21,
+        42,
+        63,
+        126
+      ],
+      "kappa": [
+        2.0,
+        3.0,
+        4.0
+      ],
+      "min_tier": [
+        "A",
+        "B"
+      ]
+    },
+    "objective": "icir",
+    "train_frac": 0.6,
+    "max_iters": 48
+  },
+  "synthetic": {
+    "n_tickers": 65,
+    "n_days": 500,
+    "alpha": 0.05,
+    "seed": 11,
+    "note": "alpha>0 injects flow->return structure so the loop CAN prove validity; set alpha=0 for a null run that MUST report NOT_VALID",
+    "beta": 0.03,
+    "ref_noise": 0.55
+  },
+  "factors": {
+    "library": [
+      "flow_accel",
+      "excess_flow",
+      "accum_div",
+      "mom_20",
+      "mom_63",
+      "rvol_20",
+      "noise"
+    ],
+    "base": "fis",
+    "accel_lag": 5,
+    "mom_short": 20,
+    "mom_long": 63,
+    "rvol_win": 20,
+    "keep_incremental_t": 2.0,
+    "compose": "zsum"
+  },
+  "bridge": {
+    "source": "../path/to/v4_output.parquet",
+    "format": "parquet",
+    "colmap": {
+      "snapshot_date": "Date",
+      "ticker": "Ticker",
+      "close": "Close",
+      "shares_out": "SharesOut",
+      "aum_reported": "AUM_Reported"
+    },
+    "note": "edit source/format/colmap to match fetch_global_etf_tracker_v4 output; aum_reported should be an INDEPENDENT issuer/NAV series to enable dual-estimator CONFLICT detection"
+  },
+  "pillar_a": {
+    "freq": "weekly",
+    "reference": "data/input/reference_flows.json",
+    "g001_rank_weekly": 0.6,
+    "g001_rank_daily": 0.4,
+    "g001_sign": 0.7,
+    "g001_slope_lo": 0.7,
+    "g001_slope_hi": 1.3,
+    "g001_r2": 0.4,
+    "g001_max_lag": 2,
+    "g001_pass_frac": 0.6
+  }
+}

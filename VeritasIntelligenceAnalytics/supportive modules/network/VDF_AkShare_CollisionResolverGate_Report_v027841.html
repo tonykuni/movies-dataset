@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VDF AkShare Collision Resolver Gate v027.8.4.1</title>
+<style>
+body{margin:0;background:#f7f4ed;color:#25312f;font-family:Arial,"Microsoft JhengHei",sans-serif}
+.wrap{max-width:1500px;margin:0 auto;padding:28px}
+.hero{border:1px solid #d8d0c3;border-radius:24px;background:#fffdf8;padding:26px;box-shadow:0 18px 50px rgba(30,40,36,.08)}
+h1{margin:0;font-size:28px}h2{margin-top:28px;font-size:20px}.sub{color:#6e7b78;margin-top:8px;line-height:1.7}
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(130px,1fr));gap:12px;margin-top:20px}
+.kpi{border:1px solid #d8d0c3;border-radius:18px;padding:14px;background:#fff}.kpi b{font-size:22px;display:block}.kpi span{font-size:12px;color:#6e7b78}
+.badge{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid #d8d0c3;background:#fff;margin-right:8px}
+.ok td{background:#f3fbf5}.warn td{background:#fff8e9}.bad td{background:#fff1f1}
+.mw{overflow:auto;border:1px solid #d8d0c3;border-radius:18px;background:#fff}
+table{border-collapse:collapse;width:100%;font-size:12px}
+th{position:sticky;top:0;background:#e8eee9;color:#20332f;z-index:1}
+th,td{border-bottom:1px solid #e8e1d6;padding:9px 10px;text-align:left;vertical-align:top;white-space:nowrap}
+td:nth-child(12),td:nth-child(13){white-space:normal;min-width:320px}
+pre{white-space:pre-wrap;background:#17211f;color:#e9fff8;padding:16px;border-radius:16px;overflow:auto}
+@media(max-width:900px){.kpis{grid-template-columns:1fr}.wrap{padding:14px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hero">
+<h1>VeritasDataForge · AkShare Collision Resolver Gate v027.8.4.1</h1>
+<div class="sub">VERITAS INTELLIGENCE ANALYTICS<br>Preserved valid authoritative · repaired collision quarantine · no DATABASE write · no canonical merge</div>
+<p><span class="badge">Status: VDF_AKSHARE_COLLISION_RESOLVER_GATE_BLOCKED</span><span class="badge">Risk: HIGH</span><span class="badge">Recommendation: BLOCK_V0279_UNTIL_DUPLICATE_REVIEW</span></p>
+<div class="kpis">
+<div class="kpi"><b>12</b><span>OK</span></div>
+<div class="kpi"><b>1</b><span>WARN / REVIEW</span></div>
+<div class="kpi"><b>2</b><span>FAIL / BLOCK</span></div>
+<div class="kpi"><b>150</b><span>Final valid rows</span></div>
+<div class="kpi"><b>0</b><span>Collision quarantine</span></div>
+<div class="kpi"><b>30</b><span>Duplicate after policy</span></div>
+</div>
+</div>
+
+<h2>def Matrix</h2>
+<div class="mw">
+<table>
+<thead><tr><th>Round</th><th>Stage</th><th>Layer</th><th>Name</th><th>Status</th><th>Risk</th><th>FixClass</th><th>Priority</th><th>Mode</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr></thead>
+<tbody><tr class='ok'><td>Round0</td><td>BOOT</td><td>PROJECT_ROOT</td><td>VeritasIntelligenceAnalytics</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>COLLISION_RESOLVER_ONLY</td><td>exists</td><td>true</td><td>Project root exists.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics</td></tr>
+<tr class='ok'><td>Round0</td><td>POLICY</td><td>NO_DB_WRITE</td><td>DATABASE</td><td>OK_POLICY_LOCKED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>COLLISION_RESOLVER_ONLY</td><td>db_write_enabled</td><td>false</td><td>No DATABASE write.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF</td></tr>
+<tr class='ok'><td>Round0</td><td>POLICY</td><td>NO_CANONICAL_MERGE</td><td>Canonical Merge</td><td>OK_POLICY_LOCKED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>COLLISION_RESOLVER_ONLY</td><td>canonical_merge_enabled</td><td>false</td><td>No canonical merge.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435</td></tr>
+<tr class='ok'><td>Round0</td><td>POLICY</td><td>PRESERVE_VALID_ROWS</td><td>Original Valid Rows</td><td>OK_POLICY_LOCKED</td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>COLLISION_RESOLVER_ONLY</td><td>preserve_original_valid</td><td>true</td><td>Original 120 valid rows are authoritative when collision occurs.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435</td></tr>
+<tr class='ok'><td>Round1</td><td>DISCOVERY</td><td>PRESERVED_VALID</td><td>v027.8.4 Preserved Valid Rows</td><td>OK_SOURCE_LOCKED</td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>COLLISION_RESOLVER_ONLY</td><td>source</td><td>preserved_valid</td><td>Locked preserved valid rows source.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_INVALID_MAPPING_REPAIR_GATE_v02784_20260611_013222\preview\VDF_AkShare_InvalidRepair_PreservedValidRows_v02784.csv</td></tr>
+<tr class='ok'><td>Round1</td><td>DISCOVERY</td><td>REPAIRED_ROWS</td><td>v027.8.4 Repaired Rows</td><td>OK_SOURCE_LOCKED</td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>COLLISION_RESOLVER_ONLY</td><td>source</td><td>repaired_rows</td><td>Locked repaired rows source.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_INVALID_MAPPING_REPAIR_GATE_v02784_20260611_013222\preview\VDF_AkShare_InvalidRepair_RepairedRows_v02784.csv</td></tr>
+<tr class='ok'><td>Round2</td><td>COLLISION_RESOLVER</td><td>PYTHON_ENGINE</td><td>Execution</td><td>OK_EXECUTED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>COLLISION_RESOLVER_ONLY</td><td>stdout</td><td>ok</td><td>{&quot;generated_at&quot;: &quot;2026-06-11T01:34:35.808773&quot;, &quot;status&quot;: &quot;VDF_AKSHARE_COLLISION_RESOLVER_GATE_BLOCKED&quot;, &quot;risk&quot;: &quot;HIGH&quot;, &quot;recommendation&quot;: &quot;BLOCK_V0279_UNTIL_DUPLICATE_REVIEW&quot;, &quot;metrics&quot;: {&quot;preserved_valid_rows&quot;: 120, &quot;input_repaired_rows&quot;: 30, &quot;collision_quarantine_rows&quot;: 0, &quot;non_collision_repaired_rows&quot;: 30, &quot;final_valid_rows&quot;: 150, &quot;duplicate_after_collision_policy&quot;: 30, &quot;still_invalid_rows&quot;: 0}, &quot;artifacts&quot;: {&quot;final_valid_csv&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\\preview\\VDF_AkShare_CollisionResolver_FinalValidRows_v027841.csv&quot;, &quot;final_valid_json&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\\preview\\VDF_AkShare_CollisionResolver_FinalValidRows_v027841.json&quot;, &quot;collision_quarantine_csv&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\\preview\\VDF_AkShare_CollisionResolver_CollisionQuarantineRows_v027841.csv&quot;, &quot;non_collision_repaired_csv&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\\preview\\VDF_AkShare_CollisionResolver_NonCollisionRepairedRows_v027841.csv&quot;, &quot;rootcause_csv&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\\registry\\VDF_AkShare_CollisionResolver_RootCause_v027841.csv&quot;, &quot;collision_audit_json&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\\registry\\VDF_AkShare_CollisionResolver_Audit_v027841.json&quot;, &quot;execution_gate_json&quot;: &quot;C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\\plan\\VDF_AkShare_CollisionResolver_ExecutionGateReview_v027841.json&quot;}, &quot;next_step&quot;: &quot;v027.8.4.2 duplicate repair review only; no DB write&quot;}
+</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\runtime\vdf_akshare_collision_resolver_gate_v027841.py</td></tr>
+<tr class='ok'><td>Round2</td><td>COLLISION_RESOLVER</td><td>PRESERVED_VALID</td><td>Preserved Valid Rows</td><td>OK_AUTHORITATIVE</td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>COLLISION_RESOLVER_ONLY</td><td>preserved_valid_rows</td><td>120</td><td>Preserved valid rows kept authoritative.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_INVALID_MAPPING_REPAIR_GATE_v02784_20260611_013222\preview\VDF_AkShare_InvalidRepair_PreservedValidRows_v02784.csv</td></tr>
+<tr class='warn'><td>Round2</td><td>COLLISION_RESOLVER</td><td>COLLISION_QUARANTINE</td><td>Collision Rows</td><td>OK_ZERO_COLLISION</td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>COLLISION_RESOLVER_ONLY</td><td>collision_quarantine_rows</td><td>0</td><td>No repaired collision rows.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\preview\VDF_AkShare_CollisionResolver_FinalValidRows_v027841.csv</td></tr>
+<tr class='bad'><td>Round2</td><td>COLLISION_RESOLVER</td><td>DUPLICATE_AFTER_POLICY</td><td>Duplicate After Collision Policy</td><td>BLOCK_DUPLICATE_REMAINS</td><td>HIGH</td><td>SEQUENTIAL_REQUIRED</td><td>P0</td><td>COLLISION_RESOLVER_ONLY</td><td>duplicate_after_collision_policy</td><td>30</td><td>Duplicate remains after collision policy.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\preview\VDF_AkShare_CollisionResolver_FinalValidRows_v027841.csv</td></tr>
+<tr class='ok'><td>Round3</td><td>CONSOLIDATE</td><td>COLLISION_AUDIT</td><td>Collision Audit</td><td>OK_AUDIT_CREATED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>COLLISION_RESOLVER_ONLY</td><td>audit</td><td>created</td><td>Collision audit generated.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\registry\VDF_AkShare_CollisionResolver_Audit_v027841.json</td></tr>
+<tr class='ok'><td>Round3</td><td>CONSOLIDATE</td><td>EXECUTION_GATE</td><td>Execution Gate Review</td><td>OK_GATE_CREATED</td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P1</td><td>COLLISION_RESOLVER_ONLY</td><td>gate</td><td>created</td><td>Execution gate review generated; no DB write.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\plan\VDF_AkShare_CollisionResolver_ExecutionGateReview_v027841.json</td></tr>
+<tr class='ok'><td>Round3</td><td>CONSOLIDATE</td><td>LOCAL_FREE_LIBS</td><td>Top10 Local Free Libs</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>COLLISION_RESOLVER_ONLY</td><td>rows</td><td>5</td><td>Top10 local free libs matrix generated.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\registry\VDF_Top10_LocalFreeLibs_CollisionResolverGate_v027841.json</td></tr>
+<tr class='bad'><td>Round3</td><td>RESULT</td><td>READINESS</td><td>VDF_AKSHARE_COLLISION_RESOLVER_GATE_BLOCKED</td><td>BLOCKED</td><td>HIGH</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>COLLISION_RESOLVER_ONLY</td><td>recommendation</td><td>BLOCK_V0279_UNTIL_DUPLICATE_REVIEW</td><td>v027.8.4.1 completed. No DB write. No canonical merge.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\runtime\vdf_akshare_collision_resolver_gate_result_v027841.json</td></tr>
+<tr class='ok'><td>Round3</td><td>POINTER</td><td>ACTIVE_POINTER</td><td>VDF_ACTIVE_POINTER.json</td><td>OK_UPDATED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>COLLISION_RESOLVER_ONLY</td><td>update</td><td>complete</td><td>Active pointer updated with v027.8.4.1.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ACTIVE_POINTER.json</td></tr></tbody>
+</table>
+</div>
+
+<h2>def Output Paths</h2>
+<pre>
+RunRoot                    : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435
+HTML                       : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\report\VDF_AkShare_CollisionResolverGate_Report_v027841.html
+CSV Matrix                 : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\registry\VDF_AkShare_CollisionResolverGate_Matrix_v027841.csv
+JSON Matrix                : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\registry\VDF_AkShare_CollisionResolverGate_Matrix_v027841.json
+Final Valid CSV            : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\preview\VDF_AkShare_CollisionResolver_FinalValidRows_v027841.csv
+Final Valid JSON           : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\preview\VDF_AkShare_CollisionResolver_FinalValidRows_v027841.json
+Collision Quarantine CSV   : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\preview\VDF_AkShare_CollisionResolver_CollisionQuarantineRows_v027841.csv
+Non-Collision Repaired CSV : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\preview\VDF_AkShare_CollisionResolver_NonCollisionRepairedRows_v027841.csv
+Collision Audit JSON       : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\registry\VDF_AkShare_CollisionResolver_Audit_v027841.json
+Execution Gate JSON        : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\plan\VDF_AkShare_CollisionResolver_ExecutionGateReview_v027841.json
+Top10 Libs                 : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\registry\VDF_Top10_LocalFreeLibs_CollisionResolverGate_v027841.json
+Runtime Result             : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\runtime\vdf_akshare_collision_resolver_gate_result_v027841.json
+Active Pointer             : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ACTIVE_POINTER.json
+Transcript                 : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_COLLISION_RESOLVER_GATE_v027841_20260611_013435\runtime\VDF_AkShare_CollisionResolverGate_Transcript_v027841_20260611_013435.txt
+</pre>
+
+<h2>def Next Gate</h2>
+<pre>
+v027.8.4.2 duplicate repair review only; no DB write
+
+Current:
+preserved_valid_rows = 120
+input_repaired_rows = 30
+collision_quarantine_rows = 0
+non_collision_repaired_rows = 30
+final_valid_rows = 150
+duplicate_after_collision_policy = 30
+
+DB write = false
+Canonical merge = false
+</pre>
+</div>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "generated_at": "2026-06-11T02:14:03.202856",
+  "stage": "v028.2",
+  "title": "Write dry-run compare only; no DB write",
+  "allowed": true,
+  "policy": {
+    "db_write_enabled": false,
+    "canonical_merge_enabled": false,
+    "compare_only": true
+  },
+  "compare_steps": [
+    "Load existing canonical table if present.",
+    "Load readiness final rows.",
+    "Compare primary-key overlap.",
+    "Classify insert/update/unchanged/conflict.",
+    "Emit dry-run delta CSV/JSON.",
+    "Do not write DATABASE."
+  ],
+  "required_outputs": [
+    "dryrun_delta_insert.csv",
+    "dryrun_delta_update.csv",
+    "dryrun_conflicts.csv",
+    "dryrun_summary.json",
+    "html matrix report"
+  ]
+}

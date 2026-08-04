@@ -1,0 +1,576 @@
+{
+  "schema": "VPNS_REGEX_REGISTRY",
+  "version": "v001.0",
+  "note": "非侵入式;持續補充(auto_update_regex);每條附語意/適用文件/風險/owner",
+  "patterns": [
+    {
+      "name": "project_management_wbs_element",
+      "description": "PSPNR",
+      "regex": "^[A-Z0-9]{1,10}(-[A-Z0-9]{1,10})*$",
+      "target_field": "AI_PRJ",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "project_management_project_id",
+      "description": "PSPID",
+      "regex": "^[A-Z0-9]{4,12}$",
+      "target_field": "AI_PRJ",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "project_management_task_id",
+      "description": "task_id",
+      "regex": "^[A-Z0-9]{3,10}$",
+      "target_field": "AI_PROC",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "project_management_milestone",
+      "description": "milestone",
+      "regex": "^[A-Z]{2}[0-9]{2}$",
+      "target_field": "AI_PROC",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "project_management_activity_code",
+      "description": "activity_code",
+      "regex": "^[0-9]{4}$",
+      "target_field": "AI_PROC",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "sap_mm_material_number",
+      "description": "MATNR",
+      "regex": "^[0-9]{6,18}$",
+      "target_field": "AI_MAT",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [
+        "000000300012"
+      ],
+      "examples_fail": [
+        "ABC"
+      ],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "sap_mm_vendor_code",
+      "description": "LIFNR",
+      "regex": "^[0-9]{5,10}$",
+      "target_field": "AI_ORG",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "sap_mm_plant",
+      "description": "WERKS",
+      "regex": "^[0-9]{4}$",
+      "target_field": "AI_ORG",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "sap_mm_storage_loc",
+      "description": "LGORT",
+      "regex": "^[A-Z0-9]{4}$",
+      "target_field": "AI_ORG",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "sap_mm_purchase_group",
+      "description": "EKGRP",
+      "regex": "^[A-Z0-9]{3}$",
+      "target_field": "AI_ORG",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "sap_mm_po_number",
+      "description": "EBELN",
+      "regex": "^[4-9][0-9]{9}$",
+      "target_field": "AI_PRJ",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [
+        "4500012345"
+      ],
+      "examples_fail": [
+        "12345"
+      ],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "sap_mm_pr_number",
+      "description": "BANFN",
+      "regex": "^[1-9][0-9]{9}$",
+      "target_field": "AI_PRJ",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "sap_mm_batch",
+      "description": "CHARG",
+      "regex": "^[A-Z0-9]{4,10}$",
+      "target_field": "AI_MAT",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "sap_pp_production_order",
+      "description": "AUFNR",
+      "regex": "^[0-9]{12}$",
+      "target_field": "AI_PRJ",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "sap_pp_work_center",
+      "description": "ARBPL",
+      "regex": "^[A-Z0-9]{4,10}$",
+      "target_field": "AI_ORG",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "sap_pp_routing",
+      "description": "PLNNR",
+      "regex": "^[0-9]{6,10}$",
+      "target_field": "AI_PROC",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "sap_pp_bom_item",
+      "description": "POSNR",
+      "regex": "^[0-9]{4}$",
+      "target_field": "AI_MAT",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "sap_pp_operation",
+      "description": "VORNR",
+      "regex": "^[0-9]{4}$",
+      "target_field": "AI_PROC",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "sap_sd_sales_order",
+      "description": "VBELN",
+      "regex": "^[0-9]{10}$",
+      "target_field": "AI_PRJ",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "sap_sd_delivery",
+      "description": "VBELN_VL",
+      "regex": "^[0-9]{10}$",
+      "target_field": "AI_PRJ",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "sap_sd_customer_code",
+      "description": "KUNNR",
+      "regex": "^[0-9]{5,10}$",
+      "target_field": "AI_ORG",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "sap_fico_company_code",
+      "description": "BUKRS",
+      "regex": "^[A-Z0-9]{4}$",
+      "target_field": "AI_ORG",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "sap_fico_cost_center",
+      "description": "KOSTL",
+      "regex": "^[A-Z0-9]{4,10}$",
+      "target_field": "AI_COST",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "sap_fico_profit_center",
+      "description": "PRCTR",
+      "regex": "^[A-Z0-9]{4,10}$",
+      "target_field": "AI_COST",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "sap_fico_gl_account",
+      "description": "HKONT",
+      "regex": "^[0-9]{4,8}$",
+      "target_field": "AI_BGT",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "sap_fico_internal_order",
+      "description": "AUFNR_CO",
+      "regex": "^[0-9]{6,12}$",
+      "target_field": "AI_BGT",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "sap_qm_inspection_lot",
+      "description": "PRUEFLOS",
+      "regex": "^[0-9]{10}$",
+      "target_field": "AI_PROC",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "sap_qm_defect_code",
+      "description": "defect_code",
+      "regex": "^[A-Z0-9]{2,6}$",
+      "target_field": "AI_PROC",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "common_iso_date",
+      "description": "iso_date",
+      "regex": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "target_field": "AI_TIME",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "common_sap_date",
+      "description": "sap_date",
+      "regex": "^[0-9]{8}$",
+      "target_field": "AI_TIME",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "common_employee_id",
+      "description": "PERNR",
+      "regex": "^[A-Z]{0,4}[-]?[0-9]{3,8}$",
+      "target_field": "AI_EMP",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "common_currency_ntd",
+      "description": "currency_ntd",
+      "regex": "^NT\\$?\\s?[0-9,]+(\\.[0-9]{1,2})?$",
+      "target_field": "AI_COST",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    },
+    {
+      "name": "common_email",
+      "description": "email",
+      "regex": "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",
+      "target_field": "AI_EMP",
+      "source_types": [
+        "csv",
+        "xlsx",
+        "pdf",
+        "docx",
+        "txt"
+      ],
+      "examples_pass": [],
+      "examples_fail": [],
+      "risk": "LOW",
+      "owner": "VPNS"
+    }
+  ]
+}

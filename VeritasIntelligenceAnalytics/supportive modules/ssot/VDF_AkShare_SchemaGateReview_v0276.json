@@ -1,0 +1,51 @@
+{
+  "status": "OK_SCHEMA_GATE_REVIEW_WITH_MAPPING_REQUIRED",
+  "risk": "MEDIUM",
+  "items": [
+    {
+      "target_table": "VDF_Global_Commodity_AkShare_Candidate",
+      "status": "OK_SCHEMA_REVIEW_WITH_MAPPING_REQUIRED",
+      "risk": "MEDIUM",
+      "expected_rows": 150,
+      "actual_rows": 150,
+      "columns": [
+        "vdf_source_function",
+        "vdf_selected_category",
+        "vdf_target_table",
+        "vdf_symbol_hint",
+        "vdf_canonical_family",
+        "vdf_priority",
+        "vdf_seeded_at",
+        "vdf_policy",
+        "时间",
+        "排名",
+        "证券代码",
+        "value"
+      ],
+      "canonical_families": [
+        "VDF_Global_Commodity"
+      ],
+      "source_functions": [
+        "futures_foreign_commodity_subscribe_exchange_symbol",
+        "stock_hk_hot_rank_detail_em"
+      ],
+      "family_reviews": [
+        {
+          "canonical_family": "VDF_Global_Commodity",
+          "canonical_columns_required": [
+            "symbol",
+            "date",
+            "value",
+            "source",
+            "unit",
+            "frequency",
+            "description"
+          ],
+          "exact_canonical_columns_present": false,
+          "mapping_required": true
+        }
+      ],
+      "message": "Raw AkShare candidate staging is valid, but canonical mapping is required before merge."
+    }
+  ]
+}

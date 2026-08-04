@@ -1,0 +1,164 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · 集中式參數/模板管理 · 萬物皆自動編碼</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--blue:#4c78a8;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--vi:#7a6daa;
+ --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg)}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5}
+.wrap{max-width:1300px;margin:0 auto;padding:0 22px 60px}
+.bar{position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50}
+header{padding:20px 0 9px;margin-bottom:10px;border-bottom:2px solid var(--ink)}
+.kicker{font:700 10px 'DM Mono',monospace;letter-spacing:2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px}
+h1{font:800 18px/1.2 'Syne',sans-serif;color:var(--ink)}h1 span{color:var(--up)}
+.sub{margin-top:6px;font:400 10.5px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:1050px}.sub b{color:var(--ink2)}
+.gov{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#1e1d1a;border-radius:3px;padding:7px 14px;margin:12px 0}
+.gov .lk{font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase}
+.gov .pill{font:600 7.5px 'DM Mono',monospace;color:#cfcabf}.gov .ver{margin-left:auto;font:700 8px 'DM Mono',monospace;color:#1e1d1a;background:#c4943a;border-radius:3px;padding:2px 8px}
+.note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--am);border-radius:3px;padding:8px 14px;margin-bottom:14px;font:500 9px/1.6 'DM Mono',monospace;color:var(--mut)}.note b{color:var(--ink2)}
+.arch{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:12px 0}@media(max-width:900px){.arch{grid-template-columns:1fr 1fr}}
+.ac{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:11px 13px;border-top:3px solid var(--blue)}
+.ac.j{border-top-color:var(--am)}.ac.e{border-top-color:var(--up)}.ac.m{border-top-color:var(--teal)}.ac.p{border-top-color:var(--vi)}
+.ac .t{font:800 11px 'Syne',sans-serif;color:var(--ink)}.ac .f{font:600 8px 'DM Mono',monospace;color:var(--mut);margin-top:2px}
+.ac .d{font:400 9px 'Noto Sans TC',sans-serif;color:var(--mut);margin-top:5px}
+.tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.tab{font:700 10.5px 'DM Sans','Noto Sans TC',sans-serif;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--mut);border-radius:3px;padding:7px 11px}
+.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.sec{display:none}.sec.on{display:block}
+h2{font:800 13px 'Syne',sans-serif;color:var(--ink);margin:16px 0 4px;padding-bottom:5px;border-bottom:1px solid var(--line)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-top:12px}
+.hd2{font:800 11px 'Syne',sans-serif;padding:10px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+table{width:100%;border-collapse:collapse;font:500 10px 'DM Mono',monospace}
+th{font:700 8px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.4px;color:var(--mut);text-align:left;padding:7px 8px;border-bottom:2px solid var(--ink);background:var(--paper2)}
+td{padding:5px 8px;border-bottom:1px solid var(--soft)}tr:hover td{background:var(--paper2)}
+.code{font:700 9px 'DM Mono',monospace;color:var(--vi)}.name{font:600 10px 'Noto Sans TC',sans-serif;color:var(--ink)}
+.typ{font:700 7px 'DM Mono',monospace;color:#fff;border-radius:3px;padding:1px 6px}.d-DOM{background:var(--blue)}.d-PRD{background:var(--up)}.d-SUB{background:var(--am)}.d-KNW{background:var(--teal)}.d-IFC{background:var(--vi)}.d-TPL{background:var(--ink)}
+.fixed{font:600 8px 'DM Mono',monospace;color:var(--mut2)}
+.layer{border:1px solid var(--line);border-radius:5px;margin:8px 0;overflow:hidden}
+.layer .lh{background:var(--paper2);padding:7px 12px;font:700 10px 'Noto Sans TC',sans-serif;color:var(--ink);border-bottom:1px solid var(--soft)}
+.layer .lb{padding:8px 12px;display:flex;gap:5px;flex-wrap:wrap}
+.mchip{font:600 9px 'Noto Sans TC',sans-serif;background:var(--soft);border-radius:3px;padding:2px 8px;color:var(--ink2)}
+.gate{font:700 8px 'DM Mono',monospace;border-radius:3px;padding:2px 8px;background:var(--am);color:#fff}
+.btn{font:700 8.5px 'DM Mono',monospace;cursor:pointer;border:1px solid var(--ink);background:transparent;color:var(--ink);border-radius:3px;padding:6px 11px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:11px 14px;border-top:1px solid var(--line);align-items:center}
+.tk{font:500 9px 'DM Mono',monospace;color:var(--mut)}
+.pdf{position:fixed;top:12px;right:14px;z-index:999;background:var(--ink);color:#fff;border:none;border-radius:5px;padding:7px 13px;font:700 9px 'DM Mono',monospace;cursor:pointer}
+@media print{@page{size:A4 landscape;margin:8mm}.pdf,.tabs,.toolbar{display:none!important}.sec{display:block!important}}
+</style></head><body>
+<div class="bar"></div><button class="pdf" onclick="window.print()">⤓ PDF</button>
+<div class="wrap">
+<header>
+ <div class="kicker">VERITAS INTELLIGENCE · CENTRAL PARAMETER/TEMPLATE MANAGEMENT · CODE EVERYTHING</div>
+ <h1>集中式參數/模板管理 <span>·</span> 萬物皆自動編碼</h1>
+ <p class="sub">單一真相源架構:<b>PARAMETERS IN JSON · ENGINE IN PY · SYSTEM MANAGER IN PY · POWERSHELL SYNC</b>。領域/產品/次產品/產業知識/介面/模板全部自動編 VIA 碼;外部平台碼(ticker/yfinance/SAP/MSP)<b>完全不動、只對齊</b>。只增不減、核可制。</p>
+</header>
+<div class="gov"><span class="lk">🔒 CENTRAL · APPEND-ONLY · APPROVAL-GATED</span><span class="pill">JSON params</span><span class="pill">PY engine+manager</span>
+ <span class="pill">PS sync</span><span class="ver">CENTRAL v0100</span></div>
+<div class="arch">
+ <div class="ac j"><div class="t">① PARAMETERS</div><div class="f">via_params.json</div><div class="d">所有模板/UI參數/介面合約/SAP清單/分類 集中於 JSON,單一真相源。</div></div>
+ <div class="ac e"><div class="t">② ENGINE</div><div class="f">via_codegen.py</div><div class="d">讀 JSON,為萬物生成決定性 VIA 碼(同輸入同碼)。</div></div>
+ <div class="ac m"><div class="t">③ SYSTEM MANAGER</div><div class="f">via_system_manager.py</div><div class="d">只增不減檢查 + 核可閘門 + 同步計畫編排。</div></div>
+ <div class="ac p"><div class="t">④ POWERSHELL</div><div class="f">VIA_Central_Activate_Sync.ps1</div><div class="d">一鍵啟動同步;未加 -Approve 一律 dry-run 不落地。</div></div>
+</div>
+<div class="note">📐 分頁:① 萬物編碼 ② 介面合約 ③ SAP Vendor/Customer 模板 ④ 產業分類 ⑤ UI Token。核可閘門:未 -Approve 僅 dry-run。<span class="gate">APPROVAL REQUIRED</span></div>
+<div class="tabs" id="tabs"></div>
+
+<div class="sec on" id="sec-code">
+ <h2>萬物皆自動編碼</h2>
+ <div class="card"><div class="hd2">領域/產品/次產品/產業知識/模板 → VIA 碼<span class="tk" id="codeCnt"></span></div>
+  <table><thead><tr><th>類型</th><th>名稱</th><th>VIA 碼(己方)</th></tr></thead><tbody id="codes"></tbody></table>
+  <div class="toolbar"><button class="btn" id="expCode">匯出全碼 CSV</button><span class="tk">決定性:同名同碼,可重現。</span></div></div>
+</div>
+
+<div class="sec" id="sec-ifc">
+ <h2>介面合約(7 引擎 API,集中管理)</h2>
+ <div class="card"><table><thead><tr><th>引擎</th><th>方法</th><th>合約碼 VIA-IFC</th></tr></thead><tbody id="ifc"></tbody></table></div>
+</div>
+
+<div class="sec" id="sec-sap">
+ <h2>SAP Vendor / Customer 模板(外部碼不動,只掛對齊碼)</h2>
+ <div class="card"><div class="hd2">Vendor 供應商(LIFNR 客戶端自有)<span class="tk" id="vFields"></span></div>
+  <table><thead><tr><th>類別</th><th>供應商</th><th>SAP 欄位</th><th>VIA 對齊碼</th></tr></thead><tbody id="vend"></tbody></table></div>
+ <div class="card"><div class="hd2">Customer 客戶(KUNNR 客戶端自有)<span class="tk" id="cFields"></span></div>
+  <table><thead><tr><th>類別</th><th>客戶</th><th>SAP 欄位</th><th>VIA 對齊碼</th></tr></thead><tbody id="cust"></tbody></table></div>
+</div>
+
+<div class="sec" id="sec-ind">
+ <h2>產業分群分類模板</h2>
+ <div id="ind"></div>
+</div>
+
+<div class="sec" id="sec-ui">
+ <h2>UI Token(Visual Lock,集中管理)</h2>
+ <div class="card"><table><thead><tr><th>Token</th><th>值</th></tr></thead><tbody id="ui"></tbody></table></div>
+</div>
+</div>
+<script>
+const D={"ev": {"page_items": {"domains": [{"name": "電源", "code": "VIA-DOM-7CBC11"}, {"name": "散熱", "code": "VIA-DOM-11FB25"}, {"name": "BOM", "code": "VIA-DOM-3A4FA9"}, {"name": "PLM", "code": "VIA-DOM-27AD0C"}, {"name": "Finance", "code": "VIA-DOM-E7F3C9"}, {"name": "Sales", "code": "VIA-DOM-C0778D"}, {"name": "Cost", "code": "VIA-DOM-EFB58A"}, {"name": "ASP", "code": "VIA-DOM-24DFAE"}], "products": [{"name": "水冷板", "code": "VIA-PRD-8D22DC"}, {"name": "均熱片", "code": "VIA-PRD-613322"}, {"name": "AI伺服器電源", "code": "VIA-PRD-147011"}, {"name": "CDU", "code": "VIA-PRD-A32B11"}, {"name": "分歧管", "code": "VIA-PRD-4ECA50"}, {"name": "快接頭", "code": "VIA-PRD-6EBF80"}, {"name": "導線架", "code": "VIA-PRD-142E90"}, {"name": "浸沒式液冷", "code": "VIA-PRD-16472C"}, {"name": "板式熱交換器", "code": "VIA-PRD-980DE9"}], "subproducts": [{"name": "MLCP", "code": "VIA-SUB-D58F01"}, {"name": "MCCP", "code": "VIA-SUB-30493D"}, {"name": "UQD快接頭", "code": "VIA-SUB-0DD8FB"}, {"name": "Lid", "code": "VIA-SUB-C2516A"}, {"name": "Stiffener", "code": "VIA-SUB-24A185"}, {"name": "環形均熱片", "code": "VIA-SUB-597EFB"}, {"name": "冷卻液分配單元", "code": "VIA-SUB-E10E96"}], "knowledge": [{"name": "液冷取代氣冷", "code": "VIA-KNW-E8B11A"}, {"name": "TDP上探3kW", "code": "VIA-KNW-994DDE"}, {"name": "VR200全液冷", "code": "VIA-KNW-B18D37"}, {"name": "均熱片ASP+3x", "code": "VIA-KNW-B32BDD"}, {"name": "機櫃功率破百kW", "code": "VIA-KNW-4666A7"}, {"name": "晶片級散熱", "code": "VIA-KNW-9104C7"}]}, "interfaces": [{"engine": "IntakeEngine", "method": "run", "code": "VIA-IFC-20C98D"}, {"engine": "IntakeEngine", "method": "parse_code", "code": "VIA-IFC-326129"}, {"engine": "IntakeEngine", "method": "repair_table", "code": "VIA-IFC-BAC698"}, {"engine": "IntakeEngine", "method": "assets", "code": "VIA-IFC-E5C885"}, {"engine": "IntakeEngine", "method": "guarantee", "code": "VIA-IFC-B0C8AF"}, {"engine": "IntakeEngine", "method": "ocr", "code": "VIA-IFC-ADB553"}, {"engine": "IntakeEngine", "method": "decompose_filename", "code": "VIA-IFC-05B295"}, {"engine": "SSOTEngine", "method": "resolve", "code": "VIA-IFC-C8C689"}, {"engine": "SSOTEngine", "method": "add_synonym", "code": "VIA-IFC-601D66"}, {"engine": "SSOTEngine", "method": "registry", "code": "VIA-IFC-1FD713"}, {"engine": "SSOTEngine", "method": "autocode", "code": "VIA-IFC-563880"}, {"engine": "SyncEngine", "method": "sync", "code": "VIA-IFC-903816"}, {"engine": "SyncEngine", "method": "conflicts", "code": "VIA-IFC-9B27A6"}, {"engine": "SyncEngine", "method": "link_bom", "code": "VIA-IFC-D3AF95"}, {"engine": "SyncEngine", "method": "ms_anchor", "code": "VIA-IFC-144217"}, {"engine": "SyncEngine", "method": "bom_anchor", "code": "VIA-IFC-FDF0C2"}, {"engine": "SyncEngine", "method": "writeback", "code": "VIA-IFC-43DAE7"}, {"engine": "SyncEngine", "method": "to_xml", "code": "VIA-IFC-8904F9"}, {"engine": "SyncEngine", "method": "roundtrip", "code": "VIA-IFC-AE23CD"}, {"engine": "BOMEngine", "method": "classify", "code": "VIA-IFC-9183DD"}, {"engine": "BOMEngine", "method": "taxonomy", "code": "VIA-IFC-A153C8"}, {"engine": "BOMEngine", "method": "validate", "code": "VIA-IFC-BBE5F1"}, {"engine": "BOMEngine", "method": "rollup", "code": "VIA-IFC-8AE65D"}, {"engine": "BOMEngine", "method": "where_used", "code": "VIA-IFC-969B4A"}, {"engine": "BOMEngine", "method": "template", "code": "VIA-IFC-C875DB"}, {"engine": "BOMEngine", "method": "operation", "code": "VIA-IFC-CA6FA3"}, {"engine": "BOMEngine", "method": "auto_code", "code": "VIA-IFC-07CA2D"}, {"engine": "BOMEngine", "method": "local_libs", "code": "VIA-IFC-137F1D"}, {"engine": "FinanceEngine", "method": "verify", "code": "VIA-IFC-85DC66"}, {"engine": "FinanceEngine", "method": "cost", "code": "VIA-IFC-E9A653"}, {"engine": "FinanceEngine", "method": "calibrate", "code": "VIA-IFC-B5ED2F"}, {"engine": "FinanceEngine", "method": "peers", "code": "VIA-IFC-01E82A"}, {"engine": "KnowledgeEngine", "method": "tcode", "code": "VIA-IFC-6588C6"}, {"engine": "KnowledgeEngine", "method": "select_bom", "code": "VIA-IFC-F7F966"}, {"engine": "KnowledgeEngine", "method": "plm_concepts", "code": "VIA-IFC-81663F"}, {"engine": "KnowledgeEngine", "method": "pmbok_areas", "code": "VIA-IFC-A75B56"}, {"engine": "GovernanceEngine", "method": "scan", "code": "VIA-IFC-719B9A"}, {"engine": "GovernanceEngine", "method": "import_order", "code": "VIA-IFC-F6ACCF"}, {"engine": "GovernanceEngine", "method": "sector_registry", "code": "VIA-IFC-24BA33"}, {"engine": "GovernanceEngine", "method": "check_registration", "code": "VIA-IFC-7EF3C8"}], "external_align": {"vendors": [{"name": "Infineon", "category": "功率半導體 GaN/SiC", "sap": "LIFNR(客戶端自有·不動)", "via_align": "VIA-PRD-84AEF1"}, {"name": "onsemi", "category": "功率半導體 GaN/SiC", "sap": "LIFNR(客戶端自有·不動)", "via_align": "VIA-PRD-16BA23"}, {"name": "TI", "category": "功率半導體 GaN/SiC", "sap": "LIFNR(客戶端自有·不動)", "via_align": "VIA-PRD-1CA6F4"}, {"name": "Wolfspeed", "category": "功率半導體 GaN/SiC", "sap": "LIFNR(客戶端自有·不動)", "via_align": "VIA-PRD-FF8A0E"}, {"name": "Navitas", "category": "功率半導體 GaN/SiC", "sap": "LIFNR(客戶端自有·不動)", "via_align": "VIA-PRD-44630C"}, {"name": "Yageo 國巨", "category": "被動元件 MLCC/電阻", "sap": "LIFNR(客戶端自有·不動)", "via_align": "VIA-PRD-E5E0D1"}, {"name": "Murata", "category": "被動元件 MLCC/電阻", "sap": "LIFNR(客戶端自有·不動)", "via_align": "VIA-PRD-93A8CF"}, {"name": "TDK", "category": "被動元件 MLCC/電阻", "sap": "LIFNR(客戶端自有·不動)", "via_align": "VIA-PRD-955F54"}, {"name": "Samsung EM", "category": "被動元件 MLCC/電阻", "sap": "LIFNR(客戶端自有·不動)", "via_align": "VIA-PRD-1F8AF8"}, {"name": "Amphenol", "category": "連接器/快接頭", "sap": "LIFNR(客戶端自有·不動)", "via_align": "VIA-PRD-BC3C22"}, {"name": "TE Connectivity", "category": "連接器/快接頭", "sap": "LIFNR(客戶端自有·不動)", "via_align": "VIA-PRD-A7A6AB"}, {"name": "CPC", "category": "連接器/快接頭", "sap": "LIFNR(客戶端自有·不動)", "via_align": "VIA-PRD-508647"}, {"name": "TDK", "category": "磁性元件/變壓器", "sap": "LIFNR(客戶端自有·不動)", "via_align": "VIA-PRD-955F54"}, {"name": "Sumida", "category": "磁性元件/變壓器", "sap": "LIFNR(客戶端自有·不動)", "via_align": "VIA-PRD-FBF997"}, {"name": "銅箔供應商", "category": "銅/鋁/散熱基材", "sap": "LIFNR(客戶端自有·不動)", "via_align": "VIA-PRD-A3057E"}, {"name": "鋁擠型", "category": "銅/鋁/散熱基材", "sap": "LIFNR(客戶端自有·不動)", "via_align": "VIA-PRD-61A210"}, {"name": "導熱介面TIM", "category": "銅/鋁/散熱基材", "sap": "LIFNR(客戶端自有·不動)", "via_align": "VIA-PRD-AC8F81"}, {"name": "鍍金製程", "category": "鍍金/表面處理(委外)", "sap": "LIFNR(客戶端自有·不動)", "via_align": "VIA-PRD-4B2E5B"}, {"name": "電鍍代工", "category": "鍍金/表面處理(委外)", "sap": "LIFNR(客戶端自有·不動)", "via_align": "VIA-PRD-90034F"}], "customers": [{"name": "NVIDIA", "category": "AI 晶片原廠", "sap": "KUNNR(客戶端自有·不動)", "via_align": "VIA-PRD-EF6269"}, {"name": "AMD", "category": "AI 晶片原廠", "sap": "KUNNR(客戶端自有·不動)", "via_align": "VIA-PRD-4B7BC2"}, {"name": "Microsoft Azure", "category": "雲端 CSP", "sap": "KUNNR(客戶端自有·不動)", "via_align": "VIA-PRD-CD42FF"}, {"name": "AWS", "category": "雲端 CSP", "sap": "KUNNR(客戶端自有·不動)", "via_align": "VIA-PRD-2A49D9"}, {"name": "Google", "category": "雲端 CSP", "sap": "KUNNR(客戶端自有·不動)", "via_align": "VIA-PRD-74476A"}, {"name": "Meta", "category": "雲端 CSP", "sap": "KUNNR(客戶端自有·不動)", "via_align": "VIA-PRD-DEF7F5"}, {"name": "Google TPU", "category": "自研 ASIC", "sap": "KUNNR(客戶端自有·不動)", "via_align": "VIA-PRD-650B08"}, {"name": "AWS Trainium", "category": "自研 ASIC", "sap": "KUNNR(客戶端自有·不動)", "via_align": "VIA-PRD-4564D4"}, {"name": "Meta MTIA", "category": "自研 ASIC", "sap": "KUNNR(客戶端自有·不動)", "via_align": "VIA-PRD-D22603"}, {"name": "鴻海 Foxconn", "category": "伺服器 ODM/OEM", "sap": "KUNNR(客戶端自有·不動)", "via_align": "VIA-PRD-B63417"}, {"name": "廣達 Quanta", "category": "伺服器 ODM/OEM", "sap": "KUNNR(客戶端自有·不動)", "via_align": "VIA-PRD-C95604"}, {"name": "緯穎 Wiwynn", "category": "伺服器 ODM/OEM", "sap": "KUNNR(客戶端自有·不動)", "via_align": "VIA-PRD-A312A6"}, {"name": "美超微 Supermicro", "category": "伺服器 ODM/OEM", "sap": "KUNNR(客戶端自有·不動)", "via_align": "VIA-PRD-21F6DE"}, {"name": "華碩 ASUS", "category": "伺服器 ODM/OEM", "sap": "KUNNR(客戶端自有·不動)", "via_align": "VIA-PRD-569604"}, {"name": "全球前十車廠", "category": "車廠/電信/衛星", "sap": "KUNNR(客戶端自有·不動)", "via_align": "VIA-PRD-AF86D4"}, {"name": "全球電信商", "category": "車廠/電信/衛星", "sap": "KUNNR(客戶端自有·不動)", "via_align": "VIA-PRD-8D806A"}, {"name": "低軌衛星服務商", "category": "車廠/電信/衛星", "sap": "KUNNR(客戶端自有·不動)", "via_align": "VIA-PRD-56A175"}]}, "templates": [{"name": "PowerThermal_Unified", "code": "VIA-TPL-87BF7A"}, {"name": "PowerThermal_Registry", "code": "VIA-TPL-F87CA9"}, {"name": "Electric_SuperBOM", "code": "VIA-TPL-185C95"}, {"name": "PowerThermal_SAP_SuperBOM", "code": "VIA-TPL-41A517"}, {"name": "Capability_Matrix", "code": "VIA-TPL-F31D5C"}, {"name": "MSProject_SSOT_Sync", "code": "VIA-TPL-7F7DA2"}]}, "ui": {"bg": "#f5f4f0", "paper": "#fff", "ink": "#1e1d1a", "blue": "#4c78a8", "teal": "#439a9a", "up": "#c96b5a", "down": "#5a9e6f", "am": "#c4943a", "vi": "#7a6daa", "fonts": {"display": "Syne", "body": "DM Sans", "mono": "DM Mono", "tc": "Noto Sans TC"}, "radius": "2-3px", "reson": "7-color resonance gradient", "rule": "紅=漲 綠=跌;2位小數千分位"}, "scheme": {"DOMAIN": {"prefix": "VIA-DOM", "desc": "領域(電源/散熱/BOM/PLM/Finance...)"}, "PRODUCT": {"prefix": "VIA-PRD", "desc": "產品(水冷板/均熱片/AI伺服器電源...)"}, "SUBPRODUCT": {"prefix": "VIA-SUB", "desc": "次產品(MLCP/MCCP/CDU/快接頭...)"}, "KNOWLEDGE": {"prefix": "VIA-KNW", "desc": "產業知識(液冷趨勢/TDP/ASP動態...)"}, "COMPANY": {"prefix": "VIA-{PW|TH}", "desc": "企業(依族群)"}, "TEMPLATE": {"prefix": "VIA-TPL", "desc": "大模板/UI"}, "PARAM": {"prefix": "VIA-PRM", "desc": "參數"}, "INTERFACE": {"prefix": "VIA-IFC", "desc": "介面合約"}, "hash": "blake2s digest_size=3, upper hex", "rule": "code = prefix + '-' + hash(type|name|context)"}, "vendor_fields": ["LIFNR 供應商碼(SAP自有)", "NAME1 名稱", "LAND1 國別", "WERKS 供貨廠", "AKONT 統馭科目", "category 類別", "via_align VIA對齊碼"], "customer_fields": ["KUNNR 客戶碼(SAP自有)", "NAME1 名稱", "LAND1 國別", "VKORG 銷售組織", "KTOKD 客戶群", "category 類別", "via_align VIA對齊碼"], "industry": {"電源 Power": {"系統整合": ["台達電", "光寶科", "Vertiv", "Schneider", "Eaton"], "電源模組": ["群電", "海韻電", "康舒", "全漢"]}, "散熱 Thermal": {"①主動散熱模組/風扇": ["奇鋐", "雙鴻", "建準", "力致", "尼得科超眾", "邁科", "泰碩", "元山", "協禧", "動力-KY", "曜越"], "②熱傳導材料/液冷零組件": ["健策", "富世達", "鴻準", "高力", "廣運", "上品", "萬在"], "③液冷系統整合/機櫃": ["晟銘電", "勤誠", "營邦", "川湖", "嘉澤"], "④散熱控制/感測IC": ["茂達", "矽力-KY", "迅杰"], "⑤國際液冷龍頭": ["Vertiv", "Modine", "nVent", "Asetek", "Alfa Laval", "Munters"], "⑥私人液冷專家": ["Rittal", "Stulz", "Boyd", "CoolIT", "Motivair", "LiquidStack", "GRC", "Iceotope", "Chilldyne", "Danfoss", "Submer"]}}, "contracts": {"IntakeEngine": ["run", "parse_code", "repair_table", "assets", "guarantee", "ocr", "decompose_filename"], "SSOTEngine": ["resolve", "add_synonym", "registry", "autocode"], "SyncEngine": ["sync", "conflicts", "link_bom", "ms_anchor", "bom_anchor", "writeback", "to_xml", "roundtrip"], "BOMEngine": ["classify", "taxonomy", "validate", "rollup", "where_used", "template", "operation", "auto_code", "local_libs"], "FinanceEngine": ["verify", "cost", "calibrate", "peers"], "KnowledgeEngine": ["tcode", "select_bom", "plm_concepts", "pmbok_areas"], "GovernanceEngine": ["scan", "import_order", "sector_registry", "check_registration"]}, "meta": {"name": "VIA Central Parameter Store", "version": "v0100", "governance": "append-only 只增不減 · 核可制", "principle": "外部平台編碼(ticker/yfinance/SAP/MSP)完全不動;VIA 只自動編碼己方並對齊", "approval_required": true}};
+const $=id=>document.getElementById(id);
+const TABS=[["code","① 萬物編碼"],["ifc","② 介面合約"],["sap","③ SAP 模板"],["ind","④ 產業分類"],["ui","⑤ UI Token"]];
+let cur="code";
+$("tabs").innerHTML=TABS.map(([id,n])=>`<div class="tab ${id===cur?'on':''}" data-id="${id}">${n}</div>`).join("");
+$("tabs").querySelectorAll(".tab").forEach(t=>t.onclick=()=>{cur=t.dataset.id;$("tabs").querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x.dataset.id===cur));document.querySelectorAll(".sec").forEach(s=>s.classList.toggle("on",s.id==="sec-"+cur));});
+
+// 萬物編碼
+const pi=D.ev.page_items;
+const allCodes=[
+ ...pi.domains.map(x=>["領域","DOM",x]),...pi.products.map(x=>["產品","PRD",x]),
+ ...pi.subproducts.map(x=>["次產品","SUB",x]),...pi.knowledge.map(x=>["知識","KNW",x]),
+ ...D.ev.templates.map(x=>["模板","TPL",x])];
+$("codes").innerHTML=allCodes.map(([lbl,cls,x])=>`<tr><td><span class="typ d-${cls}">${lbl}</span></td><td class="name">${x.name}</td><td class="code">${x.code}</td></tr>`).join("");
+$("codeCnt").textContent=allCodes.length+" 個己方碼";
+$("expCode").onclick=()=>{let o="Type,Name,VIA_Code\n";allCodes.forEach(([l,c,x])=>o+=`${l},"${x.name}",${x.code}\n`);
+ const b=new Blob(["\ufeff"+o],{type:"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="VIA_All_Codes.csv";a.click();};
+
+// 介面
+$("ifc").innerHTML=D.ev.interfaces.map(i=>`<tr><td class="name">${i.engine}</td><td class="code" style="color:var(--blue)">.${i.method}()</td><td class="code">${i.code}</td></tr>`).join("");
+
+// SAP
+$("vFields").textContent=D.vendor_fields.length+" 欄位";
+$("cFields").textContent=D.customer_fields.length+" 欄位";
+$("vend").innerHTML=D.ev.external_align.vendors.map(v=>`<tr><td style="font-family:'Noto Sans TC';color:var(--mut)">${v.category}</td><td class="name">${v.name}</td><td class="fixed">${v.sap}</td><td class="code">${v.via_align}</td></tr>`).join("");
+$("cust").innerHTML=D.ev.external_align.customers.map(c=>`<tr><td style="font-family:'Noto Sans TC';color:var(--mut)">${c.category}</td><td class="name">${c.name}</td><td class="fixed">${c.sap}</td><td class="code">${c.via_align}</td></tr>`).join("");
+
+// 產業分類
+$("ind").innerHTML=Object.entries(D.industry).map(([g,layers])=>`<div class="card"><div class="hd2">${g}</div>
+ ${Object.entries(layers).map(([ln,members])=>`<div class="layer"><div class="lh">${ln} · ${members.length} 家</div><div class="lb">${members.map(m=>`<span class="mchip">${m}</span>`).join("")}</div></div>`).join("")}</div>`).join("");
+
+// UI
+$("ui").innerHTML=Object.entries(D.ui).map(([k,v])=>`<tr><td class="name">${k}</td><td class="code" style="color:${typeof v==='string'&&v.startsWith('#')?v:'var(--ink)'}">${typeof v==='object'?JSON.stringify(v):v}</td></tr>`).join("");
+</script><script>
+(function(){
+ function cellText(td){var el=td.querySelector('input,select,textarea');
+  var v=el?(el.value||''):td.textContent;return (v||'').trim().replace(/\|/g,'\\|').replace(/\s+/g,' ');}
+ function tableToMd(tbl){
+  var heads=tbl.tHead?Array.prototype.slice.call(tbl.tHead.rows):[];
+  var body=tbl.tBodies.length?Array.prototype.slice.call(tbl.tBodies[0].rows):Array.prototype.slice.call(tbl.rows);
+  var hRow=heads.length?heads[heads.length-1]:body.shift();
+  if(!hRow)return '';
+  var cols=Array.prototype.map.call(hRow.cells,cellText);
+  var out='| '+cols.join(' | ')+' |\n| '+cols.map(function(){return '---';}).join(' | ')+' |\n';
+  body.forEach(function(tr){out+='| '+Array.prototype.map.call(tr.cells,cellText).join(' | ')+' |\n';});
+  return out;
+ }
+ window.exportPageMarkdown=function(){
+  var title=document.querySelector('h1')?document.querySelector('h1').innerText.trim():'VIA';
+  var kick=document.querySelector('.kicker')?document.querySelector('.kicker').innerText.trim():'';
+  var md='# '+title+'\n\n';
+  if(kick)md+='> '+kick+'\n\n';
+  md+='_匯出 '+new Date().toISOString().slice(0,19).replace('T',' ')+' · VIA · append-only_\n\n';
+  var nodes=document.querySelectorAll('h2, table');
+  Array.prototype.forEach.call(nodes,function(n){
+   if(n.tagName==='H2'){md+='\n## '+n.innerText.trim().replace(/\s+/g,' ')+'\n\n';}
+   else{var t=tableToMd(n);if(t)md+=t+'\n';}
+  });
+  var blob=new Blob([md],{type:'text/markdown'});var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=(title.replace(/[^\w\u4e00-\u9fff]+/g,'_').slice(0,40)||'VIA')+'.md';a.click();
+ };
+ function addBtn(){if(document.getElementById('viaMdBtn'))return;var b=document.createElement('button');b.id='viaMdBtn';b.textContent='\u2913 MD';b.className='pdf';b.style.right='66px';b.onclick=window.exportPageMarkdown;document.body.appendChild(b);}
+ if(document.body)addBtn();else window.addEventListener('DOMContentLoaded',addBtn);
+})();
+</script>
+</body></html>

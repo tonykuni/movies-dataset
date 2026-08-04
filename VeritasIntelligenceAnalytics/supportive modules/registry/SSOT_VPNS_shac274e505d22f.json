@@ -1,0 +1,195 @@
+{
+  "schema": "SSOT_VPNS",
+  "version": "v001.0",
+  "system": {
+    "name": "VeritasProcessNexus System",
+    "short_name": "VPNS",
+    "purpose": "Process Mining · Workflow Insight · Operational Optimization"
+  },
+  "input_formats": [
+    "csv",
+    "xlsx",
+    "json",
+    "md",
+    "txt",
+    "pdf",
+    "docx",
+    "png",
+    "jpg",
+    "html"
+  ],
+  "normalized_layers": [
+    "raw_source",
+    "extraction_block",
+    "entity_layer",
+    "workflow_candidate",
+    "event_log",
+    "process_model",
+    "ssot",
+    "regex_registry",
+    "html_report"
+  ],
+  "paths": {
+    "input": "input",
+    "mm": "input/mm",
+    "control": "input/control",
+    "temp": "temp",
+    "lake": "lake",
+    "output": "output",
+    "archive": "archive",
+    "normalized": "_vpns_system/normalized",
+    "workflows": "_vpns_system/workflows",
+    "event_logs": "_vpns_system/event_logs",
+    "registry": "_vpns_system/registry",
+    "reports": "_vpns_system/reports",
+    "runtime": "_vpns_system/runtime"
+  },
+  "workflow_schema": {
+    "activity": "required",
+    "actor": "optional",
+    "object": "recommended",
+    "timestamp": "recommended",
+    "condition": "optional",
+    "exception": "optional",
+    "source_trace": "required"
+  },
+  "output_formats": {
+    "event_log": [
+      "csv",
+      "json",
+      "parquet",
+      "xes"
+    ],
+    "workflow": [
+      "bpmn",
+      "dfg_json"
+    ],
+    "ssot": "json",
+    "regex_registry": "json",
+    "report": "html"
+  },
+  "normalized_block": {
+    "schema": "VPNS_NORMALIZED_EXTRACTION_BLOCK",
+    "purpose": "AI candidate → Regex/Schema Test → 人讀矩陣 → SSOT 的證據閘",
+    "fields": [
+      "source_id",
+      "source_type",
+      "block_id",
+      "extracted_text",
+      "detected_entities(activity/actor/object/timestamp/document_id/amount/status/condition)",
+      "workflow_candidates",
+      "regex_candidates",
+      "confidence",
+      "trace(file/page/line/cell/bbox)"
+    ],
+    "evidence_gate": [
+      "1. AI 產 candidate",
+      "2. Regex/Schema 自動測試",
+      "3. 人讀矩陣檢查",
+      "4. 通過才寫入 SSOT"
+    ]
+  },
+  "industry": {
+    "segments": [
+      {
+        "name": "Power Electronics 電源及零組件",
+        "share_q1_2026": "54%",
+        "lines": [
+          "電感/磁性元件",
+          "AC-DC/DC-DC 電源模組",
+          "AI/HPC 機架電源 800VDC",
+          "散熱/液冷 CDU"
+        ]
+      },
+      {
+        "name": "Infrastructure 基礎設施",
+        "share_q1_2026": "32%",
+        "lines": [
+          "AI Data Center",
+          "Telecom",
+          "Energy/EV Charging/ESS"
+        ]
+      },
+      {
+        "name": "Automation 自動化",
+        "share_q1_2026": "9%",
+        "lines": [
+          "Drive/Motion/Control",
+          "Robot",
+          "DIA 軟體平台",
+          "Building Automation"
+        ]
+      },
+      {
+        "name": "Mobility 交通",
+        "share_q1_2026": "5%",
+        "lines": [
+          "e-Powertrain",
+          "EV Charging",
+          "車用熱管理"
+        ]
+      }
+    ],
+    "supplier_tiers": [
+      "功率半導體(SiC/GaN/IGBT/MOSFET)",
+      "被動元件(MLCC/電容/電阻/電感)",
+      "磁性材料(Ferrite/磁芯/銅線)",
+      "PCB/載板",
+      "連接器/線束/busbar",
+      "散熱(風扇/heat pipe/cold plate/CDU/泵)",
+      "機構件(鈑金/壓鑄/機櫃)",
+      "電池與儲能(cell/BMS/pack/超級電容)"
+    ],
+    "sites": [
+      "台灣(桃園/中壢/平鎮/台南/台中)",
+      "中國(東莞/吳江/郴州/上海)",
+      "泰國(Bangpoo/Wellgrow)",
+      "印度(Gurgaon/Krishnagiri/Chennai)",
+      "歐洲(Slovakia)",
+      "美國(Plano TX)"
+    ]
+  },
+  "governance": {
+    "top_down": "部署標準 SSOT + 框架",
+    "bottom_up": "介面智慧自動補 regex/同步/補齊",
+    "conflict_priority": [
+      "SSOT",
+      "HQ",
+      "ERP",
+      "SAP",
+      "PM",
+      "Local"
+    ],
+    "evidence_gate": "AI candidate → Regex/Schema Test → 人讀矩陣 → SSOT"
+  },
+  "non_intrusive": "讀 ERP/SAP 輸出、AI 內部編碼對齊、不改來源、不做系統對系統同步",
+  "supportive_integration": {
+    "nexus_readme": {
+      "name": "Read_Me_VeritasNexusCore.md",
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules\\Read_Me_VeritasNexusCore.md",
+      "exists": true,
+      "role": "NexusCore governance and supportive module documentation"
+    },
+    "nexus_invoke": {
+      "name": "Invoke-VeritasNexusCore.ps1",
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules\\Invoke-VeritasNexusCore.ps1",
+      "exists": true,
+      "role": "Supportive module governance launcher"
+    },
+    "polyglot_repair": {
+      "name": "Invoke-VIA-PolyglotCheckTestRepair-v0101.ps1",
+      "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules\\Invoke-VIA-PolyglotCheckTestRepair-v0101.ps1",
+      "exists": true,
+      "role": "Polyglot check / test / repair supportive gate"
+    }
+  },
+  "vpns_deployment": {
+    "bridge_json": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\functional modules\\VPNS\\_vpns_system\\bridge\\SSOT_VPNS_NexusBridge.json",
+    "deploy_launcher": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\functional modules\\VPNS\\_vpns_system\\deploy\\Invoke-VPNS-SystemTestDeploy.ps1",
+    "html_report": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\functional modules\\VPNS\\_vpns_system\\reports\\VPNS_Nexus_Panorama_Deploy_Report.html",
+    "final_findings": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\functional modules\\VPNS\\_vpns_system\\registry\\VPNS_Nexus_Panorama_Findings_Final.json",
+    "final_summary": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\functional modules\\VPNS\\_vpns_system\\runtime\\VPNS_Nexus_Panorama_Final_Summary.json"
+  },
+  "nexus_bridge_path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\functional modules\\VPNS\\_vpns_system\\bridge\\SSOT_VPNS_NexusBridge.json",
+  "last_nexus_bridge_update": "2026-06-16 22:05:39"
+}

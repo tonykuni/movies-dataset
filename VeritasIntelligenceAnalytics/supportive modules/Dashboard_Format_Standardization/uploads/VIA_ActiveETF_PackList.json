@@ -1,0 +1,187 @@
+{
+  "package": "VIA Active ETF — deployment bundle",
+  "generated": "2026-06-02",
+  "root": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\supportive_module",
+  "policy": "append-only · 只增不減 · 部署前過 VIA_EnvManager eco-check",
+  "answer_打包": "Console/模板是自帶資料的純 HTML，執行期不 import 任何 .py；只有『資料層』要那幾支。VRN 財報管線那一大批與 Active-ETF 無關，不需隨此包複製/移動。",
+  "groups": {
+    "ESSENTIAL_runtime_html": [
+      {
+        "file": "VIA_ActiveETF_Console.html",
+        "role": "整合控制台(Matrix+Flow, BASE/DICT, ACTIVATE/REFRESH)",
+        "need": "必"
+      },
+      {
+        "file": "VIA_ETF_Performance_Ranking.html",
+        "role": "績效排行 Matrix",
+        "need": "必"
+      },
+      {
+        "file": "VIA_ETF_Holdings_Flow.html",
+        "role": "持股異動(個別/數個/全部)",
+        "need": "必"
+      },
+      {
+        "file": "VIA_Active_ETF_Holdings_Panorama.html",
+        "role": "持股全景(月度)",
+        "need": "選"
+      },
+      {
+        "file": "VIA_ActiveETF_Matrix.html",
+        "role": "你的 Matrix 原檔",
+        "need": "選"
+      },
+      {
+        "file": "VIA_logo.png",
+        "role": "去背 logo(模板已內嵌, 供換標插槽)",
+        "need": "選"
+      },
+      {
+        "file": "VIA_ActiveETF_Activate.ps1",
+        "role": "PS7 啟動器(選 BASE/DICT→注入凍結→開 UI)",
+        "need": "必"
+      }
+    ],
+    "DATA_LAYER_python": [
+      {
+        "file": "VIA_ActiveETF_DataStore.py",
+        "role": "PARQUET 增量(持股/量價/AUM/資金流)+BASE/DICT",
+        "need": "必(接真資料時)",
+        "present": true
+      },
+      {
+        "file": "VIA_EnvManager.py",
+        "role": "環境治理 + eco-check 守門",
+        "need": "必(部署守門)",
+        "present": true
+      },
+      {
+        "file": "VeritasCeleritas.py",
+        "role": "並行加速(可選, 批次抓取)",
+        "need": "建議",
+        "present": true
+      },
+      {
+        "file": "VeritasAegisNexus.py",
+        "role": "取數防護(robots/offline)",
+        "need": "建議",
+        "present": true
+      },
+      {
+        "file": "VIA_SSOT_Unified.py",
+        "role": "SSOT/TW_TICKER_REGEX 驗證",
+        "need": "建議",
+        "present": true
+      }
+    ],
+    "NOT_REQUIRED_for_active_etf": [
+      {
+        "pattern": "VIS_VRN_*.py / .json / .md",
+        "role": "VRN 財報抽取管線(別系統)",
+        "need": "否"
+      },
+      {
+        "pattern": "Invoke-VRN-*.ps1 / Invoke-VIA-*.ps1",
+        "role": "VRN 守門/批次入口",
+        "need": "否"
+      },
+      {
+        "pattern": "VIA_HardGate_* / VIA_Supportive_HardGate_* / *Seal*",
+        "role": "HardGate 封印引擎(VRN)",
+        "need": "否"
+      },
+      {
+        "pattern": "VIA_RuntimeImportFirewall.py / VIA_Runtime_Bridge_All_in_One.py",
+        "role": "執行期防火牆/橋接(VRN runtime)",
+        "need": "否(此 Console 不呼叫)"
+      },
+      {
+        "pattern": "VIA_Panorama_AST_RuntimeInjector.py / VIA_RegistryCore_v1.py",
+        "role": "AST 注入/資產登錄(VRN/全域治理)",
+        "need": "否(Active-ETF 不依賴)"
+      },
+      {
+        "pattern": "VIS_InstallHealthRegistry* / VRN_*Command_Center*.html",
+        "role": "VRN 安裝健康/指令中心",
+        "need": "否"
+      },
+      {
+        "pattern": "*.bak_* / * - 複製.*",
+        "role": "備份/複本",
+        "need": "否(勿打包)"
+      }
+    ]
+  },
+  "deploy_gate_cmd": "py -3.12 VIA_EnvManager.py eco-check \"pyarrow pandas yfinance\" via_core 3.12 windows",
+  "note": "6 支前缺模組(Celeritas/Aegis/SSOT/RuntimeInjector/RegistryCore/Runtime_Bridge)已在你的 supportive_module 內確認存在；其中 Active-ETF 只實際用到 Celeritas/Aegis/SSOT(建議)+EnvManager(必)。",
+  "integrated_entrypoints": {
+    "ONE_PY": "VIA_ActiveETF_System.py — SYNC：抓取→PARQUET增量→eco守門→雙內嵌匯出→注入建HTML",
+    "ONE_PS": "VIA_ActiveETF.ps1 — 選BASE/DICT(Windows I/O)→呼叫PY sync→Start-Process 跳出 Console UI",
+    "ui_templates": [
+      "perf_template3.html",
+      "holdings_template.html",
+      "console_template.html"
+    ],
+    "ui_assets": [
+      "VIA_logo.png"
+    ],
+    "note": "DataStore + EnvManager(eco-check) 已整併進 VIA_ActiveETF_System.py；一鍵：pwsh -File VIA_ActiveETF.ps1"
+  },
+  "consolidation_v2": {
+    "change": "兩 HTML UI 合併成單一多頁檔（績效 Matrix + 持股 Flow 共殼），移除 iframe，降低檔案量",
+    "ONE_UI": "VIA_ActiveETF_Console.html（單檔多頁，內嵌雙資料+logo，零 iframe）",
+    "ONE_TEMPLATE": "console_merged_template.html（PY 注入 __PERF__/__HOLD__/__LOGO__/__BASE__/__DICT__）",
+    "superseded": [
+      "perf_template3.html",
+      "holdings_template.html",
+      "console_template.html",
+      "VIA_ETF_Performance_Ranking.html",
+      "VIA_ETF_Holdings_Flow.html"
+    ],
+    "deploy_min": [
+      "VIA_ActiveETF_System.py",
+      "VIA_ActiveETF.ps1",
+      "console_merged_template.html",
+      "VIA_logo.png"
+    ],
+    "note": "部署只需 4 檔；跑 VIA_ActiveETF.ps1 → sync 建出單一 VIA_ActiveETF_Console.html 並開啟。舊三檔模板/兩 HTML 已被取代。"
+  },
+  "consolidation_v3_final": {
+    "optimize": "logo base64 由 3 次內嵌改為 1 次(JS 套用 header/浮水印/遮罩)→ 合併 Console 912KB→451KB",
+    "cockpit": "主動式 ETF 三入口(etf_rank/etf_flow/etf_console)合併為單一 etf_console → 子系統 14→12",
+    "regression": "PY selftest 4/4 · sync 建單檔 · 合併 Console 雙頁 0 錯誤 · Cockpit 12 子系統 0 載入錯誤 · 巢狀渲染 25 列",
+    "deploy_min_4_files": [
+      "VIA_ActiveETF_System.py",
+      "VIA_ActiveETF.ps1",
+      "console_merged_template.html",
+      "VIA_logo.png"
+    ],
+    "activate": "pwsh -File VIA_ActiveETF.ps1  → 選 BASE/DICT → sync → 跳出單一多頁 Console"
+  },
+  "exe_pwa_packaging": {
+    "ONE_PS_packer": "VIA_ActiveETF_Pack.ps1 — INTEGRATE(盤點+輔助工具評估) → COPY(dist) → PACK(.NET 編譯內嵌 Console 成 VIA_ActiveETF.exe) → PWA(manifest/sw/icons)",
+    "supportive_tools_hook": "UI EXE / Console 為自帶資料單檔 → 執行期不需掛入任何輔助工具；唯有要在 EXE 內重新 sync 抓資料才需 Python + 4 支(Aegis/Celeritas/EnvManager/SSOT)，用 -SyncBundle 併入",
+    "exe": "雙擊 .exe → 解出 %TEMP%\\Console → Edge --app 視窗開啟(無 Edge 退回預設瀏覽器)；單檔自帶 UI，免安裝",
+    "pwa": "dist 以 http 提供(py -m http.server)→ Edge/Chrome 開 Console → 網址列『安裝』為 App；sw.js 離線快取，manifest+icon 齊備",
+    "responsive": "≤900px 側欄轉抽屜(漢堡開關)+右側群組換行+KPI 2欄；≤540px KPI 1欄、隱藏副標；桌機維持側欄",
+    "ui_optimize": "字體 fitText 自適應(h1/h3)、表格自動密度、logo 單嵌、互動動畫(漣漪/旋轉/遮罩脈動/分頁滑動)",
+    "usage": [
+      "pwsh -File VIA_ActiveETF_Pack.ps1",
+      "pwsh -File VIA_ActiveETF_Pack.ps1 -Sync -SyncBundle"
+    ]
+  },
+  "closeout_deploy": {
+    "ONE_PS": "VIA_ActiveETF_Deploy.ps1 — 結案：AUDIT→GATE→SNAPSHOT→SETTINGS(PATH)→DAILY→CLOSEOUT",
+    "audit": "Python(py 啟動器) + pyarrow/pandas/numpy(<2.0)/yfinance + eco-check + 核心5檔 + 輔助4 + Edge",
+    "gate": "numpy>=2.0 / eco BLOCK / 缺核心 → 中止不部署(除非 -Force)；-Install 補套件(numpy 鎖<2.0)",
+    "baseline": "無衝突即以現況鎖為自動部署基準 → VIA_ActiveETF_DeployConfig.json(含 python/套件/路徑/重裝指令)",
+    "path": "-AddToPath 將 vetf 加入使用者 PATH(append-only，已存在則略過)",
+    "daily_update": "Register-ScheduledTask VIA_ActiveETF_DailyUpdate 每日 @08:00 跑 System.py sync(PARQUET 增量→重建 Console)",
+    "usage": [
+      "pwsh -File VIA_ActiveETF_Deploy.ps1",
+      "pwsh -File VIA_ActiveETF_Deploy.ps1 -Install -AddToPath",
+      "pwsh -File VIA_ActiveETF_Deploy.ps1 -UpdateTime 07:30"
+    ],
+    "verified": "結構 lint：param 頂部 · 程式碼括號平衡 · 無 Start-Job · [IO.File]/py 啟動器/排程/PATH 齊 · eco-check PASS/BLOCK 介接正確"
+  }
+}

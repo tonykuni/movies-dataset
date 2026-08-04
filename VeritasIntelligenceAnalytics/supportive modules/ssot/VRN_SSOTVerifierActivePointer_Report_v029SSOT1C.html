@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VRN SSOT Verifier Active Pointer Seal v029.SSOT.1C</title>
+<style>
+:root{--sky:#d8f0ef;--ink:#1d3438;--muted:#657f82;--line:rgba(38,70,75,.16);--head:#edf8f6;--hover:rgba(216,240,239,.20);--ok:#0f766e;--warn:#b7791f;--fail:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Microsoft JhengHei","Segoe UI",Arial,sans-serif;background:linear-gradient(180deg,#fbfdfb,#f3f8f6);color:var(--ink);font-size:11px;line-height:1.28}
+header{position:sticky;top:0;z-index:80;padding:14px 26px 10px;background:rgba(251,253,251,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+h1{margin:0;font-size:18px;text-align:center;letter-spacing:.035em}
+.sub{text-align:center;color:var(--muted);font-size:10.5px;margin-top:4px}
+.wrap{padding:12px 22px 36px}
+.kpis{display:grid;grid-template-columns:repeat(8,minmax(96px,1fr));gap:8px;margin-bottom:12px}
+.card{border-radius:10px;padding:8px 10px;background:rgba(255,255,255,.82);border:1px solid var(--line);box-shadow:0 6px 16px rgba(30,52,56,.04)}
+.k{font-size:9.5px;color:var(--muted);letter-spacing:.07em}.v{font-size:16px;font-weight:750;margin-top:2px}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.fail{color:var(--fail)}
+section{margin-top:12px}
+h2{position:sticky;top:45px;z-index:70;margin:0 0 6px;padding:6px 9px;border:1px solid var(--line);border-left:4px solid var(--sky);border-radius:9px;background:rgba(250,253,252,.96);font-size:12px;text-align:center}
+table{width:100%;border-collapse:separate;border-spacing:0;table-layout:auto;background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:10px;overflow:clip}
+thead{position:sticky;top:76px;z-index:60}
+th{position:sticky;top:76px;z-index:61;background:var(--head);font-size:10px;font-weight:800;text-align:center;vertical-align:top;padding:5px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{font-size:10px;padding:4px 6px;border-bottom:1px solid var(--line);vertical-align:top;text-align:center;white-space:nowrap}
+td.via-left,td:has(code){text-align:left;white-space:normal;word-break:break-word;overflow-wrap:anywhere}
+tr:hover td{background:var(--hover)}
+code{font-family:Consolas,"Cascadia Mono",monospace;font-size:9.5px;white-space:normal;word-break:break-word}
+</style>
+</head>
+<body>
+<header>
+<h1>def VRN SSOT Verifier + Active Pointer Seal · v029.SSOT.1C</h1>
+<div class="sub">Verify SSOT · Activate stage pointer · Table staging allowed · Canonical blocked</div>
+</header>
+<div class="wrap">
+<div class="kpis">
+<div class="card"><div class="k">Status</div><div class="v">VRN_SSOT_ACTIVE_POINTER_READY</div></div>
+<div class="card"><div class="k">Risk</div><div class="v">MEDIUM</div></div>
+<div class="card"><div class="k">OK</div><div class="v ok">27</div></div>
+<div class="card"><div class="k">WARN</div><div class="v warn">3</div></div>
+<div class="card"><div class="k">FAIL</div><div class="v fail">0</div></div>
+<div class="card"><div class="k">SSOT Score</div><div class="v">85</div></div>
+<div class="card"><div class="k">Table 1D</div><div class="v ok">True</div></div>
+<div class="card"><div class="k">Canonical</div><div class="v fail">False</div></div>
+</div>
+
+<section><h2>def SSOT Verifier Matrix</h2>
+<table>
+<thead><tr><th>Round</th><th>Layer</th><th>Name</th><th>Status</th><th>Risk</th><th>Class</th><th>Priority</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr></thead>
+<tbody><tr><td>Round0</td><td>POLICY</td><td>No Extraction Rerun</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>rerun</td><td>false</td><td>Verifier only.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_SSOT_VERIFIER_ACTIVE_POINTER_SEAL_v029SSOT1C_20260615_144418</code></td></tr>
+<tr><td>Round0</td><td>POLICY</td><td>No Canonical Promotion</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>canonical</td><td>false</td><td>Canonical remains blocked.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_SSOT_VERIFIER_ACTIVE_POINTER_SEAL_v029SSOT1C_20260615_144418</code></td></tr>
+<tr><td>Round0</td><td>POLICY</td><td>Activate Pointer</td><td><b>OK_POINTER_ACTIVATION_REQUESTED</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>activate</td><td>True</td><td>Pointer activation is explicit in this gate.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT</code></td></tr>
+<tr><td>Round0</td><td>POLICY</td><td>DuckDB Serving Only</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>duckdb_role</td><td>serving_layer</td><td>Parquet remains truth source.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_SSOT_VERIFIER_ACTIVE_POINTER_SEAL_v029SSOT1C_20260615_144418</code></td></tr>
+<tr><td>Round1</td><td>INPUT</td><td>SSOT 1B Runtime</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>runtime</td><td>found</td><td>Latest SSOT 1B runtime found.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_UNIFIED_SSOT_BUILDER_v029SSOT1B_20260615_143918\runtime\VRN_UnifiedSSOTBuilder_Runtime_v029SSOT1B.json</code></td></tr>
+<tr><td>Round1</td><td>INPUT</td><td>parquet</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>exists</td><td>true</td><td>Required SSOT/stage path found.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_UNIFIED_SSOT_BUILDER_v029SSOT1B_20260615_143918\parquet</code></td></tr>
+<tr><td>Round1</td><td>INPUT</td><td>VRN_ACTIVE_STAGE_POINTER_CANDIDATE_v029SSOT1B.json</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>exists</td><td>true</td><td>Required SSOT/stage path found.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\VRN_ACTIVE_STAGE_POINTER_CANDIDATE_v029SSOT1B.json</code></td></tr>
+<tr><td>Round1</td><td>INPUT</td><td>VRN_ReportBasicInfo_StageFixed_v029VRN1C41.parquet</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>exists</td><td>true</td><td>Required SSOT/stage path found.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_BROKER_BACKFILL_GATE_v029VRN1C41_20260615_131852\stage_parquet\VRN_ReportBasicInfo_StageFixed_v029VRN1C41.parquet</code></td></tr>
+<tr><td>Round1</td><td>INPUT</td><td>VRN_ReportText_StageFixed_v029VRN1C3.parquet</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>exists</td><td>true</td><td>Required SSOT/stage path found.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541\stage_parquet\VRN_ReportText_StageFixed_v029VRN1C3.parquet</code></td></tr>
+<tr><td>Round1</td><td>ENGINE</td><td>pyarrow</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>pyarrow</td><td>available</td><td>pyarrow available.</td><td><code>C:\Python313\python.exe</code></td></tr>
+<tr><td>Round2</td><td>ENGINE</td><td>SSOT Verifier Engine</td><td><b>OK_CREATED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>script</td><td>created</td><td>SSOT verifier Python engine created.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_SSOT_VERIFIER_ACTIVE_POINTER_SEAL_v029SSOT1C_20260615_144418\work\vrn_ssot_verifier_active_pointer_v029ssot1c.py</code></td></tr>
+<tr><td>Round2</td><td>VERIFY</td><td>SSOT Verifier</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>exit</td><td>0</td><td>SSOT verification complete.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_SSOT_VERIFIER_ACTIVE_POINTER_SEAL_v029SSOT1C_20260615_144418\runtime\VRN_SSOTVerifierActivePointer_PythonRuntime_v029SSOT1C.json</code></td></tr>
+<tr><td>Round2</td><td>SSOT_TABLE</td><td>ticker_regex</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>rows</td><td>6</td><td>SSOT parquet table exists.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_UNIFIED_SSOT_BUILDER_v029SSOT1B_20260615_143918\parquet\VRN_TickerRegexSSOT_v029SSOT1B.parquet</code></td></tr>
+<tr><td>Round2</td><td>SSOT_TABLE</td><td>date_regex</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>rows</td><td>6</td><td>SSOT parquet table exists.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_UNIFIED_SSOT_BUILDER_v029SSOT1B_20260615_143918\parquet\VRN_DatePeriodRegexSSOT_v029SSOT1B.parquet</code></td></tr>
+<tr><td>Round2</td><td>SSOT_TABLE</td><td>rating_alias</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>rows</td><td>16</td><td>SSOT parquet table exists.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_UNIFIED_SSOT_BUILDER_v029SSOT1B_20260615_143918\parquet\VRN_RatingAliasSSOT_v029SSOT1B.parquet</code></td></tr>
+<tr><td>Round2</td><td>SSOT_TABLE</td><td>broker_alias</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>rows</td><td>35</td><td>SSOT parquet table exists.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_UNIFIED_SSOT_BUILDER_v029SSOT1B_20260615_143918\parquet\VRN_BrokerAliasSSOT_v029SSOT1B.parquet</code></td></tr>
+<tr><td>Round2</td><td>SSOT_TABLE</td><td>basic_def</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>rows</td><td>14</td><td>SSOT parquet table exists.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_UNIFIED_SSOT_BUILDER_v029SSOT1B_20260615_143918\parquet\VRN_BasicInfoDefinitionSSOT_v029SSOT1B.parquet</code></td></tr>
+<tr><td>Round2</td><td>SSOT_TABLE</td><td>financial_alias</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>rows</td><td>42</td><td>SSOT parquet table exists.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_UNIFIED_SSOT_BUILDER_v029SSOT1B_20260615_143918\parquet\VRN_FinancialAccountAliasSSOT_v029SSOT1B.parquet</code></td></tr>
+<tr><td>Round2</td><td>SSOT_TABLE</td><td>validation_rules</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>rows</td><td>15</td><td>SSOT parquet table exists.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_UNIFIED_SSOT_BUILDER_v029SSOT1B_20260615_143918\parquet\VRN_FinancialValidationRulesSSOT_v029SSOT1B.parquet</code></td></tr>
+<tr><td>Round2</td><td>SSOT_TABLE</td><td>source_inventory</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>rows</td><td>589</td><td>SSOT parquet table exists.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_UNIFIED_SSOT_BUILDER_v029SSOT1B_20260615_143918\parquet\VRN_SSOT_SourceInventory_v029SSOT1B.parquet</code></td></tr>
+<tr><td>Round2</td><td>REGEX_TEST</td><td>TW ticker policy</td><td><b>WARN_REVIEW_REQUIRED</b></td><td>MEDIUM</td><td>SEQUENTIAL_REQUIRED</td><td>P1</td><td>pass</td><td>partial</td><td>Ticker policy exists but one guard/suffix test is partial.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_UNIFIED_SSOT_BUILDER_v029SSOT1B_20260615_143918\parquet\VRN_TickerRegexSSOT_v029SSOT1B.parquet</code></td></tr>
+<tr><td>Round2</td><td>STAGE_PARQUET</td><td>BasicInfo candidate</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>rows</td><td>400</td><td>BasicInfo candidate row count verified.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_BROKER_BACKFILL_GATE_v029VRN1C41_20260615_131852\stage_parquet\VRN_ReportBasicInfo_StageFixed_v029VRN1C41.parquet</code></td></tr>
+<tr><td>Round2</td><td>STAGE_PARQUET</td><td>ReportText candidate</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>rows</td><td>3878</td><td>ReportText candidate has sufficient rows.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541\stage_parquet\VRN_ReportText_StageFixed_v029VRN1C3.parquet</code></td></tr>
+<tr><td>Round2</td><td>FINANCIAL_SSOT</td><td>Financial baseline</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>alias/rules</td><td>42/15</td><td>Financial alias and validation-rule baseline passed.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_UNIFIED_SSOT_BUILDER_v029SSOT1B_20260615_143918\parquet\VRN_FinancialAccountAliasSSOT_v029SSOT1B.parquet</code></td></tr>
+<tr><td>Round2</td><td>BROKER_SSOT</td><td>Broker alias baseline</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>aliases</td><td>35</td><td>Broker alias baseline passed, but 33 missing broker rows still require later review.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_UNIFIED_SSOT_BUILDER_v029SSOT1B_20260615_143918\parquet\VRN_BrokerAliasSSOT_v029SSOT1B.parquet</code></td></tr>
+<tr><td>Round3</td><td>POINTER</td><td>VRN_ACTIVE_STAGE_POINTER.json</td><td><b>OK_ACTIVE_POINTER_WRITTEN</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>active</td><td>true</td><td>Active stage pointer written.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\VRN_ACTIVE_STAGE_POINTER.json</code></td></tr>
+<tr><td>Round3</td><td>SEAL</td><td>Active Pointer Seal</td><td><b>OK_SEALED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>seal</td><td>written</td><td>Active pointer seal written.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_SSOT_VERIFIER_ACTIVE_POINTER_SEAL_v029SSOT1C_20260615_144418\seal\VRN_SSOT_ACTIVE_POINTER_SEAL_v029SSOT1C.json</code></td></tr>
+<tr><td>Round3</td><td>READINESS</td><td>VRN 1D Table Extraction Staging</td><td><b>OK_READY</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>allowed</td><td>true</td><td>1D table extraction staging can proceed.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\VRN_ACTIVE_STAGE_POINTER.json</code></td></tr>
+<tr><td>Round3</td><td>READINESS</td><td>Canonical Promotion</td><td><b>WARN_BLOCKED_BY_POLICY</b></td><td>MEDIUM</td><td>SEQUENTIAL_REQUIRED</td><td>P1</td><td>allowed</td><td>false</td><td>Canonical promotion remains blocked by policy and review items.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\VRN_ACTIVE_STAGE_POINTER.json</code></td></tr>
+<tr><td>Round3</td><td>FINAL</td><td>SSOT Verifier Active Pointer Seal</td><td><b>VRN_SSOT_ACTIVE_POINTER_READY</b></td><td>MEDIUM</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>hard_blocks</td><td>0</td><td>Final SSOT verifier and active pointer decision.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\SSOT\_runs\VRN_SSOT_VERIFIER_ACTIVE_POINTER_SEAL_v029SSOT1C_20260615_144418</code></td></tr></tbody>
+</table>
+</section>
+</div>
+<script>
+(function(){
+ const left=/(path|message|reason|action|issue|路徑|訊息|原因|動作|問題)/i;
+ const path=/([A-Za-z]:\\|\\\\|\/|\.ps1|\.py|\.parquet|\.csv|\.json|\.html|\.txt|\.pdf|\.duckdb)/i;
+ function clean(t){return String(t||"").replace(/,/g,"").replace(/%/g,"").trim();}
+ function isnum(t){const s=clean(t);return !!s && /^[-+]?(\d+|\d*\.\d+)(e[-+]?\d+)?$/i.test(s) && Number.isFinite(Number(s));}
+ function fmt(t){const n=Number(clean(t));return Number.isFinite(n)?n.toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:2}):t;}
+ function heads(table){return Array.from(table.querySelectorAll("thead th")).map(x=>(x.textContent||"").trim());}
+ function process(table){const hs=heads(table);Array.from(table.querySelectorAll("th")).forEach(th=>{th.style.textAlign="center";th.style.verticalAlign="top";});Array.from(table.querySelectorAll("tbody tr")).forEach(row=>{Array.from(row.children).forEach((cell,i)=>{const h=hs[i]||"";const raw=(cell.textContent||"").trim();cell.style.verticalAlign="top";cell.style.textAlign="center";if(isnum(raw)){cell.textContent=fmt(raw);return;}if(left.test(h)||path.test(raw)||raw.length>=36||cell.querySelector("code")){cell.classList.add("via-left");}});});}
+ Array.from(document.querySelectorAll("table")).forEach(process);
+})();
+</script>
+</body>
+</html>

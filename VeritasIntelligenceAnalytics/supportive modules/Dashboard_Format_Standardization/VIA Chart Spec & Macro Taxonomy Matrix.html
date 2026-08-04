@@ -1,0 +1,218 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · 繪圖規範 × 總經分類矩陣 · Chart Spec × Macro Taxonomy</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--blue:#4c78a8;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--vi:#7a6daa;
+ --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg)}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5}
+.wrap{max-width:1340px;margin:0 auto;padding:0 22px 60px}
+.bar{position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50}
+header{margin:14px 0 10px}
+.masthead{display:flex;gap:14px;align-items:stretch;flex-wrap:wrap;border:1px solid var(--line);border-top:2px solid var(--ink);border-radius:6px;overflow:hidden;background:var(--paper)}
+.mh-left{flex:1 1 520px;min-width:280px;padding:14px 18px}
+.mh-right{flex:1 1 300px;min-width:240px;background:#1e1d1a;padding:13px 16px;display:flex;flex-direction:column;gap:9px;justify-content:flex-end}
+.kicker{font:700 9px 'DM Mono',monospace;letter-spacing:1.8px;color:var(--mut);text-transform:uppercase;margin-bottom:7px;line-height:1.4}
+h1{font:800 18px/1.16 'Syne',sans-serif;color:var(--ink)}h1 span{color:var(--up)}
+.sub{margin-top:7px;font:400 10px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:820px}.sub b{color:var(--ink2)}
+.gov{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.gov .lk{font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase}
+.gov .ver{margin-left:auto;font:700 8px 'DM Mono',monospace;color:#1e1d1a;background:#c4943a;border-radius:3px;padding:2px 8px}
+.rlab{font:700 7.5px 'DM Mono',monospace;letter-spacing:1.4px;color:#8a867d;text-transform:uppercase;border-bottom:1px solid #34322c;padding-bottom:6px}
+.params{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#34322c;border:1px solid #34322c;border-radius:4px;overflow:hidden}
+.pcell{background:#26251f;padding:7px 6px;text-align:center}
+.pcell .pn{font:800 15px 'DM Mono',monospace;color:#fff;font-variant-numeric:tabular-nums;line-height:1}
+.pcell .pk{font:600 6.5px 'DM Mono',monospace;letter-spacing:.4px;color:#a49f92;text-transform:uppercase;margin-top:4px}
+.tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.tab{font:700 10.5px 'DM Sans','Noto Sans TC',sans-serif;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--mut);border-radius:3px;padding:7px 11px}
+.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.sec{display:none}.sec.on{display:block}
+h2{font:800 13px 'Syne',sans-serif;color:var(--ink);margin:16px 0 4px;padding-bottom:5px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:8px}
+h2 .en{font:600 8px 'DM Mono',monospace;color:var(--mut2);letter-spacing:1px;text-transform:uppercase}
+h2 .rc{margin-left:auto;font:700 8px 'DM Mono',monospace;color:var(--vi)}
+.note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--am);border-radius:3px;padding:8px 14px;margin-bottom:12px;font:500 9px/1.6 'DM Mono',monospace;color:var(--mut)}.note b{color:var(--ink2)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-top:12px}
+.hd2{font:800 11px 'Syne',sans-serif;padding:10px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;color:var(--ink)}
+table{width:100%;border-collapse:collapse;font:500 10px 'DM Mono',monospace}
+th{font:700 8px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.4px;color:var(--mut);text-align:left;padding:7px 9px;border-bottom:2px solid var(--ink);background:var(--paper2)}
+td{padding:6px 9px;border-bottom:1px solid var(--soft);vertical-align:top}tr:hover td{background:var(--paper2)}
+.nm{font:700 10px 'Noto Sans TC',sans-serif;color:var(--ink)}.mono{font:700 9px 'DM Mono',monospace;color:var(--vi)}
+.lockbadge{font:700 7px 'DM Mono',monospace;color:#fff;background:#8a5a3a;border-radius:3px;padding:1px 6px;letter-spacing:.5px}
+.axgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.axcard{background:var(--paper);border:1px solid var(--line);border-top:3px solid var(--blue);border-radius:6px;padding:12px 14px}
+.axcard.dual{border-top-color:var(--vi)}.axcard.stk{border-top-color:var(--teal)}
+.axcard .at{font:800 12px 'Noto Sans TC',sans-serif;color:var(--ink)}
+.axcard .ae{font:600 7.5px 'DM Mono',monospace;color:var(--mut2);text-transform:uppercase;letter-spacing:.5px;margin:2px 0 8px}
+.axcard ul{list-style:none;display:flex;flex-direction:column;gap:4px}
+.axcard li{font:500 9.5px/1.5 'Noto Sans TC',sans-serif;color:var(--ink2);padding-left:12px;position:relative}
+.axcard li::before{content:"";position:absolute;left:0;top:6px;width:5px;height:5px;border-radius:1px;background:var(--blue)}
+.axcard.dual li::before{background:var(--vi)}.axcard.stk li::before{background:var(--teal)}
+.tag{font:600 8px 'DM Mono',monospace;background:var(--soft);border-radius:3px;padding:1px 7px;color:var(--ink2)}
+.tag.dyn{background:#eef3f7;color:var(--blue)}.tag.sta{background:#f3eefa;color:var(--vi)}
+/* palettes */
+.palrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--soft);flex-wrap:wrap}
+.pallab{font:700 10px 'DM Mono',monospace;color:var(--ink);min-width:80px}
+.sws{display:flex;gap:0;border-radius:4px;overflow:hidden;border:1px solid var(--line)}
+.sw{width:34px;height:22px}
+.palsub{font:500 8.5px 'DM Mono',monospace;color:var(--mut2)}
+.palhex{font:500 7.5px 'DM Mono',monospace;color:var(--mut2);margin-left:auto}
+/* macro tree */
+.tree{margin-top:12px}
+.idn{border:1px solid var(--line);border-radius:6px;background:var(--paper);margin-top:6px;overflow:hidden}
+.idn>.ih{display:flex;align-items:center;gap:9px;padding:9px 13px;cursor:pointer;background:var(--paper2)}
+.idn>.ih .ico{font:700 10px 'DM Mono',monospace;color:var(--vi);width:12px;flex:none}
+.idn>.ih .it{font:800 11px 'Noto Sans TC',sans-serif;color:var(--ink)}
+.idn>.ih .ie{font:600 8px 'DM Mono',monospace;color:var(--mut2);text-transform:uppercase;letter-spacing:.4px}
+.idn>.ih .iv{margin-left:auto;font:700 9px 'DM Mono',monospace;color:var(--up)}
+.idn>.ic{padding:4px 13px 11px 34px;display:none}
+.idn.op>.ic{display:block}
+.leaf{display:flex;gap:8px;align-items:baseline;padding:4px 0;border-bottom:1px dashed var(--soft)}
+.leaf:last-child{border-bottom:0}
+.leaf .lk2{font:700 8px 'DM Mono',monospace;color:var(--teal);min-width:96px;flex:none}
+.leaf .lv{font:500 9.5px 'Noto Sans TC',sans-serif;color:var(--ink2)}
+.leaf .ld{font:500 8px 'DM Mono',monospace;color:var(--mut2);margin-left:6px}
+.eqbar{font:700 12px 'DM Mono',monospace;color:var(--ink);background:#f2effa;border:1px solid var(--vi);border-radius:5px;padding:10px 14px;margin-top:12px;text-align:center;letter-spacing:.5px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:11px 14px;border-top:1px solid var(--line);align-items:center}
+.btn{font:700 8.5px 'DM Mono',monospace;cursor:pointer;border:1px solid var(--ink);background:transparent;color:var(--ink);border-radius:3px;padding:6px 11px}
+.tk{font:500 9px 'DM Mono',monospace;color:var(--mut)}
+.pdf{position:fixed;top:12px;right:14px;z-index:999;background:var(--ink);color:#fff;border:none;border-radius:5px;padding:7px 13px;font:700 9px 'DM Mono',monospace;cursor:pointer}
+@media print{@page{size:A4 landscape;margin:8mm}.pdf,.tabs,.toolbar{display:none!important}.sec{display:block!important}.idn>.ic{display:block!important}}
+@media(max-width:760px){.axgrid{grid-template-columns:1fr}}
+</style></head><body>
+<div class="bar"></div><button class="pdf" onclick="window.print()">⤓ PDF</button>
+<div class="wrap">
+<header>
+ <div class="masthead">
+  <div class="mh-left">
+   <div class="kicker">VERITAS INTELLIGENCE ANALYTICS · CHART SPEC × MACRO TAXONOMY · LOCKED TEMPLATE MATRIX</div>
+   <h1>繪圖規範 × 總經分類矩陣 <span>·</span> Chart Spec × Macro Taxonomy</h1>
+   <p class="sub">鎖定模板矩陣:<b>單軸/雙軸/堆疊組合 × 圖類型 × 繪圖規範</b>、<b>Seaborn 配色組合</b>、<b>動態 Plotly / 靜態 Matplotlib</b> 雙引擎規範;總經以<b>一條恆等式向下展開</b>(GDP → 分項 → 區域指數 → 央行/利率/美元/財政),數據細節逐層抓齊。只增不減、規範鎖定。</p>
+  </div>
+  <div class="mh-right">
+   <div class="gov"><span class="lk">🔒 LOCKED-SPEC · APPEND-ONLY</span><span class="ver">SPEC v0100</span></div>
+   <div class="rlab">諸元鎖定 · Locked Registry</div>
+   <div class="params" id="params"></div>
+  </div>
+ </div>
+</header>
+<div class="note">📐 四分頁:① 軸模式 × 圖類型 × 繪圖規範(鎖定) ② Seaborn 配色組合 ③ 動態/靜態雙引擎規範 ④ 總經分類恆等式向下展開。規範為鎖定模板,擴張採「加項目」只增不減。</div>
+<div class="tabs" id="tabs"></div>
+
+<div class="sec on" id="sec-chart">
+ <h2>① 軸模式 × 圖類型 × 繪圖規範 <span class="en">Axis × Chart Type × Spec (Locked)</span></h2>
+ <div class="axgrid">
+  <div class="axcard"><div class="at">單圖單軸</div><div class="ae">Single Axis</div><ul>
+   <li>單一量綱、單一 Y 軸;基準線=起始日 100</li><li>nice 刻度(2/2.5/5/10 倍數)、包覆 min/max + 上緣留格</li><li>主序列粗 1.2、次序列 husl;紅虛線 benchmark 貫穿</li></ul></div>
+  <div class="axcard dual"><div class="at">雙軸</div><div class="ae">Dual Axis</div><ul>
+   <li>左右軸不同量綱;左右刻度等間隔 → 格線對齊</li><li>標題只標左右軸、不換行、不標圖型</li><li>左右序列互異色;同數據同色</li></ul></div>
+  <div class="axcard stk"><div class="at">堆疊 / 組合圖</div><div class="ae">Stacked / Combo</div><ul>
+   <li>堆疊=各期比重→100%;寬度因子 0.92</li><li>組合=長條(量)+ 折線(率/指數)雙軸</li><li>框 0.8 實線、框內透明 0.8、無日曆空隙</li></ul></div>
+ </div>
+ <div class="card"><div class="hd2">圖類型 × 規範矩陣<span class="tk" id="chartCnt"></span></div>
+  <div style="overflow-x:auto"><table><thead><tr><th>圖類型</th><th>軸模式</th><th>間隙/寬度</th><th>邊框/透明</th><th>典型用途</th><th>引擎</th></tr></thead><tbody id="chartRows"></tbody></table></div>
+  <div class="toolbar"><button class="btn" id="expChart">⤓ 匯出規範 CSV</button><span class="tk">交易日序軸(移除週末/假日);月/週映射最近交易日;YoY 多抓前一年。</span></div>
+ </div>
+</div>
+
+<div class="sec" id="sec-color">
+ <h2>② Seaborn 配色組合 <span class="en">Seaborn Color Combos</span><span class="rc" id="palCnt"></span></h2>
+ <div class="note">類別型(qualitative)用於多序列區分;連續型(sequential)用於熱力/程度;發散型(diverging)用於中心對比。同數據同色、鎖定不變。</div>
+ <div class="card"><div class="hd2">類別型 Qualitative</div><div style="padding:8px 14px" id="palQual"></div></div>
+ <div class="card"><div class="hd2">連續型 Sequential</div><div style="padding:8px 14px" id="palSeq"></div></div>
+ <div class="card"><div class="hd2">發散型 Diverging</div><div style="padding:8px 14px" id="palDiv"></div></div>
+</div>
+
+<div class="sec" id="sec-engine">
+ <h2>③ 動態 / 靜態 雙引擎規範 <span class="en">Plotly (dynamic) / Matplotlib (static)</span></h2>
+ <div class="card"><div style="overflow-x:auto"><table><thead><tr><th>規範項目</th><th><span class="tag dyn">動態 Plotly</span></th><th><span class="tag sta">靜態 Matplotlib/Seaborn</span></th></tr></thead><tbody id="engRows"></tbody></table></div></div>
+</div>
+
+<div class="sec" id="sec-macro">
+ <h2>④ 總經分類 · 恆等式向下展開 <span class="en">Macro Taxonomy · Identity Expansion</span></h2>
+ <div class="eqbar">GDP ＝ C ＋ I ＋ G ＋ ( X − M )　·　支出面恆等式</div>
+ <div class="note">點各節點展開:GDP 分項 → 區域指數 → 央行政策(FED)/利率/美元/財政。每一層抓齊細節指標。</div>
+ <div class="tree" id="tree"></div>
+</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+// ① chart types
+const CHARTS=[
+ ["折線 Line","單軸","—","線寬 1.2/0.8","走勢/指數","靜+動"],
+ ["長條 Bar","單軸","0.82","框 0.8 · α0.8","非農/零售/初領","靜+動"],
+ ["堆疊長條 Stacked","單軸","0.92","框 0.8 · α0.8","比重→100%","靜+動"],
+ ["區域 Area","單軸","填滿","α0.10 填色","累積/占比","靜+動"],
+ ["組合 Combo","雙軸","0.82+線","框 0.8","量+率/指數","靜+動"],
+ ["散點 Scatter","雙軸","點 r","α0.7","相關/分佈","靜+動"],
+ ["熱力 Heatmap","矩陣","格","rocket/mako","相關矩陣","靜+動"],
+ ["箱型 Box","單軸","0.6","框 0.8","分佈/離群","靜"],
+ ["蠟燭 Candlestick","單軸","0.7","漲跌雙色","OHLC 價格","動"],
+ ["甘特 Gantt","時間軸","條","框 0.8","排程/里程碑","靜+動"]
+];
+$("chartRows").innerHTML=CHARTS.map(c=>`<tr><td class="nm">${c[0]}</td><td>${c[1]}</td><td>${c[2]}</td><td>${c[3]}</td><td class="tk">${c[4]}</td><td><span class="tag">${c[5]}</span></td></tr>`).join("");
+$("chartCnt").textContent=CHARTS.length+" 圖類型";
+$("expChart").onclick=()=>{let o="ChartType,Axis,Gap,Border,Use,Engine\n";CHARTS.forEach(c=>o+=`"${c[0]}",${c[1]},${c[2]},"${c[3]}","${c[4]}",${c[5]}\n`);const b=new Blob(["\ufeff"+o],{type:"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="VIA_Chart_Spec.csv";a.click();};
+
+// ② palettes
+const QUAL=[
+ ["deep",["#4c78a8","#e45756","#f58518","#72b7b2","#54a24b","#b279a2"],"預設 · 平衡飽和"],
+ ["Set2",["#66c2a5","#fc8d62","#8da0cb","#e78ac3","#a6d854","#ffd92f"],"pastel · 高辨識"],
+ ["tab10",["#1f77b4","#ff7f0e","#2ca02c","#d62728","#9467bd","#8c564b","#e377c2","#7f7f7f","#bcbd22","#17becf"],"matplotlib 經典 10 色"],
+ ["Paired",["#a6cee3","#1f78b4","#b2df8a","#33a02c","#fb9a99","#e31a1c","#fdbf6f","#ff7f00"],"淺+深配對 · 子類別"],
+ ["husl",["#f77189","#ce9032","#77ab31","#33b07a","#38a9c5","#6e9bf4","#e866f4"],"等亮度 · 多序列均衡"]
+];
+const SEQ=[
+ ["rocket",["#03051a","#340f3c","#6b1f6a","#a33262","#d2544b","#f48c3c","#fdc96b","#fef0b6"],"感知均勻 · 熱力"],
+ ["mako",["#0b0405","#1e2a4a","#245f6e","#2c9178","#4cbf8e","#9adab9","#d5ede7","#f3faf8"],"冷色專業 · 深→淺"],
+ ["Blues",["#f7fbff","#c6dbef","#9ecae1","#6baed6","#3182bd","#08519c"],"單一色相 · ColorBrewer"]
+];
+const DIV=[
+ ["RdBu",["#b2182b","#ef8a62","#fddbc7","#d1e5f0","#67a9cf","#2166ac"],"紅藍發散 · 中心對比"],
+ ["vlag",["#2369bd","#7d9fc9","#c4ccd8","#e6c6c0","#d2867e","#a63b3b"],"VIA 紅升綠降相容"],
+ ["Spectral",["#d53e4f","#fc8d59","#fee08b","#e6f598","#99d594","#3288bd"],"多段發散 · 分級"]
+];
+function palRow(p){return `<div class="palrow"><span class="pallab">${p[0]}</span><span class="sws">${p[1].map(c=>`<span class="sw" style="background:${c}" title="${c}"></span>`).join("")}</span><span class="palsub">${p[2]}</span><span class="palhex">${p[1].length} 色</span></div>`;}
+$("palQual").innerHTML=QUAL.map(palRow).join("");
+$("palSeq").innerHTML=SEQ.map(palRow).join("");
+$("palDiv").innerHTML=DIV.map(palRow).join("");
+$("palCnt").textContent=(QUAL.length+SEQ.length+DIV.length)+" 組合";
+
+// ③ engine spec
+const ENG=[
+ ["互動","hover/zoom/pan/legend toggle/滑桿範圍","無互動 · 出版級靜態"],
+ ["輸出","HTML/JSON · 內嵌網頁","PNG/SVG/PDF · 300dpi"],
+ ["軸/刻度","tickformat · rangeslider · rangeselector","MaxNLocator · nice 2/2.5/5/10"],
+ ["雙軸","yaxis2 overlaying=y side=right","twinx() · 左右刻度對齊"],
+ ["堆疊","barmode=stack / relative","bottom= 累加 · 100% 正規化"],
+ ["配色","colorway=seaborn hex","sns.set_palette()"],
+ ["benchmark","add_hline/add_vline/annotation","axhline/axvline · 紅虛線 α0.8"],
+ ["交易日軸","rangebreaks 移除週末","reindex 交易日 · 前值填補(量不填)"],
+ ["用途","儀表板/探索/簡報互動","週報/PDF/出版鎖定"]
+];
+$("engRows").innerHTML=ENG.map(e=>`<tr><td class="nm">${e[0]}</td><td>${e[1]}</td><td>${e[2]}</td></tr>`).join("");
+
+// ④ macro tree
+const TREE=[
+ {t:"C · 民間消費",e:"Consumption",v:"~68% GDP",leaf:[["耐久財","汽車/家電/3C","Durable"],["非耐久財","食品/能源/服飾","Nondurable"],["服務","住房/醫療/金融","Services"],["信心","密大消費者信心/零售銷售","Sentiment"]]},
+ {t:"I · 投資",e:"Investment",v:"~18% GDP",leaf:[["固定投資","設備/智財/建物","Fixed"],["住宅投資","開工/許可/NAHB","Residential"],["存貨變動","庫存循環","Inventory"],["資本支出","AI/半導體 capex","Capex"]]},
+ {t:"G · 政府支出 · 財政",e:"Government · Fiscal",v:"~17% GDP",leaf:[["聯邦/州/地方","支出結構","Gov Layers"],["財政赤字","~$1.9T · GDP 5.8%","Deficit"],["國債/利息","債/GDP 101→124% · 淨利息>$1T","Debt/Interest"],["評等","失 AAA · term premium","Rating"]]},
+ {t:"X − M · 淨出口 · 美元",e:"Net Exports · USD",v:"逆差",leaf:[["出口/進口","貿易帳/關稅有效稅率","Trade"],["美元 DXY","強弱/避險/套利","USD Index"],["匯率","USD/JPY · USD/TWD · EUR/USD","FX"],["資金流","回流/carry unwind","Flows"]]},
+ {t:"央行政策 FED",e:"Central Bank · FED",v:"政策軸",leaf:[["政策利率","Fed Funds · 點陣圖中位 3.8%","Policy Rate"],["殖利率曲線","2Y/10Y/3M · 倒掛訊號","Yield Curve"],["資產負債","QT/QE · 準備金","Balance Sheet"],["前瞻指引","2026 升息路徑 · 終端利率","Guidance"]]},
+ {t:"區域指數展開",e:"Regional Indices",v:"6 區",leaf:[["美國 US","S&P500 / Nasdaq / Dow","US"],["歐洲 EU","STOXX600 / DAX","EU"],["日本 JP","Nikkei225 / TOPIX · BoJ 1.0%","JP"],["中國 CN","滬深300 / HSI","CN"],["台灣 TW","加權 ^TWII / 櫃買","TW"],["新興 EM","MSCI EM","EM"]]},
+ {t:"經濟分類指標指數",e:"Indicator Classes",v:"領先/同時/落後",leaf:[["領先","PMI/新訂單/初領/殖利率曲線","Leading"],["同時","非農/工業生產/實質所得","Coincident"],["落後","CPI/PCE/失業率/單位勞動成本","Lagging"],["通膨","Core CPI 2.9% · PPI · PCE","Inflation"]]}
+];
+$("tree").innerHTML=TREE.map((n,i)=>`<div class="idn${i===0?' op':''}" data-i="${i}"><div class="ih"><span class="ico">${i===0?'−':'+'}</span><span class="it">${n.t}</span><span class="ie">${n.e}</span><span class="iv">${n.v}</span></div><div class="ic">${n.leaf.map(l=>`<div class="leaf"><span class="lk2">${l[0]}</span><span class="lv">${l[1]}<span class="ld">${l[2]}</span></span></div>`).join("")}</div></div>`).join("");
+$("tree").querySelectorAll(".idn .ih").forEach(h=>h.onclick=()=>{const n=h.parentElement;n.classList.toggle("op");n.querySelector(".ico").textContent=n.classList.contains("op")?"−":"+";});
+
+// params
+$("params").innerHTML=[["圖類型",CHARTS.length],["配色",QUAL.length+SEQ.length+DIV.length],["引擎規範",ENG.length],["總經節點",TREE.length]].map(p=>`<div class="pcell"><div class="pn">${p[1]}</div><div class="pk">${p[0]}</div></div>`).join("");
+
+// tabs
+const TABS=[["chart","① 軸×圖類型×規範"],["color","② Seaborn 配色"],["engine","③ 動態/靜態引擎"],["macro","④ 總經恆等式展開"]];
+let cur="chart";
+$("tabs").innerHTML=TABS.map(([id,n])=>`<div class="tab ${id===cur?'on':''}" data-id="${id}">${n}</div>`).join("");
+$("tabs").querySelectorAll(".tab").forEach(t=>t.onclick=()=>{cur=t.dataset.id;$("tabs").querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x.dataset.id===cur));document.querySelectorAll(".sec").forEach(s=>s.classList.toggle("on",s.id==="sec-"+cur));});
+</script>
+</body></html>

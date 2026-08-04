@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f4f0; --bg2:#e5e3df; --paper:#ffffff; --paper2:#fafaf8;
+    --ink:#1e1d1a; --ink2:#33403f; --mut:#6b6860; --mut2:#9c9890;
+    --line:#dbd9d3; --soft:#ecebe6;
+    --blue:#4c78a8; --grey:#9c9890; --teal:#439a9a;
+    --up:#c96b5a; --down:#5a9e6f; --am:#c4943a; --co:#c96b5a; --vi:#7a6daa; --gn:#5a9e6f; --ro:#b05580;
+    --green:#2d8659; --amber:#c4943a; --red:#b85450; --accent:#439a9a;
+    --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);}
+  body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  ::selection{background:rgba(67,154,154,.22);}
+</style>
+<style>@media print{@page{size:A4;margin:11mm}html,body{background:#fff !important}.__pdfbtn{display:none !important}*{box-shadow:none !important}[style*="position:sticky"]{position:static !important}[style*="overflow-y:auto"],[style*="overflow:auto"],[style*="overflow-x:auto"]{overflow:visible !important;max-height:none !important}table,section,.brk{break-inside:avoid}}</style>
+<script>window.addEventListener('load',function(){if(document.getElementById('__pdfbtn'))return;var b=document.createElement('div');b.id='__pdfbtn';b.className='__pdfbtn';b.innerHTML='<img src="assets/pdf-icon.png" alt="PDF" style="width:30px;height:30px;display:block">';b.title='A4 PDF';b.style.cssText='position:fixed;top:12px;right:14px;z-index:99999;background:transparent;border:none;padding:0;font:700 10px monospace;letter-spacing:.5px;cursor:pointer;';b.onclick=function(){window.print()};document.body.appendChild(b);});</script>
+</helmet>
+
+<div ref="{{ rootRef }}" style="max-width:1360px;margin:0 auto;padding:0 22px 46px;">
+
+  <div style="position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50;"></div>
+
+  <header style="position:relative;padding:22px 0 10px;margin-bottom:12px;border-bottom:2px solid var(--ink);">
+    <div style="font:700 10px 'DM Mono',monospace;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px;">VERITAS INTELLIGENCE ANALYTICS · 全球總經指標</div>
+    <h1 style="font:800 18px/1.2 'Syne',sans-serif;color:var(--ink);">全球總經指標 <span style="color:var(--up);">PMI · 通膨 · 消費</span> · Global Macro</h1>
+    <p style="margin-top:5px;font:400 10.5px/1.5 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:980px;">製造業/服務業 PMI 含分項細節、CPI / PPI 細項、零售 / 消費 / 消費者信心、就業勞動市場、金融市場×商品指數 — 美國 · 歐洲 · 日本 · 中國 · 台灣 · 東南亞 · 南亞 · 中東 · 澳洲 九區並列。PMI 50 為榮枯線；YoY 紅升綠降。</p>
+  </header>
+
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#1e1d1a;border-radius:3px;padding:6px 13px;margin-bottom:8px;">
+    <span style="display:inline-flex;align-items:center;gap:6px;font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase;">🔒 VISUAL LOCK · 全格式鎖定</span>
+    <span style="display:inline-flex;align-items:center;gap:4px;font:500 8px 'DM Mono',monospace;color:#cfcabf;">色票
+      <span style="width:11px;height:11px;border-radius:2px;background:#4c78a8;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#439a9a;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#9c9890;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#c96b5a;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#5a9e6f;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#f5f4f0;border:1px solid #555;"></span>
+    </span>
+    <span style="font:500 8px 'DM Mono',monospace;color:#8a948f;">字體 Syne / DM Sans / DM Mono</span>
+    <span style="font:500 8px 'DM Mono',monospace;color:#8a948f;">漲紅跌綠 · 千分位 · 熱力色階</span>
+    <span style="margin-left:auto;font:700 8px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:2px 8px;">v1.0 · LOCKED 2026-06-22</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;background:#fff;border:1px solid #dbd9d3;border-left:3px solid #439a9a;border-radius:3px;padding:6px 13px;margin-bottom:12px;">
+    <span style="font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;">🛰 資料請求 · VDF ENGINES</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">TWSE→rest</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#c4943a;border-radius:3px;padding:1px 6px;">SITCA→parse</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">MOPS→parse</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">yfinance→pyproc</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#c0584e;border-radius:3px;padding:1px 6px;">FactSet→keyed</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">FRED→keyed</span>
+    <span style="margin-left:auto;font:500 8px 'DM Mono',monospace;color:#9c9890;">request.json → VDF 擷取 → 雙重驗算 → Parquet → JSON</span>
+  </div>
+
+  <details data-contract="1" style="margin-bottom:12px;border:1px solid #dbd9d3;border-left:3px solid #1e1d1a;border-radius:3px;background:#fbfaf7;overflow:hidden;">
+    <summary style="cursor:pointer;user-select:none;padding:6px 13px;font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;list-style:none;">📜 引擎連接合約 · request.json（點擊展開 · 可選取複製）</summary>
+    <pre style="margin:0;padding:10px 13px;background:#1e1d1a;color:#cfe3d6;font:500 9px/1.55 'DM Mono',monospace;white-space:pre;overflow-x:auto;">{
+  "request": "global_macro_indicators",
+  "asof": "2026-06-22",
+  "universe": { "market": "TW", "exchange": ["TWSE","TPEX"] },
+  "sources": ["TWSE","TPEX","SITCA","MOPS","yfinance","FactSet","FRED"],
+  "engines": { "TWSE":"rest","TPEX":"rest","SITCA":"parse","MOPS":"parse","yfinance":"pyproc","FactSet":"keyed","FRED":"keyed" },
+  "range": { "start":"1996-01-01","end":"latest" },
+  "verify": "double_identity",
+  "db_discover": { "folder":"D:\\VDF\\databases\\","recursive":true,"match":["*.parquet","*.duckdb","*.db","*.csv"] },
+  "sink": { "parquet":"vdf/global_macro_indicators/","export":"global_macro_indicators.json" }
+}</pre>
+    <div style="padding:6px 13px;font:400 8px 'DM Sans','Noto Sans TC',sans-serif;color:#9c9890;">本檔即以此合約向 VDF 引擎請求 → 依 engines 分流(rest/parse/pyproc/keyed) → 雙重恆等驗算 → 落地 Parquet → 匯出 <b style="color:#6b6860;">global_macro_indicators.json</b> 覆蓋本頁資料源。</div>
+  </details>
+
+  <!-- country legend -->
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;font:600 9px 'DM Mono',monospace;color:var(--mut);">
+    <span style="font-weight:700;color:var(--ink2);">國別：</span>
+    <sc-for list="{{ countries }}" as="c" hint-placeholder-count="6">
+      <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:10px;height:10px;border-radius:2px;background:{{ c.color }};"></span>{{ c.flagEl }}{{ c.name }}</span>
+    </sc-for>
+  </div>
+
+  <!-- row gradient legend -->
+  <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:12px;font:600 9px 'DM Mono',monospace;color:var(--mut);">
+    <span style="font-weight:700;color:var(--ink2);">同列色階：</span>
+    <span style="display:inline-flex;align-items:center;gap:6px;">低<span style="width:80px;height:10px;border-radius:2px;background:linear-gradient(90deg,rgba(45,134,89,.85),rgba(217,168,33,.4),rgba(192,57,43,.85));display:inline-block;"></span>高</span>
+    <span style="font-weight:500;">常態分布(z→CDF)逐列上色，跨國比高低</span>
+    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;border-radius:2px;box-shadow:inset 0 0 0 1.5px rgba(201,107,90,.95);display:inline-block;"></span>該列最高</span>
+    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:11px;height:11px;border-radius:2px;box-shadow:inset 0 0 0 1.5px rgba(90,158,111,.95);display:inline-block;"></span>該列最低</span>
+  </div>
+
+  <!-- macro identity banner -->
+  <div style="background:var(--paper);border:1px solid var(--line);border-top:2px solid var(--ink);border-radius:3px;padding:10px 14px;margin-bottom:10px;">
+    <div style="font:700 8px 'DM Mono',monospace;letter-spacing:1.2px;color:var(--mut);text-transform:uppercase;margin-bottom:6px;">總體經濟恆等式 · Macro Identity</div>
+    <div style="font:800 13px/1.5 'Syne','Noto Sans TC',sans-serif;color:var(--ink);display:flex;flex-wrap:wrap;align-items:center;gap:6px;">
+      <span>名目 GDP</span><span style="color:var(--mut2);">＝</span>
+      <span>實質 GDP <span style="color:var(--vi);">×(1+通膨率)</span></span><span style="color:var(--mut2);">＝</span>
+      <span style="color:var(--co);">民間消費 C</span><span style="color:var(--mut2);">＋</span>
+      <span style="color:var(--blue);">投資 I</span><span style="color:var(--mut2);">＋</span>
+      <span style="color:var(--am);">政府支出 G</span><span style="color:var(--mut2);">＋</span>
+      <span style="color:var(--teal);">淨出口 (X−M)</span>
+    </div>
+  </div>
+
+  <details style="margin-bottom:12px;border:1px solid var(--line);border-left:3px solid var(--vi);border-radius:3px;background:#fbfaf7;overflow:hidden;">
+    <summary style="cursor:pointer;user-select:none;padding:7px 14px;font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;list-style:none;">🧭 景氣時序 × 恆等式對齊 · 領先(上) / 同步(中) / 落後(下)（點擊展開）</summary>
+    <div style="display:grid;grid-template-columns:1fr;gap:1px;background:var(--line);border-top:1px solid var(--line);">
+      <sc-for list="{{ identityBands }}" as="b" hint-placeholder-count="3">
+        <div style="background:var(--paper);display:flex;gap:12px;align-items:flex-start;padding:9px 14px;">
+          <div style="flex:none;width:118px;">
+            <div style="font:800 10.5px 'Syne','Noto Sans TC',sans-serif;color:{{ b.css }};">{{ b.tier }}</div>
+            <div style="font:600 7.5px 'DM Mono',monospace;color:var(--mut2);text-transform:uppercase;letter-spacing:.4px;margin-top:2px;">{{ b.comp }}</div>
+          </div>
+          <div style="flex:1;display:flex;flex-wrap:wrap;gap:5px;">
+            <sc-for list="{{ b.items }}" as="it" hint-placeholder-count="5">
+              <span style="font:600 8.5px 'Noto Sans TC',sans-serif;background:var(--soft);border-radius:3px;padding:2px 8px;color:var(--ink2);">{{ it }}</span>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </details>
+
+  <!-- tabs -->
+  <div style="display:flex;gap:4px;margin-bottom:13px;border-bottom:1px solid var(--line);flex-wrap:wrap;">
+    <div onClick="{{ tabMfg }}" style="font:700 11px 'Syne',sans-serif;padding:7px 13px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;position:relative;top:1px;user-select:none;{{ tcMfg }}">🏭 製造業 PMI</div>
+    <div onClick="{{ tabSvc }}" style="font:700 11px 'Syne',sans-serif;padding:7px 13px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;position:relative;top:1px;user-select:none;{{ tcSvc }}">🛎️ 服務業 PMI</div>
+    <div onClick="{{ tabInf }}" style="font:700 11px 'Syne',sans-serif;padding:7px 13px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;position:relative;top:1px;user-select:none;{{ tcInf }}">📈 通膨 CPI/PPI</div>
+    <div onClick="{{ tabCon }}" style="font:700 11px 'Syne',sans-serif;padding:7px 13px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;position:relative;top:1px;user-select:none;{{ tcCon }}">🛒 消費 零售/信心</div>
+    <div onClick="{{ tabEmp }}" style="font:700 11px 'Syne',sans-serif;padding:7px 13px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;position:relative;top:1px;user-select:none;{{ tcEmp }}">👷 就業 勞動市場</div>
+    <div onClick="{{ tabFin }}" style="font:700 11px 'Syne',sans-serif;padding:7px 13px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;position:relative;top:1px;user-select:none;{{ tcFin }}">💹 金融市場</div>
+    <div onClick="{{ tabChart }}" style="font:700 11px 'Syne',sans-serif;padding:7px 13px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;position:relative;top:1px;user-select:none;{{ tcChart }}">📊 指數×PMI(總經圖 · 置底)</div>
+  </div>
+
+  <!-- ===== PMI (mfg / svc) ===== -->
+  <sc-if value="{{ isPmi }}">
+  <div>
+    <!-- headline strip -->
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:13px;">
+      <sc-for list="{{ headline }}" as="h" hint-placeholder-count="6">
+        <div style="position:relative;overflow:hidden;background:var(--paper);border:1px solid var(--line);border-top:3px solid {{ h.color }};border-radius:2px;padding:8px 11px 7px;">
+          <div style="position:absolute;left:0;right:0;bottom:0;height:24px;pointer-events:none;">{{ h.spark }}</div>
+          <div style="position:relative;display:flex;align-items:center;justify-content:space-between;gap:4px;font:600 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);margin-bottom:2px;">
+            <span style="display:inline-flex;align-items:center;">{{ h.flagEl }}{{ h.name }}</span>
+            <span style="font:700 8px 'DM Mono',monospace;color:#fff;background:{{ h.zoneCss }};border-radius:2px;padding:1px 5px;">{{ h.zone }}</span>
+          </div>
+          <div style="position:relative;display:flex;align-items:baseline;justify-content:space-between;gap:5px;">
+            <span style="font:500 20px 'DM Mono',monospace;{{ h.valCss }}">{{ h.val }}</span>
+            <span style="font:600 8px 'DM Mono',monospace;{{ h.chgCss }}">{{ h.chg }}</span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <!-- per-country 3-month component matrix -->
+    <div style="font:700 12px 'Syne',sans-serif;color:var(--ink);margin:4px 0 8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">{{ pmiTitle }} · 分項細節 · 近六月<span style="font:600 8px 'DM Mono',monospace;color:#fff;background:var(--ink);border-radius:2px;padding:2px 8px;">≥50 擴張 · &lt;50 收縮</span><span style="font:600 8px 'DM Mono',monospace;color:var(--mut);">▲ 較前升(紅) ▼ 較前降(綠)</span></div>
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:9px;">
+      <sc-for list="{{ pmiCards }}" as="g" hint-placeholder-count="6">
+        <div style="border:1px solid var(--line);border-left:3px solid {{ g.color }};border-radius:2px;overflow:hidden;background:var(--paper);">
+          <div style="display:flex;align-items:center;gap:6px;padding:5px 10px;border-bottom:1px solid var(--line);background:var(--paper2);">
+            <span style="display:inline-flex;align-items:center;gap:4px;font:700 10.5px 'Syne',sans-serif;color:var(--ink);">{{ g.flagEl }}{{ g.name }}</span>
+            <span style="margin-left:auto;font:700 12px 'DM Mono',monospace;{{ g.headCss }}">{{ g.headline }}</span>
+          </div>
+          <table style="width:100%;border-collapse:separate;border-spacing:0;">
+            <thead><tr>
+              <th style="text-align:left;padding:3px 9px;font:700 7.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">分項</th>
+              <th style="text-align:center;padding:3px 3px;font:700 7.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">當月</th>
+              <th style="text-align:center;padding:3px 3px;font:700 7.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">前1</th>
+              <th style="text-align:center;padding:3px 3px;font:700 7.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">前2</th>
+              <th style="text-align:center;padding:3px 3px;font:700 7.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">前3</th>
+              <th style="text-align:center;padding:3px 3px;font:700 7.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">前4</th>
+              <th style="text-align:center;padding:3px 3px;font:700 7.5px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">前5</th>
+            </tr></thead>
+            <tbody>
+              <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="5">
+                <tr>
+                  <td style="padding:3px 9px;border-top:1px solid var(--soft);font:600 8.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);white-space:nowrap;">{{ r.label }}</td>
+                  <sc-for list="{{ r.cells }}" as="x" hint-placeholder-count="6">
+                    <td style="border-top:1px solid var(--soft);text-align:center;font:600 8px 'DM Mono',monospace;color:{{ x.fg }};background:{{ x.bg }};font-variant-numeric:tabular-nums;padding:2px 3px;white-space:nowrap;">{{ x.v }}<span style="font-size:6px;margin-left:1px;{{ x.triCss }}">{{ x.tri }}</span></td>
+                  </sc-for>
+                </tr>
+              </sc-for>
+            </tbody>
+          </table>
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:2px;padding:9px 13px;margin-top:10px;font:400 10px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">{{ pmiNote }}</div>
+  </div>
+  </sc-if>
+
+  <!-- ===== INFLATION ===== -->
+  <sc-if value="{{ isInf }}">
+  <div>
+    <div style="border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper);overflow-x:auto;">
+      <table style="width:100%;border-collapse:separate;border-spacing:0;min-width:1280px;">
+        <thead><tr>
+          <th style="text-align:left;padding:6px 11px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">指標</th>
+          <sc-for list="{{ countries }}" as="c" hint-placeholder-count="6">
+            <th style="text-align:center;padding:6px 8px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);white-space:nowrap;">{{ c.flagEl }}{{ c.name }}</th>
+          </sc-for>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ infRows }}" as="r" hint-placeholder-count="6">
+            <sc-if value="{{ r.isHead }}">
+              <tr><td colspan="10" style="padding:5px 11px;border-top:1px solid var(--line);font:700 8.5px 'DM Mono',monospace;letter-spacing:.5px;color:#fff;background:{{ r.headCss }};">{{ r.label }}</td></tr>
+            </sc-if>
+            <sc-if value="{{ r.isRow }}">
+              <tr style="background:{{ r.bg }};">
+                <td style="padding:5px 11px;border-top:1px solid var(--soft);font:600 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);white-space:nowrap;">{{ r.label }} <span style="font:400 7.5px 'DM Mono',monospace;color:var(--mut2);">{{ r.unit }}</span></td>
+                <sc-for list="{{ r.cells }}" as="x" hint-placeholder-count="6">
+                  <td style="border-top:1px solid var(--soft);text-align:center;font:600 9px 'DM Mono',monospace;font-variant-numeric:tabular-nums;color:var(--ink2);background:{{ x.bg }};box-shadow:{{ x.ring }};">{{ x.v }}</td>
+                </sc-for>
+              </tr>
+            </sc-if>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+    <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--am);border-radius:2px;padding:9px 13px;margin-top:10px;font:400 10px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);"><b style="color:var(--ink);">讀法：</b>CPI/PPI 為 YoY 年增率（紅升綠降，越高通膨壓力越大）；核心 CPI 剔除食品能源。PPI 領先 CPI（生產端傳導消費端）。日本擺脫通縮、中國近通縮邊緣為當前焦點。</div>
+  </div>
+  </sc-if>
+
+  <!-- ===== CONSUMPTION ===== -->
+  <sc-if value="{{ isCon }}">
+  <div>
+    <div style="border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper);overflow-x:auto;">
+      <table style="width:100%;border-collapse:separate;border-spacing:0;min-width:1280px;">
+        <thead><tr>
+          <th style="text-align:left;padding:6px 11px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">指標</th>
+          <sc-for list="{{ countries }}" as="c" hint-placeholder-count="6">
+            <th style="text-align:center;padding:6px 8px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);white-space:nowrap;">{{ c.flagEl }}{{ c.name }}</th>
+          </sc-for>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ conRows }}" as="r" hint-placeholder-count="5">
+            <tr style="background:{{ r.bg }};">
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);font:600 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);white-space:nowrap;">{{ r.label }} <span style="font:400 7.5px 'DM Mono',monospace;color:var(--mut2);">{{ r.unit }}</span></td>
+              <sc-for list="{{ r.cells }}" as="x" hint-placeholder-count="6">
+                <td style="border-top:1px solid var(--soft);text-align:center;font:600 9px 'DM Mono',monospace;font-variant-numeric:tabular-nums;color:var(--ink2);background:{{ x.bg }};box-shadow:{{ x.ring }};">{{ x.v }}</td>
+              </sc-for>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+    <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--vi);border-radius:2px;padding:9px 13px;margin-top:10px;font:400 10px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);"><b style="color:var(--ink);">讀法：</b>零售銷售/消費 YoY 反映內需動能；消費者信心指數各國基準不同（美 密大/諮商會、歐 EC、台 NCU），看趨勢與相對高低，非絕對值跨國比較。</div>
+  </div>
+  </sc-if>
+
+  <!-- ===== EMPLOYMENT / LABOR ===== -->
+  <sc-if value="{{ isEmp }}">
+  <div>
+    <div style="border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper);overflow-x:auto;">
+      <table style="width:100%;border-collapse:separate;border-spacing:0;min-width:1280px;">
+        <thead><tr>
+          <th style="text-align:left;padding:6px 11px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">指標</th>
+          <sc-for list="{{ countries }}" as="c" hint-placeholder-count="9">
+            <th style="text-align:center;padding:6px 8px;font:700 8.5px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);white-space:nowrap;">{{ c.flagEl }}{{ c.name }}</th>
+          </sc-for>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ empRows }}" as="r" hint-placeholder-count="12">
+            <tr style="background:{{ r.bg }};">
+              <td style="padding:5px 11px;border-top:1px solid var(--soft);font:600 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);white-space:nowrap;">{{ r.label }} <span style="font:400 7.5px 'DM Mono',monospace;color:var(--mut2);">{{ r.unit }}</span></td>
+              <sc-for list="{{ r.cells }}" as="x" hint-placeholder-count="9">
+                <td style="border-top:1px solid var(--soft);text-align:center;font:600 9px 'DM Mono',monospace;font-variant-numeric:tabular-nums;color:var(--ink2);background:{{ x.bg }};box-shadow:{{ x.ring }};">{{ x.v }}</td>
+              </sc-for>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+    <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--down);border-radius:2px;padding:9px 13px;margin-top:10px;font:400 10px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);"><b style="color:var(--ink);">讀法：</b>就業為<b>落後指標</b>(對齊恆等式 C 端的所得支撐)。失業率/青年失業率越低越緊俏;職缺率高+薪資年增高=勞動市場過熱,通膨僵固風險;實質薪資轉正才支撐民間消費 C。就業 PMI 分項 &lt;50 代表企業縮編,常領先失業率上升 3–6 個月。</div>
+  </div>
+  </sc-if>
+
+  <!-- ===== INDEX × PMI DUAL-AXIS CHARTS ===== -->
+  <sc-if value="{{ isChart }}">
+  <div>
+    <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:11px;font:600 9px 'DM Mono',monospace;color:var(--mut);">
+      <span style="font-weight:700;color:var(--ink2);">2023 → 最新 · 各國一製造業一非製造業</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:14px;height:3px;background:var(--mut2);border-radius:2px;display:inline-block;"></span>左軸 股價指數</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:14px;height:3px;background:#33403f;border-radius:2px;display:inline-block;"></span>右軸 PMI</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:14px;height:0;border-top:2px dashed #c96b5a;display:inline-block;"></span>50 榮枯線</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(540px,1fr));gap:10px;">
+      <sc-for list="{{ chartCountries }}" as="c" hint-placeholder-count="6">
+        <div style="border:1px solid var(--line);border-left:3px solid {{ c.color }};border-radius:2px;overflow:hidden;background:var(--paper);">
+          <div style="display:flex;align-items:center;gap:6px;padding:5px 11px;border-bottom:1px solid var(--line);background:var(--paper2);">
+            <span style="font:700 11px 'Syne',sans-serif;color:var(--ink);">{{ c.flagEl }}{{ c.name }}</span>
+            <span style="font:500 8.5px 'DM Mono',monospace;color:var(--mut);">{{ c.idxName }}</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+            <div style="padding:7px 8px;border-right:1px solid var(--line);">
+              <div style="font:700 8.5px 'DM Mono',monospace;color:var(--ink2);margin-bottom:2px;">製造業 PMI</div>
+              {{ c.mfgChart }}
+            </div>
+            <div style="padding:7px 8px;">
+              <div style="font:700 8.5px 'DM Mono',monospace;color:var(--ink2);margin-bottom:2px;">非製造業 PMI</div>
+              {{ c.svcChart }}
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--blue);border-radius:2px;padding:9px 13px;margin-top:10px;font:400 10px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);"><b style="color:var(--ink);">讀法：</b>股價指數（左軸，國別色）對照 PMI（右軸，深灰）。PMI 跌破紅色 50 榮枯線常領先股市修正；PMI 自谷底回升越線多伴隨指數轉強。右軸固定 40–60，故 50 線位置跨國一致可比。</div>
+  </div>
+  </sc-if>
+
+  <!-- ===== FINANCIAL MARKETS ===== -->
+  <sc-if value="{{ isFin }}">
+  <div>
+    <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:11px;font:600 9px 'DM Mono',monospace;color:var(--mut);">
+      <span style="font-weight:700;color:var(--ink2);">全球金融市場 × 商品指數 · 近 42 期走勢(示意)</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:12px;height:8px;border-radius:2px;background:rgba(201,107,90,.5);display:inline-block;"></span>上漲 紅</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;"><span style="width:12px;height:8px;border-radius:2px;background:rgba(90,158,111,.5);display:inline-block;"></span>下跌 綠</span>
+      <span style="font-weight:500;">折線下方面積填色 0.5 · 漲紅跌綠</span>
+    </div>
+
+    <div style="font:700 11px 'Syne',sans-serif;color:var(--ink);margin:2px 0 7px;display:flex;align-items:center;gap:7px;">股價指數 · Equity Indices<span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:var(--ink);border-radius:2px;padding:2px 7px;">含 道瓊 · 費半</span></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:9px;">
+      <sc-for list="{{ finEquity }}" as="m" hint-placeholder-count="9">
+        <div style="border:1px solid var(--line);border-radius:3px;overflow:hidden;background:var(--paper);">
+          <div style="display:flex;align-items:center;gap:7px;padding:7px 11px 5px;">
+            {{ m.flagEl }}
+            <div style="min-width:0;">
+              <div style="font:700 10.5px 'Noto Sans TC',sans-serif;color:var(--ink);line-height:1.15;">{{ m.name }}</div>
+              <div style="font:500 7.5px 'DM Mono',monospace;color:var(--mut2);letter-spacing:.4px;">{{ m.code }}</div>
+            </div>
+            <div style="margin-left:auto;text-align:right;">
+              <div style="font:600 13px 'DM Mono',monospace;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.1;">{{ m.last }}</div>
+              <div style="font:700 8.5px 'DM Mono',monospace;{{ m.chgCss }}">{{ m.chg }}</div>
+            </div>
+          </div>
+          <div style="padding:0 2px 2px;">{{ m.chart }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="font:700 11px 'Syne',sans-serif;color:var(--ink);margin:16px 0 7px;">能源 · 金屬 · 商品 · Commodities</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:9px;">
+      <sc-for list="{{ finCommodity }}" as="m" hint-placeholder-count="5">
+        <div style="border:1px solid var(--line);border-radius:3px;overflow:hidden;background:var(--paper);">
+          <div style="display:flex;align-items:center;gap:7px;padding:7px 11px 5px;">
+            <span style="flex:none;width:16px;height:16px;border-radius:50%;background:var(--soft);display:grid;place-items:center;font:700 8px 'DM Mono',monospace;color:var(--am);box-shadow:0 0 0 1px var(--line);">◆</span>
+            <div style="min-width:0;">
+              <div style="font:700 10.5px 'Noto Sans TC',sans-serif;color:var(--ink);line-height:1.15;">{{ m.name }}</div>
+              <div style="font:500 7.5px 'DM Mono',monospace;color:var(--mut2);letter-spacing:.4px;">{{ m.code }}</div>
+            </div>
+            <div style="margin-left:auto;text-align:right;">
+              <div style="font:600 13px 'DM Mono',monospace;color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.1;">{{ m.last }}</div>
+              <div style="font:700 8.5px 'DM Mono',monospace;{{ m.chgCss }}">{{ m.chg }}</div>
+            </div>
+          </div>
+          <div style="padding:0 2px 2px;">{{ m.chart }}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--co);border-radius:2px;padding:9px 13px;margin-top:12px;font:400 10px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);"><b style="color:var(--ink);">讀法：</b>各金融市場/商品指數後方折線圖為近 42 期走勢，折線下方面積依方向填色 — <b style="color:var(--up);">上漲紅</b> / <b style="color:var(--down);">下跌綠</b>（台股慣例）。含 <b style="color:var(--ink);">道瓊工業指數</b> 與 <b style="color:var(--ink);">費城半導體指數</b>。示意資料，非投資建議。</div>
+  </div>
+  </sc-if>
+
+  <footer style="margin-top:22px;border-top:1px solid var(--line);padding-top:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font:500 10px 'DM Mono',monospace;color:var(--mut);">
+    <span style="font-weight:700;letter-spacing:1.3px;color:var(--ink);">VERITAS INTELLIGENCE ANALYTICS</span>
+    <span>Global Macro · PMI / CPI / Consumption · Visual Lock SSOT</span>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{ &quot;$preview&quot;: { &quot;width&quot;: 1360, &quot;height&quot;: 760 } }">
+class Component extends DCLogic {
+  state = { tab: 'mfg' };
+
+  _countries() {
+    return [
+      { key: 'US', name: '美國', flag: '🇺🇸', color: 'var(--co)' },
+      { key: 'EU', name: '歐洲', flag: '🇪🇺', color: 'var(--blue)' },
+      { key: 'JP', name: '日本', flag: '🇯🇵', color: 'var(--vi)' },
+      { key: 'CN', name: '中國', flag: '🇨🇳', color: 'var(--am)' },
+      { key: 'TW', name: '台灣', flag: '🇹🇼', color: 'var(--teal)' },
+      { key: 'SEA', name: '東南亞', flag: '🇮🇩', color: 'var(--gn)' },
+      { key: 'SAS', name: '南亞', flag: '🇮🇳', color: 'var(--ro)' },
+      { key: 'ME', name: '中東', flag: '🇸🇦', color: '#8f7a3c' },
+      { key: 'AU', name: '澳洲', flag: '🇦🇺', color: '#6b6860' },
+    ];
+  }
+
+  _flagUrl(key) { const m = { US:'us', EU:'eu', JP:'jp', CN:'cn', TW:'tw', SEA:'id', SAS:'in', ME:'sa', AU:'au' }; return 'https://flagcdn.com/w40/' + (m[key] || 'un') + '.png'; }
+  _flagEl(key, size) { const E = React.createElement; const s = size || 14; return E('img', { src: this._flagUrl(key), alt: '', style: { width: s + 'px', height: s + 'px', borderRadius: '50%', objectFit: 'cover', boxShadow: '0 0 0 1px var(--line)', verticalAlign: '-2px', marginRight: '4px', flex: 'none' } }); }
+
+  // Financial-market & commodity indices — [name, code, flagKey|null, last, chgPct]
+  _finMarkets() {
+    return {
+      equity: [
+        ['道瓊工業指數', 'DJI', 'US', 43210, 0.18],
+        ['S&P 500', 'SPX', 'US', 5930, 0.42],
+        ['那斯達克 100', 'NDX', 'US', 21480, 0.65],
+        ['費城半導體指數', 'SOX', 'US', 5240, 1.05],
+        ['歐洲 STOXX 50', 'SX5E', 'EU', 5040, 0.20],
+        ['日經 225', 'N225', 'JP', 39200, -0.30],
+        ['滬深 300', 'CSI300', 'CN', 3520, -0.42],
+        ['台灣加權指數', 'TWII', 'TW', 22900, 0.50],
+        ['澳洲 ASX 200', 'AXJO', 'AU', 7880, 0.22],
+      ],
+      commodity: [
+        ['西德州原油 WTI', 'CL', null, 78.4, 1.20],
+        ['布蘭特原油', 'BRENT', null, 82.1, 0.98],
+        ['黃金', 'XAU', null, 2380, 0.30],
+        ['銅', 'HG', null, 4.35, -0.61],
+        ['天然氣', 'NG', null, 2.85, -1.42],
+      ],
+    };
+  }
+
+  // sparkline with red(up)/green(down) area fill under the line
+  _areaChart(series, rising, hgt) {
+    const E = React.createElement;
+    const n = series.length, W = 168, H = hgt || 42, mT = 4, mB = 3;
+    const x = i => W * (i / (n - 1));
+    let lo = Math.min.apply(null, series), hi = Math.max.apply(null, series); const pad = (hi - lo) * 0.14 || 1; lo -= pad; hi += pad;
+    const y = v => mT + (H - mT - mB) * (1 - (v - lo) / (hi - lo));
+    const col = rising ? '#c96b5a' : '#5a9e6f';
+    const line = series.map((v, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1)).join(' ');
+    const area = line + ' L ' + W.toFixed(1) + ' ' + H + ' L 0 ' + H + ' Z';
+    return E('svg', { viewBox: '0 0 ' + W + ' ' + H, width: '100%', height: H, preserveAspectRatio: 'none', style: { display: 'block' } },
+      E('path', { d: area, fill: col, 'fill-opacity': 0.5, stroke: 'none' }),
+      E('path', { d: line, fill: 'none', stroke: col, strokeWidth: 1, strokeLinejoin: 'round' }),
+      E('circle', { cx: x(n - 1), cy: y(series[n - 1]), r: 1.8, fill: col }));
+  }
+
+  // 景氣時序分類，對齊名目GDP恆等式 C+I+G+(X−M)
+  _identityBands() {
+    return [
+      { tier: '領先 Leading', css: 'var(--co)', comp: '需求/預期端', items: ['製造業 PMI 新訂單', '股價指數(道瓊/費半/S&P)', '殖利率曲線利差', '新出口訂單', '消費者信心'] },
+      { tier: '同步 Coincident', css: 'var(--am)', comp: 'C + I 實現端', items: ['工業生產', '零售銷售', '民間消費 C', '就業/薪資', '企業投資 I'] },
+      { tier: '落後 Lagging', css: 'var(--teal)', comp: '價格/政策端', items: ['CPI / 核心 CPI', '失業率', '未交訂單', '單位勞動成本', '政府支出 G · 淨出口(X−M)'] },
+    ];
+  }
+
+  // PMI sub-components: [label, en, US, EU, JP, CN, TW, AU]
+  _mfg() {
+    return {
+      headline: ['Headline 製造業 PMI', 'Headline', 48.7, 45.8, 50.1, 50.8, 48.3, 51.2, 57.5, 54.2, 47.6],
+      prev: [48.4, 46.1, 49.6, 50.4, 47.9, 50.8, 57.0, 53.8, 47.2],
+      rows: [
+        ['新訂單', 'New Orders', 49.2, 44.3, 50.6, 51.2, 49.1, 51.8, 58.4, 55.0, 47.8],
+        ['生產', 'Production/Output', 50.4, 45.0, 51.0, 51.5, 50.2, 52.4, 59.2, 55.8, 48.4],
+        ['就業', 'Employment', 47.3, 44.8, 49.4, 48.6, 47.0, 50.6, 55.4, 52.6, 46.9],
+        ['供應商交貨', 'Supplier Deliveries', 50.1, 49.2, 50.8, 49.9, 50.4, 50.9, 52.2, 51.4, 49.6],
+        ['存貨', 'Inventories', 46.8, 45.4, 49.0, 48.2, 46.5, 49.8, 53.0, 50.8, 47.1],
+        ['客戶存貨', 'Customers\u2019 Inventories', 48.2, 49.0, 47.8, 47.4, 48.6, 48.9, 47.2, 48.4, 48.0],
+        ['物價', 'Prices', 54.6, 52.3, 53.1, 49.8, 55.2, 53.8, 56.4, 55.6, 53.4],
+        ['未交訂單', 'Backlog of Orders', 45.9, 43.2, 48.6, 48.9, 46.2, 50.2, 56.0, 52.8, 45.4],
+        ['新出口訂單', 'New Export Orders', 47.1, 44.0, 49.8, 49.2, 48.8, 51.4, 55.2, 51.8, 46.2],
+        ['進口', 'Imports', 48.9, 46.6, 50.2, 50.4, 49.0, 51.0, 56.6, 53.2, 47.9],
+      ],
+      title: 'ISM 製造業 / S&P Global Mfg PMI',
+      note: '美國 ISM；歐洲/日本/澳洲 S&P Global；中國 官方(NBS)；台灣 S&P Global；東南亞(ASEAN·印尼代表)/南亞(印度)/中東(沙烏地) 採 S&P Global 區域 PMI。物價分項普遍 >50 顯示成本壓力仍在；南亞/中東擴張最強、歐洲仍弱、中國重回擴張。',
+    };
+  }
+  _svc() {
+    return {
+      headline: ['Headline 服務業 PMI', 'Headline', 52.6, 49.8, 53.4, 51.6, 53.1, 53.8, 60.2, 56.4, 50.8],
+      prev: [52.1, 50.2, 53.0, 51.2, 52.6, 53.2, 59.6, 55.8, 51.0],
+      rows: [
+        ['商業活動', 'Business Activity', 53.8, 49.6, 54.0, 52.0, 54.2, 54.6, 61.0, 57.2, 51.2],
+        ['新訂單', 'New Orders', 53.0, 48.9, 53.2, 51.8, 53.4, 54.0, 60.4, 56.6, 50.6],
+        ['就業', 'Employment', 51.2, 49.4, 51.6, 49.8, 51.0, 52.2, 56.8, 54.0, 49.9],
+        ['供應商交貨', 'Supplier Deliveries', 50.6, 50.0, 50.4, 50.2, 50.8, 50.9, 52.4, 51.6, 50.1],
+        ['存貨', 'Inventories', 49.4, 48.6, 49.8, 49.0, 49.2, 49.9, 51.8, 50.6, 48.8],
+        ['物價', 'Prices', 57.2, 53.8, 54.6, 50.4, 56.8, 55.2, 58.4, 57.0, 54.2],
+        ['未交訂單', 'Backlog of Orders', 48.8, 47.0, 49.2, 49.4, 48.4, 50.0, 54.6, 51.2, 47.6],
+        ['新出口訂單', 'New Export Orders', 50.2, 48.2, 51.0, 50.6, 51.4, 52.0, 55.8, 52.4, 49.0],
+      ],
+      title: 'ISM 服務業 / S&P Global Services PMI',
+      note: '美國 ISM Services；其餘 S&P Global / Caixin(中國)；東南亞/南亞/中東採 S&P Global 區域服務業 PMI。服務業普遍優於製造業，南亞(印度)服務業擴張全球最強；物價分項偏高反映服務通膨僵固，為各國央行降息節奏的關鍵。',
+    };
+  }
+  // inflation: groups + rows [label, unit, US, EU, JP, CN, TW, AU]
+  _inf() {
+    return [
+      { head: 'CPI 消費者物價（YoY %）', color: 'var(--co)' },
+      ['CPI 總指數', 'YoY%', 3.1, 2.4, 2.8, 0.3, 2.1, 3.2, 5.1, 2.9, 3.6],
+      ['核心 CPI', 'YoY% ex food/energy', 3.4, 2.7, 2.4, 0.6, 1.8, 2.9, 4.4, 2.4, 3.9],
+      ['CPI 月增', 'MoM%', 0.2, 0.1, 0.2, -0.1, 0.1, 0.3, 0.5, 0.2, 0.3],
+      ['食品 CPI', 'YoY%', 2.4, 1.9, 3.4, -0.5, 2.8, 3.6, 6.2, 2.2, 3.0],
+      ['能源 CPI', 'YoY%', 1.8, 0.4, 4.2, -1.2, 1.4, 2.8, 4.0, 1.0, 4.4],
+      ['服務 CPI', 'YoY%', 4.2, 3.6, 2.2, 0.8, 2.0, 3.4, 5.2, 3.2, 4.6],
+      ['核心商品 CPI', 'YoY%', 0.8, 0.6, 2.6, -0.4, 1.2, 2.2, 3.8, 1.8, 1.6],
+      ['居住/房租', 'YoY%', 4.6, 2.8, 0.6, 0.2, 1.8, 2.6, 4.8, 3.6, 5.2],
+      ['通膨預期 1年', '%', 3.0, 2.6, 2.2, 1.8, 2.0, 3.1, 4.6, 2.8, 3.8],
+      { head: 'PPI 生產者物價（YoY %）', color: 'var(--blue)' },
+      ['PPI 總指數', 'YoY%', 2.2, -0.8, 2.6, -2.5, 1.2, 2.4, 3.8, 2.0, 2.8],
+      ['核心 PPI', 'YoY%', 2.6, 0.2, 2.0, -1.8, 0.9, 2.1, 3.2, 1.6, 2.4],
+      ['PPI 月增', 'MoM%', 0.1, -0.1, 0.2, -0.2, 0.1, 0.2, 0.3, 0.1, 0.2],
+    ];
+  }
+  // consumption: rows [label, unit, US, EU, JP, CN, TW, AU]
+  _con() {
+    return [
+      ['零售銷售', 'YoY%', 2.9, 1.2, 1.8, 4.7, 3.4, 5.2, 7.4, 4.8, 1.6],
+      ['零售銷售', 'MoM%', 0.4, 0.1, 0.3, 0.5, 0.6, 0.6, 0.8, 0.5, 0.2],
+      ['民間消費', 'YoY%', 2.4, 0.8, 0.6, 5.0, 2.8, 4.8, 6.8, 4.2, 1.1],
+      ['個人薪資所得', 'YoY%', 4.1, 3.2, 2.0, 5.4, 3.0, 5.6, 8.2, 5.0, 3.4],
+      ['失業率', '%', 4.0, 6.4, 2.5, 5.1, 3.4, 3.0, 7.6, 5.6, 4.1],
+      ['失業率 趨勢', 'MoM Δ', 0.1, -0.1, 0.0, 0.0, -0.1, 0.0, -0.2, -0.1, 0.2],
+      ['汽車銷售', '萬輛/月', 132.0, 98.0, 38.0, 235.0, 3.6, 28.0, 36.0, 12.0, 9.4],
+      ['汽車銷售', 'YoY%', -1.2, 2.4, -3.1, 5.8, 4.2, 6.4, 8.8, 5.2, 1.1],
+      ['電動車銷售', '萬輛/月', 12.4, 18.6, 2.1, 98.0, 0.6, 1.8, 4.2, 0.8, 1.2],
+      ['電動車銷售', 'YoY%', 8.4, 14.2, 6.1, 32.4, 18.6, 24.8, 38.4, 28.6, 22.4],
+      ['EV 滲透率', '%', 9.4, 19.0, 5.5, 41.7, 16.6, 6.4, 11.6, 6.8, 12.8],
+      ['消費者信心', 'index', 69.1, -14.0, 36.2, 86.0, 72.4, 78.2, 92.4, 88.0, 84.6],
+      ['信心 趨勢', 'MoM Δ', 1.8, 0.6, -0.4, 1.2, 0.9, 1.1, 1.6, 0.8, -0.8],
+    ];
+  }
+
+  // employment / labor market: rows [label, unit, US, EU, JP, CN, TW, SEA, SAS, ME, AU]
+  _emp() {
+    return [
+      ['失業率', '%', 4.0, 6.4, 2.5, 5.1, 3.4, 3.0, 7.6, 5.6, 4.1],
+      ['失業率 趨勢', 'MoM Δ', 0.1, -0.1, 0.0, 0.0, -0.1, 0.0, -0.2, -0.1, 0.2],
+      ['青年失業率', '%', 8.6, 14.2, 4.1, 14.9, 8.2, 9.8, 15.8, 11.2, 9.0],
+      ['勞動參與率', '%', 62.6, 74.8, 63.1, 66.9, 59.2, 67.4, 58.2, 61.8, 66.8],
+      ['新增就業', '萬人/月', 18.5, 12.0, 4.2, 90.0, 1.8, 32.0, 85.0, 10.5, 3.2],
+      ['就業增長', 'YoY%', 1.2, 0.8, 0.4, 0.6, 0.9, 2.4, 3.1, 2.6, 1.8],
+      ['職缺率', '%', 4.8, 2.9, 3.2, 1.6, 2.6, 2.2, 1.8, 2.4, 3.3],
+      ['薪資年增', 'YoY%', 4.1, 3.2, 2.0, 5.4, 3.0, 5.6, 8.2, 5.0, 3.4],
+      ['實質薪資年增', 'YoY%', 1.0, 0.8, -0.8, 5.1, 0.9, 2.4, 3.1, 2.1, -0.2],
+      ['平均工時', '小時/週', 34.3, 36.2, 38.4, 46.1, 40.2, 44.6, 48.0, 45.2, 37.8],
+      ['就業 PMI(製造)', 'index', 47.3, 44.8, 49.4, 48.6, 47.0, 50.6, 55.4, 52.6, 46.9],
+      ['就業 PMI(服務)', 'index', 51.2, 49.4, 51.6, 49.8, 51.0, 52.2, 56.8, 54.0, 49.9],
+    ];
+  }
+
+  _rng(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+
+  _indices() {
+    return {
+      US: ['S&P 500', 3840, 5460], EU: ['EuroStoxx 50', 4080, 5040], JP: ['Nikkei 225', 26100, 39200],
+      CN: ['CSI 300', 3960, 3520], TW: ['加權指數', 14600, 22900], SEA: ['MSCI 東協', 640, 742],
+      SAS: ['Nifty 50', 18100, 24800], ME: ['沙烏地 TASI', 10400, 11900], AU: ['ASX 200', 7050, 7880],
+    };
+  }
+  _genSeries(a, b, seed, vol) {
+    const r = this._rng(seed >>> 0); const n = 42; const arr = [];
+    for (let i = 0; i < n; i++) { const t = i / (n - 1); const base = a + (b - a) * t; const wob = Math.sin(i * 0.55 + seed) * 0.5 + (r() - 0.5); arr.push(base + wob * vol); }
+    arr[0] = a; arr[n - 1] = b; return arr;
+  }
+  _dualChart(stock, pmi, stockHex, idxName, pmiLabel) {
+    const E = React.createElement;
+    const n = stock.length, W = 320, H = 184, mL = 34, mR = 24, mT = 10, mB = 18;
+    const x = i => mL + (W - mL - mR) * (i / (n - 1));
+    let slo = Math.min.apply(null, stock), shi = Math.max.apply(null, stock); const sp = (shi - slo) * 0.08 || 1; slo -= sp; shi += sp;
+    const pLo = 40, pHi = 60;
+    const yL = v => mT + (H - mT - mB) * (1 - (v - slo) / (shi - slo));
+    const yR = v => mT + (H - mT - mB) * (1 - (v - pLo) / (pHi - pLo));
+    const months = []; for (let i = 0; i < n; i++) { const m = (i % 12) + 1, y = 2023 + Math.floor(i / 12); months.push(y + '-' + String(m).padStart(2, '0')); }
+    const base = E('line', { x1: mL, x2: W - mR, y1: yR(50), y2: yR(50), stroke: '#c96b5a', strokeWidth: 0.8, opacity: 0.8, strokeDasharray: '4 3' });
+    const fmtL = v => v >= 10000 ? (v / 1000).toFixed(0) + 'k' : (v >= 1000 ? (v / 1000).toFixed(1) + 'k' : String(Math.round(v)));
+    const axis = [
+      E('line', { key: 'axL', x1: mL, x2: mL, y1: mT, y2: H - mB, stroke: '#dbd9d3', strokeWidth: 1 }),
+      E('line', { key: 'axR', x1: W - mR, x2: W - mR, y1: mT, y2: H - mB, stroke: '#dbd9d3', strokeWidth: 1 }),
+      E('line', { key: 'axB', x1: mL, x2: W - mR, y1: H - mB, y2: H - mB, stroke: '#dbd9d3', strokeWidth: 1 })];
+    [0.02, 0.5, 0.98].forEach((f, k) => {
+      const v = slo + (shi - slo) * f, yy = yL(v);
+      axis.push(E('text', { key: 'lt' + k, x: mL - 4, y: yy + 2.5, 'text-anchor': 'end', fill: stockHex, style: { font: "500 7px 'DM Mono',monospace" } }, fmtL(v)));
+      axis.push(E('line', { key: 'lg' + k, x1: mL - 2, x2: mL, y1: yy, y2: yy, stroke: '#9c9890', strokeWidth: 0.8 }));
+    });
+    [40, 45, 50, 55, 60].forEach((v, k) => {
+      const yy = yR(v);
+      axis.push(E('text', { key: 'rt' + k, x: W - mR + 4, y: yy + 2.5, 'text-anchor': 'start', fill: '#33403f', style: { font: "500 7px 'DM Mono',monospace" } }, String(v)));
+      axis.push(E('line', { key: 'rg' + k, x1: W - mR, x2: W - mR + 2, y1: yy, y2: yy, stroke: '#9c9890', strokeWidth: 0.8 }));
+    });
+    const ticks = []; for (let i = 0; i < n; i += 6) ticks.push(E('text', { key: 't' + i, x: x(i), y: H - 5, 'text-anchor': 'middle', fill: '#9c9890', style: { font: "500 7px 'DM Mono',monospace" } }, months[i].slice(0, 7)));
+    const sPath = stock.map((v, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + yL(v).toFixed(1)).join(' ');
+    const cl = v => Math.max(pLo, Math.min(pHi, v));
+    const pPath = pmi.map((v, i) => (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + yR(cl(v)).toFixed(1)).join(' ');
+    return E('svg', { viewBox: '0 0 ' + W + ' ' + H, width: '100%', style: { display: 'block' } },
+      base, axis, ticks,
+      E('path', { d: sPath, fill: 'none', stroke: stockHex, strokeWidth: 1.7, strokeLinejoin: 'round' }),
+      E('path', { d: pPath, fill: 'none', stroke: '#33403f', strokeWidth: 1.3, strokeLinejoin: 'round' }),
+      E('circle', { cx: x(n - 1), cy: yL(stock[n - 1]), r: 2.4, fill: stockHex }),
+      E('circle', { cx: x(n - 1), cy: yR(cl(pmi[n - 1])), r: 2.4, fill: '#33403f' }));
+  }
+
+  _pmiCell(v) {
+    // color by expansion/contraction distance from 50
+    if (v >= 50) { const t = Math.min(1, (v - 50) / 6); return { bg: 'rgba(201,107,90,' + (0.1 + t * 0.42).toFixed(2) + ')', fg: v >= 53 ? '#fff' : 'var(--ink2)' }; }
+    const t = Math.min(1, (50 - v) / 6); return { bg: 'rgba(90,158,111,' + (0.1 + t * 0.42).toFixed(2) + ')', fg: v <= 47 ? '#fff' : 'var(--ink2)' };
+  }
+
+  renderVals() {
+    const tab = this.state.tab;
+    const set = t => () => this.setState({ tab: t });
+    const tc = on => on
+      ? 'background:var(--bg);color:var(--ink);border-color:var(--ink);box-shadow:0 -2px 0 var(--accent) inset;'
+      : 'background:var(--soft);color:var(--mut);';
+    const countries = this._countries();
+    countries.forEach(c => { c.flagUrl = this._flagUrl(c.key); c.flagEl = this._flagEl(c.key, 18); });
+    const isPmi = tab === 'mfg' || tab === 'svc';
+    const isChart = tab === 'chart';
+    const isFin = tab === 'fin';
+    const sc = v => v >= 0 ? 'color:var(--up);' : 'color:var(--down);';
+    const hex = { US: '#c96b5a', EU: '#4c78a8', JP: '#7a6daa', CN: '#c4943a', TW: '#439a9a', SEA: '#5a9e6f', SAS: '#b05580', ME: '#8f7a3c', AU: '#6b6860' };
+    // row-wise RYG gradient by normal-distribution position (z → CDF); high=red, low=green
+    const ncdf = z => { const t = 1 / (1 + 0.2316419 * Math.abs(z)); const d = 0.3989423 * Math.exp(-z * z / 2); let p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274)))); return z > 0 ? 1 - p : p; };
+    const lerp = (a, b, t) => Math.round(a + (b - a) * t);
+    const ryg = t => { const t2 = Math.min(1, Math.max(0, 0.5 + (t - 0.5) * 1.75)); let c1, c2, tt; if (t2 < 0.5) { c1 = [45, 134, 89]; c2 = [217, 168, 33]; tt = t2 / 0.5; } else { c1 = [217, 168, 33]; c2 = [192, 57, 43]; tt = (t2 - 0.5) / 0.5; } const a = 0.32 + Math.abs(t2 - 0.5) * 1.06; return 'rgba(' + lerp(c1[0], c2[0], tt) + ',' + lerp(c1[1], c2[1], tt) + ',' + lerp(c1[2], c2[2], tt) + ',' + a.toFixed(2) + ')'; };
+    const rowColor = nums => {
+      const mean = nums.reduce((a, b) => a + b, 0) / nums.length;
+      const std = Math.sqrt(nums.reduce((a, b) => a + (b - mean) * (b - mean), 0) / nums.length);
+      let mx = 0, mn = 0; nums.forEach((v, i) => { if (v > nums[mx]) mx = i; if (v < nums[mn]) mn = i; });
+      return nums.map((v, i) => ({ bg: ryg(std > 0 ? ncdf((v - mean) / std) : 0.5),
+        ring: i === mx ? 'inset 0 0 0 1.5px rgba(201,107,90,0.95)' : (i === mn ? 'inset 0 0 0 1.5px rgba(90,158,111,0.95)' : 'none') }));
+    };
+
+    // PMI tab
+    const pmi = tab === 'svc' ? this._svc() : this._mfg();
+    const headline = countries.map((c, i) => {
+      const v = pmi.headline[2 + i], prev = pmi.prev[i], chg = v - prev, exp = v >= 50;
+      return { name: c.name, flag: c.flag, flagEl: this._flagEl(c.key, 20), color: c.color, val: v.toFixed(1),
+        valCss: 'color:' + (exp ? 'var(--up)' : 'var(--down)') + ';',
+        zone: exp ? '擴張' : '收縮', zoneCss: exp ? 'var(--co)' : 'var(--down)',
+        spark: this._areaChart(this._genSeries(prev - 1.1, v, 41 + i * 9, 0.9), chg >= 0, 26),
+        chg: (chg >= 0 ? '+' : '') + chg.toFixed(1), chgCss: sc(chg) };
+    });
+    // per-country 3-month component matrix (key components only)
+    const keyLabels = tab === 'svc' ? ['商業活動', '新訂單', '存貨', '物價', '未交訂單'] : ['新訂單', '生產', '存貨', '客戶存貨', '物價'];
+    const keyRows = pmi.rows.filter(r => keyLabels.indexOf(r[0]) >= 0);
+    const pmiCards = countries.map((c, ci) => {
+      const hv = pmi.headline[2 + ci], exp = hv >= 50;
+      return { name: c.name, flag: c.flag, flagEl: this._flagEl(c.key, 18), color: c.color, headline: hv.toFixed(1),
+        headCss: 'color:' + (exp ? 'var(--up)' : 'var(--down)') + ';',
+        rows: keyRows.map(r => {
+          const v = r[2 + ci];
+          const rr = this._rng((r[0].length * 31 + ci * 7 + (tab === 'svc' ? 100 : 0)) >>> 0);
+          const vals = [v]; let cur = v;
+          for (let k = 1; k < 6; k++) { cur = cur - (rr() - 0.5) * 1.6; vals.push(cur); }
+          return { label: r[0], cells: vals.map((xx, i) => {
+            const cell = this._pmiCell(xx);
+            let tri = '', triCss = '';
+            if (i < vals.length - 1) { const up = xx > vals[i + 1]; tri = up ? '▲' : '▼'; triCss = up ? 'color:var(--up);' : 'color:var(--down);'; }
+            return { v: xx.toFixed(1), fg: cell.fg, bg: cell.bg, tri, triCss };
+          }) };
+        }) };
+    });
+
+    // dual-axis index × PMI charts (2023→latest), one mfg + one non-mfg per country
+    const idxMeta = this._indices();
+    const mfgH = this._mfg().headline, svcH = this._svc().headline;
+    const chartCountries = !isChart ? [] : countries.map((c, ci) => {
+      const meta = idxMeta[c.key];
+      const stock = this._genSeries(meta[1], meta[2], (ci + 1) * 13, (meta[2] - meta[1]) * 0.06);
+      const mfgP = this._genSeries(mfgH[2 + ci] - 1.6, mfgH[2 + ci], (ci + 1) * 29 + 1, 1.5);
+      const svcP = this._genSeries(svcH[2 + ci] - 1.3, svcH[2 + ci], (ci + 1) * 29 + 2, 1.5);
+      return { name: c.name, flag: c.flag, flagEl: this._flagEl(c.key, 18), color: hex[c.key], idxName: meta[0],
+        mfgChart: this._dualChart(stock, mfgP, hex[c.key], meta[0], '製造業 PMI'),
+        svcChart: this._dualChart(stock, svcP, hex[c.key], meta[0], '非製造業 PMI') };
+    });
+
+    // financial markets tab
+    const buildFM = (arr, kind) => arr.map((r, i) => {
+      const name = r[0], code = r[1], fk = r[2], last = r[3], chgPct = r[4];
+      const rising = chgPct >= 0;
+      const seed = (code.length * 17 + i * 5 + (kind === 'commodity' ? 200 : 0)) >>> 0;
+      const a = last * (1 - chgPct / 100 * 4.5), b = last;
+      const series = this._genSeries(a, b, seed, (Math.abs(b - a) * 0.9) || last * 0.012);
+      return { name, code, flagEl: fk ? this._flagEl(fk, 18) : null,
+        last: last >= 1000 ? last.toLocaleString('en-US') : last.toFixed(2),
+        chg: (chgPct >= 0 ? '+' : '') + chgPct.toFixed(2) + '%',
+        chgCss: 'color:' + (rising ? 'var(--up)' : 'var(--down)') + ';',
+        chart: this._areaChart(series, rising) };
+    });
+    const fm = this._finMarkets();
+    const finEquity = isFin ? buildFM(fm.equity, 'equity') : [];
+    const finCommodity = isFin ? buildFM(fm.commodity, 'commodity') : [];
+    const identityBands = this._identityBands();
+
+    // inflation tab
+    const infRaw = this._inf();
+    const infRows = infRaw.map(r => {
+      if (r.head) return { isHead: true, isRow: false, label: r.head, headCss: r.color };
+      const nums = countries.map((c, j) => r[2 + j]);
+      const col = rowColor(nums);
+      return { isHead: false, isRow: true, label: r[0], unit: r[1],
+        cells: nums.map((v, j) => ({ v: (v > 0 ? '+' : '') + v.toFixed(1), bg: col[j].bg, ring: col[j].ring })) };
+    });
+
+    // employment tab
+    const empRows = this._emp().map((r, i) => {
+      const signed = /YoY|MoM|Δ/.test(r[1]);
+      const nums = countries.map((c, j) => r[2 + j]);
+      const col = rowColor(nums);
+      return { label: r[0], unit: r[1], bg: i % 2 ? '#f6f4ef' : 'var(--paper)',
+        cells: nums.map((v, j) => ({ v: signed ? (v > 0 ? '+' : '') + v.toFixed(1) : v.toFixed(1), bg: col[j].bg, ring: col[j].ring })) };
+    });
+
+    // consumption tab
+    const conRows = this._con().map((r, i) => {
+      const signed = /YoY|MoM|Δ/.test(r[1]);
+      const nums = countries.map((c, j) => r[2 + j]);
+      const col = rowColor(nums);
+      return { label: r[0], unit: r[1], bg: i % 2 ? '#f6f4ef' : 'var(--paper)',
+        cells: nums.map((v, j) => ({ v: signed ? (v > 0 ? '+' : '') + v.toFixed(1) : v.toFixed(1), bg: col[j].bg, ring: col[j].ring })) };
+    });
+
+    return {
+      rootRef: el => { this.root = el; },
+      countries,
+      tabMfg: set('mfg'), tabSvc: set('svc'), tabInf: set('inf'), tabCon: set('con'), tabEmp: set('emp'), tabChart: set('chart'), tabFin: set('fin'),
+      tcMfg: tc(tab === 'mfg'), tcSvc: tc(tab === 'svc'), tcInf: tc(tab === 'inf'), tcCon: tc(tab === 'con'), tcEmp: tc(tab === 'emp'), tcChart: tc(isChart), tcFin: tc(isFin),
+      isPmi, isInf: tab === 'inf', isCon: tab === 'con', isEmp: tab === 'emp', isChart, isFin, empRows,
+      headline, pmiCards, pmiTitle: pmi.title, pmiNote: pmi.note,
+      infRows, conRows, chartCountries,
+      finEquity, finCommodity, identityBands,
+    };
+  }
+}
+</script>
+</body>
+</html>

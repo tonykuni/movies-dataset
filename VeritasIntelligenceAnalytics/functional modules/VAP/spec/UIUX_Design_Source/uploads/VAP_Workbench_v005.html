@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA · VeritasAutoPlot 工作台 · Full Chart SSOT &amp; Template Library v005</title>
+<style>
+:root{
+ --bg:#f2f1ec; --paper:#fff; --paper2:#fbfaf7;
+ --ink:#1b1a17; --ink2:#3a3f3e; --mut:#6b6860; --mut2:#9c9890;
+ --line:#dcdad3; --line2:#ebe9e3;
+ --teal:#3d8f8f; --blue:#4c78a8; --violet:#7a6daa; --amber:#bf8f33; --green:#4f9465; --red:#c4634f;
+ --chart-left:#4c72b0; --chart-right:#dd8452;
+ --r:8px; --r-sm:5px;
+ --fs-h2:clamp(17px,1.45vw,21px); --fs-h3:clamp(14px,1.08vw,15.5px);
+ --fs-metric:clamp(20px,1.85vw,27px); --fs-body:clamp(12.5px,.86vw,13.5px);
+ --fs-sm:clamp(11.5px,.78vw,12.5px); --fs-xs:clamp(10px,.68vw,11px); --fs-lbl:clamp(9.5px,.62vw,10.5px);
+ --sb:clamp(232px,18vw,268px);
+ --frozen-head-h:116px;
+ --shadow:0 1px 2px rgba(27,26,23,.04),0 8px 24px -12px rgba(27,26,23,.14);
+ --mono:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+ --sans:"Microsoft JhengHei","Segoe UI",system-ui,Arial,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink2);font-family:var(--sans);font-size:var(--fs-body);line-height:1.62;display:flex;overflow:hidden}
+.sidebar{position:relative;z-index:70;flex:none;width:var(--sb);height:100vh;height:100dvh;background:var(--paper);border-right:1px solid var(--line);display:flex;flex-direction:column;isolation:isolate}
+.brand{position:sticky;top:0;inset-block-start:0;z-index:72;flex:0 0 var(--frozen-head-h);height:var(--frozen-head-h);min-height:var(--frozen-head-h);max-height:var(--frozen-head-h);overflow:hidden;padding:18px 16px 12px;border-bottom:1px solid var(--line);background:var(--paper);box-shadow:0 6px 18px -18px rgba(27,26,23,.8);transform:none!important;user-select:none;contain:layout paint}
+.brand .k{font:700 var(--fs-lbl) var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--mut2)}
+.brand h2{font-size:var(--fs-h2);color:var(--ink);line-height:1.25;margin-top:4px}
+.brand h2 span{display:block;font-size:var(--fs-xs);font-weight:400;color:var(--mut)}
+.brand p{font:600 var(--fs-lbl) var(--mono);color:var(--teal);margin-top:6px;letter-spacing:.06em}
+.navScroll{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:10px 10px 14px;scrollbar-gutter:stable}
+.groupTitle{font:700 var(--fs-lbl) var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mut2);padding:12px 8px 5px}
+.nav button{display:flex;align-items:center;gap:9px;width:100%;text-align:left;border:1px solid transparent;background:none;
+ border-radius:var(--r-sm);padding:7px 9px;font-family:var(--sans);font-size:var(--fs-sm);color:var(--ink2);cursor:pointer}
+.nav button:hover{background:var(--paper2);border-color:var(--line2)}
+.nav button.on{background:var(--ink);color:#fff}
+.nav button.on .n{color:#fff;opacity:.7}
+.nav .n{font:700 var(--fs-lbl) var(--mono);color:var(--mut2);width:18px;flex:none}
+.nav .en{display:block;font-size:var(--fs-xs);opacity:.65}
+.sideStats{border-top:1px solid var(--line2);padding:10px 16px;display:grid;grid-template-columns:1fr 1fr;gap:6px 10px}
+.sideStats .mk{font:700 var(--fs-lbl) var(--mono);letter-spacing:.08em;color:var(--mut2);text-transform:uppercase;display:block}
+.sideStats .mv{font:700 var(--fs-sm) var(--mono);color:var(--ink)}
+.main{position:relative;z-index:1;flex:1;min-width:0;height:100vh;height:100dvh;overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;scrollbar-gutter:stable}
+header{position:sticky;top:0;inset-block-start:0;z-index:60;flex:0 0 var(--frozen-head-h);height:var(--frozen-head-h);min-height:var(--frozen-head-h);max-height:var(--frozen-head-h);overflow:hidden;padding:18px 26px 12px;border-bottom:1px solid var(--line);background:rgba(251,250,247,.97);backdrop-filter:blur(10px);display:flex;justify-content:space-between;gap:18px;flex-wrap:nowrap;box-shadow:0 8px 22px -20px rgba(27,26,23,.9);transform:none!important;user-select:none;contain:layout paint}
+.kicker{font:700 var(--fs-lbl) var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--teal)}
+header h1{font-size:var(--fs-h2);color:var(--ink);margin-top:2px}
+header h1 span{font-size:var(--fs-xs);font-weight:400;color:var(--mut);margin-left:8px}
+.sub{font-size:var(--fs-sm);color:var(--mut)}
+.headMeta{display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.headMeta .mk{font:700 var(--fs-lbl) var(--mono);letter-spacing:.08em;color:var(--mut2);text-transform:uppercase;display:block}
+.headMeta .mv{font:700 var(--fs-sm) var(--mono);color:var(--ink)}
+.pages{flex:1;padding:18px 26px 30px;min-width:0}
+.page{display:none}
+.page.on{display:block}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.card{display:flex;flex-direction:column;justify-content:space-between;min-height:78px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 13px;min-width:0}
+.card .v{font:700 var(--fs-metric) var(--mono);color:var(--ink)}
+.card .l{font:700 var(--fs-lbl) var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut2)}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:15px 18px;margin-bottom:16px}
+.panel h3{font-size:var(--fs-h3);color:var(--ink)}
+.panel h3 span{font-size:var(--fs-xs);font-weight:400;color:var(--mut);margin-left:7px}
+.panel .hint{font-size:var(--fs-xs);color:var(--mut);margin:2px 0 10px}
+table{width:100%;border-collapse:collapse;font-size:var(--fs-sm)}
+th{font:700 var(--fs-lbl) var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--mut2);text-align:left;
+ border-bottom:1px solid var(--line);padding:5px 8px}
+td{border-bottom:1px solid var(--line2);padding:6px 8px;vertical-align:top;word-break:break-word}
+.mono{font-family:var(--mono)}
+.ctrl{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
+.ctrl label{display:block;font:700 var(--fs-lbl) var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut2);margin-bottom:3px}
+.ctrl select,.ctrl button{font-family:var(--sans);font-size:var(--fs-sm);color:var(--ink2);background:var(--paper2);
+ border:1px solid var(--line);border-radius:var(--r-sm);padding:6px 9px;cursor:pointer}
+.ctrl .go{background:var(--ink);color:#fff;font-weight:700;border-color:var(--ink);padding:6px 16px}
+.ctrl .swap{font-family:var(--mono)}
+.legend{display:flex;gap:18px;font-size:var(--fs-sm);margin:4px 0 2px}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+svg{width:100%;height:auto;display:block}
+.hv:hover .ch{opacity:1}
+.readout{font:600 var(--fs-xs) var(--mono);color:var(--mut);min-height:18px;margin-top:4px}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px}
+.gcell{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-sm);padding:10px 12px;cursor:pointer}
+.gcell:hover{border-color:var(--teal)}
+.gcell .t{font-size:var(--fs-sm);font-weight:700;color:var(--ink)}
+.gcell .s{font-size:var(--fs-xs);color:var(--mut);margin-bottom:4px}
+.libraryToolbar{display:flex;gap:9px;align-items:flex-end;flex-wrap:wrap;margin:9px 0 13px}
+.templateGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:11px}
+.chartTemplate{position:relative;min-width:0;overflow:hidden;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:11px 12px;box-shadow:var(--shadow)}
+.chartTemplate:target,.chartTemplate.focused{border-color:var(--violet);box-shadow:0 0 0 2px rgba(122,109,170,.18)}
+.chartTemplateHead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:6px}.chartTemplateTitle{font-weight:700;color:var(--ink);line-height:1.35}.chartTemplateCode{font:700 var(--fs-lbl) var(--mono);color:var(--violet);white-space:nowrap}
+.chartTemplateMeta{display:flex;gap:5px;flex-wrap:wrap;margin:4px 0 7px}.chartTemplateMeta .badge{padding:2px 6px}
+.chartPreview{height:138px;overflow:hidden;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2);background:#fff;margin:0 -2px 7px}.chartPreview svg{height:100%;width:100%}
+.chartTemplateRule{min-height:31px;font-size:var(--fs-xs);color:var(--mut);line-height:1.45}.chartTemplateFields{font:500 var(--fs-lbl) var(--mono);color:var(--mut2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:5px}
+.paletteRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:5px 0;border-bottom:1px solid var(--line2)}.paletteSet{display:flex;border:1px solid var(--line);border-radius:4px;overflow:hidden}.paletteSet i{display:block;width:19px;height:19px}.paletteLabel{font:700 var(--fs-lbl) var(--mono);color:var(--mut);min-width:150px}.paletteApply{min-height:25px;font:700 var(--fs-lbl) var(--mono);color:var(--ink2);background:var(--paper2);border:1px solid var(--line);border-radius:var(--r-sm);padding:3px 8px;cursor:pointer}.paletteApply:hover,.paletteApply.active{border-color:var(--violet);color:var(--violet)}
+.specSection{margin-bottom:14px}.specSection h4{font-size:var(--fs-sm);color:var(--ink);margin:0 0 5px}.specMatrix td:first-child{font-family:var(--mono);font-weight:700;color:var(--ink2);width:34%}.specMatrix td:nth-child(2){font-family:var(--mono);color:var(--violet)}
+.ruleList{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:6px 16px;counter-reset:rule}.ruleItem{position:relative;padding:7px 8px 7px 34px;border-bottom:1px solid var(--line2);font-size:var(--fs-xs);color:var(--mut)}.ruleItem::before{counter-increment:rule;content:counter(rule,decimal-leading-zero);position:absolute;left:7px;top:7px;font:700 var(--fs-lbl) var(--mono);color:var(--violet)}
+.frozenMark{display:inline-flex;align-items:center;gap:5px;font:700 8.5px var(--mono);letter-spacing:.08em;color:var(--violet);margin-left:6px}.frozenMark::before{content:'🔒';font-size:9px}
+.lockrow{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+.badge{font:700 var(--fs-lbl) var(--mono);letter-spacing:.06em;border:1px solid var(--line);border-radius:var(--r-sm);
+ background:var(--paper2);color:var(--ink2);padding:3px 9px}
+.status{display:inline-flex;align-items:center;gap:6px;font:700 var(--fs-lbl) var(--mono);letter-spacing:.04em;border:1px solid var(--line);border-radius:999px;padding:3px 8px;background:var(--paper2);white-space:nowrap}
+.status::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--mut2)}
+.status.good{color:var(--green);border-color:color-mix(in srgb,var(--green) 35%,var(--line))}.status.good::before{background:var(--green)}
+.status.warn{color:var(--amber);border-color:color-mix(in srgb,var(--amber) 35%,var(--line))}.status.warn::before{background:var(--amber)}
+.status.bad{color:var(--red);border-color:color-mix(in srgb,var(--red) 35%,var(--line))}.status.bad::before{background:var(--red)}
+.actionbar{display:flex;gap:9px;align-items:flex-end;flex-wrap:wrap;margin:10px 0 14px}
+.field{min-width:150px;flex:1}.field.compact{flex:0 1 210px}.field.wide{min-width:min(420px,100%)}
+.field label{display:block;font:700 var(--fs-lbl) var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mut2);margin-bottom:3px}
+.field input,.field select{width:100%;min-height:34px;font-family:var(--sans);font-size:var(--fs-sm);color:var(--ink2);background:var(--paper2);border:1px solid var(--line);border-radius:var(--r-sm);padding:6px 9px}
+.field input:focus,.field select:focus,.ctrl select:focus,.ctrl button:focus,.btn:focus{outline:2px solid color-mix(in srgb,var(--violet) 45%,transparent);outline-offset:1px}
+.btn{min-height:34px;font-family:var(--sans);font-size:var(--fs-sm);font-weight:700;color:var(--ink2);background:var(--paper2);border:1px solid var(--line);border-radius:var(--r-sm);padding:6px 11px;cursor:pointer}
+.btn:hover{border-color:var(--teal)}.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}.btn.small{min-height:26px;padding:3px 7px;font-size:var(--fs-xs)}
+.btn:disabled{cursor:not-allowed;opacity:.48}
+.tableWrap{width:100%;overflow:auto;border:1px solid var(--line2);border-radius:var(--r-sm);scrollbar-gutter:stable}
+.tableWrap table{min-width:760px}.tableWrap th{position:sticky;top:0;z-index:2;background:var(--paper2)}
+.templateName{font-weight:700;color:var(--ink)}.templateMeta{display:block;font:500 var(--fs-lbl) var(--mono);color:var(--mut2);margin-top:1px}
+.buttonRow{display:flex;gap:5px;flex-wrap:wrap}
+.dropzone{border:1px dashed var(--mut2);border-radius:var(--r);background:var(--paper2);padding:14px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.dropzone.drag{border-color:var(--violet);background:#f2effa}
+.qaGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:8px;margin:10px 0}
+.qaItem{border:1px solid var(--line2);border-radius:var(--r-sm);padding:8px 10px;background:var(--paper2)}
+.qaItem .qk{display:block;font:700 var(--fs-lbl) var(--mono);color:var(--mut2);text-transform:uppercase}.qaItem .qv{display:block;font:700 var(--fs-sm) var(--mono);color:var(--ink);margin-top:2px}
+.empty{padding:18px;text-align:center;color:var(--mut);font-size:var(--fs-sm)}
+.notice{border-left:3px solid var(--teal);padding:7px 10px;background:var(--paper2);color:var(--mut);font-size:var(--fs-xs);margin:8px 0}
+.notice.warn{border-left-color:var(--amber)}.notice.bad{border-left-color:var(--red)}
+.srOnly{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+footer{border-top:1px solid var(--line);padding:8px 26px;font-size:var(--fs-xs);color:var(--mut);background:var(--paper2);
+ display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+kbd{font:700 var(--fs-lbl) var(--mono);border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;background:var(--paper)}
+@media(max-width:920px){:root{--sb:218px;--frozen-head-h:122px}.pages{padding:14px 16px 26px}header{padding:14px 16px 10px}.headMeta{gap:10px}.gallery{grid-template-columns:1fr}.templateGrid{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}}
+@media(max-width:680px){:root{--sb:188px;--frozen-head-h:148px}.brand{padding:13px 11px 10px}.brand h2{font-size:15px}.nav button{padding:7px 6px}.sideStats{padding:8px 10px;grid-template-columns:1fr}.pages{padding:12px}.headMeta{width:100%;justify-content:space-between}.field,.field.compact,.field.wide{flex:1 1 100%;min-width:100%}.templateGrid{grid-template-columns:1fr}}
+</style></head><body>
+<aside class="sidebar">
+ <div class="brand" data-frozen-lock="HEADER_EQUAL_HEIGHT_LOCKED">
+  <div class="k"><span>Veritas Intelligence Analytics</span></div>
+  <h2>自動繪圖工作台<br><span>AutoPlot Workbench</span></h2>
+  <p>VAP · VeritasAutoPlot · v005 <span class="frozenMark">FROZEN</span></p>
+ </div>
+ <div class="navScroll">
+  <div class="groupTitle">繪圖 Plotting</div>
+  <div class="nav">
+   <button id="nav-home" onclick="switchPage('home')"><span class="n">01</span><span>平台總覽<span class="en">OVERVIEW</span></span></button>
+   <button id="nav-pair" onclick="switchPage('pair')"><span class="n">02</span><span>配對繪圖<span class="en">PAIR PLOT</span></span></button>
+   <button id="nav-gallery" onclick="switchPage('gallery')"><span class="n">03</span><span>圖庫 <span class="en">GALLERY</span></span></button>
+  </div>
+  <div class="groupTitle">治理 Governance</div>
+  <div class="nav">
+   <button id="nav-spec" onclick="switchPage('spec')"><span class="n">04</span><span>繪圖規範<span class="en">SPEC · VISUAL LOCK</span></span></button>
+  </div>
+  <div class="groupTitle">管理 Management</div>
+  <div class="nav">
+   <button id="nav-template" onclick="switchPage('template')"><span class="n">05</span><span>模板管理<span class="en">TEMPLATE REGISTRY</span></span></button>
+   <button id="nav-data" onclick="switchPage('data')"><span class="n">06</span><span>資料庫對接<span class="en">DATA BRIDGE</span></span></button>
+  </div>
+ </div>
+ <div class="sideStats">
+  <div><span class="mk">Tables</span><span class="mv" id="ssTables">0</span></div>
+  <div><span class="mk">Pairs</span><span class="mv" id="ssPairs">0</span></div>
+  <div><span class="mk">State</span><span class="mv" id="sideState" style="color:var(--green)">READY</span></div>
+  <div><span class="mk">Lock</span><span class="mv">🔒 1 · 0.75</span></div>
+ </div>
+</aside>
+<div class="main">
+ <header data-frozen-lock="HEADER_EQUAL_HEIGHT_LOCKED">
+  <div>
+   <div class="kicker">VDF 資料庫 → 雙軸互比 → 規範圖表 · VISUAL LOCK</div>
+   <h1 id="pageTitle">平台總覽 <span>Overview</span></h1>
+   <p id="pageSubtitle" class="sub">資料目錄與繪圖入口 · Data catalog and plotting entry</p>
+  </div>
+  <div class="headMeta">
+   <div><span class="mk">建置 Build</span><span class="mv">VAP v005</span></div>
+   <div><span class="mk">資料表 Tables</span><span class="mv" id="hmTables">0</span></div>
+   <div><span class="mk">資料橋接 Bridge</span><span class="mv" id="hmBridge">LOCAL READY</span></div>
+   <div><span class="mk">規範 Spec</span><span class="mv">ONE 🔒</span></div>
+  </div>
+ </header>
+ <div class="pages">
+  <section class="page" id="page-home">
+   <div class="cards">
+    <div class="card"><div class="v" id="cTables">0</div><div class="l">資料表 Tables</div></div>
+    <div class="card"><div class="v" id="cRows">0</div><div class="l">資料列 Rows</div></div>
+    <div class="card"><div class="v" id="cCols">0</div><div class="l">數值欄 Numeric</div></div>
+    <div class="card"><div class="v" id="cPairs">0</div><div class="l">可配對 Pairs</div></div>
+   </div>
+   <div class="panel">
+    <h3>VDF 資料目錄 <span>Data Catalog</span></h3>
+    <div class="hint">來源 Source:VDF 分析資料庫(CSV / TSV / JSON / SQLite)· 唯讀 READ-ONLY</div>
+    <table><thead><tr><th>資料表 Table</th><th>列數 Rows</th><th>X 軸</th><th>數值欄 Numeric Columns</th><th>來源 Origin</th></tr></thead>
+    <tbody id="catalogBody"></tbody></table>
+   </div>
+  </section>
+  <section class="page" id="page-pair">
+   <div class="panel">
+    <h3>雙軸互比設定 <span>Dual-Axis Pairing</span></h3>
+    <div class="hint">配對規約:一個資料一個軸 · 兩軸互比 · 兩系列必用不同圖形 · 顯示清楚</div>
+    <div class="ctrl">
+     <div><label>資料表 Table</label><select id="selTable"></select></div>
+     <div><label>X 軸</label><select id="selX"></select></div>
+     <div><label>左軸 Left</label><select id="selLeft"></select></div>
+     <div><label>左圖形 Form</label><select id="selLeftForm"><option value="bar">柱狀 BAR</option><option value="line">折線 LINE</option><option value="area">面積 AREA</option></select></div>
+     <div><label>右軸 Right</label><select id="selRight"></select></div>
+     <div><label>右圖形 Form</label><select id="selRightForm"><option value="line">折線 LINE</option><option value="bar">柱狀 BAR</option><option value="area">面積 AREA</option></select></div>
+     <div><label for="pairPalette">色盤 Palette</label><select id="pairPalette" data-palette-select></select></div>
+     <button class="swap" onclick="swapAxes()" title="左右互換">⇄ 互換</button>
+     <button class="go" onclick="renderPair()">繪製 RENDER</button>
+    </div>
+    <div class="legend" id="pairLegend"></div>
+    <div id="pairChart"></div>
+    <div class="readout" id="pairReadout">滑鼠移入圖面可讀值 · hover for readout</div>
+   </div>
+  </section>
+  <section class="page" id="page-gallery">
+   <div class="panel">
+    <h3>Canonical 圖表範本庫 <span>VAP-CH-01～28 · SSOT Locked</span></h3>
+    <div class="hint">28 種圖型全數登錄；每張卡包含軸數、資料型態、必要欄位、規則與規範預覽。</div>
+    <div class="libraryToolbar">
+     <div class="field wide"><label for="librarySearch">搜尋 Search</label><input id="librarySearch" placeholder="代碼、圖型、欄位或規則"></div>
+     <div class="field compact"><label for="libraryGroup">群組 Group</label><select id="libraryGroup"><option value="ALL">全部 ALL</option></select></div>
+     <div class="field compact"><label for="galleryPalette">色盤 Palette</label><select id="galleryPalette" data-palette-select></select></div>
+     <span class="status good" id="libraryCount">28 / 28 LOCKED</span>
+    </div>
+    <div class="templateGrid" id="canonicalGalleryGrid"></div>
+   </div>
+   <div class="panel">
+    <h3>資料自動配對圖庫 <span>Auto-Pair Gallery</span></h3>
+    <div class="hint">每一組數值欄配對一張縮圖；點擊載入「02 配對繪圖」細看。</div>
+    <div class="gallery" id="galleryGrid"></div>
+   </div>
+  </section>
+  <section class="page" id="page-spec">
+   <div class="cards">
+    <div class="card"><div class="v">28</div><div class="l">Canonical Charts</div></div>
+    <div class="card"><div class="v">9</div><div class="l">Chart Groups</div></div>
+    <div class="card"><div class="v">14</div><div class="l">Palettes</div></div>
+    <div class="card"><div class="v">SSOT</div><div class="l">Authority</div></div>
+   </div>
+   <div class="panel">
+    <h3>視覺鎖 <span>VISUAL LOCK</span></h3>
+    <div class="lockrow">
+     <span class="badge">線粗 LINE WIDTH · 1</span>
+     <span class="badge">透明度 OPACITY · 0.75</span>
+     <span class="badge">軸距 AXIS STEPS · 1 / 2 / 2.5 / 5 / 10</span>
+     <span class="badge">軸域涵蓋極值 DOMAIN COVERS EXTREMES</span>
+    </div>
+    <div class="hint">權威來源 Authority:VIA · 繪圖版面規範 ONE · Chart &amp; Layout Spec ONE(spec/,SHA-256 登錄於 VAP anchor)</div>
+   </div>
+   <div class="panel">
+    <h3>完整繪圖規範 <span>VAP Spec SSOT · Machine-Readable</span></h3>
+    <div class="hint">頁面不得另行寫死圖表參數；Runtime 應由此規範物件產生繪圖設定。</div>
+    <div id="specMatrix"></div>
+   </div>
+   <div class="panel">
+    <h3>核准色票 <span>Approved Palettes · VIA + Seaborn Locked</span></h3>
+    <div class="actionbar"><div class="field compact"><label for="specPalette">目前色盤 Active Palette</label><select id="specPalette" data-palette-select></select></div><span class="status good" id="paletteStatus">SEABORN READY</span></div>
+    <div id="paletteMatrix"></div>
+   </div>
+   <div class="panel">
+    <h3>資料與繪圖規則 <span>Append-Only Rules</span></h3>
+    <div class="ruleList" id="dataRuleList"></div>
+   </div>
+   <div class="panel">
+    <h3>配對規約 <span>Pairing Contract</span></h3>
+    <table><thead><tr><th>項目 Item</th><th>規定 Rule</th></tr></thead><tbody>
+     <tr><td>軸 Axes</td><td>一個資料一個軸;左軸 × 右軸,共用 X,相互比較</td></tr>
+     <tr><td>圖形 Forms</td><td>兩系列必用不同圖形(柱 / 線 / 面積);相同選擇會被強制錯開</td></tr>
+     <tr><td>色票 Colors</td><td><span class="sw" style="background:var(--chart-left)"></span>左軸 · <span class="sw" style="background:var(--chart-right)"></span>右軸 · 由全域 Palette Control 同步；金融語意色不受覆寫</td></tr>
+     <tr><td>清晰 Clarity</td><td>軸刻度染系列色 · 圖例 · 末值直標 · 懸停讀值 · 淡灰格線</td></tr>
+     <tr><td>治理 Governance</td><td>VDF 資料庫唯讀;產出僅寫入 &lt;Base&gt;/VAP/output</td></tr>
+   </tbody></table>
+   </div>
+  </section>
+  <section class="page" id="page-template">
+   <div class="panel">
+    <h3>分析模板登錄 <span>Template Registry · Append-Only</span></h3>
+    <div class="hint">模板版本不可覆寫；變更一律建立新版本。Canonical 與分析實例分離。</div>
+    <div class="actionbar">
+     <div class="field wide"><label for="templateName">模板名稱 Template Name</label><input id="templateName" maxlength="80" placeholder="例：收盤價 × 外資買賣超"></div>
+     <button class="btn primary" onclick="saveCurrentTemplate()">＋ 儲存目前配對</button>
+     <button class="btn" onclick="document.getElementById('templateImport').click()">匯入 JSON</button>
+     <button class="btn" onclick="exportTemplates()">匯出 Registry</button>
+     <input class="srOnly" id="templateImport" type="file" accept="application/json,.json">
+    </div>
+    <div class="notice" id="templateNotice">目前配對設定可直接登錄為不可變模板版本。</div>
+    <div class="tableWrap"><table><thead><tr><th>模板 Template</th><th>版本</th><th>資料與配對</th><th>狀態</th><th>操作</th></tr></thead><tbody id="templateBody"></tbody></table></div>
+   </div>
+  </section>
+  <section class="page" id="page-data">
+   <div class="cards">
+    <div class="card"><div class="v" id="dbCatalogs">0</div><div class="l">Catalogs</div></div>
+    <div class="card"><div class="v" id="dbRows">0</div><div class="l">Rows</div></div>
+    <div class="card"><div class="v" id="dbQuality">PASS</div><div class="l">Import Gate</div></div>
+    <div class="card"><div class="v" id="dbBridge">READY</div><div class="l">Runtime Bridge</div></div>
+   </div>
+   <div class="panel">
+    <h3>瀏覽器唯讀匯入 <span>CSV · TSV · JSON</span></h3>
+    <div class="hint">檔案先通過日期、數值、重複、排序、缺值與可配對欄位檢查；FAIL 不進入繪圖目錄。</div>
+    <div class="dropzone" id="dataDropzone">
+     <div><b>拖放資料檔至此</b><div class="hint" style="margin:2px 0 0">或選擇本機檔案；資料僅在本次頁面工作階段使用。</div></div>
+     <button class="btn primary" onclick="document.getElementById('dataImport').click()">選擇資料檔</button>
+     <input class="srOnly" id="dataImport" type="file" accept=".csv,.tsv,.json,text/csv,text/tab-separated-values,application/json">
+    </div>
+    <div class="qaGrid" id="qaGrid">
+     <div class="qaItem"><span class="qk">Gate</span><span class="qv">WAITING</span></div>
+     <div class="qaItem"><span class="qk">Rows</span><span class="qv">—</span></div>
+     <div class="qaItem"><span class="qk">X Axis</span><span class="qv">—</span></div>
+     <div class="qaItem"><span class="qk">Numeric</span><span class="qv">—</span></div>
+     <div class="qaItem"><span class="qk">Duplicates</span><span class="qv">—</span></div>
+     <div class="qaItem"><span class="qk">Missing</span><span class="qv">—</span></div>
+    </div>
+    <div class="notice" id="dataNotice">尚未匯入資料。內建 Demo 已標示為示範資料。</div>
+   </div>
+   <div class="panel">
+    <h3>資料庫 Runtime 對接 <span>DuckDB · Parquet · SQLite · JSON Endpoint</span></h3>
+    <div class="hint">Standalone 頁面不直接讀取任意磁碟資料庫；此處建立唯讀 Adapter Manifest，交由 VIA Python／PowerShell Runtime 注入已驗證 Catalog。</div>
+    <div class="actionbar">
+     <div class="field compact"><label for="connectorAlias">連線別名 Alias</label><input id="connectorAlias" maxlength="60" value="VDF_PRIMARY"></div>
+     <div class="field compact"><label for="connectorEngine">引擎 Engine</label><select id="connectorEngine"><option>DuckDB</option><option>Parquet</option><option>SQLite</option><option>JSON Endpoint</option></select></div>
+     <div class="field wide"><label for="connectorLocation">唯讀位置 Location / URL</label><input id="connectorLocation" maxlength="260" placeholder="&lt;Base&gt;/functional modules/VDF/db 或 https://…/catalog.json"></div>
+     <button class="btn primary" onclick="registerConnector()">驗證並登錄</button>
+     <button class="btn" onclick="exportConnectors()">匯出 Adapter JSON</button>
+    </div>
+    <div class="notice warn" id="connectorNotice">資料庫連線設定不儲存密碼；所有 Adapter 固定 READ-ONLY。</div>
+    <div class="tableWrap"><table><thead><tr><th>Alias</th><th>Engine</th><th>Location</th><th>Mode</th><th>狀態</th><th>建立時間</th></tr></thead><tbody id="connectorBody"></tbody></table></div>
+   </div>
+   <div class="panel">
+    <h3>資料橋接契約 <span>Runtime Injection Contract</span></h3>
+    <table><thead><tr><th>項目</th><th>規格</th></tr></thead><tbody>
+     <tr><td>唯讀治理</td><td><span class="mono">mode=READ_ONLY</span>；禁止 DELETE／UPDATE／INSERT／DDL。</td></tr>
+     <tr><td>優先格式</td><td>DuckDB／Parquet 為主；CSV／TSV／JSON 為交換格式；SQLite 為相容 Adapter。</td></tr>
+     <tr><td>品質 Gate</td><td>日期／X 軸、數值欄、重複、排序、缺值、可配對欄位。FAIL 不註冊。</td></tr>
+     <tr><td>注入介面</td><td><span class="mono">window.VeritasAutoPlot.registerCatalog(table)</span> 或 <span class="mono">vap:catalog</span> CustomEvent。</td></tr>
+     <tr><td>輸出邊界</td><td>資料庫不寫回；圖表與模板輸出僅寫入 VAP/output 或由使用者下載。</td></tr>
+    </tbody></table>
+   </div>
+  </section>
+ </div>
+ <footer>
+  <span>VIA · VeritasAutoPlot v005 · 🔒 28 CHART SSOT · 14 PALETTES · EQUAL FROZEN HEADERS · APPEND-ONLY TEMPLATE · READ-ONLY DATA BRIDGE</span>
+  <span>鍵盤:<kbd>[</kbd> / <kbd>]</kbd> 切換頁面</span>
+ </footer>
+</div>
+<script>
+let CATALOG = [{"name": "demo_tw_stock_monthly", "origin": "functional modules/VDF/db/demo_tw_stock_monthly.csv", "x": "date", "all_columns": ["date", "close", "volume", "foreign_net"], "numeric": ["close", "volume", "foreign_net"], "rows": [{"date": "2024-01", "close": "597.1", "volume": "18925397", "foreign_net": "-2.5"}, {"date": "2024-02", "close": "580.0", "volume": "45249434", "foreign_net": "5.53"}, {"date": "2024-03", "close": "617.6", "volume": "21216736", "foreign_net": "0.44"}, {"date": "2024-04", "close": "583.1", "volume": "26089605", "foreign_net": "2.11"}, {"date": "2024-05", "close": "550.3", "volume": "25356993", "foreign_net": "5.0"}, {"date": "2024-06", "close": "559.3", "volume": "26156303", "foreign_net": "3.79"}, {"date": "2024-07", "close": "589.1", "volume": "18240454", "foreign_net": "8.12"}, {"date": "2024-08", "close": "611.3", "volume": "30589269", "foreign_net": "-4.89"}, {"date": "2024-09", "close": "656.6", "volume": "30453998", "foreign_net": "-6.15"}, {"date": "2024-10", "close": "626.1", "volume": "49357291", "foreign_net": "4.07"}, {"date": "2024-11", "close": "659.2", "volume": "45000076", "foreign_net": "2.72"}, {"date": "2024-12", "close": "709.5", "volume": "32005771", "foreign_net": "3.04"}, {"date": "2025-01", "close": "749.3", "volume": "40885230", "foreign_net": "9.23"}, {"date": "2025-02", "close": "764.9", "volume": "44069157", "foreign_net": "-7.08"}, {"date": "2025-03", "close": "743.4", "volume": "28707354", "foreign_net": "-6.4"}, {"date": "2025-04", "close": "723.0", "volume": "21737052", "foreign_net": "-2.44"}, {"date": "2025-05", "close": "744.0", "volume": "31498790", "foreign_net": "-0.6"}, {"date": "2025-06", "close": "721.2", "volume": "27878179", "foreign_net": "10.73"}, {"date": "2025-07", "close": "743.4", "volume": "40537847", "foreign_net": "-4.58"}, {"date": "2025-08", "close": "774.6", "volume": "24045892", "foreign_net": "-0.41"}, {"date": "2025-09", "close": "835.5", "volume": "41679991", "foreign_net": "3.14"}, {"date": "2025-10", "close": "865.4", "volume": "49185521", "foreign_net": "7.52"}, {"date": "2025-11", "close": "841.2", "volume": "19187709", "foreign_net": "-1.69"}, {"date": "2025-12", "close": "822.3", "volume": "25806365", "foreign_net": "10.86"}]}];
+const LOCK = {lw:1, op:0.75, steps:[1,2,2.5,5,10]};
+const COLORS = {left:'#4c78a8', right:'#3d8f8f', soft:'#ebe9e3', mut:'#6b6860', mut2:'#9c9890'};
+const BAR_WIDTH_RATIO = 0.92;
+const BAR_GAP_RATIO = 0.08;
+const DEFAULT_PALETTE_KEY = 'snsDeep';
+const PALETTE_STORAGE_KEY = 'via_vap_palette_v005';
+const APP_VERSION = 'v005';
+const TEMPLATE_SCHEMA = 'VIA-VAP-TEMPLATE-REGISTRY/1.0';
+const CONNECTOR_SCHEMA = 'VIA-VAP-DATA-ADAPTERS/1.0';
+const TEMPLATE_STORAGE_KEY = 'via_vap_templates_v005';
+const CONNECTOR_STORAGE_KEY = 'via_vap_connectors_v005';
+const LEGACY_TEMPLATE_STORAGE_KEYS = ['via_vap_templates_v004','via_vap_templates_v003','via_vap_templates_v002'];
+const LEGACY_CONNECTOR_STORAGE_KEYS = ['via_vap_connectors_v004','via_vap_connectors_v003','via_vap_connectors_v002'];
+const MAX_IMPORT_BYTES = 25*1024*1024;
+const MIN_COMPLETE_ROWS = 3;
+const NUMERIC_ACCEPTANCE_RATIO = 0.8;
+const DATE_FIELD_CANDIDATES = ['date','datetime','timestamp','time','period','month','日期','時間'];
+const ALLOWED_IMPORT_EXTENSIONS = ['csv','tsv','json'];
+const READ_ONLY_ENGINES = ['DuckDB','Parquet','SQLite','JSON Endpoint'];
+const VAP_PALETTES={
+ via:{name:'VIA',colors:['#c96b5a','#c4943a','#5a9e6f','#439a9a','#4c78a8','#7a6daa']},
+ deep:{name:'deep',colors:['#4c78a8','#e45756','#f58518','#72b7b2','#54a24b','#b279a2']},
+ set2:{name:'Set2',colors:['#66c2a5','#fc8d62','#8da0cb','#e78ac3','#a6d854','#ffd92f']},
+ tab10:{name:'tab10',colors:['#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd','#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf']},
+ paired:{name:'Paired',colors:['#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99','#e31a1c','#fdbf6f','#ff7f00']},
+ muted:{name:'muted',colors:['#4878d0','#ee854a','#6acc64','#d65f5f','#956cb4','#8c613c']},
+ pastel:{name:'pastel',colors:['#a1c9f4','#ffb482','#8de5a1','#ff9f9b','#d0bbff','#debb9b']},
+ cb:{name:'colorblind',colors:['#0173b2','#de8f05','#029e73','#d55e00','#cc78bc','#ca9161']},
+ snsDeep:{name:'Seaborn Deep',source:'Seaborn 0.13.2 qualitative',colors:['#4c72b0','#dd8452','#55a868','#c44e52','#8172b3','#937860','#da8bc3','#8c8c8c','#ccb974','#64b5cd']},
+ snsMuted:{name:'Seaborn Muted',source:'Seaborn 0.13.2 qualitative',colors:['#4878d0','#ee854a','#6acc64','#d65f5f','#956cb4','#8c613c','#dc7ec0','#797979','#d5bb67','#82c6e2']},
+ snsPastel:{name:'Seaborn Pastel',source:'Seaborn 0.13.2 qualitative',colors:['#a1c9f4','#ffb482','#8de5a1','#ff9f9b','#d0bbff','#debb9b','#fab0e4','#cfcfcf','#fffea3','#b9f2f0']},
+ snsBright:{name:'Seaborn Bright',source:'Seaborn 0.13.2 qualitative',colors:['#023eff','#ff7c00','#1ac938','#e8000b','#8b2be2','#9f4800','#f14cc1','#a3a3a3','#ffc400','#00d7ff']},
+ snsDark:{name:'Seaborn Dark',source:'Seaborn 0.13.2 qualitative',colors:['#001c7f','#b1400d','#12711c','#8c0800','#591e71','#592f0d','#a23582','#3c3c3c','#b8850a','#006374']},
+ snsColorblind:{name:'Seaborn Colorblind',source:'Seaborn 0.13.2 qualitative',colors:['#0173b2','#de8f05','#029e73','#d55e00','#cc78bc','#ca9161','#fbafe4','#949494','#ece133','#56b4e9']}
+};
+let ACTIVE_PALETTE_KEY = DEFAULT_PALETTE_KEY;
+const VAP_SPEC={
+ meta:{schema:'VIA-VAP-SPEC/1.0',code:'VIA-SSOT-VAPSPEC',version:'1.2.0',policy:'只增不減 · 修改需升版並保留 changelog',authority:'頁面不得另行寫死數值；一律讀取本規範',changelog:'v004 · Bar width 92% / visible gap 8% · Candlestick up red/down green · Volume follows candle direction；v005 · Seaborn qualitative color combinations + global palette control + semantic color precedence'},
+ line:{width:1,widthRange:[0.5,6],widthStep:0.5,opacity:0.9,secondaryDash:'5 3',rule:'虛線僅用於期貨或比較序列'},
+ fill:{areaUnderLine:0.75,areaUnderLineWithShadow:0.5,barFace:0.6,barFaceDense:0.8,eventBand:0.3},
+ bar:{gapSeamless:1,gapTight:0.86,gapNormal:0.8,gapGrouped:0.44,edgeWidth:0.8,edgeOpacity:1,stackedGapMin:true,widthRatio:BAR_WIDTH_RATIO,visibleGapRatio:BAR_GAP_RATIO,gapPolicy:'最小化但必須保留可見空隙；單列 Bar 使用 92% 格寬、8% 間距'},
+ axis:{tickMultiples:[2,2.5,5,10],sameTickCountBothSides:true,decimalUnified:true,thousandsSeparator:true,headroomTicks:1,rangeWrapsData:true,dualAxisAligned:true},
+ timeAxis:{mode:'tradingDaySequence',dropEmptyDates:true,normalizeBase:'startDate',stackAlignment:'absolute',mixedFrequency:'日×月期末對齊；價格 ffill 前一交易日；Volume 不補值',dataStart:'1920-01-01',displayStart:'2007-01-01',zoomable:true},
+ referenceLines:{horizontal:'benchmark · solid · width 0.8 · opacity 0.8',eventVertical:'dash · width 0.8 · opacity 0.8 · red/grey alternating',zeroAxis:'solid · width 1 · #c96b5a',eventMatrixHorizontal:false},
+ semanticColors:{up:'#c96b5a',down:'#5a9e6f',neutral:'#9c9890',benchmark:'#9c9890',correlationNegative:'#3f7f93',correlationMid:'#f2f2f2',correlationPositive:'#d93a46',correlationLevels:15,zmid:0,mask:'lowerTriangle'},
+ palette:{default:DEFAULT_PALETTE_KEY,approvedCount:14,seabornVersion:'0.13.2',seaborn:['snsDeep','snsMuted','snsPastel','snsBright','snsDark','snsColorblind'],seriesRule:'一般序列依選定色盤循環；雙軸固定取 colors[0]／colors[1]',categoryRule:'分類色最多使用 5 個主色；單序列不得製造冗餘圖例',semanticPrecedence:'漲跌、狀態、基準與相關熱圖優先於 Palette，不得被覆寫',nonColorEncoding:'雙軸以實線／虛線、Bar／Line／Area、軸側與直標共同辨識'},
+ typography:{brand:'Syne',body:'DM Sans',mono:'DM Mono',zh:'Noto Sans TC',eyebrow:9,en:9,badge:9.5,hint:11,tab:13,brandSize:16,chartTitle:12,axisTitle:10,tick:9.5,legend:10,slideMin:24,printMinPt:12},
+ layout:{marginTop:30,marginRight:20,marginBottom:34,marginLeft:56,stackStandardHeight:280,chartsPerRow:2,fullBleed:true,cardRadius:9,border:'#dbd9d3',grid:'#ecebe6',paper:'#f5f4f0',plot:'#ffffff',noOverlap:'labels ≥ 9px'},
+ price:{useAdjClose:true,adjustAllPrices:true,splitAdjustVolume:true,missingPrice:'previousTradingDay',missingVolume:'doNotFill',sourcePriority:['adjClose','close'],fallback:'close',adjustedSuffix:'(adj)',candleUpRule:'close ≥ open → #c96b5a',candleDownRule:'close < open → #5a9e6f',volumeColorRule:'與同根 K 棒方向完全一致'},
+ interaction:{analysisZoom:true,lockedReportZoom:false,hover:'x unified',collapsible:true,brushMeasure:['high','low','maxDD','duration','recoveryTime']},
+ export:{png:{background:'#ffffff',scale:4},html:'interactive',pdf:'print-based',pptx:'editable'},
+ profiles:{analysis:'zoom/brush enabled',lockedReport:'fixed range / no drag',export:'white background / deterministic'}
+};
+const DATA_RULES=[
+ '股票與指數一律使用 ADJ CLOSE 並換算全部 ADJ PRICE 欄位。','Stock Split 發生時，Volume 依拆分比反向調整。','台股漲紅、跌綠；不得只靠顏色辨識。',
+ 'K 線 close ≥ open 定義為上漲：K 棒、影線與同根成交量固定紅色 #c96b5a；close < open 定義為下跌：三者固定綠色 #5a9e6f。','所有單列 Bar 寬度固定為分類格寬 92%，保留 8% 可見空隙；不得無縫黏合。',
+ 'Seaborn 色盤僅用於一般資料序列與分類組合；台股漲紅跌綠、成交量同色、狀態色、Benchmark 與相關熱圖色階具有更高優先權。',
+ '雙軸搭配採面積×對比線或 Bar×Line；量綱不同才允許雙軸。','左右軸間隔數相同；間隔值採 2／2.5／5／10 倍數；同軸小數位一致。',
+ '事件矩陣使用垂直虛線 0.8／0.8、區段陰影 0.3，且不畫水平線。','水平線只作 Benchmark：實線、線寬 0.8、Opacity 0.8。',
+ '相關熱力圖固定雙向色階、zmid=0、遮罩上三角、顯示下三角。','日期軸支援 Normalized／Start／End／Now，鎖定後凍結。',
+ '地圖必須顯示區域、代碼、紅色上標／綠色下標、走勢與成交量。','輸出支援白底 PNG 4×、互動 HTML、JSON、PDF 與可編輯 PPTX。',
+ '上下堆疊圖共用同一日期 index、同一 X 軸刻度與同步 Hover。','日×月資料採期末重採樣對齊。','價格缺值只准以前一交易日 ffill，禁止使用未來資料。',
+ 'Volume 不得 ffill；缺值維持 0 或 NaN 並標示。','共識資料支援 yfinance／FactSet keyed；欄位含 EPS、目標價、評等與分析師家數。',
+ '所有資料標註必須自動避讓且不得重疊。','Heatmap 依實際波動區間正規化以提高辨識度。','Workbench 預設可 Zoom；Visual Lock 與匯出 Profile 必須固定。',
+ '台美資料對齊採 TW(t) 對 US(t−1)。','共識目標價／評等區間／EPS 佐證線使用水平虛線 0.8／0.8。',
+ 'TA 指標使用 ADJ PRICE；量能指標使用 Split-adjusted Volume。','圖卡採 CSS Grid、auto-fill minmax、留白或底色分隔。',
+ '圖卡、標籤、文字與 SVG 不得突出格子；必須 hidden／ellipsis／max-width 100%。','商品、貴金屬、匯率、VIX、BDI、^TWII 共用 LEX Ticker Registry。',
+ '國旗使用圓形旗標、適度放大並左右自動分散；VDF／VRN／VAP 共用。'
+];
+const CHART_LIBRARY=[
+ {code:'VAP-CH-01',id:'line',group:'單軸 Single-Axis',zh:'折線圖',en:'Line',axes:1,dataShape:'series[]',fields:['date','value'],rule:'多序列趨勢；線寬 1、Opacity 0.9',renderer:'go.Scatter(mode=lines)'},
+ {code:'VAP-CH-02',id:'area',group:'單軸 Single-Axis',zh:'面積折線',en:'Area',axes:1,dataShape:'series',fields:['date','value'],rule:'下方填色；areaUnderLine 0.75',renderer:'go.Scatter(fill=tozeroy)'},
+ {code:'VAP-CH-03',id:'bar',group:'單軸 Single-Axis',zh:'直條圖',en:'Bar',axes:1,dataShape:'categorical',fields:['label','value'],rule:'分類比較；Bar Face 0.6／Dense 0.8；格寬 92%、可見間距 8%',renderer:'go.Bar'},
+ {code:'VAP-CH-04',id:'hbar',group:'單軸 Single-Axis',zh:'橫條圖',en:'H-Bar',axes:1,dataShape:'categorical',fields:['label','value'],rule:'長標籤排序比較；條高 92%、可見間距 8%',renderer:'go.Bar(orientation=h)'},
+ {code:'VAP-CH-05',id:'scatter',group:'單軸 Single-Axis',zh:'散點圖',en:'Scatter',axes:1,dataShape:'xy',fields:['x','y'],rule:'關聯與離群值辨識',renderer:'go.Scatter(mode=markers)'},
+ {code:'VAP-CH-06',id:'sarea',group:'堆疊 Stacked',zh:'堆疊面積',en:'Stacked Area',axes:1,dataShape:'series[]',fields:['date','value','group'],rule:'同一時間軸顯示組成變化',renderer:'go.Scatter(stackgroup)'},
+ {code:'VAP-CH-07',id:'sbar',group:'堆疊 Stacked',zh:'堆疊直條',en:'Stacked Bar',axes:1,dataShape:'categorical[]',fields:['label','value','group'],rule:'外部格寬 92%、可見間距 8%；同柱堆疊段不留縫',renderer:'go.Bar(barmode=stack)'},
+ {code:'VAP-CH-08',id:'sbar100',group:'堆疊 Stacked',zh:'百分比堆疊',en:'100% Stacked',axes:1,dataShape:'categorical[]',fields:['label','value','group'],rule:'每期總和正規化為 100%',renderer:'go.Bar(barnorm=percent)'},
+ {code:'VAP-CH-09',id:'multi',group:'個別 Small Multiples',zh:'個別小圖',en:'Small Multiples',axes:1,dataShape:'series[]',fields:['date','value','panel'],rule:'預設 2×2；同尺度或清楚標示各尺度',renderer:'make_subplots'},
+ {code:'VAP-CH-10',id:'gbar',group:'個別 Small Multiples',zh:'並列直條',en:'Grouped Bar',axes:1,dataShape:'categorical[]',fields:['label','value','group'],rule:'群組使用 92% 格寬；群內與群間均保留最小可見空隙',renderer:'go.Bar(barmode=group)'},
+ {code:'VAP-CH-11',id:'dline',group:'雙軸 Dual-Axis',zh:'底色面積 × 對比折線',en:'Area × Line',axes:2,dataShape:'series×2',fields:['date','left','right'],rule:'底色序列置右軸 α0.75；折線置左軸 lw1',renderer:'make_subplots(secondary_y)'},
+ {code:'VAP-CH-12',id:'dbarline',group:'雙軸 Dual-Axis',zh:'條 + 線 雙軸',en:'Bar × Line',axes:2,dataShape:'mixed',fields:['date','bar','line'],rule:'Bar 使用 92% 格寬／8% 可見間距；Bar 與 Line 使用互補色且左右軸同格數',renderer:'go.Bar + go.Scatter'},
+ {code:'VAP-CH-13',id:'evtmx',group:'進階 Advanced',zh:'事件矩陣',en:'Event Matrix',axes:1,dataShape:'series+events',fields:['date','value','events[]'],rule:'垂直虛線 0.8／0.8；陰影 0.3；無水平線',renderer:'add_vline + add_vrect'},
+ {code:'VAP-CH-14',id:'corrheat',group:'進階 Advanced',zh:'相關熱力圖',en:'Masked Corr',axes:0,dataShape:'matrix',fields:['corr'],rule:'下三角遮罩；zmid 0；15 級雙向色階',renderer:'go.Heatmap'},
+ {code:'VAP-CH-15',id:'brush',group:'進階 Advanced',zh:'區間量測',en:'Brush Measure',axes:1,dataShape:'series',fields:['date','value'],rule:'High／Low／MaxDD／Duration／Recovery',renderer:'drag select'},
+ {code:'VAP-CH-16',id:'map',group:'進階 Advanced',zh:'地圖 × 數據',en:'Map',axes:0,dataShape:'geo',fields:['region','value','change'],rule:'漲跌以上下三角標示；圓形旗標',renderer:'Leaflet / scattergeo'},
+ {code:'VAP-CH-17',id:'roll',group:'滾動績效 Rolling Performance',zh:'滾動報酬',en:'Rolling Returns',axes:1,dataShape:'series',fields:['date','return'],rule:'固定窗口並標示年化方法',renderer:'rolling return'},
+ {code:'VAP-CH-18',id:'rollcorr',group:'滾動績效 Rolling Performance',zh:'滾動相關',en:'Rolling Correlation',axes:1,dataShape:'series×2',fields:['date','a','b'],rule:'相關軸固定 −1～1；台美採 lead-lag',renderer:'rolling correlation'},
+ {code:'VAP-CH-19',id:'rollsharpe',group:'滾動績效 Rolling Performance',zh:'移動夏普',en:'Trailing Sharpe',axes:1,dataShape:'series',fields:['date','sharpe'],rule:'無風險利率與年化頻率必須標示',renderer:'rolling sharpe'},
+ {code:'VAP-CH-20',id:'sortino',group:'滾動績效 Rolling Performance',zh:'Sharpe × Sortino 比較',en:'Sharpe × Sortino',axes:2,dataShape:'series×2',fields:['date','sharpe','sortino'],rule:'左 Sharpe、右 Sortino、相同格數',renderer:'secondary_y lines'},
+ {code:'VAP-CH-21',id:'radar',group:'滾動績效 Rolling Performance',zh:'風險雷達',en:'Risk Radar',axes:0,dataShape:'radial',fields:['metric','value','benchmark'],rule:'基準為外圈虛線；填色 α0.3',renderer:'go.Scatterpolar'},
+ {code:'VAP-CH-22',id:'alpha',group:'滾動績效 Rolling Performance',zh:'Alpha 策略',en:'Alpha Strategy',axes:2,dataShape:'series×3',fields:['date','strategy','benchmark','excess'],rule:'累積績效左軸；超額報酬右軸直條（漲紅跌綠）；0 軸紅線',renderer:'lines + excess bars'},
+ {code:'VAP-CH-23',id:'econcal',group:'滾動績效 Rolling Performance',zh:'經濟日曆',en:'Economic Calendar',axes:0,dataShape:'events',fields:['date','event','importance','actual','forecast','previous'],rule:'重要度紅黃綠三階；Actual／Forecast／Previous 並列',renderer:'calendar table'},
+ {code:'VAP-CH-24',id:'consensus',group:'基本面 Consensus',zh:'共識總覽',en:'Consensus Overview',axes:1,dataShape:'table',fields:['dilutedEPS','targetPrice','rating','analystCount','forwardPER','forwardPBR'],rule:'綠黃紅 Spectrum；目標價取左右最長',renderer:'indicator + bullet'},
+ {code:'VAP-CH-25',id:'backtest',group:'滾動績效 Rolling Performance',zh:'回測驗證',en:'Backtest Validation',axes:2,dataShape:'matrix+series',fields:['lag','rankIC','tStat','pValue'],rule:'Rank-IC 直條＋t 統計折線；|t|=1.96 基準線',renderer:'bar + line + hline'},
+ {code:'VAP-CH-26',id:'intraday',group:'技術分析 Technical',zh:'當日走勢 + 成交量',en:'Intraday + Volume',axes:2,dataShape:'ohlcv',fields:['time','price','volume'],rule:'上下兩列 .72／.28；shared_xaxes',renderer:'make_subplots rows=2'},
+ {code:'VAP-CH-27',id:'candle',group:'技術分析 Technical',zh:'K線 × SMA/EMA/BB × Volume',en:'Candlestick TA',axes:2,dataShape:'ohlcv',fields:['date','open','high','low','close','volume'],rule:'close ≥ open：K棒、影線、Volume 全部使用上漲紅 #c96b5a；close < open：全部使用下跌綠 #5a9e6f；ADJ Price；Split-adjusted Volume',renderer:'go.Candlestick + indicators'},
+ {code:'VAP-CH-28',id:'spotfut',group:'技術分析 Technical',zh:'現貨 × 期貨',en:'Spot × Futures',axes:1,dataShape:'series[]',fields:['date','spot','futures'],rule:'同色：現貨實線、期貨虛線；基差標籤 ≥9px',renderer:'normalized lines'}
+];
+const BUILTIN_TEMPLATES=CHART_LIBRARY.map(c=>({
+ id:'VAP-TPL-'+c.code.slice(-2),version:1,name:c.zh+' · '+c.en,state:'CANONICAL',builtin:true,createdAt:'2026-08-02T00:00:00.000Z',parentVersion:null,
+ chartCode:c.code,chartId:c.id,group:c.group,axes:c.axes,dataShape:c.dataShape,fields:[...c.fields],rule:c.rule,renderer:c.renderer,
+ config:{mode:'CANONICAL_CHART',chartCode:c.code,palette:DEFAULT_PALETTE_KEY},visualLock:{lineWidth:LOCK.lw,opacity:LOCK.op,axisSteps:[...LOCK.steps],paletteFamily:'SEABORN_QUALITATIVE',palette:DEFAULT_PALETTE_KEY,semanticColorsLocked:true,specRef:'VIA-SSOT-VAPSPEC/1.0'}
+}));
+const PAGES = ['home','pair','gallery','spec','template','data'];
+const TITLES = {home:['平台總覽','Overview','資料目錄與繪圖入口 · Data catalog and plotting entry'],
+ pair:['配對繪圖','Pair Plot','雙軸互比 · 一個資料一個軸 · Dual-axis comparison'],
+ gallery:['圖庫','Gallery','全配對縮圖 · All numeric pairs at a glance'],
+ spec:['繪圖規範','Spec · Visual Lock','權威定義與配對規約 · Authority and pairing contract'],
+ template:['模板管理','Template Registry','不可變模板版本 · Append-only template governance'],
+ data:['資料庫對接','Data Bridge','唯讀匯入、品質 Gate 與 Runtime Adapter']};
+function switchPage(p){
+ PAGES.forEach(q=>{document.getElementById('page-'+q).classList.toggle('on',q===p);
+  document.getElementById('nav-'+q).classList.toggle('on',q===p);});
+ const t=TITLES[p];
+ document.getElementById('pageTitle').innerHTML=t[0]+' <span>'+t[1]+'</span>';
+ document.getElementById('pageSubtitle').textContent=t[2];
+ if(p==='gallery')renderCanonicalGallery();
+ if(p==='spec')renderSpecMatrix();
+ if(p==='template')renderTemplates();
+ if(p==='data')renderConnectors();
+ try{localStorage.setItem('vap_wb_page',p);}catch(e){}
+}
+document.addEventListener('keydown',e=>{
+ if(e.key!=='['&&e.key!==']')return;
+ const cur=PAGES.findIndex(p=>document.getElementById('page-'+p).classList.contains('on'));
+ switchPage(PAGES[(cur+(e.key===']'?1:PAGES.length-1))%PAGES.length]);
+});
+function niceTicks(lo,hi){
+ if(hi<=lo)hi=lo+1;
+ const raw=(hi-lo)/5, mag=Math.pow(10,Math.floor(Math.log10(raw)));
+ let step=mag*10;
+ for(const c of LOCK.steps){if(c*mag>=raw){step=c*mag;break;}}
+ const t=[Math.floor(lo/step)*step];
+ while(t[t.length-1]<hi)t.push(+(t[t.length-1]+step).toPrecision(12));
+ return t;
+}
+function fmt(v){
+ if(v===0)return'0';
+ const a=Math.abs(v);
+ if(a>=1e9)return(v/1e9).toPrecision(4).replace(/\.?0+$/,'')+'B';
+ if(a>=1e6)return(v/1e6).toPrecision(4).replace(/\.?0+$/,'')+'M';
+ if(a>=1e4)return(v/1e3).toPrecision(4).replace(/\.?0+$/,'')+'K';
+ if(a>=100)return v.toLocaleString(undefined,{maximumFractionDigits:0});
+ return String(+v.toPrecision(6));
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function nowIso(){return new Date().toISOString();}
+function loadStore(key,fallback){
+ try{const value=JSON.parse(localStorage.getItem(key)||'null');return value&&typeof value==='object'?value:fallback();}
+ catch(e){return fallback();}
+}
+function saveStore(key,value){
+ try{localStorage.setItem(key,JSON.stringify(value));return true;}
+ catch(e){return false;}
+}
+function activePalette(){return VAP_PALETTES[ACTIVE_PALETTE_KEY]||VAP_PALETTES[DEFAULT_PALETTE_KEY];}
+function chartColors(){const colors=activePalette().colors;return{left:colors[0],right:colors[1]||colors[0],series:colors,soft:COLORS.soft,mut:COLORS.mut,mut2:COLORS.mut2};}
+function paletteOptionsHtml(){return Object.entries(VAP_PALETTES).map(([key,p])=>'<option value="'+esc(key)+'">'+esc(p.name)+(p.source?' · SNS':'')+'</option>').join('');}
+function syncPaletteControls(){
+ document.querySelectorAll('[data-palette-select]').forEach(select=>{if(!select.options.length)select.innerHTML=paletteOptionsHtml();select.value=ACTIVE_PALETTE_KEY;});
+ const colors=chartColors();document.documentElement.style.setProperty('--chart-left',colors.left);document.documentElement.style.setProperty('--chart-right',colors.right);
+ const status=document.getElementById('paletteStatus');if(status)status.textContent=activePalette().name.toUpperCase()+' · ACTIVE';
+}
+function restorePairConfig(config){
+ if(!config||!tableByName(config.table))return;
+ fillSelect(document.getElementById('selTable'),CATALOG.map(x=>x.name),config.table);onTableChange();
+ for(const [id,value] of [['selX',config.x],['selLeft',config.left],['selRight',config.right],['selLeftForm',config.leftForm],['selRightForm',config.rightForm]]){const el=document.getElementById(id);if(el&&[...el.options].some(o=>o.value===value||o.text===value))el.value=value;}
+}
+function setActivePalette(key,persist=true,rerender=true){
+ if(!VAP_PALETTES[key])return false;const pairConfig=currentPairConfig();ACTIVE_PALETTE_KEY=key;syncPaletteControls();
+ if(persist){try{localStorage.setItem(PALETTE_STORAGE_KEY,key);}catch(e){}}
+ if(rerender){renderCanonicalGallery();refreshCatalogUI();restorePairConfig(pairConfig);if(pairConfig)renderPair();renderSpecMatrix();}
+ return true;
+}
+function setupPaletteControls(){
+ let key=DEFAULT_PALETTE_KEY;try{const saved=localStorage.getItem(PALETTE_STORAGE_KEY);if(saved&&VAP_PALETTES[saved])key=saved;}catch(e){}
+ ACTIVE_PALETTE_KEY=key;document.querySelectorAll('[data-palette-select]').forEach(select=>{select.innerHTML=paletteOptionsHtml();select.value=key;select.addEventListener('change',()=>setActivePalette(select.value,true,true));});syncPaletteControls();
+}
+function loadVersionedStore(primaryKey,legacyKeys,fallback){
+ const current=loadStore(primaryKey,()=>null);if(current)return current;
+ for(const key of legacyKeys){const legacy=loadStore(key,()=>null);if(legacy){saveStore(primaryKey,legacy);return legacy;}}
+ return fallback();
+}
+function newId(prefix){
+ const token=(globalThis.crypto&&crypto.randomUUID)?crypto.randomUUID().slice(0,8):Math.random().toString(36).slice(2,10);
+ return prefix+'-'+new Date().toISOString().replace(/[-:TZ.]/g,'').slice(0,14)+'-'+token.toUpperCase();
+}
+function downloadJson(filename,payload){
+ const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
+ const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;a.click();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function setNotice(id,message,tone){
+ const el=document.getElementById(id);if(!el)return;el.textContent=message;el.className='notice'+(tone?' '+tone:'');
+}
+function templateStore(){
+ const store=loadVersionedStore(TEMPLATE_STORAGE_KEY,LEGACY_TEMPLATE_STORAGE_KEYS,()=>({schema:TEMPLATE_SCHEMA,policy:'APPEND_ONLY',records:[],events:[]}));
+ if(!Array.isArray(store.records))store.records=[];if(!Array.isArray(store.events))store.events=[];return store;
+}
+function templateKey(t){return t.id+'@'+t.version;}
+function allTemplates(){
+ const store=templateStore(),seen=new Set(),out=[];
+ for(const t of [...BUILTIN_TEMPLATES,...store.records]){const key=templateKey(t);if(!seen.has(key)){seen.add(key);out.push(t);}}
+ return out.sort((a,b)=>a.id.localeCompare(b.id)||b.version-a.version);
+}
+function effectiveTemplateState(t,store){
+ const events=store.events.filter(e=>e.id===t.id&&e.version===t.version).sort((a,b)=>String(a.at).localeCompare(String(b.at)));
+ return events.length?events[events.length-1].state:(t.state||'ACTIVE');
+}
+function currentPairConfig(){
+ const ids=['selTable','selX','selLeft','selLeftForm','selRight','selRightForm'];
+ if(ids.some(id=>!document.getElementById(id)))return null;
+ const config={table:document.getElementById('selTable').value,x:document.getElementById('selX').value,
+  left:document.getElementById('selLeft').value,leftForm:document.getElementById('selLeftForm').value,
+  right:document.getElementById('selRight').value,rightForm:document.getElementById('selRightForm').value,palette:ACTIVE_PALETTE_KEY};
+ if(config.leftForm===config.rightForm)config.rightForm=config.leftForm!=='line'?'line':'bar';
+ return config;
+}
+function validateTemplateRecord(t){
+ const c=t&&t.config;
+ const identity=!!(t&&/^[A-Za-z0-9_-]{4,100}$/.test(String(t.id||''))&&Number.isInteger(+t.version)&&+t.version>0&&String(t.name||'').trim()&&c);
+ if(!identity)return false;
+ if(c.mode==='CANONICAL_CHART')return CHART_LIBRARY.some(chart=>chart.code===c.chartCode);
+ return !!(c.table&&c.x&&c.left&&c.right&&['bar','line','area'].includes(c.leftForm)&&['bar','line','area'].includes(c.rightForm));
+}
+function saveCurrentTemplate(){
+ const name=document.getElementById('templateName').value.trim(),config=currentPairConfig();
+ if(!name){setNotice('templateNotice','請先輸入模板名稱。','bad');return;}
+ if(!config||!config.table||!config.left||!config.right){setNotice('templateNotice','目前沒有可登錄的配對設定。','bad');return;}
+ const store=templateStore(),record={id:newId('VAP-TPL'),version:1,name,state:'ACTIVE',builtin:false,createdAt:nowIso(),parentVersion:null,
+  config,visualLock:{lineWidth:LOCK.lw,opacity:LOCK.op,axisSteps:[...LOCK.steps],paletteFamily:'SEABORN_QUALITATIVE',palette:ACTIVE_PALETTE_KEY,semanticColorsLocked:true}};
+ store.records.push(record);
+ if(!saveStore(TEMPLATE_STORAGE_KEY,store)){setNotice('templateNotice','瀏覽器儲存空間不可用，模板未寫入。','bad');return;}
+ document.getElementById('templateName').value='';renderTemplates();
+ setNotice('templateNotice','已新增 '+record.id+' v1；既有版本未被修改。','');
+}
+function findTemplate(id,version){return allTemplates().find(t=>t.id===id&&t.version===+version);}
+function applyTemplate(id,version){
+ const t=findTemplate(id,version);if(!t)return;
+ const c=t.config,table=tableByName(c.table);
+ if(c.palette&&VAP_PALETTES[c.palette])setActivePalette(c.palette,true,true);
+ if(c.mode==='CANONICAL_CHART'){openCanonicalPreview(c.chartCode);return;}
+ if(!table){setNotice('templateNotice','模板資料表目前未載入：'+c.table,'bad');return;}
+ const state=effectiveTemplateState(t,templateStore());if(state==='ARCHIVED'){setNotice('templateNotice','封存版本不可直接套用；請先建立新版本或還原。','warn');return;}
+ fillSelect(document.getElementById('selTable'),CATALOG.map(x=>x.name),c.table);onTableChange();
+ const fields=[['selX',c.x],['selLeft',c.left],['selRight',c.right],['selLeftForm',c.leftForm],['selRightForm',c.rightForm]];
+ for(const [id2,value] of fields){const el=document.getElementById(id2);if([...el.options].some(o=>o.value===value||o.text===value))el.value=value;}
+ switchPage('pair');renderPair();
+}
+function createTemplateVersion(id,version){
+ const source=findTemplate(id,version);if(!source)return;
+ const store=templateStore(),maxVersion=Math.max(...allTemplates().filter(t=>t.id===id).map(t=>+t.version));
+ const record={...source,version:maxVersion+1,state:'ACTIVE',builtin:false,createdAt:nowIso(),parentVersion:+version,
+  config:{...source.config},visualLock:{...source.visualLock,axisSteps:[...(source.visualLock.axisSteps||LOCK.steps)]}};
+ store.records.push(record);saveStore(TEMPLATE_STORAGE_KEY,store);renderTemplates();
+ setNotice('templateNotice','已由 '+id+' v'+version+' 新增不可變版本 v'+record.version+'。','');
+}
+function toggleTemplateArchive(id,version){
+ const t=findTemplate(id,version);if(!t||t.builtin)return;
+ const store=templateStore(),current=effectiveTemplateState(t,store),next=current==='ARCHIVED'?'ACTIVE':'ARCHIVED';
+ store.events.push({type:'STATE',id,version:+version,state:next,at:nowIso()});saveStore(TEMPLATE_STORAGE_KEY,store);renderTemplates();
+ setNotice('templateNotice',id+' v'+version+' 已以追加事件標記為 '+next+'；版本內容未刪除。',next==='ARCHIVED'?'warn':'');
+}
+function renderTemplates(){
+ const body=document.getElementById('templateBody');if(!body)return;const store=templateStore(),items=allTemplates();body.innerHTML='';
+ if(!items.length){body.innerHTML='<tr><td colspan="5" class="empty">尚無模板</td></tr>';return;}
+ for(const t of items){
+  const state=effectiveTemplateState(t,store),c=t.config,tr=document.createElement('tr');
+  const stateClass=state==='ARCHIVED'?'warn':t.builtin?'good':'';
+  const paletteKey=c.palette||(t.visualLock&&t.visualLock.palette)||'via',paletteName=(VAP_PALETTES[paletteKey]||VAP_PALETTES.via).name;
+  const mapping=(c.mode==='CANONICAL_CHART'
+   ?'<b class="mono">'+esc(t.chartCode)+'</b> · '+esc(t.dataShape)+'<br>'+esc((t.fields||[]).join(' · '))
+   :'<span class="mono">'+esc(c.table)+'</span><br>'+esc(c.left)+' ('+esc(c.leftForm)+') × '+esc(c.right)+' ('+esc(c.rightForm)+')')+'<br><span class="templateMeta">PALETTE · '+esc(paletteName)+'</span>';
+  tr.innerHTML='<td><span class="templateName">'+esc(t.name)+'</span><span class="templateMeta">'+esc(t.id)+'</span></td>'+
+   '<td class="mono">v'+t.version+(t.parentVersion?' ← v'+t.parentVersion:'')+'</td>'+
+   '<td>'+mapping+'</td>'+
+   '<td><span class="status '+stateClass+'">'+esc(t.builtin?'CANONICAL':state)+'</span></td>'+
+   '<td><div class="buttonRow"><button class="btn small" onclick="applyTemplate(\''+t.id+'\','+t.version+')">套用</button>'+
+   '<button class="btn small" onclick="createTemplateVersion(\''+t.id+'\','+t.version+')">新版本</button>'+
+   (t.builtin?'':'<button class="btn small" onclick="toggleTemplateArchive(\''+t.id+'\','+t.version+')">'+(state==='ARCHIVED'?'還原':'封存')+'</button>')+'</div></td>';
+  body.appendChild(tr);
+ }
+}
+async function importTemplatesFile(file){
+ try{
+  const raw=JSON.parse(await file.text()),incoming=Array.isArray(raw)?raw:(raw.templates||raw.records||[]),events=Array.isArray(raw.events)?raw.events:[];
+  if(!Array.isArray(incoming))throw new Error('找不到 templates / records 陣列');
+  const store=templateStore(),existing=new Set(allTemplates().map(templateKey));let added=0,skipped=0;
+  for(const item of incoming){if(!validateTemplateRecord(item)){skipped++;continue;}const clean={...item,version:+item.version,builtin:false,createdAt:item.createdAt||nowIso(),config:{...item.config}};
+   if(existing.has(templateKey(clean))){skipped++;continue;}store.records.push(clean);existing.add(templateKey(clean));added++;}
+  for(const event of events){if(event&&event.id&&Number.isInteger(+event.version)&&['ACTIVE','ARCHIVED'].includes(event.state))store.events.push({...event,version:+event.version,at:event.at||nowIso()});}
+  saveStore(TEMPLATE_STORAGE_KEY,store);renderTemplates();setNotice('templateNotice','匯入完成：新增 '+added+'，略過 '+skipped+'。','');
+ }catch(e){setNotice('templateNotice','模板匯入失敗：'+e.message,'bad');}
+}
+function exportTemplates(){
+ const store=templateStore();downloadJson('VIA_VAP_Template_Registry_'+APP_VERSION+'.json',{
+  schema:TEMPLATE_SCHEMA,system:'VeritasAutoPlot',policy:'APPEND_ONLY',exportedAt:nowIso(),templates:allTemplates(),events:store.events});
+}
+function simpleHash(text){let h=2166136261;for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619);}return('00000000'+(h>>>0).toString(16)).slice(-8);}
+function numericValue(value){
+ if(value===null||value===undefined||String(value).trim()==='')return null;
+ const n=Number(String(value).replace(/,/g,'').replace(/%$/,''));return Number.isFinite(n)?n:NaN;
+}
+function parseDelimited(text,delimiter){
+ text=String(text).replace(/^\uFEFF/,'');const matrix=[];let row=[],cell='',quoted=false;
+ for(let i=0;i<text.length;i++){const ch=text[i];
+  if(ch==='"'){if(quoted&&text[i+1]==='"'){cell+='"';i++;}else quoted=!quoted;}
+  else if(ch===delimiter&&!quoted){row.push(cell);cell='';}
+  else if((ch==='\n'||ch==='\r')&&!quoted){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(cell);cell='';if(row.some(v=>String(v).trim()!==''))matrix.push(row);row=[];}
+  else cell+=ch;}
+ row.push(cell);if(row.some(v=>String(v).trim()!==''))matrix.push(row);
+ if(matrix.length<2)throw new Error('檔案沒有足夠資料列');
+ const headers=matrix[0].map((h,i)=>String(h).trim()||'column_'+(i+1)),seen={};
+ for(let i=0;i<headers.length;i++){const base=headers[i];seen[base]=(seen[base]||0)+1;if(seen[base]>1)headers[i]=base+'_'+seen[base];}
+ return matrix.slice(1).map(values=>Object.fromEntries(headers.map((h,i)=>[h,values[i]===undefined?'':values[i]])));
+}
+function inferColumns(rows){
+ const cols=[];for(const row of rows.slice(0,1000))for(const key of Object.keys(row||{}))if(!cols.includes(key))cols.push(key);return cols;
+}
+function inferXColumn(rows,columns){
+ const lower=columns.map(c=>String(c).toLowerCase());
+ for(const candidate of DATE_FIELD_CANDIDATES){const i=lower.indexOf(candidate.toLowerCase());if(i>=0)return columns[i];}
+ for(const col of columns){const values=rows.slice(0,100).map(r=>r[col]).filter(v=>String(v??'').trim()!=='');if(values.some(v=>Number.isNaN(numericValue(v))))return col;}
+ return columns[0]||null;
+}
+function inferNumericColumns(rows,columns){
+ return columns.filter(col=>{const values=rows.slice(0,1000).map(r=>r[col]).filter(v=>String(v??'').trim()!=='');if(!values.length)return false;
+  return values.filter(v=>Number.isFinite(numericValue(v))).length/values.length>=NUMERIC_ACCEPTANCE_RATIO;});
+}
+function looksTemporal(column,rows){
+ if(DATE_FIELD_CANDIDATES.includes(String(column).toLowerCase()))return true;
+ const values=rows.slice(0,20).map(r=>String(r[column]??'')).filter(Boolean);return values.length>0&&values.filter(v=>/^\d{4}[-\/]\d{1,2}/.test(v)).length/values.length>=0.8;
+}
+function validateCatalogTable(candidate){
+ const rows=Array.isArray(candidate&&candidate.rows)?candidate.rows:[],columns=Array.isArray(candidate&&candidate.all_columns)&&candidate.all_columns.length?candidate.all_columns:inferColumns(rows);
+ const x=candidate&&candidate.x&&columns.includes(candidate.x)?candidate.x:inferXColumn(rows,columns);
+ const numeric=Array.isArray(candidate&&candidate.numeric)&&candidate.numeric.length?candidate.numeric.filter(c=>columns.includes(c)):inferNumericColumns(rows,columns).filter(c=>c!==x);
+ let missing=0,badNumeric=0,duplicates=0,unsorted=0;const seen=new Set(),temporal=looksTemporal(x,rows);let prior=-Infinity;
+ for(const row of rows){for(const col of columns)if(row[col]===null||row[col]===undefined||String(row[col]).trim()==='')missing++;
+  for(const col of numeric){const v=numericValue(row[col]);if(Number.isNaN(v))badNumeric++;}
+  const key=String(row[x]??'').trim();if(key){if(seen.has(key))duplicates++;seen.add(key);if(temporal){const time=Date.parse(key);if(Number.isFinite(time)){if(time<prior)unsorted++;prior=time;}}}}
+ const failures=[];if(rows.length<MIN_COMPLETE_ROWS)failures.push('ROWS_LT_'+MIN_COMPLETE_ROWS);if(!x)failures.push('X_AXIS_MISSING');if(numeric.length<2)failures.push('NUMERIC_PAIR_MISSING');
+ if(temporal&&duplicates>0)failures.push('DUPLICATE_TIME_KEY');if(temporal&&unsorted>0)failures.push('TIME_NOT_SORTED');if(badNumeric>0)failures.push('INVALID_NUMERIC');
+ const warnings=[];if(missing>0)warnings.push('MISSING_VALUES');
+ return {gate:failures.length?'FAIL':warnings.length?'WARN':'PASS',failures,warnings,rows:rows.length,columns:columns.length,x,numeric,duplicates,missing,badNumeric,unsorted,temporal};
+}
+function normalizeCatalogTable(candidate,origin,fingerprint){
+ const qa=validateCatalogTable(candidate),rows=candidate.rows||[],columns=inferColumns(rows),base=String(candidate.name||'imported_table').replace(/[^\w\u4e00-\u9fff-]+/g,'_').slice(0,80)||'imported_table';
+ let name=base,n=2;while(CATALOG.some(t=>t.name===name&&t.source_fingerprint!==fingerprint))name=base+'_'+n++;
+ return {table:{name,origin:origin||candidate.origin||'runtime',x:qa.x,all_columns:columns,numeric:qa.numeric,rows,source_fingerprint:fingerprint||candidate.source_fingerprint||null,imported_at:nowIso()},qa};
+}
+let LAST_IMPORT_GATE='PASS';
+function registerCatalogTable(candidate,origin,fingerprint){
+ const normalized=normalizeCatalogTable(candidate,origin,fingerprint),qa=normalized.qa;
+ if(qa.gate==='FAIL')return{accepted:false,qa,table:normalized.table};
+ if(fingerprint&&CATALOG.some(t=>t.source_fingerprint===fingerprint))return{accepted:false,qa:{...qa,gate:'FAIL',failures:['DUPLICATE_SOURCE']},table:normalized.table};
+ CATALOG.push(normalized.table);LAST_IMPORT_GATE=qa.gate;refreshCatalogUI();renderQa(qa,normalized.table.name);return{accepted:true,qa,table:normalized.table};
+}
+function jsonTables(raw,filename){
+ if(Array.isArray(raw))return[{name:filename.replace(/\.json$/i,''),rows:raw}];
+ if(raw&&Array.isArray(raw.tables))return raw.tables;
+ if(raw&&Array.isArray(raw.rows))return[{...raw,name:raw.name||filename.replace(/\.json$/i,'')}];
+ if(raw&&raw.data&&Array.isArray(raw.data))return[{name:raw.name||filename.replace(/\.json$/i,''),rows:raw.data,x:raw.x,numeric:raw.numeric}];
+ throw new Error('JSON 需為 rows 陣列，或包含 rows／data／tables');
+}
+async function importDataFile(file){
+ try{
+  const ext=(file.name.split('.').pop()||'').toLowerCase();if(!ALLOWED_IMPORT_EXTENSIONS.includes(ext))throw new Error('僅接受 CSV／TSV／JSON');
+  if(file.size>MAX_IMPORT_BYTES)throw new Error('檔案超過 '+Math.round(MAX_IMPORT_BYTES/1024/1024)+' MB');
+  const text=await file.text(),fingerprint=ext+'-'+file.size+'-'+simpleHash(text);let tables;
+  if(ext==='json')tables=jsonTables(JSON.parse(text),file.name);
+  else tables=[{name:file.name.replace(/\.(csv|tsv)$/i,''),rows:parseDelimited(text,ext==='tsv'?'\t':',')}];
+  let accepted=0,failed=0,last=null;
+  for(let i=0;i<tables.length;i++){const result=registerCatalogTable(tables[i],'browser:'+file.name,fingerprint+(tables.length>1?'-'+i:''));last=result.qa;result.accepted?accepted++:failed++;}
+  if(!accepted){LAST_IMPORT_GATE='FAIL';renderQa(last,null);throw new Error('品質 Gate 拒絕：'+(last.failures||[]).join(', '));}
+  setNotice('dataNotice','匯入完成：'+accepted+' 個資料表已加入本次工作階段'+(failed?'；'+failed+' 個被拒絕':'')+'。',last&&last.gate==='WARN'?'warn':'');
+ }catch(e){LAST_IMPORT_GATE='FAIL';document.getElementById('dbQuality').textContent='FAIL';setNotice('dataNotice','匯入失敗：'+e.message,'bad');}
+}
+function renderQa(qa,tableName){
+ if(!qa)return;const values=[['Gate',qa.gate],['Rows',qa.rows],['X Axis',qa.x||'—'],['Numeric',qa.numeric.length],['Duplicates',qa.duplicates],['Missing',qa.missing]];
+ document.getElementById('qaGrid').innerHTML=values.map(([k,v])=>'<div class="qaItem"><span class="qk">'+esc(k)+'</span><span class="qv">'+esc(v)+'</span></div>').join('');
+ document.getElementById('dbQuality').textContent=qa.gate;document.getElementById('dbQuality').style.color=qa.gate==='FAIL'?'var(--red)':qa.gate==='WARN'?'var(--amber)':'var(--green)';
+ if(tableName)setNotice('dataNotice',tableName+'：'+qa.gate+(qa.warnings.length?' · '+qa.warnings.join(', '):''),qa.gate==='WARN'?'warn':'');
+}
+function connectorStore(){
+ const store=loadVersionedStore(CONNECTOR_STORAGE_KEY,LEGACY_CONNECTOR_STORAGE_KEYS,()=>({schema:CONNECTOR_SCHEMA,policy:'APPEND_ONLY_READ_ONLY',records:[]}));if(!Array.isArray(store.records))store.records=[];return store;
+}
+function registerConnector(){
+ const alias=document.getElementById('connectorAlias').value.trim(),engine=document.getElementById('connectorEngine').value,location=document.getElementById('connectorLocation').value.trim();
+ if(!/^[A-Za-z0-9_-]{3,60}$/.test(alias)){setNotice('connectorNotice','Alias 只能使用英數、底線、連字號，長度 3–60。','bad');return;}
+ if(!READ_ONLY_ENGINES.includes(engine)||!location){setNotice('connectorNotice','請選擇引擎並填入唯讀位置。','bad');return;}
+ if(/(?:password|pwd|token|secret)\s*[=:]/i.test(location)){setNotice('connectorNotice','Location 不得包含密碼、Token 或 Secret。','bad');return;}
+ const store=connectorStore();if(store.records.some(r=>r.alias===alias&&r.engine===engine&&r.location===location)){setNotice('connectorNotice','相同 Adapter 已登錄，未重複新增。','warn');return;}
+ const record={id:newId('VAP-DB'),alias,engine,location,mode:'READ_ONLY',status:engine==='JSON Endpoint'?'CORS_CHECK_REQUIRED':'MANIFEST_READY',createdAt:nowIso()};
+ store.records.push(record);saveStore(CONNECTOR_STORAGE_KEY,store);renderConnectors();setNotice('connectorNotice','已追加 '+record.id+'；未儲存任何密碼，等待 Runtime Bridge 執行。','');
+}
+function renderConnectors(){
+ const body=document.getElementById('connectorBody');if(!body)return;const records=connectorStore().records;body.innerHTML='';
+ if(!records.length){body.innerHTML='<tr><td colspan="6" class="empty">尚無 Runtime Adapter Manifest</td></tr>';return;}
+ for(const r of [...records].reverse()){const tr=document.createElement('tr'),tone=r.status==='MANIFEST_READY'?'good':'warn';tr.innerHTML='<td><b>'+esc(r.alias)+'</b><span class="templateMeta">'+esc(r.id)+'</span></td><td>'+esc(r.engine)+'</td><td class="mono">'+esc(r.location)+'</td><td class="mono">READ_ONLY</td><td><span class="status '+tone+'">'+esc(r.status)+'</span></td><td class="mono">'+esc(String(r.createdAt).replace('T',' ').slice(0,19))+'</td>';body.appendChild(tr);}
+}
+function exportConnectors(){
+ const store=connectorStore();downloadJson('VIA_VAP_Data_Adapters_'+APP_VERSION+'.json',{schema:CONNECTOR_SCHEMA,system:'VeritasAutoPlot',policy:'APPEND_ONLY_READ_ONLY',exportedAt:nowIso(),adapters:store.records});
+}
+function previewFrame(body,axes=true){
+ const grid=axes?'<path d="M28 26H302M28 56H302M28 86H302M28 116H302" stroke="#ebe9e3" stroke-width="1"/><path d="M28 16V116H306" fill="none" stroke="#9c9890" stroke-width="1"/>':'';
+ return '<svg viewBox="0 0 320 138" role="img" aria-label="chart template preview" data-palette="'+esc(ACTIVE_PALETTE_KEY)+'" xmlns="http://www.w3.org/2000/svg">'+grid+body+'</svg>';
+}
+function chartPreviewSvg(chart){
+ const series=activePalette().colors,a=series[0],b=series[1]||series[0],c=series[2]||series[0],violet=series[4]||series[3]||series[0],up=VAP_SPEC.semanticColors.up,down=VAP_SPEC.semanticColors.down,amber='#c4943a',mut=VAP_SPEC.semanticColors.neutral;
+ const line1='<polyline points="28,96 66,78 104,84 142,52 180,61 218,36 258,45 302,25" fill="none" stroke="'+a+'" stroke-width="2"/>';
+ const line2='<polyline points="28,67 66,72 104,58 142,68 180,44 218,52 258,31 302,39" fill="none" stroke="'+b+'" stroke-width="2" stroke-dasharray="5 3"/>';
+ let body='';
+ switch(chart.id){
+  case'line':body=line1+line2;break;
+  case'area':body='<polygon points="28,116 28,96 66,78 104,84 142,52 180,61 218,36 258,45 302,25 302,116" fill="'+a+'" opacity=".42"/>'+line1;break;
+  case'bar':body=[32,62,92,122,152,182,212,242,272].map((x,i)=>'<rect x="'+x+'" y="'+(96-(i%4)*15)+'" width="27" height="'+(20+(i%4)*15)+'" fill="'+series[i%Math.min(5,series.length)]+'" opacity=".72"/>').join('');break;
+  case'hbar':body=[0,1,2,3,4].map((_,i)=>'<rect x="42" y="'+(20+i*20)+'" width="'+(80+i*34)+'" height="18" fill="'+series[i%Math.min(5,series.length)]+'" opacity=".72"/>').join('');break;
+  case'scatter':body=Array.from({length:28},(_,i)=>'<circle cx="'+(40+(i*37)%250)+'" cy="'+(26+(i*29)%83)+'" r="3" fill="'+(i%2?a:b)+'" opacity=".7"/>').join('');break;
+  case'sarea':body='<polygon points="28,116 28,91 66,82 104,89 142,70 180,79 218,61 258,67 302,52 302,116" fill="'+a+'" opacity=".45"/><polygon points="28,91 66,82 104,89 142,70 180,79 218,61 258,67 302,52 302,30 258,42 218,34 180,53 142,46 104,64 66,58 28,66" fill="'+b+'" opacity=".45"/>';break;
+  case'sbar':case'sbar100':body=[48,86,124,162,200,238,276].map((x,i)=>{const h1=18+(i%3)*7,h2=16+((i+1)%3)*7,h3=chart.id==='sbar100'?68-h1-h2:14;return'<rect x="'+(x-17.5)+'" y="'+(116-h1)+'" width="35" height="'+h1+'" fill="'+a+'"/><rect x="'+(x-17.5)+'" y="'+(116-h1-h2)+'" width="35" height="'+h2+'" fill="'+b+'"/><rect x="'+(x-17.5)+'" y="'+(116-h1-h2-h3)+'" width="35" height="'+h3+'" fill="'+c+'"/>';}).join('');break;
+  case'multi':body=[[30,18],[170,18],[30,70],[170,70]].map((p,i)=>'<g transform="translate('+p[0]+' '+p[1]+')"><rect width="120" height="45" fill="#fafaf8" stroke="#dcdad3"/><polyline points="6,35 30,'+(25-i*2)+' 55,29 82,'+(12+i*2)+' 113,18" fill="none" stroke="'+series[i%Math.min(5,series.length)]+'" stroke-width="1.5"/></g>').join('');break;
+  case'gbar':body=[50,95,140,185,230,275].map((x,i)=>'<rect x="'+(x-20)+'" y="'+(80-(i%3)*10)+'" width="19" height="'+(36+(i%3)*10)+'" fill="'+a+'"/><rect x="'+(x+1)+'" y="'+(68-((i+1)%3)*8)+'" width="19" height="'+(48+((i+1)%3)*8)+'" fill="'+b+'"/>').join('');break;
+  case'dline':body='<polygon points="28,116 28,96 66,78 104,84 142,52 180,61 218,36 258,45 302,25 302,116" fill="'+a+'" opacity=".28"/>'+line1+line2+'<path d="M306 16V116" stroke="'+b+'"/>';break;
+  case'dbarline':body=[48,86,124,162,200,238,276].map((x,i)=>'<rect x="'+(x-17.5)+'" y="'+(96-(i%4)*13)+'" width="35" height="'+(20+(i%4)*13)+'" fill="'+a+'" opacity=".58"/>').join('')+line2+'<path d="M306 16V116" stroke="'+b+'"/>';break;
+  case'evtmx':body='<rect x="102" y="16" width="40" height="100" fill="'+up+'" opacity=".12"/><rect x="218" y="16" width="34" height="100" fill="'+mut+'" opacity=".16"/>'+line1+'<path d="M102 16V116M142 16V116M218 16V116M252 16V116" stroke="'+up+'" stroke-dasharray="4 3" opacity=".75"/>';break;
+  case'corrheat':{let cells='';const cs=17;for(let i=0;i<6;i++)for(let j=0;j<=i;j++){const colors=['#3f7f93','#75a5b3','#b8ced4','#f2f2f2','#e9989e','#d93a46'];cells+='<rect x="'+(88+j*cs)+'" y="'+(18+i*cs)+'" width="16" height="16" fill="'+colors[(i+j)%colors.length]+'"/>';}body=cells;return previewFrame(body,false);}
+  case'brush':body='<polygon points="28,116 28,96 66,78 104,84 142,52 180,61 218,36 258,45 302,25 302,116" fill="'+a+'" opacity=".18"/>'+line1+'<rect x="104" y="18" width="114" height="98" fill="'+violet+'" opacity=".13" stroke="'+violet+'" stroke-dasharray="4 3"/>';break;
+  case'map':body='<path d="M72 32l38-10 31 13 28-8 41 18-9 24 26 22-35 21-41-12-31 14-39-22 12-24z" fill="#e8ece8" stroke="#9c9890"/><circle cx="119" cy="56" r="7" fill="'+up+'"/><circle cx="178" cy="74" r="6" fill="'+down+'"/><circle cx="146" cy="96" r="5" fill="'+amber+'"/><text x="236" y="54" font-size="11" fill="'+up+'">▲ +3.2%</text><text x="236" y="76" font-size="11" fill="'+down+'">▼ −1.4%</text>';return previewFrame(body,false);
+  case'roll':case'rollcorr':case'rollsharpe':body=line1+(chart.id==='rollcorr'?'<path d="M28 66H302" stroke="'+mut+'" stroke-dasharray="3 3"/>':'');break;
+  case'sortino':body=line1+line2+'<path d="M306 16V116" stroke="'+b+'"/>';break;
+  case'radar':body='<polygon points="160,15 244,48 226,112 94,112 76,48" fill="none" stroke="'+mut+'" stroke-dasharray="4 3"/><polygon points="160,30 218,55 204,98 108,104 91,52" fill="'+violet+'" opacity=".28" stroke="'+violet+'" stroke-width="2"/><path d="M160 15V116M76 48L244 48M94 112L226 112" stroke="#ebe9e3"/>';return previewFrame(body,false);
+  case'alpha':body='<polygon points="28,78 66,74 104,67 142,60 180,50 218,42 258,34 302,26 302,50 258,52 218,58 180,65 142,70 104,78 66,82 28,86" fill="'+a+'" opacity=".22"/>'+line1+line2+[46,84,122,160,198,236,274].map((x,i)=>'<rect x="'+(x-17.5)+'" y="'+(i%2?92:78)+'" width="35" height="'+(i%2?24:38)+'" fill="'+(i%2?down:up)+'" opacity=".62"/>').join('');break;
+  case'econcal':body=[0,1,2,3].map((_,i)=>'<g transform="translate(36 '+(20+i*27)+')"><circle cx="6" cy="6" r="5" fill="'+[up,amber,down,up][i]+'"/><rect x="22" y="0" width="86" height="11" fill="#ebe9e3"/><rect x="122" y="0" width="42" height="11" fill="'+a+'" opacity=".35"/><rect x="176" y="0" width="42" height="11" fill="'+b+'" opacity=".35"/></g>').join('');return previewFrame(body,false);
+  case'consensus':body='<rect x="42" y="25" width="210" height="16" fill="#ebe9e3"/><rect x="42" y="25" width="148" height="16" fill="'+up+'" opacity=".6"/><path d="M180 19V47" stroke="'+amber+'" stroke-width="2"/><text x="42" y="70" font-size="12" fill="'+mut+'">EPS 12.8 · TP 820 · BUY</text><rect x="42" y="82" width="70" height="24" fill="'+down+'" opacity=".45"/><rect x="120" y="82" width="70" height="24" fill="'+amber+'" opacity=".45"/><rect x="198" y="82" width="70" height="24" fill="'+up+'" opacity=".45"/>';return previewFrame(body,false);
+  case'backtest':body=[50,86,122,158,194,230,266].map((x,i)=>'<rect x="'+(x-16.5)+'" y="'+(65+(i%2)*8)+'" width="33" height="'+(51-(i%3)*9)+'" fill="'+a+'" opacity=".6"/>').join('')+line2+'<path d="M28 48H302" stroke="'+up+'" stroke-dasharray="4 3"/>';break;
+  case'intraday':body='<path d="M28 72H302M28 92H302" stroke="#ebe9e3"/>'+line1.replaceAll('116','72').replaceAll('96','58').replaceAll('84','51').replaceAll('78','46').replaceAll('61','36').replaceAll('52','31').replaceAll('45','27').replaceAll('36','24').replaceAll('25','18')+[44,72,100,128,156,184,212,240,268,296].map((x,i)=>'<rect x="'+(x-12)+'" y="'+(104-(i%3)*4)+'" width="24" height="'+(12+(i%3)*4)+'" fill="'+(i%2?down:up)+'" opacity=".65"/>').join('');break;
+  case'candle':{let candles='<path d="M28 88H302" stroke="#dcdad3" stroke-width="1"/>';for(let i=0;i<14;i++){const x=38+i*18,isUp=i%3!==0,direction=isUp?'up':'down',color=isUp?up:down,open=34+(i*9)%31,close=isUp?open-10:open+10,top=Math.min(open,close),bottom=Math.max(open,close),volumeHeight=10+(i*7)%20;candles+='<path data-role="wick" data-direction="'+direction+'" d="M'+x+' '+(top-6)+'V'+(bottom+6)+'" stroke="'+color+'" stroke-width="1.2"/><rect data-role="candle" data-direction="'+direction+'" x="'+(x-5)+'" y="'+top+'" width="10" height="'+Math.max(3,bottom-top)+'" fill="'+color+'" opacity=".86"/><rect data-role="volume" data-direction="'+direction+'" x="'+(x-6)+'" y="'+(116-volumeHeight)+'" width="12" height="'+volumeHeight+'" fill="'+color+'" opacity=".72"/>';}body=candles+'<polyline points="32,58 68,52 104,56 140,44 176,49 212,38 248,43 286,31" fill="none" stroke="'+amber+'" stroke-width="1.5"/>';break;}
+  case'spotfut':body=line1+line1.replaceAll(a,b).replace('stroke-width="2"','stroke-width="2" stroke-dasharray="5 3"')+'<text x="210" y="108" font-size="10" fill="'+mut+'">BASIS +1.8%</text>';break;
+  default:body=line1;
+ }
+ return previewFrame(body,true);
+}
+function renderCanonicalGallery(){
+ const grid=document.getElementById('canonicalGalleryGrid');if(!grid)return;
+ const query=(document.getElementById('librarySearch').value||'').trim().toLowerCase(),group=document.getElementById('libraryGroup').value;
+ const filtered=CHART_LIBRARY.filter(c=>(group==='ALL'||c.group===group)&&(!query||[c.code,c.id,c.group,c.zh,c.en,c.dataShape,c.fields.join(' '),c.rule,c.renderer].join(' ').toLowerCase().includes(query)));
+ grid.innerHTML='';
+ for(const c of filtered){const card=document.createElement('article');card.className='chartTemplate';card.id='chart-'+c.code;
+  card.innerHTML='<div class="chartTemplateHead"><div class="chartTemplateTitle">'+esc(c.zh)+' <span class="templateMeta">'+esc(c.en)+'</span></div><span class="chartTemplateCode">'+esc(c.code)+'</span></div>'+
+   '<div class="chartTemplateMeta"><span class="badge">AXES '+c.axes+'</span><span class="badge">'+esc(c.dataShape)+'</span><span class="badge">'+esc(activePalette().name)+'</span><span class="badge">🔒 SSOT</span></div><div class="chartPreview">'+chartPreviewSvg(c)+'</div>'+
+   '<div class="chartTemplateRule">'+esc(c.rule)+'</div><div class="chartTemplateFields">FIELDS · '+esc(c.fields.join(' · '))+'</div><div class="buttonRow" style="margin-top:7px"><button class="btn small" onclick="openCanonicalPreview(\''+c.code+'\')">鎖定檢視</button><span class="templateMeta">'+esc(c.renderer)+'</span></div>';
+  grid.appendChild(card);}
+ document.getElementById('libraryCount').textContent=filtered.length+' / '+CHART_LIBRARY.length+' LOCKED';
+ if(!filtered.length)grid.innerHTML='<div class="empty">沒有符合的圖表範本</div>';
+}
+function openCanonicalPreview(code){
+ switchPage('gallery');document.getElementById('librarySearch').value=code;document.getElementById('libraryGroup').value='ALL';renderCanonicalGallery();
+ requestAnimationFrame(()=>{const card=document.getElementById('chart-'+code);if(card){card.classList.add('focused');card.scrollIntoView({block:'center',behavior:'smooth'});}});
+}
+function renderSpecMatrix(){
+ const out=document.getElementById('specMatrix');if(!out)return;out.innerHTML='';
+ for(const [section,values] of Object.entries(VAP_SPEC)){if(section==='meta')continue;const wrap=document.createElement('div');wrap.className='specSection';
+  let rows='';for(const [key,value] of Object.entries(values)){const formatted=Array.isArray(value)?value.join(' · '):value&&typeof value==='object'?Object.entries(value).map(([k,v])=>k+'='+v).join(' · '):String(value);rows+='<tr><td>'+esc(section+'.'+key)+'</td><td>'+esc(formatted)+'</td></tr>';}
+  wrap.innerHTML='<h4>'+esc(section)+'</h4><div class="tableWrap"><table class="specMatrix"><tbody>'+rows+'</tbody></table></div>';out.appendChild(wrap);}
+ document.getElementById('paletteMatrix').innerHTML=Object.entries(VAP_PALETTES).map(([key,p])=>'<div class="paletteRow" data-palette-key="'+esc(key)+'"><span class="paletteLabel">'+esc(key)+' · '+esc(p.name)+'</span><span class="paletteSet">'+p.colors.map(color=>'<i style="background:'+color+'" title="'+color+'"></i>').join('')+'</span><button class="paletteApply'+(key===ACTIVE_PALETTE_KEY?' active':'')+'" onclick="setActivePalette(\''+key+'\')">'+(key===ACTIVE_PALETTE_KEY?'ACTIVE':'APPLY')+'</button><span class="templateMeta">'+esc((p.source?p.source+' · ':'')+p.colors.join(' · '))+'</span></div>').join('');
+ document.getElementById('dataRuleList').innerHTML=DATA_RULES.map(rule=>'<div class="ruleItem">'+esc(rule)+'</div>').join('');
+}
+function setupCanonicalLibrary(){
+ const select=document.getElementById('libraryGroup'),groups=[...new Set(CHART_LIBRARY.map(c=>c.group))];select.innerHTML='<option value="ALL">全部 ALL</option>'+groups.map(group=>'<option value="'+esc(group)+'">'+esc(group)+'</option>').join('');
+ document.getElementById('librarySearch').addEventListener('input',renderCanonicalGallery);select.addEventListener('change',renderCanonicalGallery);renderCanonicalGallery();renderSpecMatrix();
+}
+function drawChart(labels,lv,rv,lname,rname,lform,rform,compact){
+ if(lform===rform)rform=lform!=='line'?'line':'bar';
+ const CC=chartColors();
+ const W=960,H=compact?300:420,PL=64,PR=64,PT=18,PB=44,pw=W-PL-PR,ph=H-PT-PB,n=labels.length;
+ function dom(vals,zero){let lo=Math.min(...vals),hi=Math.max(...vals);
+  if(zero){lo=Math.min(lo,0);hi=Math.max(hi,0);}if(lo===hi){lo-=1;hi+=1;}
+  const t=niceTicks(lo,hi);return{lo:t[0],hi:t[t.length-1],t:t};}
+ const L=dom(lv,lform!=='line'),R=dom(rv,rform!=='line');
+ const yl=v=>PT+ph-(v-L.lo)/(L.hi-L.lo)*ph, yr=v=>PT+ph-(v-R.lo)/(R.hi-R.lo)*ph;
+ const slot=pw/Math.max(1,n), xc=i=>PL+slot*i+slot/2;
+ let s='<svg viewBox="0 0 '+W+' '+H+'" data-palette="'+esc(ACTIVE_PALETTE_KEY)+'" xmlns="http://www.w3.org/2000/svg" font-family="Microsoft JhengHei,Segoe UI,sans-serif" font-size="11">';
+ for(const t of L.t)s+='<line x1="'+PL+'" y1="'+yl(t)+'" x2="'+(W-PR)+'" y2="'+yl(t)+'" stroke="'+CC.soft+'"/>';
+ function marks(vals,form,color,yof){
+  let o='';const bw=Math.max(2,slot*VAP_SPEC.bar.widthRatio);
+  if(form==='bar'){const base=yof(0);
+   for(let i=0;i<n;i++){const top=Math.min(yof(vals[i]),base),h=Math.max(1,Math.abs(yof(vals[i])-base));
+    o+='<rect data-role="bar" data-width-ratio="'+VAP_SPEC.bar.widthRatio+'" x="'+(xc(i)-bw/2)+'" y="'+top+'" width="'+bw+'" height="'+h+'" rx="1.5" fill="'+color+'" fill-opacity="'+LOCK.op+'"/>';}
+   return o;}
+  const pts=vals.map((v,i)=>xc(i)+','+yof(v)).join(' ');
+  if(form==='area'){o+='<polygon points="'+xc(0)+','+yof(Math.max(Math.min(...vals),0))+' '+pts+' '+xc(n-1)+','+yof(Math.max(Math.min(...vals),0))+'" fill="'+color+'" fill-opacity="'+(LOCK.op*0.4).toFixed(2)+'"/>';}
+  o+='<polyline points="'+pts+'" fill="none" stroke="'+color+'" stroke-width="'+LOCK.lw+'" stroke-opacity="'+LOCK.op+'" stroke-linejoin="round" stroke-linecap="round"/>';
+  for(let i=0;i<n;i++)o+='<circle cx="'+xc(i)+'" cy="'+yof(vals[i])+'" r="1.6" fill="'+color+'"/>';
+  return o;}
+ s+=marks(lv,lform,CC.left,yl)+marks(rv,rform,CC.right,yr);
+ s+='<line x1="'+PL+'" y1="'+PT+'" x2="'+PL+'" y2="'+(PT+ph)+'" stroke="'+CC.left+'" stroke-width="'+LOCK.lw+'"/>';
+ s+='<line x1="'+(W-PR)+'" y1="'+PT+'" x2="'+(W-PR)+'" y2="'+(PT+ph)+'" stroke="'+CC.right+'" stroke-width="'+LOCK.lw+'"/>';
+ for(const t of L.t)s+='<text x="'+(PL-6)+'" y="'+(yl(t)+3.5)+'" text-anchor="end" fill="'+CC.left+'">'+fmt(t)+'</text>';
+ for(const t of R.t)s+='<text x="'+(W-PR+6)+'" y="'+(yr(t)+3.5)+'" text-anchor="start" fill="'+CC.right+'">'+fmt(t)+'</text>';
+ const ev=Math.max(1,Math.ceil(n/(compact?6:10)));
+ for(let i=0;i<n;i+=ev)s+='<text x="'+xc(i)+'" y="'+(PT+ph+16)+'" text-anchor="middle" fill="'+CC.mut+'">'+esc(labels[i])+'</text>';
+ s+='<text x="'+(xc(n-1)-4)+'" y="'+(yl(lv[n-1])-6)+'" text-anchor="end" font-weight="700" fill="'+CC.left+'">'+fmt(lv[n-1])+'</text>';
+ s+='<text x="'+(xc(n-1)+4)+'" y="'+(yr(rv[n-1])-6)+'" text-anchor="start" font-weight="700" fill="'+CC.right+'">'+fmt(rv[n-1])+'</text>';
+ for(let i=0;i<n;i++){
+  s+='<g class="hv" data-i="'+i+'"><rect x="'+(PL+slot*i)+'" y="'+PT+'" width="'+slot+'" height="'+ph+'" fill="transparent"/>'
+   +'<line class="ch" x1="'+xc(i)+'" y1="'+PT+'" x2="'+xc(i)+'" y2="'+(PT+ph)+'" stroke="'+CC.mut2+'" stroke-dasharray="3 3" opacity="0"/></g>';}
+ s+='</svg>';
+ return s;
+}
+function tableByName(name){return CATALOG.find(t=>t.name===name);}
+function fillSelect(sel,opts,val){sel.innerHTML=opts.map(o=>'<option'+(o===val?' selected':'')+'>'+esc(o)+'</option>').join('');}
+function onTableChange(){
+ const t=tableByName(document.getElementById('selTable').value);if(!t)return;
+ fillSelect(document.getElementById('selX'),t.all_columns,t.x);
+ fillSelect(document.getElementById('selLeft'),t.numeric,t.numeric[0]);
+ fillSelect(document.getElementById('selRight'),t.numeric,t.numeric[1]||t.numeric[0]);
+}
+function swapAxes(){
+ const l=document.getElementById('selLeft'),r=document.getElementById('selRight');
+ const tmp=l.value;l.value=r.value;r.value=tmp;renderPair();
+}
+function seriesOf(t,xcol,col){
+ const pts=[];
+ for(let i=0;i<t.rows.length;i++){
+  const x=t.rows[i][xcol],v=parseFloat(String(t.rows[i][col]).replace(/,/g,''));
+  if(x!==undefined&&x!==null&&String(x).length&&isFinite(v))pts.push([String(x),v]);}
+ return pts;
+}
+function renderPair(){
+ const t=tableByName(document.getElementById('selTable').value);if(!t)return;
+ const xcol=document.getElementById('selX').value,
+  ln=document.getElementById('selLeft').value, rn=document.getElementById('selRight').value,
+  lf=document.getElementById('selLeftForm').value, rf=document.getElementById('selRightForm').value;
+ const lp=seriesOf(t,xcol,ln), rp=seriesOf(t,xcol,rn);
+ const keys=lp.map(p=>p[0]).filter(k=>rp.some(q=>q[0]===k));
+ const labels=keys, lv=keys.map(k=>lp.find(p=>p[0]===k)[1]), rv=keys.map(k=>rp.find(p=>p[0]===k)[1]);
+ if(labels.length<3){document.getElementById('pairChart').innerHTML='<div class="hint">資料點不足(&lt;3)· not enough complete points</div>';return;}
+ const fz={bar:'柱狀 BAR',line:'折線 LINE',area:'面積 AREA'},CC=chartColors();
+ document.getElementById('pairLegend').innerHTML=
+  '<span><span class="sw" style="background:'+CC.left+'"></span><b>'+esc(ln)+'</b> · 左軸 LEFT · '+fz[lf]+'</span>'
+ +'<span><span class="sw" style="background:'+CC.right+'"></span><b>'+esc(rn)+'</b> · 右軸 RIGHT · '+fz[rf===lf?(lf!=='line'?'line':'bar'):rf]+'</span><span class="templateMeta">PALETTE · '+esc(activePalette().name)+'</span>';
+ document.getElementById('pairChart').innerHTML=drawChart(labels,lv,rv,ln,rn,lf,rf,false);
+ document.querySelectorAll('#pairChart .hv').forEach(g=>{
+  g.addEventListener('mousemove',()=>{const i=+g.dataset.i;
+   document.getElementById('pairReadout').textContent=labels[i]+' · '+ln+' '+fmt(lv[i])+' · '+rn+' '+fmt(rv[i]);});});
+}
+function openInPair(tname,l,r){
+ fillSelect(document.getElementById('selTable'),CATALOG.map(t=>t.name),tname);
+ onTableChange();
+ document.getElementById('selLeft').value=l;document.getElementById('selRight').value=r;
+ switchPage('pair');renderPair();
+}
+function refreshCatalogUI(){
+ let rows=0,cols=0,pairs=0;
+ const cbody=document.getElementById('catalogBody'),grid=document.getElementById('galleryGrid');
+ cbody.innerHTML='';grid.innerHTML='';
+ for(const t of CATALOG){
+  rows+=t.rows.length;cols+=t.numeric.length;
+  pairs+=t.numeric.length*(t.numeric.length-1)/2;
+  cbody.innerHTML+='<tr><td class="mono"><b>'+esc(t.name)+'</b></td><td class="mono">'+t.rows.length+'</td><td class="mono">'+esc(t.x)+'</td><td>'+t.numeric.map(esc).join(' · ')+'</td><td class="mono">'+esc(t.origin)+'</td></tr>';
+  for(let i=0;i<t.numeric.length;i++)for(let j=i+1;j<t.numeric.length;j++){
+   const l=t.numeric[i],r=t.numeric[j];
+   const lp=seriesOf(t,t.x,l),rp=seriesOf(t,t.x,r);
+   const keys=lp.map(p=>p[0]).filter(k=>rp.some(q=>q[0]===k));
+   if(keys.length<3)continue;
+   const cell=document.createElement('div');cell.className='gcell';
+   cell.innerHTML='<div class="t">'+esc(l)+' × '+esc(r)+'</div><div class="s">'+esc(t.name)+' · '+keys.length+' pts</div>'
+    +drawChart(keys,keys.map(k=>lp.find(p=>p[0]===k)[1]),keys.map(k=>rp.find(p=>p[0]===k)[1]),l,r,'bar','line',true);
+   cell.onclick=()=>openInPair(t.name,l,r);
+   grid.appendChild(cell);}}
+ document.getElementById('cTables').textContent=CATALOG.length;
+ document.getElementById('cRows').textContent=rows;
+ document.getElementById('cCols').textContent=cols;
+ document.getElementById('cPairs').textContent=pairs;
+ document.getElementById('ssTables').textContent=CATALOG.length;
+ document.getElementById('ssPairs').textContent=pairs;
+ document.getElementById('hmTables').textContent=CATALOG.length;
+ document.getElementById('dbCatalogs').textContent=CATALOG.length;
+ document.getElementById('dbRows').textContent=rows;
+ document.getElementById('dbQuality').textContent=LAST_IMPORT_GATE;
+ if(CATALOG.length){const tableSelect=document.getElementById('selTable'),prior=tableSelect.value;
+  fillSelect(tableSelect,CATALOG.map(t=>t.name),CATALOG.some(t=>t.name===prior)?prior:CATALOG[0].name);onTableChange();renderPair();}
+}
+function setupDataImport(){
+ const input=document.getElementById('dataImport'),drop=document.getElementById('dataDropzone');
+ input.addEventListener('change',()=>{if(input.files&&input.files[0])importDataFile(input.files[0]);input.value='';});
+ for(const event of ['dragenter','dragover'])drop.addEventListener(event,e=>{e.preventDefault();drop.classList.add('drag');});
+ for(const event of ['dragleave','drop'])drop.addEventListener(event,e=>{e.preventDefault();drop.classList.remove('drag');});
+ drop.addEventListener('drop',e=>{const file=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];if(file)importDataFile(file);});
+ document.getElementById('templateImport').addEventListener('change',e=>{const file=e.target.files&&e.target.files[0];if(file)importTemplatesFile(file);e.target.value='';});
+}
+function installRuntimeBridge(){
+ const api={version:APP_VERSION,schema:'VIA-VAP-RUNTIME-BRIDGE/1.0',mode:'READ_ONLY',
+  registerCatalog(table){return registerCatalogTable(table,'runtime:window.VeritasAutoPlot',table&&table.source_fingerprint||null);},
+  catalogSummary(){return CATALOG.map(t=>({name:t.name,origin:t.origin,x:t.x,numeric:[...t.numeric],rows:t.rows.length}));},
+  paletteSummary(){return{active:ACTIVE_PALETTE_KEY,name:activePalette().name,left:chartColors().left,right:chartColors().right,approved:Object.keys(VAP_PALETTES),semanticColors:{...VAP_SPEC.semanticColors}};}};
+ Object.freeze(api);Object.defineProperty(window,'VeritasAutoPlot',{value:api,writable:false,configurable:false});
+ window.addEventListener('vap:catalog',event=>{const detail=event.detail,tables=Array.isArray(detail)?detail:(detail&&Array.isArray(detail.tables)?detail.tables:[detail]);
+  for(const table of tables)if(table)registerCatalogTable(table,'runtime:event',table.source_fingerprint||null);});
+ document.getElementById('dbBridge').textContent='READY';document.getElementById('hmBridge').textContent='RUNTIME READY';
+}
+function boot(){
+ document.getElementById('selTable').addEventListener('change',onTableChange);
+ setupPaletteControls();setupDataImport();setupCanonicalLibrary();installRuntimeBridge();renderTemplates();renderConnectors();refreshCatalogUI();
+ let p='home';try{p=localStorage.getItem('vap_wb_page')||'home';}catch(e){}
+ switchPage(PAGES.includes(p)?p:'home');
+}
+boot();
+</script></body></html>

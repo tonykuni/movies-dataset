@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>VDF FRED Canonical Key Repair Dry-Run v026.1.2</title>
+<style>
+body{margin:0;background:#f5f4f0;color:#1e1d1a;font-family:Arial,"Microsoft JhengHei",sans-serif;font-size:10.4px;line-height:1.32}
+.header{padding:22px 28px;background:linear-gradient(135deg,#1e293b,#31517a);color:white;text-align:center}
+.header h1{margin:0;font-size:25px}.line2{margin-top:6px;font-size:13px;font-weight:800;letter-spacing:1.4px}.line3{margin-top:6px;font-size:11.5px;opacity:.9}
+.wrap{padding:18px 24px}.grid{display:grid;grid-template-columns:repeat(8,minmax(95px,1fr));gap:10px;margin-bottom:14px}
+.card{background:white;border:1px solid #d8d6cf;border-radius:12px;padding:10px 12px;box-shadow:0 5px 16px rgba(16,24,40,.045)}
+.kpi{font-size:22px;font-weight:900;font-family:Consolas,monospace;text-align:center}.label{text-align:center;color:#7b786f;font-size:10.5px;margin-top:5px}
+.badge{display:inline-block;padding:7px 10px;border-radius:999px;font-weight:900}
+.badge.low{background:#cde8d5;color:#5a9e6f}.badge.medium{background:#f5e2b8;color:#c4943a}.badge.high{background:#f5d0c8;color:#c96b5a}
+.lock{font-family:Consolas,"Microsoft JhengHei",monospace;white-space:pre-wrap;background:#0b1020;color:#dbeafe;padding:12px 14px;border-radius:10px;line-height:1.38;overflow:auto;font-size:10.5px}
+.mw{max-height:780px;overflow:auto;border:1px solid #d8d6cf;border-radius:12px;background:white;margin-bottom:16px}
+table{width:100%;border-collapse:collapse;table-layout:auto;background:white}
+thead th{position:sticky;top:0;z-index:2;text-align:center;vertical-align:top;background:#eef2f8;color:#334155;font-size:10.1px;font-weight:900;padding:7px;border-bottom:1px solid #d8d6cf;border-right:1px solid #e4e7ec}
+tbody td{font-size:10.1px;padding:6px 7px;border-bottom:1px solid #edf0f4;border-right:1px solid #edf0f4;vertical-align:top;word-break:break-word;overflow-wrap:anywhere;white-space:normal;text-align:center}
+.path{font-family:Consolas,monospace;font-size:9.2px;color:#475467;min-width:220px;max-width:360px;text-align:left}
+tr.ok td:first-child{border-left:4px solid #5a9e6f}tr.warn td:first-child{border-left:4px solid #c4943a}tr.fail td:first-child{border-left:4px solid #c96b5a}
+h2{font-size:14px;margin:14px 0 8px}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>VeritasDataForge</h1>
+<div class="line2">VERITAS INTELLIGENCE ANALYTICS</div>
+<div class="line3">FRED Canonical Key Repair Dry-Run v026.1.2 · Repair Preview Only · No Canonical Overwrite</div>
+</div>
+<div class="wrap">
+<div class="grid">
+<div class="card"><div class="badge low">VDF_FRED_CANONICAL_KEY_REPAIR_DRYRUN_READY</div><div class="label">Risk LOW</div></div>
+<div class="card"><div class="kpi">32</div><div class="label">OK</div></div>
+<div class="card"><div class="kpi">0</div><div class="label">WARN</div></div>
+<div class="card"><div class="kpi">0</div><div class="label">FAIL</div></div>
+<div class="card"><div class="kpi">10</div><div class="label">Canonical Before</div></div>
+<div class="card"><div class="kpi">1</div><div class="label">Repair Preview</div></div>
+<div class="card"><div class="kpi">1453</div><div class="label">Merge Preview</div></div>
+<div class="card"><div class="kpi">1.03</div><div class="label">Seconds</div></div>
+</div>
+
+<h2>def Repair Dry-Run Scope</h2>
+<div class="lock">Canonical before:
+rows = 10
+unique keys = 1
+duplicate keys = 9
+
+Repair preview:
+rows after repair preview = 1
+dropped duplicate rows in repair preview = 9
+
+Candidate:
+rows = 1452
+unique keys = 1452
+
+Merge preview after repair:
+rows = 1453
+
+Recommendation:
+ALLOW_V0262_REAL_MERGE_WITH_BACKUP_AND_REPAIR_RULE
+
+Repair Report:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_FRED_CANONICAL_KEY_REPAIR_DRYRUN_v02612_20260610_135521\registry\VDF_FredCanonical_KeyRepairReport_v02612.json
+
+Repair Plan:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_FRED_CANONICAL_KEY_REPAIR_DRYRUN_v02612_20260610_135521\plan\VDF_FredCanonical_KeyRepairDryRun_Plan_v02612.json
+
+Staging:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_FRED_CANONICAL_KEY_REPAIR_DRYRUN_v02612_20260610_135521\staging
+
+Policy:
+def repair dry-run only
+def no canonical overwrite
+def no DB rewrite
+def no fetch
+def future v026.2 must backup canonical three files before write
+def no destructive delete
+def no Stop-Process
+def no exit</div>
+
+<h2>def Matrix</h2>
+<div class="mw">
+<table>
+<thead><tr><th>Round</th><th>Stage</th><th>Layer</th><th>Name</th><th>Status</th><th>Risk</th><th>FixClass</th><th>Priority</th><th>Mode</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr></thead>
+<tbody>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>ACTIVE_POINTER</td><td>VDF_ACTIVE_POINTER.json</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>json_parse</td><td>ok</td><td>JSON parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ACTIVE_POINTER.json</td></tr>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>FRED_SMALL_SCOPE_SEAL_POINTER</td><td>VDF_LATEST_FRED_SMALL_SCOPE_SEAL_POINTER.json</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>json_parse</td><td>ok</td><td>JSON parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_freeze\VDF_LATEST_FRED_SMALL_SCOPE_SEAL_POINTER.json</td></tr>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>FRED_CAPABILITY_POINTER</td><td>VDF_LATEST_FRED_AKSHARE_CAPABILITY_SEAL_POINTER.json</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>json_parse</td><td>ok</td><td>JSON parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_freeze\VDF_LATEST_FRED_AKSHARE_CAPABILITY_SEAL_POINTER.json</td></tr>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>VDF_ENTRY</td><td>Invoke-VDF.ps1</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>exists_sha256</td><td>DC72773B64F027CC8699199F3E315586AFB2BF0DEAF7D0B7B3430CF57A3A73FD</td><td>File exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\Invoke-VDF.ps1</td></tr>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>VDF_ENTRY_AST</td><td>Invoke-VDF.ps1</td><td>OK_AST_PARSE</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>functions</td><td>1</td><td>PowerShell AST parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\Invoke-VDF.ps1</td></tr>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>VDF_FETCH_ENTRY</td><td>Invoke-VDF-Fetch.ps1</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>exists_sha256</td><td>C625DA53435FBC27CDE102F634D8BC9BF4BD22DEA728E2B6499F0077305F7364</td><td>File exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\Invoke-VDF-Fetch.ps1</td></tr>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>VDF_FETCH_ENTRY_AST</td><td>Invoke-VDF-Fetch.ps1</td><td>OK_AST_PARSE</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>functions</td><td>1</td><td>PowerShell AST parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\Invoke-VDF-Fetch.ps1</td></tr>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>NEXUSCORE_ENTRY</td><td>Invoke-VeritasNexusCore.ps1</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>exists_sha256</td><td>D8741599A121F33A31A57C372BA86AA328D74F1C9BE5817AEB7682C1FFFC267C</td><td>File exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\Invoke-VeritasNexusCore.ps1</td></tr>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>NEXUSCORE_AST</td><td>Invoke-VeritasNexusCore.ps1</td><td>OK_AST_PARSE</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>functions</td><td>2</td><td>PowerShell AST parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\Invoke-VeritasNexusCore.ps1</td></tr>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>NEXUSCORE_README</td><td>Read_Me_VeritasNexusCore.md</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>exists_sha256</td><td>E17A9D1312F6B730094C4D868156681CF7B7D49C53FA1B2226AB5C859F6B79F2</td><td>File exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\Read_Me_VeritasNexusCore.md</td></tr>
+<tr class='ok'><td>Round2</td><td>TEST_DEBUG</td><td>SOURCE_OUTPUT</td><td>VDF_Global_Macro.csv</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>exists_sha256</td><td>B0936CF01853586A06B5D4EE730B3BD9363BCD91D280686E65F6CFBC7785DC83</td><td>File exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE\VDF_Global_Macro.csv</td></tr>
+<tr class='ok'><td>Round2</td><td>TEST_DEBUG</td><td>SOURCE_OUTPUT</td><td>VDF_Global_Macro.json</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>exists_sha256</td><td>2D659E8468FE065E8E67D792C6B316C522BDBA0E7A893FB3A20439AADACF51B4</td><td>File exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE\VDF_Global_Macro.json</td></tr>
+<tr class='ok'><td>Round2</td><td>TEST_DEBUG</td><td>SOURCE_OUTPUT</td><td>VDF_Global_Macro.parquet</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>exists_sha256</td><td>A8F4DB61478BDBFDDF03F3CB433D366B22E8335F36B109B947708FD1F989F130</td><td>File exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE\VDF_Global_Macro.parquet</td></tr>
+<tr class='ok'><td>Round2</td><td>TEST_DEBUG</td><td>SOURCE_OUTPUT</td><td>VDF_Global_Macro_FRED_SmallScope_Candidate.csv</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>exists_sha256</td><td>C9D75033DC6916BFF66B98764009D8BFCB743505D445E1CE4837E7AC67BBD0D4</td><td>File exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE\VDF_Global_Macro_FRED_SmallScope_Candidate.csv</td></tr>
+<tr class='ok'><td>Round2</td><td>TEST_DEBUG</td><td>SOURCE_OUTPUT</td><td>VDF_Global_Macro_FRED_SmallScope_Candidate.json</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>exists_sha256</td><td>00571F273BF56BE5629F97BBD3876FFA72550CA90A4204C6B415F5D98F0191E7</td><td>File exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE\VDF_Global_Macro_FRED_SmallScope_Candidate.json</td></tr>
+<tr class='ok'><td>Round2</td><td>TEST_DEBUG</td><td>SOURCE_OUTPUT</td><td>VDF_Global_Macro_FRED_SmallScope_Candidate.parquet</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>exists_sha256</td><td>14CDB46A30096A702839EF466661402F5E67358C56AC4866E9C243DB290FE518</td><td>File exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE\VDF_Global_Macro_FRED_SmallScope_Candidate.parquet</td></tr>
+<tr class='warn'><td>Round2</td><td>TEST_DEBUG</td><td>ROW_VALIDATE</td><td>VDF_Global_Macro</td><td>OK_SOURCE_READABLE</td><td>MEDIUM</td><td>SEQUENTIAL_GATED</td><td>P1</td><td>REPAIR_DRYRUN_ONLY</td><td>rows</td><td>10</td><td>Canonical source readable; repair preview required due duplicate keys.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE\VDF_Global_Macro.csv</td></tr>
+<tr class='ok'><td>Round2</td><td>TEST_DEBUG</td><td>ROW_VALIDATE</td><td>VDF_Global_Macro_FRED_SmallScope_Candidate</td><td>OK_CANDIDATE_READY</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>rows</td><td>1452</td><td>Candidate source readable and clean from prior gate.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE\VDF_Global_Macro_FRED_SmallScope_Candidate.csv</td></tr>
+<tr class='ok'><td>Round3</td><td>DRY_RUN</td><td>PYTHON_REPAIR_DRYRUN</td><td>vdf_fred_canonical_key_repair_dryrun_v02612.py</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>exists_sha256</td><td>7B1FA6C23EE700CD767ADE35D5A984FB42B42AD75D4ECF2CB3A9051BC34EA2F5</td><td>File exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_FRED_CANONICAL_KEY_REPAIR_DRYRUN_v02612_20260610_135521\runtime\vdf_fred_canonical_key_repair_dryrun_v02612.py</td></tr>
+<tr class='ok'><td>Round3</td><td>DRY_RUN</td><td>PYTHON_REPAIR_DRYRUN</td><td>canonical key repair dry-run</td><td>OK_REPAIR_DRYRUN_EXECUTED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>execute</td><td>ok</td><td>{&quot;status&quot;: &quot;VDF_FRED_CANONICAL_KEY_REPAIR_DRYRUN_READY&quot;, &quot;risk&quot;: &quot;LOW&quot;, &quot;canonical_rows_before&quot;: 10, &quot;canonical_unique_keys_before&quot;: 1, &quot;canonical_duplicate_keys_before&quot;: 9, &quot;canonical_rows_after_repair_preview&quot;: 1, &quot;candidate_rows&quot;: 1452, &quot;merge_preview_rows&quot;: 1453, &quot;recommendation&quot;: &quot;ALLOW_V0262_REAL_MERGE_WITH_BACKUP_AND_REPAIR_RULE&quot;}</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_FRED_CANONICAL_KEY_REPAIR_DRYRUN_v02612_20260610_135521\runtime\vdf_fred_canonical_key_repair_dryrun_v02612.py</td></tr>
+<tr class='ok'><td>Round3</td><td>DRY_RUN</td><td>PYTHON_RESULT</td><td>vdf_fred_canonical_key_repair_dryrun_result_v02612.json</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>json_parse</td><td>ok</td><td>JSON parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_FRED_CANONICAL_KEY_REPAIR_DRYRUN_v02612_20260610_135521\runtime\vdf_fred_canonical_key_repair_dryrun_result_v02612.json</td></tr>
+<tr class='warn'><td>Round3</td><td>DRY_RUN</td><td>REPAIR_DECISION</td><td>canonical key repair preview</td><td>OK_REPAIR_PREVIEW_READY</td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P1</td><td>REPAIR_DRYRUN_ONLY</td><td>dropped_duplicates</td><td>9</td><td>Repair preview ready. Canonical not overwritten.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_FRED_CANONICAL_KEY_REPAIR_DRYRUN_v02612_20260610_135521\runtime\vdf_fred_canonical_key_repair_dryrun_result_v02612.json</td></tr>
+<tr class='ok'><td>Round4</td><td>TEST_DEBUG</td><td>STAGING_OUTPUT</td><td>VDF_Global_Macro_CANONICAL_KEY_REPAIR_PREVIEW_v02612.csv</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>exists_sha256</td><td>676D1C2B22AD3EDF061E764E2903FC89A4FF875103D7BFB55F722D73B4584ACB</td><td>File exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_FRED_CANONICAL_KEY_REPAIR_DRYRUN_v02612_20260610_135521\staging\VDF_Global_Macro_CANONICAL_KEY_REPAIR_PREVIEW_v02612.csv</td></tr>
+<tr class='ok'><td>Round4</td><td>TEST_DEBUG</td><td>STAGING_OUTPUT</td><td>VDF_Global_Macro_CANONICAL_KEY_REPAIR_PREVIEW_v02612.json</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>exists_sha256</td><td>CE3DB4D36D7137BFD975C409DCAE7639C282C7DA89D713668A0D5FBCE9F010C9</td><td>File exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_FRED_CANONICAL_KEY_REPAIR_DRYRUN_v02612_20260610_135521\staging\VDF_Global_Macro_CANONICAL_KEY_REPAIR_PREVIEW_v02612.json</td></tr>
+<tr class='ok'><td>Round4</td><td>TEST_DEBUG</td><td>STAGING_OUTPUT</td><td>VDF_Global_Macro_CANONICAL_KEY_REPAIR_PREVIEW_v02612.parquet</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>exists_sha256</td><td>7F09DFD7CB286FD006E2858E71404C09496ECD9A4B7113FAC711B7F011E77326</td><td>File exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_FRED_CANONICAL_KEY_REPAIR_DRYRUN_v02612_20260610_135521\staging\VDF_Global_Macro_CANONICAL_KEY_REPAIR_PREVIEW_v02612.parquet</td></tr>
+<tr class='ok'><td>Round4</td><td>TEST_DEBUG</td><td>STAGING_OUTPUT</td><td>VDF_Global_Macro_MERGE_PREVIEW_AFTER_REPAIR_v02612.csv</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>exists_sha256</td><td>FB9BBE5C5931F600099B78045E892F7CEAA9960824BC8861F720C5DAED136A66</td><td>File exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_FRED_CANONICAL_KEY_REPAIR_DRYRUN_v02612_20260610_135521\staging\VDF_Global_Macro_MERGE_PREVIEW_AFTER_REPAIR_v02612.csv</td></tr>
+<tr class='ok'><td>Round4</td><td>TEST_DEBUG</td><td>STAGING_OUTPUT</td><td>VDF_Global_Macro_MERGE_PREVIEW_AFTER_REPAIR_v02612.json</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>exists_sha256</td><td>4CB1CE9DC5E5A1C5BDF18EA95C4CBD57DF776C725CDA382D2E03648B51F53DE6</td><td>File exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_FRED_CANONICAL_KEY_REPAIR_DRYRUN_v02612_20260610_135521\staging\VDF_Global_Macro_MERGE_PREVIEW_AFTER_REPAIR_v02612.json</td></tr>
+<tr class='ok'><td>Round4</td><td>TEST_DEBUG</td><td>STAGING_OUTPUT</td><td>VDF_Global_Macro_MERGE_PREVIEW_AFTER_REPAIR_v02612.parquet</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>exists_sha256</td><td>88241B06A1EA96E06970D2D298D17BD29810C15FF12A6D97020F26AD9D5692A0</td><td>File exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_FRED_CANONICAL_KEY_REPAIR_DRYRUN_v02612_20260610_135521\staging\VDF_Global_Macro_MERGE_PREVIEW_AFTER_REPAIR_v02612.parquet</td></tr>
+<tr class='ok'><td>Round4</td><td>TEST_DEBUG</td><td>REPAIR_REPORT</td><td>VDF_FredCanonical_KeyRepairReport_v02612.json</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>json_parse</td><td>ok</td><td>JSON parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_FRED_CANONICAL_KEY_REPAIR_DRYRUN_v02612_20260610_135521\registry\VDF_FredCanonical_KeyRepairReport_v02612.json</td></tr>
+<tr class='ok'><td>Round5</td><td>CONSOLIDATE</td><td>LOCAL_FREE_LIBS</td><td>VDF_Top10_LocalFreeLibs_FredCanonicalKeyRepairDryRun_v02612.json</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>json_parse</td><td>ok</td><td>JSON parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_FRED_CANONICAL_KEY_REPAIR_DRYRUN_v02612_20260610_135521\registry\VDF_Top10_LocalFreeLibs_FredCanonicalKeyRepairDryRun_v02612.json</td></tr>
+<tr class='ok'><td>Round5</td><td>CONSOLIDATE</td><td>REPAIR_PLAN</td><td>VDF_FredCanonical_KeyRepairDryRun_Plan_v02612.json</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>json_parse</td><td>ok</td><td>JSON parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_FRED_CANONICAL_KEY_REPAIR_DRYRUN_v02612_20260610_135521\plan\VDF_FredCanonical_KeyRepairDryRun_Plan_v02612.json</td></tr>
+<tr class='ok'><td>Round5</td><td>CONSOLIDATE</td><td>ACTIVE_POINTER</td><td>VDF_ACTIVE_POINTER.json</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>REPAIR_DRYRUN_ONLY</td><td>update</td><td>complete</td><td>Active pointer updated with v026.1.2 repair dry-run.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ACTIVE_POINTER.json</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</body>
+</html>

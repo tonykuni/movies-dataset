@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA Dual Project Six-Lane Concurrent Gate v029.DUAL.1B</title>
+<style>
+:root{--sky:#d8f0ef;--ink:#1d3438;--muted:#657f82;--line:rgba(38,70,75,.16);--head:#edf8f6;--hover:rgba(216,240,239,.20);--ok:#0f766e;--warn:#b7791f;--fail:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Microsoft JhengHei","Segoe UI",Arial,sans-serif;background:linear-gradient(180deg,#fbfdfb,#f3f8f6);color:var(--ink);font-size:11px;line-height:1.28}
+header{position:sticky;top:0;z-index:80;padding:14px 26px 10px;background:rgba(251,253,251,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+h1{margin:0;font-size:18px;text-align:center;letter-spacing:.035em}
+.sub{text-align:center;color:var(--muted);font-size:10.5px;margin-top:4px}
+.wrap{padding:12px 22px 36px}
+.kpis{display:grid;grid-template-columns:repeat(8,minmax(96px,1fr));gap:8px;margin-bottom:12px}
+.card{border-radius:10px;padding:8px 10px;background:rgba(255,255,255,.82);border:1px solid var(--line);box-shadow:0 6px 16px rgba(30,52,56,.04)}
+.k{font-size:9.5px;color:var(--muted);letter-spacing:.07em}.v{font-size:16px;font-weight:750;margin-top:2px}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.fail{color:var(--fail)}
+section{margin-top:12px}
+h2{position:sticky;top:45px;z-index:70;margin:0 0 6px;padding:6px 9px;border:1px solid var(--line);border-left:4px solid var(--sky);border-radius:9px;background:rgba(250,253,252,.96);font-size:12px;text-align:center}
+table{width:100%;border-collapse:separate;border-spacing:0;table-layout:auto;background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:10px;overflow:clip}
+thead{position:sticky;top:76px;z-index:60}
+th{position:sticky;top:76px;z-index:61;background:var(--head);font-size:10px;font-weight:800;text-align:center;vertical-align:top;padding:5px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{font-size:10px;padding:4px 6px;border-bottom:1px solid var(--line);vertical-align:top;text-align:center;white-space:nowrap}
+td.via-left,td:has(code){text-align:left;white-space:normal;word-break:break-word;overflow-wrap:anywhere}
+tr:hover td{background:var(--hover)}
+code{font-family:Consolas,"Cascadia Mono",monospace;font-size:9.5px;white-space:normal;word-break:break-word}
+</style>
+</head>
+<body>
+<header>
+<h1>def VIA Dual Project Six-Lane Concurrent Gate · v029.DUAL.1B</h1>
+<div class="sub">VDF × 3 lanes · VRN × 3 lanes · concurrent · no canonical · no Stop-Process · no destructive delete</div>
+</header>
+<div class="wrap">
+<div class="kpis">
+<div class="card"><div class="k">Status</div><div class="v">VIA_DUALPROJECT_SIXLANE_CONCURRENT_READY_WITH_REVIEW</div></div>
+<div class="card"><div class="k">Risk</div><div class="v">MEDIUM</div></div>
+<div class="card"><div class="k">OK</div><div class="v ok">36</div></div>
+<div class="card"><div class="k">WARN</div><div class="v warn">8</div></div>
+<div class="card"><div class="k">FAIL</div><div class="v fail">0</div></div>
+<div class="card"><div class="k">VDF</div><div class="v">DATA_READY_BUT_COMPLETION_SEAL_REVIEW</div></div>
+<div class="card"><div class="k">VRN Fin Rows</div><div class="v ok">29114</div></div>
+<div class="card"><div class="k">Next</div><div class="v">VDF_1A_FINISH_SEAL_REVIEW + VRN_1D2_VALIDATION</div></div>
+</div>
+
+<section><h2>def Six-Lane Concurrent Matrix</h2>
+<table>
+<thead><tr><th>Round</th><th>Project</th><th>Lane</th><th>Layer</th><th>Name</th><th>Status</th><th>Risk</th><th>Class</th><th>Priority</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr></thead>
+<tbody><tr><td>Round0</td><td>VIA</td><td>ALL</td><td>POLICY</td><td>No Canonical</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>canonical</td><td>false</td><td>No canonical promotion in this gate.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUALPROJECT_SIXLANE_CONCURRENT_GATE_v029DUAL1B_20260615_162518</code></td></tr>
+<tr><td>Round0</td><td>VIA</td><td>ALL</td><td>POLICY</td><td>No Stop-Process</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>stop_process</td><td>false</td><td>No process kill.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUALPROJECT_SIXLANE_CONCURRENT_GATE_v029DUAL1B_20260615_162518</code></td></tr>
+<tr><td>Round0</td><td>VIA</td><td>ALL</td><td>POLICY</td><td>No Full VDF Rerun</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>vdf_full_rerun</td><td>false</td><td>VDF lane only audits and plans finish; no blind rerun.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUALPROJECT_SIXLANE_CONCURRENT_GATE_v029DUAL1B_20260615_162518</code></td></tr>
+<tr><td>Round0</td><td>VIA</td><td>ALL</td><td>POLICY</td><td>Six Concurrent Lanes</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>lanes</td><td>6</td><td>VDF three lanes + VRN three lanes.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUALPROJECT_SIXLANE_CONCURRENT_GATE_v029DUAL1B_20260615_162518</code></td></tr>
+<tr><td>Round1</td><td>VIA</td><td>ALL</td><td>ENGINE</td><td>Python Stack</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>deps</td><td>pandas/pyarrow/duckdb</td><td>Python stack verified.</td><td><code>C:\Python313\python.exe</code></td></tr>
+<tr><td>Round1</td><td>VIA</td><td>ALL</td><td>ENGINE</td><td>Six-Lane Worker Engine</td><td><b>OK_CREATED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>script</td><td>created</td><td>Lane worker written.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUALPROJECT_SIXLANE_CONCURRENT_GATE_v029DUAL1B_20260615_162518\work\via_dual_sixlane_worker_v029dual1b.py</code></td></tr>
+<tr><td>Round1</td><td>VIA</td><td>VDF1_RUNTIME</td><td>START</td><td>VDF1_RUNTIME</td><td><b>OK_CREATED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>job</td><td>started</td><td>Concurrent lane started.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUALPROJECT_SIXLANE_CONCURRENT_GATE_v029DUAL1B_20260615_162518\lanes</code></td></tr>
+<tr><td>Round1</td><td>VIA</td><td>VDF2_DATA</td><td>START</td><td>VDF2_DATA</td><td><b>OK_CREATED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>job</td><td>started</td><td>Concurrent lane started.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUALPROJECT_SIXLANE_CONCURRENT_GATE_v029DUAL1B_20260615_162518\lanes</code></td></tr>
+<tr><td>Round1</td><td>VIA</td><td>VDF3_GAP_PLAN</td><td>START</td><td>VDF3_GAP_PLAN</td><td><b>OK_CREATED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>job</td><td>started</td><td>Concurrent lane started.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUALPROJECT_SIXLANE_CONCURRENT_GATE_v029DUAL1B_20260615_162518\lanes</code></td></tr>
+<tr><td>Round1</td><td>VIA</td><td>VRN1_TABLE_GEOMETRY</td><td>START</td><td>VRN1_TABLE_GEOMETRY</td><td><b>OK_CREATED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>job</td><td>started</td><td>Concurrent lane started.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUALPROJECT_SIXLANE_CONCURRENT_GATE_v029DUAL1B_20260615_162518\lanes</code></td></tr>
+<tr><td>Round1</td><td>VIA</td><td>VRN2_VALIDATION</td><td>START</td><td>VRN2_VALIDATION</td><td><b>OK_CREATED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>job</td><td>started</td><td>Concurrent lane started.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUALPROJECT_SIXLANE_CONCURRENT_GATE_v029DUAL1B_20260615_162518\lanes</code></td></tr>
+<tr><td>Round1</td><td>VIA</td><td>VRN3_EXCEPTION_REVIEW</td><td>START</td><td>VRN3_EXCEPTION_REVIEW</td><td><b>OK_CREATED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>job</td><td>started</td><td>Concurrent lane started.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUALPROJECT_SIXLANE_CONCURRENT_GATE_v029DUAL1B_20260615_162518\lanes</code></td></tr>
+<tr><td>Round2</td><td>VDF</td><td>VDF1_RUNTIME</td><td>RESULT</td><td>VDF1_RUNTIME</td><td><b>VDF_RUNTIME_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>runtime</td><td>found</td><td>Lane runtime collected.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUALPROJECT_SIXLANE_CONCURRENT_GATE_v029DUAL1B_20260615_162518\lanes\VDF1_RUNTIME_Runtime.json</code></td></tr>
+<tr><td>Round2</td><td>VDF</td><td>VDF2_DATA</td><td>RESULT</td><td>VDF2_DATA</td><td><b>VDF_DATA_INTEGRITY_READY</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>runtime</td><td>found</td><td>Lane runtime collected.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUALPROJECT_SIXLANE_CONCURRENT_GATE_v029DUAL1B_20260615_162518\lanes\VDF2_DATA_Runtime.json</code></td></tr>
+<tr><td>Round2</td><td>VDF</td><td>VDF3_GAP_PLAN</td><td>RESULT</td><td>VDF3_GAP_PLAN</td><td><b>VDF_GAP_PLAN_READY</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>runtime</td><td>found</td><td>Lane runtime collected.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUALPROJECT_SIXLANE_CONCURRENT_GATE_v029DUAL1B_20260615_162518\lanes\VDF3_GAP_PLAN_Runtime.json</code></td></tr>
+<tr><td>Round2</td><td>VRN</td><td>VRN1_TABLE_GEOMETRY</td><td>RESULT</td><td>VRN1_TABLE_GEOMETRY</td><td><b>VRN_1D1_TABLELIKE_EXPANSION_READY</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>runtime</td><td>found</td><td>Lane runtime collected.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUALPROJECT_SIXLANE_CONCURRENT_GATE_v029DUAL1B_20260615_162518\lanes\VRN1_TABLE_GEOMETRY_Runtime.json</code></td></tr>
+<tr><td>Round2</td><td>VRN</td><td>VRN2_VALIDATION</td><td>RESULT</td><td>VRN2_VALIDATION</td><td><b>VRN_VALIDATION_READY</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>runtime</td><td>found</td><td>Lane runtime collected.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUALPROJECT_SIXLANE_CONCURRENT_GATE_v029DUAL1B_20260615_162518\lanes\VRN2_VALIDATION_Runtime.json</code></td></tr>
+<tr><td>Round2</td><td>VRN</td><td>VRN3_EXCEPTION_REVIEW</td><td>RESULT</td><td>VRN3_EXCEPTION_REVIEW</td><td><b>VRN_REVIEW_MATRIX_READY</b></td><td>MEDIUM</td><td>SEQUENTIAL_REQUIRED</td><td>P1</td><td>runtime</td><td>found</td><td>Lane runtime collected.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUALPROJECT_SIXLANE_CONCURRENT_GATE_v029DUAL1B_20260615_162518\lanes\VRN3_EXCEPTION_REVIEW_Runtime.json</code></td></tr>
+<tr><td>Round2</td><td>VDF</td><td>VDF1_RUNTIME</td><td>METRIC</td><td>runtime_total</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>runtime_total</td><td>69</td><td>Lane metric.</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VDF</td><td>VDF1_RUNTIME</td><td>METRIC</td><td>vdf_runtime_count</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>vdf_runtime_count</td><td>2</td><td>Lane metric.</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VDF</td><td>VDF1_RUNTIME</td><td>METRIC</td><td>final_seal_found</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>final_seal_found</td><td>True</td><td>Lane metric.</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VDF</td><td>VDF1_RUNTIME</td><td>METRIC</td><td>daily_health_found</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>daily_health_found</td><td>True</td><td>Lane metric.</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VDF</td><td>VDF2_DATA</td><td>METRIC</td><td>parquet_count</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>parquet_count</td><td>25</td><td>Lane metric.</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VDF</td><td>VDF2_DATA</td><td>METRIC</td><td>duckdb_count</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>duckdb_count</td><td>1</td><td>Lane metric.</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VDF</td><td>VDF2_DATA</td><td>METRIC</td><td>bad_parquet</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>bad_parquet</td><td>0</td><td>Lane metric.</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VDF</td><td>VDF2_DATA</td><td>METRIC</td><td>bad_duckdb</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>bad_duckdb</td><td>0</td><td>Lane metric.</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VDF</td><td>VDF3_GAP_PLAN</td><td>METRIC</td><td>expected_categories</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>expected_categories</td><td>10</td><td>Lane metric.</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VDF</td><td>VDF3_GAP_PLAN</td><td>METRIC</td><td>found_categories</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>found_categories</td><td>9</td><td>Lane metric.</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VDF</td><td>VDF3_GAP_PLAN</td><td>METRIC</td><td>missing_categories</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>missing_categories</td><td>1</td><td>Lane metric.</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VRN</td><td>VRN1_TABLE_GEOMETRY</td><td>METRIC</td><td>text_rows</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>text_rows</td><td>3878</td><td>Lane metric.</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VRN</td><td>VRN1_TABLE_GEOMETRY</td><td>METRIC</td><td>scanned_text_rows</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>scanned_text_rows</td><td>3878</td><td>Lane metric.</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VRN</td><td>VRN1_TABLE_GEOMETRY</td><td>METRIC</td><td>matched_text_rows</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>matched_text_rows</td><td>1656</td><td>Lane metric.</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VRN</td><td>VRN1_TABLE_GEOMETRY</td><td>METRIC</td><td>stage_rows</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>stage_rows</td><td>28868</td><td>Lane metric.</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VRN</td><td>VRN1_TABLE_GEOMETRY</td><td>METRIC</td><td>merged_total_rows</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>merged_total_rows</td><td>29114</td><td>Lane metric.</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VRN</td><td>VRN2_VALIDATION</td><td>METRIC</td><td>financial_rows</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>financial_rows</td><td>246</td><td>Lane metric.</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VRN</td><td>VRN2_VALIDATION</td><td>METRIC</td><td>fail</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>fail</td><td>0</td><td>Lane metric.</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VRN</td><td>VRN2_VALIDATION</td><td>METRIC</td><td>warn</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>warn</td><td>0</td><td>Lane metric.</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VRN</td><td>VRN2_VALIDATION</td><td>METRIC</td><td>checks</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>checks</td><td>4</td><td>Lane metric.</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VRN</td><td>VRN3_EXCEPTION_REVIEW</td><td>METRIC</td><td>review_rows</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>review_rows</td><td>34</td><td>Lane metric.</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VRN</td><td>VRN3_EXCEPTION_REVIEW</td><td>METRIC</td><td>high</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>high</td><td>0</td><td>Lane metric.</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VRN</td><td>VRN3_EXCEPTION_REVIEW</td><td>METRIC</td><td>medium</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P2</td><td>medium</td><td>34</td><td>Lane metric.</td><td><code></code></td></tr>
+<tr><td>Round3</td><td>VIA</td><td>FINAL</td><td>FINAL</td><td>VDF Status</td><td><b>DATA_READY_BUT_COMPLETION_SEAL_REVIEW</b></td><td>MEDIUM</td><td>SEQUENTIAL_REQUIRED</td><td>P0</td><td>status</td><td>DATA_READY_BUT_COMPLETION_SEAL_REVIEW</td><td>VDF data exists but completion seal still needs targeted review.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</code></td></tr>
+<tr><td>Round3</td><td>VIA</td><td>FINAL</td><td>FINAL</td><td>VRN Status</td><td><b>OK_READY</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>financial_rows</td><td>29114</td><td>VRN FinancialData table-like expansion completed or reviewed.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN\DATABASE</code></td></tr>
+<tr><td>Round3</td><td>VIA</td><td>FINAL</td><td>FINAL</td><td>Six-Lane Concurrent Gate</td><td><b>VIA_DUALPROJECT_SIXLANE_CONCURRENT_READY_WITH_REVIEW</b></td><td>MEDIUM</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>hard_blocks</td><td>0</td><td>Final six-lane concurrent decision.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUALPROJECT_SIXLANE_CONCURRENT_GATE_v029DUAL1B_20260615_162518</code></td></tr></tbody>
+</table>
+</section>
+</div>
+<script>
+(function(){
+ const left=/(path|message|reason|action|issue|路徑|訊息|原因|動作|問題)/i;
+ const path=/([A-Za-z]:\\|\\\\|\/|\.ps1|\.py|\.parquet|\.csv|\.json|\.html|\.txt|\.pdf|\.duckdb)/i;
+ function clean(t){return String(t||"").replace(/,/g,"").replace(/%/g,"").trim();}
+ function isnum(t){const s=clean(t);return !!s && /^[-+]?(\d+|\d*\.\d+)(e[-+]?\d+)?$/i.test(s) && Number.isFinite(Number(s));}
+ function fmt(t){const n=Number(clean(t));return Number.isFinite(n)?n.toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:2}):t;}
+ function heads(table){return Array.from(table.querySelectorAll("thead th")).map(x=>(x.textContent||"").trim());}
+ function process(table){const hs=heads(table);Array.from(table.querySelectorAll("th")).forEach(th=>{th.style.textAlign="center";th.style.verticalAlign="top";});Array.from(table.querySelectorAll("tbody tr")).forEach(row=>{Array.from(row.children).forEach((cell,i)=>{const h=hs[i]||"";const raw=(cell.textContent||"").trim();cell.style.verticalAlign="top";cell.style.textAlign="center";if(isnum(raw)){cell.textContent=fmt(raw);return;}if(left.test(h)||path.test(raw)||raw.length>=36||cell.querySelector("code")){cell.classList.add("via-left");}});});}
+ Array.from(document.querySelectorAll("table")).forEach(process);
+})();
+</script>
+</body>
+</html>

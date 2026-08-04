@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VeritasAutoPlot™ T03 — K-Line + MA + BB + Volume</title>
+<script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+<style>
+:root{
+  --sb-blue:#4C72B0;--sb-orange:#DD8452;--sb-green:#55A868;--sb-red:#C44E52;
+  --sb-purple:#8172B3;--sb-brown:#937860;--sb-pink:#DA8BC3;--sb-gray:#8C8C8C;
+  --sb-yellow:#CCB974;--sb-cyan:#64B5CD;
+  --up:#55A868;--dn:#C44E52;
+  --bg:#FFFFFF;--bg2:#F7F6F3;--bg3:#EFEEE9;
+  --tx1:#37352F;--tx2:#6B6B6B;--tx3:#9B9A97;--bd:#E8E7E4;
+  --font:'Inter','Noto Sans TC',-apple-system,sans-serif;
+  --radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg2);color:var(--tx1);padding:24px}
+.header{text-align:center;margin-bottom:18px}
+.header h1{font-size:clamp(16px,2.5vw,22px);font-weight:600;letter-spacing:-.3px}
+.header .sub{font-size:13px;color:var(--tx3);margin-top:4px}
+.card{background:var(--bg);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--bd);padding:20px;margin-bottom:14px}
+.ctrl-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.ctrl-group{display:flex;align-items:center;gap:4px}
+.ctrl-group label{font-size:11px;color:var(--tx2);white-space:nowrap}
+select,input[type=color],input[type=number]{font-family:var(--font);font-size:11px;border:1px solid var(--bd);border-radius:4px;padding:3px 6px;background:var(--bg);color:var(--tx1);outline:none}
+input[type=color]{width:26px;height:26px;padding:1px;cursor:pointer}
+input[type=number]{width:50px}
+.chip{display:inline-flex;align-items:center;padding:3px 9px;border-radius:18px;font-size:10px;cursor:pointer;border:1px solid var(--bd);background:var(--bg);transition:.15s;user-select:none}
+.chip.active{background:var(--sb-blue);color:#fff;border-color:var(--sb-blue)}
+.chip:hover{background:var(--bg3)}.chip.active:hover{background:#3a5f96}
+.sep{width:1px;height:20px;background:var(--bd);flex-shrink:0}
+.ohlc-bar{display:flex;gap:16px;padding:6px 0;font-size:12px;font-family:var(--font)}
+.ohlc-bar span{color:var(--tx2)}.ohlc-bar .v{font-weight:600}
+#chart{width:100%;height:clamp(500px,68vh,820px)}
+.footer{text-align:center;font-size:11px;color:var(--tx3);margin-top:12px}
+@media(max-width:768px){body{padding:10px}.ctrl-row{gap:5px}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>VeritasAutoPlot™ T03 — Candlestick + MA + BB + Volume</h1>
+  <div class="sub">K線圖 + 均線(SMA/EMA) + 布林通道 + 成交量 · 危機標註 + H/L + 事件線</div>
+</div>
+
+<div class="card">
+  <!-- MA Chips -->
+  <div class="ctrl-row">
+    <label style="font-size:11px;color:var(--tx2)">SMA:</label>
+    <span class="chip active" id="sma5" onclick="toggle(this);render()">5</span>
+    <span class="chip active" id="sma10" onclick="toggle(this);render()">10</span>
+    <span class="chip active" id="sma20" onclick="toggle(this);render()">20</span>
+    <span class="chip" id="sma60" onclick="toggle(this);render()">60</span>
+    <span class="chip" id="sma120" onclick="toggle(this);render()">120</span>
+    <span class="chip" id="sma240" onclick="toggle(this);render()">240</span>
+    <div class="sep"></div>
+    <label style="font-size:11px;color:var(--tx2)">EMA:</label>
+    <span class="chip" id="ema12" onclick="toggle(this);render()">12</span>
+    <span class="chip" id="ema26" onclick="toggle(this);render()">26</span>
+    <div class="sep"></div>
+    <span class="chip active" id="cBB" onclick="toggle(this);render()">BB(20,2)</span>
+    <span class="chip active" id="cVol" onclick="toggle(this);render()">Volume</span>
+    <span class="chip active" id="cHL" onclick="toggle(this);render()">H/L</span>
+    <span class="chip" id="cCrisis" onclick="toggle(this);render()">Crisis</span>
+  </div>
+  <div class="ctrl-row">
+    <div class="ctrl-group"><label>Up</label><input type="color" id="clrUp" value="#55A868" onchange="render()"></div>
+    <div class="ctrl-group"><label>Down</label><input type="color" id="clrDn" value="#C44E52" onchange="render()"></div>
+    <div class="ctrl-group"><label>BB Period</label><input type="number" id="bbP" value="20" min="5" max="100" onchange="render()"></div>
+    <div class="ctrl-group"><label>BB Std</label><input type="number" id="bbS" value="2" min="0.5" max="4" step="0.5" onchange="render()"></div>
+  </div>
+
+  <div id="chart"></div>
+</div>
+
+<div class="footer">VeritasAutoPlot™ · T03 Candlestick · SMA 5/10/20/60/120/240 · EMA 12/26 · BB · Volume</div>
+
+<script>
+/* ═══ OHLCV Demo Data ═══ */
+function genOHLCV(n=300){
+  const dates=[],open=[],high=[],low=[],close=[],vol=[];
+  let c=500,d=new Date('2023-06-01');
+  for(let i=0;i<n;i++){
+    const o=c+c*(Math.random()-.5)*0.01;
+    const chg=c*(Math.random()-.48)*0.025;
+    const cl=o+chg;
+    const h=Math.max(o,cl)+Math.abs(chg)*Math.random()*0.5;
+    const l=Math.min(o,cl)-Math.abs(chg)*Math.random()*0.5;
+    dates.push(d.toISOString().slice(0,10));
+    open.push(+o.toFixed(2));high.push(+h.toFixed(2));low.push(+l.toFixed(2));close.push(+cl.toFixed(2));
+    vol.push(Math.round(3e6+Math.random()*8e6));
+    c=cl;
+    d=new Date(d.getTime()+864e5);
+    if(d.getDay()===0)d=new Date(d.getTime()+864e5);
+    if(d.getDay()===6)d=new Date(d.getTime()+2*864e5);
+  }
+  return{dates,open,high,low,close,vol};
+}
+const D=genOHLCV();
+
+/* ═══ Indicator Functions ═══ */
+function sma(arr,p){return arr.map((_,i)=>i<p-1?null:arr.slice(i-p+1,i+1).reduce((a,b)=>a+b,0)/p);}
+function ema(arr,p){const k=2/(p+1);const r=[arr[0]];for(let i=1;i<arr.length;i++)r.push(arr[i]*k+r[i-1]*(1-k));return r;}
+function bb(arr,p,std){
+  const mid=sma(arr,p);
+  const upper=[],lower=[];
+  for(let i=0;i<arr.length;i++){
+    if(mid[i]===null){upper.push(null);lower.push(null);continue;}
+    const slice=arr.slice(Math.max(0,i-p+1),i+1);
+    const avg=slice.reduce((a,b)=>a+b,0)/slice.length;
+    const sd=Math.sqrt(slice.reduce((a,b)=>a+(b-avg)**2,0)/slice.length);
+    upper.push(+(mid[i]+std*sd).toFixed(2));lower.push(+(mid[i]-std*sd).toFixed(2));
+  }
+  return{mid,upper,lower};
+}
+
+function gc(id){return document.getElementById(id).classList.contains('active')}
+function toggle(el){el.classList.toggle('active')}
+
+const SB={bl:'#4C72B0',or:'#DD8452',gn:'#55A868',rd:'#C44E52',pu:'#8172B3',br:'#937860',pk:'#DA8BC3',gy:'#8C8C8C',yl:'#CCB974',cy:'#64B5CD'};
+const MA_COLORS={5:SB.or,10:SB.bl,20:SB.gn,60:SB.pu,120:SB.br,240:SB.gy,12:SB.cy,26:SB.pk};
+const CFG={responsive:true,displayModeBar:false};
+
+const CRISES=[{name:'Correction',s:'2024-01-15',e:'2024-03-01',color:'#7f7f7f'}];
+
+function render(){
+  const clrUp=document.getElementById('clrUp').value;
+  const clrDn=document.getElementById('clrDn').value;
+  const bbPeriod=+document.getElementById('bbP').value;
+  const bbStd=+document.getElementById('bbS').value;
+  const showVol=gc('cVol'),showBB=gc('cBB'),showHL=gc('cHL'),showCrisis=gc('cCrisis');
+
+  /* Domain allocation: main chart + optional volume */
+  const mainDomain=showVol?[0.18,1]:[0,1];
+  const volDomain=[0,0.14];
+
+  const traces=[];
+
+  /* Candlestick */
+  traces.push({
+    type:'candlestick',x:D.dates,open:D.open,high:D.high,low:D.low,close:D.close,
+    name:'OHLC',yaxis:'y',
+    increasing:{line:{color:clrUp},fillcolor:clrUp},
+    decreasing:{line:{color:clrDn},fillcolor:clrDn},
+  });
+
+  /* SMA lines */
+  [5,10,20,60,120,240].forEach(p=>{
+    if(!gc('sma'+p))return;
+    const vals=sma(D.close,p);
+    traces.push({type:'scatter',mode:'lines',x:D.dates,y:vals,name:'SMA'+p,yaxis:'y',
+      line:{color:MA_COLORS[p],width:1.2},connectgaps:true});
+  });
+
+  /* EMA lines */
+  [12,26].forEach(p=>{
+    if(!gc('ema'+p))return;
+    const vals=ema(D.close,p);
+    traces.push({type:'scatter',mode:'lines',x:D.dates,y:vals,name:'EMA'+p,yaxis:'y',
+      line:{color:MA_COLORS[p],width:1.2,dash:'dot'},connectgaps:true});
+  });
+
+  /* Bollinger Bands */
+  if(showBB){
+    const b=bb(D.close,bbPeriod,bbStd);
+    traces.push({type:'scatter',mode:'lines',x:D.dates,y:b.upper,name:'BB Upper',yaxis:'y',
+      line:{color:SB.gy,width:0.8,dash:'dash'},showlegend:false});
+    traces.push({type:'scatter',mode:'lines',x:D.dates,y:b.lower,name:'BB Lower',yaxis:'y',
+      line:{color:SB.gy,width:0.8,dash:'dash'},fill:'tonexty',fillcolor:'rgba(140,140,140,.08)',showlegend:false});
+    traces.push({type:'scatter',mode:'lines',x:D.dates,y:b.mid,name:`BB(${bbPeriod},${bbStd})`,yaxis:'y',
+      line:{color:SB.gy,width:1}});
+  }
+
+  /* Volume */
+  if(showVol){
+    const volColors=D.close.map((c,i)=>i===0?clrUp+'88':(c>=D.open[i]?clrUp+'88':clrDn+'88'));
+    traces.push({type:'bar',x:D.dates,y:D.vol,name:'Volume',yaxis:'y2',
+      marker:{color:volColors},showlegend:false});
+  }
+
+  /* Layout */
+  const layout={
+    title:{text:'Candlestick + MA + BB + Volume',font:{family:'Inter,Noto Sans TC',size:15,color:'#37352F'},x:0.01,xanchor:'left'},
+    paper_bgcolor:'#FFF',plot_bgcolor:'#FFF',
+    margin:{t:55,r:50,b:45,l:60},
+    xaxis:{showgrid:false,linecolor:'#E8E7E4',tickfont:{size:10,color:'#6B6B6B'},rangeslider:{visible:false},dtick:'M2',tickformat:'%Y-%m'},
+    yaxis:{domain:mainDomain,showgrid:true,gridcolor:'#F0EFEC',linecolor:'#E8E7E4',tickfont:{size:10},separatethousands:true,title:{text:'Price',font:{size:11}}},
+    hovermode:'x unified',hoverlabel:{bgcolor:'rgba(255,255,255,.95)',bordercolor:'#E8E7E4',font:{size:11,family:'Inter'}},
+    legend:{orientation:'h',y:1.10,x:0,font:{size:10},tracegroupgap:5},
+    shapes:[],annotations:[]
+  };
+
+  if(showVol){
+    layout.yaxis2={domain:volDomain,showgrid:false,linecolor:'#E8E7E4',tickfont:{size:9,color:'#8C8C8C'},title:{text:'Vol',font:{size:9,color:'#8C8C8C'}}};
+  }
+
+  /* Crisis shading */
+  if(showCrisis){
+    CRISES.forEach(cr=>{
+      layout.shapes.push({type:'rect',xref:'x',yref:'paper',x0:cr.s,x1:cr.e,y0:0,y1:1,fillcolor:cr.color,opacity:0.12,line:{width:0}});
+      layout.annotations.push({x:cr.s,y:1.02,xref:'x',yref:'paper',text:cr.name,showarrow:false,font:{size:9,color:cr.color},xanchor:'left'});
+    });
+  }
+
+  /* High / Low */
+  if(showHL){
+    const mx=D.high.indexOf(Math.max(...D.high));
+    const mn=D.low.indexOf(Math.min(...D.low));
+    layout.annotations.push(
+      {x:D.dates[mx],y:D.high[mx],text:'▲ '+D.high[mx].toLocaleString(),showarrow:true,arrowhead:0,ax:0,ay:-28,
+       font:{size:10,color:'#55A868',weight:700},bgcolor:'rgba(255,255,255,.9)',bordercolor:'#55A868',borderwidth:1,borderpad:3},
+      {x:D.dates[mn],y:D.low[mn],text:'▼ '+D.low[mn].toLocaleString(),showarrow:true,arrowhead:0,ax:0,ay:28,
+       font:{size:10,color:'#C44E52',weight:700},bgcolor:'rgba(255,255,255,.9)',bordercolor:'#C44E52',borderwidth:1,borderpad:3}
+    );
+  }
+
+  Plotly.react('chart',traces,layout,CFG);
+}
+
+render();
+</script>
+</body>
+</html>

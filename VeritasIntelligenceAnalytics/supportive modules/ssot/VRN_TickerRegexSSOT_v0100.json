@@ -1,0 +1,48 @@
+{
+  "schema_id": "VRN_TickerRegexSSOT",
+  "version": "v0100",
+  "status": "ACTIVE",
+  "issued": "2026-08-04",
+  "operator_directive": "將 VDF VRN VAP ticker regex 為四碼數字第一碼不可為零(2026-08-04 操作員核准,範疇凍結)",
+  "scope": ["VDF", "VRN", "VAP"],
+  "scope_freeze": true,
+  "supersedes": {
+    "schema_id": "VRN_TickerRegexSSOT",
+    "version": "v029SSOT1B",
+    "file": "supportive modules/ssot/VRN_TickerRegexSSOT_v029SSOT1B.json",
+    "disposition": "ARCHIVED_IN_PLACE_NEVER_DELETED",
+    "defect": "regex 內建 (?!202[1-9])(?!2030) 年份排除,誤殺 2021-2030 帶內 10 檔真實股號"
+  },
+  "rules": {
+    "TW_TICKER_REGEX": "(?<!\\d)([1-9]\\d{3})(?!\\d)",
+    "TW_YFINANCE_TICKER_REGEX": "(?<!\\d)([1-9]\\d{3})\\.(TW|TWO)\\b",
+    "TW_BLOOMBERG_TICKER_REGEX": "(?<!\\d)([1-9]\\d{3})\\s+TT\\b",
+    "definition": "四碼數字,第一碼不可為零;年份排除不得寫入 regex 本體",
+    "year_band_policy": {
+      "band": [2021, 2030],
+      "handling": "CONTEXT_DISAMBIGUATION_LAYER",
+      "implementation": "supportive modules/70_VRN_Rules/VIS_VRN_TickerFilenameSSOT_v0100.py :: disambiguate_year_vs_ticker",
+      "signals": {
+        "firstpage_ticker_match": 0.97,
+        "official_list_member": 0.9,
+        "date_cue_adjacent": "YEAR 0.9 (年/Q1-Q4/H1-H2/FY/上下半年/第一至第四季)",
+        "no_corroboration": "AMBIGUOUS -> manual review, never auto-YEAR"
+      }
+    },
+    "known_real_tickers_in_band": {
+      "2021": "中鋼構", "2022": "聚亨", "2023": "燁輝", "2024": "志聯", "2025": "千興",
+      "2027": "大成鋼", "2028": "威致", "2029": "盛餘", "2030": "彰源"
+    },
+    "etf_note": "首碼 0 之基金/ETF 代碼(0050/006208/00980A 等)不屬本 regex 範疇,由 ETF 代碼規則另管"
+  },
+  "corroborating_artifacts": [
+    { "layer": "python_module", "path": "supportive modules/70_VRN_Rules/VIS_VRN_TickerFilenameSSOT_v0100.py" },
+    { "layer": "design_canonical", "path": "supportive modules/ui_support/VIA_SSOT_Regex_Control.dc.html", "note": "^[1-9][0-9]{3}$ + 2021-2030 需語境判定, locked:true" },
+    { "layer": "adjudication_record", "path": "functional modules/VRN/registry/DRAFT_TickerRegex_SSOT_Transition_v0100.md" }
+  ],
+  "legacy_debt_policy": {
+    "note": "既存 69+ 檔帶舊排除式者列入凍結債務普查,不做全庫突變;執行入口以 runtime 墊片優先;audit 紀錄永不改寫",
+    "census_record": "supportive modules/audit_tools/TickerRegex_LegacyDebt_Census_v0100.json"
+  },
+  "only_add_compliance": true
+}

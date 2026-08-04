@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f5f4f0; --bg2:#e5e3df; --paper:#ffffff; --paper2:#fafaf8;
+    --ink:#1e1d1a; --ink2:#33403f; --mut:#6b6860; --mut2:#9c9890;
+    --line:#dbd9d3; --soft:#ecebe6;
+    --blue:#4c78a8; --grey:#9c9890; --teal:#439a9a;
+    --up:#c96b5a; --down:#5a9e6f; --am:#c4943a; --co:#c96b5a; --vi:#7a6daa; --gn:#5a9e6f; --ro:#b05580;
+    --green:#2d8659; --amber:#c4943a; --red:#b85450; --accent:#439a9a;
+    --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);}
+  body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  ::selection{background:rgba(67,154,154,.22);}
+</style>
+<style>@media print{@page{size:A4;margin:11mm}html,body{background:#fff !important}.__pdfbtn{display:none !important}*{box-shadow:none !important}[style*="position:sticky"]{position:static !important}[style*="overflow-y:auto"],[style*="overflow:auto"],[style*="overflow-x:auto"]{overflow:visible !important;max-height:none !important}table,section,.brk{break-inside:avoid}}</style>
+<script>window.addEventListener('load',function(){if(document.getElementById('__pdfbtn'))return;var b=document.createElement('div');b.id='__pdfbtn';b.className='__pdfbtn';b.innerHTML='<img src="assets/pdf-icon.png" alt="PDF" style="width:30px;height:30px;display:block">';b.title='A4 PDF';b.style.cssText='position:fixed;top:12px;right:14px;z-index:99999;background:transparent;border:none;padding:0;font:700 10px monospace;letter-spacing:.5px;cursor:pointer;';b.onclick=function(){window.print()};document.body.appendChild(b);});</script>
+</helmet>
+
+<div ref="{{ rootRef }}" style="max-width:1340px;margin:0 auto;padding:0 22px 46px;">
+
+  <div style="position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50;"></div>
+
+  <header style="position:relative;padding:22px 0 10px;margin-bottom:12px;border-bottom:2px solid var(--ink);">
+    <div style="font:700 10px 'DM Mono',monospace;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px;">VERITAS INTELLIGENCE ANALYTICS · 國際原物料儀表板</div>
+    <h1 style="font:800 18px/1.2 'Syne',sans-serif;color:var(--ink);">國際原物料 <span style="color:var(--up);">期貨 × 現貨</span> · Commodities Dashboard</h1>
+    <p style="margin-top:5px;font:400 10.5px/1.5 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:940px;">原物料為下游行業之<b style="color:var(--ink2);">領先指標</b>。每項列出期貨(front-month)與現貨(spot)、期現價差(basis)、日/月變動，及其<b style="color:var(--ink2);">對應台股族群</b>。紅漲綠跌。</p>
+  </header>
+
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#1e1d1a;border-radius:3px;padding:6px 13px;margin-bottom:8px;">
+    <span style="display:inline-flex;align-items:center;gap:6px;font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase;">🔒 VISUAL LOCK · 全格式鎖定</span>
+    <span style="display:inline-flex;align-items:center;gap:4px;font:500 8px 'DM Mono',monospace;color:#cfcabf;">色票
+      <span style="width:11px;height:11px;border-radius:2px;background:#4c78a8;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#439a9a;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#9c9890;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#c96b5a;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#5a9e6f;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#f5f4f0;border:1px solid #555;"></span>
+    </span>
+    <span style="font:500 8px 'DM Mono',monospace;color:#8a948f;">字體 Syne / DM Sans / DM Mono</span>
+    <span style="font:500 8px 'DM Mono',monospace;color:#8a948f;">漲紅跌綠 · 千分位 · 熱力色階</span>
+    <span style="margin-left:auto;font:700 8px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:2px 8px;">v1.0 · LOCKED 2026-06-22</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;background:#fff;border:1px solid #dbd9d3;border-left:3px solid #439a9a;border-radius:3px;padding:6px 13px;margin-bottom:12px;">
+    <span style="font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;">🛰 資料請求 · VDF ENGINES</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">TWSE→rest</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#c4943a;border-radius:3px;padding:1px 6px;">SITCA→parse</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">MOPS→parse</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">yfinance→pyproc</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#c0584e;border-radius:3px;padding:1px 6px;">FactSet→keyed</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">FRED→keyed</span>
+    <span style="margin-left:auto;font:500 8px 'DM Mono',monospace;color:#9c9890;">request.json → VDF 擷取 → 雙重驗算 → Parquet → JSON</span>
+  </div>
+
+  <details data-contract="1" style="margin-bottom:12px;border:1px solid #dbd9d3;border-left:3px solid #1e1d1a;border-radius:3px;background:#fbfaf7;overflow:hidden;">
+    <summary style="cursor:pointer;user-select:none;padding:6px 13px;font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;list-style:none;">📜 引擎連接合約 · request.json（點擊展開 · 可選取複製）</summary>
+    <pre style="margin:0;padding:10px 13px;background:#1e1d1a;color:#cfe3d6;font:500 9px/1.55 'DM Mono',monospace;white-space:pre;overflow-x:auto;">{
+  "request": "commodities_dashboard",
+  "asof": "2026-06-22",
+  "universe": { "market": "TW", "exchange": ["TWSE","TPEX"] },
+  "sources": ["TWSE","TPEX","SITCA","MOPS","yfinance","FactSet","FRED"],
+  "engines": { "TWSE":"rest","TPEX":"rest","SITCA":"parse","MOPS":"parse","yfinance":"pyproc","FactSet":"keyed","FRED":"keyed" },
+  "range": { "start":"1996-01-01","end":"latest" },
+  "verify": "double_identity",
+  "db_discover": { "folder":"D:\\VDF\\databases\\","recursive":true,"match":["*.parquet","*.duckdb","*.db","*.csv"] },
+  "sink": { "parquet":"vdf/commodities_dashboard/","export":"commodities_dashboard.json" }
+}</pre>
+    <div style="padding:6px 13px;font:400 8px 'DM Sans','Noto Sans TC',sans-serif;color:#9c9890;">本檔即以此合約向 VDF 引擎請求 → 依 engines 分流(rest/parse/pyproc/keyed) → 雙重恆等驗算 → 落地 Parquet → 匯出 <b style="color:#6b6860;">commodities_dashboard.json</b> 覆蓋本頁資料源。</div>
+  </details>
+
+  <!-- scorecards -->
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:13px;">
+    <sc-for list="{{ scoreCards }}" as="s" hint-placeholder-count="5">
+      <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid {{ s.color }};border-radius:2px;padding:8px 11px;">
+        <div style="font:600 8.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);margin-bottom:2px;">{{ s.l }}</div>
+        <div style="font:500 16px 'DM Mono',monospace;color:var(--ink);">{{ s.v }}</div>
+        <div style="font:600 8px 'DM Mono',monospace;margin-top:1px;{{ s.css }}">{{ s.s }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <!-- at-a-glance highlights -->
+  <div style="border:1px solid var(--line);border-radius:2px;background:var(--paper);padding:8px 11px;margin-bottom:13px;">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <span style="font:700 9px 'DM Mono',monospace;letter-spacing:.6px;color:var(--ink);text-transform:uppercase;white-space:nowrap;">★ 今日亮點</span>
+      <span style="font:500 8px 'DM Mono',monospace;color:var(--mut2);white-space:nowrap;">月變動最大</span>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-left:6px;">
+        <sc-for list="{{ highlights }}" as="h" hint-placeholder-count="6">
+          <span style="display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-left:3px solid {{ h.color }};border-radius:2px;padding:3px 9px;background:var(--paper2);">
+            <span style="font:700 8px 'DM Mono',monospace;{{ h.arrowCss }}">{{ h.arrow }}</span>
+            <span style="font:600 9.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink);">{{ h.name }}</span>
+            <span style="font:700 9.5px 'DM Mono',monospace;{{ h.mCss }}">{{ h.m }}</span>
+            <span style="font:500 8px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">{{ h.tag }}</span>
+          </span>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:4px;margin-bottom:13px;border-bottom:1px solid var(--line);">
+    <div onClick="{{ tabBoard }}" style="font:700 11px 'Syne',sans-serif;padding:7px 14px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;position:relative;top:1px;user-select:none;{{ tcBoard }}">🛢️ 期貨×現貨總覽</div>
+    <div onClick="{{ tabLink }}" style="font:700 11px 'Syne',sans-serif;padding:7px 14px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;position:relative;top:1px;user-select:none;{{ tcLink }}">🔗 原物料→族群</div>
+    <div onClick="{{ tabLeaders }}" style="font:700 11px 'Syne',sans-serif;padding:7px 14px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:7px 7px 0 0;position:relative;top:1px;user-select:none;{{ tcLeaders }}">🏆 國際龍頭股價</div>
+  </div>
+
+  <!-- ===== BOARD ===== -->
+  <sc-if value="{{ isBoard }}">
+  <div>
+    <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:11px;font:600 9px 'DM Mono',monospace;color:var(--mut);">
+      <span><b style="color:var(--ink2);">basis</b> = 期貨 − 現貨：正 = 正價差 contango，負 = 逆價差 backwardation</span>
+      <span style="margin-left:auto;display:inline-flex;gap:6px;"><span style="color:#fff;background:var(--up);border-radius:6px;padding:1px 7px;">期&gt;現</span><span style="color:#fff;background:var(--down);border-radius:6px;padding:1px 7px;">期&lt;現</span></span>
+    </div>
+
+    <sc-for list="{{ catBlocks }}" as="c" hint-placeholder-count="7">
+      <div style="border:1px solid var(--line);border-left:3px solid {{ c.color }};border-radius:2px;overflow:hidden;background:var(--paper);margin-bottom:9px;">
+        <div style="display:flex;align-items:center;gap:7px;padding:5px 11px;border-bottom:1px solid var(--line);background:var(--paper2);">
+          <span style="font:700 11px 'Syne',sans-serif;color:var(--ink);">{{ c.icon }} {{ c.name }}</span>
+          <span style="font:500 8px 'DM Mono',monospace;color:var(--mut);">{{ c.en }}</span>
+        </div>
+        <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:separate;border-spacing:0;min-width:1180px;">
+          <thead><tr>
+            <th style="text-align:left;padding:5px 11px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">商品</th>
+            <th style="text-align:left;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">期貨代碼</th>
+            <th style="text-align:right;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">期貨</th>
+            <th style="text-align:right;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">現貨</th>
+            <th style="text-align:right;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">basis</th>
+            <sc-for list="{{ retCols }}" as="rc" hint-placeholder-count="9">
+              <th style="text-align:right;padding:5px 7px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);white-space:nowrap;">{{ rc }}</th>
+            </sc-for>
+            <th style="text-align:left;padding:5px 11px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">指標族群</th>
+          </tr></thead>
+          <tbody>
+            <sc-for list="{{ c.rows }}" as="r" hint-placeholder-count="4">
+              <tr style="background:{{ r.bg }};">
+                <td style="padding:4px 11px;border-top:1px solid var(--soft);font:600 9.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);white-space:nowrap;"><span style="display:inline-block;width:10px;{{ r.starCss }}">{{ r.star }}</span>{{ r.name }} <span style="font:400 8px 'DM Mono',monospace;color:var(--mut2);">{{ r.unit }}</span></td>
+                <td style="padding:4px 9px;border-top:1px solid var(--soft);font:500 9px 'DM Mono',monospace;color:var(--blue);">{{ r.code }}</td>
+                <td style="padding:4px 9px;border-top:1px solid var(--soft);text-align:right;font:600 9.5px 'DM Mono',monospace;color:var(--ink);font-variant-numeric:tabular-nums;">{{ r.fut }}</td>
+                <td style="padding:4px 9px;border-top:1px solid var(--soft);text-align:right;font:500 9.5px 'DM Mono',monospace;color:var(--mut);font-variant-numeric:tabular-nums;">{{ r.spot }}</td>
+                <td style="padding:4px 9px;border-top:1px solid var(--soft);text-align:right;font:600 9px 'DM Mono',monospace;{{ r.basisCss }}">{{ r.basis }}</td>
+                <sc-for list="{{ r.rets }}" as="x" hint-placeholder-count="9">
+                  <td style="padding:4px 7px;border-top:1px solid var(--soft);text-align:right;font:600 8.5px 'DM Mono',monospace;font-variant-numeric:tabular-nums;{{ x.css }}">{{ x.t }}</td>
+                </sc-for>
+                <td style="padding:4px 11px;border-top:1px solid var(--soft);font:400 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">{{ r.groups }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+  </sc-if>
+
+  <!-- ===== LINK MAP ===== -->
+  <sc-if value="{{ isLink }}">
+  <div>
+    <div style="font:600 9px 'DM Mono',monospace;color:var(--mut);margin-bottom:10px;">原物料 → 台股族群 領先對照：<b style="color:var(--ink2);">↑ 漲利多 / ↓ 漲利空（成本）</b>。箭頭色=該商品近月方向。</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:10px;">
+      <sc-for list="{{ linkCards }}" as="g" hint-placeholder-count="8">
+        <div style="border:1px solid var(--line);border-left:3px solid {{ g.color }};border-radius:2px;overflow:hidden;background:var(--paper);">
+          <div style="display:flex;align-items:center;gap:7px;padding:6px 11px;border-bottom:1px solid var(--line);background:var(--paper2);">
+            <span style="font:700 11px 'Syne',sans-serif;color:var(--ink);">{{ g.group }}</span>
+            <span style="margin-left:auto;font:600 8px 'DM Mono',monospace;color:#fff;background:{{ g.netCss }};border-radius:2px;padding:1px 7px;">{{ g.net }}</span>
+          </div>
+          <div style="padding:5px 11px 8px;">
+            <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--soft);">
+                <span style="font:700 11px 'DM Mono',monospace;{{ it.arrowCss }}">{{ it.arrow }}</span>
+                <span style="flex:1;font:600 9.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">{{ it.commodity }}</span>
+                <span style="font:500 8px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">{{ it.effect }}</span>
+                <span style="font:600 9px 'DM Mono',monospace;min-width:46px;text-align:right;{{ it.mCss }}">{{ it.m }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===== INTERNATIONAL LEADERS · STOCK PRICES ===== -->
+  <sc-if value="{{ isLeaders }}">
+  <div>
+    <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:11px;font:600 9px 'DM Mono',monospace;color:var(--mut);">
+      <span style="font-weight:700;color:var(--ink2);">各原物料相關行業 · 國際龍頭（上市）股價</span>
+      <span style="background:rgba(196,148,58,.16);color:var(--am);padding:2px 8px;border-radius:2px;">驅動商品標注</span>
+      <span style="margin-left:auto;color:var(--mut2);">幣別/交易所於代碼 · 紅漲綠跌</span>
+    </div>
+
+    <sc-for list="{{ leaderBlocks }}" as="b" hint-placeholder-count="6">
+      <div style="border:1px solid var(--line);border-left:3px solid {{ b.color }};border-radius:2px;overflow:hidden;background:var(--paper);margin-bottom:9px;">
+        <div style="display:flex;align-items:center;gap:7px;padding:5px 11px;border-bottom:1px solid var(--line);background:var(--paper2);">
+          <span style="font:700 11px 'Syne',sans-serif;color:var(--ink);">{{ b.industry }}</span>
+          <span style="font:600 8px 'DM Mono',monospace;color:#fff;background:{{ b.color }};border-radius:2px;padding:1px 7px;">驅動 {{ b.driver }}</span>
+          <span style="margin-left:auto;font:500 8px 'DM Mono',monospace;color:var(--mut);">{{ b.driverMove }}</span>
+        </div>
+        <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:separate;border-spacing:0;min-width:720px;">
+          <thead><tr>
+            <th style="text-align:left;padding:5px 11px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">公司</th>
+            <th style="text-align:left;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">代碼</th>
+            <th style="text-align:right;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">股價</th>
+            <th style="text-align:right;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">日%</th>
+            <th style="text-align:right;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">月%</th>
+            <th style="text-align:right;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">YTD%</th>
+            <th style="text-align:right;padding:5px 9px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">市值</th>
+            <th style="text-align:right;padding:5px 11px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">PE</th>
+          </tr></thead>
+          <tbody>
+            <sc-for list="{{ b.rows }}" as="r" hint-placeholder-count="4">
+              <tr style="background:{{ r.bg }};">
+                <td style="padding:4px 11px;border-top:1px solid var(--soft);font:600 9.5px 'DM Sans','Noto Sans TC',sans-serif;{{ r.nameCss }};white-space:nowrap;">{{ r.name }}</td>
+                <td style="padding:4px 9px;border-top:1px solid var(--soft);font:500 9px 'DM Mono',monospace;color:{{ r.tickCol }};">{{ r.ticker }}</td>
+                <td style="padding:4px 9px;border-top:1px solid var(--soft);text-align:right;font:600 9.5px 'DM Mono',monospace;color:var(--ink);font-variant-numeric:tabular-nums;">{{ r.px }}</td>
+                <td style="padding:4px 9px;border-top:1px solid var(--soft);text-align:right;font:600 9px 'DM Mono',monospace;{{ r.dCss }}">{{ r.d }}</td>
+                <td style="padding:4px 9px;border-top:1px solid var(--soft);text-align:right;font:600 9px 'DM Mono',monospace;{{ r.mCss }}">{{ r.m }}</td>
+                <td style="padding:4px 9px;border-top:1px solid var(--soft);text-align:right;font:600 9px 'DM Mono',monospace;{{ r.yCss }}">{{ r.y }}</td>
+                <td style="padding:4px 9px;border-top:1px solid var(--soft);text-align:right;font:500 9px 'DM Mono',monospace;color:var(--mut);">{{ r.cap }}</td>
+                <td style="padding:4px 11px;border-top:1px solid var(--soft);text-align:right;font:500 9px 'DM Mono',monospace;color:var(--mut);">{{ r.pe }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </sc-for>
+    <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:2px;padding:10px 13px;font:400 10.5px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);"><b style="color:var(--ink);">用法：</b>當驅動商品（如銅、鐵礦、BDI）轉強，對照其龍頭股是否同步反應，可判斷行業景氣傳導是否到位。市值單位 $B（台股為 NT$B），代碼附交易所，可直餵 yfinance。</div>
+  </div>
+  </sc-if>
+
+  <footer style="margin-top:22px;border-top:1px solid var(--line);padding-top:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font:500 10px 'DM Mono',monospace;color:var(--mut);">
+    <span style="font-weight:700;letter-spacing:1.3px;color:var(--ink);">VERITAS INTELLIGENCE ANALYTICS</span>
+    <span>Commodities · Futures &amp; Spot · Visual Lock SSOT</span>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{ &quot;$preview&quot;: { &quot;width&quot;: 1340, &quot;height&quot;: 900 } }">
+class Component extends DCLogic {
+  state = { tab: 'board' };
+
+  _rng(seed) { let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+
+  _cats() {
+    // category: [icon, name, en, color, rows[ name, unit, code, fut, spot, day%, month%, groups ]]
+    return [
+      ['⚡', '能源', 'energy', 'var(--co)', [
+        ['原油 WTI', '$/bbl', 'CL=F', 78.4, 77.9, 0.9, -3.2, '航空(成本) · 航運(成本) · 塑化'],
+        ['原油 Brent', '$/bbl', 'BZ=F', 82.1, 81.6, 0.7, -2.8, '航空 · 航運 · 油氣'],
+        ['天然氣', '$/MMBtu', 'NG=F', 2.94, 2.88, 1.8, 5.4, '電力 · 塑化原料'],
+        ['動力煤', '$/t', 'MTF=F', 118.0, 116.5, -0.4, -1.9, '電力 · 鋼鐵(成本)'],
+      ]],
+      ['🥇', '貴金屬', 'precious', 'var(--am)', [
+        ['黃金', '$/oz', 'GC=F', 2348.0, 2345.2, 0.5, 2.1, '避險 · 珠寶'],
+        ['白銀', '$/oz', 'SI=F', 30.6, 30.4, 1.2, 4.6, '太陽能 · 電子'],
+        ['鉑金', '$/oz', 'PL=F', 998.0, 994.0, 0.3, 1.4, '汽車觸媒 · 氫能'],
+        ['鈀金', '$/oz', 'PA=F', 935.0, 931.0, -0.8, -3.1, '汽車觸媒'],
+      ]],
+      ['🔩', '基本金屬', 'base metals', 'var(--blue)', [
+        ['銅 Copper', '$/t', 'HG=F', 9820.0, 9785.0, 1.1, 3.8, '重電 · 電線電纜 · 半導體'],
+        ['鋁 Aluminum', '$/t', 'ALI=F', 2560.0, 2548.0, 0.6, 2.2, '汽車 · 機殼 · 散熱'],
+        ['鎳 Nickel', '$/t', 'LN', 17850.0, 17790.0, -0.5, -1.6, '不鏽鋼 · 電池'],
+        ['錫 Tin', '$/t', 'LT', 31200.0, 31050.0, 0.9, 4.1, '半導體焊料 · PCB'],
+        ['鋅 Zinc', '$/t', 'LX', 2890.0, 2876.0, 0.2, 0.8, '鍍鋅鋼 · 五金'],
+      ]],
+      ['🏗️', '鋼鐵原料', 'steel inputs', 'var(--gn)', [
+        ['鐵礦砂', '$/t', 'TIO=F', 106.5, 105.8, -1.2, -5.4, '鋼鐵(成本)'],
+        ['焦煤', '$/t', 'CC', 238.0, 236.0, -0.6, -2.8, '鋼鐵(成本)'],
+        ['熱軋鋼捲 HRC', '$/t', 'HRC=F', 820.0, 815.0, 0.8, 3.2, '鋼鐵 · 條鋼'],
+        ['廢鋼 Scrap', '$/t', 'SCRAP', 392.0, 389.0, 0.4, 1.7, '條鋼 · 電爐鋼'],
+      ]],
+      ['🚢', '散裝航運指數', 'dry bulk freight', 'var(--teal)', [
+        ['波羅的海乾散 BDI', 'pt', 'BDI', 1842.0, 1842.0, 2.4, 8.6, '散裝航運(綜合)'],
+        ['海岬型 BCI', 'pt', 'BCI', 2685.0, 2685.0, 3.8, 14.2, '散裝航運(鐵礦/煤)'],
+        ['巴拿馬型 BPI', 'pt', 'BPI', 1742.0, 1742.0, 2.1, 7.4, '散裝航運(穀物/煤)'],
+        ['超輕便型 BSI', 'pt', 'BSI', 1326.0, 1326.0, 1.4, 4.8, '散裝航運(雜貨)'],
+        ['輕便型 BHSI', 'pt', 'BHSI', 742.0, 742.0, 0.9, 3.1, '散裝航運(小宗)'],
+        ['乾散租金 Capesize T/C', '$/day', 'C5TC', 22280.0, 22280.0, 4.1, 15.6, '散裝航運(日租)'],
+        ['乾散租金 Panamax T/C', '$/day', 'P5TC', 15680.0, 15680.0, 2.3, 8.1, '散裝航運(日租)'],
+      ]],
+      ['📦', '貨櫃/油輪運價', 'container/tanker', 'var(--blue)', [
+        ['上海出口貨櫃 SCFI', 'pt', 'SCFI', 2156.0, 2156.0, 1.6, 6.2, '貨櫃航運'],
+        ['中國出口貨櫃 CCFI', 'pt', 'CCFI', 1488.0, 1488.0, 1.1, 4.4, '貨櫃航運'],
+        ['上海進口貨櫃 SCFIS', 'pt', 'SCFIS', 1962.0, 1962.0, 1.3, 5.1, '貨櫃航運'],
+        ['原油油輪 BDTI', 'pt', 'BDTI', 1042.0, 1042.0, -1.2, -3.4, '油輪 · 油氣'],
+        ['成品油輪 BCTI', 'pt', 'BCTI', 768.0, 768.0, -0.8, -2.1, '油輪'],
+      ]],
+      ['💡', '科技原料', 'tech materials', 'var(--vi)', [
+        ['多晶矽', '$/kg', 'POLY', 5.4, 5.3, -2.1, -8.4, '太陽能 · 半導體'],
+        ['氖氣 Neon', 'idx', 'NEON', 142.0, 141.0, 0.3, 1.2, '半導體(微影)'],
+        ['碳酸鋰', '¥/t k', 'LITH', 89.0, 88.5, -1.4, -6.2, '電池 · BBU'],
+        ['銅箔 ED', '$/kg', 'CUFL', 11.8, 11.7, 0.5, 2.4, 'PCB · ABF 載板'],
+      ]],
+      ['🌾', '農工原料', 'agri/chem', 'var(--ro)', [
+        ['黃豆', '¢/bu', 'ZS=F', 1184.0, 1180.0, -0.6, -2.4, '食品 · 飼料'],
+        ['乙烯 Ethylene', '$/t', 'ETH', 940.0, 936.0, 0.4, 1.8, '塑化'],
+        ['對二甲苯 PX', '$/t', 'PX', 1012.0, 1008.0, 0.6, 2.6, '聚酯 · 塑化'],
+        ['石腦油 Naphtha', '$/t', 'NAP', 678.0, 675.0, 0.5, -1.2, '塑化原料'],
+      ]],
+    ];
+  }
+
+  _leaders() {
+    // industry: [driver, driverMove, color, rows[ name, ticker, px, day%, month%, ytd%, mktCap$B, PE ]]
+    return [
+      ['能源 Oil & Gas', 'WTI/Brent', '原油 −3.2% 月', 'var(--co)', [
+        ['ExxonMobil', 'XOM (NYSE)', 114.2, 0.6, -1.8, 8.4, 512, 13.6],
+        ['Chevron', 'CVX (NYSE)', 158.4, 0.4, -2.1, 6.2, 292, 14.1],
+        ['Shell', 'SHEL.L', 28.6, 0.3, -1.2, 9.1, 188, 11.8],
+        ['Saudi Aramco', '2222.SR', 28.1, -0.2, -0.9, -3.4, 1840, 16.2],
+        ['TotalEnergies', 'TTE.PA', 62.4, 0.5, -1.5, 4.8, 152, 9.4],
+      ]],
+      ['基本金屬 Miners', '銅 Copper', '銅 +3.8% 月', 'var(--blue)', [
+        ['BHP', 'BHP (NYSE)', 58.2, 1.2, 4.6, 7.8, 148, 12.4],
+        ['Rio Tinto', 'RIO (NYSE)', 68.4, 1.0, 3.9, 5.4, 110, 9.8],
+        ['Freeport-McMoRan', 'FCX (NYSE)', 48.6, 2.1, 8.2, 18.6, 70, 28.4],
+        ['Glencore', 'GLEN.L', 4.6, 0.8, 3.2, 6.1, 72, 17.2],
+        ['Southern Copper', 'SCCO (NYSE)', 108.4, 1.6, 6.4, 22.1, 84, 26.8],
+      ]],
+      ['鋼鐵 Steel', '鐵礦/HRC', '鐵礦 −5.4% 月', 'var(--gn)', [
+        ['ArcelorMittal', 'MT (NYSE)', 26.8, -0.6, 2.4, 9.2, 21, 8.1],
+        ['Nucor', 'NUE (NYSE)', 168.2, 0.8, 3.6, -4.2, 39, 12.6],
+        ['POSCO', '005490.KS', 372000, -1.2, -3.8, -8.4, 31, 9.2],
+        ['Nippon Steel', '5401.T', 3284, 0.4, 1.8, 6.2, 31, 7.4],
+        ['China Steel 中鋼', '2002.TW', 21.4, 0.2, 0.9, -3.1, 337, 22.8],
+      ]],
+      ['散裝航運 Dry Bulk', 'BDI/BCI', 'BCI +14.2% 月', 'var(--teal)', [
+        ['Star Bulk', 'SBLK (Nasdaq)', 22.4, 2.6, 11.8, 14.2, 2.6, 6.8],
+        ['Golden Ocean', 'GOGL (Nasdaq)', 13.8, 2.1, 9.4, 8.6, 2.7, 7.2],
+        ['Genco Shipping', 'GNK (NYSE)', 21.2, 1.8, 8.1, 12.4, 0.9, 8.4],
+        ['Pacific Basin', '2343.HK', 2.42, 1.4, 6.8, 4.2, 1.6, 9.1],
+        ['慧洋-KY', '2637.TW', 78.6, 1.2, 5.4, 11.2, 58, 8.8],
+      ]],
+      ['航空 Airlines', 'Brent(燃油)', '油價 −2.8% 月利多', 'var(--ro)', [
+        ['Delta Air Lines', 'DAL (NYSE)', 52.4, 1.4, 6.2, 28.4, 34, 8.2],
+        ['United Airlines', 'UAL (Nasdaq)', 78.6, 1.8, 8.4, 42.6, 26, 7.6],
+        ['Singapore Airlines', 'C6L.SI', 6.84, 0.6, 2.1, 4.8, 16, 9.4],
+        ['長榮航', '2618.TW', 42.8, 1.1, 4.6, 18.2, 232, 11.2],
+        ['華航', '2610.TW', 24.6, 0.8, 3.2, 9.4, 152, 13.8],
+      ]],
+      ['電力/重電 Power', '銅 Copper', '銅 +3.8% 月', 'var(--am)', [
+        ['Schneider Electric', 'SU.PA', 232.4, 0.9, 4.2, 16.8, 142, 28.6],
+        ['Eaton', 'ETN (NYSE)', 318.6, 1.2, 5.6, 22.4, 126, 34.2],
+        ['GE Vernova', 'GEV (NYSE)', 178.4, 1.8, 8.9, 38.6, 49, 42.1],
+        ['ABB', 'ABBN.SW', 51.2, 0.6, 3.1, 12.4, 96, 26.4],
+        ['華城', '1519.TW', 642.0, 2.4, 9.2, 48.6, 64, 38.4],
+      ]],
+    ];
+  }
+
+  renderVals() {
+    const tab = this.state.tab;
+    const set = t => () => this.setState({ tab: t });
+    const tc = on => on
+      ? 'background:var(--bg);color:var(--ink);border-color:var(--ink);box-shadow:0 -2px 0 var(--accent) inset;'
+      : 'background:var(--soft);color:var(--mut);';
+    const sc = v => v >= 0 ? 'color:var(--up);' : 'color:var(--down);';
+    const sg = (v, d) => (v > 0 ? '+' : '') + v.toFixed(d == null ? 2 : d) + '%';
+    const nf = v => v >= 1000 ? v.toLocaleString('en-US', { maximumFractionDigits: 1 }) : v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const cats = this._cats();
+
+    const retCols = ['1D', '3D', '5D', '10D', '20D', '60D', '120D', '240D', 'YTD'];
+    // build multi-horizon returns anchored to 1D(day%) and 20D(month%)
+    const mkRets = (code, d1, d20) => {
+      const r = this._rng((String(code).split('').reduce((a, c) => a + c.charCodeAt(0), 0)) * 17 + 3);
+      const horizons = [1, 3, 5, 10, 20, 60, 120, 240];
+      const perDay = d20 / 20; // avg daily drift implied by the month move
+      return horizons.map(h => {
+        if (h === 1) return d1;
+        if (h === 20) return d20;
+        // cumulative drift + sqrt-time noise, decaying momentum past 20d
+        const decay = h <= 20 ? 1 : 1 - Math.min(0.45, (h - 20) / 480);
+        const base = perDay * h * decay;
+        const noise = (r() - 0.5) * Math.sqrt(h) * 0.9;
+        return +(base + noise).toFixed(1);
+      }).concat([+(d20 * (2.3 + r() * 1.4)).toFixed(1)]); // YTD ~ a few months of the trend
+    };
+    const HOT = 4; // |month%| standout threshold
+    const catBlocks = cats.map(c => ({
+      icon: c[0], name: c[1], en: c[2], color: c[3],
+      rows: c[4].map((r, i) => {
+        const basis = r[3] - r[4];
+        const hot = Math.abs(r[6]) >= HOT;
+        const tint = !hot ? (i % 2 ? '#f6f4ef' : 'var(--paper)') : (r[6] > 0 ? 'rgba(201,107,90,0.09)' : 'rgba(90,158,111,0.09)');
+        return { name: r[0], unit: r[1], code: r[2], fut: nf(r[3]), spot: nf(r[4]),
+          basis: (basis >= 0 ? '+' : '') + nf(Math.abs(basis) < 1 ? +basis.toFixed(2) : +basis.toFixed(1)).replace('-', ''),
+          basisCss: basis >= 0 ? 'color:var(--up);' : 'color:var(--down);',
+          rets: mkRets(r[2], r[5], r[6]).map(v => ({ t: (v > 0 ? '+' : '') + v.toFixed(1), css: sc(v) })),
+          groups: r[7],
+          star: hot ? '★' : '', starCss: hot ? ('color:' + (r[6] > 0 ? 'var(--up)' : 'var(--down)') + ';font-size:8px;') : '',
+          bg: tint };
+      }),
+    }));
+
+    // at-a-glance highlights: largest |month%| movers
+    const flat = cats.flatMap(c => c[4].map(r => ({ name: r[0], m: r[6], cat: c[1], color: c[3] })));
+    const highlights = flat.slice().sort((a, b) => Math.abs(b.m) - Math.abs(a.m)).slice(0, 6).map(h => ({
+      name: h.name, color: h.color, arrow: h.m >= 0 ? '▲' : '▼', arrowCss: h.m >= 0 ? 'color:var(--up);' : 'color:var(--down);',
+      m: (h.m >= 0 ? '+' : '') + h.m.toFixed(1) + '%', mCss: h.m >= 0 ? 'color:var(--up);' : 'color:var(--down);', tag: h.cat,
+    }));
+
+    // scorecards
+    const all = cats.flatMap(c => c[4]);
+    const up = all.filter(r => r[5] > 0).length;
+    const energyAvg = cats.find(c => c[1] === '能源')[4].reduce((s, r) => s + r[6], 0) / 4;
+    const bdi = all.find(r => r[0].indexOf('BDI') >= 0);
+    const copper = all.find(r => r[0].indexOf('銅') >= 0);
+    const gold = all.find(r => r[0].indexOf('黃金') >= 0);
+    const scoreCards = [
+      { l: '追蹤商品', v: all.length, s: up + ' 漲 / ' + (all.length - up) + ' 跌', css: 'color:var(--mut2);', color: 'var(--blue)' },
+      { l: '銅 (景氣)', v: nf(copper[3]), s: sg(copper[6]) + ' 月', css: sc(copper[6]), color: 'var(--blue)' },
+      { l: '黃金 (避險)', v: nf(gold[3]), s: sg(gold[6]) + ' 月', css: sc(gold[6]), color: 'var(--am)' },
+      { l: 'BDI (散裝)', v: nf(bdi[3]), s: sg(bdi[6]) + ' 月', css: sc(bdi[6]), color: 'var(--teal)' },
+      { l: '能源 (成本)', v: sg(energyAvg, 1), s: 'avg 月', css: sc(energyAvg), color: 'var(--co)' },
+    ];
+
+    // commodity → group link map (effect: + tailwind / − cost headwind)
+    const groupColors = { '散裝航運': 'var(--am)', '貨櫃航運': 'var(--teal)', '鋼鐵': 'var(--gn)', '條鋼': 'var(--gn)', '航空': 'var(--ro)', '重電': 'var(--blue)', 'PCB · ABF 載板': 'var(--am)', '電池 · BBU': 'var(--vi)', '太陽能': 'var(--am)', '半導體': 'var(--co)', '塑化': 'var(--ro)' };
+    // [group, [ [commodity, effect(+/-), month%], ... ] ]
+    const links = [
+      ['散裝航運', [['BDI 運價', 1, 8.6]], 'var(--blue)'],
+      ['貨櫃航運', [['SCFI 運價', 1, 6.2], ['CCFI 運價', 1, 4.4], ['原油(燃油成本)', -1, -3.2]], 'var(--teal)'],
+      ['鋼鐵', [['鐵礦砂(成本)', -1, -5.4], ['焦煤(成本)', -1, -2.8], ['HRC 鋼價', 1, 3.2]], 'var(--gn)'],
+      ['條鋼', [['廢鋼(成本)', -1, 1.7], ['HRC', 1, 3.2]], 'var(--gn)'],
+      ['航空', [['原油 Brent(燃油)', -1, -2.8]], 'var(--ro)'],
+      ['重電/電纜', [['銅 Copper', 1, 3.8]], 'var(--blue)'],
+      ['PCB · ABF 載板', [['銅箔', 1, 2.4], ['錫(焊料)', 1, 4.1]], 'var(--am)'],
+      ['電池 · BBU', [['碳酸鋰(成本)', -1, -6.2], ['鎳', -1, -1.6]], 'var(--vi)'],
+      ['太陽能', [['多晶矽(成本)', -1, -8.4], ['白銀', 1, 4.6]], 'var(--am)'],
+      ['半導體', [['銅', 1, 3.8], ['氖氣', 1, 1.2], ['錫(焊料)', 1, 4.1]], 'var(--co)'],
+      ['塑化', [['乙烯', 1, 1.8], ['PX', 1, 2.6], ['石腦油(成本)', -1, -1.2]], 'var(--ro)'],
+    ];
+    const linkCards = links.map(L => {
+      let net = 0;
+      const items = L[1].map(it => {
+        const tail = it[1] > 0 ? (it[2] >= 0 ? 1 : -1) : (it[2] >= 0 ? -1 : 1); // net direction on the group
+        net += tail;
+        return { commodity: it[0], effect: it[1] > 0 ? '利多' : '成本',
+          arrow: it[2] >= 0 ? '▲' : '▼', arrowCss: it[2] >= 0 ? 'color:var(--up);' : 'color:var(--down);',
+          m: (it[2] >= 0 ? '+' : '') + it[2].toFixed(1) + '%', mCss: it[2] >= 0 ? 'color:var(--up);' : 'color:var(--down);' };
+      });
+      return { group: L[0], color: L[2], items,
+        net: net > 0 ? '淨利多' : net < 0 ? '淨偏空' : '中性',
+        netCss: net > 0 ? 'var(--up)' : net < 0 ? 'var(--down)' : 'var(--mut2)' };
+    });
+
+    // international leader stock prices per commodity-driven industry
+    const capFmt = v => v >= 1000 ? '$' + (v / 1000).toFixed(2) + 'T' : '$' + v.toFixed(0) + 'B';
+    const pxFmt = v => v >= 1000 ? v.toLocaleString('en-US', { maximumFractionDigits: 0 }) : v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const leaderBlocks = this._leaders().map(L => ({
+      industry: L[0], driver: L[1], driverMove: L[2], color: L[3],
+      rows: L[4].map((r, i) => {
+        const tw = /\.TW/.test(r[1]);
+        return { name: r[0], ticker: r[1], px: pxFmt(r[2]),
+          d: sg(r[3]), dCss: sc(r[3]), m: sg(r[4]), mCss: sc(r[4]), y: sg(r[5]), yCss: sc(r[5]),
+          cap: capFmt(r[6]), pe: r[7].toFixed(1),
+          nameCss: tw ? 'color:' + L[3] : 'color:var(--ink2)', tickCol: tw ? L[3] : 'var(--blue)',
+          bg: i % 2 ? '#f6f4ef' : 'var(--paper)' };
+      }),
+    }));
+
+    return {
+      rootRef: el => { this.root = el; },
+      tabBoard: set('board'), tabLink: set('link'), tabLeaders: set('leaders'),
+      tcBoard: tc(tab === 'board'), tcLink: tc(tab === 'link'), tcLeaders: tc(tab === 'leaders'),
+      isBoard: tab === 'board', isLink: tab === 'link', isLeaders: tab === 'leaders',
+      catBlocks, scoreCards, linkCards, highlights, retCols, leaderBlocks,
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>VIA · VRN Sidebar Workbench</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --bg:#f5f4f0;--paper:#fff;--ink:#1e1d1a;--ink2:#33403f;
+    --mut:#6b6860;--mut2:#9c9890;--line:#dbd9d3;--soft:#ecebe6;
+    --up:#c96b5a;--down:#5a9e6f;--blue:#4c78a8;--teal:#439a9a;
+    --am:#c4943a;--vi:#7a6daa;
+    --sidebar:#f8f7f3;
+    --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%)
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{
+    background:var(--bg);color:var(--ink2);
+    font:11px/1.5 "DM Sans","Noto Sans TC","Microsoft JhengHei",sans-serif;
+    -webkit-font-smoothing:antialiased
+}
+.bar{position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);z-index:100}
+.appShell{min-height:100vh}
+.sidebar{
+    position:fixed;top:4px;left:0;bottom:0;width:232px;
+    background:var(--sidebar);border-right:1px solid var(--line);
+    padding:18px 14px 16px;overflow:auto;z-index:60
+}
+.sideBrand{padding:2px 5px 15px;border-bottom:2px solid var(--ink)}
+.sideKicker{
+    font:700 8px "DM Mono",Consolas,monospace;
+    letter-spacing:1.5px;color:var(--mut);text-transform:uppercase
+}
+.sideTitle{
+    margin-top:7px;font:800 17px/1.2 "Syne","Microsoft JhengHei",sans-serif;
+    color:var(--ink)
+}
+.sideTitle span{color:var(--up)}
+.sideSub{margin-top:6px;color:var(--mut);font-size:9.5px}
+.sideGroup{margin-top:18px}
+.sideGroupTitle{
+    margin:0 6px 6px;font:700 7.5px "DM Mono",Consolas,monospace;
+    color:var(--mut2);letter-spacing:1.2px;text-transform:uppercase
+}
+.sideNav button{
+    display:block;width:100%;text-align:left;margin-bottom:4px;
+    border:1px solid transparent;border-radius:4px;background:transparent;
+    color:var(--ink2);padding:8px 9px;
+    font:700 8.5px "DM Mono",Consolas,monospace;cursor:pointer
+}
+.sideNav button:hover{background:var(--paper);border-color:var(--line)}
+.sideNav button.active{
+    background:var(--ink);color:#fff;border-color:var(--ink)
+}
+.sideNav button .n{
+    display:inline-block;min-width:21px;color:var(--mut2)
+}
+.sideNav button.active .n{color:#fff}
+.sideMetrics{
+    margin-top:16px;border-top:1px solid var(--line);padding-top:12px
+}
+.sideMetric{
+    display:flex;justify-content:space-between;gap:8px;
+    padding:5px 3px;border-bottom:1px solid var(--soft)
+}
+.sideMetric .k{
+    font:700 7.5px "DM Mono",Consolas,monospace;
+    color:var(--mut);text-transform:uppercase
+}
+.sideMetric .v{
+    max-width:112px;text-align:right;overflow-wrap:anywhere;
+    font:700 8px "DM Mono",Consolas,monospace;color:var(--ink)
+}
+.sideFooter{margin-top:14px}
+.sideFooter button{width:100%}
+.workspace{margin-left:232px;min-height:100vh}
+.workspaceInner{max-width:1240px;margin:0 auto;padding:0 22px 54px}
+header{padding:22px 0 9px;margin-bottom:12px;border-bottom:2px solid var(--ink)}
+.kicker{
+    font:700 10px "DM Mono",Consolas,monospace;
+    letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px
+}
+h1{
+    font:800 20px/1.2 "Syne","Microsoft JhengHei",sans-serif;color:var(--ink)
+}
+h1 span{color:var(--up)}
+.sub{margin-top:6px;font-size:10.5px;color:var(--mut);max-width:1030px}
+.sub b{color:var(--ink2)}
+.page{display:none}.page.active{display:block}
+.hero{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 4px}
+.hc{
+    background:var(--paper);border:1px solid var(--line);
+    border-radius:5px;padding:10px 16px;min-width:130px
+}
+.hc .v{
+    font:800 18px "Syne","Microsoft JhengHei",sans-serif;
+    line-height:1;overflow-wrap:anywhere
+}
+.hc .l{
+    font:600 8px "DM Mono",Consolas,monospace;
+    color:var(--mut);text-transform:uppercase;margin-top:4px
+}
+h2{
+    font:800 13px "Syne","Microsoft JhengHei",sans-serif;
+    color:var(--ink);margin:24px 0 8px;padding-bottom:5px;
+    border-bottom:1px solid var(--line)
+}
+h2 .en{
+    font:600 8px "DM Mono",Consolas,monospace;
+    color:var(--mut2);letter-spacing:1px;margin-left:8px;text-transform:uppercase
+}
+.panel{
+    background:var(--paper);border:1px solid var(--line);
+    border-radius:6px;padding:14px 16px;margin-top:10px
+}
+.panel.input{border-left:3px solid var(--up)}
+.panel.summary{border-left:3px solid var(--teal)}
+.panel.basic{border-left:3px solid var(--blue)}
+.panel.financial{border-left:3px solid var(--vi)}
+.panel.queuePanel{border-left:3px solid var(--am)}
+.panel.registryPanel{border-left:3px solid var(--down)}
+.panel.logPanel{border-left:3px solid var(--ink)}
+.homeColumns{display:flex;gap:12px;align-items:flex-start}
+.homeMain{flex:1;min-width:0}
+.homeAside{width:355px;min-width:320px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.full{grid-column:1/3}
+.field{border-bottom:1px solid var(--soft);padding:8px 0}
+.field:last-child{border-bottom:none}
+label{
+    display:block;font:700 8px "DM Mono",Consolas,monospace;
+    color:var(--mut);text-transform:uppercase;margin-bottom:5px
+}
+.row{display:flex;align-items:center;gap:6px}
+input[type=text],input[type=number]{
+    width:100%;border:1px solid var(--line);border-radius:4px;padding:7px 9px;
+    background:#fafaf8;color:var(--ink2);
+    font:500 10px "DM Mono",Consolas,monospace
+}
+input:focus{outline:1px solid var(--teal);border-color:var(--teal)}
+.check{display:flex;align-items:center;gap:7px;min-height:30px}
+button{
+    border:1px solid var(--line);border-radius:4px;padding:7px 10px;
+    background:var(--paper);color:var(--ink2);
+    font:700 8px "DM Mono",Consolas,monospace;cursor:pointer
+}
+button:hover{background:#fafaf8}
+button.primary{color:#fff;background:var(--teal);border-color:var(--teal)}
+button.danger{color:#fff;background:var(--up);border-color:var(--up)}
+button:disabled{opacity:.45;cursor:default}
+.hint{color:var(--mut);font-size:9px;margin-top:4px}
+.drop{
+    border:1px dashed var(--mut2);border-radius:5px;background:#fafaf8;
+    padding:18px;text-align:center;color:var(--mut)
+}
+.drop.active{border-color:var(--teal);background:#eef7f5}
+.drop b{
+    display:block;color:var(--ink);
+    font:800 11px "Syne","Microsoft JhengHei",sans-serif
+}
+.drop span{display:block;margin-top:4px;font-size:9px}
+.actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+.queue{
+    margin-top:10px;border:1px solid var(--line);border-radius:4px;
+    max-height:430px;overflow:auto
+}
+.queueItem{
+    display:flex;justify-content:space-between;gap:10px;
+    padding:7px 9px;border-bottom:1px solid var(--soft);
+    font:500 9px "DM Mono",Consolas,monospace
+}
+.queueItem:last-child{border-bottom:none}
+.progressOuter{
+    height:9px;background:var(--soft);border-radius:3px;
+    overflow:hidden;margin-top:12px
+}
+.progressInner{height:100%;width:0%;background:var(--reson)}
+.status{
+    display:grid;grid-template-columns:118px 1fr;
+    gap:5px 10px;margin-top:11px
+}
+.k{
+    font:700 8px "DM Mono",Consolas,monospace;
+    color:var(--mut);text-transform:uppercase
+}
+.code{
+    font-family:"DM Mono",Consolas,monospace;
+    overflow-wrap:anywhere
+}
+.log{
+    background:#f8f8f5;color:var(--ink2);
+    border:1px solid var(--line);border-radius:4px;padding:10px;
+    min-height:470px;max-height:650px;overflow:auto;white-space:pre-wrap;
+    font:500 9px/1.55 "DM Mono",Consolas,monospace
+}
+.pill{
+    display:inline-block;font:700 7.5px "DM Mono",Consolas,monospace;
+    color:#fff;border-radius:3px;padding:2px 7px;letter-spacing:.3px
+}
+.ok{background:var(--down)}.warn{background:var(--am)}
+.blind{background:var(--mut2)}.prov{background:var(--vi)}
+.viewerTop{
+    display:flex;align-items:center;justify-content:space-between;
+    gap:10px;flex-wrap:wrap
+}
+.viewerPath{
+    color:var(--mut);font:500 9px "DM Mono",Consolas,monospace;
+    overflow-wrap:anywhere;margin-top:6px
+}
+.frameWrap{
+    margin-top:10px;border:1px solid var(--line);
+    background:#fafaf8;min-height:620px
+}
+iframe{
+    display:block;width:100%;height:620px;border:0;background:#fff
+}
+.emptyView{padding:80px 20px;text-align:center;color:var(--mut)}
+.emptyView b{
+    display:block;color:var(--ink);
+    font:800 14px "Syne","Microsoft JhengHei",sans-serif;margin-bottom:6px
+}
+.registryGrid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:10px
+}
+.registryCard{
+    border:1px solid var(--line);border-radius:5px;background:#fafaf8;
+    padding:11px;min-height:88px
+}
+.registryCard .l{
+    font:700 7.5px "DM Mono",Consolas,monospace;
+    color:var(--mut);text-transform:uppercase
+}
+.registryCard .v{
+    margin-top:7px;color:var(--ink);
+    font:700 10px/1.45 "DM Mono",Consolas,monospace;
+    overflow-wrap:anywhere
+}
+.quickLinks{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}
+.quickLink{
+    border:1px solid var(--line);border-radius:5px;padding:10px;
+    cursor:pointer;background:#fafaf8
+}
+.quickLink:hover{background:var(--paper)}
+.quickLink b{
+    display:block;color:var(--ink);
+    font:800 11px "Syne","Microsoft JhengHei",sans-serif
+}
+.quickLink span{display:block;color:var(--mut);font-size:9px;margin-top:4px}
+.footer{
+    margin-top:14px;color:var(--mut2);
+    font:500 8px "DM Mono",Consolas,monospace
+}
+@media(max-width:980px){
+    .sidebar{width:194px}
+    .workspace{margin-left:194px}
+    .homeColumns{display:block}
+    .homeAside{width:auto;min-width:0}
+    .grid{grid-template-columns:1fr}
+    .full{grid-column:auto}
+    .registryGrid{grid-template-columns:1fr}
+}
+</style>
+<script>
+function byId(id){return document.getElementById(id);}
+function setText(id,value){var node=byId(id);if(node){node.textContent=value;}}
+function switchPage(name){
+    var pages=["home","basic","financial","queue","registry","logs"];
+    var labels={
+        home:["首頁 · 輸入與摘要","Home · Input + Summary"],
+        basic:["Basic Info","Independent primary page"],
+        financial:["Financial Data","Independent primary page"],
+        queue:["報告佇列","Investment report intake queue"],
+        registry:["Runtime Registry","Tools, modules and library registration"],
+        logs:["Execution Logs","Worker events and Gate evidence"]
+    };
+    for(var i=0;i<pages.length;i++){
+        var page=pages[i];
+        byId("page-"+page).className="page"+(page===name?" active":"");
+        byId("nav-"+page).className=page===name?"active":"";
+    }
+    setText("pageTitle",labels[name][0]);
+    setText("pageSubtitle",labels[name][1]);
+}
+window.onload=function(){
+    switchPage("home");
+    byId("base").value="C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics";
+    byId("input").value="<Base>\_vrn_research_report_incremental_intake_v0156\incoming";
+    byId("manifest").value="<Base>\_vrn_research_report_incremental_intake_v0156\VRN_ResearchReport_Incremental_Manifest.v0156.jsonl";
+    byId("python").value="C:\Users\tonyk\envs\via_core_312\Scripts\python.exe";
+    byId("timeout").value="2400";
+    byId("recursive").checked=true;
+    byId("openHtml").checked=true;
+};
+</script>
+</head>
+<body>
+<div class="bar"></div>
+<div class="appShell">
+<aside class="sidebar">
+<div class="sideBrand">
+<div class="sideKicker">VERITAS INTELLIGENCE ANALYTICS</div>
+<div class="sideTitle">VRN <span>Workbench</span></div>
+<div class="sideSub">Visual Lock · Sidebar Edition · v0159</div>
+</div>
+
+<div class="sideGroup">
+<div class="sideGroupTitle">Workspace</div>
+<div class="sideNav">
+<button id="nav-home" onclick="switchPage('home')"><span class="n">01</span>HOME · INPUT + SUMMARY</button>
+<button id="nav-basic" onclick="switchPage('basic')"><span class="n">02</span>BASIC INFO</button>
+<button id="nav-financial" onclick="switchPage('financial')"><span class="n">03</span>FINANCIAL DATA</button>
+</div>
+</div>
+
+<div class="sideGroup">
+<div class="sideGroupTitle">Operations</div>
+<div class="sideNav">
+<button id="nav-queue" onclick="switchPage('queue')"><span class="n">04</span>REPORT QUEUE</button>
+<button id="nav-registry" onclick="switchPage('registry')"><span class="n">05</span>RUNTIME REGISTRY</button>
+<button id="nav-logs" onclick="switchPage('logs')"><span class="n">06</span>EXECUTION LOGS</button>
+</div>
+</div>
+
+<div class="sideMetrics">
+<div class="sideMetric"><div class="k">STATE</div><div id="sideState" class="v">READY</div></div>
+<div class="sideMetric"><div class="k">PROGRESS</div><div id="sideProgress" class="v">0%</div></div>
+<div class="sideMetric"><div class="k">QUEUE</div><div id="sideQueue" class="v">0</div></div>
+<div class="sideMetric"><div class="k">GATE</div><div id="sideGate" class="v">—</div></div>
+</div>
+
+<div class="sideFooter">
+<button class="danger" onclick="window.close()">CLOSE WORKBENCH</button>
+</div>
+</aside>
+
+<div class="workspace">
+<div class="workspaceInner">
+<header>
+<div class="kicker">VRN RESEARCH REPORT SSOT · ACTIVE GENERATION · VISUAL LOCK</div>
+<h1 id="pageTitle">首頁 · 輸入與摘要</h1>
+<p id="pageSubtitle" class="sub">Home · Input + Summary</p>
+</header>
+
+<section id="page-home" class="page active">
+<div class="hero">
+<div class="hc"><div id="summaryState" class="v" style="color:var(--teal)">READY</div><div class="l">WORKBENCH STATE</div></div>
+<div class="hc"><div id="summaryProgress" class="v">0%</div><div class="l">PROGRESS</div></div>
+<div class="hc"><div id="homeQueue" class="v">0</div><div class="l">INPUT QUEUE</div></div>
+<div class="hc"><div id="summaryReports" class="v">0</div><div class="l">STAGED REPORTS</div></div>
+<div class="hc"><div id="summaryDrafts" class="v">0</div><div class="l">DISABLED DRAFTS</div></div>
+<div class="hc"><div id="summaryRegistry" class="v">—</div><div class="l">REGISTERED FILES</div></div>
+<div class="hc" style="min-width:270px"><div id="summaryGate" class="v" style="font:700 9px/1.35 &quot;DM Mono&quot;,Consolas,monospace">—</div><div class="l">LATEST GATE</div></div>
+</div>
+
+<div class="homeColumns">
+<div class="homeMain">
+<h2>① 輸入參數 <span class="en">seven runtime parameters</span></h2>
+<div class="panel input">
+<div class="grid">
+<div class="field full">
+<label>1. Base · 母系統根目錄</label>
+<div class="row"><input id="base" type="text"><button onclick="browseField('Folder','base')">WINDOWS SEARCH</button></div>
+<div class="hint">其餘 authority、schema、adapter、ledger 與 runtime 路徑全部由 Base 相對推導。</div>
+</div>
+<div class="field full">
+<label>2. Input · 投資報告輸入目錄</label>
+<div class="row"><input id="input" type="text"><button onclick="browseField('Folder','input')">WINDOWS SEARCH</button><button onclick="openManual(byId('input').value)">OPEN</button></div>
+</div>
+<div class="field full">
+<label>3. Manifest · Operational JSONL</label>
+<div class="row"><input id="manifest" type="text"><button onclick="browseField('Manifest','manifest')">WINDOWS SEARCH</button><button onclick="openManual(byId('manifest').value)">OPEN</button></div>
+</div>
+<div class="field"><label>4. Python Runtime</label><div class="row"><input id="python" type="text"><button onclick="browseField('Python','python')">SEARCH</button></div></div>
+<div class="field"><label>5. Timeout Seconds</label><input id="timeout" type="number" min="60" max="86400" step="60"></div>
+<div class="field"><label>6. Recursive Scan</label><div class="check"><input id="recursive" type="checkbox"><span>資料夾輸入採遞迴搜尋</span></div></div>
+<div class="field"><label>7. Open Result HTML</label><div class="check"><input id="openHtml" type="checkbox"><span>成功後自動開啟 v0156 結果</span></div></div>
+</div>
+</div>
+</div>
+
+<div class="homeAside">
+<h2>② 啟動與摘要 <span class="en">one-click execution</span></h2>
+<div class="panel summary">
+<div class="actions">
+<button id="run" class="primary" onclick="submitRun()">ONE-CLICK START VRN</button>
+<button id="result" disabled onclick="openDataPath(this)">RESULT</button>
+<button id="runDir" disabled onclick="openDataPath(this)">RUNDIR</button>
+</div>
+<div class="progressOuter"><div id="bar" class="progressInner"></div></div>
+<div class="status">
+<div class="k">STATE</div><div id="state"><span class="pill blind">READY</span></div>
+<div class="k">MESSAGE</div><div id="message">等待執行。</div>
+<div class="k">GATE</div><div id="gate" class="code">—</div>
+<div class="k">REGISTRY</div><div id="registry" class="code">執行時驗證、匯入與註冊。</div>
+</div>
+</div>
+
+<h2>③ 快速拖曳 <span class="en">external report intake</span></h2>
+<div id="dropHome" class="drop">
+<b>從 Windows 檔案總管拖曳投資報告</b>
+<span>詳細佇列請使用左側 REPORT QUEUE</span>
+</div>
+<div class="actions">
+<button onclick="addFiles()">SELECT FILES</button>
+<button onclick="addFolder()">SELECT FOLDER</button>
+<button onclick="switchPage('queue')">OPEN QUEUE</button>
+</div>
+
+<div class="quickLinks">
+<div class="quickLink" onclick="switchPage('basic')"><b>Basic Info</b><span>查看最新基本資料頁</span></div>
+<div class="quickLink" onclick="switchPage('financial')"><b>Financial Data</b><span>查看最新財務資料頁</span></div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="page-basic" class="page">
+<h2>Basic Info <span class="en">independent primary page</span></h2>
+<div class="panel basic">
+<div class="viewerTop">
+<div><span class="pill" style="background:var(--blue)">BASIC INFO</span><div id="basicPath" class="viewerPath"></div></div>
+<div class="actions"><button onclick="loadView('basic')">RELOAD</button><button onclick="openView('basic')">OPEN EXTERNAL</button></div>
+</div>
+<div class="frameWrap">
+<div id="basicEmpty" class="emptyView"><b>Basic Info HTML 尚未找到</b>Workbench 會從 Base 的 VRN functional modules、output 與最新 run folders 自動尋找。</div>
+<iframe id="basicFrame" style="display:none"></iframe>
+</div>
+</div>
+</section>
+
+<section id="page-financial" class="page">
+<h2>Financial Data <span class="en">independent primary page</span></h2>
+<div class="panel financial">
+<div class="viewerTop">
+<div><span class="pill prov">FINANCIAL DATA</span><div id="financialPath" class="viewerPath"></div></div>
+<div class="actions"><button onclick="loadView('financial')">RELOAD</button><button onclick="openView('financial')">OPEN EXTERNAL</button></div>
+</div>
+<div class="frameWrap">
+<div id="financialEmpty" class="emptyView"><b>Financial Data HTML 尚未找到</b>Workbench 會從 Base 的 VRN functional modules、output 與最新 run folders 自動尋找。</div>
+<iframe id="financialFrame" style="display:none"></iframe>
+</div>
+</div>
+</section>
+
+<section id="page-queue" class="page">
+<h2>報告佇列 <span class="en">windows I/O + drag and drop</span></h2>
+<div class="panel queuePanel">
+<div id="dropQueue" class="drop">
+<b>拖曳投資報告至佇列</b>
+<span>PDF、DOCX、TXT、HTML、JSON、CSV、Excel、PowerPoint</span>
+</div>
+<div class="actions">
+<button onclick="addFiles()">WINDOWS SELECT FILES</button>
+<button onclick="addFolder()">WINDOWS SELECT FOLDER</button>
+<button onclick="sources=[];renderQueue()">CLEAR QUEUE</button>
+<button onclick="switchPage('home')">BACK TO HOME</button>
+</div>
+<div class="status">
+<div class="k">QUEUE COUNT</div><div id="queueCount">0</div>
+<div class="k">INPUT TARGET</div><div class="code">使用首頁 Input 參數指定的位置</div>
+<div class="k">MANIFEST MODE</div><div>只建立 enabled=false 草稿，不自動核准日期。</div>
+</div>
+<div id="queue" class="queue"></div>
+</div>
+</section>
+
+<section id="page-registry" class="page">
+<h2>Runtime Registry <span class="en">support tools + modules + libraries</span></h2>
+<div class="panel registryPanel">
+<div class="registryGrid">
+<div class="registryCard"><div class="l">SUPPORT FILES</div><div id="registryFiles" class="v">—</div></div>
+<div class="registryCard"><div class="l">POWERSHELL IMPORTS</div><div id="psModuleCount" class="v">—</div></div>
+<div class="registryCard"><div class="l">PYTHON PACKAGES</div><div id="pythonPackageCount" class="v">—</div></div>
+<div class="registryCard"><div class="l">SNAPSHOT SHA256</div><div id="registrySnapshot" class="v">—</div></div>
+<div class="registryCard"><div class="l">SUPPORT LEDGER</div><div id="registryLedger" class="v">—</div></div>
+<div class="registryCard"><div class="l">V0156 RUNTIME REGISTRY</div><div id="runtimeRegistryPath" class="v">—</div></div>
+</div>
+<div class="hint" style="margin-top:12px">
+支援性工具採 SHA registry；只 Import 核准 PowerShell modules，不會盲目 dot-source 全部 supportive scripts。
+</div>
+</div>
+</section>
+
+<section id="page-logs" class="page">
+<h2>Execution Logs <span class="en">worker events + gate evidence</span></h2>
+<div class="panel logPanel">
+<div class="actions">
+<button onclick="byId('log').innerText='VIA VRN Sidebar Workbench ready.'">CLEAR DISPLAY</button>
+<button onclick="switchPage('home')">BACK TO HOME</button>
+</div>
+<div id="log" class="log">VIA VRN Sidebar Workbench ready.</div>
+</div>
+</section>
+
+<div class="footer">VIA VRN Visual Lock · fixed left navigation · multiple independent pages · no canonical mutation · disabled drafts only · 理</div>
+</div>
+</div>
+</div>
+</body>
+</html>

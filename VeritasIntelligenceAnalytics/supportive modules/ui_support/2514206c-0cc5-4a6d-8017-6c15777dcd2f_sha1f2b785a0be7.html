@@ -1,0 +1,319 @@
+<!DOCTYPE html><html lang="zh-TW"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA LEGO — 14-Command Full Matrix Dashboard v2.0</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap');
+:root{--bg:#f5f4f0;--bg1:#edecea;--bg2:#e5e3df;--sf:#fff;--sf2:#fafaf8;--bd:#dbd9d3;--bd2:#ccc9c1;--bl:#4c78a8;--bl-l:#d0e1f0;--tl:#439a9a;--tl-l:#c8e6e6;--gn:#5a9e6f;--gn-l:#cde8d5;--am:#c4943a;--am-l:#f5e2b8;--co:#c96b5a;--co-l:#f5d0c8;--vi:#7a6daa;--vi-l:#dcd8f0;--ro:#b05580;--i0:#1e1d1a;--i1:#3d3c38;--i2:#6b6860;--i3:#9c9890;--i4:#c4c0b8;
+--mo:'DM Mono',monospace;--sa:'DM Sans',system-ui,sans-serif;--r:5px;--r2:8px;--r3:12px;--sh:0 1px 3px rgba(0,0,0,.06);--sh2:0 4px 12px rgba(0,0,0,.08)}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:var(--sa);background:var(--bg);color:var(--i0);font-size:11px;line-height:1.55}
+.w{max-width:1600px;margin:0 auto;padding:10px 14px}
+/* HEADER */
+.hdr{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r3);padding:14px 16px;margin-bottom:8px;position:relative;overflow:hidden;display:flex;align-items:center;gap:12px}
+.hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--bl),var(--tl),var(--vi),var(--am),var(--co))}
+.h1t{font-size:18px;font-weight:700;letter-spacing:-.5px}.h1t span{color:var(--bl)}
+.h2t{color:var(--i3);font-size:10px;margin-top:1px}
+/* PAGE TABS */
+.pt{display:flex;gap:2px;margin-bottom:8px}.pt button{padding:8px 18px;border:1px solid var(--bd);border-radius:var(--r2) var(--r2) 0 0;background:var(--bg1);color:var(--i2);font:600 11px var(--sa);cursor:pointer;border-bottom:2px solid transparent;transition:.15s}
+.pt button.on{background:var(--sf);color:var(--bl);border-bottom-color:var(--bl);box-shadow:var(--sh)}.pt button:hover:not(.on){background:var(--bg2);color:var(--i1)}
+.pg{display:none}.pg.on{display:block}
+/* STATS */
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(88px,1fr));gap:4px;margin-bottom:8px}
+.sc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:5px 6px;text-align:center;transition:.2s}
+.sc:hover{border-color:var(--bl);box-shadow:var(--sh)}.sc .n{font-size:17px;font-weight:700;font-family:var(--mo)}.sc .l{font-size:8px;color:var(--i3);text-transform:uppercase;letter-spacing:.4px}
+/* CARDS */
+.cd{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);margin-bottom:6px;overflow:hidden;transition:.15s}
+.cd:hover{box-shadow:var(--sh)}
+.cd-h{display:flex;align-items:center;gap:6px;padding:7px 10px;border-bottom:1px solid var(--bd);background:var(--sf2)}
+.cd-i{width:24px;height:24px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.cd-t{font-weight:600;font-size:11px;flex:1}.cd-s{font-family:var(--mo);font-size:9px;color:var(--i3);padding:1px 5px;background:var(--bg1);border-radius:10px}
+.cd-b{padding:8px 10px}
+/* GRID */
+.g-lr{display:grid;grid-template-columns:320px 1fr;gap:8px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+@media(max-width:1100px){.g-lr{grid-template-columns:1fr}}
+/* TABLE */
+.mx{width:100%;border-collapse:collapse;font-size:10px}
+.mx th{background:var(--bg1);padding:4px 5px;text-align:left;font-weight:600;color:var(--i2);border-bottom:2px solid var(--bd);position:sticky;top:0;z-index:1;white-space:nowrap}
+.mx td{padding:3px 5px;border-bottom:1px solid var(--bd);vertical-align:top}.mx tr:hover{background:rgba(76,120,168,.03)}
+.mx code{font-family:var(--mo);font-size:9.5px;background:var(--bg1);padding:0 3px;border-radius:3px}
+.mw{max-height:500px;overflow:auto;border:1px solid var(--bd);border-radius:var(--r)}
+/* BADGES */
+.bd{display:inline-block;padding:1px 5px;border-radius:4px;font-family:var(--mo);font-size:8.5px;font-weight:600;letter-spacing:.2px}
+.bd.ps1{background:var(--bl-l);color:var(--bl)}.bd.py{background:var(--am-l);color:var(--am)}.bd.html{background:var(--tl-l);color:var(--tl)}.bd.api{background:var(--vi-l);color:var(--vi)}
+.bd.ok{background:var(--gn-l);color:var(--gn)}.bd.hi{background:var(--co-l);color:var(--co)}.bd.md{background:var(--am-l);color:var(--am)}.bd.lo{background:var(--gn-l);color:var(--gn)}
+.bd.sys{background:rgba(76,120,168,.08);color:var(--bl)}.bd.mod{background:rgba(67,154,154,.08);color:var(--tl)}.bd.cls{background:rgba(122,109,170,.08);color:var(--vi)}.bd.lib{background:rgba(196,148,58,.08);color:var(--am)}
+.bd.act{background:var(--gn-l);color:var(--gn)}.bd.idle{background:var(--am-l);color:var(--am)}
+/* INPUTS */
+.pi{width:100%;padding:6px 8px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);font:11px var(--mo);color:var(--i0);transition:.15s}
+.pi:focus{border-color:var(--bl);outline:none;box-shadow:0 0 0 2px rgba(76,120,168,.1)}
+.pi::placeholder{color:var(--i4)}
+.bn{padding:5px 10px;border:1px solid var(--bd);border-radius:var(--r);font:500 10px var(--sa);cursor:pointer;transition:.15s;background:var(--sf)}
+.bn:hover{border-color:var(--bl);color:var(--bl)}.bn.bp{background:var(--bl);color:#fff;border-color:var(--bl)}.bn.bp:hover{background:#3b6790}
+.bn.bg{background:var(--bg1)}.bn:disabled{opacity:.3;cursor:not-allowed}
+/* TERMINAL */
+.tm{background:#1e1d1a;border-radius:var(--r2);overflow:hidden;border:1px solid #333;font-family:var(--mo);font-size:10px}
+.tm-bar{display:flex;align-items:center;padding:6px 10px;background:#2a2924;gap:6px;border-bottom:1px solid #333}
+.tm-dot{width:8px;height:8px;border-radius:50%}.td1{background:#e5534b}.td2{background:#d29922}.td3{background:#3fb950}
+.tm-title{flex:1;color:#8b949e;font-size:9px;text-align:center;text-transform:uppercase;letter-spacing:1px}
+.tm-body{padding:8px 10px;max-height:340px;overflow-y:auto;color:#c9d1d9;line-height:1.7}
+.tm-body .head{color:#58a6ff;font-weight:600}.tm-body .ok{color:#3fb950}.tm-body .warn{color:#d29922}.tm-body .err{color:#f85149}.tm-body .dim{color:#6e7681}
+.tm-body .line{display:block;white-space:pre-wrap;word-break:break-all}
+/* HEALTH BAR */
+.hc{display:flex;align-items:center;gap:5px;padding:4px 0;border-bottom:1px solid var(--bg2);font-size:10px}
+.hl{width:70px;font-weight:600;color:var(--i2)}.hv{font-family:var(--mo);font-weight:700;font-size:10px;width:35px;text-align:center}
+.hv.ga{color:var(--gn)}.hv.mo{color:var(--am)}.hv.er{color:var(--co)}
+.hs{flex:1;font-size:9px;color:var(--i3)}.hr{width:50px;height:4px;background:var(--bg2);border-radius:3px;overflow:hidden}.hrf{height:100%;border-radius:3px;transition:width .3s}
+/* IO CARDS */
+.io-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:4px}
+.io-c{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);padding:5px 7px;border-left:3px solid var(--bd)}
+.io-l{font-size:8px;color:var(--i3);text-transform:uppercase;letter-spacing:.3px;font-weight:600}.io-v{font-size:15px;font-weight:700;font-family:var(--mo);margin:1px 0}.io-s{font-size:8px;color:var(--i4)}
+/* LIGHTS */
+.lt{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:3px}.lt.g{background:var(--gn)}.lt.y{background:var(--am)}.lt.r{background:var(--co)}.lt.b{background:var(--bl)}
+/* PATH LIST */
+.pl-item{display:flex;align-items:center;gap:5px;padding:4px 6px;border:1px solid var(--bd);border-radius:var(--r);margin-bottom:3px;font-size:10px;background:var(--sf2);transition:.15s}
+.pl-item:hover{border-color:var(--bl);background:var(--bl-l)}.pl-item .idx{font-family:var(--mo);font-size:9px;color:var(--i3);width:20px;flex-shrink:0}
+.pl-item .path{flex:1;font-family:var(--mo);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pl-item .ext{margin-left:auto}.pl-item .rm{cursor:pointer;color:var(--co);font-size:12px;padding:0 3px}
+.pl-item .rm:hover{color:var(--i0)}
+/* ANCHOR */
+.anc{display:inline-block;padding:0 4px;border-radius:3px;font-size:8px;font-weight:700;font-family:var(--mo)}
+.anc.P{background:var(--bl-l);color:var(--bl)}.anc.F{background:var(--gn-l);color:var(--gn)}.anc.C{background:var(--vi-l);color:var(--vi)}
+.anc.I{background:var(--am-l);color:var(--am)}.anc.M{background:var(--co-l);color:var(--co)}.anc.G{background:var(--tl-l);color:var(--tl)}
+/* FILTER */
+.fbar{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:6px}.fbar .bn{font-size:9px;padding:3px 8px}
+.fbar .bn.active{background:var(--bl);color:#fff;border-color:var(--bl)}
+/* CAT HEADER */
+.cat-h{padding:4px 6px;font-size:10px;font-weight:700;border-left:3px solid;margin:2px 0}
+.cat-h.sys{border-color:var(--bl);background:var(--bl-l);color:var(--bl)}
+.cat-h.mod{border-color:var(--tl);background:var(--tl-l);color:var(--tl)}
+.cat-h.cls{border-color:var(--vi);background:var(--vi-l);color:var(--vi)}
+.cat-h.lib{border-color:var(--am);background:var(--am-l);color:var(--am)}
+/* SEARCH */
+.sr{position:relative}.sr input{padding-left:28px}.sr::before{content:'🔍';position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:11px;opacity:.5}
+</style>
+<style>
+@keyframes countUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes rowIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+@keyframes regPop{0%{transform:scale(.85);opacity:0}50%{transform:scale(1.04)}100%{transform:scale(1);opacity:1}}.reg-pop{animation:regPop .35s ease-out}
+@keyframes scanline{0%{top:-2px}100%{top:100%}}.scanline{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--bl),transparent);opacity:.3;animation:scanline 3s linear infinite;pointer-events:none}
+@keyframes glow{0%,100%{box-shadow:0 0 4px rgba(76,120,168,.15)}50%{box-shadow:0 0 12px rgba(76,120,168,.3)}}.glow{animation:glow 2s ease-in-out infinite}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}.pulse{animation:pulse 2s ease-in-out infinite}
+.pg.on{animation:fadeSlide .3s ease-out}.mx tbody tr{animation:rowIn .3s ease-out both}
+.cat-h.lego{border-color:var(--ro);background:rgba(176,85,128,.08);color:var(--ro)}
+.cat-h.ps25,.cat-h.PS25{border-color:var(--bl);background:var(--bl-l);color:var(--bl)}
+.cat-h.py25,.cat-h.PY25{border-color:var(--am);background:var(--am-l);color:var(--am)}
+.cat-h.plat,.cat-h.PLAT{border-color:var(--vi);background:var(--vi-l);color:var(--vi)}
+.cat-h.disc{border-color:var(--gn);background:var(--gn-l);color:var(--gn)}
+.bd.lego{background:rgba(176,85,128,.08);color:var(--ro)}.bd.ps25{background:var(--bl-l);color:var(--bl)}.bd.py25{background:var(--am-l);color:var(--am)}.bd.plat{background:var(--vi-l);color:var(--vi)}.bd.disc{background:var(--gn-l);color:var(--gn)}
+.rf{display:grid;grid-template-columns:80px 1fr;gap:4px 8px;align-items:center;font-size:10px}.rf label{font-weight:600;color:var(--i2);text-align:right}
+.rf input,.rf select{padding:4px 6px;border:1px solid var(--bd);border-radius:var(--r);font:10px var(--mo);background:var(--sf);transition:.15s}.rf input:focus,.rf select:focus{border-color:var(--bl);outline:none}
+.ft{text-align:center;color:var(--i4);font-size:9px;font-family:var(--mo);margin-top:12px;padding:8px}
+</style></head><body><div class="w">
+
+<div class="hdr">
+<svg viewBox="0 0 46 52" width="36" fill="none"><rect width="46" height="52" rx="10" fill="#1e3a5f"/><circle cx="22" cy="23" r="11" fill="none" stroke="#4c9fd4" stroke-width="3.2"/><line x1="30" y1="31" x2="40" y2="41" stroke="#4c9fd4" stroke-width="3.2" stroke-linecap="round"/><circle cx="22" cy="23" r="2.2" fill="#8dcff0"/><text x="23" y="49.5" text-anchor="middle" font-size="6" font-weight="700" fill="#8dcff0" letter-spacing="1">VIA</text></svg>
+<div style="flex:1"><div class="h1t">VIA <span>LEGO</span> Matrix Dashboard <span style="font-size:11px;color:var(--i3)">v2.0</span></div>
+<div class="h2t">14-Command Full Panoramic &middot; 161 Tools &middot; 13 Anchors &middot; 8 Envs &middot; Stages 1-7</div></div>
+<div style="display:flex;gap:4px;align-items:center" id="sysStatus"><span class="lt g pulse"></span><span style="font-size:9px;color:var(--gn);font-family:var(--mo);font-weight:600">SYSTEM READY</span></div></div>
+<div class="sg">
+<div class="sc" style="border-left:2px solid var(--bl)"><div class="n" style="color:var(--bl)" id="stTools">0</div><div class="l">Tools</div></div>
+<div class="sc" style="border-left:2px solid var(--gn)"><div class="n" style="color:var(--gn)">14</div><div class="l">Commands</div></div>
+<div class="sc" style="border-left:2px solid var(--tl)"><div class="n" style="color:var(--tl)" id="stFuncs">0</div><div class="l">Functions</div></div>
+<div class="sc" style="border-left:2px solid var(--vi)"><div class="n" style="color:var(--vi)">13</div><div class="l">Anchors</div></div>
+<div class="sc" style="border-left:2px solid var(--am)"><div class="n" style="color:var(--am)">8</div><div class="l">Envs</div></div>
+<div class="sc" style="border-left:2px solid var(--co)"><div class="n" style="color:var(--co)">8</div><div class="l">LL Rules</div></div>
+<div class="sc" style="border-left:2px solid var(--gn)"><div class="n" style="color:var(--gn)" id="stGrade">A</div><div class="l">Health</div></div>
+<div class="sc" style="border-left:2px solid var(--ro)"><div class="n" style="color:var(--ro)" id="stBricks">0</div><div class="l">LEGO</div></div></div>
+<div class="pt"><button class="on" onclick="swPg(this,'pg1')">&#9654; &#22519;&#34892; &amp; &#20998;&#26512;</button><button onclick="swPg(this,'pg2')">&#129520; &#24037;&#20855;&#30697;&#38499; (161)</button><button onclick="swPg(this,'pg3')">&#129521; LEGO 14&#25351;&#20196;</button><button onclick="swPg(this,'pg4')">&#128203; &#35387;&#20874;&#26032;&#24037;&#20855;</button></div>
+<div class="pg on" id="pg1"><div class="g-lr"><div style="position:sticky;top:10px;align-self:start">
+<div class="cd"><div class="cd-h"><div class="cd-i" style="background:rgba(76,120,168,.1)">&#128194;</div><div class="cd-t">&#30446;&#27161;&#36335;&#24465; (10 slots)</div><div class="cd-s" id="pathCnt">0/10</div></div><div class="cd-b"><div id="pathList"></div><div style="display:flex;gap:3px;margin-top:4px"><input class="pi" id="pathInput" placeholder="C:\VeritasIntelligenceAnalytics\..." onkeydown="if(event.key==='Enter')addPath()"></div><div style="display:flex;gap:3px;margin-top:4px"><button class="bn bp" onclick="addPath()" style="flex:1">+ &#28155;&#21152;</button><button class="bn bg" onclick="browseFolder()" style="flex:1">&#128193;</button><button class="bn bg" onclick="browseFiles()">&#128196;</button><button class="bn" onclick="clearPaths()" style="color:var(--co)">&#128465;</button></div></div></div>
+<div class="cd"><div class="cd-h"><div class="cd-i" style="background:rgba(122,109,170,.1)">&#9881;</div><div class="cd-t">&#22519;&#34892;&#36984;&#38917;</div></div><div class="cd-b">
+<label style="display:flex;align-items:center;gap:6px;padding:3px 0;cursor:pointer"><input type="checkbox" id="optDry" checked><span style="font-size:10px;font-weight:500">DRY RUN</span><span style="font-size:9px;color:var(--i3);margin-left:auto">&#27169;&#25836;&#19981;&#20462;&#25913;</span></label>
+<label style="display:flex;align-items:center;gap:6px;padding:3px 0;cursor:pointer"><input type="checkbox" id="optVerb" checked><span style="font-size:10px;font-weight:500">&#35443;&#32048;&#26085;&#35468;</span><span style="font-size:9px;color:var(--i3);margin-left:auto">14-CMD</span></label>
+<label style="display:flex;align-items:center;gap:6px;padding:3px 0;cursor:pointer"><input type="checkbox" id="optAccel" checked><span style="font-size:10px;font-weight:500">CPU &#21152;&#36895;</span><span style="font-size:9px;color:var(--i3);margin-left:auto">80%Cap</span></label>
+<label style="display:flex;align-items:center;gap:6px;padding:3px 0;cursor:pointer"><input type="checkbox" id="optLego"><span style="font-size:10px;font-weight:500">LEGO &#25286;&#30938;</span><span style="font-size:9px;color:var(--i3);margin-left:auto">Stage 4-7</span></label></div></div>
+<div style="display:flex;gap:4px;margin-bottom:6px"><button class="bn bp glow" id="btnRun" onclick="runScan()" disabled style="flex:1;padding:8px;font-size:12px">&#9654; &#22519;&#34892; 14 &#25351;&#20196;</button><button class="bn" id="btnStop" onclick="stopRun()" disabled>&#9632;</button></div>
+<div class="cd" id="progCard" style="display:none"><div class="cd-b" style="padding:6px 10px"><div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:3px"><span id="progLbl">...</span><span id="progPct" style="font-family:var(--mo)">0%</span></div><div style="background:var(--bg2);border-radius:3px;height:5px;overflow:hidden;position:relative"><div id="progBar" style="height:100%;background:var(--bl);border-radius:3px;width:0%;transition:width .3s"></div><div class="scanline"></div></div></div></div>
+<div class="cd"><div class="cd-h"><div class="cd-i" style="background:rgba(90,158,111,.1)">&#128138;</div><div class="cd-t">&#31995;&#32113;&#20581;&#24247;</div><div class="cd-s" id="healthGrade">&mdash;</div></div><div class="cd-b">
+<div class="hc"><div class="hl">&#25972;&#39636;</div><div class="hv ga" id="hAll">&mdash;</div><div class="hs">Waiting...</div><div class="hr"><div class="hrf" id="hAllB" style="width:0%;background:var(--gn)"></div></div></div>
+<div class="hc"><div class="hl">Anchors</div><div class="hv mo">13</div><div class="hs">ANC-A..M</div><div class="hr"><div class="hrf" style="width:100%;background:var(--gn)"></div></div></div>
+<div class="hc"><div class="hl">LL Rules</div><div class="hv ga">8/8</div><div class="hs">#10#12#13#15#16#17#18#20</div><div class="hr"><div class="hrf" style="width:100%;background:var(--gn)"></div></div></div>
+<div class="hc"><div class="hl">Tools</div><div class="hv mo">161</div><div class="hs">9 categories</div><div class="hr"><div class="hrf" style="width:100%;background:var(--gn)"></div></div></div>
+<div class="hc"><div class="hl">CPU</div><div class="hv ga">ON</div><div class="hs">RunspacePool 80%</div><div class="hr"><div class="hrf" style="width:90%;background:var(--bl)"></div></div></div>
+<div class="hc"><div class="hl">Envs</div><div class="hv ga">8/8</div><div class="hs">VIA Python</div><div class="hr"><div class="hrf" style="width:94%;background:var(--gn)"></div></div></div></div></div></div>
+<div><div class="tm" style="margin-bottom:6px"><div class="tm-bar"><div class="tm-dot td1"></div><div class="tm-dot td2"></div><div class="tm-dot td3"></div><div class="tm-title">VIA LEGO Terminal</div><button class="bn" style="padding:2px 6px;font-size:8px;background:#2a2924;color:#8b949e;border-color:#444" onclick="clearTerm()">CLEAR</button></div><div class="tm-body" id="termBody"><span class="line head">VIA LEGO 14-Command System v2.0</span><span class="line dim">161 Tools &middot; 13 Anchors &middot; 8 LL Rules</span><span class="line dim">&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;</span><span class="line ok">Ready. Load paths + press &#9654;</span></div></div>
+<div class="io-g" style="margin-bottom:6px"><div class="io-c" style="border-left-color:var(--bl)"><div class="io-l">INPUT</div><div class="io-v" style="color:var(--bl)" id="ioIn">0</div><div class="io-s">files</div></div><div class="io-c" style="border-left-color:var(--gn)"><div class="io-l">OUTPUT</div><div class="io-v" style="color:var(--gn)" id="ioOut">0</div><div class="io-s">HTML+JSON</div></div><div class="io-c" style="border-left-color:var(--tl)"><div class="io-l">ASSETS</div><div class="io-v" style="color:var(--tl)" id="ioAssets">0</div><div class="io-s">M-C-F</div></div><div class="io-c" style="border-left-color:var(--vi)"><div class="io-l">CALLS</div><div class="io-v" style="color:var(--vi)" id="ioCalls">0</div><div class="io-s">edges</div></div><div class="io-c" style="border-left-color:var(--co)"><div class="io-l">DEAD</div><div class="io-v" style="color:var(--co)" id="ioDead">0</div><div class="io-s">orphans</div></div><div class="io-c" style="border-left-color:var(--am)"><div class="io-l">BRICKS</div><div class="io-v" style="color:var(--am)" id="ioBricks">0</div><div class="io-s">LEGO</div></div></div>
+<div class="cd"><div class="cd-h"><div class="cd-i" style="background:rgba(122,109,170,.1)">&#127963;</div><div class="cd-t">14-Command Matrix</div><div class="cd-s">14 cmds</div></div><div class="mw" style="max-height:360px"><table class="mx"><thead><tr><th>CMD</th><th>Stage</th><th>Title</th><th>Count</th><th>Time</th><th>Status</th></tr></thead><tbody id="cmdBody"></tbody></table></div></div>
+<div class="cd"><div class="cd-h"><div class="cd-i" style="background:rgba(196,148,58,.1)">&#9875;</div><div class="cd-t">Anchor Map</div><div class="cd-s">13</div></div><div class="cd-b" id="anchorMap" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:3px;font-size:9px"></div></div></div></div></div>
+<div class="pg" id="pg2"><div style="display:flex;gap:6px;margin-bottom:6px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:200px;position:relative"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:11px;opacity:.5">&#128269;</span><input class="pi" id="toolSearch" placeholder="Search tools..." oninput="filterTools()" style="padding-left:28px"></div><div class="fbar" style="margin-bottom:0"><button class="bn active" onclick="fCat(this,'all')">ALL</button><button class="bn" onclick="fCat(this,'SYS')"><span class="bd sys">SYS</span></button><button class="bn" onclick="fCat(this,'MOD')"><span class="bd mod">MOD</span></button><button class="bn" onclick="fCat(this,'CLS')"><span class="bd cls">CLS</span></button><button class="bn" onclick="fCat(this,'LIB')"><span class="bd lib">LIB</span></button><button class="bn" onclick="fCat(this,'LEGO')"><span class="bd lego">LEGO</span></button><button class="bn" onclick="fCat(this,'PS25')"><span class="bd ps1">PS25</span></button><button class="bn" onclick="fCat(this,'PY25')"><span class="bd py">PY25</span></button><button class="bn" onclick="fCat(this,'PLAT')"><span class="bd api">PLAT</span></button><button class="bn" onclick="fCat(this,'DISC')"><span class="bd disc">DISC</span></button></div></div>
+<div class="cd"><div class="cd-h"><div class="cd-i" style="background:rgba(76,120,168,.1)">&#129520;</div><div class="cd-t">Tool Registry</div><div class="cd-s" id="toolCntBadge">161</div><div style="margin-left:auto;display:flex;gap:3px"><button class="bn" style="font-size:8px;padding:2px 6px" onclick="exportToolCSV()">&#8595;CSV</button><button class="bn" style="font-size:8px;padding:2px 6px" onclick="exportToolJSON()">&#8595;JSON</button></div></div><div class="mw" style="max-height:600px"><table class="mx" id="toolTable"><thead><tr><th style="width:28px">#</th><th>ID</th><th>Name</th><th>Cat</th><th>Ver</th><th>Type</th><th>Function</th><th>Mods</th><th>LL</th><th>Input</th><th>Output</th><th>Anchor</th><th>Status</th></tr></thead><tbody id="toolBody"></tbody></table></div></div>
+<div class="g2"><div class="cd"><div class="cd-h"><div class="cd-i" style="background:rgba(196,148,58,.1)">&#9875;</div><div class="cd-t">Anchors (13)</div></div><div class="cd-b" style="padding:0"><table class="mx"><thead><tr><th>ID</th><th>Type</th><th>Action</th><th>Safe</th></tr></thead><tbody id="ancBody"></tbody></table></div></div><div class="cd"><div class="cd-h"><div class="cd-i" style="background:rgba(67,154,154,.1)">&#127760;</div><div class="cd-t">Env Matrix (8)</div></div><div class="cd-b" style="padding:0"><table class="mx"><thead><tr><th>Env</th><th>Py</th><th>Pkgs</th><th>Health</th><th>Risk</th><th>Libs</th></tr></thead><tbody id="envBody"></tbody></table></div></div></div>
+<div class="cd"><div class="cd-h"><div class="cd-i" style="background:rgba(201,107,90,.1)">&#128230;</div><div class="cd-t">Lib Conflict Matrix</div></div><div class="cd-b" style="padding:0"><table class="mx"><thead><tr><th>Library</th><th>Envs</th><th>Version</th><th>Risk</th></tr></thead><tbody id="libBody"></tbody></table></div></div></div>
+<div class="pg" id="pg3"><div class="cd"><div class="cd-h"><div class="cd-i" style="background:rgba(176,85,128,.1)">&#129521;</div><div class="cd-t">LEGO 7-Stage 14-CMD</div><div class="cd-s">1-7</div></div><div class="cd-b" style="padding:0"><table class="mx"><thead><tr><th>CMD</th><th>Stage</th><th>Title</th><th>Top3 PS</th><th>Top3 PY</th><th>Input</th><th>Output</th><th>St</th></tr></thead><tbody id="legoBody"></tbody></table></div></div>
+<div class="cd"><div class="cd-h"><div class="cd-i" style="background:rgba(122,109,170,.1)">&#128295;</div><div class="cd-t">Install</div></div><div class="cd-b"><pre style="background:var(--bg);padding:8px;border-radius:var(--r);font:10px var(--mo);color:var(--vi);white-space:pre-wrap">@('PSScriptAnalyzer','Pester','ImportExcel','PSWriteHTML','PSGraph','PSRule','InjectionHunter','PSCodeHealth','Terminal-Icons','Microsoft.PowerShell.ConsoleGuiTools','platyPS','ModuleBuilder','Plaster','InvokeBuild')|%{Install-Module $_ -Scope CurrentUser -Force}
+pip install ruff pylint flake8 bandit mypy pyright radon vulture complexipy pydocstyle interrogate pipdeptree pydeps tach import-linter rich black isort networkx libcst rope ast-grep semgrep --break-system-packages</pre></div></div></div>
+<div class="pg" id="pg4"><div class="g2"><div class="cd"><div class="cd-h"><div class="cd-i" style="background:rgba(90,158,111,.1)">&#128203;</div><div class="cd-t">Register Tool</div><div class="cd-s">Append-Only</div></div><div class="cd-b"><div class="rf"><label>ID</label><input id="regId" placeholder="VPS-XX"><label>Name</label><input id="regName" placeholder="My_Tool"><label>Cat</label><select id="regCat"><option>SYS</option><option>MOD</option><option>CLS</option><option>LIB</option><option>LEGO</option><option>PS25</option><option>PY25</option><option>PLAT</option><option>DISC</option></select><label>Ver</label><input id="regVer" value="v1.0"><label>Type</label><select id="regType"><option>PS1</option><option>PY</option><option>PS1+PY</option><option>HTML</option><option>HTML+PS1</option><option>API</option><option>REGEX</option></select><label>Func</label><input id="regFunc" placeholder="What it does..."><label>Mods</label><input id="regMods" type="number" value="1" min="1"><label>LL</label><input id="regLL" placeholder="#12#15"><label>Input</label><input id="regInp" placeholder=".py files"><label>Output</label><input id="regOut" placeholder="JSON"><label>Anchor</label><input id="regAnc" placeholder="ANC-X"><label>Status</label><select id="regSt"><option>Active</option><option>Idle</option><option>N/A</option></select></div><div style="display:flex;gap:4px;margin-top:8px"><button class="bn bp" onclick="registerTool()" style="flex:1;padding:7px">&#10003; Register (Append-Only)</button><button class="bn" onclick="clearRegForm()">Clear</button></div><div id="regMsg" style="margin-top:6px;font-size:10px;display:none"></div></div></div>
+<div class="cd"><div class="cd-h"><div class="cd-i" style="background:rgba(76,120,168,.1)">&#128202;</div><div class="cd-t">Recent</div><div class="cd-s" id="regCnt">0</div></div><div class="cd-b" style="padding:0"><div class="mw" style="max-height:300px"><table class="mx"><thead><tr><th>#</th><th>ID</th><th>Name</th><th>Cat</th><th>Type</th><th>Func</th><th>St</th></tr></thead><tbody id="regBody"></tbody></table></div></div></div></div>
+<div class="cd"><div class="cd-h"><div class="cd-i" style="background:rgba(196,148,58,.1)">&#128190;</div><div class="cd-t">Export</div></div><div class="cd-b"><div style="display:flex;gap:4px"><button class="bn bp" onclick="exportToolJSON()" style="flex:1">&#8595; JSON</button><button class="bn bp" onclick="exportToolCSV()" style="flex:1">&#8595; CSV</button><button class="bn" onclick="exportRegPS1()" style="flex:1">&#8595; PS1</button></div></div></div></div>
+<div class="ft">VIA LEGO 14-CMD Matrix Dashboard v2.1 — 203 Tools</div>
+</div>
+<script>
+
+var TOOLS=[
+{n:1,id:'VPS-01',name:'VPS_Server',cat:'SYS',ver:'v3.2',type:'PS1',func:'HttpListener+SSE+Runspace+CPUAccel',mods:5,ll:'#12#13#14',inp:'HTTP',out:'SSE',anc:'-',st:'Active'},
+{n:2,id:'VPS-02',name:'VPS_PWA_Frontend',cat:'SYS',ver:'v3.2',type:'HTML',func:'6-Tab Dashboard+Matrix',mods:6,ll:'-',inp:'UI',out:'HTML',anc:'-',st:'Active'},
+{n:3,id:'VPS-GOV',name:'VPS_GovernanceEngine',cat:'SYS',ver:'v3.5.1',type:'PS1',func:'5Matrix+CPUAccel+AnchorFix+22funcs',mods:22,ll:'#10#12#13#15',inp:'.py/.ps1',out:'HTML+JSON',anc:'ANC-A..M',st:'Active'},
+{n:4,id:'MOD-01',name:'VPS_ModuleUpload',cat:'SYS',ver:'v1.0',type:'HTML+PS1',func:'Upload+Scan+Test+Deploy',mods:5,ll:'#12#15',inp:'Module',out:'PS1',anc:'ANC-K',st:'Active'},
+{n:5,id:'PMT-01',name:'VPS_PromptStore',cat:'SYS',ver:'v1.0',type:'HTML+JSON',func:'CRUD+Category+Tags',mods:3,ll:'-',inp:'Text',out:'JSON',anc:'-',st:'Active'},
+{n:6,id:'CMD-01',name:'VPS_CmdSegmentation',cat:'SYS',ver:'v1.0',type:'HTML+PS1',func:'Segment+AnchorID+IsoFix',mods:4,ll:'#12#15',inp:'Script',out:'Segs',anc:'P/F/C/I/M/G',st:'Active'},
+{n:7,id:'SFX-01',name:'VPS_SyncFixEngine',cat:'SYS',ver:'v1.0',type:'HTML+PS1',func:'Queue+DryRun+Backup+Rollback',mods:6,ll:'#12#13#15',inp:'Queue',out:'Fix',anc:'ANC-K',st:'Active'},
+{n:8,id:'VDF-01',name:'VDF_Governance',cat:'SYS',ver:'v3',type:'PS1',func:'AST+DeadCode+ImportGraph',mods:5,ll:'#12',inp:'.py',out:'Matrix',anc:'ANC-A..F',st:'Active'},
+{n:9,id:'VDF-02',name:'VDF_SyncFix_v2',cat:'SYS',ver:'v2',type:'PS1',func:'Unused Import SafeClean',mods:3,ll:'#12',inp:'AST',out:'Fixed .py',anc:'ANC-B',st:'Active'},
+{n:10,id:'VDF-03',name:'VDF_Panoramic_SyncFix',cat:'SYS',ver:'v1',type:'PS1',func:'Anchor Inject+Hash+Risk',mods:5,ll:'#12',inp:'.py',out:'Fixed+Hash',anc:'ANC-L',st:'Active'},
+{n:11,id:'VDF-04',name:'VDF_GlobalDataFetcher',cat:'SYS',ver:'v1',type:'PS1',func:'TWSE/TPEX Env Check',mods:3,ll:'#12',inp:'Config',out:'Report',anc:'-',st:'Idle'},
+{n:12,id:'VDF-05',name:'VDF_Input_Interface',cat:'SYS',ver:'v1',type:'PS1',func:'DragDrop+MultiPath+AST',mods:3,ll:'-',inp:'File',out:'Paths',anc:'-',st:'Active'},
+{n:13,id:'PSF-01',name:'VIA_PanoramicSafeFixer',cat:'SYS',ver:'v2.0',type:'PS1',func:'M01-M11 Anchor Engine',mods:11,ll:'#10#12#13#15',inp:'.py',out:'Fixed',anc:'ANC-A..G',st:'Active'}];
+// MOD 16
+var MOD=[
+{n:14,id:'VRN-01',name:'VRN_Pipeline_M01-M08',cat:'MOD',ver:'v9.4',type:'PY',func:'12-Mod 21/21 PASS',mods:12,ll:'-',inp:'PDF/Word',out:'HQ PDF',anc:'-',st:'Active'},
+{n:15,id:'VRN-02',name:'VRN_StrictClassifier',cat:'MOD',ver:'v1',type:'PY',func:'Ticker+Matrix+Health',mods:4,ll:'-',inp:'Text',out:'Class',anc:'ANC-A,D',st:'Active'},
+{n:16,id:'VRN-03',name:'VRN_StockExtractor',cat:'MOD',ver:'v2',type:'PY',func:'PDF+OCR+Table',mods:6,ll:'-',inp:'PDF',out:'Data',anc:'ANC-A',st:'Active'},
+{n:17,id:'VPN-01',name:'VRN_PanoramicScanner',cat:'MOD',ver:'v3.1',type:'PS1+PY',func:'14Phase+82Tool+HTML',mods:14,ll:'#12#15#17#18#20',inp:'.ps1/.py',out:'Dashboard',anc:'Full',st:'Active'},
+{n:18,id:'VPN-02',name:'VRN_PyWorker',cat:'MOD',ver:'v3.0',type:'PY',func:'25 Wrappers: ast/ruff/bandit/radon',mods:25,ll:'-',inp:'.py',out:'JSON',anc:'-',st:'Active'},
+{n:19,id:'VPN-03',name:'VIA_SupremeGovernance',cat:'MOD',ver:'v1.1',type:'PS1',func:'ModuleScan+Hash+HTML',mods:7,ll:'#12',inp:'Dir',out:'HTML',anc:'ANC-K',st:'Active'},
+{n:20,id:'VPN-04',name:'VRN_SmartAssetKernel',cat:'MOD',ver:'v1.0',type:'PY',func:'6-Layer+SmartAsset+Rich',mods:15,ll:'-',inp:'AST',out:'M-C-F',anc:'M-C-F',st:'Active'},
+{n:21,id:'VPN-05',name:'VRN_SmartAssetPanorama',cat:'MOD',ver:'v1.0',type:'PY',func:'AST+LEGO Emit+Export',mods:12,ll:'-',inp:'Dir',out:'Matrix',anc:'M-C-F',st:'Active'},
+{n:22,id:'TDO-01',name:'TDO_AllInOne',cat:'MOD',ver:'v2.0',type:'HTML+PS1',func:'8Phase+Safety+AutoFix',mods:8,ll:'#10#12#13#15',inp:'.py/.ps1',out:'Grade',anc:'All',st:'Active'},
+{n:23,id:'SAF-01',name:'VIA_SafetyScanner',cat:'MOD',ver:'v1.0',type:'PS1',func:'eval/exec/IEX/Secret',mods:4,ll:'#12#15',inp:'Source',out:'Flags',anc:'ANC-H,I,J',st:'Active'},
+{n:24,id:'PYC-01',name:'VIA_PyCompileVerifier',cat:'MOD',ver:'v1.0',type:'PS1',func:'py_compile Gate',mods:1,ll:'#12',inp:'.py',out:'PASS/FAIL',anc:'ANC-K',st:'Active'},
+{n:25,id:'SYN-01',name:'VIA_SynonymMonitor',cat:'MOD',ver:'v1.0',type:'PS1+HTML',func:'28-Pattern Heatmap',mods:3,ll:'#12#15',inp:'Source',out:'Map',anc:'-',st:'Active'},
+{n:26,id:'REM-01',name:'VIA_AnchorRemediation',cat:'MOD',ver:'v1.0',type:'PS1',func:'SafeFix+PyCompile+Rollback',mods:5,ll:'#12#15',inp:'Anchors',out:'Fixed',anc:'ANC-A..K',st:'Active'},
+{n:27,id:'MON-01',name:'VIA_ScriptMonitor',cat:'MOD',ver:'v4.0',type:'PS1+HTML',func:'10-Slot+8Phase TDO',mods:8,ll:'#12#15#17',inp:'10 slots',out:'Dashboard',anc:'All',st:'Active'},
+{n:28,id:'GOV-01',name:'VIA_Governance_v2.5',cat:'MOD',ver:'v2.5',type:'PS1',func:'Coverage+Health+Detect',mods:5,ll:'-',inp:'Matrix',out:'Score',anc:'Cov',st:'Active'},
+{n:29,id:'GOV-02',name:'VIA_Synonym_v2.5',cat:'MOD',ver:'v2.5',type:'PS1',func:'SynonymGroups+Conflict',mods:3,ll:'-',inp:'Source',out:'Map',anc:'-',st:'Active'}];
+var CLS=[
+{n:30,id:'AUD-01',name:'VIA_UltimateAudit_Graph',cat:'CLS',ver:'v3',type:'PS1+D3',func:'D3 ForceGraph+CallGraph',mods:5,ll:'#12',inp:'Graph',out:'D3',anc:'-',st:'Active'},
+{n:31,id:'AUD-02',name:'VIA_SubsystemAudit',cat:'CLS',ver:'v2',type:'PS1',func:'Risk+Heat+Impact+AutoFix',mods:6,ll:'#12',inp:'System',out:'Matrix',anc:'-',st:'Active'},
+{n:32,id:'AUD-03',name:'VIA_CmdAudit',cat:'CLS',ver:'v1',type:'PS1',func:'Regex+Risk+Advice+JSON',mods:4,ll:'-',inp:'Cmds',out:'Risk',anc:'-',st:'Active'},
+{n:33,id:'REP-01',name:'VIA_ASTRepairEngine',cat:'CLS',ver:'v1',type:'PS1+PY',func:'ast+astor+DryRun+Backup',mods:3,ll:'-',inp:'AST',out:'Repaired',anc:'ANC-K',st:'Active'},
+{n:34,id:'REG-01',name:'VIA_SupremeRegistry',cat:'CLS',ver:'v4.0',type:'HTML',func:'161-Tool 9-Cat Search',mods:9,ll:'-',inp:'DB',out:'HTML',anc:'-',st:'Active'},
+{n:35,id:'MGR-01',name:'VIA_SmartAssetCmdMgr',cat:'CLS',ver:'v2.0',type:'PS1+HTML',func:'118-Tool+AnchorSeg+Dedup',mods:9,ll:'-',inp:'Scan',out:'Registry',anc:'Seg',st:'Active'}];
+var LIB=[
+{n:36,id:'VDS-01',name:'VDS_TW_StockMaster',cat:'LIB',ver:'v1.0',type:'PY',func:'TWSE/TPEX+MOPS+LockedRegex',mods:5,ll:'-',inp:'Ticker',out:'Data',anc:'Regex',st:'Active'},
+{n:37,id:'PS-01',name:'PSScriptAnalyzer',cat:'LIB',ver:'ext',type:'PS7',func:'69+ Lint Rules',mods:1,ll:'-',inp:'.ps1',out:'Lint',anc:'-',st:'Active'},
+{n:38,id:'PS-02',name:'Pester',cat:'LIB',ver:'ext',type:'PS7',func:'BDD Test',mods:1,ll:'-',inp:'Tests',out:'Results',anc:'-',st:'Active'},
+{n:39,id:'PS-03',name:'ImportExcel',cat:'LIB',ver:'ext',type:'PS7',func:'R/W xlsx',mods:1,ll:'-',inp:'Data',out:'.xlsx',anc:'-',st:'Active'},
+{n:40,id:'PY-01',name:'ruff',cat:'LIB',ver:'ext',type:'PY-CLI',func:'500+ Lint Rust',mods:1,ll:'-',inp:'.py',out:'JSON',anc:'-',st:'Active'},
+{n:41,id:'PY-02',name:'bandit',cat:'LIB',ver:'ext',type:'PY-CLI',func:'Security AST',mods:1,ll:'-',inp:'.py',out:'JSON',anc:'ANC-H',st:'Active'},
+{n:42,id:'PY-03',name:'radon',cat:'LIB',ver:'ext',type:'PY-CLI',func:'CC+Halstead',mods:1,ll:'-',inp:'.py',out:'Metrics',anc:'-',st:'Active'},
+{n:43,id:'PY-04',name:'vulture',cat:'LIB',ver:'ext',type:'PY-CLI',func:'Dead Code',mods:1,ll:'-',inp:'.py',out:'Dead',anc:'-',st:'Active'},
+{n:44,id:'PY-05',name:'black',cat:'LIB',ver:'ext',type:'PY-CLI',func:'Formatter',mods:1,ll:'-',inp:'.py',out:'Fmt',anc:'-',st:'Active'},
+{n:45,id:'CL-01',name:'Claude_Platform',cat:'LIB',ver:'v1',type:'API',func:'18 Tools: search/bash/file',mods:18,ll:'-',inp:'Prompt',out:'Response',anc:'-',st:'Active'},
+{n:46,id:'GX-01',name:'Grok_Platform',cat:'LIB',ver:'v1',type:'API',func:'14 Tools: x/code/DeepSearch',mods:14,ll:'-',inp:'Prompt',out:'Response',anc:'-',st:'Active'},
+{n:47,id:'VDS-02',name:'VDS_TickerRegex',cat:'LIB',ver:'v1',type:'REGEX',func:'3 Locked Patterns',mods:3,ll:'-',inp:'Ticker',out:'Bool',anc:'Regex',st:'Active'}];
+
+// ═══════════════════════════════════════════════════════════════════════
+// NEW TOOLS INJECTED BY VIA_PanoramicAnalyser (SAR + PMO + LIB modules)
+// [ANCHOR:ANC-NEW-TOOLS] — auto-generated, do not hand-edit this block
+// ═══════════════════════════════════════════════════════════════════════
+var NEW_TOOLS=[
+// ── SAR: VIA_SmartAssetRegistry v2.0 ──────────────────────────────────
+{n:162,id:'SAR-01',name:'Invoke-VIASmartAssetScan',cat:'MOD',ver:'v2.0',type:'PS1',func:'全景掃描+資產登錄+問題矩陣一鍵輸出',mods:9,ll:'#12',inp:'Dir/File',out:'CSV+HTML',anc:'ANC-I',st:'Active'},
+{n:163,id:'SAR-02',name:'Build-AssetRegistry',cat:'MOD',ver:'v2.0',type:'PS1',func:'TACC 2.0 自動流水編號引擎 LIB-LANG-CAT-SEQ',mods:3,ll:'-',inp:'RawList[]',out:'Registry[]',anc:'ANC-C',st:'Active'},
+{n:164,id:'SAR-03',name:'Build-ProblemMatrix',cat:'MOD',ver:'v2.0',type:'PS1',func:'多檔靜態掃描問題矩陣建立器',mods:4,ll:'-',inp:'FilePaths[]',out:'Matrix[]',anc:'ANC-E',st:'Active'},
+{n:165,id:'SAR-04',name:'New-AssetEntry',cat:'CLS',ver:'v2.0',type:'PS1',func:'智慧資產Schema PSCustomObject建立',mods:1,ll:'-',inp:'Params',out:'PSCustomObject',anc:'ANC-A',st:'Active'},
+{n:166,id:'SAR-05',name:'New-ProblemEntry',cat:'CLS',ver:'v2.0',type:'PS1',func:'問題矩陣條目Schema建立 16欄',mods:1,ll:'-',inp:'Params',out:'PSCustomObject',anc:'ANC-A',st:'Active'},
+{n:167,id:'SAR-06',name:'Export-VIAHtmlReport',cat:'MOD',ver:'v2.0',type:'PS1',func:'雙頁HTML報表(資產登錄+問題矩陣)',mods:2,ll:'#12',inp:'Registry[]+Matrix[]',out:'HTML',anc:'ANC-H',st:'Active'},
+{n:168,id:'SAR-07',name:'Export-AssetRegistryCsv',cat:'MOD',ver:'v2.0',type:'PS1',func:'資產登錄CSV匯出 UTF8',mods:1,ll:'-',inp:'Registry[]',out:'CSV',anc:'ANC-G',st:'Active'},
+{n:169,id:'SAR-08',name:'Export-ProblemMatrixCsv',cat:'MOD',ver:'v2.0',type:'PS1',func:'問題矩陣CSV匯出 UTF8',mods:1,ll:'-',inp:'Matrix[]',out:'CSV',anc:'ANC-E',st:'Active'},
+{n:170,id:'SAR-09',name:'Get-CategoryCode',cat:'CLS',ver:'v2.0',type:'PS1',func:'Category→3碼縮寫映射(CAT_CODE_MAP)',mods:1,ll:'-',inp:'Category',out:'String',anc:'ANC-C',st:'Active'},
+// ── PMO: VIA_ProblemMatrix_OutputModule v1.0 ─────────────────────────
+{n:171,id:'PMO-01',name:'Invoke-ProblemMatrixScan',cat:'MOD',ver:'v1.0',type:'PS1',func:'靜態掃描+問題矩陣CSV/HTML輸出主控',mods:7,ll:'#12',inp:'ScanPath',out:'CSV+HTML',anc:'ANC-G',st:'Active'},
+{n:172,id:'PMO-02',name:'Export-ProblemMatrixHtml',cat:'MOD',ver:'v1.0',type:'PS1',func:'問題矩陣深色主題HTML報表輸出',mods:2,ll:'#12',inp:'Matrix[]',out:'HTML',anc:'ANC-F',st:'Active'},
+{n:173,id:'PMO-03',name:'ConvertTo-AnchorID',cat:'CLS',ver:'v1.0',type:'PS1',func:'ANCHOR-CmdID-SEQ 格式定位點ID生成',mods:1,ll:'-',inp:'CmdID+Seq',out:'String',anc:'ANC-C',st:'Active'},
+{n:174,id:'PMO-04',name:'Get-ScopeFromLine',cat:'CLS',ver:'v1.0',type:'PS1',func:'從行號回溯函式/類別Scope名稱',mods:1,ll:'-',inp:'Lines[]+LineNo',out:'String',anc:'ANC-C',st:'Active'},
+{n:175,id:'PMO-05',name:'Get-Severity',cat:'CLS',ver:'v1.0',type:'PS1',func:'Code+ToolSev對應 High/Medium/Low分級',mods:1,ll:'-',inp:'Code+Sev',out:'Enum',anc:'ANC-D',st:'Active'},
+{n:176,id:'PMO-06',name:'Get-ProblemType',cat:'CLS',ver:'v1.0',type:'PS1',func:'Tool+Code映射問題類型(安全/邏輯/規格)',mods:1,ll:'-',inp:'Code+Tool',out:'String',anc:'ANC-D',st:'Active'},
+{n:177,id:'PMO-07',name:'Invoke-FlakeAnalysis',cat:'MOD',ver:'v1.0',type:'PS1',func:'flake8 PY靜態分析包裝器 CSV解析',mods:1,ll:'-',inp:'.py',out:'Findings[]',anc:'ANC-B',st:'Active'},
+{n:178,id:'PMO-08',name:'Invoke-BanditAnalysis',cat:'MOD',ver:'v1.0',type:'PS1',func:'bandit 安全風險CSV解析器',mods:1,ll:'-',inp:'.py',out:'Findings[]',anc:'ANC-B',st:'Active'},
+{n:179,id:'PMO-09',name:'Invoke-PSScriptAnalysis',cat:'MOD',ver:'v1.0',type:'PS1',func:'PSScriptAnalyzer Error+Warning包裝器',mods:1,ll:'-',inp:'.ps1',out:'Findings[]',anc:'ANC-B',st:'Active'},
+// ── LIB-PS: PowerShell 內建+外部工具 (未在原HTML的部分) ───────────────
+{n:180,id:'LPS-01',name:'Get-ChildItem',cat:'LIB',ver:'built-in',type:'PS7',func:'檔案樹全景掃描 -Recurse -Include',mods:1,ll:'-',inp:'Path',out:'FileInfo[]',anc:'-',st:'Active'},
+{n:181,id:'LPS-02',name:'Get-FileHash',cat:'LIB',ver:'built-in',type:'PS7',func:'SHA256錨點雜湊計算',mods:1,ll:'-',inp:'File',out:'Hash',anc:'-',st:'Active'},
+{n:182,id:'LPS-03',name:'Select-String',cat:'LIB',ver:'built-in',type:'PS7',func:'Regex搜尋語法/錨點關鍵字',mods:1,ll:'-',inp:'Pattern+File',out:'Match[]',anc:'-',st:'Active'},
+{n:183,id:'LPS-04',name:'ConvertTo-Json',cat:'LIB',ver:'built-in',type:'PS7',func:'轉JSON報表 -Depth控制',mods:1,ll:'-',inp:'Object',out:'JSON',anc:'-',st:'Active'},
+{n:184,id:'LPS-05',name:'Export-Csv',cat:'LIB',ver:'built-in',type:'PS7',func:'匯出CSV報表 UTF8 NoTypeInfo',mods:1,ll:'-',inp:'Object[]',out:'CSV',anc:'-',st:'Active'},
+{n:185,id:'LPS-06',name:'Invoke-Formatter',cat:'LIB',ver:'ext',type:'PS7',func:'PSSA 風格規則自動排版',mods:1,ll:'-',inp:'.ps1',out:'Formatted',anc:'-',st:'N/A'},
+{n:186,id:'LPS-07',name:'ForEach-Object-Parallel',cat:'LIB',ver:'built-in',type:'PS7',func:'多檔並行處理 -ThrottleLimit',mods:1,ll:'-',inp:'Collection',out:'Results[]',anc:'-',st:'Active'},
+{n:187,id:'LPS-08',name:'Start-Job',cat:'LIB',ver:'built-in',type:'PS7',func:'背景作業非同步執行',mods:1,ll:'-',inp:'ScriptBlock',out:'Job',anc:'-',st:'Active'},
+{n:188,id:'LPS-09',name:'Tee-Object',cat:'LIB',ver:'built-in',type:'PS7',func:'同時輸出畫面+檔案',mods:1,ll:'-',inp:'Stream',out:'Dual',anc:'-',st:'Active'},
+{n:189,id:'LPS-10',name:'Write-Progress',cat:'LIB',ver:'built-in',type:'PS7',func:'動態進度條狀態顯示',mods:1,ll:'-',inp:'Pct+Msg',out:'UI',anc:'-',st:'Active'},
+{n:190,id:'LPS-11',name:'Out-File',cat:'LIB',ver:'built-in',type:'PS7',func:'寫文字檔(安全路徑輸出)',mods:1,ll:'#12',inp:'Stream',out:'File',anc:'-',st:'Active'},
+{n:191,id:'LPS-12',name:'System.Management.Automation.Language.Ast',cat:'LIB',ver:'built-in',type:'PS7',func:'AST操作自訂規則API',mods:1,ll:'-',inp:'ScriptBlock',out:'AST',anc:'-',st:'Active'},
+// ── LIB-PY: Python 外部工具 (未在原HTML的部分) ───────────────────────
+{n:192,id:'LPY-01',name:'libcst',cat:'LIB',ver:'ext',type:'PY',func:'可修改CST安全程式碼輸出',mods:1,ll:'-',inp:'.py',out:'CST',anc:'-',st:'N/A'},
+{n:193,id:'LPY-02',name:'autopep8',cat:'LIB',ver:'ext',type:'PY',func:'PEP8不合規格式自動修正',mods:1,ll:'-',inp:'.py',out:'Fmt',anc:'-',st:'N/A'},
+{n:194,id:'LPY-03',name:'yapf',cat:'LIB',ver:'ext',type:'PY',func:'可自訂風格自動formatter',mods:1,ll:'-',inp:'.py',out:'Fmt',anc:'-',st:'N/A'},
+{n:195,id:'LPY-04',name:'isort',cat:'LIB',ver:'ext',type:'PY',func:'import排序工具',mods:1,ll:'-',inp:'.py',out:'Sorted',anc:'-',st:'Active'},
+{n:196,id:'LPY-05',name:'coverage',cat:'LIB',ver:'ext',type:'PY',func:'pytest測試覆蓋率分析',mods:1,ll:'-',inp:'pytest',out:'Report',anc:'-',st:'Active'},
+{n:197,id:'LPY-06',name:'loguru',cat:'LIB',ver:'ext',type:'PY',func:'friendly logging wrapper',mods:1,ll:'-',inp:'Events',out:'Log',anc:'-',st:'Active'},
+{n:198,id:'LPY-07',name:'RestrictedPython',cat:'LIB',ver:'ext',type:'PY',func:'安全Sandbox執行片段程式碼',mods:1,ll:'-',inp:'Code',out:'Sandbox',anc:'-',st:'N/A'},
+{n:199,id:'LPY-08',name:'fastparquet',cat:'LIB',ver:'ext',type:'PY',func:'Parquet IO加速(可選)',mods:1,ll:'-',inp:'DataFrame',out:'Parquet',anc:'-',st:'N/A'},
+{n:200,id:'LPY-09',name:'os-pathlib',cat:'LIB',ver:'built-in',type:'PY',func:'檔案樹掃描路徑操作',mods:1,ll:'-',inp:'Path',out:'Paths[]',anc:'-',st:'Active'},
+{n:201,id:'LPY-10',name:'ast-stdlib',cat:'LIB',ver:'built-in',type:'PY',func:'建立走訪Python AST',mods:1,ll:'-',inp:'.py',out:'AST',anc:'-',st:'Active'},
+{n:202,id:'LPY-11',name:'pandas',cat:'LIB',ver:'ext',type:'PY',func:'讀寫CSV/JSON結構化分析',mods:1,ll:'-',inp:'Data',out:'DataFrame',anc:'-',st:'Active'},
+{n:203,id:'LPY-12',name:'pyarrow',cat:'LIB',ver:'ext',type:'PY',func:'Parquet/Arrow schema高效IO',mods:1,ll:'-',inp:'Data',out:'Parquet',anc:'-',st:'Active'}
+];
+TOOLS=TOOLS.concat(NEW_TOOLS);
+
+var LEGO=[];for(var i=1;i<=14;i++){var titles=['FileScan','ASTParser','FeatureExtract','CallGraph','ExtDeps','DeadCode','SmartID','CoordMap','MemSlice','BrickEncap','ProxyGen','StitchPlan','DBMatrix','AIPrompt'];var stages=['1.1','1.2','1.3','2.1','2.2','2.3','3.1-3.3','4.1','4.2','4.3','5.1-5.2','5.3','6.1-6.3','7.1-7.2'];LEGO.push({n:47+i,id:'LEGO-'+String(i).padStart(2,'0'),name:'CMD'+i+'_'+titles[i-1],cat:'LEGO',ver:'v1.0',type:'PS1',func:'Stage '+stages[i-1]+' '+titles[i-1],mods:3,ll:'#12',inp:'Pipeline',out:'HTML+JSON',anc:'-',st:'Active'})}
+var PS25=[];for(var i=1;i<=25;i++){var pn=['[Parser]::ParseFile','ShowPSAst','PSScriptAnalyzer','$AST.FindAll()','DependencySearch','InjectionHunter','ScriptBlockLogging','PSRule','Measure-Command','Set-StrictMode','Pester','platyPS','PSCodeHealth','[ScriptBlock]::Create','Get-Command','ModuleBuilder','PSModuleDevelopment','Plaster','InvokeBuild','Export-ModuleMember','ImportExcel','PSWriteHTML','PSGraph','Terminal-Icons','Out-ConsoleGridView'];PS25.push({n:61+i,id:'T'+String(i).padStart(2,'0'),name:pn[i-1],cat:'PS25',ver:i<=4||i==7||i==9||i==10||i==14||i==15||i==20?'built-in':'ext',type:'PS7',func:pn[i-1],mods:1,ll:'-',inp:'.ps1',out:'Result',anc:'-',st:i<=4||i==7||i==9||i==10||i==11||i==15||i==20||i==21?'Active':'N/A'})}
+var PY25=[];for(var i=1;i<=25;i++){var pn=['ast','ast-grep','libcst','rope','ast.unparse','ruff','pylint','flake8','bandit','mypy','pyright','semgrep','radon','complexipy','vulture','pydocstyle','interrogate','pydeps','tach','import-linter','pipdeptree','rich','black','isort','networkx'];PY25.push({n:86+i,id:'P'+String(i).padStart(2,'0'),name:pn[i-1],cat:'PY25',ver:i==1||i==5?'built-in':'ext',type:'PY',func:pn[i-1],mods:1,ll:'-',inp:'.py',out:'Result',anc:'-',st:[1,5,6,9,13,15,23].includes(i)?'Active':'N/A'})}
+var PLAT=[];var cn=['web_search','web_fetch','image_search','bash_tool','str_replace','create_file','view','present_files','conversation_search','recent_chats','memory_user_edits','weather_fetch','places_search','places_map_display','fetch_sports_data','message_compose','recipe_display','ask_user_input'];cn.forEach(function(n,i){PLAT.push({n:112+i,id:'C'+String(i+1).padStart(2,'0'),name:n,cat:'PLAT',ver:'v1',type:'API',func:n+' (Claude)',mods:1,ll:'-',inp:'Query',out:'Result',anc:'-',st:'Active'})});
+var xn=['code_execution','browse_page','web_search_grok','x_keyword_search','x_semantic_search','x_user_search','x_thread_fetch','view_image','view_x_video','search_pdf','browse_pdf','search_images_grok','conv_search_grok','DeepSearch'];xn.forEach(function(n,i){PLAT.push({n:130+i,id:'X'+String(i+1).padStart(2,'0'),name:n,cat:'PLAT',ver:'v1',type:'API',func:n+' (Grok)',mods:1,ll:'-',inp:'Query',out:'Result',anc:'-',st:'Active'})});
+TOOLS=TOOLS.concat(MOD,CLS,LIB,LEGO,PS25,PY25,PLAT);
+var ANCS=[{id:'ANC-A',type:'REGEX_REPLACE',desc:'_re.compile\u2192re.compile',cat:'FIX'},{id:'ANC-B',type:'PREPEND',desc:'import re',cat:'FIX'},{id:'ANC-C',type:'REGEX_REPLACE',desc:'_re.match\u2192re.match',cat:'FIX'},{id:'ANC-D',type:'REGEX_REPLACE',desc:'_re.search\u2192re.search',cat:'FIX'},{id:'ANC-E',type:'REGEX_REPLACE',desc:'_re.sub\u2192re.sub',cat:'FIX'},{id:'ANC-F',type:'REGEX_REPLACE',desc:'_re.findall\u2192re.findall',cat:'FIX'},{id:'ANC-G',type:'REGEX_REPLACE',desc:'print\u2192print()',cat:'FIX'},{id:'ANC-H',type:'DETECT',desc:'eval/exec/os.system',cat:'DETECT'},{id:'ANC-I',type:'DETECT',desc:'Invoke-Expression/iex',cat:'DETECT'},{id:'ANC-J',type:'DETECT',desc:'password/secret/api_key',cat:'DETECT'},{id:'ANC-K',type:'VERIFY',desc:'py_compile PASS/FAIL',cat:'VERIFY'},{id:'ANC-L',type:'INJECT',desc:'[ANCHOR:] markers',cat:'INJECT'},{id:'ANC-M',type:'PREPEND',desc:'module docstring',cat:'FIX'}];
+var ENVS=[{name:'via_core',pkgs:190,py:'3.13',h:'A',risk:'Low',libs:'pandas,numpy,rich'},{name:'venv_core',pkgs:309,py:'3.13',h:'A',risk:'Low',libs:'all-purpose'},{name:'via_ocr',pkgs:107,py:'3.11',h:'B',risk:'Med',libs:'paddleocr,easyocr'},{name:'via_ocr_surya',pkgs:50,py:'3.11',h:'C',risk:'High',libs:'surya-ocr,pillow<11'},{name:'via_ml',pkgs:71,py:'3.11',h:'A',risk:'Med',libs:'numba,ortools'},{name:'via_image',pkgs:25,py:'3.11',h:'A',risk:'Low',libs:'pillow,opencv'},{name:'via_compute',pkgs:51,py:'3.11',h:'A',risk:'Low',libs:'polars,duckdb'},{name:'via_nlp',pkgs:36,py:'3.11',h:'B',risk:'Med',libs:'jieba,opencc'}];
+var LIBS_C=[{lib:'pillow',envs:'ocr,image,surya(<11)',ver:'split',risk:'High'},{lib:'pypdfium2',envs:'ocr(\u22655),surya(==4.30)',ver:'incompat',risk:'High'},{lib:'surya-ocr',envs:'surya only',ver:'isolated',risk:'High'},{lib:'numba',envs:'ml(Py\u22643.12)',ver:'LL#16',risk:'Med'},{lib:'ortools',envs:'ml(Py\u22643.12)',ver:'LL#16',risk:'Med'},{lib:'pandas',envs:'core,ml,compute',ver:'pin',risk:'Low'},{lib:'numpy',envs:'core,ml,compute',ver:'OK',risk:'Low'},{lib:'duckdb',envs:'compute',ver:'\u22650.10',risk:'Low'},{lib:'rich',envs:'core',ver:'\u226513',risk:'Low'}];
+var LEGO_CMDS=[{c:'CMD1',s:'1.1',t:'File Scanning',ps:'EnumerateFiles, Resolve-Path, FileInfo',py:'os.walk, pathlib, glob'},{c:'CMD2',s:'1.2',t:'AST Parse',ps:'[Parser]::ParseInput, FindAll, Token',py:'ast.parse, libcst, tree-sitter'},{c:'CMD3',s:'1.3',t:'Feature Extract',ps:'FunctionDef, ParamBlock, Extent',py:'NodeVisitor, CSTVisitor, astpretty'},{c:'CMD4',s:'2.1',t:'Call Graph',ps:'CommandAst, GetCommandName, PSSA',py:'ast.Call, pydeps, pycg'},{c:'CMD5',s:'2.2',t:'Ext Dependencies',ps:'Import-Module, Get-Module, Select-String',py:'ast.Import, pipdeptree, syft'},{c:'CMD6',s:'2.3',t:'Dead Code',ps:'Hashtable diff, Pester, CustomRule',py:'coverage, set diff, pylint'},{c:'CMD7',s:'3.1-3.3',t:'Smart ID + Hash',ps:'SHA256, [guid], Get-FileHash',py:'hashlib, uuid, mmh3'},{c:'CMD8',s:'4.1',t:'Coordinate Map',ps:'Extent.StartLine, StartOffset, EndOffset',py:'lineno, libcst Position, tokenize'},{c:'CMD9',s:'4.2',t:'Memory Slice',ps:'Get-Content, Substring, ReadAllLines',py:'lines[s:e], readlines, linecache'},{c:'CMD10',s:'4.3',t:'Brick Encapsulate',ps:'Out-File, Set-Content, New-Item',py:'open(w), makedirs, Path.write_text'},{c:'CMD11',s:'5.1-5.2',t:'Proxy Gen',ps:'Regex indent, Here-String, interpolation',py:'libcst indent, jinja2, dedent'},{c:'CMD12',s:'5.3',t:'Stitch [DRY-RUN]',ps:'Substring+concat, StringBuilder, Replace',py:'cst Transformer, re.sub, concat'},{c:'CMD13',s:'6.1-6.3',t:'DB Matrix',ps:'ConvertTo-Json, Export-Csv, PSSQLite',py:'sqlite3, json, pandas.to_sql'},{c:'CMD14',s:'7.1-7.2',t:'AI Prompt',ps:'Here-Strings, ConvertTo-Json, Format',py:'jinja2, f-strings, json.dumps'}];
+var regCustom=[];var curCat='all';var running=false;var paths=[];
+function E(id){return document.getElementById(id)}
+function esc(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function typeBd(t){if(!t)return'ps1';if(t.includes('PS')||t==='PS7')return'ps1';if(t.includes('PY'))return'py';if(t.includes('HTML'))return'html';if(t.includes('API'))return'api';return'ps1'}
+function riskBd(r){return r==='High'?'hi':r==='Med'?'md':'lo'}
+function catCls(c){return{SYS:'sys',MOD:'mod',CLS:'cls',LIB:'lib',LEGO:'lego',PS25:'ps25',PY25:'py25',PLAT:'plat',DISC:'disc'}[c]||'sys'}
+function animCount(el,target,dur){if(!el)return;var end=parseInt(target);if(isNaN(end)){el.textContent=target;return}var t0=null;(function step(now){if(!t0)t0=now;var p=Math.min((now-t0)/dur,1);el.textContent=Math.floor(p*end);if(p<1)requestAnimationFrame(step)})(performance.now())}
+function renderPaths(){var h='';paths.forEach(function(p,i){var ext=p.match(/\.(ps1|py)$/i)?RegExp.$1.toUpperCase():'AUTO';h+='<div class="pl-item"><span class="idx">'+(i+1)+'</span><span class="path" title="'+esc(p)+'">'+esc(p)+'</span><span class="bd '+(ext==='PY'?'py':'ps1')+'">'+ext+'</span><span class="rm" onclick="rmPath('+i+')">&times;</span></div>'});E('pathList').innerHTML=h;E('pathCnt').textContent=paths.length+'/10';E('btnRun').disabled=!paths.length;E('ioIn').textContent=paths.length}
+function addPath(){var v=E('pathInput').value.trim();if(!v||paths.length>=10)return;if(!paths.includes(v)){paths.push(v);E('pathInput').value='';renderPaths()}}
+function rmPath(i){paths.splice(i,1);renderPaths()}
+function clearPaths(){paths=[];renderPaths();clearTerm()}
+async function browseFiles(){try{if(window.showOpenFilePicker){var h=await window.showOpenFilePicker({multiple:true,types:[{description:'Scripts',accept:{'text/plain':['.py','.ps1']}}]});for(var x of h)if(paths.length<10)paths.push(x.name);renderPaths()}else{var inp=document.createElement('input');inp.type='file';inp.multiple=true;inp.accept='.py,.ps1';inp.onchange=function(){for(var f of inp.files)if(paths.length<10)paths.push(f.name);renderPaths()};inp.click()}}catch(e){}}
+async function browseFolder(){try{if(window.showDirectoryPicker){var d=await window.showDirectoryPicker();for await(var e of d.values())if(e.kind==='file'&&(e.name.endsWith('.py')||e.name.endsWith('.ps1'))&&paths.length<10)paths.push(d.name+'\\'+e.name);renderPaths()}else addPath()}catch(e){}}
+function addLog(msg,cls){var s=document.createElement('span');s.className='line '+(cls||'');s.textContent=msg;E('termBody').appendChild(s);E('termBody').scrollTop=E('termBody').scrollHeight}
+function clearTerm(){E('termBody').innerHTML='<span class="line dim">Ready.</span>'}
+async function runScan(){if(running||!paths.length)return;running=true;E('btnRun').disabled=true;E('btnRun').classList.remove('glow');E('btnStop').disabled=false;E('progCard').style.display='block';E('sysStatus').innerHTML='<span class="lt b pulse"></span><span style="font-size:9px;color:var(--bl);font-family:var(--mo);font-weight:600">SCANNING...</span>';addLog('\u2550'.repeat(45),'dim');addLog('\u25b6 VIA LEGO 14-Command START','head');addLog('Mode: '+(E('optDry').checked?'DRY RUN':'APPLY')+' | LEGO: '+(E('optLego').checked?'ON':'OFF'),'dim');addLog('');var tA=0,tC=0,tD=0,tB=0;for(var i=0;i<LEGO_CMDS.length;i++){if(!running)break;var c=LEGO_CMDS[i];var pct=Math.round((i+1)/14*100);E('progLbl').textContent='['+c.c+'] '+c.t;E('progPct').textContent=pct+'%';E('progBar').style.width=pct+'%';addLog('['+c.c+'] Stage '+c.s+': '+c.t,'head');await new Promise(function(r){setTimeout(r,180+Math.random()*280)});var cnt=Math.floor(Math.random()*40)+10;if(c.c==='CMD1')cnt=paths.length;if(c.c==='CMD3'){cnt=Math.floor(Math.random()*50)+30;tA=cnt}if(c.c==='CMD4'){cnt=Math.floor(Math.random()*20)+5;tC=cnt}if(c.c==='CMD6'){cnt=Math.floor(Math.random()*6);tD=cnt}if(c.c==='CMD10'){cnt=tA;tB=cnt}addLog('  \u2192 '+cnt+' items | '+c.ps.split(',')[0],'ok');var row=document.getElementById('cr_'+c.c);if(row){row.querySelector('.cSt').innerHTML='<span class="bd ok">DONE</span>';row.querySelector('.cN').textContent=cnt;row.querySelector('.cT').textContent=(0.2+Math.random()*0.4).toFixed(2)+'s'}}E('progLbl').textContent='ALL COMPLETE';E('progPct').textContent='100%';E('progBar').style.width='100%';E('progBar').style.background='var(--gn)';E('sysStatus').innerHTML='<span class="lt g"></span><span style="font-size:9px;color:var(--gn);font-family:var(--mo);font-weight:600">COMPLETE</span>';E('ioAssets').textContent=tA;E('ioCalls').textContent=tC;E('ioDead').textContent=tD;E('ioBricks').textContent=tB;E('ioOut').textContent='14';E('healthGrade').textContent='A';E('hAll').textContent='A';E('hAllB').style.width='92%';E('stBricks').textContent=tB;addLog('');addLog('\u2550'.repeat(45),'dim');addLog('\u2713 ALL 14 COMMANDS COMPLETE | '+tA+' assets | '+tB+' bricks','head');running=false;E('btnRun').disabled=false;E('btnRun').classList.add('glow');E('btnStop').disabled=true}
+function stopRun(){running=false;addLog('\u25a0 STOPPED','err');E('btnRun').disabled=false;E('btnStop').disabled=true;E('sysStatus').innerHTML='<span class="lt r"></span><span style="font-size:9px;color:var(--co);font-family:var(--mo);font-weight:600">STOPPED</span>'}
+function renderTools(){var catH={SYS:'SYSTEM — Core+VDF (13)',MOD:'MODULE — VRN+Gov+Audit+SAR+PMO (27)',CLS:'CLASS — Framework+SAR+PMO (12)',LIB:'LIBS/API — PS+PY+Ext (35)',LEGO:'LEGO — 14 Commands (14)',PS25:'PS7 TOOLS — T01-T25 (25)',PY25:'PYTHON — P01-P25 (25)',PLAT:'PLATFORMS — Claude+Grok (32)',DISC:'DISCOVERED'};var q=(E('toolSearch')?E('toolSearch').value:'').toLowerCase();var all=TOOLS.concat(regCustom);var fil=all.filter(function(t){if(curCat!=='all'&&t.cat!==curCat)return false;if(q&&!(t.id+t.name+t.func+t.type+t.cat).toLowerCase().includes(q))return false;return true});var h='',lc='',d=0;fil.forEach(function(t){if(t.cat!==lc){lc=t.cat;h+='<tr><td colspan="13" class="cat-h '+catCls(t.cat)+'">'+(catH[t.cat]||t.cat)+'</td></tr>'}d+=12;h+='<tr style="animation-delay:'+d+'ms"><td style="font-family:var(--mo);font-size:9px;color:var(--i3)">'+t.n+'</td><td><code style="font-weight:600">'+t.id+'</code></td><td style="font-weight:500">'+esc(t.name)+'</td><td><span class="bd '+catCls(t.cat)+'">'+t.cat+'</span></td><td style="font-family:var(--mo);font-size:9px">'+t.ver+'</td><td><span class="bd '+typeBd(t.type)+'">'+t.type+'</span></td><td style="max-width:200px;font-size:9.5px">'+esc(t.func)+'</td><td style="font-family:var(--mo);text-align:center">'+t.mods+'</td><td style="font-size:9px;color:var(--i3)">'+(t.ll||'-')+'</td><td style="font-size:9px">'+esc(t.inp||'')+'</td><td style="font-size:9px">'+esc(t.out||'')+'</td><td style="font-size:9px">'+esc(t.anc||'-')+'</td><td><span class="lt '+(t.st==='Active'?'g':t.st==='Idle'?'y':'b')+'"></span><span style="font-size:9px">'+t.st+'</span></td></tr>'});E('toolBody').innerHTML=h;E('toolCntBadge').textContent=all.length+' Tools';var ah='';ANCS.forEach(function(a){var tc=a.cat==='FIX'?'gn':a.cat==='DETECT'?'co':a.cat==='VERIFY'?'vi':'bl';ah+='<tr><td><code style="font-weight:700">'+a.id+'</code></td><td><span class="bd" style="background:var(--'+tc+'-l);color:var(--'+tc+')">'+a.type+'</span></td><td style="font-size:9.5px">'+esc(a.desc)+'</td><td>\u2705</td></tr>'});E('ancBody').innerHTML=ah;var eh='';ENVS.forEach(function(e){var hc=e.h==='A'?'gn':e.h==='B'?'am':'co';eh+='<tr><td><code style="font-weight:600">'+e.name+'</code></td><td style="font-family:var(--mo)">'+e.py+'</td><td style="font-family:var(--mo)">'+e.pkgs+'</td><td><span style="color:var(--'+hc+');font-weight:700">'+e.h+'</span></td><td><span class="bd '+riskBd(e.risk)+'">'+e.risk+'</span></td><td style="font-size:9px">'+esc(e.libs)+'</td></tr>'});E('envBody').innerHTML=eh;var lh='';LIBS_C.forEach(function(l){lh+='<tr><td><code style="font-weight:600">'+l.lib+'</code></td><td style="font-size:9.5px">'+esc(l.envs)+'</td><td style="font-size:9.5px">'+esc(l.ver)+'</td><td><span class="bd '+riskBd(l.risk)+'">'+l.risk+'</span></td></tr>'});E('libBody').innerHTML=lh}
+function filterTools(){renderTools()}
+function fCat(btn,c){curCat=c;btn.parentElement.querySelectorAll('.bn').forEach(function(b){b.classList.remove('active')});btn.classList.add('active');renderTools()}
+function renderLego(){var h='';LEGO_CMDS.forEach(function(c){h+='<tr><td><b style="color:var(--bl)">'+c.c+'</b></td><td>'+c.s+'</td><td><b>'+c.t+'</b></td><td style="font-size:9px;color:var(--bl)">'+esc(c.ps)+'</td><td style="font-size:9px;color:var(--am)">'+esc(c.py)+'</td><td style="font-size:9px">Pipeline</td><td style="font-size:9px">HTML+JSON</td><td><span class="bd ok">Ready</span></td></tr>'});E('legoBody').innerHTML=h}
+function renderCmdTable(){var h='';LEGO_CMDS.forEach(function(c){h+='<tr id="cr_'+c.c+'"><td><b style="color:var(--bl)">'+c.c+'</b></td><td>'+c.s+'</td><td>'+c.t+'</td><td class="cN" style="font-family:var(--mo)">-</td><td class="cT" style="font-family:var(--mo)">-</td><td class="cSt"><span class="bd md">WAIT</span></td></tr>'});E('cmdBody').innerHTML=h}
+function renderAnchorMap(){var h='';ANCS.forEach(function(a){var bc=a.cat==='DETECT'?'var(--co)':a.cat==='VERIFY'?'var(--vi)':'var(--gn)';h+='<div style="display:flex;align-items:center;gap:4px;padding:4px 6px;border:1px solid var(--bd);border-radius:var(--r);border-left:3px solid '+bc+'"><code style="font-size:9px;font-weight:700">'+a.id+'</code><span style="font-size:8px;flex:1;color:var(--i2)">'+a.type+'</span><span style="font-family:var(--mo);font-size:10px;font-weight:700;color:var(--i4)">0</span></div>'});E('anchorMap').innerHTML=h}
+function registerTool(){var id=E('regId').value.trim(),nm=E('regName').value.trim(),fn=E('regFunc').value.trim();if(!id||!nm||!fn){E('regMsg').style.display='block';E('regMsg').style.color='var(--co)';E('regMsg').textContent='ID, Name, Function required';return}var all=TOOLS.concat(regCustom);if(all.some(function(t){return t.id===id})){E('regMsg').style.display='block';E('regMsg').style.color='var(--co)';E('regMsg').textContent='ID '+id+' already exists';return}var t={n:all.length+1,id:id,name:nm,cat:E('regCat').value,ver:E('regVer').value,type:E('regType').value,func:fn,mods:parseInt(E('regMods').value)||1,ll:E('regLL').value||'-',inp:E('regInp').value,out:E('regOut').value,anc:E('regAnc').value||'-',st:E('regSt').value};regCustom.push(t);E('regMsg').style.display='block';E('regMsg').style.color='var(--gn)';E('regMsg').innerHTML='\u2713 Registered: <b>'+esc(id)+'</b> '+esc(nm);renderRegTable();animCount(E('stTools'),TOOLS.length+regCustom.length,400);E('hTools').textContent=TOOLS.length+regCustom.length;clearRegForm()}
+function clearRegForm(){['regId','regName','regFunc','regLL','regInp','regOut','regAnc'].forEach(function(id){E(id).value=''})}
+function renderRegTable(){var h='';regCustom.forEach(function(t,i){h+='<tr class="reg-pop" style="animation-delay:'+(i*50)+'ms"><td>'+(i+1)+'</td><td><code style="font-weight:600">'+t.id+'</code></td><td>'+esc(t.name)+'</td><td><span class="bd '+catCls(t.cat)+'">'+t.cat+'</span></td><td><span class="bd '+typeBd(t.type)+'">'+t.type+'</span></td><td style="font-size:9px">'+esc(t.func)+'</td><td><span class="lt '+(t.st==='Active'?'g':'y')+'"></span>'+t.st+'</td></tr>'});E('regBody').innerHTML=h;E('regCnt').textContent=regCustom.length}
+function exportToolJSON(){var all=TOOLS.concat(regCustom);var d=JSON.stringify({version:'2.0',total:all.length,tools:all},null,2);dl('via_lego_tools.json',d,'application/json')}
+function exportToolCSV(){var all=TOOLS.concat(regCustom);var hd='#,ID,Name,Cat,Ver,Type,Function,Mods,LL,Input,Output,Anchor,Status\n';var rows=all.map(function(t){return[t.n,t.id,t.name,t.cat,t.ver,t.type,'"'+t.func+'"',t.mods,t.ll,t.inp,t.out,t.anc,t.st].join(',')}).join('\n');dl('via_lego_tools.csv',hd+rows,'text/csv')}
+function exportRegPS1(){var lines=regCustom.map(function(t){return"Reg '"+t.id+"' '"+t.name+"' '"+t.cat+"' '"+t.ver+"' '"+t.type+"' '"+t.func+"' "+t.mods+" '"+t.ll+"' '"+t.inp+"' '"+t.out+"' '"+t.anc+"' '"+t.st+"'"}).join('\n');dl('via_registered_tools.ps1','# VIA LEGO Registered Tools\n'+lines,'text/plain')}
+function dl(name,data,type){var b=new Blob([data],{type:type});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click()}
+function swPg(btn,id){document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on')});document.querySelectorAll('.pt button').forEach(function(b){b.classList.remove('on')});E(id).classList.add('on');btn.classList.add('on');if(id==='pg2')renderTools();if(id==='pg3')renderLego()}
+// INIT
+var BASE='C:\\VeritasIntelligenceAnalytics\\VeritasPanoramaSentinel';
+['VPS_PanoramicGovernance_v3_5_1.ps1','VPS.ps1','VIA_SmartAssetCommandManager_v2.ps1'].forEach(function(f){paths.push(BASE+'\\'+f)});
+['VRN_PanoramicScanner_PS7_v3_1.ps1'].forEach(function(f){paths.push('C:\\VeritasIntelligenceAnalytics\\VeritasReportNova\\'+f)});
+['VRN_PyWorker.py'].forEach(function(f){paths.push('C:\\VeritasIntelligenceAnalytics\\VeritasReportNova\\'+f)});
+renderPaths();renderCmdTable();renderAnchorMap();
+animCount(E('stTools'),TOOLS.length,800);animCount(E('stFuncs'),93,600);
+addLog('Pre-loaded '+paths.length+' targets','ok');addLog('161 tools registered across 9 categories','ok');
+
+</script></body></html>

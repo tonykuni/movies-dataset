@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NexusCore Accelerator Progress</title>
+<style>
+  :root { --blue:#4c78a8; --teal:#439a9a; --grey:#9c9890; }
+  * { box-sizing: border-box; }
+  body { font-family: "DM Sans", Arial, "Microsoft JhengHei", sans-serif; background: #0f172a; color: #e5e7eb; margin: 0; padding: 28px; }
+  h1 { font-family: "Syne", "DM Sans", sans-serif; font-size: 24px; margin: 0 0 4px; }
+  .sub { color: #94a3b8; font-size: 13px; margin-bottom: 20px; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .kpi { background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 14px 16px; }
+  .kpi .n { font-family: "DM Mono", Consolas, monospace; font-size: 22px; font-weight: 700; }
+  .kpi .l { color: #94a3b8; font-size: 12px; margin-top: 2px; }
+  .card { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 18px 20px; margin-bottom: 18px; }
+  .card h2 { font-size: 15px; margin: 0 0 12px; color: #cbd5e1; letter-spacing: .04em; text-transform: uppercase; }
+  .stacked { display: flex; height: 22px; border-radius: 999px; overflow: hidden; background: #0f172a; border: 1px solid #334155; }
+  .seg { width: 0; animation: grow 1.4s cubic-bezier(.2,.8,.2,1) forwards; }
+  .step { margin: 14px 0; }
+  .step-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; font-size: 13px; }
+  .step-name { font-family: "DM Mono", Consolas, monospace; color: #e2e8f0; }
+  .step-ms { margin-left: auto; color: #94a3b8; font-size: 12px; font-family: "DM Mono", Consolas, monospace; }
+  .bar { background: #0f172a; border: 1px solid #334155; border-radius: 999px; height: 10px; overflow: hidden; }
+  .fill { height: 100%; width: 0; border-radius: 999px; animation: grow 1.1s ease-out forwards; }
+  .detail { color: #fca5a5; font-size: 12px; margin-top: 4px; }
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+  .badge.ok { background: rgba(67,154,154,.18); color: #5eead4; }
+  .badge.warn { background: rgba(234,179,8,.18); color: #fde047; }
+  .badge.fail { background: rgba(239,68,68,.18); color: #fca5a5; }
+  .status-pill { display: inline-block; padding: 6px 14px; border-radius: 999px; font-family: "DM Mono", Consolas, monospace; font-size: 13px; animation: pulse 2.4s ease-in-out infinite; }
+  .status-pill.ok { background: rgba(67,154,154,.16); color: #5eead4; border: 1px solid #2dd4bf; }
+  .status-pill.warn { background: rgba(234,179,8,.16); color: #fde047; border: 1px solid #eab308; }
+  .status-pill.fail { background: rgba(239,68,68,.16); color: #fca5a5; border: 1px solid #ef4444; }
+  @keyframes grow { to { width: var(--w); } }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
+</style>
+</head>
+<body>
+  <h1>NexusCore Accelerator · 動態進度</h1>
+  <div class="sub">Run 20260610_161032 · 並行 SHA256 加速 · 加權步驟追蹤</div>
+
+  <div class="grid">
+    <div class="kpi"><div class="n">9</div><div class="l">Steps</div></div>
+    <div class="kpi"><div class="n" style="color:#5eead4">8</div><div class="l">OK</div></div>
+    <div class="kpi"><div class="n" style="color:#fca5a5">0</div><div class="l">Fail</div></div>
+    <div class="kpi"><div class="n">333<span style="font-size:13px;color:#94a3b8"> ms</span></div><div class="l">Total Time</div></div>
+  </div>
+
+  <div class="card">
+    <h2>Overall Status</h2>
+    <span class="status-pill ok">NEXUSCORE_ONBOARDING_MATRIX_READY · Risk LOW</span>
+  </div>
+
+  <div class="card">
+    <h2>Time Proportion (stacked)</h2>
+    <div class="stacked"><div class='seg' style='--w:4.8%;background:#4c78a8' title='EnsureOutputDir: 16 ms'></div><div class='seg' style='--w:44.44%;background:#439a9a' title='PrimeHashCache(parallel): 148 ms'></div><div class='seg' style='--w:10.51%;background:#9c9890' title='BuildToolMatrix: 35 ms'></div><div class='seg' style='--w:5.71%;background:#6b8fb5' title='WriteMatrixJson: 19 ms'></div><div class='seg' style='--w:4.5%;background:#5aa9a0' title='WriteMatrixCsv: 15 ms'></div><div class='seg' style='--w:5.11%;background:#8aa0c0' title='WriteAiOnboardingMd: 17 ms'></div><div class='seg' style='--w:10.21%;background:#7fb3ab' title='WriteMatrixHtml: 34 ms'></div><div class='seg' style='--w:14.71%;background:#b0aca6' title='WriteProgressHtml: 49 ms'></div><div class='seg' style='--w:0%;background:#5e7fa6' title='Finalize: 0 ms'></div></div>
+  </div>
+
+  <div class="card">
+    <h2>Step Progress</h2>
+    <div class="step">
+  <div class="step-head">
+    <span class="step-name">EnsureOutputDir</span>
+    <span class="badge ok">OK</span>
+    <span class="step-ms">16 ms · w5</span>
+  </div>
+  <div class="bar"><div class="fill" style="--w:100%;background:#4c78a8"></div></div>
+  
+</div><div class="step">
+  <div class="step-head">
+    <span class="step-name">PrimeHashCache(parallel)</span>
+    <span class="badge ok">OK</span>
+    <span class="step-ms">148 ms · w28</span>
+  </div>
+  <div class="bar"><div class="fill" style="--w:100%;background:#439a9a"></div></div>
+  
+</div><div class="step">
+  <div class="step-head">
+    <span class="step-name">BuildToolMatrix</span>
+    <span class="badge ok">OK</span>
+    <span class="step-ms">35 ms · w14</span>
+  </div>
+  <div class="bar"><div class="fill" style="--w:100%;background:#9c9890"></div></div>
+  
+</div><div class="step">
+  <div class="step-head">
+    <span class="step-name">WriteMatrixJson</span>
+    <span class="badge ok">OK</span>
+    <span class="step-ms">19 ms · w10</span>
+  </div>
+  <div class="bar"><div class="fill" style="--w:100%;background:#6b8fb5"></div></div>
+  
+</div><div class="step">
+  <div class="step-head">
+    <span class="step-name">WriteMatrixCsv</span>
+    <span class="badge ok">OK</span>
+    <span class="step-ms">15 ms · w10</span>
+  </div>
+  <div class="bar"><div class="fill" style="--w:100%;background:#5aa9a0"></div></div>
+  
+</div><div class="step">
+  <div class="step-head">
+    <span class="step-name">WriteAiOnboardingMd</span>
+    <span class="badge ok">OK</span>
+    <span class="step-ms">17 ms · w10</span>
+  </div>
+  <div class="bar"><div class="fill" style="--w:100%;background:#8aa0c0"></div></div>
+  
+</div><div class="step">
+  <div class="step-head">
+    <span class="step-name">WriteMatrixHtml</span>
+    <span class="badge ok">OK</span>
+    <span class="step-ms">34 ms · w10</span>
+  </div>
+  <div class="bar"><div class="fill" style="--w:100%;background:#7fb3ab"></div></div>
+  
+</div><div class="step">
+  <div class="step-head">
+    <span class="step-name">WriteProgressHtml</span>
+    <span class="badge ok">OK</span>
+    <span class="step-ms">49 ms · w8</span>
+  </div>
+  <div class="bar"><div class="fill" style="--w:100%;background:#b0aca6"></div></div>
+  
+</div><div class="step">
+  <div class="step-head">
+    <span class="step-name">Finalize</span>
+    <span class="badge warn">RUN</span>
+    <span class="step-ms">0 ms · w5</span>
+  </div>
+  <div class="bar"><div class="fill" style="--w:100%;background:#5e7fa6"></div></div>
+  
+</div>
+  </div>
+</body>
+</html>

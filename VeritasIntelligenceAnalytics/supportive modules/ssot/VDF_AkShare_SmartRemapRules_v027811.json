@@ -1,0 +1,16 @@
+{
+  "generated_at": "2026-06-10 22:15:01",
+  "policy": "Root-cause and smart remap only. No DATABASE write. No canonical merge.",
+  "selected_columns": {
+    "date_col": "date",
+    "value_col": "value",
+    "symbol_col": "symbol"
+  },
+  "rules": [
+    "symbol = existing symbol OR vdf_symbol_hint OR best symbol-like raw column OR category/fallback",
+    "date = parse existing date OR best date-like raw column OR vdf_seeded_at OR today",
+    "value = numeric existing value OR best numeric raw column OR first numeric raw field",
+    "source = existing source OR akshare",
+    "canonical_family = existing family OR VDF_Global_Commodity"
+  ]
+}

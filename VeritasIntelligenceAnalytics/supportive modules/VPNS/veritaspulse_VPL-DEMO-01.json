@@ -1,0 +1,975 @@
+{
+  "project": {
+    "id": 1,
+    "code": "VPL-DEMO-01",
+    "name": "VIA Visual Lock v1 — Closeout",
+    "owner": "Tony",
+    "start": "2026-05-01",
+    "finish": "2026-06-20",
+    "status": "active",
+    "summary": "Formalise the VIA design-DNA spec and close the VDF/VRN PanoramaFix 278-issue backlog across a 5-wave, risk-tiered plan.",
+    "tasks": [
+      {
+        "id": 1,
+        "project_id": 1,
+        "name": "VRN Fetch v4 — BRIDGE integration",
+        "start": "2026-05-01",
+        "finish": "2026-05-12",
+        "progress": 1,
+        "status": "done",
+        "lane": "VRN"
+      },
+      {
+        "id": 2,
+        "project_id": 1,
+        "name": "M01 TIFF → PDF migration",
+        "start": "2026-05-03",
+        "finish": "2026-05-10",
+        "progress": 1,
+        "status": "done",
+        "lane": "VRN"
+      },
+      {
+        "id": 3,
+        "project_id": 1,
+        "name": "Celeritas v1.1 lazy modules",
+        "start": "2026-05-06",
+        "finish": "2026-05-14",
+        "progress": 1,
+        "status": "done",
+        "lane": "VIA"
+      },
+      {
+        "id": 4,
+        "project_id": 1,
+        "name": "Visual Lock — forbidden list",
+        "start": "2026-05-12",
+        "finish": "2026-05-31",
+        "progress": 0.82,
+        "status": "active",
+        "lane": "VIA"
+      },
+      {
+        "id": 5,
+        "project_id": 1,
+        "name": "PanoramaFix — wave 1-2",
+        "start": "2026-05-13",
+        "finish": "2026-05-22",
+        "progress": 1,
+        "status": "done",
+        "lane": "VIA"
+      },
+      {
+        "id": 6,
+        "project_id": 1,
+        "name": "PanoramaFix — wave 3 verify",
+        "start": "2026-05-22",
+        "finish": "2026-06-04",
+        "progress": 0.65,
+        "status": "active",
+        "lane": "VIA"
+      },
+      {
+        "id": 7,
+        "project_id": 1,
+        "name": "Module Standard v1.0 S0-S7",
+        "start": "2026-06-04",
+        "finish": "2026-06-16",
+        "progress": 0,
+        "status": "blocked",
+        "lane": "VIA"
+      },
+      {
+        "id": 8,
+        "project_id": 1,
+        "name": "ConformanceAudit tooling",
+        "start": "2026-06-10",
+        "finish": "2026-06-20",
+        "progress": 0,
+        "status": "waiting",
+        "lane": "VIA"
+      }
+    ],
+    "milestones": [
+      {
+        "id": 1,
+        "project_id": 1,
+        "name": "Visual Lock spec frozen",
+        "due": "2026-05-31",
+        "hit": 0
+      },
+      {
+        "id": 2,
+        "project_id": 1,
+        "name": "PanoramaFix closeout (applied>0)",
+        "due": "2026-06-04",
+        "hit": 0
+      },
+      {
+        "id": 3,
+        "project_id": 1,
+        "name": "Module Standard GA",
+        "due": "2026-06-20",
+        "hit": 0
+      }
+    ],
+    "budget": [
+      {
+        "id": 1,
+        "project_id": 1,
+        "category": "Engineering hours",
+        "planned": 120000,
+        "actual": 98500
+      },
+      {
+        "id": 2,
+        "project_id": 1,
+        "category": "Compute / infra",
+        "planned": 18000,
+        "actual": 14200
+      },
+      {
+        "id": 3,
+        "project_id": 1,
+        "category": "Tooling / licences",
+        "planned": 9000,
+        "actual": 9000
+      },
+      {
+        "id": 4,
+        "project_id": 1,
+        "category": "Contingency",
+        "planned": 15000,
+        "actual": 3000
+      }
+    ],
+    "risks": [
+      {
+        "id": 1,
+        "project_id": 1,
+        "name": "wave-3 patch fails applied>0 gate",
+        "probability": 3,
+        "impact": 5,
+        "owner": "Tony",
+        "status": "active"
+      },
+      {
+        "id": 2,
+        "project_id": 1,
+        "name": "numpy 2.0 leak into vpl_core",
+        "probability": 2,
+        "impact": 4,
+        "owner": "Tony",
+        "status": "active"
+      },
+      {
+        "id": 3,
+        "project_id": 1,
+        "name": "Seaborn/matplotlib pin drift",
+        "probability": 2,
+        "impact": 3,
+        "owner": "Tony",
+        "status": "watch"
+      },
+      {
+        "id": 4,
+        "project_id": 1,
+        "name": "Google API quota on sync",
+        "probability": 2,
+        "impact": 2,
+        "owner": "Tony",
+        "status": "watch"
+      },
+      {
+        "id": 5,
+        "project_id": 1,
+        "name": "Font fallback breaks brand render",
+        "probability": 4,
+        "impact": 2,
+        "owner": "Tony",
+        "status": "active"
+      }
+    ],
+    "stakeholders": [
+      {
+        "id": 1,
+        "project_id": 1,
+        "name": "Tony (Owner/Architect)",
+        "power": 5,
+        "interest": 5,
+        "role": "Decision"
+      },
+      {
+        "id": 2,
+        "project_id": 1,
+        "name": "VIA downstream consumers",
+        "power": 2,
+        "interest": 5,
+        "role": "Affected"
+      },
+      {
+        "id": 3,
+        "project_id": 1,
+        "name": "Future maintainers",
+        "power": 3,
+        "interest": 4,
+        "role": "Affected"
+      },
+      {
+        "id": 4,
+        "project_id": 1,
+        "name": "Anthropic tooling",
+        "power": 2,
+        "interest": 2,
+        "role": "Support"
+      }
+    ],
+    "resources": [
+      {
+        "id": 1,
+        "project_id": 1,
+        "name": "Tony",
+        "load": 0.92,
+        "capacity": 1
+      },
+      {
+        "id": 2,
+        "project_id": 1,
+        "name": "vpl_core CI",
+        "load": 0.4,
+        "capacity": 1
+      },
+      {
+        "id": 3,
+        "project_id": 1,
+        "name": "via_plot_basic",
+        "load": 0.3,
+        "capacity": 1
+      }
+    ],
+    "flow_nodes": [
+      {
+        "id": 1,
+        "project_id": 1,
+        "node_key": "n1",
+        "label": "Scan VDF/VRN",
+        "meta": "START",
+        "kind": "start",
+        "x": 40,
+        "y": 170
+      },
+      {
+        "id": 2,
+        "project_id": 1,
+        "node_key": "n2",
+        "label": "AST 分析",
+        "meta": "VPN M02",
+        "kind": "step",
+        "x": 250,
+        "y": 90
+      },
+      {
+        "id": 3,
+        "project_id": 1,
+        "node_key": "n3",
+        "label": "Risk 分級",
+        "meta": "7 layers",
+        "kind": "step",
+        "x": 250,
+        "y": 250
+      },
+      {
+        "id": 4,
+        "project_id": 1,
+        "node_key": "n4",
+        "label": "SafePatch",
+        "meta": "applied>0?",
+        "kind": "decision",
+        "x": 470,
+        "y": 170
+      },
+      {
+        "id": 5,
+        "project_id": 1,
+        "node_key": "n5",
+        "label": "Closeout",
+        "meta": "END",
+        "kind": "end",
+        "x": 680,
+        "y": 170
+      }
+    ],
+    "flow_edges": [
+      {
+        "id": 1,
+        "project_id": 1,
+        "src": "n1",
+        "dst": "n2"
+      },
+      {
+        "id": 2,
+        "project_id": 1,
+        "src": "n1",
+        "dst": "n3"
+      },
+      {
+        "id": 3,
+        "project_id": 1,
+        "src": "n2",
+        "dst": "n4"
+      },
+      {
+        "id": 4,
+        "project_id": 1,
+        "src": "n3",
+        "dst": "n4"
+      },
+      {
+        "id": 5,
+        "project_id": 1,
+        "src": "n4",
+        "dst": "n5"
+      }
+    ],
+    "ledger": [
+      {
+        "id": 1,
+        "project_id": 1,
+        "day": "2026-05-04",
+        "item": "GPU compute hrs",
+        "category": "Compute / infra",
+        "amount": -1800
+      },
+      {
+        "id": 2,
+        "project_id": 1,
+        "day": "2026-05-09",
+        "item": "python-pptx licence",
+        "category": "Tooling / licences",
+        "amount": 0
+      },
+      {
+        "id": 3,
+        "project_id": 1,
+        "day": "2026-05-13",
+        "item": "Contractor — wave1",
+        "category": "Engineering hours",
+        "amount": -6200
+      },
+      {
+        "id": 4,
+        "project_id": 1,
+        "day": "2026-05-20",
+        "item": "Storage tier",
+        "category": "Compute / infra",
+        "amount": -640
+      },
+      {
+        "id": 5,
+        "project_id": 1,
+        "day": "2026-05-27",
+        "item": "Contractor — wave2",
+        "category": "Engineering hours",
+        "amount": -7100
+      }
+    ],
+    "checklist": [
+      {
+        "id": 1,
+        "project_id": 1,
+        "item": "Confirm PanoramaFix wave-3 applied>0",
+        "done": 0,
+        "priority": "high",
+        "due": "2026-05-31"
+      },
+      {
+        "id": 2,
+        "project_id": 1,
+        "item": "Freeze Visual Lock forbidden list",
+        "done": 0,
+        "priority": "high",
+        "due": "2026-05-31"
+      },
+      {
+        "id": 3,
+        "project_id": 1,
+        "item": "Review Aegis import-time round 2",
+        "done": 0,
+        "priority": "med",
+        "due": "2026-05-31"
+      },
+      {
+        "id": 4,
+        "project_id": 1,
+        "item": "Daily shutdown review",
+        "done": 1,
+        "priority": "low",
+        "due": "2026-05-31"
+      },
+      {
+        "id": 5,
+        "project_id": 1,
+        "item": "Tag VRN Fetch v4 release",
+        "done": 1,
+        "priority": "med",
+        "due": "2026-05-30"
+      }
+    ],
+    "events": [
+      {
+        "id": 1,
+        "project_id": 1,
+        "title": "Visual Lock — forbidden list closeout",
+        "day": "2026-05-31",
+        "at_time": "09:30",
+        "kind": "focus",
+        "remind_min": 10,
+        "source": "vtn"
+      },
+      {
+        "id": 2,
+        "project_id": 1,
+        "title": "Sync — VRN Fetch v4 review",
+        "day": "2026-05-31",
+        "at_time": "11:00",
+        "kind": "meeting",
+        "remind_min": 15,
+        "source": "gcal"
+      },
+      {
+        "id": 3,
+        "project_id": 1,
+        "title": "PanoramaFix wave-3 verify",
+        "day": "2026-05-31",
+        "at_time": "14:00",
+        "kind": "focus",
+        "remind_min": 30,
+        "source": "vtn"
+      },
+      {
+        "id": 4,
+        "project_id": 1,
+        "title": "LL handbook — document LL#34",
+        "day": "2026-05-31",
+        "at_time": "16:30",
+        "kind": "task",
+        "remind_min": 10,
+        "source": "vtn"
+      }
+    ],
+    "contacts": [
+      {
+        "id": 1,
+        "project_id": 1,
+        "name": "Tony",
+        "role": "Owner / Architect",
+        "org": "VIA",
+        "channel": "email",
+        "handle": "tony@via",
+        "tags": "decision,core"
+      },
+      {
+        "id": 2,
+        "project_id": 1,
+        "name": "VRN Maintainer",
+        "role": "Maintainer",
+        "org": "VIA/VRN",
+        "channel": "slack",
+        "handle": "#vrn-fetch",
+        "tags": "affected"
+      },
+      {
+        "id": 3,
+        "project_id": 1,
+        "name": "Infra On-call",
+        "role": "Compute",
+        "org": "VIA",
+        "channel": "slack",
+        "handle": "#infra",
+        "tags": "support"
+      },
+      {
+        "id": 4,
+        "project_id": 1,
+        "name": "Anthropic Tooling",
+        "role": "Support",
+        "org": "Anthropic",
+        "channel": "email",
+        "handle": "support@",
+        "tags": "support"
+      }
+    ],
+    "news": [
+      {
+        "id": 1,
+        "day": "2026-05-31",
+        "at_time": "08:55",
+        "source": "鉅亨網",
+        "headline": "台股開盤走勢與權值股動向",
+        "url": "https://www.cnyes.com/",
+        "urgency": "important",
+        "kind": "market"
+      },
+      {
+        "id": 2,
+        "day": "2026-05-31",
+        "at_time": "08:40",
+        "source": "Yahoo奇摩股市",
+        "headline": "美股收盤與台積電 ADR 變化",
+        "url": "https://tw.stock.yahoo.com/",
+        "urgency": "normal",
+        "kind": "market"
+      },
+      {
+        "id": 3,
+        "day": "2026-05-31",
+        "at_time": "08:10",
+        "source": "CNBC",
+        "headline": "Fed commentary and rate outlook",
+        "url": "https://www.cnbc.com/",
+        "urgency": "important",
+        "kind": "macro"
+      },
+      {
+        "id": 4,
+        "day": "2026-05-31",
+        "at_time": "07:30",
+        "source": "鉅亨網",
+        "headline": "外資買賣超與期貨未平倉",
+        "url": "https://www.cnyes.com/",
+        "urgency": "normal",
+        "kind": "market"
+      },
+      {
+        "id": 5,
+        "day": "2026-05-30",
+        "at_time": "21:15",
+        "source": "CNBC",
+        "headline": "Tech earnings recap",
+        "url": "https://www.cnbc.com/",
+        "urgency": "normal",
+        "kind": "tech"
+      }
+    ],
+    "news_sources": [
+      {
+        "id": 1,
+        "name": "CNBC",
+        "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html",
+        "enabled": 1
+      },
+      {
+        "id": 2,
+        "name": "Yahoo奇摩股市",
+        "url": "https://tw.stock.yahoo.com/rss",
+        "enabled": 1
+      },
+      {
+        "id": 3,
+        "name": "鉅亨網",
+        "url": "https://www.cnyes.com/rss",
+        "enabled": 1
+      }
+    ],
+    "team": [
+      {
+        "id": 1,
+        "project_id": 1,
+        "name": "Tony",
+        "role": "Architect / Lead",
+        "allocation": 0.92,
+        "current": "Visual Lock closeout",
+        "status": "active"
+      },
+      {
+        "id": 2,
+        "project_id": 1,
+        "name": "VRN Maintainer",
+        "role": "Engineer",
+        "allocation": 0.55,
+        "current": "VRN Fetch v4",
+        "status": "active"
+      },
+      {
+        "id": 3,
+        "project_id": 1,
+        "name": "Infra On-call",
+        "role": "DevOps",
+        "allocation": 0.3,
+        "current": "Compute monitoring",
+        "status": "active"
+      },
+      {
+        "id": 4,
+        "project_id": 1,
+        "name": "Reviewer",
+        "role": "QA / Review",
+        "allocation": 0.2,
+        "current": "PanoramaFix verify",
+        "status": "waiting"
+      }
+    ],
+    "weeklog": [
+      {
+        "id": 1,
+        "project_id": 1,
+        "dow": "Mon",
+        "focus": 1.5,
+        "deep": 3.2,
+        "meeting": 0.9
+      },
+      {
+        "id": 2,
+        "project_id": 1,
+        "dow": "Tue",
+        "focus": 2,
+        "deep": 2.7,
+        "meeting": 0.6
+      },
+      {
+        "id": 3,
+        "project_id": 1,
+        "dow": "Wed",
+        "focus": 1.2,
+        "deep": 3.6,
+        "meeting": 1.2
+      },
+      {
+        "id": 4,
+        "project_id": 1,
+        "dow": "Thu",
+        "focus": 2.3,
+        "deep": 2.8,
+        "meeting": 0.5
+      },
+      {
+        "id": 5,
+        "project_id": 1,
+        "dow": "Fri",
+        "focus": 1.8,
+        "deep": 3.3,
+        "meeting": 0.8
+      },
+      {
+        "id": 6,
+        "project_id": 1,
+        "dow": "Sat",
+        "focus": 2.6,
+        "deep": 2,
+        "meeting": 0.3
+      },
+      {
+        "id": 7,
+        "project_id": 1,
+        "dow": "Sun",
+        "focus": 0.7,
+        "deep": 0.9,
+        "meeting": 0
+      }
+    ],
+    "notes": [
+      {
+        "id": 1,
+        "parent_id": 0,
+        "title": "VIA 知識庫",
+        "body": "# VIA 知識庫\n\nVeritas Intelligence Analytics 的中央筆記。\n\n- 子頁可**樹枝狀展開**\n- 支援 *Markdown*\n- 連結 [docs](https://example)",
+        "kind": "page",
+        "ord": 1
+      },
+      {
+        "id": 4,
+        "parent_id": 0,
+        "title": "個人規劃",
+        "body": "# 個人規劃\n\n非專案的個人計畫與筆記。",
+        "kind": "page",
+        "ord": 2
+      },
+      {
+        "id": 2,
+        "parent_id": 1,
+        "title": "Visual Lock v1",
+        "body": "## Visual Lock v1\n\n設計 DNA 規範。\n\n**配色**\n- 暖白 `#f5f4f0`\n- 橄欖綠 `#5e7032`\n\n**字體**: Syne / DM Sans / DM Mono\n\n**Forbidden**\n- 無紫色漸層\n- 無標題底線",
+        "kind": "page",
+        "ord": 1
+      },
+      {
+        "id": 3,
+        "parent_id": 1,
+        "title": "LL Handbook",
+        "body": "## Lesson Learned\n\n- LL#10: 區塊註解內不可有 `<#`\n- LL#16: numba/ortools 需 Py<=3.12\n- LL#21: 永久隔離 venv\n- LL#25: Celeritas lazy import 13x",
+        "kind": "page",
+        "ord": 2
+      },
+      {
+        "id": 5,
+        "parent_id": 4,
+        "title": "本週重點",
+        "body": "## 本週重點\n\n1. 關閉 PanoramaFix wave-3\n2. 凍結 Visual Lock\n3. VeritasPulse S1",
+        "kind": "page",
+        "ord": 1
+      },
+      {
+        "id": 6,
+        "parent_id": 4,
+        "title": "閱讀清單",
+        "body": "## 閱讀清單\n\n- [ ] Notion API docs\n- [ ] AppFlowy 架構\n- [x] Open-Meteo API",
+        "kind": "page",
+        "ord": 2
+      }
+    ],
+    "plans": [
+      {
+        "id": 1,
+        "name": "VIA Visual Lock",
+        "kind": "project",
+        "phases": [
+          [
+            "Spec",
+            100
+          ],
+          [
+            "Forbidden",
+            82
+          ],
+          [
+            "Apply",
+            40
+          ],
+          [
+            "Audit",
+            0
+          ]
+        ]
+      },
+      {
+        "id": 2,
+        "name": "PanoramaFix",
+        "kind": "project",
+        "phases": [
+          [
+            "Wave1",
+            100
+          ],
+          [
+            "Wave2",
+            100
+          ],
+          [
+            "Wave3",
+            65
+          ],
+          [
+            "Closeout",
+            0
+          ]
+        ]
+      },
+      {
+        "id": 3,
+        "name": "VRN Fetch v4",
+        "kind": "project",
+        "phases": [
+          [
+            "Design",
+            100
+          ],
+          [
+            "Build",
+            100
+          ],
+          [
+            "BRIDGE",
+            100
+          ],
+          [
+            "Ship",
+            90
+          ]
+        ]
+      },
+      {
+        "id": 4,
+        "name": "VeritasPulse 學習",
+        "kind": "personal",
+        "phases": [
+          [
+            "Plan",
+            100
+          ],
+          [
+            "Build",
+            70
+          ],
+          [
+            "Test",
+            50
+          ],
+          [
+            "Ship",
+            10
+          ]
+        ]
+      },
+      {
+        "id": 5,
+        "name": "健康 / 作息",
+        "kind": "personal",
+        "phases": [
+          [
+            "規劃",
+            100
+          ],
+          [
+            "執行",
+            60
+          ],
+          [
+            "回顧",
+            30
+          ],
+          [
+            "優化",
+            0
+          ]
+        ]
+      }
+    ]
+  },
+  "modules": [
+    {
+      "id": "dash",
+      "group": "INTEL",
+      "label": "Dashboard",
+      "icon": "grid",
+      "enabled": true
+    },
+    {
+      "id": "today",
+      "group": "EXEC",
+      "label": "每日清單",
+      "icon": "check",
+      "enabled": true
+    },
+    {
+      "id": "cal",
+      "group": "EXEC",
+      "label": "月曆 Calendar",
+      "icon": "cal",
+      "enabled": true
+    },
+    {
+      "id": "board",
+      "group": "EXEC",
+      "label": "看板 Board",
+      "icon": "rows",
+      "enabled": true
+    },
+    {
+      "id": "gantt",
+      "group": "PLAN",
+      "label": "甘特 Gantt",
+      "icon": "rows",
+      "enabled": true
+    },
+    {
+      "id": "flow",
+      "group": "PLAN",
+      "label": "流程 Flow",
+      "icon": "flow",
+      "enabled": true
+    },
+    {
+      "id": "seq",
+      "group": "EXEC",
+      "label": "燈號 Sequence",
+      "icon": "dots",
+      "enabled": true
+    },
+    {
+      "id": "budget",
+      "group": "FIN",
+      "label": "預算 Budget",
+      "icon": "chart",
+      "enabled": true
+    },
+    {
+      "id": "ledger",
+      "group": "FIN",
+      "label": "記帳 Ledger",
+      "icon": "coins",
+      "enabled": true
+    },
+    {
+      "id": "people",
+      "group": "PEOPLE",
+      "label": "利害關係人",
+      "icon": "users",
+      "enabled": true
+    },
+    {
+      "id": "contacts",
+      "group": "PEOPLE",
+      "label": "聯絡人 Contacts",
+      "icon": "users",
+      "enabled": true
+    },
+    {
+      "id": "team",
+      "group": "PEOPLE",
+      "label": "團隊 Team",
+      "icon": "users",
+      "enabled": true
+    },
+    {
+      "id": "notes",
+      "group": "NOTES",
+      "label": "筆記 Notes",
+      "icon": "book",
+      "enabled": true
+    },
+    {
+      "id": "notebook",
+      "group": "NOTES",
+      "label": "LLM Notebook",
+      "icon": "ai",
+      "enabled": true
+    },
+    {
+      "id": "matrix",
+      "group": "INTEL",
+      "label": "進度矩陣 Matrix",
+      "icon": "grid",
+      "enabled": true
+    },
+    {
+      "id": "connect",
+      "group": "EXEC",
+      "label": "連線 Connections",
+      "icon": "flow",
+      "enabled": true
+    },
+    {
+      "id": "res",
+      "group": "PEOPLE",
+      "label": "資源 Resources",
+      "icon": "gauge",
+      "enabled": true
+    },
+    {
+      "id": "risk",
+      "group": "RISK",
+      "label": "風險 Risk",
+      "icon": "alert",
+      "enabled": true
+    }
+  ],
+  "groups": {
+    "INTEL": "Intelligence",
+    "EXEC": "執行",
+    "PLAN": "規劃",
+    "FIN": "財務",
+    "PEOPLE": "人與關係",
+    "RISK": "風險",
+    "NOTES": "筆記與計畫"
+  }
+}

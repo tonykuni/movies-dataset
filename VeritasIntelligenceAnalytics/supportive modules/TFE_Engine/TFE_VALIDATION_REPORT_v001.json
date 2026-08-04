@@ -1,0 +1,141 @@
+{
+  "run_tag": "TFE_SYNTH_VALIDATION",
+  "config_id": "TFE-CFG-000001-P-DEFENSE-SYNTH",
+  "generated": "2026-07-08T15:27:03",
+  "watermark": "SYNTHETIC_GROUND_TRUTH_T4",
+  "optimize_selected": {
+    "smoothing": 10,
+    "scheme": "IC_SIGNED",
+    "is_ic": -0.3757328500186419
+  },
+  "optimize_grid": [
+    {
+      "smoothing": 1,
+      "scheme": "EQUAL",
+      "is_ic": -0.17779160137906022
+    },
+    {
+      "smoothing": 1,
+      "scheme": "IC_SIGNED",
+      "is_ic": -0.2511476536577814
+    },
+    {
+      "smoothing": 5,
+      "scheme": "EQUAL",
+      "is_ic": -0.26265164674670016
+    },
+    {
+      "smoothing": 5,
+      "scheme": "IC_SIGNED",
+      "is_ic": -0.34067466625779896
+    },
+    {
+      "smoothing": 10,
+      "scheme": "EQUAL",
+      "is_ic": -0.30400483744094836
+    },
+    {
+      "smoothing": 10,
+      "scheme": "IC_SIGNED",
+      "is_ic": -0.3757328500186419
+    }
+  ],
+  "gates": {
+    "G01_PARSE_RUN": {
+      "status": "PASS",
+      "detail": "end-to-end no exception"
+    },
+    "G02_DATA_QUALITY": {
+      "status": "PASS",
+      "detail": "first_valid@bar370 (budget 460) | post-valid NaN=0.0000"
+    },
+    "G03_LEAKAGE": {
+      "status": "PASS",
+      "detail": "leaky IC=-0.998 flagged=True; clean IC=-0.377 flagged=False"
+    },
+    "G04_NULL_PERM": {
+      "status": "PASS",
+      "detail": "IC(fwd20)=-0.377 p=0.0040 (circular-shift n=1000)"
+    },
+    "G05_PLACEBO": {
+      "status": "PASS",
+      "detail": "placebo IC=-0.013 p=0.3210 (must NOT be significant)"
+    },
+    "G06_OOS": {
+      "status": "PASS",
+      "detail": "IS IC=-0.376(n=1628) OOS IC=-0.455(n=1491) OOS p=0.0280"
+    },
+    "G07_EXTREME_SIGNHIT": {
+      "status": "PASS",
+      "detail": "P(fwd20<0 | fomo_z>+1.5)=0.922 n=255"
+    },
+    "G08_GFI_DETECT": {
+      "status": "PASS",
+      "detail": "thr(IS)=0.95 F1_IS=0.729 | OOS F1=0.771 P=0.891 R=0.679"
+    },
+    "G09_SCALE_SANITY": {
+      "status": "PASS",
+      "detail": "max|fomo|=0.962 max|gfi|=0.964"
+    },
+    "G10_CONTRACT": {
+      "status": "PASS",
+      "detail": "15/15 cols; confidence_raw=90.0 capped->59.0"
+    }
+  },
+  "gates_pass": "10/10",
+  "criteria": {
+    "G01_PARSE_RUN": "no exception end-to-end",
+    "G02_DATA_QUALITY": "post-warmup NaN ratio < 0.5% and composite bounded",
+    "G03_LEAKAGE": "detector flags leaky variant (|IC|>0.60) AND clears clean signal",
+    "G04_NULL_PERM": "clean signal p<0.05 vs circular-shift null on primary horizon",
+    "G05_PLACEBO": "pure-noise factor p>0.10 (must NOT be significant)",
+    "G06_OOS": "OOS IC same sign as IS, |OOS IC|>=0.05, OOS p<0.10",
+    "G07_EXTREME_SIGNHIT": "P(fwd20<0 | fomo_z>+1.5) >= 0.55",
+    "G08_GFI_DETECT": "OOS F1 vs planted intervention days >= 0.60 (threshold fit on IS)",
+    "G09_SCALE_SANITY": "no inf; |composite|<=1 (tanh); GFI bounded",
+    "G10_CONTRACT": "15-column output row complete; confidence from gates; SYNTHETIC cap 59"
+  },
+  "log": [
+    "OPTIMIZE grid (IS only): [{'smoothing': 1, 'scheme': 'EQUAL', 'is_ic': np.float64(-0.17779160137906022)}, {'smoothing': 1, 'scheme': 'IC_SIGNED', 'is_ic': np.float64(-0.2511476536577814)}, {'smoothing': 5, 'scheme': 'EQUAL', 'is_ic': np.float64(-0.26265164674670016)}, {'smoothing': 5, 'scheme': 'IC_SIGNED', 'is_ic': np.float64(-0.34067466625779896)}, {'smoothing': 10, 'scheme': 'EQUAL', 'is_ic': np.float64(-0.30400483744094836)}, {'smoothing': 10, 'scheme': 'IC_SIGNED', 'is_ic': np.float64(-0.3757328500186419)}]; selected={'smoothing': 10, 'scheme': 'IC_SIGNED', 'is_ic': np.float64(-0.3757328500186419)}",
+    "INFO fwd5 IC=-0.282 (informational; primary gate horizon = fwd20)"
+  ],
+  "series_tail": {
+    "fomo": {
+      "2025-10-13": 0.1672,
+      "2025-10-14": 0.1677,
+      "2025-10-15": 0.2952,
+      "2025-10-16": 0.3376,
+      "2025-10-17": 0.3838
+    },
+    "gfi": {
+      "2025-10-13": -0.2264,
+      "2025-10-14": 0.1359,
+      "2025-10-15": -0.2296,
+      "2025-10-16": -0.2296,
+      "2025-10-17": -0.2296
+    }
+  },
+  "contract_row_15col": {
+    "as_of": "2025-10-17",
+    "asset_id": "TWSE_TAIEX",
+    "asset_bucket": "TW_EQUITY_INDEX",
+    "source_list": [
+      "SYNTHETIC_GENERATOR_v001"
+    ],
+    "evidence_tier": "T4_SYNTHETIC",
+    "coverage_ratio": 1.0,
+    "raw_netflow_usd": null,
+    "implied_netflow_usd": null,
+    "organic_flow_ratio": null,
+    "fis_score": 0.3838,
+    "direction": "FOMO_HIGH",
+    "strength": 0.3838,
+    "confidence_score": 59.0,
+    "residual_unexplained": null,
+    "failure_flags": [
+      "SYNTHETIC_DATA",
+      "SYNTHETIC_CONF_CAP_59",
+      "CONF_COMPONENT_MISSING_amount_accuracy"
+    ]
+  }
+}

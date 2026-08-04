@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA Dual Project Safe Parallel Gate v028.7.2</title>
+<style>
+:root{--sky:#d8f0ef;--ink:#1d3438;--muted:#657f82;--line:rgba(38,70,75,.16);--head:#edf8f6;--hover:rgba(216,240,239,.20);--ok:#0f766e;--warn:#b7791f;--fail:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Microsoft JhengHei","Segoe UI",Arial,sans-serif;background:linear-gradient(180deg,#fbfdfb,#f3f8f6);color:var(--ink);font-size:11px;line-height:1.28}
+header{position:sticky;top:0;z-index:80;padding:14px 26px 10px;background:rgba(251,253,251,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+h1{margin:0;font-size:18px;text-align:center;letter-spacing:.035em}
+.sub{text-align:center;color:var(--muted);font-size:10.5px;margin-top:4px}
+.wrap{padding:12px 22px 36px}
+.kpis{display:grid;grid-template-columns:repeat(8,minmax(96px,1fr));gap:8px;margin-bottom:12px}
+.card{border-radius:10px;padding:8px 10px;background:rgba(255,255,255,.82);border:1px solid var(--line);box-shadow:0 6px 16px rgba(30,52,56,.04)}
+.k{font-size:9.5px;color:var(--muted);letter-spacing:.07em}.v{font-size:16px;font-weight:750;margin-top:2px}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.fail{color:var(--fail)}
+section{margin-top:12px}
+h2{position:sticky;top:45px;z-index:70;margin:0 0 6px;padding:6px 9px;border:1px solid var(--line);border-left:4px solid var(--sky);border-radius:9px;background:rgba(250,253,252,.96);font-size:12px;text-align:center}
+table{width:100%;border-collapse:separate;border-spacing:0;table-layout:auto;background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:10px;overflow:clip}
+thead{position:sticky;top:76px;z-index:60}
+th{position:sticky;top:76px;z-index:61;background:var(--head);font-size:10px;font-weight:800;text-align:center;vertical-align:top;padding:5px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{font-size:10px;padding:4px 6px;border-bottom:1px solid var(--line);vertical-align:top;text-align:center;white-space:nowrap}
+td.via-left,td:has(code){text-align:left;white-space:normal;word-break:break-word;overflow-wrap:anywhere}
+tr:hover td{background:var(--hover)}
+code{font-family:Consolas,"Cascadia Mono",monospace;font-size:9.5px;white-space:normal;word-break:break-word}
+</style>
+</head>
+<body>
+<header>
+<h1>def VIA Dual Project Safe Parallel Gate · v028.7.2</h1>
+<div class="sub">VDF + VRN · Three Low-Correlation Lanes Each · Plan/Launcher Only · No Source Repair</div>
+</header>
+<div class="wrap">
+<div class="kpis">
+<div class="card"><div class="k">Status</div><div class="v">DUAL_PROJECT_SAFE_PARALLEL_READY</div></div>
+<div class="card"><div class="k">Risk</div><div class="v">LOW</div></div>
+<div class="card"><div class="k">OK</div><div class="v ok">10</div></div>
+<div class="card"><div class="k">WARN</div><div class="v warn">5</div></div>
+<div class="card"><div class="k">FAIL</div><div class="v fail">0</div></div>
+<div class="card"><div class="k">Safe Lanes</div><div class="v">6</div></div>
+<div class="card"><div class="k">Blocked Lanes</div><div class="v fail">0</div></div>
+<div class="card"><div class="k">Next</div><div class="v">User-Test</div></div>
+</div>
+
+<section><h2>def Matrix</h2>
+<table><thead><tr><th>Round</th><th>Project</th><th>Lane</th><th>Stage</th><th>Name</th><th>Status</th><th>Risk</th><th>FixClass</th><th>Priority</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr></thead><tbody><tr><td>Round0</td><td>VIA</td><td>CONTROL</td><td>POLICY</td><td>No DB Write</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>db_write</td><td>false</td><td>Plan/launcher only. No production DB write.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</code></td></tr>
+<tr><td>Round0</td><td>VIA</td><td>CONTROL</td><td>POLICY</td><td>No Source Repair</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>source_repair</td><td>false</td><td>No source file modification.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics</code></td></tr>
+<tr><td>Round0</td><td>VIA</td><td>CONTROL</td><td>POLICY</td><td>No Stop-Process</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>stop_process</td><td>false</td><td>No process kill.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_SAFE_PARALLEL_GATE_v02872_20260611_205436</code></td></tr>
+<tr><td>Round0</td><td>VIA</td><td>CONTROL</td><td>POLICY</td><td>Network / Parallel Accelerator Locked</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>network_parallel</td><td>false</td><td>No network I/O and no parallel accelerator execution.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_SAFE_PARALLEL_GATE_v02872_20260611_205436</code></td></tr>
+<tr><td>Round0</td><td>VDF</td><td>ANCHOR</td><td>ACTIVE_POINTER</td><td>VDF Active Pointer</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>status</td><td>FINAL_PROMOTED_ACTIVE_POINTER_LOCKED</td><td>VDF active pointer is final promoted lock.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ACTIVE_POINTER.json</code></td></tr>
+<tr><td>Round0</td><td>VDF</td><td>ANCHOR</td><td>FROZEN_POINTER</td><td>VDF Frozen Pointer</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>status</td><td>FINAL_PROMOTED_ACTIVE_POINTER_LOCKED</td><td>VDF frozen pointer is final promoted lock.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_freeze\VDF_FINAL_ACTIVATION_SEAL_POINTER_v02868.json</code></td></tr>
+<tr><td>Round0</td><td>VRN</td><td>ANCHOR</td><td>ROOT</td><td>VRN Root</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>exists</td><td>true</td><td>VRN root found.</td><td><code>C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\VRN</code></td></tr>
+<tr><td>Round0</td><td>VRN</td><td>ANCHOR</td><td>ENTRY</td><td>Invoke-VRN.ps1</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>exists</td><td>true</td><td>VRN entry found.</td><td><code>C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\VRN\Invoke-VRN.ps1</code></td></tr>
+<tr><td>Round1</td><td>VDF</td><td>LANE_PLAN</td><td>SAFE_3_LANES</td><td>VDF Three Safe Lanes</td><td><b>OK_CREATED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>lanes</td><td>3</td><td>VDF three low-correlation lanes created.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_SAFE_PARALLEL_GATE_v02872_20260611_205436\launchers</code></td></tr>
+<tr><td>Round1</td><td>VRN</td><td>LANE_PLAN</td><td>SAFE_3_LANES</td><td>VRN Three Safe Lanes</td><td><b>OK_CREATED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>lanes</td><td>3</td><td>VRN three low-correlation lanes created.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_SAFE_PARALLEL_GATE_v02872_20260611_205436\launchers</code></td></tr>
+<tr><td>Round2</td><td>VDF</td><td>INVENTORY</td><td>FAST_SCAN</td><td>OK_SCANNED</td><td><b>LOW</b></td><td>PARALLEL_SAFE</td><td>P2</td><td>files</td><td>2000</td><td>VDF fast inventory completed with cap.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VRN</td><td>INVENTORY</td><td>FAST_SCAN</td><td>OK_SCANNED</td><td><b>LOW</b></td><td>PARALLEL_SAFE</td><td>P2</td><td>files</td><td>2000</td><td>VRN fast inventory completed with cap.</td><td>C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\VRN</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VIA</td><td>LAUNCHERS</td><td>PS_PARSE</td><td>OK_ALL_PARSE</td><td><b>LOW</b></td><td>PARALLEL_SAFE</td><td>P0</td><td>parse_fail</td><td>0</td><td>All generated lane launchers parse cleanly.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_SAFE_PARALLEL_GATE_v02872_20260611_205436\launchers</td><td><code></code></td></tr>
+<tr><td>Round2</td><td>VIA</td><td>CORRELATION</td><td>SAFE_PARALLEL_GATE</td><td>SAFE_PARALLEL_READY</td><td><b>LOW</b></td><td>PARALLEL_SAFE</td><td>P0</td><td>safe_lanes</td><td>6</td><td>At least three low-correlation lanes are safe. No system safety policy violated.</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_SAFE_PARALLEL_GATE_v02872_20260611_205436\launchers</td><td><code></code></td></tr>
+<tr><td>Round3</td><td>VIA</td><td>FINAL</td><td>DECISION</td><td>Dual Project Safe Parallel Gate</td><td><b>DUAL_PROJECT_SAFE_PARALLEL_READY</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>blocked_lanes</td><td>0</td><td>Final decision created. Next: Proceed to v028.7.3 Dual Project User-Test Console.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_SAFE_PARALLEL_GATE_v02872_20260611_205436</code></td></tr></tbody></table>
+</section>
+
+<section><h2>def Safe Parallel Lanes</h2>
+<table><thead><tr><th>Project</th><th>Lane</th><th>Correlation</th><th>Allowed</th><th>Mode</th><th>Risk</th><th>Launcher</th><th>Path</th></tr></thead><tbody><tr><td>VDF</td><td>VDF-1 Final Seal Health</td><td>LOW</td><td>True</td><td>READ_ONLY_LAUNCHER</td><td>LOW</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_SAFE_PARALLEL_GATE_v02872_20260611_205436\launchers\Start-VDF-Lane1-FinalSealHealth.ps1</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ACTIVE_POINTER.json</code></td></tr>
+<tr><td>VDF</td><td>VDF-2 Data/Documents Inventory</td><td>LOW</td><td>True</td><td>READ_ONLY_LAUNCHER</td><td>LOW</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_SAFE_PARALLEL_GATE_v02872_20260611_205436\launchers\Start-VDF-Lane2-ReadOnlyInventory.ps1</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics</code></td></tr>
+<tr><td>VDF</td><td>VDF-3 Env/Supportive HardGate</td><td>LOW</td><td>True</td><td>PLAN_ONLY_LAUNCHER</td><td>LOW</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_SAFE_PARALLEL_GATE_v02872_20260611_205436\launchers\Start-VDF-Lane3-EnvSupportiveHardGate.ps1</td><td><code>C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\supportive_module</code></td></tr>
+<tr><td>VRN</td><td>VRN-1 Active Entry Health</td><td>LOW</td><td>True</td><td>READ_ONLY_LAUNCHER</td><td>LOW</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_SAFE_PARALLEL_GATE_v02872_20260611_205436\launchers\Start-VRN-Lane1-EntryHealth.ps1</td><td><code>C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\VRN\Invoke-VRN.ps1</code></td></tr>
+<tr><td>VRN</td><td>VRN-2 IO/DB Readiness Inventory</td><td>LOW</td><td>True</td><td>READ_ONLY_LAUNCHER</td><td>LOW</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_SAFE_PARALLEL_GATE_v02872_20260611_205436\launchers\Start-VRN-Lane2-IOInventory.ps1</td><td><code>C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\VRN</code></td></tr>
+<tr><td>VRN</td><td>VRN-3 Engine Capability Plan</td><td>LOW</td><td>True</td><td>PLAN_ONLY_LAUNCHER</td><td>LOW</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_SAFE_PARALLEL_GATE_v02872_20260611_205436\launchers\Start-VRN-Lane3-EngineCapability.ps1</td><td><code>C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\VRN</code></td></tr></tbody></table>
+</section>
+
+<section><h2>def Inventory Summary</h2>
+<table><thead><tr><th>Group</th><th>Files</th><th>Bytes</th></tr></thead><tbody><tr><td>VDF, VDF-2 Data/Documents Inventory</td><td>2000</td><td>383141918</td></tr>
+<tr><td>VRN, VRN-2 IO/DB Readiness Inventory</td><td>2000</td><td>567652361</td></tr></tbody></table>
+</section>
+
+<section><h2>def Remaining Process Plan</h2>
+<table><thead><tr><th>Project</th><th>Lane</th><th>FixClass</th><th>Priority</th><th>Risk</th><th>Action</th><th>Reason</th><th>Path</th></tr></thead><tbody><tr><td>VDF</td><td>VDF-1 Final Seal Health</td><td><b>PARALLEL_SAFE</b></td><td>P3</td><td>LOW</td><td>Can run as read-only user-test lane.</td><td>Low correlation and no write/repair/process-kill action.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_SAFE_PARALLEL_GATE_v02872_20260611_205436\launchers\Start-VDF-Lane1-FinalSealHealth.ps1</code></td></tr>
+<tr><td>VDF</td><td>VDF-2 Data/Documents Inventory</td><td><b>PARALLEL_SAFE</b></td><td>P3</td><td>LOW</td><td>Can run as read-only user-test lane.</td><td>Low correlation and no write/repair/process-kill action.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_SAFE_PARALLEL_GATE_v02872_20260611_205436\launchers\Start-VDF-Lane2-ReadOnlyInventory.ps1</code></td></tr>
+<tr><td>VDF</td><td>VDF-3 Env/Supportive HardGate</td><td><b>PARALLEL_SAFE</b></td><td>P3</td><td>LOW</td><td>Can run as read-only user-test lane.</td><td>Low correlation and no write/repair/process-kill action.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_SAFE_PARALLEL_GATE_v02872_20260611_205436\launchers\Start-VDF-Lane3-EnvSupportiveHardGate.ps1</code></td></tr>
+<tr><td>VRN</td><td>VRN-1 Active Entry Health</td><td><b>PARALLEL_SAFE</b></td><td>P3</td><td>LOW</td><td>Can run as read-only user-test lane.</td><td>Low correlation and no write/repair/process-kill action.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_SAFE_PARALLEL_GATE_v02872_20260611_205436\launchers\Start-VRN-Lane1-EntryHealth.ps1</code></td></tr>
+<tr><td>VRN</td><td>VRN-2 IO/DB Readiness Inventory</td><td><b>PARALLEL_SAFE</b></td><td>P3</td><td>LOW</td><td>Can run as read-only user-test lane.</td><td>Low correlation and no write/repair/process-kill action.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_SAFE_PARALLEL_GATE_v02872_20260611_205436\launchers\Start-VRN-Lane2-IOInventory.ps1</code></td></tr>
+<tr><td>VRN</td><td>VRN-3 Engine Capability Plan</td><td><b>PARALLEL_SAFE</b></td><td>P3</td><td>LOW</td><td>Can run as read-only user-test lane.</td><td>Low correlation and no write/repair/process-kill action.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_SAFE_PARALLEL_GATE_v02872_20260611_205436\launchers\Start-VRN-Lane3-EngineCapability.ps1</code></td></tr></tbody></table>
+</section>
+</div>
+<script>
+(function(){
+ const left=/(path|message|reason|action|launcher|lane|project|路徑|訊息|原因|動作|啟動|流程|專案)/i;
+ const path=/([A-Za-z]:\\|\\\\|\/|\.ps1|\.py|\.html|\.csv|\.json|\.txt|\.lnk)/i;
+ function clean(t){return String(t||"").replace(/,/g,"").replace(/%/g,"").trim();}
+ function isnum(t){const s=clean(t);return !!s && /^[-+]?(\d+|\d*\.\d+)(e[-+]?\d+)?$/i.test(s) && Number.isFinite(Number(s));}
+ function fmt(t){const n=Number(clean(t));return Number.isFinite(n)?n.toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:1}):t;}
+ function heads(table){return Array.from(table.querySelectorAll("thead th")).map(x=>(x.textContent||"").trim());}
+ function process(table){const hs=heads(table);Array.from(table.querySelectorAll("th")).forEach(th=>{th.style.textAlign="center";th.style.verticalAlign="top";});Array.from(table.querySelectorAll("tbody tr")).forEach(row=>{Array.from(row.children).forEach((cell,i)=>{const h=hs[i]||"";const raw=(cell.textContent||"").trim();cell.style.verticalAlign="top";cell.style.textAlign="center";if(isnum(raw)){cell.textContent=fmt(raw);return;}if(left.test(h)||path.test(raw)||raw.length>=36||cell.querySelector("code")){cell.classList.add("via-left");}});});}
+ Array.from(document.querySelectorAll("table")).forEach(process);
+})();
+</script>
+</body>
+</html>

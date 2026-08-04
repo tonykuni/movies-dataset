@@ -1,0 +1,2458 @@
+**********************
+PowerShell transcript start
+Start time: 20260611100744
+Username: TONY-NB\tonyk
+RunAs User: TONY-NB\tonyk
+Configuration Name: 
+Machine: TONY-NB (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\Program Files\PowerShell\7\pwsh.dll -NoLogo
+Process ID: 4728
+PSVersion: 7.6.0
+PSEdition: Core
+GitCommitId: 7.6.0
+OS: Microsoft Windows 10.0.26200
+Platform: Win32NT
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1, 6.0, 7.0
+PSRemotingProtocolVersion: 2.4
+SerializationVersion: 1.1.0.1
+WSManStackVersion: 3.0
+**********************
+PS>TerminatingError(): "The variable '$ExecuteWrite' cannot be retrieved because it has not been set."
+
+================================================================================
+def VDF AKSHARE GENERATED SCRIPT REVIEW v028.5 FATAL BUT POWERSHELL STAYS OPEN
+================================================================================
+[FATAL] The variable '$ExecuteWrite' cannot be retrieved because it has not been set.
+at Invoke-VDF-AkShareGeneratedScriptReview-v0285, <No file>: line 174
+at <ScriptBlock>, <No file>: line 2
+
+PowerShell remains open. No exit was called.
+C:\Users\tonyk
+ >
+
+PS7 #requires -Version 7.0
+C:\Users\tonyk
+ >
+
+PS7 Set-StrictMode -Version Latest
+C:\Users\tonyk
+ >
+
+PS7 $ErrorActionPreference = "Stop"
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 function Invoke-VDF-AkShareGeneratedScriptReview-v0285 {
+    param(
+        [string]$ProjectRoot = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics",
+        [switch]$OpenHtmlReport = $true
+    )
+
+    $script:OK = 0
+    $script:WARN = 0
+    $script:FAIL = 0
+
+    function def_Stamp { Get-Date -Format "yyyyMMdd_HHmmss" }
+    function def_Iso { (Get-Date).ToString("yyyy-MM-ddTHH:mm:ss.fffK") }
+    function def_Mkdir([string]$p) { [System.IO.Directory]::CreateDirectory($p) | Out-Null }
+    function def_Html([AllowNull()][string]$s) {
+        if ($null -eq $s) { return "" }
+        return [System.Net.WebUtility]::HtmlEncode($s)
+    }
+    function def_GetProp {
+        param([object]$Obj,[string]$Name,[object]$Default = 0)
+        if ($null -eq $Obj) { return $Default }
+        $p = $Obj.PSObject.Properties[$Name]
+        if ($null -eq $p) { return $Default }
+        if ($null -eq $p.Value -or "$($p.Value)" -eq "") { return $Default }
+        return $p.Value
+    }
+    function def_AddRow {
+        param(
+            [System.Collections.Generic.List[object]]$Rows,
+            [string]$Round,[string]$Stage,[string]$Layer,[string]$Name,
+            [string]$Status,[string]$Risk,[string]$FixClass,[string]$Priority,
+            [string]$Mode,[string]$Metric,[string]$Value,[string]$Message,[string]$Path
+        )
+
+        if ($Status -match "FAIL|FATAL|BLOCK") { $script:FAIL++ }
+        elseif ($Status -match "WARN|REVIEW|MEDIUM|MISSING|APPROVAL|SCRIPT|GUARD") { $script:WARN++ }
+        else { $script:OK++ }
+
+        $Rows.Add([pscustomobject]@{
+            Round=$Round; Stage=$Stage; Layer=$Layer; Name=$Name; Status=$Status; Risk=$Risk
+            FixClass=$FixClass; Priority=$Priority; Mode=$Mode; Metric=$Metric; Value=$Value
+            Message=$Message; Path=$Path
+        }) | Out-Null
+    }
+    function def_Hash {
+        param([string]$Path)
+        if (-not [System.IO.File]::Exists($Path)) { return "" }
+        return (Get-FileHash -LiteralPath $Path -Algorithm SHA256 -ErrorAction Stop).Hash
+    }
+
+    if (-not [System.IO.Directory]::Exists($ProjectRoot)) {
+        throw "ProjectRoot not found: $ProjectRoot"
+    }
+
+    $Stamp = def_Stamp
+    $DictRoot     = Join-Path $ProjectRoot "dict\VDF"
+    $ActiveRoot   = Join-Path $DictRoot "_active"
+    $BackupRoot   = Join-Path $DictRoot "_backup"
+    $DatabaseRoot = Join-Path $DictRoot "DATABASE"
+
+    foreach ($d in @($DictRoot,$ActiveRoot,$BackupRoot,$DatabaseRoot)) { def_Mkdir $d }
+
+    $Latest = Get-ChildItem -LiteralPath $ActiveRoot -Directory -Filter "VDF_AKSHARE_STAGING_WRITE_SCRIPT_GENERATION_APPROVAL_v0284_*" -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending |
+        Select-Object -First 1
+
+    if ($null -eq $Latest) {
+        throw "Latest v028.4 staging-write script generation approval run not found."
+    }
+
+    $RunRoot = Join-Path $ActiveRoot "VDF_AKSHARE_GENERATED_SCRIPT_REVIEW_v0285_$Stamp"
+    $ReportDir = Join-Path $RunRoot "report"
+    $RegistryDir = Join-Path $RunRoot "registry"
+    $PlanDir = Join-Path $RunRoot "plan"
+    $RuntimeDir = Join-Path $RunRoot "runtime"
+    $BackupDir = Join-Path $RunRoot "backup"
+
+    foreach ($d in @($RunRoot,$ReportDir,$RegistryDir,$PlanDir,$RuntimeDir,$BackupDir)) { def_Mkdir $d }
+
+    $Rows = [System.Collections.Generic.List[object]]::new()
+    $ActivePointer = Join-Path $ActiveRoot "VDF_ACTIVE_POINTER.json"
+    $Transcript = Join-Path $RuntimeDir "VDF_AkShare_GeneratedScriptReview_Transcript_v0285_$Stamp.txt"
+
+    Write-Host ""
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "def VDF AKSHARE GENERATED SCRIPT REVIEW v028.5" -ForegroundColor Cyan
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "Review generated script only · real SHA256 · AST/static safety · no execution · no DATABASE write"
+    Write-Host ""
+
+    try { Start-Transcript -LiteralPath $Transcript -Force | Out-Null } catch {}
+
+    if (Test-Path -LiteralPath $ActivePointer) {
+        Copy-Item -LiteralPath $ActivePointer -Destination (Join-Path $BackupDir "VDF_ACTIVE_POINTER_before_v0285_$Stamp.json") -Force
+    }
+
+    def_AddRow $Rows "Round0" "BOOT" "PROJECT_ROOT" "VeritasIntelligenceAnalytics" "OK" "LOW" "PARALLEL_SAFE" "P0" "GENERATED_SCRIPT_REVIEW_ONLY" "exists" "true" "Project root exists." $ProjectRoot
+    def_AddRow $Rows "Round0" "POLICY" "NO_DB_WRITE" "DATABASE" "OK_POLICY_LOCKED" "LOW" "PARALLEL_SAFE" "P0" "GENERATED_SCRIPT_REVIEW_ONLY" "db_write_enabled" "false" "No DATABASE write in v028.5." $DatabaseRoot
+    def_AddRow $Rows "Round0" "POLICY" "NO_CANONICAL_MERGE" "Canonical Merge" "OK_POLICY_LOCKED" "LOW" "PARALLEL_SAFE" "P0" "GENERATED_SCRIPT_REVIEW_ONLY" "canonical_merge_enabled" "false" "No canonical merge in v028.5." $RunRoot
+    def_AddRow $Rows "Round0" "POLICY" "NO_SCRIPT_EXECUTION" "Generated Script" "OK_POLICY_LOCKED" "LOW" "SEQUENTIAL_REQUIRED" "P0" "GENERATED_SCRIPT_REVIEW_ONLY" "script_execute_now" "false" "Review only. Generated script is not executed." $RunRoot
+
+    $GeneratedScript = Get-ChildItem -LiteralPath $Latest.FullName -Recurse -File -Filter "Invoke-VDF-AkShare-StagingWrite-GENERATED-NOT-RUN-v0285.ps1" -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending |
+        Select-Object -First 1
+
+    $ScriptReviewJson0284 = Get-ChildItem -LiteralPath $Latest.FullName -Recurse -File -Filter "VDF_AkShare_v0284_GeneratedScriptReview.json" -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending |
+        Select-Object -First 1
+
+    $ApprovalGateJson0284 = Get-ChildItem -LiteralPath $Latest.FullName -Recurse -File -Filter "VDF_AkShare_v0284_UserApprovalGate.json" -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending |
+        Select-Object -First 1
+
+    $RuntimeResultJson0284 = Get-ChildItem -LiteralPath $Latest.FullName -Recurse -File -Filter "vdf_akshare_staging_write_script_generation_approval_result_v0284.json" -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending |
+        Select-Object -First 1
+
+    foreach ($x in @($GeneratedScript,$ScriptReviewJson0284,$ApprovalGateJson0284,$RuntimeResultJson0284)) {
+        if ($null -eq $x) { throw "Missing required v028.4 generated-script artifact for v028.5 review." }
+    }
+
+    $V0284 = Get-Content -LiteralPath $RuntimeResultJson0284.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+    $M = $V0284.metrics
+
+    $CandidateRows = [int](def_GetProp $M "candidate_rows" 0)
+    $InsertRows = [int](def_GetProp $M "insert_rows" 0)
+    $UpdateRows = [int](def_GetProp $M "update_rows" 0)
+    $ConflictRows = [int](def_GetProp $M "conflict_rows" 0)
+    $DuplicateQuarantineRows = [int](def_GetProp $M "duplicate_quarantine_rows" 0)
+
+    def_AddRow $Rows "Round1" "DISCOVERY" "V0284_RUN" "v028.4 RunRoot" "OK_SOURCE_LOCKED" "LOW" "SEQUENTIAL_GATED" "P0" "GENERATED_SCRIPT_REVIEW_ONLY" "source" "v0284" "Locked latest v028.4 generated-script run." $Latest.FullName
+    def_AddRow $Rows "Round1" "DISCOVERY" "GENERATED_SCRIPT" "Generated Script" "OK_SOURCE_LOCKED" "LOW" "SEQUENTIAL_GATED" "P0" "GENERATED_SCRIPT_REVIEW_ONLY" "source" "ps1" "Generated script found." $GeneratedScript.FullName
+
+    $ScriptText = Get-Content -LiteralPath $GeneratedScript.FullName -Raw -Encoding UTF8
+    $RealSha256 = def_Hash $GeneratedScript.FullName
+    $ScriptSize = (Get-Item -LiteralPath $GeneratedScript.FullName).Length
+
+    if ([string]::IsNullOrWhiteSpace($RealSha256) -or $RealSha256 -eq "SKIPPED_CURRENT_RUNROOT") {
+        def_AddRow $Rows "Round1" "HASH" "REAL_SHA256" "Generated Script SHA256" "BLOCK_HASH_INVALID" "HIGH" "SEQUENTIAL_REQUIRED" "P0" "GENERATED_SCRIPT_REVIEW_ONLY" "sha256" "$RealSha256" "Real SHA256 was not produced." $GeneratedScript.FullName
+        throw "Generated script real SHA256 invalid."
+    } else {
+        def_AddRow $Rows "Round1" "HASH" "REAL_SHA256" "Generated Script SHA256" "OK_REAL_HASH" "LOW" "PARALLEL_SAFE" "P0" "GENERATED_SCRIPT_REVIEW_ONLY" "sha256" "$RealSha256" "Real SHA256 computed." $GeneratedScript.FullName
+    }
+
+    $ParseErrors = $null
+    $Tokens = $null
+    $Ast = [System.Management.Automation.Language.Parser]::ParseFile($GeneratedScript.FullName, [ref]$Tokens, [ref]$ParseErrors)
+
+    if ($ParseErrors.Count -gt 0) {
+        $msg = ($ParseErrors | ForEach-Object { $_.Message }) -join " | "
+        def_AddRow $Rows "Round2" "STATIC_REVIEW" "AST_PARSE" "PowerShell AST" "BLOCK_AST_PARSE_FAIL" "HIGH" "SEQUENTIAL_REQUIRED" "P0" "GENERATED_SCRIPT_REVIEW_ONLY" "parse_errors" "$($ParseErrors.Count)" $msg $GeneratedScript.FullName
+    } else {
+        def_AddRow $Rows "Round2" "STATIC_REVIEW" "AST_PARSE" "PowerShell AST" "OK_AST_PARSE" "LOW" "PARALLEL_SAFE" "P0" "GENERATED_SCRIPT_REVIEW_ONLY" "parse_errors" "0" "Generated script AST parse OK." $GeneratedScript.FullName
+    }
+
+    $CommandNames = @(
+        $Ast.FindAll({
+            param($n)
+            $n -is [System.Management.Automation.Language.CommandAst]
+        }, $true) | ForEach-Object {
+            try { $_.GetCommandName() } catch { "" }
+        } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+    )
+
+    $ForbiddenCommands = @("Stop-Process","Remove-Item","rm","del","rmdir","Invoke-Expression","iex","Start-Job","Start-Process")
+    $FoundForbidden = @($CommandNames | Where-Object { $ForbiddenCommands -contains $_ } | Sort-Object -Unique)
+
+    if (@($FoundForbidden).Count -gt 0) {
+        def_AddRow $Rows "Round2" "STATIC_REVIEW" "FORBIDDEN_COMMANDS" "Forbidden Commands" "BLOCK_FORBIDDEN_COMMANDS" "HIGH" "SEQUENTIAL_REQUIRED" "P0" "GENERATED_SCRIPT_REVIEW_ONLY" "commands" ($FoundForbidden -join ";") "Forbidden command found in generated script." $GeneratedScript.FullName
+    } else {
+        def_AddRow $Rows "Round2" "STATIC_REVIEW" "FORBIDDEN_COMMANDS" "Forbidden Commands" "OK_NONE_FOUND" "LOW" "PARALLEL_SAFE" "P0" "GENERATED_SCRIPT_REVIEW_ONLY" "commands" "0" "No forbidden command found." $GeneratedScript.FullName
+    }
+
+    $HasToken = $ScriptText -match "APPROVE_VDF_AKSHARE_STAGING_WRITE_STAGE_ONLY"
+    $HasExecuteSwitch = $ScriptText -match '\[switch\]\s*\$ExecuteWrite'
+    $HasReviewDefault = $ScriptText -match "REVIEW ONLY"
+    $HasDisabledExecution = $ScriptText -match "Execution path intentionally disabled"
+    $HasNoExitMessage = $ScriptText -match "PowerShell remains open"
+    $HasDatabaseRoot = $ScriptText -match "DATABASE"
+
+    if ($HasToken -and $HasExecuteSwitch -and $HasReviewDefault -and $HasDisabledExecution) {
+        def_AddRow $Rows "Round2" "STATIC_REVIEW" "GUARD_RAILS" "Guard Rails" "OK_GUARDS_PRESENT" "LOW" "SEQUENTIAL_GATED" "P0" "GENERATED_SCRIPT_REVIEW_ONLY" "guards" "present" "Token/switch/review-only/disabled-execution guards present." $GeneratedScript.FullName
+    } else {
+        $missing = @()
+        if (-not $HasToken) { $missing += "token" }
+        if (-not $HasExecuteSwitch) { $missing += "execute_switch" }
+        if (-not $HasReviewDefault) { $missing += "review_default" }
+        if (-not $HasDisabledExecution) { $missing += "disabled_execution_throw" }
+        def_AddRow $Rows "Round2" "STATIC_REVIEW" "GUARD_RAILS" "Guard Rails" "BLOCK_GUARDS_MISSING" "HIGH" "SEQUENTIAL_REQUIRED" "P0" "GENERATED_SCRIPT_REVIEW_ONLY" "missing" ($missing -join ";") "Required guard rails missing." $GeneratedScript.FullName
+    }
+
+    if ($HasNoExitMessage) {
+        def_AddRow $Rows "Round2" "STATIC_REVIEW" "NO_EXIT_POLICY" "No Exit Policy" "OK_POLICY_TEXT_PRESENT" "LOW" "PARALLEL_SAFE" "P1" "GENERATED_SCRIPT_REVIEW_ONLY" "text" "present" "PowerShell remains open message present." $GeneratedScript.FullName
+    } else {
+        def_AddRow $Rows "Round2" "STATIC_REVIEW" "NO_EXIT_POLICY" "No Exit Policy" "WARN_TEXT_MISSING" "MEDIUM" "SEQUENTIAL_GATED" "P1" "GENERATED_SCRIPT_REVIEW_ONLY" "text" "missing" "No PowerShell remains open message found." $GeneratedScript.FullName
+    }
+
+    if ($HasDatabaseRoot) {
+        def_AddRow $Rows "Round2" "STATIC_REVIEW" "DATABASE_REFERENCE" "DATABASE Reference" "WARN_REFERENCE_ONLY" "MEDIUM" "SEQUENTIAL_GATED" "P1" "GENERATED_SCRIPT_REVIEW_ONLY" "database_reference" "present" "Script references DATABASE path, but execution path is disabled." $GeneratedScript.FullName
+    } else {
+        def_AddRow $Rows "Round2" "STATIC_REVIEW" "DATABASE_REFERENCE" "DATABASE Reference" "OK_NO_DATABASE_REF" "LOW" "PARALLEL_SAFE" "P1" "GENERATED_SCRIPT_REVIEW_ONLY" "database_reference" "absent" "No DATABASE reference." $GeneratedScript.FullName
+    }
+
+    $HardBlocks = @($Rows | Where-Object { $_.Status -match "BLOCK|FAIL|FATAL" }).Count
+    $Status = if ($HardBlocks -eq 0) { "VDF_AKSHARE_GENERATED_SCRIPT_REVIEW_READY" } else { "VDF_AKSHARE_GENERATED_SCRIPT_REVIEW_BLOCKED" }
+    $Risk = if ($HardBlocks -eq 0) { "MEDIUM" } else { "HIGH" }
+    $Recommendation = if ($HardBlocks -eq 0) { "ALLOW_V0286_USER_APPROVAL_GATE_FOR_EXECUTION_CAPABLE_SCRIPT_DESIGN_NO_DB_WRITE" } else { "BLOCK_V0286_UNTIL_GENERATED_SCRIPT_REVIEW_DEFECTS_REPAIRED" }
+    $NextStep = if ($HardBlocks -eq 0) { "v028.6 user approval gate for execution-capable script design only; no DB write" } else { "repair generated script review defects; no DB write" }
+
+    $ScriptReviewJson = Join-Path $PlanDir "VDF_AkShare_v0285_GeneratedScriptReview.json"
+    $StaticAuditJson = Join-Path $RegistryDir "VDF_AkShare_v0285_StaticAudit.json"
+    $CommandInventoryCsv = Join-Path $RegistryDir "VDF_AkShare_v0285_CommandInventory.csv"
+    $ApprovalGateJson = Join-Path $PlanDir "VDF_AkShare_v0285_UserApprovalGate.json"
+    $RuntimeResultJson = Join-Path $RuntimeDir "vdf_akshare_generated_script_review_result_v0285.json"
+    $Top10Json = Join-Path $RegistryDir "VDF_Top10_LocalFreeLibs_GeneratedScriptReview_v0285.json"
+
+    $CommandNames | Group-Object | Sort-Object Name | ForEach-Object {
+        [pscustomobject]@{ command = $_.Name; count = $_.Count }
+    } | Export-Csv -LiteralPath $CommandInventoryCsv -NoTypeInformation -Encoding UTF8BOM
+
+    $Review = [pscustomobject]@{
+        generated_at = def_Iso
+        status = $Status
+        risk = $Risk
+        generated_script = $GeneratedScript.FullName
+        script_bytes = $ScriptSize
+        script_sha256 = $RealSha256
+        parse_errors = $ParseErrors.Count
+        forbidden_commands = @($FoundForbidden)
+        guards = [pscustomobject]@{
+            token_present = $HasToken
+            execute_switch_present = $HasExecuteSwitch
+            review_default_present = $HasReviewDefault
+            disabled_execution_present = $HasDisabledExecution
+            powershell_remains_open_text_present = $HasNoExitMessage
+        }
+        metrics = [pscustomobject]@{
+            candidate_rows = $CandidateRows
+            insert_rows = $InsertRows
+            update_rows = $UpdateRows
+            conflict_rows = $ConflictRows
+            duplicate_quarantine_rows = $DuplicateQuarantineRows
+            hard_blocks = $HardBlocks
+            script_executed_now = $false
+            db_write_enabled = $false
+            canonical_merge_enabled = $false
+        }
+        recommendation = $Recommendation
+        next_step = $NextStep
+    }
+
+    $Review | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $ScriptReviewJson -Encoding UTF8
+    $Review | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $StaticAuditJson -Encoding UTF8
+
+    $Approval = [pscustomobject]@{
+        generated_at = def_Iso
+        status = $Status
+        risk = $Risk
+        approved_now = $false
+        actual_write_allowed = $false
+        db_write_enabled = $false
+        canonical_merge_enabled = $false
+        reviewed_script = $GeneratedScript.FullName
+        reviewed_script_sha256 = $RealSha256
+        what_is_allowed_next = "execution-capable script design only; still no DB write"
+        what_is_not_allowed = "actual DATABASE write or canonical merge"
+        recommendation = $Recommendation
+        next_step = $NextStep
+    }
+    $Approval | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $ApprovalGateJson -Encoding UTF8
+
+    $Result = [pscustomobject]@{
+        generated_at = def_Iso
+        status = $Status
+        risk = $Risk
+        recommendation = $Recommendation
+        metrics = $Review.metrics
+        artifacts = [pscustomobject]@{
+            script_review_json = $ScriptReviewJson
+            static_audit_json = $StaticAuditJson
+            command_inventory_csv = $CommandInventoryCsv
+            approval_gate_json = $ApprovalGateJson
+        }
+        next_step = $NextStep
+    }
+    $Result | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $RuntimeResultJson -Encoding UTF8
+
+    def_AddRow $Rows "Round3" "CONSOLIDATE" "SCRIPT_REVIEW" "Script Review JSON" "OK_REVIEW_CREATED" "LOW" "SEQUENTIAL_GATED" "P0" "GENERATED_SCRIPT_REVIEW_ONLY" "review" "created" "Generated script review created." $ScriptReviewJson
+    def_AddRow $Rows "Round3" "CONSOLIDATE" "COMMAND_INVENTORY" "Command Inventory CSV" "OK_INVENTORY_CREATED" "LOW" "PARALLEL_SAFE" "P1" "GENERATED_SCRIPT_REVIEW_ONLY" "commands" "$(@($CommandNames).Count)" "Command inventory created." $CommandInventoryCsv
+    def_AddRow $Rows "Round3" "APPROVAL" "USER_GATE" "Approval Gate" "WARN_APPROVAL_REQUIRED" "MEDIUM" "SEQUENTIAL_REQUIRED" "P0" "GENERATED_SCRIPT_REVIEW_ONLY" "approved_now" "false" "Actual write still not approved." $ApprovalGateJson
+
+    $Top10Libs = @(
+        [pscustomobject]@{FunctionArea="Generated Script Review"; Language="PowerShell"; Top10LocalFreeLibs="Pester; PSScriptAnalyzer; Get-FileHash; Start-Transcript; ConvertTo-Json; ImportExcel; PSWriteHTML; ThreadJob; ScheduledTasks; PSFramework"; UseCase="script AST/static review/hash/no-write guard"}
+        [pscustomobject]@{FunctionArea="Execution-capable Script Design"; Language="PowerShell"; Top10LocalFreeLibs="Pester; PSScriptAnalyzer; Get-FileHash; Start-Transcript; ConvertTo-Json; ImportExcel; PSWriteHTML; ThreadJob; ScheduledTasks; PSFramework"; UseCase="future guarded script design"}
+        [pscustomobject]@{FunctionArea="Staging Validation"; Language="Python"; Top10LocalFreeLibs="duckdb; pandas; polars; pyarrow; pandera; pydantic; pytest; hypothesis; orjson; rich"; UseCase="future staging table validation"}
+        [pscustomobject]@{FunctionArea="Backup Rollback"; Language="PowerShell"; Top10LocalFreeLibs="Get-FileHash; Copy-Item; Compress-Archive; Start-Transcript; Pester; PSScriptAnalyzer; PSWriteHTML; ImportExcel; ThreadJob; ScheduledTasks"; UseCase="backup/hash/rollback/report"}
+        [pscustomobject]@{FunctionArea="HTML UI Report"; Language="JS/HTML"; Top10LocalFreeLibs="Tabulator; DataTables; ECharts; Chart.js; Mermaid; Ajv; DOMPurify; FileSaver.js; Playwright; Lighthouse"; UseCase="matrix/report/schema/export"}
+    )
+    $Top10Libs | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $Top10Json -Encoding UTF8
+    def_AddRow $Rows "Round3" "CONSOLIDATE" "LOCAL_FREE_LIBS" "Top10 Local Free Libs" "OK" "LOW" "PARALLEL_SAFE" "P2" "GENERATED_SCRIPT_REVIEW_ONLY" "rows" "$(@($Top10Libs).Count)" "Top10 local free libs matrix generated." $Top10Json
+
+    def_AddRow $Rows "Round3" "RESULT" "READINESS" $Status $(if ($Risk -eq "HIGH") { "BLOCKED" } else { "WARN_REVIEW_READY" }) $Risk "SEQUENTIAL_GATED" "P0" "GENERATED_SCRIPT_REVIEW_ONLY" "recommendation" $Recommendation "v028.5 completed. Review only. No DB write. No canonical merge." $RuntimeResultJson
+
+    $CsvMatrix = Join-Path $RegistryDir "VDF_AkShare_GeneratedScriptReview_Matrix_v0285.csv"
+    $JsonMatrix = Join-Path $RegistryDir "VDF_AkShare_GeneratedScriptReview_Matrix_v0285.json"
+    $Rows | Export-Csv -LiteralPath $CsvMatrix -NoTypeInformation -Encoding UTF8BOM
+    $Rows | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $JsonMatrix -Encoding UTF8
+
+    try {
+        $ptr = if (Test-Path -LiteralPath $ActivePointer) {
+            Get-Content -LiteralPath $ActivePointer -Raw -Encoding UTF8 | ConvertFrom-Json
+        } else {
+            [pscustomobject]@{}
+        }
+
+        $ptr | Add-Member -NotePropertyName "latest_akshare_generated_script_review_v0285" -NotePropertyValue ([pscustomobject]@{
+            generated_at = def_Iso
+            status = $Status
+            risk = $Risk
+            run_root = $RunRoot
+            result_json = $RuntimeResultJson
+            reviewed_script = $GeneratedScript.FullName
+            reviewed_script_sha256 = $RealSha256
+            hard_blocks = $HardBlocks
+            recommendation = $Recommendation
+        }) -Force
+
+        $ptr | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $ActivePointer -Encoding UTF8
+        def_AddRow $Rows "Round3" "POINTER" "ACTIVE_POINTER" "VDF_ACTIVE_POINTER.json" "OK_UPDATED" "LOW" "PARALLEL_SAFE" "P1" "GENERATED_SCRIPT_REVIEW_ONLY" "update" "complete" "Active pointer updated with v028.5." $ActivePointer
+    } catch {}
+
+    $Rows | Export-Csv -LiteralPath $CsvMatrix -NoTypeInformation -Encoding UTF8BOM
+    $Rows | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $JsonMatrix -Encoding UTF8
+
+    $trs = foreach ($r in $Rows) {
+        $cls = if ($r.Risk -eq "HIGH" -or $r.Status -match "FAIL|FATAL|BLOCK") { "bad" }
+               elseif ($r.Risk -match "MEDIUM|REVIEW" -or $r.Status -match "WARN|REVIEW|APPROVAL|SCRIPT|GUARD") { "warn" }
+               else { "ok" }
+        "<tr class='$cls'><td>$(def_Html $r.Round)</td><td>$(def_Html $r.Stage)</td><td>$(def_Html $r.Layer)</td><td>$(def_Html $r.Name)</td><td>$(def_Html $r.Status)</td><td>$(def_Html $r.Risk)</td><td>$(def_Html $r.FixClass)</td><td>$(def_Html $r.Priority)</td><td>$(def_Html $r.Mode)</td><td>$(def_Html $r.Metric)</td><td>$(def_Html $r.Value)</td><td>$(def_Html $r.Message)</td><td>$(def_Html $r.Path)</td></tr>"
+    }
+
+    $HtmlReport = Join-Path $ReportDir "VDF_AkShare_GeneratedScriptReview_Report_v0285.html"
+    $Html = @"
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VDF AkShare Generated Script Review v028.5</title>
+<style>
+body{margin:0;background:#f7f4ed;color:#25312f;font-family:Arial,"Microsoft JhengHei",sans-serif}
+.wrap{max-width:1500px;margin:0 auto;padding:28px}
+.hero{border:1px solid #d8d0c3;border-radius:24px;background:#fffdf8;padding:26px;box-shadow:0 18px 50px rgba(30,40,36,.08)}
+h1{margin:0;font-size:28px}h2{margin-top:28px;font-size:20px}.sub{color:#6e7b78;margin-top:8px;line-height:1.7}
+.kpis{display:grid;grid-template-columns:repeat(7,minmax(120px,1fr));gap:12px;margin-top:20px}
+.kpi{border:1px solid #d8d0c3;border-radius:18px;padding:14px;background:#fff}.kpi b{font-size:22px;display:block}.kpi span{font-size:12px;color:#6e7b78}
+.badge{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid #d8d0c3;background:#fff;margin-right:8px}
+.ok td{background:#f3fbf5}.warn td{background:#fff8e9}.bad td{background:#fff1f1}
+.mw{overflow:auto;border:1px solid #d8d0c3;border-radius:18px;background:#fff}
+table{border-collapse:collapse;width:100%;font-size:12px}
+th{position:sticky;top:0;background:#e8eee9;color:#20332f;z-index:1}
+th,td{border-bottom:1px solid #e8e1d6;padding:9px 10px;text-align:left;vertical-align:top;white-space:nowrap}
+td:nth-child(12),td:nth-child(13){white-space:normal;min-width:320px}
+pre{white-space:pre-wrap;background:#17211f;color:#e9fff8;padding:16px;border-radius:16px;overflow:auto}
+@media(max-width:900px){.kpis{grid-template-columns:1fr}.wrap{padding:14px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hero">
+<h1>VeritasDataForge · AkShare Generated Script Review v028.5</h1>
+<div class="sub">VERITAS INTELLIGENCE ANALYTICS<br>Script review only · real SHA256 · AST/static safety · not executed · no DATABASE write · no canonical merge</div>
+<p><span class="badge">Status: $(def_Html $Status)</span><span class="badge">Risk: $(def_Html $Risk)</span><span class="badge">Recommendation: $(def_Html $Recommendation)</span></p>
+<div class="kpis">
+<div class="kpi"><b>$script:OK</b><span>OK</span></div>
+<div class="kpi"><b>$script:WARN</b><span>WARN / REVIEW</span></div>
+<div class="kpi"><b>$script:FAIL</b><span>FAIL / BLOCK</span></div>
+<div class="kpi"><b>$CandidateRows</b><span>Candidate</span></div>
+<div class="kpi"><b>$InsertRows</b><span>Insert</span></div>
+<div class="kpi"><b>$ConflictRows</b><span>Conflict</span></div>
+<div class="kpi"><b>$HardBlocks</b><span>Hard blocks</span></div>
+</div>
+</div>
+
+<h2>def Matrix</h2>
+<div class="mw">
+<table>
+<thead><tr><th>Round</th><th>Stage</th><th>Layer</th><th>Name</th><th>Status</th><th>Risk</th><th>FixClass</th><th>Priority</th><th>Mode</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr></thead>
+<tbody>$($trs -join "`n")</tbody>
+</table>
+</div>
+
+<h2>def Output Paths</h2>
+<pre>
+RunRoot               : $RunRoot
+HTML                  : $HtmlReport
+CSV Matrix            : $CsvMatrix
+JSON Matrix           : $JsonMatrix
+Reviewed Script       : $($GeneratedScript.FullName)
+Real Script SHA256    : $RealSha256
+Script Review JSON    : $ScriptReviewJson
+Static Audit JSON     : $StaticAuditJson
+Command Inventory CSV : $CommandInventoryCsv
+Approval Gate JSON    : $ApprovalGateJson
+Top10 Libs            : $Top10Json
+Runtime Result        : $RuntimeResultJson
+Active Pointer        : $ActivePointer
+Transcript            : $Transcript
+</pre>
+
+<h2>def Next Gate</h2>
+<pre>
+$NextStep
+
+Current:
+candidate_rows = $CandidateRows
+insert_rows = $InsertRows
+update_rows = $UpdateRows
+conflict_rows = $ConflictRows
+duplicate_quarantine_rows = $DuplicateQuarantineRows
+script_executed_now = false
+db_write_enabled = false
+canonical_merge_enabled = false
+actual_write_allowed = false
+hard_blocks = $HardBlocks
+</pre>
+</div>
+</body>
+</html>
+"@
+
+    Set-Content -LiteralPath $HtmlReport -Value $Html -Encoding UTF8
+
+    try {
+        $ptr = Get-Content -LiteralPath $ActivePointer -Raw -Encoding UTF8 | ConvertFrom-Json
+        $ptr.latest_akshare_generated_script_review_v0285 | Add-Member -NotePropertyName "report" -NotePropertyValue $HtmlReport -Force
+        $ptr | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $ActivePointer -Encoding UTF8
+    } catch {}
+
+    if ($OpenHtmlReport -and (Test-Path -LiteralPath $HtmlReport)) {
+        Start-Process -FilePath $HtmlReport | Out-Null
+    }
+
+    try { Stop-Transcript | Out-Null } catch {}
+
+    Write-Host ""
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "def VDF AKSHARE GENERATED SCRIPT REVIEW v028.5 COMPLETE" -ForegroundColor Cyan
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "Status                    : $Status"
+    Write-Host "Risk                      : $Risk"
+    Write-Host "RunRoot                   : $RunRoot"
+    Write-Host "HTML                      : $HtmlReport"
+    Write-Host "CSV Matrix                : $CsvMatrix"
+    Write-Host "JSON Matrix               : $JsonMatrix"
+    Write-Host "Reviewed Script           : $($GeneratedScript.FullName)"
+    Write-Host "Real Script SHA256        : $RealSha256"
+    Write-Host "Script Review JSON        : $ScriptReviewJson"
+    Write-Host "Static Audit JSON         : $StaticAuditJson"
+    Write-Host "Command Inventory CSV     : $CommandInventoryCsv"
+    Write-Host "Approval Gate JSON        : $ApprovalGateJson"
+    Write-Host "Runtime Result            : $RuntimeResultJson"
+    Write-Host "Active Pointer            : $ActivePointer"
+    Write-Host "OK                        : $script:OK"
+    Write-Host "WARN                      : $script:WARN"
+    Write-Host "FAIL                      : $script:FAIL"
+    Write-Host "Candidate Rows            : $CandidateRows"
+    Write-Host "Insert Rows               : $InsertRows"
+    Write-Host "Update Rows               : $UpdateRows"
+    Write-Host "Conflict Rows             : $ConflictRows"
+    Write-Host "Duplicate Quarantine      : $DuplicateQuarantineRows"
+    Write-Host "Hard Blocks               : $HardBlocks"
+    Write-Host "Script Executed Now       : False"
+    Write-Host "Recommendation            : $Recommendation"
+    Write-Host "Next Step                 : $NextStep"
+    Write-Host ""
+    Write-Host "PowerShell remains open. No exit. No Stop-Process. No destructive delete." -ForegroundColor Green
+}
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 try {
+    Invoke-VDF-AkShareGeneratedScriptReview-v0285
+}
+catch {
+    Write-Host ""
+    Write-Host "================================================================================" -ForegroundColor Red
+    Write-Host "def VDF AKSHARE GENERATED SCRIPT REVIEW v028.5 FATAL BUT POWERSHELL STAYS OPEN" -ForegroundColor Red
+    Write-Host "================================================================================" -ForegroundColor Red
+    Write-Host "[FATAL] $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host $_.ScriptStackTrace -ForegroundColor DarkRed
+    Write-Host ""
+    Write-Host "PowerShell remains open. No exit was called." -ForegroundColor Yellow
+}
+
+================================================================================
+def VDF AKSHARE GENERATED SCRIPT REVIEW v028.5
+================================================================================
+Review generated script only · real SHA256 · AST/static safety · no execution · no DATABASE write
+
+
+================================================================================
+def VDF AKSHARE GENERATED SCRIPT REVIEW v028.5 COMPLETE
+================================================================================
+Status                    : VDF_AKSHARE_GENERATED_SCRIPT_REVIEW_BLOCKED
+Risk                      : HIGH
+RunRoot                   : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_GENERATED_SCRIPT_REVIEW_v0285_20260611_101304
+HTML                      : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_GENERATED_SCRIPT_REVIEW_v0285_20260611_101304\report\VDF_AkShare_GeneratedScriptReview_Report_v0285.html
+CSV Matrix                : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_GENERATED_SCRIPT_REVIEW_v0285_20260611_101304\registry\VDF_AkShare_GeneratedScriptReview_Matrix_v0285.csv
+JSON Matrix               : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_GENERATED_SCRIPT_REVIEW_v0285_20260611_101304\registry\VDF_AkShare_GeneratedScriptReview_Matrix_v0285.json
+Reviewed Script           : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_STAGING_WRITE_SCRIPT_GENERATION_APPROVAL_v0284_20260611_033432\generated_script\Invoke-VDF-AkShare-StagingWrite-GENERATED-NOT-RUN-v0285.ps1
+Real Script SHA256        : 7EE93582609BBD957CF8EB56245A84C14D5A3C154A611C99D4138CCD66186445
+Script Review JSON        : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_GENERATED_SCRIPT_REVIEW_v0285_20260611_101304\plan\VDF_AkShare_v0285_GeneratedScriptReview.json
+Static Audit JSON         : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_GENERATED_SCRIPT_REVIEW_v0285_20260611_101304\registry\VDF_AkShare_v0285_StaticAudit.json
+Command Inventory CSV     : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_GENERATED_SCRIPT_REVIEW_v0285_20260611_101304\registry\VDF_AkShare_v0285_CommandInventory.csv
+Approval Gate JSON        : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_GENERATED_SCRIPT_REVIEW_v0285_20260611_101304\plan\VDF_AkShare_v0285_UserApprovalGate.json
+Runtime Result            : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_AKSHARE_GENERATED_SCRIPT_REVIEW_v0285_20260611_101304\runtime\vdf_akshare_generated_script_review_result_v0285.json
+Active Pointer            : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ACTIVE_POINTER.json
+OK                        : 12
+WARN                      : 4
+FAIL                      : 2
+Candidate Rows            : 121
+Insert Rows               : 121
+Update Rows               : 0
+Conflict Rows             : 0
+Duplicate Quarantine      : 29
+Hard Blocks               : 1
+Script Executed Now       : False
+Recommendation            : BLOCK_V0286_UNTIL_GENERATED_SCRIPT_REVIEW_DEFECTS_REPAIRED
+Next Step                 : repair generated script review defects; no DB write
+
+PowerShell remains open. No exit. No Stop-Process. No destructive delete.
+C:\Users\tonyk
+ >
+
+PS7 #requires -Version 7.0
+C:\Users\tonyk
+ >
+
+PS7 Set-StrictMode -Version Latest
+C:\Users\tonyk
+ >
+
+PS7 $ErrorActionPreference = "Stop"
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 function Invoke-VIA-Panorama3Round-VDFVRN-v02851 {
+    param(
+        [string]$ProjectRoot = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics",
+        [switch]$OpenHtmlReport = $true
+    )
+
+    $script:OK = 0
+    $script:WARN = 0
+    $script:FAIL = 0
+
+    function def_Stamp { Get-Date -Format "yyyyMMdd_HHmmss" }
+    function def_Iso { (Get-Date).ToString("yyyy-MM-ddTHH:mm:ss.fffK") }
+    function def_Mkdir([string]$p) { [System.IO.Directory]::CreateDirectory($p) | Out-Null }
+    function def_Html([AllowNull()][string]$s) {
+        if ($null -eq $s) { return "" }
+        return [System.Net.WebUtility]::HtmlEncode($s)
+    }
+    function def_Hash([string]$Path) {
+        try {
+            if (-not [System.IO.File]::Exists($Path)) { return "" }
+            return (Get-FileHash -LiteralPath $Path -Algorithm SHA256 -ErrorAction Stop).Hash
+        } catch { return "HASH_ERROR" }
+    }
+    function def_ReadTextSafe([string]$Path) {
+        try {
+            if (-not [System.IO.File]::Exists($Path)) { return "" }
+            return Get-Content -LiteralPath $Path -Raw -Encoding UTF8 -ErrorAction Stop
+        } catch {
+            try { return Get-Content -LiteralPath $Path -Raw -ErrorAction Stop } catch { return "" }
+        }
+    }
+    function def_AddRow {
+        param(
+            [System.Collections.Generic.List[object]]$Rows,
+            [string]$Round,[string]$Project,[string]$Lane,[string]$Stage,[string]$Name,
+            [string]$Status,[string]$Risk,[string]$FixClass,[string]$Priority,
+            [string]$Mode,[string]$Metric,[string]$Value,[string]$Message,[string]$Path
+        )
+
+        if ($Status -match "FAIL|FATAL|BLOCK") { $script:FAIL++ }
+        elseif ($Status -match "WARN|REVIEW|MEDIUM|MISSING|EMPTY|APPROVAL|REPAIR|GUARD|PLAN") { $script:WARN++ }
+        else { $script:OK++ }
+
+        $Rows.Add([pscustomobject]@{
+            Round=$Round; Project=$Project; Lane=$Lane; Stage=$Stage; Name=$Name
+            Status=$Status; Risk=$Risk; FixClass=$FixClass; Priority=$Priority
+            Mode=$Mode; Metric=$Metric; Value=$Value; Message=$Message; Path=$Path
+        }) | Out-Null
+    }
+
+    function def_ParsePowerShellFile {
+        param([string]$Path)
+        $tokens = $null
+        $errors = $null
+        $ast = [System.Management.Automation.Language.Parser]::ParseFile($Path, [ref]$tokens, [ref]$errors)
+        $cmds = @(
+            $ast.FindAll({
+                param($n)
+                $n -is [System.Management.Automation.Language.CommandAst]
+            }, $true) | ForEach-Object {
+                try { $_.GetCommandName() } catch { "" }
+            } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+        )
+        [pscustomobject]@{
+            Path = $Path
+            ParseErrorCount = @($errors).Count
+            ParseErrors = @($errors | ForEach-Object { $_.Message })
+            CommandCount = @($cmds).Count
+            Commands = @($cmds)
+        }
+    }
+
+    if (-not [System.IO.Directory]::Exists($ProjectRoot)) {
+        throw "ProjectRoot not found: $ProjectRoot"
+    }
+
+    $Stamp = def_Stamp
+    $DictRoot = Join-Path $ProjectRoot "dict\VDF"
+    $ActiveRoot = Join-Path $DictRoot "_active"
+    $BackupRoot = Join-Path $DictRoot "_backup"
+    $DatabaseRoot = Join-Path $DictRoot "DATABASE"
+
+    $SupportiveRoot = Join-Path $ProjectRoot "supportive modules"
+    $NexusCore = Join-Path $SupportiveRoot "Invoke-VeritasNexusCore.ps1"
+    $VdfRoot = Join-Path $ProjectRoot "functional modules\VDF"
+    $VrnRoot = Join-Path $ProjectRoot "functional modules\VRN"
+
+    foreach ($d in @($DictRoot,$ActiveRoot,$BackupRoot,$DatabaseRoot,$SupportiveRoot,$VdfRoot,$VrnRoot)) {
+        if (-not [System.IO.Directory]::Exists($d)) { def_Mkdir $d }
+    }
+
+    $RunRoot = Join-Path $ActiveRoot "VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_$Stamp"
+    $ReportDir = Join-Path $RunRoot "report"
+    $RegistryDir = Join-Path $RunRoot "registry"
+    $PlanDir = Join-Path $RunRoot "plan"
+    $RuntimeDir = Join-Path $RunRoot "runtime"
+    $PreviewDir = Join-Path $RunRoot "preview"
+    $RepairDir = Join-Path $RunRoot "repair"
+    $BackupDir = Join-Path $RunRoot "backup"
+
+    foreach ($d in @($RunRoot,$ReportDir,$RegistryDir,$PlanDir,$RuntimeDir,$PreviewDir,$RepairDir,$BackupDir)) { def_Mkdir $d }
+
+    $Rows = [System.Collections.Generic.List[object]]::new()
+    $ActivePointer = Join-Path $ActiveRoot "VDF_ACTIVE_POINTER.json"
+    $Transcript = Join-Path $RuntimeDir "VIA_Panorama3Round_VDFVRN_v02851_Transcript_$Stamp.txt"
+
+    Write-Host ""
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "def VIA PANORAMA 3-ROUND · VDF + VRN · GENERATED SCRIPT REPAIR v028.5.1" -ForegroundColor Cyan
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "Full repo scan · NexusCore control plane · VDF/VRN lanes · repair generated script AST · no DB write"
+    Write-Host ""
+
+    try { Start-Transcript -LiteralPath $Transcript -Force | Out-Null } catch {}
+
+    if (Test-Path -LiteralPath $ActivePointer) {
+        Copy-Item -LiteralPath $ActivePointer -Destination (Join-Path $BackupDir "VDF_ACTIVE_POINTER_before_v02851_$Stamp.json") -Force
+    }
+
+    # =============================================================================
+    # ROUND 0 · INVENTORY / BASELINE / CONTROL PLANE
+    # =============================================================================
+    def_AddRow $Rows "Round0" "VIA" "CONTROL_PLANE" "BOOT" "ProjectRoot" "OK" "LOW" "PARALLEL_SAFE" "P0" "ANALYZE_ONLY" "exists" "true" "Project root exists." $ProjectRoot
+    def_AddRow $Rows "Round0" "VIA" "CONTROL_PLANE" "POLICY" "No DB Write" "OK_POLICY_LOCKED" "LOW" "PARALLEL_SAFE" "P0" "ANALYZE_ONLY" "db_write_enabled" "false" "This run never writes DATABASE." $DatabaseRoot
+    def_AddRow $Rows "Round0" "VIA" "CONTROL_PLANE" "POLICY" "No Canonical Merge" "OK_POLICY_LOCKED" "LOW" "PARALLEL_SAFE" "P0" "ANALYZE_ONLY" "canonical_merge_enabled" "false" "This run never canonical-merges." $RunRoot
+    def_AddRow $Rows "Round0" "VIA" "CONTROL_PLANE" "POLICY" "No Generated Script Execution" "OK_POLICY_LOCKED" "LOW" "SEQUENTIAL_REQUIRED" "P0" "ANALYZE_REPAIR_ONLY" "execute_generated_script" "false" "Generated write script is reviewed/repaired only, not executed." $RunRoot
+
+    if (Test-Path -LiteralPath $NexusCore) {
+        def_AddRow $Rows "Round0" "VIA" "CONTROL_PLANE" "NEXUSCORE" "Invoke-VeritasNexusCore.ps1" "OK_FOUND" "LOW" "SEQUENTIAL_GATED" "P0" "CONTROL_PLANE_ONLY" "exists" "true" "Supportive modules will be routed through NexusCore." $NexusCore
+    } else {
+        def_AddRow $Rows "Round0" "VIA" "CONTROL_PLANE" "NEXUSCORE" "Invoke-VeritasNexusCore.ps1" "WARN_MISSING" "MEDIUM" "SEQUENTIAL_REQUIRED" "P0" "CONTROL_PLANE_ONLY" "exists" "false" "NexusCore entry missing; create/restore before integration." $NexusCore
+    }
+
+    $AllFiles = Get-ChildItem -LiteralPath $ProjectRoot -Recurse -File -Force -ErrorAction SilentlyContinue
+    $InventoryCsv = Join-Path $RegistryDir "VIA_Panorama_FileInventory_v02851.csv"
+    $InventoryJson = Join-Path $RegistryDir "VIA_Panorama_FileInventory_v02851.json"
+
+    $Inventory = foreach ($f in $AllFiles) {
+        $bucket = if ($f.FullName.StartsWith($VdfRoot,[System.StringComparison]::OrdinalIgnoreCase)) { "VDF" }
+                  elseif ($f.FullName.StartsWith($VrnRoot,[System.StringComparison]::OrdinalIgnoreCase)) { "VRN" }
+                  elseif ($f.FullName.StartsWith($SupportiveRoot,[System.StringComparison]::OrdinalIgnoreCase)) { "Supportive" }
+                  elseif ($f.FullName.StartsWith($ActiveRoot,[System.StringComparison]::OrdinalIgnoreCase)) { "VDF_Active" }
+                  elseif ($f.FullName.StartsWith($DatabaseRoot,[System.StringComparison]::OrdinalIgnoreCase)) { "VDF_DATABASE" }
+                  else { "Other" }
+        [pscustomobject]@{
+            bucket = $bucket
+            name = $f.Name
+            extension = $f.Extension
+            bytes = $f.Length
+            modified = $f.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")
+            path = $f.FullName
+        }
+    }
+
+    $Inventory | Export-Csv -LiteralPath $InventoryCsv -NoTypeInformation -Encoding UTF8BOM
+    $Inventory | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $InventoryJson -Encoding UTF8
+
+    $ProjectCounts = $Inventory | Group-Object bucket | Sort-Object Name | ForEach-Object {
+        [pscustomobject]@{ bucket=$_.Name; count=$_.Count }
+    }
+    $ProjectCountsCsv = Join-Path $RegistryDir "VIA_Panorama_ProjectCounts_v02851.csv"
+    $ProjectCounts | Export-Csv -LiteralPath $ProjectCountsCsv -NoTypeInformation -Encoding UTF8BOM
+
+    def_AddRow $Rows "Round0" "VIA" "CONTROL_PLANE" "INVENTORY" "Repo File Inventory" "OK_CREATED" "LOW" "PARALLEL_SAFE" "P0" "ANALYZE_ONLY" "files" "$(@($Inventory).Count)" "Full repo file inventory created." $InventoryCsv
+
+    $ToolNames = @("python","pwsh","git","node","npm","pnpm","uv","ruff","pytest","playwright","dotnet")
+    $ToolRows = foreach ($t in $ToolNames) {
+        $cmd = Get-Command $t -ErrorAction SilentlyContinue
+        [pscustomobject]@{
+            tool = $t
+            found = [bool]($null -ne $cmd)
+            path = if ($null -ne $cmd) { $cmd.Source } else { "" }
+        }
+    }
+
+    $ToolCsv = Join-Path $RegistryDir "VIA_Panorama_ToolAvailability_v02851.csv"
+    $ToolJson = Join-Path $RegistryDir "VIA_Panorama_ToolAvailability_v02851.json"
+    $ToolRows | Export-Csv -LiteralPath $ToolCsv -NoTypeInformation -Encoding UTF8BOM
+    $ToolRows | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $ToolJson -Encoding UTF8
+
+    def_AddRow $Rows "Round0" "VIA" "TOOLING" "BOOTSTRAP" "Tool Availability" "OK_CREATED" "LOW" "PARALLEL_SAFE" "P1" "ANALYZE_ONLY" "tools" "$(@($ToolRows).Count)" "Tool availability matrix generated." $ToolCsv
+
+    # guarded installer plan only
+    $InstallPlanJson = Join-Path $PlanDir "VIA_ToolBundle_InstallPlan_GUARDED_NOT_RUN_v02851.json"
+    $InstallScript = Join-Path $PlanDir "Invoke-VIA-ToolBundle-Install-GUARDED-NOT-RUN-v02851.ps1"
+    $InstallPlan = [pscustomobject]@{
+        generated_at = def_Iso
+        status = "VIA_TOOL_BUNDLE_INSTALL_PLAN_READY_NOT_RUN"
+        risk = "MEDIUM"
+        approved_now = $false
+        install_executed_now = $false
+        core_bundle = @("uv","ruff","pytest","pytest-xdist","Pester","PSScriptAnalyzer")
+        web_ui_bundle = @("pnpm","vitest","eslint","playwright")
+        conditional_dotnet_bundle = @(".NET test tools only if .sln/.csproj/.cs are detected")
+        rule = "generate guarded installer; do not install in this run"
+    }
+    $InstallPlan | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $InstallPlanJson -Encoding UTF8
+
+    @'
+#requires -Version 7.0
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
+
+param(
+    [switch]$ExecuteInstall,
+    [string]$ApprovalToken = ""
+)
+
+$RequiredToken = "APPROVE_VIA_TOOL_BUNDLE_INSTALL"
+if (-not $ExecuteInstall -or $ApprovalToken -ne $RequiredToken) {
+    Write-Host "[REVIEW ONLY] Tool install not executed." -ForegroundColor Yellow
+    Write-Host "To execute later, run with: -ExecuteInstall -ApprovalToken $RequiredToken"
+    Write-Host "PowerShell remains open. No exit." -ForegroundColor Green
+    return
+}
+
+Write-Host "Install path intentionally disabled in v028.5.1 generated installer. Create a separate approved install gate first." -ForegroundColor Yellow
+return
+'@ | Set-Content -LiteralPath $InstallScript -Encoding UTF8
+
+    def_AddRow $Rows "Round0" "VIA" "TOOLING" "INSTALL_PLAN" "Guarded Tool Installer" "WARN_PLAN_ONLY" "MEDIUM" "SEQUENTIAL_GATED" "P1" "PLAN_ONLY" "install_executed_now" "false" "Generated guarded install plan only; no install executed." $InstallPlanJson
+
+    # =============================================================================
+    # ROUND 1 · PARALLEL-SAFE ANALYSIS
+    # =============================================================================
+    $PsFiles = @($AllFiles | Where-Object { $_.Extension -in @(".ps1",".psm1",".psd1") -and (
+        $_.FullName.StartsWith($VdfRoot,[System.StringComparison]::OrdinalIgnoreCase) -or
+        $_.FullName.StartsWith($VrnRoot,[System.StringComparison]::OrdinalIgnoreCase) -or
+        $_.FullName.StartsWith($SupportiveRoot,[System.StringComparison]::OrdinalIgnoreCase) -or
+        $_.FullName.StartsWith($ActiveRoot,[System.StringComparison]::OrdinalIgnoreCase)
+    ) })
+
+    $PsAstCsv = Join-Path $RegistryDir "VIA_Panorama_PowerShellAstAudit_v02851.csv"
+    $PsAstRows = [System.Collections.Generic.List[object]]::new()
+
+    $i = 0
+    foreach ($f in $PsFiles) {
+        $i++
+        Write-Progress -Activity "Round1 PowerShell AST audit" -Status $f.Name -PercentComplete ([int](($i / [Math]::Max(1,@($PsFiles).Count)) * 100))
+        try {
+            $r = def_ParsePowerShellFile $f.FullName
+            $PsAstRows.Add([pscustomobject]@{
+                path = $f.FullName
+                parse_error_count = $r.ParseErrorCount
+                command_count = $r.CommandCount
+                parse_errors = ($r.ParseErrors -join " | ")
+            }) | Out-Null
+        } catch {
+            $PsAstRows.Add([pscustomobject]@{
+                path = $f.FullName
+                parse_error_count = 999
+                command_count = 0
+                parse_errors = $_.Exception.Message
+            }) | Out-Null
+        }
+    }
+    Write-Progress -Activity "Round1 PowerShell AST audit" -Completed
+    $PsAstRows | Export-Csv -LiteralPath $PsAstCsv -NoTypeInformation -Encoding UTF8BOM
+
+    $PsAstFailCount = @($PsAstRows | Where-Object { [int]$_.parse_error_count -gt 0 }).Count
+    if ($PsAstFailCount -eq 0) {
+        def_AddRow $Rows "Round1" "VIA" "PARALLEL_SAFE" "AST_AUDIT" "PowerShell AST Audit" "OK_ALL_PARSE" "LOW" "PARALLEL_SAFE" "P0" "ANALYZE_ONLY" "parse_fail_files" "0" "All scanned PowerShell files parse cleanly." $PsAstCsv
+    } else {
+        def_AddRow $Rows "Round1" "VIA" "PARALLEL_SAFE" "AST_AUDIT" "PowerShell AST Audit" "WARN_PARSE_ERRORS_FOUND" "MEDIUM" "SEQUENTIAL_REQUIRED" "P0" "ANALYZE_ONLY" "parse_fail_files" "$PsAstFailCount" "Some PowerShell files have parse errors; repair sequentially." $PsAstCsv
+    }
+
+    $HtmlFiles = @($AllFiles | Where-Object { $_.Extension -in @(".html",".htm") })
+    $HtmlAuditCsv = Join-Path $RegistryDir "VIA_Panorama_HtmlAudit_v02851.csv"
+    $HtmlAudit = foreach ($h in $HtmlFiles) {
+        $txt = def_ReadTextSafe $h.FullName
+        [pscustomobject]@{
+            path = $h.FullName
+            bytes = $h.Length
+            has_doctype = [bool]($txt -match "<!doctype")
+            has_charset = [bool]($txt -match "charset")
+            has_viewport = [bool]($txt -match "viewport")
+            has_table = [bool]($txt -match "<table")
+        }
+    }
+    $HtmlAudit | Export-Csv -LiteralPath $HtmlAuditCsv -NoTypeInformation -Encoding UTF8BOM
+    def_AddRow $Rows "Round1" "VIA" "PARALLEL_SAFE" "HTML_AUDIT" "HTML UI Report Audit" "OK_CREATED" "LOW" "PARALLEL_SAFE" "P1" "ANALYZE_ONLY" "html_files" "$(@($HtmlFiles).Count)" "HTML file audit matrix generated." $HtmlAuditCsv
+
+    $PythonFiles = @($AllFiles | Where-Object { $_.Extension -eq ".py" -and (
+        $_.FullName.StartsWith($VdfRoot,[System.StringComparison]::OrdinalIgnoreCase) -or
+        $_.FullName.StartsWith($VrnRoot,[System.StringComparison]::OrdinalIgnoreCase) -or
+        $_.FullName.StartsWith($SupportiveRoot,[System.StringComparison]::OrdinalIgnoreCase)
+    ) })
+    $PyAuditCsv = Join-Path $RegistryDir "VIA_Panorama_PythonInventory_v02851.csv"
+    $PyAudit = foreach ($p in $PythonFiles) {
+        [pscustomobject]@{
+            path = $p.FullName
+            bytes = $p.Length
+            modified = $p.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")
+        }
+    }
+    $PyAudit | Export-Csv -LiteralPath $PyAuditCsv -NoTypeInformation -Encoding UTF8BOM
+    def_AddRow $Rows "Round1" "VIA" "PARALLEL_SAFE" "PYTHON_INVENTORY" "Python File Inventory" "OK_CREATED" "LOW" "PARALLEL_SAFE" "P1" "ANALYZE_ONLY" "py_files" "$(@($PythonFiles).Count)" "Python inventory generated." $PyAuditCsv
+
+    # VDF/VRN lane plan
+    $LanePlanJson = Join-Path $PlanDir "VIA_VDF_VRN_5Lane_Plan_v02851.json"
+    $LanePlan = [pscustomobject]@{
+        generated_at = def_Iso
+        status = "VIA_VDF_VRN_5LANE_PLAN_READY"
+        risk = "MEDIUM"
+        no_db_write = $true
+        no_canonical_merge = $true
+        control_plane = $NexusCore
+        vdf_lanes = @(
+            [pscustomobject]@{
+                lane = "VDF_Write_Governance_Lane"
+                mode = "SEQUENTIAL_GATED"
+                reason = "Touches write boundary; only reviews/rehearsals allowed."
+                next = "repair generated script AST, then review execution-capable design only"
+            },
+            [pscustomobject]@{
+                lane = "VDF_Quarantine_Reduction_Lane"
+                mode = "PARALLEL_SAFE"
+                reason = "Researches 29 duplicate quarantine causes without changing frozen 121 candidate set."
+                next = "root-cause profile only; no DB write"
+            }
+        )
+        vrn_lanes = @(
+            [pscustomobject]@{
+                lane = "VRN_Ingestion_Lane"
+                mode = "PARALLEL_SAFE"
+                reason = "Source/OCR/adapter inventory only; no shared schema write."
+                next = "file source manifest and extractor capability matrix"
+            },
+            [pscustomobject]@{
+                lane = "VRN_Normalization_Lane"
+                mode = "PARALLEL_SAFE"
+                reason = "Schema/entity/canonical-key preview only."
+                next = "normalization schema preview and traceability matrix"
+            },
+            [pscustomobject]@{
+                lane = "VRN_Presentation_Lane"
+                mode = "PARALLEL_SAFE"
+                reason = "HTML/UI/export/user-test scaffold only."
+                next = "HTML matrix smoke tests and report UI audit"
+            }
+        )
+        stop_conditions = @(
+            "Any lane touching NexusCore public API becomes SEQUENTIAL_GATED.",
+            "Any lane touching shared schema contract becomes SEQUENTIAL_GATED.",
+            "Any lane touching VDF write boundary becomes SEQUENTIAL_REQUIRED.",
+            "Any DB write request is blocked until separate explicit approval gate."
+        )
+    }
+    $LanePlan | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $LanePlanJson -Encoding UTF8
+    def_AddRow $Rows "Round1" "VIA" "CONTROL_PLANE" "LANE_PLAN" "VDF/VRN Five Lane Plan" "OK_PLAN_CREATED" "LOW" "PARALLEL_SAFE" "P0" "PLAN_ONLY" "lanes" "5" "VDF two lanes and VRN three lanes plan generated." $LanePlanJson
+
+    # =============================================================================
+    # ROUND 2 · SEQUENTIAL-GATED REPAIR: VDF v028.5 generated script AST
+    # =============================================================================
+    $LatestV0285 = Get-ChildItem -LiteralPath $ActiveRoot -Directory -Filter "VDF_AKSHARE_GENERATED_SCRIPT_REVIEW_v0285_*" -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending | Select-Object -First 1
+
+    $LatestV0284 = Get-ChildItem -LiteralPath $ActiveRoot -Directory -Filter "VDF_AKSHARE_STAGING_WRITE_SCRIPT_GENERATION_APPROVAL_v0284_*" -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending | Select-Object -First 1
+
+    $OriginalGeneratedScript = $null
+    if ($null -ne $LatestV0284) {
+        $OriginalGeneratedScript = Get-ChildItem -LiteralPath $LatestV0284.FullName -Recurse -File -Filter "Invoke-VDF-AkShare-StagingWrite-GENERATED-NOT-RUN-v0285.ps1" -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    }
+
+    if ($null -eq $OriginalGeneratedScript) {
+        def_AddRow $Rows "Round2" "VDF" "Write_Governance" "SCRIPT_REPAIR" "Original Generated Script" "BLOCK_MISSING_SCRIPT" "HIGH" "SEQUENTIAL_REQUIRED" "P0" "REPAIR_ONLY" "exists" "false" "Original generated script not found." $ActiveRoot
+    } else {
+        $OriginalBackup = Join-Path $BackupDir ("Original_" + $OriginalGeneratedScript.Name)
+        Copy-Item -LiteralPath $OriginalGeneratedScript.FullName -Destination $OriginalBackup -Force
+        def_AddRow $Rows "Round2" "VDF" "Write_Governance" "SCRIPT_REPAIR" "Original Script Backup" "OK_BACKUP_CREATED" "LOW" "SEQUENTIAL_GATED" "P0" "REPAIR_ONLY" "backup" "created" "Original generated script backed up." $OriginalBackup
+    }
+
+    $RepairedScript = Join-Path $RepairDir "Invoke-VDF-AkShare-StagingWrite-REPAIRED-NOT-RUN-v02851.ps1"
+    $RepairedScriptText = @'
+#requires -Version 7.0
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
+
+<#
+GENERATED/REPAIRED BY:
+  VIA Panorama 3-Round · VDF/VRN · v028.5.1
+
+STATUS:
+  REPAIRED SKELETON ONLY. NOT EXECUTED.
+
+SAFETY:
+  - Review-only by default.
+  - Does not write DATABASE.
+  - Does not canonical-merge.
+  - Does not delete files.
+  - Does not Stop-Process.
+  - Execution path is intentionally disabled.
+#>
+
+param(
+    [string]$ProjectRoot = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics",
+    [string]$ApprovalToken = "",
+    [switch]$ExecuteWrite,
+    [switch]$OpenHtmlReport = $true
+)
+
+function def_Mkdir {
+    param([string]$Path)
+    [System.IO.Directory]::CreateDirectory($Path) | Out-Null
+}
+
+function def_Stamp {
+    Get-Date -Format "yyyyMMdd_HHmmss"
+}
+
+$RequiredToken = "APPROVE_VDF_AKSHARE_STAGING_WRITE_STAGE_ONLY"
+$Stamp = def_Stamp
+
+$DictRoot     = Join-Path $ProjectRoot "dict\VDF"
+$DatabaseRoot = Join-Path $DictRoot "DATABASE"
+$BackupRoot   = Join-Path $DictRoot "_backup"
+$ActiveRoot   = Join-Path $DictRoot "_active"
+
+$RunRoot    = Join-Path $ActiveRoot "VDF_AKSHARE_STAGING_WRITE_STAGE_EXECUTION_REVIEW_v0286_REVIEW_ONLY_$Stamp"
+$ReportDir  = Join-Path $RunRoot "report"
+$StagingDir = Join-Path $RunRoot "staging"
+$RuntimeDir = Join-Path $RunRoot "runtime"
+
+foreach ($dir in @($DatabaseRoot, $BackupRoot, $ActiveRoot, $RunRoot, $ReportDir, $StagingDir, $RuntimeDir)) {
+    def_Mkdir -Path $dir
+}
+
+Write-Host ""
+Write-Host "================================================================================" -ForegroundColor Yellow
+Write-Host "def VDF AKSHARE STAGING WRITE REPAIRED SCRIPT · REVIEW ONLY" -ForegroundColor Yellow
+Write-Host "================================================================================" -ForegroundColor Yellow
+Write-Host "This repaired script is guarded. It will not write DATABASE in this version."
+Write-Host ""
+
+if ((-not $ExecuteWrite) -or ($ApprovalToken -ne $RequiredToken)) {
+    Write-Host "[REVIEW ONLY] No write executed." -ForegroundColor Yellow
+    Write-Host "Required future token:"
+    Write-Host "  APPROVE_VDF_AKSHARE_STAGING_WRITE_STAGE_ONLY"
+    Write-Host ""
+    Write-Host "PowerShell remains open. No exit." -ForegroundColor Green
+    return
+}
+
+throw "Execution path intentionally disabled in v028.5.1 repaired skeleton. Build execution-capable script in a separate approved v028.6 gate."
+'@
+
+    Set-Content -LiteralPath $RepairedScript -Value $RepairedScriptText -Encoding UTF8
+
+    $OriginalReviewCsv = Join-Path $RegistryDir "VDF_AkShare_v02851_OriginalGeneratedScriptReview.csv"
+    if ($null -ne $OriginalGeneratedScript) {
+        $origReview = def_ParsePowerShellFile $OriginalGeneratedScript.FullName
+        [pscustomobject]@{
+            path = $OriginalGeneratedScript.FullName
+            sha256 = def_Hash $OriginalGeneratedScript.FullName
+            parse_error_count = $origReview.ParseErrorCount
+            parse_errors = ($origReview.ParseErrors -join " | ")
+            command_count = $origReview.CommandCount
+        } | Export-Csv -LiteralPath $OriginalReviewCsv -NoTypeInformation -Encoding UTF8BOM
+
+        if ($origReview.ParseErrorCount -gt 0) {
+            def_AddRow $Rows "Round2" "VDF" "Write_Governance" "ORIGINAL_SCRIPT_REVIEW" "Original Generated Script" "WARN_ORIGINAL_PARSE_BLOCKED" "MEDIUM" "SEQUENTIAL_REQUIRED" "P0" "REPAIR_ONLY" "parse_errors" "$($origReview.ParseErrorCount)" "Original generated script has parse errors; repaired copy generated." $OriginalReviewCsv
+        } else {
+            def_AddRow $Rows "Round2" "VDF" "Write_Governance" "ORIGINAL_SCRIPT_REVIEW" "Original Generated Script" "OK_ORIGINAL_PARSE" "LOW" "SEQUENTIAL_GATED" "P1" "REPAIR_ONLY" "parse_errors" "0" "Original generated script parses cleanly." $OriginalReviewCsv
+        }
+    }
+
+    $RepairedReview = def_ParsePowerShellFile $RepairedScript
+    $RepairedHash = def_Hash $RepairedScript
+    $Forbidden = @("Stop-Process","Remove-Item","rm","del","rmdir","Invoke-Expression","iex","Start-Process")
+    $ForbiddenFound = @($RepairedReview.Commands | Where-Object { $Forbidden -contains $_ } | Sort-Object -Unique)
+    $RepairedText = def_ReadTextSafe $RepairedScript
+
+    $HasGuardToken = $RepairedText -match "APPROVE_VDF_AKSHARE_STAGING_WRITE_STAGE_ONLY"
+    $HasDisabledPath = $RepairedText -match "Execution path intentionally disabled"
+    $HasReviewOnly = $RepairedText -match "REVIEW ONLY"
+    $HasNoExit = $RepairedText -match "PowerShell remains open"
+    $HardBlocks = 0
+
+    if ($RepairedReview.ParseErrorCount -eq 0) {
+        def_AddRow $Rows "Round2" "VDF" "Write_Governance" "REPAIRED_AST" "Repaired Script AST" "OK_AST_PARSE" "LOW" "SEQUENTIAL_GATED" "P0" "REPAIR_ONLY" "parse_errors" "0" "Repaired script parses cleanly." $RepairedScript
+    } else {
+        $HardBlocks++
+        def_AddRow $Rows "Round2" "VDF" "Write_Governance" "REPAIRED_AST" "Repaired Script AST" "BLOCK_AST_PARSE_FAIL" "HIGH" "SEQUENTIAL_REQUIRED" "P0" "REPAIR_ONLY" "parse_errors" "$($RepairedReview.ParseErrorCount)" ($RepairedReview.ParseErrors -join " | ") $RepairedScript
+    }
+
+    if (@($ForbiddenFound).Count -eq 0) {
+        def_AddRow $Rows "Round2" "VDF" "Write_Governance" "REPAIRED_FORBIDDEN" "Forbidden Commands" "OK_NONE_FOUND" "LOW" "SEQUENTIAL_GATED" "P0" "REPAIR_ONLY" "commands" "0" "No forbidden commands in repaired script." $RepairedScript
+    } else {
+        $HardBlocks++
+        def_AddRow $Rows "Round2" "VDF" "Write_Governance" "REPAIRED_FORBIDDEN" "Forbidden Commands" "BLOCK_FORBIDDEN_COMMANDS" "HIGH" "SEQUENTIAL_REQUIRED" "P0" "REPAIR_ONLY" "commands" ($ForbiddenFound -join ";") "Forbidden commands in repaired script." $RepairedScript
+    }
+
+    if ($HasGuardToken -and $HasDisabledPath -and $HasReviewOnly -and $HasNoExit) {
+        def_AddRow $Rows "Round2" "VDF" "Write_Governance" "REPAIRED_GUARDS" "Guard Rails" "OK_GUARDS_PRESENT" "LOW" "SEQUENTIAL_GATED" "P0" "REPAIR_ONLY" "guards" "present" "Guard token, review-only path, disabled execution, and no-exit text are present." $RepairedScript
+    } else {
+        $HardBlocks++
+        def_AddRow $Rows "Round2" "VDF" "Write_Governance" "REPAIRED_GUARDS" "Guard Rails" "BLOCK_GUARDS_MISSING" "HIGH" "SEQUENTIAL_REQUIRED" "P0" "REPAIR_ONLY" "guards" "missing" "Required guard rails missing." $RepairedScript
+    }
+
+    $RepairedReviewJson = Join-Path $PlanDir "VDF_AkShare_v02851_RepairedGeneratedScriptReview.json"
+    $RepairedCommandCsv = Join-Path $RegistryDir "VDF_AkShare_v02851_RepairedCommandInventory.csv"
+    $RepairedStaticAuditJson = Join-Path $RegistryDir "VDF_AkShare_v02851_RepairedStaticAudit.json"
+
+    $RepairedReview.Commands | Group-Object | Sort-Object Name | ForEach-Object {
+        [pscustomobject]@{ command=$_.Name; count=$_.Count }
+    } | Export-Csv -LiteralPath $RepairedCommandCsv -NoTypeInformation -Encoding UTF8BOM
+
+    $RepairedAudit = [pscustomobject]@{
+        generated_at = def_Iso
+        status = if ($HardBlocks -eq 0) { "VDF_AKSHARE_GENERATED_SCRIPT_REPAIR_READY" } else { "VDF_AKSHARE_GENERATED_SCRIPT_REPAIR_BLOCKED" }
+        risk = if ($HardBlocks -eq 0) { "MEDIUM" } else { "HIGH" }
+        original_script = if ($null -ne $OriginalGeneratedScript) { $OriginalGeneratedScript.FullName } else { "" }
+        repaired_script = $RepairedScript
+        repaired_sha256 = $RepairedHash
+        parse_errors = $RepairedReview.ParseErrorCount
+        forbidden_commands = @($ForbiddenFound)
+        guards = [pscustomobject]@{
+            guard_token = $HasGuardToken
+            disabled_execution = $HasDisabledPath
+            review_only = $HasReviewOnly
+            no_exit_text = $HasNoExit
+        }
+        hard_blocks = $HardBlocks
+        script_executed_now = $false
+        db_write_enabled = $false
+        canonical_merge_enabled = $false
+        recommendation = if ($HardBlocks -eq 0) { "ALLOW_V0286_USER_APPROVAL_GATE_FOR_EXECUTION_CAPABLE_SCRIPT_DESIGN_NO_DB_WRITE" } else { "BLOCK_V0286_UNTIL_REPAIRED_SCRIPT_DEFECTS_RESOLVED" }
+        next_step = if ($HardBlocks -eq 0) { "v028.6 user approval gate for execution-capable script design only; no DB write" } else { "repair repaired-script defects; no DB write" }
+    }
+
+    $RepairedAudit | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $RepairedReviewJson -Encoding UTF8
+    $RepairedAudit | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $RepairedStaticAuditJson -Encoding UTF8
+
+    # =============================================================================
+    # ROUND 3 · CONSOLIDATE / REPORT / NEXT-GATE
+    # =============================================================================
+    $Risk = if ($HardBlocks -eq 0) { "MEDIUM" } else { "HIGH" }
+    $Status = if ($HardBlocks -eq 0) { "VIA_PANORAMA3ROUND_VDF_VRN_REPAIR_READY" } else { "VIA_PANORAMA3ROUND_VDF_VRN_REPAIR_BLOCKED" }
+    $Recommendation = if ($HardBlocks -eq 0) { "ALLOW_V0286_USER_APPROVAL_GATE_FOR_EXECUTION_CAPABLE_SCRIPT_DESIGN_NO_DB_WRITE" } else { "BLOCK_V0286_UNTIL_REPAIRED_SCRIPT_DEFECTS_RESOLVED" }
+    $NextStep = if ($HardBlocks -eq 0) { "v028.6 user approval gate for execution-capable script design only; no DB write" } else { "repair repaired-script defects; no DB write" }
+
+    def_AddRow $Rows "Round3" "VIA" "CONSOLIDATE" "RESULT" "Repair Result" $(if ($HardBlocks -eq 0) { "WARN_REVIEW_READY" } else { "BLOCKED" }) $Risk "SEQUENTIAL_GATED" "P0" "REPAIR_ONLY" "recommendation" $Recommendation "Three-round panorama repair completed." $RepairedReviewJson
+
+    $Top10Json = Join-Path $RegistryDir "VIA_Top10_LocalFreeLibs_Panorama3Round_v02851.json"
+    $Top10 = @(
+        [pscustomobject]@{FunctionArea="NexusCore Control Plane"; Language="PowerShell"; Top10LocalFreeLibs="Pester; PSScriptAnalyzer; ThreadJob; ImportExcel; PSWriteHTML; Get-FileHash; Start-Transcript; ConvertTo-Json; ScheduledTasks; PSFramework"; UseCase="orchestration/test/report/hash/audit"}
+        [pscustomobject]@{FunctionArea="Python Core"; Language="Python"; Top10LocalFreeLibs="uv; ruff; pytest; pytest-xdist; pandas; polars; pyarrow; duckdb; pandera; pydantic"; UseCase="env/lint/test/data/schema"}
+        [pscustomobject]@{FunctionArea="Web UI"; Language="Node"; Top10LocalFreeLibs="pnpm; vitest; eslint; playwright; prettier; typescript; vite; chart.js; echarts; mermaid"; UseCase="HTML UI/user-test/report smoke"}
+        [pscustomobject]@{FunctionArea="VDF Lanes"; Language="Mixed"; Top10LocalFreeLibs="duckdb; pandas; pyarrow; polars; pydantic; pandera; pytest; Get-FileHash; Pester; PSScriptAnalyzer"; UseCase="write governance/quarantine research"}
+        [pscustomobject]@{FunctionArea="VRN Lanes"; Language="Python"; Top10LocalFreeLibs="pdfplumber; PyMuPDF; pdfminer.six; pypdf; camelot; tabula-py; opencv-python; pillow; pandas; pyarrow"; UseCase="ingestion/normalization/presentation"}
+    )
+    $Top10 | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $Top10Json -Encoding UTF8
+    def_AddRow $Rows "Round3" "VIA" "CONSOLIDATE" "LOCAL_FREE_LIBS" "Top10 Local Free Libs" "OK" "LOW" "PARALLEL_SAFE" "P2" "PLAN_ONLY" "rows" "$(@($Top10).Count)" "Top10 tool matrix generated." $Top10Json
+
+    $NextGateJson = Join-Path $PlanDir "VIA_v0286_NextGatePlan_NO_DB_WRITE.json"
+    $NextGate = [pscustomobject]@{
+        generated_at = def_Iso
+        status = $Status
+        risk = $Risk
+        recommendation = $Recommendation
+        next_step = $NextStep
+        policy = [pscustomobject]@{
+            db_write_enabled = $false
+            canonical_merge_enabled = $false
+            generated_script_executed_now = $false
+            destructive_delete = $false
+            stop_process = $false
+        }
+        ready_inputs = [pscustomobject]@{
+            repaired_script = $RepairedScript
+            repaired_script_sha256 = $RepairedHash
+            lane_plan = $LanePlanJson
+            install_plan = $InstallPlanJson
+        }
+    }
+    $NextGate | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $NextGateJson -Encoding UTF8
+    def_AddRow $Rows "Round3" "VIA" "CONSOLIDATE" "NEXT_GATE" "v028.6 Next Gate Plan" "OK_PLAN_CREATED" "LOW" "SEQUENTIAL_GATED" "P0" "PLAN_ONLY" "next_step" $NextStep "Next gate plan generated." $NextGateJson
+
+    $CsvMatrix = Join-Path $RegistryDir "VIA_Panorama3Round_VDFVRN_Matrix_v02851.csv"
+    $JsonMatrix = Join-Path $RegistryDir "VIA_Panorama3Round_VDFVRN_Matrix_v02851.json"
+    $RuntimeResultJson = Join-Path $RuntimeDir "via_panorama3round_vdf_vrn_result_v02851.json"
+    $HtmlReport = Join-Path $ReportDir "VIA_Panorama3Round_VDFVRN_Report_v02851.html"
+
+    $Rows | Export-Csv -LiteralPath $CsvMatrix -NoTypeInformation -Encoding UTF8BOM
+    $Rows | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $JsonMatrix -Encoding UTF8
+
+    $Result = [pscustomobject]@{
+        generated_at = def_Iso
+        status = $Status
+        risk = $Risk
+        ok = $script:OK
+        warn = $script:WARN
+        fail = $script:FAIL
+        project_root = $ProjectRoot
+        nexus_core = $NexusCore
+        vdf_root = $VdfRoot
+        vrn_root = $VrnRoot
+        inventory_files = @($Inventory).Count
+        powershell_files_scanned = @($PsFiles).Count
+        powershell_parse_fail_files = $PsAstFailCount
+        original_generated_script = if ($null -ne $OriginalGeneratedScript) { $OriginalGeneratedScript.FullName } else { "" }
+        repaired_script = $RepairedScript
+        repaired_script_sha256 = $RepairedHash
+        hard_blocks = $HardBlocks
+        db_write_enabled = $false
+        canonical_merge_enabled = $false
+        generated_script_executed_now = $false
+        recommendation = $Recommendation
+        next_step = $NextStep
+        artifacts = [pscustomobject]@{
+            html = $HtmlReport
+            matrix_csv = $CsvMatrix
+            matrix_json = $JsonMatrix
+            inventory_csv = $InventoryCsv
+            ps_ast_csv = $PsAstCsv
+            html_audit_csv = $HtmlAuditCsv
+            lane_plan_json = $LanePlanJson
+            repaired_review_json = $RepairedReviewJson
+            next_gate_json = $NextGateJson
+            tool_install_plan_json = $InstallPlanJson
+            guarded_install_script = $InstallScript
+        }
+    }
+    $Result | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $RuntimeResultJson -Encoding UTF8
+
+    try {
+        $ptr = if (Test-Path -LiteralPath $ActivePointer) {
+            Get-Content -LiteralPath $ActivePointer -Raw -Encoding UTF8 | ConvertFrom-Json
+        } else {
+            [pscustomobject]@{}
+        }
+        $ptr | Add-Member -NotePropertyName "latest_via_panorama3round_vdf_vrn_v02851" -NotePropertyValue ([pscustomobject]@{
+            generated_at = def_Iso
+            status = $Status
+            risk = $Risk
+            run_root = $RunRoot
+            result_json = $RuntimeResultJson
+            html = $HtmlReport
+            repaired_script = $RepairedScript
+            repaired_script_sha256 = $RepairedHash
+            hard_blocks = $HardBlocks
+            recommendation = $Recommendation
+            next_step = $NextStep
+        }) -Force
+        $ptr | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $ActivePointer -Encoding UTF8
+        def_AddRow $Rows "Round3" "VIA" "CONSOLIDATE" "POINTER" "VDF_ACTIVE_POINTER.json" "OK_UPDATED" "LOW" "PARALLEL_SAFE" "P1" "PLAN_ONLY" "update" "complete" "Active pointer updated." $ActivePointer
+    } catch {
+        def_AddRow $Rows "Round3" "VIA" "CONSOLIDATE" "POINTER" "VDF_ACTIVE_POINTER.json" "WARN_POINTER_UPDATE_FAILED" "MEDIUM" "SEQUENTIAL_GATED" "P1" "PLAN_ONLY" "error" $_.Exception.Message "Pointer update failed, but run artifacts are intact." $ActivePointer
+    }
+
+    $Rows | Export-Csv -LiteralPath $CsvMatrix -NoTypeInformation -Encoding UTF8BOM
+    $Rows | ConvertTo-Json -Depth 100 | Set-Content -LiteralPath $JsonMatrix -Encoding UTF8
+
+    $trs = foreach ($r in $Rows) {
+        $cls = if ($r.Risk -eq "HIGH" -or $r.Status -match "FAIL|FATAL|BLOCK") { "bad" }
+               elseif ($r.Risk -match "MEDIUM|REVIEW" -or $r.Status -match "WARN|REPAIR|PLAN|APPROVAL|GUARD") { "warn" }
+               else { "ok" }
+        "<tr class='$cls'><td>$(def_Html $r.Round)</td><td>$(def_Html $r.Project)</td><td>$(def_Html $r.Lane)</td><td>$(def_Html $r.Stage)</td><td>$(def_Html $r.Name)</td><td>$(def_Html $r.Status)</td><td>$(def_Html $r.Risk)</td><td>$(def_Html $r.FixClass)</td><td>$(def_Html $r.Priority)</td><td>$(def_Html $r.Mode)</td><td>$(def_Html $r.Metric)</td><td>$(def_Html $r.Value)</td><td>$(def_Html $r.Message)</td><td>$(def_Html $r.Path)</td></tr>"
+    }
+
+    $Html = @"
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA Panorama 3-Round · VDF + VRN · v028.5.1</title>
+<style>
+body{margin:0;background:#f7f4ed;color:#25312f;font-family:Arial,"Microsoft JhengHei",sans-serif}
+.wrap{max-width:1600px;margin:0 auto;padding:28px}
+.hero{border:1px solid #d8d0c3;border-radius:24px;background:#fffdf8;padding:26px;box-shadow:0 18px 50px rgba(30,40,36,.08)}
+h1{margin:0;font-size:28px}
+h2{margin-top:28px;font-size:20px}
+.sub{color:#6e7b78;margin-top:8px;line-height:1.7}
+.kpis{display:grid;grid-template-columns:repeat(8,minmax(120px,1fr));gap:12px;margin-top:20px}
+.kpi{border:1px solid #d8d0c3;border-radius:18px;padding:14px;background:#fff}
+.kpi b{font-size:22px;display:block}
+.kpi span{font-size:12px;color:#6e7b78}
+.badge{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid #d8d0c3;background:#fff;margin-right:8px;margin-top:8px}
+.ok td{background:#f3fbf5}.warn td{background:#fff8e9}.bad td{background:#fff1f1}
+.mw{overflow:auto;border:1px solid #d8d0c3;border-radius:18px;background:#fff}
+table{border-collapse:collapse;width:100%;font-size:12px}
+th{position:sticky;top:0;background:#e8eee9;color:#20332f;z-index:1}
+th,td{border-bottom:1px solid #e8e1d6;padding:9px 10px;text-align:left;vertical-align:top;white-space:nowrap}
+td:nth-child(13),td:nth-child(14){white-space:normal;min-width:320px}
+pre{white-space:pre-wrap;background:#17211f;color:#e9fff8;padding:16px;border-radius:16px;overflow:auto}
+@media(max-width:900px){.kpis{grid-template-columns:1fr}.wrap{padding:14px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hero">
+<h1>Veritas Intelligence Analytics · Panorama 3-Round · VDF + VRN · v028.5.1</h1>
+<div class="sub">NexusCore control plane · VDF write governance + quarantine research · VRN ingestion/normalization/presentation · generated script AST repair · no DATABASE write · no canonical merge</div>
+<p><span class="badge">Status: $(def_Html $Status)</span><span class="badge">Risk: $(def_Html $Risk)</span><span class="badge">Recommendation: $(def_Html $Recommendation)</span></p>
+<div class="kpis">
+<div class="kpi"><b>$script:OK</b><span>OK</span></div>
+<div class="kpi"><b>$script:WARN</b><span>WARN / REVIEW</span></div>
+<div class="kpi"><b>$script:FAIL</b><span>FAIL / BLOCK</span></div>
+<div class="kpi"><b>$(@($Inventory).Count)</b><span>Files inventoried</span></div>
+<div class="kpi"><b>$(@($PsFiles).Count)</b><span>PS files scanned</span></div>
+<div class="kpi"><b>$PsAstFailCount</b><span>PS parse fail files</span></div>
+<div class="kpi"><b>$HardBlocks</b><span>Repair hard blocks</span></div>
+<div class="kpi"><b>5</b><span>VDF/VRN lanes</span></div>
+</div>
+</div>
+
+<h2>def Matrix</h2>
+<div class="mw">
+<table>
+<thead>
+<tr><th>Round</th><th>Project</th><th>Lane</th><th>Stage</th><th>Name</th><th>Status</th><th>Risk</th><th>FixClass</th><th>Priority</th><th>Mode</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr>
+</thead>
+<tbody>$($trs -join "`n")</tbody>
+</table>
+</div>
+
+<h2>def Output Paths</h2>
+<pre>
+RunRoot                  : $RunRoot
+HTML                     : $HtmlReport
+CSV Matrix               : $CsvMatrix
+JSON Matrix              : $JsonMatrix
+Runtime Result           : $RuntimeResultJson
+Inventory CSV            : $InventoryCsv
+PowerShell AST CSV       : $PsAstCsv
+HTML Audit CSV           : $HtmlAuditCsv
+Lane Plan JSON           : $LanePlanJson
+Install Plan JSON        : $InstallPlanJson
+Guarded Install Script   : $InstallScript
+Original Script Review   : $OriginalReviewCsv
+Repaired Script          : $RepairedScript
+Repaired Script SHA256   : $RepairedHash
+Repaired Review JSON     : $RepairedReviewJson
+Next Gate JSON           : $NextGateJson
+Active Pointer           : $ActivePointer
+Transcript               : $Transcript
+</pre>
+
+<h2>def Next Gate</h2>
+<pre>
+$NextStep
+
+Policy:
+DB write = false
+Canonical merge = false
+Generated script executed now = false
+Destructive delete = false
+Stop-Process = false
+
+Recommended lane control:
+VDF lane 1 = Write Governance Lane / SEQUENTIAL_GATED
+VDF lane 2 = Quarantine Reduction Lane / PARALLEL_SAFE
+VRN lane 1 = Ingestion Lane / PARALLEL_SAFE
+VRN lane 2 = Normalization Lane / PARALLEL_SAFE
+VRN lane 3 = Presentation Lane / PARALLEL_SAFE
+</pre>
+</div>
+</body>
+</html>
+"@
+
+    Set-Content -LiteralPath $HtmlReport -Value $Html -Encoding UTF8
+
+    if ($OpenHtmlReport -and (Test-Path -LiteralPath $HtmlReport)) {
+        Start-Process -FilePath $HtmlReport | Out-Null
+    }
+
+    try { Stop-Transcript | Out-Null } catch {}
+
+    Write-Host ""
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "def VIA PANORAMA 3-ROUND · VDF + VRN · v028.5.1 COMPLETE" -ForegroundColor Cyan
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "Status                    : $Status"
+    Write-Host "Risk                      : $Risk"
+    Write-Host "RunRoot                   : $RunRoot"
+    Write-Host "HTML                      : $HtmlReport"
+    Write-Host "CSV Matrix                : $CsvMatrix"
+    Write-Host "JSON Matrix               : $JsonMatrix"
+    Write-Host "Runtime Result            : $RuntimeResultJson"
+    Write-Host "Inventory CSV             : $InventoryCsv"
+    Write-Host "PowerShell AST CSV        : $PsAstCsv"
+    Write-Host "HTML Audit CSV            : $HtmlAuditCsv"
+    Write-Host "Lane Plan JSON            : $LanePlanJson"
+    Write-Host "Install Plan JSON         : $InstallPlanJson"
+    Write-Host "Guarded Install Script    : $InstallScript"
+    Write-Host "Repaired Script           : $RepairedScript"
+    Write-Host "Repaired Script SHA256    : $RepairedHash"
+    Write-Host "Repaired Review JSON      : $RepairedReviewJson"
+    Write-Host "Next Gate JSON            : $NextGateJson"
+    Write-Host "Active Pointer            : $ActivePointer"
+    Write-Host "OK                        : $script:OK"
+    Write-Host "WARN                      : $script:WARN"
+    Write-Host "FAIL                      : $script:FAIL"
+    Write-Host "Files Inventoried         : $(@($Inventory).Count)"
+    Write-Host "PowerShell Files Scanned  : $(@($PsFiles).Count)"
+    Write-Host "PowerShell Parse Fail     : $PsAstFailCount"
+    Write-Host "Repair Hard Blocks        : $HardBlocks"
+    Write-Host "DB Write Enabled          : False"
+    Write-Host "Canonical Merge Enabled   : False"
+    Write-Host "Generated Script Executed : False"
+    Write-Host "Recommendation            : $Recommendation"
+    Write-Host "Next Step                 : $NextStep"
+    Write-Host ""
+    Write-Host "PowerShell remains open. No exit. No Stop-Process. No destructive delete." -ForegroundColor Green
+}
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 try {
+    Invoke-VIA-Panorama3Round-VDFVRN-v02851
+}
+catch {
+    Write-Host ""
+    Write-Host "================================================================================" -ForegroundColor Red
+    Write-Host "def VIA PANORAMA 3-ROUND · VDF + VRN · v028.5.1 FATAL BUT POWERSHELL STAYS OPEN" -ForegroundColor Red
+    Write-Host "================================================================================" -ForegroundColor Red
+    Write-Host "[FATAL] $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host $_.ScriptStackTrace -ForegroundColor DarkRed
+    Write-Host ""
+    Write-Host "PowerShell remains open. No exit was called." -ForegroundColor Yellow
+}
+
+================================================================================
+def VIA PANORAMA 3-ROUND · VDF + VRN · GENERATED SCRIPT REPAIR v028.5.1
+================================================================================
+Full repo scan · NexusCore control plane · VDF/VRN lanes · repair generated script AST · no DB write
+
+
+================================================================================
+def VIA PANORAMA 3-ROUND · VDF + VRN · v028.5.1 COMPLETE
+================================================================================
+Status                    : VIA_PANORAMA3ROUND_VDF_VRN_REPAIR_BLOCKED
+Risk                      : HIGH
+RunRoot                   : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333
+HTML                      : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\report\VIA_Panorama3Round_VDFVRN_Report_v02851.html
+CSV Matrix                : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\registry\VIA_Panorama3Round_VDFVRN_Matrix_v02851.csv
+JSON Matrix               : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\registry\VIA_Panorama3Round_VDFVRN_Matrix_v02851.json
+Runtime Result            : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\runtime\via_panorama3round_vdf_vrn_result_v02851.json
+Inventory CSV             : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\registry\VIA_Panorama_FileInventory_v02851.csv
+PowerShell AST CSV        : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\registry\VIA_Panorama_PowerShellAstAudit_v02851.csv
+HTML Audit CSV            : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\registry\VIA_Panorama_HtmlAudit_v02851.csv
+Lane Plan JSON            : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\plan\VIA_VDF_VRN_5Lane_Plan_v02851.json
+Install Plan JSON         : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\plan\VIA_ToolBundle_InstallPlan_GUARDED_NOT_RUN_v02851.json
+Guarded Install Script    : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\plan\Invoke-VIA-ToolBundle-Install-GUARDED-NOT-RUN-v02851.ps1
+Repaired Script           : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\repair\Invoke-VDF-AkShare-StagingWrite-REPAIRED-NOT-RUN-v02851.ps1
+Repaired Script SHA256    : F8B82A96E68A3E0BC89CA98713223D2C52E023DEE97A31FD238F63BDDC94CBBE
+Repaired Review JSON      : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\plan\VDF_AkShare_v02851_RepairedGeneratedScriptReview.json
+Next Gate JSON            : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_PANORAMA3ROUND_VDF_VRN_SCRIPT_REPAIR_v02851_20260611_104333\plan\VIA_v0286_NextGatePlan_NO_DB_WRITE.json
+Active Pointer            : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ACTIVE_POINTER.json
+OK                        : 13
+WARN                      : 5
+FAIL                      : 3
+Files Inventoried         : 19723
+PowerShell Files Scanned  : 16
+PowerShell Parse Fail     : 1
+Repair Hard Blocks        : 1
+DB Write Enabled          : False
+Canonical Merge Enabled   : False
+Generated Script Executed : False
+Recommendation            : BLOCK_V0286_UNTIL_REPAIRED_SCRIPT_DEFECTS_RESOLVED
+Next Step                 : repair repaired-script defects; no DB write
+
+PowerShell remains open. No exit. No Stop-Process. No destructive delete.
+C:\Users\tonyk
+ >
+
+PS7 #requires -Version 7.0
+C:\Users\tonyk
+ >
+
+PS7 Set-StrictMode -Version Latest
+C:\Users\tonyk
+ >
+
+PS7 $ErrorActionPreference = "Stop"
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 function Invoke-VIA-Panorama3Round-VDFVRN-OneClick-v02853 {
+    param(
+        [string]$ProjectRoot = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics",
+        [switch]$OpenHtmlReport = $true,
+        [bool]$InstallTools = $true,
+        [switch]$IncludeHeavy,
+        [switch]$IncludeNode,
+        [switch]$UseNexusCore
+    )
+
+    $script:OK = 0
+    $script:WARN = 0
+    $script:FAIL = 0
+    $script:PhaseTotal = 13
+    $script:PhaseNow = 0
+
+    # ---------------- helpers ----------------
+    function def_Stamp { Get-Date -Format "yyyyMMdd_HHmmss" }
+    function def_Iso { (Get-Date).ToString("yyyy-MM-ddTHH:mm:ss.fffK") }
+    function def_Mkdir([string]$Path) { [System.IO.Directory]::CreateDirectory($Path) | Out-Null }
+    function def_Html([AllowNull()][string]$Text) {
+        if ($null -eq $Text) { return "" }
+        return [System.Net.WebUtility]::HtmlEncode($Text)
+    }
+    function def_WriteText {
+        param([string]$Path,[string]$Text)
+        [System.IO.File]::WriteAllText($Path, $Text, [System.Text.UTF8Encoding]::new($false))
+    }
+    function def_WriteJson {
+        param([string]$Path,[object]$Obj)
+        $json = $Obj | ConvertTo-Json -Depth 100
+        def_WriteText -Path $Path -Text $json
+    }
+    function def_Csv([object]$Value) {
+        $s = if ($null -eq $Value) { "" } else { [string]$Value }
+        if ($s -match '[",\r\n]') { '"' + $s.Replace('"','""') + '"' } else { $s }
+    }
+    function def_Hash([string]$Path) {
+        try {
+            if (-not [System.IO.File]::Exists($Path)) { return "" }
+            return (Get-FileHash -LiteralPath $Path -Algorithm SHA256 -ErrorAction Stop).Hash
+        } catch { return "HASH_ERROR" }
+    }
+    function def_Phase {
+        param([string]$Name)
+        $script:PhaseNow++
+        $pct = [int](($script:PhaseNow / $script:PhaseTotal) * 100)
+        if ($pct -gt 100) { $pct = 100 }
+        Write-Progress -Id 1 -Activity "VIA Panorama 3-Round v028.5.3" -Status "[$($script:PhaseNow)/$($script:PhaseTotal)] $Name" -PercentComplete $pct
+        $bar = ('#' * [int]($pct / 5)).PadRight(20,'.')
+        Write-Host "  [$pct%] [$bar] $Name" -ForegroundColor DarkCyan
+    }
+    function def_AddRow {
+        param(
+            [System.Collections.Generic.List[object]]$Rows,
+            [string]$Round,[string]$Project,[string]$Lane,[string]$Stage,[string]$Name,
+            [string]$Status,[string]$Risk,[string]$FixClass,[string]$Priority,
+            [string]$Mode,[string]$Metric,[string]$Value,[string]$Message,[string]$Path
+        )
+        if ($Status -match '^(OK|PASS|READY)') { $script:OK++ }
+        elseif ($Status -match 'FAIL|FATAL|BLOCK') { $script:FAIL++ }
+        else { $script:WARN++ }
+
+        $Rows.Add([pscustomobject]@{
+            Round=$Round; Project=$Project; Lane=$Lane; Stage=$Stage; Name=$Name
+            Status=$Status; Risk=$Risk; FixClass=$FixClass; Priority=$Priority
+            Mode=$Mode; Metric=$Metric; Value=$Value; Message=$Message; Path=$Path
+        }) | Out-Null
+    }
+    function def_ParsePS {
+        param([string]$Path)
+        $tokens = $null
+        $errors = $null
+        $ast = [System.Management.Automation.Language.Parser]::ParseFile($Path, [ref]$tokens, [ref]$errors)
+        $errCount = if ($null -eq $errors) { 0 } else { @($errors).Count }
+        $cmds = @()
+        if ($null -ne $ast) {
+            $cmds = @(
+                $ast.FindAll({ param($n) $n -is [System.Management.Automation.Language.CommandAst] }, $true) |
+                ForEach-Object { try { $_.GetCommandName() } catch { "" } } |
+                Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+            )
+        }
+        $errRows = @()
+        if ($errCount -gt 0) {
+            $errRows = @($errors | ForEach-Object {
+                [pscustomobject]@{
+                    message = $_.Message
+                    line = $_.Extent.StartLineNumber
+                    column = $_.Extent.StartColumnNumber
+                    text = $_.Extent.Text
+                }
+            })
+        }
+        [pscustomobject]@{
+            Path = $Path
+            ParseErrorCount = $errCount
+            ParseErrors = $errRows
+            CommandCount = @($cmds).Count
+            Commands = @($cmds)
+        }
+    }
+    function def_Proc {
+        param(
+            [string]$FilePath,
+            [string[]]$Arguments = @(),
+            [int]$TimeoutSec = 600,
+            [string]$WorkDir = ""
+        )
+        $psi = [System.Diagnostics.ProcessStartInfo]::new()
+        $psi.FileName = $FilePath
+        foreach ($a in $Arguments) { [void]$psi.ArgumentList.Add($a) }
+        $psi.RedirectStandardOutput = $true
+        $psi.RedirectStandardError = $true
+        $psi.UseShellExecute = $false
+        $psi.CreateNoWindow = $true
+        if (-not [string]::IsNullOrWhiteSpace($WorkDir)) { $psi.WorkingDirectory = $WorkDir }
+        $proc = [System.Diagnostics.Process]::new()
+        $proc.StartInfo = $psi
+        try { [void]$proc.Start() }
+        catch { return [pscustomobject]@{ ExitCode = -2; TimedOut = $false; StdOut = ""; StdErr = $_.Exception.Message } }
+        $outTask = $proc.StandardOutput.ReadToEndAsync()
+        $errTask = $proc.StandardError.ReadToEndAsync()
+        $exited = $proc.WaitForExit($TimeoutSec * 1000)
+        if (-not $exited) {
+            try { $proc.Kill($true) } catch {}
+            return [pscustomobject]@{ ExitCode = -1; TimedOut = $true; StdOut = $outTask.GetAwaiter().GetResult(); StdErr = "TIMEOUT after $TimeoutSec sec" }
+        }
+        return [pscustomobject]@{
+            ExitCode = $proc.ExitCode
+            TimedOut = $false
+            StdOut = $outTask.GetAwaiter().GetResult()
+            StdErr = $errTask.GetAwaiter().GetResult()
+        }
+    }
+
+    if (-not [System.IO.Directory]::Exists($ProjectRoot)) { throw "ProjectRoot not found: $ProjectRoot" }
+
+    $Stamp = def_Stamp
+    $DictRoot = Join-Path $ProjectRoot "dict\VDF"
+    $ActiveRoot = Join-Path $DictRoot "_active"
+    $BackupRoot = Join-Path $DictRoot "_backup"
+    $DatabaseRoot = Join-Path $DictRoot "DATABASE"
+    $SupportiveRoot = Join-Path $ProjectRoot "supportive modules"
+    $NexusCore = Join-Path $SupportiveRoot "Invoke-VeritasNexusCore.ps1"
+    $VdfRoot = Join-Path $ProjectRoot "functional modules\VDF"
+    $VrnRoot = Join-Path $ProjectRoot "functional modules\VRN"
+
+    foreach ($d in @($DictRoot,$ActiveRoot,$BackupRoot,$DatabaseRoot,$SupportiveRoot,$VdfRoot,$VrnRoot)) {
+        if (-not [System.IO.Directory]::Exists($d)) { def_Mkdir $d }
+    }
+
+    $RunRoot = Join-Path $ActiveRoot "VIA_PANORAMA3ROUND_VDF_VRN_ONECLICK_v02853_$Stamp"
+    $ReportDir = Join-Path $RunRoot "report"
+    $RegistryDir = Join-Path $RunRoot "registry"
+    $PlanDir = Join-Path $RunRoot "plan"
+    $RuntimeDir = Join-Path $RunRoot "runtime"
+    $RepairDir = Join-Path $RunRoot "repair"
+    $BackupDir = Join-Path $RunRoot "backup"
+    $InstallDir = Join-Path $RunRoot "install"
+    foreach ($d in @($RunRoot,$ReportDir,$RegistryDir,$PlanDir,$RuntimeDir,$RepairDir,$BackupDir,$InstallDir)) { def_Mkdir $d }
+
+    $Rows = [System.Collections.Generic.List[object]]::new()
+    $ActivePointer = Join-Path $ActiveRoot "VDF_ACTIVE_POINTER.json"
+    $Transcript = Join-Path $RuntimeDir "VIA_Panorama3Round_VDFVRN_v02853_Transcript_$Stamp.txt"
+
+    Write-Host ""
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "def VIA PANORAMA 3-ROUND · VDF + VRN · ONE-CLICK + ACCEL v028.5.3" -ForegroundColor Cyan
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "Line-safe repair · parallel AST · one-click toolchain · env/PATH/venv · animated progress · no DB write"
+    Write-Host ""
+
+    try { Start-Transcript -LiteralPath $Transcript -Force | Out-Null } catch {}
+    if (Test-Path -LiteralPath $ActivePointer) {
+        Copy-Item -LiteralPath $ActivePointer -Destination (Join-Path $BackupDir "VDF_ACTIVE_POINTER_before_v02853_$Stamp.json") -Force
+    }
+
+    # ==========================================================================
+    # Round 0 · control plane / policy / NexusCore
+    # ==========================================================================
+    def_Phase "Round0 · control plane + policy"
+    def_AddRow $Rows "Round0" "VIA" "CONTROL_PLANE" "BOOT" "ProjectRoot" "OK" "LOW" "PARALLEL_SAFE" "P0" "ANALYZE_ONLY" "exists" "true" "Project root exists." $ProjectRoot
+    def_AddRow $Rows "Round0" "VIA" "CONTROL_PLANE" "POLICY" "No DB Write" "OK_POLICY_LOCKED" "LOW" "PARALLEL_SAFE" "P0" "ANALYZE_REPAIR_ONLY" "db_write_enabled" "false" "This run never writes DATABASE." $DatabaseRoot
+    def_AddRow $Rows "Round0" "VIA" "CONTROL_PLANE" "POLICY" "No Canonical Merge" "OK_POLICY_LOCKED" "LOW" "PARALLEL_SAFE" "P0" "ANALYZE_REPAIR_ONLY" "canonical_merge_enabled" "false" "This run never canonical-merges." $RunRoot
+    def_AddRow $Rows "Round0" "VIA" "CONTROL_PLANE" "POLICY" "No Generated Write Execution" "OK_POLICY_LOCKED" "LOW" "SEQUENTIAL_REQUIRED" "P0" "ANALYZE_REPAIR_ONLY" "generated_script_executed" "false" "Generated write script is repaired/reviewed only." $RunRoot
+    def_AddRow $Rows "Round0" "VIA" "CONTROL_PLANE" "POLICY" "Tool Install Mode" "OK_POLICY" "LOW" "SEQUENTIAL_GATED" "P0" "ONECLICK_ADDITIVE" "install_tools" "$InstallTools" "One-click toolchain is additive/idempotent only; never removes or downgrades." $InstallDir
+
+    def_Phase "Round0 · NexusCore detect"
+    if (Test-Path -LiteralPath $NexusCore) {
+        $nexusParse = def_ParsePS $NexusCore
+        if ($nexusParse.ParseErrorCount -eq 0) {
+            def_AddRow $Rows "Round0" "VIA" "NEXUSCORE" "CONTROL_PLANE" "Invoke-VeritasNexusCore.ps1" "OK_NEXUSCORE_PARSE" "LOW" "SEQUENTIAL_GATED" "P0" "CONTROL_PLANE_ONLY" "parse_errors" "0" "NexusCore exists and parses." $NexusCore
+            if ($UseNexusCore) {
+                try { . $NexusCore; def_AddRow $Rows "Round0" "VIA" "NEXUSCORE" "DOT_SOURCE" "NexusCore Dot-Source" "OK_DOTSOURCED" "LOW" "SEQUENTIAL_REQUIRED" "P0" "CONTROL_PLANE_ONLY" "dot_sourced" "true" "NexusCore dot-sourced on request." $NexusCore }
+                catch { def_AddRow $Rows "Round0" "VIA" "NEXUSCORE" "DOT_SOURCE" "NexusCore Dot-Source" "WARN_DOTSOURCE_FAILED" "MEDIUM" "SEQUENTIAL_REQUIRED" "P0" "CONTROL_PLANE_ONLY" "error" $_.Exception.Message "NexusCore dot-source failed; continuing standalone." $NexusCore }
+            }
+        } else {
+            def_AddRow $Rows "Round0" "VIA" "NEXUSCORE" "CONTROL_PLANE" "Invoke-VeritasNexusCore.ps1" "WARN_NEXUSCORE_PARSE_ERRORS" "MEDIUM" "SEQUENTIAL_REQUIRED" "P0" "CONTROL_PLANE_ONLY" "parse_errors" "$($nexusParse.ParseErrorCount)" "NexusCore has parse errors; not dot-sourced." $NexusCore
+        }
+    } else {
+        def_AddRow $Rows "Round0" "VIA" "NEXUSCORE" "CONTROL_PLANE" "Invoke-VeritasNexusCore.ps1" "WARN_NEXUSCORE_MISSING" "MEDIUM" "SEQUENTIAL_REQUIRED" "P0" "CONTROL_PLANE_ONLY" "exists" "false" "NexusCore missing." $NexusCore
+    }
+
+    # ==========================================================================
+    # Round 0 · accelerated inventory (EnumerateFiles + IgnoreInaccessible)
+    # ==========================================================================
+    def_Phase "Round0 · accelerated repo inventory"
+    $enumOpts = [System.IO.EnumerationOptions]::new()
+    $enumOpts.RecurseSubdirectories = $true
+    $enumOpts.IgnoreInaccessible = $true
+    $enumOpts.ReturnSpecialDirectories = $false
+    $enumOpts.AttributesToSkip = [System.IO.FileAttributes]::ReparsePoint
+
+    $InventoryCsv = Join-Path $RegistryDir "VIA_Panorama_FileInventory_v02853.csv"
+    $sbInv = [System.Text.StringBuilder]::new()
+    [void]$sbInv.AppendLine("bucket,name,extension,bytes,modified,path")
+
+    $psPaths = [System.Collections.Generic.List[string]]::new()
+    $htmlPaths = [System.Collections.Generic.List[string]]::new()
+    $pyPaths = [System.Collections.Generic.List[string]]::new()
+    $fileCount = 0
+
+    $cmpOI = [System.StringComparison]::OrdinalIgnoreCase
+    foreach ($p in [System.IO.Directory]::EnumerateFiles($ProjectRoot, "*", $enumOpts)) {
+        try {
+            $fileCount++
+            $fi = [System.IO.FileInfo]::new($p)
+            $ext = $fi.Extension
+            $bucket =
+                if ($p.StartsWith($VdfRoot,$cmpOI)) { "VDF" }
+                elseif ($p.StartsWith($VrnRoot,$cmpOI)) { "VRN" }
+                elseif ($p.StartsWith($SupportiveRoot,$cmpOI)) { "Supportive" }
+                elseif ($p.StartsWith($DatabaseRoot,$cmpOI)) { "VDF_DATABASE" }
+                elseif ($p.StartsWith($ActiveRoot,$cmpOI)) { "VDF_ACTIVE" }
+                else { "Other" }
+            [void]$sbInv.AppendLine( (def_Csv $bucket)+","+(def_Csv $fi.Name)+","+(def_Csv $ext)+","+$fi.Length+","+(def_Csv $fi.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss"))+","+(def_Csv $p) )
+
+            $extL = $ext.ToLowerInvariant()
+            $inScan = ($p.StartsWith($VdfRoot,$cmpOI) -or $p.StartsWith($VrnRoot,$cmpOI) -or $p.StartsWith($SupportiveRoot,$cmpOI) -or $p.StartsWith($ActiveRoot,$cmpOI))
+            if ($extL -in @(".ps1",".psm1",".psd1") -and $inScan) { $psPaths.Add($p) }
+            elseif ($extL -in @(".html",".htm")) { $htmlPaths.Add($p) }
+            elseif ($extL -eq ".py" -and ($p.StartsWith($VdfRoot,$cmpOI) -or $p.StartsWith($VrnRoot,$cmpOI) -or $p.StartsWith($SupportiveRoot,$cmpOI))) { $pyPaths.Add($p) }
+
+            if (($fileCount % 2000) -eq 0) {
+                Write-Progress -Id 2 -ParentId 1 -Activity "Repo inventory" -Status "$fileCount files scanned"
+            }
+        } catch { continue }
+    }
+    Write-Progress -Id 2 -Completed
+    [System.IO.File]::WriteAllText($InventoryCsv, $sbInv.ToString(), [System.Text.UTF8Encoding]::new($true))
+    def_AddRow $Rows "Round0" "VIA" "CONTROL_PLANE" "INVENTORY" "Full Repo Inventory" "OK_CREATED" "LOW" "PARALLEL_SAFE" "P0" "ANALYZE_ONLY" "files" "$fileCount" "Accelerated repo inventory created." $InventoryCsv
+
+    # ==========================================================================
+    # Round 0 · tool availability
+    # ==========================================================================
+    def_Phase "Round0 · tool availability"
+    $ToolNames = @("pwsh","powershell","python","py","node","npm","pnpm","git","dotnet","uv","ruff","pytest")
+    $ToolCsv = Join-Path $RegistryDir "VIA_ToolAvailability_v02853.csv"
+    $ToolRows = foreach ($t in $ToolNames) {
+        $cmd = Get-Command $t -ErrorAction SilentlyContinue
+        [pscustomobject]@{ tool = $t; found = [bool]($null -ne $cmd); path = if ($null -ne $cmd) { $cmd.Source } else { "" } }
+    }
+    $ToolRows | Export-Csv -LiteralPath $ToolCsv -NoTypeInformation -Encoding UTF8BOM
+    def_AddRow $Rows "Round0" "VIA" "TOOLING" "DISCOVERY" "Tool Availability" "OK_CREATED" "LOW" "PARALLEL_SAFE" "P1" "ANALYZE_ONLY" "tools" "$(@($ToolRows).Count)" "Tool availability matrix created." $ToolCsv
+
+    # ==========================================================================
+    # Round 0 · env / PATH / venv plan (+ corrected guarded bootstrap)
+    # ==========================================================================
+    def_Phase "Round0 · env/PATH/venv plan"
+    $VenvRoot = Join-Path $ProjectRoot ".venv"
+    $EnvPlanJson = Join-Path $PlanDir "VIA_NexusCore_EnvPathVenvPlan_v02853.json"
+    $GuardedEnvScript = Join-Path $PlanDir "Invoke-VIA-NexusCore-EnvBootstrap-GUARDED-NOT-RUN-v02853.ps1"
+
+    $PyVenvs = @(
+        [pscustomobject]@{ name="via_core"; path=(Join-Path $VenvRoot "via_core"); purpose="shared scan/report/schema/quality" }
+        [pscustomobject]@{ name="vdf_core"; path=(Join-Path $VenvRoot "vdf_core"); purpose="VDF data/duckdb/parquet" }
+        [pscustomobject]@{ name="vrn_core"; path=(Join-Path $VenvRoot "vrn_core"); purpose="VRN pdf/ocr/layout (heavy, optional)" }
+    )
+    $CoreToolLibs = @("ruff","pytest","pytest-xdist","rich","orjson")
+    $DataLibs = @("numpy>=1.24,<2.0","pandas","polars","pyarrow","duckdb","pandera","pydantic","jsonschema")
+    $HeavyLibs = @("pdfplumber","PyMuPDF","pdfminer.six","pypdf","pillow","opencv-python")
+
+    $EnvPlan = [pscustomobject]@{
+        generated_at = def_Iso
+        status = "VIA_NEXUSCORE_ENV_PATH_VENV_PLAN_READY"
+        risk = "MEDIUM"
+        nexus_core = $NexusCore
+        path_policy = "process_scope_first; no global PATH pollution; user PATH only via separate approval gate"
+        venv_root = $VenvRoot
+        python_launcher = "py -3.11 (Windows py launcher; do not use where.exe python3.11)"
+        numpy_golden_rule = ">=1.24,<2.0"
+        python_venvs = $PyVenvs
+        powershell_modules = @("Pester","PSScriptAnalyzer","ThreadJob","ImportExcel","PSWriteHTML")
+        via_core_libs = $CoreToolLibs
+        vdf_core_libs = $DataLibs
+        vrn_core_libs_heavy = $HeavyLibs
+        node_ui_libs = @("vite","typescript","vitest","eslint","prettier","playwright","chart.js","echarts","mermaid","tabulator-tables")
+    }
+    def_WriteJson -Path $EnvPlanJson -Obj $EnvPlan
+
+    $GuardedEnvLines = @(
+        '#requires -Version 7.0',
+        '',
+        'param(',
+        '    [string]$ProjectRoot = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics",',
+        '    [switch]$ExecuteInstall,',
+        '    [string]$ApprovalToken = ""',
+        ')',
+        '',
+        'Set-StrictMode -Version Latest',
+        '$ErrorActionPreference = "Stop"',
+        '',
+        '$RequiredToken = "APPROVE_VIA_NEXUSCORE_ENV_BOOTSTRAP"',
+        '$NexusCore = Join-Path $ProjectRoot "supportive modules\Invoke-VeritasNexusCore.ps1"',
+        '',
+        'if ((-not $ExecuteInstall) -or ($ApprovalToken -ne $RequiredToken)) {',
+        '    Write-Host "[REVIEW ONLY] Environment bootstrap not executed." -ForegroundColor Yellow',
+        '    Write-Host "NexusCore:" $NexusCore',
+        '    Write-Host "Future approval token: APPROVE_VIA_NEXUSCORE_ENV_BOOTSTRAP"',
+        '    Write-Host "PowerShell remains open. No exit." -ForegroundColor Green',
+        '    return',
+        '}',
+        '',
+        'throw "Execution path intentionally disabled in this guarded bootstrap. Use the main one-click installer or a separate approved gate."'
+    )
+    def_WriteText -Path $GuardedEnvScript -Text ($GuardedEnvLines -join "`r`n")
+    def_AddRow $Rows "Round0" "VIA" "TOOLING" "ENV_PLAN" "NexusCore Env/PATH/Venv Plan" "OK_PLAN_CREATED" "LOW" "SEQUENTIAL_GATED" "P1" "PLAN_ONLY" "venvs" "$(@($PyVenvs).Count)" "Env/PATH/venv plan + corrected guarded bootstrap created." $EnvPlanJson
+
+    # ==========================================================================
+    # Round 0 · ONE-CLICK toolchain install (additive / idempotent / no hang)
+    # ==========================================================================
+    def_Phase "Round0 · one-click toolchain install"
+    $InstallRows = [System.Collections.Generic.List[object]]::new()
+    $InstallResultJson = Join-Path $InstallDir "VIA_Toolchain_InstallResult_v02853.json"
+    $InstallCsv = Join-Path $InstallDir "VIA_Toolchain_InstallResult_v02853.csv"
+    $AddedPaths = [System.Collections.Generic.List[string]]::new()
+
+    # --- PowerShell modules ---
+    foreach ($m in @("Pester","PSScriptAnalyzer","ThreadJob","ImportExcel","PSWriteHTML")) {
+        $have = Get-Module -ListAvailable -Name $m -ErrorAction SilentlyContinue
+        if ($have) {
+            $InstallRows.Add([pscustomobject]@{ kind="ps_module"; target=$m; action="present"; status="OK_PRESENT"; detail="already available" }) | Out-Null
+            def_AddRow $Rows "Round0" "VIA" "TOOLING" "INSTALL_PS_MODULE" "PS Module: $m" "OK_PRESENT" "LOW" "PARALLEL_SAFE" "P1" "ONECLICK_ADDITIVE" "module" $m "Already installed." $SupportiveRoot
+        } elseif ($InstallTools) {
+            try {
+                Install-Module -Name $m -Scope CurrentUser -Force -AllowClobber -SkipPublisherCheck -ErrorAction Stop
+                $InstallRows.Add([pscustomobject]@{ kind="ps_module"; target=$m; action="installed"; status="OK_INSTALLED"; detail="CurrentUser scope" }) | Out-Null
+                def_AddRow $Rows "Round0" "VIA" "TOOLING" "INSTALL_PS_MODULE" "PS Module: $m" "OK_INSTALLED" "LOW" "PARALLEL_SAFE" "P1" "ONECLICK_ADDITIVE" "module" $m "Installed (CurrentUser)." $SupportiveRoot
+            } catch {
+                $InstallRows.Add([pscustomobject]@{ kind="ps_module"; target=$m; action="failed"; status="WARN_INSTALL_FAILED"; detail=$_.Exception.Message }) | Out-Null
+                def_AddRow $Rows "Round0" "VIA" "TOOLING" "INSTALL_PS_MODULE" "PS Module: $m" "WARN_INSTALL_FAILED" "MEDIUM" "PARALLEL_SAFE" "P1" "ONECLICK_ADDITIVE" "module" $m "Install failed; environment issue, not a gate block." $SupportiveRoot
+            }
+        } else {
+            $InstallRows.Add([pscustomobject]@{ kind="ps_module"; target=$m; action="plan"; status="WARN_PLAN_ONLY"; detail="InstallTools=false" }) | Out-Null
+            def_AddRow $Rows "Round0" "VIA" "TOOLING" "INSTALL_PS_MODULE" "PS Module: $m" "WARN_PLAN_ONLY" "MEDIUM" "PARALLEL_SAFE" "P1" "PLAN_ONLY" "module" $m "Plan only (InstallTools disabled)." $SupportiveRoot
+        }
+    }
+
+    # --- Python venvs + libs ---
+    $pyLauncher = Get-Command py -ErrorAction SilentlyContinue
+    if (-not $pyLauncher) {
+        def_AddRow $Rows "Round0" "VIA" "TOOLING" "INSTALL_VENV" "Python launcher (py)" "WARN_PY_MISSING" "MEDIUM" "SEQUENTIAL_GATED" "P1" "ONECLICK_ADDITIVE" "py" "missing" "Windows py launcher not found; skipping venv creation." $VenvRoot
+    } elseif (-not $InstallTools) {
+        def_AddRow $Rows "Round0" "VIA" "TOOLING" "INSTALL_VENV" "Python venvs" "WARN_PLAN_ONLY" "MEDIUM" "SEQUENTIAL_GATED" "P1" "PLAN_ONLY" "venvs" "0" "InstallTools disabled; venv plan only." $VenvRoot
+    } else {
+        if (-not [System.IO.Directory]::Exists($VenvRoot)) { def_Mkdir $VenvRoot }
+        foreach ($v in $PyVenvs) {
+            $venvPy = Join-Path $v.path "Scripts\python.exe"
+            if (-not [System.IO.File]::Exists($venvPy)) {
+                $r = def_Proc -FilePath $pyLauncher.Source -Arguments @("-3.11","-m","venv",$v.path) -TimeoutSec 300
+                if ($r.ExitCode -eq 0 -and [System.IO.File]::Exists($venvPy)) {
+                    $InstallRows.Add([pscustomobject]@{ kind="venv"; target=$v.name; action="created"; status="OK_INSTALLED"; detail=$v.path }) | Out-Null
+                    def_AddRow $Rows "Round0" "VIA" "TOOLING" "INSTALL_VENV" "Venv: $($v.name)" "OK_INSTALLED" "LOW" "SEQUENTIAL_GATED" "P1" "ONECLICK_ADDITIVE" "venv" $v.name "Created via py -3.11 -m venv." $v.path
+                } else {
+                    $InstallRows.Add([pscustomobject]@{ kind="venv"; target=$v.name; action="failed"; status="WARN_INSTALL_FAILED"; detail=($r.StdErr) }) | Out-Null
+                    def_AddRow $Rows "Round0" "VIA" "TOOLING" "INSTALL_VENV" "Venv: $($v.name)" "WARN_INSTALL_FAILED" "MEDIUM" "SEQUENTIAL_GATED" "P1" "ONECLICK_ADDITIVE" "venv" $v.name "Venv creation failed." $v.path
+                }
+            } else {
+                $InstallRows.Add([pscustomobject]@{ kind="venv"; target=$v.name; action="present"; status="OK_PRESENT"; detail=$v.path }) | Out-Null
+                def_AddRow $Rows "Round0" "VIA" "TOOLING" "INSTALL_VENV" "Venv: $($v.name)" "OK_PRESENT" "LOW" "SEQUENTIAL_GATED" "P1" "ONECLICK_ADDITIVE" "venv" $v.name "Venv already present." $v.path
+            }
+
+            if ([System.IO.File]::Exists($venvPy)) {
+                $AddedPaths.Add((Join-Path $v.path "Scripts")) | Out-Null
+                $up = def_Proc -FilePath $venvPy -Arguments @("-m","pip","install","--upgrade","pip","wheel","setuptools","--disable-pip-version-check") -TimeoutSec 300
+
+                $libs = @()
+                if ($v.name -eq "via_core") { $libs = $CoreToolLibs }
+                elseif ($v.name -eq "vdf_core") { $libs = $DataLibs }
+                elseif ($v.name -eq "vrn_core") { if ($IncludeHeavy) { $libs = $HeavyLibs } }
+
+                if (@($libs).Count -gt 0) {
+                    $args = @("-m","pip","install","--disable-pip-version-check") + $libs
+                    $ri = def_Proc -FilePath $venvPy -Arguments $args -TimeoutSec 900
+                    if ($ri.TimedOut) {
+                        $InstallRows.Add([pscustomobject]@{ kind="pip"; target=$v.name; action="timeout"; status="WARN_INSTALL_FAILED"; detail="pip timeout" }) | Out-Null
+                        def_AddRow $Rows "Round0" "VIA" "TOOLING" "INSTALL_PIP" "Libs: $($v.name)" "WARN_INSTALL_FAILED" "MEDIUM" "SEQUENTIAL_GATED" "P1" "ONECLICK_ADDITIVE" "venv" $v.name "pip install timed out; rerun with -IncludeHeavy off or retry." $v.path
+                    } elseif ($ri.ExitCode -eq 0) {
+                        $InstallRows.Add([pscustomobject]@{ kind="pip"; target=$v.name; action="installed"; status="OK_INSTALLED"; detail=(@($libs) -join ";") }) | Out-Null
+                        def_AddRow $Rows "Round0" "VIA" "TOOLING" "INSTALL_PIP" "Libs: $($v.name)" "OK_INSTALLED" "LOW" "SEQUENTIAL_GATED" "P1" "ONECLICK_ADDITIVE" "libs" "$(@($libs).Count)" "pip libs installed (numpy pinned >=1.24,<2.0)." $v.path
+                    } else {
+                        $tail = if ($ri.StdErr.Length -gt 400) { $ri.StdErr.Substring($ri.StdErr.Length-400) } else { $ri.StdErr }
+                        $InstallRows.Add([pscustomobject]@{ kind="pip"; target=$v.name; action="failed"; status="WARN_INSTALL_FAILED"; detail=$tail }) | Out-Null
+                        def_AddRow $Rows "Round0" "VIA" "TOOLING" "INSTALL_PIP" "Libs: $($v.name)" "WARN_INSTALL_FAILED" "MEDIUM" "SEQUENTIAL_GATED" "P1" "ONECLICK_ADDITIVE" "venv" $v.name "Some pip libs failed; environment issue." $v.path
+                    }
+                }
+            }
+        }
+        # process-scope PATH (additive, dedup, no global pollution)
+        if (@($AddedPaths).Count -gt 0) {
+            $existing = $env:PATH -split ';'
+            $newSegs = @($AddedPaths | Where-Object { $existing -notcontains $_ })
+            if (@($newSegs).Count -gt 0) {
+                $env:PATH = (($newSegs -join ';') + ';' + $env:PATH)
+                def_AddRow $Rows "Round0" "VIA" "TOOLING" "INSTALL_PATH" "Process PATH (venv Scripts)" "OK_UPDATED" "LOW" "PARALLEL_SAFE" "P1" "ONECLICK_ADDITIVE" "added" "$(@($newSegs).Count)" "Added venv Scripts to process PATH (process scope only)." $VenvRoot
+            }
+        }
+    }
+
+    if ($IncludeNode) {
+        def_AddRow $Rows "Round0" "VIA" "TOOLING" "INSTALL_NODE" "Node UI libs" "WARN_PLAN_ONLY" "MEDIUM" "SEQUENTIAL_GATED" "P2" "PLAN_ONLY" "node" "deferred" "Node UI libs deferred to a dedicated ui workspace gate." $ProjectRoot
+    }
+
+    $InstallRows | Export-Csv -LiteralPath $InstallCsv -NoTypeInformation -Encoding UTF8BOM
+    def_WriteJson -Path $InstallResultJson -Obj ([pscustomobject]@{
+        generated_at = def_Iso
+        install_tools = $InstallTools
+        include_heavy = [bool]$IncludeHeavy
+        include_node = [bool]$IncludeNode
+        added_process_paths = @($AddedPaths)
+        rows = @($InstallRows)
+    })
+
+    # ==========================================================================
+    # Round 1 · parallel PS AST audit + HTML/python inventory + lane plan
+    # ==========================================================================
+    def_Phase "Round1 · parallel PowerShell AST audit"
+    $PsAstCsv = Join-Path $RegistryDir "VIA_PowerShellAstAudit_v02853.csv"
+    $throttle = [Math]::Max(2,[Environment]::ProcessorCount)
+    $psResults = $psPaths | ForEach-Object -ThrottleLimit $throttle -Parallel {
+        $path = $_
+        $tokens = $null
+        $errors = $null
+        try {
+            $ast = [System.Management.Automation.Language.Parser]::ParseFile($path, [ref]$tokens, [ref]$errors)
+            $errCount = if ($null -eq $errors) { 0 } else { @($errors).Count }
+            $cmdCount = 0
+            if ($null -ne $ast) {
+                $cmdCount = @($ast.FindAll({ param($n) $n -is [System.Management.Automation.Language.CommandAst] }, $true)).Count
+            }
+            $errText = ""
+            if ($errCount -gt 0) {
+                $errText = (@($errors) | ForEach-Object { "L$($_.Extent.StartLineNumber):$($_.Extent.StartColumnNumber) $($_.Message)" }) -join " | "
+            }
+            [pscustomobject]@{ path=$path; parse_error_count=$errCount; command_count=$cmdCount; parse_errors=$errText }
+        } catch {
+            [pscustomobject]@{ path=$path; parse_error_count=999; command_count=0; parse_errors=$_.Exception.Message }
+        }
+    }
+    $psResults = @($psResults)
+    $psResults | Export-Csv -LiteralPath $PsAstCsv -NoTypeInformation -Encoding UTF8BOM
+    $PsParseFails = @($psResults | Where-Object { [int]$_.parse_error_count -gt 0 })
+    if (@($PsParseFails).Count -eq 0) {
+        def_AddRow $Rows "Round1" "VIA" "PARALLEL_SAFE" "AST_AUDIT" "PowerShell AST Audit" "OK_ALL_PARSE" "LOW" "PARALLEL_SAFE" "P0" "ANALYZE_ONLY" "parse_fail_files" "0" "All scanned PowerShell files parse cleanly." $PsAstCsv
+    } else {
+        def_AddRow $Rows "Round1" "VIA" "PARALLEL_SAFE" "AST_AUDIT" "PowerShell AST Audit" "WARN_PARSE_ERRORS_FOUND" "MEDIUM" "SEQUENTIAL_REQUIRED" "P0" "ANALYZE_ONLY" "parse_fail_files" "$(@($PsParseFails).Count)" "Pre-existing parse-error files detected (older guarded artifacts); only this run's repaired script is auto-contained." $PsAstCsv
+    }
+
+    def_Phase "Round1 · HTML audit"
+    $HtmlAuditCsv = Join-Path $RegistryDir "VIA_HtmlAudit_v02853.csv"
+    $HtmlAudit = foreach ($hf in $htmlPaths) {
+        $txt = ""
+        try { $txt = Get-Content -LiteralPath $hf -Raw -Encoding UTF8 -ErrorAction Stop } catch {}
+        [pscustomobject]@{
+            path = $hf
+            has_doctype = [bool]($txt -match "<!doctype")
+            has_charset = [bool]($txt -match "charset")
+            has_viewport = [bool]($txt -match "viewport")
+            has_table = [bool]($txt -match "<table")
+        }
+    }
+    @($HtmlAudit) | Export-Csv -LiteralPath $HtmlAuditCsv -NoTypeInformation -Encoding UTF8BOM
+    def_AddRow $Rows "Round1" "VIA" "PARALLEL_SAFE" "HTML_AUDIT" "HTML UI Audit" "OK_CREATED" "LOW" "PARALLEL_SAFE" "P1" "ANALYZE_ONLY" "html_files" "$(@($htmlPaths).Count)" "HTML audit matrix created." $HtmlAuditCsv
+
+    def_Phase "Round1 · Python inventory"
+    $PyInventoryCsv = Join-Path $RegistryDir "VIA_PythonInventory_v02853.csv"
+    @($pyPaths | ForEach-Object { [pscustomobject]@{ path = $_ } }) | Export-Csv -LiteralPath $PyInventoryCsv -NoTypeInformation -Encoding UTF8BOM
+    def_AddRow $Rows "Round1" "VIA" "PARALLEL_SAFE" "PYTHON_INVENTORY" "Python Inventory" "OK_CREATED" "LOW" "PARALLEL_SAFE" "P1" "ANALYZE_ONLY" "py_files" "$(@($pyPaths).Count)" "Python inventory created." $PyInventoryCsv
+
+    def_Phase "Round1 · VDF/VRN five-lane plan"
+    $LanePlanJson = Join-Path $PlanDir "VIA_VDF_VRN_5Lane_Plan_v02853.json"
+    $LanePlan = [pscustomobject]@{
+        generated_at = def_Iso
+        status = "VIA_VDF_VRN_5LANE_PLAN_READY"
+        risk = "MEDIUM"
+        no_db_write = $true
+        no_canonical_merge = $true
+        control_plane = $NexusCore
+        vdf_lanes = @(
+            [pscustomobject]@{ lane="VDF_Write_Governance_Lane"; mode="SEQUENTIAL_GATED"; next="generated script repair/review; execution-capable design only after approval" }
+            [pscustomobject]@{ lane="VDF_Quarantine_Reduction_Lane"; mode="PARALLEL_SAFE"; next="profile duplicate quarantine causes; no frozen-set mutation" }
+        )
+        vrn_lanes = @(
+            [pscustomobject]@{ lane="VRN_Ingestion_Lane"; mode="PARALLEL_SAFE"; next="source manifest and extractor capability matrix" }
+            [pscustomobject]@{ lane="VRN_Normalization_Lane"; mode="PARALLEL_SAFE"; next="schema/entity/traceability preview only" }
+            [pscustomobject]@{ lane="VRN_Presentation_Lane"; mode="PARALLEL_SAFE"; next="HTML matrix/UI smoke audit" }
+        )
+        hydra_risk_rules = @(
+            "Any shared schema change becomes SEQUENTIAL_REQUIRED.",
+            "Any DB write boundary becomes SEQUENTIAL_REQUIRED.",
+            "Any NexusCore public interface mutation becomes SEQUENTIAL_GATED.",
+            "Only inventory, lint, hash, AST, report, plan, and additive install are PARALLEL_SAFE."
+        )
+    }
+    def_WriteJson -Path $LanePlanJson -Obj $LanePlan
+    def_AddRow $Rows "Round1" "VIA" "CONTROL_PLANE" "LANE_PLAN" "VDF/VRN Five Lane Plan" "OK_PLAN_CREATED" "LOW" "PARALLEL_SAFE" "P0" "PLAN_ONLY" "lanes" "5" "Two VDF lanes and three VRN lanes planned." $LanePlanJson
+
+    # ==========================================================================
+    # Round 2 · line-safe repaired generated script (param-first, no interpolation)
+    # ==========================================================================
+    def_Phase "Round2 · line-safe generated-script repair"
+    $LatestV0284 = Get-ChildItem -LiteralPath $ActiveRoot -Directory -Filter "VDF_AKSHARE_STAGING_WRITE_SCRIPT_GENERATION_APPROVAL_v0284_*" -ErrorAction SilentlyContinue |
+        Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    $OriginalScript = $null
+    if ($null -ne $LatestV0284) {
+        $OriginalScript = Get-ChildItem -LiteralPath $LatestV0284.FullName -Recurse -File -Filter "Invoke-VDF-AkShare-StagingWrite-GENERATED-NOT-RUN-v0285.ps1" -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTime -Descending | Select-Object -First 1
+    }
+    if ($null -ne $OriginalScript) {
+        Copy-Item -LiteralPath $OriginalScript.FullName -Destination (Join-Path $BackupDir ("Original_" + $OriginalScript.Name)) -Force
+        $orig = def_ParsePS $OriginalScript.FullName
+        def_AddRow $Rows "Round2" "VDF" "Write_Governance" "ORIGINAL_SCRIPT" "Original Generated Script" $(if ($orig.ParseErrorCount -eq 0) { "OK_ORIGINAL_PARSE" } else { "WARN_ORIGINAL_PARSE_BLOCKED" }) $(if ($orig.ParseErrorCount -eq 0) { "LOW" } else { "MEDIUM" }) "SEQUENTIAL_REQUIRED" "P0" "REPAIR_ONLY" "parse_errors" "$($orig.ParseErrorCount)" "Original reviewed and backed up." $OriginalScript.FullName
+    } else {
+        def_AddRow $Rows "Round2" "VDF" "Write_Governance" "ORIGINAL_SCRIPT" "Original Generated Script" "WARN_ORIGINAL_MISSING" "MEDIUM" "SEQUENTIAL_REQUIRED" "P0" "REPAIR_ONLY" "exists" "false" "Original not found; producing clean skeleton anyway." $ActiveRoot
+    }
+
+    $RepairedScript = Join-Path $RepairDir "Invoke-VDF-AkShare-StagingWrite-REPAIRED-NOT-RUN-v02853.ps1"
+    $SafeScriptLines = @(
+        '#requires -Version 7.0',
+        '',
+        '<#',
+        'GENERATED/REPAIRED BY: VIA Panorama 3-Round v028.5.3',
+        'STATUS: REPAIRED SKELETON ONLY. NOT EXECUTED.',
+        'SAFETY: review-only default; no DATABASE write; no canonical merge;',
+        '        no delete; no Stop-Process; execution path intentionally disabled.',
+        '#>',
+        '',
+        'param(',
+        '    [string]$ProjectRoot = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics",',
+        '    [string]$ApprovalToken = "",',
+        '    [switch]$ExecuteWrite,',
+        '    [switch]$OpenHtmlReport = $true',
+        ')',
+        '',
+        'Set-StrictMode -Version Latest',
+        '$ErrorActionPreference = "Stop"',
+        '',
+        'function def_Mkdir {',
+        '    param([string]$Path)',
+        '    [System.IO.Directory]::CreateDirectory($Path) | Out-Null',
+        '}',
+        '',
+        'function def_Stamp { Get-Date -Format "yyyyMMdd_HHmmss" }',
+        '',
+        '$RequiredToken = "APPROVE_VDF_AKSHARE_STAGING_WRITE_STAGE_ONLY"',
+        '$Stamp = def_Stamp',
+        '',
+        '$DictRoot = Join-Path $ProjectRoot "dict\VDF"',
+        '$DatabaseRoot = Join-Path $DictRoot "DATABASE"',
+        '$BackupRoot = Join-Path $DictRoot "_backup"',
+        '$ActiveRoot = Join-Path $DictRoot "_active"',
+        '',
+        '$RunRoot = Join-Path $ActiveRoot "VDF_AKSHARE_STAGING_WRITE_STAGE_EXECUTION_REVIEW_v0286_REVIEW_ONLY_$Stamp"',
+        '$ReportDir = Join-Path $RunRoot "report"',
+        '$StagingDir = Join-Path $RunRoot "staging"',
+        '$RuntimeDir = Join-Path $RunRoot "runtime"',
+        '',
+        'foreach ($DirPath in @($DatabaseRoot, $BackupRoot, $ActiveRoot, $RunRoot, $ReportDir, $StagingDir, $RuntimeDir)) {',
+        '    def_Mkdir -Path $DirPath',
+        '}',
+        '',
+        'Write-Host ""',
+        'Write-Host "================================================================================" -ForegroundColor Yellow',
+        'Write-Host "def VDF AKSHARE STAGING WRITE REPAIRED SCRIPT REVIEW ONLY" -ForegroundColor Yellow',
+        'Write-Host "================================================================================" -ForegroundColor Yellow',
+        'Write-Host "This repaired script is guarded. It will not write DATABASE in this version."',
+        'Write-Host ""',
+        '',
+        'if ((-not $ExecuteWrite) -or ($ApprovalToken -ne $RequiredToken)) {',
+        '    Write-Host "[REVIEW ONLY] No write executed." -ForegroundColor Yellow',
+        '    Write-Host "Required future token: APPROVE_VDF_AKSHARE_STAGING_WRITE_STAGE_ONLY"',
+        '    Write-Host ""',
+        '    Write-Host "PowerShell remains open. No exit." -ForegroundColor Green',
+        '    return',
+        '}',
+        '',
+        'throw "Execution path intentionally disabled in v028.5.3 repaired skeleton. Build execution-capable script in a separate approved v028.6 gate."'
+    )
+    def_WriteText -Path $RepairedScript -Text ($SafeScriptLines -join "`r`n")
+
+    $RepairedParse = def_ParsePS $RepairedScript
+    $RepairedHash = def_Hash $RepairedScript
+    $RepairedText = Get-Content -LiteralPath $RepairedScript -Raw -Encoding UTF8
+
+    $ForbiddenCommands = @("Stop-Process","Remove-Item","rm","del","rmdir","Invoke-Expression","iex","Start-Process")
+    $ForbiddenFound = @($RepairedParse.Commands | Where-Object { $ForbiddenCommands -contains $_ } | Sort-Object -Unique)
+
+    $HasToken = $RepairedText -match "APPROVE_VDF_AKSHARE_STAGING_WRITE_STAGE_ONLY"
+    $HasExecuteSwitch = $RepairedText -match '\[switch\]\s*\$ExecuteWrite'
+    $HasReviewOnly = $RepairedText -match "REVIEW ONLY"
+    $HasDisabledPath = $RepairedText -match "Execution path intentionally disabled"
+    $HasNoExit = $RepairedText -match "PowerShell remains open"
+
+    $HardBlocks = 0
+    if ($RepairedParse.ParseErrorCount -eq 0) {
+        def_AddRow $Rows "Round2" "VDF" "Write_Governance" "REPAIRED_AST" "Repaired Script AST" "OK_AST_PARSE" "LOW" "SEQUENTIAL_GATED" "P0" "REPAIR_ONLY" "parse_errors" "0" "Line-safe repaired script parses cleanly." $RepairedScript
+    } else {
+        $HardBlocks++
+        $RepairedErrCsv = Join-Path $RegistryDir "VDF_AkShare_v02853_RepairedParseErrors.csv"
+        @($RepairedParse.ParseErrors) | Export-Csv -LiteralPath $RepairedErrCsv -NoTypeInformation -Encoding UTF8BOM
+        def_AddRow $Rows "Round2" "VDF" "Write_Governance" "REPAIRED_AST" "Repaired Script AST" "BLOCK_AST_PARSE_FAIL" "HIGH" "SEQUENTIAL_REQUIRED" "P0" "REPAIR_ONLY" "parse_errors" "$($RepairedParse.ParseErrorCount)" "Repaired script still has parse errors; see CSV." $RepairedErrCsv
+    }
+
+    if (@($ForbiddenFound).Count -eq 0) {
+        def_AddRow $Rows "Round2" "VDF" "Write_Governance" "REPAIRED_FORBIDDEN" "Forbidden Commands" "OK_NONE_FOUND" "LOW" "SEQUENTIAL_GATED" "P0" "REPAIR_ONLY" "commands" "0" "No forbidden command in repaired script." $RepairedScript
+    } else {
+        $HardBlocks++
+        def_AddRow $Rows "Round2" "VDF" "Write_Governance" "REPAIRED_FORBIDDEN" "Forbidden Commands" "BLOCK_FORBIDDEN_COMMANDS" "HIGH" "SEQUENTIAL_REQUIRED" "P0" "REPAIR_ONLY" "commands" ($ForbiddenFound -join ";") "Forbidden command found." $RepairedScript
+    }
+
+    if ($HasToken -and $HasExecuteSwitch -and $HasReviewOnly -and $HasDisabledPath -and $HasNoExit) {
+        def_AddRow $Rows "Round2" "VDF" "Write_Governance" "REPAIRED_GUARDS" "Guard Rails" "OK_GUARDS_PRESENT" "LOW" "SEQUENTIAL_GATED" "P0" "REPAIR_ONLY" "guards" "present" "Token/switch/review-only/disabled-execution/no-exit guards present." $RepairedScript
+    } else {
+        $HardBlocks++
+        $missing = @()
+        if (-not $HasToken) { $missing += "token" }
+        if (-not $HasExecuteSwitch) { $missing += "execute_switch" }
+        if (-not $HasReviewOnly) { $missing += "review_only" }
+        if (-not $HasDisabledPath) { $missing += "disabled_path" }
+        if (-not $HasNoExit) { $missing += "no_exit_text" }
+        def_AddRow $Rows "Round2" "VDF" "Write_Governance" "REPAIRED_GUARDS" "Guard Rails" "BLOCK_GUARDS_MISSING" "HIGH" "SEQUENTIAL_REQUIRED" "P0" "REPAIR_ONLY" "missing" ($missing -join ";") "Required guard rails missing." $RepairedScript
+    }
+
+    $RepairedReviewJson = Join-Path $PlanDir "VDF_AkShare_v02853_RepairedGeneratedScriptReview.json"
+    def_WriteJson -Path $RepairedReviewJson -Obj ([pscustomobject]@{
+        generated_at = def_Iso
+        status = if ($HardBlocks -eq 0) { "VDF_AKSHARE_GENERATED_SCRIPT_REPAIR_READY" } else { "VDF_AKSHARE_GENERATED_SCRIPT_REPAIR_BLOCKED" }
+        risk = if ($HardBlocks -eq 0) { "MEDIUM" } else { "HIGH" }
+        repaired_script = $RepairedScript
+        repaired_sha256 = $RepairedHash
+        parse_errors = $RepairedParse.ParseErrorCount
+        forbidden_commands = @($ForbiddenFound)
+        hard_blocks = $HardBlocks
+        script_executed_now = $false
+        db_write_enabled = $false
+        canonical_merge_enabled = $false
+        guards = [pscustomobject]@{ token=$HasToken; execute_switch=$HasExecuteSwitch; review_only=$HasReviewOnly; disabled_execution=$HasDisabledPath; no_exit_text=$HasNoExit }
+    })
+
+    # ==========================================================================
+    # Round 3 · consolidate: Top10 libs / next gate / matrix / animated HTML
+    # ==========================================================================
+    def_Phase "Round3 · Top10 libs + next-gate plan"
+    $Status = if ($HardBlocks -eq 0) { "VIA_PANORAMA3ROUND_VDF_VRN_ONECLICK_READY" } else { "VIA_PANORAMA3ROUND_VDF_VRN_ONECLICK_BLOCKED" }
+    $Risk = if ($HardBlocks -eq 0) { "MEDIUM" } else { "HIGH" }
+    $Recommendation = if ($HardBlocks -eq 0) { "ALLOW_V0286_USER_APPROVAL_GATE_FOR_EXECUTION_CAPABLE_SCRIPT_DESIGN_NO_DB_WRITE" } else { "BLOCK_V0286_UNTIL_REPAIRED_SCRIPT_DEFECTS_RESOLVED" }
+    $NextStep = if ($HardBlocks -eq 0) { "v028.6 user approval gate for execution-capable script design only; no DB write" } else { "repair repaired-script defects; no DB write" }
+
+    def_AddRow $Rows "Round3" "VIA" "CONSOLIDATE" "RESULT" "Repair Result" $(if ($HardBlocks -eq 0) { "READY_REVIEW" } else { "BLOCKED" }) $Risk "SEQUENTIAL_GATED" "P0" "REPAIR_ONLY" "recommendation" $Recommendation "Three-round panorama repair completed." $RepairedReviewJson
+
+    $Top10Json = Join-Path $RegistryDir "VIA_Top10_LocalFreeLibs_ByFunctionLanguage_v02853.json"
+    $Top10Csv = Join-Path $RegistryDir "VIA_Top10_LocalFreeLibs_ByFunctionLanguage_v02853.csv"
+    $Top10 = @(
+        [pscustomobject]@{FunctionArea="Control Plane / Orchestration"; Language="PowerShell"; Top10LocalFreeLibs="Pester; PSScriptAnalyzer; ThreadJob; ImportExcel; PSWriteHTML; Get-FileHash; Start-Transcript; ConvertTo-Json; ScheduledTasks; PSFramework"; UseCase="NexusCore orchestration, test, report, audit"}
+        [pscustomobject]@{FunctionArea="Testing"; Language="Python"; Top10LocalFreeLibs="pytest; unittest; hypothesis; tox; nox; pytest-xdist; pytest-cov; pytest-mock; robotframework; locust"; UseCase="unit, property, parallel, coverage, load"}
+        [pscustomobject]@{FunctionArea="Debugging"; Language="Python"; Top10LocalFreeLibs="pdb; ipdb; debugpy; pudb; logging; faulthandler; icecream; rich; py-spy; memory_profiler"; UseCase="trace, debug, log, stack, memory"}
+        [pscustomobject]@{FunctionArea="Optimization / Profiling"; Language="Python"; Top10LocalFreeLibs="cProfile; pstats; scalene; py-spy; line_profiler; memory_profiler; snakeviz; numba; cython; polars"; UseCase="performance, memory, vectorization"}
+        [pscustomobject]@{FunctionArea="Data / Schema"; Language="Python"; Top10LocalFreeLibs="pandas; polars; pyarrow; duckdb; pandera; pydantic; jsonschema; frictionless; great_expectations; orjson"; UseCase="VDF/VRN data contracts"}
+        [pscustomobject]@{FunctionArea="PDF / OCR / Extraction"; Language="Python"; Top10LocalFreeLibs="pdfplumber; PyMuPDF; pdfminer.six; pypdf; camelot-py; tabula-py; opencv-python; pillow; pytesseract; pandas"; UseCase="VRN ingestion"}
+        [pscustomobject]@{FunctionArea="Testing"; Language="JavaScript/Node"; Top10LocalFreeLibs="vitest; jest; mocha; jasmine; playwright; cypress; testing-library; karma; puppeteer; tap"; UseCase="UI/API/user-test"}
+        [pscustomobject]@{FunctionArea="Debugging"; Language="JavaScript/Node"; Top10LocalFreeLibs="Chrome DevTools; Node Inspector; VS Code Debugger; source-map-support; debug; ndb; node-inspect; React DevTools; Redux DevTools; why-is-node-running"; UseCase="frontend/node diagnostics"}
+        [pscustomobject]@{FunctionArea="Optimization / Profiling"; Language="JavaScript/Node"; Top10LocalFreeLibs="Lighthouse; clinic.js; autocannon; Artillery; webpack-bundle-analyzer; source-map-explorer; sitespeed.io; esbuild-analyzer; rollup-plugin-visualizer; vite-bundle-visualizer"; UseCase="HTML/UI performance"}
+        [pscustomobject]@{FunctionArea="HTML / Reporting UI"; Language="JavaScript/HTML"; Top10LocalFreeLibs="Tabulator; DataTables; ECharts; Chart.js; D3.js; Mermaid; Bootstrap; Tailwind CSS; AG Grid Community; DOMPurify"; UseCase="Matrix report and dashboard"}
+        [pscustomobject]@{FunctionArea="Testing"; Language="C#/.NET"; Top10LocalFreeLibs="xUnit; NUnit; MSTest; FluentAssertions; Moq; NSubstitute; SpecFlow; Bogus; BenchmarkDotNet; bUnit"; UseCase="future .NET module testing"}
+        [pscustomobject]@{FunctionArea="Debugging / Profiling"; Language="C#/.NET"; Top10LocalFreeLibs="VS Community Debugger; VS Code C# Debugger; PerfView; dotnet-trace; dotnet-counters; dotnet-dump; dotnet-gcdump; ILSpy; Serilog; NLog"; UseCase="future .NET diagnostics"}
+        [pscustomobject]@{FunctionArea="PowerShell Quality"; Language="PowerShell"; Top10LocalFreeLibs="Pester; PSScriptAnalyzer; PSProfiler; ThreadJob; ImportExcel; PSWriteHTML; Pode; BurntToast; PSFramework; PlatyPS"; UseCase="script QA, reporting, docs"}
+        [pscustomobject]@{FunctionArea="Environment / Install"; Language="Mixed"; Top10LocalFreeLibs="uv; venv; pip-tools; pipx; pnpm; npm; nvm-windows; dotnet CLI; winget; Chocolatey"; UseCase="venv, PATH, package bootstrap"}
+    )
+    $Top10 | Export-Csv -LiteralPath $Top10Csv -NoTypeInformation -Encoding UTF8BOM
+    def_WriteJson -Path $Top10Json -Obj $Top10
+    def_AddRow $Rows "Round3" "VIA" "CONSOLIDATE" "TOP10_LIBS" "Top10 Local Free Libs" "OK_CREATED" "LOW" "PARALLEL_SAFE" "P2" "PLAN_ONLY" "rows" "$(@($Top10).Count)" "Top10 libs by function/language created." $Top10Csv
+
+    $NextGateJson = Join-Path $PlanDir "VIA_v0286_NextGatePlan_NO_DB_WRITE_v02853.json"
+    def_WriteJson -Path $NextGateJson -Obj ([pscustomobject]@{
+        generated_at = def_Iso
+        status = $Status
+        risk = $Risk
+        recommendation = $Recommendation
+        next_step = $NextStep
+        policy = [pscustomobject]@{ db_write_enabled=$false; canonical_merge_enabled=$false; generated_script_executed_now=$false; destructive_delete=$false; stop_process=$false }
+        ready_inputs = [pscustomobject]@{ repaired_script=$RepairedScript; repaired_script_sha256=$RepairedHash; env_plan=$EnvPlanJson; lane_plan=$LanePlanJson; install_result=$InstallResultJson; top10_libs=$Top10Json }
+    })
+    def_AddRow $Rows "Round3" "VIA" "CONSOLIDATE" "NEXT_GATE" "v028.6 Next Gate" "OK_PLAN_CREATED" "LOW" "SEQUENTIAL_GATED" "P0" "PLAN_ONLY" "next_step" $NextStep "Next gate plan created." $NextGateJson
+
+    # ---- matrices (written once) ----
+    def_Phase "Round3 · matrix + animated HTML report"
+    $CsvMatrix = Join-Path $RegistryDir "VIA_Panorama3Round_VDFVRN_Matrix_v02853.csv"
+    $JsonMatrix = Join-Path $RegistryDir "VIA_Panorama3Round_VDFVRN_Matrix_v02853.json"
+    $RuntimeResultJson = Join-Path $RuntimeDir "via_panorama3round_vdf_vrn_result_v02853.json"
+    $HtmlReport = Join-Path $ReportDir "VIA_Panorama3Round_VDFVRN_Report_v02853.html"
+
+    $Rows | Export-Csv -LiteralPath $CsvMatrix -NoTypeInformation -Encoding UTF8BOM
+    def_WriteJson -Path $JsonMatrix -Obj @($Rows)
+
+    def_WriteJson -Path $RuntimeResultJson -Obj ([pscustomobject]@{
+        generated_at = def_Iso
+        status = $Status
+        risk = $Risk
+        ok = $script:OK
+        warn = $script:WARN
+        fail = $script:FAIL
+        files_inventoried = $fileCount
+        powershell_files_scanned = @($psPaths).Count
+        powershell_parse_fail_files = @($PsParseFails).Count
+        repaired_script = $RepairedScript
+        repaired_script_sha256 = $RepairedHash
+        repair_hard_blocks = $HardBlocks
+        install_tools = $InstallTools
+        include_heavy = [bool]$IncludeHeavy
+        db_write_enabled = $false
+        canonical_merge_enabled = $false
+        generated_script_executed_now = $false
+        recommendation = $Recommendation
+        next_step = $NextStep
+    })
+
+    try {
+        $ptr = if (Test-Path -LiteralPath $ActivePointer) { Get-Content -LiteralPath $ActivePointer -Raw -Encoding UTF8 | ConvertFrom-Json } else { [pscustomobject]@{} }
+        $ptr | Add-Member -NotePropertyName "latest_via_panorama3round_vdf_vrn_v02853" -NotePropertyValue ([pscustomobject]@{
+            generated_at = def_Iso
+            status = $Status
+            risk = $Risk
+            run_root = $RunRoot
+            result_json = $RuntimeResultJson
+            html = $HtmlReport
+            repaired_script = $RepairedScript
+            repaired_script_sha256 = $RepairedHash
+            repair_hard_blocks = $HardBlocks
+            recommendation = $Recommendation
+            next_step = $NextStep
+        }) -Force
+        def_WriteJson -Path $ActivePointer -Obj $ptr
+        def_AddRow $Rows "Round3" "VIA" "CONSOLIDATE" "POINTER" "VDF_ACTIVE_POINTER.json" "OK_UPDATED" "LOW" "PARALLEL_SAFE" "P1" "PLAN_ONLY" "update" "complete" "Active pointer updated." $ActivePointer
+    } catch {
+        def_AddRow $Rows "Round3" "VIA" "CONSOLIDATE" "POINTER" "VDF_ACTIVE_POINTER.json" "WARN_POINTER_UPDATE_FAILED" "MEDIUM" "SEQUENTIAL_GATED" "P1" "PLAN_ONLY" "error" $_.Exception.Message "Pointer update failed; artifacts remain intact." $ActivePointer
+    }
+
+    # rewrite matrices once more to include the pointer row
+    $Rows | Export-Csv -LiteralPath $CsvMatrix -NoTypeInformation -Encoding UTF8BOM
+    def_WriteJson -Path $JsonMatrix -Obj @($Rows)
+
+    # ---- animated HTML ----
+    $Total = [Math]::Max(1, ($script:OK + $script:WARN + $script:FAIL))
+    $OkPct = [Math]::Round((($script:OK / $Total) * 100), 1)
+    $WarnPct = [Math]::Round((($script:WARN / $Total) * 100), 1)
+    $FailPct = [Math]::Round((($script:FAIL / $Total) * 100), 1)
+
+    $trs = foreach ($r in $Rows) {
+        $cls = if ($r.Risk -eq "HIGH" -or $r.Status -match "FAIL|FATAL|BLOCK") { "bad" }
+               elseif ($r.Status -match '^(OK|PASS|READY)') { "ok" }
+               else { "warn" }
+        "<tr class='$cls'><td>$(def_Html $r.Round)</td><td>$(def_Html $r.Project)</td><td>$(def_Html $r.Lane)</td><td>$(def_Html $r.Stage)</td><td>$(def_Html $r.Name)</td><td>$(def_Html $r.Status)</td><td>$(def_Html $r.Risk)</td><td>$(def_Html $r.FixClass)</td><td>$(def_Html $r.Priority)</td><td>$(def_Html $r.Mode)</td><td>$(def_Html $r.Metric)</td><td>$(def_Html $r.Value)</td><td>$(def_Html $r.Message)</td><td>$(def_Html $r.Path)</td></tr>"
+    }
+
+    $Html = @"
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA Panorama 3-Round VDF VRN One-Click v028.5.3</title>
+<style>
+body{margin:0;background:#f7f4ed;color:#25312f;font-family:Arial,"Microsoft JhengHei",sans-serif}
+.wrap{max-width:1640px;margin:0 auto;padding:28px}
+.hero{border:1px solid #d8d0c3;border-radius:24px;background:#fffdf8;padding:26px;box-shadow:0 18px 50px rgba(30,40,36,.08)}
+h1{margin:0;font-size:26px}h2{margin-top:28px;font-size:20px}.sub{color:#6e7b78;margin-top:8px;line-height:1.7}
+.kpis{display:grid;grid-template-columns:repeat(8,minmax(110px,1fr));gap:12px;margin-top:20px}
+.kpi{border:1px solid #d8d0c3;border-radius:18px;padding:14px;background:#fff}.kpi b{font-size:22px;display:block}.kpi span{font-size:12px;color:#6e7b78}
+.badge{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid #d8d0c3;background:#fff;margin-right:8px;margin-top:8px}
+.prog{margin-top:20px}
+.plabel{font-size:13px;color:#6e7b78;margin-bottom:6px}
+.pbar{height:16px;border-radius:999px;background:#e8e1d6;overflow:hidden}
+.pfill{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,#439a9a,#4c78a8);background-size:200% 100%;transition:width 1.4s cubic-bezier(.2,.8,.2,1);animation:sh 2.4s linear infinite}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.stack{display:flex;height:16px;border-radius:999px;overflow:hidden;margin-top:10px;border:1px solid #d8d0c3}
+.s-ok{background:#439a9a;transition:width 1.4s ease}.s-warn{background:#caa14a;transition:width 1.4s ease}.s-bad{background:#b4564f;transition:width 1.4s ease}
+.ok td{background:#f3fbf5}.warn td{background:#fff8e9}.bad td{background:#fff1f1}
+.mw{overflow:auto;border:1px solid #d8d0c3;border-radius:18px;background:#fff;margin-top:10px}
+table{border-collapse:collapse;width:100%;font-size:12px}
+th{position:sticky;top:0;background:#e8eee9;color:#20332f;z-index:1}
+th,td{border-bottom:1px solid #e8e1d6;padding:9px 10px;text-align:left;vertical-align:top;white-space:nowrap}
+td:nth-child(13),td:nth-child(14){white-space:normal;min-width:320px}
+pre{white-space:pre-wrap;background:#17211f;color:#e9fff8;padding:16px;border-radius:16px;overflow:auto}
+@media(max-width:900px){.kpis{grid-template-columns:1fr}.wrap{padding:14px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="hero">
+<h1>Veritas Intelligence Analytics · Panorama 3-Round · VDF + VRN · One-Click v028.5.3</h1>
+<div class="sub">NexusCore control plane · accelerated inventory · parallel AST · one-click toolchain (PS modules + venv + PATH) · line-safe repaired script · animated progress · no DATABASE write · no canonical merge</div>
+<p><span class="badge">Status: $(def_Html $Status)</span><span class="badge">Risk: $(def_Html $Risk)</span><span class="badge">Recommendation: $(def_Html $Recommendation)</span></p>
+<div class="prog">
+<div class="plabel">Pipeline completion</div>
+<div class="pbar"><div class="pfill" id="pfill"></div></div>
+<div class="stack" title="OK / WARN / FAIL">
+<div class="s-ok" id="sok" style="width:0%"></div>
+<div class="s-warn" id="swarn" style="width:0%"></div>
+<div class="s-bad" id="sbad" style="width:0%"></div>
+</div>
+</div>
+<div class="kpis">
+<div class="kpi"><b>$script:OK</b><span>OK</span></div>
+<div class="kpi"><b>$script:WARN</b><span>WARN / REVIEW</span></div>
+<div class="kpi"><b>$script:FAIL</b><span>FAIL / BLOCK</span></div>
+<div class="kpi"><b>$fileCount</b><span>Files</span></div>
+<div class="kpi"><b>$(@($psPaths).Count)</b><span>PS scanned</span></div>
+<div class="kpi"><b>$(@($PsParseFails).Count)</b><span>PS parse fail</span></div>
+<div class="kpi"><b>$HardBlocks</b><span>Repair hard blocks</span></div>
+<div class="kpi"><b>5</b><span>VDF/VRN lanes</span></div>
+</div>
+</div>
+
+<h2>def Matrix</h2>
+<div class="mw">
+<table>
+<thead><tr><th>Round</th><th>Project</th><th>Lane</th><th>Stage</th><th>Name</th><th>Status</th><th>Risk</th><th>FixClass</th><th>Priority</th><th>Mode</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr></thead>
+<tbody>$($trs -join "`n")</tbody>
+</table>
+</div>
+
+<h2>def Output Paths</h2>
+<pre>
+RunRoot                 : $RunRoot
+HTML                    : $HtmlReport
+CSV Matrix              : $CsvMatrix
+JSON Matrix             : $JsonMatrix
+Runtime Result          : $RuntimeResultJson
+Inventory CSV           : $InventoryCsv
+PowerShell AST CSV      : $PsAstCsv
+HTML Audit CSV          : $HtmlAuditCsv
+Python Inventory CSV    : $PyInventoryCsv
+Env/PATH/Venv Plan      : $EnvPlanJson
+Guarded Env Script      : $GuardedEnvScript
+Install Result JSON     : $InstallResultJson
+Install Result CSV      : $InstallCsv
+Lane Plan JSON          : $LanePlanJson
+Repaired Script         : $RepairedScript
+Repaired Script SHA256  : $RepairedHash
+Repaired Review JSON    : $RepairedReviewJson
+Top10 Libs CSV          : $Top10Csv
+Next Gate JSON          : $NextGateJson
+Active Pointer          : $ActivePointer
+Transcript              : $Transcript
+</pre>
+
+<h2>def Next Gate</h2>
+<pre>
+$NextStep
+
+Policy:
+DB write = false
+Canonical merge = false
+Generated script executed now = false
+Install mode = one-click additive/idempotent (InstallTools=$InstallTools, IncludeHeavy=$([bool]$IncludeHeavy))
+Destructive delete = false
+Stop-Process = false
+
+Lane control:
+VDF lane 1 = Write Governance Lane / SEQUENTIAL_GATED
+VDF lane 2 = Quarantine Reduction Lane / PARALLEL_SAFE
+VRN lane 1 = Ingestion Lane / PARALLEL_SAFE
+VRN lane 2 = Normalization Lane / PARALLEL_SAFE
+VRN lane 3 = Presentation Lane / PARALLEL_SAFE
+</pre>
+</div>
+<script>
+window.addEventListener('load',function(){
+  setTimeout(function(){
+    document.getElementById('pfill').style.width='100%';
+    document.getElementById('sok').style.width='$OkPct%';
+    document.getElementById('swarn').style.width='$WarnPct%';
+    document.getElementById('sbad').style.width='$FailPct%';
+  },180);
+});
+</script>
+</body>
+</html>
+"@
+    def_WriteText -Path $HtmlReport -Text $Html
+
+    try {
+        $ptr2 = Get-Content -LiteralPath $ActivePointer -Raw -Encoding UTF8 | ConvertFrom-Json
+        $ptr2.latest_via_panorama3round_vdf_vrn_v02853 | Add-Member -NotePropertyName "report" -NotePropertyValue $HtmlReport -Force
+        def_WriteJson -Path $ActivePointer -Obj $ptr2
+    } catch {}
+
+    Write-Progress -Id 1 -Completed
+    if ($OpenHtmlReport -and (Test-Path -LiteralPath $HtmlReport)) { Start-Process -FilePath $HtmlReport | Out-Null }
+    try { Stop-Transcript | Out-Null } catch {}
+
+    Write-Host ""
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "def VIA PANORAMA 3-ROUND · VDF + VRN · ONE-CLICK v028.5.3 COMPLETE" -ForegroundColor Cyan
+    Write-Host "================================================================================" -ForegroundColor Cyan
+    Write-Host "Status                    : $Status"
+    Write-Host "Risk                      : $Risk"
+    Write-Host "RunRoot                   : $RunRoot"
+    Write-Host "HTML                      : $HtmlReport"
+    Write-Host "Repaired Script           : $RepairedScript"
+    Write-Host "Repaired Script SHA256    : $RepairedHash"
+    Write-Host "Install Result JSON       : $InstallResultJson"
+    Write-Host "Env/PATH/Venv Plan        : $EnvPlanJson"
+    Write-Host "OK                        : $script:OK"
+    Write-Host "WARN                      : $script:WARN"
+    Write-Host "FAIL                      : $script:FAIL"
+    Write-Host "Files Inventoried         : $fileCount"
+    Write-Host "PowerShell Files Scanned  : $(@($psPaths).Count)"
+    Write-Host "PowerShell Parse Fail     : $(@($PsParseFails).Count)"
+    Write-Host "Repair Hard Blocks        : $HardBlocks"
+    Write-Host "Install Tools             : $InstallTools (Heavy=$([bool]$IncludeHeavy))"
+    Write-Host "DB Write Enabled          : False"
+    Write-Host "Canonical Merge Enabled   : False"
+    Write-Host "Generated Script Executed : False"
+    Write-Host "Recommendation            : $Recommendation"
+    Write-Host "Next Step                 : $NextStep"
+    Write-Host ""
+    Write-Host "PowerShell remains open. No exit. No Stop-Process. No destructive delete." -ForegroundColor Green
+}
+C:\Users\tonyk
+ >
+
+C:\Users\tonyk
+ >
+
+PS7 try {
+    Invoke-VIA-Panorama3Round-VDFVRN-OneClick-v02853
+}
+catch {
+    Write-Host ""
+    Write-Host "================================================================================" -ForegroundColor Red
+    Write-Host "def VIA PANORAMA 3-ROUND · VDF + VRN · v028.5.3 FATAL BUT POWERSHELL STAYS OPEN" -ForegroundColor Red
+    Write-Host "================================================================================" -ForegroundColor Red
+    Write-Host "[FATAL] $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host $_.ScriptStackTrace -ForegroundColor DarkRed
+    Write-Host ""
+    Write-Host "PowerShell remains open. No exit was called." -ForegroundColor Yellow
+}
+
+================================================================================
+def VIA PANORAMA 3-ROUND · VDF + VRN · ONE-CLICK + ACCEL v028.5.3
+================================================================================
+Line-safe repair · parallel AST · one-click toolchain · env/PATH/venv · animated progress · no DB write
+
+  [8%] [##..................] Round0 · control plane + policy
+  [15%] [###.................] Round0 · NexusCore detect
+  [23%] [#####...............] Round0 · accelerated repo inventory
+  [31%] [######..............] Round0 · tool availability
+  [38%] [########............] Round0 · env/PATH/venv plan
+  [46%] [#########...........] Round0 · one-click toolchain install

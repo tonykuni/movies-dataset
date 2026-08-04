@@ -1,0 +1,38 @@
+{
+  "staging": "VIA_Rescue_Staging_20260802",
+  "classified_at": "2026-08-02",
+  "validation": {
+    "python": "3/3 loose modules + 62/62 PMIS-Lite modules pass py_compile",
+    "powershell": "5/5 staged scripts parse with 0 AST errors (PowerShell 7.4)"
+  },
+  "promotions": [
+    {
+      "target": "VIA_Governance_Runtime/v0162C/",
+      "files": ["engine/via_system_manager_engine_v0162C.py", "bin/Invoke-VIA-SystemManager-AllInOne-v0162C.ps1", "VIA_SystemManager_v0162C_Manifest.json"],
+      "note": "v0162C engine diffs from v0162B by version strings only (7 lines, no logic change); promoted as the successor lineage alongside v0162B"
+    },
+    {
+      "target": "VIA_Governance_Runtime/installers/",
+      "files": ["VIAv0162BMaster.ps1", "VIA-v0162B-Master.ps1.ps1", "Install-VIA-v0162B-Complete.ps1.ps1", "Start-VIA-SystemManager.variant.ps1"],
+      "note": "Start-VIA-SystemManager renamed .variant — content differs from the tracked VIA-root StartVIASystemManager.ps1"
+    },
+    {
+      "target": "functional modules/VDF/engine/candidates/",
+      "files": ["sector_rotation_capital_flow_engine.py"],
+      "note": "Market-data engine draft; candidate status per intake policy (no automatic promotion to active VDF engine)"
+    },
+    {
+      "target": "supportive modules/PMIS-Lite/",
+      "files": ["entire PMIS-Lite tree (62 python modules, adapters, SSOT stores, sample data)"],
+      "note": "Standalone project-management ingestion system; promoted out of staging as its own supportive module"
+    }
+  ],
+  "removed_identical_to_repo_canonical": [
+    {"file": "via_system_manager_engine_v0162B (1).py", "canonical": "VIA_Governance_Runtime/v0162B/engine/via_system_manager_engine_v0162B.py"},
+    {"file": "VIA Chart Layout Spec ONE - Standalone.html", "canonical": "functional modules/VAP/spec/VIA_Chart_Layout_Spec_ONE_Standalone.html"}
+  ],
+  "retained_for_operator_review": [
+    {"file": "VIA_SystemManager_v0162B_Manifest (1).json", "reason": "Pre-integration variant: flat layout, different AllInOne hash (143477 bytes / e6155465…) vs the tracked integration-build manifest — historical record"},
+    {"file": "VIA_Unified_ReadableUI_v0161B_Manifest (1).json", "reason": "No repo counterpart; v0161B ReadableUI lineage reference"}
+  ]
+}

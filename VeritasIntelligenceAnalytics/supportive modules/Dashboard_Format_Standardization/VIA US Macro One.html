@@ -1,0 +1,51 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · 美國總經一體 · US Macro ONE</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--blue:#4c78a8;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--vi:#7a6daa;}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg);height:100%}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:12px;line-height:1.5;display:flex;flex-direction:column}
+.hd{padding:10px 8px 0}
+h1{font:800 19px/1.2 'Syne','Noto Sans TC',sans-serif;color:var(--ink);display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+h1::before{content:"";display:inline-block;width:5px;height:20px;background:var(--vi);border-radius:2px;transform:translateY(3px);margin-right:2px}
+h1 .flow{font:500 10px 'DM Mono',monospace;color:var(--mut2)}
+.tabs{display:flex;gap:20px;flex-wrap:wrap;margin:10px 0 0;border-bottom:2px solid var(--soft)}
+.tab{font:700 12px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);padding:8px 2px 10px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap;flex-shrink:0}
+.tab.on{color:var(--vi);border-bottom-color:var(--vi)}
+.tab .no{font:700 9px 'DM Mono',monospace;color:var(--mut2);margin-right:5px}
+.meta{display:flex;gap:10px;align-items:center;padding:6px 8px;font:500 10px 'DM Mono',monospace;color:var(--mut)}
+.meta .code{color:var(--vi);font-weight:700}
+.meta a{margin-left:auto;font:700 9px 'DM Mono',monospace;color:var(--ink2);border:1px solid var(--line);border-radius:4px;padding:4px 8px;text-decoration:none;background:var(--paper2)}
+.stage{flex:1;min-height:0}
+iframe{width:100%;height:100%;border:none;border-top:1px solid var(--line);background:#fff}
+</style></head><body>
+<div class="hd">
+ <h1>美國總經一體 · US Macro ONE <span class="flow">矩陣 × 脈動 × 母版 合一 · 零複本 · VIA-M-USMONE</span></h1>
+ <div class="tabs" id="tabs"></div>
+</div>
+<div class="meta"><span id="mCode" class="code"></span><span id="mFile"></span><a id="mOpen" href="#" target="_blank">↗ 開新視窗</a><a href="VIA Economics One.html">🌐 總經一體</a><a href="VIA Master Console.html">🎛 主控台</a></div>
+<div class="stage"><iframe id="fr" title="us macro module"></iframe></div>
+<script>
+const ALL=[
+ {no:"41", t:"美國總經矩陣", code:"VIA-M-USMACRO", file:"uploads/VIA_US_Macro_Matrix_Dashboard-fa3aeb51.html"},
+ {no:"42", t:"美國總經脈動", code:"VIA-M-USPULSE", file:"VIA US Macro Pulse.dc.html"},
+ {no:"77", t:"美國總經母版", code:"VIA-M-USMT", file:"uploads/VIA_US_Macro_Template-4aac936e.html"}
+];
+const $=s=>document.querySelector(s);
+let CUR=0;
+const P=new URLSearchParams(location.search);
+if(P.get("m")){const i=ALL.findIndex(e=>e.code===P.get("m")||e.no===P.get("m"));if(i>=0)CUR=i;}
+function render(){
+ $("#tabs").innerHTML=ALL.map((e,i)=>'<div class="tab'+(i===CUR?" on":"")+'" data-i="'+i+'"><span class="no">'+e.no+'</span>'+e.t+'</div>').join("");
+ document.querySelectorAll(".tab").forEach(el=>el.onclick=()=>{CUR=+el.dataset.i;render();});
+ const e=ALL[CUR];
+ $("#mCode").textContent=e.code;$("#mFile").textContent=e.file;$("#mOpen").href=e.file;
+ const fr=$("#fr");const want=new URL(e.file,location.href).href;
+ if(fr.src!==want)fr.src=want;
+ try{history.replaceState(null,"","?m="+e.code);}catch(_){}
+}
+render();
+</script>
+</body></html>

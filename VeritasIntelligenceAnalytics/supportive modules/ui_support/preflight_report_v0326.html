@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA Optional Active Lock Preflight v032.6</title>
+<style>
+:root{--bg:#F9F9F6;--ink:#16211D;--muted:#66726B;--line:rgba(42,64,55,.14);--sky:#BED9D1;--green:#769782;--dan:#B64236;--dan2:#843127;--ok:#26764F;--warn:#A96B13;--fail:#AE2E24;--shadow:0 10px 28px rgba(28,45,39,.08)}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{color:var(--ink);font-family:"Noto Sans TC","Microsoft JhengHei","PingFang TC",Inter,Arial,sans-serif;font-size:11px;background:radial-gradient(circle at 10% 5%,rgba(190,217,209,.35),transparent 26%),radial-gradient(circle at 92% 6%,rgba(182,66,54,.08),transparent 24%),linear-gradient(135deg,#F9F9F6 0%,#F2F6F1 55%,#ECF3EE 100%)}
+.page{width:100vw;height:100vh;padding:10px 12px;display:grid;grid-template-rows:auto auto auto minmax(0,1fr) auto;gap:7px;overflow:hidden}
+.top{max-width:1920px;width:100%;margin:0 auto;display:grid;grid-template-columns:40px minmax(0,1fr) minmax(420px,760px);gap:9px;align-items:stretch;padding:7px 10px;border:1px solid var(--line);border-radius:17px;background:rgba(255,255,250,.72);box-shadow:var(--shadow);backdrop-filter:blur(14px);min-height:56px;overflow:hidden}
+.seal{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;background:linear-gradient(145deg,var(--dan),var(--dan2));font-size:21px;font-weight:900;transform:rotate(-3deg);align-self:center}
+.title{display:grid;align-content:center;overflow:hidden}.title h1{margin:0;font-size:13.5px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.title p{margin:2px 0 0;color:var(--muted);font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.progressGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.projectBox{height:44px;border:1px solid var(--line);border-radius:13px;background:rgba(255,255,250,.70);padding:5px 8px;display:grid;grid-template-rows:22px 8px;overflow:hidden}.projectBox .head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;font-size:9.5px;align-items:center}.projectBox span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.projectBox b{white-space:nowrap}.bar{height:8px;border-radius:999px;background:rgba(42,64,55,.10);overflow:hidden}.bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--green),var(--sky))}
+.kpiRow{max-width:1920px;width:100%;margin:0 auto;display:grid;grid-template-columns:repeat(10,minmax(70px,1fr));grid-auto-rows:44px;gap:5px}.kpi{height:44px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,250,.72);display:grid;grid-template-columns:18px minmax(0,1fr);grid-template-rows:16px 18px;gap:0 5px;align-items:center;padding:5px 6px;overflow:hidden}.kpi span{grid-row:1/span 2;width:18px;height:18px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;background:var(--dan);font-size:9px;font-weight:900}.kpi em{font-style:normal;color:var(--muted);font-size:8px;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.kpi b{font-size:10.8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ok b{color:var(--ok)}.warn b{color:var(--warn)}.fail b{color:var(--fail)}.risk b{color:var(--dan2)}
+.mid{max-width:1920px;width:100%;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:7px;align-items:stretch;min-height:0}.panel{height:64px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,250,.70);box-shadow:var(--shadow);backdrop-filter:blur(14px);padding:7px 9px;overflow:hidden}.panel b{display:block;font-size:10px;margin-bottom:4px}.panel span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:8.8px;color:var(--muted);line-height:1.25}
+.matrix{max-width:1920px;width:100%;height:100%;min-height:0;margin:0 auto;border:1px solid var(--line);border-radius:17px;background:rgba(255,255,250,.84);box-shadow:var(--shadow);overflow:hidden;display:grid;grid-template-rows:28px minmax(0,1fr)}.matrixHead{height:28px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 10px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(237,246,240,.94),rgba(229,239,232,.94));overflow:hidden}.matrixHead h2{margin:0;font-size:10px;letter-spacing:.06em;white-space:nowrap}.matrixHead span{font-size:8.8px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tableShell{min-height:0;overflow:auto;scrollbar-gutter:stable both-edges}table{width:100%;min-width:1480px;table-layout:fixed;border-collapse:separate;border-spacing:0}th{position:sticky;top:0;z-index:3;height:24px;padding:4px 5px;background:#EAF2EC;border-bottom:1px solid var(--line);font-size:8.6px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}td{height:58px;min-height:58px;max-height:58px;padding:5px;border-bottom:1px solid rgba(47,70,61,.07);vertical-align:top;overflow:hidden;font-size:8.8px}tbody tr{height:58px;min-height:58px;max-height:58px}tbody tr:hover,tbody tr:hover td{height:98px;max-height:98px}.cellBox{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;line-height:1.24;white-space:normal;word-break:break-word;overflow-wrap:anywhere}tbody tr:hover .cellBox{-webkit-line-clamp:5}.path{font-family:Consolas,"Cascadia Mono",monospace}.num{text-align:right;font-variant-numeric:tabular-nums}.sok{color:var(--ok);font-weight:800}.swarn{color:var(--warn);font-weight:800}.sfail{color:var(--fail);font-weight:900}
+.footer{max-width:1920px;width:100%;margin:0 auto;display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:8.5px;line-height:1.15;padding:0 4px;overflow:hidden}.footer span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:1380px){html,body{overflow:auto}.page{height:auto;min-height:100vh;overflow:visible}.top{grid-template-columns:40px minmax(0,1fr)}.progressGrid{grid-column:1/-1}.kpiRow{grid-template-columns:repeat(5,minmax(0,1fr))}.mid{grid-template-columns:1fr}.matrix{height:72vh}}
+</style>
+</head>
+<body>
+<div class="page">
+<header class="top">
+  <div class="seal">理</div>
+  <div class="title">
+    <h1>Veritas Intelligence Analytics · Optional Active Lock Preflight</h1>
+    <p>v032.6 · preflight only · no active pointer change · no canonical promotion · EnvInstallApproved=false</p>
+  </div>
+  <div class="progressGrid">
+    <div class="projectBox"><div class="head"><span>Preflight</span><b>100%</b></div><div class="bar"><i style="width:100%"></i></div></div>
+    <div class="projectBox"><div class="head"><span>Hash Verify</span><b>100%</b></div><div class="bar"><i style="width:100%"></i></div></div>
+    <div class="projectBox"><div class="head"><span>Decision</span><b>96%</b></div><div class="bar"><i style="width:96%"></i></div></div>
+  </div>
+</header>
+
+<section class="kpiRow">
+  <div class="kpi risk"><span>鑑</span><em>Risk</em><b>MEDIUM</b></div>
+  <div class="kpi risk"><span>勢</span><em>Status</em><b>VIA_VRN_VDF_OPTIONAL_ACTIVE_LOCK_PREFLIGHT_READY</b></div>
+  <div class="kpi ok"><span>過</span><em>Pass</em><b>7</b></div>
+  <div class="kpi warn"><span>審</span><em>Warn</em><b>3</b></div>
+  <div class="kpi fail"><span>敗</span><em>Fail</em><b>0</b></div>
+  <div class="kpi fail"><span>真</span><em>HIGH</em><b>0</b></div>
+  <div class="kpi warn"><span>環</span><em>Env Gate</em><b>7</b></div>
+  <div class="kpi ok"><span>驗</span><em>Hash OK</em><b>5</b></div>
+  <div class="kpi fail"><span>警</span><em>Hash Warn</em><b>0</b></div>
+  <div class="kpi warn"><span>次</span><em>Next</em><b>USER_DECIDE_FINAL_ACTIVE_LOCK_OR_KEEP_REVIEW_ONLY</b></div>
+</section>
+
+<section class="mid">
+  <div class="panel"><b>Preflight Only</b><span>本輪只判斷是否具備 active lock 條件，不改 canonical，不改 active pointer。</span></div>
+  <div class="panel"><b>Environment Gate</b><span>EnvInstallApproved=false / AutoPipInstallAllowed=false 是必要條件。</span></div>
+  <div class="panel"><b>Final Decision</b><span>若 Fail=0，下一步才可由人工決定是否建立 Final Active Lock Review Package。</span></div>
+</section>
+
+<main class="matrix">
+  <div class="matrixHead">
+    <h2>綱 · Optional Active Lock Preflight Matrix</h2>
+    <span>Generated 20260615_180647 · rows 10 · read-only</span>
+  </div>
+  <div class="tableShell">
+    <table>
+      <thead>
+        <tr>
+          <th>Layer</th><th>Gate</th><th>Status</th><th>Risk</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+<td><span class="cellBox">Risk</span></td>
+<td><span class="cellBox">Final HIGH Gate</span></td>
+<td><span class="cellBox">PASS</span></td>
+<td><span class="cellBox sok">LOW</span></td>
+<td><span class="cellBox">final_high</span></td>
+<td class="num"><span class="cellBox">0</span></td>
+<td><span class="cellBox">Direct executable blockers must be zero.</span></td>
+<td><span class="cellBox path">C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_vrn_vdf_final_risk_downgrade_runs\RUN_20260615_180155_v03252_FINAL_RISK_DOWNGRADE_ENV_APPROVAL\runtime\VIA_VRN_VDF_FinalRiskDowngrade_Runtime_v03252.json</span></td>
+</tr>
+<tr>
+<td><span class="cellBox">Risk</span></td>
+<td><span class="cellBox">Final MEDIUM Review Gate</span></td>
+<td><span class="cellBox">WARN_ACCEPTED_WITH_GATE</span></td>
+<td><span class="cellBox swarn">MEDIUM</span></td>
+<td><span class="cellBox">final_medium</span></td>
+<td class="num"><span class="cellBox">7</span></td>
+<td><span class="cellBox">MEDIUM rows are allowed only under approval gates.</span></td>
+<td><span class="cellBox path">C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_vrn_vdf_final_risk_downgrade_runs\RUN_20260615_180155_v03252_FINAL_RISK_DOWNGRADE_ENV_APPROVAL\runtime\VIA_VRN_VDF_FinalRiskDowngrade_Runtime_v03252.json</span></td>
+</tr>
+<tr>
+<td><span class="cellBox">Env</span></td>
+<td><span class="cellBox">Env Approval Gate</span></td>
+<td><span class="cellBox">PASS</span></td>
+<td><span class="cellBox sok">LOW</span></td>
+<td><span class="cellBox">EnvInstallApproved</span></td>
+<td class="num"><span class="cellBox">False</span></td>
+<td><span class="cellBox">Environment install must remain disabled.</span></td>
+<td><span class="cellBox path">C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_vrn_vdf_final_risk_downgrade_runs\RUN_20260615_180155_v03252_FINAL_RISK_DOWNGRADE_ENV_APPROVAL\runtime\VIA_VRN_VDF_FinalRiskDowngrade_Runtime_v03252.json</span></td>
+</tr>
+<tr>
+<td><span class="cellBox">Env</span></td>
+<td><span class="cellBox">Auto Pip Gate</span></td>
+<td><span class="cellBox">PASS</span></td>
+<td><span class="cellBox sok">LOW</span></td>
+<td><span class="cellBox">AutoPipInstallAllowed</span></td>
+<td class="num"><span class="cellBox">False</span></td>
+<td><span class="cellBox">Automatic pip install must remain disabled.</span></td>
+<td><span class="cellBox path">C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_vrn_vdf_final_risk_downgrade_runs\RUN_20260615_180155_v03252_FINAL_RISK_DOWNGRADE_ENV_APPROVAL\runtime\VIA_VRN_VDF_FinalRiskDowngrade_Runtime_v03252.json</span></td>
+</tr>
+<tr>
+<td><span class="cellBox">Lock</span></td>
+<td><span class="cellBox">True Active Blocker Gate</span></td>
+<td><span class="cellBox">PASS</span></td>
+<td><span class="cellBox sok">LOW</span></td>
+<td><span class="cellBox">true_active_blocker</span></td>
+<td class="num"><span class="cellBox">0</span></td>
+<td><span class="cellBox">Locked package must have no true active blocker.</span></td>
+<td><span class="cellBox path">C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_vrn_vdf_user_review_final_lock_runs\RUN_20260615_174654_v03231_USER_REVIEW_FINAL_LOCK_HOTFIX\runtime\VIA_VRN_VDF_UserReviewFinalSealLock_Runtime_v03231.json</span></td>
+</tr>
+<tr>
+<td><span class="cellBox">Hash</span></td>
+<td><span class="cellBox">Lock SHA256 Gate</span></td>
+<td><span class="cellBox">PASS</span></td>
+<td><span class="cellBox sok">LOW</span></td>
+<td><span class="cellBox">hash_warn</span></td>
+<td class="num"><span class="cellBox">0</span></td>
+<td><span class="cellBox">Review lock hashes must still match.</span></td>
+<td><span class="cellBox path">C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_vrn_vdf_user_review_final_lock_runs\RUN_20260615_174654_v03231_USER_REVIEW_FINAL_LOCK_HOTFIX\registry\VIA_VRN_VDF_UserReviewFinalSealLock_Manifest_v03231.csv</span></td>
+</tr>
+<tr>
+<td><span class="cellBox">Hash</span></td>
+<td><span class="cellBox">Digest Hash Gate</span></td>
+<td><span class="cellBox">PASS</span></td>
+<td><span class="cellBox sok">LOW</span></td>
+<td><span class="cellBox">digest_hash_warn</span></td>
+<td class="num"><span class="cellBox">0</span></td>
+<td><span class="cellBox">Manual digest hash verification must remain clean.</span></td>
+<td><span class="cellBox path">C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_vrn_vdf_manual_review_digest_runs\RUN_20260615_175021_v0324_MANUAL_REVIEW_DIGEST\runtime\VIA_VRN_VDF_ManualReviewDigest_Runtime_v0324.json</span></td>
+</tr>
+<tr>
+<td><span class="cellBox">Review</span></td>
+<td><span class="cellBox">Review-Not-Blocker Record</span></td>
+<td><span class="cellBox">WARN_REVIEW_ONLY</span></td>
+<td><span class="cellBox swarn">MEDIUM</span></td>
+<td><span class="cellBox">review_but_not_blocker</span></td>
+<td class="num"><span class="cellBox">37</span></td>
+<td><span class="cellBox">Review items are recorded; they do not block preflight after line inspection.</span></td>
+<td><span class="cellBox path">C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_vrn_vdf_manual_review_digest_runs\RUN_20260615_175021_v0324_MANUAL_REVIEW_DIGEST\runtime\VIA_VRN_VDF_ManualReviewDigest_Runtime_v0324.json</span></td>
+</tr>
+<tr>
+<td><span class="cellBox">SSOT</span></td>
+<td><span class="cellBox">SSOT Review Copy Record</span></td>
+<td><span class="cellBox">WARN_REVIEW_COPY_ONLY</span></td>
+<td><span class="cellBox swarn">MEDIUM</span></td>
+<td><span class="cellBox">ssot_review_copy_only</span></td>
+<td class="num"><span class="cellBox">8</span></td>
+<td><span class="cellBox">SSOT remains review-copy-only; no canonical overwrite.</span></td>
+<td><span class="cellBox path">C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_vrn_vdf_manual_review_digest_runs\RUN_20260615_175021_v0324_MANUAL_REVIEW_DIGEST\runtime\VIA_VRN_VDF_ManualReviewDigest_Runtime_v0324.json</span></td>
+</tr>
+<tr>
+<td><span class="cellBox">Policy</span></td>
+<td><span class="cellBox">Preflight Only Policy</span></td>
+<td><span class="cellBox">PASS</span></td>
+<td><span class="cellBox sok">LOW</span></td>
+<td><span class="cellBox">canonical_promotion</span></td>
+<td class="num"><span class="cellBox">False</span></td>
+<td><span class="cellBox">This run does not promote canonical or active pointer.</span></td>
+<td><span class="cellBox path">C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_vrn_vdf_final_risk_downgrade_runs\RUN_20260615_180155_v03252_FINAL_RISK_DOWNGRADE_ENV_APPROVAL\optional_active_lock_preflight\VIA_VRN_VDF_OptionalActiveLockPreflight_Input_v03252.json</span></td>
+</tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<footer class="footer">
+  <span>判天地之美，析萬物之理。 Veritas Intelligence Analytics │ AI-Augmented Investment Intelligence</span>
+  <span>Runtime: C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_vrn_vdf_optional_active_lock_preflight_runs\RUN_20260615_180647_v0326_OPTIONAL_ACTIVE_LOCK_PREFLIGHT\runtime\VIA_VRN_VDF_OptionalActiveLockPreflight_Runtime_v0326.json</span>
+</footer>
+</div>
+</body>
+</html>

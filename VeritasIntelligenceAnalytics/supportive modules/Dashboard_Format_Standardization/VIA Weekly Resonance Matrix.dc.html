@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f5f4f0;--paper:#fff;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;--line:#dbd9d3;--soft:#ecebe6;--accent:#439a9a;--blue:#4c78a8;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--co:#c96b5a;--vi:#7a6daa;--gn:#5a9e6f;--ro:#b05580;--reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);}
+  body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+</style>
+<style>@media print{@page{size:A4;margin:11mm}html,body{background:#fff !important}.__pdfbtn{display:none !important}*{box-shadow:none !important}[style*="position:sticky"]{position:static !important}[style*="overflow-y:auto"],[style*="overflow:auto"],[style*="overflow-x:auto"]{overflow:visible !important;max-height:none !important}table,section,.brk{break-inside:avoid}}</style>
+<script>window.addEventListener('load',function(){if(document.getElementById('__pdfbtn'))return;var b=document.createElement('div');b.id='__pdfbtn';b.className='__pdfbtn';b.innerHTML='<img src="assets/pdf-icon.png" alt="PDF" style="width:18px;height:18px;display:block">下載 PDF';b.title='A4 PDF';b.style.cssText='position:absolute;right:74px;bottom:11px;z-index:50;display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #dbd9d3;border-radius:7px;padding:3px 10px 3px 6px;cursor:pointer;font:600 9px \'DM Mono\',monospace;letter-spacing:.4px;color:#6b6860;';b.onmouseenter=function(){b.style.background='#ecebe6'};b.onmouseleave=function(){b.style.background='#fff'};b.onclick=function(){window.print()};(document.querySelector('header')||document.body).appendChild(b);});</script>
+</helmet>
+<div ref="{{ rootRef }}" style="max-width:1180px;margin:0 auto;padding:0 22px 46px;">
+  <div style="position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50;"></div>
+  <header style="position:relative;padding:22px 0 11px;margin-bottom:13px;border-bottom:2px solid var(--ink);">
+    <div style="position:absolute;top:50%;transform:translateY(-50%);right:0;width:60px;height:60px;display:flex;align-items:center;justify-content:center;"><img src="assets/seal-trans.png" alt="理" style="width:86px;height:86px;object-fit:contain;image-rendering:-webkit-optimize-contrast;" /></div>
+    <div style="font:700 10px 'DM Mono',monospace;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px;">VERITAS INTELLIGENCE ANALYTICS · WEEKLY RESONANCE MATRIX</div>
+    <h1 style="font:800 19px/1.25 'Syne',sans-serif;color:var(--ink);max-width:900px;">本週重點：央行決策、重大數據與機構觀點共振</h1>
+    <p style="margin-top:7px;font:400 10.5px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:920px;">涵蓋區間 <b style="color:var(--ink2);">2026/06/22（一）起 – 06/28（日）</b> 台灣時間。主軸：央行決策落地後續 → 數據驗證 → 停火細節 → 油價/日圓/長端殖利率三線共振 → 台股與 S&P 500 風險重定價。</p>
+  </header>
+
+  <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;background:#fff;border:1px solid #dbd9d3;border-left:3px solid #439a9a;border-radius:3px;padding:6px 13px;margin-bottom:12px;">
+    <span style="font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;">🛰 資料請求 · VDF ENGINES</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">TWSE→rest</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#c4943a;border-radius:3px;padding:1px 6px;">SITCA→parse</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">MOPS→parse</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">yfinance→pyproc</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#c0584e;border-radius:3px;padding:1px 6px;">FactSet→keyed</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">FRED→keyed</span>
+    <span style="margin-left:auto;font:500 8px 'DM Mono',monospace;color:#9c9890;">request.json → VDF 擷取 → 雙重驗算 → Parquet → JSON</span>
+  </div>
+
+  <details data-contract="1" style="margin-bottom:12px;border:1px solid #dbd9d3;border-left:3px solid #1e1d1a;border-radius:3px;background:#fbfaf7;overflow:hidden;">
+    <summary style="cursor:pointer;user-select:none;padding:6px 13px;font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;list-style:none;">📜 引擎連接合約 · request.json（點擊展開 · 可選取複製）</summary>
+    <pre style="margin:0;padding:10px 13px;background:#1e1d1a;color:#cfe3d6;font:500 9px/1.55 'DM Mono',monospace;white-space:pre;overflow-x:auto;">{
+  "request": "weekly_resonance_matrix",
+  "asof": "2026-06-22",
+  "universe": { "market": "TW", "exchange": ["TWSE","TPEX"] },
+  "sources": ["TWSE","TPEX","SITCA","MOPS","yfinance","FactSet","FRED"],
+  "engines": { "TWSE":"rest","TPEX":"rest","SITCA":"parse","MOPS":"parse","yfinance":"pyproc","FactSet":"keyed","FRED":"keyed" },
+  "range": { "start":"1996-01-01","end":"latest" },
+  "verify": "double_identity",
+  "db_discover": { "folder":"D:\\VDF\\databases\\","recursive":true,"match":["*.parquet","*.duckdb","*.db","*.csv"] },
+  "sink": { "parquet":"vdf/weekly_resonance_matrix/","export":"weekly_resonance_matrix.json" }
+}</pre>
+    <div style="padding:6px 13px;font:400 8px 'DM Sans','Noto Sans TC',sans-serif;color:#9c9890;">本檔即以此合約向 VDF 引擎請求 → 依 engines 分流(rest/parse/pyproc/keyed) → 雙重恆等驗算 → 落地 Parquet → 匯出 <b style="color:#6b6860;">weekly_resonance_matrix.json</b> 覆蓋本頁資料源。</div>
+  </details>
+
+  <div style="display:flex;align-items:stretch;gap:0;flex-wrap:wrap;background:#1a2423;border-radius:6px;overflow:hidden;margin-bottom:12px;">
+    <div style="display:flex;align-items:center;gap:7px;padding:8px 14px;background:rgba(90,158,111,.16);border-right:1px solid rgba(255,255,255,.08);">
+      <span style="width:8px;height:8px;border-radius:50%;background:#5a9e6f;box-shadow:0 0 0 3px rgba(90,158,111,.25);"></span>
+      <span style="font:700 9.5px 'DM Mono',monospace;letter-spacing:1px;color:#7fd0a0;text-transform:uppercase;">🔒 Visual Lock · 已鎖定</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:18px;flex:1;flex-wrap:wrap;padding:8px 16px;">
+      <div style="display:flex;flex-direction:column;line-height:1.25;"><span style="font:600 7.5px 'DM Mono',monospace;letter-spacing:.5px;color:#8a948f;text-transform:uppercase;">版本</span><span style="font:700 10px 'DM Mono',monospace;color:#f1ede2;">v1.0</span></div>
+      <div style="display:flex;flex-direction:column;line-height:1.25;"><span style="font:600 7.5px 'DM Mono',monospace;letter-spacing:.5px;color:#8a948f;text-transform:uppercase;">凍結時間</span><span style="font:700 10px 'DM Mono',monospace;color:#f1ede2;">2026-06-22 08:00 TPE</span></div>
+      <div style="display:flex;flex-direction:column;line-height:1.25;"><span style="font:600 7.5px 'DM Mono',monospace;letter-spacing:.5px;color:#8a948f;text-transform:uppercase;">資料來源</span><span style="font:700 10px 'DM Mono',monospace;color:#e3ab62;">🟡 4/5 已同步 · 油價延遲</span></div>
+      <div style="display:flex;flex-direction:column;line-height:1.25;"><span style="font:600 7.5px 'DM Mono',monospace;letter-spacing:.5px;color:#8a948f;text-transform:uppercase;">SSOT 雜湊</span><span style="font:700 10px 'DM Mono',monospace;color:#f1ede2;">#A7F3-2026W26</span></div>
+      <span style="margin-left:auto;font:500 8px 'DM Mono',monospace;color:#6b746f;">凍結後僅每日 08:00 例行刷新 · 不接受臨時覆寫</span>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:3px;padding:8px 13px;margin-bottom:14px;">
+    <span style="font:700 9px 'DM Mono',monospace;letter-spacing:.6px;color:var(--ink);text-transform:uppercase;">⟳ 自動查詢狀態</span>
+    <sc-for list="{{ feeds }}" as="f" hint-placeholder-count="5">
+      <span style="display:inline-flex;align-items:center;gap:5px;font:600 9px 'DM Mono',monospace;color:var(--ink2);background:var(--soft);border-radius:3px;padding:2px 8px;"><span style="width:7px;height:7px;border-radius:50%;background:{{ f.dot }};"></span>{{ f.name }} <span style="color:var(--mut2);">{{ f.t }}</span></span>
+    </sc-for>
+    <span style="margin-left:auto;font:500 8.5px 'DM Mono',monospace;color:var(--mut2);">資料時點 2026-06-22 · 下次更新 每日 08:00</span>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;background:var(--ink);border-radius:8px;padding:12px 16px;margin-bottom:14px;">
+    <sc-for list="{{ flow }}" as="f" hint-placeholder-count="6">
+      <span style="font:600 10px 'DM Sans','Noto Sans TC',sans-serif;color:#f1ede2;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:5px 10px;">{{ f.t }}</span>
+      <sc-if value="{{ f.arrow }}"><span style="font:700 12px 'DM Mono',monospace;color:var(--am);">→</span></sc-if>
+    </sc-for>
+  </div>
+
+  <div style="font:700 13px 'Syne',sans-serif;color:var(--ink);margin:6px 0 9px;display:flex;align-items:center;gap:8px;">共振鏈 · 各環節可能事件情境<span style="flex:1;height:1px;background:var(--line);"></span></div>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px;">
+    <sc-for list="{{ chain }}" as="c" hint-placeholder-count="5">
+      <div style="border:1px solid var(--line);border-top:3px solid {{ c.color }};border-radius:3px;background:var(--paper);padding:10px 11px;box-shadow:0 1px 2px rgba(31,42,42,.05);">
+        <div style="font:700 10.5px 'Syne',sans-serif;color:var(--ink);margin-bottom:6px;">{{ c.step }} {{ c.name }}</div>
+        <div style="margin-bottom:5px;"><span style="font:700 7px 'DM Mono',monospace;color:#fff;background:var(--down);border-radius:2px;padding:1px 5px;">多</span> <span style="font:400 8.5px/1.4 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">{{ c.bull }}</span></div>
+        <div><span style="font:700 7px 'DM Mono',monospace;color:#fff;background:var(--co);border-radius:2px;padding:1px 5px;">空</span> <span style="font:400 8.5px/1.4 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">{{ c.bear }}</span></div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="font:700 13px 'Syne',sans-serif;color:var(--ink);margin:6px 0 9px;display:flex;align-items:center;gap:8px;">三大警戒指標 · 進入本週的起點<span style="flex:1;height:1px;background:var(--line);"></span></div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;">
+    <sc-for list="{{ alerts }}" as="a" hint-placeholder-count="3">
+      <div style="border:1px solid var(--line);border-top:3px solid {{ a.color }};border-radius:3px;background:var(--paper);padding:12px 14px;box-shadow:0 1px 2px rgba(31,42,42,.05);">
+        <div style="display:flex;align-items:baseline;gap:7px;margin-bottom:5px;"><span style="font:700 12px 'Syne',sans-serif;color:var(--ink);">{{ a.name }}</span><span style="font:600 11px 'DM Mono',monospace;color:{{ a.color }};margin-left:auto;">{{ a.now }}</span></div>
+        <span style="font:700 8px 'DM Mono',monospace;color:#fff;background:{{ a.color }};border-radius:3px;padding:2px 8px;">{{ a.tag }}</span>
+        <p style="font:400 9.5px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);margin-top:7px;">{{ a.note }}</p>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="font:700 13px 'Syne',sans-serif;color:var(--ink);margin:6px 0 9px;display:flex;align-items:center;gap:8px;">本週事件時間軸矩陣<span style="flex:1;height:1px;background:var(--line);"></span></div>
+  <div style="border:1px solid var(--line);border-radius:3px;overflow:hidden;background:var(--paper);overflow-x:auto;margin-bottom:16px;">
+    <table style="width:100%;border-collapse:separate;border-spacing:0;min-width:680px;">
+      <thead><tr>
+        <th style="text-align:left;padding:7px 11px;font:700 9px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">日期</th>
+        <th style="text-align:left;padding:7px 11px;font:700 9px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">事件／數據</th>
+        <th style="text-align:left;padding:7px 11px;font:700 9px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">市場焦點</th>
+        <th style="text-align:center;padding:7px 11px;font:700 9px 'Syne',sans-serif;color:var(--ink);border-bottom:1px solid var(--line);background:var(--soft);">共振</th>
+      </tr></thead>
+      <tbody>
+        <sc-for list="{{ events }}" as="e" hint-placeholder-count="7">
+          <tr style="background:{{ e.bg }};">
+            <td style="padding:6px 11px;border-top:1px solid var(--soft);font:600 9.5px 'DM Mono',monospace;color:var(--ink2);white-space:nowrap;">{{ e.date }}</td>
+            <td style="padding:6px 11px;border-top:1px solid var(--soft);font:600 9.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">{{ e.evt }}</td>
+            <td style="padding:6px 11px;border-top:1px solid var(--soft);font:400 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">{{ e.focus }}</td>
+            <td style="padding:6px 11px;border-top:1px solid var(--soft);text-align:center;"><span style="font:700 8px 'DM Mono',monospace;color:#fff;background:{{ e.dirCss }};border-radius:3px;padding:2px 8px;white-space:nowrap;">{{ e.dir }}</span></td>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+    <sc-for list="{{ cbanks }}" as="c" hint-placeholder-count="2">
+      <div style="border:1px solid var(--line);border-left:3px solid {{ c.color }};border-radius:3px;background:var(--paper);padding:12px 15px;box-shadow:0 1px 2px rgba(31,42,42,.05);">
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:7px;"><span style="font:800 14px 'Syne',sans-serif;color:var(--ink);">{{ c.name }}</span><span style="font:600 9px 'DM Mono',monospace;color:{{ c.color }};margin-left:auto;">{{ c.action }}</span></div>
+        <div style="font:400 10px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);"><b style="color:var(--ink2);">市場預期：</b>{{ c.exp }}</div>
+        <div style="font:400 10px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);margin-top:4px;"><b style="color:var(--co);">最該盯：</b>{{ c.watch }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+    <div style="border:1px solid var(--line);border-left:3px solid var(--down);border-radius:3px;background:var(--paper);padding:12px 15px;">
+      <div style="font:700 12px 'Syne',sans-serif;color:var(--down);margin-bottom:7px;">偏多路徑 · 停火維繫 + 數據溫和</div>
+      <sc-for list="{{ bull }}" as="b" hint-placeholder-count="4"><div style="position:relative;padding-left:14px;margin:4px 0;font:400 9.5px/1.5 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);"><span style="position:absolute;left:0;color:var(--down);">▸</span>{{ b }}</div></sc-for>
+    </div>
+    <div style="border:1px solid var(--line);border-left:3px solid var(--co);border-radius:3px;background:var(--paper);padding:12px 15px;">
+      <div style="font:700 12px 'Syne',sans-serif;color:var(--co);margin-bottom:7px;">偏空路徑 · 共振升級</div>
+      <sc-for list="{{ bear }}" as="b" hint-placeholder-count="4"><div style="position:relative;padding-left:14px;margin:4px 0;font:400 9.5px/1.5 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);"><span style="position:absolute;left:0;color:var(--co);">▸</span>{{ b }}</div></sc-for>
+    </div>
+  </div>
+
+  <div style="font:700 13px 'Syne',sans-serif;color:var(--ink);margin:6px 0 9px;display:flex;align-items:center;gap:8px;">市場表現快照 · 台指期 / 美股 / 類股 / 資金流向<span style="flex:1;height:1px;background:var(--line);"></span></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+    <div style="border:1px solid var(--line);border-left:3px solid var(--co);border-radius:3px;background:var(--paper);padding:11px 14px;">
+      <div style="font:700 11px 'Syne',sans-serif;color:var(--ink);margin-bottom:7px;">台指期持倉 · 籌碼</div>
+      <sc-for list="{{ twf }}" as="t" hint-placeholder-count="4">
+        <div style="display:flex;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid var(--soft);">
+          <span style="flex:1;font:600 9.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">{{ t.k }}</span>
+          <span style="font:600 9.5px 'DM Mono',monospace;color:{{ t.color }};">{{ t.v }}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="border:1px solid var(--line);border-left:3px solid var(--blue);border-radius:3px;background:var(--paper);padding:11px 14px;">
+      <div style="font:700 11px 'Syne',sans-serif;color:var(--ink);margin-bottom:7px;">美股主要指數 · 週表現</div>
+      <sc-for list="{{ usidx }}" as="u" hint-placeholder-count="4">
+        <div style="display:flex;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid var(--soft);">
+          <span style="flex:1;font:600 9.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">{{ u.k }}</span>
+          <span style="font:500 9px 'DM Mono',monospace;color:var(--ink);">{{ u.v }}</span>
+          <span style="font:600 9.5px 'DM Mono',monospace;min-width:48px;text-align:right;color:{{ u.color }};">{{ u.chg }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+    <div style="border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:3px;background:var(--paper);padding:11px 14px;">
+      <div style="font:700 11px 'Syne',sans-serif;color:var(--ink);margin-bottom:7px;">類股表現 · 週漲跌(台股)</div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <sc-for list="{{ sectors }}" as="s" hint-placeholder-count="6">
+          <div style="display:flex;align-items:center;gap:7px;">
+            <span style="width:64px;flex:none;font:600 9px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">{{ s.k }}</span>
+            <div style="flex:1;position:relative;height:11px;"><div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line);"></div><div style="position:absolute;top:1px;height:9px;border-radius:2px;{{ s.barCss }}"></div></div>
+            <span style="width:42px;text-align:right;flex:none;font:600 9px 'DM Mono',monospace;color:{{ s.color }};">{{ s.v }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="border:1px solid var(--line);border-left:3px solid var(--vi);border-radius:3px;background:var(--paper);padding:11px 14px;">
+      <div style="font:700 11px 'Syne',sans-serif;color:var(--ink);margin-bottom:7px;">資金流向 · 本週</div>
+      <sc-for list="{{ flows }}" as="f" hint-placeholder-count="5">
+        <div style="display:flex;align-items:center;gap:8px;padding:3px 0;border-bottom:1px solid var(--soft);">
+          <span style="font:700 10px 'DM Mono',monospace;{{ f.arrowCss }}">{{ f.arrow }}</span>
+          <span style="flex:1;font:600 9.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">{{ f.k }}</span>
+          <span style="font:600 9.5px 'DM Mono',monospace;color:{{ f.color }};">{{ f.v }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="background:linear-gradient(135deg,#222e2e,#1a2423);border-radius:8px;padding:16px 20px;margin-bottom:14px;">
+    <div style="font:700 9px 'DM Mono',monospace;letter-spacing:1.6px;color:#bdb8a9;text-transform:uppercase;margin-bottom:8px;">本週判讀 · WEEKLY READ</div>
+    <p style="font:500 13px/1.7 'DM Sans','Noto Sans TC',sans-serif;color:#f1ede2;">真正的風險不在升息本身（多已定價），而在 <b style="color:#e3ab62;">Fed 點陣圖是否刪除降息</b>、<b style="color:#e3ab62;">BoJ 升息後日圓是否急升</b>、再疊加 <b style="color:#e3ab62;">停火能否守住</b> —— 三者若共振向上，台股高 Beta 與美股高估值同步承壓。</p>
+  </div>
+
+  <div style="background:var(--soft);border:1px solid var(--line);border-radius:3px;padding:9px 13px;font:400 9px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">⚠️ 本報告為資訊與情境分析用途，不構成買賣建議。數據時點 2026-06-21；自動查詢每日 08:00 更新警戒指標與事件狀態。</div>
+
+  <footer style="margin-top:16px;border-top:1px solid var(--line);padding-top:11px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font:500 10px 'DM Mono',monospace;color:var(--mut);">
+    <span style="font-weight:700;letter-spacing:1.3px;color:var(--ink);">VERITAS INTELLIGENCE ANALYTICS</span>
+    <span>Weekly Resonance Matrix · Visual Lock SSOT</span>
+  </footer>
+</div>
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#1e1d1a"/><rect x="30" y="30" width="40" height="40" rx="5" fill="#439a9a"/><text x="50" y="58" text-anchor="middle" font-family="serif" font-size="22" fill="#fff" font-weight="700">理</text></svg></template>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{ &quot;$preview&quot;: { &quot;width&quot;: 1180, &quot;height&quot;: 900 } }">
+class Component extends DCLogic {
+  renderVals() {
+    const feeds = [
+      { name: 'FRED', t: '✓ 08:00', dot: 'var(--gn)' },
+      { name: 'yfinance', t: '✓ 08:00', dot: 'var(--gn)' },
+      { name: 'TWSE', t: '✓ 盤後', dot: 'var(--gn)' },
+      { name: 'Econ Calendar', t: '✓ 同步', dot: 'var(--gn)' },
+      { name: '油價/Reuters', t: '△ 延遲', dot: 'var(--am)' },
+    ];
+    const flow = [
+      ['央行決策後續'], ['數據驗證景氣'], ['停火細節落地'], ['油價+日圓+10年債共振'], ['台股/美股重定價'],
+    ].map((x, i, a) => ({ t: x[0], arrow: i < a.length - 1 }));
+
+    const alerts = [
+      { name: '布蘭特原油', now: '~$87', tag: '已跌破警戒', color: 'var(--down)', note: '警戒 95–100。停火使油價自 101 回落；若破局可迅速重返 100+ 重燃通膨鏈。' },
+      { name: 'USD/JPY', now: '~160', tag: '與警戒反向', color: 'var(--am)', note: '警戒「跌破 145」=日圓升值。目前日圓極弱；BoJ 升息為潛在引信，留意急升觸發套利平倉。' },
+      { name: '美 10 年債殖利率', now: '~4.5%', tag: '逼近未破', color: 'var(--am)', note: '警戒 5%。30 年期曾觸 5.2%；Fed 點陣圖轉鷹、長端破 5% 將觸發全球估值下修。' },
+    ];
+
+    const dc = { '偏空': 'var(--co)', '偏多': 'var(--down)', '中性': 'var(--mut2)', '波動': 'var(--am)' };
+    const ev = (date, evt, focus, dir) => ({ date, evt, focus, dir, dirCss: dc[dir] || 'var(--mut2)' });
+    const events = [
+      ev('06/21 日', '週初開盤 · 停火進展檢視', '油價跳空 / 日圓缺口', '波動'),
+      ev('06/23 二', '美 6 月製造業/服務業 PMI 初值', '景氣動能 vs 通膨', '波動'),
+      ev('06/24 三', '美新屋銷售 · Fed 官員談話', '房市 + 點陣圖延伸', '偏空'),
+      ev('06/25 四', '美 Q1 GDP 終值 · 初領失業金', '成長韌性驗證', '中性'),
+      ev('06/26 五', '美 5 月 PCE 物價 (Fed 首選)', '核心 PCE 黏著度', '偏空'),
+      ev('06/27 六', '台股週結算 · 外資籌碼', '期貨空單 / 新台幣', '波動'),
+      ev('全週', '油價 / 日圓 / 10年債 三線', '共振方向決定風險', '波動'),
+    ].map((e, i) => ({ ...e, bg: i % 2 ? '#f6f4ef' : 'var(--paper)' }));
+
+    const cbanks = [
+      { name: 'BoJ 日本央行', action: '升息後觀察', color: 'var(--vi)', exp: '升至 1.0% 已落地，市場聚焦後續路徑與縮表節奏。', watch: '日圓是否急升、套利平倉是否擴散。' },
+      { name: 'Fed 聯準會', action: '按兵 + 點陣圖', color: 'var(--co)', exp: '維持利率，點陣圖年內降息次數為核心。', watch: '是否刪除降息、長端殖利率反應。' },
+    ];
+
+    const bull = ['美伊協議簽署、霍爾木茲重開', '油價守 $80 下方、通膨鏈降溫', 'Fed 點陣圖維持降息、長端回落', '外資回補、新台幣止貶'];
+    const bear = ['停火細節破局、油價重上 95', 'PCE 黏著、Fed 點陣圖刪降息', '日圓急升觸發套利平倉', '台股期貨空單再擴、高 Beta 承壓'];
+
+    const chain = [
+      { step: '①', name: '央行決策後續', color: 'var(--vi)', bull: 'Fed 點陣圖維持 2 碼降息、BoJ 鴿派升息、日圓溫和', bear: '點陣圖刪降息、BoJ 鷹派前瞻、日圓急升套利平倉' },
+      { step: '②', name: '數據驗證景氣', color: 'var(--blue)', bull: 'PMI 站穩 50、PCE 降溫、初領平穩 → 軟著陸', bear: 'PCE 黏著破 3%、PMI 走弱 → 停滯性通膨疑慮' },
+      { step: '③', name: '停火細節落地', color: 'var(--am)', bull: '協議簽署、霍爾木茲重開、油供恢復', bear: '文本破局、海峽再封、地緣升級' },
+      { step: '④', name: '三線共振', color: 'var(--co)', bull: '油<$80 + 日圓穩 + 10年債<4.5% → 風險偏好回升', bear: '油>95 + 日圓急升 + 10年債破 5% → 全球估值下修' },
+      { step: '⑤', name: '台股/美股重定價', color: 'var(--teal)', bull: '外資回補、S&P 守高檔、台股籌碼轉溫', bear: '高估值成長股殺、台股高 Beta 補跌、新台幣再貶' },
+    ];
+    const sc = v => v >= 0 ? 'var(--up)' : 'var(--down)';
+    const twf = [
+      { k: '外資台指期淨部位', v: '淨空 −18,400 口', color: 'var(--down)' },
+      { k: '投信淨部位', v: '淨多 +3,200 口', color: 'var(--up)' },
+      { k: '散戶多空比', v: '偏多 1.32', color: 'var(--am)' },
+      { k: '未平倉 OI', v: '11.2 萬口', color: 'var(--ink)' },
+    ];
+    const usidx = [
+      { k: 'S&P 500', v: '6,012', chg: '+0.4%', color: 'var(--up)' },
+      { k: 'Nasdaq 100', v: '21,840', chg: '+0.7%', color: 'var(--up)' },
+      { k: 'Dow Jones', v: '42,360', chg: '−0.2%', color: 'var(--down)' },
+      { k: 'Russell 2000', v: '2,284', chg: '−0.8%', color: 'var(--down)' },
+    ];
+    const sct = (k, v) => { const mag = Math.min(50, Math.abs(v) / 4 * 50); return { k, v: (v >= 0 ? '+' : '') + v.toFixed(1) + '%', color: sc(v), barCss: v >= 0 ? ('left:50%;width:' + mag + '%;background:var(--up);') : ('right:50%;width:' + mag + '%;background:var(--down);') }; };
+    const sectors = [sct('半導體', 1.8), sct('AI 伺服器', 2.4), sct('金融', 0.3), sct('航運', -1.2), sct('鋼鐵', -0.6), sct('重電', 1.1)];
+    const fl = (k, v, up) => ({ k, v, arrow: up >= 0 ? '▲' : '▼', arrowCss: up >= 0 ? 'color:var(--up);' : 'color:var(--down);', color: up >= 0 ? 'var(--up)' : 'var(--down)' });
+    const flows = [
+      fl('外資現貨', '−$842B', -1), fl('投信', '+$96B', 1), fl('自營商', '+$54B', 1),
+      fl('融資餘額', '−1.2%', -1), fl('新台幣 USD/TWD', '31.62 (貶)', -1),
+    ];
+    return { rootRef: el => { this.root = el; }, feeds, flow, alerts, events, cbanks, bull, bear, chain, twf, usidx, sectors, flows };
+  }
+}
+</script>
+</body>
+</html>

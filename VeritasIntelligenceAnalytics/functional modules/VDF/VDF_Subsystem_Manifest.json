@@ -1,9 +1,21 @@
 {
   "subsystem": "VDF",
   "role": "Veritas Data Forge · market data sources, basic info and financial data outputs",
-  "integration_state": "ANCHOR_REGISTERED_FOR_SYSTEM_MANAGER_DISCOVERY",
-  "canonical_tree": "Maintained locally under <Base>/functional modules/VDF (or VeritasDataForge) on the operator workstation; this anchor registers the discovery root and governance gates only.",
+  "integration_state": "ANCHOR_REGISTERED_WITH_MOVIES_INTAKE_ENGINE",
+  "canonical_tree": "Maintained locally under <Base>/functional modules/VDF (or VeritasDataForge) on the operator workstation; this anchor registers the discovery root, governance gates, and the movies-dataset intake engine.",
   "discovery_root": "functional modules/VDF",
+  "artifacts": [
+    {
+      "filename": "engine/vdf_movies_intake_v001.py",
+      "role": "VDF movies-dataset intake forge v001 · reads <Repo>/data/*.csv (movie_metadata / tmdb_5000_movies / movies_genres_summary) and materializes the VDF analytical database db/movies_dataset.sqlite (tables: movies_genres_summary, yearly_box_office, yearly_tmdb) · modes Refresh/ValidateOnly/DryRun · sources read-only · atomic replace · intake summary under qa/evidence (zero dependencies)",
+      "bytes": 10506,
+      "sha256": "5675d447f7ae52fd4b944e6861643d65e5a9853fd31b162677206b84e5507694"
+    }
+  ],
+  "products": {
+    "database": "db/movies_dataset.sqlite (git-ignored product; rebuild via the intake engine)",
+    "evidence": "qa/evidence/movies_intake_summary.json (tracked · source sha256, row counts, gate)"
+  },
   "governance": {
     "update_modes": ["Incremental", "Refresh", "ValidateOnly", "DryRun"],
     "promotion_gate": "OPERATOR_REVIEW_AND_SEPARATE_HASH_LOCKED_TRANSACTION_REQUIRED",

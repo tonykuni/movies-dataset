@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>VDF Three Deferred Flow Sync Gate v024</title>
+<style>
+body{margin:0;background:#f5f4f0;color:#1e1d1a;font-family:Arial,"Microsoft JhengHei",sans-serif;font-size:10.4px;line-height:1.32}
+.header{padding:22px 28px;background:linear-gradient(135deg,#1e293b,#31517a);color:white;text-align:center}
+.header h1{margin:0;font-size:25px}.line2{margin-top:6px;font-size:13px;font-weight:800;letter-spacing:1.4px}.line3{margin-top:6px;font-size:11.5px;opacity:.9}
+.wrap{padding:18px 24px}.grid{display:grid;grid-template-columns:repeat(8,minmax(95px,1fr));gap:10px;margin-bottom:14px}
+.card{background:white;border:1px solid #d8d6cf;border-radius:12px;padding:10px 12px;box-shadow:0 5px 16px rgba(16,24,40,.045)}
+.kpi{font-size:22px;font-weight:900;font-family:Consolas,monospace;text-align:center}.label{text-align:center;color:#7b786f;font-size:10.5px;margin-top:5px}
+.badge{display:inline-block;padding:7px 10px;border-radius:999px;font-weight:900}
+.badge.low{background:#cde8d5;color:#5a9e6f}.badge.medium{background:#f5e2b8;color:#c4943a}.badge.high{background:#f5d0c8;color:#c96b5a}
+.lock{font-family:Consolas,"Microsoft JhengHei",monospace;white-space:pre-wrap;background:#0b1020;color:#dbeafe;padding:12px 14px;border-radius:10px;line-height:1.38;overflow:auto;font-size:10.5px}
+.mw{max-height:780px;overflow:auto;border:1px solid #d8d6cf;border-radius:12px;background:white;margin-bottom:16px}
+table{width:100%;border-collapse:collapse;table-layout:auto;background:white}
+thead th{position:sticky;top:0;z-index:2;text-align:center;vertical-align:top;background:#eef2f8;color:#334155;font-size:10.1px;font-weight:900;padding:7px;border-bottom:1px solid #d8d6cf;border-right:1px solid #e4e7ec}
+tbody td{font-size:10.1px;padding:6px 7px;border-bottom:1px solid #edf0f4;border-right:1px solid #edf0f4;vertical-align:top;word-break:break-word;overflow-wrap:anywhere;white-space:normal;text-align:center}
+.path{font-family:Consolas,monospace;font-size:9.2px;color:#475467;min-width:220px;max-width:360px;text-align:left}
+tr.ok td:first-child{border-left:4px solid #5a9e6f}tr.warn td:first-child{border-left:4px solid #c4943a}tr.fail td:first-child{border-left:4px solid #c96b5a}
+h2{font-size:14px;margin:14px 0 8px}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>VeritasDataForge</h1>
+<div class="line2">VERITAS INTELLIGENCE ANALYTICS</div>
+<div class="line3">Three Deferred Flow Synchronization Gate v024 · Selector · CompanyProfile Gate · FRED/AkShare Capability</div>
+</div>
+<div class="wrap">
+<div class="grid">
+<div class="card"><div class="badge medium">VDF_THREE_DEFERRED_FLOW_SYNC_GATE_READY</div><div class="label">Risk MEDIUM</div></div>
+<div class="card"><div class="kpi">39</div><div class="label">OK</div></div>
+<div class="card"><div class="kpi">0</div><div class="label">WARN</div></div>
+<div class="card"><div class="kpi">0</div><div class="label">FAIL</div></div>
+<div class="card"><div class="kpi">LOW</div><div class="label">Probe Risk</div></div>
+<div class="card"><div class="kpi">True</div><div class="label">FRED Key</div></div>
+<div class="card"><div class="kpi">4</div><div class="label">Sequential</div></div>
+<div class="card"><div class="kpi">0.39</div><div class="label">Seconds</div></div>
+</div>
+
+<h2>def Three Deferred Flow Scope</h2>
+<div class="lock">Gate Plan:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_THREE_DEFERRED_FLOW_SYNC_GATE_v024_20260610_123806\plan\VDF_ThreeDeferredFlow_GatePlan_v024.json
+
+Capability Probe:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_THREE_DEFERRED_FLOW_SYNC_GATE_v024_20260610_123806\runtime\vdf_three_deferred_flow_capability_probe_result_v024.json
+
+Top10 Local Free Libs:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_THREE_DEFERRED_FLOW_SYNC_GATE_v024_20260610_123806\registry\VDF_Top10_LocalFreeLibs_ThreeDeferredFlow_v024.json
+
+Three flows:
+1. MOPS OTC MonthlyRevenue selector gate
+2. MOPS CompanyProfile isolated gate
+3. FRED/AkShare local capability probe gate
+
+Policy:
+def no broad fetch
+def no database rewrite
+def no destructive delete
+def no Stop-Process
+def no exit
+def do not run TPEX + MOPS + FRED/AkShare real fetch together
+def no FinancialStatement before CompanyProfile gate
+def no FinancialRatio before FinancialStatement seal
+def next step = v024.1 FRED/AkShare capability seal OR MOPS CompanyProfile isolated gate</div>
+
+<h2>def Matrix</h2>
+<div class="mw">
+<table>
+<thead><tr><th>Round</th><th>Flow</th><th>Layer</th><th>Name</th><th>Status</th><th>Risk</th><th>FixClass</th><th>Priority</th><th>Mode</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr></thead>
+<tbody>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>ACTIVE_POINTER</td><td>VDF_ACTIVE_POINTER.json</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NO_FETCH</td><td>json_parse</td><td>ok</td><td>JSON parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ACTIVE_POINTER.json</td></tr>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>ALLFLOW_MASTER</td><td>VDF_ALLFLOW_MASTER_POINTER.json</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NO_FETCH</td><td>json_parse</td><td>ok</td><td>JSON parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ALLFLOW_MASTER_POINTER.json</td></tr>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>TWSE_SEAL</td><td>VDF_LATEST_TWSE_OFFICIAL_SEED_SEAL_POINTER.json</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NO_FETCH</td><td>json_parse</td><td>ok</td><td>JSON parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_freeze\VDF_LATEST_TWSE_OFFICIAL_SEED_SEAL_POINTER.json</td></tr>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>TPEX_SEAL</td><td>VDF_LATEST_TPEX_SMALL_SCOPE_SEAL_POINTER.json</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NO_FETCH</td><td>json_parse</td><td>ok</td><td>JSON parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_freeze\VDF_LATEST_TPEX_SMALL_SCOPE_SEAL_POINTER.json</td></tr>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>MOPS_REVENUE_SEAL</td><td>VDF_LATEST_MOPS_MONTHLY_REVENUE_SEAL_POINTER.json</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NO_FETCH</td><td>json_parse</td><td>ok</td><td>JSON parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_freeze\VDF_LATEST_MOPS_MONTHLY_REVENUE_SEAL_POINTER.json</td></tr>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>SSOT_PARAMS</td><td>VDF_Extraction_Params_SSOT.json</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NO_FETCH</td><td>json_parse</td><td>ok</td><td>JSON parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_ssot\VDF_Extraction_Params_SSOT.json</td></tr>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>HEADER_REGISTRY</td><td>VDF_DataScope_HeaderRegistry_SSOT.json</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NO_FETCH</td><td>json_parse</td><td>ok</td><td>JSON parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_ssot\VDF_DataScope_HeaderRegistry_SSOT.json</td></tr>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>SUPPORTIVE_MANIFEST</td><td>VDF_SupportiveTools_ImportManifest.json</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NO_FETCH</td><td>json_parse</td><td>ok</td><td>JSON parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_ssot\VDF_SupportiveTools_ImportManifest.json</td></tr>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>VDF_ENTRY</td><td>Invoke-VDF.ps1</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NO_FETCH</td><td>exists_sha256</td><td>DC72773B64F027CC8699199F3E315586AFB2BF0DEAF7D0B7B3430CF57A3A73FD</td><td>File exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\Invoke-VDF.ps1</td></tr>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>VDF_ENTRY_AST</td><td>Invoke-VDF.ps1</td><td>OK_AST_PARSE</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NO_FETCH</td><td>functions</td><td>1</td><td>PowerShell AST parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\Invoke-VDF.ps1</td></tr>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>VDF_FETCH_ENTRY</td><td>Invoke-VDF-Fetch.ps1</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NO_FETCH</td><td>exists_sha256</td><td>C625DA53435FBC27CDE102F634D8BC9BF4BD22DEA728E2B6499F0077305F7364</td><td>File exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\Invoke-VDF-Fetch.ps1</td></tr>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>VDF_FETCH_ENTRY_AST</td><td>Invoke-VDF-Fetch.ps1</td><td>OK_AST_PARSE</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NO_FETCH</td><td>functions</td><td>1</td><td>PowerShell AST parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\Invoke-VDF-Fetch.ps1</td></tr>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>NEXUSCORE_ENTRY</td><td>Invoke-VeritasNexusCore.ps1</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NO_FETCH</td><td>exists_sha256</td><td>D8741599A121F33A31A57C372BA86AA328D74F1C9BE5817AEB7682C1FFFC267C</td><td>File exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\Invoke-VeritasNexusCore.ps1</td></tr>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>NEXUSCORE_AST</td><td>Invoke-VeritasNexusCore.ps1</td><td>OK_AST_PARSE</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NO_FETCH</td><td>functions</td><td>2</td><td>PowerShell AST parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\Invoke-VeritasNexusCore.ps1</td></tr>
+<tr class='ok'><td>Round1</td><td>BASE_STATE</td><td>NEXUSCORE_README</td><td>Read_Me_VeritasNexusCore.md</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NO_FETCH</td><td>exists_sha256</td><td>E17A9D1312F6B730094C4D868156681CF7B7D49C53FA1B2226AB5C859F6B79F2</td><td>File exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\Read_Me_VeritasNexusCore.md</td></tr>
+<tr class='ok'><td>Round2</td><td>MOPS_OTC_SELECTOR</td><td>CURRENT_STATE</td><td>VDF_TW_MonthlyRevenue</td><td>OK_CANONICAL_READY</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NO_FETCH</td><td>rows</td><td>1078</td><td>Canonical monthly revenue is already sealed; OTC selector must not overwrite it.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE\VDF_TW_MonthlyRevenue.csv</td></tr>
+<tr class='ok'><td>Round2</td><td>MOPS_OTC_SELECTOR</td><td>CURRENT_STATE</td><td>VDF_MOPS_Raw_MonthlyRevenue_Listed</td><td>OK_LISTED_READY</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NO_FETCH</td><td>rows</td><td>1078</td><td>Listed monthly revenue raw is sealed.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE\VDF_MOPS_Raw_MonthlyRevenue_Listed.csv</td></tr>
+<tr class='warn'><td>Round2</td><td>MOPS_OTC_SELECTOR</td><td>CURRENT_STATE</td><td>VDF_MOPS_Raw_MonthlyRevenue_OTC</td><td>OK_DEFERRED</td><td>MEDIUM</td><td>SEQUENTIAL_DEFERRED</td><td>P2</td><td>SELECTOR_ONLY</td><td>rows</td><td>0</td><td>OTC raw endpoint remains deferred; next action is endpoint selector only.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE\VDF_MOPS_Raw_MonthlyRevenue_OTC.csv</td></tr>
+<tr class='warn'><td>Round2</td><td>MOPS_COMPANY_PROFILE_GATE</td><td>SCOPE_LOCK</td><td>VDF_TW_CompanyProfile</td><td>OK_SCOPE_LOCKED</td><td>MEDIUM</td><td>SEQUENTIAL_DEFERRED</td><td>P2</td><td>GATE_ONLY</td><td>policy</td><td>separate</td><td>CompanyProfile must be its own gate. Do not mix with FinancialStatement or MonthlyRevenue.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE\VDF_TW_CompanyProfile.csv</td></tr>
+<tr class='warn'><td>Round2</td><td>MOPS_COMPANY_PROFILE_GATE</td><td>BLOCKED</td><td>VDF_TW_FinancialStatement</td><td>OK_BLOCKED</td><td>MEDIUM</td><td>SEQUENTIAL_DEFERRED</td><td>P3</td><td>GATE_ONLY</td><td>policy</td><td>blocked</td><td>FinancialStatement remains blocked until CompanyProfile gate succeeds.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE\VDF_TW_FinancialStatement.csv</td></tr>
+<tr class='warn'><td>Round2</td><td>MOPS_COMPANY_PROFILE_GATE</td><td>BLOCKED</td><td>VDF_TW_FinancialRatio</td><td>OK_BLOCKED</td><td>MEDIUM</td><td>SEQUENTIAL_DEFERRED</td><td>P3</td><td>GATE_ONLY</td><td>policy</td><td>blocked</td><td>FinancialRatio remains blocked until FinancialStatement seal exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE\VDF_TW_FinancialRatio.csv</td></tr>
+<tr class='ok'><td>Round2</td><td>FRED_AKSHARE_CAPABILITY</td><td>SCOPE_LOCK</td><td>Global Macro / Commodity / Freight / FX</td><td>OK_SCOPE_LOCKED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>CAPABILITY_ONLY</td><td>policy</td><td>probe_only</td><td>Only local package/API-key capability probe is allowed in v024. No broad data fetch.</td><td class='path'></td></tr>
+<tr class='ok'><td>Round3</td><td>CAPABILITY_PROBE</td><td>PYTHON_PROBE</td><td>vdf_three_deferred_flow_capability_probe_v024.py</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NO_FETCH</td><td>exists_sha256</td><td>9E027CDDE0B62C734309C1E9E74895FC88EB15244B6FCCCCFF96FAED4952F907</td><td>File exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_THREE_DEFERRED_FLOW_SYNC_GATE_v024_20260610_123806\runtime\vdf_three_deferred_flow_capability_probe_v024.py</td></tr>
+<tr class='ok'><td>Round3</td><td>FRED_AKSHARE_CAPABILITY</td><td>PYTHON_PROBE</td><td>local capability probe</td><td>OK_PROBE_EXECUTED</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>CAPABILITY_ONLY</td><td>execute</td><td>ok</td><td>{&quot;status&quot;: &quot;VDF_THREE_DEFERRED_FLOW_CAPABILITY_PROBE_READY&quot;, &quot;risk&quot;: &quot;LOW&quot;, &quot;missing&quot;: [], &quot;fred_api_key_exists&quot;: true}</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_THREE_DEFERRED_FLOW_SYNC_GATE_v024_20260610_123806\runtime\vdf_three_deferred_flow_capability_probe_v024.py</td></tr>
+<tr class='ok'><td>Round3</td><td>FRED_AKSHARE_CAPABILITY</td><td>PYTHON_RESULT</td><td>vdf_three_deferred_flow_capability_probe_result_v024.json</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NO_FETCH</td><td>json_parse</td><td>ok</td><td>JSON parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_THREE_DEFERRED_FLOW_SYNC_GATE_v024_20260610_123806\runtime\vdf_three_deferred_flow_capability_probe_result_v024.json</td></tr>
+<tr class='ok'><td>Round3</td><td>FRED_AKSHARE_CAPABILITY</td><td>PACKAGE</td><td>requests</td><td>OK_AVAILABLE</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>CAPABILITY_ONLY</td><td>import_spec</td><td>available</td><td>Package is locally available.</td><td class='path'></td></tr>
+<tr class='ok'><td>Round3</td><td>FRED_AKSHARE_CAPABILITY</td><td>PACKAGE</td><td>pandas</td><td>OK_AVAILABLE</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>CAPABILITY_ONLY</td><td>import_spec</td><td>available</td><td>Package is locally available.</td><td class='path'></td></tr>
+<tr class='ok'><td>Round3</td><td>FRED_AKSHARE_CAPABILITY</td><td>PACKAGE</td><td>pyarrow</td><td>OK_AVAILABLE</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>CAPABILITY_ONLY</td><td>import_spec</td><td>available</td><td>Package is locally available.</td><td class='path'></td></tr>
+<tr class='ok'><td>Round3</td><td>FRED_AKSHARE_CAPABILITY</td><td>PACKAGE</td><td>duckdb</td><td>OK_AVAILABLE</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>CAPABILITY_ONLY</td><td>import_spec</td><td>available</td><td>Package is locally available.</td><td class='path'></td></tr>
+<tr class='ok'><td>Round3</td><td>FRED_AKSHARE_CAPABILITY</td><td>PACKAGE</td><td>pandas_datareader</td><td>OK_AVAILABLE</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>CAPABILITY_ONLY</td><td>import_spec</td><td>available</td><td>Package is locally available.</td><td class='path'></td></tr>
+<tr class='ok'><td>Round3</td><td>FRED_AKSHARE_CAPABILITY</td><td>PACKAGE</td><td>fredapi</td><td>OK_AVAILABLE</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>CAPABILITY_ONLY</td><td>import_spec</td><td>available</td><td>Package is locally available.</td><td class='path'></td></tr>
+<tr class='ok'><td>Round3</td><td>FRED_AKSHARE_CAPABILITY</td><td>PACKAGE</td><td>akshare</td><td>OK_AVAILABLE</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>CAPABILITY_ONLY</td><td>import_spec</td><td>available</td><td>Package is locally available.</td><td class='path'></td></tr>
+<tr class='ok'><td>Round3</td><td>FRED_AKSHARE_CAPABILITY</td><td>PACKAGE</td><td>bs4</td><td>OK_AVAILABLE</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>CAPABILITY_ONLY</td><td>import_spec</td><td>available</td><td>Package is locally available.</td><td class='path'></td></tr>
+<tr class='ok'><td>Round3</td><td>FRED_AKSHARE_CAPABILITY</td><td>PACKAGE</td><td>lxml</td><td>OK_AVAILABLE</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>CAPABILITY_ONLY</td><td>import_spec</td><td>available</td><td>Package is locally available.</td><td class='path'></td></tr>
+<tr class='ok'><td>Round3</td><td>FRED_AKSHARE_CAPABILITY</td><td>PACKAGE</td><td>openpyxl</td><td>OK_AVAILABLE</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>CAPABILITY_ONLY</td><td>import_spec</td><td>available</td><td>Package is locally available.</td><td class='path'></td></tr>
+<tr class='ok'><td>Round3</td><td>FRED_AKSHARE_CAPABILITY</td><td>API_KEY</td><td>FRED API key</td><td>OK_KEY_EXISTS</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>CAPABILITY_ONLY</td><td>env_key</td><td>exists</td><td>FRED API key exists in environment.</td><td class='path'></td></tr>
+<tr class='ok'><td>Round4</td><td>CONSOLIDATE</td><td>LOCAL_FREE_LIBS</td><td>VDF_Top10_LocalFreeLibs_ThreeDeferredFlow_v024.json</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NO_FETCH</td><td>json_parse</td><td>ok</td><td>JSON parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_THREE_DEFERRED_FLOW_SYNC_GATE_v024_20260610_123806\registry\VDF_Top10_LocalFreeLibs_ThreeDeferredFlow_v024.json</td></tr>
+<tr class='ok'><td>Round4</td><td>CONSOLIDATE</td><td>GATE_PLAN</td><td>VDF_ThreeDeferredFlow_GatePlan_v024.json</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NO_FETCH</td><td>json_parse</td><td>ok</td><td>JSON parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_THREE_DEFERRED_FLOW_SYNC_GATE_v024_20260610_123806\plan\VDF_ThreeDeferredFlow_GatePlan_v024.json</td></tr>
+<tr class='ok'><td>Round4</td><td>CONSOLIDATE</td><td>ACTIVE_POINTER</td><td>VDF_ACTIVE_POINTER.json</td><td>OK</td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>NO_FETCH</td><td>update</td><td>complete</td><td>Active pointer updated with v024 three-deferred-flow sync gate.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ACTIVE_POINTER.json</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</body>
+</html>

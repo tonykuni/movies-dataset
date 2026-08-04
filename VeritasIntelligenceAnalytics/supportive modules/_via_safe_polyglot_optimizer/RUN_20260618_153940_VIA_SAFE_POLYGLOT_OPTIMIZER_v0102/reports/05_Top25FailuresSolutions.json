@@ -1,0 +1,177 @@
+﻿[
+  {
+    "Id": 1,
+    "Failure": "Missing input file",
+    "Risk": "HIGH",
+    "Solution": "Mark missing in registry, skip execution, require path fix before activation.",
+    "Class": "SEQUENCE_DEPENDENT"
+  },
+  {
+    "Id": 2,
+    "Failure": "PowerShell parser error",
+    "Risk": "HIGH",
+    "Solution": "Use AST parse message, fix exact line, rerun sandbox parse only.",
+    "Class": "SEQUENCE_DEPENDENT"
+  },
+  {
+    "Id": 3,
+    "Failure": "Remove-Item in optimizer path",
+    "Risk": "HIGH",
+    "Solution": "Downgrade to report-only or quarantine plan; never direct delete.",
+    "Class": "SEQUENCE_DEPENDENT"
+  },
+  {
+    "Id": 4,
+    "Failure": "Clear-RecycleBin usage",
+    "Risk": "HIGH",
+    "Solution": "Disable; use recoverable quarantine and manual review.",
+    "Class": "SEQUENCE_DEPENDENT"
+  },
+  {
+    "Id": 5,
+    "Failure": "Stop-Process usage",
+    "Risk": "HIGH",
+    "Solution": "Replace with detection/report; user closes process manually.",
+    "Class": "SEQUENCE_DEPENDENT"
+  },
+  {
+    "Id": 6,
+    "Failure": "Docker prune volumes",
+    "Risk": "HIGH",
+    "Solution": "Permit docker system df only; volumes require explicit backup and manual approval.",
+    "Class": "SEQUENCE_DEPENDENT"
+  },
+  {
+    "Id": 7,
+    "Failure": "Global PATH mutation",
+    "Risk": "MEDIUM",
+    "Solution": "Use process-local PATH; write env plan instead of applying globally.",
+    "Class": "SEQUENCE_DEPENDENT"
+  },
+  {
+    "Id": 8,
+    "Failure": "OneDrive online-only forced download",
+    "Risk": "MEDIUM",
+    "Solution": "Skip reparse/cloud placeholders; use explicit Free up space helper only.",
+    "Class": "PARALLEL_FIXABLE"
+  },
+  {
+    "Id": 9,
+    "Failure": ".git deletion or cleanup",
+    "Risk": "HIGH",
+    "Solution": "Protect .git; use git gc only when repo is clean and backed up.",
+    "Class": "SEQUENCE_DEPENDENT"
+  },
+  {
+    "Id": 10,
+    "Failure": "node_modules active project removal",
+    "Risk": "MEDIUM",
+    "Solution": "Classify as cache candidate only; require lockfile and rebuild plan.",
+    "Class": "PARALLEL_FIXABLE"
+  },
+  {
+    "Id": 11,
+    "Failure": "venv/site-packages removal",
+    "Risk": "MEDIUM",
+    "Solution": "Protect active env; only stale env candidate after manifest verification.",
+    "Class": "PARALLEL_FIXABLE"
+  },
+  {
+    "Id": 12,
+    "Failure": "Huge duplicated CSV/Parquet",
+    "Risk": "LOW",
+    "Solution": "Use size+extension candidate then SHA256; report/quarantine only.",
+    "Class": "PARALLEL_FIXABLE"
+  },
+  {
+    "Id": 13,
+    "Failure": "HTML report huge due base64",
+    "Risk": "LOW",
+    "Solution": "Move assets external; compress; keep final/latest only.",
+    "Class": "PARALLEL_FIXABLE"
+  },
+  {
+    "Id": 14,
+    "Failure": "Recursive junction loop",
+    "Risk": "HIGH",
+    "Solution": "Skip reparse points; cap MaxFiles and MaxDepth.",
+    "Class": "SEQUENCE_DEPENDENT"
+  },
+  {
+    "Id": 15,
+    "Failure": "Long path failures",
+    "Risk": "MEDIUM",
+    "Solution": "Use LiteralPath and extended-path awareness; report failures.",
+    "Class": "SEQUENCE_DEPENDENT"
+  },
+  {
+    "Id": 16,
+    "Failure": "Encoding corruption",
+    "Risk": "MEDIUM",
+    "Solution": "Use UTF8 with BOM only for Excel CSV; UTF8 for JSON/HTML.",
+    "Class": "PARALLEL_FIXABLE"
+  },
+  {
+    "Id": 17,
+    "Failure": "Invalid JSON from child script",
+    "Risk": "MEDIUM",
+    "Solution": "Capture stdout/stderr separately; validate with ConvertFrom-Json.",
+    "Class": "PARALLEL_FIXABLE"
+  },
+  {
+    "Id": 18,
+    "Failure": "Port conflict",
+    "Risk": "LOW",
+    "Solution": "Probe port; choose next candidate; report selected port.",
+    "Class": "PARALLEL_FIXABLE"
+  },
+  {
+    "Id": 19,
+    "Failure": "Browser auto-open blocked",
+    "Risk": "LOW",
+    "Solution": "Print HTML path; skip browser with -NoBrowser.",
+    "Class": "PARALLEL_FIXABLE"
+  },
+  {
+    "Id": 20,
+    "Failure": "Admin-required command",
+    "Risk": "MEDIUM",
+    "Solution": "Detect admin status; degrade to read-only report when not elevated.",
+    "Class": "PARALLEL_FIXABLE"
+  },
+  {
+    "Id": 21,
+    "Failure": "Network dependency",
+    "Risk": "MEDIUM",
+    "Solution": "Local-only by default; no install unless explicit flag added in future.",
+    "Class": "PARALLEL_FIXABLE"
+  },
+  {
+    "Id": 22,
+    "Failure": "Package version conflict",
+    "Risk": "MEDIUM",
+    "Solution": "Generate env plan; avoid global pip/npm install.",
+    "Class": "PARALLEL_FIXABLE"
+  },
+  {
+    "Id": 23,
+    "Failure": "C drive low space during run",
+    "Risk": "HIGH",
+    "Solution": "Preflight disk check; write outputs under chosen root; cap logs.",
+    "Class": "SEQUENCE_DEPENDENT"
+  },
+  {
+    "Id": 24,
+    "Failure": "Hydra cascade risk",
+    "Risk": "HIGH",
+    "Solution": "Classify parallel vs sequence; cap fixes at three rounds.",
+    "Class": "SEQUENCE_DEPENDENT"
+  },
+  {
+    "Id": 25,
+    "Failure": "False duplicate detection by size only",
+    "Risk": "HIGH",
+    "Solution": "Size/extension only candidate; SHA256 required for confirmed duplicate.",
+    "Class": "SEQUENCE_DEPENDENT"
+  }
+]

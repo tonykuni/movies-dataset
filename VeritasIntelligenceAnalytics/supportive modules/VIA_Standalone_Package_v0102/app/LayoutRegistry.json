@@ -1,0 +1,112 @@
+{
+  "meta": {
+    "schema": "VIA.CodexNexus.LayoutRegistry",
+    "version": "v1.0",
+    "generated": "2026-06-17",
+    "engine": "LayoutRegistry",
+    "output": "LayoutRegistry.json",
+    "reads": "Header/Sidebar/Workspace/Split/Grid/RWD",
+    "append_only": true,
+    "languages": [
+      "PowerShell",
+      "Python",
+      "JavaScript",
+      "HTML"
+    ]
+  },
+  "language_adapters": {
+    "Header": {
+      "python": "beautifulsoup4",
+      "javascript": "semantic <header>",
+      "powershell": "—",
+      "html": "header"
+    },
+    "Sidebar": {
+      "python": "lxml",
+      "javascript": "nav/aside",
+      "powershell": "—",
+      "html": "sidebar(可伸縮)"
+    },
+    "RightPanel": {
+      "python": "lxml",
+      "javascript": "aside",
+      "powershell": "—",
+      "html": "rightpanel(可開關)"
+    },
+    "SplitPanel": {
+      "python": "JSON spec",
+      "javascript": "Split.js",
+      "powershell": "—",
+      "html": "split"
+    },
+    "GridLayout": {
+      "python": "JSON spec",
+      "javascript": "Gridstack.js / Muuri",
+      "powershell": "—",
+      "html": "grid"
+    },
+    "AutoPack": {
+      "python": "JSON spec",
+      "javascript": "Muuri / packery",
+      "powershell": "—",
+      "html": "reflow"
+    },
+    "TabLayout": {
+      "python": "html.parser",
+      "javascript": "tabs",
+      "powershell": "—",
+      "html": "tabs"
+    },
+    "Responsive": {
+      "python": "tinycss2",
+      "javascript": "CSS Grid/Flex",
+      "powershell": "—",
+      "html": "@media"
+    },
+    "Spacing": {
+      "python": "tinycss2",
+      "javascript": "CSS variables",
+      "powershell": "—",
+      "html": "—"
+    },
+    "Typography": {
+      "python": "tinycss2",
+      "javascript": "CSS variables / clamp",
+      "powershell": "—",
+      "html": "—"
+    }
+  },
+  "zones": {
+    "sidebar": {
+      "collapsible": true,
+      "width": [
+        "238px",
+        "58px(icon rail)"
+      ]
+    },
+    "content": {
+      "scroll": "內捲",
+      "max": "1060px"
+    },
+    "rightpanel": {
+      "collapsible": true,
+      "width": [
+        "304px",
+        "0"
+      ]
+    }
+  },
+  "adaptive": {
+    "grid": "var(--sbw) 1fr var(--rpw)",
+    "font": "clamp(12.5px,0.86vw,15px)",
+    "breakpoints": {
+      "<1280px": "收右欄",
+      "<980px": "左欄收圖示軌"
+    },
+    "print_safe": "版面CSS包@media screen→PDF不受影響"
+  },
+  "io": {
+    "output": "LayoutRegistry.json",
+    "cmd": "Invoke-VeritasCodexNexus.ps1 -Mode Layout -Task ExtractLayout"
+  }
+}

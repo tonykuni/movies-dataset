@@ -1,0 +1,234 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · Evolving SSOT Super Engine · 中樞註冊與編碼引擎</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--blue:#4c78a8;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--vi:#7a6daa;
+ --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg)}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5}
+.wrap{max-width:1340px;margin:0 auto;padding:0 22px 60px}
+.bar{position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50}
+header{margin:14px 0 10px}
+.masthead{display:flex;gap:14px;align-items:stretch;flex-wrap:wrap;border:1px solid var(--line);border-top:2px solid var(--ink);border-radius:6px;overflow:hidden;background:var(--paper)}
+.mh-left{flex:1 1 520px;min-width:280px;padding:14px 18px}
+.mh-right{flex:1 1 320px;min-width:250px;background:#1e1d1a;padding:13px 16px;display:flex;flex-direction:column;gap:9px;justify-content:flex-end}
+.kicker{font:700 9px 'DM Mono',monospace;letter-spacing:1.8px;color:var(--mut);text-transform:uppercase;margin-bottom:7px;line-height:1.4}
+h1{font:800 19px/1.16 'Syne',sans-serif;color:var(--ink)}h1 span{color:var(--up)}
+.sub{margin-top:7px;font:400 10px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:820px}.sub b{color:var(--ink2)}
+.gov{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.gov .lk{font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase}
+.gov .ver{margin-left:auto;font:700 8px 'DM Mono',monospace;color:#1e1d1a;background:#c4943a;border-radius:3px;padding:2px 8px}
+.rlab{font:700 7.5px 'DM Mono',monospace;letter-spacing:1.4px;color:#8a867d;text-transform:uppercase;border-bottom:1px solid #34322c;padding-bottom:6px}
+.params{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#34322c;border:1px solid #34322c;border-radius:4px;overflow:hidden}
+.pcell{background:#26251f;padding:7px 6px;text-align:center}
+.pcell .pn{font:800 15px 'DM Mono',monospace;color:#fff;font-variant-numeric:tabular-nums;line-height:1}
+.pcell .pk{font:600 6.5px 'DM Mono',monospace;letter-spacing:.4px;color:#a49f92;text-transform:uppercase;margin-top:4px}
+.tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px}
+.tab{font:700 10.5px 'DM Sans','Noto Sans TC',sans-serif;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--mut);border-radius:3px;padding:7px 11px}
+.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.sec{display:none}.sec.on{display:block}
+h2{font:800 13px 'Syne',sans-serif;color:var(--ink);margin:16px 0 4px;padding-bottom:5px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:8px}
+h2 .en{font:600 8px 'DM Mono',monospace;color:var(--mut2);letter-spacing:1px;text-transform:uppercase}
+h2 .rc{margin-left:auto;font:700 8px 'DM Mono',monospace;color:var(--vi)}
+.note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--am);border-radius:3px;padding:8px 14px;margin-bottom:12px;font:500 9px/1.6 'DM Mono',monospace;color:var(--mut)}.note b{color:var(--ink2)}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-top:12px}
+.hd2{font:800 11px 'Syne',sans-serif;padding:10px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;color:var(--ink)}
+table{width:100%;border-collapse:collapse;font:500 10px 'DM Mono',monospace}
+th{font:700 8px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.4px;color:var(--mut);text-align:left;padding:7px 9px;border-bottom:2px solid var(--ink);background:var(--paper2)}
+td{padding:6px 9px;border-bottom:1px solid var(--soft);vertical-align:middle}tr:hover td{background:var(--paper2)}
+.nm{font:700 10px 'Noto Sans TC',sans-serif;color:var(--ink)}.code{font:700 9px 'DM Mono',monospace;color:var(--vi)}
+.lockbadge{font:700 7px 'DM Mono',monospace;color:#fff;background:var(--ink);border-radius:3px;padding:1px 6px;letter-spacing:.5px}
+.b-lock{background:#8a5a3a}.b-via{background:var(--vi)}.b-new{background:var(--down)}
+.tag{font:600 8px 'Noto Sans TC',sans-serif;background:var(--soft);border-radius:3px;padding:1px 7px;color:var(--ink2)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-top:12px}
+.lockcard{background:var(--paper);border:1px solid var(--line);border-left:3px solid #8a5a3a;border-radius:6px;overflow:hidden}
+.lockcard .lh{padding:9px 13px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px;background:#faf6f2}
+.lockcard .lt{font:800 11px 'Noto Sans TC',sans-serif;color:var(--ink)}
+.lockcard .le{font:600 7.5px 'DM Mono',monospace;color:var(--mut2);text-transform:uppercase;letter-spacing:.5px}
+.lockcard .lb{padding:9px 13px;display:flex;gap:5px;flex-wrap:wrap}
+.term{font:600 9px 'DM Mono',monospace;background:#f3ede8;border:1px solid #e4d9d0;border-radius:3px;padding:2px 7px;color:#6d4b32}
+/* engine */
+.eng{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;padding:12px 14px}
+.fld{display:flex;flex-direction:column;gap:4px}
+.fld label{font:700 7.5px 'DM Mono',monospace;letter-spacing:.5px;color:var(--mut);text-transform:uppercase}
+.fld input,.fld select{font:600 11px 'DM Mono','Noto Sans TC',monospace;border:1px solid var(--line);border-radius:3px;padding:7px 9px;background:var(--paper2);color:var(--ink)}
+.fld input{min-width:220px}
+.btn{font:700 8.5px 'DM Mono',monospace;cursor:pointer;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:3px;padding:8px 13px}
+.btn.o{background:transparent;color:var(--ink)}
+.btn:hover{opacity:.88}
+.out{font:700 13px 'DM Mono',monospace;color:var(--vi);background:#f2effa;border:1px dashed var(--vi);border-radius:4px;padding:8px 12px;min-width:170px;text-align:center}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;padding:11px 14px;border-top:1px solid var(--line);align-items:center}
+.tk{font:500 9px 'DM Mono',monospace;color:var(--mut)}
+.del{cursor:pointer;color:var(--up);font-weight:700;font-family:'DM Mono',monospace}
+/* modules */
+.mman{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px;padding:12px 14px}
+.mrow{display:flex;align-items:center;gap:9px;border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:5px;padding:8px 11px;background:var(--paper)}
+.mrow.off{border-left-color:var(--mut2);opacity:.55}
+.mrow .sw{flex:none;width:30px;height:16px;border-radius:9px;background:var(--down);position:relative;cursor:pointer;transition:.15s}
+.mrow.off .sw{background:var(--mut2)}
+.mrow .sw::after{content:"";position:absolute;top:2px;left:16px;width:12px;height:12px;border-radius:50%;background:#fff;transition:.15s}
+.mrow.off .sw::after{left:2px}
+.mrow .mi{min-width:0}.mrow .mi .mt{font:700 10px 'Noto Sans TC',sans-serif;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mrow .mi .mc{font:700 7.5px 'DM Mono',monospace;color:var(--vi)}
+/* prompts */
+.prompt{border:1px solid var(--line);border-left:4px solid var(--vi);border-radius:5px;margin-top:10px;background:var(--paper);overflow:hidden}
+.prompt .ph{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 13px;border-bottom:1px solid var(--line);background:var(--paper2)}
+.prompt .pt{font:800 11px 'Noto Sans TC',sans-serif;color:var(--ink)}
+.prompt .pe{font:600 7.5px 'DM Mono',monospace;color:var(--mut2);text-transform:uppercase;letter-spacing:.5px}
+.prompt pre{margin:0;padding:11px 13px;font:500 9.5px/1.66 'DM Mono',monospace;color:var(--ink2);white-space:pre-wrap;background:var(--paper)}
+.cpy{font:700 7.5px 'DM Mono',monospace;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--ink2);border-radius:3px;padding:5px 9px}
+.cpy:hover{border-color:var(--vi);color:var(--vi)}
+.pdf{position:fixed;top:12px;right:14px;z-index:999;background:var(--ink);color:#fff;border:none;border-radius:5px;padding:7px 13px;font:700 9px 'DM Mono',monospace;cursor:pointer}
+@media print{@page{size:A4 landscape;margin:8mm}.pdf,.tabs,.toolbar{display:none!important}.sec{display:block!important}}
+</style></head><body>
+<div class="bar"></div><button class="pdf" onclick="window.print()">⤓ PDF</button>
+<div class="wrap">
+<header>
+ <div class="masthead">
+  <div class="mh-left">
+   <div class="kicker">VERITAS INTELLIGENCE · EVOLVING SSOT SUPER ENGINE · CENTRAL REGISTRY × ASSET CODING</div>
+   <h1>VIA Evolving SSOT Super Engine <span>·</span> 中樞註冊與編碼引擎</h1>
+   <p class="sub">單頁中樞:<b>內容/UI 諸元/參數註冊集中管理</b>、外部詞彙<b>鎖定不改</b>(MS Project · SAP Code/T-Code · PMBOK)、<b>SSOT 大整合</b>、VIA <b>自動智慧資產編號編碼生成引擎</b>,並支援<b>模塊化增減 + AI Prompt</b> 演化。鎖定層只對齊、VIA 為主、只增不減 — 降低整合負擔。</p>
+  </div>
+  <div class="mh-right">
+   <div class="gov"><span class="lk">🔒 LOCKED-VOCAB · VIA-PRIMARY · APPEND-ONLY</span><span class="ver">SSOT v0100</span></div>
+   <div class="rlab">諸元鎖定 · Locked Registry</div>
+   <div class="params" id="params"></div>
+  </div>
+ </div>
+</header>
+<div class="note">📐 四分頁:① 鎖定詞彙(不可改) ② 自動編碼引擎(可生成/增減) ③ 參數諸元相連 ④ 模塊化 + AI Prompt。外部標準(MSP/SAP/T-Code/PMBOK)僅對齊、絕不改動;VIA 自研編碼為唯一真相源(SSOT),一切只增不減。</div>
+<div class="tabs" id="tabs"></div>
+
+<div class="sec on" id="sec-lock">
+ <h2>① 鎖定詞彙註冊 <span class="en">Locked Vocabulary · Align-only, Never Modify</span><span class="rc" id="lockCnt"></span></h2>
+ <div class="note">此層為外部標準,<b>一律鎖定不改</b>。VIA 僅建立對齊別名(alias),不改原碼、不改原義 — 這是降低整合問題與維護負擔的核心規則。</div>
+ <div class="grid2" id="locks"></div>
+</div>
+
+<div class="sec" id="sec-eng">
+ <h2>② 自動智慧資產編碼生成引擎 <span class="en">Auto Asset Coding Engine</span><span class="rc" id="assetCnt"></span></h2>
+ <div class="card"><div class="hd2">決定性編碼生成 · VIA-&lt;TYPE&gt;-&lt;HASH&gt;<span class="tk">同名同碼 · 只增不減 · 本機登錄</span></div>
+  <div class="eng">
+   <div class="fld"><label>類型 Type</label><select id="tSel"></select></div>
+   <div class="fld"><label>名稱 Name(製程/設備/參數/UI諸元…)</label><input id="tName" placeholder="例:兩相式液冷 / 目標價PER / 側欄模組"></div>
+   <div class="fld"><label>生成碼 VIA Code</label><div class="out" id="tOut">VIA-…</div></div>
+   <button class="btn" id="genBtn">＋ 生成並登錄</button>
+  </div>
+  <div style="overflow-x:auto"><table><thead><tr><th>VIA 碼</th><th>類型</th><th>名稱</th><th>命名空間</th><th>狀態</th><th></th></tr></thead><tbody id="assetRows"></tbody></table></div>
+  <div class="toolbar"><button class="btn o" id="expAsset">⤓ 匯出資產 CSV</button><span class="tk">決定性雜湊:同名→同碼,避免重號;刪除為軟移除(登錄保留稽核)。</span></div>
+ </div>
+</div>
+
+<div class="sec" id="sec-link">
+ <h2>③ 參數 × 諸元相連集中管理 <span class="en">Parameter × Element Linkage</span></h2>
+ <div class="note">每個外部鎖定詞彙 → 對齊到 VIA SSOT 別名 → 由哪些模組消費。一處定義,全站連動;改別名不改鎖定原碼。</div>
+ <div class="card"><div style="overflow-x:auto"><table><thead><tr><th>外部鎖定詞彙</th><th>來源標準</th><th>→ VIA SSOT 別名</th><th>消費模組</th></tr></thead><tbody id="linkRows"></tbody></table></div></div>
+</div>
+
+<div class="sec" id="sec-mod">
+ <h2>④ 模塊化增減 + AI Prompt <span class="en">Modular · AI-driven Evolution</span></h2>
+ <div class="card"><div class="hd2">引擎模塊清單 · 可增減(AI 依 Prompt 增減)<span class="tk" id="modStat"></span></div>
+  <div class="mman" id="modMan"></div>
+  <div class="toolbar"><input id="newMod" class="tk" style="border:1px solid var(--line);border-radius:3px;padding:6px 9px;min-width:200px" placeholder="新模塊名稱…"><button class="btn" id="addMod">＋ 新增模塊(自動編碼)</button></div>
+ </div>
+ <div id="prompts"></div>
+</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const LKEY="via_ssot_super_v1";
+// ---- 決定性雜湊 → 6 HEX ----
+function hash6(s){let h=2166136261>>>0;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return ("00000"+h.toString(16).toUpperCase()).slice(-6);}
+function viaCode(type,name){return "VIA-"+type+"-"+hash6(type+"::"+name);}
+
+// ---- 鎖定詞彙(不可改) ----
+const LOCKS=[
+ {t:"MS Project 排程欄位",e:"MS Project Fields",src:"MSP",terms:["Task ID","WBS","Predecessors","Duration","% Complete","Baseline Start","Baseline Finish","Resource Names","Milestone","Constraint Type"]},
+ {t:"SAP 模組碼",e:"SAP Modules",src:"SAP",terms:["MM","PP","SD","CO","FI/FA","PS","QM","PM"]},
+ {t:"SAP T-Code",e:"SAP Transaction Codes",src:"T-CODE",terms:["ME21N","MD04","CS01","CS03","MIGO","MB51","CO02","VA01","KP06","CJ20N"]},
+ {t:"PMBOK 詞彙",e:"PMBOK Terms",src:"PMBOK",terms:["WBS","Scope Baseline","Schedule Baseline","Cost Baseline","RACI","Risk Register","Change Control","EVM · PV/EV/AC","CPI/SPI","Stakeholder Register"]}
+];
+// ---- VIA 命名空間 ----
+const NS=[
+ {type:"PRC",label:"製程 Process"},{type:"EQ",label:"設備 Equipment"},{type:"CPX",label:"資本支出 Capex"},
+ {type:"CO",label:"公司 Company"},{type:"PARAM",label:"參數 Parameter"},{type:"UISPEC",label:"UI 諸元 UI Spec"},
+ {type:"SSOT",label:"真相源 SSOT"},{type:"M",label:"模組 Module"},{type:"IDX",label:"指數 Index"},{type:"VAL",label:"估值 Valuation"}
+];
+// ---- 參數諸元相連 ----
+const LINKS=[
+ ["WBS","MSP/PMBOK","VIA-SSOT-WBS 別名","製程設備資本 · MS Project 同步"],
+ ["Baseline Start/Finish","MSP","VIA-PARAM-SCHEDULE","MS Project 同步 · 每週共振"],
+ ["CS03 (BOM 顯示)","SAP T-Code","VIA-SSOT-BOM","SAP Super BOM · PSU/Thermal 一體"],
+ ["MM/PP/CO","SAP","VIA-SSOT-PROCUREMENT/SCHEDULE/COST","Super BOM · 資本支出"],
+ ["EVM · PV/EV/AC","PMBOK","VIA-PARAM-EVM","財務估值 · 風險引擎"],
+ ["Risk Register","PMBOK","VIA-SSOT-RISK","市場風險框架 · 風險引擎"],
+ ["Resource Names","MSP","VIA-SSOT-STAKEHOLDER","MS Project 同步 · 同義字 PLM"]
+];
+// ---- 預設模塊 ----
+const DEF_MODS=[
+ {n:"鎖定詞彙註冊 Locked Vocabulary",on:true},{n:"自動編碼引擎 Asset Coding",on:true},
+ {n:"參數諸元相連 Linkage",on:true},{n:"SSOT 大整合 Grand Merge",on:true},
+ {n:"AI Prompt 演化 Evolution",on:true},{n:"稽核軌跡 Audit Trail",on:true}
+];
+// ---- AI Prompts ----
+const PROMPTS=[
+ {t:"新編碼 New Coding",e:"generate VIA codes",p:"[ROLE] VIA-ACG 自動編碼生成器。\n[RULE] 外部標準(MSP/SAP/T-Code/PMBOK)一律鎖定不改,僅建立 VIA 對齊別名。\n[TASK] 為 <實體清單> 依類型生成決定性 VIA 碼 VIA-<TYPE>-<HASH>,寫入 via_params.json(只增不減)。同名同碼、禁止重號。\n[OUT] 表格:名稱 / 類型 / VIA碼 / 對齊之鎖定詞彙。核可制:未核可僅 dry-run。"},
+ {t:"改編碼 Re-coding",e:"re-map without breaking locks",p:"[ROLE] VIA-RECODE 重映射器。\n[RULE] 不得更動任何鎖定原碼與原義;僅可調整 VIA 別名層與消費對應。\n[TASK] 針對 <既有 VIA 碼> 調整其 SSOT 別名 / 消費模組;保留舊碼為 alias(append-only,不刪不改)。\n[OUT] 差異表:舊別名 → 新別名 / 影響模組 / 相容性註記。"},
+ {t:"模塊增減 Module Add/Remove",e:"grow or shrink the engine",p:"[ROLE] VIA-MODULER 模塊治理。\n[TASK] 依需求 <新增/停用 模塊>,為新模塊自動生成 VIA-M-<HASH>,登錄至模塊清單並標記啟用狀態。停用為軟移除(保留稽核)。\n[RULE] 只增不減之原則下,停用≠刪除;所有變更寫入 audit trail。"},
+ {t:"鎖定守門 Lock Guard",e:"guard immutable vocab",p:"[ROLE] VIA-LOCKGUARD 守門員。\n[TASK] 掃描任一變更提案,若涉及修改 MSP/SAP/T-Code/PMBOK 原碼或原義 → 拒絕並回報。\n[OUT] PASS(僅新增 VIA 別名) / BLOCK(觸及鎖定層)+ 原因。降低整合風險與負擔。"}
+];
+
+let ASSET=[], MODM=[];
+(function boot(){try{const s=JSON.parse(localStorage.getItem(LKEY));if(s){ASSET=s.asset||[];MODM=s.mod||[];}}catch(e){}
+ if(!MODM.length)MODM=DEF_MODS.map(m=>({n:m.n,on:m.on,c:viaCode("M",m.n)}));})();
+function persist(){try{localStorage.setItem(LKEY,JSON.stringify({asset:ASSET,mod:MODM}));}catch(e){}}
+
+// tabs
+const TABS=[["lock","① 鎖定詞彙"],["eng","② 編碼引擎"],["link","③ 參數諸元相連"],["mod","④ 模塊+AI Prompt"]];
+let cur="lock";
+$("tabs").innerHTML=TABS.map(([id,n])=>`<div class="tab ${id===cur?'on':''}" data-id="${id}">${n}</div>`).join("");
+$("tabs").querySelectorAll(".tab").forEach(t=>t.onclick=()=>{cur=t.dataset.id;$("tabs").querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x.dataset.id===cur));document.querySelectorAll(".sec").forEach(s=>s.classList.toggle("on",s.id==="sec-"+cur));});
+
+// params
+function lockTermCount(){return LOCKS.reduce((a,l)=>a+l.terms.length,0);}
+function renderParams(){$("params").innerHTML=[["鎖定詞彙",lockTermCount()],["VIA 資產",ASSET.length],["連動",LINKS.length],["模塊",MODM.filter(m=>m.on).length]].map(p=>`<div class="pcell"><div class="pn">${p[1]}</div><div class="pk">${p[0]}</div></div>`).join("");}
+
+// ① locks
+$("locks").innerHTML=LOCKS.map(l=>`<div class="lockcard"><div class="lh"><span class="lockbadge b-lock">🔒 LOCKED</span><div><div class="lt">${l.t}</div><div class="le">${l.e} · ${l.src}</div></div></div><div class="lb">${l.terms.map(x=>`<span class="term">${x}</span>`).join("")}</div></div>`).join("");
+$("lockCnt").textContent=LOCKS.length+" 標準 · "+lockTermCount()+" 詞彙";
+
+// ② engine
+$("tSel").innerHTML=NS.map(n=>`<option value="${n.type}">${n.type} · ${n.label}</option>`).join("");
+function preview(){const t=$("tSel").value,n=$("tName").value.trim();$("tOut").textContent=n?viaCode(t,n):"VIA-…";}
+$("tSel").onchange=preview;$("tName").oninput=preview;
+function renderAssets(){
+ $("assetRows").innerHTML=ASSET.length?ASSET.map((a,i)=>`<tr${a.rm?' style="opacity:.45"':''}><td class="code">${a.c}</td><td><span class="tag">${a.t}</span></td><td class="nm">${a.n}</td><td class="tk">VIA-${a.t}</td><td>${a.rm?'<span class="lockbadge" style="background:var(--mut2)">RETIRED</span>':'<span class="lockbadge b-new">ACTIVE</span>'}</td><td>${a.rm?'':'<span class="del" data-i="'+i+'">✕ 移除</span>'}</td></tr>`).join(""):'<tr><td colspan="6" class="tk" style="padding:14px">尚無登錄資產 — 於上方生成。</td></tr>';
+ $("assetRows").querySelectorAll(".del").forEach(el=>el.onclick=()=>{ASSET[+el.dataset.i].rm=true;persist();renderAssets();renderParams();$("assetCnt").textContent=ASSET.filter(a=>!a.rm).length+" 資產";});
+ $("assetCnt").textContent=ASSET.filter(a=>!a.rm).length+" 資產";
+}
+$("genBtn").onclick=()=>{const t=$("tSel").value,n=$("tName").value.trim();if(!n)return;const c=viaCode(t,n);
+ if(ASSET.some(a=>a.c===c&&!a.rm)){$("tOut").textContent=c+" (已存在)";return;}
+ ASSET.push({c,t,n});persist();$("tName").value="";preview();renderAssets();renderParams();};
+$("expAsset").onclick=()=>{let o="VIA_Code,Type,Name,Status\n";ASSET.forEach(a=>o+=`${a.c},${a.t},"${a.n}",${a.rm?'RETIRED':'ACTIVE'}\n`);const b=new Blob(["\ufeff"+o],{type:"text/csv"});const u=document.createElement("a");u.href=URL.createObjectURL(b);u.download="VIA_Asset_Registry.csv";u.click();};
+
+// ③ links
+$("linkRows").innerHTML=LINKS.map(l=>`<tr><td class="nm">${l[0]}</td><td><span class="lockbadge b-lock">🔒 ${l[1]}</span></td><td class="code">${l[2]}</td><td class="tk">${l[3]}</td></tr>`).join("");
+
+// ④ modules
+function renderMods(){
+ $("modMan").innerHTML=MODM.map((m,i)=>`<div class="mrow ${m.on?'':'off'}" data-i="${i}"><span class="sw"></span><div class="mi"><div class="mt">${m.n}</div><div class="mc">${m.c}</div></div></div>`).join("");
+ $("modMan").querySelectorAll(".mrow").forEach(el=>el.querySelector(".sw").onclick=()=>{const i=+el.dataset.i;MODM[i].on=!MODM[i].on;persist();renderMods();renderParams();});
+ $("modStat").textContent=MODM.filter(m=>m.on).length+" / "+MODM.length+" 啟用";
+}
+$("addMod").onclick=()=>{const n=$("newMod").value.trim();if(!n)return;MODM.push({n,on:true,c:viaCode("M",n)});persist();$("newMod").value="";renderMods();renderParams();};
+
+// prompts
+$("prompts").innerHTML=PROMPTS.map(p=>`<div class="prompt"><div class="ph"><div><div class="pt">${p.t}</div><div class="pe">${p.e}</div></div><button class="cpy" data-p="${encodeURIComponent(p.p)}">⧉ 複製</button></div><pre>${p.p.replace(/</g,"&lt;")}</pre></div>`).join("");
+$("prompts").querySelectorAll(".cpy").forEach(b=>b.onclick=()=>{const t=decodeURIComponent(b.dataset.p);navigator.clipboard&&navigator.clipboard.writeText(t);b.textContent="✓ 已複製";setTimeout(()=>b.textContent="⧉ 複製",1200);});
+
+preview();renderAssets();renderMods();renderParams();
+</script>
+</body></html>

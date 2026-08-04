@@ -1,0 +1,48 @@
+{
+  "generated_at": "2026-06-11T10:43:40.550+08:00",
+  "status": "VIA_VDF_VRN_5LANE_PLAN_READY",
+  "risk": "MEDIUM",
+  "no_db_write": true,
+  "no_canonical_merge": true,
+  "control_plane": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules\\Invoke-VeritasNexusCore.ps1",
+  "vdf_lanes": [
+    {
+      "lane": "VDF_Write_Governance_Lane",
+      "mode": "SEQUENTIAL_GATED",
+      "reason": "Touches write boundary; only reviews/rehearsals allowed.",
+      "next": "repair generated script AST, then review execution-capable design only"
+    },
+    {
+      "lane": "VDF_Quarantine_Reduction_Lane",
+      "mode": "PARALLEL_SAFE",
+      "reason": "Researches 29 duplicate quarantine causes without changing frozen 121 candidate set.",
+      "next": "root-cause profile only; no DB write"
+    }
+  ],
+  "vrn_lanes": [
+    {
+      "lane": "VRN_Ingestion_Lane",
+      "mode": "PARALLEL_SAFE",
+      "reason": "Source/OCR/adapter inventory only; no shared schema write.",
+      "next": "file source manifest and extractor capability matrix"
+    },
+    {
+      "lane": "VRN_Normalization_Lane",
+      "mode": "PARALLEL_SAFE",
+      "reason": "Schema/entity/canonical-key preview only.",
+      "next": "normalization schema preview and traceability matrix"
+    },
+    {
+      "lane": "VRN_Presentation_Lane",
+      "mode": "PARALLEL_SAFE",
+      "reason": "HTML/UI/export/user-test scaffold only.",
+      "next": "HTML matrix smoke tests and report UI audit"
+    }
+  ],
+  "stop_conditions": [
+    "Any lane touching NexusCore public API becomes SEQUENTIAL_GATED.",
+    "Any lane touching shared schema contract becomes SEQUENTIAL_GATED.",
+    "Any lane touching VDF write boundary becomes SEQUENTIAL_REQUIRED.",
+    "Any DB write request is blocked until separate explicit approval gate."
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "generated_at": "2026-06-11T00:11:46.776+08:00",
+  "project_root": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics",
+  "run_root": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_VRN_SYNC5_ORCHESTRATION_HOTFIX_v02801_20260611_001129",
+  "status": "VDF_VRN_SYNC5_ORCHESTRATION_HOTFIX_READY_WITH_REVIEW",
+  "risk": "MEDIUM",
+  "hotfix": {
+    "fixed_issue": "Transcript/current-runroot file lock during parallel hash/html scan",
+    "fix_1": "Exclude current RunRoot from all worker scans",
+    "fix_2": "SafeHash returns LOCKED_OR_BUSY instead of throwing",
+    "fix_3": "Prefer Microsoft.PowerShell.ThreadJob"
+  },
+  "policy": {
+    "db_write_enabled": false,
+    "canonical_merge_enabled": false,
+    "destructive_delete_enabled": false,
+    "stop_process_enabled": false,
+    "max_mutation_rounds": 3,
+    "parallel_lane_ceiling": 5,
+    "actual_parallel_lanes_started": 5
+  },
+  "five_parallel_flows": [
+    "FLOW1_POINTER_SEAL_HASH_BACKUP",
+    "FLOW2_AKSHARE_CHAIN_AUDIT",
+    "FLOW3_CANONICAL_CONTRACT_KEY_GATE",
+    "FLOW4_VRN_INTEGRATION_INVENTORY",
+    "FLOW5_HTML_UI_TOP10_LIBS_REPORT_GATE"
+  ],
+  "parallel_safe_fixes": [
+    {
+      "Item": "Pointer / seal backup manifest",
+      "Class": "PARALLEL_SAFE",
+      "Reason": "Read-only plus backup copy only; no DB/canonical mutation."
+    },
+    {
+      "Item": "AkShare chain audit",
+      "Class": "PARALLEL_SAFE",
+      "Reason": "Reads v027.x artifacts only; current runroot excluded."
+    },
+    {
+      "Item": "VRN file inventory",
+      "Class": "PARALLEL_SAFE",
+      "Reason": "Scans files and AST parses scripts only; hash is lock-safe."
+    },
+    {
+      "Item": "HTML UI smoke audit",
+      "Class": "PARALLEL_SAFE",
+      "Reason": "Reads generated HTML only; current runroot excluded."
+    },
+    {
+      "Item": "Top10 local free libs matrix",
+      "Class": "PARALLEL_SAFE",
+      "Reason": "Governance plan only."
+    }
+  ],
+  "sequential_required_fixes": [
+    {
+      "Step": "v027.8.1.2",
+      "Item": "Raw-column profile + canonical key contract",
+      "Reason": "Must precede any smart remap because current invalid/duplicate signals are contract-inconsistent."
+    },
+    {
+      "Step": "v027.8.2",
+      "Item": "Smart-repaired dry-run",
+      "Reason": "Run only after raw lineage and key contract unify."
+    },
+    {
+      "Step": "v027.8.3",
+      "Item": "Dedup gate",
+      "Reason": "Must run after smart remap because v027.8.1.1 introduced duplicate_after=29."
+    },
+    {
+      "Step": "v027.9",
+      "Item": "Execution readiness review",
+      "Reason": "Only allowed after invalid_after=0 and duplicate_after=0."
+    },
+    {
+      "Step": "v028.0",
+      "Item": "VRN final readiness freeze seal",
+      "Reason": "Final readiness only; no DB write unless separately approved."
+    }
+  ],
+  "next_recommended_stage": "v027.8.1.2 raw-column profile + canonical key contract gate; no DB write"
+}

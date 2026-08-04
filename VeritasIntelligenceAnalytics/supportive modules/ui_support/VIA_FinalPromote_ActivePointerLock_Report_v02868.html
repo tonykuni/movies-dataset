@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA Final Promote Active Pointer Lock v028.6.8</title>
+<style>
+:root{--sky:#d8f0ef;--ink:#1d3438;--muted:#657f82;--line:rgba(38,70,75,.16);--head:#edf8f6;--hover:rgba(216,240,239,.20);--ok:#0f766e;--warn:#b7791f;--fail:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Microsoft JhengHei","Segoe UI",Arial,sans-serif;background:linear-gradient(180deg,#fbfdfb,#f3f8f6);color:var(--ink);font-size:11px;line-height:1.28}
+header{position:sticky;top:0;z-index:80;padding:14px 26px 10px;background:rgba(251,253,251,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+h1{margin:0;font-size:18px;text-align:center;letter-spacing:.035em}
+.sub{text-align:center;color:var(--muted);font-size:10.5px;margin-top:4px}
+.wrap{padding:12px 22px 36px}
+.kpis{display:grid;grid-template-columns:repeat(8,minmax(96px,1fr));gap:8px;margin-bottom:12px}
+.card{border-radius:10px;padding:8px 10px;background:rgba(255,255,255,.82);border:1px solid var(--line);box-shadow:0 6px 16px rgba(30,52,56,.04)}
+.k{font-size:9.5px;color:var(--muted);letter-spacing:.07em}.v{font-size:16px;font-weight:750;margin-top:2px}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.fail{color:var(--fail)}
+section{margin-top:12px}
+h2{position:sticky;top:45px;z-index:70;margin:0 0 6px;padding:6px 9px;border:1px solid var(--line);border-left:4px solid var(--sky);border-radius:9px;background:rgba(250,253,252,.96);font-size:12px;text-align:center}
+table{width:100%;border-collapse:separate;border-spacing:0;table-layout:auto;background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:10px;overflow:clip}
+thead{position:sticky;top:76px;z-index:60}
+th{position:sticky;top:76px;z-index:61;background:var(--head);font-size:10px;font-weight:800;text-align:center;vertical-align:top;padding:5px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{font-size:10px;padding:4px 6px;border-bottom:1px solid var(--line);vertical-align:top;text-align:center;white-space:nowrap}
+td.via-left,td:has(code){text-align:left;white-space:normal;word-break:break-word;overflow-wrap:anywhere}
+tr:hover td{background:var(--hover)}
+code{font-family:Consolas,"Cascadia Mono",monospace;font-size:9.5px;white-space:normal;word-break:break-word}
+</style>
+</head>
+<body>
+<header>
+<h1>def VIA Final Promote · Active Pointer Lock · v028.6.8</h1>
+<div class="sub">Final Seal Promote · Active Pointer Backup · Freeze Pointer · No Stop-Process · No DB Write</div>
+</header>
+<div class="wrap">
+<div class="kpis">
+<div class="card"><div class="k">Status</div><div class="v">FINAL_PROMOTED_ACTIVE_POINTER_LOCKED</div></div>
+<div class="card"><div class="k">Risk</div><div class="v">LOW</div></div>
+<div class="card"><div class="k">OK</div><div class="v ok">12</div></div>
+<div class="card"><div class="k">WARN</div><div class="v warn">0</div></div>
+<div class="card"><div class="k">FAIL</div><div class="v fail">0</div></div>
+<div class="card"><div class="k">Promoted</div><div class="v">True</div></div>
+<div class="card"><div class="k">Pointer Locked</div><div class="v">True</div></div>
+<div class="card"><div class="k">Freeze</div><div class="v">True</div></div>
+</div>
+
+<section>
+<h2>def Matrix</h2>
+<table>
+<thead><tr><th>Round</th><th>Lane</th><th>Stage</th><th>Name</th><th>Status</th><th>Risk</th><th>FixClass</th><th>Priority</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr></thead>
+<tbody><tr><td>Round0</td><td>CONTROL</td><td>POLICY</td><td>No DB Write</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>db_write</td><td>false</td><td>No production DB write in promote.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</code></td></tr>
+<tr><td>Round0</td><td>CONTROL</td><td>POLICY</td><td>No Canonical Merge</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>canonical_merge</td><td>false</td><td>No canonical merge in promote.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_FINAL_PROMOTE_ACTIVE_POINTER_LOCK_v02868_20260611_123905</code></td></tr>
+<tr><td>Round0</td><td>CONTROL</td><td>POLICY</td><td>No Stop-Process</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>stop_process</td><td>false</td><td>Promote does not touch process state.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_FINAL_PROMOTE_ACTIVE_POINTER_LOCK_v02868_20260611_123905</code></td></tr>
+<tr><td>Round0</td><td>CONTROL</td><td>POLICY</td><td>No Source Repair</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>repair</td><td>false</td><td>No source code is modified.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_FINAL_PROMOTE_ACTIVE_POINTER_LOCK_v02868_20260611_123905</code></td></tr>
+<tr><td>Round0</td><td>ANCHOR</td><td>RUNTIME</td><td>Latest v02867 Runtime</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>runtime</td><td>found</td><td>Latest v02867 runtime found.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_FINAL_LONGRUN_SEAL_v02867_20260611_123639\runtime\VIA_FinalLongRunSeal_Runtime_v02867.json</code></td></tr>
+<tr><td>Round1</td><td>GATE</td><td>PROMOTABILITY</td><td>Final Seal Promotable</td><td><b>OK_PROMOTABLE</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>promotable</td><td>true</td><td>Promotable final activation seal.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_FINAL_LONGRUN_SEAL_v02867_20260611_123639\runtime\VIA_FinalLongRunSeal_Runtime_v02867.json</code></td></tr>
+<tr><td>Round1</td><td>POINTER</td><td>BACKUP</td><td>Active Pointer Backup</td><td><b>OK_BACKED_UP</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>backup</td><td>created</td><td>Existing active pointer backed up.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_FINAL_PROMOTE_ACTIVE_POINTER_LOCK_v02868_20260611_123905\backup\VDF_ACTIVE_POINTER.before_v02868_20260611_123905.json</code></td></tr>
+<tr><td>Round2</td><td>PROMOTE</td><td>SEAL</td><td>Promoted Seal Object</td><td><b>OK_CREATED</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>status</td><td>FINAL_PROMOTED_ACTIVE_POINTER_LOCKED</td><td>Promoted seal object created.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_FINAL_PROMOTE_ACTIVE_POINTER_LOCK_v02868_20260611_123905</code></td></tr>
+<tr><td>Round2</td><td>POINTER</td><td>ACTIVE_LOCK</td><td>VDF_ACTIVE_POINTER.json</td><td><b>LOCKED_ACTIVE_POINTER</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>locked</td><td>true</td><td>Active pointer now points to final promoted seal.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ACTIVE_POINTER.json</code></td></tr>
+<tr><td>Round2</td><td>POINTER</td><td>FREEZE_LOCK</td><td>Final Freeze Pointer</td><td><b>OK_FREEZE_POINTER_CREATED</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>freeze</td><td>true</td><td>Freeze pointer created for final activation seal.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_freeze\VDF_FINAL_ACTIVATION_SEAL_POINTER_v02868.json</code></td></tr>
+<tr><td>Round3</td><td>VERIFY</td><td>ACTIVE_POINTER</td><td>Active Pointer Verify</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>verified</td><td>true</td><td>Active pointer verified.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VDF_ACTIVE_POINTER.json</code></td></tr>
+<tr><td>Round3</td><td>VERIFY</td><td>FREEZE_POINTER</td><td>Freeze Pointer Verify</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>verified</td><td>true</td><td>Freeze pointer verified.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_freeze\VDF_FINAL_ACTIVATION_SEAL_POINTER_v02868.json</code></td></tr></tbody>
+</table>
+</section>
+
+<section>
+<h2>def Source Seal</h2>
+<table>
+<thead><tr><th>Field</th><th>Value</th></tr></thead>
+<tbody><tr><td>Status</td><td>FINAL_ACTIVATION_SEAL_READY_WITH_LONGRUN_REVIEW</td></tr>
+<tr><td>Risk</td><td>LOW</td></tr>
+<tr><td>Parse Errors</td><td>0</td></tr>
+<tr><td>Forbidden Count</td><td>0</td></tr>
+<tr><td>Smoke Status</td><td>WARN_SMOKE_TIMEOUT_NO_STOP</td></tr>
+<tr><td>Smoke PID</td><td>20920</td></tr>
+<tr><td>Smoke PID Alive</td><td>True</td></tr>
+<tr><td>Supportive Blockers</td><td>0</td></tr>
+<tr><td>Network I/O Enabled</td><td>False</td></tr>
+<tr><td>Parallel Enabled</td><td>False</td></tr>
+<tr><td>No Stop-Process</td><td>True</td></tr>
+<tr><td>Source RunRoot</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_FINAL_LONGRUN_SEAL_v02867_20260611_123639</code></td></tr></tbody>
+</table>
+</section>
+</div>
+
+<script>
+(function(){
+ const left=/(path|message|value|source|pointer|html|json|路徑|訊息|來源|指標)/i;
+ const path=/([A-Za-z]:\\|\\\\|\/|\.ps1|\.py|\.html|\.csv|\.json|\.txt)/i;
+ function clean(t){return String(t||"").replace(/,/g,"").replace(/%/g,"").trim();}
+ function isnum(t){const s=clean(t);return !!s && /^[-+]?(\\d+|\\d*\\.\\d+)(e[-+]?\\d+)?$/i.test(s) && Number.isFinite(Number(s));}
+ function fmt(t){const n=Number(clean(t));return Number.isFinite(n)?n.toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:1}):t;}
+ function heads(table){return Array.from(table.querySelectorAll("thead th")).map(x=>(x.textContent||"").trim());}
+ function process(table){const hs=heads(table);Array.from(table.querySelectorAll("th")).forEach(th=>{th.style.textAlign="center";th.style.verticalAlign="top";});Array.from(table.querySelectorAll("tbody tr")).forEach(row=>{Array.from(row.children).forEach((cell,i)=>{const h=hs[i]||"";const raw=(cell.textContent||"").trim();cell.style.verticalAlign="top";cell.style.textAlign="center";if(isnum(raw)){cell.textContent=fmt(raw);return;}if(left.test(h)||path.test(raw)||raw.length>=36||cell.querySelector("code")){cell.classList.add("via-left");}});});}
+ Array.from(document.querySelectorAll("table")).forEach(process);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · Super Engine · Visual Lock · 混沌留池/BOM拓撲/流程探勘/SSOT總帳</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--blue:#4c78a8;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--vi:#7a6daa;
+ --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg)}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5}
+.wrap{max-width:1340px;margin:0 auto;padding:0 22px 60px}
+.bar{position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50}
+header{padding:20px 0 9px;margin-bottom:10px;border-bottom:2px solid var(--ink)}
+.kicker{font:700 10px 'DM Mono',monospace;letter-spacing:2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px}
+h1{font:800 18px/1.2 'Syne',sans-serif;color:var(--ink)}h1 span{color:var(--up)}
+.sub{margin-top:6px;font:400 10.5px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:1050px}.sub b{color:var(--ink2)}
+/* 彈性狀態列:內容少水平鋪滿 */
+.statusrow{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.stat{flex:1 1 160px;display:flex;align-items:center;gap:8px;background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:8px 12px}
+.dot{width:8px;height:8px;border-radius:50%;flex:none}.d-on{background:var(--down)}.d-lock{background:var(--blue)}.d-idle{background:var(--am)}
+.stat .l{font:600 8px 'DM Mono',monospace;color:var(--mut);text-transform:uppercase;letter-spacing:.5px}
+.stat .v{font:700 9px 'DM Mono',monospace;color:var(--ink);margin-left:auto}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tab{font:700 11px 'DM Sans','Noto Sans TC',sans-serif;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--mut);border-radius:3px;padding:7px 13px;display:flex;align-items:center;gap:6px}
+.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.sec{display:none}.sec.on{display:block}
+h2{font:800 13px 'Syne',sans-serif;color:var(--ink);margin:16px 0 6px;padding-bottom:5px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:8px}
+h2 .en{font:600 8px 'DM Mono',monospace;color:var(--mut2);letter-spacing:1px;text-transform:uppercase}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.hd2{font:800 11px 'Syne',sans-serif;padding:9px 13px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.hd2 .mod{font:600 8px 'DM Mono',monospace;color:var(--mut2);border:1px solid var(--line);padding:1px 7px;border-radius:3px}
+/* 彈性列:卡片內容少時水平分布、自動換行 */
+.flexrow{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
+.flexrow>.card{flex:1 1 340px}
+.entrow{display:flex;gap:8px;flex-wrap:wrap;padding:11px 13px}
+.ent{flex:1 1 180px;background:var(--paper2);border:1px solid var(--line);border-radius:5px;padding:8px 11px;display:flex;flex-direction:column;gap:2px}
+.ent .k{font:600 7.5px 'DM Mono',monospace;color:var(--mut);text-transform:uppercase;letter-spacing:.5px}
+.ent .val{font:700 11px 'Noto Sans TC',sans-serif;color:var(--ink)}
+.ent .conf{align-self:flex-start;font:700 7px 'DM Mono',monospace;color:var(--down);background:#eef5ef;border:1px solid #cfe3d5;border-radius:3px;padding:1px 6px;margin-top:2px}
+.mail{padding:14px;font:400 11px/1.7 'Noto Sans TC',serif;color:var(--ink2);white-space:pre-wrap}
+.mint{display:flex;flex-direction:column;align-items:center;gap:9px;padding:16px}
+.mint .lbl{font:700 8px 'DM Mono',monospace;color:var(--blue);text-transform:uppercase;letter-spacing:1px}
+.mint .code{font:800 15px 'DM Mono',monospace;color:#fff;background:var(--ink);border-radius:5px;padding:8px 16px;letter-spacing:2px}
+.mint .via{font:700 10px 'DM Mono',monospace;color:var(--vi)}
+.mint .ok{font:600 8px 'DM Mono',monospace;color:var(--down)}
+/* 智慧資產束狀樹(向右展開) */
+.tnode{background:var(--paper2);border:1px solid var(--line);border-radius:5px;padding:8px 11px;min-width:158px;max-width:200px;transition:border-color .15s}
+.tnode:hover{border-color:var(--teal)}
+.tnode.root{border-left:3px solid var(--vi);background:#faf8fc}
+.tnode.grp{border-left:3px solid var(--teal)}
+.tn-head{display:flex;align-items:center;gap:6px}
+.tn-tog{font:700 10px 'DM Mono',monospace;color:var(--teal);width:11px;flex:none}
+.tn-dot{font-size:6px;color:var(--mut2);width:11px;flex:none}
+.tn-lbl{font:700 9.5px 'Noto Sans TC',sans-serif;color:var(--ink)}
+.tn-val{font:600 10px 'Noto Sans TC',sans-serif;color:var(--ink2);margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.tn-conf{font:700 7px 'DM Mono',monospace;color:var(--down);background:#eef5ef;border:1px solid #cfe3d5;border-radius:3px;padding:0 5px}
+.tn-code{font:700 8px 'DM Mono',monospace;color:var(--vi);margin-top:4px}
+.tcol{display:flex;flex-direction:column;gap:14px}
+.btn{font:700 8.5px 'DM Mono',monospace;cursor:pointer;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:3px;padding:7px 13px}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.seg{display:flex;gap:3px;background:var(--paper2);border:1px solid var(--line);border-radius:4px;padding:2px}
+.seg button{font:700 9px 'DM Mono',monospace;cursor:pointer;border:none;background:transparent;color:var(--mut);border-radius:3px;padding:5px 11px}
+.seg button.on{background:var(--ink);color:#fff}
+table{width:100%;border-collapse:collapse;font:500 10px 'DM Mono',monospace}
+th{font:700 8px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.4px;color:var(--mut);text-align:left;padding:7px 10px;border-bottom:2px solid var(--ink);background:var(--paper2)}
+td{padding:6px 10px;border-bottom:1px solid var(--soft)}
+.pn{font:700 10px 'DM Mono',monospace;color:var(--ink)}
+.badge{font:700 7px 'DM Mono',monospace;border-radius:3px;padding:1px 7px}
+.b-add{background:#eef5ef;color:var(--down);border:1px solid #cfe3d5}.b-rem{background:#f7ecea;color:var(--up);border:1px solid #e6c9c3}.b-unc{color:var(--mut2)}
+.r-add td{background:#f6faf6}.r-rem td{background:#faf1ef;text-decoration:line-through;color:var(--mut2)}
+input.search{font:500 11px 'DM Mono',monospace;padding:6px 10px 6px 28px;border:1px solid var(--line);border-radius:3px;width:230px}
+.tl{position:relative;padding:14px 14px 14px 14px}
+.tl:before{content:"";position:absolute;left:70px;top:16px;bottom:16px;width:1px;background:var(--line)}
+.tlrow{display:flex;gap:14px;align-items:flex-start;margin-bottom:10px;position:relative}
+.tlseq{flex:none;width:56px;font:700 8px 'DM Mono',monospace;color:var(--mut);background:var(--paper2);border:1px solid var(--line);border-radius:3px;padding:3px 0;text-align:center;z-index:1}
+.tlbody{flex:1;background:var(--paper2);border:1px solid var(--line);border-radius:5px;padding:8px 12px}
+.tlbody .ev{font:700 10px 'DM Mono',monospace;color:var(--down)}
+.tlbody .id{font:600 8px 'DM Mono',monospace;color:var(--blue);background:#eef3f7;border-radius:3px;padding:1px 6px;margin-left:6px}
+.tlbody .ti{font:600 8px 'DM Mono',monospace;color:var(--mut);float:right}
+.tlbody .ds{font:400 10px 'Noto Sans TC',sans-serif;color:var(--ink2);margin-top:3px}
+.topo{position:relative;height:440px;background:var(--paper2);border-radius:6px;margin:12px 14px;overflow:hidden}
+.node{position:absolute;transform:translate(-50%,-50%);border:2px solid var(--line);background:var(--paper);border-radius:6px;padding:8px 12px;text-align:center;z-index:2;min-width:96px}
+.node .nl{font:700 10px 'Noto Sans TC',sans-serif;color:var(--ink)}.node .nr{font:600 7px 'DM Mono',monospace;color:var(--mut);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.node.src{border-color:var(--down)}.node.bot{border-color:var(--up);box-shadow:0 0 0 3px rgba(201,107,90,.12)}.node.end{border-color:var(--blue)}
+.legend{position:absolute;bottom:10px;right:10px;background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:8px 11px;font:600 8px 'DM Mono',monospace;color:var(--mut);z-index:3}
+.legend div{display:flex;align-items:center;gap:6px;margin-top:3px}
+.lgd{width:12px;height:3px;border-radius:2px;flex:none}
+.note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--am);border-radius:3px;padding:8px 14px;margin-bottom:12px;font:500 9px/1.6 'DM Mono',monospace;color:var(--mut)}.note b{color:var(--ink2)}
+.gov{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#1e1d1a;border-radius:3px;padding:7px 14px;margin:12px 0}
+.gov .lk{font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase}.gov .pill{font:600 7.5px 'DM Mono',monospace;color:#cfcabf}.gov .ver{margin-left:auto;font:700 8px 'DM Mono',monospace;color:#1e1d1a;background:#c4943a;border-radius:3px;padding:2px 8px}
+.pdf{position:fixed;top:12px;right:14px;z-index:999;background:var(--ink);color:#fff;border:none;border-radius:5px;padding:7px 13px;font:700 9px 'DM Mono',monospace;cursor:pointer}
+@media print{@page{size:A4 landscape;margin:8mm}.pdf,.tabs,.btn,.seg,.search{display:none!important}.sec{display:block!important}}
+</style></head><body>
+<div class="bar"></div><button class="pdf" onclick="window.print()">⤓ PDF</button>
+<div class="wrap">
+<header>
+ <div class="kicker">VERITAS INTELLIGENCE · SUPER ENGINE · VISUAL LOCK U/I · INGESTION / BOM / TOPOLOGY / LEDGER</div>
+ <h1>VIA Super Engine <span>·</span> 混沌留池 / BOM 拓撲 / 流程探勘 / SSOT 總帳</h1>
+ <p class="sub">將暗色原型重製為我方 <b>Visual Lock 模板視覺</b>,並最佳化為<b>彈性分布</b>(內容少的卡片水平鋪滿、自動換行)。四模組:AI 混沌留池解析、BOM 深度拓撲變更、流程探勘與網路、SSOT 時序總帳(只增不減)。已註冊進中央模板系統(萬物皆碼)。</p>
+</header>
+<div class="gov"><span class="lk">🔒 SUPER ENGINE · REGISTERED · APPEND-ONLY</span><span class="pill">Visual Lock</span><span class="pill">flexible layout</span>
+ <span class="pill">auto-coded</span><span class="ver" id="ver">SUPER ENGINE v1</span></div>
+<div class="statusrow" id="statusrow"></div>
+<div class="note">📐 彈性佈局:狀態列與抽取實體卡片以 <b>flex 水平鋪滿</b>,視窗窄時自動換行堆疊。四模組已註冊 VIA 碼,可經中央 PowerShell 同步(核可制)。</div>
+<div class="tabs" id="tabs"></div>
+
+<div class="sec on" id="sec-ing">
+ <h2>① AI 混沌留池解析 · 智慧資產束狀樹 <span class="en">Smart assets · rightward bundle · auto-coded</span></h2>
+ <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;flex-wrap:wrap;gap:8px">
+   <div class="tk" style="font:500 9px 'DM Mono',monospace;color:var(--mut)">點節點可向右束狀摺疊/展開;每個智慧資產自動編碼(VIA 碼)。</div>
+   <div style="display:flex;gap:6px"><button class="btn ghost" id="expandAll">全展開</button><button class="btn ghost" id="collapseAll">全收合</button><button class="btn" id="runBtn">▶ 啟動 AI 洗淨管線</button></div>
+ </div>
+ <div class="flexrow">
+  <div class="card" style="flex:1 1 300px;max-width:400px"><div class="hd2">原始留池 <span class="mod">SOURCE · IMAP_GMAIL</span></div><div class="mail" id="mail"></div></div>
+  <div class="card" style="flex:2 1 600px"><div class="hd2">智慧資產束狀樹 <span class="mod">Bundle · auto-coded</span></div>
+   <div id="treeWrap" style="position:relative;overflow-x:auto;padding:16px 14px;min-height:320px">
+    <svg id="beams" style="position:absolute;inset:0;pointer-events:none;z-index:1"></svg>
+    <div id="tree" style="position:relative;z-index:2;display:flex;gap:56px;align-items:flex-start"></div>
+   </div></div>
+ </div>
+</div>
+
+<div class="sec" id="sec-bom">
+ <h2>② BOM 深度拓撲與變更 <span class="en">Multi-level DeepDiff · ECO</span></h2>
+ <div class="card"><div class="hd2">MP-001 主機板 · 用料清單
+   <span style="display:flex;gap:8px;align-items:center"><div class="seg" id="bomSeg">
+    <button data-v="v1">V1 原始</button><button data-v="v2">V2 草稿</button><button data-v="diff" class="on">◇ Diff 差異</button></div>
+    <button class="btn" id="ecoBtn">✓ 簽核 ECO 生效(核可)</button></span></div>
+  <div style="overflow-x:auto"><table><thead><tr><th>階層</th><th>料號</th><th>品名規格</th><th style="text-align:right">數量</th><th>單位</th><th id="stTh">變更狀態</th></tr></thead><tbody id="bom"></tbody></table></div></div>
+</div>
+
+<div class="sec" id="sec-topo">
+ <h2>③ 流程探勘與網路拓撲 <span class="en">Process mining · bottleneck</span></h2>
+ <div class="card"><div class="hd2">ECO 流程真實路徑(還原自事件日誌)<span class="mod">PM4Py · NetworkX</span></div>
+  <div class="topo" id="topo"></div></div>
+</div>
+
+<div class="sec" id="sec-led">
+ <h2>④ SSOT 時序總帳 <span class="en">Append-only · tamper-proof</span></h2>
+ <div class="card"><div class="hd2">不可篡改事件溯源
+   <span style="position:relative"><span style="position:absolute;left:9px;top:7px;color:var(--mut)">⌕</span><input class="search" id="ledSearch" placeholder="檢索 Event/ID/內容..."></span></div>
+  <div class="tl" id="led"></div></div>
+</div>
+</div>
+<script>
+const RAW="Tony，\n陳總監指示,MP-001 主機板的 MCU 目前嚴重缺料。請即刻改用備用的 IC-MCU-101,並為了通過 DVT 測試,必須在 USB 接口旁加上兩顆 DIO-TVS-01 防靜電二極體。\n請於 2026/07/05 前發行 ECO 並更新 BOM 表。急件!";
+const ENTS=[["意圖 Intent","規格變更 / ECO發行","98%"],["目標母階 Target_BOM","MP-001","99%"],
+ ["替換料號 Swap","MCU → IC-MCU-101","95%"],["新增料號 Add","DIO-TVS-01 (Qty 2)","92%"],["絕對期限 Deadline","2026-07-05","99%"]];
+const BOM_V1=[["0","MP-001","Main PCBA 主機板","1","PCS","unc"],["1","PCB-001-A","Bare Board 空板","1","PCS","unc"],
+ ["1","IC-MCU-100","Microcontroller V1","1","PCS","rem"],["1","RES-0402-10K","SMD Resistor 10K","15","PCS","unc"],["1","CON-USB-C","USB Type-C Receptacle","1","PCS","unc"]];
+const BOM_V2=[["0","MP-001","Main PCBA 主機板","1","PCS","unc"],["1","PCB-001-A","Bare Board 空板","1","PCS","unc"],
+ ["1","IC-MCU-101","Microcontroller V2 (Alt)","1","PCS","add"],["1","RES-0402-10K","SMD Resistor 10K","15","PCS","unc"],
+ ["1","CON-USB-C","USB Type-C Receptacle","1","PCS","unc"],["1","DIO-TVS-01","TVS Diode Array","2","PCS","add"]];
+const LEDGER=[["09:15:22","MAIL_INGESTED","VIS-M-2607-A1B2","收容供應商郵件 (Thread-ID 8821)"],
+ ["09:15:24","NLP_INTENT_LOCKED","VIS-M-2607-A1B2","意圖解析為: 規格變更 (ECO)"],
+ ["09:18:05","BOM_DRAFT_CREATED","BOM-MP-001-V2","依指令建立 MP-001 V2 草稿"],
+ ["09:45:11","STATE_TRANSITION","ECO-M-2607-X9F2","狀態機流轉: DRAFT → PENDING_APPROVAL"],
+ ["11:20:01","TOPOLOGY_UPDATED","NET-SYS-001","拓撲網路權重更新 (NetworkX)"]];
+const NODES=[["N1","供應商信件","SOURCE",12,50,"src"],["N2","PM 審核","HUB",34,20,""],["N3","RD 變更圖面","ACTION",58,20,""],
+ ["N4","品保 QA 簽核","BOTTLENECK",84,50,"bot"],["N5","ERP 同步","SYSTEM",58,82,"end"]];
+const EDGES=[["N1","N2","1.2h","var(--down)",0,0],["N2","N3","4.5h","var(--down)",0,0],
+ ["N3","N4","11.4d 滯留","var(--up)",1,0],["N4","N5","0.1h","var(--blue)",0,0],["N4","N3","退件環","var(--am)",0,1]];
+
+// 決定性 VIA 碼(模擬 code_for)
+function viaCode(t,n){let h=0x811c9dc5>>>0;const s=t+"|"+n;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,0x01000193);}return "VIA-"+t+"-"+(h>>>0).toString(16).toUpperCase().slice(0,6);}
+
+const $=id=>document.getElementById(id);
+// 狀態列(彈性)
+$("statusrow").innerHTML=[["d-on","NLP_ENGINE","ONLINE"],["d-lock","DUCKDB_VAULT","APPEND-ONLY"],
+ ["d-lock","SCHEMA","DYNAMIC"],["d-idle","PIPELINE","IDLE"]].map(s=>`<div class="stat"><span class="dot ${s[0]}"></span><span class="l">${s[1]}</span><span class="v">${s[2]}</span></div>`).join("");
+// tabs
+const TABS=[["ing","① AI 混沌留池"],["bom","② BOM 拓撲變更"],["topo","③ 流程探勘"],["led","④ SSOT 總帳"]];
+let cur="ing";
+$("tabs").innerHTML=TABS.map(([id,n])=>`<div class="tab ${id===cur?'on':''}" data-id="${id}">${n}</div>`).join("");
+$("tabs").querySelectorAll(".tab").forEach(t=>t.onclick=()=>{cur=t.dataset.id;$("tabs").querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x.dataset.id===cur));document.querySelectorAll(".sec").forEach(s=>s.classList.toggle("on",s.id==="sec-"+cur));});
+
+// ① Ingestion · 智慧資產束狀樹
+$("mail").textContent=RAW;
+const TREE={id:"root",label:"郵件資產 Email Asset",val:"ECO-M-2607-X9F2",type:"AST",conf:"",open:true,children:[
+  {id:"intent",label:"意圖 Intent",val:"規格變更 / ECO發行",type:"KNW",conf:"98%"},
+  {id:"target",label:"目標母階 Target_BOM",val:"MP-001",type:"PRD",conf:"99%"},
+  {id:"parts",label:"料號實體 Entities",val:"2 項",type:"GRP",conf:"",open:false,children:[
+     {id:"swap",label:"替換料 Swap",val:"IC-MCU-101",type:"PRD",conf:"95%"},
+     {id:"add",label:"新增料 Add",val:"DIO-TVS-01 ×2",type:"PRD",conf:"92%"}]},
+  {id:"actions",label:"動作 Actions",val:"2 項",type:"GRP",conf:"",open:false,children:[
+     {id:"a1",label:"Swap",val:"MCU→IC-MCU-101",type:"IFC",conf:""},
+     {id:"a2",label:"Add",val:"DIO-TVS-01 Qty2",type:"IFC",conf:""}]},
+  {id:"deadline",label:"絕對期限 Deadline",val:"2026-07-05",type:"KNW",conf:"99%"}]};
+(function assign(n){n.code=viaCode(n.type,n.val||n.label);(n.children||[]).forEach(assign);})(TREE);
+let started=false;
+function findNode(n,id){if(n.id===id)return n;for(const c of(n.children||[])){const r=findNode(c,id);if(r)return r;}return null;}
+function columns(){const cols=[];(function walk(n,d){if(!cols[d])cols[d]=[];cols[d].push(n);if(n.open&&n.children)n.children.forEach(c=>walk(c,d+1));})(TREE,0);return cols;}
+function renderTree(){
+ if(!started){$("tree").innerHTML='<div style="padding:24px;font:500 10px \'DM Mono\';color:var(--mut2)">按「啟動 AI 洗淨管線」擷取智慧資產...</div>';$("beams").innerHTML="";return;}
+ const cols=columns();
+ $("tree").innerHTML=cols.map(col=>`<div class="tcol">${col.map(n=>{const hc=n.children&&n.children.length;
+   const cls=n.id==="root"?"root":n.type==="GRP"?"grp":"";
+   return `<div class="tnode ${cls}" data-id="${n.id}" style="cursor:${hc?'pointer':'default'}">
+    <div class="tn-head">${hc?`<span class="tn-tog">${n.open?'▾':'▸'}</span>`:'<span class="tn-dot">●</span>'}<span class="tn-lbl">${n.label}</span></div>
+    <div class="tn-val">${n.val}${n.conf?`<span class="tn-conf">${n.conf}</span>`:''}</div>
+    <div class="tn-code">${n.code}</div></div>`;}).join("")}</div>`).join("");
+ $("tree").querySelectorAll(".tnode").forEach(el=>el.onclick=()=>{const n=findNode(TREE,el.dataset.id);if(n&&n.children){n.open=!n.open;renderTree();}});
+ requestAnimationFrame(drawBeams);
+}
+function drawBeams(){
+ const wrap=$("treeWrap");if(!wrap)return;const wb=wrap.getBoundingClientRect();
+ const svg=$("beams");svg.setAttribute("width",wrap.scrollWidth);svg.setAttribute("height",wrap.scrollHeight);
+ let p="";
+ (function walk(n){if(n.open&&n.children){const pe=$("tree").querySelector(`.tnode[data-id="${n.id}"]`);
+   if(pe){const pr=pe.getBoundingClientRect();const x1=pr.right-wb.left+wrap.scrollLeft,y1=pr.top+pr.height/2-wb.top;
+    n.children.forEach(c=>{const ce=$("tree").querySelector(`.tnode[data-id="${c.id}"]`);
+     if(ce){const cr=ce.getBoundingClientRect();const x2=cr.left-wb.left+wrap.scrollLeft,y2=cr.top+cr.height/2-wb.top;const mx=(x1+x2)/2;
+      p+=`<path d="M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}" fill="none" stroke="#439a9a" stroke-width="1.5" opacity=".55"/>`;
+      p+=`<circle cx="${x2}" cy="${y2}" r="2.5" fill="#439a9a"/><circle cx="${x1}" cy="${y1}" r="2" fill="#7a6daa"/>`;}});
+    n.children.forEach(walk);}}})(TREE);
+ svg.innerHTML=p;
+}
+$("expandAll").onclick=()=>{started=true;(function o(n){n.open=true;(n.children||[]).forEach(o);})(TREE);renderTree();};
+$("collapseAll").onclick=()=>{(function c(n){if(n.id!=="root")n.open=false;(n.children||[]).forEach(c);})(TREE);TREE.open=true;renderTree();};
+$("runBtn").onclick=function(){const b=this;b.disabled=true;b.textContent="管線執行中...";started=true;TREE.open=true;renderTree();
+ setTimeout(()=>{const pn=findNode(TREE,"parts");if(pn)pn.open=true;renderTree();},900);
+ setTimeout(()=>{b.textContent="解析完成";},1800);};
+renderTree();
+window.addEventListener("resize",()=>{if(cur==="ing")drawBeams();});
+$("tabs").querySelectorAll(".tab").forEach(t=>{if(t.dataset.id==="ing")t.addEventListener("click",()=>setTimeout(drawBeams,60));});
+
+// ② BOM
+let bomView="diff";
+function renderBom(){const data=bomView==="v1"?BOM_V1:bomView==="v2"?BOM_V2:[...BOM_V1.filter(r=>r[5]==="rem"),...BOM_V2];
+ $("stTh").style.display=bomView==="diff"?"":"none";
+ $("bom").innerHTML=data.map(r=>{const st=r[5];const rc=bomView==="diff"?(st==="add"?"r-add":st==="rem"?"r-rem":""):"";
+  const badge=st==="add"?'<span class="badge b-add">+ ADDED</span>':st==="rem"?'<span class="badge b-rem">− REMOVED</span>':'<span class="badge b-unc">UNCHANGED</span>';
+  return `<tr class="${rc}"><td style="padding-left:${8+ +r[0]*18}px;color:var(--mut)">${r[0]==="0"?"▰":"▧"} L${r[0]}</td>
+   <td class="pn">${r[1]}</td><td style="font-family:'Noto Sans TC'">${r[2]}</td><td style="text-align:right">${r[3]}</td><td style="color:var(--mut)">${r[4]}</td>
+   ${bomView==="diff"?`<td>${badge}</td>`:''}</tr>`;}).join("");}
+$("bomSeg").querySelectorAll("button").forEach(b=>b.onclick=()=>{bomView=b.dataset.v;$("bomSeg").querySelectorAll("button").forEach(x=>x.classList.toggle("on",x.dataset.v===bomView));renderBom();});
+renderBom();
+$("ecoBtn").onclick=()=>alert("ECO 簽核為核可制:此為預覽,實際生效需經中央 SystemManager 核可閘門(未 -Approve 僅 dry-run)。");
+
+// ③ Topology
+function renderTopo(){const el=$("topo");const W=el.clientWidth||900,H=440;
+ let svg=`<svg width="100%" height="100%" style="position:absolute;inset:0;z-index:1"><defs><marker id="ah" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0, 9 3.5, 0 7" fill="#9c9890"/></marker></defs>`;
+ EDGES.forEach(e=>{const a=NODES.find(n=>n[0]===e[0]),b=NODES.find(n=>n[0]===e[1]);
+  const x1=a[3]/100*W,y1=a[4]/100*H,x2=b[3]/100*W,y2=b[4]/100*H;
+  const d=e[5]?`M ${x1} ${y1} Q ${(x1+x2)/2} ${Math.min(y1,y2)-70}, ${x2} ${y2}`:`M ${x1} ${y1} L ${x2} ${y2}`;
+  svg+=`<path d="${d}" fill="none" stroke="${e[3]}" stroke-width="2" stroke-dasharray="${e[4]?'6,5':'none'}" marker-end="url(#ah)" opacity=".75"/>`;
+  svg+=`<text x="${(x1+x2)/2}" y="${(y1+y2)/2-6}" fill="${e[3]}" font-size="10" font-family="DM Mono" text-anchor="middle" style="paint-order:stroke;stroke:#f5f4f0;stroke-width:4px">${e[2]}</text>`;});
+ svg+=`</svg>`;
+ svg+=NODES.map(n=>`<div class="node ${n[5]}" style="left:${n[3]}%;top:${n[4]}%"><div class="nl">${n[1]}</div><div class="nr">${n[2]}</div></div>`).join("");
+ svg+=`<div class="legend"><div style="color:var(--ink);font-weight:800;margin-bottom:2px">TOPOLOGY</div>
+  <div><span class="lgd" style="background:var(--down)"></span>入口 Source</div><div><span class="lgd" style="background:var(--up)"></span>卡點 Bottleneck</div>
+  <div><span class="lgd" style="background:var(--up)"></span>異常滯留</div><div><span class="lgd" style="background:var(--am)"></span>迴圈退件</div></div>`;
+ el.innerHTML=svg;}
+setTimeout(renderTopo,50);window.addEventListener("resize",()=>{if(cur==="topo")renderTopo();});
+$("tabs").querySelectorAll(".tab").forEach(t=>{if(t.dataset.id==="topo")t.addEventListener("click",()=>setTimeout(renderTopo,50));});
+
+// ④ Ledger
+function renderLed(q){q=(q||"").toLowerCase();const rows=LEDGER.filter(l=>!q||l[1].toLowerCase().includes(q)||l[2].toLowerCase().includes(q)||l[3].toLowerCase().includes(q));
+ $("led").innerHTML=rows.map(l=>`<div class="tlrow"><div class="tlseq">⏱ SEQ</div><div class="tlbody">
+  <span class="ev">${l[1]}</span><span class="id">${l[2]}</span><span class="ti">2026-07-02 ${l[0]}</span><div class="ds">${l[3]}</div></div></div>`).join("")
+  +'<div style="text-align:center;font:600 8px DM Mono;color:var(--mut2);padding:8px">— END OF LEDGER / HASH VERIFIED —</div>';}
+$("ledSearch").oninput=e=>renderLed(e.target.value);renderLed("");
+</script><script>
+(function(){
+ function cellText(td){var el=td.querySelector('input,select,textarea');
+  var v=el?(el.value||''):td.textContent;return (v||'').trim().replace(/\|/g,'\\|').replace(/\s+/g,' ');}
+ function tableToMd(tbl){
+  var heads=tbl.tHead?Array.prototype.slice.call(tbl.tHead.rows):[];
+  var body=tbl.tBodies.length?Array.prototype.slice.call(tbl.tBodies[0].rows):Array.prototype.slice.call(tbl.rows);
+  var hRow=heads.length?heads[heads.length-1]:body.shift();
+  if(!hRow)return '';
+  var cols=Array.prototype.map.call(hRow.cells,cellText);
+  var out='| '+cols.join(' | ')+' |\n| '+cols.map(function(){return '---';}).join(' | ')+' |\n';
+  body.forEach(function(tr){out+='| '+Array.prototype.map.call(tr.cells,cellText).join(' | ')+' |\n';});
+  return out;
+ }
+ window.exportPageMarkdown=function(){
+  var title=document.querySelector('h1')?document.querySelector('h1').innerText.trim():'VIA';
+  var kick=document.querySelector('.kicker')?document.querySelector('.kicker').innerText.trim():'';
+  var md='# '+title+'\n\n';
+  if(kick)md+='> '+kick+'\n\n';
+  md+='_匯出 '+new Date().toISOString().slice(0,19).replace('T',' ')+' · VIA · append-only_\n\n';
+  var nodes=document.querySelectorAll('h2, table');
+  Array.prototype.forEach.call(nodes,function(n){
+   if(n.tagName==='H2'){md+='\n## '+n.innerText.trim().replace(/\s+/g,' ')+'\n\n';}
+   else{var t=tableToMd(n);if(t)md+=t+'\n';}
+  });
+  var blob=new Blob([md],{type:'text/markdown'});var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=(title.replace(/[^\w\u4e00-\u9fff]+/g,'_').slice(0,40)||'VIA')+'.md';a.click();
+ };
+ function addBtn(){if(document.getElementById('viaMdBtn'))return;var b=document.createElement('button');b.id='viaMdBtn';b.textContent='\u2913 MD';b.className='pdf';b.style.right='66px';b.onclick=window.exportPageMarkdown;document.body.appendChild(b);}
+ if(document.body)addBtn();else window.addEventListener('DOMContentLoaded',addBtn);
+})();
+</script>
+</body></html>

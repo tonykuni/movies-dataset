@@ -1,0 +1,504 @@
+{
+ "meta": {
+  "version": "v0116",
+  "note": "interactive flow simulation params; loadings are PRIORS, grounded by engine when real df present"
+ },
+ "factors": [
+  "RISK",
+  "USD",
+  "INFL",
+  "GEO"
+ ],
+ "scenario_keyframes": [
+  [
+   "Risk-On 風險偏好擴張",
+   {
+    "RISK": 1.0,
+    "USD": -0.4,
+    "INFL": 0.1,
+    "GEO": -0.2
+   }
+  ],
+  [
+   "高峰 Peak Euphoria",
+   {
+    "RISK": 1.1,
+    "USD": -0.5,
+    "INFL": 0.2,
+    "GEO": -0.1
+   }
+  ],
+  [
+   "地緣衝擊 Geopolitical",
+   {
+    "RISK": -0.3,
+    "USD": 0.3,
+    "INFL": 0.5,
+    "GEO": 1.0
+   }
+  ],
+  [
+   "Risk-Off 避險撤退",
+   {
+    "RISK": -1.0,
+    "USD": 0.6,
+    "INFL": -0.1,
+    "GEO": 0.4
+   }
+  ],
+  [
+   "美元擠壓 USD Squeeze",
+   {
+    "RISK": -0.6,
+    "USD": 1.0,
+    "INFL": -0.2,
+    "GEO": 0.2
+   }
+  ],
+  [
+   "企穩 Stabilization",
+   {
+    "RISK": 0.2,
+    "USD": 0.1,
+    "INFL": 0.1,
+    "GEO": 0.0
+   }
+  ],
+  [
+   "復甦 Recovery",
+   {
+    "RISK": 0.7,
+    "USD": -0.3,
+    "INFL": 0.2,
+    "GEO": -0.1
+   }
+  ]
+ ],
+ "days": 180,
+ "steps_per_gap": 14,
+ "fis_kappa": 1.5,
+ "gram_kappa": 40,
+ "gram_thresh": 15,
+ "uncertainty_frac": 0.18,
+ "dims": {
+  "region": {
+   "world": true,
+   "nodes": {
+    "US Equity": {
+     "lat": 40,
+     "lon": -95,
+     "role": "risk",
+     "load": {
+      "RISK": 0.7,
+      "USD": 0.1,
+      "INFL": 0,
+      "GEO": -0.2
+     },
+     "aum": 1500,
+     "zh": "美股",
+     "desc": "美國股市"
+    },
+    "US Cash/UST": {
+     "lat": 33,
+     "lon": -84,
+     "role": "safe",
+     "load": {
+      "RISK": -0.8,
+      "USD": 0.4,
+      "INFL": -0.1,
+      "GEO": 0.5
+     },
+     "aum": 800,
+     "zh": "美債/現金",
+     "desc": "美元現金與美國公債(終極避風港)"
+    },
+    "Gold": {
+     "lat": 34,
+     "lon": -26,
+     "role": "safe",
+     "load": {
+      "RISK": -0.3,
+      "USD": -0.7,
+      "INFL": 0.5,
+      "GEO": 0.9
+     },
+     "aum": 320,
+     "zh": "黃金(避險)",
+     "desc": "黃金 地緣避險"
+    },
+    "JPY/Japan": {
+     "lat": 34,
+     "lon": 142,
+     "role": "safe",
+     "load": {
+      "RISK": -0.5,
+      "USD": 0.2,
+      "INFL": -0.1,
+      "GEO": 0.4
+     },
+     "aum": 220,
+     "zh": "日圓/日本",
+     "desc": "日圓/日本(套利撤退水表)"
+    },
+    "Europe": {
+     "lat": 50,
+     "lon": 9,
+     "role": "risk",
+     "load": {
+      "RISK": 0.5,
+      "USD": -0.3,
+      "INFL": 0,
+      "GEO": -0.2
+     },
+     "aum": 620,
+     "zh": "歐洲(成熟)",
+     "desc": "歐洲成熟市場"
+    },
+    "China": {
+     "lat": 38,
+     "lon": 103,
+     "role": "risk",
+     "load": {
+      "RISK": 0.6,
+      "USD": -0.5,
+      "INFL": 0,
+      "GEO": -0.4
+     },
+     "aum": 520,
+     "zh": "中國(新興)",
+     "desc": "中國(新興、政策敏感)"
+    },
+    "Taiwan": {
+     "lat": 23.7,
+     "lon": 121,
+     "role": "risk",
+     "load": {
+      "RISK": 0.95,
+      "USD": -0.5,
+      "INFL": 0,
+      "GEO": -0.3
+     },
+     "aum": 260,
+     "zh": "台灣",
+     "desc": "台灣(半導體/AI 高Beta)"
+    },
+    "Korea": {
+     "lat": 41,
+     "lon": 127,
+     "role": "risk",
+     "load": {
+      "RISK": 0.85,
+      "USD": -0.5,
+      "INFL": 0,
+      "GEO": -0.3
+     },
+     "aum": 210,
+     "zh": "韓國",
+     "desc": "韓國(記憶體週期)"
+    },
+    "India": {
+     "lat": 22,
+     "lon": 79,
+     "role": "risk",
+     "load": {
+      "RISK": 0.8,
+      "USD": -0.4,
+      "INFL": 0.1,
+      "GEO": -0.2
+     },
+     "aum": 210,
+     "zh": "印度",
+     "desc": "印度(新興成長)"
+    },
+    "EM LatAm": {
+     "lat": -12,
+     "lon": -55,
+     "role": "risk",
+     "load": {
+      "RISK": 0.9,
+      "USD": -0.6,
+      "INFL": 0.2,
+      "GEO": -0.1
+     },
+     "aum": 260,
+     "zh": "新興/拉美",
+     "desc": "新興/拉美"
+    }
+   },
+   "corr": [
+    [
+     "US Cash/UST",
+     "Taiwan"
+    ],
+    [
+     "US Cash/UST",
+     "Korea"
+    ],
+    [
+     "US Cash/UST",
+     "India"
+    ],
+    [
+     "US Cash/UST",
+     "EM LatAm"
+    ],
+    [
+     "US Cash/UST",
+     "US Equity"
+    ],
+    [
+     "Gold",
+     "US Equity"
+    ],
+    [
+     "JPY/Japan",
+     "Taiwan"
+    ],
+    [
+     "JPY/Japan",
+     "EM LatAm"
+    ],
+    [
+     "Europe",
+     "US Equity"
+    ],
+    [
+     "China",
+     "US Equity"
+    ]
+   ]
+  },
+  "tier": {
+   "world": false,
+   "nodes": {
+    "Tier1": {
+     "x": 210,
+     "y": 405,
+     "load": {
+      "RISK": -0.7,
+      "USD": 0.2,
+      "INFL": -0.1,
+      "GEO": 0.6
+     },
+     "aum": 1100,
+     "role": "safe",
+     "zh": "T1 主權/現金",
+     "desc": "極低/主權風險:美短債/黃金/現金"
+    },
+    "Tier2": {
+     "x": 440,
+     "y": 340,
+     "load": {
+      "RISK": -0.3,
+      "USD": 0.1,
+      "INFL": 0,
+      "GEO": 0.2
+     },
+     "aum": 900,
+     "role": "safe",
+     "zh": "T2 防禦/IG",
+     "desc": "投資級/防禦:IG債/公用/核心地產"
+    },
+    "Tier3": {
+     "x": 665,
+     "y": 275,
+     "load": {
+      "RISK": 0.5,
+      "USD": -0.3,
+      "INFL": 0.3,
+      "GEO": -0.1
+     },
+     "aum": 1400,
+     "role": "risk",
+     "zh": "T3 景氣循環",
+     "desc": "景氣循環:大盤/工業/原油/銅"
+    },
+    "Tier4": {
+     "x": 885,
+     "y": 210,
+     "load": {
+      "RISK": 1.0,
+      "USD": -0.5,
+      "INFL": 0,
+      "GEO": -0.3
+     },
+     "aum": 800,
+     "role": "risk",
+     "zh": "T4 高Beta",
+     "desc": "高Beta投機:新興股/科技/加密/高收債"
+    }
+   },
+   "corr": [
+    [
+     "Tier1",
+     "Tier2"
+    ],
+    [
+     "Tier2",
+     "Tier3"
+    ],
+    [
+     "Tier3",
+     "Tier4"
+    ]
+   ]
+  },
+  "type": {
+   "world": false,
+   "nodes": {
+    "Equity": {
+     "x": 820.8,
+     "y": 333.8,
+     "load": {
+      "RISK": 0.8,
+      "USD": -0.2,
+      "INFL": 0,
+      "GEO": -0.2
+     },
+     "aum": 1600,
+     "role": "risk",
+     "zh": "股票",
+     "desc": "全球股市(SPY/QQQ等)"
+    },
+    "Bond": {
+     "x": 754.6,
+     "y": 257.9,
+     "load": {
+      "RISK": -0.5,
+      "USD": 0.2,
+      "INFL": -0.1,
+      "GEO": 0.3
+     },
+     "aum": 1000,
+     "role": "safe",
+     "zh": "債券",
+     "desc": "投資級/主權債(TLT/LQD)"
+    },
+    "Cash": {
+     "x": 663.4,
+     "y": 202.7,
+     "load": {
+      "RISK": -0.7,
+      "USD": 0.4,
+      "INFL": -0.1,
+      "GEO": 0.4
+     },
+     "aum": 700,
+     "role": "safe",
+     "zh": "現金",
+     "desc": "現金/短債(BIL/SGOV)"
+    },
+    "Commodity": {
+     "x": 556.3,
+     "y": 173.7,
+     "load": {
+      "RISK": 0.4,
+      "USD": -0.5,
+      "INFL": 0.7,
+      "GEO": 0.5
+     },
+     "aum": 350,
+     "role": "risk",
+     "zh": "大宗商品",
+     "desc": "大宗商品(原油/工業金屬)"
+    },
+    "Gold": {
+     "x": 443.7,
+     "y": 173.7,
+     "load": {
+      "RISK": -0.2,
+      "USD": -0.6,
+      "INFL": 0.5,
+      "GEO": 0.9
+     },
+     "aum": 320,
+     "role": "safe",
+     "zh": "黃金",
+     "desc": "黃金(GLD)"
+    },
+    "Crypto": {
+     "x": 336.6,
+     "y": 202.7,
+     "load": {
+      "RISK": 1.1,
+      "USD": -0.4,
+      "INFL": 0,
+      "GEO": -0.2
+     },
+     "aum": 300,
+     "role": "risk",
+     "zh": "加密",
+     "desc": "加密(BTC/ETH)"
+    },
+    "REIT": {
+     "x": 245.4,
+     "y": 257.9,
+     "load": {
+      "RISK": 0.4,
+      "USD": -0.2,
+      "INFL": 0.2,
+      "GEO": -0.1
+     },
+     "aum": 280,
+     "role": "risk",
+     "zh": "地產",
+     "desc": "不動產(VNQ)"
+    },
+    "FX": {
+     "x": 179.2,
+     "y": 333.8,
+     "load": {
+      "RISK": -0.3,
+      "USD": 1.0,
+      "INFL": -0.2,
+      "GEO": 0.2
+     },
+     "aum": 260,
+     "role": "safe",
+     "zh": "外匯",
+     "desc": "外匯(美元指數)"
+    }
+   },
+   "corr": [
+    [
+     "Cash",
+     "Equity"
+    ],
+    [
+     "Cash",
+     "Crypto"
+    ],
+    [
+     "Bond",
+     "Equity"
+    ],
+    [
+     "Gold",
+     "Equity"
+    ],
+    [
+     "Cash",
+     "Commodity"
+    ],
+    [
+     "Bond",
+     "REIT"
+    ],
+    [
+     "FX",
+     "Equity"
+    ],
+    [
+     "Gold",
+     "Crypto"
+    ]
+   ]
+  }
+ },
+ "valuation": {
+  "lambda_risk": 0.5,
+  "alpha_cost": 0.7,
+  "risk_floor": 0.25,
+  "note": "評價 V=(預期報酬 ER − λ·風險)/估值成本;成本隨區間累積流入上升(反身性變貴);Vscore 0-100 越高越划算"
+ }
+}

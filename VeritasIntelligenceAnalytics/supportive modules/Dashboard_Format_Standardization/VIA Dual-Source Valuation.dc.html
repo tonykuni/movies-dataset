@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  html,body{margin:0;background:#f5f4f0;}
+  input[type=range]{accent-color:#2a6fdb;height:3px;}
+</style>
+</helmet>
+<div style="max-width:1180px;margin:0 auto;padding:20px 26px 32px;font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;color:#1e1d1a;">
+
+  <div style="height:4px;border-radius:3px;background:linear-gradient(90deg,#4c72b0,#55a868,#dd8452,#c44e52,#8172b3);margin-bottom:14px;"></div>
+
+  <div style="background:#fffdf8;border:1px solid #dbd9d3;border-radius:9px;padding:15px 18px 12px;margin-bottom:14px;box-shadow:0 1px 3px rgba(31,42,42,.05);">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;">
+      <div>
+        <div style="font:700 10px 'DM Mono',monospace;letter-spacing:2px;color:#6b6860;text-transform:uppercase;">Veritas Intelligence Analytics · Equity Insight</div>
+        <h1 style="margin:5px 0 0;font:800 22px/1.2 'Syne',sans-serif;">ACME Semiconductor (SAMPLE) · 個股洞察儀表板</h1>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:9px 16px;flex-wrap:wrap;align-items:center;border-top:1px solid #efece4;margin-top:13px;padding-top:9px;font:600 8.5px 'DM Mono',monospace;color:#9c9890;">
+      <span style="display:inline-flex;gap:5px;align-items:center;color:#5a9e6f;"><span style="width:7px;height:7px;border-radius:50%;background:#5fcf80;box-shadow:0 0 6px #5fcf80;"></span>VISUAL LOCK</span>
+      <span>基準 <b style="color:#1e1d1a;">Adj Close／Adj Volume</b></span>
+      <span>快照 <b style="color:#1e1d1a;">2026-06-26</b></span>
+      <span>來源 <b style="color:#1e1d1a;">YFinance＋FactSet（鉅亨網）</b></span>
+      <span>成交量 <b style="color:#1e1d1a;">{{ volLbl }} 張</b></span>
+      <span>前收 <b style="color:#1e1d1a;">{{ prevCloseLbl }}</b></span>
+      <span style="margin-left:auto;color:#b3afa5;">只增不減 · Add-Only</span>
+    </div>
+  </div>
+
+  <!-- INTRADAY: independent price card + independent chart card -->
+  <div style="display:grid;grid-template-columns:minmax(300px,26%) 1fr;gap:14px;align-items:stretch;margin-bottom:14px;">
+
+      <div style="background:#fffdf8;border:1px solid #dbd9d3;border-radius:9px;box-shadow:0 1px 3px rgba(31,42,42,.05);padding:13px 16px 12px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;text-align:left;">
+        <div style="display:flex;justify-content:flex-start;font:600 8px 'DM Mono',monospace;color:#9c9890;letter-spacing:1.5px;">現價 · NT$</div>
+        <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px;">
+          <span style="font:800 30px/0.9 'DM Mono',monospace;color:{{ changeColor }};letter-spacing:-0.5px;">{{ priceLbl }}</span>
+          <span style="display:inline-flex;align-items:center;gap:5px;background:{{ changeBg }};color:{{ changeColor }};border-radius:6px;padding:3px 8px;font:700 10.5px 'DM Mono',monospace;white-space:nowrap;">
+            <span>{{ changeLbl }}</span><span style="opacity:.4;">·</span><span>{{ chgPctLbl }}</span>
+          </span>
+        </div>
+        <div style="display:flex;justify-content:space-between;gap:8px;margin-top:11px;padding-top:9px;border-top:1px solid #ece9e1;font:600 9px 'DM Mono',monospace;color:#9c9890;">
+          <span>成交量 <b style="color:#1e1d1a;">{{ volLbl }}</b> 張</span>
+          <span style="color:#d8d4cb;">|</span>
+          <span>市值 <b style="color:#1e1d1a;">{{ marketCapLbl }}</b></span>
+        </div>
+        <div style="display:flex;gap:6px 12px;flex-wrap:wrap;margin-top:9px;font:600 8.5px 'DM Mono',monospace;color:#9c9890;">
+          <span>開 <b style="color:#1e1d1a;">{{ idOpenLbl }}</b></span>
+          <span>高 <b style="color:#c0392b;">{{ idHiLbl }}</b></span>
+          <span>低 <b style="color:#1e8449;">{{ idLoLbl }}</b></span>
+          <span>前收 <b style="color:#1e1d1a;">{{ prevCloseLbl }}</b></span>
+        </div>
+        <div style="display:flex;gap:6px 12px;flex-wrap:wrap;margin-top:7px;padding-top:7px;border-top:1px solid #ece9e1;font:600 8.5px 'DM Mono',monospace;color:#9c9890;">
+          <span>β <b style="color:#1e1d1a;">{{ betaLbl }}</b></span>
+          <span style="color:#d8d4cb;">|</span>
+          <span>Sharpe <b style="color:#1e1d1a;">{{ sharpeLbl }}</b></span>
+          <span style="color:#b3afa5;font-weight:500;">{{ riskWinLbl }}</span>
+        </div>
+      </div>
+
+      <div style="background:#fffdf8;border:1px solid #dbd9d3;border-radius:9px;box-shadow:0 1px 3px rgba(31,42,42,.05);overflow:hidden;display:flex;flex-direction:column;min-width:0;">
+        <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;padding:10px 16px 4px;">
+          <span style="font:700 12px 'Syne',sans-serif;">當日走勢 · Intraday</span>
+          <span style="font:600 8px 'DM Mono',monospace;color:#9c9890;letter-spacing:.4px;">折線（價）＋量能柱　共用時間軸 09:00–13:30</span>
+        </div>
+        <div style="padding:0 8px 4px;">{{ intradayChart }}</div>
+      </div>
+
+  </div>
+
+  <div style="display:grid;grid-template-columns:minmax(300px,26%) 1fr;gap:14px;align-items:stretch;">
+    <sc-if value="{{ showFwd }}">
+    <div style="background:#fffdf8;border:1px solid #dbd9d3;border-radius:9px;padding:13px 15px;box-shadow:0 1px 3px rgba(31,42,42,.05);">
+      <div style="font:700 11.5px 'Syne',sans-serif;margin-bottom:2px;">前瞻本益比 · Forward P/E</div>
+      <div style="font:500 7.5px 'DM Mono',monospace;color:#9c9890;margin-bottom:9px;">分子 Adj Close ÷ 分母 FactSet EPS（{{ fySel }}）· 以明年 N+1 為基準</div>
+      <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:11px;">
+        <span style="font:700 30px 'DM Mono',monospace;color:#4c72b0;">{{ fwdPE }}</span>
+        <span style="font:700 12px 'DM Mono',monospace;color:#6b6860;">x</span>
+        <span style="margin-left:auto;font:600 7.5px 'DM Mono',monospace;color:#9c9890;">EPS {{ epsUpdate }}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat({{ epsColCount }},1fr);gap:5px;">
+        <sc-for list="{{ epsRows }}" as="e" hint-placeholder-count="4">
+          <div onClick="{{ e.onClick }}" style="cursor:pointer;border-radius:5px;padding:6px 4px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0;{{ e.css }}">
+            <span style="font:700 7px 'DM Mono',monospace;letter-spacing:.2px;white-space:nowrap;">{{ e.rel }}</span>
+            <span style="font:700 14px 'DM Mono',monospace;line-height:1.05;">{{ e.pe }}x</span>
+            <span style="font:600 6.5px 'DM Mono',monospace;opacity:.82;white-space:nowrap;">{{ e.y }}</span>
+            <span style="font:500 6px 'DM Mono',monospace;opacity:.6;white-space:nowrap;">EPS {{ e.eps }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    </sc-if>
+    <div style="background:#fffdf8;border:1px solid #dbd9d3;border-radius:9px;padding:18px 18px 12px;box-shadow:0 1px 3px rgba(31,42,42,.05);">
+    <div style="display:flex;gap:14px;">
+
+      <div style="width:170px;flex:none;display:flex;flex-direction:column;gap:11px;padding-top:4px;">
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="3">
+          <div style="height:36px;display:flex;flex-direction:column;justify-content:center;text-align:left;">
+            <div style="display:flex;align-items:center;justify-content:flex-start;gap:5px;">
+              <span style="width:8px;height:8px;border-radius:50%;display:inline-block;{{ r.dotStyle }}"></span>
+              <span style="font:700 9.5px 'DM Sans','Noto Sans TC',sans-serif;color:#1e1d1a;">{{ r.name }}</span>
+            </div>
+            <div style="font:500 7px 'DM Mono',monospace;color:#9c9890;margin-top:2px;">更新：{{ r.update }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="position:relative;flex:1;display:flex;flex-direction:column;gap:11px;padding-top:4px;">
+        <sc-for list="{{ ticks }}" as="t" hint-placeholder-count="5">
+          <div style="position:absolute;top:0;bottom:20px;width:0;border-left:1px solid #ece9e1;{{ t.style }}"></div>
+        </sc-for>
+
+        <div style="position:absolute;top:-3px;bottom:20px;width:0;border-left:1px dashed #2a6fdb;z-index:6;{{ lineStyle }}">
+          <span style="position:absolute;top:-1px;left:4px;font:700 8.5px 'DM Mono',monospace;color:#2a6fdb;white-space:nowrap;background:#fffdf8;padding:0 4px;border-radius:3px;z-index:7;">現價 {{ lineLbl }}</span>
+        </div>
+
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="3">
+          <div style="position:relative;height:36px;">
+            <div style="position:absolute;top:50%;left:0;right:0;height:1px;background:#ece9e1;transform:translateY(-50%);"></div>
+            <div style="position:absolute;top:50%;height:6px;border-radius:4px;transform:translateY(-50%);{{ r.segStyle }}"></div>
+            <div style="position:absolute;top:1px;font:600 7px 'DM Mono',monospace;color:#6b6860;white-space:nowrap;{{ r.annoPosStyle }}">{{ r.meanAnno }}</div>
+            <div style="position:absolute;top:50%;width:8px;height:8px;border-radius:50%;background:#fffdf8;border:1.4px solid #888;transform:translate(-50%,-50%);z-index:3;{{ r.meanStyle }}"></div>
+            <div style="position:absolute;top:50%;width:8px;height:8px;border-radius:50%;transform:translate(-50%,-50%);z-index:4;{{ r.medStyle }}"></div>
+            <div style="position:absolute;top:50%;transform:translate(0,-50%);padding-left:6px;font:400 9px 'DM Mono',monospace;color:#33403f;white-space:nowrap;{{ r.lowPosStyle }}">{{ r.lowLbl }}</div>
+            <div style="position:absolute;top:50%;transform:translate(-100%,-50%);padding-right:6px;font:400 9px 'DM Mono',monospace;color:#33403f;white-space:nowrap;{{ r.highPosStyle }}">{{ r.highLbl }}</div>
+          </div>
+        </sc-for>
+
+        <div style="position:relative;height:12px;">
+          <sc-for list="{{ ticks }}" as="t" hint-placeholder-count="5">
+            <div style="position:absolute;transform:translateX(-50%);font:500 8px 'DM Mono',monospace;color:#9c9890;{{ t.style }}">{{ t.lbl }}</div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  </div>
+
+  <!-- FACTSET EPS MATRIX + FORWARD P/E · P/B BANDS (3 across) -->
+  <div style="display:grid;grid-template-columns:minmax(0,1.18fr) minmax(0,1fr) minmax(0,1fr);gap:13px;margin-top:13px;align-items:stretch;">
+  <div style="background:#fffdf8;border:1px solid #dbd9d3;border-radius:9px;overflow:hidden;box-shadow:0 1px 3px rgba(31,42,42,.05);">
+    <div style="padding:9px 14px;border-bottom:1px solid #e8e5dd;background:#faf8f1;display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;">
+      <span style="font:700 12px 'Syne',sans-serif;">FactSet EPS 預估矩陣 · Estimate Matrix</span>
+      <span style="font:500 8px 'DM Mono',monospace;color:#9c9890;">統計項目 × 年度（來年 N+1 為前瞻基準）</span>
+    </div>
+    <div>
+      <table style="width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed;">
+        <thead><tr>
+          <th style="text-align:left;padding:7px 14px;font:700 8.5px 'Syne',sans-serif;color:#6b6860;border-bottom:1px solid #ece9e1;">統計項目 Statistic</th>
+          <sc-for list="{{ epsCols }}" as="c" hint-placeholder-count="4">
+            <th style="text-align:right;padding:7px 12px;border-bottom:1px solid #ece9e1;{{ c.thStyle }}">
+              <div style="font:700 9px 'DM Mono',monospace;color:{{ c.relColor }};">{{ c.rel }}</div>
+              <div style="font:500 7.5px 'DM Mono',monospace;color:#9c9890;">{{ c.y }}</div>
+            </th>
+          </sc-for>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ epsMatrix }}" as="m" hint-placeholder-count="4">
+            <tr style="{{ m.rowBg }}">
+              <td style="padding:7px 14px;border-top:1px solid #f0eee7;font:700 9px 'DM Sans','Noto Sans TC',sans-serif;color:{{ m.color }};white-space:nowrap;"><span style="display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:6px;background:{{ m.color }};"></span>{{ m.label }}</td>
+              <sc-for list="{{ m.cells }}" as="c" hint-placeholder-count="4">
+                <td style="padding:7px 12px;border-top:1px solid #f0eee7;text-align:right;font:{{ c.weight }} 9.5px 'DM Mono',monospace;color:{{ c.color }};{{ c.cellBg }}">{{ c.val }}</td>
+              </sc-for>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FORWARD P/E BAND -->
+  <div style="background:#fffdf8;border:1px solid #dbd9d3;border-radius:9px;overflow:hidden;box-shadow:0 1px 3px rgba(31,42,42,.05);display:flex;flex-direction:column;">
+    <div style="padding:9px 14px;border-bottom:1px solid #e8e5dd;background:#faf8f1;">
+      <div style="font:700 12px 'Syne',sans-serif;">前瞻本益比通道 · Forward P/E Band</div>
+      <div style="font:500 8px 'DM Mono',monospace;color:#9c9890;margin-top:2px;">股價 ÷ FactSet EPS（N+1 {{ fwdEpsLbl }}）· {{ peBandLbl }} 倍數帶</div>
+    </div>
+    <div style="padding:8px 8px 2px;flex:1;display:flex;align-items:center;">{{ peBand }}</div>
+    <div style="padding:7px 14px 10px;border-top:1px solid #f0eee7;display:flex;align-items:baseline;justify-content:space-between;gap:8px;">
+      <span style="font:500 8px 'DM Mono',monospace;color:#9c9890;">現價對應</span>
+      <span style="font:700 12.5px 'DM Mono',monospace;color:#4c72b0;">{{ curPELbl }}x <span style="font-size:8px;color:#9c9890;font-weight:500;">· {{ peZoneLbl }}</span></span>
+    </div>
+  </div>
+
+  <!-- FORWARD P/B BAND -->
+  <div style="background:#fffdf8;border:1px solid #dbd9d3;border-radius:9px;overflow:hidden;box-shadow:0 1px 3px rgba(31,42,42,.05);display:flex;flex-direction:column;">
+    <div style="padding:9px 14px;border-bottom:1px solid #e8e5dd;background:#faf8f1;">
+      <div style="font:700 12px 'Syne',sans-serif;">前瞻股價淨值比通道 · Forward P/B Band</div>
+      <div style="font:500 8px 'DM Mono',monospace;color:#9c9890;margin-top:2px;">股價 ÷ 預估每股淨值（BVPS {{ bvpsLbl }}）· {{ pbBandLbl }} 倍數帶</div>
+    </div>
+    <div style="padding:8px 8px 2px;flex:1;display:flex;align-items:center;">{{ pbBand }}</div>
+    <div style="padding:7px 14px 10px;border-top:1px solid #f0eee7;display:flex;align-items:baseline;justify-content:space-between;gap:8px;">
+      <span style="font:500 8px 'DM Mono',monospace;color:#9c9890;">現價對應</span>
+      <span style="font:700 12.5px 'DM Mono',monospace;color:#55a868;">{{ curPBLbl }}x <span style="font-size:8px;color:#9c9890;font-weight:500;">· {{ pbZoneLbl }}</span></span>
+    </div>
+  </div>
+  </div>
+
+  <!-- CONCLUSION (本局定調 + 顯示邏輯 merged) -->
+  <div style="margin-top:14px;border:1px solid #e8e5dd;border-radius:9px;overflow:hidden;box-shadow:0 1px 3px rgba(31,42,42,.05);">
+    <div style="background:#1e1d1a;color:#f1ede2;padding:12px 16px;font:700 11.5px/1.55 'DM Sans','Noto Sans TC',sans-serif;">
+      <span style="color:#dd8452;">本局定調：</span>現價 {{ priceLbl }} 落於 FactSet（中位 {{ fsMidLbl }}）與 YFinance（中位 {{ yfMidLbl }}）目標區間之 <b style="color:#fff;">下緣</b> — 雙源仍指向 <b style="color:#7fd0a0;">中位上行</b>，惟 52 週位階偏高，留意回檔風險。
+    </div>
+    <div style="background:#faf8f1;padding:11px 16px;display:flex;flex-direction:column;gap:4px;font:400 9px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:#4a4842;">
+      <div><b style="color:#4c72b0;">● 中位圓點</b>＝各來源區間中位／中點；<b style="color:#2a6fdb;">藍虛線</b>＝現價錨定。<b style="color:#55a868;">共用 X 軸</b>（{{ axisLbl }}）三列同尺度，可直接比較重疊與分歧。</div>
+      <div><b style="color:#dd8452;">雙時間戳</b>：YFinance 量價（每日收盤）與 FactSet 目標價／EPS（各自宣告日）分開記錄，距快照逾 {{ staleThreshLbl }} 日標滯後。紅漲綠跌，<b>Adj Close／Adj Volume</b> 為計算基準。</div>
+      <div style="margin-top:3px;padding-top:7px;border-top:1px solid #ece9e1;color:#6b6860;"><b style="color:#1e1d1a;">↓ 下方台股共振堆疊圖</b>：從 K 線、技術指標到三大法人籌碼，逐層驗證上方估值定調。</div>
+    </div>
+  </div>
+
+  <!-- RESONANCE STACK — header moved into the card -->
+  <div style="margin-top:16px;background:#fffdf8;border:1px solid #dbd9d3;border-radius:9px;overflow:hidden;box-shadow:0 1px 3px rgba(31,42,42,.05);">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;padding:11px 16px;border-bottom:1px solid #efece4;">
+      <div style="display:flex;align-items:baseline;gap:9px;">
+        <span style="font:700 13px 'Syne',sans-serif;">台股共振堆疊圖 · TW Resonance Stock Stack</span>
+        <span style="font:600 8px 'DM Mono',monospace;color:#9c9890;letter-spacing:.4px;">14 PANELS · K線＋技術指標＋籌碼共振</span>
+      </div>
+      <a href="VIA TW Resonance Stock Stack.html" target="_blank" style="font:600 8.5px 'DM Mono',monospace;color:#4c72b0;text-decoration:none;">↗ 獨立開啟</a>
+    </div>
+    <iframe src="VIA TW Resonance Stock Stack.html" id="resFrame" loading="lazy" style="width:100%;height:1480px;border:0;display:block;background:transparent;"></iframe>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{ &quot;$preview&quot;: { &quot;width&quot;: 1180, &quot;height&quot;: 880 }, &quot;staleThresh&quot;: { &quot;editor&quot;: &quot;int&quot;, &quot;default&quot;: 30, &quot;tsType&quot;: &quot;number&quot;, &quot;min&quot;: 1, &quot;max&quot;: 120 }, &quot;showForwardPE&quot;: { &quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot; } }">
+class Component extends DCLogic {
+  state = { price: 2340, fy: 'fy2' };
+
+  componentDidMount() {
+    if (this.__resBound) return;
+    this.__resBound = true;
+    window.addEventListener('message', (e) => {
+      const d = e && e.data;
+      if (!d || d.type !== 'via-res-height') return;
+      const f = document.getElementById('resFrame');
+      if (f) f.style.height = Math.max(600, d.height) + 'px';
+    });
+  }
+
+  renderVals() {
+    const staleThresh = this.props.staleThresh ?? 30;
+    const showFwd = this.props.showForwardPE ?? true;
+    const AMIN = 1000, AMAX = 3600, SPAN = AMAX - AMIN;
+    const pct = v => ((v - AMIN) / SPAN) * 100;
+    const price = Math.max(AMIN, Math.min(AMAX, Number(this.state.price) || 2340));
+    const fmt = n => Math.round(n).toLocaleString('en-US');
+    const today = new Date('2026-06-26');
+
+    const raw = [
+      { key: 'yf52', name: 'YFinance 52週歷史波動', short: 'YFinance 52週', low: 1200, high: 2450, mid: 1825, mean: 1795, color: '#4c72b0', soft: 'rgba(76,114,176,.28)', update: '2026-06-26 13:30', kind: 'range' },
+      { key: 'fsTgt', name: 'FactSet 機構目標價區間', short: 'FactSet 目標', low: 2051, high: 3500, mid: 2700, mean: 2662, color: '#55a868', soft: 'rgba(85,168,104,.28)', update: '2026-06-24', kind: 'target' },
+      { key: 'yfTgt', name: 'YFinance 機構目標價區間', short: 'YFinance 目標', low: 2100, high: 3400, mid: 2750, mean: 2708, color: '#dd8452', soft: 'rgba(221,132,82,.30)', update: '2026-06-26', kind: 'target' },
+    ];
+
+    const rows = raw.map((r, i) => {
+      const lp = pct(r.low), hp = pct(r.high), mp = pct(r.mid), ap = pct(r.mean);
+      const upPct = v => { const u = (v - price) / price * 100; return (u >= 0 ? '+' : '') + u.toFixed(1) + '%'; };
+      const meanAnno = '平均 ' + fmt(r.mean) + ' (' + upPct(r.mean) + ') · 中位 ' + fmt(r.mid) + ' (' + upPct(r.mid) + ')';
+      let metricLabel, metricVal, metricColor;
+      if (r.kind === 'target') {
+        const up = (r.mid - price) / price * 100;
+        metricVal = (up >= 0 ? '+' : '') + up.toFixed(1) + '%';
+        metricColor = up >= 0 ? '#c96b5a' : '#5a9e6f';
+      } else {
+        const posn = (price - r.low) / (r.high - r.low) * 100;
+        metricVal = '位階 ' + Math.round(posn) + '%';
+        metricColor = '#4c72b0';
+      }
+      const upd = new Date(r.update.slice(0, 10));
+      const days = Math.round((today - upd) / 86400000);
+      const stale = days > staleThresh;
+      return {
+        ...r,
+        lowLbl: fmt(r.low), highLbl: fmt(r.high), midLbl: fmt(r.mid), meanLbl: fmt(r.mean), meanAnno,
+        dotStyle: 'background:' + r.color + ';',
+        segStyle: `left:${lp}%;width:${hp - lp}%;background:${r.soft};`,
+        fillStyle: `left:${lp}%;width:${hp - lp}%;background:${r.color};`,
+        medStyle: `left:${mp}%;background:${r.color};`,
+        meanStyle: `left:${ap}%;border-color:${r.color};`,
+        annoPosStyle: `left:${(ap + mp) / 2}%;transform:translateX(-50%);`,
+        medPosStyle: `left:${mp}%;`,
+        lowPosStyle: `left:${lp}%;`,
+        highPosStyle: `left:${hp}%;`,
+        metricVal, metricColor,
+        staleMark: (stale ? '► 滯後 ' : '✓ ') + days + 'D',
+        staleColor: stale ? '#c96b5a' : '#5a9e6f',
+        rowBg: i % 2 ? 'background:#faf8f1;' : 'background:#fffdf8;',
+      };
+    });
+
+    const ticks = [1500, 2000, 2500, 3000, 3500].map(t => ({ v: t, lbl: fmt(t), style: `left:${pct(t)}%;` }));
+
+    // QUOTE STRIP
+    const prevClose = 2312;
+    const chg = price - prevClose;
+    const chgPct = chg / prevClose * 100;
+    const dir = chg >= 0;
+    const upCol = '#c0392b', dnCol = '#1e8449'; // 台股 紅漲綠跌
+    const quoteCells = [
+      { lbl: '最新價格 Price', val: fmt(price), sub: 'NT$', color: '#1e1d1a' },
+      { lbl: '漲跌 Change', val: (dir ? '▲ ' : '▼ ') + fmt(Math.abs(chg)), sub: '', color: dir ? upCol : dnCol },
+      { lbl: '漲跌幅 Chg%', val: (dir ? '+' : '−') + Math.abs(chgPct).toFixed(2) + '%', sub: '', color: dir ? upCol : dnCol },
+      { lbl: '成交量 Volume', val: '38,420', sub: '張', color: '#1e1d1a' },
+      { lbl: '最新 Adj Close', val: fmt(price), sub: '調整後', color: '#4c72b0' },
+    ];
+
+    // ANALYST CONSENSUS
+    const consRaw = [
+      { lbl: '賣出 Sell', n: 1, color: '#1e8449' },
+      { lbl: '減碼 Underperform', n: 1, color: '#6fbf8a' },
+      { lbl: '持有 Hold', n: 5, color: '#d4a93a' },
+      { lbl: '買進 Buy', n: 10, color: '#e06a52' },
+      { lbl: '強力買進 Strong Buy', n: 17, color: '#c0392b' },
+    ];
+    const consTotal = consRaw.reduce((a, b) => a + b.n, 0);
+    let _cum = 0;
+    const consSegs = consRaw.map((s, i) => {
+      const left = _cum / consTotal * 100;
+      const w = s.n / consTotal * 100;
+      const mid = left + w / 2;
+      _cum += s.n;
+      return {
+        ...s,
+        dotStyle: `background:${s.color};`,
+        pctLbl: Math.round(s.n / consTotal * 100) + '%',
+        divStyle: i === 0 ? 'display:none;' : `position:absolute;top:0;bottom:0;left:${left}%;width:1px;background:rgba(255,255,255,.6);`,
+        labelStyle: `position:absolute;top:50%;left:${mid}%;transform:translate(-50%,-50%);font:700 9.5px 'DM Mono',monospace;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.35);white-space:nowrap;`,
+      };
+    });
+    // weighted consensus needle (mass centre across the spectrum)
+    const consMeanPct = consSegs.reduce((a, s) => a + (s.labelStyle.match(/left:([\d.]+)%/)[1] * 1) * s.n, 0) / consTotal;
+    const consMarkerStyle = `position:absolute;top:-4px;bottom:-4px;left:${consMeanPct}%;width:2px;background:#1e1d1a;box-shadow:0 0 0 2px rgba(255,253,248,.85);z-index:4;`;
+    const consBullPct = Math.round((17 + 10) / consTotal * 100);
+    const consHoldPct = Math.round(5 / consTotal * 100);
+    const consBearPct = Math.round((1 + 1) / consTotal * 100);
+
+    // FACTSET EPS MATRIX
+    const epsColsRaw = [
+      { rel: 'N', y: '2026E', m: 99.31 },
+      { rel: 'N+1', y: '2027E', m: 125.17 },
+      { rel: 'N+2', y: '2028E', m: 155.10 },
+    ];
+    const epsCols = epsColsRaw.map(c => ({
+      rel: c.rel, y: c.y,
+      relColor: c.rel === 'N+1' ? '#4c72b0' : (c.actual ? '#9c9890' : '#6b6860'),
+      thStyle: c.rel === 'N+1' ? 'background:rgba(76,114,176,.07);' : (c.actual ? 'background:rgba(120,116,108,.06);' : ''),
+    }));
+    const statDefs = [
+      ['最高值 High', '#c0392b', m => m * 1.10],
+      ['平均值 Mean', '#4c72b0', m => m * 1.012],
+      ['中位數 Median', '#1e1d1a', m => m],
+      ['最低值 Low', '#5a9e6f', m => m * 0.90],
+    ];
+    const epsMatrix = statDefs.map(([label, color, f], ri) => {
+      const isMed = label.indexOf('中位') === 0;
+      return {
+        label, color,
+        rowBg: ri % 2 ? 'background:#faf8f1;' : 'background:#fffdf8;',
+        cells: epsColsRaw.map(c => ({
+          val: c.actual ? (isMed ? c.m.toFixed(2) : '—') : f(c.m).toFixed(2),
+          weight: isMed ? 700 : 500,
+          color: c.actual ? '#9c9890' : (isMed ? '#1e1d1a' : '#6b6860'),
+          cellBg: c.rel === 'N+1' ? 'background:rgba(76,114,176,.06);' : (c.actual ? 'background:rgba(120,116,108,.04);' : ''),
+        })),
+      };
+    });
+
+    const eps = { fy1: { y: '2026E', rel: 'N', v: 99.31 }, fy2: { y: '2027E', rel: 'N+1', v: 125.17 }, fy3: { y: '2028E', rel: 'N+2', v: 155.10 } };
+    const fy = this.state.fy;
+    const epsRows = Object.keys(eps).map(k => {
+      const base = k === 'fy2';
+      return {
+        k, y: eps[k].y, rel: eps[k].rel, baseLbl: base ? '明年基準' : '', eps: eps[k].v.toFixed(2), pe: (price / eps[k].v).toFixed(1),
+        onClick: () => this.setState({ fy: k }),
+        css: k === fy ? 'background:#1e1d1a;color:#fff;' : (base ? 'background:#f0eee7;color:#33403f;box-shadow:inset 0 0 0 1.5px #4c72b0;' : 'background:#f0eee7;color:#33403f;'),
+      };
+    });
+
+    // ── FORWARD P/E & P/B BAND CHARTS (SVG) ──────────────────────
+    // nice-number ladder + envelope (port of VDF-VAL-BAND-GRID-03)
+    const NICE_M = [2.0, 2.5, 5.0, 10.0];
+    const niceStep = (span, target = 5) => {
+      if (!isFinite(span) || span <= 0) return 0.5;
+      const raw = span / Math.max(target, 1);
+      const exp = Math.floor(Math.log10(raw));
+      const base = Math.pow(10, exp);
+      const mant = raw / base;
+      for (const m of NICE_M) if (mant <= m + 1e-9) return +(m * base);
+      return +(10 * base);
+    };
+    const envelopeLevels = (vMin, vMax, step) => {
+      const eps = step * 1e-6;
+      let lo = Math.floor(vMin / step) * step;
+      if (Math.abs(lo - vMin) < eps) lo -= step;       // push one notch out
+      let hi = Math.ceil(vMax / step) * step;
+      if (Math.abs(hi - vMax) < eps) hi += step;
+      const n = Math.round((hi - lo) / step);
+      const out = [];
+      for (let i = 0; i <= n; i++) out.push(+(lo + i * step).toFixed(6));
+      return out;
+    };
+    const decForStep = (step) => { const s = step.toString(); return s.includes('.') ? s.split('.')[1].length : 0; };
+
+    const bandChart = (cfg) => {
+      const { metric0, metric1, curPrice, color, rgb, targetLines } = cfg;
+      const N = 37, W = 350, H = 188, ml = 40, mr = 34, mt = 10, mb = 22;
+      const pw = W - ml - mr, ph = H - mt - mb;
+      const metric = [];
+      for (let i = 0; i < N; i++){ const f = i / (N - 1); metric.push(metric0 + (metric1 - metric0) * Math.pow(f, 0.92)); }
+      // --- price path: larger swing amplitude (波動幅度大一點) ---
+      const pStart = (curPrice / metric1) * metric[0] * 0.9;
+      const price = [];
+      for (let i = 0; i < N; i++){
+        const f = i / (N - 1);
+        const trend = pStart + (curPrice - pStart) * Math.pow(f, 1.08);
+        const wig = (Math.sin(i * 0.8) * 0.11 + Math.sin(i * 0.31 + 1.3) * 0.075 + Math.sin(i * 1.7 + 0.5) * 0.045 + Math.sin(i * 0.13 + 2.1) * 0.05) * (1 - f * 0.55);
+        price.push(i === N - 1 ? curPrice : trend * (1 + wig));
+      }
+      // --- derive band multiples that strictly ENVELOPE the path min/max ---
+      const impl = price.map((v, i) => v / metric[i]).filter(isFinite);
+      const vMin = Math.min(...impl), vMax = Math.max(...impl);
+      const step = niceStep(vMax - vMin, targetLines || 5);
+      const mults = envelopeLevels(vMin, vMax, step);
+      const dec = decForStep(step);
+      // y-range from outer envelope bands (pad 4%) → guarantees the path is wrapped
+      const yLoRaw = mults[0] * metric[0];
+      const yHiRaw = mults[mults.length - 1] * metric[N - 1];
+      const yMin = yLoRaw - (yHiRaw - yLoRaw) * 0.04;
+      const yMax = yHiRaw + (yHiRaw - yLoRaw) * 0.04;
+      const X = i => ml + pw * i / (N - 1);
+      const Y = v => mt + ph * (1 - (v - yMin) / (yMax - yMin));
+      // band fills (subtle, alternating) low→high
+      let fills = '';
+      for (let b = 0; b < mults.length - 1; b++){
+        const top = metric.map((m, i) => `${X(i).toFixed(1)},${Y(mults[b + 1] * m).toFixed(1)}`);
+        const bot = metric.map((m, i) => `${X(i).toFixed(1)},${Y(mults[b] * m).toFixed(1)}`).reverse();
+        fills += `<polygon points="${top.concat(bot).join(' ')}" fill="rgba(${rgb},${b % 2 ? 0.05 : 0.10})"/>`;
+      }
+      // y grid ticks (4 across the enveloped range)
+      let grid = '';
+      for (let k = 0; k <= 3; k++){
+        const v = yMin + (yMax - yMin) * k / 3;
+        const yy = Y(v);
+        grid += `<line x1="${ml}" y1="${yy.toFixed(1)}" x2="${ml + pw}" y2="${yy.toFixed(1)}" stroke="#ece9e1" stroke-width="0.7"/>`;
+        grid += `<text x="${ml - 4}" y="${(yy + 3).toFixed(1)}" text-anchor="end" font-family="DM Mono,monospace" font-size="7.5" fill="#9c9890">${fmt(v)}</text>`;
+      }
+      // benchmark band lines: solid · lw 0.8 (outer envelope 1.0) · alpha 0.7 · fixed-decimal labels
+      let bands = '';
+      let lastLy = null;
+      for (let b = 0; b < mults.length; b++){
+        const pts = metric.map((m, i) => `${X(i).toFixed(1)},${Y(mults[b] * m).toFixed(1)}`).join(' ');
+        const isEnv = (b === 0 || b === mults.length - 1);
+        bands += `<polyline points="${pts}" fill="none" stroke="rgba(${rgb},0.7)" stroke-width="${isEnv ? 1.0 : 0.8}"/>`;
+        const ly = Y(mults[b] * metric[N - 1]);
+        if (lastLy === null || Math.abs(ly - lastLy) >= 10){
+          bands += `<text x="${(ml + pw + 4).toFixed(1)}" y="${(ly + 3).toFixed(1)}" font-family="DM Mono,monospace" font-size="7.5" font-weight="600" fill="rgba(${rgb},0.95)">${mults[b].toFixed(dec)}x</text>`;
+          lastLy = ly;
+        }
+      }
+      const years = [['’23H2', 0], ['2024', 9], ['2025', 21], ['2026', 33]];
+      let xlab = '';
+      years.forEach(([lb, i]) => { xlab += `<text x="${X(i).toFixed(1)}" y="${H - 5}" text-anchor="middle" font-family="DM Mono,monospace" font-size="7.5" fill="#9c9890">${lb}</text>`; });
+      const pline = price.map((v, i) => `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' ');
+      const cx = X(N - 1), cy = Y(curPrice);
+      const svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet" style="display:block;">${fills}${grid}${bands}<polyline points="${pline}" fill="none" stroke="#1e1d1a" stroke-width="1.7" stroke-linejoin="round"/><circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="3.6" fill="${color}" stroke="#fffdf8" stroke-width="1.4"/>${xlab}</svg>`;
+      return { el: React.createElement('div', { dangerouslySetInnerHTML: { __html: svg } }), mults, dec };
+    };
+    const zoneLbl = (mults, dec, m) => {
+      const f = x => x.toFixed(dec);
+      if (m <= mults[0]) return '低於 ' + f(mults[0]) + 'x';
+      if (m >= mults[mults.length - 1]) return '高於 ' + f(mults[mults.length - 1]) + 'x';
+      for (let i = 0; i < mults.length - 1; i++) if (m >= mults[i] && m < mults[i + 1]) return f(mults[i]) + 'x–' + f(mults[i + 1]) + 'x 之間';
+      return '';
+    };
+    // ── INTRADAY: price line + volume bars combined (台股 09:00–13:30) ──
+    const intradayChart = (() => {
+      const prevC = 2312, open = 2326, cur = price;
+      const N = 91; // 270 min / 3-min bars
+      const seed = (Math.round(cur) % 997) || 7;
+      let s = seed; const rnd = () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; };
+      const px = [];
+      for (let i = 0; i < N; i++) {
+        const f = i / (N - 1);
+        const trend = open + (cur - open) * Math.pow(f, 1.04);
+        const wig = (Math.sin(i * 0.55) * 0.0045 + Math.sin(i * 0.21 + 1.1) * 0.0032 + Math.sin(i * 1.3 + 0.6) * 0.0021 + (rnd() - 0.5) * 0.0026) * (1 - f * 0.4);
+        px.push(i === N - 1 ? cur : trend * (1 + wig));
+      }
+      const hi = Math.max(...px), lo = Math.min(...px);
+      const vol = [];
+      for (let i = 0; i < N; i++) {
+        const f = i / (N - 1);
+        const u = 1.5 * (Math.pow(f - 0.5, 2) * 3.0) + 0.45; // U-shaped: heavy at open/close
+        vol.push((u + rnd() * 0.5) * 1000);
+      }
+      const totVol = 38420;
+      const volMax = Math.max(...vol);
+      const W = 1120, H = 196, ml = 50, mr = 56, mt = 12, mb = 20;
+      const pw = W - ml - mr, fullH = H - mt - mb;
+      const priceH = fullH * 0.66, volH = fullH * 0.24, gap = fullH * 0.10;
+      const priceBot = mt + priceH, volTop = mt + priceH + gap, volBot = volTop + volH;
+      const padHi = Math.max(hi, prevC), padLo = Math.min(lo, prevC);
+      const yPad = (padHi - padLo) * 0.18 || 4;
+      const yMin = padLo - yPad, yMax = padHi + yPad;
+      const X = i => ml + pw * i / (N - 1);
+      const Yp = v => mt + priceH * (1 - (v - yMin) / (yMax - yMin));
+      const Yv = v => volBot - volH * (v / volMax);
+      const up = cur >= prevC, lineCol = up ? '#c0392b' : '#1e8449', rgb = up ? '192,57,43' : '30,132,73';
+      // prev-close ref
+      const yPrev = Yp(prevC);
+      let ref = `<line x1="${ml}" y1="${yPrev.toFixed(1)}" x2="${ml + pw}" y2="${yPrev.toFixed(1)}" stroke="#9c9890" stroke-width="0.8" stroke-dasharray="3 3"/>`;
+      ref += `<text x="${(ml + pw + 5).toFixed(1)}" y="${(yPrev + 3).toFixed(1)}" font-family="DM Mono,monospace" font-size="7.5" fill="#9c9890">前收 ${fmt(prevC)}</text>`;
+      // price y grid (3)
+      let grid = '';
+      for (let k = 0; k <= 3; k++) {
+        const v = yMin + (yMax - yMin) * k / 3, yy = Yp(v);
+        grid += `<line x1="${ml}" y1="${yy.toFixed(1)}" x2="${ml + pw}" y2="${yy.toFixed(1)}" stroke="#f0eee7" stroke-width="0.6"/>`;
+        grid += `<text x="${ml - 5}" y="${(yy + 3).toFixed(1)}" text-anchor="end" font-family="DM Mono,monospace" font-size="7.5" fill="#9c9890">${fmt(v)}</text>`;
+      }
+      // area fill under price
+      const linePts = px.map((v, i) => `${X(i).toFixed(1)},${Yp(v).toFixed(1)}`);
+      const area = `${ml},${priceBot.toFixed(1)} ` + linePts.join(' ') + ` ${(ml + pw).toFixed(1)},${priceBot.toFixed(1)}`;
+      const fill = `<polygon points="${area}" fill="rgba(${rgb},0.10)"/>`;
+      const pline = `<polyline points="${linePts.join(' ')}" fill="none" stroke="${lineCol}" stroke-width="1.6" stroke-linejoin="round"/>`;
+      // volume bars (per-tick direction colour)
+      const bw = pw / N * 0.62;
+      let bars = '';
+      for (let i = 0; i < N; i++) {
+        const tickUp = i === 0 ? (px[0] >= prevC) : (px[i] >= px[i - 1]);
+        const c = tickUp ? '192,57,43' : '30,132,73';
+        const y = Yv(vol[i]), h = volBot - y;
+        bars += `<rect x="${(X(i) - bw / 2).toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(0.5, h).toFixed(1)}" fill="rgba(${c},0.55)"/>`;
+      }
+      bars += `<line x1="${ml}" y1="${volBot.toFixed(1)}" x2="${ml + pw}" y2="${volBot.toFixed(1)}" stroke="#dbd9d3" stroke-width="0.7"/>`;
+      bars += `<text x="${ml - 5}" y="${(volTop + 6).toFixed(1)}" text-anchor="end" font-family="DM Mono,monospace" font-size="7" fill="#b3afa5">量</text>`;
+      // x time labels
+      const times = [['09:00', 0], ['10:00', 20], ['11:00', 40], ['12:00', 60], ['13:00', 80], ['13:30', 90]];
+      let xlab = '';
+      times.forEach(([lb, i]) => { xlab += `<line x1="${X(i).toFixed(1)}" y1="${mt}" x2="${X(i).toFixed(1)}" y2="${priceBot.toFixed(1)}" stroke="#f4f2ec" stroke-width="0.6"/><text x="${X(i).toFixed(1)}" y="${H - 6}" text-anchor="middle" font-family="DM Mono,monospace" font-size="7.5" fill="#9c9890">${lb}</text>`; });
+      const cx = X(N - 1), cy = Yp(cur);
+      const dot = `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="3.4" fill="${lineCol}" stroke="#fffdf8" stroke-width="1.4"/>`;
+      const svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet" style="display:block;">${grid}${ref}${fill}${pline}${bars}${xlab}${dot}</svg>`;
+      return {
+        el: React.createElement('div', { dangerouslySetInnerHTML: { __html: svg } }),
+        open, hi, lo, totVol,
+      };
+    })();
+
+    const fwdEps = 125.17, bvps = 360;
+    const peRes = bandChart({ metric0: 72, metric1: fwdEps, curPrice: price, color: '#4c72b0', rgb: '76,114,176', targetLines: 5 });
+    const pbRes = bandChart({ metric0: 250, metric1: bvps, curPrice: price, color: '#55a868', rgb: '85,168,104', targetLines: 5 });
+    const peBand = peRes.el, pbBand = pbRes.el;
+    const peMults = peRes.mults, pbMults = pbRes.mults;
+    const peBandLbl = `${peMults[0].toFixed(peRes.dec)}–${peMults[peMults.length - 1].toFixed(peRes.dec)}x`;
+    const pbBandLbl = `${pbMults[0].toFixed(pbRes.dec)}–${pbMults[pbMults.length - 1].toFixed(pbRes.dec)}x`;
+    const curPE = price / fwdEps, curPB = price / bvps;
+
+    return {
+      price, priceLbl: fmt(price),
+      intradayChart: intradayChart.el,
+      idOpenLbl: fmt(intradayChart.open), idHiLbl: fmt(intradayChart.hi), idLoLbl: fmt(intradayChart.lo), idVolLbl: fmt(intradayChart.totVol),
+      peBand, pbBand, peBandLbl, pbBandLbl,
+      curPELbl: curPE.toFixed(1), curPBLbl: curPB.toFixed(2),
+      peZoneLbl: zoneLbl(peMults, peRes.dec, curPE), pbZoneLbl: zoneLbl(pbMults, pbRes.dec, curPB),
+      fwdEpsLbl: fwdEps.toFixed(2), bvpsLbl: fmt(bvps),
+      onPrice: e => this.setState({ price: e.target.value }),
+      rows, ticks,
+      lineStyle: `left:${pct(price)}%;`, lineLbl: fmt(price),
+      showFwd,
+      fwdPE: (price / eps[fy].v).toFixed(1), fySel: eps[fy].y, epsRows, epsColCount: epsRows.length, epsUpdate: '2026-05-15',
+      axisLbl: 'NT$ ' + fmt(AMIN) + '–' + fmt(AMAX),
+      staleThreshLbl: staleThresh,
+      fsMidLbl: fmt(2700), yfMidLbl: fmt(2750),
+      quoteCells, consSegs, consTotal, consBullPct, consHoldPct, consBearPct, consMarkerStyle, epsCols, epsMatrix,
+      changeLbl: (dir ? '▲ ' : '▼ ') + fmt(Math.abs(chg)),
+      chgPctLbl: (dir ? '+' : '−') + Math.abs(chgPct).toFixed(2) + '%',
+      changeColor: dir ? upCol : dnCol,
+      changeBg: dir ? '#fbeae7' : '#e6f3ec',
+      volLbl: '38,420', prevCloseLbl: fmt(prevClose),
+      marketCapLbl: 'NT$' + (price * 25.93e9 / 1e12).toFixed(1) + '兆',
+      betaLbl: '1.05', sharpeLbl: '1.42', riskWinLbl: '252D · vs ^TWII · rf=台灣10年期公債殖利率',
+    };
+  }
+}
+</script>
+</body>
+</html>

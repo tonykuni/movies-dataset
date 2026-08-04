@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA Dual Project Daily Health Scheduler v028.7.5</title>
+<style>
+:root{--sky:#d8f0ef;--ink:#1d3438;--muted:#657f82;--line:rgba(38,70,75,.16);--head:#edf8f6;--hover:rgba(216,240,239,.20);--ok:#0f766e;--warn:#b7791f;--fail:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Microsoft JhengHei","Segoe UI",Arial,sans-serif;background:linear-gradient(180deg,#fbfdfb,#f3f8f6);color:var(--ink);font-size:11px;line-height:1.28}
+header{position:sticky;top:0;z-index:80;padding:14px 26px 10px;background:rgba(251,253,251,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+h1{margin:0;font-size:18px;text-align:center;letter-spacing:.035em}
+.sub{text-align:center;color:var(--muted);font-size:10.5px;margin-top:4px}
+.wrap{padding:12px 22px 36px}
+.kpis{display:grid;grid-template-columns:repeat(8,minmax(96px,1fr));gap:8px;margin-bottom:12px}
+.card{border-radius:10px;padding:8px 10px;background:rgba(255,255,255,.82);border:1px solid var(--line);box-shadow:0 6px 16px rgba(30,52,56,.04)}
+.k{font-size:9.5px;color:var(--muted);letter-spacing:.07em}.v{font-size:16px;font-weight:750;margin-top:2px}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.fail{color:var(--fail)}
+section{margin-top:12px}
+h2{position:sticky;top:45px;z-index:70;margin:0 0 6px;padding:6px 9px;border:1px solid var(--line);border-left:4px solid var(--sky);border-radius:9px;background:rgba(250,253,252,.96);font-size:12px;text-align:center}
+table{width:100%;border-collapse:separate;border-spacing:0;table-layout:auto;background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:10px;overflow:clip}
+thead{position:sticky;top:76px;z-index:60}
+th{position:sticky;top:76px;z-index:61;background:var(--head);font-size:10px;font-weight:800;text-align:center;vertical-align:top;padding:5px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{font-size:10px;padding:4px 6px;border-bottom:1px solid var(--line);vertical-align:top;text-align:center;white-space:nowrap}
+td.via-left,td:has(code){text-align:left;white-space:normal;word-break:break-word;overflow-wrap:anywhere}
+tr:hover td{background:var(--hover)}
+code{font-family:Consolas,"Cascadia Mono",monospace;font-size:9.5px;white-space:normal;word-break:break-word}
+</style>
+</head>
+<body>
+<header>
+<h1>def VIA Dual Project Daily Health Scheduler · v028.7.5</h1>
+<div class="sub">VDF + VRN · Daily Read-Only Health · Windows Task · No DB Write · No Extraction</div>
+</header>
+<div class="wrap">
+<div class="kpis">
+<div class="card"><div class="k">Status</div><div class="v">DUAL_PROJECT_DAILY_HEALTH_SCHEDULER_READY_WITH_REVIEW</div></div>
+<div class="card"><div class="k">Risk</div><div class="v">MEDIUM</div></div>
+<div class="card"><div class="k">OK</div><div class="v ok">8</div></div>
+<div class="card"><div class="k">WARN</div><div class="v warn">2</div></div>
+<div class="card"><div class="k">FAIL</div><div class="v fail">1</div></div>
+<div class="card"><div class="k">Task</div><div class="v">WARN_TASK_REGISTER_FAILED</div></div>
+<div class="card"><div class="k">Smoke</div><div class="v">WARN_SMOKE_NONZERO_EXIT</div></div>
+<div class="card"><div class="k">Enabled</div><div class="v">False</div></div>
+</div>
+
+<section><h2>def Matrix</h2>
+<table>
+<thead><tr><th>Round</th><th>Lane</th><th>Stage</th><th>Name</th><th>Status</th><th>Risk</th><th>FixClass</th><th>Priority</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr></thead>
+<tbody><tr><td>Round0</td><td>CONTROL</td><td>POLICY</td><td>No DB Write</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>db_write</td><td>false</td><td>Daily health is read-only.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\DATABASE</code></td></tr>
+<tr><td>Round0</td><td>CONTROL</td><td>POLICY</td><td>No Source Repair</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>source_repair</td><td>false</td><td>No source file modification.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics</code></td></tr>
+<tr><td>Round0</td><td>CONTROL</td><td>POLICY</td><td>No Extraction</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>extraction</td><td>false</td><td>VRN extraction and VDF DB write remain locked.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_DAILY_HEALTH_SCHEDULER_v02875_20260611_213209</code></td></tr>
+<tr><td>Round0</td><td>CONTROL</td><td>POLICY</td><td>No Stop-Process</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>stop_process</td><td>false</td><td>No process kill.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_DAILY_HEALTH_SCHEDULER_v02875_20260611_213209</code></td></tr>
+<tr><td>Round0</td><td>ANCHOR</td><td>SMOKE_RUNTIME</td><td>Latest v02874 Runtime</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>status</td><td>READONLY_LANE_SMOKE_READY</td><td>Read-only lane smoke is ready.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_READONLY_LANE_EXECUTION_SMOKE_TEST_v02874_20260611_211312\runtime\VIA_ReadOnlyLaneSmoke_Runtime_v02874.json</code></td></tr>
+<tr><td>Round1</td><td>DAILY_HEALTH</td><td>SCRIPT</td><td>Daily Health Script</td><td><b>OK_CREATED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>parse_fail</td><td>0</td><td>Daily health script created and parse clean.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\tools\VIA_DualProjectDailyHealth\Invoke-VIA-DualProjectDailyHealth.ps1</code></td></tr>
+<tr><td>Round1</td><td>DAILY_HEALTH</td><td>LAUNCHER</td><td>Manual Launcher</td><td><b>OK_CREATED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>parse_fail</td><td>0</td><td>Manual launcher created and parse clean.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\tools\VIA_DualProjectDailyHealth\Start-VIA-DualProjectDailyHealth.ps1</code></td></tr>
+<tr><td>Round2</td><td>SMOKE</td><td>DAILY_HEALTH</td><td>Immediate Smoke</td><td><b>WARN_SMOKE_NONZERO_EXIT</b></td><td>MEDIUM</td><td>SEQUENTIAL_REQUIRED</td><td>P1</td><td>exit</td><td>1</td><td>Daily health script exited nonzero; review stderr.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_DAILY_HEALTH_SCHEDULER_v02875_20260611_213209\runtime\daily_health_smoke.stderr.txt</code></td></tr>
+<tr><td>Round2</td><td>SCHEDULER</td><td>WINDOWS_TASK</td><td>Scheduled Task</td><td><b>WARN_TASK_REGISTER_FAILED</b></td><td>MEDIUM</td><td>SEQUENTIAL_REQUIRED</td><td>P1</td><td>task</td><td>failed</td><td>Cannot process argument transformation on parameter &#39;RunLevel&#39;. Cannot convert value &quot;LeastPrivilege&quot; to type &quot;Microsoft.PowerShell.Cmdletization.GeneratedTypes.ScheduledTask.RunLevelEnum&quot;. Error: &quot;Unable to match the identifier name LeastPrivilege to a valid enumerator name. Specify one of the following enumerator names and try again:
+Limited, Highest&quot;</td><td><code>VIA Dual Project Daily Health</code></td></tr>
+<tr><td>Round2</td><td>LAUNCHER</td><td>SHORTCUT</td><td>Desktop Shortcut</td><td><b>OK_CREATED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>shortcut</td><td>true</td><td>Desktop shortcut created.</td><td><code>C:\Users\tonyk\OneDrive\Desktop\VIA Dual Project Daily Health.lnk</code></td></tr>
+<tr><td>Round3</td><td>FINAL</td><td>DECISION</td><td>Dual Project Daily Health Scheduler</td><td><b>DUAL_PROJECT_DAILY_HEALTH_SCHEDULER_READY_WITH_REVIEW</b></td><td>MEDIUM</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>hard_blocks</td><td>0</td><td>Final scheduler decision created. Next: Review scheduler warning, then proceed to final operations seal.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_DUAL_PROJECT_DAILY_HEALTH_SCHEDULER_v02875_20260611_213209</code></td></tr></tbody>
+</table>
+</section>
+</div>
+<script>
+(function(){
+ const left=/(path|message|task|script|runtime|路徑|訊息|任務|腳本)/i;
+ const path=/([A-Za-z]:\\|\\\\|\/|\.ps1|\.html|\.csv|\.json|\.txt|\.lnk)/i;
+ function clean(t){return String(t||"").replace(/,/g,"").replace(/%/g,"").trim();}
+ function isnum(t){const s=clean(t);return !!s && /^[-+]?(\\d+|\\d*\\.\\d+)(e[-+]?\\d+)?$/i.test(s) && Number.isFinite(Number(s));}
+ function fmt(t){const n=Number(clean(t));return Number.isFinite(n)?n.toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:1}):t;}
+ function heads(table){return Array.from(table.querySelectorAll("thead th")).map(x=>(x.textContent||"").trim());}
+ function process(table){const hs=heads(table);Array.from(table.querySelectorAll("th")).forEach(th=>{th.style.textAlign="center";th.style.verticalAlign="top";});Array.from(table.querySelectorAll("tbody tr")).forEach(row=>{Array.from(row.children).forEach((cell,i)=>{const h=hs[i]||"";const raw=(cell.textContent||"").trim();cell.style.verticalAlign="top";cell.style.textAlign="center";if(isnum(raw)){cell.textContent=fmt(raw);return;}if(left.test(h)||path.test(raw)||raw.length>=36||cell.querySelector("code")){cell.classList.add("via-left");}});});}
+ Array.from(document.querySelectorAll("table")).forEach(process);
+})();
+</script>
+</body>
+</html>

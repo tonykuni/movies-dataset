@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VRN Parquet Unified Stage Repair Gate v029.1C.3</title>
+<style>
+:root{--sky:#d8f0ef;--ink:#1d3438;--muted:#657f82;--line:rgba(38,70,75,.16);--head:#edf8f6;--hover:rgba(216,240,239,.20);--ok:#0f766e;--warn:#b7791f;--fail:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Microsoft JhengHei","Segoe UI",Arial,sans-serif;background:linear-gradient(180deg,#fbfdfb,#f3f8f6);color:var(--ink);font-size:11px;line-height:1.28}
+header{position:sticky;top:0;z-index:80;padding:14px 26px 10px;background:rgba(251,253,251,.96);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+h1{margin:0;font-size:18px;text-align:center;letter-spacing:.035em}
+.sub{text-align:center;color:var(--muted);font-size:10.5px;margin-top:4px}
+.wrap{padding:12px 22px 36px}
+.kpis{display:grid;grid-template-columns:repeat(9,minmax(92px,1fr));gap:8px;margin-bottom:12px}
+.card{border-radius:10px;padding:8px 10px;background:rgba(255,255,255,.82);border:1px solid var(--line);box-shadow:0 6px 16px rgba(30,52,56,.04)}
+.k{font-size:9.5px;color:var(--muted);letter-spacing:.07em}.v{font-size:16px;font-weight:750;margin-top:2px}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.fail{color:var(--fail)}
+section{margin-top:12px}
+h2{position:sticky;top:45px;z-index:70;margin:0 0 6px;padding:6px 9px;border:1px solid var(--line);border-left:4px solid var(--sky);border-radius:9px;background:rgba(250,253,252,.96);font-size:12px;text-align:center}
+table{width:100%;border-collapse:separate;border-spacing:0;table-layout:auto;background:rgba(255,255,255,.78);border:1px solid var(--line);border-radius:10px;overflow:clip}
+thead{position:sticky;top:76px;z-index:60}
+th{position:sticky;top:76px;z-index:61;background:var(--head);font-size:10px;font-weight:800;text-align:center;vertical-align:top;padding:5px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{font-size:10px;padding:4px 6px;border-bottom:1px solid var(--line);vertical-align:top;text-align:center;white-space:nowrap}
+td.via-left,td:has(code){text-align:left;white-space:normal;word-break:break-word;overflow-wrap:anywhere}
+tr:hover td{background:var(--hover)}
+code{font-family:Consolas,"Cascadia Mono",monospace;font-size:9.5px;white-space:normal;word-break:break-word}
+</style>
+</head>
+<body>
+<header>
+<h1>def VRN Parquet Unified Stage Repair Gate · v029.1C.3</h1>
+<div class="sub">Parquet as SSOT · CSV audit only · ragged-row safe · async drain (no hang) · no original overwrite · no extraction rerun</div>
+</header>
+<div class="wrap">
+<div class="kpis">
+<div class="card"><div class="k">Status</div><div class="v">VRN_1C3_PARQUET_UNIFIED_STAGE_READY_WITH_REVIEW</div></div>
+<div class="card"><div class="k">Risk</div><div class="v">MEDIUM</div></div>
+<div class="card"><div class="k">OK</div><div class="v ok">18</div></div>
+<div class="card"><div class="k">WARN</div><div class="v warn">3</div></div>
+<div class="card"><div class="k">FAIL</div><div class="v fail">0</div></div>
+<div class="card"><div class="k">Reports</div><div class="v">400</div></div>
+<div class="card"><div class="k">Text Rows</div><div class="v">3878</div></div>
+<div class="card"><div class="k">Duplicate IDs</div><div class="v">0</div></div>
+<div class="card"><div class="k">Ragged Rows</div><div class="v warn">0</div></div>
+</div>
+
+<section><h2>def Parquet Unified Repair Matrix</h2>
+<table>
+<thead><tr><th>Round</th><th>Layer</th><th>Name</th><th>Status</th><th>Risk</th><th>Class</th><th>Priority</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr></thead>
+<tbody><tr><td>Round0</td><td>POLICY</td><td>Parquet SSOT</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>main_format</td><td>parquet</td><td>Parquet is main storage format from this gate.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541\stage_parquet</code></td></tr>
+<tr><td>Round0</td><td>POLICY</td><td>CSV Audit Only</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>csv_role</td><td>audit_only</td><td>CSV is only audit/sample, not canonical stage.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541\audit</code></td></tr>
+<tr><td>Round0</td><td>POLICY</td><td>No Original Overwrite</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>overwrite</td><td>false</td><td>Create parquet staging copy only.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541</code></td></tr>
+<tr><td>Round0</td><td>POLICY</td><td>No Extraction Rerun</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>rerun_extraction</td><td>false</td><td>Do not rerun VRN 1C.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541</code></td></tr>
+<tr><td>Round0</td><td>POLICY</td><td>Ragged Preserve No Realign</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>ragged_policy</td><td>preserve+flag</td><td>Ragged rows preserved into _csv_overflow and flagged; never realign-guessed.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541</code></td></tr>
+<tr><td>Round0</td><td>POLICY</td><td>No Source Repair</td><td><b>OK_POLICY_LOCKED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>source_repair</td><td>false</td><td>No source modification.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541</code></td></tr>
+<tr><td>Round1</td><td>DIAGNOSE</td><td>VRN_ParquetUnifiedStageRepair.stderr.txt</td><td><b>OK_FOUND</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>chars</td><td>456</td><td>  File &quot;C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_ALL_TURBO_QUALIFIED_STAGING_EXTRACTION_v029VRN1C_20260615_115316\stage\VRN_ReportBasicInfo_Stage_v029VRN1C.csv&quot;, line 2
+    650b2d77cd95cd86,144913c917d9,2025-08-19,6873,,兆豐,,買進,,,100,1.0,False,20250819兆豐個股報告-泓德能源(6873).pdf,C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module\VRN\input\20250819兆豐個股報告-泓德能源(6873).pdf
+      ^
+SyntaxError: invalid decimal literal
+</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C2_20260615_123205\runtime\VRN_ParquetUnifiedStageRepair.stderr.txt</code></td></tr>
+<tr><td>Round1</td><td>INPUT</td><td>Stage CSV Files</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>files</td><td>4</td><td>Original stage CSV files verified.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VIA_THREEROUND_PANORAMIC_CONSOLIDATION_v029DUAL0E_20260615_121827\runtime\VIA_ThreeRoundPanoramic_Runtime_v029DUAL0E.json</code></td></tr>
+<tr><td>Round1</td><td>ENGINE</td><td>pyarrow</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>pyarrow</td><td>available</td><td>pyarrow available.</td><td><code>C:\Python313\python.exe</code></td></tr>
+<tr><td>Round1</td><td>ENGINE</td><td>Parquet Repair Engine</td><td><b>OK_CREATED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>script</td><td>created</td><td>Hardened parquet repair engine (P-A..P-D) created.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541\work\vrn_parquet_unified_stage_repair_v1c3.py</code></td></tr>
+<tr><td>Round2</td><td>REPAIR</td><td>Python Parquet Repair</td><td><b>OK_REPAIRED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>exit</td><td>0</td><td>Parquet unified repair completed.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541\runtime\VRN_ParquetUnifiedStageRepair_PythonRuntime_v029VRN1C3.json</code></td></tr>
+<tr><td>Round2</td><td>VERIFY</td><td>Parquet Basic Rows</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>rows</td><td>400</td><td>BasicInfo parquet rows.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541\stage_parquet\VRN_ReportBasicInfo_StageFixed_v029VRN1C3.parquet</code></td></tr>
+<tr><td>Round2</td><td>VERIFY</td><td>Parquet File Rows</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>rows</td><td>400</td><td>FileRegistry parquet rows.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541\stage_parquet\VRN_FileRegistry_StageFixed_v029VRN1C3.parquet</code></td></tr>
+<tr><td>Round2</td><td>VERIFY</td><td>Parquet Text Rows</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>rows</td><td>3878</td><td>ReportText parquet rows.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541\stage_parquet\VRN_ReportText_StageFixed_v029VRN1C3.parquet</code></td></tr>
+<tr><td>Round2</td><td>VERIFY</td><td>Duplicate ReportID</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>SEQUENTIAL_REQUIRED</td><td>P0</td><td>duplicates</td><td>0</td><td>Duplicate report_id after parquet rekey.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541\stage_parquet\VRN_ReportBasicInfo_StageFixed_v029VRN1C3.parquet</code></td></tr>
+<tr><td>Round2</td><td>VERIFY</td><td>Missing Ticker</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>SEQUENTIAL_REQUIRED</td><td>P1</td><td>missing</td><td>0</td><td>Missing ticker after parquet repair.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541\stage_parquet\VRN_ReportBasicInfo_StageFixed_v029VRN1C3.parquet</code></td></tr>
+<tr><td>Round2</td><td>VERIFY</td><td>Missing Date/Broker</td><td><b>WARN_REVIEW_REQUIRED</b></td><td>MEDIUM</td><td>SEQUENTIAL_REQUIRED</td><td>P1</td><td>date/broker</td><td>1/33</td><td>Date filled=15; Broker filled=0.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541\stage_parquet\VRN_ReportBasicInfo_StageFixed_v029VRN1C3.parquet</code></td></tr>
+<tr><td>Round2</td><td>VERIFY</td><td>Ragged Rows</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P1</td><td>basic/file/exc/text</td><td>0/0/0/0</td><td>Ragged rows preserved into _csv_overflow and flagged review; no realign guess.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541\stage_parquet\VRN_ReportBasicInfo_StageFixed_v029VRN1C3.parquet</code></td></tr>
+<tr><td>Round3</td><td>CLASSIFY</td><td>Join-Key Safety</td><td><b>OK_VERIFIED</b></td><td>LOW</td><td>PARALLEL_SAFE</td><td>P0</td><td>status</td><td>safe</td><td>ReportID and ticker safe for table extraction staging.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541\stage_parquet\VRN_ReportIdRekeyMapping_v029VRN1C3.parquet</code></td></tr>
+<tr><td>Round3</td><td>CLASSIFY</td><td>Canonical Promotion Readiness</td><td><b>WARN_CANONICAL_BLOCKED</b></td><td>MEDIUM</td><td>SEQUENTIAL_REQUIRED</td><td>P1</td><td>date/broker/review/exc/ragged</td><td>1/33/1/49/0</td><td>These block canonical promotion, not table extraction staging.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541\stage_parquet\VRN_ReportBasicInfo_StageFixed_v029VRN1C3.parquet</code></td></tr>
+<tr><td>Round3</td><td>FINAL</td><td>VRN 1C.3 Parquet Unified Stage</td><td><b>VRN_1C3_PARQUET_UNIFIED_STAGE_READY_WITH_REVIEW</b></td><td>MEDIUM</td><td>SEQUENTIAL_GATED</td><td>P0</td><td>hard_blocks</td><td>0</td><td>Final parquet unified stage decision.</td><td><code>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF\_active\VRN_PARQUET_UNIFIED_STAGE_REPAIR_GATE_v029VRN1C3_20260615_125541</code></td></tr></tbody>
+</table>
+</section>
+</div>
+<script>
+(function(){
+ const left=/(path|message|reason|action|issue|overflow|路徑|訊息|原因|動作|問題)/i;
+ const path=/([A-Za-z]:\\|\\\\|\/|\.ps1|\.py|\.parquet|\.csv|\.json|\.html|\.txt|\.pdf|\.duckdb)/i;
+ function clean(t){return String(t||"").replace(/,/g,"").replace(/%/g,"").trim();}
+ function isnum(t){const s=clean(t);return !!s && /^[-+]?(\d+|\d*\.\d+)(e[-+]?\d+)?$/i.test(s) && Number.isFinite(Number(s));}
+ function fmt(t){const n=Number(clean(t));return Number.isFinite(n)?n.toLocaleString(undefined,{minimumFractionDigits:1,maximumFractionDigits:2}):t;}
+ function heads(table){return Array.from(table.querySelectorAll("thead th")).map(x=>(x.textContent||"").trim());}
+ function process(table){const hs=heads(table);Array.from(table.querySelectorAll("th")).forEach(th=>{th.style.textAlign="center";th.style.verticalAlign="top";});Array.from(table.querySelectorAll("tbody tr")).forEach(row=>{Array.from(row.children).forEach((cell,i)=>{const h=hs[i]||"";const raw=(cell.textContent||"").trim();cell.style.verticalAlign="top";cell.style.textAlign="center";if(isnum(raw)){cell.textContent=fmt(raw);return;}if(left.test(h)||path.test(raw)||raw.length>=36||cell.querySelector("code")){cell.classList.add("via-left");}});});}
+ Array.from(document.querySelectorAll("table")).forEach(process);
+})();
+</script>
+</body>
+</html>

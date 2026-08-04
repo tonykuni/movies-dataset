@@ -1,0 +1,60 @@
+{
+  "generated_at": "2026-06-15 16:37:51",
+  "status": "VIA_VRN_VDF_CONTINUE_INTEGRATION_PLAN_READY",
+  "risk": "MEDIUM",
+  "policy": {
+    "no_canonical_promotion": true,
+    "no_stop_process": true,
+    "no_destructive_delete": true,
+    "no_blind_full_rerun": true,
+    "max_rounds": 3,
+    "parallel_only_for_readonly_validation": true,
+    "sequential_required_for_code_or_ssot_patch": true
+  },
+  "current_state": {
+    "v031_status": "VRN_VDF_SUPPORTIVE_NEXUS_SSOT_READY_WITH_REPAIR_REVIEW",
+    "v031_risk": "HIGH",
+    "v029_status": "VIA_DUALPROJECT_SIXLANE_CONCURRENT_READY_WITH_REVIEW",
+    "v029_risk": "MEDIUM",
+    "vdf_status": "DATA_READY_BUT_COMPLETION_SEAL_REVIEW",
+    "vrn_status": "READY",
+    "vrn_financial_rows_total": "29114",
+    "active_fail_count": 3,
+    "archive_fail_count": 42,
+    "ssot_warn_count": 18,
+    "policy_warn_count": 51
+  },
+  "next_gates": [
+    {
+      "gate": "VDF_1A_FINISH_SEAL_REVIEW",
+      "mode": "SEQUENTIAL_REQUIRED",
+      "reason": "VDF data ready but completion seal review remains.",
+      "action": "Audit final seal pointer, runtime JSON, daily health runtime, database inventory; generate finish seal candidate only.",
+      "destructive": false
+    },
+    {
+      "gate": "VRN_1D2_VALIDATION",
+      "mode": "PARALLEL_SAFE_THEN_SEQUENTIAL_REVIEW",
+      "reason": "VRN financial rows ready; validate table-like expansion and exception review.",
+      "action": "Validate FinancialData parquet rows, duplicates, record_hash, account coverage, and exception matrix.",
+      "destructive": false
+    },
+    {
+      "gate": "SSOT_SUPPLEMENT_REVIEW",
+      "mode": "SEQUENTIAL_REQUIRED",
+      "reason": "SSOT keys missing: base / vrn / vdf / supportive_modules / field_registry / broker_list.",
+      "action": "Merge supplement candidate into review copy only; no canonical overwrite.",
+      "destructive": false
+    },
+    {
+      "gate": "POLICY_PATTERN_REVIEW",
+      "mode": "SEQUENTIAL_REQUIRED",
+      "reason": "Stop-Process and pip install patterns detected; must classify actual vs historical/archive usage.",
+      "action": "Classify policy patterns as active blocker / archive review / allowed comment; do not auto-delete.",
+      "destructive": false
+    }
+  ],
+  "html": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_vrn_vdf_integrated_closeout_ui\\VIA_VRN_VDF_Integrated_NonBlocking_Closeout_UI_v0315_20260615_162850.html",
+  "v031_json": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_vrn_vdf_supportive_nexus_runs\\RUN_20260615_155645_v0311_HOTFIX\\VRN_VDF_Supportive_Nexus_SSOT_HardGate_v0311.json",
+  "v029_runtime_json": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VIA_DUALPROJECT_SIXLANE_CONCURRENT_GATE_v029DUAL1B_20260615_162518\\runtime\\VIA_DualProjectSixLaneConcurrent_Runtime_v029DUAL1B.json"
+}

@@ -1,0 +1,208 @@
+{
+  "meta": {
+    "schema": "VIA.CodexNexus.VisualRegistry",
+    "version": "v1.0",
+    "generated": "2026-06-17",
+    "engine": "VisualRegistry",
+    "output": "VisualRegistry.json",
+    "reads": "Plotly/Seaborn/Matplotlib/Chart.js/ECharts",
+    "append_only": true,
+    "languages": [
+      "PowerShell",
+      "Python",
+      "JavaScript",
+      "HTML"
+    ]
+  },
+  "language_adapters": {
+    "ChartType": {
+      "python": "plotly / detect_engines(VVX)",
+      "javascript": "Plotly.js",
+      "powershell": "—",
+      "html": "—"
+    },
+    "ExtractPlotly": {
+      "python": "VVX.extract_plotly",
+      "javascript": "Plotly.js",
+      "powershell": "—",
+      "html": "—"
+    },
+    "ExtractChartjs": {
+      "python": "VVX.extract_chartjs",
+      "javascript": "Chart.js",
+      "powershell": "—",
+      "html": "—"
+    },
+    "ExtractECharts": {
+      "python": "VVX.extract_echarts",
+      "javascript": "ECharts",
+      "powershell": "—",
+      "html": "—"
+    },
+    "SingleDualAxis": {
+      "python": "matplotlib / plotly",
+      "javascript": "Plotly.js",
+      "powershell": "—",
+      "html": "—"
+    },
+    "Colorway": {
+      "python": "seaborn",
+      "javascript": "CSS variables",
+      "powershell": "—",
+      "html": "—"
+    },
+    "HeatmapScale": {
+      "python": "seaborn(low-sat celadon)",
+      "javascript": "ECharts visualMap",
+      "powershell": "—",
+      "html": "—"
+    },
+    "StackedChart": {
+      "python": "plotly / seaborn",
+      "javascript": "ECharts",
+      "powershell": "—",
+      "html": "—"
+    },
+    "DashboardGrid": {
+      "python": "dash / panel",
+      "javascript": "Gridstack.js",
+      "powershell": "—",
+      "html": "grid"
+    },
+    "ChartExport": {
+      "python": "kaleido",
+      "javascript": "html2canvas",
+      "powershell": "—",
+      "html": "—"
+    },
+    "VisualLock": {
+      "python": "pydantic + VHS registry",
+      "javascript": "JSON registry",
+      "powershell": "Get-FileHash",
+      "html": "—"
+    }
+  },
+  "chart_spec_rules": {
+    "priority": "單軸 > 雙軸 > 多圖堆疊",
+    "style": "低彩度·留白·金融級·不花",
+    "font_hierarchy": [
+      "標題",
+      "副標",
+      "軸標",
+      "註解",
+      "tick"
+    ],
+    "legend": "能少就少,必要時置底",
+    "background": "米白/白卡/淡灰線",
+    "status_colors": {
+      "OK": "#166534",
+      "WARN": "#B7791F",
+      "FAIL": "#B91C1C"
+    },
+    "tw_updown": "可切換:漲紅跌綠",
+    "single_axis": {
+      "use": [
+        "同單位",
+        "報酬率比較",
+        "多股累積報酬",
+        "產業比較",
+        "分數/排名"
+      ],
+      "taboo": [
+        "不同單位硬放單軸",
+        "類別過多用垂直長條",
+        "百分比與金額混軸"
+      ]
+    },
+    "dual_axis": {
+      "pairs": {
+        "股價": "成交量",
+        "指數": "匯率",
+        "報酬": "資金流",
+        "CPI": "利率",
+        "EPS": "股價"
+      },
+      "hard": [
+        "一定標單位",
+        "左右軸色對應線色",
+        "不放大縮小誤導",
+        "右軸只放第二單位不放第三",
+        "標題寫 X vs Y"
+      ],
+      "taboo": [
+        "為好看硬做雙軸",
+        "三軸",
+        "兩線不同單位卻不標",
+        "左右刻度製造假相關"
+      ]
+    },
+    "chart_by_data": {
+      "水平Bar": "類別多/名稱長/排名/Top10",
+      "垂直Bar": "類別少/月份/年度",
+      "Line": "時間序列",
+      "Heatmap": "matrix/correlation/risk",
+      "Scatter": "關係/分布/估值",
+      "StackedBar": "結構占比(≤6-8類)",
+      "Area": "累積/組成變化"
+    },
+    "seaborn": {
+      "category": "VIA_COLORWAY",
+      "sequential": "celadon light→dark",
+      "diverging": "red→neutral→green",
+      "heatmap": "low-sat celadon",
+      "taboo": [
+        "rainbow",
+        "neon",
+        "高飽和撞色",
+        "每圖重設palette",
+        "heatmap用jet"
+      ]
+    },
+    "plotly": {
+      "multiline": "colorway",
+      "heatmap": "colorscale",
+      "diverging": "diverging scale",
+      "dashboard": "shared template",
+      "taboo": [
+        "每圖自訂亂色",
+        "legend太多",
+        "背景太黑字太暗",
+        "hover過度複雜"
+      ]
+    },
+    "via_palette": {
+      "Background": "#F9F9F6",
+      "Surface": "#FFFFFF",
+      "Celadon": "#DFECEA",
+      "SkyCeladon": "#AFCFCC",
+      "Ink": "#1F2933",
+      "Muted": "#6B7C78",
+      "SealRed": "#9F1D1D",
+      "ChartBlue": "#2563EB",
+      "ChartTeal": "#0F766E",
+      "ChartAmber": "#D97706",
+      "ChartPurple": "#7C3AED",
+      "ChartSlate": "#475569"
+    },
+    "master_taboo": [
+      "不亂用雙軸",
+      "不用彩虹heatmap",
+      "不用三軸",
+      "不用過多legend",
+      "不同單位不混軸",
+      "類別太多不用垂直bar",
+      "時間序列不用水平bar",
+      "堆疊分類不可太多",
+      "圖不可缺單位",
+      "標題不可只寫代號",
+      "字太小不可",
+      "hover不可塞太多",
+      "不讓PY/Seaborn/HTML各自一套色"
+    ],
+    "reconcile": "VIA_palette=圖表用色;VPN三核心=品牌鎖;Resonance=報告主題;由 VAP 統一治理"
+  },
+  "io": {
+    "output": "VisualRegistry.json",
+    "cmd": "Invoke-VeritasCodexNexus.ps1 -Mode Visual -Task ExtractChartSpec"
+  }
+}

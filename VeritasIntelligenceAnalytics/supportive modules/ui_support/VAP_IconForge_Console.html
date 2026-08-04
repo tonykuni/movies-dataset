@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>觀 · VAP Icon Forge</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%8A%3C/text%3E%3C/svg%3E">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&family=Syne:wght@600;700&family=Noto+Serif+TC:wght@500;600&display=swap');
+:root{
+  --bg:#f5f4f0; --bg2:#e9e7e1; --surface:#fbfaf7; --line:#ddd9d0;
+  --bl:#4c78a8; --gy:#9c9890; --te:#439a9a; --dan:#b5291a; --qing:#2f6f6f;
+  --i0:#1c1a17; --i1:#34302a; --i2:#5a554c; --i3:#8a847a; --i4:#b6b0a4;
+  --mo:'DM Mono',ui-monospace,monospace; --sa:'DM Sans',system-ui,sans-serif;
+  --sy:'Syne',var(--sa); --wen:'Cormorant Garamond','Noto Serif TC',serif;
+  --rad:14px; --sh:0 1px 2px rgba(28,26,23,.06),0 8px 24px rgba(28,26,23,.05);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--i1);font-family:var(--sa);
+  -webkit-font-smoothing:antialiased;background-image:
+   radial-gradient(circle at 12% 8%,rgba(255,255,255,.5),transparent 38%),
+   radial-gradient(circle at 88% 92%,rgba(67,154,154,.05),transparent 42%);}
+.wrap{max-width:1180px;margin:0 auto;padding:26px 22px 80px}
+header.top{display:flex;align-items:center;gap:18px;padding:18px 22px;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--rad);
+  box-shadow:var(--sh);margin-bottom:18px}
+.seal{width:62px;height:62px;flex:0 0 62px;display:grid;place-items:center;
+  font-family:var(--wen);font-weight:600;font-size:40px;color:var(--dan);
+  border:2px solid var(--dan);border-radius:10px;background:rgba(181,41,26,.04)}
+.tt{display:flex;flex-direction:column;gap:3px}
+.tt h1{margin:0;font-family:var(--wen);font-weight:600;font-size:26px;
+  letter-spacing:.5px;color:var(--i0)}
+.tt .sub{font-family:var(--mo);font-size:11px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--i3)}
+.tt .sub b{color:var(--qing)}
+nav.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+nav.tabs button{font-family:var(--sa);font-size:13px;font-weight:500;
+  padding:9px 15px;border:1px solid var(--line);background:var(--surface);
+  color:var(--i2);border-radius:10px;cursor:pointer;transition:.16s;
+  display:flex;align-items:center;gap:7px}
+nav.tabs button .em{font-size:15px}
+nav.tabs button:hover{border-color:var(--te);color:var(--i0);
+  transform:translateY(-1px)}
+nav.tabs button.on{background:var(--i0);color:var(--bg);border-color:var(--i0)}
+.pg{display:none;animation:fade .25s ease}
+.pg.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.note{font-size:13px;color:var(--i2);background:var(--surface);
+  border:1px solid var(--line);border-left:3px solid var(--te);
+  border-radius:10px;padding:11px 14px;margin-bottom:16px;line-height:1.55}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--rad);
+  box-shadow:var(--sh);overflow:hidden;display:flex;flex-direction:column}
+.card .pv{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line)}
+.card .pv > div{background:repeating-conic-gradient(#eceae4 0 25%,#f6f5f1 0 50%)
+   50%/16px 16px;display:grid;place-items:center;min-height:118px;padding:10px;position:relative}
+.card .pv img,.card .pv svg{max-width:100%;max-height:96px}
+.card .pv .lab{position:absolute;top:5px;left:6px;font-family:var(--mo);
+  font-size:9px;color:var(--i3);letter-spacing:1px}
+.card .meta{padding:10px 12px;display:flex;flex-direction:column;gap:7px}
+.card .meta .nm{font-family:var(--mo);font-size:12px;color:var(--i1);
+  word-break:break-all;font-weight:500}
+.card .meta .st{font-size:11px;color:var(--i3);display:flex;gap:9px;flex-wrap:wrap}
+.card .meta .st b{color:var(--qing);font-weight:600}
+.cpr{display:flex;gap:6px;flex-wrap:wrap}
+.cpr button{font-family:var(--mo);font-size:10px;padding:5px 9px;border-radius:8px;
+  border:1px solid var(--line);background:var(--bg2);color:var(--i2);cursor:pointer;
+  transition:.14s}
+.cpr button:hover{background:var(--te);color:#fff;border-color:var(--te)}
+.cpr button.done{background:var(--qing);color:#fff;border-color:var(--qing)}
+/* segment map */
+.seg{background:var(--surface);border:1px solid var(--line);border-radius:var(--rad);
+  box-shadow:var(--sh);padding:14px 16px;margin-bottom:12px;display:grid;
+  grid-template-columns:54px 60px 1fr auto;gap:14px;align-items:center}
+.seg .emoji{font-size:34px;text-align:center;cursor:pointer;line-height:1;
+  border-radius:10px;padding:6px 0;transition:.14s}
+.seg .emoji:hover{background:var(--bg2)}
+.seg .sl{font-family:var(--wen);font-size:30px;font-weight:600;color:var(--dan);
+  text-align:center;border:1.5px solid var(--dan);border-radius:8px;
+  background:rgba(181,41,26,.04);padding:4px 0;cursor:pointer}
+.seg .fields{display:flex;flex-direction:column;gap:5px}
+.seg .fields input{font-family:var(--sa);font-size:13px;padding:6px 9px;
+  border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--i1)}
+.seg .fields input.code{font-family:var(--mo);font-size:11px;color:var(--i2)}
+.seg .act{display:flex;flex-direction:column;gap:6px}
+.btn{font-family:var(--sa);font-size:12px;font-weight:500;padding:7px 13px;
+  border-radius:9px;border:1px solid var(--line);background:var(--bg2);
+  color:var(--i1);cursor:pointer;transition:.14s}
+.btn:hover{border-color:var(--te);color:var(--i0)}
+.btn.pri{background:var(--i0);color:var(--bg);border-color:var(--i0)}
+.btn.pri:hover{opacity:.9;color:var(--bg)}
+.picker{position:fixed;inset:0;background:rgba(28,26,23,.34);display:none;
+  place-items:center;z-index:50;backdrop-filter:blur(2px)}
+.picker.on{display:grid}
+.picker .box{background:var(--surface);border:1px solid var(--line);
+  border-radius:16px;box-shadow:var(--sh);width:min(560px,92vw);max-height:78vh;
+  overflow:auto;padding:16px}
+.picker h3{margin:0 0 10px;font-family:var(--sy);font-size:15px;color:var(--i0)}
+.emgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:5px}
+.emgrid span{font-size:26px;text-align:center;padding:8px 0;border-radius:9px;
+  cursor:pointer;transition:.1s}
+.emgrid span:hover{background:var(--bg2);transform:scale(1.18)}
+.preview{background:var(--surface);border:1px solid var(--line);border-radius:var(--rad);
+  box-shadow:var(--sh);padding:16px;margin-top:16px}
+.preview .ph{display:flex;align-items:center;gap:14px;padding-bottom:14px;
+  border-bottom:1px solid var(--line);margin-bottom:14px}
+.preview .ph .lg{font-family:var(--wen);font-size:34px;font-weight:600;color:var(--dan)}
+.preview .ph .tx h2{margin:0;font-family:var(--wen);font-size:21px;color:var(--i0)}
+.preview .ph .tx .s{font-family:var(--mo);font-size:10px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--i3)}
+.preview .pt{display:flex;gap:7px;flex-wrap:wrap}
+.preview .pt .t{font-size:13px;padding:8px 13px;border-radius:9px;
+  border:1px solid var(--line);background:var(--bg);color:var(--i2);
+  display:flex;align-items:center;gap:7px}
+.preview .pt .t .e{font-size:15px}
+pre.out{background:#1c1a17;color:#e8e4da;font-family:var(--mo);font-size:11px;
+  padding:13px 15px;border-radius:11px;overflow:auto;margin-top:13px;
+  line-height:1.5;max-height:260px}
+.bar{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0}
+.fav{display:flex;gap:16px;flex-wrap:wrap}
+.favcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--rad);
+  box-shadow:var(--sh);padding:16px;width:230px}
+.favcard .big{width:64px;height:64px;display:grid;place-items:center;font-size:46px;
+  background:repeating-conic-gradient(#eceae4 0 25%,#f6f5f1 0 50%) 50%/14px 14px;
+  border-radius:12px;margin-bottom:10px}
+.favcard .big .sealfav{font-family:var(--wen);font-weight:600;color:var(--dan);font-size:44px}
+.favcard input{font-family:var(--sa);font-size:13px;width:100%;padding:7px 9px;
+  border:1px solid var(--line);border-radius:8px;background:var(--bg);margin-bottom:9px}
+.foot{margin-top:34px;font-family:var(--mo);font-size:10px;letter-spacing:1.5px;
+  color:var(--i4);text-align:center;text-transform:uppercase}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="seal">觀</div>
+    <div class="tt">
+      <h1>VAP Icon Forge</h1>
+      <div class="sub">Veritas AutoPlot · <b>PNG → SVG</b> · Notion-style Emoji Segments</div>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="on" data-pg="forge"><span class="em">🎨</span>SVG 鍛造 Forge</button>
+    <button data-pg="seg"><span class="em">🧩</span>分段圖標 Segments</button>
+    <button data-pg="fav"><span class="em">🪟</span>視窗圖標 Favicon</button>
+  </nav>
+
+  <!-- FORGE -->
+  <section class="pg on" id="pg-forge">
+    <div class="note">每張 PNG 已向量化為 <b>高品質 SVG</b>（保留色彩與透明背景）。左為原圖、右為 SVG。
+      可複製 <b>inline SVG</b>（直接貼進 header）、<b>&lt;img&gt; data-uri</b>（視窗/分頁 logo）、或 <b>原始碼</b>。</div>
+    <div class="grid" id="gallery"></div>
+  </section>
+
+  <!-- SEGMENTS -->
+  <section class="pg" id="pg-seg">
+    <div class="note">Notion 風格：每個 UI 分段（如各分頁/功能區）配一個 <b>emoji</b> 當功能標記，加一個 <b>一字印章</b> 當段落 logo。
+      點 emoji 換圖示、點印章換字、改標題與代碼，下方即時預覽 header 與分頁列，再複製產生的 HTML。</div>
+    <div id="segList"></div>
+    <div class="bar">
+      <button class="btn" id="addSeg">＋ 新增分段</button>
+      <button class="btn" id="genSeg">⟳ 重新產生程式碼</button>
+      <button class="btn pri" id="expSeg">⬇ 匯出 segment-map.json</button>
+    </div>
+    <div class="preview" id="segPreview"></div>
+    <pre class="out" id="segCode"></pre>
+  </section>
+
+  <!-- FAVICON -->
+  <section class="pg" id="pg-fav">
+    <div class="note">視窗 / 分頁圖標：左邊用 <b>emoji</b> 直接當 favicon（Notion 做法，零檔案、SVG data-uri），
+      右邊用 <b>一字印章</b> 渲染成 favicon。改字後複製 <code>&lt;link rel="icon"&gt;</code>。</div>
+    <div class="fav">
+      <div class="favcard">
+        <div class="big" id="emFavBig">📊</div>
+        <input id="emFavIn" value="📊" maxlength="4">
+        <div class="cpr"><button data-cp="emfav">複製 &lt;link&gt;</button></div>
+      </div>
+      <div class="favcard">
+        <div class="big"><span class="sealfav" id="slFavBig">觀</span></div>
+        <input id="slFavIn" value="觀" maxlength="2">
+        <div class="cpr"><button data-cp="slfav">複製 &lt;link&gt;</button></div>
+      </div>
+    </div>
+    <pre class="out" id="favCode"></pre>
+  </section>
+
+  <div class="foot">VIA · Veritas AutoPlot · Visual Lock 觀 · Append-Only</div>
+</div>
+
+<!-- emoji picker -->
+<div class="picker" id="picker">
+  <div class="box">
+    <h3>選一個功能 emoji</h3>
+    <div class="emgrid" id="emgrid"></div>
+  </div>
+</div>
+
+<script>
+var MANIFEST = {"records":[]};
+
+/* curated finance / analytics / module emoji set (Notion-style) */
+var EMOJI = ['📊','📈','📉','🎯','🎨','🖼️','🗂️','📐','🔍','⚙️','🧩','📤','📥','🧭',
+  '🕸️','🌡️','💹','💰','🪙','🏦','📜','🧾','🔭','🧪','⏱️','📅','🗺️','🔗','🧬','🪄',
+  '🟢','🔴','🟡','⚖️','🧱','🪟','🖥️','🛠️','🧰','📦','🔔','⭐','🚀','🌊','🌀','🪶'];
+/* one-character seals usable as segment title logos */
+var SEALS = ['理','庫','牘','觀','輔','究','鑑','真','源','綱','衡','局','勢','值','象'];
+
+function $(s,r){return (r||document).querySelector(s);}
+function $all(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function copy(txt,btn){
+  navigator.clipboard.writeText(txt).then(function(){
+    if(btn){var o=btn.textContent;btn.textContent='✓ 已複製';btn.classList.add('done');
+      setTimeout(function(){btn.textContent=o;btn.classList.remove('done');},1100);}
+  });
+}
+function dataUri(svg){return 'data:image/svg+xml,'+encodeURIComponent(svg);}
+
+/* ---- tabs ---- */
+$all('#tabs button').forEach(function(b){
+  b.addEventListener('click',function(){
+    $all('#tabs button').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on');
+    $all('.pg').forEach(function(p){p.classList.remove('on');});
+    $('#pg-'+b.dataset.pg).classList.add('on');
+  });
+});
+
+/* ---- FORGE gallery ---- */
+function renderGallery(){
+  var g=$('#gallery'); if(!g) return;
+  var recs=(MANIFEST&&MANIFEST.records)||[];
+  if(!recs.length){g.innerHTML='<div class="note">尚無 PNG。把印章/圖示放進掃描資料夾後重跑。</div>';return;}
+  g.innerHTML=recs.map(function(r,i){
+    var svgInline=r.svgText||'';
+    var imgUri=svgInline?('<img src="'+esc(dataUri(svgInline))+'" alt="">'):'<span style="color:#b6b0a4">—</span>';
+    var origImg=r.pngUri?('<img src="'+esc(r.pngUri)+'" alt="">'):'<span style="color:#b6b0a4">PNG</span>';
+    var method=r.method==='vtracer'?('<b>vector</b> · '+r.paths+' paths'):'raster-embed';
+    return '<div class="card" data-i="'+i+'">'+
+      '<div class="pv"><div><span class="lab">PNG</span>'+origImg+'</div>'+
+      '<div><span class="lab">SVG</span>'+imgUri+'</div></div>'+
+      '<div class="meta"><div class="nm">'+esc(r.name)+'.svg</div>'+
+      '<div class="st"><span>'+r.orig_w+'×'+r.orig_h+'</span><span>'+method+'</span>'+
+      '<span>'+Math.round((r.bytes||0)/1024*10)/10+' KB</span></div>'+
+      '<div class="cpr">'+
+        '<button data-act="inline">inline SVG</button>'+
+        '<button data-act="img">&lt;img&gt; uri</button>'+
+        '<button data-act="raw">原始碼</button>'+
+      '</div></div></div>';
+  }).join('');
+  $all('#gallery .card').forEach(function(card){
+    var r=recs[+card.dataset.i];
+    $all('.cpr button',card).forEach(function(btn){
+      btn.addEventListener('click',function(){
+        var a=btn.dataset.act,svg=r.svgText||'';
+        if(a==='inline') copy(svg,btn);
+        else if(a==='img') copy('<img src="'+dataUri(svg)+'" width="'+r.orig_w+'" alt="'+r.name+'">',btn);
+        else copy(svg,btn);
+      });
+    });
+  });
+}
+
+/* ---- SEGMENTS ---- */
+var SEG=[
+  {em:'📊',sl:'觀',title:'AutoPlot 繪圖核心',code:'vap-core'},
+  {em:'🎨',sl:'牘',title:'Template Workbench',code:'vap-template'},
+  {em:'🎯',sl:'局',title:'Master Cockpit',code:'vap-cockpit'},
+  {em:'🖼️',sl:'象',title:'Gallery',code:'vap-gallery'},
+  {em:'📐',sl:'勢',title:'Auto Layout',code:'vap-layout'}
+];
+var pickTarget=null;
+function renderSeg(){
+  var L=$('#segList');
+  L.innerHTML=SEG.map(function(s,i){
+    return '<div class="seg" data-i="'+i+'">'+
+      '<div class="emoji" data-pick="em">'+s.em+'</div>'+
+      '<div class="sl" data-pick="sl">'+esc(s.sl)+'</div>'+
+      '<div class="fields">'+
+        '<input data-f="title" value="'+esc(s.title)+'" placeholder="分段標題">'+
+        '<input class="code" data-f="code" value="'+esc(s.code)+'" placeholder="代碼 id">'+
+      '</div>'+
+      '<div class="act"><button class="btn" data-del="'+i+'">刪除</button></div>'+
+    '</div>';
+  }).join('');
+  $all('#segList .seg').forEach(function(row){
+    var i=+row.dataset.i;
+    $all('[data-pick]',row).forEach(function(el){
+      el.addEventListener('click',function(){openPicker(i,el.dataset.pick);});
+    });
+    $all('input',row).forEach(function(inp){
+      inp.addEventListener('input',function(){SEG[i][inp.dataset.f]=inp.value;genSeg();});
+    });
+    $('[data-del]',row).addEventListener('click',function(){
+      SEG.splice(i,1);renderSeg();genSeg();});
+  });
+  genSeg();
+}
+function openPicker(i,kind){
+  pickTarget={i:i,kind:kind};
+  var grid=$('#emgrid'),arr=kind==='sl'?SEALS:EMOJI;
+  grid.innerHTML=arr.map(function(e){return '<span>'+esc(e)+'</span>';}).join('');
+  $all('#emgrid span').forEach(function(sp){
+    sp.addEventListener('click',function(){
+      SEG[pickTarget.i][pickTarget.kind]=sp.textContent;
+      $('#picker').classList.remove('on');renderSeg();
+    });
+  });
+  $('#picker .box h3').textContent=kind==='sl'?'選一個一字印章':'選一個功能 emoji';
+  $('#picker').classList.add('on');
+}
+$('#picker').addEventListener('click',function(e){
+  if(e.target===this) this.classList.remove('on');});
+$('#addSeg').addEventListener('click',function(){
+  SEG.push({em:'🧩',sl:'源',title:'新分段',code:'vap-new'});renderSeg();});
+$('#genSeg').addEventListener('click',genSeg);
+$('#expSeg').addEventListener('click',function(){
+  var blob=new Blob([JSON.stringify(SEG,null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='segment-map.json';a.click();
+});
+function genSeg(){
+  var first=SEG[0]||{em:'📊',sl:'觀',title:'VAP',code:'vap'};
+  var pv=$('#segPreview');
+  pv.innerHTML='<div class="ph"><span class="lg">'+esc(first.sl)+'</span>'+
+    '<div class="tx"><h2>'+esc(first.title)+'</h2>'+
+    '<div class="s">Veritas AutoPlot</div></div></div>'+
+    '<div class="pt">'+SEG.map(function(s){
+      return '<div class="t"><span class="e">'+s.em+'</span>'+esc(s.title)+'</div>';
+    }).join('')+'</div>';
+  var html='<!-- VAP header lockup (一字印章 logo) -->\n'+
+    '<header class="vap-head">\n'+
+    '  <span class="vap-seal">'+first.sl+'</span>\n'+
+    '  <span class="vap-title">'+first.title+'</span>\n'+
+    '</header>\n\n'+
+    '<!-- VAP tab bar (Notion-style emoji markers) -->\n'+
+    '<nav class="vap-tabs">\n'+
+    SEG.map(function(s){
+      return '  <button data-tab="'+s.code+'"><span class="vap-em">'+s.em+
+        '</span>'+s.title+'</button>';
+    }).join('\n')+'\n</nav>';
+  $('#segCode').textContent=html;
+}
+
+/* ---- FAVICON ---- */
+function emFavSvg(e){
+  return "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>"+
+    "<text y='.9em' font-size='90'>"+e+"</text></svg>";
+}
+function slFavSvg(ch){
+  return "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>"+
+    "<rect x='6' y='6' width='88' height='88' rx='12' fill='none' stroke='%23b5291a' stroke-width='6'/>"+
+    "<text x='50' y='50' font-size='58' font-family='serif' font-weight='600' fill='%23b5291a' "+
+    "text-anchor='middle' dominant-baseline='central'>"+ch+"</text></svg>";
+}
+function favLink(svg){return '<link rel="icon" href="data:image/svg+xml,'+
+  svg.replace(/</g,'%3C').replace(/>/g,'%3E').replace(/#/g,'%23').replace(/"/g,"'")+'">';}
+function refreshFav(){
+  var e=$('#emFavIn').value||'📊', s=$('#slFavIn').value||'觀';
+  $('#emFavBig').textContent=e; $('#slFavBig').textContent=s;
+  $('#favCode').textContent=
+    '/* emoji favicon */\n'+favLink(emFavSvg(e))+'\n\n'+
+    '/* 一字印章 favicon */\n'+favLink(slFavSvg(s));
+}
+$('#emFavIn').addEventListener('input',refreshFav);
+$('#slFavIn').addEventListener('input',refreshFav);
+$all('[data-cp]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var e=$('#emFavIn').value||'📊', s=$('#slFavIn').value||'觀';
+    copy(b.dataset.cp==='emfav'?favLink(emFavSvg(e)):favLink(slFavSvg(s)),b);
+  });
+});
+
+/* init */
+renderGallery();
+renderSeg();
+refreshFav();
+</script>
+</body>
+</html>

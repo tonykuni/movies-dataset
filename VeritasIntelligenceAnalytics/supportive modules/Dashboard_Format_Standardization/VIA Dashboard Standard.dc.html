@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<style>
+  :root{
+    --bg:#f5f4f0; --bg2:#e5e3df; --paper:#ffffff; --paper2:#fafaf8;
+    --ink:#1e1d1a; --ink2:#33403f; --mut:#6b6860; --mut2:#9c9890;
+    --line:#dbd9d3; --soft:#ecebe6; --line-soft:#ebe9e2;
+    --blue:#4c78a8; --grey:#9c9890; --teal:#439a9a;
+    --up:#c96b5a; --down:#5a9e6f;
+    --gn:#5a9e6f; --am:#c4943a; --co:#c96b5a; --vi:#7a6daa; --ro:#b5697f;
+    --green:#2d8659; --yellow:#c4943a; --amber:#c4943a; --red:#b85450;
+    --accent:#439a9a;
+    --tpad:8px 11px; --tfs:11.5px; --cardpad:15px 17px; --gap:12px; --topH:300px;
+    --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);}
+  body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+  ::selection{background:rgba(67,154,154,.22);}
+  @keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+  .js-plotly-plot .plotly .modebar{opacity:.35}
+  .js-plotly-plot .plotly .modebar:hover{opacity:1}
+</style>
+<style>@media print{@page{size:A4;margin:11mm}html,body{background:#fff !important}.__pdfbtn{display:none !important}*{box-shadow:none !important}[style*="position:sticky"]{position:static !important}[style*="overflow-y:auto"],[style*="overflow:auto"],[style*="overflow-x:auto"]{overflow:visible !important;max-height:none !important}table,section,.brk{break-inside:avoid}}</style>
+<script>window.addEventListener('load',function(){if(document.getElementById('__pdfbtn'))return;var b=document.createElement('div');b.id='__pdfbtn';b.className='__pdfbtn';b.innerHTML='<img src="assets/pdf-icon.png" alt="PDF" style="width:30px;height:30px;display:block">';b.title='A4 PDF';b.style.cssText='position:fixed;top:12px;right:14px;z-index:99999;background:transparent;border:none;padding:0;font:700 10px monospace;letter-spacing:.5px;cursor:pointer;';b.onclick=function(){window.print()};document.body.appendChild(b);});</script>
+</helmet>
+
+<div ref="{{ rootRef }}" style="max-width:1480px;margin:0 auto;padding:0 28px 64px;">
+
+  <div style="position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50;"></div>
+
+  <!-- left reveal hotzone + toggle + collapsible nav (invisible until reached) -->
+  <div onMouseEnter="{{ openNav }}" style="position:fixed;left:0;top:0;bottom:0;width:16px;z-index:55;"></div>
+  <button onClick="{{ toggleNav }}" title="Navigation" style="position:fixed;left:14px;top:13px;z-index:58;width:30px;height:30px;border:1px solid var(--line);background:var(--paper);border-radius:8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;box-shadow:0 1px 3px rgba(31,42,42,.1);">
+    <span style="width:14px;height:2px;background:var(--ink);border-radius:2px;"></span>
+    <span style="width:14px;height:2px;background:var(--ink);border-radius:2px;"></span>
+    <span style="width:14px;height:2px;background:var(--ink);border-radius:2px;"></span>
+  </button>
+  <aside onMouseLeave="{{ closeNav }}" style="position:fixed;left:0;top:0;bottom:0;width:232px;z-index:57;background:var(--paper);border-right:1px solid var(--line);box-shadow:6px 0 24px rgba(31,42,42,.1);transition:transform .26s cubic-bezier(.4,0,.2,1);transform:{{ navTransform }};display:flex;flex-direction:column;padding:18px 14px;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;padding:0 4px;">
+      <div style="width:32px;height:32px;border-radius:9px;background:var(--reson);display:flex;align-items:center;justify-content:center;flex:none;"><span style="font:800 11px 'Syne',sans-serif;color:#fff;">VIA</span></div>
+      <div><div style="font:800 12.5px 'Syne',sans-serif;color:var(--ink);line-height:1.1;">Dashboard</div><div style="font:500 9.5px 'DM Mono',monospace;color:var(--mut);">Standard v1.0</div></div>
+    </div>
+    <div style="font:600 9px 'DM Mono',monospace;color:var(--mut);letter-spacing:1px;text-transform:uppercase;padding:0 6px;margin-bottom:6px;">Views</div>
+    <div onClick="{{ navFound }}" style="font:700 12px 'DM Sans',sans-serif;padding:8px 10px;border-radius:7px;cursor:pointer;color:var(--ink);{{ nvFound }}">🎨 Foundations</div>
+    <div onClick="{{ navComp }}" style="font:700 12px 'DM Sans',sans-serif;padding:8px 10px;border-radius:7px;cursor:pointer;color:var(--ink);{{ nvComp }}">🧩 Components</div>
+    <div onClick="{{ navCharts }}" style="font:700 12px 'DM Sans',sans-serif;padding:8px 10px;border-radius:7px;cursor:pointer;color:var(--ink);{{ nvCharts }}">📊 Charts</div>
+    <div style="margin-top:auto;font:500 9.5px 'DM Mono',monospace;color:var(--mut2);padding:0 6px;line-height:1.6;letter-spacing:.4px;">VERITAS INTELLIGENCE<br>ANALYTICS</div>
+  </aside>
+
+  <!-- frozen top: header + stat grid + tabs -->
+  <div ref="{{ topRef }}" style="background:var(--bg);">
+
+  <!-- ============ HEADER (3 variants) ============ -->
+  <sc-if value="{{ hv_spec }}" hint-placeholder-val="{{ true }}">
+    <header style="position:relative;padding:38px 0 18px;margin-bottom:20px;border-bottom:2px solid var(--ink);">
+      <div style="font:700 10.5px 'DM Mono',monospace;letter-spacing:2.4px;color:var(--mut);text-transform:uppercase;margin-bottom:9px;">VERITAS INTELLIGENCE ANALYTICS · DASHBOARD STANDARD · v1.0</div>
+      <h1 style="font:800 25px/1.26 'Syne',sans-serif;letter-spacing:.2px;color:var(--ink);">儀表板格式<span style="color:var(--up);">標準化</span> — Visual Lock 元件規範</h1>
+      <p style="margin-top:10px;font:400 12.5px/1.7 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:880px;">單一真實來源：所有 VIA / VRN 儀表板沿用的 header、tabs、卡片、表格與圖表面板規格。鎖定品牌三色與台股漲跌色，DM Mono 為數嗓、Syne 為標嗓。</p>
+    </header>
+
+  <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;background:#fff;border:1px solid #dbd9d3;border-left:3px solid #439a9a;border-radius:3px;padding:6px 13px;margin-bottom:12px;">
+    <span style="font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;">🛰 資料請求 · VDF ENGINES</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">TWSE→rest</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#c4943a;border-radius:3px;padding:1px 6px;">SITCA→parse</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">MOPS→parse</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">yfinance→pyproc</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#c0584e;border-radius:3px;padding:1px 6px;">FactSet→keyed</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">FRED→keyed</span>
+    <span style="margin-left:auto;font:500 8px 'DM Mono',monospace;color:#9c9890;">request.json → VDF 擷取 → 雙重驗算 → Parquet → JSON</span>
+  </div>
+
+  <details data-contract="1" style="margin-bottom:12px;border:1px solid #dbd9d3;border-left:3px solid #1e1d1a;border-radius:3px;background:#fbfaf7;overflow:hidden;">
+    <summary style="cursor:pointer;user-select:none;padding:6px 13px;font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;list-style:none;">📜 引擎連接合約 · request.json（點擊展開 · 可選取複製）</summary>
+    <pre style="margin:0;padding:10px 13px;background:#1e1d1a;color:#cfe3d6;font:500 9px/1.55 'DM Mono',monospace;white-space:pre;overflow-x:auto;">{
+  "request": "dashboard_standard",
+  "asof": "2026-06-22",
+  "universe": { "market": "TW", "exchange": ["TWSE","TPEX"] },
+  "sources": ["TWSE","TPEX","SITCA","MOPS","yfinance","FactSet","FRED"],
+  "engines": { "TWSE":"rest","TPEX":"rest","SITCA":"parse","MOPS":"parse","yfinance":"pyproc","FactSet":"keyed","FRED":"keyed" },
+  "range": { "start":"1996-01-01","end":"latest" },
+  "verify": "double_identity",
+  "db_discover": { "folder":"D:\\VDF\\databases\\","recursive":true,"match":["*.parquet","*.duckdb","*.db","*.csv"] },
+  "sink": { "parquet":"vdf/dashboard_standard/","export":"dashboard_standard.json" }
+}</pre>
+    <div style="padding:6px 13px;font:400 8px 'DM Sans','Noto Sans TC',sans-serif;color:#9c9890;">本檔即以此合約向 VDF 引擎請求 → 依 engines 分流(rest/parse/pyproc/keyed) → 雙重恆等驗算 → 落地 Parquet → 匯出 <b style="color:#6b6860;">dashboard_standard.json</b> 覆蓋本頁資料源。</div>
+  </details>
+  </sc-if>
+
+  <sc-if value="{{ hv_seal }}">
+    <header style="position:relative;padding:38px 0 18px;margin-bottom:14px;border-bottom:2px solid var(--ink);">
+      <div style="font:700 10.5px 'DM Mono',monospace;letter-spacing:2.4px;color:var(--mut);text-transform:uppercase;margin-bottom:9px;">VERITAS INTELLIGENCE ANALYTICS · DASHBOARD STANDARD · v1.0</div>
+      <h1 style="font:800 25px/1.26 'Syne',sans-serif;letter-spacing:.2px;color:var(--ink);max-width:760px;">儀表板格式<span style="color:var(--up);">標準化</span> — Visual Lock 元件規範</h1>
+      <div style="margin-top:13px;font:500 11px 'DM Mono',monospace;color:var(--mut);display:flex;gap:9px 18px;flex-wrap:wrap;">
+        <span style="position:relative;padding-left:12px;"><span style="position:absolute;left:0;top:6px;width:5px;height:5px;border-radius:50%;background:var(--up);"></span>資料時點 <b style="color:var(--ink);font-weight:700;">2026-06-16</b></span>
+        <span style="position:relative;padding-left:12px;"><span style="position:absolute;left:0;top:6px;width:5px;height:5px;border-radius:50%;background:var(--up);"></span>面板 <b style="color:var(--ink);font-weight:700;">11</b></span>
+        <span style="position:relative;padding-left:12px;"><span style="position:absolute;left:0;top:6px;width:5px;height:5px;border-radius:50%;background:var(--up);"></span>引擎 <b style="color:var(--ink);font-weight:700;">Seaborn · Plotly</b></span>
+      </div>
+      <div style="position:absolute;top:32px;right:0;width:78px;height:78px;border-radius:50%;border:2px solid var(--up);color:var(--up);display:flex;align-items:center;justify-content:center;font:800 17px/1.12 'Syne',sans-serif;letter-spacing:.5px;transform:rotate(-11deg);text-align:center;background:radial-gradient(circle at 50% 40%,rgba(201,107,90,.07),transparent 70%);box-shadow:inset 0 0 0 1.5px rgba(201,107,90,.16);">觀<br>VIA</div>
+    </header>
+    <div style="margin-bottom:20px;background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--up);border-radius:8px;padding:10px 14px;font:400 12px/1.65 'DM Sans','Noto Sans TC',sans-serif;box-shadow:0 1px 2px rgba(31,42,42,.04);"><b style="color:var(--up);">更新摘要：</b>統一三檔報告的 header／tabs／表格對齊規則；鎖定 Visual Lock 配色；Plotly 面板標準尺寸 1000×560、台股紅漲綠跌。</div>
+  </sc-if>
+
+  <sc-if value="{{ hv_minimal }}">
+    <header style="display:flex;align-items:center;gap:14px;padding:30px 0 18px;margin-bottom:20px;border-bottom:1px solid var(--line);">
+      <div style="width:42px;height:42px;border-radius:11px;background:var(--reson);display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 2px 8px rgba(31,42,42,.12);"><span style="font:800 14px 'Syne',sans-serif;color:#fff;letter-spacing:.5px;">VIA</span></div>
+      <div style="flex:1;">
+        <h1 style="font:800 19px 'Syne',sans-serif;color:var(--ink);letter-spacing:.2px;">儀表板格式標準化</h1>
+        <div style="font:500 11px 'DM Mono',monospace;color:var(--mut);margin-top:2px;">Visual Lock · 元件規範</div>
+      </div>
+      <span style="font:700 9.5px 'DM Mono',monospace;letter-spacing:.6px;color:#fff;background:var(--green);padding:3px 9px;border-radius:9px;">v1.0</span>
+    </header>
+  </sc-if>
+
+  <!-- ============ STAT STRIP ============ -->
+  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:20px;">
+    <div style="background:var(--paper);padding:11px 13px;border-left:3px solid var(--blue);border-radius:3px;box-shadow:0 1px 2px rgba(31,42,42,.04);"><div style="font:600 9px 'DM Sans';color:var(--mut);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Brand 色</div><div style="font:500 18px 'DM Mono',monospace;color:var(--ink);">3</div></div>
+    <div style="background:var(--paper);padding:11px 13px;border-left:3px solid var(--teal);border-radius:3px;box-shadow:0 1px 2px rgba(31,42,42,.04);"><div style="font:600 9px 'DM Sans';color:var(--mut);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">面板</div><div style="font:500 18px 'DM Mono',monospace;color:var(--ink);">11</div></div>
+    <div style="background:var(--paper);padding:11px 13px;border-left:3px solid var(--down);border-radius:3px;box-shadow:0 1px 2px rgba(31,42,42,.04);"><div style="font:600 9px 'DM Sans';color:var(--mut);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">圖標準尺寸</div><div style="font:500 18px 'DM Mono',monospace;color:var(--ink);">1000×560</div></div>
+    <div style="background:var(--paper);padding:11px 13px;border-left:3px solid var(--am);border-radius:3px;box-shadow:0 1px 2px rgba(31,42,42,.04);"><div style="font:600 9px 'DM Sans';color:var(--mut);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">字嗓</div><div style="font:500 18px 'DM Mono',monospace;color:var(--ink);">3</div></div>
+    <div style="background:var(--paper);padding:11px 13px;border-left:3px solid var(--vi);border-radius:3px;box-shadow:0 1px 2px rgba(31,42,42,.04);"><div style="font:600 9px 'DM Sans';color:var(--mut);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">引擎</div><div style="font:500 18px 'DM Mono',monospace;color:var(--ink);">2</div></div>
+    <div style="background:var(--paper);padding:11px 13px;border-left:3px solid var(--up);border-radius:3px;box-shadow:0 1px 2px rgba(31,42,42,.04);"><div style="font:600 9px 'DM Sans';color:var(--mut);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">漲跌色</div><div style="font:500 18px 'DM Mono',monospace;color:var(--ink);">紅／綠</div></div>
+  </div>
+
+  </div><!-- /header: title + stats scroll away -->
+
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#1e1d1a;border-radius:3px;padding:6px 13px;margin-bottom:16px;">
+    <span style="display:inline-flex;align-items:center;gap:6px;font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase;">🔒 VISUAL LOCK · 全格式鎖定</span>
+    <span style="display:inline-flex;align-items:center;gap:4px;font:500 8px 'DM Mono',monospace;color:#cfcabf;">色票
+      <span style="width:11px;height:11px;border-radius:2px;background:#4c78a8;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#439a9a;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#9c9890;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#c96b5a;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#5a9e6f;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#f5f4f0;border:1px solid #555;"></span>
+    </span>
+    <span style="font:500 8px 'DM Mono',monospace;color:#8a948f;">字體 Syne / DM Sans / DM Mono</span>
+    <span style="font:500 8px 'DM Mono',monospace;color:#8a948f;">漲紅跌綠 · 千分位 · 熱力色階</span>
+    <span style="margin-left:auto;font:700 8px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:2px 8px;">v1.0 · LOCKED 2026-06-22</span>
+  </div>
+
+  <!-- ============ TABS — only the bottom of the header is frozen ============ -->
+  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:22px;border-bottom:1px solid var(--line);position:sticky;top:4px;z-index:40;background:var(--bg);padding-top:10px;box-shadow:0 10px 13px -12px rgba(31,42,42,.5);" role="tablist">
+    <div onClick="{{ tabFound }}" style="font:700 11.5px 'Syne',sans-serif;padding:8px 14px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:8px 8px 0 0;position:relative;top:1px;user-select:none;white-space:nowrap;{{ tcFound }}">🎨 Foundations</div>
+    <div onClick="{{ tabComp }}" style="font:700 11.5px 'Syne',sans-serif;padding:8px 14px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:8px 8px 0 0;position:relative;top:1px;user-select:none;white-space:nowrap;{{ tcComp }}">🧩 Components</div>
+    <div onClick="{{ tabCharts }}" style="font:700 11.5px 'Syne',sans-serif;padding:8px 14px;cursor:pointer;border:1px solid var(--line);border-bottom:none;border-radius:8px 8px 0 0;position:relative;top:1px;user-select:none;white-space:nowrap;{{ tcCharts }}">📊 Charts</div>
+  </div>
+
+  <!-- ============ FOUNDATIONS ============ -->
+  <sc-if value="{{ isFound }}" hint-placeholder-val="{{ true }}">
+  <div style="animation:fade .28s ease;">
+
+    <h2 style="font:800 16px 'Syne',sans-serif;color:var(--ink);margin:6px 0 12px;padding-bottom:9px;position:relative;display:flex;align-items:center;gap:10px;">
+      <span style="font:800 11px 'DM Mono',monospace;color:#fff;background:var(--ink);min-width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;">1</span>配色鎖定 · Visual Lock
+      <span style="position:absolute;left:0;bottom:0;width:100%;height:1px;background:var(--line);"></span>
+      <span style="position:absolute;left:0;bottom:-1px;width:50px;height:3px;background:var(--reson);border-radius:2px;"></span>
+    </h2>
+
+    <div style="font:600 10px 'DM Mono',monospace;color:var(--mut);letter-spacing:1px;text-transform:uppercase;margin:6px 0 8px;">品牌三色 (VPN Lock)</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:11px;margin-bottom:16px;">
+      <div><div style="height:54px;border-radius:8px;background:#4c78a8;border:1px solid rgba(0,0,0,.08);"></div><div style="font:600 11px 'DM Sans';color:var(--ink);margin-top:6px;">Blue 藍</div><div style="font:500 10.5px 'DM Mono',monospace;color:var(--mut);">#4c78a8</div></div>
+      <div><div style="height:54px;border-radius:8px;background:#9c9890;border:1px solid rgba(0,0,0,.08);"></div><div style="font:600 11px 'DM Sans';color:var(--ink);margin-top:6px;">Grey 灰</div><div style="font:500 10.5px 'DM Mono',monospace;color:var(--mut);">#9c9890</div></div>
+      <div><div style="height:54px;border-radius:8px;background:#439a9a;border:1px solid rgba(0,0,0,.08);"></div><div style="font:600 11px 'DM Sans';color:var(--ink);margin-top:6px;">Teal 青</div><div style="font:500 10.5px 'DM Mono',monospace;color:var(--mut);">#439a9a</div></div>
+    </div>
+
+    <div style="font:600 10px 'DM Mono',monospace;color:var(--mut);letter-spacing:1px;text-transform:uppercase;margin:6px 0 8px;">台股漲跌色 (與美股相反 · 鎖定)</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:11px;margin-bottom:16px;">
+      <div><div style="height:54px;border-radius:8px;background:#c96b5a;border:1px solid rgba(0,0,0,.08);display:flex;align-items:flex-end;padding:7px;"><span style="font:700 9.5px 'DM Mono',monospace;color:#fff;">▲ UP</span></div><div style="font:600 11px 'DM Sans';color:var(--ink);margin-top:6px;">漲 Red</div><div style="font:500 10.5px 'DM Mono',monospace;color:var(--mut);">#c96b5a</div></div>
+      <div><div style="height:54px;border-radius:8px;background:#5a9e6f;border:1px solid rgba(0,0,0,.08);display:flex;align-items:flex-end;padding:7px;"><span style="font:700 9.5px 'DM Mono',monospace;color:#fff;">▼ DOWN</span></div><div style="font:600 11px 'DM Sans';color:var(--ink);margin-top:6px;">跌 Green</div><div style="font:500 10.5px 'DM Mono',monospace;color:var(--mut);">#5a9e6f</div></div>
+    </div>
+
+    <div style="font:600 10px 'DM Mono',monospace;color:var(--mut);letter-spacing:1px;text-transform:uppercase;margin:6px 0 8px;">墨階 Ink Scale + 強調色 Accents</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:9px;margin-bottom:8px;">
+      <div><div style="height:42px;border-radius:7px;background:#1e1d1a;border:1px solid rgba(0,0,0,.08);"></div><div style="font:500 10px 'DM Mono',monospace;color:var(--mut);margin-top:5px;">ink · #1e1d1a</div></div>
+      <div><div style="height:42px;border-radius:7px;background:#33403f;border:1px solid rgba(0,0,0,.08);"></div><div style="font:500 10px 'DM Mono',monospace;color:var(--mut);margin-top:5px;">ink2 · #33403f</div></div>
+      <div><div style="height:42px;border-radius:7px;background:#6b6860;border:1px solid rgba(0,0,0,.08);"></div><div style="font:500 10px 'DM Mono',monospace;color:var(--mut);margin-top:5px;">mut · #6b6860</div></div>
+      <div><div style="height:42px;border-radius:7px;background:#dbd9d3;border:1px solid rgba(0,0,0,.08);"></div><div style="font:500 10px 'DM Mono',monospace;color:var(--mut);margin-top:5px;">line · #dbd9d3</div></div>
+      <div><div style="height:42px;border-radius:7px;background:#c4943a;border:1px solid rgba(0,0,0,.08);"></div><div style="font:500 10px 'DM Mono',monospace;color:var(--mut);margin-top:5px;">amber</div></div>
+      <div><div style="height:42px;border-radius:7px;background:#7a6daa;border:1px solid rgba(0,0,0,.08);"></div><div style="font:500 10px 'DM Mono',monospace;color:var(--mut);margin-top:5px;">violet</div></div>
+      <div><div style="height:42px;border-radius:7px;background:#b5697f;border:1px solid rgba(0,0,0,.08);"></div><div style="font:500 10px 'DM Mono',monospace;color:var(--mut);margin-top:5px;">rose</div></div>
+    </div>
+
+    <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--up);border-radius:8px;padding:11px 14px;font:400 11.8px/1.65 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);margin:8px 0 22px;"><b style="color:var(--ink);">背景紙色：</b><span style="display:inline-block;width:11px;height:11px;border-radius:3px;background:#f5f4f0;border:1px solid var(--line);vertical-align:-1px;margin:0 4px;"></span>--bg #f5f4f0 → <span style="display:inline-block;width:11px;height:11px;border-radius:3px;background:#e5e3df;border:1px solid var(--line);vertical-align:-1px;margin:0 4px;"></span>--bg2 #e5e3df。白與黑皆中性偏暖，飽和度 ≤ 0.02。</div>
+
+    <h2 style="font:800 16px 'Syne',sans-serif;color:var(--ink);margin:24px 0 12px;padding-bottom:9px;position:relative;display:flex;align-items:center;gap:10px;">
+      <span style="font:800 11px 'DM Mono',monospace;color:#fff;background:var(--ink);min-width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;">2</span>字嗓 · Type System
+      <span style="position:absolute;left:0;bottom:0;width:100%;height:1px;background:var(--line);"></span>
+      <span style="position:absolute;left:0;bottom:-1px;width:50px;height:3px;background:var(--reson);border-radius:2px;"></span>
+    </h2>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+      <div style="background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:16px 17px;box-shadow:0 1px 2px rgba(31,42,42,.04);"><div style="font:500 9.5px 'DM Mono',monospace;color:var(--mut);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;">Display · 標嗓</div><div style="font:800 26px 'Syne',sans-serif;color:var(--ink);">Syne 800</div><div style="font:400 11px 'DM Sans';color:var(--mut);margin-top:6px;">標題 / H1 / H2 / tabs</div></div>
+      <div style="background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:16px 17px;box-shadow:0 1px 2px rgba(31,42,42,.04);"><div style="font:500 9.5px 'DM Mono',monospace;color:var(--mut);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;">Body · 內文</div><div style="font:500 22px 'DM Sans';color:var(--ink);">DM Sans 400/500</div><div style="font:400 11px 'DM Sans';color:var(--mut);margin-top:6px;">段落 / 說明 / 卡片內文</div></div>
+      <div style="background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:16px 17px;box-shadow:0 1px 2px rgba(31,42,42,.04);"><div style="font:500 9.5px 'DM Mono',monospace;color:var(--mut);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;">Data · 數嗓</div><div style="font:500 22px 'DM Mono',monospace;color:var(--ink);">DM Mono 1,234.5</div><div style="font:400 11px 'DM Sans';color:var(--mut);margin-top:6px;">所有數字 / 代碼 / 刻度 (tabular-nums)</div></div>
+    </div>
+
+    <h2 style="font:800 16px 'Syne',sans-serif;color:var(--ink);margin:24px 0 12px;padding-bottom:9px;position:relative;display:flex;align-items:center;gap:10px;">
+      <span style="font:800 11px 'DM Mono',monospace;color:#fff;background:var(--ink);min-width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;">3</span>AOpt · 同框字級自動最佳化
+      <span style="font:700 10px 'DM Mono',monospace;letter-spacing:1.4px;color:var(--mut2);text-transform:uppercase;margin-left:auto;">BINARY-FIT · RESIZE-REFIT</span>
+      <span style="position:absolute;left:0;bottom:0;width:100%;height:1px;background:var(--line);"></span>
+      <span style="position:absolute;left:0;bottom:-1px;width:50px;height:3px;background:var(--reson);border-radius:2px;"></span>
+    </h2>
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:12px;">
+      <label style="font:600 9px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:4px;text-transform:uppercase;letter-spacing:.5px;">框寬 {{ aoptW }}px<input type="range" min="180" max="560" step="4" value="{{ aoptW }}" onInput="{{ aoptWSet }}" style="width:200px;accent-color:var(--accent);"></label>
+      <div style="display:flex;gap:4px;">
+        <span onClick="{{ aoptShort }}" style="font:700 10px 'DM Mono',monospace;padding:4px 10px;border-radius:7px;cursor:pointer;user-select:none;{{ aoptcShort }}">短</span>
+        <span onClick="{{ aoptMed }}" style="font:700 10px 'DM Mono',monospace;padding:4px 10px;border-radius:7px;cursor:pointer;user-select:none;{{ aoptcMed }}">中</span>
+        <span onClick="{{ aoptLong }}" style="font:700 10px 'DM Mono',monospace;padding:4px 10px;border-radius:7px;cursor:pointer;user-select:none;{{ aoptcLong }}">長</span>
+      </div>
+      <span ref="{{ aoptReadoutRef }}" style="font:600 10px 'DM Mono',monospace;color:var(--accent);margin-left:auto;">—</span>
+    </div>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;margin-bottom:10px;">
+      <div ref="{{ aoptFrameRef }}" style="width:{{ aoptWpx }};height:172px;flex:none;background:var(--paper);border:1px solid var(--line);border-radius:10px;box-shadow:0 1px 2px rgba(31,42,42,.05);padding:15px 17px;display:flex;flex-direction:column;gap:7px;overflow:hidden;">
+        <div data-fit="line" data-fit-role="標題" data-fit-min="15" data-fit-max="46" style="font-family:'Syne',sans-serif;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;line-height:1.1;">{{ aoptTitle }}</div>
+        <div data-fit="box" data-fit-role="內文" data-fit-min="9" data-fit-max="22" style="font-family:'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);flex:1;min-height:0;overflow:hidden;line-height:1.45;text-wrap:pretty;">{{ aoptBody }}</div>
+      </div>
+      <div style="flex:1;min-width:240px;background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:8px;padding:13px 15px;font:400 12px/1.7 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">
+        <b style="color:var(--ink);">演算法：</b>每塊文字對其容器做 <b style="color:var(--ink);">二分搜尋字級</b>（min↔max，約 8 次收斂），收斂條件為「不溢出」(標題比 <span style="font-family:'DM Mono',monospace;">scrollWidth</span>，內文比 <span style="font-family:'DM Mono',monospace;">scrollHeight</span>)。<br>
+        <b style="color:var(--ink);">重排掛鉤：</b><span style="font-family:'DM Mono',monospace;">ResizeObserver</span> 監看框寬，變動即重算；字體載入完成 (<span style="font-family:'DM Mono',monospace;">document.fonts.ready</span>) 後再校一次。<br>
+        <b style="color:var(--ink);">排版輔助：</b><span style="font-family:'DM Mono',monospace;">text-wrap:pretty</span> · <span style="font-family:'DM Mono',monospace;">overflow:hidden</span> · 固定框高。拖框寬或切換長度即可見字級自動適配（右上顯示收斂後 px）。
+      </div>
+    </div>
+
+  </div>
+  </sc-if>
+
+  <!-- ============ COMPONENTS ============ -->
+  <sc-if value="{{ isComp }}">
+  <div style="animation:fade .28s ease;">
+
+    <h2 style="font:800 16px 'Syne',sans-serif;color:var(--ink);margin:6px 0 12px;padding-bottom:9px;position:relative;display:flex;align-items:center;gap:10px;">
+      <span style="font:800 11px 'DM Mono',monospace;color:#fff;background:var(--ink);min-width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;">3</span>Pills · Badges · 風險色
+      <span style="position:absolute;left:0;bottom:0;width:100%;height:1px;background:var(--line);"></span>
+      <span style="position:absolute;left:0;bottom:-1px;width:50px;height:3px;background:var(--reson);border-radius:2px;"></span>
+    </h2>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+      <span style="font:700 9.5px 'DM Mono',monospace;color:#fff;background:var(--green);border-radius:10px;padding:3px 10px;letter-spacing:.3px;">GREEN · KEEP</span>
+      <span style="font:700 9.5px 'DM Mono',monospace;color:#fff;background:var(--yellow);border-radius:10px;padding:3px 10px;letter-spacing:.3px;">YELLOW · REVIEW</span>
+      <span style="font:700 9.5px 'DM Mono',monospace;color:#fff;background:var(--red);border-radius:10px;padding:3px 10px;letter-spacing:.3px;">RED · QUARANTINE</span>
+      <span style="font:700 9.5px 'DM Mono',monospace;color:#fff;background:var(--blue);border-radius:10px;padding:3px 10px;letter-spacing:.3px;">PASS</span>
+      <span style="font:700 9.5px 'DM Mono',monospace;color:#fff;background:var(--teal);border-radius:10px;padding:3px 10px;letter-spacing:.3px;">VERIFIABLE</span>
+      <span style="font:700 9.5px 'DM Mono',monospace;color:#fff;background:var(--grey);border-radius:10px;padding:3px 10px;letter-spacing:.3px;">DERIVED</span>
+      <span style="font:700 9.5px 'DM Mono',monospace;color:var(--mut);background:transparent;border:1px solid var(--line);border-radius:10px;padding:2px 9px;letter-spacing:.3px;">OPINION</span>
+    </div>
+    <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--green);border-radius:8px;padding:11px 14px;font:400 11.8px/1.65 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);margin-bottom:22px;"><b style="color:var(--ink);">風險色 Dragon-9：</b>GREEN 保留 / YELLOW 待裁切 / RED 隔離。實心 badge 用於狀態，外框 pill 用於分類標記。</div>
+
+    <h2 style="font:800 16px 'Syne',sans-serif;color:var(--ink);margin:24px 0 12px;padding-bottom:9px;position:relative;display:flex;align-items:center;gap:10px;">
+      <span style="font:800 11px 'DM Mono',monospace;color:#fff;background:var(--ink);min-width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;">4</span>表格標準 · 排序 + 對齊規則
+      <span style="position:absolute;left:0;bottom:0;width:100%;height:1px;background:var(--line);"></span>
+      <span style="position:absolute;left:0;bottom:-1px;width:50px;height:3px;background:var(--reson);border-radius:2px;"></span>
+    </h2>
+    <div style="font:400 11.5px/1.6 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);margin-bottom:10px;">點欄位標題即排序。表頭=置上置中；首欄/長資料=置上置左；數據=置上置右 (tabular-nums + 千分位)；漲跌依台股紅綠。</div>
+    <table style="width:100%;border-collapse:separate;border-spacing:0;background:var(--paper);border:1px solid var(--line);border-radius:8px;overflow:hidden;box-shadow:0 1px 2px rgba(31,42,42,.05);margin-bottom:22px;">
+      <thead>
+        <tr>
+          <th onClick="{{ sortPanel }}" style="background:var(--soft);color:var(--ink);text-align:left;padding:var(--tpad);font:700 10.5px 'Syne',sans-serif;letter-spacing:.4px;border-bottom:1px solid var(--line);cursor:pointer;user-select:none;vertical-align:top;">面板 {{ indPanel }}</th>
+          <th onClick="{{ sortSeries }}" style="background:var(--soft);color:var(--ink);text-align:left;padding:var(--tpad);font:700 10.5px 'Syne',sans-serif;letter-spacing:.4px;border-bottom:1px solid var(--line);cursor:pointer;user-select:none;vertical-align:top;">序列 {{ indSeries }}</th>
+          <th onClick="{{ sortValue }}" style="background:var(--soft);color:var(--ink);text-align:right;padding:var(--tpad);font:700 10.5px 'Syne',sans-serif;letter-spacing:.4px;border-bottom:1px solid var(--line);cursor:pointer;user-select:none;vertical-align:top;">數值 {{ indValue }}</th>
+          <th onClick="{{ sortChg }}" style="background:var(--soft);color:var(--ink);text-align:right;padding:var(--tpad);font:700 10.5px 'Syne',sans-serif;letter-spacing:.4px;border-bottom:1px solid var(--line);cursor:pointer;user-select:none;vertical-align:top;">漲跌% {{ indChg }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <sc-for list="{{ rows }}" as="row" hint-placeholder-count="6">
+          <tr style="background:{{ row.bg }};">
+            <td style="padding:var(--tpad);border-top:1px solid var(--soft);font:600 var(--tfs) 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink);text-align:left;vertical-align:top;">{{ row.panel }}</td>
+            <td style="padding:var(--tpad);border-top:1px solid var(--soft);font:400 var(--tfs) 'DM Sans',sans-serif;color:var(--ink2);text-align:left;vertical-align:top;">{{ row.series }}</td>
+            <td style="padding:var(--tpad);border-top:1px solid var(--soft);font:500 var(--tfs) 'DM Mono',monospace;color:var(--ink);text-align:right;font-variant-numeric:tabular-nums;vertical-align:top;">{{ row.valueFmt }}</td>
+            <td style="padding:var(--tpad);border-top:1px solid var(--soft);font:500 var(--tfs) 'DM Mono',monospace;text-align:right;font-variant-numeric:tabular-nums;vertical-align:top;{{ row.chgCss }}">{{ row.chgFmt }}</td>
+          </tr>
+        </sc-for>
+      </tbody>
+    </table>
+
+  </div>
+  </sc-if>
+
+  <!-- ============ CHARTS ============ -->
+  <sc-if value="{{ isCharts }}">
+  <div style="animation:fade .28s ease;">
+
+    <h2 style="font:800 16px 'Syne',sans-serif;color:var(--ink);margin:6px 0 12px;padding-bottom:9px;position:relative;display:flex;align-items:center;gap:10px;">
+      <span style="font:800 11px 'DM Mono',monospace;color:#fff;background:var(--ink);min-width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;">5</span>Plotly 互動面板標準
+      <span style="font:700 10px 'DM Mono',monospace;letter-spacing:1.4px;color:var(--mut2);text-transform:uppercase;margin-left:auto;">OFFLINE · 1000×560</span>
+      <span style="position:absolute;left:0;bottom:0;width:100%;height:1px;background:var(--line);"></span>
+      <span style="position:absolute;left:0;bottom:-1px;width:50px;height:3px;background:var(--reson);border-radius:2px;"></span>
+    </h2>
+
+    <div style="display:grid;grid-template-columns:1.55fr 1fr;gap:14px;margin-bottom:14px;align-items:stretch;">
+      <!-- LEFT: wide single-cell chart -->
+      <div style="background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 1px 2px rgba(31,42,42,.05);display:flex;flex-direction:column;">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);">
+          <span style="font:700 12px 'Syne',sans-serif;color:var(--ink);">① 股價指數 · 標準化線</span>
+          <span style="font:600 9px 'DM Mono',monospace;color:#fff;background:var(--up);border-radius:9px;padding:2px 8px;">標準化</span>
+          <span style="font:500 10px 'DM Mono',monospace;color:var(--mut);margin-left:auto;">高/低標註 · 透明區 · 垂直基準線</span><button onClick="{{ veditA }}" style="font:600 11px 'DM Sans';background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:2px 7px;cursor:pointer;color:var(--ink2);margin-left:6px;">⚙</button>
+        </div>
+        <sc-if value="{{ vEditA }}"><div style="padding:8px 12px;border-bottom:1px solid var(--line);background:var(--bg);display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:8px;"><label style="font:600 8px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:2px;text-transform:uppercase;letter-spacing:.4px;">擷取來源<select onChange="{{ vsrcA }}" value="{{ vA.source }}" style="font:500 9.5px 'DM Mono',monospace;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:2px 4px;width:100%;"><option value="yfinance">yfinance</option><option value="VDF DuckDB">VDF DuckDB</option><option value="TWSE/TPEX">TWSE/TPEX</option><option value="histock">histock</option></select></label><label style="font:600 8px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:2px;text-transform:uppercase;letter-spacing:.4px;">粗度 {{ vA.widthMul }}×<input type="range" min="0.5" max="2" step="0.1" value="{{ vA.widthMul }}" onInput="{{ vwidthA }}" style="width:100%;accent-color:var(--accent);"></label><label style="font:600 8px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:2px;text-transform:uppercase;letter-spacing:.4px;">透明度 {{ vA.opacity }}<input type="range" min="0.2" max="1" step="0.05" value="{{ vA.opacity }}" onInput="{{ vopacA }}" style="width:100%;accent-color:var(--accent);"></label></div></sc-if><div ref="{{ elARef }}" style="width:100%;flex:1;min-height:540px;"></div>
+      </div>
+      <!-- RIGHT: dual chart stack -->
+      <div style="display:grid;grid-template-rows:1fr 1fr;gap:14px;">
+        <div style="background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 1px 2px rgba(31,42,42,.05);display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:center;gap:8px;padding:9px 13px;border-bottom:1px solid var(--line);">
+            <span style="font:700 11.5px 'Syne',sans-serif;color:var(--ink);">⑨ 日漲跌 · 雙軸</span>
+            <span style="font:600 8.5px 'DM Mono',monospace;color:#fff;background:var(--blue);border-radius:9px;padding:2px 7px;">直條</span>
+            <span style="font:600 8.5px 'DM Mono',monospace;color:#fff;background:var(--down);border-radius:9px;padding:2px 7px;">線</span>
+            <span style="font:500 9px 'DM Mono',monospace;color:var(--mut);margin-left:auto;">軸間隔數相同·格線對齊</span><button onClick="{{ veditB }}" style="font:600 11px 'DM Sans';background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:2px 7px;cursor:pointer;color:var(--ink2);margin-left:6px;">⚙</button>
+          </div>
+          <sc-if value="{{ vEditB }}"><div style="padding:8px 12px;border-bottom:1px solid var(--line);background:var(--bg);display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:8px;"><label style="font:600 8px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:2px;text-transform:uppercase;letter-spacing:.4px;">擷取來源<select onChange="{{ vsrcB }}" value="{{ vB.source }}" style="font:500 9.5px 'DM Mono',monospace;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:2px 4px;width:100%;"><option value="yfinance">yfinance</option><option value="VDF DuckDB">VDF DuckDB</option><option value="TWSE/TPEX">TWSE/TPEX</option><option value="histock">histock</option></select></label><label style="font:600 8px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:2px;text-transform:uppercase;letter-spacing:.4px;">粗度 {{ vB.widthMul }}×<input type="range" min="0.5" max="2" step="0.1" value="{{ vB.widthMul }}" onInput="{{ vwidthB }}" style="width:100%;accent-color:var(--accent);"></label><label style="font:600 8px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:2px;text-transform:uppercase;letter-spacing:.4px;">透明度 {{ vB.opacity }}<input type="range" min="0.2" max="1" step="0.05" value="{{ vB.opacity }}" onInput="{{ vopacB }}" style="width:100%;accent-color:var(--accent);"></label></div></sc-if><div ref="{{ elBRef }}" style="width:100%;flex:1;min-height:262px;"></div>
+        </div>
+        <div style="background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 1px 2px rgba(31,42,42,.05);display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:center;gap:8px;padding:9px 13px;border-bottom:1px solid var(--line);">
+            <span style="font:700 11.5px 'Syne',sans-serif;color:var(--ink);">⑩ 失業結構 · 堆疊</span>
+            <span style="font:600 8.5px 'DM Mono',monospace;color:#fff;background:var(--vi);border-radius:9px;padding:2px 7px;">堆疊長條</span>
+            <span style="font:500 9px 'DM Mono',monospace;color:var(--mut);margin-left:auto;">佔比→100% · 有框 0.8</span><button onClick="{{ veditC }}" style="font:600 11px 'DM Sans';background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:2px 7px;cursor:pointer;color:var(--ink2);margin-left:6px;">⚙</button>
+          </div>
+          <sc-if value="{{ vEditC }}"><div style="padding:8px 12px;border-bottom:1px solid var(--line);background:var(--bg);display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:8px;"><label style="font:600 8px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:2px;text-transform:uppercase;letter-spacing:.4px;">擷取來源<select onChange="{{ vsrcC }}" value="{{ vC.source }}" style="font:500 9.5px 'DM Mono',monospace;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:2px 4px;width:100%;"><option value="yfinance">yfinance</option><option value="VDF DuckDB">VDF DuckDB</option><option value="TWSE/TPEX">TWSE/TPEX</option><option value="histock">histock</option></select></label><label style="font:600 8px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:2px;text-transform:uppercase;letter-spacing:.4px;">粗度 {{ vC.widthMul }}×<input type="range" min="0.5" max="2" step="0.1" value="{{ vC.widthMul }}" onInput="{{ vwidthC }}" style="width:100%;accent-color:var(--accent);"></label><label style="font:600 8px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:2px;text-transform:uppercase;letter-spacing:.4px;">透明度 {{ vC.opacity }}<input type="range" min="0.2" max="1" step="0.05" value="{{ vC.opacity }}" onInput="{{ vopacC }}" style="width:100%;accent-color:var(--accent);"></label></div></sc-if><div ref="{{ elCRef }}" style="width:100%;flex:1;min-height:262px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <h2 style="font:800 16px 'Syne',sans-serif;color:var(--ink);margin:24px 0 12px;padding-bottom:9px;position:relative;display:flex;align-items:center;gap:10px;">
+      <span style="font:800 11px 'DM Mono',monospace;color:#fff;background:var(--ink);min-width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;">6</span>技術分析 K 線 · BB + SMA + 量
+      <span style="font:700 10px 'DM Mono',monospace;letter-spacing:1.4px;color:var(--mut2);text-transform:uppercase;margin-left:auto;">CANDLESTICK</span>
+      <span style="position:absolute;left:0;bottom:0;width:100%;height:1px;background:var(--line);"></span>
+      <span style="position:absolute;left:0;bottom:-1px;width:50px;height:3px;background:var(--reson);border-radius:2px;"></span>
+    </h2>
+    <div style="background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 1px 2px rgba(31,42,42,.05);margin-bottom:16px;display:flex;flex-direction:column;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--line);">
+        <span style="font:700 12px 'Syne',sans-serif;color:var(--ink);">台積電 2330 · 日 K</span>
+        <span style="font:600 9px 'DM Mono',monospace;color:#fff;background:var(--up);border-radius:9px;padding:2px 8px;">紅漲綠跌</span>
+        <span style="font:600 9px 'DM Mono',monospace;color:#fff;background:var(--blue);border-radius:9px;padding:2px 8px;">BB(20,2)</span>
+        <span style="font:600 9px 'DM Mono',monospace;color:var(--mut);background:var(--soft);border-radius:9px;padding:2px 8px;">SMA 5·10·20·60·120·240</span>
+        <span style="display:inline-flex;gap:3px;margin-left:8px;">
+          <span onClick="{{ kgDay }}" style="font:700 8.5px 'DM Mono',monospace;padding:2px 7px;border-radius:5px;cursor:pointer;user-select:none;{{ kcDay }}">日</span>
+          <span onClick="{{ kgMon }}" style="font:700 8.5px 'DM Mono',monospace;padding:2px 7px;border-radius:5px;cursor:pointer;user-select:none;{{ kcMon }}">月</span>
+          <span onClick="{{ kgYr }}" style="font:700 8.5px 'DM Mono',monospace;padding:2px 7px;border-radius:5px;cursor:pointer;user-select:none;{{ kcYr }}">年</span>
+        </span>
+        <span style="display:inline-flex;gap:3px;margin-left:6px;">
+          <span onClick="{{ kfYtd }}" style="font:700 8.5px 'DM Mono',monospace;padding:2px 7px;border-radius:5px;cursor:pointer;user-select:none;{{ kcYtd }}">YTD</span>
+          <span onClick="{{ kf23 }}" style="font:700 8.5px 'DM Mono',monospace;padding:2px 7px;border-radius:5px;cursor:pointer;user-select:none;{{ kc23 }}">2023</span>
+          <span onClick="{{ kf24 }}" style="font:700 8.5px 'DM Mono',monospace;padding:2px 7px;border-radius:5px;cursor:pointer;user-select:none;{{ kc24 }}">2024</span>
+          <span onClick="{{ kf25 }}" style="font:700 8.5px 'DM Mono',monospace;padding:2px 7px;border-radius:5px;cursor:pointer;user-select:none;{{ kc25 }}">2025</span>
+        </span>
+        <span style="font:500 10px 'DM Mono',monospace;color:var(--mut);margin-left:auto;">量價同框 · 量透明 0.75</span><button onClick="{{ veditK }}" style="font:600 11px 'DM Sans';background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:2px 7px;cursor:pointer;color:var(--ink2);margin-left:6px;">⚙</button>
+      </div>
+      <sc-if value="{{ vEditK }}"><div style="padding:8px 12px;border-bottom:1px solid var(--line);background:var(--bg);display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:8px;"><label style="font:600 8px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:2px;text-transform:uppercase;letter-spacing:.4px;">擷取來源<select onChange="{{ vsrcK }}" value="{{ vK.source }}" style="font:500 9.5px 'DM Mono',monospace;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:2px 4px;width:100%;"><option value="yfinance">yfinance</option><option value="VDF DuckDB">VDF DuckDB</option><option value="TWSE/TPEX">TWSE/TPEX</option><option value="histock">histock</option></select></label><label style="font:600 8px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:2px;text-transform:uppercase;letter-spacing:.4px;">粗度 {{ vK.widthMul }}×<input type="range" min="0.5" max="2" step="0.1" value="{{ vK.widthMul }}" onInput="{{ vwidthK }}" style="width:100%;accent-color:var(--accent);"></label><label style="font:600 8px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:2px;text-transform:uppercase;letter-spacing:.4px;">透明度 {{ vK.opacity }}<input type="range" min="0.2" max="1" step="0.05" value="{{ vK.opacity }}" onInput="{{ vopacK }}" style="width:100%;accent-color:var(--accent);"></label></div></sc-if><div ref="{{ elKRef }}" style="width:100%;flex:1;min-height:560px;"></div>
+    </div>
+
+    <h2 style="font:800 16px 'Syne',sans-serif;color:var(--ink);margin:24px 0 12px;padding-bottom:9px;position:relative;display:flex;align-items:center;gap:10px;">
+      <span style="font:800 11px 'DM Mono',monospace;color:#fff;background:var(--ink);min-width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;">7</span>多序列識別 + 特定日期分散
+      <span style="font:700 10px 'DM Mono',monospace;letter-spacing:1.4px;color:var(--mut2);text-transform:uppercase;margin-left:auto;">8 LINES · STACKED AREA</span>
+      <span style="position:absolute;left:0;bottom:0;width:100%;height:1px;background:var(--line);"></span>
+      <span style="position:absolute;left:0;bottom:-1px;width:50px;height:3px;background:var(--reson);border-radius:2px;"></span>
+    </h2>
+    <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:14px;margin-bottom:14px;">
+      <div style="background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 1px 2px rgba(31,42,42,.05);display:flex;flex-direction:column;">
+        <div style="display:flex;align-items:center;gap:8px;padding:9px 13px;border-bottom:1px solid var(--line);">
+          <span style="font:700 11.5px 'Syne',sans-serif;color:var(--ink);">8 條折線 · 末端直接標示</span>
+          <span style="font:500 9px 'DM Mono',monospace;color:var(--mut);margin-left:auto;">色相 + 虛實線 + 末端標籤 · 日期讀值垂直分散</span><button onClick="{{ veditM }}" style="font:600 11px 'DM Sans';background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:2px 7px;cursor:pointer;color:var(--ink2);margin-left:6px;">⚙</button>
+        </div>
+        <sc-if value="{{ vEditM }}"><div style="padding:8px 12px;border-bottom:1px solid var(--line);background:var(--bg);display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:8px;"><label style="font:600 8px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:2px;text-transform:uppercase;letter-spacing:.4px;">擷取來源<select onChange="{{ vsrcM }}" value="{{ vM.source }}" style="font:500 9.5px 'DM Mono',monospace;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:2px 4px;width:100%;"><option value="yfinance">yfinance</option><option value="VDF DuckDB">VDF DuckDB</option><option value="TWSE/TPEX">TWSE/TPEX</option><option value="histock">histock</option></select></label><label style="font:600 8px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:2px;text-transform:uppercase;letter-spacing:.4px;">粗度 {{ vM.widthMul }}×<input type="range" min="0.5" max="2" step="0.1" value="{{ vM.widthMul }}" onInput="{{ vwidthM }}" style="width:100%;accent-color:var(--accent);"></label><label style="font:600 8px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:2px;text-transform:uppercase;letter-spacing:.4px;">透明度 {{ vM.opacity }}<input type="range" min="0.2" max="1" step="0.05" value="{{ vM.opacity }}" onInput="{{ vopacM }}" style="width:100%;accent-color:var(--accent);"></label></div></sc-if><div ref="{{ elMRef }}" style="width:100%;flex:1;min-height:380px;"></div>
+      </div>
+      <div style="background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 1px 2px rgba(31,42,42,.05);display:flex;flex-direction:column;">
+        <div style="display:flex;align-items:center;gap:8px;padding:9px 13px;border-bottom:1px solid var(--line);">
+          <span style="font:700 11.5px 'Syne',sans-serif;color:var(--ink);">三組堆積折線</span>
+          <span style="font:600 8.5px 'DM Mono',monospace;color:#fff;background:var(--vi);border-radius:9px;padding:2px 7px;">stacked area</span><button onClick="{{ veditS }}" style="font:600 11px 'DM Sans';background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:2px 7px;cursor:pointer;color:var(--ink2);margin-left:auto;">⚙</button>
+        </div>
+        <sc-if value="{{ vEditS }}"><div style="padding:8px 12px;border-bottom:1px solid var(--line);background:var(--bg);display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:8px;"><label style="font:600 8px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:2px;text-transform:uppercase;letter-spacing:.4px;">擷取來源<select onChange="{{ vsrcS }}" value="{{ vS.source }}" style="font:500 9.5px 'DM Mono',monospace;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:2px 4px;width:100%;"><option value="yfinance">yfinance</option><option value="VDF DuckDB">VDF DuckDB</option><option value="TWSE/TPEX">TWSE/TPEX</option><option value="histock">histock</option></select></label><label style="font:600 8px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:2px;text-transform:uppercase;letter-spacing:.4px;">粗度 {{ vS.widthMul }}×<input type="range" min="0.5" max="2" step="0.1" value="{{ vS.widthMul }}" onInput="{{ vwidthS }}" style="width:100%;accent-color:var(--accent);"></label><label style="font:600 8px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:2px;text-transform:uppercase;letter-spacing:.4px;">透明度 {{ vS.opacity }}<input type="range" min="0.2" max="1" step="0.05" value="{{ vS.opacity }}" onInput="{{ vopacS }}" style="width:100%;accent-color:var(--accent);"></label></div></sc-if><div ref="{{ elSRef }}" style="width:100%;flex:1;min-height:380px;"></div>
+      </div>
+    </div>
+    <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:8px;padding:11px 14px;font:400 11.5px/1.65 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);margin-bottom:22px;"><b style="color:var(--ink);">多序列識別：</b>折線過多時 → 不同<b>色相</b> + <b>虛實線</b> (solid/dash/dot/dashdot) + <b>末端直接標籤</b>(免圖例往返)；<b>特定日期讀值</b> → 沿垂直基準線將各組數值<b>垂直分散</b>(依高低排列 + 細引線)避免重疊；堆積比重用 <b>stacked area</b>。<b style="color:var(--ink);">雙軸線+直條</b> → 直條底色透明度 <b>0.75</b>。</div>
+
+    <h2 style="font:800 16px 'Syne',sans-serif;color:var(--ink);margin:24px 0 12px;padding-bottom:9px;position:relative;display:flex;align-items:center;gap:10px;">
+      <span style="font:800 11px 'DM Mono',monospace;color:#fff;background:var(--ink);min-width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;">8</span>直條樣式規格 (Seaborn / Plotly 共用)
+      <span style="position:absolute;left:0;bottom:0;width:100%;height:1px;background:var(--line);"></span>
+      <span style="position:absolute;left:0;bottom:-1px;width:50px;height:3px;background:var(--reson);border-radius:2px;"></span>
+    </h2>
+    <table style="width:100%;border-collapse:separate;border-spacing:0;background:var(--paper);border:1px solid var(--line);border-radius:8px;overflow:hidden;box-shadow:0 1px 2px rgba(31,42,42,.05);margin-bottom:14px;">
+      <thead><tr>
+        <th style="background:var(--soft);color:var(--ink);text-align:left;padding:var(--tpad);font:700 10.5px 'Syne',sans-serif;letter-spacing:.4px;border-bottom:1px solid var(--line);vertical-align:top;">樣式</th>
+        <th style="background:var(--soft);color:var(--ink);text-align:left;padding:var(--tpad);font:700 10.5px 'Syne',sans-serif;letter-spacing:.4px;border-bottom:1px solid var(--line);vertical-align:top;">用途</th>
+        <th style="background:var(--soft);color:var(--ink);text-align:center;padding:var(--tpad);font:700 10.5px 'Syne',sans-serif;letter-spacing:.4px;border-bottom:1px solid var(--line);vertical-align:top;">寬度因子</th>
+        <th style="background:var(--soft);color:var(--ink);text-align:center;padding:var(--tpad);font:700 10.5px 'Syne',sans-serif;letter-spacing:.4px;border-bottom:1px solid var(--line);vertical-align:top;">邊框</th>
+        <th style="background:var(--soft);color:var(--ink);text-align:right;padding:var(--tpad);font:700 10.5px 'Syne',sans-serif;letter-spacing:.4px;border-bottom:1px solid var(--line);vertical-align:top;">框內α</th>
+      </tr></thead>
+      <tbody>
+        <tr style="background:var(--paper);"><td style="padding:var(--tpad);border-top:1px solid var(--soft);font:600 var(--tfs) 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink);">無空隙 seamless</td><td style="padding:var(--tpad);border-top:1px solid var(--soft);font:400 var(--tfs) 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">密集日資料 (利差)</td><td style="padding:var(--tpad);border-top:1px solid var(--soft);text-align:center;font:500 var(--tfs) 'DM Mono',monospace;">1.00</td><td style="padding:var(--tpad);border-top:1px solid var(--soft);text-align:center;font:400 var(--tfs) 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">無框</td><td style="padding:var(--tpad);border-top:1px solid var(--soft);text-align:right;font:500 var(--tfs) 'DM Mono',monospace;">0.80</td></tr>
+        <tr style="background:#f6f4ef;"><td style="padding:var(--tpad);border-top:1px solid var(--soft);font:600 var(--tfs) 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink);">極小空隙 tiny</td><td style="padding:var(--tpad);border-top:1px solid var(--soft);font:400 var(--tfs) 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">月/週 (非農·初領)</td><td style="padding:var(--tpad);border-top:1px solid var(--soft);text-align:center;font:500 var(--tfs) 'DM Mono',monospace;">0.92</td><td style="padding:var(--tpad);border-top:1px solid var(--soft);text-align:center;font:400 var(--tfs) 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">0.8 實線</td><td style="padding:var(--tpad);border-top:1px solid var(--soft);text-align:right;font:500 var(--tfs) 'DM Mono',monospace;">0.80</td></tr>
+        <tr style="background:var(--paper);"><td style="padding:var(--tpad);border-top:1px solid var(--soft);font:600 var(--tfs) 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink);">低間隙 low</td><td style="padding:var(--tpad);border-top:1px solid var(--soft);font:400 var(--tfs) 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">需清楚分隔之長條</td><td style="padding:var(--tpad);border-top:1px solid var(--soft);text-align:center;font:500 var(--tfs) 'DM Mono',monospace;">0.82</td><td style="padding:var(--tpad);border-top:1px solid var(--soft);text-align:center;font:400 var(--tfs) 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">0.8 實線</td><td style="padding:var(--tpad);border-top:1px solid var(--soft);text-align:right;font:500 var(--tfs) 'DM Mono',monospace;">0.80</td></tr>
+        <tr style="background:#f6f4ef;"><td style="padding:var(--tpad);border-top:1px solid var(--soft);font:600 var(--tfs) 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink);">堆疊 stacked</td><td style="padding:var(--tpad);border-top:1px solid var(--soft);font:400 var(--tfs) 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">佔比 (失業比重→100%)</td><td style="padding:var(--tpad);border-top:1px solid var(--soft);text-align:center;font:500 var(--tfs) 'DM Mono',monospace;">0.92</td><td style="padding:var(--tpad);border-top:1px solid var(--soft);text-align:center;font:400 var(--tfs) 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);">0.8 實線</td><td style="padding:var(--tpad);border-top:1px solid var(--soft);text-align:right;font:500 var(--tfs) 'DM Mono',monospace;">0.80</td></tr>
+      </tbody>
+    </table>
+    <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--blue);border-radius:8px;padding:11px 14px;font:400 11.5px/1.65 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);"><b style="color:var(--ink);">Plotly wrapper 約定：</b>離線內嵌 plotly.js (無 CDN)、<span style="font-family:'DM Mono',monospace;">responsive:true</span>、字體 DM Mono、刻度 nice ticks (2/2.5/5/10 倍數)、左右軸間隔數相同→格線對齊、千分位、上方留一格。匯出標準尺寸 1000×560、保比例。</div>
+
+    <h2 style="font:800 16px 'Syne',sans-serif;color:var(--ink);margin:24px 0 12px;padding-bottom:9px;position:relative;display:flex;align-items:center;gap:10px;">
+      <span style="font:800 11px 'DM Mono',monospace;color:#fff;background:var(--ink);min-width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;">9</span>三圖併排 · 隱藏編輯
+      <span style="font:700 10px 'DM Mono',monospace;letter-spacing:1.4px;color:var(--mut2);text-transform:uppercase;margin-left:auto;">EDITABLE · 3-UP</span>
+      <span style="position:absolute;left:0;bottom:0;width:100%;height:1px;background:var(--line);"></span>
+      <span style="position:absolute;left:0;bottom:-1px;width:50px;height:3px;background:var(--reson);border-radius:2px;"></span>
+    </h2>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px;">
+
+      <div style="background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 1px 2px rgba(31,42,42,.05);display:flex;flex-direction:column;">
+        <div style="display:flex;align-items:center;gap:7px;padding:8px 11px;border-bottom:1px solid var(--line);">
+          <span style="font:700 11px 'Syne',sans-serif;color:var(--ink);">三大法人買賣超 · 堆疊</span>
+          <span style="font:600 8.5px 'DM Mono',monospace;color:var(--mut);background:var(--soft);border-radius:8px;padding:2px 7px;">{{ c1.source }}</span>
+          <button onClick="{{ editC1 }}" style="margin-left:auto;font:600 11px 'DM Sans';background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:2px 8px;cursor:pointer;color:var(--ink2);">⚙</button>
+        </div>
+        <sc-if value="{{ openC1 }}">
+          <div style="padding:9px 12px;border-bottom:1px solid var(--line);background:var(--bg);display:grid;grid-template-columns:1fr 1fr;gap:7px 9px;">
+            <label style="font:600 8.5px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:3px;text-transform:uppercase;letter-spacing:.4px;">擷取來源<select onChange="{{ srcC1 }}" value="{{ c1.source }}" style="font:500 10px 'DM Mono',monospace;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:3px 5px;width:100%;"><option value="yfinance">yfinance</option><option value="VDF DuckDB">VDF DuckDB</option><option value="TWSE/TPEX">TWSE/TPEX</option><option value="histock">histock</option></select></label>
+            <label style="font:600 8.5px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:3px;text-transform:uppercase;letter-spacing:.4px;">類型<select onChange="{{ typeC1 }}" value="{{ c1.type }}" style="font:500 10px 'DM Mono',monospace;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:3px 5px;width:100%;"><option value="line">折線</option><option value="bar">直條</option></select></label>
+            <label style="font:600 8.5px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:3px;text-transform:uppercase;letter-spacing:.4px;">邊框<select onChange="{{ borderC1 }}" value="{{ c1.borderStr }}" style="font:500 10px 'DM Mono',monospace;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:3px 5px;width:100%;"><option value="on">有框</option><option value="off">無框</option></select></label>
+            <label style="font:600 8.5px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:3px;text-transform:uppercase;letter-spacing:.4px;">顏色<select onChange="{{ colorC1 }}" value="{{ c1.color }}" style="font:500 10px 'DM Mono',monospace;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:3px 5px;width:100%;"><option value="#4c78a8">藍</option><option value="#c96b5a">珊瑚</option><option value="#5a9e6f">綠</option><option value="#c4943a">琥珀</option><option value="#439a9a">青</option><option value="#7a6daa">紫</option></select></label>
+            <label style="font:600 8.5px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:3px;text-transform:uppercase;letter-spacing:.4px;">透明度 {{ c1.opacity }}<input type="range" min="0.2" max="1" step="0.05" value="{{ c1.opacity }}" onInput="{{ opacityC1 }}" style="width:100%;accent-color:var(--accent);"></label>
+            <label style="font:600 8.5px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:3px;text-transform:uppercase;letter-spacing:.4px;">粗度 {{ c1.width }}<input type="range" min="0.5" max="3" step="0.1" value="{{ c1.width }}" onInput="{{ widthC1 }}" style="width:100%;accent-color:var(--accent);"></label>
+          </div>
+        </sc-if>
+        <div ref="{{ elC1Ref }}" style="width:100%;flex:1;min-height:230px;"></div>
+      </div>
+
+      <div style="background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 1px 2px rgba(31,42,42,.05);display:flex;flex-direction:column;">
+        <div style="display:flex;align-items:center;gap:7px;padding:8px 11px;border-bottom:1px solid var(--line);">
+          <span style="font:700 11px 'Syne',sans-serif;color:var(--ink);">融資餘額</span>
+          <span style="font:600 8.5px 'DM Mono',monospace;color:var(--mut);background:var(--soft);border-radius:8px;padding:2px 7px;">{{ c2.source }}</span>
+          <button onClick="{{ editC2 }}" style="margin-left:auto;font:600 11px 'DM Sans';background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:2px 8px;cursor:pointer;color:var(--ink2);">⚙</button>
+        </div>
+        <sc-if value="{{ openC2 }}">
+          <div style="padding:9px 12px;border-bottom:1px solid var(--line);background:var(--bg);display:grid;grid-template-columns:1fr 1fr;gap:7px 9px;">
+            <label style="font:600 8.5px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:3px;text-transform:uppercase;letter-spacing:.4px;">擷取來源<select onChange="{{ srcC2 }}" value="{{ c2.source }}" style="font:500 10px 'DM Mono',monospace;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:3px 5px;width:100%;"><option value="yfinance">yfinance</option><option value="VDF DuckDB">VDF DuckDB</option><option value="TWSE/TPEX">TWSE/TPEX</option><option value="histock">histock</option></select></label>
+            <label style="font:600 8.5px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:3px;text-transform:uppercase;letter-spacing:.4px;">類型<select onChange="{{ typeC2 }}" value="{{ c2.type }}" style="font:500 10px 'DM Mono',monospace;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:3px 5px;width:100%;"><option value="line">折線</option><option value="bar">直條</option></select></label>
+            <label style="font:600 8.5px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:3px;text-transform:uppercase;letter-spacing:.4px;">邊框<select onChange="{{ borderC2 }}" value="{{ c2.borderStr }}" style="font:500 10px 'DM Mono',monospace;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:3px 5px;width:100%;"><option value="on">有框</option><option value="off">無框</option></select></label>
+            <label style="font:600 8.5px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:3px;text-transform:uppercase;letter-spacing:.4px;">顏色<select onChange="{{ colorC2 }}" value="{{ c2.color }}" style="font:500 10px 'DM Mono',monospace;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:3px 5px;width:100%;"><option value="#4c78a8">藍</option><option value="#c96b5a">珊瑚</option><option value="#5a9e6f">綠</option><option value="#c4943a">琥珀</option><option value="#439a9a">青</option><option value="#7a6daa">紫</option></select></label>
+            <label style="font:600 8.5px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:3px;text-transform:uppercase;letter-spacing:.4px;">透明度 {{ c2.opacity }}<input type="range" min="0.2" max="1" step="0.05" value="{{ c2.opacity }}" onInput="{{ opacityC2 }}" style="width:100%;accent-color:var(--accent);"></label>
+            <label style="font:600 8.5px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:3px;text-transform:uppercase;letter-spacing:.4px;">粗度 {{ c2.width }}<input type="range" min="0.5" max="3" step="0.1" value="{{ c2.width }}" onInput="{{ widthC2 }}" style="width:100%;accent-color:var(--accent);"></label>
+          </div>
+        </sc-if>
+        <div ref="{{ elC2Ref }}" style="width:100%;flex:1;min-height:230px;"></div>
+      </div>
+
+      <div style="background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 1px 2px rgba(31,42,42,.05);display:flex;flex-direction:column;">
+        <div style="display:flex;align-items:center;gap:7px;padding:8px 11px;border-bottom:1px solid var(--line);">
+          <span style="font:700 11px 'Syne',sans-serif;color:var(--ink);">成交量</span>
+          <span style="font:600 8.5px 'DM Mono',monospace;color:var(--mut);background:var(--soft);border-radius:8px;padding:2px 7px;">{{ c3.source }}</span>
+          <button onClick="{{ editC3 }}" style="margin-left:auto;font:600 11px 'DM Sans';background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:2px 8px;cursor:pointer;color:var(--ink2);">⚙</button>
+        </div>
+        <sc-if value="{{ openC3 }}">
+          <div style="padding:9px 12px;border-bottom:1px solid var(--line);background:var(--bg);display:grid;grid-template-columns:1fr 1fr;gap:7px 9px;">
+            <label style="font:600 8.5px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:3px;text-transform:uppercase;letter-spacing:.4px;">擷取來源<select onChange="{{ srcC3 }}" value="{{ c3.source }}" style="font:500 10px 'DM Mono',monospace;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:3px 5px;width:100%;"><option value="yfinance">yfinance</option><option value="VDF DuckDB">VDF DuckDB</option><option value="TWSE/TPEX">TWSE/TPEX</option><option value="histock">histock</option></select></label>
+            <label style="font:600 8.5px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:3px;text-transform:uppercase;letter-spacing:.4px;">類型<select onChange="{{ typeC3 }}" value="{{ c3.type }}" style="font:500 10px 'DM Mono',monospace;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:3px 5px;width:100%;"><option value="line">折線</option><option value="bar">直條</option></select></label>
+            <label style="font:600 8.5px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:3px;text-transform:uppercase;letter-spacing:.4px;">邊框<select onChange="{{ borderC3 }}" value="{{ c3.borderStr }}" style="font:500 10px 'DM Mono',monospace;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:3px 5px;width:100%;"><option value="on">有框</option><option value="off">無框</option></select></label>
+            <label style="font:600 8.5px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:3px;text-transform:uppercase;letter-spacing:.4px;">顏色<select onChange="{{ colorC3 }}" value="{{ c3.color }}" style="font:500 10px 'DM Mono',monospace;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:3px 5px;width:100%;"><option value="#4c78a8">藍</option><option value="#c96b5a">珊瑚</option><option value="#5a9e6f">綠</option><option value="#c4943a">琥珀</option><option value="#439a9a">青</option><option value="#7a6daa">紫</option></select></label>
+            <label style="font:600 8.5px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:3px;text-transform:uppercase;letter-spacing:.4px;">透明度 {{ c3.opacity }}<input type="range" min="0.2" max="1" step="0.05" value="{{ c3.opacity }}" onInput="{{ opacityC3 }}" style="width:100%;accent-color:var(--accent);"></label>
+            <label style="font:600 8.5px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:3px;text-transform:uppercase;letter-spacing:.4px;">粗度 {{ c3.width }}<input type="range" min="0.5" max="3" step="0.1" value="{{ c3.width }}" onInput="{{ widthC3 }}" style="width:100%;accent-color:var(--accent);"></label>
+          </div>
+        </sc-if>
+        <div ref="{{ elC3Ref }}" style="width:100%;flex:1;min-height:230px;"></div>
+      </div>
+
+    </div>
+    <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--am);border-radius:8px;padding:11px 14px;font:400 11.5px/1.65 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);margin-bottom:22px;">點 <b style="color:var(--ink);">⚙</b> 開啟隱藏編輯：<b style="color:var(--ink);">擷取來源 · 類型(折線/直條) · 有框/無框 · 顏色 · 透明度 · 粗度(折線/邊寬)</b>，即時套用。分頁、編輯面板與各圖設定<b style="color:var(--ink);">自動儲存</b>(localStorage)，重新整理後復原。</div>
+
+    <h2 style="font:800 16px 'Syne',sans-serif;color:var(--ink);margin:24px 0 12px;padding-bottom:9px;position:relative;display:flex;align-items:center;gap:10px;">
+      <span style="font:800 11px 'DM Mono',monospace;color:#fff;background:var(--ink);min-width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;">10</span>全球指數地圖 · 點擊載入走勢
+      <span style="font:700 10px 'DM Mono',monospace;letter-spacing:1.4px;color:var(--mut2);text-transform:uppercase;margin-left:auto;">WORLD · AT A GLANCE</span>
+      <span style="position:absolute;left:0;bottom:0;width:100%;height:1px;background:var(--line);"></span>
+      <span style="position:absolute;left:0;bottom:-1px;width:50px;height:3px;background:var(--reson);border-radius:2px;"></span>
+    </h2>
+    <div style="background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 1px 2px rgba(31,42,42,.05);display:flex;flex-direction:column;margin-bottom:16px;">
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);">
+        <span style="font:700 12px 'Syne',sans-serif;color:var(--ink);">全球主要指數 · 當日漲跌</span>
+        <span style="font:600 9px 'DM Mono',monospace;color:#fff;background:var(--up);border-radius:9px;padding:2px 8px;">紅漲</span>
+        <span style="font:600 9px 'DM Mono',monospace;color:#fff;background:var(--down);border-radius:9px;padding:2px 8px;">綠跌</span>
+        <span style="font:500 10px 'DM Mono',monospace;color:var(--mut);margin-left:auto;">點標記 → 載入該指數走勢（左下小圖）</span><button onClick="{{ veditG }}" style="font:600 11px 'DM Sans';background:var(--soft);border:1px solid var(--line);border-radius:6px;padding:2px 7px;cursor:pointer;color:var(--ink2);margin-left:6px;">⚙</button>
+      </div>
+      <sc-if value="{{ vEditG }}"><div style="padding:8px 12px;border-bottom:1px solid var(--line);background:var(--bg);display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:8px;"><label style="font:600 8px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:2px;text-transform:uppercase;letter-spacing:.4px;">擷取來源<select onChange="{{ vsrcG }}" value="{{ vG.source }}" style="font:500 9.5px 'DM Mono',monospace;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:5px;padding:2px 4px;width:100%;"><option value="yfinance">yfinance</option><option value="VDF DuckDB">VDF DuckDB</option><option value="TWSE/TPEX">TWSE/TPEX</option><option value="histock">histock</option></select></label><label style="font:600 8px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:2px;text-transform:uppercase;letter-spacing:.4px;">標記大小 {{ vG.widthMul }}×<input type="range" min="0.5" max="2" step="0.1" value="{{ vG.widthMul }}" onInput="{{ vwidthG }}" style="width:100%;accent-color:var(--accent);"></label><label style="font:600 8px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:2px;text-transform:uppercase;letter-spacing:.4px;">透明度 {{ vG.opacity }}<input type="range" min="0.2" max="1" step="0.05" value="{{ vG.opacity }}" onInput="{{ vopacG }}" style="width:100%;accent-color:var(--accent);"></label></div></sc-if>
+      <div style="position:relative;width:100%;flex:1;min-height:540px;">
+        <div ref="{{ elGRef }}" style="position:absolute;inset:0;"></div>
+        <div style="position:absolute;inset:0;pointer-events:none;z-index:6;"><div style="position:relative;width:100%;height:100%;pointer-events:none;"><div style="pointer-events:auto;">{{ usMiniCards }}</div></div></div>
+        <div style="position:absolute;left:16px;top:14px;display:flex;gap:4px;z-index:5;">
+          <span onClick="{{ rgWorld }}" style="font:700 9px 'DM Mono',monospace;padding:3px 9px;border-radius:6px;cursor:pointer;user-select:none;{{ rgcWorld }}">🌐 全球</span>
+          <span onClick="{{ rgAsia }}" style="font:700 9px 'DM Mono',monospace;padding:3px 9px;border-radius:6px;cursor:pointer;user-select:none;{{ rgcAsia }}">亞洲</span>
+          <span onClick="{{ rgNA }}" style="font:700 9px 'DM Mono',monospace;padding:3px 9px;border-radius:6px;cursor:pointer;user-select:none;{{ rgcNA }}">北美</span>
+          <span onClick="{{ rgEU }}" style="font:700 9px 'DM Mono',monospace;padding:3px 9px;border-radius:6px;cursor:pointer;user-select:none;{{ rgcEU }}">歐洲</span>
+        </div>
+        <div style="position:absolute;left:16px;bottom:16px;width:200px;max-width:calc(100% - 32px);background:rgba(255,255,255,0.6);backdrop-filter:blur(3px);border:none;border-radius:8px;box-shadow:0 4px 14px rgba(31,42,42,.16);overflow:hidden;">
+          <div style="display:flex;align-items:baseline;gap:6px;padding:6px 9px 1px;">
+            <span style="font:700 10.5px 'Syne',sans-serif;color:var(--ink);">{{ selName }}</span>
+            <span style="font:500 9px 'DM Mono',monospace;color:var(--ink2);font-variant-numeric:tabular-nums;">{{ selLast }}</span>
+            <span style="margin-left:auto;font:700 8.5px 'DM Mono',monospace;color:#fff;border-radius:4px;padding:1px 5px;{{ selPctBg }}">{{ selPctArrow }} {{ selPct }}</span>
+            <span onClick="{{ veditT }}" style="font:600 9px 'DM Sans';cursor:pointer;color:var(--mut);user-select:none;">⚙</span>
+          </div>
+          <sc-if value="{{ vEditT }}"><div style="display:flex;gap:8px;padding:2px 9px 4px;"><label style="flex:1;font:600 7px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:1px;text-transform:uppercase;">粗度 {{ vT.widthMul }}×<input type="range" min="0.5" max="2" step="0.1" value="{{ vT.widthMul }}" onInput="{{ vwidthT }}" style="width:100%;accent-color:var(--accent);"></label><label style="flex:1;font:600 7px 'DM Mono',monospace;color:var(--mut);display:flex;flex-direction:column;gap:1px;text-transform:uppercase;">透明 {{ vT.opacity }}<input type="range" min="0.2" max="1" step="0.05" value="{{ vT.opacity }}" onInput="{{ vopacT }}" style="width:100%;accent-color:var(--accent);"></label></div></sc-if>
+          <div ref="{{ elTRef }}" style="width:100%;height:70px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <h2 style="font:800 16px 'Syne',sans-serif;color:var(--ink);margin:24px 0 12px;padding-bottom:9px;position:relative;display:flex;align-items:center;gap:10px;">
+      <span style="font:800 11px 'DM Mono',monospace;color:#fff;background:var(--ink);min-width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;">11</span>全部指數同時 · 小倍數網格
+      <span style="font:700 10px 'DM Mono',monospace;letter-spacing:1.4px;color:var(--mut2);text-transform:uppercase;margin-left:auto;">SMALL MULTIPLES · SHARED SCALE</span>
+      <span style="position:absolute;left:0;bottom:0;width:100%;height:1px;background:var(--line);"></span>
+      <span style="position:absolute;left:0;bottom:-1px;width:50px;height:3px;background:var(--reson);border-radius:2px;"></span>
+    </h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(146px,1fr));gap:9px;margin-bottom:14px;">
+      <sc-for list="{{ miniCards }}" as="m" hint-placeholder-count="14">
+        <div onClick="{{ m.pick }}" style="background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:9px 10px 7px;cursor:pointer;box-shadow:0 1px 2px rgba(31,42,42,.04);{{ m.selCss }}">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">
+            <span style="font:700 11px 'Syne',sans-serif;color:var(--ink);">{{ m.name }}</span>
+            <span style="font:700 9px 'DM Mono',monospace;margin-left:auto;{{ m.pctCss }}">{{ m.pct }}</span>
+          </div>
+          {{ m.spark }}
+        </div>
+      </sc-for>
+    </div>
+    <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:8px;padding:11px 14px;font:400 11.5px/1.65 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);margin-bottom:22px;"><b style="color:var(--ink);">同時全部展現：</b>14 檔指數採<b style="color:var(--ink);">小倍數 (small multiples)</b> — 各自縮小、共用同一振幅標尺 (shared scale)，故跌幅高度可直接目視比較，互不重疊、不雜亂。紅漲綠跌。點任一格 → 載入地圖走勢小圖。<br><span style="color:var(--mut2);">其他可選排法：單邊不重疊堆疊 (ridgeline) · 雙邊鏡像堆疊 — 需要再切換。</span></div>
+
+    <h2 style="font:800 16px 'Syne',sans-serif;color:var(--ink);margin:24px 0 12px;padding-bottom:9px;position:relative;display:flex;align-items:center;gap:10px;">
+      <span style="font:800 11px 'DM Mono',monospace;color:#fff;background:var(--ink);min-width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;">12</span>主動式 ETF 矩陣 · Active ETF Matrix
+      <span style="font:700 10px 'DM Mono',monospace;letter-spacing:1.4px;color:var(--mut2);text-transform:uppercase;margin-left:auto;">ACTIVE ETF · 紅框標記</span>
+      <span style="position:absolute;left:0;bottom:0;width:100%;height:1px;background:var(--line);"></span>
+      <span style="position:absolute;left:0;bottom:-1px;width:50px;height:3px;background:var(--reson);border-radius:2px;"></span>
+    </h2>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+      <span style="display:inline-flex;align-items:center;gap:6px;font:600 9.5px 'DM Mono',monospace;color:var(--mut);"><span style="width:16px;height:11px;border:1.6px solid var(--up);border-radius:2px;background:rgba(201,107,90,.06);"></span>主動式 Active（紅實線框）</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;font:600 9.5px 'DM Mono',monospace;color:var(--mut);"><span style="width:16px;height:11px;border:1px solid var(--line);border-radius:2px;background:var(--paper);"></span>被動式 Passive</span>
+      <span style="margin-left:auto;display:inline-flex;gap:8px;font:600 9px 'DM Mono',monospace;">
+        <span style="color:#fff;background:var(--green);border-radius:7px;padding:2px 8px;">GREEN 強</span>
+        <span style="color:#fff;background:var(--amber);border-radius:7px;padding:2px 8px;">YELLOW 中</span>
+        <span style="color:#fff;background:var(--red);border-radius:7px;padding:2px 8px;">RED 弱</span>
+      </span>
+    </div>
+    <div style="border:1px solid var(--line);border-radius:9px;overflow:hidden;box-shadow:0 1px 2px rgba(31,42,42,.04);overflow-x:auto;margin-bottom:14px;">
+      <table style="width:100%;border-collapse:separate;border-spacing:0;min-width:760px;">
+        <thead><tr>
+          <th style="background:var(--soft);color:var(--ink);text-align:left;padding:8px 11px;font:700 9.5px 'Syne',sans-serif;border-bottom:1px solid var(--line);position:sticky;left:0;z-index:2;">ETF · 代號</th>
+          <th style="background:var(--soft);color:var(--ink);text-align:left;padding:8px 11px;font:700 9.5px 'Syne',sans-serif;border-bottom:1px solid var(--line);">追蹤族群</th>
+          <th style="background:var(--soft);color:var(--ink);text-align:right;padding:8px 11px;font:700 9.5px 'Syne',sans-serif;border-bottom:1px solid var(--line);">規模(億)</th>
+          <th style="background:var(--soft);color:var(--ink);text-align:center;padding:8px 11px;font:700 9.5px 'Syne',sans-serif;border-bottom:1px solid var(--line);">近月報酬</th>
+          <th style="background:var(--soft);color:var(--ink);text-align:center;padding:8px 11px;font:700 9.5px 'Syne',sans-serif;border-bottom:1px solid var(--line);">法人淨買</th>
+          <th style="background:var(--soft);color:var(--ink);text-align:center;padding:8px 11px;font:700 9.5px 'Syne',sans-serif;border-bottom:1px solid var(--line);">折溢價</th>
+          <th style="background:var(--soft);color:var(--ink);text-align:center;padding:8px 11px;font:700 9.5px 'Syne',sans-serif;border-bottom:1px solid var(--line);">熱門度</th>
+          <th style="background:var(--soft);color:var(--ink);text-align:center;padding:8px 11px;font:700 9.5px 'Syne',sans-serif;border-bottom:1px solid var(--line);">領先性</th>
+        </tr></thead>
+        <tbody>
+          <sc-for list="{{ etfRows }}" as="e" hint-placeholder-count="9">
+            <tr style="background:{{ e.bg }};">
+              <td style="padding:6px 11px;border-top:1px solid var(--soft);font:600 10px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink);position:sticky;left:0;background:{{ e.bg }};z-index:1;{{ e.activeCss }}"><span>{{ e.name }}</span> <span style="font:500 8.5px 'DM Mono',monospace;color:var(--mut2);">{{ e.code }}</span></td>
+              <td style="padding:6px 11px;border-top:1px solid var(--soft);font:400 9.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">{{ e.group }}</td>
+              <td style="padding:6px 11px;border-top:1px solid var(--soft);text-align:right;font:500 10px 'DM Mono',monospace;color:var(--ink);font-variant-numeric:tabular-nums;">{{ e.aum }}</td>
+              <td style="padding:6px 11px;border-top:1px solid var(--soft);text-align:center;font:600 10px 'DM Mono',monospace;{{ e.retCss }}">{{ e.ret }}</td>
+              <td style="padding:6px 11px;border-top:1px solid var(--soft);text-align:center;font:600 10px 'DM Mono',monospace;{{ e.flowCss }}">{{ e.flow }}</td>
+              <td style="padding:6px 11px;border-top:1px solid var(--soft);text-align:center;font:500 10px 'DM Mono',monospace;{{ e.premCss }}">{{ e.prem }}</td>
+              <td style="padding:6px 11px;border-top:1px solid var(--soft);text-align:center;"><span style="display:inline-block;min-width:30px;font:700 8.5px 'DM Mono',monospace;color:#fff;border-radius:7px;padding:2px 7px;background:{{ e.hotCss }};">{{ e.hot }}</span></td>
+              <td style="padding:6px 11px;border-top:1px solid var(--soft);text-align:center;"><span style="display:inline-block;min-width:30px;font:700 8.5px 'DM Mono',monospace;color:#fff;border-radius:7px;padding:2px 7px;background:{{ e.leadCss }};">{{ e.lead }}</span></td>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+    </div>
+    <div style="background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--up);border-radius:8px;padding:11px 14px;font:400 11.5px/1.65 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);margin-bottom:22px;"><b style="color:var(--up);">主動式 ETF 以紅色實線框標記</b>（沿用法人面板慣例）。風險色 GREEN/YELLOW/RED 反映各維度強弱；熱門度＝量能+法人淨買+融資使用率 z 分數，領先性＝CCF 領先（負 lag）。紅漲綠跌一致。</div>
+
+  </div>
+  </sc-if>
+
+  <footer style="margin-top:30px;border-top:1px solid var(--line);padding-top:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font:500 10.5px 'DM Mono',monospace;color:var(--mut);">
+    <span style="font-weight:700;letter-spacing:1.4px;color:var(--ink);">VERITAS INTELLIGENCE ANALYTICS</span>
+    <span>Dashboard Standard · Visual Lock v1.0 · 2026-06-16</span>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;accent&quot;: { &quot;editor&quot;: &quot;color&quot;, &quot;default&quot;: &quot;#439a9a&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;options&quot;: [&quot;#439a9a&quot;, &quot;#4c78a8&quot;, &quot;#5a9e6f&quot;, &quot;#c4943a&quot;, &quot;#7a6daa&quot;, &quot;#c96b5a&quot;] },
+  &quot;headerVariant&quot;: { &quot;editor&quot;: &quot;enum&quot;, &quot;default&quot;: &quot;spec&quot;, &quot;options&quot;: [&quot;spec&quot;, &quot;seal&quot;, &quot;minimal&quot;], &quot;tsType&quot;: &quot;string&quot; },
+  &quot;density&quot;: { &quot;editor&quot;: &quot;enum&quot;, &quot;default&quot;: &quot;comfortable&quot;, &quot;options&quot;: [&quot;comfortable&quot;, &quot;compact&quot;], &quot;tsType&quot;: &quot;string&quot; }
+}">
+class Component extends DCLogic {
+  state = {
+    tab: 'found', sortKey: 'panel', sortDir: 1, navOpen: false,
+    mapSel: '台股', tf: '60D', trendMode: 'line', aoptW: 320, aoptText: 'med', mapRegion: 'world', kRange: 'ytd', kAgg: 'day',
+    editOpen: { c1: false, c2: false, c3: false },
+    vEdit: { A: false, B: false, C: false, K: false, M: false, S: false, T: false, G: false },
+    vcfg: {
+      A: { source: 'yfinance', widthMul: 1, opacity: 1 },
+      B: { source: 'TWSE/TPEX', widthMul: 1, opacity: 1 },
+      C: { source: 'TWSE/TPEX', widthMul: 1, opacity: 1 },
+      K: { source: 'yfinance', widthMul: 1, opacity: 1 },
+      M: { source: 'VDF DuckDB', widthMul: 1, opacity: 1 },
+      S: { source: 'TWSE/TPEX', widthMul: 1, opacity: 1 },
+      T: { source: 'yfinance', widthMul: 1, opacity: 1 },
+      G: { source: 'yfinance', widthMul: 1, opacity: 1 },
+    },
+    cfg: {
+      c1: { source: 'TWSE/TPEX', type: 'bar', border: true, color: '#4c78a8', opacity: 0.75, width: 0.8, kind: 'inst3' },
+      c2: { source: 'TWSE/TPEX', type: 'line', border: false, color: '#c96b5a', opacity: 1, width: 1.8, kind: 'level' },
+      c3: { source: 'yfinance', type: 'bar', border: true, color: '#439a9a', opacity: 0.65, width: 0.8, kind: 'vol' },
+    },
+    usM: {
+      pos: { 'S&P 500': { x: 16, y: 44 }, '道瓊': { x: 132, y: 44 }, 'NASDAQ': { x: 16, y: 150 }, '費城半導體': { x: 132, y: 150 } },
+      z: {}, zTop: 20, edit: null,
+      sty: {
+        'S&P 500': { lw: 1.3, dash: false, fill: true, fo: 0.6, bd: false, bw: 1 },
+        '道瓊': { lw: 1.3, dash: false, fill: true, fo: 0.6, bd: false, bw: 1 },
+        'NASDAQ': { lw: 1.3, dash: false, fill: true, fo: 0.6, bd: false, bw: 1 },
+        '費城半導體': { lw: 1.3, dash: false, fill: true, fo: 0.6, bd: false, bw: 1 },
+      },
+    },
+  };
+
+  componentDidMount() {
+    try {
+      const raw = localStorage.getItem('via_dashboard_std');
+      if (raw) {
+        const s = JSON.parse(raw);
+        this.setState(st => ({
+          tab: s.tab || st.tab,
+          mapSel: s.mapSel || st.mapSel, tf: ['1D', '5D', '10D', '20D', '60D', '120D', '240D'].includes(s.tf) ? s.tf : st.tf, trendMode: s.trendMode || st.trendMode,
+          editOpen: { ...st.editOpen, ...(s.editOpen || {}) },
+          vEdit: { ...st.vEdit, ...(s.vEdit || {}) },
+          vcfg: {
+            A: { ...st.vcfg.A, ...((s.vcfg || {}).A || {}) }, B: { ...st.vcfg.B, ...((s.vcfg || {}).B || {}) },
+            C: { ...st.vcfg.C, ...((s.vcfg || {}).C || {}) }, K: { ...st.vcfg.K, ...((s.vcfg || {}).K || {}) },
+            M: { ...st.vcfg.M, ...((s.vcfg || {}).M || {}) }, S: { ...st.vcfg.S, ...((s.vcfg || {}).S || {}) },
+            T: { ...st.vcfg.T, ...((s.vcfg || {}).T || {}) },
+            G: { ...st.vcfg.G, ...((s.vcfg || {}).G || {}) },
+          },
+          cfg: {
+            c1: { ...st.cfg.c1, ...((s.cfg || {}).c1 || {}), kind: st.cfg.c1.kind },
+            c2: { ...st.cfg.c2, ...((s.cfg || {}).c2 || {}), kind: st.cfg.c2.kind },
+            c3: { ...st.cfg.c3, ...((s.cfg || {}).c3 || {}), kind: st.cfg.c3.kind },
+          },
+        }));
+      }
+    } catch (e) { /* ignore corrupt state */ }
+    this.applyVars();
+    this._tries = 0;
+    const tick = () => {
+      if (window.Plotly) { this.drawCharts(); }
+      else if (this._tries++ < 80) { setTimeout(tick, 100); }
+    };
+    tick();
+    setTimeout(() => this.applyVars(), 450);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => this.fitAopt());
+    this._onResize = () => { this.applyVars(); if (window.Plotly) this.drawCharts(); };
+    window.addEventListener('resize', this._onResize);
+  }
+  componentDidUpdate() {
+    this.applyVars();
+    this.fitAopt();
+    try {
+      localStorage.setItem('via_dashboard_std', JSON.stringify({
+        tab: this.state.tab, editOpen: this.state.editOpen, cfg: this.state.cfg,
+        mapSel: this.state.mapSel, tf: this.state.tf, trendMode: this.state.trendMode,
+        vEdit: this.state.vEdit, vcfg: this.state.vcfg, usM: this.state.usM,
+      }));
+    } catch (e) { /* storage full / blocked */ }
+    if (this.state.tab === 'charts' && window.Plotly) this.drawCharts();
+  }
+  componentWillUnmount() {
+    if (this._onResize) window.removeEventListener('resize', this._onResize);
+    if (this._aoptRO) this._aoptRO.disconnect();
+  }
+
+  // AOpt: binary-search font fit + resize refit
+  _fitOne(el) {
+    const min = +(el.dataset.fitMin || 8), max = +(el.dataset.fitMax || 48);
+    const line = el.dataset.fit === 'line';
+    let lo = min, hi = max;
+    for (let i = 0; i < 8; i++) {
+      const mid = (lo + hi) / 2; el.style.fontSize = mid + 'px';
+      const over = line ? (el.scrollWidth > el.clientWidth + 0.5) : (el.scrollHeight > el.clientHeight + 0.5);
+      if (over) hi = mid; else lo = mid;
+    }
+    el.style.fontSize = lo.toFixed(1) + 'px';
+    el.dataset.fitted = lo.toFixed(1);
+  }
+  fitAopt() {
+    const f = this.aoptFrame; if (!f) return;
+    const info = [];
+    f.querySelectorAll('[data-fit]').forEach(el => { this._fitOne(el); info.push((el.dataset.fitRole || '') + ' ' + el.dataset.fitted + 'px'); });
+    if (this.aoptReadout) this.aoptReadout.textContent = info.join(' · ');
+  }
+
+  applyVars() {
+    const r = this.root; if (!r) return;
+    r.style.setProperty('--accent', this.props.accent || '#439a9a');
+    if (this.topEl) r.style.setProperty('--topH', (this.topEl.offsetHeight + 4) + 'px');
+    const dense = (this.props.density || 'comfortable') === 'compact';
+    r.style.setProperty('--tpad', dense ? '5px 9px' : '8px 11px');
+    r.style.setProperty('--tfs', dense ? '10.5px' : '11.5px');
+    r.style.setProperty('--cardpad', dense ? '11px 13px' : '15px 17px');
+    r.style.setProperty('--gap', dense ? '8px' : '12px');
+  }
+
+  // ---- deterministic rng ----
+  _rng(seed) { let s = seed >>> 0; return () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; }; }
+
+  _tradingDays(n) {
+    const out = []; const d = new Date(2026, 0, 2);
+    while (out.length < n) {
+      const dow = d.getDay();
+      if (dow !== 0 && dow !== 6) out.push((d.getMonth() + 1) + '/' + d.getDate());
+      d.setDate(d.getDate() + 1);
+    }
+    return out;
+  }
+  _walk(n, start, drift, vol, seed) {
+    const rnd = this._rng(seed); const out = [start]; let v = start;
+    for (let i = 1; i < n; i++) { v = v * (1 + drift + (rnd() - 0.5) * vol); out.push(v); }
+    return out;
+  }
+  _norm(arr) { const b = arr[0]; return arr.map(v => +(v / b * 100).toFixed(2)); }
+
+  // single-index price + volume series for the trend chart (deterministic by name)
+  _indexSeries(name, tf) {
+    const seedMap = { '台股': 7, '日經': 13, '上證': 19, '恒生': 23, '韓股': 29, 'S&P500': 31, 'NASDAQ': 37, 'DAX': 41, 'FTSE': 43, 'CAC': 47, 'SENSEX': 53, 'ASX': 59, 'TSX': 61, 'BOVESPA': 67 };
+    const baseMap = { '台股': 23150, '日經': 39200, '上證': 3210, '恒生': 18050, '韓股': 2710, 'S&P500': 6234, 'NASDAQ': 20100, 'DAX': 18480, 'FTSE': 8210, 'CAC': 7620, 'SENSEX': 80200, 'ASX': 8120, 'TSX': 24050, 'BOVESPA': 128400 };
+    const lenMap = { '1D': 27, '5D': 5, '10D': 10, '20D': 20, '60D': 60, '120D': 120, '240D': 240 };
+    const n = lenMap[tf] || 60;
+    const seed = seedMap[name] || 7, base = baseMap[name] || 1000;
+    let x, price;
+    if (tf === '1D') {
+      const pts = 27; price = this._walk(pts, base, 0.0002, 0.004, seed).map(v => +v.toFixed(2));
+      x = []; let hh = 9, mm = 0; for (let i = 0; i < pts; i++) { x.push((hh < 10 ? '0' : '') + hh + ':' + (mm < 10 ? '0' : '') + mm); mm += 15; if (mm >= 60) { mm -= 60; hh++; } }
+    } else {
+      price = this._walk(n, base, 0.0006, 0.013, seed).map(v => +v.toFixed(2));
+      x = this._tradingDays(n);
+    }
+    const r = this._rng(seed + 500);
+    const vol = price.map(() => Math.round(8000 + r() * 12000));
+    const last = price[price.length - 1], first = price[0];
+    const pct = +(((last - first) / first) * 100).toFixed(2);
+    return { x, price, vol, last, first, pct, up: pct >= 0 };
+  }
+
+  // index universe (shared by the small-multiples grid + 3-day bars)
+  _idxNames() { return ['台股', '日經', '上證', '恒生', '韓股', 'S&P500', 'NASDAQ', 'DAX', 'FTSE', 'CAC', 'SENSEX', 'ASX', 'TSX', 'BOVESPA']; }
+  _idxSeed(name) { const m = { '台股': 7, '日經': 13, '上證': 19, '恒生': 23, '韓股': 29, 'S&P500': 31, 'NASDAQ': 37, 'DAX': 41, 'FTSE': 43, 'CAC': 47, 'SENSEX': 53, 'ASX': 59, 'TSX': 61, 'BOVESPA': 67 }; return m[name] || 7; }
+  // deterministic last-`days` daily % changes for an index
+  _dayChanges(name, days) {
+    const r = this._rng(this._idxSeed(name) + 900);
+    const out = []; for (let i = 0; i < 240; i++) out.push(+((r() - 0.46) * 2.6).toFixed(2));
+    return out.slice(-days);
+  }
+  // tiny normalized sparkline as a React SVG element (shared y-domain across all indices)
+  // US index mini weekly-trend cards — draggable, stackable, per-card edit (line width/dash, fill+α, border)
+  _usDefs() {
+    return [
+      { name: 'S&P 500', tic: '^GSPC', seed: 31, base: 6234, vola: 0.011 },
+      { name: '道瓊', tic: '^DJI', seed: 67, base: 43600, vola: 0.009 },
+      { name: 'NASDAQ', tic: '^IXIC', seed: 37, base: 20100, vola: 0.014 },
+      { name: '費城半導體', tic: '^SOX', seed: 71, base: 5380, vola: 0.019 },
+    ];
+  }
+  _usDragStart(name, e) {
+    e.preventDefault();
+    const m = this.state.usM, host = this.elG && this.elG.parentElement;
+    const rect = host ? host.getBoundingClientRect() : { left: 0, top: 0, width: 900, height: 560 };
+    const p = m.pos[name] || { x: 16, y: 44 };
+    const ox = e.clientX - p.x, oy = e.clientY - p.y;
+    const z = { ...m.z }; z[name] = (m.zTop + 1); 
+    this.setState({ usM: { ...m, z, zTop: m.zTop + 1 } });
+    const move = ev => {
+      let nx = ev.clientX - ox, ny = ev.clientY - oy;
+      nx = Math.max(-40, Math.min(rect.width - 70, nx));
+      ny = Math.max(0, Math.min(rect.height - 30, ny));
+      const cur = this.state.usM; this.setState({ usM: { ...cur, pos: { ...cur.pos, [name]: { x: nx, y: ny } } } });
+    };
+    const up = () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up); this._persist(); };
+    window.addEventListener('mousemove', move); window.addEventListener('mouseup', up);
+  }
+  _persist() { /* setState already triggers componentDidUpdate → localStorage autosave */ }
+  _usSty(name, patch) { const m = this.state.usM; this.setState({ usM: { ...m, sty: { ...m.sty, [name]: { ...m.sty[name], ...patch } } } }, () => this._persist()); }
+  _usPanel() {
+    const E = React.createElement, m = this.state.usM;
+    return this._usDefs().map(d => {
+      const st = (m.sty && m.sty[d.name]) || { lw: 1.3, dash: false, fill: true, fo: 0.6, bd: false, bw: 1 };
+      const pos = (m.pos && m.pos[d.name]) || { x: 16, y: 44 };
+      const W = 100, H = 30, VH = 9, N = 25;
+      const r = this._rng(d.seed + 1700);
+      const price = [d.base]; for (let i = 1; i < N; i++) price.push(price[i - 1] * (1 + (r() - 0.48) * d.vola));
+      const vol = price.map(() => 0.4 + r() * 0.6);
+      const up = price[N - 1] >= price[0];
+      const pct = +(((price[N - 1] - price[0]) / price[0]) * 100).toFixed(2);
+      const col = up ? '#c96b5a' : '#5a9e6f';
+      const rgb = up ? '201,107,90' : '90,158,111';
+      const lo = Math.min(...price), hi = Math.max(...price), sp = (hi - lo) || 1;
+      const yOf = p => +(2 + (H - 4) * (1 - (p - lo) / sp)).toFixed(1);
+      const xOf = i => +(i / (N - 1) * W).toFixed(1);
+      const linePts = price.map((p, i) => xOf(i) + ',' + yOf(p)).join(' ');
+      const areaPts = '0,' + H + ' ' + linePts + ' ' + W + ',' + H;
+      const vmax = Math.max(...vol);
+      const svgKids = [];
+      if (st.fill) svgKids.push(E('polygon', { key: 'a', points: areaPts, fill: 'rgba(' + rgb + ',' + st.fo + ')' }));
+      svgKids.push(E('polyline', { key: 'l', points: linePts, fill: 'none', stroke: col, strokeWidth: st.lw, strokeDasharray: st.dash ? '3,2.4' : 'none', strokeLinejoin: 'round', strokeLinecap: 'round' }));
+      vol.forEach((v, i) => svgKids.push(E('rect', { key: 'v' + i, x: xOf(i) - 1.1, y: (H + VH) - (v / vmax) * VH, width: 2.2, height: (v / vmax) * VH, fill: 'rgba(' + rgb + ',0.4)' })));
+      const svg = E('svg', { viewBox: '0 0 ' + W + ' ' + (H + VH), width: '100%', height: 32, preserveAspectRatio: 'none', style: { display: 'block' } }, svgKids);
+      const isEdit = m.edit === d.name;
+      const ctrlRow = (label, node) => E('div', { style: { display: 'flex', alignItems: 'center', gap: '5px', margin: '2px 0' } },
+        E('span', { style: { font: "600 7px 'DM Mono',monospace", color: '#787268', minWidth: '40px' } }, label), node);
+      const editBox = isEdit ? E('div', { style: { padding: '5px 7px', borderTop: '1px solid #eceae4', background: 'rgba(247,246,243,0.95)' } },
+        ctrlRow('線寬 ' + st.lw, E('input', { type: 'range', min: 0.5, max: 3, step: 0.1, value: st.lw, onChange: e => this._usSty(d.name, { lw: +e.target.value }), style: { flex: 1, accentColor: '#439a9a' } })),
+        ctrlRow('線型', E('span', { onClick: () => this._usSty(d.name, { dash: !st.dash }), style: { cursor: 'pointer', font: "700 7px 'DM Mono',monospace", color: '#fff', background: st.dash ? '#9b9690' : '#4c78a8', borderRadius: '3px', padding: '1px 6px' } }, st.dash ? '虛線' : '實線')),
+        ctrlRow('底色', E('span', { onClick: () => this._usSty(d.name, { fill: !st.fill }), style: { cursor: 'pointer', font: "700 7px 'DM Mono',monospace", color: '#fff', background: st.fill ? '#5a9e6f' : '#9b9690', borderRadius: '3px', padding: '1px 6px' } }, st.fill ? '有' : '無')),
+        st.fill ? ctrlRow('透明 ' + st.fo, E('input', { type: 'range', min: 0.1, max: 1, step: 0.05, value: st.fo, onChange: e => this._usSty(d.name, { fo: +e.target.value }), style: { flex: 1, accentColor: '#439a9a' } })) : null,
+        ctrlRow('外框', E('span', { onClick: () => this._usSty(d.name, { bd: !st.bd }), style: { cursor: 'pointer', font: "700 7px 'DM Mono',monospace", color: '#fff', background: st.bd ? '#4c78a8' : '#9b9690', borderRadius: '3px', padding: '1px 6px' } }, st.bd ? '有框' : '無框')),
+        st.bd ? ctrlRow('框寬 ' + st.bw, E('input', { type: 'range', min: 0.5, max: 3, step: 0.5, value: st.bw, onChange: e => this._usSty(d.name, { bw: +e.target.value }), style: { flex: 1, accentColor: '#439a9a' } })) : null
+      ) : null;
+      return E('div', { key: d.name, style: { position: 'absolute', left: pos.x + 'px', top: pos.y + 'px', width: '112px', zIndex: (m.z && m.z[d.name]) || 6, background: 'rgba(255,255,255,0.82)', backdropFilter: 'blur(2px)', borderRadius: '7px', boxShadow: '0 2px 8px rgba(31,42,42,.16)', border: st.bd ? (st.bw + 'px solid ' + col) : 'none', overflow: 'hidden' } },
+        E('div', { onMouseDown: e => this._usDragStart(d.name, e), style: { display: 'flex', alignItems: 'baseline', gap: '3px', padding: '4px 6px 1px', cursor: 'grab', userSelect: 'none' } },
+          E('span', { style: { font: "700 8.5px 'Syne',sans-serif", color: '#1e1d1a' } }, d.name),
+          E('span', { style: { marginLeft: 'auto', font: "700 7.5px 'DM Mono',monospace", color: '#fff', background: col, borderRadius: '3px', padding: '0 4px' } }, (pct >= 0 ? '+' : '') + pct + '%'),
+          E('span', { onClick: e => { e.stopPropagation(); const mm = this.state.usM; this.setState({ usM: { ...mm, edit: isEdit ? null : d.name } }); }, style: { cursor: 'pointer', font: "600 8px 'DM Sans'", color: isEdit ? '#4c78a8' : '#9b9690' } }, '⚙')),
+        E('div', { style: { padding: '0 5px 3px' } }, svg),
+        editBox);
+    });
+  }
+  _usMiniPanel() {
+    const E = React.createElement;
+    const defs = [
+      { name: 'S&P 500', tic: '^GSPC', seed: 31, base: 6234, vola: 0.011 },
+      { name: '道瓊', tic: '^DJI', seed: 67, base: 43600, vola: 0.009 },
+      { name: 'NASDAQ', tic: '^IXIC', seed: 37, base: 20100, vola: 0.014 },
+      { name: '費城半導體', tic: '^SOX', seed: 71, base: 5380, vola: 0.019 },
+    ];
+    const W = 100, H = 30, VH = 9, N = 25; // ~5 trading weeks
+    const cards = defs.map(d => {
+      const r = this._rng(d.seed + 1700);
+      const price = [d.base]; for (let i = 1; i < N; i++) price.push(price[i - 1] * (1 + (r() - 0.48) * d.vola));
+      const vol = price.map(() => 0.4 + r() * 0.6);
+      const up = price[N - 1] >= price[0];
+      const pct = +(((price[N - 1] - price[0]) / price[0]) * 100).toFixed(2);
+      const col = up ? '#c96b5a' : '#5a9e6f';
+      const rgb = up ? '201,107,90' : '90,158,111';
+      const lo = Math.min(...price), hi = Math.max(...price), sp = (hi - lo) || 1;
+      const yOf = p => +(2 + (H - 4) * (1 - (p - lo) / sp)).toFixed(1);
+      const xOf = i => +(i / (N - 1) * W).toFixed(1);
+      const linePts = price.map((p, i) => xOf(i) + ',' + yOf(p)).join(' ');
+      const areaPts = '0,' + H + ' ' + linePts + ' ' + W + ',' + H;
+      const vmax = Math.max(...vol);
+      const bars = vol.map((v, i) => E('rect', { key: i, x: xOf(i) - 1.1, y: (H + VH) - (v / vmax) * VH, width: 2.2, height: (v / vmax) * VH, fill: 'rgba(' + rgb + ',0.4)' }));
+      const svg = E('svg', { viewBox: '0 0 ' + W + ' ' + (H + VH), width: '100%', height: 32, preserveAspectRatio: 'none', style: { display: 'block' } },
+        E('polygon', { points: areaPts, fill: 'rgba(' + rgb + ',0.4)' }),
+        E('polyline', { points: linePts, fill: 'none', stroke: col, strokeWidth: 1.3, strokeLinejoin: 'round', strokeLinecap: 'round' }),
+        ...bars);
+      return E('div', { key: d.name, style: { background: 'rgba(255,255,255,0.74)', borderRadius: '7px', padding: '5px 7px 3px', boxShadow: '0 1px 3px rgba(31,42,42,.1)' } },
+        E('div', { style: { display: 'flex', alignItems: 'baseline', gap: '4px', marginBottom: '1px' } },
+          E('span', { style: { font: "700 9px 'Syne',sans-serif", color: '#1e1d1a' } }, d.name),
+          E('span', { style: { font: "500 6.5px 'DM Mono',monospace", color: '#9b9690' } }, d.tic),
+          E('span', { style: { marginLeft: 'auto', font: "700 8px 'DM Mono',monospace", color: '#fff', background: col, borderRadius: '3px', padding: '0 4px' } }, (pct >= 0 ? '▲ +' : '▼ ') + pct + '%')),
+        svg);
+    });
+    return E('div', { style: { background: 'rgba(250,250,248,0.55)', backdropFilter: 'blur(3px)', borderRadius: '9px', boxShadow: '0 4px 14px rgba(31,42,42,.16)', padding: '7px 8px' } },
+      E('div', { style: { font: "700 8px 'DM Mono',monospace", letterSpacing: '.6px', color: '#787268', textTransform: 'uppercase', margin: '0 1px 5px' } }, '美股 · 週走勢 · NYSE / NASDAQ'),
+      E('div', { style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '5px' } }, ...cards));
+  }
+
+  _spark(name, lo, hi) {
+    const r = this._rng(this._idxSeed(name) + 1300);
+    const N = 60, W = 124, H = 30; let v = 100; const ys = [v];
+    for (let i = 1; i < N; i++) { v = v * (1 + (r() - 0.5) * 0.02); ys.push(v); }
+    const up = ys[N - 1] >= ys[0];
+    const col = up ? '#c96b5a' : '#5a9e6f';
+    const pts = ys.map((y, i) => (i / (N - 1) * W).toFixed(1) + ',' + (H - (y - lo) / (hi - lo) * H).toFixed(1)).join(' ');
+    const area = '0,' + H + ' ' + pts + ' ' + W + ',' + H;
+    return React.createElement('svg', { viewBox: '0 0 ' + W + ' ' + H, width: '100%', height: H, preserveAspectRatio: 'none', style: { display: 'block' } },
+      React.createElement('polygon', { points: area, fill: up ? 'rgba(201,107,90,0.10)' : 'rgba(90,158,111,0.10)' }),
+      React.createElement('polyline', { points: pts, fill: 'none', stroke: col, strokeWidth: 1.2, strokeLinejoin: 'round' }));
+  }
+
+  // same interval count on both axes; step from {1,2,2.5,5,10}×10^k
+  _niceStep(x) {
+    const a = Math.abs(x) || 1;
+    const mag = Math.pow(10, Math.floor(Math.log10(a)));
+    const n = a / mag;
+    const c = n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10;
+    return c * mag;
+  }
+  _axisFor(min, max, N) {
+    let step = this._niceStep((max - min) / N);
+    let lo = Math.floor(min / step) * step, guard = 0;
+    while (lo + step * N < max - 1e-9 && guard++ < 8) { step = this._niceStep(step * 1.5); lo = Math.floor(min / step) * step; }
+    return { tick0: lo, dtick: step, range: [lo, lo + step * N] };
+  }
+
+  drawCharts() {
+    if (!window.Plotly) return;
+    const elA = this.elA, elB = this.elB, elC = this.elC, elK = this.elK, elM = this.elM, elS = this.elS;
+    const FONT = { family: 'DM Mono, monospace', size: 11, color: '#33403f' };
+    const PAPER = '#fafaf8', PLOT = '#ffffff', GRID = '#ecebe6', LINE = '#dbd9d3';
+    const UP = '#c96b5a', DOWN = '#5a9e6f', BLUE = '#4c78a8';
+    const sma = (a, p) => a.map((_, i) => { if (i < p - 1) return null; let s = 0; for (let k = 0; k < p; k++) s += a[i - k]; return +(s / p).toFixed(2); });
+    const stdAt = (a, p, i) => { let m = 0; for (let k = 0; k < p; k++) m += a[i - k]; m /= p; let v = 0; for (let k = 0; k < p; k++) { const d = a[i - k] - m; v += d * d; } return Math.sqrt(v / p); };
+    // declutter: spread label y-positions so they never overlap (sorted high→low, min gap enforced)
+    const spread = (vals, lo, hi, gap) => {
+      const items = vals.map((y, i) => ({ y, i })).sort((a, b) => b.y - a.y);
+      const mg = (hi - lo) * gap;
+      for (let k = 1; k < items.length; k++) if (items[k].y > items[k - 1].y - mg) items[k].y = items[k - 1].y - mg;
+      const minY = items[items.length - 1].y; if (minY < lo) items.forEach(it => it.y += (lo - minY));
+      const maxY = items[0].y; if (maxY > hi) items.forEach(it => it.y -= (maxY - hi));
+      const out = new Array(vals.length); items.forEach(it => out[it.i] = it.y); return out;
+    };
+    const V = this.state.vcfg;
+    const applyV = (data, c) => { data.forEach(t => { t.opacity = c.opacity; if (t.line && typeof t.line.width === 'number') t.line.width = t.line.width * c.widthMul; }); return data; };
+
+    // ---- Chart A: normalized indices · area fill · max/min annot · vertical marker ----
+    if (elA) {
+      const N = 120, x = this._tradingDays(N);
+      const tickIdx = []; for (let i = 0; i < N; i += 17) tickIdx.push(i);
+      const tickvals = tickIdx.map(i => x[i]);
+      const sp = this._norm(this._walk(N, 100, 0.0018, 0.012, 7));
+      const tw = this._norm(this._walk(N, 100, 0.0009, 0.018, 23));
+      const ks = this._norm(this._walk(N, 100, 0.0012, 0.015, 51));
+      const T = (name, y, color, w, fill) => ({ x, y, name, type: 'scatter', mode: 'lines',
+        line: { color, width: w }, fill: fill || 'none', fillcolor: 'rgba(201,107,90,0.6)',
+        hovertemplate: '%{y:.1f}<extra>' + name + '</extra>' });
+      const dataA = [
+        T('台股加權 (^TWII)', tw, UP, 1.8, 'tozeroy'),
+        T('S&P 500 (^GSPC)', sp, BLUE, 1.6),
+        T('韓股 (^KS11)', ks, DOWN, 1.2),
+      ];
+      // high label up / low label down → never overlap
+      let hi = 0, lo = 0; tw.forEach((v, i) => { if (v > tw[hi]) hi = i; if (v < tw[lo]) lo = i; });
+      const mark = 60;
+      const annotations = [
+        { x: x[hi], y: tw[hi], text: '高 ' + tw[hi].toFixed(1), showarrow: true, arrowcolor: UP, arrowwidth: 1, arrowhead: 0, ax: 0, ay: -24, font: { size: 9.5, color: UP, family: 'DM Mono, monospace' }, bgcolor: '#fff', bordercolor: UP, borderwidth: 0.8, borderpad: 2 },
+        { x: x[lo], y: tw[lo], text: '低 ' + tw[lo].toFixed(1), showarrow: true, arrowcolor: DOWN, arrowwidth: 1, arrowhead: 0, ax: 0, ay: 24, font: { size: 9.5, color: DOWN, family: 'DM Mono, monospace' }, bgcolor: '#fff', bordercolor: DOWN, borderwidth: 0.8, borderpad: 2 },
+        { x: x[mark], y: 1, yref: 'paper', yanchor: 'bottom', showarrow: false, text: x[mark], font: { size: 9, color: '#6b6860', family: 'DM Mono, monospace' } },
+      ];
+      const layoutA = {
+        autosize: true, margin: { l: 50, r: 14, t: 16, b: 66 },
+        paper_bgcolor: PAPER, plot_bgcolor: PLOT, font: FONT, hovermode: 'x unified',
+        xaxis: { type: 'category', tickmode: 'array', tickvals, ticktext: tickvals,
+          showgrid: false, linecolor: LINE, ticks: 'outside', tickcolor: LINE, tickfont: { size: 10 } },
+        yaxis: { title: { text: '標準化 (起始=100)', font: { size: 11 } }, gridcolor: GRID,
+          zeroline: false, tickformat: ',.0f', nticks: 6, linecolor: LINE },
+        legend: { orientation: 'h', y: -0.13, x: 0, font: { size: 10 }, bgcolor: 'rgba(0,0,0,0)' },
+        annotations,
+        shapes: [{ type: 'line', x0: x[mark], x1: x[mark], yref: 'paper', y0: 0, y1: 1, line: { color: '#9c9890', width: 1, dash: 'dot' } }],
+      };
+      window.Plotly.react(elA, applyV(dataA, V.A), layoutA, this._cfg());
+    }
+
+    // ---- Chart B: dual axis · equal interval count · nice ticks 2/2.5/5/10 ----
+    if (elB) {
+      const N = 56, x = this._tradingDays(N);
+      const tickIdx = []; for (let i = 0; i < N; i += 11) tickIdx.push(i);
+      const tickvals = tickIdx.map(i => x[i]);
+      const rnd = this._rng(99);
+      const chg = []; for (let i = 0; i < N; i++) chg.push(+((rnd() - 0.46) * 3.2).toFixed(2));
+      const fill = chg.map(v => v >= 0 ? 'rgba(201,107,90,0.75)' : 'rgba(90,158,111,0.75)');
+      const edge = chg.map(v => v >= 0 ? UP : DOWN);
+      let yld = 4.2; const yArr = []; for (let i = 0; i < N; i++) { yld += (rnd() - 0.5) * 0.06; yArr.push(+yld.toFixed(2)); }
+      const NI = 6;
+      const aL = this._axisFor(Math.min(...chg), Math.max(...chg), NI);
+      const aR = this._axisFor(Math.min(...yArr), Math.max(...yArr), NI);
+      const dataB = [
+        { x, y: chg, name: '日漲跌%', type: 'bar', yaxis: 'y',
+          marker: { color: fill, line: { color: edge, width: 0.8 } }, hovertemplate: '%{y:.2f}%<extra>日漲跌</extra>' },
+        { x, y: yArr, name: '10Y%', type: 'scatter', mode: 'lines', yaxis: 'y2',
+          line: { color: BLUE, width: 1.8 }, hovertemplate: '%{y:.2f}%<extra>10Y</extra>' },
+      ];
+      const layoutB = {
+        autosize: true, margin: { l: 44, r: 44, t: 10, b: 40 }, bargap: 0.08,
+        paper_bgcolor: PAPER, plot_bgcolor: PLOT, font: FONT, hovermode: 'x unified', showlegend: false,
+        xaxis: { type: 'category', tickmode: 'array', tickvals, ticktext: tickvals,
+          showgrid: false, linecolor: LINE, ticks: 'outside', tickcolor: LINE, tickfont: { size: 9 } },
+        yaxis: { title: { text: '漲跌%', font: { size: 10 } }, gridcolor: GRID, zeroline: true, zerolinecolor: LINE,
+          tickformat: ',.1f', tick0: aL.tick0, dtick: aL.dtick, range: aL.range, tickfont: { size: 9 } },
+        yaxis2: { title: { text: '殖利率%', font: { size: 10 } }, overlaying: 'y', side: 'right', showgrid: false,
+          tickformat: ',.1f', tick0: aR.tick0, dtick: aR.dtick, range: aR.range, tickfont: { size: 9 } },
+      };
+      window.Plotly.react(elB, applyV(dataB, V.B), layoutB, this._cfg());
+    }
+
+    // ---- Chart C: stacked bar → 100% · hollow 0.8 border ----
+    if (elC) {
+      const cats = ['1月', '2月', '3月', '4月', '5月', '6月'];
+      const rnd = this._rng(33);
+      const s1 = [], s2 = [], s3 = [];
+      for (let i = 0; i < cats.length; i++) { const a = 30 + rnd() * 18, b = 24 + rnd() * 14, c = 100 - a - b; s1.push(+a.toFixed(1)); s2.push(+b.toFixed(1)); s3.push(+c.toFixed(1)); }
+      const bar = (name, y, rgb) => ({ x: cats, y, name, type: 'bar',
+        marker: { color: 'rgba(' + rgb + ',0.8)', line: { color: 'rgb(' + rgb + ')', width: 0.8 } },
+        hovertemplate: '%{y:.1f}%<extra>' + name + '</extra>' });
+      const dataC = [bar('<5週', s1, '76,120,168'), bar('5-14週', s2, '67,154,154'), bar('15週+', s3, '122,109,170')];
+      const layoutC = {
+        autosize: true, margin: { l: 44, r: 14, t: 10, b: 42 }, barmode: 'stack', bargap: 0.45,
+        paper_bgcolor: PAPER, plot_bgcolor: PLOT, font: FONT, hovermode: 'x unified',
+        xaxis: { showgrid: false, linecolor: LINE, ticks: 'outside', tickcolor: LINE, tickfont: { size: 9 } },
+        yaxis: { title: { text: '佔比%', font: { size: 10 } }, gridcolor: GRID, range: [0, 100], tick0: 0, dtick: 20, tickformat: ',.0f', tickfont: { size: 9 } },
+        legend: { orientation: 'h', y: -0.2, x: 0, font: { size: 9 }, bgcolor: 'rgba(0,0,0,0)' },
+      };
+      window.Plotly.react(elC, applyV(dataC, V.C), layoutC, this._cfg());
+    }
+
+    // ---- Chart K: candlestick + BB(20,2) + SMA 5/10/20/60/120/240 + volume subpanel ----
+    if (elK) {
+      const N = 760, rnd = this._rng(11);
+      let x = this._tradingDays(N);
+      const kR = this.state.kRange || 'ytd';
+      let kStart = { '2023': 0, '2024': 250, '2025': 500, 'ytd': 640 }[kR] || 640;
+      const close0 = []; let pr = 560;
+      for (let i = 0; i < N; i++) { pr = pr * (1 + (rnd() - 0.5) * 0.026 + 0.0006); close0.push(+pr.toFixed(2)); }
+      let open = close0.map((c, i) => i ? +(close0[i - 1] * (1 + (rnd() - 0.5) * 0.006)).toFixed(2) : +(c * 0.998).toFixed(2));
+      let high = close0.map((c, i) => +(Math.max(c, open[i]) * (1 + rnd() * 0.013)).toFixed(2));
+      let low = close0.map((c, i) => +(Math.min(c, open[i]) * (1 - rnd() * 0.013)).toFixed(2));
+      let vol = close0.map(() => Math.round(8000 + rnd() * 9000));
+      let close = close0;
+      // 日/月/年 聚合:把日K resample 成月/年OHLC
+      const kAgg = this.state.kAgg || 'day';
+      if (kAgg !== 'day') {
+        const span = kAgg === 'yr' ? 250 : 21;
+        const nx = [], no = [], nh = [], nl = [], nc = [], nv = [];
+        for (let i = 0; i < N; i += span) {
+          const j = Math.min(N, i + span);
+          nx.push(x[j - 1]); no.push(open[i]); nc.push(close[j - 1]);
+          let hh = -1e9, ll = 1e9, vv = 0;
+          for (let k = i; k < j; k++) { if (high[k] > hh) hh = high[k]; if (low[k] < ll) ll = low[k]; vv += vol[k]; }
+          nh.push(+hh.toFixed(2)); nl.push(+ll.toFixed(2)); nv.push(vv);
+        }
+        x = nx; open = no; high = nh; low = nl; close = nc; vol = nv;
+        kStart = Math.round(kStart / span);
+      }
+      const volCol = close.map((c, i) => c >= open[i] ? 'rgba(201,107,90,0.75)' : 'rgba(90,158,111,0.75)');
+      const mid = sma(close, 20);
+      const bbU = mid.map((m, i) => m == null ? null : +(m + 2 * stdAt(close, 20, i)).toFixed(2));
+      const bbL = mid.map((m, i) => m == null ? null : +(m - 2 * stdAt(close, 20, i)).toFixed(2));
+      const smaDef = [[5, '#e0b3a8', 0.8, 'legendonly'], [10, '#d6a36a', 0.8, 'legendonly'], [20, '#5a9e6f', 1, true], [60, '#439a9a', 1.1, true], [120, '#4c78a8', 1.3, true], [240, '#7a6daa', 1.5, 'legendonly']];
+      // YTD running mean (cumulative average from series start)
+      const M = x.length;
+      const ytd = []; let cum = 0; for (let i = 0; i < M; i++) { cum += close[i]; ytd.push(+(cum / (i + 1)).toFixed(2)); }
+      const tstep = kAgg === 'yr' ? 1 : kAgg === 'mon' ? 6 : 40;
+      const tickIdx = []; for (let i = 0; i < M; i += tstep) tickIdx.push(i); const tickvals = tickIdx.map(i => x[i]);
+      const dataK = [
+        { x, y: bbL, name: 'BB下', type: 'scatter', mode: 'lines', line: { width: 0, color: 'rgba(76,120,168,0)' }, hoverinfo: 'skip', showlegend: false },
+        { x, y: bbU, name: 'BB(20,2)', type: 'scatter', mode: 'lines', line: { width: 0.8, color: 'rgba(76,120,168,0.28)' }, fill: 'tonexty', fillcolor: 'rgba(76,120,168,0.045)', hoverinfo: 'skip' },
+        { x, open, high, low, close, name: '日K (adj)', type: 'candlestick', whiskerwidth: 0.4,
+          increasing: { line: { color: UP, width: 1 }, fillcolor: 'rgba(201,107,90,0.65)' },
+          decreasing: { line: { color: DOWN, width: 1 }, fillcolor: 'rgba(90,158,111,0.65)' } },
+        ...smaDef.map(d => ({ x, y: sma(close, d[0]), name: 'SMA' + d[0], type: 'scatter', mode: 'lines', line: { color: d[1], width: d[2] }, visible: d[3] === true ? true : 'legendonly', hovertemplate: '%{y:.1f}<extra>SMA' + d[0] + '</extra>' })),
+        { x, y: ytd, name: 'YTD', type: 'scatter', mode: 'lines', line: { color: '#1e1d1a', width: 1, dash: 'dot' }, visible: 'legendonly', hovertemplate: '%{y:.1f}<extra>YTD均</extra>' },
+        { x, y: vol, name: '量', type: 'bar', yaxis: 'y2', marker: { color: volCol, line: { width: 0 } }, hovertemplate: '%{y:,}<extra>量</extra>' },
+        { x, y: sma(vol, 60), name: '量MA60', type: 'scatter', mode: 'lines', yaxis: 'y2', line: { color: 'rgba(201,107,90,0.8)', width: 0.8, dash: 'dash' }, hovertemplate: '%{y:,.0f}<extra>量MA60</extra>' },
+        { x, y: sma(vol, 120), name: '量MA120', type: 'scatter', mode: 'lines', yaxis: 'y2', line: { color: 'rgba(217,139,125,0.8)', width: 0.8, dash: 'dash' }, visible: 'legendonly', hovertemplate: '%{y:,.0f}<extra>量MA120</extra>' },
+        { x, y: sma(vol, 240), name: '量MA240', type: 'scatter', mode: 'lines', yaxis: 'y2', line: { color: 'rgba(227,169,158,0.8)', width: 0.8, dash: 'dash' }, visible: 'legendonly', hovertemplate: '%{y:,.0f}<extra>量MA240</extra>' },
+      ];
+      const layoutK = {
+        autosize: true, margin: { l: 54, r: 14, t: 10, b: 48 },
+        paper_bgcolor: PAPER, plot_bgcolor: PLOT, font: FONT, hovermode: 'x unified',
+        xaxis: { type: 'category', anchor: 'y2', tickmode: 'array', tickvals, ticktext: tickvals, showgrid: false, linecolor: LINE, ticks: 'outside', tickcolor: LINE, tickfont: { size: 9 }, rangeslider: { visible: false }, range: [kStart - 0.5, M - 0.5] },
+        yaxis: { domain: [0.28, 1], title: { text: '價', font: { size: 10 } }, gridcolor: GRID, tickformat: ',.0f', nticks: 6, tickfont: { size: 9 }, linecolor: LINE },
+        yaxis2: { domain: [0, 0.18], title: { text: '量', font: { size: 10 } }, gridcolor: GRID, anchor: 'x', tickformat: '~s', nticks: 3, tickfont: { size: 9 } },
+        legend: { orientation: 'h', y: -0.1, x: 0, font: { size: 9 }, bgcolor: 'rgba(0,0,0,0)' },
+      };
+      window.Plotly.react(elK, applyV(dataK, V.K), layoutK, this._cfg());
+    }
+
+    // ---- Chart M: 8 lines (color + dash + end labels) + specific-date value fan-out ----
+    if (elM) {
+      const N = 90, x = this._tradingDays(N);
+      const names = ['電子', '金融', '傳產', '航運', '生技', '鋼鐵', '光電', '觀光'];
+      const cols = ['#4c78a8', '#c96b5a', '#5a9e6f', '#c4943a', '#7a6daa', '#439a9a', '#b5697f', '#876d49'];
+      const dash = ['solid', 'solid', 'dash', 'dash', 'dot', 'dot', 'dashdot', 'longdash'];
+      const series = names.map((nm, k) => this._norm(this._walk(N, 100, (k - 3.5) * 0.0007 + 0.0008, 0.012, 13 + k * 7)));
+      const flat = series.flat();
+      const aMin = Math.min(...flat), aMax = Math.max(...flat), pad = (aMax - aMin) * 0.05;
+      const lo = aMin - pad, hi = aMax + pad;
+      const dIdx = 44;
+      const lastY = series.map(s => s[N - 1]);
+      const dateY = series.map(s => s[dIdx]);
+      const endPos = spread(lastY, lo, hi, 0.052);
+      const datePos = spread(dateY, lo, hi, 0.052);
+      const dataM = names.map((nm, k) => ({ x, y: series[k], name: nm, type: 'scatter', mode: 'lines', line: { color: cols[k], width: 1.4, dash: dash[k] }, hovertemplate: '%{y:.1f}<extra>' + nm + '</extra>' }));
+      const ann = []; const shapes = [{ type: 'line', x0: x[dIdx], x1: x[dIdx], yref: 'paper', y0: 0, y1: 1, line: { color: '#9c9890', width: 1, dash: 'dot' } }];
+      names.forEach((nm, k) => {
+        ann.push({ xref: 'paper', x: 1.004, xanchor: 'left', y: endPos[k], yref: 'y', text: nm + ' ' + lastY[k].toFixed(1), showarrow: false, font: { size: 8.5, color: cols[k], family: 'DM Mono, monospace' } });
+        ann.push({ x: x[dIdx], xanchor: 'left', xshift: 7, y: datePos[k], yref: 'y', text: dateY[k].toFixed(1), showarrow: false, font: { size: 8, color: cols[k], family: 'DM Mono, monospace' }, bgcolor: 'rgba(255,255,255,0.72)', borderpad: 1 });
+        shapes.push({ type: 'line', x0: x[dIdx], x1: x[dIdx], y0: dateY[k], y1: datePos[k], yref: 'y', line: { color: cols[k], width: 0.6 } });
+      });
+      const tickIdx = []; for (let i = 0; i < N; i += 15) tickIdx.push(i); const tickvals = tickIdx.map(i => x[i]);
+      const layoutM = {
+        autosize: true, margin: { l: 42, r: 80, t: 10, b: 38 },
+        paper_bgcolor: PAPER, plot_bgcolor: PLOT, font: FONT, hovermode: 'closest', showlegend: false,
+        xaxis: { type: 'category', tickmode: 'array', tickvals, ticktext: tickvals, showgrid: false, linecolor: LINE, ticks: 'outside', tickcolor: LINE, tickfont: { size: 9 } },
+        yaxis: { title: { text: '標準化', font: { size: 10 } }, gridcolor: GRID, zeroline: false, range: [lo, hi], nticks: 6, tickfont: { size: 9 } },
+        annotations: ann, shapes,
+      };
+      window.Plotly.react(elM, applyV(dataM, V.M), layoutM, this._cfg());
+    }
+
+    // ---- Chart S: 3-series stacked area ----
+    if (elS) {
+      const N = 90, x = this._tradingDays(N);
+      const mk = (seed, base) => { const r = this._rng(seed); const o = []; let v = base; for (let i = 0; i < N; i++) { v = Math.max(2, v + (r() - 0.5) * 1.3); o.push(+v.toFixed(1)); } return o; };
+      const tickIdx = []; for (let i = 0; i < N; i += 15) tickIdx.push(i); const tickvals = tickIdx.map(i => x[i]);
+      const area = (nm, y, rgb) => ({ x, y, name: nm, type: 'scatter', mode: 'lines', stackgroup: 'one', line: { color: 'rgb(' + rgb + ')', width: 1 }, fillcolor: 'rgba(' + rgb + ',0.5)', hovertemplate: '%{y:.1f}<extra>' + nm + '</extra>' });
+      const dataS = [area('外資', mk(1, 18), '76,120,168'), area('投信', mk(2, 14), '67,154,154'), area('自營', mk(3, 10), '122,109,170')];
+      const layoutS = {
+        autosize: true, margin: { l: 42, r: 14, t: 10, b: 38 },
+        paper_bgcolor: PAPER, plot_bgcolor: PLOT, font: FONT, hovermode: 'x unified',
+        xaxis: { type: 'category', tickmode: 'array', tickvals, ticktext: tickvals, showgrid: false, linecolor: LINE, ticks: 'outside', tickcolor: LINE, tickfont: { size: 9 } },
+        yaxis: { title: { text: '累計', font: { size: 10 } }, gridcolor: GRID, zeroline: false, nticks: 6, tickfont: { size: 9 } },
+        legend: { orientation: 'h', y: -0.18, x: 0, font: { size: 9 }, bgcolor: 'rgba(0,0,0,0)' },
+      };
+      window.Plotly.react(elS, applyV(dataS, V.S), layoutS, this._cfg());
+    }
+
+    // ---- 3 editable small charts: type / border / color / opacity / width from state.cfg ----
+    const toRgba = (hex, a) => { const n = parseInt(hex.replace('#', ''), 16); return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')'; };
+    const drawSmall = (el, c, seed) => {
+      if (!el) return;
+      // three-institution net buy/sell, stacked: buy=full colour, sell=same colour @0.75
+      if (c.kind === 'inst3') {
+        const M = 60, x = this._tradingDays(M), r = this._rng(seed);
+        const insts = [['外資', '#4c78a8'], ['投信', '#c4943a'], ['自營', '#5a9e6f']];
+        const data = insts.map((it, k) => {
+          const y = []; for (let i = 0; i < M; i++) y.push(+((r() - 0.46) * (28 - k * 7)).toFixed(1));
+          const colors = y.map(v => v >= 0 ? toRgba(it[1], 1) : toRgba(it[1], 0.75));
+          return { x, y, name: it[0], type: 'bar', marker: { color: colors, line: { width: 0 } }, hovertemplate: '%{y:,.0f}<extra>' + it[0] + '</extra>' };
+        });
+        const ti = []; for (let i = 0; i < M; i += 12) ti.push(i); const tv = ti.map(i => x[i]);
+        const layout = {
+          autosize: true, margin: { l: 42, r: 10, t: 8, b: 40 }, barmode: 'relative', bargap: 0.2,
+          paper_bgcolor: PAPER, plot_bgcolor: PLOT, font: FONT, hovermode: 'x unified',
+          xaxis: { type: 'category', tickmode: 'array', tickvals: tv, ticktext: tv, showgrid: false, linecolor: LINE, ticks: 'outside', tickcolor: LINE, tickfont: { size: 8 } },
+          yaxis: { gridcolor: GRID, zeroline: true, zerolinecolor: LINE, tickfont: { size: 8 }, nticks: 5 },
+          legend: { orientation: 'h', y: -0.22, x: 0, font: { size: 8 }, bgcolor: 'rgba(0,0,0,0)' },
+        };
+        window.Plotly.react(el, data, layout, this._cfg());
+        return;
+      }
+      const M = 60, x = this._tradingDays(M), r = this._rng(seed);
+      let y;
+      if (c.kind === 'flow') { y = []; for (let i = 0; i < M; i++) y.push(+((r() - 0.45) * 42).toFixed(1)); }
+      else if (c.kind === 'level') { y = this._norm(this._walk(M, 100, 0.0005, 0.01, seed)); }
+      else { y = []; for (let i = 0; i < M; i++) y.push(Math.round(6000 + r() * 8000)); }
+      let tr;
+      if (c.type === 'line') tr = { x, y, type: 'scatter', mode: 'lines', line: { color: toRgba(c.color, c.opacity), width: c.width }, fill: 'tozeroy', fillcolor: toRgba(c.color, 0.6) };
+      else tr = { x, y, type: 'bar', marker: { color: toRgba(c.color, c.opacity), line: { color: c.border ? c.color : 'rgba(0,0,0,0)', width: c.border ? c.width : 0 } } };
+      tr.hovertemplate = '%{y:,.1f}<extra></extra>';
+      const ti = []; for (let i = 0; i < M; i += 12) ti.push(i); const tv = ti.map(i => x[i]);
+      const layout = {
+        autosize: true, margin: { l: 42, r: 10, t: 8, b: 32 }, bargap: 0.15,
+        paper_bgcolor: PAPER, plot_bgcolor: PLOT, font: FONT, hovermode: 'x unified', showlegend: false,
+        xaxis: { type: 'category', tickmode: 'array', tickvals: tv, ticktext: tv, showgrid: false, linecolor: LINE, ticks: 'outside', tickcolor: LINE, tickfont: { size: 8 } },
+        yaxis: { gridcolor: GRID, zeroline: true, zerolinecolor: LINE, tickfont: { size: 8 }, nticks: 5 },
+      };
+      window.Plotly.react(el, [tr], layout, this._cfg());
+    };
+    const cfg = this.state.cfg;
+    drawSmall(this.elC1, cfg.c1, 5);
+    drawSmall(this.elC2, cfg.c2, 9);
+    drawSmall(this.elC3, cfg.c3, 14);
+
+    // ---- world map: global indices, marker color = TW red(up)/green(down), size = |chg| ----
+    if (this.elG) {
+      const MK = [
+        ['台股', 25.0, 121.5], ['日經', 35.7, 139.7], ['上證', 31.2, 121.5], ['恆生', 22.3, 114.2], ['韓股', 37.6, 127.0],
+        ['SENSEX', 19.1, 72.9], ['STI', 1.3, 103.8], ['SET', 13.7, 100.5], ['JKSE', -6.2, 106.8], ['KLCI', 3.1, 101.7],
+        ['S&P500', 40.7, -74.0], ['NASDAQ', 40.0, -83.0], ['道瓊', 38.9, -77.0], ['TSX', 43.7, -79.4], ['IPC', 19.4, -99.1], ['BOVESPA', -23.5, -46.6],
+        ['FTSE', 51.5, -0.1], ['DAX', 50.1, 8.7], ['CAC', 48.9, 2.3], ['AEX', 52.4, 4.9], ['SMI', 46.9, 7.4], ['MIB', 45.5, 9.2], ['IBEX', 40.4, -3.7], ['MOEX', 55.7, 37.6],
+        ['TASI', 24.7, 46.7], ['ASX', -33.9, 151.2],
+      ];
+      // spread labels to avoid the European/US clusters colliding
+      const TPOS = { '台股': 'middle left', '日經': 'top center', '上證': 'top right', '恆生': 'bottom center', '韓股': 'middle right',
+        'SENSEX': 'bottom center', 'STI': 'bottom center', 'SET': 'middle left', 'JKSE': 'bottom center', 'KLCI': 'top center',
+        'S&P500': 'middle left', 'NASDAQ': 'bottom center', '道瓊': 'bottom right', 'TSX': 'top center', 'IPC': 'bottom left', 'BOVESPA': 'bottom center',
+        'FTSE': 'middle left', 'DAX': 'top center', 'CAC': 'bottom center', 'AEX': 'top right', 'SMI': 'bottom left', 'MIB': 'bottom right', 'IBEX': 'middle left', 'MOEX': 'middle right',
+        'TASI': 'bottom center', 'ASX': 'top center' };
+      const rg = this._rng(202);
+      const chg = MK.map(() => +((rg() - 0.45) * 4).toFixed(2));
+      const sel = this.state.mapSel || '台股';
+      const G = this.state.vcfg.G;
+      const REGIONS = { world: { lon: 10, lat: 18, scale: 1 }, asia: { lon: 118, lat: 26, scale: 2.4 }, na: { lon: -96, lat: 40, scale: 2.6 }, eu: { lon: 12, lat: 50, scale: 3 } };
+      const REGION = REGIONS[this.state.mapRegion] || REGIONS.world;
+      const selM = MK.find(m => m[0] === sel) || MK[0];
+      const dataG = [{
+        type: 'scattergeo', lon: MK.map(m => m[2]), lat: MK.map(m => m[1]),
+        text: MK.map((m, i) => m[0] + ' ' + (chg[i] > 0 ? '+' : '') + chg[i] + '%'),
+        mode: 'markers+text',
+        textposition: MK.map(m => TPOS[m[0]] || 'top center'),
+        textfont: { family: 'DM Mono, monospace', size: 6.5, color: '#1e1d1a' },
+        marker: { size: MK.map((m, i) => ((m[0] === sel ? 9 : 5.5) + Math.abs(chg[i]) * 1.1) * G.widthMul), color: chg, cmin: -3, cmid: 0, cmax: 3, opacity: G.opacity,
+          colorscale: [[0, '#5a9e6f'], [0.5, '#e9e5dc'], [1, '#c96b5a']],
+          line: { color: MK.map(m => m[0] === sel ? '#1e1d1a' : '#fff'), width: MK.map(m => m[0] === sel ? 1.6 : 0.5) },
+          colorbar: { title: { text: '漲跌%', font: { size: 8 } }, thickness: 8, len: 0.5, tickfont: { size: 7 }, outlinewidth: 0 } },
+        hovertemplate: '%{text}<extra>點擊 → 載入走勢</extra>',
+      }];
+      const layoutG = {
+        autosize: true, margin: { l: 6, r: 6, t: 6, b: 6 }, paper_bgcolor: PAPER, font: FONT,
+        geo: { projection: { type: 'natural earth', scale: REGION.scale }, center: { lon: REGION.lon, lat: REGION.lat },
+          showland: true, landcolor: '#eceae3', showcountries: true, countrycolor: '#d4cfc0',
+          showocean: true, oceancolor: '#eef3f4', coastlinecolor: '#cfc9ba', bgcolor: PAPER, showframe: false,
+          showlakes: false, lataxis: { range: [-58, 84] }, lonaxis: { range: [-170, 190] } },
+        dragmode: false,
+      };
+      window.Plotly.react(this.elG, dataG, layoutG, this._cfg());
+      const gd = this.elG;
+      if (gd.removeAllListeners) gd.removeAllListeners('plotly_click');
+      gd.on('plotly_click', ev => {
+        const p = ev.points && ev.points[0];
+        if (!p) return;
+        const m = MK[p.pointNumber];
+        if (m) this.setState({ mapSel: m[0] });
+      });
+    }
+
+    // ---- Chart T: selected-index trend (area + volume + right-edge price tag) ----
+    if (this.elT) {
+      const name = this.state.mapSel || '台股';
+      const tf = this.state.tf || '1Y';
+      const S = this._indexSeries(name, tf);
+      const { x, price, vol } = S, n = price.length;
+      const col = S.up ? UP : DOWN;
+      const fillc = S.up ? 'rgba(201,107,90,0.13)' : 'rgba(90,158,111,0.13)';
+      const pmin = Math.min(...price), pmax = Math.max(...price), pad = (pmax - pmin) * 0.14;
+      const volCol = price.map((p, i) => i && p >= price[i - 1] ? 'rgba(201,107,90,0.5)' : 'rgba(90,158,111,0.5)');
+      const ti = [], step = Math.max(1, Math.round(n / 8)); for (let i = 0; i < n; i += step) ti.push(i); const tv = ti.map(i => x[i]);
+      const mode = this.state.trendMode || 'line';
+      const rgbOf = up => up ? '201,107,90' : '90,158,111';
+      let dataT;
+      if (mode === 'stack') {
+        // split index into 3 same-colour-family constituents, stacked area, fill 0.7
+        const r = this._rng((name.length * 31 + 5));
+        const w = [0.5, 0.32, 0.18], labels = ['大型', '中型', '小型'], alphas = [0.6, 0.42, 0.26];
+        const baseRgb = rgbOf(S.up);
+        dataT = labels.map((lb, k) => {
+          const y = price.map(p => +(p * w[k] * (0.92 + r() * 0.16)).toFixed(2));
+          return { x, y, name: lb, type: 'scatter', mode: 'lines', stackgroup: 'idx',
+            line: { color: 'rgba(' + baseRgb + ',' + Math.min(1, alphas[k] + 0.2) + ')', width: 1 },
+            fillcolor: 'rgba(' + baseRgb + ',' + alphas[k] + ')',
+            hovertemplate: '%{y:,.0f}<extra>' + lb + '</extra>' };
+        });
+        dataT.push({ x, y: vol, name: '量', type: 'bar', yaxis: 'y2', marker: { color: volCol, line: { width: 0 } }, hovertemplate: '%{y:,}<extra>量</extra>' });
+      } else {
+        // single line: area hugs the line (fill down to tight floor), dashed period-start baseline,
+        // light SMA context line, and a marked last point. Colour-by-direction at 0.75.
+        const floor = pmin - pad;
+        const sw = Math.max(2, Math.round(n / 6));
+        const sma = price.map((_, i) => { const a = Math.max(0, i - sw + 1); let s = 0; for (let k = a; k <= i; k++) s += price[k]; return +(s / (i - a + 1)).toFixed(2); });
+        const base0 = price[0];
+        dataT = [
+          // floor anchor (invisible) so 'tonexty' fill is a thin band hugging the line, not a block to zero
+          { x, y: price.map(() => floor), type: 'scatter', mode: 'lines', line: { width: 0, color: 'rgba(0,0,0,0)' }, hoverinfo: 'skip', showlegend: false },
+          { x, y: price, name, type: 'scatter', mode: 'lines', line: { color: col, width: 1.7, shape: 'spline', smoothing: 0.6 }, fill: 'tonexty', fillcolor: 'rgba(' + rgbOf(S.up) + ',0.6)', hovertemplate: '%{y:,.2f}<extra>' + name + '</extra>' },
+          // period-start baseline (dashed) so gain/loss is visible at a glance
+          { x, y: price.map(() => base0), type: 'scatter', mode: 'lines', line: { color: 'rgba(31,42,42,0.4)', width: 1, dash: 'dot' }, hoverinfo: 'skip', showlegend: false },
+          // SMA context line (light, same hue)
+          { x, y: sma, name: 'SMA', type: 'scatter', mode: 'lines', line: { color: 'rgba(' + rgbOf(S.up) + ',0.55)', width: 1 }, hovertemplate: '%{y:,.2f}<extra>SMA</extra>' },
+          // last point marker
+          { x: [x[n - 1]], y: [price[n - 1]], type: 'scatter', mode: 'markers', marker: { color: col, size: 5, line: { color: '#fff', width: 1.2 } }, hoverinfo: 'skip', showlegend: false },
+          { x, y: vol, name: '量', type: 'bar', yaxis: 'y2', marker: { color: volCol, line: { width: 0 } }, hovertemplate: '%{y:,}<extra>量</extra>' },
+        ];
+      }
+      const yRange = mode === 'stack' ? null : [pmin - pad, pmax + pad];
+      const layoutT = {
+        autosize: true, margin: { l: 4, r: 4, t: mode === 'stack' ? 14 : 4, b: 4 }, bargap: 0.55,
+        paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)', font: FONT, hovermode: 'x unified', showlegend: false,
+        xaxis: { type: 'category', anchor: 'y2', showgrid: false, showticklabels: false, ticks: '', zeroline: false, linecolor: 'rgba(0,0,0,0)', fixedrange: true },
+        yaxis: { domain: [0.24, 1], side: 'right', showgrid: false, showticklabels: false, zeroline: false, range: yRange, fixedrange: true },
+        yaxis2: { domain: [0, 0.15], side: 'right', showgrid: false, showticklabels: false, zeroline: false, fixedrange: true },
+      };
+      window.Plotly.react(this.elT, applyV(dataT, V.T), layoutT, this._cfg());
+    }
+  }
+
+  _cfg() {
+    return { responsive: true, displaylogo: false,
+      modeBarButtonsToRemove: ['lasso2d', 'select2d', 'autoScale2d'],
+      toImageButtonOptions: { format: 'png', width: 1000, height: 560 } };
+  }
+
+  // ---- sortable table ----
+  _base() {
+    return [
+      { panel: '① 股價指數', series: 'S&P 500', value: 6234.5, chg: 0.82 },
+      { panel: '① 股價指數', series: '台股加權 ^TWII', value: 23150.2, chg: -1.34 },
+      { panel: '① 股價指數', series: '韓股 KOSPI', value: 2710.8, chg: 0.45 },
+      { panel: '⑤ 10Y-2Y 利差', series: 'Spread', value: 0.42, chg: 0.07 },
+      { panel: '③ 波動·殖利率', series: 'VIX', value: 14.7, chg: -2.10 },
+      { panel: '⑨ 非農·失業率', series: 'NFP (千人)', value: 206.0, chg: 1.12 },
+    ];
+  }
+
+  _etfMatrix() {
+    const RC = { G: 'var(--green)', Y: 'var(--amber)', R: 'var(--red)' };
+    const sc = v => v >= 0 ? 'color:var(--up);' : 'color:var(--down);';
+    const sg = v => (v > 0 ? '+' : '') + v.toFixed(1) + '%';
+    // [name, code, active, group, aum, ret, flow(億), prem%, hot, lead]
+    const D = [
+      ['野村臺灣創新科技', '00935', true, '半導體·AI', 182, 4.2, 12.4, 0.18, 'G', 'G'],
+      ['群益台灣強棒', '00946', true, '電子·權值', 96, 2.1, 5.8, 0.09, 'G', 'Y'],
+      ['統一台灣高息動能', '00939', true, '高息·金融', 254, -1.3, -3.2, -0.21, 'Y', 'Y'],
+      ['主動野村臺灣優選', '00980A', true, '跨產業·主動', 71, 3.6, 8.9, 0.14, 'G', 'G'],
+      ['主動統一台股增長', '00981A', true, '成長·主動', 58, 1.4, 2.1, 0.04, 'Y', 'G'],
+      ['元大台灣50', '0050', false, '權值·被動', 4120, 1.8, 22.6, 0.02, 'G', 'Y'],
+      ['富邦台50', '006208', false, '權值·被動', 980, 1.7, 6.4, 0.01, 'G', 'Y'],
+      ['元大高股息', '0056', false, '高息·被動', 3180, -0.9, -8.1, -0.05, 'Y', 'R'],
+      ['國泰永續高股息', '00878', false, '高息·被動', 2890, -1.1, -5.6, -0.07, 'R', 'R'],
+    ];
+    return D.map((r, i) => ({
+      name: r[0], code: r[1], group: r[3],
+      aum: r[4].toLocaleString('en-US'),
+      ret: sg(r[5]), retCss: sc(r[5]),
+      flow: (r[6] > 0 ? '+' : '') + r[6].toFixed(1), flowCss: sc(r[6]),
+      prem: (r[7] > 0 ? '+' : '') + r[7].toFixed(2) + '%', premCss: Math.abs(r[7]) > 0.15 ? 'color:var(--am);' : 'color:var(--mut);',
+      hot: r[8], hotCss: RC[r[8]], lead: r[9], leadCss: RC[r[9]],
+      activeCss: r[2] ? 'box-shadow:inset 0 0 0 1.6px var(--up);border-radius:4px;' : '',
+      bg: i % 2 ? '#f6f4ef' : 'var(--paper)',
+    }));
+  }
+
+  renderVals() {
+    const hv = this.props.headerVariant || 'spec';
+    const tab = this.state.tab;
+    const set = t => () => this.setState({ tab: t });
+    const tc = on => on
+      ? 'background:var(--bg);color:var(--ink);border-color:var(--ink);box-shadow:0 -2px 0 var(--accent) inset;'
+      : 'background:var(--soft);color:var(--mut);';
+
+    // sort
+    const { sortKey, sortDir } = this.state;
+    const rows0 = this._base().slice().sort((a, b) => {
+      const va = a[sortKey], vb = b[sortKey];
+      if (typeof va === 'number') return (va - vb) * sortDir;
+      return String(va).localeCompare(String(vb)) * sortDir;
+    });
+    const rows = rows0.map((r, i) => ({
+      panel: r.panel, series: r.series,
+      valueFmt: r.value.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }),
+      chgFmt: (r.chg > 0 ? '+' : '') + r.chg.toFixed(2) + '%',
+      chgCss: r.chg > 0 ? 'color:var(--up);' : (r.chg < 0 ? 'color:var(--down);' : 'color:var(--mut);'),
+      bg: i % 2 ? '#f6f4ef' : 'var(--paper)',
+    }));
+    const ind = k => sortKey === k ? (sortDir === 1 ? '▲' : '▼') : '';
+    const sortBy = k => () => this.setState(s => ({ sortKey: k, sortDir: s.sortKey === k ? -s.sortDir : 1 }));
+
+    const navTo = t => () => this.setState({ tab: t, navOpen: false });
+    const nv = on => on ? 'background:var(--soft);box-shadow:inset 3px 0 0 var(--accent);' : '';
+
+    // AOpt demo content + controls
+    const aoptText = this.state.aoptText || 'med';
+    const aoptContent = {
+      short: { title: '台積電', body: '單一標的，標題字級自動放到框內最大。' },
+      med: { title: '族群自動分類引擎', body: '凝聚清洗 → Leader / Peer / Laggard 三分類 → 有效性驗證。標題與內文各自二分搜尋最適字級。' },
+      long: { title: '跨產業輪動 · Leader/Peer/Laggard 有效性驗證', body: '相關熱力圖(高→低) · benchmark 錨點(可選) · 無風險利率(可選) · 領先性 / 同步性 / 前瞻單調性驗證。脫隊股以相關係數踢除；追蹤指標預設用 Leader(最敏感)，可選 Leader+Peer。內文在固定框高內自動縮放至不溢出。' },
+    }[aoptText];
+    const aoptBtn = on => on ? 'background:var(--ink);color:#fff;' : 'background:var(--soft);color:var(--mut);';
+
+    // editable small-chart handlers + exposed cfg
+    const cfg = this.state.cfg, eo = this.state.editOpen;
+    const setCfg = (id, patch) => this.setState(s => ({ cfg: { ...s.cfg, [id]: { ...s.cfg[id], ...patch } } }));
+    const H = {};
+    ['c1', 'c2', 'c3'].forEach(id => {
+      const U = id.toUpperCase();
+      H['edit' + U] = () => this.setState(s => ({ editOpen: { ...s.editOpen, [id]: !s.editOpen[id] } }));
+      H['src' + U] = e => setCfg(id, { source: e.target.value });
+      H['type' + U] = e => setCfg(id, { type: e.target.value });
+      H['border' + U] = e => setCfg(id, { border: e.target.value === 'on' });
+      H['color' + U] = e => setCfg(id, { color: e.target.value });
+      H['opacity' + U] = e => setCfg(id, { opacity: +e.target.value });
+      H['width' + U] = e => setCfg(id, { width: +e.target.value });
+    });
+    const expand = c => ({ ...c, borderStr: c.border ? 'on' : 'off' });
+
+    // universal per-chart view-config (source / width / opacity) for the 6 main panels
+    const vcfg = this.state.vcfg, ve = this.state.vEdit;
+    const setV = (id, patch) => this.setState(s => ({ vcfg: { ...s.vcfg, [id]: { ...s.vcfg[id], ...patch } } }));
+    const VH = {};
+    ['A', 'B', 'C', 'K', 'M', 'S', 'T', 'G'].forEach(id => {
+      VH['vedit' + id] = () => this.setState(s => ({ vEdit: { ...s.vEdit, [id]: !s.vEdit[id] } }));
+      VH['vsrc' + id] = e => setV(id, { source: e.target.value });
+      VH['vwidth' + id] = e => setV(id, { widthMul: +e.target.value });
+      VH['vopac' + id] = e => setV(id, { opacity: +e.target.value });
+    });
+
+    // selected-index trend header + timeframe controls
+    const SS = this._indexSeries(this.state.mapSel || '台股', this.state.tf || '60D');
+    const tfSet = t => () => this.setState({ tf: t });
+    const tfc = on => on
+      ? 'background:var(--ink);color:#fff;'
+      : 'background:var(--soft);color:var(--mut);';
+    const curTf = this.state.tf || '60D';
+
+    // 3-day change bars on a shared scale (max abs across all indices → comparable heights)
+    const sel = this.state.mapSel || '台股';
+    let sMax = 0.01;
+    this._idxNames().forEach(nm => this._dayChanges(nm, 3).forEach(v => { sMax = Math.max(sMax, Math.abs(v)); }));
+    const d3labels = ['前2', '前1', '今'];
+    const days3 = this._dayChanges(sel, 3).map((v, i) => {
+      const h = Math.max(2, Math.round(Math.abs(v) / sMax * 22)), up = v >= 0;
+      return {
+        label: d3labels[i], val: (v > 0 ? '+' : '') + v.toFixed(2),
+        txtCss: up ? 'color:var(--up);' : 'color:var(--down);',
+        barCss: (up ? 'bottom:50%;' : 'top:50%;') + 'height:' + h + 'px;background:' + (up ? 'var(--up)' : 'var(--down)') + ';',
+      };
+    });
+
+    // small-multiples: all indices at once, shared amplitude scale
+    const miniCards = this._idxNames().map(nm => {
+      const ch = this._indexSeries(nm, '60D').pct;
+      const up = ch >= 0;
+      return {
+        name: nm, pct: (ch > 0 ? '+' : '') + ch.toFixed(2) + '%',
+        pctCss: up ? 'color:var(--up);' : 'color:var(--down);',
+        spark: this._spark(nm, 70, 130),
+        selCss: nm === sel ? 'border-color:var(--ink);box-shadow:0 0 0 1px var(--ink);' : '',
+        pick: () => this.setState({ mapSel: nm }),
+      };
+    });
+    const tmSet = m => () => this.setState({ trendMode: m });
+    const tmc = on => on ? 'background:var(--accent);color:#fff;' : 'background:var(--soft);color:var(--mut);';
+    const curTm = this.state.trendMode || 'line';
+
+    return {
+      rootRef: el => { this.root = el; },
+      topRef: el => { this.topEl = el; },
+      navTransform: this.state.navOpen ? 'translateX(0)' : 'translateX(-100%)',
+      openNav: () => this.setState({ navOpen: true }),
+      closeNav: () => this.setState({ navOpen: false }),
+      toggleNav: () => this.setState(s => ({ navOpen: !s.navOpen })),
+      navFound: navTo('found'), navComp: navTo('comp'), navCharts: navTo('charts'),
+      nvFound: nv(tab === 'found'), nvComp: nv(tab === 'comp'), nvCharts: nv(tab === 'charts'),
+      elARef: el => { this.elA = el; },
+      elBRef: el => { this.elB = el; },
+      elCRef: el => { this.elC = el; },
+      elKRef: el => { this.elK = el; },
+      kfYtd: () => this.setState({ kRange: 'ytd' }), kf23: () => this.setState({ kRange: '2023' }), kf24: () => this.setState({ kRange: '2024' }), kf25: () => this.setState({ kRange: '2025' }),
+      kgDay: () => this.setState({ kAgg: 'day' }), kgMon: () => this.setState({ kAgg: 'mon' }), kgYr: () => this.setState({ kAgg: 'yr' }),
+      kcDay: (this.state.kAgg || 'day') === 'day' ? 'background:var(--accent);color:#fff;' : 'background:var(--soft);color:var(--mut);',
+      kcMon: this.state.kAgg === 'mon' ? 'background:var(--accent);color:#fff;' : 'background:var(--soft);color:var(--mut);',
+      kcYr: this.state.kAgg === 'yr' ? 'background:var(--accent);color:#fff;' : 'background:var(--soft);color:var(--mut);',
+      kcYtd: (this.state.kRange || 'ytd') === 'ytd' ? 'background:var(--ink);color:#fff;' : 'background:var(--soft);color:var(--mut);',
+      kc23: this.state.kRange === '2023' ? 'background:var(--ink);color:#fff;' : 'background:var(--soft);color:var(--mut);',
+      kc24: this.state.kRange === '2024' ? 'background:var(--ink);color:#fff;' : 'background:var(--soft);color:var(--mut);',
+      kc25: this.state.kRange === '2025' ? 'background:var(--ink);color:#fff;' : 'background:var(--soft);color:var(--mut);',
+      elMRef: el => { this.elM = el; },
+      elSRef: el => { this.elS = el; },
+      elC1Ref: el => { this.elC1 = el; },
+      elC2Ref: el => { this.elC2 = el; },
+      elC3Ref: el => { this.elC3 = el; },
+      elGRef: el => { this.elG = el; },
+      usMiniCards: this._usPanel(),
+      rgWorld: () => this.setState({ mapRegion: 'world' }), rgAsia: () => this.setState({ mapRegion: 'asia' }),
+      rgNA: () => this.setState({ mapRegion: 'na' }), rgEU: () => this.setState({ mapRegion: 'eu' }),
+      rgcWorld: (this.state.mapRegion || 'world') === 'world' ? 'background:var(--ink);color:#fff;' : 'background:rgba(255,255,255,.8);color:var(--ink2);border:1px solid var(--line);',
+      rgcAsia: this.state.mapRegion === 'asia' ? 'background:var(--ink);color:#fff;' : 'background:rgba(255,255,255,.8);color:var(--ink2);border:1px solid var(--line);',
+      rgcNA: this.state.mapRegion === 'na' ? 'background:var(--ink);color:#fff;' : 'background:rgba(255,255,255,.8);color:var(--ink2);border:1px solid var(--line);',
+      rgcEU: this.state.mapRegion === 'eu' ? 'background:var(--ink);color:#fff;' : 'background:rgba(255,255,255,.8);color:var(--ink2);border:1px solid var(--line);',
+      elTRef: el => { this.elT = el; },
+      aoptFrameRef: el => {
+        this.aoptFrame = el;
+        if (el) {
+          if (this._aoptRO) this._aoptRO.disconnect();
+          this._aoptRO = new ResizeObserver(() => this.fitAopt());
+          this._aoptRO.observe(el);
+          requestAnimationFrame(() => this.fitAopt());
+        }
+      },
+      aoptReadoutRef: el => { this.aoptReadout = el; },
+      aoptW: this.state.aoptW, aoptWpx: this.state.aoptW + 'px',
+      aoptWSet: e => this.setState({ aoptW: +e.target.value }),
+      aoptTitle: aoptContent.title, aoptBody: aoptContent.body,
+      aoptShort: () => this.setState({ aoptText: 'short' }),
+      aoptMed: () => this.setState({ aoptText: 'med' }),
+      aoptLong: () => this.setState({ aoptText: 'long' }),
+      aoptcShort: aoptBtn(aoptText === 'short'), aoptcMed: aoptBtn(aoptText === 'med'), aoptcLong: aoptBtn(aoptText === 'long'),
+      ...H, ...VH,
+      etfRows: this._etfMatrix(),
+      selName: this.state.mapSel || '台股',
+      selLast: SS.last.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      selPct: (SS.pct > 0 ? '+' : '') + SS.pct.toFixed(2) + '%',
+      selPctCss: SS.up ? 'background:var(--up);' : 'background:var(--down);',
+      selPctBg: SS.up ? 'background:var(--up);' : 'background:var(--down);',
+      selPctArrow: SS.up ? '▲' : '▼',
+      tfLabel: this.state.tf || '60D',
+      tfD: tfSet('1D'), tf5D: tfSet('5D'), tf10D: tfSet('10D'), tf20D: tfSet('20D'), tf60D: tfSet('60D'), tf120D: tfSet('120D'), tf240D: tfSet('240D'),
+      tcD: tfc(curTf === '1D'), tc5D: tfc(curTf === '5D'), tc10D: tfc(curTf === '10D'), tc20D: tfc(curTf === '20D'), tc60D: tfc(curTf === '60D'), tc120D: tfc(curTf === '120D'), tc240D: tfc(curTf === '240D'),
+      days3, miniCards,
+      tmLine: tmSet('line'), tmStack: tmSet('stack'),
+      tmcLine: tmc(curTm === 'line'), tmcStack: tmc(curTm === 'stack'),
+      openC1: eo.c1, openC2: eo.c2, openC3: eo.c3,
+      c1: expand(cfg.c1), c2: expand(cfg.c2), c3: expand(cfg.c3),
+      vEditA: ve.A, vEditB: ve.B, vEditC: ve.C, vEditK: ve.K, vEditM: ve.M, vEditS: ve.S, vEditT: ve.T, vEditG: ve.G,
+      vA: vcfg.A, vB: vcfg.B, vC: vcfg.C, vK: vcfg.K, vM: vcfg.M, vS: vcfg.S, vT: vcfg.T, vG: vcfg.G,
+      hv_spec: hv === 'spec', hv_seal: hv === 'seal', hv_minimal: hv === 'minimal',
+      isFound: tab === 'found', isComp: tab === 'comp', isCharts: tab === 'charts',
+      tabFound: set('found'), tabComp: set('comp'), tabCharts: set('charts'),
+      tcFound: tc(tab === 'found'), tcComp: tc(tab === 'comp'), tcCharts: tc(tab === 'charts'),
+      rows,
+      sortPanel: sortBy('panel'), sortSeries: sortBy('series'), sortValue: sortBy('value'), sortChg: sortBy('chg'),
+      indPanel: ind('panel'), indSeries: ind('series'), indValue: ind('value'), indChg: ind('chg'),
+    };
+  }
+}
+</script>
+</body>
+</html>

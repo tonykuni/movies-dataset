@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+<style>
+  :root{
+    --bg:#f5f4f0; --paper:#ffffff; --paper2:#fafaf8;
+    --ink:#1e1d1a; --ink2:#33403f; --mut:#6b6860; --mut2:#9c9890;
+    --line:#dbd9d3; --soft:#ecebe6; --accent:#439a9a;
+    --blue:#4c78a8; --teal:#439a9a; --up:#c96b5a; --down:#5a9e6f; --am:#c4943a; --co:#c96b5a; --vi:#7a6daa; --gn:#5a9e6f; --ro:#b05580;
+    --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);}
+  body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  ::selection{background:rgba(67,154,154,.22);}
+</style>
+<style>@media print{@page{size:A4;margin:11mm}html,body{background:#fff !important}.__pdfbtn{display:none !important}*{box-shadow:none !important}[style*="position:sticky"]{position:static !important}[style*="overflow-y:auto"],[style*="overflow:auto"],[style*="overflow-x:auto"]{overflow:visible !important;max-height:none !important}table,section,.brk{break-inside:avoid}}</style>
+<script>window.addEventListener('load',function(){if(document.getElementById('__pdfbtn'))return;var b=document.createElement('div');b.id='__pdfbtn';b.className='__pdfbtn';b.innerHTML='<img src="assets/pdf-icon.png" alt="PDF" style="width:30px;height:30px;display:block">';b.title='A4 PDF';b.style.cssText='position:fixed;top:12px;right:14px;z-index:99999;background:transparent;border:none;padding:0;font:700 10px monospace;letter-spacing:.5px;cursor:pointer;';b.onclick=function(){window.print()};document.body.appendChild(b);});</script>
+</helmet>
+
+<div ref="{{ rootRef }}" style="max-width:1340px;margin:0 auto;padding:0 22px 46px;">
+
+  <div style="position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50;"></div>
+
+  <header style="position:relative;padding:22px 0 10px;margin-bottom:12px;border-bottom:2px solid var(--ink);">
+    <div style="font:700 10px 'DM Mono',monospace;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px;">VERITAS INTELLIGENCE ANALYTICS · 事件時間軸矩陣</div>
+    <h1 style="font:800 18px/1.2 'Syne',sans-serif;color:var(--ink);">事件時間軸 <span style="color:var(--up);">矩陣</span> · Event Timeline Matrix</h1>
+    <p style="margin-top:5px;font:400 10.5px/1.5 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:920px;">Crisis 母事件 + Sub-Event 子事件 · 矩陣化管理 · 勾選即渲染 · 期間陰影 + 垂直事件線 + 自動高低點。紅漲綠跌。</p>
+  </header>
+
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#1e1d1a;border-radius:3px;padding:6px 13px;margin-bottom:8px;">
+    <span style="display:inline-flex;align-items:center;gap:6px;font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase;">🔒 VISUAL LOCK · 全格式鎖定</span>
+    <span style="display:inline-flex;align-items:center;gap:4px;font:500 8px 'DM Mono',monospace;color:#cfcabf;">色票
+      <span style="width:11px;height:11px;border-radius:2px;background:#4c78a8;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#439a9a;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#9c9890;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#c96b5a;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#5a9e6f;"></span>
+      <span style="width:11px;height:11px;border-radius:2px;background:#f5f4f0;border:1px solid #555;"></span>
+    </span>
+    <span style="font:500 8px 'DM Mono',monospace;color:#8a948f;">字體 Syne / DM Sans / DM Mono</span>
+    <span style="font:500 8px 'DM Mono',monospace;color:#8a948f;">漲紅跌綠 · 千分位 · 熱力色階</span>
+    <span style="margin-left:auto;font:700 8px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:2px 8px;">v1.0 · LOCKED 2026-06-22</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;background:#fff;border:1px solid #dbd9d3;border-left:3px solid #439a9a;border-radius:3px;padding:6px 13px;margin-bottom:12px;">
+    <span style="font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;">🛰 資料請求 · VDF ENGINES</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">TWSE→rest</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#c4943a;border-radius:3px;padding:1px 6px;">SITCA→parse</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">MOPS→parse</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">yfinance→pyproc</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#c0584e;border-radius:3px;padding:1px 6px;">FactSet→keyed</span>
+    <span style="font:600 7.5px 'DM Mono',monospace;color:#fff;background:#5a9e6f;border-radius:3px;padding:1px 6px;">FRED→keyed</span>
+    <span style="margin-left:auto;font:500 8px 'DM Mono',monospace;color:#9c9890;">request.json → VDF 擷取 → 雙重驗算 → Parquet → JSON</span>
+  </div>
+
+  <details data-contract="1" style="margin-bottom:12px;border:1px solid #dbd9d3;border-left:3px solid #1e1d1a;border-radius:3px;background:#fbfaf7;overflow:hidden;">
+    <summary style="cursor:pointer;user-select:none;padding:6px 13px;font:700 8.5px 'DM Mono',monospace;letter-spacing:.6px;color:#1e1d1a;list-style:none;">📜 引擎連接合約 · request.json（點擊展開 · 可選取複製）</summary>
+    <pre style="margin:0;padding:10px 13px;background:#1e1d1a;color:#cfe3d6;font:500 9px/1.55 'DM Mono',monospace;white-space:pre;overflow-x:auto;">{
+  "request": "event_timeline_matrix",
+  "asof": "2026-06-22",
+  "universe": { "market": "TW", "exchange": ["TWSE","TPEX"] },
+  "sources": ["TWSE","TPEX","SITCA","MOPS","yfinance","FactSet","FRED"],
+  "engines": { "TWSE":"rest","TPEX":"rest","SITCA":"parse","MOPS":"parse","yfinance":"pyproc","FactSet":"keyed","FRED":"keyed" },
+  "range": { "start":"1996-01-01","end":"latest" },
+  "verify": "double_identity",
+  "db_discover": { "folder":"D:\\VDF\\databases\\","recursive":true,"match":["*.parquet","*.duckdb","*.db","*.csv"] },
+  "sink": { "parquet":"vdf/event_timeline_matrix/","export":"event_timeline_matrix.json" }
+}</pre>
+    <div style="padding:6px 13px;font:400 8px 'DM Sans','Noto Sans TC',sans-serif;color:#9c9890;">本檔即以此合約向 VDF 引擎請求 → 依 engines 分流(rest/parse/pyproc/keyed) → 雙重恆等驗算 → 落地 Parquet → 匯出 <b style="color:#6b6860;">event_timeline_matrix.json</b> 覆蓋本頁資料源。</div>
+  </details>
+
+  <!-- FULL-WIDTH TIMELINE RIBBON -->
+  <div style="border:1px solid var(--line);border-radius:2px;background:var(--paper);padding:8px 12px 6px;margin-bottom:12px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
+      <span style="font:700 9px 'DM Mono',monospace;letter-spacing:1px;color:var(--mut);text-transform:uppercase;">時間軸總覽 · Timeline Overview</span>
+      <span style="font:500 8px 'DM Mono',monospace;color:var(--mut2);">起訖實線 · 事件虛線 · 區間 0.5 · 1929→2025</span>
+    </div>
+    <div style="width:100%;">{{ timelineSvg }}</div>
+  </div>
+
+  <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;">
+
+    <!-- LEFT · crisis tree + controls -->
+    <sc-if value="{{ leftOpen }}">
+    <div style="width:360px;flex:none;display:flex;flex-direction:column;gap:10px;">
+      <!-- summary -->
+      <div style="border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper);">
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 11px;border-bottom:1px solid var(--line);background:var(--paper2);">
+          <span style="font:700 10.5px 'Syne',sans-serif;color:var(--ink);">📊 Event Matrix Summary</span>
+          <span style="margin-left:auto;font:600 8px 'DM Mono',monospace;color:#fff;background:var(--ink);border-radius:2px;padding:1px 8px;">{{ badge }}</span>
+        </div>
+        <table style="width:100%;border-collapse:separate;border-spacing:0;">
+          <thead><tr>
+            <th style="text-align:left;padding:4px 11px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">Crisis</th>
+            <th style="text-align:center;padding:4px 7px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">ON</th>
+            <th style="text-align:left;padding:4px 7px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">期間</th>
+            <th style="text-align:right;padding:4px 11px;font:700 8px 'Syne',sans-serif;color:var(--mut);border-bottom:1px solid var(--line);background:var(--paper2);">事件</th>
+          </tr></thead>
+          <tbody>
+            <sc-for list="{{ summary }}" as="s" hint-placeholder-count="9">
+              <tr style="background:{{ s.bg }};">
+                <td style="padding:4px 11px;border-top:1px solid var(--soft);font:600 8.5px 'DM Mono',monospace;color:var(--ink2);"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:{{ s.color }};margin-right:5px;"></span>{{ s.id }}</td>
+                <td style="padding:4px 7px;border-top:1px solid var(--soft);text-align:center;font:700 8.5px 'DM Mono',monospace;{{ s.onCss }}">{{ s.on }}</td>
+                <td style="padding:4px 7px;border-top:1px solid var(--soft);font:400 8px 'DM Mono',monospace;color:var(--mut);white-space:nowrap;">{{ s.span }}</td>
+                <td style="padding:4px 11px;border-top:1px solid var(--soft);text-align:right;font:600 8.5px 'DM Mono',monospace;color:var(--ink);">{{ s.events }}</td>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- controls -->
+      <div style="border:1px solid var(--line);border-radius:2px;background:var(--paper);padding:9px 11px;">
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;">
+          <span onClick="{{ selAll }}" style="font:700 9px 'DM Mono',monospace;padding:3px 9px;border-radius:3px;cursor:pointer;user-select:none;background:var(--ink);color:#fff;">全選</span>
+          <span onClick="{{ selNone }}" style="font:700 9px 'DM Mono',monospace;padding:3px 9px;border-radius:3px;cursor:pointer;user-select:none;background:var(--soft);color:var(--mut);">全清</span>
+          <span style="width:1px;background:var(--line);margin:0 2px;"></span>
+          <sc-for list="{{ toggles }}" as="t" hint-placeholder-count="4">
+            <span onClick="{{ t.go }}" style="font:700 9px 'DM Mono',monospace;padding:3px 9px;border-radius:3px;cursor:pointer;user-select:none;{{ t.css }}">{{ t.label }}</span>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- crisis tree -->
+      <div style="border:1px solid var(--line);border-radius:2px;overflow:hidden;background:var(--paper);max-height:560px;overflow-y:auto;">
+        <div style="padding:6px 11px;border-bottom:1px solid var(--line);background:var(--paper2);font:700 10.5px 'Syne',sans-serif;color:var(--ink);position:sticky;top:0;">🗂️ Crisis / Sub-Event Tree</div>
+        <sc-for list="{{ tree }}" as="c" hint-placeholder-count="9">
+          <div style="border-bottom:1px solid var(--soft);">
+            <div onClick="{{ c.toggleOpen }}" style="display:flex;align-items:center;gap:7px;padding:6px 11px;cursor:pointer;user-select:none;background:{{ c.headBg }};">
+              <span onClick="{{ c.toggleOn }}" style="font:700 11px 'DM Mono',monospace;{{ c.checkCss }}">{{ c.check }}</span>
+              <span style="width:8px;height:8px;border-radius:50%;background:{{ c.color }};flex:none;"></span>
+              <span style="flex:1;font:600 9.5px 'DM Sans','Noto Sans TC',sans-serif;color:var(--ink2);">{{ c.name }}</span>
+              <span style="font:600 8px 'DM Mono',monospace;color:var(--mut2);">{{ c.cnt }}</span>
+              <span style="font:500 9px 'DM Mono',monospace;color:var(--mut2);">{{ c.caret }}</span>
+            </div>
+            <sc-if value="{{ c.open }}">
+              <div style="background:var(--paper2);">
+                <sc-for list="{{ c.subs }}" as="e" hint-placeholder-count="5">
+                  <div onClick="{{ e.toggle }}" style="display:flex;align-items:center;gap:6px;padding:3px 11px 3px 30px;cursor:pointer;user-select:none;border-top:1px solid var(--soft);">
+                    <span style="font:700 10px 'DM Mono',monospace;{{ e.checkCss }}">{{ e.check }}</span>
+                    <span style="font:400 8px 'DM Mono',monospace;color:var(--mut2);min-width:66px;">{{ e.date }}</span>
+                    <span style="flex:1;font:400 8.5px 'DM Sans','Noto Sans TC',sans-serif;color:{{ e.txt }};">{{ e.label }}</span>
+                    <span style="font:500 7.5px 'DM Mono',monospace;color:var(--mut2);">{{ e.style }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    </sc-if>
+
+    <!-- RIGHT · chart -->
+    <div style="flex:1;min-width:420px;border:1px solid var(--line);border-radius:2px;background:var(--paper);padding:12px 14px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
+        <span onClick="{{ toggleLeft }}" title="收合 / 展開左側" style="font:700 11px 'DM Mono',monospace;color:var(--mut);cursor:pointer;user-select:none;border:1px solid var(--line);border-radius:4px;padding:2px 8px;">{{ leftCaret }}</span>
+        <span style="font:700 12px 'Syne',sans-serif;color:var(--ink);">指數 · 事件時間軸</span>
+        <div style="display:flex;gap:3px;margin-left:auto;">
+          <sc-for list="{{ idxTabs }}" as="i" hint-placeholder-count="3">
+            <span onClick="{{ i.go }}" style="font:700 9px 'DM Mono',monospace;padding:3px 10px;border-radius:3px;cursor:pointer;user-select:none;{{ i.css }}">{{ i.label }}</span>
+          </sc-for>
+        </div>
+      </div>
+      <div ref="{{ chartRef }}" style="width:100%;height:560px;"></div>
+    </div>
+
+  </div>
+
+  <footer style="margin-top:18px;border-top:1px solid var(--line);padding-top:11px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font:500 10px 'DM Mono',monospace;color:var(--mut);">
+    <span style="font-weight:700;letter-spacing:1.3px;color:var(--ink);">VERITAS INTELLIGENCE ANALYTICS</span>
+    <span>Event Timeline Matrix · Crisis → Sub-Events · Visual Lock SSOT</span>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{ &quot;$preview&quot;: { &quot;width&quot;: 1340, &quot;height&quot;: 820 } }">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { idx: 'sp500', open: {}, leftOpen: true, show: { shade: true, events: true, hl: true, grid: true, log: true }, matrix: this._seed() };
+  }
+  _seed() {
+    const M = [
+      ['CRASH29', '1929 大崩盤 / 大蕭條', '1929-09-03', '1932-06-01', '#7f7f7f', true, [
+        ['1929-10-24', '⚡ 黑色星期四', 'co', 'solid', true], ['1929-10-29', '⚡ 黑色星期二', 'co', 'solid', true],
+        ['1930-06-17', 'Smoot-Hawley 關稅法', 'co', 'dash', true], ['1932-06-01', '⚡ 道瓊觸底 -89%', 'gn', 'solid', true]]],
+      ['REC37', '1937-38 大蕭條二次衰退', '1937-03-06', '1938-03-31', '#8a8275', false, [
+        ['1937-03-06', '市場見頂轉跌', 'am', 'dash', true], ['1938-03-31', '⚡ 觸底 -54%', 'gn', 'solid', true]]],
+      ['KENNEDY', '1962 甘迺迪股災 (Flash Crash)', '1962-03-01', '1962-06-26', '#6f7e99', false, [
+        ['1962-05-28', '⚡ 道瓊單日 -5.7%', 'co', 'solid', true], ['1962-06-26', '觸底 -27%', 'gn', 'dash', true]]],
+      ['BEAR73', '1973-74 石油危機熊市', '1973-01-11', '1974-10-03', '#677ea5', true, [
+        ['1973-10-17', '阿拉伯石油禁運', 'co', 'dash', true], ['1974-08-09', '尼克森辭職', 'am', 'dash', true],
+        ['1974-10-03', '⚡ 觸底 -48%', 'gn', 'solid', true]]],
+      ['BLACK87', '1987 黑色星期一', '1987-08-25', '1987-12-04', '#5f7db2', true, [
+        ['1987-10-19', '⚡ 黑色星期一 道瓊 -22.6%', 'co', 'solid', true], ['1987-12-04', '觸底 -34%', 'gn', 'dash', true]]],
+      ['GULF90', '1990 波灣戰爭衰退', '1990-07-16', '1990-10-11', '#587cbf', false, [
+        ['1990-08-02', '伊拉克入侵科威特', 'co', 'dash', true], ['1990-10-11', '⚡ 觸底 -20%', 'gn', 'solid', true]]],
+      ['DOTCOM', '2000-2002 網路泡沫', '2000-03-24', '2002-10-09', '#507ccc', true, [
+        ['2000-03-24', 'S&P 歷史高 1527', 'am', 'dash', true], ['2001-09-11', '⚡ 911 恐怖攻擊', 'co', 'solid', true],
+        ['2002-07-23', 'WorldCom 破產', 'co', 'dash', true], ['2002-10-09', '⚡ 觸底 1810 → 777', 'gn', 'solid', true]]],
+      ['GFC', '2007-2009 全球金融危機', '2007-08-09', '2009-03-31', '#9c8d7a', true, [
+        ['2007-08-09', 'BNP Paribas 停止贖回', 'co', 'dash', true], ['2008-03-14', 'Bear Stearns 被收購', 'co', 'dash', true],
+        ['2008-09-15', '⚡ 雷曼兄弟破產', 'co', 'solid', true], ['2008-09-16', 'AIG 850億紓困', 'am', 'dash', true],
+        ['2008-10-03', 'TARP 7000億通過', 'gn', 'dash', true], ['2008-11-25', 'Fed QE1 啟動', 'blue', 'dash', true],
+        ['2009-03-09', '⚡ S&P 500 觸底 666', 'gn', 'solid', true]]],
+      ['FLASH', '2010 股市閃崩', '2010-04-01', '2010-07-31', '#677ea5', true, [
+        ['2010-05-06', '⚡ 閃崩 道瓊-998點 (HFT)', 'co', 'solid', true], ['2010-05-10', 'EU 7500億歐元紓困', 'blue', 'dash', true]]],
+      ['EURO', '2011-2012 歐債危機', '2011-04-01', '2011-10-31', '#6f7e99', true, [
+        ['2011-04-27', 'S&P 調降美國展望→負面', 'am', 'dash', true], ['2011-08-05', '⚡ S&P 調降美國評級 AA+', 'co', 'solid', true],
+        ['2011-08-08', '美股暴跌 S&P -6.7%', 'co', 'dash', true], ['2011-10-27', 'EFSF 擴大至1兆歐元', 'gn', 'dash', true]]],
+      ['OIL', '2015-2016 油價暴跌', '2015-05-01', '2016-02-29', '#5f7db2', false, [
+        ['2015-08-24', '中國黑色星期一 上證-8.5%', 'co', 'dash', true], ['2016-01-20', 'WTI 原油跌破 $27', 'co', 'dash', true],
+        ['2016-02-11', '⚡ S&P 500 觸底 1810', 'gn', 'solid', true]]],
+      ['TRADE', '2018 美中貿易戰', '2018-09-01', '2018-12-31', '#587cbf', true, [
+        ['2018-10-10', 'S&P -3.3% 科技股崩', 'co', 'dash', true], ['2018-12-19', 'Fed升息+鷹派前瞻', 'co', 'dash', true],
+        ['2018-12-24', '⚡ 聖誕崩盤 S&P 2351', 'co', 'solid', true]]],
+      ['COVID', '2020 新冠肺炎大流行', '2020-02-01', '2020-03-31', '#507ccc', true, [
+        ['2020-03-09', '⚡ 第一次熔斷 -7%', 'co', 'solid', true], ['2020-03-15', 'Fed 降至零利率 + QE∞', 'blue', 'dash', true],
+        ['2020-03-16', '第三次熔斷 -12%', 'co', 'dash', true], ['2020-03-23', '⚡ S&P 觸底 2237', 'gn', 'solid', true],
+        ['2020-03-27', 'CARES Act 2.2兆美元', 'gn', 'dash', true]]],
+      ['RATE', '2022 通膨升息熊市', '2022-01-01', '2022-10-31', '#487bd9', true, [
+        ['2022-02-24', '俄羅斯入侵烏克蘭', 'co', 'dash', true], ['2022-03-16', 'Fed 首次升息 25bp', 'blue', 'dash', true],
+        ['2022-06-13', 'S&P 進入熊市 (-20%)', 'co', 'dash', true], ['2022-10-13', '⚡ S&P 觸底 3577', 'gn', 'solid', true]]],
+      ['TRUMP2', '2024-2025 川普第二任期', '2024-11-06', '2025-02-14', '#937860', true, [
+        ['2024-11-06', '川普當選 美股大漲', 'gn', 'dash', true], ['2025-01-20', '川普就職', 'am', 'dash', true],
+        ['2025-02-01', '對中加徵10%關稅', 'co', 'dash', true]]],
+    ];
+    return M.map(c => ({ id: c[0], name: c[1], start: c[2], end: c[3], color: c[4], enabled: c[5],
+      subs: c[6].map(s => ({ date: s[0], label: s[1], color: s[2], style: s[3], enabled: s[4] })) }));
+  }
+  _hex(k) { return ({ co: '#c96b5a', am: '#c4943a', gn: '#5a9e6f', blue: '#4c78a8', vi: '#7a6daa' })[k] || k; }
+
+  _anchors(idx) {
+    if (idx === 'twii') return [['1967-01-01', 100], ['1990-02-10', 12495], ['1990-10-01', 2560], ['1997-08-01', 10116], ['1998-09-01', 6251],
+      ['2000-02-01', 10202], ['2001-09-26', 3446], ['2007-10-01', 9809], ['2008-11-21', 3955], ['2011-08-01', 7148], ['2015-08-24', 7410],
+      ['2018-01-01', 11270], ['2020-03-19', 8523], ['2022-01-05', 18619], ['2022-10-25', 12666], ['2024-07-11', 24390], ['2025-02-14', 23200], ['2025-06-01', 22000]];
+    if (idx === 'sox') return [['1994-01-01', 200], ['2000-03-10', 1362], ['2002-10-09', 209], ['2007-07-01', 549], ['2008-11-21', 168],
+      ['2014-01-01', 540], ['2018-03-12', 1392], ['2018-12-24', 967], ['2020-02-19', 1928], ['2020-03-18', 1287], ['2021-12-27', 4039],
+      ['2022-10-13', 2105], ['2024-07-11', 5904], ['2025-02-14', 5200], ['2025-06-01', 4950]];
+    // S&P composite, real-ish monthly anchors 1928→2025
+    return [['1928-01-01', 17.8], ['1929-09-16', 31.9], ['1932-06-01', 4.4], ['1937-03-06', 18.7], ['1938-03-31', 8.5],
+      ['1946-05-01', 19.3], ['1949-06-01', 13.5], ['1957-08-01', 49.7], ['1962-03-01', 71.0], ['1962-06-26', 52.3],
+      ['1968-11-01', 108.0], ['1970-05-26', 69.3], ['1973-01-11', 120.2], ['1974-10-03', 62.3], ['1980-01-01', 114.0],
+      ['1982-08-01', 102.4], ['1987-08-25', 336.8], ['1987-12-04', 223.9], ['1990-07-16', 369.0], ['1990-10-11', 295.5],
+      ['1995-01-01', 465.0], ['2000-03-24', 1527.5], ['2002-10-09', 776.8], ['2007-10-09', 1565.2], ['2009-03-09', 676.5],
+      ['2013-03-01', 1518.0], ['2015-05-21', 2130.8], ['2016-02-11', 1829.1], ['2018-09-20', 2930.8], ['2018-12-24', 2351.1],
+      ['2020-02-19', 3386.2], ['2020-03-23', 2237.4], ['2022-01-03', 4796.6], ['2022-10-13', 3577.0], ['2024-11-06', 5929.0],
+      ['2025-02-14', 6115.0], ['2025-06-01', 5950.0]];
+  }
+  _series(idx) {
+    const ad = this._anchors(idx).map(a => [new Date(a[0]).getTime(), a[1]]);
+    const start = ad[0][0], end = ad[ad.length - 1][0];
+    const vol = { sp500: 1, twii: 1.2, sox: 1.5 }[idx];
+    const rng = (s => () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; })(idx === 'sp500' ? 7 : idx === 'twii' ? 17 : 29);
+    const out = { dates: [], vals: [] };
+    for (let t = start; t <= end; t += 30.4 * 864e5) {
+      let i = 0; while (i < ad.length - 1 && ad[i + 1][0] < t) i++;
+      const a = ad[i], b = ad[Math.min(i + 1, ad.length - 1)];
+      const f = b[0] === a[0] ? 0 : (t - a[0]) / (b[0] - a[0]);
+      // geometric interpolation (log-linear) for realistic long-run shape
+      const mult = Math.exp(Math.log(a[1]) + (Math.log(b[1]) - Math.log(a[1])) * f);
+      const noise = 1 + (rng() - 0.5) * 0.04 * vol;
+      out.dates.push(new Date(t).toISOString().slice(0, 10));
+      out.vals.push(+(mult * noise).toFixed(1));
+    }
+    return out;
+  }
+
+  _timeline() {
+    const E = React.createElement, M = this.state.matrix;
+    const toT = d => new Date(d).getTime();
+    const en = M.filter(c => c.enabled);
+    const src = en.length ? en : M;
+    let lo = Math.min.apply(null, src.map(c => toT(c.start)));
+    let hi = Math.max.apply(null, src.map(c => toT(c.end)));
+    const span = hi - lo || 1; lo -= span * 0.015; hi += span * 0.02;
+    const W = 1680, H = 88, mL = 10, mR = 10;
+    const bandY = 40, bandH = 16;
+    const x = t => mL + (W - mL - mR) * ((t - lo) / (hi - lo));
+    const els = [];
+    // axis
+    const axisY = bandY + bandH + 12;
+    els.push(E('line', { key: 'ax', x1: mL, x2: W - mR, y1: axisY, y2: axisY, stroke: '#dbd9d3', strokeWidth: 1 }));
+    for (let y = 1930; y <= 2025; y += 10) {
+      const t = toT(y + '-01-01'); if (t < lo || t > hi) continue; const xx = x(t);
+      els.push(E('line', { key: 'tk' + y, x1: xx, x2: xx, y1: axisY, y2: axisY + 3, stroke: '#cfc9ba', strokeWidth: 0.8 }));
+      els.push(E('text', { key: 'ty' + y, x: xx, y: axisY + 12, 'text-anchor': 'middle', fill: '#9b9690', style: { font: "500 6px 'DM Mono',monospace" } }, "'" + String(y).slice(2)));
+    }
+    M.forEach((cr, i) => {
+      if (!cr.enabled) return;
+      const x0 = x(toT(cr.start)), x1 = x(toT(cr.end)), cx = (x0 + x1) / 2, col = cr.color;
+      // region 0.5
+      els.push(E('rect', { key: 'r' + i, x: x0, y: bandY, width: Math.max(2, x1 - x0), height: bandH, fill: col, opacity: 0.5, rx: 2 }));
+      // start/end solid lines 0.8
+      els.push(E('line', { key: 's' + i, x1: x0, x2: x0, y1: bandY - 5, y2: bandY + bandH + 5, stroke: col, strokeWidth: 1.2, opacity: 0.8 }));
+      els.push(E('line', { key: 'e' + i, x1: x1, x2: x1, y1: bandY - 5, y2: bandY + bandH + 5, stroke: col, strokeWidth: 1.2, opacity: 0.8 }));
+      // sub-events dashed 0.8 same color
+      cr.subs.forEach((ev, j) => {
+        if (!ev.enabled) return; const xe = x(toT(ev.date)); if (xe < x0 - 1 || xe > x1 + 1) return;
+        els.push(E('line', { key: 'd' + i + '_' + j, x1: xe, x2: xe, y1: bandY, y2: bandY + bandH, stroke: col, strokeWidth: 0.8, opacity: 0.8, strokeDasharray: '2 2' }));
+      });
+      // tier 1: crisis id centered above (alternate height to avoid collision)
+      const ly = (i % 2 === 0) ? bandY - 15 : bandY - 7;
+      els.push(E('line', { key: 'lc' + i, x1: cx, x2: cx, y1: ly + 2, y2: bandY - 3, stroke: '#cfc9ba', strokeWidth: 0.5 }));
+      els.push(E('text', { key: 't1' + i, x: cx, y: ly, 'text-anchor': 'middle', fill: '#37352f', style: { font: "700 6px 'DM Mono',monospace" } }, cr.id));
+      // tier 2: start–end below band
+      els.push(E('text', { key: 't2' + i, x: cx, y: bandY + bandH + 10, 'text-anchor': 'middle', fill: '#9b9690', style: { font: "500 5.5px 'DM Mono',monospace" } }, cr.start.slice(2, 7) + '–' + cr.end.slice(2, 7)));
+    });
+    return E('svg', { viewBox: '0 0 ' + W + ' ' + H, width: '100%', style: { display: 'block' } }, els);
+  }
+
+  componentDidMount() { this._draw(); }
+  componentDidUpdate() { this._draw(); }
+  _draw() {
+    if (!this.chart || !window.Plotly) return;
+    const idx = this.state.idx, S = this._series(idx), show = this.state.show;
+    const names = { sp500: 'S&P 500 (^GSPC)', twii: '臺灣加權 (^TWII)', sox: '費城半導體 (^SOX)' };
+    const shapes = [], anns = [];
+    this.state.matrix.forEach(cr => {
+      if (!cr.enabled) return;
+      if (show.shade) shapes.push({ type: 'rect', xref: 'x', yref: 'paper', x0: cr.start, x1: cr.end, y0: 0, y1: 1,
+        fillcolor: cr.color, opacity: 0.1, line: { width: 0 }, layer: 'below' });
+      if (show.events) cr.subs.forEach(ev => {
+        if (!ev.enabled) return;
+        if (ev.date < S.dates[0] || ev.date > S.dates[S.dates.length - 1]) return;
+        const dash = ev.style === 'solid' ? 'solid' : ev.style === 'dot' ? 'dot' : 'dash';
+        const w = ev.style === 'solid' ? 1.8 : 0.8;
+        shapes.push({ type: 'line', xref: 'x', yref: 'paper', x0: ev.date, x1: ev.date, y0: 0, y1: 1,
+          line: { color: this._hex(ev.color), width: w, dash } });
+      });
+    });
+    const logY = !!show.log;
+    const data = [{ x: S.dates, y: S.vals, type: 'scatter', mode: 'lines', line: { color: '#1e1d1a', width: 1.4 },
+      hovertemplate: '%{x|%Y-%m}<br>%{y:,.0f}<extra></extra>', name: names[idx] }];
+    // crisis hi/lo markers
+    if (show.hl) {
+      this.state.matrix.forEach(cr => {
+        if (!cr.enabled) return;
+        const seg = S.dates.map((d, i) => [d, S.vals[i]]).filter(p => p[0] >= cr.start && p[0] <= cr.end);
+        if (seg.length < 2) return;
+        let hi = seg[0], lo = seg[0];
+        seg.forEach(p => { if (p[1] > hi[1]) hi = p; if (p[1] < lo[1]) lo = p; });
+        data.push({ x: [hi[0], lo[0]], y: [hi[1], lo[1]], type: 'scatter', mode: 'markers',
+          marker: { size: 7, color: ['#c96b5a', '#5a9e6f'], line: { color: '#fff', width: 1 } }, hoverinfo: 'skip', showlegend: false });
+      });
+    }
+    const layout = {
+      margin: { t: 10, r: 16, b: 36, l: 54 }, paper_bgcolor: '#fff', plot_bgcolor: '#fff',
+      font: { family: 'DM Mono, monospace', size: 10, color: '#33403f' }, hovermode: 'x unified', showlegend: false,
+      xaxis: { type: 'date', showgrid: show.grid, gridcolor: '#ecebe6', linecolor: '#dbd9d3', tickfont: { size: 9 } },
+      yaxis: { type: logY ? 'log' : 'linear', showgrid: show.grid, gridcolor: '#ecebe6', linecolor: '#dbd9d3', tickfont: { size: 9 }, separatethousands: true },
+      shapes, annotations: anns,
+    };
+    window.Plotly.react(this.chart, data, layout, { displayModeBar: false, responsive: true });
+  }
+
+  renderVals() {
+    const M = this.state.matrix, open = this.state.open, show = this.state.show;
+    const sd = s => s.replace(/-/g, '/').slice(2);
+    let enC = 0, enE = 0;
+    M.forEach(c => { if (c.enabled) { enC++; c.subs.forEach(e => { if (e.enabled) enE++; }); } });
+
+    const summary = M.map((c, i) => ({ id: c.id, color: c.color, on: c.enabled ? 'ON' : '·',
+      onCss: c.enabled ? 'color:var(--gn);' : 'color:var(--mut2);', span: sd(c.start) + '–' + sd(c.end),
+      events: c.subs.filter(e => e.enabled).length + '/' + c.subs.length, bg: i % 2 ? '#f6f4ef' : 'var(--paper)' }));
+
+    const tree = M.map((c, ci) => ({
+      name: c.name, color: c.color, cnt: c.subs.filter(e => e.enabled).length + '/' + c.subs.length,
+      check: c.enabled ? '☑' : '☐', checkCss: c.enabled ? 'color:var(--co);' : 'color:var(--mut2);',
+      headBg: c.enabled ? 'var(--paper)' : 'var(--paper2)', open: !!open[ci], caret: open[ci] ? '▾' : '▸',
+      toggleOpen: () => this.setState(s => ({ open: { ...s.open, [ci]: !s.open[ci] } })),
+      toggleOn: (ev) => { if (ev && ev.stopPropagation) ev.stopPropagation(); this.setState(s => { const m = s.matrix.map(x => ({ ...x, subs: x.subs.slice() })); m[ci].enabled = !m[ci].enabled; return { matrix: m }; }); },
+      subs: c.subs.map((e, ei) => ({ date: e.date, label: e.label, style: e.style,
+        check: e.enabled ? '☑' : '☐', checkCss: e.enabled ? ('color:' + this._hex(e.color) + ';') : 'color:var(--mut2);',
+        txt: e.enabled ? 'var(--ink2)' : 'var(--mut2)',
+        toggle: () => this.setState(s => { const m = s.matrix.map(x => ({ ...x, subs: x.subs.slice() })); m[ci].subs[ei] = { ...m[ci].subs[ei], enabled: !m[ci].subs[ei].enabled }; return { matrix: m }; }) })),
+    }));
+
+    const tdef = [['shade', 'Shading'], ['events', 'Sub-Events'], ['hl', 'H/L'], ['grid', 'Grid'], ['log', 'Log軸']];
+    const toggles = tdef.map(t => ({ label: t[1], go: () => this.setState(s => ({ show: { ...s.show, [t[0]]: !s.show[t[0]] } })),
+      css: show[t[0]] ? 'background:var(--accent);color:#fff;' : 'background:var(--soft);color:var(--mut);' }));
+
+    const idxTabs = [['sp500', 'S&P 500'], ['twii', '台股'], ['sox', 'SOX']].map(t => ({ label: t[1],
+      go: () => this.setState({ idx: t[0] }), css: this.state.idx === t[0] ? 'background:var(--ink);color:#fff;' : 'background:var(--soft);color:var(--mut);' }));
+
+    return {
+      rootRef: el => { this.root = el; },
+      chartRef: el => { this.chart = el; if (el && window.Plotly) requestAnimationFrame(() => this._draw()); },
+      summary, tree, toggles, idxTabs, timelineSvg: this._timeline(),
+      leftOpen: this.state.leftOpen, leftCaret: this.state.leftOpen ? '◧ 收合矩陣' : '▸ 展開矩陣',
+      toggleLeft: () => this.setState(s => ({ leftOpen: !s.leftOpen })),
+      badge: enC + ' crisis · ' + enE + ' events',
+      selAll: () => this.setState(s => ({ matrix: s.matrix.map(c => ({ ...c, enabled: true, subs: c.subs.map(e => ({ ...e, enabled: true })) })) })),
+      selNone: () => this.setState(s => ({ matrix: s.matrix.map(c => ({ ...c, enabled: false })) })),
+    };
+  }
+}
+</script>
+</body>
+</html>

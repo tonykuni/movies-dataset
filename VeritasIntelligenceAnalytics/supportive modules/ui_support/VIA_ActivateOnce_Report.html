@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>VIA Activate Once</title>
+<style>
+body{margin:0;background:#f5f4f0;color:#1e1d1a;font-family:Arial,"Microsoft JhengHei",sans-serif;font-size:12px}
+.header{padding:28px 34px;background:linear-gradient(135deg,#0f172a,#263b6f);color:white}
+.header h1{margin:0;font-size:30px}.line2{margin-top:7px;font-size:15px;font-weight:800;letter-spacing:1.5px}.line3{margin-top:8px;font-size:13px;opacity:.92}
+.wrap{padding:24px 34px}.grid{display:grid;grid-template-columns:repeat(5,minmax(130px,1fr));gap:14px;margin-bottom:18px}
+.card{background:white;border:1px solid #dbd9d3;border-radius:16px;padding:16px;box-shadow:0 8px 24px rgba(16,24,40,.06)}
+.kpi{font-size:29px;font-weight:900;font-family:Consolas,monospace}.label{color:#9c9890;font-size:12px;margin-top:4px}
+.badge{display:inline-block;padding:8px 12px;border-radius:999px;font-weight:900}
+.badge.low{background:#cde8d5;color:#5a9e6f}.badge.medium{background:#f5e2b8;color:#c4943a}.badge.high{background:#f5d0c8;color:#c96b5a}
+.lock{font-family:Consolas,monospace;white-space:pre-wrap;background:#0b1020;color:#dbeafe;padding:14px;border-radius:12px;line-height:1.5;overflow:auto}
+table{width:100%;border-collapse:collapse;background:white;border:1px solid #dbd9d3;border-radius:12px;overflow:hidden}
+th{text-align:left;background:#eef2f8;color:#334155;font-size:12px;padding:10px;border-bottom:1px solid #dbd9d3}
+td{font-size:12px;padding:9px 10px;border-bottom:1px solid #eef1f6;vertical-align:top}
+tr.ok td:first-child{border-left:4px solid #5a9e6f}tr.warn td:first-child{border-left:4px solid #c4943a}tr.fail td:first-child{border-left:4px solid #c96b5a}
+.path{font-family:Consolas,monospace;font-size:10px;color:#475467;word-break:break-all}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>VERITAS INTELLIGENCE ANALYTICS</h1>
+<div class="line2">VIA Activate Once v01</div>
+<div class="line3">v05 Param-First Gateway · VDF/VRN Production Scope · One-Time Activation Check</div>
+</div>
+<div class="wrap">
+<div class="grid">
+<div class="card"><div class="badge low">VIA_ACTIVATE_ONCE_READY</div><div class="label">Risk LOW</div></div>
+<div class="card"><div class="kpi">9</div><div class="label">OK</div></div>
+<div class="card"><div class="kpi">0</div><div class="label">WARN</div></div>
+<div class="card"><div class="kpi">0</div><div class="label">FAIL</div></div>
+<div class="card"><div class="kpi">0.02</div><div class="label">Seconds</div></div>
+</div>
+
+<h2>def Activation Scope</h2>
+<div class="lock">Root:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics
+
+Unified Input SSOT:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\VIA_UnifiedInput_SSOT.json
+
+Active Pointer:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_active\VIA_ACTIVE_POINTER.json
+
+VDF Functional:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF
+
+VRN Functional:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VRN
+
+VDF Dict:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF
+
+VRN Dict:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN
+
+NexusCore:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\Invoke-VeritasNexusCore.ps1
+
+Active Gateway v05:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_activation\VIA_ACTIVATION_GATEWAY_V05_PARAM_FIRST_FINAL_20260609_040014\gateway\Invoke-VIA-ActivationGateway-ParamFirst.ps1
+
+Active Once Pointer:
+C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_active\VIA_ACTIVE_ONCE_POINTER.json
+
+Policy:
+def no exit
+def no Stop-Process
+def no destructive delete
+def VAP non-core review is excluded from VDF/VRN production blocker scope</div>
+
+<h2>def Matrix</h2>
+<table>
+<thead><tr><th>Round</th><th>Layer</th><th>Name</th><th>Status</th><th>Risk</th><th>Metric</th><th>Value</th><th>Message</th><th>Path</th></tr></thead>
+<tbody>
+<tr class='ok'><td>Round0</td><td>JSON_CHECK</td><td>VIA_UnifiedInput_SSOT.json</td><td>OK</td><td>LOW</td><td>json_parse</td><td>ok</td><td>JSON parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\VIA_UnifiedInput_SSOT.json</td></tr>
+<tr class='ok'><td>Round0</td><td>JSON_CHECK</td><td>VIA_ACTIVE_POINTER.json</td><td>OK</td><td>LOW</td><td>json_parse</td><td>ok</td><td>JSON parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_active\VIA_ACTIVE_POINTER.json</td></tr>
+<tr class='ok'><td>Round0</td><td>FUNCTIONAL_ROOT</td><td>functional modules VDF</td><td>OK</td><td>LOW</td><td>directory</td><td>exists</td><td>Directory exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF</td></tr>
+<tr class='ok'><td>Round0</td><td>FUNCTIONAL_ROOT</td><td>functional modules VRN</td><td>OK</td><td>LOW</td><td>directory</td><td>exists</td><td>Directory exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VRN</td></tr>
+<tr class='ok'><td>Round0</td><td>DATABASE_OUTPUT_ROOT</td><td>dict VDF</td><td>OK</td><td>LOW</td><td>directory</td><td>exists</td><td>Directory exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VDF</td></tr>
+<tr class='ok'><td>Round0</td><td>DATABASE_OUTPUT_ROOT</td><td>dict VRN</td><td>OK</td><td>LOW</td><td>directory</td><td>exists</td><td>Directory exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\dict\VRN</td></tr>
+<tr class='ok'><td>Round0</td><td>NEXUS_CORE</td><td>Invoke-VeritasNexusCore.ps1</td><td>OK</td><td>LOW</td><td>exists</td><td>ok</td><td>File exists.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\Invoke-VeritasNexusCore.ps1</td></tr>
+<tr class='ok'><td>Round1</td><td>ACTIVE_GATEWAY</td><td>Invoke-VIA-ActivationGateway-ParamFirst.ps1</td><td>OK</td><td>LOW</td><td>latest_v05_gateway</td><td>found</td><td>Latest valid v05 Param-First Gateway found.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_activation\VIA_ACTIVATION_GATEWAY_V05_PARAM_FIRST_FINAL_20260609_040014\gateway\Invoke-VIA-ActivationGateway-ParamFirst.ps1</td></tr>
+<tr class='ok'><td>Round1</td><td>ACTIVE_GATEWAY_AST</td><td>Invoke-VIA-ActivationGateway-ParamFirst.ps1</td><td>OK</td><td>LOW</td><td>ast_parse</td><td>ok</td><td>PowerShell AST parse OK.</td><td class='path'>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_activation\VIA_ACTIVATION_GATEWAY_V05_PARAM_FIRST_FINAL_20260609_040014\gateway\Invoke-VIA-ActivationGateway-ParamFirst.ps1</td></tr>
+</tbody>
+</table>
+</div>
+</body>
+</html>

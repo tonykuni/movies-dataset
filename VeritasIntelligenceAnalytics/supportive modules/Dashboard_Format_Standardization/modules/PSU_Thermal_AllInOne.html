@@ -1,0 +1,326 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · PSU &amp; Thermal · AUTO SSOT × SUPER BOM 一體模板 v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--blue:#4c78a8;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--vi:#7a6daa;
+ --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg)}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5}
+.wrap{max-width:1300px;margin:0 auto;padding:0 22px 60px}
+.bar{position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50}
+header{padding:20px 0 9px;margin-bottom:10px;border-bottom:2px solid var(--ink)}
+.kicker{font:700 10px 'DM Mono',monospace;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px}
+h1{font:800 19px/1.2 'Syne',sans-serif;color:var(--ink)}h1 span{color:var(--up)}
+.sub{margin-top:6px;font:400 10.5px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:1030px}
+.sub b{color:var(--ink2)}
+.gov{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#1e1d1a;border-radius:3px;padding:7px 14px;margin:12px 0}
+.gov .lk{font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase}
+.gov .pill{font:600 7.5px 'DM Mono',monospace;color:#cfcabf}
+.gov .del{margin-left:auto;display:flex;align-items:center;gap:6px}
+.gov .del label{font:700 7.5px 'DM Mono',monospace;color:#e0b0a5;cursor:pointer;user-select:none}
+.gov .ver{font:700 8px 'DM Mono',monospace;color:#1e1d1a;background:#5a9e6f;border-radius:3px;padding:2px 8px}
+.gov .ver.armed{background:#c96b5a;color:#fff}.gov .ver.live{background:#c4943a}
+.note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--am);border-radius:3px;padding:8px 14px;margin-bottom:14px;font:500 9px/1.6 'DM Mono',monospace;color:var(--mut)}
+.note b{color:var(--ink2)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tab{font:700 11px 'DM Sans','Noto Sans TC',sans-serif;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--mut);border-radius:3px;padding:7px 13px}
+.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.sec{display:none}.sec.on{display:block}
+h2{font:800 13px 'Syne',sans-serif;color:var(--ink);margin:18px 0 4px;padding-bottom:5px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:8px}
+h2 .en{font:600 8px 'DM Mono',monospace;color:var(--mut2);letter-spacing:1px;text-transform:uppercase}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:0;overflow:hidden;margin-top:12px}
+.hd2{font:800 11px 'Syne',sans-serif;padding:10px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+table{width:100%;border-collapse:collapse;font:500 10px 'DM Mono',monospace}
+th{font:700 8px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.5px;color:var(--mut);text-align:right;padding:7px 8px;border-bottom:2px solid var(--ink);background:var(--paper2)}
+th.l,td.l{text-align:left}
+td{padding:5px 8px;border-bottom:1px solid var(--soft);text-align:right;vertical-align:middle}
+tr:hover td{background:var(--paper2)}
+.lvl{font:700 7px 'DM Mono',monospace;color:#fff;border-radius:3px;padding:1px 6px}
+.L1{background:#1e1d1a}.L2{background:#4c78a8}.L3{background:#439a9a}.GL{background:#7a6daa}
+.acode{font:500 8.5px 'DM Mono',monospace;color:var(--vi)}.scode{font:700 9px 'DM Mono',monospace;color:var(--blue)}
+.nm{font:700 11.5px 'Noto Sans TC',sans-serif;color:var(--ink)}.tk{font:500 9px 'DM Mono',monospace;color:var(--mut)}
+.i1 td{background:#f1eee9;font-weight:700}.i2 td{background:#f7f5f1}
+.ind1{padding-left:10px}.ind2{padding-left:26px}.ind3{padding-left:42px}
+.idx{font:800 12px 'Syne',sans-serif}.up{color:var(--up)}.down{color:var(--down)}
+.cellin{font-family:'DM Mono',monospace;text-align:right;border:none;background:transparent;width:58px;font-size:10px}
+.cellin:focus{outline:1px solid var(--blue)}
+select,input.big{font:500 12px 'DM Sans','Noto Sans TC',sans-serif;padding:6px 8px;border:1px solid var(--line);border-radius:3px;background:var(--paper);width:100%}
+.r3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;padding:12px 14px}
+.r4{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:9px;padding:0 14px 12px}
+.delbtn{border:none;background:transparent;color:var(--up);cursor:pointer;padding:0 5px;font-weight:700}
+.delbtn:disabled{color:var(--line);cursor:not-allowed}
+.pill{display:inline-block;background:var(--soft);border-radius:3px;padding:1px 7px;font:600 8px 'DM Mono',monospace;color:var(--mut)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:11px 14px;border-top:1px solid var(--line)}
+.btn{font:700 8.5px 'DM Mono',monospace;cursor:pointer;border:1px solid var(--ink);background:transparent;color:var(--ink);border-radius:3px;padding:6px 11px}
+.pdf{position:fixed;top:12px;right:14px;z-index:999;background:var(--ink);color:#fff;border:none;border-radius:5px;padding:7px 13px;font:700 9px 'DM Mono',monospace;cursor:pointer}
+.chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 14px 10px}
+.chip{font:600 9px 'DM Mono',monospace;background:var(--soft);border-radius:3px;padding:3px 9px;color:var(--ink2)}.chip b{color:var(--up)}
+svg{width:100%;height:auto;display:block;padding:10px 8px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;padding:4px 14px 0}
+.lg{display:flex;align-items:center;gap:6px;font:600 10px 'DM Sans','Noto Sans TC',sans-serif}.lg .sw{width:15px;height:3px;border-radius:2px}
+.gl{stroke:var(--soft);stroke-width:1}.axl{font:500 8px 'DM Mono',monospace;fill:var(--mut2)}
+.baseln{stroke:var(--mut2);stroke-width:1;stroke-dasharray:3 3}.pl{fill:none;stroke-width:2;vector-effect:non-scaling-stroke}
+.log{max-height:180px;overflow:auto;padding:6px 14px}
+.logi{font:500 9px 'DM Mono',monospace;color:var(--ink2);padding:3px 0;border-bottom:1px solid var(--soft);display:flex;gap:10px}
+.logi .tm{color:var(--mut2)}.logi .ac{color:var(--down);font-weight:700;min-width:52px}
+@media print{@page{size:A4 landscape;margin:9mm}.pdf,.toolbar,.tabs{display:none!important}.sec{display:block!important}th{position:static!important}}
+</style></head><body>
+<div class="bar"></div><button class="pdf" onclick="window.print()">⤓ PDF</button>
+<div class="wrap">
+<header>
+ <div class="kicker">VERITAS INTELLIGENCE · PSU &amp; THERMAL · AUTO SSOT × SUPER BOM · ALL-IN-ONE v2</div>
+ <h1>PSU &amp; Thermal 一體模板 <span>·</span> SSOT × BOM × 指數走勢 × 評價連動</h1>
+ <p class="sub">單一模板統合：<b>AUTO SSOT</b> 三階層自動編碼＋<b>族群指數走勢圖</b>、<b>SUPER BOM</b> 料本→毛利率、<b>評價</b>（含 BOM 料本連動與全球同業）。可<b>匯入真實 via_prices.csv</b> 轉實際走勢。<b>只增不減</b>：刪除須先宣告；每次新增寫入 <b>append 日誌</b>。紅漲綠跌・非投資建議。</p>
+</header>
+<div class="gov">
+ <span class="lk">🔒 GOVERNED · AUTO-CODING</span><span class="pill">L1/L2/L3</span><span class="pill">Super BOM</span>
+ <span class="pill">append-log</span>
+ <span class="del"><label><input type="checkbox" id="delArm"> 宣告刪除模式</label>
+  <span class="ver" id="delState">APPEND-ONLY</span><span class="ver" id="mode">示意 DEMO</span></span>
+</div>
+<div class="note">📐 <b>本版四合一</b>：①族群指數走勢圖（時間序列）②BOM料本→毛利率→評價連動 ③匯入真實價格 ④append 日誌。<b>只增不減除非額外聲明</b>。</div>
+<div class="tabs" id="tabs"></div>
+
+<div class="sec on" id="sec-ssot">
+ <h2>AUTO SSOT · 三階層 + 族群指數走勢 <span class="en">Hierarchy + Index Trend</span></h2>
+ <div class="card"><div class="hd2">L1 族群指數走勢 <span class="tk" id="chSpan"></span></div>
+  <div class="legend" id="chLegend"></div>
+  <svg id="chart" viewBox="0 0 900 300" preserveAspectRatio="xMidYMid meet"></svg>
+  <div class="toolbar">
+   <label class="btn" style="display:inline-block">匯入真實 via_prices.csv<input type="file" id="imp" accept=".csv" style="display:none"></label>
+   <button class="btn" id="regen">重生示意</button>
+  </div></div>
+ <div class="card"><table><thead><tr><th class="l">Lv</th><th class="l">語意碼</th><th class="l">自動 VIA 碼</th><th class="l">名稱</th><th>成員</th><th>族群指數</th><th>報酬%</th></tr></thead><tbody id="tree"></tbody></table></div>
+</div>
+
+<div class="sec" id="sec-bom">
+ <h2>SUPER BOM · 料本 → 毛利率 <span class="en">BOM → Cost → Gross Margin</span></h2>
+ <div class="card">
+  <div class="r3">
+   <div><span class="tk">選公司</span><select id="selCo"></select></div>
+   <div><span class="tk">SSOT 多軸碼</span><input class="big" id="coCode" readonly></div>
+   <div><span class="tk">自動 VIA 碼</span><input class="big" id="coAuto" readonly></div>
+  </div>
+  <div class="chips" id="coAxis"></div>
+  <table><thead><tr><th class="l">品項</th><th class="l">品類 Commodity</th><th>用量</th><th>單價</th><th>小計</th><th></th></tr></thead><tbody id="bomBody"></tbody></table>
+  <div class="r4">
+   <div style="align-self:end"><span class="pill" id="bomCost">料本 —</span></div>
+   <div><span class="tk">單位售價 ASP</span><input class="cellin big" id="asp" style="width:100%"></div>
+   <div style="align-self:end"><span class="pill" id="gm">毛利率 —</span></div>
+   <div style="align-self:end"><button class="btn" id="addRow">＋ 加列(append)</button></div>
+  </div>
+ </div>
+</div>
+
+<div class="sec" id="sec-val">
+ <h2>評價 · BOM連動 + 全球同業 <span class="en">Valuation · BOM-linked</span></h2>
+ <div class="card"><div class="hd2">2026~28 攤薄EPS(diluted) · PER=Price/EPS · PBR=Price/BVPS · 料本/毛利率來自 Super BOM<span class="tk" id="vstat"></span></div>
+ <div style="overflow-x:auto"><table><thead>
+  <tr><th class="l" rowspan="2">Lv</th><th class="l" rowspan="2">名稱</th><th class="l" rowspan="2">代號</th><th rowspan="2">Adj Close</th><th rowspan="2">成長g%</th>
+   <th colspan="3" style="text-align:center;border-left:1px solid var(--line)">攤薄EPS diluted</th>
+   <th colspan="3" style="text-align:center;border-left:1px solid var(--line)">PER</th>
+   <th colspan="3" style="text-align:center;border-left:1px solid var(--line)">PBR</th>
+   <th rowspan="2" style="border-left:1px solid var(--line)">料本BOM</th><th rowspan="2">毛利率</th></tr>
+  <tr><th style="border-left:1px solid var(--line)">26</th><th>27</th><th>28</th>
+   <th style="border-left:1px solid var(--line)">26</th><th>27</th><th>28</th>
+   <th style="border-left:1px solid var(--line)">26</th><th>27</th><th>28</th></tr>
+ </thead><tbody id="val"></tbody></table></div></div>
+</div>
+
+<h2>Append 日誌 <span class="en">Append-only Changelog</span></h2>
+<div class="card"><div class="log" id="log"></div>
+ <div class="toolbar"><button class="btn" id="expLog">匯出日誌 CSV</button>
+  <button class="btn" id="expAll">匯出一體 JSON</button><button class="btn" id="expReg">匯出編號登錄</button>
+  <span class="tk">日誌僅增不減，記錄每次新增/匯入/宣告。</span></div></div>
+</div>
+<script>
+const D={"l1": {"TH": "熱管理 Thermal", "PW": "電源 Power"}, "l2": {"TH-110": ["TH", "氣冷/均熱片"], "TH-120": ["TH", "液冷水冷板"], "TH-130": ["TH", "CDU"], "TH-140": ["TH", "散熱風扇"], "TH-150": ["TH", "快接頭"], "TH-160": ["TH", "機櫃/背門"], "PW-210": ["PW", "伺服器電源模組"], "PW-220": ["PW", "Power Shelf"], "PW-230": ["PW", "消費/電競電源"], "PW-240": ["PW", "工業/醫療/車用"]}, "stocks": [{"n": "奇鋐", "t": "3017", "fam": "TH", "code": "TH-110-01", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "VN", "desc": "3D VC 均熱片・水冷板龍頭・垂直整合", "new": false, "region": "TW", "px": 1450, "eps": 55, "bvps": 180, "l2": "TH-110"}, {"n": "雙鴻", "t": "3324", "fam": "TH", "code": "TH-120-02", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "VN", "desc": "水冷板/CDU・微水道加工・液冷轉型最快", "new": false, "region": "TW", "px": 720, "eps": 28, "bvps": 95, "l2": "TH-120"}, {"n": "健策", "t": "3653", "fam": "TH", "code": "TH-120-03", "tr": "TH-TR-01", "pr": "TH-PR-01", "loc": "TW", "desc": "晶片級均熱片・全球市佔一・毛利含金量王", "new": false, "region": "TW", "px": 3480, "eps": 90, "bvps": 260, "l2": "TH-120"}, {"n": "高力", "t": "8996", "fam": "TH", "code": "TH-130-04", "tr": "TH-TR-01", "pr": "TH-PR-03", "loc": "TW", "desc": "CDU・真空硬焊・大型熱交換機櫃", "new": false, "region": "TW", "px": 1445, "eps": 32, "bvps": 120, "l2": "TH-130"}, {"n": "富世達", "t": "6805", "fam": "TH", "code": "TH-150-05", "tr": "TH-TR-01", "pr": "TH-PR-01", "loc": "TW", "desc": "快接頭・MIM 精密製程・零洩漏", "new": false, "region": "TW", "px": 1300, "eps": 40, "bvps": 150, "l2": "TH-150"}, {"n": "晟銘電", "t": "3013", "fam": "TH", "code": "TH-160-06", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "TW", "desc": "機櫃/水冷背門・一體化液冷機櫃", "new": true, "region": "TW", "px": 94, "eps": 4.5, "bvps": 30, "l2": "TH-160"}, {"n": "勤誠", "t": "8210", "fam": "TH", "code": "TH-160-07", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "TW", "desc": "伺服器機殼・水冷機櫃基礎設施", "new": true, "region": "TW", "px": 520, "eps": 25, "bvps": 110, "l2": "TH-160"}, {"n": "力致", "t": "3483", "fam": "TH", "code": "TH-140-08", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "TW", "desc": "高壓高轉速風扇・熱排交換", "new": true, "region": "TW", "px": 380, "eps": 12, "bvps": 55, "l2": "TH-140"}, {"n": "動力-KY", "t": "6591", "fam": "TH", "code": "TH-140-09", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "TW", "desc": "伺服器高壓風扇", "new": true, "region": "TW", "px": 430, "eps": 15, "bvps": 60, "l2": "TH-140"}, {"n": "建準", "t": "2421", "fam": "TH", "code": "TH-140-10", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "TW", "desc": "風扇/水泵/風扇背牆", "new": true, "region": "TW", "px": 280, "eps": 9, "bvps": 40, "l2": "TH-140"}, {"n": "一詮", "t": "2486", "fam": "TH", "code": "TH-110-11", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "TW", "desc": "導線架轉 TPU 先進封裝散熱片", "new": true, "region": "TW", "px": 120, "eps": 3.5, "bvps": 22, "l2": "TH-110"}, {"n": "邁科", "t": "6831", "fam": "TH", "code": "TH-120-12", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "TW", "desc": "美系 ASIC 熱解方案", "new": true, "region": "TW", "px": 210, "eps": 6, "bvps": 35, "l2": "TH-120"}, {"n": "台達電", "t": "2308", "fam": "PW", "code": "PW-210-01", "tr": "PW-TR-01", "pr": "PW-PR-01", "loc": "TH", "desc": "Grid to Chip 電源+液冷一條龍・全球龍頭", "new": false, "region": "TW", "px": 350, "eps": 15, "bvps": 90, "l2": "PW-210"}, {"n": "光寶科", "t": "2301", "fam": "PW", "code": "PW-220-02", "tr": "PW-TR-01", "pr": "PW-PR-01", "loc": "TH", "desc": "5.5kW/8kW ORv3・Power Shelf 率先出貨", "new": false, "region": "TW", "px": 159, "eps": 7, "bvps": 50, "l2": "PW-220"}, {"n": "群電", "t": "6412", "fam": "PW", "code": "PW-220-03", "tr": "PW-TR-01", "pr": "PW-PR-02", "loc": "TW", "desc": "機架整合・低軌衛星地面站電源", "new": false, "region": "TW", "px": 280, "eps": 12, "bvps": 70, "l2": "PW-220"}, {"n": "海韻電", "t": "6203", "fam": "PW", "code": "PW-230-04", "tr": "PW-TR-02", "pr": "PW-PR-02", "loc": "TW", "desc": "ATX 3.1/PCIe 5.1 原生模組化電源", "new": false, "region": "TW", "px": 210, "eps": 10, "bvps": 45, "l2": "PW-230"}, {"n": "康舒", "t": "6282", "fam": "PW", "code": "PW-220-05", "tr": "PW-TR-01", "pr": "PW-PR-01", "loc": "TW", "desc": "33kW PowerShelf・金仁寶集團", "new": true, "region": "TW", "px": 95, "eps": 4, "bvps": 30, "l2": "PW-220"}, {"n": "全漢", "t": "3015", "fam": "PW", "code": "PW-230-06", "tr": "PW-TR-02", "pr": "PW-PR-02", "loc": "TW", "desc": "電競/工業/PC 電源・防潮工業級", "new": true, "region": "TW", "px": 120, "eps": 6, "bvps": 40, "l2": "PW-230"}, {"n": "曜越", "t": "3540", "fam": "PW", "code": "PW-230-07", "tr": "PW-TR-02", "pr": "PW-PR-02", "loc": "TW", "desc": "電競 RGB 電源周邊", "new": true, "region": "TW", "px": 85, "eps": 3, "bvps": 22, "l2": "PW-230"}], "peers": [{"n": "Vertiv", "t": "VRT", "region": "US", "fam": "TH", "l2": "GL-COOL", "desc": "液冷/電源龍頭・$15B backlog", "px": 280, "eps": 6.05, "bvps": 22}, {"n": "Eaton", "t": "ETN", "region": "US", "fam": "PW", "l2": "GL-PWR", "desc": "電源管理+Boyd液冷", "px": 360, "eps": 11.5, "bvps": 70}, {"n": "Modine", "t": "MOD", "region": "US", "fam": "TH", "l2": "GL-COOL", "desc": "資料中心散熱純樸", "px": 140, "eps": 4.2, "bvps": 28}, {"n": "Schneider", "t": "SBGSY", "region": "EU", "fam": "PW", "l2": "GL-PWR", "desc": "歐系電源+軟體整合", "px": 48, "eps": 2.0, "bvps": 15}, {"n": "nVent", "t": "NVT", "region": "US", "fam": "TH", "l2": "GL-COOL", "desc": "800V DC轉型+散熱", "px": 95, "eps": 3.1, "bvps": 24}], "commodities": ["主動元件 Active / IC", "主動元件 Active / 電晶體 Transistor", "主動元件 Active / 二極體 Diode", "被動元件 Passive / 電阻 Resistor", "被動元件 Passive / 電容 Capacitor", "被動元件 Passive / 電感 Inductor", "被動元件 Passive / 晶振 Crystal", "電磁機構 Electromechanical / 連接器 Connector", "電磁機構 Electromechanical / 繼電器 Relay", "電磁機構 Electromechanical / 開關 Switch", "電磁機構 Electromechanical / 變壓器 Transformer", "機構件 Mechanical / 外殼 Housing", "機構件 Mechanical / 散熱 Thermal", "機構件 Mechanical / 緊固 Fastener", "機構件 Mechanical / 標籤 Label", "板類 Board / PCB", "板類 Board / 軟板 FPC", "線材 Cable / 線束 Harness", "線材 Cable / 排線 FFC", "其他 Others / 原材料 Raw", "其他 Others / 包材 Packaging", "其他 Others / 軟韌體 Firmware", "散熱-氣冷 Thermal-Air / 熱導管 Heat Pipe", "散熱-氣冷 Thermal-Air / 均溫板 Vapor Chamber", "散熱-氣冷 Thermal-Air / 散熱片/鰭片 Heatsink/Fin", "散熱-氣冷 Thermal-Air / 風扇 Fan", "散熱-液冷 Thermal-Liquid / 水冷板 Cold Plate", "散熱-液冷 Thermal-Liquid / 微流道 MLCP", "散熱-液冷 Thermal-Liquid / 分歧管 Manifold", "散熱-液冷 Thermal-Liquid / CDU", "散熱-液冷 Thermal-Liquid / 快接頭 Quick Disconnect", "散熱-液冷 Thermal-Liquid / 水冷頭 Water Block", "散熱-液冷 Thermal-Liquid / 水泵 Pump/RPU", "散熱-液冷 Thermal-Liquid / 冷卻液 Coolant", "散熱-界面/結構 Thermal-Interface/Struct / 均熱片 Heat Spreader", "散熱-界面/結構 Thermal-Interface/Struct / 導熱介面 TIM", "散熱-界面/結構 Thermal-Interface/Struct / 導線架 Leadframe", "散熱-界面/結構 Thermal-Interface/Struct / 機殼 Chassis"], "defbom": {"TH": [["水冷板本體", "散熱-液冷 Thermal-Liquid / 水冷板 Cold Plate", 1, 260], ["快接頭", "散熱-液冷 Thermal-Liquid / 快接頭 Quick Disconnect", 2, 30], ["分歧管", "散熱-液冷 Thermal-Liquid / 分歧管 Manifold", 1, 120], ["均熱片", "散熱-氣冷 Thermal-Air / 均熱片 Heat Spreader", 1, 45]], "PW": [["電源模組 PCBA", "電源 Power / 電源模組 PSU Module", 1, 900], ["GaN 功率元件", "電源 Power / 第三代半導體 GaN-SiC", 4, 60], ["變壓器", "電源 Power / 磁性元件 Magnetics", 2, 80], ["電容組", "電源 Power / 被動元件 Passive", 10, 3]]}};
+const $=id=>document.getElementById(id);
+const f0=n=>isFinite(n)?n.toLocaleString('en-US',{maximumFractionDigits:0}):"—";
+const f2=n=>isFinite(n)?n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
+const pc=n=>isFinite(n)?(n*100).toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1})+"%":"—";
+let DEL=false;
+function hash32(s){let h=2166136261>>>0;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+const autoCode=(lv,fam,name,tk)=>`VIA-${lv}-${fam}-${hash32((name+"|"+(tk||"")+"|"+lv).toLowerCase()).toString(36).toUpperCase().padStart(4,"0").slice(0,4)}`;
+
+// ---- append 日誌 ----
+const LOG=[];
+function logAdd(action,detail){const t=new Date().toISOString().slice(0,19).replace("T"," ");LOG.push({t,action,detail});renderLog();}
+function renderLog(){$("log").innerHTML=LOG.slice().reverse().map(e=>`<div class="logi"><span class="tm">${e.t}</span><span class="ac">${e.action}</span><span>${e.detail}</span></div>`).join("");}
+
+// ---- 分頁 ----
+const TABS=[["ssot","① SSOT+走勢"],["bom","② SUPER BOM"],["val","③ 評價"]];let cur="ssot";
+$("tabs").innerHTML=TABS.map(([id,n])=>`<div class="tab ${id===cur?'on':''}" data-id="${id}">${n}</div>`).join("");
+$("tabs").querySelectorAll(".tab").forEach(t=>t.onclick=()=>{cur=t.dataset.id;$("tabs").querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x.dataset.id===cur));document.querySelectorAll(".sec").forEach(s=>s.classList.toggle("on",s.id==="sec-"+cur));});
+$("delArm").onchange=e=>{DEL=e.target.checked;$("delState").textContent=DEL?"刪除已解鎖":"APPEND-ONLY";$("delState").classList.toggle("armed",DEL);logAdd(DEL?"宣告刪除":"重新鎖定","額外聲明切換");renderBom();};
+
+// ---- 時間序列（示意 or 匯入）----
+let dates=[], SERIES={}, extra={};   // SERIES[ticker]=[norm...]; extra[TAIEX/TPEX]
+function genDates(){const o=[];let d=new Date("2026-01-02T00:00:00");const end=new Date("2026-06-26T00:00:00");while(d<=end){o.push(d.toISOString().slice(0,10));d=new Date(d.getTime()+7*864e5);}return o;}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function demo(){
+ dates=genDates();SERIES={};extra={};
+ D.stocks.forEach(s=>{const r=mulberry32(hash32(s.t));const arr=[100];for(let i=1;i<dates.length;i++)arr.push(Math.max(30,arr[i-1]*(1+((s.fam==="TH"?1.3:0.6)+(r()-0.5)*5)/100)));SERIES[s.t]=arr;});
+ $("mode").textContent="示意 DEMO";$("mode").classList.remove("live");
+}
+const lastN=t=>{const a=SERIES[t];return a?a[a.length-1]:null;};
+const memSeries=pred=>{const ms=D.stocks.filter(pred).map(s=>SERIES[s.t]).filter(Boolean);if(!ms.length)return[];return dates.map((_,i)=>{const v=ms.map(a=>a[i]).filter(isFinite);return v.reduce((x,y)=>x+y,0)/v.length;});};
+const memLast=pred=>{const s=memSeries(pred);return s.length?s[s.length-1]:null;};
+
+// ---- 走勢圖：L1 TH/PW（+ 匯入的 TAIEX/TPEX）----
+function renderChart(){
+ const L1S=[["TH","熱管理指數","#c96b5a"],["PW","電源指數","#4c78a8"]];
+ const lines=L1S.map(([f,n,c])=>[n,c,memSeries(s=>s.fam===f)]);
+ if(extra.TAIEX)lines.push(["加權指數","#1e1d1a",extra.TAIEX]);
+ if(extra.TPEX)lines.push(["櫃買指數","#7a6daa",extra.TPEX]);
+ const W=900,H=300,mL=40,mR=96,mT=10,mB=24,pW=W-mL-mR,pH=H-mT-mB;
+ let vmin=Infinity,vmax=-Infinity;lines.forEach(([n,c,ser])=>ser.forEach(v=>{if(isFinite(v)){vmin=Math.min(vmin,v);vmax=Math.max(vmax,v);}}));
+ if(!isFinite(vmin)){vmin=90;vmax=140;}const pad=(vmax-vmin)*0.08||8;vmin-=pad;vmax+=pad;
+ const x=i=>mL+pW*(i/(dates.length-1||1)),y=v=>mT+pH*(1-(v-vmin)/(vmax-vmin||1));
+ let s='';
+ for(let i=0;i<=4;i++){const val=vmin+(vmax-vmin)*i/4,yy=y(val);s+=`<line class="gl" x1="${mL}" y1="${yy}" x2="${mL+pW}" y2="${yy}"/><text class="axl" x="${mL-6}" y="${yy+3}" text-anchor="end">${val.toFixed(0)}</text>`;}
+ if(100>=vmin&&100<=vmax)s+=`<line class="baseln" x1="${mL}" y1="${y(100)}" x2="${mL+pW}" y2="${y(100)}"/>`;
+ [0,Math.floor(dates.length/2),dates.length-1].forEach(i=>{if(dates[i])s+=`<text class="axl" x="${x(i)}" y="${H-6}" text-anchor="middle">${dates[i].slice(5)}</text>`;});
+ lines.forEach(([n,c,ser])=>{const pts=ser.map((v,i)=>isFinite(v)?`${x(i).toFixed(1)},${y(v).toFixed(1)}`:null).filter(Boolean).join(" ");s+=`<polyline class="pl" points="${pts}" stroke="${c}"/>`;const lv=ser[ser.length-1];if(isFinite(lv))s+=`<text class="axl" x="${x(dates.length-1)+5}" y="${y(lv)+3}" fill="${c}" style="font-weight:700">${n} ${lv.toFixed(0)}</text>`;});
+ $("chart").innerHTML=s;
+ $("chLegend").innerHTML=lines.map(([n,c])=>`<span class="lg"><span class="sw" style="background:${c}"></span>${n}</span>`).join("");
+ $("chSpan").textContent=`基準 2026-01-02=100 · ${dates.length} 期 · ${dates[0]||''}→${dates[dates.length-1]||''}`;
+}
+function renderTree(){
+ let h="";
+ Object.entries(D.l1).forEach(([fam,n1])=>{const i1=memLast(s=>s.fam===fam);
+  h+=`<tr class="i1"><td class="l"><span class="lvl L1">L1</span></td><td class="l scode ind1">${fam}-000</td><td class="l acode">${autoCode("L1",fam,n1,"")}</td><td class="l nm">${n1}</td><td>${D.stocks.filter(s=>s.fam===fam).length}</td><td class="idx">${f0(i1)}</td><td class="${i1>=100?'up':'down'}">${i1!=null?(i1>=100?'+':'')+(i1-100).toFixed(1)+'%':''}</td></tr>`;
+  Object.entries(D.l2).filter(([k,v])=>v[0]===fam).forEach(([code,m])=>{const mem=D.stocks.filter(s=>s.l2===code);if(!mem.length)return;const i2=memLast(s=>s.l2===code);
+   h+=`<tr class="i2"><td class="l"><span class="lvl L2">L2</span></td><td class="l scode ind2">${code}</td><td class="l acode">${autoCode("L2",fam,m[1],code)}</td><td class="l">${m[1]}</td><td>${mem.length}</td><td class="idx" style="font-size:11px">${f0(i2)}</td><td class="${i2>=100?'up':'down'}">${i2!=null?(i2>=100?'+':'')+(i2-100).toFixed(1)+'%':''}</td></tr>`;
+   mem.forEach(s=>{const v=lastN(s.t);h+=`<tr><td class="l"><span class="lvl L3">L3</span></td><td class="l scode ind3">${s.code}</td><td class="l acode">${autoCode("L3",fam,s.n,s.t)}</td><td class="l"><span class="nm" style="font-size:11px">${s.n}</span> <span class="tk">${s.t}</span></td><td class="tk">個股</td><td>${f0(v)}</td><td class="${v>=100?'up':'down'}">${v!=null?(v>=100?'+':'')+(v-100).toFixed(1)+'%':''}</td></tr>`;});
+  });
+ });
+ $("tree").innerHTML=h;
+}
+
+// ---- SUPER BOM + ASP/毛利率 ----
+let BOMS={},ASP={};
+D.stocks.forEach(s=>{BOMS[s.t]=(D.defbom[s.fam]||[]).map(r=>({pn:r[0],comm:r[1],qty:r[2],cost:r[3]}));});
+const bomCost=t=>BOMS[t].reduce((a,r)=>a+(+r.qty||0)*(+r.cost||0),0);
+D.stocks.forEach(s=>{ASP[s.t]=Math.round(bomCost(s.t)/(1-0.38));});  // 預設毛利率~38%
+function fillCo(){const sel=$("selCo");sel.innerHTML="";D.stocks.forEach(s=>sel.add(new Option(`${s.n} ${s.t} · ${s.code}`,s.t)));sel.onchange=renderBom;}
+function commOpts(sel){return D.commodities.map(x=>`<option${x===sel?' selected':''}>${x}</option>`).join("");}
+const curCo=()=>D.stocks.find(s=>s.t===$("selCo").value)||D.stocks[0];
+function renderBom(){
+ const s=curCo(),rows=BOMS[s.t];
+ $("coCode").value=`${s.code} / ${s.tr} / ${s.pr} / ${s.fam}-LOC-${s.loc}`;
+ $("coAuto").value=autoCode("L3",s.fam,s.n,s.t);
+ $("coAxis").innerHTML=[["族群",s.fam+"-000"],["趨勢",s.tr],["製程",s.pr],["基地",s.fam+"-LOC-"+s.loc]].map(([k,v])=>`<span class="chip">${k} <b>${v}</b></span>`).join("");
+ $("bomBody").innerHTML=rows.map((r,i)=>{const sub=(+r.qty||0)*(+r.cost||0);
+  return `<tr><td class="l"><input class="cellin" style="text-align:left;width:120px" value="${r.pn}" data-i="${i}" data-k="pn"></td><td class="l"><select class="cellin" style="text-align:left;width:220px" data-i="${i}" data-k="comm">${commOpts(r.comm)}</select></td><td><input class="cellin" value="${r.qty}" data-i="${i}" data-k="qty"></td><td><input class="cellin" value="${r.cost}" data-i="${i}" data-k="cost"></td><td>${f2(sub)}</td><td><button class="delbtn" data-del="${i}" ${DEL?'':'disabled'}>×</button></td></tr>`;}).join("");
+ const mat=bomCost(s.t);$("bomCost").textContent="料本 "+f2(mat);
+ if($("asp").value==="")$("asp").value=ASP[s.t];
+ const asp=parseFloat($("asp").value)||0;const gm=asp>0?(asp-mat)/asp:NaN;
+ $("gm").innerHTML="毛利率 "+`<span class="${gm<0?'up':'down'}">${pc(gm)}</span>`;
+ $("bomBody").querySelectorAll(".cellin").forEach(el=>el.oninput=e=>{const i=+e.target.dataset.i,k=e.target.dataset.k;rows[i][k]=(k==="qty"||k==="cost")?(parseFloat(e.target.value)||0):e.target.value;if(k==="qty"||k==="cost")renderBom();});
+ $("bomBody").querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{if(!DEL){alert("只增不減：請先勾選『宣告刪除模式』");return;}const d=rows[+b.dataset.del];rows.splice(+b.dataset.del,1);logAdd("刪除",`${s.n} BOM 移除 ${d.pn}（已宣告）`);renderBom();renderVal();});
+}
+$("asp").oninput=()=>{ASP[curCo().t]=parseFloat($("asp").value)||0;renderBom();renderVal();};
+$("selCo").addEventListener("change",()=>{$("asp").value=ASP[curCo().t];});
+$("addRow").onclick=()=>{const s=curCo();BOMS[s.t].push({pn:"新品項",comm:D.commodities[0],qty:1,cost:0});logAdd("新增",`${s.n} BOM 加一列`);renderBom();renderVal();};
+
+// ---- 評價（BOM 連動）----
+let VAL=[];
+const GTH={"TH":26,"PW":12}, PEERG={"VRT":40,"ETN":12,"MOD":30,"SBGSY":10,"NVT":15};
+D.stocks.forEach(s=>VAL.push({lv:"L3",fam:s.fam,n:s.n,t:s.t,region:s.region,px:s.px,eps:s.eps,bvps:s.bvps,g:GTH[s.fam]||15,payout:40,code:autoCode("L3",s.fam,s.n,s.t)}));
+D.peers.forEach(p=>VAL.push({lv:"GL",fam:p.fam,n:p.n,t:p.t,region:p.region,px:p.px,eps:p.eps,bvps:p.bvps,g:PEERG[p.t]||15,payout:35,code:autoCode("GL",p.fam,p.n,p.t),peer:true}));
+const bPER=()=>Math.min(...VAL.map(r=>r.px/r.eps).filter(x=>isFinite(x)&&x>0));
+const bPBR=()=>Math.min(...VAL.map(r=>r.px/r.bvps).filter(x=>isFinite(x)&&x>0));
+function renderVal(){
+ const perY={26:[],27:[],28:[]},pbrY={26:[],27:[],28:[]};
+ const calc=r=>{const g=(r.g||0)/100,po=(r.payout||0)/100;
+  const eps={26:r.eps,27:r.eps*(1+g),28:r.eps*(1+g)*(1+g)};
+  const bv={26:r.bvps}; bv[27]=bv[26]+eps[26]*(1-po); bv[28]=bv[27]+eps[27]*(1-po);
+  const per={},pbr={};[26,27,28].forEach(y=>{per[y]=eps[y]?r.px/eps[y]:NaN;pbr[y]=bv[y]?r.px/bv[y]:NaN;});
+  return {eps,per,pbr};};
+ VAL.forEach(r=>{const c=calc(r);[26,27,28].forEach(y=>{if(isFinite(c.per[y])&&c.per[y]>0)perY[y].push(c.per[y]);if(isFinite(c.pbr[y])&&c.pbr[y]>0)pbrY[y].push(c.pbr[y]);});});
+ const bPer={26:Math.min(...perY[26]),27:Math.min(...perY[27]),28:Math.min(...perY[28])};
+ const bPbr={26:Math.min(...pbrY[26]),27:Math.min(...pbrY[27]),28:Math.min(...pbrY[28])};
+ $("val").innerHTML=VAL.map((r,i)=>{const c=calc(r);
+  const mat=r.peer?null:bomCost(r.t);const asp=r.peer?null:ASP[r.t];const gm=(mat!=null&&asp>0)?(asp-mat)/asp:null;
+  const epsC=y=>`<td class="tk">${f2(c.eps[y])}</td>`;
+  const perC=y=>`<td class="${Math.abs(c.per[y]-bPer[y])<0.01?'up':''}" style="${Math.abs(c.per[y]-bPer[y])<0.01?'font-weight:700':''};${y===26?'border-left:1px solid var(--soft)':''}">${f2(c.per[y])}</td>`;
+  const pbrC=y=>`<td class="${Math.abs(c.pbr[y]-bPbr[y])<0.01?'up':''}" style="${Math.abs(c.pbr[y]-bPbr[y])<0.01?'font-weight:700':''};${y===26?'border-left:1px solid var(--soft)':''}">${f2(c.pbr[y])}</td>`;
+  return `<tr><td class="l"><span class="lvl ${r.lv}">${r.lv}</span></td><td class="l nm" style="font-size:11px">${r.n}</td><td class="l tk">${r.t}</td>
+   <td><input class="cellin" value="${r.px}" data-i="${i}" data-k="px"></td>
+   <td><input class="cellin" style="width:42px" value="${r.g}" data-i="${i}" data-k="g"></td>
+   <td style="border-left:1px solid var(--soft)"><input class="cellin" value="${r.eps}" data-i="${i}" data-k="eps"></td>${epsC(27)}${epsC(28)}
+   ${perC(26)}${perC(27)}${perC(28)}${pbrC(26)}${pbrC(27)}${pbrC(28)}
+   <td class="tk" style="border-left:1px solid var(--soft)">${mat!=null?f2(mat):"—"}</td>
+   <td class="${gm!=null&&gm<0?'up':'down'}">${gm!=null?pc(gm):"—"}</td></tr>`;}).join("");
+ $("val").querySelectorAll(".cellin").forEach(el=>el.oninput=e=>{VAL[+e.target.dataset.i][e.target.dataset.k]=parseFloat(e.target.value)||0;renderVal();});
+ $("vstat").textContent=`${VAL.length} 檔 · 2026 攤薄EPS 基期，27/28 依 g% 複利；BVPS 以保留盈餘累積（配息率 ${VAL[0]?VAL[0].payout:40}%）`;
+}
+
+// ---- 匯入真實 ----
+function importCsv(text){
+ const lines=text.trim().split(/\r?\n/);const hdr=lines[0].split(",").map(s=>s.trim().replace(/^"|"$/g,""));const rows=lines.slice(1).map(l=>l.split(","));
+ const ci={};hdr.forEach((h,i)=>ci[h]=i);const D0=rows.map(r=>r[ci.Date!=null?ci.Date:0]);
+ let bi=D0.findIndex(d=>d>="2026-01-02");if(bi<0)bi=0;dates=D0;
+ const normArr=c=>{const bv=parseFloat(rows[bi][c]);return rows.map(r=>{const v=parseFloat(r[c]);return(isFinite(v)&&bv>0)?v/bv*100:null;});};
+ D.stocks.forEach(s=>{if(ci[s.t]!=null)SERIES[s.t]=normArr(ci[s.t]);});
+ extra={};["TAIEX","加權指數"].forEach(a=>{if(ci[a]!=null)extra.TAIEX=normArr(ci[a]);});["TPEX","櫃買指數"].forEach(a=>{if(ci[a]!=null)extra.TPEX=normArr(ci[a]);});
+ VAL.forEach(r=>{if(ci[r.t]!=null){const lv=parseFloat(rows[rows.length-1][ci[r.t]]);if(isFinite(lv))r.px=lv;}});
+ $("mode").textContent="真實 LIVE";$("mode").classList.add("live");
+ logAdd("匯入",`真實價格 ${dates.length} 期 · ${Object.keys(ci).length-1} 欄`);
+ renderChart();renderTree();renderVal();
+}
+$("imp").onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>importCsv(rd.result);rd.readAsText(f);};
+$("regen").onclick=()=>{demo();renderChart();renderTree();logAdd("重生","示意序列");};
+
+function dl(name,txt,type){const b=new Blob(["\ufeff"+txt],{type:type||"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name;a.click();}
+$("expLog").onclick=()=>{let o="Time,Action,Detail\n";LOG.forEach(e=>o+=`${e.t},${e.action},"${e.detail}"\n`);dl("VIA_AllInOne_Changelog.csv",o);};
+$("expReg").onclick=()=>{let o="Level,SemanticCode,AutoCode,Name,Ticker\n";Object.entries(D.l1).forEach(([f,n])=>o+=`L1,${f}-000,${autoCode("L1",f,n,"")},"${n}",\n`);Object.entries(D.l2).forEach(([c,m])=>{if(D.stocks.some(s=>s.l2===c))o+=`L2,${c},${autoCode("L2",m[0],m[1],c)},"${m[1]}",\n`;});D.stocks.forEach(s=>o+=`L3,${s.code},${autoCode("L3",s.fam,s.n,s.t)},"${s.n}",${s.t}\n`);D.peers.forEach(p=>o+=`GL,${p.fam}-GLOBAL,${autoCode("GL",p.fam,p.n,p.t)},"${p.n}",${p.t}\n`);dl("VIA_AllInOne_Registry.csv",o);};
+$("expAll").onclick=()=>{const obj={meta:{template:"PSU&Thermal AllInOne v2",policy:"append-only unless declared",base:"2026-01-02=100",mode:$("mode").textContent},
+ ssot:D.stocks.map(s=>({name:s.n,ticker:s.t,semantic:s.code,auto:autoCode("L3",s.fam,s.n,s.t),trend:s.tr,process:s.pr,loc:s.loc,index:Math.round(lastN(s.t))})),
+ bom:Object.fromEntries(D.stocks.map(s=>[s.t,{rows:BOMS[s.t],matCost:bomCost(s.t),asp:ASP[s.t],gm:+((ASP[s.t]-bomCost(s.t))/ASP[s.t]).toFixed(4)}])),
+ valuation:VAL.map(r=>{const g=(r.g||0)/100,po=(r.payout||0)/100;const e26=r.eps,e27=e26*(1+g),e28=e27*(1+g);const b26=r.bvps,b27=b26+e26*(1-po),b28=b27+e27*(1-po);return {lv:r.lv,name:r.n,ticker:r.t,px:r.px,g:r.g,eps:{2026:+e26.toFixed(2),2027:+e27.toFixed(2),2028:+e28.toFixed(2)},per:{2026:+(r.px/e26).toFixed(2),2027:+(r.px/e27).toFixed(2),2028:+(r.px/e28).toFixed(2)},pbr:{2026:+(r.px/b26).toFixed(2),2027:+(r.px/b27).toFixed(2),2028:+(r.px/b28).toFixed(2)},bom:r.peer?null:bomCost(r.t),gm:r.peer?null:+((ASP[r.t]-bomCost(r.t))/ASP[r.t]).toFixed(4)};}),
+ changelog:LOG};dl("VIA_AllInOne_PSU_Thermal.json",JSON.stringify(obj,null,2),"application/json");};
+
+demo();renderChart();renderTree();fillCo();$("asp").value=ASP[curCo().t];renderBom();renderVal();
+logAdd("初始化","PSU&Thermal 一體模板 · 19 個股 + 5 全球同業 · append-only");
+</script><script>
+(function(){
+ function cellText(td){var el=td.querySelector('input,select,textarea');
+  var v=el?(el.value||''):td.textContent;return (v||'').trim().replace(/\|/g,'\\|').replace(/\s+/g,' ');}
+ function tableToMd(tbl){
+  var heads=tbl.tHead?Array.prototype.slice.call(tbl.tHead.rows):[];
+  var body=tbl.tBodies.length?Array.prototype.slice.call(tbl.tBodies[0].rows):Array.prototype.slice.call(tbl.rows);
+  var hRow=heads.length?heads[heads.length-1]:body.shift();
+  if(!hRow)return '';
+  var cols=Array.prototype.map.call(hRow.cells,cellText);
+  var out='| '+cols.join(' | ')+' |\n| '+cols.map(function(){return '---';}).join(' | ')+' |\n';
+  body.forEach(function(tr){out+='| '+Array.prototype.map.call(tr.cells,cellText).join(' | ')+' |\n';});
+  return out;
+ }
+ window.exportPageMarkdown=function(){
+  var title=document.querySelector('h1')?document.querySelector('h1').innerText.trim():'VIA';
+  var kick=document.querySelector('.kicker')?document.querySelector('.kicker').innerText.trim():'';
+  var md='# '+title+'\n\n';
+  if(kick)md+='> '+kick+'\n\n';
+  md+='_匯出 '+new Date().toISOString().slice(0,19).replace('T',' ')+' · VIA · append-only_\n\n';
+  var nodes=document.querySelectorAll('h2, table');
+  Array.prototype.forEach.call(nodes,function(n){
+   if(n.tagName==='H2'){md+='\n## '+n.innerText.trim().replace(/\s+/g,' ')+'\n\n';}
+   else{var t=tableToMd(n);if(t)md+=t+'\n';}
+  });
+  var blob=new Blob([md],{type:'text/markdown'});var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=(title.replace(/[^\w\u4e00-\u9fff]+/g,'_').slice(0,40)||'VIA')+'.md';a.click();
+ };
+ // 加 MD 按鈕（在 PDF 左側）— 立即掛載（腳本在 body 尾端）
+ function addBtn(){if(document.getElementById('viaMdBtn'))return;var b=document.createElement('button');
+  b.id='viaMdBtn';b.textContent='\u2913 MD';b.className='pdf';b.style.right='66px';
+  b.onclick=window.exportPageMarkdown;document.body.appendChild(b);}
+ if(document.body)addBtn();else window.addEventListener('DOMContentLoaded',addBtn);
+})();
+</script>
+</body></html>
