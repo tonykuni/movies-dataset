@@ -1,0 +1,74 @@
+{
+  "schema_version": "vtr-lexicon/1.0",
+  "kind": "person",
+  "description": "人名詞庫 · 結構範本。本檔僅含範本詞條（enabled=false），實際人名須由 operator 依內部名冊建立並覆核 —— 人名屬個資，不由引擎自行推斷入庫。",
+  "entries": [
+    {
+      "id": "LEX-PER-0001",
+      "canonical": "<姓名範本·中文>",
+      "aliases": [
+        { "surface": "<英文名>", "type": "translation", "lang": "en" },
+        { "surface": "<同音字錯誤形>", "type": "asr_error", "lang": "zh" },
+        { "surface": "<職稱＋姓>", "type": "spoken", "lang": "zh", "auto_correct": false }
+      ],
+      "lang": "zh",
+      "status": "draft",
+      "enabled": false,
+      "scope": ["global"],
+      "match_policy": { "threshold": 0.88 },
+      "notes": "中文人名比對門檻高於全域預設（0.75 → 0.88）：人名多為 2–3 字，拼音距離區辨力低，門檻過低會把「大衛」改成「大偉」。同時 meta.participants 命中者可獲 +0.25 context_boost，這才是人名比對的主要訊號來源。",
+      "provenance": {
+        "created_at": "2026-08-04T00:00:00Z",
+        "created_by": "operator",
+        "source": "operator",
+        "approved_at": null,
+        "approved_by": null,
+        "evidence_doc_id": null
+      }
+    },
+    {
+      "id": "LEX-PER-0002",
+      "canonical": "<Name Template · EN>",
+      "aliases": [
+        { "surface": "<Nickname>", "type": "spoken", "lang": "en", "auto_correct": false },
+        { "surface": "<ASR mishearing>", "type": "asr_error", "lang": "en" }
+      ],
+      "lang": "en",
+      "status": "draft",
+      "enabled": false,
+      "scope": ["global"],
+      "match_policy": { "threshold": 0.85 },
+      "notes": "英文人名以 Double Metaphone 為主要音素訊號。單字名（Sam / Max / Bill）必須設 exact_only=true，否則會與一般詞衝突。",
+      "provenance": {
+        "created_at": "2026-08-04T00:00:00Z",
+        "created_by": "operator",
+        "source": "operator",
+        "approved_at": null,
+        "approved_by": null,
+        "evidence_doc_id": null
+      }
+    },
+    {
+      "id": "LEX-PER-0003",
+      "canonical": "operator",
+      "aliases": [
+        { "surface": "維運人員", "type": "translation", "lang": "zh", "auto_correct": false },
+        { "surface": "操作員", "type": "translation", "lang": "zh", "auto_correct": false }
+      ],
+      "lang": "en",
+      "status": "active",
+      "enabled": true,
+      "scope": ["global"],
+      "match_policy": { "exact_only": true, "case_sensitive": true },
+      "notes": "VIA 治理角色（非特定個人）。全小寫且 exact_only，避免與一般名詞「操作員」互相收斂。",
+      "provenance": {
+        "created_at": "2026-08-04T00:00:00Z",
+        "created_by": "operator",
+        "source": "migration",
+        "approved_at": "2026-08-04T00:00:00Z",
+        "approved_by": "operator",
+        "evidence_doc_id": null
+      }
+    }
+  ]
+}

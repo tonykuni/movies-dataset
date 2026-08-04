@@ -1,0 +1,217 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dg-in.local/vtr/contracts/vtr-document.schema.json",
+  "title": "VTR Document Contract v1",
+  "description": "SSOT 資料契約：Python 版與 JavaScript 版修復引擎共用。任何一步（Stage）的輸入與輸出都是本文件，差異只以 Patch 表示。Document is the only thing that crosses a stage boundary.",
+  "type": "object",
+  "required": ["schema_version", "doc_id", "meta", "segments", "revisions"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": "vtr-document/1.0" },
+    "doc_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9._-]{1,128}$",
+      "description": "會議紀錄唯一識別碼，例如 DGIN-MTG-20260804-01"
+    },
+    "content_hash": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "目前 segments 正規化序列化後的 SHA-256。每次 commit 後重算，用於 Diff & Versioning Pipeline 的 hash-lock。"
+    },
+    "meta": {
+      "type": "object",
+      "required": ["source", "primary_lang"],
+      "additionalProperties": true,
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": ["asr", "human", "mixed", "unknown"],
+          "description": "逐字稿來源。asr = 語音辨識輸出（錯字/無標點/斷句錯亂機率最高）"
+        },
+        "asr_engine": { "type": ["string", "null"] },
+        "primary_lang": { "type": "string", "enum": ["zh", "en", "mixed"] },
+        "meeting_title": { "type": ["string", "null"] },
+        "meeting_date": { "type": ["string", "null"], "format": "date" },
+        "participants": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "與會者。會被 Lexicon 的 people 詞庫用來加權（in-meeting boost）。"
+        },
+        "lexicon_scopes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "本場會議適用的 Lexicon scope，例如 [\"global\", \"project:VIA\", \"customer:ACME\"]"
+        }
+      }
+    },
+    "segments": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/segment" }
+    },
+    "revisions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/revision" },
+      "description": "append-only。每個 Stage 產生一個 revision；任何狀態都可由 revisions 重播還原。"
+    },
+    "review_queue": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/patch" },
+      "description": "信心度落在 review band 的 Patch，未套用，等待人工裁決。"
+    },
+    "structure": { "$ref": "#/$defs/structure" }
+  },
+  "$defs": {
+    "segment": {
+      "type": "object",
+      "required": ["id", "lang", "text"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^s[0-9]{5,}$" },
+        "lang": {
+          "type": "string",
+          "enum": ["zh", "en", "mixed"],
+          "description": "由 L1 語言分段引擎判定。mixed = 句內夾雜且無法再切分（例：『看一下 dashboard 的 KPI』）"
+        },
+        "text": { "type": "string" },
+        "speaker": { "type": ["string", "null"] },
+        "t_start": { "type": ["number", "null"], "description": "秒。ASR 時間軸，用於對齊音檔重聽。" },
+        "t_end": { "type": ["number", "null"] },
+        "runs": {
+          "type": "array",
+          "description": "句內 script run。mixed 句必填，供雙語 pipeline 分流。",
+          "items": {
+            "type": "object",
+            "required": ["start", "end", "script"],
+            "additionalProperties": false,
+            "properties": {
+              "start": { "type": "integer", "minimum": 0 },
+              "end": { "type": "integer", "minimum": 0 },
+              "script": { "type": "string", "enum": ["cjk", "latin", "digit", "punct", "other"] },
+              "role": {
+                "type": "string",
+                "enum": ["main", "embedded", "protected"],
+                "description": "embedded = 內嵌外語詞（不得送進該語言的獨立句法修復）；protected = 遮罩區（見 protections）"
+              }
+            }
+          }
+        },
+        "protections": {
+          "type": "array",
+          "description": "P0 遮罩區。任何生成式步驟（標點/文法/LLM）看到的是 sentinel，不是原文。",
+          "items": { "$ref": "#/$defs/protection" }
+        },
+        "flags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["low_confidence_asr", "crosstalk", "inaudible", "needs_audio_recheck", "unresolved_entity"]
+          }
+        }
+      }
+    },
+    "protection": {
+      "type": "object",
+      "required": ["sentinel", "surface", "kind"],
+      "additionalProperties": false,
+      "properties": {
+        "sentinel": {
+          "type": "string",
+          "pattern": "^⟦P[0-9]{4}⟧$",
+          "description": "遮罩符。刻意選用 U+27E6/U+27E7，不出現於中英文會議語料，且不會被 tokenizer 拆成語意單位。"
+        },
+        "surface": { "type": "string", "description": "被遮罩的原始字串" },
+        "kind": {
+          "type": "string",
+          "enum": ["lexicon", "part_number", "url", "email", "code_ident", "number_unit", "timestamp", "id_code"]
+        },
+        "lexicon_id": { "type": ["string", "null"] }
+      }
+    },
+    "patch": {
+      "type": "object",
+      "required": ["patch_id", "stage", "segment_id", "span", "before", "after", "rule_id", "confidence", "decision"],
+      "additionalProperties": false,
+      "properties": {
+        "patch_id": { "type": "string" },
+        "stage": {
+          "type": "string",
+          "enum": ["LANG_DETECT", "NORMALIZE", "PROTECT", "PUNCTUATE", "SEGMENT", "SPELL", "GRAMMAR", "LEXICON", "STRUCTURE", "UNPROTECT"]
+        },
+        "segment_id": { "type": "string" },
+        "span": {
+          "type": "array",
+          "prefixItems": [{ "type": "integer" }, { "type": "integer" }],
+          "minItems": 2,
+          "maxItems": 2,
+          "description": "[start, end)，以套用當下的 segment.text 為座標系"
+        },
+        "before": { "type": "string" },
+        "after": { "type": "string" },
+        "rule_id": {
+          "type": "string",
+          "pattern": "^VTR\\.[A-Z_]+\\.[a-z0-9_]+$",
+          "description": "跨語言共用命名空間，例：VTR.SPELL.zh_csc_macbert / VTR.LEXICON.pinyin_fuzzy。Python 版與 JS 版對同一規則必須用同一個 rule_id，才能做交叉驗證。"
+        },
+        "source": {
+          "type": "string",
+          "enum": ["deterministic", "model", "lexicon", "llm_arbiter", "human"]
+        },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "decision": { "type": "string", "enum": ["auto", "review", "reject"] },
+        "evidence": {
+          "type": ["string", "null"],
+          "description": "為什麼改。人工複核時唯一要讀的欄位；LLM 仲裁層必須填。"
+        }
+      }
+    },
+    "revision": {
+      "type": "object",
+      "required": ["rev", "stage", "at", "patches_applied", "content_hash"],
+      "additionalProperties": false,
+      "properties": {
+        "rev": { "type": "integer", "minimum": 0 },
+        "stage": { "type": "string" },
+        "at": { "type": "string", "format": "date-time" },
+        "engine": { "type": "string", "description": "例：vtr-py/1.0.0 或 vtr-js/1.0.0" },
+        "patches_applied": { "type": "array", "items": { "$ref": "#/$defs/patch" } },
+        "content_hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "metrics": { "type": "object", "additionalProperties": true }
+      }
+    },
+    "structure": {
+      "type": "object",
+      "description": "第八步輸出。會議結構化結果，不改動 segments，只引用 segment_id。",
+      "additionalProperties": false,
+      "properties": {
+        "topics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["title", "segment_ids"],
+            "additionalProperties": false,
+            "properties": {
+              "title": { "type": "string" },
+              "segment_ids": { "type": "array", "items": { "type": "string" } }
+            }
+          }
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["type", "text", "segment_ids", "confidence"],
+            "additionalProperties": false,
+            "properties": {
+              "type": { "type": "string", "enum": ["decision", "action", "issue", "risk", "info"] },
+              "text": { "type": "string" },
+              "owner": { "type": ["string", "null"] },
+              "due": { "type": ["string", "null"] },
+              "segment_ids": { "type": "array", "items": { "type": "string" } },
+              "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

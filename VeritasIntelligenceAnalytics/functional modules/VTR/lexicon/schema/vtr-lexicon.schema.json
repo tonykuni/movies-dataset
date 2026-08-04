@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dg-in.local/vtr/lexicon/vtr-lexicon.schema.json",
+  "title": "VTR SSOT Lexicon File v1",
+  "description": "單一詞庫檔（一個 kind 一個檔）。Python 版與 JavaScript 版讀同一批檔案，這是 SSOT 的實體形式。",
+  "type": "object",
+  "required": ["schema_version", "kind", "entries"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": "vtr-lexicon/1.0" },
+    "kind": {
+      "type": "string",
+      "enum": ["project", "product", "person", "part_number", "domain_term"]
+    },
+    "description": { "type": "string" },
+    "entries": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/entry" }
+    }
+  },
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "required": ["id", "canonical", "lang", "status", "enabled", "scope", "provenance"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^LEX-(PRJ|PRD|PER|PN|DOM)-[0-9]{4}$",
+          "description": "永久識別碼。詞條改名時 id 不變（canonical 改、舊名進 aliases）。"
+        },
+        "canonical": {
+          "type": "string",
+          "minLength": 1,
+          "description": "唯一正確寫法。UNPROTECT 一律還原成此形式。"
+        },
+        "aliases": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/alias" },
+          "description": "所有應被辨識並收斂到 canonical 的寫法，含 ASR 常見錯誤形。"
+        },
+        "lang": { "type": "string", "enum": ["zh", "en", "mixed", "code"] },
+        "status": {
+          "type": "string",
+          "enum": ["draft", "active", "deprecated"],
+          "description": "draft = 新增草稿，需 operator 覆核；deprecated = 保留辨識、不再作為 canonical 目標"
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "false 的詞條不參與比對。新入庫一律 false（VIA intake policy）。"
+        },
+        "scope": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^(global|project:[A-Za-z0-9_-]+|customer:[A-Za-z0-9_-]+|dept:[A-Za-z0-9_-]+)$"
+          },
+          "description": "適用範圍。會議的 meta.lexicon_scopes 交集後才啟用；同 scope 命中在比對時獲得 context_boost。"
+        },
+        "phonetic": {
+          "type": "object",
+          "description": "由 `vtr lexicon build` 自動產生，勿手改。手改值會在下次 build 被覆蓋。",
+          "additionalProperties": false,
+          "properties": {
+            "pinyin": { "type": "string", "description": "無聲調拼音串（zh）" },
+            "metaphone": { "type": "string", "description": "Double Metaphone 主碼（en）" }
+          }
+        },
+        "match_policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "覆寫全域比對設定。只在該詞條有特殊風險時使用。",
+          "properties": {
+            "exact_only": {
+              "type": "boolean",
+              "description": "true = 只做精確比對，不做模糊／拼音。用於與常用詞衝突的短詞。"
+            },
+            "threshold": { "type": "number", "minimum": 0, "maximum": 1 },
+            "case_sensitive": { "type": "boolean" },
+            "protect": {
+              "type": "boolean",
+              "default": true,
+              "description": "false = 命中後不遮罩（極少用；僅限確定不會被後續步驟破壞的詞）"
+            },
+            "negative_guard": {
+              "type": "boolean",
+              "default": false,
+              "description": "true = 反向護欄詞條：此 canonical 同時是合法的一般詞。當它被其他詞條列為別名時，LEXICON 步驟一律送仲裁而非自動收斂。強制條件：其他詞條若以此字串為別名，該別名必須設 auto_correct=false（由 validate_lexicon.py 檢查）。"
+            }
+          }
+        },
+        "deprecated_by": {
+          "type": ["string", "null"],
+          "pattern": "^LEX-(PRJ|PRD|PER|PN|DOM)-[0-9]{4}$"
+        },
+        "notes": { "type": ["string", "null"] },
+        "provenance": {
+          "type": "object",
+          "required": ["created_at", "created_by", "source"],
+          "additionalProperties": false,
+          "properties": {
+            "created_at": { "type": "string", "format": "date-time" },
+            "created_by": { "type": "string" },
+            "source": {
+              "type": "string",
+              "enum": ["operator", "meeting_intake", "erp_import", "migration"],
+              "description": "meeting_intake = 引擎從會議中發現的候選新詞；一律 enabled=false"
+            },
+            "approved_at": { "type": ["string", "null"], "format": "date-time" },
+            "approved_by": { "type": ["string", "null"] },
+            "evidence_doc_id": { "type": ["string", "null"] }
+          }
+        }
+      }
+    },
+    "alias": {
+      "type": "object",
+      "required": ["surface", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "surface": { "type": "string", "minLength": 1 },
+        "type": {
+          "type": "string",
+          "enum": ["abbrev", "spoken", "asr_error", "legacy", "translation", "typo"],
+          "description": "asr_error = 實際觀察到的語音辨識錯誤形（最高價值的一類，直接來自真實會議）"
+        },
+        "lang": { "type": ["string", "null"], "enum": ["zh", "en", "mixed", "code", null] },
+        "auto_correct": {
+          "type": "boolean",
+          "default": true,
+          "description": "false = 只辨識、不自動收斂成 canonical（用於語意上仍可接受的別名）"
+        }
+      }
+    }
+  }
+}
