@@ -1,0 +1,39 @@
+{
+  "record_id": "VIA_VDF_v0160C_BrowserUI_Record_v0100",
+  "record_date": "2026-08-05",
+  "action": "VERSION_FORWARD_BROWSER_UI",
+  "directive": "一般的html u/i (replace the mshta HTA window with a regular browser HTML UI)",
+  "from": {
+    "file": "supportive modules/VIA_Governance_Runtime/v0160B/bin/Invoke-VIA-VDF-OneClick-Sidebar-v0160B.ps1",
+    "sha256": "184f5195679715ad0d97a4b08b794c5ac53f784e95298cbc7e3e8de8622d96bc",
+    "state": "UNTOUCHED — gated by Start-VIA-VDF-v0102.ps1 (HTA rollback)"
+  },
+  "to": {
+    "file": "supportive modules/VIA_Governance_Runtime/v0160C/bin/Invoke-VIA-VDF-OneClick-Sidebar-v0160C.ps1",
+    "sha256": "1cc63429dd1b3d619338efd08b6951cc588803206a2072672738f26b36534a6e",
+    "gate": "functional modules/VDF/Start-VIA-VDF-v0103.ps1 (bin/via-vdf.cmd now points here)"
+  },
+  "architecture": "Same pattern as Control Tower: launcher hosts System.Net.HttpListener on 127.0.0.1 (8766, fallback 8768/8776), serves the workbench page at /, opens the default browser, and bridges every Windows action through endpoints: POST /api/run (write worker config + spawn hidden pwsh worker), GET /api/status (worker poll), GET /api/dialog (STA WinForms file/folder picker returning real paths), GET /api/exists, POST /api/open (open file/folder via OS default, parent-folder fallback), GET /view (serve generated report HTML into iframes — replaces file:// embedding). Ctrl+C stops the server.",
+  "activex_removal_map": {
+    "WScript.Shell worker launch": "POST /api/run (server-side Start-Process, quoting-safe array args)",
+    "WScript.Shell dialog helper": "GET /api/dialog (server runs the same -Sta helper, synchronous)",
+    "WScript.Shell open path": "POST /api/open",
+    "ADODB.Stream jsonRead/jsonWrite": "fetch JSON via apiGet/apiPost",
+    "FileSystemObject existence checks": "GET /api/exists (and server-side checks in /api/open, /view)",
+    "file:// iframe embedding": "GET /view?path= (http-served, avoids mixed file:// blocking)",
+    "HTA:APPLICATION block + window.resizeTo": "removed (browser manages the window)"
+  },
+  "behavior_notes": [
+    "All seven parameters, worker protocol, status schema, registries and governance gates unchanged.",
+    "Browser drag/drop cannot supply full Windows paths (unlike Explorer→HTA); UI logs guidance to use the Windows 選檔 buttons, which return real paths via the STA dialog helper.",
+    "Google Fonts now load fully (real browser engine) — the v0160B serif masthead renders as designed.",
+    "While a file dialog is open the single-threaded bridge pauses other requests (status polling resumes after choosing).",
+    "PS-side AST is formally validated by the v0103 gate on the user's machine before launch (fail-closed); JS side node --check PASS recorded here."
+  ],
+  "verification": {
+    "js_syntax": "node --check PASS",
+    "here_string_delimiters": "3 open / 3 close (unchanged)",
+    "activex_residual_count": 0
+  },
+  "append_only": true
+}
