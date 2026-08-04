@@ -332,11 +332,27 @@ function Invoke-Restore {
 
     if ([string]::IsNullOrWhiteSpace($Path)) {
         Write-Fail '需要 -Path（逐字稿檔案或資料夾）'
+        Write-Info '想先看範例：Run-VTR.cmd -Action Restore -Path .\samples\'
         Add-Result 'Restore' 1 '缺少 -Path'
         return 1
     }
 
-    $files = Get-TranscriptFiles -InputPath $Path
+    if (-not (Test-Path -LiteralPath $Path)) {
+        Write-Fail "找不到這個路徑：$Path"
+        $samples = Join-Path $script:Root 'samples'
+        if (Test-Path -LiteralPath $samples) {
+            Write-Info '想先看內建範例跑起來，執行：'
+            Write-Info '  Run-VTR.cmd -Action Restore -Path .\samples\'
+        } else {
+            Write-Info '請確認資料夾存在，或先自己建一個資料夾、把 .txt 逐字稿放進去。'
+        }
+        Add-Result 'Restore' 1 '路徑不存在'
+        return 1
+    }
+
+    # @() 強制陣列：函式 return 會把單元素陣列拆成純量，呼叫端不包 @() 就會
+    # 在只有一個逐字稿時，讓後面的 .Count 爆「property 'Count' cannot be found」。
+    $files = @(Get-TranscriptFiles -InputPath $Path)
     if ($files.Count -eq 0) {
         Write-Warn2 "$Path 底下沒有 .txt / .md / .log 檔案"
         Add-Result 'Restore' 0 '無輸入'

@@ -12,19 +12,34 @@ Best Solution Portfolio 定義了「要哪七大模組」；本目錄是它的**
 
 > **在檔案總管裡，雙擊 `Install-VTR.cmd`**
 
-它會自動幫你：檢查有沒有 Python → 沒有就自動下載安裝（不用你動手、不需要管理員）
-→ 設好 PATH → 跑一次完整驗證確認能用。全程中文提示，告訴你每一步在做什麼。
+它會自動幫你：**先裝最新版 PowerShell 7** → 檢查有沒有 Python，沒有就自動下載安裝
+→ 設好 PATH → 跑一次完整驗證確認能用。全程中文提示，告訴你每一步在做什麼，
+全程**不需要管理員權限**。
 
 裝好之後，日常只要**雙擊 `Run-VTR.cmd`** 就會跑一次完整檢查。就這樣，不用記任何指令。
+
+### 想先看它跑起來？（用內建範例）
+
+專案內附了一份範例逐字稿 `samples\meeting-sample.txt`。在終端機依序執行：
+
+```powershell
+Run-VTR.cmd -Action Restore -Path .\samples\
+Run-VTR.cmd -Action Inspect -DocId meeting-sample -ShowReview
+```
+
+第一行會把範例修復好（畫面會顯示 doc-id 是 `meeting-sample`），第二行檢視結果與待裁決清單。
 
 | 你想做的事 | 怎麼做 |
 |---|---|
 | 第一次安裝（新電腦） | 雙擊 `Install-VTR.cmd` |
 | 平常檢查系統正不正常 | 雙擊 `Run-VTR.cmd` |
-| 修復一批逐字稿 | 把 `.txt` 放進 `input\` 資料夾，在終端機執行 `Run-VTR.cmd -Action Restore -Path .\input\` |
+| 先看範例跑一次 | `Run-VTR.cmd -Action Restore -Path .\samples\` |
+| 修復你自己的逐字稿 | 把 `.txt` 放進一個資料夾（例如自己建一個 `input`），執行 `Run-VTR.cmd -Action Restore -Path .\input\` |
+| 檢視某份修復結果 | `Run-VTR.cmd -Action Inspect -DocId <畫面顯示的id> -ShowReview` |
 
-> 需要管理員權限嗎？**不需要。** Python 只裝給你目前的帳號，不會動到系統設定。
+> 需要管理員權限嗎？**不需要。** PowerShell 與 Python 都優先裝給你目前的帳號。
 > 出現「系統禁止執行指令碼」的紅字嗎？**不會。** 那兩個 `.cmd` 已經幫你處理好了。
+> 打了一個還沒修復過的 doc-id？**不會噴一堆英文錯誤。** 會用中文告訴你先跑 restore。
 
 下面是給工程師看的細節。一般使用者看到這裡就夠了。
 

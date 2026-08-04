@@ -46,6 +46,7 @@ SPEC_ARTIFACTS: tuple[tuple[str, str], ...] = (
     ("Install-VTR.ps1", "一鍵安裝器 · 新電腦自動補齊 Python 並驗證"),
     ("Install-VTR.cmd", "安裝器雙擊啟動器（略過執行原則、初學者用）"),
     ("Run-VTR.cmd", "日常雙擊啟動器 · 執行完整檢查"),
+    ("samples/meeting-sample.txt", "內建範例逐字稿 · 讓範例指令一跑就成功"),
     ("README.md", "VTR 子系統導覽"),
 )
 

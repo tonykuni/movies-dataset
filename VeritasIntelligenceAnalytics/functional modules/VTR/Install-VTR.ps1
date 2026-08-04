@@ -39,6 +39,8 @@
 [CmdletBinding()]
 param(
     [switch] $SkipInstall,
+    [switch] $SkipPowerShell,
+    [switch] $UpgradePowerShell,
     [switch] $SkipVerify,
     [string] $PythonVersion = '3.12',
     [switch] $NoColor
@@ -120,6 +122,103 @@ function Update-SessionPath {
         $joined  = (@($machine, $user) | Where-Object { $_ }) -join ';'
         if ($joined) { $env:Path = $joined }
     } catch { }
+}
+
+# --------------------------------------------------------------------------- #
+# PowerShell 7 偵測與安裝（一開始就把最新版準備好）
+# --------------------------------------------------------------------------- #
+
+function Get-PwshPath {
+    # 找 pwsh（PowerShell 7+）。先問 PATH，再試常見安裝位置
+    # （winget/安裝腳本剛裝完，PATH 在本視窗可能還沒更新）。
+    $cmd = Get-Command pwsh -ErrorAction SilentlyContinue
+    if ($cmd) { return $cmd.Source }
+    $bases = @($env:ProgramFiles, ${env:ProgramFiles(x86)}, $env:LOCALAPPDATA) |
+             Where-Object { $_ }
+    foreach ($b in $bases) {
+        foreach ($sub in @('PowerShell\7\pwsh.exe', 'Microsoft\PowerShell\7\pwsh.exe')) {
+            $p = Join-Path $b $sub
+            if (Test-Path -LiteralPath $p) { return $p }
+        }
+    }
+    return $null
+}
+
+function Get-PwshVersion {
+    param([string] $Exe)
+    try {
+        $v = & $Exe -NoProfile -Command '$PSVersionTable.PSVersion.ToString()' 2>$null
+        return ([string]$v).Trim()
+    } catch { return $null }
+}
+
+function Install-PowerShell7 {
+    # 先試 winget（官方來源、自動取最新版）。
+    if ($null -ne (Get-Command winget -ErrorAction SilentlyContinue)) {
+        Say-Wait '使用 winget 安裝最新版 PowerShell…'
+        try {
+            $a = @('install', '--exact', '--id', 'Microsoft.PowerShell',
+                   '--source', 'winget', '--silent',
+                   '--accept-package-agreements', '--accept-source-agreements')
+            & winget @a | Out-Host
+            if ($LASTEXITCODE -eq 0) { return $true }
+            Say-Note "winget 退出碼 $LASTEXITCODE，改用官方安裝腳本（免管理員）。"
+        } catch {
+            Say-Note "winget 失敗：$($_.Exception.Message)，改用官方安裝腳本。"
+        }
+    }
+    # 備援：微軟官方安裝腳本，解壓到使用者目錄並加入 PATH —— 不需要管理員。
+    Say-Wait '從 aka.ms 官方腳本安裝最新版 PowerShell（免管理員）…'
+    try {
+        $installer = Invoke-RestMethod -Uri 'https://aka.ms/install-powershell.ps1' -UseBasicParsing
+        $sb = [ScriptBlock]::Create($installer)
+        $dest = Join-Path $env:LOCALAPPDATA 'Microsoft\PowerShell\7'
+        & $sb -Destination $dest -AddToPath
+        return $true
+    } catch {
+        Say-Fail "PowerShell 安裝未成功：$($_.Exception.Message)"
+        return $false
+    }
+}
+
+function Ensure-PowerShell7 {
+    $exe = Get-PwshPath
+    if ($null -ne $exe) {
+        $ver = Get-PwshVersion -Exe $exe
+        if ($UpgradePowerShell -and -not $SkipPowerShell) {
+            Say-Wait "已安裝 PowerShell $ver，依 -UpgradePowerShell 嘗試升級到最新…"
+            if (Install-PowerShell7) {
+                Update-SessionPath
+                $exe = Get-PwshPath; $ver = Get-PwshVersion -Exe $exe
+            }
+        }
+        Say-OK "PowerShell 7 已就緒：版本 $ver"
+        return $true
+    }
+
+    if ($SkipPowerShell) {
+        Say-Wait '未安裝 PowerShell 7，且指定了 -SkipPowerShell；改用內建的 Windows PowerShell 5.1 繼續。'
+        return $false
+    }
+
+    Say-Wait '沒偵測到 PowerShell 7，開始安裝最新版（可能要幾分鐘）…'
+    Say-Note '若跳出「使用者帳戶控制 (UAC)」詢問，點「是」即可。'
+    Say-Note '不能點（沒有管理員權限）也沒關係，會自動改用免管理員的方式安裝。'
+
+    [void](Install-PowerShell7)
+    Update-SessionPath
+    $exe = Get-PwshPath
+
+    if ($null -ne $exe) {
+        Say-OK "PowerShell 7 安裝完成：版本 $(Get-PwshVersion -Exe $exe)"
+        return $true
+    }
+
+    # 裝好了但本視窗還沒吃到 PATH，或安裝未成功 —— 都不影響後續（5.1 也能跑）。
+    Say-Wait 'PowerShell 7 尚未在本視窗生效（多半是 PATH 要重開視窗才更新）。'
+    Say-Note 'VTR 在內建的 Windows PowerShell 5.1 上也能正常運作，這一步不影響驗證。'
+    Say-Note '想立刻改用 7：關掉視窗重開一次；日後雙擊 Run-VTR.cmd 會自動優先用 pwsh。'
+    return $false
 }
 
 # --------------------------------------------------------------------------- #
@@ -205,13 +304,13 @@ function Invoke-FullCheck {
         Say-Fail "找不到 Invoke-VTR.ps1（應與本程式在同一資料夾）"
         return 1
     }
-    # 用目前這個 PowerShell 的執行檔，開一個子程序去跑驗證。
-    # 這樣 Invoke-VTR.ps1 結尾的 exit 只會結束子程序，不會關掉安裝器視窗。
-    $host_exe = $null
-    try { $host_exe = (Get-Process -Id $PID).Path } catch { }
+    # 開一個子程序去跑驗證，這樣 Invoke-VTR.ps1 結尾的 exit 只會結束子程序，
+    # 不會關掉安裝器視窗。**優先用剛裝好的 PowerShell 7**，找不到才退回目前的殼。
+    $host_exe = Get-PwshPath
     if ([string]::IsNullOrWhiteSpace($host_exe)) {
-        $host_exe = if (Get-Command pwsh -ErrorAction SilentlyContinue) { 'pwsh' } else { 'powershell' }
+        try { $host_exe = (Get-Process -Id $PID).Path } catch { }
     }
+    if ([string]::IsNullOrWhiteSpace($host_exe)) { $host_exe = 'powershell' }
     & $host_exe -NoProfile -ExecutionPolicy Bypass -File $invoke | Out-Host
     return $LASTEXITCODE
 }
@@ -224,13 +323,17 @@ Initialize-Utf8
 
 Say-Title 'VTR 一鍵安裝器 · 中英文會議紀錄修復引擎'
 Say "  這支程式會自動把需要的東西裝好，你只要看提示就行。" 'DarkGray'
-Say "  不需要管理員權限；Python 只裝給你目前的帳號。" 'DarkGray'
+Say "  會先裝最新版 PowerShell，再裝 Python，最後驗證。全程免管理員。" 'DarkGray'
 
 $exitCode = 0
 
 try {
-    # --- 步驟 1：檢查 Python ------------------------------------------------ #
-    Say-Step 1 '檢查 Python（VTR 唯一需要的東西）'
+    # --- 步驟 1：最新版 PowerShell ------------------------------------------ #
+    Say-Step 1 '確認 / 安裝最新版 PowerShell 7'
+    [void](Ensure-PowerShell7)
+
+    # --- 步驟 2：檢查 Python ------------------------------------------------ #
+    Say-Step 2 '檢查 Python（VTR 唯一需要的執行環境）'
     $py = Find-Python
 
     if ($null -ne $py) {
@@ -260,13 +363,13 @@ try {
         Say-OK "安裝完成：$($py.Exe) 版本 $($py.Version)"
     }
 
-    # --- 步驟 2：完整驗證 --------------------------------------------------- #
+    # --- 步驟 3：完整驗證 --------------------------------------------------- #
     if ($SkipVerify) {
-        Say-Step 2 '略過驗證（-SkipVerify）'
+        Say-Step 3 '略過驗證（-SkipVerify）'
         Say-Note '之後想檢查，雙擊 Run-VTR.cmd 即可。'
     }
     else {
-        Say-Step 2 '執行 VTR 完整驗證'
+        Say-Step 3 '執行 VTR 完整驗證'
         Say-Note '（環境檢查 → 詞庫 → 引擎測試 → manifest 稽核）'
         $code = Invoke-FullCheck
         if ($code -eq 0) {
