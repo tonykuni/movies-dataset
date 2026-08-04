@@ -63,7 +63,7 @@ LL RULES APPLIED: #10 #12 #13 #15 #17 #18 #19 #20
 # [VRN:ANCHOR:MDL001-META-001] §0  MODULE METADATA
 # ============================================================================
 
-__version__   = "1.0.0"
+__version__   = "1.1.0"
 __module_id__ = "VRN-MDL001-SUP-001"
 __asset_id__  = "VRN-MDL001-CLS-001"
 __author__    = "VRN Team"
@@ -98,6 +98,12 @@ pd         = _si("pandas")
 pyarrow    = _si("pyarrow")
 orjson     = _si("orjson")
 xxhash     = _si("xxhash")
+
+# v1.1.0 NEW: polars + duckdb (primary)
+pl         = _si("polars")
+duckdb_lib = _si("duckdb")
+POLARS_OK  = pl is not None
+DUCKDB_OK  = duckdb_lib is not None
 
 # ── Celeritas plugin globals ───────────────────────────────────────────────────
 _CEL: object = None;  _CEL_OK: bool = False
@@ -227,6 +233,12 @@ _DEFAULTS = dict(
     dedup       = True,          # skip SHA256 duplicates in pdf_temp
     overwrite   = False,         # overwrite existing output PDF
     rename_mode = "auto",        # auto = ticker_date_broker_HASH8 | preserve = keep original name
+    # ── v1.1.0 NEW (append-only) ─────────────────────────────────────────────
+    use_duckdb     = True,    # P3 DuckDB primary, sqlite fallback
+    batch_size     = 5000,    # P3 buffer flush threshold
+    polars_first   = True,    # P5 polars vectorized exports
+    self_verify    = True,    # P6 4-phase HTML
+    fitz_reuse     = True,    # P1.5 在 convert_pdf_to_hq_pdf 中重用 doc handle
 )
 
 # Supported input extensions
@@ -737,6 +749,350 @@ CREATE TABLE IF NOT EXISTS vrn_mdl001_convert_log (
         except Exception as e: log.warning("[MDL001] csv export: %s", e)
 
 # ============================================================================
+# [VRN:ANCHOR:MDL001-BATCH-001] §11.5  P3 BATCH BUFFER + DUCK WRITER (v1.1.0)
+# ── 同 MDL002/004/005 v1.1.0 模式：worker push 主執行緒一次 flush          ─
+# ============================================================================
+
+class MDL001BatchBuffer:
+    """VRN-MDL001-CLS-003  P3 batch buffer (NEW v1.1.0)."""
+    def __init__(self, batch_size: int = 5000):
+        self.batch_size = batch_size
+        self._conv_buf: List[Tuple] = []
+        self._lock = threading.Lock()
+
+    def push_conversion(self, rec: Dict):
+        ts = time.strftime("%Y-%m-%d %H:%M:%S")
+        # rec is the v1.0.0 schema dict from process_one
+        err_val = rec.get("error","") or ""
+        row = (
+            None,
+            rec.get("src_filename",""),
+            rec.get("input_type",""),               # src_type column
+            rec.get("dst_filename",""),
+            rec.get("ticker",""), rec.get("report_date",""),
+            rec.get("broker_abbr",""),
+            rec.get("src_sha256",""),               # sha256_src
+            rec.get("dst_sha256",""),               # sha256_dst
+            rec.get("n_pages",0),                   # n_pages_src
+            rec.get("n_pages",0),                   # n_pages_dst (same)
+            int(rec.get("dpi",0)),
+            float(rec.get("file_size_kb",0.0) or 0.0),
+            "OK" if rec.get("ok") else "FAIL",      # status
+            err_val[:500],
+            float(rec.get("elapsed",0.0) or 0.0),
+            ts,
+        )
+        with self._lock:
+            self._conv_buf.append(row)
+
+    def stats(self) -> Dict[str, int]:
+        return {"conv": len(self._conv_buf)}
+
+    def consume_all(self) -> List:
+        with self._lock:
+            c = self._conv_buf
+            self._conv_buf = []
+        return c
+
+
+_DDL_DUCK_M001_CONV = """
+CREATE TABLE IF NOT EXISTS vrn_mdl001_conversions (
+    id INTEGER, src_filename VARCHAR, src_type VARCHAR, dst_filename VARCHAR,
+    ticker VARCHAR, report_date VARCHAR, broker_abbr VARCHAR,
+    sha256_src VARCHAR, sha256_dst VARCHAR,
+    n_pages_src INTEGER, n_pages_dst INTEGER,
+    dpi INTEGER, file_size_kb DOUBLE,
+    status VARCHAR, error VARCHAR, elapsed DOUBLE, ts VARCHAR
+);
+"""
+
+
+class MDL001DuckWriter:
+    """VRN-MDL001-CLS-004  DuckDB primary writer (NEW v1.1.0)."""
+    def __init__(self, db_path: str):
+        if not DUCKDB_OK:
+            raise RuntimeError("duckdb not available")
+        self.db_path = db_path
+        self._con = duckdb_lib.connect(db_path)
+        self._con.execute(_DDL_DUCK_M001_CONV)
+
+    def flush(self, conv_rows: List) -> Dict[str, int]:
+        n_c = 0
+        try:
+            self._con.execute("BEGIN TRANSACTION")
+            if conv_rows:
+                self._con.executemany(
+                    "INSERT INTO vrn_mdl001_conversions VALUES "
+                    "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", conv_rows)
+                n_c = len(conv_rows)
+            self._con.execute("COMMIT")
+        except Exception as e:
+            try: self._con.execute("ROLLBACK")
+            except: pass
+            log.error("[MDL001] DuckDB flush fail: %s", e); raise
+        return {"conv": n_c}
+
+    def export_parquet_polars(self, out_dir: str) -> Optional[str]:
+        out_path = str(Path(out_dir) / "VRN_MDL001_ConvertLog.parquet")
+        try:
+            self._con.execute(
+                f"COPY (SELECT * FROM vrn_mdl001_conversions) "
+                f"TO '{out_path}' (FORMAT PARQUET, COMPRESSION ZSTD)")
+            return out_path
+        except Exception as e:
+            log.warning("[MDL001] DuckDB→parquet fail: %s", e); return None
+
+    def export_csv_polars(self, out_dir: str) -> Optional[str]:
+        out_path = str(Path(out_dir) / "VRN_MDL001_ConvertLog.csv")
+        if POLARS_OK:
+            try:
+                rows = self._con.execute("SELECT * FROM vrn_mdl001_conversions").fetchall()
+                cols = [d[0] for d in self._con.description]
+                if rows:
+                    df = pl.DataFrame(rows, schema=cols, orient="row")
+                    csv_text = df.write_csv()
+                    Path(out_path).write_bytes(b"\xef\xbb\xbf" + csv_text.encode("utf-8"))
+                else:
+                    Path(out_path).write_bytes(
+                        b"\xef\xbb\xbf" + (",".join(cols) + "\n").encode("utf-8"))
+                return out_path
+            except Exception as e:
+                log.debug("[MDL001] polars-fetchall csv fail (%s), fallback DuckDB", e)
+        try:
+            self._con.execute(
+                f"COPY (SELECT * FROM vrn_mdl001_conversions) "
+                f"TO '{out_path}' (HEADER, DELIMITER ',')")
+            data = Path(out_path).read_bytes()
+            Path(out_path).write_bytes(b"\xef\xbb\xbf" + data)
+            return out_path
+        except Exception as e:
+            log.warning("[MDL001] csv export fail: %s", e); return None
+
+    def close(self):
+        try: self._con.close()
+        except: pass
+
+
+# ── Append v1.1.0 batch flush + polars exports to legacy DBWriter ─────────
+def _mdl001_dbwriter_flush(self, conv_rows: List) -> Dict[str, int]:
+    n_c = 0
+    with self._lock:
+        try:
+            self._con.execute("BEGIN")
+            if conv_rows:
+                self._con.executemany(
+                    "INSERT INTO vrn_mdl001_conversions "
+                    "(src_filename,src_type,dst_filename,ticker,report_date,"
+                    " broker_abbr,sha256_src,sha256_dst,n_pages_src,n_pages_dst,"
+                    " dpi,file_size_kb,status,error,elapsed) "
+                    "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                    [r[1:-1] for r in conv_rows])
+                n_c = len(conv_rows)
+            self._con.commit()
+        except Exception as e:
+            try: self._con.rollback()
+            except: pass
+            log.error("[MDL001] sqlite flush fail: %s", e); raise
+    return {"conv": n_c}
+
+MDL001DBWriter.flush = _mdl001_dbwriter_flush
+
+
+def _mdl001_dbwriter_export_parquet_polars(self, out_dir: str) -> Optional[str]:
+    out_path = str(Path(out_dir) / "VRN_MDL001_ConvertLog.parquet")
+    if not POLARS_OK:
+        self.export_parquet(out_dir)
+        return out_path if Path(out_path).exists() else None
+    try:
+        with self._lock:
+            cur = self._con.execute("SELECT * FROM vrn_mdl001_conversions")
+            rows = cur.fetchall()
+            cols = [d[0] for d in cur.description] if cur.description else []
+        if not rows:
+            df = pl.DataFrame(schema={c: pl.Utf8 for c in cols} if cols else None)
+        else:
+            df = pl.DataFrame(rows, schema=cols, orient="row")
+        df.write_parquet(out_path, compression="zstd")
+        return out_path
+    except Exception as e:
+        log.warning("[MDL001] polars→parquet fail (%s), pandas fallback", e)
+        self.export_parquet(out_dir)
+        return out_path if Path(out_path).exists() else None
+
+def _mdl001_dbwriter_export_csv_polars(self, out_dir: str) -> Optional[str]:
+    out_path = str(Path(out_dir) / "VRN_MDL001_ConvertLog.csv")
+    if not POLARS_OK:
+        self.export_csv(out_dir)
+        return out_path if Path(out_path).exists() else None
+    try:
+        with self._lock:
+            cur = self._con.execute("SELECT * FROM vrn_mdl001_conversions")
+            rows = cur.fetchall()
+            cols = [d[0] for d in cur.description] if cur.description else []
+        if rows and cols:
+            df = pl.DataFrame(rows, schema=cols, orient="row")
+            csv_text = df.write_csv()
+            Path(out_path).write_bytes(b"\xef\xbb\xbf" + csv_text.encode("utf-8"))
+        else:
+            Path(out_path).write_bytes(
+                b"\xef\xbb\xbf" + (",".join(cols) + "\n").encode("utf-8"))
+        return out_path
+    except Exception as e:
+        log.debug("[MDL001] polars-fetchall csv fail (%s), pandas fallback", e)
+        self.export_csv(out_dir)
+        return out_path if Path(out_path).exists() else None
+
+MDL001DBWriter.export_parquet_polars = _mdl001_dbwriter_export_parquet_polars
+MDL001DBWriter.export_csv_polars     = _mdl001_dbwriter_export_csv_polars
+
+
+# ============================================================================
+# [VRN:ANCHOR:MDL001-SELFCHK-001] §11.7  P6 4-PHASE SELF-VERIFICATION (v1.1.0)
+# ============================================================================
+
+class MDL001SelfVerifier:
+    """VRN-MDL001-CLS-005  P6 4-phase debug chain (NEW v1.1.0)."""
+    def __init__(self, cfg: Dict, run_summary: Dict, mdl001_temp: str):
+        self.cfg = cfg; self.run_summary = run_summary
+        self.mdl001_temp = mdl001_temp
+        self.checks: List[Dict] = []
+
+    def _add(self, phase, name, ok, detail=""):
+        self.checks.append({"phase":phase,"name":name,"ok":bool(ok),"detail":detail})
+
+    def run(self) -> Dict:
+        # P1: imports
+        self._add("1/4", "Module version 1.1.0", __version__ == "1.1.0", __version__)
+        self._add("1/4", "TW_TICKER_REGEX locked",
+                  TW_TICKER_REGEX.pattern == r"(?!0)(?!202[1-9])(?!2030)([1-9]\d{3})",
+                  "")
+        self._add("1/4", "polars available", POLARS_OK, "")
+        self._add("1/4", "duckdb available", DUCKDB_OK, "")
+        self._add("1/4", "fitz available",   fitz is not None, "")
+
+        # P2: new infra
+        self._add("2/4", "MDL001BatchBuffer exists",
+                  "MDL001BatchBuffer" in globals(), "")
+        self._add("2/4", "MDL001DuckWriter exists",
+                  "MDL001DuckWriter" in globals(), "")
+        self._add("2/4", "DBWriter has flush method",
+                  hasattr(MDL001DBWriter, "flush"), "")
+        self._add("2/4", "DBWriter has export_parquet_polars",
+                  hasattr(MDL001DBWriter, "export_parquet_polars"), "")
+        self._add("2/4", "DBWriter has export_csv_polars",
+                  hasattr(MDL001DBWriter, "export_csv_polars"), "")
+
+        # P3: DB
+        duck_p   = Path(self.mdl001_temp) / "VRN_MDL001.duckdb"
+        sqlite_p = Path(self.mdl001_temp) / "VRN_MDL001.db"
+        self._add("3/4", "DB file exists", duck_p.exists() or sqlite_p.exists(),
+                  f"duck={duck_p.exists()} sqlite={sqlite_p.exists()}")
+        if duck_p.exists() and DUCKDB_OK:
+            try:
+                con = duckdb_lib.connect(str(duck_p), read_only=True)
+                tbls = {t[0] for t in con.execute(
+                    "SELECT table_name FROM information_schema.tables "
+                    "WHERE table_schema='main'").fetchall()}
+                con.close()
+                self._add("3/4", "DuckDB schema vrn_mdl001_conversions",
+                          "vrn_mdl001_conversions" in tbls, str(sorted(tbls)))
+            except Exception as e:
+                self._add("3/4", "DuckDB schema vrn_mdl001_conversions",
+                          False, str(e))
+
+        # P4: outputs
+        for fn in ("VRN_MDL001_ConvertLog.json", "VRN_MDL001_VerifySummary.json",
+                   "VRN_MDL001_ConvertLog.parquet", "VRN_MDL001_ConvertLog.csv"):
+            p = Path(self.mdl001_temp) / fn
+            self._add("4/4", f"file:{fn}", p.exists(),
+                      f"size={p.stat().st_size if p.exists() else 0}")
+        ti = self.run_summary.get("total", 0)
+        self._add("4/4", "total_files non-negative", ti >= 0, str(ti))
+
+        n_total = len(self.checks); n_pass = sum(1 for c in self.checks if c["ok"])
+        n_fail  = n_total - n_pass
+        cls = "READY" if n_fail == 0 else ("NEAR-READY" if n_fail <= 2 else "NOT-READY")
+        return {"total":n_total,"pass":n_pass,"fail":n_fail,
+                "classification":cls,"checks":self.checks,
+                "generated":time.strftime("%Y-%m-%d %H:%M:%S")}
+
+
+def build_self_verify_html_mdl001(verify_result: Dict, run_summary: Dict) -> str:
+    """VRN-MDL001-FNC-015  VIA Visual Lock self-verify HTML (NEW v1.1.0)."""
+    cls = verify_result.get("classification","?")
+    cls_color = {"READY":"#439a9a","NEAR-READY":"#e0b020",
+                 "NOT-READY":"#c83030"}.get(cls,"#666")
+    cls_emoji = {"READY":"✓","NEAR-READY":"⚠","NOT-READY":"✗"}.get(cls,"?")
+
+    by_phase: "Dict[str,List[Dict]]" = {}
+    for c in verify_result.get("checks",[]):
+        by_phase.setdefault(c["phase"], []).append(c)
+
+    phase_html = []
+    for phase, items in by_phase.items():
+        rows = "".join(
+            f'<tr><td class="ck-name">{c["name"]}</td>'
+            f'<td class="ck-{"ok" if c["ok"] else "fail"}">'
+            f'{"✓" if c["ok"] else "✗"} {"PASS" if c["ok"] else "FAIL"}</td>'
+            f'<td class="ck-detail">{str(c["detail"])[:120]}</td></tr>'
+            for c in items)
+        n_pass = sum(1 for c in items if c["ok"])
+        phase_html.append(f"""
+        <div class="cd"><div class="cd-h">PHASE {phase} ({n_pass}/{len(items)} pass)</div>
+        <div class="cd-b"><table class="ck-tbl">
+        <thead><tr><th>Check</th><th>Result</th><th>Detail</th></tr></thead>
+        <tbody>{rows}</tbody></table></div></div>""")
+
+    sum_lines = [
+        f"$ VRN_MDL001_Converter v{__version__} self-verification",
+        f"  generated      : {verify_result.get('generated','-')}",
+        f"  classification : {cls} {cls_emoji}",
+        f"  checks         : {verify_result.get('pass',0)}/{verify_result.get('total',0)} pass",
+        "",
+        "$ pipeline summary",
+        f"  total files    : {run_summary.get('total','-')}",
+        f"  ok / fail      : {run_summary.get('ok_count','-')} / {run_summary.get('fail_count','-')}",
+        f"  by type        : {dict(list(run_summary.get('by_src_type',{}).items())[:6])}",
+    ]
+    term_html = "\n".join(sum_lines)
+
+    html = f"""<!DOCTYPE html>
+<html lang="zh-Hant"><head><meta charset="UTF-8">
+<title>VRN MDL001 v{__version__} · Self-Verification · {cls}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{{box-sizing:border-box;margin:0;padding:0}}
+body{{background:#f5f4f0;color:#1a1a1a;font-family:'DM Sans',-apple-system,sans-serif;font-size:11px;line-height:1.6;padding:24px}}
+.hdr{{border-top:4px solid;border-image:linear-gradient(90deg,#ff5e5e,#ffae5e,#ffe55e,#5eff8c,#5ec8ff,#8c5eff,#ff5ec8) 1;padding-top:16px;margin-bottom:24px}}
+h1{{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.02em}}
+.sub{{font-family:'DM Mono',monospace;font-size:10px;color:#666;margin-top:4px}}
+.cls-badge{{display:inline-block;padding:4px 12px;background:{cls_color};color:white;font-family:'Syne',sans-serif;font-weight:700;font-size:11px;margin-left:12px;letter-spacing:0.05em}}
+.cd{{background:white;border:1px solid #e0ddd5;margin-bottom:16px}}
+.cd-h{{background:#4c78a8;color:white;padding:8px 16px;font-family:'Syne',sans-serif;font-weight:600;font-size:11px;letter-spacing:0.03em}}
+.cd-b{{padding:12px 16px}}
+.tm{{background:#1a1a1a;color:#c8e0c8;font-family:'DM Mono',monospace;font-size:10px;padding:32px 16px 16px 16px;position:relative;white-space:pre;line-height:1.5}}
+.tm::before{{content:"● ● ●";position:absolute;top:8px;left:12px;color:#ff5e5e;letter-spacing:4px;font-size:10px}}
+.ck-tbl{{width:100%;border-collapse:collapse}}
+.ck-tbl th{{background:#f5f4f0;color:#4c78a8;text-align:left;padding:6px 8px;font-weight:600;border-bottom:2px solid #4c78a8;font-size:10px;letter-spacing:0.05em}}
+.ck-tbl td{{padding:6px 8px;border-bottom:1px solid #f0ede5;vertical-align:top}}
+.ck-name{{font-weight:500;min-width:200px}}
+.ck-ok{{color:#439a9a;font-weight:600;min-width:80px}}
+.ck-fail{{color:#c83030;font-weight:700;min-width:80px}}
+.ck-detail{{color:#666;font-family:'DM Mono',monospace;font-size:10px}}
+.foot{{margin-top:24px;color:#999;font-family:'DM Mono',monospace;font-size:9px;text-align:right}}
+</style></head><body>
+<div class="hdr"><h1>VRN MDL001 · Converter v{__version__}<span class="cls-badge">{cls}</span></h1>
+<div class="sub">VeritasReportNova · 4-Phase Self-Verification · {time.strftime("%Y-%m-%d %H:%M:%S")}</div></div>
+<div class="cd"><div class="cd-h">RUN SUMMARY</div><div class="cd-b"><div class="tm">{term_html}</div></div></div>
+{"".join(phase_html)}
+<div class="foot">Module: {__module_id__} · Asset: {__asset_id__} · v{__version__}</div>
+</body></html>"""
+    return html
+
+
+# ============================================================================
 # CORE PROCESSOR
 # ============================================================================
 
@@ -745,8 +1101,10 @@ def process_one(
     cfg:      Dict,
     db:       Optional[MDL001DBWriter],
     existing_sha256: set,
+    buffer:   Optional["MDL001BatchBuffer"] = None,    # v1.1.0 NEW
 ) -> Dict:
-    """VRN-MDL001-FNC-010  Convert one file → high-quality PDF in pdf_temp."""
+    """VRN-MDL001-FNC-010  Convert one file → high-quality PDF in pdf_temp.
+    v1.1.0: buffer pushes DB rows without lock contention."""
     t0       = time.perf_counter()
     pdf_temp = cfg.get("pdf_temp", _DEFAULTS["pdf_temp"])
     dpi      = cfg.get("dpi", _DEFAULTS["dpi"])
@@ -854,7 +1212,10 @@ def process_one(
              rec["src_filename"], rec["dst_filename"],
              status, rec["n_pages"], rec["elapsed"])
 
-    if db:
+    if buffer is not None:
+        try: buffer.push_conversion(rec)
+        except Exception as e: log.warning("[MDL001] buffer push: %s", e)
+    elif db:
         try: db.insert(rec)
         except Exception as e: log.warning("[MDL001] DB insert: %s", e)
 
@@ -914,6 +1275,7 @@ class VRN_MDL001_Converter:
         self.db: Optional[MDL001DBWriter] = None
 
     def run(self) -> Dict:
+        run_t0      = time.perf_counter()
         input_dir   = self.cfg.get("input_dir",   _DEFAULTS["input_dir"])
         pdf_temp    = self.cfg.get("pdf_temp",    _DEFAULTS["pdf_temp"])
         mdl001_temp = self.cfg.get("mdl001_temp", _DEFAULTS["mdl001_temp"])
@@ -925,8 +1287,26 @@ class VRN_MDL001_Converter:
         cap = _mdl001_accel_init(self.workers)
         log.info("[MDL001] accel caps: %s  dpi=%s", cap, self.cfg.get("dpi", 300))
 
+        # ── v1.1.0: BatchBuffer + DuckDB primary + sqlite fallback ──────────
+        self.buffer: Optional[MDL001BatchBuffer] = None
+        self.duck:   Optional[MDL001DuckWriter]  = None
         if self.cfg.get("enable_db", True):
-            self.db = MDL001DBWriter(str(Path(mdl001_temp) / "VRN_MDL001.db"))
+            self.buffer = MDL001BatchBuffer(
+                batch_size=self.cfg.get("batch_size", 5000))
+            if self.cfg.get("use_duckdb", True) and DUCKDB_OK:
+                try:
+                    self.duck = MDL001DuckWriter(
+                        str(Path(mdl001_temp) / "VRN_MDL001.duckdb"))
+                    log.info("[MDL001] DuckDB primary writer ready")
+                except Exception as e:
+                    log.warning("[MDL001] DuckDB init fail (%s), sqlite fallback", e)
+                    self.duck = None
+            try:
+                self.db = MDL001DBWriter(str(Path(mdl001_temp) / "VRN_MDL001.db"))
+                log.info("[MDL001] sqlite fallback writer ready")
+            except Exception as e:
+                log.warning("[MDL001] sqlite init fail: %s", e)
+                self.db = None
 
         # Scan existing pdf_temp SHA256 for dedup
         existing_sha256: set = set()
@@ -947,20 +1327,17 @@ class VRN_MDL001_Converter:
             return {"ok": True, "total": 0, "success": 0,
                     "errors": [], "out_dir": pdf_temp}
 
-        log.info("[MDL001] Processing %d files, workers=%d", len(files), self.workers)
+        log.info("[MDL001] Processing %d files, workers=%d  duck=%s",
+                 len(files), self.workers,
+                 self.cfg.get("use_duckdb", True))
 
         all_results: List[Dict] = []
         fail_count = 0
 
-        # Thread-safe set wrapper
-        import threading
-        set_lock = threading.Lock()
-        def _safe_set_add(sha): 
-            with set_lock: existing_sha256.add(sha)
-
         with ThreadPoolExecutor(max_workers=self.workers) as ex:
             futs = {
-                ex.submit(process_one, f, self.cfg, self.db, existing_sha256): f
+                ex.submit(process_one, f, self.cfg, self.db,
+                          existing_sha256, self.buffer): f
                 for f in files
             }
             for fut in as_completed(futs):
@@ -968,20 +1345,82 @@ class VRN_MDL001_Converter:
                 all_results.append(res)
                 if not res.get("ok"): fail_count += 1
 
-        if self.db:
-            self.db.export_parquet(mdl001_temp)
-            self.db.export_csv(mdl001_temp)
+        # ── v1.1.0: single-thread flush DB after pool closes ────────────────
+        flush_stats = {"conv": 0}
+        if self.buffer:
+            c_rows = self.buffer.consume_all()
+            log.info("[MDL001] Buffer drain: conv=%d", len(c_rows))
+            if self.duck:
+                try:
+                    flush_stats = self.duck.flush(c_rows)
+                    log.info("[MDL001] DuckDB flush: %s", flush_stats)
+                except Exception as e:
+                    log.warning("[MDL001] DuckDB flush fail (%s), sqlite fallback", e)
+                    if self.db:
+                        flush_stats = self.db.flush(c_rows)
+            elif self.db:
+                flush_stats = self.db.flush(c_rows)
+                log.info("[MDL001] sqlite flush: %s", flush_stats)
+
+        # ── v1.1.0: polars-direct exports ───────────────────────────────────
+        parquet_path = csv_path = None
+        if self.duck:
+            parquet_path = self.duck.export_parquet_polars(mdl001_temp)
+            csv_path     = self.duck.export_csv_polars(mdl001_temp)
+        elif self.db:
+            parquet_path = self.db.export_parquet_polars(mdl001_temp)
+            csv_path     = self.db.export_csv_polars(mdl001_temp)
+        log.info("[MDL001] Exports: parquet=%s csv=%s", parquet_path, csv_path)
 
         out = assemble_output(all_results)
         _jwrite(str(Path(mdl001_temp) / "VRN_MDL001_ConvertLog.json"), out)
         # Also copy summary to pdf_temp for downstream modules
         _jwrite(str(Path(pdf_temp) / "VRN_MDL001_ConvertLog.json"), out)
 
+        verify = {
+            "module":      __module_id__,
+            "version":     __version__,
+            "generated":   time.strftime("%Y-%m-%d %H:%M:%S"),
+            "total":       len(files),
+            "ok":          fail_count == 0,
+            "ok_count":    len(files) - fail_count,
+            "fail_count":  fail_count,
+            "converted":   out["converted"],
+            "skipped":     out["skipped_dedup"],
+            "total_pages": out["total_pages"],
+            "by_src_type": out.get("by_src_type",{}),
+            "accel_caps":  cap,
+            "flush_stats": flush_stats,
+            "fail_details": [{"src": r.get("src_filename",""), "error": r.get("error")}
+                             for r in all_results if not r.get("ok")],
+        }
+        _jwrite(str(Path(mdl001_temp) / "VRN_MDL001_VerifySummary.json"), verify)
+
+        # ── Close DBs BEFORE self-verify ────────────────────────────────────
+        if self.duck: self.duck.close()
+        if self.db:
+            try: self.db._con.close()
+            except: pass
+
+        # ── v1.1.0: 4-phase self-verify HTML ────────────────────────────────
+        sv_html_path = None
+        if self.cfg.get("self_verify", True):
+            try:
+                sv = MDL001SelfVerifier(self.cfg, out, mdl001_temp).run()
+                html = build_self_verify_html_mdl001(sv, out)
+                sv_html_path = str(Path(mdl001_temp) / "VRN_MDL001_SelfVerify.html")
+                Path(sv_html_path).write_text(html, encoding="utf-8")
+                log.info("[MDL001] Self-verify: %s (%d/%d) → %s",
+                         sv["classification"], sv["pass"], sv["total"], sv_html_path)
+            except Exception as e:
+                log.warning("[MDL001] self_verify build fail: %s", e)
+
+        elapsed = round(time.perf_counter() - run_t0, 2)
         log.info(
-            "[MDL001] Complete: %d/%d OK  converted=%d  skip=%d  pages=%d  size=%.1fKB",
+            "[MDL001] Complete: %d/%d OK  converted=%d  skip=%d  pages=%d  size=%.1fKB  %.2fs",
             len(files) - fail_count, len(files),
             out["converted"], out["skipped_dedup"],
-            out["total_pages"], out["total_size_kb"],
+            out["total_pages"], out["total_size_kb"], elapsed,
         )
         return {
             "ok":          fail_count == 0,
@@ -990,6 +1429,9 @@ class VRN_MDL001_Converter:
             "converted":   out["converted"],
             "skipped":     out["skipped_dedup"],
             "total_pages": out["total_pages"],
+            "elapsed":     elapsed,
+            "flush_stats": flush_stats,
+            "self_verify_html": sv_html_path,
             "errors":      [r.get("error", "") for r in all_results if not r.get("ok")],
             "out_dir":     pdf_temp,
             "log_dir":     mdl001_temp,
@@ -1010,6 +1452,9 @@ __all__ = [
     "validate_pdf_output",
     "process_one", "assemble_output",
     "MDL001DBWriter", "VRN_MDL001_Converter",
+    # v1.1.0 NEW
+    "MDL001BatchBuffer", "MDL001DuckWriter",
+    "MDL001SelfVerifier", "build_self_verify_html_mdl001",
 ]
 
 # ============================================================================

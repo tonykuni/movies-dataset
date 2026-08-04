@@ -41,7 +41,7 @@ ANCHOR MAP
 LL RULES: #10 #12 #13 #15 #17 #18 #19 #20
 """
 
-__version__   = "1.1.0"
+__version__   = "1.0.0"
 __module_id__ = "VRN-MDL007-SUP-001"
 __asset_id__  = "VRN-MDL007-CLS-001"
 
@@ -69,12 +69,6 @@ duckdb  = _si("duckdb")
 requests= _si("requests")
 yf_lib  = _si("yfinance")
 xxhash  = _si("xxhash")
-
-# v1.1.0 NEW: polars + duckdb alias
-pl         = _si("polars")
-duckdb_lib = duckdb
-POLARS_OK  = pl is not None
-DUCKDB_OK  = duckdb_lib is not None
 
 logging.basicConfig(level=logging.INFO,
     format="[%(asctime)s][%(levelname)s] %(message)s", datefmt="%H:%M:%S")
@@ -134,11 +128,6 @@ _PARAMS: dict = {
     # ── DB ───────────────────────────────────────────────────────────────────
     "enable_db": True,
     "csv_encoding": "utf-8-sig",
-    # ── v1.1.0 NEW (append-only) ─────────────────────────────────────────────
-    "use_duckdb":    True,    # P3 DuckDB primary, sqlite fallback
-    "batch_size":    5000,    # P3 buffer flush threshold
-    "polars_first":  True,    # P5 polars vectorized exports
-    "self_verify":   True,    # P6 4-phase HTML
 }
 _P = _PARAMS
 
@@ -726,229 +715,6 @@ CREATE INDEX IF NOT EXISTS idx_mdl007_ticker ON vrn_mdl007_api_data(ticker,canon
         log.info("[MDL007] Exported %s: %d rows", base_name, len(df))
 
 # ============================================================================
-# [VRN:ANCHOR:MDL007-BATCH-001]  v1.1.0  P3 BATCH BUFFER + DUCK WRITER
-# ============================================================================
-
-class MDL007BatchBuffer:
-    """VRN-MDL007-CLS-002 (NEW v1.1.0)."""
-    def __init__(self, batch_size: int = 5000):
-        self.batch_size = batch_size
-        self._buf: List[Tuple] = []
-        self._lock = threading.Lock()
-
-    def push(self, row: Dict):
-        ts = time.strftime("%Y-%m-%d %H:%M:%S")
-        r = (None,
-             row.get("ticker",""), row.get("source",""),
-             row.get("category",""), row.get("data_name",""),
-             row.get("canonical",""), row.get("period",""),
-             float(row.get("value",0.0) or 0.0),
-             row.get("unit","million"),
-             float(row.get("confidence",0.9) or 0.9),
-             row.get("status","ok"), ts)
-        with self._lock:
-            self._buf.append(r)
-
-    def push_many(self, rows: List[Dict]):
-        for r in rows: self.push(r)
-
-    def stats(self) -> Dict[str, int]:
-        return {"data": len(self._buf)}
-
-    def consume_all(self) -> List:
-        with self._lock:
-            r = self._buf
-            self._buf = []
-        return r
-
-
-_DDL_DUCK_M007 = """
-CREATE TABLE IF NOT EXISTS vrn_mdl007_apidata (
-    id INTEGER, ticker VARCHAR, source VARCHAR,
-    category VARCHAR, data_name VARCHAR, canonical VARCHAR,
-    period VARCHAR, value DOUBLE, unit VARCHAR,
-    confidence DOUBLE, status VARCHAR, ts VARCHAR
-);
-"""
-
-
-class MDL007DuckWriter:
-    """VRN-MDL007-CLS-003 (NEW v1.1.0)."""
-    def __init__(self, db_path: str):
-        if not DUCKDB_OK:
-            raise RuntimeError("duckdb not available")
-        self.db_path = db_path
-        self._con = duckdb_lib.connect(db_path)
-        self._con.execute(_DDL_DUCK_M007)
-
-    def flush(self, rows: List) -> Dict[str, int]:
-        n = 0
-        try:
-            self._con.execute("BEGIN TRANSACTION")
-            if rows:
-                self._con.executemany(
-                    "INSERT INTO vrn_mdl007_apidata VALUES "
-                    "(?,?,?,?,?,?,?,?,?,?,?,?)", rows)
-                n = len(rows)
-            self._con.execute("COMMIT")
-        except Exception as e:
-            try: self._con.execute("ROLLBACK")
-            except: pass
-            log.error("[MDL007] DuckDB flush fail: %s", e); raise
-        return {"data": n}
-
-    def export_parquet_polars(self, out_dir: str) -> Optional[str]:
-        out_path = str(Path(out_dir) / "VRN_MDL007_APIData.parquet")
-        try:
-            self._con.execute(
-                f"COPY (SELECT * FROM vrn_mdl007_apidata) "
-                f"TO '{out_path}' (FORMAT PARQUET, COMPRESSION ZSTD)")
-            return out_path
-        except Exception as e:
-            log.warning("[MDL007] DuckDB→parquet fail: %s", e); return None
-
-    def close(self):
-        try: self._con.close()
-        except: pass
-
-
-# ============================================================================
-# [VRN:ANCHOR:MDL007-SELFCHK-001]  v1.1.0  P6 4-PHASE SELF-VERIFICATION
-# ============================================================================
-
-class MDL007SelfVerifier:
-    """VRN-MDL007-CLS-004 (NEW v1.1.0)."""
-    def __init__(self, cfg: Dict, run_summary: Dict, out_dir: str):
-        self.cfg = cfg; self.run_summary = run_summary; self.out_dir = out_dir
-        self.checks: List[Dict] = []
-
-    def _add(self, phase, name, ok, detail=""):
-        self.checks.append({"phase":phase,"name":name,"ok":bool(ok),"detail":detail})
-
-    def run(self) -> Dict:
-        self._add("1/4", "Module version 1.1.0", __version__ == "1.1.0", __version__)
-        self._add("1/4", "TW_TICKER_REGEX locked",
-                  TW_TICKER_REGEX.pattern == r"(?!0)(?!202[1-9])(?!2030)([1-9]\d{3})", "")
-        self._add("1/4", "polars available", POLARS_OK, "")
-        self._add("1/4", "duckdb available", DUCKDB_OK, "")
-        self._add("1/4", "MOPS_ACCOUNT_MAP defined",
-                  "MOPS_ACCOUNT_MAP" in globals() and len(MOPS_ACCOUNT_MAP) > 0, "")
-
-        self._add("2/4", "MDL007BatchBuffer exists", "MDL007BatchBuffer" in globals())
-        self._add("2/4", "MDL007DuckWriter exists",  "MDL007DuckWriter" in globals())
-        self._add("2/4", "fetch_mops_income callable", callable(fetch_mops_income))
-        self._add("2/4", "fetch_yfinance_data callable", callable(fetch_yfinance_data))
-        self._add("2/4", "norm() helper callable", callable(norm))
-
-        duck_p = Path(self.out_dir) / "VRN_MDL007.duckdb"
-        self._add("3/4", "DuckDB file exists", duck_p.exists(),
-                  f"size={duck_p.stat().st_size if duck_p.exists() else 0}")
-        if duck_p.exists() and DUCKDB_OK:
-            try:
-                con = duckdb_lib.connect(str(duck_p), read_only=True)
-                tbls = {t[0] for t in con.execute(
-                    "SELECT table_name FROM information_schema.tables "
-                    "WHERE table_schema='main'").fetchall()}
-                con.close()
-                self._add("3/4", "DuckDB schema vrn_mdl007_apidata",
-                          "vrn_mdl007_apidata" in tbls, str(sorted(tbls)))
-            except Exception as e:
-                self._add("3/4", "DuckDB schema vrn_mdl007_apidata", False, str(e))
-
-        for fn in ("VRN_MDL007_Summary.json",):
-            p = Path(self.out_dir) / fn
-            self._add("4/4", f"file:{fn}", p.exists(),
-                      f"size={p.stat().st_size if p.exists() else 0}")
-        self._add("4/4", "n_tickers >= 0",
-                  self.run_summary.get("n_tickers", 0) >= 0)
-        self._add("4/4", "total_rows >= 0",
-                  self.run_summary.get("total_rows", 0) >= 0)
-
-        n_total = len(self.checks); n_pass = sum(1 for c in self.checks if c["ok"])
-        n_fail  = n_total - n_pass
-        cls = "READY" if n_fail == 0 else ("NEAR-READY" if n_fail <= 2 else "NOT-READY")
-        return {"total":n_total,"pass":n_pass,"fail":n_fail,
-                "classification":cls,"checks":self.checks,
-                "generated":time.strftime("%Y-%m-%d %H:%M:%S")}
-
-
-def build_self_verify_html_mdl007(verify_result: Dict, run_summary: Dict) -> str:
-    """VRN-MDL007  VIA Visual Lock self-verify HTML (NEW v1.1.0)."""
-    cls = verify_result.get("classification","?")
-    cls_color = {"READY":"#439a9a","NEAR-READY":"#e0b020",
-                 "NOT-READY":"#c83030"}.get(cls,"#666")
-    cls_emoji = {"READY":"✓","NEAR-READY":"⚠","NOT-READY":"✗"}.get(cls,"?")
-
-    by_phase: Dict[str,List[Dict]] = {}
-    for c in verify_result.get("checks",[]):
-        by_phase.setdefault(c["phase"], []).append(c)
-
-    phase_html = []
-    for phase, items in by_phase.items():
-        rows = "".join(
-            f'<tr><td class="ck-name">{c["name"]}</td>'
-            f'<td class="ck-{"ok" if c["ok"] else "fail"}">'
-            f'{"✓" if c["ok"] else "✗"} {"PASS" if c["ok"] else "FAIL"}</td>'
-            f'<td class="ck-detail">{str(c["detail"])[:120]}</td></tr>'
-            for c in items)
-        n_pass = sum(1 for c in items if c["ok"])
-        phase_html.append(f"""
-        <div class="cd"><div class="cd-h">PHASE {phase} ({n_pass}/{len(items)} pass)</div>
-        <div class="cd-b"><table class="ck-tbl">
-        <thead><tr><th>Check</th><th>Result</th><th>Detail</th></tr></thead>
-        <tbody>{rows}</tbody></table></div></div>""")
-
-    sum_lines = [
-        f"$ VRN_MDL007 v{__version__} self-verification",
-        f"  generated      : {verify_result.get('generated','-')}",
-        f"  classification : {cls} {cls_emoji}",
-        f"  checks         : {verify_result.get('pass',0)}/{verify_result.get('total',0)} pass",
-        "",
-        "$ pipeline summary",
-        f"  n_tickers      : {run_summary.get('n_tickers','-')}",
-        f"  total_rows     : {run_summary.get('total_rows','-')}",
-        f"  ok             : {run_summary.get('ok','-')}",
-        f"  elapsed        : {run_summary.get('elapsed','-')} sec",
-    ]
-    term_html = "\n".join(sum_lines)
-
-    html = f"""<!DOCTYPE html>
-<html lang="zh-Hant"><head><meta charset="UTF-8">
-<title>VRN MDL007 v{__version__} · Self-Verification · {cls}</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-*{{box-sizing:border-box;margin:0;padding:0}}
-body{{background:#f5f4f0;color:#1a1a1a;font-family:'DM Sans',-apple-system,sans-serif;font-size:11px;line-height:1.6;padding:24px}}
-.hdr{{border-top:4px solid;border-image:linear-gradient(90deg,#ff5e5e,#ffae5e,#ffe55e,#5eff8c,#5ec8ff,#8c5eff,#ff5ec8) 1;padding-top:16px;margin-bottom:24px}}
-h1{{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-0.02em}}
-.sub{{font-family:'DM Mono',monospace;font-size:10px;color:#666;margin-top:4px}}
-.cls-badge{{display:inline-block;padding:4px 12px;background:{cls_color};color:white;font-family:'Syne',sans-serif;font-weight:700;font-size:11px;margin-left:12px;letter-spacing:0.05em}}
-.cd{{background:white;border:1px solid #e0ddd5;margin-bottom:16px}}
-.cd-h{{background:#4c78a8;color:white;padding:8px 16px;font-family:'Syne',sans-serif;font-weight:600;font-size:11px;letter-spacing:0.03em}}
-.cd-b{{padding:12px 16px}}
-.tm{{background:#1a1a1a;color:#c8e0c8;font-family:'DM Mono',monospace;font-size:10px;padding:32px 16px 16px 16px;position:relative;white-space:pre;line-height:1.5}}
-.tm::before{{content:"● ● ●";position:absolute;top:8px;left:12px;color:#ff5e5e;letter-spacing:4px;font-size:10px}}
-.ck-tbl{{width:100%;border-collapse:collapse}}
-.ck-tbl th{{background:#f5f4f0;color:#4c78a8;text-align:left;padding:6px 8px;font-weight:600;border-bottom:2px solid #4c78a8;font-size:10px;letter-spacing:0.05em}}
-.ck-tbl td{{padding:6px 8px;border-bottom:1px solid #f0ede5;vertical-align:top}}
-.ck-name{{font-weight:500;min-width:200px}}
-.ck-ok{{color:#439a9a;font-weight:600;min-width:80px}}
-.ck-fail{{color:#c83030;font-weight:700;min-width:80px}}
-.ck-detail{{color:#666;font-family:'DM Mono',monospace;font-size:10px}}
-.foot{{margin-top:24px;color:#999;font-family:'DM Mono',monospace;font-size:9px;text-align:right}}
-</style></head><body>
-<div class="hdr"><h1>VRN MDL007 · APIDataFetcher v{__version__}<span class="cls-badge">{cls}</span></h1>
-<div class="sub">VeritasReportNova · 4-Phase Self-Verification · {time.strftime("%Y-%m-%d %H:%M:%S")}</div></div>
-<div class="cd"><div class="cd-h">RUN SUMMARY</div><div class="cd-b"><div class="tm">{term_html}</div></div></div>
-{"".join(phase_html)}
-<div class="foot">Module: {__module_id__} · v{__version__}</div>
-</body></html>"""
-    return html
-
-
-# ============================================================================
 # [VRN:ANCHOR:MDL007-SYS-001] §12  PIPELINE ENTRY
 # ============================================================================
 
@@ -1041,7 +807,7 @@ class VRN_MDL007_APIDataFetcher:
                     except Exception as e:
                         all_results.append({"ticker":futs[fut],"ok":False,"error":str(e)})
 
-        # Export (legacy DB sqlite path)
+        # Export
         if self.db:
             self.db.export(out_dir)
 
@@ -1055,50 +821,9 @@ class VRN_MDL007_APIDataFetcher:
             "results":   all_results,
             "plugin_caps": plugin_caps,
         }
-        # v1.0.0 had bug: Path(out_dir/"...") — fix to Path(out_dir)/"..."
-        summary_path = str(Path(out_dir) / "VRN_MDL007_Summary.json")
-        Path(summary_path).write_text(
+        Path(out_dir/"VRN_MDL007_Summary.json").write_text(
             json.dumps(summary, ensure_ascii=False, indent=2, default=str),
             encoding="utf-8")
-
-        # ── v1.1.0: BatchBuffer + DuckDB ───────────────────────────────────
-        flush_stats = {"data": 0}
-        if self.cfg.get("use_duckdb", True) and DUCKDB_OK:
-            try:
-                buf = MDL007BatchBuffer(self.cfg.get("batch_size", 5000))
-                # Aggregate all rows from all tickers' results
-                for r in all_results:
-                    for row in r.get("data", []):
-                        buf.push(row)
-
-                duck_path = str(Path(out_dir) / "VRN_MDL007.duckdb")
-                duck = MDL007DuckWriter(duck_path)
-                d_rows = buf.consume_all()
-                flush_stats = duck.flush(d_rows)
-                log.info("[MDL007] DuckDB flush: %s", flush_stats)
-
-                pq_path = duck.export_parquet_polars(out_dir)
-                if pq_path: log.info("[MDL007] Parquet: %s", pq_path)
-                duck.close()
-                summary["flush_stats"] = flush_stats
-            except Exception as e:
-                log.warning("[MDL007] DuckDB pipeline fail: %s", e)
-
-        # ── v1.1.0: 4-phase Self-Verify HTML ───────────────────────────────
-        sv_html_path = None
-        if self.cfg.get("self_verify", True):
-            try:
-                sv = MDL007SelfVerifier(self.cfg, summary, out_dir).run()
-                html = build_self_verify_html_mdl007(sv, summary)
-                sv_html_path = str(Path(out_dir) / "VRN_MDL007_SelfVerify.html")
-                Path(sv_html_path).write_text(html, encoding="utf-8")
-                log.info("[MDL007] Self-verify: %s (%d/%d) → %s",
-                         sv["classification"], sv["pass"], sv["total"], sv_html_path)
-                summary["self_verify"] = sv["classification"]
-                summary["self_verify_html"] = sv_html_path
-            except Exception as e:
-                log.warning("[MDL007] self_verify build fail: %s", e)
-
         log.info("[MDL007] DONE: %d tickers %d rows %.2fs", len(tickers), total_rows, elapsed)
         return summary
 
@@ -1114,10 +839,6 @@ __all__ = [
     "fetch_twse_market","fetch_yfinance_data",
     "dedup_rows","compute_derived_ratios",
     "FETCH_COLS","MDL007DBWriter","VRN_MDL007_APIDataFetcher",
-    # v1.1.0 NEW
-    "MDL007BatchBuffer","MDL007DuckWriter","MDL007SelfVerifier",
-    "build_self_verify_html_mdl007",
-    "POLARS_OK","DUCKDB_OK",
 ]
 
 if __name__ == "__main__":
