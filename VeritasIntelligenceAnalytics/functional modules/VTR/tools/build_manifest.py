@@ -43,6 +43,9 @@ SPEC_ARTIFACTS: tuple[tuple[str, str], ...] = (
     ("lexicon/tools/validate_lexicon.py", "Lexicon 驗證器 / 索引產生器 · CI 掛載點"),
     ("tools/build_manifest.py", "Manifest 重算工具（本檔）"),
     ("Invoke-VTR.ps1", "PowerShell 單一進入點 · operator workstation 用"),
+    ("Install-VTR.ps1", "一鍵安裝器 · 新電腦自動補齊 Python 並驗證"),
+    ("Install-VTR.cmd", "安裝器雙擊啟動器（略過執行原則、初學者用）"),
+    ("Run-VTR.cmd", "日常雙擊啟動器 · 執行完整檢查"),
     ("README.md", "VTR 子系統導覽"),
 )
 
