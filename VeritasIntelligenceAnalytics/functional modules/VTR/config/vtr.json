@@ -1,0 +1,62 @@
+{
+  "_comment": "VTR 引擎設定。Python 版與 JavaScript 版讀同一份檔案 —— 門檻與權重必須一致，否則兩版引擎的 patch 無法交叉驗證。JSON 而非 YAML：確定性層必須零第三方相依（PyYAML 非標準函式庫）。安裝 PyYAML 後亦可改用 .yaml。",
+
+  "engine": "vtr-py/1.0.0",
+
+  "gate": {
+    "auto_threshold": 0.85,
+    "review_threshold": 0.60,
+    "llm_only_ceiling": 0.80,
+    "_comment": "llm_only_ceiling 必須小於 auto_threshold —— 這是「LLM 不得在無人複核下改動會議紀錄」的機器強制形式。ConfidenceGate 在建構時檢查。"
+  },
+
+  "lang_detect": {
+    "min_run_cjk": 2,
+    "min_run_latin": 3,
+    "mixed_threshold": 0.7,
+    "_comment": "語言比重以 token 計（CJK 字元 = 1 token，Latin 單字 = 1 token），不以字元計 —— 字元計數會系統性高估英文比重。"
+  },
+
+  "normalize": {
+    "opencc": "s2twp",
+    "filler_policy": "mark",
+    "filler_confidence": 0.70,
+    "_comment": "filler_policy: mark（預設，只提建議）| remove（自動刪除）| keep（完全不處理）。預設 mark，因為「那個」可能是指示代詞，誤刪會改變語意。"
+  },
+
+  "protect": {
+    "enabled_kinds": [
+      "url", "email", "timestamp",
+      "part_number", "code_ident", "number_unit"
+    ],
+    "_comment": "料號規則刻意放寬：過度遮罩的代價是「這段沒被修」，漏遮的代價是「料號被改錯」。兩者不對等。"
+  },
+
+  "lexicon": {
+    "scopes": ["global"],
+    "match_threshold": 0.75,
+    "common_word_threshold": 0.92,
+    "weights": { "literal": 0.5, "phonetic": 0.3, "context": 0.2 },
+    "_comment": "步驟 7 尚未實作。此區塊先行定義，讓兩版引擎的比對分數從一開始就讀同一組權重。"
+  },
+
+  "arbiter": {
+    "enabled": false,
+    "model": "claude-opus-5",
+    "effort": "medium",
+    "max_tokens": 4096,
+    "batch": false,
+    "max_cases_per_doc": 200,
+    "_comment": "LLM 仲裁層尚未實作，預設關閉。max_cases_per_doc 是成本失控的斷路器。"
+  },
+
+  "pipeline": {
+    "strict": false,
+    "_comment": "true = 不變式違反直接拋錯（CI 建議）；false = 回退該 Stage 並記錄於 revision metrics（生產建議）。"
+  },
+
+  "eval": {
+    "harmful_edit_rate_max": 0.005,
+    "_comment": "改壞率是本引擎的頭號安全指標。一筆把正確內容改錯的修復，傷害遠大於十筆漏修。"
+  }
+}

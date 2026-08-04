@@ -1,8 +1,8 @@
 {
   "subsystem": "VTR",
   "role": "DG-IN Meeting Transcript Restoration Engine · 中英文會議紀錄修復引擎（雙語混合修復架構 / 八步修復法 / SSOT Lexicon / 四大 Pipeline）",
-  "integration_state": "SPEC_AND_LEXICON_REGISTERED_ENGINE_NOT_YET_IMPLEMENTED",
-  "canonical_tree": "本 anchor 攜帶 VTR canonical 規格件（contracts/, docs/, lexicon/）並登錄探索根與治理閘門。引擎程式碼（vtr_py / @dg-in/vtr-js）尚未實作，見 README.md 的下一步。",
+  "integration_state": "SPEC_REGISTERED_DETERMINISTIC_LAYER_IMPLEMENTED",
+  "canonical_tree": "本 anchor 攜帶 VTR canonical 規格件（contracts/, config/, docs/, lexicon/）與確定性層引擎（engine/vtr_py：步驟 1–2 + P0 遮罩 + 版本重播）。步驟 3–8 需模型層，尚未實作 —— 見 README.md。",
   "discovery_root": "functional modules/VTR",
   "artifacts": [
     {
@@ -12,6 +12,12 @@
       "sha256": "769be8a0131092613ccf48b5fea3c2fce298c9a67a987652a001b815966517fc"
     },
     {
+      "filename": "config/vtr.json",
+      "role": "引擎設定 · 兩版引擎共用的門檻與權重",
+      "bytes": 2453,
+      "sha256": "eede2cff9038a814f12c72d10a650598aac1080e164ed14929ebb209a2abf0b5"
+    },
+    {
       "filename": "docs/00_ARCHITECTURE.md",
       "role": "完整修復引擎架構圖 · 三層架構 / 八步管線 / P0 遮罩 / 信心度閘門 / 四大 Pipeline",
       "bytes": 14844,
@@ -19,9 +25,9 @@
     },
     {
       "filename": "docs/01_PYTHON_ENGINE_SPEC.md",
-      "role": "Python 版修復引擎規格書 · 權威實作（批次 / 模型層 / LLM 仲裁）",
-      "bytes": 19561,
-      "sha256": "59720fd53f152ca1bd0ce0824432a3471030c4e7dd6e3a6aa69aae172597fe15"
+      "role": "Python 版修復引擎規格書 · 權威實作（含實作狀態標記）",
+      "bytes": 22161,
+      "sha256": "ebab21ecba0371bcf52dba21202609f59dfae59b76f40ffd318773b697126d8a"
     },
     {
       "filename": "docs/02_JAVASCRIPT_ENGINE_SPEC.md",
@@ -43,7 +49,7 @@
     },
     {
       "filename": "lexicon/lexicon.index.json",
-      "role": "Lexicon 索引 · 各詞庫檔 SHA-256 與統計（由驗證器產生）",
+      "role": "Lexicon 索引 · 各詞庫檔 SHA-256 與統計",
       "bytes": 1926,
       "sha256": "11354214397eef20519562bb6e205c9198e8dcb906804c19c79889fbe0cc35dd"
     },
@@ -56,10 +62,148 @@
     {
       "filename": "README.md",
       "role": "VTR 子系統導覽",
-      "bytes": 4620,
-      "sha256": "24e5424038f784031f8b3beefded2f7942074196b537044a31521001123d50bc"
+      "bytes": 6647,
+      "sha256": "2b13d7fba1b01efff19bb94bee94e6729efa27eca802f7c4a77c7a01c0ce2d70"
+    },
+    {
+      "filename": "engine/tests/__init__.py",
+      "role": "引擎程式碼（確定性層）",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "filename": "engine/tests/test_engine.py",
+      "role": "引擎程式碼（確定性層）",
+      "bytes": 23128,
+      "sha256": "d43f95f9a680df5322486a6a9909927fbed89b4620b68e2d659d65b62a100b0e"
+    },
+    {
+      "filename": "engine/vtr_py/__init__.py",
+      "role": "引擎程式碼（確定性層）",
+      "bytes": 903,
+      "sha256": "8de4622dd5d44293f1fad06d08d1046d8a19d6983ee2d5856d2711ed3947be8a"
+    },
+    {
+      "filename": "engine/vtr_py/cli.py",
+      "role": "引擎程式碼（確定性層）",
+      "bytes": 5528,
+      "sha256": "f0df19148083970fcba8cbd5d4bf68c9be2991bce0f9f5de9ea8990411caf24d"
+    },
+    {
+      "filename": "engine/vtr_py/context.py",
+      "role": "引擎程式碼（確定性層）",
+      "bytes": 5316,
+      "sha256": "6451bb5ae8ef1ccd2f194d45c244cd61083d5a6231d2ddee4eed0b09233c1735"
+    },
+    {
+      "filename": "engine/vtr_py/document.py",
+      "role": "引擎程式碼（確定性層）",
+      "bytes": 11949,
+      "sha256": "f070348692f133121b7063e1bf4eb2f8d32d0fc51350915c9d4a85b734c92506"
+    },
+    {
+      "filename": "engine/vtr_py/gate.py",
+      "role": "引擎程式碼（確定性層）",
+      "bytes": 1718,
+      "sha256": "01b2c72fe5a34fe38ac21119e6bb0081479cd9b6fff684a1195107282ff888e3"
+    },
+    {
+      "filename": "engine/vtr_py/pipeline.py",
+      "role": "引擎程式碼（確定性層）",
+      "bytes": 8086,
+      "sha256": "efd4d101d7c5e824f3ba2483cc6e5ef45e38ec7f0866da3664430103c9e38544"
+    },
+    {
+      "filename": "engine/vtr_py/protect.py",
+      "role": "引擎程式碼（確定性層）",
+      "bytes": 8642,
+      "sha256": "26373e2b6b79d61df8adc6f988a342a24c59a406bce7dd9df21f01376119603b"
+    },
+    {
+      "filename": "engine/vtr_py/rules.py",
+      "role": "引擎程式碼（確定性層）",
+      "bytes": 4036,
+      "sha256": "eb2341818ca8eb8e212d44dc056d6386ff7e4ecab9778ffb1f1c26151c8c6a32"
+    },
+    {
+      "filename": "engine/vtr_py/stages/__init__.py",
+      "role": "引擎程式碼（確定性層）",
+      "bytes": 335,
+      "sha256": "508f959593b900f3d3c8b3cc36685fceb48dc53f3658b01c6969d3283790c6d2"
+    },
+    {
+      "filename": "engine/vtr_py/stages/s1_lang_detect.py",
+      "role": "引擎程式碼（確定性層）",
+      "bytes": 6089,
+      "sha256": "7253870ea87ade5a4246ff87368c39bb252dcb180c933600bae64ba63ff2ccda"
+    },
+    {
+      "filename": "engine/vtr_py/stages/s2_normalize.py",
+      "role": "引擎程式碼（確定性層）",
+      "bytes": 13919,
+      "sha256": "c51e74a7572a6d96741f5932d83b9b15d2041383a636c98b65a3aba8214d4c91"
+    },
+    {
+      "filename": "engine/vtr_py/stages/s3_protect.py",
+      "role": "引擎程式碼（確定性層）",
+      "bytes": 3437,
+      "sha256": "3eea3c47b746c7baafc4b3c6f8b04f053f45cf465fb9b4be0158bbe373599d54"
+    },
+    {
+      "filename": "engine/vtr_py/versioning/__init__.py",
+      "role": "引擎程式碼（確定性層）",
+      "bytes": 179,
+      "sha256": "331a525c7fa583694de964e9db6291c16bb23bfd35af9abad2f14197d9c7200e"
+    },
+    {
+      "filename": "engine/vtr_py/versioning/patchlog.py",
+      "role": "引擎程式碼（確定性層）",
+      "bytes": 2017,
+      "sha256": "f49477ac1b80901d3abbf8bd5cec7373cb8b8c75d751590e2b3d3195cd59d2c0"
+    },
+    {
+      "filename": "engine/vtr_py/versioning/replay.py",
+      "role": "引擎程式碼（確定性層）",
+      "bytes": 4991,
+      "sha256": "52c3739f25d87167730e238eff4fe7921acd0ccea193d1b6db427e40ae8f733a"
     }
   ],
+  "implementation_status": {
+    "implemented": [
+      "資料契約與 Python 綁定",
+      "Pipeline 四條不變式",
+      "信心度閘門",
+      "步驟 1 LANG_DETECT",
+      "步驟 2 NORMALIZE",
+      "P0 PROTECT / UNPROTECT（pattern 規則）",
+      "Diff & Versioning（patch log / replay / 回滾）",
+      "CLI restore / inspect / replay"
+    ],
+    "not_implemented": [
+      "P0 詞庫精確命中（待接 SSOT Lexicon）",
+      "步驟 3 PUNCTUATE",
+      "步驟 4 SEGMENT",
+      "步驟 5 SPELL",
+      "步驟 6 GRAMMAR",
+      "步驟 7 LEXICON",
+      "步驟 8 STRUCTURE",
+      "LLM 仲裁層",
+      "@dg-in/vtr-js"
+    ],
+    "third_party_dependencies": "無。確定性層僅使用 Python 標準函式庫，可在未安裝任何套件的環境執行。"
+  },
+  "verification": {
+    "lexicon": "python3 lexicon/tools/validate_lexicon.py（exit 0/2/3）",
+    "engine": "cd engine && python3 -m unittest discover -s tests -t .",
+    "tests": 49,
+    "test_categories": [
+      "單元",
+      "屬性/不變式",
+      "對抗",
+      "回歸",
+      "突變驗證"
+    ]
+  },
   "lexicon": {
     "totals": {
       "entries": 29,
@@ -72,12 +216,7 @@
       "project:VIA"
     ],
     "index_file": "lexicon/lexicon.index.json",
-    "validator": "lexicon/tools/validate_lexicon.py",
-    "validator_exit_codes": {
-      "0": "通過",
-      "2": "schema 錯誤",
-      "3": "SSOT 一致性錯誤"
-    }
+    "validator": "lexicon/tools/validate_lexicon.py"
   },
   "engine_contract": {
     "document_schema": "contracts/vtr-document.schema.json",
@@ -100,11 +239,18 @@
       "llm_only_ceiling": 0.8
     },
     "rule_id_namespace": "VTR.<STAGE>.<rule>",
+    "invariants": [
+      "只有 SEGMENT 可改變 segment 數量",
+      "PROTECT 與 UNPROTECT 之間 sentinel 原封不動",
+      "Patch.span 必須落在 Stage 執行前的合法範圍",
+      "rule_id 必須已註冊於 RULE_REGISTRY"
+    ],
+    "rollback_semantics": "不變式違反時該 Stage 的所有 patch 一律不套用，但仍寫入 revision 記錄違反原因。",
     "cross_engine_rule": "Python 版與 JavaScript 版對同一規則必須使用同一 rule_id；Lexicon 比對分數差異須 < 0.01。"
   },
   "governance": {
     "intake_policy": "新詞條一律 enabled=false 草稿（source=meeting_intake 強制 false）；啟用需 provenance.approved_by。由 validate_lexicon.py 強制。",
-    "restoration_policy": "引擎僅產生 candidate + patch log，不得直接改寫 canonical 逐字稿。單獨 LLM 判斷信心度上限 0.80，永遠進人工複核。",
+    "restoration_policy": "引擎僅產生 candidate + patch log，不得直接改寫 canonical 逐字稿。單獨 LLM 判斷信心度上限 0.80，永遠進人工複核（由 ConfidenceGate 建構時強制）。",
     "audit_chain": "append-only patch log；每筆改動可回答 source / rule_id / evidence / confidence。",
     "promotion_gate": "OPERATOR_REVIEW_AND_SEPARATE_HASH_LOCKED_TRANSACTION_REQUIRED",
     "canonical_mutation_by_system_manager": false,

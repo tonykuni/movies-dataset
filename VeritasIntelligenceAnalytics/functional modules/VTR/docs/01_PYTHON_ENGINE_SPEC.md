@@ -7,39 +7,57 @@
 
 ## 1. 專案結構
 
+實際落點為 `VTR/engine/vtr_py/`（遵循 VIA 六槽標準佈局的 `engine/` 槽）。
+**✅ = 已實作並有測試覆蓋；⬜ = 尚未實作。**
+
 ```
 vtr_py/
-├── __init__.py
-├── document.py            # Document / Segment / Patch / Revision 資料類別（pydantic）
-├── context.py             # Context：設定、詞庫快照、模型 handle、量測收集器
-├── pipeline.py            # Pipeline 執行器（純函式串接 + patch 收集 + hash 計算）
-├── gate.py                # 信心度閘門
-├── protect.py             # P0 遮罩／還原 + sentinel 完整性檢查
+├── __init__.py            ✅
+├── document.py            ✅ Document / Segment / Patch / Revision（stdlib dataclasses）
+├── rules.py               ✅ rule_id 註冊表（跨引擎一致性的錨點）
+├── context.py             ✅ Context：設定、詞庫快照、量測收集器、注入式時鐘
+├── pipeline.py            ✅ Pipeline 執行器（純函式串接 + 四條不變式 + hash）
+├── gate.py                ✅ 信心度閘門
+├── protect.py             ✅ P0 遮罩／還原 + sentinel 完整性檢查
 ├── stages/
-│   ├── s1_lang_detect.py
-│   ├── s2_normalize.py
-│   ├── s3_punctuate.py
-│   ├── s4_segment.py
-│   ├── s5_spell.py
-│   ├── s6_grammar.py
-│   ├── s7_lexicon.py
-│   └── s8_structure.py
+│   ├── s1_lang_detect.py  ✅ 步驟 1
+│   ├── s2_normalize.py    ✅ 步驟 2
+│   ├── s3_protect.py      ✅ P0 PROTECT / UNPROTECT（pattern；詞庫待接）
+│   ├── s4_punctuate.py    ⬜ 步驟 3（需模型）
+│   ├── s5_segment.py      ⬜ 步驟 4
+│   ├── s6_spell.py        ⬜ 步驟 5（需模型）
+│   ├── s7_grammar.py      ⬜ 步驟 6（需模型）
+│   ├── s8_lexicon.py      ⬜ 步驟 7
+│   └── s9_structure.py    ⬜ 步驟 8（需 LLM）
 ├── lang/
 │   ├── zh/                # 中文子管線實作
 │   └── en/                # 英文子管線實作
 ├── lexicon/
-│   ├── store.py           # SSOT Lexicon 載入、scope 解析、索引建置
-│   └── matcher.py         # 精確 / 模糊 / 拼音 / 音素比對
+│   ├── store.py           ⬜ SSOT Lexicon 載入、scope 解析、索引建置
+│   └── matcher.py         ⬜ 精確 / 模糊 / 拼音 / 音素比對
 ├── arbiter/
-│   └── claude.py          # LLM 仲裁層（Anthropic SDK）
+│   └── claude.py          ⬜ LLM 仲裁層（Anthropic SDK）
 ├── versioning/
-│   ├── patchlog.py        # JSONL append-only
-│   └── replay.py          # 重播 / 回滾
+│   ├── patchlog.py        ✅ JSONL append-only
+│   └── replay.py          ✅ 重播 / 回滾
 ├── eval/
-│   ├── metrics.py
-│   └── goldset.py
-└── cli.py                 # vtr restore / replay / lexicon / eval
+│   ├── metrics.py         ⬜
+│   └── goldset.py         ⬜
+└── cli.py                 ✅ restore / replay / inspect（lexicon / eval 待補）
 ```
+
+### 1.1 相依策略：確定性層零第三方相依
+
+已實作的部分（步驟 1–2、P0、骨架）**只用標準函式庫**，刻意不引入 pydantic：
+
+| 決定 | 理由 |
+|---|---|
+| 用 `dataclasses` 而非 pydantic | 確定性層必須能在未安裝任何套件的環境跑起來，包含 CI 與鎖定環境。SSOT 是 `contracts/vtr-document.schema.json`，Python 型別只是它的綁定 —— 不需要第二套執行期驗證框架。 |
+| 設定用 JSON（`config/vtr.json`） | PyYAML 非標準函式庫。`Config.load()` 兩種副檔名都支援，安裝 PyYAML 後可改用 `.yaml`。 |
+| 測試用 `unittest` 而非 pytest | 同上；`python3 -m unittest` 隨處可跑。 |
+
+模型層（步驟 3 以後）才引入 torch / transformers / spaCy 等重相依 —— 屆時 pydantic
+若有需要可只用於該層。
 
 ---
 
@@ -47,32 +65,35 @@ vtr_py/
 
 ```python
 # document.py
-from pydantic import BaseModel, Field
+from dataclasses import dataclass, field
 from typing import Literal, Optional
 
 Lang     = Literal["zh", "en", "mixed"]
 Decision = Literal["auto", "review", "reject"]
 Source   = Literal["deterministic", "model", "lexicon", "llm_arbiter", "human"]
 
-class Protection(BaseModel):
+@dataclass(frozen=True)
+class Protection:
     sentinel: str            # ⟦P0001⟧
     surface: str
     kind: Literal["lexicon", "part_number", "url", "email",
                   "code_ident", "number_unit", "timestamp", "id_code"]
     lexicon_id: Optional[str] = None
 
-class Segment(BaseModel):
+@dataclass(frozen=True)
+class Segment:
     id: str
     lang: Lang
     text: str
     speaker: Optional[str] = None
     t_start: Optional[float] = None
     t_end: Optional[float] = None
-    runs: list["Run"] = Field(default_factory=list)
-    protections: list[Protection] = Field(default_factory=list)
-    flags: list[str] = Field(default_factory=list)
+    runs: tuple["Run", ...] = ()
+    protections: tuple[Protection, ...] = ()
+    flags: tuple[str, ...] = ()
 
-class Patch(BaseModel):
+@dataclass(frozen=True)
+class Patch:
     patch_id: str
     stage: str
     segment_id: str
@@ -85,10 +106,11 @@ class Patch(BaseModel):
     decision: Decision
     evidence: Optional[str] = None
 
-class StageResult(BaseModel):
+@dataclass(frozen=True)
+class StageResult:
     doc: "Document"
-    patches: list[Patch]
-    metrics: dict = Field(default_factory=dict)
+    patches: tuple[Patch, ...] = ()
+    metrics: dict = field(default_factory=dict)
 ```
 
 ### 2.1 Stage 協定
@@ -214,7 +236,16 @@ def classify(ch: str) -> str:
 1. 連續同類 code point 合成一個 run。
 2. run 長度 < `min_run`（zh 預設 2 字、en 預設 3 字母）併入前一個 run。
 3. **CJK 主體句中的 latin run → `role="embedded"`**，不送進英文子管線做獨立句法修復（否則 `dashboard` 會被要求加冠詞）。
-4. 句子 `lang`：cjk 佔比 > 0.7 → `zh`；latin > 0.7 → `en`；否則 `mixed`。
+4. 句子 `lang`：**以 token 計佔比**（CJK 字元 = 1 token，Latin 單字 = 1 token）。
+   cjk 佔比 > 0.7 → `zh`；latin > 0.7 → `en`；否則 `mixed`。
+
+> **為什麼是 token 不是字元。** 實作初版用字元計數，結果「看一下 dashboard 的 KPI」
+> 被判成英文（字元比 4:12），整句會被送進英文管線。一個中文字承載的資訊量大致
+> 等同一個英文**單字**，不是一個英文字母 —— 用字元計數會系統性高估英文比重。
+> 改成 token 計數後同一句是 4:2，判為 `mixed`，且英文詞正確標為 `embedded`。
+>
+> 附帶結論：`lang` 標成 `zh` 或 `mixed` 其實不影響安全性 —— 真正保護 `dashboard`
+> 不被英文文法修復動到的是 `role="embedded"`，不是句子層級的標籤。
 
 ### 5.2 `NORMALIZE`
 
@@ -413,8 +444,10 @@ vtr eval --goldset ./eval/goldset/ --report ./out/eval.html
 
 ## 8. 設定檔
 
+實檔為 `config/vtr.json`（下列為節錄；完整版含每個區塊的 `_comment` 說明）。
+
 ```yaml
-# config/vtr.yaml
+# 等價 YAML 表示（Config.load 兩種格式皆支援）
 engine: vtr-py/1.0.0
 
 gate:
@@ -460,6 +493,14 @@ eval:
 | 對抗測試 | 專門構造會誘使模型改壞專名的輸入（料號旁邊放常見詞、人名用同音字），斷言 `harmful_edit == 0` |
 | 黃金集回歸 | ≥200 段人工標註；任一指標退步即 CI 失敗 |
 | 跨引擎 | 同一 Document 分別跑 Python 版與 JS 版，比對共同 rule_id 的 patch；不一致即告警 |
+| 突變測試 | 把已修掉的 bug 逐一打回去，確認對應測試會失敗 —— 防止「看起來有測、實際上抓不到」的無效測試 |
+
+執行（零相依）：
+
+```bash
+cd "functional modules/VTR/engine"
+python3 -m unittest discover -s tests -t .        # 49 tests, OK
+```
 
 ---
 

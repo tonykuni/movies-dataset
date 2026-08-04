@@ -16,6 +16,9 @@ Best Solution Portfolio 定義了「要哪七大模組」；本目錄是它的**
 | `docs/02_JAVASCRIPT_ENGINE_SPEC.md` | JavaScript 版規格書（即時預覽／編輯器層／人工裁決 UI） |
 | `docs/03_SSOT_LEXICON_SPEC.md` | SSOT Lexicon 結構規格書 |
 | `lexicon/` | **可執行的詞庫**：schema、五個種子詞庫、索引、驗證器 |
+| `engine/vtr_py/` | **可執行的引擎**：骨架 + 步驟 1–2 + P0 遮罩（零第三方相依） |
+| `engine/tests/` | 49 個測試（單元・不變式・對抗・回歸・突變驗證） |
+| `config/vtr.json` | 兩版引擎共用的門檻與權重設定 |
 | `VTR_Subsystem_Manifest.json` | 子系統 anchor manifest（SHA-256 登錄、治理閘門） |
 
 ---
@@ -53,14 +56,50 @@ Best Solution Portfolio 定義了「要哪七大模組」；本目錄是它的**
 
 ## 立即可執行
 
-```bash
-cd "VeritasIntelligenceAnalytics/functional modules/VTR/lexicon/tools"
+全部零第三方相依，clone 下來就能跑。
 
-python3 validate_lexicon.py                # 驗證詞庫（exit 0/2/3）
-python3 validate_lexicon.py --write-index  # 驗證並更新 lexicon.index.json
+```bash
+cd "VeritasIntelligenceAnalytics/functional modules/VTR"
+
+# 1. 詞庫驗證（exit 0/2/3）
+python3 lexicon/tools/validate_lexicon.py
+
+# 2. 引擎測試（49 tests）
+cd engine && python3 -m unittest discover -s tests -t .
+
+# 3. 對真實逐字稿跑 Preprocessing Pipeline
+python3 -m vtr_py.cli restore transcript.txt --doc-id MTG-001 --out ./out/
+python3 -m vtr_py.cli inspect ./out --review     # 看待裁決佇列
+python3 -m vtr_py.cli replay  ./out --to-rev 1   # 回滾到任一版本
 ```
 
-目前種子詞庫：**29 詞條・26 啟用・3 草稿・74 別名**，驗證通過。
+### 實際輸出範例
+
+輸入（ASR 原始逐字稿）：
+
+```
+嗯，那個  我們先看一下dashboard的ＫＰＩ
+VeritasAutoPlot在v0162B已經鎖定, 請在14:30前回覆tony@example.com
+```
+
+輸出：
+
+```
+嗯，那個我們先看一下 dashboard 的 KPI
+⟦P0001⟧ 在 ⟦P0002⟧ 已經鎖定，請在 ⟦P0003⟧ 前回覆 ⟦P0004⟧
+    ⟦P0001⟧ = 'VeritasAutoPlot'   (code_ident)
+    ⟦P0002⟧ = 'v0162B'            (part_number)
+    ⟦P0003⟧ = '14:30'             (timestamp)
+    ⟦P0004⟧ = 'tony@example.com'  (email)
+
+待裁決：'嗯' → ''（conf 0.70，疑似語助詞，不自動套用）
+        '那個' → ''（conf 0.70）
+```
+
+全形 ＫＰＩ 轉半形、中英交界補空白、半形逗號在中文語境轉全形、專名與料號全部遮罩；
+語助詞只提建議不自動刪除；`v0162B` 沒有被拆成 `v0162 B`。
+
+目前狀態：**種子詞庫 29 詞條・26 啟用・3 草稿・74 別名**；**引擎 49 個測試全過**。
 
 ---
 
@@ -75,13 +114,25 @@ python3 validate_lexicon.py --write-index  # 驗證並更新 lexicon.index.json
 
 ---
 
-## 下一步（尚未實作）
+## 已實作 vs 尚未實作
 
-本目錄是**規格與詞庫**，尚未包含引擎程式碼。依相依順序：
+| 元件 | 狀態 |
+|---|---|
+| 資料契約 · Pipeline 不變式 · 信心度閘門 | ✅ |
+| 步驟 1 LANG_DETECT · 步驟 2 NORMALIZE | ✅ |
+| P0 PROTECT / UNPROTECT（pattern 規則） | ✅ |
+| Diff & Versioning（patch log · replay · 回滾） | ✅ |
+| CLI（restore / inspect / replay） | ✅ |
+| P0 詞庫精確命中（接上 SSOT Lexicon） | ⬜ |
+| 步驟 3–8（標點／斷句／錯字／文法／專名／結構化） | ⬜ 需模型層 |
+| LLM 仲裁層 | ⬜ |
+| `@dg-in/vtr-js` | ⬜ |
 
-1. `vtr_py` 骨架：`document.py` / `pipeline.py` / `gate.py` / `protect.py` + 步驟 1–2（純確定性，無模型相依）
-2. 黃金測試集：≥200 段人工標註（中／英／混雜各三分之一）—— **應早於模型層建立**，否則沒有東西可以量測
-3. 步驟 3–4（標點／斷句，需模型）
-4. 步驟 7 Lexicon 比對 + 跨引擎數值一致性測試
-5. `@dg-in/vtr-js` 本地管線 + Review Queue UI
-6. LLM 仲裁層
+### 下一步（依相依順序）
+
+1. **黃金測試集**：≥200 段人工標註（中／英／混雜各三分之一）。**應早於模型層建立** ——
+   否則「改壞率」沒有東西可以量測，而那是本引擎唯一真正重要的安全指標。
+2. `lexicon/store.py` + `matcher.py`，把 SSOT Lexicon 接上 P0（精確命中）與步驟 7（模糊比對）。
+3. 步驟 3–4（標點恢復、斷句）—— 第一次引入模型相依與信心度校準。
+4. `@dg-in/vtr-js` 本地管線 + Review Queue UI + 跨引擎一致性測試。
+5. LLM 仲裁層。
