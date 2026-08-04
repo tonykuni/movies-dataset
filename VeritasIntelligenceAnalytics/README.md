@@ -25,6 +25,7 @@ pwsh -File "VeritasIntelligenceAnalytics\Install-VIA.ps1"     # 加 -AutoStart �
 | `via-batch` | **VRN 批次**:incoming 全部 PDF 過 No-OCR 生產線(並行池、可續跑;`-Fresh` 全部重跑) |
 | `via-import` | manifest 匯入:Downloads 批次去重入庫(清單由 Claude 寫進 `import_manifests/`) |
 | `via-vmt` | VMT SuperBOM 總指揮(via_master_engine:問卷→附件→收斂→CPM,缺件優雅略過) |
+| `via-vdf` | VDF 一鍵側欄工作台(v0160A canonical,SHA256+AST 閘門後啟動) |
 
 ## 系統架構
 

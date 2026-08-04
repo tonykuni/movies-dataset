@@ -1,0 +1,33 @@
+{
+  "record_id": "VIA_Import20260805B_Closure_v0100",
+  "record_date": "2026-08-05",
+  "status": "CLOSED",
+  "manifest": "import_manifests/IMPORT_20260805B.json",
+  "user_run_evidence": "via-import x4 deterministic: NEW=1 SAME=0 CONFL=0 MISS=4 LARGE=0",
+  "entries": [
+    {
+      "item": "Start-VIA-VDF.ps1",
+      "result": "RECOVERED_AND_PLACED",
+      "detail": [
+        "Downloads-era original archived byte-exact: supportive modules/VIA_Governance_Runtime/installers/Start-VIA-VDF_20260805.ps1 (hardcoded C:\\Users\\tonyk\\Downloads paths, kept as evidence, not runnable in repo).",
+        "Its canonical target Invoke-VIA-VDF-OneClick-Sidebar-v0160A.ps1 was NOT lost: rebuilt byte-perfect from the gzip+base64 payload $Script:AssetVdf embedded in v0162C/bin/Invoke-VIA-SystemManager-AllInOne-v0162C.ps1.",
+        "SHA256 verified equal to the gate value 778ced5d0c127d61a8d104bfcca77bcb1a6597e010b12dda80d7c23d1e43f021 before writing.",
+        "Placed at supportive modules/VIA_Governance_Runtime/v0160A/bin/Invoke-VIA-VDF-OneClick-Sidebar-v0160A.ps1 with .gitattributes -text byte-exact protection.",
+        "Repo-rooted successor entry: functional modules/VDF/Start-VIA-VDF-v0101.ps1 (self-locating, same SHA256+AST fail-closed gate) + bin/via-vdf.cmd."
+      ]
+    },
+    { "item": "vmt_reply_ingest.py", "result": "MISS_EVERYWHERE", "detail": ["Absent from Downloads and repo. via_master_engine reply stage reports MISSING honestly and skips gracefully."] },
+    { "item": "vmt_superbom_eventstream.py", "result": "MISS_EVERYWHERE", "detail": ["Absent from Downloads and repo. eventstream stage MISSING, graceful skip."] },
+    { "item": "vmt_process_mining.py", "result": "MISS_EVERYWHERE", "detail": ["Absent from Downloads and repo. mining stage MISSING, graceful skip."] },
+    { "item": "VIA_SuperBOM_ContentParser_v0100.py", "result": "MISS_EVERYWHERE", "detail": ["Absent from Downloads and repo. Not referenced by via_master_engine stage table; no runtime impact."] }
+  ],
+  "vmt_master_engine_state_after_colocation": {
+    "run": "2026-08-05 via-vmt",
+    "ok": ["survey", "convergence", "planning"],
+    "skip_graceful": ["wire (no overrides)", "attach (no superbom.duckdb)", "bridge_out (no superbom.duckdb)", "bridge_in (no superbom.duckdb)"],
+    "missing": ["reply", "eventstream", "mining"],
+    "note": "SKIP lanes light up once the mailer/OneShot run produces superbom.duckdb and ssot.json; MISSING lanes require the three engines above."
+  },
+  "open_decision": "rebuild-vs-archive for the four MISS_EVERYWHERE items. Under scope freeze (VIA_ScopeFreeze_Closure_v0100) rebuilding new engines is scope expansion, so default posture is ARCHIVED_AS_MISSING until the user explicitly reopens.",
+  "append_only": true
+}
