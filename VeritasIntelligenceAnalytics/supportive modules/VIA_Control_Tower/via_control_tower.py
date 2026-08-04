@@ -21,7 +21,7 @@ import uuid
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-VERSION = "v004"
+VERSION = "v005"
 
 
 def find_pwsh() -> str | None:
@@ -763,7 +763,7 @@ ARCH_SVG = r"""<svg viewBox="0 0 980 430" xmlns="http://www.w3.org/2000/svg" sty
 <path class="fl" d="M140 202H198"/><path class="fl" d="M360 202H418"/><path class="fl" d="M540 202H598"/>
 <rect x="20" y="300" width="940" height="100" fill="#fbfaf7" stroke="#dcdad3" rx="8"/>
 <rect class="seal" x="40" y="322" width="40" height="40" rx="4"/><text x="60" y="350" text-anchor="middle" font-family="serif" font-size="22" fill="#f2f1ec">理</text>
-<text class="t" x="100" y="340">CONTROL TOWER v004</text>
+<text class="t" x="100" y="340">CONTROL TOWER v005</text>
 <text class="s" x="100" y="356">背景 jobs · 動態進度 · 12 主動作 + 6 收尾流程 + 20 加速器</text>
 <text class="io" x="100" y="374">Supportive:Optimizer Suite · Governance v0162B/C · 60_/70_ · Standalone Pkg · PMIS-Lite · Dashboard 標準</text>
 <path class="fl" d="M280 298V246" stroke-dasharray="4 3"/><path class="fl" d="M680 298V246" stroke-dasharray="4 3"/>
@@ -776,12 +776,17 @@ PAGE = r"""<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
 <style>
 :root{--bg:#f2f1ec;--paper:#fff;--paper2:#fbfaf7;--ink:#1b1a17;--ink2:#3a3f3e;--mut:#6b6860;
  --line:#dcdad3;--seal:#9e2b25;--teal:#3d8f8f;--violet:#7a6daa;--green:#4f9465;--red:#c4634f;--amber:#bf8f33;
- --mono:"SFMono-Regular",Consolas,monospace;--sans:"Microsoft JhengHei","Segoe UI",system-ui,sans-serif}
+ --mono:"SFMono-Regular",Consolas,monospace;--sans:"Microsoft JhengHei","Segoe UI",system-ui,sans-serif;
+ --serif:"Cormorant Garamond",Georgia,serif;--cjkserif:"Noto Serif CJK TC","Songti TC","PMingLiU",serif}
 *{box-sizing:border-box;margin:0}
 body{background:var(--bg);font-family:var(--sans);color:var(--ink);min-height:100vh}
-.mast{background:#fff;display:flex;align-items:center;gap:21px;padding:11px 40px 10px}
+.eyebrow{display:flex;align-items:center;gap:10px;padding:10px 40px 0;background:#fff}
+.eyebrow .chip{padding:3px 9px;background:var(--seal);color:#fff;font:11px var(--mono);letter-spacing:.14em}
+.eyebrow .ey{font:11px var(--mono);letter-spacing:.14em;color:var(--mut);text-transform:uppercase}
+.mast{background:#fff;display:flex;align-items:center;gap:21px;padding:11px 40px 12px;border-bottom:1px solid var(--line);box-shadow:0 1px 0 rgba(27,26,23,.04)}
 .mast .seal{width:46px;height:46px;background:var(--seal);color:#f2f1ec;display:flex;align-items:center;justify-content:center;font-family:serif;font-size:26px;border-radius:4px}
-.mast .wm{font-family:Georgia,serif;font-size:22px;letter-spacing:.1em;color:var(--ink2);white-space:nowrap}
+.mast .wm{font-family:var(--serif);font-weight:600;font-size:24px;letter-spacing:.1em;color:var(--ink2);white-space:nowrap}
+.mast .wmcjk{font-family:var(--cjkserif);font-size:12.5px;letter-spacing:.5em;color:var(--ink2);margin-top:1px}
 .mast .sub{font-family:var(--mono);font-size:8.5px;letter-spacing:.36em;color:var(--mut);text-transform:uppercase}
 .rule{height:1px;background:linear-gradient(to right,var(--violet) 0 34px,rgba(27,26,23,.14) 34px 100%)}
 .tabs{display:flex;gap:2px;background:var(--paper2);padding:8px 20px 0;border-bottom:1px solid var(--line);overflow-x:auto}
@@ -807,7 +812,7 @@ h3{font:700 10.5px var(--mono);letter-spacing:.14em;color:var(--mut);text-transf
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:10px}
 .card{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:9px;transition:transform .16s,box-shadow .16s}
 .card:hover{transform:translateY(-2px);box-shadow:0 10px 28px -14px rgba(27,26,23,.3)}
-.card h4{font:700 14px var(--sans);color:var(--ink)}
+.card h4{font:700 14.5px var(--cjkserif);letter-spacing:.08em;color:var(--ink)}
 .card .k{font:700 9.5px var(--mono);letter-spacing:.1em;text-transform:uppercase}
 .card select{padding:7px 9px;border:1px solid var(--line);border-radius:7px;background:var(--paper2);font:12px var(--sans);color:var(--ink);width:100%;cursor:pointer}
 .card .go{padding:9px;border:none;border-radius:8px;background:var(--teal);color:#fff;font:700 12.5px var(--sans);cursor:pointer;transition:transform .15s,filter .15s}
@@ -835,9 +840,11 @@ button.act .t{font-size:13px;color:var(--ink)}
 .arch{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:18px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style></head><body>
+<div class="eyebrow"><span class="chip">v005</span><span class="ey">Veritas Intelligence Analytics · Control Tower · 治理總控台</span></div>
 <div class="mast"><div class="seal">理</div>
  <div><div class="wm">VIA CONTROL TOWER</div>
- <div class="sub">Veritas Intelligence Analytics · matrix · launcher · flows · 127.0.0.1</div></div></div>
+ <div class="wmcjk">維里塔斯 · 情報分析 · 總控台</div>
+ <div class="sub">matrix · launcher · flows · accelerators · 127.0.0.1</div></div></div>
 <div class="rule"></div>
 <div class="tabs" id="tabs"></div>
 <main>
