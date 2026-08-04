@@ -1,6 +1,7 @@
-# DRAFT · TickerRegex SSOT 過渡裁決書 v0100
+# TickerRegex SSOT 過渡裁決書 v0100
 
-**狀態:草案(review_before_apply,未生效)** · 2026-08-04
+**狀態:P1 已核准並執行** · 2026-08-04 操作員指令:「將 VDF VRN VAP ticker regex 為四碼數字第一碼不可為零」(範疇凍結)
+**P1 產物:`supportive modules/ssot/VRN_TickerRegexSSOT_v0100.json`(ACTIVE);v029SSOT1B 原地封存不刪除**
 
 ## 1. 爭點
 
@@ -29,5 +30,5 @@
 
 ## 4. 待操作員核准事項
 
-- [ ] 核准 P1:發行 v0100 SSOT JSON 並轉指針
-- [ ] 核准 P2:對現役執行入口(Invoke-VRN 系)加 runtime 墊片
+- [x] 核准 P1:發行 v0100 SSOT JSON 並轉指針(2026-08-04 執行;凍結債務普查 106 檔入 audit_tools)
+- [ ] 核准 P2:對現役執行入口(Invoke-VRN 系)加 runtime 墊片(16 個候選已列普查,待排程)
