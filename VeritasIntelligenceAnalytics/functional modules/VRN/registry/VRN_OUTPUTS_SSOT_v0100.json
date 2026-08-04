@@ -1,0 +1,623 @@
+{
+  "def_schema": "VRN_OUTPUTS_SSOT",
+  "def_schema_version": "v0100",
+  "def_system": "VeritasReportNova",
+  "def_generated_for": "Veritas Intelligence Analytics / VRN PDF Table Text Extraction System",
+  "def_status": "VRN_OUTPUTS_SSOT_READY",
+  "def_language": "zh-TW",
+  "def_purpose": "Single Source of Truth for VRN output contracts, output paths, file formats, IDs, validation gates, DuckDB sync, and HTML UI reporting.",
+  "def_policy": {
+    "def_destructive_delete": false,
+    "def_stop_process": false,
+    "def_network_required": false,
+    "def_parallel_allowed": true,
+    "def_patch_source_allowed_by_default": false,
+    "def_review_before_apply": true,
+    "def_outputs_are_append_only_by_default": true,
+    "def_encoding": "utf-8-sig for CSV, utf-8 for JSON/HTML",
+    "def_timezone": "Asia/Taipei",
+    "def_date_format_output": "YYYY/MM/DD",
+    "def_datetime_format_output": "YYYY/MM/DD HH:mm:ss"
+  },
+  "def_root": {
+    "def_default_root": "C:\\VeritasReportNova",
+    "def_project_root_candidates": [
+      "C:\\VeritasReportNova",
+      "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VRN",
+      "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\functional modules\\VRN"
+    ],
+    "def_runtime_root_template": "${VRN_ROOT}\\_vrn_runs\\${RUN_ID}",
+    "def_run_id_template": "RUN_${YYYYMMDD}_${HHMMSS}_VRN_${RUN_MODE}",
+    "def_active_pointer": "${VRN_ROOT}\\_vrn_active\\VRN_ACTIVE_POINTER.json",
+    "def_outputs_ssot_path": "${VRN_ROOT}\\registry\\VRN_OUTPUTS_SSOT_v0100.json"
+  },
+  "def_required_directories": {
+    "def_registry": "${RUN_ROOT}\\registry",
+    "def_input_manifest": "${RUN_ROOT}\\input_manifest",
+    "def_extract_raw": "${RUN_ROOT}\\extract_raw",
+    "def_layout": "${RUN_ROOT}\\layout",
+    "def_tables": "${RUN_ROOT}\\tables",
+    "def_texts": "${RUN_ROOT}\\texts",
+    "def_cells": "${RUN_ROOT}\\cells",
+    "def_sentences": "${RUN_ROOT}\\sentences",
+    "def_evidence": "${RUN_ROOT}\\evidence",
+    "def_validation": "${RUN_ROOT}\\validation",
+    "def_review_queue": "${RUN_ROOT}\\review_queue",
+    "def_reports": "${RUN_ROOT}\\reports",
+    "def_db": "${RUN_ROOT}\\db",
+    "def_logs": "${RUN_ROOT}\\logs",
+    "def_cache": "${RUN_ROOT}\\cache"
+  },
+  "def_output_bundles": [
+    {
+      "def_bundle_id": "B001_RUN_CONTROL",
+      "def_priority": "P0",
+      "def_owner_layer": "SystemManager",
+      "def_description": "Run-level manifest, runtime policy, and active pointer outputs.",
+      "def_outputs": [
+        {
+          "def_output_id": "O001_RUN_MANIFEST_JSON",
+          "def_path_template": "${RUN_ROOT}\\registry\\run_manifest.json",
+          "def_format": "json",
+          "def_required": true,
+          "def_duckdb_table": "vrn_run_manifest",
+          "def_write_mode": "overwrite_per_run",
+          "def_validation": ["file_exists", "non_empty", "json_parseable", "run_id_present"]
+        },
+        {
+          "def_output_id": "O002_RUN_MANIFEST_PARQUET",
+          "def_path_template": "${RUN_ROOT}\\registry\\run_manifest.parquet",
+          "def_format": "parquet",
+          "def_required": true,
+          "def_duckdb_table": "vrn_run_manifest",
+          "def_write_mode": "overwrite_per_run",
+          "def_validation": ["file_exists", "non_empty", "parquet_readable", "schema_match"]
+        },
+        {
+          "def_output_id": "O003_ACTIVE_POINTER_JSON",
+          "def_path_template": "${VRN_ROOT}\\_vrn_active\\VRN_ACTIVE_POINTER.json",
+          "def_format": "json",
+          "def_required": true,
+          "def_duckdb_table": null,
+          "def_write_mode": "atomic_replace_after_success",
+          "def_validation": ["file_exists", "json_parseable", "points_to_existing_run"]
+        }
+      ]
+    },
+    {
+      "def_bundle_id": "B002_INPUT_REGISTRY",
+      "def_priority": "P0",
+      "def_owner_layer": "InputRegistry",
+      "def_description": "Source PDF inventory, file hash, deduplication, and page count registry.",
+      "def_outputs": [
+        {
+          "def_output_id": "O010_FILES_REGISTRY_PARQUET",
+          "def_path_template": "${RUN_ROOT}\\input_manifest\\files_registry.parquet",
+          "def_format": "parquet",
+          "def_required": true,
+          "def_duckdb_table": "vrn_files_registry",
+          "def_write_mode": "append_run_partition",
+          "def_validation": ["file_exists", "non_empty", "parquet_readable", "unique_file_id", "source_path_exists_or_recorded_missing"]
+        },
+        {
+          "def_output_id": "O011_FILES_REGISTRY_CSV",
+          "def_path_template": "${RUN_ROOT}\\input_manifest\\files_registry.csv",
+          "def_format": "csv",
+          "def_required": true,
+          "def_duckdb_table": null,
+          "def_write_mode": "export_copy",
+          "def_validation": ["file_exists", "csv_readable", "row_count_matches_parquet"]
+        },
+        {
+          "def_output_id": "O012_FILES_REGISTRY_JSONL",
+          "def_path_template": "${RUN_ROOT}\\input_manifest\\files_registry.jsonl",
+          "def_format": "jsonl",
+          "def_required": false,
+          "def_duckdb_table": null,
+          "def_write_mode": "export_copy",
+          "def_validation": ["jsonl_parseable", "row_count_matches_parquet"]
+        }
+      ]
+    },
+    {
+      "def_bundle_id": "B003_LAYOUT_OUTPUTS",
+      "def_priority": "P0",
+      "def_owner_layer": "LayoutEngine",
+      "def_description": "Page sectors, blocks, columns, footer/header exclusion, and table candidate regions.",
+      "def_outputs": [
+        {
+          "def_output_id": "O020_PAGE_BLOCKS_PARQUET",
+          "def_path_template": "${RUN_ROOT}\\layout\\page_blocks.parquet",
+          "def_format": "parquet",
+          "def_required": true,
+          "def_duckdb_table": "vrn_page_blocks",
+          "def_write_mode": "append_run_partition",
+          "def_validation": ["parquet_readable", "schema_match", "page_id_present", "bbox_valid"]
+        },
+        {
+          "def_output_id": "O021_TABLE_CANDIDATES_PARQUET",
+          "def_path_template": "${RUN_ROOT}\\layout\\table_candidates.parquet",
+          "def_format": "parquet",
+          "def_required": true,
+          "def_duckdb_table": "vrn_table_candidates",
+          "def_write_mode": "append_run_partition",
+          "def_validation": ["parquet_readable", "candidate_id_unique", "bbox_valid", "sector_present"]
+        },
+        {
+          "def_output_id": "O022_LAYOUT_DEBUG_JSONL",
+          "def_path_template": "${RUN_ROOT}\\layout\\layout_debug.jsonl",
+          "def_format": "jsonl",
+          "def_required": false,
+          "def_duckdb_table": "vrn_layout_debug",
+          "def_write_mode": "append_run_partition",
+          "def_validation": ["jsonl_parseable"]
+        }
+      ]
+    },
+    {
+      "def_bundle_id": "B004_TABLE_OUTPUTS",
+      "def_priority": "P0",
+      "def_owner_layer": "TableExtractionEngine",
+      "def_description": "Canonical table metadata and long-form table cells extracted from PDFs.",
+      "def_outputs": [
+        {
+          "def_output_id": "O030_TABLES_META_PARQUET",
+          "def_path_template": "${RUN_ROOT}\\tables\\tables_meta.parquet",
+          "def_format": "parquet",
+          "def_required": true,
+          "def_duckdb_table": "vrn_tables_meta",
+          "def_write_mode": "append_run_partition",
+          "def_validation": ["parquet_readable", "table_id_unique", "file_id_present", "page_number_valid", "bbox_valid", "engine_trace_present"]
+        },
+        {
+          "def_output_id": "O031_TABLES_LONG_PARQUET",
+          "def_path_template": "${RUN_ROOT}\\tables\\tables_long.parquet",
+          "def_format": "parquet",
+          "def_required": true,
+          "def_duckdb_table": "vrn_tables_long",
+          "def_write_mode": "append_run_partition",
+          "def_validation": ["parquet_readable", "cell_id_unique", "table_id_present", "row_col_valid", "text_cleaned"]
+        },
+        {
+          "def_output_id": "O032_TABLES_META_CSV",
+          "def_path_template": "${RUN_ROOT}\\tables\\tables_meta.csv",
+          "def_format": "csv",
+          "def_required": true,
+          "def_duckdb_table": null,
+          "def_write_mode": "export_copy",
+          "def_validation": ["csv_readable", "row_count_matches_parquet"]
+        },
+        {
+          "def_output_id": "O033_TABLES_LONG_CSV",
+          "def_path_template": "${RUN_ROOT}\\tables\\tables_long.csv",
+          "def_format": "csv",
+          "def_required": true,
+          "def_duckdb_table": null,
+          "def_write_mode": "export_copy",
+          "def_validation": ["csv_readable", "row_count_matches_parquet"]
+        },
+        {
+          "def_output_id": "O034_TABLES_JSONL",
+          "def_path_template": "${RUN_ROOT}\\tables\\tables.jsonl",
+          "def_format": "jsonl",
+          "def_required": false,
+          "def_duckdb_table": null,
+          "def_write_mode": "export_nested_copy",
+          "def_validation": ["jsonl_parseable", "table_id_present"]
+        }
+      ]
+    },
+    {
+      "def_bundle_id": "B005_TEXT_OUTPUTS",
+      "def_priority": "P0",
+      "def_owner_layer": "TextExtractionEngine",
+      "def_description": "Paragraph, sentence, token, and OCR text outputs with source trace.",
+      "def_outputs": [
+        {
+          "def_output_id": "O040_TEXT_BLOCKS_PARQUET",
+          "def_path_template": "${RUN_ROOT}\\texts\\text_blocks.parquet",
+          "def_format": "parquet",
+          "def_required": true,
+          "def_duckdb_table": "vrn_text_blocks",
+          "def_write_mode": "append_run_partition",
+          "def_validation": ["parquet_readable", "text_block_id_unique", "page_id_present", "bbox_valid_or_null"]
+        },
+        {
+          "def_output_id": "O041_SENTENCES_PARQUET",
+          "def_path_template": "${RUN_ROOT}\\sentences\\sentences.parquet",
+          "def_format": "parquet",
+          "def_required": true,
+          "def_duckdb_table": "vrn_sentences",
+          "def_write_mode": "append_run_partition",
+          "def_validation": ["parquet_readable", "sentence_id_unique", "source_trace_present", "text_cleaned"]
+        },
+        {
+          "def_output_id": "O042_TEXT_BLOCKS_CSV",
+          "def_path_template": "${RUN_ROOT}\\texts\\text_blocks.csv",
+          "def_format": "csv",
+          "def_required": true,
+          "def_duckdb_table": null,
+          "def_write_mode": "export_copy",
+          "def_validation": ["csv_readable", "row_count_matches_parquet"]
+        },
+        {
+          "def_output_id": "O043_SENTENCES_CSV",
+          "def_path_template": "${RUN_ROOT}\\sentences\\sentences.csv",
+          "def_format": "csv",
+          "def_required": true,
+          "def_duckdb_table": null,
+          "def_write_mode": "export_copy",
+          "def_validation": ["csv_readable", "row_count_matches_parquet"]
+        }
+      ]
+    },
+    {
+      "def_bundle_id": "B006_EVIDENCE_AND_VALIDATION",
+      "def_priority": "P0",
+      "def_owner_layer": "ValidationEngine",
+      "def_description": "Cross-engine evidence, conflicts, confidence scoring, and human review queue.",
+      "def_outputs": [
+        {
+          "def_output_id": "O050_EVIDENCE_MATRIX_PARQUET",
+          "def_path_template": "${RUN_ROOT}\\evidence\\evidence_matrix.parquet",
+          "def_format": "parquet",
+          "def_required": true,
+          "def_duckdb_table": "vrn_evidence_matrix",
+          "def_write_mode": "append_run_partition",
+          "def_validation": ["parquet_readable", "object_id_present", "engine_name_present", "confidence_valid"]
+        },
+        {
+          "def_output_id": "O051_VALIDATION_MATRIX_PARQUET",
+          "def_path_template": "${RUN_ROOT}\\validation\\validation_matrix.parquet",
+          "def_format": "parquet",
+          "def_required": true,
+          "def_duckdb_table": "vrn_validation_matrix",
+          "def_write_mode": "append_run_partition",
+          "def_validation": ["parquet_readable", "test_id_present", "status_valid", "risk_valid"]
+        },
+        {
+          "def_output_id": "O052_CONFLICTS_PARQUET",
+          "def_path_template": "${RUN_ROOT}\\validation\\extraction_conflicts.parquet",
+          "def_format": "parquet",
+          "def_required": true,
+          "def_duckdb_table": "vrn_extraction_conflicts",
+          "def_write_mode": "append_run_partition",
+          "def_validation": ["parquet_readable", "conflict_id_unique", "severity_valid"]
+        },
+        {
+          "def_output_id": "O053_HUMAN_REVIEW_QUEUE_PARQUET",
+          "def_path_template": "${RUN_ROOT}\\review_queue\\human_review_queue.parquet",
+          "def_format": "parquet",
+          "def_required": true,
+          "def_duckdb_table": "vrn_human_review_queue",
+          "def_write_mode": "append_run_partition",
+          "def_validation": ["parquet_readable", "review_id_unique", "reason_present", "priority_valid"]
+        }
+      ]
+    },
+    {
+      "def_bundle_id": "B007_REPORTING",
+      "def_priority": "P1",
+      "def_owner_layer": "ReportEngine",
+      "def_description": "Human-readable HTML reports, matrices, and audit dashboards.",
+      "def_outputs": [
+        {
+          "def_output_id": "O060_RUN_REPORT_HTML",
+          "def_path_template": "${RUN_ROOT}\\reports\\vrn_run_report.html",
+          "def_format": "html",
+          "def_required": true,
+          "def_duckdb_table": null,
+          "def_write_mode": "overwrite_per_run",
+          "def_validation": ["file_exists", "non_empty", "html_has_status_cards", "html_has_validation_matrix"]
+        },
+        {
+          "def_output_id": "O061_PANORAMIC_HTML",
+          "def_path_template": "${RUN_ROOT}\\reports\\panoramic.html",
+          "def_format": "html",
+          "def_required": true,
+          "def_duckdb_table": null,
+          "def_write_mode": "overwrite_per_run",
+          "def_validation": ["file_exists", "non_empty", "html_has_table_preview", "html_has_review_queue"]
+        },
+        {
+          "def_output_id": "O062_RUN_SUMMARY_JSON",
+          "def_path_template": "${RUN_ROOT}\\reports\\run_summary.json",
+          "def_format": "json",
+          "def_required": true,
+          "def_duckdb_table": "vrn_run_summary",
+          "def_write_mode": "overwrite_per_run",
+          "def_validation": ["json_parseable", "status_present", "risk_present", "counts_present"]
+        }
+      ]
+    },
+    {
+      "def_bundle_id": "B008_DATABASE_SYNC",
+      "def_priority": "P0",
+      "def_owner_layer": "DuckDBSyncEngine",
+      "def_description": "DuckDB local database sync for all canonical Parquet outputs.",
+      "def_outputs": [
+        {
+          "def_output_id": "O070_DUCKDB_DATABASE",
+          "def_path_template": "${RUN_ROOT}\\db\\vrn.duckdb",
+          "def_format": "duckdb",
+          "def_required": true,
+          "def_duckdb_table": null,
+          "def_write_mode": "transactional_sync",
+          "def_validation": ["file_exists", "duckdb_openable", "tables_exist", "row_counts_match_parquet"]
+        },
+        {
+          "def_output_id": "O071_DUCKDB_SYNC_REPORT_JSON",
+          "def_path_template": "${RUN_ROOT}\\db\\duckdb_sync_report.json",
+          "def_format": "json",
+          "def_required": true,
+          "def_duckdb_table": null,
+          "def_write_mode": "overwrite_per_run",
+          "def_validation": ["json_parseable", "all_required_tables_checked"]
+        }
+      ]
+    }
+  ],
+  "def_canonical_ids": {
+    "def_run_id": {
+      "def_formula": "RUN_${YYYYMMDD}_${HHMMSS}_VRN_${RUN_MODE}",
+      "def_required_in": ["all_outputs"]
+    },
+    "def_file_id": {
+      "def_formula": "sha12(normalized_source_path + file_size + modified_time + content_sha256)",
+      "def_required_in": ["files_registry", "page_blocks", "tables_meta", "tables_long", "text_blocks", "sentences"]
+    },
+    "def_page_id": {
+      "def_formula": "${file_id}::P${page_number_4d}",
+      "def_required_in": ["page_blocks", "table_candidates", "tables_meta", "text_blocks", "sentences"]
+    },
+    "def_sector_id": {
+      "def_formula": "${page_id}::S${sector_code}",
+      "def_sector_codes": ["FULL", "LEFT", "RIGHT", "MIDDLE", "TOP", "BOTTOM", "FOOTER_EXCLUDED", "HEADER_EXCLUDED"],
+      "def_required_in": ["page_blocks", "table_candidates", "tables_meta"]
+    },
+    "def_table_id": {
+      "def_formula": "${file_id}::P${page_number_4d}::${sector_code}::T${table_index_3d}::${content_hash8}",
+      "def_required_in": ["tables_meta", "tables_long", "evidence_matrix", "validation_matrix"]
+    },
+    "def_cell_id": {
+      "def_formula": "${table_id}::R${row_index_4d}::C${col_index_4d}",
+      "def_required_in": ["tables_long"]
+    },
+    "def_sentence_id": {
+      "def_formula": "${source_object_id}::SENT${sentence_index_5d}",
+      "def_required_in": ["sentences"]
+    },
+    "def_review_id": {
+      "def_formula": "REVIEW::${object_type}::${object_id}::${reason_hash8}",
+      "def_required_in": ["human_review_queue"]
+    }
+  },
+  "def_table_contracts": {
+    "vrn_run_manifest": {
+      "def_primary_key": ["run_id"],
+      "def_required_columns": ["run_id", "started_at", "completed_at", "status", "risk", "source_pdf_count", "page_count", "table_count", "sentence_count", "operator_mode", "policy_json"]
+    },
+    "vrn_files_registry": {
+      "def_primary_key": ["run_id", "file_id"],
+      "def_required_columns": ["run_id", "file_id", "source_path", "file_name", "file_ext", "file_size_bytes", "content_sha256", "sha12", "page_count", "status", "error_message"]
+    },
+    "vrn_page_blocks": {
+      "def_primary_key": ["run_id", "page_block_id"],
+      "def_required_columns": ["run_id", "file_id", "page_id", "page_number", "page_block_id", "block_type", "sector_code", "bbox_x0", "bbox_y0", "bbox_x1", "bbox_y1", "engine_name", "confidence"]
+    },
+    "vrn_table_candidates": {
+      "def_primary_key": ["run_id", "candidate_id"],
+      "def_required_columns": ["run_id", "file_id", "page_id", "candidate_id", "sector_code", "bbox_x0", "bbox_y0", "bbox_x1", "bbox_y1", "candidate_source", "confidence", "status"]
+    },
+    "vrn_tables_meta": {
+      "def_primary_key": ["run_id", "table_id"],
+      "def_required_columns": ["run_id", "file_id", "page_id", "table_id", "page_number", "sector_code", "table_index", "row_count", "col_count", "header_row_count", "bbox_x0", "bbox_y0", "bbox_x1", "bbox_y1", "engine_winner", "engine_votes_json", "confidence", "status", "review_flag"]
+    },
+    "vrn_tables_long": {
+      "def_primary_key": ["run_id", "cell_id"],
+      "def_required_columns": ["run_id", "file_id", "page_id", "table_id", "cell_id", "row_index", "col_index", "row_span", "col_span", "header_flag", "raw_text", "clean_text", "value_type", "numeric_value", "unit", "bbox_x0", "bbox_y0", "bbox_x1", "bbox_y1", "source_engine", "confidence"]
+    },
+    "vrn_text_blocks": {
+      "def_primary_key": ["run_id", "text_block_id"],
+      "def_required_columns": ["run_id", "file_id", "page_id", "text_block_id", "page_number", "sector_code", "block_order", "raw_text", "clean_text", "language_hint", "bbox_x0", "bbox_y0", "bbox_x1", "bbox_y1", "source_engine", "confidence", "is_footer", "is_appendix"]
+    },
+    "vrn_sentences": {
+      "def_primary_key": ["run_id", "sentence_id"],
+      "def_required_columns": ["run_id", "file_id", "page_id", "source_object_type", "source_object_id", "sentence_id", "sentence_index", "raw_text", "clean_text", "language_hint", "token_count", "source_trace_json", "confidence"]
+    },
+    "vrn_evidence_matrix": {
+      "def_primary_key": ["run_id", "evidence_id"],
+      "def_required_columns": ["run_id", "evidence_id", "object_type", "object_id", "engine_name", "engine_version", "claim_type", "claim_value_json", "confidence", "bbox_json", "created_at"]
+    },
+    "vrn_validation_matrix": {
+      "def_primary_key": ["run_id", "test_id", "object_id"],
+      "def_required_columns": ["run_id", "test_id", "test_name", "object_type", "object_id", "status", "risk", "message", "expected_value", "actual_value", "created_at"]
+    },
+    "vrn_extraction_conflicts": {
+      "def_primary_key": ["run_id", "conflict_id"],
+      "def_required_columns": ["run_id", "conflict_id", "object_type", "object_id", "severity", "conflict_type", "engine_a", "engine_b", "value_a_json", "value_b_json", "resolution_status", "resolution_rule"]
+    },
+    "vrn_human_review_queue": {
+      "def_primary_key": ["run_id", "review_id"],
+      "def_required_columns": ["run_id", "review_id", "object_type", "object_id", "priority", "reason_code", "reason_detail", "suggested_action", "status", "created_at"]
+    },
+    "vrn_run_summary": {
+      "def_primary_key": ["run_id"],
+      "def_required_columns": ["run_id", "status", "risk", "ok_count", "warn_count", "fail_count", "source_pdf_count", "page_count", "table_count", "cell_count", "sentence_count", "review_queue_count", "html_report_path", "duckdb_path"]
+    }
+  },
+  "def_engine_trace_contract": {
+    "def_allowed_engines": [
+      "pdfplumber",
+      "pymupdf",
+      "pdfminer_six",
+      "camelot",
+      "tabula",
+      "opencv_grid",
+      "tesseract_hocr",
+      "paddleocr",
+      "easyocr",
+      "layoutparser",
+      "donut",
+      "table_transformer",
+      "manual_override"
+    ],
+    "def_minimum_required_votes_for_table_acceptance": 2,
+    "def_confidence_range": {"def_min": 0.0, "def_max": 1.0},
+    "def_confidence_bands": {
+      "def_high": ">=0.85",
+      "def_medium": ">=0.65 and <0.85",
+      "def_low": "<0.65"
+    },
+    "def_review_triggers": [
+      "engine_conflict_high",
+      "low_confidence",
+      "bbox_overlap_conflict",
+      "header_shape_mismatch",
+      "numeric_type_mismatch",
+      "empty_table_after_cleaning",
+      "footer_or_appendix_ambiguous",
+      "multi_column_order_ambiguous"
+    ]
+  },
+  "def_validation_gates": [
+    {
+      "def_gate_id": "G001_OUTPUT_PRESENCE",
+      "def_priority": "P0",
+      "def_pass_condition": "all required outputs exist and are non-empty unless allowed_empty=true",
+      "def_fail_blocks_next": true
+    },
+    {
+      "def_gate_id": "G002_SCHEMA_CONTRACT",
+      "def_priority": "P0",
+      "def_pass_condition": "all canonical Parquet outputs contain required columns and valid primary keys",
+      "def_fail_blocks_next": true
+    },
+    {
+      "def_gate_id": "G003_ID_UNIQUENESS",
+      "def_priority": "P0",
+      "def_pass_condition": "run_id/file_id/table_id/cell_id/sentence_id uniqueness rules pass",
+      "def_fail_blocks_next": true
+    },
+    {
+      "def_gate_id": "G004_ROW_COUNT_RECONCILIATION",
+      "def_priority": "P0",
+      "def_pass_condition": "CSV/JSON exports row counts match Parquet canonical rows",
+      "def_fail_blocks_next": true
+    },
+    {
+      "def_gate_id": "G005_DUCKDB_SYNC",
+      "def_priority": "P0",
+      "def_pass_condition": "DuckDB tables exist and row counts match canonical Parquet outputs",
+      "def_fail_blocks_next": true
+    },
+    {
+      "def_gate_id": "G006_REVIEW_QUEUE_DISCIPLINE",
+      "def_priority": "P1",
+      "def_pass_condition": "objects below confidence threshold or with conflicts are routed to human_review_queue",
+      "def_fail_blocks_next": false
+    },
+    {
+      "def_gate_id": "G007_HTML_REPORT_READINESS",
+      "def_priority": "P1",
+      "def_pass_condition": "HTML report includes status cards, matrices, sample previews, conflict list, and review queue",
+      "def_fail_blocks_next": false
+    }
+  ],
+  "def_duckdb_sync_plan": {
+    "def_database_path_template": "${RUN_ROOT}\\db\\vrn.duckdb",
+    "def_transactional": true,
+    "def_create_or_replace_views": true,
+    "def_create_indexes_after_load": true,
+    "def_tables_to_load": [
+      {"def_table": "vrn_run_manifest", "def_source": "${RUN_ROOT}\\registry\\run_manifest.parquet"},
+      {"def_table": "vrn_files_registry", "def_source": "${RUN_ROOT}\\input_manifest\\files_registry.parquet"},
+      {"def_table": "vrn_page_blocks", "def_source": "${RUN_ROOT}\\layout\\page_blocks.parquet"},
+      {"def_table": "vrn_table_candidates", "def_source": "${RUN_ROOT}\\layout\\table_candidates.parquet"},
+      {"def_table": "vrn_tables_meta", "def_source": "${RUN_ROOT}\\tables\\tables_meta.parquet"},
+      {"def_table": "vrn_tables_long", "def_source": "${RUN_ROOT}\\tables\\tables_long.parquet"},
+      {"def_table": "vrn_text_blocks", "def_source": "${RUN_ROOT}\\texts\\text_blocks.parquet"},
+      {"def_table": "vrn_sentences", "def_source": "${RUN_ROOT}\\sentences\\sentences.parquet"},
+      {"def_table": "vrn_evidence_matrix", "def_source": "${RUN_ROOT}\\evidence\\evidence_matrix.parquet"},
+      {"def_table": "vrn_validation_matrix", "def_source": "${RUN_ROOT}\\validation\\validation_matrix.parquet"},
+      {"def_table": "vrn_extraction_conflicts", "def_source": "${RUN_ROOT}\\validation\\extraction_conflicts.parquet"},
+      {"def_table": "vrn_human_review_queue", "def_source": "${RUN_ROOT}\\review_queue\\human_review_queue.parquet"}
+    ],
+    "def_required_views": [
+      "vw_vrn_latest_run_summary",
+      "vw_vrn_table_quality",
+      "vw_vrn_low_confidence_objects",
+      "vw_vrn_human_review_open",
+      "vw_vrn_file_to_table_trace",
+      "vw_vrn_sentence_source_trace"
+    ]
+  },
+  "def_html_ui_contract": {
+    "def_required_sections": [
+      "status_cards",
+      "run_manifest",
+      "file_registry_matrix",
+      "table_meta_matrix",
+      "table_preview_matrix",
+      "text_preview_matrix",
+      "evidence_matrix",
+      "validation_matrix",
+      "conflict_matrix",
+      "human_review_queue",
+      "duckdb_sync_report"
+    ],
+    "def_visual_style_lock": {
+      "def_background": "#F9F9F6",
+      "def_surface": "#FFFFFF",
+      "def_celadon": "#DFECEA",
+      "def_sky_celadon": "#AFCFCC",
+      "def_ink": "#1F2933",
+      "def_muted": "#6B7C78",
+      "def_ok": "#166534",
+      "def_warn": "#B7791F",
+      "def_fail": "#B91C1C"
+    }
+  },
+  "def_json_event_bus": {
+    "def_enabled": true,
+    "def_directory_template": "${RUN_ROOT}\\registry\\events",
+    "def_event_file_template": "${RUN_ROOT}\\registry\\events\\${event_ts}_${event_type}.json",
+    "def_event_types": [
+      "RUN_STARTED",
+      "INPUT_DISCOVERED",
+      "PDF_PARSED",
+      "LAYOUT_COMPLETED",
+      "TABLES_EXTRACTED",
+      "TEXT_EXTRACTED",
+      "VALIDATION_COMPLETED",
+      "DUCKDB_SYNC_COMPLETED",
+      "HTML_REPORT_WRITTEN",
+      "RUN_COMPLETED",
+      "RUN_FAILED"
+    ],
+    "def_event_required_fields": ["run_id", "event_ts", "event_type", "status", "message", "payload"]
+  },
+  "def_success_definition": {
+    "def_final_status_ready": "VRN_OUTPUTS_READY",
+    "def_final_status_review": "VRN_OUTPUTS_READY_WITH_REVIEW_QUEUE",
+    "def_final_status_blocked": "VRN_OUTPUTS_BLOCKED",
+    "def_ready_conditions": [
+      "G001_OUTPUT_PRESENCE passes",
+      "G002_SCHEMA_CONTRACT passes",
+      "G003_ID_UNIQUENESS passes",
+      "G004_ROW_COUNT_RECONCILIATION passes",
+      "G005_DUCKDB_SYNC passes"
+    ],
+    "def_review_allowed_conditions": [
+      "only P1 gates warn",
+      "human_review_queue_count > 0 but P0 gates pass"
+    ],
+    "def_block_conditions": [
+      "missing required P0 output",
+      "canonical Parquet unreadable",
+      "primary key duplicate",
+      "DuckDB row count mismatch",
+      "run_manifest missing or invalid"
+    ]
+  }
+}
