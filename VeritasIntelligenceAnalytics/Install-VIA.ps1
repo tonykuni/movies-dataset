@@ -100,5 +100,6 @@ foreach ($cmd in "via.cmd","via-tower.cmd","via-all.cmd","via-shim.cmd","via-syn
 Write-Host "`n==================== PROVISION MATRIX ====================" -ForegroundColor Cyan
 $M | Format-Table -AutoSize
 Write-Host "開新終端機後直接輸入:  via   |   via-tower   |   via-all   |   via-shim   |   via-sync" -ForegroundColor Green
-Write-Host "(本視窗已即時生效,可立刻試 via-tower)" -ForegroundColor Green
+Write-Host "注意:若本安裝器是以 pwsh -File 從另一個視窗啟動,母視窗需開新終端機才會生效;" -ForegroundColor Yellow
+Write-Host "      或在母視窗貼:  \$env:Path += \";$binDir\"" -ForegroundColor Yellow
 Write-Host "PowerShell session remains open." -ForegroundColor Cyan
