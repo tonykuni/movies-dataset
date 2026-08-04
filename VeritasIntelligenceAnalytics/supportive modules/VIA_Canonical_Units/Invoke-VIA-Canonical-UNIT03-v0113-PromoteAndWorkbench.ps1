@@ -73,8 +73,13 @@ $hdr = "# PROMOTED by UNIT03 v0113 $ts from Chart Library Builder candidate (SHA
 $final = $hdr + $text
 if (Test-Path -LiteralPath $dest) {
     $existing = [IO.File]::ReadAllText($dest, [Text.UTF8Encoding]::new($false))
-    if ($existing -eq $final) { Gate "P1.4 promote" "PASS" "already promoted, identical (idempotent)" }
-    else { Gate "P1.4 promote" "FAIL" "dest exists with different content - refusing overwrite"; throw "DEST_CONFLICT" }
+    # idempotence: ignore the 3-line promotion header (carries run timestamp) and CRLF/LF,
+    # compare bodies only - identical body means the promotion already happened
+    $stripHdr = { param($t) (($t -replace "`r`n", "`n") -split "`n" | Select-Object -Skip 3) -join "`n" }
+    if ((& $stripHdr $existing) -eq (& $stripHdr $final)) {
+        Gate "P1.4 promote" "PASS" "ALREADY_PROMOTED - body identical, header timestamp differs only (idempotent)"
+    }
+    else { Gate "P1.4 promote" "FAIL" "dest exists with DIFFERENT BODY - refusing overwrite"; throw "DEST_CONFLICT" }
 } else {
     [IO.File]::WriteAllText($dest, $final, [Text.UTF8Encoding]::new($false))
     Gate "P1.4 promote" "PASS" $destRel
