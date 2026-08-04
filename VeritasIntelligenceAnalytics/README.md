@@ -23,6 +23,7 @@ pwsh -File "VeritasIntelligenceAnalytics\Install-VIA.ps1"     # 加 -AutoStart �
 | `via-shim` | TickerRegex v0100 墊片入口:`via-shim -Target <檔> [-DryRun]` |
 | `via-sync` | repo 同步(fetch + merge claude 分支 + push main) |
 | `via-batch` | **VRN 批次**:incoming 全部 PDF 過 No-OCR 生產線(並行池、可續跑;`-Fresh` 全部重跑) |
+| `via-import` | manifest 匯入:Downloads 批次去重入庫(清單由 Claude 寫進 `import_manifests/`) |
 
 ## 系統架構
 

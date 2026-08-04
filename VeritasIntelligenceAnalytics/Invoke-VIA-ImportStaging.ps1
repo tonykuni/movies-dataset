@@ -23,6 +23,7 @@ Write-Host "[IMPORT] manifest: $(Split-Path $mfile -Leaf) ($($m.files.Count) ent
 Push-Location $repo
 try {
     git fetch origin 2>&1 | Out-Null
+    git checkout main 2>&1 | Out-Host
     git merge origin/claude/via-system-followup-tz7k9t 2>&1 | Out-Host
 
     $stage = Join-Path $via $m.staging_dir
@@ -72,7 +73,7 @@ try {
     }
     Write-Host "==== NEW=$new SAME=$same CONFL=$cfl MISS=$miss LARGE=$big ====" -ForegroundColor Cyan
 
-    git add -- (Join-Path "VeritasIntelligenceAnalytics" $m.staging_dir) 2>$null
+    git add -- ("VeritasIntelligenceAnalytics/" + $m.staging_dir) 2>&1 | Out-Host
     $staged = @(git diff --cached --name-only)
     if ($staged.Count) {
         git commit -m "Import staging $($m.staging_dir): $new new, $cfl conflicts ($same identical skipped)" 2>&1 | Out-Host
