@@ -1,7 +1,7 @@
 # Veritas Intelligence Analytics(VIA)
 
 台股/全球市場情報平台:資料鍛造(VDF)× 自動繪圖(VAP)× 研報擷取(VRN),
-以 SSOT 單一真相與 hash 鎖定治理貫穿。**2026-08-04 全系統整合收官版。**
+以 SSOT 單一真相與 hash 鎖定治理貫穿。**2026-08-05 全綠穩態版(Mega 10 域 1208 檔 GREEN)。**
 
 ---
 
@@ -41,11 +41,13 @@ functional modules/
 └── VRN/   研報擷取:生產線 v1.1.0(MDL001-008,manifest hash 9/9)、
            TrustPolish v04.4、Incremental DB AIO、Finalize AIO、SSOT 鏈、六槽標準
 supportive modules/
-├── ssot/、registry/、audit_tools/       真相層、登錄層、稽核紀錄(永不改寫)
+├── ssot/、registry/、audit_tools/       真相層(+同義字引擎/種子)、登錄層(+編號器)、稽核紀錄(永不改寫)
 ├── 70_VRN_Rules/                        規則模組(TickerFilename SSOT、墊片、券商別名…)
-├── VIA_Canonical_Units/                 UNIT03 治理管線(v0109-v0113)+ 判定表
+├── VIA_Canonical_Units/                 UNIT03 治理管線(v0109-v0113)+ 判定表 + 晉升記錄
 ├── VIA_Control_Tower/                   HTML 總控台 v005(Veritas 鎖定版式)
-└── bin/ + Install-VIA.ps1(於 VIA 根)   五指令 + 一鍵布建
+├── VIA_Governance_Runtime/              Mega 引擎 v0100-v0102、v0160A/B/C 工作台家族、installers(OneShot 等)
+├── VMT_SuperBOM/                        VMT 引擎家族 + master engine v1.0/v0101/v0102
+└── bin/ + Install-VIA.ps1(於 VIA 根)   十三指令 + 一鍵布建
 ```
 
 ## SSOT 總表(現役真相)
@@ -60,6 +62,12 @@ supportive modules/
 | Header 鎖 | `functional modules/VAP/spec/Veritas_Header_Masthead_1d.html` | 1d LOCKED(幾何/色票/字體不得覆寫) |
 | VRN 資料契約 | `functional modules/VRN/registry/VRN_REPORT_*_SSOT_v0100.json` | v0100(parquet 正本 + DuckDB 鏡像) |
 | VRN 生產線 | `functional modules/VRN/registry/VRN_Production_Manifest.json` | v1.1.0(核心模組 SHA256 錨定) |
+| 設計鎖 tokens | `supportive modules/ssot/VIA_DesignLock_SSOT_v0100.json` | v0100 ACTIVE(palette/fonts/刊頭配方/印章家族 理鑑鍛郵核/compact 字級) |
+| 公定處理模式 | `supportive modules/ssot/VIA_MegaPrompt_OfficialMode_v0100.md` | v0100(三輪硬性上限、20 加速器、沙盒循環;執行載體 `via-mega`) |
+| 欄位 regex 庫 | `functional modules/VRN/InvestmentRegexPattern_VALIDATED.py` | v3.0 ACTIVE(525 patterns;PROMOTION_RECORD 錨定 SHA256) |
+| 同義字引擎 | `supportive modules/ssot/via_synonym_engine_v0100.py` + Seed | v0100 ACTIVE(41 canonical 錨點;同義字增量只增不減) |
+| 編碼註冊中心 | `supportive modules/registry/VIA_AutoCode_Registry_v0100.json` | v0100(八架構類別+泛用狀態;六共存域不侵入;`via-code`) |
+| regex/同義字普查 | `supportive modules/ssot/VIA_RegexSynonym_Census_v0100.json` | v0100(四族無遺漏;兩遺漏已晉升) |
 
 ## 治理原則(不可違背)
 
@@ -88,4 +96,4 @@ supportive modules/
 | 範疇已凍結項目 | 見 `audit_tools/VIA_ScopeFreeze_Closure_v0100.json`;重開需操作員點名 |
 
 ---
-*營運手冊 2026-08-04 · 對應 Control Tower v005 / TickerRegex v0100 / VRN v1.1.0 / 判定表 v002*
+*營運手冊 2026-08-05 · 對應 Tower v005 / Mega v0102 / VMT v0102 / VDF 工作台 v0160C / TickerRegex v0100 / VRN v1.1.0 / 判定表 v002*
