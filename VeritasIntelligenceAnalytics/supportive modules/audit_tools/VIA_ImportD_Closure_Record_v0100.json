@@ -1,0 +1,22 @@
+{
+  "record_id": "VIA_ImportD_Closure_Record_v0100",
+  "record_date": "2026-08-05",
+  "batch": "IMPORT_20260805D (CGE family completion)",
+  "adjudication": {
+    "CONFL_v0300": "raw-byte SAME → REDUNDANT_COPY,staging 副本移除",
+    "CONFL_v0400": "raw-byte SAME → REDUNDANT_COPY;此結果同時證明 5c8c185 自 installer 11 段 payload 重組復原之 v0400 與操作員原檔位元組一致(sha 92c294537306...),payload 復原路徑三度獲證(v0160A/VMT 四引擎/CGE v0400)"
+  },
+  "placed_new": [
+    "VIA_Central_Governance/VIA_CentralGovernanceEngine_v0200.py (py_compile PASS;版本鏈 v0100→v0200→v0300→v0400 補齊)",
+    "VIA_Central_Governance/VIA_CentralGovernance_v0200_sample.html",
+    "VIA_Central_Governance/VIA_CentralGovernance_v0300_sample.html",
+    "VIA_Central_Governance/VIA_CentralGovernance_v0400_sample.html",
+    "VIA_Central_Governance/VIACGEOneShotv0400.ps1 (CGE 專屬一鍵佈署器)"
+  ],
+  "first_commit_run_evidence": "操作員 via-gov --commit R0001 落地:canonical 79/同義字 372/regex 79 全編譯/回測 451 條 100%/temporal 79 向量全過/gate 10 項 1 WARN(NONEMPTY_VOCAB 屬首跑預期)/ledger 471 事件;ASK 佇列 70 筆待儀表板滑鼠確認",
+  "known_issues": {
+    "syntax_warning_line1896": "v0400 HTML 模板字串含 \\d 未 raw 化 — 純 SyntaxWarning 不影響執行;匯入原件不就地修改,若需消音待版本前送 v0401 一併處理",
+    "fetch_tw_ssl": "Windows py3.13 urllib CERTIFICATE_VERIFY_FAILED — 環境憑證鏈問題非引擎缺陷;替代路徑 --tw-source 本地 JSON,或安裝 certifi 後設 SSL_CERT_FILE"
+  },
+  "append_only": true
+}
