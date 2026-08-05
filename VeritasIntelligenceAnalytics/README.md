@@ -24,7 +24,8 @@ pwsh -File "VeritasIntelligenceAnalytics\Install-VIA.ps1"     # 加 -AutoStart �
 | `via-sync` | repo 同步(fetch + merge claude 分支 + push main) |
 | `via-batch` | **VRN 批次**:incoming 全部 PDF 過 No-OCR 生產線(並行池、可續跑;`-Fresh` 全部重跑) |
 | `via-import` | manifest 匯入:Downloads 批次去重入庫(清單由 Claude 寫進 `import_manifests/`) |
-| `via-vmt` | VMT SuperBOM 總指揮(v0101 設計鎖刊頭;問卷→附件→收斂→CPM,缺件優雅略過) |
+| `via-vmt` | VMT SuperBOM 總指揮(v0102 設計鎖刊頭;問卷→附件→收斂→CPM,缺件優雅略過) |
+| `via-vmt-init` | VMT 資料層 bootstrap:OneShot 對準 VMT 根建 DB/SSOT 種子 + 跑郵件器 + Command Center |
 | `via-vdf` | VDF 一鍵側欄工作台(v0160C 一般瀏覽器 HTML U/I + 本機 HTTP 橋;SHA256+AST 閘門;回退 v0102/v0101) |
 
 ## 系統架構
