@@ -1,0 +1,20 @@
+{
+  "record_id": "SynonymEngine_PROMOTION_RECORD_v0100",
+  "record_date": "2026-08-05",
+  "action": "PROMOTE_CANDIDATE_TO_ACTIVE",
+  "subject": {
+    "implementation": "supportive modules/PMIS-Lite/pmis_lite/pmis_lite/ssot_synonyms.py (SynonymSSOT — 唯一 canonical、add_synonym 只增不減、衝突回報、append-only ledger;未複製未修改,直接 import)",
+    "adapter": "supportive modules/ssot/via_synonym_engine_v0100.py",
+    "seed": "supportive modules/ssot/VIA_Synonym_Seed_v0100.json (41 canonical 錨點:BASIC 23 + FIN 18,程式化抽自兩份 VRN 資料契約;synonyms=[] — 同義字不杜撰,增量登錄)"
+  },
+  "gates": {
+    "hydra_guard": "PASS — 平台唯一同義字實作,轉接器 import 原引擎,零複製",
+    "evidence_honest_seed": "PASS — canonical 全數來自契約 def_core_columns / def_extension_columns_optional,零捏造;種子 synonyms 空集合",
+    "smoke": "PASS — canonicals=41,resolve('ticker') 命中,ledger 41 筆",
+    "registration_anchor": "ssot/VIA_RegexSynonym_Census_v0100.json (omissions_found_and_registered[1])"
+  },
+  "known_behavior_note": "跨域同名(如 BASIC.ticker / FIN.ticker)於名稱索引後者覆前者;canon_id 索引不受影響。消費端以 canon_id 為準;如需域內解析,resolve 前綴 BASIC./FIN.",
+  "consumers_next": "VRN account_canonical mapper(契約指定 account_alias_registry)與 VDF 欄位正規化;account_raw→account_canonical 對映由實際擷取證據 add_synonym 增量累積",
+  "status_after": "ACTIVE — 平台同義字機制唯一真相;引擎/種子改版必版本前送",
+  "append_only": true
+}
