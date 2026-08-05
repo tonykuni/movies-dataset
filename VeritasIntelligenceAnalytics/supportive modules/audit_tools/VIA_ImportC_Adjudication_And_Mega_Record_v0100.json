@@ -1,0 +1,23 @@
+{
+  "record_id": "VIA_ImportC_Adjudication_And_Mega_Record_v0100",
+  "record_date": "2026-08-05",
+  "part1_import_C_adjudication": {
+    "conflicts": 14,
+    "verdict_all": "REDUNDANT_COPY (九頭龍防治:同名同內容 → 去重,repo 版保留)",
+    "evidence": "11 件 raw-byte IDENTICAL;VAP_Workbench_v009 staged == 已歸檔 uploads/VAP_Workbench_v009_variant_20260805.html (sha 98ab67ccdb15);VIA VAP Spec SSOT 與 Veritas UI == uploads 既有件(CRLF 正規化後同雜湊)",
+    "staging_cleared": true,
+    "new_placed": "survey_pack_psu.json -> supportive modules/VMT_SuperBOM/ (與 vmt_survey 同層)"
+  },
+  "part2_mega_engine": {
+    "file": "supportive modules/VIA_Governance_Runtime/via_mega_engine_v0100.py",
+    "command": "via-mega",
+    "mode": "唯讀提案型 v0100:三輪全景(硬性上限+提前收斂)、AST 掃描(py ast)、JSON 驗證、九頭龍同名異雜湊偵測、SSOT 六真相對照、HTML Matrix(DesignLock 版式,印章「核」)、動態進度條/說明、20 加速器面板;高風險節點只建議不自動修",
+    "live_validation_run": {
+      "environment": "session container (linux)",
+      "result": "R1=R2 提前收斂;273 檔;hydra 0;SSOT 6/6;AST fail 1",
+      "ast_fail_analysis": "functional modules/VRN/comprehensive_pdf_extractor (1)_sha72238d6aa40a.py:411 — f-string 含反斜線,Python 3.12+ 合法(操作員 py 3.13 可解析);六月 legacy 匯入件,無管線引用;分類 SEQUENCE_DEPENDENT/HIGH → PROPOSE_ONLY,不自動修"
+    },
+    "outputs": "VIA_Reports/VIA_MegaMatrix.html + mega_state.json (run-local,不入庫)"
+  },
+  "append_only": true
+}
