@@ -1,0 +1,10 @@
+{
+  "record_id": "VIA_Mega_R1_PanoramicAnalysis_Record_v0100",
+  "record_date": "2026-08-05",
+  "directive": "先全景式分析研究 (operator via-mega runs: YELLOW, 337 files, hydra 0, AST 0, SSOT 6/6)",
+  "root_cause": "YELLOW 唯一來源 = 4 個 VRN 煙霧測試證據檔 (VRN_MDL140/141/142/143, 2026-05-25, 3/10/30/60-PDF smoke, 全部 system_pass:true) 的 Message 欄嵌原始 console 輸出含 ANSI ESC 控制字元;嚴格 JSON 禁止,json.loads(strict=False) 可完整解析",
+  "classification": "PARALLEL_FIXABLE / 零風險 — 缺陷在引擎驗證器對 legacy 證據過嚴,不在檔案;稽核紀錄永不改寫,故四檔一位元組不動",
+  "fix": "via_mega_engine_v0101.py (版本前送,v0100 保留):JSON 驗證加 strict=False 後備 — 可解析者降級為資訊項 json_legacy(矩陣灰字註記),不構成 YELLOW;完全不可解析者仍為 finding",
+  "validation": "container re-run: JSON findings 0;殘餘 RED 為容器 Python 版本差異之 legacy AST 項(操作員 py 3.13 合法),操作員端預期 GREEN",
+  "append_only": true
+}
