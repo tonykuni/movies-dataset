@@ -1,0 +1,21 @@
+{
+  "record_id": "VIA_Import20260805B_Recovery_v0101",
+  "record_date": "2026-08-05",
+  "action": "RECOVERY_FROM_EMBEDDED_PAYLOAD",
+  "supersedes_status_of": "VIA_Import20260805B_Closure_v0100.json (record untouched; the four MISS_EVERYWHERE verdicts are hereby resolved — they were never lost)",
+  "source": "supportive modules/VIA_Governance_Runtime/installers/VIA-OneShot-v0100.ps1 — self-extracting bundle embedding all VMT engines as base64 payloads (same pattern as the v0160A launcher recovered from the v0162C AssetVdf payload)",
+  "extraction_trust_proof": {
+    "method": "decode the two payloads whose repo copies already exist and compare SHA256",
+    "vmt_superbom_attach_router.py": "decoded == repo (3ee5ebe2f42d..., 17011 bytes) SAME",
+    "vmt_superbom_bridge.py": "decoded == repo (e414f5fc0edf..., 17064 bytes) SAME"
+  },
+  "recovered": [
+    { "file": "supportive modules/VMT_SuperBOM/vmt_reply_ingest.py", "bytes": 21700, "sha256": "07639d8f81871ef4952c61432d2f9a024115a6cad0aa479e3f9b2b21213f0b38", "py_compile": "PASS", "lights_up": "reply stage (回覆閉環)" },
+    { "file": "supportive modules/VMT_SuperBOM/vmt_superbom_eventstream.py", "bytes": 14650, "sha256": "0ad1d3be7cdf61423b7880450694a7c3d06f4a7b97fb8df35b02ba95fce8a0d8", "py_compile": "PASS", "lights_up": "eventstream stage (接縫3)" },
+    { "file": "supportive modules/VMT_SuperBOM/vmt_process_mining.py", "bytes": 20680, "sha256": "9d0da51cdf1a6e55e173d4bce11d5939e5b77582e88b4ea046a129b077ad6733", "py_compile": "PASS", "lights_up": "mining stage (流程探勘)" },
+    { "file": "supportive modules/VMT_SuperBOM/VIA_SuperBOM_ContentParser_v0100.py", "bytes": 36066, "sha256": "47694c975943a9ceef6bd6efa649d3485750d6a697d34ed51e69a8460ee5258b", "py_compile": "PASS", "lights_up": "not in stage table; BOM content-level parser (Round-1 gate, quarantine, append-only DB)" }
+  ],
+  "scope_note": "No scope expansion: these are the original engines recovered from a repo-held payload, not rebuilt code. Colocated in VMT_SuperBOM so via_master_engine (v1.0 and v0101 alike) auto-detects them via engines_dir.",
+  "expected_master_run_delta": "MISSING 3 -> 0. reply/eventstream/mining stages will now execute; lanes still needing runtime data (superbom.duckdb, ssot.json) keep their honest SKIP until the mailer/OneShot produces them.",
+  "append_only": true
+}
