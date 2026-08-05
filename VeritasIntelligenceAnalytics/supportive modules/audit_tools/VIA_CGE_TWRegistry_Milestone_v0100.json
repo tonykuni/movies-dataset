@@ -1,0 +1,13 @@
+{
+  "record_id": "VIA_CGE_TWRegistry_Milestone_v0100",
+  "record_date": "2026-08-05",
+  "milestone": "CGE 台股代號登記簿雙路徑驗證成功",
+  "runs": {
+    "R0002": "同視窗 setx 未生效 → SSL 失敗(診斷正確:setx 不影響當前 session)",
+    "R0004_online": "in-session $env:SSL_CERT_FILE=certifi 後 --fetch-tw 成功:上市 1087 + 上櫃 890 = 現役 1977,全數新增,三代號鎖死衍生,ledger 1978 事件",
+    "R0005_offline": "Invoke-WebRequest 下載雙 JSON + --tw-source 兩檔:新增 0、下市 0 — 離線路徑與冪等性同時獲證"
+  },
+  "ssl_fix_permanent": "setx SSL_CERT_FILE 已寫入(新視窗自動生效);當前視窗需 $env:SSL_CERT_FILE 手動設定",
+  "observation_for_v0401": "tw_stock_tickers_latest.csv(引擎自身產出)被語料掃描回收:token 337→2299,ASK 70→588、QUARANTINE 248→1686,增量幾乎全是公司名——公司名屬代號登記簿域,再進同義字監測是自我回饋噪音。建議 v0401 版本前送時將該 CSV 加入 discover_sources 排除清單;現階段儀表板 ASK 佇列裁決時可整批略過公司名項",
+  "append_only": true
+}
