@@ -1,0 +1,28 @@
+{
+  "ssot_id": "VIA_RegexSynonym_Census_v0100",
+  "version": "v0100",
+  "record_date": "2026-08-05",
+  "directive": "掃描整棵樹(Downloads 資料夾之入庫版)所有 ssot regex/同義字資產,補足遺漏登錄",
+  "registered_ok": [
+    { "asset": "股號 regex", "ssot": "ssot/VRN_TickerRegexSSOT_v0100.json (ACTIVE) + TickerRegex_LegacyDebt_Census_v0100 (106 legacy 檔列管)", "verdict": "無遺漏" },
+    { "asset": "券商別名", "ssot": "70_VRN_Rules/VIS_VRN_BrokerAlias_FullList_v0100.py + VRN_BROKER_LIST_v01.json (20 家,CJK 無邊界/ASCII 字母邊界,60/60 驗收)", "verdict": "無遺漏" },
+    { "asset": "報表欄位同義字", "ssot": "VRN/registry/VRN_REPORT_BASIC_INFO / FINANCIAL_DATA _SSOT_v0100.json (欄位別名內建)", "verdict": "無遺漏" },
+    { "asset": "檔名消歧", "ssot": "70_VRN_Rules/VIS_VRN_TickerFilenameSSOT_v0100.py (0.97/0.9/YEAR/AMBIGUOUS)", "verdict": "無遺漏" }
+  ],
+  "omissions_found_and_registered": [
+    {
+      "asset": "投資財務報表 regex 模式庫",
+      "file": "functional modules/VRN/InvestmentRegexPattern_VALIDATED.py (v3.0, 525 個 pattern 定義:三大報表/比率/每股/驗證)",
+      "gap": "未出現在任何 SSOT/registry 登錄 — 遺漏",
+      "action": "本 census 即其登錄錨點;定位 = VRN 內容級擷取之欄位 regex 真相候選(CANDIDATE);晉升 ACTIVE 需經 hash-locked transaction 與 TickerRegexSSOT 相容性檢核(其內部股號樣式須走 shim 或已符 v0100 四碼首碼非零)"
+    },
+    {
+      "asset": "同義字增量展開引擎",
+      "file": "supportive modules/PMIS-Lite/pmis_lite/pmis_lite/ssot_synonyms.py (SynonymSSOT:唯一 canonical、add_synonym 只增不減、衝突回報、append-only ledger)",
+      "gap": "引擎存在但未登錄為平台級同義字機制 — 遺漏",
+      "action": "本 census 登錄為平台同義字引擎 CANDIDATE;與 Note Pro 'ssot_synonym v2.0.0' 構想同源(中/英/API 別名→正規欄位);跨子系統採用時以此引擎為唯一實作,不另造(九頭龍防治)"
+    }
+  ],
+  "non_ssot_inline_tables_noted": "VRN_MDL003/005/008、VIA_HardGate_BootPrecheck 含實作層 alias/synonym 內表 — 屬消費端,不另立真相;如與上列 SSOT 牴觸依 SSOT 為準(shim 機制處理)",
+  "append_only": true
+}
