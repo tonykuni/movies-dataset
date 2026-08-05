@@ -1,0 +1,18 @@
+{
+  "record_id": "VIA_CGE_Import_And_Adjudication_Record_v0100",
+  "record_date": "2026-08-05",
+  "import": {
+    "family": "VIA_CentralGovernanceEngine v0100(704行) / v0300(1574行) / v0400(1991行,自 viagovinstaller.html 的 11 段 gzip+base64 payload 重組復原,sha256 92c294537306915d650dd2c5e2afa0c6bd3bb15327bdb813ed41304494e20f39)",
+    "placed": "supportive modules/VIA_Central_Governance/ (三版並存,只增不減;installer 與 sample R0002 儀表板留存為證據;ssot_paths.txt 為操作員 Downloads 36 個 legacy ssot 產出物之語料清單,僅列管不整包匯入)",
+    "verification": "py_compile x3 PASS;v0400 沙箱 dry-run 全管線 PASS(canonical 79/同義字 371/regex 79/temporal 79 向量/gate 10 項/DRY-RUN 未寫)"
+  },
+  "wiring": "bin/via-gov.cmd → v0400,workdir=%VMT_ROOT%(語料=VMT 資料層 ssot.json/events.jsonl;governance_vocab.json 落於 VMT root,run-local);dry-run 預設,--commit 才落地",
+  "hydra_adjudication_vs_ENG004": {
+    "verdict": "NO_HYDRA — 分層共存",
+    "ENG-004 via_synonym_engine": "契約欄位 canonical 解析器(VRN BASIC/FIN 41 錨點,runtime resolve API)",
+    "ENG-006 CGE v0400": "詞彙生命週期治理管線(語料收割/變體擴大/歸戶 AUTO-ASK-QUARANTINE/regex 合成/確認迴路/namespace 隔離/台股三代號/憲法 gate),自有 governance_vocab.json 儲存",
+    "boundary": "CGE 產出之 V 級 canonical 若屬契約欄位域,晉升進 ENG-004 Seed 需另行 hash-locked 交易;兩引擎互不覆蓋"
+  },
+  "autocode": "ENG-006 = VIA_CentralGovernanceEngine_v0400",
+  "append_only": true
+}
