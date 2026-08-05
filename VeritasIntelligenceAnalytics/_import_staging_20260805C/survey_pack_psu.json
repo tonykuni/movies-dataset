@@ -1,0 +1,122 @@
+{
+  "name": "電子零組件 — 電源供應器 (PSU) v2.0 完整版",
+  "_comment": "選項充分製作: 複選題涵蓋完整現實選項; 每個選項仍直接餵系統旋鈕. 需引擎 v1.2 (multi 支援).",
+  "sections": [
+    {"sec": "A 你的角色與產品", "qs": [
+      {"id": "Q1", "q": "你負責哪些階段？(可複選)", "knob": "stage", "multi": true,
+       "opts": [
+         ["RD 設計/選料", {"domain.labels": ["選料", "規格審查", "Derating", "layout"], "domain.attach_keywords": ["datasheet", "規格書", "spec"]}],
+         ["NPI 試產/DVT/EVT", {"domain.labels": ["試產異常", "DVT", "EVT", "治具"], "domain.attach_keywords": ["測試報告", "DVT", "EVT"]}],
+         ["量產/供應鏈", {"domain.labels": ["缺料", "交期", "替代料", "產能"], "domain.attach_keywords": ["BOM", "料表", "交期表", "AVL"]}],
+         ["品保/RMA 售後", {"domain.labels": ["RMA分析", "不良率", "客訴", "8D"], "domain.attach_keywords": ["RMA", "8D", "不良分析", "FA報告"]}],
+         ["業務/PM 對客戶", {"domain.labels": ["報價", "樣品", "客戶需求"], "domain.attach_keywords": ["報價單", "RFQ", "需求書"]}]
+       ], "default": 2},
+      {"id": "Q2", "q": "主要產品類型？(可複選, 影響規格關鍵字)", "knob": "product", "multi": true,
+       "opts": [
+         ["AC-DC 適配器/充電器", {"domain.product_keywords": ["adapter", "充電器", "PD", "GaN", "USB-C"]}],
+         ["開放框/工業電源", {"domain.product_keywords": ["open frame", "工業電源", "DIN rail", "醫規"]}],
+         ["伺服器/CRPS/資料中心", {"domain.product_keywords": ["CRPS", "伺服器", "redundant", "PMBus", "鈦金"]}],
+         ["DC-DC 模組/磚型", {"domain.product_keywords": ["DC-DC", "brick", "POL", "隔離"]}],
+         ["車載/OBC", {"domain.product_keywords": ["車載", "OBC", "AEC-Q", "IATF"]}]
+       ], "default": 0},
+      {"id": "Q3", "q": "最常經手哪些文件？(可複選, 影響附件自動入庫)", "knob": "docs", "multi": true,
+       "opts": [
+         ["BOM / 料表 / AVL", {"domain.attach_keywords": ["BOM", "料號", "AVL", "料表"], "auto_classify": 2}],
+         ["規格書 / 圖面", {"domain.attach_keywords": ["規格書", "圖面", "drawing", "spec"]}],
+         ["測試報告 (DVT/ORT/ATE)", {"domain.attach_keywords": ["測試報告", "ORT", "ATE", "burn-in"]}],
+         ["安規/認證文件", {"domain.attach_keywords": ["安規", "CB", "UL", "TUV", "CE", "報驗", "證書"]}],
+         ["8D / FA / 客訴報告", {"domain.attach_keywords": ["8D", "FA", "客訴", "CAR"]}],
+         ["報價 / 成本表", {"domain.attach_keywords": ["報價", "cost", "BOM cost"]}]
+       ], "default": 0}
+    ]},
+    {"sec": "B 卡點盤點 (教分類器抓警訊)", "qs": [
+      {"id": "Q4", "q": "哪些原因常讓案子延遲？(可複選, 選越準系統抓警訊越準)", "knob": "blockers", "multi": true,
+       "opts": [
+         ["缺料/長交期", {"domain.warning_keywords": ["缺料", "長交期", "EOL", "停產", "allocation", "shortage"]}],
+         ["客戶規格未凍結/需求變更", {"domain.warning_keywords": ["規格變更", "未凍結", "改版", "ECN", "ECR"]}],
+         ["安規/認證卡關", {"domain.warning_keywords": ["安規卡", "認證延遲", "報驗", "能效", "DoE", "CoC"]}],
+         ["供應商/外包回覆慢", {"domain.warning_keywords": ["未回覆", "供應商", "外包", "催"]}],
+         ["測試治具/設備排隊", {"domain.warning_keywords": ["治具", "設備", "排隊", "測試站"]}],
+         ["BOM 版本混亂/料號錯", {"domain.warning_keywords": ["版本", "料號錯", "位號", "數量不符"]}],
+         ["跨廠溝通", {"domain.warning_keywords": ["工廠", "產線", "跨廠", "移轉"]}],
+         ["客戶端驗證/回饋慢", {"domain.warning_keywords": ["客戶未回", "驗證中", "approval", "sign-off"]}],
+         ["人力/多案搶資源", {"domain.warning_keywords": ["人力", "資源", "撞期"]}]
+       ], "default": 0},
+      {"id": "Q5", "q": "缺料時最常缺哪類？(可複選)", "knob": "shortage", "multi": true,
+       "opts": [
+         ["主 IC / 控制器", {"domain.shortage_keywords": ["PWM IC", "控制器", "controller"]}],
+         ["功率元件 (MOSFET/二極體)", {"domain.shortage_keywords": ["MOSFET", "二極體", "SiC", "GaN"]}],
+         ["電解/薄膜電容", {"domain.shortage_keywords": ["電解電容", "薄膜", "cap"]}],
+         ["磁性元件 (變壓器/電感)", {"domain.shortage_keywords": ["變壓器", "電感", "磁芯"]}],
+         ["連接器/線材/機構", {"domain.shortage_keywords": ["連接器", "線材", "外殼"]}],
+         ["很少缺料", {}]
+       ], "default": 5}
+    ]},
+    {"sec": "C 往來與認證", "qs": [
+      {"id": "Q6", "q": "主要往來對象在哪些地區？(可複選, 影響寄信時窗)", "knob": "counterpart", "multi": true,
+       "opts": [
+         ["台灣", {"domain.regions": ["TW"], "send_window": "evening"}],
+         ["中國華南", {"domain.regions": ["CN"], "send_window": "evening"}],
+         ["越南/東南亞", {"domain.regions": ["SEA"], "send_window": "evening"}],
+         ["印度", {"domain.regions": ["IN"], "send_window": "late_evening"}],
+         ["歐洲", {"domain.regions": ["EU"], "send_window": "afternoon"}],
+         ["美洲", {"domain.regions": ["US"], "send_window": "morning"}]
+       ], "default": 0},
+      {"id": "Q7", "q": "常打交道的認證體系？(可複選)", "knob": "cert", "multi": true,
+       "opts": [
+         ["UL / cUL", {"domain.cert_keywords": ["UL", "cUL"]}],
+         ["CB / IEC / TUV", {"domain.cert_keywords": ["CB", "IEC 62368", "TUV"]}],
+         ["CE / UKCA", {"domain.cert_keywords": ["CE", "UKCA", "LVD", "EMC"]}],
+         ["能效 (DoE VI / CoC / MEPS)", {"domain.cert_keywords": ["DoE", "CoC Tier2", "MEPS", "能效"]}],
+         ["BSMI / CCC / PSE / KC", {"domain.cert_keywords": ["BSMI", "CCC", "PSE", "KC"]}],
+         ["醫規 60601 / 車規", {"domain.cert_keywords": ["60601", "AEC-Q", "IATF"]}],
+         ["不太碰認證", {}]
+       ], "default": 1},
+      {"id": "Q8", "q": "安規/認證案要提前幾天提醒？", "knob": "cert_lead",
+       "opts": [
+         ["14 天 (要排送測窗口)", {"domain.cert_lead_days": 14}],
+         ["7 天", {"domain.cert_lead_days": 7}],
+         ["3 天", {"domain.cert_lead_days": 3}],
+         ["1 天", {"domain.cert_lead_days": 1}]
+       ], "default": 1}
+    ]},
+    {"sec": "D 系統幫你的程度", "qs": [
+      {"id": "Q9", "q": "要不要系統每天自動從 Email 抓待辦？", "knob": "auto_ingest",
+       "opts": [
+         ["要, 全自動抓", {"auto_ingest": 2}],
+         ["抓了先給我確認", {"auto_ingest": 1}],
+         ["我自己填", {"auto_ingest": 0}]
+       ], "default": 1},
+      {"id": "Q10", "q": "追蹤信要系統幫到什麼程度？", "knob": "mail_assist",
+       "opts": [
+         ["整封寫好我按送出", {"mail_assist": 2}],
+         ["寫好草稿我改一下", {"mail_assist": 1}],
+         ["給我範本就好", {"mail_assist": 0}]
+       ], "default": 1},
+      {"id": "Q11", "q": "提醒頻率？", "knob": "remind_freq",
+       "opts": [
+         ["一天多次沒關係", {"remind_per_day": 3}],
+         ["早晚各一次", {"remind_per_day": 2}],
+         ["一天一次", {"remind_per_day": 1}],
+         ["盡量少吵我", {"remind_per_day": 0}]
+       ], "default": 2},
+      {"id": "Q12", "q": "系統要你確認時, 一次最多問幾題？", "knob": "queue_budget",
+       "opts": [
+         ["10 題內", {"max_questions": 10}],
+         ["5 題內", {"max_questions": 5}],
+         ["3 題內", {"max_questions": 3}]
+       ], "default": 1},
+      {"id": "Q13", "q": "整體自動化強度？", "knob": "automation_level",
+       "opts": [
+         ["盡量全自動, 錯了我再改", {"level": 3, "auto_accept_delta": -0.10}],
+         ["自動+關鍵事項問我", {"level": 2, "auto_accept_delta": 0.0}],
+         ["每件事都先問我", {"level": 1, "auto_accept_delta": 0.10}]
+       ], "default": 1},
+      {"id": "Q14", "q": "系統判斷錯誤時你偏好？", "knob": "error_pref",
+       "opts": [
+         ["寧可它多做, 我事後改", {"err": "act"}],
+         ["寧可它先問, 慢一點沒關係", {"err": "ask"}]
+       ], "default": 1}
+    ]}
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "_comment": "VMT 收斂引擎參數. VMT_ROOT 環境變數會覆寫 paths.vmt_root. 改門檻即改行為, 不改程式.",
+  "paths": {
+    "vmt_root": "",
+    "ssot": "data/ssot.json",
+    "events": "data/events.jsonl",
+    "confirmations": "data/confirmations.jsonl",
+    "confirmations_inbox": "confirmations_inbox.txt",
+    "out_dir": "reports"
+  },
+  "task": {
+    "label_field": "type",
+    "text_fields": ["title"],
+    "numeric_fields": ["urgency"],
+    "categorical_fields": ["caseId"],
+    "active_status": ["OPEN", "NEED_DATA", "NEED_CLARIFY", "EXTENDED"],
+    "trust_done_as_label": true
+  },
+  "confidence": {
+    "auto_accept": 0.80,
+    "quarantine_below": 0.35,
+    "max_questions_per_round": 10,
+    "prioritize_disagreement": true
+  },
+  "evidence_tiers": {
+    "_comment": "對應你的證據誠實分級; 只有人/權威SoR = Confirmed",
+    "confirmed_reserved_for_human": true,
+    "high_min": 0.85,
+    "medium_min": 0.60,
+    "synthetic_cap": 0.59
+  },
+  "freshness": {
+    "apply_decay": true,
+    "half_life_days": 45
+  },
+  "model": {
+    "backend": "auto",
+    "embeddings": "tfidf",
+    "query_strategy": "uncertainty",
+    "min_labels_per_class": 2,
+    "calibrate": true
+  }
+}
