@@ -1,0 +1,17 @@
+{
+  "record_id": "VIA_CGE_v0401_TabUI_Record_v0100",
+  "record_date": "2026-08-05",
+  "directive": "整合所有 U/I U/X 準備對接;單頁資料量太大者轉多頁 TAB/PAGE HTML U/I;視覺鎖定依設計源",
+  "target_selected": "CGE 儀表板 — R0004 後單頁承載 1977 檔登記簿 + 588 ASK + 1686 隔離 + 79 canonical 同義字 chips,為全平台最大單頁",
+  "action": "VERSION_FORWARD v0400→v0401(v0400 原封保留,回退=改指)",
+  "delta_inventory": [
+    "TAB 化後處理器 _tabify():5 個 h2 區段自動轉 5 分頁(Canonical/台股登記簿/SSOT 戶政/ASK/隔離),模板本體不動,風險最小",
+    "大表分段載入:任何 tbody >200 列自動隱藏後段 + 「載入更多(n/總數)」按鈕,單頁渲染負擔固定",
+    "DesignLock 刊頭配方深色 colorway:七段 reson 帶 + 印章「治」(家族第六枚:理鑑鍛郵核治) + Cormorant 字標 VERITAS CENTRAL GOVERNANCE + 中文襯線副標",
+    "修復① \\\\d SyntaxWarning(模板跳脫,啟動不再吐警告)",
+    "修復② tw_stock_tickers_latest.csv 加入語料排除 — 自我回饋噪音源移除,下次 run ASK 預期自 588 回落至真實水位(~70)"
+  ],
+  "validation": "py_compile PASS;沙箱 dry-run:零 SyntaxWarning、5 panes、tab 切換 JS、分段載入 JS、刊頭三要素全數出現於輸出 HTML",
+  "ui_integration_state": "全平台 U/I 對接盤點:Tower(理)/VAP v010(鑑)/VDF v0160C(鍛)/VMT v0102(郵)/Mega(核)/CGE v0401(治)六介面同刊頭家族;Note Pro 同色系;設計源資料夾與 repo 登錄 64 artifacts 位元組一致,無需再匯",
+  "append_only": true
+}
