@@ -17,6 +17,7 @@ pwsh -File "VeritasIntelligenceAnalytics\Install-VIA.ps1"     # 加 -AutoStart �
 | 指令 | 作用 |
 |---|---|
 | `via` | 同步 + VDF 進料 + VAP 繪圖 + 自動開 UI(日常預設) |
+| `via-one` | **最終整合總啟動器**:sync→Mega 三輪→VMT→CGE→VRN probe/extract→UI Hub(一鍵全程不卡斷) |
 | `via-all` | 互動全套:VDF + VAP + VRN 預檢 + Control Tower(不含長跑稽核,不卡斷) |
 | `via-audit` | 長跑稽核三件套:TurboOptimizer SafeAudit + Panorama + Polyglot(預期數分鐘以上) |
 | `via-tower` | 治理總控台 `http://127.0.0.1:8765`(桌面捷徑同此) |
