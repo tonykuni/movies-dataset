@@ -1,0 +1,20 @@
+{
+  "record_id": "VRN_ContentExtract_ACTIVATION_RECORD_v0100",
+  "record_date": "2026-08-05",
+  "action": "ACTIVATE_CONTENT_LEVEL_EXTRACTION",
+  "operator_authorization": "操作員 2026-08-05 點名「1」(下一步決策清單第 1 項:內容級擷取啟用)",
+  "scope_unfreeze": "VIA_ScopeFreeze_Closure_v0100 之『VRN OCR 內容級擷取』凍結項,依操作員點名解凍;範疇=財務欄位內容擷取落地",
+  "go_evidence": {
+    "probe": "via-probe GO — 20 檔語料平均 21 欄位命中/檔;域統計 損益表111/資產負債表109/現金流量表48/附註160",
+    "dryrun": "via-extract 20 檔 → 260 列候選(平均 13.0 列/檔),數值/單位/信心齊備"
+  },
+  "active_engine": {
+    "file": "functional modules/VRN/vrn_content_extract_v0101.py",
+    "sha256": "2f5270ddd182ada23c5e384ddf9e671b7103e04ef8528d368347d21952664076",
+    "candidate_kept": "vrn_content_extract_candidate_v0100.py (e3d7d01c9218...,回退用)",
+    "deltas": "BasicInfo 輕量補齊(ticker=TickerRegexSSOT 樣式/report_date=檔名日期/broker=VRN_BROKER_LIST 20 家 CJK無邊界+ASCII字母邊界長別名優先);--commit=append-only FINANCIAL_DATA_STORE.csv,record_hash 去重永不覆寫;產出物不入 git",
+    "unit_tests": "parse_meta 三向量 PASS(兆豐/GS/台新;日期三格式;ticker 首碼非零)"
+  },
+  "gates_honored": "只增不減/正本保留/fail-closed(無啟用記錄時 --commit 仍拒絕)/hash 錨定",
+  "append_only": true
+}

@@ -1,3 +1,3 @@
 @echo off
-rem VRN 內容級擷取 CANDIDATE(DRY-RUN 專用,不寫 SSOT;--commit 被啟用記錄閘門擋下):via-extract [PDF資料夾] [--limit N]
-py "%~dp0..\functional modules\VRN\vrn_content_extract_candidate_v0100.py" %*
+rem VRN 內容級擷取 v0101 ACTIVE(啟用交易 2026-08-05):dry-run 預設;--commit 落地 append-only store;回退=改指 candidate
+py "%~dp0..\functional modules\VRN\vrn_content_extract_v0101.py" %*
