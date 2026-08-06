@@ -1,0 +1,46 @@
+{
+  "record": "VIA_FlowConsole_Import_Record",
+  "version": "v0100",
+  "date": "2026-08-06",
+  "batch": "uploads 5 檔(via_master_engine_4.py / vmt_survey_3.py / vmt_planning_cpm_2.py / via_master_params_2.json / 1783304970954_VIA_Flow_Overview_Console.html)",
+  "dedupe_verdicts": {
+    "via_master_engine_4.py": {
+      "verdict": "REDUNDANT_COPY",
+      "canonical": "supportive modules/VMT_SuperBOM/via_master_engine.py",
+      "note": "CRLF 正規化後逐位元一致,略過"
+    },
+    "vmt_survey_3.py": {
+      "verdict": "REDUNDANT_COPY",
+      "canonical": "supportive modules/VMT_SuperBOM/vmt_survey.py"
+    },
+    "vmt_planning_cpm_2.py": {
+      "verdict": "REDUNDANT_COPY",
+      "canonical": "supportive modules/VMT_SuperBOM/vmt_planning_cpm.py"
+    },
+    "via_master_params_2.json": {
+      "verdict": "REDUNDANT_COPY",
+      "canonical": "supportive modules/VMT_SuperBOM/via_master_params.json"
+    },
+    "1783304970954_VIA_Flow_Overview_Console.html": {
+      "verdict": "NEW",
+      "placed": "supportive modules/ui_support/VIA_Flow_Overview_Console_v0100.html",
+      "sha256": "d9a1c3e1c220e9ab7e20a3a822420a6e8a298fc3f87d3ff0fdf10ad22a524537",
+      "note": "全庫無同名/同雜湊;7 段 scoped 整合頁(idx/mon/map/comm/etfclass/ext/qual),印章「流」"
+    }
+  },
+  "wiring_changes": {
+    "VIA_UI_Hub": {
+      "from": "v0100",
+      "to": "v0101",
+      "change": "版本前送新檔;新增第 8 卡 FLOW OVERVIEW(印章 流);v0100 原地保留供回退",
+      "sha256_v0101": "c17d25f2ebb40c29d5f19ab43e34a9a7223fff7ace32972b820a2f18ee2df22f"
+    },
+    "bin/via-ui.cmd": "改指 v0101,rem 註明回退路徑"
+  },
+  "governance": [
+    "只增不減",
+    "正本不就地修改(Hub 版本前送)",
+    "九頭龍防治(SHA 全庫對帳)",
+    "append-only 稽核"
+  ]
+}
