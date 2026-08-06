@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Veritas Mail-Ops · Unified Engine (Standalone)</title>
+<style>
+  :root{
+    --bg:#020617; --panel:#040C1A; --panel2:#050B14; --card:#0f172a;
+    --line:#1e293b; --line2:#334155;
+    --ink:#f1f5f9; --mut:#94a3b8; --mut2:#64748b;
+    --em:#10b981; --em2:#34d399; --emdim:rgba(16,185,129,.12);
+    --blue:#60a5fa; --red:#f87171; --amber:#fbbf24;
+    --sans:'Segoe UI','PingFang TC','Microsoft JhengHei','Noto Sans TC',system-ui,-apple-system,sans-serif;
+    --mono:'Cascadia Code','Consolas','SFMono-Regular',ui-monospace,'DejaVu Sans Mono',monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13px;-webkit-font-smoothing:antialiased;overflow:hidden}
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  input{font-family:inherit}
+  .mono{font-family:var(--mono)}
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-thumb{background:#1c2740;border-radius:6px}
+  ::-webkit-scrollbar-track{background:transparent}
+  svg{display:block}
+  .fadein{animation:fadein .25s ease}
+  @keyframes fadein{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .pulse{animation:pulse 1.6s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+  .grid-bg{background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:32px 32px}
+  /* print: only the deck's slides, one page each */
+  #deckprint{display:none}
+  @media print{
+    @page{size:A4 landscape;margin:0}
+    body>#app{display:none !important}
+    #deckprint{display:block !important}
+    .pslide{width:100%;min-height:100vh;page-break-after:always;box-sizing:border-box}
+  }
+</style>
+</head>
+<body>
+<div id="app" style="display:flex;flex-direction:column;height:100vh"></div>
+<div id="deckprint"></div>
+
+<script>
+"use strict";
+(function(){
+  /* =========================================================================
+     Veritas Mail-Ops — Unified single-file engine (standalone, offline, mock)
+     Pure in-browser demo: no network, no real mailbox, only your own sample
+     tasks. VeritasDataEngine simulates NLP intent extraction, hash ID minting
+     and an append-only ledger. Fused with a dependency-free vanilla UI.
+     ========================================================================= */
+  var LS = 'veritas_mailops_v1';
+  var D = document;
+
+  /* ---------------- tiny inline icons (replaces lucide-react) ---------------- */
+  function svg(paths, o){
+    o = o || {};
+    var fill = o.fill ? 'currentColor' : 'none';
+    return '<svg viewBox="0 0 24 24" width="'+(o.s||16)+'" height="'+(o.s||16)+'" fill="'+fill+'" stroke="currentColor" stroke-width="'+(o.w||2)+'" stroke-linecap="round" stroke-linejoin="round">'+paths+'</svg>';
+  }
+  var IC = {
+    inbox:  function(o){return svg('<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>',o);},
+    kanban: function(o){return svg('<path d="M6 4v13"/><path d="M12 4v9"/><path d="M18 4v16"/>',o);},
+    term:   function(o){return svg('<polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>',o);},
+    zap:    function(o){return svg('<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',o);},
+    db:     function(o){return svg('<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/>',o);},
+    user:   function(o){return svg('<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',o);},
+    clock:  function(o){return svg('<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/>',o);},
+    search: function(o){return svg('<circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',o);},
+    plus:   function(o){return svg('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',o);},
+    lock:   function(o){return svg('<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',o);},
+    check:  function(o){return svg('<path d="M20 6 9 17l-5-5"/>',o);},
+    trash:  function(o){return svg('<path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>',o);},
+    folder: function(o){return svg('<path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z"/>',o);},
+    up:     function(o){return svg('<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>',o);},
+    play:   function(o){return svg('<polygon points="6 3 20 12 6 21 6 3"/>',o);},
+    printer:function(o){return svg('<polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>',o);},
+    x:      function(o){return svg('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',o);},
+    gear:   function(o){return svg('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',o);},
+    doc:    function(o){return svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/>',o);},
+    scale:  function(o){return svg('<path d="M12 3v18"/><path d="M5 21h14"/><path d="M6 8h12"/><path d="M6 8l-3 6a3 3 0 0 0 6 0z"/><path d="M18 8l-3 6a3 3 0 0 0 6 0z"/>',o);}
+  };
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+
+  /* ============================= THE ENGINE ============================= */
+  function VeritasDataEngine(restored){
+    this.vault = new Map();
+    this.ledger = [];
+    this.tasks = { todo:[], doing:[], done:[] };
+    this._seq = 1000;
+    if(restored){ this._restore(restored); } else { this._seed(); }
+  }
+  VeritasDataEngine.prototype._hash = function(str){
+    var h=0; for(var i=0;i<str.length;i++){ h=((h<<5)-h)+str.charCodeAt(i); h|=0; }
+    return Math.abs(h).toString(16).slice(0,6).toUpperCase();
+  };
+  VeritasDataEngine.prototype._nlp = function(text){
+    var U = text.toUpperCase();
+    var intent='GEN', tag='INFO_REVIEW', tasks=[], project='未分類專案';
+    if(/缺料|變更|急件|修改|干涉|異常/.test(text)){ intent='ECO'; tag='ACTION_REQUIRED'; }
+    else if(/核准|APPROVED|已核准/.test(text)){ intent='APR'; tag='STATUS_UPDATE'; }
+    var pm = text.match(/(MP-\d{3}|PO-\d{6}-\d{3}|Q\d\s*稽核)/i);
+    if(pm) project = pm[0]+' 專案';
+    if(tag==='ACTION_REQUIRED'){
+      text.split(/[，。！\n]/).forEach(function(s){
+        if(/改用|加上|發行|發布|修改|處理/.test(s)){
+          var m = s.replace(/請|必須|務必/g,'').trim();
+          if(m.length>2){
+            tasks.push({
+              id:'xt-'+this._hash(s),
+              desc:m,
+              assignee: /TONY/.test(U) ? 'Tony' : 'RD Team',
+              deadline: (text.match(/\d{4}\/\d{2}\/\d{2}/)||['ASAP'])[0]
+            });
+          }
+        }
+      }.bind(this));
+    }
+    return { intent:intent, tag:tag, project:project, tasks:tasks };
+  };
+  VeritasDataEngine.prototype.ingest = function(raw){
+    var nlp = this._nlp((raw.body||'')+' '+(raw.subject||''));
+    var sysId = nlp.intent+'-M-2608-'+this._hash(raw.body||raw.subject||'');
+    if(this.vault.has(sysId)){ this._log('WARN','DUPLICATE_REJECTED','拒絕重複收容: '+sysId); return null; }
+    var asset = {
+      id:sysId, sender:raw.sender, subject:raw.subject,
+      snippet:(raw.body||'').slice(0,60)+'…', fullBody:raw.body||'',
+      time: raw.time || this._clock(), isUnread:true,
+      aiTag:nlp.tag, project:nlp.project, extractedTasks:nlp.tasks
+    };
+    this.vault.set(sysId, asset);
+    this._log('SUCCESS','ASSET_MINTED','成功鑄造資產: '+sysId+' ('+nlp.intent+')');
+    return asset;
+  };
+  VeritasDataEngine.prototype._log = function(type,event,desc){
+    this.ledger.unshift({ id:'SEQ-'+(this._seq++), time:this._clockS(), type:type, event:event, desc:desc });
+  };
+  VeritasDataEngine.prototype.addTask = function(desc,project,deadline,sourceId){
+    var t = { id:'tk-'+this._hash(desc+this.ledger.length), title:desc, project:project, due:deadline, source:sourceId };
+    this.tasks.todo.push(t);
+    this._log('INFO','TASK_CREATED','從 '+sourceId+' 萃取並建立任務: '+t.id);
+    return t;
+  };
+  VeritasDataEngine.prototype.moveTask = function(id, to){
+    var cols=['todo','doing','done'], found=null;
+    cols.forEach(function(c){ var i=this.tasks[c].findIndex(function(t){return t.id===id;}); if(i>=0){ found=this.tasks[c].splice(i,1)[0]; } }.bind(this));
+    if(found){ this.tasks[to].push(found); this._log('INFO','TASK_MOVED','任務 '+id+' → '+to.toUpperCase()); }
+  };
+  VeritasDataEngine.prototype.getInbox = function(){ return Array.from(this.vault.values()).reverse(); };
+  VeritasDataEngine.prototype._clock = function(){ var d=new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); };
+  VeritasDataEngine.prototype._clockS = function(){ var d=new Date(); return this._clock()+':'+String(d.getSeconds()).padStart(2,'0'); };
+  VeritasDataEngine.prototype.serialize = function(){
+    return JSON.stringify({ vault:Array.from(this.vault.values()), ledger:this.ledger, tasks:this.tasks, seq:this._seq });
+  };
+  VeritasDataEngine.prototype._restore = function(o){
+    (o.vault||[]).forEach(function(a){ this.vault.set(a.id, a); }.bind(this));
+    this.ledger = o.ledger||[]; this.tasks = o.tasks||{todo:[],doing:[],done:[]}; this._seq = o.seq||1000;
+  };
+  VeritasDataEngine.prototype._seed = function(){
+    this.ingest({sender:'System ERP', subject:'PO-202608-088 採購單已核准', time:'Yesterday',
+      body:'您的採購單 PO-202608-088 已由總經理核准，請進行後續發包作業。'});
+    this.ingest({sender:'Sarah (品保部)', subject:'Q3 供應商稽核報告彙整', time:'09:15',
+      body:'附件是本季度的稽核報告，其中兩家廠商的交期達交率低於標準，請審閱。'});
+    this.ingest({sender:'Andy Lin (供應商)', subject:'Re: MP-001 主機板 DVT 測試異常', time:'10:29',
+      body:'Tony，陳總監指示，MP-001 主機板的 MCU 目前嚴重缺料。請即刻改用備用的 IC-MCU-101，並務必於 2026/08/05 前發行 ECO 變更單。急件！'});
+    this.tasks.doing.push({ id:'tk-old1', title:'將 PO 單發送給供應商', project:'PO-202608-088', due:'08/03', source:'APR-M-2608-D41A' });
+    this.tasks.done.push({ id:'tk-old2', title:'確認 DVT 測試環境', project:'MP-001 專案', due:'08/01', source:'系統建立' });
+  };
+
+  /* ---- injectable sample mails (own data, cycled) ---- */
+  var SAMPLES = [
+    {sender:'機構部 - Leo', subject:'急: MP-001 機殼開模尺寸修改',
+     body:'Tony，我們剛收到工廠回報，MP-001 的機殼干涉到新的 TVS 二極體。請在 2026/08/06 前修改機構 3D 圖面，並發布新版 CAD 檔！'},
+    {sender:'採購 - Wendy', subject:'PO-202608-090 交期確認',
+     body:'PO-202608-090 供應商回覆可如期交貨，已核准，供參考。'},
+    {sender:'客戶 - 林經理', subject:'Re: MP-002 樣機外觀色差',
+     body:'Tony 你好，MP-002 樣機的陽極處理有色差。請協助改用 Pantone 430C 重新打樣，並於 2026/08/12 前回覆。'},
+    {sender:'RD - Kevin', subject:'週報：韌體進度',
+     body:'本週韌體開發依進度進行中，無異常，僅供參考。'}
+  ];
+  var sampleIdx = 0;
+
+  /* ============================= STATE + BOOT ============================= */
+  var engine, state = { nav:'inbox', selected:null, query:'', loadedTab:'mails', loadErr:'', tplSel:null, recAppr:{} };
+  // Real exported data (your own mailbox metadata). Kept in MEMORY ONLY — never
+  // written to localStorage, since it may contain real mail bodies.
+  var loaded = { mails:[], cases:[], stake:[], pending:[], qc:[], control:[], at:null, files:[] };
+  var deck = { open:false, idx:0, slides:[] };
+  var trackState = { sel:null };
+  var SET_LS = 'via_mailops_settings_v1';
+  var DEFAULT_SET = { w:{ action:0.35, attention:0.25, urgent:0.20, unread:0.10, code:0.10 }, thr:0.5 };
+  var settings = loadSettings();
+  function loadSettings(){ try{ var r=localStorage.getItem(SET_LS); if(r){ var s=JSON.parse(r); if(s&&s.w) return s; } }catch(e){} return JSON.parse(JSON.stringify(DEFAULT_SET)); }
+  function saveSettings(){ try{ localStorage.setItem(SET_LS, JSON.stringify(settings)); }catch(e){} }
+
+  /* ---------------- 範本庫 template library (config; persisted) ---------------- */
+  var TPL_LS = 'via_mailops_templates_v1';
+  var CHOICE_FORM = '<table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:14px 0;width:100%;max-width:560px;"><tr><td style="background:#1e293b;color:#fff;font:700 13px \'Segoe UI\',sans-serif;padding:8px 14px;border-radius:6px 6px 0 0;">請圈選或保留適用項後直接回覆(選項為主,幾乎免打字)</td></tr><tr><td style="border:1px solid #e2e8f0;border-top:none;padding:12px 16px;font:400 13px \'Segoe UI\',sans-serif;color:#1e293b;line-height:2.1;">1. 目前狀態： ○ 進行中　○ 已完成　○ 卡關<br/>2. 完成百分比： ○ 25%　○ 50%　○ 75%　○ 100%<br/>3. 預計完成 ETA： ○ 今日　○ 明日　○ 本週　○ 其他：__________<br/>4. 是否有阻礙 / 風險： ○ 無　○ 有：__________<br/>5. 是否需要我協助： ○ 否　○ 是：__________</td></tr></table>';
+  function seedTemplates(){
+    var wrap=function(subj,lead,extra){ return '<div style="font:400 13px/1.6 \'Segoe UI\',\'Microsoft JhengHei\',sans-serif;color:#1e293b;"><p>Hi {{ProjectName}} 窗口,</p><p>'+lead+'</p>'+(extra||'')+CHOICE_FORM+'<p style="color:#64748b;font-size:12px;">若已於電話/會議說明,也請於上方簡短補一句以便留存。謝謝!</p><p>Best regards,<br/>{{MyName}}</p><p style="color:#94a3b8;font-size:11px;font-family:Consolas,monospace;">追蹤案號 {{ProjectCode}} · {{Date}}</p></div>'; };
+    return [
+      { id:'t_status', key:'status_request', name:'進度確認', cat:'追蹤', subject:'[追蹤] {{ProjectCode}} {{ProjectName}} - 進度確認', body:wrap('','想跟你確認 <b>{{ProjectName}}</b>({{ProjectCode}})目前的進度。','') },
+      { id:'t_eta', key:'eta_confirm', name:'交期確認', cat:'追蹤', subject:'[追蹤] {{ProjectCode}} {{ProjectName}} - 交期確認', body:wrap('','想再次確認 <b>{{ProjectName}}</b>({{ProjectCode}})的<b>預計完成/交期</b>是否仍如原訂。','<p style="color:#c0392b;">如需調整,請於第 3 點圈選或填新日期並簡述原因。</p>') },
+      { id:'t_blocker', key:'blocker_check', name:'風險/阻礙盤點', cat:'追蹤', subject:'[追蹤] {{ProjectCode}} {{ProjectName}} - 風險/阻礙盤點', body:wrap('','想確認 <b>{{ProjectName}}</b>({{ProjectCode}})目前是否有卡關或潛在風險,以便及早協助。','') },
+      { id:'t_approval', key:'approval_request', name:'請確認/核准', cat:'核准', subject:'[待核] {{ProjectCode}} {{ProjectName}} - 請確認/核准', body:wrap('','以下 <b>{{ProjectName}}</b>({{ProjectCode}})事項需要你確認或核准,煩請於下方圈選回覆。','') },
+      { id:'t_followup', key:'followup', name:'補追殺(尚未回覆)', cat:'追蹤', subject:'[再次追蹤] {{ProjectCode}} {{ProjectName}} - 尚未收到回覆', body:wrap('','先前關於 <b>{{ProjectName}}</b>({{ProjectCode}})的進度確認尚未收到回覆,再麻煩你抽空圈選一下,謝謝!','') }
+    ];
+  }
+  var templates = loadTemplates();
+  function loadTemplates(){ try{ var r=localStorage.getItem(TPL_LS); if(r){ var d=JSON.parse(r); if(d&&d.length) return d; } }catch(e){} return seedTemplates(); }
+  function saveTemplates(){ try{ localStorage.setItem(TPL_LS, JSON.stringify(templates)); }catch(e){} }
+  function detectVars(t){ var s=(t.subject||'')+' '+(t.body||''); var m, set={}, re=/\{\{\s*([A-Za-z0-9_]+)\s*\}\}/g; while((m=re.exec(s))) set[m[1]]=1; return Object.keys(set); }
+  var SAMPLE_VARS={ ProjectCode:'PRJ-001', ProjectName:'日本合資案', MyName:'你的名字', Date:'2026/08/07' };
+  function fillVars(str){ return (str||'').replace(/\{\{\s*([A-Za-z0-9_]+)\s*\}\}/g, function(_,k){ return SAMPLE_VARS[k]!=null?SAMPLE_VARS[k]:'〈'+k+'〉'; }); }
+  function persist(){ try{ localStorage.setItem(LS, engine.serialize()); }catch(e){} }
+  function boot(){
+    var restored=null;
+    try{ var raw=localStorage.getItem(LS); if(raw) restored=JSON.parse(raw); }catch(e){}
+    engine = new VeritasDataEngine(restored);
+    var inbox = engine.getInbox();
+    state.selected = inbox.length ? inbox[0].id : null;
+    render();
+  }
+
+  /* ============================= RENDER ============================= */
+  function render(){
+    D.getElementById('app').innerHTML = header() + '<div style="display:flex;flex:1;overflow:hidden">' + sidebar() + main() + '</div>';
+  }
+
+  function header(){
+    var unread = engine.getInbox().filter(function(m){return m.isUnread;}).length;
+    return '<header style="height:52px;flex:none;border-bottom:1px solid var(--line);background:rgba(4,12,26,.92);display:flex;align-items:center;justify-content:space-between;padding:0 22px;z-index:20">'+
+      '<div style="display:flex;align-items:center;gap:11px">'+
+        '<div style="width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,#059669,#0f3d34);display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 4px 14px rgba(16,185,129,.2)">'+IC.zap({s:15,fill:true})+'</div>'+
+        '<span style="font-weight:800;letter-spacing:2px;text-transform:uppercase;font-size:13px">Veritas <span class="mono" style="font-size:9px;color:var(--em);background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.35);border-radius:5px;padding:2px 7px;margin-left:6px;letter-spacing:1px">Unified Engine</span></span>'+
+      '</div>'+
+      '<div style="display:flex;gap:8px">'+
+        '<button data-act="inject" class="mono" style="display:flex;align-items:center;gap:5px;font-size:10px;background:#0f1e34;color:var(--em2);padding:7px 12px;border-radius:9px;border:1px solid var(--line2)">'+IC.plus({s:13})+' 模擬接收新信件</button>'+
+        '<button data-act="reset" class="mono" title="清除本機資料重來" style="display:flex;align-items:center;gap:5px;font-size:10px;background:#1a1020;color:#e0899b;padding:7px 12px;border-radius:9px;border:1px solid #3a2230">'+IC.trash({s:13})+'</button>'+
+      '</div>'+
+    '</header>';
+  }
+
+  function navBtn(id,icon,label,badge){
+    var on = state.nav===id;
+    return '<button data-nav="'+id+'" title="'+label+'" style="position:relative;width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;'+
+      (on?'background:rgba(16,185,129,.16);color:var(--em2);border:1px solid rgba(16,185,129,.35)':'color:var(--mut2);border:1px solid transparent')+'">'+icon+
+      (badge?'<span style="position:absolute;top:-3px;right:-3px;background:#ef4444;color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px">'+badge+'</span>':'')+
+    '</button>';
+  }
+  function sidebar(){
+    var unread = engine.getInbox().filter(function(m){return m.isUnread;}).length;
+    return '<aside style="width:60px;flex:none;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;padding:22px 0;gap:14px;z-index:20">'+
+      navBtn('inbox', IC.inbox({s:19}), '智能收件匣', unread)+
+      navBtn('board', IC.kanban({s:19}), '專案看板', 0)+
+      navBtn('ledger', IC.term({s:19}), '引擎總帳', 0)+
+      '<div style="height:8px"></div>'+
+      navBtn('loaded', IC.folder({s:19}), '載入本機匯出 (你自己的 JSON)', loaded.mails.length+loaded.cases.length+loaded.stake.length)+
+      navBtn('templates', IC.doc({s:19}), '範本庫管理 · 導入不寄出', 0)+
+      navBtn('validate', IC.check({s:19}), '驗證中心 · 一鍵自檢', 0)+
+      '<div style="flex:1"></div>'+
+      navBtn('settings', IC.gear({s:19}), '參數設定', 0)+
+    '</aside>';
+  }
+
+  function main(){
+    var inner = state.nav==='inbox' ? inboxView()
+              : state.nav==='board' ? boardView()
+              : state.nav==='ledger' ? ledgerView()
+              : state.nav==='validate' ? validationView()
+              : state.nav==='settings' ? settingsView()
+              : state.nav==='templates' ? templatesView()
+              : loadedView();
+    return '<main class="grid-bg" style="flex:1;position:relative;overflow:hidden;display:flex">'+inner+'</main>';
+  }
+
+  function tagBadge(tag){
+    var map = {
+      ACTION_REQUIRED:['需採取行動','var(--red)','rgba(248,113,113,.12)','rgba(248,113,113,.3)'],
+      STATUS_UPDATE:['狀態更新','var(--blue)','rgba(96,165,250,.12)','rgba(96,165,250,.3)'],
+      INFO_REVIEW:['僅供參考','var(--em2)','rgba(16,185,129,.12)','rgba(16,185,129,.3)']
+    };
+    var m = map[tag]||map.INFO_REVIEW;
+    return '<span class="mono" style="font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:2px 7px;border-radius:5px;color:'+m[1]+';background:'+m[2]+';border:1px solid '+m[3]+'">'+m[0]+'</span>';
+  }
+
+  function inboxView(){
+    var mails = engine.getInbox();
+    var q = state.query.toLowerCase();
+    var shown = mails.filter(function(m){ return !q || (m.subject+m.sender+m.fullBody+m.id+m.project).toLowerCase().indexOf(q)>=0; });
+    var sel = mails.filter(function(m){return m.id===state.selected;})[0] || shown[0] || null;
+
+    var list = shown.map(function(m){
+      var active = sel && m.id===sel.id;
+      return '<div data-open="'+m.id+'" style="padding:13px 15px;border-bottom:1px solid rgba(30,41,59,.5);cursor:pointer;border-left:2px solid '+(active?'var(--em)':'transparent')+';'+(active?'background:rgba(30,41,59,.55)':'')+'">'+
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px"><span style="font-size:12px;font-weight:600;color:'+(m.isUnread?'#fff':'var(--mut)')+'">'+esc(m.sender)+'</span><span class="mono" style="font-size:10px;color:var(--mut2)">'+esc(m.time)+'</span></div>'+
+        '<div style="font-size:13px;margin-bottom:3px;color:'+(m.isUnread?'#d1fae5':'var(--mut)')+';font-weight:'+(m.isUnread?'600':'400')+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(m.subject)+'</div>'+
+        '<div style="font-size:11px;color:var(--mut2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:7px">'+esc(m.snippet)+'</div>'+
+        '<div style="display:flex;align-items:center;gap:7px">'+tagBadge(m.aiTag)+
+          '<span class="mono" style="font-size:9px;color:var(--mut2);background:#08111f;border:1px solid var(--line);border-radius:4px;padding:1px 6px;display:inline-flex;align-items:center;gap:3px">'+IC.db({s:10})+esc(m.id.split('-')[2])+'</span>'+
+          '<span class="mono" style="font-size:9px;color:var(--mut2)">'+esc(m.project)+'</span>'+
+        '</div>'+
+      '</div>';
+    }).join('') || '<div style="padding:30px;text-align:center;color:var(--mut2);font-size:12px">無相符信件</div>';
+
+    var reader = sel ? readerPane(sel) : '<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--mut2)" class="mono">選擇一封信件進行解析</div>';
+
+    return '<div class="fadein" style="display:flex;flex:1;overflow:hidden;position:relative;z-index:10">'+
+      '<div style="width:360px;flex:none;border-right:1px solid var(--line);background:var(--panel2);display:flex;flex-direction:column">'+
+        '<div style="padding:14px;border-bottom:1px solid var(--line)">'+
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:11px;font-size:13px;font-weight:600;color:#fff">AI Triage Inbox <span class="mono" style="font-size:9px;color:var(--em2);background:rgba(16,185,129,.14);border:1px solid rgba(16,185,129,.3);border-radius:20px;padding:2px 8px">L0 Filter</span></div>'+
+          '<div style="position:relative"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--mut2)">'+IC.search({s:14})+'</span>'+
+          '<input id="q" value="'+esc(state.query)+'" placeholder="搜尋意圖、任務或 ID…" style="width:100%;background:var(--bg);border:1px solid rgba(51,65,85,.5);border-radius:9px;padding:8px 10px 8px 32px;font-size:12px;color:var(--ink);outline:none"></div>'+
+        '</div>'+
+        '<div style="flex:1;overflow-y:auto">'+list+'</div>'+
+      '</div>'+
+      '<div style="flex:1;overflow-y:auto">'+reader+'</div>'+
+    '</div>';
+  }
+
+  function readerPane(m){
+    var tasks = m.extractedTasks.length ? m.extractedTasks.map(function(t){
+      var urgent = t.deadline==='ASAP' || /08\/0[56]|2026\/08\/0[56]/.test(t.deadline);
+      return '<div style="background:rgba(2,6,23,.8);border:1px solid var(--line);border-radius:12px;padding:11px 13px;display:flex;align-items:center;justify-content:space-between;gap:12px">'+
+        '<div style="display:flex;align-items:center;gap:11px;min-width:0"><div style="width:15px;height:15px;border-radius:4px;border:1px solid var(--line2);flex:none"></div><span style="font-size:13px;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(t.desc)+'</span></div>'+
+        '<div style="display:flex;align-items:center;gap:12px;flex:none">'+
+          '<span class="mono" style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--mut)">'+IC.user({s:13})+esc(t.assignee)+'</span>'+
+          '<span class="mono" style="display:flex;align-items:center;gap:4px;font-size:10px;color:'+(urgent?'var(--red)':'var(--mut)')+';background:'+(urgent?'rgba(248,113,113,.12)':'rgba(30,41,59,.6)')+';border:1px solid '+(urgent?'rgba(248,113,113,.3)':'transparent')+';padding:3px 7px;border-radius:5px">'+IC.clock({s:12})+esc(t.deadline)+'</span>'+
+          '<button data-addtask="'+esc(m.id)+'|'+esc(t.desc)+'|'+esc(t.deadline)+'" style="font-size:12px;background:rgba(16,185,129,.9);color:#fff;padding:6px 12px;border-radius:9px;font-weight:600;box-shadow:0 0 10px rgba(16,185,129,.2)">加入看板</button>'+
+        '</div>'+
+      '</div>';
+    }).join('<div style="height:8px"></div>')
+      : '<div class="mono" style="font-size:12px;color:var(--mut2);font-style:italic;padding:16px;text-align:center;border:1px dashed rgba(51,65,85,.5);border-radius:10px">無偵測到具體行動事項 (No Action Items detected)</div>';
+
+    return '<div class="fadein" style="max-width:820px;margin:0 auto;padding:30px;display:flex;flex-direction:column;gap:22px">'+
+      '<div><h1 style="font-size:22px;font-weight:600;color:#fff;margin-bottom:8px">'+esc(m.subject)+'</h1>'+
+        '<div style="display:flex;align-items:center;gap:11px;font-size:12px;color:var(--mut)"><span style="color:#cbd5e1;font-weight:500">'+esc(m.sender)+'</span><span>•</span><span>'+esc(m.time)+'</span><span>•</span><span class="mono" style="font-size:11px;color:var(--mut2)">SYS_ID: '+esc(m.id)+'</span></div>'+
+      '</div>'+
+      '<div style="background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:20px"><div style="font-size:13px;color:#cbd5e1;white-space:pre-wrap;line-height:1.7">'+esc(m.fullBody)+'</div></div>'+
+      '<div style="border:1px solid rgba(16,185,129,.28);background:linear-gradient(135deg,rgba(6,78,59,.18),rgba(15,23,42,.2));border-radius:16px;padding:20px;position:relative;overflow:hidden">'+
+        '<div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--em)"></div>'+
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:15px">'+
+          '<div class="mono" style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:var(--em2);text-transform:uppercase;letter-spacing:1.5px">'+IC.zap({s:15})+' NLP Mail-to-Task Resolution</div>'+
+          '<span class="mono" style="font-size:10px;background:#08111f;border:1px solid var(--line);color:var(--mut);padding:3px 8px;border-radius:5px">Context: '+esc(m.project)+'</span>'+
+        '</div>'+tasks+
+      '</div>'+
+    '</div>';
+  }
+
+  function boardView(){
+    var cols = [['todo','TO DO (待處理)','var(--line2)'],['doing','IN PROGRESS (進行中)','#2563eb'],['done','DONE (已完成)','var(--em)']];
+    var body = cols.map(function(c){ return column(c[0],c[1],c[2]); }).join('');
+    return '<div class="fadein" style="flex:1;display:flex;flex-direction:column;position:relative;z-index:10">'+
+      '<div style="height:60px;flex:none;border-bottom:1px solid var(--line);padding:0 30px;display:flex;align-items:center;gap:14px;background:rgba(4,12,26,.5)">'+
+        '<h2 style="font-size:17px;font-weight:600;color:#fff;display:flex;align-items:center;gap:9px">'+IC.kanban({s:19})+' SSOT 專案看板</h2>'+
+        '<span class="mono" style="font-size:10px;background:#0f1e34;border:1px solid var(--line2);color:var(--mut);padding:2px 8px;border-radius:5px">Data Driven</span>'+
+      '</div>'+
+      '<div style="flex:1;overflow-x:auto;padding:26px 30px;display:flex;gap:22px">'+body+'</div>'+
+    '</div>';
+  }
+  function column(key,title,color){
+    var tasks = engine.tasks[key];
+    var cards = tasks.map(function(t){
+      var urgent = t.due==='ASAP' || /08\/0[56]/.test(t.due);
+      var prev = key==='todo'?'':key==='doing'?'todo':'doing';
+      var next = key==='done'?'':key==='todo'?'doing':'done';
+      return '<div style="background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;position:relative;overflow:hidden">'+
+        '<div style="position:absolute;top:0;left:0;bottom:0;width:3px;background:'+color+'"></div>'+
+        '<div class="mono" style="font-size:9px;color:var(--mut2);margin-bottom:7px">'+esc(t.project)+'</div>'+
+        '<div style="font-size:13px;color:#e2e8f0;font-weight:500;line-height:1.4;margin-bottom:12px">'+esc(t.title)+'</div>'+
+        '<div style="display:flex;align-items:center;justify-content:space-between;gap:6px">'+
+          '<span class="mono" style="font-size:9px;color:var(--mut);background:#08111f;border:1px solid var(--line);border-radius:4px;padding:2px 6px;display:inline-flex;align-items:center;gap:3px;max-width:120px;overflow:hidden">'+IC.db({s:10})+esc(String(t.source).split('-').pop())+'</span>'+
+          '<span class="mono" style="font-size:10px;padding:2px 7px;border-radius:5px;color:'+(urgent?'var(--red)':'var(--mut)')+';background:'+(urgent?'rgba(248,113,113,.12)':'rgba(30,41,59,.6)')+';border:1px solid '+(urgent?'rgba(248,113,113,.3)':'transparent')+'">'+esc(t.due)+'</span>'+
+        '</div>'+
+        '<div style="display:flex;gap:6px;margin-top:10px">'+
+          (prev?'<button data-move="'+t.id+'|'+prev+'" class="mono" style="flex:1;font-size:10px;color:var(--mut);background:#0d1626;border:1px solid var(--line);border-radius:6px;padding:4px">← '+prev.toUpperCase()+'</button>':'')+
+          (next?'<button data-move="'+t.id+'|'+next+'" class="mono" style="flex:1;font-size:10px;color:var(--em2);background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.25);border-radius:6px;padding:4px">'+next.toUpperCase()+' →</button>':'')+
+        '</div>'+
+      '</div>';
+    }).join('<div style="height:12px"></div>') || '<div class="mono" style="border:2px dashed var(--line);border-radius:12px;height:96px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--mut2)">Empty Dropzone</div>';
+    return '<div style="width:300px;flex:none;display:flex;flex-direction:column">'+
+      '<div class="mono" style="font-size:11px;font-weight:700;color:var(--mut);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;border-top:2px solid '+color+';padding-top:11px">'+
+        '<span>'+esc(title)+'</span><span style="background:#0f1e34;color:#cbd5e1;padding:1px 8px;border-radius:10px;font-size:10px">'+tasks.length+'</span></div>'+
+      '<div>'+cards+'</div>'+
+    '</div>';
+  }
+
+  function ledgerView(){
+    var rows = engine.ledger.map(function(l){
+      var dot = l.type==='WARN'?'var(--amber)':l.type==='SUCCESS'?'var(--em)':'var(--blue)';
+      var chip = l.type==='SUCCESS'?['var(--em2)','rgba(16,185,129,.14)','rgba(16,185,129,.3)']:l.type==='WARN'?['var(--amber)','rgba(251,191,36,.14)','rgba(251,191,36,.3)']:['var(--blue)','rgba(96,165,250,.14)','rgba(96,165,250,.3)'];
+      return '<div style="display:flex;align-items:flex-start">'+
+        '<div style="width:80px;flex:none;padding:10px 16px 0 0;text-align:right;position:relative"><span class="mono" style="font-size:10px;color:var(--mut2)">'+esc(l.time)+'</span>'+
+          '<div style="position:absolute;right:-5px;top:12px;width:9px;height:9px;border-radius:50%;background:'+dot+';border:2px solid var(--panel2)"></div></div>'+
+        '<div style="flex:1;background:rgba(15,23,42,.5);border:1px solid rgba(30,41,59,.8);border-radius:10px;padding:11px 13px">'+
+          '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><span class="mono" style="font-size:10px;padding:2px 8px;border-radius:5px;color:'+chip[0]+';background:'+chip[1]+';border:1px solid '+chip[2]+'">'+esc(l.event)+'</span><span class="mono" style="font-size:9px;color:var(--mut2)">['+esc(l.id)+']</span></div>'+
+          '<div class="mono" style="font-size:12px;color:#cbd5e1">'+esc(l.desc)+'</div>'+
+        '</div>'+
+      '</div>';
+    }).join('<div style="height:16px"></div>');
+
+    return '<div class="fadein" style="flex:1;overflow-y:auto;padding:30px;position:relative;z-index:10"><div style="max-width:820px;margin:0 auto">'+
+      '<div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:26px">'+
+        '<div><h2 style="font-size:22px;font-weight:300;color:#fff;display:flex;align-items:center;gap:11px">'+IC.term({s:22})+' JS 引擎時序總帳 <span class="mono" style="font-size:13px;color:var(--em)">/ Console Ledger</span></h2>'+
+        '<div class="mono" style="font-size:11px;color:var(--mut2);margin-top:8px">append-only memory stream · '+engine.ledger.length+' entries</div></div>'+
+        '<div class="mono" style="display:flex;align-items:center;gap:8px;background:rgba(15,23,42,.8);border:1px solid var(--line2);padding:6px 12px;border-radius:9px;font-size:11px;color:var(--mut)">'+IC.lock({s:13})+' Immutable Stream</div>'+
+      '</div>'+
+      '<div style="background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:24px;position:relative">'+
+        '<div style="position:absolute;left:95px;top:24px;bottom:24px;width:1px;background:var(--line)"></div>'+
+        '<div style="position:relative">'+rows+'</div>'+
+      '</div>'+
+    '</div></div>';
+  }
+
+  /* =================== LOADED (your own exported JSON) =================== */
+  function loadedView(){
+    var has = loaded.mails.length || loaded.cases.length || loaded.stake.length;
+    var head = '<div style="height:60px;flex:none;border-bottom:1px solid var(--line);padding:0 30px;display:flex;align-items:center;gap:14px;background:rgba(4,12,26,.5)">'+
+      '<h2 style="font-size:17px;font-weight:600;color:#fff;display:flex;align-items:center;gap:9px">'+IC.folder({s:19})+' 本機匯出資料</h2>'+
+      '<span class="mono" style="font-size:10px;background:#0f1e34;border:1px solid var(--line2);color:var(--mut);padding:2px 8px;border-radius:5px">read-only · in-memory · 不上傳</span>'+
+      (has?'<button data-act="deck" style="margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px;background:rgba(16,185,129,.9);color:#fff;padding:7px 13px;border-radius:9px;font-weight:600">'+IC.play({s:14})+' 生成簡報</button>'+
+              '<button data-act="pickjson" class="mono" style="display:flex;align-items:center;gap:5px;font-size:10px;background:#0f1e34;color:var(--em2);padding:6px 11px;border-radius:8px;border:1px solid var(--line2)">'+IC.up({s:13})+' 再載入</button>'+
+              '<button data-act="clearjson" class="mono" style="font-size:10px;background:#1a1020;color:#e0899b;padding:6px 11px;border-radius:8px;border:1px solid #3a2230">清除</button>':'')+
+    '</div>';
+
+    if(!has){
+      return '<div class="fadein" style="flex:1;display:flex;flex-direction:column;position:relative;z-index:10">'+head+
+        '<div style="flex:1;display:flex;align-items:center;justify-content:center;padding:30px">'+
+          '<div id="dropzone" style="max-width:560px;width:100%;border:2px dashed var(--line2);border-radius:16px;padding:44px 30px;text-align:center;background:rgba(5,11,20,.5)">'+
+            '<div style="color:var(--em2);display:flex;justify-content:center;margin-bottom:14px">'+IC.up({s:34})+'</div>'+
+            '<div style="font-size:15px;color:#e2e8f0;font-weight:600;margin-bottom:6px">拖入或選擇你自己匯出的 JSON</div>'+
+            '<div class="mono" style="font-size:11px;color:var(--mut);line-height:1.9;margin-bottom:18px">支援 Wizard 匯出的:<br><b style="color:var(--em2)">Mail_Events.json</b> · <b style="color:var(--em2)">Case_Groups.json</b> · <b style="color:var(--em2)">Stakeholders.json</b><br>(任一或全部，可一次多選)</div>'+
+            '<button data-act="pickjson" style="font-size:13px;background:rgba(16,185,129,.9);color:#fff;padding:9px 18px;border-radius:10px;font-weight:600">選擇檔案</button>'+
+            (state.loadErr?'<div class="mono" style="margin-top:16px;font-size:11px;color:var(--red);background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);border-radius:8px;padding:8px 12px">'+esc(state.loadErr)+'</div>':'')+
+            '<div class="mono" style="margin-top:18px;font-size:10px;color:var(--mut2);line-height:1.7">全程離線:檔案只在瀏覽器記憶體解析，不連網、不寫入 localStorage。<br>重新整理後即清除(因為可能含真實信件內文)。</div>'+
+          '</div>'+
+        '</div>'+
+      '</div>';
+    }
+
+    var trackN = (loaded.pending.length || loaded.cases.length || loaded.mails.length);
+    var tabs = [['track','應追蹤清單',trackN],['mails','郵件事件',loaded.mails.length],['cases','案件分群',loaded.cases.length],['stake','聯絡頻率',loaded.stake.length]]
+      .filter(function(t){return t[2]>0;});
+    if(tabs.map(function(t){return t[0];}).indexOf(state.loadedTab)<0 && tabs.length) state.loadedTab=tabs[0][0];
+    var tabBar = tabs.map(function(t){
+      var on=state.loadedTab===t[0];
+      return '<button data-ltab="'+t[0]+'" style="font-size:12px;padding:7px 14px;border-radius:9px;border:1px solid '+(on?'rgba(16,185,129,.35)':'var(--line)')+';background:'+(on?'rgba(16,185,129,.14)':'transparent')+';color:'+(on?'var(--em2)':'var(--mut)')+'">'+t[1]+' <span class="mono" style="font-size:10px;opacity:.7">'+t[2]+'</span></button>';
+    }).join('');
+
+    var body = state.loadedTab==='track'?renderTrack():state.loadedTab==='cases'?loadedCases():state.loadedTab==='stake'?loadedStake():loadedMails();
+    return '<div class="fadein" style="flex:1;display:flex;flex-direction:column;position:relative;z-index:10;overflow:hidden">'+head+
+      '<div style="padding:16px 30px 0;display:flex;gap:8px;flex-wrap:wrap">'+tabBar+
+        '<span class="mono" style="margin-left:auto;font-size:10px;color:var(--mut2);align-self:center">載入於 '+esc(loaded.at||'')+' · '+esc(loaded.files.join(', '))+'</span></div>'+
+      '<div style="flex:1;overflow:auto;padding:16px 30px 30px">'+body+'</div>'+
+    '</div>';
+  }
+  function cap(n){ return n>500 ? 500 : n; }
+  function td(v,o){ o=o||{}; return '<td style="padding:7px 10px;border-bottom:1px solid rgba(30,41,59,.6);font-size:11.5px;color:'+(o.c||'#cbd5e1')+';white-space:'+(o.wrap?'normal':'nowrap')+';'+(o.mono?'font-family:var(--mono);':'')+(o.max?'max-width:'+o.max+';overflow:hidden;text-overflow:ellipsis;':'')+'">'+esc(v)+'</td>'; }
+  function th(v,o){ o=o||{}; return '<th style="padding:8px 10px;text-align:'+(o.a||'left')+';font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--mut2);border-bottom:1px solid var(--line2);position:sticky;top:0;background:var(--panel2)">'+esc(v)+'</th>'; }
+  function tableWrap(head, rows, total, shown){
+    var note = total>shown ? '<div class="mono" style="font-size:10px;color:var(--mut2);padding:8px 2px">顯示前 '+shown+' / 共 '+total+' 筆(避免超大檔案卡頓)</div>' : '';
+    return '<div style="border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel2)"><div style="overflow:auto;max-height:100%"><table style="width:100%;border-collapse:collapse"><thead><tr>'+head+'</tr></thead><tbody>'+rows+'</tbody></table></div></div>'+note;
+  }
+  function loadedMails(){
+    var rows = loaded.mails.slice(0,cap(loaded.mails.length)).map(function(m){
+      var cat = m.ConfirmedCategory||m.SuggestedCategory||'';
+      var unread = (m.Unread===true||m.Unread==='True');
+      return '<tr>'+
+        td(m.EventDate||'',{mono:true,c:'var(--mut)'})+
+        td(m.Direction||'',{mono:true,c:(m.Direction==='OUTBOUND'||m.Direction==='OUT')?'var(--blue)':'var(--em2)'})+
+        td(m.SenderName||m.SenderEmail||'',{max:'160px'})+
+        td(m.Subject||'',{max:'320px',c:unread?'#fff':'#cbd5e1'})+
+        td(cat,{mono:true,c:'var(--mut)',max:'160px'})+
+        td((m.AttachmentCount||0),{a:'center',mono:true})+
+      '</tr>';
+    }).join('');
+    return tableWrap(th('日期')+th('方向')+th('寄件人')+th('主旨')+th('分類')+th('附件'), rows, loaded.mails.length, cap(loaded.mails.length));
+  }
+  function loadedCases(){
+    var rows = loaded.cases.slice(0,cap(loaded.cases.length)).map(function(c){
+      var need = (c.NeedsAttention===true||c.NeedsAttention==='True');
+      return '<tr>'+
+        td(c.Subject||c.ConversationID||'',{max:'320px',c:'#e2e8f0'})+
+        '<td style="padding:7px 10px;border-bottom:1px solid rgba(30,41,59,.6)"><span class="mono" style="font-size:10px;padding:2px 7px;border-radius:5px;color:'+(need?'var(--red)':'var(--mut)')+';background:'+(need?'rgba(248,113,113,.12)':'rgba(30,41,59,.6)')+';border:1px solid '+(need?'rgba(248,113,113,.3)':'transparent')+'">'+esc(c.WorkflowStatus||'')+'</span></td>'+
+        td((c.MessageCount||0),{a:'center',mono:true})+
+        td((c.InboundCount||0)+' / '+(c.OutboundCount||0),{a:'center',mono:true,c:'var(--mut)'})+
+        td(c.LastDate||'',{mono:true,c:'var(--mut)'})+
+        td(c.ConfirmedCategory||c.SuggestedCategory||'',{mono:true,c:'var(--mut)',max:'150px'})+
+      '</tr>';
+    }).join('');
+    return tableWrap(th('案件主旨')+th('工作流狀態')+th('封數')+th('收/發')+th('最後日期')+th('分類'), rows, loaded.cases.length, cap(loaded.cases.length));
+  }
+  function loadedStake(){
+    var rows = loaded.stake.slice(0,cap(loaded.stake.length)).map(function(s){
+      return '<tr>'+
+        td(s.Email||'',{mono:true,max:'240px',c:'#cbd5e1'})+
+        td(s.Domain||'',{mono:true,c:'var(--mut)'})+
+        td((s.FromCount||0),{a:'center',mono:true,c:'var(--em2)'})+
+        td((s.ToOrCcCount||0),{a:'center',mono:true,c:'var(--blue)'})+
+        td((s.TotalTouches||0),{a:'center',mono:true})+
+        td(s.LastDate||'',{mono:true,c:'var(--mut)'})+
+      '</tr>';
+    }).join('');
+    return tableWrap(th('聯絡人')+th('網域')+th('來自',{a:'center'})+th('寄給/副本',{a:'center'})+th('總互動',{a:'center'})+th('最後日期'), rows, loaded.stake.length, cap(loaded.stake.length));
+  }
+
+  /* ---- transparent priority score + track list (their factor model, local) ---- */
+  function scoreItem(x, isCase){
+    var f=[], s=0, W=settings.w;
+    var subj=((x.Subject||x.NormalizedSubject||'')+'');
+    var cat=((x.ConfirmedCategory||x.SuggestedCategory||'')+'');
+    var status=((x.WorkflowStatus||'')+'');
+    function add(w,l){ s+=w; f.push(l); }
+    if(/01_|需要我|need|action/i.test(cat) || /待我|需優先|需確認|待確認/.test(status)) add(W.action,'需我行動');
+    if(isCase && (x.NeedsAttention===true||x.NeedsAttention==='True')) add(W.attention,'需注意');
+    if(/急|urgent|asap|eod|今日|deadline|立即|immediately|盡快/i.test(subj)) add(W.urgent,'急件字');
+    if(isCase ? ((x.UnreadCount||0)>0) : (x.Unread===true||x.Unread==='True')) add(W.unread,'未讀');
+    if(/\[?(PRJ|PO|MP)[-_ ]?\d/i.test(subj)) add(W.code,'專案號');
+    if(s>1) s=1;
+    return { score:s, factors:f };
+  }
+  function extractCode(subj, fallback){
+    var m=(subj||'').match(/\[?([A-Za-z]{2,4}[-_ ]?\d[\w-]*)\]?/);
+    return m ? m[1].toUpperCase().replace(/\s/g,'-') : (fallback||'');
+  }
+  function computeTrackList(){
+    // v004 pending-response is a ready-made, prioritized track list (with real addresses)
+    if(loaded.pending.length){
+      return loaded.pending.map(function(p,i){
+        var subj=p.TITLE||p.CASE_ID||'(無主旨)';
+        var pri=((p.PRIORITY||'')+'').toUpperCase();
+        var score = pri==='P1'?0.9:pri==='P2'?0.7:pri==='P3'?0.4:0.5;
+        // chase the counterparty: if we're waiting on our OUTBOUND mail, chase the recipient (TO);
+        // if an INBOUND needs our reply, the counterparty is the sender.
+        var to = ((p.LAST_DIRECTION||'')+'').toUpperCase()==='OUTBOUND' ? (firstAddr(p.TO)||p.FROM_ADDRESS||'') : (p.FROM_ADDRESS||firstAddr(p.TO)||p.FROM||'');
+        var st=((p.PENDING_STATUS||'')+(p.NEXT_ACTION?(' · '+p.NEXT_ACTION):''));
+        var tpl=/WAITING_EXTERNAL/.test(p.PENDING_STATUS||'')?'followup':/RSK|RISK|風險/.test((p.CATEGORY||'')+(p.PENDING_STATUS||''))?'blocker_check':'status_request';
+        return { id:p.CASE_ID||('p'+i), subject:subj, code:extractCode(subj,p.CASE_ID), name:subj, to:to, template:tpl, status:st, score:score, factors:[pri||'v004'] };
+      }).sort(function(a,b){ return b.score-a.score; });
+    }
+    var useCases = loaded.cases.length>0;
+    var src = useCases ? loaded.cases : loaded.mails;
+    var list = src.map(function(x,i){
+      var sc = scoreItem(x, useCases);
+      var subj = x.Subject||x.NormalizedSubject||'(無主旨)';
+      var id = x.GroupID||x.MailID||('row'+i);
+      var status = x.WorkflowStatus||x.ConfirmedCategory||x.SuggestedCategory||'';
+      // best-effort recipient: case participants (Wizard) or mail sender; may be blank
+      var to='';
+      if(useCases && x.Participants && x.Participants.length) to=x.Participants[0];
+      else if(!useCases && x.SenderEmail) to=x.SenderEmail;
+      var tpl = /等待對方|等待/.test(status) ? 'eta_confirm' : /風險|阻礙|blocker/.test(status) ? 'blocker_check' : 'status_request';
+      return { id:id, subject:subj, code:extractCode(subj,id), name:subj, to:to, template:tpl, status:status, score:sc.score, factors:sc.factors };
+    });
+    list.sort(function(a,b){ return b.score-a.score; });
+    return list;
+  }
+  function resetTrackSel(list){ trackState.sel={}; list.forEach(function(r){ trackState.sel[r.id]= r.score>=settings.thr; }); }
+  function scoreColor(s){ return s>=0.7?'var(--red)':s>=0.4?'var(--amber)':'var(--mut)'; }
+  function renderTrack(){
+    var list = computeTrackList();
+    if(!trackState.sel) resetTrackSel(list);
+    var selCount = list.filter(function(r){ return trackState.sel[r.id]; }).length;
+    var rows = list.map(function(r){
+      var on = !!trackState.sel[r.id];
+      var pct = Math.round(r.score*100);
+      return '<div style="display:flex;align-items:center;gap:12px;padding:9px 12px;border-bottom:1px solid rgba(30,41,59,.6)">'+
+        '<span data-tsel="'+esc(r.id)+'" style="flex:none;width:18px;height:18px;border-radius:5px;border:1px solid '+(on?'var(--em)':'var(--line2)')+';background:'+(on?'var(--em)':'transparent')+';color:#04140e;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;font-weight:900">'+(on?'✓':'')+'</span>'+
+        '<div style="width:96px;flex:none"><div style="height:8px;background:#0e1726;border-radius:5px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:'+scoreColor(r.score)+'"></div></div><div class="mono" style="font-size:9px;color:'+scoreColor(r.score)+';margin-top:2px">'+r.score.toFixed(2)+'</div></div>'+
+        '<div style="flex:1;min-width:0"><div style="font-size:12.5px;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(r.subject)+'</div>'+
+          '<div class="mono" style="font-size:10px;color:var(--mut2);margin-top:2px">'+esc(r.status)+(r.factors.length?' · '+esc(r.factors.join('/')):'')+'</div></div>'+
+        '<div class="mono" style="font-size:10px;color:var(--mut);flex:none;max-width:150px;overflow:hidden;text-overflow:ellipsis">'+esc(r.to||'(填收件人)')+'</div>'+
+      '</div>';
+    }).join('');
+    return '<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:11px 14px">'+
+        '<span style="font-size:12px;color:#e2e8f0;font-weight:600">優先級門檻</span>'+
+        '<input type="range" min="0" max="100" step="5" value="'+Math.round(settings.thr*100)+'" data-thr="1" style="width:160px;accent-color:var(--em)">'+
+        '<span class="mono" style="font-size:11px;color:var(--em2)">≥ '+settings.thr.toFixed(2)+'</span>'+
+        '<span class="mono" style="font-size:10px;color:var(--mut2)">已勾 '+selCount+' / '+list.length+'</span>'+
+        '<button data-act="exportcsv" style="margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px;background:rgba(16,185,129,.9);color:#fff;padding:7px 13px;border-radius:9px;font-weight:600">'+IC.up({s:14})+' 匯出 recipients.csv</button>'+
+      '</div>'+
+      '<div class="mono" style="font-size:10px;color:var(--mut2);margin-bottom:8px">評分因子:需我行動 +0.35 · 需注意 +0.25 · 急件字 +0.20 · 未讀 +0.10 · 專案號 +0.10(可在原碼調整)。勾選的列會匯出成清單,直接餵給追蹤信引擎。</div>'+
+      '<div style="border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel2)"><div style="overflow:auto">'+(rows||'<div style="padding:20px;text-align:center;color:var(--mut2)">無資料</div>')+'</div></div>';
+  }
+  function exportTrackCsv(){
+    var list = computeTrackList().filter(function(r){ return trackState.sel && trackState.sel[r.id]; });
+    if(!list.length){ alert('沒有勾選任何項目。'); return; }
+    function q(v){ v=(v==null?'':''+v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+    var out='ProjectCode,ProjectName,To,Cc,Template\n'+list.map(function(r){
+      return [q(r.code),q(r.name),q(r.to),q(''),q(r.template)].join(',');
+    }).join('\n')+'\n';
+    downloadText('recipients.csv', out, 'text/csv');
+  }
+  function downloadText(name, text, mime){
+    var blob=new Blob(['﻿'+text],{type:mime||'text/plain'}); var url=URL.createObjectURL(blob);
+    var a=D.createElement('a'); a.href=url; a.download=name; D.body.appendChild(a); a.click();
+    setTimeout(function(){ D.body.removeChild(a); URL.revokeObjectURL(url); },100);
+  }
+
+  /* ---------------- 📄 範本庫管理 Template Library (import-to-draft, never send) ---------------- */
+  function tplKeyFromName(n){ return (n||'template').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,40)||('tpl'+Math.floor(Math.random()*9999)); }
+  function currentTpl(){ for(var i=0;i<templates.length;i++){ if(templates[i].id===state.tplSel) return templates[i]; } return templates[0]||null; }
+  function templatesView(){
+    if(!state.tplSel && templates.length) state.tplSel=templates[0].id;
+    var t=currentTpl();
+    var cats={}; templates.forEach(function(x){ (cats[x.cat||'未分類']=cats[x.cat||'未分類']||[]).push(x); });
+    var listHtml=Object.keys(cats).sort().map(function(c){
+      return '<div style="font:700 9px var(--mono);letter-spacing:1px;color:var(--mut2);text-transform:uppercase;padding:10px 10px 4px">'+esc(c)+'</div>'+
+        cats[c].map(function(x){
+          var on=t&&x.id===t.id;
+          return '<div data-tplsel="'+x.id+'" style="padding:9px 11px;border-radius:7px;cursor:pointer;margin:1px 6px;border-left:2px solid '+(on?'var(--em)':'transparent')+';'+(on?'background:rgba(30,41,59,.55)':'')+'">'+
+            '<div style="font-size:12.5px;color:'+(on?'#fff':'#cbd5e1')+';font-weight:600">'+esc(x.name)+'</div>'+
+            '<div class="mono" style="font-size:9px;color:var(--mut2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">TPL_'+esc(x.key)+'.html</div></div>';
+        }).join('');
+    }).join('');
+
+    var editor;
+    if(!t){ editor='<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--mut2)" class="mono">按「＋ 新增範本」開始</div>'; }
+    else {
+      var vars=detectVars(t);
+      editor='<div style="flex:1;overflow-y:auto;padding:20px 24px">'+
+        '<div style="display:flex;gap:8px;align-items:center;margin-bottom:14px">'+
+          '<input data-tf="name" value="'+esc(t.name)+'" placeholder="範本名稱" style="flex:1;font:600 14px var(--sans);color:#fff;background:transparent;border:none;border-bottom:1px solid var(--line2);padding:4px 0;outline:none">'+
+          '<input data-tf="cat" value="'+esc(t.cat||'')+'" placeholder="分類" style="width:110px;font:600 11px var(--mono);color:var(--em2);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:5px 8px;outline:none">'+
+          '<button data-tplact="dup" class="mono" style="font-size:10px;color:var(--mut);border:1px solid var(--line2);border-radius:6px;padding:6px 9px">⧉ 複製</button>'+
+          '<button data-tplact="del" class="mono" style="font-size:10px;color:#e0899b;border:1px solid #3a2230;border-radius:6px;padding:6px 9px">🗑 刪除</button>'+
+        '</div>'+
+        '<div class="mono" style="font-size:9px;color:var(--mut2);margin-bottom:4px">主旨(第一行 SUBJECT,可含 {{變數}})</div>'+
+        '<input data-tf="subject" value="'+esc(t.subject)+'" style="width:100%;font:500 12.5px var(--sans);color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:8px 10px;margin-bottom:12px;outline:none">'+
+        '<div class="mono" style="font-size:9px;color:var(--mut2);margin-bottom:4px">內文 HTML(可含 {{變數}} 與選擇題表格)</div>'+
+        '<textarea data-tf="body" spellcheck="false" style="width:100%;height:220px;font:400 11.5px/1.6 var(--mono);color:#cbd5e1;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:10px;resize:vertical;outline:none">'+esc(t.body)+'</textarea>'+
+        '<div style="margin:12px 0 6px;display:flex;gap:6px;flex-wrap:wrap;align-items:center"><span class="mono" style="font-size:10px;color:var(--mut)">偵測到變數:</span>'+
+          (vars.length?vars.map(function(v){return '<span class="mono" style="font-size:10px;color:var(--em2);background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);border-radius:5px;padding:2px 7px">{{'+esc(v)+'}}</span>';}).join(''):'<span class="mono" style="font-size:10px;color:var(--mut2)">無</span>')+'</div>'+
+        '<div class="mono" style="font-size:9px;color:var(--mut2);margin:14px 0 4px">預覽(套入示範值)</div>'+
+        '<div style="border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff">'+
+          '<div id="tplprevsubj" style="background:#efede8;padding:7px 12px;font:600 12px \'Segoe UI\',sans-serif;color:#1e293b;border-bottom:1px solid #ddd">主旨:'+esc(fillVars(t.subject))+'</div>'+
+          '<div id="tplpreview" style="padding:14px;max-height:300px;overflow:auto">'+fillVars(t.body)+'</div>'+
+        '</div>'+
+      '</div>';
+    }
+
+    return '<div class="fadein" style="flex:1;display:flex;flex-direction:column;position:relative;z-index:10;overflow:hidden">'+
+      '<div style="height:56px;flex:none;border-bottom:1px solid var(--line);padding:0 22px;display:flex;align-items:center;gap:12px;background:rgba(4,12,26,.5)">'+
+        '<h2 style="font-size:16px;font-weight:600;color:#fff;display:flex;align-items:center;gap:9px">'+IC.doc({s:18})+' 範本庫管理</h2>'+
+        '<span class="mono" style="font-size:10px;background:#0f1e34;border:1px solid var(--line2);color:var(--mut);padding:2px 8px;border-radius:5px">導入不寄出 · 讀信只讀</span>'+
+        '<button data-tplact="add" style="margin-left:auto;display:flex;align-items:center;gap:5px;font-size:12px;background:rgba(16,185,129,.9);color:#fff;padding:7px 12px;border-radius:8px;font-weight:600">'+IC.plus({s:13})+' 新增範本</button>'+
+        '<button data-tplact="exporthtml" class="mono" style="font-size:10px;color:var(--em2);background:#0f1e34;border:1px solid var(--line2);border-radius:8px;padding:7px 11px">⭳ templates/(給草稿引擎)</button>'+
+        '<button data-tplact="exportjson" class="mono" style="font-size:10px;color:var(--mut);background:#0f1e34;border:1px solid var(--line2);border-radius:8px;padding:7px 11px">⭳ JSON 備份</button>'+
+      '</div>'+
+      '<div class="mono" style="font-size:10px;color:var(--mut2);background:var(--panel2);border-bottom:1px solid var(--line);padding:7px 22px">此頁只「管理範本」。導入 = 追蹤信引擎把範本套進 Outlook <b style="color:var(--em2)">草稿</b> 開起來供你檢視 → <b style="color:var(--em2)">你親自按傳送</b>。程式不呼叫 .Send(),讀信只讀不介入。</div>'+
+      '<div style="flex:1;display:flex;overflow:hidden">'+
+        '<div style="width:250px;flex:none;border-right:1px solid var(--line);background:var(--panel2);overflow-y:auto;padding-bottom:10px">'+listHtml+'</div>'+
+        '<div style="flex:1;display:flex;flex-direction:column;overflow:hidden">'+editor+'</div>'+
+      '</div>'+
+    '</div>';
+  }
+  function tplExportHtml(){
+    templates.forEach(function(t){
+      var content='<!-- SUBJECT: '+t.subject+' -->\n'+t.body+'\n';
+      downloadText('TPL_'+(t.key||tplKeyFromName(t.name))+'.html', content, 'text/html');
+    });
+  }
+  function tplExportJson(){ downloadText('templates.json', JSON.stringify(templates,null,2), 'application/json'); }
+  function tplNewId(){ var n=0; templates.forEach(function(x){ var m=/^t_(\d+)$/.exec(x.id); if(m) n=Math.max(n,+m[1]); }); return 't_'+(n+1); }
+  function tplAction(a){
+    if(a==='add'){
+      var nt={ id:tplNewId(), key:'new_template', name:'新範本', cat:'追蹤',
+        subject:'[追蹤] {{ProjectCode}} {{ProjectName}} - 進度確認',
+        body:'<div style="font:400 13px/1.6 \'Segoe UI\',sans-serif;color:#1e293b;"><p>Hi {{ProjectName}} 窗口,</p><p>想跟你確認 <b>{{ProjectName}}</b>({{ProjectCode}})目前的進度。</p>'+CHOICE_FORM+'<p>Best regards,<br/>{{MyName}}</p><p style="color:#94a3b8;font-size:11px;font-family:Consolas,monospace;">追蹤案號 {{ProjectCode}} · {{Date}}</p></div>' };
+      nt.key=tplKeyFromName(nt.name)==='new_template'?'new_template':tplKeyFromName(nt.name);
+      templates.push(nt); state.tplSel=nt.id; saveTemplates(); render(); return;
+    }
+    var t=currentTpl(); if(!t) return;
+    if(a==='dup'){
+      var c=JSON.parse(JSON.stringify(t)); c.id=tplNewId(); c.name=t.name+' 複本'; c.key=tplKeyFromName(c.name);
+      templates.push(c); state.tplSel=c.id; saveTemplates(); render(); return;
+    }
+    if(a==='del'){
+      if(templates.length<=1){ alert('至少保留一個範本。'); return; }
+      if(!confirm('刪除範本「'+t.name+'」?此動作僅移除本機清單,不影響已匯出的檔案。')) return;
+      var i=templates.indexOf(t); templates.splice(i,1); state.tplSel=templates[Math.max(0,i-1)].id; saveTemplates(); render(); return;
+    }
+    if(a==='exporthtml'){ tplExportHtml(); return; }
+    if(a==='exportjson'){ tplExportJson(); return; }
+  }
+
+  /* ---------------- ⚙ Settings (mouse-adjustable factor weights) ---------------- */
+  function settingsView(){
+    var W=settings.w;
+    var factors=[['action','需我行動'],['attention','需注意(案件)'],['urgent','急件字'],['unread','未讀'],['code','專案號']];
+    var sum=W.action+W.attention+W.urgent+W.unread+W.code;
+    var rows=factors.map(function(fk){
+      var v=W[fk[0]];
+      return '<div style="display:flex;align-items:center;gap:14px;padding:11px 0;border-bottom:1px solid rgba(30,41,59,.5)">'+
+        '<div style="width:140px;font-size:13px;color:#e2e8f0">'+fk[1]+'</div>'+
+        '<input type="range" min="0" max="100" step="5" value="'+Math.round(v*100)+'" data-wt="'+fk[0]+'" style="flex:1;accent-color:var(--em)">'+
+        '<span class="mono" style="width:48px;text-align:right;color:var(--em2)">+'+v.toFixed(2)+'</span></div>';
+    }).join('');
+    var sumOk=Math.abs(sum-1)<0.001;
+    return '<div class="fadein" style="flex:1;overflow-y:auto;position:relative;z-index:10;padding:26px 30px"><div style="max-width:640px;margin:0 auto">'+
+      '<h2 style="font-size:18px;font-weight:600;color:#fff;display:flex;align-items:center;gap:9px;margin-bottom:6px">'+IC.gear({s:19})+' 參數設定</h2>'+
+      '<div class="mono" style="font-size:11px;color:var(--mut2);margin-bottom:18px">全部用滑鼠調,自動存本機。改完回「應追蹤清單」即時套用。</div>'+
+      '<div style="background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:16px 18px">'+
+        '<div style="font-size:12px;font-weight:700;color:var(--mut);letter-spacing:.5px;margin-bottom:6px">優先級因子權重</div>'+rows+
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:12px"><span style="color:var(--mut)">權重總和</span><span class="mono" style="color:'+(sumOk?'var(--em2)':'var(--amber)')+'">'+sum.toFixed(2)+(sumOk?' ✓':' ⚠ 建議湊成 1.00')+'</span></div>'+
+      '</div>'+
+      '<div style="background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-top:14px">'+
+        '<div style="display:flex;align-items:center;gap:14px"><div style="width:140px;font-size:13px;color:#e2e8f0">追蹤門檻</div>'+
+        '<input type="range" min="0" max="100" step="5" value="'+Math.round(settings.thr*100)+'" data-thr="1" style="flex:1;accent-color:var(--em)">'+
+        '<span class="mono" style="width:48px;text-align:right;color:var(--em2)">≥'+settings.thr.toFixed(2)+'</span></div>'+
+        '<div class="mono" style="font-size:10px;color:var(--mut2);margin-top:8px">分數 ≥ 門檻的案件會被自動勾選匯出。</div>'+
+      '</div>'+
+      '<button data-act="resetset" class="mono" style="margin-top:16px;font-size:11px;color:var(--mut);border:1px solid var(--line2);border-radius:8px;padding:8px 14px;background:transparent">↺ 還原預設值</button>'+
+    '</div></div>';
+  }
+
+  /* ---------------- ✓ Validation Center (one-click self-test, matrix) ---------------- */
+  var REGISTRY=[
+    ['ENG-ING','載入本機匯出','ingestFiles / classify','已實作·已測'],
+    ['ENG-SCORE','優先級評分','scoreItem / computeTrackList','已實作·已測'],
+    ['ENG-TRACK','應追蹤清單','renderTrack / resetTrackSel','已實作·已測'],
+    ['ENG-CSV','匯出 recipients.csv','exportTrackCsv','已實作·已測'],
+    ['ENG-DECK','簡報生成','buildDeckSlides / deckOverlay','已實作·已測'],
+    ['ENG-SET','參數設定','settings / saveSettings','已實作·已測'],
+    ['ENG-VAL','驗證中心','runValidation','已實作·已測'],
+    ['EXT-PS','追蹤信範本引擎','Invoke-VeritasMailOps-TrackingDrafts.ps1','外部·語法驗證'],
+    ['EXT-SCAN','信箱掃描匯出','SafeLocal / Outlook Wizard','外部·語法驗證']
+  ];
+  function runValidation(){
+    var subs=[], list=[], scoreErr=null;
+    try{ list=computeTrackList(); }catch(e){ scoreErr=e.message; }
+    var hasAny=loaded.mails.length||loaded.cases.length;
+    subs.push({name:'① 資料載入 Ingest', checks:[
+      {n:'已載入資料(mails 或 cases)', pass:!!hasAny, d:'mails='+loaded.mails.length+' cases='+loaded.cases.length},
+      {n:'每封郵件有識別碼', pass: loaded.mails.length? loaded.mails.every(function(m){return m.MailID||m.id;}) : true, d: loaded.mails.length?'':'（無 mails，略）'},
+      {n:'案件有狀態或分類', pass: loaded.cases.length? loaded.cases.every(function(c){return c.WorkflowStatus||c.SuggestedCategory||c.ConfirmedCategory;}) : true, d: loaded.cases.length?('cases='+loaded.cases.length):'（無 cases，略）'}
+    ]});
+    var wsum=settings.w.action+settings.w.attention+settings.w.urgent+settings.w.unread+settings.w.code;
+    subs.push({name:'② 評分引擎 Scoring', checks:[
+      {n:'評分執行無錯誤', pass:!scoreErr, d:scoreErr||'OK'},
+      {n:'所有分數落在 0–1', pass:list.every(function(r){return r.score>=0&&r.score<=1;}), d:'n='+list.length},
+      {n:'權重總和 ≈ 1.00', pass:Math.abs(wsum-1)<0.001, warn:Math.abs(wsum-1)>=0.001, d:'總和='+wsum.toFixed(2)}
+    ]});
+    var selList=list.filter(function(r){return r.score>=settings.thr;});
+    subs.push({name:'③ 追蹤清單 Track List', checks:[
+      {n:'清單可產生', pass:list.length>0, d:'列='+list.length},
+      {n:'門檻 ≥'+settings.thr.toFixed(2)+' 有命中', pass:true, warn:(selList.length===0 && list.length>0), d:'命中='+selList.length+((selList.length===0&&list.length>0)?' · 可在 ⚙設定 調低門檻':'')},
+      {n:'專案號擷取', pass:null, info:true, d:list.filter(function(r){return r.code;}).length+'/'+list.length+' 有碼'}
+    ]});
+    var csvOk=false, csvErr=null;
+    try{ var csv='ProjectCode,ProjectName,To,Cc,Template\n'+selList.map(function(r){return [r.code,r.name,r.to,'',r.template].join(',');}).join('\n'); csvOk=csv.indexOf('ProjectCode')===0; }catch(e){ csvErr=e.message; }
+    var toMiss=selList.filter(function(r){return !r.to;}).length;
+    subs.push({name:'④ 匯出 Recipients CSV', checks:[
+      {n:'CSV 可組出', pass:csvOk, d:csvErr||('列='+selList.length)},
+      {n:'收件人完整度(缺可於 CSV 補)', pass:true, warn:toMiss>0, d:(selList.length-toMiss)+'/'+selList.length+' 有收件人'+(toMiss>0?' · SafeLocal 匯出無地址屬正常':'')}
+    ]});
+    var slides=[], deckErr=null;
+    try{ slides=buildDeckSlides(); }catch(e){ deckErr=e.message; }
+    subs.push({name:'⑤ 簡報 Deck', checks:[
+      {n:'簡報可生成(≥2 頁)', pass:!deckErr&&slides.length>=2, d:deckErr||('頁數='+slides.length)}
+    ]});
+    subs.push({name:'⑥ 範本引擎 Drafts (外部)', checks:[
+      {n:'PowerShell 追蹤信引擎', pass:null, info:true, d:'外部工具,已語法驗證;需在 Windows/Outlook 執行'}
+    ]});
+    if(loaded.pending.length) subs.push({name:'⑦ v004 待回覆匯入', checks:[
+      {n:'pending-response 已載入', pass:true, d:'筆數='+loaded.pending.length},
+      {n:'含真實收件人地址', pass:true, warn: loaded.pending.filter(function(p){return !(p.FROM_ADDRESS||p.TO||p.FROM);}).length>0, d:loaded.pending.filter(function(p){return (p.FROM_ADDRESS||p.TO||p.FROM);}).length+'/'+loaded.pending.length+' 有地址'}
+    ]});
+    if(loaded.qc.length) subs.push({name:'⑧ v004 品質檢查(匯入)', checks: loaded.qc.slice(0,14).map(function(q){
+      var res=((q.RESULT||'')+'').toUpperCase();
+      return { n:(q.CHECK||'(未命名)'), pass: res==='PASS'?true:(res==='FAIL'?false:null), warn:(res==='WARN'), d:'RESULT='+(q.RESULT||'')+' · '+(q.VALUE||'') };
+    })});
+    return subs;
+  }
+  function chkIcon(c){
+    if(c.pass===true) return '<span style="color:var(--em2)">✓</span>';
+    if(c.pass===false) return '<span style="color:var(--red)">✗</span>';
+    if(c.warn) return '<span style="color:var(--amber)">⚠</span>';
+    return '<span style="color:var(--blue)">ℹ</span>';
+  }
+  function validationView(){
+    var subs=runValidation();
+    var totalFail=0, totalWarn=0, totalPass=0;
+    subs.forEach(function(s){ s.checks.forEach(function(c){ if(c.pass===false) totalFail++; else if(c.warn) totalWarn++; else if(c.pass===true) totalPass++; }); });
+    var overall = totalFail===0;
+    // matrix summary
+    var matRows=subs.map(function(s){
+      var f=0,w=0,p=0,i=0; s.checks.forEach(function(c){ if(c.pass===false)f++; else if(c.warn)w++; else if(c.pass===true)p++; else i++; });
+      var st = f>0?['FAIL','var(--red)']:w>0?['WARN','var(--amber)']:['PASS','var(--em2)'];
+      return '<tr>'+td(s.name,{c:'#e2e8f0'})+td(s.checks.length,{a:'center',mono:true})+td(p,{a:'center',mono:true,c:'var(--em2)'})+td(w,{a:'center',mono:true,c:'var(--amber)'})+td(f,{a:'center',mono:true,c:'var(--red)'})+
+        '<td style="padding:7px 10px;border-bottom:1px solid rgba(30,41,59,.6)"><span class="mono" style="font-size:10px;padding:2px 8px;border-radius:5px;color:'+st[1]+';background:rgba(0,0,0,.25);border:1px solid '+st[1]+'">'+st[0]+'</span></td></tr>';
+    }).join('');
+    var matrix=tableWrap(th('子系統')+th('檢查',{a:'center'})+th('通過',{a:'center'})+th('警告',{a:'center'})+th('失敗',{a:'center'})+th('狀態'), matRows, subs.length, subs.length);
+    // per-subsystem pages
+    var pages=subs.map(function(s){
+      var rows=s.checks.map(function(c){
+        return '<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid rgba(30,41,59,.4)"><span style="width:18px;text-align:center;font-weight:900">'+chkIcon(c)+'</span>'+
+          '<div style="flex:1"><div style="font-size:12.5px;color:#e2e8f0">'+esc(c.n)+'</div>'+(c.d?'<div class="mono" style="font-size:10px;color:var(--mut2);margin-top:1px">'+esc(c.d)+'</div>':'')+'</div></div>';
+      }).join('');
+      return '<div style="background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px 16px"><div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:6px">'+esc(s.name)+'</div>'+rows+'</div>';
+    }).join('');
+    var reg=REGISTRY.map(function(r){
+      var ext=/外部/.test(r[3]);
+      return '<tr>'+td(r[0],{mono:true,c:'var(--mut)'})+td(r[1],{c:'#e2e8f0'})+td(r[2],{mono:true,c:'var(--mut)',max:'260px'})+
+        '<td style="padding:7px 10px;border-bottom:1px solid rgba(30,41,59,.6)"><span class="mono" style="font-size:10px;color:'+(ext?'var(--blue)':'var(--em2)')+'">'+esc(r[3])+'</span></td></tr>';
+    }).join('');
+    var registry=tableWrap(th('編號')+th('子系統')+th('函式 / 檔案')+th('狀態'), reg, REGISTRY.length, REGISTRY.length);
+
+    return '<div class="fadein" style="flex:1;overflow-y:auto;position:relative;z-index:10;padding:24px 30px"><div style="max-width:900px;margin:0 auto">'+
+      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">'+
+        '<h2 style="font-size:18px;font-weight:600;color:#fff;display:flex;align-items:center;gap:9px">'+IC.check({s:19})+' 驗證中心 · 一鍵自檢</h2>'+
+        '<span class="mono" style="font-size:11px;padding:3px 10px;border-radius:6px;color:'+(overall?'#04140e':'#fff')+';background:'+(overall?'var(--em2)':'var(--red)')+';font-weight:700">'+(overall?'全部通過 PASS':'有失敗 FAIL')+'</span>'+
+        '<span class="mono" style="font-size:10px;color:var(--mut2)">通過 '+totalPass+' · 警告 '+totalWarn+' · 失敗 '+totalFail+'</span>'+
+        '<button data-act="runval" class="mono" style="margin-left:auto;display:flex;align-items:center;gap:5px;font-size:11px;background:#0f1e34;color:var(--em2);border:1px solid var(--line2);border-radius:8px;padding:7px 12px">↻ 重新執行</button>'+
+      '</div>'+
+      '<div style="font-size:12px;font-weight:700;color:var(--mut);letter-spacing:.5px;margin-bottom:8px">總覽矩陣 SUMMARY MATRIX</div>'+matrix+
+      '<div style="font-size:12px;font-weight:700;color:var(--mut);letter-spacing:.5px;margin:20px 0 10px">子系統明細 SUBSYSTEM PAGES</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">'+pages+'</div>'+
+      '<div style="font-size:12px;font-weight:700;color:var(--mut);letter-spacing:.5px;margin:20px 0 8px">功能註冊表 FUNCTION REGISTRY</div>'+registry+
+    '</div></div>';
+  }
+
+  function ingestFiles(fileList){
+    var files = Array.prototype.slice.call(fileList||[]);
+    if(!files.length) return;
+    state.loadErr=''; var pending=files.length, names=[];
+    files.forEach(function(f){
+      var r=new FileReader();
+      r.onload=function(){
+        try{
+          var arr, low=(f.name||'').toLowerCase();
+          if(low.slice(-4)==='.csv'){ arr=parseCsv(r.result); }
+          else if(low.slice(-6)==='.jsonl'){ arr=r.result.split(/\r?\n/).filter(function(l){return l.trim();}).map(function(l){return JSON.parse(l);}); }
+          else { var data=JSON.parse(r.result); arr = Array.isArray(data)?data : (data.rows||data.items||data.Rows||[]); }
+          if(!Array.isArray(arr) || !arr.length) throw 0;
+          var kind = classify(f.name, arr[0]||{});
+          if(kind){ storeBucket(kind, arr); if(kind!=='ignore') names.push(f.name); }
+          else state.loadErr='無法辨識檔案類型: '+f.name;
+        }catch(e){ state.loadErr='解析失敗: '+f.name+'(不是有效 JSON/CSV)'; }
+        if(--pending===0){ if(names.length){ loaded.at=stampNow(); loaded.files=names; trackState.sel=null; } state.nav='loaded'; render(); }
+      };
+      r.readAsText(f);
+    });
+  }
+  function classify(name, sample){
+    var n=(name||'').toLowerCase();
+    // ---- 控管表 governing control sheet (explicit) ----
+    if(/control_sheet|controlsheet|governance|控管表|治理表|專案控管|master_?tracker/.test(n)) return 'control';
+    if((sample.ProjectCode!==undefined||sample['專案代號']!==undefined||sample['案號']!==undefined) &&
+       (sample.Status!==undefined||sample['狀態']!==undefined||sample.Owner!==undefined||sample['負責人']!==undefined)) return 'control';
+    // ---- VIA WorkOps v004 CSV outputs ----
+    if(/pending/.test(n) || (sample.PENDING_STATUS!==undefined && sample.CASE_ID!==undefined)) return 'pending';
+    if(/quality_check|quality_matrix/.test(n) || (sample.CHECK!==undefined && sample.RESULT!==undefined)) return 'qc';
+    if(/mail_enriched|mail_index|mail_intel/.test(n) || sample.MAIL_FINGERPRINT!==undefined || sample.PROCESS_STATUS!==undefined) return 'mails';
+    if(/mail_fetched/.test(n) || (sample.title!==undefined && sample.event_time!==undefined)) return 'mails';
+    if(/project_candidate|cluster_candidate|controlling/.test(n) || sample.AUTO_PROJECT_CODE!==undefined || sample.PROJECT_NAME_CANDIDATE!==undefined) return 'cases';
+    if(/stakeholder/.test(n) || sample.STAKEHOLDER!==undefined || sample.CONTACT!==undefined) return 'stake';
+    if(/keyword_dictionary|forge_|folder_scan|scan_error/.test(n)) return 'ignore';
+    // ---- Wizard: Mail_Events / Case_Groups / Stakeholders · SafeLocal: Subject_Events / Subject_Groups ----
+    if(n.indexOf('mail_event')>=0 || n.indexOf('mail-event')>=0 || n.indexOf('subject_event')>=0 || n.indexOf('subject-event')>=0) return 'mails';
+    if(n.indexOf('case_group')>=0 || n.indexOf('case-group')>=0 || n.indexOf('subject_group')>=0 || n.indexOf('subject-group')>=0) return 'cases';
+    if(n.indexOf('stakeholder')>=0) return 'stake';
+    // fall back to key sniffing
+    if(sample.MailID!==undefined && sample.Subject!==undefined && sample.ConversationID!==undefined && sample.WorkflowStatus===undefined) return 'mails';
+    if(sample.GroupID!==undefined || sample.WorkflowStatus!==undefined || sample.MailIDs!==undefined) return 'cases';
+    if(sample.FromCount!==undefined && sample.ToOrCcCount!==undefined) return 'stake';
+    return null;
+  }
+  // ---- minimal CSV parser (quoted fields, CRLF/LF, UTF-8 BOM) ----
+  function parseCsv(text){
+    text=(text||'').replace(/^﻿/,'');
+    var rows=[], row=[], cur='', inq=false, i, c;
+    for(i=0;i<text.length;i++){ c=text[i];
+      if(inq){ if(c==='"'){ if(text[i+1]==='"'){ cur+='"'; i++; } else inq=false; } else cur+=c; }
+      else { if(c==='"') inq=true; else if(c===','){ row.push(cur); cur=''; } else if(c==='\n'){ row.push(cur); rows.push(row); row=[]; cur=''; } else if(c==='\r'){} else cur+=c; }
+    }
+    if(cur.length||row.length){ row.push(cur); rows.push(row); }
+    if(!rows.length) return [];
+    var head=rows[0].map(function(h){return h.trim();});
+    return rows.slice(1).filter(function(r){return r.length && r.some(function(x){return x!=='';});}).map(function(r){
+      var o={}; head.forEach(function(h,j){ o[h]=r[j]!==undefined?r[j]:''; }); return o;
+    });
+  }
+  // ---- v004 → canonical normalizers ----
+  function num(v){ v=parseInt(v,10); return isNaN(v)?0:v; }
+  function firstAddr(s){ if(!s) return ''; return (''+s).split(/[;,]/)[0].trim(); }
+  function normMailV004(r){ return { MailID:r.MAIL_FINGERPRINT||r.CASE_ID||'', Subject:r.TITLE||r.NORMALIZED_TITLE||'', EventDate:r.TIME||'', Direction:r.DIRECTION||'', Unread:(r.READ_STATUS==='UNREAD'), ConversationID:r.CASE_ID||'', SuggestedCategory:r.PRIMARY_CATEGORY||'', ConfirmedCategory:r.PRIMARY_CATEGORY||'', WorkflowStatus:r.PROCESS_STATUS||'', SenderEmail:r.FROM_ADDRESS||r.FROM||'', AttachmentCount:0 }; }
+  function normStakeV004(r){ var em=r.CONTACT||r.STAKEHOLDER||''; var inb=num(r.INBOUND_COUNT), out=num(r.OUTBOUND_OR_TO_COUNT), cc=num(r.CC_COUNT); return { Email:em, Domain:((em.split('@')[1])||''), FromCount:inb, ToOrCcCount:out+cc, TotalTouches:inb+out+cc, LastDate:r.LAST_INBOUND||r.LAST_OUTBOUND||'' }; }
+  function normControl(r){
+    var g=function(keys){ for(var i=0;i<keys.length;i++){ var k=keys[i]; if(r[k]!==undefined && (''+r[k]).trim()!=='') return (''+r[k]).trim(); } return ''; };
+    return {
+      Code:    g(['ProjectCode','project_code','專案代號','案號','代號','Code']),
+      Name:    g(['ProjectName','project_name','專案名稱','案名','Name']),
+      Owner:   g(['Owner','owner','負責人','窗口','PIC']),
+      Status:  g(['Status','status','狀態','進度狀態']),
+      Progress:g(['Progress','progress','進度','完成','完成百分比']),
+      Due:     g(['DueDate','due','ETA','交期','截止','預計完成']),
+      Updated: g(['LastUpdated','last_updated','UpdatedAt','最後更新','更新日','更新日期']),
+      _raw:r
+    };
+  }
+  function normProjV004(r){ return { GroupID:r.AUTO_PROJECT_CODE||r.CLUSTER_ID||'', Subject:r.PROJECT_NAME_CANDIDATE||r.REPRESENTATIVE_TITLE||'', MessageCount:num(r.MAIL_COUNT), InboundCount:0, OutboundCount:0, LastDate:'', WorkflowStatus:'候選(待確認)', SuggestedCategory:r.PRIMARY_CATEGORY_CODE||'', ConfirmedCategory:r.PRIMARY_CATEGORY_CODE||'', NeedsAttention:false, MailIDs:[] }; }
+  // fetch_mailbox.py JSONL record: title/body/actor/counterparts/event_time/thread_id/source_ref
+  function isFetchMail(r){ return r.title!==undefined && (r.counterparts!==undefined || r.event_time!==undefined); }
+  function normMailFetch(r){ return { MailID:r.source_ref||r.thread_id||'', Subject:r.title||'', EventDate:(r.event_time||'').replace('T',' '), Direction:'', Unread:false, ConversationID:r.thread_id||'', SuggestedCategory:'', ConfirmedCategory:'', WorkflowStatus:'', SenderEmail:firstAddr(r.counterparts)||r.actor||'', AttachmentCount:0 }; }
+  function isV004Mail(r){ return r.MAIL_FINGERPRINT!==undefined || r.PROCESS_STATUS!==undefined || r.PRIMARY_CATEGORY!==undefined; }
+  function isV004Stake(r){ return r.STAKEHOLDER!==undefined || r.CONTACT!==undefined; }
+  function isV004Proj(r){ return r.AUTO_PROJECT_CODE!==undefined || r.PROJECT_NAME_CANDIDATE!==undefined; }
+  function storeBucket(kind, arr){
+    if(kind==='ignore') return;
+    if(kind==='pending'){ loaded.pending=arr; }
+    else if(kind==='control'){ loaded.control=arr.map(normControl); state.recAppr={}; }
+    else if(kind==='qc'){ loaded.qc=arr; }
+    else if(kind==='mails'){ loaded.mails=arr.map(function(r){ return isV004Mail(r)?normMailV004(r): isFetchMail(r)?normMailFetch(r): r; }); }
+    else if(kind==='stake'){ loaded.stake=arr.map(function(r){ return isV004Stake(r)?normStakeV004(r):r; }); }
+    else if(kind==='cases'){ loaded.cases=arr.map(function(r){ return isV004Proj(r)?normProjV004(r):r; }); }
+  }
+  function stampNow(){ var d=new Date(); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+':'+String(d.getSeconds()).padStart(2,'0'); }
+  function today(){ var d=new Date(); return d.getFullYear()+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0'); }
+
+  /* =================== SLIDE DECK (professional, print→PDF) =================== */
+  function buildDeckSlides(){
+    var cases = loaded.cases.slice();
+    var mails = loaded.mails;
+    // category counts
+    var byCat = {};
+    (cases.length?cases:mails).forEach(function(x){ var c=x.ConfirmedCategory||x.SuggestedCategory||'99_其他待確認'; byCat[c]=(byCat[c]||0)+1; });
+    var catRows = Object.keys(byCat).sort().map(function(k){ return {k:k,n:byCat[k]}; });
+    var needs = cases.filter(function(c){ return c.NeedsAttention===true||c.NeedsAttention==='True'; });
+    var byStatus = {};
+    cases.forEach(function(c){ var s=c.WorkflowStatus||'未分類'; (byStatus[s]=byStatus[s]||[]).push(c); });
+
+    var slides = [];
+    // 1) Title
+    slides.push({type:'title', title:'專案狀態簡報', sub:'Veritas Mail-Ops · Project Status Review', meta:today()+' · 來源: '+(loaded.files.join(', ')||'本機匯出')});
+    // 2) Summary KPIs
+    slides.push({type:'kpi', title:'摘要 Overview', kpis:[
+      {n:mails.length, l:'郵件事件'}, {n:cases.length, l:'案件 / 討論串'},
+      {n:needs.length, l:'需要我行動', hot:true}, {n:catRows.length, l:'分類數'}
+    ], cats:catRows});
+    // 3) Needs-attention
+    if(needs.length){
+      slides.push({type:'list', title:'需優先處理 · Needs Action', accent:'#c0392b', items:needs.slice(0,10).map(function(c){
+        return { a:c.Subject||c.ConversationID||'(無主旨)', b:(c.WorkflowStatus||'')+' · 最後 '+(c.LastDate||''), c:'IN '+(c.InboundCount||0)+' / OUT '+(c.OutboundCount||0) };
+      }), more: needs.length>10 ? needs.length-10 : 0 });
+    }
+    // 4) One slide per workflow status
+    Object.keys(byStatus).forEach(function(s){
+      var arr = byStatus[s].slice(0,10);
+      slides.push({type:'list', title:'工作流狀態：'+s, accent:'#2c5aa0', items:arr.map(function(c){
+        return { a:c.Subject||c.ConversationID||'(無主旨)', b:(c.ConfirmedCategory||c.SuggestedCategory||''), c:'最後 '+(c.LastDate||'') };
+      }), more: byStatus[s].length>10 ? byStatus[s].length-10 : 0 });
+    });
+    // 5) Closing
+    slides.push({type:'title', title:'謝謝', sub:'Generated offline by Veritas Mail-Ops', meta:'資料未離開本機 · '+today()});
+    return slides;
+  }
+  function slideHTML(s, idx, total, forPrint){
+    var pad = forPrint ? '48px 60px' : '0';
+    var wrap = 'font-family:var(--sans);color:#1e2530;background:#ffffff;'+(forPrint?'':'width:100%;max-width:960px;');
+    var bar = '<div style="height:6px;background:linear-gradient(90deg,#c96b5a 0 16%,#c4943a 0 33%,#5a9e6f 0 50%,#439a9a 0 66%,#4c78a8 0 83%,#7a6daa 0 100%)"></div>';
+    var foot = '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:26px;padding-top:12px;border-top:1px solid #e6e8ec;font-family:var(--mono);font-size:11px;color:#9aa2ad"><span>VERITAS MAIL-OPS</span><span>'+(idx+1)+' / '+total+'</span></div>';
+    var inner='';
+    if(s.type==='title'){
+      inner='<div style="display:flex;flex-direction:column;justify-content:center;min-height:'+(forPrint?'70vh':'420px')+'">'+
+        '<div style="font:800 44px/1.15 var(--sans);color:#141a22;margin-bottom:14px">'+esc(s.title)+'</div>'+
+        '<div style="font:600 18px var(--sans);color:#5a6472;margin-bottom:8px">'+esc(s.sub)+'</div>'+
+        '<div style="font-family:var(--mono);font-size:13px;color:#9aa2ad">'+esc(s.meta)+'</div>'+
+      '</div>';
+    } else if(s.type==='kpi'){
+      var kp = s.kpis.map(function(k){ return '<div style="flex:1;background:'+(k.hot?'#fbece9':'#f5f7f9')+';border:1px solid '+(k.hot?'#e7b4ab':'#e6e8ec')+';border-radius:14px;padding:20px 16px;text-align:center"><div style="font:800 40px var(--sans);color:'+(k.hot?'#c0392b':'#1f6f5c')+'">'+k.n+'</div><div style="font-size:13px;color:#5a6472;margin-top:4px">'+esc(k.l)+'</div></div>'; }).join('');
+      var cats = s.cats.map(function(c){
+        var pct = Math.round(c.n / Math.max(1, s.cats.reduce(function(a,x){return Math.max(a,x.n);},1)) * 100);
+        return '<div style="display:flex;align-items:center;gap:12px;margin:7px 0"><div style="width:220px;font-size:13px;color:#3a4150;font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(c.k)+'</div><div style="flex:1;height:16px;background:#eef1f4;border-radius:8px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:#439a9a"></div></div><div style="width:34px;text-align:right;font-weight:700;color:#1e2530">'+c.n+'</div></div>';
+      }).join('');
+      inner='<div style="font:800 30px var(--sans);color:#141a22;margin-bottom:20px">'+esc(s.title)+'</div>'+
+        '<div style="display:flex;gap:14px;margin-bottom:26px">'+kp+'</div>'+
+        '<div style="font-size:13px;font-weight:700;color:#5a6472;margin-bottom:8px;letter-spacing:.5px">分類分布 BY CATEGORY</div>'+cats;
+    } else if(s.type==='list'){
+      var items = s.items.map(function(it){
+        return '<div style="display:flex;gap:14px;padding:11px 0;border-bottom:1px solid #eef1f4"><div style="width:5px;border-radius:3px;background:'+(s.accent||'#439a9a')+';flex:none"></div>'+
+          '<div style="flex:1;min-width:0"><div style="font-size:16px;font-weight:600;color:#1e2530;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(it.a)+'</div>'+
+          '<div style="font-family:var(--mono);font-size:12px;color:#8a929d;margin-top:2px">'+esc(it.b)+'</div></div>'+
+          '<div style="font-family:var(--mono);font-size:12px;color:#5a6472;align-self:center;flex:none">'+esc(it.c)+'</div></div>';
+      }).join('');
+      inner='<div style="font:800 28px var(--sans);color:#141a22;margin-bottom:6px;border-left:6px solid '+(s.accent||'#439a9a')+';padding-left:14px">'+esc(s.title)+'</div>'+
+        '<div style="margin-top:16px">'+items+'</div>'+
+        (s.more?'<div style="font-family:var(--mono);font-size:12px;color:#9aa2ad;margin-top:12px">…另有 '+s.more+' 筆</div>':'');
+    }
+    return '<div class="pslide" style="'+wrap+'">'+bar+'<div style="padding:'+pad+'">'+inner+foot+'</div></div>';
+  }
+  function deckOverlay(){
+    if(!deck.open) return '';
+    var s = deck.slides[deck.idx] || deck.slides[0];
+    return '<div id="deck" style="position:fixed;inset:0;z-index:120;background:#0b0f16;display:flex;flex-direction:column">'+
+      '<div style="flex:1;display:flex;align-items:center;justify-content:center;padding:4vh 5vw;overflow:auto">'+
+        '<div style="width:100%;max-width:980px;box-shadow:0 24px 60px rgba(0,0,0,.5);border-radius:14px;overflow:hidden">'+slideHTML(s, deck.idx, deck.slides.length, false)+'</div>'+
+      '</div>'+
+      '<div style="flex:none;display:flex;align-items:center;justify-content:center;gap:14px;padding:14px;color:#9aa2ad;font-family:var(--mono);font-size:12px;background:#0b0f16;border-top:1px solid #1b2330">'+
+        '<button data-deck="prev" style="display:flex;align-items:center;gap:5px;color:#cbd5e1;border:1px solid #2a3444;border-radius:8px;padding:7px 14px">← 上一頁</button>'+
+        '<span>'+(deck.idx+1)+' / '+deck.slides.length+' · ← → 換頁 · Esc 離開</span>'+
+        '<button data-deck="next" style="display:flex;align-items:center;gap:5px;color:#cbd5e1;border:1px solid #2a3444;border-radius:8px;padding:7px 14px">下一頁 →</button>'+
+        '<button data-deck="print" style="display:flex;align-items:center;gap:6px;color:#0b0f16;background:var(--em2);border-radius:8px;padding:7px 14px;font-weight:700;margin-left:16px">'+IC.printer({s:14})+' 列印 / PDF</button>'+
+        '<button data-deck="exit" style="display:flex;align-items:center;gap:5px;color:#cbd5e1;border:1px solid #2a3444;border-radius:8px;padding:7px 14px">'+IC.x({s:13})+' 離開</button>'+
+      '</div>'+
+    '</div>';
+  }
+  function renderDeck(){
+    // screen overlay appended to #app; print stack into #deckprint
+    var host = D.getElementById('deckhost');
+    if(!host){ host=D.createElement('div'); host.id='deckhost'; D.getElementById('app').appendChild(host); }
+    host.innerHTML = deckOverlay();
+    var pr = D.getElementById('deckprint');
+    pr.innerHTML = deck.open ? deck.slides.map(function(s,i){ return slideHTML(s,i,deck.slides.length,true); }).join('') : '';
+  }
+  function openDeck(){ deck.slides=buildDeckSlides(); deck.idx=0; deck.open=true; renderDeck(); }
+  function closeDeck(){ deck.open=false; renderDeck(); }
+  function deckNav(dir){ if(dir==='next') deck.idx=Math.min(deck.idx+1,deck.slides.length-1); else if(dir==='prev') deck.idx=Math.max(deck.idx-1,0); renderDeck(); }
+
+  /* ============================= EVENTS ============================= */
+  D.getElementById('app').addEventListener('click', function(e){
+    var t = e.target.closest('[data-act],[data-nav],[data-open],[data-addtask],[data-move],[data-ltab],[data-deck],[data-tsel],[data-tplsel],[data-tplact]');
+    if(!t) return;
+    if(t.dataset.tplsel){ state.tplSel=t.dataset.tplsel; render(); return; }
+    if(t.dataset.tplact){ tplAction(t.dataset.tplact); return; }
+    if(t.dataset.deck){ var dd=t.dataset.deck; if(dd==='exit') closeDeck(); else if(dd==='print') window.print(); else deckNav(dd); return; }
+    if(t.dataset.act==='deck'){ openDeck(); return; }
+    if(t.dataset.act==='inject'){ var s=SAMPLES[sampleIdx%SAMPLES.length]; sampleIdx++; var a=engine.ingest({sender:s.sender,subject:s.subject,body:s.body,time:'Just Now'}); if(a) state.selected=a.id; state.nav='inbox'; persist(); render(); return; }
+    if(t.dataset.act==='reset'){ if(confirm('清除本機示範資料並重新載入種子資料？')){ try{localStorage.removeItem(LS);}catch(e){} sampleIdx=0; boot(); } return; }
+    if(t.dataset.act==='pickjson'){ var inp=D.createElement('input'); inp.type='file'; inp.accept='.json,application/json'; inp.multiple=true; inp.onchange=function(){ ingestFiles(inp.files); }; inp.click(); return; }
+    if(t.dataset.act==='clearjson'){ loaded={mails:[],cases:[],stake:[],pending:[],qc:[],control:[],at:null,files:[]}; trackState.sel=null; state.recAppr={}; state.loadErr=''; render(); return; }
+    if(t.dataset.act==='exportcsv'){ exportTrackCsv(); return; }
+    if(t.dataset.act==='runval'){ render(); return; }
+    if(t.dataset.act==='resetset'){ settings=JSON.parse(JSON.stringify(DEFAULT_SET)); saveSettings(); trackState.sel=null; render(); return; }
+    if(t.dataset.tsel){ var id=t.dataset.tsel; if(!trackState.sel) trackState.sel={}; trackState.sel[id]=!trackState.sel[id]; render(); return; }
+    if(t.dataset.ltab){ state.loadedTab=t.dataset.ltab; render(); return; }
+    if(t.dataset.nav){ state.nav=t.dataset.nav; render(); return; }
+    if(t.dataset.open){ var m=engine.vault.get(t.dataset.open); if(m){ m.isUnread=false; state.selected=m.id; persist(); render(); } return; }
+    if(t.dataset.addtask){ var p=t.dataset.addtask.split('|'); var mm=engine.vault.get(p[0]); engine.addTask(p[1], mm?mm.project:'未分類專案', p[2], p[0]); persist(); flashBoardHint(); render(); return; }
+    if(t.dataset.move){ var q=t.dataset.move.split('|'); engine.moveTask(q[0], q[1]); persist(); render(); return; }
+  });
+  D.getElementById('app').addEventListener('input', function(e){
+    if(e.target.id==='q'){ state.query=e.target.value; var f=D.activeElement, c=f&&f.selectionStart;
+      // re-render inbox list only-ish: simplest is full render + refocus
+      render(); var nq=D.getElementById('q'); if(nq){ nq.focus(); try{nq.setSelectionRange(c,c);}catch(_){} } return; }
+    var tf=e.target.getAttribute && e.target.getAttribute('data-tf');
+    if(tf){
+      var t=currentTpl(); if(!t) return;
+      t[tf]=e.target.value;
+      if(tf==='name') t.key=tplKeyFromName(e.target.value);
+      saveTemplates();
+      // live-update preview only (no full render → caret preserved in the field being typed)
+      if(tf==='subject'){ var ps=D.getElementById('tplprevsubj'); if(ps) ps.textContent='主旨:'+fillVars(e.target.value); }
+      if(tf==='body'){ var pb=D.getElementById('tplpreview'); if(pb) pb.innerHTML=fillVars(e.target.value); }
+      return;
+    }
+  });
+  function flashBoardHint(){ /* subtle: switch nothing, task lands in board; ledger records it */ }
+
+  // Drag-drop of exported JSON onto the dropzone (offline, in-memory)
+  var appEl = D.getElementById('app');
+  appEl.addEventListener('dragover', function(e){ var dz=e.target.closest&&e.target.closest('#dropzone'); if(dz){ e.preventDefault(); dz.style.borderColor='var(--em)'; dz.style.background='rgba(16,185,129,.06)'; } });
+  appEl.addEventListener('dragleave', function(e){ var dz=e.target.closest&&e.target.closest('#dropzone'); if(dz){ dz.style.borderColor='var(--line2)'; dz.style.background='rgba(5,11,20,.5)'; } });
+  appEl.addEventListener('drop', function(e){ var dz=e.target.closest&&e.target.closest('#dropzone'); if(dz){ e.preventDefault(); if(e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files.length) ingestFiles(e.dataTransfer.files); } });
+
+  D.getElementById('app').addEventListener('change', function(e){
+    if(e.target.getAttribute && e.target.getAttribute('data-thr')!=null){
+      settings.thr = (+e.target.value)/100; saveSettings();
+      resetTrackSel(computeTrackList());
+      render();
+    }
+    if(e.target.getAttribute && e.target.getAttribute('data-wt')!=null){
+      settings.w[e.target.getAttribute('data-wt')] = (+e.target.value)/100; saveSettings();
+      trackState.sel=null; render();
+    }
+  });
+
+  D.addEventListener('keydown', function(e){
+    if(!deck.open) return;
+    if(e.key==='ArrowRight'||e.key===' '){ e.preventDefault(); deckNav('next'); }
+    else if(e.key==='ArrowLeft'){ e.preventDefault(); deckNav('prev'); }
+    else if(e.key==='Escape'){ closeDeck(); }
+  });
+
+  boot();
+})();
+</script>
+</body>
+</html>
