@@ -1,0 +1,14 @@
+{
+  "record_id": "VIA_ExternalInstaller_Remediation_Record_v0100",
+  "record_date": "2026-08-05",
+  "event": "外部 AI 產生之 CGE OneShot 安裝器於操作員機器執行",
+  "kept_good": "資料面成果有效且已入 governance_vocab:curated 141 詞條/499 V regex、matrix 77 dataset(provider 77/77 歸類)+175 instrument+TW 衍生 21、SSOT 戶政 298 檔(重複群 38/81 檔,dedup_plan dry-run 產出)、ledger 2455 事件",
+  "regressions_on_operator_machine": {
+    "hydra": "v0400 引擎被解壓至 VIA_Governance_Runtime\\ — 與 VIA_Central_Governance\\ 正本家族重複(repo 未受影響,屬本機未追蹤檔)",
+    "wiring_rollback": "bin\\via-gov.cmd 被改指該 v0400 副本 — 丟失 v0401 TAB UI + 兩修復(repo HEAD 的 via-gov.cmd 仍正確指 v0401)"
+  },
+  "remediation": "操作員端兩指令:git checkout 還原 via-gov.cmd;刪除 Governance_Runtime 下的 v0400 未追蹤副本(正本在 Central_Governance 完整保留,零損失)",
+  "permanent_prevention": "ssot/VIA_AICodegen_Prompt_SSOT_v0100.md — AI 撰寫規範 Prompt(平台座標/現役接線不得倒退/九頭龍防治/一貼即用交付契約/自我驗證閘);今後給任何 AI 寫碼一律先貼此 SSOT",
+  "note_fetch_tw": "此輪 fetch-tw 失敗為 IncompleteRead(網路中斷非憑證)——重跑即可,或 --tw-source 用已存證快照",
+  "append_only": true
+}

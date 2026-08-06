@@ -66,6 +66,7 @@ supportive modules/
 | VRN 生產線 | `functional modules/VRN/registry/VRN_Production_Manifest.json` | v1.1.0(核心模組 SHA256 錨定) |
 | 設計鎖 tokens | `supportive modules/ssot/VIA_DesignLock_SSOT_v0100.json` | v0100 ACTIVE(palette/fonts/刊頭配方/印章家族 理鑑鍛郵核/compact 字級) |
 | 公定處理模式 | `supportive modules/ssot/VIA_MegaPrompt_OfficialMode_v0100.md` | v0100(三輪硬性上限、20 加速器、沙盒循環;執行載體 `via-mega`) |
+| AI 撰寫規範 | `supportive modules/ssot/VIA_AICodegen_Prompt_SSOT_v0100.md` | v0100(給任何 AI 的一貼即用 PS 撰寫契約:座標/鐵律/交付/驗證閘) |
 | 欄位 regex 庫 | `functional modules/VRN/InvestmentRegexPattern_VALIDATED.py` | v3.0 ACTIVE(525 patterns;PROMOTION_RECORD 錨定 SHA256) |
 | 同義字引擎 | `supportive modules/ssot/via_synonym_engine_v0100.py` + Seed | v0100 ACTIVE(41 canonical 錨點;同義字增量只增不減) |
 | 編碼註冊中心 | `supportive modules/registry/VIA_AutoCode_Registry_v0100.json` | v0100(八架構類別+泛用狀態;六共存域不侵入;`via-code`) |
