@@ -27,7 +27,7 @@ pwsh -File "VeritasIntelligenceAnalytics\Install-VIA.ps1"     # 加 -AutoStart �
 | `via-import` | manifest 匯入:Downloads 批次去重入庫(清單由 Claude 寫進 `import_manifests/`) |
 | `via-vmt` | VMT SuperBOM 總指揮(v0102 設計鎖刊頭;問卷→附件→收斂→CPM,缺件優雅略過) |
 | `via-vmt-init` | VMT 資料層 bootstrap:OneShot 對準 VMT 根建 DB/SSOT 種子 + 跑郵件器 + Command Center |
-| `via-mega` | 公定處理模式 v0104:三輪全景 x 20 加速器 x Porcelain Matrix;參數置頂可增減(`--set k=v`)、附掛掃描根、parquet 增量 store(DuckDB)、rich 摘要矩陣 |
+| `via-mega` | 公定處理模式 v0105:三輪全景 x 20 加速器 x Porcelain Matrix;參數置頂可增減(`--set k=v`)、附掛掃描根、parquet 增量 store(DuckDB)、rich 摘要矩陣;hydra 僅平台域 |
 | `via-code` | 自動識別編號器:`via-code <類別> <元件> [suffix]`(冪等給號;`--list`;`--register`) |
 | `via-gov` | 中央治理引擎 CGE v0401:TAB 多頁儀表板+台股登記簿 1977 檔(dry-run 預設;`--commit`;`--fetch-tw`) |
 | `via-vdf` | VDF 一鍵側欄工作台(v0160C 一般瀏覽器 HTML U/I + 本機 HTTP 橋;SHA256+AST 閘門;回退 v0102/v0101) |
@@ -99,4 +99,4 @@ supportive modules/
 | 範疇已凍結項目 | 見 `audit_tools/VIA_ScopeFreeze_Closure_v0100.json`;重開需操作員點名 |
 
 ---
-*營運手冊 2026-08-06 · 對應 Tower v005 / Mega v0104 / VMT v0102 / VDF 工作台 v0160C / UI Hub v0103 Porcelain / TickerRegex v0100 / VRN v1.1.0 / 判定表 v002*
+*營運手冊 2026-08-06 · 對應 Tower v005 / Mega v0105 / VMT v0102 / VDF 工作台 v0160C / UI Hub v0103 Porcelain / TickerRegex v0100 / VRN v1.1.0 / 判定表 v002*

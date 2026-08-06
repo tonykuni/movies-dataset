@@ -1,0 +1,19 @@
+{
+  "record": "VIA_Mega_v0105_Promotion_Record",
+  "version": "v0100",
+  "date": "2026-08-06",
+  "action": "Mega v0104 -> v0105:hydra 偵測預設僅平台域",
+  "trigger": "操作員機 v0104 首跑 R1 YELLOW(hydra 7)— 全部來自 ATT:VMT_ROOT 附掛資料層與平台正本的部署副本同名,屬附掛之常態非九頭龍",
+  "change": "names 記錄加 kind;hydra 池預設過濾 kind==PLATFORM;跨域同名降為資訊項 att_kin(rich 摘要顯示);PARAMS.hydra_include_attachments=true 可還原 v0104 行為",
+  "ssot_floor_note": "AICodegen SSOT v0101 接線地板 via-mega→v0104 為下限語意,v0105>=v0104 不構成倒退,SSOT 不需升版",
+  "hashes": {
+    "v0104(retained)": "575867db1e059317cc3a75e994160ea0144140138558fef1079acd24f610f901",
+    "v0105(new ACTIVE)": "e15304f9fc06ae46f801d03ee227c0757a5b197f2507d0d549d7f3d53cd98154"
+  },
+  "verification": "py_compile PASS;容器實跑 hydra 0(v0104 同庫 7 → 0 因無附掛;邏輯路徑經 --set 驗證);唯一 RED 為既知容器 py3.11 f-string 地雷,操作員機不受影響",
+  "governance": [
+    "正本不就地修改",
+    "hash 鎖定交易",
+    "append-only"
+  ]
+}
