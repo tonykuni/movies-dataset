@@ -1,0 +1,24 @@
+﻿def_column,def_meaning,def_value_type,def_engine_purpose
+def_matrix_id,唯一矩陣列 ID,run_id + sequence,所有格式統一主鍵
+def_run_id,執行批次 ID,timestamp + engine version,append-only 回溯
+def_ingested_at,讀取時間,ISO datetime,資料新舊與演化判斷
+def_source_path,來源路徑,WindowsPath,來源追溯
+def_file_name,檔名,string,去重與角色分類
+def_ext,副檔名,.html/.json/.csv/.py/...,格式路由
+def_format_family,格式家族,table/structured/html_ui/code/...,Reader 分派
+def_domain,領域,SSOT/BOM/PMIS/UI/Engine/...,VIA 模組歸位
+def_role,角色,CanonicalSSOT/Registry/Matrix/Engine/...,SSOT 推升規則
+def_exists,是否存在,bool,路徑健康檢查
+def_status,讀取狀態,READ_OK/MISSING_SOURCE/ERROR_READ_PARTIAL,Gate 判斷
+def_risk,風險,LOW/MEDIUM_REVIEW/HIGH_REVIEW,不產生九頭龍風險
+def_sha12,檔案指紋,sha256 first 12,去重與版本控制
+def_reader,讀取器,json/csv/html/PyMuPDF/...,可驗證 Reader trace
+def_text_chars,文字量,int,讀懂程度 proxy
+def_table_count,表格數,int,矩陣與表格擷取 proxy
+def_record_count,紀錄數,int,資料型檔案規模
+def_schema_keys,schema/headings/functions,string,自動字典/欄位 registry
+def_keyword_hits,SSOT 關鍵字命中,semicolon list,推升候選 SSOT
+def_canonical_area,歸一區域,SSOT::...,統一 Canonical Layer
+def_ingest_action,建議動作,PROMOTE/REGISTER/LINK/REVIEW,下一步操作
+def_validation_gate,驗證門,STATIC_PASS/REVIEW/BLOCKED,安全落地
+def_evolution_score,演化分數,0-100,優先級排序

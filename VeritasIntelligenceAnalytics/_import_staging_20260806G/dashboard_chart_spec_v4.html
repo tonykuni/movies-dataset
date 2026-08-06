@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VERITAS 儀表板圖規格表 v4</title>
+<style>
+  :root{--bg:#f5f4f0;--paper:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+    --line:#dbd9d3;--soft:#ecebe6;--red:#c96b5a;--gold:#c4943a;--green:#5a9e6f;--teal:#439a9a;--blue:#4c78a8;--purple:#7a6daa;--brown:#876d49;
+    --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink2);max-width:1120px;margin:0 auto;padding:0 26px 60px;
+    font:13.5px/1.7 "Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;}
+  body::before{content:"";position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);z-index:50;opacity:.92}
+  header{padding:34px 0 16px;border-bottom:2px solid var(--ink);margin-bottom:22px;}
+  .kick{font-size:10.5px;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;font-weight:700;margin-bottom:8px;}
+  h1{font-size:23px;font-weight:800;color:var(--ink);letter-spacing:.2px;}
+  h1 .a{color:var(--red);}
+  .sub{margin-top:9px;font-size:12.5px;color:var(--mut);max-width:860px;}
+  h2{font-size:16px;font-weight:800;color:var(--ink);margin:26px 0 12px;padding-bottom:9px;position:relative;display:flex;align-items:center;gap:10px;}
+  h2::after{content:"";position:absolute;left:0;bottom:0;width:100%;height:1px;background:var(--line);}
+  h2::before{content:"";position:absolute;left:0;bottom:-1px;width:50px;height:3px;background:var(--reson);border-radius:2px;}
+  h2 .no{font-size:11px;color:#fff;background:var(--ink);min-width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-weight:800;}
+  table{width:100%;border-collapse:separate;border-spacing:0;font-size:12px;background:var(--paper);border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 3px rgba(31,42,42,.05);}
+  thead th{background:var(--ink);color:#f3efe6;text-align:center;vertical-align:top;padding:8px 10px;font-size:10.5px;font-weight:700;letter-spacing:.4px;border-bottom:2px solid var(--red);}
+  tbody td{padding:7px 10px;border-top:1px solid var(--soft);vertical-align:top;line-height:1.55;overflow-wrap:break-word;}
+  tbody tr:nth-child(even){background:#f6f4ef;}
+  td.first{font-weight:700;color:var(--ink);text-align:left;white-space:nowrap;}
+  td.c{text-align:center;} td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;}
+  .sw{display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin-right:5px;border:1px solid rgba(0,0,0,.12);}
+  .pill{display:inline-block;font-size:9.5px;font-weight:800;color:#fff;border-radius:9px;padding:2px 8px;letter-spacing:.3px;}
+  .p-bar{background:var(--blue)} .p-line{background:var(--green)} .p-stack{background:var(--purple)} .p-dual{background:var(--gold)} .p-norm{background:var(--red)}
+  .demo{display:inline-flex;gap:3px;align-items:flex-end;height:18px;vertical-align:-4px}
+  .demo i{width:5px;background:var(--teal);display:inline-block;border-radius:1px 1px 0 0}
+  .note{background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--red);border-radius:8px;padding:11px 14px;font-size:11.8px;color:var(--mut);margin:8px 0 16px;line-height:1.65;}
+  .note b{color:var(--ink);}
+  footer{margin-top:30px;border-top:1px solid var(--line);padding-top:14px;font-size:10.5px;color:var(--mut);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+  footer .v{font-weight:800;letter-spacing:1.4px;color:var(--ink);}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:.92em;background:var(--soft);padding:1px 5px;border-radius:4px;color:var(--ink);}
+</style>
+</head>
+<body>
+<header>
+  <div class="kick">VERITAS INTELLIGENCE ANALYTICS · MACRO DASHBOARD · CHART SPECIFICATION</div>
+  <h1>儀表板圖規格表 <span class="a">v4</span>（靜態 Seaborn / 交易日序軸）</h1>
+  <p class="sub">本表定義各面板圖型、直條樣式、雙軸規則、配色、時間區間與更新項。對應 <code>macro_dashboard.py</code>。資料時點 2026-06-16。</p>
+</header>
+
+<h2><span class="no">1</span>直條圖樣式規格</h2>
+<table>
+  <thead><tr><th>樣式</th><th>用途</th><th>間隙(寬度因子)</th><th>邊框</th><th>框內透明度</th><th>單獨/堆疊</th><th>示意</th></tr></thead>
+  <tbody>
+    <tr><td class="first">無空隙 seamless</td><td>密集日資料(殖利率利差)</td><td class="c">無空隙　factor 1.00</td><td class="c">無框</td><td class="n">0.80</td><td class="c">單獨</td><td><span class="demo"><i style="height:10px"></i><i style="height:16px"></i><i style="height:8px"></i><i style="height:13px"></i><i style="height:11px"></i></span></td></tr>
+    <tr><td class="first">極小空隙 tiny</td><td>月/週資料(非農·零售·初領)</td><td class="c">極小空隙　factor 0.92</td><td class="c">有框 0.8 實線</td><td class="n">0.80</td><td class="c">單獨</td><td><span class="demo"><i style="height:10px;border:1px solid #2a6b6b"></i><i style="height:16px;border:1px solid #2a6b6b"></i><i style="height:8px;border:1px solid #2a6b6b"></i><i style="height:13px;border:1px solid #2a6b6b"></i></span></td></tr>
+    <tr><td class="first">低間隙 low</td><td>需更清楚分隔之長條</td><td class="c">低間隙　factor 0.82</td><td class="c">有框 0.8 實線</td><td class="n">0.80</td><td class="c">單獨</td><td><span class="demo"><i style="height:10px;border:1px solid #2a6b6b"></i><i style="height:16px;border:1px solid #2a6b6b"></i><i style="height:8px;border:1px solid #2a6b6b"></i></span></td></tr>
+    <tr><td class="first">堆疊 stacked</td><td>佔比(各期間失業比重→100%)</td><td class="c">極小空隙　factor 0.92</td><td class="c">有框 0.8 實線</td><td class="n">0.80</td><td class="c">堆疊</td><td><span class="demo"><i style="height:16px;border:1px solid #2a6b6b"></i><i style="height:16px;border:1px solid #2a6b6b"></i><i style="height:16px;border:1px solid #2a6b6b"></i></span></td></tr>
+  </tbody>
+</table>
+<div class="note"><b>邊框規則:</b>有框者邊框 <b>粗 0.8、實線、不透明</b>;框內填色 <b>透明度 0.80</b>(<code>facecolor=rgba(color,0.8)</code> + <code>edgecolor=color, lw=0.8</code>)。無空隙=寬度貼合相鄰直條;極小空隙=留 8% 間隙;低間隙=留 18%。</div>
+
+<h2><span class="no">2</span>時間區間預設(壓起始數據日 · 正規化基準=起始日)</h2>
+<table>
+  <thead><tr><th>代號</th><th>說明</th><th>起始日</th><th>指令</th></tr></thead>
+  <tbody>
+    <tr><td class="first">60D</td><td>近一季(約60交易日)</td><td class="c">今日−60交易日</td><td><code>macro_dashboard.py 60D</code></td></tr>
+    <tr><td class="first">120D</td><td>近半年(約120交易日)</td><td class="c">今日−120交易日</td><td><code>macro_dashboard.py 120D</code></td></tr>
+    <tr><td class="first">240D</td><td>近一年(約240交易日)</td><td class="c">今日−240交易日</td><td><code>macro_dashboard.py 240D</code></td></tr>
+    <tr><td class="first">YTD<span class="pill p-norm" style="margin-left:6px">預設</span></td><td>年初至今</td><td class="c">2025-01-02</td><td><code>macro_dashboard.py</code></td></tr>
+    <tr><td class="first">2023 / 2021</td><td>向前推至該年初</td><td class="c">2023-01-02 / 2021-01-02</td><td><code>macro_dashboard.py 2023</code></td></tr>
+    <tr><td class="first">10Y / 15Y / 20Y</td><td>近 N 年</td><td class="c">今日−N年</td><td><code>macro_dashboard.py 10Y</code></td></tr>
+    <tr><td class="first">ALL</td><td>全部可得</td><td class="c">2005-01-03 起</td><td><code>macro_dashboard.py ALL</code></td></tr>
+  </tbody>
+</table>
+
+<h2><span class="no">3</span>各面板規格(11 面板)</h2>
+<table>
+  <thead><tr><th>#</th><th>面板</th><th>左軸(序列·單位)</th><th>右軸(序列·單位)</th><th>圖型</th></tr></thead>
+  <tbody>
+    <tr><td class="c n">①</td><td class="first">股價指數(2.5×高)</td><td>三大+群組指數 標準化(指數)</td><td>同左(鏡像)</td><td><span class="pill p-norm">標準化線</span></td></tr>
+    <tr><td class="c n">②</td><td class="first">原油·美元</td><td>Brent/WTI(美元/桶)</td><td>美元指數(指數)</td><td><span class="pill p-dual">雙軸線</span></td></tr>
+    <tr><td class="c n">③</td><td class="first">波動·殖利率</td><td>VIX(指數)</td><td>美國10年期殖利率(%)</td><td><span class="pill p-dual">雙軸線</span></td></tr>
+    <tr><td class="c n">④</td><td class="first">黃金·美元</td><td>黃金期貨(美元/盎司)</td><td>美元指數(指數)</td><td><span class="pill p-dual">雙軸線</span></td></tr>
+    <tr><td class="c n">⑤</td><td class="first">10Y-2Y 利差</td><td>利差(%)<span class="sw" style="background:var(--teal)"></span>無空隙直條</td><td>10Y/2Y 殖利率(%)實線</td><td><span class="pill p-bar">直條</span> + <span class="pill p-line">線</span></td></tr>
+    <tr><td class="c n">⑥</td><td class="first">10Y-3M 利差</td><td>利差(%)<span class="sw" style="background:var(--gold)"></span>無空隙直條</td><td>10Y/3M 殖利率(%)實線</td><td><span class="pill p-bar">直條</span> + <span class="pill p-line">線</span></td></tr>
+    <tr><td class="c n">⑦</td><td class="first">PMI·標普</td><td>ISM 製造/非製造 PMI(指數)</td><td>標普500(指數)</td><td><span class="pill p-dual">雙軸線</span></td></tr>
+    <tr><td class="c n">⑧</td><td class="first">通膨·原油</td><td>CPI/PPI 年增率(%)</td><td>Brent/WTI(美元/桶)</td><td><span class="pill p-dual">雙軸線</span></td></tr>
+    <tr><td class="c n">⑨</td><td class="first">非農·失業率</td><td>非農月變動(千人)<span class="sw" style="background:var(--blue)"></span>極小空隙有框</td><td>失業率(%)</td><td><span class="pill p-bar">直條</span> + <span class="pill p-line">線</span></td></tr>
+    <tr><td class="c n">⑩</td><td class="first">失業結構·初領</td><td>各期間失業比重(%)<span class="sw" style="background:var(--purple)"></span>堆疊</td><td>初領(千人)極小空隙有框</td><td><span class="pill p-stack">堆疊直條</span> + <span class="pill p-bar">直條</span></td></tr>
+    <tr><td class="c n">⑪</td><td class="first">信心·零售</td><td>消費者信心 密西根/OECD(指數)</td><td>零售年增率(%)極小空隙有框</td><td><span class="pill p-line">線</span> + <span class="pill p-bar">直條</span></td></tr>
+  </tbody>
+</table>
+
+<h2><span class="no">4</span>配色盤(Seaborn + 房屋色)</h2>
+<table>
+  <thead><tr><th>用途</th><th>配色</th><th>來源</th></tr></thead>
+  <tbody>
+    <tr><td class="first">主要指數</td><td><span class="sw" style="background:#4c78a8"></span>S&P500　<span class="sw" style="background:#c96b5a"></span>^TWII　<span class="sw" style="background:#5a9e6f"></span>韓股(粗1.2)</td><td>房屋色</td></tr>
+    <tr><td class="first">次要指數</td><td>道瓊/NASDAQ/費半/日經/上證/恆生/歐STOXX(粗1.0)</td><td>Seaborn <code>husl</code> 調色盤</td></tr>
+    <tr><td class="first">利差(互異)</td><td><span class="sw" style="background:#439a9a"></span>10Y-2Y　<span class="sw" style="background:#c4943a"></span>10Y-3M</td><td>房屋色</td></tr>
+    <tr><td class="first">同數據同色</td><td><span class="sw" style="background:#4c78a8"></span>DGS10(兩張利差圖皆同藍)</td><td>房屋色</td></tr>
+    <tr><td class="first">benchmark 線</td><td><span class="sw" style="background:#c96b5a"></span>紅虛線 粗0.8 透明0.8</td><td>房屋色</td></tr>
+  </tbody>
+</table>
+
+<h2><span class="no">5</span>軸與資料規則</h2>
+<table>
+  <thead><tr><th>項目</th><th>規則</th></tr></thead>
+  <tbody>
+    <tr><td class="first">左右軸刻度</td><td>間距值皆為 <b>2 / 2.5 / 5 / 10 的倍數</b>(nice ticks);左右<b>間隔數相同</b>→格線對齊;小數位依間距統一;千位數加千分位號。</td></tr>
+    <tr><td class="first">軸範圍</td><td>包覆資料 min/max;<b>上方自動留一格</b>給圖示(避免與線重疊)。</td></tr>
+    <tr><td class="first">時間軸</td><td><b>交易日序軸</b>:左右軸雙方皆無資料的日期(週末/假日)整列移除→無日曆空隙;從上到下全面板一致。</td></tr>
+    <tr><td class="first">缺值處理</td><td>聯集日期→全空日刪除→缺資料者取<b>前一交易日的值</b>(前值填補);<b>量不前值填補</b>。</td></tr>
+    <tr><td class="first">垂直線</td><td>2025上半年高 / 2025低 / 2026-01-02 / 2026高 / 目前,<b>貫穿全部面板</b>+圖①頂端標籤;標最大拉回% 與 高→低 歷時(日/交易日)。</td></tr>
+    <tr><td class="first">標題/圖示</td><td>標題僅標左右軸(不換行、不標圖型);圖示=完整名稱 (Ticker/ID);指數單位統一「(指數)」。</td></tr>
+  </tbody>
+</table>
+
+<div class="note"><b>v4 更新摘要:</b>① 直條樣式系統(無空隙/極小空隙/低間隙/堆疊;有框0.8實線+框內透明0.8)　② 時間區間新增 60D/120D/240D/2023/2021/ALL　③ 次要指數改用 Seaborn husl 調色盤　④ 各期間失業比重改堆疊直條　⑤ 交易日序軸消除日曆空隙　⑥ nice 刻度+圖示留格。</div>
+
+<footer>
+  <span class="v">VERITAS INTELLIGENCE ANALYTICS</span>
+  <span>Macro Dashboard Chart Spec v4 · 靜態 Seaborn · 交易日序軸 · 2026-06-16</span>
+</footer>
+</body>
+</html>

@@ -1,0 +1,2603 @@
+{
+  "system": "VIA Decision Studio — Function & Tool Registry",
+  "version": "1.1",
+  "principle": "append-only (只增不減) · zero-omission (避免遺漏)",
+  "generated": "2026-06-08T20:14:31.691Z",
+  "counts": {
+    "items": 70,
+    "functions": 255,
+    "built": 58,
+    "pending": 10
+  },
+  "animations": {
+    "base": [
+      [
+        "fade-in",
+        "淡入",
+        "fade-in .5s ease-out"
+      ],
+      [
+        "fade-out",
+        "淡出",
+        "fade-out .5s ease-out forwards"
+      ],
+      [
+        "slide-up",
+        "上滑",
+        "slide-up .5s ease-out"
+      ],
+      [
+        "slide-down",
+        "下滑",
+        "slide-down .5s ease-out"
+      ],
+      [
+        "zoom-in",
+        "放大",
+        "zoom-in .5s ease-out"
+      ],
+      [
+        "pulse",
+        "脈衝",
+        "pulse .6s ease-in-out 2"
+      ],
+      [
+        "bounce",
+        "彈跳",
+        "bounce .6s ease-out 2"
+      ]
+    ],
+    "composite": [
+      [
+        "fade-slide",
+        "淡入+上滑",
+        "fade-in .5s ease-out, slide-up .5s ease-out"
+      ],
+      [
+        "zoom-fade",
+        "放大+淡入",
+        "zoom-in .5s ease-out, fade-in .5s ease-out"
+      ],
+      [
+        "bounce-fade",
+        "彈跳+淡入",
+        "bounce .6s ease-out, fade-in .5s ease-out"
+      ]
+    ],
+    "component": [
+      [
+        "button-pulse",
+        "按鈕脈衝 (hover)",
+        "pulse .6s ease-in-out 2"
+      ],
+      [
+        "menu-slide",
+        "選單下滑",
+        "slide-down .4s ease-out"
+      ],
+      [
+        "chart-appear",
+        "圖表出現",
+        "zoom-in .5s ease-out"
+      ],
+      [
+        "matrix-highlight",
+        "矩陣高亮",
+        "pulse 1s ease-out 2"
+      ]
+    ]
+  },
+  "order": [
+    "DS-M-CORE",
+    "DS-T-SPEC",
+    "DS-M-A",
+    "DS-M-B",
+    "DS-M-C",
+    "DS-M-D",
+    "DS-M-E",
+    "DS-M-F",
+    "DS-M-G",
+    "DS-M-H",
+    "DS-M-I",
+    "DS-M-J",
+    "DS-M-K",
+    "DS-M-L",
+    "DS-M-M",
+    "DS-M-N",
+    "DS-M-O",
+    "DS-M-P",
+    "DS-M-Q",
+    "DS-M-R",
+    "DS-M-S",
+    "DS-M-RDR",
+    "DS-M-WIZ",
+    "DS-M-LOCK",
+    "DS-S-SPEC",
+    "DS-T-MDL501",
+    "DS-T-HOME",
+    "DS-T-AUTOPLOT",
+    "DS-T-RESONANCE",
+    "DS-T-USMACRO",
+    "DS-T-YIELD",
+    "DS-T-UNIV",
+    "DS-T-INJECT",
+    "DS-R-PNUM",
+    "DS-R-MREG",
+    "DS-R-FB",
+    "DS-R-VIEW",
+    "DS-D-HCI",
+    "DS-D-MOT",
+    "DS-D-GRID",
+    "DS-D-GFX",
+    "DS-D-RWD",
+    "DS-D-ICON",
+    "DS-D-AISEL",
+    "DS-N-CORE",
+    "DS-N-RM",
+    "DS-N-AN",
+    "DS-N-CL",
+    "DS-N-EX",
+    "DS-N-RP",
+    "DS-N-AC",
+    "DS-N-PYR",
+    "DS-N-NDR",
+    "DS-N-CSR",
+    "DS-N-PSR",
+    "DS-N-HTR",
+    "DS-N-L0",
+    "DS-N-D9",
+    "DS-N-D9M",
+    "DS-N-CC",
+    "DS-N-CE",
+    "DS-N-DA",
+    "DS-N-3R",
+    "DS-N-DB",
+    "DS-N-API",
+    "DS-N-QUE",
+    "DS-N-AUTH",
+    "DS-N-CFG",
+    "DS-N-CICD",
+    "DS-N-OBS"
+  ],
+  "registry": [
+    {
+      "id": "DS-M-CORE",
+      "code": "CORE",
+      "cat": "engine",
+      "status": "built",
+      "name": "UI-Spec Engine",
+      "file": "ui-spec-engine/renderer/render.js",
+      "desc": "規格驅動渲染核心。讀取一份 UI-Spec JSON → 自動產生整個介面(UI = JSON,而非手刻)。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "renderUI(spec)",
+          "d": "主入口:套主題→排版→逐元件渲染"
+        },
+        {
+          "c": "FNC",
+          "n": "applyTheme(theme)",
+          "d": "寫入 CSS 變數 + 動畫 class"
+        },
+        {
+          "c": "FNC",
+          "n": "renderLayout(layout)",
+          "d": "CSS Grid 動態欄數/間距"
+        },
+        {
+          "c": "FNC",
+          "n": "autoOptimizeLayout(root)",
+          "d": "依寬度/元件數自動排版"
+        },
+        {
+          "c": "FNC",
+          "n": "renderComponent(c)",
+          "d": "元件工廠:依 type 分派"
+        },
+        {
+          "c": "FNC",
+          "n": "renderButton(c)",
+          "d": "按鈕"
+        },
+        {
+          "c": "FNC",
+          "n": "renderChart(c)",
+          "d": "圖表(fetch→Chart.js)"
+        },
+        {
+          "c": "FNC",
+          "n": "renderMatrix(c)",
+          "d": "風險矩陣表"
+        },
+        {
+          "c": "FNC",
+          "n": "renderQuestionnaire(c)",
+          "d": "問卷"
+        },
+        {
+          "c": "FNC",
+          "n": "renderMenu(c)",
+          "d": "選單"
+        },
+        {
+          "c": "FNC",
+          "n": "extractChartData(data)",
+          "d": "資料→圖表格式"
+        },
+        {
+          "c": "FNC",
+          "n": "renderMatrixTable(items)",
+          "d": "矩陣表格輸出"
+        }
+      ],
+      "chips": [
+        "UI=JSON",
+        "locked specs",
+        "auto_optimize"
+      ]
+    },
+    {
+      "id": "DS-T-SPEC",
+      "code": "TOOL",
+      "cat": "tool",
+      "status": "built",
+      "name": "spec_tool.py",
+      "file": "spec_tool.py",
+      "desc": "CLI:讀取數個 HTML 規格 → 抽出 component/fields → 建立規格 → 對照 base_spec 補充缺漏欄位。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "parse_html_spec(path)",
+          "d": "BeautifulSoup 抓 table/th → fields"
+        },
+        {
+          "c": "FNC",
+          "n": "load_base_spec(path)",
+          "d": "載入既有規格 JSON"
+        },
+        {
+          "c": "FNC",
+          "n": "merge_specs(base,specs)",
+          "d": "以 id/selector 為 key 合併補欄位"
+        },
+        {
+          "c": "FNC",
+          "n": "main()",
+          "d": "argparse 入口"
+        }
+      ],
+      "chips": [
+        "--inputs",
+        "--base-spec",
+        "--out",
+        "BeautifulSoup"
+      ]
+    },
+    {
+      "id": "DS-M-A",
+      "code": "A",
+      "cat": "editor",
+      "status": "built",
+      "name": "UI-Spec Editor",
+      "file": "ui-editor/spec-editor/{editor.html,js,css}",
+      "desc": "外行人用選單/下拉/顏色挑選器編輯 UI-Spec,即時輸出 JSON,支援 locked。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "updateOutput()",
+          "d": "即時序列化 spec → textarea"
+        },
+        {
+          "c": "BND",
+          "n": "layout columns/gap/auto",
+          "d": "版面綁定"
+        },
+        {
+          "c": "BND",
+          "n": "theme primary/accent/bg/animation",
+          "d": "主題綁定"
+        },
+        {
+          "c": "EVT",
+          "n": "add-component",
+          "d": "新增元件"
+        },
+        {
+          "c": "FNC",
+          "n": "renderComponentList()",
+          "d": "元件清單 + locked 勾選"
+        }
+      ],
+      "chips": [
+        "即時預覽",
+        "色彩挑選",
+        "locked 鎖定"
+      ]
+    },
+    {
+      "id": "DS-M-B",
+      "code": "B",
+      "cat": "pending",
+      "status": "merged",
+      "name": "UI-Spec → HTML Renderer",
+      "file": "(已併入 F · 即時預覽)",
+      "desc": "將 UI-Spec 直接輸出為可獨立執行的 HTML;實作已落於 F 的 renderUISpec()。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "specToHTML(spec)",
+          "d": "規格 → HTML 字串(規劃,F 已涵蓋)"
+        },
+        {
+          "c": "FNC",
+          "n": "buildStyle(theme)",
+          "d": "主題 → style"
+        },
+        {
+          "c": "FNC",
+          "n": "buildBody(components)",
+          "d": "元件 → body"
+        }
+      ],
+      "chips": [
+        "見 F",
+        "已實作"
+      ]
+    },
+    {
+      "id": "DS-M-C",
+      "code": "C",
+      "cat": "lib",
+      "status": "built",
+      "name": "Animation Library",
+      "file": "ui-spec-engine/{animations.css,js}",
+      "desc": "可被 spec 呼叫(animation:\"pulse\")、可被編輯器選單化、渲染器自動套用的動畫系統。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "applyAnimation(el,name)",
+          "d": "清舊 anim-* → 套新 anim-{name}"
+        },
+        {
+          "c": "FNC",
+          "n": "animateComponent(component,spec)",
+          "d": "依元件型別套對應動畫"
+        },
+        {
+          "c": "CSS",
+          "n": "@keyframes",
+          "d": "fade-in/out · slide-up/down · zoom-in · pulse · bounce"
+        },
+        {
+          "c": "CSS",
+          "n": "composite",
+          "d": "anim-fade-slide · anim-zoom-fade · anim-bounce-fade"
+        },
+        {
+          "c": "CSS",
+          "n": "component",
+          "d": "anim-button-pulse · anim-menu-slide · anim-chart-appear · anim-matrix-highlight"
+        }
+      ],
+      "chips": [
+        "7 keyframes",
+        "3 composite",
+        "4 component",
+        "hover pulse"
+      ]
+    },
+    {
+      "id": "DS-M-D",
+      "code": "D",
+      "cat": "pending",
+      "status": "merged",
+      "name": "Matrix Dashboard 高階互動",
+      "file": "(已併入 K)",
+      "desc": "排序/篩選/熱力圖/動畫的高階矩陣儀表板;實作已落於模組 K。",
+      "fns": [],
+      "chips": [
+        "見 K"
+      ]
+    },
+    {
+      "id": "DS-M-E",
+      "code": "E",
+      "cat": "qengine",
+      "status": "built",
+      "name": "Questionnaire Engine",
+      "file": "ui-spec-engine/questionnaire/{questionnaire.js,css}",
+      "desc": "規格驅動問卷:多題型渲染 + 資料收集(JSON 輸出),可與動畫庫整合。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "renderQuestionnaire(component)",
+          "d": "依 questions 渲染"
+        },
+        {
+          "c": "FNC",
+          "n": "renderRadio(q)",
+          "d": "單選"
+        },
+        {
+          "c": "FNC",
+          "n": "renderCheckbox(q)",
+          "d": "複選"
+        },
+        {
+          "c": "FNC",
+          "n": "renderText(q)",
+          "d": "文字"
+        },
+        {
+          "c": "FNC",
+          "n": "renderSlider(q)",
+          "d": "滑桿"
+        },
+        {
+          "c": "FNC",
+          "n": "renderRating(q)",
+          "d": "星級評分"
+        },
+        {
+          "c": "FNC",
+          "n": "renderMatrixQuestion(q)",
+          "d": "矩陣題(rows×columns)"
+        },
+        {
+          "c": "FNC",
+          "n": "collectQuestionnaireData(component)",
+          "d": "收集答案 → JSON"
+        }
+      ],
+      "chips": [
+        "radio",
+        "checkbox",
+        "text",
+        "slider",
+        "rating",
+        "matrix"
+      ]
+    },
+    {
+      "id": "DS-M-F",
+      "code": "F",
+      "cat": "runtime",
+      "status": "built",
+      "name": "UI-Spec → 即時渲染器 (Live Renderer)",
+      "file": "in-app · 即時預覽分頁",
+      "desc": "整合動畫 + 問卷 + Matrix + Chart + 選單 + 表格的可運作渲染器:讀 spec.components → 真正渲染成互動元件,主題/動畫即時反映。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "renderUISpec(spec)",
+          "d": "主渲染:套主題 → 逐元件"
+        },
+        {
+          "c": "FNC",
+          "n": "applySpecTheme(theme)",
+          "d": "套用 mode/animation"
+        },
+        {
+          "c": "FNC",
+          "n": "rRenderButton(c)",
+          "d": "可點擊動畫按鈕"
+        },
+        {
+          "c": "FNC",
+          "n": "rRenderChart(c)",
+          "d": "純 CSS 長條圖(無外部庫)"
+        },
+        {
+          "c": "FNC",
+          "n": "rRenderMatrix(c)",
+          "d": "可排序熱力圖"
+        },
+        {
+          "c": "FNC",
+          "n": "rRenderQuestionnaire(c)",
+          "d": "多題型問卷 + 收集"
+        },
+        {
+          "c": "FNC",
+          "n": "rRenderMenu(c)",
+          "d": "選單"
+        },
+        {
+          "c": "FNC",
+          "n": "rRenderTable(c)",
+          "d": "資料表"
+        }
+      ],
+      "chips": [
+        "可運作",
+        "self-contained",
+        "主題即時"
+      ]
+    },
+    {
+      "id": "DS-M-G",
+      "code": "G",
+      "cat": "qengine",
+      "status": "built",
+      "name": "Conditional Logic Engine",
+      "file": "ui-spec-engine/questionnaire/logic.js",
+      "desc": "依答案動態控制題目顯示/隱藏/必填/啟用/停用;多條件 AND + 六運算子。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "applyLogic(component)",
+          "d": "逐題套用 logic 規則"
+        },
+        {
+          "c": "FNC",
+          "n": "evaluateConditions(conds)",
+          "d": "AND 聚合(.every)"
+        },
+        {
+          "c": "FNC",
+          "n": "evaluateSingle(cond)",
+          "d": "單條件比對"
+        },
+        {
+          "c": "FNC",
+          "n": "getAnswer(qid)",
+          "d": "取 radio/text/slider/rating 值"
+        },
+        {
+          "c": "FNC",
+          "n": "toggleRequired(qid,req)",
+          "d": "動態必填"
+        },
+        {
+          "c": "FNC",
+          "n": "toggleDisabled(qid,dis)",
+          "d": "啟用/停用"
+        }
+      ],
+      "chips": [
+        "show_if",
+        "hide_if",
+        "required_if",
+        "enable_if",
+        "disable_if",
+        "equals/in/gt/lt"
+      ]
+    },
+    {
+      "id": "DS-M-H",
+      "code": "H",
+      "cat": "integration",
+      "status": "built",
+      "name": "Survey Analyzer",
+      "file": "in-app · 即時預覽分頁",
+      "desc": "問卷結果分析器:收集答案 → 自動統計、加權風險評分、等級判定(嵌入即時預覽的問卷元件)。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "collectRQ(id)",
+          "d": "收集問卷元件答案 → JSON"
+        },
+        {
+          "c": "FNC",
+          "n": "analyzeSurvey(data)",
+          "d": "統計 + 加權評分"
+        },
+        {
+          "c": "FNC",
+          "n": "weightScore(answers)",
+          "d": "依規則加權"
+        },
+        {
+          "c": "FNC",
+          "n": "classifyRisk(score)",
+          "d": "高/中/低判定"
+        }
+      ],
+      "chips": [
+        "統計",
+        "加權評分",
+        "風險等級"
+      ]
+    },
+    {
+      "id": "DS-M-I",
+      "code": "I",
+      "cat": "editor",
+      "status": "built",
+      "name": "Visual Logic Editor",
+      "file": "ui-editor/{logic-editor.html,js,css}",
+      "desc": "外行人用選單/條件列設定問卷邏輯,自動寫回 spec.logic 區塊。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "initLogicEditor(spec)",
+          "d": "題目下拉 + 事件綁定"
+        },
+        {
+          "c": "FNC",
+          "n": "loadQuestionLogic(spec,qid)",
+          "d": "載入該題既有邏輯"
+        },
+        {
+          "c": "FNC",
+          "n": "addConditionRow(cond)",
+          "d": "新增條件列"
+        },
+        {
+          "c": "FNC",
+          "n": "saveLogic(spec)",
+          "d": "序列化條件 → logic[type]"
+        }
+      ],
+      "chips": [
+        "選單化",
+        "多條件",
+        "寫回 spec"
+      ]
+    },
+    {
+      "id": "DS-M-J",
+      "code": "J",
+      "cat": "integration",
+      "status": "built",
+      "name": "Survey → Matrix Integration",
+      "file": "ui-spec-engine/integration/survey-to-matrix.js",
+      "desc": "問卷結果 → 風險分數 → 自動分類(High/Medium/Low)→ 更新 Matrix Dashboard。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "surveyToMatrix(surveyData,matrixSpec)",
+          "d": "依 dimensions 算各維度"
+        },
+        {
+          "c": "FNC",
+          "n": "evaluateRiskScore(answer,rules)",
+          "d": "規則比對 → 分數"
+        },
+        {
+          "c": "FNC",
+          "n": "classify(score)",
+          "d": "≥3 high / ≥2 medium / else low"
+        },
+        {
+          "c": "FNC",
+          "n": "onSurveySubmit(component,matrixSpec)",
+          "d": "收集→換算→渲染矩陣"
+        }
+      ],
+      "chips": [
+        "risk score",
+        "dimensions/rules",
+        "GREEN/AMBER/RED"
+      ]
+    },
+    {
+      "id": "DS-M-K",
+      "code": "K",
+      "cat": "dashboard",
+      "status": "built",
+      "name": "Matrix Dashboard (互動版)",
+      "file": "ui-spec-engine/matrix/{matrix.js,css}",
+      "desc": "風險熱力圖 + 點欄排序 + 篩選(可擴充)+ 高風險 pulse 動畫。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "renderMatrix(matrix)",
+          "d": "熱力圖表格 + 排序綁定"
+        },
+        {
+          "c": "FNC",
+          "n": "sortMatrix(matrix,key)",
+          "d": "點欄位排序重繪"
+        },
+        {
+          "c": "CSS",
+          "n": "matrix-high/medium/low",
+          "d": "紅/橙/綠上色,high 帶 pulse"
+        }
+      ],
+      "chips": [
+        "熱力圖",
+        "排序",
+        "篩選(擴充)",
+        "pulse"
+      ]
+    },
+    {
+      "id": "DS-M-L",
+      "code": "L",
+      "cat": "editor",
+      "status": "built",
+      "name": "Flowchart Logic Editor",
+      "file": "ui-editor/logic-flow/{flow.html,js,css}",
+      "desc": "問卷邏輯流程圖:節點=問題、邊=邏輯條件,可拖拉/連線(可擴充)。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "initFlowEditor(spec)",
+          "d": "建節點/邊 → 渲染畫布"
+        },
+        {
+          "c": "FNC",
+          "n": "extractEdges(spec)",
+          "d": "從各題 logic 抽出依賴邊"
+        },
+        {
+          "c": "FNC",
+          "n": "renderFlow(canvas)",
+          "d": "繪製節點與邊"
+        }
+      ],
+      "chips": [
+        "nodes",
+        "edges",
+        "拖拉(擴充)"
+      ]
+    },
+    {
+      "id": "DS-M-M",
+      "code": "M",
+      "cat": "decision",
+      "status": "built",
+      "name": "Round-Based Decision Engine",
+      "file": "decision-engine/rounds.js",
+      "desc": "多輪決策:Round0 初始 → R1 追問 → R2 補充 → R3 最終 → Matrix。",
+      "fns": [
+        {
+          "c": "CLS",
+          "n": "DecisionEngine",
+          "d": "決策引擎類別"
+        },
+        {
+          "c": "MTD",
+          "n": "constructor(matrixSpec)",
+          "d": "初始化"
+        },
+        {
+          "c": "MTD",
+          "n": "nextRound(newAnswers)",
+          "d": "合併答案 + 推進輪次"
+        },
+        {
+          "c": "MTD",
+          "n": "generateFollowUpQuestions()",
+          "d": "R1 追問"
+        },
+        {
+          "c": "MTD",
+          "n": "generateFinalQuestions()",
+          "d": "R2 最終確認"
+        },
+        {
+          "c": "MTD",
+          "n": "generateMatrix()",
+          "d": "R3 輸出 → 矩陣"
+        }
+      ],
+      "chips": [
+        "Round0–3",
+        "follow-up",
+        "final"
+      ]
+    },
+    {
+      "id": "DS-M-N",
+      "code": "N",
+      "cat": "decision",
+      "status": "built",
+      "name": "Decision Studio (平台整合)",
+      "file": "decision-studio/runtime/app.js",
+      "desc": "總控:問卷→邏輯→Flowchart→多輪決策→Matrix→動畫,全部由一份 spec 驅動。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "init()",
+          "d": "載 spec → new DecisionEngine → renderUI"
+        },
+        {
+          "c": "FNC",
+          "n": "onSurveySubmit(answers)",
+          "d": "推進輪次或渲染最終矩陣"
+        }
+      ],
+      "chips": [
+        "事件流串接",
+        "spec-driven"
+      ]
+    },
+    {
+      "id": "DS-M-O",
+      "code": "O",
+      "cat": "ai",
+      "status": "built",
+      "name": "Decision AI",
+      "file": "decision-studio/decision-ai/{generator,prompt-templates,ai-mapper}.js",
+      "desc": "一句描述 → AI 自動生成問卷/邏輯/Flowchart/Matrix/動畫/Layout/Theme 的完整 UI-Spec。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "generateSpec(description)",
+          "d": "套模板→callAI→映射 spec"
+        },
+        {
+          "c": "FNC",
+          "n": "mapAIResponseToSpec(aiJson)",
+          "d": "AI 回傳 → UI-Spec"
+        },
+        {
+          "c": "FNC",
+          "n": "callAI(prompt)",
+          "d": "你自己的 AI API(待接)"
+        },
+        {
+          "c": "TPL",
+          "n": "QUESTIONNAIRE_TEMPLATE",
+          "d": "問卷生成提示模板"
+        }
+      ],
+      "chips": [
+        "自然語言→spec",
+        "callAI 待接"
+      ]
+    },
+    {
+      "id": "DS-M-P",
+      "code": "P",
+      "cat": "runtime",
+      "status": "built",
+      "name": "Decision Runtime (可部署)",
+      "file": "decision-studio/runtime/{index.html,main.js,router.js}+api/",
+      "desc": "可部署執行環境:路由(editor/runtime/flow)、讀寫 spec、執行整套引擎。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "initRouter()",
+          "d": "hash 路由 editor/flow/runtime"
+        },
+        {
+          "c": "FNC",
+          "n": "loadPage(path)",
+          "d": "fetch 頁面注入 #app"
+        },
+        {
+          "c": "FNC",
+          "n": "main.init()",
+          "d": "載 spec → 渲染"
+        },
+        {
+          "c": "API",
+          "n": "loadSpec()",
+          "d": "讀 ui-spec.json"
+        },
+        {
+          "c": "API",
+          "n": "saveSpec(spec)",
+          "d": "寫 ui-spec.json"
+        }
+      ],
+      "chips": [
+        "路由",
+        "SSR(可選)",
+        "Docker/靜態/Node"
+      ]
+    },
+    {
+      "id": "DS-M-Q",
+      "code": "Q",
+      "cat": "pending",
+      "status": "pending",
+      "name": "User Behavior Analytics",
+      "file": "(規劃中 · 函式已定義)",
+      "desc": "追蹤填答 → 熱點 → 跳題 → 決策路徑 → Matrix 影響分析。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "trackEvent(e)",
+          "d": "記錄互動事件"
+        },
+        {
+          "c": "FNC",
+          "n": "buildHeatmap()",
+          "d": "答題熱點"
+        },
+        {
+          "c": "FNC",
+          "n": "pathAnalysis()",
+          "d": "決策路徑"
+        },
+        {
+          "c": "FNC",
+          "n": "exportAnalytics()",
+          "d": "匯出分析"
+        }
+      ],
+      "chips": [
+        "規劃中",
+        "API 已定義"
+      ]
+    },
+    {
+      "id": "DS-M-R",
+      "code": "R",
+      "cat": "pending",
+      "status": "pending",
+      "name": "Plugin System",
+      "file": "(規劃中 · 函式已定義)",
+      "desc": "像 VSCode 一樣可裝插件的擴充系統。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "registerPlugin(p)",
+          "d": "註冊插件"
+        },
+        {
+          "c": "FNC",
+          "n": "loadPlugin(id)",
+          "d": "載入插件"
+        },
+        {
+          "c": "FNC",
+          "n": "pluginAPI()",
+          "d": "對外 API"
+        },
+        {
+          "c": "FNC",
+          "n": "listPlugins()",
+          "d": "列出已裝插件"
+        }
+      ],
+      "chips": [
+        "規劃中",
+        "API 已定義"
+      ]
+    },
+    {
+      "id": "DS-M-S",
+      "code": "S",
+      "cat": "pending",
+      "status": "pending",
+      "name": "i18n 多語系",
+      "file": "(規劃中 · 函式已定義)",
+      "desc": "Decision Studio 國際化(多語言)。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "setLocale(l)",
+          "d": "切換語系"
+        },
+        {
+          "c": "FNC",
+          "n": "t(key)",
+          "d": "翻譯查表"
+        },
+        {
+          "c": "FNC",
+          "n": "loadMessages(locale)",
+          "d": "載入語言包"
+        },
+        {
+          "c": "FNC",
+          "n": "detectLocale()",
+          "d": "偵測瀏覽器語系"
+        }
+      ],
+      "chips": [
+        "規劃中",
+        "API 已定義"
+      ]
+    },
+    {
+      "id": "DS-M-RDR",
+      "code": "RDR",
+      "cat": "tool",
+      "status": "built",
+      "name": "HTML Reader (讀取HTML→建立規格)",
+      "file": "in-app · DOMParser",
+      "desc": "以 BASE 目標輸入 + 拖放/選檔讀取 HTML,瀏覽器端解析抽出設計 Token / 字體 / 動畫 / 響應式 / 元件 / 結構 → 建立規格,可匯出 JSON。對應 spec_tool.py 的前端版。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "confirmTarget()",
+          "d": "BASE 式目標鎖定(偽製輸入)"
+        },
+        {
+          "c": "FNC",
+          "n": "readFile(f)",
+          "d": "FileReader 讀檔"
+        },
+        {
+          "c": "FNC",
+          "n": "parseHTML(html,name)",
+          "d": "DOMParser 解析 → spec"
+        },
+        {
+          "c": "FNC",
+          "n": "renderExtracted(s)",
+          "d": "渲染抽取結果(token 色票)"
+        },
+        {
+          "c": "FNC",
+          "n": "exportExtracted()",
+          "d": "匯出抽取規格 JSON"
+        }
+      ],
+      "chips": [
+        "讀取HTML",
+        "建立規格",
+        "token 抽取",
+        "BASE 式輸入"
+      ]
+    },
+    {
+      "id": "DS-M-WIZ",
+      "code": "WIZ",
+      "cat": "qengine",
+      "status": "built",
+      "name": "需求問卷 → 規格新模板",
+      "file": "in-app · questionnaire",
+      "desc": "問券化了解需求:7 題白話問卷(介面/版面/主題/元件/動畫/響應式/鎖死)→ 產生易懂的 UI-Spec 新模板,可匯出。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "buildWizard()",
+          "d": "渲染問卷"
+        },
+        {
+          "c": "FNC",
+          "n": "pick(id,o,type)",
+          "d": "單/複選作答"
+        },
+        {
+          "c": "FNC",
+          "n": "genSpec()",
+          "d": "答案 → UI-Spec 模板"
+        },
+        {
+          "c": "FNC",
+          "n": "exportWizSpec()",
+          "d": "匯出模板 JSON"
+        }
+      ],
+      "chips": [
+        "問券化",
+        "建立規格",
+        "新模板",
+        "外行人可用"
+      ]
+    },
+    {
+      "id": "DS-M-LOCK",
+      "code": "LOCK",
+      "cat": "schema",
+      "status": "built",
+      "name": "鎖死規範 Locked Spec",
+      "file": "in-app · immutable registry",
+      "desc": "建立鎖死規範:三色/字體比率/Logo/Header/註冊原則等不可變更常數的鎖死登錄,併入問卷選定鎖定項,匯出 locked-spec.json。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "buildLocked()",
+          "d": "渲染鎖死清單"
+        },
+        {
+          "c": "FNC",
+          "n": "exportLocked()",
+          "d": "匯出鎖死規範 JSON"
+        }
+      ],
+      "chips": [
+        "鎖死",
+        "immutable",
+        "locked:true"
+      ]
+    },
+    {
+      "id": "DS-S-SPEC",
+      "code": "SCH",
+      "cat": "schema",
+      "status": "built",
+      "name": "規格 Schema 與枚舉",
+      "file": "ui-spec.json / matrix / flowchart / rounds",
+      "desc": "整個平台的契約:所有 UI/問卷/邏輯/決策/矩陣皆由這些 schema 定義。",
+      "fns": [
+        {
+          "c": "SCH",
+          "n": "UI-Spec",
+          "d": "layout + theme + components[] + matrix + flowchart"
+        },
+        {
+          "c": "SCH",
+          "n": "Matrix Spec",
+          "d": "dimensions[]{id,label,question,rules[]}"
+        },
+        {
+          "c": "SCH",
+          "n": "Flowchart Spec",
+          "d": "nodes[] + edges[]{from,to,condition}"
+        },
+        {
+          "c": "SCH",
+          "n": "Rounds Spec",
+          "d": "rounds[]{id,questions[]}"
+        },
+        {
+          "c": "ENUM",
+          "n": "component types",
+          "d": "button / chart / matrix / questionnaire / menu"
+        },
+        {
+          "c": "ENUM",
+          "n": "question types",
+          "d": "radio / checkbox / text / slider / rating / matrix"
+        },
+        {
+          "c": "ENUM",
+          "n": "logic types",
+          "d": "show_if / hide_if / required_if / enable_if / disable_if"
+        },
+        {
+          "c": "ENUM",
+          "n": "operators",
+          "d": "equals / not_equals / in / not_in / greater_than / less_than"
+        }
+      ],
+      "chips": [
+        "契約",
+        "locked",
+        "5 component",
+        "6 question"
+      ]
+    },
+    {
+      "id": "DS-T-MDL501",
+      "sys": "sys2",
+      "code": "MDL501",
+      "cat": "template",
+      "status": "built",
+      "name": "VDF Data Module Controller v2.0",
+      "file": "VDF_MDL501_DataModuleController.html",
+      "desc": "VDF 資料模組控制器 · Full Ecosystem。字型 DM Mono;配色已符合鎖定色票(藍/青/綠/琥珀/珊瑚)。",
+      "fns": [
+        {
+          "c": "TPL",
+          "n": "視覺鎖定",
+          "d": "✓ 已符合"
+        },
+        {
+          "c": "ROLE",
+          "n": "資料模組控制",
+          "d": "管理 VDF 各引擎"
+        }
+      ],
+      "chips": [
+        "VDF",
+        "DM Mono",
+        "✓鎖定"
+      ]
+    },
+    {
+      "id": "DS-T-HOME",
+      "sys": "sys2",
+      "code": "HOME",
+      "cat": "template",
+      "status": "built",
+      "name": "VIA Home Launcher",
+      "file": "VIA_HomeLauncher_Optimized_Consolidated_v1_1_0.html",
+      "desc": "首頁啟動器 · 模組總入口。字型 Syne;圖表系列色略偏(#4c72b0/#4f8a5b/#7a6cae/#64b5cd/#23405f)→ 正規化到鎖定色。",
+      "fns": [
+        {
+          "c": "TPL",
+          "n": "視覺鎖定",
+          "d": "⚠ 圖表系列略調"
+        },
+        {
+          "c": "ROLE",
+          "n": "總入口",
+          "d": "啟動各模板/引擎"
+        }
+      ],
+      "chips": [
+        "Syne",
+        "⚠略調",
+        "launcher"
+      ]
+    },
+    {
+      "id": "DS-T-AUTOPLOT",
+      "sys": "sys2",
+      "code": "APLOT",
+      "cat": "template",
+      "status": "built",
+      "name": "VeritasAutoPlot Console",
+      "file": "VIA_AutoPlot_Console.html",
+      "desc": "自動繪圖主控台。字型 Syne;matplotlib 系列色(#4c72b0/#c0392b/#2e7d52/#c8902f/#7a6cae)→ 正規化到鎖定色。",
+      "fns": [
+        {
+          "c": "TPL",
+          "n": "視覺鎖定",
+          "d": "⚠ 圖表系列略調"
+        },
+        {
+          "c": "ROLE",
+          "n": "自動繪圖",
+          "d": "供各模板圖形"
+        }
+      ],
+      "chips": [
+        "Syne",
+        "⚠略調",
+        "AutoPlot"
+      ]
+    },
+    {
+      "id": "DS-T-RESONANCE",
+      "sys": "sys2",
+      "code": "RESON",
+      "cat": "template",
+      "status": "built",
+      "name": "TW Resonance Stock Stack v3 (Equity Insight)",
+      "file": "VIA_TW_Resonance_Stock_Stack.html",
+      "desc": "台股共振堆疊圖 · Equity Insight。字型 Syne;配色用鎖定珊瑚 #c96b5a + 紫 #7a6daa,已符合。由 VIA_Inject 注入 window.VIA_REAL。",
+      "fns": [
+        {
+          "c": "TPL",
+          "n": "視覺鎖定",
+          "d": "✓ 已符合"
+        },
+        {
+          "c": "ROLE",
+          "n": "個股洞察",
+          "d": "OHLCV + 法人淨買賣"
+        },
+        {
+          "c": "DATA",
+          "n": "window.VIA_REAL",
+          "d": "Inject 注入"
+        }
+      ],
+      "chips": [
+        "Syne",
+        "✓鎖定",
+        "Equity"
+      ]
+    },
+    {
+      "id": "DS-T-USMACRO",
+      "sys": "sys2",
+      "code": "USMAC",
+      "cat": "template",
+      "status": "built",
+      "name": "US Macro Template v3",
+      "file": "VIA_US_Macro_Template.html",
+      "desc": "美國總經模板。字型 DM Mono;僅深藍 #1e3a5f 略偏 → #3d6188,其餘符合鎖定。",
+      "fns": [
+        {
+          "c": "TPL",
+          "n": "視覺鎖定",
+          "d": "⚠ 深藍略調"
+        },
+        {
+          "c": "ROLE",
+          "n": "美國總經",
+          "d": "宏觀指標"
+        }
+      ],
+      "chips": [
+        "DM Mono",
+        "⚠略調",
+        "Macro"
+      ]
+    },
+    {
+      "id": "DS-T-YIELD",
+      "sys": "sys2",
+      "code": "YIELD",
+      "cat": "template",
+      "status": "built",
+      "name": "Yield-Curve Spread",
+      "file": "VIA_Yield_Curve_Spread.html",
+      "desc": "殖利率曲線利差。字型 DM Mono;配色完全符合鎖定色票。",
+      "fns": [
+        {
+          "c": "TPL",
+          "n": "視覺鎖定",
+          "d": "✓ 已符合"
+        },
+        {
+          "c": "ROLE",
+          "n": "殖利率利差",
+          "d": "曲線/利差圖"
+        }
+      ],
+      "chips": [
+        "DM Mono",
+        "✓鎖定",
+        "Yield"
+      ]
+    },
+    {
+      "id": "DS-T-UNIV",
+      "sys": "sys2",
+      "code": "UNIV",
+      "cat": "template",
+      "status": "built",
+      "name": "TW Universe Builder (Python)",
+      "file": "VIA_TW_Universe_Builder.py",
+      "desc": "全台股宇宙建構:TWSE+TPEx 免費官方源(每筆附 source_url),套用鎖定 TW_TICKER_REGEX;輸出 master universe(json/duckdb)。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "fetch_twse()/fetch_tpex()",
+          "d": "官方 OpenAPI"
+        },
+        {
+          "c": "FNC",
+          "n": "TW_TICKER_REGEX",
+          "d": "首位1-9·排除2021-2030"
+        },
+        {
+          "c": "OUT",
+          "n": "universe",
+          "d": "code/name/market/yf/source_url"
+        }
+      ],
+      "chips": [
+        "TWSE+TPEx",
+        "免費官方",
+        "master universe"
+      ]
+    },
+    {
+      "id": "DS-T-INJECT",
+      "sys": "sys2",
+      "code": "INJECT",
+      "cat": "template",
+      "status": "built",
+      "name": "VIA Inject (Python)",
+      "file": "VIA_Inject.py",
+      "desc": "資料注入器:VDF Bridge 輸出 → equity_real.json / etf_real.json → 注入 Equity & ETF 模板;自算 AUM=NAV×Units、NetFlow=ΔUnits×NAV。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "build_equity(real)",
+          "d": "per-symbol OHLCV + 法人"
+        },
+        {
+          "c": "FNC",
+          "n": "build_etf(real)",
+          "d": "PERF(adj/aum/flow) + HOLD"
+        },
+        {
+          "c": "FNC",
+          "n": "inject_html(...)",
+          "d": "注入 window.VIA_REAL/VIA_ETF_REAL"
+        }
+      ],
+      "chips": [
+        "注入器",
+        "equity_real",
+        "etf_real"
+      ]
+    },
+    {
+      "id": "DS-R-PNUM",
+      "sys": "sys2",
+      "code": "PNUM",
+      "cat": "product",
+      "status": "built",
+      "name": "多組合產品編號",
+      "file": "產品/機台註冊 · 組合編號",
+      "desc": "用已登錄模組勾選組合成產品 → 自動產生產品編號 VIA-PRD-NNN 與組合簽章(模組代號串接);append-only 流水號。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "addProduct()",
+          "d": "name + 勾選模組 → 新產品編號"
+        },
+        {
+          "c": "FNC",
+          "n": "nextPrdNo()",
+          "d": "VIA-PRD-NNN 流水號"
+        },
+        {
+          "c": "FNC",
+          "n": "sigOf(mods)",
+          "d": "模組代號 → 組合簽章"
+        },
+        {
+          "c": "FNC",
+          "n": "renderModPick(q)",
+          "d": "可搜尋模組勾選清單"
+        }
+      ],
+      "chips": [
+        "VIA-PRD-NNN",
+        "模組組合",
+        "append-only"
+      ]
+    },
+    {
+      "id": "DS-R-MREG",
+      "sys": "sys2",
+      "code": "MREG",
+      "cat": "product",
+      "status": "built",
+      "name": "機台註冊 (一號對多機)",
+      "file": "產品/機台註冊 · 機台",
+      "desc": "註冊機台(機台一/二…),一個產品編號可勾選註冊到多台機台 — 一號對 2 機。預設建立機台一、機台二。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "addMachine()",
+          "d": "新增機台 id/名稱"
+        },
+        {
+          "c": "FNC",
+          "n": "assignMachine(no,mid,on)",
+          "d": "產品 ↔ 機台 綁定"
+        },
+        {
+          "c": "FNC",
+          "n": "seedMachines()",
+          "d": "預設 M01/M02"
+        }
+      ],
+      "chips": [
+        "機台",
+        "一號對2機",
+        "多機綁定"
+      ]
+    },
+    {
+      "id": "DS-R-FB",
+      "sys": "sys2",
+      "code": "FB",
+      "cat": "product",
+      "status": "built",
+      "name": "反饋更新管理",
+      "file": "產品/機台註冊 · 反饋/版本",
+      "desc": "每個產品記錄反饋/更新/Bug/版本(類型+機台+備註+狀態+時間戳),append-only 日誌;版本可遞增並寫入變更記錄。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "addFeedback(no)",
+          "d": "新增反饋/更新項(open/done)"
+        },
+        {
+          "c": "FNC",
+          "n": "bumpVersion(no)",
+          "d": "版本遞增 + changelog"
+        },
+        {
+          "c": "FNC",
+          "n": "toggleFb(id)",
+          "d": "狀態切換 open↔done"
+        },
+        {
+          "c": "FNC",
+          "n": "exportReg()/importReg()",
+          "d": "JSON 匯出/匯入"
+        }
+      ],
+      "chips": [
+        "反饋",
+        "版本",
+        "狀態",
+        "append-only"
+      ]
+    },
+    {
+      "id": "DS-R-VIEW",
+      "sys": "sys2",
+      "code": "PVIEW",
+      "cat": "product",
+      "status": "built",
+      "name": "反饋矩陣 + 機台對比視圖",
+      "file": "產品/機台註冊 · 管理視圖",
+      "desc": "反饋日誌以系統二 Matrix 風格呈現(依類型上色、點欄排序、只看待辦篩選);機台對比視圖把同一產品在多台機台的反饋數/待辦/版本/最後活動並排(一號對多機對比)。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "renderFbMatrix()",
+          "d": "可排序反饋矩陣(產品/機台/類型/狀態/版本/時間)"
+        },
+        {
+          "c": "FNC",
+          "n": "sortFb(key)/setFbFilter(v)",
+          "d": "點欄排序 · 待辦篩選"
+        },
+        {
+          "c": "FNC",
+          "n": "renderCompare()",
+          "d": "多機並排對比"
+        },
+        {
+          "c": "FNC",
+          "n": "setPrdView(v)/setCmp(no)",
+          "d": "視圖/產品切換"
+        }
+      ],
+      "chips": [
+        "Matrix 風格",
+        "排序",
+        "一號對多機對比"
+      ]
+    },
+    {
+      "id": "DS-D-HCI",
+      "sys": "sys2",
+      "code": "HCI",
+      "cat": "hci",
+      "status": "built",
+      "name": "人機互動動畫庫",
+      "file": "設計資產 · 互動動畫",
+      "desc": "HCI 互動動畫:hover/press/focus/ripple/shake/spinner/toast/tooltip,點擊或滑過即時預覽、可複製 CSS。",
+      "fns": [
+        {
+          "c": "FX",
+          "n": "fx-lift",
+          "d": "懸停浮起 + 陰影"
+        },
+        {
+          "c": "FX",
+          "n": "fx-press",
+          "d": "按下縮放"
+        },
+        {
+          "c": "FX",
+          "n": "fx-ring",
+          "d": "focus 光環"
+        },
+        {
+          "c": "FX",
+          "n": "fx-shake",
+          "d": "錯誤抖動"
+        },
+        {
+          "c": "FX",
+          "n": "fx-spin",
+          "d": "載入轉圈"
+        },
+        {
+          "c": "FX",
+          "n": "ripple / toast / tooltip",
+          "d": "點擊漣漪/通知/提示"
+        }
+      ],
+      "chips": [
+        "hover",
+        "press",
+        "focus",
+        "可複製"
+      ]
+    },
+    {
+      "id": "DS-D-MOT",
+      "sys": "sys2",
+      "code": "MOT",
+      "cat": "motion",
+      "status": "built",
+      "name": "現代化動畫庫",
+      "file": "設計資產 · 現代動畫",
+      "desc": "現代動效:skeleton shimmer、gradient shift、glassmorphism、spring pop、float、morph、scroll-reveal、count-up。",
+      "fns": [
+        {
+          "c": "FX",
+          "n": "fx-shimmer",
+          "d": "骨架載入微光"
+        },
+        {
+          "c": "FX",
+          "n": "fx-grad",
+          "d": "漸層流動"
+        },
+        {
+          "c": "FX",
+          "n": "fx-glass",
+          "d": "玻璃擬態"
+        },
+        {
+          "c": "FX",
+          "n": "fx-spring",
+          "d": "彈簧彈出"
+        },
+        {
+          "c": "FX",
+          "n": "fx-float",
+          "d": "漂浮"
+        },
+        {
+          "c": "FX",
+          "n": "fx-morph",
+          "d": "有機形變"
+        }
+      ],
+      "chips": [
+        "glass",
+        "shimmer",
+        "spring",
+        "可複製"
+      ]
+    },
+    {
+      "id": "DS-D-GRID",
+      "sys": "sys2",
+      "code": "GRID",
+      "cat": "grid",
+      "status": "built",
+      "name": "CSS Grid 版型庫",
+      "file": "設計資產 · CSS Grids",
+      "desc": "常用 Grid 版型:auto-fit 卡片、12 欄儀表板、側欄、Holy Grail、split、masonry;附迷你預覽與可複製 CSS。",
+      "fns": [
+        {
+          "c": "GRD",
+          "n": "auto-fit cards",
+          "d": "repeat(auto-fit,minmax(180px,1fr))"
+        },
+        {
+          "c": "GRD",
+          "n": "dashboard 12-col",
+          "d": "repeat(12,1fr)"
+        },
+        {
+          "c": "GRD",
+          "n": "sidebar",
+          "d": "240px 1fr"
+        },
+        {
+          "c": "GRD",
+          "n": "holy grail",
+          "d": "grid-template-areas"
+        },
+        {
+          "c": "GRD",
+          "n": "split / masonry",
+          "d": "1fr 1fr / columns"
+        }
+      ],
+      "chips": [
+        "auto-fit",
+        "12-col",
+        "可複製"
+      ]
+    },
+    {
+      "id": "DS-D-GFX",
+      "sys": "sys2",
+      "code": "GFX",
+      "cat": "gfx",
+      "status": "built",
+      "name": "Matrix Dashboard 圖表/圖形庫",
+      "file": "設計資產 · Charts/Graphics",
+      "desc": "圖表型別:bar / sparkline / heatmap / radar / gauge / donut / progress(純 CSS/SVG 自包),並標註推薦庫。",
+      "fns": [
+        {
+          "c": "CHT",
+          "n": "bar / sparkline",
+          "d": "CSS / SVG polyline"
+        },
+        {
+          "c": "CHT",
+          "n": "heatmap",
+          "d": "風險熱力圖(grid)"
+        },
+        {
+          "c": "CHT",
+          "n": "radar / gauge / donut",
+          "d": "SVG polygon / conic-gradient"
+        },
+        {
+          "c": "LIB",
+          "n": "推薦庫",
+          "d": "Chart.js · ECharts · D3 · Recharts"
+        }
+      ],
+      "chips": [
+        "heatmap",
+        "radar",
+        "gauge",
+        "self-contained"
+      ]
+    },
+    {
+      "id": "DS-D-RWD",
+      "sys": "sys2",
+      "code": "RWD",
+      "cat": "responsive",
+      "status": "built",
+      "name": "響應式設計規範",
+      "file": "設計資產 · Responsive",
+      "desc": "斷點 token(sm/md/lg/xl/2xl)與響應式樣式:流體字級 clamp、手機堆疊、隱藏/顯示、container query;可複製片段。",
+      "fns": [
+        {
+          "c": "BP",
+          "n": "sm/md/lg/xl/2xl",
+          "d": "480/768/1024/1280/1536"
+        },
+        {
+          "c": "PAT",
+          "n": "fluid type",
+          "d": "clamp(min,vw,max)"
+        },
+        {
+          "c": "PAT",
+          "n": "stack-on-mobile",
+          "d": "@media grid→1fr"
+        },
+        {
+          "c": "PAT",
+          "n": "container query",
+          "d": "@container"
+        }
+      ],
+      "chips": [
+        "breakpoints",
+        "clamp",
+        "container"
+      ]
+    },
+    {
+      "id": "DS-D-ICON",
+      "sys": "sys2",
+      "code": "ICON",
+      "cat": "icon",
+      "status": "built",
+      "name": "Icon Base 圖示庫",
+      "file": "內建 24 SVG + 載入 …\\VeritasIntelligenceAnalytics\\icon base",
+      "desc": "列管圖示供 UI 設計取用:內建 24 個 currentColor 線性 SVG(點擊複製 SVG);可載入本機 icon base 資料夾(拖放/選檔)做縮圖列管、複製檔名。",
+      "fns": [
+        {
+          "c": "SET",
+          "n": "內建 24 UI icons",
+          "d": "home/search/settings/user/chart…(複製 SVG)"
+        },
+        {
+          "c": "FNC",
+          "n": "loadIconBase()",
+          "d": "載入本機 icon base 檔案"
+        },
+        {
+          "c": "FNC",
+          "n": "copyText(svg)",
+          "d": "點擊複製"
+        }
+      ],
+      "chips": [
+        "24 SVG",
+        "載入本機",
+        "click-to-copy"
+      ]
+    },
+    {
+      "id": "DS-D-AISEL",
+      "sys": "sys2",
+      "code": "AISEL",
+      "cat": "aiassist",
+      "status": "built",
+      "name": "AI 選用建議 (AI-Powered Selection)",
+      "file": "設計資產 · AI 選用",
+      "desc": "描述用途/選意圖 → 自動推薦動畫+Grid+圖表+圖示組合(離線啟發式;可接 Decision AI 模組 O 的 callAI 升級為真 AI)。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "buildAI()",
+          "d": "渲染意圖選擇"
+        },
+        {
+          "c": "FNC",
+          "n": "aiRecommend(intent)",
+          "d": "意圖 → 資產組合 + 理由"
+        },
+        {
+          "c": "NOTE",
+          "n": "callAI 升級",
+          "d": "可接 O · Decision AI"
+        }
+      ],
+      "chips": [
+        "AI 選用",
+        "離線啟發式",
+        "可接真 AI"
+      ]
+    },
+    {
+      "id": "DS-N-CORE",
+      "sys": "sys1",
+      "code": "ORC",
+      "cat": "orchestrator",
+      "status": "built",
+      "name": "NexusCore Orchestrator",
+      "file": "orchestrator/orchestrator.py",
+      "desc": "跨語言自動治理引擎主入口:Round 0→1→2→3 串接全景分析、測試、修正、回滾。",
+      "fns": [
+        {
+          "c": "FNC",
+          "n": "main()",
+          "d": "建立 RoundManager → 跑四輪"
+        }
+      ],
+      "chips": [
+        "跨語言",
+        "三輪",
+        "治理引擎"
+      ]
+    },
+    {
+      "id": "DS-N-RM",
+      "sys": "sys1",
+      "code": "RM",
+      "cat": "orchestrator",
+      "status": "built",
+      "name": "RoundManager (九頭龍嚴格版)",
+      "file": "core/round_manager.py",
+      "desc": "三輪控制器內建九頭龍九重結界:多源驗證、平行/順序分離、依賴鏈鎖定、三輪隔離、回滾。",
+      "fns": [
+        {
+          "c": "MTD",
+          "n": "run_round0()",
+          "d": "全景式分析(只分析不修)"
+        },
+        {
+          "c": "MTD",
+          "n": "run_round1()",
+          "d": "平行修正 + 多源驗證"
+        },
+        {
+          "c": "MTD",
+          "n": "run_round2()",
+          "d": "順序修正(依賴鏈)"
+        },
+        {
+          "c": "MTD",
+          "n": "run_round3()",
+          "d": "收尾整合"
+        },
+        {
+          "c": "MTD",
+          "n": "verify_multi_source(...)",
+          "d": "任一來源 fail → 全 fail"
+        },
+        {
+          "c": "MTD",
+          "n": "rollback(round)",
+          "d": "回滾至上一輪 checkpoint"
+        }
+      ],
+      "chips": [
+        "Round0–3",
+        "多源驗證",
+        "回滾",
+        "九頭龍"
+      ]
+    },
+    {
+      "id": "DS-N-AN",
+      "sys": "sys1",
+      "code": "ANL",
+      "cat": "analysis",
+      "status": "built",
+      "name": "Analyzer (全景式)",
+      "file": "core/analyzer.py",
+      "desc": "全景式分析:AST / Lint / Type / 依賴 / 風險 / 測試 / 性能。",
+      "fns": [
+        {
+          "c": "MTD",
+          "n": "panoramic(files)",
+          "d": "彙總全部分析"
+        },
+        {
+          "c": "MTD",
+          "n": "run_ast_analysis()",
+          "d": "AST"
+        },
+        {
+          "c": "MTD",
+          "n": "run_lint()",
+          "d": "靜態檢查"
+        },
+        {
+          "c": "MTD",
+          "n": "run_type_check()",
+          "d": "型別"
+        },
+        {
+          "c": "MTD",
+          "n": "run_dependency_analysis()",
+          "d": "依賴"
+        },
+        {
+          "c": "MTD",
+          "n": "run_risk_analysis()",
+          "d": "風險"
+        },
+        {
+          "c": "MTD",
+          "n": "run_tests()",
+          "d": "測試"
+        },
+        {
+          "c": "MTD",
+          "n": "run_performance()",
+          "d": "性能"
+        }
+      ],
+      "chips": [
+        "AST",
+        "lint",
+        "type",
+        "perf"
+      ]
+    },
+    {
+      "id": "DS-N-CL",
+      "sys": "sys1",
+      "code": "CLS",
+      "cat": "analysis",
+      "status": "built",
+      "name": "Classifier (平行/順序)",
+      "file": "core/classifier.py",
+      "desc": "把問題分為「可平行修正(互不影響)」與「需順序修正(有依賴/高風險)」。",
+      "fns": [
+        {
+          "c": "MTD",
+          "n": "classify(issues)",
+          "d": "→ {parallel[], sequential[]}"
+        }
+      ],
+      "chips": [
+        "parallel",
+        "sequential",
+        "九頭龍核心"
+      ]
+    },
+    {
+      "id": "DS-N-EX",
+      "sys": "sys1",
+      "code": "EXE",
+      "cat": "orchestrator",
+      "status": "built",
+      "name": "Executor (多工具並行)",
+      "file": "core/executor.py",
+      "desc": "多工具並行/順序執行器:同時或依序啟動各語言 Runner。",
+      "fns": [
+        {
+          "c": "MTD",
+          "n": "run_parallel()",
+          "d": "全 Runner 同時跑"
+        },
+        {
+          "c": "MTD",
+          "n": "run_sequential(seq)",
+          "d": "依依賴鏈順序跑"
+        }
+      ],
+      "chips": [
+        "並行",
+        "順序",
+        "加速器"
+      ]
+    },
+    {
+      "id": "DS-N-RP",
+      "sys": "sys1",
+      "code": "RPT",
+      "cat": "infra",
+      "status": "built",
+      "name": "Reporter (Matrix JSON)",
+      "file": "core/reporter.py",
+      "desc": "產生每輪 Matrix JSON(matrix_round0–3.json),供系統二渲染。",
+      "fns": [
+        {
+          "c": "MTD",
+          "n": "generate(round,issues,path)",
+          "d": "輸出 Matrix JSON"
+        }
+      ],
+      "chips": [
+        "matrix_roundN.json",
+        "輸出層"
+      ]
+    },
+    {
+      "id": "DS-N-AC",
+      "sys": "sys1",
+      "code": "ACC",
+      "cat": "lib",
+      "status": "built",
+      "name": "Accelerator (加速器全開)",
+      "file": "core/accelerator.py",
+      "desc": "Diff(只分析變動)/ Cache(結果快取)/ Parallel(並行)/ Matrix(即時渲染)四大加速器。",
+      "fns": [
+        {
+          "c": "MTD",
+          "n": "diff(files)",
+          "d": "增量分析"
+        },
+        {
+          "c": "MTD",
+          "n": "cache_get/set(k,v)",
+          "d": "快取"
+        },
+        {
+          "c": "MTD",
+          "n": "parallel(tasks)",
+          "d": "並行執行"
+        }
+      ],
+      "chips": [
+        "diff",
+        "cache",
+        "parallel",
+        "matrix"
+      ]
+    },
+    {
+      "id": "DS-N-PYR",
+      "sys": "sys1",
+      "code": "PYR",
+      "cat": "runner",
+      "status": "built",
+      "name": "Python Runner",
+      "file": "runners/python_runner.py",
+      "desc": "真實工具:pytest / ruff / black / mypy / scalene。",
+      "fns": [
+        {
+          "c": "MTD",
+          "n": "run_all()",
+          "d": "pytest·ruff·black·mypy·scalene"
+        }
+      ],
+      "chips": [
+        "pytest",
+        "ruff",
+        "mypy",
+        "scalene"
+      ]
+    },
+    {
+      "id": "DS-N-NDR",
+      "sys": "sys1",
+      "code": "NDR",
+      "cat": "runner",
+      "status": "built",
+      "name": "Node Runner",
+      "file": "runners/node_runner.py",
+      "desc": "真實工具:jest / eslint / prettier / clinic.js。",
+      "fns": [
+        {
+          "c": "MTD",
+          "n": "run_all()",
+          "d": "jest·eslint·prettier·clinic"
+        }
+      ],
+      "chips": [
+        "jest",
+        "eslint",
+        "clinic.js"
+      ]
+    },
+    {
+      "id": "DS-N-CSR",
+      "sys": "sys1",
+      "code": "CSR",
+      "cat": "runner",
+      "status": "built",
+      "name": "C# Runner",
+      "file": "runners/csharp_runner.py",
+      "desc": "真實工具:dotnet restore / build / test / format。",
+      "fns": [
+        {
+          "c": "MTD",
+          "n": "run_all()",
+          "d": "dotnet restore·build·test·format"
+        }
+      ],
+      "chips": [
+        "dotnet test",
+        "dotnet format"
+      ]
+    },
+    {
+      "id": "DS-N-PSR",
+      "sys": "sys1",
+      "code": "PSR",
+      "cat": "runner",
+      "status": "built",
+      "name": "PowerShell Runner",
+      "file": "runners/powershell_runner.py",
+      "desc": "真實工具:Invoke-Pester / Invoke-ScriptAnalyzer。",
+      "fns": [
+        {
+          "c": "MTD",
+          "n": "run_all()",
+          "d": "Pester·ScriptAnalyzer"
+        }
+      ],
+      "chips": [
+        "Pester",
+        "PSScriptAnalyzer"
+      ]
+    },
+    {
+      "id": "DS-N-HTR",
+      "sys": "sys1",
+      "code": "HTR",
+      "cat": "runner",
+      "status": "built",
+      "name": "HTML Runner",
+      "file": "runners/html_runner.py",
+      "desc": "Matrix UI build / bundle(npm install / build)。",
+      "fns": [
+        {
+          "c": "MTD",
+          "n": "run_all()",
+          "d": "npm install·build"
+        }
+      ],
+      "chips": [
+        "npm build",
+        "Matrix UI"
+      ]
+    },
+    {
+      "id": "DS-N-L0",
+      "sys": "sys1",
+      "code": "L0",
+      "cat": "analysis",
+      "status": "built",
+      "name": "Layer-0 Panoramic Orchestrator (Super Brain)",
+      "file": "core/layer0_orchestrator.py",
+      "desc": "第一道防線:全語言全景分析 + 契約抽取 + 依賴鏈 + 一致性檢查 + 九頭龍風險偵測整合。",
+      "fns": [
+        {
+          "c": "MTD",
+          "n": "run_all()",
+          "d": "panoramic+contracts+deps"
+        },
+        {
+          "c": "MTD",
+          "n": "analyze_python/node/csharp/powershell/html()",
+          "d": "各語言分析"
+        },
+        {
+          "c": "MTD",
+          "n": "extract_contracts()",
+          "d": "抽契約"
+        },
+        {
+          "c": "MTD",
+          "n": "analyze_dependencies()",
+          "d": "依賴鏈"
+        },
+        {
+          "c": "MTD",
+          "n": "check_consistency(...)",
+          "d": "一致性"
+        },
+        {
+          "c": "MTD",
+          "n": "detect_risks(issues)",
+          "d": "Dragon-9 風險"
+        }
+      ],
+      "chips": [
+        "Layer-0",
+        "多源交叉",
+        "降九頭龍風險"
+      ]
+    },
+    {
+      "id": "DS-N-D9",
+      "sys": "sys1",
+      "code": "D9",
+      "cat": "risk",
+      "status": "built",
+      "name": "Dragon-9 Risk Detector",
+      "file": "core/risk_detector.py",
+      "desc": "九頭龍風險偵測器:9 維度加權 → 風險分數 → 等級 → 強制治理規則。",
+      "fns": [
+        {
+          "c": "MTD",
+          "n": "analyze_issue(issue)",
+          "d": "主入口 → score/level/rules"
+        },
+        {
+          "c": "MTD",
+          "n": "calculate_risk_score(dims)",
+          "d": "Σ(等級×權重)"
+        },
+        {
+          "c": "MTD",
+          "n": "classify_risk(score)",
+          "d": "≥45 high / ≥25 medium / low"
+        },
+        {
+          "c": "MTD",
+          "n": "governance_rules(...)",
+          "d": "sequential/forbid_parallel/stop_round..."
+        }
+      ],
+      "chips": [
+        "9 維度",
+        "加權",
+        "治理規則"
+      ]
+    },
+    {
+      "id": "DS-N-D9M",
+      "sys": "sys1",
+      "code": "D9M",
+      "cat": "schema",
+      "status": "built",
+      "name": "Dragon-9 Risk Matrix (規格)",
+      "file": "rules / Matrix schema",
+      "desc": "九頭龍風險矩陣:9 維度 × 3 等級 × 權重 + 9 條強制避險規則。",
+      "fns": [
+        {
+          "c": "DIM",
+          "n": "D1–D9",
+          "d": "跨模組/跨語言/跨工具/依賴鏈/回歸/性能/資料一致/覆蓋/未知"
+        },
+        {
+          "c": "WGT",
+          "n": "weights",
+          "d": "D9 未知=5(最高) · 多數=3"
+        },
+        {
+          "c": "LVL",
+          "n": "levels",
+          "d": "high=3 / medium=2 / low=1"
+        },
+        {
+          "c": "RUL",
+          "n": "9 enforcement rules",
+          "d": "high→sequential·D9≥med→stop_round..."
+        }
+      ],
+      "chips": [
+        "9×3",
+        "D9 黑箱",
+        "避險規則"
+      ]
+    },
+    {
+      "id": "DS-N-CC",
+      "sys": "sys1",
+      "code": "CCC",
+      "cat": "integration",
+      "status": "built",
+      "name": "Cross-Language Consistency Checker",
+      "file": "core/consistency_checker.py",
+      "desc": "跨語言防火牆:Python↔Node↔C#↔PS↔HTML 的型別/Model/Cmdlet/Schema/工具結果一致性。",
+      "fns": [
+        {
+          "c": "MTD",
+          "n": "run_all_checks(contracts)",
+          "d": "全部檢查 → mismatches"
+        },
+        {
+          "c": "MTD",
+          "n": "compare_python_node_types(...)",
+          "d": "型別"
+        },
+        {
+          "c": "MTD",
+          "n": "compare_csharp_models(...)",
+          "d": "Model"
+        },
+        {
+          "c": "MTD",
+          "n": "compare_powershell_csharp(...)",
+          "d": "Cmdlet"
+        },
+        {
+          "c": "MTD",
+          "n": "compare_html_api_schema(...)",
+          "d": "HTML↔API"
+        },
+        {
+          "c": "MTD",
+          "n": "compare_tool_results(...)",
+          "d": "工具結果"
+        }
+      ],
+      "chips": [
+        "跨語言",
+        "一致性",
+        "防火牆"
+      ]
+    },
+    {
+      "id": "DS-N-CE",
+      "sys": "sys1",
+      "code": "CEX",
+      "cat": "integration",
+      "status": "built",
+      "name": "Contract Extractor",
+      "file": "core/contract_extractor.py",
+      "desc": "自動抽取各語言型別/Schema/Interface/Cmdlet/HTML 綁定/API 契約。",
+      "fns": [
+        {
+          "c": "MTD",
+          "n": "extract_python_types()",
+          "d": "Python"
+        },
+        {
+          "c": "MTD",
+          "n": "extract_node_types()",
+          "d": "TS/JS"
+        },
+        {
+          "c": "MTD",
+          "n": "extract_csharp_models()",
+          "d": "C#"
+        },
+        {
+          "c": "MTD",
+          "n": "extract_powershell_contracts()",
+          "d": "PS Cmdlet"
+        },
+        {
+          "c": "MTD",
+          "n": "extract_html_schema()",
+          "d": "data-*/v-model"
+        },
+        {
+          "c": "MTD",
+          "n": "extract_api_schema()",
+          "d": "OpenAPI/JSON Schema"
+        }
+      ],
+      "chips": [
+        "契約抽取",
+        "多語言"
+      ]
+    },
+    {
+      "id": "DS-N-DA",
+      "sys": "sys1",
+      "code": "DEP",
+      "cat": "analysis",
+      "status": "built",
+      "name": "Dependency Chain Analyzer",
+      "file": "core/dependency_analyzer.py",
+      "desc": "自動建立 schema → repository → service → api → ui 跨語言依賴鏈(依賴鏈鎖定來源)。",
+      "fns": [
+        {
+          "c": "MTD",
+          "n": "analyze(path)",
+          "d": "主入口 → chain"
+        },
+        {
+          "c": "MTD",
+          "n": "scan_dependencies()",
+          "d": "掃描檔案"
+        },
+        {
+          "c": "MTD",
+          "n": "extract_imports()",
+          "d": "import/require/using"
+        },
+        {
+          "c": "MTD",
+          "n": "build_dependency_chain()",
+          "d": "分層"
+        },
+        {
+          "c": "MTD",
+          "n": "identify_layer(file)",
+          "d": "判斷所屬層"
+        }
+      ],
+      "chips": [
+        "依賴鏈",
+        "schema→ui",
+        "鎖定"
+      ]
+    },
+    {
+      "id": "DS-N-3R",
+      "sys": "sys1",
+      "code": "3R",
+      "cat": "schema",
+      "status": "built",
+      "name": "三輪流程 (Three-Round Flow)",
+      "file": "流程規格",
+      "desc": "Round0 全景分析(只分析)→ R1 平行修正 → R2 順序修正 → R3 收尾;每輪自動產 HTML Matrix Report,≤3 輪主修避免修壞。",
+      "fns": [
+        {
+          "c": "R0",
+          "n": "Panoramic Analysis",
+          "d": "錯誤全集/風險矩陣/分類"
+        },
+        {
+          "c": "R1",
+          "n": "Parallel Fix",
+          "d": "互不影響項 + 多源驗證"
+        },
+        {
+          "c": "R2",
+          "n": "Sequential Fix",
+          "d": "依賴鏈順序"
+        },
+        {
+          "c": "R3",
+          "n": "Consolidate",
+          "d": "清理/整合/最終測試"
+        }
+      ],
+      "chips": [
+        "Round0–3",
+        "平行/順序",
+        "每輪 Matrix"
+      ]
+    },
+    {
+      "id": "DS-N-DB",
+      "sys": "sys1",
+      "code": "DB",
+      "cat": "infra",
+      "status": "pending",
+      "name": "DB / Storage (資料模型)",
+      "file": "(設計 · 後端第一階段)",
+      "desc": "關聯式資料模型(PostgreSQL):Project/Run/Round/Issue/Fix/Risk/Report/Spec。",
+      "fns": [
+        {
+          "c": "ENT",
+          "n": "Project / Run / Round",
+          "d": "執行歷程"
+        },
+        {
+          "c": "ENT",
+          "n": "Issue / Fix / Risk",
+          "d": "問題/修正/風險"
+        },
+        {
+          "c": "ENT",
+          "n": "Report / Spec",
+          "d": "報表/規格"
+        }
+      ],
+      "chips": [
+        "PostgreSQL",
+        "UUID PK",
+        "設計"
+      ]
+    },
+    {
+      "id": "DS-N-API",
+      "sys": "sys1",
+      "code": "API",
+      "cat": "infra",
+      "status": "pending",
+      "name": "REST API",
+      "file": "(設計 · 後端第一階段)",
+      "desc": "專案 CRUD、啟動 Run、查報表、取風險矩陣、觸發回滾、Webhook。",
+      "fns": [
+        {
+          "c": "EP",
+          "n": "/api/projects",
+          "d": "CRUD"
+        },
+        {
+          "c": "EP",
+          "n": "/api/runs",
+          "d": "啟動/查 Run"
+        },
+        {
+          "c": "EP",
+          "n": "/api/reports/{id}",
+          "d": "報表"
+        },
+        {
+          "c": "EP",
+          "n": "/api/.../risk-matrix",
+          "d": "風險矩陣"
+        },
+        {
+          "c": "EP",
+          "n": "/api/runs/{id}/rollback",
+          "d": "回滾"
+        },
+        {
+          "c": "EP",
+          "n": "/api/webhook",
+          "d": "外部事件"
+        }
+      ],
+      "chips": [
+        "REST",
+        "設計"
+      ]
+    },
+    {
+      "id": "DS-N-QUE",
+      "sys": "sys1",
+      "code": "QUE",
+      "cat": "infra",
+      "status": "pending",
+      "name": "Task Queue",
+      "file": "(設計)",
+      "desc": "並發任務緩衝/排程(RabbitMQ / Kafka / Redis)。",
+      "fns": [],
+      "chips": [
+        "RabbitMQ",
+        "設計"
+      ]
+    },
+    {
+      "id": "DS-N-AUTH",
+      "sys": "sys1",
+      "code": "AUTH",
+      "cat": "infra",
+      "status": "pending",
+      "name": "Auth / ACL",
+      "file": "(設計)",
+      "desc": "OAuth2 / OIDC + JWT 認證授權(Keycloak/IdentityServer);審計日誌。",
+      "fns": [],
+      "chips": [
+        "OAuth2/OIDC",
+        "JWT",
+        "設計"
+      ]
+    },
+    {
+      "id": "DS-N-CFG",
+      "sys": "sys1",
+      "code": "CFG",
+      "cat": "infra",
+      "status": "pending",
+      "name": "Config 管理",
+      "file": "config/settings.yaml · rules.yaml",
+      "desc": "統一參數/依賴順序/風險規則;熱重載。",
+      "fns": [
+        {
+          "c": "CFG",
+          "n": "settings.yaml",
+          "d": "路徑/工具/依賴順序"
+        },
+        {
+          "c": "CFG",
+          "n": "rules.yaml",
+          "d": "風險/分類規則"
+        }
+      ],
+      "chips": [
+        "YAML",
+        "熱重載"
+      ]
+    },
+    {
+      "id": "DS-N-CICD",
+      "sys": "sys1",
+      "code": "CICD",
+      "cat": "infra",
+      "status": "pending",
+      "name": "CI/CD + 部署",
+      "file": "(設計)",
+      "desc": "Docker/K8s/Helm,RollingUpdate,roll-forward 為主、kubectl rollout undo 回滾。",
+      "fns": [],
+      "chips": [
+        "Docker",
+        "K8s",
+        "滾轉前推"
+      ]
+    },
+    {
+      "id": "DS-N-OBS",
+      "sys": "sys1",
+      "code": "OBS",
+      "cat": "infra",
+      "status": "pending",
+      "name": "日誌 / 監控 / 告警",
+      "file": "(設計)",
+      "desc": "ELK/EFK 或 Loki + Prometheus/Grafana + Sentry;四黃金指標與告警規則。",
+      "fns": [],
+      "chips": [
+        "Prometheus",
+        "Sentry",
+        "設計"
+      ]
+    }
+  ]
+}
