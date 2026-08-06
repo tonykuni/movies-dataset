@@ -1,0 +1,61 @@
+{
+  "record": "VIA_One_v0101_FullActivation_Record",
+  "version": "v0100",
+  "date": "2026-08-06",
+  "operator_directive": "one powershell code to handle all and activate all system with u/i",
+  "activation": {
+    "via-flow": {
+      "engine": "VIA_FlowSystem_OneShot.py v1.0",
+      "smoke": "容器實跑五閘全 PASS(registry 77 列 dup=0 conflict=0、FIS finite/值域)、UI 產出",
+      "run_local": "VIA_Reports/flow_run(cwd 隔離,不覆寫歸檔正本 VIA_FlowSystem_UI.html)"
+    },
+    "via-if": {
+      "engine": "via_if_engine.py v0100",
+      "smoke": "--selftest 全 PASS 含 append_only_rerun_no_new_ids",
+      "outputs": "VIA_Reports/if_out(append-only)"
+    },
+    "via-fis": {
+      "engine": "VIA_FIS_Validation_v3.py",
+      "dependency": "scipy/numpy(容器缺,cmd rem 註明安裝指令;缺件誠實 FAIL 續行)",
+      "run_local": "VIA_Reports/fis_run"
+    },
+    "via-pipe": {
+      "engine": "via_pipeline.py",
+      "status": "PENDING_COMPANION:import rotation_engine 於本批不存在;cmd 已接線並誠實註明;補檔即用"
+    }
+  },
+  "via_one_v0101": {
+    "stages": 10,
+    "new": [
+      "FLOW OneShot(自產 UI)",
+      "IF selftest",
+      "FIS(Optional=缺依賴標 SKIP)",
+      "Hub v0104"
+    ],
+    "upgrades": [
+      "Mega v0103->v0106",
+      "VRN extract candidate->v0101 ACTIVE 載體",
+      "Hub v0100->v0104",
+      "階段 Cwd 支援(run-local 隔離)",
+      "Optional 階段標記"
+    ],
+    "rollback": "bin/via-one.cmd 改指 Invoke-VIA-One-v0100.ps1(原檔保留)"
+  },
+  "ui_hub_v0104": {
+    "tiles": 12,
+    "new_seals": "湧(FlowSystem)預(IF)驗(FIS)輪(Pipeline)",
+    "grouping": "四新家均 supportive 歸屬入支援性 grid",
+    "rollback": "v0103 保留"
+  },
+  "hashes": {
+    "Invoke-VIA-One-v0100.ps1(retained)": "c14179c6f1bfdcc6bce371c57e212eed9442dd39a36d7bbebc871305735b28af",
+    "Invoke-VIA-One-v0101.ps1(new ACTIVE)": "0ed90abd58026b5b85153ae0d63e412690d7dadad46880278397728f8bf2bd15",
+    "VIA_UI_Hub_v0104.html(new ACTIVE)": "a6ffdff0ce670b757458e712f27c14015948a8526b35402b88fba969d7aee645"
+  },
+  "governance": [
+    "正本不就地修改(v0100/Hub v0103 原地保留)",
+    "run-local 產出不入庫(VIA_Reports gitignored)",
+    "缺件誠實 FAIL/SKIP 不卡斷",
+    "append-only"
+  ]
+}

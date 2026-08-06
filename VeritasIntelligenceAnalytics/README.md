@@ -17,7 +17,7 @@ pwsh -File "VeritasIntelligenceAnalytics\Install-VIA.ps1"     # 加 -AutoStart �
 | 指令 | 作用 |
 |---|---|
 | `via` | 同步 + VDF 進料 + VAP 繪圖 + 自動開 UI(日常預設) |
-| `via-one` | **最終整合總啟動器**:sync→Mega 三輪→VMT→CGE→VRN probe/extract→UI Hub(一鍵全程不卡斷) |
+| `via-one` | **全系統總啟動器 v0101**:sync→Mega v0106→VMT→CGE→VRN probe/extract→FlowSystem UI→IF selftest→FIS→UI Hub 十二介面(一鍵全程不卡斷) |
 | `via-all` | 互動全套:VDF + VAP + VRN 預檢 + Control Tower(不含長跑稽核,不卡斷) |
 | `via-audit` | 長跑稽核三件套:TurboOptimizer SafeAudit + Panorama + Polyglot(預期數分鐘以上) |
 | `via-tower` | 治理總控台 `http://127.0.0.1:8765`(桌面捷徑同此) |
@@ -31,6 +31,10 @@ pwsh -File "VeritasIntelligenceAnalytics\Install-VIA.ps1"     # 加 -AutoStart �
 | `via-code` | 自動識別編號器:`via-code <類別> <元件> [suffix]`(冪等給號;`--list`;`--register`) |
 | `via-gov` | 中央治理引擎 CGE v0401:TAB 多頁儀表板+台股登記簿 1977 檔(dry-run 預設;`--commit`;`--fetch-tw`) |
 | `via-vdf` | VDF 一鍵側欄工作台(v0160C 一般瀏覽器 HTML U/I + 本機 HTTP 橋;SHA256+AST 閘門;回退 v0102/v0101) |
+| `via-flow` | FlowSystem OneShot:五鏡頭 FIS+fusion+五 QA 閘+自產 Visual-Lock UI(synthetic 誠實標示;run-local) |
+| `via-if` | VIA-IF 產業預測整合引擎:唯讀掃描+append-only 輸出(`--selftest` 自檢) |
+| `via-fis` | FIS 驗證 harness v3:E1/E2/E3 實驗+Matrix 報告(需 `py -m pip install scipy`) |
+| `via-pipe` | 統一輪動引擎(回測+自演化+證偽;**待同伴檔 rotation_engine.py 補齊**) |
 
 ## 系統架構
 
@@ -104,4 +108,4 @@ supportive modules/
 | 範疇已凍結項目 | 見 `audit_tools/VIA_ScopeFreeze_Closure_v0100.json`;重開需操作員點名 |
 
 ---
-*營運手冊 2026-08-06 · 對應 Tower v005 / Mega v0106 / VMT v0102 / VDF 工作台 v0160C / UI Hub v0103 Porcelain / TickerRegex v0100 / VRN v1.1.0 / 判定表 v002*
+*營運手冊 2026-08-06 · 對應 Tower v005 / Mega v0106 / VMT v0102 / VDF 工作台 v0160C / UI Hub v0104 Porcelain / TickerRegex v0100 / VRN v1.1.0 / 判定表 v002*

@@ -1,0 +1,74 @@
+#requires -Version 7.0
+<#
+Invoke-VIA-One v0101 — 全系統總啟動器(v0100 版本前送;依 VIA_MegaPrompt_OfficialMode_v0100)
+一支 PowerShell 處理全部並啟動全系統含 U/I:
+  同步 → Mega v0106 三輪全景(Porcelain Matrix)→ VMT 總指揮 → CGE dry-run
+  → VRN 內容探測/擷取 → FlowSystem OneShot(自產 UI)→ VIA-IF selftest
+  → FIS 驗證 harness(缺 scipy 誠實 FAIL 續行)→ UI Hub v0104(十二介面)。
+不關閉、不阻塞、不卡斷:無 Read-Host、無 exit;UI 以 Start-Process 非阻塞開啟;
+每階段動態進度條(Write-Progress)+ 動態說明;單一階段失敗誠實記錄後續行。
+回退:bin\via-one.cmd 改指 Invoke-VIA-One-v0100.ps1
+#>
+$ErrorActionPreference = "Continue"
+$Root = $PSScriptRoot
+$Bin = Join-Path $Root "bin"
+$Reports = Join-Path $Root "VIA_Reports"
+New-Item -ItemType Directory -Force -Path (Join-Path $Reports "flow_run"), (Join-Path $Reports "if_out") | Out-Null
+
+$Accelerators = @(
+    "AST 精準解析","多語言語意模型","九頭龍風險預測","依賴拓撲排序","沙盒隔離執行",
+    "自動修正建議生成","三輪全景式分析","SSOT 對齊","視覺化矩陣生成","錯誤分類與分群",
+    "性能與複雜度分析","多子系統同步檢視","版本差異與回滾","覆蓋率與回歸檢查","修正順序最佳化",
+    "動態進度條","動態說明","非阻塞 PowerShell","多引擎整合","自動部署與環境初始化")
+
+Write-Host ("=" * 70) -ForegroundColor DarkCyan
+Write-Host "  VIA ONE v0101  |  全系統總啟動器 · 20 加速器 · 公定處理模式 · Porcelain" -ForegroundColor Cyan
+Write-Host ("=" * 70) -ForegroundColor DarkCyan
+Write-Host ("[加速器] " + ($Accelerators -join " · ")) -ForegroundColor DarkGray
+
+$Stages = @(
+    @{ Name = "SYNC 同步 repo";                Kind = "ps";  Target = (Join-Path $Bin "via-sync.ps1") },
+    @{ Name = "MEGA 三輪全景 v0106(Porcelain)"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_Governance_Runtime\via_mega_engine_v0106.py") },
+    @{ Name = "VMT 總指揮 9 階段";              Kind = "py";  Target = (Join-Path $Root "supportive modules\VMT_SuperBOM\via_master_engine_v0102.py"); Args = @("--no-open") },
+    @{ Name = "CGE 中央治理 dry-run";           Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_Central_Governance\VIA_CentralGovernanceEngine_v0401.py"); Args = @("--workdir", ($env:VMT_ROOT ?? "C:\VIA\VeritasMailTracker")) },
+    @{ Name = "VRN 內容探測(唯讀 GO gate)";     Kind = "py";  Target = (Join-Path $Root "functional modules\VRN\vrn_content_probe_v0100.py"); Args = @("--no-open") },
+    @{ Name = "VRN 內容擷取 dry-run(v0101)";    Kind = "py";  Target = (Join-Path $Root "functional modules\VRN\vrn_content_extract_v0101.py") },
+    @{ Name = "FLOW 系統 OneShot(自產 UI)";     Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_FlowSystem\VIA_FlowSystem_OneShot.py"); Cwd = (Join-Path $Reports "flow_run") },
+    @{ Name = "IF 產業預測 selftest";           Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_IF_Engine\via_if_engine.py"); Args = @("--selftest") },
+    @{ Name = "FIS 驗證 harness(需 scipy)";     Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_FlowSystem\VIA_FIS_Validation_v3.py"); Cwd = (Join-Path $Reports "fis_run"); Optional = $true },
+    @{ Name = "UI HUB 十二介面樞紐 v0104";      Kind = "open"; Target = (Join-Path $Root "supportive modules\ui_support\VIA_UI_Hub_v0104.html") }
+)
+
+$Results = @()
+$total = $Stages.Count
+for ($i = 0; $i -lt $total; $i++) {
+    $st = $Stages[$i]
+    $pct = [int](($i) / $total * 100)
+    Write-Progress -Activity "VIA ONE 總管線" -Status $st.Name -PercentComplete $pct
+    Write-Host ("`n[STATUS] ({0}/{1}) {2}" -f ($i + 1), $total, $st.Name) -ForegroundColor Yellow
+    $sw = [System.Diagnostics.Stopwatch]::StartNew()
+    $ok = $true
+    try {
+        switch ($st.Kind) {
+            "ps"   { if (Test-Path -LiteralPath $st.Target) { & pwsh -NoProfile -File $st.Target } else { throw "缺檔 $($st.Target)" } }
+            "py"   { if (-not (Test-Path -LiteralPath $st.Target)) { throw "缺檔 $($st.Target)" }
+                     if ($st.Cwd) { Push-Location $st.Cwd }
+                     try { & py $st.Target @($st.Args) } finally { if ($st.Cwd) { Pop-Location } }
+                     if ($LASTEXITCODE -ne 0) { $ok = $false } }
+            "open" { if (Test-Path -LiteralPath $st.Target) { Start-Process $st.Target | Out-Null } else { throw "缺檔 $($st.Target)" } }
+        }
+    }
+    catch { $ok = $false; Write-Host ("[STATUS] 階段異常(續行):{0}" -f $_.Exception.Message) -ForegroundColor Red }
+    $sw.Stop()
+    $tag = if ($ok) { "OK" } elseif ($st.Optional) { "SKIP" } else { "FAIL" }
+    $Results += [pscustomobject]@{ 階段 = $st.Name; 結果 = $tag; 耗時s = [math]::Round($sw.Elapsed.TotalSeconds, 1) }
+}
+Write-Progress -Activity "VIA ONE 總管線" -Completed
+
+Write-Host ""
+Write-Host ("=" * 70) -ForegroundColor DarkCyan
+$Results | Format-Table -AutoSize
+$okN = ($Results | Where-Object 結果 -eq "OK").Count
+Write-Host ("[總結] {0}/{1} 階段 OK · FlowSystem UI + Mega Matrix + UI Hub 已非阻塞開啟 · PowerShell 保持開啟" -f $okN, $total) -ForegroundColor Green
+Write-Host "[提示] 選配依賴一鍵補齊:py -m pip install duckdb rich scipy numpy pandas" -ForegroundColor DarkGray
+Write-Host "[提示] via-pipe(輪動引擎)待同伴檔 rotation_engine.py 補齊後可用" -ForegroundColor DarkGray
