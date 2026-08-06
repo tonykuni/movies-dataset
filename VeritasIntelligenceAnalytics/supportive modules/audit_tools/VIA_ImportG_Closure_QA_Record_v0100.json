@@ -1,0 +1,28 @@
+{
+  "record": "VIA_ImportG_Closure_QA_Record",
+  "version": "v0100",
+  "date": "2026-08-06",
+  "rerun_cleanup": {
+    "cause": "Stage-2 歸位後操作員重跑 via-import,manifest G 對 Downloads 重演 -> a1584e8 再入 127 檔(3 NEW + 124 CONFL)",
+    "adjudication": "127/127 冗餘:121 CRLF 假衝突 = 庫內已歸位副本;preview/MapSim/HomeLauncher = 已歸檔親緣逐位元一致;Start-VIA-VDF/MarketRisk = 已歸檔變體逐位元一致;factor_dict_matrix = modules/Factor_Dict_Matrix.html 大小寫異名同內容",
+    "action": "staging 全刪;IMPORT_20260806H 哨兵(空清單)終結循環 — via-import 自此 no-op 直到真 I 批 manifest"
+  },
+  "consolidation_qa": {
+    "py_compile": "批次 G 新歸位 13 支 .py 全 PASS(Pipeline/FlowSystem/IF/network/audit/VDF MDL/ps_lint)",
+    "ps1_ast": "容器無 pwsh;操作員機一鍵驗證:[System.Management.Automation.Language.Parser]::ParseFile()(AI 撰寫規範 SSOT 第 7 節)",
+    "activation_policy": "歸檔碼不自動接線;任何新家族要啟用(如 via-flow / via-if)需操作員點名,屆時走版本前送+bin cmd+回退註解"
+  },
+  "mega_v0106": {
+    "change": "掃描期 ast.parse 的 SyntaxWarning 靜音(catch_warnings);AST 錯誤照常計 fail;起因=操作員輸出出現 <unknown>:1896 SyntaxWarning 污染進度條",
+    "hashes": {
+      "v0105(retained)": "e15304f9fc06ae46f801d03ee227c0757a5b197f2507d0d549d7f3d53cd98154",
+      "v0106(new ACTIVE)": "d87994cf2c45e9af5b5a1faafa613de0f8dce1554e6a7308e12f96dd927b4ab0"
+    },
+    "operator_baseline": "v0105 實跑 GREEN 1317 檔 / hydra 0 / SSOT 7/7 / parquet 冪等 0+1317"
+  },
+  "governance": [
+    "九頭龍防治",
+    "正本不就地修改",
+    "append-only"
+  ]
+}
