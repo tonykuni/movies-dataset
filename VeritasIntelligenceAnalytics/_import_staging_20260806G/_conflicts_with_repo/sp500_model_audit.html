@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>模型審計與惡魔驗證 · Model Audit</title>
+<style>
+  :root{
+    --bg:#f8f7f2; --ink:#1f2a2a; --red:#b94a48; --orange:#c9822b;
+    --green:#3f7f5f; --blue:#4b6f88; --purple:#6f5b8e; --brown:#8a6f4a;
+    --line:#ddd8cc; --soft:#efece3; --mut:#6c6a60;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg); color:var(--ink); max-width:1180px; margin:0 auto; padding:34px 30px 60px;
+    font:13.5px/1.6 "Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif; -webkit-font-smoothing:antialiased;}
+  header{position:relative; border-bottom:2.5px solid var(--ink); padding-bottom:16px; margin-bottom:24px;}
+  .kicker{font-size:11.5px; letter-spacing:3px; color:var(--mut); text-transform:uppercase; margin-bottom:7px;}
+  h1{font-size:25px; line-height:1.24; font-weight:800; letter-spacing:.2px;}
+  h1 .accent{color:var(--red);}
+  .sub{margin-top:9px; font-size:13px; color:var(--mut); max-width:820px;}
+  .meta{margin-top:12px; font-size:11.5px; color:var(--mut); display:flex; gap:18px; flex-wrap:wrap;}
+  .meta b{color:var(--ink); font-weight:700;}
+  .stamp{position:absolute; top:-3px; right:0; width:82px; height:82px; border-radius:50%;
+    border:2.5px solid var(--red); color:var(--red); display:flex; align-items:center; justify-content:center;
+    font-size:15px; font-weight:800; letter-spacing:1px; transform:rotate(-12deg); text-align:center; line-height:1.15;
+    opacity:.92; box-shadow:inset 0 0 0 2px rgba(185,74,72,.18);}
+
+  section{margin-bottom:30px;}
+  h2{font-size:17.5px; font-weight:800; letter-spacing:.4px; margin-bottom:11px; display:flex; align-items:baseline; gap:11px;}
+  h2 .no{font-size:12px; color:#fff; background:var(--ink); width:22px; height:22px; border-radius:5px; display:inline-flex; align-items:center; justify-content:center; font-weight:700; flex:none;}
+  h2 .en{font-size:11px; letter-spacing:2px; color:var(--mut); font-weight:600; text-transform:uppercase;}
+  .lead{font-size:12.5px; color:var(--mut); margin:-2px 0 12px;}
+
+  table{width:100%; border-collapse:collapse; font-size:11.8px; background:#fff; border:1px solid var(--line); border-radius:8px; overflow:hidden; margin-bottom:8px;}
+  thead th{background:var(--ink); color:#fff; text-align:left; padding:7px 9px; font-size:10.5px; font-weight:700;}
+  tbody td{padding:6px 9px; border-top:1px solid var(--soft); vertical-align:top;}
+  tbody tr:nth-child(even){background:#fdfcf9;}
+  td.n{text-align:right; font-variant-numeric:tabular-nums; font-weight:700;}
+  .cat{background:var(--soft); font-weight:800; font-size:11px; letter-spacing:.5px;}
+  .cat td{padding:5px 9px; color:var(--ink);}
+  .st{display:inline-block; font-size:9.5px; font-weight:800; color:#fff; border-radius:9px; padding:1px 7px; white-space:nowrap;}
+  .s-hot{background:var(--red)} .s-warm{background:var(--orange)} .s-cool{background:var(--green)} .s-bg{background:var(--blue)} .s-gate{background:var(--purple)} .s-neu{background:#9a978c}
+  .pos{color:var(--green)} .neg{color:var(--red)} .flat{color:var(--orange)}
+  tr.hl{background:#f3ece4 !important} tr.hl td{font-weight:700}
+
+  .devil{background:var(--ink); color:#f3f0e8; border-radius:12px; padding:20px 24px; margin-bottom:14px;}
+  .devil .tag{font-size:11px;letter-spacing:2px;color:var(--orange);font-weight:700;text-transform:uppercase;margin-bottom:9px;}
+  .devil .q{font-size:16px;font-weight:800;color:#fff;line-height:1.55;}
+  .devil .q b{color:#e0a85e;}
+  .attack{background:#fff;border:1px solid var(--line);border-left:4px solid var(--red);border-radius:8px;padding:11px 15px;margin-bottom:9px;}
+  .attack.surv{border-left-color:var(--green)}
+  .attack h4{font-size:12.8px;font-weight:800;margin-bottom:4px;display:flex;justify-content:space-between;gap:8px;}
+  .attack h4 .res{font-size:10px;font-weight:800;color:#fff;border-radius:9px;padding:2px 8px;white-space:nowrap;}
+  .res-soft{background:var(--orange)} .res-hold{background:var(--green)} .res-up{background:var(--red)}
+  .attack p{font-size:12px;line-height:1.55;color:var(--mut)}
+  .attack p b{color:var(--ink)}
+
+  .survive{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:15px 18px;}
+  .survive h3{font-size:14px;font-weight:800;margin-bottom:9px;color:var(--green)}
+  .survive p{font-size:13px;line-height:1.7}
+  .survive b{font-weight:800}
+  .survive .down{color:var(--red);border-bottom:2px solid var(--red);font-weight:800}
+
+  .disclaim{background:var(--soft); border:1px dashed var(--line); border-radius:7px; padding:10px 13px; font-size:11px; color:var(--mut); margin-top:14px; line-height:1.6;}
+  footer{margin-top:34px; border-top:1.5px solid var(--line); padding-top:14px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; font-size:11px; color:var(--mut);}
+  footer .v{font-weight:800; letter-spacing:2px; color:var(--ink);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="stamp">模型<br>審計</div>
+  <div class="kicker">Model Audit · Sources · Literature · Backtest · Devil's Verification</div>
+  <h1>模型審計與<span class="accent">惡魔驗證</span>:把整套模型攤在陽光下</h1>
+  <p class="sub">資料來源清單(分類+時點)、文獻研究清單、回測結果,以及反向壓力測試——我刻意回頭攻擊自己的「向下」結論,看它撐不撐得住。</p>
+  <div class="meta">
+    <span><b>資料時點</b>　2026/06/15</span>
+    <span><b>結論受測</b>　評價方向=向下(de-rating)</span>
+    <span><b>驗證法</b>　三面攻擊 + 敏感度 + breakeven</span>
+  </div>
+</header>
+
+<!-- 1 資料來源清單 -->
+<section>
+  <h2><span class="no">1</span>資料來源清單(分類 · 時點 · 狀態)<span class="en">Data Registry</span></h2>
+  <p class="lead">狀態:<span class="st s-hot">危險</span>觸發/脆弱亮紅　<span class="st s-warm">半觸發</span>　<span class="st s-cool">支撐/平靜</span>　<span class="st s-bg">背景</span>　<span class="st s-gate">情境閘</span>。所有讀數為 2026 年 6 月當期。</p>
+  <table>
+    <thead><tr><th>指標</th><th>讀數</th><th>來源</th><th>時點</th><th>狀態</th></tr></thead>
+    <tbody>
+      <tr class="cat"><td colspan="5">A · 估值 Valuation</td></tr>
+      <tr class="hl"><td>Shiller CAPE</td><td class="n">40.06</td><td>GuruFocus</td><td>2026-06-01</td><td><span class="st s-hot">危險·史上第二</span></td></tr>
+      <tr><td>Forward P/E</td><td class="n">~22</td><td>FactSet/Goldman</td><td>2026-06</td><td><span class="st s-warm">偏高</span></td></tr>
+      <tr><td>超額CAPE殖利率 ECY</td><td class="n">1.32</td><td>GuruFocus</td><td>2026-05</td><td><span class="st s-warm">偏低</span></td></tr>
+      <tr><td>Buffett 指標(市值/GDP)</td><td class="n">~222%</td><td>GuruFocus</td><td>2025末</td><td><span class="st s-hot">極高</span></td></tr>
+      <tr class="cat"><td colspan="5">B · 利率與信用 Rates & Credit</td></tr>
+      <tr><td>10Y / 2Y / 3M 公債</td><td class="n">4.49 / 4.09 / 3.71%</td><td>StreetStats</td><td>2026-06</td><td><span class="st s-neu">中性</span></td></tr>
+      <tr><td>曲線 10y-3m / 10y-2y</td><td class="n">+77 / +40bp</td><td>StreetStats</td><td>2026-06</td><td><span class="st s-cool">正斜率·休眠</span></td></tr>
+      <tr><td>HY OAS 高收益利差</td><td class="n">~275bps</td><td>FRED/govspending</td><td>2026-06-05</td><td><span class="st s-cool">平靜·休眠</span></td></tr>
+      <tr><td>IG OAS / MOVE</td><td class="n">~80bps / ~69</td><td>StreetStats</td><td>2026-06</td><td><span class="st s-cool">平靜</span></td></tr>
+      <tr class="cat"><td colspan="5">C · 波動 Volatility</td></tr>
+      <tr><td>VIX</td><td class="n">~17–19</td><td>FRED/StreetStats</td><td>2026-06</td><td><span class="st s-cool">平靜(3月曾破30)</span></td></tr>
+      <tr class="cat"><td colspan="5">D · 勞動與總經 Labor & Macro</td></tr>
+      <tr><td>失業率 / Sahm 指標</td><td class="n">~4.3% / 0.23–0.30</td><td>CurrentMktVal</td><td>2026-06</td><td><span class="st s-cool">休眠(&lt;0.5)</span></td></tr>
+      <tr><td>核心CPI / headline / supercore</td><td class="n">2.9% / 4.2% / ~3.7%</td><td>TradingEcon/Kiplinger</td><td>2026-05</td><td><span class="st s-hot">危險·半觸發</span></td></tr>
+      <tr><td>PPI YoY</td><td class="n">+6.5%</td><td>多來源</td><td>2026-05</td><td><span class="st s-hot">多年高</span></td></tr>
+      <tr class="cat"><td colspan="5">E · 獲利 Earnings</td></tr>
+      <tr><td>S&P500 EPS 成長 CY26 / CY27</td><td class="n">+21~23% / +16%</td><td>FactSet</td><td>2026-06</td><td><span class="st s-cool">支撐</span></td></tr>
+      <tr><td>獲利修正廣度</td><td class="n">正/上修</td><td>FactSet/Mill St</td><td>2026-06</td><td><span class="st s-cool">支撐</span></td></tr>
+      <tr class="cat"><td colspan="5">F · 部位與槓桿 Positioning & Leverage</td></tr>
+      <tr><td>FINRA 融資餘額 margin debt</td><td class="n">$1.30兆 (+53%YoY)</td><td>AdvisorPersp/dshort</td><td>2026-04</td><td><span class="st s-hot">創紀錄</span></td></tr>
+      <tr><td>margin debt / GDP</td><td class="n">~4.1% (50年中位1.5%)</td><td>Atwater Malick</td><td>2026</td><td><span class="st s-hot">危險</span></td></tr>
+      <tr><td>集中度 前10大 / Mag7</td><td class="n">&gt;37% / ~34%</td><td>Motley Fool 等</td><td>2026-06</td><td><span class="st s-hot">危險</span></td></tr>
+      <tr class="cat"><td colspan="5">G · 商品與地緣 Commodities & Geopolitics</td></tr>
+      <tr><td>布蘭特原油 (3月曾114)</td><td class="n">~87–91</td><td>CNBC</td><td>2026-06-09</td><td><span class="st s-warm">半觸發</span></td></tr>
+      <tr><td>DXY 美元指數</td><td class="n">~99</td><td>多來源</td><td>2026-06</td><td><span class="st s-neu">—</span></td></tr>
+      <tr class="cat"><td colspan="5">H · 財政 / 中國 / 數據可信度(結構背景)</td></tr>
+      <tr><td>CBO:OBBBA 2025-34 赤字</td><td class="n">+3.4兆;債2034→GDP124%</td><td>CBO</td><td>2025</td><td><span class="st s-bg">結構壓力</span></td></tr>
+      <tr><td>中國證券淨流出 / FDI</td><td class="n">~$425bn / 淨負</td><td>BOFIT</td><td>2026-04</td><td><span class="st s-gate">外溢</span></td></tr>
+      <tr><td>BLS 機構調查回覆率</td><td class="n">61%(15)→42.6%(25)</td><td>Purdue/Holtz-Eakin</td><td>2025</td><td><span class="st s-bg">背景脆弱</span></td></tr>
+      <tr><td>BLS 2025 基準修正</td><td class="n">−911k</td><td>PolitiFact/RSM</td><td>2025-09</td><td><span class="st s-bg">背景脆弱</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 2 文獻清單 -->
+<section>
+  <h2><span class="no">2</span>文獻研究清單<span class="en">Literature Registry</span></h2>
+  <table>
+    <thead><tr><th>文獻(作者·年·期刊)</th><th>核心發現 / 在模型中的角色</th></tr></thead>
+    <tbody>
+      <tr class="cat"><td colspan="2">觸發類因子 Triggers</td></tr>
+      <tr><td>Estrella & Mishkin 1996/1998（NY Fed / RES）</td><td>殖利率曲線 10y-3m 為最佳單一衰退預測,領先 2–6 季,樣本外優於其他變數。</td></tr>
+      <tr><td>Gilchrist & Zakrajšek 2012（AER 102:1692）</td><td>EBP/信用利差;EBP +100bp → 隨後 4 季實質 GDP -1.5pp,並壓低股價。</td></tr>
+      <tr><td>Sahm 2019（Brookings/FRED）</td><td>失業率 3m 均值升 0.5pp = 衰退即時觸發;1959 以來幾無假陽性。</td></tr>
+      <tr><td>Hamilton 1983 / 2011（JPE / NBER）</td><td>戰後 11 次衰退 10 次前有油價急升;1996 強調 regime-dependent「淨油價」。</td></tr>
+      <tr><td>Mill Street / Guerard（I/B/E/S）</td><td>獲利修正「廣度」較「幅度」更具持續預測力。</td></tr>
+      <tr class="cat"><td colspan="2">脆弱性與乘數結構 Fragility & Vulnerability</td></tr>
+      <tr class="hl"><td>Adrian, Boyarchenko & Giannone 2019（AER 109:1263）</td><td>Vulnerable Growth:金融條件惡化使成長「下尾」非線性放大、上尾穩定。<b>= 觸發×脆弱乘數結構的核心學理依據。</b></td></tr>
+      <tr><td>Campbell & Shiller 1988</td><td>CAPE 預測長期報酬之框架(本回測的理論基礎)。</td></tr>
+      <tr><td>Invesco / 多研究</td><td>CAPE 對 10 年報酬 R² ~0.4–0.78、對 1 年近零 → 評價只准做報酬高低、禁止擇時。</td></tr>
+      <tr><td>Siegel 2016（FAJ 72:41）<b>【反方】</b></td><td>FAS 142/144 會計變動使報酬earnings下偏→CAPE 上偏;結構因素支撐更高合理本益比。<b>本報告反向壓力測試的主攻點。</b></td></tr>
+      <tr><td>Arnott / Research Affiliates</td><td>均值回歸長期強短期弱;實質 EPS 趨勢自 1871 僅 ~1.5%;公允 CAPE 16.6 偏低但市場仍貴。</td></tr>
+      <tr class="cat"><td colspan="2">勞動-資本-AI(代表性) Factor Shares & AI</td></tr>
+      <tr><td>Karabarbounis & Neiman 2014（QJE 129:61）</td><td>全球勞動份額自 1980s 初降約 5pp;投資財變便宜→資本替代勞動。</td></tr>
+      <tr><td>Autor, Dorn, Katz, Patterson, Van Reenen 2020（QJE 135:645）</td><td>美國勞動份額 66%(1980)→<60%(2010);超級明星企業(低勞動份額·高加成)主導。</td></tr>
+      <tr><td>Chen, Karabarbounis & Neiman 2017（JME 89:1）</td><td>企業利潤佔 GDP 上升、企業變淨儲蓄者(回購/現金堆積)。</td></tr>
+      <tr><td>Acemoglu 2024（NBER w32487 / Econ Policy）</td><td>AI 對 TFP 十年貢獻 ≤0.53–0.71%;資本攫取大部分利益、勞動份額或續降。</td></tr>
+      <tr class="cat"><td colspan="2">數據可信度 · 中國 · 地緣 Background / Gate</td></tr>
+      <tr><td>Clark, Dawson, Pinkovskiy & Sala-i-Martin（NY Fed）</td><td>夜燈估計:中國 2012 後官方數據未明顯高估(只是平滑波動)→中國數據爭議的反證。</td></tr>
+      <tr><td>GAO 2026 / Holtz-Eakin 2025</td><td>BLS 回覆率下滑、修正擴大;數據品質風險上升(但屬正常程序非造假)。</td></tr>
+      <tr><td>Caldara & Iacoviello 2022（AER 112:1194）</td><td>GPR 指數預示投資/就業下降,但多為次月均值回歸 → 地緣降權、僅留油價傳導管道。</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 3 回測結果 -->
+<section>
+  <h2><span class="no">3</span>回測結果<span class="en">Backtest Results</span></h2>
+  <p class="lead">Bogle 分解:10年年化報酬 = 股息(1.25%) + 名目EPS成長(5%) + 估值變動。下表每列為「10年後 CAPE 落點」情境。</p>
+  <table>
+    <thead><tr><th>10年後CAPE</th><th>含義</th><th class="n">估值拖累/年</th><th class="n">名目/年</th><th class="n">實質/年</th></tr></thead>
+    <tbody>
+      <tr class="hl"><td>40</td><td>永久高檔(資本/AI論成立)</td><td class="n">−0.01%</td><td class="n pos">+6.24%</td><td class="n pos">+3.24%</td></tr>
+      <tr><td>35</td><td>輕微回落</td><td class="n">−1.34%</td><td class="n pos">+4.91%</td><td class="n flat">+1.91%</td></tr>
+      <tr><td>30</td><td>偏高新常態</td><td class="n">−2.85%</td><td class="n flat">+3.40%</td><td class="n flat">+0.40%</td></tr>
+      <tr><td>25</td><td>現代中位數</td><td class="n">−4.61%</td><td class="n flat">+1.64%</td><td class="n neg">−1.36%</td></tr>
+      <tr><td>20</td><td>長期中位數</td><td class="n">−6.71%</td><td class="n neg">−0.46%</td><td class="n neg">−3.46%</td></tr>
+      <tr><td>17</td><td>1990前中位數</td><td class="n">−8.21%</td><td class="n neg">−1.96%</td><td class="n neg">−4.96%</td></tr>
+    </tbody>
+  </table>
+  <p class="lead" style="margin-top:6px;">機率加權(judgment:30→40%、25→25%、35→20%、20→8%、40→5%、17→2%):<b>期望實質報酬 ≈ −0.01%/年</b>,較歷史 +6.5% 透支約 −6.5%/年。歷史對照(CAPE&gt;35,n≈3):2000(44)→失落十年、2021(38)→2022 −25%、1929(32)→崩89%,方向一致。<br>12個月:觸發合成 0.10 × 脆弱合成 0.92 = 0.09 → 系統性崩跌非基準(基準震盪/溫和 55–60%、中度修正 25–30%、尾端 10–15%)。</p>
+</section>
+
+<!-- 4 惡魔驗證 -->
+<section>
+  <h2><span class="no">4</span>惡魔驗證法 · 反向壓力測試<span class="en">Devil's Verification</span></h2>
+  <div class="devil">
+    <div class="tag">把問題反過來問</div>
+    <div class="q">不問「為什麼會跌」,改問:<b>要讓『向下』結論錯,你必須相信什麼?</b><br>答案——即使 CAPE 永遠停在 40,你還得相信盈餘能<b>名目成長 8.3%/年(實質 5.3%)</b>,<br>是歷史實質 EPS 趨勢(1.5%)的三倍多。這就是反方必須吞下的代價。</div>
+  </div>
+
+  <div class="attack">
+    <h4><span>① 多方鋼鐵人:CAPE 被高估、公允值更高(Siegel)</span><span class="res res-soft">軟化幅度</span></h4>
+    <p>Siegel:會計變動使 CAPE 上偏,結構因素(指數化、低利率)支撐更高本益比,公允值或為 25 而非 17–20。<b>檢驗</b>:就算全盤接受公允=25,40→25 仍是 de-rating,g=5% 下實質報酬仍 −1.36%/年。<b>反方頂多把幅度從『很向下』軟化成『溫和向下』,扳不倒方向。</b></p>
+  </div>
+  <div class="attack">
+    <h4><span>② 空方鋼鐵人:脆弱 0.92 極端,尾端被低估</span><span class="res res-up">上修尾端</span></h4>
+    <p>觸發可數週內由休眠轉點火(2020 COVID、2007 信用);油價已半觸發;集中度使單一巨頭失誤即級聯。<b>檢驗</b>:此攻擊<b>成立但方向相反</b>——它不否定「向下」,反而說 12 個月尾端崩跌或略高於 10–15%。我接受並上修尾端警戒,基準「震盪」是『觸發續休眠』的賭注而非必然。</p>
+  </div>
+  <div class="attack">
+    <h4><span>③ 方法論攻擊:Bogle 對 g 與終端 CAPE 敏感</span><span class="res res-soft">加敏感度</span></h4>
+    <p>結果取決於假設。<b>敏感度</b>:唯有「終端 CAPE≥35 <u>且</u> g≥6%」才回到正常實質報酬;g 從 4%→6% 也只把 CAPE30 情境從 −0.6% 抬到 +1.4%。<b>翻案需同時滿足兩個偏樂觀條件,屬小機率。</b>結論對合理參數範圍穩健。</p>
+  </div>
+  <div class="attack">
+    <h4><span>④ 樣本攻擊:CAPE&gt;35 僅 n≈3,統計信心不足</span><span class="res res-soft">降信心</span></h4>
+    <p>正確。三個歷史點(1929/2000/2021)方向一致但樣本太小,不足以宣稱精確機率。<b>這正是模型只敢講「方向」而非「點位/時點」的原因</b>——也是對舊模型喊「−50%」的修正。</p>
+  </div>
+
+  <div class="survive">
+    <h3>四面攻擊後,結論存活檢查</h3>
+    <p>把多方、空方、方法論、樣本四把刀都砍上去之後:<b>「評價方向 = <span class="down">向下</span>」這個方向性結論存活</b>。多方只能軟化幅度(公允 25 仍 &lt; 40)、空方反而上修尾端(同向加碼)、方法論顯示翻案需要 g≥6% 且 CAPE≥35 的雙樂觀小機率組合、樣本攻擊正當地把結論限縮在「方向」而非「點位」。<b>沒有任何一刀能把方向從『向下』翻成『向上』。</b>能被動搖的只有「跌多深、何時跌」——而那本來就不是評價該回答的問題(評價管長期報酬高低,觸發管短期時點)。</p>
+  </div>
+</section>
+
+<div class="disclaim">
+  資料時點 2026 年 6 月 15 日。資料來源清單之讀數來自所列公開來源,時點如標示,快變數(CAPE、利差、油價、VIX)可能於數日內變動。文獻清單之發現為原研究結論摘要。Bogle 分解為透明會計恆等式,情境權重與 12 個月機率為標示之 judgment、非精算輸出;敏感度與 breakeven 為機械推算。歷史 CAPE&gt;35 對照為小樣本(n≈3),僅供方向參考。本報告陳述「預期報酬方向(評價貴賤)」,<b>不構成任何買進/賣出/持有之投資建議</b>;CAPE 高位可維持數年,評價不等於擇時訊號。<b>非投資建議。</b>
+</div>
+
+<footer>
+  <span class="v">VERITAS INTELLIGENCE ANALYTICS</span>
+  <span>Model Audit · Data &amp; Literature Registry · Backtest · Devil's Verification</span>
+</footer>
+
+</body>
+</html>

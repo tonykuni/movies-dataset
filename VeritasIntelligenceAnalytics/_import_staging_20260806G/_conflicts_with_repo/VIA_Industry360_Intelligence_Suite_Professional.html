@@ -1,0 +1,914 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VIA Industry360 Intelligence Suite · 行業分類 / 客戶銷售 / 成本供應鏈 / BOM / AI PromptOps</title>
+  <style>
+    :root{
+      --bg:#F9F9F6;
+      --surface:#FFFFFF;
+      --surface2:#F3F6F4;
+      --ink:#1F2933;
+      --muted:#6B7C78;
+      --line:#DFECEA;
+      --celadon:#DFECEA;
+      --sky:#AFCFCC;
+      --seal:#9F1D1D;
+      --ok:#166534;
+      --warn:#B7791F;
+      --fail:#B91C1C;
+      --blue:#2563EB;
+      --teal:#0F766E;
+      --amber:#D97706;
+      --purple:#7C3AED;
+      --shadow:0 18px 48px rgba(31,41,51,.09);
+      --radius:22px;
+      --mono:"SFMono-Regular","Cascadia Mono","Consolas",monospace;
+      --sans:Inter,"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:
+        radial-gradient(circle at 8% 6%, rgba(175,207,204,.48), transparent 28%),
+        radial-gradient(circle at 92% 10%, rgba(223,236,234,.72), transparent 31%),
+        linear-gradient(120deg, rgba(255,255,255,.48), rgba(249,249,246,.96));
+      color:var(--ink);
+      font-family:var(--sans);
+      line-height:1.5;
+    }
+    .wrap{max-width:1540px;margin:0 auto;padding:28px 30px 58px}
+    .topbar{display:grid;grid-template-columns:1fr 400px;gap:18px;align-items:stretch;margin-bottom:18px}
+    .hero,.control,.card{
+      background:rgba(255,255,255,.86);
+      border:1px solid var(--line);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+    }
+    .hero{padding:26px 28px;position:relative;overflow:hidden}
+    .hero:before{
+      content:"";
+      position:absolute;
+      width:290px;height:290px;
+      left:-120px;top:-110px;
+      border-radius:48px;
+      background:rgba(159,29,29,.075);
+      transform:rotate(-7deg);
+    }
+    .seal{
+      display:inline-flex;align-items:center;justify-content:center;
+      width:46px;height:46px;border-radius:14px;
+      background:var(--seal);color:#fff;font-weight:900;font-size:25px;
+      box-shadow:0 10px 24px rgba(159,29,29,.22);
+      margin-right:12px;vertical-align:middle;
+    }
+    h1{font-size:32px;margin:0 0 8px;letter-spacing:.15px}
+    .sub{color:var(--muted);font-size:14px;margin:4px 0}
+    .quote{color:var(--seal);font-size:13px;letter-spacing:.55px;margin-top:12px}
+    .idline{font-family:var(--mono);color:var(--muted);font-size:12px;margin-top:10px}
+    .control{padding:18px}
+    label{display:block;font-size:12px;font-weight:850;color:var(--muted);margin:0 0 7px}
+    select,input{
+      width:100%;border:1px solid var(--line);border-radius:14px;padding:12px 13px;
+      background:#fff;color:var(--ink);font-size:14px;outline:none;margin-bottom:12px;
+    }
+    .pillrow{display:flex;gap:8px;flex-wrap:wrap}
+    .pill{font-family:var(--mono);font-size:11px;border:1px solid var(--line);background:var(--surface2);color:var(--muted);border-radius:999px;padding:6px 9px}
+    .grid{display:grid;gap:18px}
+    .kpi{grid-template-columns:repeat(6,1fr);margin:18px 0}
+    .two{grid-template-columns:1.05fr .95fr}
+    .three{grid-template-columns:1fr 1fr 1fr}
+    .card{padding:18px;overflow:hidden}
+    .card h2,.card h3{
+      margin:0 0 12px;font-size:18px;display:flex;align-items:center;gap:9px;line-height:1.3;
+    }
+    .secid{
+      font-family:var(--mono);font-size:11px;color:var(--seal);
+      border:1px solid rgba(159,29,29,.22);background:rgba(159,29,29,.045);
+      border-radius:9px;padding:3px 6px;white-space:nowrap;
+    }
+    .kpi .card{padding:16px}
+    .kpi-title{font-size:12px;color:var(--muted);font-weight:850;margin-bottom:8px}
+    .kpi-value{font-size:24px;font-weight:900;letter-spacing:-.45px}
+    .kpi-note{font-size:12px;color:var(--muted);margin-top:7px;min-height:34px}
+    .num{text-align:right;font-family:var(--mono);white-space:nowrap}
+    .mono{font-family:var(--mono)}
+    .small{font-size:12px;color:var(--muted)}
+    .scroll{max-height:430px;overflow:auto;padding-right:4px}
+    table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+    th{
+      position:sticky;top:0;z-index:2;text-align:left;color:var(--muted);font-size:12px;
+      background:var(--surface2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+      padding:10px 9px;
+    }
+    th:first-child{border-left:1px solid var(--line);border-radius:12px 0 0 12px}
+    th:last-child{border-right:1px solid var(--line);border-radius:0 12px 12px 0}
+    td{padding:10px 9px;border-bottom:1px solid rgba(223,236,234,.78);vertical-align:top}
+    tr:hover td{background:rgba(223,236,234,.25)}
+    .tag{
+      display:inline-block;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:850;
+      border:1px solid var(--line);white-space:nowrap;
+    }
+    .ok{color:var(--ok);background:rgba(22,101,52,.065);border-color:rgba(22,101,52,.18)}
+    .warn{color:var(--warn);background:rgba(183,121,31,.075);border-color:rgba(183,121,31,.20)}
+    .fail{color:var(--fail);background:rgba(185,28,28,.075);border-color:rgba(185,28,28,.20)}
+    .info{color:var(--blue);background:rgba(37,99,235,.065);border-color:rgba(37,99,235,.18)}
+    .up{color:var(--seal)} .down{color:var(--ok)} .flat{color:var(--muted)}
+    .chartbox{height:330px;position:relative}
+    .chartbox.tall{height:420px}
+    svg{width:100%;height:100%}
+    .legend{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px}
+    .dot{display:inline-block;width:10px;height:10px;border-radius:999px;margin-right:4px;background:var(--muted)}
+    .flow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .step{
+      border:1px solid var(--line);border-radius:18px;padding:13px;background:linear-gradient(180deg,#fff,rgba(223,236,234,.34));
+    }
+    .step b{display:block;margin-bottom:6px}
+    .step p{margin:0;color:var(--muted);font-size:12px}
+    .noteBox{
+      border-left:4px solid var(--seal);background:rgba(159,29,29,.035);
+      padding:11px 13px;border-radius:12px;color:var(--muted);font-size:13px;margin-top:10px;
+    }
+    .pathbox{
+      display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px;
+      font-size:12px;color:var(--muted);
+    }
+    .crumb{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 10px}
+    .arrow{color:var(--seal);font-family:var(--mono)}
+    .matrix{display:grid;grid-template-columns:135px repeat(5,1fr);gap:6px;font-size:12px}
+    .matrix div{border:1px solid var(--line);border-radius:10px;padding:9px 8px;min-height:42px;background:#fff}
+    .matrix .head{font-weight:850;background:var(--surface2);color:var(--muted)}
+    .risk-low{background:rgba(22,101,52,.08)!important;color:var(--ok)}
+    .risk-mid{background:rgba(183,121,31,.10)!important;color:var(--warn)}
+    .risk-high{background:rgba(185,28,28,.10)!important;color:var(--fail)}
+    textarea{
+      width:100%;
+      min-height:210px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:13px;
+      font-family:var(--mono);
+      font-size:12px;
+      color:var(--ink);
+      background:#fff;
+      resize:vertical;
+      line-height:1.45;
+    }
+    .promptgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .copyBtn{
+      border:1px solid var(--line);border-radius:999px;padding:7px 11px;background:var(--surface2);
+      color:var(--ink);font-size:12px;cursor:pointer;margin-bottom:8px;font-weight:800;
+    }
+    .copyBtn:hover{border-color:rgba(159,29,29,.35);color:var(--seal)}
+    .foot{margin-top:18px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    @media (max-width:1220px){
+      .topbar,.two,.three{grid-template-columns:1fr}
+      .kpi{grid-template-columns:repeat(3,1fr)}
+      .flow{grid-template-columns:1fr 1fr}
+      .promptgrid{grid-template-columns:1fr}
+    }
+    @media (max-width:760px){
+      .wrap{padding:18px 14px 36px}
+      h1{font-size:24px}
+      .kpi{grid-template-columns:1fr 1fr}
+      .flow{grid-template-columns:1fr}
+      .matrix{grid-template-columns:1fr}
+      .matrix .head{display:none}
+    }
+    @media print{
+      body{background:#fff}
+      .control,.copyBtn{display:none}
+      .card,.hero{box-shadow:none;break-inside:avoid}
+      .wrap{max-width:none}
+    }
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+  <section class="topbar">
+    <div class="hero">
+      <h1><span class="seal">理</span>VIA Industry360 Intelligence Suite</h1>
+      <div class="sub">Industry Taxonomy · Customer & Revenue Intelligence · Cost & Supply Chain Intelligence · BOM Value Chain Analytics · AI PromptOps</div>
+      <div class="sub">最多三層行業分類，自動編號，全項目帶版本日期，支援客戶銷售、成本供應鏈、BOM、風險與 AI 接力整合。</div>
+      <div class="quote">判天地之美，析萬物之理｜把產業分類、客戶結構、銷售動能、BOM 成本、供應鏈風險與 Prompt 規範整合成可驗證 SSOT。</div>
+      <div class="idline" id="productIdLine"></div>
+    </div>
+
+    <aside class="control">
+      <label>def 00 行業分類 Level 1 / 2 / 3</label>
+      <select id="industrySelect"></select>
+      <label>def 01 情境假設：成本通膨 / 成本下降</label>
+      <input id="scenarioSlider" type="range" min="-20" max="20" value="0" />
+      <div class="pillrow">
+        <span class="pill" id="scenarioText">Base 0%</span>
+        <span class="pill">Version 20260701</span>
+        <span class="pill">Auto-ID</span>
+        <span class="pill">PromptOps</span>
+      </div>
+    </aside>
+  </section>
+
+  <section class="grid kpi" id="kpiGrid"></section>
+
+  <section class="grid two">
+    <article class="card">
+      <h2><span class="secid" id="secTaxonomy"></span>三層行業分類與自動編號</h2>
+      <div class="pathbox" id="taxonomyPath"></div>
+      <div class="scroll"><table id="taxonomyTable"></table></div>
+      <div class="noteBox">def Rule：行業分類最多三層 L1/L2/L3；所有分析物件 ID 必須包含 VIA、版本日期、分類碼、項目流水號，避免不同日期或不同分類的資料混用。</div>
+    </article>
+
+    <article class="card">
+      <h2><span class="secid" id="secIdRule"></span>自動編號規則</h2>
+      <div class="scroll"><table id="idRuleTable"></table></div>
+      <div class="noteBox">def Pattern：VIA-YYYYMMDD-L1xx-L2xx-L3xx-SECTION-Ixxx。SECTION 可為 TAX、CUS、SAL、BOM、SUP、RISK、KPI、CHT、MTH、PRM。</div>
+    </article>
+  </section>
+
+  <section class="grid two" style="margin-top:18px">
+    <article class="card">
+      <h2><span class="secid" id="secCustomer"></span>行業客戶銷售分析</h2>
+      <div class="scroll"><table id="customerTable"></table></div>
+    </article>
+    <article class="card">
+      <h2><span class="secid" id="secCustomerChart"></span>客戶營收結構 / 議價權圖</h2>
+      <div class="chartbox tall" id="customerChart"></div>
+      <div class="legend" id="customerLegend"></div>
+    </article>
+  </section>
+
+  <section class="grid three" style="margin-top:18px">
+    <article class="card">
+      <h3><span class="secid" id="secSalesBridge"></span>銷售橋接：價格 × 數量 × Mix</h3>
+      <div class="chartbox" id="salesBridgeChart"></div>
+    </article>
+    <article class="card">
+      <h3><span class="secid" id="secSalesSignal"></span>銷售訊號矩陣</h3>
+      <div class="scroll"><table id="salesSignalTable"></table></div>
+    </article>
+    <article class="card">
+      <h3><span class="secid" id="secDemandRadar"></span>需求品質雷達</h3>
+      <div class="chartbox" id="demandRadarChart"></div>
+    </article>
+  </section>
+
+  <section class="grid two" style="margin-top:18px">
+    <article class="card">
+      <h2><span class="secid" id="secBom"></span>行業成本供應鏈分析：BOM 成本分層</h2>
+      <div class="scroll"><table id="bomTable"></table></div>
+    </article>
+    <article class="card">
+      <h2><span class="secid" id="secCostDonut"></span>成本占比 Donut</h2>
+      <div class="chartbox" id="donutChart"></div>
+      <div class="legend" id="donutLegend"></div>
+    </article>
+  </section>
+
+  <section class="grid two" style="margin-top:18px">
+    <article class="card">
+      <h2><span class="secid" id="secMargin"></span>價值鏈毛利池 / 議價權</h2>
+      <div class="chartbox tall" id="marginChart"></div>
+    </article>
+    <article class="card">
+      <h2><span class="secid" id="secRisk"></span>供應鏈風險熱區</h2>
+      <div class="matrix" id="riskMatrix"></div>
+    </article>
+  </section>
+
+  <section class="grid three" style="margin-top:18px">
+    <article class="card">
+      <h3><span class="secid" id="secWaterfall"></span>Waterfall：成本變動到毛利率</h3>
+      <div class="chartbox" id="waterfallChart"></div>
+    </article>
+    <article class="card">
+      <h3><span class="secid" id="secSupplier"></span>供應商集中度 Top 10</h3>
+      <div class="scroll"><table id="supplierTable"></table></div>
+    </article>
+    <article class="card">
+      <h3><span class="secid" id="secSupplyRadar"></span>供應風險雷達</h3>
+      <div class="chartbox" id="supplyRadarChart"></div>
+    </article>
+  </section>
+
+  <section class="grid two" style="margin-top:18px">
+    <article class="card">
+      <h2><span class="secid" id="secMethod"></span>商業化分析流程</h2>
+      <div class="flow">
+        <div class="step"><b id="m1"></b><p>建立 L1/L2/L3 行業分類，鎖定可比較樣本與上下游邊界。</p></div>
+        <div class="step"><b id="m2"></b><p>拆客戶別營收、終端需求、ASP、Volume、Mix、訂單能見度與集中度。</p></div>
+        <div class="step"><b id="m3"></b><p>拆 BOM、供應商、地區、交期、替代難度、良率、匯率、關稅與物流。</p></div>
+        <div class="step"><b id="m4"></b><p>把銷售橋接與成本橋接接到毛利率、EPS、估值、風險與投資結論。</p></div>
+        <div class="step"><b id="m5"></b><p>用財報、法說、報價、海關、供應鏈、拆解報告與通路資料交叉驗證。</p></div>
+        <div class="step"><b id="m6"></b><p>建立正反情境、觸發條件、回測因子、風控規則與 lesson-learned。</p></div>
+        <div class="step"><b id="m7"></b><p>輸出 SSOT：JSON / Parquet / CSV / HTML Dashboard，支援版本追蹤。</p></div>
+        <div class="step"><b id="m8"></b><p>同步輸出 Prompt 規範，讓任何 AI 都能接手擴充、驗證與重構。</p></div>
+      </div>
+    </article>
+
+    <article class="card">
+      <h2><span class="secid" id="secConclusion"></span>研究結論模板</h2>
+      <div class="scroll"><table id="conclusionTable"></table></div>
+    </article>
+  </section>
+
+  <section class="card" style="margin-top:18px">
+    <h2><span class="secid" id="secPromptOps"></span>AI PromptOps 規範：可交給任何 AI 接力分析</h2>
+    <div class="promptgrid">
+      <div>
+        <button class="copyBtn" data-copy="promptMaster">複製 Master Prompt</button>
+        <textarea id="promptMaster" readonly></textarea>
+      </div>
+      <div>
+        <button class="copyBtn" data-copy="promptSchema">複製 JSON / SSOT Prompt</button>
+        <textarea id="promptSchema" readonly></textarea>
+      </div>
+      <div>
+        <button class="copyBtn" data-copy="promptValidation">複製驗證與反論證 Prompt</button>
+        <textarea id="promptValidation" readonly></textarea>
+      </div>
+      <div>
+        <button class="copyBtn" data-copy="promptCoding">複製自動化 Coding Prompt</button>
+        <textarea id="promptCoding" readonly></textarea>
+      </div>
+    </div>
+    <div class="noteBox">def AI-Handoff：任何分析輸出都必須附 Prompt 規範，讓下一個 AI 可依同一套分類、編號、欄位、證據、驗證與禁止事項繼續工作。</div>
+  </section>
+
+  <section class="card" style="margin-top:18px">
+    <h2><span class="secid" id="secSchema"></span>SSOT Schema / 欄位字典</h2>
+    <div class="scroll"><table id="schemaTable"></table></div>
+  </section>
+
+  <div class="foot">
+    <div>def Generated：<span id="generatedAt"></span> · VersionDate=20260701 · Offline single-file HTML</div>
+    <div class="mono">VIA Industry360 Intelligence Suite · taxonomy / sales / cost / supply chain / BOM / PromptOps</div>
+  </div>
+</div>
+
+<script>
+const CONFIG = {
+  productName:"VIA Industry360 Intelligence Suite",
+  productCode:"VIA-I360",
+  versionDate:"20260701",
+  version:"v1.2",
+  idPattern:"VIA-YYYYMMDD-L1xx-L2xx-L3xx-SECTION-Ixxx"
+};
+
+const COLORS = {
+  seal:"#9F1D1D", ok:"#166534", warn:"#B7791F", fail:"#B91C1C",
+  blue:"#2563EB", teal:"#0F766E", amber:"#D97706", purple:"#7C3AED",
+  sky:"#AFCFCC", celadon:"#DFECEA", ink:"#1F2933", muted:"#6B7C78", line:"#DFECEA"
+};
+
+const DATASETS = {
+  "AI 基礎設施 / AI 伺服器 / GPU Server": {
+    taxonomy:{l1Code:"L101",l1:"AI 基礎設施",l2Code:"L201",l2:"AI 伺服器",l3Code:"L301",l3:"GPU Server"},
+    currency:"USD", revenueBase:100, baseGm:18.5,
+    customerSegments:[
+      ["Hyperscaler CSP",42,88,35,12,"AI cluster CAPEX","高集中高能見度，但砍單影響大"],
+      ["Sovereign AI / Government",16,78,28,8,"主權 AI 建置","政策與驗收週期長"],
+      ["Enterprise AI",14,66,18,5,"企業私有模型","需求分散但預算不穩"],
+      ["ODM Direct / OEM Brand",18,72,22,6,"品牌伺服器與 ODM 專案","價格壓力較高"],
+      ["Research / HPC",10,58,16,4,"科研與高效運算","週期長、規格特殊"]
+    ],
+    salesBridge:[["Base Revenue",100],["Volume",18],["ASP",9],["Mix",7],["FX / Others",-3],["Scenario Revenue",131]],
+    salesSignals:[
+      ["Order Visibility","12-24 months","High","雲端大客戶長約支撐"],
+      ["Customer Concentration","Top 3 > 50%","High Risk","需追單一客戶 CAPEX"],
+      ["ASP Trend","Up","Bullish","GPU 與 HBM 供給限制支撐"],
+      ["Inventory Quality","Low finished goods","Bullish","缺貨情境優於庫存堆高"],
+      ["Cancellation Risk","Medium","Watch","若訓練需求放緩會先影響整機"]
+    ],
+    components:[
+      ["L1","Accelerator Board","GPU / AI Accelerator",38,45,"NVIDIA / AMD / ASIC","US/TW/KR",98,96,32,"up","最高報價權，決定整機 ASP 與供給瓶頸"],
+      ["L1","Memory","HBM / DDR5",18,21,"SK hynix / Samsung / Micron","KR/US/JP",92,88,28,"up","HBM 供給與良率決定 AI server 放量速度"],
+      ["L1","Board","PCB / HDI / ABF",9,8,"Unimicron / Nan Ya / Ibiden","TW/JP/CN",84,76,18,"up","高速材料與良率是關鍵"],
+      ["L1","Thermal","Liquid Cooling / Cold Plate",8,9,"Auras / AVC / Delta","TW/CN",82,70,14,"up","功耗上升使水冷滲透率提升"],
+      ["L1","Power","PSU / Power Shelf / VRM",7,7,"Delta / Lite-On / Chicony","TW/CN",78,68,12,"flat","電源效率與可靠度影響總持有成本"],
+      ["L1","Networking","NIC / Switch / Retimer",6,8,"Broadcom / Marvell / NVIDIA","US/TW",86,82,20,"up","Cluster scale-out 時重要性上升"],
+      ["L2","Chassis","Mechanics / Cable / Rack",5,3,"Foxconn / Quanta / Wistron","TW/CN/MX",58,44,8,"flat","供給彈性較高但受組裝地影響"],
+      ["L2","Storage","SSD / Controller",4,3,"Samsung / Kioxia / Phison","KR/JP/TW",60,48,10,"flat","受 NAND 景氣循環影響"],
+      ["L2","Others","Firmware / Test / Logistics",5,4,"ODM / EMS","Global",66,52,6,"flat","驗證與出貨流程影響交期"]
+    ],
+    suppliers:[
+      ["NVIDIA","GPU/Networking",38,"Very High","高報價權，供給緊張時整機毛利承壓"],
+      ["SK hynix","HBM",10,"High","HBM 產能與良率為重要變數"],
+      ["Samsung","HBM/DDR/SSD",8,"High","記憶體循環與報價波動"],
+      ["Delta","Power/Thermal",6,"Medium","AI 電源與散熱受惠"],
+      ["Unimicron","PCB/ABF",5,"Medium","高階載板與高速板供需"]
+    ],
+    marginPool:[["GPU/IP",65],["HBM",35],["Networking IC",42],["PCB/ABF",24],["Thermal",22],["Power",18],["ODM Assembly",7],["Channel",5]],
+    riskRows:[["GPU 供給","供給",5,"配額、交期、客戶優先序"],["HBM 良率","製程",5,"良率不穩導致供貨延後"],["水冷導入","技術",4,"漏液、維修與標準化"],["出口管制","政策",4,"規格限制與區域禁售"],["客戶 CAPEX","需求",3,"雲端資本支出節奏"]]
+  },
+  "移動電氣化 / 電動車 / EV Powertrain": {
+    taxonomy:{l1Code:"L102",l1:"移動電氣化",l2Code:"L202",l2:"電動車",l3Code:"L302",l3:"EV Powertrain"},
+    currency:"USD", revenueBase:100, baseGm:21.0,
+    customerSegments:[
+      ["Mass-market OEM",35,62,16,5,"銷量規模","價格戰壓力最高"],
+      ["Premium OEM",20,78,22,7,"高階車型與品牌溢價","規格嚴格但毛利較佳"],
+      ["China NEV Brands",24,70,18,6,"快速迭代與本土供應鏈","降價速度快"],
+      ["Fleet / Commercial",12,55,12,4,"商用車與車隊 TCO","交期與維修成本重要"],
+      ["Aftermarket / Service",9,48,10,3,"維修替換與保固","長尾但分散"]
+    ],
+    salesBridge:[["Base Revenue",100],["Volume",8],["ASP",-6],["Mix",4],["FX / Others",-2],["Scenario Revenue",104]],
+    salesSignals:[
+      ["Order Visibility","3-9 months","Medium","消費景氣與補貼影響大"],
+      ["Customer Concentration","Top 5 > 45%","Medium Risk","平台定點後黏著度高"],
+      ["ASP Trend","Down","Bearish","價格戰壓縮供應鏈"],
+      ["Inventory Quality","Mixed","Watch","終端庫存需與出貨交叉檢查"],
+      ["Cancellation Risk","Medium-High","Watch","補貼與景氣轉弱時提升"]
+    ],
+    components:[
+      ["L1","Battery System","Cell / Module / Pack",42,38,"CATL / BYD / LGES / Panasonic","CN/KR/JP",96,82,20,"down","電池成本決定整車價格競爭力"],
+      ["L1","Power Electronics","Inverter / SiC / IGBT",12,15,"Infineon / ST / Rohm / BYD","EU/JP/CN",86,78,24,"flat","SiC 滲透提升效率但成本較高"],
+      ["L1","Motor","E-Motor / Magnet",10,10,"Nidec / Bosch / Local","JP/EU/CN",80,70,16,"flat","稀土磁材供需與政策敏感"],
+      ["L1","Thermal","Heat Pump / Battery Cooling",8,9,"Denso / Hanon / Sanhua","JP/KR/CN",75,62,12,"up","續航與快充提高熱管理價值"],
+      ["L1","ADAS","Camera / Radar / Domain Controller",9,13,"Mobileye / Bosch / Valeo","US/EU/CN",82,76,18,"up","軟硬整合與法規驗證門檻高"],
+      ["L2","Chassis","Suspension / Brake / Steering",9,7,"ZF / Brembo / Local","EU/CN",64,46,10,"flat","傳統零部件價格壓力高"],
+      ["L2","Interior","Display / Seat / Wiring",6,5,"LGD / BOE / Lear","KR/CN/US",55,42,8,"flat","消費電子化，降本壓力大"],
+      ["L2","Others","Assembly / Logistics / Warranty",4,3,"OEM","Global",60,50,6,"flat","保固與召回風險需納入"]
+    ],
+    suppliers:[
+      ["CATL","Battery Cell",20,"Very High","電池價格與供應策略影響整車毛利"],
+      ["BYD","Battery/Powertrain",12,"High","垂直整合造成競爭壓力"],
+      ["Infineon","Power IC",5,"Medium","車規半導體週期與長約"],
+      ["Denso","Thermal",4,"Medium","熱泵系統價值提升"],
+      ["Bosch","ADAS/Chassis",4,"Medium","車規認證與平台黏著度"]
+    ],
+    marginPool:[["Battery Cell",18],["Battery Materials",16],["SiC/Power IC",32],["ADAS Domain",28],["Thermal",19],["Motor",14],["OEM Assembly",9],["Dealer/Service",6]],
+    riskRows:[["鋰價波動","原料",4,"碳酸鋰價格循環"],["價格戰","競爭",5,"整車降價壓縮供應鏈"],["SiC 良率","製程",4,"高壓平台良率與成本"],["補貼退坡","政策",3,"需求提前或延後"],["召回保固","品質",4,"安全問題損害毛利"]]
+  },
+  "半導體 / 半導體設備 / Advanced Packaging Equipment": {
+    taxonomy:{l1Code:"L103",l1:"半導體",l2Code:"L203",l2:"半導體設備",l3Code:"L303",l3:"Advanced Packaging Equipment"},
+    currency:"USD", revenueBase:100, baseGm:35.0,
+    customerSegments:[
+      ["Leading Foundry",38,86,30,12,"先進製程與先進封裝 CAPEX","客戶集中但訂單品質高"],
+      ["Memory Maker",18,65,18,8,"HBM 與高頻寬記憶體","循環波動較大"],
+      ["OSAT",20,72,16,6,"先進封裝外包","價格敏感但成長快"],
+      ["IDM",14,70,14,5,"車用/工業/邏輯整合","驗證週期長"],
+      ["R&D / Pilot Line",10,55,8,3,"研發線與小量產","金額小但技術指標重要"]
+    ],
+    salesBridge:[["Base Revenue",100],["Volume",10],["ASP",5],["Mix",6],["FX / Others",-1],["Scenario Revenue",120]],
+    salesSignals:[
+      ["Order Visibility","12-18 months","High","設備訂單能見度較長"],
+      ["Customer Concentration","Top 3 > 60%","High Risk","大客戶 CAPEX 變動影響大"],
+      ["ASP Trend","Up","Bullish","規格升級與客製化支撐"],
+      ["Inventory Quality","Project-based","Neutral","需看客戶驗收與 backlog"],
+      ["Cancellation Risk","Medium","Watch","景氣反轉時遞延交機"]
+    ],
+    components:[
+      ["L1","Motion & Precision","Stage / Linear Motor / Encoder",22,24,"ASML ecosystem / THK / Renishaw","EU/JP",94,90,36,"up","精密運動控制決定良率與 throughput"],
+      ["L1","Optics / Laser","Lens / Laser / Illumination",18,22,"Zeiss / Coherent / Trumpf","EU/US",96,94,40,"up","最難替代，高技術壁壘"],
+      ["L1","Vacuum / Gas","Pump / Valve / MFC",13,12,"Edwards / VAT / Horiba","EU/JP",84,74,26,"flat","可靠度與潔淨度要求高"],
+      ["L1","Metrology","Sensor / Inspection / Camera",12,15,"KLA / Keyence / Hamamatsu","US/JP",90,84,30,"up","先進封裝提高檢測價值"],
+      ["L1","Control","PLC / Industrial PC / Software",10,12,"Siemens / Beckhoff / Advantech","EU/TW",78,66,18,"flat","軟體與控制整合影響服務黏著度"],
+      ["L2","Chamber","Ceramics / Coating / Metal Parts",11,8,"Ferrotec / Kyocera / Local","JP/TW/CN",76,64,20,"flat","材料與加工一致性重要"],
+      ["L2","Utilities","Power / Thermal / Facility",8,5,"Local / Global","Global",62,46,12,"flat","供應商較多但規格驗證耗時"],
+      ["L2","Others","Assembly / Service / Spare Parts",6,2,"OEM","Global",58,42,8,"flat","售後服務支撐長尾收入"]
+    ],
+    suppliers:[
+      ["Zeiss","Optics",12,"Very High","極高替代難度"],
+      ["KLA","Inspection",8,"High","量測檢測需求受先進節點驅動"],
+      ["VAT","Vacuum Valve",5,"Medium","半導體真空閥門黏著度高"],
+      ["Edwards","Vacuum Pump",5,"Medium","供貨穩定性與服務網絡"],
+      ["Siemens","Control",4,"Medium","工控標準與安全認證"]
+    ],
+    marginPool:[["System OEM",45],["Optics/Laser",40],["Metrology",38],["Precision Stage",32],["Vacuum",25],["Control Software",28],["Chamber Parts",18],["Service",36]],
+    riskRows:[["出口管制","政策",5,"設備與零件出口限制"],["超長交期","供給",5,"關鍵件 lead time 30 週以上"],["客戶 CAPEX","需求",4,"晶圓廠擴產週期波動"],["良率認證","技術",4,"客戶驗證耗時"],["單一供應商","集中度",5,"精密光學與運動控制"]]
+  }
+};
+
+const SCHEMA_ROWS = [
+  ["def record_id", "全域唯一編號", "VIA-YYYYMMDD-L1xx-L2xx-L3xx-SECTION-Ixxx", "版本追蹤與跨表 join"],
+  ["def taxonomy_l1/l2/l3", "最多三層行業分類", "L1 / L2 / L3", "避免分類爆炸與分析邊界失控"],
+  ["def customer_segment", "客戶群與終端需求", "text", "客戶銷售分析主鍵"],
+  ["def revenue_pct", "營收占比", "0-100", "衡量銷售集中度"],
+  ["def pricing_power", "客戶/供應商議價權", "0-100", "判斷毛利與價格轉嫁能力"],
+  ["def order_visibility", "訂單能見度", "months / score", "需求品質與庫存風險"],
+  ["def bom_level", "BOM 層級", "L1/L2/L3", "成本供應鏈主鍵"],
+  ["def cost_pct", "成本占比", "0-100", "COGS 與毛利率橋接"],
+  ["def supplier_region", "供應商與地區", "text", "地緣與集中度風險"],
+  ["def lead_time_weeks", "交期週數", "number", "缺料與景氣先行指標"],
+  ["def substitute_difficulty", "替代難度", "0-100", "報價權與風險共同指標"],
+  ["def evidence_score", "證據強度", "0-100", "財報/法說/報價/海關/新聞交叉驗證"],
+  ["def ai_prompt_spec", "AI 接力提示規範", "markdown/text", "讓其他 AI 依同一標準延伸分析"]
+];
+
+function el(id){return document.getElementById(id);}
+function fmt(x,d=1){return Number(x).toFixed(d);}
+function clamp(x,min,max){return Math.max(min,Math.min(max,x));}
+function getData(){return DATASETS[el("industrySelect").value];}
+function tax(data){return data.taxonomy;}
+function prefix(data){const t=tax(data);return `VIA-${CONFIG.versionDate}-${t.l1Code}-${t.l2Code}-${t.l3Code}`;}
+function id(data,section,i){return `${prefix(data)}-${section}-I${String(i).padStart(3,"0")}`;}
+function sectionId(data,section,i){return `${prefix(data)}-${section}-${String(i).padStart(2,"0")}`;}
+function tag(text,kind="info"){return `<span class="tag ${kind}">${text}</span>`;}
+function trend(t){if(t==="up")return '<span class="up">▲ 上升</span>'; if(t==="down")return '<span class="down">▼ 下降</span>'; return '<span class="flat">→ 持平</span>';}
+function riskKind(score){return score>=85?"fail":score>=70?"warn":"ok";}
+function scoreTag(score){return tag(score>=85?"HIGH":score>=70?"MED":"LOW",riskKind(score));}
+function table(headers, rows){return `<thead><tr>${headers.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</tbody>`;}
+function svg(content,vb="0 0 640 320"){return `<svg viewBox="${vb}" role="img">${content}</svg>`;}
+
+function components(data){
+  return data.components.map((r,i)=>({
+    itemNo:i+1,tier:r[0],module:r[1],item:r[2],costPct:r[3],valuePct:r[4],suppliers:r[5],region:r[6],
+    criticality:r[7],subDiff:r[8],lead:r[9],trend:r[10],note:r[11]
+  }));
+}
+function totalCost(data){return components(data).reduce((s,d)=>s+d.costPct,0);}
+function weighted(data,key){const c=totalCost(data);return components(data).reduce((s,d)=>s+d.costPct*d[key],0)/c;}
+function adjustedGM(data,scenario){return data.baseGm - scenario*0.42;}
+function salesAdj(data,scenario){return data.salesBridge[data.salesBridge.length-1][1] - Math.max(scenario,0)*0.12 + Math.max(-scenario,0)*0.05;}
+
+function buildKpis(data,scenario){
+  const cs=data.customerSegments;
+  const comp=components(data);
+  const topCus=cs.slice().sort((a,b)=>b[1]-a[1])[0];
+  const topComp=comp.slice().sort((a,b)=>b.costPct-a.costPct)[0];
+  const customerTop3=cs.slice(0,3).reduce((s,d)=>s+d[1],0);
+  const costTop3=comp.slice().sort((a,b)=>b.costPct-a.costPct).slice(0,3).reduce((s,d)=>s+d.costPct,0);
+  const gm=adjustedGM(data,scenario);
+  const kpis=[
+    ["主產品名稱",CONFIG.productName,`${CONFIG.productCode} · ${CONFIG.version}`],
+    ["Top 客戶群",topCus[0],`${fmt(topCus[1])}% revenue · ${scoreTag(topCus[2])}`],
+    ["客戶 Top3 集中度",`${fmt(customerTop3)}%`,customerTop3>60?"高集中，需看單一客戶 CAPEX":"集中度中性"],
+    ["Top BOM 成本",topComp.item,`${fmt(topComp.costPct)}% COGS · ${topComp.module}`],
+    ["成本 Top3 集中度",`${fmt(costTop3)}%`,costTop3>60?"BOM 高集中，缺料風險高":"成本集中度可控"],
+    ["情境後 GM",`${fmt(gm)}%`,scenario>0?"成本上行情境，毛利率承壓":"基準或成本下降情境"]
+  ];
+  el("kpiGrid").innerHTML=kpis.map((k,i)=>`<div class="card"><div class="kpi-title">${id(data,"KPI",i+1)}</div><div class="kpi-value">${k[1]}</div><div class="kpi-note"><b>${k[0]}</b><br>${k[2]}</div></div>`).join("");
+}
+
+function buildTaxonomy(data){
+  const t=tax(data);
+  el("productIdLine").textContent=`def ProductID：${prefix(data)}-PRODUCT-${CONFIG.version}`;
+  el("taxonomyPath").innerHTML=[
+    `<span class="crumb">${t.l1Code} · ${t.l1}</span>`,
+    `<span class="arrow">→</span>`,
+    `<span class="crumb">${t.l2Code} · ${t.l2}</span>`,
+    `<span class="arrow">→</span>`,
+    `<span class="crumb">${t.l3Code} · ${t.l3}</span>`
+  ].join("");
+  const rows=[
+    [id(data,"TAX",1),"Level 1",t.l1Code,t.l1,"產業大類","不能超過三層分類"],
+    [id(data,"TAX",2),"Level 2",t.l2Code,t.l2,"行業次分類","承接 L1，定義可比較同業"],
+    [id(data,"TAX",3),"Level 3",t.l3Code,t.l3,"產品/技術/應用分類","分析最小主分類，不再往下無限制展開"]
+  ];
+  el("taxonomyTable").innerHTML=table(["ID","層級","分類碼","名稱","用途","治理規則"],rows);
+  const rules=[
+    ["Product",`${prefix(data)}-PRODUCT-v1.2`,"產品頁與 dashboard 主 ID"],
+    ["Taxonomy",`${prefix(data)}-TAX-I001`,"分類項目 ID"],
+    ["Customer",`${prefix(data)}-CUS-I001`,"客戶銷售項目 ID"],
+    ["Sales",`${prefix(data)}-SAL-I001`,"銷售橋接 / 訊號 ID"],
+    ["BOM",`${prefix(data)}-BOM-I001`,"成本與零組件 ID"],
+    ["Supplier",`${prefix(data)}-SUP-I001`,"供應商集中度 ID"],
+    ["Risk",`${prefix(data)}-RISK-I001`,"風險事件 ID"],
+    ["Prompt",`${prefix(data)}-PRM-I001`,"AI Prompt 規範 ID"]
+  ];
+  el("idRuleTable").innerHTML=table(["物件","編號範例","用途"],rules);
+}
+
+function buildCustomers(data){
+  const rows=data.customerSegments.map((r,i)=>[
+    id(data,"CUS",i+1),`<b>${r[0]}</b><div class="small">${r[5]}</div>`,
+    `<span class="num">${fmt(r[1])}%</span>`,scoreTag(r[2]),`<span class="num">${r[3]}%</span>`,`<span class="num">${r[4]}M</span>`,r[6]
+  ]);
+  el("customerTable").innerHTML=table(["ID","客戶群","營收占比","需求品質","毛利貢獻","能見度","判讀"],rows);
+  const sig=data.salesSignals.map((r,i)=>[
+    id(data,"SAL",i+1),r[0],r[1],
+    r[2].includes("High Risk")||r[2].includes("Bearish")?tag(r[2],"fail"):r[2].includes("Watch")||r[2].includes("Medium")?tag(r[2],"warn"):tag(r[2],"ok"),
+    r[3]
+  ]);
+  el("salesSignalTable").innerHTML=table(["ID","訊號","目前狀態","方向","判讀"],sig);
+}
+
+function buildBom(data){
+  const rows=components(data).map((d,i)=>[
+    id(data,"BOM",i+1),`<span class="mono">${d.tier}</span>`,d.module,
+    `<b>${d.item}</b><div class="small">${d.note}</div>`,
+    `<span class="num">${fmt(d.costPct)}%</span>`,`<span class="num">${fmt(d.valuePct)}%</span>`,
+    scoreTag(d.criticality),`<span class="num">${d.lead}</span>`,trend(d.trend),d.suppliers
+  ]);
+  el("bomTable").innerHTML=table(["ID","Tier","Module","Component","成本占比","價值占比","風險","交期週","趨勢","主要供應商"],rows);
+  const sup=data.suppliers.map((s,i)=>[
+    id(data,"SUP",i+1),`<b>${s[0]}</b>`,s[1],`<span class="num">${fmt(s[2])}%</span>`,
+    s[3]==="Very High"?tag("Very High","fail"):s[3]==="High"?tag("High","warn"):tag("Medium","ok"),s[4]
+  ]);
+  el("supplierTable").innerHTML=table(["ID","Supplier","Exposure","成本曝險","集中度","判讀"],sup);
+}
+
+function buildConclusion(data,scenario){
+  const comp=components(data);
+  const topAlpha=comp.slice().sort((a,b)=>(b.valuePct-b.costPct)-(a.valuePct-a.costPct))[0];
+  const topRisk=comp.slice().sort((a,b)=>(b.criticality+b.subDiff)-(a.criticality+a.subDiff))[0];
+  const topCus=data.customerSegments.slice().sort((a,b)=>b[1]-a[1])[0];
+  const rows=[
+    [id(data,"MTH",1),"核心結論",`${topCus[0]} 是最大客戶群；${topAlpha.item} 是價值占比優於成本占比的 Alpha 區；${topRisk.item} 是最大風險源。`],
+    [id(data,"MTH",2),"正向情境","客戶訂單能見度上升、ASP/Mix 改善、成本下降、交期縮短，毛利率與出貨同時改善。"],
+    [id(data,"MTH",3),"反向情境","價格戰、客戶砍單、關鍵料缺貨、出口管制、替代技術與庫存堆高，會讓估值與毛利率同時修正。"],
+    [id(data,"MTH",4),"追蹤指標","客戶 CAPEX、ASP、Volume、Mix、交期、供應商法說、庫存週轉、海關資料、替代料認證。"],
+    [id(data,"MTH",5),"投資連結",`情境後毛利率約 ${fmt(adjustedGM(data,scenario))}%；若銷售橋接與成本橋接同向改善，可提高權重，反之降低。`],
+    [id(data,"MTH",6),"AI 接力要求","任何 AI 延伸分析都必須保留 ID、版本日期、分類碼、證據欄、反論證欄與驗證狀態。"]
+  ];
+  el("conclusionTable").innerHTML=table(["ID","項目","專業判讀"],rows);
+}
+
+function buildSchema(data){
+  el("schemaTable").innerHTML=table(["欄位","定義","格式","用途"],SCHEMA_ROWS.map((r,i)=>[id(data,"SCH",i+1),r[0],r[1],`${r[2]} · ${r[3]}`]));
+}
+
+function buildRiskMatrix(data){
+  const cols=["風險項","類別","分數","投資含義","對策"];
+  const mitigation={供給:"第二供應商、追交期與擴產進度",製程:"追良率、認證、客訴與保固",技術:"拆 roadmap，驗證替代方案成熟度",政策:"建立國家/客戶/產品規格限制清單",需求:"追客戶 CAPEX、庫存與接單取消",原料:"建立商品價格與長約對照",競爭:"追 ASP、降價、補貼與份額",品質:"追召回、保固率、失效率",集中度:"拆供應商 HHI 與替代料"};
+  let html=cols.map(c=>`<div class="head">${c}</div>`).join("");
+  data.riskRows.forEach((r,i)=>{
+    const cls=r[2]>=5?"risk-high":r[2]>=4?"risk-mid":"risk-low";
+    html+=`<div><b>${id(data,"RISK",i+1)}</b><br>${r[0]}</div><div>${r[1]}</div><div class="${cls} mono">${"●".repeat(r[2])}</div><div>${r[3]}</div><div>${mitigation[r[1]]||"建立觸發條件與週期性驗證"}</div>`;
+  });
+  el("riskMatrix").innerHTML=html;
+}
+
+function polar(cx,cy,r,angle){const a=(angle-90)*Math.PI/180;return [cx+r*Math.cos(a),cy+r*Math.sin(a)];}
+function arcPath(cx,cy,r,start,end){const p1=polar(cx,cy,r,end),p2=polar(cx,cy,r,start),large=end-start<=180?0:1;return `M ${p1[0]} ${p1[1]} A ${r} ${r} 0 ${large} 0 ${p2[0]} ${p2[1]}`;}
+
+function buildDonut(data){
+  const palette=[COLORS.seal,COLORS.blue,COLORS.teal,COLORS.amber,COLORS.purple,COLORS.ok,COLORS.warn,COLORS.sky,COLORS.muted];
+  let start=0, paths="";
+  components(data).forEach((d,i)=>{const end=start+d.costPct/100*360;paths+=`<path d="${arcPath(160,160,104,start,end)}" stroke="${palette[i%palette.length]}" stroke-width="42" fill="none"><title>${d.item}: ${d.costPct}%</title></path>`;start=end;});
+  const center=`<circle cx="160" cy="160" r="70" fill="#fff"/><text x="160" y="152" text-anchor="middle" font-size="28" font-weight="800" fill="${COLORS.ink}">100%</text><text x="160" y="178" text-anchor="middle" font-size="12" fill="${COLORS.muted}">BOM COGS</text>`;
+  const right=components(data).map((d,i)=>`<g transform="translate(330 ${35+i*28})"><rect x="0" y="-11" width="16" height="16" rx="4" fill="${palette[i%palette.length]}"/><text x="25" y="2" font-size="12" fill="${COLORS.ink}">${d.item}</text><text x="250" y="2" font-size="12" text-anchor="end" fill="${COLORS.muted}">${fmt(d.costPct)}%</text></g>`).join("");
+  el("donutChart").innerHTML=svg(paths+center+right,"0 0 640 330");
+  el("donutLegend").innerHTML=components(data).slice(0,5).map((d,i)=>`<span><span class="dot" style="background:${palette[i]}"></span>${d.module}</span>`).join("");
+}
+
+function buildCustomerChart(data){
+  const max=Math.max(...data.customerSegments.map(d=>d[1]));
+  const rows=data.customerSegments.map((d,i)=>{
+    const y=38+i*62,w=420*d[1]/max,color=d[2]>=80?COLORS.seal:d[2]>=65?COLORS.blue:COLORS.teal;
+    return `<text x="18" y="${y+15}" font-size="12" fill="${COLORS.ink}">${d[0]}</text>
+      <rect x="190" y="${y}" width="${w}" height="24" rx="8" fill="${color}" opacity=".86"/>
+      <text x="${200+w}" y="${y+16}" font-size="12" fill="${COLORS.ink}">${d[1]}% · score ${d[2]}</text>`;
+  }).join("");
+  el("customerChart").innerHTML=svg(rows+`<line x1="190" y1="386" x2="610" y2="386" stroke="${COLORS.line}"/>`,"0 0 640 420");
+  el("customerLegend").innerHTML=`<span><span class="dot" style="background:${COLORS.seal}"></span>高需求品質</span><span><span class="dot" style="background:${COLORS.blue}"></span>中高</span><span><span class="dot" style="background:${COLORS.teal}"></span>中性</span>`;
+}
+
+function buildMarginChart(data){
+  const max=Math.max(...data.marginPool.map(d=>d[1]));
+  const rows=data.marginPool.map((d,i)=>{
+    const y=35+i*45,w=440*d[1]/max,color=d[1]>=40?COLORS.seal:d[1]>=30?COLORS.blue:d[1]>=20?COLORS.teal:COLORS.warn;
+    return `<text x="18" y="${y+15}" font-size="12" fill="${COLORS.ink}">${d[0]}</text><rect x="170" y="${y}" width="${w}" height="24" rx="8" fill="${color}" opacity=".86"/><text x="${180+w}" y="${y+16}" font-size="12" fill="${COLORS.ink}">${d[1]}%</text>`;
+  }).join("");
+  el("marginChart").innerHTML=svg(rows+`<line x1="170" y1="405" x2="610" y2="405" stroke="${COLORS.line}"/>`,"0 0 640 440");
+}
+
+function buildBridgeChart(idName, rows, finalAdjust=0){
+  const min=Math.min(0,...rows.map(d=>d[1]))-8,max=Math.max(...rows.map(d=>d[1]))+12;
+  const scale=v=>250-(v-min)/(max-min)*210;
+  let running=rows[0][1], bars="";
+  rows.forEach((d,i)=>{
+    const x=45+i*95; let y,h,color,label=d[1];
+    if(i===0||i===rows.length-1){
+      const val=i===rows.length-1?d[1]+finalAdjust:d[1];
+      y=scale(val);h=scale(0)-scale(val);color=i===0?COLORS.blue:COLORS.seal;label=val;
+    }else{
+      const next=running+d[1];y=scale(Math.max(running,next));h=Math.abs(scale(running)-scale(next));color=d[1]>=0?COLORS.ok:COLORS.fail;running=next;
+    }
+    bars+=`<rect x="${x}" y="${y}" width="46" height="${Math.max(h,2)}" rx="8" fill="${color}" opacity=".84"/><text x="${x+23}" y="${y-8}" text-anchor="middle" font-size="11" fill="${COLORS.ink}">${label>=0?"+":""}${fmt(label)}%</text><text x="${x+23}" y="292" text-anchor="middle" font-size="10" fill="${COLORS.muted}">${d[0]}</text>`;
+  });
+  el(idName).innerHTML=svg(`<line x1="30" x2="610" y1="${scale(0)}" y2="${scale(0)}" stroke="${COLORS.line}"/>`+bars,"0 0 640 320");
+}
+
+function buildRadar(idName, axes){
+  const cx=320,cy=160,r=105;
+  const grid=[25,50,75,100].map(level=>{
+    const p=axes.map((a,i)=>{const angle=-90+i*360/axes.length,rr=r*level/100,rad=angle*Math.PI/180;return `${cx+rr*Math.cos(rad)},${cy+rr*Math.sin(rad)}`;}).join(" ");
+    return `<polygon points="${p}" fill="none" stroke="${COLORS.line}"/>`;
+  }).join("");
+  const lines=axes.map((a,i)=>{
+    const angle=-90+i*360/axes.length,rad=angle*Math.PI/180,x=cx+r*Math.cos(rad),y=cy+r*Math.sin(rad),lx=cx+(r+42)*Math.cos(rad),ly=cy+(r+30)*Math.sin(rad);
+    return `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="${COLORS.line}"/><text x="${lx}" y="${ly}" font-size="11" text-anchor="middle" fill="${COLORS.muted}">${a[0]}</text>`;
+  }).join("");
+  const pts=axes.map((a,i)=>{const angle=-90+i*360/axes.length,rr=r*a[1]/100,rad=angle*Math.PI/180;return [cx+rr*Math.cos(rad),cy+rr*Math.sin(rad)];});
+  el(idName).innerHTML=svg(grid+lines+`<polygon points="${pts.map(p=>p.join(",")).join(" ")}" fill="${COLORS.seal}" opacity=".17" stroke="${COLORS.seal}" stroke-width="3"/>`,"0 0 640 320");
+}
+
+function buildPrompts(data){
+  const t=tax(data);
+  const baseId=prefix(data);
+  const selectedName=el("industrySelect").value;
+  const promptMaster=`def ROLE
+你是產業研究、BOM 成本拆解、客戶銷售分析、供應鏈風險、投資研究與資料架構整合專家。
+
+def TARGET
+請依據 VIA Industry360 Intelligence Suite 規範，分析以下行業：
+- ProductID: ${baseId}
+- VersionDate: ${CONFIG.versionDate}
+- L1: ${t.l1Code} ${t.l1}
+- L2: ${t.l2Code} ${t.l2}
+- L3: ${t.l3Code} ${t.l3}
+- IndustryName: ${selectedName}
+
+def REQUIRED_OUTPUT
+1. 三層行業分類表，最多 L1/L2/L3，不得新增第四層。
+2. 行業客戶銷售分析：客戶群、營收占比、需求品質、毛利貢獻、能見度、風險。
+3. 行業成本供應鏈分析：BOM、成本占比、價值占比、供應商、地區、交期、替代難度。
+4. 銷售橋接：Base Revenue、Volume、ASP、Mix、FX/Others、Scenario Revenue。
+5. 成本橋接：Base GM、材料、良率、匯率/運費、議價轉嫁、Adjusted GM。
+6. 供應鏈風險矩陣：風險項、類別、分數、投資含義、對策。
+7. 結論必須包含正向情境、反向情境、追蹤指標、投資連結。
+8. 每一列都要有 ID：${baseId}-SECTION-Ixxx。
+9. 所有判斷要標示 EvidenceStatus：Confirmed / Estimated / NeedsCheck。
+10. 最後輸出一段可交給下一個 AI 的 PromptOps 規範。
+
+def CONSTRAINTS
+- 使用繁體中文。
+- 不可移除版本日期。
+- 不可混用不同日期的資料。
+- 不可無證據斷言。
+- 不可把供應鏈風險與客戶需求混成同一欄。
+- 不可輸出沒有 ID 的列。`;
+
+  const promptSchema=`def TASK
+請把產業分析轉成可機器讀取的 JSON SSOT。
+
+def JSON_SCHEMA
+{
+  "product_id": "${baseId}-PRODUCT-${CONFIG.version}",
+  "version_date": "${CONFIG.versionDate}",
+  "taxonomy": {
+    "l1_code": "${t.l1Code}",
+    "l1_name": "${t.l1}",
+    "l2_code": "${t.l2Code}",
+    "l2_name": "${t.l2}",
+    "l3_code": "${t.l3Code}",
+    "l3_name": "${t.l3}"
+  },
+  "customer_sales_analysis": [
+    {
+      "record_id": "${baseId}-CUS-I001",
+      "customer_segment": "",
+      "revenue_pct": 0,
+      "demand_quality_score": 0,
+      "gross_profit_contribution_pct": 0,
+      "order_visibility_months": 0,
+      "sales_driver": "",
+      "risk_comment": "",
+      "evidence_status": "Estimated"
+    }
+  ],
+  "cost_supply_chain_analysis": [
+    {
+      "record_id": "${baseId}-BOM-I001",
+      "bom_level": "L1",
+      "module": "",
+      "component": "",
+      "cost_pct": 0,
+      "value_pct": 0,
+      "suppliers": "",
+      "region": "",
+      "criticality_score": 0,
+      "substitute_difficulty_score": 0,
+      "lead_time_weeks": 0,
+      "trend": "up/down/flat",
+      "evidence_status": "Estimated"
+    }
+  ],
+  "risk_matrix": [],
+  "ai_promptops": []
+}
+
+def VALIDATION
+- cost_pct 合計應接近 100。
+- revenue_pct 合計應接近 100。
+- 每筆 record_id 必須唯一。
+- taxonomy 不得超過三層。
+- 所有資料必須保留 version_date。`;
+
+  const promptValidation=`def ROLE
+你是反論證、驗證、風控與資料品質稽核 AI。
+
+def INPUT
+請稽核 ProductID=${baseId} 的產業分析。
+
+def CHECKLIST
+1. 檢查所有 ID 是否符合 ${baseId}-SECTION-Ixxx。
+2. 檢查 version_date 是否全部為 ${CONFIG.versionDate}。
+3. 檢查行業分類是否只有 L1/L2/L3，沒有第四層。
+4. 檢查客戶營收占比是否接近 100。
+5. 檢查 BOM 成本占比是否接近 100。
+6. 檢查銷售分析是否包含客戶群、營收占比、需求品質、毛利貢獻、能見度。
+7. 檢查成本供應鏈是否包含供應商、地區、交期、替代難度、成本占比。
+8. 找出 20 個可能錯誤：資料過期、分類錯誤、重複 ID、成本合計錯誤、客戶集中度低估、交期錯估、供應商替代性錯估等。
+9. 對每個錯誤提出修正方案與驗證資料來源。
+10. 輸出 PASS / WARN / FAIL gate。
+
+def OUTPUT_MATRIX
+- check_id
+- check_item
+- status
+- evidence
+- failure_case
+- fix_action
+- owner
+- next_review_date`;
+
+  const promptCoding=`def TASK
+請產生一套本機可執行的 Python + JSON + HTML 自動化架構，用於 VIA Industry360 Intelligence Suite。
+
+def REQUIREMENTS
+- 所有參數放在程式碼頂部。
+- 使用 JSON 作為系統參數與資料交換。
+- 產出 CSV / Parquet / JSON / HTML。
+- 每一列自動編號：${baseId}-SECTION-Ixxx。
+- 保留 version_date=${CONFIG.versionDate}。
+- 行業分類最多三層。
+- 模組分離：taxonomy_engine、customer_sales_engine、cost_supply_chain_engine、bom_engine、risk_engine、promptops_engine、html_report_engine。
+- 每個 engine 都要有 validate()、run()、export()。
+- 不可刪除原始資料。
+- append-only 輸出。
+- 發現錯誤時輸出 review matrix，不要直接覆蓋 canonical source。
+
+def OUTPUT
+請輸出：
+1. folder structure
+2. config JSON
+3. Python engine code
+4. HTML report template
+5. validation matrix
+6. PowerShell launch script
+7. failure cases and mitigation matrix`;
+  el("promptMaster").value=promptMaster;
+  el("promptSchema").value=promptSchema;
+  el("promptValidation").value=promptValidation;
+  el("promptCoding").value=promptCoding;
+}
+
+function setSectionIds(data){
+  const map={
+    secTaxonomy:["TAX",1],secIdRule:["TAX",2],secCustomer:["CUS",1],secCustomerChart:["CHT",1],
+    secSalesBridge:["SAL",1],secSalesSignal:["SAL",2],secDemandRadar:["CHT",2],secBom:["BOM",1],
+    secCostDonut:["CHT",3],secMargin:["CHT",4],secRisk:["RISK",1],secWaterfall:["CHT",5],
+    secSupplier:["SUP",1],secSupplyRadar:["CHT",6],secMethod:["MTH",1],secConclusion:["MTH",2],
+    secPromptOps:["PRM",1],secSchema:["SCH",1]
+  };
+  Object.entries(map).forEach(([k,v])=>{el(k).textContent=sectionId(data,v[0],v[1]);});
+  for(let i=1;i<=8;i++){el(`m${i}`).textContent=id(data,"MTH",i);}
+}
+
+function refresh(){
+  const data=getData();
+  const scenario=Number(el("scenarioSlider").value);
+  el("scenarioText").textContent=scenario===0?"Base 0%":scenario>0?`Cost Inflation +${scenario}%`:`Cost Deflation ${scenario}%`;
+  setSectionIds(data);
+  buildKpis(data,scenario);
+  buildTaxonomy(data);
+  buildCustomers(data);
+  buildBom(data);
+  buildConclusion(data,scenario);
+  buildSchema(data);
+  buildRiskMatrix(data);
+  buildDonut(data);
+  buildCustomerChart(data);
+  buildMarginChart(data);
+  buildBridgeChart("salesBridgeChart",data.salesBridge, scenario<0?Math.abs(scenario)*0.2:-Math.max(scenario,0)*0.12);
+  buildBridgeChart("waterfallChart",[["Base GM",data.baseGm],["材料",-scenario*0.22],["良率",-Math.max(scenario,0)*0.08],["匯率/運費",-scenario*0.06],["議價轉嫁",Math.max(scenario,0)*0.11],["Adj GM",adjustedGM(data,scenario)]],0);
+  const customerTop3=data.customerSegments.slice(0,3).reduce((s,d)=>s+d[1],0);
+  buildRadar("demandRadarChart",[
+    ["集中度",clamp(customerTop3,0,100)],
+    ["需求品質",data.customerSegments.reduce((s,d)=>s+d[1]*d[2],0)/100],
+    ["毛利貢獻",data.customerSegments.reduce((s,d)=>s+d[3],0)],
+    ["能見度",clamp(data.customerSegments.reduce((s,d)=>s+d[4],0)*2,0,100)],
+    ["ASP/Mix",clamp(data.salesBridge[2][1]*4+50,0,100)]
+  ]);
+  buildRadar("supplyRadarChart",[
+    ["成本集中",clamp(components(data).slice(0,3).reduce((s,d)=>s+d.costPct,0),0,100)],
+    ["替代難度",weighted(data,"subDiff")],
+    ["關鍵性",weighted(data,"criticality")],
+    ["長交期",clamp(weighted(data,"lead")*3,0,100)],
+    ["價值占比",clamp(weighted(data,"valuePct")*1.15,0,100)]
+  ]);
+  buildPrompts(data);
+}
+
+function init(){
+  el("industrySelect").innerHTML=Object.keys(DATASETS).map(k=>`<option value="${k}">${k}</option>`).join("");
+  el("industrySelect").addEventListener("change",refresh);
+  el("scenarioSlider").addEventListener("input",refresh);
+  el("generatedAt").textContent=new Date().toLocaleString("zh-TW",{hour12:false});
+  document.querySelectorAll(".copyBtn").forEach(btn=>{
+    btn.addEventListener("click",async ()=>{
+      const target=el(btn.dataset.copy);
+      target.select();
+      try{await navigator.clipboard.writeText(target.value);btn.textContent="已複製";setTimeout(()=>btn.textContent=btn.textContent.replace("已複製","複製 "+(btn.dataset.copy==="promptMaster"?"Master Prompt":btn.dataset.copy==="promptSchema"?"JSON / SSOT Prompt":btn.dataset.copy==="promptValidation"?"驗證與反論證 Prompt":"自動化 Coding Prompt")),1000);}
+      catch(e){document.execCommand("copy");}
+    });
+  });
+  refresh();
+}
+init();
+</script>
+</body>
+</html>
