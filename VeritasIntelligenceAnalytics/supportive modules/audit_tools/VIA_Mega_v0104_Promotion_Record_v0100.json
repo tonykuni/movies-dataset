@@ -1,0 +1,34 @@
+{
+  "record": "VIA_Mega_v0104_Promotion_Record",
+  "version": "v0100",
+  "date": "2026-08-06",
+  "action": "Mega 引擎 v0103 -> v0104 版本前送(操作員指令:參數置頂含預設值可增減 + attachment + parquet 增量維護 + DuckDB + rich 摘要矩陣)",
+  "features": {
+    "params_top": "PARAMS 置頂;覆寫鏈 預設 < via_mega_params.json < --set key.path=value(JSON 值);增減 subsystems/attachments/skip_dirs/ssot_required 均可",
+    "attachments": "附掛掃描根納入全景(ATT: 前綴域);attach_vmt_root 便捷開關自動附掛 VMT_ROOT",
+    "parquet_incremental": "per-file 記錄 record_hash=sha256(relpath|sha|zone|flag) 去重;僅新增/變更列寫入 VIA_Reports/mega_store/run_*.parquet(run-local 不入庫);DuckDB read_parquet 聚合",
+    "rich_summary": "Panel 三輪燈號 + 子系統健康度表 + 分區×子系統矩陣 + SSOT/九頭龍/store 摘要;缺 rich/duckdb 優雅降級並誠實標 SKIP",
+    "porcelain": "HTML Matrix 換 Porcelain(DesignLock SSOT v0101 政策第 2 條):朱紅印記+BRAND·6 帶+狀態六階 #3d7a52/#8a6420/#a4472f"
+  },
+  "verification": {
+    "py_compile": "PASS",
+    "full_run": "1166 檔 R2 提前收斂;parquet +1166 首寫",
+    "idempotence": "重跑 增量 0 新列(去重跳過 1166)",
+    "set_overrides": "rounds_max=1 / rich_summary=false / parquet.enabled=false 全部生效;降級路徑誠實 SKIP",
+    "known_env_delta": "容器 py3.11 對歸檔證據檔 comprehensive_pdf_extractor (1)_sha72238d6aa40a.py 報 f-string 反斜線 AST fail(py3.12+ 合法);操作員機 py3.12+ 不受影響,非回歸,不動該檔"
+  },
+  "hashes": {
+    "via_mega_engine_v0103.py(retained)": "d1f602d154112e94300378d53954da355f7470f50344e99eb3b2cd5f8b26a156",
+    "via_mega_engine_v0104.py(new ACTIVE)": "575867db1e059317cc3a75e994160ea0144140138558fef1079acd24f610f901",
+    "VIA_AICodegen_Prompt_SSOT_v0101.md(new ACTIVE)": "2755c49553329538763ed6a755cfb267aa9a80261cd1ca3cbf65ac12de3ea69f"
+  },
+  "wiring": "bin/via-mega.cmd -> v0104(rem 註明回退 v0103);AICodegen SSOT v0100->v0101 接線表同步(原檔保留)",
+  "dependencies": "duckdb、rich 皆選配:py -m pip install duckdb rich;缺件降級不中斷",
+  "governance": [
+    "正本不就地修改",
+    "只增不減(SSOT 升版)",
+    "hash 鎖定交易",
+    "產出物(mega_store parquet)run-local 不入庫",
+    "append-only"
+  ]
+}

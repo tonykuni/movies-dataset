@@ -27,7 +27,7 @@ pwsh -File "VeritasIntelligenceAnalytics\Install-VIA.ps1"     # 加 -AutoStart �
 | `via-import` | manifest 匯入:Downloads 批次去重入庫(清單由 Claude 寫進 `import_manifests/`) |
 | `via-vmt` | VMT SuperBOM 總指揮(v0102 設計鎖刊頭;問卷→附件→收斂→CPM,缺件優雅略過) |
 | `via-vmt-init` | VMT 資料層 bootstrap:OneShot 對準 VMT 根建 DB/SSOT 種子 + 跑郵件器 + Command Center |
-| `via-mega` | 公定處理模式:三輪全景分析 x 20 加速器 x Mega Matrix(唯讀提案型,提前收斂) |
+| `via-mega` | 公定處理模式 v0104:三輪全景 x 20 加速器 x Porcelain Matrix;參數置頂可增減(`--set k=v`)、附掛掃描根、parquet 增量 store(DuckDB)、rich 摘要矩陣 |
 | `via-code` | 自動識別編號器:`via-code <類別> <元件> [suffix]`(冪等給號;`--list`;`--register`) |
 | `via-gov` | 中央治理引擎 CGE v0401:TAB 多頁儀表板+台股登記簿 1977 檔(dry-run 預設;`--commit`;`--fetch-tw`) |
 | `via-vdf` | VDF 一鍵側欄工作台(v0160C 一般瀏覽器 HTML U/I + 本機 HTTP 橋;SHA256+AST 閘門;回退 v0102/v0101) |
@@ -66,7 +66,7 @@ supportive modules/
 | VRN 生產線 | `functional modules/VRN/registry/VRN_Production_Manifest.json` | v1.1.0(核心模組 SHA256 錨定) |
 | 設計鎖 tokens | `supportive modules/ssot/VIA_DesignLock_SSOT_v0101.json` | v0101 ACTIVE(顏色鎖定源=Veritas Header copy.dc.html:Porcelain BRAND·6+朱紅印記+狀態六階;v0100 色票保留供既有介面;回退=改引 v0100) |
 | 公定處理模式 | `supportive modules/ssot/VIA_MegaPrompt_OfficialMode_v0100.md` | v0100(三輪硬性上限、20 加速器、沙盒循環;執行載體 `via-mega`) |
-| AI 撰寫規範 | `supportive modules/ssot/VIA_AICodegen_Prompt_SSOT_v0100.md` | v0100(給任何 AI 的一貼即用 PS 撰寫契約:座標/鐵律/交付/驗證閘) |
+| AI 撰寫規範 | `supportive modules/ssot/VIA_AICodegen_Prompt_SSOT_v0101.md` | v0101(接線表 via-mega→v0104、via-ui→Hub v0103;Porcelain 設計鎖引用鐵律) |
 | 欄位 regex 庫 | `functional modules/VRN/InvestmentRegexPattern_VALIDATED.py` | v3.0 ACTIVE(525 patterns;PROMOTION_RECORD 錨定 SHA256) |
 | 同義字引擎 | `supportive modules/ssot/via_synonym_engine_v0100.py` + Seed | v0100 ACTIVE(41 canonical 錨點;同義字增量只增不減) |
 | 編碼註冊中心 | `supportive modules/registry/VIA_AutoCode_Registry_v0100.json` | v0100(八架構類別+泛用狀態;六共存域不侵入;`via-code`) |
@@ -99,4 +99,4 @@ supportive modules/
 | 範疇已凍結項目 | 見 `audit_tools/VIA_ScopeFreeze_Closure_v0100.json`;重開需操作員點名 |
 
 ---
-*營運手冊 2026-08-05 · 對應 Tower v005 / Mega v0102 / VMT v0102 / VDF 工作台 v0160C / TickerRegex v0100 / VRN v1.1.0 / 判定表 v002*
+*營運手冊 2026-08-06 · 對應 Tower v005 / Mega v0104 / VMT v0102 / VDF 工作台 v0160C / UI Hub v0103 Porcelain / TickerRegex v0100 / VRN v1.1.0 / 判定表 v002*
