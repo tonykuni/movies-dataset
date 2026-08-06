@@ -75,7 +75,7 @@ supportive modules/
 | VRN 生產線 | `functional modules/VRN/registry/VRN_Production_Manifest.json` | v1.1.0(核心模組 SHA256 錨定) |
 | 設計鎖 tokens | `supportive modules/ssot/VIA_DesignLock_SSOT_v0101.json` | v0101 ACTIVE(顏色鎖定源=Veritas Header copy.dc.html:Porcelain BRAND·6+朱紅印記+狀態六階;v0100 色票保留供既有介面;回退=改引 v0100) |
 | 公定處理模式 | `supportive modules/ssot/VIA_MegaPrompt_OfficialMode_v0100.md` | v0100(三輪硬性上限、20 加速器、沙盒循環;執行載體 `via-mega`) |
-| AI 撰寫規範 | `supportive modules/ssot/VIA_AICodegen_Prompt_SSOT_v0101.md` | v0101(接線表 via-mega→v0104、via-ui→Hub v0103;Porcelain 設計鎖引用鐵律) |
+| AI 撰寫規範 | `supportive modules/ssot/VIA_AICodegen_Prompt_SSOT_v0102.md` | v0102(接線地板 one v0101/mega v0106/Hub v0104+批次 G 四指令;run-local cwd 隔離鐵律) |
 | 欄位 regex 庫 | `functional modules/VRN/InvestmentRegexPattern_VALIDATED.py` | v3.0 ACTIVE(525 patterns;PROMOTION_RECORD 錨定 SHA256) |
 | 同義字引擎 | `supportive modules/ssot/via_synonym_engine_v0100.py` + Seed | v0100 ACTIVE(41 canonical 錨點;同義字增量只增不減) |
 | 編碼註冊中心 | `supportive modules/registry/VIA_AutoCode_Registry_v0100.json` | v0100(八架構類別+泛用狀態;六共存域不侵入;`via-code`) |
