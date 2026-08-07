@@ -193,7 +193,14 @@ def selftest():
     ck("export_ics", ic.get("ok"))
     oc = eng.outlook_oneclick(transport=lambda db,mx:[{"id":"o1","subject":"PN-9942 \u505c\u7dda","body":"\u8acb\u63d0\u4f9b\u65b9\u6848","sender":"qa.li@corp.com","received":"2026-07-06 09:00:00"}])
     ck("outlook \u4e00\u9375(fake transport)", oc.get("ok") and oc.get("count") == 1)
-    ck("outlook \u672a\u5c31\u7dd2\u53cb\u5584\u8a3a\u65b7", eng.outlook_oneclick().get("ok") is False and "hint" in eng.outlook_oneclick())
+    # \u672a\u5c31\u7dd2\u8a3a\u65b7\u6539\u78ba\u5b9a\u6027\u6a21\u64ec\uff1a\u539f\u5beb\u6cd5\u4f9d\u8cf4\u4e3b\u6a5f\u7121 Outlook\uff0c\u5728\u771f Outlook \u5728\u4f4d\u7684\u6a5f\u5668\u6703\u8b80\u771f\u4fe1\u7bb1\u4e14\u5fc5 FAIL
+    _avail = _C.LocalOutlookConnector.available
+    try:
+        _C.LocalOutlookConnector.available = lambda self: False
+        nr = eng.outlook_oneclick()
+        ck("outlook \u672a\u5c31\u7dd2\u53cb\u5584\u8a3a\u65b7", nr.get("ok") is False and "hint" in nr)
+    finally:
+        _C.LocalOutlookConnector.available = _avail
     b = eng.operations_board(recs)
     rb = eng.work_rebuild(recs)
     ck("work_rebuild", "rows" in rb and "risk_control" in rb and "rebuild_plan" in rb and "stakeholder_control" in rb)

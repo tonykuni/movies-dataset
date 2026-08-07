@@ -1,0 +1,20 @@
+{
+ "record_id": "VIA_Forge_MailhubSelftest_HostIndependence_Fix_v0100",
+ "ts": "2026-08-07T23:32:32",
+ "symptom": "操作員機 via-forge check 43/45:mailhub『outlook 未就緒友善診斷』FAIL;manager『all green』連動 RED",
+ "root_cause": "測試設計缺陷 — 該測試斷言無 transport 呼叫必回 ok=False,只在無 Outlook 主機成立;真 Outlook 在位之機器上自測走進真信箱(唯讀)拉信成功回 ok=True 而 FAIL,且斷言式重複呼叫兩次",
+ "fix": "自測改確定性模擬:暫時強制 LocalOutlookConnector.available()=False,單次呼叫驗證友善診斷,finally 還原;不再依賴主機環境、自測絕不觸真信箱",
+ "file": {
+  "path": "supportive modules/VIA_Forge/via_mailhub.py",
+  "original_sha16": "41b1667ca2a338c1",
+  "patched_sha16": "3ce1a8cf3b65f995",
+  "rollback": "git history(9f3be7d 之版本)"
+ },
+ "verification": {
+  "container_no_outlook": "20/20 PASS",
+  "simulated_outlook_host": "available() 強制 True + 真 fetch 防護哨(觸即 AssertionError)→ 20/20 PASS 且哨未觸發",
+  "checkmatrix_container": "45/45 GREEN"
+ },
+ "expected_operator_result": "via-forge check → 45/45(mailhub 20/0;manager all-green 連動自動轉綠)",
+ "append_only": true
+}
