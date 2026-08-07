@@ -1,0 +1,26 @@
+{
+  "record": "VIA_FullLoop_QA_Record",
+  "version": "v0100",
+  "date": "2026-08-07",
+  "operator_directive": "debug/test/optimize/consolidate/user-test/activate 循環直到全部完美",
+  "bug_found_and_fixed": {
+    "id": "PACK-LAUNCH-ARGSPLIT",
+    "symptom": "pack v0101 Launch 模板以 Split(\" \") 拆參數 — 引號變字面字元、含空白路徑碎裂;cge 包 --workdir 首當其衝",
+    "fix": "v0102:entry_args 規格改列表形,Launch 生成 PS 原生陣列 @(\"--workdir\", $WorkDir) + splatting,引號/空白全免疫",
+    "regression": "八規格重打全過;產品號穩定(payload 未變沿用原號);cge/mega/flow 三種參數形態逐一驗證"
+  },
+  "test_matrix": {
+    "ps_lint(容器 pwsh 替代)": "One v0102 / Bridge / EnvFix v0101+v0102 / 生成之 Install+Launch — 全 0 error(param 位置 WARN 為註釋塊誤判,實際 param 合規)",
+    "engines": "mega v0106 hydra0 · bridge 25/25 · autocoder PKG 域正常 · synonym SMOKE PASS · EnvManager plan-install JSON 合法 · FlowSystem 五閘 PASS · IF selftest PASS · FIS LOGIC PROVEN(前輪)",
+    "fail_soft_honest": "probe/extract 無語料誠實 MISS(語料在操作員機,非缺陷)"
+  },
+  "hashes": {
+    "via_pack_engine_v0101(retained)": "ec73227d8cb4918e30fc6886cc797de660d916eea9d0ea076a673486bbe8a9b0",
+    "via_pack_engine_v0102(new ACTIVE)": "e8a32e2e53731870a452e2feaa4a25dbd167173af2f9addcdd42b1d352070409"
+  },
+  "governance": [
+    "正本不就地修改",
+    "回歸全過才接線",
+    "append-only"
+  ]
+}
