@@ -1,0 +1,31 @@
+{
+  "record": "VIA_Pack_v0100_Activation_Record",
+  "version": "v0100",
+  "date": "2026-08-07",
+  "operator_directive": "自動生成獨一無二打包後產品號,單獨綁定一個主機",
+  "product_id_scheme": {
+    "format": "PKG-<seq>-<SUBSYS>-<YYYYMMDD>-<content_sha8>",
+    "uniqueness": "雙保險:AutoCoder 註冊中心序號(全平台唯一、冪等——同內容重打得同號)× payload 內容定址 SHA8(內容變=號變)",
+    "registry": "新類別『打包產品』PKG 落籍 VIA_AutoCode_Registry;首兩號 PKG-001(MegaAuditor)/PKG-002(CentralGovernance)"
+  },
+  "host_binding": {
+    "policy": "NODE_LOCKED_1_HOST",
+    "install": "MachineGuid+電腦名+產品號 → SHA256 主機指紋寫 HOST_BINDING_LOCK.json(只存雜湊不存原值);已綁他機=fail-closed 拒重綁",
+    "launch": "每次啟動重算指紋比對;未綁定/不符=fail-closed 拒跑,誠實訊息不靜默",
+    "idempotent": "同機重跑 Install=冪等通過"
+  },
+  "gates": "py_compile 全過才成包(fail-closed);逐檔 SHA256 入 PACKAGE_VALIDATION_Manifest(沿 Standalone_Package_v0102 樣板)",
+  "specs": "八規格:cge/mega/bridge/audit/flow/if/vmt/tools(SPECS 表可增減)",
+  "container_verification": "mega 成包 PKG-001(1 檔)· cge 成包 PKG-002(5 檔含 TW 快照)· 同內容重打同號(冪等)· zip 產出 · 產物 run-local",
+  "fix_log": "初版 PKG- 前綴致雙連字號 PKG--001;register 改 PKG 前綴,測試期 registry 未提交寫入已還原重發",
+  "hashes": {
+    "via_pack_engine_v0100.py": "ca7e658bbc8fbc7ca4e722987d299ff898ea9a199e3e30c5d7aac9da081ea310"
+  },
+  "governance": [
+    "唯讀取材正本不動",
+    "fail-closed 成包閘與綁定閘",
+    "產出 run-local 不入庫",
+    "編號登錄只增不減",
+    "append-only"
+  ]
+}
