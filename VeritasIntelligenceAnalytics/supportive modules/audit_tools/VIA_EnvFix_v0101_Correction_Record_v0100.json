@@ -1,0 +1,25 @@
+{
+  "record": "VIA_EnvFix_v0101_Correction_Record",
+  "version": "v0100",
+  "date": "2026-08-07",
+  "operator_evidence": "v0100 實跑:import 驗證 OK(duckdb 1.5.2/scipy 1.17.1/numpy 2.4.4/pandas 3.0.2/rich)但聯合安裝 FAIL+黃金律 FAIL;pip check 大量存量破損(torch/tokenizers/streamlit/gradio 等)",
+  "root_cause": {
+    "golden_rule_misscope": "numpy>=1.24,<2.0 是 vmt_pm venv(pm4py)專律;操作員 base 為 numpy 2.4.4+pandas 3.0.2 世代,pandas 3.x 需 numpy 2.x → constraints 造成 pip 無解。引擎側證據:Mega 全綠與 FIS LOGIC PROVEN 均在 numpy 2.x 取得",
+    "pip_check_junk": "base 存量破損為既有雜訊(與本平台無關的 ML 生態殘骸),v0100 一刀判 FAIL 失真",
+    "envmanager_blocked": "NO_HEALTHY_MANAGED_ENV_AVAILABLE=操作員機管理 venv 未在 EnvManager 掃描根;決策留痕仍有效,屬資訊非錯誤"
+  },
+  "v0101_fixes": [
+    "F1 已就緒即不動(import 先探,五件全 READY 則零安裝)",
+    "F2 黃金律範圍修正:base 資訊性顯示,vmt_pm venv 由 Deploy_VMT 自帶 constraints 維持",
+    "F3 pip check 前後差分:僅新增破損判 FAIL,存量誠實列數"
+  ],
+  "hashes": {
+    "v0100(retained)": "f3f0854084554e84c9feae602253219559927fa5fd7f3d42840e75900bd1de3d",
+    "v0101(new ACTIVE)": "e3dd2b0f487292c3d77742880f00e7b94e3d008bb9cb3a5cca1231f4438ebb39"
+  },
+  "governance": [
+    "正本不就地修改",
+    "誠實不列罪(存量雜訊)",
+    "append-only"
+  ]
+}
