@@ -37,6 +37,7 @@ pwsh -File "VeritasIntelligenceAnalytics\Install-VIA.ps1"     # 加 -AutoStart �
 | `via-pipe` | 統一輪動引擎(回測+自演化+證偽;**待同伴檔 rotation_engine.py 補齊**) |
 | `via-envfix` | EnvManager 決策式無衝突安裝:五依賴 plan-install 留痕 → NumPy 黃金律 constraints → py 基底聯合安裝 → pip check 後驗 |
 | `via-bridge` | **Command Bridge**:一鍵前後端對接——後端 B1-B5 探測(接線/SSOT/依賴/資料庫/UI)+ test/debug 三輪 + 多 TAB 前端,首頁=總覽+全系統狀態矩陣(每跑必重生=當下真相) |
+| `via-trinity` | 功能三系整合模板:VIA 母刊頭 > 鍛 VDF/研 VRN/鑑 VAP 四 TAB(Porcelain;22 個 {{…}} 資料綁定槽) |
 | `via-pack` | 子系統獨立打包:`via-pack <cge\|mega\|bridge\|audit\|flow\|if\|vmt\|tools>` — 產品號自動編號(PKG 序號×內容 SHA8,冪等)+ **單機綁定**(Install 綁主機指紋、Launch 驗證,不符 fail-closed)+ **每包自帶封面 U/I**(產品/綁定/manifest 矩陣/報告出口,Launch 自動開)+ 逐檔 SHA256 manifest + zip |
 
 ## 系統架構
