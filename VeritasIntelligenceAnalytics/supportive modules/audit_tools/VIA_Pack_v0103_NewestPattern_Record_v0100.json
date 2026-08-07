@@ -1,0 +1,26 @@
+{
+  "record": "VIA_Pack_v0103_NewestPattern_Record",
+  "version": "v0100",
+  "date": "2026-08-07",
+  "action": "Pack v0102 -> v0103:SPECS 支援 entry_newest/extra_newest 萬用字元 — 引擎檔取最新版,entry 自動解析",
+  "trigger": "vmt 規格滯留 via_master_engine_v0102(實況 v0103)— 與 via-one 曾患同病;本次連根治",
+  "regression": {
+    "all_8_specs": "全過;Launch entry 自動解析 v0103",
+    "id_semantics_proven": [
+      "vmt:內容變(v0102->v0103)-> 新號 PKG-007-...-d3bae36d(家族序號不變)",
+      "flow:批次 I 新入 SandboxPatch -> 內容變號 5ac2a85d(正確)",
+      "cge/mega/bridge/if/tools:內容未變沿用原號(冪等)"
+    ],
+    "fail_closed": "pattern 無匹配即中止不成包"
+  },
+  "dynamic_resolution_now_complete": "via-one v0104(Mega/VMT/Hub)+ via-pack v0103(全引擎規格)— 平台再無寫死版號的接線點",
+  "hashes": {
+    "v0102(retained)": "e8a32e2e53731870a452e2feaa4a25dbd167173af2f9addcdd42b1d352070409",
+    "v0103(new ACTIVE)": "1bb22ac487e7ffde07d761ebd892b0ee760e9b510dca330a33065c312178da3b"
+  },
+  "governance": [
+    "正本不就地修改",
+    "fail-closed",
+    "append-only"
+  ]
+}
