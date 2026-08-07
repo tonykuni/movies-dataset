@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="zh-Hant" data-density="compact">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA Intelligence Asset Generator Super Engine v0402</title>
+<style>
+:root {
+  --bg:#F9F9F6; --surface:rgba(255,255,255,.82); --line:#DCE8E3; --ink:#1F2933; --muted:#6B7C78;
+  --celadon:#DFECEA; --sky:#AFCFCC; --seal:#9F1D1D; --ok:#166534; --warn:#B7791F; --fail:#B91C1C;
+  --teal:#0F766E; --shadow:0 16px 44px rgba(31,41,51,.075);
+  --base-font:13px; --table-font:12px; --th-font:12px;
+  --py:8px; --px:10px; --kpi-font:24px;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0; color:var(--ink); font-family:"Noto Sans TC","Microsoft JhengHei","Segoe UI",Inter,Arial,sans-serif;
+  font-size:var(--base-font); line-height:1.42;
+  background:radial-gradient(circle at 13% 8%, rgba(223,236,234,.94), transparent 25%),
+             radial-gradient(circle at 84% 6%, rgba(175,207,204,.48), transparent 23%),
+             linear-gradient(135deg,#F9F9F6,#F4F7F2);
+}
+body:before {
+  content:""; position:fixed; inset:0; pointer-events:none; opacity:.16;
+  background-image:linear-gradient(112deg, transparent 0 42%, rgba(15,118,110,.15) 42.3% 42.7%, transparent 43%),
+                   linear-gradient(72deg, transparent 0 70%, rgba(159,29,29,.09) 70.2% 70.55%, transparent 71%);
+}
+header { position:sticky; top:0; z-index:5; backdrop-filter:blur(14px); background:rgba(249,249,246,.88); border-bottom:1px solid var(--line); padding:20px 34px; }
+.brand { display:flex; align-items:center; gap:14px; }
+.seal { width:38px; height:38px; border-radius:11px; display:grid; place-items:center; background:var(--seal); color:white; font-weight:800; font-size:22px; box-shadow:var(--shadow); }
+h1 { margin:0; font-size:22px; letter-spacing:.018em; font-weight:720; }
+.subtitle { color:var(--muted); margin-top:4px; font-size:12px; }
+.wrap { padding:22px 34px 60px; max-width:1760px; margin:auto; }
+.kpis { display:grid; grid-template-columns:repeat(6,minmax(130px,1fr)); gap:12px; margin-bottom:16px; }
+.kpi { background:var(--surface); border:1px solid var(--line); border-radius:17px; padding:12px 14px; box-shadow:var(--shadow); }
+.kpi span { color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.045em; }
+.kpi b { display:block; font-size:var(--kpi-font); margin-top:4px; line-height:1.05; }
+.grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.card { background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:14px; box-shadow:var(--shadow); margin-top:14px; }
+h2 { margin:2px 0 10px; font-size:16px; font-weight:720; }
+.controls { display:flex; gap:8px; flex-wrap:wrap; margin:10px 0; }
+button,input { border:1px solid var(--line); background:white; border-radius:999px; padding:7px 11px; color:var(--ink); font-size:12px; }
+button { cursor:pointer; } button:hover { background:var(--celadon); }
+.table-wrap { max-height:72vh; overflow:auto; border:1px solid var(--line); border-radius:14px; background:white; }
+table { width:100%; border-collapse:separate; border-spacing:0; background:white; }
+th,td { padding:var(--py) var(--px); border-bottom:1px solid var(--line); text-align:left; font-size:var(--table-font); vertical-align:top; white-space:nowrap; }
+td:nth-child(5),td:nth-child(10) { white-space:normal; min-width:180px; }
+th { position:sticky; top:0; background:rgba(223,236,234,.96); z-index:3; font-size:var(--th-font); color:#31423f; font-weight:720; }
+tr:hover td { background:#F7FBF9; }
+.pill,.risk { display:inline-block; border-radius:999px; padding:2px 7px; font-size:10.5px; color:white; line-height:1.3; }
+.pass,.low { background:var(--ok); } .warn,.review,.medium { background:var(--warn); } .fail,.blocked,.high { background:var(--fail); } .neutral { background:var(--muted); }
+.small { color:var(--muted); font-size:11px; } .mono { font-family:"Cascadia Mono","DM Mono",Consolas,monospace; font-size:calc(var(--table-font) - .3px); }
+.num { text-align:right; font-variant-numeric:tabular-nums; }
+.meta { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+.badge { border-radius:999px; padding:3px 8px; background:var(--celadon); color:var(--teal); font-size:11px; }
+@media (max-width:1100px) { .kpis { grid-template-columns:repeat(2,1fr); } .grid2 { grid-template-columns:1fr; } header { padding:16px 20px; } .wrap { padding:18px 20px 50px; } th { position:static; } }
+</style>
+</head>
+<body>
+<header><div class="brand"><div class="seal">理</div><div><h1>Veritas Intelligence Asset Generator · UI v0402</h1><div class="subtitle">Professional Dense UI · Auto Density: compact · Function Records → Lego Intelligence Assets</div></div></div></header>
+<div class="wrap">
+<div class="kpis">
+<div class="kpi"><span>Processed Assets</span><b>6</b></div>
+<div class="kpi"><span>Registry Total</span><b>4</b></div>
+<div class="kpi"><span>Activation Ready</span><b>4</b></div>
+<div class="kpi"><span>P1 Build</span><b>1</b></div>
+<div class="kpi"><span>Merge Review</span><b>0</b></div>
+<div class="kpi"><span>Hydra Review</span><b>3</b></div>
+</div>
+<div class="meta"><span class="badge">Font: Noto Sans TC / Segoe UI</span><span class="badge">Base 13px</span><span class="badge">Table 12px</span><span class="badge">Max rows 1400</span></div>
+<div class="grid2">
+<div class="card"><h2>Gate Matrix</h2><div class="table-wrap"><table><thead><tr><th>Gate</th><th>Status</th><th>Risk</th><th>Message</th></tr></thead><tbody><tr><td>INTAKE</td><td><span class='pill pass'>PASS</span></td><td>LOW</td><td>Segments mined=6</td></tr>
+<tr><td>ASSET_CLASSIFICATION</td><td><span class='pill pass'>PASS</span></td><td>LOW</td><td>Assets processed=6</td></tr>
+<tr><td>SCHEMA</td><td><span class='pill pass'>PASS</span></td><td>LOW</td><td>Fail tests=0</td></tr>
+<tr><td>HYDRA</td><td><span class='pill pass'>PASS</span></td><td>LOW</td><td>Hydra review assets=3, high risk=0</td></tr>
+<tr><td>ACTIVATION_CANDIDATE</td><td><span class='pill pass'>PASS</span></td><td>LOW</td><td>Activation-ready candidates=4</td></tr>
+<tr><td>REGISTRY_APPEND_ONLY</td><td><span class='pill pass'>PASS</span></td><td>LOW</td><td>Registry total=4</td></tr></tbody></table></div></div>
+<div class="card"><h2>Action Summary</h2><div class="table-wrap"><table><thead><tr><th>Action</th><th>Count</th></tr></thead><tbody><tr><td>REFERENCE_EXISTING_OR_MERGE</td><td class='num'>2</td></tr>
+<tr><td>SANDBOX_TEST_NEXT</td><td class='num'>4</td></tr></tbody></table></div></div>
+</div>
+<div class="grid2">
+<div class="card"><h2>Asset Type Distribution</h2><div class="table-wrap"><table><thead><tr><th>Asset Type</th><th>Count</th></tr></thead><tbody><tr><td>FunctionAsset</td><td class='num'>3</td></tr>
+<tr><td>ModuleAsset</td><td class='num'>1</td></tr>
+<tr><td>RepairAsset</td><td class='num'>1</td></tr>
+<tr><td>ReportAsset</td><td class='num'>1</td></tr></tbody></table></div></div>
+<div class="card"><h2>Top Function Areas</h2><div class="table-wrap"><table><thead><tr><th>Function Area</th><th>Count</th></tr></thead><tbody><tr><td>schema_json_repair</td><td class='num'>4</td></tr>
+<tr><td>registry_asset_management</td><td class='num'>1</td></tr>
+<tr><td>report_html_ui</td><td class='num'>1</td></tr></tbody></table></div></div>
+</div>
+<div class="card"><h2>Processed Intelligence Assets</h2>
+<div class="controls"><input id="q" placeholder="Search name / function area / action..." oninput="filterRows()"><button onclick="setFilter('ALL')">All</button><button onclick="setFilter('SANDBOX_TEST_NEXT')">Sandbox</button><button onclick="setFilter('MERGE_REVIEW')">Merge</button><button onclick="setFilter('REVIEW_REQUIRED')">Review</button><button onclick="setFilter('ARCHIVE_ONLY')">Archive</button><button onclick="toggleDensity()">Toggle Density</button></div>
+<div class="small">Activation Ready = registry-ready candidate only. Sandbox/user-test/regression still required before ActivePointer switch.</div>
+<div class="table-wrap"><table id="assetTable"><thead><tr><th>Priority</th><th>Action</th><th>Type</th><th>Name</th><th>Function Area</th><th>Status</th><th>Risk</th><th>Value</th><th>Activation</th><th>Hydra</th></tr></thead><tbody><tr data-action='SANDBOX_TEST_NEXT' data-risk='LOW' data-type='FunctionAsset'><td>P1_BUILD</td><td>SANDBOX_TEST_NEXT</td><td>FunctionAsset</td><td class='mono'>def_json_repair_safe_loader</td><td>schema_json_repair</td><td>CANDIDATE</td><td><span class='risk low'>LOW</span></td><td class='num'>0.95</td><td>YES</td><td></td></tr>
+<tr data-action='SANDBOX_TEST_NEXT' data-risk='LOW' data-type='ReportAsset'><td>P2_CANDIDATE</td><td>SANDBOX_TEST_NEXT</td><td>ReportAsset</td><td class='mono'>Invoke-VIA-IntelligenceAssetGenerator-v0402</td><td>report_html_ui</td><td>CANDIDATE</td><td><span class='risk low'>LOW</span></td><td class='num'>0.6</td><td>YES</td><td></td></tr>
+<tr data-action='SANDBOX_TEST_NEXT' data-risk='LOW' data-type='ModuleAsset'><td>P2_CANDIDATE</td><td>SANDBOX_TEST_NEXT</td><td>ModuleAsset</td><td class='mono'>ModuleAsset_508922c1d846</td><td>registry_asset_management</td><td>CANDIDATE</td><td><span class='risk low'>LOW</span></td><td class='num'>0.55</td><td>YES</td><td></td></tr>
+<tr data-action='SANDBOX_TEST_NEXT' data-risk='MEDIUM' data-type='RepairAsset'><td>P2_CANDIDATE</td><td>SANDBOX_TEST_NEXT</td><td>RepairAsset</td><td class='mono'>RepairAsset_241d3d5b94f2</td><td>schema_json_repair</td><td>CANDIDATE</td><td><span class='risk medium'>MEDIUM</span></td><td class='num'>0.55</td><td>YES</td><td>HYDRA_REPAIR_CHAIN</td></tr>
+<tr data-action='REFERENCE_EXISTING_OR_MERGE' data-risk='MEDIUM' data-type='FunctionAsset'><td>P3_ARCHIVE</td><td>REFERENCE_EXISTING_OR_MERGE</td><td>FunctionAsset</td><td class='mono'>def_json_repair_safe_loader</td><td>schema_json_repair</td><td>EXISTS</td><td><span class='risk medium'>MEDIUM</span></td><td class='num'>0.95</td><td>NO</td><td>HYDRA_DUPLICATE</td></tr>
+<tr data-action='REFERENCE_EXISTING_OR_MERGE' data-risk='MEDIUM' data-type='FunctionAsset'><td>P3_ARCHIVE</td><td>REFERENCE_EXISTING_OR_MERGE</td><td>FunctionAsset</td><td class='mono'>def_json_repair_safe_loader</td><td>schema_json_repair</td><td>EXISTS</td><td><span class='risk medium'>MEDIUM</span></td><td class='num'>0.7</td><td>NO</td><td>HYDRA_DUPLICATE</td></tr></tbody></table></div></div>
+<div class="grid2">
+<div class="card"><h2>Hydra Playbook</h2><div class="table-wrap"><table><thead><tr><th>Hydra Type</th><th>Prepared Solution</th></tr></thead><tbody><tr><td class='mono'>HYDRA_DUPLICATE</td><td>Review merge_target. Do not create a new active module before dedup approval.</td></tr>
+<tr><td class='mono'>HYDRA_REPAIR_CHAIN</td><td>Move to quarantine and require snapshot + regression test before repair.</td></tr>
+<tr><td class='mono'>HYDRA_DEPENDENCY</td><td>Split required/optional/fallback dependencies and block cloud/API dependency.</td></tr>
+<tr><td class='mono'>HYDRA_PATH</td><td>Use WriteTargetLock. Same target can only have one writer per run.</td></tr>
+<tr><td class='mono'>HYDRA_ACTIVATION</td><td>Block activation until unit/integration/user-test pass.</td></tr>
+<tr><td class='mono'>HYDRA_LLM_HALLUCINATION</td><td>Require source_line trace. LLM candidate cannot activate directly.</td></tr>
+<tr><td class='mono'>HYDRA_VERSION_DRIFT</td><td>Route through ActivePointer, never newest-file auto-pick.</td></tr>
+<tr><td class='mono'>HYDRA_SCHEMA_DRIFT</td><td>Normalize with fixed Asset Schema; do not allow free asset_type creation.</td></tr></tbody></table></div></div>
+<div class="card"><h2>Top 8 Local Free Library Stacks</h2><div class="table-wrap"><table><thead><tr><th>Stack</th><th>Rank</th><th>Library</th><th>Kind</th><th>Available</th><th>Role</th></tr></thead><tbody><tr><td>record_intake_and_cleaning</td><td class='num'>1</td><td class='mono'>charset-normalizer</td><td>pip</td><td>YES</td><td>encoding detection</td></tr>
+<tr><td>record_intake_and_cleaning</td><td class='num'>2</td><td class='mono'>ftfy</td><td>pip</td><td>NO</td><td>unicode repair</td></tr>
+<tr><td>record_intake_and_cleaning</td><td class='num'>3</td><td class='mono'>regex</td><td>pip</td><td>YES</td><td>advanced Unicode regex</td></tr>
+<tr><td>record_intake_and_cleaning</td><td class='num'>4</td><td class='mono'>beautifulsoup4</td><td>pip</td><td>YES</td><td>HTML cleanup</td></tr>
+<tr><td>record_intake_and_cleaning</td><td class='num'>5</td><td class='mono'>markdown-it-py</td><td>pip</td><td>YES</td><td>Markdown parsing</td></tr>
+<tr><td>record_intake_and_cleaning</td><td class='num'>6</td><td class='mono'>mistune</td><td>pip</td><td>YES</td><td>Markdown fallback</td></tr>
+<tr><td>record_intake_and_cleaning</td><td class='num'>7</td><td class='mono'>pathlib</td><td>stdlib</td><td>YES</td><td>path handling</td></tr>
+<tr><td>record_intake_and_cleaning</td><td class='num'>8</td><td class='mono'>tqdm</td><td>pip</td><td>YES</td><td>progress bar</td></tr>
+<tr><td>function_call_detection</td><td class='num'>1</td><td class='mono'>ast</td><td>stdlib</td><td>YES</td><td>Python AST parser</td></tr>
+<tr><td>function_call_detection</td><td class='num'>2</td><td class='mono'>libcst</td><td>pip</td><td>NO</td><td>safe Python codemod parser</td></tr>
+<tr><td>function_call_detection</td><td class='num'>3</td><td class='mono'>tree-sitter</td><td>pip</td><td>NO</td><td>polyglot code parsing</td></tr>
+<tr><td>function_call_detection</td><td class='num'>4</td><td class='mono'>parso</td><td>pip</td><td>YES</td><td>Python parser fallback</td></tr>
+<tr><td>function_call_detection</td><td class='num'>5</td><td class='mono'>jedi</td><td>pip</td><td>YES</td><td>Python code intelligence</td></tr>
+<tr><td>function_call_detection</td><td class='num'>6</td><td class='mono'>PSScriptAnalyzer</td><td>psmodule</td><td>NO</td><td>PowerShell static analysis</td></tr>
+<tr><td>function_call_detection</td><td class='num'>7</td><td class='mono'>rapidfuzz</td><td>pip</td><td>YES</td><td>fuzzy name matching</td></tr>
+<tr><td>function_call_detection</td><td class='num'>8</td><td class='mono'>networkx</td><td>pip</td><td>YES</td><td>call graph</td></tr>
+<tr><td>asset_classification</td><td class='num'>1</td><td class='mono'>lingua-language-detector</td><td>pip</td><td>NO</td><td>language detection</td></tr>
+<tr><td>asset_classification</td><td class='num'>2</td><td class='mono'>opencc</td><td>pip</td><td>NO</td><td>traditional/simplified Chinese normalization</td></tr>
+<tr><td>asset_classification</td><td class='num'>3</td><td class='mono'>jieba</td><td>pip</td><td>NO</td><td>Chinese segmentation</td></tr>
+<tr><td>asset_classification</td><td class='num'>4</td><td class='mono'>janome</td><td>pip</td><td>NO</td><td>Japanese segmentation</td></tr>
+<tr><td>asset_classification</td><td class='num'>5</td><td class='mono'>spacy</td><td>pip</td><td>YES</td><td>English NLP</td></tr>
+<tr><td>asset_classification</td><td class='num'>6</td><td class='mono'>stanza</td><td>pip</td><td>NO</td><td>multilingual NLP fallback</td></tr>
+<tr><td>asset_classification</td><td class='num'>7</td><td class='mono'>dateparser</td><td>pip</td><td>NO</td><td>time normalization</td></tr>
+<tr><td>asset_classification</td><td class='num'>8</td><td class='mono'>flashtext</td><td>pip</td><td>NO</td><td>keyword extraction</td></tr>
+<tr><td>local_llm_candidate_extraction</td><td class='num'>1</td><td class='mono'>ollama</td><td>binary</td><td>NO</td><td>local LLM runtime</td></tr>
+<tr><td>local_llm_candidate_extraction</td><td class='num'>2</td><td class='mono'>llama.cpp</td><td>binary</td><td>NO</td><td>GGUF runtime</td></tr>
+<tr><td>local_llm_candidate_extraction</td><td class='num'>3</td><td class='mono'>llama-cpp-python</td><td>pip</td><td>NO</td><td>Python GGUF inference</td></tr>
+<tr><td>local_llm_candidate_extraction</td><td class='num'>4</td><td class='mono'>gpt4all</td><td>pip</td><td>NO</td><td>local LLM</td></tr>
+<tr><td>local_llm_candidate_extraction</td><td class='num'>5</td><td class='mono'>transformers</td><td>pip</td><td>NO</td><td>local HF model inference</td></tr>
+<tr><td>local_llm_candidate_extraction</td><td class='num'>6</td><td class='mono'>accelerate</td><td>pip</td><td>NO</td><td>local inference acceleration</td></tr>
+<tr><td>local_llm_candidate_extraction</td><td class='num'>7</td><td class='mono'>ctransformers</td><td>pip</td><td>NO</td><td>light local inference</td></tr>
+<tr><td>local_llm_candidate_extraction</td><td class='num'>8</td><td class='mono'>outlines</td><td>pip</td><td>NO</td><td>structured generation</td></tr>
+<tr><td>dedup_and_retrieval</td><td class='num'>1</td><td class='mono'>sentence-transformers</td><td>pip</td><td>NO</td><td>local embeddings</td></tr>
+<tr><td>dedup_and_retrieval</td><td class='num'>2</td><td class='mono'>faiss-cpu</td><td>pip</td><td>NO</td><td>vector search</td></tr>
+<tr><td>dedup_and_retrieval</td><td class='num'>3</td><td class='mono'>hnswlib</td><td>pip</td><td>NO</td><td>ANN vector index</td></tr>
+<tr><td>dedup_and_retrieval</td><td class='num'>4</td><td class='mono'>rank-bm25</td><td>pip</td><td>NO</td><td>lexical retrieval</td></tr>
+<tr><td>dedup_and_retrieval</td><td class='num'>5</td><td class='mono'>whoosh</td><td>pip</td><td>NO</td><td>local full text search</td></tr>
+<tr><td>dedup_and_retrieval</td><td class='num'>6</td><td class='mono'>rapidfuzz</td><td>pip</td><td>YES</td><td>fuzzy matching</td></tr>
+<tr><td>dedup_and_retrieval</td><td class='num'>7</td><td class='mono'>duckdb</td><td>pip</td><td>NO</td><td>local analytical DB</td></tr>
+<tr><td>dedup_and_retrieval</td><td class='num'>8</td><td class='mono'>sqlite3</td><td>stdlib</td><td>YES</td><td>local registry DB fallback</td></tr>
+<tr><td>schema_validation_and_json_repair</td><td class='num'>1</td><td class='mono'>pydantic</td><td>pip</td><td>YES</td><td>asset schema validation</td></tr>
+<tr><td>schema_validation_and_json_repair</td><td class='num'>2</td><td class='mono'>jsonschema</td><td>pip</td><td>YES</td><td>JSON schema validation</td></tr>
+<tr><td>schema_validation_and_json_repair</td><td class='num'>3</td><td class='mono'>orjson</td><td>pip</td><td>YES</td><td>fast JSON</td></tr>
+<tr><td>schema_validation_and_json_repair</td><td class='num'>4</td><td class='mono'>msgspec</td><td>pip</td><td>NO</td><td>fast schema validation</td></tr>
+<tr><td>schema_validation_and_json_repair</td><td class='num'>5</td><td class='mono'>json-repair</td><td>pip</td><td>NO</td><td>repair malformed JSON</td></tr>
+<tr><td>schema_validation_and_json_repair</td><td class='num'>6</td><td class='mono'>dirtyjson</td><td>pip</td><td>NO</td><td>lenient JSON parser</td></tr>
+<tr><td>schema_validation_and_json_repair</td><td class='num'>7</td><td class='mono'>PyYAML</td><td>pip</td><td>YES</td><td>YAML config</td></tr>
+<tr><td>schema_validation_and_json_repair</td><td class='num'>8</td><td class='mono'>ruamel.yaml</td><td>pip</td><td>YES</td><td>round-trip YAML</td></tr>
+<tr><td>hydra_governance_and_locking</td><td class='num'>1</td><td class='mono'>networkx</td><td>pip</td><td>YES</td><td>risk graph</td></tr>
+<tr><td>hydra_governance_and_locking</td><td class='num'>2</td><td class='mono'>portalocker</td><td>pip</td><td>NO</td><td>write target lock</td></tr>
+<tr><td>hydra_governance_and_locking</td><td class='num'>3</td><td class='mono'>filelock</td><td>pip</td><td>YES</td><td>file locking fallback</td></tr>
+<tr><td>hydra_governance_and_locking</td><td class='num'>4</td><td class='mono'>deepdiff</td><td>pip</td><td>NO</td><td>baseline diff</td></tr>
+<tr><td>hydra_governance_and_locking</td><td class='num'>5</td><td class='mono'>tenacity</td><td>pip</td><td>NO</td><td>bounded retry</td></tr>
+<tr><td>hydra_governance_and_locking</td><td class='num'>6</td><td class='mono'>diskcache</td><td>pip</td><td>NO</td><td>local cache</td></tr>
+<tr><td>hydra_governance_and_locking</td><td class='num'>7</td><td class='mono'>watchdog</td><td>pip</td><td>NO</td><td>record folder watcher</td></tr>
+<tr><td>hydra_governance_and_locking</td><td class='num'>8</td><td class='mono'>send2trash</td><td>pip</td><td>YES</td><td>safe quarantine workflow</td></tr>
+<tr><td>reporting_and_weekend_maintenance</td><td class='num'>1</td><td class='mono'>jinja2</td><td>pip</td><td>YES</td><td>HTML templates</td></tr>
+<tr><td>reporting_and_weekend_maintenance</td><td class='num'>2</td><td class='mono'>pandas</td><td>pip</td><td>YES</td><td>matrix export</td></tr>
+<tr><td>reporting_and_weekend_maintenance</td><td class='num'>3</td><td class='mono'>polars</td><td>pip</td><td>NO</td><td>fast matrix handling</td></tr>
+<tr><td>reporting_and_weekend_maintenance</td><td class='num'>4</td><td class='mono'>duckdb</td><td>pip</td><td>NO</td><td>local analytics</td></tr>
+<tr><td>reporting_and_weekend_maintenance</td><td class='num'>5</td><td class='mono'>plotly</td><td>pip</td><td>YES</td><td>local interactive charts</td></tr>
+<tr><td>reporting_and_weekend_maintenance</td><td class='num'>6</td><td class='mono'>markdown</td><td>pip</td><td>NO</td><td>markdown report</td></tr>
+<tr><td>reporting_and_weekend_maintenance</td><td class='num'>7</td><td class='mono'>rich</td><td>pip</td><td>YES</td><td>console UI</td></tr>
+<tr><td>reporting_and_weekend_maintenance</td><td class='num'>8</td><td class='mono'>typer</td><td>pip</td><td>YES</td><td>CLI framework</td></tr></tbody></table></div></div>
+</div>
+</div>
+<script>
+let currentFilter='ALL'; let denseMode=true;
+function setFilter(v){currentFilter=v;filterRows();}
+function filterRows(){const q=document.getElementById('q').value.toLowerCase();document.querySelectorAll('#assetTable tbody tr').forEach(tr=>{const txt=tr.innerText.toLowerCase();const action=tr.dataset.action||'';const okFilter=currentFilter==='ALL'||action===currentFilter;const okQ=!q||txt.includes(q);tr.style.display=(okFilter&&okQ)?'':'none';});}
+function toggleDensity(){denseMode=!denseMode;document.documentElement.style.setProperty('--table-font',denseMode?'12px':'12.5px');document.documentElement.style.setProperty('--py',denseMode?'8px':'9px');document.documentElement.style.setProperty('--px',denseMode?'10px':'11px');}
+</script>
+</body></html>

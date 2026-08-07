@@ -1,0 +1,2874 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA SSOT VisualMaintainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* VisualLock tokens — SSOT-locked, do not edit */
+  --lock-primary:#4c78a8;
+  --lock-neutral:#9c9890;
+  --lock-accent:#439a9a;
+  /* console ground */
+  --ground:#0e1519;
+  --ground-2:#131c22;
+  --surface:#18232b;
+  --surface-2:#1e2c35;
+  --line:#2a3b46;
+  --line-soft:#223139;
+  --ink:#eef3f5;
+  --ink-dim:#aebdc4;
+  --ink-faint:#7f939d;
+  --g:#2e9e6b; --y:#c9a227; --r:#cf5b54; --lock:#9c9890;
+  --mono:"DM Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:"DM Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  --disp:"Syne",var(--sans);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{
+  background:
+    radial-gradient(1100px 540px at 88% -8%, rgba(67,154,154,.10), transparent 60%),
+    radial-gradient(900px 520px at -6% 4%, rgba(76,120,168,.12), transparent 55%),
+    var(--ground);
+  color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+.app{display:grid;grid-template-columns:248px 1fr;grid-template-rows:auto 1fr;min-height:100vh}
+
+/* masthead */
+header.mast{
+  grid-column:1/3;display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+  padding:14px 22px;border-bottom:1px solid var(--line);
+  background:linear-gradient(180deg,var(--ground-2),rgba(19,28,34,.55));
+  position:sticky;top:0;z-index:30;backdrop-filter:blur(6px);
+}
+.brand{display:flex;align-items:center;gap:13px;min-width:max-content}
+.seal{width:34px;height:34px;border-radius:9px;flex:0 0 auto;
+  background:conic-gradient(from 210deg,var(--lock-primary),var(--lock-accent),var(--lock-neutral),var(--lock-primary));
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.12), 0 2px 14px rgba(67,154,154,.25);
+  position:relative}
+.seal::after{content:"";position:absolute;inset:8px;border-radius:4px;background:var(--ground);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.10)}
+.brand h1{font-family:var(--disp);font-weight:800;font-size:15px;letter-spacing:.04em;margin:0;line-height:1.05}
+.brand .sub{font-family:var(--mono);font-size:10.5px;color:var(--ink-faint);letter-spacing:.08em;text-transform:uppercase}
+.mast .stats{display:flex;gap:16px;flex-wrap:wrap;margin-left:6px}
+.stat{display:flex;flex-direction:column;gap:1px}
+.stat .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-faint)}
+.stat .v{font-family:var(--mono);font-size:12.5px;color:var(--ink)}
+.mast .spacer{flex:1 1 auto}
+.tier-pick{display:flex;align-items:center;gap:8px}
+.tier-pick label{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
+select,.btn{font-family:var(--mono);font-size:12px}
+select{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:7px 9px}
+.btn{background:var(--surface-2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 13px;cursor:pointer;transition:.15s}
+.btn:hover{border-color:var(--lock-accent);color:#fff}
+.btn.primary{background:linear-gradient(180deg,var(--lock-primary),#3f6692);border-color:transparent;color:#fff}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent}
+
+/* nav rail */
+nav.rail{border-right:1px solid var(--line);background:var(--ground-2);padding:14px 10px;overflow:auto}
+nav .grp{font-family:var(--mono);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-faint);padding:14px 12px 6px}
+nav a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;color:var(--ink-dim);
+  text-decoration:none;cursor:pointer;font-size:13px;border:1px solid transparent;transition:.13s}
+nav a .idx{font-family:var(--mono);font-size:10px;color:var(--ink-faint);width:18px;text-align:right}
+nav a:hover{background:var(--surface);color:var(--ink)}
+nav a.active{background:var(--surface-2);border-color:var(--line);color:#fff}
+nav a.active .idx{color:var(--lock-accent)}
+
+/* main */
+main{padding:24px 28px 60px;overflow:auto}
+.view{display:none;animation:fade .25s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.view-head{display:flex;align-items:baseline;gap:14px;margin:0 0 4px}
+.view-head h2{font-family:var(--disp);font-weight:700;font-size:21px;letter-spacing:.01em;margin:0}
+.view-head .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--lock-accent)}
+.view-sub{color:var(--ink-faint);font-size:12.5px;margin:0 0 20px;max-width:70ch}
+
+.card{background:linear-gradient(180deg,var(--surface),var(--ground-2));border:1px solid var(--line);
+  border-radius:14px;padding:4px;margin:0 0 22px;overflow:hidden}
+.card > .card-title{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink-dim);padding:13px 14px 9px;display:flex;align-items:center;gap:9px}
+.card > .card-title .count{margin-left:auto;color:var(--ink-faint)}
+
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);
+  text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--ground-2);z-index:1}
+td{padding:9px 12px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(76,120,168,.06)}
+td.key{font-family:var(--mono);color:var(--ink);white-space:nowrap}
+td.note{color:var(--ink-faint);font-size:11.5px}
+td.mono,.mono{font-family:var(--mono)}
+.val-input{font-family:var(--mono);font-size:12px;width:100%;min-width:90px;background:var(--ground);color:var(--ink);
+  border:1px solid var(--line);border-radius:7px;padding:6px 8px}
+.val-input:focus{outline:none;border-color:var(--lock-accent)}
+.val-input:disabled{opacity:.55;cursor:not-allowed;background:var(--ground-2)}
+tr.dirty td:first-child{box-shadow:inset 3px 0 0 var(--lock-accent)}
+
+.badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;letter-spacing:.05em;
+  padding:3px 8px;border-radius:999px;border:1px solid var(--line);color:var(--ink-dim);white-space:nowrap}
+.badge.g{color:#8fe3bd;border-color:rgba(46,158,107,.5);background:rgba(46,158,107,.12)}
+.badge.y{color:#ecd57d;border-color:rgba(201,162,39,.5);background:rgba(201,162,39,.12)}
+.badge.r{color:#f0a9a4;border-color:rgba(207,91,84,.5);background:rgba(207,91,84,.12)}
+.badge.lock{color:#d6cfc6;border-color:rgba(156,152,144,.55);background:rgba(156,152,144,.14)}
+.badge.tier{color:#bcd2ec;border-color:rgba(76,120,168,.5);background:rgba(76,120,168,.12)}
+.badge.acc{color:#a3e0e0;border-color:rgba(67,154,154,.5);background:rgba(67,154,154,.12)}
+
+/* lock toggle */
+.lk{display:inline-flex;align-items:center;gap:7px;cursor:pointer;user-select:none}
+.lk .dot{width:30px;height:17px;border-radius:999px;background:var(--ground);border:1px solid var(--line);position:relative;transition:.15s}
+.lk .dot::after{content:"";position:absolute;top:1.5px;left:2px;width:12px;height:12px;border-radius:50%;
+  background:var(--ink-faint);transition:.15s}
+.lk.on .dot{background:rgba(156,152,144,.3);border-color:var(--lock)}
+.lk.on .dot::after{left:14px;background:var(--lock)}
+.lk .txt{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint)}
+.shield{color:var(--y)}
+
+/* overview kpis */
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin:0 0 22px}
+.kpi{background:linear-gradient(180deg,var(--surface),var(--ground-2));border:1px solid var(--line);border-radius:13px;padding:14px}
+.kpi .n{font-family:var(--disp);font-weight:700;font-size:26px;line-height:1}
+.kpi .l{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin-top:7px}
+
+/* validation ladder (signature) */
+.ladder{display:flex;flex-direction:column;gap:0;padding:8px 6px 14px}
+.rung{display:grid;grid-template-columns:62px 1fr;gap:14px;position:relative;padding:11px 10px}
+.rung::before{content:"";position:absolute;left:31px;top:0;bottom:0;width:2px;background:var(--line)}
+.rung:first-child::before{top:50%}
+.rung:last-child::before{bottom:50%}
+.rung .lv{position:relative;z-index:1;justify-self:center;align-self:start;font-family:var(--mono);font-weight:500;
+  width:46px;height:46px;border-radius:12px;display:grid;place-items:center;font-size:13px;
+  background:var(--surface-2);border:1px solid var(--line);color:var(--ink)}
+.rung[data-gate="hard"] .lv{border-color:var(--lock-primary);box-shadow:0 0 0 3px rgba(76,120,168,.14)}
+.rung[data-gate="review"] .lv{border-color:var(--y);box-shadow:0 0 0 3px rgba(201,162,39,.12)}
+.rung[data-gate="activate"] .lv{border-color:var(--lock-accent);box-shadow:0 0 0 3px rgba(67,154,154,.16)}
+.rung .body{padding-top:2px}
+.rung .name{font-weight:600;font-size:14px}
+.rung .pair{display:flex;gap:22px;flex-wrap:wrap;margin-top:5px;font-size:12px;color:var(--ink-dim)}
+.rung .pair b{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);font-weight:500;margin-right:6px}
+
+/* tokens */
+.swatches{display:flex;gap:14px;flex-wrap:wrap;padding:14px}
+.sw{border:1px solid var(--line);border-radius:12px;overflow:hidden;width:150px}
+.sw .chip{height:64px}
+.sw .meta{padding:9px 11px;font-family:var(--mono);font-size:11px}
+.sw .meta .nm{color:var(--ink);text-transform:uppercase;letter-spacing:.08em;font-size:9.5px;color:var(--ink-faint)}
+.sw .meta .hex{color:var(--ink)}
+.fontrow{display:flex;gap:14px;flex-wrap:wrap;padding:0 14px 14px}
+.fontcard{border:1px solid var(--line);border-radius:12px;padding:14px 16px;flex:1 1 180px}
+.fontcard .role{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint)}
+.fontcard .samp{font-size:24px;margin-top:6px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;padding:0 14px 14px}
+
+/* region cards */
+.regions{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;padding:14px}
+.region{border:1px solid var(--line);border-radius:12px;padding:13px 14px;background:var(--ground-2)}
+.region h4{margin:0 0 8px;font-family:var(--disp);font-weight:700;font-size:15px;display:flex;align-items:center;gap:8px}
+.region .field{display:flex;justify-content:space-between;gap:10px;font-size:11.5px;padding:3px 0;border-bottom:1px dashed var(--line-soft)}
+.region .field b{font-family:var(--mono);font-size:10px;color:var(--ink-faint);font-weight:500}
+.region .field span{font-family:var(--mono);color:var(--ink-dim);text-align:right}
+.region .special{margin-top:8px;font-size:11px;color:var(--ink-faint)}
+
+/* bridge */
+.bridge-item{border:1px solid var(--line);border-radius:12px;padding:13px 14px;margin:10px 14px;background:var(--ground-2)}
+.bridge-item .role{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--lock-accent)}
+.bridge-item .path{font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);word-break:break-all;margin:5px 0}
+.cmd{display:flex;gap:8px;align-items:center;margin-top:7px}
+.cmd code{flex:1;font-family:var(--mono);font-size:11px;background:var(--ground);border:1px solid var(--line);
+  border-radius:7px;padding:7px 9px;color:var(--ink-dim);word-break:break-all}
+
+/* toolbar */
+.toolbar{position:sticky;bottom:0;grid-column:1/3;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:12px 22px;border-top:1px solid var(--line);background:rgba(14,21,25,.92);backdrop-filter:blur(6px);z-index:25}
+.toolbar .status{font-family:var(--mono);font-size:11px;color:var(--ink-faint)}
+.toolbar .spacer{flex:1}
+.dirtycount{color:var(--lock-accent)}
+
+/* modal */
+.scrim{position:fixed;inset:0;background:rgba(6,10,12,.66);display:none;place-items:center;z-index:60}
+.scrim.on{display:grid}
+.modal{width:min(440px,92vw);background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;
+  box-shadow:0 22px 60px rgba(0,0,0,.5)}
+.modal h3{margin:0 0 4px;font-family:var(--disp);font-weight:700}
+.modal p{color:var(--ink-dim);font-size:13px;margin:0 0 14px}
+.modal .field{font-family:var(--mono);font-size:11px;color:var(--y);margin-bottom:6px}
+.modal input[type=text]{width:100%;font-family:var(--mono);font-size:13px;background:var(--ground);color:var(--ink);
+  border:1px solid var(--line);border-radius:8px;padding:9px 10px;margin-bottom:14px}
+.modal .row{display:flex;gap:10px;justify-content:flex-end}
+.hidden{display:none!important}
+::-webkit-scrollbar{width:11px;height:11px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:99px;border:3px solid var(--ground-2)}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="mast">
+    <div class="brand">
+      <div class="seal"></div>
+      <div>
+        <h1>SSOT VisualMaintainer</h1>
+        <div class="sub" id="m-ssotid">SSOT</div>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><span class="k">Schema</span><span class="v" id="m-schema">–</span></div>
+      <div class="stat"><span class="k">Content</span><span class="v" id="m-content">–</span></div>
+      <div class="stat"><span class="k">Integrity</span><span class="v" id="m-sha">–</span></div>
+      <div class="stat"><span class="k">Run Mode</span><span class="v" id="m-runmode">–</span></div>
+      <div class="stat"><span class="k">Rounds</span><span class="v" id="m-rounds">–</span></div>
+    </div>
+    <div class="spacer"></div>
+    <div class="tier-pick">
+      <label for="tier">Acting as</label>
+      <select id="tier">
+        <option value="Operator">Operator</option>
+        <option value="Maintainer">Maintainer</option>
+        <option value="Architect">Architect</option>
+      </select>
+    </div>
+  </header>
+
+  <nav class="rail" id="rail"></nav>
+  <main id="main"></main>
+
+  <div class="toolbar">
+    <span class="status" id="status">Loaded.</span>
+    <span class="status">Dirty edits: <span class="dirtycount" id="dirty">0</span></span>
+    <span class="spacer"></span>
+    <label class="btn ghost" for="loadfile">Load SSOT JSON…</label>
+    <input id="loadfile" type="file" accept=".json,application/json" class="hidden">
+    <button class="btn" id="copycmd">Copy launch command</button>
+    <button class="btn primary" id="export">Export updated SSOT JSON</button>
+  </div>
+</div>
+
+<div class="scrim" id="scrim">
+  <div class="modal">
+    <h3 id="mod-title">Confirm protected change</h3>
+    <p id="mod-body">This toggle is high-risk and requires dual confirmation.</p>
+    <div class="field" id="mod-field"></div>
+    <input type="text" id="mod-input" placeholder="Type CONFIRM to proceed" autocomplete="off">
+    <div class="row">
+      <button class="btn ghost" id="mod-cancel">Cancel</button>
+      <button class="btn primary" id="mod-ok">Proceed</button>
+    </div>
+  </div>
+</div>
+
+<script id="ssot-data" type="application/json">{
+  "meta": {
+    "ssot_id": "SSOT_20260617",
+    "name": "VIA VisualDesignOps / VDF / VRN Unified SSOT",
+    "schema_version": "1.0.0",
+    "content_version": "0.1.0",
+    "generated": "2026-06-17T00:00:00+08:00",
+    "mother_system": "VERITAS INTELLIGENCE ANALYTICS",
+    "supportive_subsystem": "VeritasNexusCore",
+    "rounds": 3,
+    "policy": {
+      "source_patch": "DISABLED_BY_DEFAULT",
+      "db_write": "DISABLED_IN_DRY_RUN",
+      "destructive_delete": "FORBIDDEN",
+      "freeze_zone": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules",
+      "first_layer_interface": "Invoke-VeritasNexusCore.ps1",
+      "maintenance_rule": "All edits write to the SSOT registry, never to source code.",
+      "keep_powershell_open": true,
+      "sha256_required": true
+    },
+    "integrity": {
+      "sha256_of_body": "4cd358dd6aec5185eb748695397a09a9aa80dd8fdfd8352375e4df2031c4d7fd",
+      "algo": "SHA256",
+      "canonical": "py_json_sorted_compact",
+      "note": "Hash of body (all keys except meta), json.dumps sort_keys, compact, utf-8. PowerShell Bump rewrites this with canonical=ps_file_raw_masked for PS round-trip verification."
+    }
+  },
+  "authority_tiers": [
+    {
+      "tier": "Operator",
+      "rank": 1,
+      "can_edit": [
+        "RUN_MODE",
+        "switches",
+        "operator_params"
+      ],
+      "note": "Day-to-day run controls."
+    },
+    {
+      "tier": "Maintainer",
+      "rank": 2,
+      "can_edit": [
+        "paths",
+        "formats",
+        "dates",
+        "workers"
+      ],
+      "note": "Infrastructure + format + path controls."
+    },
+    {
+      "tier": "Architect",
+      "rank": 3,
+      "can_edit": [
+        "protected_toggles",
+        "rounds"
+      ],
+      "note": "High-risk toggles, dual-confirmation required."
+    }
+  ],
+  "input_parameters": {
+    "paths": [
+      {
+        "key": "BASE_ROOT",
+        "default": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics",
+        "ui": "folder_picker",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "Single system root.",
+        "locked": false,
+        "value": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics"
+      },
+      {
+        "key": "SUPPORTIVE_MODULES_DIR",
+        "default": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules",
+        "ui": "folder_picker",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "NexusCore / PolyglotCheck / README.",
+        "locked": false,
+        "value": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules"
+      },
+      {
+        "key": "OUTPUT_ROOT",
+        "default": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_system_runs",
+        "ui": "folder_picker",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "All run output.",
+        "locked": false,
+        "value": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_system_runs"
+      },
+      {
+        "key": "VDF_ROOT",
+        "default": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\module\\VDF",
+        "ui": "folder_picker",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "VDF Python managers.",
+        "locked": false,
+        "value": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\module\\VDF"
+      },
+      {
+        "key": "VRN_ROOT",
+        "default": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\module\\VRN",
+        "ui": "folder_picker",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "VRN PDF pipeline.",
+        "locked": false,
+        "value": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\module\\VRN"
+      },
+      {
+        "key": "VETF_ROOT",
+        "default": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\module\\VETF",
+        "ui": "folder_picker",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "Active ETF subsystem.",
+        "locked": false,
+        "value": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\module\\VETF"
+      },
+      {
+        "key": "LOG_ROOT",
+        "default": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_system_runs\\logs",
+        "ui": "folder_picker",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "All logs.",
+        "locked": false,
+        "value": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_system_runs\\logs"
+      },
+      {
+        "key": "REPORT_ROOT",
+        "default": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_system_runs\\reports",
+        "ui": "folder_picker",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "HTML/CSV/JSON reports.",
+        "locked": false,
+        "value": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_system_runs\\reports"
+      },
+      {
+        "key": "CACHE_ROOT",
+        "default": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_system_runs\\cache",
+        "ui": "folder_picker",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "API/raw fetch cache.",
+        "locked": false,
+        "value": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_system_runs\\cache"
+      },
+      {
+        "key": "QUARANTINE_ROOT",
+        "default": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_system_runs\\quarantine",
+        "ui": "folder_picker",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "High-risk data isolation.",
+        "locked": false,
+        "value": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\_system_runs\\quarantine"
+      }
+    ],
+    "run_mode": [
+      {
+        "key": "RUN_MODE",
+        "default": "dry_run",
+        "ui": "dropdown",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "dry_run / preview_fix / execute / user_test",
+        "locked": false,
+        "value": "dry_run",
+        "options": [
+          "dry_run",
+          "preview_fix",
+          "execute",
+          "user_test"
+        ]
+      },
+      {
+        "key": "ROUNDS",
+        "default": 3,
+        "ui": "badge",
+        "adjustable": false,
+        "authority": "Architect",
+        "note": "Panorama analysis max three rounds.",
+        "locked": false,
+        "value": 3
+      },
+      {
+        "key": "OPEN_HTML_REPORT",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "Auto-open HTML report each round.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "AUTO_DEPLOY_MISSING_LIBS",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "PowerShell fills missing deps.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "ALLOW_SOURCE_PATCH",
+        "default": false,
+        "ui": "protected_toggle",
+        "adjustable": true,
+        "authority": "Architect",
+        "note": "Write back to source. Dual confirm.",
+        "locked": false,
+        "value": false,
+        "protected": true
+      },
+      {
+        "key": "ALLOW_DB_WRITE",
+        "default": false,
+        "ui": "protected_toggle",
+        "adjustable": true,
+        "authority": "Architect",
+        "note": "Write to production DB. Dual confirm.",
+        "locked": false,
+        "value": false,
+        "protected": true
+      },
+      {
+        "key": "ALLOW_NETWORK_FETCH",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "Allow external fetch.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "ALLOW_PARALLEL_RUN",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "Run low-coupling flows in parallel.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "MAX_WORKERS",
+        "default": 8,
+        "ui": "number",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "Parallel worker count.",
+        "locked": false,
+        "value": 8
+      },
+      {
+        "key": "FAIL_FAST",
+        "default": false,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "Stop on first error.",
+        "locked": false,
+        "value": false
+      },
+      {
+        "key": "KEEP_POWERSHELL_OPEN",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "Do not close window after run.",
+        "locked": false,
+        "value": true
+      }
+    ],
+    "vdf_params": [
+      {
+        "key": "VDF_FETCH_TW_STOCK_DAILY",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "TW per-stock daily price/volume.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "VDF_FETCH_TW_INDEX_DAILY",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "TAIEX / OTC / sector indices.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "VDF_FETCH_TW_CHIPS",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "Institutional flow / margin.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "VDF_FETCH_MARKET_CAP",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "Market cap / shares / rank.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "VDF_FETCH_MACRO_US",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "US macro.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "VDF_FETCH_MACRO_GLOBAL",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "EU/CN/JP/ASEAN/AU.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "VDF_FETCH_ETF",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "ETF / Active ETF.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "VDF_START_DATE",
+        "default": "2005-01-01",
+        "ui": "date",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "Default history start.",
+        "locked": false,
+        "value": "2005-01-01"
+      },
+      {
+        "key": "VDF_END_DATE",
+        "default": "today",
+        "ui": "date",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "Default latest.",
+        "locked": false,
+        "value": "today"
+      },
+      {
+        "key": "VDF_PRICE_ADJUST_POLICY",
+        "default": "adj_close_primary",
+        "ui": "dropdown",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "Adj Close = return core.",
+        "locked": false,
+        "value": "adj_close_primary",
+        "options": [
+          "adj_close_primary",
+          "close_primary"
+        ]
+      },
+      {
+        "key": "VDF_OUTPUT_FORMATS",
+        "default": "parquet,duckdb,csv,json,html",
+        "ui": "checkbox",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "Multi-format output.",
+        "locked": false,
+        "value": "parquet,duckdb,csv,json,html"
+      }
+    ],
+    "vrn_params": [
+      {
+        "key": "VRN_INPUT_PDF_ROOT",
+        "default": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\input\\reports",
+        "ui": "folder_picker",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "Broker PDF source.",
+        "locked": false,
+        "value": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\input\\reports"
+      },
+      {
+        "key": "VRN_PARSE_FILENAME",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "Filename ticker/date/broker.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "VRN_PARSE_FIRST_PAGE",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "First-page BasicInfo.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "VRN_PARSE_TABLES",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "Table extraction.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "VRN_PARSE_FINANCIAL_DATA",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "Financial statement extraction.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "VRN_ENABLE_OCR",
+        "default": "auto",
+        "ui": "dropdown",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "off / auto / force",
+        "locked": false,
+        "value": "auto",
+        "options": [
+          "off",
+          "auto",
+          "force"
+        ]
+      },
+      {
+        "key": "VRN_ENABLE_QUARANTINE",
+        "default": true,
+        "ui": "switch",
+        "adjustable": true,
+        "authority": "Operator",
+        "note": "Isolate noisy/suspect data.",
+        "locked": false,
+        "value": true
+      },
+      {
+        "key": "VRN_ALLOW_BROKER_VIEW_OVERWRITE",
+        "default": false,
+        "ui": "readonly",
+        "adjustable": false,
+        "authority": "Architect",
+        "note": "Rating/TP never overwritten.",
+        "locked": false,
+        "value": false,
+        "protected": true
+      },
+      {
+        "key": "VRN_OUTPUT_FORMATS",
+        "default": "parquet,csv,json,html",
+        "ui": "checkbox",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "Multi-format output.",
+        "locked": false,
+        "value": "parquet,csv,json,html"
+      },
+      {
+        "key": "VRN_REVIEW_THRESHOLD",
+        "default": "YELLOW",
+        "ui": "dropdown",
+        "adjustable": true,
+        "authority": "Maintainer",
+        "note": "YELLOW+ enters review.",
+        "locked": false,
+        "value": "YELLOW",
+        "options": [
+          "GREEN",
+          "YELLOW",
+          "RED"
+        ]
+      }
+    ]
+  },
+  "ticker_rules": {
+    "tw_ticker": {
+      "regex": "^[1-9][0-9]{3}$",
+      "definition": "Four digits, first digit not 0.",
+      "exclude_years": "2021-2030 in date context are not tickers (needs token context).",
+      "filename_priority": "Standalone four-digit token in filename wins, still excluding date fragments.",
+      "yfinance_map": {
+        "TWSE": "XXXX.TW",
+        "TPEX": "XXXX.TWO",
+        "unknown": "auto-test both"
+      },
+      "bloomberg_map": "XXXX TT (first four = TW_TICKER)",
+      "conflict_policy": "filename / PDF / VDF universe mismatch -> YELLOW_REVIEW",
+      "forbidden": "Never mutate TW_TICKER because yfinance missed it; only fallback / review."
+    },
+    "filename_tokens": [
+      {
+        "type": "date8",
+        "rule": "YYYYMMDD",
+        "priority": 1,
+        "note": "e.g. 20250822 is a date, not a ticker."
+      },
+      {
+        "type": "roc_date",
+        "rule": "ROC year/month/day",
+        "priority": 2,
+        "note": "Convert to Gregorian."
+      },
+      {
+        "type": "ticker4",
+        "rule": "^[1-9][0-9]{3}$",
+        "priority": 3,
+        "note": "2021-2030 needs context check."
+      },
+      {
+        "type": "broker",
+        "rule": "broker alias dictionary",
+        "priority": 4,
+        "note": "Citi / GS / Daiwa / local brokers."
+      },
+      {
+        "type": "company",
+        "rule": "ZH/EN name fragment",
+        "priority": 5,
+        "note": "Fuzzy match to VDF universe."
+      },
+      {
+        "type": "noise",
+        "rule": "init/buy/report/pdf",
+        "priority": 99,
+        "note": "Never enters primary columns."
+      }
+    ]
+  },
+  "vdf_contracts": {
+    "tw_stock_daily": [
+      {
+        "category": "Universe",
+        "item": "Ticker",
+        "scope": "All listed/OTC",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "local registry",
+        "frequency": "D/W",
+        "table": "vdf_tw_universe",
+        "validation": "4-digit ticker + market"
+      },
+      {
+        "category": "Universe",
+        "item": "Company name",
+        "scope": "All listed/OTC",
+        "p1_source": "TWSE/TPEX/MOPS",
+        "fallback": "local alias",
+        "frequency": "D/W",
+        "table": "vdf_tw_universe",
+        "validation": "ticker-name consistent"
+      },
+      {
+        "category": "Universe",
+        "item": "Market",
+        "scope": "TWSE/TPEX",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "auto-detect",
+        "frequency": "D",
+        "table": "vdf_tw_universe",
+        "validation": ".TW/.TWO test"
+      },
+      {
+        "category": "Price",
+        "item": "Open",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "yfinance",
+        "frequency": "D",
+        "table": "vdf_tw_price_daily",
+        "validation": "OHLC legality"
+      },
+      {
+        "category": "Price",
+        "item": "High",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "yfinance",
+        "frequency": "D",
+        "table": "vdf_tw_price_daily",
+        "validation": "High >= Low"
+      },
+      {
+        "category": "Price",
+        "item": "Low",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "yfinance",
+        "frequency": "D",
+        "table": "vdf_tw_price_daily",
+        "validation": "Low <= Close"
+      },
+      {
+        "category": "Price",
+        "item": "Close",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "yfinance",
+        "frequency": "D",
+        "table": "vdf_tw_price_daily",
+        "validation": "close non-negative"
+      },
+      {
+        "category": "Price",
+        "item": "Adj Close",
+        "scope": "All",
+        "p1_source": "yfinance/self-adjust",
+        "fallback": "TWSE+dividend",
+        "frequency": "D",
+        "table": "vdf_tw_price_adjusted",
+        "validation": "return recompute"
+      },
+      {
+        "category": "Volume",
+        "item": "Volume",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "yfinance",
+        "frequency": "D",
+        "table": "vdf_tw_volume_daily",
+        "validation": "non-negative"
+      },
+      {
+        "category": "Turnover",
+        "item": "Turnover value",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "Close x Volume",
+        "frequency": "D",
+        "table": "vdf_tw_turnover_daily",
+        "validation": "unit check"
+      },
+      {
+        "category": "MarketCap",
+        "item": "Market cap",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX/shares x close",
+        "fallback": "yfinance",
+        "frequency": "D/M",
+        "table": "vdf_tw_market_cap",
+        "validation": "rank sanity"
+      },
+      {
+        "category": "Shares",
+        "item": "Float/capital",
+        "scope": "All",
+        "p1_source": "MOPS/TWSE",
+        "fallback": "financials",
+        "frequency": "M/Q",
+        "table": "vdf_tw_shares",
+        "validation": "market cap bridge"
+      },
+      {
+        "category": "Returns",
+        "item": "1D/5D/20D/60D/120D/240D",
+        "scope": "All",
+        "p1_source": "Adj Close derived",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_return_matrix",
+        "validation": "Adj Close recompute"
+      },
+      {
+        "category": "Liquidity",
+        "item": "Turnover ratio",
+        "scope": "All",
+        "p1_source": "value/cap",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_liquidity",
+        "validation": "extreme review"
+      },
+      {
+        "category": "Limit",
+        "item": "Up/down limit",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "derived",
+        "frequency": "D",
+        "table": "vdf_tw_price_limit",
+        "validation": "return band check"
+      }
+    ],
+    "tw_chips": [
+      {
+        "category": "Institutional",
+        "item": "Foreign net shares",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_institutional_flow",
+        "validation": "sign/unit"
+      },
+      {
+        "category": "Institutional",
+        "item": "Trust net shares",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_institutional_flow",
+        "validation": "vs volume anomaly"
+      },
+      {
+        "category": "Institutional",
+        "item": "Dealer net shares",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_institutional_flow",
+        "validation": "unit consistent"
+      },
+      {
+        "category": "Institutional",
+        "item": "Foreign net value",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "close x shares",
+        "frequency": "D",
+        "table": "vdf_tw_institutional_value",
+        "validation": "value estimate match"
+      },
+      {
+        "category": "Margin",
+        "item": "Margin balance",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_margin_short",
+        "validation": "non-negative"
+      },
+      {
+        "category": "Margin",
+        "item": "Short balance",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_margin_short",
+        "validation": "non-negative"
+      },
+      {
+        "category": "Margin",
+        "item": "Margin delta",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "balance diff",
+        "frequency": "D",
+        "table": "vdf_tw_margin_short",
+        "validation": "delta bridge"
+      },
+      {
+        "category": "Lending",
+        "item": "SBL sell/balance",
+        "scope": "All",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_lending",
+        "validation": "unit/date"
+      },
+      {
+        "category": "Short",
+        "item": "Short ratio",
+        "scope": "All",
+        "p1_source": "short/SBL derived",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_short_pressure",
+        "validation": "ratio sanity"
+      }
+    ],
+    "tw_index": [
+      {
+        "category": "Index",
+        "item": "TAIEX OHLC",
+        "scope": "TAIEX",
+        "p1_source": "TWSE",
+        "fallback": "yfinance",
+        "frequency": "D",
+        "table": "vdf_tw_index_daily",
+        "validation": "TWSE vs yfinance"
+      },
+      {
+        "category": "Index",
+        "item": "OTC OHLC",
+        "scope": "OTC",
+        "p1_source": "TPEX",
+        "fallback": "yfinance",
+        "frequency": "D",
+        "table": "vdf_tw_index_daily",
+        "validation": "TPEX vs yfinance"
+      },
+      {
+        "category": "Index",
+        "item": "Index turnover/volume",
+        "scope": "TAIEX/OTC",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_index_turnover",
+        "validation": "market total"
+      },
+      {
+        "category": "Index",
+        "item": "Sector index",
+        "scope": "TWSE/TPEX sectors",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_sector_index",
+        "validation": "sector map"
+      },
+      {
+        "category": "MarketChips",
+        "item": "Market net flow",
+        "scope": "Index/OTC",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_market_chips",
+        "validation": "per-market sum"
+      },
+      {
+        "category": "Breadth",
+        "item": "Adv/Dec/flat counts",
+        "scope": "TWSE/TPEX",
+        "p1_source": "TWSE/TPEX",
+        "fallback": "self-calc",
+        "frequency": "D",
+        "table": "vdf_tw_breadth",
+        "validation": "universe count"
+      },
+      {
+        "category": "Regime",
+        "item": "trend/risk/liquidity",
+        "scope": "Derived",
+        "p1_source": "price+breadth+chips",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_tw_market_regime",
+        "validation": "rule validation"
+      }
+    ],
+    "etf_universe": [
+      {
+        "category": "Universe",
+        "item": "ETF ticker",
+        "scope": "TW ETF/Active",
+        "p1_source": "TWSE",
+        "fallback": "local registry",
+        "frequency": "D",
+        "table": "vdf_etf_universe",
+        "validation": "ticker check"
+      },
+      {
+        "category": "Universe",
+        "item": "ETF name",
+        "scope": "TW ETF",
+        "p1_source": "TWSE/issuer",
+        "fallback": "local registry",
+        "frequency": "D",
+        "table": "vdf_etf_universe",
+        "validation": "name match"
+      },
+      {
+        "category": "Universe",
+        "item": "ETF type",
+        "scope": "passive/active/bond/lev/inv",
+        "p1_source": "TWSE/issuer",
+        "fallback": "manual",
+        "frequency": "D/W",
+        "table": "vdf_etf_universe",
+        "validation": "type enum"
+      },
+      {
+        "category": "Universe",
+        "item": "Listing date",
+        "scope": "ETF",
+        "p1_source": "TWSE",
+        "fallback": "issuer",
+        "frequency": "W",
+        "table": "vdf_etf_universe",
+        "validation": "date"
+      },
+      {
+        "category": "Universe",
+        "item": "Manager/issuer",
+        "scope": "ETF",
+        "p1_source": "issuer/TWSE",
+        "fallback": "local registry",
+        "frequency": "W",
+        "table": "vdf_etf_universe",
+        "validation": "name"
+      },
+      {
+        "category": "Theme",
+        "item": "Theme/sector/strategy",
+        "scope": "ETF",
+        "p1_source": "holdings/issuer",
+        "fallback": "manual",
+        "frequency": "W/M",
+        "table": "vdf_etf_theme_map",
+        "validation": "mapping"
+      }
+    ],
+    "etf_daily": [
+      {
+        "category": "Price",
+        "item": "OHLC",
+        "scope": "Each ETF",
+        "p1_source": "TWSE",
+        "fallback": "yfinance",
+        "frequency": "D",
+        "table": "vdf_etf_price_daily",
+        "validation": "OHLC legal"
+      },
+      {
+        "category": "Price",
+        "item": "Close/Adj Close",
+        "scope": "Each ETF",
+        "p1_source": "TWSE/yfinance",
+        "fallback": "self-calc",
+        "frequency": "D",
+        "table": "vdf_etf_price_daily",
+        "validation": "return recompute"
+      },
+      {
+        "category": "Volume",
+        "item": "Volume",
+        "scope": "Each ETF",
+        "p1_source": "TWSE",
+        "fallback": "yfinance",
+        "frequency": "D",
+        "table": "vdf_etf_volume",
+        "validation": "non-negative"
+      },
+      {
+        "category": "Turnover",
+        "item": "Turnover value",
+        "scope": "Each ETF",
+        "p1_source": "TWSE",
+        "fallback": "close x volume",
+        "frequency": "D",
+        "table": "vdf_etf_turnover",
+        "validation": "unit check"
+      },
+      {
+        "category": "NAV",
+        "item": "NAV per unit",
+        "scope": "Each ETF",
+        "p1_source": "issuer/TWSE",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_etf_nav",
+        "validation": "premium/discount"
+      },
+      {
+        "category": "Units",
+        "item": "Units outstanding",
+        "scope": "Each ETF",
+        "p1_source": "issuer/TWSE",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_etf_units",
+        "validation": "AUM bridge"
+      },
+      {
+        "category": "AUM",
+        "item": "Net assets",
+        "scope": "Each ETF",
+        "p1_source": "issuer/TWSE",
+        "fallback": "NAV x units",
+        "frequency": "D",
+        "table": "vdf_etf_aum",
+        "validation": "AUM ~= NAV x units"
+      },
+      {
+        "category": "Flow",
+        "item": "Inflow/outflow",
+        "scope": "Each ETF",
+        "p1_source": "AUM/units derived",
+        "fallback": "issuer",
+        "frequency": "D",
+        "table": "vdf_etf_flow",
+        "validation": "flow bridge"
+      },
+      {
+        "category": "Premium",
+        "item": "Premium/discount",
+        "scope": "Each ETF",
+        "p1_source": "price/NAV derived",
+        "fallback": "none",
+        "frequency": "D",
+        "table": "vdf_etf_premium",
+        "validation": "Close/NAV - 1"
+      },
+      {
+        "category": "Holdings",
+        "item": "Constituents/weight",
+        "scope": "Each ETF",
+        "p1_source": "issuer",
+        "fallback": "none",
+        "frequency": "D/W",
+        "table": "vdf_etf_holdings",
+        "validation": "weights ~= 100%"
+      },
+      {
+        "category": "Cash",
+        "item": "Cash position",
+        "scope": "Each ETF",
+        "p1_source": "issuer",
+        "fallback": "holdings residual",
+        "frequency": "D/W",
+        "table": "vdf_etf_holdings",
+        "validation": "holdings + cash"
+      },
+      {
+        "category": "Creation",
+        "item": "Create/redeem",
+        "scope": "Each ETF",
+        "p1_source": "issuer/TWSE",
+        "fallback": "units delta",
+        "frequency": "D",
+        "table": "vdf_etf_creation",
+        "validation": "units change"
+      }
+    ]
+  },
+  "macro_contracts": {
+    "us_leading": [
+      {
+        "layer": 1,
+        "category": "Leading",
+        "item": "Conference Board LEI",
+        "region": "US",
+        "sources": "FRED/Conference Board",
+        "frequency": "M",
+        "use": "leading cycle"
+      },
+      {
+        "layer": 1,
+        "category": "Leading",
+        "item": "ISM Manufacturing PMI",
+        "region": "US",
+        "sources": "ISM/FRED",
+        "frequency": "M",
+        "use": "mfg cycle"
+      },
+      {
+        "layer": 1,
+        "category": "Leading",
+        "item": "ISM Services PMI",
+        "region": "US",
+        "sources": "ISM/FRED",
+        "frequency": "M",
+        "use": "svc cycle"
+      },
+      {
+        "layer": 1,
+        "category": "Leading",
+        "item": "New Orders",
+        "region": "US",
+        "sources": "FRED/ISM",
+        "frequency": "M",
+        "use": "order momentum"
+      },
+      {
+        "layer": 1,
+        "category": "Leading",
+        "item": "Building Permits",
+        "region": "US",
+        "sources": "FRED",
+        "frequency": "M",
+        "use": "housing lead"
+      },
+      {
+        "layer": 1,
+        "category": "Leading",
+        "item": "Initial Jobless Claims",
+        "region": "US",
+        "sources": "FRED",
+        "frequency": "W",
+        "use": "labor turn"
+      },
+      {
+        "layer": 1,
+        "category": "Leading",
+        "item": "Yield Curve 10Y-2Y",
+        "region": "US",
+        "sources": "FRED",
+        "frequency": "D",
+        "use": "recession risk"
+      },
+      {
+        "layer": 1,
+        "category": "Leading",
+        "item": "Credit Spread",
+        "region": "US",
+        "sources": "FRED",
+        "frequency": "D",
+        "use": "credit stress"
+      },
+      {
+        "layer": 1,
+        "category": "Leading",
+        "item": "Consumer Sentiment",
+        "region": "US",
+        "sources": "FRED/UMich",
+        "frequency": "M",
+        "use": "consumer expectation"
+      },
+      {
+        "layer": 1,
+        "category": "Leading",
+        "item": "NFIB Small Business Optimism",
+        "region": "US",
+        "sources": "FRED/NFIB",
+        "frequency": "M",
+        "use": "small biz cycle"
+      }
+    ],
+    "us_inflation": [
+      {
+        "layer": 2,
+        "category": "CPI",
+        "item": "Headline CPI YoY/MoM",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "MoM->YoY bridge"
+      },
+      {
+        "layer": 2,
+        "category": "CPI",
+        "item": "Core CPI",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "ex food energy"
+      },
+      {
+        "layer": 2,
+        "category": "CPI",
+        "item": "Shelter CPI",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "sticky inflation"
+      },
+      {
+        "layer": 2,
+        "category": "CPI",
+        "item": "Rent / OER",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "housing inflation"
+      },
+      {
+        "layer": 2,
+        "category": "CPI",
+        "item": "Food CPI",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "sub-item"
+      },
+      {
+        "layer": 2,
+        "category": "CPI",
+        "item": "Energy CPI",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "oil pass-through"
+      },
+      {
+        "layer": 2,
+        "category": "PCE",
+        "item": "Core PCE",
+        "region": "US",
+        "sources": "BEA/FRED",
+        "frequency": "M",
+        "use": "Fed preferred"
+      },
+      {
+        "layer": 2,
+        "category": "PCE",
+        "item": "Headline PCE",
+        "region": "US",
+        "sources": "BEA/FRED",
+        "frequency": "M",
+        "use": "consumption inflation"
+      },
+      {
+        "layer": 2,
+        "category": "PPI",
+        "item": "Final Demand PPI",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "upstream price"
+      },
+      {
+        "layer": 2,
+        "category": "PPI",
+        "item": "Core PPI",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "ex food energy"
+      },
+      {
+        "layer": 2,
+        "category": "Wage",
+        "item": "Average Hourly Earnings",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "wage inflation"
+      }
+    ],
+    "us_employment": [
+      {
+        "layer": 2,
+        "category": "Payroll",
+        "item": "Nonfarm Payrolls",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "core jobs"
+      },
+      {
+        "layer": 2,
+        "category": "Payroll",
+        "item": "Private Payrolls",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "private momentum"
+      },
+      {
+        "layer": 2,
+        "category": "Payroll",
+        "item": "Government Payrolls",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "gov jobs"
+      },
+      {
+        "layer": 2,
+        "category": "Unemployment",
+        "item": "Unemployment Rate",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "u-rate"
+      },
+      {
+        "layer": 2,
+        "category": "Unemployment",
+        "item": "U-6 Underemployment",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "broad u-rate"
+      },
+      {
+        "layer": 2,
+        "category": "Participation",
+        "item": "Labor Force Participation",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "labor supply"
+      },
+      {
+        "layer": 2,
+        "category": "Hours",
+        "item": "Average Weekly Hours",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "demand"
+      },
+      {
+        "layer": 2,
+        "category": "Claims",
+        "item": "Initial Claims",
+        "region": "US",
+        "sources": "DOL/FRED",
+        "frequency": "W",
+        "use": "leading turn"
+      },
+      {
+        "layer": 2,
+        "category": "Claims",
+        "item": "Continuing Claims",
+        "region": "US",
+        "sources": "DOL/FRED",
+        "frequency": "W",
+        "use": "unemployment duration"
+      },
+      {
+        "layer": 2,
+        "category": "JOLTS",
+        "item": "Job Openings",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "demand"
+      },
+      {
+        "layer": 2,
+        "category": "JOLTS",
+        "item": "Quits Rate",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "worker confidence"
+      },
+      {
+        "layer": 2,
+        "category": "JOLTS",
+        "item": "Hires Rate",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "hiring"
+      },
+      {
+        "layer": 2,
+        "category": "JOLTS",
+        "item": "Layoffs Rate",
+        "region": "US",
+        "sources": "BLS/FRED",
+        "frequency": "M",
+        "use": "layoffs"
+      },
+      {
+        "layer": 2,
+        "category": "ADP",
+        "item": "ADP Employment",
+        "region": "US",
+        "sources": "ADP",
+        "frequency": "M",
+        "use": "auxiliary"
+      }
+    ],
+    "us_fiscal_rates": [
+      {
+        "layer": 2,
+        "category": "Treasury",
+        "item": "3M/2Y/5Y/10Y/30Y yield",
+        "region": "US",
+        "sources": "FRED/Treasury",
+        "frequency": "D",
+        "use": "curve"
+      },
+      {
+        "layer": 2,
+        "category": "Treasury",
+        "item": "10Y-2Y / 10Y-3M spread",
+        "region": "US",
+        "sources": "FRED derived",
+        "frequency": "D",
+        "use": "recession signal"
+      },
+      {
+        "layer": 2,
+        "category": "Treasury",
+        "item": "Real Yield",
+        "region": "US",
+        "sources": "FRED/Treasury",
+        "frequency": "D",
+        "use": "real rate"
+      },
+      {
+        "layer": 2,
+        "category": "Treasury",
+        "item": "Breakeven Inflation",
+        "region": "US",
+        "sources": "FRED",
+        "frequency": "D",
+        "use": "inflation expectation"
+      },
+      {
+        "layer": 2,
+        "category": "Fed",
+        "item": "Fed Funds Target",
+        "region": "US",
+        "sources": "FRED",
+        "frequency": "D/meeting",
+        "use": "policy rate"
+      },
+      {
+        "layer": 2,
+        "category": "Fed",
+        "item": "Effective Fed Funds Rate",
+        "region": "US",
+        "sources": "FRED",
+        "frequency": "D",
+        "use": "actual rate"
+      },
+      {
+        "layer": 2,
+        "category": "Fed",
+        "item": "Balance Sheet Total Assets",
+        "region": "US",
+        "sources": "FRED",
+        "frequency": "W",
+        "use": "QE/QT"
+      },
+      {
+        "layer": 2,
+        "category": "Fed",
+        "item": "Reverse Repo",
+        "region": "US",
+        "sources": "FRED",
+        "frequency": "D",
+        "use": "liquidity"
+      },
+      {
+        "layer": 2,
+        "category": "Fed",
+        "item": "Bank Reserves",
+        "region": "US",
+        "sources": "FRED",
+        "frequency": "W",
+        "use": "bank liquidity"
+      },
+      {
+        "layer": 2,
+        "category": "Fiscal",
+        "item": "Federal Receipts",
+        "region": "US",
+        "sources": "Treasury/FRED",
+        "frequency": "M",
+        "use": "revenue"
+      },
+      {
+        "layer": 2,
+        "category": "Fiscal",
+        "item": "Federal Outlays",
+        "region": "US",
+        "sources": "Treasury/FRED",
+        "frequency": "M",
+        "use": "spending"
+      },
+      {
+        "layer": 2,
+        "category": "Fiscal",
+        "item": "Deficit / Surplus",
+        "region": "US",
+        "sources": "Treasury/FRED",
+        "frequency": "M",
+        "use": "deficit"
+      },
+      {
+        "layer": 2,
+        "category": "Debt",
+        "item": "Public Debt",
+        "region": "US",
+        "sources": "Treasury/FRED",
+        "frequency": "M/D",
+        "use": "debt load"
+      },
+      {
+        "layer": 2,
+        "category": "Debt",
+        "item": "Debt to GDP",
+        "region": "US",
+        "sources": "FRED",
+        "frequency": "Q",
+        "use": "long-term fiscal"
+      }
+    ]
+  },
+  "global_comparable_macro": {
+    "core_fields": [
+      "GDP",
+      "CPI",
+      "PPI",
+      "PMI Mfg",
+      "PMI Svc",
+      "Unemployment",
+      "Policy Rate",
+      "10Y Yield",
+      "FX",
+      "Equity Index",
+      "Exports/Imports",
+      "Industrial Production",
+      "Retail Sales",
+      "Credit/M2"
+    ],
+    "regions": {
+      "US": {
+        "policy": "Fed",
+        "10y": "UST 10Y",
+        "fx": "DXY",
+        "equity": "S&P/Nasdaq"
+      },
+      "EU": {
+        "policy": "ECB",
+        "10y": "DE/FR/IT 10Y",
+        "fx": "EURUSD",
+        "equity": "STOXX/DAX",
+        "special": [
+          "ECB deposit rate",
+          "IT-DE spread",
+          "natgas price",
+          "ZEW",
+          "Ifo"
+        ]
+      },
+      "CN": {
+        "policy": "PBOC/LPR/RRR",
+        "10y": "CN 10Y",
+        "fx": "USDCNY",
+        "equity": "CSI300/HSI",
+        "special": [
+          "TSF",
+          "M2",
+          "new RMB loans",
+          "LPR",
+          "RRR",
+          "property sales",
+          "exports",
+          "PPI"
+        ]
+      },
+      "JP": {
+        "policy": "BOJ",
+        "10y": "JGB 10Y",
+        "fx": "USDJPY",
+        "equity": "Nikkei/TOPIX",
+        "special": [
+          "BOJ policy rate",
+          "YCC/JGB 10Y",
+          "CPI ex fresh food",
+          "Tankan",
+          "JPY"
+        ]
+      },
+      "ASEAN": {
+        "policy": "per-central-bank",
+        "10y": "major 10Y",
+        "fx": "ASEAN FX",
+        "equity": "ASEAN indices",
+        "special": [
+          "VN/TH/ID/MY/SG PMI",
+          "FX",
+          "policy rate",
+          "exports"
+        ]
+      },
+      "AU": {
+        "policy": "RBA",
+        "10y": "AU 10Y",
+        "fx": "AUDUSD",
+        "equity": "ASX200",
+        "special": [
+          "RBA cash rate",
+          "iron ore exports",
+          "AUD",
+          "employment",
+          "CPI",
+          "terms of trade"
+        ]
+      }
+    }
+  },
+  "vrn_contracts": {
+    "basic_info": [
+      {
+        "field": "Report Date",
+        "p1_source": "broker PDF",
+        "validation_source": "filename date",
+        "rule": "PDF internal date wins"
+      },
+      {
+        "field": "Broker",
+        "p1_source": "broker PDF/filename",
+        "validation_source": "broker alias registry",
+        "rule": "alias normalize"
+      },
+      {
+        "field": "Analyst",
+        "p1_source": "broker PDF",
+        "validation_source": "signature block",
+        "rule": "nullable but flagged"
+      },
+      {
+        "field": "Ticker",
+        "p1_source": "filename/broker PDF",
+        "validation_source": "VDF universe",
+        "rule": "filename standalone 4-digit wins"
+      },
+      {
+        "field": "YFinance Ticker",
+        "p1_source": "derived",
+        "validation_source": "yfinance test",
+        "rule": ".TW/.TWO"
+      },
+      {
+        "field": "Bloomberg Ticker",
+        "p1_source": "derived/PDF",
+        "validation_source": "regex",
+        "rule": "XXXX TT"
+      },
+      {
+        "field": "Company Name",
+        "p1_source": "broker PDF",
+        "validation_source": "VDF universe",
+        "rule": "fuzzy match"
+      },
+      {
+        "field": "Rating",
+        "p1_source": "broker PDF",
+        "validation_source": "none",
+        "rule": "NEVER overwritten by external"
+      },
+      {
+        "field": "Target Price",
+        "p1_source": "broker PDF",
+        "validation_source": "yfinance consensus (reference only)",
+        "rule": "NEVER overwritten"
+      },
+      {
+        "field": "Last Adj Close",
+        "p1_source": "VDF",
+        "validation_source": "broker PDF quote",
+        "rule": "VDF is P1"
+      },
+      {
+        "field": "Last Data Date",
+        "p1_source": "VDF",
+        "validation_source": "report date",
+        "rule": "not unreasonably later than report"
+      },
+      {
+        "field": "Validation Status",
+        "p1_source": "system",
+        "validation_source": "all checks",
+        "rule": "GREEN/YELLOW/RED"
+      }
+    ],
+    "financial_data": [
+      {
+        "section": "IS",
+        "item": "Revenue",
+        "p1": "broker PDF",
+        "validation": "VDF actual/MOPS",
+        "rule": "forecast not overwritten"
+      },
+      {
+        "section": "IS",
+        "item": "Gross Profit",
+        "p1": "broker PDF",
+        "validation": "formula",
+        "rule": "Revenue - COGS"
+      },
+      {
+        "section": "IS",
+        "item": "Operating Income",
+        "p1": "broker PDF",
+        "validation": "formula",
+        "rule": "GP - Opex"
+      },
+      {
+        "section": "IS",
+        "item": "Net Income",
+        "p1": "broker PDF",
+        "validation": "formula",
+        "rule": "pretax - tax"
+      },
+      {
+        "section": "IS",
+        "item": "EPS",
+        "p1": "broker PDF",
+        "validation": "VDF actual/shares",
+        "rule": "NI / shares approx"
+      },
+      {
+        "section": "BS",
+        "item": "Cash",
+        "p1": "broker PDF",
+        "validation": "MOPS actual",
+        "rule": "actual/forecast separated"
+      },
+      {
+        "section": "BS",
+        "item": "Total Assets",
+        "p1": "broker PDF",
+        "validation": "formula",
+        "rule": "A = L + E"
+      },
+      {
+        "section": "BS",
+        "item": "Total Liabilities",
+        "p1": "broker PDF",
+        "validation": "formula",
+        "rule": "subtotal"
+      },
+      {
+        "section": "BS",
+        "item": "Equity",
+        "p1": "broker PDF",
+        "validation": "formula",
+        "rule": "A - L"
+      },
+      {
+        "section": "CF",
+        "item": "OCF",
+        "p1": "broker PDF",
+        "validation": "formula/MOPS",
+        "rule": "OCF vs NI"
+      },
+      {
+        "section": "CF",
+        "item": "CapEx",
+        "p1": "broker PDF",
+        "validation": "formula",
+        "rule": "sign convention"
+      },
+      {
+        "section": "CF",
+        "item": "FCF",
+        "p1": "broker PDF",
+        "validation": "formula",
+        "rule": "OCF - CapEx"
+      },
+      {
+        "section": "CF",
+        "item": "CFI / CFF",
+        "p1": "broker PDF",
+        "validation": "cash bridge",
+        "rule": "CFO + CFI + CFF"
+      }
+    ]
+  },
+  "validation_contract": [
+    {
+      "level": "L0",
+      "name": "File / path",
+      "vdf": "exists, non-empty",
+      "vrn": "PDF exists, page count",
+      "result": "PASS/FAIL"
+    },
+    {
+      "level": "L1",
+      "name": "Schema",
+      "vdf": "fields, types, keys",
+      "vrn": "BasicInfo/FinancialData fields",
+      "result": "PASS/FAIL"
+    },
+    {
+      "level": "L2",
+      "name": "Regex",
+      "vdf": "ticker/date/source code",
+      "vrn": "ticker/date/period",
+      "result": "PASS/REVIEW"
+    },
+    {
+      "level": "L3",
+      "name": "Source",
+      "vdf": "TWSE/TPEX/yfinance/FRED",
+      "vrn": "PDF engines",
+      "result": "confidence"
+    },
+    {
+      "level": "L4",
+      "name": "Formula",
+      "vdf": "return/market cap/ETF flow",
+      "vrn": "IS/BS/CF",
+      "result": "GREEN/YELLOW/RED"
+    },
+    {
+      "level": "L5",
+      "name": "Time Series",
+      "vdf": "missing/dup/jump",
+      "vrn": "report date/period",
+      "result": "REVIEW"
+    },
+    {
+      "level": "L6",
+      "name": "Cross-system",
+      "vdf": "VDF actual vs VRN quoted",
+      "vrn": "VRN forecast vs VDF actual",
+      "result": "diff flag"
+    },
+    {
+      "level": "L7",
+      "name": "Quarantine",
+      "vdf": "stale/outlier/missing",
+      "vrn": "OCR/footnote/1H/2H",
+      "result": "quarantine"
+    },
+    {
+      "level": "L8",
+      "name": "Human Review",
+      "vdf": "HTML Matrix",
+      "vrn": "HTML Matrix",
+      "result": "approve/hold"
+    },
+    {
+      "level": "L9",
+      "name": "Activation",
+      "vdf": "high risk = 0",
+      "vrn": "high risk = 0",
+      "result": "activate"
+    }
+  ],
+  "visual_lock": {
+    "tokens": {
+      "color": {
+        "primary": "#4c78a8",
+        "neutral": "#9c9890",
+        "accent": "#439a9a"
+      },
+      "font": {
+        "mono": "DM Mono",
+        "sans": "DM Sans",
+        "display": "Syne"
+      }
+    },
+    "lock_markers": [
+      "data-lock",
+      "data-locked",
+      "data-immutable",
+      "@lock",
+      "immutable",
+      "do not edit",
+      "不可改"
+    ],
+    "lock_layers": [
+      {
+        "layer": "Token Lock",
+        "scope": "color/font/brand CSS variables"
+      },
+      {
+        "layer": "Component Lock",
+        "scope": "e.g. locked Header becomes the template others must match"
+      },
+      {
+        "layer": "Template Lock",
+        "scope": "TPL-HEADER-LOCKED is platform standard; extend only, never break core"
+      }
+    ]
+  },
+  "component_taxonomy": [
+    {
+      "class": "header",
+      "use": "page head, brand bar, title/subtitle"
+    },
+    {
+      "class": "logo",
+      "use": "VIA logo, seal, mark, brand"
+    },
+    {
+      "class": "stats",
+      "use": "KPI strip, number cards"
+    },
+    {
+      "class": "tabs",
+      "use": "tab switch, module selector"
+    },
+    {
+      "class": "grid_matrix",
+      "use": "grids matrix, card matrix, module grid"
+    },
+    {
+      "class": "table",
+      "use": "registry table, data table"
+    },
+    {
+      "class": "button",
+      "use": "default/primary/danger button"
+    },
+    {
+      "class": "form",
+      "use": "input/select/textarea/filter bar"
+    },
+    {
+      "class": "modal",
+      "use": "popup, run dialog, settings"
+    },
+    {
+      "class": "command",
+      "use": "PowerShell command box, copy block"
+    },
+    {
+      "class": "log",
+      "use": "console log, event log"
+    },
+    {
+      "class": "footer",
+      "use": "footer / slogan"
+    },
+    {
+      "class": "image",
+      "use": "img/svg/canvas/seal/screenshot"
+    },
+    {
+      "class": "chart",
+      "use": "plot/chart/canvas/svg chart"
+    }
+  ],
+  "template_library": [
+    {
+      "id": "TPL-HEADER-LOCKED",
+      "required": [
+        "brand",
+        "title",
+        "subtitle",
+        "lock_marker"
+      ]
+    },
+    {
+      "id": "TPL-KPI-STRIP",
+      "required": [
+        "label",
+        "value",
+        "delta"
+      ]
+    },
+    {
+      "id": "TPL-GRID-MATRIX",
+      "required": [
+        "columns",
+        "gap",
+        "cardRadius",
+        "hover",
+        "deleteButton",
+        "addButton",
+        "sort",
+        "filter"
+      ]
+    },
+    {
+      "id": "TPL-TABS",
+      "required": [
+        "items",
+        "active",
+        "switch"
+      ]
+    },
+    {
+      "id": "TPL-TABLE",
+      "required": [
+        "columns",
+        "rows",
+        "sort"
+      ]
+    },
+    {
+      "id": "TPL-MODAL",
+      "required": [
+        "title",
+        "body",
+        "confirm",
+        "cancel"
+      ]
+    },
+    {
+      "id": "TPL-COMMAND",
+      "required": [
+        "command",
+        "copy"
+      ]
+    },
+    {
+      "id": "TPL-LOG",
+      "required": [
+        "lines",
+        "level"
+      ]
+    },
+    {
+      "id": "TPL-FOOTER",
+      "required": [
+        "text"
+      ]
+    },
+    {
+      "id": "TPL-FORM",
+      "required": [
+        "fields",
+        "submit"
+      ]
+    },
+    {
+      "id": "TPL-IMAGE-SPEC",
+      "required": [
+        "src",
+        "alt",
+        "size"
+      ]
+    },
+    {
+      "id": "TPL-CHART",
+      "required": [
+        "type",
+        "data",
+        "axes"
+      ]
+    }
+  ],
+  "html_ui_spec": {
+    "tabs": [
+      {
+        "id": "overview",
+        "title": "Overview",
+        "use": "system status, run mode, round, risk"
+      },
+      {
+        "id": "input_parameters",
+        "title": "Input Parameters",
+        "use": "all parameter matrices, edit by authority"
+      },
+      {
+        "id": "vdf_contracts",
+        "title": "VDF Dataset Contract",
+        "use": "TW / macro / ETF data contracts"
+      },
+      {
+        "id": "vrn_contracts",
+        "title": "VRN Dataset Contract",
+        "use": "PDF BasicInfo, FinancialData, table parser"
+      },
+      {
+        "id": "ticker_rules",
+        "title": "Ticker Rules",
+        "use": "TW_TICKER / yfinance / Bloomberg / filename parser"
+      },
+      {
+        "id": "macro_contracts",
+        "title": "Macro / Global",
+        "use": "US core + global comparable"
+      },
+      {
+        "id": "validation",
+        "title": "Validation Matrix",
+        "use": "L0-L9 validation states"
+      },
+      {
+        "id": "visual_lock",
+        "title": "VisualLock",
+        "use": "tokens, lock markers, lock layers, templates"
+      },
+      {
+        "id": "bridge",
+        "title": "Supportive Bridge",
+        "use": "NexusCore / PolyglotCheck / README existence + sha"
+      },
+      {
+        "id": "activation",
+        "title": "Activation Gate",
+        "use": "user-test / final activate"
+      }
+    ],
+    "principles": [
+      "Default shows the 10 most-used parameters; advanced collapsed.",
+      "Locked parameters are read-only.",
+      "High-risk toggles require dual confirmation.",
+      "Every run generates a run_id.",
+      "Each round auto-opens the HTML Matrix Report.",
+      "All edits write to the Parameter Registry, never to source code."
+    ]
+  },
+  "supportive_bridge": {
+    "mode": "read_heavy_dry_run",
+    "first_layer_interface": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules\\Invoke-VeritasNexusCore.ps1",
+    "modules": [
+      {
+        "role": "readme",
+        "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules\\Read_Me_VeritasNexusCore.md",
+        "suggested_command": null
+      },
+      {
+        "role": "nexus_core",
+        "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules\\Invoke-VeritasNexusCore.ps1",
+        "suggested_command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"<path>\" -Action Validate -OpenReport"
+      },
+      {
+        "role": "polyglot_check",
+        "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\supportive modules\\Invoke-VIA-PolyglotCheckTestRepair-v0101.ps1",
+        "suggested_command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"<path>\""
+      }
+    ],
+    "rules": [
+      "Build bridge manifest + existence check + sha12 + suggested command only.",
+      "Do not execute supportive modules from the SSOT manager.",
+      "Do not write back to source HTML or frozen engines."
+    ]
+  }
+}</script>
+<script>
+"use strict";
+
+/* ----- load SSOT (injected by PowerShell launcher, or via file picker) ----- */
+let SSOT = null;
+try {
+  const raw = document.getElementById("ssot-data").textContent;
+  const parsed = JSON.parse(raw);
+  SSOT = (parsed && parsed.meta) ? parsed : null;
+} catch(e){ SSOT = null; }
+
+const dirty = new Set();
+const TIERRANK = {Operator:1, Maintainer:2, Architect:3};
+let actingTier = "Operator";
+
+const el = (t,c,txt)=>{const n=document.createElement(t); if(c)n.className=c; if(txt!=null)n.textContent=txt; return n;};
+const badge = (txt,cls)=>{const b=el("span","badge "+(cls||""),txt); return b;};
+const riskClass = v => ({LOW:"g",MEDIUM:"y",HIGH:"r"}[String(v).toUpperCase()]||"");
+const resultClass = v => {const s=String(v).toUpperCase(); if(/GREEN|PASS|ACTIVATE/.test(s))return"g"; if(/YELLOW|REVIEW/.test(s))return"y"; if(/RED|FAIL|HOLD/.test(s))return"r"; return"";};
+
+/* ----- tabs ----- */
+const TABS = (SSOT && SSOT.html_ui_spec && SSOT.html_ui_spec.tabs) ? SSOT.html_ui_spec.tabs : [];
+function buildRail(){
+  const rail = document.getElementById("rail");
+  rail.innerHTML="";
+  rail.appendChild(el("div","grp","Governance Console"));
+  TABS.forEach((t,i)=>{
+    const a = el("a"); a.dataset.tab=t.id;
+    a.appendChild(el("span","idx", String(i).padStart(2,"0")));
+    a.appendChild(el("span",null,t.title));
+    a.onclick=()=>activate(t.id);
+    rail.appendChild(a);
+  });
+}
+function activate(id){
+  document.querySelectorAll("nav a").forEach(a=>a.classList.toggle("active",a.dataset.tab===id));
+  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id==="view-"+id));
+  document.getElementById("main").scrollTop=0;
+}
+
+/* ----- generic renderers ----- */
+function viewShell(id,title,eyebrow,sub){
+  const v = el("section","view"); v.id="view-"+id;
+  const h = el("div","view-head");
+  h.appendChild(el("span","eyebrow",eyebrow||""));
+  h.appendChild(el("h2",null,title));
+  v.appendChild(h);
+  if(sub){ v.appendChild(el("p","view-sub",sub)); }
+  return v;
+}
+function card(title,count){
+  const c = el("div","card");
+  if(title){
+    const t = el("div","card-title"); t.appendChild(el("span",null,title));
+    if(count!=null) t.appendChild(el("span","count",count+" rows"));
+    c.appendChild(t);
+  }
+  return c;
+}
+function tableFrom(rows, cols){
+  const tbl = el("table");
+  const thead = el("thead"); const htr = el("tr");
+  cols.forEach(c=>htr.appendChild(el("th",null,c.h))); thead.appendChild(htr); tbl.appendChild(thead);
+  const tb = el("tbody");
+  rows.forEach(r=>{
+    const tr = el("tr");
+    cols.forEach(c=>{ tr.appendChild(c.render(r)); });
+    tb.appendChild(tr);
+  });
+  tbl.appendChild(tb);
+  return tbl;
+}
+function txtCell(val,cls){ const td=el("td",cls); td.textContent=(val==null?"":String(val)); return td; }
+function badgeCell(val,cls){ const td=el("td"); if(val!=null&&val!=="") td.appendChild(badge(String(val),cls)); return td; }
+
+/* ----- editable parameter rows ----- */
+function paramTable(groupKey, rows){
+  const cols = [
+    {h:"Parameter", render:r=>txtCell(r.key,"key")},
+    {h:"Value", render:r=>{
+        const td = el("td");
+        const locked = !!r.locked;
+        const allowed = TIERRANK[actingTier] >= TIERRANK[r.authority];
+        if(typeof r.default === "boolean"){
+          const sel = el("select"); ["true","false"].forEach(o=>{const op=el("option",null,o);op.value=o;sel.appendChild(op);});
+          sel.value = String(r.value);
+          sel.disabled = locked || !allowed;
+          sel.onchange = ()=>commit(groupKey,r,sel.value==="true", td);
+          td.appendChild(sel);
+        } else if(Array.isArray(r.options)){
+          const sel = el("select"); r.options.forEach(o=>{const op=el("option",null,o);op.value=o;sel.appendChild(op);});
+          sel.value = String(r.value); sel.disabled = locked || !allowed;
+          sel.onchange = ()=>commit(groupKey,r,sel.value,td);
+          td.appendChild(sel);
+        } else {
+          const inp = el("input","val-input"); inp.value = String(r.value);
+          inp.disabled = locked || !allowed;
+          inp.onchange = ()=>{ let v=inp.value; if(typeof r.default==="number"){const n=Number(v); v=isNaN(n)?r.value:n; inp.value=v;} commit(groupKey,r,v,td); };
+          td.appendChild(inp);
+        }
+        if(!allowed && !locked){ const b=badge(r.authority+"+","tier"); b.style.marginLeft="8px"; td.appendChild(b); }
+        return td;
+    }},
+    {h:"Authority", render:r=>badgeCell(r.authority,"tier")},
+    {h:"Lock", render:r=>{
+        const td = el("td");
+        const wrap = el("span","lk"+(r.locked?" on":""));
+        wrap.appendChild(el("span","dot"));
+        wrap.appendChild(el("span","txt", r.protected?"protected":"lock"));
+        if(r.protected){ const s=el("span","shield"," ⬡"); wrap.insertBefore(s,wrap.firstChild); }
+        wrap.onclick = ()=>toggleLock(groupKey,r,wrap,td);
+        td.appendChild(wrap);
+        return td;
+    }},
+    {h:"Note", render:r=>txtCell(r.note,"note")},
+  ];
+  return tableFrom(rows,cols);
+}
+function rowEl(td){ return td.closest("tr"); }
+function markDirty(groupKey,r,td){ const id=groupKey+":"+r.key; dirty.add(id); const tr=rowEl(td); if(tr)tr.classList.add("dirty"); document.getElementById("dirty").textContent=dirty.size; }
+function commit(groupKey,r,v,td){ r.value=v; markDirty(groupKey,r,td); setStatus("Edited "+r.key+" → "+v); }
+function toggleLock(groupKey,r,wrap,td){
+  const turningOn = !r.locked;
+  const apply = ()=>{ r.locked=turningOn; wrap.classList.toggle("on",turningOn); markDirty(groupKey,r,td); reRenderParams(); setStatus((turningOn?"Locked ":"Unlocked ")+r.key); };
+  if(r.protected){
+    confirmModal("Protected lock: "+r.key,
+      "This parameter is high-risk ("+r.note+"). Enabling/locking requires dual confirmation.",
+      r.key, apply);
+  } else { apply(); }
+}
+
+/* ----- protected confirm modal ----- */
+let _modalAction=null;
+function confirmModal(title,body,field,onok){
+  document.getElementById("mod-title").textContent=title;
+  document.getElementById("mod-body").textContent=body;
+  document.getElementById("mod-field").textContent=field?("Target: "+field):"";
+  const inp=document.getElementById("mod-input"); inp.value="";
+  _modalAction=onok;
+  document.getElementById("scrim").classList.add("on"); inp.focus();
+}
+function closeModal(){ document.getElementById("scrim").classList.remove("on"); _modalAction=null; }
+
+/* ----- build all views ----- */
+function buildViews(){
+  const main = document.getElementById("main"); main.innerHTML="";
+  TABS.forEach(t=>{ const fn = VIEWS[t.id]; main.appendChild(fn ? fn(t) : viewShell(t.id,t.title,t.id,t.use)); });
+  if(TABS[0]) activate(TABS[0].id);
+}
+function reRenderParams(){ /* rebuild only the input_parameters view to reflect lock/disable state */
+  const old=document.getElementById("view-input_parameters"); if(!old)return;
+  const fresh=VIEWS.input_parameters({title:"Input Parameters",use:""});
+  fresh.classList.add("active"); old.replaceWith(fresh);
+}
+
+const VIEWS = {
+  overview(t){
+    const v = viewShell("overview","System Overview","SSOT · "+SSOT.meta.ssot_id,
+      "Single source of truth for VIA VisualDesignOps, VDF / VRN dataset contracts, ticker rules, validation, and VisualLock. Edits stay in this registry — never written back to source.");
+    const counts = {
+      "Input parameters": Object.values(SSOT.input_parameters).reduce((a,b)=>a+b.length,0),
+      "VDF contract rows": Object.values(SSOT.vdf_contracts).reduce((a,b)=>a+b.length,0),
+      "Macro rows": Object.values(SSOT.macro_contracts).reduce((a,b)=>a+b.length,0),
+      "VRN rows": Object.values(SSOT.vrn_contracts).reduce((a,b)=>a+b.length,0),
+      "Validation levels": SSOT.validation_contract.length,
+      "Templates": SSOT.template_library.length,
+    };
+    const kp = el("div","kpis");
+    Object.entries(counts).forEach(([l,n])=>{ const k=el("div","kpi"); k.appendChild(el("div","n",String(n))); k.appendChild(el("div","l",l)); kp.appendChild(k); });
+    v.appendChild(kp);
+
+    const pc = card("Run Policy");
+    const ptbl = el("table"); const tb=el("tbody");
+    Object.entries(SSOT.meta.policy).forEach(([k,val])=>{
+      if(typeof val==="object") return;
+      const tr=el("tr"); tr.appendChild(txtCell(k,"key")); tr.appendChild(txtCell(val,"mono")); tb.appendChild(tr);
+    });
+    ptbl.appendChild(tb); pc.appendChild(ptbl); v.appendChild(pc);
+
+    const ac = card("Authority Tiers", SSOT.authority_tiers.length);
+    ac.appendChild(tableFrom(SSOT.authority_tiers,[
+      {h:"Tier",render:r=>badgeCell(r.tier,"tier")},
+      {h:"Rank",render:r=>txtCell(r.rank,"mono")},
+      {h:"Can edit",render:r=>txtCell((r.can_edit||[]).join(", "),"note")},
+      {h:"Note",render:r=>txtCell(r.note,"note")},
+    ]));
+    v.appendChild(ac);
+    return v;
+  },
+  input_parameters(t){
+    const v = viewShell("input_parameters","Input Parameters","Parameter Registry",
+      SSOT.html_ui_spec.principles[0]+" Edit rights follow the acting tier; protected toggles require dual confirmation.");
+    const labels = {paths:"Paths", run_mode:"Run Mode", vdf_params:"VDF Parameters", vrn_params:"VRN Parameters"};
+    Object.entries(SSOT.input_parameters).forEach(([gk,rows])=>{
+      const c = card(labels[gk]||gk, rows.length);
+      c.appendChild(paramTable(gk,rows));
+      v.appendChild(c);
+    });
+    return v;
+  },
+  vdf_contracts(t){
+    const v = viewShell("vdf_contracts","VDF Dataset Contract","Market Facts · Verifiable",
+      "Market fact data. P1 source wins; fallback only fills gaps. VDF never overwrites VRN broker views.");
+    const labels={tw_stock_daily:"TW Stock Daily",tw_chips:"TW Chips",tw_index:"TW Index / Breadth",etf_universe:"ETF Universe",etf_daily:"ETF Daily / NAV / Flow"};
+    Object.entries(SSOT.vdf_contracts).forEach(([gk,rows])=>{
+      const c=card(labels[gk]||gk,rows.length);
+      c.appendChild(tableFrom(rows,[
+        {h:"Category",render:r=>badgeCell(r.category,"acc")},
+        {h:"Item",render:r=>txtCell(r.item,"key")},
+        {h:"Scope",render:r=>txtCell(r.scope,"note")},
+        {h:"P1 Source",render:r=>txtCell(r.p1_source,"mono")},
+        {h:"Fallback",render:r=>txtCell(r.fallback,"note")},
+        {h:"Freq",render:r=>txtCell(r.frequency,"mono")},
+        {h:"Table",render:r=>txtCell(r.table,"mono")},
+        {h:"Validation",render:r=>txtCell(r.validation,"note")},
+      ]));
+      v.appendChild(c);
+    });
+    return v;
+  },
+  vrn_contracts(t){
+    const v = viewShell("vrn_contracts","VRN Dataset Contract","Broker Reports · Views",
+      "Broker PDF report views. Rating and Target Price are never overwritten by external data. Forecasts stay separate from VDF actuals.");
+    const bc=card("BasicInfo",SSOT.vrn_contracts.basic_info.length);
+    bc.appendChild(tableFrom(SSOT.vrn_contracts.basic_info,[
+      {h:"Field",render:r=>txtCell(r.field,"key")},
+      {h:"P1 Source",render:r=>txtCell(r.p1_source,"mono")},
+      {h:"Validation Source",render:r=>txtCell(r.validation_source,"note")},
+      {h:"Rule",render:r=>txtCell(r.rule,"note")},
+    ]));
+    v.appendChild(bc);
+    const fc=card("FinancialData",SSOT.vrn_contracts.financial_data.length);
+    fc.appendChild(tableFrom(SSOT.vrn_contracts.financial_data,[
+      {h:"Section",render:r=>badgeCell(r.section,"tier")},
+      {h:"Item",render:r=>txtCell(r.item,"key")},
+      {h:"P1",render:r=>txtCell(r.p1,"mono")},
+      {h:"Validation",render:r=>txtCell(r.validation,"note")},
+      {h:"Rule",render:r=>txtCell(r.rule,"note")},
+    ]));
+    v.appendChild(fc);
+    return v;
+  },
+  ticker_rules(t){
+    const v = viewShell("ticker_rules","Ticker Rules","Normalization SSOT",
+      "TW ticker, yfinance, Bloomberg and filename parsing. These rules gate VDF, VRN and ETF identity resolution.");
+    const tw=SSOT.ticker_rules.tw_ticker;
+    const c=card("TW_TICKER");
+    const tbl=el("table"); const tb=el("tbody");
+    const rowKV=(k,val)=>{const tr=el("tr"); tr.appendChild(txtCell(k,"key")); const td=el("td","mono"); td.textContent=typeof val==="object"?JSON.stringify(val):String(val); tr.appendChild(td); tb.appendChild(tr);};
+    Object.entries(tw).forEach(([k,val])=>rowKV(k,val));
+    tbl.appendChild(tb); c.appendChild(tbl); v.appendChild(c);
+    const fc=card("Filename Tokens",SSOT.ticker_rules.filename_tokens.length);
+    fc.appendChild(tableFrom(SSOT.ticker_rules.filename_tokens,[
+      {h:"Type",render:r=>badgeCell(r.type,"acc")},
+      {h:"Rule",render:r=>txtCell(r.rule,"mono")},
+      {h:"Priority",render:r=>txtCell(r.priority,"mono")},
+      {h:"Note",render:r=>txtCell(r.note,"note")},
+    ]));
+    v.appendChild(fc);
+    return v;
+  },
+  macro_contracts(t){
+    const v = viewShell("macro_contracts","Macro & Global","US Core + Global Comparable",
+      "US is the most complete core; other regions capture comparable fields plus region-specific signals.");
+    const labels={us_leading:"US Leading Indicators",us_inflation:"US Inflation (CPI/PCE/PPI)",us_employment:"US Employment",us_fiscal_rates:"US Fiscal / Rates / Fed"};
+    Object.entries(SSOT.macro_contracts).forEach(([gk,rows])=>{
+      const c=card(labels[gk]||gk,rows.length);
+      c.appendChild(tableFrom(rows,[
+        {h:"Layer",render:r=>txtCell(r.layer,"mono")},
+        {h:"Category",render:r=>badgeCell(r.category,"acc")},
+        {h:"Item",render:r=>txtCell(r.item,"key")},
+        {h:"Sources",render:r=>txtCell(r.sources,"mono")},
+        {h:"Freq",render:r=>txtCell(r.frequency,"mono")},
+        {h:"Use",render:r=>txtCell(r.use,"note")},
+      ]));
+      v.appendChild(c);
+    });
+    const gc=card("Global Comparable Regions");
+    gc.appendChild((()=>{ const wrap=el("div","chips");
+      SSOT.global_comparable_macro.core_fields.forEach(f=>wrap.appendChild(badge(f,"")));
+      return wrap; })());
+    const reg=el("div","regions");
+    Object.entries(SSOT.global_comparable_macro.regions).forEach(([name,info])=>{
+      const r=el("div","region"); r.appendChild(el("h4",null,name));
+      ["policy","10y","fx","equity"].forEach(f=>{ if(info[f]!=null){ const fr=el("div","field"); fr.appendChild(el("b",null,f)); fr.appendChild(el("span",null,info[f])); r.appendChild(fr);} });
+      if(info.special){ const s=el("div","special"); s.textContent="special: "+info.special.join(", "); r.appendChild(s); }
+      reg.appendChild(r);
+    });
+    gc.appendChild(reg); v.appendChild(gc);
+    return v;
+  },
+  validation(t){
+    const v = viewShell("validation","Validation Matrix","L0 → L9 Activation Ladder",
+      "Each level gates the next. Hard gates (L0/L1) must pass; review gates raise flags; activation requires zero high-risk.");
+    const c=card("Validation Ladder");
+    const ladder=el("div","ladder");
+    SSOT.validation_contract.forEach(lvl=>{
+      const gate = /L0|L1/.test(lvl.level)?"hard": /L8|L9/.test(lvl.level)?"activate":"review";
+      const rung=el("div","rung"); rung.dataset.gate=gate;
+      rung.appendChild(el("div","lv",lvl.level));
+      const body=el("div","body");
+      const nm=el("div","name"); nm.appendChild(document.createTextNode(lvl.name+"  "));
+      nm.appendChild(badge(lvl.result, resultClass(lvl.result))); body.appendChild(nm);
+      const pair=el("div","pair");
+      const vdf=el("span"); vdf.appendChild(el("b",null,"VDF")); vdf.appendChild(document.createTextNode(lvl.vdf)); pair.appendChild(vdf);
+      const vrn=el("span"); vrn.appendChild(el("b",null,"VRN")); vrn.appendChild(document.createTextNode(lvl.vrn)); pair.appendChild(vrn);
+      body.appendChild(pair); rung.appendChild(body); ladder.appendChild(rung);
+    });
+    c.appendChild(ladder); v.appendChild(c);
+    return v;
+  },
+  visual_lock(t){
+    const v = viewShell("visual_lock","VisualLock","Locked Tokens · Templates",
+      "Color and type tokens locked across the platform. Components and templates extend, never break the core.");
+    const tc=card("Locked Tokens");
+    const sw=el("div","swatches");
+    Object.entries(SSOT.visual_lock.tokens.color).forEach(([nm,hex])=>{
+      const s=el("div","sw"); const chip=el("div","chip"); chip.style.background=hex; s.appendChild(chip);
+      const m=el("div","meta"); m.appendChild(el("div","nm",nm)); m.appendChild(el("div","hex",hex)); s.appendChild(m); sw.appendChild(s);
+    });
+    tc.appendChild(sw);
+    const fr=el("div","fontrow");
+    const fmap={mono:'"DM Mono",monospace',sans:'"DM Sans",sans-serif',display:'"Syne",sans-serif'};
+    Object.entries(SSOT.visual_lock.tokens.font).forEach(([role,fam])=>{
+      const f=el("div","fontcard"); f.appendChild(el("div","role",role)); const s=el("div","samp",fam); s.style.fontFamily=fmap[role]||"inherit"; f.appendChild(s);
+      const lbl=el("div","note"); lbl.style.fontFamily="var(--mono)"; lbl.style.fontSize="11px"; lbl.style.marginTop="6px"; lbl.textContent="Aa Bb Cc 0123"; lbl.style.fontFamily=fmap[role]; f.appendChild(lbl);
+      fr.appendChild(f);
+    });
+    tc.appendChild(fr); v.appendChild(tc);
+
+    const mc=card("Lock Markers");
+    const ch=el("div","chips"); SSOT.visual_lock.lock_markers.forEach(m=>ch.appendChild(badge(m,"lock"))); mc.appendChild(ch);
+    mc.appendChild(tableFrom(SSOT.visual_lock.lock_layers,[
+      {h:"Layer",render:r=>badgeCell(r.layer,"lock")},
+      {h:"Scope",render:r=>txtCell(r.scope,"note")},
+    ]));
+    v.appendChild(mc);
+
+    const lc=card("Component Taxonomy",SSOT.component_taxonomy.length);
+    lc.appendChild(tableFrom(SSOT.component_taxonomy,[
+      {h:"Class",render:r=>badgeCell(r.class,"acc")},
+      {h:"Use",render:r=>txtCell(r.use,"note")},
+    ]));
+    v.appendChild(lc);
+
+    const pc=card("Template Library",SSOT.template_library.length);
+    pc.appendChild(tableFrom(SSOT.template_library,[
+      {h:"Template",render:r=>txtCell(r.id,"key")},
+      {h:"Required Specs",render:r=>{ const td=el("td"); r.required.forEach(s=>{const b=badge(s,"");b.style.margin="2px 4px 2px 0";td.appendChild(b);}); return td; }},
+    ]));
+    v.appendChild(pc);
+    return v;
+  },
+  bridge(t){
+    const v = viewShell("bridge","Supportive Bridge","Read-heavy · Dry-run",
+      "NexusCore, PolyglotCheck and README are bridged for existence + hash checks only. The maintainer never executes them or writes back to frozen engines.");
+    const c=card("Bridged Modules ("+SSOT.supportive_bridge.mode+")");
+    SSOT.supportive_bridge.modules.forEach(m=>{
+      const it=el("div","bridge-item");
+      it.appendChild(el("div","role",m.role));
+      it.appendChild(el("div","path",m.path));
+      if(m.suggested_command){
+        const cmd=el("div","cmd"); const code=el("code",null,m.suggested_command.replace("<path>",m.path));
+        const b=el("button","btn ghost","Copy"); b.onclick=()=>copy(code.textContent,b);
+        cmd.appendChild(code); cmd.appendChild(b); it.appendChild(cmd);
+      }
+      c.appendChild(it);
+    });
+    v.appendChild(c);
+    const rc=card("Bridge Rules");
+    const ul=el("div"); ul.style.padding="6px 14px 14px";
+    SSOT.supportive_bridge.rules.forEach(r=>{ const p=el("div","note"); p.style.padding="4px 0"; p.textContent="• "+r; ul.appendChild(p); });
+    rc.appendChild(ul); v.appendChild(rc);
+    return v;
+  },
+  activation(t){
+    const v = viewShell("activation","Activation Gate","User-test → Activate",
+      "Final readiness summary. Activation is a record of intent in this SSOT; it triggers no execution here.");
+    const c=card("Readiness");
+    const tbl=el("table"); const tb=el("tbody");
+    const rm = findParam("run_mode","RUN_MODE");
+    const rows=[
+      ["Run mode", rm?rm.value:"—"],
+      ["Source patch", SSOT.meta.policy.source_patch],
+      ["DB write", SSOT.meta.policy.db_write],
+      ["High-risk protected toggles enabled", String(countProtectedOn())],
+      ["Dirty edits pending export", String(dirty.size)],
+    ];
+    rows.forEach(([k,val])=>{ const tr=el("tr"); tr.appendChild(txtCell(k,"key")); const td=el("td"); td.appendChild(badge(String(val), /0|dry_run|DISABLED|FORBIDDEN|user_test/.test(String(val))?"g":"y")); tr.appendChild(td); tb.appendChild(tr); });
+    tbl.appendChild(tb); c.appendChild(tbl);
+    const note=el("div","note"); note.style.padding="12px 14px"; note.textContent="Activation principle: high-risk count must be 0 and edits exported before promoting RUN_MODE to execute.";
+    c.appendChild(note); v.appendChild(c);
+    return v;
+  },
+};
+
+function findParam(group,key){ const g=SSOT.input_parameters[group]; return g?g.find(r=>r.key===key):null; }
+function countProtectedOn(){ let n=0; Object.values(SSOT.input_parameters).forEach(g=>g.forEach(r=>{ if(r.protected && (r.value===true)) n++; })); return n; }
+
+/* ----- masthead ----- */
+function fillMast(){
+  const m=SSOT.meta;
+  document.getElementById("m-ssotid").textContent=m.ssot_id;
+  document.getElementById("m-schema").textContent=m.schema_version;
+  document.getElementById("m-content").textContent=m.content_version;
+  document.getElementById("m-sha").textContent=(m.integrity.sha256_of_body||"").slice(0,12)||"–";
+  const rm=findParam("run_mode","RUN_MODE"); document.getElementById("m-runmode").textContent=rm?rm.value:"–";
+  document.getElementById("m-rounds").textContent=String(m.rounds);
+}
+
+/* ----- canonical hash (mirrors py sort_keys + compact) ----- */
+function sortValue(x){
+  if(Array.isArray(x)) return x.map(sortValue);
+  if(x && typeof x==="object"){ const o={}; Object.keys(x).sort().forEach(k=>o[k]=sortValue(x[k])); return o; }
+  return x;
+}
+async function recomputeIntegrity(obj){
+  const body={}; Object.keys(obj).forEach(k=>{ if(k!=="meta") body[k]=obj[k]; });
+  const canon=JSON.stringify(sortValue(body));
+  const buf=new TextEncoder().encode(canon);
+  const dig=await crypto.subtle.digest("SHA-256",buf);
+  return Array.from(new Uint8Array(dig)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+
+/* ----- export ----- */
+async function exportSSOT(){
+  const out=JSON.parse(JSON.stringify(SSOT));
+  // bump content version patch
+  const parts=(out.meta.content_version||"0.0.0").split(".").map(n=>parseInt(n,10)||0);
+  parts[2]=(parts[2]||0)+1; out.meta.content_version=parts.join(".");
+  out.meta.generated=new Date().toISOString();
+  out.meta.integrity.canonical="js_json_sorted_compact";
+  out.meta.integrity.note="Rewritten by VisualMaintainer export. JS canonical sorted-compact SHA-256 over body.";
+  try{ out.meta.integrity.sha256_of_body=await recomputeIntegrity(out); }catch(e){ out.meta.integrity.sha256_of_body="HASH_UNAVAILABLE_OFFLINE"; }
+  const stamp=new Date().toISOString().replace(/[-:T]/g,"").slice(0,15);
+  const name="SSOT_VIA_VisualDesignOps_"+stamp+"_v"+out.meta.content_version.replace(/\./g,"")+".json";
+  const blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
+  const a=el("a"); a.href=URL.createObjectURL(blob); a.download=name; a.click();
+  URL.revokeObjectURL(a.href);
+  dirty.clear(); document.getElementById("dirty").textContent="0";
+  document.querySelectorAll("tr.dirty").forEach(tr=>tr.classList.remove("dirty"));
+  SSOT.meta.content_version=out.meta.content_version; SSOT.meta.integrity=out.meta.integrity; fillMast();
+  setStatus("Exported "+name+" (content v"+out.meta.content_version+")");
+}
+
+/* ----- misc ----- */
+function setStatus(s){ document.getElementById("status").textContent=s; }
+function copy(text,btn){ navigator.clipboard?.writeText(text).then(()=>{ const o=btn.textContent; btn.textContent="Copied"; setTimeout(()=>btn.textContent=o,1100); }).catch(()=>{}); }
+
+function wire(){
+  document.getElementById("tier").onchange=(e)=>{ actingTier=e.target.value; reRenderParams(); setStatus("Acting as "+actingTier); };
+  document.getElementById("export").onclick=exportSSOT;
+  document.getElementById("copycmd").onclick=(e)=>copy('pwsh -NoProfile -ExecutionPolicy Bypass -File "Invoke-VIA-SSOT-Manager-v0100.ps1" -Action Launch -OpenReport', e.target);
+  document.getElementById("mod-cancel").onclick=closeModal;
+  document.getElementById("mod-ok").onclick=()=>{ const v=document.getElementById("mod-input").value.trim().toUpperCase(); if(v==="CONFIRM"){ const a=_modalAction; closeModal(); if(a)a(); } else { document.getElementById("mod-input").style.borderColor="var(--r)"; } };
+  document.getElementById("scrim").onclick=(e)=>{ if(e.target.id==="scrim") closeModal(); };
+  document.getElementById("loadfile").onchange=(e)=>{
+    const f=e.target.files[0]; if(!f)return; const rd=new FileReader();
+    rd.onload=()=>{ try{ const j=JSON.parse(rd.result); if(!j.meta) throw new Error("not an SSOT"); SSOT=j; boot(); setStatus("Loaded "+f.name); }catch(err){ setStatus("Load failed: "+err.message); } };
+    rd.readAsText(f);
+  };
+}
+
+function boot(){ buildRail(); buildViews(); fillMast(); }
+
+if(SSOT){ wire(); boot(); }
+else {
+  document.getElementById("main").innerHTML='<section class="view active"><div class="view-head"><span class="eyebrow">No data</span><h2>Load an SSOT JSON</h2></div><p class="view-sub">No SSOT was injected. Use “Load SSOT JSON…” in the toolbar to open SSOT_VIA_VisualDesignOps_20260617.json.</p></section>';
+  wire();
+}
+</script>
+</body>
+</html>

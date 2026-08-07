@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VERITAS INTELLIGENCE SYSTEM</title>
+<!-- @lock VPN v3.5 visual identity : palette + fonts immutable -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --vpn-blue:#4c78a8;--vpn-grey:#9c9890;--vpn-teal:#439a9a;
+  --bg:#0f1318;--bg2:#141a21;--panel:#1a212a;--line:#2a3540;
+  --ink:#e7ecf1;--ink-dim:#9aa7b4;--ink-faint:#6b7886;
+  --par:#5bb38a;--seq:#e0b450;--fin:#7fb3e0;--hi:#d8654f;--mid:#e0b450;--lo:#5bb38a;
+  --font-display:"Syne",sans-serif;--font-body:"DM Sans",sans-serif;--font-mono:"DM Mono",monospace;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);}
+header.top{background:linear-gradient(90deg,var(--vpn-blue),#3c5f86);padding:16px 26px;display:flex;align-items:center;gap:16px;border-bottom:1px solid var(--line);}
+.mark{width:38px;height:38px;border-radius:9px;background:var(--vpn-teal);display:grid;place-items:center;font-family:var(--font-display);font-weight:800;color:#0f1318;font-size:18px;}
+.tt h1{margin:0;font-family:var(--font-display);font-weight:800;font-size:19px;}
+.tt p{margin:2px 0 0;font-size:12px;color:#dbe6f2;letter-spacing:1.5px;text-transform:uppercase;}
+.wrap{padding:18px 26px 60px;max-width:1180px;}
+.summary{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px;}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 18px;min-width:110px;}
+.stat-n{font-family:var(--font-mono);font-size:22px;}
+.stat-l{font-size:11px;color:var(--ink-dim);margin-top:3px;}
+.is-par .stat-n{color:var(--par);}.is-seq .stat-n{color:var(--seq);}.is-pass .stat-n{color:var(--par);}
+h2{font-family:var(--font-display);font-size:15px;font-weight:700;margin:26px 0 10px;border-bottom:1px solid var(--line);padding-bottom:7px;letter-spacing:.4px;}
+.note{font-size:12px;color:var(--ink-dim);margin:-4px 0 12px;line-height:1.6;}
+table{width:100%;border-collapse:collapse;font-size:12px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+th{background:var(--panel);text-align:left;padding:9px 11px;font-family:var(--font-mono);font-size:11px;color:var(--ink-dim);font-weight:500;border-bottom:1px solid var(--line);}
+td{padding:9px 11px;border-bottom:1px solid rgba(42,53,64,.5);vertical-align:top;color:var(--ink);}
+tr:last-child td{border-bottom:0;}
+.id{font-family:var(--font-mono);color:var(--vpn-teal);}
+.tag{font-size:10px;font-family:var(--font-mono);padding:2px 7px;border-radius:6px;white-space:nowrap;}
+.t-par{background:rgba(91,179,138,.14);color:var(--par);border:1px solid rgba(91,179,138,.4);}
+.t-seq{background:rgba(224,180,80,.14);color:var(--seq);border:1px solid rgba(224,180,80,.4);}
+.t-fin{background:rgba(127,179,224,.14);color:var(--fin);border:1px solid rgba(127,179,224,.4);}
+.h-HIGH{color:var(--hi);font-family:var(--font-mono);}.h-MID{color:var(--mid);font-family:var(--font-mono);}.h-LOW{color:var(--lo);font-family:var(--font-mono);}.h-NONE{color:var(--ink-faint);font-family:var(--font-mono);}
+.st{font-family:var(--font-mono);font-size:11px;}
+.st-FIXED,.st-DONE,.st-PASS{color:var(--par);}
+.delta{font-family:var(--font-mono);color:var(--ink-dim);}
+.flow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0 4px;}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:8px 12px;font-family:var(--font-mono);font-size:11px;}
+.step.pass{border-color:rgba(91,179,138,.5);color:var(--par);}
+.arrow{color:var(--ink-faint);}
+.bar{height:10px;border-radius:6px;background:linear-gradient(90deg,var(--vpn-teal),var(--par));}
+.barrow{display:grid;grid-template-columns:160px 1fr 70px;gap:12px;align-items:center;margin:6px 0;font-size:12px;}
+.barrow .lbl{font-family:var(--font-mono);color:var(--ink-dim);}
+.track{background:#0c1014;border:1px solid var(--line);border-radius:6px;overflow:hidden;}
+.val{font-family:var(--font-mono);text-align:right;}
+.foot{margin-top:24px;font-size:11px;color:var(--ink-faint);font-family:var(--font-mono);}
+</style>
+</head>
+<body>
+<header class="top" data-lock="true">
+  <div class="mark">V</div>
+  <div class="tt"><h1>VVX \u00b7 \u5168\u666f\u5f0f\u5206\u6790\u8207\u4fee\u6b63\u77e9\u9663\u5831\u544a</h1>
+  <p>VERITAS INTELLIGENCE SYSTEM \u00b7 PANORAMIC FIX MATRIX</p></div>
+</header>
+<div class="wrap">
+  <div class="summary" id="summary"></div>
+
+  <h2>1 \u00b7 \u4fee\u6b63\u968e\u6bb5\u6d41\u7a0b\uff08\u907f\u514d\u4e5d\u982d\u9f8d\u98a8\u96aa\uff09</h2>
+  <div class="note">\u5168\u9762\u6027\uff08\u53ef\u5e73\u884c\u3001\u4e92\u4e0d\u5f71\u97ff\uff09\u2192 \u9806\u5e8f\u6027\uff08\u52d5\u5171\u7528\u89e3\u6790\u8def\u5f91\uff09\u2192 \u6536\u5c3e\u6027\uff08\u512a\u5316\u8207\u4e00\u81f4\u6027\uff09\u3002\u6bcf\u4e00\u8f2a\u4fee\u6b63\u5f8c\u91cd\u8de1\u5168\u5957\u6e2c\u8a66\uff0c\u78ba\u8a8d\u672a\u5f15\u5165\u65b0\u932f\u8aa4\u3002</div>
+  <div class="flow">
+    <div class="step pass">\u5168\u9762\u6027\u6279\u6b21\uff083 \u9805\uff09</div><span class="arrow">\u2192</span>
+    <div class="step pass">\u9806\u5e8f\u6027 S1</div><span class="arrow">\u2192</span>
+    <div class="step pass">\u6536\u5c3e\u6027\uff084 \u9805\uff09</div><span class="arrow">\u2192</span>
+    <div class="step pass">\u5168\u666f\u91cd\u9a57</div>
+  </div>
+
+  <h2>2 \u00b7 \u4e09\u8f2a\u5168\u666f\u5206\u6790 \u00b7 \u932f\u8aa4\u8207\u512a\u5316\u77e9\u9663</h2>
+  <table id="matrix"><thead><tr>
+    <th>ID</th><th>\u9805\u76ee</th><th>\u985e\u5225</th><th>\u4e5d\u982d\u9f8d\u98a8\u96aa</th>
+    <th>\u6839\u56e0</th><th>\u4fee\u6b63</th><th>\u72c0\u614b</th><th>\u6e2c\u8a66\u5dee</th>
+  </tr></thead><tbody></tbody></table>
+
+  <h2>3 \u00b7 \u6e2c\u8a66\u6f14\u9032\uff08\u6bcf\u968e\u6bb5\u91cd\u8de1\uff09</h2>
+  <div id="evo"></div>
+
+  <h2>4 \u00b7 \u9a57\u8b49\u95dc\u5361\uff08test\u2192debug\u2192upgrade\u2192optimize\u2192consolidate\u2192user-test\uff09</h2>
+  <div class="flow" id="gates"></div>
+
+  <div class="foot" id="foot"></div>
+</div>
+
+<script>
+var R = {
+  generated: "AUTO",
+  summary: [["\u932f\u8aa4\u6578",3],["\u512a\u5316\u9805",5],["\u5df2\u4fee\u6b63",8,"par"],["\u5206\u6790\u8f2a\u6b21",3],["\u6700\u7d42\u901a\u904e",46,"pass"]],
+  matrix: [
+    ["E01","Plotly var-assignment \u8b80\u53d6\u932f\u8aa4\uff08\u8aa4\u628a config \u7576 layout\uff09","seq","HIGH",
+     "extract_plotly \u50c5\u8b58\u5167\u806f JSON \u5b57\u9762\uff0cidentifier \u5f15\u6578\u672a\u89e3\u6790",
+     "\u5efa var/let/const \u8c4b\u503c\u8868\uff0cnewPlot identifier \u5f15\u6578\u4ee3\u5165\uff08\u4fdd\u7559 inline \u8def\u5f91\uff09","FIXED","3\u21920"],
+    ["E02","Chart.js unquoted JS keys \u89e3\u6790\u5931\u6557\uff08\u6642\u9593\u8ef8/\u8272\u5f69/stacked \u5168\u7121\uff09","par","LOW",
+     "json.loads \u62d2\u7d55 JS \u7269\u4ef6\u5b57\u9762\uff08\u672a\u52a0\u5f15\u865f\u9375\uff09",
+     "\u5bec\u9b06\u6b63\u5247 fallback\uff1atype/color/stacked/scale=time","FIXED","3\u21920"],
+    ["E03","ECharts unquoted JS keys \u89e3\u6790\u5931\u6557\uff08\u6642\u9593\u8ef8/\u8272\u5f69\uff09","par","LOW",
+     "\u540c E02\uff1asetOption \u7269\u4ef6\u672a\u52a0\u5f15\u865f",
+     "\u5bec\u9b06\u6b63\u5247 fallback\uff1acolor[]/xAxis type=time/series type","FIXED","2\u21920"],
+    ["O01","\u7f3a\u4e4f\u6bcf\u5716\u8a3a\u65b7\u8cc7\u8a0a","par","NONE",
+     "\u898f\u683c\u7121\u554f\u984c\u6a19\u8a18\uff0c\u4f7f\u7528\u8005\u96e3\u5224\u65b7\u53ef\u4fe1\u5ea6",
+     "\u65b0\u589e issues[] \u6b04\u4f4d\uff08\u7121\u5bec\u9ad8/spec-only/raster\u672a\u9a57\u7b49\uff09","DONE","\u2014"],
+    ["O02","\u91cd\u8907\u5716\u8868\uff08plotly offline newPlot + json \u96d9\u80de\uff09","par","LOW",
+     "\u540c\u4e00\u5716\u88ab newPlot \u8207 application/json \u5169\u8def\u91cd\u8907\u64f7\u53d6",
+     "\u4f9d\u7c3d\u540d\uff08engine+\u5c3a\u5bf8+\u8272+\u5167\u5bb9 hash\uff09\u53bb\u91cd","DONE","\u2014"],
+    ["O03","colorway \u4e09\u5143\u5f0f\u8106\u5f31","fin","LOW",
+     "\u904b\u7b97\u5b50\u512a\u5148\u5e8f\u96e3\u8b80\u3001\u6613\u8aa4\u89e3",
+     "\u6539\u70ba\u660e\u78ba\u5206\u652f\u908f\u8f2f","DONE","\u2014"],
+    ["O04","\u4e32\u884c\u89e3\u6790\uff08\u591a\u6a94\u6548\u80fd\uff09","fin","LOW",
+     "\u9010\u6a94\u4e32\u884c\uff0c\u5927\u91cf\u6a94\u6848\u504f\u6162",
+     "ThreadPoolExecutor\uff08ex.map \u4fdd\u5e8f\uff0c>3 \u6a94\u555f\u7528\uff09","DONE","\u2014"],
+    ["O05","\u7121\u905e\u8ff4\u6383\u63cf","fin","NONE",
+     "\u50c5\u6383\u9802\u5c64\u8cc7\u6599\u593e",
+     "--recurse / -Recurse\uff0c\u4e26\u6392\u9664\u81ea\u8eab\u8f38\u51fa\u76ee\u9304","DONE","\u2014"]
+  ],
+  evo: [
+    ["\u57fa\u6e96 spec suite",23,31],
+    ["\u5168\u9762\u6027\u6279\u6b21\u5f8c",28,31],
+    ["\u9806\u5e8f\u6027 S1 \u5f8c",31,31],
+    ["\u6536\u5c3e\u6027\u5f8c\uff08\u7121\u56de\u6b78\uff09",31,31],
+    ["jsdom user-test",15,15]
+  ],
+  gates: [["test",1],["debug",1],["upgrade",1],["test",1],["optimize",1],["test",1],
+          ["consolidate",1],["test",1],["user-test 15/15",1],["ps_lint 0E/0W",1],["http \u5b78\u67e55/5",1]]
+};
+
+(function(){
+  var s=document.getElementById('summary');
+  R.summary.forEach(function(r){var b=document.createElement('div');b.className='stat'+(r[2]?' is-'+r[2]:'');
+    b.innerHTML='<div class="stat-n">'+r[1]+'</div><div class="stat-l">'+r[0]+'</div>';s.appendChild(b);});
+
+  var tb=document.querySelector('#matrix tbody');
+  var tagcls={par:'t-par',seq:'t-seq',fin:'t-fin'},tagtxt={par:'\u53ef\u5e73\u884c',seq:'\u9806\u5e8f',fin:'\u6536\u5c3e'};
+  R.matrix.forEach(function(r){
+    var tr=document.createElement('tr');
+    tr.innerHTML='<td class="id">'+r[0]+'</td><td>'+r[1]+'</td>'+
+      '<td><span class="tag '+tagcls[r[2]]+'">'+tagtxt[r[2]]+'</span></td>'+
+      '<td class="h-'+r[3]+'">'+r[3]+'</td><td>'+r[4]+'</td><td>'+r[5]+'</td>'+
+      '<td class="st st-'+r[6]+'">'+r[6]+'</td><td class="delta">'+r[7]+'</td>';
+    tb.appendChild(tr);
+  });
+
+  var evo=document.getElementById('evo');
+  R.evo.forEach(function(r){
+    var pct=Math.round(r[1]/r[2]*100);
+    var row=document.createElement('div');row.className='barrow';
+    row.innerHTML='<span class="lbl">'+r[0]+'</span>'+
+      '<div class="track"><div class="bar" style="width:'+pct+'%"></div></div>'+
+      '<span class="val">'+r[1]+'/'+r[2]+'</span>';
+    evo.appendChild(row);
+  });
+
+  var g=document.getElementById('gates');
+  R.gates.forEach(function(r,i){
+    var d=document.createElement('div');d.className='step pass';d.textContent='\u2713 '+r[0];g.appendChild(d);
+    if(i<R.gates.length-1){var a=document.createElement('span');a.className='arrow';a.textContent='\u2192';g.appendChild(a);}
+  });
+
+  document.getElementById('foot').textContent=
+    'VVX Extractor v01.1 \u00b7 8 \u9805\u5168\u4fee\u6b63\u7d93 1 \u6b21\u5e73\u884c\u6279\u6b21 + 1 \u6b21\u9806\u5e8f\u4fee\u6b63\u5b8c\u6210 \u00b7 \u6bcf\u8f2a\u91cd\u8de1\u7121\u4e5d\u982d\u9f8d\u56de\u6b78 \u00b7 \u751f\u6210\uff1a'+
+    new Date().toISOString().slice(0,19).replace('T',' ');
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA · FIS 驗證 v3 Matrix Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--sf:#fff;--ink:#1e1d1a;--sub:#6b6860;--gr:#9c9890;--bd:#dbd9d3;
+--up:#c96b5a;--dn:#5a9e6f;--bl:#4c78a8;--tl:#439a9a;--seal:#b5291a;--amber:#c4943a}
+*{box-sizing:border-box}body{background:var(--bg);color:var(--ink);margin:0;padding:22px;
+font-family:"DM Sans","Noto Sans TC",system-ui,sans-serif;font-size:13px;line-height:1.55}
+.wrap{max-width:1100px;margin:0 auto}
+.eyebrow{font-family:"DM Mono",monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--sub)}
+h1{font-family:"Syne";font-weight:800;font-size:24px;margin:6px 0 2px}
+.seal{display:inline-flex;width:32px;height:32px;align-items:center;justify-content:center;border-radius:7px;background:var(--seal);color:#fff;font-weight:900;margin-right:9px;vertical-align:middle}
+.sub{color:var(--sub);font-size:12px;max-width:960px}
+.strip{height:6px;border-radius:2px;margin:14px 0;background:linear-gradient(90deg,#4c78a8,#439a9a,#7fae6f,#c9b05a,#c96b5a)}
+.verdict{display:inline-block;background:var(--dn);color:#fff;font-weight:800;border-radius:4px;padding:6px 14px;font-size:15px;margin:4px 0 10px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:14px;margin:12px 0}
+h2{font-size:14px;margin:0 0 4px}.intro{color:var(--sub);font-size:11.5px;margin-bottom:4px}
+table{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:6px}
+th,td{padding:5px 8px;border-bottom:1px solid #eceae2;text-align:left;vertical-align:top}
+th{font-size:9.5px;color:var(--sub);text-transform:uppercase;letter-spacing:.4px}
+.mono{font-family:"DM Mono",monospace}.l{text-align:left}
+.foot{color:var(--gr);font-size:11px;border-top:1px solid var(--bd);padding-top:10px;margin-top:16px;line-height:1.6}
+</style></head><body><div class="wrap">
+<div class="eyebrow">VERITAS INTELLIGENCE · FIS 驗證 v3 · MONTE-CARLO 40 SIMS · EVIDENCE-HONEST</div>
+<h1><span class="seal">證</span>資金流邏輯驗證 Matrix Report</h1>
+<div class="sub">方向性 · 關聯性 · 強度 · 金額精準度 — 多方法標準化 / 金額推估收斂 / 多源 fusion 三組實驗 + 9 驗證閘。受控 DGP(沙盒無行情真值);同介面換 TWSE T86 / ETF創贖 / CFTC COT 即真回測。</div>
+<div class="strip"></div>
+<div class="verdict">VERDICT: LOGIC PROVEN ✓ — 9/9 GATES(全 ≥90%,7 項 100%)</div>
+
+<div class="card"><h2>E1 · 多方法可驗證標準化(方向性+關聯性)</h2>
+<div class="intro">三種獨立標準化法皆抓到方向 → 訊號非單一公式假象;Ensemble 穩健、同號過濾非劣。</div>
+<table><tr><th class='l'>方法</th><th class='l'>Rank-IC (mean±sd)</th><th class='l'>註</th></tr><tr><td class='l'>robust-z tanh(現行)</td><td class='l'>+0.0937 ± 0.0092</td><td class='l'>基準</td></tr><tr><td class='l'>plain-z</td><td class='l'>+0.0945 ± 0.0091</td><td class='l'>替代法有效</td></tr><tr><td class='l'>cross-sectional rank</td><td class='l'>+0.0981 ± 0.0105</td><td class='l'>替代法有效</td></tr><tr><td class='l'><b>Ensemble(3法)</b></td><td class='l'><b>+0.0971 ± 0.0096</b></td><td class='l'>≥最弱單法</td></tr><tr><td class='l'>命中率(|FIS|>20)</td><td class='l'>單法 53.96% → 同號過濾 54.08%</td><td class='l'>非劣+微增</td></tr></table></div>
+
+<div class="card"><h2>E2 · 推估金額趨近實際金額(精準度)</h2>
+<div class="intro">金額誤差機制 = ETF固定美元級特有流 ÷ 覆蓋率(1/cov 放大)。三個規則被證明:動態覆蓋率、Basket 聚合、coverage floor。</div>
+<table><tr><th class='l'>估算法</th><th class='l'>corr(implied, actual)</th><th class='l'>Median APE</th><th class='l'>結論</th></tr><tr><td class='l'>靜態覆蓋率(過期)</td><td class='l'>0.277</td><td class='l'>3.944</td><td class='l'>基準(最差)</td></tr><tr><td class='l'>動態覆蓋率(AUM/市值 5日平滑)</td><td class='l'>0.269</td><td class='l'><b>3.101</b></td><td class='l'>尺度誤差↓ 21%</td></tr><tr><td class='l'><b>Basket(3 ETF Σflow/Σcov)</b></td><td class='l'><b>0.417</b></td><td class='l'><b>1.805</b></td><td class='l'>corr +55%·APE 減半</td></tr><tr><td class='l'>覆蓋率分桶(動態)</td><td class='l'>—</td><td class='l'>&lt;5%: 5.177 ｜ ≥5%: 2.642</td><td class='l'><b>coverage floor 成立</b>(低覆蓋誤差 ~2×)</td></tr></table></div>
+
+<div class="card"><h2>E3 · 多源 fusion(實測IC加權)</h2>
+<div class="intro">異質源(ETF流 × positioning)依實測 IC 加權融合,OOS 勝任一單源——「準確度提升」的實質引擎。</div>
+<table><tr><th class='l'>來源</th><th class='l'>OOS Rank-IC</th><th class='l'>權重(實測IC)</th><th class='l'>結論</th></tr><tr><td class='l'>ETF 創贖流</td><td class='l'>0.1013</td><td class='l'>0.47</td><td class='l'>單源</td></tr><tr><td class='l'>positioning(COT型)</td><td class='l'>0.0973</td><td class='l'>0.53</td><td class='l'>單源(較噪)</td></tr><tr><td class='l'><b>measured-weight fusion</b></td><td class='l'><b>0.1322</b></td><td class='l'>—</td><td class='l'><b>勝任一單源 +30%</b></td></tr></table></div>
+
+<div class="card"><h2>驗證閘 Matrix(40 sims)</h2><table><tr><th class='l'>驗證閘</th><th class='l'>通過率</th></tr><tr><td class='l'>方向IC>0顯著(tanh)</td><td class='l'><span style='color:var(--dn);font-weight:700'>PASS</span> <span style='color:var(--gr);font-family:DM Mono,monospace;font-size:10px'>100%</span></td></tr><tr><td class='l'>多方法皆有效(z/rank IC>0)</td><td class='l'><span style='color:var(--dn);font-weight:700'>PASS</span> <span style='color:var(--gr);font-family:DM Mono,monospace;font-size:10px'>100%</span></td></tr><tr><td class='l'>Ensemble≥最弱單法</td><td class='l'><span style='color:var(--dn);font-weight:700'>PASS</span> <span style='color:var(--gr);font-family:DM Mono,monospace;font-size:10px'>100%</span></td></tr><tr><td class='l'>同號過濾命中率≥單法</td><td class='l'><span style='color:var(--dn);font-weight:700'>PASS</span> <span style='color:var(--gr);font-family:DM Mono,monospace;font-size:10px'>100%</span></td></tr><tr><td class='l'>basket金額優於單ETF(MAPE)</td><td class='l'><span style='color:var(--dn);font-weight:700'>PASS</span> <span style='color:var(--gr);font-family:DM Mono,monospace;font-size:10px'>100%</span></td></tr><tr><td class='l'>動態MAPE≤靜態</td><td class='l'><span style='color:var(--dn);font-weight:700'>PASS</span> <span style='color:var(--gr);font-family:DM Mono,monospace;font-size:10px'>100%</span></td></tr><tr><td class='l'>低覆蓋率誤差>高覆蓋率(floor成立)</td><td class='l'><span style='color:var(--dn);font-weight:700'>PASS</span> <span style='color:var(--gr);font-family:DM Mono,monospace;font-size:10px'>100%</span></td></tr><tr><td class='l'>fusion OOS≥最佳單源-1%</td><td class='l'><span style='color:var(--dn);font-weight:700'>PASS</span> <span style='color:var(--gr);font-family:DM Mono,monospace;font-size:10px'>100%</span></td></tr><tr><td class='l'>強度long-short顯著</td><td class='l'><span style='color:var(--dn);font-weight:700'>PASS</span> <span style='color:var(--gr);font-family:DM Mono,monospace;font-size:10px'>100%</span></td></tr></table></div>
+
+<div class="card"><h2>20 Local Free Libs · 功能註冊表</h2>
+<div class="intro">全本機、免費、不外傳;每 lib 綁定系統接入點。</div>
+<table><tr><th class='l'>#</th><th class='l'>Lib</th><th class='l'>功能</th><th class='l'>接入點</th></tr><tr><td class='l'>1</td><td class='l'><span class='mono'>numpy</span></td><td class='l'>向量運算/DGP/tanh 引擎</td><td class='l'>E1-E3 全部</td></tr><tr><td class='l'>2</td><td class='l'><span class='mono'>scipy</span></td><td class='l'>Spearman IC/穩健統計/t 檢定</td><td class='l'>IC·gates</td></tr><tr><td class='l'>3</td><td class='l'><span class='mono'>pandas</span></td><td class='l'>面板資料/對帳表</td><td class='l'>真值接入層</td></tr><tr><td class='l'>4</td><td class='l'><span class='mono'>polars</span></td><td class='l'>高速面板(大宇宙)</td><td class='l'>擴充至全球宇宙</td></tr><tr><td class='l'>5</td><td class='l'><span class='mono'>duckdb</span></td><td class='l'>ASOF JOIN/T-1 紀律</td><td class='l'>真值對齊</td></tr><tr><td class='l'>6</td><td class='l'><span class='mono'>pyarrow</span></td><td class='l'>Parquet 增量存量</td><td class='l'>日更管線</td></tr><tr><td class='l'>7</td><td class='l'><span class='mono'>statsmodels</span></td><td class='l'>Granger/lead-lag</td><td class='l'>目的地矩陣</td></tr><tr><td class='l'>8</td><td class='l'><span class='mono'>scikit-learn</span></td><td class='l'>fusion 權重/校準</td><td class='l'>E3 加權</td></tr><tr><td class='l'>9</td><td class='l'><span class='mono'>networkx</span></td><td class='l'>流向網路/守恆約束</td><td class='l'>目的地推斷</td></tr><tr><td class='l'>10</td><td class='l'><span class='mono'>requests</span></td><td class='l'>官方源抓取</td><td class='l'>TWSE/EIA/COT</td></tr><tr><td class='l'>11</td><td class='l'><span class='mono'>beautifulsoup4</span></td><td class='l'>HTML 解析</td><td class='l'>公會/公告</td></tr><tr><td class='l'>12</td><td class='l'><span class='mono'>lxml</span></td><td class='l'>XML/HTML 快解析</td><td class='l'>MOPS/申報</td></tr><tr><td class='l'>13</td><td class='l'><span class='mono'>yfinance</span></td><td class='l'>ETF 價格/股數 fallback</td><td class='l'>創贖流</td></tr><tr><td class='l'>14</td><td class='l'><span class='mono'>pandas_datareader</span></td><td class='l'>FRED 介接</td><td class='l'>宏觀因子</td></tr><tr><td class='l'>15</td><td class='l'><span class='mono'>plotly</span></td><td class='l'>離線互動圖</td><td class='l'>報告層</td></tr><tr><td class='l'>16</td><td class='l'><span class='mono'>jsonschema</span></td><td class='l'>SSOT 驗證</td><td class='l'>registry QA</td></tr><tr><td class='l'>17</td><td class='l'><span class='mono'>deepdiff</span></td><td class='l'>SSOT drift 比對</td><td class='l'>只增不減稽核</td></tr><tr><td class='l'>18</td><td class='l'><span class='mono'>tenacity</span></td><td class='l'>抓取重試</td><td class='l'>管線韌性</td></tr><tr><td class='l'>19</td><td class='l'><span class='mono'>rich</span></td><td class='l'>終端矩陣/進度</td><td class='l'>運行監看</td></tr><tr><td class='l'>20</td><td class='l'><span class='mono'>jinja2</span></td><td class='l'>HTML 範本</td><td class='l'>matrix 報告</td></tr></table></div>
+
+<div class="foot">
+誠實邊界:本報告驗證的是「估計子+規則+閘」的邏輯正確性(受控 DGP,真流已知故可測金額收斂);實盤準確度天花板由真值源決定,接入後以同一 harness 重測。
+findings:①同號過濾在同質方法間僅微增,其價值在異質源(見 E3);②金額 corr 對覆蓋率過期不敏感(尺度誤差),MAPE 才是正確度量。<br>
+append-only · 非投資建議 · VIA FIS Validation v3 · 產生 2026-07-06 07:55
+</div></div></body></html>
