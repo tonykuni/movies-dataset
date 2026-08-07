@@ -36,6 +36,7 @@ pwsh -File "VeritasIntelligenceAnalytics\Install-VIA.ps1"     # 加 -AutoStart �
 | `via-fis` | FIS 驗證 harness v3:E1/E2/E3 實驗+Matrix 報告(需 `py -m pip install scipy`) |
 | `via-pipe` | 統一輪動引擎(回測+自演化+證偽;**待同伴檔 rotation_engine.py 補齊**) |
 | `via-envfix` | EnvManager 決策式無衝突安裝:五依賴 plan-install 留痕 → NumPy 黃金律 constraints → py 基底聯合安裝 → pip check 後驗 |
+| `via-bridge` | **Command Bridge**:一鍵前後端對接——後端 B1-B5 探測(接線/SSOT/依賴/資料庫/UI)+ test/debug 三輪 + 多 TAB 前端,首頁=總覽+全系統狀態矩陣(每跑必重生=當下真相) |
 
 ## 系統架構
 
@@ -109,4 +110,4 @@ supportive modules/
 | 範疇已凍結項目 | 見 `audit_tools/VIA_ScopeFreeze_Closure_v0100.json`;重開需操作員點名 |
 
 ---
-*營運手冊 2026-08-06 · 對應 Tower v005 / Mega v0106 / VMT v0102 / VDF 工作台 v0160C / UI Hub v0104 Porcelain / TickerRegex v0100 / VRN v1.1.0 / 判定表 v002*
+*營運手冊 2026-08-06 · 對應 Tower v005 / Mega v0106 / VMT v0102 / VDF 工作台 v0160C / UI Hub v0105 Porcelain / TickerRegex v0100 / VRN v1.1.0 / 判定表 v002*

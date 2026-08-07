@@ -1,0 +1,29 @@
+{
+  "record": "VIA_CommandBridge_Activation_Record",
+  "version": "v0100",
+  "date": "2026-08-07",
+  "operator_directive": "one powershell to connect sync front end & backend, test debug user-test debug activate, multiple tab & page layout, detailed summary and status matrix in the first page till they work",
+  "architecture": {
+    "backend": "via_bridge_engine_v0100.py — B1 指令接線(23 cmd 逐一解析目標+存在+SHA12)/ B2 SSOT 九檔對照 / B3 依賴六件(duckdb·rich·scipy·numpy·pandas·certifi)/ B4 資料庫證據(生產庫列數·parquet store·mega 歷史·VMT 資料層)/ B5 UI 盤點",
+    "frontend": "VIA_Reports/VIA_CommandBridge.html — Porcelain 5 TAB;首頁=摘要卡六枚+全系統狀態矩陣(指令×接線×版本×SHA×狀態);table fixed+wrap",
+    "sync_model": "靜態資料綁定:每次 via-bridge 重新探測+重生頁面 => 前端永遠等於後端當下真相;無伺服器、無阻塞",
+    "launcher": "Invoke-VIA-Bridge-v0100.ps1 — sync(容錯)-> 後端 -> TEST(JSON 可解析+頁面存在+TAB 元件>=5)-> 未過即 DEBUG(py 版本+py_compile 診斷)重試上限 3 輪 -> ACTIVATE 非阻塞開 UI -> OK/FAIL 總表"
+  },
+  "container_verification": {
+    "engine_run": "GREEN · 接線 23/23 · SSOT 9/9 · 依賴 6/6 · UI 頁 257",
+    "frontend_check": "5 TAB / 5 pane / show() 綁定 5 處",
+    "py_compile": "PASS"
+  },
+  "ui_hub": "v0104 -> v0105:第 13 卡 COMMAND BRIDGE(印章 橋,朱紅 accent);v0104 原地保留",
+  "hashes": {
+    "via_bridge_engine_v0100.py": "a428d05de751b53457f6f4cd52d24a53bab67464f41166bfd09ac261215914ad",
+    "Invoke-VIA-Bridge-v0100.ps1": "32f971b17c5e1f729c6c36dadc880dd5e2966838236b41c250639e4f06059839",
+    "VIA_UI_Hub_v0105.html": "3aa7b73bb0f9e13c20670642e58bc1bb299705cffb93bb624137bb70fd99fb0e"
+  },
+  "governance": [
+    "唯讀探測",
+    "run-local 產出不入庫",
+    "正本不就地修改(Hub 版本前送)",
+    "append-only"
+  ]
+}
