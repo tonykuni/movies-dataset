@@ -1,0 +1,26 @@
+{
+  "record": "VIA_EnvFix_v0102_RepairBase_Record",
+  "version": "v0100",
+  "date": "2026-08-07",
+  "operator_directive": "沒安裝成功的 libs 記得補安裝",
+  "milestones_confirmed": {
+    "via_one": "10/10 全 OK(FIS 49s LOGIC PROVEN)",
+    "via_bridge": "4/4 GREEN·接線 24/24·SSOT 9/9·依賴 6/6·UI 258 頁",
+    "conclusion": "VIA 自身依賴零缺件;待補者為 base 存量破損(ML 生態舊帳)"
+  },
+  "v0102_feature": {
+    "-RepairBase": "解析 pip check『which is not installed』→ 去重 → 排除重型(torch/torchvision/onnxruntime/paddlepaddle/opencv/pyppeteer/enum34/spacy-pkuseg)→ --only-binary=:all: 只裝 wheel 絕不編譯(v0100 numpy 源碼編譯 clang 失敗之鑑)→ 整批失敗則逐件重試誠實列失敗名單 → 前後差分",
+    "-IncludeHeavy": "明示才裝 torch 家族(數 GB)",
+    "version_conflicts_policy": "gradio/streamlit 要 pandas<3 等互斥屬其生態內鬥,不動 pandas 3 正本"
+  },
+  "hashes": {
+    "v0101(retained)": "e3dd2b0f487292c3d77742880f00e7b94e3d008bb9cb3a5cca1231f4438ebb39",
+    "v0102(new ACTIVE)": "d8b278b59108e0addcfd4b7e0294e32403adb5be46182abe5af93e82eb60834a"
+  },
+  "governance": [
+    "正本不就地修改",
+    "wheel 限定防編譯炸彈",
+    "誠實差分",
+    "append-only"
+  ]
+}
