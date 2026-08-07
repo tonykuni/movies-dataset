@@ -1,0 +1,18 @@
+{
+ "record_id": "VIA_Mega_v0108_NestedRepoContainment_Record_v0100",
+ "ts": "2026-08-07T23:53:34",
+ "symptom": "操作員機 via-mega v0107 YELLOW:hydra 12 + STORAGE JSON fail 1(掃描 1446 檔 vs 容器 1281)",
+ "root_cause": "storage session 遺留之巢狀 clone VeritasStorageOptimizer/movies-dataset/(未追蹤)內含舊版同名檔 — 擴域後被當平台正本掃描,同名異雜湊誤判九頭龍;通則缺口=任何自帶 .git 之子目錄(外來 clone)都不應入全景",
+ "fix": "v0108 sweep 目錄修剪加圍堵:子目錄含 .git 即整棵跳過",
+ "verification": {
+  "repro": "容器造假巢狀 clone(.git+舊變體 py+壞 json)→ v0107 YELLOW hydra 1(重現症狀)",
+  "contained": "同況跑 v0108 → GREEN · hydra 0 · AST 0 · SSOT 9/9(py3.13 操作員輪廓)",
+  "fixture_removed": true
+ },
+ "operator_note": "v0108 下即使巢狀 clone 未刪也會 GREEN;仍建議刪除該目錄(內容皆可自 git 歷史復原):先 dir 檢視,後 Remove-Item -Recurse -Force",
+ "wiring": {
+  "bin/via-mega.cmd": "→ via_mega_engine_v0108.py(rollback rem 保留 v0107)",
+  "README": "via-mega 列更新"
+ },
+ "append_only": true
+}
