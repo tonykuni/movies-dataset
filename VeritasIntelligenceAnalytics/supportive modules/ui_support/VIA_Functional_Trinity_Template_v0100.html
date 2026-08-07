@@ -1,0 +1,151 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA 功能三系整合模板 v0100 — VDF · VRN · VAP(Porcelain)</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Noto+Serif+TC:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/* ============ Porcelain tokens(DesignLock SSOT v0101;不得自創色)============ */
+:root{--bg:#f0efeb;--paper:#fbfaf7;--paper2:#fdfbf6;--ink:#1b1a17;--mut:#6b6860;--mut2:#9aa5a1;--hair:#dcdad3;
+--seal:#9e2b25;--teal:#3d8f8f;--navy:#24457f;--tealgr:#3c6660;--gold:#8a7340;--slate:#3f4f78;--olive:#5e5540;--moss:#4a6b45;
+--ok:#3d7a52;--partial:#8a6420;--fail:#a4472f;--info:#3c6660;
+--up:#c96b5a;--down:#5a9e6f; /* 漲跌色=功能語意,鎖定不改 */
+--serif:'Cormorant Garamond',Georgia,serif;--cjk:'Noto Serif TC','Noto Serif CJK TC','Songti TC','PMingLiU',serif;
+--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace;--sans:'Microsoft JhengHei','Segoe UI',system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);padding:26px;max-width:1160px;margin:0 auto}
+.eyebrow{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.chip{padding:2px 7px;background:var(--ink);color:#fbfaf7;font:700 9px var(--mono);letter-spacing:.14em}
+.ey{font:700 8.5px var(--mono);letter-spacing:.13em;color:var(--mut);text-transform:uppercase}
+header{display:flex;align-items:center;border-bottom:3px solid var(--seal);padding-bottom:14px}
+.hseal{width:44px;height:44px;background:var(--seal);color:#fbfaf7;display:flex;align-items:center;justify-content:center;font-family:var(--cjk);font-size:24px;border-radius:5px;margin-right:14px}
+h1{font:500 20px/1.2 var(--serif);letter-spacing:.055em}
+.wmcjk{font:600 9.5px var(--cjk);letter-spacing:.22em;color:var(--teal);margin-top:2px}
+.sub{font:10.5px var(--mono);color:var(--mut);margin-top:4px}
+.strip{height:4px;background:linear-gradient(90deg,#24457f 0 16.6%,#3c6660 0 33.3%,#4a6b45 0 50%,#8a7340 0 66.6%,#5e5540 0 83.3%,#3f4f78 0 100%);margin:13px 0 0;border-radius:2px}
+.tabs{display:flex;gap:6px;margin:14px 0 0;flex-wrap:wrap;border-bottom:1px solid var(--hair)}
+.tab{padding:8px 18px;border-radius:6px 6px 0 0;font:700 12px var(--mono);cursor:pointer;color:var(--mut);border:1px solid transparent;display:flex;gap:8px;align-items:center}
+.tab .ts{width:18px;height:18px;background:var(--seal);color:#fbfaf7;display:inline-flex;align-items:center;justify-content:center;font-family:var(--cjk);font-size:11px;border-radius:3px}
+.tab.on{background:var(--paper);border:1px solid var(--hair);border-bottom-color:var(--paper);color:var(--seal)}
+.pane{display:none;padding-top:16px}.pane.on{display:block}
+h2{font:700 11px var(--mono);letter-spacing:2px;color:var(--mut);margin:20px 0 9px;text-transform:uppercase}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.card{background:var(--paper2);border:1px solid var(--hair);border-left:4px solid var(--acc,var(--navy));border-radius:8px;padding:16px}
+.crow{display:flex;gap:12px;align-items:flex-start}
+.cseal{flex:none;width:40px;height:40px;background:var(--seal);color:#fbfaf7;display:flex;align-items:center;justify-content:center;font-family:var(--cjk);font-size:20px;border-radius:5px}
+.cwm{font:600 15px var(--serif);letter-spacing:.05em}.csub{font-size:11.5px;color:var(--mut);margin-top:1px}
+.cmeta{font:500 9.5px var(--mono);color:var(--mut2);margin-top:8px;line-height:1.8}
+.cmd{display:inline-block;margin-top:8px;font:700 10.5px var(--mono);background:var(--ink);color:#fbfaf7;border-radius:4px;padding:4px 10px;margin-right:6px}
+.flow{display:flex;align-items:center;gap:0;flex-wrap:wrap;background:var(--paper);border:1px solid var(--hair);border-radius:8px;padding:18px 16px;margin-top:6px}
+.fnode{text-align:center;min-width:150px;flex:1}
+.fseal{width:34px;height:34px;background:var(--seal);color:#fbfaf7;display:inline-flex;align-items:center;justify-content:center;font-family:var(--cjk);font-size:17px;border-radius:4px}
+.fname{font:600 12px var(--serif);margin-top:5px}.fdesc{font-size:10px;color:var(--mut);margin-top:2px}
+.farrow{font:700 16px var(--mono);color:var(--tealgr);padding:0 6px}
+table{width:100%;border-collapse:collapse;background:var(--paper);border:1px solid var(--hair);table-layout:fixed}
+th{font:700 10px var(--mono);text-align:left;padding:8px 10px;border-bottom:1px solid var(--hair);color:var(--mut)}
+td{font-size:11.5px;padding:7px 10px;border-bottom:1px solid var(--hair);word-wrap:break-word;overflow-wrap:anywhere}
+tr:last-child td{border-bottom:none}.mono{font-family:var(--mono);font-size:10.5px}
+.pill{color:#fbfaf7;font:500 10px var(--mono);padding:2px 7px;border-radius:2px}
+.slot{background:#f4f1e8;border:1px dashed var(--gold);color:var(--gold);font:600 10px var(--mono);padding:1px 6px;border-radius:3px}
+.note{background:var(--paper2);border-left:4px solid var(--teal);padding:10px 14px;font-size:12px;border-radius:3px;margin:10px 0}
+footer{margin-top:26px;font:10px var(--mono);color:var(--mut2)}
+</style></head><body>
+<div class="eyebrow"><span class="chip">TEMPLATE v0100</span><span class="ey">Veritas Intelligence Analytics · Functional Trinity · Porcelain</span></div>
+<header><div class="hseal">理</div><div><h1>VIA 功能三系整合模板 — VDF · VRN · VAP</h1>
+<div class="wmcjk">維里塔斯 · 鍛研鑑 · 一體三面</div>
+<div class="sub">{{GENERATED_AT}} · 資料綁定模板(虛線槽=佔位,依 DATA_BOUND 慣例注入)· 設計鎖 DesignLock SSOT v0101</div></div></header>
+<div class="strip"></div>
+
+<div class="tabs">
+<span class="tab on" onclick="show(0)"><span class="ts">理</span>總覽 · 三系流水線</span>
+<span class="tab" onclick="show(1)"><span class="ts">鍛</span>VDF 資料鍛造</span>
+<span class="tab" onclick="show(2)"><span class="ts">研</span>VRN 研報擷取</span>
+<span class="tab" onclick="show(3)"><span class="ts">鑑</span>VAP 自動繪圖</span>
+</div>
+
+<!-- ============ TAB 0 總覽 ============ -->
+<div class="pane on" id="p0">
+<h2>三系資料流水線</h2>
+<div class="flow">
+<div class="fnode"><span class="fseal">鍛</span><div class="fname">VDF DATA FORGE</div><div class="fdesc">市場資料進料 · GREEN gate · 77 資料源矩陣</div></div>
+<span class="farrow">─▶</span>
+<div class="fnode"><span class="fseal">研</span><div class="fname">VRN RESEARCH</div><div class="fdesc">研報內容擷取 v0101 · 141 欄位域 · append-only 生產庫</div></div>
+<span class="farrow">─▶</span>
+<div class="fnode"><span class="fseal">鑑</span><div class="fname">VAP AUTOPLOT</div><div class="fdesc">28 型圖庫 · Header 鎖 1d · Workbench v010</div></div>
+</div>
+<h2>三系一覽</h2>
+<div class="cards">
+<div class="card" style="--acc:#4a6b45"><div class="crow"><div class="cseal">鍛</div><div>
+<div class="cwm">VDF — 資料鍛造</div><div class="csub">functional modules/VDF</div></div></div>
+<div class="cmeta">進料引擎(GREEN gate)· MDL001-007 擷取引擎 · 六槽標準<br>登錄:Schema/Full 238 項 · 覆蓋率 · 資料源矩陣 77 項</div>
+<span class="cmd">via-vdf</span><span class="cmd">via</span>
+<div class="cmeta">現況槽:<span class="slot">{{VDF_STATUS}}</span> <span class="slot">{{VDF_LAST_RUN}}</span></div></div>
+<div class="card" style="--acc:#24457f"><div class="crow"><div class="cseal">研</div><div>
+<div class="cwm">VRN — 研報擷取</div><div class="csub">functional modules/VRN</div></div></div>
+<div class="cmeta">生產線 v1.1.0(MDL001-008 hash 9/9)· 內容級擷取 v0101 ACTIVE<br>TickerRegex SSOT · 券商 20 家 · InvestmentRegexPattern 525</div>
+<span class="cmd">via-batch</span><span class="cmd">via-probe</span><span class="cmd">via-extract</span>
+<div class="cmeta">現況槽:<span class="slot">{{VRN_STORE_ROWS}}</span> 列生產庫 · <span class="slot">{{VRN_LAST_COMMIT}}</span></div></div>
+<div class="card" style="--acc:#8a7340"><div class="crow"><div class="cseal">鑑</div><div>
+<div class="cwm">VAP — 自動繪圖</div><div class="csub">functional modules/VAP</div></div></div>
+<div class="cmeta">engine v001 + chartlib_v002 · 28 型 VAP-CH-01…28<br>視覺鎖三層:vap_spec v1.0.0 · Header 1d LOCKED · 判定表 v002</div>
+<span class="cmd">via-all</span>
+<div class="cmeta">現況槽:<span class="slot">{{VAP_CHARTS_BUILT}}</span> 圖 · <span class="slot">{{VAP_LAST_RUN}}</span></div></div>
+</div>
+<h2>三系健康矩陣(綁定槽)</h2>
+<table><tr><th style="width:80px">子系統</th><th style="width:70px">燈號</th><th>最近一輪</th><th>SSOT 錨</th><th style="width:110px">產出物</th></tr>
+<tr><td>鍛 VDF</td><td><span class="pill" style="background:var(--ok)">{{VDF_LIGHT}}</span></td><td class="mono">{{VDF_ROUND_DETAIL}}</td><td class="mono">vdf registry 238 項</td><td class="mono">{{VDF_OUTPUTS}}</td></tr>
+<tr><td>研 VRN</td><td><span class="pill" style="background:var(--ok)">{{VRN_LIGHT}}</span></td><td class="mono">{{VRN_ROUND_DETAIL}}</td><td class="mono">TickerRegex v0100 · 契約 v0100</td><td class="mono">{{VRN_OUTPUTS}}</td></tr>
+<tr><td>鑑 VAP</td><td><span class="pill" style="background:var(--ok)">{{VAP_LIGHT}}</span></td><td class="mono">{{VAP_ROUND_DETAIL}}</td><td class="mono">vap_spec v1.0.0 · chartlib v1.0.1</td><td class="mono">{{VAP_OUTPUTS}}</td></tr></table>
+<div class="note">模板用法:<b>複製本檔 → 以 token 替換(非 %-format,防 CSS 百分號衝突)注入 {{…}} 槽 → 存為 run-local 報告</b>。漲跌色 --up/--down 為功能語意鎖定;其餘一律引用 :root Porcelain tokens。</div>
+</div>
+
+<!-- ============ TAB 1 VDF ============ -->
+<div class="pane" id="p1">
+<h2>鍛 · VDF 資料鍛造 — 模組矩陣</h2>
+<table><tr><th style="width:110px">模組</th><th>職能</th><th style="width:90px">狀態槽</th></tr>
+<tr><td class="mono">MDL001</td><td>Converter 進料轉換</td><td><span class="slot">{{VDF_MDL001}}</span></td></tr>
+<tr><td class="mono">MDL002</td><td>YFinance 抓取引擎</td><td><span class="slot">{{VDF_MDL002}}</span></td></tr>
+<tr><td class="mono">MDL003</td><td>Sentiment/宏觀引擎</td><td><span class="slot">{{VDF_MDL003}}</span></td></tr>
+<tr><td class="mono">MDL004</td><td>台股全市場引擎</td><td><span class="slot">{{VDF_MDL004}}</span></td></tr>
+<tr><td class="mono">MDL006</td><td>財務模型</td><td><span class="slot">{{VDF_MDL006}}</span></td></tr>
+<tr><td class="mono">MDL007</td><td>SSOT Resolver</td><td><span class="slot">{{VDF_MDL007}}</span></td></tr>
+<tr><td class="mono">MDL10x/40x</td><td>Registry 載入/Schema/覆蓋率</td><td><span class="slot">{{VDF_REGISTRY}}</span></td></tr></table>
+<h2>入口</h2>
+<div><span class="cmd">via-vdf</span> 側欄工作台 v0160C(HTTP 橋 :8766)<span class="cmd">via</span> 日常進料+繪圖</div>
+</div>
+
+<!-- ============ TAB 2 VRN ============ -->
+<div class="pane" id="p2">
+<h2>研 · VRN 研報擷取 — 生產線</h2>
+<div class="flow">
+<div class="fnode"><div class="fname">incoming PDF</div><div class="fdesc"><span class="slot">{{VRN_INCOMING_N}}</span> 檔</div></div>
+<span class="farrow">─▶</span>
+<div class="fnode"><div class="fname">probe GO gate</div><div class="fdesc">唯讀可行性 <span class="slot">{{VRN_PROBE}}</span></div></div>
+<span class="farrow">─▶</span>
+<div class="fnode"><div class="fname">extract v0101</div><div class="fdesc">141 欄位域 · parse_meta(ticker/date/broker)</div></div>
+<span class="farrow">─▶</span>
+<div class="fnode"><div class="fname">FINANCIAL_DATA_STORE</div><div class="fdesc">append-only+record_hash · <span class="slot">{{VRN_STORE_ROWS}}</span> 列</div></div>
+</div>
+<h2>入口與契約</h2>
+<div><span class="cmd">via-batch</span><span class="cmd">via-probe</span><span class="cmd">via-extract --commit</span></div>
+<div class="cmeta" style="margin-top:8px">SSOT 鏈:TickerRegex v0100(四碼首碼非零/年份不入 regex)· 券商清單 v01 · REPORT 契約 v0100(parquet 正本+DuckDB 鏡像)</div>
+</div>
+
+<!-- ============ TAB 3 VAP ============ -->
+<div class="pane" id="p3">
+<h2>鑑 · VAP 自動繪圖 — 視覺鎖三層</h2>
+<table><tr><th style="width:160px">層</th><th>錨</th><th style="width:110px">狀態</th></tr>
+<tr><td>繪圖規範</td><td class="mono">vap_spec.json v1.0.0(線粗/透明度/via 色票)</td><td><span class="pill" style="background:var(--ok)">LOCKED</span></td></tr>
+<tr><td>Header 幾何</td><td class="mono">Veritas_Header_Masthead_1d.html(不得覆寫)</td><td><span class="pill" style="background:var(--ok)">LOCKED</span></td></tr>
+<tr><td>判定表</td><td class="mono">VAP_VisualLock_Adjudication_Table v002(分項閘)</td><td><span class="pill" style="background:var(--ok)">ACTIVE</span></td></tr></table>
+<h2>圖庫與工作台</h2>
+<div class="cmeta">chartlib v1.0.1:VAP-CH-01…28(28 型)· Workbench v010 HEADER_LOCKED_1d(響應式+拖曳)</div>
+<div style="margin-top:8px"><span class="cmd">via-all</span> 內含 VAP 工作台</div>
+<h2>產出槽</h2>
+<table><tr><th style="width:200px">圖組</th><th>綁定槽</th></tr>
+<tr><td class="mono">日常繪圖輪</td><td><span class="slot">{{VAP_DAILY_CHARTS}}</span></td></tr>
+<tr><td class="mono">Warehouse 系列</td><td><span class="slot">{{VAP_WAREHOUSE}}</span></td></tr></table>
+</div>
+
+<footer>VIA_Functional_Trinity_Template v0100 · Porcelain(DesignLock SSOT v0101)| 印章:理(母)鍛研鑑(三系;研=VRN 新提案印)| 槽位 {{…}} 以 token 替換注入 · 漲跌色功能語意鎖定 | 歸檔:ui_support</footer>
+<script>function show(i){document.querySelectorAll('.tab').forEach(function(t,j){t.classList.toggle('on',j===i)});
+document.querySelectorAll('.pane').forEach(function(p,j){p.classList.toggle('on',j===i)});}</script>
+</body></html>
