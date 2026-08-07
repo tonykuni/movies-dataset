@@ -1,0 +1,35 @@
+{
+ "record_id": "VIA_ForgeFamily_StageK_Integration_Record_v0100",
+ "ts": "2026-08-07T23:08:09",
+ "directive": "go on. 自動調整最佳化 功能參數 test debug optimize…till all work perfectly(VIA_Forge 28 檔)",
+ "source": "Downloads\\VIA_Forge (4)\\VIA_Forge → _import_staging_20260807K_forge(9ed43f4)",
+ "整合去重": {
+  "double_copy": "staging 內含兩套完全相同集合(Copy-Item 跑兩次)— 34 檔 SHA 全等,取一套歸家",
+  "homing": "supportive modules/VIA_Forge/(34 檔含 ui/docs/runtime)",
+  "ui_index_adjudication": "ui/index.html sha f3998e6a = 先前上傳之 b6a787d2-index.html — 證實該『WorkOps Workbench』實為 Forge UI;移除 WorkOps 誤植副本 VIA_WorkOps_Intelligence_Workbench_v0100.html,WorkOps 改用其原生 Veritas_MailOps_Standalone.html",
+  "via_manager_same_name": "supportive modules/via_manager.py(b0f3f6c5)≠ Forge via_manager.py(2b48c3fb)— 異雜湊異域,各自保留(Forge 家族自含)",
+  "checkmatrix_upload": "先前歸檔之 ui_support 驗收證據保留;家族自帶 VIA_CheckMatrix.html 為自更新報告"
+ },
+ "prompt_injection_audit": {
+  "file": "Invoke-VIA-SupportiveCore-PromptInjection.ps1(800 行逐行審閱)",
+  "verdict": "BENIGN — 名稱指『將 Prompt 注入治理管線』之合規匯入器,非攻擊工具",
+  "evidence": "static-only(ast.parse/py_compile/PS Parser,絕不執行目標)· 5 個突變開關全預設 OFF · 零網路 · run-local 證據帳本 append-only hash chain · 無 Read-Host 無 exit",
+  "caveats": "寫死舊 Downloads 路徑 C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics 與 C:\\Python313 — LEGACY 血統,保留原樣不接線不改寫"
+ },
+ "qa": {
+  "py_compile": "20/20 OK",
+  "checkmatrix_container": "初跑 41/45 → 根因單一串聯:sink parquet 缺 pyarrow → dataforge/insight/manager 連動 RED;補 openpyxl+pyarrow 後 45/45 GREEN,完整重現操作員驗收",
+  "server_binding": "via_server 127.0.0.1-only 確認",
+  "hub_v0105_container_run": "17 磚 · FORGE 磚在列 · WorkOps URL 更正 · f2f1ec=1",
+  "operator_note": "操作員機若缺 pyarrow/openpyxl,via-envfix -RepairBase 可補"
+ },
+ "wiring": {
+  "bin/via-forge.cmd": "NEW — 無參數開 Forge UI;check 跑 45 項驗收;server 啟 Start-VIA(127.0.0.1)",
+  "bin/via-workops.cmd": "更正 → Veritas_MailOps_Standalone.html",
+  "bin/via-ui.cmd": "→ via_hub_engine_v0105.py",
+  "bin/via-one.cmd": "→ Invoke-VIA-One-v0110.ps1(十四階段,+FORGE)",
+  "registry": "ENG-017 = VIA_Forge_family_v001",
+  "caveat": "via-forge check 會自更新 VIA_Forge/VIA_CheckMatrix.html(家族自身設計)— 屬可提交之產品工件"
+ },
+ "append_only": true
+}
