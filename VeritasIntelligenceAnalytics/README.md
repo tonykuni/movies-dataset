@@ -17,7 +17,7 @@ pwsh -File "VeritasIntelligenceAnalytics\Install-VIA.ps1"     # 加 -AutoStart �
 | 指令 | 作用 |
 |---|---|
 | `via` | 同步 + VDF 進料 + VAP 繪圖 + 自動開 UI(日常預設) |
-| `via-one` | **全系統總啟動器 v0103**:十階段全跑 或 `via-one -Only <flow\|mega\|cge\|…>` 選子系統並開其 U/I(Hub 動態最新版;不卡斷) |
+| `via-one` | **全系統總啟動器 v0104**:十階段全跑(Mega/VMT/Hub 動態最新版) 或 `via-one -Only <flow\|mega\|cge\|…>` 選子系統並開其 U/I(Hub 動態最新版;不卡斷) |
 | `via-all` | 互動全套:VDF + VAP + VRN 預檢 + Control Tower(不含長跑稽核,不卡斷) |
 | `via-audit` | 長跑稽核三件套:TurboOptimizer SafeAudit + Panorama + Polyglot(預期數分鐘以上) |
 | `via-tower` | 治理總控台 `http://127.0.0.1:8765`(桌面捷徑同此) |
@@ -25,7 +25,7 @@ pwsh -File "VeritasIntelligenceAnalytics\Install-VIA.ps1"     # 加 -AutoStart �
 | `via-sync` | repo 同步(fetch + merge claude 分支 + push main) |
 | `via-batch` | **VRN 批次**:incoming 全部 PDF 過 No-OCR 生產線(並行池、可續跑;`-Fresh` 全部重跑) |
 | `via-import` | manifest 匯入:Downloads 批次去重入庫(清單由 Claude 寫進 `import_manifests/`) |
-| `via-vmt` | VMT SuperBOM 總指揮(v0102 設計鎖刊頭;問卷→附件→收斂→CPM,缺件優雅略過) |
+| `via-vmt` | VMT SuperBOM 總指揮 v0103(Porcelain 刊頭;問卷→附件→收斂→CPM,缺件優雅略過) |
 | `via-vmt-init` | VMT 資料層 bootstrap:OneShot 對準 VMT 根建 DB/SSOT 種子 + 跑郵件器 + Command Center |
 | `via-mega` | 公定處理模式 v0106:三輪全景 x 20 加速器 x Porcelain Matrix;參數置頂可增減(`--set k=v`)、附掛掃描根、parquet 增量 store(DuckDB)、rich 摘要矩陣;hydra 僅平台域;掃描警告靜音 |
 | `via-code` | 自動識別編號器:`via-code <類別> <元件> [suffix]`(冪等給號;`--list`;`--register`) |
@@ -111,4 +111,4 @@ supportive modules/
 | 範疇已凍結項目 | 見 `audit_tools/VIA_ScopeFreeze_Closure_v0100.json`;重開需操作員點名 |
 
 ---
-*營運手冊 2026-08-06 · 對應 Tower v005 / Mega v0106 / VMT v0102 / VDF 工作台 v0160C / UI Hub v0106 Porcelain / TickerRegex v0100 / VRN v1.1.0 / 判定表 v002*
+*營運手冊 2026-08-06 · 對應 Tower v005 / Mega v0106 / VMT v0103 / VDF 工作台 v0160C / UI Hub v0107 Porcelain / TickerRegex v0100 / VRN v1.1.0 / 判定表 v002*
