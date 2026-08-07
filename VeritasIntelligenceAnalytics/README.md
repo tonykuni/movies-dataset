@@ -77,7 +77,7 @@ supportive modules/
 | Header 鎖 | `functional modules/VAP/spec/Veritas_Header_Masthead_1d.html` | 1d LOCKED(幾何/色票/字體不得覆寫) |
 | VRN 資料契約 | `functional modules/VRN/registry/VRN_REPORT_*_SSOT_v0100.json` | v0100(parquet 正本 + DuckDB 鏡像) |
 | VRN 生產線 | `functional modules/VRN/registry/VRN_Production_Manifest.json` | v1.1.0(核心模組 SHA256 錨定) |
-| 設計鎖 tokens | `supportive modules/ssot/VIA_DesignLock_SSOT_v0101.json` | v0101 ACTIVE(顏色鎖定源=Veritas Header copy.dc.html:Porcelain BRAND·6+朱紅印記+狀態六階;v0100 色票保留供既有介面;回退=改引 v0100) |
+| 設計鎖 tokens | `supportive modules/ssot/VIA_DesignLock_SSOT_v0102.json` | v0102 ACTIVE(視覺鎖源=VAP_Workbench_v009:暖紙底+墨印+六彩 accent;Porcelain v0101 降前代保留;回退=改引 v0101) |
 | 公定處理模式 | `supportive modules/ssot/VIA_MegaPrompt_OfficialMode_v0100.md` | v0100(三輪硬性上限、20 加速器、沙盒循環;執行載體 `via-mega`) |
 | AI 撰寫規範 | `supportive modules/ssot/VIA_AICodegen_Prompt_SSOT_v0103.md` | v0103(地板 one v0107/vmt v0103/Hub Live;**動態解析鐵律**嚴禁寫死版號;ENG/PKG 取號義務) |
 | 欄位 regex 庫 | `functional modules/VRN/InvestmentRegexPattern_VALIDATED.py` | v3.0 ACTIVE(525 patterns;PROMOTION_RECORD 錨定 SHA256) |
