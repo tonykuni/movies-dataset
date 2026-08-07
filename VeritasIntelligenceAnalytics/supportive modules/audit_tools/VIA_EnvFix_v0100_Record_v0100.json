@@ -1,0 +1,31 @@
+{
+  "record": "VIA_EnvFix_v0100_Record",
+  "version": "v0100",
+  "date": "2026-08-07",
+  "operator_directive": "請用系統中 env_manager 去生成無衝突安裝指令",
+  "canonical_envmanager": {
+    "file": "supportive modules/VIA_EnvManager.py",
+    "sha256": "11d331409dfc630bb147198ae12df3d49790d36c9593ce28e6dd6b855426819c",
+    "triplicate_note": "environment/ 與 40_Environment_Health/ 兩份副本與正本逐位元一致(11d331409dfc),非九頭龍"
+  },
+  "design": {
+    "step1": "plan-install 逐包決策(EnvManager 官方裁決 append-only 留痕;輸出 _via_envmanager_output 落 run-local VIA_Reports/envmgr_run)",
+    "step2": "NumPy 黃金律 constraints numpy>=1.24,<2.0(與 VIA_EnvManager_Deploy_VMT.ps1 同律,防 2.x 漂移撞 pm4py/既有引擎)",
+    "step3": "py 基底『一次性聯合安裝』五包 — pip 對全集求解依賴即無衝突;--upgrade-strategy only-if-needed 不動既有滿足版;受保護 venv(via_core/venv_core/via_ml/vgf_*/via_image)零接觸",
+    "step4": "gatekeeper 後驗:pip check(EnvManager gatekeeper 同款)+ import 五包 + NumPy<2.0 斷言",
+    "rationale": "安裝目標=py 基底,因 bin/*.cmd 全部以 py 啟動引擎;EnvManager 決策供稽核與環境路由參考"
+  },
+  "verification": {
+    "container_interface": "plan-install 輸出合法 JSON;無管理環境時誠實 BLOCKED(NO_HEALTHY_MANAGED_ENV_AVAILABLE)",
+    "ps_ast": "操作員機首跑前可 ParseFile 驗證(SSOT 第 7 節)"
+  },
+  "hashes": {
+    "Invoke-VIA-EnvFix-v0100.ps1": "f3f0854084554e84c9feae602253219559927fa5fd7f3d42840e75900bd1de3d"
+  },
+  "governance": [
+    "只增不減(受保護 venv 名單原封)",
+    "run-local 留痕不入庫",
+    "缺件誠實 FAIL 續行",
+    "append-only"
+  ]
+}
