@@ -1,0 +1,23 @@
+{
+  "record": "VIA_Hub_DirectEnter_Record",
+  "version": "v0100",
+  "date": "2026-08-07",
+  "operator_directive": "Hub 個方塊一點進入子系統;VAP/VDF/VRN 用附件選定介面頁視覺鎖定",
+  "attachment_dedupe": "Veritas_Intelligence_Analytics_UI.html = 登錄正本 SAME(manifest 雜湊鎖 48264c85)",
+  "design_finding": "主頁為 bundler 打包多頁應用,內含三系導航(vdfNav/vdf_eod/vdf_quarterly_fin 等)— 即三系選定介面本體,以 manifest 視覺鎖定",
+  "hub_v0101": {
+    "direct_enter": "12/14 卡帶直達連結(↗ 標記),單擊即新分頁開啟:VAP/VDF/VRN→設計主頁;記→NotePro;理→Trinity;流→Console v0101;湧→FlowSystem UI(run-local);核→MegaMatrix;橋→CommandBridge;郵/治→VMT_ROOT file URI;Tower→:8765",
+    "cmd_only": "預 IF/驗 FIS(無靜態頁,顯示指令)",
+    "vmt_uri": "@VMT@ token 於生成時以 VMT_ROOT 解析為 file:/// URI"
+  },
+  "via_one_v0108": "HUB 階段改動態 pattern(遵 SSOT v0103 動態解析鐵律;v0107 曾寫死 hub v0100 檔名)",
+  "container_test": "12 直達卡 + 設計主頁 3 處連結生成正確;py_compile + ps_lint PASS",
+  "hashes": {
+    "via_hub_engine_v0101.py": "eea80508ab1aaae047b021f5697d11b765504c9de3b17b300352e8e08b9671a3"
+  },
+  "governance": [
+    "附件先去重(SAME 不入庫)",
+    "正本不就地修改",
+    "append-only"
+  ]
+}
