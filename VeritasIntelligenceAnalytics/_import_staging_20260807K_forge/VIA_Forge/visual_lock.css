@@ -1,0 +1,83 @@
+/* ============================================================================
+   VIA Visual Lock  ——  visual_lock.css   (單一真相 · 視覺鎖定範本)
+   來源：VIA_TW_ETF_Group_Console.html（Tony 上傳，2026-07）
+   所有 VIA HTML 輸出共用此鎖定樣式。只增不減：新增類別可加，鎖定 token 不改。
+   字體：@import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;600&family=DM+Mono&family=Noto+Sans+TC:wght@400;500&display=swap');
+   ============================================================================ */
+:root{
+  /* 表面 */
+  --bg:#f5f4f0;      /* 頁背景 */
+  --sf:#ffffff;      /* 紙面/卡片 */
+  --sf2:#faf9f6;     /* 次表面 */
+  --sf3:#faf9f4;     /* 淺表面 */
+  --sf4:#eceae2;     /* 深表面/hover */
+  --bd:#dbd9d3;      /* 髮絲線 */
+  /* 墨色 */
+  --ink:#1e1d1a;     /* 主墨 */
+  --sub:#6b6a66;     /* 副墨 */
+  --gr:#9c9890;      /* 灰(footer/次要) */
+  /* 強調（TW 慣例：紅=漲 綠=跌） */
+  --up:#c96b5a;      /* 漲/紅 */
+  --dn:#5a9e6f;      /* 跌/綠 */
+  --bl:#4c78a8;      /* 藍 */
+  --tl:#439a9a;      /* 青 */
+  --amber:#c4943a;   /* 琥珀 */
+  --gold:#c9b05a;    /* 金(共振條用) */
+  --seal:#b5291a;    /* 朱文方印紅 */
+  /* 圓角 */
+  --r-sharp:2px; --r-sm:3px; --r-md:4px; --r-seal:7px; --r-card:8px; --r-pill:9px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);
+  font-family:"DM Sans","Noto Sans TC",sans-serif;font-size:13px;line-height:1.6}
+.wrap{max-width:1060px;margin:0 auto;padding:26px}
+.mono{font-family:"DM Mono",monospace}
+h1,h2,h3,.display{font-family:"Syne",sans-serif;font-weight:800}
+h1{font-size:22px} h2{font-size:15px;font-weight:700} h3{font-size:13px;font-weight:700}
+
+/* 眉標 */
+.eyebrow{font-family:"DM Mono",monospace;font-size:11px;letter-spacing:2px;
+  text-transform:uppercase;color:var(--sub)}
+
+/* 朱文方印 */
+.seal{display:inline-flex;width:30px;height:30px;align-items:center;justify-content:center;
+  border-radius:var(--r-seal);background:var(--seal);color:#fff;font-weight:900;
+  margin-right:8px;vertical-align:middle}
+
+/* 共振漸層條 */
+.strip{height:6px;border-radius:var(--r-sharp);margin:12px 0;
+  background:linear-gradient(90deg,#4c78a8,#439a9a,#c9b05a,#c96b5a)}
+
+/* 卡片 */
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r-card);
+  padding:12px;margin:10px 0}
+
+/* 分頁 */
+.tabs{display:flex;gap:4px;flex-wrap:wrap;border-bottom:1px solid var(--bd);
+  padding-bottom:8px;margin-bottom:12px}
+.tab{cursor:pointer;border:1px solid var(--bd);border-radius:var(--r-sm);
+  padding:5px 13px;font-weight:600;user-select:none}
+.tab.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+/* 按鈕 */
+.btn{cursor:pointer;border:1px solid var(--ink);border-radius:var(--r-sm);
+  padding:5px 12px;font-weight:600;background:transparent;color:var(--ink)}
+.btn.teal{border-color:var(--tl);color:var(--tl)}
+.btn.up{border-color:var(--up);color:var(--up)}
+
+/* 圓標籤（狀態 pill） */
+.rl{border-radius:var(--r-pill);padding:1px 8px;font-size:9.5px;font-weight:700;color:#fff;
+  display:inline-block}
+.rl.up{background:var(--up)} .rl.dn{background:var(--dn)}
+.rl.bl{background:var(--bl)} .rl.tl{background:var(--tl)}
+.rl.amber{background:var(--amber)} .rl.seal{background:var(--seal)}
+
+/* 表格 */
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:6px 9px;text-align:left;border-bottom:1px solid var(--bd);vertical-align:top}
+th{font-family:"DM Mono",monospace;font-size:9.5px;text-transform:uppercase;
+  letter-spacing:1px;color:var(--sub)}
+
+/* 頁尾 */
+.foot{color:var(--gr);font-size:11px;border-top:1px solid var(--bd);
+  padding-top:10px;margin-top:12px;line-height:1.7}
