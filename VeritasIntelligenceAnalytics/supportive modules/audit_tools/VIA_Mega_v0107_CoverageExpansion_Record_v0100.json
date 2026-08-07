@@ -1,0 +1,22 @@
+{
+ "record_id": "VIA_Mega_v0107_CoverageExpansion_Record_v0100",
+ "ts": "2026-08-07T23:44:31",
+ "directive": "next and the following processes(覆蓋缺口掃描)",
+ "gap": "Mega 三輪全景 11 域不含新整合之 WorkOps/Forge/Storage;ssot_required 停在 DesignLock v0101",
+ "changes": {
+  "subsystems": "11→14 域:+WORKOPS(functional modules/WorkOps)、FORGE(supportive modules/VIA_Forge)、STORAGE(../VeritasStorageOptimizer)",
+  "ssot_required": "7→9 項:+DesignLock v0102、AICodegen SSOT v0103(舊項保留,只增不減)",
+  "skip_dirs": "+.venv(Forge Start-VIA 於家族目錄自建虛擬環境,絕不掃)、logs",
+  "hydra_conventional_whitelist": "README.md/README.txt/.gitignore/.gitkeep/__init__.py — 各產品域慣例檔名跨域同名不構成九頭龍(首跑即抓到 FORGE vs STORAGE 之 README.md 誤報,據此裁決)"
+ },
+ "verification": {
+  "container_py311": "14 域掃描 1281 檔 · hydra 0 · SSOT 9/9;AST fail 1 = 已知 py3.11 誤報(comprehensive_pdf_extractor (1) 歸檔變體 L411 f-string 反斜線,py3.12+ 合法)",
+  "container_py313": "GREEN 全綠:AST fail 0 · hydra 0 · SSOT 缺 0(與操作員 py 版本一致)"
+ },
+ "wiring": {
+  "bin/via-mega.cmd": "→ via_mega_engine_v0107.py(rollback rem 保留 v0106)",
+  "via-one": "動態 pattern 自動拾取 v0107,無需改",
+  "README": "via-one v0110/via-mega v0107 敘述更新;新增 via-workops/via-forge/via-storage 三列"
+ },
+ "append_only": true
+}

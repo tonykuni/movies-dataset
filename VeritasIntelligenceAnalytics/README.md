@@ -17,7 +17,7 @@ pwsh -File "VeritasIntelligenceAnalytics\Install-VIA.ps1"     # 加 -AutoStart �
 | 指令 | 作用 |
 |---|---|
 | `via` | 同步 + VDF 進料 + VAP 繪圖 + 自動開 UI(日常預設) |
-| `via-one` | **全系統總啟動器 v0107**:十二階段一支到底(DEPS 預檢+sync+Mega+VMT+CGE+VRN×2+FLOW+IF+FIS+**BRIDGE**+Hub,引擎全動態最新版)或 `-Only <鍵>` 選子系統看 U/I |
+| `via-one` | **全系統總啟動器 v0110**:十四階段一支到底(DEPS 預檢+sync+Mega+VMT+CGE+VRN×2+FLOW+IF+FIS+**WORKOPS+FORGE+BRIDGE**+Hub 活化,引擎全動態最新版)或 `-Only <鍵>` 選子系統看 U/I |
 | `via-all` | 互動全套:VDF + VAP + VRN 預檢 + Control Tower(不含長跑稽核,不卡斷) |
 | `via-audit` | 長跑稽核三件套:TurboOptimizer SafeAudit + Panorama + Polyglot(預期數分鐘以上) |
 | `via-tower` | 治理總控台 `http://127.0.0.1:8765`(桌面捷徑同此) |
@@ -27,7 +27,7 @@ pwsh -File "VeritasIntelligenceAnalytics\Install-VIA.ps1"     # 加 -AutoStart �
 | `via-import` | manifest 匯入:Downloads 批次去重入庫(清單由 Claude 寫進 `import_manifests/`) |
 | `via-vmt` | VMT SuperBOM 總指揮 v0103(Porcelain 刊頭;問卷→附件→收斂→CPM,缺件優雅略過) |
 | `via-vmt-init` | VMT 資料層 bootstrap:OneShot 對準 VMT 根建 DB/SSOT 種子 + 跑郵件器 + Command Center |
-| `via-mega` | 公定處理模式 v0106:三輪全景 x 20 加速器 x Porcelain Matrix;參數置頂可增減(`--set k=v`)、附掛掃描根、parquet 增量 store(DuckDB)、rich 摘要矩陣;hydra 僅平台域;掃描警告靜音 |
+| `via-mega` | 公定處理模式 v0107:三輪全景 **14 域**(+WORKOPS/FORGE/STORAGE)x 20 加速器 x Matrix;參數置頂可增減(`--set k=v`)、附掛掃描根、parquet 增量 store(DuckDB)、rich 摘要矩陣;hydra 僅平台域+慣例檔名白名單;SSOT 9 項 |
 | `via-code` | 自動識別編號器:`via-code <類別> <元件> [suffix]`(冪等給號;`--list`;`--register`) |
 | `via-gov` | 中央治理引擎 CGE v0401:TAB 多頁儀表板+台股登記簿 1977 檔(dry-run 預設;`--commit`;`--fetch-tw`) |
 | `via-vdf` | VDF 一鍵側欄工作台(v0160C 一般瀏覽器 HTML U/I + 本機 HTTP 橋;SHA256+AST 閘門;回退 v0102/v0101) |
@@ -38,6 +38,9 @@ pwsh -File "VeritasIntelligenceAnalytics\Install-VIA.ps1"     # 加 -AutoStart �
 | `via-envfix` | EnvManager 決策式無衝突安裝:五依賴 plan-install 留痕 → NumPy 黃金律 constraints → py 基底聯合安裝 → pip check 後驗 |
 | `via-bridge` | **Command Bridge**:一鍵前後端對接——後端 B1-B5 探測(接線/SSOT/依賴/資料庫/UI)+ test/debug 三輪 + 多 TAB 前端,首頁=總覽+全系統狀態矩陣(每跑必重生=當下真相) |
 | `via-trinity` | 功能三系整合模板:VIA 母刊頭 > 鍛 VDF/研 VRN/鑑 VAP 四 TAB(Porcelain;22 個 {{…}} 資料綁定槽) |
+| `via-workops` | **WorkOps/MailOps 合規工具鏈**(session 0198 整合):無參數開 MailOps 儀表板;`via-workops Scan\|Reconcile\|Draft\|FollowUp\|Templates\|All` 走非互動引擎(只讀 Outlook、草稿不自寄) |
+| `via-forge` | **VIA_Forge 五引擎家族**(45/45 驗收):無參數開工作台 UI;`check` 跑驗收矩陣;`server` 啟本機服務(127.0.0.1) |
+| `via-storage` | **Storage Optimizer AIO**:預覽制清理(雙引擎+GUI;`-Execute` 才刪;`-TestAll` 全鏈測試;`.veritas_protect` 禁區跳過) |
 | `via-pack` | 子系統獨立打包:`via-pack <cge\|mega\|bridge\|audit\|flow\|if\|vmt\|tools>` — 產品號自動編號(PKG 序號×內容 SHA8,冪等)+ **單機綁定**(Install 綁主機指紋、Launch 驗證,不符 fail-closed)+ **每包自帶封面 U/I**(產品/綁定/manifest 矩陣/報告出口,Launch 自動開)+ 逐檔 SHA256 manifest + zip |
 
 ## 系統架構
