@@ -17,7 +17,7 @@ pwsh -File "VeritasIntelligenceAnalytics\Install-VIA.ps1"     # 加 -AutoStart �
 | 指令 | 作用 |
 |---|---|
 | `via` | 同步 + VDF 進料 + VAP 繪圖 + 自動開 UI(日常預設) |
-| `via-one` | **全系統總啟動器 v0106**:十二階段一支到底(DEPS 預檢+sync+Mega+VMT+CGE+VRN×2+FLOW+IF+FIS+**BRIDGE**+Hub,引擎全動態最新版)或 `-Only <鍵>` 選子系統看 U/I |
+| `via-one` | **全系統總啟動器 v0107**:十二階段一支到底(DEPS 預檢+sync+Mega+VMT+CGE+VRN×2+FLOW+IF+FIS+**BRIDGE**+Hub,引擎全動態最新版)或 `-Only <鍵>` 選子系統看 U/I |
 | `via-all` | 互動全套:VDF + VAP + VRN 預檢 + Control Tower(不含長跑稽核,不卡斷) |
 | `via-audit` | 長跑稽核三件套:TurboOptimizer SafeAudit + Panorama + Polyglot(預期數分鐘以上) |
 | `via-tower` | 治理總控台 `http://127.0.0.1:8765`(桌面捷徑同此) |
@@ -112,4 +112,4 @@ supportive modules/
 | 範疇已凍結項目 | 見 `audit_tools/VIA_ScopeFreeze_Closure_v0100.json`;重開需操作員點名 |
 
 ---
-*營運手冊 2026-08-06 · 對應 Tower v005 / Mega v0106 / VMT v0103 / VDF 工作台 v0160C / UI Hub v0108 Porcelain / TickerRegex v0100 / VRN v1.1.0 / 判定表 v002*
+*營運手冊 2026-08-06 · 對應 Tower v005 / Mega v0106 / VMT v0103 / VDF 工作台 v0160C / UI Hub Live(活化樞紐)+ 靜態 v0108 回退 / TickerRegex v0100 / VRN v1.1.0 / 判定表 v002*
