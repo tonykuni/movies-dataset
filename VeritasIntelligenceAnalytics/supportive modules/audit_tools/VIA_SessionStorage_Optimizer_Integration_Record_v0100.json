@@ -1,0 +1,36 @@
+{
+ "record_id": "VIA_SessionStorage_Optimizer_Integration_Record_v0100",
+ "ts": "2026-08-07T22:57:20",
+ "directive": "使用者本機 git pull storage-architecture 分支(編輯器卡住)→ 改為伺服器端標準整合",
+ "source_session": {
+  "outcome_branch": "claude/storage-architecture-2026-n7x4o4",
+  "commits_merged": [
+   "ac97f84",
+   "471a562",
+   "10f1496",
+   "7105ac9",
+   "c93d55c",
+   "17ec076",
+   "cadb0d5",
+   "0de4b55"
+  ]
+ },
+ "整合去重": {
+  "path_overlap": "無 — 9 檔全在 repo 根層新資料夾 VeritasStorageOptimizer/",
+  "gitlink_defect_fixed": "VeritasStorageOptimizer/movies-dataset 為意外 gitlink(mode 160000 指向 c93d55c,無 .gitmodules)— 該 session 誤將巢狀 clone 入版控;整合時 git rm --cached 移除,避免 clone 出現空殼 submodule",
+  "ps_lint_同名": "tests/ps_lint.py 與 Dashboard uploads 之 ps_lint.py 同名跨域 — 各屬獨立產品域,資訊項非九頭龍"
+ },
+ "qa": {
+  "ps_lint": "AllInOne.ps1 0 errors 0 warnings",
+  "py_compile": "veritas_cleaner.py / veritas_gui.py / ps_lint.py OK",
+  "node_check": "veritas_cleaner.js / e2e_apitest.js OK",
+  "safety": "預設預覽制不刪檔(-Execute 才動手);venv 保護;symlink 圍堵;.veritas_protect 使用者釘選禁區",
+  "hub_v0104_container_run": "16 磚 · STORAGE 磚在列 · f2f1ec=1 · 朱紅殘留=0 · 指令 28"
+ },
+ "wiring": {
+  "bin/via-storage.cmd": "NEW — 透傳 AllInOne(-TestAll/-SelfTest/-MaxMB/-Execute)",
+  "bin/via-ui.cmd": "→ via_hub_engine_v0104.py(rollback rem 保留 v0103)",
+  "registry": "ENG-016 = VeritasStorageOptimizer_AllInOne"
+ },
+ "append_only": true
+}
