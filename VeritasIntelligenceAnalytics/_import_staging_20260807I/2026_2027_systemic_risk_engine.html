@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026–2027 全球系統性風險引擎 · GSRS 主控台</title>
+<style>
+  :root{
+    --bg:#f8f7f2; --ink:#1f2a2a; --red:#b94a48; --orange:#c9822b;
+    --green:#3f7f5f; --blue:#4b6f88; --purple:#6f5b8e; --brown:#8a6f4a;
+    --line:#ddd8cc; --soft:#efece3; --mut:#6c6a60;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink); max-width:1180px; margin:0 auto;
+    padding:34px 30px 60px;
+    font:14px/1.62 "Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  header{position:relative; border-bottom:2.5px solid var(--ink); padding-bottom:16px; margin-bottom:26px;}
+  .kicker{font-size:11.5px; letter-spacing:3px; color:var(--mut); text-transform:uppercase; margin-bottom:7px;}
+  h1{font-size:27px; line-height:1.24; font-weight:800; letter-spacing:.5px;}
+  h1 .accent{color:var(--red);}
+  .sub{margin-top:9px; font-size:13px; color:var(--mut); max-width:780px;}
+  .meta{margin-top:12px; font-size:11.5px; color:var(--mut); display:flex; gap:18px; flex-wrap:wrap;}
+  .meta b{color:var(--ink); font-weight:700;}
+  .stamp{position:absolute; top:-3px; right:0; width:76px; height:76px; border-radius:50%;
+    border:2.5px solid var(--red); color:var(--red); display:flex; align-items:center; justify-content:center;
+    font-size:17px; font-weight:800; letter-spacing:2px; transform:rotate(-11deg); text-align:center; line-height:1.15;
+    opacity:.92; box-shadow:inset 0 0 0 2px rgba(185,74,72,.18);}
+
+  section{margin-bottom:34px;}
+  h2{font-size:18px; font-weight:800; letter-spacing:.5px; margin-bottom:13px; display:flex; align-items:baseline; gap:11px;}
+  h2 .no{font-size:12px; color:#fff; background:var(--ink); width:22px; height:22px; border-radius:5px; display:inline-flex; align-items:center; justify-content:center; font-weight:700; flex:none;}
+  h2 .en{font-size:11px; letter-spacing:2px; color:var(--mut); font-weight:600; text-transform:uppercase;}
+  .lead{font-size:13px; color:var(--mut); margin:-4px 0 14px;}
+
+  /* pipeline flow */
+  .flow{display:flex; align-items:stretch; gap:7px; flex-wrap:wrap; background:#fff; border:1px solid var(--line); border-radius:10px; padding:16px 14px;}
+  .fnode{flex:1; min-width:120px; text-align:center; background:var(--soft); border:1px solid var(--line); border-radius:8px; padding:11px 9px;}
+  .fnode .ft{font-size:13px; font-weight:800;}
+  .fnode .fs{font-size:10px; color:var(--mut); display:block; margin-top:3px; letter-spacing:.5px;}
+  .farr{display:flex; align-items:center; color:var(--mut); font-size:17px; font-weight:800; flex:none;}
+
+  /* weight bars */
+  .wbar{display:flex; align-items:center; gap:11px; margin-bottom:9px;}
+  .wlbl{width:188px; font-size:13px; font-weight:700; flex:none;}
+  .wlbl small{font-weight:400; color:var(--mut); display:block; font-size:10.5px; letter-spacing:.3px;}
+  .wtrack{flex:1; background:var(--soft); border-radius:6px; height:24px; overflow:hidden; border:1px solid var(--line);}
+  .wfill{height:100%; display:flex; align-items:center; padding-left:9px; color:#fff; font-size:12px; font-weight:800;}
+
+  /* generic table */
+  table{width:100%; border-collapse:collapse; font-size:13px; background:#fff; border:1px solid var(--line); border-radius:8px; overflow:hidden;}
+  thead th{background:var(--ink); color:#fff; text-align:left; padding:8px 12px; font-size:11.5px; letter-spacing:.4px; font-weight:700;}
+  tbody td{padding:7px 12px; border-top:1px solid var(--soft); vertical-align:middle;}
+  tbody tr:nth-child(even){background:#fdfcf9;}
+  td.c{text-align:center;}
+  .scale td{font-size:12.5px;}
+  .pill{display:inline-block; font-size:11px; font-weight:800; color:#fff; border-radius:11px; padding:2px 9px;}
+  .p-g{background:var(--green)} .p-y{background:var(--orange)} .p-o{background:#cf6a2e} .p-r{background:var(--red)} .p-d{background:#7a2c2b}
+
+  /* FRRI modules */
+  .frgrid{display:grid; grid-template-columns:repeat(2,1fr); gap:13px;}
+  .frcard{background:#fff; border:1px solid var(--line); border-top-width:4px; border-radius:9px; padding:13px 15px;}
+  .frcard h4{font-size:13.5px; font-weight:800; margin-bottom:4px; display:flex; justify-content:space-between; align-items:baseline;}
+  .frcard h4 .w{font-size:12px; color:var(--mut); font-weight:700;}
+  .frcard .mscore{font-size:11px; color:var(--mut); margin-bottom:9px;}
+  .frcard ul{list-style:none; font-size:12.3px;}
+  .frcard li{display:flex; justify-content:space-between; padding:4px 0; border-top:1px dashed var(--soft);}
+  .frcard li:first-child{border-top:none;}
+  .frcard li .dz{color:var(--mut); font-size:11px;}
+  .frcard li .sv{font-weight:700;}
+  .ft-red{border-top-color:var(--red)} .ft-purple{border-top-color:var(--purple)} .ft-blue{border-top-color:var(--blue)} .ft-brown{border-top-color:var(--brown)}
+  .sv.hi{color:var(--red)} .sv.mid{color:var(--orange)} .sv.lo{color:var(--green)}
+
+  .gauge{background:var(--ink); color:#f3f0e8; border-radius:10px; padding:14px 18px; margin-top:14px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;}
+  .gauge .num{font-size:30px; font-weight:900; color:#fff;}
+  .gauge .num small{font-size:13px; color:#b8b4a6; font-weight:600;}
+  .gauge .gtxt{font-size:12.5px; color:#d8d3c5; line-height:1.55;}
+  .gauge .gtxt b{color:#e8a; }
+
+  /* CLD chain */
+  .cld{background:#fff; border:1px solid var(--line); border-radius:10px; padding:16px;}
+  .cstep{display:flex; align-items:center; gap:12px; margin-bottom:6px;}
+  .cnum{width:26px; height:26px; border-radius:50%; background:var(--red); color:#fff; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; flex:none;}
+  .cbody{flex:1; background:var(--soft); border:1px solid var(--line); border-radius:7px; padding:8px 12px; font-size:12.8px;}
+  .cbody b{font-weight:800;} .cbody span{color:var(--mut); font-size:11.5px;}
+  .cdown{text-align:left; padding-left:11px; color:var(--mut); font-size:14px; line-height:.4;}
+  .loopnote{margin-top:11px; text-align:center; font-size:12.5px; color:var(--red); font-weight:700; background:#f6e6e4; border:1px solid #e3b9b6; border-radius:8px; padding:9px;}
+
+  /* valuation math */
+  .vmath{display:grid; grid-template-columns:repeat(3,1fr); gap:11px;}
+  .vbox{background:#fff; border:1px solid var(--line); border-radius:9px; padding:13px; text-align:center;}
+  .vbox .vk{font-size:11px; color:var(--mut); letter-spacing:.5px;}
+  .vbox .vp{font-size:19px; font-weight:800; margin:5px 0;}
+  .vbox .vr{font-size:15px; font-weight:900;}
+  .down{color:var(--red)} .up{color:var(--green)}
+  .veq{background:var(--ink); color:#f3f0e8; border-radius:9px; padding:12px 16px; margin-top:11px; font-size:13px; text-align:center;}
+  .veq b{color:#fff; border-bottom:2px solid var(--red);}
+
+  /* scenario cards */
+  .sgrid{display:grid; grid-template-columns:repeat(5,1fr); gap:9px;}
+  .scard{background:#fff; border:1px solid var(--line); border-top-width:4px; border-radius:9px; padding:11px 11px 12px; display:flex; flex-direction:column;}
+  .scard .scode{font-size:11px; font-weight:800; letter-spacing:1px; text-transform:uppercase;}
+  .scard .snm{font-size:13.5px; font-weight:800; margin:2px 0 7px;}
+  .scard .sprob{font-size:11px; font-weight:800; color:#fff; border-radius:10px; padding:2px 8px; align-self:flex-start; margin-bottom:9px;}
+  .scard dl{font-size:11.6px; line-height:1.5;}
+  .scard dl div{display:flex; justify-content:space-between; padding:2.5px 0; border-top:1px dashed var(--soft);}
+  .scard dl div:first-child{border-top:none;}
+  .scard dt{color:var(--mut);} .scard dd{font-weight:700;}
+  .scard .sdraw{margin-top:9px; font-size:12px; font-weight:900; text-align:center; padding:6px; border-radius:6px; background:var(--soft);}
+  .s1{border-top-color:var(--green)} .s2{border-top-color:var(--orange)} .s3{border-top-color:var(--red)} .s4{border-top-color:var(--purple)} .s5{border-top-color:#7a2c2b}
+  .s1 .scode,.s1 .sprob{color:var(--green)} .s2 .scode{color:var(--orange)} .s3 .scode{color:var(--red)} .s4 .scode{color:var(--purple)} .s5 .scode{color:#7a2c2b}
+  .sprob.b1{background:var(--green)} .sprob.b2{background:var(--orange)} .sprob.b3{background:var(--red)} .sprob.b4{background:var(--purple)} .sprob.b5{background:#7a2c2b}
+  .focus-tag{font-size:10px; background:var(--red); color:#fff; border-radius:9px; padding:1px 7px; font-weight:700; margin-left:5px;}
+
+  /* dashboard chips */
+  .dgrid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px;}
+  .dchip{background:#fff; border:1px solid var(--line); border-left-width:4px; border-radius:7px; padding:9px 11px;}
+  .dchip .dn{font-size:12px; font-weight:700;}
+  .dchip .dval{font-size:14px; font-weight:900; margin-top:2px;}
+  .dchip .dz{font-size:10px; color:var(--mut);}
+  .lv-hi{border-left-color:var(--red)} .lv-hi .dval{color:var(--red)}
+  .lv-mid{border-left-color:var(--orange)} .lv-mid .dval{color:var(--orange)}
+  .lv-lo{border-left-color:var(--green)} .lv-lo .dval{color:var(--green)}
+
+  /* backtest */
+  .btrow{display:flex; align-items:center; gap:11px; padding:8px 0; border-top:1px solid var(--soft); font-size:12.5px;}
+  .btrow:first-child{border-top:none;}
+  .btyr{width:120px; font-weight:800; flex:none;}
+  .btyr small{display:block; font-weight:400; color:var(--mut); font-size:10.5px;}
+  .bttrack{flex:1; height:18px; background:var(--soft); border-radius:5px; position:relative; border:1px solid var(--line);}
+  .btfill{position:absolute; height:100%; border-radius:4px; opacity:.85;}
+  .btmeta{width:160px; flex:none; text-align:right; font-size:11.5px; color:var(--mut);}
+  .btmeta b{color:var(--ink);}
+
+  /* paths */
+  .pgrid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+  .pcard{border:1px solid var(--line); border-radius:10px; padding:14px; background:#fff;}
+  .pcard.base{border-top:4px solid var(--orange)} .pcard.stress{border-top:4px solid var(--red)} .pcard.tail{border-top:4px solid #7a2c2b}
+  .pcard h4{font-size:14px; font-weight:800; display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px;}
+  .pcard h4 .pp{font-size:11px; color:#fff; border-radius:10px; padding:2px 8px; font-weight:800;}
+  .base .pp{background:var(--orange)} .stress .pp{background:var(--red)} .tail .pp{background:#7a2c2b}
+  .ptraj{font-family:monospace; font-size:11.5px; color:var(--mut); background:var(--soft); border-radius:6px; padding:7px 9px; margin:8px 0; letter-spacing:.5px;}
+  .pcard ul{list-style:none; font-size:12px; color:var(--mut);}
+  .pcard li{padding:3px 0 3px 13px; position:relative;}
+  .pcard li::before{content:"·"; position:absolute; left:2px; font-weight:900;}
+  .pdraw{margin-top:9px; font-size:14px; font-weight:900; text-align:center; padding:7px; border-radius:7px;}
+  .base .pdraw{background:#f6ead8; color:#a86a1f} .stress .pdraw{background:#f6e6e4; color:var(--red)} .tail .pdraw{background:#efdcdb; color:#7a2c2b}
+
+  /* probability distribution */
+  .distrow{display:flex; align-items:center; gap:11px; margin-bottom:7px;}
+  .distlbl{width:150px; font-size:13px; font-weight:700; flex:none;}
+  .disttrack{flex:1; background:var(--soft); border:1px solid var(--line); border-radius:6px; height:26px; overflow:hidden;}
+  .distfill{height:100%; display:flex; align-items:center; padding-left:10px; color:#fff; font-size:12px; font-weight:800;}
+  .disttag{width:120px; flex:none; font-size:12px; color:var(--mut); text-align:right;}
+
+  /* balance block */
+  .balance{background:#fff; border:1px dashed var(--green); border-radius:10px; padding:15px 18px;}
+  .balance h4{font-size:13.5px; color:var(--green); font-weight:800; margin-bottom:9px;}
+  .balance ul{list-style:none; columns:2; column-gap:26px; font-size:12.5px;}
+  .balance li{padding:5px 0 5px 15px; position:relative; break-inside:avoid;}
+  .balance li::before{content:"↺"; position:absolute; left:0; color:var(--green); font-weight:800;}
+
+  /* compare 2000 vs 2026 */
+  .cmp{display:grid; grid-template-columns:1fr 1fr; gap:11px;}
+  .cmpcol{background:#fff; border:1px solid var(--line); border-radius:10px; padding:14px 16px;}
+  .cmpcol h4{font-size:14px; font-weight:800; padding-bottom:7px; margin-bottom:9px; border-bottom:2px solid;}
+  .cmpcol.a h4{color:var(--green); border-color:var(--green)} .cmpcol.b h4{color:var(--red); border-color:var(--red)}
+  .cmpcol ul{list-style:none; font-size:12.5px;}
+  .cmpcol li{padding:5px 0 5px 14px; position:relative; border-top:1px solid var(--soft);}
+  .cmpcol li:first-child{border-top:none;}
+  .cmpcol.a li::before{content:"✓"; position:absolute; left:0; color:var(--green); font-weight:800;}
+  .cmpcol.b li::before{content:"!"; position:absolute; left:2px; color:var(--red); font-weight:800;}
+
+  .verdict{background:var(--ink); color:#f3f0e8; border-radius:11px; padding:20px 24px;}
+  .verdict h3{font-size:15px; color:#fff; margin-bottom:13px; display:flex; align-items:center; gap:9px;}
+  .verdict h3::before{content:"▮"; color:var(--red);}
+  .verdict p{font-size:13.5px; line-height:1.75; color:#e9e5d9;}
+  .verdict b{color:#fff; border-bottom:2px solid var(--red);}
+
+  .disclaim{background:var(--soft); border:1px dashed var(--line); border-radius:7px; padding:10px 13px; font-size:11px; color:var(--mut); margin-top:14px; line-height:1.6;}
+  footer{margin-top:38px; border-top:1.5px solid var(--line); padding-top:14px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; font-size:11px; color:var(--mut);}
+  footer .v{font-weight:800; letter-spacing:2px; color:var(--ink);}
+
+  @media(max-width:820px){
+    .frgrid,.cmp{grid-template-columns:1fr;} .vmath,.sgrid,.dgrid,.pgrid{grid-template-columns:1fr 1fr;}
+    .balance ul{columns:1;} .wlbl{width:130px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="stamp">風險<br>引擎</div>
+  <div class="kicker">Global Systemic Risk Engine · Model Blueprint</div>
+  <h1>2026–2027 全球系統性風險引擎 — <span class="accent">GSRS 主控台</span></h1>
+  <p class="sub">把通膨、利率、美債信用、估值、EPS、信用流動性、地緣與 AI 結構風險，全部收斂成一個可量化、可回測、可監控的總風險分數，並推估 S&amp;P 500 的估值壓縮路徑。</p>
+  <div class="meta">
+    <span><b>總指標</b>　GSRS 0–100</span>
+    <span><b>子引擎</b>　FRRI 0–100</span>
+    <span><b>情境</b>　S1–S5</span>
+    <span><b>回測危機</b>　6 次</span>
+    <span><b>領先指標</b>　12 項</span>
+  </div>
+</header>
+
+<!-- 1 框架總覽 -->
+<section>
+  <h2><span class="no">1</span>框架推演鏈<span class="en">Pipeline</span></h2>
+  <p class="lead">從質性洞察一路工程化到可監控的數字輸出——這是整套引擎的骨幹。</p>
+  <div class="flow">
+    <div class="fnode"><div class="ft">核心洞察</div><span class="fs">政治 / AI / 美債 / 地緣</span></div>
+    <div class="farr">→</div>
+    <div class="fnode"><div class="ft">因子全集</div><span class="fs">6 大類 · 72 指標</span></div>
+    <div class="farr">→</div>
+    <div class="fnode"><div class="ft">領先指標</div><span class="fs">12 項回測篩選</span></div>
+    <div class="farr">→</div>
+    <div class="fnode"><div class="ft">情境引擎</div><span class="fs">S1–S5 機率</span></div>
+    <div class="farr">→</div>
+    <div class="fnode"><div class="ft">GSRS / FRRI</div><span class="fs">0–100 打分</span></div>
+    <div class="farr">→</div>
+    <div class="fnode"><div class="ft">估值結論</div><span class="fs">PER / PBR 壓縮</span></div>
+  </div>
+</section>
+
+<!-- 2 GSRS 權重 -->
+<section>
+  <h2><span class="no">2</span>GSRS 六大模組與權重<span class="en">Weights</span></h2>
+  <p class="lead">折現率（利率）是估值的主導因子，故再升息風險權重最高；估值是放大器居次；信用、地緣為間接加速器。</p>
+  <div class="wbar"><div class="wlbl">FRRI 再升息風險<small>折現率主導 · 最直接</small></div><div class="wtrack"><div class="wfill" style="width:100%;background:var(--red)">30%</div></div></div>
+  <div class="wbar"><div class="wlbl">估值壓力<small>PER / PBR / CAPE</small></div><div class="wtrack"><div class="wfill" style="width:66%;background:var(--orange)">20%</div></div></div>
+  <div class="wbar"><div class="wlbl">EPS 下修風險<small>第二階段殺傷力</small></div><div class="wtrack"><div class="wfill" style="width:50%;background:var(--green)">15%</div></div></div>
+  <div class="wbar"><div class="wlbl">美債信用風險<small>2026 的新核心</small></div><div class="wtrack"><div class="wfill" style="width:50%;background:var(--purple)">15%</div></div></div>
+  <div class="wbar"><div class="wlbl">信用與流動性<small>決定跌幅速度</small></div><div class="wtrack"><div class="wfill" style="width:33%;background:var(--blue)">10%</div></div></div>
+  <div class="wbar"><div class="wlbl">地緣與供應鏈<small>決定通膨壓力</small></div><div class="wtrack"><div class="wfill" style="width:33%;background:var(--brown)">10%</div></div></div>
+
+  <table class="scale" style="margin-top:14px;">
+    <thead><tr><th>GSRS 區間</th><th>市場狀態</th><th>S&amp;P 500 合理跌幅</th></tr></thead>
+    <tbody>
+      <tr><td class="c">0–30</td><td><span class="pill p-g">低風險</span></td><td>−10% ～ +10%</td></tr>
+      <tr><td class="c">30–50</td><td><span class="pill p-y">中風險</span></td><td>−15% ～ −25%</td></tr>
+      <tr><td class="c">50–70</td><td><span class="pill p-o">高風險</span></td><td>−25% ～ −40%</td></tr>
+      <tr><td class="c">70–85</td><td><span class="pill p-r">極高風險</span></td><td>−40% ～ −50%</td></tr>
+      <tr><td class="c">85–100</td><td><span class="pill p-d">系統性危機</span></td><td>−50% ～ −60%</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 3 FRRI -->
+<section>
+  <h2><span class="no">3</span>FRRI · Fed 再升息風險指數<span class="en">Re-Hike Index</span></h2>
+  <p class="lead">下列數值為框架示意（非即時市場數據），用以演示打分邏輯。實作時需接真實數據源逐日更新。</p>
+  <div class="frgrid">
+    <div class="frcard ft-red">
+      <h4>M1 通膨與再升息壓力<span class="w">35%</span></h4>
+      <div class="mscore">示意分數 ≈ 25 / 35</div>
+      <ul>
+        <li><span>核心服務通膨 Supercore</span><span><span class="dz">&gt;4%　</span><span class="sv hi">4.2%</span></span></li>
+        <li><span>工資增速 Wage Growth</span><span><span class="dz">&gt;4.5%　</span><span class="sv hi">4.6%</span></span></li>
+        <li><span>油價 WTI</span><span><span class="dz">&gt;100　</span><span class="sv mid">$92</span></span></li>
+      </ul>
+    </div>
+    <div class="frcard ft-purple">
+      <h4>M2 美債信用與財政<span class="w">30%</span></h4>
+      <div class="mscore">示意分數 ≈ 20 / 30</div>
+      <ul>
+        <li><span>UST 10Y 殖利率</span><span><span class="dz">&gt;5%　</span><span class="sv mid">4.9%</span></span></li>
+        <li><span>拍賣 Bid-to-Cover</span><span><span class="dz">&lt;2.3　</span><span class="sv hi">2.28</span></span></li>
+        <li><span>利息支出 / 稅收</span><span><span class="dz">&gt;20%　</span><span class="sv mid">19%</span></span></li>
+      </ul>
+    </div>
+    <div class="frcard ft-blue">
+      <h4>M3 信用與流動性<span class="w">20%</span></h4>
+      <div class="mscore">示意分數 ≈ 10 / 20</div>
+      <ul>
+        <li><span>HY Spread</span><span><span class="dz">&gt;600　</span><span class="sv mid">480</span></span></li>
+        <li><span>MOVE 債市波動</span><span><span class="dz">&gt;120　</span><span class="sv mid">118</span></span></li>
+        <li><span>流動性深度</span><span><span class="dz">嚴重↓　</span><span class="sv mid">下降</span></span></li>
+      </ul>
+    </div>
+    <div class="frcard ft-brown">
+      <h4>M4 全球美元與需求<span class="w">15%</span></h4>
+      <div class="mscore">示意分數 ≈ 10 / 15</div>
+      <ul>
+        <li><span>DXY 美元指數</span><span><span class="dz">&gt;110　</span><span class="sv mid">108</span></span></li>
+        <li><span>實質薪資增速</span><span><span class="dz">&lt;0%　</span><span class="sv hi">−0.3%</span></span></li>
+        <li><span>零售銷售 YoY</span><span><span class="dz">&lt;0%　</span><span class="sv mid">0.5%</span></span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="gauge">
+    <div class="num">≈65–70<small> / 100</small></div>
+    <div class="gtxt">在此示意組合下 FRRI 落入 <b>高風險區</b>：通膨黏著 + 美債需求疲弱 + 流動性偏弱。<br>FRRI &gt; 60 等於崩盤 CLD 的負向迴路已「接通」，只差觸發點即進入 −35%～−50% 區間。</div>
+  </div>
+</section>
+
+<!-- 4 CLD -->
+<section>
+  <h2><span class="no">4</span>Fed 再升息 × 市場崩盤 因果環路<span class="en">Causal Loop</span></h2>
+  <div class="cld">
+    <div class="cstep"><div class="cnum">1</div><div class="cbody"><b>通膨黏著 ↑</b>　<span>Supercore &gt;4%、工資高、油價/航運上升 → Fed 被迫升息</span></div></div>
+    <div class="cdown">↓</div>
+    <div class="cstep"><div class="cnum">2</div><div class="cbody"><b>Fed 再升息 ↑</b>　<span>實質利率、短端利率上升 → 折現率跳升</span></div></div>
+    <div class="cdown">↓</div>
+    <div class="cstep"><div class="cnum">3</div><div class="cbody"><b>估值壓縮 ↑</b>　<span>PER 22→14、PBR 4.5→2.5</span></div></div>
+    <div class="cdown">↓</div>
+    <div class="cstep"><div class="cnum">4</div><div class="cbody"><b>流動性枯竭 ↓</b>　<span>銀行收縮信貸、美元荒、市場深度下降</span></div></div>
+    <div class="cdown">↓</div>
+    <div class="cstep"><div class="cnum">5</div><div class="cbody"><b>信用惡化 ↑</b>　<span>HY Spread &gt;600、企業融資困難</span></div></div>
+    <div class="cdown">↓</div>
+    <div class="cstep"><div class="cnum">6</div><div class="cbody"><b>美債信用風險 ↑</b>　<span>拍賣需求下降、評級展望負向、利息支出爆炸</span></div></div>
+    <div class="cdown">↓</div>
+    <div class="cstep"><div class="cnum">7</div><div class="cbody"><b>全球資金重定價</b>　<span>美元走強、新興市場外流、風險溢酬上升</span></div></div>
+    <div class="cdown">↓</div>
+    <div class="cstep"><div class="cnum">8</div><div class="cbody"><b>市場崩盤 ↓</b>　<span>S&amp;P 500 −40%～−55%、科技股 −60%、流動性真空</span></div></div>
+    <div class="loopnote">↻ 財富效應崩潰 → 消費下降 → EPS 下修 → 估值再壓縮（自我強化負向迴路）</div>
+  </div>
+</section>
+
+<!-- 5 估值壓縮數學 -->
+<section>
+  <h2><span class="no">5</span>估值壓縮數學<span class="en">Compression Math</span></h2>
+  <p class="lead">純估值壓縮（PER 由 ~22 倍回落）的跌幅是可計算的；再疊加 EPS 下修即得最終區間。</p>
+  <div class="vmath">
+    <div class="vbox"><div class="vk">溫和修正</div><div class="vp">22 → 18</div><div class="vr down">−18%</div></div>
+    <div class="vbox"><div class="vk">景氣下行</div><div class="vp">22 → 16</div><div class="vr down">−27%</div></div>
+    <div class="vbox"><div class="vk">危機壓縮</div><div class="vp">22 → 14</div><div class="vr down">−36%</div></div>
+  </div>
+  <div class="veq">估值壓縮 −45% × EPS 下修 −10% ＋ 流動性折價　→　<b>指數跌幅 ≈ −50%</b>（1 − 0.9 × 0.55 ≈ −50.5%）</div>
+</section>
+
+<!-- 6 情境 -->
+<section>
+  <h2><span class="no">6</span>五大情境 · EPS × PER × PBR 路徑<span class="en">Scenarios</span></h2>
+  <div class="sgrid">
+    <div class="scard s1">
+      <div class="scode">S1</div><div class="snm">軟著陸</div><div class="sprob b1">10–15%</div>
+      <dl>
+        <div><dt>EPS</dt><dd>+5/+7%</dd></div>
+        <div><dt>PER</dt><dd>18–20</dd></div>
+        <div><dt>PBR</dt><dd>3.5–4.0</dd></div>
+        <div><dt>S&amp;P</dt><dd>5200–5800</dd></div>
+      </dl>
+      <div class="sdraw" style="color:var(--green)">−5%～−12%</div>
+    </div>
+    <div class="scard s2">
+      <div class="scode">S2</div><div class="snm">硬著陸</div><div class="sprob b2">25–30%</div>
+      <dl>
+        <div><dt>EPS</dt><dd>−5/+3%</dd></div>
+        <div><dt>PER</dt><dd>15–17</dd></div>
+        <div><dt>PBR</dt><dd>2.8–3.2</dd></div>
+        <div><dt>S&amp;P</dt><dd>4200–4700</dd></div>
+      </dl>
+      <div class="sdraw" style="color:var(--orange)">−15%～−25%</div>
+    </div>
+    <div class="scard s3">
+      <div class="scode">S3 <span class="focus-tag">最接近</span></div><div class="snm">慢性衰退</div><div class="sprob b3">35–40%</div>
+      <dl>
+        <div><dt>EPS</dt><dd>0/−3%</dd></div>
+        <div><dt>PER</dt><dd>13–16</dd></div>
+        <div><dt>PBR</dt><dd>2.5–3.0</dd></div>
+        <div><dt>S&amp;P</dt><dd>3800–4400</dd></div>
+      </dl>
+      <div class="sdraw" style="color:var(--red)">−20%～−30%</div>
+    </div>
+    <div class="scard s4">
+      <div class="scode">S4</div><div class="snm">二次泡沫</div><div class="sprob b4">10–15%</div>
+      <dl>
+        <div><dt>EPS</dt><dd>+8/+10%</dd></div>
+        <div><dt>PER</dt><dd>22–25</dd></div>
+        <div><dt>PBR</dt><dd>4.5–5.5</dd></div>
+        <div><dt>S&amp;P</dt><dd>6000–7200</dd></div>
+      </dl>
+      <div class="sdraw" style="color:var(--purple)">先漲後 −30%↑</div>
+    </div>
+    <div class="scard s5">
+      <div class="scode">S5</div><div class="snm">系統性危機</div><div class="sprob b5">10–15%</div>
+      <dl>
+        <div><dt>EPS</dt><dd>−10/−5%</dd></div>
+        <div><dt>PER</dt><dd>10–14</dd></div>
+        <div><dt>PBR</dt><dd>1.8–2.3</dd></div>
+        <div><dt>S&amp;P</dt><dd>2800–3500</dd></div>
+      </dl>
+      <div class="sdraw" style="color:#7a2c2b">−35%～−55%</div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 領先指標 -->
+<section>
+  <h2><span class="no">7</span>12 領先指標監控盤<span class="en">Leading Indicators</span></h2>
+  <p class="lead">經 6 次危機回測篩出、跨時代有效且不易被敘事美化的指標。色塊為示意風險燈號。</p>
+  <div class="dgrid">
+    <div class="dchip lv-hi"><div class="dn">實質利率</div><div class="dval">&gt;2%</div><div class="dz">估值壓縮觸發</div></div>
+    <div class="dchip lv-hi"><div class="dn">Supercore</div><div class="dval">&gt;4%</div><div class="dz">Fed 無法降息</div></div>
+    <div class="dchip lv-hi"><div class="dn">工資增速</div><div class="dval">&gt;4.5%</div><div class="dz">通膨回升</div></div>
+    <div class="dchip lv-mid"><div class="dn">UST 10Y</div><div class="dval">4–5%</div><div class="dz">折現率壓力</div></div>
+    <div class="dchip lv-hi"><div class="dn">拍賣 B/C</div><div class="dval">&lt;2.3</div><div class="dz">美債需求疲弱</div></div>
+    <div class="dchip lv-mid"><div class="dn">利息/稅收</div><div class="dval">15–20%</div><div class="dz">財政可持續性</div></div>
+    <div class="dchip lv-mid"><div class="dn">HY Spread</div><div class="dval">400–600</div><div class="dz">信用壓力上升</div></div>
+    <div class="dchip lv-mid"><div class="dn">MOVE</div><div class="dval">90–120</div><div class="dz">債市波動</div></div>
+    <div class="dchip lv-mid"><div class="dn">流動性深度</div><div class="dval">下降</div><div class="dz">一戳就破</div></div>
+    <div class="dchip lv-mid"><div class="dn">全職/兼職比</div><div class="dval">↓</div><div class="dz">勞動結構惡化</div></div>
+    <div class="dchip lv-mid"><div class="dn">零售 YoY</div><div class="dval">~0%</div><div class="dz">需求端疲弱</div></div>
+    <div class="dchip lv-hi"><div class="dn">實質薪資</div><div class="dval">&lt;0%</div><div class="dz">消費靠信用撐</div></div>
+  </div>
+</section>
+
+<!-- 8 回測 -->
+<section>
+  <h2><span class="no">8</span>回測 · 6 次危機 GSRS 疊圖<span class="en">Backtest</span></h2>
+  <p class="lead">每次危機由不同模組主導，但 GSRS 區間與實際跌幅高度吻合——這是權重「因果一致」的證據。横條 = 危機前 12 個月 GSRS 區間。</p>
+  <div style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px;">
+    <div class="btrow"><div class="btyr">2000<small>科技泡沫</small></div><div class="bttrack"><div class="btfill" style="left:70%;width:25%;background:var(--orange)"></div></div><div class="btmeta">估值主導 · <b>−49%</b></div></div>
+    <div class="btrow"><div class="btyr">2008<small>金融海嘯</small></div><div class="bttrack"><div class="btfill" style="left:85%;width:12%;background:#7a2c2b"></div></div><div class="btmeta">信用主導 · <b>−57%</b></div></div>
+    <div class="btrow"><div class="btyr">2011<small>歐債危機</small></div><div class="bttrack"><div class="btfill" style="left:55%;width:10%;background:var(--blue)"></div></div><div class="btmeta">主權信用 · <b>−19%</b></div></div>
+    <div class="btrow"><div class="btyr">2015–16<small>中國/油價</small></div><div class="bttrack"><div class="btfill" style="left:45%;width:10%;background:var(--brown)"></div></div><div class="btmeta">需求/油價 · <b>−14%</b></div></div>
+    <div class="btrow"><div class="btyr">2018 Q4<small>Fed 緊縮</small></div><div class="bttrack"><div class="btfill" style="left:60%;width:10%;background:var(--red)"></div></div><div class="btmeta">利率主導 · <b>−20%</b></div></div>
+    <div class="btrow"><div class="btyr">2020<small>COVID</small></div><div class="bttrack"><div class="btfill" style="left:70%;width:15%;background:var(--blue)"></div></div><div class="btmeta">流動性主導 · <b>−35%</b></div></div>
+    <div class="btrow" style="border-top:2px solid var(--ink);"><div class="btyr" style="color:var(--red)">2026–27<small>推估</small></div><div class="bttrack"><div class="btfill" style="left:65%;width:11%;background:var(--red);opacity:1"></div></div><div class="btmeta">四因子疊加 · <b>−35%～−50%</b></div></div>
+  </div>
+  <p class="lead" style="margin-top:11px;">2026–27 最像：2018（利率）＋ 2022（通膨）＋ 2000（估值）＋ 2008（信用）的疊影——歷史上第一次「四因子同時惡化」。</p>
+</section>
+
+<!-- 9 風險路徑 -->
+<section>
+  <h2><span class="no">9</span>2026–2027 未來 12 個月風險路徑<span class="en">Trajectory</span></h2>
+  <div class="pgrid">
+    <div class="pcard base">
+      <h4>基準路徑<span class="pp">45–55%</span></h4>
+      <div class="ptraj">65 → 70 → 74 → 77 → 80</div>
+      <ul>
+        <li>通膨黏著、Fed 維持高利率</li>
+        <li>美債需求疲弱、估值偏高</li>
+        <li>EPS 緩慢下修</li>
+      </ul>
+      <div class="pdraw">−30% ～ −40%</div>
+    </div>
+    <div class="pcard stress">
+      <h4>壓力路徑<span class="pp">30–35%</span></h4>
+      <div class="ptraj">65 → 75 → 82 → 86 → 90</div>
+      <ul>
+        <li>通膨反彈、Fed 被迫再升息</li>
+        <li>拍賣失敗、HY &gt;600、MOVE &gt;120</li>
+        <li>EPS 下修加速</li>
+      </ul>
+      <div class="pdraw">−40% ～ −50%</div>
+    </div>
+    <div class="pcard tail">
+      <h4>尾端路徑<span class="pp">10–15%</span></h4>
+      <div class="ptraj">65 → 78 → 87 → 93 → 98</div>
+      <ul>
+        <li>美債信用事件、評級負向</li>
+        <li>地緣升級、全球美元荒</li>
+        <li>流動性真空、企業違約上升</li>
+      </ul>
+      <div class="pdraw">−50% ～ −60%</div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 機率分佈 -->
+<section>
+  <h2><span class="no">10</span>S&amp;P 500 跌幅機率分佈<span class="en">Distribution</span></h2>
+  <p class="lead">本框架在其假設因子組合下的條件式輸出（非點位預測）。</p>
+  <div class="distrow"><div class="distlbl">−10% ～ −20%</div><div class="disttrack"><div class="distfill" style="width:25%;background:var(--green)">15%</div></div><div class="disttag">溫和修正</div></div>
+  <div class="distrow"><div class="distlbl">−20% ～ −35%</div><div class="disttrack"><div class="distfill" style="width:75%;background:var(--orange)">45%</div></div><div class="disttag">基準 · 最可能</div></div>
+  <div class="distrow"><div class="distlbl">−35% ～ −50%</div><div class="disttrack"><div class="distfill" style="width:42%;background:var(--red)">25%</div></div><div class="disttag">壓力情境</div></div>
+  <div class="distrow"><div class="distlbl">−50% ～ −60%</div><div class="disttrack"><div class="distfill" style="width:22%;background:#7a2c2b">10–15%</div></div><div class="disttag">尾端但合理</div></div>
+</section>
+
+<!-- 11 2000 vs 2026 -->
+<section>
+  <h2><span class="no">11</span>2000 vs 2026 結構對照<span class="en">Then vs Now</span></h2>
+  <div class="cmp">
+    <div class="cmpcol a">
+      <h4>2000 · 單因子泡沫</h4>
+      <ul>
+        <li>僅估值泡沫（科技 PER 30–80+）</li>
+        <li>美國財政健康、美債無風險地位穩固</li>
+        <li>Fed 獨立性強、地緣政治平穩</li>
+        <li>全球化紅利強、勞動市場健康</li>
+      </ul>
+    </div>
+    <div class="cmpcol b">
+      <h4>2026 · 六因子疊加</h4>
+      <ul>
+        <li>估值泡沫（AI 集中度史上最高）</li>
+        <li>美債信用 + 財政惡化（前所未見）</li>
+        <li>Fed 獨立性受政治壓力、通膨黏著</li>
+        <li>地緣衝突常態化、勞動結構惡化</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 12 反方制衡 -->
+<section>
+  <h2><span class="no">12</span>反方制衡 · 盲區校正<span class="en">Counter-View</span></h2>
+  <p class="lead">客觀模型必須同時容納「崩壞」與「修復」的可能。以下是會降低尾端機率的緩衝因子，需一併監控以免單邊外推。</p>
+  <div class="balance">
+    <h4>降低風險的反向因子</h4>
+    <ul>
+      <li>家戶資產負債表槓桿明顯低於 2008，斷裂速度可能較慢</li>
+      <li>後 2008 監管更嚴（資本適足、壓力測試、清算機制），未必複製瞬間崩潰</li>
+      <li>央行 swap line、IMF、BIS 的「分層協作」在金融層面仍存在</li>
+      <li>危機中資金仍傾向先回美元——美國變弱不等於被取代</li>
+      <li>政治在被逼到牆角時也會「求生式」做對（Volcker、2008 救市）</li>
+      <li>AI、綠能、生醫、半導體可能在 3–7 年內形成新投資循環</li>
+      <li>負面因子未必同時發生，時間錯開會大幅降低疊加強度</li>
+      <li>高估值集中於有真實現金流的巨頭，與 2000 純故事股不同</li>
+    </ul>
+  </div>
+</section>
+
+<!-- verdict -->
+<section>
+  <h2><span class="no">13</span>核心判讀<span class="en">Verdict</span></h2>
+  <div class="verdict">
+    <h3>2026–2027 估值壓縮路徑</h3>
+    <p>
+      GSRS 示意落在 <b>65–75（高風險區）</b>，最接近 <b>S3 慢性衰退</b>，並帶 2018 利率、2022 通膨、2000 估值、2008 信用的疊影。<br>
+      基準情境下 S&amp;P 500 內在價值約 <b>3800–4400</b>，對應 −20%～−35% 估值壓縮（機率約 45%）；<br>
+      若 <b>Fed 被迫再升息或美債信用惡化</b>，路徑上移至壓力（−40%～−50%）乃至尾端（−50%～−60%）。<br>
+      &gt;50% 回撤不是主情境，而是「<b>尾端但結構上合理</b>」——這正是需要持續監控 12 指標與 FRRI 門檻的理由。
+    </p>
+  </div>
+  <div class="disclaim">
+    資料時點：模型藍圖整理版。文中所有指標數值與機率均為框架示意 / 假設值，<b>非即時市場數據、非點位預測</b>；實作時須接真實數據源逐日更新並重新回測校準。本內容為風險分析框架之整理，<b>不構成投資建議</b>，任何投資決策應自行評估並承擔風險。
+  </div>
+</section>
+
+<footer>
+  <span class="v">VERITAS INTELLIGENCE ANALYTICS</span>
+  <span>GSRS · FRRI · Scenario Engine · Backtest 2000–2020 · Trajectory 2026–2027</span>
+</footer>
+
+</body>
+</html>

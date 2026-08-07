@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 系統性風險 · 名句提煉與資料矩陣</title>
+<style>
+  :root{
+    --bg:#f8f7f2; --ink:#1f2a2a; --red:#b94a48; --orange:#c9822b;
+    --green:#3f7f5f; --blue:#4b6f88; --purple:#6f5b8e;
+    --line:#ddd8cc; --soft:#efece3; --mut:#6c6a60;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink); max-width:1180px; margin:0 auto;
+    padding:34px 30px 60px;
+    font:14px/1.62 "Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---- Header ---- */
+  header{position:relative; border-bottom:2.5px solid var(--ink); padding-bottom:16px; margin-bottom:26px;}
+  .kicker{font-size:11.5px; letter-spacing:3px; color:var(--mut); text-transform:uppercase; margin-bottom:7px;}
+  h1{font-size:27px; line-height:1.25; font-weight:800; letter-spacing:.5px;}
+  h1 .accent{color:var(--red);}
+  .sub{margin-top:9px; font-size:13px; color:var(--mut); max-width:760px;}
+  .meta{margin-top:12px; font-size:11.5px; color:var(--mut); display:flex; gap:18px; flex-wrap:wrap;}
+  .meta b{color:var(--ink); font-weight:700;}
+  .stamp{
+    position:absolute; top:-4px; right:0; width:74px; height:74px; border-radius:50%;
+    border:2.5px solid var(--red); color:var(--red); display:flex; align-items:center; justify-content:center;
+    font-size:19px; font-weight:800; letter-spacing:3px; transform:rotate(-11deg);
+    opacity:.92; box-shadow:inset 0 0 0 2px rgba(185,74,72,.18);
+  }
+
+  /* ---- Section ---- */
+  section{margin-bottom:34px;}
+  h2{
+    font-size:18px; font-weight:800; letter-spacing:.5px; margin-bottom:14px;
+    display:flex; align-items:baseline; gap:11px;
+  }
+  h2 .no{font-size:12px; color:#fff; background:var(--ink); width:22px; height:22px; border-radius:5px;
+    display:inline-flex; align-items:center; justify-content:center; font-weight:700; flex:none;}
+  h2 .en{font-size:11px; letter-spacing:2px; color:var(--mut); font-weight:600; text-transform:uppercase;}
+
+  /* ---- Quote cards ---- */
+  .qgrid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px;}
+  .qcard{background:#fff; border:1px solid var(--line); border-left-width:4px; border-radius:9px; padding:15px 17px;}
+  .qcard .tag{font-size:11px; letter-spacing:1.5px; font-weight:800; text-transform:uppercase; margin-bottom:10px; display:flex; align-items:center; gap:7px;}
+  .qcard .tag .dot{width:8px;height:8px;border-radius:50%;}
+  .qcard ul{list-style:none;}
+  .qcard li{position:relative; padding:6px 0 6px 16px; font-size:13.5px; border-top:1px dashed var(--soft);}
+  .qcard li:first-child{border-top:none;}
+  .qcard li::before{content:"›"; position:absolute; left:0; font-weight:800;}
+  .qcard li b{font-weight:700;}
+  .c-red{border-left-color:var(--red)} .c-red .tag,.c-red li::before{color:var(--red)} .c-red .dot{background:var(--red)}
+  .c-orange{border-left-color:var(--orange)} .c-orange .tag,.c-orange li::before{color:var(--orange)} .c-orange .dot{background:var(--orange)}
+  .c-blue{border-left-color:var(--blue)} .c-blue .tag,.c-blue li::before{color:var(--blue)} .c-blue .dot{background:var(--blue)}
+  .c-purple{border-left-color:var(--purple)} .c-purple .tag,.c-purple li::before{color:var(--purple)} .c-purple .dot{background:var(--purple)}
+
+  /* ---- Reverse loop flow ---- */
+  .loop{background:#fff; border:1px solid var(--line); border-radius:10px; padding:20px 18px 16px;}
+  .loop-row{display:flex; align-items:stretch; gap:8px; flex-wrap:wrap; justify-content:center;}
+  .node{flex:1; min-width:118px; background:var(--soft); border:1px solid var(--line); border-radius:8px;
+    padding:11px 10px; text-align:center; position:relative;}
+  .node .n-en{font-size:9.5px; letter-spacing:1px; color:var(--mut); text-transform:uppercase; display:block; margin-top:3px;}
+  .node.hot{background:#f6e6e4; border-color:#e3b9b6;}
+  .node.cool{background:#e4ecef; border-color:#bcd0d8;}
+  .node b{font-size:13.5px; font-weight:800;}
+  .node .delta{font-weight:900;}
+  .up{color:var(--green)} .down{color:var(--red)}
+  .arr{display:flex; align-items:center; color:var(--mut); font-size:18px; font-weight:800; flex:none;}
+  .loop-back{margin-top:14px; text-align:center; font-size:12.5px; color:var(--red); font-weight:700;
+    border-top:1px dashed var(--line); padding-top:12px;}
+  .loop-back span{display:inline-block; background:#f6e6e4; border:1px solid #e3b9b6; border-radius:20px; padding:4px 14px;}
+
+  /* ---- Compare 2008 vs 2026 ---- */
+  .cmp{display:grid; grid-template-columns:1fr 56px 1fr; gap:0; align-items:stretch;}
+  .cmp-col{background:#fff; border:1px solid var(--line); padding:16px 18px;}
+  .cmp-col.l{border-radius:10px 0 0 10px; border-right:none;}
+  .cmp-col.r{border-radius:0 10px 10px 0; border-left:none;}
+  .cmp-head{font-size:15px; font-weight:800; margin-bottom:11px; padding-bottom:8px; border-bottom:2px solid;}
+  .cmp-col.l .cmp-head{color:var(--green); border-color:var(--green);}
+  .cmp-col.r .cmp-head{color:var(--red); border-color:var(--red);}
+  .cmp-col ul{list-style:none;}
+  .cmp-col li{font-size:12.8px; padding:6px 0 6px 15px; position:relative; border-top:1px solid var(--soft);}
+  .cmp-col li:first-child{border-top:none;}
+  .cmp-col li::before{content:""; position:absolute; left:0; top:13px; width:6px; height:6px; border-radius:50%;}
+  .cmp-col.l li::before{background:var(--green)} .cmp-col.r li::before{background:var(--red)}
+  .cmp-vs{display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:900;
+    color:var(--mut); background:var(--soft); border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+
+  /* ---- Matrix grid ---- */
+  .mgroup{margin-bottom:14px;}
+  .mhead{font-size:13px; font-weight:800; letter-spacing:.5px; padding:7px 12px; border-radius:7px 7px 0 0; color:#fff; display:flex; justify-content:space-between;}
+  .mhead .gc{font-size:11px; opacity:.85; font-weight:600; letter-spacing:1px;}
+  .m-A{background:var(--red)} .m-B{background:var(--orange)} .m-C{background:var(--blue)} .m-D{background:var(--green)} .m-E{background:var(--purple)}
+  .mcells{display:grid; grid-template-columns:repeat(5,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-top:none; border-radius:0 0 7px 7px; overflow:hidden;}
+  .cell{background:#fff; padding:9px 10px; font-size:12.3px; min-height:58px;}
+  .cell .id{font-size:10px; font-weight:800; color:var(--mut);}
+  .cell .nm{font-weight:700; display:block; margin-top:2px; line-height:1.35;}
+  .cell .en{font-size:9.5px; color:var(--mut); letter-spacing:.3px; display:block; margin-top:3px;}
+
+  /* ---- Mapping table ---- */
+  table{width:100%; border-collapse:collapse; font-size:13px; background:#fff; border:1px solid var(--line); border-radius:8px; overflow:hidden;}
+  thead th{background:var(--ink); color:#fff; text-align:left; padding:9px 13px; font-size:12px; letter-spacing:.5px; font-weight:700;}
+  tbody td{padding:8px 13px; border-top:1px solid var(--soft); vertical-align:top;}
+  tbody tr:nth-child(even){background:#fdfcf9;}
+  td.q{font-weight:600; width:54%;}
+  .chip{display:inline-block; min-width:22px; text-align:center; font-size:11px; font-weight:800; color:#fff;
+    border-radius:5px; padding:2px 6px; margin:1px 3px 1px 0;}
+  .ck-A{background:var(--red)} .ck-B{background:var(--orange)} .ck-C{background:var(--blue)} .ck-D{background:var(--green)} .ck-E{background:var(--purple)}
+  .legend{display:flex; gap:16px; flex-wrap:wrap; font-size:11.5px; color:var(--mut); margin-top:10px;}
+  .legend span{display:flex; align-items:center; gap:6px;}
+  .legend i{width:11px; height:11px; border-radius:3px; display:inline-block;}
+
+  /* ---- Verdict flow ---- */
+  .verdict{background:var(--ink); color:#f3f0e8; border-radius:11px; padding:22px 24px;}
+  .verdict h3{font-size:15px; letter-spacing:1px; margin-bottom:16px; color:#fff; display:flex; align-items:center; gap:9px;}
+  .verdict h3::before{content:"▮"; color:var(--red);}
+  .vflow{display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center;}
+  .vnode{background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.16); border-radius:9px; padding:13px 18px; text-align:center; min-width:150px;}
+  .vnode .vt{font-size:15px; font-weight:800; color:#fff;}
+  .vnode .vd{font-size:11px; color:#b8b4a6; margin-top:4px; letter-spacing:.5px;}
+  .vplus{font-size:22px; font-weight:900; color:var(--red);}
+  .vsum{margin-top:18px; text-align:center; font-size:14px; line-height:1.7; color:#e9e5d9; border-top:1px solid rgba(255,255,255,.14); padding-top:16px;}
+  .vsum b{color:#fff; border-bottom:2px solid var(--red);}
+
+  footer{margin-top:40px; border-top:1.5px solid var(--line); padding-top:14px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; font-size:11px; color:var(--mut);}
+  footer .v{font-weight:800; letter-spacing:2px; color:var(--ink);}
+  .disclaim{background:var(--soft); border:1px dashed var(--line); border-radius:7px; padding:9px 13px; font-size:11px; color:var(--mut); margin-top:14px;}
+
+  @media(max-width:760px){
+    .qgrid,.cmp{grid-template-columns:1fr;} .cmp-col.l,.cmp-col.r{border-radius:10px; border:1px solid var(--line);}
+    .cmp{display:block;} .cmp-vs{display:none;} .cmp-col{margin-bottom:8px;}
+    .mcells{grid-template-columns:repeat(2,1fr);} .vflow{flex-direction:column;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="stamp">提<br>煉</div>
+  <div class="kicker">Systemic Risk Framework · Distilled</div>
+  <h1>2026 系統性風險  — <span class="accent">名句提煉</span>與資料矩陣</h1>
+  <p class="sub">將今日論述的核心語句，提煉為一句一句可引用、可建模、可量化的命題，並對映成 25 項可監控指標的資料矩陣（Data Matrix）。</p>
+  <div class="meta">
+    <span><b>框架來源</b>　Tony 論述彙整</span>
+    <span><b>命題</b>　16 句</span>
+    <span><b>指標</b>　25 項 / 5 群組</span>
+    <span><b>核心矛盾</b>　效率提升取代需求</span>
+  </div>
+</header>
+
+<!-- 1. 名句四大類 -->
+<section>
+  <h2><span class="no">1</span>四大命題類別<span class="en">Core Propositions</span></h2>
+  <div class="qgrid">
+    <div class="qcard c-red">
+      <div class="tag"><span class="dot"></span>A · 政治 × 資訊 × 群體心理</div>
+      <ul>
+        <li>政治干預資訊公正性與透明度，是這波危機的<b>起點</b>。</li>
+        <li>短期股市泡沫的利潤，<b>麻痺</b>了投資人與一般百姓。</li>
+        <li>選擇麻痺的人，無法避免成為<b>被害者</b>。</li>
+        <li>政治的貪婪注入金融的貪婪，形成<b>系統性風險</b>。</li>
+        <li>個人貪婪凌駕群體責任，是浩劫的<b>真正起點</b>。</li>
+      </ul>
+    </div>
+    <div class="qcard c-orange">
+      <div class="tag"><span class="dot"></span>B · 地緣政治 × 全球協作</div>
+      <ul>
+        <li>2008 的危機<b>有全球協作</b>，所以有底。</li>
+        <li>2026 的危機因地緣分裂，所以<b>沒有共同底</b>。</li>
+        <li>不平衡、不團結的地緣政治，將<b>拉長、加深、模糊</b>谷底。</li>
+      </ul>
+    </div>
+    <div class="qcard c-blue">
+      <div class="tag"><span class="dot"></span>C · AI × 就業 × 需求崩落</div>
+      <ul>
+        <li>AI 尚未蒙其利，便先<b>衝擊終端就業</b>市場。</li>
+        <li>AI 的效率提升<b>取代了需求復甦</b>，形成反向循環。</li>
+        <li>AI 行業獲利上升卻仍裁員，受益的是<b>資本家</b>。</li>
+        <li><b>效率提升取代需求</b>，是 2026 危機的核心矛盾。</li>
+      </ul>
+    </div>
+    <div class="qcard c-purple">
+      <div class="tag"><span class="dot"></span>D · 2026 vs 2008 本質差異</div>
+      <ul>
+        <li>2008 的反轉靠<b>真實需求</b>（iPhone）。</li>
+        <li>2026 沒有革命性終端產品，只有 AI 的<b>資本效率</b>。</li>
+        <li>Fed 若因<b>虛假就業數據</b>降息，可能發現完全無效。</li>
+        <li>本質：<b>需求缺失 × AI 失衡 × 政策誤判</b>。</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 2. 反向循環 -->
+<section>
+  <h2><span class="no">2</span>反向循環機制<span class="en">Reverse Loop</span></h2>
+  <div class="loop">
+    <div class="loop-row">
+      <div class="node cool"><b>AI CapEx <span class="delta up">↑</span></b><span class="n-en">Capex Intensity</span></div>
+      <div class="arr">→</div>
+      <div class="node cool"><b>效率提升 <span class="delta up">↑</span></b><span class="n-en">Efficiency Gain</span></div>
+      <div class="arr">→</div>
+      <div class="node hot"><b>取代需求復甦</b><span class="n-en">Demand Substitution</span></div>
+      <div class="arr">→</div>
+      <div class="node hot"><b>裁員 <span class="delta up">↑</span></b><span class="n-en">Layoff Intensity</span></div>
+      <div class="arr">→</div>
+      <div class="node hot"><b>終端需求 <span class="delta down">↓</span></b><span class="n-en">Demand Index</span></div>
+    </div>
+    <div class="loop-back">
+      <span>↻　需求↓ → 企業再求效率 → 再裁員 → 中產萎縮 → 需求再↓（自我強化的反向循環）</span>
+    </div>
+  </div>
+</section>
+
+<!-- 3. 2008 vs 2026 -->
+<section>
+  <h2><span class="no">3</span>反轉動能對照<span class="en">2008 vs 2026</span></h2>
+  <div class="cmp">
+    <div class="cmp-col l">
+      <div class="cmp-head">2008 · 有底</div>
+      <ul>
+        <li>危機根源為金融崩壞，可被流動性與政策修復</li>
+        <li>全球央行與政府<b>同步協作</b>，築出共同底部</li>
+        <li>反轉靠<b>真實終端需求</b>（智慧型手機革命）</li>
+        <li>需求是引擎，資本與就業隨之復甦</li>
+      </ul>
+    </div>
+    <div class="cmp-vs">VS</div>
+    <div class="cmp-col r">
+      <div class="cmp-head">2026 · 無共同底</div>
+      <ul>
+        <li>危機根源為<b>需求缺失</b>，非單純金融崩壞</li>
+        <li>地緣分裂、協作瓦解，谷底被拉長加深模糊</li>
+        <li>無革命性終端產品，只有 AI 的<b>資本效率</b></li>
+        <li>效率取代需求；Fed 若依虛假數據降息恐無效</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 4. 資料矩陣 -->
+<section>
+  <h2><span class="no">4</span>系統風險資料矩陣<span class="en">25 Indicators · 5 Groups</span></h2>
+
+  <div class="mgroup">
+    <div class="mhead m-A"><span>A · 政治 × 資訊透明度</span><span class="gc">POLITICS / INFO</span></div>
+    <div class="mcells">
+      <div class="cell"><span class="id">01</span><span class="nm">資訊透明度</span><span class="en">Info Transparency Index</span></div>
+      <div class="cell"><span class="id">02</span><span class="nm">數據可信度</span><span class="en">Data Reliability Score</span></div>
+      <div class="cell"><span class="id">03</span><span class="nm">政治干預風險</span><span class="en">Political Interference</span></div>
+      <div class="cell"><span class="id">04</span><span class="nm">敘事偏差度</span><span class="en">Narrative Bias Index</span></div>
+      <div class="cell"><span class="id">05</span><span class="nm">群體麻痺程度</span><span class="en">Mass Numbness Index</span></div>
+    </div>
+  </div>
+
+  <div class="mgroup">
+    <div class="mhead m-B"><span>B · 地緣政治 × 全球協作</span><span class="gc">GEOPOLITICS</span></div>
+    <div class="mcells">
+      <div class="cell"><span class="id">06</span><span class="nm">地緣衝突風險</span><span class="en">Geopolitical Risk</span></div>
+      <div class="cell"><span class="id">07</span><span class="nm">央行同步度</span><span class="en">CB Synchronization</span></div>
+      <div class="cell"><span class="id">08</span><span class="nm">供應鏈穩定度</span><span class="en">Supply Chain Stability</span></div>
+      <div class="cell"><span class="id">09</span><span class="nm">能源風險</span><span class="en">Energy Shock Risk</span></div>
+      <div class="cell"><span class="id">10</span><span class="nm">全球協作度</span><span class="en">Global Cooperation</span></div>
+    </div>
+  </div>
+
+  <div class="mgroup">
+    <div class="mhead m-C"><span>C · AI × 就業 × 需求（反向循環）</span><span class="gc">AI / DEMAND</span></div>
+    <div class="mcells">
+      <div class="cell"><span class="id">11</span><span class="nm">AI CapEx 強度</span><span class="en">AI Capex Intensity</span></div>
+      <div class="cell"><span class="id">12</span><span class="nm">AI 裁員強度</span><span class="en">AI Layoff Intensity</span></div>
+      <div class="cell"><span class="id">13</span><span class="nm">AI 獲利集中度</span><span class="en">Profit Concentration</span></div>
+      <div class="cell"><span class="id">14</span><span class="nm">終端需求指標</span><span class="en">Demand Index</span></div>
+      <div class="cell"><span class="id">15</span><span class="nm">中產萎縮指標</span><span class="en">Middle Class Compression</span></div>
+    </div>
+  </div>
+
+  <div class="mgroup">
+    <div class="mhead m-D"><span>D · 金融 × 流動性 × 資產</span><span class="gc">FINANCE</span></div>
+    <div class="mcells">
+      <div class="cell"><span class="id">16</span><span class="nm">流動性壓力</span><span class="en">Liquidity Stress</span></div>
+      <div class="cell"><span class="id">17</span><span class="nm">信用鏈條壓力</span><span class="en">Credit Chain Stress</span></div>
+      <div class="cell"><span class="id">18</span><span class="nm">高收益債利差</span><span class="en">HY Spread</span></div>
+      <div class="cell"><span class="id">19</span><span class="nm">波動率</span><span class="en">VIX</span></div>
+      <div class="cell"><span class="id">20</span><span class="nm">資產泡沫指標</span><span class="en">Asset Bubble Index</span></div>
+    </div>
+  </div>
+
+  <div class="mgroup">
+    <div class="mhead m-E"><span>E · 系統性風險（整合）</span><span class="gc">SYSTEM</span></div>
+    <div class="mcells">
+      <div class="cell"><span class="id">21</span><span class="nm">系統脆弱度</span><span class="en">System Fragility</span></div>
+      <div class="cell"><span class="id">22</span><span class="nm">反向循環強度</span><span class="en">Reverse Loop Strength</span></div>
+      <div class="cell"><span class="id">23</span><span class="nm">政策錯判風險</span><span class="en">Policy Misjudgment</span></div>
+      <div class="cell"><span class="id">24</span><span class="nm">需求缺失風險</span><span class="en">Demand Collapse Risk</span></div>
+      <div class="cell"><span class="id">25</span><span class="nm">全球谷底深度</span><span class="en">Bottom Depth Estimate</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. 名句對映 -->
+<section>
+  <h2><span class="no">5</span>命題 → 矩陣對映<span class="en">Mapping</span></h2>
+  <table>
+    <thead><tr><th>核心命題</th><th>對應指標</th></tr></thead>
+    <tbody>
+      <tr><td class="q">政治干預資訊透明度</td><td><span class="chip ck-A">01</span><span class="chip ck-A">02</span><span class="chip ck-A">03</span></td></tr>
+      <tr><td class="q">短期泡沫麻痺投資人</td><td><span class="chip ck-A">04</span><span class="chip ck-A">05</span></td></tr>
+      <tr><td class="q">選擇麻痺的人成為被害者</td><td><span class="chip ck-A">05</span></td></tr>
+      <tr><td class="q">政治貪婪 × 金融貪婪</td><td><span class="chip ck-A">03</span><span class="chip ck-A">04</span><span class="chip ck-D">16</span><span class="chip ck-D">20</span></td></tr>
+      <tr><td class="q">個人貪婪凌駕群體責任</td><td><span class="chip ck-A">05</span><span class="chip ck-E">21</span></td></tr>
+      <tr><td class="q">2008 有全球協作</td><td><span class="chip ck-B">10</span></td></tr>
+      <tr><td class="q">2026 無全球協作</td><td><span class="chip ck-B">10</span><span class="chip ck-B">06</span></td></tr>
+      <tr><td class="q">地緣政治拉長谷底</td><td><span class="chip ck-B">06</span><span class="chip ck-B">09</span><span class="chip ck-E">25</span></td></tr>
+      <tr><td class="q">AI 尚未蒙其利先衝擊就業</td><td><span class="chip ck-C">12</span><span class="chip ck-C">15</span></td></tr>
+      <tr><td class="q">AI 效率取代需求</td><td><span class="chip ck-C">11</span><span class="chip ck-C">12</span><span class="chip ck-C">14</span></td></tr>
+      <tr><td class="q">AI 獲利集中但裁員</td><td><span class="chip ck-C">11</span><span class="chip ck-C">12</span><span class="chip ck-C">13</span></td></tr>
+      <tr><td class="q">2008 有 iPhone 需求</td><td><span class="chip ck-C">14</span></td></tr>
+      <tr><td class="q">2026 無終端需求</td><td><span class="chip ck-C">14</span><span class="chip ck-E">24</span></td></tr>
+      <tr><td class="q">Fed 降息無效</td><td><span class="chip ck-E">23</span><span class="chip ck-E">24</span></td></tr>
+      <tr><td class="q">危機本質：需求缺失 × AI 失衡 × 政策誤判</td><td><span class="chip ck-C">11</span>–<span class="chip ck-C">15</span><span class="chip ck-E">23</span>–<span class="chip ck-E">24</span></td></tr>
+    </tbody>
+  </table>
+  <div class="legend">
+    <span><i style="background:var(--red)"></i>A 政治／資訊</span>
+    <span><i style="background:var(--orange)"></i>B 地緣政治</span>
+    <span><i style="background:var(--blue)"></i>C AI／需求</span>
+    <span><i style="background:var(--green)"></i>D 金融</span>
+    <span><i style="background:var(--purple)"></i>E 系統整合</span>
+  </div>
+</section>
+
+<!-- 6. 核心判讀 -->
+<section>
+  <h2><span class="no">6</span>核心判讀<span class="en">Verdict</span></h2>
+  <div class="verdict">
+    <h3>2026 危機本質 — 不是金融崩壞</h3>
+    <div class="vflow">
+      <div class="vnode"><div class="vt">需求缺失</div><div class="vd">Demand Collapse</div></div>
+      <div class="vplus">×</div>
+      <div class="vnode"><div class="vt">AI 失衡</div><div class="vd">AI Imbalance</div></div>
+      <div class="vplus">×</div>
+      <div class="vnode"><div class="vt">政策誤判</div><div class="vd">Policy Misjudgment</div></div>
+    </div>
+    <div class="vsum">
+      與 2008 不同——本輪缺乏革命性終端產品與全球協作底部。<br>
+      效率取代需求形成<b>自我強化的反向循環</b>，地緣分裂使谷底被<b>拉長、加深、模糊</b>。<br>
+      若政策依虛假就業數據誤判降息，恐發現<b>傳統貨幣工具完全失效</b>。
+    </div>
+  </div>
+  <div class="disclaim">
+    資料時點：論述彙整版（思想框架，非即時市場數據）。本內容為思考與分析框架之整理，<b>非投資建議</b>；任何投資決策應自行評估並承擔風險。
+  </div>
+</section>
+
+<footer>
+  <span class="v">VERITAS INTELLIGENCE ANALYTICS</span>
+  <span>2026 Systemic Risk · Propositions &amp; Data Matrix</span>
+</footer>
+
+</body>
+</html>

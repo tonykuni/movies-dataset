@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VERITAS INTELLIGENCE SYSTEM</title>
+<!-- @lock VPN v3.5 visual identity : palette + fonts immutable -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* VPN v3.5 locked palette */
+  --vpn-blue:#4c78a8; --vpn-grey:#9c9890; --vpn-teal:#439a9a;
+  /* dark enterprise shell */
+  --bg:#0f1318; --bg2:#141a21; --panel:#1a212a; --panel2:#202a35;
+  --line:#2a3540; --ink:#e7ecf1; --ink-dim:#9aa7b4; --ink-faint:#6b7886;
+  --lock:#d8654f; --edit:#5bb38a;
+  --font-display:"Syne",sans-serif; --font-body:"DM Sans",sans-serif; --font-mono:"DM Mono",monospace;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);}
+a{color:inherit;}
+
+/* header --------------------------------------------------------------- */
+header.vhs-top{
+  background:linear-gradient(90deg,var(--vpn-blue),#3c5f86);
+  padding:16px 26px;display:flex;align-items:center;gap:16px;
+  border-bottom:1px solid var(--line);
+}
+.vhs-mark{width:38px;height:38px;border-radius:9px;background:var(--vpn-teal);
+  display:grid;place-items:center;font-family:var(--font-display);font-weight:800;
+  color:#0f1318;font-size:18px;flex:0 0 auto;}
+.vhs-tt{display:flex;flex-direction:column;}
+.vhs-tt h1{margin:0;font-family:var(--font-display);font-weight:800;font-size:19px;letter-spacing:.3px;}
+.vhs-tt p{margin:2px 0 0;font-size:12px;color:#dbe6f2;letter-spacing:1.5px;text-transform:uppercase;}
+
+/* summary -------------------------------------------------------------- */
+.vhs-summary{display:flex;gap:14px;padding:18px 26px 6px;flex-wrap:wrap;}
+.vhs-stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  padding:13px 18px;min-width:120px;}
+.vhs-stat-n{font-family:var(--font-mono);font-size:22px;font-weight:500;}
+.vhs-stat-l{font-size:11px;color:var(--ink-dim);margin-top:3px;letter-spacing:.4px;}
+.vhs-stat.is-lock .vhs-stat-n{color:var(--lock);}
+.vhs-stat.is-edit .vhs-stat-n{color:var(--edit);}
+.vhs-scanpath{padding:2px 26px 14px;font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);}
+
+/* toolbar -------------------------------------------------------------- */
+.vhs-bar{display:flex;gap:10px;padding:0 26px 14px;flex-wrap:wrap;align-items:center;}
+.vhs-bar input,.vhs-bar select{
+  background:var(--bg2);border:1px solid var(--line);color:var(--ink);
+  border-radius:9px;padding:8px 12px;font-family:var(--font-body);font-size:13px;}
+.vhs-bar input{min-width:240px;flex:1;}
+.vhs-seg{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;}
+.vhs-seg button{background:var(--bg2);color:var(--ink-dim);border:0;padding:8px 14px;
+  font-size:12px;cursor:pointer;font-family:var(--font-body);}
+.vhs-seg button.on{background:var(--vpn-blue);color:#fff;}
+
+/* tabs ----------------------------------------------------------------- */
+.vhs-tabs{display:flex;gap:8px;padding:0 26px;flex-wrap:wrap;border-bottom:1px solid var(--line);}
+.vhs-tab{background:transparent;border:1px solid var(--line);border-bottom:0;
+  border-radius:10px 10px 0 0;padding:9px 14px;color:var(--ink-dim);cursor:pointer;
+  display:flex;align-items:center;gap:9px;font-family:var(--font-mono);font-size:12px;
+  transform:translateY(1px);}
+.vhs-tab.active{background:var(--panel);color:var(--ink);border-color:var(--vpn-teal);}
+.vhs-mini{font-family:var(--font-mono);font-size:11px;padding:1px 6px;border-radius:6px;}
+.vhs-mini.lock{background:rgba(216,101,79,.16);color:var(--lock);}
+.vhs-mini.edit{background:rgba(91,179,138,.16);color:var(--edit);}
+.vhs-tab-badge{display:flex;gap:4px;}
+
+/* body ----------------------------------------------------------------- */
+.vhs-stage{padding:18px 26px 60px;}
+.vhs-filehead{display:flex;align-items:center;gap:14px;margin-bottom:14px;flex-wrap:wrap;}
+.vhs-fh-name{font-family:var(--font-display);font-size:18px;font-weight:700;}
+.vhs-fh-meta{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);}
+.vhs-livebtn{margin-left:auto;background:var(--vpn-teal);color:#0f1318;border:0;
+  padding:8px 14px;border-radius:9px;font-weight:600;cursor:pointer;font-size:12px;}
+
+.vhs-cat{margin-bottom:18px;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--bg2);}
+.vhs-cat-h{display:flex;align-items:center;justify-content:space-between;
+  padding:11px 16px;background:var(--panel);border-bottom:1px solid var(--line);}
+.vhs-cat-t{font-family:var(--font-mono);font-size:13px;letter-spacing:.5px;color:var(--ink);}
+.vhs-cat-c{font-family:var(--font-mono);font-size:11px;color:var(--ink-faint);}
+
+.vhs-table{display:flex;flex-direction:column;}
+.vhs-row{display:grid;grid-template-columns:78px minmax(0,1.6fr) minmax(0,1fr);
+  gap:14px;padding:9px 16px;align-items:center;border-bottom:1px solid rgba(42,53,64,.5);}
+.vhs-row:last-child{border-bottom:0;}
+.vhs-row.r-lock{background:rgba(216,101,79,.05);}
+.vhs-badge{font-size:11px;text-align:center;padding:3px 0;border-radius:7px;font-weight:600;}
+.b-lock{background:rgba(216,101,79,.16);color:var(--lock);border:1px solid rgba(216,101,79,.4);}
+.b-edit{background:rgba(91,179,138,.13);color:var(--edit);border:1px solid rgba(91,179,138,.35);}
+.vhs-kv{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.vhs-k{font-family:var(--font-mono);font-size:12px;color:var(--ink);}
+.vhs-v{font-size:12px;color:var(--ink-dim);word-break:break-all;}
+.vhs-reason{font-size:11px;color:var(--ink-faint);}
+
+.vhs-empty{padding:30px;text-align:center;color:var(--ink-faint);font-size:13px;}
+.vhs-livebox{margin-top:8px;}
+
+@media(max-width:720px){
+  .vhs-row{grid-template-columns:64px 1fr;}
+  .vhs-reason{grid-column:1/-1;padding-left:78px;}
+}
+</style>
+</head>
+<body>
+<header class="vhs-top" data-lock="true">
+  <div class="vhs-mark">V</div>
+  <div class="vhs-tt">
+    <h1>VHS \u00b7 HTML U/I \u5168\u898f\u683c\u8b80\u53d6\u5668</h1>
+    <p>VERITAS INTELLIGENCE SYSTEM</p>
+  </div>
+</header>
+
+<div class="vhs-summary" id="vhs-summary"></div>
+<div class="vhs-scanpath" id="vhs-scanpath"></div>
+
+<div class="vhs-bar">
+  <input id="vhs-search" placeholder="\u641c\u5c0b key / value / reason\u2026">
+  <select id="vhs-catsel"></select>
+  <div class="vhs-seg">
+    <button data-filter="ALL" class="on">\u5168\u90e8</button>
+    <button data-filter="LOCK">\u50c5\u4e0d\u53ef\u6539</button>
+    <button data-filter="EDIT">\u50c5\u53ef\u6539</button>
+  </div>
+</div>
+
+<div class="vhs-tabs" id="vhs-tabs"></div>
+<div class="vhs-stage"><div id="vhs-files"></div></div>
+
+<script src="./vhs_extract.js"></script>
+</body>
+</html>

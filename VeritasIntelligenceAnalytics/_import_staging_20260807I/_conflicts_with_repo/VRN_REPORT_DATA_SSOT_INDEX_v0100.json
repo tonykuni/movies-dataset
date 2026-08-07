@@ -1,0 +1,117 @@
+{
+  "def_schema": "VRN_REPORT_DATA_SSOT_INDEX",
+  "def_schema_version": "v0100",
+  "def_system": "VeritasReportNova",
+  "def_module": "VRN",
+  "def_generated_at": "2026/06/26 00:00:00 Asia/Taipei",
+  "def_status": "VRN_REPORT_DATA_SSOT_INDEX_READY",
+  "def_language": "zh-TW",
+  "def_purpose": "Index linking Report Basic Info SSOT and Report Financial Data SSOT for System Manager, DuckDB, validation gates, and HTML audit.",
+  "def_policy": {
+    "def_destructive_delete": false,
+    "def_stop_process": false,
+    "def_network_required": false,
+    "def_patch_source_allowed_by_default": false,
+    "def_review_before_apply": true,
+    "def_outputs_are_append_only_by_default": true,
+    "def_encoding": {
+      "def_json": "utf-8",
+      "def_parquet": "pyarrow parquet",
+      "def_csv": "utf-8-sig",
+      "def_html": "utf-8"
+    },
+    "def_timezone": "Asia/Taipei",
+    "def_date_format_output": "YYYY/MM/DD",
+    "def_datetime_format_output": "YYYY/MM/DD HH:mm:ss",
+    "def_path_policy": "Use LiteralPath in PowerShell. Keep OneDrive and Downloads paths as candidates. Do not delete old outputs; write run-scoped outputs and update active pointer only after validation."
+  },
+  "def_datasets": [
+    {
+      "def_dataset_name": "StockReportBasicInfo",
+      "def_ssot_file": "VRN_REPORT_BASIC_INFO_SSOT_v0100.json",
+      "def_role": "report_master_dimension",
+      "def_core_columns": 13,
+      "def_primary_key": [
+        "record_hash"
+      ],
+      "def_business_key": [
+        "report_id"
+      ]
+    },
+    {
+      "def_dataset_name": "StockReportFinancialData",
+      "def_ssot_file": "VRN_REPORT_FINANCIAL_DATA_SSOT_v0100.json",
+      "def_role": "report_financial_fact_table",
+      "def_core_columns": 18,
+      "def_primary_key": [
+        "record_hash"
+      ],
+      "def_foreign_key": [
+        {
+          "def_field": "report_id",
+          "def_target_dataset": "StockReportBasicInfo",
+          "def_target_field": "report_id"
+        }
+      ]
+    }
+  ],
+  "def_join_contract": {
+    "def_join_name": "basic_info_to_financial_data",
+    "def_left_dataset": "StockReportBasicInfo",
+    "def_right_dataset": "StockReportFinancialData",
+    "def_join_key": "report_id",
+    "def_cardinality": "one_basic_info_to_many_financial_rows",
+    "def_required_gate": "FIN_G006_BASIC_INFO_FK"
+  },
+  "def_system_manager_load_order": [
+    "VRN_OUTPUTS_SSOT_v0100.json",
+    "VRN_REPORT_BASIC_INFO_SSOT_v0100.json",
+    "VRN_REPORT_FINANCIAL_DATA_SSOT_v0100.json",
+    "VRN_REPORT_DATA_SSOT_INDEX_v0100.json"
+  ],
+  "def_minimum_ready_gates": [
+    "BASIC_G001_FILE_EXISTS_NON_EMPTY",
+    "BASIC_G002_PARQUET_READABLE",
+    "BASIC_G003_CORE_13_COLUMNS",
+    "BASIC_G004_REQUIRED_NOT_BLANK",
+    "BASIC_G005_REPORT_ID_UNIQUE",
+    "BASIC_G006_RECORD_HASH_UNIQUE",
+    "FIN_G001_FILE_EXISTS_NON_EMPTY",
+    "FIN_G002_PARQUET_READABLE",
+    "FIN_G003_CORE_18_COLUMNS",
+    "FIN_G004_REQUIRED_NOT_BLANK",
+    "FIN_G005_RECORD_HASH_UNIQUE",
+    "FIN_G006_BASIC_INFO_FK",
+    "FIN_G007_ACCOUNT_CANONICAL_NOT_BLANK"
+  ],
+  "def_html_combined_panel": {
+    "def_panel_name": "VRN Report Data SSOT",
+    "def_required_cards": [
+      "basic_rows",
+      "financial_rows",
+      "report_count",
+      "ticker_count",
+      "account_canonical_count",
+      "fk_orphan_count",
+      "review_queue_count"
+    ],
+    "def_required_tables": [
+      "dataset_readiness_matrix",
+      "join_quality_matrix",
+      "validation_gate_matrix",
+      "latest_reports_matrix"
+    ]
+  },
+  "def_artifact_manifest": [
+    {
+      "def_file": "VRN_REPORT_BASIC_INFO_SSOT_v0100.json",
+      "def_sha256": "6b4382a8fa5c1d8e2aa432a969e6700b58eb2abe566ab9cd82cffa57ed25fe7d",
+      "def_size_bytes": 17420
+    },
+    {
+      "def_file": "VRN_REPORT_FINANCIAL_DATA_SSOT_v0100.json",
+      "def_sha256": "847d8fbd00fd9c7fb95334bbdb987be2560d16404d4f569ca355e66880c09bb3",
+      "def_size_bytes": 23225
+    }
+  ]
+}

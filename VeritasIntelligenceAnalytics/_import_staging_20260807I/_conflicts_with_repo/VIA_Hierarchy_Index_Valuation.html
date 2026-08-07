@@ -1,0 +1,237 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · 三階層族群指數 × 全球評價 · Auto-Coding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--blue:#4c78a8;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--vi:#7a6daa;
+ --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg)}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5}
+.wrap{max-width:1280px;margin:0 auto;padding:0 22px 60px}
+.bar{position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50}
+header{padding:20px 0 9px;margin-bottom:10px;border-bottom:2px solid var(--ink)}
+.kicker{font:700 10px 'DM Mono',monospace;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px}
+h1{font:800 19px/1.2 'Syne',sans-serif;color:var(--ink)}h1 span{color:var(--up)}
+.sub{margin-top:6px;font:400 10.5px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:1010px}
+.sub b{color:var(--ink2)}
+.gov{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#1e1d1a;border-radius:3px;padding:7px 14px;margin:12px 0}
+.gov .lk{font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase}
+.gov .pill{font:600 7.5px 'DM Mono',monospace;color:#cfcabf}
+.gov .ver{margin-left:auto;font:700 8px 'DM Mono',monospace;color:#1e1d1a;background:#c4943a;border-radius:3px;padding:2px 8px}
+.note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--am);border-radius:3px;padding:8px 14px;margin-bottom:14px;font:500 9px/1.6 'DM Mono',monospace;color:var(--mut)}
+.note b{color:var(--ink2)}
+h2{font:800 13px 'Syne',sans-serif;color:var(--ink);margin:26px 0 4px;padding-bottom:5px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:8px}
+h2 .en{font:600 8px 'DM Mono',monospace;color:var(--mut2);letter-spacing:1px;text-transform:uppercase}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:0;overflow:hidden;margin-top:12px}
+table{width:100%;border-collapse:collapse;font:500 10px 'DM Mono',monospace}
+th{font:700 8px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.5px;color:var(--mut);text-align:right;padding:7px 8px;border-bottom:2px solid var(--ink);background:var(--paper2);position:sticky;top:0}
+th.l,td.l{text-align:left}
+td{padding:5px 8px;border-bottom:1px solid var(--soft);text-align:right}
+tr:hover td{background:var(--paper2)}
+.lvl{font:700 7px 'DM Mono',monospace;color:#fff;border-radius:3px;padding:1px 6px}
+.L1{background:#1e1d1a}.L2{background:#4c78a8}.L3{background:#439a9a}.GL{background:#7a6daa}
+.acode{font:500 8.5px 'DM Mono',monospace;color:var(--vi)}
+.scode{font:700 9px 'DM Mono',monospace;color:var(--blue)}
+.nm{font:700 11.5px 'Noto Sans TC',sans-serif;color:var(--ink)}
+.tk{font:500 9px 'DM Mono',monospace;color:var(--mut)}
+.idx{font:800 13px 'Syne',sans-serif}
+.i1 td{background:#f1eee9;font-weight:700}
+.i2 td{background:#f7f5f1}
+.ind1{padding-left:10px}.ind2{padding-left:26px}.ind3{padding-left:42px}
+.up{color:var(--up)}.down{color:var(--down)}
+.cellin{font-family:'DM Mono',monospace;text-align:right;border:none;background:transparent;width:56px;font-size:10px}
+.cellin:focus{outline:1px solid var(--blue)}
+.reg{font:600 7.5px 'DM Mono',monospace;border-radius:3px;padding:1px 5px;background:var(--soft);color:var(--mut)}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:11px 14px;border-top:1px solid var(--line)}
+.btn{font:700 8.5px 'DM Mono',monospace;cursor:pointer;border:1px solid var(--ink);background:transparent;color:var(--ink);border-radius:3px;padding:6px 11px}
+.pdf{position:fixed;top:12px;right:14px;z-index:999;background:var(--ink);color:#fff;border:none;border-radius:5px;padding:7px 13px;font:700 9px 'DM Mono',monospace;cursor:pointer}
+.hd2{font:800 11px 'Syne',sans-serif;padding:10px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between}
+@media print{@page{size:A4 landscape;margin:9mm}.pdf,.toolbar{display:none!important}th{position:static!important}}
+</style></head><body>
+<div class="bar"></div><button class="pdf" onclick="window.print()">⤓ PDF</button>
+<div class="wrap">
+<header>
+ <div class="kicker">VERITAS INTELLIGENCE · 三階層族群指數 × 全球評價 · AUTO-CODING EMBEDDED</div>
+ <h1>三階層族群指數 <span>×</span> 全球同業評價 · Hierarchical Index &amp; Valuation</h1>
+ <p class="sub">每個族群分 <b>三階層 L1 族群 / L2 次族群 / L3 個股</b>，自動編碼系統為每個節點鑄唯一 <b>VIA 碼</b>（語意碼 + 自動宇宙碼）。L1、L2 各自 <b>化為族群指數</b>（正規化 adj close 均值，基準 2026-01-02=100）。評價表涵蓋 <b>全部個股 + 全球同業</b>（Vertiv/Eaton/Modine/Schneider/nVent），以 <b>adj close</b> 為價。每列標 <b>Level</b>。<b>紅漲綠跌・非投資建議</b>。</p>
+</header>
+<div class="gov">
+ <span class="lk">🔒 AUTO-CODING · GOVERNED</span>
+ <span class="pill">L1/L2/L3 三階層</span>
+ <span class="pill">auto universal code</span>
+ <span class="pill">base 2026-01-02=100</span>
+ <span class="pill">append-only</span>
+ <span class="ver" id="mode">示意 DEMO</span>
+</div>
+<div class="note">⚠️ <b>資料狀態</b>：族群指數用示意正規化序列、評價用示意價/EPS（皆合成）。<b>匯入 via_prices.csv</b> → 指數與 adj close 轉真實；EPS/BVPS 可直接於表中編輯或匯入財報。自動編碼即時對每個節點產生 VIA 碼。</div>
+
+<h2>三階層族群指數樹 <span class="en">L1 / L2 Group Index · normalized adj close</span></h2>
+<div class="card"><table><thead><tr>
+ <th class="l">Level</th><th class="l">語意碼</th><th class="l">自動 VIA 碼</th><th class="l">名稱</th>
+ <th>成員</th><th>族群指數</th><th>報酬%</th></tr></thead>
+<tbody id="tree"></tbody></table></div>
+
+<h2>評價表 · 全部個股 + 全球同業 <span class="en">Valuation · Adj Close based</span></h2>
+<div class="card"><div class="hd2">以 adj close 為價 · PER=Price/EPS · PBR=Price/BVPS<span class="tk" id="vstat"></span></div>
+<table><thead><tr>
+ <th class="l">Lv</th><th class="l">VIA 碼</th><th class="l">名稱</th><th class="l">代號</th><th class="l">區</th>
+ <th>Adj Close</th><th>EPS</th><th>PER</th><th>BVPS</th><th>PBR</th></tr></thead>
+<tbody id="val"></tbody></table>
+<div class="toolbar">
+ <label class="btn" style="display:inline-block">匯入 via_prices.csv<input type="file" id="imp" accept=".csv" style="display:none"></label>
+ <button class="btn" id="expReg">匯出編號登錄(含自動碼)</button>
+ <button class="btn" id="expVal">匯出評價表 CSV</button>
+ <span class="tk">TW 個股 + 全球同業；PER/PBR 越低相對越便宜（紅字=同組最低）。</span>
+</div></div>
+</div>
+<script>
+const D={"l1": {"TH": "熱管理 Thermal", "PW": "電源 Power"}, "l2": {"TH-110": ["TH", "氣冷/均熱片"], "TH-120": ["TH", "液冷水冷板"], "TH-130": ["TH", "CDU"], "TH-140": ["TH", "散熱風扇"], "TH-150": ["TH", "快接頭"], "TH-160": ["TH", "機櫃/背門"], "PW-210": ["PW", "伺服器電源模組"], "PW-220": ["PW", "Power Shelf"], "PW-230": ["PW", "消費/電競電源"], "PW-240": ["PW", "工業/醫療/車用"]}, "stocks": [{"n": "奇鋐", "t": "3017", "fam": "TH", "code": "TH-110-01", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "VN", "desc": "3D VC 均熱片・水冷板龍頭・垂直整合", "new": false, "region": "TW", "px": 1450, "eps": 55, "bvps": 180, "l2": "TH-110"}, {"n": "雙鴻", "t": "3324", "fam": "TH", "code": "TH-120-02", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "VN", "desc": "水冷板/CDU・微水道加工・液冷轉型最快", "new": false, "region": "TW", "px": 720, "eps": 28, "bvps": 95, "l2": "TH-120"}, {"n": "健策", "t": "3653", "fam": "TH", "code": "TH-120-03", "tr": "TH-TR-01", "pr": "TH-PR-01", "loc": "TW", "desc": "晶片級均熱片・全球市佔一・毛利含金量王", "new": false, "region": "TW", "px": 3480, "eps": 90, "bvps": 260, "l2": "TH-120"}, {"n": "高力", "t": "8996", "fam": "TH", "code": "TH-130-04", "tr": "TH-TR-01", "pr": "TH-PR-03", "loc": "TW", "desc": "CDU・真空硬焊・大型熱交換機櫃", "new": false, "region": "TW", "px": 1445, "eps": 32, "bvps": 120, "l2": "TH-130"}, {"n": "富世達", "t": "6805", "fam": "TH", "code": "TH-150-05", "tr": "TH-TR-01", "pr": "TH-PR-01", "loc": "TW", "desc": "快接頭・MIM 精密製程・零洩漏", "new": false, "region": "TW", "px": 1300, "eps": 40, "bvps": 150, "l2": "TH-150"}, {"n": "晟銘電", "t": "3013", "fam": "TH", "code": "TH-160-06", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "TW", "desc": "機櫃/水冷背門・一體化液冷機櫃", "new": true, "region": "TW", "px": 94, "eps": 4.5, "bvps": 30, "l2": "TH-160"}, {"n": "勤誠", "t": "8210", "fam": "TH", "code": "TH-160-07", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "TW", "desc": "伺服器機殼・水冷機櫃基礎設施", "new": true, "region": "TW", "px": 520, "eps": 25, "bvps": 110, "l2": "TH-160"}, {"n": "力致", "t": "3483", "fam": "TH", "code": "TH-140-08", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "TW", "desc": "高壓高轉速風扇・熱排交換", "new": true, "region": "TW", "px": 380, "eps": 12, "bvps": 55, "l2": "TH-140"}, {"n": "動力-KY", "t": "6591", "fam": "TH", "code": "TH-140-09", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "TW", "desc": "伺服器高壓風扇", "new": true, "region": "TW", "px": 430, "eps": 15, "bvps": 60, "l2": "TH-140"}, {"n": "建準", "t": "2421", "fam": "TH", "code": "TH-140-10", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "TW", "desc": "風扇/水泵/風扇背牆", "new": true, "region": "TW", "px": 280, "eps": 9, "bvps": 40, "l2": "TH-140"}, {"n": "一詮", "t": "2486", "fam": "TH", "code": "TH-110-11", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "TW", "desc": "導線架轉 TPU 先進封裝散熱片", "new": true, "region": "TW", "px": 120, "eps": 3.5, "bvps": 22, "l2": "TH-110"}, {"n": "邁科", "t": "6831", "fam": "TH", "code": "TH-120-12", "tr": "TH-TR-01", "pr": "TH-PR-02", "loc": "TW", "desc": "美系 ASIC 熱解方案", "new": true, "region": "TW", "px": 210, "eps": 6, "bvps": 35, "l2": "TH-120"}, {"n": "台達電", "t": "2308", "fam": "PW", "code": "PW-210-01", "tr": "PW-TR-01", "pr": "PW-PR-01", "loc": "TH", "desc": "Grid to Chip 電源+液冷一條龍・全球龍頭", "new": false, "region": "TW", "px": 350, "eps": 15, "bvps": 90, "l2": "PW-210"}, {"n": "光寶科", "t": "2301", "fam": "PW", "code": "PW-220-02", "tr": "PW-TR-01", "pr": "PW-PR-01", "loc": "TH", "desc": "5.5kW/8kW ORv3・Power Shelf 率先出貨", "new": false, "region": "TW", "px": 159, "eps": 7, "bvps": 50, "l2": "PW-220"}, {"n": "群電", "t": "6412", "fam": "PW", "code": "PW-220-03", "tr": "PW-TR-01", "pr": "PW-PR-02", "loc": "TW", "desc": "機架整合・低軌衛星地面站電源", "new": false, "region": "TW", "px": 280, "eps": 12, "bvps": 70, "l2": "PW-220"}, {"n": "海韻電", "t": "6203", "fam": "PW", "code": "PW-230-04", "tr": "PW-TR-02", "pr": "PW-PR-02", "loc": "TW", "desc": "ATX 3.1/PCIe 5.1 原生模組化電源", "new": false, "region": "TW", "px": 210, "eps": 10, "bvps": 45, "l2": "PW-230"}, {"n": "康舒", "t": "6282", "fam": "PW", "code": "PW-220-05", "tr": "PW-TR-01", "pr": "PW-PR-01", "loc": "TW", "desc": "33kW PowerShelf・金仁寶集團", "new": true, "region": "TW", "px": 95, "eps": 4, "bvps": 30, "l2": "PW-220"}, {"n": "全漢", "t": "3015", "fam": "PW", "code": "PW-230-06", "tr": "PW-TR-02", "pr": "PW-PR-02", "loc": "TW", "desc": "電競/工業/PC 電源・防潮工業級", "new": true, "region": "TW", "px": 120, "eps": 6, "bvps": 40, "l2": "PW-230"}, {"n": "曜越", "t": "3540", "fam": "PW", "code": "PW-230-07", "tr": "PW-TR-02", "pr": "PW-PR-02", "loc": "TW", "desc": "電競 RGB 電源周邊", "new": true, "region": "TW", "px": 85, "eps": 3, "bvps": 22, "l2": "PW-230"}], "peers": [{"n": "Vertiv", "t": "VRT", "region": "US", "fam": "TH", "l2": "GL-COOL", "desc": "液冷/電源龍頭・$15B backlog", "px": 280, "eps": 6.05, "bvps": 22}, {"n": "Eaton", "t": "ETN", "region": "US", "fam": "PW", "l2": "GL-PWR", "desc": "電源管理+Boyd液冷", "px": 360, "eps": 11.5, "bvps": 70}, {"n": "Modine", "t": "MOD", "region": "US", "fam": "TH", "l2": "GL-COOL", "desc": "資料中心散熱純樸", "px": 140, "eps": 4.2, "bvps": 28}, {"n": "Schneider", "t": "SBGSY", "region": "EU", "fam": "PW", "l2": "GL-PWR", "desc": "歐系電源+軟體整合", "px": 48, "eps": 2.0, "bvps": 15}, {"n": "nVent", "t": "NVT", "region": "US", "fam": "TH", "l2": "GL-COOL", "desc": "800V DC轉型+散熱", "px": 95, "eps": 3.1, "bvps": 24}]};
+const $=id=>document.getElementById(id);
+const f2=n=>isFinite(n)?n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
+const f0=n=>isFinite(n)?n.toLocaleString('en-US',{maximumFractionDigits:0}):"—";
+
+// ---- 自動編碼系統（嵌入）----
+function hash32(str){let h=2166136261>>>0;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function autoCode(level,family,name,ticker){
+ const key=(name+"|"+(ticker||"")+"|"+level).toLowerCase();
+ const b32=hash32(key).toString(36).toUpperCase().padStart(6,"0").slice(0,4);
+ return `VIA-${level}-${family}-${b32}`;
+}
+
+// ---- 示意正規化序列（每檔），可被 CSV 覆蓋 ----
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+let NORM={};   // ticker -> last normalized value (base 100)
+function demoNorm(){
+ NORM={};
+ D.stocks.forEach(s=>{const r=mulberry32(hash32(s.t));let v=100;for(let i=0;i<26;i++){const drift=s.fam==="TH"?1.3:0.6;v*=1+(drift+(r()-0.5)*5)/100;}NORM[s.t]=Math.max(30,v);});
+ $("mode").textContent="示意 DEMO";
+}
+// L2/L1 指數 = 成員正規化均值
+function memberNorm(pred){const vs=D.stocks.filter(pred).map(s=>NORM[s.t]).filter(v=>isFinite(v));return vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:null;}
+
+function renderTree(){
+ let h="";
+ Object.entries(D.l1).forEach(([fam,l1name])=>{
+  const idx1=memberNorm(s=>s.fam===fam);
+  const ac1=autoCode("L1",fam,l1name,"");
+  const cnt1=D.stocks.filter(s=>s.fam===fam).length;
+  h+=`<tr class="i1"><td class="l"><span class="lvl L1">L1</span></td><td class="l scode ind1">${fam}-000</td>
+   <td class="l acode">${ac1}</td><td class="l nm">${l1name}</td><td>${cnt1}</td>
+   <td class="idx">${idx1!=null?f0(idx1):"—"}</td><td class="${idx1>=100?'up':'down'}">${idx1!=null?(idx1>=100?'+':'')+(idx1-100).toFixed(1)+'%':''}</td></tr>`;
+  // L2
+  Object.entries(D.l2).filter(([k,v])=>v[0]===fam).forEach(([code,meta])=>{
+   const idx2=memberNorm(s=>s.l2===code);
+   const cnt2=D.stocks.filter(s=>s.l2===code).length;
+   if(cnt2===0)return;
+   const ac2=autoCode("L2",fam,meta[1],code);
+   h+=`<tr class="i2"><td class="l"><span class="lvl L2">L2</span></td><td class="l scode ind2">${code}</td>
+    <td class="l acode">${ac2}</td><td class="l">${meta[1]}</td><td>${cnt2}</td>
+    <td class="idx" style="font-size:11px">${idx2!=null?f0(idx2):"—"}</td><td class="${idx2>=100?'up':'down'}">${idx2!=null?(idx2>=100?'+':'')+(idx2-100).toFixed(1)+'%':''}</td></tr>`;
+   // L3
+   D.stocks.filter(s=>s.l2===code).forEach(s=>{
+    const v=NORM[s.t]; const ac3=autoCode("L3",fam,s.n,s.t);
+    h+=`<tr><td class="l"><span class="lvl L3">L3</span></td><td class="l scode ind3">${s.code}</td>
+     <td class="l acode">${ac3}</td><td class="l"><span class="nm" style="font-size:11px">${s.n}</span> <span class="tk">${s.t}</span></td>
+     <td class="tk">個股</td><td>${v!=null?f0(v):"—"}</td><td class="${v>=100?'up':'down'}">${v!=null?(v>=100?'+':'')+(v-100).toFixed(1)+'%':''}</td></tr>`;
+   });
+  });
+ });
+ $("tree").innerHTML=h;
+}
+
+// ---- 評價表：全部個股 + 全球同業 ----
+let VAL=[];
+function buildVal(){
+ VAL=[];
+ D.stocks.forEach(s=>VAL.push({lv:"L3",fam:s.fam,n:s.n,t:s.t,region:s.region,px:s.px,eps:s.eps,bvps:s.bvps,code:autoCode("L3",s.fam,s.n,s.t)}));
+ D.peers.forEach(p=>VAL.push({lv:"GL",fam:p.fam,n:p.n,t:p.t,region:p.region,px:p.px,eps:p.eps,bvps:p.bvps,code:autoCode("GL",p.fam,p.n,p.t)}));
+}
+function bestPER(){const v=VAL.map(r=>r.px/r.eps).filter(x=>isFinite(x)&&x>0);return v.length?Math.min(...v):NaN;}
+function bestPBR(){const v=VAL.map(r=>r.px/r.bvps).filter(x=>isFinite(x)&&x>0);return v.length?Math.min(...v):NaN;}
+function renderVal(){
+ const bp=bestPER(),bb=bestPBR();
+ $("val").innerHTML=VAL.map((r,i)=>{
+  const per=r.eps?r.px/r.eps:NaN, pbr=r.bvps?r.px/r.bvps:NaN;
+  const lc={L3:"L3",GL:"GL"}[r.lv];
+  return `<tr><td class="l"><span class="lvl ${lc}">${r.lv}</span></td>
+   <td class="l acode">${r.code}</td><td class="l nm" style="font-size:11px">${r.n}</td>
+   <td class="l tk">${r.t}</td><td class="l"><span class="reg">${r.region}</span></td>
+   <td><input class="cellin" value="${r.px}" data-i="${i}" data-k="px"></td>
+   <td><input class="cellin" value="${r.eps}" data-i="${i}" data-k="eps"></td>
+   <td class="${Math.abs(per-bp)<0.01?'up':''}" style="${Math.abs(per-bp)<0.01?'font-weight:700':''}">${f2(per)}</td>
+   <td><input class="cellin" value="${r.bvps}" data-i="${i}" data-k="bvps"></td>
+   <td class="${Math.abs(pbr-bb)<0.01?'up':''}" style="${Math.abs(pbr-bb)<0.01?'font-weight:700':''}">${f2(pbr)}</td></tr>`;
+ }).join("");
+ $("val").querySelectorAll(".cellin").forEach(el=>el.oninput=e=>{VAL[+e.target.dataset.i][e.target.dataset.k]=parseFloat(e.target.value)||0;renderVal();});
+ $("vstat").textContent=`${VAL.length} 檔（含 ${D.peers.length} 全球同業）`;
+}
+
+// ---- 匯入真實價格 ----
+function importCsv(text){
+ const lines=text.trim().split(/\r?\n/); const hdr=lines[0].split(",").map(s=>s.trim().replace(/^"|"$/g,""));
+ const rows=lines.slice(1).map(l=>l.split(","));
+ let bi=rows.findIndex(r=>r[0]>="2026-01-02"); if(bi<0)bi=0;
+ const ci={}; hdr.forEach((h,i)=>ci[h]=i);
+ // 正規化 last
+ Object.keys(ci).forEach(tk=>{if(tk==="Date")return;const c=ci[tk];const bv=parseFloat(rows[bi][c]);const lv=parseFloat(rows[rows.length-1][c]);if(isFinite(bv)&&bv>0&&isFinite(lv))NORM[tk]=lv/bv*100;});
+ // adj close last → 評價價格
+ VAL.forEach(r=>{if(ci[r.t]!=null){const lv=parseFloat(rows[rows.length-1][ci[r.t]]);if(isFinite(lv))r.px=lv;}});
+ $("mode").textContent="真實 LIVE"; renderTree(); renderVal();
+}
+$("imp").onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>importCsv(rd.result);rd.readAsText(f);};
+
+function dl(name,txt){const b=new Blob(["\ufeff"+txt],{type:"text/csv"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=name;a.click();}
+$("expReg").onclick=()=>{
+ let out="Level,SemanticCode,AutoCode,Name,Ticker\n";
+ Object.entries(D.l1).forEach(([f,n])=>out+=`L1,${f}-000,${autoCode("L1",f,n,"")},"${n}",\n`);
+ Object.entries(D.l2).forEach(([c,m])=>{if(D.stocks.some(s=>s.l2===c))out+=`L2,${c},${autoCode("L2",m[0],m[1],c)},"${m[1]}",\n`;});
+ D.stocks.forEach(s=>out+=`L3,${s.code},${autoCode("L3",s.fam,s.n,s.t)},"${s.n}",${s.t}\n`);
+ D.peers.forEach(p=>out+=`GL,${p.fam}-GLOBAL,${autoCode("GL",p.fam,p.n,p.t)},"${p.n}",${p.t}\n`);
+ dl("VIA_AutoCode_Registry.csv",out);
+};
+$("expVal").onclick=()=>{
+ let out="Level,AutoCode,Name,Ticker,Region,AdjClose,EPS,PER,BVPS,PBR\n";
+ VAL.forEach(r=>{const per=r.eps?r.px/r.eps:"",pbr=r.bvps?r.px/r.bvps:"";out+=`${r.lv},${r.code},"${r.n}",${r.t},${r.region},${r.px},${r.eps},${isFinite(per)?per.toFixed(2):""},${r.bvps},${isFinite(pbr)?pbr.toFixed(2):""}\n`;});
+ dl("VIA_Valuation_AdjClose.csv",out);
+};
+
+demoNorm(); renderTree(); buildVal(); renderVal();
+</script><script>
+(function(){
+ function cellText(td){var el=td.querySelector('input,select,textarea');
+  var v=el?(el.value||''):td.textContent;return (v||'').trim().replace(/\|/g,'\\|').replace(/\s+/g,' ');}
+ function tableToMd(tbl){
+  var heads=tbl.tHead?Array.prototype.slice.call(tbl.tHead.rows):[];
+  var body=tbl.tBodies.length?Array.prototype.slice.call(tbl.tBodies[0].rows):Array.prototype.slice.call(tbl.rows);
+  var hRow=heads.length?heads[heads.length-1]:body.shift();
+  if(!hRow)return '';
+  var cols=Array.prototype.map.call(hRow.cells,cellText);
+  var out='| '+cols.join(' | ')+' |\n| '+cols.map(function(){return '---';}).join(' | ')+' |\n';
+  body.forEach(function(tr){out+='| '+Array.prototype.map.call(tr.cells,cellText).join(' | ')+' |\n';});
+  return out;
+ }
+ window.exportPageMarkdown=function(){
+  var title=document.querySelector('h1')?document.querySelector('h1').innerText.trim():'VIA';
+  var kick=document.querySelector('.kicker')?document.querySelector('.kicker').innerText.trim():'';
+  var md='# '+title+'\n\n';
+  if(kick)md+='> '+kick+'\n\n';
+  md+='_匯出 '+new Date().toISOString().slice(0,19).replace('T',' ')+' · VIA · append-only_\n\n';
+  var nodes=document.querySelectorAll('h2, table');
+  Array.prototype.forEach.call(nodes,function(n){
+   if(n.tagName==='H2'){md+='\n## '+n.innerText.trim().replace(/\s+/g,' ')+'\n\n';}
+   else{var t=tableToMd(n);if(t)md+=t+'\n';}
+  });
+  var blob=new Blob([md],{type:'text/markdown'});var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=(title.replace(/[^\w\u4e00-\u9fff]+/g,'_').slice(0,40)||'VIA')+'.md';a.click();
+ };
+ // 加 MD 按鈕（在 PDF 左側）— 立即掛載（腳本在 body 尾端）
+ function addBtn(){if(document.getElementById('viaMdBtn'))return;var b=document.createElement('button');
+  b.id='viaMdBtn';b.textContent='\u2913 MD';b.className='pdf';b.style.right='66px';
+  b.onclick=window.exportPageMarkdown;document.body.appendChild(b);}
+ if(document.body)addBtn();else window.addEventListener('DOMContentLoaded',addBtn);
+})();
+</script>
+</body></html>

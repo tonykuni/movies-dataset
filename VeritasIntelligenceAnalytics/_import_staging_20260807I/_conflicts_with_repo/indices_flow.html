@@ -1,0 +1,83 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · 指數資金流(代表ETF·總金額·力道方向·標準化·驗證)</title>
+<style>
+:root{--bg:#f5f4f0;--sf:#fff;--bd:#dbd9d3;--ink:#1e1d1a;--ink2:#6b6860;--gr:#9c9890;
+--up:#c96b5a;--dn:#5a9e6f;--bl:#4c78a8;--tl:#439a9a;--amber:#c4943a;--seal:#b5291a;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Sans CJK TC","Noto Sans TC","DM Sans",sans-serif;padding:18px;max-width:1180px;margin:0 auto;line-height:1.55}
+h1{font-size:clamp(17px,4.4vw,22px);font-weight:800}
+h2{font-size:15px;font-weight:800}
+.sub{color:var(--gr);font-size:12px;margin-top:3px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:16px;margin-top:14px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:clamp(10.5px,1.5vw,12.5px);table-layout:auto}
+th,td{padding:clamp(4px,.9vw,7px) clamp(4px,1vw,9px);border-bottom:1px solid #eceae2;text-align:right;overflow-wrap:anywhere;line-height:1.35}
+th{font-size:10px;color:var(--ink2);text-transform:uppercase;letter-spacing:.4px;font-weight:700}
+td.l,th.l{text-align:left}
+.mono{font-family:"DM Mono",monospace;white-space:nowrap}
+.mk{font-size:10px;color:#fff;padding:1px 7px;border-radius:10px;font-weight:700;background:var(--bl)}
+.bar0{display:inline-block;vertical-align:middle}
+.tier{font-size:10px;padding:1px 6px;border-radius:9px;font-weight:700;color:#fff}
+.note{font-size:11px;color:var(--gr);margin-top:8px;line-height:1.5}
+.method{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:10px}
+.mcard{background:#faf9f5;border:1px solid var(--bd);border-radius:8px;padding:11px}
+.mcard b{color:var(--seal);font-size:12.5px}
+.mcard p{font-size:11.5px;color:var(--ink2);margin-top:4px}
+.etflist{font-size:10px;color:var(--ink2)}
+.repdot{color:var(--dn);font-weight:700}
+</style></head><body>
+<h1>VIA · 指數資金流 — 代表ETF · 總金額 · 力道方向 · 標準化 · 驗證</h1>
+<div class="sub" id="head"></div>
+
+<div class="card">
+  <h2>方法論 — 你的五個問題</h2>
+  <div class="method" id="method"></div>
+</div>
+
+<div class="card">
+  <h2>指數資金流(依力道排序)</h2>
+  <div class="sub">流入紅→右、流出綠→左(0軸=力道);金額=ETF NetFlow$ 與覆蓋率推估的指數隱含總流</div>
+  <table style="margin-top:8px"><thead><tr>
+    <th class="l">市場</th><th class="l">指數</th><th class="l">代表ETF(rep)</th>
+    <th class="l">力道×方向(0軸)</th><th>ETF淨流$</th><th>隱含指數總流$</th>
+    <th>覆蓋率</th><th>證據</th><th class="l">驗證真值源</th></tr></thead>
+    <tbody id="tb"></tbody></table>
+  <div class="note" id="foot"></div>
+</div>
+
+<script>
+const D={"as_of": "2026-06-29", "n_index": 15, "method": {"representative": "代表性 rep_score=追蹤直接度·AUM·流動性·實體複製·主掛牌綜合;選 rep 最高且在 FIS 宇宙有真實資料者,否則標記待加入。", "total_dollar": "代表/成分 ETF 之 NetFlow$ = ΔShares×NAV(申購贖回=一級市場真實流);指數隱含總流 ≈ ΣNetFlow$ / 覆蓋率cov。ETF 流是樣本與前瞻代理,非全市場真值。", "force_direction": "方向=FIS 符號(申購+/贖回−);力道=|FIS|(0–100,已標準化);交易金額=NetFlow$ 與隱含總流並列。", "standardize": "有機流=NetFlow/AUM_{t-1} → 穩健 z(中位/MAD,σ=1.4826·MAD)→ FIS=100·tanh(z/κ)∈[−100,100];跨區另做 FX 調整。", "validate": "證偽優先:leaky-vs-clean Rank-IC gap、null≈0、OOS、CPCV;並以 truth 源(ICI/TWSE T86/北向/EPFR)交叉驗證 ETF 隱含流的領先性與覆蓋率穩定度。"}, "rows": [{"market": "香港", "index_zh": "恒生指數", "index": "^HSI", "ccy": "HKD", "rep_etf": "盈富基金(本地) 2800.HK", "rep_score": 0.9, "all_etfs": [{"tk": "2800.HK", "zh": "盈富基金(本地)", "rep": 0.9, "in_universe": false}, {"tk": "EWH", "zh": "iShares香港(美掛)", "rep": 0.65, "in_universe": false}], "direction": "流出", "fis": -55.0, "intensity": 55.0, "etf_netflow_usd": 2003309500, "implied_index_usd": 50082737497, "coverage": 0.04, "evidence_tier": "T4", "src_state": "待加入宇宙(合成估計)", "truth_source": "HKEX"}, {"market": "新興市場", "index_zh": "MSCI EM", "index": "EEM", "ccy": "USD", "rep_etf": "iShares MSCI EM EEM", "rep_score": 0.9, "all_etfs": [{"tk": "EEM", "zh": "iShares MSCI EM", "rep": 0.9, "in_universe": true}, {"tk": "VWO", "zh": "Vanguard EM", "rep": 0.85, "in_universe": false}, {"tk": "IEMG", "zh": "iShares核心EM", "rep": 0.83, "in_universe": false}], "direction": "流入", "fis": 48.8, "intensity": 48.8, "etf_netflow_usd": 3667152229, "implied_index_usd": 73343044572, "coverage": 0.05, "evidence_tier": "T1", "src_state": "真實FIS", "truth_source": "EPFR/IIF"}, {"market": "韓國", "index_zh": "KOSPI", "index": "^KS11", "ccy": "KRW", "rep_etf": "iShares南韓(美掛) EWY", "rep_score": 0.88, "all_etfs": [{"tk": "EWY", "zh": "iShares南韓(美掛)", "rep": 0.88, "in_universe": true}], "direction": "流出", "fis": -36.3, "intensity": 36.3, "etf_netflow_usd": -65239720, "implied_index_usd": -1630992996, "coverage": 0.04, "evidence_tier": "T1", "src_state": "真實FIS", "truth_source": "KRX 外資"}, {"market": "德國", "index_zh": "DAX", "index": "^GDAXI", "ccy": "EUR", "rep_etf": "iShares德國(美掛) EWG", "rep_score": 0.85, "all_etfs": [{"tk": "EWG", "zh": "iShares德國(美掛)", "rep": 0.85, "in_universe": true}], "direction": "流出", "fis": -34.2, "intensity": 34.2, "etf_netflow_usd": -23678912, "implied_index_usd": -789297081, "coverage": 0.03, "evidence_tier": "T1", "src_state": "真實FIS", "truth_source": "EPFR"}, {"market": "印度", "index_zh": "Nifty50/Sensex", "index": "^NSEI", "ccy": "INR", "rep_etf": "iShares印度(MSCI) INDA", "rep_score": 0.85, "all_etfs": [{"tk": "INDA", "zh": "iShares印度(MSCI)", "rep": 0.85, "in_universe": true}, {"tk": "INDY", "zh": "iShares Nifty50", "rep": 0.72, "in_universe": false}, {"tk": "EPI", "zh": "WisdomTree印度盈利", "rep": 0.66, "in_universe": false}], "direction": "流入", "fis": 33.2, "intensity": 33.2, "etf_netflow_usd": 2764272957, "implied_index_usd": 92142431911, "coverage": 0.03, "evidence_tier": "T1", "src_state": "真實FIS", "truth_source": "NSDL FII"}, {"market": "美國", "index_zh": "羅素2000", "index": "^RUT", "ccy": "USD", "rep_etf": "iShares羅素2000 IWM", "rep_score": 0.95, "all_etfs": [{"tk": "IWM", "zh": "iShares羅素2000", "rep": 0.95, "in_universe": true}, {"tk": "VTWO", "zh": "Vanguard羅素2000", "rep": 0.78, "in_universe": false}], "direction": "流出", "fis": -28.3, "intensity": 28.3, "etf_netflow_usd": -549098266, "implied_index_usd": -9151637767, "coverage": 0.06, "evidence_tier": "T1", "src_state": "真實FIS", "truth_source": "ICI"}, {"market": "台灣", "index_zh": "加權指數 TAIEX", "index": "^TWII", "ccy": "TWD", "rep_etf": "元大台灣50 0050.TW", "rep_score": 0.92, "all_etfs": [{"tk": "0050.TW", "zh": "元大台灣50", "rep": 0.92, "in_universe": true}, {"tk": "006208.TW", "zh": "富邦台50", "rep": 0.85, "in_universe": false}, {"tk": "EWT", "zh": "iShares台灣(美掛)", "rep": 0.7, "in_universe": true}], "direction": "流入", "fis": 26.9, "intensity": 26.9, "etf_netflow_usd": 1872816077, "implied_index_usd": 26754515390, "coverage": 0.07, "evidence_tier": "T1", "src_state": "真實FIS", "truth_source": "TWSE T86 外資淨買超"}, {"market": "中國", "index_zh": "滬深300", "index": "000300.SS", "ccy": "CNY", "rep_etf": "iShares中國(MSCI) MCHI", "rep_score": 0.78, "all_etfs": [{"tk": "ASHR", "zh": "Xtrackers滬深300(美掛A股)", "rep": 0.82, "in_universe": false}, {"tk": "MCHI", "zh": "iShares中國(MSCI)", "rep": 0.78, "in_universe": true}, {"tk": "FXI", "zh": "iShares中國大型", "rep": 0.7, "in_universe": true}], "direction": "流出", "fis": -23.8, "intensity": 23.8, "etf_netflow_usd": -45169092634, "implied_index_usd": -1505636421119, "coverage": 0.03, "evidence_tier": "T1", "src_state": "真實FIS", "truth_source": "AKShare 北向資金"}, {"market": "台灣", "index_zh": "櫃買指數 TPEx", "index": "^TWOII", "ccy": "TWD", "rep_etf": "元大富櫃50 006201.TW", "rep_score": 0.75, "all_etfs": [{"tk": "006201.TW", "zh": "元大富櫃50", "rep": 0.75, "in_universe": false}], "direction": "流入", "fis": 20.6, "intensity": 20.6, "etf_netflow_usd": 84236206, "implied_index_usd": 2807873529, "coverage": 0.03, "evidence_tier": "T4", "src_state": "待加入宇宙(合成估計)", "truth_source": "TPEx 外資淨買超(獨立表)"}, {"market": "日本", "index_zh": "日經225/TOPIX", "index": "^N225", "ccy": "JPY", "rep_etf": "iShares日本(美掛) EWJ", "rep_score": 0.85, "all_etfs": [{"tk": "EWJ", "zh": "iShares日本(美掛)", "rep": 0.85, "in_universe": true}, {"tk": "1306.T", "zh": "TOPIX連動(本地)", "rep": 0.8, "in_universe": false}, {"tk": "DXJ", "zh": "WisdomTree日本(避險)", "rep": 0.72, "in_universe": true}], "direction": "流出", "fis": -20.5, "intensity": 20.5, "etf_netflow_usd": -21385281925, "implied_index_usd": -427705638497, "coverage": 0.05, "evidence_tier": "T1", "src_state": "真實FIS", "truth_source": "日銀/投信協會"}, {"market": "美國", "index_zh": "S&P 500", "index": "^GSPC", "ccy": "USD", "rep_etf": "SPDR標普500 SPY", "rep_score": 0.95, "all_etfs": [{"tk": "SPY", "zh": "SPDR標普500", "rep": 0.95, "in_universe": true}, {"tk": "IVV", "zh": "iShares核心標普500", "rep": 0.9, "in_universe": false}, {"tk": "VOO", "zh": "Vanguard標普500", "rep": 0.88, "in_universe": false}], "direction": "流入", "fis": 18.2, "intensity": 18.2, "etf_netflow_usd": 7601776022, "implied_index_usd": 69107054748, "coverage": 0.11, "evidence_tier": "T1", "src_state": "真實FIS", "truth_source": "ICI 週度基金流"}, {"market": "美國", "index_zh": "道瓊工業", "index": "^DJI", "ccy": "USD", "rep_etf": "SPDR道瓊 DIA", "rep_score": 0.92, "all_etfs": [{"tk": "DIA", "zh": "SPDR道瓊", "rep": 0.92, "in_universe": false}], "direction": "流入", "fis": 13.9, "intensity": 13.9, "etf_netflow_usd": -1125646675, "implied_index_usd": -28141166871, "coverage": 0.04, "evidence_tier": "T4", "src_state": "待加入宇宙(合成估計)", "truth_source": "ICI"}, {"market": "英國", "index_zh": "FTSE 100", "index": "^FTSE", "ccy": "GBP", "rep_etf": "iShares英國(美掛) EWU", "rep_score": 0.85, "all_etfs": [{"tk": "EWU", "zh": "iShares英國(美掛)", "rep": 0.85, "in_universe": true}], "direction": "流出", "fis": -6.7, "intensity": 6.7, "etf_netflow_usd": 2821438, "implied_index_usd": 94047944, "coverage": 0.03, "evidence_tier": "T1", "src_state": "真實FIS", "truth_source": "EPFR"}, {"market": "歐洲", "index_zh": "歐洲Stoxx50/600", "index": "^STOXX50E", "ccy": "EUR", "rep_etf": "Vanguard歐洲(廣基) VGK", "rep_score": 0.8, "all_etfs": [{"tk": "FEZ", "zh": "SPDR歐洲Stoxx50(美掛)", "rep": 0.84, "in_universe": false}, {"tk": "VGK", "zh": "Vanguard歐洲(廣基)", "rep": 0.8, "in_universe": true}, {"tk": "EZU", "zh": "iShares歐元區", "rep": 0.74, "in_universe": false}], "direction": "流入", "fis": 5.9, "intensity": 5.9, "etf_netflow_usd": 645328012, "implied_index_usd": 16133200294, "coverage": 0.04, "evidence_tier": "T1", "src_state": "真實FIS", "truth_source": "EPFR"}, {"market": "美國", "index_zh": "那斯達克100", "index": "^NDX", "ccy": "USD", "rep_etf": "Invesco QQQ QQQ", "rep_score": 0.95, "all_etfs": [{"tk": "QQQ", "zh": "Invesco QQQ", "rep": 0.95, "in_universe": true}, {"tk": "QQQM", "zh": "QQQ迷你", "rep": 0.8, "in_universe": false}], "direction": "持平", "fis": -1.1, "intensity": 1.1, "etf_netflow_usd": 5457744163, "implied_index_usd": 60641601817, "coverage": 0.09, "evidence_tier": "T1", "src_state": "真實FIS", "truth_source": "ICI"}]};
+const UP="#c96b5a",DN="#5a9e6f",GR="#9c9890";
+document.getElementById("head").textContent="as_of "+D.as_of+" · "+D.n_index+" 個指數 · 重用已驗證 FIS 快照(有機流→穩健z→tanh)· 代表ETF+總金額推估+交叉驗證";
+const M=D.method;
+document.getElementById("method").innerHTML=[
+ ["① 代表性",M.representative],["② 推估總金額·有效性",M.total_dollar],
+ ["③ 力道·方向·交易金額",M.force_direction],["④ 標準化",M.standardize],
+ ["⑤ 驗證方法論與流程",M.validate]].map(m=>`<div class="mcard"><b>${m[0]}</b><p>${m[1]}</p></div>`).join("");
+const TC={T1:"#5a9e6f",T3:"#c4943a",T4:"#9c9890"};
+const fmtB=v=>v==null?"—":(v>=0?"+":"")+(v/1e9).toFixed(2)+"B";
+function bar0(fis){const W=150,H=16,cx=W/2,half=cx-4,len=Math.max(2,Math.min(half,Math.abs(fis)/100*half));
+  let x,w,c; if(fis>3){c=UP;w=len;x=cx;}else if(fis<-3){c=DN;w=len;x=cx-len;}else{c=GR;w=3;x=cx-1.5;}
+  const lab=(fis>3?"▲":fis<-3?"▼":"—")+Math.abs(fis).toFixed(0);
+  return `<svg class="bar0" width="${W}" height="${H}"><rect x="0" y="${H/2-1}" width="${W}" height="1.5" fill="#eceae2"/>`
+    +`<line x1="${cx}" y1="1" x2="${cx}" y2="${H-1}" stroke="#9c9890" stroke-width="1"/>`
+    +`<rect x="${x}" y="3" width="${w}" height="${H-6}" rx="2" fill="${c}"/></svg> <span class="mono" style="color:${c};font-weight:700">${lab}</span>`;}
+document.getElementById("tb").innerHTML=D.rows.map(r=>{
+  const etfs=r.all_etfs.map(e=>`${e.in_universe?'<span class="repdot">●</span>':'○'}${e.zh} ${e.tk}(${e.rep})`).join("、");
+  return `<tr>
+   <td class="l"><span class="mk">${r.market}</span></td>
+   <td class="l" style="font-weight:700">${r.index_zh}<br><span class="etflist">${r.index}</span></td>
+   <td class="l">${r.rep_etf} <span class="etflist">rep ${r.rep_score}</span><br><span class="etflist">${etfs}</span></td>
+   <td class="l">${bar0(r.fis)}</td>
+   <td class="mono" style="color:${r.etf_netflow_usd>=0?UP:DN}">${fmtB(r.etf_netflow_usd)}</td>
+   <td class="mono" style="color:${(r.implied_index_usd||0)>=0?UP:DN}">${fmtB(r.implied_index_usd)}</td>
+   <td class="mono">${(r.coverage*100).toFixed(0)}%</td>
+   <td><span class="tier" style="background:${TC[r.evidence_tier]}">${r.evidence_tier}</span><br><span class="etflist">${r.src_state}</span></td>
+   <td class="l etflist">${r.truth_source}</td></tr>`;}).join("");
+document.getElementById("foot").innerHTML="● = 已在 FIS 宇宙(真實流)、○ = 待加入。隱含指數總流 = ETF淨流$ / 覆蓋率,為<strong>放大推估非全市場真值</strong>,須以真值源交叉驗證。力道=|FIS| 已標準化。"
+ +"待加入宇宙者(如 DIA 道瓊、櫃買、恒生)接上 yfinance/本地資料即轉真實。";
+</script>
+<script>
+function autofitTables(){document.querySelectorAll('table').forEach(t=>{const w=t.parentElement;if(!w)return;t.style.fontSize='';let fs=parseFloat(getComputedStyle(t).fontSize)||12,g=0;while(t.scrollWidth>w.clientWidth+1&&fs>9.5&&g<10){fs-=0.5;t.style.fontSize=fs+'px';g++;}});}
+window.addEventListener('resize',autofitTables);window.addEventListener('load',autofitTables);setTimeout(autofitTables,300);
+</script></body></html>

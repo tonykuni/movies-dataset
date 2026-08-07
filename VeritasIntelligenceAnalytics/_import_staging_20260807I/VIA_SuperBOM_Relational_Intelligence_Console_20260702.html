@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>VIA Super BOM Relational Intelligence Console · 真實數據取得 × 關聯式矩陣</title>
+<style>
+:root{
+ --bg:#F9F9F6;--paper:#fff;--paper2:#F3F6F4;--ink:#1F2933;--mut:#6B7C78;--line:#DFECEA;
+ --seal:#9F1D1D;--ok:#166534;--warn:#B7791F;--fail:#B91C1C;--blue:#2563EB;--teal:#0F766E;--amber:#D97706;
+ --shadow:0 12px 30px rgba(31,41,51,.08);--mono:"Cascadia Mono","Consolas",monospace;--sans:Inter,"Noto Sans TC","Microsoft JhengHei",system-ui,sans-serif;
+}
+*{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 8% 4%,rgba(175,207,204,.45),transparent 28%),linear-gradient(120deg,#fff,var(--bg));color:var(--ink);font-family:var(--sans);font-size:10.5px;line-height:1.42}
+.wrap{max-width:1880px;margin:0 auto;padding:16px 18px 42px}
+.hero,.card{background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+.hero{display:grid;grid-template-columns:1fr 420px;gap:10px;margin-bottom:10px}
+.brand{padding:16px 18px;position:relative} .seal{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;background:var(--seal);color:white;font-weight:900;font-size:19px;margin-right:8px;vertical-align:middle}
+h1{font-size:22px;margin:0 0 4px} .sub{font-size:10px;color:var(--mut);margin:2px 0} .idline{font-family:var(--mono);font-size:8.8px;color:var(--mut);margin-top:6px}
+.control{padding:12px} .pillrow{display:flex;gap:5px;flex-wrap:wrap} .pill{font-family:var(--mono);font-size:8.5px;border:1px solid var(--line);border-radius:999px;background:var(--paper2);color:var(--mut);padding:4px 6px}
+.grid{display:grid;gap:10px} .two{grid-template-columns:1fr 1fr} .three{grid-template-columns:1fr 1fr 1fr} .four{grid-template-columns:repeat(4,1fr)} .kpi{grid-template-columns:repeat(8,1fr);margin-bottom:10px}
+.card{padding:10px;margin-bottom:10px} h2,h3{margin:0 0 8px;font-size:12.4px;display:flex;gap:6px;align-items:center} .secid{font-family:var(--mono);font-size:8px;color:var(--seal);border:1px solid rgba(159,29,29,.22);background:rgba(159,29,29,.045);border-radius:6px;padding:2px 5px;white-space:nowrap}
+.kpi .card{padding:9px} .kv{font-size:18px;font-weight:900} .kl{font-family:var(--mono);font-size:8.2px;color:var(--mut)} .kn{font-size:8.8px;color:var(--mut)}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:9.5px} th{text-align:left;font-size:8.4px;color:var(--mut);background:var(--paper2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:5px;white-space:nowrap;position:sticky;top:0} td{padding:5px;border-bottom:1px solid rgba(223,236,234,.85);vertical-align:top} tr:hover td{background:rgba(223,236,234,.24)} .scroll{max-height:390px;overflow:auto} .tall{max-height:520px}
+.tag{display:inline-block;border-radius:999px;padding:2px 6px;font-size:8px;font-weight:850;border:1px solid var(--line);white-space:nowrap} .ok{color:var(--ok);background:rgba(22,101,52,.06);border-color:rgba(22,101,52,.18)} .warn{color:var(--warn);background:rgba(183,121,31,.08);border-color:rgba(183,121,31,.2)} .fail{color:var(--fail);background:rgba(185,28,28,.07);border-color:rgba(185,28,28,.2)} .info{color:var(--blue);background:rgba(37,99,235,.06);border-color:rgba(37,99,235,.18)} .mut{color:var(--mut)} .mono{font-family:var(--mono)} .num{text-align:right;font-family:var(--mono);white-space:nowrap}
+.flow{display:grid;grid-template-columns:repeat(10,1fr);gap:6px} .node{border:1px solid var(--line);border-radius:12px;background:linear-gradient(180deg,#fff,rgba(223,236,234,.35));padding:7px;min-height:62px} .node b{display:block;font-size:9.5px} .node span{font-size:8.3px;color:var(--mut)} .arrow{display:flex;align-items:center;justify-content:center;color:var(--seal);font-family:var(--mono);font-weight:900}
+svg{width:100%;height:260px} .note{border-left:3px solid var(--seal);background:rgba(159,29,29,.035);border-radius:10px;padding:8px;color:var(--mut);font-size:9.3px;margin-top:7px}
+textarea{width:100%;min-height:240px;border:1px solid var(--line);border-radius:12px;background:white;padding:10px;font-family:var(--mono);font-size:9.2px;line-height:1.42;color:var(--ink)} .btn{border:1px solid var(--line);background:var(--paper2);border-radius:999px;padding:5px 8px;font-size:8.8px;font-weight:850;cursor:pointer;margin-bottom:6px}
+@media(max-width:1350px){.hero,.two,.three,.four{grid-template-columns:1fr}.kpi{grid-template-columns:repeat(4,1fr)}.flow{grid-template-columns:1fr 1fr}}
+@media print{body{background:#fff}.hero,.card{box-shadow:none;break-inside:avoid}.btn{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<section class="hero">
+  <div class="brand">
+    <h1><span class="seal">理</span>VIA Super BOM Relational Intelligence Console</h1>
+    <div class="sub">真實數據取得 × 關聯式矩陣 × SAP BOM × 管理會計 × 首頁一頁看全部；超高度整合後，再分產品、公司、產業分頁分析。</div>
+    <div class="sub">不是把表格堆在一起，而是建立 Driver → Company → BU → Product → SAP BOM → Costing → CO-PA → Financial Model 的資料庫關聯。</div>
+    <div class="idline">ProductID：VIA-SBOM-REL-20260702 · EvidenceMode：Confirmed / Estimated / NeedsSAP / NeedsCheck · Output：HTML + JSON SSOT</div>
+  </div>
+  <aside class="control">
+    <div class="pillrow">
+      <span class="pill">Industry Aggregate</span><span class="pill">Company View</span><span class="pill">Product View</span><span class="pill">Change View</span>
+      <span class="pill">Structure View</span><span class="pill">Numbers View</span><span class="pill">Prompt Update</span><span class="pill">True Data Ready</span>
+    </div>
+    <div class="note">def 首頁原則：先在首頁把產業/公司/產品/數字/結構/變化/證據狀態一次看清楚；再往下分頁或 drill-down，不要一開始就分散成孤立頁面。</div>
+  </aside>
+</section>
+
+<section class="grid kpi">
+  <div class="card"><div class="kl">VIA-20260702-KPI-001</div><div class="kv">3</div><div class="kn">Companies：台達 / 光寶 / 康舒</div></div>
+  <div class="card"><div class="kl">VIA-20260702-KPI-002</div><div class="kv">11</div><div class="kn">Core fact tables</div></div>
+  <div class="card"><div class="kl">VIA-20260702-KPI-003</div><div class="kv">10</div><div class="kn">Data source classes</div></div>
+  <div class="card"><div class="kl">VIA-20260702-KPI-004</div><div class="kv">8</div><div class="kn">SAP integration objects</div></div>
+  <div class="card"><div class="kl">VIA-20260702-KPI-005</div><div class="kv">8</div><div class="kn">Validation gates</div></div>
+  <div class="card"><div class="kl">VIA-20260702-KPI-006</div><div class="kv">ID</div><div class="kn">All records auto-coded</div></div>
+  <div class="card"><div class="kl">VIA-20260702-KPI-007</div><div class="kv">SSOT</div><div class="kn">JSON master generated</div></div>
+  <div class="card"><div class="kl">VIA-20260702-KPI-008</div><div class="kv">Prompt</div><div class="kn">Update / fetch / validate</div></div>
+</section>
+
+<section class="card">
+  <h2><span class="secid">VIA-20260702-HOME-001</span>首頁一頁看全部：產業匯總 × 個別公司 × 個別產品 × 結構 × 數字 × 變化</h2>
+  <div class="grid three">
+    <div><h3><span class="secid">IND</span>Industry Aggregate</h3><table><thead><tr><th>Driver</th><th>Type</th><th>Impact</th><th>Evidence</th></tr></thead><tbody><tr><td>AI Data Center Power Density</td><td>Demand + Technology</td><td>ASP ↑、BOM complexity ↑、CAPEX test line ↑</td><td><span class="tag fail">High</span></td></tr><tr><td>Liquid Cooling Adoption</td><td>Technology + Cost</td><td>New BOM、qualification、warranty risk</td><td><span class="tag fail">High</span></td></tr><tr><td>EV / Charging / Energy Transition</td><td>Demand + Policy</td><td>Long design-in、certification、project revenue</td><td><span class="tag warn">Medium</span></td></tr><tr><td>Industrial Automation Cycle</td><td>Demand + CAPEX</td><td>Cyclical demand、higher service margin</td><td><span class="tag warn">Medium</span></td></tr></tbody></table></div>
+    <div><h3><span class="secid">COM</span>Company View</h3><table><thead><tr><th>ID</th><th>Company</th><th>BU</th><th>Application</th><th>Status</th></tr></thead><tbody><tr><td>VIA-20260702-COM-DELTA</td><td><b>台達電</b><br><span class='mut'>2308.TW</span></td><td>電源及零組件 / 基礎設施 / 自動化 / EV</td><td>AI Data Center Power、Liquid Cooling、EV Power、Industrial Automation</td><td><span class="tag warn">Needs Financial Fetch</span></td></tr><tr><td>VIA-20260702-COM-LITEON</td><td><b>光寶科</b><br><span class='mut'>2301.TW</span></td><td>Cloud & AIoT / Opto-electronics / IT & Consumer Electronics</td><td>Cloud Power、Opto Module、Consumer / PC</td><td><span class="tag warn">Needs Financial Fetch</span></td></tr><tr><td>VIA-20260702-COM-ACBEL</td><td><b>康舒</b><br><span class='mut'>6282.TW</span></td><td>Server Power / Consumer Power / Energy Industrial Auto</td><td>Server PSU、Adapter、ESS/Industrial/Auto Power</td><td><span class="tag warn">Needs Financial Fetch</span></td></tr></tbody></table></div>
+    <div><h3><span class="secid">PRD</span>Product / Spec View</h3><table><thead><tr><th>Product Lens</th><th>ASP</th><th>BOM</th><th>COGS</th><th>Evidence</th></tr></thead><tbody><tr><td>AI PSU / Power Shelf</td><td>ASP bridge</td><td>Power Semi / Magnetics / Thermal</td><td>VUC + Fixed OH</td><td><span class="tag fail">Needs SAP</span></td></tr><tr><td>Liquid Cooling / CDU</td><td>New product premium</td><td>Pump / Valve / Sensor / Controller</td><td>Warranty + Test Cost</td><td><span class="tag fail">Needs SAP</span></td></tr><tr><td>Server PSU / HVDC</td><td>Customer program</td><td>MOSFET / Transformer / Control / Thermal</td><td>Material PPV</td><td><span class="tag fail">Needs SAP</span></td></tr><tr><td>Opto / MiniLED</td><td>Mix dependent</td><td>LED die / Lens / Driver / Package</td><td>Yield Loss</td><td><span class="tag warn">Needs Check</span></td></tr></tbody></table></div>
+  </div>
+</section>
+
+<section class="card">
+<h2><span class="secid">VIA-20260702-REL-001</span>關聯式資料庫不是頁面堆疊：資料如何相連、交叉分析</h2>
+<div class="flow">
+ <div class="node"><b>Industry Driver</b><span>Demand / ASP / Cost / Supply / Tech / Policy</span></div>
+ <div class="arrow">→</div><div class="node"><b>Company</b><span>台達 / 光寶 / 康舒</span></div>
+ <div class="arrow">→</div><div class="node"><b>BU / Application</b><span>事業群 / Customer BU</span></div>
+ <div class="arrow">→</div><div class="node"><b>Product Spec</b><span>功率 / 效率 / 認證 / 規格</span></div>
+ <div class="arrow">→</div><div class="node"><b>SAP BOM</b><span>Material / BOM / Routing</span></div>
+</div>
+<div class="flow" style="margin-top:6px">
+ <div class="node"><b>Sales / ASP</b><span>SD / Sales order / CO-PA</span></div>
+ <div class="arrow">↘</div><div class="node"><b>Costing</b><span>CK11N / Material Ledger</span></div>
+ <div class="arrow">→</div><div class="node"><b>COGS / VUC</b><span>Material / Labor / OH / Warranty</span></div>
+ <div class="arrow">→</div><div class="node"><b>Mgmt Accounting</b><span>Profit Center / Cost Center / Variance</span></div>
+ <div class="arrow">→</div><div class="node"><b>Financial Model</b><span>Revenue / GM / FCF / ROIC</span></div>
+</div>
+<div class="note">def 交叉分析：同一個 product_id 同時接 sales_id、bom_item_id、routing_id、cost_id、copa_id、variance_id；所以可回答「哪個客戶 BU 的哪個產品規格，因哪個 BOM 零件或製程成本，造成毛利率變化」。</div>
+</section>
+
+<section class="grid two">
+<article class="card"><h2><span class="secid">VIA-20260702-SCHEMA-001</span>關聯表 / Primary Key / Join Key</h2><div class="scroll tall"><table><thead><tr><th>Table</th><th>Primary Key</th><th>Join Key</th><th>Purpose</th></tr></thead><tbody><tr><td>dim_industry_driver</td><td>driver_id</td><td>period_id</td><td>產業展開入口；不直接看 BOM，先判斷 demand / ASP / cost / supply / tech / policy driver</td></tr><tr><td>dim_company</td><td>company_id</td><td>ticker</td><td>公司主檔：台達電、光寶科、康舒與 peer set</td></tr><tr><td>dim_business_unit</td><td>bu_id</td><td>company_id</td><td>事業群：接產品線、Profit Center、CO-PA segment</td></tr><tr><td>dim_application</td><td>application_id</td><td>bu_id</td><td>應用分類 / Customer BU / End market</td></tr><tr><td>dim_product_spec</td><td>product_id</td><td>application_id</td><td>產品規格：功率、效率、認證、form factor、phase、cooling spec</td></tr><tr><td>fact_sales_asp_period</td><td>sales_id</td><td>product_id + customer_id + period_id</td><td>ASP、Volume、Mix、Discount、Rebate、FX、Revenue</td></tr><tr><td>fact_sap_bom_item</td><td>bom_item_id</td><td>product_id + material_id + plant_id + valid_from</td><td>SAP BOM item：component、qty、scrap、alt BOM、BOM usage</td></tr><tr><td>fact_routing_workcenter_cost</td><td>routing_id</td><td>product_id + work_center_id</td><td>Routing / Work Center：operation、cycle time、activity type、cost center</td></tr><tr><td>fact_costing_material_ledger</td><td>cost_id</td><td>material_id + plant_id + period_id</td><td>CK11N/CK13N/Material Ledger：standard cost、actual cost、price diff</td></tr><tr><td>fact_copa_profitability</td><td>copa_id</td><td>customer_id + product_id + period_id</td><td>CO-PA：customer/product revenue、COGS、gross profit、GM</td></tr><tr><td>fact_variance_bridge</td><td>variance_id</td><td>cost_object + period_id</td><td>Material price、usage、yield、labor、overhead、warranty、mix、ASP variance</td></tr><tr><td>fact_validation_evidence</td><td>evidence_id</td><td>record_id</td><td>來源、頁碼/URL/SAP extract、抓取日期、EvidenceStatus、缺口</td></tr></tbody></table></div></article>
+<article class="card"><h2><span class="secid">VIA-20260702-SRC-001</span>真實數據取得完整性：季報 / 半年報 / 年報 / 網頁 / SAP</h2><div class="scroll tall"><table><thead><tr><th>ID</th><th>Source</th><th>Object</th><th>Fields</th><th>Frequency</th><th>Method</th><th>Status</th></tr></thead><tbody><tr><td>SRC-001</td><td>季報 / 半年報 / 年報</td><td>公開財報 PDF / HTML / XBRL / MOPS</td><td>Revenue、GM、OPEX、CAPEX、R&D、EPS、Segment</td><td>Quarterly / Semi / Annual</td><td>PDF parser + table extractor + manual validation</td><td><span class="tag warn">Needs Fetch</span></td></tr><tr><td>SRC-002</td><td>公司官網 / 產品頁</td><td>台達 / 光寶 / 康舒官網</td><td>事業群、產品線、規格、應用分類</td><td>Monthly / Ad hoc</td><td>web page snapshot + schema extraction</td><td><span class="tag warn">Needs Fetch</span></td></tr><tr><td>SRC-003</td><td>法說會 / 簡報 / 新聞稿</td><td>IR deck / earnings call</td><td>Driver、客戶應用、產品 roadmap、capex direction</td><td>Quarterly</td><td>PDF + OCR + sentence-unit extraction</td><td><span class="tag warn">Needs Fetch</span></td></tr><tr><td>SRC-004</td><td>SAP Material Master</td><td>MARA / MARC / MBEW</td><td>Material、Plant、Material Type、Product Hierarchy、Valuation</td><td>Daily / Weekly</td><td>SAP export CSV / RFC / OData</td><td><span class="tag fail">Needs SAP</span></td></tr><tr><td>SRC-005</td><td>SAP BOM</td><td>STKO / STPO / MAST / CS03 / CS12</td><td>BOM header、component、qty、scrap、validity、alternative BOM</td><td>Change-based</td><td>SAP export + BOM explosion</td><td><span class="tag fail">Needs SAP</span></td></tr><tr><td>SRC-006</td><td>Routing / Work Center</td><td>PLKO / PLPO / CRHD / CA03 / CR03</td><td>Operation、cycle time、machine/labor、activity type、capacity</td><td>Change-based</td><td>SAP PP export</td><td><span class="tag fail">Needs SAP</span></td></tr><tr><td>SRC-007</td><td>Product Costing / Material Ledger</td><td>CK11N / CK13N / CKM3N / ACDOCA</td><td>Standard cost、actual cost、PPV、FX diff、consumption</td><td>Monthly closing</td><td>CO/MM export + reconciliation</td><td><span class="tag fail">Needs SAP</span></td></tr><tr><td>SRC-008</td><td>Sales Order / CO-PA</td><td>VA05 / KE24 / ACDOCA</td><td>Customer、product、ASP、volume、discount、COGS、GM</td><td>Daily / Monthly</td><td>SD/CO export</td><td><span class="tag fail">Needs SAP</span></td></tr><tr><td>SRC-009</td><td>採購 / 供應商 / Lead time</td><td>ME2N / Info Record / vendor master</td><td>Supplier、price、lead time、MOQ、currency、AVL</td><td>Weekly / Monthly</td><td>MM export + supplier master</td><td><span class="tag fail">Needs SAP</span></td></tr><tr><td>SRC-010</td><td>外部產業資料 / 網頁</td><td>公開產業新聞、研究報告、供應鏈資料</td><td>industry driver、competitor、customer application</td><td>Daily / Weekly</td><td>web capture + evidence tagging</td><td><span class="tag warn">Needs Review</span></td></tr></tbody></table></div></article>
+</section>
+
+<section class="grid two">
+<article class="card"><h2><span class="secid">VIA-20260702-ID-001</span>自動編號編碼規則</h2><table><thead><tr><th>Object</th><th>Pattern</th><th>Example</th></tr></thead><tbody><tr><td>Global Record</td><td>VIA-YYYYMMDD-DOMAIN-COMPANY-BU-APP-PRODUCT-SEQ</td><td>VIA-20260702-SBOM-DELTA-PWR-AIDC-PSU-0001</td></tr><tr><td>Industry Driver</td><td>VIA-YYYYMMDD-DRV-INDUSTRY-SEQ</td><td>VIA-20260702-DRV-PWRTHERMAL-0001</td></tr><tr><td>Company BU</td><td>VIA-YYYYMMDD-BU-COMPANY-BU-SEQ</td><td>VIA-20260702-BU-DELTA-PWR-0001</td></tr><tr><td>SAP BOM Item</td><td>VIA-YYYYMMDD-BOM-COMPANY-MATNR-WERKS-POSNR</td><td>VIA-20260702-BOM-DELTA-MAT001-TW01-0010</td></tr><tr><td>Routing Operation</td><td>VIA-YYYYMMDD-RTG-COMPANY-ROUTING-OPR</td><td>VIA-20260702-RTG-DELTA-R0001-0020</td></tr><tr><td>CO-PA Profitability</td><td>VIA-YYYYMMDD-COPA-COMPANY-CUSTOMER-PRODUCT</td><td>VIA-20260702-COPA-DELTA-CSP01-PSU001</td></tr><tr><td>Evidence</td><td>VIA-YYYYMMDD-EVD-SOURCE-SEQ</td><td>VIA-20260702-EVD-ANNUALREPORT-0001</td></tr></tbody></table><div class="note">def 所有項目含版本日期、公司、BU、應用、產品或 SAP key；換季、換版、換 BOM、換 routing 都不可覆蓋舊 ID，只能 append。</div></article>
+<article class="card"><h2><span class="secid">VIA-20260702-DELTA-001</span>台達電既有大量資訊如何矩陣化重用</h2><table><thead><tr><th>Company</th><th>Application</th><th>Product Spec</th><th>BOM / Cost Lens</th><th>Cross Analysis</th></tr></thead><tbody><tr><td>台達電</td><td>AI Server / Data Center Power</td><td>High-density PSU、Power Shelf、UPS、Thermal</td><td>Power Semiconductor、Magnetics、Thermal、Control IC</td><td>Sales ASP → SAP BOM → Product Costing → CO-PA</td></tr><tr><td>台達電</td><td>基礎設施 / Data Center Cooling</td><td>Liquid Cooling、CDU、Cold Plate、Pump、Sensor</td><td>Pump、Valve、Heat Exchanger、Controller、Warranty</td><td>Product Spec → Routing/Work Center → Quality Cost</td></tr><tr><td>台達電</td><td>EV / Automotive</td><td>OBC、DC-DC、Charger</td><td>SiC/IGBT、Connector、Enclosure、Certification</td><td>Customer BU → Program → SOP → Warranty</td></tr><tr><td>台達電</td><td>Industrial Automation</td><td>Drive、PLC、Servo、Motion</td><td>Power Module、Control Board、Sensor、Motor</td><td>Channel/Customer → Product Line → GM/Inventory</td></tr></tbody></table></article>
+</section>
+
+<section class="grid two">
+<article class="card"><h2><span class="secid">VIA-20260702-SAP-001</span>SAP 圖像轉資料庫物件：BOM / Work Center / Routing / Costing</h2><div class="scroll"><table><thead><tr><th>Layer</th><th>Objects</th><th>SAP / T-code</th><th>Analysis Link</th></tr></thead><tbody><tr><td>Basic Data</td><td>Material / Equipment / Documents / BOMs / Routings / Classes / PRTs / Work Centers</td><td>MM + PP Master Data</td><td>產品規格、BOM、製程與產線主檔</td></tr><tr><td>SD</td><td>Sales Order</td><td>VA01 / VA02 / VA03 / VA05</td><td>客戶、產品、ASP、Volume、Discount、Revenue</td></tr><tr><td>Production</td><td>MRP / Planned Orders / Production Orders</td><td>MD04 / CO01 / CO03</td><td>需求轉產能、工單、用料、製造成本</td></tr><tr><td>Controlling</td><td>Product Costing</td><td>CK11N / CK13N / CK40N</td><td>標準成本、成本估算、COGS、GM</td></tr><tr><td>Materials Mgmt.</td><td>Purchasing / Storage Location</td><td>ME2N / MMBE / MB52</td><td>供應商、採購價格、庫存、lead time</td></tr><tr><td>Plant Maintenance</td><td>Preventive Maintenance Plan / Maintenance Order</td><td>IP / IW series</td><td>設備維護、停機、產能與良率風險</td></tr><tr><td>Work Center Config</td><td>Category / Standard Value Key / Control Key / Formula</td><td>CR01/CR02/CR03 + OP17/OP19</td><td>Machine rate、labor rate、operation cost</td></tr><tr><td>Routing Config</td><td>Operations / setup / processing time / costing formula</td><td>CA01/CA02/CA03</td><td>製程成本、cycle time、capacity、yield loss</td></tr></tbody></table></div></article>
+<article class="card"><h2><span class="secid">VIA-20260702-VAL-001</span>可檢視 / 可驗證 / 可修正 Gate</h2><div class="scroll"><table><thead><tr><th>ID</th><th>Gate</th><th>Rule</th><th>Failure Logic</th><th>Owner</th></tr></thead><tbody><tr><td>VAL-001</td><td>ID Completeness</td><td>100% rows have auto ID</td><td>Fail if null / duplicated</td><td>System</td></tr><tr><td>VAL-002</td><td>Period Completeness</td><td>period_id links financial and operational data</td><td>Fail if date missing</td><td>DataOps</td></tr><tr><td>VAL-003</td><td>BOM Reconciliation</td><td>BOM cost_pct ≈ 100 or explained</td><td>Warn/Fail</td><td>Product Cost</td></tr><tr><td>VAL-004</td><td>SAP ↔ Financial Reconciliation</td><td>Product costing total reconciles to COGS bucket</td><td>Warn if gap > threshold</td><td>Controlling</td></tr><tr><td>VAL-005</td><td>Customer Profitability</td><td>Sales order / CO-PA has customer + product + GM</td><td>Fail if revenue without COGS</td><td>Sales Finance</td></tr><tr><td>VAL-006</td><td>Evidence Status</td><td>Confirmed / Estimated / NeedsSAP / NeedsCheck</td><td>Fail if no source</td><td>Research</td></tr><tr><td>VAL-007</td><td>Driver-to-BOM Link</td><td>Industry driver maps to affected product/BOM/cost line</td><td>Warn if disconnected</td><td>Strategy</td></tr><tr><td>VAL-008</td><td>Change History</td><td>valid_from / valid_to / revision / ECN</td><td>Fail if version mixed</td><td>PLM/SAP</td></tr></tbody></table></div></article>
+</section>
+
+<section class="card">
+<h2><span class="secid">VIA-20260702-PROMPT-001</span>Prompt 更新化：用來抓真實數據、檢視、補缺口、生成分析</h2>
+<button class="btn" onclick="copyPrompt()">複製 Prompt</button>
+<textarea id="promptBox" readonly>def ROLE
+你是 VIA Super BOM Relational Intelligence Console 的資料架構、產業研究、SAP BOM、管理會計、產品成本與真實數據擷取 AI。
+
+def CORE_RULE
+產業抓 Driver 展開。
+企業抓 BOM 展開。
+產品抓 ASP × Volume × Variable Unit Cost × Fixed Allocation × COGS。
+客戶抓 Customer BU × Program × Product Line。
+SAP 抓 Material / BOM / Routing / Work Center / Costing / Material Ledger / CO-PA。
+管理會計抓 Profit Center / Cost Center / Product Cost Object / Variance / ROIC。
+所有路徑必須回到 Revenue / COGS / GM / FCF / ROIC / EvidenceStatus。
+
+def INPUT_SOURCES
+1. 季報、半年報、年報、法說會、公司官網、產品頁、新聞稿。
+2. SAP MM/PP/SD/CO 匯出：MARA/MARC/MBEW/STKO/STPO/MAST/PLKO/PLPO/CRHD/CKIS/ACDOCA/CO-PA。
+3. BOM Template CSV：Level, Parent_PN, Item_PN, Commodity, Qty, UOM, Ref_Des, AVL, Alt_Group, Lead_Time, Package, Rating。
+4. 供應商、客戶、基地、CAPEX、設備、製程、維修與品質資料。
+5. 既有 VIA HTML / SSOT / PromptOps / Registry files。
+
+def REQUIRED_OUTPUT
+A. Homepage one-page cockpit:
+- Individual Product View
+- Individual Company View
+- Industry Aggregate View
+- Change / Structure / Number / Evidence status
+B. Relational matrix:
+- Driver → Company → BU → Application → ProductSpec → SAP BOM → Routing → Costing → CO-PA → Financial Model
+C. Data completeness matrix:
+- source, period, method, expected fields, completeness, missing gap, owner
+D. Validation matrix:
+- PASS / WARN / FAIL with root cause and repair action
+E. Prompt update:
+- next data to fetch, exact fields, extraction method, validation rule
+
+def FORBIDDEN
+不可把示範資料當成 confirmed。
+不可沒有 record_id。
+不可混用版本日期。
+不可只做頁面、不建資料庫關聯。
+不可只有 BOM 沒有 Sales/ASP/COGS/GM。
+不可只有產業 narrative 沒有 driver-to-data linkage。</textarea>
+</section>
+
+<section class="card">
+<h2><span class="secid">VIA-20260702-NEXT-001</span>下一階段：超高度整合後再分頁</h2>
+<table><thead><tr><th>Phase</th><th>Output</th><th>What changes</th></tr></thead><tbody><tr><td>P0 首頁 Cockpit</td><td>Industry / Company / Product / Change / Structure / Number all-in-one</td><td>一頁看全部，不迷路</td></tr><tr><td>P1 Data Registry</td><td>source_registry + evidence_registry + completeness_matrix</td><td>知道每個數字從哪裡來、缺什麼</td></tr><tr><td>P2 Relational DB</td><td>DuckDB tables by keys above</td><td>開始真正交叉分析，不是 HTML 堆表</td></tr><tr><td>P3 Fetch Pipeline</td><td>financial_report_fetcher + web_snapshotter + sap_export_loader</td><td>季報/半年報/年報/網頁/SAP 自動進庫</td></tr><tr><td>P4 Analysis Pages</td><td>product page / company page / industry page</td><td>高整合後再分頁，不失去全局</td></tr><tr><td>P5 Validation</td><td>PASS/WARN/FAIL + root cause + repair action</td><td>防止假資料、舊版資料、無 ID 資料進模型</td></tr></tbody></table>
+</section>
+
+<div class="idline">Generated：2026-07-02 · File：VIA_SuperBOM_Relational_Intelligence_Console_20260702.html · Companion JSON：VIA_SuperBOM_Relational_SSOT_20260702.json</div>
+</div>
+<script>
+function copyPrompt(){
+ const t=document.getElementById('promptBox'); t.select();
+ try{navigator.clipboard.writeText(t.value)}catch(e){document.execCommand('copy')}
+}
+</script>
+</body>
+</html>

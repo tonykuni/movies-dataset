@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>本週重點 · 央行決策週共振矩陣</title>
+<style>
+:root{
+  --bg:#f8f7f2;
+  --ink:#1f2a2a;
+  --muted:#6f7773;
+  --line:#d8d2c4;
+  --card:#ffffffcc;
+  --red:#b94a48;
+  --orange:#c9822b;
+  --green:#3f7f5f;
+  --blue:#4b6f88;
+  --purple:#6f5b8e;
+  --shadow:0 14px 38px rgba(31,42,42,.09);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-size:14px;
+  font-family:"Noto Sans TC","Microsoft JhengHei",Arial,sans-serif;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(120,160,150,.18), transparent 30%),
+    radial-gradient(circle at 85% 20%, rgba(180,90,70,.10), transparent 26%),
+    linear-gradient(135deg,#f9f8f3,#eef3ef);
+  color:var(--ink);
+}
+.wrapper{max-width:1180px;margin:auto;padding:34px 22px 60px}
+.header{
+  padding:26px 30px;border:1px solid var(--line);
+  background:rgba(255,255,255,.58);box-shadow:var(--shadow);border-radius:22px;
+}
+.kicker{color:var(--blue);letter-spacing:.12em;font-size:11.5px;font-weight:700}
+h1{margin:8px 0 6px;font-size:27px;letter-spacing:.02em;line-height:1.3}
+.subtitle{color:var(--muted);line-height:1.7;font-size:13px}
+.stamp{
+  float:right;border:2px solid var(--red);color:var(--red);
+  padding:7px 10px;border-radius:7px;font-weight:900;letter-spacing:.16em;font-size:13px;
+}
+.section{margin-top:22px}
+.section h2{font-size:18px;margin:0 0 11px;padding-left:11px;border-left:4px solid var(--blue);line-height:1.35}
+.matrix{
+  width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;
+  border-radius:16px;background:var(--card);box-shadow:var(--shadow);border:1px solid var(--line);
+}
+.matrix th{text-align:left;padding:11px 13px;background:#e9eee9;font-size:12.5px}
+.matrix td{padding:11px 13px;border-top:1px solid var(--line);vertical-align:top;line-height:1.55;font-size:13px}
+.day{font-weight:900;color:var(--blue);white-space:nowrap}
+.tag{display:inline-block;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:700}
+.red{background:#f6dddd;color:var(--red)}
+.orange{background:#f7ead9;color:var(--orange)}
+.green{background:#dfeee5;color:var(--green)}
+.blue{background:#e1eaf0;color:var(--blue)}
+.purple{background:#e9e3f1;color:var(--purple)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:18px;
+  padding:17px 18px;box-shadow:var(--shadow);min-height:auto;
+}
+.card h3{margin:0 0 4px;font-size:15.5px}
+.gauge{font-size:13.5px;font-weight:800;margin:4px 0 7px}
+.card p{margin:0;color:var(--muted);line-height:1.65;font-size:12.5px}
+.flow{
+  background:rgba(255,255,255,.64);border:1px solid var(--line);border-radius:20px;
+  padding:20px 22px;box-shadow:var(--shadow);line-height:1.85;font-size:15px;text-align:center;
+}
+.arrow{color:var(--red);font-weight:900}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.scenario{border:1px solid var(--line);border-radius:18px;padding:17px 18px;box-shadow:var(--shadow);background:var(--card)}
+.scenario.bull{border-top:5px solid var(--green)}
+.scenario.bear{border-top:5px solid var(--red)}
+.scenario h3{margin:0 0 9px;font-size:15.5px}
+.scenario ul{margin:0;padding-left:16px;color:var(--muted);line-height:1.75;font-size:12.5px}
+.spectrum{display:flex;flex-wrap:wrap;gap:8px;margin-top:5px}
+.chip{
+  border:1px solid var(--line);border-radius:11px;padding:8px 11px;background:#fff;
+  font-size:12px;line-height:1.45;flex:1 1 210px;
+}
+.chip b{display:block;font-size:12.5px;margin-bottom:2px}
+.chip.bullish{border-left:3px solid var(--green)}
+.chip.mid{border-left:3px solid var(--orange)}
+.chip.bearish{border-left:3px solid var(--red)}
+.subhead{margin:14px 0 5px;font-size:14px;color:var(--ink);font-weight:700}
+.note{font-size:11.5px;color:var(--muted);margin-top:6px;line-height:1.6}
+.footer{margin-top:30px;color:var(--muted);font-size:11.5px;border-top:1px solid var(--line);padding-top:14px}
+.disclaimer{
+  margin-top:14px;font-size:11.5px;color:var(--muted);background:rgba(255,255,255,.45);
+  border:1px dashed var(--line);border-radius:13px;padding:13px 16px;line-height:1.7;
+}
+@media(max-width:900px){
+  .grid,.grid2,.split{grid-template-columns:1fr}
+  h1{font-size:22px}
+  .stamp{float:none;display:inline-block;margin-bottom:12px}
+}
+</style>
+</head>
+
+<body>
+<div class="wrapper">
+
+  <header class="header">
+    <div class="stamp">本週</div>
+    <div class="kicker">VERITAS INTELLIGENCE ANALYTICS · RESONANCE MATRIX</div>
+    <h1>本週重點：央行決策超級週、重大數據與機構觀點</h1>
+    <div class="subtitle">
+      涵蓋區間：2026/06/15（一）– 06/21（日）台灣時間<br>
+      主軸：BoJ 升息 → Fed 偏鷹按兵＋點陣圖 → 零售/工業/房市數據 → 停火細節落地與否 → 油價、日圓、長端殖利率三線共振 → 台股與 S&amp;P 500 風險定價。<br>
+      <span style="color:var(--red);font-weight:700">※ 6/19（五）為美國 Juneteenth 假日，美股休市，部分數據提前發布。</span>
+    </div>
+  </header>
+
+  <section class="section">
+    <h2>一、本週主軸</h2>
+    <div class="flow">
+      BoJ 升息至 1% <span class="arrow">→</span>
+      日圓動向 <span class="arrow">→</span>
+      Fed 按兵＋點陣圖（6/17） <span class="arrow">→</span>
+      零售/房市數據驗證景氣 <span class="arrow">→</span>
+      停火細節能否落地 <span class="arrow">→</span>
+      油價＋日圓＋10 年債三線共振 <span class="arrow">→</span>
+      台股與美股風險重新定價
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>二、本週事件時間軸矩陣</h2>
+    <table class="matrix">
+      <thead>
+        <tr><th>日期</th><th>事件／數據</th><th>市場焦點</th><th>共振方向</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="day">6/15 一</td>
+          <td>BoJ 會議首日；美財政部 20 年期公債標售</td>
+          <td>行長植田因病缺席、由副行長主持；長天期標售需求是觀察重點</td>
+          <td><span class="tag blue">日圓與長端前奏</span></td>
+        </tr>
+        <tr>
+          <td class="day">6/16 二</td>
+          <td>🇯🇵 <strong>BoJ 利率決議</strong>；🇺🇸 <strong>零售銷售</strong>（5 月）、工業生產、進出口物價；FOMC 兩日會議開始</td>
+          <td>BoJ 預期升息 25bp 至 1%（1995 年來最高）；美零售反映消費韌性</td>
+          <td><span class="tag red">日圓＋消費雙主軸</span></td>
+        </tr>
+        <tr>
+          <td class="day">6/17 三</td>
+          <td>🇺🇸 <strong>FOMC 決議＋經濟預測摘要（點陣圖）</strong>；房屋開工（5 月）；初領失業金（因假日提前）；EIA 原油庫存</td>
+          <td>預期維持 3.50–3.75%；重點在點陣圖是否刪除降息、甚至暗示升息</td>
+          <td><span class="tag red">全週最大變數</span></td>
+        </tr>
+        <tr>
+          <td class="day">6/18 四</td>
+          <td>🇯🇵 日本貿易收支、5 月 CPI（前後）；全球 PMI 觀察</td>
+          <td>日本通膨與 BoJ 後續升息路徑連動</td>
+          <td><span class="tag orange">日圓延續觀察</span></td>
+        </tr>
+        <tr>
+          <td class="day">6/19 五</td>
+          <td>🇺🇸 Juneteenth 假日，美股休市</td>
+          <td>流動性偏薄，留意停火與地緣突發消息</td>
+          <td><span class="tag blue">事件風險窗口</span></td>
+        </tr>
+        <tr>
+          <td class="day">全週</td>
+          <td>美伊停火細節；台股籌碼面</td>
+          <td>霍爾木茲是否「30 天內」實質重開；外資台指期淨空單、新台幣是否貶破 32</td>
+          <td><span class="tag red">油價／台股資金總開關</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section">
+    <h2>三、本週重大經濟數據</h2>
+    <table class="matrix">
+      <thead>
+        <tr><th>數據</th><th>意義</th><th>近期／市場關注</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>FOMC 點陣圖／SEP</strong>（6/17）</td>
+          <td>本週分量最重。3 月 SEP 仍預估 2026 年降息 1 次、PCE 與核心 PCE 各 2.7%、失業率 4.4%、GDP 2.4%</td>
+          <td><span class="tag red">關鍵</span> 5 月 CPI 衝上 4.2% 後，市場觀察是否抽掉降息、轉為「年內升息」訊號</td>
+        </tr>
+        <tr>
+          <td><strong>美國零售銷售</strong>（5 月，6/16）</td>
+          <td>消費占美國 GDP 約七成，檢驗景氣是否在高利率下仍具韌性</td>
+          <td><span class="tag orange">高</span> 弱→軟著陸疑慮；強→Fed 更難轉鴿</td>
+        </tr>
+        <tr>
+          <td><strong>工業生產</strong>（5 月，6/16）</td>
+          <td>製造業活動的即時溫度計</td>
+          <td><span class="tag blue">中</span> 與全球景氣、原物料需求連動</td>
+        </tr>
+        <tr>
+          <td><strong>房屋開工／營建許可</strong>（5 月，6/17）</td>
+          <td>利率最敏感的實體部門，反映高利率對房市的壓抑</td>
+          <td><span class="tag blue">中</span> 長端殖利率高企下的房市承壓訊號</td>
+        </tr>
+        <tr>
+          <td><strong>初領失業金</strong>（6/17，提前發布）</td>
+          <td>勞動市場高頻指標</td>
+          <td><span class="tag orange">高</span> 6 月初已升至 22.9 萬、三個月新高，留意是否續升</td>
+        </tr>
+        <tr>
+          <td><strong>日本 5 月 CPI／貿易收支</strong></td>
+          <td>BoJ 升息後續路徑的依據；5 月 PPI 年增 6.1%、三年最快</td>
+          <td><span class="tag orange">高</span> 通膨黏著→BoJ 年內可能再升至 1.25%</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="note">錨點回顧：美國 5 月 CPI 年增 4.2%（2023 年來最高、首破 4%），但核心 CPI 月增僅 0.2%、年增 2.9%，能源占月增逾六成——通膨壓力集中於油價、尚未全面擴散。</p>
+  </section>
+
+  <section class="section">
+    <h2>四、三大警戒指標：進入本週的起點</h2>
+    <div class="grid">
+      <div class="card">
+        <h3>布蘭特原油</h3>
+        <div class="gauge"><span class="tag green">約 87 美元 · 已跌破警戒</span></div>
+        <p>警戒線 95–100。停火進展使油價自 101 回落。本週若停火破局，可迅速重返 100 以上，重新點燃通膨鏈。</p>
+      </div>
+      <div class="card">
+        <h3>USD/JPY</h3>
+        <div class="gauge"><span class="tag orange">約 160 · 與警戒方向相反</span></div>
+        <p>警戒線「跌破 145」代表日圓升值。目前日圓極弱。BoJ 6/16 升息為潛在引信，留意決議後是否急升、觸發套利平倉。</p>
+      </div>
+      <div class="card">
+        <h3>美國 10 年債殖利率</h3>
+        <div class="gauge"><span class="tag orange">約 4.5% · 逼近未破</span></div>
+        <p>警戒線 5%。30 年期 5 月曾觸及 5.2%。本週 Fed 點陣圖若轉鷹，長端突破 5% 將觸發全球估值下修。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>五、央行決策矩陣（本週兩大主角）</h2>
+    <table class="matrix">
+      <thead>
+        <tr><th>央行</th><th>本週動作</th><th>市場預期</th><th>最該盯的變數</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>BoJ</strong><br>6/16</td>
+          <td>升息 25bp 至 1%</td>
+          <td><span class="tag red">升息已被定價</span></td>
+          <td>升息後是否暗示再升、日圓會否從 160 急升觸發 Carry Trade 拆倉</td>
+        </tr>
+        <tr>
+          <td><strong>Fed</strong><br>6/17</td>
+          <td>按兵不動＋更新點陣圖</td>
+          <td><span class="tag orange">維持不變 ~97%</span></td>
+          <td>SEP 是否刪除 2026 年降息；Warsh 主席與記者會語氣；債市已部分定價年內升息</td>
+        </tr>
+        <tr>
+          <td><strong>ECB</strong><br>已於 6/11</td>
+          <td>已升息至 2.25%</td>
+          <td><span class="tag blue">7 月可能再升</span></td>
+          <td>本週官員談話是否確認 7 月續升路徑</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section">
+    <h2>六、各機構與學術單位看法光譜</h2>
+
+    <h3 class="subhead">① S&amp;P 500 年底目標：賣方分歧（多為 2025/12 起、部分已上修）</h3>
+    <div class="spectrum">
+      <div class="chip bullish"><b>最樂觀 8,000–8,100</b>Oppenheimer 8,100；Deutsche Bank 8,000；Capital Economics 8,000；Morgan Stanley 8,000（Michael Wilson，自 7,800 上修）；Goldman Sachs 8,000（自 7,600 上修）</div>
+      <div class="chip mid"><b>中間 7,600–7,800</b>Wells Fargo 7,800；RBC 7,750；Evercore 7,750；Yardeni／Citi／Fundstrat 7,700；JPMorgan 7,600（Lakos-Bujas，4 月自 7,200 上修）</div>
+      <div class="chip bearish"><b>最保守 7,000–7,300</b>SocGen 7,300；BofA 7,100；Ned Davis 7,100；Stifel 7,000</div>
+    </div>
+    <p class="note">共識落點約 7,600–7,650（年初普遍預估上漲約 10%）。值得注意：沒有一家賣方預測 2026 年負報酬——這本身就是「擁擠的樂觀」風險。</p>
+
+    <h3 class="subhead">② 通膨與 Fed 路徑：學術偏鷹、市場分歧</h3>
+    <div class="spectrum">
+      <div class="chip bearish"><b>通膨上行（學術）</b>PIIE 的 Adam Posen 與 Peter Orszag（Lazard）：通膨年底恐破 4%、r-star 已升 50–75bp，當前政策實際偏寬鬆——市場「Fed 已贏通膨」的樂觀過早。</div>
+      <div class="chip bearish"><b>市場定價升息</b>Bloomberg（5/28）報導債市已對新主席 Warsh 定價約 75bp 升息；CME FedWatch 顯示年內至少升息一次機率約七成。</div>
+      <div class="chip mid"><b>輕度停滯性通膨</b>RSM 的 Joe Brusuelas：「stagflation lite」，通膨約 3%，但衰退機率自 40% 降至 30%，仍預期 Fed 終將降息至 3–3.25%。</div>
+    </div>
+
+    <h3 class="subhead">③ 衰退機率：機構之間落差極大</h3>
+    <div class="spectrum">
+      <div class="chip bullish"><b>Goldman Sachs 約 30%</b>（自 25% 上修）</div>
+      <div class="chip mid"><b>Kalshi 預測市場 ~39%</b>（3 月一度自 22% 跳升）</div>
+      <div class="chip bearish"><b>Moody's 約 49%</b>（最悲觀）</div>
+    </div>
+
+    <h3 class="subhead">④ 油價預測：戰前看空 vs 戰後修正，極端分歧</h3>
+    <div class="spectrum">
+      <div class="chip bullish"><b>戰前看空（2025/12）</b>Goldman 商品團隊 Brent 2026 均價約 $56、JPMorgan 約 $58，假設供給過剩約 2mb/d、無中斷。</div>
+      <div class="chip mid"><b>官方基準</b>IMF（4 月）假設 2026 油價約 $82；嚴重情境設定油價較基準高 100%。</div>
+      <div class="chip bearish"><b>戰後修正</b>Goldman 資產管理（6/1）：若能源恢復流動，Brent 年底約 $90；Morgan Stanley 預期油價全年居高，霍爾木茲為關鍵。</div>
+    </div>
+    <p class="note">現況 Brent 約 $87、已自 101 回落——介於「戰前看空」與「戰後高檔」之間，方向完全取決於停火能否守住。</p>
+
+    <h3 class="subhead">⑤ 資產配置立場（中型／投資機構）</h3>
+    <table class="matrix">
+      <thead><tr><th>機構</th><th>股票</th><th>核心債</th><th>新興市場／其他</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Morgan Stanley</strong></td>
+          <td><span class="tag green">加碼</span></td>
+          <td><span class="tag red">減碼</span></td>
+          <td>「建設性但不自滿」，輪動式復甦，看好美股；S&amp;P 未來 12 個月約 +12%</td>
+        </tr>
+        <tr>
+          <td><strong>BlackRock</strong>（Q2）</td>
+          <td><span class="tag green">加碼美股</span></td>
+          <td><span class="tag red">減碼長天期美債</span></td>
+          <td>選擇性加碼新興市場；認為中東衝擊對全球成長傷害有限；AI mega force 加速、看好日股</td>
+        </tr>
+        <tr>
+          <td><strong>BofA／Merrill</strong>（6/8）</td>
+          <td><span class="tag green">加碼</span></td>
+          <td><span class="tag orange">強調分散</span></td>
+          <td>警告 $9 兆美債到期再融資；「Fed 意外快速升息」為非基準但須警戒的風險</td>
+        </tr>
+        <tr>
+          <td><strong>JPMorgan Global Research</strong></td>
+          <td><span class="tag green">看多全球</span></td>
+          <td>—</td>
+          <td>DM 與 EM 雙位數漲幅；AI 超級循環；但警告 K 型經濟與市場集中度創高</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="note">主流機構共識仍是「加碼股票、減碼長債」的偏多配置，分歧主要在「油價／通膨／Fed 升息」的尾部風險權重。學術界（PIIE）與部分預測機構（Moody's）對通膨與衰退的擔憂，明顯高於賣方策略部門。</p>
+  </section>
+
+  <section class="section">
+    <h2>七、兩大市場本週觀察重點</h2>
+    <div class="grid2">
+      <div class="card">
+        <h3>S&amp;P 500</h3>
+        <div class="gauge"><span class="tag orange">高估值 · 對折現率敏感</span></div>
+        <p>預估本益比約 22 倍、獲利集中於 AI 巨頭。本週若 Fed 點陣圖偏鷹＋零售強勁＋長端走高，高評價成長股首當其衝；反之停火＋油價回落則延續多頭題材。盯點陣圖與 10 年債。</p>
+      </div>
+      <div class="card">
+        <h3>台股（TAIEX）</h3>
+        <div class="gauge"><span class="tag red">籌碼偏空 · 高 Beta</span></div>
+        <p>美股強、台股籌碼冷的背離仍在：外資現貨大賣、期貨空單創高、新台幣走弱（約 31.6）。本週受 BoJ／Fed 雙會議與停火題材牽動，波動放大。盯外資期貨部位與匯率。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>八、本週情境分歧</h2>
+    <div class="split">
+      <div class="scenario bull">
+        <h3>偏多路徑（停火維繫＋數據溫和）</h3>
+        <ul>
+          <li>美伊協議簽署、霍爾木茲重開</li>
+          <li>油價穩於 85–90 美元下方</li>
+          <li>零售/房市數據溫和、不過熱</li>
+          <li>BoJ 升息但語氣偏鴿、日圓溫和</li>
+          <li>Fed 點陣圖維持降息預期</li>
+          <li>→ 風險偏好回溫，高檔震盪偏多</li>
+        </ul>
+      </div>
+      <div class="scenario bear">
+        <h3>偏空路徑（共振升級）</h3>
+        <ul>
+          <li>停火細節破局、油價重上 95</li>
+          <li>零售過熱＋初領失業金惡化的停滯性通膨組合</li>
+          <li>Fed 點陣圖刪降息／暗示升息</li>
+          <li>BoJ 鷹派指引、日圓自 160 急升</li>
+          <li>美 10 年債突破 5%</li>
+          <li>→ 套利拆倉＋估值重設，台股高 Beta 殺最兇</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>九、本週判讀</h2>
+    <div class="flow">
+      本週是 <strong>「央行決策、重大數據、停火驗證」</strong> 三線交會的一週。<br>
+      真正的風險不在升息本身（多已定價），<br>
+      而在 <strong>Fed 點陣圖</strong> 是否刪除降息、<strong>BoJ 升息後的日圓</strong> 是否急升、<br>
+      再疊加 <strong>停火能否守住</strong>──三者若共振向上，<br>
+      台股高 Beta 與美股高估值將同步承壓。
+    </div>
+  </section>
+
+  <div class="disclaimer">
+    ⚠️ 注意事項：本報告數據截至 2026/06/14，純為資訊與情境分析用途，不構成任何買賣建議。本週多項事件（BoJ 6/16、Fed 6/17 決議與點陣圖）於本報告完成時尚未公布，文中「預期」為市場定價而非定論。各機構 S&amp;P 500 目標與油價／通膨預測設定於不同時點（多為 2025/12 年度展望，部分於 2026 年上半年更新），彼此存在真實分歧，且皆為預測（projection）而非已實現結果。油價、匯率、殖利率對美伊談判極度敏感，請以即時報價為準。投資決策請自行判斷並承擔風險。
+  </div>
+
+  <footer class="footer">
+    Veritas Intelligence Analytics │ AI-Augmented Investment Intelligence for Smarter Decisions and Deeper Insight
+  </footer>
+
+</div>
+</body>
+</html>
