@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA WorkOps · 一頁式收斂地圖</title>
+<style>
+  :root{
+    --bg:#f5f4f0; --paper:#fff; --ink:#1e1d1a; --sub:#6b6860; --line:#dcdad4;
+    --blue:#4c78a8; --teal:#439a9a; --green:#5a9e6f; --amber:#c4943a; --red:#c0392b; --purple:#7a6daa;
+    --sans:'Segoe UI','PingFang TC','Microsoft JhengHei','Noto Sans TC',system-ui,sans-serif;
+    --mono:'Cascadia Code','Consolas',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13px;line-height:1.5;padding:26px}
+  .wrap{max-width:1000px;margin:0 auto}
+  .bar{height:6px;border-radius:3px;margin:0 0 18px;background:linear-gradient(90deg,#4c78a8,#439a9a,#5a9e6f,#c4943a,#c96b5a,#7a6daa)}
+  h1{font-size:22px;font-weight:800;letter-spacing:-.01em}
+  .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--sub);margin-bottom:4px}
+  h2{font-size:15px;font-weight:800;margin:22px 0 10px;display:flex;align-items:center;gap:8px}
+  h2 .n{background:var(--ink);color:#fff;width:20px;height:20px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;flex:none}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:14px 16px;margin-bottom:10px}
+  .flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin:6px 0}
+  .step{flex:1;min-width:150px;background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:11px 13px}
+  .step .k{font-family:var(--mono);font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:.5px}
+  .step .v{font-weight:700;margin:3px 0}
+  .step .d{font-size:11.5px;color:var(--sub)}
+  .arrow{align-self:center;color:var(--sub);font-weight:700;font-size:16px}
+  table{width:100%;border-collapse:collapse;background:var(--paper);border:1px solid var(--line);border-radius:9px;overflow:hidden;font-size:12px}
+  th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#efede8;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--sub)}
+  tr:last-child td{border-bottom:none}
+  .pill{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:20px}
+  .use{background:rgba(90,158,111,.14);color:#3d7a4f;border:1px solid rgba(90,158,111,.4)}
+  .bak{background:rgba(155,150,144,.16);color:#6b6860;border:1px solid rgba(155,150,144,.4)}
+  .quar{background:rgba(192,57,43,.1);color:var(--red);border:1px solid rgba(192,57,43,.4)}
+  .warn{background:#fbf3e6;border:1px solid var(--amber);border-radius:8px;padding:11px 13px;font-size:12px;margin:10px 0}
+  .warn b{color:#8a5a12}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .route{border-radius:9px;padding:14px 16px;border:1px solid var(--line)}
+  .rA{background:rgba(90,158,111,.07);border-color:rgba(90,158,111,.4)}
+  .rB{background:rgba(76,120,168,.07);border-color:rgba(76,120,168,.4)}
+  .route h3{font-size:14px;margin-bottom:6px}
+  .route .tag{font-family:var(--mono);font-size:10px;color:var(--sub);text-transform:uppercase;letter-spacing:1px}
+  .mono{font-family:var(--mono)}
+  .sop{background:var(--ink);color:#f2f0ec;border-radius:9px;padding:14px 16px;font-size:13px;line-height:1.8}
+  .sop .mono{color:#9cc7b3}
+  .foot{color:var(--sub);font-size:10.5px;margin-top:18px;text-align:center}
+  @media print{ body{background:#fff;padding:0} .card,.step,.route,table{box-shadow:none} @page{size:A4;margin:12mm} }
+  @media (max-width:680px){ .two{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar"></div>
+  <div class="eyebrow">VIA WorkOps · Consolidation Map</div>
+  <h1>一頁式收斂地圖 — 該用哪個檔、照什麼順序</h1>
+  <p style="color:var(--sub);margin-top:6px">你現在有 4 個掃描器、2 個前端、一整個 Forge。這張圖把它收斂成 <b>一條清楚的路</b>。原則不變:你自己權限、只讀、本機、不自動寄、不監控別人。</p>
+
+  <h2><span class="n">1</span>兩條路,擇一就好</h2>
+  <div class="two">
+    <div class="route rA">
+      <div class="tag">Route A · 建議</div>
+      <h3>檔案式(離線・零安裝)</h3>
+      <div style="font-size:12px;color:var(--sub)">掃描器(擇一)→ 匯出檔 → 拖進 <b>Dashboard v6</b> → 追蹤信引擎。<br>雙擊即用,不裝 Python、不開伺服器。<b>大多數人用這條。</b></div>
+    </div>
+    <div class="route rB">
+      <div class="tag">Route B · 功能最全</div>
+      <h3>伺服器式(需 Python)</h3>
+      <div style="font-size:12px;color:var(--sub)">跑 <span class="mono">via_server.py</span> → 瀏覽器開 <span class="mono">index.html</span>(即時 /api)。<br>功能多,但要維護 Python 環境與本機伺服器。<b>進階才用。</b></div>
+    </div>
+  </div>
+
+  <h2><span class="n">2</span>掃描器:四選一(其餘當備援)</h2>
+  <div class="flow">
+    <div class="step"><div class="k">公司 Outlook · 功能最全</div><div class="v">v004 All-in-One</div><div class="d">直接吐 Dashboard 要的 CSV(含 pending 待回覆)。主力首選。</div></div>
+    <div class="step"><div class="k">Gmail / 跨平台</div><div class="v">fetch_mailbox.py</div><div class="d">你自己的 App Password,存 keyring,輸出 JSONL。</div></div>
+    <div class="step"><div class="k">最保守 · 只讀主旨</div><div class="v">SafeLocal</div><div class="d">不讀本文/地址/附件。純主旨分群。</div></div>
+    <div class="step"><div class="k">要 .msg/附件備份</div><div class="v">Outlook Wizard</div><div class="d">會跳 Outlook 安全提示(正常)。</div></div>
+  </div>
+
+  <h2><span class="n">3</span>閉環:一條龍</h2>
+  <div class="flow">
+    <div class="step"><div class="k">Step 1</div><div class="v">掃描(擇一)</div><div class="d">只讀你自己信箱 → 匯出檔</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="k">Step 2</div><div class="v">Dashboard v6</div><div class="d">拖入 → 看板/評分/應追蹤清單/簡報/驗證</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="k">Step 3</div><div class="v">匯出 recipients.csv</div><div class="d">勾選要追的 → 一鍵匯出</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="k">Step 4</div><div class="v">追蹤信引擎</div><div class="d">建草稿(選擇題)→ 你檢視後親自寄</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="k">Step 5</div><div class="v">隔日補追殺</div><div class="d">-Mode FollowUp</div></div>
+  </div>
+
+  <h2><span class="n">4</span>檔案總表 — 用 / 備援 / 隔離</h2>
+  <table>
+    <thead><tr><th style="width:230px">檔案</th><th>角色</th><th style="width:70px">處置</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">Veritas_MailOps_Standalone.html (v6)</td><td>統一前端:讀 JSON/CSV/JSONL,評分、追蹤清單、簡報、驗證、設定</td><td><span class="pill use">主力</span></td></tr>
+      <tr><td class="mono">Invoke-VeritasMailOps-TrackingDrafts.ps1</td><td>追蹤信草稿(選擇題 + FollowUp),只建草稿不自動寄</td><td><span class="pill use">主力</span></td></tr>
+      <tr><td class="mono">InvokeVIAMailOpsAllInOneIntegrated.ps1 (v004)</td><td>公司 Outlook 只讀掃描 → CSV(最全)</td><td><span class="pill use">掃描主力</span></td></tr>
+      <tr><td class="mono">fetch_mailbox.py</td><td>Gmail/跨平台擷取(App Password)→ JSONL</td><td><span class="pill use">掃描(Gmail)</span></td></tr>
+      <tr><td class="mono">SafeLocal / Outlook Wizard</td><td>保守主旨分群 / .msg 備份</td><td><span class="pill bak">備援</span></td></tr>
+      <tr><td class="mono">index.html + via_server.py</td><td>伺服器式即時前端(需 Python)</td><td><span class="pill bak">Route B</span></td></tr>
+      <tr><td class="mono">_via_workops_local_helper.py</td><td>只讀靜態稽核 + 郵件分析(產 CSV)</td><td><span class="pill bak">後端</span></td></tr>
+      <tr><td class="mono">InvokeVIAConsole v0163 (+Install)</td><td>參考/能力矩陣控制台(自解壓,SHA 驗章)</td><td><span class="pill bak">參考</span></td></tr>
+      <tr><td class="mono">via_rebuild.py  (/api/rebuild)</td><td>REBUILD_MUTATION_RISK</td><td><span class="pill quar">別自動跑</span></td></tr>
+      <tr><td class="mono">Invoke-VIA-SupportiveCore-PromptInjection.ps1</td><td>系統標記 PROMPT_INJECTION_ENTRY</td><td><span class="pill quar">隔離·勿執行</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="warn">
+    <b>⚠ 隔離區(維持只讀,別接進任何自動流程)</b><br>
+    · <span class="mono">Invoke-VIA-SupportiveCore-PromptInjection.ps1</span> — 你自己的 helper 已標記為「靜態稽核、不 dot-source」。別執行、別 import、別接自動化。<br>
+    · <span class="mono">via_rebuild.py</span> — 有變更風險,永遠手動、逐次確認,別讓它自動觸發。
+  </div>
+
+  <h2><span class="n">5</span>一句話 SOP</h2>
+  <div class="sop">
+    每天:<span class="mono">掃描(擇一)</span> → <span class="mono">Dashboard 看/評分/清單</span> → <span class="mono">匯出 recipients.csv</span> → <span class="mono">追蹤信引擎建草稿</span> → <b>你檢視後親自按傳送</b> → 隔日 <span class="mono">-Mode FollowUp</span> 補追殺。<br>
+    界線:你自己權限 · 只讀擷取 · 本機處理 · 不自動寄 · 不繞過 IT · 不監控同事。
+  </div>
+
+  <div class="foot">VIA WorkOps 收斂地圖 · 可列印 / 存 PDF(Ctrl+P → 另存 PDF)。此頁為離線靜態文件,無任何連網。</div>
+</div>
+</body>
+</html>

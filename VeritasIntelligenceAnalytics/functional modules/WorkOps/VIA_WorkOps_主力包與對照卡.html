@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA WorkOps · 主力包清單 + 合規對照卡</title>
+<style>
+  :root{
+    --bg:#f5f4f0; --paper:#fff; --ink:#1e1d1a; --sub:#6b6860; --line:#dcdad4;
+    --blue:#4c78a8; --teal:#439a9a; --green:#5a9e6f; --amber:#c4943a; --red:#c0392b;
+    --sans:'Segoe UI','PingFang TC','Microsoft JhengHei','Noto Sans TC',system-ui,sans-serif;
+    --mono:'Cascadia Code','Consolas',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13px;line-height:1.5;padding:26px}
+  .wrap{max-width:1000px;margin:0 auto}
+  .bar{height:6px;border-radius:3px;margin:0 0 18px;background:linear-gradient(90deg,#4c78a8,#439a9a,#5a9e6f,#c4943a,#c96b5a,#7a6daa)}
+  h1{font-size:21px;font-weight:800}
+  .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--sub);margin-bottom:4px}
+  h2{font-size:15px;font-weight:800;margin:22px 0 10px;display:flex;align-items:center;gap:8px}
+  h2 .dot{width:11px;height:11px;border-radius:3px;flex:none}
+  .g{background:var(--green)} .a{background:var(--amber)} .r{background:var(--red)} .b{background:var(--blue)}
+  table{width:100%;border-collapse:collapse;background:var(--paper);border:1px solid var(--line);border-radius:9px;overflow:hidden;font-size:12px}
+  th,td{text-align:left;padding:8px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#efede8;font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--sub)}
+  tr:last-child td{border-bottom:none}
+  .mono{font-family:var(--mono);font-size:11.5px}
+  .lead{color:var(--sub);margin-top:6px}
+  .box{border-radius:9px;padding:12px 14px;margin:10px 0;font-size:12.5px}
+  .keep{background:rgba(90,158,111,.08);border:1px solid rgba(90,158,111,.4)}
+  .arch{background:rgba(155,150,144,.1);border:1px solid var(--line)}
+  .quar{background:rgba(192,57,43,.07);border:1px solid rgba(192,57,43,.4)}
+  .sop{background:var(--ink);color:#f2f0ec;border-radius:9px;padding:13px 15px;font-size:12.5px;line-height:1.8;margin-top:10px}
+  .sop .mono{color:#9cc7b3}
+  .foot{color:var(--sub);font-size:10.5px;margin-top:18px;text-align:center}
+  .win{color:var(--green);font-weight:700}
+  @media print{ body{background:#fff;padding:0} table,.box,.sop{box-shadow:none} @page{size:A4;margin:12mm} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar"></div>
+  <div class="eyebrow">VIA WorkOps · Mainline Pack + Compliance Crosswalk</div>
+  <h1>主力包清單 + 合規對照卡</h1>
+  <p class="lead">一頁搞定三件事:① 留哪幾個檔就夠 ② 其餘歸檔封存 ③ 為什麼「合規版」沒讓你少任何真實產能。原則不變:你自己權限 · 只讀 · 本機 · 不自動寄 · 不繞過 IT · 不監控同事。</p>
+
+  <h2><span class="dot g"></span>① 主力包 — 留這些,放一個資料夾(例:<span class="mono">VIA_WorkOps\</span>)</h2>
+  <div class="box keep">
+  <table>
+    <thead><tr><th style="width:290px">檔案</th><th>做什麼</th><th style="width:150px">怎麼啟動</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">Veritas_MailOps_Standalone.html</td><td>統一前端 hub:讀 JSON/CSV/JSONL → 看板 · 應追蹤清單(評分) · 生成簡報 · 驗證中心 · 設定</td><td>雙擊(瀏覽器開)</td></tr>
+      <tr><td class="mono">Invoke-VeritasMailOps-TrackingDrafts.ps1<br>＋ templates\ ＋ recipients.csv</td><td>追蹤信草稿(○選擇題範本 + FollowUp 補追殺);只建草稿,你檢視後親自寄</td><td class="mono">雙擊 START_TrackingDrafts.cmd</td></tr>
+      <tr><td class="mono">掃描主力(擇一)：<br>v004 All-in-One .ps1  /  fetch_mailbox.py</td><td>只讀擷取你自己信箱 → 匯出(CSV / JSONL);公司 Outlook 用 v004,Gmail 用 fetch</td><td class="mono">START_Veritas_MailOps.cmd</td></tr>
+      <tr><td class="mono">START_Veritas_MailOps.cmd</td><td>一鍵選單:掃描 → 開結果 → 開 Dashboard / 建草稿 / 補追殺</td><td>雙擊</td></tr>
+      <tr><td class="mono">收斂地圖.html ＋ README_TrackingDrafts.txt</td><td>路線圖與說明(給你或同事看一眼就會用)</td><td>雙擊 / 記事本</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2><span class="dot a"></span>② 封存區 — 移到 <span class="mono">VIA_WorkOps\_archive\</span>(不刪,當備援)</h2>
+  <div class="box arch">
+  <table>
+    <thead><tr><th style="width:290px">檔案</th><th>為何封存(不是壞,只是重複/進階)</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">SafeLocal .ps1 · Outlook Wizard .ps1</td><td>掃描器備援(主力用 v004 就夠;要 .msg 備份時才拿 Wizard 出來)</td></tr>
+      <tr><td class="mono">index.html ＋ via_server.py ＋ Forge ~26 模組</td><td>Route B 伺服器式(功能全但要跑 Python 伺服器);進階再用</td></tr>
+      <tr><td class="mono">InvokeVIAConsole v0163 (+Install)</td><td>參考/能力矩陣控制台;非日常必需</td></tr>
+      <tr><td class="mono">_via_workops_local_helper.py</td><td>後端靜態稽核+分析(v004 已內含等效輸出)</td></tr>
+      <tr><td class="mono">email_case_tracker / email_action_db / engine_* (舊三代引擎)</td><td>現行主力的前身;功能已被 Dashboard + 追蹤信引擎取代</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2><span class="dot r"></span>③ 隔離區 — 永不執行、永不接自動化</h2>
+  <div class="box quar">
+  <table>
+    <thead><tr><th style="width:290px">檔案 / 功能</th><th>原因</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">Invoke-VIA-SupportiveCore-PromptInjection.ps1</td><td>你自己的系統標記 <span class="mono">PROMPT_INJECTION_ENTRY</span>「靜態稽核、不 dot-source」。保持只讀,別執行、別 import</td></tr>
+      <tr><td class="mono">via_rebuild.py  (/api/rebuild)</td><td><span class="mono">REBUILD_MUTATION_RISK</span>;永遠手動、逐次確認</td></tr>
+      <tr><td class="mono">email_super_engine.py 的 stealth_draft / BCC 自己 / .Send() 自動寄</td><td>暗抄夾帶 + 自動寄;改用 TrackingDrafts 的 <span class="mono">.Display()</span> 草稿版(你親自寄)</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2><span class="dot b"></span>④ 隱蔽版 → 合規版 對照卡(你一樣都沒少)</h2>
+  <table>
+    <thead><tr><th style="width:250px">隱蔽版賣點</th><th>你已擁有的合規版</th><th style="width:130px">真實損失</th></tr></thead>
+    <tbody>
+      <tr><td>pywin32「不驚動 IT」讀信</td><td>SafeLocal/Wizard/v004:同樣 Outlook COM,<b>只讀·你自己權限·被擋就停不繞過</b></td><td class="win">無(只少「規避」說法)</td></tr>
+      <tr><td>DuckDB/Parquet 本機庫</td><td>v004 → CSV;DuckDB 中性可用</td><td class="win">無</td></tr>
+      <tr><td>下班前結構化追蹤信</td><td>TrackingDrafts + ○選擇題範本(狀態/ETA/阻礙)</td><td class="win">無</td></tr>
+      <tr><td>隔日 Regex 收割回覆→更新</td><td>v004 analyze() 已做;用 <b>ConversationID/案號</b>對接</td><td class="win">無(更準)</td></tr>
+      <tr><td>BCC 自己 + 隱形追蹤碼</td><td>不需要:靠信件原生 ConversationID/主旨分群對接</td><td class="win">只少「暗抄」風險</td></tr>
+      <tr><td>自動 .Send()</td><td>.Display() 建草稿 → 你檢視後親自寄</td><td class="win">只少「偷偷幫你寄」</td></tr>
+      <tr><td>稽核員調閱員工郵件(RBAC)</td><td>—(監看同事,不做)</td><td class="win">不適用</td></tr>
+      <tr><td>專案儀表板 / 簡報</td><td>Dashboard v6 + 生成簡報(PDF)</td><td class="win">無</td></tr>
+    </tbody>
+  </table>
+
+  <div class="sop">
+    每日 SOP:<span class="mono">掃描(只讀,擇一)</span> → <span class="mono">Dashboard 看/評分/清單</span> → <span class="mono">匯出 recipients.csv</span> → <span class="mono">追蹤信引擎建草稿(選擇題)</span> → <b>你檢視後親自按傳送</b> → 隔日 <span class="mono">-Mode FollowUp</span> 補追殺 → 回信用案號自動對接更新。<br>
+    一句話:<b>同樣的產能,拿掉暗抄、自動寄、與「避開 IT」——那個風險本來是你職涯在扛。</b>
+  </div>
+
+  <div class="foot">VIA WorkOps 主力包 + 對照卡 · 離線靜態文件,無連網 · 可列印/存 PDF(Ctrl+P)。</div>
+</div>
+</body>
+</html>
