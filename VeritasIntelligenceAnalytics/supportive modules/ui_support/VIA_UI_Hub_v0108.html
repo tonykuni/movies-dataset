@@ -1,0 +1,110 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>VIA UI Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Noto+Serif+TC:wght@500;600&display=swap" rel="stylesheet">
+<style>:root{--bg:#f0efeb;--paper:#fbfaf7;--paper2:#fdfbf6;--ink:#1b1a17;--mut:#6b6860;--mut2:#9aa5a1;--hair:#dcdad3;
+--seal:#9e2b25;--teal:#3d8f8f;--navy:#24457f;--tealgr:#3c6660;--gold:#8a7340;--slate:#3f4f78;--olive:#5e5540;--moss:#4a6b45;
+--serif:'Cormorant Garamond',Georgia,serif;--cjk:'Noto Serif TC','Noto Serif CJK TC','Songti TC','PMingLiU',serif;
+--mono:'SFMono-Regular',Consolas,'Liberation Mono',monospace;--sans:'Microsoft JhengHei','Segoe UI',system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.top{padding:18px 26px 0}
+.eyebrow{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.chip{padding:2px 7px;background:var(--ink);color:#fbfaf7;font:700 9px var(--mono);letter-spacing:.14em}
+.ey{font:700 8.5px var(--mono);letter-spacing:.13em;color:var(--mut);text-transform:uppercase}
+header{display:flex;align-items:center;padding-bottom:14px;border-bottom:3px solid var(--seal)}
+.hseal{width:38px;height:38px;background:var(--seal);color:#fbfaf7;display:flex;align-items:center;justify-content:center;font-family:var(--cjk);font-size:20px;border-radius:4px;margin-right:12px}
+h1{font:500 19px/1.2 var(--serif);letter-spacing:.055em}
+.wmcjk{font:600 9.5px var(--cjk);letter-spacing:.22em;color:var(--teal);margin-top:2px}
+.layout{flex:1;display:flex;min-height:0}
+.panel{width:264px;flex:none;background:var(--paper);border-right:1px solid var(--hair);padding:16px 14px;overflow-y:auto}
+.gh{font:700 10px var(--mono);letter-spacing:2px;color:var(--mut);text-transform:uppercase;margin:14px 0 8px;display:flex;align-items:center;gap:8px}
+.gh:first-child{margin-top:0}
+.gh .zh{font:600 11px var(--cjk);letter-spacing:.3em;color:var(--tealgr)}
+.gh .ln{flex:1;height:1px;background:var(--hair)}
+.bgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{display:flex;flex-direction:column;align-items:center;gap:5px;background:var(--paper2);border:1px solid var(--hair);border-top:3px solid var(--acc,var(--navy));border-radius:6px;padding:10px 6px 8px;cursor:pointer;transition:.12s}
+.btn:hover{border-color:var(--acc,var(--navy))}
+.btn.on{background:var(--ink);border-color:var(--ink);border-top-color:var(--acc,var(--navy))}
+.btn.on .bn{color:#fbfaf7}.btn.on .bm{color:var(--mut2)}
+.bseal{width:30px;height:30px;background:var(--seal);color:#fbfaf7;display:flex;align-items:center;justify-content:center;font-family:var(--cjk);font-size:16px;border-radius:4px}
+.bn{font:600 11px var(--sans);letter-spacing:.02em}
+.bm{font:500 8px var(--mono);color:var(--mut2)}
+.main{flex:1;padding:26px 30px;overflow-y:auto}
+.strip{height:4px;background:linear-gradient(90deg,#24457f 0 16.6%,#3c6660 0 33.3%,#4a6b45 0 50%,#8a7340 0 66.6%,#5e5540 0 83.3%,#3f4f78 0 100%);margin-bottom:22px;border-radius:2px}
+.detail{background:var(--paper2);border:1px solid var(--hair);border-left:4px solid var(--acc,var(--navy));border-radius:8px;padding:24px 26px;max-width:720px}
+.drow{display:flex;gap:16px;align-items:flex-start}
+.dseal{flex:none;width:64px;height:64px;background:var(--seal);color:#fbfaf7;display:flex;align-items:center;justify-content:center;font-family:var(--cjk);font-size:34px;border-radius:6px}
+.dwm{font:600 20px var(--serif);letter-spacing:.05em}
+.dsub{font-size:13px;color:var(--mut);margin-top:2px}
+.dzone{display:inline-block;margin-top:8px;font:700 9px var(--mono);letter-spacing:.12em;color:var(--tealgr);border:1px solid var(--hair);border-radius:3px;padding:2px 8px;background:var(--paper)}
+.dmeta{font:500 11px var(--mono);color:var(--mut);margin-top:16px;line-height:1.9;border-top:1px solid var(--hair);padding-top:12px}
+.dcmd{display:inline-block;margin-top:14px;font:700 13px var(--mono);background:var(--ink);color:#fbfaf7;border-radius:5px;padding:7px 16px}
+.dopen{display:inline-block;margin-top:14px;margin-left:8px;font:700 12px var(--mono);color:var(--tealgr);border:1px solid var(--tealgr);border-radius:5px;padding:7px 14px;text-decoration:none}
+.dopen:hover{background:var(--tealgr);color:#fbfaf7}
+footer{padding:10px 26px;border-top:1px solid var(--hair);font:10px var(--mono);color:var(--mut2);background:var(--paper)}
+@media(max-width:760px){.layout{flex-direction:column}.panel{width:100%;border-right:none;border-bottom:1px solid var(--hair)}body{overflow:auto;height:auto}}
+</style></head><body>
+<div class="top">
+<div class="eyebrow"><span class="chip">v0108</span><span class="ey">Veritas Intelligence Analytics UI Hub · Porcelain</span></div>
+<header><div class="hseal">樞</div><div><h1>VERITAS UI HUB</h1>
+<div class="wmcjk">維里塔斯 · 十三介面 · 左樞右詳</div></div></header>
+</div>
+<div class="layout">
+<nav class="panel" id="panel">
+<div class="gh"><span class="zh">功能性</span><span>FUNCTIONAL</span><span class="ln"></span></div>
+<div class="bgrid" id="g-func"></div>
+<div class="gh"><span class="zh">支援性</span><span>SUPPORTIVE</span><span class="ln"></span></div>
+<div class="bgrid" id="g-supp"></div>
+</nav>
+<main class="main"><div class="strip"></div><div class="detail" id="detail"></div></main>
+</div>
+<footer>VIA UI Hub v0108 · 十三介面(流 Console v0101 Porcelain 對齊)| 設計鎖:VIA_DesignLock_SSOT_v0101 Porcelain | 印章家族:理鑑鍛郵核治記流湧預驗輪橋+樞 | 回退:v0107</footer>
+<script>
+var IF = [
+ {z:"func",seal:"鑑",acc:"#3c6660",wm:"VAP WORKBENCH",sub:"自動繪圖工作台 v010",home:"functional modules/VAP",
+  meta:"HEADER_LOCKED_1d 刊頭鎖 · 響應式+拖曳 · 26 圖表 · spec/chartlib SSOT",cmd:"via-all 內含",
+  open:"../../functional modules/VAP/ui/VAP_Workbench_v010.html"},
+ {z:"func",seal:"鍛",acc:"#4a6b45",wm:"VDF WORKBENCH",sub:"資料鍛造側欄工作台 v0160C",home:"functional modules/VDF",
+  meta:"一般瀏覽器 HTML · 本機 HTTP 橋 http://127.0.0.1:8766 · 七參數 · SHA256+AST 閘門",cmd:"via-vdf",open:""},
+ {z:"func",seal:"記",acc:"#3d8f8f",wm:"NOTE PRO",sub:"智能資產筆記(Notion 式)",home:"functional modules/VAP/spec/UIUX_Design_Source",
+  meta:"Prompt 卡 · 匯入 JSON · localStorage 自動存",cmd:"直接開啟",
+  open:"../../functional modules/VAP/spec/UIUX_Design_Source/VIA_Note_Pro.dc.html"},
+ {z:"supp",seal:"理",acc:"#24457f",wm:"CONTROL TOWER",sub:"治理總控台 v005",home:"supportive modules/VIA_Control_Tower",
+  meta:"20 加速器 · 收尾流程 FLOW A-F · intake · http://127.0.0.1:8765",cmd:"via-tower",open:""},
+ {z:"supp",seal:"郵",acc:"#8a7340",wm:"VMT MASTERRUN",sub:"郵件追蹤主引擎總覽 v0103(Porcelain)",home:"supportive modules/VMT_SuperBOM",
+  meta:"9 階段管線 · Command Center · CPM 甘特 · VMT_ROOT 資料層",cmd:"via-vmt",open:""},
+ {z:"supp",seal:"核",acc:"#5e5540",wm:"MEGA MATRIX",sub:"公定模式三輪全景稽核 v0106",home:"supportive modules/VIA_Governance_Runtime",
+  meta:"11 域+附掛 · Porcelain Matrix · parquet 增量(DuckDB)· rich 摘要 · 提前收斂",cmd:"via-mega",open:""},
+ {z:"supp",seal:"治",acc:"#3f4f78",wm:"CENTRAL GOVERNANCE",sub:"中央治理詞彙總覽 v0401",home:"supportive modules/VIA_Central_Governance",
+  meta:"TAB 多頁 · 台股登記簿 1977 檔 · ASK 佇列滑鼠確認 · 確認迴路 JSONL",cmd:"via-gov",open:""},
+ {z:"supp",seal:"流",acc:"#9e2b25",wm:"FLOW OVERVIEW",sub:"資金流總覽整合 Console v0101(Porcelain)",home:"supportive modules/ui_support",
+  meta:"指數 · 族群監測 · ETF 宇宙 · 全球時間模擬 · 7 段 TAB",cmd:"直接開啟",
+  open:"VIA_Flow_Overview_Console_v0101.html"},
+ {z:"supp",seal:"湧",acc:"#3c6660",wm:"FLOW SYSTEM",sub:"FlowSystem OneShot v1.0(五鏡頭 FIS)",home:"supportive modules/VIA_FlowSystem",
+  meta:"registry 77 列 SSOT 內嵌 · FIS+fusion · 五 QA 閘 · 自產 Visual-Lock UI(synthetic 預設誠實標示)",cmd:"via-flow",open:""},
+ {z:"supp",seal:"預",acc:"#24457f",wm:"IF FORECAST",sub:"VIA-IF 產業預測整合引擎 v0100",home:"supportive modules/VIA_IF_Engine",
+  meta:"唯讀掃描 · append-only 輸出 · 提案型修復 · --selftest 自檢",cmd:"via-if",open:""},
+ {z:"supp",seal:"驗",acc:"#8a7340",wm:"FIS VALIDATION",sub:"FIS 驗證 harness v3(E1/E2/E3)",home:"supportive modules/VIA_FlowSystem",
+  meta:"標準化集成 · 金額推估 · 多源 fusion IC · Matrix 報告(需 scipy)",cmd:"via-fis",open:""},
+ {z:"supp",seal:"輪",acc:"#5e5540",wm:"PIPELINE",sub:"統一輪動引擎(回測+證偽)",home:"supportive modules/VIA_Pipeline",
+  meta:"OOS 穩健目標 · Deflated Sharpe · 魔鬼證偽閘 · 待同伴檔 rotation_engine.py",cmd:"via-pipe",open:""},
+ {z:"supp",seal:"橋",acc:"#9e2b25",wm:"COMMAND BRIDGE",sub:"前後端對接總覽 v0100",home:"supportive modules/VIA_Governance_Runtime",
+  meta:"首頁=總覽+全系統狀態矩陣 · 5 TAB(接線/資料庫/SSOT/依賴/UI)· 每跑必重生=當下真相",cmd:"via-bridge",open:""},
+];
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function render(i){var f=IF[i];
+ document.querySelectorAll('.btn').forEach(function(b,j){b.classList.toggle('on',j===i);});
+ var openBtn=f.open?'<a class="dopen" href="'+esc(f.open)+'" target="_blank">開啟頁面 ↗</a>':'';
+ document.getElementById('detail').style.setProperty('--acc',f.acc);
+ document.getElementById('detail').innerHTML=
+  '<div class="drow"><div class="dseal">'+esc(f.seal)+'</div><div>'+
+  '<div class="dwm">'+esc(f.wm)+'</div><div class="dsub">'+esc(f.sub)+'</div>'+
+  '<span class="dzone">'+(f.z==='func'?'功能性 FUNCTIONAL':'支援性 SUPPORTIVE')+' · '+esc(f.home)+'</span></div></div>'+
+  '<div class="dmeta">'+esc(f.meta)+'</div>'+
+  '<span class="dcmd">'+esc(f.cmd)+'</span>'+openBtn;}
+IF.forEach(function(f,i){var b=document.createElement('div');b.className='btn';b.style.setProperty('--acc',f.acc);
+ b.innerHTML='<div class="bseal">'+esc(f.seal)+'</div><div class="bn">'+esc(f.wm.split(' ')[0])+'</div><div class="bm">'+esc(f.cmd.indexOf('via-')===0?f.cmd:'開啟')+'</div>';
+ b.onclick=function(){render(i);};
+ document.getElementById(f.z==='func'?'g-func':'g-supp').appendChild(b);});
+render(0);
+</script></body></html>
