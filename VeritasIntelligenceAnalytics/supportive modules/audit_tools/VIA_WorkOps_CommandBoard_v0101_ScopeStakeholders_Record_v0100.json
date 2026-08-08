@@ -1,0 +1,20 @@
+{
+ "record_id": "VIA_WorkOps_CommandBoard_v0101_ScopeStakeholders_Record_v0100",
+ "ts": "2026-08-08T05:02:57",
+ "operator_verdict": "獨立系統;讀取 Outlook 於使用者權限內;讀取歸納專案範疇;讀取現況;彙總利害關係人;copilot 式輔助;易識別範本郵件一次產生但不可代發(使用者要修改,但降低其修改量);繁簡英三語",
+ "implementation": {
+  "範疇歸納": "郵件主旨代號叢集(regex [A-Z]{2,6}-\\d{2,6})× 控管表覆蓋交叉 → 遺漏偵測(郵件活躍但控管表缺 = 建議建案)",
+  "關係人彙總": "全域 stakeholders.csv + 依叢集歸戶(寄件人集合)",
+  "一次產生草稿": "≥3 天未回件自動預填 out/recipients_auto.csv(案號/對象/範本/原主旨)→ via-workops drafts 呼叫 v001 FollowUp;引擎只 .Display()/.Save() 永不 .Send()",
+  "降低修改量": "草稿預填案號/對象/範本/敬語與日期,使用者僅補重點語句",
+  "三語": "介面層 zh-TW/zh-CN/en 全字串表一鍵切換;資料照原樣",
+  "copilot_honesty": "本地規則式建議(無雲端);頁面標示為系統建議"
+ },
+ "qa": {
+  "ps_lint": "0 errors",
+  "node_check": "OK",
+  "dom_shim_logic": "5/5 PASS:XZ-777 遺漏判定/PN-9942 已控管/關係人數/草稿佇列/絕不代寄聲明",
+  "wiring": "零改動 — bin/hub/via-one 動態 pattern 自動拾取 v0101;新增 drafts 動詞"
+ },
+ "append_only": true
+}
