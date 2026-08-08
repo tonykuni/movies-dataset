@@ -1,0 +1,24 @@
+{
+ "record_id": "VIA_WorkOps_WopIdentifier_Record_v0100",
+ "ts": "2026-08-09T08:00:00",
+ "operator_verdict": "上傳 M365 規劃書 v1.3(sha256 前16 d87280a1bd8ac19d)+ 令:補強註冊功能/工具 · 整合所有工具 · 建立 U/I · test debug optimize consolidate user-test activate till it work",
+ "gap_selection": "規劃書 Phase 0 = 系統唯一 0 值缺口(WOP 專案歸戶 0 案):M1 多訊號識別 + M2 賦號 + WopConfirmQueue mouse-only UI。M3/M4/M5 部分既有(收斂引擎/v0113 範本線/追蹤哨)候 Phase 1;M6 Graph 依治理休眠;S12 Splink/S11 embedding 依規劃書自判不引入(去重)。",
+ "delivered": {
+  "eng028": "workops_wop_identifier.py(M1+M2 併):七軌訊號(S1 代號/S2 控管表/S3 命名帳本/S5 網域對映/S6 對口網域/S7 案件互鏈/LEARN 學習記憶)加權融合→AUTO/ASK/QUARANTINE 三層分流;WOP-#### 沿用板側 id_ledger 單一序號源(F11 防碰撞;編號永不變);wop_registry.json append-only(label/狀態/THR/證據鏈/history;confirmed 只升不降);原子寫(F13);壞列隔離(F19);bulk_senders.txt 再利用=電子報不成專案",
+  "params": "identifier_params.json:權重/門檻/domain_map 全 JSON(參數=JSON·模組=Python·UI=HTML 鐵律)— 行為改變只改 JSON",
+  "ui": "WopConfirmQueue.html:mouse-only 分歧確認佇列 — 預選最可能答案+chips(附證據鏈)+全部接受大按鈕+下載 wop_confirm.csv;留置區可見(F10);與板同一資料回流模式(下載→存 out\\→wop apply)",
+  "learning": "wop_confirmations.jsonl append-only 學習記憶(網域/代號/串三軌)— 規劃書「每次人工確認都是訓練資料,手動量單調遞減」落地",
+  "integration": "via-workops wop 動詞(propose/apply/list/status);ALL v0102 [2c] 段自動掛(v0101 保留);註冊 ENG-028 入 AutoCode Registry(27→28,components+ledger);規劃書 PDF 正本入 docs/;整合去重裁定書 docs/M365_Roadmap_Adjudication_v0100.md(S1-S12/M1-M6/F1-F25 對照)"
+ },
+ "qa_container": {
+  "fusion": "六串 fixtures:AUTO 2(ABC-123 兩串同 WOP+控管表名)· ASK 1(代號 3.0 vs 命名 2.0 分歧必問)· 留置 2 · 電子報略過 1 — 全對",
+  "idempotent": "重跑:同 WOP id、THR 不重附、history 零膨脹 — PASS",
+  "learning_loop": "1 筆人工確認 apply → 重 propose:ASK 1→0、留置 2→1(同網域串 THR-00006 自動歸入 WOP-0002)、confirmed 名稱不被覆蓋 — 手動遞減實證 PASS",
+  "ui_shim": "queue JS node --check + shim 7 斷言:計數/chips/雙候選/留置列/全部接受 1/1/預選亮框/確認檔 CSV 拼裝 — 全過",
+  "edges": "無 mails.csv 誠實 FAIL rc=1;空帳本誠實 [空];壞學習列容忍;params 壞檔退內建預設並明示 — 不卡斷全數守持",
+  "static": "pwsh 7.4.6 AST parse ALL v0102 PASS;py_compile PASS;紅線掃描淨;cmd CRLF 93 行;動態解析鐵律(ALL 無寫死版號)ASSERT PASS"
+ },
+ "red_lines_unchanged": "絕不代寄 · Outlook 原件/分類零觸碰 · 編號永不變 · 基底零觸碰 · 只增不減(v0101 保留)· 不代寫控管表",
+ "operator_next": "via-sync 後 via-workops all — [2c] 段自動歸戶;分歧開 out\\WopConfirmQueue.html 滑鼠清空;下載確認檔存 out\\ 後 via-workops wop apply;domain_map 可在 engines\\identifier_params.json 增列網域→單位名",
+ "append_only": true
+}

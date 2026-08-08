@@ -28,6 +28,9 @@ if "%~1"=="" (
 ) else if /i "%~1"=="decisions" (
   rem 決策追蹤（ENG-027）:decisions add "決議" 負責人 [截止] [THR-#] [會議碼] / list / start|done|block DEC-# / report / export
   py "%~dp0..\functional modules\WorkOps\engines\workops_decision_log.py" %2 %3 %4 %5 %6 %7
+) else if /i "%~1"=="wop" (
+  rem WOP 專案歸戶:wop=propose 提議歸戶 | apply 套用確認檔 | list 專案清單 | status 即況
+  py "%~dp0..\functional modules\WorkOps\engines\workops_wop_identifier.py" %2 %3
 ) else if /i "%~1"=="names" (
   rem 命名核對:names propose(提議)| apply(核對表寫回)| add 名稱 關鍵字(自建歸類)| names(現況)
   py "%~dp0..\functional modules\WorkOps\engines\workops_namer.py" %2 %3 %4 %5
@@ -68,6 +71,7 @@ if "%~1"=="" (
   echo  ^(裸打^)      指揮板一支到底:掃描+對帳+編號+六頁板+週報+KPI
   echo  all          總指揮:環境自癒 - 指揮板 - 深度鏈 - 總結表 [-Days n] [-SkipDeep] [-NoOpen]
   echo  deep         深度鏈 [-Days n] [-StartDate yyyy-MM-dd] [-EndDate yyyy-MM-dd]（尾端自動命名提議）
+  echo  wop          WOP 專案歸戶:wop=提議歸戶 apply=套用確認檔 list=清單 status=即況
   echo  names        命名核對:names=現況 propose=提議 apply=核對寫回 add 名稱 關鍵字=自建歸類
   echo  workbench    智慧工作台（Forge 12 分頁,共用語料,起本機服務）
   echo  pmsetup      隔離 venv 安裝 pm4py 全家（經 EnvManager 中央治理;-Recreate 重建）

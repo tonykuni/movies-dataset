@@ -1,0 +1,568 @@
+# -*- coding: utf-8 -*-
+r"""WorkOps WOP 識別歸戶引擎 v0100(ENG-028)— 規劃書 M1+M2:bottom-up 多訊號融合 → WOP 專案化+賦號
+
+操作員裁決(2026/08/08 M365 規劃書 v1.3):補強註冊功能/工具 · 整合所有工具 · 建立 U/I。
+規劃書 Phase 0:接通 S1–S8 訊號源 → 融合投票 → AUTO/ASK/QUARANTINE 三層分流 →
+WopConfirmQueue.html(mouse-only:預選+chips+全部接受)→ WOP 賦號 registry。
+
+訊號源(本版接通;缺料誠實降級,絕不硬判):
+  S1 主旨代號叢集   [A-Z]{2,6}-\d{2,6} regex(指揮板③頁同式)
+  S2 控管表         ProjectCode 對上 = 最強票(top-down 知識正門)
+  S3 命名帳本       THR→CASE(thr_case_map)→ 已核對/提議名稱(ENG-023 正本)
+  S5 寄件網域       identifier_params.json domain_map(操作員可增列);未對映網域弱票
+  S6 收件組合       pending.csv TO 網域(同對口圈弱票)
+  S7 案件互鏈       同 CASE 之 THR 已有 WOP → 強票歸同案(thr_case_map v0101 既有)
+  LEARN 學習記憶    wop_confirmations.jsonl:每次人工確認 = 訓練資料 → 同類下次 AUTO
+                    (規劃書「手動量單調遞減」機制)
+
+分流(權重/門檻全在 identifier_params.json — 參數=JSON 鐵律):
+  AUTO       最佳票 ≥ auto_threshold 且領先次佳 ≥ margin → 直接歸戶賦號,零人工
+  ASK        有訊號但分歧/不足 → WopConfirmQueue.html 滑鼠一鍵確認
+  QUARANTINE 訊號不足 → 留置,新郵件累積後自動重判(F10:留置可見不成黑洞)
+
+賦號(M2):WOP-#### 沿用板側 workops_id_ledger.json(seq_wop + map["WOP|鍵"])—
+  單一序號源不碰撞(F11);編號一經賦予永不變;wop_registry.json 存專案中繼資料
+  (label/狀態/THR 成員/證據鏈/history,append-only)。Outlook 原件零觸碰。
+
+動詞:propose(預設)/ apply [csv] / list / status
+  propose → 融合分流 + 產 out/WopConfirmQueue.html
+  apply   → 讀 out/wop_confirm.csv(UI 下載或手填:THR,WOP鍵,名稱)→ 確認入帳
+            + append wop_confirmations.jsonl(學習記憶)
+治理:唯讀;side-car;只增不減;誠實逐段回報。
+"""
+import argparse, csv, io, json, re, sqlite3, sys
+from collections import Counter
+from datetime import datetime
+from pathlib import Path
+
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
+
+HERE     = Path(__file__).resolve().parent            # engines/
+WORKOPS  = HERE.parent
+OUT      = WORKOPS / "out"
+PARAMS_P = HERE / "identifier_params.json"
+LEDGER_P = OUT / "workops_id_ledger.json"
+REG_P    = OUT / "wop_registry.json"
+CONF_P   = OUT / "wop_confirmations.jsonl"
+QUEUE_P  = OUT / "WopConfirmQueue.html"
+CONFIRM_CSV = OUT / "wop_confirm.csv"
+MAILS_P  = OUT / "mails.csv"
+PEND_P   = OUT / "pending.csv"
+NAMING_P = OUT / "workops_naming.json"
+THRMAP_P = OUT / "thr_case_map.json"
+DB_P     = OUT / "deep" / "engine_out" / "super_engine.db"
+BULK_P   = HERE / "bulk_senders.txt"
+
+CODE_RE   = re.compile(r"\b[A-Z]{2,6}[-_ ]?\d{2,6}\b")
+PREFIX_RE = re.compile(r"^\s*((re|fw|fwd|回覆|轉寄|答復)\s*[::]\s*)+", re.IGNORECASE)
+TAG_RE    = re.compile(r"\[(?:THR|WOP)-\d+\]")
+
+DEFAULT_PARAMS = {
+    "weights": {"s1_code": 3.0, "s2_sheet": 4.0, "s3_name": 2.0, "s5_domain": 1.5,
+                "s6_recipient": 1.0, "s7_case": 3.5, "learned": 5.0},
+    "auto_threshold": 4.0, "margin": 1.5, "ask_threshold": 1.0,
+    "min_group_mails": 1, "domain_map": {}, "bulk_skip": True,
+}
+
+
+def now():
+    return datetime.now().isoformat(timespec="seconds")
+
+
+def load_params():
+    if PARAMS_P.exists():
+        try:
+            p = json.loads(PARAMS_P.read_text(encoding="utf-8-sig"))
+            merged = dict(DEFAULT_PARAMS)
+            merged.update({k: v for k, v in p.items() if k in DEFAULT_PARAMS or k == "weights"})
+            w = dict(DEFAULT_PARAMS["weights"]); w.update(p.get("weights", {}))
+            merged["weights"] = w
+            return merged
+        except Exception as e:
+            print("[注意] 參數檔讀取失敗用內建預設:%s" % e)
+    return dict(DEFAULT_PARAMS)
+
+
+def load_json(p, default):
+    if Path(p).exists():
+        try:
+            return json.loads(Path(p).read_text(encoding="utf-8-sig"))
+        except Exception:
+            return default
+    return default
+
+
+def read_csv(p):
+    if not Path(p).exists():
+        return []
+    try:
+        with io.open(p, "r", encoding="utf-8-sig", errors="replace", newline="") as f:
+            return list(csv.DictReader(f))
+    except Exception:
+        return []
+
+
+def load_bulk_patterns():
+    pats = []
+    if BULK_P.exists():
+        for ln in BULK_P.read_text(encoding="utf-8-sig", errors="replace").splitlines():
+            ln = ln.strip().lower()
+            if ln and not ln.startswith("#"):
+                pats.append(ln)
+    return pats
+
+
+def is_bulk(sender, pats):
+    s = (sender or "").lower()
+    return any(p in s for p in pats)
+
+
+def norm_subj(s):
+    s = PREFIX_RE.sub("", (s or "").strip())
+    s = TAG_RE.sub("", s)
+    return re.sub(r"\s+", "", s).lower()[:80]
+
+
+def subj_code(s):
+    m = CODE_RE.search((s or "").upper())
+    return m.group(0).replace("_", "-").replace(" ", "-") if m else ""
+
+
+def control_sheet_rows():
+    for cand in (WORKOPS / "control_sheet.csv",
+                 WORKOPS.parent.parent / "control_sheet.csv"):   # 板 v0112 同式:庫根後備
+        rows = read_csv(cand)
+        if rows:
+            return rows
+    return []
+
+
+def load_confirmations():
+    """學習記憶:domain→鍵、code→鍵、thr→鍵(最新一筆為準;append-only 檔)。"""
+    by_dom, by_code, by_thr = {}, {}, {}
+    if CONF_P.exists():
+        for ln in CONF_P.read_text(encoding="utf-8").splitlines():
+            ln = ln.strip()
+            if not ln:
+                continue
+            try:
+                r = json.loads(ln)
+            except Exception:
+                continue                       # F19:壞列隔離不阻斷
+            k = r.get("wop_key") or ""
+            if not k:
+                continue
+            if r.get("domain"):
+                by_dom[r["domain"]] = k
+            if r.get("code"):
+                by_code[r["code"]] = k
+            if r.get("thr"):
+                by_thr[r["thr"]] = k
+    return by_dom, by_code, by_thr
+
+
+def load_ledger():
+    led = load_json(LEDGER_P, None)
+    if not isinstance(led, dict) or "map" not in led:
+        led = {"seq_wop": 0, "seq_thr": 0, "map": {}}
+    led.setdefault("seq_wop", 0); led.setdefault("seq_thr", 0); led.setdefault("map", {})
+    return led
+
+
+def save_ledger(led):
+    LEDGER_P.parent.mkdir(parents=True, exist_ok=True)
+    tmp = LEDGER_P.with_suffix(".tmp")                  # F13:原子寫,永不原地覆寫
+    tmp.write_text(json.dumps(led, ensure_ascii=False, indent=1), encoding="utf-8")
+    tmp.replace(LEDGER_P)
+
+
+def load_registry():
+    reg = load_json(REG_P, None)
+    if not isinstance(reg, dict) or "projects" not in reg:
+        reg = {"version": "v0100", "append_only": True, "projects": {}, "thr2wop": {}}
+    reg.setdefault("projects", {}); reg.setdefault("thr2wop", {})
+    return reg
+
+
+def save_registry(reg):
+    REG_P.parent.mkdir(parents=True, exist_ok=True)
+    tmp = REG_P.with_suffix(".tmp")
+    tmp.write_text(json.dumps(reg, ensure_ascii=False, indent=1), encoding="utf-8")
+    tmp.replace(REG_P)
+
+
+def ensure_wop_id(led, key):
+    """M2 賦號:沿用板側帳本 map["WOP|鍵"] — 單一序號源;編號一經賦予永不變。"""
+    mk = "WOP|" + key
+    if mk in led["map"]:
+        return led["map"][mk], False
+    led["seq_wop"] = int(led.get("seq_wop", 0)) + 1
+    wid = "WOP-%04d" % led["seq_wop"]
+    led["map"][mk] = wid
+    return wid, True
+
+
+# ---------------------------------------------------------------- signal fusion
+def gather(params):
+    """每 THR 收集訊號票 → {thr: {"votes": {鍵: 分}, "why": {鍵: [訊號...]}, "subj", "sender"}}"""
+    w = params["weights"]
+    bulk_pats = load_bulk_patterns() if params.get("bulk_skip", True) else []
+    led = load_ledger()
+    conv2thr = {k[4:]: v for k, v in led["map"].items() if k.startswith("THR|")}
+
+    mails = read_csv(MAILS_P)
+    by_conv = {}
+    for r in mails:
+        cid = (r.get("ConversationID") or "").strip()
+        if cid:
+            by_conv.setdefault(cid, []).append(r)
+
+    sheet = control_sheet_rows()
+    sheet_codes = {}
+    for r in sheet:
+        c = (r.get("ProjectCode") or "").strip().upper()
+        if c:
+            sheet_codes[c] = (r.get("ProjectName") or "").strip()
+
+    naming = load_json(NAMING_P, {}).get("entries", {})
+    thrmap = load_json(THRMAP_P, {}).get("map", {})
+    dom_map = {k.lower(): v for k, v in params.get("domain_map", {}).items()}
+    lrn_dom, lrn_code, lrn_thr = load_confirmations()
+
+    pend = read_csv(PEND_P)
+    pend_to = {}
+    for r in pend:
+        cid = (r.get("CASE_ID") or "").strip()
+        to = (r.get("TO") or "").strip()
+        if cid and to:
+            pend_to[cid] = to
+
+    reg = load_registry()
+    case2wopkey = {}
+    for wid, pj in reg["projects"].items():
+        for t in pj.get("thr", []):
+            c = thrmap.get(t)
+            if c:
+                case2wopkey.setdefault(c, pj["key"])
+
+    sig = {}
+    n_bulk = 0
+    for conv, thr in conv2thr.items():
+        rows = by_conv.get(conv, [])
+        subj = rows[0].get("Subject", "") if rows else ""
+        sender = rows[0].get("SenderEmail", "") if rows else ""
+        if rows and is_bulk(sender, bulk_pats):
+            n_bulk += 1
+            continue                                        # 電子報不成專案
+        votes, why = Counter(), {}
+
+        def vote(key, pts, tag):
+            if not key:
+                return
+            votes[key] += pts
+            why.setdefault(key, []).append(tag)
+
+        code = subj_code(subj)
+        if code:
+            vote("CODE:" + code, w["s1_code"], "S1 主旨代號 " + code)
+            if code in sheet_codes:
+                vote("CODE:" + code, w["s2_sheet"], "S2 控管表 " + (sheet_codes[code] or code))
+            if code in lrn_code:
+                vote(lrn_code[code], w["learned"], "LEARN 代號記憶")
+        case = thrmap.get(thr, "")
+        if case:
+            ent = naming.get(case) or {}
+            label = ent.get("approved") or ent.get("proposed") or ""
+            if label:
+                vote("NAME:" + label, w["s3_name"], "S3 命名帳本 " + label)
+            if case in case2wopkey:
+                vote(case2wopkey[case], w["s7_case"], "S7 同案互鏈 " + case)
+        dom = (sender.split("@")[-1] or "").lower() if "@" in (sender or "") else ""
+        if dom:
+            if dom in dom_map:
+                vote("DOM:" + dom_map[dom], w["s5_domain"], "S5 網域對映 " + dom)
+            if dom in lrn_dom:
+                vote(lrn_dom[dom], w["learned"], "LEARN 網域記憶 " + dom)
+        to = pend_to.get(conv, "")
+        tdom = (to.split("@")[-1] or "").lower() if "@" in to else ""
+        if tdom:
+            if tdom in dom_map:
+                vote("DOM:" + dom_map[tdom], w["s6_recipient"], "S6 對口網域 " + tdom)
+            if tdom in lrn_dom:
+                vote(lrn_dom[tdom], w["learned"], "LEARN 對口記憶 " + tdom)
+        if thr in lrn_thr:
+            vote(lrn_thr[thr], w["learned"] * 2, "LEARN 本串人工確認")
+        sig[thr] = {"votes": votes, "why": why, "subj": subj, "sender": sender}
+    return sig, sheet_codes, naming, n_bulk
+
+
+def classify(sig, params):
+    auto, ask, quarantine = {}, {}, []
+    for thr, d in sorted(sig.items()):
+        votes = d["votes"]
+        if not votes:
+            quarantine.append(thr)
+            continue
+        ranked = votes.most_common()
+        best_key, best = ranked[0]
+        second = ranked[1][1] if len(ranked) > 1 else 0.0
+        if best >= params["auto_threshold"] and (best - second) >= params["margin"]:
+            auto[thr] = best_key
+        elif best >= params["ask_threshold"]:
+            ask[thr] = ranked
+        else:
+            quarantine.append(thr)
+    return auto, ask, quarantine
+
+
+def wop_label(key, sheet_codes, naming):
+    if key.startswith("CODE:"):
+        c = key[5:]
+        return sheet_codes.get(c) or c
+    if key.startswith(("NAME:", "DOM:")):
+        return key[key.index(":") + 1:]
+    return key
+
+
+def assign(reg, led, thr, key, label, status, evidence):
+    wid, fresh = ensure_wop_id(led, key)
+    pj = reg["projects"].get(wid)
+    if pj is None:
+        pj = {"key": key, "label": label, "status": status, "thr": [],
+              "history": [{"ts": now(), "action": "CREATE", "value": key}]}
+        reg["projects"][wid] = pj
+    if status == "confirmed" and pj.get("status") != "confirmed":
+        pj["status"] = "confirmed"                      # 只升不降
+        pj["history"].append({"ts": now(), "action": "CONFIRM", "value": ""})
+    if label and pj.get("status") != "confirmed" and pj.get("label") != label:
+        pj["label"] = label
+    if thr not in pj["thr"]:
+        pj["thr"].append(thr)
+        pj["history"].append({"ts": now(), "action": "ATTACH", "value": thr + (" · " + evidence if evidence else "")})
+    old = reg["thr2wop"].get(thr)
+    reg["thr2wop"][thr] = wid
+    return wid, fresh, old not in (None, wid)
+
+
+# ---------------------------------------------------------------- queue UI
+def build_queue_html(ask, quarantine, sig, sheet_codes, naming):
+    """mouse-only 確認佇列:預選+chips+全部接受+下載確認檔(規劃書 §02 ASK 分流 UI)。"""
+    items = []
+    for thr, ranked in ask.items():
+        d = sig[thr]
+        items.append({
+            "thr": thr, "subj": d["subj"][:90], "sender": d["sender"],
+            "cands": [{"key": k, "score": round(s, 1),
+                       "label": wop_label(k, sheet_codes, naming),
+                       "why": " · ".join(d["why"].get(k, []))} for k, s in ranked[:4]],
+        })
+    q_items = [{"thr": t, "subj": sig[t]["subj"][:90], "sender": sig[t]["sender"]} for t in quarantine]
+    data = json.dumps({"generated": now(), "ask": items, "quarantine": q_items},
+                      ensure_ascii=False).replace("</", "<\\/")
+    html = QUEUE_TEMPLATE.replace("__WOP_DATA__", data)
+    QUEUE_P.parent.mkdir(parents=True, exist_ok=True)
+    QUEUE_P.write_text(html, encoding="utf-8")
+    return len(items), len(q_items)
+
+
+QUEUE_TEMPLATE = """<!DOCTYPE html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WOP 歸戶確認佇列 · mouse-only</title>
+<style>
+body{font-family:"Segoe UI","Microsoft JhengHei",sans-serif;background:#f5f4f0;color:#1b1a17;margin:0;padding:18px;font-size:13.5px}
+h1{font-size:17px;margin:0 0 2px}
+.sub{color:#8a877f;font-size:12px;margin-bottom:12px}
+.banner{background:#fff8e7;border:1px solid #e3d9b8;border-left:4px solid #bf8f33;border-radius:8px;padding:9px 13px;margin:10px 0;font-size:12.5px}
+.card{background:#fff;border:1px solid #dedbd2;border-radius:10px;padding:11px 14px;margin:9px 0}
+.thr{font-family:Consolas,monospace;font-weight:700;color:#4c78a8}
+.subj{margin:3px 0 7px}
+.snd{color:#8a877f;font-size:11.5px}
+.chip{display:inline-block;border:1.5px solid #c9c5ba;border-radius:16px;padding:5px 13px;margin:3px 6px 3px 0;cursor:pointer;font-size:12.5px;background:#fff;user-select:none}
+.chip.on{border-color:#4f9465;background:#eef5ef;box-shadow:inset 0 0 0 1px #4f9465}
+.chip small{color:#8a877f;margin-left:5px}
+.why{color:#8a877f;font-size:11px;margin:2px 0 0}
+.topbar{position:sticky;top:0;background:#f5f4f0;padding:8px 0;z-index:5;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+button{border:1px solid #c9c5ba;border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer;background:#fff}
+button.primary{background:#1e5c2f;color:#fff;border-color:#1e5c2f;font-weight:700}
+.qz{opacity:.8}
+.count{font-weight:700}
+.done{color:#1e5c2f;font-weight:700}
+@media (prefers-reduced-motion: no-preference){.chip{transition:all .12s ease}.chip:hover{transform:translateY(-1px)}}
+</style></head><body>
+<h1>WOP 歸戶確認佇列(mouse-only)</h1>
+<div class="sub" id="sub"></div>
+<div class="banner">分歧件才會出現在這裡 — 每列已預選模型最可能答案;不同意就點別的 chip。完成後「下載確認檔」→ 存到 WorkOps\\out\\wop_confirm.csv → 回 PowerShell 跑 via-workops wop apply。每次確認都是訓練資料,同類案下次直接自動歸戶。</div>
+<div class="topbar">
+ <button class="primary" id="acceptAll">全部接受預選建議</button>
+ <button id="dl">下載確認檔 wop_confirm.csv</button>
+ <span id="st"></span>
+</div>
+<div id="list"></div>
+<h1 style="margin-top:18px;font-size:15px">留置區 QUARANTINE(訊號不足;新郵件累積後自動重判)</h1>
+<div id="qlist" class="qz"></div>
+<script>
+var DATA = __WOP_DATA__;
+var PICK = {};
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+document.getElementById("sub").textContent="生成 "+DATA.generated+" · 待確認 "+DATA.ask.length+" 串 · 留置 "+DATA.quarantine.length+" 串";
+function renderList(){
+ var h="";
+ DATA.ask.forEach(function(it,i){
+  h+="<div class='card'><span class='thr'>"+esc(it.thr)+"</span><div class='subj'>"+esc(it.subj)+"</div><div class='snd'>"+esc(it.sender)+"</div>";
+  it.cands.forEach(function(c,j){
+   var on=(PICK[it.thr]===c.key)?" on":"";
+   h+="<span class='chip"+on+"' data-thr='"+esc(it.thr)+"' data-key='"+esc(c.key)+"'>"+esc(c.label)+"<small>"+c.score+"</small></span>";
+   if(on)h+="<div class='why'>"+esc(c.why)+"</div>";
+  });
+  h+="</div>";
+ });
+ if(!DATA.ask.length)h="<div class='card done'>沒有分歧件 — 全部已自動歸戶 ✔</div>";
+ document.getElementById("list").innerHTML=h;
+ document.querySelectorAll(".chip").forEach(function(ch){
+  ch.addEventListener("click",function(){PICK[ch.dataset.thr]=ch.dataset.key;renderList();stat();});});
+}
+function stat(){
+ var n=Object.keys(PICK).length;
+ document.getElementById("st").innerHTML="<span class='count'>"+n+"/"+DATA.ask.length+"</span> 已選";
+}
+document.getElementById("acceptAll").addEventListener("click",function(){
+ DATA.ask.forEach(function(it){if(it.cands.length&&!PICK[it.thr])PICK[it.thr]=it.cands[0].key;});
+ renderList();stat();
+});
+document.getElementById("dl").addEventListener("click",function(){
+ var lines=["THR,WOP鍵,名稱"];
+ DATA.ask.forEach(function(it){
+  var k=PICK[it.thr];if(!k)return;
+  var c=it.cands.filter(function(x){return x.key===k;})[0]||{};
+  lines.push('"'+it.thr+'","'+String(k).replace(/"/g,"'")+'","'+String(c.label||"").replace(/"/g,"'")+'"');
+ });
+ var csv="\\ufeff"+lines.join("\\r\\n");
+ try{
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download="wop_confirm.csv";a.click();
+ }catch(e){window.prompt("複製後另存 wop_confirm.csv:",csv);}
+});
+var qh="";
+DATA.quarantine.forEach(function(q){qh+="<div class='card'><span class='thr'>"+esc(q.thr)+"</span><div class='subj'>"+esc(q.subj)+"</div><div class='snd'>"+esc(q.sender)+"</div></div>";});
+if(!DATA.quarantine.length)qh="<div class='card'>留置區空 ✔</div>";
+document.getElementById("qlist").innerHTML=qh;
+renderList();stat();
+</script></body></html>
+"""
+
+
+# ---------------------------------------------------------------- verbs
+def cmd_propose():
+    if not MAILS_P.exists():
+        print("[FAIL] out\\mails.csv 不在位 — 先跑 via-workops(板掃描)")
+        return 1
+    params = load_params()
+    sig, sheet_codes, naming, n_bulk = gather(params)
+    if not sig:
+        print("[空] 帳本無 THR 串 — 先跑 via-workops(板會賦 THR 編號)")
+        return 0
+    auto, ask, quarantine = classify(sig, params)
+    led = load_ledger()
+    reg = load_registry()
+    n_auto = n_new = 0
+    for thr, key in sorted(auto.items()):
+        label = wop_label(key, sheet_codes, naming)
+        evidence = " · ".join(sig[thr]["why"].get(key, []))
+        wid, fresh, moved = assign(reg, led, thr, key, label, "auto", evidence)
+        n_auto += 1
+        if fresh:
+            n_new += 1
+    save_ledger(led)
+    save_registry(reg)
+    n_ask, n_q = build_queue_html(ask, quarantine, sig, sheet_codes, naming)
+    print("[歸戶] THR %d 串:AUTO %d(新 WOP %d)· ASK %d · 留置 %d · 電子報略過 %d"
+          % (len(sig), n_auto, n_new, n_ask, n_q, n_bulk))
+    print("[專案] WOP 共 %d 案 → %s" % (len(reg["projects"]), REG_P))
+    if n_ask:
+        print("[確認] 開 %s 滑鼠一鍵清空(預選+chips+全部接受)→ 下載 wop_confirm.csv → via-workops wop apply" % QUEUE_P)
+    else:
+        print("[確認] 無分歧件 — 全自動歸戶完成")
+    return 0
+
+
+def cmd_apply(csvpath):
+    p = Path(csvpath) if csvpath else CONFIRM_CSV
+    if not p.exists():
+        print("[FAIL] 確認檔不在位:%s(佇列頁「下載確認檔」後存到 out\\)" % p)
+        return 1
+    params = load_params()
+    sig, sheet_codes, naming, _ = gather(params)
+    led = load_ledger()
+    reg = load_registry()
+    n_ok = n_skip = 0
+    CONF_P.parent.mkdir(parents=True, exist_ok=True)
+    with io.open(CONF_P, "a", encoding="utf-8") as logf:
+        for row in read_csv(p):
+            thr = (row.get("THR") or "").strip()
+            key = (row.get("WOP鍵") or row.get("WOP") or "").strip()
+            name = (row.get("名稱") or "").strip()
+            if not thr or not key:
+                n_skip += 1
+                continue
+            d = sig.get(thr, {"subj": "", "sender": "", "why": {}})
+            label = name or wop_label(key, sheet_codes, naming)
+            wid, fresh, moved = assign(reg, led, thr, key, label, "confirmed", "人工確認")
+            dom = (d["sender"].split("@")[-1] or "").lower() if "@" in (d.get("sender") or "") else ""
+            rec = {"ts": now(), "thr": thr, "wop_key": key, "wop_id": wid,
+                   "domain": dom, "code": subj_code(d.get("subj", ""))}
+            logf.write(json.dumps(rec, ensure_ascii=False) + "\n")
+            n_ok += 1
+    save_ledger(led)
+    save_registry(reg)
+    print("[確認] 入帳 %d 筆 · 略過 %d · 學習記憶 append → %s" % (n_ok, n_skip, CONF_P))
+    print("[效果] 同網域/同代號下次 propose 直接 AUTO(手動遞減)· wop propose 重跑可見")
+    return 0
+
+
+def cmd_list():
+    reg = load_registry()
+    if not reg["projects"]:
+        print("[空] 尚無 WOP 專案 — 先跑 via-workops wop propose")
+        return 0
+    for wid in sorted(reg["projects"]):
+        pj = reg["projects"][wid]
+        mark = "✔" if pj.get("status") == "confirmed" else ("◎" if pj.get("status") == "auto" else "…")
+        print("%s %s · %s · THR %d 串 · %s" % (mark, wid, pj.get("label", ""), len(pj.get("thr", [])), pj.get("key", "")))
+    return 0
+
+
+def cmd_status():
+    reg = load_registry()
+    n = len(reg["projects"])
+    nc = sum(1 for p in reg["projects"].values() if p.get("status") == "confirmed")
+    nt = len(reg["thr2wop"])
+    nconf = 0
+    if CONF_P.exists():
+        nconf = sum(1 for ln in CONF_P.read_text(encoding="utf-8").splitlines() if ln.strip())
+    print("[WOP] 專案 %d(人工確認 %d)· THR 歸戶 %d 串 · 學習記憶 %d 筆" % (n, nc, nt, nconf))
+    print("[UI ] %s%s" % (QUEUE_P, "(在位)" if QUEUE_P.exists() else "(propose 後生成)"))
+    return 0
+
+
+def main():
+    ap = argparse.ArgumentParser(description="WOP 識別歸戶:多訊號融合→AUTO/ASK/QUARANTINE→賦號(編號永不變)")
+    ap.add_argument("command", nargs="?", default="propose",
+                    choices=["propose", "apply", "list", "status"])
+    ap.add_argument("arg1", nargs="?", default="")
+    a = ap.parse_args()
+    if a.command == "propose":
+        return cmd_propose()
+    if a.command == "apply":
+        return cmd_apply(a.arg1)
+    if a.command == "list":
+        return cmd_list()
+    return cmd_status()
+
+
+if __name__ == "__main__":
+    sys.exit(main())
