@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-r"""WorkOps WOP 識別歸戶引擎 v0104(ENG-028)— 規劃書 M1+M2:bottom-up 多訊號融合 → WOP 專案化+賦號
+r"""WorkOps WOP 識別歸戶引擎 v0105(ENG-028)— 規劃書 M1+M2:bottom-up 多訊號融合 → WOP 專案化+賦號
+
+v0105(操作員四維擷取對照令):L1 內文代號補全 — 主旨漏帶代號時掃 BODY_SNIPPET
+  (scanrange 索引;唯讀既有匯出,零新增觸碰):內文代號屬「已知代號」(控管表/學習
+  記憶/既有 WOP 鍵)才確定性直判;未知內文代號僅弱票進融合 — 內文比主旨雜,不硬錨。
 
 v0104(操作員 準確度報告 v1.0 掛載令):八層路由瀑布 — 由精準至模糊,逐層命中即終止:
   L0 雜訊池(bulk+noise 規則→專用槽 wop_noise.csv 可回顧,不刪不分類)
@@ -144,16 +148,19 @@ def load_folder_map():
     runs = sorted([d for d in root.iterdir() if d.is_dir() and d.name.startswith("RUN_")])
     if not runs:
         return {}, {}
-    m, am = {}, {}
+    m, am, bm = {}, {}, {}
     for r in read_csv(runs[-1] / "01_mail_index.csv"):
         cid = (r.get("CONVERSATION_ID") or "").strip()
         fn = (r.get("FOLDER_NAME") or "").strip()
         an = (r.get("ATTACHMENT_NAMES") or "").strip()
+        bs = (r.get("BODY_SNIPPET") or "").strip()
         if cid and fn and cid not in m:
             m[cid] = fn
         if cid and an and cid not in am:
             am[cid] = an
-    return m, am
+        if cid and bs and cid not in bm:
+            bm[cid] = bs[:600]
+    return m, am, bm
 
 
 def load_product_rules():
@@ -376,7 +383,11 @@ def gather(params):
             c = thrmap.get(t)
             if c:
                 case2wopkey.setdefault(c, pj["key"])
-    folder_map, attach_map = load_folder_map()
+    folder_map, attach_map, body_map = load_folder_map()
+    known_codes = set(sheet_codes) | set(lrn_code)
+    for _k in id2key.values():
+        if _k.startswith("CODE:"):
+            known_codes.add(_k[5:])
     prules = load_product_rules()
     fuzzy_cut = float(params.get("fuzzy_threshold", 0.90))
     appr_norm = {}
@@ -416,6 +427,10 @@ def gather(params):
                 vote("CODE:" + code, w["s2_sheet"], "S2 控管表 " + (sheet_codes[code] or code))
             if code in lrn_code:
                 vote(lrn_code[code], w["learned"], "LEARN 代號記憶")
+        else:
+            bcode = subj_code(body_map.get(conv, ""))
+            if bcode and bcode not in known_codes:        # v0105:未知內文代號=弱票不硬錨
+                vote("CODE:" + bcode, w["s1_code"] * 0.6, "S1 內文代號(弱) " + bcode)
         case = thrmap.get(thr, "")
         if case:
             ent = naming.get(case) or {}
@@ -472,6 +487,10 @@ def gather(params):
                 c1 = subj_code(subj)
                 if c1:
                     route = ("CODE:" + c1, "L1", sheet_codes.get(c1, ""))
+                else:
+                    cb = subj_code(body_map.get(conv, ""))
+                    if cb and cb in known_codes:          # v0105:內文代號限已知才直判
+                        route = ("CODE:" + cb, "L1", sheet_codes.get(cb, ""))
             elif layer in ("L3", "L4"):
                 pr = next((r for r in prules if not r.get("noise") and rule_match(r, subj, dom0, att0)), None)
                 if pr:
