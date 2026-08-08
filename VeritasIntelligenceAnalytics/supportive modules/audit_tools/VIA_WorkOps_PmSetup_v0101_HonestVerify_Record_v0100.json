@@ -1,0 +1,21 @@
+{
+ "record_id": "VIA_WorkOps_PmSetup_v0101_HonestVerify_Record_v0100",
+ "ts": "2026-08-08T09:05:00",
+ "trigger_evidence_operator_run": {
+  "numpy_pin_dead": "ERROR: Could not find a version that satisfies the requirement numpy<2 (from versions: 2.1.0 ... 2.5.1) — 現代 Python 的 PyPI 輪自 2.1.0 起,numpy<2 必敗",
+  "dishonest_verify": "v0100 [VERIFY] 硬寫「(<2 金律達成)」,實際印出 numpy 2.5.1 仍照印 — 與平台誠實原則牴觸",
+  "pm4py_on_numpy2_proven": "pm4py 2.7.23.3 於 numpy 2.5.1 實證可跑:深度鏈 386 封/144 緒/87 關係人/145 建議全程 SUCCESS,PM4Py AGPL banner 出現於 .venv_pm 執行",
+  "graphviz_gap": "[INFO] DFG 圖輸出略過(需 graphviz):failed to execute WindowsPath('dot') — 優雅降級如設計,但缺補救指引"
+ },
+ "adjudication": "NumPy 金律更新:『pm4py 需 NumPy<2』一節就當代 pm4py(2.7.23.3)已過時 — 其於 numpy 2.x 實證可用。金律核心不變:pm4py 一族絕不裝進平台基底;隔離 venv engines/.venv_pm 照舊(護基底於任何 pm4py 依賴挪移)。本記錄為裁定正本,舊記錄不改(只增不減)。",
+ "delivered": {
+  "pmsetup_v0101": "Invoke-VIA-WorkOps-PmSetup-v0101.ps1(版本前進,v0100 保留):安裝迴圈剔除 numpy<2(由 pm4py 自帶相容 numpy);[VERIFY] 只印真實 numpy/pm4py 版本,不做未驗證宣稱;新增 [5/5] graphviz 偵測 — dot 在 PATH=綠,缺席=誠實提示 winget install Graphviz.Graphviz 並說明 DFG 圖將略過其餘照常",
+  "board_matrix": "⑥矩陣分析層列措辭查核 — 無 NumPy<2 宣稱,免改",
+  "launcher": "via-workops pmsetup 動態 pattern(Invoke-VIA-WorkOps-PmSetup-v0*.ps1 取最新)自動拾取 v0101,零改動"
+ },
+ "qa": {
+  "ps_lint_proxy": "括號/大括號平衡;無 Read-Host/exit/pause/.Send(;安裝迴圈確認無 numpy<2;舊宣稱字串僅存於檔頭缺陷記錄註解,實碼 [VERIFY] 行僅印實測版本"
+ },
+ "operator_note": "venv 已可用(深度鏈實證)— 重跑 pmsetup 非必要;欲驗新版可跑 via-workops pmsetup(免 -Recreate);DFG 圖欲補:winget install Graphviz.Graphviz 後重開終端",
+ "append_only": true
+}
