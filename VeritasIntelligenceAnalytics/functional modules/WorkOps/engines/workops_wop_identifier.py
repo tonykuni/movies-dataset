@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-r"""WorkOps WOP 識別歸戶引擎 v0101(ENG-028)— 規劃書 M1+M2:bottom-up 多訊號融合 → WOP 專案化+賦號
+r"""WorkOps WOP 識別歸戶引擎 v0102(ENG-028)— 規劃書 M1+M2:bottom-up 多訊號融合 → WOP 專案化+賦號
+
+v0102(操作員 ONE POWERSHELL 令):apply 吸收預設確認檔後改名 wop_confirm.applied.<ts>.csv
+  (只增不減不刪檔;防重複吸收)— ALL 總指揮可安全自動吸收。實跑戰果:AUTO 129/87 案/ASK 0。
 
 v0101(操作員實跑 2026/08/08:AUTO 0 · ASK 129 — 個人信箱無控管表時全數進人工佇列):
   已核對名稱=操作員親手核對過的訊號(等同人工確認)→ 獨立權重 s3_approved 直接 AUTO;
@@ -525,6 +528,10 @@ def cmd_apply(csvpath):
     save_ledger(led)
     save_registry(reg)
     print("[確認] 入帳 %d 筆 · 略過 %d · 學習記憶 append → %s" % (n_ok, n_skip, CONF_P))
+    if n_ok and p.resolve() == CONFIRM_CSV.resolve():      # v0102:吸收後改名防重複(不刪檔)
+        done = CONFIRM_CSV.with_name("wop_confirm.applied.%s.csv" % datetime.now().strftime("%Y%m%d_%H%M%S"))
+        p.rename(done)
+        print("[歸檔] 確認檔已吸收改名 → %s" % done.name)
     print("[效果] 同網域/同代號下次 propose 直接 AUTO(手動遞減)· wop propose 重跑可見")
     return 0
 
