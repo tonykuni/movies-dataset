@@ -123,3 +123,41 @@ def link_task_bom(tasks: list, bom_parts: list) -> dict:
             unlinked.append(t.get("task_id"))
     return {"links": links, "unlinked": unlinked,
             "coverage": round(100 * len(links) / len(tasks), 1) if tasks else 0.0}
+
+
+# ── 雙向回寫:SSOT → MS Project(append-only + 核可閘門)──────
+def writeback_set(ssot, tasks, approved_only=True):
+    """從 SSOT 產出可回寫 MS Project 的任務集。
+
+    - 只取 active 版本(append-only:歷史版不回寫)。
+    - 核可閘門:有未解決衝突的任務預設「保留、不自動回寫」(approved_only=True)。
+    回傳 {writeback:[...], held:[...], conflicts:n}
+    """
+    conflicts = detect_conflicts(tasks)
+    conflicted = {c["task"] for c in conflicts}
+    writeback, held = [], []
+    for t in tasks:
+        tid = t.get("task_id")
+        anchor = ms_anchor(t.get("project_id", "P"), tid, "")
+        node = ssot.get(anchor)
+        # 只回寫 active(若 SSOT 有記錄且非 active 則跳過)
+        if node and node.get("state") not in (None, "active"):
+            continue
+        if approved_only and tid in conflicted:
+            held.append({"task": tid, "reason": "未解決衝突,待人工核可"})
+        else:
+            writeback.append(t)
+    return {"writeback": writeback, "held": held, "conflicts": len(conflicts),
+            "approved_only": approved_only,
+            "usable": True}   # 回寫集本身恆可用;衝突任務被 held 保護
+
+
+def to_msproject_xml(tasks, project_name="VIA_SSOT_Export"):
+    """便捷:SSOT 任務 → MS Project XML(委派 msproject_io)。"""
+    from . import msproject_io
+    return msproject_io.to_xml(tasks, project_name=project_name)
+
+
+def roundtrip_check(tasks):
+    from . import msproject_io
+    return msproject_io.roundtrip(tasks)

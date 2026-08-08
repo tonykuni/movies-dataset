@@ -1,0 +1,19 @@
+{
+ "record_id": "VIA_PMIS_Lite_Gen2_Integration_Record_v0100",
+ "ts": "2026-08-08T21:40:00",
+ "operator_verdict": "繼續整合系統(staging f97156e:_import_staging_20260808N_pmis,218 檔 1.8MB)",
+ "hash_adjudication": {
+  "intra_staging": "staging 內三層嵌套互為嚴格重複子集(頂層 52 ⊂ 套件層;套件內層 57 ⊂ 套件外層;同名全同 hash)→ 唯一內容 109 檔",
+  "vs_repo": "109 檔中 104 檔與庫內 supportive modules/PMIS-Lite/ 既有內容逐位元組相同 — PMIS-Lite 本體早已歸家;本次實為第二世代增量",
+  "delta_5": ["via_engines.py(新:七引擎門面 VIA() 單一入口,50 模組收斂)", "msproject_io.py(新:SSOT→MSP XML 回寫+反解析+round-trip)", "ocr_intake.py(新:no-OCR 檔名分解備援+surya 掛鉤)", "sync_ssot.py(演進版)", "tests/test_stage1.py(演進版,47 測)"]
+ },
+ "red_lines": "全 staging .py 掃描:無 .Send(、無硬編密鑰 — 乾淨",
+ "placement": "5 檔落庫內正本套件(pmis_lite/pmis_lite/ 四模組;tests/ 一檔);staging 目錄移除(內容全數歸家;git 歷史 f97156e 永久保留)— 三層重複不再入庫",
+ "qa_container": {
+  "ast": "5 檔 AST PASS",
+  "test_stage1": "46/47 PASS;唯一 FAIL=test_attachment_docx_and_xlsx(容器 venv 無 python-docx/openpyxl 之環境性缺依賴;操作員機 requirements 具備)— 誠實記錄非碼因"
+ },
+ "capability_alignment": "功能矩陣 v2(7 引擎/51 模組/197 函數)與統一編碼登錄簿所述之 via_engines/msproject_io/ocr_intake/via_codegen/via_system_manager 世代 — 本次補齊其中三支;via_codegen/via_system_manager 未在本批(候後續批次)",
+ "dedupe_backlog": "PMIS-Lite × WorkOps/Forge 功能重疊裁定(IntakeEngine vs 庫鍛/mail_chain vs scanrange/process_mining vs analytics PM/stakeholders vs S4)列入重串接藍圖候補,依「正本 vs 消費者」法逐項裁定",
+ "append_only": true
+}

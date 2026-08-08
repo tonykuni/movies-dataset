@@ -635,6 +635,53 @@ def test_ingest_plus_smart_asset():
     assert rep2["asset_db"]["total"] >= 1
     assert rep2["intake_pass"] is True
 
+
+def test_via_unified_engines():
+    from pmis_lite.via_engines import VIA
+    via = VIA()
+    eng = via.engines()
+    assert len(eng) == 7                       # 50 模組整合為 7 引擎
+    assert via.ssot.resolve("AENR") == "SSOT-CHANGE"
+    assert "Where-Used" in via.knowledge.tcode("CS15")
+    assert "水冷板" in via.bom.classify("液冷 水冷板 cold plate")
+    r = via.finance.verify({"assets":100,"liabilities":40,"equity":60,"revenue":50,
+                            "cogs":30,"gross":20,"opex":10,"op":10,"net":8})
+    assert r.get("usable") is True
+    ss = {}
+    rep = via.sync.sync(ss, [{"project_id":"P","task_id":"T1","name":"x","resource":"A",
+                              "start":"2026-07-01","finish":"2026-07-10","pct":50,"predecessors":[]}])
+    assert len(rep["added"]) == 1
+    assert via.sync.bom_anchor("CP-1","A","Active") == "CP-1-A-Active"
+
+
+def test_sync_writeback_and_ocr():
+    from pmis_lite import sync_ssot as sy, msproject_io as mio, ocr_intake as oc
+    tasks = [
+        {"project_id":"P","task_id":"T1","name":"設計","resource":"A","start":"2026-07-01","finish":"2026-07-10","pct":100,"predecessors":[]},
+        {"project_id":"P","task_id":"T2","name":"打樣","resource":"B","start":"2026-07-11","finish":"2026-07-20","pct":50,"predecessors":["T1"]},
+        {"project_id":"P","task_id":"T3","name":"組裝","resource":"A","start":"2026-07-05","finish":"2026-07-15","pct":0,"predecessors":["T2"]},
+    ]
+    # 雙向回寫:核可閘門(T3 衝突被 held)
+    ss = {}; sy.sync_tasks(ss, tasks)
+    wb = sy.writeback_set(ss, tasks, approved_only=True)
+    held_ids = [h["task"] for h in wb["held"]]
+    assert "T3" in held_ids and len(wb["writeback"]) == 2
+    # MS Project XML 生成 + 可反解析
+    xml = mio.to_xml(wb["writeback"], "P")
+    assert "<Task>" in xml and "PredecessorLink" in xml
+    back = mio.from_xml(xml)
+    assert len(back) == 2 and back[0]["name"] == "設計"
+    # round-trip 無資料流失
+    rt = mio.roundtrip(tasks)
+    assert rt["match"] is True and len(rt["diffs"]) == 0
+    # OCR:VRN 檔名分解錨點(no-OCR 也有錨)
+    d = oc.decompose_filename("元大_2330_台積電_20260701.pdf")
+    assert d["ticker"] == "2330" and d["broker"] == "元大" and d["date"] == "2026-07-01"
+    assert d["ticker_conf"] >= 0.9
+    o = oc.ocr_image("富邦_3017_奇鋐_20260630.png")
+    assert o["needs_ocr"] is True and o["fallback_anchor"]["ticker"] == "3017"
+    assert o["usable"] is True
+
 def _run_all():
     fns = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
     passed = 0
