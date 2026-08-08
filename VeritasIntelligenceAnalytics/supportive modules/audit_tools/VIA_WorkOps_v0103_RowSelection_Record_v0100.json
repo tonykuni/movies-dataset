@@ -1,0 +1,20 @@
+{
+ "record_id": "VIA_WorkOps_v0103_RowSelection_Record_v0100",
+ "ts": "2026-08-08T05:19:03",
+ "operator_verdict": "信件如何圈選?U/I 要簡單(附 YouTube 參考,egress 阻擋未能檢視)",
+ "design": "最簡交互:點列=圈選(亮框+左緣藍條)、再點=取消;右下浮條「已圈選 N 件」→[複製草稿指令]→回 PowerShell 貼上 — 共兩個動作",
+ "mechanism": {
+  "board": "追蹤哨與最近收件列帶 data-thr(THR 編號);圈選態存 JS,語言切換後保留",
+  "clipboard": "navigator.clipboard 優先,失敗降級 window.prompt 手動複製",
+  "engine": "-DraftsFor 'THR-…,…' 模式:帳本反查 → pending 對象(或 inbound 回追寄件人)→ recipients_auto.csv → v001 FollowUp;不重掃不開板",
+  "red_line": "只建 Outlook 草稿,永不 .Send()"
+ },
+ "qa": {
+  "ps_lint": "0 errors",
+  "node_check": "OK",
+  "dom_shim": "圈選浮條/再點取消/data-thr 列 PASS;複製指令兩路徑(clipboard+prompt fallback)PASS,格式 via-workops drafts THR-…,THR-…",
+  "harness_note": "初測 FAIL 為 Node 22 內建唯讀 navigator 蓋掉 shim 之測試殼假象,defineProperty 重驗即過"
+ },
+ "wiring": "via-workops drafts <ids> 路由至最新板 -DraftsFor;無 ids 走自動佇列;其餘動態 pattern 不變",
+ "append_only": true
+}
