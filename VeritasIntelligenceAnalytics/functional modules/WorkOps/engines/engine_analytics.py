@@ -19,7 +19,9 @@ engine_analytics.py  v1.2
 """
 
 import argparse
+import os
 import re
+import shutil
 import sqlite3
 import sys
 from collections import Counter, defaultdict
@@ -394,10 +396,23 @@ def pm_sla_breach(conn, traces):
     return sorted(out, key=lambda x: -x[2])
 
 
+def _attach_portable_graphviz():
+    """dot 不在 PATH 時,臨時接上 engines/.graphviz 可攜版(dotsetup 產物;只改本程序環境)。"""
+    if shutil.which("dot"):
+        return
+    root = Path(__file__).resolve().parent / ".graphviz"
+    for name in ("dot.exe", "dot"):
+        hits = sorted(root.glob("*/bin/" + name)) + sorted(root.glob("bin/" + name))
+        if hits:
+            os.environ["PATH"] = str(hits[0].parent) + os.pathsep + os.environ.get("PATH", "")
+            return
+
+
 def pm_pm4py_discover(conn, outdir: Path):
     """pm4py 正式流程發現:輸出 DFG 圖(需 graphviz;失敗僅記事不中斷)。"""
     if not (TOOLS["pm4py"] and TOOLS["pandas"]):
         return None
+    _attach_portable_graphviz()
     try:
         df = pd.read_sql_query(
             "SELECT case_seq AS \"case:concept:name\", activity AS \"concept:name\","

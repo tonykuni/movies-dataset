@@ -1,0 +1,20 @@
+{
+ "record_id": "VIA_WorkOps_GraphvizPortable_DotSetup_Record_v0100",
+ "ts": "2026-08-08T11:10:00",
+ "trigger": "操作員實機:winget: The term 'winget' is not recognized — 無法照提示裝 graphviz,DFG 流程圖持續略過",
+ "adjudication": "改走免 winget/免管理員之 user-scope 可攜式路:官方 GitLab Releases API 動態取最新 windows_10_cmake_Release_Graphviz-<ver>-win64.zip(動態解析鐵律,嚴禁寫死版號)+ .sha256 逐位驗證後解壓 engines/.graphviz/;不動系統 PATH、不碰登錄檔;二進位不入版控(.gitignore)",
+ "delivered": {
+  "dotsetup_eng021": "workops_graphviz_setup.py(ENG-021):status(預設)/install(--force 重裝);sha256 不符或無 .sha256 即停不解壓;zip-slip 防護;Windows 上 dot -c 建外掛設定 + dot -V 實測,非 Windows 誠實記「執行驗證待操作員機」",
+  "analytics_autoattach": "engine_analytics.py 增 _attach_portable_graphviz():dot 不在 PATH 時把 engines/.graphviz/*/bin 臨時前置到本程序 PATH(只影響該次執行)— DFG 圖免重開終端、免全域設定",
+  "pmsetup_v0103": "版本前進:[5/6] 先認可攜式 dot 再認 PATH;缺席時首推 via-workops dotsetup install,winget 降為替代方案",
+  "launcher_gitignore": "via-workops 新增 dotsetup 動詞(CRLF 完整);.gitignore 增 engines/.graphviz/ 與 WorkOps/out/(均確認原無追蹤檔)"
+ },
+ "qa_container": {
+  "e2e_install": "真下載官方 15.1.1 win64 ZIP 9.3MB → sha256 符合(e8256ef077e601d9…)→ 解壓 → bin/dot.exe 就位(PE 檔頭 MZ 確認為真 Windows 執行檔)",
+  "status_idempotent": "install 後 status ok=true(portable);重跑 install 不重下載([OK] 已在位,--force 可重裝)",
+  "analytics_attach": "importlib 載入 engine_analytics 後呼叫 _attach_portable_graphviz → PATH 首段=.graphviz/Graphviz-15.1.1-win64/bin(實測通過)",
+  "hygiene": ".graphviz 受 .gitignore 掩蔽(git status 0 筆);AST x2 PASS;ps_lint v0103 PASS;容器測試解壓已清除",
+  "honest_gap": "dot 實際執行(dot -V / DFG 產圖)僅能於 Windows 驗證 — 待操作員 dotsetup install 後跑 deep 確認 process_dfg.png"
+ },
+ "append_only": true
+}
