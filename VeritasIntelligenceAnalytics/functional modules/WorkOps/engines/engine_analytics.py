@@ -475,6 +475,37 @@ def _attach_portable_graphviz():
             return
 
 
+def pm_pmislite_dfg_svg(traces, outdir: Path):
+    """pm4py/graphviz 缺席時之後備:PMIS-Lite process_mining(純 stdlib)離線 SVG
+    流程圖(工作流優化引擎跨系統應用;瓶頸紅粗線/返工環/偷跑紅虛線)。"""
+    try:
+        import importlib.util
+        from types import SimpleNamespace
+        pm_path = (Path(__file__).resolve().parents[3] / "supportive modules"
+                   / "PMIS-Lite" / "pmis_lite" / "pmis_lite" / "process_mining.py")
+        if not pm_path.exists():
+            return None
+        spec = importlib.util.spec_from_file_location("via_pmis_process_mining", str(pm_path))
+        pm = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = pm
+        spec.loader.exec_module(pm)
+        records = []
+        for case, evs in traces.items():
+            for act, ts, _subj in evs:
+                t = ts.strftime("%Y-%m-%d %H:%M:%S") if hasattr(ts, "strftime") else str(ts or "")
+                records.append(SimpleNamespace(thread_id=case, topic=act, event_time=t, actor=""))
+        if not records:
+            return None
+        expected = ["Request", "Commitment", "Delivery"]
+        result = pm.mine(records, expected_sequence=expected)
+        svg = pm.render_svg(result, expected, title="流程探勘 · DFG 實況路徑圖(離線 SVG 後備)")
+        (outdir / "process_dfg.svg").write_text(svg, encoding="utf-8")
+        return "process_dfg.svg"
+    except Exception as e:
+        print(f"[INFO] 離線 SVG 流程圖後備未成:{e}", file=sys.stderr)
+        return None
+
+
 def pm_pm4py_discover(conn, outdir: Path):
     """pm4py 正式流程發現:輸出 DFG 圖(需 graphviz;失敗僅記事不中斷)。"""
     if not (TOOLS["pm4py"] and TOOLS["pandas"]):
@@ -679,6 +710,12 @@ def main():
     if dfg_img == "process_dfg.png":
         sections.append(("流程探勘 · pm4py DFG 流程圖", "",
                          '<img src="process_dfg.png" style="max-width:100%">'))
+    else:
+        svg_img = pm_pmislite_dfg_svg(traces, outdir)
+        if svg_img:
+            sections.append(("流程探勘 · DFG 實況路徑圖(離線 SVG 後備)",
+                             "pm4py/graphviz 缺席之機器亦有圖:PMIS-Lite 純 stdlib 探勘器(瓶頸紅粗線/返工環)。",
+                             '<img src="process_dfg.svg" style="max-width:100%">'))
 
     n_ns = export_next_steps(conn, traces, outdir)
     progress(88, f"下一步建議 {n_ns} 筆 → workmatrix_next_steps.csv")

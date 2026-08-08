@@ -1,0 +1,23 @@
+{
+ "record_id": "VIA_VRN_OCR_Review_Router_Record_v0100",
+ "ts": "2026-08-08T23:10:00",
+ "operator_verdict": "review vrn system…OCR engines…apply if necessary, local free tools/libs, register; apply workflow optimization engines",
+ "vrn_review": {
+  "inventory": "VRN(VeritasReportNova)OCR 家底:MDL005 四段文字階梯(PyMuPDF fitz 主→pdfplumber 次→pdfminer 後備→PaddleOCR 重段)、MDL004 表格擷取(PaddleOCR)、MQ-NoOCR-Staging v222 無 OCR 路線、_superseded/ 舊版妥善隔離、freeze.lock 治理在案",
+  "platform_wide": "Forge:PIL+pytesseract+tesseract 二進位(影像文字,優雅降級);PMIS:ocr_intake(surya 選配 + no-OCR 檔名分解錨,純 stdlib)",
+  "adjudication_necessary": "必要引擎(全本機免費):文字層 fitz/pdfplumber/pdfminer(輕、免 OCR)→ 影像輕段 pytesseract+tesseract → 重段 PaddleOCR(paddle_311 隔離 env 域,依 EnvManager)→ 末梯檔名錨(永遠可用,不空手)。easyocr/surya 列選配。雲端 OCR 一律不用(治理)。",
+  "gap_found": "三子系統各有家底但無統一探測/路由 — 任一機器上消費者無從得知哪幾段活著"
+ },
+ "delivered": {
+  "ocr_router_eng026": "supportive modules/VIA_OCR_Router/via_ocr_router.py:probe(十段誠實可用性:模組 import+二進位偵測+正本在位)/route(副檔名×可用性裁決,正本歸屬標注)/extract(薄執行:文字層三段擇一、影像 pytesseract、重 OCR 只路由不代跑=隔離 env 治理、末梯 PMIS 檔名錨);via-ocr 動詞(CRLF)",
+  "workflow_opt_applied": "engine_analytics 新增 pm_pmislite_dfg_svg:pm4py/graphviz 缺席機器改用 PMIS-Lite process_mining(純 stdlib)產離線 SVG 流程圖(瓶頸紅粗線/返工環)— 報表永遠有圖;只增不減(pm4py PNG 在時不啟動)"
+ },
+ "qa_container": {
+  "probe": "誠實回報 1/10 段(容器基底僅檔名錨)— 不誇口",
+  "route_extract": "裝 pdfminer.six 後:route 正確擇 pdfminer;真 PDF(EarningsInsight)抽出 37,234 字;無 tesseract 之影像正確退檔名錨並抽出 2330TW/台積電 tokens",
+  "svg_fallback": "合成 traces → process_dfg.svg 3,279 bytes,含 Request/Commitment 節點 — PASS",
+  "ast": "router + analytics AST PASS"
+ },
+ "governance": "重 OCR(Paddle/surya)只路由不代跑 — 執行留在各自隔離 env 與 VRN 正本引擎(EnvManager 治理);router 不複製任何擷取邏輯(正本 VRN/Forge/PMIS 標注於每段)",
+ "append_only": true
+}
