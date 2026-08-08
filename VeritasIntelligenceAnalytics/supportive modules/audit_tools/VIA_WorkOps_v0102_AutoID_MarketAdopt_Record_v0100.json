@@ -1,0 +1,33 @@
+{
+ "record_id": "VIA_WorkOps_v0102_AutoID_MarketAdopt_Record_v0100",
+ "ts": "2026-08-08T05:12:51",
+ "operator_verdict": "郵件/專案自動編號作識別;原郵件與任何分類不改 — 尊重既有系統與原始資料;PLM 式流程自動化;盤點市場工具並加入同類功能",
+ "auto_id": {
+  "scheme": "專案 WOP-####(案號首見)· 郵件串 THR-#####(ConversationID 首見)",
+  "ledger": "out/workops_id_ledger.json — append-only、冪等(重跑同號)、讀壞自保留 .bak 重起",
+  "non_intrusion": "編號僅存於本系統與輸出(指揮板/週報/recipients_auto.csv);Outlook 原件/分類/標籤零寫入"
+ },
+ "market_adoption": {
+  "doc": "ssot/VIA_WorkOps_MarketScan_2026_v0100.md(11 功能 × 市場代表 × 裁決)",
+  "adopted_now": [
+   "PLM 式項目編號(Windchill/Teamcenter 類比)",
+   "一鍵週報(Monday/Asana 報表類比)"
+  ],
+  "rejected": [
+   "排程寄送/讀取追蹤(違反不代寄+隱私)",
+   "收件匣暫停(違反不動原件)"
+  ],
+  "backlog": [
+   "時間線視圖",
+   "mail_rules 自訂規則",
+   "週報排程"
+  ]
+ },
+ "qa": {
+  "ps_lint": "0 errors",
+  "node_check": "OK",
+  "dom_shim": "4/4 PASS(WOP 欄/THR 欄/佇列 CaseID/表頭)"
+ },
+ "wiring": "動態 pattern 自動拾取 v0102;via-workops 新增 report 動詞",
+ "append_only": true
+}
