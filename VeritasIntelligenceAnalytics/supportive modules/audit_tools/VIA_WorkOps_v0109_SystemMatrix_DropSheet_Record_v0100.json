@@ -1,0 +1,19 @@
+{
+ "record_id": "VIA_WorkOps_v0109_SystemMatrix_DropSheet_Record_v0100",
+ "ts": "2026-08-08T07:11:34",
+ "operator_verdict": "檢查有無有用功能未加;全流程功能工具矩陣狀態表顯示於最後 tab;郵件關鍵字擷取交使用者核對;資料夾分類經使用者確認;信件再發自動帶編號並管控;excel/csv 編碼問題;控管表上傳 window I/O 或拖曳",
+ "delivered": {
+  "matrix_tab": "⑥ 系統矩陣終頁:22 列 × 類別/項目/即時狀態/指令 — 流程 7、引擎 6、擷取方法 4、郵件追蹤、支援 3;狀態由 DATA 即時計算(掃描封數/編號量/佇列/VMT/監看數)",
+  "csv_bom": "對外 CSV 全改 utf8BOM(recipients_auto/kpi_history)— Excel 開中文亂碼根治;語料橋/週報原已 BOM",
+  "drag_drop_sheet": "①頁拖曳區(或點擊選檔):UTF-8 失敗自動試 Big5(替換字元啟發式)→ 欄名別名映射(案號/專案代號/Code…)→ 前 20 列預覽核對 → 下載正規化 UTF-8 BOM control_sheet.csv → 存回 WorkOps 重跑即對帳 — window I/O 與編碼問題一次解",
+  "id_loop": "追蹤草稿主旨自動嵌 [THR-#####](已含不重複);對方回信主旨保留編號 → 之後掃描可由主旨 regex 歸戶 — 寄出/回收全程編號管控閉環",
+  "gap_audit": "VIA_Forge (3) 資料夾 = (4) 完全複本(前輪 SHA 證實),內容已全數在平台;無新功能遺漏。候補項誠實入矩陣:資料夾分類歸戶、關鍵字核對 UI"
+ },
+ "qa": {
+  "ps_lint": "0 errors(2 警告:字串內中括號誤報+param 位置慣例)",
+  "node_check": "OK",
+  "dom_shim": "8/8 PASS:矩陣 22 列/THR 計數/候補標示/tab 標題/拖曳區/拖入解析預覽/編碼標示/正規化 CSV(BOM+標準欄)"
+ },
+ "wiring": "動態 pattern 自動拾取 v0109;零接線改動",
+ "append_only": true
+}
