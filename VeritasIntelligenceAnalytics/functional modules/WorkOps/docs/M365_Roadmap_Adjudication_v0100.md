@@ -72,3 +72,25 @@ ENG-028 入 `VIA_AutoCode_Registry_v0100.json`(components+ledger append);
 | T1/T2/T3 逐段已發記錄(Current_Stage 狀態機) | 候補 — 現版每輪依等待天數重判段位;寄出留痕需回程解析(M3)先行 | Phase 1 |
 
 紅線重申:T3 升級信只建草稿、CC 主管由人自加 — 系統絕不代加代寄。
+
+---
+
+## 七、準確度提升報告 v1.0 掛載裁定(2026-08-09:八層路由瀑布)
+
+掛載目標=報告明示 M1/identifier_params.json,引擎 v0104 落地:
+
+| 層 | 報告定義 | 落地 |
+|---|---|---|
+| L0 | 雜訊池(黑名單攔截入槽) | bulk_senders 既有 + product_code_map noise 規則 → `out/wop_noise.csv` 專用槽(可回顧,不刪不分類) |
+| L1 | 主旨案號錨點 100% | 主旨代號 → 確定性 AUTO(不再過融合門檻);內文代號補全候 M3(mails.csv 無 body,誠實) |
+| L2 | 確認串永久繼承 | 學習記憶 thr 命中 → 確定性 AUTO;**序列置於 L1 前 — 鐵律①人工確認最高真相** |
+| L3/L4 | PRODUCT CODE + 組合規則 | `product_code_map.json`:code/name/domain/subject_regex/attach_regex,所列條件全命中(AND)→ 強制歸戶;示例三則出貨停用,操作員照樣式啟用 |
+| L5 | 網域白名單 | domain_map 命中 → 確定性直判(原 1.5 弱票升格) |
+| L6 | 相似已核對名 ≥0.90 | difflib(stdlib;rapidfuzz 既裁不引)→ **高票進融合不強判** — 報告警語「相似度一律不強判」優先於 L6 行自動判定 |
+| L7 | 附件指紋 | scanrange ATTACHMENT_NAMES × 規則 attach_regex → 輔助票 |
+| L8 | 統計保底=唯一校正處 | 既有加權融合(ASK/留置) |
+
+- 逐層命中分佈:`out/wop_route_stats.json` + propose 印出 `[路由]` 行(週報 KPI:L8 佔比萎縮=系統在學)
+- 路由序 `routing_priority` 可調;`fuzzy_threshold` 0.90 — 全 JSON
+- 容器實證:八情境 fixtures 一輪 L0×2/L1/L2/L3/L5/L6(經融合)/L8 留置全命中;冪等重跑序號不動
+- 視覺鎖定附件 `VIA_VRN_VisualLock_Sidebar_v0159.html`(sha256 前16 `23000e2958e9aaf9`)入庫 `supportive modules/VIA_VisualLock/` 為 HTML/CSS/JS 正本;另三個 manifest JSON 僅見路徑未附檔 — 待補傳

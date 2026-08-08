@@ -1,6 +1,6 @@
 {
  "version": "v0100",
- "comment": "M1 訊號融合參數(規劃書 §02/§07:參數=JSON·行為改變只改此檔不改程式)。weights=各訊號票重(s3_approved=已核對名,人工確認級直接歸戶;s3_name=未核對提議名弱票);auto_threshold=直接歸戶門檻;margin=最佳與次佳差距門檻(分歧必問);ask_threshold=進人工佇列下限,低於即 QUARANTINE 留置;learned=人工確認學習記憶票重(手動遞減機制);domain_map=寄件網域→單位名(S5,操作員可自行增列);min_group_mails=叢集成案最低郵件數。 v0103 增:s4_folder=自建資料夾名中票、s4_folder_strong=資料夾含 WOP 編號/代號強票(你手動分信=免費標註);folder_blacklist/sheet_aliases 可覆寫內建。",
+ "comment": "M1 訊號融合參數(規劃書 §02/§07:參數=JSON·行為改變只改此檔不改程式)。weights=各訊號票重(s3_approved=已核對名,人工確認級直接歸戶;s3_name=未核對提議名弱票);auto_threshold=直接歸戶門檻;margin=最佳與次佳差距門檻(分歧必問);ask_threshold=進人工佇列下限,低於即 QUARANTINE 留置;learned=人工確認學習記憶票重(手動遞減機制);domain_map=寄件網域→單位名(S5,操作員可自行增列);min_group_mails=叢集成案最低郵件數。 v0103 增:s4_folder=自建資料夾名中票、s4_folder_strong=資料夾含 WOP 編號/代號強票(你手動分信=免費標註);folder_blacklist/sheet_aliases 可覆寫內建。 v0104 增:routing_priority=確定性路由序(L0 雜訊/L2 已確認串(人工=最高真相故先於 L1)/L1 主旨案號/L3 產品代碼規則/L5 網域白名單 — 逐層命中即終止,其餘進 L8 融合);fuzzy_threshold=L6 相似已核對名門檻(高票進融合不強判);L3/L4 規則在 product_code_map.json。",
  "weights": {
   "s1_code": 3.0,
   "s2_sheet": 4.0,
@@ -18,5 +18,13 @@
  "ask_threshold": 1.0,
  "min_group_mails": 1,
  "domain_map": {},
- "bulk_skip": true
+ "bulk_skip": true,
+ "routing_priority": [
+  "L0",
+  "L2",
+  "L1",
+  "L3",
+  "L5"
+ ],
+ "fuzzy_threshold": 0.9
 }

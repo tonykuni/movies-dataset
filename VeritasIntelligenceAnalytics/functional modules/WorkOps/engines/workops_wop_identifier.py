@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
-r"""WorkOps WOP 識別歸戶引擎 v0103(ENG-028)— 規劃書 M1+M2:bottom-up 多訊號融合 → WOP 專案化+賦號
+r"""WorkOps WOP 識別歸戶引擎 v0104(ENG-028)— 規劃書 M1+M2:bottom-up 多訊號融合 → WOP 專案化+賦號
+
+v0104(操作員 準確度報告 v1.0 掛載令):八層路由瀑布 — 由精準至模糊,逐層命中即終止:
+  L0 雜訊池(bulk+noise 規則→專用槽 wop_noise.csv 可回顧,不刪不分類)
+  L2 已確認串(人工確認=最高真相,置於 L1 前 — 鐵律①)→ L1 主旨案號錨點(100%)
+  L3/L4 product_code_map.json 規則(domain+主旨 regex+附件 AND 組合→強制歸戶)
+  L5 網域白名單(domain_map 確定性直判)→ L6 相似已核對名(difflib ≥ fuzzy_threshold
+  高票進融合,分歧仍問 — 不強判)→ L7 附件指紋(規則 attach_regex 輔助票)
+  → L8 加權融合(既有)= 唯一產生人工候選之處。逐層命中分佈落 wop_route_stats.json。
+  路由序 routing_priority 可調(參數=JSON);錯誤的永久錨定比校正更貴 — 相似度永不強判。
 
 v0103(操作員 Gemini 研究令 2026/08/09):
   S4 資料夾訊號轉正 — 你在 Outlook 手動分信=免費人工標註:讀最新 scanrange RUN 之
@@ -43,7 +52,7 @@ WopConfirmQueue.html(mouse-only:預選+chips+全部接受)→ WOP 賦號 registr
             + append wop_confirmations.jsonl(學習記憶)
 治理:唯讀;side-car;只增不減;誠實逐段回報。
 """
-import argparse, csv, io, json, re, sqlite3, sys
+import argparse, csv, difflib, io, json, re, sqlite3, sys
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
@@ -68,6 +77,9 @@ NAMING_P = OUT / "workops_naming.json"
 THRMAP_P = OUT / "thr_case_map.json"
 DB_P     = OUT / "deep" / "engine_out" / "super_engine.db"
 BULK_P   = HERE / "bulk_senders.txt"
+PCMAP_P  = HERE / "product_code_map.json"
+NOISE_P  = OUT / "wop_noise.csv"
+STATS_P  = OUT / "wop_route_stats.json"
 
 CODE_RE   = re.compile(r"\b[A-Z]{2,6}[-_ ]?\d{2,6}\b")
 PREFIX_RE = re.compile(r"^\s*((re|fw|fwd|回覆|轉寄|答復)\s*[::]\s*)+", re.IGNORECASE)
@@ -79,6 +91,8 @@ DEFAULT_PARAMS = {
                 "s5_domain": 1.5, "s6_recipient": 1.0, "s7_case": 3.5, "learned": 5.0},
     "auto_threshold": 4.0, "margin": 1.5, "ask_threshold": 1.0,
     "min_group_mails": 1, "domain_map": {}, "bulk_skip": True,
+    "routing_priority": ["L0", "L2", "L1", "L3", "L5"],
+    "fuzzy_threshold": 0.90,
     "folder_blacklist": ["收件匣", "inbox", "寄件備份", "sent", "垃圾", "junk", "deleted",
                          "刪除", "封存", "archive", "rss", "草稿", "drafts", "行事曆",
                          "calendar", "連絡人", "contacts", "工作", "tasks", "記事",
@@ -123,20 +137,57 @@ def sheet_normalize(rows, params):
 
 
 def load_folder_map():
-    """v0103 S4:最新 scanrange RUN 的 conv→自建資料夾名(缺席誠實回空)。"""
+    """v0103 S4:最新 scanrange RUN 的 conv→自建資料夾名;v0104 併回附件檔名(L7)。"""
     root = OUT / "deep" / "scanrange"
     if not root.exists():
-        return {}
+        return {}, {}
     runs = sorted([d for d in root.iterdir() if d.is_dir() and d.name.startswith("RUN_")])
     if not runs:
-        return {}
-    m = {}
+        return {}, {}
+    m, am = {}, {}
     for r in read_csv(runs[-1] / "01_mail_index.csv"):
         cid = (r.get("CONVERSATION_ID") or "").strip()
         fn = (r.get("FOLDER_NAME") or "").strip()
+        an = (r.get("ATTACHMENT_NAMES") or "").strip()
         if cid and fn and cid not in m:
             m[cid] = fn
-    return m
+        if cid and an and cid not in am:
+            am[cid] = an
+    return m, am
+
+
+def load_product_rules():
+    """v0104 L3/L4:product_code_map.json 啟用規則(enabled!=false);缺席回空。"""
+    d = load_json(PCMAP_P, {})
+    out = []
+    for r in d.get("rules", []):
+        if not isinstance(r, dict) or r.get("enabled") is False or not r.get("code"):
+            continue
+        try:
+            r["_subj_re"] = re.compile(r["subject_regex"], re.IGNORECASE) if r.get("subject_regex") else None
+            r["_att_re"] = re.compile(r["attach_regex"], re.IGNORECASE) if r.get("attach_regex") else None
+        except re.error:
+            continue                                  # 壞 regex 隔離不阻斷
+        out.append(r)
+    return out
+
+
+def rule_match(rule, subj, dom, attach):
+    """規則所列條件全命中才算中(AND 組合=L4)。"""
+    hit = False
+    if rule.get("domain"):
+        if rule["domain"].lower() not in (dom or ""):
+            return False
+        hit = True
+    if rule.get("_subj_re") is not None:
+        if not rule["_subj_re"].search(subj or ""):
+            return False
+        hit = True
+    if rule.get("_att_re") is not None:
+        if not rule["_att_re"].search(attach or ""):
+            return False
+        hit = True
+    return hit
 
 
 def folder_blacklisted(name, params):
@@ -325,17 +376,31 @@ def gather(params):
             c = thrmap.get(t)
             if c:
                 case2wopkey.setdefault(c, pj["key"])
-    folder_map = load_folder_map()
+    folder_map, attach_map = load_folder_map()
+    prules = load_product_rules()
+    fuzzy_cut = float(params.get("fuzzy_threshold", 0.90))
+    appr_norm = {}
+    for _cs, _e in naming.items():
+        if _e.get("approved"):
+            appr_norm[norm_subj(_e["approved"])] = _e["approved"]
+    route_order = params.get("routing_priority", DEFAULT_PARAMS["routing_priority"])
 
     sig = {}
-    n_bulk = 0
+    noise = []
     for conv, thr in conv2thr.items():
         rows = by_conv.get(conv, [])
         subj = rows[0].get("Subject", "") if rows else ""
         sender = rows[0].get("SenderEmail", "") if rows else ""
+        dom0 = (sender.split("@")[-1] or "").lower() if "@" in (sender or "") else ""
+        att0 = attach_map.get(conv, "")
+        # ---- L0 雜訊池:bulk 樣式 + noise 規則 → 專用槽(可回顧,不刪不分類)----
         if rows and is_bulk(sender, bulk_pats):
-            n_bulk += 1
-            continue                                        # 電子報不成專案
+            noise.append({"thr": thr, "subj": subj, "sender": sender, "slot": "NOISE-BULK"})
+            continue
+        nz = next((r for r in prules if r.get("noise") and rule_match(r, subj, dom0, att0)), None)
+        if nz:
+            noise.append({"thr": thr, "subj": subj, "sender": sender, "slot": nz["code"]})
+            continue
         votes, why = Counter(), {}
 
         def vote(key, pts, tag):
@@ -385,34 +450,75 @@ def gather(params):
                 vote(lrn_dom[tdom], w["learned"], "LEARN 對口記憶 " + tdom)
         if thr in lrn_thr:
             vote(lrn_thr[thr], w["learned"] * 2, "LEARN 本串人工確認")
-        sig[thr] = {"votes": votes, "why": why, "subj": subj, "sender": sender}
-    return sig, sheet_codes, naming, n_bulk
+        # ---- L6 相似已核對名(difflib;高票進融合,分歧仍問 — 不強判)----
+        ns = norm_subj(subj)
+        if ns and appr_norm:
+            close = difflib.get_close_matches(ns, list(appr_norm), n=1, cutoff=fuzzy_cut)
+            if close:
+                vote("NAME:" + appr_norm[close[0]], w.get("s3_approved", 4.5),
+                     "L6 相似已核對名 " + appr_norm[close[0]])
+        # ---- L7 附件指紋(規則 attach_regex 輔助票)----
+        for pr in prules:
+            if pr.get("noise") or pr.get("_att_re") is None:
+                continue
+            if rule_match(pr, subj, dom0, att0):
+                vote("PC:" + pr["code"], w.get("s4_folder", 2.5), "L7 附件指紋 " + pr["code"])
+        # ---- 確定性路由(命中即終止;序列 routing_priority)----
+        route = None
+        for layer in route_order:
+            if layer == "L2" and thr in lrn_thr:
+                route = (lrn_thr[thr], "L2", "")
+            elif layer == "L1":
+                c1 = subj_code(subj)
+                if c1:
+                    route = ("CODE:" + c1, "L1", sheet_codes.get(c1, ""))
+            elif layer in ("L3", "L4"):
+                pr = next((r for r in prules if not r.get("noise") and rule_match(r, subj, dom0, att0)), None)
+                if pr:
+                    route = ("PC:" + pr["code"], "L3", pr.get("name", ""))
+            elif layer == "L5" and dom0 and dom0 in dom_map:
+                route = ("DOM:" + dom_map[dom0], "L5", dom_map[dom0])
+            if route:
+                break
+        if route:
+            why.setdefault(route[0], []).append(route[1] + " 確定性路由")
+        sig[thr] = {"votes": votes, "why": why, "subj": subj, "sender": sender,
+                    "route": route}
+    return sig, sheet_codes, naming, noise
 
 
 def classify(sig, params):
-    auto, ask, quarantine = {}, {}, []
+    auto, ask, quarantine, layer_hits = {}, {}, [], Counter()
     for thr, d in sorted(sig.items()):
+        if d.get("route"):
+            auto[thr] = d["route"][0]
+            layer_hits[d["route"][1]] += 1
+            continue
         votes = d["votes"]
         if not votes:
             quarantine.append(thr)
+            layer_hits["L8-留置"] += 1
             continue
         ranked = votes.most_common()
         best_key, best = ranked[0]
         second = ranked[1][1] if len(ranked) > 1 else 0.0
         if best >= params["auto_threshold"] and (best - second) >= params["margin"]:
             auto[thr] = best_key
+            layer_hits["L8-融合AUTO"] += 1
         elif best >= params["ask_threshold"]:
             ask[thr] = ranked
+            layer_hits["L8-候選"] += 1
         else:
             quarantine.append(thr)
-    return auto, ask, quarantine
+            layer_hits["L8-留置"] += 1
+    return auto, ask, quarantine, layer_hits
 
 
 def wop_label(key, sheet_codes, naming):
     if key.startswith("CODE:"):
         c = key[5:]
         return sheet_codes.get(c) or c
-    if key.startswith(("NAME:", "DOM:")):
+    if key.startswith(("NAME:", "DOM:", "PC:")):
         return key[key.index(":") + 1:]
     return key
 
@@ -552,17 +658,19 @@ def cmd_propose():
         print("[FAIL] out\\mails.csv 不在位 — 先跑 via-workops(板掃描)")
         return 1
     params = load_params()
-    sig, sheet_codes, naming, n_bulk = gather(params)
-    if not sig:
+    sig, sheet_codes, naming, noise = gather(params)
+    if not sig and not noise:
         print("[空] 帳本無 THR 串 — 先跑 via-workops(板會賦 THR 編號)")
         return 0
-    auto, ask, quarantine = classify(sig, params)
+    auto, ask, quarantine, layer_hits = classify(sig, params)
     led = load_ledger()
     reg = load_registry()
     n_auto = n_new = 0
     for thr, key in sorted(auto.items()):
-        label = wop_label(key, sheet_codes, naming)
-        evidence = " · ".join(sig[thr]["why"].get(key, []))
+        d = sig[thr]
+        rt = d.get("route")
+        label = (rt[2] if rt and rt[2] else "") or wop_label(key, sheet_codes, naming)
+        evidence = " · ".join(d["why"].get(key, []))
         wid, fresh, moved = assign(reg, led, thr, key, label, "auto", evidence)
         n_auto += 1
         if fresh:
@@ -570,8 +678,22 @@ def cmd_propose():
     save_ledger(led)
     save_registry(reg)
     n_ask, n_q = build_queue_html(ask, quarantine, sig, sheet_codes, naming)
-    print("[歸戶] THR %d 串:AUTO %d(新 WOP %d)· ASK %d · 留置 %d · 電子報略過 %d"
-          % (len(sig), n_auto, n_new, n_ask, n_q, n_bulk))
+    # ---- L0 雜訊槽落盤(可回顧;每輪重寫快照)----
+    if noise:
+        layer_hits["L0-雜訊"] = len(noise)
+        with io.open(NOISE_P, "w", encoding="utf-8-sig", newline="") as f:
+            wn = csv.writer(f)
+            wn.writerow(["THR", "槽位", "寄件者", "主旨"])
+            for z in noise:
+                wn.writerow([z["thr"], z["slot"], z["sender"], z["subj"]])
+    # ---- 逐層命中分佈(KPI:L8 佔比萎縮=系統在學)----
+    STATS_P.write_text(json.dumps({"ts": now(), "hits": dict(layer_hits),
+                                   "total": len(sig), "noise": len(noise)},
+                                  ensure_ascii=False, indent=1), encoding="utf-8")
+    dist = " · ".join("%s %d" % (k, v) for k, v in sorted(layer_hits.items()))
+    print("[歸戶] THR %d 串:AUTO %d(新 WOP %d)· ASK %d · 留置 %d · 雜訊槽 %d"
+          % (len(sig), n_auto, n_new, n_ask, n_q, len(noise)))
+    print("[路由] " + (dist if dist else "(無)") + " → %s" % STATS_P.name)
     print("[專案] WOP 共 %d 案 → %s" % (len(reg["projects"]), REG_P))
     if n_ask:
         print("[確認] 開 %s 滑鼠一鍵清空(預選+chips+全部接受)→ 下載 wop_confirm.csv → via-workops wop apply" % QUEUE_P)
@@ -586,7 +708,7 @@ def cmd_apply(csvpath):
         print("[FAIL] 確認檔不在位:%s(佇列頁「下載確認檔」後存到 out\\)" % p)
         return 1
     params = load_params()
-    sig, sheet_codes, naming, _ = gather(params)
+    sig, sheet_codes, naming, _noise = gather(params)
     led = load_ledger()
     reg = load_registry()
     n_ok = n_skip = 0
