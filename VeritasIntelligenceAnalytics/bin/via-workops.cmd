@@ -25,6 +25,9 @@ if "%~1"=="" (
 ) else if /i "%~1"=="deep" (
   for /f "delims=" %%f in ('dir /b /o:n "%~dp0..\functional modules\WorkOps\engines\Invoke-VIA-WorkOps-Deep-v0*.ps1"') do set "WOPS_DEEP=%%f"
   call pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\engines\%%WOPS_DEEP%%" %2 %3 %4 %5 %6 %7 %8 %9
+) else if /i "%~1"=="decisions" (
+  rem 決策追蹤（ENG-027）:decisions add "決議" 負責人 [截止] [THR-#] [會議碼] / list / start|done|block DEC-# / report / export
+  py "%~dp0..\functional modules\WorkOps\engines\workops_decision_log.py" %2 %3 %4 %5 %6 %7
 ) else if /i "%~1"=="names" (
   rem 命名核對:names propose(提議)| apply(核對表寫回)| add 名稱 關鍵字(自建歸類)| names(現況)
   py "%~dp0..\functional modules\WorkOps\engines\workops_namer.py" %2 %3 %4 %5

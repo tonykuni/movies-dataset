@@ -64,3 +64,30 @@ affected_records/retry_count/resolution。
 - via-ocr probe:操作員機 **9/10 段可用**(fitz/pdfplumber/pdfminer/camelot/
   PaddleOCR/pytesseract/tesseract/easyocr;僅 surya 選配缺)— 重 OCR 段
   真接火(via-ocr 代跑 paddle 段)列候補,候操作員令。
+
+## 六、Top15 本地免費庫 × 平台去重裁定(2026-08-08 追加)
+
+| 庫 | 平台現況 | 裁定 |
+|---|---|---|
+| duckdb / pyarrow | via_io 匯出已支援(選配);主庫=sqlite(super_engine/decision_log) | 已有(選配層) |
+| pandas / scikit-learn / jieba | analytics venv 全配 | 已有 |
+| pm4py / streamlit? | pm4py 在 .venv_pm;Streamlit 不採 — 平台 UI=單檔 HTML(免服務常駐) | 已有/不採 |
+| plotly | VAP 域已有 | 已有 |
+| networkx | 未在 — 關係網絡圖候補(工作台 stake 現以表格呈現) | 候補 |
+| polars | 不採 — pandas 已為基底,雙 DataFrame 庫違反去重 | 不採 |
+| pydantic | 不採(現階段)— 平台驗證用 schema.py/Pydantic 屬重依賴 | 不採 |
+| rapidfuzz | 候補 — 現以 normalized subject+規則去重;模糊比對可強化併案偵測 | 候補 |
+| APScheduler | 不採 — 排程=Windows 開機 vbs/工作排程器(零常駐服務) | 不採 |
+| loguru | 不採 — Write-WopsLog/結構化 print 已定;雙日誌系統違反去重 | 不採 |
+| tenacity | 不採 — 平台重試=launcher 指數退避(via-sync/push 迴圈) | 不採 |
+
+原則:單機、本機免費、不常駐、不雙軌。候補(networkx/rapidfuzz)待實際需求觸發。
+
+## 七、決策追蹤模組(ENG-027 · 本輪落地)
+
+Decision & Action Log 落地為 `via-workops decisions`(sqlite side-car + DEC-#### 編號
++ append-only 歷史 + source 掛 THR/CASE + KPI 完成率/逾期/平均延遲 + utf8BOM 匯出);
+會議記錄範本 docs/Meeting_Minutes_Template.md(議題→討論→決議→行動骨架,行動項目
+一行指令入帳)。流程重建器藍圖(model_builder/visualizer/stakeholder_overlay)經去重
+裁定:DFG/瓶頸/一致性=analytics 已有、PetriNet/互動 cockpit=工作台 pmine 已有、
+stakeholder overlay=E04+工作台 stake 已有 — 不重建,缺口僅 networkx 關係圖(候補)。
