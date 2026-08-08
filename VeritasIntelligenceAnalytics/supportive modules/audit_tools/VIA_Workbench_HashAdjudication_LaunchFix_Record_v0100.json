@@ -1,0 +1,23 @@
+{
+ "record_id": "VIA_Workbench_HashAdjudication_LaunchFix_Record_v0100",
+ "ts": "2026-08-08T15:50:00",
+ "operator_verdict": "功能只增不減請補齊如附件參考(附 index.html)",
+ "hash_adjudication": {
+  "uploaded": "f79080e2-index.html · md5 2fc8d2efe6c77e1eb95eadfb82650004 · 97886 bytes",
+  "in_repo": "supportive modules/VIA_Forge/ui/index.html · md5 相同 · 逐位元組一致(diff -q IDENTICAL)",
+  "verdict": "附件即庫內 Forge 工作台前端 — 功能 100% 已在庫,無一缺失"
+ },
+ "endpoint_coverage": "附件呼叫 19 個 /api/* 端點;via_server.py 全數實作且再多 6 個(config/export/pending/list/approve/regenerate/shutdown)— 前端無孤兒呼叫",
+ "root_cause": "裸打 via-forge 開 ui/index.html(file://)→ fetch(/api/...) 不可達 → 前端永遠顯示「後端離線(可用示範資料)」→ 操作員在死殼裡看不到功能,誤判缺失。缺的不是功能,是啟動線最後一吋。",
+ "delivered": {
+  "via_forge_v002": "bin/via-forge.cmd:裸打改為 Start-VIA.ps1(起 127.0.0.1 服務+自動開瀏覽器,一點直入活工作台);check/server 保留;舊 file:// 行為保留於 via-forge file(只增不減);回退 rem 註明;CRLF 21/21",
+  "workbench_verb": "via-workops workbench 新動詞 → 同一啟動線(WorkOps 日常流可直達智慧工作台);CRLF 68/68"
+ },
+ "qa_container": {
+  "server_selftest": "via_server.py --selftest 4/4 PASS(engine builds/supported≥28/port range/caps dict)",
+  "live_boot": "實啟 --no-browser → port 8780;GET / 回 UI HTML;GET /api/health 回 caps JSON;POST /api/shutdown 優雅停 — 服務鏈全通",
+  "note_container_caps": "容器 caps 多為 false(docx/pdf 等未裝)屬環境差異;操作員機 Start-VIA 會裝 .venv 依賴"
+ },
+ "residual_note": "hub v0108 Forge 磁貼仍連 ui/index.html(瀏覽器連結無法起服務;磁貼命令欄本就標示 via-forge,現裸打即活)— 如需磁貼直達活服務需 hub 版本前進,留待下輪裁示",
+ "append_only": true
+}

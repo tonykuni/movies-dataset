@@ -36,6 +36,9 @@ if "%~1"=="" (
 ) else if /i "%~1"=="pmsetup" (
   for /f "delims=" %%f in ('dir /b /o:n "%~dp0..\functional modules\WorkOps\engines\Invoke-VIA-WorkOps-PmSetup-v0*.ps1"') do set "WOPS_PMS=%%f"
   call pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\engines\%%WOPS_PMS%%" %2
+) else if /i "%~1"=="workbench" (
+  rem 智慧工作台(Forge 前端 12 分頁 × 真後端 19 端點):起本機服務並開瀏覽器,同 via-forge
+  pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\supportive modules\VIA_Forge\Start-VIA.ps1"
 ) else if /i "%~1"=="dotsetup" (
   rem graphviz 可攜式取得(免 winget/管理員):via-workops dotsetup → 狀態;dotsetup install → 下載+驗證+解壓
   py "%~dp0..\functional modules\WorkOps\engines\workops_graphviz_setup.py" %2 %3
