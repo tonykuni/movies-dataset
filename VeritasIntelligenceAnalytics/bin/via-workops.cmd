@@ -1,5 +1,5 @@
 @echo off
-rem WorkOps 指揮板 v0103(圈選:板上點列→複製指令→貼回即建草稿;絕不代寄)
+rem WorkOps × Mail Tracker 統合指揮板 v0104(一系統四頁:專案/追蹤哨/範疇關係人/VMT;負載對照;絕不代寄)
 rem 用法:via-workops                    → 一支到底:掃描+對帳+編號+指揮板+週報
 rem       via-workops drafts            → 自動佇列(≥3 天未回)一次建草稿
 rem       via-workops drafts THR-…,…    → 只為「圈選件」建草稿(板上複製之指令)
