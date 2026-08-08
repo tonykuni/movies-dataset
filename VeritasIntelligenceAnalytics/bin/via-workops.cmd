@@ -29,6 +29,9 @@ if "%~1"=="" (
 ) else if /i "%~1"=="pmsetup" (
   for /f "delims=" %%f in ('dir /b /o:n "%~dp0..\functional modules\WorkOps\engines\Invoke-VIA-WorkOps-PmSetup-v0*.ps1"') do set "WOPS_PMS=%%f"
   call pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\engines\%%WOPS_PMS%%" %2
+) else if /i "%~1"=="envmgr" (
+  rem 中央環境治理直達:via-workops envmgr health | plan pm4py | install pm4py --wheels-only
+  py "%~dp0..\functional modules\WorkOps\engines\workops_envmanager_bridge.py" %2 %3 %4 %5 %6
 ) else if /i "%~1"=="analytics" (
   if exist "%~dp0..\functional modules\WorkOps\engines\.venv_pm\Scripts\python.exe" (
     "%~dp0..\functional modules\WorkOps\engines\.venv_pm\Scripts\python.exe" "%~dp0..\functional modules\WorkOps\engines\engine_analytics.py" %2 %3 %4 %5

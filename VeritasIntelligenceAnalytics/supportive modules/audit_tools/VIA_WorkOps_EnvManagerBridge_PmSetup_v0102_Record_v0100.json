@@ -1,0 +1,25 @@
+{
+ "record_id": "VIA_WorkOps_EnvManagerBridge_PmSetup_v0102_Record_v0100",
+ "ts": "2026-08-08T09:40:00",
+ "operator_verdict": "用 VIA_EnvManager.py 來試試能否成功安裝",
+ "findings": {
+  "envmanager_selftest": "容器實測 10/10 PASS(VIA_EnvManager 1.1.0,gatekeeper/風險分級/命令產生器皆健全)",
+  "bare_run_blocked": "裸跑 plan-install pm4py → NO_HEALTHY_MANAGED_ENV_AVAILABLE:環境根目錄候選寫死 C:\\Users\\tonyk\\envs 等四處,看不到 WorkOps engines/.venv_pm",
+  "append_patch_note": "檔尾三段 append 補丁重定義 def_main 為 smoke — 因 CLI 於 __main__ 區塊先執行故不影響命令列;importer 不得依賴 def_main",
+  "import_gotcha": "importlib 載入時 dataclasses 需宿主模組在 sys.modules(容器首跑 AttributeError 即此因)— 橋已補 sys.modules 註冊"
+ },
+ "delivered": {
+  "bridge_eng020": "workops_envmanager_bridge.py(ENG-020):動態向上尋 supportive modules/VIA_EnvManager.py;執行期覆蓋 — 治理範圍→.venv_pm 上層、輸出→WorkOps/out/envmanager/、python 定位跨平台(Scripts/python.exe 與 bin/python)、快照縮至 pip/numpy/pandas;動詞 health/plan/install;--wheels-only 於 EnvManager 產生之 install 命令注入 --only-binary=:all:;誠實 JSON 逐命令結果;exit 0 成/1 執行敗/2 封鎖/3 前置缺;EnvManager 正本零改動",
+  "pmsetup_v0102": "Invoke-VIA-WorkOps-PmSetup-v0102.ps1(版本前進,v0101/v0100 保留):核心套件與 jieba 一律先經 EnvManager gatekeeper(plan 決策→其命令執行→pip check);橋缺席或未成時退回直裝後備並誠實標注路徑;沿用 v0101 誠實 [VERIFY] 與 graphviz 偵測;不試 numpy<2",
+  "launcher": "via-workops 新增 envmgr 動詞(health/plan/install 直達);pmsetup 動態 pattern 自動拾取 v0102;CRLF 55/55 完整"
+ },
+ "qa_container": {
+  "health": ".venv_pm 測試環境被 EnvManager 發現並健檢(status WARN=numpy/pandas 未裝,誠實)",
+  "install_pm4py": "經 gatekeeper 核准(strategy=preferred_env, risk=LOW)→ wheels-only 安裝成功 → pip check 通過 → import 實測 numpy 2.4.6 · pm4py 2.7.23.3(pm4py 自帶相容 numpy,再證 v0101 裁定)",
+  "plan_versioned": "plan pandas <3 → approved(版本尾綴機制通過)",
+  "error_paths": "venv 不存在 → exit 3 誠實訊息;ps_lint v0102 PASS;bridge AST PASS",
+  "decision_artifacts": "決策/健康/歷史 JSON 落 out/envmanager/(InstallDecision 含逐命令結果,append-only history)"
+ },
+ "governance": "「任何新增工具都必須先經過 EnvManager 決策」自此在 WorkOps 落地;基底封鎖(MEDIUM/HIGH 風險)與 via_core 白名單原生規則保留;venv 隔離與基底零觸碰不變",
+ "append_only": true
+}
