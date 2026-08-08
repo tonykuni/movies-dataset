@@ -1,7 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-engine_analytics.py  v1.2
+engine_analytics.py  v1.3
 =========================
+v1.3(2026-08-08 操作員實跑報告驅動之中英文優化):
+  1) 聚類/監督/相似度改用「詞級」向量(原 char_wb 2-4 字元 n-gram 把已斷詞文本
+     再切碎 → 建議關鍵字出現「銀行 , 銀」「ea, eat, ats」碎片)。
+  2) 領域詞典改以引擎目錄定位(原相對 cwd,deep 鏈 cwd 在 out\deep 永遠載不到
+     → 「永豐銀行」被切成「豐銀行」);內建詞擴充銀行/品牌/財經術語,
+     engines\domain_dict.txt 一行一詞可自行增補(只增不減)。
+  3) 停用詞擴充中英信件樣板(fw/nt/星期X/透過/您好/親愛…);純拉丁 token 需 ≥3 字。
+  4) 回覆延遲表增「型態」欄:no-reply/電子報/通知類系統寄件者誠實標注,
+     OUTLIER 升級判定只對人類對口;engines\bulk_senders.txt 可自行增補樣式。
+  5) 聚類樣本主旨過濾空值(原顯示「| |」)。
 超級引擎進階分析層:自然語言處理 × 資料挖掘 × 流程探勘
 讀取 email_super_engine.py 產出的 super_engine.db(唯讀),輸出 analytics_report.html。
 不修改引擎本體與資料庫(只增不減)。
@@ -61,21 +71,34 @@ except ImportError:
 STANDARD_FLOW = ["Request", "Commitment", "Delivery"]   # BU 標準交付流程(可改)
 STOPWORDS = set("""the a an and or of to in for on with is are was were be been this that
 please could would kindly regards thanks best dear hi hello from sent subject
-的 了 在 是 我 你 他 我們 你們 這 那 請 就 都 及 與 或 也 但 而 並 於""".split())
+your you our their via new now get all any per not fwd fwd: re: mail email
+的 了 在 是 我 你 他 我們 你們 這 那 請 就 都 及 與 或 也 但 而 並 於
+fw re 轉寄 回覆 您好 謝謝 親愛 敬啟 透過 系統 星期 星期一 星期二 星期三 星期四
+星期五 星期六 星期日 上午 下午 晚上 早上 凌晨 今天 明天 昨天 本週 上週 下週
+如下 如附 附件 內容 相關 進行 使用 提供 可以 沒有 這個 那個 什麼 任何 已經
+以上 以下 目前 之後 之前 其中 一個 一起 立刻 立即""".split())
 
 
 def load_domain_dict(path="domain_dict.txt"):
-    """jieba 自訂領域詞典:一行一詞(可附詞頻),放料號/廠名/術語。存在即自動載入。"""
+    """jieba 自訂領域詞典:一行一詞(可附詞頻),放料號/廠名/術語。
+    先找給定路徑,再找引擎目錄(deep 鏈 cwd 不在 engines,相對路徑會落空)。"""
     if not TOOLS["jieba"]:
         return False
-    p = Path(path)
-    if p.exists():
-        jieba.load_userdict(str(p))
-        return True
-    # 內建最小領域詞
-    for w in ["信賴性", "量產放行", "轉廠", "斷點", "催辦", "green light", "DVT", "reliability"]:
+    # 內建領域詞(v1.3 擴充:銀行/品牌/財經 — 修「豐銀行」類切錯)
+    for w in ["信賴性", "量產放行", "轉廠", "斷點", "催辦", "green light", "DVT", "reliability",
+              "永豐銀行", "台新銀行", "星展銀行", "第一銀行", "土地銀行", "富邦產險",
+              "中華航空", "人力銀行", "簽帳金融卡", "信用卡", "電子發票", "電子明細",
+              "網路銀行", "行動銀行", "會員點數", "定期定額", "手續費", "父親節",
+              "標普", "費半", "道瓊", "那斯達克", "美股", "台股", "升息", "降息",
+              "非農", "財報", "回檔", "鉅亨", "誠品線上", "屈臣氏", "全聯"]:
         jieba.add_word(w)
-    return False
+    loaded = False
+    for p in (Path(path), Path(__file__).resolve().parent / "domain_dict.txt"):
+        if p.exists():
+            jieba.load_userdict(str(p))
+            loaded = True
+            break
+    return loaded
 
 
 def textrank_keywords(text: str, top_n=8):
@@ -103,6 +126,10 @@ def tokenize(text: str):
         if len(t) < 2 or t in STOPWORDS or t.isdigit():
             continue
         if re.fullmatch(r"[\W_]+", t):
+            continue
+        if any(ch.isdigit() for ch in t):        # 25.1 / w32 / m27 類混數 token 無語義
+            continue
+        if re.fullmatch(r"[a-z]{1,2}", t):        # 純拉丁需 ≥3 字(fw/nt/ea 類碎片)
             continue
         out.append(t)
     return out
@@ -150,7 +177,8 @@ def nlp_cluster_unclassified(conn, max_k=5):
     if len(rows) < 3:
         return []
     texts = [" ".join(tokenize((s or "") + " " + (b or "")[:2000])) for _, s, b in rows]
-    vec = TfidfVectorizer(max_features=2000, analyzer="char_wb", ngram_range=(2, 4))
+    # v1.3:詞級向量(文本已斷詞;char n-gram 會再切碎中英詞 → 「銀行 , 銀」碎片)
+    vec = TfidfVectorizer(max_features=2000, analyzer=str.split)
     try:
         X = vec.fit_transform(texts)
     except ValueError:
@@ -174,9 +202,16 @@ def nlp_cluster_unclassified(conn, max_k=5):
     for ci in range(k):
         members = [rows[i][1] for i in range(len(rows)) if km.labels_[i] == ci]
         center = km.cluster_centers_[ci]
-        top = [terms[j] for j in center.argsort()[::-1][:6]]
+        top = []
+        for j in center.argsort()[::-1]:          # 去重去空,湊滿 6 個乾淨詞
+            t = terms[j].strip()
+            if t and t not in top:
+                top.append(t)
+            if len(top) >= 6:
+                break
+        samples = [s.strip() for s in members if s and s.strip()][:3] or ["(無主旨)"]
         clusters.append({"cluster": ci, "size": len(members),
-                         "suggest_keywords": top, "sample_subjects": members[:3]})
+                         "suggest_keywords": top, "sample_subjects": samples})
     return clusters
 
 
@@ -198,7 +233,7 @@ def nlp_supervised_suggest(conn, min_train=8, confidence=0.5):
     texts = [" ".join(tokenize(t)) for t, _ in labeled]
     ys = [l for _, l in labeled]
     clf = make_pipeline(
-        TfidfVectorizer(max_features=4000, analyzer="char_wb", ngram_range=(2, 4)),
+        TfidfVectorizer(max_features=4000, analyzer=str.split),
         LinearSVC())
     try:
         clf.fit(texts, ys)
@@ -228,7 +263,7 @@ def nlp_similar_threads(conn, threshold=0.45):
     if len(rows) < 3:
         return []
     texts = [" ".join(tokenize(r[2] or "")) for r in rows]
-    vec = TfidfVectorizer(max_features=3000, analyzer="char_wb", ngram_range=(2, 4))
+    vec = TfidfVectorizer(max_features=3000, analyzer=str.split)
     try:
         X = vec.fit_transform(texts)
     except ValueError:
@@ -247,17 +282,45 @@ def nlp_similar_threads(conn, threshold=0.45):
 # ============================================================
 # [DM] 模組
 # ============================================================
+BULK_SENDER_PATTERNS = [
+    r"no-?reply", r"donot", r"do-not-reply", r"newsletter", r"notification",
+    r"電子報", r"特刊", r"愛讀報", r"會員報", r"晨訊", r"通知", r"明細", r"官網",
+    r"平台", r"中心", r"magazine", r"defender", r"support", r"service", r"電子明細",
+    r"銀行", r"產險", r"保險", r"航空", r"金融卡", r"信用卡", r"人力",
+]
+
+
+def _load_bulk_patterns():
+    """系統寄件者樣式:內建 + engines/bulk_senders.txt(一行一個 regex,只增不減)。"""
+    pats = list(BULK_SENDER_PATTERNS)
+    p = Path(__file__).resolve().parent / "bulk_senders.txt"
+    if p.exists():
+        for line in p.read_text(encoding="utf-8-sig").splitlines():
+            line = line.strip()
+            if line and not line.startswith("#"):
+                pats.append(line)
+    return re.compile("|".join(pats), re.IGNORECASE)
+
+
 def dm_latency_outliers(conn):
-    """對口回覆延遲 IQR 離群:延遲顯著高於群體者,列為升級優先對象。"""
+    """對口回覆延遲 IQR 離群:延遲顯著高於群體者,列為升級優先對象。
+    v1.3:電子報/no-reply 類系統寄件者誠實標注「系統/電子報」,不參與升級判定
+    (對永不回信的系統算回覆延遲無意義);人類對口排前。"""
     rows = conn.execute(
         "SELECT sk_email, avg_latency_hr FROM V_LATEST_ASSESSMENT"
         " WHERE avg_latency_hr IS NOT NULL").fetchall()
-    if len(rows) < 4:
-        return [(e, l, "樣本不足,僅列值") for e, l in rows]
-    vals = sorted(l for _, l in rows)
-    q1, q3 = vals[len(vals) // 4], vals[3 * len(vals) // 4]
-    fence = q3 + 1.5 * (q3 - q1)
-    return [(e, l, "OUTLIER-升級優先" if l > fence else "") for e, l in rows]
+    bulk_re = _load_bulk_patterns()
+    tagged = [(e, l, bool(bulk_re.search(e or ""))) for e, l in rows]
+    humans = [(e, l) for e, l, b in tagged if not b]
+    if len(humans) < 4:
+        out = [(e, l, "人", "樣本不足,僅列值") for e, l in humans]
+    else:
+        vals = sorted(l for _, l in humans)
+        q1, q3 = vals[len(vals) // 4], vals[3 * len(vals) // 4]
+        fence = q3 + 1.5 * (q3 - q1)
+        out = [(e, l, "人", "OUTLIER-升級優先" if l > fence else "") for e, l in humans]
+    out += [(e, l, "系統/電子報", "不列升級") for e, l, b in tagged if b]
+    return out
 
 
 def dm_weekly_volume(conn):
@@ -507,9 +570,8 @@ def main():
     conn = sqlite3.connect(f"file:{args.db}?mode=ro", uri=True)
     sections = []
     ssot_dict = Path(args.db).parent / "domain_dict.txt"
-    if load_domain_dict(str(ssot_dict) if ssot_dict.exists() else "domain_dict.txt"):
-        print("[INFO] 已載入領域詞典:" + (str(ssot_dict) if ssot_dict.exists()
-              else "domain_dict.txt"))
+    if load_domain_dict(str(ssot_dict)):
+        print("[INFO] 已載入領域詞典(db 側或 engines\\domain_dict.txt)")
     progress(10, "分析層啟動:NLP 模組")
 
     # --- NLP ---
@@ -546,8 +608,8 @@ def main():
     progress(45, "資料挖掘模組")
     # --- DM ---
     sections.append(("資料挖掘 · 回覆延遲離群偵測(IQR)",
-                     "延遲顯著高於群體者列為升級優先對象;樣本少於 4 人僅列值。",
-                     table(["對口", "平均延遲(hr)", "判定"], dm_latency_outliers(conn)) or "<p>無資料</p>"))
+                     "延遲顯著高於群體者列為升級優先對象(僅人類對口;系統/電子報誠實標注不列升級);樣本少於 4 人僅列值。",
+                     table(["對口", "平均延遲(hr)", "型態", "判定"], dm_latency_outliers(conn)) or "<p>無資料</p>"))
     wv = dm_weekly_volume(conn)
     sections.append(("資料挖掘 · 各案週信量",
                      "單案單週信量驟增通常代表出事;可與卡住狀態交叉驗證。",

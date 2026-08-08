@@ -1,0 +1,26 @@
+{
+ "record_id": "VIA_WorkOps_Analytics_v13_ZhEnQuality_Record_v0100",
+ "ts": "2026-08-08T13:20:00",
+ "operator_verdict": "如何優化信件分析成果(中英文)— 附實跑 analytics 報告全文為證",
+ "defects_from_operator_report": {
+  "cluster_fragments": "聚類建議關鍵字碎片:「銀行, 銀行 , 銀」「訂, ea, eat, ats」— nlp_cluster/監督/相似度對『已斷詞』文本再套 char_wb 2-4 字元 n-gram,中英詞全被切碎",
+  "empty_samples": "聚類樣本主旨顯示「| |」(空值未濾)",
+  "dict_path_bug": "domain_dict.txt 以 cwd 相對路徑載入;deep 鏈 Push-Location out\\deep → 永遠載不到 → 「永豐銀行」切成「豐銀行」、「點終」「費半崩超」類切錯",
+  "boilerplate_noise": "fw/nt/13/星期六/透過/您好 全進 TF-IDF 關鍵詞",
+  "latency_meaningless": "回覆延遲表把永不回信的電子報/no-reply/銀行通知列為升級對象(屈臣氏 95.6hr、完美行 147hr…)"
+ },
+ "delivered_v13": {
+  "word_level_vectors": "聚類/監督式/相似 thread 三處 TfidfVectorizer 改 analyzer=str.split(文本已由 tokenize 斷詞)— 建議關鍵字回到完整中英詞;聚類關鍵字去重去空、樣本主旨濾空",
+  "dict_engine_anchor": "load_domain_dict 改引擎目錄定位 fallback;內建詞擴充銀行/品牌/財經 40+;新增 engines/domain_dict.txt(一行一詞,使用者只增不減)",
+  "stopwords_tokens": "停用詞擴充中英信件樣板;純拉丁 token ≥3 字;含數字 token 全濾(25.1/w32/m27)",
+  "latency_typing": "dm_latency_outliers 增「型態」欄:內建+engines/bulk_senders.txt(regex,使用者可增補)辨系統寄件者 → 標「系統/電子報·不列升級」;IQR 升級判定只算人類對口且人排前;報告表頭同步四欄"
+ },
+ "qa_container_real_libs": {
+  "tokenize": "jieba+userdict 實測:『Fw: 永豐銀行簽帳金融卡消費通知 NT 25.1 於星期六下午透過 Uber Eats…』→ [永豐銀行, 簽帳金融卡, 消費, 通知, uber, eats, 訂單, verification, code](fw/nt/25.1/星期六/透過 全濾;品牌詞完整)",
+  "word_vectors": "sklearn 實測特徵全為完整詞(cashback/信用卡/uniqlo…),無碎片",
+  "latency": "8 寄件者混測:銀行/uber eats/晨訊/no-reply 全標系統;人類 6 樣本 300hr 者 OUTLIER-升級優先;人排前 — ALL PASS",
+  "ast": "engine_analytics.py AST PASS"
+ },
+ "note": "engine_analytics 為 WorkOps 內部引擎,依其檔內版號 v1.2→v1.3 就地演進(deep 鏈以固定檔名呼叫);缺陷記錄與修法悉數入本記錄。小樣本(<5 人)IQR 柵欄壓不到極值屬統計特性,誠實保留「樣本不足」語義",
+ "append_only": true
+}
