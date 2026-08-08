@@ -1,0 +1,49 @@
+#requires -Version 7.0
+<#
+==========================================================================================
+ Invoke-VIA-WorkOps-Deep v0100 — 深度郵件智能一支到底
+------------------------------------------------------------------------------------------
+ 鏈:scanrange(時段唯讀逐封匯出,含內文片段)→ 語料橋 → 超級引擎(修復/五維分類/
+     E01-E07 庫/PMBOK 匯出)→ 分析層(NLP/DM/PM)→ 開啟報告
+ 背景:操作員實跑發現 engine --input out 讀 0 封(schema 不合)— 本鏈以語料橋補齊。
+ 治理:Outlook 唯讀;輸出落 WorkOps\out\deep\(可重生);不卡斷;各引擎動態解析最新版。
+ 回退:刪本檔,五個分段動詞(scanrange/bridge/engine/analytics)仍可手動逐步跑。
+==========================================================================================
+#>
+param(
+    [int]$Days = 14,
+    [int]$BodyChars = 1200,
+    [switch]$NoOpen
+)
+$ErrorActionPreference = "Continue"
+$Here   = $PSScriptRoot                       # engines/
+$WorkOps = Split-Path $Here -Parent
+$Deep   = Join-Path $WorkOps "out\deep"
+New-Item -ItemType Directory -Force -Path $Deep | Out-Null
+
+Write-Host "==========================================================" -ForegroundColor DarkCyan
+Write-Host ("  VIA WorkOps DEEP v0100  |  掃描→語料橋→超級引擎→分析 · {0} 天窗" -f $Days) -ForegroundColor Cyan
+Write-Host "==========================================================" -ForegroundColor DarkCyan
+
+Write-Host "[1/4] 時段唯讀逐封匯出(含內文片段)..." -ForegroundColor Yellow
+$scan = Join-Path $Here "Invoke-VIA-Outlook-TimeRange-ReadOnly.ps1"
+& $scan -StartTime (Get-Date).Date.AddDays(-1 * [math]::Abs($Days)) -EndTime (Get-Date) `
+        -OutputRoot (Join-Path $Deep "scanrange") -IncludeBodySnippet $true -BodySnippetLength $BodyChars
+
+Write-Host "[2/4] 語料橋(schema 統一)..." -ForegroundColor Yellow
+& py (Join-Path $Here "workops_corpus_bridge.py") --inputs (Join-Path $Deep "scanrange") (Join-Path $WorkOps "out") --outdir (Join-Path $Deep "corpus")
+
+Write-Host "[3/4] 郵件智能超級引擎..." -ForegroundColor Yellow
+& py (Join-Path $Here "email_super_engine.py") --input (Join-Path $Deep "corpus") --outdir (Join-Path $Deep "engine_out")
+
+Write-Host "[4/4] NLP/DM/PM 分析層..." -ForegroundColor Yellow
+Push-Location $Deep
+try { & py (Join-Path $Here "engine_analytics.py") --outdir (Join-Path $Deep "engine_out") } finally { Pop-Location }
+
+$report = Join-Path $Deep "engine_out\engine_report.html"
+$aReport = Join-Path $Deep "engine_out\analytics_report.html"
+if (-not $NoOpen) {
+    if (Test-Path -LiteralPath $report)  { Start-Process $report  | Out-Null }
+    if (Test-Path -LiteralPath $aReport) { Start-Process $aReport | Out-Null }
+}
+Write-Host ("[總結] 深度鏈完成 · 產物:{0}(Outlook 唯讀,原件零觸碰)" -f $Deep) -ForegroundColor Green

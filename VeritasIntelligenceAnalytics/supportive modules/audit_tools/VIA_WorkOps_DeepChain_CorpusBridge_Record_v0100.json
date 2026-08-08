@@ -1,0 +1,14 @@
+{
+ "record_id": "VIA_WorkOps_DeepChain_CorpusBridge_Record_v0100",
+ "ts": "2026-08-08T06:50:00",
+ "symptom": "操作員實跑 via-workops engine --input out → S1 讀 0 封",
+ "root_cause": "schema 斷層:超級引擎 CSV loader 期望 subject/sender|from/date|received/body|content;板 mails.csv 用 SenderEmail/EventDate(無 body)、TimeRange 匯出用 SENDER_ADDRESS/EVENT_TIME/BODY_SNIPPET — 欄名對不上,引擎誠實吃 0",
+ "fix": {
+  "workops_corpus_bridge.py(ENG)": "自動辨識來源 schema(別名表映射)→ 統一輸出 corpus.csv;日期正規化;主旨+寄件人+時間去重;雜表(kpi/recipients/ledger 等)自動排除;無 body 時提示 -IncludeBodySnippet",
+  "Invoke-VIA-WorkOps-Deep-v0100.ps1": "一支到底:scanrange(N 天窗,內文片段預設 1200 字)→ bridge → engine → analytics → 開雙報告;產物落 out/deep/(可重生);Outlook 全程唯讀"
+ },
+ "qa": "容器端到端:兩 schema 合成語料 4 列 → 橋 4 封(含 body 2,kpi 雜表正確排除)→ 引擎 S1=4 封 S2=4 thread(原 0 封已破);bridge AST OK;Deep ps_lint 0 errors",
+ "wiring": "via-workops 新增 deep(動態最新版)與 bridge 動詞;engine 動詞加註需先過橋",
+ "registry": "ENG-019",
+ "append_only": true
+}

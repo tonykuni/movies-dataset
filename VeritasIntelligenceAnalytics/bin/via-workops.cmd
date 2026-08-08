@@ -18,6 +18,11 @@ if "%~1"=="" (
 ) else if /i "%~1"=="silent" (
   for /f "delims=" %%f in ('dir /b /o:n "%~dp0..\functional modules\WorkOps\Invoke-VIA-WorkOps-CommandBoard-v0*.ps1"') do set "WOPS_BOARD=%%f"
   call pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\%%WOPS_BOARD%%" -Silent
+) else if /i "%~1"=="deep" (
+  for /f "delims=" %%f in ('dir /b /o:n "%~dp0..\functional modules\WorkOps\engines\Invoke-VIA-WorkOps-Deep-v0*.ps1"') do set "WOPS_DEEP=%%f"
+  call pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\engines\%%WOPS_DEEP%%" %2 %3 %4
+) else if /i "%~1"=="bridge" (
+  py "%~dp0..\functional modules\WorkOps\engines\workops_corpus_bridge.py" %2 %3 %4 %5 %6
 ) else if /i "%~1"=="engine" (
   shift
   py "%~dp0..\functional modules\WorkOps\engines\email_super_engine.py" %2 %3 %4 %5 %6 %7 %8 %9
