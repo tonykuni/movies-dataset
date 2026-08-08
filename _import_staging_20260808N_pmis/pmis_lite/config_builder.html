@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PMIS-Lite 設定產生器</title>
+<style>
+  :root{
+    --bg:#f5f4f0; --ink:#2a2a2a; --blue:#4c78a8; --teal:#439a9a;
+    --grey:#9c9890; --red:#c96b5a; --green:#5a9e6f; --line:#e3e0d8;
+    --card:#fffefb; --seal:#b13a2e;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;
+    line-height:1.6; padding-bottom:120px;
+  }
+  header{
+    background:var(--card); border-bottom:1px solid var(--line);
+    padding:18px 20px; display:flex; align-items:center; gap:14px;
+    position:sticky; top:0; z-index:20;
+  }
+  .seal{
+    width:46px;height:46px;flex:0 0 46px;border:2px solid var(--seal);border-radius:7px;
+    color:var(--seal);display:flex;align-items:center;justify-content:center;
+    font-size:24px;font-weight:700;letter-spacing:-1px;
+    box-shadow:inset 0 0 0 2px #fff, 0 0 0 1px var(--seal);
+  }
+  header h1{font-size:17px;margin:0;font-weight:700;letter-spacing:.5px;}
+  header p{font-size:11px;margin:2px 0 0;color:var(--grey);letter-spacing:.5px;}
+  .wrap{max-width:680px;margin:0 auto;padding:0 16px;}
+  .aup{
+    background:#fbf3ec;border:1px solid #ecd9c9;border-left:4px solid var(--red);
+    border-radius:8px;padding:12px 14px;margin:16px 0;font-size:12.5px;color:#7a5a48;
+  }
+  .steps{display:flex;gap:6px;margin:16px 0;overflow-x:auto;padding-bottom:4px;}
+  .pip{
+    flex:0 0 auto;font-size:11px;padding:6px 11px;border-radius:20px;
+    background:#ececff00;border:1px solid var(--line);color:var(--grey);white-space:nowrap;
+  }
+  .pip.active{background:var(--blue);color:#fff;border-color:var(--blue);}
+  .pip.done{border-color:var(--teal);color:var(--teal);}
+  .panel{display:none;}
+  .panel.show{display:block;animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .q{
+    background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:18px;margin:14px 0;
+  }
+  .q h2{font-size:15px;margin:0 0 4px;font-weight:700;}
+  .q .hint{font-size:12px;color:var(--grey);margin:0 0 14px;}
+  label.field{display:block;font-size:12px;color:var(--grey);margin:12px 0 5px;font-weight:600;}
+  select{
+    width:100%;padding:13px 12px;font-size:15px;border:1px solid var(--line);
+    border-radius:9px;background:#fff;color:var(--ink);appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' stroke='%239c9890' stroke-width='1.6' fill='none'/></svg>");
+    background-repeat:no-repeat;background-position:right 14px center;
+  }
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px;}
+  @media(max-width:480px){.cards{grid-template-columns:1fr;}}
+  .pick{
+    border:1.5px solid var(--line);border-radius:11px;padding:13px 14px;cursor:pointer;
+    background:#fff;transition:.15s;user-select:none;
+  }
+  .pick:active{transform:scale(.98);}
+  .pick.on{border-color:var(--blue);background:#f0f5fb;}
+  .pick .t{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;}
+  .pick .d{font-size:11.5px;color:var(--grey);margin-top:3px;}
+  .box{
+    width:20px;height:20px;flex:0 0 20px;border:1.5px solid var(--grey);border-radius:6px;
+    display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;
+  }
+  .pick.on .box{background:var(--blue);border-color:var(--blue);}
+  .preview{
+    background:#1f1d1a;color:#e8e4da;border-radius:12px;padding:16px;margin:14px 0;
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:11.5px;
+    white-space:pre;overflow-x:auto;line-height:1.5;
+  }
+  .preview .k{color:#7fb0d8;} .preview .s{color:#a9c48a;} .preview .n{color:#d8a26a;}
+  .navbar{
+    position:fixed;bottom:0;left:0;right:0;background:var(--card);
+    border-top:1px solid var(--line);padding:12px 16px;display:flex;gap:10px;
+    max-width:680px;margin:0 auto;
+  }
+  button.nav{
+    flex:1;padding:14px;font-size:15px;font-weight:700;border-radius:10px;border:none;cursor:pointer;
+  }
+  .back{background:#fff;border:1px solid var(--line)!important;color:var(--ink);}
+  .next{background:var(--blue);color:#fff;}
+  .dl{background:var(--green);color:#fff;}
+  .ghost{background:transparent;color:var(--grey);border:1px solid var(--line)!important;}
+  .tag{display:inline-block;font-size:10.5px;padding:2px 7px;border-radius:5px;background:#eef3f8;color:var(--blue);margin:2px 3px 0 0;}
+  .ok{color:var(--green);font-weight:700;}
+  .small{font-size:11.5px;color:var(--grey);}
+</style>
+</head>
+<body>
+<header>
+  <div class="seal">設</div>
+  <div>
+    <h1>PMIS-Lite 設定產生器</h1>
+    <p>VERITAS INTELLIGENCE · 點選即可完成客製 · 全程免打字</p>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="aup">本工具僅讀取您自己有權限的資料、於本機處理、不外傳。請先確認符合貴公司 AUP 與個資規範。產出為草稿，複核後再對外。</div>
+
+  <div class="steps" id="pips"></div>
+
+  <!-- Step 1 產業 -->
+  <div class="panel" data-step="0">
+    <div class="q">
+      <h2>① 選擇產業情境</h2>
+      <p class="hint">選一個最接近的，系統自動帶入該產業的分類關鍵字與簡寫對照，不需自己打。</p>
+      <label class="field">產業 / 領域</label>
+      <select id="industry"></select>
+      <label class="field">這份設定的角色用途</label>
+      <select id="role">
+        <option value="PM">專案管理 (PM)</option>
+        <option value="RD">研發 (RD)</option>
+        <option value="QA">品保 (QA)</option>
+        <option value="PE">製程 (PE)</option>
+        <option value="MGR">主管 / 跨部門</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Step 2 編號 -->
+  <div class="panel" data-step="1">
+    <div class="q">
+      <h2>② 編號規則</h2>
+      <p class="hint">每筆資訊的穩定識別碼前綴。換職位只要回來改這裡，歷史結構不動。</p>
+      <label class="field">編號前綴</label>
+      <select id="prefix"></select>
+      <label class="field">領域代號</label>
+      <select id="domain"></select>
+      <p class="small" style="margin-top:12px">範例編號：<span id="uidExample" class="tag"></span></p>
+    </div>
+  </div>
+
+  <!-- Step 3 來源 -->
+  <div class="panel" data-step="2">
+    <div class="q">
+      <h2>③ 資料來源</h2>
+      <p class="hint">勾選你要擷取的來源（可複選）。</p>
+      <div class="cards" id="sourceCards"></div>
+      <div id="outlookOpt" style="display:none">
+        <label class="field">Outlook 擷取範圍</label>
+        <select id="months">
+          <option value="1">近 1 個月</option>
+          <option value="3" selected>近 3 個月</option>
+          <option value="6">近 6 個月</option>
+          <option value="12">近 12 個月</option>
+          <option value="0">全部</option>
+        </select>
+      </div>
+      <div id="mspOpt" style="display:none">
+        <label class="field">MS Project 介接方式</label>
+        <select id="mspIface">
+          <option value="xml">另存 XML（推薦，免額外安裝）</option>
+          <option value="mpp">.mpp 直讀（需 mpxj + Java）</option>
+          <option value="com">COM 自動化（驅動 MS Project 程式擷取）</option>
+        </select>
+      </div>
+      <div id="plmOpt" style="display:none">
+        <label class="field">PLM 廠牌（自動帶欄位對應）</label>
+        <select id="plmVendor"></select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4 分類維度 -->
+  <div class="panel" data-step="3">
+    <div class="q">
+      <h2>④ 分類維度</h2>
+      <p class="hint">要啟用哪些分類軸。關鍵字已由產業預設帶入，可直接用。</p>
+      <div class="cards" id="dimCards"></div>
+    </div>
+  </div>
+
+  <!-- Step 5 產出 -->
+  <div class="panel" data-step="4">
+    <div class="q">
+      <h2>⑤ 完成 · 產出設定檔</h2>
+      <p class="hint">這是即時預覽。按「下載 config.json」存檔，放進 PMIS-Lite 資料夾即可執行。</p>
+      <p class="small">同義字探勘：<span class="ok">提議制，不自動合併</span>　·　完整性驗證：<span class="ok">不可遺漏 gate 內建</span></p>
+    </div>
+    <div class="preview" id="preview"></div>
+  </div>
+</div>
+
+<div class="navbar" id="navbar"></div>
+
+<script>
+const INDUSTRIES = {
+  "電源 / 電子製造": {
+    prefix:["PWR","PSU","EE","PRJ"], domain:["PWR","ELE","HW"],
+    product:{"電源供應器":["psu","電源","電供","power supply"],"變頻器":["inverter","變頻","vfd"],"散熱模組":["thermal","散熱","fan","風扇","heatsink"]},
+    topic:{"設計":["design","schematic","layout","設計","電路"],"驗證":["dvt","evt","pvt","test","驗證","測試"],"量產":["mp","量產","出貨","shipment"],"品質":["rma","8d","ncr","品質","客訴","不良"]},
+    terms:{"電源供應器":["PSU","電供"],"諧振轉換器":["LLC"],"工程驗證測試":["EVT"],"設計驗證測試":["DVT"],"量產驗證測試":["PVT"],"變頻器":["VFD"]}
+  },
+  "機構 / 機械": {
+    prefix:["MECH","ME","PRJ"], domain:["MEC","STR"],
+    product:{"外殼件":["housing","外殼","鈑金","case"],"結構件":["bracket","結構","支架"],"模具":["mold","模具","tooling"]},
+    topic:{"設計":["design","3d","圖面","設計"],"試模":["t0","t1","試模","trial"],"驗證":["dvt","驗證","fai"],"量產":["mp","量產"]},
+    terms:{"首件檢驗":["FAI"],"工程變更":["ECN","ECR"],"公差":["tol","tolerance"]}
+  },
+  "半導體": {
+    prefix:["SEMI","FAB","PRJ"], domain:["SEM","WAF"],
+    product:{"晶圓":["wafer","晶圓"],"封裝":["package","封裝","assembly"],"測試":["test","測試","ft","cp"]},
+    topic:{"設計":["design","tapeout","設計"],"流片":["tapeout","流片","mask"],"驗證":["qual","驗證","reliability"],"量產":["hvm","量產"]},
+    terms:{"流片":["tapeout"],"良率":["yield"],"晶圓允收測試":["WAT"],"晶圓針測":["CP"]}
+  },
+  "軟體 / 韌體": {
+    prefix:["SW","DEV","PRJ"], domain:["SW","FW"],
+    product:{"後端":["backend","api","server","後端"],"前端":["frontend","ui","前端"],"韌體":["firmware","韌體","fw"]},
+    topic:{"開發":["dev","feature","開發","實作"],"測試":["qa","test","測試","回歸"],"發版":["release","部署","上線","deploy"],"缺陷":["bug","issue","缺陷","修復"]},
+    terms:{"持續整合":["CI"],"持續部署":["CD"],"提取請求":["PR","MR"]}
+  },
+  "通用（不分產業）": {
+    prefix:["PRJ","GEN","OPS"], domain:["GEN","OPS"],
+    product:{"專案A":["projecta","案a"],"專案B":["projectb","案b"]},
+    topic:{"規劃":["plan","規劃"],"執行":["exec","執行","進行"],"收尾":["close","結案","收尾"],"風險":["risk","風險","議題"]},
+    terms:{"關鍵績效指標":["KPI"],"標準作業程序":["SOP"]}
+  }
+};
+
+const PLM_VENDORS = {
+  "PTC Windchill":{ "Object":"title","Description":"body","Owner":"actor","Lifecycle State":"status","Modified":"event_time","Product":"product" },
+  "Siemens Teamcenter":{ "Item Name":"title","Description":"body","Owner":"actor","Status":"status","Last Modified":"event_time","Program":"product" },
+  "Oracle Agile":{ "Title":"title","Description":"body","Originator":"actor","Lifecycle Phase":"status","Modified Date":"event_time","Product Line":"product" },
+  "SAP PLM":{ "Object Description":"title","Long Text":"body","Person Responsible":"actor","System Status":"status","Changed On":"event_time","Material Group":"product" },
+  "自訂 / 其他（之後在設定檔對應）":{}
+};
+
+const SOURCES = [
+  {id:"excel_csv", t:"Excel / CSV", d:"進度表、工作底稿", on:true},
+  {id:"outlook_desktop", t:"Outlook 桌面", d:"你已登入的信箱", on:false},
+  {id:"msproject", t:"MS Project", d:"專案排程任務", on:false},
+  {id:"plm", t:"PLM 匯出", d:"物件 / 變更單", on:false},
+];
+
+const DIMS = [
+  {id:"product", t:"產品線", d:"分產品列管", on:true},
+  {id:"topic", t:"主題類別", d:"設計/驗證/量產…", on:true},
+  {id:"status", t:"狀態", d:"待辦/進行/已結/逾期", on:true},
+];
+
+const STATUS = {"待辦":["todo","pending","待辦","未開始"],"進行中":["wip","in progress","進行","處理中"],"已結":["done","closed","完成","結案","已結"],"逾期":["overdue","delay","逾期","延遲"]};
+
+let step=0, state={
+  industry:Object.keys(INDUSTRIES)[0], role:"PM",
+  prefix:"", domain:"",
+  sources:new Set(["excel_csv"]), months:"3", mspIface:"xml", plmVendor:Object.keys(PLM_VENDORS)[0],
+  dims:new Set(["product","topic","status"])
+};
+const TOTAL=5;
+
+function el(id){return document.getElementById(id);}
+function fillSelect(s,arr,val){s.innerHTML="";arr.forEach(o=>{const op=document.createElement("option");op.value=o;op.textContent=o;if(o===val)op.selected=true;s.appendChild(op);});}
+
+function initIndustry(){
+  fillSelect(el("industry"),Object.keys(INDUSTRIES),state.industry);
+  fillSelect(el("plmVendor"),Object.keys(PLM_VENDORS),state.plmVendor);
+  syncIndustry();
+}
+function syncIndustry(){
+  const ind=INDUSTRIES[state.industry];
+  state.prefix=ind.prefix[0]; state.domain=ind.domain[0];
+  fillSelect(el("prefix"),ind.prefix,state.prefix);
+  fillSelect(el("domain"),ind.domain,state.domain);
+  updUid();
+}
+function updUid(){ el("uidExample").textContent=`${state.prefix}-${state.domain}-A1B2C3`; }
+
+function renderSourceCards(){
+  const c=el("sourceCards");c.innerHTML="";
+  SOURCES.forEach(s=>{
+    const on=state.sources.has(s.id);
+    const d=document.createElement("div");d.className="pick"+(on?" on":"");
+    d.innerHTML=`<div class="t"><span class="box">${on?"✓":""}</span>${s.t}</div><div class="d">${s.d}</div>`;
+    d.onclick=()=>{ on?state.sources.delete(s.id):state.sources.add(s.id); renderSourceCards(); toggleOpts(); };
+    c.appendChild(d);
+  });
+  toggleOpts();
+}
+function toggleOpts(){
+  el("outlookOpt").style.display=state.sources.has("outlook_desktop")?"block":"none";
+  el("mspOpt").style.display=state.sources.has("msproject")?"block":"none";
+  el("plmOpt").style.display=state.sources.has("plm")?"block":"none";
+}
+function renderDimCards(){
+  const c=el("dimCards");c.innerHTML="";
+  DIMS.forEach(s=>{
+    const on=state.dims.has(s.id);
+    const d=document.createElement("div");d.className="pick"+(on?" on":"");
+    d.innerHTML=`<div class="t"><span class="box">${on?"✓":""}</span>${s.t}</div><div class="d">${s.d}</div>`;
+    d.onclick=()=>{ on?state.dims.delete(s.id):state.dims.add(s.id); renderDimCards(); };
+    c.appendChild(d);
+  });
+}
+
+function buildConfig(){
+  const ind=INDUSTRIES[state.industry];
+  const cls={"_comment":"分類維度，資料驅動。命中關鍵字即歸類；可自由增減。"};
+  if(state.dims.has("product")) cls.product=ind.product;
+  if(state.dims.has("topic")) cls.topic=ind.topic;
+  if(state.dims.has("status")) cls.status=STATUS;
+
+  const sources=[];
+  if(state.sources.has("excel_csv")) sources.push({type:"excel_csv",path:"sample_data",enabled:true});
+  if(state.sources.has("msproject")){
+    if(state.mspIface==="xml") sources.push({type:"msproject",path:"sample_data/project_export.xml",enabled:true,_iface:"xml"});
+    else sources.push({type:"msproject",path:"sample_data",enabled:false,_iface:state.mspIface,_note:state.mspIface==="mpp"?"需 mpxj + Java":"需 pywin32 驅動 MS Project"});
+  }
+  if(state.sources.has("plm")){
+    const fm=PLM_VENDORS[state.plmVendor];
+    const src={type:"plm",path:"sample_data/plm_export.csv",enabled:true,_vendor:state.plmVendor};
+    if(Object.keys(fm).length) src.field_map=fm;
+    sources.push(src);
+  }
+  if(state.sources.has("outlook_desktop"))
+    sources.push({type:"outlook_desktop",enabled:false,months:Number(state.months),_note:"Windows 裝 pywin32 後設 true"});
+
+  return {
+    _AUP_REMINDER:"本工具僅讀取您自己有權限的資料，於本機處理、不外傳。使用前請確認符合貴公司 AUP 與個資規範。",
+    owner:"me", locale:"zh-TW",
+    _profile:{industry:state.industry, role:state.role},
+    numbering:{prefix:state.prefix, domain:state.domain, hash_len:6},
+    classification:cls,
+    terms:{seed:ind.terms},
+    mining:{min_frequency:2, min_confidence:0.55, auto_merge:false,
+            stopwords:["RD","PM","QA","QC","PE","ME","EE","HR","IT","BOM","ECN","ECR","PO"]},
+    sources:sources,
+    attachments:{dir:"sample_data/attachments", enabled:true},
+    output:{store_dir:"ssot_store", markdown:true, pptx_template:null}
+  };
+}
+
+function highlight(json){
+  return json
+    .replace(/("[^"]+")(\s*:)/g,'<span class="k">$1</span>$2')
+    .replace(/:\s*("[^"]*")/g,': <span class="s">$1</span>')
+    .replace(/:\s*(true|false|\d+)/g,': <span class="n">$1</span>');
+}
+function renderPreview(){ el("preview").innerHTML=highlight(JSON.stringify(buildConfig(),null,2)); }
+
+function renderPips(){
+  const names=["產業","編號","來源","分類","完成"];
+  el("pips").innerHTML=names.map((n,i)=>
+    `<div class="pip ${i===step?'active':(i<step?'done':'')}">${i+1} ${n}</div>`).join("");
+}
+function show(){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("show",+p.dataset.step===step));
+  renderPips(); renderNav();
+  if(step===4) renderPreview();
+}
+function renderNav(){
+  const n=el("navbar");
+  if(step===0){
+    n.innerHTML=`<button class="nav next" onclick="go(1)">下一步</button>`;
+  }else if(step<TOTAL-1){
+    n.innerHTML=`<button class="nav back" onclick="go(${step-1})">上一步</button>
+                 <button class="nav next" onclick="go(${step+1})">下一步</button>`;
+  }else{
+    n.innerHTML=`<button class="nav back" onclick="go(${step-1})">上一步</button>
+                 <button class="nav dl" onclick="download_()">下載 config.json</button>
+                 <button class="nav ghost" onclick="copy_()">複製</button>`;
+  }
+}
+function go(s){ step=Math.max(0,Math.min(TOTAL-1,s)); show(); window.scrollTo({top:0,behavior:"smooth"}); }
+
+function download_(){
+  const blob=new Blob([JSON.stringify(buildConfig(),null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="config.json";
+  document.body.appendChild(a);a.click();a.remove();
+}
+function copy_(){
+  const t=JSON.stringify(buildConfig(),null,2);
+  navigator.clipboard?.writeText(t).then(()=>flash("已複製")).catch(()=>fallbackCopy(t));
+}
+function fallbackCopy(t){const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");flash("已複製");}catch(e){}ta.remove();}
+function flash(m){const b=event.target;const o=b.textContent;b.textContent=m;setTimeout(()=>b.textContent=o,1200);}
+
+// events
+window.addEventListener("DOMContentLoaded",()=>{
+  initIndustry(); renderSourceCards(); renderDimCards(); show();
+  el("industry").onchange=e=>{state.industry=e.target.value;syncIndustry();};
+  el("role").onchange=e=>state.role=e.target.value;
+  el("prefix").onchange=e=>{state.prefix=e.target.value;updUid();};
+  el("domain").onchange=e=>{state.domain=e.target.value;updUid();};
+  el("months").onchange=e=>state.months=e.target.value;
+  el("mspIface").onchange=e=>state.mspIface=e.target.value;
+  el("plmVendor").onchange=e=>state.plmVendor=e.target.value;
+});
+window.go=go; window.download_=download_; window.copy_=copy_;
+</script>
+</body>
+</html>
