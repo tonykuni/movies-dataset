@@ -29,6 +29,7 @@ v1.3(2026-08-08 操作員實跑報告驅動之中英文優化):
 """
 
 import argparse
+import json
 import os
 import re
 import shutil
@@ -575,6 +576,30 @@ def main():
     ssot_dict = Path(args.db).parent / "domain_dict.txt"
     if load_domain_dict(str(ssot_dict)):
         print("[INFO] 已載入領域詞典(db 側或 engines\\domain_dict.txt)")
+
+    # 命名帳本(workops_namer 產):報表以「編號·名稱」顯示,編號本身不變
+    names = {}
+    for cand in ([Path(args.db).resolve().parents[2] / "workops_naming.json"]
+                 if len(Path(args.db).resolve().parents) > 2 else []) + \
+                [Path(__file__).resolve().parent.parent / "out" / "workops_naming.json"]:
+        if cand.exists():
+            try:
+                names = json.loads(cand.read_text(encoding="utf-8")).get("entries", {})
+                print("[INFO] 已載入命名帳本:%d 筆(via-workops names 管理)" % len(names))
+            except Exception as e:
+                print("[WARN] 命名帳本讀取失敗:%s" % e, file=sys.stderr)
+            break
+
+    def L(cs):
+        e = names.get(cs)
+        if not e:
+            return cs
+        if e.get("approved"):
+            return "%s·%s" % (cs, e["approved"])
+        return "%s·%s(待核對)" % (cs, e.get("proposed", "")) if e.get("proposed") else cs
+
+    def LR(rows):
+        return [(L(r[0]),) + tuple(r[1:]) for r in rows]
     progress(10, "分析層啟動:NLP 模組")
 
     # --- NLP ---
@@ -584,7 +609,7 @@ def main():
     else:
         sections.append(("NLP · 各案 TF-IDF 關鍵詞",
                          "每案信件合併為一份文件,關鍵詞代表該案討論核心;關鍵詞突變=案件重心轉移。",
-                         table(["案件", "關鍵詞"], [(c, ", ".join(k)) for c, k in kw]) if kw else "<p>樣本不足</p>"))
+                         table(["案件", "關鍵詞"], [(L(c), ", ".join(k)) for c, k in kw]) if kw else "<p>樣本不足</p>"))
     cl = nlp_cluster_unclassified(conn)
     if cl:
         sections.append(("NLP · 待歸類信件聚類(建議新規則)",
@@ -616,14 +641,14 @@ def main():
     wv = dm_weekly_volume(conn)
     sections.append(("資料挖掘 · 各案週信量",
                      "單案單週信量驟增通常代表出事;可與卡住狀態交叉驗證。",
-                     table(["案件", "週", "封數"], [(c, w, n) for (c, w), n in wv])))
+                     table(["案件", "週", "封數"], [(L(c), w, n) for (c, w), n in wv])))
     sections.append(("資料挖掘 · 未結行動 Pareto(對口集中度)",
                      "累積 % 快速到 80 = 卡點集中於少數對口,升級火力應對準這幾位。",
                      table(["對口", "未結行動", "累積%"], dm_pareto_blocked(conn))))
     co = dm_label_cooccurrence(conn)
     sections.append(("資料挖掘 · CASE × 管理領域 共現",
                      "哪個案子的風險/時程議題最集中,即為每日優先案。",
-                     table(["案件", "管理領域", "共現次數"], [(a, b, n) for (a, b), n in co])))
+                     table(["案件", "管理領域", "共現次數"], [(L(a), b, n) for (a, b), n in co])))
 
     progress(70, "流程探勘模組")
     # --- PM ---
@@ -634,10 +659,10 @@ def main():
     loops = pm_reminder_loops(traces)
     sections.append(("流程探勘 · 催辦迴圈與無交付懸案",
                      "Reminder≥2 或有要求無交付的案件;直接對應 48h 升級規則的觸發清單。",
-                     table(["案件", "催辦次數", "型態"], loops) if loops else "<p>無懸案。</p>"))
+                     table(["案件", "催辦次數", "型態"], LR(loops)) if loops else "<p>無懸案。</p>"))
     sections.append(("流程探勘 · 一致性檢查(vs 標準流程 Request→Commitment→Delivery)",
                      "NO_DELIVERY / EXTRA_LOOP 即為流程偏差,可作為上報 BU 的偏差清單。",
-                     table(["案件", "實際軌跡", "判定"], pm_conformance(traces))))
+                     table(["案件", "實際軌跡", "判定"], LR(pm_conformance(traces)))))
     sections.append(("流程探勘 · 軌跡變體",
                      "同一活動序列歸為一個變體;最大宗變體=實際主流程,長尾=例外處理。",
                      table(["活動序列", "案件數"], pm_variants(traces))))
@@ -645,11 +670,11 @@ def main():
     if durs:
         sections.append(("流程探勘 · 案件工期(首末事件間隔)",
                          f"分位數:P50={pct['P50']}hr / P90={pct['P90']}hr / MAX={pct['MAX']}hr;超過 P90 的案優先檢視。",
-                         table(["案件", "工期(hr)"], durs)))
+                         table(["案件", "工期(hr)"], LR(durs))))
     breach = pm_sla_breach(conn, traces)
     sections.append(("流程探勘 · SLA 違約(承諾日已過且無交付)",
                      "承諾日取自信件正規化期限;逾期天數即上報 BU 的量化依據。",
-                     table(["案件", "承諾日", "逾期天數", "事項"], breach) if breach else "<p>無違約。</p>"))
+                     table(["案件", "承諾日", "逾期天數", "事項"], LR(breach)) if breach else "<p>無違約。</p>"))
     dfg_img = pm_pm4py_discover(conn, outdir)
     if dfg_img == "process_dfg.png":
         sections.append(("流程探勘 · pm4py DFG 流程圖", "",

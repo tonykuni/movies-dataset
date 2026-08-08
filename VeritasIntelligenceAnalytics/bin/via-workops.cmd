@@ -24,7 +24,10 @@ if "%~1"=="" (
   call pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\%%WOPS_BOARD%%" -Silent
 ) else if /i "%~1"=="deep" (
   for /f "delims=" %%f in ('dir /b /o:n "%~dp0..\functional modules\WorkOps\engines\Invoke-VIA-WorkOps-Deep-v0*.ps1"') do set "WOPS_DEEP=%%f"
-  call pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\engines\%%WOPS_DEEP%%" %2 %3 %4
+  call pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\engines\%%WOPS_DEEP%%" %2 %3 %4 %5 %6 %7 %8 %9
+) else if /i "%~1"=="names" (
+  rem 命名核對:names propose(提議)| apply(核對表寫回)| add 名稱 關鍵字(自建歸類)| names(現況)
+  py "%~dp0..\functional modules\WorkOps\engines\workops_namer.py" %2 %3 %4 %5
 ) else if /i "%~1"=="bridge" (
   py "%~dp0..\functional modules\WorkOps\engines\workops_corpus_bridge.py" %2 %3 %4 %5 %6
 ) else if /i "%~1"=="engine" (

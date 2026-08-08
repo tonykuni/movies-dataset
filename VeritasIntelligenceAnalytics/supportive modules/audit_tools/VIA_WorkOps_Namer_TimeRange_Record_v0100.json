@@ -1,0 +1,27 @@
+{
+ "record_id": "VIA_WorkOps_Namer_TimeRange_Record_v0100",
+ "ts": "2026-08-08T14:40:00",
+ "operator_verdicts": [
+  "讀取可設定時間起迄",
+  "可讀取 control sheet(既有)",
+  "可讀取信件(既有)",
+  "可自建名稱歸類",
+  "自動編號的號碼不便",
+  "系統自動提議名稱給使用者核對"
+ ],
+ "adjudication": "編號(CASE/THR/WOP)為 PLM 管控鐵律不可變;「不便」以別名層解:系統自動提議人話名稱→使用者核對→全報表顯示「編號·名稱」。名稱帳本 side-car(out/workops_naming.json)只增不減:approved 永不被 propose 覆蓋,逐筆 history。",
+ "delivered": {
+  "namer_eng023": "workops_namer.py(ENG-023):propose(E01_MAIL 啟發式=最常見清理主旨,Re/Fw/回覆/轉寄前綴剝除,主旨全空退主寄件者)→ naming_review.csv(utf8BOM:編號/建議名稱/核對名稱(空=接受)/狀態)→ apply 寫回 → list 現況;add 名稱 關鍵字=自建歸類入帳本 custom_groups",
+  "analytics_display": "engine_analytics 載入命名帳本,七處案件表(關鍵詞/週信量/共現/催辦/一致性/工期/SLA)顯示「編號·名稱」;待核對者標(待核對);無帳本時原樣退化",
+  "deep_v0101": "版本前進:-StartDate/-EndDate 自由起迄(優先於 -Days 天窗;操作員裁決①);[5/5] 鏈尾自動 names propose — 每次深跑後核對表常新",
+  "launcher": "via-workops names 動詞(propose/apply/add/list);deep 傳參擴至 %9(容納起迄+NoOpen);CRLF 65/65 完整"
+ },
+ "qa_container": {
+  "roundtrip": "假引擎庫 3 案:propose(Re: 前綴剝除、空主旨退寄件者)→ 模擬使用者改名 CASE-0042 → apply 3 筆 → list ✔ 顯示;add 自建群組入帳本",
+  "append_only": "重跑 propose:『新/更新 0 · 已核對保留 3』;history=[PROPOSE, APPROVE] 逐筆留痕 — approved 永不被覆蓋 PASS",
+  "display": "L() 實測:CASE-0042·台新登入通知(自訂名);未知編號原樣退化 PASS",
+  "static": "AST x2 PASS;ps_lint Deep v0101 PASS(無寫死版號);測試殘留已清(out/ 不入版控)"
+ },
+ "usage": "via-workops deep -StartDate 2026-07-01 -EndDate 2026-08-08 → 起迄自訂;跑完開 out\\naming_review.csv 核對 → via-workops names apply → 下次報表即「編號·名稱」;自建歸類:via-workops names add 名稱 關鍵字",
+ "append_only": true
+}
