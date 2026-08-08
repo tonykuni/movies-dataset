@@ -1,0 +1,591 @@
+# -*- coding: utf-8 -*-
+"""
+engine_analytics.py  v1.2
+=========================
+超級引擎進階分析層:自然語言處理 × 資料挖掘 × 流程探勘
+讀取 email_super_engine.py 產出的 super_engine.db(唯讀),輸出 analytics_report.html。
+不修改引擎本體與資料庫(只增不減)。
+
+三大模組(缺套件自動跳過並提示):
+  [NLP]  jieba 中英混合斷詞 + TF-IDF 各案關鍵詞
+         scikit-learn KMeans 對「待歸類」信件聚類 → 建議新分類關鍵字(人工核准後增補規則)
+  [DM]   回覆延遲離群偵測(IQR)/ 各案週信量趨勢 / 未結行動 Pareto(80/20 對口集中度)
+         標籤共現分析(CASE × PMAREA 風險集中矩陣)
+  [PM]   DFG 流程發現(pm4py,無則內建 fallback)/ 轉移平均等待時間 /
+         催辦迴圈偵測 / 一致性檢查:實際軌跡 vs 標準流程 Request→Commitment→Delivery
+
+用法:
+  python engine_analytics.py --db ./engine_out/super_engine.db --outdir ./engine_out
+"""
+
+import argparse
+import re
+import sqlite3
+import sys
+from collections import Counter, defaultdict
+from datetime import datetime
+from pathlib import Path
+
+
+def progress(pct: int, label: str):
+    print(f"@@PROGRESS|{pct}|{label}", file=sys.stderr, flush=True)
+
+
+# ---- 可選套件偵測(優雅降級) ----
+TOOLS = {}
+try:
+    import jieba
+    jieba.setLogLevel(60)
+    TOOLS["jieba"] = True
+except ImportError:
+    TOOLS["jieba"] = False
+try:
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.cluster import KMeans
+    TOOLS["sklearn"] = True
+except ImportError:
+    TOOLS["sklearn"] = False
+try:
+    import pandas as pd
+    TOOLS["pandas"] = True
+except ImportError:
+    TOOLS["pandas"] = False
+try:
+    import pm4py
+    TOOLS["pm4py"] = True
+except ImportError:
+    TOOLS["pm4py"] = False
+
+STANDARD_FLOW = ["Request", "Commitment", "Delivery"]   # BU 標準交付流程(可改)
+STOPWORDS = set("""the a an and or of to in for on with is are was were be been this that
+please could would kindly regards thanks best dear hi hello from sent subject
+的 了 在 是 我 你 他 我們 你們 這 那 請 就 都 及 與 或 也 但 而 並 於""".split())
+
+
+def load_domain_dict(path="domain_dict.txt"):
+    """jieba 自訂領域詞典:一行一詞(可附詞頻),放料號/廠名/術語。存在即自動載入。"""
+    if not TOOLS["jieba"]:
+        return False
+    p = Path(path)
+    if p.exists():
+        jieba.load_userdict(str(p))
+        return True
+    # 內建最小領域詞
+    for w in ["信賴性", "量產放行", "轉廠", "斷點", "催辦", "green light", "DVT", "reliability"]:
+        jieba.add_word(w)
+    return False
+
+
+def textrank_keywords(text: str, top_n=8):
+    """jieba TextRank:圖排序關鍵詞,對長文與口語信件比 TF-IDF 穩。"""
+    if not TOOLS["jieba"]:
+        return []
+    try:
+        import jieba.analyse
+        return jieba.analyse.textrank(text, topK=top_n,
+                                      allowPOS=("n", "nz", "vn", "eng", "nr", "ns"))
+    except Exception:
+        return []
+
+
+def tokenize(text: str):
+    text = re.sub(r"[\w.+-]+@[\w.-]+", " ", text)
+    text = re.sub(r"https?://\S+", " ", text)
+    if TOOLS["jieba"]:
+        toks = jieba.lcut(text)
+    else:
+        toks = re.findall(r"[a-zA-Z]{2,}|[\u4e00-\u9fff]{2,}", text)
+    out = []
+    for t in toks:
+        t = t.strip().lower()
+        if len(t) < 2 or t in STOPWORDS or t.isdigit():
+            continue
+        if re.fullmatch(r"[\W_]+", t):
+            continue
+        out.append(t)
+    return out
+
+
+# ============================================================
+# [NLP] 模組
+# ============================================================
+def nlp_case_keywords(conn, top_n=8):
+    """各案 TF-IDF 關鍵詞(以案為文件)。"""
+    if not TOOLS["sklearn"]:
+        return None
+    rows = conn.execute(
+        "SELECT case_seq, subject || ' ' || body_clean FROM E01_MAIL").fetchall()
+    docs = defaultdict(list)
+    for cs, text in rows:
+        docs[cs].append(text or "")
+    cases = sorted(docs)
+    corpus = [" ".join(tokenize(" ".join(docs[c]))) for c in cases]
+    if len(corpus) < 2 or all(not c for c in corpus):
+        return []
+    vec = TfidfVectorizer(max_features=3000)
+    try:
+        X = vec.fit_transform(corpus)
+    except ValueError:
+        return []
+    terms = vec.get_feature_names_out()
+    out = []
+    for i, cs in enumerate(cases):
+        arr = X[i].toarray()[0]
+        idx = arr.argsort()[::-1][:top_n]
+        kws = [terms[j] for j in idx if arr[j] > 0]
+        out.append((cs, kws))
+    return out
+
+
+def nlp_cluster_unclassified(conn, max_k=5):
+    """對 CASE 維度未命中(待歸類)之信件聚類,產出建議關鍵字供人工增補規則。"""
+    if not TOOLS["sklearn"]:
+        return None
+    rows = conn.execute(
+        "SELECT m.mail_id, m.subject, m.body_clean FROM E01_MAIL m"
+        " WHERE m.mail_id NOT IN (SELECT mail_id FROM E03_LABEL WHERE dimension='CASE')"
+    ).fetchall()
+    if len(rows) < 3:
+        return []
+    texts = [" ".join(tokenize((s or "") + " " + (b or "")[:2000])) for _, s, b in rows]
+    vec = TfidfVectorizer(max_features=2000, analyzer="char_wb", ngram_range=(2, 4))
+    try:
+        X = vec.fit_transform(texts)
+    except ValueError:
+        return []
+    from sklearn.metrics import silhouette_score
+    best_k, best_score, best_km = 2, -1.0, None
+    for k in range(2, min(max_k, len(rows) - 1) + 1):
+        km_try = KMeans(n_clusters=k, n_init=10, random_state=42).fit(X)
+        if len(set(km_try.labels_)) < 2:
+            continue
+        try:
+            sc = silhouette_score(X, km_try.labels_)
+        except ValueError:
+            continue
+        if sc > best_score:
+            best_k, best_score, best_km = k, sc, km_try
+    km = best_km if best_km is not None else KMeans(n_clusters=2, n_init=10, random_state=42).fit(X)
+    k = best_k
+    terms = vec.get_feature_names_out()
+    clusters = []
+    for ci in range(k):
+        members = [rows[i][1] for i in range(len(rows)) if km.labels_[i] == ci]
+        center = km.cluster_centers_[ci]
+        top = [terms[j] for j in center.argsort()[::-1][:6]]
+        clusters.append({"cluster": ci, "size": len(members),
+                         "suggest_keywords": top, "sample_subjects": members[:3]})
+    return clusters
+
+
+def nlp_supervised_suggest(conn, min_train=8, confidence=0.5):
+    """監督式二階分類:以規則已標 CASE 的信為訓練集(LinearSVC),
+    對「待歸類」信件給高信心案件建議。僅建議、不寫庫,人工核准後入 rules_addendum。"""
+    if not TOOLS["sklearn"]:
+        return None
+    labeled = conn.execute(
+        "SELECT m.subject || ' ' || m.body_clean, l.label FROM E01_MAIL m"
+        " JOIN E03_LABEL l ON l.mail_id=m.mail_id AND l.dimension='CASE'").fetchall()
+    unlabeled = conn.execute(
+        "SELECT m.mail_id, m.subject, m.subject || ' ' || m.body_clean FROM E01_MAIL m"
+        " WHERE m.mail_id NOT IN (SELECT mail_id FROM E03_LABEL WHERE dimension='CASE')").fetchall()
+    if len(labeled) < min_train or len(set(l for _, l in labeled)) < 2 or not unlabeled:
+        return []
+    from sklearn.svm import LinearSVC
+    from sklearn.pipeline import make_pipeline
+    texts = [" ".join(tokenize(t)) for t, _ in labeled]
+    ys = [l for _, l in labeled]
+    clf = make_pipeline(
+        TfidfVectorizer(max_features=4000, analyzer="char_wb", ngram_range=(2, 4)),
+        LinearSVC())
+    try:
+        clf.fit(texts, ys)
+    except ValueError:
+        return []
+    out = []
+    ux = [" ".join(tokenize(t)) for _, _, t in unlabeled]
+    scores = clf.decision_function(ux)
+    preds = clf.predict(ux)
+    import numpy as np
+    for i, (mid, subj, _) in enumerate(unlabeled):
+        row = scores[i] if getattr(scores[i], "__len__", None) else [scores[i]]
+        margin = float(np.max(row))
+        if margin >= confidence:
+            out.append((mid, subj[:60], preds[i], round(margin, 2)))
+    return out
+
+
+def nlp_similar_threads(conn, threshold=0.45):
+    """相似 thread 偵測:主旨不同但內容高度相似(cosine),提示可能是同一件事拆線。"""
+    if not TOOLS["sklearn"]:
+        return None
+    rows = conn.execute(
+        "SELECT t.case_seq, t.norm_subject,"
+        " (SELECT group_concat(substr(body_clean,1,800),' ') FROM E01_MAIL m"
+        "  WHERE m.thread_key=t.thread_key) FROM E02_THREAD t").fetchall()
+    if len(rows) < 3:
+        return []
+    texts = [" ".join(tokenize(r[2] or "")) for r in rows]
+    vec = TfidfVectorizer(max_features=3000, analyzer="char_wb", ngram_range=(2, 4))
+    try:
+        X = vec.fit_transform(texts)
+    except ValueError:
+        return []
+    from sklearn.metrics.pairwise import cosine_similarity
+    S = cosine_similarity(X)
+    out = []
+    for i in range(len(rows)):
+        for j in range(i + 1, len(rows)):
+            if S[i, j] >= threshold:
+                out.append((rows[i][0], rows[j][0], round(float(S[i, j]), 2),
+                            rows[i][1][:40], rows[j][1][:40]))
+    return sorted(out, key=lambda x: -x[2])
+
+
+# ============================================================
+# [DM] 模組
+# ============================================================
+def dm_latency_outliers(conn):
+    """對口回覆延遲 IQR 離群:延遲顯著高於群體者,列為升級優先對象。"""
+    rows = conn.execute(
+        "SELECT sk_email, avg_latency_hr FROM V_LATEST_ASSESSMENT"
+        " WHERE avg_latency_hr IS NOT NULL").fetchall()
+    if len(rows) < 4:
+        return [(e, l, "樣本不足,僅列值") for e, l in rows]
+    vals = sorted(l for _, l in rows)
+    q1, q3 = vals[len(vals) // 4], vals[3 * len(vals) // 4]
+    fence = q3 + 1.5 * (q3 - q1)
+    return [(e, l, "OUTLIER-升級優先" if l > fence else "") for e, l in rows]
+
+
+def dm_weekly_volume(conn):
+    """各案每週信量(趨勢資料;信量驟增常代表案件出事)。"""
+    rows = conn.execute(
+        "SELECT case_seq, mail_date FROM E01_MAIL WHERE mail_date IS NOT NULL").fetchall()
+    weekly = Counter()
+    for cs, d in rows:
+        dt = datetime.fromisoformat(d)
+        weekly[(cs, dt.strftime("%G-W%V"))] += 1
+    return sorted(weekly.items())
+
+
+def dm_pareto_blocked(conn):
+    """未結行動依對口 Pareto:找出 20% 對口佔 80% 卡點。"""
+    rows = conn.execute(
+        "SELECT counterpart, COUNT(*) FROM V_OPEN_ACTIONS GROUP BY counterpart"
+        " ORDER BY COUNT(*) DESC").fetchall()
+    total = sum(n for _, n in rows) or 1
+    out, cum = [], 0
+    for cp, n in rows:
+        cum += n
+        out.append((cp, n, round(100 * cum / total, 1)))
+    return out
+
+
+def dm_label_cooccurrence(conn):
+    """CASE × PMAREA 共現矩陣:哪個案子的風險/時程議題最集中。"""
+    rows = conn.execute(
+        "SELECT a.label, b.label FROM E03_LABEL a JOIN E03_LABEL b"
+        " ON a.mail_id=b.mail_id AND a.dimension='CASE' AND b.dimension='PMAREA'"
+    ).fetchall()
+    m = Counter(rows)
+    return sorted(m.items(), key=lambda kv: -kv[1])
+
+
+# ============================================================
+# [PM] 模組
+# ============================================================
+def pm_build_traces(conn):
+    rows = conn.execute(
+        "SELECT case_seq, activity, ts, resource FROM E05_INTERACTION"
+        " WHERE ts IS NOT NULL ORDER BY case_seq, ts").fetchall()
+    traces = defaultdict(list)
+    for cs, act, ts, res in rows:
+        traces[cs].append((act, datetime.fromisoformat(ts), res))
+    return traces
+
+
+def pm_dfg_with_time(traces):
+    """DFG + 每個轉移的平均等待小時(瓶頸=等待最久的邊)。"""
+    edge_n, edge_t = Counter(), defaultdict(list)
+    for evs in traces.values():
+        for (a1, t1, _), (a2, t2, _) in zip(evs, evs[1:]):
+            edge_n[(a1, a2)] += 1
+            edge_t[(a1, a2)].append((t2 - t1).total_seconds() / 3600)
+    out = []
+    for (a, b), n in edge_n.most_common():
+        ts = edge_t[(a, b)]
+        out.append((a, b, n, round(sum(ts) / len(ts), 1)))
+    return out
+
+
+def pm_reminder_loops(traces):
+    """催辦迴圈:每案 Reminder 次數與 Request→無 Delivery 的懸案。"""
+    out = []
+    for cs, evs in traces.items():
+        acts = [a for a, _, _ in evs]
+        rem = acts.count("Reminder")
+        has_req = "Request" in acts or "Reminder" in acts
+        has_del = "Delivery" in acts
+        if rem >= 2 or (has_req and not has_del):
+            out.append((cs, rem, "無交付" if (has_req and not has_del) else "多次催辦"))
+    return sorted(out, key=lambda x: -x[1])
+
+
+def pm_conformance(traces):
+    """一致性檢查:實際軌跡 vs 標準流程 Request→Commitment→Delivery。
+    偏差分類:CONFORM / MISSING_COMMITMENT(跳過承諾直接催)/ NO_DELIVERY / EXTRA_LOOP。"""
+    results = []
+    for cs, evs in traces.items():
+        acts = [a for a, _, _ in evs]
+        core = [a for a in acts if a in STANDARD_FLOW]
+        dedup = list(dict.fromkeys(core))
+        if dedup == STANDARD_FLOW:
+            verdict = "CONFORM"
+        elif "Delivery" not in acts and ("Request" in acts or "Reminder" in acts):
+            verdict = "NO_DELIVERY"
+        elif "Commitment" not in acts and "Delivery" in acts:
+            verdict = "MISSING_COMMITMENT"
+        elif acts.count("Reminder") >= 2:
+            verdict = "EXTRA_LOOP"
+        else:
+            verdict = "PARTIAL"
+        results.append((cs, "→".join(acts), verdict))
+    return results
+
+
+def pm_variants(traces):
+    """軌跡變體統計:相同活動序列的案件歸為一個變體,主流程 vs 例外一目了然。"""
+    v = Counter()
+    for evs in traces.values():
+        v["→".join(a for a, _, _ in evs)] += 1
+    return v.most_common()
+
+
+def pm_case_durations(traces):
+    """案件工期(首事件到末事件,小時)與分位數。"""
+    durs = []
+    for cs, evs in traces.items():
+        if len(evs) >= 2:
+            durs.append((cs, round((evs[-1][1] - evs[0][1]).total_seconds() / 3600, 1)))
+    durs.sort(key=lambda x: -x[1])
+    if not durs:
+        return [], {}
+    vals = sorted(d for _, d in durs)
+    pct = {"P50": vals[len(vals) // 2], "P90": vals[min(len(vals) - 1, int(len(vals) * 0.9))],
+           "MAX": vals[-1]}
+    return durs, pct
+
+
+def pm_sla_breach(conn, traces):
+    """SLA 違約:E07 有正規化承諾日(due_date_iso)但該案在期限前無 Delivery 事件。"""
+    rows = conn.execute(
+        "SELECT a.case_code, m.case_seq, a.due_date_iso, a.description"
+        " FROM E07_ACTION a JOIN E01_MAIL m ON m.mail_id=a.mail_id"
+        " WHERE a.due_date_iso IS NOT NULL").fetchall()
+    today = datetime.now().date()
+    out = []
+    for case_code, case_seq, due_iso, desc in rows:
+        due = datetime.fromisoformat(due_iso).date()
+        delivered = any(a == "Delivery" and t.date() <= due
+                        for a, t, _ in traces.get(case_seq, []))
+        if not delivered and due < today:
+            out.append((case_code, due_iso, (today - due).days, desc[:60]))
+    return sorted(out, key=lambda x: -x[2])
+
+
+def pm_pm4py_discover(conn, outdir: Path):
+    """pm4py 正式流程發現:輸出 DFG 圖(需 graphviz;失敗僅記事不中斷)。"""
+    if not (TOOLS["pm4py"] and TOOLS["pandas"]):
+        return None
+    try:
+        df = pd.read_sql_query(
+            "SELECT case_seq AS \"case:concept:name\", activity AS \"concept:name\","
+            " ts AS \"time:timestamp\" FROM E05_INTERACTION WHERE ts IS NOT NULL", conn)
+        if df.empty:
+            return None
+        df["time:timestamp"] = pd.to_datetime(df["time:timestamp"])
+        log = pm4py.format_dataframe(df, case_id="case:concept:name",
+                                     activity_key="concept:name",
+                                     timestamp_key="time:timestamp")
+        dfg, start, end = pm4py.discover_dfg(log)
+        try:
+            pm4py.save_vis_dfg(dfg, start, end, str(outdir / "process_dfg.png"))
+            return "process_dfg.png"
+        except Exception as e:
+            print(f"[INFO] DFG 圖輸出略過(需 graphviz):{e}", file=sys.stderr)
+            return "dfg-computed-no-image"
+    except Exception as e:
+        print(f"[WARN] pm4py 分析失敗:{e}", file=sys.stderr)
+        return None
+
+
+# ============================================================
+# HTML 報告
+# ============================================================
+NEXT_STEP_MAP = {
+    "NO_DELIVERY": "書面催辦(CC 主管);2 個工作天無果,附影響評估上報",
+    "EXTRA_LOOP": "停止再催,直接升級:附催辦次數與延誤天數",
+    "MISSING_COMMITMENT": "要求對方補書面承諾日期,入矩陣列管",
+    "CONFORM": "維持追蹤,期限前 2 天主動提醒",
+    "PARTIAL": "確認缺口環節(承諾或交付),補齊後結案",
+}
+
+
+def export_next_steps(conn, traces, outdir: Path):
+    """依一致性判定產出「下一步」建議 CSV,欄位可直接貼 WorkMatrix。"""
+    import csv as _csv
+    rows = []
+    subj = dict(conn.execute("SELECT case_seq, norm_subject FROM E02_THREAD").fetchall())
+    for cs, trace, verdict in pm_conformance(traces):
+        rows.append((cs, subj.get(cs, "")[:50], verdict,
+                     NEXT_STEP_MAP.get(verdict, "維持追蹤")))
+    out = outdir / "workmatrix_next_steps.csv"
+    with open(out, "w", encoding="utf-8-sig", newline="") as f:
+        w = _csv.writer(f)
+        w.writerow(["案件", "主旨", "流程判定", "建議下一步(可貼 WorkMatrix)"])
+        w.writerows(rows)
+    return len(rows)
+
+
+def esc(s):
+    return str(s).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def table(headers, rows):
+    h = "<tr>" + "".join(f"<th>{esc(x)}</th>" for x in headers) + "</tr>"
+    b = "".join("<tr>" + "".join(f"<td>{esc(c)}</td>" for c in r) + "</tr>" for r in rows)
+    return f"<table>{h}{b}</table>"
+
+
+def write_report(outdir: Path, sections):
+    sb = ['<!DOCTYPE html><html><head><meta charset="utf-8"><title>進階分析報告</title>',
+          '<style>body{font-family:"Microsoft JhengHei",sans-serif;background:#f5f4f0;'
+          'color:#26313a;margin:32px;max-width:1100px}h1{font-size:20px}'
+          'h2{font-size:16px;margin-top:30px;border-left:4px solid #0e7c86;padding-left:10px}'
+          'table{border-collapse:collapse;background:#fff;margin-top:8px;width:100%}'
+          'td,th{border:1px solid #dbd9d3;padding:6px 10px;font-size:13px;text-align:left}'
+          'th{background:#2b3a42;color:#fff}p.note{color:#6b7a85;font-size:12px}</style></head><body>',
+          f'<h1>超級引擎進階分析報告 · {datetime.now():%Y-%m-%d %H:%M}</h1>',
+          '<p class="note">工具狀態:' + " / ".join(
+              f"{k}:{'可用' if v else '未安裝'}" for k, v in TOOLS.items()) + '</p>']
+    for title, note, content in sections:
+        sb.append(f"<h2>{esc(title)}</h2>")
+        if note:
+            sb.append(f'<p class="note">{esc(note)}</p>')
+        sb.append(content)
+    sb.append('<p class="note">所有統計為 M 級證據(信件樣本推算);正式上報請註明資料範圍。'
+              '聚類建議關鍵字須人工核准後才增補至分類規則(只增不減)。</p></body></html>')
+    (outdir / "analytics_report.html").write_text("".join(sb), encoding="utf-8")
+
+
+# ============================================================
+# main
+# ============================================================
+def main():
+    ap = argparse.ArgumentParser(description="超級引擎進階分析層")
+    ap.add_argument("--db", default="./engine_out/super_engine.db")
+    ap.add_argument("--outdir", default="./engine_out")
+    args = ap.parse_args()
+    outdir = Path(args.outdir)
+    outdir.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(f"file:{args.db}?mode=ro", uri=True)
+    sections = []
+    ssot_dict = Path(args.db).parent / "domain_dict.txt"
+    if load_domain_dict(str(ssot_dict) if ssot_dict.exists() else "domain_dict.txt"):
+        print("[INFO] 已載入領域詞典:" + (str(ssot_dict) if ssot_dict.exists()
+              else "domain_dict.txt"))
+    progress(10, "分析層啟動:NLP 模組")
+
+    # --- NLP ---
+    kw = nlp_case_keywords(conn)
+    if kw is None:
+        sections.append(("NLP · 各案關鍵詞", "需 pip install scikit-learn jieba", "<p>模組未啟用</p>"))
+    else:
+        sections.append(("NLP · 各案 TF-IDF 關鍵詞",
+                         "每案信件合併為一份文件,關鍵詞代表該案討論核心;關鍵詞突變=案件重心轉移。",
+                         table(["案件", "關鍵詞"], [(c, ", ".join(k)) for c, k in kw]) if kw else "<p>樣本不足</p>"))
+    cl = nlp_cluster_unclassified(conn)
+    if cl:
+        sections.append(("NLP · 待歸類信件聚類(建議新規則)",
+                         "KMeans 聚類未命中 CASE 的信件;建議關鍵字經人工核准後增補 CASE_RULES。",
+                         table(["群", "封數", "建議關鍵字", "樣本主旨"],
+                               [(c["cluster"], c["size"], ", ".join(c["suggest_keywords"]),
+                                 " | ".join(c["sample_subjects"])) for c in cl])))
+    elif cl is not None:
+        sections.append(("NLP · 待歸類信件聚類", "", "<p>待歸類信件少於 3 封,無需聚類。</p>"))
+
+    sug = nlp_supervised_suggest(conn)
+    if sug:
+        sections.append(("NLP · 監督式分類建議(高信心)",
+                         "以規則已標信件訓練 LinearSVC;僅供建議,人工核准後寫入 rules_addendum.json。",
+                         table(["mail_id", "主旨", "建議案件", "信心分數"], sug)))
+    elif sug is not None:
+        sections.append(("NLP · 監督式分類建議", "訓練樣本不足(<8 封已標信或類別<2),累積後自動啟用。", "<p>暫不啟用</p>"))
+    sim = nlp_similar_threads(conn)
+    if sim:
+        sections.append(("NLP · 相似 thread 偵測(疑似同案拆線)",
+                         "主旨不同但內容 cosine 相似度高,建議人工確認是否併案追蹤。",
+                         table(["Thread A", "Thread B", "相似度", "主旨A", "主旨B"], sim)))
+
+    progress(45, "資料挖掘模組")
+    # --- DM ---
+    sections.append(("資料挖掘 · 回覆延遲離群偵測(IQR)",
+                     "延遲顯著高於群體者列為升級優先對象;樣本少於 4 人僅列值。",
+                     table(["對口", "平均延遲(hr)", "判定"], dm_latency_outliers(conn)) or "<p>無資料</p>"))
+    wv = dm_weekly_volume(conn)
+    sections.append(("資料挖掘 · 各案週信量",
+                     "單案單週信量驟增通常代表出事;可與卡住狀態交叉驗證。",
+                     table(["案件", "週", "封數"], [(c, w, n) for (c, w), n in wv])))
+    sections.append(("資料挖掘 · 未結行動 Pareto(對口集中度)",
+                     "累積 % 快速到 80 = 卡點集中於少數對口,升級火力應對準這幾位。",
+                     table(["對口", "未結行動", "累積%"], dm_pareto_blocked(conn))))
+    co = dm_label_cooccurrence(conn)
+    sections.append(("資料挖掘 · CASE × 管理領域 共現",
+                     "哪個案子的風險/時程議題最集中,即為每日優先案。",
+                     table(["案件", "管理領域", "共現次數"], [(a, b, n) for (a, b), n in co])))
+
+    progress(70, "流程探勘模組")
+    # --- PM ---
+    traces = pm_build_traces(conn)
+    sections.append(("流程探勘 · DFG 轉移與平均等待",
+                     "等待小時最長的邊就是流程瓶頸;Request→Reminder 高頻=對方拖延的量化證據。",
+                     table(["From", "To", "次數", "平均等待(hr)"], pm_dfg_with_time(traces))))
+    loops = pm_reminder_loops(traces)
+    sections.append(("流程探勘 · 催辦迴圈與無交付懸案",
+                     "Reminder≥2 或有要求無交付的案件;直接對應 48h 升級規則的觸發清單。",
+                     table(["案件", "催辦次數", "型態"], loops) if loops else "<p>無懸案。</p>"))
+    sections.append(("流程探勘 · 一致性檢查(vs 標準流程 Request→Commitment→Delivery)",
+                     "NO_DELIVERY / EXTRA_LOOP 即為流程偏差,可作為上報 BU 的偏差清單。",
+                     table(["案件", "實際軌跡", "判定"], pm_conformance(traces))))
+    sections.append(("流程探勘 · 軌跡變體",
+                     "同一活動序列歸為一個變體;最大宗變體=實際主流程,長尾=例外處理。",
+                     table(["活動序列", "案件數"], pm_variants(traces))))
+    durs, pct = pm_case_durations(traces)
+    if durs:
+        sections.append(("流程探勘 · 案件工期(首末事件間隔)",
+                         f"分位數:P50={pct['P50']}hr / P90={pct['P90']}hr / MAX={pct['MAX']}hr;超過 P90 的案優先檢視。",
+                         table(["案件", "工期(hr)"], durs)))
+    breach = pm_sla_breach(conn, traces)
+    sections.append(("流程探勘 · SLA 違約(承諾日已過且無交付)",
+                     "承諾日取自信件正規化期限;逾期天數即上報 BU 的量化依據。",
+                     table(["案件", "承諾日", "逾期天數", "事項"], breach) if breach else "<p>無違約。</p>"))
+    dfg_img = pm_pm4py_discover(conn, outdir)
+    if dfg_img == "process_dfg.png":
+        sections.append(("流程探勘 · pm4py DFG 流程圖", "",
+                         '<img src="process_dfg.png" style="max-width:100%">'))
+
+    n_ns = export_next_steps(conn, traces, outdir)
+    progress(88, f"下一步建議 {n_ns} 筆 → workmatrix_next_steps.csv")
+    progress(92, "產出分析報告")
+    write_report(outdir, sections)
+    conn.close()
+    progress(100, "分析層完成")
+    print(f"完成:{outdir / 'analytics_report.html'}")
+    missing = [k for k, v in TOOLS.items() if not v]
+    if missing:
+        print("未安裝(可選):pip install " + " ".join(missing))
+
+
+if __name__ == "__main__":
+    main()
