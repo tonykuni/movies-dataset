@@ -134,7 +134,8 @@ def cmd_install(em, venv_dir, package, version, wheels_only):
 
 def main():
     ap = argparse.ArgumentParser(description="WorkOps × VIA_EnvManager 橋:讓中央環境治理管到 .venv_pm")
-    ap.add_argument("command", choices=["health", "plan", "install"])
+    ap.add_argument("command", nargs="?", default="health", choices=["health", "plan", "install"],
+                    help="預設 health(裸打 via-workops envmgr 即健檢)")
     ap.add_argument("package", nargs="?", default="")
     ap.add_argument("version", nargs="?", default="", help="版本尾綴,如 <3 或 ==2.7.23.3")
     ap.add_argument("--venv", default=str(HERE / ".venv_pm"), help="目標 venv(預設 engines/.venv_pm)")
