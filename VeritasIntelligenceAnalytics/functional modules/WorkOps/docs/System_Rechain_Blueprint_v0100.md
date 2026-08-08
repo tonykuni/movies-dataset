@@ -97,3 +97,21 @@
 ```
 
 紅線不變:絕不代寄 · Outlook 原件/分類零觸碰 · 編號永不變 · 基底零觸碰 · 只增不減。
+
+---
+
+## 五、補遺(2026-08-09 補不足令落地)
+
+**帳本互鏈完成**:namer v0101 於 propose 尾端自動做 THR↔CASE 對映(正規化主旨
+比對板側 mails.csv+id_ledger × 深鏈 E01;剝 Re/Fw/[THR-#] 標籤)→ side-car
+`out/thr_case_map.json`;THR 繼承所連 CASE 名稱入命名帳本(approved 永不覆蓋,
+LINK/REPROPOSE-LINK 入 history),核對表單表涵蓋兩套編號。原候補「THR↔CASE
+跨帳本對映」結案 — 不需 ConversationID 入語料(主旨錨足矣,誠實比對不硬連)。
+
+**關係網絡圖落地**:analytics 新增利害關係人網絡 SVG(同案共現=邊、信量=節點,
+圓形佈局純 stdlib)— 原候補「networkx 關係圖」以零依賴方式結案,networkx 免引入
+(去重原則);對口<3 或無共現誠實不出圖。
+
+**圈選勾選閉環**(同日 v0112):圈選件=必回選擇題範本+Outlook 原生投票鈕;
+控管表庫根後備路。候補清單餘:via-ocr 重段代跑、via_fetch_prices→via-pipe、
+rapidfuzz 併案、取消訂閱清單、多帳號聚合、hub 磁貼 — 候令。

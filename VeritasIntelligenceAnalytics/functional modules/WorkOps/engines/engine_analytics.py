@@ -351,6 +351,65 @@ def dm_pareto_blocked(conn):
     return out
 
 
+def dm_stakeholder_network_svg(conn, outdir: Path, max_nodes=12):
+    """利害關係人關係網絡圖(v1.3 補不足):同案共現=邊,信量=節點大小。
+    純 stdlib 圓形佈局 SVG(不引 networkx — 去重裁定);對口不足或無共現時誠實回 None。"""
+    import math
+    from itertools import combinations
+    rows = conn.execute(
+        "SELECT case_seq, sender FROM E01_MAIL WHERE sender IS NOT NULL AND sender<>''").fetchall()
+    case2s, vol = defaultdict(set), Counter()
+    for cs, s in rows:
+        s = (s or "").strip()[:24]
+        if not s:
+            continue
+        case2s[cs].add(s)
+        vol[s] += 1
+    pair = Counter()
+    for _cs, ss in case2s.items():
+        for a, b in combinations(sorted(ss), 2):
+            pair[(a, b)] += 1
+    if not pair:
+        return None
+    deg = Counter()
+    for (a, b), w in pair.items():
+        deg[a] += w
+        deg[b] += w
+    nodes = [n for n, _ in deg.most_common(max_nodes)]
+    if len(nodes) < 3:
+        return None
+    idx = {n: i for i, n in enumerate(nodes)}
+    W, H, R = 860, 560, 210
+    cx, cy = W / 2, H / 2 + 10
+    pos = {n: (cx + R * math.cos(2 * math.pi * i / len(nodes) - math.pi / 2),
+               cy + R * math.sin(2 * math.pi * i / len(nodes) - math.pi / 2))
+           for i, n in enumerate(nodes)}
+    def esc_(t):
+        return (t.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
+    parts = ['<svg xmlns="http://www.w3.org/2000/svg" width="%d" height="%d" '
+             'style="background:#f5f4f0;font-family:sans-serif">' % (W, H),
+             '<text x="%d" y="26" font-size="15" fill="#1e1d1a" text-anchor="middle">'
+             '利害關係人網絡(同案共現;線寬=共現案數,點大=信量)</text>' % (W // 2)]
+    mx = max(pair.values())
+    for (a, b), w in pair.most_common():
+        if a in idx and b in idx:
+            x1, y1 = pos[a]; x2, y2 = pos[b]
+            parts.append('<line x1="%.0f" y1="%.0f" x2="%.0f" y2="%.0f" stroke="#4c78a8" '
+                         'stroke-opacity="0.55" stroke-width="%.1f"/>' % (x1, y1, x2, y2, 1 + 5.0 * w / mx))
+    mv = max(vol[n] for n in nodes)
+    for n in nodes:
+        x, y = pos[n]
+        r = 7 + 11.0 * vol[n] / mv
+        parts.append('<circle cx="%.0f" cy="%.0f" r="%.1f" fill="#439a9a" stroke="#1e1d1a"/>' % (x, y, r))
+        anchor = "start" if x >= cx else "end"
+        dx = (r + 5) if x >= cx else -(r + 5)
+        parts.append('<text x="%.0f" y="%.0f" font-size="11" fill="#33403f" text-anchor="%s">%s(%d)</text>'
+                     % (x + dx, y + 4, anchor, esc_(n), vol[n]))
+    parts.append("</svg>")
+    (outdir / "stakeholder_network.svg").write_text("\n".join(parts), encoding="utf-8")
+    return "stakeholder_network.svg"
+
+
 def dm_label_cooccurrence(conn):
     """CASE × PMAREA 共現矩陣:哪個案子的風險/時程議題最集中。"""
     rows = conn.execute(
@@ -680,6 +739,11 @@ def main():
     sections.append(("資料挖掘 · CASE × 管理領域 共現",
                      "哪個案子的風險/時程議題最集中,即為每日優先案。",
                      table(["案件", "管理領域", "共現次數"], [(L(a), b, n) for (a, b), n in co])))
+    net_img = dm_stakeholder_network_svg(conn, outdir)
+    if net_img:
+        sections.append(("資料挖掘 · 利害關係人網絡(同案共現)",
+                         "誰跟誰常在同一案出現;粗線=強連結對,大點=高信量對口(人 × 流程全景)。",
+                         '<img src="stakeholder_network.svg" style="max-width:100%">'))
 
     progress(70, "流程探勘模組")
     # --- PM ---
