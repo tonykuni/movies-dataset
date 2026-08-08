@@ -76,7 +76,8 @@ your you our their via new now get all any per not fwd fwd: re: mail email
 fw re 轉寄 回覆 您好 謝謝 親愛 敬啟 透過 系統 星期 星期一 星期二 星期三 星期四
 星期五 星期六 星期日 上午 下午 晚上 早上 凌晨 今天 明天 昨天 本週 上週 下週
 如下 如附 附件 內容 相關 進行 使用 提供 可以 沒有 這個 那個 什麼 任何 已經
-以上 以下 目前 之後 之前 其中 一個 一起 立刻 立即""".split())
+以上 以下 目前 之後 之前 其中 一個 一起 立刻 立即 一下 這些 那些 就是 怎麼
+還沒 不用 只要 即將 把握 提醒您 快來 看吧 感謝 歡迎""".split())
 
 
 def load_domain_dict(path="domain_dict.txt"):
@@ -116,6 +117,8 @@ def textrank_keywords(text: str, top_n=8):
 def tokenize(text: str):
     text = re.sub(r"[\w.+-]+@[\w.-]+", " ", text)
     text = re.sub(r"https?://\S+", " ", text)
+    # 中文詞被 HTML 折行切斷(「永\n豐銀行」→ 殘片「豐銀行」)— 接合 CJK 間空白
+    text = re.sub(r"(?<=[一-鿿])\s+(?=[一-鿿])", "", text)
     if TOOLS["jieba"]:
         toks = jieba.lcut(text)
     else:
