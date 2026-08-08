@@ -1,0 +1,19 @@
+{
+ "record_id": "VIA_WorkOps_All_v0100_OneShot_Record_v0100",
+ "ts": "2026-08-08T12:20:00",
+ "operator_verdict": "one powershell to handle all above and the following processes.",
+ "context": "同輪深度鏈於操作員機首次含 DFG 全綠(dot 15.1.1 可攜版接上,無略過訊息);operator 隨即下 ONE POWERSHELL 總指揮令",
+ "delivered": {
+  "all_eng022": "Invoke-VIA-WorkOps-All-v0100.ps1(ENG-022):[0] 環境自癒 — venv 缺→最新 PmSetup(EnvManager 中央治理)、dot 缺→dotsetup install(官方可攜+sha256)、envmgr 健檢落檔;[1] 指揮板一支到底(-Silent 建板);[2] 深度鏈(-Days/-BodyChars 傳遞,-NoOpen);[3] 逐段 OK/FAIL/秒數表 + 產物在位清單 + 開指揮板與 analytics 報告(-NoOpen 全不開;-SkipDeep 可略深鏈)",
+  "resilience": "每段 try/catch 失敗續行(不卡斷);段前重置 LASTEXITCODE 防跨段污染;[誠實清單] 列未成段",
+  "dynamic": "PmSetup/CommandBoard/Deep 皆 Get-ChildItem 排序取最新(動態解析鐵律;lint 驗無寫死版號呼叫);boardHtml 推導與指揮板同式(WorkOps→functional modules→VIA 根)",
+  "launcher": "via-workops all 動詞(dir /b /o:n 取最新 All);用法首行入 cmd 標頭;CRLF 完整"
+ },
+ "qa": {
+  "ps_lint": "括號平衡/無 Read-Host/無 .Send(/無 bare exit/無寫死版號呼叫 — PASS",
+  "callee_params": "Deep 具 -NoOpen(實檔 16 行)、Board 具 -Silent(實檔 73 行)確認",
+  "container_limit": "pwsh/Outlook 不在容器 — 全鏈執行驗證待操作員 via-sync 後跑 via-workops all"
+ },
+ "rollback": "刪 All 檔即回,各分段動詞照常獨立可跑",
+ "append_only": true
+}

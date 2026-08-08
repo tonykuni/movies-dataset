@@ -1,6 +1,7 @@
 @echo off
 rem WorkOps × Mail Tracker 統合指揮板 v0104(一系統四頁:專案/追蹤哨/範疇關係人/VMT;負載對照;絕不代寄)
-rem 用法:via-workops                    → 一支到底:掃描+對帳+編號+指揮板+週報+通知+KPI
+rem 用法:via-workops all               → ONE POWERSHELL:環境自癒+指揮板+深度鏈 全一支([-Days n] [-SkipDeep] [-NoOpen])
+rem       via-workops                    → 一支到底:掃描+對帳+編號+指揮板+週報+通知+KPI
 rem       via-workops silent            → 靜默背景:同上但不開瀏覽器(配 WorkOps_Background.vbs)
 rem       via-workops drafts            → 自動佇列(≥3 天未回)一次建草稿
 rem       via-workops drafts THR-…,…    → 只為「圈選件」建草稿(板上複製之指令)
@@ -8,6 +9,9 @@ rem       via-workops report | ui | Scan|Reconcile|Draft|FollowUp|Templates|All
 if "%~1"=="" (
   for /f "delims=" %%f in ('dir /b /o:n "%~dp0..\functional modules\WorkOps\Invoke-VIA-WorkOps-CommandBoard-v0*.ps1"') do set "WOPS_BOARD=%%f"
   call pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\%%WOPS_BOARD%%"
+) else if /i "%~1"=="all" (
+  for /f "delims=" %%f in ('dir /b /o:n "%~dp0..\functional modules\WorkOps\Invoke-VIA-WorkOps-All-v0*.ps1"') do set "WOPS_ALL=%%f"
+  call pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\%%WOPS_ALL%%" %2 %3 %4 %5 %6
 ) else if /i "%~1"=="drafts" (
   if "%~2"=="" (
     powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\Invoke-VeritasMailOps.ps1" -Action FollowUp -RecipientsCsv "%~dp0..\functional modules\WorkOps\out\recipients_auto.csv"
