@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# WorkOps 命名核對引擎 v0101(ENG-023)— 編號不變,名稱作別名層(提議→核對→顯示)
+# WorkOps 命名核對引擎 v0102(ENG-023)— v0102:共用詞彙收斂 import workops_lexicon(SSOT 去重令)— 編號不變,名稱作別名層(提議→核對→顯示)
 #
 # v0101(操作員 2026/08/09 補不足令):propose 尾端自動做 THR↔CASE 跨帳本連結 —
 #   以正規化主旨(剝 Re/Fw/[THR-#] 標籤)比對板側 mails.csv+id_ledger 與深鏈 E01,
@@ -19,6 +19,8 @@ import argparse, csv, io, json, re, sqlite3, sys
 from datetime import datetime
 from pathlib import Path
 
+from workops_lexicon import PREFIX_RE, TAG_RE, norm_subj, clean_subject
+
 try:
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 except Exception:
@@ -30,17 +32,9 @@ LEDGER  = OUT / "workops_naming.json"
 REVIEW  = OUT / "naming_review.csv"
 DB_DEF  = OUT / "deep" / "engine_out" / "super_engine.db"
 
-PREFIX_RE = re.compile(r"^\s*((re|fw|fwd|回覆|轉寄|答復)\s*[::]\s*)+", re.IGNORECASE)
-TAG_RE = re.compile(r"\[(?:THR|WOP)-\d+\]")
 BOARD_MAILS = OUT / "mails.csv"
 ID_LEDGER = OUT / "workops_id_ledger.json"
 THR_MAP = OUT / "thr_case_map.json"
-
-
-def norm_subj(s):
-    s = PREFIX_RE.sub("", (s or "").strip())
-    s = TAG_RE.sub("", s)
-    return re.sub(r"\s+", "", s).lower()[:80]
 
 
 def link_thr_to_case(led, dbpath):
@@ -113,12 +107,6 @@ def load_ledger():
 def save_ledger(led):
     LEDGER.parent.mkdir(parents=True, exist_ok=True)
     LEDGER.write_text(json.dumps(led, ensure_ascii=False, indent=1), encoding="utf-8")
-
-
-def clean_subject(s):
-    s = PREFIX_RE.sub("", (s or "").strip())
-    s = re.sub(r"\s+", " ", s)
-    return s[:40]
 
 
 def propose_name(subjects, senders):

@@ -1,0 +1,26 @@
+{
+ "record_id": "VIA_WorkOps_SSOT_Lexicon_Record_v0100",
+ "ts": "2026-08-09T13:50:00",
+ "operator_verdict": "五附件(產業分類編號/台達電相關 SSOT/流程探勘指南)+ 令:SSOT/REGEX/同義字/LIST/DICT 共用彙整去重;郵件/URL 上方機構名可作關鍵字/SSOT 擷取源",
+ "intake_dedupe": {
+  "homed": "supportive modules/VIA_SSOT/:VIA_StockGrouping_v1.1.html(ae1e7d92,31 族群 149 檔含 yfinance/Bloomberg 碼)· VIA_Industry_CapexProcessEquipment_v0100.html(c7bd336e,六雄製程/設備/資本 40 VIA 碼)· VIA_PowerThermal_SAP_SuperBOM_v2.html(654f5484,SAP 對齊+供應商/客戶/基地)· reference_ProcessMining_IBM_Guide.docx(c5b04899,研究參考)",
+  "rejected_duplicate": "SuperBOM v1(15eba43a)= v2 減日期戳一行 — diff 實證,不重複入庫(hash 記錄)"
+ },
+ "delivered": {
+  "lexicon_module": "engines/workops_lexicon.py — Python 側真去重:CODE_RE/PREFIX_RE/TAG_RE/WOPID_RE/URL_RE + norm_subj/clean_subject/subj_code + bulk/org 載入器 + URL 網域萃取,唯一正本;identifier v0106 與 namer v0102 原各自複本刪除改 import — 同 regex 三處定義收斂為一",
+  "lexicon_registry": "supportive modules/VIA_SSOT/VIA_Shared_Lexicon_Registry_v0100.json — 14 項共用資產目錄冊:每項標定正本歸屬/消費者/裁定;跨語言複本(板 JS CODE_RE、板 PS SheetAlias)登記防漂移",
+  "org_lexicon": "engines/org_lexicon.json — 由三正本萃取:149 家公司(名/代號/市場/族群/LPG)+ 38 機構(供應商/客戶)+ 40 VIA 製程/設備碼;來源 sha 內載",
+  "s9_signal": "identifier v0106 S9 機構名訊號:主旨+寄件顯示名(scanrange FROM)含 org_lexicon 機構名 → 中票 2.0 進融合(不強判;至多兩票)",
+  "domains_verb": "wop domains 網域收割:寄件網域+內文 URL 網域+常見寄件顯示名(=郵件上方機構名)→ out/domain_candidates.csv 提議清單(件數排序;bulk/已對映排除);核對後貼 domain_map 即 L5 白名單直判",
+  "crawl_adjudication": "「點進網站擷取」裁定不爬站 — run-local 治理;FROM 顯示名+網域+URL 已達同一目的零網路行為;主動抓站候操作員明令"
+ },
+ "qa_container": {
+  "extraction": "org_lexicon 萃取斷言:149/38/40 全數;grouping D array regex 解析 + SuperBOM/CPE JSON 解析",
+  "s9": "fixtures:主旨含台達電 + FROM 含奇鋐 → 佇列雙候選在列 — PASS",
+  "domains": "fixtures:寄件網域 deltaww.com/內文 URL portal.avc.co/顯示名建議 台達電子投資人關係 全收割;gmail 未濾(非 bulk 誠實列出)— PASS",
+  "dedupe_regression": "identifier/namer/lexicon py_compile PASS;namer list 動詞實跑 OK(import 改造後行為不變);cmd CRLF+help 更新"
+ },
+ "red_lines_unchanged": "唯讀 · 不爬站 · 原件零觸碰 · 絕不代寄 · 編號永不變 · 只增不減(v1 重複檔不入庫=去重,非減既有)",
+ "operator_next": "via-sync 後:via-workops wop domains 看網域候選 → 貼 domain_map;via-workops all 照常 — S9 會把台股公司/供應鏈機構信自動聚成候選",
+ "append_only": true
+}

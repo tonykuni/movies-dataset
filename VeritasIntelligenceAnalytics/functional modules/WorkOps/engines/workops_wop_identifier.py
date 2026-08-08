@@ -1,5 +1,13 @@
 # -*- coding: utf-8 -*-
-r"""WorkOps WOP 識別歸戶引擎 v0105(ENG-028)— 規劃書 M1+M2:bottom-up 多訊號融合 → WOP 專案化+賦號
+r"""WorkOps WOP 識別歸戶引擎 v0106(ENG-028)— 規劃書 M1+M2:bottom-up 多訊號融合 → WOP 專案化+賦號
+
+v0106(操作員 SSOT 彙整去重令 2026/08/09):
+  共用詞彙收斂 — regex/正規化/清單載入一律 import workops_lexicon(去重正本);
+  S9 機構名訊號 — org_lexicon.json(族群 149 家+SuperBOM 38 機構,SSOT 附件萃取):
+  主旨或寄件顯示名含機構名 → 中票進融合(不強判);
+  domains 動詞 — 收割寄件網域+內文 URL 網域+常見寄件顯示名 → out/domain_candidates.csv
+  提議清單(操作員核對後貼入 domain_map=L5 白名單;爬站不做 — run-local 紅線,
+  郵件上方機構名+網域已足萃取)。
 
 v0105(操作員四維擷取對照令):L1 內文代號補全 — 主旨漏帶代號時掃 BODY_SNIPPET
   (scanrange 索引;唯讀既有匯出,零新增觸碰):內文代號屬「已知代號」(控管表/學習
@@ -61,6 +69,9 @@ from collections import Counter
 from datetime import datetime
 from pathlib import Path
 
+from workops_lexicon import (CODE_RE, PREFIX_RE, TAG_RE, WOPID_RE, norm_subj, subj_code,
+                             load_bulk_patterns, is_bulk, load_org_lexicon, extract_url_domains)
+
 try:
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 except Exception:
@@ -85,14 +96,10 @@ PCMAP_P  = HERE / "product_code_map.json"
 NOISE_P  = OUT / "wop_noise.csv"
 STATS_P  = OUT / "wop_route_stats.json"
 
-CODE_RE   = re.compile(r"\b[A-Z]{2,6}[-_ ]?\d{2,6}\b")
-PREFIX_RE = re.compile(r"^\s*((re|fw|fwd|回覆|轉寄|答復)\s*[::]\s*)+", re.IGNORECASE)
-TAG_RE    = re.compile(r"\[(?:THR|WOP)-\d+\]")
-
 DEFAULT_PARAMS = {
     "weights": {"s1_code": 3.0, "s2_sheet": 4.0, "s3_name": 2.0, "s3_approved": 4.5,
                 "s4_folder": 2.5, "s4_folder_strong": 4.0,
-                "s5_domain": 1.5, "s6_recipient": 1.0, "s7_case": 3.5, "learned": 5.0},
+                "s5_domain": 1.5, "s6_recipient": 1.0, "s7_case": 3.5, "s9_org": 2.0, "learned": 5.0},
     "auto_threshold": 4.0, "margin": 1.5, "ask_threshold": 1.0,
     "min_group_mails": 1, "domain_map": {}, "bulk_skip": True,
     "routing_priority": ["L0", "L2", "L1", "L3", "L5"],
@@ -109,7 +116,6 @@ DEFAULT_PARAMS = {
     },
 }
 
-WOPID_RE = re.compile(r"WOP-\d{4}")
 
 
 def sheet_normalize(rows, params):
@@ -148,19 +154,22 @@ def load_folder_map():
     runs = sorted([d for d in root.iterdir() if d.is_dir() and d.name.startswith("RUN_")])
     if not runs:
         return {}, {}
-    m, am, bm = {}, {}, {}
+    m, am, bm, fm = {}, {}, {}, {}
     for r in read_csv(runs[-1] / "01_mail_index.csv"):
         cid = (r.get("CONVERSATION_ID") or "").strip()
         fn = (r.get("FOLDER_NAME") or "").strip()
         an = (r.get("ATTACHMENT_NAMES") or "").strip()
         bs = (r.get("BODY_SNIPPET") or "").strip()
+        fr = (r.get("FROM") or "").strip()
         if cid and fn and cid not in m:
             m[cid] = fn
         if cid and an and cid not in am:
             am[cid] = an
         if cid and bs and cid not in bm:
             bm[cid] = bs[:600]
-    return m, am, bm
+        if cid and fr and cid not in fm:
+            fm[cid] = fr
+    return m, am, bm, fm
 
 
 def load_product_rules():
@@ -237,32 +246,6 @@ def read_csv(p):
             return list(csv.DictReader(f))
     except Exception:
         return []
-
-
-def load_bulk_patterns():
-    pats = []
-    if BULK_P.exists():
-        for ln in BULK_P.read_text(encoding="utf-8-sig", errors="replace").splitlines():
-            ln = ln.strip().lower()
-            if ln and not ln.startswith("#"):
-                pats.append(ln)
-    return pats
-
-
-def is_bulk(sender, pats):
-    s = (sender or "").lower()
-    return any(p in s for p in pats)
-
-
-def norm_subj(s):
-    s = PREFIX_RE.sub("", (s or "").strip())
-    s = TAG_RE.sub("", s)
-    return re.sub(r"\s+", "", s).lower()[:80]
-
-
-def subj_code(s):
-    m = CODE_RE.search((s or "").upper())
-    return m.group(0).replace("_", "-").replace(" ", "-") if m else ""
 
 
 def control_sheet_rows(params=None):
@@ -343,7 +326,7 @@ def ensure_wop_id(led, key):
 def gather(params):
     """每 THR 收集訊號票 → {thr: {"votes": {鍵: 分}, "why": {鍵: [訊號...]}, "subj", "sender"}}"""
     w = params["weights"]
-    bulk_pats = load_bulk_patterns() if params.get("bulk_skip", True) else []
+    bulk_pats = load_bulk_patterns(BULK_P) if params.get("bulk_skip", True) else []
     led = load_ledger()
     conv2thr = {k[4:]: v for k, v in led["map"].items() if k.startswith("THR|")}
 
@@ -383,7 +366,8 @@ def gather(params):
             c = thrmap.get(t)
             if c:
                 case2wopkey.setdefault(c, pj["key"])
-    folder_map, attach_map, body_map = load_folder_map()
+    folder_map, attach_map, body_map, from_map = load_folder_map()
+    org_names, _orgmeta = load_org_lexicon()
     known_codes = set(sheet_codes) | set(lrn_code)
     for _k in id2key.values():
         if _k.startswith("CODE:"):
@@ -478,6 +462,15 @@ def gather(params):
                 continue
             if rule_match(pr, subj, dom0, att0):
                 vote("PC:" + pr["code"], w.get("s4_folder", 2.5), "L7 附件指紋 " + pr["code"])
+        # ---- S9 機構名訊號(org_lexicon;主旨+寄件顯示名;中票不強判)----
+        s9text = subj + " " + from_map.get(conv, "")
+        n_hit = 0
+        for onm in org_names:
+            if onm in s9text:
+                vote("ORG:" + onm, w.get("s9_org", 2.0), "S9 機構名 " + onm)
+                n_hit += 1
+                if n_hit >= 2:
+                    break
         # ---- 確定性路由(命中即終止;序列 routing_priority)----
         route = None
         for layer in route_order:
@@ -537,7 +530,7 @@ def wop_label(key, sheet_codes, naming):
     if key.startswith("CODE:"):
         c = key[5:]
         return sheet_codes.get(c) or c
-    if key.startswith(("NAME:", "DOM:", "PC:")):
+    if key.startswith(("NAME:", "DOM:", "PC:", "ORG:")):
         return key[key.index(":") + 1:]
     return key
 
@@ -771,6 +764,53 @@ def cmd_list():
     return 0
 
 
+def cmd_domains():
+    """v0106:網域收割 — 寄件網域+內文 URL 網域+常見寄件顯示名 → 提議清單(不爬站)。"""
+    params = load_params()
+    mails = read_csv(MAILS_P)
+    if not mails:
+        print("[FAIL] out\\mails.csv 不在位 — 先跑 via-workops(板掃描)")
+        return 1
+    _fm_folder, _fm_att, body_map, from_map = load_folder_map()
+    bulk_pats = load_bulk_patterns(BULK_P)
+    dom_map = {k.lower() for k in params.get("domain_map", {})}
+    agg = {}
+    for r in mails:
+        sender = (r.get("SenderEmail") or "").strip()
+        conv = (r.get("ConversationID") or "").strip()
+        subj = (r.get("Subject") or "").strip()
+        doms = []
+        if "@" in sender and not is_bulk(sender, bulk_pats):
+            doms.append(sender.split("@")[-1].lower())
+        doms += extract_url_domains(body_map.get(conv, ""))
+        disp = from_map.get(conv, "")
+        for d in doms:
+            if not d or d in dom_map:
+                continue
+            a = agg.setdefault(d, {"n": 0, "names": Counter(), "subj": subj})
+            a["n"] += 1
+            if disp:
+                a["names"][disp] += 1
+    if not agg:
+        print("[空] 無新網域候選(全數已在 domain_map 或無語料)")
+        return 0
+    OUT.mkdir(parents=True, exist_ok=True)
+    outp = OUT / "domain_candidates.csv"
+    rows = sorted(agg.items(), key=lambda kv: -kv[1]["n"])
+    with io.open(outp, "w", encoding="utf-8-sig", newline="") as f:
+        wcsv = csv.writer(f)
+        wcsv.writerow(["網域", "件數", "常見寄件名稱(建議單位名)", "例主旨"])
+        for d, a in rows:
+            top = a["names"].most_common(1)
+            wcsv.writerow([d, a["n"], top[0][0] if top else "", a["subj"][:60]])
+    print("[收割] 新網域候選 %d 個 → %s" % (len(rows), outp))
+    for d, a in rows[:10]:
+        top = a["names"].most_common(1)
+        print("   %-30s %3d 件  %s" % (d, a["n"], top[0][0] if top else ""))
+    print("[下一步] 核對後把「網域: 單位名」貼入 engines\\identifier_params.json 的 domain_map — 即成 L5 白名單直判")
+    return 0
+
+
 def cmd_status():
     reg = load_registry()
     n = len(reg["projects"])
@@ -787,7 +827,7 @@ def cmd_status():
 def main():
     ap = argparse.ArgumentParser(description="WOP 識別歸戶:多訊號融合→AUTO/ASK/QUARANTINE→賦號(編號永不變)")
     ap.add_argument("command", nargs="?", default="propose",
-                    choices=["propose", "apply", "list", "status"])
+                    choices=["propose", "apply", "list", "status", "domains"])
     ap.add_argument("arg1", nargs="?", default="")
     a = ap.parse_args()
     if a.command == "propose":
@@ -796,6 +836,8 @@ def main():
         return cmd_apply(a.arg1)
     if a.command == "list":
         return cmd_list()
+    if a.command == "domains":
+        return cmd_domains()
     return cmd_status()
 
 

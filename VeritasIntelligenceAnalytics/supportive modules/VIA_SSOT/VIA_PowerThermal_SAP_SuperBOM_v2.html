@@ -1,0 +1,160 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · 電源/散熱龍頭 × SAP 全模組對齊 Super BOM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--paper2:#fafaf8;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--blue:#4c78a8;--teal:#439a9a;--up:#c96b5a;--down:#5a9e6f;--am:#c4943a;--vi:#7a6daa;
+ --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%);}
+*{box-sizing:border-box;margin:0;padding:0}html,body{background:var(--bg)}
+body{color:var(--ink2);font-family:'DM Sans','Noto Sans TC',system-ui,sans-serif;font-size:11px;line-height:1.5}
+.wrap{max-width:1300px;margin:0 auto;padding:0 22px 60px}
+.bar{position:fixed;top:0;left:0;right:0;height:4px;background:var(--reson);opacity:.92;z-index:50}
+header{padding:20px 0 9px;margin-bottom:10px;border-bottom:2px solid var(--ink)}
+.kicker{font:700 10px 'DM Mono',monospace;letter-spacing:2.2px;color:var(--mut);text-transform:uppercase;margin-bottom:7px}
+h1{font:800 18px/1.2 'Syne',sans-serif;color:var(--ink)}h1 span{color:var(--up)}
+.sub{margin-top:6px;font:400 10.5px/1.55 'DM Sans','Noto Sans TC',sans-serif;color:var(--mut);max-width:1030px}.sub b{color:var(--ink2)}
+.gov{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#1e1d1a;border-radius:3px;padding:7px 14px;margin:12px 0}
+.gov .lk{font:700 8.5px 'DM Mono',monospace;letter-spacing:.8px;color:#7fd0a0;text-transform:uppercase}
+.gov .pill{font:600 7.5px 'DM Mono',monospace;color:#cfcabf}.gov .ver{margin-left:auto;font:700 8px 'DM Mono',monospace;color:#1e1d1a;background:#c4943a;border-radius:3px;padding:2px 8px}
+.note{background:#fff;border:1px solid var(--line);border-left:3px solid var(--am);border-radius:3px;padding:8px 14px;margin-bottom:14px;font:500 9px/1.6 'DM Mono',monospace;color:var(--mut)}.note b{color:var(--ink2)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tab{font:700 11px 'DM Sans','Noto Sans TC',sans-serif;cursor:pointer;border:1px solid var(--line);background:var(--paper);color:var(--mut);border-radius:3px;padding:7px 13px}
+.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.sec{display:none}.sec.on{display:block}
+h2{font:800 13px 'Syne',sans-serif;color:var(--ink);margin:18px 0 4px;padding-bottom:5px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:8px}
+h2 .en{font:600 8px 'DM Mono',monospace;color:var(--mut2);letter-spacing:1px;text-transform:uppercase}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:0;overflow:hidden;margin-top:12px}
+.hd2{font:800 11px 'Syne',sans-serif;padding:10px 14px;border-bottom:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font:500 10px 'DM Mono',monospace}
+th{font:700 8px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.5px;color:var(--mut);text-align:left;padding:7px 8px;border-bottom:2px solid var(--ink);background:var(--paper2)}
+td{padding:5px 8px;border-bottom:1px solid var(--soft);vertical-align:top}tr:hover td{background:var(--paper2)}
+.tc{font:700 8px 'DM Mono',monospace;color:#fff;background:var(--blue);border-radius:3px;padding:1px 5px;display:inline-block;margin:1px}
+.fld{font:600 8px 'DM Mono',monospace;color:var(--vi)}
+.canon{font:600 8px 'DM Mono',monospace;color:var(--teal)}
+.selco{display:flex;gap:6px;flex-wrap:wrap;padding:10px 14px}
+.cobtn{font:700 10px 'Noto Sans TC',sans-serif;cursor:pointer;border:1px solid var(--line);background:var(--paper2);color:var(--mut);border-radius:3px;padding:6px 12px}
+.cobtn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.pw{border-left:3px solid var(--blue)}.th{border-left:3px solid var(--up)}
+.chips{display:flex;gap:5px;flex-wrap:wrap;padding:0 14px 10px}
+.chip{font:600 9px 'DM Mono',monospace;background:var(--soft);border-radius:3px;padding:2px 8px;color:var(--ink2)}
+.chip.cust{background:#eef3f7;color:var(--blue)}.chip.base{background:#eef5ef;color:var(--down)}
+.mtype{font:700 7px 'DM Mono',monospace;color:#fff;border-radius:3px;padding:1px 5px}.FERT{background:#c96b5a}.HALB{background:#c4943a}
+.basegrid{display:flex;gap:6px;flex-wrap:wrap;padding:12px 14px}
+.basecard{border:1px solid var(--line);border-radius:5px;padding:8px 12px;min-width:88px;text-align:center}
+.basecard .n{font:800 11px 'Noto Sans TC',sans-serif;color:var(--ink)}.basecard .c{font:600 8px 'DM Mono',monospace;color:var(--mut);margin-top:2px}
+.pdf{position:fixed;top:12px;right:14px;z-index:999;background:var(--ink);color:#fff;border:none;border-radius:5px;padding:7px 13px;font:700 9px 'DM Mono',monospace;cursor:pointer}
+@media print{@page{size:A4 landscape;margin:9mm}.pdf,.tabs{display:none!important}.sec{display:block!important}}
+</style></head><body>
+<div class="bar"></div><button class="pdf" onclick="window.print()">⤓ PDF</button>
+<div class="wrap">
+<header>
+ <div class="kicker">VERITAS INTELLIGENCE · POWER/THERMAL LEADERS × SAP MM/PP/SD/SCM/CO/BOM/PLM ALIGNMENT</div>
+ <h1>電源/散熱龍頭 <span>×</span> SAP 全模組對齊 Super BOM</h1>
+ <p class="sub">以台達電/康舒/奇鋐/雙鴻/健策為例:產品分類、全球供應商、全球客戶、生產基地——<b>先列舉後對齊</b>到 SAP(MM/PP/SD/SCM/CO/BOM/PLM)既有代碼與術語 + SSOT canonical。<b>100% 尊重 SAP 既有用語,只對齊不改</b>。紅=散熱 藍=電源。非投資建議。</p>
+</header>
+<div class="gov"><span class="lk" style="background:#3d5a48;color:#d9ece0;">資料基準 2026.06 · 更新 2026.07.05</span><span class="lk">🔒 SAP-ALIGNED · APPEND-ONLY</span><span class="pill">MM/PP/SD/SCM/CO</span><span class="pill">BOM/PLM</span>
+ <span class="pill">respect existing</span><span class="ver">SAP ALIGN v1</span></div>
+<div class="note">📐 分頁:① SAP 全模組對齊 ② 五家產品分類 ③ 全球供應商(列舉→對齊 MM)④ 全球客戶(列舉→對齊 SD)⑤ 生產基地。客戶/供應商/基地為<b>公開資訊整理</b>,實際 BOM/成本仍本地主權。</div>
+<div class="tabs" id="tabs"></div>
+
+<div class="sec on" id="sec-sap">
+ <h2>SAP 全模組 → SSOT 對齊 <span class="en">Respect SAP · align only</span></h2>
+ <div class="card"><table><thead><tr><th>模組</th><th>名稱</th><th>關鍵 T-Codes</th><th>關鍵欄位</th><th>SSOT Canonical</th></tr></thead><tbody id="sap"></tbody></table></div>
+</div>
+
+<div class="sec" id="sec-co">
+ <h2>五家產品分類 <span class="en">Product × SAP Material Type × SSOT</span></h2>
+ <div class="card"><div class="selco" id="selco"></div>
+  <div id="coHead" class="hd2" style="border-top:1px solid var(--line)"></div>
+  <table><thead><tr><th>產品族</th><th>SAP 物料類型</th><th>SSOT</th><th>備註</th></tr></thead><tbody id="coProd"></tbody></table>
+  <div class="chips" id="coCust"></div><div class="chips" id="coBase"></div></div>
+</div>
+
+<div class="sec" id="sec-sup">
+ <h2>全球供應商(上游)· 列舉 → 對齊 SAP MM <span class="en">Suppliers → LIFNR/AML</span></h2>
+ <div class="card"><table><thead><tr><th>類別</th><th>代表供應商(列舉)</th><th>SAP 對齊</th><th>SSOT</th></tr></thead><tbody id="sup"></tbody></table></div>
+</div>
+
+<div class="sec" id="sec-cust">
+ <h2>全球客戶(下游)· 列舉 → 對齊 SAP SD <span class="en">Customers → KUNNR</span></h2>
+ <div class="card"><table><thead><tr><th>類別</th><th>代表客戶(列舉)</th><th>SAP 對齊</th><th>SSOT</th></tr></thead><tbody id="cust"></tbody></table></div>
+</div>
+
+<div class="sec" id="sec-base">
+ <h2>龍頭生產基地分布 <span class="en">Production Bases → SAP WERKS Plant</span></h2>
+ <div class="card"><div class="hd2">各基地進駐家數(對齊 SAP · WERKS 工廠碼)</div><div class="basegrid" id="baseGrid"></div></div>
+</div>
+</div>
+<script>
+const D={"modules": {"BOM": {"name": "Bill of Materials 物料清單", "tcodes": {"CS01": "Create BOM", "CS02": "Change BOM", "CS03": "Display BOM", "CS11": "Single-level explode", "CS12": "Multi-level explode", "CS13": "BOM with history", "CS14": "BOM compare", "CS15": "Where-used"}, "fields": {"STLNR": "BOM 編號", "STLAL": "替代 BOM", "POSNR": "BOM 項目", "MENGE": "用量"}, "canon": "SSOT-BOM"}, "PLM": {"name": "Product Lifecycle Mgmt 產品生命週期", "tcodes": {"CC01": "Create ECM(工程變更)", "CC02": "Change ECM", "CC03": "Display ECM", "CV01N": "Create Document(DMS)", "CV02N": "Change Document", "C223": "Production Version"}, "fields": {"AENR": "工程變更號 Change Number", "DOKNR": "文件號", "REVLV": "版次 Revision"}, "canon": "SSOT-CHANGE"}, "MM": {"name": "Materials Management 物料管理", "tcodes": {"MM01": "Create Material", "MM02": "Change Material", "MM03": "Display Material", "ME51N": "Create PR(採購申請)", "ME21N": "Create PO(採購單)", "MIGO": "Goods Movement 收貨", "MMBE": "Stock Overview 庫存總覽", "MB51": "Material Doc List"}, "fields": {"MATNR": "料號 Material", "LIFNR": "供應商 Vendor", "EBELN": "採購單號 PO", "BANFN": "採購申請號 PR", "WERKS": "工廠 Plant", "MEINS": "計量單位"}, "canon": "SSOT-PROCUREMENT"}, "PP": {"name": "Production Planning 生產規劃", "tcodes": {"CO01": "Create Production Order", "CO02": "Change Order", "MD01": "MRP Run(整廠)", "MD01N": "MRP Live", "MD04": "Stock/Requirements List", "CR01": "Create Work Center", "CA01": "Create Routing", "C223": "Production Version(BOM+Routing)"}, "fields": {"AUFNR": "生產工單號 Order", "PLNNR": "途程 Routing", "ARBPL": "工作中心 Work Center", "VERID": "生產版本 Production Version"}, "canon": "SSOT-SCHEDULE"}, "SD": {"name": "Sales & Distribution 銷售配銷", "tcodes": {"VA01": "Create Sales Order", "VA02": "Change Sales Order", "VL01N": "Create Delivery(交貨)", "VF01": "Create Billing(開票)", "VA05": "List Sales Orders", "CO09": "ATP 可用量檢查"}, "fields": {"VBELN": "銷售單號 Sales Doc", "KUNNR": "客戶 Customer", "MATNR": "料號", "KWMENG": "訂單數量", "ATP": "Available-to-Promise"}, "canon": "SSOT-STAKEHOLDER"}, "SCM": {"name": "Supply Chain Mgmt 供應鏈(APO/IBP)", "tcodes": {"/SAPAPO/SNP": "Supply Network Planning", "/SAPAPO/PPDS": "Production Planning/Detailed Sched", "/SAPAPO/DP": "Demand Planning", "IBP": "Integrated Business Planning"}, "fields": {"Location": "配銷據點", "Demand": "需求預測", "Safety_Stock": "安全庫存", "Lead_Time": "前置期"}, "canon": "SSOT-INTEGRATION"}, "CO": {"name": "Controlling 管理會計", "tcodes": {"KP06": "Cost Center Planning", "KSB1": "Cost Center Line Items", "KO88": "Order Settlement", "KE30": "CO-PA Report(獲利分析)", "KEU5": "Assessment"}, "fields": {"KOSTL": "成本中心 Cost Center", "KSTAR": "成本要素 Cost Element", "AUFNR": "訂單(成本歸集)", "PRCTR": "利潤中心 Profit Center"}, "canon": "SSOT-COST"}}, "align": [{"module": "BOM", "name": "Bill of Materials 物料清單", "canon": "SSOT-BOM", "n_tcodes": 8, "key_fields": ["STLNR", "STLAL", "POSNR", "MENGE"]}, {"module": "PLM", "name": "Product Lifecycle Mgmt 產品生命週期", "canon": "SSOT-CHANGE", "n_tcodes": 6, "key_fields": ["AENR", "DOKNR", "REVLV"]}, {"module": "MM", "name": "Materials Management 物料管理", "canon": "SSOT-PROCUREMENT", "n_tcodes": 8, "key_fields": ["MATNR", "LIFNR", "EBELN", "BANFN", "WERKS", "MEINS"]}, {"module": "PP", "name": "Production Planning 生產規劃", "canon": "SSOT-SCHEDULE", "n_tcodes": 8, "key_fields": ["AUFNR", "PLNNR", "ARBPL", "VERID"]}, {"module": "SD", "name": "Sales & Distribution 銷售配銷", "canon": "SSOT-STAKEHOLDER", "n_tcodes": 6, "key_fields": ["VBELN", "KUNNR", "MATNR", "KWMENG", "ATP"]}, {"module": "SCM", "name": "Supply Chain Mgmt 供應鏈(APO/IBP)", "canon": "SSOT-INTEGRATION", "n_tcodes": 4, "key_fields": ["Location", "Demand", "Safety_Stock", "Lead_Time"]}, {"module": "CO", "name": "Controlling 管理會計", "canon": "SSOT-COST", "n_tcodes": 5, "key_fields": ["KOSTL", "KSTAR", "AUFNR", "PRCTR"]}], "companies": [{"name": "台達電", "ticker": "2308", "group": "電源 Power", "role": "全球電源供應器龍頭 · 電力與散熱", "products": [{"family": "AI 伺服器電源", "sap_mtype": "FERT 成品", "ssot": "SSOT-BOM", "note": "NVIDIA AI 電源市佔~65%"}, {"family": "資料中心配電/散熱", "sap_mtype": "FERT", "ssot": "SSOT-BOM"}, {"family": "電動車動力電源(EV)", "sap_mtype": "FERT", "ssot": "SSOT-BOM", "note": "全球前十車廠 Tier 1"}, {"family": "儲能/綠能系統", "sap_mtype": "FERT", "ssot": "SSOT-BOM"}, {"family": "通訊/低軌衛星電源", "sap_mtype": "FERT", "ssot": "SSOT-BOM", "note": "泰達電 DET · 通訊電源市佔第一"}], "customers": ["NVIDIA", "全球前十大車廠(Tier1)", "全球電信商", "(美系)低軌衛星服務商", "CSP 雲端業者"], "bases": ["台灣", "中國", "泰國(泰達電 DET)", "印度", "美國", "德國"]}, {"name": "康舒", "ticker": "6282", "group": "電源 Power", "role": "電源供應器(AI 伺服器電源供應鏈)", "products": [{"family": "伺服器/工業電源", "sap_mtype": "FERT", "ssot": "SSOT-BOM"}, {"family": "電源模組 PSU", "sap_mtype": "FERT", "ssot": "SSOT-BOM"}, {"family": "不斷電系統 UPS", "sap_mtype": "FERT", "ssot": "SSOT-BOM"}], "customers": ["伺服器 ODM/OEM", "工業設備商", "(公開資訊有限,以公開產品線分類)"], "bases": ["台灣", "中國"]}, {"name": "奇鋐", "ticker": "3017", "group": "散熱 Thermal", "role": "散熱整合能力最強 · 一站式", "products": [{"family": "水冷板 Cold Plate", "sap_mtype": "FERT", "ssot": "SSOT-BOM", "note": "業界最大產能"}, {"family": "快接頭 Quick Disconnect", "sap_mtype": "HALB 半成品", "ssot": "SSOT-BOM"}, {"family": "分歧管 Manifold", "sap_mtype": "HALB", "ssot": "SSOT-BOM"}, {"family": "整櫃液冷模組+機殼", "sap_mtype": "FERT", "ssot": "SSOT-BOM", "note": "GB300/VR200"}, {"family": "MCCP 微通道水冷板", "sap_mtype": "FERT", "ssot": "SSOT-BOM", "note": "鍍金製程"}], "customers": ["NVIDIA", "AMD", "AWS", "Google"], "bases": ["台灣", "越南(擴產)"]}, {"name": "雙鴻", "ticker": "3324", "group": "散熱 Thermal", "role": "液冷純度最高 · 全套系統", "products": [{"family": "水冷板 Cold Plate", "sap_mtype": "FERT", "ssot": "SSOT-BOM"}, {"family": "分歧管 Manifold", "sap_mtype": "HALB", "ssot": "SSOT-BOM"}, {"family": "CDU 冷卻液分配單元", "sap_mtype": "FERT", "ssot": "SSOT-BOM"}, {"family": "均熱片(供 AMD)", "sap_mtype": "HALB", "ssot": "SSOT-BOM"}], "customers": ["NVIDIA(GB300)", "AMD", "AWS", "Meta", "Microsoft", "Google", "廣達 Quanta", "美超微 Supermicro", "緯穎 Wiwynn"], "bases": ["台灣"]}, {"name": "健策", "ticker": "3653", "group": "散熱 Thermal", "role": "均熱片龍頭 · 晶片級散熱", "products": [{"family": "均熱片 Heat Spreader/Lid", "sap_mtype": "HALB", "ssot": "SSOT-BOM", "note": "環形均熱片 Stiffener"}, {"family": "MLCP 微通道蓋板", "sap_mtype": "FERT", "ssot": "SSOT-BOM", "note": "過輝達驗證"}, {"family": "導線架 Leadframe(本業)", "sap_mtype": "HALB", "ssot": "SSOT-BOM"}], "customers": ["NVIDIA(VR200)", "晶圓廠/封測廠", "Google TPU", "AWS Trainium", "Meta MTIA"], "bases": ["台灣", "中國"]}], "suppliers": [{"cat": "功率半導體 GaN/SiC", "names": ["Infineon", "onsemi", "TI", "Wolfspeed", "Navitas"], "sap": "MM · LIFNR", "ssot": "SSOT-PROCUREMENT"}, {"cat": "被動元件 MLCC/電阻", "names": ["Yageo 國巨", "Murata", "TDK", "Samsung EM"], "sap": "MM · LIFNR", "ssot": "SSOT-PROCUREMENT"}, {"cat": "連接器/快接頭", "names": ["Amphenol", "TE Connectivity", "CPC"], "sap": "MM · LIFNR", "ssot": "SSOT-PROCUREMENT"}, {"cat": "磁性元件/變壓器", "names": ["TDK", "Sumida", "Delta 自製"], "sap": "MM · LIFNR", "ssot": "SSOT-PROCUREMENT"}, {"cat": "銅/鋁/散熱基材", "names": ["銅箔/鋁擠型供應商", "導熱介面材料 TIM"], "sap": "MM · LIFNR", "ssot": "SSOT-PROCUREMENT"}, {"cat": "鍍金/表面處理", "names": ["鍍金製程(Lid/MLCP)", "電鍍代工"], "sap": "MM · 委外 Subcontracting", "ssot": "SSOT-PROCUREMENT"}], "customers": [{"cat": "AI 晶片原廠", "names": ["NVIDIA", "AMD"], "sap": "SD · KUNNR", "ssot": "SSOT-STAKEHOLDER"}, {"cat": "雲端 CSP/超大規模", "names": ["Microsoft Azure", "AWS", "Google", "Meta"], "sap": "SD · KUNNR", "ssot": "SSOT-STAKEHOLDER"}, {"cat": "自研 ASIC", "names": ["Google TPU", "AWS Trainium", "Meta MTIA"], "sap": "SD · KUNNR", "ssot": "SSOT-STAKEHOLDER"}, {"cat": "伺服器 ODM/OEM", "names": ["鴻海 Foxconn", "廣達 Quanta", "緯穎 Wiwynn", "美超微 Supermicro", "華碩 ASUS"], "sap": "SD · KUNNR", "ssot": "SSOT-STAKEHOLDER"}, {"cat": "車廠/電信/衛星", "names": ["全球前十車廠", "全球電信商", "低軌衛星服務商"], "sap": "SD · KUNNR", "ssot": "SSOT-STAKEHOLDER"}], "bases": ["台灣", "中國", "泰國", "越南", "印度", "美國", "德國"]};
+const $=id=>document.getElementById(id);
+const TABS=[["sap","① SAP 全模組"],["co","② 五家產品"],["sup","③ 全球供應商"],["cust","④ 全球客戶"],["base","⑤ 生產基地"]];
+let cur="sap";
+$("tabs").innerHTML=TABS.map(([id,n])=>`<div class="tab ${id===cur?'on':''}" data-id="${id}">${n}</div>`).join("");
+$("tabs").querySelectorAll(".tab").forEach(t=>t.onclick=()=>{cur=t.dataset.id;$("tabs").querySelectorAll(".tab").forEach(x=>x.classList.toggle("on",x.dataset.id===cur));document.querySelectorAll(".sec").forEach(s=>s.classList.toggle("on",s.id==="sec-"+cur));});
+
+// SAP 對齊
+$("sap").innerHTML=D.align.map(a=>{const m=D.modules[a.module];
+ return `<tr><td><span class="tc">${a.module}</span></td><td style="font-family:'Noto Sans TC'">${a.name}</td>
+  <td>${Object.keys(m.tcodes).slice(0,6).map(t=>`<span class="tc" style="background:var(--teal)">${t}</span>`).join("")}</td>
+  <td>${a.key_fields.map(f=>`<span class="fld">${f}</span>`).join(" ")}</td>
+  <td class="canon">${a.canon}</td></tr>`;}).join("");
+
+// 五家
+let coi=0;
+function renderSel(){$("selco").innerHTML=D.companies.map((c,i)=>`<span class="cobtn ${i===coi?'on':''}" data-i="${i}">${c.name} ${c.ticker}</span>`).join("");
+ $("selco").querySelectorAll(".cobtn").forEach(b=>b.onclick=()=>{coi=+b.dataset.i;renderCo();});}
+function renderCo(){const c=D.companies[coi];const cls=c.group.startsWith("散熱")?"th":"pw";
+ $("coHead").innerHTML=`<span class="${cls}" style="padding-left:8px">${c.name} ${c.ticker} · ${c.group} · ${c.role}</span>`;
+ $("coProd").innerHTML=c.products.map(p=>`<tr><td style="font-family:'Noto Sans TC';font-weight:600">${p.family}</td>
+  <td><span class="mtype ${p.sap_mtype.split(' ')[0]}">${p.sap_mtype}</span></td><td class="canon">${p.ssot}</td>
+  <td class="tk" style="color:var(--mut)">${p.note||''}</td></tr>`).join("");
+ $("coCust").innerHTML='<span style="font-size:9px;color:var(--mut);align-self:center">客戶(SD·KUNNR):</span>'+c.customers.map(x=>`<span class="chip cust">${x}</span>`).join("");
+ $("coBase").innerHTML='<span style="font-size:9px;color:var(--mut);align-self:center">基地(WERKS):</span>'+c.bases.map(x=>`<span class="chip base">${x}</span>`).join("");
+ renderSel();}
+renderSel();renderCo();
+
+// 供應商
+$("sup").innerHTML=D.suppliers.map(s=>`<tr><td style="font-family:'Noto Sans TC';font-weight:600">${s.cat}</td>
+ <td>${s.names.map(n=>`<span class="chip">${n}</span>`).join(" ")}</td><td class="fld">${s.sap}</td><td class="canon">${s.ssot}</td></tr>`).join("");
+// 客戶
+$("cust").innerHTML=D.customers.map(s=>`<tr><td style="font-family:'Noto Sans TC';font-weight:600">${s.cat}</td>
+ <td>${s.names.map(n=>`<span class="chip cust">${n}</span>`).join(" ")}</td><td class="fld">${s.sap}</td><td class="canon">${s.ssot}</td></tr>`).join("");
+// 基地
+const bc={}; D.companies.forEach(c=>c.bases.forEach(b=>{const k=b.split("(")[0];bc[k]=(bc[k]||0)+1;}));
+$("baseGrid").innerHTML=Object.entries(bc).sort((a,b)=>b[1]-a[1]).map(([b,n])=>`<div class="basecard"><div class="n">${b}</div><div class="c">${n} 家 · WERKS</div></div>`).join("");
+</script><script>
+(function(){
+ function cellText(td){var el=td.querySelector('input,select,textarea');
+  var v=el?(el.value||''):td.textContent;return (v||'').trim().replace(/\|/g,'\\|').replace(/\s+/g,' ');}
+ function tableToMd(tbl){
+  var heads=tbl.tHead?Array.prototype.slice.call(tbl.tHead.rows):[];
+  var body=tbl.tBodies.length?Array.prototype.slice.call(tbl.tBodies[0].rows):Array.prototype.slice.call(tbl.rows);
+  var hRow=heads.length?heads[heads.length-1]:body.shift();
+  if(!hRow)return '';
+  var cols=Array.prototype.map.call(hRow.cells,cellText);
+  var out='| '+cols.join(' | ')+' |\n| '+cols.map(function(){return '---';}).join(' | ')+' |\n';
+  body.forEach(function(tr){out+='| '+Array.prototype.map.call(tr.cells,cellText).join(' | ')+' |\n';});
+  return out;
+ }
+ window.exportPageMarkdown=function(){
+  var title=document.querySelector('h1')?document.querySelector('h1').innerText.trim():'VIA';
+  var kick=document.querySelector('.kicker')?document.querySelector('.kicker').innerText.trim():'';
+  var md='# '+title+'\n\n';
+  if(kick)md+='> '+kick+'\n\n';
+  md+='_匯出 '+new Date().toISOString().slice(0,19).replace('T',' ')+' · VIA · append-only_\n\n';
+  var nodes=document.querySelectorAll('h2, table');
+  Array.prototype.forEach.call(nodes,function(n){
+   if(n.tagName==='H2'){md+='\n## '+n.innerText.trim().replace(/\s+/g,' ')+'\n\n';}
+   else{var t=tableToMd(n);if(t)md+=t+'\n';}
+  });
+  var blob=new Blob([md],{type:'text/markdown'});var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download=(title.replace(/[^\w\u4e00-\u9fff]+/g,'_').slice(0,40)||'VIA')+'.md';a.click();
+ };
+ function addBtn(){if(document.getElementById('viaMdBtn'))return;var b=document.createElement('button');b.id='viaMdBtn';b.textContent='\u2913 MD';b.className='pdf';b.style.right='66px';b.onclick=window.exportPageMarkdown;document.body.appendChild(b);}
+ if(document.body)addBtn();else window.addEventListener('DOMContentLoaded',addBtn);
+})();
+</script>
+</body></html>
