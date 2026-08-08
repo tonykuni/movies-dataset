@@ -37,8 +37,10 @@ Write-Host "[3/4] 郵件智能超級引擎..." -ForegroundColor Yellow
 & py (Join-Path $Here "email_super_engine.py") --input (Join-Path $Deep "corpus") --outdir (Join-Path $Deep "engine_out")
 
 Write-Host "[4/4] NLP/DM/PM 分析層..." -ForegroundColor Yellow
+$VPy = Join-Path $Here ".venv_pm\Scripts\python.exe"
+$PyCmd = if (Test-Path -LiteralPath $VPy) { $VPy } else { "py" }
 Push-Location $Deep
-try { & py (Join-Path $Here "engine_analytics.py") --outdir (Join-Path $Deep "engine_out") } finally { Pop-Location }
+try { & $PyCmd (Join-Path $Here "engine_analytics.py") --outdir (Join-Path $Deep "engine_out") } finally { Pop-Location }
 
 $report = Join-Path $Deep "engine_out\engine_report.html"
 $aReport = Join-Path $Deep "engine_out\analytics_report.html"

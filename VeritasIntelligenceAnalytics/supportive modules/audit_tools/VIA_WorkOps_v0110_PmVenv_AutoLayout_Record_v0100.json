@@ -1,0 +1,19 @@
+{
+ "record_id": "VIA_WorkOps_v0110_PmVenv_AutoLayout_Record_v0100",
+ "ts": "2026-08-08T07:28:47",
+ "operator_verdict": "透過系統中的工具無衝突地安裝(pm4py);完善串聯所有功能引擎;高度自動化整合化;自動優化排版;test debug till perfect",
+ "golden_rule_adjudication": "analytics 畫面之 pip install pm4py 不可照做 — pm4py 需 NumPy<2,基底為 NumPy 2.x(pandas 3);直接裝會炸全平台。裁決=隔離 venv(平台 vmt_pm 同法)",
+ "delivered": {
+  "pmsetup": "Invoke-VIA-WorkOps-PmSetup-v0100.ps1:engines/.venv_pm 專用環境;wheels-only 裝 numpy<2/pandas<3/scikit-learn/pm4py;jieba(純 Python 無 wheel)另裝;import 實測;逐套件誠實成敗;基底零觸碰;venv 入 .gitignore 不進版控",
+  "engine_chaining": "analytics 動詞與 deep 鏈自動優先 .venv_pm python(在位=全配 NLP+pm4py;不在=基底優雅降級)",
+  "matrix_live": "⑥矩陣:深度鏈列=跑過+時間戳/未跑;分析層列=venv 全配/降級可跑(附 pmsetup 指令)",
+  "auto_layout": "資料量 >60 列自動 dense 密度;≤900px 窄幕摺疊細節欄;@media print 列印樣式(白底/隱導航/僅當前頁)"
+ },
+ "qa": {
+  "ps_lint": "PmSetup/Deep/Board 0 errors",
+  "node_check": "OK",
+  "dom_shim": "4/4 PASS:dense 自動啟用(70 列)/深度鏈時間戳/venv 全配/pmsetup 入矩陣"
+ },
+ "wiring": "via-workops 新增 pmsetup 動詞;analytics 動詞 venv 偏好;動態 pattern 拾取 v0110",
+ "append_only": true
+}
