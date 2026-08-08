@@ -1,0 +1,13 @@
+{
+ "record_id": "VIA_WorkOps_DotSetup_OperatorVerified_Record_v0100",
+ "ts": "2026-08-08T11:45:00",
+ "scope": "操作員實機(Windows,無 winget)驗證 dotsetup 可攜式 graphviz",
+ "operator_evidence": {
+  "install": "via-workops dotsetup install:動態取官方最新 15.1.1 → 下載 9.3MB → sha256 符合(e8256ef077e601d9…)→ 解壓 engines\\.graphviz\\Graphviz-15.1.1-win64",
+  "exec_verified": "[5/5] 實測:dot - graphviz version 15.1.1 (20260805.0921) — Windows 真執行通過,關閉前記錄之誠實缺口",
+  "status_idempotent": "裸打 dotsetup 兩次皆回 ok=true(portable)+ 版本字串;免管理員、未動系統 PATH",
+  "envmgr_health": "同輪 via-workops envmgr:.venv_pm status OK / 30 包 / pip_check_ok true(conflicts:1 = 治理範圍內無 base 之誠實回報,隔離奏效之證)"
+ },
+ "closure": "graphviz 選配補齊之全鏈(API 動態→sha256→user-scope 解壓→dot 實跑)容器+實機雙證。餘一步屬使用者流程:跑 via-workops deep 令 analytics 產出 process_dfg.png(_attach_portable_graphviz 自動接上)。",
+ "append_only": true
+}
