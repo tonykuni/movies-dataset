@@ -17,7 +17,7 @@ if "%~1"=="" (
     powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\Invoke-VeritasMailOps.ps1" -Action FollowUp -RecipientsCsv "%~dp0..\functional modules\WorkOps\out\recipients_auto.csv"
   ) else (
     for /f "delims=" %%f in ('dir /b /o:n "%~dp0..\functional modules\WorkOps\Invoke-VIA-WorkOps-CommandBoard-v0*.ps1"') do set "WOPS_BOARD=%%f"
-    call pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\%%WOPS_BOARD%%" -DraftsFor "%~2"
+    call pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\%%WOPS_BOARD%%" -DraftsFor "%~2" -DraftsTemplate "%~3"
   )
 ) else if /i "%~1"=="silent" (
   for /f "delims=" %%f in ('dir /b /o:n "%~dp0..\functional modules\WorkOps\Invoke-VIA-WorkOps-CommandBoard-v0*.ps1"') do set "WOPS_BOARD=%%f"
@@ -73,7 +73,7 @@ if "%~1"=="" (
   echo  pmsetup      隔離 venv 安裝 pm4py 全家（經 EnvManager 中央治理;-Recreate 重建）
   echo  envmgr       中央環境治理:envmgr=健檢 plan 套件=決策 install 套件 --wheels-only=執行
   echo  dotsetup     graphviz 可攜版:dotsetup=狀態 install=下載+sha256+解壓（免 winget）
-  echo  drafts       追蹤草稿:drafts=自動佇列 drafts THR-...=圈選件（絕不代寄）
+  echo  drafts       追蹤草稿:drafts=自動佇列 drafts THR-...=圈選件 [第三參數=範本鍵]（絕不代寄）
   echo  silent       靜默一支到底（不開瀏覽器;配開機 vbs）
   echo  report       開週報   ui  開單機板   scanrange  時段唯讀掃描
   echo  bridge       語料橋   engine  超級引擎   analytics  分析層   actiondb  行動庫

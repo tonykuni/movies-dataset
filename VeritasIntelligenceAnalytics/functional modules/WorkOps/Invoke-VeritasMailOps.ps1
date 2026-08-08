@@ -179,11 +179,51 @@ $Answer
 </div>
 "@
     }
+    # v0113:豐富版必回選擇題(操作員令:範本內文寫得太過簡單)— 背景區塊+三種回覆方式+
+    # 每題補充說明+期限句;placeholders 由列欄位注入,缺席欄位由 Render 清空
+    $RichApproval = @'
+<!-- SUBJECT: [待回·選擇題] {{ProjectCode}} {{ProjectName}} - 請點投票鈕或圈選,一分鐘可回 -->
+<div style="font:400 13px/1.7 'Segoe UI','Microsoft JhengHei',sans-serif;color:#1e293b;max-width:660px;">
+  <p>Hi {{ProjectName}} 窗口,您好:</p>
+  <p>關於 <b>{{ProjectName}}</b>(案號 <span style="font-family:Consolas,monospace;">{{ProjectCode}}</span>)的目前進度,
+     我這邊正在彙整各案排程與資源配置,需要您更新一下狀態。這封信設計成<b>選擇題</b>,回覆幾乎不用打字。</p>
+  <table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:10px 0;width:100%;">
+    <tr><td style="background:#f1f5f9;border-left:4px solid #64748b;padding:8px 12px;font-size:12px;color:#475569;line-height:1.8;">
+      原信主旨:{{OrigSubject}}<br/>追蹤識別:{{CaseID}} · 已等候 {{WaitingDays}} 天 · 原寄出 {{SentOn}}
+    </td></tr>
+  </table>
+  <table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:12px 0;width:100%;">
+    <tr><td style="background:#1e293b;color:#fff;font:700 13px 'Segoe UI',sans-serif;padding:8px 14px;border-radius:6px 6px 0 0;">三種回覆方式,擇一即可(最快 10 秒)</td></tr>
+    <tr><td style="border:1px solid #e2e8f0;border-top:none;padding:12px 16px;font-size:13px;line-height:2.0;">
+      ① <b>最快 — 投票按鈕</b>:本信上方 Outlook「投票」列(進行中 / 已完成 / 卡關 / 需要協助),點一顆即回,零打字。<br/>
+      ② <b>回覆本信</b>:在下表把適用的 ○ 圈起、或刪去不適用的選項後送出。<br/>
+      ③ <b>一句話</b>:例「進行中,70%,週五完成」— 我來歸檔。
+    </td></tr>
+  </table>
+  <table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:12px 0;width:100%;">
+    <tr><td style="background:#334155;color:#fff;font:700 13px 'Segoe UI',sans-serif;padding:8px 14px;border-radius:6px 6px 0 0;">必回五題(圈選即可)</td></tr>
+    <tr><td style="border:1px solid #e2e8f0;border-top:none;padding:12px 16px;font-size:13px;line-height:2.2;">
+      1. 目前狀態: ○ 進行中 ○ 已完成 ○ 卡關<br/>
+      <span style="color:#64748b;font-size:11.5px;">└ 卡關請順帶在第 4 題說明原因,我來協助排除</span><br/>
+      2. 完成百分比: ○ 25% ○ 50% ○ 75% ○ 100%<br/>
+      3. 預計完成 ETA: ○ 今日 ○ 明日 ○ 本週 ○ 其他:__________<br/>
+      <span style="color:#64748b;font-size:11.5px;">└ 交期若需調整,直接填新日期即可,我會同步更新排程</span><br/>
+      4. 是否有阻礙 / 風險: ○ 無 ○ 有:__________<br/>
+      5. 是否需要我協助: ○ 否 ○ 是:__________<br/>
+      <span style="color:#64748b;font-size:11.5px;">└ 需要資源、需要向上反映、需要跨組協調,都算「是」</span>
+    </td></tr>
+  </table>
+  <p>若能於 <b>明日中午前</b> 回覆,即可趕上本週彙整;若您已在會議或電話中說明,回「已口頭說明」即可留檔。謝謝!</p>
+  <p>Best regards,<br/>{{MyName}}</p>
+  <p style="color:#94a3b8;font-size:11px;font-family:Consolas,monospace;">追蹤 {{ProjectCode}} {{CaseID}} · {{Date}} · 本信為 VIA WorkOps 產生之草稿,經本人確認後親自寄出</p>
+</div>
+'@
     return @{
         "status_request"   = (& $Wrap "[追蹤] {{ProjectCode}} {{ProjectName}} - 進度確認" "想跟你確認 <b>{{ProjectName}}</b>({{ProjectCode}})目前的進度。" "")
         "eta_confirm"      = (& $Wrap "[追蹤] {{ProjectCode}} {{ProjectName}} - 交期確認" "想跟你再次確認 <b>{{ProjectName}}</b>({{ProjectCode}})的<b>預計完成 / 交期</b>是否仍如原訂。" "  <p style='color:#c0392b;'>如需調整交期,請於下方第 3 點圈選或填新日期並簡述原因。</p>")
         "blocker_check"    = (& $Wrap "[追蹤] {{ProjectCode}} {{ProjectName}} - 風險 / 阻礙盤點" "想確認 <b>{{ProjectName}}</b>({{ProjectCode}})目前是否有卡關或潛在風險,以便及早協助。" "")
         "approval_request" = (& $Wrap "[待核] {{ProjectCode}} {{ProjectName}} - 請確認 / 核准" "以下 <b>{{ProjectName}}</b>({{ProjectCode}})事項需要你確認或核准,煩請於下方圈選回覆。" "")
+        "approval_request_v2" = $RichApproval
         "followup"         = (& $Wrap "[再次追蹤] {{ProjectCode}} {{ProjectName}} - 尚未收到回覆" "先前關於 <b>{{ProjectName}}</b>({{ProjectCode}})的進度確認尚未收到你的回覆,再麻煩你抽空圈選一下,謝謝!" "")
         "followup_firm"    = (& $Wrap "[急件·再追] {{ProjectCode}} {{ProjectName}} - 需盡快回覆" "<b>{{ProjectName}}</b>({{ProjectCode}})的進度已影響後續排程,今天內需要你的回覆。麻煩直接圈選下列項目即可:" "  <p style='color:#c0392b;'>若有困難請於第 5 點勾『是』並說明,我來協助排除。</p>")
     }
@@ -219,8 +259,10 @@ PRJ-003,Q3 產線稽核,Tony,已完成,100%,2026/07/31,2026/07/30
 function VO_LoadTemplate {
     param([string]$Key)
     $File = Join-Path $TemplateDir ("TPL_{0}.html" -f $Key)
-    if (-not (Test-Path -LiteralPath $File)) { return $null }
-    return (Get-Content -LiteralPath $File -Raw -Encoding UTF8)
+    if (Test-Path -LiteralPath $File) { return (Get-Content -LiteralPath $File -Raw -Encoding UTF8) }
+    $Defaults = VO_GetDefaultTemplates          # v0113:檔案缺席退內建預設(檔案優先,可自行覆寫)
+    if ($Defaults.ContainsKey($Key)) { return [string]$Defaults[$Key] }
+    return $null
 }
 
 function VO_RenderTemplate {
@@ -238,6 +280,8 @@ function VO_RenderTemplate {
         $Subject = $Subject.Replace($Token, [string]$Values[$Key])
         $Body = $Body.Replace($Token, [string]$Values[$Key])
     }
+    $Subject = [regex]::Replace($Subject, "\{\{[A-Za-z]+\}\}", "")   # v0113:缺席欄位清空不留 token
+    $Body    = [regex]::Replace($Body, "\{\{[A-Za-z]+\}\}", "")
     return [pscustomobject]@{ Subject = $Subject; HtmlBody = $Body }
 }
 
@@ -558,7 +602,7 @@ function VO_Draft {
             # v0112 追加:必回選擇題範本附 Outlook 原生投票按鈕(收件人點按即回,零打字)。
             # 回覆 HTML 表單在收件端不作用(Outlook 剝除表單),投票鈕是唯一原生勾選 UI。
             # 仍只建草稿(.Display/.Save),絕不 .Send;投票由收件人於原生介面操作。
-            if ($TemplateKey -eq "approval_request") {
+            if ($TemplateKey -like "approval_request*") {   # v0113:v2 豐富版同附投票鈕
                 try { $Mail.VotingOptions = "進行中;已完成;卡關;需要協助" } catch { }
             }
 

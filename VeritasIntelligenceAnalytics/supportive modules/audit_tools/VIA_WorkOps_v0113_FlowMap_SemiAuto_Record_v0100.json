@@ -1,0 +1,22 @@
+{
+ "record_id": "VIA_WorkOps_v0113_FlowMap_SemiAuto_Record_v0100",
+ "ts": "2026-08-09T06:10:00",
+ "operator_verdict": "八項 U/I 令:註冊功能/編號功能上板 · 流程圖顯示全系統運作(顏色/圖案=模組狀態) · 流程圖放第一頁做邏輯指導及動畫 · 範本內文太簡單(補豐) · 必回資訊如何選擇勾選(介面) · 專案指揮改工作專案半自動建構(多源+先分類後核對+提準確度) · 兩份報告(Outlook 唯讀掃描+超級引擎進階分析)整合到 U/I",
+ "delivered": {
+  "board_v0113_p0": "⓪系統流程頁(第一頁·預設頁):三排流程圖 — 環境自癒→掃描→語料橋+引擎→分析層 / 命名→互鏈→六頁板→追蹤哨 / 決策→Copilot→工作台→雲端線;節點顏色=即時狀態(綠就緒/黃待跑/灰休眠),黃節點脈衝+箭頭流動動畫(prefers-reduced-motion 全靜),點節點跳轉分頁=邏輯指導;正本報告三連結(掃描報告=最新 RUN 相對路徑/引擎/分析,缺席誠實灰鈕);註冊與編號即況六晶片(註冊引擎數自 VIA_AutoCode_Registry 現算 · WOP/THR 序號 · 已核對名稱 · 互鏈串數 · DEC 決策)",
+  "board_v0113_semi": "①頁工作專案半自動建構:四源候選(控管表現有列/郵件叢集歸納 ≥2 封/命名帳本 CASE 已核對名優先/自建歸類)→ 自動分類預勾(叢集 ≥3 封)→ 核對表格(勾選框+名稱可直接改)→ 複製控管表格式列(ProjectCode..LastUpdated 七欄 CSV)貼入 control_sheet.csv — 系統不代寫控管表;附四條準確度指引(核對迴圈/自建規則/主旨帶代號/互鏈累積)= 操作員問「還有哪些方法+如何降低校正機率」之答",
+  "board_v0113_picker": "②頁範本下拉選擇器:七鍵(預設 approval_request_v2 豐富版);圈選複製指令自動帶第三參數 via-workops drafts THR-… 範本鍵",
+  "wiring": "-DraftsTemplate 參數(空=approval_request_v2)+ selQ Template 套用;via-workops.cmd drafts 分支傳 %~3;help 表註記第三參數",
+  "mailops": "approval_request_v2 豐富範本(背景區塊=原信主旨/追蹤識別/已等天數 · 三種回覆方式含投票鈕教學 · 必回五題每題補充說明 · 期限句);VotingOptions 條件擴 -like approval_request*;VO_LoadTemplate 檔案缺席退內建預設(檔案優先);VO_RenderTemplate 缺席欄位 token 清空",
+  "data_additions": "$data 增 thr_links(thr_case_map)/decisions(decision_log.csv 狀態=DONE 計數)/reports(scan 最新 RUN·engine·analytics 相對路徑)/reg.engines(登錄簿 引擎| 前綴現算)/naming_top(CASE 前 40 已核對優先)/naming_custom"
+ },
+ "qa_container": {
+  "ps": "pwsh 7.4.6 AST 實 parse 板+MailOps 雙 PASS;紅線實碼掃描板 CLEAN(MailOps Read-Host 為既有互動選單 VO_Menu,僅裸跑進入,自動鏈一律 -Action 不經過 — 非本輪引入,不動)",
+  "js": "node --check PASS;DOM shim 22 斷言全過 — p0 流程節點/三色狀態/跳轉/報告連結(缺席灰鈕誠實)/註冊晶片、7 tab 三語標籤、①四源候選(叢集 XYZ-777 自動歸納+命名帳本名)、②選擇器七鍵、模擬圈選+選範本→指令 via-workops drafts THR-00001 status_request 正確拼裝",
+  "mailops_functional": "pwsh 抽函數實跑:七範本鍵含 v2;v2 渲染主旨正確、token 全清、投票教學+三回覆方式在;loader 無檔退預設、未知鍵誠實 null",
+  "cmd": "CRLF 全檔;%~3 傳遞在;新改行無半形括號違規(五筆既有 rem 括號=歷輪實跑證實可容,不動)"
+ },
+ "red_lines_unchanged": "絕不代寄(.Send 僅檔頭宣言)· Outlook 原件/分類零觸碰 · 編號永不變 · 不代寫控管表(半自動建構=複製由人貼入)· 只增不減(v0112 保留)",
+ "operator_next": "via-sync 後 via-workops — 開板即見⓪系統流程頁;①頁下方=半自動建構候選;②頁選範本後圈選複製;草稿=豐富版選擇題+投票鈕",
+ "append_only": true
+}
