@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-r"""WorkOps WOP 識別歸戶引擎 v0100(ENG-028)— 規劃書 M1+M2:bottom-up 多訊號融合 → WOP 專案化+賦號
+r"""WorkOps WOP 識別歸戶引擎 v0101(ENG-028)— 規劃書 M1+M2:bottom-up 多訊號融合 → WOP 專案化+賦號
+
+v0101(操作員實跑 2026/08/08:AUTO 0 · ASK 129 — 個人信箱無控管表時全數進人工佇列):
+  已核對名稱=操作員親手核對過的訊號(等同人工確認)→ 獨立權重 s3_approved 直接 AUTO;
+  未核對提議名維持弱票進 ASK;佇列按信心分數排序(最有把握的先看)。能全自動的絕不半自動。
 
 操作員裁決(2026/08/08 M365 規劃書 v1.3):補強註冊功能/工具 · 整合所有工具 · 建立 U/I。
 規劃書 Phase 0:接通 S1–S8 訊號源 → 融合投票 → AUTO/ASK/QUARANTINE 三層分流 →
@@ -61,8 +65,8 @@ PREFIX_RE = re.compile(r"^\s*((re|fw|fwd|回覆|轉寄|答復)\s*[::]\s*)+", re.
 TAG_RE    = re.compile(r"\[(?:THR|WOP)-\d+\]")
 
 DEFAULT_PARAMS = {
-    "weights": {"s1_code": 3.0, "s2_sheet": 4.0, "s3_name": 2.0, "s5_domain": 1.5,
-                "s6_recipient": 1.0, "s7_case": 3.5, "learned": 5.0},
+    "weights": {"s1_code": 3.0, "s2_sheet": 4.0, "s3_name": 2.0, "s3_approved": 4.5,
+                "s5_domain": 1.5, "s6_recipient": 1.0, "s7_case": 3.5, "learned": 5.0},
     "auto_threshold": 4.0, "margin": 1.5, "ask_threshold": 1.0,
     "min_group_mails": 1, "domain_map": {}, "bulk_skip": True,
 }
@@ -275,9 +279,10 @@ def gather(params):
         case = thrmap.get(thr, "")
         if case:
             ent = naming.get(case) or {}
-            label = ent.get("approved") or ent.get("proposed") or ""
-            if label:
-                vote("NAME:" + label, w["s3_name"], "S3 命名帳本 " + label)
+            if ent.get("approved"):                      # v0101:已核對名=人工確認級訊號
+                vote("NAME:" + ent["approved"], w.get("s3_approved", 4.5), "S3 已核對名 " + ent["approved"])
+            elif ent.get("proposed"):
+                vote("NAME:" + ent["proposed"], w["s3_name"], "S3 提議名(未核對) " + ent["proposed"])
             if case in case2wopkey:
                 vote(case2wopkey[case], w["s7_case"], "S7 同案互鏈 " + case)
         dom = (sender.split("@")[-1] or "").lower() if "@" in (sender or "") else ""
@@ -351,7 +356,7 @@ def assign(reg, led, thr, key, label, status, evidence):
 def build_queue_html(ask, quarantine, sig, sheet_codes, naming):
     """mouse-only 確認佇列:預選+chips+全部接受+下載確認檔(規劃書 §02 ASK 分流 UI)。"""
     items = []
-    for thr, ranked in ask.items():
+    for thr, ranked in sorted(ask.items(), key=lambda kv: -kv[1][0][1]):   # v0101:信心高者先看
         d = sig[thr]
         items.append({
             "thr": thr, "subj": d["subj"][:90], "sender": d["sender"],
