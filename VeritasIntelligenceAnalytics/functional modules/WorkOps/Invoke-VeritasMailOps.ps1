@@ -218,12 +218,32 @@ $Answer
   <p style="color:#94a3b8;font-size:11px;font-family:Consolas,monospace;">追蹤 {{ProjectCode}} {{CaseID}} · {{Date}} · 本信為 VIA WorkOps 產生之草稿,經本人確認後親自寄出</p>
 </div>
 '@
+    # v0115 三段追蹤 T3:緊急升級範本(前兩段未獲回覆;建議 CC 主管由人自加 — 系統絕不代加代寄)
+    $UrgentEscalation = @"
+<!-- SUBJECT: [緊急·第三次通知] {{ProjectCode}} {{ProjectName}} - 今日內需要您的回覆 -->
+<div style="font:400 13px/1.7 'Segoe UI','Microsoft JhengHei',sans-serif;color:#1e293b;max-width:660px;">
+  <p>Hi {{ProjectName}} 窗口,您好:</p>
+  <table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:10px 0;width:100%;">
+    <tr><td style="background:#fef2f2;border-left:4px solid #dc2626;padding:10px 14px;font-size:12.5px;color:#7f1d1d;line-height:1.8;">
+      <b>此為第三次通知。</b>關於「{{OrigSubject}}」(追蹤識別 {{CaseID}}),自 {{SentOn}} 寄出至今已 {{WaitingDays}} 天未獲回覆,
+      前兩次追蹤信亦未見回音。此案已影響後續排程,若今日內仍無回覆,我將需要向上反映以尋求協助排除。
+    </td></tr>
+  </table>
+  <p>仍然只需要幾秒:點本信上方的<b>投票按鈕</b>(進行中 / 已完成 / 卡關 / 需要協助),或直接回一句話即可。
+     若您已於電話/會議中說明,回「已口頭說明」即可留檔結案。</p>
+$Answer
+  <p style="color:#7f1d1d;"><b>請於今日下班前回覆。</b>若有任何困難,直接回「需要協助」,我來安排。謝謝!</p>
+  <p>Best regards,<br/>{{MyName}}</p>
+  <p style="color:#94a3b8;font-size:11px;font-family:Consolas,monospace;">追蹤 {{ProjectCode}} {{CaseID}} · {{Date}} · T3 升級通知 · 本信為草稿,經本人確認後親自寄出;如需 CC 主管由本人寄出時自行加入</p>
+</div>
+"@
     return @{
         "status_request"   = (& $Wrap "[追蹤] {{ProjectCode}} {{ProjectName}} - 進度確認" "想跟你確認 <b>{{ProjectName}}</b>({{ProjectCode}})目前的進度。" "")
         "eta_confirm"      = (& $Wrap "[追蹤] {{ProjectCode}} {{ProjectName}} - 交期確認" "想跟你再次確認 <b>{{ProjectName}}</b>({{ProjectCode}})的<b>預計完成 / 交期</b>是否仍如原訂。" "  <p style='color:#c0392b;'>如需調整交期,請於下方第 3 點圈選或填新日期並簡述原因。</p>")
         "blocker_check"    = (& $Wrap "[追蹤] {{ProjectCode}} {{ProjectName}} - 風險 / 阻礙盤點" "想確認 <b>{{ProjectName}}</b>({{ProjectCode}})目前是否有卡關或潛在風險,以便及早協助。" "")
         "approval_request" = (& $Wrap "[待核] {{ProjectCode}} {{ProjectName}} - 請確認 / 核准" "以下 <b>{{ProjectName}}</b>({{ProjectCode}})事項需要你確認或核准,煩請於下方圈選回覆。" "")
         "approval_request_v2" = $RichApproval
+        "urgent_escalation" = $UrgentEscalation
         "followup"         = (& $Wrap "[再次追蹤] {{ProjectCode}} {{ProjectName}} - 尚未收到回覆" "先前關於 <b>{{ProjectName}}</b>({{ProjectCode}})的進度確認尚未收到你的回覆,再麻煩你抽空圈選一下,謝謝!" "")
         "followup_firm"    = (& $Wrap "[急件·再追] {{ProjectCode}} {{ProjectName}} - 需盡快回覆" "<b>{{ProjectName}}</b>({{ProjectCode}})的進度已影響後續排程,今天內需要你的回覆。麻煩直接圈選下列項目即可:" "  <p style='color:#c0392b;'>若有困難請於第 5 點勾『是』並說明,我來協助排除。</p>")
     }

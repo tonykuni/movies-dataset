@@ -1,6 +1,6 @@
 {
  "version": "v0100",
- "comment": "M1 訊號融合參數(規劃書 §02/§07:參數=JSON·行為改變只改此檔不改程式)。weights=各訊號票重(s3_approved=已核對名,人工確認級直接歸戶;s3_name=未核對提議名弱票);auto_threshold=直接歸戶門檻;margin=最佳與次佳差距門檻(分歧必問);ask_threshold=進人工佇列下限,低於即 QUARANTINE 留置;learned=人工確認學習記憶票重(手動遞減機制);domain_map=寄件網域→單位名(S5,操作員可自行增列);min_group_mails=叢集成案最低郵件數。",
+ "comment": "M1 訊號融合參數(規劃書 §02/§07:參數=JSON·行為改變只改此檔不改程式)。weights=各訊號票重(s3_approved=已核對名,人工確認級直接歸戶;s3_name=未核對提議名弱票);auto_threshold=直接歸戶門檻;margin=最佳與次佳差距門檻(分歧必問);ask_threshold=進人工佇列下限,低於即 QUARANTINE 留置;learned=人工確認學習記憶票重(手動遞減機制);domain_map=寄件網域→單位名(S5,操作員可自行增列);min_group_mails=叢集成案最低郵件數。 v0103 增:s4_folder=自建資料夾名中票、s4_folder_strong=資料夾含 WOP 編號/代號強票(你手動分信=免費標註);folder_blacklist/sheet_aliases 可覆寫內建。",
  "weights": {
   "s1_code": 3.0,
   "s2_sheet": 4.0,
@@ -9,7 +9,9 @@
   "s5_domain": 1.5,
   "s6_recipient": 1.0,
   "s7_case": 3.5,
-  "learned": 5.0
+  "learned": 5.0,
+  "s4_folder": 2.5,
+  "s4_folder_strong": 4.0
  },
  "auto_threshold": 4.0,
  "margin": 1.5,

@@ -1,0 +1,21 @@
+{
+ "record_id": "VIA_WorkOps_ThreeStage_S4_Record_v0100",
+ "ts": "2026-08-09T10:30:00",
+ "operator_verdict": "「三段時間發信追蹤/跟進/緊急跟進」+ Gemini 研究全文(工作日曆/模糊映射/命名聯動/隱性阻塞/多候選chips/SSOT-DuckDB/資料夾分類)",
+ "adjudication": "docs/M365_Roadmap_Adjudication_v0100.md 第六節:建成 4 項(三段追蹤/工作日引擎/S4 資料夾/表頭映射)· 不引入 2 項(SSOT-DuckDB 同構既有、rapidfuzz 既裁)· 既有涵蓋 1 項(候選chips+證據)· 候補 2 項(隱性阻塞、Current_Stage 狀態機留 M3)",
+ "delivered": {
+  "board_v0115": "三段追蹤升級鏈:[3/5] 佇列以工作日計等待(週末+holidays_tw.txt 跳過;無效日期退日曆日)→ T1≥3 followup / T2≥5 followup_firm / T3≥7 urgent_escalation;參數 watchtower_params.json(t1/t2/t3/use_business_days);②頁佇列表增「段」欄(T1綠/T2黃/T3紅)+工作日數;異質控管表表頭映射 ConvertTo-StdSheet(案號/Trace_ID/承辦人/Deadline 等 alias 對齊七標準欄,對不上保留原名)",
+  "mailops_urgent": "urgent_escalation 範本:紅色第三次通知區塊(原主旨/識別/已等天數/前兩次未回)+投票鈕教學+五題表+今日期限;CC 主管明文由人自加 — 系統絕不代加代寄;$Answer 展開實測",
+  "engine_v0103": "S4 資料夾訊號轉正(規劃書候補→正式):最新 scanrange RUN 01_mail_index.csv FOLDER_NAME — 含 WOP-#### 或代號=強票 4.0(可獨立 AUTO)、自建資料夾名=中票 2.5(進 ASK 候選)、系統資料夾黑名單(收件匣/寄件/垃圾/封存等 22 詞)排除;sheet_normalize 表頭映射與板同軸;params 增 s4 權重/blacklist/aliases 全可覆寫"
+ },
+ "qa_container": {
+  "engine": "fixtures:資料夾含代號+外星表頭(案號/名稱/承辦人)→ AUTO 且 label 取自映射後表 · 自建資料夾名→ASK 候選在列 · 黑名單資料夾→留置 — PASS",
+  "board": "pwsh AST parse PASS;ConvertTo-StdSheet 實跑(案號→ProjectCode/名稱→ProjectName/承辦人→Owner/Deadline→DueDate,怪欄位保留)PASS;Get-WaitBusinessDays 實跑(7/31→8/8 跳週末+8/5 假日=4 工作日;壞日期→-1)PASS;紅線淨",
+  "mailops": "urgent_escalation 鍵在/渲染主旨正確/$Answer 五題表展開/token 全清 — PASS;紅線淨",
+  "ui": "node --check PASS;shim:三段列/T3 範本/紅黃綠段燈/工作日表頭 — 全過"
+ },
+ "pitfall_fixed": "PS 單引號 here-string 內 $Answer 不展開 → 該範本改雙引號 here-string(內容無其他 $ 符)實測展開",
+ "red_lines_unchanged": "絕不代寄 · T3 升級 CC 主管由人自加 · 原件/分類零觸碰 · 編號永不變 · 只增不減(v0114 保留)· 參數=JSON",
+ "operator_next": "via-sync 後 via-workops all — ②頁佇列自動分三段;T3 件草稿=緊急升級信;浮動假日請維護 engines\\holidays_tw.txt;資料夾分信習慣會直接提升 AUTO 率",
+ "append_only": true
+}

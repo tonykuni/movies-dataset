@@ -55,3 +55,20 @@ ENG-028 入 `VIA_AutoCode_Registry_v0100.json`(components+ledger append);
 引擎數 27→28;板⓪頁註冊晶片下次產板自動反映(現算,不寫死)。
 
 紅線不變:絕不代寄 · 原件/分類零觸碰 · 編號永不變 · 基底零觸碰 · 只增不減 · 參數=JSON。
+
+---
+
+## 六、Gemini 研究裁定補遺(2026-08-09:三段時間發信追蹤令)
+
+| 研究項 | 裁定 | 落點 |
+|---|---|---|
+| 三段追蹤 T1/T2/T3(追蹤/跟進/緊急) | **建成** | 板 v0115 [3/5]:工作日制門檻(watchtower_params.json)→ followup / followup_firm / urgent_escalation;佇列表增段欄+工作日數 |
+| 工作日曆/假日引擎 | **建成**(純 PS 零依賴,不引 numpy busday) | `engines/holidays_tw.txt`(固定假日起手,浮動假日操作員維護)|
+| Outlook 資料夾訊號(S4 轉正) | **建成** | 識別引擎 v0103:最新 scanrange RUN 之 FOLDER_NAME — 含 WOP 編號/代號=強票 4.0、自建資料夾名=中票 2.5、系統資料夾黑名單排除 |
+| 異質控管表表頭映射 | **建成**(alias 字典;rapidfuzz 依既裁不引入,難字保留原名不硬猜) | 板 v0115 ConvertTo-StdSheet + 引擎 sheet_normalize;7 標準欄 alias 各行業慣用語 |
+| SSOT + DuckDB/Parquet SYNC | **不引入** — 既有 side-car(registry/ledger/naming/jsonl)+ apply 吸收改名歸檔已同構(事實流可重放);F2 裁定十萬列級 pandas/JSON 足矣,DuckDB 留規模化 | 維持 |
+| 多候選名稱 chips + 證據並排 | **既有涵蓋** — WopConfirmQueue 每列候選 chips 附證據鏈(訊號來源)+主旨/寄件者 | 維持 |
+| 隱性阻塞偵測(等/卡/未回 詞) | 候補 — 需 MailOps Reconcile 線深改,候令 | 下輪 |
+| T1/T2/T3 逐段已發記錄(Current_Stage 狀態機) | 候補 — 現版每輪依等待天數重判段位;寄出留痕需回程解析(M3)先行 | Phase 1 |
+
+紅線重申:T3 升級信只建草稿、CC 主管由人自加 — 系統絕不代加代寄。

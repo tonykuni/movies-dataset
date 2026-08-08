@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
-r"""WorkOps WOP 識別歸戶引擎 v0102(ENG-028)— 規劃書 M1+M2:bottom-up 多訊號融合 → WOP 專案化+賦號
+r"""WorkOps WOP 識別歸戶引擎 v0103(ENG-028)— 規劃書 M1+M2:bottom-up 多訊號融合 → WOP 專案化+賦號
+
+v0103(操作員 Gemini 研究令 2026/08/09):
+  S4 資料夾訊號轉正 — 你在 Outlook 手動分信=免費人工標註:讀最新 scanrange RUN 之
+  01_mail_index.csv(FOLDER_NAME/CONVERSATION_ID),資料夾名含 WOP 編號/代號=強票,
+  一般自建資料夾名=中票(系統資料夾黑名單排除);異質控管表表頭映射(alias 字典,
+  案號/Trace_ID/承辦人等自動對齊)。
 
 v0102(操作員 ONE POWERSHELL 令):apply 吸收預設確認檔後改名 wop_confirm.applied.<ts>.csv
   (只增不減不刪檔;防重複吸收)— ALL 總指揮可安全自動吸收。實跑戰果:AUTO 129/87 案/ASK 0。
@@ -69,10 +75,73 @@ TAG_RE    = re.compile(r"\[(?:THR|WOP)-\d+\]")
 
 DEFAULT_PARAMS = {
     "weights": {"s1_code": 3.0, "s2_sheet": 4.0, "s3_name": 2.0, "s3_approved": 4.5,
+                "s4_folder": 2.5, "s4_folder_strong": 4.0,
                 "s5_domain": 1.5, "s6_recipient": 1.0, "s7_case": 3.5, "learned": 5.0},
     "auto_threshold": 4.0, "margin": 1.5, "ask_threshold": 1.0,
     "min_group_mails": 1, "domain_map": {}, "bulk_skip": True,
+    "folder_blacklist": ["收件匣", "inbox", "寄件備份", "sent", "垃圾", "junk", "deleted",
+                         "刪除", "封存", "archive", "rss", "草稿", "drafts", "行事曆",
+                         "calendar", "連絡人", "contacts", "工作", "tasks", "記事",
+                         "notes", "同步處理", "outbox", "重要", "clutter"],
+    "sheet_aliases": {
+        "ProjectCode": ["projectcode", "專案代號", "案號", "案件編號", "代號", "編號",
+                        "trace_id", "wop_id", "tracking no", "trackingno", "code", "id"],
+        "ProjectName": ["projectname", "專案名稱", "案名", "名稱", "項目", "project",
+                        "task", "activity", "主題", "作業步驟"]
+    },
 }
+
+WOPID_RE = re.compile(r"WOP-\d{4}")
+
+
+def sheet_normalize(rows, params):
+    """v0103:異質表頭映射 — 各行各業欄名對齊 ProjectCode/ProjectName(對不上保留原名)。"""
+    if not rows:
+        return rows
+    aliases = params.get("sheet_aliases", DEFAULT_PARAMS["sheet_aliases"])
+    src_cols = list(rows[0].keys())
+    col_map = {}
+    used = set()
+    for src in src_cols:
+        k = (src or "").strip().lower()
+        for std, al in aliases.items():
+            if std in used:
+                continue
+            if k in al or any(a in k for a in al):
+                col_map[src] = std
+                used.add(std)
+                break
+    if not col_map:
+        return rows
+    out = []
+    for r in rows:
+        nr = {}
+        for c, v in r.items():
+            nr[col_map.get(c, c)] = v
+        out.append(nr)
+    return out
+
+
+def load_folder_map():
+    """v0103 S4:最新 scanrange RUN 的 conv→自建資料夾名(缺席誠實回空)。"""
+    root = OUT / "deep" / "scanrange"
+    if not root.exists():
+        return {}
+    runs = sorted([d for d in root.iterdir() if d.is_dir() and d.name.startswith("RUN_")])
+    if not runs:
+        return {}
+    m = {}
+    for r in read_csv(runs[-1] / "01_mail_index.csv"):
+        cid = (r.get("CONVERSATION_ID") or "").strip()
+        fn = (r.get("FOLDER_NAME") or "").strip()
+        if cid and fn and cid not in m:
+            m[cid] = fn
+    return m
+
+
+def folder_blacklisted(name, params):
+    n = (name or "").strip().lower()
+    return any(b in n for b in params.get("folder_blacklist", []))
 
 
 def now():
@@ -138,12 +207,12 @@ def subj_code(s):
     return m.group(0).replace("_", "-").replace(" ", "-") if m else ""
 
 
-def control_sheet_rows():
+def control_sheet_rows(params=None):
     for cand in (WORKOPS / "control_sheet.csv",
                  WORKOPS.parent.parent / "control_sheet.csv"):   # 板 v0112 同式:庫根後備
         rows = read_csv(cand)
         if rows:
-            return rows
+            return sheet_normalize(rows, params or DEFAULT_PARAMS)   # v0103:表頭映射
     return []
 
 
@@ -227,7 +296,7 @@ def gather(params):
         if cid:
             by_conv.setdefault(cid, []).append(r)
 
-    sheet = control_sheet_rows()
+    sheet = control_sheet_rows(params)
     sheet_codes = {}
     for r in sheet:
         c = (r.get("ProjectCode") or "").strip().upper()
@@ -249,11 +318,14 @@ def gather(params):
 
     reg = load_registry()
     case2wopkey = {}
+    id2key = {}
     for wid, pj in reg["projects"].items():
+        id2key[wid] = pj["key"]
         for t in pj.get("thr", []):
             c = thrmap.get(t)
             if c:
                 case2wopkey.setdefault(c, pj["key"])
+    folder_map = load_folder_map()
 
     sig = {}
     n_bulk = 0
@@ -294,6 +366,16 @@ def gather(params):
                 vote("DOM:" + dom_map[dom], w["s5_domain"], "S5 網域對映 " + dom)
             if dom in lrn_dom:
                 vote(lrn_dom[dom], w["learned"], "LEARN 網域記憶 " + dom)
+        fol = folder_map.get(conv, "")
+        if fol and not folder_blacklisted(fol, params):
+            wm = WOPID_RE.search(fol.upper())
+            fcode = subj_code(fol)
+            if wm and wm.group(0) in id2key:
+                vote(id2key[wm.group(0)], w.get("s4_folder_strong", 4.0), "S4 資料夾含編號 " + fol)
+            elif fcode:
+                vote("CODE:" + fcode, w.get("s4_folder_strong", 4.0), "S4 資料夾含代號 " + fol)
+            else:
+                vote("NAME:" + fol[:40], w.get("s4_folder", 2.5), "S4 自建資料夾 " + fol)
         to = pend_to.get(conv, "")
         tdom = (to.split("@")[-1] or "").lower() if "@" in to else ""
         if tdom:
