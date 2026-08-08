@@ -69,17 +69,22 @@ def rotation_signal(px, themes, p):
         return None
     mom = gidx.pct_change(p["WIN"])
     cols = sorted({c for ms in members.values() for c in ms})
-    W = pd.DataFrame(0.0, index=px.index, columns=cols)
+    # 再平衡日寫入「整列」(未入選者明確歸零)再 ffill 持有至下次再平衡。
+    # 原寫法 replace(0→NaN).ffill 會令舊持倉跨期復活 → 權重和>1(weights_bounded
+    # 三輪必 FAIL,rotation_engine 補齊後首跑實證);此為訊號層缺陷,非引擎層。
+    W = pd.DataFrame(np.nan, index=px.index, columns=cols)
     rebal_days = px.index[p["WIN"]::p["REBAL"]]
     for t in rebal_days:
         m = mom.loc[t].dropna()
         if m.empty:
             continue
         top = m.sort_values(ascending=False).head(p["TOP_K"]).index
-        picks = [c for th in top for c in members.get(th, [])]
+        picks = sorted({c for th in top for c in members.get(th, [])})
+        row = pd.Series(0.0, index=cols)
         if picks:
-            W.loc[t, picks] = 1.0 / len(picks)
-    return W.replace(0.0, np.nan).ffill().fillna(0.0)
+            row[picks] = 1.0 / len(picks)
+        W.loc[t] = row
+    return W.ffill().fillna(0.0)
 
 
 def backtest(W, px, cost_bps=EVAL_COST_BPS):

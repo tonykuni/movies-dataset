@@ -1,0 +1,25 @@
+{
+ "record_id": "VIA_Pipeline_RotationEngine_Alive_Record_v0100",
+ "ts": "2026-08-08T20:30:00",
+ "operator_verdict": "整合去重優化(附三件上傳)· 繼續整合系統(附 PMIS-Lite 清單)",
+ "hash_adjudication": {
+  "capability_matrix": "上傳 md5 a2bbd568… = 庫內兩份(VAP spec uploads 檔案庫 + ui_support live)逐位元組相同 — 功能已在,零新增",
+  "unified_code_registry": "上傳 md5 9ea7c68a… = 庫內 VAP spec uploads 份相同;本輪補一份 live 家 ui_support/(與功能矩陣同址並列;spec 份為設計源檔案庫)",
+  "sector_rotation_engine": "上傳 md5 d4f1ead5… = 庫內 VDF/engine/candidates/ 份相同 — 正本已在庫"
+ },
+ "integration_eng024": {
+  "gap": "via-pipe 自歸家日等待同伴檔 rotation_engine.py(rebase100/log_ret/debeta/classify_and_prune/make_demo/THEMES/MARKET_COL/CORR_KEEP);候選引擎介面不同名但方法論同魂",
+  "adapter": "supportive modules/VIA_Pipeline/rotation_engine.py(ENG-024):族群表 VIA_TAXONOMY_V1_1 以 AST 靜態抽取自候選正本(不執行其 import,免 statsmodels/sklearn;不複製=去重;正本不就地修改);剔除採候選 PC1 共動法(numpy SVD 實作零依賴;LEADER 永留;|corr|<CORR_KEEP 剔);make_demo 採候選生成法(決定性 seed;偽濫竽充數股)",
+  "selftest": "6 族群 38 檔;示範資料留 33 剔 5(雜訊股正確被剔)"
+ },
+ "pipeline_fixes_from_first_run": {
+  "weights_resurrect": "via_pipeline.rotation_signal 之 replace(0→NaN).ffill 令舊持倉跨期復活 → 權重和>1(weights_bounded 三輪必 FAIL,補齊同伴檔後首跑實證)→ 改再平衡日寫整列(未入選明確歸零)後 ffill;自癒改為 round 1 PASS",
+  "regime_align": "devils_advocate.regime_split 布林索引未對齊(rolling20 與回測 lag 起訖不同)→ reindex(clean.index)+fillna(False)"
+ },
+ "e2e_evidence": {
+  "run": "via_pipeline --demo(容器 .venv 實跑):自演化 24 trials · OOS median Sharpe 1.58(5 folds)· self_heal PASS r1 · 證偽 11/14 · deflated_SR FAIL → FALSIFIED → VERDICT NOT VALIDATED 勿 promote",
+  "honesty": "合成資料被多重測試校正正確擊落 = fail-closed 如設計;[SIMULATED] 橫幅在;機器全通,裁決留給真實行情"
+ },
+ "pmis_lite_next": "操作員出示 Downloads/PMIS-Lite (4)/pmis_lite 22 檔清單(capability matrix/code registry 即其產物)— 檔案在操作員機,待其以既定 staging 流程(Copy-Item 至 _import_staging_* + via-sync)入庫後續整合",
+ "append_only": true
+}

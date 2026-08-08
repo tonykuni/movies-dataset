@@ -90,8 +90,10 @@ def cost_sweep(signal, prices, clean, bps=(0,5,10,20,50)):
                    avg_turnover=round(float(tn.mean()),3))
 
 def regime_split(clean, market):
-    vol = market.rolling(20).std()
-    hi = clean[vol >= vol.median()]; lo = clean[vol < vol.median()]
+    # vol 與 clean 起訖不同(rolling 20 吃頭、回測 lag 吃頭)→ 布林索引必先對齊
+    vol = market.rolling(20).std().reindex(clean.index)
+    med = vol.median()
+    hi = clean[(vol >= med).fillna(False)]; lo = clean[(vol < med).fillna(False)]
     s_hi, s_lo = sharpe(hi), sharpe(lo)
     v = "pass" if (s_hi>0 and s_lo>0) else ("wounded" if (s_hi>0 or s_lo>0) else "fail")
     return v, dict(sharpe_highvol=round(s_hi,2), sharpe_lowvol=round(s_lo,2),
