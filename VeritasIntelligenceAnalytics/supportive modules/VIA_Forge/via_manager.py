@@ -19,6 +19,71 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 UTC = timezone.utc
 
+# WorkOps 深度鏈產物(結合層資料來源;唯讀)
+_WOPS_OUT = os.path.abspath(os.path.join(HERE, "..", "..", "functional modules", "WorkOps", "out"))
+_WOPS_DB = os.path.join(_WOPS_OUT, "deep", "engine_out", "super_engine.db")
+_WOPS_NAMES = os.path.join(_WOPS_OUT, "workops_naming.json")
+
+
+def _load_workops_corpus(manager, limit=5000):
+    """WorkOps 深度鏈語料 → Forge 統一 records(結合層,唯讀)。
+    保留 WorkOps CASE 編號與已核對名稱(編號不變鐵律);來源缺席回 []。"""
+    if not os.path.exists(_WOPS_DB):
+        return []
+    try:
+        import sqlite3
+        from email.utils import format_datetime as _fmtdt
+        names = {}
+        if os.path.exists(_WOPS_NAMES):
+            try:
+                with open(_WOPS_NAMES, encoding="utf-8") as fh:
+                    names = (json.load(fh).get("entries") or {})
+            except Exception:
+                names = {}
+        conn = sqlite3.connect("file:%s?mode=ro" % _WOPS_DB, uri=True)
+        rows = conn.execute(
+            "SELECT mail_id, case_seq, thread_key, mail_date, sender, to_list,"
+            " subject, body_clean FROM E01_MAIL ORDER BY mail_id LIMIT ?", (limit,)).fetchall()
+        conn.close()
+        if not rows:
+            return []
+        me = manager.engine("mailhub")
+        out = []
+        for mid, cs, tkey, md, snd, to, subj, body in rows:
+            date_hdr = ""
+            try:
+                date_hdr = _fmtdt(datetime.fromisoformat((md or "").strip()).replace(tzinfo=UTC))
+            except Exception:
+                pass
+            rec = {
+                "status": "OK", "kind": "EMAIL",
+                "doc_id": "WOPS-%05d" % mid,
+                "file_name": (subj or "(無主旨)")[:60],
+                "format_family": "EMAIL_EML", "health": "HEALTHY",
+                "aspects": {"title": subj or "", "content_domain": "GENERAL",
+                            "sensitivity": "PUBLIC_OR_UNMARKED", "pii": [],
+                            "keywords": [], "classify_confidence": "M", "language": ""},
+                "text_preview": (body or "")[:1200],
+                "structured": {"headers": {"Subject": subj or "", "From": snd or "",
+                                           "To": to or "", "Date": date_hdr}},
+            }
+            try:
+                intel = me.mail._email_intel(rec)   # 智慧層在 MailForgeEngine(牡 absorbs)
+            except Exception:
+                intel = None
+            if intel:
+                if cs:
+                    intel["case_id"] = cs               # WorkOps 編號優先(編號不變)
+                    ent = names.get(cs) or {}
+                    label = ent.get("approved") or ent.get("proposed")
+                    if label:
+                        intel["cluster_label"] = label   # 已核對名稱一體呈現
+            rec["email_intel"] = intel
+            out.append(rec)
+        return out
+    except Exception:
+        return []
+
 
 # \u5f15\u64ce\u8a3b\u518a\u8868\uff1a3 \u652f\u5f37\u5f15\u64ce\uff08\u7531 9 \u5b50\u5f15\u64ce\u6574\u5408\uff1b\u5e95\u5c64\u4fdd\u7559\u4e0d\u522a\u3001\u53ea\u589e\u4e0d\u6e1b\uff09
 ENGINE_REGISTRY = [
@@ -101,6 +166,13 @@ class SystemManager:
         self.state["updated_at"] = datetime.now(UTC).isoformat()
 
     def records(self):
+        # 結合裁決(2026/08/08):工作台非獨立系統 — 自身語料為空時自動吃
+        # WorkOps 深度鏈語料(super_engine.db + 命名帳本),同編號同名稱一體呈現。
+        if not self.state["records"]:
+            wb = _load_workops_corpus(self)
+            if wb:
+                self.set_records(wb, {"total": len(wb), "healthy": len(wb), "dup": 0, "bad": 0},
+                                 source="workops:super_engine.db")
         return self.state["records"]
 
     # ---------- \u7d71\u4e00\u72c0\u614b\uff08UI \u540c\u6b65\u4f86\u6e90\uff09 ----------

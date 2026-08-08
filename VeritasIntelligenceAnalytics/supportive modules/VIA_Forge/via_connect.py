@@ -338,6 +338,23 @@ class LocalOutlookConnector(BaseConnector):
         return out
 
     def _read_inbox(self, days_back, max_items, all_mailboxes=False):
+        # ThreadingHTTPServer 的工作執行緒未初始化 COM(操作員實跑:CoInitialize 尚未被呼叫)
+        try:
+            import pythoncom
+        except Exception:
+            pythoncom = None
+        if pythoncom is not None:
+            pythoncom.CoInitialize()
+        try:
+            return self._read_inbox_impl(days_back, max_items, all_mailboxes=all_mailboxes)
+        finally:
+            if pythoncom is not None:
+                try:
+                    pythoncom.CoUninitialize()
+                except Exception:
+                    pass
+
+    def _read_inbox_impl(self, days_back, max_items, all_mailboxes=False):
         import win32com.client
         from datetime import timedelta as _td
         outlook = win32com.client.Dispatch("Outlook.Application")
@@ -401,6 +418,23 @@ class LocalOutlookCalendar:
     def events(self, days_back=30, days_ahead=30, max_items=100):
         if self.transport is not None:
             return self.transport(days_back, days_ahead, max_items)
+        # ThreadingHTTPServer 工作執行緒需先初始化 COM(同 _read_inbox)
+        try:
+            import pythoncom
+        except Exception:
+            pythoncom = None
+        if pythoncom is not None:
+            pythoncom.CoInitialize()
+        try:
+            return self._events_impl(days_back, days_ahead, max_items)
+        finally:
+            if pythoncom is not None:
+                try:
+                    pythoncom.CoUninitialize()
+                except Exception:
+                    pass
+
+    def _events_impl(self, days_back=30, days_ahead=30, max_items=100):
         out = []
         try:
             import win32com.client

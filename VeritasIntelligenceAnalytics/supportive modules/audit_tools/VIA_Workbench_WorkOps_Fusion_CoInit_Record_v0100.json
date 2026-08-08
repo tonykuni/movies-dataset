@@ -1,0 +1,23 @@
+{
+ "record_id": "VIA_Workbench_WorkOps_Fusion_CoInit_Record_v0100",
+ "ts": "2026-08-08T17:10:00",
+ "operator_verdict": "不是獨立系統,是跟 WorkOps 指揮板相結合功能更完善(附實跑:一鍵讀取 Outlook 崩潰 CoInitialize 尚未被呼叫;analytics SyntaxWarning)",
+ "fixes": {
+  "coinit_crash": "via_connect.py:ThreadingHTTPServer 工作執行緒呼 win32com.Dispatch 前未初始化 COM(操作員按「一鍵讀取我的 Outlook」實跑崩潰)→ _read_inbox 與 LocalOutlookCalendar.events 改為 wrapper 形式:pythoncom.CoInitialize → impl → finally CoUninitialize(非 Windows 無 pythoncom 時原樣通過)",
+  "syntaxwarning": "engine_analytics.py 檔頭 docstring 含 out\\deep 逃逸序列(v1.3 註解)→ 改 raw docstring r\"\"\";py_compile -W error::SyntaxWarning 驗證清除"
+ },
+ "fusion_layer": {
+  "adjudication": "工作台非獨立系統 — via_manager.records() 於自身語料為空時,自動唯讀載入 WorkOps 深度鏈語料:functional modules/WorkOps/out/deep/engine_out/super_engine.db(E01_MAIL)+ out/workops_naming.json(命名帳本)",
+  "id_name_preserved": "統一 records 建構時 email_intel.case_id 以 WorkOps CASE 編號覆蓋(編號不變鐵律);cluster_label 帶已核對名稱 — 工作台郵箱分頁與 WorkOps 報表同編號同名稱一體呈現",
+  "governance": "唯讀 mode=ro 開庫;來源缺席回 [] 原行為不變;智慧層計算沿用 MailForgeEngine(_email_intel 經 me.mail 屬性);上限 5000 封防爆",
+  "flow": "操作員動線:via-workops all(深度鏈落庫)→ via-forge / via-workops workbench → 工作台郵箱/專案分頁直接呈現同一批 394 封+編號·名稱,無需重拉 Outlook"
+ },
+ "qa_container": {
+  "ast": "via_connect/via_manager AST PASS;SyntaxWarning 清除 PASS",
+  "server_selftest": "via_server --selftest 4/4",
+  "fusion_e2e": "假 WorkOps 庫 2 封 + 命名帳本 → records() source=workops:super_engine.db;replystatus cases=[CASE-0009, CASE-0042];intelligence 2 案;CASE-0042 cluster_label=台新登入通知(自訂名) — PASS;fixture 已清",
+  "checkmatrix": "45/45 ALL GREEN(無退化;報告自更新)"
+ },
+ "known_residual": "操作員機 Start-VIA 自檢一項紅字(manager: status health all green)為環境依賴差異,啟動器設計上容忍續行;工作台 stakeholders 需寄件者為 email 位址(顯示名寄件者不計)— 屬既有語意",
+ "append_only": true
+}
