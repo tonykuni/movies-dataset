@@ -504,7 +504,9 @@ def test_ingest_engine_guarantee_dedup():
 def test_module_scan_and_nodedup_csv():
     import os, tempfile
     from pmis_lite import module_scan as ms, ingest_engine as ie
-    r = ms.scan_project("pmis_lite")
+    # cwd 相依修正:相對 "pmis_lite" 只在套件母目錄執行時成立(操作員自庫根跑
+    # 即 FAIL count>=20)— 改以 ROOT 錨定,任何 cwd 皆可跑
+    r = ms.scan_project(os.path.join(ROOT, "pmis_lite"))
     assert r["count"] >= 20
     roles = r["by_role"]
     assert roles.get("SUPPORTIVE", 0) >= 1 and roles.get("FUNCTIONAL", 0) >= 1
