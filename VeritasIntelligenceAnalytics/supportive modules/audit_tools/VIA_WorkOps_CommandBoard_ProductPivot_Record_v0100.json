@@ -1,0 +1,24 @@
+{
+ "record_id": "VIA_WorkOps_CommandBoard_ProductPivot_Record_v0100",
+ "ts": "2026-08-08T04:26:49",
+ "operator_verdict": "跟 Outlook 差不多=多餘;還要人工看 Excel control sheet=多餘;太複雜=反效果。要:①一頁以專案為單位控管要事+郵件狀態一目了然 ②一頁主動跳出追蹤郵件、回覆與否自動記錄",
+ "product_answer": {
+  "差異化(非 Outlook)": "以專案歸戶 + 控管表交叉核對(Verified/Stale/Conflicted/Pending Review/Unmatched 五級亮燈)— Outlook 沒有的智慧",
+  "人不開 Excel": "control_sheet.csv 由引擎自動吃入對帳;指揮板即控管表視圖;缺表時給三步引導卡",
+  "不複雜": "一個指令 via-workops 進、一頁出、零設定;有 ≥3 天未回件時自動切到追蹤哨(主動跳出)",
+  "回覆記錄": "未回=在列(逾期/該追了/觀察三級);已回=自動離列歸戶專案活動;最近收件自動記錄"
+ },
+ "engine": "Invoke-VIA-WorkOps-CommandBoard-v0100.ps1(重用 v001 Scan/Reconcile 唯讀面;資料內嵌 HTML;run-local workops_run/;不卡斷;Outlook 未開誠實降級)",
+ "qa": {
+  "ps_lint": "0 errors",
+  "js": "node --check OK(合成資料重演注入)",
+  "visual": "Workbench 鎖 token;XSS esc() 於渲染層;JSON </ 轉義防提早關閉 script"
+ },
+ "wiring": {
+  "bin/via-workops.cmd": "無參數=指揮板一支到底;ui=靜態儀表板;動作透傳 — 全動態最新版",
+  "hub v0107": "WorkOps 磚 → workops_run/VIA_WorkOps_CommandBoard.html(run-local,同 FLOW 磚模式)",
+  "via-one v0112": "WORKOPS 階段 Kind=ps 跑指揮板(自開 UI,不設 Ui 避免雙開)",
+  "registry": "ENG-018"
+ },
+ "append_only": true
+}
