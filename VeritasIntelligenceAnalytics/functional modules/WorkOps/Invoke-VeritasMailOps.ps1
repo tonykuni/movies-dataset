@@ -352,6 +352,7 @@ function VO_Scan {
                     ConversationID = $conv
                     Unread         = [bool]$it.UnRead    # READ ONLY — value is observed, never assigned
                     Categories     = [string]$it.Categories
+                    VotingResponse = $(try { [string]$it.VotingResponse } catch { "" })   # READ ONLY(M3 回覆解析投票層)
                 }
                 $null = $mails.Add($row)
                 if ($from) {

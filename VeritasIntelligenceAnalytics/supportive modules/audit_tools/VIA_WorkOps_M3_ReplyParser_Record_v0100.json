@@ -1,0 +1,22 @@
+{
+ "record_id": "VIA_WorkOps_M3_ReplyParser_Record_v0100",
+ "ts": "2026-08-09T15:10:00",
+ "operator_verdict": "NEXT — 依規劃書 Phase 1 序推進:M3 回覆自動解析(追蹤信寄出→回信自動判讀→狀態自動更新,閉環最後一段)",
+ "delivered": {
+  "eng029": "workops_reply_parser.py(ENG-029):三層 fallback — V 投票層(VotingResponse 直讀零解析)→ T token 層(==VMT-CONFIRM== Qn:idx,Q1=狀態題)→ K 關鍵詞層(reply_parser_params.json 三語同義字);任一命中即完成,都未中誠實列未解析絕不猜;事實流 out/reply_events.jsonl(append-only,冪等=同 conv+日期不重記,壞列隔離)+ 衍生狀態 out/reply_status.json(每輪由事實流全量重算 — F20 狀態不手改);import workops_lexicon(去重正本)",
+  "mailops_voting_read": "MailOps Scan 收件列增 VotingResponse 唯讀匯出(guarded try;READ ONLY 註記)— 投票鈕回信零解析成本",
+  "board_v0116": "②「最近收到」增判讀欄:已完成綠/卡關·需協助紅/進行中黃;reply_status 入 $data 自動顯示(v0115 保留)",
+  "all_v0104": "[2b] 回覆解析 → [2c] WOP 歸戶 → [2d] 決策 KPI(執行序=編號序;v0103 保留)",
+  "integration": "via-workops replies 動詞(parse/status);註冊 ENG-029(28→29);參數 reply_parser_params.json 全 JSON"
+ },
+ "qa_container": {
+  "three_layer": "fixtures 四封:投票已完成→V 層 · token Q1:2→T 層卡關 · 內文卡住→K 層卡關 · 哈囉→誠實未解析 — 全對",
+  "idempotent": "連跑兩輪:事件檔仍 3 筆(已記略過 3)— PASS",
+  "static": "pwsh AST parse MailOps+板 v0116+ALL v0104 三 PASS;py_compile PASS;紅線淨(VotingResponse 為唯讀屬性取值);cmd CRLF+replies 動詞",
+  "ui": "node --check + shim:判讀表頭/已完成綠燈/雙列渲染 — PASS"
+ },
+ "loop_now_closed": "寄出(三段升級鏈 T1/T2/T3)→ 收件(唯讀掃描)→ 判讀(M3 三層)→ 板上顯示(②判讀欄)→ 歸戶/KPI — 規劃書「郵件→事件→決策→郵件」循環全段在編,唯 VotingResponse 實值需操作員實跑驗證(投票鈕回信要 Outlook 端實測)",
+ "red_lines_unchanged": "唯讀(VotingResponse 僅取值)· 原件/分類零觸碰 · 絕不代寄 · 編號永不變 · 只增不減(v0115/v0103 保留)· 未解析誠實不猜",
+ "operator_next": "via-sync 後 via-workops all — [2b] 段印三層統計;②頁最近收到有判讀欄;實測:對一封 approval_request 草稿寄出後,收件人點投票鈕回信,下輪 all 應見 V 層判讀",
+ "append_only": true
+}
