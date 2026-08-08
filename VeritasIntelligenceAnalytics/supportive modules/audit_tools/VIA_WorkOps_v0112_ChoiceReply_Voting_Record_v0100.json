@@ -1,0 +1,16 @@
+{
+ "record_id": "VIA_WorkOps_v0112_ChoiceReply_Voting_Record_v0100",
+ "ts": "2026-08-09T03:20:00",
+ "operator_verdict": "展示 TPL_approval_request.html(必回選擇題)+ 問「如何勾選?信件有這樣的 U/I 嗎?」;同輪 Templates 產範例、DEC-0001 done",
+ "honest_answer": "收件端 HTML 表單控件(radio/checkbox)在 Outlook 不作用(安全性剝除)— 範本上的 ○ 是純文字,靠回信時圈選/刪去不適用。原生真勾選 UI 只有一條本機路:Outlook 投票按鈕(VotingOptions)— 收件人於信上點鈕即回,零打字。雲端 Actionable Messages 表單屬 Graph 線,依治理休眠至 IT 核准。",
+ "delivered": {
+  "board_v0112": "版本前進(v0111 保留):①圈選件草稿 Template=approval_request(圈選=主動索狀態→必回選擇題;自動佇列維持 followup 軟催);ProjectName 空值退 ProjectCode/『專案』防招呼句空洞;②控管表路徑後備 — WorkOps\\ 缺席改讀庫根 control_sheet.csv(操作員實跑抓到 Templates 範例落庫根與板尋徑錯位);③⑥矩陣追蹤哨列註記圈選=必回選擇題+投票勾選",
+  "mailops_voting": "Invoke-VeritasMailOps VO_Draft:approval_request 範本草稿附 VotingOptions=進行中;已完成;卡關;需要協助(guarded try;仍 .Display/.Save 只建草稿絕不 .Send;投票由收件人原生介面操作)— 候辦「必回選擇題範本入草稿線」正式落地"
+ },
+ "qa_container": {
+  "board": "紅線實碼淨(.Send 僅檔頭宣言)/三改動字樣在/模板抽取+合成 DATA → node --check PASS",
+  "mailops": "實碼無 .Send( 行;VotingOptions 字串在;guarded catch 不卡斷"
+ },
+ "next_operator": "via-sync 後:板上②追蹤哨圈選 THR → 複製指令 → via-workops drafts THR-... → Outlook 草稿=選擇題內文+投票鈕;控管表範例填好放庫根即被板讀到(或放 WorkOps\\)",
+ "append_only": true
+}

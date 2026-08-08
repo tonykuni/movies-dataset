@@ -555,6 +555,12 @@ function VO_Draft {
             if (($Row.PSObject.Properties.Name -contains "Cc") -and -not [string]::IsNullOrWhiteSpace($Row.Cc)) { $Mail.CC = [string]$Row.Cc }
             $Mail.HTMLBody = $Rendered.HtmlBody
             try { $Mail.Categories = $Category } catch { }
+            # v0112 追加:必回選擇題範本附 Outlook 原生投票按鈕(收件人點按即回,零打字)。
+            # 回覆 HTML 表單在收件端不作用(Outlook 剝除表單),投票鈕是唯一原生勾選 UI。
+            # 仍只建草稿(.Display/.Save),絕不 .Send;投票由收件人於原生介面操作。
+            if ($TemplateKey -eq "approval_request") {
+                try { $Mail.VotingOptions = "進行中;已完成;卡關;需要協助" } catch { }
+            }
 
             if ($OpenMode -eq "Display") { $Mail.Display($false) } else { $Mail.Save() }
             $Created++
