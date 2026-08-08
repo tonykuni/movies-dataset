@@ -1,0 +1,19 @@
+{
+ "record_id": "VIA_System_Rechain_v0100_Record_v0100",
+ "ts": "2026-08-08T18:40:00",
+ "operator_verdict": "將功能拆開重新檢視,去重、補不足的功能及工具後,再重新串接成系統",
+ "delivered": {
+  "blueprint": "docs/System_Rechain_Blueprint_v0100.md:六層拆解總表(取得/語料/智慧/環境/呈現/指揮)+ 九項去重裁定(正本 vs 消費者)+ 補缺清單(已補/候補)+ 重串接圖(all 為脊椎,共用語料為腰,板與工作台為兩面)",
+  "dedupe_adjudications": "郵件語料正本=WorkOps 深度鏈(工作台 fusion 消費);案件編號正本=CASE+THR/WOP side-car;名稱正本=workops_naming.json;回覆狀態管控在板②/檢視在台;流程探勘正本=analytics(pmine 為互動視圖);匯出各服其面;環境兩域隔離(.venv_pm vs Forge .venv);分段動詞=回退路非重複",
+  "board_v0111": "版本前進(v0110 保留):⑥矩陣新增五列即時狀態 — EnvManager 治理(ENG-020)/graphviz 可攜(ENG-021)/命名核對含筆數(ENG-023)/工作台結合(共用語料)/ALL 總指揮(ENG-022);$data 增 dot_ready/envmgr_ran/forge_ready/naming{total,approved};原 22 列俱在(只增不減)",
+  "help_verb": "via-workops help:全動詞總表(重串接後 20+ 動詞一眼可查)"
+ },
+ "qa_container": {
+  "board_static": "紅線檢查:實碼無 .Send((檔頭紅線宣言除外,與 v0110 同);$data 四新鍵 PS/JS 兩側俱在;五新列字樣在",
+  "board_dynamic": "模板抽取+合成 DATA 注入 → node --check PASS → DOM shim 渲染 6/6 PASS(五新列+原列抽查;naming 顯示 145 筆·核對 145)",
+  "cmd_paren_trap": "help 區塊 8 行 echo 含半形括號(會提早關 if 塊)→ 全形化,assert 0 危險行;CRLF 86/86",
+  "lesson": "cmd if 塊內 echo 之半形括號為地雷;本輪由掃描器抓出後修復 — 未來 cmd 編輯必掃"
+ },
+ "residual_backlog": "THR↔CASE 跨帳本對映(需 ConversationID 入語料)/資料夾歸戶 UI/關鍵字核對 UI/必回選擇題範本/Voice-Minutes 卡/深度輸出入板分頁/hub Forge 磁貼直達活服務/控制表未放 — 均候操作員裁示",
+ "append_only": true
+}
