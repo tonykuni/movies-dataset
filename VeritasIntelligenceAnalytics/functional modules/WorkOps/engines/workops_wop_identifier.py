@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-r"""WorkOps WOP 識別歸戶引擎 v0108(ENG-028)— 規劃書 M1+M2:bottom-up 多訊號融合 → WOP 專案化+賦號
+r"""WorkOps WOP 識別歸戶引擎 v0109(ENG-028)— 規劃書 M1+M2:bottom-up 多訊號融合 → WOP 專案化+賦號
+
+v0109(UI Phase C 令 2026/08/10):propose 加 append wop_route_history.jsonl(每輪 L8 佔比)
+  — 板 05 準確度面趨勢資料源(L8 萎縮=系統在學,KPI 可視化)。
 
 v0108(UI Phase B 令 2026/08/10):propose 加落 out/wop_ask.json(ASK 候選+留置唯讀彙總)
   供板 04 確認中心即時顯示;互動確認正本不變(WopConfirmQueue.html → wop apply)。
@@ -723,6 +726,13 @@ def cmd_propose():
     STATS_P.write_text(json.dumps({"ts": now(), "hits": dict(layer_hits),
                                    "total": len(sig), "noise": len(noise)},
                                   ensure_ascii=False, indent=1), encoding="utf-8")
+    # ---- v0109 L8 趨勢歷史(append-only;板 05 準確度面畫萎縮曲線)----
+    l8 = sum(v for k, v in layer_hits.items() if k.startswith("L8"))
+    tot = len(sig)
+    with io.open(OUT / "wop_route_history.jsonl", "a", encoding="utf-8") as hf:
+        hf.write(json.dumps({"ts": now(), "total": tot, "l8": l8,
+                             "l8_share": round(l8 / tot, 4) if tot else None,
+                             "hits": dict(layer_hits)}, ensure_ascii=False) + "\n")
     dist = " · ".join("%s %d" % (k, v) for k, v in sorted(layer_hits.items()))
     print("[歸戶] THR %d 串:AUTO %d(新 WOP %d)· ASK %d · 留置 %d · 雜訊槽 %d"
           % (len(sig), n_auto, n_new, n_ask, n_q, len(noise)))
