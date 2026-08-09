@@ -1,0 +1,32 @@
+{
+ "record_id": "VIA_DedupEngine_Record_v0100",
+ "ts": "2026-08-10T20:10:00",
+ "operator_order": "整合優化(2026-08-10,承 40+ 檔整合去重戰役)",
+ "adjudication": "把本輪手工重複 40+ 次的去重判定流程產品化為 ENG-049,操作員本機一鍵判定免逐檔上傳",
+ "built": [
+  "supportive modules/registry/via_dedup_index.py(ENG-049 v0100;stdlib 零依賴;全唯讀)",
+  "bin/via-dedup.cmd(build / check 路徑 / report)",
+  ".gitignore 新增 VIA_Reports/dedup/(索引與報告=可再生側車不入 git)"
+ ],
+ "verbs": {
+  "build": "全庫 sha256 索引(容器實測 5720 檔)→ VIA_Reports/dedup/VIA_Content_Hash_Index.json",
+  "check": "IDENTICAL=已在籍免上傳(隔離件命中加紅線標示)/ VERSION_DIFFERS=同名異雜湊人工裁定 / NOT_IN_REPO=候歸戶;檔名 8hex- 前綴與 _n/(n) 尾綴自動正規化;報告落 dedup_check_*.json",
+  "report": "戰役總表 HTML — 合併三份稽核紀錄(ModuleDedup+FIS+Upload)共 45 筆:38 已在籍/4 新歸戶/3 劣本留痕"
+ },
+ "qa": [
+  "py_compile PASS",
+  "沙箱三情境全對:BatchMailer 上傳→IDENTICAL+隔離紅線;via_pipeline_1.py 舊版→VERSION_DIFFERS(正規化命中);全新檔→NOT_IN_REPO",
+  "report HTML 驗證五關鍵詞在位(隔離/SUPERSEDED/新歸戶樣本)"
+ ],
+ "governance": [
+  "全唯讀 — 只寫 VIA_Reports/dedup/ 產物;正本零觸碰",
+  "劣本不入籍、隔離件永不回歸 — 判定語言與帳本一致",
+  "索引可再生 — 正本增減後 build 重跑即新,不產生第二真相"
+ ],
+ "operator_verification": [
+  "via-sync",
+  "via-dedup build",
+  "via-dedup check \"C:\\Users\\tonyk\\Downloads\"",
+  "via-dedup report"
+ ]
+}

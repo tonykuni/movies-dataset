@@ -204,7 +204,8 @@
   "引擎|workops_daily_todo_v0100": "ENG-046",
   "引擎|via_meetingloop_engine_v005": "ENG-047",
   "引擎|workops_meetingloop_bridge_v0100": "ENG-048",
-  "功能性工具|via_note_pro_standalone": "FNT-001"
+  "功能性工具|via_note_pro_standalone": "FNT-001",
+  "引擎|via_dedup_index_v0100": "ENG-049"
  },
  "ledger": [
   {
@@ -988,6 +989,14 @@
    "component": "整合去重追加五檔(VDF MDL401-404 registry 家族+VIS ReleaseRegistry)",
    "code": "VIA-DEDUP-09",
    "note": "同令追加五檔全數已在籍零落籍:①VDF_MDL401_RegistrySchema.json(fffc87e8 — 庫內雙正本並存:VDF/registry/VDF_MDL401_RegistrySchema_v1.json 與 supportive modules/registry/ 同 bytes)②VDF_MDL402_RegistrySample.json(49a5bb59=supportive registry 正本,18 項示範樣本)③VDF_MDL403_RegistryFull.json(bd1a251f=supportive registry 正本,238 項全量)④VDF_MDL404_CoverageReport.json(e91121cf=VDF/registry 正本,~1937 項盤點涵蓋率報告)⑤VIS_ReleaseRegistry.json(05ca0a0e=supportive registry 正本,append-only 封存帳)。"
+  },
+  {
+   "ts": "2026-08-10T20:10:00",
+   "op": "ASSIGN",
+   "category": "引擎",
+   "component": "via_dedup_index_v0100",
+   "code": "ENG-049",
+   "note": "操作員「整合優化」令:整合去重鐵律產品化 — 40+ 檔手工判定收斂為一支引擎(位階 1 registry 工具)。三動詞:build=全庫 sha256 索引(5720 檔,可再生側車不入 git,gitignore VIA_Reports/dedup/);check 路徑=本機逐檔判定 IDENTICAL(已在籍免上傳)/VERSION_DIFFERS(同名異雜湊需人工裁定;上傳檔名 8hex- 前綴與 _n/(n) 尾綴自動正規化)/NOT_IN_REPO(候歸戶),隔離件命中額外紅線標示永不回歸;report=戰役總表 HTML(合併三份稽核紀錄 45 筆判定:38 已在籍/4 新歸戶/3 劣本留痕)。全唯讀零觸碰正本;stdlib 零依賴。沙箱實測三判定全對(含 BatchMailer 隔離命中、pipeline 舊版同名異版)。bin/via-dedup。"
   }
  ]
 }
