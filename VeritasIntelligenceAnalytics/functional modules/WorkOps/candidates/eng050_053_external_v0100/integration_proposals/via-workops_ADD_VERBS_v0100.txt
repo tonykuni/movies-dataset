@@ -1,0 +1,14 @@
+REM REVIEW-ONLY proposal after ENG-049:
+) else if /i "%~1"=="register" (
+  rem ENG-050 Unified Work Register:read-only derived cross-ledger view
+  py "%~dp0..\functional modules\WorkOps\engines\workops_unified_work_register.py"
+) else if /i "%~1"=="commitments" (
+  rem ENG-051 Commitments:CMT-####, human-confirmed create/accept/fulfill/reschedule
+  py "%~dp0..\functional modules\WorkOps\engines\workops_commitment_intelligence.py" %2 %3 %4 %5 %6 %7 %8 %9
+) else if /i "%~1"=="consistency" (
+  rem ENG-052 Cross-ledger contradiction guard:report only, no auto-fix
+  py "%~dp0..\functional modules\WorkOps\engines\workops_consistency_guard.py"
+) else if /i "%~1"=="health" (
+  rem ENG-053 Explainable WOP progress/health
+  py "%~dp0..\functional modules\WorkOps\engines\workops_project_health.py"
+)

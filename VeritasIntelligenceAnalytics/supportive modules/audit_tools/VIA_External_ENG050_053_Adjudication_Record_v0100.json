@@ -1,0 +1,40 @@
+{
+ "record_id": "VIA_External_ENG050_053_Adjudication_Record_v0100",
+ "ts": "2026-08-11T08:10:00",
+ "operator_action": "五批共 20 檔上傳(無文字)= 外部 ENG050-053 套件整合去重 + 歸戶裁定",
+ "dedup_verdicts": {
+  "IDENTICAL_已在籍免上傳_7": [
+   "PANORAMIC_GAP_AUDIT_v0200.md / .html → docs/gapfill_v0200/(既有正本)",
+   "PANORAMIC_CAPABILITY_MATRIX.json ×2(同雜湊 474da8227523fe04)→ docs/gapfill_v0200/",
+   "QA_GAPFILL_v0200.json / STAGE2_INTEGRATION_GUIDE.md / GapFill-ReviewOnly-v0200.ps1 → docs/gapfill_v0200/"
+  ],
+  "重複上傳_2": "QA_ENG050_053_v0100.json 與 ReviewOnly PS1 各上傳兩次(雜湊同)— 首件已歸戶,次件免處理",
+  "新歸戶_15": "外部套件 15/17 檔 → functional modules/WorkOps/candidates/eng050_053_external_v0100/(鏡照 RELEASE_MANIFEST 版型:根/docs/engines/config/integration_proposals)"
+ },
+ "manifest_verification": {
+  "manifest": "RELEASE_MANIFEST.json 17 檔 sha256 全清單",
+  "result": "到齊 15 檔雜湊全數與 manifest 相符(HASH_MISMATCH 0);未到 2 檔:integration_proposals/BOARD_v0127_PROPOSAL.md、tests/test_eng050_053.py — 候上傳補齊"
+ },
+ "code_collision_ruling": {
+  "conflict": "外部套件自標 ENG-050..053(統一登記簿/承諾追蹤/一致性守衛/健康分)— 本方 registry 已於 2026-08-11T06:20 ASSIGN ENG-050=workops_accuracy_harness;另其 SELFTEST_v0103_PROPOSAL 撞本方 selftest v0103(實機 KeyError 補洞版,已在籍)",
+  "ruling": "編號一旦生成永不變 + TheirCode 不能改只能對照:外部 ENG-050..053 一律視為他方對照碼,本方 ENG-050 歸屬不動;四引擎若升籍依 registry 現行流程領新號並記兩碼對照。他方 REGISTRY_PROPOSAL 自標 PROPOSAL_ONLY 與此裁定相容。selftest 版號若採納其提案則版本前進至 v0104+,不覆蓋本方 v0103",
+  "cmt_id_family": "ENG-051 引入 CMT-#### 新編號族 — 領號啟用前不得生效(編號主權位階 1)"
+ },
+ "candidate_qa": {
+  "py_compile": "5/5 引擎 PASS(container)",
+  "red_line_scan": "5/5 零命中(.Send(/smtplib/sendmail/DeleteItem/.Move(/requests/urllib/socket)— 全 stdlib 唯讀+側車寫入",
+  "schema_compat": "control_common.decision_rows() 之 SELECT 11 欄與本方 ENG-027 DECISIONS 表完全同序;milestones.json/closures.json/closure_candidates.json/timeline_links.json 檔名與本方 GapFill 鏈側車一致 — 套件確按本方 repo 版型構建",
+  "config_json": "3/3 解析 PASS",
+  "not_yet_run": "沙箱實跑(synthetic fixtures)與 selftest 整合 — 候啟用令後執行;他方 QA 自報 contradiction_gate=FAIL/health 32 待實跑釐清"
+ },
+ "governance_alignment": [
+  "套件治理宣稱與紅線相容:不代寄/不動信箱/不自動結案/不自動生承諾/不改既有編號 — 實碼掃描佐證(見 candidate_qa)",
+  "衍生檔可再生、來源帳本仍為正本 — 符合單一真相原則",
+  "他方 GitHub 寫入 403 被擋 — repo 寫入權未外開,符合預期",
+  "本輪=歸戶留檔;零啟用、零 cmd 接線、零 registry 領號、engines/ 正本區零觸碰"
+ ],
+ "pending": [
+  "候上傳:BOARD_v0127_PROPOSAL.md、tests/test_eng050_053.py(manifest 差 2 檔)",
+  "候顯式令:四引擎沙箱評審→領號升籍→cmd 動詞接線(commitments/register/consistency/health)→ALL v0106 版本前進;CMT-#### 編號族啟用"
+ ]
+}
