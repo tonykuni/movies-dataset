@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-r"""WorkOps 回覆解析引擎 v0102(ENG-029)— 規劃書 M3:回信 → 三層 fallback 解析 → 狀態事件
+r"""WorkOps 回覆解析引擎 v0103(ENG-029)— 規劃書 M3:回信 → 三層 fallback 解析 → 狀態事件
 
 v0101(操作員六機制研究令):三項增能 —
   ① OOO 偵測:收信含 OOO/自動回覆詞 → flags.ooo(⏸窗口休假)+ 內文代理人 email 提示;
@@ -14,6 +14,14 @@ v0101(操作員六機制研究令):三項增能 —
 → 對方回信 → 本引擎自動判讀 → 狀態自動更新,人不再逐封讀信。
 
 v0102(UI Phase B 令):未解析樣本(≤40 筆)入 reply_status.json unparsed 欄 — 板 04 確認中心唯讀顯示。
+
+v0103(操作員「大幅提高正確率各類方法」令):V/T/K 之後三新層,全數守誠實閘 —
+  A ACK 層   極短回覆(正規化 ≤12 字)命中確認詞(收到/好的/OK/noted…)→「已回覆確認」
+             (脫離未回佇列;不冒充完成狀態)
+  Q 問句層   回覆以問句收尾/含問號且短 →「對方提問」(球在我方 — 板上紅字提醒)
+  E 集成層   三類弱訊號詞庫(完成弱詞/進行弱詞/卡關弱詞)計分投票 — 最高分 ≥2 且
+             嚴格領先次高才判(FIS 同號過濾精神:訊號衝突=不判,回未解析)
+  詞庫全入 reply_parser_params.json v0102(ack_terms/weak_signals/ensemble_min)。
 
 三層 fallback(規劃書 §01:任一命中即完成狀態識別;都未命中誠實列未解析,絕不猜):
   V 投票層   Outlook VotingResponse 屬性(MailOps Scan v0116 起唯讀匯出)→ 零解析成本
@@ -65,6 +73,15 @@ DEFAULT_PARAMS = {
     },
     "ooo_terms": ["out of office", "automatic reply", "自動回覆", "休假中"],
     "risk_terms": ["違約", "律師", "breach", "penalty"],
+    "ack_max_chars": 12,
+    "ack_terms": ["收到", "好的", "了解", "瞭解", "沒問題", "谢谢", "謝謝", "ok", "okay", "noted", "thanks", "roger", "got it"],
+    "question_max_chars": 60,
+    "ensemble_min": 2,
+    "weak_signals": {
+        "已完成": ["已寄", "已提供", "已回覆", "已更新", "已上傳", "已送出", "如附件", "請查收", "attached", "sent you", "uploaded", "delivered"],
+        "進行中": ["正在", "盡快", "安排", "預計", "下週", "下周", "明天", "本週內", "will ", "working on", "eta", "on it"],
+        "卡關": ["等待", "尚未", "還沒", "延後", "延誤", "無法", "pending", "waiting", "delay", "cannot", "unable"],
+    },
 }
 
 
@@ -150,6 +167,31 @@ def parse_one(row, body, params):
         for wd in words:
             if wd.lower() in low:
                 return "K", st, "關鍵詞「%s」" % wd
+    # ---- v0103 各類方法(誠實閘:寧未解析不亂判)----
+    core = re.sub(r"[\s。,,!!??\~~\.…]+", "", (body or ""))
+    # A ACK 短覆層:極短且命中確認詞 → 已回覆確認(脫離未回佇列,不冒充完成)
+    if 0 < len(core) <= int(params.get("ack_max_chars", 12)):
+        for t in params.get("ack_terms", []):
+            if t.lower() in core.lower():
+                return "A", "已回覆確認", "ACK 短覆「%s」" % core[:12]
+    # Q 問句層:含問號且短 → 對方提問(球在我方)
+    if ("?" in (body or "") or "?" in (body or "")) and len(core) <= int(params.get("question_max_chars", 60)):
+        return "Q", "對方提問", "問句回覆(需我方回答)"
+    # E 弱訊號集成層:三類弱詞計分,最高分 ≥ ensemble_min 且嚴格領先次高才判
+    ws = params.get("weak_signals", {})
+    scores = {}
+    ev = {}
+    for st, words in ws.items():
+        hits = [w for w in words if w.lower() in low]
+        if hits:
+            scores[st] = len(hits)
+            ev[st] = hits
+    if scores:
+        rank = sorted(scores.items(), key=lambda kv: -kv[1])
+        top_st, top_n = rank[0]
+        second = rank[1][1] if len(rank) > 1 else 0
+        if top_n >= int(params.get("ensemble_min", 2)) and top_n > second:
+            return "E", top_st, "弱訊號集成 %d 票「%s」" % (top_n, "、".join(ev[top_st][:3]))
     return None
 
 

@@ -205,7 +205,8 @@
   "引擎|via_meetingloop_engine_v005": "ENG-047",
   "引擎|workops_meetingloop_bridge_v0100": "ENG-048",
   "功能性工具|via_note_pro_standalone": "FNT-001",
-  "引擎|via_dedup_index_v0100": "ENG-049"
+  "引擎|via_dedup_index_v0100": "ENG-049",
+  "引擎|workops_accuracy_harness_v0100": "ENG-050"
  },
  "ledger": [
   {
@@ -1133,6 +1134,22 @@
    "component": "系統與 U/I 雙優化(板 v0126+ENG-049 v0106)",
    "code": "VIA-OPT-20260811",
    "note": "操作員 OPTIMIZE THE SYSTEM & U/I 令:①U/I — 板 v0125→v0126 視覺鎖定 v2 全面換膚:中性色全套換 Industry tokens(bg #f2f2f3/panel #e9e9ea/card #fff/ink #1d1f20/冷灰線條)+主 accent #4c78a8→#5980a6;漲跌/風險語意色原封不動(紅漲綠跌鐵律不受換膚影響);流程帶灰階改 tokens 一致。結構/資料流/JS 零改動;QA AST 0 錯+shim 33 斷言全過+token 斷言(v2 中性色在位、語意色未動)。②系統 — ENG-049 v0106:check 增量快取(check_cache.json,絕對路徑+size+mtime)— Downloads 87k 檔重掃免重雜湊,判定邏輯零改動;沙箱實證第二輪快取命中。啟動器動態解析自取 v0126。"
+  },
+  {
+   "ts": "2026-08-11T06:20:00",
+   "op": "ASSIGN",
+   "category": "引擎",
+   "component": "workops_accuracy_harness_v0100",
+   "code": "ENG-050",
+   "note": "操作員「大幅提高正確率各類方法」令:受控正確率 harness — FIS 受控 DGP 精神移植郵件解析:25 合成真值案例 + 4 旗標案例丟進真生產 parse_one/detect_flags(吃合併後 reply_parser_params.json),四閘 G1 逐層命中/G2 誠實閘零亂判(噪音+訊號衝突必回未解析)/G3 OOO·風險旗標/G4 可判全覆蓋 — 首跑 ALL PASS;報告落 out/accuracy_harness_report.json;與 ENG-030 Gold Set 分工:benchmark=真實信件人工核對,harness=合成語料零人工邏輯零迴歸。verb:via-workops accuracy harness。"
+  },
+  {
+   "ts": "2026-08-11T06:20:00",
+   "op": "UPDATE",
+   "category": "引擎",
+   "component": "workops_reply_parser v0103(A/Q/E 三新層)",
+   "code": "ENG-029",
+   "note": "同令:實機 194/195 未解析=最大正確率槓桿 → V/T/K 之後加三誠實層:A ACK 短覆(正規化 ≤12 字命中確認詞→已回覆確認,脫離未回佇列不冒充完成)/Q 問句(含問號且 ≤60 字→對方提問,球在我方)/E 弱訊號集成(三類弱詞計分,最高 ≥2 且嚴格領先次高才判 — FIS 同號過濾精神:衝突=誠實未解析)。詞庫全入 reply_parser_params.json v0102(ack_terms/weak_signals/ensemble_min);正則字元類 ~~ FutureWarning 排雷(\\~);ENG-050 harness 25+4 案例 ALL PASS + selftest 7/7 迴歸綠。"
   }
  ]
 }

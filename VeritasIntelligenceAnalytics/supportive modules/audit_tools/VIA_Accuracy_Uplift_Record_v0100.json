@@ -1,0 +1,50 @@
+{
+ "record_id": "VIA_Accuracy_Uplift_Record_v0100",
+ "ts": "2026-08-11T06:20:00",
+ "operator_order": "大幅提高正確率各類方法(2026-08-11)",
+ "diagnosis": "實機數據:195 封收信僅 1 封有判讀(V/T/K 三層覆蓋不足)— 回覆解析=全系統正確率最大槓桿",
+ "adjudication": "雙軌:①ENG-029 解析器加三誠實層擴大覆蓋(絕不放鬆誠實閘);②ENG-050 受控 harness 把 FIS 受控 DGP 驗證哲學移植到郵件解析,任何參數/邏輯改動先過閘再上線",
+ "changes": {
+  "ENG-029 workops_reply_parser v0103": [
+   "A ACK 短覆層:信體正規化(剝空白標點)≤ack_max_chars=12 字且命中確認詞 → 「已回覆確認」(脫離未回佇列;不冒充完成狀態)",
+   "Q 問句層:含問號(半形/全形)且 ≤question_max_chars=60 字 → 「對方提問」(球在我方)",
+   "E 弱訊號集成層:已完成/進行中/卡關三類弱詞計分投票 — 最高分 ≥ensemble_min=2 且嚴格領先次高才判;FIS 同號過濾精神:訊號衝突=誠實回未解析",
+   "層序 V→T→K→A→Q→E;前層命中即回,後層永不越權",
+   "正則字元類 ~~ 觸發 Python FutureWarning(集合運算保留語法)→ 跳脫 \\~ 排雷",
+   "詞庫修正:進行中弱詞「處理中會」筆誤 → 「盡快」"
+  ],
+  "reply_parser_params.json v0102": [
+   "新增 ack_max_chars/ack_terms(14 詞繁简英)/question_max_chars/ensemble_min/weak_signals(3 類 35 詞)",
+   "行為改變只改此檔 — load_params 以 DEFAULT_PARAMS 為底合併,舊檔缺鍵不炸"
+  ],
+  "ENG-050 workops_accuracy_harness v0100": [
+   "合成語料 25 案例自帶真值:V3/T3/K4/A4/Q2/E3 + 噪音 4 + 訊號衝突 2",
+   "旗標案例 4:OOO+代理人擷取/中文休假/風險語意/無旗標",
+   "吃真生產 parse_one/detect_flags + 真合併參數 — 非影子邏輯",
+   "四閘:G1 逐層 100% / G2 誠實閘零亂判 / G3 旗標全對 / G4 可判全覆蓋;任一 FAIL 整體 FAIL exit 1",
+   "報告 out/accuracy_harness_report.json;與 ENG-030 Gold Set 互補(真實信件人工核對 vs 合成零人工零迴歸)"
+  ],
+  "bin/via-workops.cmd": [
+   "accuracy 動詞巢狀分派:accuracy harness → ENG-050;其餘維持 ENG-030 benchmark",
+   "help 行更新;顯示行全形括號鐵律掃描 0 隱患;CRLF 保持"
+  ]
+ },
+ "qa": [
+  "py_compile PASS(parser+harness+benchmark)",
+  "harness 首跑 ALL PASS:25 案例 + 4 旗標全綠;G1-G4 四閘 PASS;-W error::FutureWarning 下零警告",
+  "workops_selftest 7/7 PASS(FinalGate;解析器改動後全鏈迴歸)",
+  "cmd 隱患掃描:LF-only 0 行;區塊內 echo/rem 半形括號 0 件"
+ ],
+ "governance": [
+  "誠實閘不放鬆:新三層全數寧未解析不亂判;衝突與噪音案例入 harness 永久看守",
+  "只增不減:V/T/K 原層零改動;params 舊鍵零改動",
+  "行為改變只改 JSON;ENG-050 全唯讀只寫 out/ 報告",
+  "編號:ENG-050 新發;ENG-029 沿用不變"
+ ],
+ "operator_verification": [
+  "via-sync",
+  "via-workops accuracy harness",
+  "via-workops selftest",
+  "via-workops replies"
+ ]
+}

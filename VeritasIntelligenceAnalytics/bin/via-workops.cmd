@@ -29,8 +29,12 @@ if "%~1"=="" (
   rem 決策追蹤（ENG-027）:decisions add "決議" 負責人 [截止] [THR-#] [會議碼] / list / start|done|block DEC-# / report / export
   py "%~dp0..\functional modules\WorkOps\engines\workops_decision_log.py" %2 %3 %4 %5 %6 %7
 ) else if /i "%~1"=="accuracy" (
-  rem Gate E Gold Set 準確度基準:accuracy=template 產核對樣板 | accuracy run=實測計分
-  py "%~dp0..\functional modules\WorkOps\engines\workops_accuracy_benchmark.py" %2 %3
+  rem Gate E 準確度:accuracy=template 產核對樣板 | accuracy run=Gold Set 實測計分 | accuracy harness=ENG-050 受控驗證
+  if /i "%~2"=="harness" (
+    py "%~dp0..\functional modules\WorkOps\engines\workops_accuracy_harness.py" %3
+  ) else (
+    py "%~dp0..\functional modules\WorkOps\engines\workops_accuracy_benchmark.py" %2 %3
+  )
 ) else if /i "%~1"=="backup" (
   rem L06 安全車道:backup=備份側車正本 | verify=雜湊驗證 | restore=只還原到暫存
   py "%~dp0..\functional modules\WorkOps\engines\workops_backup.py" %2 %3
@@ -128,7 +132,7 @@ if "%~1"=="" (
   echo  ^(裸打^)      指揮板一支到底:掃描+對帳+編號+六頁板+週報+KPI
   echo  all          總指揮:環境自癒 - 指揮板 - 深度鏈 - 總結表 [-Days n] [-SkipDeep] [-NoOpen]
   echo  deep         深度鏈 [-Days n] [-StartDate yyyy-MM-dd] [-EndDate yyyy-MM-dd]（尾端自動命名提議）
-  echo  accuracy     Gold Set 準確度:template=產樣板 run=實測計分
+  echo  accuracy     準確度:template=產樣板 run=Gold Set 實測 harness=受控驗證（ENG-050）
   echo  backup       備份/驗證/還原到暫存:backup verify restore
   echo  selftest     全鏈自測（ENG-032）:沙箱實跑 命名-歸戶-回覆-準確度-會議決策-備份 六段
   echo  replies      M3 回覆解析:replies=三層判讀 status=現況

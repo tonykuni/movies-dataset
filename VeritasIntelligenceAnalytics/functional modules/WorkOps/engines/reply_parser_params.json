@@ -1,6 +1,6 @@
 {
- "version": "v0100",
- "comment": "M3 回覆解析參數(規劃書 §07:投票→token→關鍵詞三層 fallback,任一命中即完成狀態識別;都未命中誠實列未解析,絕不猜)。voting_map=Outlook 投票回覆文字→狀態;token regex 於引擎(==VMT-CONFIRM== Qn:idx);q1_options=第一題選項序(token idx 對照);keywords=關鍵詞層(繁/简/en 同義字,依序先中先贏)。行為改變只改此檔。 v0101 增:ooo_terms=OOO/自動回覆偵測(⏸凍結標籤+代理人提示);risk_terms=風險語意越級(⚡無視天數直上 T3);皆三語同義字可增列。",
+ "version": "v0102",
+ "comment": "M3 回覆解析參數(規劃書 §07:投票→token→關鍵詞三層 fallback,任一命中即完成狀態識別;都未命中誠實列未解析,絕不猜)。voting_map=Outlook 投票回覆文字→狀態;token regex 於引擎(==VMT-CONFIRM== Qn:idx);q1_options=第一題選項序(token idx 對照);keywords=關鍵詞層(繁/简/en 同義字,依序先中先贏)。行為改變只改此檔。 v0101 增:ooo_terms=OOO/自動回覆偵測(⏸凍結標籤+代理人提示);risk_terms=風險語意越級(⚡無視天數直上 T3);皆三語同義字可增列。 v0102 增(大幅提高正確率各類方法令):ack_terms=A 層極短確認詞(正規化 ≤ack_max_chars 字才適用→已回覆確認);question_max_chars=Q 層問句上限;weak_signals=E 層三類弱訊號詞庫(計分投票,最高 ≥ensemble_min 且嚴格領先次高才判;訊號衝突=誠實回未解析 — FIS 同號過濾精神)。",
  "voting_map": {
   "進行中": "進行中",
   "已完成": "已完成",
@@ -85,5 +85,67 @@
   "legal action",
   "dispute",
   "termination notice"
- ]
+ ],
+ "ack_max_chars": 12,
+ "ack_terms": [
+  "收到",
+  "好的",
+  "了解",
+  "瞭解",
+  "沒問題",
+  "没问题",
+  "謝謝",
+  "谢谢",
+  "ok",
+  "okay",
+  "noted",
+  "thanks",
+  "roger",
+  "got it"
+ ],
+ "question_max_chars": 60,
+ "ensemble_min": 2,
+ "weak_signals": {
+  "已完成": [
+   "已寄",
+   "已提供",
+   "已回覆",
+   "已更新",
+   "已上傳",
+   "已送出",
+   "如附件",
+   "請查收",
+   "attached",
+   "sent you",
+   "uploaded",
+   "delivered"
+  ],
+  "進行中": [
+   "正在",
+   "盡快",
+   "安排",
+   "預計",
+   "下週",
+   "下周",
+   "明天",
+   "本週內",
+   "will ",
+   "working on",
+   "eta",
+   "on it"
+  ],
+  "卡關": [
+   "等待",
+   "尚未",
+   "還沒",
+   "延後",
+   "延誤",
+   "無法",
+   "pending",
+   "waiting",
+   "delay",
+   "cannot",
+   "unable"
+  ]
+ }
 }
