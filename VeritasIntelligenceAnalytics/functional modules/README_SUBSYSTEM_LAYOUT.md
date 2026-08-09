@@ -112,3 +112,20 @@ VTR(原 `functional modules/VTR`)git mv 併入 `functional modules/WorkOps/{VMT,
 
 
 **商業定名(2026-08-09)**:VIA WorkOps 子系統對外定名 **Veritas WorkOps**;檔名/編號/動詞不動,品牌見板 v0118 起。
+
+## 位階總表(2026-08-10 操作員「更新所有子系統 注意位階」令)
+
+| 位階 | 層 | 成員 | 狀態 |
+|---|---|---|---|
+| 1 | VIA 母系統 | VeritasIntelligenceAnalytics(bin/ 啟動器 · registry 編號正本 · VIA_SSOT · audit_tools · VisualLock UI 風格正本) | 治理層 |
+| 2 | 子系統 | **Veritas WorkOps**(SUB-006,產品主線:48 引擎/十面板/七段自測/日節奏) | 運轉中 |
+| 2 | 子系統 | **VDF**(SPJ-VDF,取數:契約 277 項+MDL501 增減) | 結案基線 PASS,照常可用 |
+| 2 | 子系統 | **VRN**(SPJ-VRN,研報修復;VisualLock=全系統 UI 正本) | 結案基線 PASS |
+| 2 | 子系統 | **VAP**(SPJ-VAP,自動繪圖;消費 VDF db) | 結案基線 PASS |
+| 2.5 | WorkOps 轄下模組 | VMT(追蹤自動化;資料層待 init;quarantine 含紅線隔離件)· VTR(逐字稿確定性修復正本)· MeetingLoop(會議循環:修復/摘要/行動/工作台;ENG-048 橋入對帳) | 模組不另立子系統位階 |
+| 3 | 引擎 | ENG-001..048(registry ASSIGN;編號永不變) | 帳本 89 筆 |
+| 4 | 側車/產物 | out/ 各帳本(append-only)· VIA_Reports/ | 只增不減 |
+
+位階鐵則:模組永不越級呼叫(MeetingLoop 產物經 ENG-048 橋進 WorkOps 帳,不直寫);
+編號主權在位階 1 registry;跨子系統共用資產一律經 VIA_SSOT/Shared_Lexicon_Registry 登記。
+MeetingLoop 發現根:`functional modules/WorkOps/MeetingLoop`(2026-08-10 歸位)。

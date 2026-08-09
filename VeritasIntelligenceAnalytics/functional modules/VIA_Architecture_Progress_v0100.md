@@ -60,3 +60,25 @@ WorkOps 衝刺:ENG-028 WOP 識別(八層路由/學習迴圈/87 案實戰)→ ENG
   VIA_VAP_Chart_Library_Builder.html、VIA_VAP_System.html(UI 版)。
 - **VRN**:VisualLock v0159 為 UI 風格正本(板 v0119+ 已採);VRN 本體(Guarded Entry v217、
   Batch AllInOne、staging 修復系)原狀在位,無本輪改動需求。
+
+## 補遺三(2026-08-10 操作員「更新所有子系統 注意位階」令)— 全系統位階與現況定格
+
+```
+位階 1  VIA 母系統(bin 啟動器 · registry 編號正本 89 筆 · VIA_SSOT · VisualLock UI 正本)
+  ├─ 位階 2  Veritas WorkOps(SUB-006)── 產品主線,PRODUCTIZED_FULL_LOOP
+  │    ├─ 引擎 ENG-015/017-048(歸戶八層 AUTO 129/ASK 0 · 回覆三層 · 自測 7 段 ·
+  │    │   TO-DO 七批 · 簡報 · 稽核包 · 矩陣 · 搜尋/里程碑/時間軸/結案/教訓/保留/首跑)
+  │    ├─ 板 v0123 十面(今日作戰面/確認中心/準確度)· ALL v0105 十三段 · 日節奏 16/11/16
+  │    ├─ 模組 VMT(位階 2.5;資料層待 init;quarantine:BatchMailer 紅線隔離)
+  │    ├─ 模組 VTR(位階 2.5;逐字稿確定性修復正本;49 測試)
+  │    └─ 模組 MeetingLoop(位階 2.5;會議循環 v005;實機 9/9;ENG-048 橋入對帳)
+  ├─ 位階 2  VDF(SPJ-VDF)── 結案基線 PASS;取數契約 277 項;MDL501 增減管理
+  ├─ 位階 2  VRN(SPJ-VRN)── 結案基線 PASS;VisualLock v0159=全系統 UI 風格正本
+  └─ 位階 2  VAP(SPJ-VAP)── 結案基線 PASS;9 artifacts;chartlib v002 升級鏈完整
+位階 3  引擎(編號永不變;晉升必納 selftest)   位階 4  側車(append-only)
+```
+
+- 位階鐵則:模組不越級(MeetingLoop→ENG-048 橋→WorkOps 帳);編號主權=位階 1 registry;
+  共用資產經 Shared_Lexicon_Registry 登記;結案=基線封存非停用,重跑 via-closure 落新基線。
+- 待操作員:控管表(嚴格提示詞)· Gold Set 首測 · VMT via-vmt-init;候令:VTR 模型層/JS、
+  RC 產品線 payload、Graph(IT 核准後)。
