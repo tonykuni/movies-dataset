@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-"""WorkOps 共用詞彙模組 v0100 — SSOT/REGEX/同義字/LIST 彙整去重(操作員 2026/08/09 令)。
+"""WorkOps 共用詞彙模組 v0101 — SSOT/REGEX/同義字/LIST 彙整去重(操作員 2026/08/09 令)。
+
+v0101(擇優去重令):load_org_lexicon 併入 VTR 詞庫(products/projects,enabled 且非
+樣板佔位)— VTR 人工核准詞條=高質專名,S9 訊號與網域收割共享;人名庫刻意排除
+(常見姓名易誤中,VTR 修復自身仍用)。
 
 正本原則:凡跨引擎共用之 regex/正規化函數/清單載入器,一律以本模組為唯一定義;
 消費者(workops_wop_identifier / workops_namer / …)import 之,不得各自複本。
@@ -58,16 +62,39 @@ def is_bulk(sender, pats):
     return any(p in s for p in pats)
 
 
-def load_org_lexicon(path=None):
-    """org_lexicon.json:機構/公司名(SSOT 附件萃取)。回 (names_desc_len, meta)。"""
-    p = Path(path) if path else HERE / "org_lexicon.json"
-    if not p.exists():
-        return [], {}
-    try:
-        d = json.loads(p.read_text(encoding="utf-8-sig"))
-    except Exception:
-        return [], {}
+def _vtr_terms():
+    """v0101:VTR 詞庫 products/projects 之 enabled 詞條(canonical+aliases;樣板佔位排除)。"""
+    vtr = HERE.parent / "VTR" / "lexicon"
     names = set()
+    for bank in ("products.json", "projects.json"):
+        p = vtr / bank
+        if not p.exists():
+            continue
+        try:
+            d = json.loads(p.read_text(encoding="utf-8-sig"))
+        except Exception:
+            continue
+        for e in d.get("entries", []):
+            if e.get("enabled") is False:
+                continue
+            cands = [e.get("canonical", "")] + [a.get("surface", "") for a in e.get("aliases", [])]
+            for nm in cands:
+                nm = (nm or "").strip()
+                if len(nm) >= 3 and "<" not in nm and ">" not in nm:
+                    names.add(nm)
+    return names
+
+
+def load_org_lexicon(path=None):
+    """org_lexicon.json + VTR 詞庫(v0101 擇優共用):機構/公司/產品/專案名。回 (names_desc_len, meta)。"""
+    p = Path(path) if path else HERE / "org_lexicon.json"
+    names = set()
+    d = {}
+    if p.exists():
+        try:
+            d = json.loads(p.read_text(encoding="utf-8-sig"))
+        except Exception:
+            d = {}
     for c in d.get("companies", []):
         nm = (c.get("name") or "").strip()
         if len(nm) >= 2:
@@ -76,6 +103,7 @@ def load_org_lexicon(path=None):
         nm = (nm or "").strip()
         if len(nm) >= 2:
             names.add(nm)
+    names |= _vtr_terms()
     return sorted(names, key=len, reverse=True), d
 
 
