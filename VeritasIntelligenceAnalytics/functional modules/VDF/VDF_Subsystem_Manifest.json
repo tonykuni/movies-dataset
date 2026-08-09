@@ -1,30 +1,49 @@
 {
-  "subsystem": "VDF",
-  "role": "Veritas Data Forge · market data sources, basic info and financial data outputs",
-  "integration_state": "ANCHOR_REGISTERED_WITH_MOVIES_INTAKE_ENGINE",
-  "canonical_tree": "Maintained locally under <Base>/functional modules/VDF (or VeritasDataForge) on the operator workstation; this anchor registers the discovery root, governance gates, and the movies-dataset intake engine.",
-  "discovery_root": "functional modules/VDF",
-  "artifacts": [
-    {
-      "filename": "engine/vdf_movies_intake_v001.py",
-      "role": "VDF movies-dataset intake forge v001 · reads <Repo>/data/*.csv (movie_metadata / tmdb_5000_movies / movies_genres_summary) and materializes the VDF analytical database db/movies_dataset.sqlite (tables: movies_genres_summary, yearly_box_office, yearly_tmdb) · modes Refresh/ValidateOnly/DryRun · sources read-only · atomic replace · intake summary under qa/evidence (zero dependencies)",
-      "bytes": 10506,
-      "sha256": "5675d447f7ae52fd4b944e6861643d65e5a9853fd31b162677206b84e5507694"
-    }
-  ],
-  "products": {
-    "database": "db/movies_dataset.sqlite (git-ignored product; rebuild via the intake engine)",
-    "evidence": "qa/evidence/movies_intake_summary.json (tracked · source sha256, row counts, gate)"
-  },
-  "governance": {
-    "update_modes": ["Incremental", "Refresh", "ValidateOnly", "DryRun"],
-    "promotion_gate": "OPERATOR_REVIEW_AND_SEPARATE_HASH_LOCKED_TRANSACTION_REQUIRED",
-    "canonical_mutation_by_system_manager": false,
-    "sandbox_repair_only": true
-  },
-  "system_manager": {
-    "version": "v0162B",
-    "analyzed_sections": ["MODULE", "ENGINE", "FUNCTION-LIB", "OTHERS"],
-    "round_limit": 3
+ "subsystem": "VDF",
+ "role": "Veritas Data Forge · market data sources, basic info and financial data outputs",
+ "integration_state": "ANCHOR_REGISTERED_WITH_MOVIES_INTAKE_ENGINE",
+ "canonical_tree": "Maintained locally under <Base>/functional modules/VDF (or VeritasDataForge) on the operator workstation; this anchor registers the discovery root, governance gates, and the movies-dataset intake engine.",
+ "discovery_root": "functional modules/VDF",
+ "artifacts": [
+  {
+   "filename": "engine/vdf_movies_intake_v001.py",
+   "role": "VDF movies-dataset intake forge v001 · reads <Repo>/data/*.csv (movie_metadata / tmdb_5000_movies / movies_genres_summary) and materializes the VDF analytical database db/movies_dataset.sqlite (tables: movies_genres_summary, yearly_box_office, yearly_tmdb) · modes Refresh/ValidateOnly/DryRun · sources read-only · atomic replace · intake summary under qa/evidence (zero dependencies)",
+   "bytes": 10506,
+   "sha256": "5675d447f7ae52fd4b944e6861643d65e5a9853fd31b162677206b84e5507694"
   }
+ ],
+ "products": {
+  "database": "db/movies_dataset.sqlite (git-ignored product; rebuild via the intake engine)",
+  "evidence": "qa/evidence/movies_intake_summary.json (tracked · source sha256, row counts, gate)"
+ },
+ "governance": {
+  "update_modes": [
+   "Incremental",
+   "Refresh",
+   "ValidateOnly",
+   "DryRun"
+  ],
+  "promotion_gate": "OPERATOR_REVIEW_AND_SEPARATE_HASH_LOCKED_TRANSACTION_REQUIRED",
+  "canonical_mutation_by_system_manager": false,
+  "sandbox_repair_only": true
+ },
+ "system_manager": {
+  "version": "v0162B",
+  "analyzed_sections": [
+   "MODULE",
+   "ENGINE",
+   "FUNCTION-LIB",
+   "OTHERS"
+  ],
+  "round_limit": 3
+ },
+ "fetch_contract": {
+  "file": "registry/VIA_VDF_Fetch_Contract.json",
+  "schema": "VDF-FETCH/1.0",
+  "code": "VIA-M-VDFONE",
+  "asof": "2026-08-09",
+  "sha256_16": "5803bdfe3f2c81d6",
+  "inventory": "14 域 277 項(ok 217 / proxy 45 / todo 15)· 10 個 fetcher 模組",
+  "homed": "2026-08-10 操作員上傳歸位;取數規則正本(Adj 優先/缺值前值/低頻對齊/權威層級)"
+ }
 }

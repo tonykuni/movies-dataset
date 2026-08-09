@@ -48,3 +48,15 @@ WorkOps 衝刺:ENG-028 WOP 識別(八層路由/學習迴圈/87 案實戰)→ ENG
 (workops_lexicon + org_lexicon 149 家)→ M365 規劃書與準確度報告全文裁定落地。
 
 紅線全程未動:唯讀 · 絕不代寄/代跑 · 原件零觸碰 · 編號永不變 · 基底零觸碰 · 只增不減 · 參數=JSON。
+
+## 補遺二(2026-08-10 操作員「完成 vdf vrn vap」令)
+
+- **VDF**:取數契約 SSOT 歸位 — `VDF/registry/VIA_VDF_Fetch_Contract.json`(VDF-FETCH/1.0,
+  14 域 277 項:ok 217 / proxy 45 / todo 15;10 個 fetcher 模組;Adj 優先/前值補價/低頻對齊/
+  權威層級規則入冊)。todo 15 項=下一步取數開發清單(如 US-L22 半導體 B/B)。
+- **VAP**:操作員貼附 40+ 路徑經倉內比對 — chartlib/spec SSOT、Workbench v005/v009/v010、
+  UNIT03 系列(倉內 v0111R2/v0112/v0113 較貼附之 v0111 新)、duckdb parquet 加速器、
+  v8 master、panorama maturity 全在位;**真缺 3 件待上傳**:GuardedDynamicSandbox-v0109.ps1、
+  VIA_VAP_Chart_Library_Builder.html、VIA_VAP_System.html(UI 版)。
+- **VRN**:VisualLock v0159 為 UI 風格正本(板 v0119+ 已採);VRN 本體(Guarded Entry v217、
+  Batch AllInOne、staging 修復系)原狀在位,無本輪改動需求。
