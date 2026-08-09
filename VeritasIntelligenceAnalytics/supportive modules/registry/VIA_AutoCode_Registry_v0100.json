@@ -1125,6 +1125,14 @@
    "component": "decision_log 防呆+todo v0102(實機誤報修復)",
    "code": "ENG-027/ENG-046",
    "note": "操作員實機揪出帳面矛盾:decisions list 報「無決議」而 mtg status 明示已吸收 3 筆 — 真因=todo 指令字串「via-workops decisions list / milestones list」之「/」被 list 當狀態過濾參數,WHERE status='/' 靜默濾成 0 列(決議資料完好,零流失)。三修:①ENG-027 cmd_list 未知狀態誠實忽略並印可用值,不再沉默清空 ②ENG-046 v0102 批次指令改單一可貼「via-workops decisions list」③daily_prompts.txt 檔頭加防呆「切勿貼進 PowerShell」(操作員誤把提示文貼殼致連串 ParserError)。沙箱驗證:壞參數→忽略列全部、OPEN 過濾照常。"
+  },
+  {
+   "ts": "2026-08-11T05:40:00",
+   "op": "UPDATE",
+   "category": "治理",
+   "component": "系統與 U/I 雙優化(板 v0126+ENG-049 v0106)",
+   "code": "VIA-OPT-20260811",
+   "note": "操作員 OPTIMIZE THE SYSTEM & U/I 令:①U/I — 板 v0125→v0126 視覺鎖定 v2 全面換膚:中性色全套換 Industry tokens(bg #f2f2f3/panel #e9e9ea/card #fff/ink #1d1f20/冷灰線條)+主 accent #4c78a8→#5980a6;漲跌/風險語意色原封不動(紅漲綠跌鐵律不受換膚影響);流程帶灰階改 tokens 一致。結構/資料流/JS 零改動;QA AST 0 錯+shim 33 斷言全過+token 斷言(v2 中性色在位、語意色未動)。②系統 — ENG-049 v0106:check 增量快取(check_cache.json,絕對路徑+size+mtime)— Downloads 87k 檔重掃免重雜湊,判定邏輯零改動;沙箱實證第二輪快取命中。啟動器動態解析自取 v0126。"
   }
  ]
 }

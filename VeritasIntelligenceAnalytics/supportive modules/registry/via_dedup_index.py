@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-r"""VIA 整合去重引擎 v0105(ENG-049)— 操作員「整合優化」令
+r"""VIA 整合去重引擎 v0106(ENG-049)— 操作員「整合優化」令
 
 v0101 實戰修正(操作員 Downloads 掃描 Ctrl+C 誠實 FAIL):
   check 大檔預設略過(>200MB → SKIP_LARGE 判定,--all 才全查)— Downloads 常見
@@ -13,6 +13,9 @@ v0102「上船的資料去重留有用的」令:新 internal 動詞 — 庫內�
 
 v0105 硬化令 OPTIMIZE:build 增量快取 — 前次索引之 path+size+mtime 命中者免重算
   sha(VPNS Get-Sha12 快取先例);全新/變動檔才雜湊。重跑由全量降為增量。
+
+v0106 OPTIMIZE THE SYSTEM 令:check 也上增量快取(check_cache.json,鍵=絕對路徑
+  +size+mtime)— Downloads 87k 檔重掃免重雜湊;判定邏輯零改動,只省算力。
 
 v0103 實戰修正(操作員 Downloads 全掃出兩真 bug):
   ①假紅線:隔離判定原為路徑含 quarantine 字串 → 檔名 _quarantine_gate_ 誤中,
@@ -40,6 +43,7 @@ HERE = Path(__file__).resolve().parent          # supportive modules/registry
 ROOT = HERE.parent.parent                        # VeritasIntelligenceAnalytics
 OUT = ROOT / "VIA_Reports" / "dedup"
 INDEX_P = OUT / "VIA_Content_Hash_Index.json"
+CHECK_CACHE_P = OUT / "check_cache.json"
 AUDIT_P = HERE.parent / "audit_tools" / "VIA_ModuleDedup_Homing_Record_v0100.json"
 EXCLUDE_DIRS = {".git", "__pycache__", "node_modules", ".venv", ".venv_pm", "dedup", "_superseded_redundant"}
 UPLOAD_PREFIX = re.compile(r"^[0-9a-f]{8}-")
@@ -125,6 +129,12 @@ def cmd_check(target, include_all=False):
         and not any(d in p.parts for d in EXCLUDE_DIRS))
     print("[掃描] %d 檔待判定(>200MB %s;進度每 200 檔一行)"
           % (len(cands), "全查 --all" if include_all else "預設略過"))
+    ccache = {}
+    try:
+        ccache = json.loads(CHECK_CACHE_P.read_text(encoding="utf-8"))
+    except Exception:
+        ccache = {}
+    c_hit = 0
     rows = []
     redlines = {}
     n_id = n_ver = n_new = n_skip = n_empty = 0
@@ -143,7 +153,13 @@ def cmd_check(target, include_all=False):
                              "size_mb": round(size / 1048576),
                              "hint": ">200MB 預設略過 — 需查加 --all"})
                 continue
-            sha = sha256_of(p)
+            ap = str(p); mt = int(p.stat().st_mtime_ns)
+            cc = ccache.get(ap)
+            if cc and cc[0] == size and cc[1] == mt:
+                sha = cc[2]; c_hit += 1
+            else:
+                sha = sha256_of(p)
+                ccache[ap] = [size, mt, sha]
         except Exception as e:
             rows.append({"file": str(p), "verdict": "READ_ERROR", "detail": str(e)[:80]})
             continue
@@ -174,7 +190,11 @@ def cmd_check(target, include_all=False):
                                  "identical": n_id, "version_differs": n_ver, "not_in_repo": n_new,
                                  "skipped_large": n_skip, "empty": n_empty,
                                  "rows": rows}, ensure_ascii=False, indent=1), encoding="utf-8")
-    print("========== 整合去重判定(%d 檔)==========" % len(cands))
+    try:
+        CHECK_CACHE_P.write_text(json.dumps(ccache, ensure_ascii=False), encoding="utf-8")
+    except Exception:
+        pass
+    print("========== 整合去重判定(%d 檔;快取命中 %d 免重算)==========" % (len(cands), c_hit))
     print("  已在籍 IDENTICAL       %d(免上傳)" % n_id)
     print("  同名異版 VERSION_DIFFERS %d(需人工裁定)" % n_ver)
     print("  候歸戶 NOT_IN_REPO     %d(上傳交裁定)" % n_new)
