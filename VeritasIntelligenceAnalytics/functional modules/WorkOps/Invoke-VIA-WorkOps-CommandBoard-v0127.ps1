@@ -201,7 +201,7 @@ function Send-WopsToast { param([string]$Title, [string]$Msg)
 Write-WopsLog ("=== v0107 啟動 Days={0} Silent={1} DraftsFor={2}" -f $Days, [bool]$Silent, $DraftsFor)
 
 Write-Host "==========================================================" -ForegroundColor DarkCyan
-Write-Host "  Veritas WorkOps 統合指揮板 v0126  |  視覺鎖定 v2 全面換膚(seal 4cb90a0bd31df637)" -ForegroundColor Cyan
+Write-Host "  Veritas WorkOps 統合指揮板 v0127  |  治理鏈入板 ENG-051..054(視覺鎖定 v2 · seal 4cb90a0bd31df637)" -ForegroundColor Cyan
 Write-Host "==========================================================" -ForegroundColor DarkCyan
 
 # ---- [1/5] 掃描 + 對帳(重用 v001 引擎;Outlook 不在 = 誠實降級)----
