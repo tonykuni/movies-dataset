@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-r"""WorkOps WOP 識別歸戶引擎 v0106(ENG-028)— 規劃書 M1+M2:bottom-up 多訊號融合 → WOP 專案化+賦號
+r"""WorkOps WOP 識別歸戶引擎 v0107(ENG-028)— 規劃書 M1+M2:bottom-up 多訊號融合 → WOP 專案化+賦號
+
+v0107(產品化令 2026/08/09):sheet_aliases 增 TheirCode(對方編號/客戶案號/PO no…)—
+  對方編號永不改、只對照:辨識後原值原樣保留同列,供板面與 AI 控管表提示詞對照欄使用;
+  置於 ProjectCode 之前,避免「對方編號」被「編號」模糊吸入。板 v0118 $SheetAlias PS 複本同步。
 
 v0106(操作員 SSOT 彙整去重令 2026/08/09):
   共用詞彙收斂 — regex/正規化/清單載入一律 import workops_lexicon(去重正本);
@@ -109,6 +113,9 @@ DEFAULT_PARAMS = {
                          "calendar", "連絡人", "contacts", "工作", "tasks", "記事",
                          "notes", "同步處理", "outbox", "重要", "clutter"],
     "sheet_aliases": {
+        "TheirCode": ["theircode", "對方編號", "對方案號", "對方代號", "客戶編號", "客戶案號",
+                      "供應商編號", "來文編號", "來文文號", "貴司編號", "客編",
+                      "po no", "po number", "ref no", "reference no", "their ref"],
         "ProjectCode": ["projectcode", "專案代號", "案號", "案件編號", "代號", "編號",
                         "trace_id", "wop_id", "tracking no", "trackingno", "code", "id"],
         "ProjectName": ["projectname", "專案名稱", "案名", "名稱", "項目", "project",

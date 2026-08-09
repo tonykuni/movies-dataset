@@ -1,0 +1,18 @@
+{
+ "version": "v0100",
+ "comment": "標準配置快照(產品化令 2026/08/09:『就用這台電腦的配置作為標準配置』)。此檔=操作員工作機的觀測金基準,供一鍵部署器驗收比對與新機對齊;部署時各元件依動態解析鐵律抓最新相容版(嚴禁寫死鎖裝),裝完以本檔為『至少不低於』的比對線。新進員工全新電腦(僅內建 Windows PowerShell 5.1)跑 INSTALL_ONECLICK.cmd 即自動對齊。",
+ "golden_baseline": {
+  "os": "Windows 10/11 x64",
+  "shell_entry": "Windows PowerShell 5.1(內建;部署器唯一前置需求)",
+  "pwsh": {"min": "7.4.6", "install": "GitHub releases 最新 7.x win-x64 zip → tools\\pwsh(可攜,免管理員)"},
+  "python": {"min": "3.12", "install": "python.org 最新 3.12.x amd64 /quiet InstallAllUsers=0 PrependPath=1 Include_launcher=1(使用者範圍)"},
+  "venv_pm": {"path": "engines\\.venv_pm", "packages_observed": {"pm4py": "2.7.23.3", "numpy": "2.5.1"}, "install": "pmsetup 引擎(隔離 venv;基底零觸碰)"},
+  "graphviz": {"install": "dotsetup 引擎(GitHub 最新 win64 zip+sha256 可攜;嚴禁寫死版號)"},
+  "outlook": "桌面版 Outlook 已登入(COM 唯讀附掛;不裝任何外掛)",
+  "path_user_scope": ["<repo>\\bin", "<repo>\\tools\\pwsh"],
+  "encoding": "UTF-8(chcp 65001 / python UTF-8 mode)",
+  "timezone": "Asia/Taipei"
+ },
+ "schedule_from": "engines/watchtower_params.json daily_rhythm(16:00 產草稿、12:00 期限刷新;排程只到產草稿,絕不代寄)",
+ "selfcheck": "部署尾聲自動跑 via-workops selftest(ENG-032 沙箱五段)= 新機驗收門"
+}

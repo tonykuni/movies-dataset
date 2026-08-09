@@ -1,0 +1,19 @@
+{
+ "record_id": "VIA_Productization_SelftestBootstrap_Record_v0100",
+ "ts": "2026-08-10T00:55:00",
+ "operator_order": "產品化令(2026/08/09):整合/系統測試確認無誤後串聯並顯示狀態;SSOT 字庫加速器與 VIA 共用確認;支援工具導入確認;給 IT 的一封信一定要準備;新進員工全新電腦(僅 PS 5.1)一鍵自動部署工具/環境/PATH,以操作員此機配置為標準配置;控管表丟任何 AI 用預寫嚴格提示詞;編號永不變+對方編號只對照;錯誤只問選擇題;16:00 產草稿/次日 12:00 期限/下午僅急件。",
+ "deliverables": [
+  {"id": "A", "item": "ENG-032 workops_selftest.py 全鏈自測器", "evidence": "沙箱五段(命名→歸戶八層→回覆解析→Gold Set→備份還原)subprocess 實跑;容器兩輪 FinalGate PASS 5/5;正本零觸碰(temp mkdtemp,finally 清除);via-workops selftest 動詞+help 已掛(CRLF 斷言插入);registry ENG-032 ASSIGN 入帳(components 51/ledger 53)"},
+  {"id": "B", "item": "IT 核准信正本", "evidence": "docs/IT_Approval_Letter_VeritasWorkOps_v0100.md — 整併規劃書 §12+v0200_rc IT_GOVERNANCE_HANDOFF/IT_INPUTS_REQUIRED;Phase 1 COM 唯讀現行+Phase 2 Graph 休眠報備;可直接複製寄出;內部紅線對照表"},
+  {"id": "C", "item": "嚴格控管表 AI 提示詞+對方編號對照", "evidence": "docs/Strict_ControlSheet_AI_Prompt_v0100.md(八欄契約,TheirCode 逐字元不可改,只整理不發明,違規誠實 FAIL);sheet_aliases 增 TheirCode 於 identifier v0107 DEFAULT_PARAMS(Python 正本)+板 v0118 $SheetAlias(PS 複本)兩處同步,置 ProjectCode 前防「編號」誤吸;共用詞庫目錄冊 sheet_aliases 條目已記"},
+  {"id": "D", "item": "一鍵部署器+標準配置", "evidence": "Install-VeritasWorkOps-OneClick.ps1(PS 5.1 全相容語法;pwsh7 可攜 GitHub 最新+Python 3.12 最新 python.org 動態解析嚴禁寫死版號+使用者 PATH+pmsetup+dotsetup+SCHTASKS 依 daily_rhythm+尾聲自測;零互動不卡斷;out/bootstrap_report.json)+INSTALL_ONECLICK.cmd 雙擊入口(CRLF)+engines/standard_config.json 金基準快照(pm4py 2.7.23.3/numpy 2.5.1 觀測值);pwsh 7.4.6 AST CLEAN(首輪 [ref] 未宣告致假 CLEAN,已重驗);Windows 實機安裝行為誠實待操作員首跑"},
+  {"id": "E", "item": "日節奏參數", "evidence": "watchtower_params.json v0101 daily_rhythm:16:00 產草稿/次日 12:00 期限/下午僅急件(13:00 起);時間全可改;排程只到產草稿絕不代寄"},
+  {"id": "F", "item": "UI 重規劃產品化補篇", "evidence": "Veritas_WorkOps_UI_Replan_v0100.md §四:首跑精靈六步(全滑鼠)、節奏帶、封閉式問句鐵則(其他=選項失敗指標)、候令:自動簡報+主管表匯出"}
+ ],
+ "answers_to_operator": {
+  "SSOT字庫加速器與VIA共用": "是 — workops_lexicon.py 為 Python 正本(namer/identifier 皆 import),VIA_Shared_Lexicon_Registry 16 資產目錄冊含 VTR 五詞庫/org_lexicon 234 名/跨語言複本登記",
+  "支援工具導入": "pmsetup/dotsetup/envmgr/scanrange/workbench 皆掛 via-workops 動詞;一鍵部署器統一串起;VMT 資料候 via-vmt-init;VTR 模型層/JS 引擎候令"
+ },
+ "qa": ["selftest 兩輪 5/5 PASS", "identifier py_compile OK", "installer+board pwsh AST CLEAN(重驗版)", "紅線 lint .Send( 零出現(六檔)", "cmd 檔 CRLF 確認+新 echo/rem 行全形括號", "python replace 全部 count==1 斷言"],
+ "red_lines_reaffirmed": ["系統不可代為發送(排程只到產草稿)", "原郵件/分類不改", "編號永不變;對方編號不能改只能對照", "基底零觸碰(pm4py 隔離 venv)", "正本不就地修改(還原只到暫存)", "不爬站", "機密只走環境變數", "Graph 休眠待 IT"]
+}

@@ -180,6 +180,7 @@ $ctrl  = Read-CsvSafe $Control
 
 # ---- v0115:異質控管表表頭映射(各行各業欄名自動對齊;對不上者保留原名)----
 $SheetAlias = [ordered]@{
+    TheirCode   = @("theircode","對方編號","對方案號","對方代號","客戶編號","客戶案號","供應商編號","來文編號","來文文號","貴司編號","客編","po no","po number","ref no","reference no","their ref")
     ProjectCode = @("projectcode","專案代號","案號","案件編號","代號","編號","trace_id","wop_id","tracking no","trackingno","code","id")
     ProjectName = @("projectname","專案名稱","案名","名稱","項目","project","task","activity","主題","作業步驟")
     Owner       = @("owner","負責人","對口","承辦人","pm","單位","owner_domain","stakeholder")
