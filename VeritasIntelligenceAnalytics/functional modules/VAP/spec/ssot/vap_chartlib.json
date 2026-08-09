@@ -1,509 +1,563 @@
 {
-  "$schema": "VIA-VAP-CHARTLIB/1.0",
-  "meta": {
-    "code": "VIA-SSOT-VAPLIB",
-    "seal": "觀 · VIA-SEAL-GUAN",
-    "name": "VeritasAutoPlot 圖庫定義 SSOT",
-    "version": "1.0.1",
-    "updated": "2026-08-04",
-    "specRef": "ssot/vap_spec.json",
-    "policy": "只增不減 · 每型唯一(同主題去重)· 新增圖型須配 VAP-CH 代碼"
+ "$schema": "VIA-VAP-CHARTLIB/1.0",
+ "meta": {
+  "code": "VIA-SSOT-VAPLIB",
+  "seal": "觀 · VIA-SEAL-GUAN",
+  "name": "VeritasAutoPlot 圖庫定義 SSOT",
+  "version": "1.1.0",
+  "updated": "2026-08-11",
+  "specRef": "ssot/vap_spec.json",
+  "policy": "只增不減 · 每型唯一(同主題去重)· 新增圖型須配 VAP-CH 代碼"
+ },
+ "groups": [
+  {
+   "id": "single",
+   "zh": "單軸",
+   "en": "Single-Axis",
+   "charts": [
+    {
+     "code": "VAP-CH-01",
+     "id": "line",
+     "zh": "折線圖",
+     "en": "Line",
+     "axes": 1,
+     "dataShape": "series[]",
+     "fields": [
+      "date",
+      "value"
+     ],
+     "use": "水準/指數趨勢"
+    },
+    {
+     "code": "VAP-CH-02",
+     "id": "area",
+     "zh": "面積折線",
+     "en": "Area",
+     "axes": 1,
+     "dataShape": "series",
+     "fields": [
+      "date",
+      "value"
+     ],
+     "use": "單一序列強調量體",
+     "override": {
+      "fill.areaUnderLine": 0.75
+     }
+    },
+    {
+     "code": "VAP-CH-03",
+     "id": "bar",
+     "zh": "直條圖",
+     "en": "Bar",
+     "axes": 1,
+     "dataShape": "categorical",
+     "fields": [
+      "label",
+      "value"
+     ],
+     "use": "分項比較"
+    },
+    {
+     "code": "VAP-CH-04",
+     "id": "hbar",
+     "zh": "橫條圖",
+     "en": "H-Bar",
+     "axes": 1,
+     "dataShape": "categorical",
+     "fields": [
+      "label",
+      "value"
+     ],
+     "use": "長標籤分項(CPI 分項左負右正)"
+    },
+    {
+     "code": "VAP-CH-05",
+     "id": "scatter",
+     "zh": "散點圖",
+     "en": "Scatter",
+     "axes": 1,
+     "dataShape": "xy",
+     "fields": [
+      "x",
+      "y"
+     ],
+     "use": "兩變數關係"
+    }
+   ]
   },
-  "groups": [
+  {
+   "id": "stack",
+   "zh": "堆疊",
+   "en": "Stacked",
+   "charts": [
     {
-      "id": "single",
-      "zh": "單軸",
-      "en": "Single-Axis",
-      "charts": [
-        {
-          "code": "VAP-CH-01",
-          "id": "line",
-          "zh": "折線圖",
-          "en": "Line",
-          "axes": 1,
-          "dataShape": "series[]",
-          "fields": [
-            "date",
-            "value"
-          ],
-          "use": "水準/指數趨勢"
-        },
-        {
-          "code": "VAP-CH-02",
-          "id": "area",
-          "zh": "面積折線",
-          "en": "Area",
-          "axes": 1,
-          "dataShape": "series",
-          "fields": [
-            "date",
-            "value"
-          ],
-          "use": "單一序列強調量體",
-          "override": {
-            "fill.areaUnderLine": 0.75
-          }
-        },
-        {
-          "code": "VAP-CH-03",
-          "id": "bar",
-          "zh": "直條圖",
-          "en": "Bar",
-          "axes": 1,
-          "dataShape": "categorical",
-          "fields": [
-            "label",
-            "value"
-          ],
-          "use": "分項比較"
-        },
-        {
-          "code": "VAP-CH-04",
-          "id": "hbar",
-          "zh": "橫條圖",
-          "en": "H-Bar",
-          "axes": 1,
-          "dataShape": "categorical",
-          "fields": [
-            "label",
-            "value"
-          ],
-          "use": "長標籤分項(CPI 分項左負右正)"
-        },
-        {
-          "code": "VAP-CH-05",
-          "id": "scatter",
-          "zh": "散點圖",
-          "en": "Scatter",
-          "axes": 1,
-          "dataShape": "xy",
-          "fields": [
-            "x",
-            "y"
-          ],
-          "use": "兩變數關係"
-        }
-      ]
+     "code": "VAP-CH-06",
+     "id": "sarea",
+     "zh": "堆疊面積",
+     "en": "Stacked Area",
+     "axes": 1,
+     "dataShape": "series[]",
+     "fields": [
+      "date",
+      "value",
+      "group"
+     ],
+     "use": "組成消長"
     },
     {
-      "id": "stack",
-      "zh": "堆疊",
-      "en": "Stacked",
-      "charts": [
-        {
-          "code": "VAP-CH-06",
-          "id": "sarea",
-          "zh": "堆疊面積",
-          "en": "Stacked Area",
-          "axes": 1,
-          "dataShape": "series[]",
-          "fields": [
-            "date",
-            "value",
-            "group"
-          ],
-          "use": "組成消長"
-        },
-        {
-          "code": "VAP-CH-07",
-          "id": "sbar",
-          "zh": "堆疊直條",
-          "en": "Stacked Bar",
-          "axes": 1,
-          "dataShape": "categorical[]",
-          "fields": [
-            "label",
-            "value",
-            "group"
-          ],
-          "use": "財政收支結構(間隙最小化)",
-          "override": {
-            "bar.gapFactor": "tight"
-          }
-        },
-        {
-          "code": "VAP-CH-08",
-          "id": "sbar100",
-          "zh": "百分比堆疊",
-          "en": "100% Stacked",
-          "axes": 1,
-          "dataShape": "categorical[]",
-          "fields": [
-            "label",
-            "value",
-            "group"
-          ],
-          "use": "占比結構"
-        }
-      ]
+     "code": "VAP-CH-07",
+     "id": "sbar",
+     "zh": "堆疊直條",
+     "en": "Stacked Bar",
+     "axes": 1,
+     "dataShape": "categorical[]",
+     "fields": [
+      "label",
+      "value",
+      "group"
+     ],
+     "use": "財政收支結構(間隙最小化)",
+     "override": {
+      "bar.gapFactor": "tight"
+     }
     },
     {
-      "id": "indiv",
-      "zh": "個別",
-      "en": "Small Multiples",
-      "charts": [
-        {
-          "code": "VAP-CH-09",
-          "id": "multi",
-          "zh": "個別小圖",
-          "en": "Small Multiples",
-          "axes": 1,
-          "dataShape": "series[]",
-          "fields": [
-            "date",
-            "value",
-            "panel"
-          ],
-          "use": "多標的同軸比較",
-          "override": {
-            "grid": "2x2"
-          }
-        },
-        {
-          "code": "VAP-CH-10",
-          "id": "gbar",
-          "zh": "並列直條",
-          "en": "Grouped Bar",
-          "axes": 1,
-          "dataShape": "categorical[]",
-          "fields": [
-            "label",
-            "value",
-            "group"
-          ],
-          "use": "官方×民間數據對照"
-        }
-      ]
-    },
-    {
-      "id": "dual",
-      "zh": "雙軸",
-      "en": "Dual-Axis",
-      "charts": [
-        {
-          "code": "VAP-CH-11",
-          "id": "dline",
-          "zh": "底色面積 × 對比折線",
-          "en": "Area × Line",
-          "axes": 2,
-          "dataShape": "series×2",
-          "fields": [
-            "date",
-            "left",
-            "right"
-          ],
-          "use": "一邊底色一邊折線(信心指數 × 零售年增率)",
-          "rule": "底色序列置右軸 α0.75;折線置左軸 lw1"
-        },
-        {
-          "code": "VAP-CH-12",
-          "id": "dbarline",
-          "zh": "條 + 線 雙軸",
-          "en": "Bar × Line",
-          "axes": 2,
-          "dataShape": "mixed",
-          "fields": [
-            "date",
-            "bar",
-            "line"
-          ],
-          "use": "非農新增(條) × 失業率(線)"
-        }
-      ]
-    },
-    {
-      "id": "adv",
-      "zh": "進階",
-      "en": "Advanced",
-      "charts": [
-        {
-          "code": "VAP-CH-13",
-          "id": "evtmx",
-          "zh": "事件矩陣",
-          "en": "Event Matrix",
-          "axes": 1,
-          "dataShape": "series+events",
-          "fields": [
-            "date",
-            "value",
-            "events[]"
-          ],
-          "use": "危機事件對照",
-          "rule": "垂直虛線 0.8/0.8 · 區間陰影 0.3 · 無水平線"
-        },
-        {
-          "code": "VAP-CH-14",
-          "id": "corrheat",
-          "zh": "相關熱力圖",
-          "en": "Masked Corr",
-          "axes": 0,
-          "dataShape": "matrix",
-          "fields": [
-            "corr"
-          ],
-          "use": "資產相關性",
-          "rule": "下三角遮罩 · zmid 0 · seaborn 15 級色階"
-        },
-        {
-          "code": "VAP-CH-15",
-          "id": "brush",
-          "zh": "區間量測",
-          "en": "Brush Measure",
-          "axes": 1,
-          "dataShape": "series",
-          "fields": [
-            "date",
-            "value"
-          ],
-          "use": "拉選區間求高低/MaxDD/耗時"
-        },
-        {
-          "code": "VAP-CH-16",
-          "id": "map",
-          "zh": "地圖 × 數據",
-          "en": "Map",
-          "axes": 0,
-          "dataShape": "geo",
-          "fields": [
-            "region",
-            "value",
-            "change"
-          ],
-          "use": "全球/美國/歐洲/東亞/台灣",
-          "engine": "leaflet",
-          "rule": "漲跌以上下三角標示"
-        }
-      ]
-    },
-    {
-      "id": "rolling",
-      "zh": "滾動績效",
-      "en": "Rolling Performance",
-      "charts": [
-        {
-          "code": "VAP-CH-17",
-          "id": "roll",
-          "zh": "滾動報酬",
-          "en": "Rolling Returns",
-          "axes": 1,
-          "dataShape": "series",
-          "fields": [
-            "date",
-            "return"
-          ],
-          "use": "期間績效穩定度"
-        },
-        {
-          "code": "VAP-CH-18",
-          "id": "rollcorr",
-          "zh": "滾動相關",
-          "en": "Rolling Correlation",
-          "axes": 1,
-          "dataShape": "series×2",
-          "fields": [
-            "date",
-            "a",
-            "b"
-          ],
-          "use": "關係變化"
-        },
-        {
-          "code": "VAP-CH-19",
-          "id": "rollsharpe",
-          "zh": "移動夏普",
-          "en": "Trailing Sharpe",
-          "axes": 1,
-          "dataShape": "series",
-          "fields": [
-            "date",
-            "sharpe"
-          ],
-          "use": "風險調整後報酬"
-        },
-        {
-          "code": "VAP-CH-20",
-          "id": "sortino",
-          "zh": "Sharpe × Sortino 比較",
-          "en": "Sharpe × Sortino",
-          "axes": 2,
-          "dataShape": "series×2",
-          "fields": [
-            "date",
-            "sharpe",
-            "sortino"
-          ],
-          "use": "下行風險與總波動對照",
-          "rule": "左軸 Sharpe · 右軸 Sortino · 同等格數"
-        },
-        {
-          "code": "VAP-CH-21",
-          "id": "radar",
-          "zh": "風險雷達",
-          "en": "Risk Radar",
-          "axes": 0,
-          "dataShape": "radial",
-          "fields": [
-            "metric",
-            "value",
-            "benchmark"
-          ],
-          "use": "多維風險輪廓(波動·MaxDD·Beta·集中度·流動性)",
-          "rule": "基準線為外圈虛線 · 填色 α0.3"
-        },
-        {
-          "code": "VAP-CH-22",
-          "id": "alpha",
-          "zh": "Alpha 策略",
-          "en": "Alpha Strategy",
-          "axes": 2,
-          "dataShape": "series×3",
-          "fields": [
-            "date",
-            "strategy",
-            "benchmark",
-            "excess"
-          ],
-          "use": "策略 vs 基準 + 超額報酬",
-          "rule": "累積績效置左軸 · 超額報酬置右軸直條(漲紅跌綠) · 0 軸紅線"
-        },
-        {
-          "code": "VAP-CH-23",
-          "id": "econcal",
-          "zh": "經濟日曆",
-          "en": "Economic Calendar",
-          "axes": 0,
-          "dataShape": "events",
-          "fields": [
-            "date",
-            "event",
-            "importance",
-            "actual",
-            "forecast",
-            "previous"
-          ],
-          "use": "重要數據發布時程與預期落差",
-          "rule": "重要度以紅黃綠三階 · 實際優於預期標紅"
-        },
-        {
-          "code": "VAP-CH-25",
-          "id": "backtest",
-          "zh": "回測驗證",
-          "en": "Backtest Validation",
-          "axes": 2,
-          "dataShape": "matrix+series",
-          "fields": [
-            "lag",
-            "rankIC",
-            "tStat",
-            "pValue"
-          ],
-          "use": "Rank-IC 衰減 × 顯著性",
-          "rule": "左軸 Rank-IC 直條 · 右軸 t 統計量折線 · |t|=1.96 水平基準線 0.8"
-        }
-      ]
-    },
-    {
-      "id": "ta",
-      "zh": "技術分析",
-      "en": "Technical",
-      "charts": [
-        {
-          "code": "VAP-CH-26",
-          "id": "intraday",
-          "zh": "當日走勢 + 成交量",
-          "en": "Intraday + Volume",
-          "axes": 2,
-          "dataShape": "ohlcv",
-          "fields": [
-            "time",
-            "price",
-            "volume"
-          ],
-          "use": "當日盤勢",
-          "rule": "rows=2 · row_heights [.72,.28] · shared_xaxes"
-        },
-        {
-          "code": "VAP-CH-27",
-          "id": "candle",
-          "zh": "K線 × SMA/EMA/BB × Volume",
-          "en": "Candlestick TA",
-          "axes": 2,
-          "dataShape": "ohlcv",
-          "fields": [
-            "date",
-            "open",
-            "high",
-            "low",
-            "close",
-            "volume"
-          ],
-          "use": "技術分析",
-          "rule": "adj price · split 調整"
-        },
-        {
-          "code": "VAP-CH-28",
-          "id": "spotfut",
-          "zh": "現貨 × 期貨",
-          "en": "Spot × Futures",
-          "axes": 1,
-          "dataShape": "series[]",
-          "fields": [
-            "date",
-            "spot",
-            "futures"
-          ],
-          "use": "BRENT / WTI / GOLD 基差",
-          "rule": "現貨實線 · 期貨虛線 · 基差標籤堆疊 ≥9px"
-        }
-      ]
-    },
-    {
-      "id": "fund",
-      "zh": "基本面",
-      "en": "Consensus",
-      "charts": [
-        {
-          "code": "VAP-CH-24",
-          "id": "consensus",
-          "zh": "共識總覽",
-          "en": "Consensus Overview",
-          "axes": 1,
-          "dataShape": "table",
-          "fields": [
-            "dilutedEPS",
-            "targetPrice",
-            "rating",
-            "analystCount",
-            "forwardPER",
-            "forwardPBR"
-          ],
-          "use": "yfinance / FactSet 共識",
-          "rule": "綠黃紅 spectrum · 目標價取左右最長"
-        }
-      ]
+     "code": "VAP-CH-08",
+     "id": "sbar100",
+     "zh": "百分比堆疊",
+     "en": "100% Stacked",
+     "axes": 1,
+     "dataShape": "categorical[]",
+     "fields": [
+      "label",
+      "value",
+      "group"
+     ],
+     "use": "占比結構"
     }
-  ],
-  "dataSources": [
-    "TWSE 台灣證交所",
-    "TPEX 櫃買中心",
-    "SITCA 投信投顧公會",
-    "MOPS 公開資訊觀測站",
-    "yfinance",
-    "FactSet (keyed)",
-    "FRED",
-    "EPFR",
-    "HKEX 港交所"
-  ],
-  "changelog": [
+   ]
+  },
+  {
+   "id": "indiv",
+   "zh": "個別",
+   "en": "Small Multiples",
+   "charts": [
     {
-      "version": "1.0.0",
-      "date": "2026-08-02",
-      "note": "自 Builder GROUPS 抽出 28 型全數建檔(VAP-CH-01…28)"
+     "code": "VAP-CH-09",
+     "id": "multi",
+     "zh": "個別小圖",
+     "en": "Small Multiples",
+     "axes": 1,
+     "dataShape": "series[]",
+     "fields": [
+      "date",
+      "value",
+      "panel"
+     ],
+     "use": "多標的同軸比較",
+     "override": {
+      "grid": "2x2"
+     }
     },
     {
-      "version": "1.0.1",
-      "date": "2026-08-04",
-      "note": "VAP-CH-22 規則註記亂碼修復:「漇2跌綣」→「漲紅跌綠」(與 vap_spec palette.semantic up=紅/down=綠 一致);僅此一處文字修復,無結構或數值變更"
+     "code": "VAP-CH-10",
+     "id": "gbar",
+     "zh": "並列直條",
+     "en": "Grouped Bar",
+     "axes": 1,
+     "dataShape": "categorical[]",
+     "fields": [
+      "label",
+      "value",
+      "group"
+     ],
+     "use": "官方×民間數據對照"
     }
-  ]
+   ]
+  },
+  {
+   "id": "dual",
+   "zh": "雙軸",
+   "en": "Dual-Axis",
+   "charts": [
+    {
+     "code": "VAP-CH-11",
+     "id": "dline",
+     "zh": "底色面積 × 對比折線",
+     "en": "Area × Line",
+     "axes": 2,
+     "dataShape": "series×2",
+     "fields": [
+      "date",
+      "left",
+      "right"
+     ],
+     "use": "一邊底色一邊折線(信心指數 × 零售年增率)",
+     "rule": "底色序列置右軸 α0.75;折線置左軸 lw1"
+    },
+    {
+     "code": "VAP-CH-12",
+     "id": "dbarline",
+     "zh": "條 + 線 雙軸",
+     "en": "Bar × Line",
+     "axes": 2,
+     "dataShape": "mixed",
+     "fields": [
+      "date",
+      "bar",
+      "line"
+     ],
+     "use": "非農新增(條) × 失業率(線)"
+    }
+   ]
+  },
+  {
+   "id": "adv",
+   "zh": "進階",
+   "en": "Advanced",
+   "charts": [
+    {
+     "code": "VAP-CH-13",
+     "id": "evtmx",
+     "zh": "事件矩陣",
+     "en": "Event Matrix",
+     "axes": 1,
+     "dataShape": "series+events",
+     "fields": [
+      "date",
+      "value",
+      "events[]"
+     ],
+     "use": "危機事件對照",
+     "rule": "垂直虛線 0.8/0.8 · 區間陰影 0.3 · 無水平線"
+    },
+    {
+     "code": "VAP-CH-14",
+     "id": "corrheat",
+     "zh": "相關熱力圖",
+     "en": "Masked Corr",
+     "axes": 0,
+     "dataShape": "matrix",
+     "fields": [
+      "corr"
+     ],
+     "use": "資產相關性",
+     "rule": "下三角遮罩 · zmid 0 · seaborn 15 級色階"
+    },
+    {
+     "code": "VAP-CH-15",
+     "id": "brush",
+     "zh": "區間量測",
+     "en": "Brush Measure",
+     "axes": 1,
+     "dataShape": "series",
+     "fields": [
+      "date",
+      "value"
+     ],
+     "use": "拉選區間求高低/MaxDD/耗時"
+    },
+    {
+     "code": "VAP-CH-16",
+     "id": "map",
+     "zh": "地圖 × 數據",
+     "en": "Map",
+     "axes": 0,
+     "dataShape": "geo",
+     "fields": [
+      "region",
+      "value",
+      "change"
+     ],
+     "use": "全球/美國/歐洲/東亞/台灣",
+     "engine": "leaflet",
+     "rule": "漲跌以上下三角標示"
+    }
+   ]
+  },
+  {
+   "id": "rolling",
+   "zh": "滾動績效",
+   "en": "Rolling Performance",
+   "charts": [
+    {
+     "code": "VAP-CH-17",
+     "id": "roll",
+     "zh": "滾動報酬",
+     "en": "Rolling Returns",
+     "axes": 1,
+     "dataShape": "series",
+     "fields": [
+      "date",
+      "return"
+     ],
+     "use": "期間績效穩定度"
+    },
+    {
+     "code": "VAP-CH-18",
+     "id": "rollcorr",
+     "zh": "滾動相關",
+     "en": "Rolling Correlation",
+     "axes": 1,
+     "dataShape": "series×2",
+     "fields": [
+      "date",
+      "a",
+      "b"
+     ],
+     "use": "關係變化"
+    },
+    {
+     "code": "VAP-CH-19",
+     "id": "rollsharpe",
+     "zh": "移動夏普",
+     "en": "Trailing Sharpe",
+     "axes": 1,
+     "dataShape": "series",
+     "fields": [
+      "date",
+      "sharpe"
+     ],
+     "use": "風險調整後報酬"
+    },
+    {
+     "code": "VAP-CH-20",
+     "id": "sortino",
+     "zh": "Sharpe × Sortino 比較",
+     "en": "Sharpe × Sortino",
+     "axes": 2,
+     "dataShape": "series×2",
+     "fields": [
+      "date",
+      "sharpe",
+      "sortino"
+     ],
+     "use": "下行風險與總波動對照",
+     "rule": "左軸 Sharpe · 右軸 Sortino · 同等格數"
+    },
+    {
+     "code": "VAP-CH-21",
+     "id": "radar",
+     "zh": "風險雷達",
+     "en": "Risk Radar",
+     "axes": 0,
+     "dataShape": "radial",
+     "fields": [
+      "metric",
+      "value",
+      "benchmark"
+     ],
+     "use": "多維風險輪廓(波動·MaxDD·Beta·集中度·流動性)",
+     "rule": "基準線為外圈虛線 · 填色 α0.3"
+    },
+    {
+     "code": "VAP-CH-22",
+     "id": "alpha",
+     "zh": "Alpha 策略",
+     "en": "Alpha Strategy",
+     "axes": 2,
+     "dataShape": "series×3",
+     "fields": [
+      "date",
+      "strategy",
+      "benchmark",
+      "excess"
+     ],
+     "use": "策略 vs 基準 + 超額報酬",
+     "rule": "累積績效置左軸 · 超額報酬置右軸直條(漲紅跌綠) · 0 軸紅線"
+    },
+    {
+     "code": "VAP-CH-23",
+     "id": "econcal",
+     "zh": "經濟日曆",
+     "en": "Economic Calendar",
+     "axes": 0,
+     "dataShape": "events",
+     "fields": [
+      "date",
+      "event",
+      "importance",
+      "actual",
+      "forecast",
+      "previous"
+     ],
+     "use": "重要數據發布時程與預期落差",
+     "rule": "重要度以紅黃綠三階 · 實際優於預期標紅"
+    },
+    {
+     "code": "VAP-CH-25",
+     "id": "backtest",
+     "zh": "回測驗證",
+     "en": "Backtest Validation",
+     "axes": 2,
+     "dataShape": "matrix+series",
+     "fields": [
+      "lag",
+      "rankIC",
+      "tStat",
+      "pValue"
+     ],
+     "use": "Rank-IC 衰減 × 顯著性",
+     "rule": "左軸 Rank-IC 直條 · 右軸 t 統計量折線 · |t|=1.96 水平基準線 0.8"
+    }
+   ]
+  },
+  {
+   "id": "ta",
+   "zh": "技術分析",
+   "en": "Technical",
+   "charts": [
+    {
+     "code": "VAP-CH-26",
+     "id": "intraday",
+     "zh": "當日走勢 + 成交量",
+     "en": "Intraday + Volume",
+     "axes": 2,
+     "dataShape": "ohlcv",
+     "fields": [
+      "time",
+      "price",
+      "volume"
+     ],
+     "use": "當日盤勢",
+     "rule": "rows=2 · row_heights [.72,.28] · shared_xaxes"
+    },
+    {
+     "code": "VAP-CH-27",
+     "id": "candle",
+     "zh": "K線 × SMA/EMA/BB × Volume",
+     "en": "Candlestick TA",
+     "axes": 2,
+     "dataShape": "ohlcv",
+     "fields": [
+      "date",
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume"
+     ],
+     "use": "技術分析",
+     "rule": "adj price · split 調整"
+    },
+    {
+     "code": "VAP-CH-28",
+     "id": "spotfut",
+     "zh": "現貨 × 期貨",
+     "en": "Spot × Futures",
+     "axes": 1,
+     "dataShape": "series[]",
+     "fields": [
+      "date",
+      "spot",
+      "futures"
+     ],
+     "use": "BRENT / WTI / GOLD 基差",
+     "rule": "現貨實線 · 期貨虛線 · 基差標籤堆疊 ≥9px"
+    }
+   ]
+  },
+  {
+   "id": "fund",
+   "zh": "基本面",
+   "en": "Consensus",
+   "charts": [
+    {
+     "code": "VAP-CH-24",
+     "id": "consensus",
+     "zh": "共識總覽",
+     "en": "Consensus Overview",
+     "axes": 1,
+     "dataShape": "table",
+     "fields": [
+      "dilutedEPS",
+      "targetPrice",
+      "rating",
+      "analystCount",
+      "forwardPER",
+      "forwardPBR"
+     ],
+     "use": "yfinance / FactSet 共識",
+     "rule": "綠黃紅 spectrum · 目標價取左右最長"
+    }
+   ]
+  }
+ ],
+ "dataSources": [
+  "TWSE 台灣證交所",
+  "TPEX 櫃買中心",
+  "SITCA 投信投顧公會",
+  "MOPS 公開資訊觀測站",
+  "yfinance",
+  "FactSet (keyed)",
+  "FRED",
+  "EPFR",
+  "HKEX 港交所"
+ ],
+ "changelog": [
+  {
+   "version": "1.0.0",
+   "date": "2026-08-02",
+   "note": "自 Builder GROUPS 抽出 28 型全數建檔(VAP-CH-01…28)"
+  },
+  {
+   "version": "1.0.1",
+   "date": "2026-08-04",
+   "note": "VAP-CH-22 規則註記亂碼修復:「漇2跌綣」→「漲紅跌綠」(與 vap_spec palette.semantic up=紅/down=綠 一致);僅此一處文字修復,無結構或數值變更"
+  },
+  {
+   "version": "1.1.0",
+   "date": "2026-08-11",
+   "note": "操作員令 Ensure VAP have creating analysis chart functions like MacroMicro:新增 transforms 節(yoy/mom/rebase100/ma:N/ytd + 事件帶 + 次要編碼鐵律);圖型零增減(multi 疊線=CH-01 series[] 實作、堆疊=CH-06/07/08 實作、事件帶=CH-13 規則實作);引擎 chartlib_v003 版本前進落地,v002 正本零觸碰"
+  }
+ ],
+ "transforms": {
+  "policy": "分析變換=繪前資料函數,非圖型;可疊加於任何 series[] 圖(VAP-CH-01/06 等)。變換一律於副標誠實註記(含躍期);樣本不足/無日期=誠實 FAIL 不硬算。引擎:via_autoplot_engine_chartlib_v003 --transform。",
+  "items": [
+   {
+    "id": "yoy",
+    "zh": "年增率",
+    "en": "YoY %",
+    "note": "躍期=中位間距推頻率;分母 0 或缺值=該點無值"
+   },
+   {
+    "id": "mom",
+    "zh": "月增率",
+    "en": "MoM %",
+    "note": "躍期=頻率/12 四捨五入,最小 1"
+   },
+   {
+    "id": "rebase100",
+    "zh": "指數化",
+    "en": "Rebase=100",
+    "note": "首個非零值=100;跨尺度同軸比較之首選(取代雙軸)"
+   },
+   {
+    "id": "ma:N",
+    "zh": "移動平均",
+    "en": "Moving Average",
+    "note": "N 期簡單平均;不足 N 期=無值"
+   },
+   {
+    "id": "ytd",
+    "zh": "年累計",
+    "en": "Year-to-Date",
+    "note": "逐年歸零累加;需日期 X 軸"
+   }
+  ],
+  "bands": {
+   "id": "bands",
+   "zh": "事件/衰退帶",
+   "rule": "承 VAP-CH-13:區間陰影 0.12 + 虛線邊 0.8;CLI 起:迄:標籤;無日期 X 軸=誠實略過"
+  },
+  "secondary_encoding": {
+   "reason": "via combo 為鎖定色序;dataviz 驗證器實測 C4(#4c78a8)×C5(#7a6daa)色盲分離 ΔE 1.3(deutan)未達標",
+   "mandatory": [
+    "圖例常在(≥2 序列)",
+    "彩色端標防碰撞 ≥11px",
+    "第 5/6 序列(C4/C5 槽)虛線 6 3"
+   ],
+   "cap": "同圖 series ≤6;更多依規約摺疊或改 small multiples(VAP-CH-09)"
+  }
+ }
 }

@@ -1,0 +1,33 @@
+{
+ "record_id": "VIA_VAP_Analysis_Charts_Record_v0100",
+ "ts": "2026-08-11T14:50:00",
+ "operator_order": "Ensure vap have creating analysis chart functions like macromicro",
+ "gap_found": "chartlib SSOT 1.0.1 已定義 28 圖型,但實作引擎 v002 僅雙軸配對圖 — MacroMicro 級分析函數(多序列/變換/堆疊/事件帶)規格有、引擎無",
+ "built": {
+  "engine": "via_autoplot_engine_chartlib_v003.py(版本前進;v002 動詞原樣保留)",
+  "functions": [
+   "--series 2-6 欄同軸多序列疊線(VAP-CH-01 series[])",
+   "--transform yoy|mom|rebase100|ma:N|ytd — 躍期自動推頻率、註記入副標、不足=誠實 FAIL",
+   "--stackchart sarea|sbar|sbar100(VAP-CH-06/07/08;sbar100 鎖 0-100 軸)",
+   "--bands 起:迄:標籤 事件/衰退陰影(VAP-CH-13 規則)",
+   "零軸虛線(spec referenceLines.zeroAxis)於 yoy/mom 自動啟用;原生 <title> hover 每點讀值"
+  ],
+  "spec": "vap_chartlib.json 1.0.1→1.1.0:transforms 節 + secondary_encoding 鐵律 + changelog;圖型零增減"
+ },
+ "palette_governance": {
+  "validator": "dataviz validate_palette.js 實測 via combo(鎖定序)against #fbfaf7",
+  "result_honest": "FAIL — C4 #4c78a8 × C5 #7a6daa deutan ΔE 1.3/normal 6.5;C1 #c4943a 對比 2.63 WARN;後四色 chroma 低",
+  "ruling": "色序=視覺鎖定 SSOT 不可改 → 依驗證器規則以次要編碼補償:圖例常在+彩色端標(≥11px 防碰撞)+C4/C5 槽虛線;series 上限 6",
+  "residual_risk": "C4×C5 同圖且相鄰時色盲讀者仍靠虛線與端標辨識 — 已為現行鎖定下最大補償"
+ },
+ "qa": [
+  "py_compile PASS;七圖組合全出(yoy/mom/rebase100/ma:6/ytd/sarea/sbar100)",
+  "數值抽驗:YoY@2025-01 期望 2.73=實出 2.73;rebase100 起點 100;sbar100 佔比 37.74 合理;躍期=12 正確",
+  "Playwright 實渲染截圖目檢 ×2:事件帶/零軸/端標/圖例/0-100 軸全對;首截抓到 sbar100 軸過衝 200 → 鎖軸修復後複驗綠",
+  "雙軸配對(v002 行為)迴歸 OK"
+ ],
+ "operator_verification": [
+  "via-sync",
+  "py \"functional modules\\VAP\\engine\\via_autoplot_engine_chartlib_v003.py\" --base . --demo --table demo_tw_stock_monthly --x date --series close,volume --transform rebase100"
+ ]
+}

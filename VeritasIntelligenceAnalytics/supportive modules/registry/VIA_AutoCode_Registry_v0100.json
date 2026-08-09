@@ -1251,6 +1251,14 @@
    "component": "板 v0129:等格流程帶+在地化宣告+排程白話化",
    "code": "SUB-006",
    "note": "操作員三令:①流程帶 .fnode 統一 172×54 等寬等高格;②在地化不上雲端 — 雲端 Graph 線節點/矩陣列改「在地化 · 不上雲端/全系統本地執行」綠顯,雲端線正式不採用(docs 申請範本留檔備查,只增不減;Graph 休眠紅線升級為在地化鐵律);③④頁 CPM 排程白話化 — 表頭改人話(要幾天/可緩衝天/牽全案/來得及),CP→「是」、LATE→「排不進」紅字,日期一律 yyyy-MM-dd 正規化(斜線與單位數月日自動轉),無起日誠實標「2026-01-01(預設)」=操作員定義之系統時間起點,圖例白話說明關鍵鏈與排不進的處置(減量/加手/延期)。QA:AST 0 錯;shim129 12 斷言全過(日期正規化/預設起點標示/術語清除/在地化雙位置/總覽與視覺鎖迴歸)。版本前進 v0128 零觸碰。"
+  },
+  {
+   "ts": "2026-08-11T14:50:00",
+   "op": "UPDATE",
+   "category": "引擎",
+   "component": "VAP chartlib 引擎 v003 + 圖庫 SSOT 1.1.0(MacroMicro 級分析函數)",
+   "code": "VAP/SUB",
+   "note": "操作員令 Ensure VAP have creating analysis chart functions like MacroMicro:引擎 chartlib_v002→v003 版本前進(正本零觸碰)新四能力 — ①--series 同軸多序列疊線(CH-01 series[] 實作);②--transform yoy/mom/rebase100/ma:N/ytd(躍期由中位間距自動推頻率;分母零/樣本不足/無日期=誠實 FAIL;變換註記入副標);③--stackchart sarea/sbar/sbar100(CH-06/07/08;段間紙面縫;百分比鎖 0-100 軸 — 首截圖抓到浮點過衝 200 即修);④--bands 事件/衰退帶(CH-13 陰影+虛線邊)。色彩治理:via combo 鎖定序沿用,dataviz 驗證器實測 C4×C5 deutan ΔE 1.3 未達標 → 三重次要編碼強制(圖例+彩色端標防碰撞+C4/C5 虛線),誠實錄稽核。QA:py_compile PASS;36 月合成資料七圖全出;YoY@躍12期數值抽驗 2.73=2.73、rebase100 起點=100、sbar100 佔比 37.7 抽驗過;雙軸配對迴歸 OK;Playwright 實渲染截圖目檢兩張過。圖庫 SSOT 1.0.1→1.1.0:新 transforms 節+changelog,圖型零增減。全離線 HTML+SVG 零依賴,符在地化鐵律。"
   }
  ]
 }
