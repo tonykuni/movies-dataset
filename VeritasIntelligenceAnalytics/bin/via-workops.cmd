@@ -1,10 +1,10 @@
 @echo off
-rem WorkOps × Mail Tracker 統合指揮板 v0104(一系統四頁:專案/追蹤哨/範疇關係人/VMT;負載對照;絕不代寄)
-rem 用法:via-workops all               → ONE POWERSHELL:環境自癒+指揮板+深度鏈 全一支([-Days n] [-SkipDeep] [-NoOpen])
+rem WorkOps × Mail Tracker 統合指揮板 v0104（一系統四頁:專案/追蹤哨/範疇關係人/VMT;負載對照;絕不代寄）
+rem 用法:via-workops all               → ONE POWERSHELL:環境自癒+指揮板+深度鏈 全一支（[-Days n] [-SkipDeep] [-NoOpen]）
 rem       via-workops                    → 一支到底:掃描+對帳+編號+指揮板+週報+通知+KPI
-rem       via-workops silent            → 靜默背景:同上但不開瀏覽器(配 WorkOps_Background.vbs)
-rem       via-workops drafts            → 自動佇列(≥3 天未回)一次建草稿
-rem       via-workops drafts THR-…,…    → 只為「圈選件」建草稿(板上複製之指令)
+rem       via-workops silent            → 靜默背景:同上但不開瀏覽器（配 WorkOps_Background.vbs）
+rem       via-workops drafts            → 自動佇列（≥3 天未回）一次建草稿
+rem       via-workops drafts THR-…,…    → 只為「圈選件」建草稿（板上複製之指令）
 rem       via-workops report | ui | Scan|Reconcile|Draft|FollowUp|Templates|All
 if "%~1"=="" (
   for /f "delims=" %%f in ('dir /b /o:n "%~dp0..\functional modules\WorkOps\Invoke-VIA-WorkOps-CommandBoard-v0*.ps1"') do set "WOPS_BOARD=%%f"
@@ -44,41 +44,41 @@ if "%~1"=="" (
   rem WOP 專案歸戶:wop=propose 提議歸戶 | apply 套用確認檔 | list 專案清單 | status 即況 | domains 網域收割
   py "%~dp0..\functional modules\WorkOps\engines\workops_wop_identifier.py" %2 %3
 ) else if /i "%~1"=="names" (
-  rem 命名核對:names propose(提議)| apply(核對表寫回)| add 名稱 關鍵字(自建歸類)| names(現況)
+  rem 命名核對:names propose（提議）| apply（核對表寫回）| add 名稱 關鍵字（自建歸類）| names（現況）
   py "%~dp0..\functional modules\WorkOps\engines\workops_namer.py" %2 %3 %4 %5
 ) else if /i "%~1"=="slides" (
   rem ENG-033 自動簡報:板資料合成週報 slides;產完自動開啟;Ctrl+P 列印即簡報
   py "%~dp0..\functional modules\WorkOps\engines\workops_slides.py"
   start "" "%~dp0..\functional modules\WorkOps\out\VIA_WorkOps_Slides.html"
 ) else if /i "%~1"=="mtg" (
-  rem ENG-048 會議對帳橋:MeetingLoop 決議→DEC 帳(冪等)· 未完行動→TO-DO 會議行動批;mtg=pull | status
+  rem ENG-048 會議對帳橋:MeetingLoop 決議→DEC 帳（冪等）· 未完行動→TO-DO 會議行動批;mtg=pull | status
   py "%~dp0..\functional modules\WorkOps\engines\workops_meetingloop_bridge.py" %2
 ) else if /i "%~1"=="todo" (
-  rem ENG-046 每日 TO-DO:同類一口氣批次(前日16:00 寄出/11:00 收件/16:00 前急追)+AI 代筆提示
+  rem ENG-046 每日 TO-DO:同類一口氣批次（前日16:00 寄出/11:00 收件/16:00 前急追）+AI 代筆提示
   py "%~dp0..\functional modules\WorkOps\engines\workops_daily_todo.py"
 ) else if /i "%~1"=="search" (
-  rem 統一搜尋(唯讀跨九側車):search 關鍵字 [關鍵字2]
+  rem 統一搜尋（唯讀跨九側車）:search 關鍵字 [關鍵字2]
   py "%~dp0..\functional modules\WorkOps\engines\workops_unified_search.py" %2 %3 %4 %5 %6 %7 %8 %9
 ) else if /i "%~1"=="milestones" (
-  rem 里程碑(append-only):create WOP-# 名 日期 [--owner] | complete MLS-# [--evidence] | list | status
+  rem 里程碑（append-only）:create WOP-# 名 日期 [--owner] | complete MLS-# [--evidence] | list | status
   py "%~dp0..\functional modules\WorkOps\engines\workops_milestone_manager.py" %2 %3 %4 %5 %6 %7 %8 %9
 ) else if /i "%~1"=="timeline" (
-  rem 時間軸/依賴(下游衝擊):timeline=build | link MLS-A MLS-B | list
+  rem 時間軸/依賴（下游衝擊）:timeline=build | link MLS-A MLS-B | list
   py "%~dp0..\functional modules\WorkOps\engines\workops_timeline_dependency.py" %2 %3 %4 %5 %6 %7 %8 %9
 ) else if /i "%~1"=="closure" (
-  rem 案件結案智能(絕不自動結案):closure=build 候選 | confirm WOP-# --reason 事由 | list
+  rem 案件結案智能（絕不自動結案）:closure=build 候選 | confirm WOP-# --reason 事由 | list
   py "%~dp0..\functional modules\WorkOps\engines\workops_closure_intelligence.py" %2 %3 %4 %5 %6 %7 %8 %9
 ) else if /i "%~1"=="lessons" (
-  rem 教訓(人工確認才成立):lessons=build 候選 | confirm 序號 --root-cause X --prevention Y | list
+  rem 教訓（人工確認才成立）:lessons=build 候選 | confirm 序號 --root-cause X --prevention Y | list
   py "%~dp0..\functional modules\WorkOps\engines\workops_lesson_learned.py" %2 %3 %4 %5 %6 %7 %8 %9
 ) else if /i "%~1"=="retention" (
-  rem 保留政策(PLAN 先行;apply 三重門):retention=plan | apply --confirm | log
+  rem 保留政策（PLAN 先行;apply 三重門）:retention=plan | apply --confirm | log
   py "%~dp0..\functional modules\WorkOps\engines\workops_retention_manager.py" %2 %3 %4 %5 %6 %7 %8 %9
 ) else if /i "%~1"=="onboard" (
-  rem 首跑導入狀態機(唯讀,由真實產物推導八步)
+  rem 首跑導入狀態機（唯讀,由真實產物推導八步）
   py "%~dp0..\functional modules\WorkOps\engines\workops_onboarding.py" %2 %3 %4 %5 %6 %7 %8 %9
 ) else if /i "%~1"=="auditpack" (
-  rem ENG-036 稽核包:全系統證據+現場紅線掃描 → 帶 sha256 manifest 之 zip(IT/主管交件)
+  rem ENG-036 稽核包:全系統證據+現場紅線掃描 → 帶 sha256 manifest 之 zip（IT/主管交件）
   py "%~dp0..\functional modules\WorkOps\engines\workops_audit_bundle.py"
 ) else if /i "%~1"=="matrix" (
   rem ENG-037 總結矩陣:成果×側車×DB 全盤點 → out\VIA_Summary_Matrix.html;產完自動開啟
@@ -96,10 +96,10 @@ if "%~1"=="" (
   for /f "delims=" %%f in ('dir /b /o:n "%~dp0..\functional modules\WorkOps\engines\Invoke-VIA-WorkOps-PmSetup-v0*.ps1"') do set "WOPS_PMS=%%f"
   call pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\engines\%%WOPS_PMS%%" %2
 ) else if /i "%~1"=="workbench" (
-  rem 智慧工作台(Forge 前端 12 分頁 × 真後端 19 端點):起本機服務並開瀏覽器,同 via-forge
+  rem 智慧工作台（Forge 前端 12 分頁 × 真後端 19 端點）:起本機服務並開瀏覽器,同 via-forge
   pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\supportive modules\VIA_Forge\Start-VIA.ps1"
 ) else if /i "%~1"=="dotsetup" (
-  rem graphviz 可攜式取得(免 winget/管理員):via-workops dotsetup → 狀態;dotsetup install → 下載+驗證+解壓
+  rem graphviz 可攜式取得（免 winget/管理員）:via-workops dotsetup → 狀態;dotsetup install → 下載+驗證+解壓
   py "%~dp0..\functional modules\WorkOps\engines\workops_graphviz_setup.py" %2 %3
 ) else if /i "%~1"=="envmgr" (
   rem 中央環境治理直達:via-workops envmgr health | plan pm4py | install pm4py --wheels-only
@@ -115,10 +115,10 @@ if "%~1"=="" (
 ) else if /i "%~1"=="scanrange" (
   pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\engines\Invoke-VIA-Outlook-TimeRange-ReadOnly.ps1" %2 %3 %4 %5 %6
 ) else if /i "%~1"=="matrixsync" (
-  rem 注意:此工具會「建立」Outlook 行事曆事件(使用者主動觸發之寫入;郵件/分類仍零觸碰)
+  rem 注意:此工具會「建立」Outlook 行事曆事件（使用者主動觸發之寫入;郵件/分類仍零觸碰）
   pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\engines\Sync-MatrixToOutlook.ps1" %2 %3 %4
 ) else if /i "%~1"=="note" (
-  rem VIA Note Pro 單機筆記(FNT-001):雙擊即用,資料全在瀏覽器 localStorage;同 via-note
+  rem VIA Note Pro 單機筆記（FNT-001）:雙擊即用,資料全在瀏覽器 localStorage;同 via-note
   for /f "delims=" %%f in ('dir /b /o:n "%~dp0..\functional modules\VAP\spec\UIUX_Design_Source\VIA_Note_Pro_Standalone*.html"') do set "WOPS_NOTE=%%f"
   call start "" "%~dp0..\functional modules\VAP\spec\UIUX_Design_Source\%%WOPS_NOTE%%"
 ) else if /i "%~1"=="help" (
@@ -155,7 +155,7 @@ if "%~1"=="" (
   echo  matrix       總結矩陣（ENG-037）:成果×側車×DB 全盤點 HTML
   echo  slides       自動簡報（ENG-033）:板資料合成週報投影片,Ctrl+P 列印即簡報
   echo  vtr          會議紀錄修復引擎（VTR 子系統）:裸打=全套驗證 Restore=修逐字稿 Inspect=待裁決
-  echo  note         VIA Note Pro 單機筆記(FNT-001):雙擊即開,資料在本機瀏覽器
+  echo  note         VIA Note Pro 單機筆記（FNT-001）:雙擊即開,資料在本機瀏覽器
   echo  matrixsync   WorkMatrix 到行事曆（唯一寫入,主動觸發）
   echo  Scan/Reconcile/Draft/FollowUp/Templates/All  MailOps v001 傳遞
 ) else if /i "%~1"=="report" (
