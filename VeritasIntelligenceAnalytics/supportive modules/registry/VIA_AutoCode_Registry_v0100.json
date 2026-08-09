@@ -202,7 +202,8 @@
   "引擎|workops_lesson_learned_v0100": "ENG-044",
   "引擎|workops_retention_manager_v0100": "ENG-045",
   "引擎|workops_daily_todo_v0100": "ENG-046",
-  "引擎|via_meetingloop_engine_v005": "ENG-047"
+  "引擎|via_meetingloop_engine_v005": "ENG-047",
+  "引擎|workops_meetingloop_bridge_v0100": "ENG-048"
  },
  "ledger": [
   {
@@ -874,6 +875,14 @@
    "component": "via_meetingloop_engine_v005",
    "code": "ENG-047",
    "note": "MeetingLoop 套件 12 件上傳歸位 functional modules/WorkOps/MeetingLoop/(9 唯一;引擎 v005 正本,v003 僅版本字串差;launchers v003/v005+DataEnvironment 安裝器+FullUXData 驗收器+duck/parquet 驗收+README+驗證/完整性報告)。容器 QA:紅線 7 件 CLEAN、compile×3、AST×4、doctor GREEN(誠實降級);self-test 需套件 sample(未上傳)誠實未跑。生產宣稱照套件自狀態=NOT_YET_VALIDATED_ON_USER_WINDOWS,實機驗收待操作員跑 Test ps1。與 VTR 擇優裁定書同目錄(重疊=逐字稿修復層,合流待令;VTR 修復正本不動)。via-meetingloop 轉發器(動態解析)。"
+  },
+  {
+   "ts": "2026-08-10T14:30:00",
+   "op": "ASSIGN",
+   "category": "引擎",
+   "component": "workops_meetingloop_bridge_v0100",
+   "code": "ENG-048",
+   "note": "操作員「合為對帳」令:MeetingLoop→WorkOps 對帳橋 — 每輪 run 之 04_decisions.json 決議(會議中人已確認=人工確認等級)自動入 ENG-027 DEC 帳(本冊發號;橋帳本 meeting+內容雜湊冪等永不重入;來源標 MTG id);06_actions.csv/actions_current 未完行動 → out/meeting_actions.json → 每日 TO-DO v0101 新「會議行動批」(第七批)。行動只彙整不代辦;append-only;絕不代寄。沙箱五段斷言 PASS(入帳2→冪等→COMPLETED 排除→TO-DO 批→status)。硬化總掃:全引擎編譯零失敗、自測 7/7、稽核紅線 112 檔 PASS。via-workops mtg。"
   }
  ]
 }

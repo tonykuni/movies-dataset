@@ -50,6 +50,9 @@ if "%~1"=="" (
   rem ENG-033 自動簡報:板資料合成週報 slides;產完自動開啟;Ctrl+P 列印即簡報
   py "%~dp0..\functional modules\WorkOps\engines\workops_slides.py"
   start "" "%~dp0..\functional modules\WorkOps\out\VIA_WorkOps_Slides.html"
+) else if /i "%~1"=="mtg" (
+  rem ENG-048 會議對帳橋:MeetingLoop 決議→DEC 帳(冪等)· 未完行動→TO-DO 會議行動批;mtg=pull | status
+  py "%~dp0..\functional modules\WorkOps\engines\workops_meetingloop_bridge.py" %2
 ) else if /i "%~1"=="todo" (
   rem ENG-046 每日 TO-DO:同類一口氣批次(前日16:00 寄出/11:00 收件/16:00 前急追)+AI 代筆提示
   py "%~dp0..\functional modules\WorkOps\engines\workops_daily_todo.py"
@@ -135,6 +138,7 @@ if "%~1"=="" (
   echo  silent       靜默一支到底（不開瀏覽器;配開機 vbs）
   echo  report       開週報   ui  開單機板   scanrange  時段唯讀掃描
   echo  bridge       語料橋   engine  超級引擎   analytics  分析層   actiondb  行動庫
+  echo  mtg          會議對帳橋（ENG-048）:MeetingLoop 決議入 DEC 帳、行動入 TO-DO 批
   echo  todo         每日 TO-DO（ENG-046）:三時間錨批次+AI 代筆提示（寄出永遠人按）
   echo  search       統一搜尋:search 關鍵字（跨九側車唯讀）
   echo  milestones   里程碑:create/complete/list/status（MLS-# 永不變）

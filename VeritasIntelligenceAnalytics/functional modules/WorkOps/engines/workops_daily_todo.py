@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-r"""Veritas WorkOps 每日 TO-DO 引擎 v0100(ENG-046)— 同類工作一口氣,三時間錨
+r"""Veritas WorkOps 每日 TO-DO 引擎 v0101(ENG-046)— 同類工作一口氣,三時間錨
 
 操作員令(2026/08/10):每日 TO-DO LIST,一口氣做相同工作 —
   [前日 16:00] 陸續寄出追蹤信(系統建草稿批;寄出人按 — 絕不代寄)
@@ -116,6 +116,7 @@ def build():
     n_nm = sum(1 for v in nm.values() if isinstance(v, dict) and not v.get("approved"))
     cls_c = jload(OUT / "closure_candidates.json", {}).get("candidates", [])
     dec_open = [r for r in rows(OUT / "decision_log.csv") if (r.get("狀態") or "") != "DONE"]
+    mtg_ac = jload(OUT / "meeting_actions.json", {}).get("open_actions", [])
     ms = jload(OUT / "milestones.json", {}).get("items", {})
     today = date.today().isoformat()
     ms_late = [m for m, it in ms.items() if it["status"] == "OPEN" and it.get("due", "9999") < today]
@@ -134,6 +135,8 @@ def build():
                 {"anchor": "全日", "batch": "結案批:候選 %d 件(confirm 顯式)" % len(cls_c), "n": len(cls_c), "cmd": "via-workops closure"},
                 {"anchor": "全日", "batch": "決策/里程碑批:未結決議 %d · 逾期里程碑 %d" % (len(dec_open), len(ms_late)),
                  "n": len(dec_open) + len(ms_late), "cmd": "via-workops decisions list / milestones list"},
+                {"anchor": "全日", "batch": "會議行動批:未完 %d 件(MeetingLoop 對帳橋)" % len(mtg_ac),
+                 "n": len(mtg_ac), "items": mtg_ac[:20], "cmd": "via-workops mtg status"},
             ]}
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "daily_todo.json").write_text(json.dumps(todo, ensure_ascii=False, indent=1), encoding="utf-8")
