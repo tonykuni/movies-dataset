@@ -43,7 +43,13 @@ function Test-PsAst { param([string]$Path)
     return (-not ($err -and $err.Count))
 }
 function Get-Sha16 { param([string]$Path)
-    (Get-FileHash -LiteralPath $Path -Algorithm SHA256).Hash.Substring(0, 16).ToLower()
+    # 行尾正規化後計算(Windows autocrlf 簽出 CRLF、倉內 LF — 內容等值即同 sha,跨平台恆定)
+    $bytes = [System.IO.File]::ReadAllBytes($Path)
+    $text = [System.Text.Encoding]::UTF8.GetString($bytes).Replace("`r`n", "`n")
+    [byte[]]$norm = [System.Text.Encoding]::UTF8.GetBytes($text)
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    try { (($sha.ComputeHash($norm) | ForEach-Object { $_.ToString("x2") }) -join "").Substring(0, 16) }
+    finally { $sha.Dispose() }
 }
 
 Write-Host "==========================================================" -ForegroundColor DarkCyan

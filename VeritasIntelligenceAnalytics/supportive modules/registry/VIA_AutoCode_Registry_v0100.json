@@ -717,6 +717,14 @@
    "component": "VIA_VAP_Chart_Library_Builder.html",
    "code": "SPJ-VAP",
    "note": "結案後補件到貨 2 件:①Chart_Library_Builder(sha cc255176…,真新件)→ VAP/spec/ 歸位+manifest artifacts 增列(9 件);②VIA_VAP_System.html 與倉內 ui/VAP_System.html 僅 <title> 一行差=等值變體,不重複入庫。結案基線不受影響(結案器 artifacts 檢核以 manifest 為準,下次重跑 via-closure 即含新件落新基線)。仍缺 1 件:UNIT03-GuardedDynamicSandbox-v0109.ps1。"
+  },
+  {
+   "ts": "2026-08-10T07:30:00",
+   "op": "UPDATE",
+   "category": "引擎",
+   "component": "Invoke-VIA-TrinityClosure_v0100",
+   "code": "ENG-034",
+   "note": "操作員實機首跑 13/14(唯 VisualLock sha FAIL)— 根因:Windows git autocrlf 簽出把 LF 轉 CRLF,位元組級 sha 自然不合(檔案內容完好)。修正:Get-Sha16 改行尾正規化(CRLF→LF)後計算,跨平台恆定;容器實證 LF/CRLF 兩版同 sha 23000e2958e9aaf9,結案器重跑 14/14 PASS。封存語意不變 — 內容等值即同基線。"
   }
  ]
 }
