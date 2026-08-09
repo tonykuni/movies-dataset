@@ -183,7 +183,8 @@
   "引擎|via_ocr_router_v0100": "ENG-026",
   "引擎|workops_decision_log_v0100": "ENG-027",
   "引擎|workops_wop_identifier_v0100": "ENG-028",
-  "引擎|workops_reply_parser_v0100": "ENG-029"
+  "引擎|workops_reply_parser_v0100": "ENG-029",
+  "專案子系統|VIA_WorkOps子系統": "SUB-006"
  },
  "ledger": [
   {
@@ -535,6 +536,14 @@
    "component": "workops_reply_parser_v0100",
    "code": "ENG-029",
    "note": "M3 回覆解析(規劃書 Phase 1 閉環):投票 VotingResponse(MailOps Scan 唯讀匯出)→ ==VMT-CONFIRM== token → 關鍵詞三語同義字 三層 fallback;事實流 reply_events.jsonl append-only 冪等 + 衍生狀態 reply_status.json 全量重算(F20);未解析誠實不猜;板 v0116 ②判讀欄自動顯示;ALL v0104 [2b] 段;via-workops replies"
+  },
+  {
+   "ts": "2026-08-09T18:00:00",
+   "op": "MERGE",
+   "category": "專案子系統",
+   "component": "VIA_WorkOps子系統",
+   "code": "SUB-006",
+   "note": "操作員令:VMT+VTR 併入 WorkOps 升格獨立子系統 VIA WorkOps。實體遷移 git mv(歷史保留):VMT_SuperBOM→WorkOps/VMT、VTR→WorkOps/VTR;舊路留 MOVED 麵包屑;via-vmt/via-one(v0113)改指新家。原 VMT子系統/VTR子系統 條目保留不刪(只增不減),其正本自此由 VIA_WorkOps 統轄。SSOT/工具共用不另立:VIA_SSOT、workops_lexicon、org_lexicon、本登錄簿、audit_tools;VTR lexicon 入 Shared_Lexicon_Registry。"
   }
  ]
 }

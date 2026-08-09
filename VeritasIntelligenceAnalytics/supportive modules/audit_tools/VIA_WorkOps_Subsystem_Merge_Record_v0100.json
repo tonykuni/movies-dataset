@@ -1,0 +1,19 @@
+{
+ "record_id": "VIA_WorkOps_Subsystem_Merge_Record_v0100",
+ "ts": "2026-08-09T18:30:00",
+ "operator_verdict": "將這兩個(VMT+VTR)併入 WorkOps 並改名為 VIA WorkOps 為獨立子系統,但與先前的 SSOT 及工具共用",
+ "delivered": {
+  "physical_merge": "git mv 歷史全保留:supportive modules/VMT_SuperBOM → functional modules/WorkOps/VMT(引擎 v0103+八階段+參數,引擎旁相對路徑移動安全實證)· functional modules/VTR → functional modules/WorkOps/VTR(自帶入口 %~dp0 相對,隨樹遷移);舊路各留 MOVED 麵包屑(只增不減)",
+  "subsystem_promotion": "登錄簿新增 專案子系統|VIA_WorkOps子系統(SUB-006)+ ledger MERGE 記錄;原 VMT子系統/VTR子系統 條目保留不刪,正本改由 VIA_WorkOps 統轄;WorkOps/VIA_WorkOps_Subsystem_Manifest.json 宣告組成與共用資產;README_SUBSYSTEM_LAYOUT 發現表更新+併入補遺",
+  "shared_not_duplicated": "SSOT/工具一本不複製:VIA_SSOT · workops_lexicon · org_lexicon · AutoCode Registry · audit_tools;VTR 五詞庫(29 詞/74 別名,validate 閘門實跑過)與 VMT convergence/master params 登入 Shared_Lexicon_Registry(14→16 資產)",
+  "launchers": "via-vmt.cmd 改指新家;via-one.cmd 前送 Invoke-VIA-One-v0113(v0112 保留回退;VMT 磁貼新路徑×2、舊路徑 0);via-vmt-init 不動(指 installer+VMT_ROOT 資料層,與碼位無關)"
+ },
+ "qa_container": {
+  "moved_trees": "py_compile via_master_engine_v0103/vmt_convergence/vtr pipeline 全過;VTR validate_lexicon 實跑(29 詞條/啟用 26/草稿 3)",
+  "launchers": "pwsh AST parse v0113 PASS;via-vmt/via-one CRLF 淨;新舊路徑 grep 斷言",
+  "known_residue": "舊版 Invoke-VIA-One ≤v0112 與 mega/pack 引擎歷史版內之 VMT_SuperBOM 字樣屬凍結歷史版,不回改(版本前進原則);mega 引擎盤點表之 VMT 路徑更新候令(缺席時誠實列 missing,不致崩)"
+ },
+ "red_lines_unchanged": "只增不減(舊條目/舊版/麵包屑全留)· 正本不就地修改(via-one 版本前進)· 編號永不變 · SSOT 一本",
+ "operator_next": "via-sync 後照常:via-workops / via-vmt / via-vmt-init 全部照舊指令,家已換新;VMT 資料布建與 VTR 模型層仍為候令缺口",
+ "append_only": true
+}

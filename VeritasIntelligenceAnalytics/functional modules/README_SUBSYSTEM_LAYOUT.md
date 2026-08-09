@@ -8,7 +8,7 @@ subsystems in this order:
 | VRN | `functional modules/VRN` |
 | VDF | `functional modules/VDF`, `functional modules/VeritasDataForge`, `module/VeritasDataForge`, `VeritasDataForge` |
 | VAP | `functional modules/VAP`, `module/VAP`, `VAP` |
-| VTR | `functional modules/VTR` |
+| VTR | `functional modules/WorkOps/VTR`(2026-08-09 併入 VIA WorkOps;舊根 `functional modules/VTR` 留 VTR_MOVED.md 麵包屑)|
 | Others | every other directory under `functional modules/` and `module/` |
 | Supportive | `supportive modules/` |
 
@@ -96,3 +96,16 @@ canonical transcript.
 
 排除規則：`.git`, `__pycache__`, `node_modules`, `venv`, `cache*`, `archive*`,
 `backup*`, `staging`, `received_duplicates` 不列入分析。
+
+
+---
+
+## 併入補遺(2026-08-09 操作員令)
+
+**VIA WorkOps 升格獨立子系統**:VMT(原 `supportive modules/VMT_SuperBOM`)與
+VTR(原 `functional modules/VTR`)git mv 併入 `functional modules/WorkOps/{VMT,VTR}/`,
+全部歷史保留。VIA WorkOps = WorkOps 核心(郵件×專案治理)+ VMT(追蹤自動化資料層)
++ VTR(會議紀錄修復)。SSOT 與支援工具共用不另立:`supportive modules/VIA_SSOT/`、
+`WorkOps/engines/workops_lexicon.py`、org_lexicon、AutoCode Registry、audit_tools。
+啟動器:`via-vmt`/`via-vmt-init` 已改指新家;`via-one` 前送 v0113;VTR 自帶入口隨樹遷移。
+子系統 manifest:`WorkOps/VIA_WorkOps_Subsystem_Manifest.json`。

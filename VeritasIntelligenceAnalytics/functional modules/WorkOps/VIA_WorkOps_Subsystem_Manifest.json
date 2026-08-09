@@ -1,0 +1,26 @@
+{
+ "manifest_id": "VIA_WorkOps_Subsystem_Manifest",
+ "version": "v0100",
+ "ts": "2026-08-09T18:00:00",
+ "subsystem": "VIA WorkOps(獨立子系統;2026-08-09 操作員令升格)",
+ "integration_state": "MERGED_VMT_VTR_SHARED_SSOT",
+ "composition": {
+  "core": "functional modules/WorkOps/(郵件×專案智慧治理:指揮板 v0117 · ALL v0104 · ENG-015/017-023/026-029)",
+  "VMT": "functional modules/WorkOps/VMT/(追蹤自動化:via_master_engine v0103+八階段;code_gaps ZERO;資料層 VMT_ROOT 待 via-vmt-init 布建;原 supportive modules/VMT_SuperBOM,git mv 歷史保留)",
+  "VTR": "functional modules/WorkOps/VTR/(會議紀錄修復:確定性層+501 行測試;模型層/JS 引擎候令;原 functional modules/VTR,git mv 歷史保留)"
+ },
+ "shared_assets_not_duplicated": [
+  "supportive modules/VIA_SSOT/(產業/公司 SSOT 正本 + VIA_Shared_Lexicon_Registry)",
+  "WorkOps/engines/workops_lexicon.py(regex/正規化正本)+ org_lexicon.json",
+  "supportive modules/registry/VIA_AutoCode_Registry_v0100.json(編號正本)",
+  "supportive modules/audit_tools/(append-only 審計)",
+  "VTR/lexicon/(詞庫 SSOT — 治理同 VRN 政策,登記於 Shared_Lexicon_Registry)"
+ ],
+ "launchers": {
+  "via-workops": "核心",
+  "via-vmt": "VMT 總指揮(已改指新家)",
+  "via-vmt-init": "VMT 資料層 bootstrap",
+  "VTR": "自帶 Invoke-VTR.ps1/Run-VTR.cmd"
+ },
+ "governance": "唯讀 · 絕不代寄/代跑 · 編號永不變 · 只增不減(原路徑麵包屑保留;registry 舊子系統條目不刪)"
+}

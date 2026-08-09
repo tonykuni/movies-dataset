@@ -5,20 +5,169 @@
  "operator_verdict": "VIA 系統 SSOT / REGEX / 同義字 / LIST / DICT 共用彙整去重(2026-08-09 令)",
  "principle": "每項共用資產標定唯一正本歸屬;Python 側可共享 runtime 者收斂至 workops_lexicon.py;跨語言(PS/JS)複本無法共享 runtime,登記於此防漂移 — 修改正本時同步複本並更新本冊。資料詞庫維持各自檔案,統一載入器在 lexicon 模組。",
  "assets": [
-  {"id": "CODE_RE", "kind": "regex", "canonical": "engines/workops_lexicon.py", "consumers": ["workops_wop_identifier", "指揮板 JS clusters(顯示層複本 v0110+)", "板 PS $codeRe(複本)"], "verdict": "Python 收斂完成;JS/PS 複本登記"},
-  {"id": "PREFIX_RE + TAG_RE + norm_subj + clean_subject", "kind": "regex+函數", "canonical": "engines/workops_lexicon.py", "consumers": ["workops_wop_identifier", "workops_namer v0102(已改 import)"], "verdict": "Python 收斂完成 — namer/identifier 原各自複本已刪"},
-  {"id": "WOPID_RE / URL_RE / extract_url_domains", "kind": "regex+函數", "canonical": "engines/workops_lexicon.py", "consumers": ["workops_wop_identifier(S4/domains)"], "verdict": "正本唯一"},
-  {"id": "bulk_senders.txt", "kind": "list(雜訊寄件樣式)", "canonical": "engines/bulk_senders.txt", "consumers": ["engine_analytics(latency 型態)", "workops_wop_identifier L0", "domains 收割排除"], "verdict": "檔案正本唯一;載入器收斂 lexicon.load_bulk_patterns"},
-  {"id": "domain_dict.txt", "kind": "dict(領域詞)", "canonical": "engines/domain_dict.txt", "consumers": ["engine_analytics NLP"], "verdict": "正本唯一"},
-  {"id": "domain_map", "kind": "dict(網域→單位)", "canonical": "engines/identifier_params.json", "consumers": ["identifier L5/S5/S6", "domains 收割排除"], "verdict": "正本唯一;wop domains 產候選餵入"},
-  {"id": "product_code_map.json", "kind": "rules(L3/L4+noise)", "canonical": "engines/product_code_map.json", "consumers": ["identifier L0/L3/L7"], "verdict": "正本唯一"},
-  {"id": "org_lexicon.json", "kind": "dict(機構/公司名+VIA 碼)", "canonical": "engines/org_lexicon.json", "consumers": ["identifier S9", "domains 收割建議"], "verdict": "本輪新建 — 由 VIA_SSOT 三正本萃取(sha256 內載);更新=重跑萃取 append", "sources": ["VIA_StockGrouping_v1.1.html ae1e7d92a88f85d7", "VIA_PowerThermal_SAP_SuperBOM_v2.html 654f54847254b91d", "VIA_Industry_CapexProcessEquipment_v0100.html c7bd336e6a9edf97"]},
-  {"id": "sheet_aliases(表頭同義字)", "kind": "synonym", "canonical": "engines/identifier_params.json sheet_aliases", "consumers": ["identifier sheet_normalize", "板 v0115 $SheetAlias(PS 複本)"], "verdict": "Python 正本;PS 複本登記 — 增列同義字時兩處同步"},
-  {"id": "folder_blacklist", "kind": "list(系統資料夾)", "canonical": "engines/identifier_params.json", "consumers": ["identifier S4"], "verdict": "正本唯一"},
-  {"id": "holidays_tw.txt", "kind": "list(假日)", "canonical": "engines/holidays_tw.txt", "consumers": ["板 v0115 工作日計算"], "verdict": "正本唯一;浮動假日操作員維護"},
-  {"id": "watchtower_params.json", "kind": "dict(三段門檻)", "canonical": "engines/watchtower_params.json", "consumers": ["板 v0115 [3/5]"], "verdict": "正本唯一"},
-  {"id": "命名帳本 workops_naming.json(名稱同義層)", "kind": "ledger(alias)", "canonical": "out/workops_naming.json(run-local)", "consumers": ["analytics 七表", "identifier S3/L6", "namer 核對迴圈", "板/工作台顯示"], "verdict": "side-car 正本唯一;approved 永不覆蓋"},
-  {"id": "SSOT 附件正本(產業分類/台達電相關)", "kind": "SSOT 文件", "canonical": "supportive modules/VIA_SSOT/", "consumers": ["org_lexicon 萃取"], "verdict": "StockGrouping v1.1 + CPE v0100 + SuperBOM v2 入庫;SuperBOM v1(sha 15eba43a72049a26)=v2 減日期戳之重複 — 不入庫;IBM 流程探勘指南=研究參考入庫"}
+  {
+   "id": "CODE_RE",
+   "kind": "regex",
+   "canonical": "engines/workops_lexicon.py",
+   "consumers": [
+    "workops_wop_identifier",
+    "指揮板 JS clusters(顯示層複本 v0110+)",
+    "板 PS $codeRe(複本)"
+   ],
+   "verdict": "Python 收斂完成;JS/PS 複本登記"
+  },
+  {
+   "id": "PREFIX_RE + TAG_RE + norm_subj + clean_subject",
+   "kind": "regex+函數",
+   "canonical": "engines/workops_lexicon.py",
+   "consumers": [
+    "workops_wop_identifier",
+    "workops_namer v0102(已改 import)"
+   ],
+   "verdict": "Python 收斂完成 — namer/identifier 原各自複本已刪"
+  },
+  {
+   "id": "WOPID_RE / URL_RE / extract_url_domains",
+   "kind": "regex+函數",
+   "canonical": "engines/workops_lexicon.py",
+   "consumers": [
+    "workops_wop_identifier(S4/domains)"
+   ],
+   "verdict": "正本唯一"
+  },
+  {
+   "id": "bulk_senders.txt",
+   "kind": "list(雜訊寄件樣式)",
+   "canonical": "engines/bulk_senders.txt",
+   "consumers": [
+    "engine_analytics(latency 型態)",
+    "workops_wop_identifier L0",
+    "domains 收割排除"
+   ],
+   "verdict": "檔案正本唯一;載入器收斂 lexicon.load_bulk_patterns"
+  },
+  {
+   "id": "domain_dict.txt",
+   "kind": "dict(領域詞)",
+   "canonical": "engines/domain_dict.txt",
+   "consumers": [
+    "engine_analytics NLP"
+   ],
+   "verdict": "正本唯一"
+  },
+  {
+   "id": "domain_map",
+   "kind": "dict(網域→單位)",
+   "canonical": "engines/identifier_params.json",
+   "consumers": [
+    "identifier L5/S5/S6",
+    "domains 收割排除"
+   ],
+   "verdict": "正本唯一;wop domains 產候選餵入"
+  },
+  {
+   "id": "product_code_map.json",
+   "kind": "rules(L3/L4+noise)",
+   "canonical": "engines/product_code_map.json",
+   "consumers": [
+    "identifier L0/L3/L7"
+   ],
+   "verdict": "正本唯一"
+  },
+  {
+   "id": "org_lexicon.json",
+   "kind": "dict(機構/公司名+VIA 碼)",
+   "canonical": "engines/org_lexicon.json",
+   "consumers": [
+    "identifier S9",
+    "domains 收割建議"
+   ],
+   "verdict": "本輪新建 — 由 VIA_SSOT 三正本萃取(sha256 內載);更新=重跑萃取 append",
+   "sources": [
+    "VIA_StockGrouping_v1.1.html ae1e7d92a88f85d7",
+    "VIA_PowerThermal_SAP_SuperBOM_v2.html 654f54847254b91d",
+    "VIA_Industry_CapexProcessEquipment_v0100.html c7bd336e6a9edf97"
+   ]
+  },
+  {
+   "id": "sheet_aliases(表頭同義字)",
+   "kind": "synonym",
+   "canonical": "engines/identifier_params.json sheet_aliases",
+   "consumers": [
+    "identifier sheet_normalize",
+    "板 v0115 $SheetAlias(PS 複本)"
+   ],
+   "verdict": "Python 正本;PS 複本登記 — 增列同義字時兩處同步"
+  },
+  {
+   "id": "folder_blacklist",
+   "kind": "list(系統資料夾)",
+   "canonical": "engines/identifier_params.json",
+   "consumers": [
+    "identifier S4"
+   ],
+   "verdict": "正本唯一"
+  },
+  {
+   "id": "holidays_tw.txt",
+   "kind": "list(假日)",
+   "canonical": "engines/holidays_tw.txt",
+   "consumers": [
+    "板 v0115 工作日計算"
+   ],
+   "verdict": "正本唯一;浮動假日操作員維護"
+  },
+  {
+   "id": "watchtower_params.json",
+   "kind": "dict(三段門檻)",
+   "canonical": "engines/watchtower_params.json",
+   "consumers": [
+    "板 v0115 [3/5]"
+   ],
+   "verdict": "正本唯一"
+  },
+  {
+   "id": "命名帳本 workops_naming.json(名稱同義層)",
+   "kind": "ledger(alias)",
+   "canonical": "out/workops_naming.json(run-local)",
+   "consumers": [
+    "analytics 七表",
+    "identifier S3/L6",
+    "namer 核對迴圈",
+    "板/工作台顯示"
+   ],
+   "verdict": "side-car 正本唯一;approved 永不覆蓋"
+  },
+  {
+   "id": "SSOT 附件正本(產業分類/台達電相關)",
+   "kind": "SSOT 文件",
+   "canonical": "supportive modules/VIA_SSOT/",
+   "consumers": [
+    "org_lexicon 萃取"
+   ],
+   "verdict": "StockGrouping v1.1 + CPE v0100 + SuperBOM v2 入庫;SuperBOM v1(sha 15eba43a72049a26)=v2 減日期戳之重複 — 不入庫;IBM 流程探勘指南=研究參考入庫"
+  },
+  {
+   "id": "VTR lexicon SSOT(人名/產品/專案/料號/領域 五詞庫)",
+   "kind": "dict(SSOT)",
+   "canonical": "functional modules/WorkOps/VTR/lexicon/",
+   "consumers": [
+    "VTR 修復引擎",
+    "候補:WorkOps S9/命名核對(共用機構/專案名)"
+   ],
+   "verdict": "2026-08-09 併入 VIA WorkOps — 治理同 VRN 政策(新詞 enabled=false,啟用需核准人);validate_lexicon.py 為閘門"
+  },
+  {
+   "id": "VMT convergence_params.json + via_master_params.json",
+   "kind": "dict(門檻/管線參數)",
+   "canonical": "functional modules/WorkOps/VMT/",
+   "consumers": [
+    "VMT 八階段",
+    "板④頁唯讀附掛",
+    "WorkOps 三段追蹤同軸概念"
+   ],
+   "verdict": "2026-08-09 併入 VIA WorkOps — 引擎旁正本;問卷 overrides 接線既有"
+  }
  ],
  "crawl_adjudication": "「點進網站擷取關鍵字」裁定:不爬站(run-local 治理;主動網路抓取待操作員明令+政策核可)。郵件上方機構名(FROM 顯示名)+寄件網域+內文 URL 網域已由 wop domains 收割成提議清單 — 同一目的,零網路行為。"
 }
