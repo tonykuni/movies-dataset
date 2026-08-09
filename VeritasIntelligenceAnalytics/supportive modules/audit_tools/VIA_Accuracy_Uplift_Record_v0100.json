@@ -46,5 +46,16 @@
   "via-workops accuracy harness",
   "via-workops selftest",
   "via-workops replies"
- ]
+ ],
+ "hotfix_v0104": {
+  "ts": "2026-08-11T07:00:00",
+  "live_failure": "操作員實機 via-workops replies → KeyError 'E'(harness 與 selftest 皆綠之後)",
+  "root_cause": "cmd_parse 計數器只開 V/T/K 三格;A/Q/E 於實信首度命中即炸 — 代表新層確實在實機開火",
+  "fix": [
+   "reply_parser v0104:counts 補滿六層 + counts.get 防炸;彙總行顯示 投票/token/關鍵詞/ACK/問句/集成 六數",
+   "selftest v0103(ENG-032):沙箱信件補 c7(A ACK 短覆「收到,謝謝!」)/c8(E 集成「報告已寄出,如附件,請查收」),stage 3 斷言層別=A/E"
+  ],
+  "honest_lesson": "harness 直測 parse_one 蓋不到 cmd_parse 彙總段;selftest 沙箱信件原只蓋 V 層 — 測試覆蓋缺口由實機補課,雙測具已補洞永久看守",
+  "qa_after_fix": "selftest 7/7 PASS(stage 3 標籤改 V/A/E 層)+ harness ALL PASS + py_compile PASS"
+ }
 }

@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
-r"""Veritas WorkOps 全鏈自測器 v0102(ENG-032)— Integration + System Test 一鍵版
+r"""Veritas WorkOps 全鏈自測器 v0103(ENG-032)— Integration + System Test 一鍵版
+
+v0103(實機 KeyError 教訓):stage 3 沙箱信件原只蓋 V 層 — parser v0103 新層
+  A/Q/E 於實機首命中 cmd_parse 計數器即炸而自測仍 7/7 綠。補 c7(A ACK 短覆)、
+  c8(E 弱訊號集成)兩串,斷言層別 — 彙總段從此在自測看守下。
 
 操作員令(2026/08/09):測試功能完整確認無誤後開始串聯 — 本引擎在「隔離沙箱」跑完
 整條 Python 引擎鏈(命名→互鏈→歸戶八層→回覆解析→準確度→會議決策→GapFill 鏈→備份/還原),
 逐段斷言,
 印狀態表 + FinalGate;報告落 out/selftest_report.json。真實 out/ 正本零觸碰。
 
-沙箱法:temp 目錄複製 engines/*.py + 參數詞庫 → 合成 fixtures(六串郵件涵蓋
-L1/L2/S3/S4/風險/OOO)→ 逐引擎 subprocess 實跑 → 斷言產物。每段誠實 OK/FAIL,
+沙箱法:temp 目錄複製 engines/*.py + 參數詞庫 → 合成 fixtures(八串郵件涵蓋
+L1/L2/S3/S4/風險/OOO/ACK/集成)→ 逐引擎 subprocess 實跑 → 斷言產物。每段誠實 OK/FAIL,
 失敗不中斷其餘段(不卡斷);FinalGate=PASS 才可宣稱鏈路無誤。
 動詞:run(預設)。via-workops selftest。
 """
@@ -50,7 +54,7 @@ def run_py(sandbox, script, *args):
 def build_fixtures(sb):
     out = sb / "out"
     out.mkdir(parents=True, exist_ok=True)
-    led = {"seq_wop": 0, "seq_thr": 6, "map": {("THR|c%d" % i): ("THR-%05d" % i) for i in range(1, 7)}}
+    led = {"seq_wop": 0, "seq_thr": 8, "map": {("THR|c%d" % i): ("THR-%05d" % i) for i in range(1, 9)}}
     (out / "workops_id_ledger.json").write_text(json.dumps(led), encoding="utf-8")
     rows = [
         {"MailID": "c1", "Subject": "ABC-123 kickoff", "SenderEmail": "wang@acme.com", "ConversationID": "c1", "VotingResponse": ""},
@@ -59,6 +63,8 @@ def build_fixtures(sb):
         {"MailID": "c4", "Subject": "進度更新", "SenderEmail": "pm@corp.com", "ConversationID": "c4", "VotingResponse": ""},
         {"MailID": "c5", "Subject": "RE: 合約", "SenderEmail": "legal@vendor.com", "ConversationID": "c5", "VotingResponse": ""},
         {"MailID": "c6", "Subject": "Automatic reply: 追蹤", "SenderEmail": "ooo@corp.com", "ConversationID": "c6", "VotingResponse": ""},
+        {"MailID": "c7", "Subject": "RE: 請款單", "SenderEmail": "amy@corp.com", "ConversationID": "c7", "VotingResponse": ""},
+        {"MailID": "c8", "Subject": "RE: 月報", "SenderEmail": "ben@corp.com", "ConversationID": "c8", "VotingResponse": ""},
     ]
     for r in rows:
         r.update({"Direction": "INBOUND", "EventDate": "2026/08/09 10:00", "Unread": "False", "Categories": ""})
@@ -75,6 +81,10 @@ def build_fixtures(sb):
          "FOLDER_NAME": "收件匣", "BODY_SNIPPET": "I am out of office, contact mary@corp.com", "ATTACHMENT_NAMES": "", "FROM": ""},
         {"CONVERSATION_ID": "c5", "DIRECTION": "OUTBOUND", "TITLE": "[急件·再追] 合約 [THR-00005]", "TIME": "t",
          "FOLDER_NAME": "寄件備份", "BODY_SNIPPET": "", "ATTACHMENT_NAMES": "", "FROM": ""},
+        {"CONVERSATION_ID": "c7", "DIRECTION": "INBOUND", "TITLE": "RE: 請款單", "TIME": "t",
+         "FOLDER_NAME": "收件匣", "BODY_SNIPPET": "收到,謝謝!", "ATTACHMENT_NAMES": "", "FROM": ""},
+        {"CONVERSATION_ID": "c8", "DIRECTION": "INBOUND", "TITLE": "RE: 月報", "TIME": "t",
+         "FOLDER_NAME": "收件匣", "BODY_SNIPPET": "報告已寄出,如附件,請查收", "ATTACHMENT_NAMES": "", "FROM": ""},
     ]
     with io.open(run / "01_mail_index.csv", "w", encoding="utf-8-sig", newline="") as f:
         w = csv.DictWriter(f, fieldnames=list(frows[0])); w.writeheader(); w.writerows(frows)
@@ -120,9 +130,11 @@ def main():
         rs = json.loads((out / "reply_status.json").read_text(encoding="utf-8")) if (out / "reply_status.json").exists() else {}
         fl = rs.get("flags", {})
         ok = (rc == 0 and rs.get("status", {}).get("THR-00002", {}).get("layer") == "V"
+              and rs.get("status", {}).get("THR-00007", {}).get("layer") == "A"
+              and rs.get("status", {}).get("THR-00008", {}).get("layer") == "E"
               and fl.get("THR-00005", {}).get("risk") and fl.get("THR-00006", {}).get("ooo")
               and rs.get("sent_stage", {}).get("THR-00005", {}).get("stage") == "T2")
-        stage("3 回覆解析(V 層/⚡風險/⏸OOO/已發段)", ok)
+        stage("3 回覆解析(V/A/E 層/⚡風險/⏸OOO/已發段)", ok)
 
         rc, o = run_py(sb, "workops_accuracy_benchmark.py", "template")
         tpl_ok = rc == 0 and (out / "gold_set_template.csv").exists()

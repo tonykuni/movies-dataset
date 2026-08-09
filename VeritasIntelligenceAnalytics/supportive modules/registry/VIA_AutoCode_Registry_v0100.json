@@ -1150,6 +1150,14 @@
    "component": "workops_reply_parser v0103(A/Q/E 三新層)",
    "code": "ENG-029",
    "note": "同令:實機 194/195 未解析=最大正確率槓桿 → V/T/K 之後加三誠實層:A ACK 短覆(正規化 ≤12 字命中確認詞→已回覆確認,脫離未回佇列不冒充完成)/Q 問句(含問號且 ≤60 字→對方提問,球在我方)/E 弱訊號集成(三類弱詞計分,最高 ≥2 且嚴格領先次高才判 — FIS 同號過濾精神:衝突=誠實未解析)。詞庫全入 reply_parser_params.json v0102(ack_terms/weak_signals/ensemble_min);正則字元類 ~~ FutureWarning 排雷(\\~);ENG-050 harness 25+4 案例 ALL PASS + selftest 7/7 迴歸綠。"
+  },
+  {
+   "ts": "2026-08-11T07:00:00",
+   "op": "UPDATE",
+   "category": "引擎",
+   "component": "reply_parser v0104 熱修 + selftest v0103 補洞",
+   "code": "ENG-029/ENG-032",
+   "note": "操作員實機揪出:accuracy harness 與 selftest 雙綠後 via-workops replies 仍 KeyError 'E' — 真因=cmd_parse 計數器只開 V/T/K 三格,A/Q/E 實機首命中即炸(=新層真的在實信上開火)。熱修:計數器補滿六層 + counts.get 防炸,彙總行顯示六層。誠實教訓:harness 直測 parse_one 蓋不到彙總段、selftest 沙箱信件只蓋 V 層 → ENG-032 v0103 補 c7(ACK 短覆)/c8(弱訊號集成)兩串並斷言層別=A/E — 同類迴歸從此被自測看守。修後 selftest 7/7 + harness ALL PASS。"
   }
  ]
 }

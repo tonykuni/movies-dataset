@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-r"""WorkOps 回覆解析引擎 v0103(ENG-029)— 規劃書 M3:回信 → 三層 fallback 解析 → 狀態事件
+r"""WorkOps 回覆解析引擎 v0104(ENG-029)— 規劃書 M3:回信 → 三層 fallback 解析 → 狀態事件
+
+v0104(實機 FAIL 驅動熱修):cmd_parse 計數器原只開 V/T/K 三格 — A/Q/E 於
+  操作員實機首度命中即 KeyError。補滿六層 + counts.get 防炸;彙總行顯示六層。
+  教訓:harness 直測 parse_one 未蓋彙總段 → selftest 沙箱信件補 A/E 案例補此洞。
 
 v0101(操作員六機制研究令):三項增能 —
   ① OOO 偵測:收信含 OOO/自動回覆詞 → flags.ooo(⏸窗口休假)+ 內文代理人 email 提示;
@@ -223,7 +227,7 @@ def cmd_parse():
     seen = load_seen()
     from datetime import datetime
     now = datetime.now().isoformat(timespec="seconds")
-    counts = {"V": 0, "T": 0, "K": 0}
+    counts = {"V": 0, "T": 0, "K": 0, "A": 0, "Q": 0, "E": 0}
     n_un = n_dup = 0
     un_sample = []
     events = []
@@ -267,7 +271,7 @@ def cmd_parse():
                                   "from": r.get("SenderEmail", "")})
             continue
         layer, st, ev = got
-        counts[layer] += 1
+        counts[layer] = counts.get(layer, 0) + 1
         events.append({"ts": now, "thr": conv2thr.get(conv, ""), "conv": conv,
                        "mail_date": key[1], "layer": layer, "status": st,
                        "evidence": ev, "sender": r.get("SenderEmail", ""),
@@ -302,8 +306,9 @@ def cmd_parse():
                                "unparsed": {"n": n_un, "sample": un_sample}},
                               ensure_ascii=False, indent=1), encoding="utf-8")
     tmp.replace(STATUS_P)
-    print("[解析] 新事件 %d(投票 %d · token %d · 關鍵詞 %d)· 已記略過 %d · 未解析 %d(誠實不猜)"
-          % (len(events), counts["V"], counts["T"], counts["K"], n_dup, n_un))
+    print("[解析] 新事件 %d(投票 %d · token %d · 關鍵詞 %d · ACK %d · 問句 %d · 集成 %d)· 已記略過 %d · 未解析 %d(誠實不猜)"
+          % (len(events), counts["V"], counts["T"], counts["K"],
+             counts["A"], counts["Q"], counts["E"], n_dup, n_un))
     n_ooo = sum(1 for f in flags.values() if f.get("ooo"))
     n_risk = sum(1 for f in flags.values() if f.get("risk"))
     if n_ooo or n_risk or sent_stage:
