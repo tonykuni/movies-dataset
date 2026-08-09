@@ -1,0 +1,42 @@
+{
+ "record_id": "VIA_RedundantTool_Archive_Record_v0100",
+ "ts": "2026-08-10T23:20:00",
+ "operator_order": "移除多餘的工具引擎 小心檢查 重建系統(2026-08-10)",
+ "principle": "移除=拔位元組完全相同的冗餘複本,非拔內容;git mv 出列保全歷史;零資訊流失",
+ "careful_checks": [
+  "①sha 驗證:四支出列檔與倖存正本逐一 byte-identical(MANIFEST 記錄雙路徑+sha16)",
+  "②基名引用覆核 41 件:全屬清冊/展示頁(MODULE_VALIDATION_Manifest/DESIGN_SOURCE_Manifest/資產瀏覽 HTML)歷史紀錄,非執行依賴",
+  "③路徑限定引用:零功能載入;B_ 檔在 Master/Release registry 僅舊沙箱 run 檔案清冊列"
+ ],
+ "archived": [
+  {
+   "file": "VRN_Finalize_AIO_v2 (1).ps1",
+   "survivor": "functional modules/VRN/VRN_Finalize_AIO_v2_1.ps1"
+  },
+  {
+   "file": "Invoke-VIA-SSOT-Manager-v0100 (1).ps1",
+   "survivor": "functional modules/VRN/registry/Invoke-VIA-SSOTManager-v0100.ps1"
+  },
+  {
+   "file": "Run_VIS_HyperBOM_All_In_One (7).ps1",
+   "survivor": "functional modules/WorkOps/VMT/Run_VIS_HyperBOM_All_In_One.ps1"
+  },
+  {
+   "file": "B_Invoke-VIA-NexusToolBridge-AIO-v010.ps1",
+   "survivor": "supportive modules/network/Invoke-VIA-NexusToolBridge-AIO-v010.ps1"
+  }
+ ],
+ "scope_note": "其餘 37 件暫存冗餘為資料/文件件且受設計源清冊路徑引用 — 非「工具引擎」範圍,原地保留;要清需另下顯式令",
+ "rebuild_verification": [
+  "索引重建 5720 檔(出列區排除,v0104)",
+  "四倖存正本 pwsh AST 解析 0 錯誤",
+  "WorkOps 全鏈自測 7/7 FinalGate PASS",
+  "internal 復盤:冗餘 38→35 叢集/有用留用 696 不變(零流失)"
+ ],
+ "operator_verification": [
+  "via-sync",
+  "via-dedup build",
+  "via-dedup internal",
+  "via-workops selftest"
+ ]
+}

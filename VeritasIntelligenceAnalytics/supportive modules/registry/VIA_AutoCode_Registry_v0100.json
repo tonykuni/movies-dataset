@@ -1037,6 +1037,22 @@
    "component": "via-workops.cmd 括號地雷修復",
    "code": "VIA-CMDFIX-20260810",
    "note": "操作員實機 via-workops selftest 炸「:雙擊即開 was unexpected」誠實 FAIL:note help 行 echo 內半形括號 (FNT-001) — cmd 區塊內 echo 的裸 ) 提前關塊,整條 if/else 鏈解析壞掉、所有動詞全斷。修復:via-workops.cmd 全檔 21 行 echo/rem 顯示行半形括號→全形(^( ^) 逸脫保留);全 bin 34 支 cmd 掃描=區塊內 echo 危險括號歸零;CRLF 完好。教訓=全形括號鐵律的 echo 行例外零容忍,本次為 help 行漏網。」"
+  },
+  {
+   "ts": "2026-08-10T23:20:00",
+   "op": "RENAME",
+   "category": "治理",
+   "component": "冗餘工具引擎出列(4 支)",
+   "code": "VIA-DEDUP-ARCHIVE-01",
+   "note": "操作員「移除多餘的工具引擎 小心檢查 重建系統」令。三段小心檢查:①候選 42 件全數 sha 驗證 byte-identical 正本另在位 ②基名引用 41 件逐一覆核=全屬清冊/展示頁歷史紀錄 ③路徑限定引用比對=零功能依賴(B_ 檔在 Master/Release registry 僅舊沙箱 run 檔案清冊列)。依令聚焦工具引擎,出列 4 支複本 → supportive modules/_superseded_redundant/20260810/(git mv 保歷史+MANIFEST 記 sha 與倖存正本;移除=拔複本非拔內容,零資訊流失):VRN_Finalize_AIO_v2 (1).ps1、Invoke-VIA-SSOT-Manager-v0100 (1).ps1、Run_VIS_HyperBOM_All_In_One (7).ps1、B_Invoke-VIA-NexusToolBridge-AIO-v010.ps1。其餘 37 件冗餘=資料/文件件且受設計源清冊路徑引用 — 非本令範圍,原地保留。重建驗證:索引重建 5720 檔、四倖存正本 AST 0 錯、全鏈自測 7/7 PASS、internal 復盤冗餘 38→35 叢集/留用 696 不變。"
+  },
+  {
+   "ts": "2026-08-10T23:21:00",
+   "op": "UPDATE",
+   "category": "引擎",
+   "component": "via_dedup_index_v0104",
+   "code": "ENG-049",
+   "note": "出列區 _superseded_redundant 加入索引排除清單 — 已出列複本不再參與判定(避免 DUAL_CANON 假膨脹);出列後 internal 數字乾淨:378 叢集/冗餘 35/留用 696。"
   }
  ]
 }

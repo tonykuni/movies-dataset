@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-r"""VIA 整合去重引擎 v0101(ENG-049)— 操作員「整合優化」令
+r"""VIA 整合去重引擎 v0104(ENG-049)— 操作員「整合優化」令
 
 v0101 實戰修正(操作員 Downloads 掃描 Ctrl+C 誠實 FAIL):
   check 大檔預設略過(>200MB → SKIP_LARGE 判定,--all 才全查)— Downloads 常見
@@ -38,7 +38,7 @@ ROOT = HERE.parent.parent                        # VeritasIntelligenceAnalytics
 OUT = ROOT / "VIA_Reports" / "dedup"
 INDEX_P = OUT / "VIA_Content_Hash_Index.json"
 AUDIT_P = HERE.parent / "audit_tools" / "VIA_ModuleDedup_Homing_Record_v0100.json"
-EXCLUDE_DIRS = {".git", "__pycache__", "node_modules", ".venv", ".venv_pm", "dedup"}
+EXCLUDE_DIRS = {".git", "__pycache__", "node_modules", ".venv", ".venv_pm", "dedup", "_superseded_redundant"}
 UPLOAD_PREFIX = re.compile(r"^[0-9a-f]{8}-")
 UPLOAD_SUFFIX = re.compile(r"(_\d+| \(\d+\))$")
 SIZE_CAP = 200 * 1024 * 1024   # check 預設大檔上限;--all 解除
