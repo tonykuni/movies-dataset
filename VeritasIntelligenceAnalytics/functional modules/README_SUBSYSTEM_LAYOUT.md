@@ -109,3 +109,6 @@ VTR(原 `functional modules/VTR`)git mv 併入 `functional modules/WorkOps/{VMT,
 `WorkOps/engines/workops_lexicon.py`、org_lexicon、AutoCode Registry、audit_tools。
 啟動器:`via-vmt`/`via-vmt-init` 已改指新家;`via-one` 前送 v0113;VTR 自帶入口隨樹遷移。
 子系統 manifest:`WorkOps/VIA_WorkOps_Subsystem_Manifest.json`。
+
+
+**商業定名(2026-08-09)**:VIA WorkOps 子系統對外定名 **Veritas WorkOps**;檔名/編號/動詞不動,品牌見板 v0118 起。

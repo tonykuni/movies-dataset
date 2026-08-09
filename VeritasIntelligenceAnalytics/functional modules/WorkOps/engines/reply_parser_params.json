@@ -1,16 +1,89 @@
 {
  "version": "v0100",
- "comment": "M3 回覆解析參數(規劃書 §07:投票→token→關鍵詞三層 fallback,任一命中即完成狀態識別;都未命中誠實列未解析,絕不猜)。voting_map=Outlook 投票回覆文字→狀態;token regex 於引擎(==VMT-CONFIRM== Qn:idx);q1_options=第一題選項序(token idx 對照);keywords=關鍵詞層(繁/简/en 同義字,依序先中先贏)。行為改變只改此檔。",
+ "comment": "M3 回覆解析參數(規劃書 §07:投票→token→關鍵詞三層 fallback,任一命中即完成狀態識別;都未命中誠實列未解析,絕不猜)。voting_map=Outlook 投票回覆文字→狀態;token regex 於引擎(==VMT-CONFIRM== Qn:idx);q1_options=第一題選項序(token idx 對照);keywords=關鍵詞層(繁/简/en 同義字,依序先中先贏)。行為改變只改此檔。 v0101 增:ooo_terms=OOO/自動回覆偵測(⏸凍結標籤+代理人提示);risk_terms=風險語意越級(⚡無視天數直上 T3);皆三語同義字可增列。",
  "voting_map": {
-  "進行中": "進行中", "已完成": "已完成", "卡關": "卡關", "需要協助": "需要協助",
-  "In Progress": "進行中", "Done": "已完成", "Blocked": "卡關", "Need Help": "需要協助"
+  "進行中": "進行中",
+  "已完成": "已完成",
+  "卡關": "卡關",
+  "需要協助": "需要協助",
+  "In Progress": "進行中",
+  "Done": "已完成",
+  "Blocked": "卡關",
+  "Need Help": "需要協助"
  },
- "q1_options": ["進行中", "已完成", "卡關"],
+ "q1_options": [
+  "進行中",
+  "已完成",
+  "卡關"
+ ],
  "keywords": {
-  "已完成": ["已完成", "完成了", "已結案", "已办结", "done", "completed", "finished"],
-  "卡關": ["卡關", "卡住", "卡在", "受阻", "blocked", "stuck"],
-  "需要協助": ["需要協助", "請協助", "需要幫忙", "需要支援", "need help", "need assistance"],
-  "已口頭說明": ["已口頭說明", "電話中說明", "已於會議說明", "已电话说明"],
-  "進行中": ["進行中", "處理中", "进行中", "处理中", "in progress", "ongoing", "working on"]
- }
+  "已完成": [
+   "已完成",
+   "完成了",
+   "已結案",
+   "已办结",
+   "done",
+   "completed",
+   "finished"
+  ],
+  "卡關": [
+   "卡關",
+   "卡住",
+   "卡在",
+   "受阻",
+   "blocked",
+   "stuck"
+  ],
+  "需要協助": [
+   "需要協助",
+   "請協助",
+   "需要幫忙",
+   "需要支援",
+   "need help",
+   "need assistance"
+  ],
+  "已口頭說明": [
+   "已口頭說明",
+   "電話中說明",
+   "已於會議說明",
+   "已电话说明"
+  ],
+  "進行中": [
+   "進行中",
+   "處理中",
+   "进行中",
+   "处理中",
+   "in progress",
+   "ongoing",
+   "working on"
+  ]
+ },
+ "ooo_terms": [
+  "out of office",
+  "automatic reply",
+  "auto-reply",
+  "自動回覆",
+  "休假中",
+  "休假通知",
+  "不在辦公室",
+  "外出中",
+  "on leave",
+  "annual leave"
+ ],
+ "risk_terms": [
+  "違約",
+  "暫停付款",
+  "律師",
+  "爭議",
+  "仲裁",
+  "索賠",
+  "存證信函",
+  "終止合約",
+  "penalty",
+  "breach",
+  "lawsuit",
+  "legal action",
+  "dispute",
+  "termination notice"
+ ]
 }

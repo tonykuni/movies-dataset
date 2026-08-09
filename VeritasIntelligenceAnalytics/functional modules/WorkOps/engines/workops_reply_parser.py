@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
-r"""WorkOps 回覆解析引擎 v0100(ENG-029)— 規劃書 M3:回信 → 三層 fallback 解析 → 狀態事件
+r"""WorkOps 回覆解析引擎 v0101(ENG-029)— 規劃書 M3:回信 → 三層 fallback 解析 → 狀態事件
+
+v0101(操作員六機制研究令):三項增能 —
+  ① OOO 偵測:收信含 OOO/自動回覆詞 → flags.ooo(⏸窗口休假)+ 內文代理人 email 提示;
+    誠實限制:OOO 自動回覆已使該串脫離未回佇列(=實質計時凍結,不誤升級);
+    休假結束自動恢復追蹤需 MailOps replied 判定排除 OOO — 候令深改。
+  ② 風險語意越級:收信含 risk_terms(違約/律師/breach…)→ flags.risk —
+    板端無視工作日數破格直上 T3(⚡);詞庫全 JSON。
+  ③ 已發段留痕:掃描索引 OUTBOUND 主旨前綴([再次追蹤]=T1/[急件·再追]=T2/
+    [緊急·第三次通知]=T3)→ sent_stage{thr:段,日期} — 板佇列顯示已發到哪段。
 
 操作員 NEXT 令(2026/08/09):Phase 1 閉環最後一段 — 追蹤信寄出(板 [3/5] 三段升級鏈)
 → 對方回信 → 本引擎自動判讀 → 狀態自動更新,人不再逐封讀信。
@@ -38,6 +47,9 @@ EVENTS_P = OUT / "reply_events.jsonl"
 STATUS_P = OUT / "reply_status.json"
 
 TOKEN_RE = re.compile(r"==VMT-CONFIRM==\s*Q(\d+)\s*[::]\s*(\d+)", re.IGNORECASE)
+EMAIL_RE = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
+STAGE_PREFIX = [("[緊急·第三次通知]", "T3"), ("[急件·再追]", "T2"), ("[再次追蹤]", "T1")]
+STAGE_RANK = {"T1": 1, "T2": 2, "T3": 3}
 
 DEFAULT_PARAMS = {
     "voting_map": {"進行中": "進行中", "已完成": "已完成", "卡關": "卡關", "需要協助": "需要協助"},
@@ -49,6 +61,8 @@ DEFAULT_PARAMS = {
         "已口頭說明": ["已口頭說明"],
         "進行中": ["進行中", "處理中", "in progress"],
     },
+    "ooo_terms": ["out of office", "automatic reply", "自動回覆", "休假中"],
+    "risk_terms": ["違約", "律師", "breach", "penalty"],
 }
 
 
@@ -82,21 +96,38 @@ def read_csv(p):
         return []
 
 
-def load_bodies():
-    """最新 scanrange RUN:conv→BODY_SNIPPET(缺席誠實回空 — K/T 層退主旨判讀)。"""
+def load_scan_index():
+    """最新 scanrange RUN:(conv→body, outbound 列[(conv,title,time)])。缺席誠實回空。"""
     root = OUT / "deep" / "scanrange"
     if not root.exists():
-        return {}
+        return {}, []
     runs = sorted([d for d in root.iterdir() if d.is_dir() and d.name.startswith("RUN_")])
     if not runs:
-        return {}
-    m = {}
+        return {}, []
+    m, outb = {}, []
     for r in read_csv(runs[-1] / "01_mail_index.csv"):
         cid = (r.get("CONVERSATION_ID") or "").strip()
         bs = (r.get("BODY_SNIPPET") or "").strip()
         if cid and bs and cid not in m:
             m[cid] = bs
-    return m
+        if cid and (r.get("DIRECTION") or "").upper() == "OUTBOUND":
+            outb.append((cid, r.get("TITLE") or "", r.get("TIME") or ""))
+    return m, outb
+
+
+def detect_flags(row, body, params):
+    """v0101:OOO 與風險語意(獨立於狀態判讀;flags 不覆蓋 V/T/K 結果)。"""
+    text = ((row.get("Subject") or "") + "\n" + (body or "")).lower()
+    ooo = any(t.lower() in text for t in params.get("ooo_terms", []))
+    hits = [t for t in params.get("risk_terms", []) if t.lower() in text]
+    agent = ""
+    if ooo:
+        own = (row.get("SenderEmail") or "").lower()
+        for em in EMAIL_RE.findall(body or ""):
+            if em.lower() != own:
+                agent = em
+                break
+    return ooo, hits, agent
 
 
 def parse_one(row, body, params):
@@ -143,7 +174,7 @@ def cmd_parse():
         return 1
     led = load_json(LEDGER_P, {"map": {}})
     conv2thr = {k[4:]: v for k, v in led.get("map", {}).items() if k.startswith("THR|")}
-    bodies = load_bodies()
+    bodies, outbound = load_scan_index()
     params = load_params()
     seen = load_seen()
     from datetime import datetime
@@ -151,6 +182,16 @@ def cmd_parse():
     counts = {"V": 0, "T": 0, "K": 0}
     n_un = n_dup = 0
     events = []
+    flags = {}
+    sent_stage = {}
+    for conv, title, tm in outbound:
+        for pfx, stg in STAGE_PREFIX:
+            if pfx in (title or ""):
+                thr0 = conv2thr.get(conv, "") or conv
+                cur = sent_stage.get(thr0)
+                if cur is None or STAGE_RANK[stg] > STAGE_RANK[cur["stage"]]:
+                    sent_stage[thr0] = {"stage": stg, "date": tm}
+                break
     for r in mails:
         if (r.get("Direction") or "").upper() not in ("", "INBOUND"):
             continue
@@ -161,7 +202,19 @@ def cmd_parse():
         if key in seen:
             n_dup += 1
             continue
-        got = parse_one(r, bodies.get(conv, ""), params)
+        b = bodies.get(conv, "")
+        ooo, risks, agent = detect_flags(r, b, params)
+        thr0 = conv2thr.get(conv, "") or conv
+        if ooo or risks:
+            fl = flags.setdefault(thr0, {})
+            if ooo:
+                fl["ooo"] = True
+                if agent:
+                    fl["agent_hint"] = agent
+            if risks:
+                fl["risk"] = True
+                fl["risk_terms"] = sorted(set(fl.get("risk_terms", []) + risks))
+        got = parse_one(r, b, params)
         if got is None:
             n_un += 1
             continue
@@ -196,11 +249,16 @@ def cmd_parse():
                 status[t] = {"status": e["status"], "layer": e["layer"],
                              "mail_date": e.get("mail_date", ""), "evidence": e.get("evidence", "")}
     tmp = STATUS_P.with_suffix(".tmp")
-    tmp.write_text(json.dumps({"version": "v0100", "updated": now, "status": status},
+    tmp.write_text(json.dumps({"version": "v0101", "updated": now, "status": status,
+                               "flags": flags, "sent_stage": sent_stage},
                               ensure_ascii=False, indent=1), encoding="utf-8")
     tmp.replace(STATUS_P)
     print("[解析] 新事件 %d(投票 %d · token %d · 關鍵詞 %d)· 已記略過 %d · 未解析 %d(誠實不猜)"
           % (len(events), counts["V"], counts["T"], counts["K"], n_dup, n_un))
+    n_ooo = sum(1 for f in flags.values() if f.get("ooo"))
+    n_risk = sum(1 for f in flags.values() if f.get("risk"))
+    if n_ooo or n_risk or sent_stage:
+        print("[旗標] ⏸OOO %d 串 · ⚡風險 %d 串 · 已發段留痕 %d 串" % (n_ooo, n_risk, len(sent_stage)))
     print("[狀態] %d 串有判讀 → %s(板 ② 最近收到自動顯示)" % (len(status), STATUS_P.name))
     return 0
 

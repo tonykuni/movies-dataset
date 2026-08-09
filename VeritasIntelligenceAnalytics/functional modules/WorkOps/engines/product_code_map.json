@@ -1,9 +1,55 @@
 {
  "version": "v0100",
- "comment": "L3/L4 產品代碼規則(準確度報告 §02:結構化郵件 regex 抽碼→強制歸戶;組合規則=同一則規則同時給 domain+subject_regex 即 AND)。每則:code=內部代碼(歸戶鍵) · name=顯示名 · domain=寄件網域含此字串(選) · subject_regex=主旨正則(選) · attach_regex=附件檔名正則(選;L7 輔助) · noise=true 表雜訊槽(L0 攔截入槽可回顧,不刪不分類)。所列條件全命中才算中。示例已停用(enabled=false)— 操作員照樣式增列自己的高頻信後改 true。",
+ "comment": "L3/L4 產品代碼規則(準確度報告 §02:結構化郵件 regex 抽碼→強制歸戶;組合規則=同一則規則同時給 domain+subject_regex 即 AND)。每則:code=內部代碼(歸戶鍵) · name=顯示名 · domain=寄件網域含此字串(選) · subject_regex=主旨正則(選) · attach_regex=附件檔名正則(選;L7 輔助) · noise=true 表雜訊槽(L0 攔截入槽可回顧,不刪不分類)。所列條件全命中才算中。示例已停用(enabled=false)— 操作員照樣式增列自己的高頻信後改 true。 v0101 增:VTR partnumbers 擇優生成之停用草稿規則(source 標記;啟用=人工核對後 enabled true)。",
  "rules": [
-  {"enabled": false, "code": "SINOPAC-DEBIT-NOTIF", "name": "永豐簽帳卡消費", "domain": "sinopac", "subject_regex": "消費通知"},
-  {"enabled": false, "code": "EINVOICE-XML", "name": "電子發票", "subject_regex": "電子發票|發票開立", "attach_regex": "\\.xml$"},
-  {"enabled": false, "code": "NOISE-PROMO", "name": "行銷促銷雜訊", "subject_regex": "限時優惠|早鳥|抽獎|折扣碼", "noise": true}
+  {
+   "enabled": false,
+   "code": "SINOPAC-DEBIT-NOTIF",
+   "name": "永豐簽帳卡消費",
+   "domain": "sinopac",
+   "subject_regex": "消費通知"
+  },
+  {
+   "enabled": false,
+   "code": "EINVOICE-XML",
+   "name": "電子發票",
+   "subject_regex": "電子發票|發票開立",
+   "attach_regex": "\\.xml$"
+  },
+  {
+   "enabled": false,
+   "code": "NOISE-PROMO",
+   "name": "行銷促銷雜訊",
+   "subject_regex": "限時優惠|早鳥|抽獎|折扣碼",
+   "noise": true
+  },
+  {
+   "enabled": false,
+   "code": "VTR-PN-V0162B",
+   "name": "料號/版號 v0162B",
+   "subject_regex": "v0162B",
+   "source": "VTR partnumbers 擇優(v0101 令);啟用前操作員核對"
+  },
+  {
+   "enabled": false,
+   "code": "VTR-PN-V0162C",
+   "name": "料號/版號 v0162C",
+   "subject_regex": "v0162C",
+   "source": "VTR partnumbers 擇優(v0101 令);啟用前操作員核對"
+  },
+  {
+   "enabled": false,
+   "code": "VTR-PN-V0159",
+   "name": "料號/版號 v0159",
+   "subject_regex": "v0159",
+   "source": "VTR partnumbers 擇優(v0101 令);啟用前操作員核對"
+  },
+  {
+   "enabled": false,
+   "code": "VTR-PN-V0156",
+   "name": "料號/版號 v0156",
+   "subject_regex": "v0156",
+   "source": "VTR partnumbers 擇優(v0101 令);啟用前操作員核對"
+  }
  ]
 }
