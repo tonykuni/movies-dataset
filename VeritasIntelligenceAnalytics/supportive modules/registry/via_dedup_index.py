@@ -5,6 +5,12 @@ v0101 實戰修正(操作員 Downloads 掃描 Ctrl+C 誠實 FAIL):
   check 大檔預設略過(>200MB → SKIP_LARGE 判定,--all 才全查)— Downloads 常見
   GB 級安裝包/壓縮包逐位元組雜湊會像當機;加進度心跳(每 200 檔一行)誠實可見。
 
+v0102「上船的資料去重留有用的」令:新 internal 動詞 — 庫內重複盤點:
+  UPLOADS_REDUNDANT=上船暫存區(uploads/_inbox_to_classify)複本且正本另在位 → 冗餘對照
+  USEFUL_UNIQUE=暫存區唯一正本 → 有用留用(候升籍)
+  UPLOADS_ONLY_DUP=只在暫存區互重 / DUAL_CANON=正本區互重(只增不減,列示不動)
+  全唯讀零刪除 — 出留用裁定表,清理永遠由人顯式決策。
+
 把整合去重鐵律產品化:本機一鍵對照庫內正本出判定,免逐檔上傳。
   build          全庫 sha256 索引 → VIA_Reports/dedup/VIA_Content_Hash_Index.json(可再生側車,不入 git)
   check <路徑>   檔案或資料夾逐檔判定:IDENTICAL(已在籍)/ VERSION_DIFFERS(同名異雜湊)/
@@ -30,6 +36,7 @@ EXCLUDE_DIRS = {".git", "__pycache__", "node_modules", ".venv", ".venv_pm", "ded
 UPLOAD_PREFIX = re.compile(r"^[0-9a-f]{8}-")
 UPLOAD_SUFFIX = re.compile(r"(_\d+| \(\d+\))$")
 SIZE_CAP = 200 * 1024 * 1024   # check 預設大檔上限;--all 解除
+STAGING_PARTS = {"uploads", "_inbox_to_classify"}   # 上船暫存區(internal 盤點用)
 
 
 def sha256_of(p):
@@ -158,6 +165,55 @@ def cmd_check(target, include_all=False):
     return 0
 
 
+def _is_staging(rel):
+    return any(part in STAGING_PARTS for part in Path(rel).parts)
+
+
+def cmd_internal():
+    idx = _load_index()
+    if idx is None:
+        return 1
+    clusters = {h: ps for h, ps in idx["by_sha"].items() if len(ps) > 1}
+    red, dual, updup = [], [], []
+    for h, ps in clusters.items():
+        stag = [p for p in ps if _is_staging(p)]
+        canon = [p for p in ps if not _is_staging(p)]
+        if stag and canon:
+            red.append({"sha256_16": h[:16], "redundant_staging": stag, "canon": canon})
+        elif stag:
+            updup.append({"sha256_16": h[:16], "staging_copies": stag})
+        else:
+            dual.append({"sha256_16": h[:16], "paths": ps})
+    # 暫存區唯一正本 = 有用留用
+    useful = []
+    for h, ps in idx["by_sha"].items():
+        if len(ps) == 1 and _is_staging(ps[0]):
+            useful.append({"sha256_16": h[:16], "path": ps[0]})
+    useful.sort(key=lambda r: r["path"])
+    n_red_files = sum(len(r["redundant_staging"]) for r in red)
+    OUT.mkdir(parents=True, exist_ok=True)
+    rp = OUT / "internal_dedup_report.json"
+    rp.write_text(json.dumps({
+        "ts": datetime.now().isoformat(timespec="seconds"),
+        "index_generated": idx.get("generated"), "files_indexed": idx.get("files"),
+        "summary": {"clusters": len(clusters),
+                    "uploads_redundant_clusters": len(red), "uploads_redundant_files": n_red_files,
+                    "useful_unique_in_staging": len(useful),
+                    "uploads_only_dup_clusters": len(updup), "dual_canon_clusters": len(dual)},
+        "uploads_redundant": red, "useful_unique": useful,
+        "uploads_only_dup": updup, "dual_canon": dual}, ensure_ascii=False, indent=1),
+        encoding="utf-8")
+    print("========== 庫內去重盤點(上船暫存區 %s)==========" % "/".join(sorted(STAGING_PARTS)))
+    print("  重複叢集總數                 %d" % len(clusters))
+    print("  暫存冗餘(正本另在位)         %d 叢集 · %d 檔 — 可視為已歸戶,留否由人決" % (len(red), n_red_files))
+    print("  暫存唯一正本(有用留用)       %d 檔 — 唯一副本,候升籍" % len(useful))
+    print("  暫存互重(無正本區複本)       %d 叢集 — 需裁定升籍一份" % len(updup))
+    print("  正本區互重 DUAL_CANON        %d 叢集 — 只增不減,列示不動" % len(dual))
+    print("[紅線] 零刪除 — 本盤點只出裁定表;清理永遠由人顯式決策")
+    print("[報告] %s" % rp)
+    return 0
+
+
 def cmd_report():
     aud = {}
     try:
@@ -241,7 +297,9 @@ def main(argv):
         return cmd_check(args[0], include_all=("--all" in argv[2:]))
     if argv[1] == "report":
         return cmd_report()
-    print("動詞:build(預設)/ check <路徑> / report")
+    if argv[1] == "internal":
+        return cmd_internal()
+    print("動詞:build(預設)/ check <路徑> [--all] / internal / report")
     return 2
 
 
