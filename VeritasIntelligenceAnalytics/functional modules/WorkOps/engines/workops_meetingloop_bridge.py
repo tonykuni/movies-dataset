@@ -83,6 +83,9 @@ def cmd_pull():
                                     "status": st or "NOT_STARTED"})
     OUT.mkdir(parents=True, exist_ok=True)
     LEDGER_P.write_text(json.dumps(led, ensure_ascii=False, indent=1), encoding="utf-8")
+    if n_dec_new:
+        subprocess.run([sys.executable, str(HERE / "workops_decision_log.py"), "export"],
+                       capture_output=True)   # 刷新 CSV — todo「未結決議」即時同步
     ACTIONS_P.write_text(json.dumps({"ts": datetime.now().isoformat(timespec="seconds"),
                                      "open_actions": all_actions}, ensure_ascii=False, indent=1), encoding="utf-8")
     print("[對帳橋] run %d 輪 · 決議新入 %d(冪等略過 %d)· 未完行動 %d 件 → meeting_actions.json(TO-DO 會議行動批)"
