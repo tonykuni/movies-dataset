@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-r"""Veritas WorkOps 每日 TO-DO 引擎 v0101(ENG-046)— 同類工作一口氣,三時間錨
+r"""Veritas WorkOps 每日 TO-DO 引擎 v0102(ENG-046)— 同類工作一口氣,三時間錨
 
 操作員令(2026/08/10):每日 TO-DO LIST,一口氣做相同工作 —
   [前日 16:00] 陸續寄出追蹤信(系統建草稿批;寄出人按 — 絕不代寄)
@@ -134,13 +134,13 @@ def build():
                  "n": (ask.get("n_ask", 0) or 0) + n_nm, "cmd": "板 04 確認中心"},
                 {"anchor": "全日", "batch": "結案批:候選 %d 件(confirm 顯式)" % len(cls_c), "n": len(cls_c), "cmd": "via-workops closure"},
                 {"anchor": "全日", "batch": "決策/里程碑批:未結決議 %d · 逾期里程碑 %d" % (len(dec_open), len(ms_late)),
-                 "n": len(dec_open) + len(ms_late), "cmd": "via-workops decisions list / milestones list"},
+                 "n": len(dec_open) + len(ms_late), "cmd": "via-workops decisions list"},
                 {"anchor": "全日", "batch": "會議行動批:未完 %d 件(MeetingLoop 對帳橋)" % len(mtg_ac),
                  "n": len(mtg_ac), "items": mtg_ac[:20], "cmd": "via-workops mtg status"},
             ]}
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "daily_todo.json").write_text(json.dumps(todo, ensure_ascii=False, indent=1), encoding="utf-8")
-    ptxt = "═══ AI 代筆提示(逐件複製 → 貼給 Copilot/任何 AI → 產信文 → 貼回草稿 → 人按寄出)═══\n\n" + \
+    ptxt = "═══ AI 代筆提示 ═══(※本檔內容貼給 Copilot/任何 AI 用;切勿貼進 PowerShell)\n\n" + \
            ("\n\n".join(prompts) if prompts else "(今日無追蹤件需代筆)")
     if "todo_digest" in tpls:
         ptxt += "\n\n### 整份 TO-DO 請 AI 排版\n" + fill(tpls["todo_digest"], 語言="繁體中文",

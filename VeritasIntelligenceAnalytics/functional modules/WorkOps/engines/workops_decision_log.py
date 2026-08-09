@@ -88,6 +88,9 @@ def cmd_list(status):
     c = conn()
     q = "SELECT decision_id, what, owner, due, status, source, note FROM DECISIONS"
     args = ()
+    if status and status.upper() not in STATUSES:
+        print("[忽略] 未知狀態參數「%s」— 列全部(可用:%s)" % (status, "/".join(STATUSES)))
+        status = ""
     if status:
         q += " WHERE status=?"; args = (status.upper(),)
     q += " ORDER BY decision_id"

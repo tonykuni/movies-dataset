@@ -1117,6 +1117,14 @@
    "component": "全系統硬化電池 v0101",
    "code": "VIA-HARDEN-20260811",
    "note": "操作員硬化迴圈令:九段電池全跑 — py 54/AST 6/cmd 37/selftest 7-7/dedup 四動詞/紅線/會議引擎 gate/shim 33/JSON 314,初跑唯一真問題=11 支 LF-only cmd 啟動器(含 via-sync)→ 全數 CRLF 正規化排雷。OPTIMIZE:ENG-049 v0105 build 增量快取 1.43s→0.29s(5763 全命中),判定數字不變。CONSOLIDATE:硬化紀錄 v0101 入檔。無候修殘留,全綠生效。"
+  },
+  {
+   "ts": "2026-08-11T05:00:00",
+   "op": "UPDATE",
+   "category": "引擎",
+   "component": "decision_log 防呆+todo v0102(實機誤報修復)",
+   "code": "ENG-027/ENG-046",
+   "note": "操作員實機揪出帳面矛盾:decisions list 報「無決議」而 mtg status 明示已吸收 3 筆 — 真因=todo 指令字串「via-workops decisions list / milestones list」之「/」被 list 當狀態過濾參數,WHERE status='/' 靜默濾成 0 列(決議資料完好,零流失)。三修:①ENG-027 cmd_list 未知狀態誠實忽略並印可用值,不再沉默清空 ②ENG-046 v0102 批次指令改單一可貼「via-workops decisions list」③daily_prompts.txt 檔頭加防呆「切勿貼進 PowerShell」(操作員誤把提示文貼殼致連串 ParserError)。沙箱驗證:壞參數→忽略列全部、OPEN 過濾照常。"
   }
  ]
 }
