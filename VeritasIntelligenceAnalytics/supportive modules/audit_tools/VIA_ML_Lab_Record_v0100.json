@@ -1,0 +1,38 @@
+{
+ "record_id": "VIA_ML_Lab_Record_v0100",
+ "ts": "2026-08-11T10:30:00",
+ "operator_order": "apply machine learning / deep learning 2026 top 10 local free libs for each. implement viable tools.",
+ "deliverables": {
+  "盤點": "docs/ML_DL_2026_Top10_Local_Free.md — ML 十選 + DL 十選,授權/強項/VIA 三層裁定(核心採用=scikit-learn;二線=sentence-transformers/LightGBM/ONNX 等;候令=PyTorch/Transformers/Ollama 等 GB 級依賴)",
+  "引擎": "ENG-055 workops_ml_lab.py 六動詞 probe/setup/train/suggest/cluster/adopt",
+  "參數": "config/ml_params.json(門檻/最少樣本/聚類上限/嵌入開關 — 行為改變只改此檔)",
+  "接線": "via-workops ml(help 同步;全形括號 0 隱患;CRLF 保持)"
+ },
+ "viable_tools_implemented": [
+  "二十庫在位探測(容器實測 3/20:sklearn/numpy/pandas — 操作員機另測)",
+  "詞庫泛化模型:79 種子 6 類首訓,3-fold CV 0.481 誠實報分 + 訓練分數≠實測準確率永久註記",
+  "未解析 ML 候選:機率 ≥0.75 才列;0 候選時誠實報本輪最高機率(0.26)防誤判壞掉",
+  "聚類提詞:8 件→2 群→lexicon_review.csv 人填建議狀態",
+  "adopt 閉環:人核 2 詞(沒消息/卡在港口)寫回 params JSON + .bak 備份 — 沙箱驗證通過"
+ ],
+ "honest_gates": [
+  "ML 永不直寫 reply_status — 建議層位於 V/T/K/A/Q/E 之後之外,解析器本體零改動",
+  "樣本不足=誠實 FAIL 不硬 train(min_per_class=3);依賴缺席=誠實 FAIL+一行安裝指令",
+  "Gold Set 實測仍為唯一準確率權威;ML 訓練分數永不冒充",
+  "詞庫寫回唯一路徑=adopt 讀人工填過的 CSV(AI 只整理不發明);寫回前自動 .bak",
+  "ML 為選配依賴 — 不入 selftest 鏈,主鏈八段不受 sklearn 在位與否影響"
+ ],
+ "qa": [
+  "py_compile PASS;selftest 8/8 迴歸綠;harness ALL PASS 迴歸綠;cmd 掃描 0 隱患",
+  "沙箱全鏈:fixture 10 封(8 未解析)→ train→suggest→cluster→adopt 四動詞實跑全過",
+  "canonical reply_parser_params.json 零觸動(adopt 僅在沙箱副本驗證)"
+ ],
+ "operator_verification": [
+  "via-sync",
+  "via-workops ml setup",
+  "via-workops ml probe",
+  "via-workops ml train",
+  "via-workops ml suggest",
+  "via-workops ml cluster"
+ ]
+}

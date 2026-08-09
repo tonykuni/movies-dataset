@@ -47,6 +47,9 @@ if "%~1"=="" (
 ) else if /i "%~1"=="health" (
   rem ENG-053 可解釋專案健康分:進度加權 + 扣分逐項透明列示
   py "%~dp0..\functional modules\WorkOps\engines\workops_project_health.py"
+) else if /i "%~1"=="ml" (
+  rem ENG-055 ML 實驗室:probe=二十庫探測 setup=裝核心 train=詞庫泛化模型 suggest=未解析候選 cluster=聚類提詞 adopt=人核詞寫回 — ML 只建議永不自判
+  py "%~dp0..\functional modules\WorkOps\engines\workops_ml_lab.py" %2
 ) else if /i "%~1"=="backup" (
   rem L06 安全車道:backup=備份側車正本 | verify=雜湊驗證 | restore=只還原到暫存
   py "%~dp0..\functional modules\WorkOps\engines\workops_backup.py" %2 %3
@@ -149,6 +152,7 @@ if "%~1"=="" (
   echo  register     統一工作登記簿（ENG-054）:唯讀跨帳總表 JSON+CSV
   echo  consistency  跨帳一致性守衛（ENG-052）:唯讀矛盾報告不自動修
   echo  health       可解釋專案健康分（ENG-053）:進度+扣分透明列示
+  echo  ml           ML 實驗室（ENG-055）:probe setup train suggest cluster adopt — 只建議不自判
   echo  backup       備份/驗證/還原到暫存:backup verify restore
   echo  selftest     全鏈自測（ENG-032）:沙箱實跑 命名-歸戶-回覆-準確度-會議決策-備份 六段
   echo  replies      M3 回覆解析:replies=三層判讀 status=現況
