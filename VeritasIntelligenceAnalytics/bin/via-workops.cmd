@@ -88,7 +88,7 @@ if "%~1"=="" (
   echo  deep         深度鏈 [-Days n] [-StartDate yyyy-MM-dd] [-EndDate yyyy-MM-dd]（尾端自動命名提議）
   echo  accuracy     Gold Set 準確度:template=產樣板 run=實測計分
   echo  backup       備份/驗證/還原到暫存:backup verify restore
-  echo  selftest     全鏈自測（ENG-032）:沙箱實跑 命名-歸戶-回覆-準確度-備份 五段
+  echo  selftest     全鏈自測（ENG-032）:沙箱實跑 命名-歸戶-回覆-準確度-會議決策-備份 六段
   echo  replies      M3 回覆解析:replies=三層判讀 status=現況
   echo  wop          WOP 專案歸戶:wop=提議歸戶 apply=套用確認 domains=網域收割 list=清單 status=即況
   echo  names        命名核對:names=現況 propose=提議 apply=核對寫回 add 名稱 關鍵字=自建歸類
