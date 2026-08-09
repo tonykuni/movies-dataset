@@ -1,0 +1,17 @@
+{
+ "record_id": "VIA_WorkOps_v0117_ReportGenerator_Record_v0100",
+ "ts": "2026-08-09T16:00:00",
+ "operator_verdict": "兩份報告(Outlook 唯讀掃描/超級引擎進階分析)要能設 YYYY-MM-DD 起迄;「最新」勾選為預設;按「啟動」才讀取;問:系統會自己找電腦中的 Outlook 嗎?",
+ "honest_answer_outlook": "會 — 不是找路徑,是經 Windows COM 登錄自動連接:掃描器 New-Object -ComObject Outlook.Application 連到已開啟的 Classic Outlook;未開啟則 COM 自動喚起,零路徑設定。限制誠實:New Outlook 不支援 COM,引擎已內建明確報錯訊息(請開 Classic Outlook)。此答案同置於產生器面板提示。",
+ "delivered": {
+  "board_v0117": "⓪頁報告區升級「報告產生器」(v0116 保留):起/迄 date 欄(YYYY-MM-DD)+「最新(預設佐證窗)」勾選=Default(勾選時日期欄鎖灰)+「啟動讀取」鈕;按下組指令並複製 — 最新→via-workops deep;自訂→via-workops deep -StartDate 起 -EndDate 迄(Deep v0101 既有參數,起迄優先於天窗);起迄缺漏或起>迄誠實擋下顯示紅字;三語 UI",
+  "governance_note": "板為靜態 HTML 不代跑 — 「啟動」=組好指令複製,貼回 PowerShell 執行,與圈選建草稿同一資料回流模式(絕不代跑=絕不代寄同軸);兩份報告由 deep 鏈一次產出(scanrange 報告+engine/analytics 報告),⓪頁既有連結按最新 RUN 自動指向"
+ },
+ "qa_container": {
+  "shim": "8 斷言全過:面板渲染/date 欄/啟動鈕/COM 提示在;最新→via-workops deep;起>迄擋下紅字;有效起迄→-StartDate/-EndDate 指令正確拼裝;訊息清除;重勾最新→日期欄回鎖",
+  "static": "pwsh AST parse PASS;紅線淨;node --check PASS"
+ },
+ "red_lines_unchanged": "絕不代跑/代寄 · 唯讀 COM 連接 · 只增不減(v0116 保留)",
+ "operator_next": "via-sync 後 via-workops — ⓪頁報告區出現產生器;勾最新按啟動→貼指令;或取消勾選填起迄",
+ "append_only": true
+}
