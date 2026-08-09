@@ -189,7 +189,8 @@
   "引擎|workops_backup_v0100": "ENG-031",
   "引擎|workops_selftest_v0100": "ENG-032",
   "引擎|workops_slides_v0100": "ENG-033",
-  "引擎|Invoke-VIA-TrinityClosure_v0100": "ENG-034"
+  "引擎|Invoke-VIA-TrinityClosure_v0100": "ENG-034",
+  "引擎|VDF_MDL501_FetchContractManager_v0100": "ENG-035"
  },
  "ledger": [
   {
@@ -725,6 +726,14 @@
    "component": "Invoke-VIA-TrinityClosure_v0100",
    "code": "ENG-034",
    "note": "操作員實機首跑 13/14(唯 VisualLock sha FAIL)— 根因:Windows git autocrlf 簽出把 LF 轉 CRLF,位元組級 sha 自然不合(檔案內容完好)。修正:Get-Sha16 改行尾正規化(CRLF→LF)後計算,跨平台恆定;容器實證 LF/CRLF 兩版同 sha 23000e2958e9aaf9,結案器重跑 14/14 PASS。封存語意不變 — 內容等值即同基線。"
+  },
+  {
+   "ts": "2026-08-10T08:10:00",
+   "op": "ASSIGN",
+   "category": "引擎",
+   "component": "VDF_MDL501_FetchContractManager_v0100",
+   "code": "ENG-035",
+   "note": "操作員令(確認參數皆已加入+增減功能):①確認 — 上傳契約與倉內正本 sha 位元組級一致(5803bdfe…),277 項逐代碼+逐內容比對零差異=全部在庫;②增減 — MDL501 契約管理器:check 驗證盤點/list/diff 逐項比對/add(拒重複代碼,編號永不變)/remove=軟移除(status=off+removed_note 原項保留,只增不減)/setstatus;每次變更前自動備份側車(微秒戳防同秒互覆)+changelog append-only 履歷。沙箱五步實測 PASS(增→拒重→改態→軟移→盤點 278);正本零觸碰驗證。via-vdf contract。"
   }
  ]
 }

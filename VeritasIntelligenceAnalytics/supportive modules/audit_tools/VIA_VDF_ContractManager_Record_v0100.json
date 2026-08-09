@@ -1,0 +1,29 @@
+{
+ "record_id": "VIA_VDF_ContractManager_Record_v0100",
+ "ts": "2026-08-10T08:11:00",
+ "operator_order": "確認這些參數是否都有加入擷取項目 增減功能(2026-08-10;附再上傳契約)",
+ "confirmation": "上傳 vs 倉內正本:sha256 完全相同(5803bdfe3f2c81d6)· 277 項代碼集合相等 · 逐項內容零差異 · contract 規則/域序相同 — 全部參數皆已在擷取項目",
+ "built": [
+  "VDF_MDL501_FetchContractManager.py(ENG-035):check/list/diff/add/remove(soft)/setstatus",
+  "via-vdf contract 動詞(tokens=1* 整串轉傳,參數不吃字)"
+ ],
+ "governance": [
+  "只增不減:remove=軟移除 status=off,原項+removed_note 保留",
+  "編號永不變:add 拒絕重複 code",
+  "每變更前備份側車(微秒戳)+changelog append-only"
+ ],
+ "qa": [
+  "py_compile OK",
+  "check 實跑 PASS(14 域 277 項)",
+  "diff 上傳件=完全一致",
+  "沙箱五步(add/拒重/setstatus/remove/check 278)全 HIT",
+  "備份 3/3(微秒修正後)",
+  "正本零觸碰驗證(無 changelog、項數 277 不變)",
+  "cmd CRLF 統一"
+ ],
+ "operator_verification": [
+  "via-sync",
+  "via-vdf contract check",
+  "via-vdf contract list ld todo"
+ ]
+}
