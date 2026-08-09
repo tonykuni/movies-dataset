@@ -924,6 +924,30 @@
    "component": "五檔重傳(含隔離件)",
    "code": "VIA-DEDUP-03",
    "note": "操作員重傳五檔整合去重,全數 byte-identical 已在籍,零落籍:①VIA_BatchMailer_v001.ps1(18a25495)= VMT/quarantine 隔離正本同件 — 含 $mail.Send()/$smtp.Send() 觸犯「系統不可代為發送」紅線,維持隔離不回歸 live;草稿版 v002(.Display()/.Save())仍候令。②VIA_FIS_Validation_v3.py(77f21a15,第二次重傳)③VIA_FIS_Backtest_Harness.py(cea5481f,第二次重傳)= VIA_FlowSystem 正本。④VIA_FlowSystem_OneShot.py(3f2f6135)= VIA_FlowSystem 正本(庫內另有 v0101 新版,動態解析取新)。⑤Invoke-VPNS-SelfBuild.ps1(8096b12a)= supportive modules/VPNS 正本。"
+  },
+  {
+   "ts": "2026-08-10T17:50:00",
+   "op": "DEDUP",
+   "category": "支援性工具",
+   "component": "全部模組整合去重(五檔)之已在籍三檔",
+   "code": "VIA-DEDUP-04",
+   "note": "操作員「全部模組整合去重」令:①via_panorama.py(a9720fec)= VIA_Forge 正本同件,零落籍。②via_docforge_registry.json(945a8fb7)= VIA_Forge/via_forge_registry.json byte-identical(同內容雙檔名對照)。③VIA_MI_Code_Appendix_3.csv(f1f3cdde)= specs/VIA_MI_Code_Appendix.csv 內容逐列相同(200 列 MI-v2 全系列),僅 BOM/位元組層差異 — 內容已在籍零落籍。"
+  },
+  {
+   "ts": "2026-08-10T17:51:00",
+   "op": "HOME",
+   "category": "支援性工具",
+   "component": "DocForge v2 前身正本 + 三維分析面板",
+   "code": "VIA-HOME-DOCFORGE-3LENS",
+   "note": "同令新歸戶兩件:①via_docforge.py → supportive modules/VIA_Forge/(VDF DocForge v2 擷取修復分類引擎 — via_forge.py 自述整併其能力超集,本檔為前身正本,依只增不減保留譜系;py_compile PASS;紅線掃零 .Send 零網路呼叫;僅本機授權掃描,STAGE-2 雲端連接器只留註解未實作)。②via_docforge_registry.json → 同目錄(檔名契約:引擎 DEFAULT_REGISTRY 指名此檔;bytes 與 via_forge_registry.json 相同,DUP_BY_FILENAME_CONTRACT 顯式記帳,非漂移)。③VIA_ThreeLens_Analysis_v0100.html → supportive modules/ui_support/(三維分析整合面板:產業別×公司別×跨公司,Visual Lock,單檔離線;JS node --check PASS)。"
+  },
+  {
+   "ts": "2026-08-10T18:05:00",
+   "op": "DEDUP",
+   "category": "支援性工具",
+   "component": "整合去重追加十檔",
+   "code": "VIA-DEDUP-05",
+   "note": "同令追加十檔:八檔 byte-identical 已在籍零落籍 — via_if_config.json(f11af37a=Dashboard uploads 正本)、VIA_Evolving_SSOT_Engine_v0100.py(c67f128e=20_Registry_SSOT 正本)、VIA_FIS_Backtest_Harness.py(cea5481f 第三次重傳)、Invoke_VIA_FlowSystem_SandboxPatch_v025.ps1(743e0a09=VIA_FlowSystem 正本)、Run_VIS_HyperBOM_All_In_One_SELF_CONTAINED_v2.ps1(a94e7dca=WorkOps/VMT 正本)、via_io.py(70f83bd3)、Invoke-VIAPipeline.ps1(8699b640)、ManifestAutoFix v0203(24f92b30=VIA_Governance_Runtime 正本)。兩檔=修正前舊版不入籍帳上留痕:via_pipeline.py 上傳版(5a882c43)含 replace(0→NaN).ffill 舊持倉跨期復活缺陷,庫內正本(c8eb0c0f)已修並註明;devils_advocate.py 上傳版(829df543)rolling vol 未 reindex 對齊,庫內正本(00d6de68)已修。劣本不回歸,正本零觸碰。"
   }
  ]
 }

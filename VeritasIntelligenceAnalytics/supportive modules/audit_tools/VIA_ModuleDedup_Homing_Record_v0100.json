@@ -1,0 +1,114 @@
+{
+ "record_id": "VIA_ModuleDedup_Homing_Record_v0100",
+ "ts": "2026-08-10T17:51:00",
+ "operator_order": "全部模組整合去重(2026-08-10,五檔上傳)",
+ "dedup_already_homed": [
+  {
+   "upload": "via_panorama.py",
+   "sha256_16": "a9720fec5ce2c04c",
+   "verdict": "IDENTICAL",
+   "canon": "supportive modules/VIA_Forge/via_panorama.py"
+  },
+  {
+   "upload": "via_docforge_registry_1.json",
+   "sha256_16": "945a8fb7ed2ba1ba",
+   "verdict": "IDENTICAL_CONTENT_RENAMED",
+   "canon": "supportive modules/VIA_Forge/via_forge_registry.json"
+  },
+  {
+   "upload": "VIA_MI_Code_Appendix_3.csv",
+   "sha256_16": "f1f3cddec536c45f",
+   "verdict": "CONTENT_IDENTICAL(200 列全同;僅 BOM 位元組差)",
+   "canon": "supportive modules/specs/VIA_MI_Code_Appendix.csv"
+  },
+  {
+   "upload": "via_if_config.json",
+   "sha256_16": "f11af37ad851e8fc",
+   "verdict": "IDENTICAL",
+   "canon": "supportive modules/Dashboard_Format_Standardization/uploads/via_if_config.json"
+  },
+  {
+   "upload": "VIA_Evolving_SSOT_Engine_v0100.py",
+   "sha256_16": "c67f128e517bcd7e",
+   "verdict": "IDENTICAL",
+   "canon": "supportive modules/20_Registry_SSOT/VIA_Evolving_SSOT_Engine_v0100.py"
+  },
+  {
+   "upload": "VIA_FIS_Backtest_Harness_1.py",
+   "sha256_16": "cea5481f17f6d16e",
+   "verdict": "IDENTICAL(第三次重傳)",
+   "canon": "supportive modules/VIA_FlowSystem/VIA_FIS_Backtest_Harness.py"
+  },
+  {
+   "upload": "Invoke_VIA_FlowSystem_SandboxPatch_v025.ps1",
+   "sha256_16": "743e0a09df17d6f1",
+   "verdict": "IDENTICAL",
+   "canon": "supportive modules/VIA_FlowSystem/Invoke_VIA_FlowSystem_SandboxPatch_v025.ps1"
+  },
+  {
+   "upload": "Run_VIS_HyperBOM_All_In_One_SELF_CONTAINED_v2.ps1",
+   "sha256_16": "a94e7dcaf29bafd9",
+   "verdict": "IDENTICAL",
+   "canon": "functional modules/WorkOps/VMT/Run_VIS_HyperBOM_All_In_One_SELF_CONTAINED_v2.ps1"
+  },
+  {
+   "upload": "via_io.py",
+   "sha256_16": "70f83bd3a7975116",
+   "verdict": "IDENTICAL",
+   "canon": "supportive modules/VIA_Pipeline/via_io.py"
+  },
+  {
+   "upload": "InvokeVIAPipeline.ps1",
+   "sha256_16": "8699b6400ce29ebf",
+   "verdict": "IDENTICAL",
+   "canon": "supportive modules/VIA_Pipeline/Invoke-VIAPipeline.ps1"
+  },
+  {
+   "upload": "InvokeVeritasONECodexNexusVDFETFAIOv0203ManifestAutoFix.ps1",
+   "sha256_16": "24f92b30a8efcae4",
+   "verdict": "IDENTICAL",
+   "canon": "supportive modules/VIA_Governance_Runtime/Invoke-VeritasONE-CodexNexus-VDF-ETF-AIO-v0203-ManifestAutoFix.ps1"
+  }
+ ],
+ "homed_new": [
+  {
+   "upload": "via_docforge_1.py",
+   "sha256_16": "4bb17d485f1c6bc6",
+   "homed_to": "supportive modules/VIA_Forge/via_docforge.py",
+   "adjudication": "VDF DocForge v2 = via_forge.py 自述之整併前身;譜系正本保留(只增不減);py_compile PASS;零 .Send 零網路;僅本機授權掃描",
+   "companion": "via_docforge_registry.json 同目錄落籍 — 引擎 DEFAULT_REGISTRY 檔名契約;bytes=via_forge_registry.json(DUP_BY_FILENAME_CONTRACT 顯式記帳)"
+  },
+  {
+   "upload": "VIA_ThreeLens_Analysis_v0100.html",
+   "sha256_16": "508e00d3fe5096ac",
+   "homed_to": "supportive modules/ui_support/VIA_ThreeLens_Analysis_v0100.html",
+   "adjudication": "三維分析整合面板(產業×公司×跨公司,Visual Lock 單檔離線);JS node --check PASS;會計恆等式閘門 verify-before-use;數字皆樣板/T4 佔位,誠實標示"
+  }
+ ],
+ "governance": [
+  "正本零觸碰:僅新增三檔,未改任何既有檔",
+  "via_forge.py 仍為能力超集正本;docforge=譜系前身,非取代",
+  "ThreeLens 面板數據為樣板示意(T4 佔位「—」),接 VDF 真值前不可當實際數據"
+ ],
+ "operator_verification": [
+  "via-sync",
+  "py \"supportive modules\\VIA_Forge\\via_docforge.py\" --selftest",
+  "start \"\" \"supportive modules\\ui_support\\VIA_ThreeLens_Analysis_v0100.html\""
+ ],
+ "superseded_not_homed": [
+  {
+   "upload": "via_pipeline_1.py",
+   "sha256_16": "5a882c4367e19655",
+   "verdict": "SUPERSEDED_OLDER",
+   "canon": "supportive modules/VIA_Pipeline/via_pipeline.py(c8eb0c0f)",
+   "reason": "上傳版含 replace(0→NaN).ffill 舊持倉跨期復活缺陷;正本已修並於註解明載此缺陷 — 劣本不入籍,雜湊留痕"
+  },
+  {
+   "upload": "devils_advocate.py",
+   "sha256_16": "829df543b818534c",
+   "verdict": "SUPERSEDED_OLDER",
+   "canon": "supportive modules/VIA_Pipeline/devils_advocate.py(00d6de68)",
+   "reason": "上傳版 rolling vol 未 reindex 對齊(布林索引錯位);正本已修 — 劣本不入籍,雜湊留痕"
+  }
+ ]
+}

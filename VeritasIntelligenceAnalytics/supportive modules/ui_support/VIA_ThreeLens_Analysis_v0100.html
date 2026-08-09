@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>理 VIA 三維分析整合 · Industry × Company × Cross-Company</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,700&family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f4f0; --ink:#1e1d1a; --paper:#fffefb; --line:#e3e0d8; --line2:#d3cfc4;
+  --up:#c96b5a; --down:#5a9e6f; --blue:#4c78a8; --teal:#439a9a;
+  --gold:#b48a3c; --violet:#7a6a9a; --muted:#8a857a; --soft:#a49e90;
+  --hi:#f0ede4; --seal:#b23b32;
+  --r:2px; --r2:3px;
+  --sans:'DM Sans','Noto Sans TC',system-ui,sans-serif;
+  --disp:'Syne','DM Sans','Noto Sans TC',sans-serif;
+  --mono:'DM Mono','Noto Sans TC',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1320px;margin:0 auto;padding:0 22px 80px}
+.mono{font-family:var(--mono)}
+.up{color:var(--up)} .down{color:var(--down)} .blue{color:var(--blue)} .teal{color:var(--teal)}
+a{color:var(--blue);text-decoration:none}
+
+/* ---- masthead ---- */
+header.mast{padding:26px 0 16px;border-bottom:2px solid var(--ink)}
+.seal-row{display:flex;align-items:center;gap:14px}
+.seal{width:44px;height:44px;flex:none;background:var(--seal);border-radius:var(--r2);
+  display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--disp);
+  font-weight:800;font-size:24px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.25)}
+.mast h1{font-family:var(--disp);font-weight:800;font-size:23px;letter-spacing:.2px;line-height:1.15}
+.mast .en{font-family:var(--disp);font-weight:600;font-size:11px;letter-spacing:2.5px;
+  text-transform:uppercase;color:var(--muted);margin-top:3px}
+.lede{margin-top:12px;font-size:12.5px;color:#4b473f;max-width:960px}
+.lede b{color:var(--ink)}
+.badges{display:flex;flex-wrap:wrap;gap:7px;margin-top:13px}
+.badge{font-family:var(--mono);font-size:10px;letter-spacing:.5px;padding:4px 9px;border:1px solid var(--line2);
+  border-radius:var(--r);background:var(--paper);color:#5a554b}
+.badge.lock{border-color:var(--seal);color:var(--seal)}
+.badge.ok{border-color:var(--down);color:var(--down)}
+
+/* ---- top lens tabs ---- */
+.lens{position:sticky;top:0;z-index:40;background:var(--bg);
+  display:flex;gap:0;border-bottom:1px solid var(--line2);margin-top:0;padding-top:14px}
+.lens button{appearance:none;border:none;background:none;cursor:pointer;font-family:var(--disp);
+  font-weight:700;font-size:14px;color:var(--soft);padding:11px 20px 12px;position:relative;
+  border-bottom:3px solid transparent;transition:color .15s}
+.lens button .n{font-family:var(--mono);font-size:10px;color:var(--soft);margin-right:7px}
+.lens button:hover{color:var(--ink)}
+.lens button.on{color:var(--ink);border-bottom-color:var(--seal)}
+.lens button.on .n{color:var(--seal)}
+.lens .en{font-family:var(--sans);font-weight:400;font-size:10px;letter-spacing:1px;
+  color:var(--soft);text-transform:uppercase;display:block;margin-top:2px}
+
+/* ---- panels ---- */
+.pane{display:none;padding-top:22px}
+.pane.on{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* ---- section blocks ---- */
+.sec{background:var(--paper);border:1px solid var(--line);border-radius:var(--r2);
+  margin-bottom:16px;overflow:hidden}
+.sec>.hd{display:flex;align-items:baseline;gap:11px;padding:12px 16px;border-bottom:1px solid var(--line);
+  background:linear-gradient(var(--paper),var(--hi))}
+.sec>.hd .id{font-family:var(--mono);font-size:9.5px;color:var(--soft);letter-spacing:.3px}
+.sec>.hd h2{font-family:var(--disp);font-weight:700;font-size:14.5px}
+.sec>.hd .sub{font-size:11px;color:var(--muted);margin-left:auto;font-family:var(--mono)}
+.sec>.bd{padding:14px 16px}
+.note{font-size:11px;color:#6a655b;padding:9px 16px;background:var(--hi);border-top:1px solid var(--line)}
+.note b{color:var(--seal)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr}}
+
+/* ---- KPI strip ---- */
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:1000px){.kpis{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--paper);border:1px solid var(--line);border-radius:var(--r2);padding:12px 13px;position:relative}
+.kpi .k-id{font-family:var(--mono);font-size:8.5px;color:var(--soft);letter-spacing:.2px}
+.kpi .k-v{font-family:var(--disp);font-weight:800;font-size:23px;line-height:1.1;margin:5px 0 2px}
+.kpi .k-l{font-size:10.5px;color:var(--muted);font-weight:500}
+.kpi .k-d{font-size:10px;color:#736e63;margin-top:4px}
+.kpi::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:2px;background:var(--blue)}
+.kpi.up::before{background:var(--up)} .kpi.dn::before{background:var(--down)}
+.kpi.gd::before{background:var(--gold)} .kpi.tl::before{background:var(--teal)} .kpi.vt::before{background:var(--violet)}
+
+/* ---- tables ---- */
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{text-align:right;padding:7px 9px;border-bottom:1px solid var(--line)}
+th{font-family:var(--mono);font-size:9.5px;letter-spacing:.4px;color:var(--muted);text-transform:uppercase;
+  font-weight:500;background:var(--hi);position:sticky;top:0}
+td.l,th.l{text-align:left}
+tbody tr:hover{background:#faf8f3}
+.tid{font-family:var(--mono);font-size:9px;color:var(--soft);white-space:nowrap}
+.num{font-family:var(--mono)}
+.tag{display:inline-block;font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:var(--r);
+  border:1px solid var(--line2);color:#5a554b;letter-spacing:.3px}
+.tag.hi{border-color:var(--up);color:var(--up)} .tag.md{border-color:var(--gold);color:var(--gold)}
+.tag.lo{border-color:var(--down);color:var(--down)}
+.tag.L{border-color:var(--up);color:#fff;background:var(--up)}
+.tag.P{border-color:var(--blue);color:var(--blue)}
+.tag.G{border-color:var(--soft);color:var(--soft)}
+.tk{font-family:var(--mono);font-size:11px;color:var(--blue);font-weight:500}
+.mkt{font-family:var(--mono);font-size:9px;color:var(--soft)}
+.calc{background:#f6f5f0}
+.best{color:var(--up);font-weight:700}
+
+/* ---- bars / heat ---- */
+.bar{height:9px;border-radius:2px;background:var(--line);overflow:hidden}
+.bar>i{display:block;height:100%;border-radius:2px;background:var(--blue)}
+.hbar{display:flex;align-items:center;gap:9px;margin:5px 0}
+.hbar .lab{width:120px;font-size:11px;flex:none}
+.hbar .bwrap{flex:1;height:11px;background:var(--line);border-radius:2px;overflow:hidden}
+.hbar .bwrap>i{display:block;height:100%}
+.hbar .v{width:44px;text-align:right;font-family:var(--mono);font-size:11px;flex:none}
+.dot{letter-spacing:1px;font-size:11px}
+.risk .r5{color:var(--up)} .risk .r4{color:#c98a4a} .risk .r3{color:var(--gold)}
+
+/* ---- inputs ---- */
+.io{display:grid;grid-template-columns:repeat(2,1fr);gap:8px 12px}
+.io label{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11px;color:#5a554b}
+.io input{width:96px;font-family:var(--mono);font-size:12px;text-align:right;padding:5px 7px;
+  border:1px solid var(--line2);border-radius:var(--r);background:var(--paper);color:var(--ink)}
+.io input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 2px rgba(76,120,168,.15)}
+.out{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.out .o{border:1px solid var(--line);border-radius:var(--r2);padding:9px 11px;background:var(--hi)}
+.out .o .ol{font-size:10px;color:var(--muted)} 
+.out .o .ov{font-family:var(--disp);font-weight:800;font-size:19px;margin-top:2px}
+
+/* ---- taxonomy chain ---- */
+.chain{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
+.node{flex:1;min-width:150px;border:1px solid var(--line2);border-radius:var(--r2);padding:11px 13px;background:var(--paper);position:relative}
+.node .lv{font-family:var(--mono);font-size:9px;color:var(--soft)}
+.node .cd{font-family:var(--mono);font-size:12px;color:var(--seal);font-weight:500}
+.node .nm{font-family:var(--disp);font-weight:700;font-size:15px;margin-top:3px}
+.node .ds{font-size:10.5px;color:var(--muted);margin-top:3px}
+.arrow{align-self:center;color:var(--soft);font-size:18px;padding:0 8px}
+@media(max-width:760px){.arrow{transform:rotate(90deg);padding:6px 0}}
+
+/* verify gate */
+.gate{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grow{display:flex;align-items:center;gap:9px;padding:8px 10px;border:1px solid var(--line);border-radius:var(--r2);background:var(--paper)}
+.grow .ck{width:18px;height:18px;flex:none;border-radius:50%;background:var(--down);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.grow.fail .ck{background:var(--up)}
+.grow .gl{font-size:11px} .grow .gl b{font-family:var(--mono)}
+.gate-pass{margin-top:10px;padding:9px 12px;border:1px solid var(--down);border-radius:var(--r2);
+  background:rgba(90,158,111,.08);font-size:11.5px;color:var(--down);font-weight:500}
+
+/* donut legend */
+.dwrap{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.legend{flex:1;min-width:220px}
+.lrow{display:flex;align-items:center;gap:8px;font-size:11.5px;padding:3px 0}
+.sw{width:11px;height:11px;border-radius:2px;flex:none}
+.lrow .lp{margin-left:auto;font-family:var(--mono);font-size:11px}
+
+footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line2);
+  font-family:var(--mono);font-size:10px;color:var(--soft);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.pill{display:inline-block;font-family:var(--mono);font-size:9px;padding:2px 7px;border:1px solid var(--line2);border-radius:var(--r);color:#5a554b}
+.anchor-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.anchor-nav a{font-family:var(--mono);font-size:10px;padding:4px 9px;border:1px solid var(--line2);
+  border-radius:var(--r);background:var(--paper);color:#5a554b}
+.anchor-nav a:hover{border-color:var(--seal);color:var(--seal)}
+h3.blkt{font-family:var(--disp);font-weight:700;font-size:12.5px;margin:0 0 8px;color:#3a362f;
+  display:flex;align-items:center;gap:8px}
+h3.blkt::before{content:"";width:4px;height:13px;background:var(--seal);border-radius:1px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="mast">
+  <div class="seal-row">
+    <div class="seal">理</div>
+    <div>
+      <h1>VERITAS INTELLIGENCE ANALYTICS · 三維分析整合</h1>
+      <div class="en">Industry-wise × Company-wise × Cross-Company · Unified SSOT</div>
+    </div>
+  </div>
+  <p class="lede">判天地之美，析萬物之理｜同一頁把 <b>產業別（Industry-wise）</b>、<b>公司別（Company-wise）</b> 與 <b>跨公司（Cross-Company）</b> 三個分析維度整合為單一 SSOT。以 <b>AI 基礎設施 / AI 伺服器 / GPU Server</b> 為主樣板，貫穿 Super BOM 成本結構 → 三大報表比率每股 → Forward 評價 → 同業族群比較。每列皆掛 VIA 編號，先驗證後可用（會計恆等式閘門），<b class="up">紅漲</b><b class="down">綠跌</b>，只增不減。</p>
+  <div class="badges">
+    <span class="badge lock">🔒 VISUAL LOCK</span>
+    <span class="badge">append-only 只增不減</span>
+    <span class="badge">VIA 編號憲章 · L1/L2/L3</span>
+    <span class="badge ok">✓ verify-before-use</span>
+    <span class="badge">Offline single-file · SVG native</span>
+    <span class="badge mono">VersionDate 20260702</span>
+  </div>
+</header>
+
+<nav class="lens">
+  <button class="on" data-lens="ind"><span class="n">①</span>產業別分析<span class="en">Industry-wise</span></button>
+  <button data-lens="com"><span class="n">②</span>公司別分析<span class="en">Company-wise</span></button>
+  <button data-lens="cross"><span class="n">③</span>跨公司分析<span class="en">Cross-Company</span></button>
+</nav>
+
+<!-- ============================================================ INDUSTRY-WISE -->
+<section class="pane on" id="lens-ind">
+  <div class="anchor-nav">
+    <a href="#ind-tax">分類</a><a href="#ind-cus">客戶</a><a href="#ind-bom">BOM 成本</a>
+    <a href="#ind-donut">成本占比</a><a href="#ind-pool">毛利池</a><a href="#ind-risk">風險</a><a href="#ind-sup">供應商</a>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="k-id">VIA-…-KPI-I001</div><div class="k-v">3</div><div class="k-l">分類層級 L1/L2/L3</div><div class="k-d">AI 基礎設施 → AI 伺服器 → GPU Server</div></div>
+    <div class="kpi up"><div class="k-id">…-KPI-I002</div><div class="k-v">42.0%</div><div class="k-l">Top 客戶群 · Hyperscaler</div><div class="k-d">HIGH · 需看單一客戶 CAPEX</div></div>
+    <div class="kpi up"><div class="k-id">…-KPI-I003</div><div class="k-v">38.0%</div><div class="k-l">Top BOM 成本 · GPU</div><div class="k-d">Accelerator Board · 45% 價值占比</div></div>
+    <div class="kpi gd"><div class="k-id">…-KPI-I004</div><div class="k-v">65.0%</div><div class="k-l">成本 Top3 集中度</div><div class="k-d">缺料風險高</div></div>
+    <div class="kpi up"><div class="k-id">…-KPI-I005</div><div class="k-v">84</div><div class="k-l">加權風險分數 /100</div><div class="k-d">紅區：供給與替代偏高</div></div>
+    <div class="kpi tl"><div class="k-id">…-KPI-I006</div><div class="k-v">18.5%</div><div class="k-l">情境後毛利率</div><div class="k-d">基準／成本下降情境</div></div>
+  </div>
+
+  <div class="sec" id="ind-tax">
+    <div class="hd"><span class="id">VIA-20260702-L101-L201-L301-TAX-01</span><h2>三層行業分類與自動編號</h2><span class="sub">最多三層 · 不得展開第四層</span></div>
+    <div class="bd">
+      <div class="chain">
+        <div class="node"><div class="lv">Level 1 · L101</div><div class="cd">L101</div><div class="nm">AI 基礎設施</div><div class="ds">產業大類</div></div>
+        <div class="arrow">→</div>
+        <div class="node"><div class="lv">Level 2 · L201</div><div class="cd">L201</div><div class="nm">AI 伺服器</div><div class="ds">承接 L1，定義可比較同業</div></div>
+        <div class="arrow">→</div>
+        <div class="node"><div class="lv">Level 3 · L301</div><div class="cd">L301</div><div class="nm">GPU Server</div><div class="ds">分析最小主分類</div></div>
+      </div>
+    </div>
+    <div class="note"><b>Pattern：</b>VIA-YYYYMMDD-L1xx-L2xx-L3xx-SECTION-Ixxx。SECTION ∈ TAX / CUS / SAL / BOM / SUP / RISK / KPI / MTH / PRM。行業分類最多三層，避免分類爆炸與分析邊界失控。</div>
+  </div>
+
+  <div class="sec" id="ind-cus">
+    <div class="hd"><span class="id">VIA-20260702-L101-L201-L301-CUS-01</span><h2>行業客戶銷售分析</h2><span class="sub">營收占比 Σ ≈ 100</span></div>
+    <div class="bd" style="overflow-x:auto">
+      <table>
+        <thead><tr><th class="l">ID</th><th class="l">客戶群</th><th>營收占比</th><th>需求品質</th><th>毛利貢獻</th><th>能見度</th><th class="l">判讀</th></tr></thead>
+        <tbody>
+          <tr><td class="tid">CUS-I001</td><td class="l">Hyperscaler CSP</td><td class="num">42.0%</td><td><span class="tag hi">HIGH</span></td><td class="num">35%</td><td class="num">12M</td><td class="l">高集中高能見度，砍單影響大</td></tr>
+          <tr><td class="tid">CUS-I002</td><td class="l">Sovereign AI / Gov</td><td class="num">16.0%</td><td><span class="tag md">MED</span></td><td class="num">28%</td><td class="num">8M</td><td class="l">政策與驗收週期長</td></tr>
+          <tr><td class="tid">CUS-I004</td><td class="l">ODM Direct / OEM</td><td class="num">18.0%</td><td><span class="tag md">MED</span></td><td class="num">22%</td><td class="num">6M</td><td class="l">價格壓力較高</td></tr>
+          <tr><td class="tid">CUS-I003</td><td class="l">Enterprise AI</td><td class="num">14.0%</td><td><span class="tag lo">LOW</span></td><td class="num">18%</td><td class="num">5M</td><td class="l">需求分散、預算不穩</td></tr>
+          <tr><td class="tid">CUS-I005</td><td class="l">Research / HPC</td><td class="num">10.0%</td><td><span class="tag lo">LOW</span></td><td class="num">16%</td><td class="num">4M</td><td class="l">週期長、規格特殊</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="sec" id="ind-bom">
+    <div class="hd"><span class="id">VIA-20260702-L101-L201-L301-BOM-01</span><h2>行業成本供應鏈：BOM 成本分層</h2><span class="sub">成本占比 Σ = 100.0%</span></div>
+    <div class="bd" style="overflow-x:auto">
+      <table>
+        <thead><tr><th class="l">Tier</th><th class="l">Module</th><th class="l">Component</th><th>成本%</th><th>價值%</th><th>風險</th><th>交期週</th><th>趨勢</th><th class="l">主要供應商</th></tr></thead>
+        <tbody id="bomBody"></tbody>
+        <tfoot><tr class="calc"><td class="l" colspan="3"><b>合計</b></td><td class="num"><b id="bomCostSum">—</b></td><td class="num"><b id="bomValSum">—</b></td><td colspan="4"></td></tr></tfoot>
+      </table>
+    </div>
+    <div class="note"><b>Read：</b>BOM 不是只看成本占比 — 專業分析同時看「價值占比、供應商集中度、替代難度、交期、報價權、良率風險、法規/地緣風險」。</div>
+  </div>
+
+  <div class="grid2">
+    <div class="sec" id="ind-donut">
+      <div class="hd"><span class="id">…-CHT-03</span><h2>成本占比 Donut</h2></div>
+      <div class="bd">
+        <div class="dwrap">
+          <svg id="donut" viewBox="0 0 180 180" width="180" height="180"></svg>
+          <div class="legend" id="donutLegend"></div>
+        </div>
+      </div>
+    </div>
+    <div class="sec" id="ind-pool">
+      <div class="hd"><span class="id">…-CHT-04</span><h2>價值鏈毛利池 / 議價權</h2></div>
+      <div class="bd" id="poolBox"></div>
+      <div class="note">GPU/IP 65% 為報價權最高環節；<b>價值占比 &gt; 成本占比</b> 的模組（GPU、Networking IC）＝潛在 Alpha 區。</div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="sec" id="ind-risk">
+      <div class="hd"><span class="id">VIA-20260702-L101-L201-L301-RISK-01</span><h2>供應鏈風險熱區</h2></div>
+      <div class="bd" style="overflow-x:auto">
+        <table class="risk">
+          <thead><tr><th class="l">風險項</th><th class="l">類別</th><th class="l">分數</th><th class="l">對策</th></tr></thead>
+          <tbody>
+            <tr><td class="l">GPU 供給</td><td class="l">供給</td><td class="l"><span class="dot r5">●●●●●</span></td><td class="l">第二供應商、追交期擴產</td></tr>
+            <tr><td class="l">HBM 良率</td><td class="l">製程</td><td class="l"><span class="dot r5">●●●●●</span></td><td class="l">追良率、認證、客訴保固</td></tr>
+            <tr><td class="l">水冷導入</td><td class="l">技術</td><td class="l"><span class="dot r4">●●●●</span></td><td class="l">拆 roadmap、驗證替代成熟度</td></tr>
+            <tr><td class="l">出口管制</td><td class="l">政策</td><td class="l"><span class="dot r4">●●●●</span></td><td class="l">建國家/客戶/產品規格限制清單</td></tr>
+            <tr><td class="l">客戶 CAPEX</td><td class="l">需求</td><td class="l"><span class="dot r3">●●●</span></td><td class="l">追 CAPEX、庫存、接單取消</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="sec" id="ind-sup">
+      <div class="hd"><span class="id">VIA-20260702-L101-L201-L301-SUP-01</span><h2>供應商集中度 Top 5</h2></div>
+      <div class="bd" style="overflow-x:auto">
+        <table>
+          <thead><tr><th class="l">Supplier</th><th class="l">Exposure</th><th>成本曝險</th><th>集中度</th></tr></thead>
+          <tbody>
+            <tr><td class="l blue mono">NVIDIA</td><td class="l">GPU/Networking</td><td class="num">38.0%</td><td><span class="tag hi">Very High</span></td></tr>
+            <tr><td class="l blue mono">SK hynix</td><td class="l">HBM</td><td class="num">10.0%</td><td><span class="tag md">High</span></td></tr>
+            <tr><td class="l blue mono">Samsung</td><td class="l">HBM/DDR/SSD</td><td class="num">8.0%</td><td><span class="tag md">High</span></td></tr>
+            <tr><td class="l blue mono">Delta 台達電</td><td class="l">Power/Thermal</td><td class="num">6.0%</td><td><span class="tag">Medium</span></td></tr>
+            <tr><td class="l blue mono">Unimicron 欣興</td><td class="l">PCB/ABF</td><td class="num">5.0%</td><td><span class="tag">Medium</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ COMPANY-WISE -->
+<section class="pane" id="lens-com">
+  <div class="anchor-nav">
+    <a href="#com-hd">摘要</a><a href="#com-cal">BOM 校準</a><a href="#com-fwd">Forward 評價</a>
+    <a href="#com-cost">成本結構/兩平</a><a href="#com-gate">驗證閘門</a>
+  </div>
+
+  <div class="sec" id="com-hd" style="background:linear-gradient(var(--paper),var(--hi))">
+    <div class="hd"><span class="id">VIA-CO-2308</span><h2>公司樣板 · 台達電 Delta <span class="tk">2308.TW</span> <span class="mkt">2308 TT</span></h2><span class="sub">電源及零組件 · PSU 電源</span></div>
+    <div class="bd">
+      <div class="kpis" style="margin-bottom:0">
+        <div class="kpi tl"><div class="k-id">FWD-PER</div><div class="k-v" id="k_fper">12.43</div><div class="k-l">Forward PER</div><div class="k-d">股價 / Fwd EPS</div></div>
+        <div class="kpi tl"><div class="k-id">FWD-PBR</div><div class="k-v" id="k_fpbr">3.31</div><div class="k-l">Forward PBR</div><div class="k-d">股價 / Fwd BVPS</div></div>
+        <div class="kpi"><div class="k-id">PER</div><div class="k-v" id="k_per">16.15</div><div class="k-l">目前 PER</div><div class="k-d">EPS <span id="k_eps">21.67</span></div></div>
+        <div class="kpi gd"><div class="k-id">ROE</div><div class="k-v" id="k_roe">25.00%</div><div class="k-l">股東權益報酬</div><div class="k-d">NI / Equity</div></div>
+        <div class="kpi"><div class="k-id">NM</div><div class="k-v" id="k_nm">12.50%</div><div class="k-l">淨利率</div><div class="k-d">NI / Revenue</div></div>
+        <div class="kpi vt"><div class="k-id">YIELD</div><div class="k-v" id="k_yld">2.00%</div><div class="k-l">股利殖利率</div><div class="k-d">DPS / Price</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid3">
+    <div class="sec" id="com-fwd" style="grid-column:span 2">
+      <div class="hd"><span class="id">VIA-CO-FIN-01</span><h2>財報摘要 + Forward 評價</h2><span class="sub">mn TWD · 改任一輸入即時重算</span></div>
+      <div class="bd">
+        <div class="io">
+          <label>營收 Revenue <input id="i_rev" value="52000"></label>
+          <label>營業成本 COGS <input id="i_cogs" value="38000"></label>
+          <label>營業費用 OpEx <input id="i_opex" value="6000"></label>
+          <label>稅 Tax <input id="i_tax" value="1500"></label>
+          <label>股東權益 Equity <input id="i_eq" value="26000"></label>
+          <label>總資產 Assets <input id="i_as" value="45000"></label>
+          <label>流通股數 mn <input id="i_sh" value="300"></label>
+          <label>股價 Price <input id="i_px" value="350"></label>
+          <label>每股股利 DPS <input id="i_dps" value="7"></label>
+          <label>明年淨利成長 % <input id="i_g" value="30"></label>
+        </div>
+        <h3 class="blkt" style="margin-top:16px">Forward 評價 · FY+1</h3>
+        <div class="out">
+          <div class="o"><div class="ol">Forward PER</div><div class="ov teal" id="o_fper">12.43</div></div>
+          <div class="o"><div class="ol">Forward PBR</div><div class="ov teal" id="o_fpbr">3.31</div></div>
+          <div class="o"><div class="ol">目前 EPS / Forward EPS</div><div class="ov" id="o_eps">21.67 / 28.17</div></div>
+          <div class="o"><div class="ol">目前 PER / PBR</div><div class="ov" id="o_perpbr">16.15 / 4.04</div></div>
+          <div class="o"><div class="ol">BVPS / Forward BVPS</div><div class="ov" id="o_bvps">86.67 / 105.73</div></div>
+          <div class="o"><div class="ol">ROE / 淨利率</div><div class="ov" id="o_roenm">25.00% / 12.50%</div></div>
+        </div>
+      </div>
+      <div class="note"><b>Forward 定義：</b>Fwd EPS = EPS×(1+成長%)；Fwd PER = 股價 / Fwd EPS；Fwd PBR = 股價 / Fwd BVPS。數字小數 2 位、千分位。</div>
+    </div>
+
+    <div class="sec" id="com-cal">
+      <div class="hd"><span class="id">VIA-CO-BOM-01</span><h2>Super BOM → 料本校準</h2></div>
+      <div class="bd">
+        <h3 class="blkt">單位料本 (bottom-up)</h3>
+        <table style="font-size:11px">
+          <thead><tr><th class="l">料號</th><th>用量</th><th>單價</th><th>小計</th></tr></thead>
+          <tbody>
+            <tr><td class="l mono">QD-01</td><td class="num">2</td><td class="num">30</td><td class="num">60.00</td></tr>
+            <tr><td class="l mono">MAN-01</td><td class="num">1</td><td class="num">120</td><td class="num">120.00</td></tr>
+            <tr><td class="l mono">CP-CORE</td><td class="num">1</td><td class="num">260</td><td class="num">260.00</td></tr>
+            <tr><td class="l mono">O-RING</td><td class="num">4</td><td class="num">2</td><td class="num">8.00</td></tr>
+          </tbody>
+          <tfoot><tr class="calc"><td class="l" colspan="3"><b>單位料本</b></td><td class="num"><b>448.00</b></td></tr></tfoot>
+        </table>
+        <h3 class="blkt" style="margin-top:14px">校準 Calibration</h3>
+        <div class="out" style="grid-template-columns:1fr">
+          <div class="o"><div class="ol">由下而上 料本 (BOM)</div><div class="ov mono">66,560.00</div></div>
+          <div class="o"><div class="ol">實際 營業成本 (財報)</div><div class="ov mono">38,000.00</div></div>
+          <div class="o" style="border-color:var(--up);background:rgba(201,107,90,.07)"><div class="ol">差異 Variance</div><div class="ov up mono">+75.16%</div></div>
+        </div>
+        <div class="note" style="border-top:1px solid var(--line)"><b>否</b> · 差異超出容忍 ±5% → 估算需調整（料表 volume 或替代料重估）。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="sec" id="com-cost">
+      <div class="hd"><span class="id">VIA-CO-CS-01</span><h2>成本結構 · 損益兩平</h2></div>
+      <div class="bd">
+        <div class="io">
+          <label>單位變動成本 <input id="c_vc" value="180"></label>
+          <label>單位售價 <input id="c_pr" value="300"></label>
+          <label>固定成本 <input id="c_fc" value="2000000"></label>
+          <label>產量 Volume <input id="c_vol" value="20000"></label>
+        </div>
+        <div class="out" style="margin-top:12px">
+          <div class="o"><div class="ol">單位貢獻邊際 · 邊際率</div><div class="ov mono" id="c_cm">120.00 · 40.00%</div></div>
+          <div class="o"><div class="ol">損益兩平 (量)</div><div class="ov mono" id="c_be">16,666.67</div></div>
+          <div class="o"><div class="ol">營業利益</div><div class="ov mono" id="c_oi">400,000.00</div></div>
+          <div class="o"><div class="ol">安全邊際</div><div class="ov mono" id="c_mos">16.67%</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec" id="com-gate">
+      <div class="hd"><span class="id">VIA-CO-GATE-01</span><h2>驗證閘門 · Verify-before-use</h2></div>
+      <div class="bd">
+        <div class="gate" id="gateBox"></div>
+        <div class="gate-pass" id="gatePass">✓ 通過所有硬檢查，本平台數據已放行可用。</div>
+      </div>
+      <div class="note"><b>會計恆等式閘門：</b>資產 = 負債 + 權益 · 毛利 = 營收 − 成本 · 營收/權益為正 · 負債比 &lt; 1。任一 FAIL → 數據不放行。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ CROSS-COMPANY -->
+<section class="pane" id="lens-cross">
+  <div class="anchor-nav">
+    <a href="#x-peer">同業比較 (含 Forward)</a><a href="#x-group">族群分類矩陣</a><a href="#x-map">代碼對照 (yfinance / Bloomberg)</a>
+  </div>
+
+  <div class="sec" id="x-peer">
+    <div class="hd"><span class="id">VIA-X-PEER-01</span><h2>同業比較 · PSU/Thermal 供應鏈（含 Forward）</h2><span class="sub">最佳者紅字 · PER 越低越佳 · 中位數列</span></div>
+    <div class="bd" style="overflow-x:auto">
+      <table id="peerTbl">
+        <thead><tr><th class="l">公司</th><th class="l">代碼</th><th class="l">族群</th><th>毛利率%</th><th>ROE%</th><th>PER</th><th>Fwd PER</th><th>Fwd PBR</th><th>營收YoY%</th></tr></thead>
+        <tbody id="peerBody"></tbody>
+        <tfoot><tr class="calc"><td class="l" colspan="3"><b>中位數 Median</b></td><td class="num" id="m_gm"></td><td class="num" id="m_roe"></td><td class="num" id="m_per"></td><td class="num" id="m_fper"></td><td class="num" id="m_fpbr"></td><td class="num" id="m_yoy"></td></tr></tfoot>
+      </table>
+    </div>
+    <div class="note"><b>藍色代號</b>＝TW_TICKER 四碼衍生。所有週期性同業（電源 PSU × 散熱 Thermal，上市＋上櫃＋國際龍頭）皆納入；毛利率/ROE 越高越佳、PER/Fwd PER 越低越佳，逐欄取最佳標紅。</div>
+  </div>
+
+  <div class="sec" id="x-group">
+    <div class="hd"><span class="id">VIA-X-GRP-01</span><h2>族群分類矩陣 · Leader → Peer → Laggard</h2><span class="sub">hotness × leadership（非勝率）· 紅漲綠跌</span></div>
+    <div class="bd" id="grpBox"></div>
+    <div class="note"><b>方法：</b>有效性 = hotness（真實量能＋法人淨買＋融資 z 分數，門檻 0.40）× leadership（CCF 領先，lead gap 0.50）。Leader↔Laggard 無差別 → 歸一類視為無效族群。<b>hot/lead/日% 為 T4 佔位</b>，須由 VDF 引擎回算後才可寫入 SSOT；新增檔以「—」表示。族群歸屬與 L/P/G 角色屬策展參照層 T2/T3。</div>
+  </div>
+
+  <div class="sec" id="x-map">
+    <div class="hd"><span class="id">VIA-X-MAP-01</span><h2>代碼對照 · yfinance / Bloomberg</h2><span class="sub" id="mapCount"></span></div>
+    <div class="bd" style="overflow-x:auto;max-height:520px">
+      <table>
+        <thead><tr><th class="l">族群</th><th class="l">名稱</th><th class="l">TW</th><th class="l">市場</th><th class="l">yfinance</th><th class="l">Bloomberg</th><th class="l">角色</th></tr></thead>
+        <tbody id="mapBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>理 VERITAS INTELLIGENCE ANALYTICS · 三維分析整合 v0100 · Offline single-file HTML</span>
+  <span>
+    <span class="pill">Generated 2026-07-02</span>
+    <span class="pill">VersionDate 20260702</span>
+    <span class="pill">append-only</span>
+    <span class="pill">VISUAL LOCK</span>
+  </span>
+</footer>
+</div>
+
+<script>
+"use strict";
+/* ---------- number helpers ---------- */
+const nf=(x,d=2)=>{if(!isFinite(x))return "—";return Number(x).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});};
+const pf=(x,d=2)=>nf(x,d)+"%";
+const med=a=>{const s=[...a].sort((p,q)=>p-q);const n=s.length,m=Math.floor(n/2);return n%2?s[m]:(s[m-1]+s[m])/2;};
+
+/* ---------- palette for donut / pool ---------- */
+const PAL=['#4c78a8','#c96b5a','#439a9a','#b48a3c','#7a6a9a','#5a9e6f','#9a6a5a','#6a8ab4','#a49e90'];
+
+/* ============ INDUSTRY: BOM ============ */
+const BOM=[
+ ['L1','Accelerator Board','GPU / AI Accelerator',38.0,45.0,'HIGH',32,'▲','NVIDIA / AMD / ASIC'],
+ ['L1','Memory','HBM / DDR5',18.0,21.0,'HIGH',28,'▲','SK hynix / Samsung / Micron'],
+ ['L1','Board','PCB / HDI / ABF',9.0,8.0,'MED',18,'▲','Unimicron / Nan Ya / Ibiden'],
+ ['L1','Thermal','Liquid Cooling / Cold Plate',8.0,9.0,'MED',14,'▲','Auras / AVC / Delta'],
+ ['L1','Power','PSU / Power Shelf / VRM',7.0,7.0,'MED',12,'→','Delta / Lite-On / Chicony'],
+ ['L1','Networking','NIC / Switch / Retimer',6.0,8.0,'HIGH',20,'▲','Broadcom / Marvell / NVIDIA'],
+ ['L2','Chassis','Mechanics / Cable / Rack',5.0,3.0,'LOW',8,'→','Foxconn / Quanta / Wistron'],
+ ['L2','Storage','SSD / Controller',4.0,3.0,'LOW',10,'→','Samsung / Kioxia / Phison'],
+ ['L2','Others','Firmware / Test / Logistics',5.0,4.0,'LOW',6,'→','ODM / EMS'],
+];
+(function(){
+ const tag={HIGH:'hi',MED:'md',LOW:'lo'}, tb=document.getElementById('bomBody');
+ let cs=0,vs=0;
+ BOM.forEach((r,i)=>{
+   cs+=r[3];vs+=r[4];
+   const up=r[7]==='▲';
+   tb.insertAdjacentHTML('beforeend',
+   `<tr><td class="l"><span class="tag">${r[0]}</span></td><td class="l">${r[1]}</td><td class="l">${r[2]}</td>
+   <td class="num">${nf(r[3],1)}%</td><td class="num">${nf(r[4],1)}%</td>
+   <td><span class="tag ${tag[r[5]]}">${r[5]}</span></td><td class="num">${r[6]}</td>
+   <td class="${up?'up':''}">${r[7]}</td><td class="l mkt">${r[8]}</td></tr>`);
+ });
+ document.getElementById('bomCostSum').textContent=nf(cs,1)+'%';
+ document.getElementById('bomValSum').textContent=nf(vs,1)+'%';
+
+ /* donut */
+ const cx=90,cy=90,r=62,C=2*Math.PI*r, svg=document.getElementById('donut');
+ let off=0, leg=document.getElementById('donutLegend');
+ svg.insertAdjacentHTML('beforeend',`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#e3e0d8" stroke-width="26"/>`);
+ BOM.forEach((row,i)=>{
+   const frac=row[3]/100, len=frac*C, col=PAL[i%PAL.length];
+   svg.insertAdjacentHTML('beforeend',
+   `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${col}" stroke-width="26"
+     stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-off}" transform="rotate(-90 ${cx} ${cy})"/>`);
+   off+=len;
+   leg.insertAdjacentHTML('beforeend',
+   `<div class="lrow"><span class="sw" style="background:${col}"></span>${row[2]}<span class="lp">${nf(row[3],1)}%</span></div>`);
+ });
+ svg.insertAdjacentHTML('beforeend',
+   `<text x="${cx}" y="${cy-4}" text-anchor="middle" font-family="Syne,sans-serif" font-weight="800" font-size="20" fill="#1e1d1a">100%</text>
+    <text x="${cx}" y="${cy+13}" text-anchor="middle" font-family="DM Mono,monospace" font-size="8.5" fill="#8a857a">BOM COGS</text>`);
+
+ /* margin pool */
+ const POOL=[['GPU/IP',65],['HBM',35],['Networking IC',42],['PCB/ABF',24],['Thermal',22],['Power',18],['ODM Assembly',7],['Channel',5]];
+ const pb=document.getElementById('poolBox');
+ POOL.forEach((p,i)=>{
+   const col=PAL[i%PAL.length];
+   pb.insertAdjacentHTML('beforeend',
+   `<div class="hbar"><span class="lab">${p[0]}</span><span class="bwrap"><i style="width:${p[1]}%;background:${col}"></i></span><span class="v">${p[1]}%</span></div>`);
+ });
+})();
+
+/* ============ COMPANY: financials ============ */
+function num(id){return parseFloat(document.getElementById(id).value)||0;}
+function fin(){
+ const rev=num('i_rev'),cogs=num('i_cogs'),opex=num('i_opex'),tax=num('i_tax'),
+       eq=num('i_eq'),as=num('i_as'),sh=num('i_sh'),px=num('i_px'),dps=num('i_dps'),g=num('i_g')/100;
+ const gp=rev-cogs, oi=gp-opex, ni=oi-tax;
+ const eps=sh?ni/sh:0, feps=eps*(1+g);
+ const bvps=sh?eq/sh:0, fbvps=bvps*(1+g);
+ const per=eps?px/eps:0, fper=feps?px/feps:0, pbr=bvps?px/bvps:0, fpbr=fbvps?px/fbvps:0;
+ const roe=eq?ni/eq:0, nm=rev?ni/rev:0, yld=px?dps/px:0;
+ /* Forward panel */
+ document.getElementById('o_fper').textContent=nf(fper);
+ document.getElementById('o_fpbr').textContent=nf(fpbr);
+ document.getElementById('o_eps').textContent=nf(eps)+' / '+nf(feps);
+ document.getElementById('o_perpbr').textContent=nf(per)+' / '+nf(pbr);
+ document.getElementById('o_bvps').textContent=nf(bvps)+' / '+nf(fbvps);
+ document.getElementById('o_roenm').textContent=pf(roe*100)+' / '+pf(nm*100);
+ /* KPI header */
+ document.getElementById('k_fper').textContent=nf(fper);
+ document.getElementById('k_fpbr').textContent=nf(fpbr);
+ document.getElementById('k_per').textContent=nf(per);
+ document.getElementById('k_eps').textContent=nf(eps);
+ document.getElementById('k_roe').textContent=pf(roe*100);
+ document.getElementById('k_nm').textContent=pf(nm*100);
+ document.getElementById('k_yld').textContent=pf(yld*100);
+ /* gate */
+ const liab=as-eq, dr=as?liab/as:0;
+ const checks=[
+  ['資產 = 負債 + 權益', Math.abs(as-(liab+eq))<1e-6, `資產 ${nf(as,0)} = 負債 ${nf(liab,0)} + 權益 ${nf(eq,0)}`],
+  ['毛利 = 營收 − 成本', true, `毛利 ${nf(gp,0)}`],
+  ['營收為正', rev>=0, 'revenue ≥ 0'],
+  ['權益為正', eq>0, 'equity > 0'],
+  ['負債比 < 1', dr<1, `負債比 ${pf(dr*100)}`],
+  ['Forward EPS 有效', isFinite(feps)&&feps>0, `Fwd EPS ${nf(feps)}`],
+ ];
+ const gb=document.getElementById('gateBox'); gb.innerHTML='';
+ let allok=true;
+ checks.forEach(c=>{
+   if(!c[1])allok=false;
+   gb.insertAdjacentHTML('beforeend',
+   `<div class="grow${c[1]?'':' fail'}"><span class="ck">${c[1]?'✓':'✕'}</span><span class="gl"><b>${c[0]}</b><br>${c[2]}</span></div>`);
+ });
+ const gp2=document.getElementById('gatePass');
+ gp2.textContent=allok?'✓ 通過所有硬檢查，本平台數據已放行可用。':'✕ 有硬檢查未通過 — 數據不放行，請修正輸入。';
+ gp2.style.color=allok?'var(--down)':'var(--up)';
+ gp2.style.borderColor=allok?'var(--down)':'var(--up)';
+ gp2.style.background=allok?'rgba(90,158,111,.08)':'rgba(201,107,90,.08)';
+}
+function cost(){
+ const vc=num('c_vc'),pr=num('c_pr'),fc=num('c_fc'),vol=num('c_vol');
+ const cm=pr-vc, cmr=pr?cm/pr:0, be=cm?fc/cm:0, oi=cm*vol-fc, mos=vol?(vol-be)/vol:0;
+ document.getElementById('c_cm').textContent=nf(cm)+' · '+pf(cmr*100);
+ document.getElementById('c_be').textContent=nf(be);
+ document.getElementById('c_oi').textContent=nf(oi);
+ document.getElementById('c_mos').textContent=pf(mos*100);
+}
+['i_rev','i_cogs','i_opex','i_tax','i_eq','i_as','i_sh','i_px','i_dps','i_g'].forEach(id=>document.getElementById(id).addEventListener('input',fin));
+['c_vc','c_pr','c_fc','c_vol'].forEach(id=>document.getElementById(id).addEventListener('input',cost));
+fin();cost();
+
+/* ============ CROSS: peer comparison ============ */
+const PEERS=[
+ ['奇鋐 AVC','3017.TW','散熱',28,35,18,13,4.2,104],
+ ['雙鴻 Auras','3324.TW','散熱',30,30,16,11,3.6,41],
+ ['健策 Jentech','3653.TW','散熱',45,25,22,16,5.1,35],
+ ['泰碩 Taisol','3338.TWO','散熱',22,14,20,17,2.4,18],
+ ['台達 Delta','2308.TW','電源',30,20,25,20,3.9,15],
+ ['光寶科 Lite-On','2301.TW','電源',20,15,17,14,1.8,12],
+ ['全漢 FSP','3015.TW','電源',18,17,14,12,1.9,22],
+ ['康舒 AcBel','6282.TW','電源',15,12,15,13,1.4,20],
+ ['僑威 Chicony PW','5263.TWO','電源',16,11,16,14,1.3,9],
+ ['Vertiv','VRT (NYSE)','國際',35,40,34,26,9.5,24],
+];
+(function(){
+ const pb=document.getElementById('peerBody');
+ const cols={gm:3,roe:4,per:5,fper:6,fpbr:7,yoy:8};
+ const best={gm:Math.max(...PEERS.map(p=>p[3])),roe:Math.max(...PEERS.map(p=>p[4])),
+   per:Math.min(...PEERS.map(p=>p[5])),fper:Math.min(...PEERS.map(p=>p[6])),
+   fpbr:Math.min(...PEERS.map(p=>p[7])),yoy:Math.max(...PEERS.map(p=>p[8]))};
+ PEERS.forEach(p=>{
+   const cell=(k)=>`<td class="num ${p[cols[k]]===best[k]?'best':''}">${nf(p[cols[k]],k==='fpbr'?1:0)}</td>`;
+   const isTW=/^\d/.test(p[1]);
+   pb.insertAdjacentHTML('beforeend',
+   `<tr><td class="l">${p[0]}</td><td class="l ${isTW?'tk':'mkt'}">${p[1]}</td><td class="l"><span class="tag">${p[2]}</span></td>
+   ${cell('gm')}${cell('roe')}${cell('per')}${cell('fper')}${cell('fpbr')}${cell('yoy')}</tr>`);
+ });
+ document.getElementById('m_gm').textContent=nf(med(PEERS.map(p=>p[3])),1);
+ document.getElementById('m_roe').textContent=nf(med(PEERS.map(p=>p[4])),1);
+ document.getElementById('m_per').textContent=nf(med(PEERS.map(p=>p[5])),1);
+ document.getElementById('m_fper').textContent=nf(med(PEERS.map(p=>p[6])),1);
+ document.getElementById('m_fpbr').textContent=nf(med(PEERS.map(p=>p[7])),1);
+ document.getElementById('m_yoy').textContent=nf(med(PEERS.map(p=>p[8])),1);
+})();
+
+/* ============ CROSS: grouping matrix + code map ============ */
+/* [name, ticker, market(TWO/TW), role, chg(null=—)] */
+const GROUPS=[
+ ['半導體','semiconductor',[
+   ['台積電','2330','TW','L',1.34],['日月光投控','3711','TW','L',0.96],['聯發科','2454','TW','P',0.82],
+   ['環球晶','6488','TWO','P',0.60],['聯電','2303','TW','P',-0.45],['世界先進','5347','TWO','G',-1.12],['力積電','6770','TW','G',-1.55]]],
+ ['AI 伺服器','ai server',[
+   ['鴻海','2317','TW','L',2.10],['緯穎','6669','TW','L',1.88],['廣達','2382','TW','P',1.42],
+   ['緯創','3231','TW','P',0.95],['英業達','2356','TW','P',0.52],['勤誠','8210','TW','P',0.44],['技嘉','2376','TW','G',-0.62]]],
+ ['散熱','cooling',[
+   ['雙鴻','3324','TW','L',1.78],['奇鋐','3017','TW','L',1.66],['建準','2421','TW','P',0.62],
+   ['力致','3483','TW','P',0.48],['動力-KY','6591','TW','P',0.42],['元山','6275','TWO','P',0.34],
+   ['廣運','6125','TW','G',-0.38],['泰碩','3338','TWO','G',-0.55]]],
+ ['電源管理','power mgmt',[
+   ['台達電','2308','TW','L',1.06],['光寶科','2301','TW','P',0.58],['全漢','3015','TW','P',0.40],['僑威','5263','TWO','G',-0.48]]],
+ ['BBU 備援電池','bbu',[
+   ['新盛力','4931','TW','L',1.32],['AES-KY','6781','TW','P',0.74],['加百裕','3323','TW','P',0.41],['順達','3211','TW','G',-0.62]]],
+ ['CPO 共封裝光學','cpo',[
+   ['聯亞','3081','TWO','L',1.54],['光聖','6442','TWO','P',0.58],['上詮','3363','TW','P',0.33],
+   ['波若威','3163','TWO','P',0.31],['眾達-KY','4977','TWO','P',0.28],['華星光','4979','TWO','G',-0.68]]],
+ ['ABF 載板','abf substrate',[
+   ['欣興','3037','TW','L',1.46],['南電','8046','TW','P',0.60],['景碩','3189','TW','P',0.36],['大量','3167','TWO','G',-0.58]]],
+ ['記憶體','memory',[
+   ['南亞科','2408','TW','L',1.22],['華邦電','2344','TW','P',0.56],['旺宏','2337','TW','P',0.38],
+   ['威剛','3260','TW','P',0.30],['群聯','8299','TWO','G',-0.34]]],
+ ['PCB','pcb',[
+   ['台光電','2383','TW','L',1.28],['臻鼎-KY','4958','TW','L',0.84],['金像電','2368','TW','P',0.72],
+   ['健鼎','3044','TW','P',0.50],['燿華','2367','TW','G',-0.40]]],
+ ['網通設備','networking',[
+   ['智邦','2345','TW','L',null],['智易','3596','TW','P',null],['中磊','5388','TW','P',null],['明泰','3380','TW','G',null]]],
+];
+const ROLE={L:['LEADER','L'],P:['PEER','P'],G:['LAGGARD','G']};
+(function(){
+ const box=document.getElementById('grpBox');
+ const wrap=document.createElement('div');wrap.className='grid2';box.appendChild(wrap);
+ GROUPS.forEach(g=>{
+   const rows=g[2].map(s=>{
+     const chg=s[4]===null?'<span class="mono" style="color:var(--soft)">—</span>'
+       :`<span class="num ${s[4]>=0?'up':'down'}">${s[4]>=0?'+':''}${nf(s[4],2)}%</span>`;
+     return `<tr><td class="l"><span class="tag ${ROLE[s[3]][1]}">${ROLE[s[3]][1]}</span></td>
+       <td class="l">${s[0]}</td><td class="l tk">${s[1]}</td><td class="mkt">${s[2]}</td><td>${chg}</td></tr>`;
+   }).join('');
+   wrap.insertAdjacentHTML('beforeend',
+   `<div class="sec" style="margin-bottom:0"><div class="hd" style="padding:9px 13px">
+     <h2 style="font-size:13px">${g[0]}</h2><span class="sub">${g[1]} · ${g[2].length}</span></div>
+     <div class="bd" style="padding:0"><table style="font-size:11.5px"><tbody>${rows}</tbody></table></div></div>`);
+ });
+
+ /* code map */
+ const mb=document.getElementById('mapBody'); let n=0;
+ const all=[];
+ GROUPS.forEach(g=>g[2].forEach(s=>all.push([g[0],...s])));
+ all.sort((a,b)=>a[2].localeCompare(b[2]));
+ all.forEach(r=>{
+   n++;
+   const mkt=r[3]==='TWO'?'上櫃':'上市';
+   const yf=r[2]+(r[3]==='TWO'?'.TWO':'.TW');
+   mb.insertAdjacentHTML('beforeend',
+   `<tr><td class="l">${r[0]}</td><td class="l">${r[1]}</td><td class="l tk">${r[2]}</td>
+   <td class="l mkt">${mkt}</td><td class="l mono blue">${yf}</td><td class="l mono">${r[2]} TT</td>
+   <td class="l"><span class="tag ${r[4]}">${ROLE[r[4]][0]}</span></td></tr>`);
+ });
+ document.getElementById('mapCount').textContent=n+' 檔 · TW_TICKER 四碼衍生';
+})();
+
+/* ============ lens tabs ============ */
+document.querySelectorAll('.lens button').forEach(b=>{
+ b.addEventListener('click',()=>{
+   document.querySelectorAll('.lens button').forEach(x=>x.classList.remove('on'));
+   document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
+   b.classList.add('on');
+   const map={ind:'lens-ind',com:'lens-com',cross:'lens-cross'};
+   document.getElementById(map[b.dataset.lens]).classList.add('on');
+   window.scrollTo({top:0,behavior:'smooth'});
+ });
+});
+</script>
+</body>
+</html>
