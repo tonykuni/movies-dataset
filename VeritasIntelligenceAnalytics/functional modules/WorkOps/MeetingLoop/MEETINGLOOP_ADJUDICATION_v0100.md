@@ -19,3 +19,13 @@ VTR = 會議逐字稿「確定性修復」正本(49 測試、freeze.lock 治理)
 MeetingLoop = 修復+摘要+Action+滑鼠工作台+SSOT(SQLite/Parquet/DuckDB)— 能力更寬。
 重疊層(逐字稿修復)之擇優合流待操作員明令;現階段共存:VTR 修復正本、MeetingLoop
 以摘要/Action/工作台為主用途。N-3/N-1 一律 DraftOnly(絕不代寄相容)。
+
+## 補遺(2026-08-10 操作員實機首跑後)
+
+- 實機 doctor GREEN 且 duckdb/pyarrow/rapidfuzz/dateparser/sklearn 全在(僅 opencc 缺=
+  繁簡轉換降級)— 比容器更完整。
+- SelfTest WinError 2 根因=套件兩檔未上傳:`sample_meeting.txt` 與
+  `templates/mouse_first_workbench.html`。本席自建補齊:樣本逐字稿(含決議/行動/風險
+  線索,覆蓋九斷言)+ 滑鼠工作台模板(__EMBEDDED_DATA__ 契約;chips 全滑鼠、
+  匯出 review.json → import-review 吸收;不回寫正本)。容器全跑 self-test 9/9 PASS。
+  若原廠模板日後上傳,依擇優去重比對後裁定正本。

@@ -555,10 +555,14 @@ $data = [ordered]@{
     prompts_text   = $(if (Test-Path -LiteralPath (Join-Path $Here "out\daily_prompts.txt")) {
         try { Get-Content -LiteralPath (Join-Path $Here "out\daily_prompts.txt") -Raw -Encoding UTF8 } catch { "" } } else { "" })
     gap_counts     = $(
-        $gms = $(try { (Get-Content -LiteralPath (Join-Path $Here "out\milestones.json") -Raw -Encoding UTF8 | ConvertFrom-Json).items.PSObject.Properties } catch { @() })
-        $gcl = $(try { (Get-Content -LiteralPath (Join-Path $Here "out\closures.json") -Raw -Encoding UTF8 | ConvertFrom-Json).items.PSObject.Properties } catch { @() })
-        $gln = $(try { (Get-Content -LiteralPath (Join-Path $Here "out\lessons.json") -Raw -Encoding UTF8 | ConvertFrom-Json).items.PSObject.Properties } catch { @() })
-        [ordered]@{ milestones = @($gms).Count; closures = @($gcl).Count; lessons = @($gln).Count })
+        $gcRes = [ordered]@{ milestones = 0; closures = 0; lessons = 0 }
+        foreach ($gk in @("milestones", "closures", "lessons")) {
+            $gp = Join-Path $Here ("out\" + $gk + ".json")
+            if (Test-Path -LiteralPath $gp) {
+                try { $gcRes[$gk] = @(((Get-Content -LiteralPath $gp -Raw -Encoding UTF8 | ConvertFrom-Json).items).PSObject.Properties).Count } catch { }
+            }
+        }
+        $gcRes)
     wop            = [ordered]@{ total = $wopN }
     wop_top        = $wopTop
 }

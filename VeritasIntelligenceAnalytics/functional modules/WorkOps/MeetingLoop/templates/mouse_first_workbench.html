@@ -1,0 +1,63 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<title>MeetingLoop 滑鼠工作台</title><style>
+:root{--bg:#f5f4f0;--ink:#23221e;--mut:#6f6c63;--line:#dedbd2;--teal:#2f6f5e;--red:#b04532;--amber:#8a5a2b}
+*{box-sizing:border-box;margin:0}body{background:var(--bg);color:var(--ink);font:14.5px/1.65 "Noto Sans TC","Microsoft JhengHei",sans-serif;padding:26px}
+.k{font-family:"DM Mono",Consolas,monospace;font-size:11px;letter-spacing:.16em;color:var(--mut)}
+h1{font-size:22px;margin:4px 0 2px}h2{font-size:16px;margin:20px 0 8px}
+.sub{color:var(--mut);font-size:13px}
+.kpis{display:flex;gap:12px;margin:14px 0;flex-wrap:wrap}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 18px}
+.kpi b{font-size:22px;display:block}.kpi span{font-size:11.5px;color:var(--mut)}
+table{border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden;width:100%;margin-bottom:8px}
+th,td{padding:7px 12px;border-bottom:1px solid #e8e5dc;font-size:13px;text-align:left;vertical-align:top}
+th{background:#eceae3;font-size:12px}
+tr.hi td{background:#fbeee9}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:20px;padding:2px 12px;font-size:12px;cursor:pointer;margin:1px 3px 1px 0;background:#fff}
+.chip.on{background:var(--teal);color:#fff;border-color:var(--teal)}
+.note{color:var(--mut);font-size:12px;margin-top:12px}
+button.exp{border:none;background:var(--teal);color:#fff;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px}
+</style></head><body>
+<div class="k">VIA MEETINGLOOP · MOUSE-FIRST WORKBENCH</div>
+<h1 id="ttl"></h1><div class="sub" id="sub"></div>
+<div class="kpis" id="kpis"></div>
+<h2>逐字稿段落核對(點選狀態;全滑鼠零打字)</h2>
+<div id="segs"></div>
+<h2>行動項</h2><div id="acts"></div>
+<h2>摘要</h2><div id="sum"></div>
+<button class="exp" id="exp">匯出審核 JSON(review.json → import-review 吸收;append-only)</button>
+<div class="note">政策:append-only · 絕不代寄 · 本頁不回寫任何正本 — 匯出檔由引擎 import-review 吸收。</div>
+<script>
+var DATA=__EMBEDDED_DATA__;
+var review={meeting_id:(DATA.meeting||{}).meeting_id||"",segments:[],actions:[]};
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+document.getElementById("ttl").textContent=(DATA.meeting||{}).meeting_title||"會議工作台";
+document.getElementById("sub").textContent="會議 "+((DATA.meeting||{}).meeting_id||"")+" · 下次會議 "+((DATA.meeting||{}).next_meeting_date||"未定")+" · 出席 "+((DATA.attendees||[]).join("、")||"—");
+var K=DATA.kpi||{};
+document.getElementById("kpis").innerHTML=[["需核對",K.need_verification],["待回覆",K.unanswered],["逾期",K.overdue]].map(function(x){return "<div class='kpi'><b>"+(x[1]||0)+"</b><span>"+x[0]+"</span></div>";}).join("");
+var h="<table><tr><th>段</th><th>時間</th><th>建議文字</th><th>發言人</th><th>狀態(點選)</th></tr>";
+(DATA.segments||[]).forEach(function(s,i){
+ h+="<tr"+(s.risk_level==="HIGH"?" class='hi'":"")+"><td>"+esc(s.segment_id)+"</td><td>"+esc(s.start_time)+"</td><td>"+esc(s.suggested_text)+"</td><td>"+esc((s.speaker_candidates&&s.speaker_candidates[0]||{}).name)+"</td>"
+   +"<td data-seg='"+i+"'><span class='chip st on' data-v='CONFIRMED'>✓確認</span><span class='chip st' data-v='NEEDS_REVIEW'>?再核</span><span class='chip st' data-v='REJECTED'>✕退回</span></td></tr>";});
+document.getElementById("segs").innerHTML=h+"</table>";
+var a="<table><tr><th>行動</th><th>負責</th><th>期限</th><th>狀態(點選)</th></tr>";
+(DATA.actions||[]).forEach(function(x,i){
+ a+="<tr><td>"+esc(x.action_item)+"</td><td>"+esc(x.owner||"待指派")+"</td><td>"+esc(x.due_date||"—")+"</td>"
+   +"<td data-act='"+i+"'><span class='chip ac on' data-v='IN_PROGRESS'>進行中</span><span class='chip ac' data-v='COMPLETED'>完成</span><span class='chip ac' data-v='BLOCKED'>卡關</span><span class='chip ac' data-v='CANCELLED'>取消</span></td></tr>";});
+document.getElementById("acts").innerHTML=a+"</table>";
+document.getElementById("sum").innerHTML="<table>"+(DATA.summary||[]).map(function(s){return "<tr><td>"+esc(s.text||s.point||JSON.stringify(s))+"</td></tr>";}).join("")+"</table>";
+document.querySelectorAll("td[data-seg],td[data-act]").forEach(function(td){
+ td.addEventListener("click",function(e){
+  var c=e.target;if(!c.classList||!c.classList.contains("chip"))return;
+  td.querySelectorAll(".chip").forEach(function(x){x.classList.remove("on");});c.classList.add("on");});});
+document.getElementById("exp").addEventListener("click",function(){
+ review.segments=[];review.actions=[];
+ document.querySelectorAll("td[data-seg]").forEach(function(td){
+  var i=+td.dataset.seg,v=td.querySelector(".chip.on");
+  review.segments.push({segment_id:(DATA.segments[i]||{}).segment_id,review_status:v?v.dataset.v:"CONFIRMED"});});
+ document.querySelectorAll("td[data-act]").forEach(function(td){
+  var i=+td.dataset.act,v=td.querySelector(".chip.on");
+  review.actions.push({action_id:(DATA.actions[i]||{}).action_id,status:v?v.dataset.v:"IN_PROGRESS"});});
+ var a=document.createElement("a");
+ a.href=URL.createObjectURL(new Blob([JSON.stringify(review,null,1)],{type:"application/json"}));
+ a.download="review.json";a.click();});
+</script></body></html>
