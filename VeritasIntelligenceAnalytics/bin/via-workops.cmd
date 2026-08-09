@@ -46,6 +46,9 @@ if "%~1"=="" (
 ) else if /i "%~1"=="names" (
   rem 命名核對:names propose(提議)| apply(核對表寫回)| add 名稱 關鍵字(自建歸類)| names(現況)
   py "%~dp0..\functional modules\WorkOps\engines\workops_namer.py" %2 %3 %4 %5
+) else if /i "%~1"=="vtr" (
+  rem VTR 會議紀錄修復引擎:裸打=All 全套驗證;Doctor Lexicon Test Manifest Restore Inspect Replay 傳遞
+  pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\VTR\Invoke-VTR.ps1" %2 %3 %4 %5 %6 %7 %8 %9
 ) else if /i "%~1"=="bridge" (
   py "%~dp0..\functional modules\WorkOps\engines\workops_corpus_bridge.py" %2 %3 %4 %5 %6
 ) else if /i "%~1"=="engine" (
@@ -97,6 +100,7 @@ if "%~1"=="" (
   echo  silent       靜默一支到底（不開瀏覽器;配開機 vbs）
   echo  report       開週報   ui  開單機板   scanrange  時段唯讀掃描
   echo  bridge       語料橋   engine  超級引擎   analytics  分析層   actiondb  行動庫
+  echo  vtr          會議紀錄修復引擎（VTR 子系統）:裸打=全套驗證 Restore=修逐字稿 Inspect=待裁決
   echo  matrixsync   WorkMatrix 到行事曆（唯一寫入,主動觸發）
   echo  Scan/Reconcile/Draft/FollowUp/Templates/All  MailOps v001 傳遞
 ) else if /i "%~1"=="report" (

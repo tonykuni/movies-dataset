@@ -1,0 +1,12 @@
+{
+ "record_id": "VIA_MeetingEngines_Integration_Check_Record_v0100",
+ "ts": "2026-08-10T01:25:00",
+ "operator_order": "檢查會議記錄引擎有無整合進去(2026-08-10;操作員實機 selftest 5/5 PASS + via-sync 94bf759 對齊後)",
+ "findings": [
+  {"engine": "ENG-027 workops_decision_log(會議決策追蹤,DEC-#### + 會議碼)", "before": "已整合:via-workops decisions 動詞 + ALL v0103 段 2c 決策 KPI + 板面顯示 + out/decision_log.csv 在位(操作員畫面實證)", "gap": "不在 ENG-032 全鏈自測範圍(五段未含)", "fix": "補為自測第 5 段:add→report→export,斷言 DEC-0001 + MTG-001 入 CSV;自測升 v0101 六段;容器實測 6/6 PASS"},
+  {"engine": "VTR 會議紀錄修復引擎(子系統)", "before": "已併入 functional modules/WorkOps/VTR/(deterministic 層+五詞庫 SSOT+測試);詞庫 48 詞已入 S9 共用線", "gap": "PATH 不可達 — 只有子系統資料夾內 Run-VTR.cmd/Invoke-VTR.ps1,bin/ 無轉發器,亦無 via-workops 動詞", "fix": "新增 bin/via-vtr.cmd(pwsh/powershell 雙備援轉發,CRLF)+ via-workops vtr 動詞 + help 行;子系統 manifest launchers 欄同步記載"}
+ ],
+ "not_changed": ["VTR 模型層/JS 引擎(候令,原狀)", "編號/檔名/既有動詞(永不變)", "VTR Invoke-VTR.ps1 本體(零觸碰,僅外掛轉發)"],
+ "qa": ["selftest v0101 容器 6/6 PASS(段序 1 命名/2 歸戶/3 回覆/4 準確度/5 會議決策/6 備份)", "py_compile OK", "cmd 檔 CRLF 確認;新 rem/echo 行全形括號", "python replace 全 count==1 斷言", "registry ledger 54 筆(UPDATE ENG-032 v0101)"],
+ "operator_verification": ["via-sync", "via-workops selftest(應見 6/6)", "via-vtr(全套驗證)", "via-workops vtr Inspect"]
+}

@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-r"""Veritas WorkOps 全鏈自測器 v0100(ENG-032)— Integration + System Test 一鍵版
+r"""Veritas WorkOps 全鏈自測器 v0101(ENG-032)— Integration + System Test 一鍵版
 
 操作員令(2026/08/09):測試功能完整確認無誤後開始串聯 — 本引擎在「隔離沙箱」跑完
-整條 Python 引擎鏈(命名→互鏈→歸戶八層→回覆解析→準確度→備份/還原),逐段斷言,
+整條 Python 引擎鏈(命名→互鏈→歸戶八層→回覆解析→準確度→會議決策→備份/還原),
+逐段斷言,
 印狀態表 + FinalGate;報告落 out/selftest_report.json。真實 out/ 正本零觸碰。
 
 沙箱法:temp 目錄複製 engines/*.py + 參數詞庫 → 合成 fixtures(六串郵件涵蓋
@@ -23,7 +24,8 @@ HERE = Path(__file__).resolve().parent
 REAL_OUT = HERE.parent / "out"
 
 ENGINE_FILES = ["workops_lexicon.py", "workops_namer.py", "workops_wop_identifier.py",
-                "workops_reply_parser.py", "workops_accuracy_benchmark.py", "workops_backup.py"]
+                "workops_reply_parser.py", "workops_accuracy_benchmark.py", "workops_backup.py",
+                "workops_decision_log.py"]
 DATA_FILES = ["identifier_params.json", "product_code_map.json", "reply_parser_params.json",
               "org_lexicon.json", "bulk_senders.txt", "domain_dict.txt", "holidays_tw.txt",
               "watchtower_params.json"]
@@ -129,6 +131,15 @@ def main():
             tpl_ok = rc2 == 0 and rep.get("assignment_accuracy") == 1.0
         stage("4 Gold Set 準確度(全同意=100%)", tpl_ok)
 
+        rc, o = run_py(sb, "workops_decision_log.py", "add", "沙箱決議:契約回簽追蹤", "Tony",
+                       "2026-08-15", "THR-00001", "MTG-001")
+        rc2, _ = run_py(sb, "workops_decision_log.py", "report")
+        rc3, _ = run_py(sb, "workops_decision_log.py", "export")
+        dcsv = out / "decision_log.csv"
+        dtxt = dcsv.read_text(encoding="utf-8-sig") if dcsv.exists() else ""
+        ok = rc == 0 and rc2 == 0 and rc3 == 0 and "DEC-0001" in dtxt and "MTG-001" in dtxt
+        stage("5 會議決策追蹤(ENG-027:add→report→export)", ok, "DEC-0001 · 會議碼 MTG-001")
+
         rc, o = run_py(sb, "workops_backup.py", "backup")
         bks = sorted((out / "backups").glob("*.zip")) if (out / "backups").exists() else []
         bk_ok = rc == 0 and bks
@@ -136,7 +147,7 @@ def main():
             rc2, _ = run_py(sb, "workops_backup.py", "verify", str(bks[-1]))
             rc3, _ = run_py(sb, "workops_backup.py", "restore", str(bks[-1]))
             bk_ok = rc2 == 0 and rc3 == 0 and (out / "restore_staging").exists()
-        stage("5 備份→驗證→還原到暫存", bk_ok)
+        stage("6 備份→驗證→還原到暫存", bk_ok)
 
         n_fail = sum(1 for r in RESULTS if r["gate"] == "FAIL")
         final = "PASS" if n_fail == 0 else "FAIL"
