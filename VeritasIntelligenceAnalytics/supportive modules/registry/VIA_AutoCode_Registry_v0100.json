@@ -190,7 +190,9 @@
   "引擎|workops_selftest_v0100": "ENG-032",
   "引擎|workops_slides_v0100": "ENG-033",
   "引擎|Invoke-VIA-TrinityClosure_v0100": "ENG-034",
-  "引擎|VDF_MDL501_FetchContractManager_v0100": "ENG-035"
+  "引擎|VDF_MDL501_FetchContractManager_v0100": "ENG-035",
+  "引擎|workops_audit_bundle_v0100": "ENG-036",
+  "引擎|workops_summary_matrix_v0100": "ENG-037"
  },
  "ledger": [
   {
@@ -734,6 +736,30 @@
    "component": "VDF_MDL501_FetchContractManager_v0100",
    "code": "ENG-035",
    "note": "操作員令(確認參數皆已加入+增減功能):①確認 — 上傳契約與倉內正本 sha 位元組級一致(5803bdfe…),277 項逐代碼+逐內容比對零差異=全部在庫;②增減 — MDL501 契約管理器:check 驗證盤點/list/diff 逐項比對/add(拒重複代碼,編號永不變)/remove=軟移除(status=off+removed_note 原項保留,只增不減)/setstatus;每次變更前自動備份側車(微秒戳防同秒互覆)+changelog append-only 履歷。沙箱五步實測 PASS(增→拒重→改態→軟移→盤點 278);正本零觸碰驗證。via-vdf contract。"
+  },
+  {
+   "ts": "2026-08-10T08:50:00",
+   "op": "ASSIGN",
+   "category": "引擎",
+   "component": "workops_audit_bundle_v0100",
+   "code": "ENG-036",
+   "note": "六機制研究第六項 audit bundle 落地(NEXT 令):證據彙整(自測/部署/結案快照/準確度/路由趨勢/決策/節奏/帳本尾 50/環境指紋/最新備份指標)+現場紅線掃描 → 帶 sha256 manifest 之 zip;缺件誠實 absent。首跑即立功:抓到 VMT 併入之 VIA_BatchMailer_v001.ps1 真實 .Send 呼叫(Outlook COM+Gmail SMTP)→ 隔離處置(改副檔名 SEND_QUARANTINED,內容零動可回溯+README);掃描器修去註解誤報+自身字面;重跑 94 檔 PASS。via-workops auditpack。"
+  },
+  {
+   "ts": "2026-08-10T08:50:00",
+   "op": "ASSIGN",
+   "category": "引擎",
+   "component": "workops_summary_matrix_v0100",
+   "code": "ENG-037",
+   "note": "操作員令(DETAILED SUMMARY MATRIX TO DISPLAY THE RESULT AND DB):三區總結矩陣 — A 成果 9 項(板/週報/簡報/佇列/雙報告/結案/稽核包/掃描,在位·大小·時間)、B 側車 12 項(歸戶/命名/互鏈/回覆/事實流/決策/路由/趨勢/GoldSet/自測/餘量,筆數+關鍵指標)、C 資料庫 5 項(sqlite 唯讀逐表列數+VDF/VAP db 目錄檔型統計);主控台+HTML 雙輸出;缺席誠實列示。有料態 sqlite 沙箱斷言 PASS。via-workops matrix。"
+  },
+  {
+   "ts": "2026-08-10T08:50:00",
+   "op": "QUARANTINE",
+   "category": "工具",
+   "component": "VIA_BatchMailer_v001",
+   "code": "SPJ-VMT",
+   "note": "紅線違規隔離:VMT/quarantine/VIA_BatchMailer_v001.ps1.SEND_QUARANTINED — 真實 Send 呼叫(COM+SMTP)牴觸永久鐵律「系統不可代為發送」;內容一位元組未動(只增不減可回溯),非 .ps1 副檔名=不可執行實質阻斷;README_QUARANTINE.md 說明;若需群發功能待操作員明令建 v002 草稿版。"
   }
  ]
 }

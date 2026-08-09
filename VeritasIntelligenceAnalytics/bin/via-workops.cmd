@@ -50,6 +50,13 @@ if "%~1"=="" (
   rem ENG-033 自動簡報:板資料合成週報 slides;產完自動開啟;Ctrl+P 列印即簡報
   py "%~dp0..\functional modules\WorkOps\engines\workops_slides.py"
   start "" "%~dp0..\functional modules\WorkOps\out\VIA_WorkOps_Slides.html"
+) else if /i "%~1"=="auditpack" (
+  rem ENG-036 稽核包:全系統證據+現場紅線掃描 → 帶 sha256 manifest 之 zip(IT/主管交件)
+  py "%~dp0..\functional modules\WorkOps\engines\workops_audit_bundle.py"
+) else if /i "%~1"=="matrix" (
+  rem ENG-037 總結矩陣:成果×側車×DB 全盤點 → out\VIA_Summary_Matrix.html;產完自動開啟
+  py "%~dp0..\functional modules\WorkOps\engines\workops_summary_matrix.py"
+  start "" "%~dp0..\functional modules\WorkOps\out\VIA_Summary_Matrix.html"
 ) else if /i "%~1"=="vtr" (
   rem VTR 會議紀錄修復引擎:裸打=All 全套驗證;Doctor Lexicon Test Manifest Restore Inspect Replay 傳遞
   pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\VTR\Invoke-VTR.ps1" %2 %3 %4 %5 %6 %7 %8 %9
@@ -104,6 +111,8 @@ if "%~1"=="" (
   echo  silent       靜默一支到底（不開瀏覽器;配開機 vbs）
   echo  report       開週報   ui  開單機板   scanrange  時段唯讀掃描
   echo  bridge       語料橋   engine  超級引擎   analytics  分析層   actiondb  行動庫
+  echo  auditpack    稽核包（ENG-036）:證據彙整+現場紅線掃描 → 帶雜湊 zip 交件
+  echo  matrix       總結矩陣（ENG-037）:成果×側車×DB 全盤點 HTML
   echo  slides       自動簡報（ENG-033）:板資料合成週報投影片,Ctrl+P 列印即簡報
   echo  vtr          會議紀錄修復引擎（VTR 子系統）:裸打=全套驗證 Restore=修逐字稿 Inspect=待裁決
   echo  matrixsync   WorkMatrix 到行事曆（唯一寫入,主動觸發）
