@@ -1,0 +1,37 @@
+{
+ "record_id": "VIA_NotePro_Integration_Record_v0100",
+ "ts": "2026-08-10T16:45:00",
+ "operator_order": "上傳 VIA_Note_Pro_Standalone.html + 加入功能(2026-08-10)",
+ "dedup": {
+  "upload_sha256_16": "5c08b9bcf3641140",
+  "verdict": "與庫內正本 functional modules/VAP/spec/UIUX_Design_Source/VIA_Note_Pro_Standalone.html byte-identical — 已在籍,不重複落籍",
+  "family_kept": [
+   "VIA_Note_Pro.dc.html(DC 框架原版,VAP spec 同目錄)",
+   "supportive modules/ui_support/VIA_Notes_Pro.html",
+   "supportive modules/Dashboard_Format_Standardization/VIA Note Pro.dc.html"
+  ]
+ },
+ "feature_wiring": [
+  "bin/via-note.cmd 新啟動器:動態解析最新 VIA_Note_Pro_Standalone*.html(dir /b /o:n,嚴禁寫死版號),缺席誠實 FAIL",
+  "bin/via-workops.cmd 新 note 動詞+help 行(同動態解析)",
+  "指揮板 v0124(v0123 版前推):頂列 📝 入口 — PS 產板時動態解析注入 DATA.notepro,缺席=display:none 不留死鏈"
+ ],
+ "registry": "FNT-001 首發(功能性工具類):DEDUP+ASSIGN 兩帳;ledger 92 筆",
+ "qa": [
+  "v0124 pwsh AST_CLEAN",
+  "v0124 模板 JS node --check PASS + DOM shim 30 斷言全過(含 noteLk href/display 兩新斷言;v0123 全數回歸不破)",
+  "Note Pro 正本 JS node --check PASS;紅線掃 fetch/XHR/WebSocket/sendBeacon/http/.Send 全零(零網路,localStorage 單機)",
+  "兩 cmd 檔 CRLF 確認;notepro 解析塊沙箱實跑 href 正確"
+ ],
+ "governance": [
+  "正本留 VAP spec UIUX_Design_Source 不搬不改(正本不就地修改;板僅掛入口不收編)",
+  "資料全在使用者瀏覽器 localStorage,不外傳;無任何寄送能力(絕不代寄紅線無涉)",
+  "只增不減:同族三舊版全保留"
+ ],
+ "operator_verification": [
+  "via-sync",
+  "via-note",
+  "via-workops note",
+  "via-workops"
+ ]
+}

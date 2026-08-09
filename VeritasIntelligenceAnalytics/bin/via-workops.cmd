@@ -117,6 +117,10 @@ if "%~1"=="" (
 ) else if /i "%~1"=="matrixsync" (
   rem 注意:此工具會「建立」Outlook 行事曆事件(使用者主動觸發之寫入;郵件/分類仍零觸碰)
   pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\engines\Sync-MatrixToOutlook.ps1" %2 %3 %4
+) else if /i "%~1"=="note" (
+  rem VIA Note Pro 單機筆記(FNT-001):雙擊即用,資料全在瀏覽器 localStorage;同 via-note
+  for /f "delims=" %%f in ('dir /b /o:n "%~dp0..\functional modules\VAP\spec\UIUX_Design_Source\VIA_Note_Pro_Standalone*.html"') do set "WOPS_NOTE=%%f"
+  call start "" "%~dp0..\functional modules\VAP\spec\UIUX_Design_Source\%%WOPS_NOTE%%"
 ) else if /i "%~1"=="help" (
   echo ============================================================
   echo  via-workops 動詞總表（重串接後全系統）
@@ -151,6 +155,7 @@ if "%~1"=="" (
   echo  matrix       總結矩陣（ENG-037）:成果×側車×DB 全盤點 HTML
   echo  slides       自動簡報（ENG-033）:板資料合成週報投影片,Ctrl+P 列印即簡報
   echo  vtr          會議紀錄修復引擎（VTR 子系統）:裸打=全套驗證 Restore=修逐字稿 Inspect=待裁決
+  echo  note         VIA Note Pro 單機筆記(FNT-001):雙擊即開,資料在本機瀏覽器
   echo  matrixsync   WorkMatrix 到行事曆（唯一寫入,主動觸發）
   echo  Scan/Reconcile/Draft/FollowUp/Templates/All  MailOps v001 傳遞
 ) else if /i "%~1"=="report" (
