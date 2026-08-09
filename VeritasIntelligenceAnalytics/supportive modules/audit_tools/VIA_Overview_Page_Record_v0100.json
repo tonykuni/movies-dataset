@@ -1,0 +1,24 @@
+{
+ "record_id": "VIA_Overview_Page_Record_v0100",
+ "ts": "2026-08-11T12:40:00",
+ "operator_order": "優化步驟性 順序性 自動化 一個頁面呈現所有成果 多矩陣堆疊 專案cards呈現各專案的狀況點進去呈現詳情",
+ "built": {
+  "Invoke-VIA-WorkOps-All-v0107.ps1": "版本前進:逐段結果(段名/OK-FAIL/秒)落 out/all_run_summary.json — 自動化步驟成果可視化的資料源",
+  "Invoke-VIA-WorkOps-CommandBoard-v0128.ps1": "新 Σ 總覽頁:①自動化流程帶(上輪 all 逐段實況,FAIL 紅顯不隱藏)②六矩陣依管線順序堆疊(計數→歸戶路由→回覆解析六層→決策 KPI→治理鏈→準確度)③專案 cards 最差先排,點卡展開詳情(追蹤串/決議/里程碑/承諾/跨帳矛盾/健康扣分逐項);再點收合"
+ },
+ "data_additions": "DATA.all_run + DATA.wop_detail(每 WOP:thr≤12/dec≤8/mls≤8/cmt≤8/find≤6 防 JSON 爆量)+ governance.health[].pen;ConvertTo-Json Depth 8",
+ "qa": [
+  "AST 0 錯 ×2(ALL v0107/板 v0128)",
+  "shim128 27 斷言全過:流程帶 OK+FAIL 雙態、六矩陣在位、最差先排(L5→L3→L1)、null 進度顯 —、點卡開/合、詳情六段(串含層別旗標/決議/里程碑/承諾/矛盾/扣分含扣點數)、今日面+確認中心+準確度頁迴歸",
+  "側車全缺席路徑:誠實雙 banner + 矩陣零值不炸(SHIM128-EMPTY PASS)"
+ ],
+ "governance": [
+  "視覺鎖定 v2 tokens 沿用;健康等級色為狀態語意(綠好紅差),不涉紅漲綠跌市場色",
+  "版本前進 — v0106/v0127 正本零觸碰;動態解析自動取新版",
+  "誠實呈現:FAIL 段紅顯、未實測顯未實測、缺席顯引導"
+ ],
+ "operator_verification": [
+  "via-sync",
+  "via-workops all"
+ ]
+}
