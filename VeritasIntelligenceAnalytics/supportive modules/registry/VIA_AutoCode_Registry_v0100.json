@@ -997,6 +997,14 @@
    "component": "via_dedup_index_v0100",
    "code": "ENG-049",
    "note": "操作員「整合優化」令:整合去重鐵律產品化 — 40+ 檔手工判定收斂為一支引擎(位階 1 registry 工具)。三動詞:build=全庫 sha256 索引(5720 檔,可再生側車不入 git,gitignore VIA_Reports/dedup/);check 路徑=本機逐檔判定 IDENTICAL(已在籍免上傳)/VERSION_DIFFERS(同名異雜湊需人工裁定;上傳檔名 8hex- 前綴與 _n/(n) 尾綴自動正規化)/NOT_IN_REPO(候歸戶),隔離件命中額外紅線標示永不回歸;report=戰役總表 HTML(合併三份稽核紀錄 45 筆判定:38 已在籍/4 新歸戶/3 劣本留痕)。全唯讀零觸碰正本;stdlib 零依賴。沙箱實測三判定全對(含 BatchMailer 隔離命中、pipeline 舊版同名異版)。bin/via-dedup。"
+  },
+  {
+   "ts": "2026-08-10T20:45:00",
+   "op": "UPDATE",
+   "category": "引擎",
+   "component": "via_dedup_index_v0101",
+   "code": "ENG-049",
+   "note": "操作員實機首戰誠實 FAIL(Downloads 掃描 Ctrl+C):GB 級安裝包/壓縮包逐位元組雜湊無上限又零輸出,看似當機。v0101 修:①check 大檔預設略過 >200MB → SKIP_LARGE 判定入報告(需查加 --all 解除)②進度心跳每 200 檔一行 ③異常清單主控台限 60 筆餘見報告 JSON。實機驗證另件:build 6610 檔 PASS;FIS v3 harness 實機 9/9 GATES LOGIC PROVEN 同步入帳。沙箱重測四判定全對(IDENTICAL+隔離紅線/VERSION_DIFFERS/NOT_IN_REPO/SKIP_LARGE)。"
   }
  ]
 }

@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-r"""VIA 整合去重引擎 v0100(ENG-049)— 操作員「整合優化」令
+r"""VIA 整合去重引擎 v0101(ENG-049)— 操作員「整合優化」令
+
+v0101 實戰修正(操作員 Downloads 掃描 Ctrl+C 誠實 FAIL):
+  check 大檔預設略過(>200MB → SKIP_LARGE 判定,--all 才全查)— Downloads 常見
+  GB 級安裝包/壓縮包逐位元組雜湊會像當機;加進度心跳(每 200 檔一行)誠實可見。
 
 把整合去重鐵律產品化:本機一鍵對照庫內正本出判定,免逐檔上傳。
   build          全庫 sha256 索引 → VIA_Reports/dedup/VIA_Content_Hash_Index.json(可再生側車,不入 git)
@@ -25,6 +29,7 @@ AUDIT_P = HERE.parent / "audit_tools" / "VIA_ModuleDedup_Homing_Record_v0100.jso
 EXCLUDE_DIRS = {".git", "__pycache__", "node_modules", ".venv", ".venv_pm", "dedup"}
 UPLOAD_PREFIX = re.compile(r"^[0-9a-f]{8}-")
 UPLOAD_SUFFIX = re.compile(r"(_\d+| \(\d+\))$")
+SIZE_CAP = 200 * 1024 * 1024   # check 預設大檔上限;--all 解除
 
 
 def sha256_of(p):
@@ -78,7 +83,7 @@ def _load_index():
     return idx
 
 
-def cmd_check(target):
+def cmd_check(target, include_all=False):
     idx = _load_index()
     if idx is None:
         return 1
@@ -89,10 +94,20 @@ def cmd_check(target):
     cands = [tp] if tp.is_file() else sorted(
         p for p in tp.rglob("*") if p.is_file()
         and not any(d in p.parts for d in EXCLUDE_DIRS))
+    print("[掃描] %d 檔待判定(>200MB %s;進度每 200 檔一行)"
+          % (len(cands), "全查 --all" if include_all else "預設略過"))
     rows = []
-    n_id = n_ver = n_new = 0
-    for p in cands:
+    n_id = n_ver = n_new = n_skip = 0
+    for i, p in enumerate(cands, 1):
+        if i % 200 == 0:
+            print("  …%d/%d(%s)" % (i, len(cands), p.name[:50]))
         try:
+            if not include_all and p.stat().st_size > SIZE_CAP:
+                n_skip += 1
+                rows.append({"file": str(p), "verdict": "SKIP_LARGE",
+                             "size_mb": round(p.stat().st_size / 1048576),
+                             "hint": ">200MB 預設略過 — 需查加 --all"})
+                continue
             sha = sha256_of(p)
         except Exception as e:
             rows.append({"file": str(p), "verdict": "READ_ERROR", "detail": str(e)[:80]})
@@ -121,16 +136,24 @@ def cmd_check(target):
     rep_p.write_text(json.dumps({"ts": datetime.now().isoformat(timespec="seconds"),
                                  "target": str(tp), "n": len(cands),
                                  "identical": n_id, "version_differs": n_ver, "not_in_repo": n_new,
+                                 "skipped_large": n_skip,
                                  "rows": rows}, ensure_ascii=False, indent=1), encoding="utf-8")
     print("========== 整合去重判定(%d 檔)==========" % len(cands))
     print("  已在籍 IDENTICAL       %d(免上傳)" % n_id)
     print("  同名異版 VERSION_DIFFERS %d(需人工裁定)" % n_ver)
     print("  候歸戶 NOT_IN_REPO     %d(上傳交裁定)" % n_new)
+    if n_skip:
+        print("  大檔略過 SKIP_LARGE     %d(>200MB;需查加 --all)" % n_skip)
+    shown = 0
     for r in rows:
-        if r["verdict"] != "IDENTICAL":
-            print("  [%s] %s" % (r["verdict"], r["file"]))
+        if r["verdict"] not in ("IDENTICAL", "SKIP_LARGE"):
+            shown += 1
+            if shown <= 60:
+                print("  [%s] %s" % (r["verdict"], r["file"]))
         if r.get("redline"):
             print("  [紅線] %s" % r["redline"])
+    if shown > 60:
+        print("  …其餘 %d 筆見報告 JSON" % (shown - 60))
     print("[報告] %s" % rep_p)
     return 0
 
@@ -211,10 +234,11 @@ def main(argv):
     if len(argv) < 2 or argv[1] == "build":
         return cmd_build()
     if argv[1] == "check":
-        if len(argv) < 3:
-            print("用法:via-dedup check <檔案或資料夾>")
+        args = [a for a in argv[2:] if a != "--all"]
+        if not args:
+            print("用法:via-dedup check <檔案或資料夾> [--all]")
             return 2
-        return cmd_check(argv[2])
+        return cmd_check(args[0], include_all=("--all" in argv[2:]))
     if argv[1] == "report":
         return cmd_report()
     print("動詞:build(預設)/ check <路徑> / report")
