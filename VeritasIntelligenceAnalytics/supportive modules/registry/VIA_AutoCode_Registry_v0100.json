@@ -184,7 +184,9 @@
   "引擎|workops_decision_log_v0100": "ENG-027",
   "引擎|workops_wop_identifier_v0100": "ENG-028",
   "引擎|workops_reply_parser_v0100": "ENG-029",
-  "專案子系統|VIA_WorkOps子系統": "SUB-006"
+  "專案子系統|VIA_WorkOps子系統": "SUB-006",
+  "引擎|workops_accuracy_benchmark_v0100": "ENG-030",
+  "引擎|workops_backup_v0100": "ENG-031"
  },
  "ledger": [
   {
@@ -544,6 +546,22 @@
    "component": "VIA_WorkOps子系統",
    "code": "SUB-006",
    "note": "操作員令:VMT+VTR 併入 WorkOps 升格獨立子系統 VIA WorkOps。實體遷移 git mv(歷史保留):VMT_SuperBOM→WorkOps/VMT、VTR→WorkOps/VTR;舊路留 MOVED 麵包屑;via-vmt/via-one(v0113)改指新家。原 VMT子系統/VTR子系統 條目保留不刪(只增不減),其正本自此由 VIA_WorkOps 統轄。SSOT/工具共用不另立:VIA_SSOT、workops_lexicon、org_lexicon、本登錄簿、audit_tools;VTR lexicon 入 Shared_Lexicon_Registry。"
+  },
+  {
+   "ts": "2026-08-09T20:40:00",
+   "op": "ASSIGN",
+   "category": "引擎",
+   "component": "workops_accuracy_benchmark_v0100",
+   "code": "ENG-030",
+   "note": "v0200 RC 驗收 Gate E 補強落地:Gold Set 人工標註實測準確度(template 核對樣板→run 計分)— 歸戶/狀態準確率+逐訊號層校準表+錯判清單(=校正候選回饋學習記憶);絕不以信心分數冒充生產準確度;via-workops accuracy"
+  },
+  {
+   "ts": "2026-08-09T20:40:00",
+   "op": "ASSIGN",
+   "category": "引擎",
+   "component": "workops_backup_v0100",
+   "code": "ENG-031",
+   "note": "v0200 RC 驗收 L06 安全車道補強落地:側車正本+參數 20 項備份(zip+sha256+內嵌 manifest)→ verify(zip 雜湊+逐檔)→ restore 只到暫存(STAGED_REVIEW_REQUIRED·canonical_mutation=false,正本零觸碰);篡改偵測實證;via-workops backup"
   }
  ]
 }

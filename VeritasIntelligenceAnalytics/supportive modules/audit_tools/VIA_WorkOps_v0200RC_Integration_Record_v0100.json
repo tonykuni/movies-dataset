@@ -1,0 +1,24 @@
+{
+ "record_id": "VIA_WorkOps_v0200RC_Integration_Record_v0100",
+ "ts": "2026-08-09T21:00:00",
+ "operator_verdict": "九檔 v0200 RC / TargetAcceptance v0201 治理包上傳 + 整合補強功能",
+ "intake": {
+  "homed_docs": "docs/v0200_rc/ 八檔:IT_GOVERNANCE_HANDOFF(5205261f)· QA_RC_v0200.json(4ab39cd2)· README_PRODUCT(359f7fd1)· RELEASE_NOTES(118118be)· TARGET_ACCEPTANCE_CHECKLIST(566725f2)· README_TARGET_ACCEPTANCE(9e0ab059)· IT_INPUTS_REQUIRED(446117ab)· SHA256.txt",
+  "homed_runner": "acceptance/Invoke-VeritasWorkOps-TargetAcceptance-v0201.ps1(3159d541)— AST PASS;紅線稽核 CLEAN(無 send 端點/草稿 fail-safe 回關/還原僅暫存)",
+  "honest_gaps": "RC payload zip(期望 sha 2fdc8163…)與 bundle zip(SHA256.txt 所指 da2b608e…)皆未附 — 執行器在庫內不可跑(L01 誠實 FAIL);36 模組引擎本體到貨再逐模組去重"
+ },
+ "adjudication": "docs/v0200_rc/V0200_RC_Integration_Adjudication_v0100.md:兩線共存不強併(安全預設同軸);治理文件=共用正本;IT 文件歸 Graph 休眠線(§12 具體化);closed_scopes 33 項對照 — 已有同等 13 類、本輪補強 2 件、候令 7 類",
+ "delivered_reinforcements": {
+  "eng030_accuracy": "workops_accuracy_benchmark.py(Gate E 落地):template 產核對樣板(現行歸戶+狀態快照)→ 操作員標註 gold_set.csv(空=同意)→ run 以當前系統結果實測計分 — 歸戶/狀態準確率 + 逐訊號層校準表(registry ATTACH 證據鏈反查層別)+ 錯判清單(=校正候選,可回饋 wop apply 學習記憶);accuracy_report.json;絕不以信心分數冒充生產準確度",
+  "eng031_backup": "workops_backup.py(L06 落地):20 項正本清單(側車帳本+參數,存在才收)→ zip+sha256+內嵌逐檔 manifest → verify(zip 雜湊+逐檔比對)→ restore 只解壓到 out/restore_staging/<ts>(STAGED_REVIEW_REQUIRED · canonical_mutation=false;zip-slip 防護)",
+  "integration": "via-workops accuracy / backup 動詞;登錄簿 ENG-030/031(29→31);help 表更新"
+ },
+ "qa_container": {
+  "accuracy": "fixtures 三串一錯:歸戶 66.7%/狀態 100%/層校準 L1=100%·S4=0%·S3=100%/錯判單筆列印含期望與實得 — 全對",
+  "backup": "13 檔實備→verify PASS→restore 僅暫存(正本 byte-level 未動實證)→ 篡改一 byte 驗證即 FAIL — 全過",
+  "static": "兩引擎 py_compile;外來執行器 pwsh AST PASS+紅線稽核;cmd CRLF+雙動詞"
+ },
+ "red_lines_unchanged": "絕不代寄(執行器亦無 send 端點,稽核實證)· 唯讀 · 編號永不變 · 只增不減 · restore 僅暫存 · Graph 線續休眠待 IT",
+ "operator_next": "via-sync 後:via-workops accuracy → 核對 gold_set.csv → via-workops accuracy run(第一份實測準確度報告);via-workops backup 建第一份正本備份;實跑 v0201 驗收請在原 bundle zip 佈局執行(payload 未在庫)",
+ "append_only": true
+}
