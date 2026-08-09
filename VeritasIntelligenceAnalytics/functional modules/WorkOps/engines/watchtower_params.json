@@ -1,6 +1,6 @@
 {
- "version": "v0101",
- "comment": "三段時間追蹤參數(操作員 Gemini 研究令 2026/08/09:追蹤/跟進/緊急跟進)。t1/t2/t3=各段門檻;use_business_days=true 時以工作日計(跳過週末與 holidays_tw.txt 假日),false 改日曆日。T1→followup(友善追蹤)、T2→followup_firm(積極跟進)、T3→urgent_escalation(緊急升級,建議 CC 主管由人自加)。行為改變只改此檔不改程式。 v0101 產品化令增 daily_rhythm:每日 16:00 產生全部追蹤草稿(答覆一律滑鼠可點或 abcd),回覆期限=次日 12:00,下午時段僅急件;三個時間皆可改此檔;排程由一鍵部署器 SCHTASKS 依此檔建立(絕不代寄 — 排程只到「產草稿」)。",
+ "version": "v0102",
+ "comment": "三段時間追蹤參數(操作員 Gemini 研究令 2026/08/09:追蹤/跟進/緊急跟進)。t1/t2/t3=各段門檻;use_business_days=true 時以工作日計(跳過週末與 holidays_tw.txt 假日),false 改日曆日。T1→followup(友善追蹤)、T2→followup_firm(積極跟進)、T3→urgent_escalation(緊急升級,建議 CC 主管由人自加)。行為改變只改此檔不改程式。 v0101 產品化令增 daily_rhythm:每日 16:00 產生全部追蹤草稿(答覆一律滑鼠可點或 abcd),回覆期限=次日 12:00,下午時段僅急件;三個時間皆可改此檔;排程由一鍵部署器 SCHTASKS 依此檔建立(絕不代寄 — 排程只到「產草稿」)。 v0102 每日 TO-DO 令:daily_rhythm 增 reply_check_time(11:00 開始追蹤收件)與 urgent_chase_before(16:00 前緊急追蹤未收到者);generate_drafts_time=前一日寄出批。三錨可改,todo 引擎即時讀取。",
  "t1_days": 3,
  "t2_days": 5,
  "t3_days": 7,
@@ -9,6 +9,8 @@
   "generate_drafts_time": "16:00",
   "reply_deadline_next_day": "12:00",
   "afternoon_urgent_only": true,
-  "afternoon_starts": "13:00"
+  "afternoon_starts": "13:00",
+  "reply_check_time": "11:00",
+  "urgent_chase_before": "16:00"
  }
 }

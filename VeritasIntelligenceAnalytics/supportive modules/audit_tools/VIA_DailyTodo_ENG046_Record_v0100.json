@@ -1,0 +1,32 @@
+{
+ "record_id": "VIA_DailyTodo_ENG046_Record_v0100",
+ "ts": "2026-08-10T12:21:00",
+ "operator_order": "每日TO-DO LIST 一口氣做相同工作 前一日四點陸續寄出追蹤信件 11點開始追蹤收件 4點前緊急追蹤未收到者 其他看有無可新增項 新增PROMPT範本建立 由AI撰寫寄出(2026-08-10)",
+ "built": [
+  "ENG-046 workops_daily_todo(六批次+三時間錨+AI 代筆提示)",
+  "ai_prompt_templates.json(四範本;增改只改此檔)",
+  "watchtower_params v0102(reply_check_time 11:00+urgent_chase_before 16:00)",
+  "via-workops todo 動詞+help"
+ ],
+ "batching": [
+  "A 前日 16:00 寄出批(T1≤等<T3 且非⚡)",
+  "B 11:00 收件判讀批(已回核對+未解析掃視)",
+  "C 16:00 前急件批(≥T3 或 ⚡;互斥不重複)",
+  "D 確認批(ASK+命名)",
+  "E 結案批(候選)",
+  "F 決策/里程碑批(未結+逾期)"
+ ],
+ "red_lines": [
+  "由 AI 撰寫=產信文;寄出永遠人按(絕不代寄)",
+  "OOO 凍結不催",
+  "全唯讀彙整零寫入正本"
+ ],
+ "qa": [
+  "py_compile",
+  "沙箱斷言 PASS(互斥/OOO 排除/提示佔位全填/{{ 零殘留)"
+ ],
+ "operator_verification": [
+  "via-sync",
+  "via-workops todo"
+ ]
+}
