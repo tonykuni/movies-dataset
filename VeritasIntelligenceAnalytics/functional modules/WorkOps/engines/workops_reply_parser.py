@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-r"""WorkOps 回覆解析引擎 v0101(ENG-029)— 規劃書 M3:回信 → 三層 fallback 解析 → 狀態事件
+r"""WorkOps 回覆解析引擎 v0102(ENG-029)— 規劃書 M3:回信 → 三層 fallback 解析 → 狀態事件
 
 v0101(操作員六機制研究令):三項增能 —
   ① OOO 偵測:收信含 OOO/自動回覆詞 → flags.ooo(⏸窗口休假)+ 內文代理人 email 提示;
@@ -12,6 +12,8 @@ v0101(操作員六機制研究令):三項增能 —
 
 操作員 NEXT 令(2026/08/09):Phase 1 閉環最後一段 — 追蹤信寄出(板 [3/5] 三段升級鏈)
 → 對方回信 → 本引擎自動判讀 → 狀態自動更新,人不再逐封讀信。
+
+v0102(UI Phase B 令):未解析樣本(≤40 筆)入 reply_status.json unparsed 欄 — 板 04 確認中心唯讀顯示。
 
 三層 fallback(規劃書 §01:任一命中即完成狀態識別;都未命中誠實列未解析,絕不猜):
   V 投票層   Outlook VotingResponse 屬性(MailOps Scan v0116 起唯讀匯出)→ 零解析成本
@@ -181,6 +183,7 @@ def cmd_parse():
     now = datetime.now().isoformat(timespec="seconds")
     counts = {"V": 0, "T": 0, "K": 0}
     n_un = n_dup = 0
+    un_sample = []
     events = []
     flags = {}
     sent_stage = {}
@@ -217,6 +220,9 @@ def cmd_parse():
         got = parse_one(r, b, params)
         if got is None:
             n_un += 1
+            if len(un_sample) < 40:
+                un_sample.append({"thr": conv2thr.get(conv, ""), "subj": (r.get("Subject") or "")[:60],
+                                  "from": r.get("SenderEmail", "")})
             continue
         layer, st, ev = got
         counts[layer] += 1
@@ -249,8 +255,9 @@ def cmd_parse():
                 status[t] = {"status": e["status"], "layer": e["layer"],
                              "mail_date": e.get("mail_date", ""), "evidence": e.get("evidence", "")}
     tmp = STATUS_P.with_suffix(".tmp")
-    tmp.write_text(json.dumps({"version": "v0101", "updated": now, "status": status,
-                               "flags": flags, "sent_stage": sent_stage},
+    tmp.write_text(json.dumps({"version": "v0102", "updated": now, "status": status,
+                               "flags": flags, "sent_stage": sent_stage,
+                               "unparsed": {"n": n_un, "sample": un_sample}},
                               ensure_ascii=False, indent=1), encoding="utf-8")
     tmp.replace(STATUS_P)
     print("[解析] 新事件 %d(投票 %d · token %d · 關鍵詞 %d)· 已記略過 %d · 未解析 %d(誠實不猜)"

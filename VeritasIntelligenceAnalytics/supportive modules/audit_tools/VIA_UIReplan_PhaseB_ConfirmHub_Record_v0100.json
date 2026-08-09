@@ -1,0 +1,23 @@
+{
+ "record_id": "VIA_UIReplan_PhaseB_ConfirmHub_Record_v0100",
+ "ts": "2026-08-10T03:06:00",
+ "operator_order": "PHASE B(2026-08-10;操作員誤貼入 PowerShell 亦視為對本席之開工令)",
+ "built": [
+  "板 v0120(v0119 前送):04 確認中心啟用(tab 脫灰),三佇列一頁 — ①歸戶 ASK:件數+留置數+top8 候選表(標籤+分數)+開滑鼠佇列頁+複製 wop apply;②命名待核:total-approved 計數+未核 top8+開 naming_review.csv+複製 names apply;③未解析回信:計數+樣本 top8(THR/主旨/寄件者)+誠實提示;三佇列全空=綠燈淨空 banner",
+  "identifier v0108:propose 落 out/wop_ask.json(唯讀彙總;互動正本不變)",
+  "parser v0102:reply_status.json 增 unparsed{n,sample≤40}"
+ ],
+ "dedup_note": "確認互動不在板內重造 — WopConfirmQueue.html 仍為唯一互動正本(擇優去重原則);板 04=合一入口+即況",
+ "qa": [
+  "pwsh AST CLEAN",
+  "node --check OK(65030 chars)",
+  "DOM shim 13 斷言 PASS(含 approved 排除/佔位 05 保持候令/pT p2 回歸)",
+  "selftest 6/6 回歸 PASS(引擎改動後)",
+  "紅線 lint 零 .Send",
+  "replace 全 count==1"
+ ],
+ "operator_verification": [
+  "via-sync",
+  "via-workops(開板 → 04 確認中心)"
+ ]
+}

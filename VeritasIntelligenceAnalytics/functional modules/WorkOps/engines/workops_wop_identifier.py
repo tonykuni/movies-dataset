@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-r"""WorkOps WOP 識別歸戶引擎 v0107(ENG-028)— 規劃書 M1+M2:bottom-up 多訊號融合 → WOP 專案化+賦號
+r"""WorkOps WOP 識別歸戶引擎 v0108(ENG-028)— 規劃書 M1+M2:bottom-up 多訊號融合 → WOP 專案化+賦號
+
+v0108(UI Phase B 令 2026/08/10):propose 加落 out/wop_ask.json(ASK 候選+留置唯讀彙總)
+  供板 04 確認中心即時顯示;互動確認正本不變(WopConfirmQueue.html → wop apply)。
 
 v0107(產品化令 2026/08/09):sheet_aliases 增 TheirCode(對方編號/客戶案號/PO no…)—
   對方編號永不改、只對照:辨識後原值原樣保留同列,供板面與 AI 控管表提示詞對照欄使用;
@@ -697,6 +700,17 @@ def cmd_propose():
     save_ledger(led)
     save_registry(reg)
     n_ask, n_q = build_queue_html(ask, quarantine, sig, sheet_codes, naming)
+    # ---- v0108 確認中心資料(板 04 面唯讀彙總;互動正本仍=WopConfirmQueue.html)----
+    ask_items = []
+    for thr, ranked in sorted(ask.items())[:60]:
+        d = sig[thr]
+        ask_items.append({"thr": thr, "subj": (d.get("subj") or "")[:80],
+                          "cands": [{"label": wop_label(k, sheet_codes, naming), "score": round(s, 2)}
+                                    for k, s in ranked[:3]]})
+    (OUT / "wop_ask.json").write_text(json.dumps(
+        {"ts": now(), "n_ask": n_ask, "n_quarantine": n_q, "items": ask_items,
+         "quarantine": [{"thr": q_, "subj": (sig[q_].get("subj") or "")[:80]} for q_ in quarantine[:40]]},
+        ensure_ascii=False, indent=1), encoding="utf-8")
     # ---- L0 雜訊槽落盤(可回顧;每輪重寫快照)----
     if noise:
         layer_hits["L0-雜訊"] = len(noise)
