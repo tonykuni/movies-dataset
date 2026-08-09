@@ -11,6 +11,12 @@ v0102「上船的資料去重留有用的」令:新 internal 動詞 — 庫內�
   UPLOADS_ONLY_DUP=只在暫存區互重 / DUAL_CANON=正本區互重(只增不減,列示不動)
   全唯讀零刪除 — 出留用裁定表,清理永遠由人顯式決策。
 
+v0103 實戰修正(操作員 Downloads 全掃出兩真 bug):
+  ①假紅線:隔離判定原為路徑含 quarantine 字串 → 檔名 _quarantine_gate_ 誤中,
+    且該正本為 0-byte 空檔,Downloads 所有空檔同 sha 全誤命中無上限洗版。
+    改:目錄名=quarantine 或檔名尾碼 .SEND_QUARANTINED 才算;紅線訊息去重只印一次。
+  ②空檔:0-byte → 獨立判定 EMPTY(同 sha 無資訊量,不查索引不入紅線)。
+
 把整合去重鐵律產品化:本機一鍵對照庫內正本出判定,免逐檔上傳。
   build          全庫 sha256 索引 → VIA_Reports/dedup/VIA_Content_Hash_Index.json(可再生側車,不入 git)
   check <路徑>   檔案或資料夾逐檔判定:IDENTICAL(已在籍)/ VERSION_DIFFERS(同名異雜湊)/
@@ -104,15 +110,21 @@ def cmd_check(target, include_all=False):
     print("[掃描] %d 檔待判定(>200MB %s;進度每 200 檔一行)"
           % (len(cands), "全查 --all" if include_all else "預設略過"))
     rows = []
-    n_id = n_ver = n_new = n_skip = 0
+    redlines = {}
+    n_id = n_ver = n_new = n_skip = n_empty = 0
     for i, p in enumerate(cands, 1):
         if i % 200 == 0:
             print("  …%d/%d(%s)" % (i, len(cands), p.name[:50]))
         try:
-            if not include_all and p.stat().st_size > SIZE_CAP:
+            size = p.stat().st_size
+            if size == 0:
+                n_empty += 1
+                rows.append({"file": str(p), "verdict": "EMPTY", "hint": "0-byte 無資訊量,不判定"})
+                continue
+            if not include_all and size > SIZE_CAP:
                 n_skip += 1
                 rows.append({"file": str(p), "verdict": "SKIP_LARGE",
-                             "size_mb": round(p.stat().st_size / 1048576),
+                             "size_mb": round(size / 1048576),
                              "hint": ">200MB 預設略過 — 需查加 --all"})
                 continue
             sha = sha256_of(p)
@@ -122,10 +134,11 @@ def cmd_check(target, include_all=False):
         hit = idx["by_sha"].get(sha)
         if hit:
             n_id += 1
-            quar = [h for h in hit if "quarantine" in h.lower()]
+            quar = [h for h in hit if _is_quarantine(h)]
             v = {"file": str(p), "sha256_16": sha[:16], "verdict": "IDENTICAL", "canon": hit}
             if quar:
                 v["redline"] = "命中隔離件 — 維持隔離不回歸:%s" % quar[0]
+                redlines.setdefault(quar[0], []).append(str(p))
             rows.append(v)
             continue
         nm = idx["by_name"].get(norm_name(p.name))
@@ -143,7 +156,7 @@ def cmd_check(target, include_all=False):
     rep_p.write_text(json.dumps({"ts": datetime.now().isoformat(timespec="seconds"),
                                  "target": str(tp), "n": len(cands),
                                  "identical": n_id, "version_differs": n_ver, "not_in_repo": n_new,
-                                 "skipped_large": n_skip,
+                                 "skipped_large": n_skip, "empty": n_empty,
                                  "rows": rows}, ensure_ascii=False, indent=1), encoding="utf-8")
     print("========== 整合去重判定(%d 檔)==========" % len(cands))
     print("  已在籍 IDENTICAL       %d(免上傳)" % n_id)
@@ -151,22 +164,30 @@ def cmd_check(target, include_all=False):
     print("  候歸戶 NOT_IN_REPO     %d(上傳交裁定)" % n_new)
     if n_skip:
         print("  大檔略過 SKIP_LARGE     %d(>200MB;需查加 --all)" % n_skip)
+    if n_empty:
+        print("  空檔 EMPTY             %d(0-byte 不判定)" % n_empty)
     shown = 0
     for r in rows:
-        if r["verdict"] not in ("IDENTICAL", "SKIP_LARGE"):
+        if r["verdict"] not in ("IDENTICAL", "SKIP_LARGE", "EMPTY"):
             shown += 1
             if shown <= 60:
                 print("  [%s] %s" % (r["verdict"], r["file"]))
-        if r.get("redline"):
-            print("  [紅線] %s" % r["redline"])
     if shown > 60:
         print("  …其餘 %d 筆見報告 JSON" % (shown - 60))
+    for canon, hits in redlines.items():
+        print("  [紅線] 命中隔離件 %d 檔 — 維持隔離不回歸:%s" % (len(hits), canon))
     print("[報告] %s" % rep_p)
     return 0
 
 
 def _is_staging(rel):
     return any(part in STAGING_PARTS for part in Path(rel).parts)
+
+
+def _is_quarantine(rel):
+    p = Path(rel)
+    return "quarantine" in (x.lower() for x in p.parts[:-1]) or \
+        p.name.upper().endswith(".SEND_QUARANTINED")
 
 
 def cmd_internal():

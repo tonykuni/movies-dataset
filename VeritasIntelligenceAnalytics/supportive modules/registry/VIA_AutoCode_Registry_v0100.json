@@ -1013,6 +1013,14 @@
    "component": "via_dedup_index_v0102",
    "code": "ENG-049",
    "note": "操作員「上船的資料去重留有用的」令:新 internal 動詞 — 庫內重複盤點(暫存區=uploads/_inbox_to_classify)。實測 5722 檔:380 重複叢集;暫存冗餘 38 叢集 39 檔(正本已在正式區=已歸戶,冗餘對照留否由人決);暫存唯一正本 696 檔=有用留用(_inbox_to_classify 611/Dashboard 65/VAP 20,候升籍);暫存互重 1 叢集(智能分析平台 v0162C 雙複本,正本區另有正本);正本區互重 341 叢集(刻意譜系/雙籍,只增不減不動)。零刪除紅線 — 只出裁定表;完整清單入 VIA_Onboard_Dedup_KeepUseful_Record_v0100。"
+  },
+  {
+   "ts": "2026-08-10T21:40:00",
+   "op": "UPDATE",
+   "category": "引擎",
+   "component": "via_dedup_index_v0103",
+   "code": "ENG-049",
+   "note": "操作員 Downloads 全掃(87k+ 檔)揪出兩真 bug,v0103 修:①假紅線 — 隔離判定原為路徑含 quarantine 字串,誤中 network/pycompile_…_quarantine_gate_….py_stderr.txt(檔名帶字串且為 0-byte 空檔,Downloads 所有空檔同 sha 全誤命中、紅線無上限洗版);改目錄名=quarantine 或尾碼 .SEND_QUARANTINED 才算,紅線訊息按隔離正本去重只印一次帶命中數。②空檔 — 0-byte 獨立判定 EMPTY 不查索引。沙箱重測五判定全對+隔離偵測三斷言 PASS(真隔離中/目錄中/檔名字串不中)。internal 動詞實機 6611 檔正常(暫存冗餘 39/有用留用 696 與容器一致)。"
   }
  ]
 }
