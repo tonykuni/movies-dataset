@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-r"""Veritas WorkOps 全鏈自測器 v0101(ENG-032)— Integration + System Test 一鍵版
+r"""Veritas WorkOps 全鏈自測器 v0102(ENG-032)— Integration + System Test 一鍵版
 
 操作員令(2026/08/09):測試功能完整確認無誤後開始串聯 — 本引擎在「隔離沙箱」跑完
-整條 Python 引擎鏈(命名→互鏈→歸戶八層→回覆解析→準確度→會議決策→備份/還原),
+整條 Python 引擎鏈(命名→互鏈→歸戶八層→回覆解析→準確度→會議決策→GapFill 鏈→備份/還原),
 逐段斷言,
 印狀態表 + FinalGate;報告落 out/selftest_report.json。真實 out/ 正本零觸碰。
 
@@ -25,7 +25,9 @@ REAL_OUT = HERE.parent / "out"
 
 ENGINE_FILES = ["workops_lexicon.py", "workops_namer.py", "workops_wop_identifier.py",
                 "workops_reply_parser.py", "workops_accuracy_benchmark.py", "workops_backup.py",
-                "workops_decision_log.py"]
+                "workops_decision_log.py",
+                "workops_milestone_manager.py", "workops_closure_intelligence.py",
+                "workops_lesson_learned.py", "workops_unified_search.py"]
 DATA_FILES = ["identifier_params.json", "product_code_map.json", "reply_parser_params.json",
               "org_lexicon.json", "bulk_senders.txt", "domain_dict.txt", "holidays_tw.txt",
               "watchtower_params.json"]
@@ -140,6 +142,17 @@ def main():
         ok = rc == 0 and rc2 == 0 and rc3 == 0 and "DEC-0001" in dtxt and "MTG-001" in dtxt
         stage("5 會議決策追蹤(ENG-027:add→report→export)", ok, "DEC-0001 · 會議碼 MTG-001")
 
+        rc1, _ = run_py(sb, "workops_milestone_manager.py", "create", "WOP-0001", "沙箱里程碑", "2026-08-15", "--owner", "Tony")
+        rc2, _ = run_py(sb, "workops_milestone_manager.py", "complete", "MLS-0001", "--evidence", "EML-T")
+        rc3, _ = run_py(sb, "workops_closure_intelligence.py", "build")
+        rc4, o4 = run_py(sb, "workops_closure_intelligence.py", "confirm", "WOP-0001", "--reason", "沙箱驗證")
+        rc5, _ = run_py(sb, "workops_lesson_learned.py", "build")
+        rc6, o6 = run_py(sb, "workops_lesson_learned.py", "confirm", "0", "--root-cause", "測試", "--prevention", "檢查點")
+        rc7, o7 = run_py(sb, "workops_unified_search.py", "沙箱里程碑")
+        ok = (rc1 == rc2 == rc3 == rc4 == rc5 == rc6 == rc7 == 0
+              and "CLS-0001" in o4 and "LLN-0001" in o6 and "MLS-0001" in o7)
+        stage("6 GapFill 鏈(里程碑→結案→教訓→搜尋)", ok, "MLS/CLS/LLN 各發首號")
+
         rc, o = run_py(sb, "workops_backup.py", "backup")
         bks = sorted((out / "backups").glob("*.zip")) if (out / "backups").exists() else []
         bk_ok = rc == 0 and bks
@@ -147,7 +160,7 @@ def main():
             rc2, _ = run_py(sb, "workops_backup.py", "verify", str(bks[-1]))
             rc3, _ = run_py(sb, "workops_backup.py", "restore", str(bks[-1]))
             bk_ok = rc2 == 0 and rc3 == 0 and (out / "restore_staging").exists()
-        stage("6 備份→驗證→還原到暫存", bk_ok)
+        stage("7 備份→驗證→還原到暫存", bk_ok)
 
         n_fail = sum(1 for r in RESULTS if r["gate"] == "FAIL")
         final = "PASS" if n_fail == 0 else "FAIL"

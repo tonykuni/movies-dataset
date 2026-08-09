@@ -50,6 +50,27 @@ if "%~1"=="" (
   rem ENG-033 自動簡報:板資料合成週報 slides;產完自動開啟;Ctrl+P 列印即簡報
   py "%~dp0..\functional modules\WorkOps\engines\workops_slides.py"
   start "" "%~dp0..\functional modules\WorkOps\out\VIA_WorkOps_Slides.html"
+) else if /i "%~1"=="search" (
+  rem 統一搜尋(唯讀跨九側車):search 關鍵字 [關鍵字2]
+  py "%~dp0..\functional modules\WorkOps\engines\workops_unified_search.py" %2 %3 %4 %5 %6 %7 %8 %9
+) else if /i "%~1"=="milestones" (
+  rem 里程碑(append-only):create WOP-# 名 日期 [--owner] | complete MLS-# [--evidence] | list | status
+  py "%~dp0..\functional modules\WorkOps\engines\workops_milestone_manager.py" %2 %3 %4 %5 %6 %7 %8 %9
+) else if /i "%~1"=="timeline" (
+  rem 時間軸/依賴(下游衝擊):timeline=build | link MLS-A MLS-B | list
+  py "%~dp0..\functional modules\WorkOps\engines\workops_timeline_dependency.py" %2 %3 %4 %5 %6 %7 %8 %9
+) else if /i "%~1"=="closure" (
+  rem 案件結案智能(絕不自動結案):closure=build 候選 | confirm WOP-# --reason 事由 | list
+  py "%~dp0..\functional modules\WorkOps\engines\workops_closure_intelligence.py" %2 %3 %4 %5 %6 %7 %8 %9
+) else if /i "%~1"=="lessons" (
+  rem 教訓(人工確認才成立):lessons=build 候選 | confirm 序號 --root-cause X --prevention Y | list
+  py "%~dp0..\functional modules\WorkOps\engines\workops_lesson_learned.py" %2 %3 %4 %5 %6 %7 %8 %9
+) else if /i "%~1"=="retention" (
+  rem 保留政策(PLAN 先行;apply 三重門):retention=plan | apply --confirm | log
+  py "%~dp0..\functional modules\WorkOps\engines\workops_retention_manager.py" %2 %3 %4 %5 %6 %7 %8 %9
+) else if /i "%~1"=="onboard" (
+  rem 首跑導入狀態機(唯讀,由真實產物推導八步)
+  py "%~dp0..\functional modules\WorkOps\engines\workops_onboarding.py" %2 %3 %4 %5 %6 %7 %8 %9
 ) else if /i "%~1"=="auditpack" (
   rem ENG-036 稽核包:全系統證據+現場紅線掃描 → 帶 sha256 manifest 之 zip(IT/主管交件)
   py "%~dp0..\functional modules\WorkOps\engines\workops_audit_bundle.py"
@@ -111,6 +132,13 @@ if "%~1"=="" (
   echo  silent       靜默一支到底（不開瀏覽器;配開機 vbs）
   echo  report       開週報   ui  開單機板   scanrange  時段唯讀掃描
   echo  bridge       語料橋   engine  超級引擎   analytics  分析層   actiondb  行動庫
+  echo  search       統一搜尋:search 關鍵字（跨九側車唯讀）
+  echo  milestones   里程碑:create/complete/list/status（MLS-# 永不變）
+  echo  timeline     時間軸+下游衝擊:build/link/list（A 逾期即列受阻 B）
+  echo  closure      案件結案:build 候選/confirm 顯式結案（絕不自動結案）
+  echo  lessons      教訓:build 候選/confirm 補根因預防才成立（LLN-#）
+  echo  retention    保留政策:plan 零刪除/apply --confirm 三重門
+  echo  onboard      首跑導入八步狀態（由真實產物推導）
   echo  auditpack    稽核包（ENG-036）:證據彙整+現場紅線掃描 → 帶雜湊 zip 交件
   echo  matrix       總結矩陣（ENG-037）:成果×側車×DB 全盤點 HTML
   echo  slides       自動簡報（ENG-033）:板資料合成週報投影片,Ctrl+P 列印即簡報
