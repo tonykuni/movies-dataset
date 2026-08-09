@@ -206,7 +206,11 @@
   "引擎|workops_meetingloop_bridge_v0100": "ENG-048",
   "功能性工具|via_note_pro_standalone": "FNT-001",
   "引擎|via_dedup_index_v0100": "ENG-049",
-  "引擎|workops_accuracy_harness_v0100": "ENG-050"
+  "引擎|workops_accuracy_harness_v0100": "ENG-050",
+  "引擎|workops_commitment_intelligence_v0100": "ENG-051",
+  "引擎|workops_consistency_guard_v0100": "ENG-052",
+  "引擎|workops_project_health_v0100": "ENG-053",
+  "引擎|workops_unified_work_register_v0100": "ENG-054"
  },
  "ledger": [
   {
@@ -1166,6 +1170,46 @@
    "component": "外部 ENG050-053 套件評審文件歸戶 + 編號衝突裁定",
    "code": "VIA-EXTPKG-20260811",
    "note": "操作員上傳 10 檔兩批:7 檔 IDENTICAL=gapfill_v0200 評審包已在籍免上傳;3 檔新歸戶 docs/eng050_053_external_v0100/(QA/README/ReviewOnly 啟動器)。衝突裁定:外部套件自標 ENG-050..053 與本方帳本 ENG-050=accuracy_harness 相撞 — 依編號永不變+TheirCode 對照鐵律,外部碼一律對照不改,本方歸屬不動;四引擎(統一登記簿/承諾追蹤 CMT 族/一致性守衛/健康分)日後歸戶時領新號。後續四批補齊引擎本體:15/17 檔到齊全數 sha256 對 manifest 驗真,歸戶 candidates/eng050_053_external_v0100/;5 引擎 py_compile 全過+紅線掃描零命中+DECISIONS 11 欄 schema 與側車檔名全相容;差 BOARD_v0127 提案與 tests 2 檔候上傳;隨附能力矩陣 MISSING 判定過時(GapFill 七引擎已在籍 selftest 綠)。零啟用零接線零領號。"
+  },
+  {
+   "ts": "2026-08-11T09:00:00",
+   "op": "ASSIGN",
+   "category": "引擎",
+   "component": "workops_commitment_intelligence_v0100",
+   "code": "ENG-051",
+   "note": "APPLY ALL 令升籍(外部對照碼同號 ENG-051):承諾帳本 CMT-#### 編號族依令啟用 — 結構化 DEC/MLS 只成候選,create/accept/state/reschedule/fulfill 全人工;fulfill 無證據必敗。共用基底 workops_control_common.py 隨行入 engines/(側檔不領號)。verb:via-workops commitments。"
+  },
+  {
+   "ts": "2026-08-11T09:00:00",
+   "op": "ASSIGN",
+   "category": "引擎",
+   "component": "workops_consistency_guard_v0100",
+   "code": "ENG-052",
+   "note": "APPLY ALL 令升籍(外部對照碼同號 ENG-052):跨帳一致性守衛 — 唯讀矛盾報告(既閉 WOP 未結 DEC/MLS/CMT、未知 WOP 指向、依賴環、佇列已回未清)絕不自動修;規則嚴重度全 config/consistency_rules.json。verb:via-workops consistency。"
+  },
+  {
+   "ts": "2026-08-11T09:00:00",
+   "op": "ASSIGN",
+   "category": "引擎",
+   "component": "workops_project_health_v0100",
+   "code": "ENG-053",
+   "note": "APPLY ALL 令升籍(外部對照碼同號 ENG-053):可解釋專案健康分 — 進度=可得構面加權(里程碑40/承諾30/決策20/串10 正規化),健康=100 減透明扣分逐項列示;source_coverage=資料覆蓋非準確率,與 Gold Set 嚴格分離。verb:via-workops health。"
+  },
+  {
+   "ts": "2026-08-11T09:00:00",
+   "op": "ASSIGN",
+   "category": "引擎",
+   "component": "workops_unified_work_register_v0100",
+   "code": "ENG-054",
+   "note": "APPLY ALL 令升籍(外部自標 ENG-050 已屬 accuracy harness → 依編號永不變鐵律改領 ENG-054,兩碼對照入冊):統一工作登記簿 — FOLLOWUP/THREAD/DEC/MLS/CMT/會議行動/結案七源唯讀衍生總表 JSON+CSV,來源帳本仍為正本。verb:via-workops register。"
+  },
+  {
+   "ts": "2026-08-11T09:00:00",
+   "op": "UPDATE",
+   "category": "治理",
+   "component": "治理鏈全面接線(ALL v0106+板 v0127+selftest v0104)",
+   "code": "VIA-GOV-20260811",
+   "note": "APPLY ALL 令收尾:①ALL v0106 新 2e2 治理鏈段(候選→登記簿→守衛→健康分;守衛 FAIL=示警不改資料)AST 0 錯;②板 v0127 依 BOARD 提案:今日面四 KPI 磚(開放/逾期承諾、跨帳矛盾 E·W、警戒專案)+治理鏈即況表(每 WOP 進度/健康/首要扣分),覆蓋≠準確分離註記,視覺鎖定 v2 零觸動 — shim 44 斷言+側車缺席路徑全過;③selftest v0104 第 8 段照外部提案八點:候選不自動成 CMT/顯式 accept 發 CMT-0001/無證據 fulfill 必敗/登記簿四帳/守衛偵測既閉 WOP 未結 DEC(第 6 段天然矛盾)/健康分可解釋 — 8/8 綠;④cmd 四動詞接線全形括號 0 隱患;⑤全 py 編譯過+harness ALL PASS 迴歸綠。"
   }
  ]
 }

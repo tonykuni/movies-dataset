@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
-r"""Veritas WorkOps 全鏈自測器 v0103(ENG-032)— Integration + System Test 一鍵版
+r"""Veritas WorkOps 全鏈自測器 v0104(ENG-032)— Integration + System Test 一鍵版
+
+v0104(APPLY ALL 令:外部套件升籍 ENG-051..054):新增第 8 段 — 依外部
+  SELFTEST_v0103_PROPOSAL 八點:候選不自動成 CMT→顯式 accept 發 CMT-0001→
+  無證據 fulfill 必敗→統一登記簿含四帳→一致性守衛偵測既閉 WOP 之未結 DEC
+  (第 6 段 closure 天然注入之矛盾)→健康分可解釋扣分。沙箱同格,正本零觸碰。
 
 v0103(實機 KeyError 教訓):stage 3 沙箱信件原只蓋 V 層 — parser v0103 新層
   A/Q/E 於實機首命中 cmd_parse 計數器即炸而自測仍 7/7 綠。補 c7(A ACK 短覆)、
@@ -31,7 +36,10 @@ ENGINE_FILES = ["workops_lexicon.py", "workops_namer.py", "workops_wop_identifie
                 "workops_reply_parser.py", "workops_accuracy_benchmark.py", "workops_backup.py",
                 "workops_decision_log.py",
                 "workops_milestone_manager.py", "workops_closure_intelligence.py",
-                "workops_lesson_learned.py", "workops_unified_search.py"]
+                "workops_lesson_learned.py", "workops_unified_search.py",
+                "workops_control_common.py", "workops_commitment_intelligence.py",
+                "workops_consistency_guard.py", "workops_project_health.py",
+                "workops_unified_work_register.py"]
 DATA_FILES = ["identifier_params.json", "product_code_map.json", "reply_parser_params.json",
               "org_lexicon.json", "bulk_senders.txt", "domain_dict.txt", "holidays_tw.txt",
               "watchtower_params.json"]
@@ -112,6 +120,9 @@ def main():
             src = HERE / f
             if src.exists():
                 shutil.copy(src, eng / f)
+        cfg_src = HERE.parent / "config"
+        if cfg_src.exists():
+            shutil.copytree(cfg_src, sb / "config", dirs_exist_ok=True)
         build_fixtures(sb)
         out = sb / "out"
 
@@ -173,6 +184,34 @@ def main():
             rc3, _ = run_py(sb, "workops_backup.py", "restore", str(bks[-1]))
             bk_ok = rc2 == 0 and rc3 == 0 and (out / "restore_staging").exists()
         stage("7 備份→驗證→還原到暫存", bk_ok)
+
+        rc1, o1 = run_py(sb, "workops_commitment_intelligence.py", "candidates")
+        cand = json.loads((out / "commitment_candidates.json").read_text(encoding="utf-8")) if (out / "commitment_candidates.json").exists() else {}
+        no_auto = not (out / "commitments.json").exists() or not json.loads(
+            (out / "commitments.json").read_text(encoding="utf-8")).get("items")
+        has_dec_cand = any(c.get("candidate_id") == "DEC:DEC-0001" for c in cand.get("items", []))
+        rc2, o2 = run_py(sb, "workops_commitment_intelligence.py", "accept", "DEC:DEC-0001")
+        rc3, _ = run_py(sb, "workops_commitment_intelligence.py", "fulfill", "CMT-0001", "--evidence", "")
+        rc4, o4 = run_py(sb, "workops_commitment_intelligence.py", "fulfill", "CMT-0001", "--evidence", "EML-回簽")
+        rc5, o5 = run_py(sb, "workops_unified_work_register.py")
+        reg8 = json.loads((out / "unified_work_register.json").read_text(encoding="utf-8")) if (out / "unified_work_register.json").exists() else {}
+        types8 = set(reg8.get("by_type", {}))
+        rc6, o6 = run_py(sb, "workops_consistency_guard.py")
+        cons = json.loads((out / "consistency_report.json").read_text(encoding="utf-8")) if (out / "consistency_report.json").exists() else {}
+        codes8 = {f.get("code") for f in cons.get("findings", [])}
+        rc7, o7 = run_py(sb, "workops_project_health.py")
+        hl = json.loads((out / "project_health.json").read_text(encoding="utf-8")) if (out / "project_health.json").exists() else {}
+        h_items = hl.get("items", [])
+        h_ok = bool(h_items) and all(("health_score" in x and "penalties" in x) for x in h_items)
+        ok = (rc1 == 0 and no_auto and has_dec_cand
+              and rc2 == 0 and "CMT-0001" in o2
+              and rc3 != 0
+              and rc4 == 0 and "FULFILLED" in o4
+              and rc5 == 0 and {"DECISION", "MILESTONE", "COMMITMENT", "THREAD"} <= types8
+              and rc6 == 0 and "closed_has_open_decision" in codes8
+              and rc7 == 0 and h_ok)
+        stage("8 承諾→登記簿→一致性→健康分(ENG-051/054/052/053)", ok,
+              "CMT-0001 顯式納管 · 無證據必敗 · 守衛偵測既閉 WOP 未結 DEC")
 
         n_fail = sum(1 for r in RESULTS if r["gate"] == "FAIL")
         final = "PASS" if n_fail == 0 else "FAIL"

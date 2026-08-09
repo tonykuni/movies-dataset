@@ -35,6 +35,18 @@ if "%~1"=="" (
   ) else (
     py "%~dp0..\functional modules\WorkOps\engines\workops_accuracy_benchmark.py" %2 %3
   )
+) else if /i "%~1"=="commitments" (
+  rem ENG-051 承諾追蹤:candidates=候選 accept=納管 create/state/reschedule/fulfill 全人工確認,絕不自動生承諾
+  py "%~dp0..\functional modules\WorkOps\engines\workops_commitment_intelligence.py" %2 %3 %4 %5 %6 %7 %8 %9
+) else if /i "%~1"=="register" (
+  rem ENG-054 統一工作登記簿:唯讀衍生跨帳總表,來源帳本仍為正本
+  py "%~dp0..\functional modules\WorkOps\engines\workops_unified_work_register.py"
+) else if /i "%~1"=="consistency" (
+  rem ENG-052 跨帳一致性守衛:唯讀矛盾報告,絕不自動修
+  py "%~dp0..\functional modules\WorkOps\engines\workops_consistency_guard.py"
+) else if /i "%~1"=="health" (
+  rem ENG-053 可解釋專案健康分:進度加權 + 扣分逐項透明列示
+  py "%~dp0..\functional modules\WorkOps\engines\workops_project_health.py"
 ) else if /i "%~1"=="backup" (
   rem L06 安全車道:backup=備份側車正本 | verify=雜湊驗證 | restore=只還原到暫存
   py "%~dp0..\functional modules\WorkOps\engines\workops_backup.py" %2 %3
@@ -133,6 +145,10 @@ if "%~1"=="" (
   echo  all          總指揮:環境自癒 - 指揮板 - 深度鏈 - 總結表 [-Days n] [-SkipDeep] [-NoOpen]
   echo  deep         深度鏈 [-Days n] [-StartDate yyyy-MM-dd] [-EndDate yyyy-MM-dd]（尾端自動命名提議）
   echo  accuracy     準確度:template=產樣板 run=Gold Set 實測 harness=受控驗證（ENG-050）
+  echo  commitments  承諾追蹤（ENG-051）:candidates accept 候選ID create state reschedule fulfill
+  echo  register     統一工作登記簿（ENG-054）:唯讀跨帳總表 JSON+CSV
+  echo  consistency  跨帳一致性守衛（ENG-052）:唯讀矛盾報告不自動修
+  echo  health       可解釋專案健康分（ENG-053）:進度+扣分透明列示
   echo  backup       備份/驗證/還原到暫存:backup verify restore
   echo  selftest     全鏈自測（ENG-032）:沙箱實跑 命名-歸戶-回覆-準確度-會議決策-備份 六段
   echo  replies      M3 回覆解析:replies=三層判讀 status=現況
