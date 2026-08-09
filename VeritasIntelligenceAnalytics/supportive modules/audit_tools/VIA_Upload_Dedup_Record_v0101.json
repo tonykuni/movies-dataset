@@ -1,0 +1,16 @@
+{
+ "record_id": "VIA_Upload_Dedup_Record_v0101",
+ "ts": "2026-08-10T17:20:00",
+ "operator_order": "重傳五檔(無另令;依整合去重鐵律出判定,2026-08-10)",
+ "dedup": [
+  {"upload": "VIA_BatchMailer_v001.ps1", "sha256_16": "18a25495fc8e36c2", "verdict": "IDENTICAL_TO_QUARANTINED", "canon": "functional modules/WorkOps/VMT/quarantine/VIA_BatchMailer_v001.ps1.SEND_QUARANTINED", "redline": "含 $mail.Send() 與 $smtp.Send() — 觸犯「系統不可代為發送」紅線;維持隔離,不回歸 live;v002 草稿版(.Display()/.Save())候令"},
+  {"upload": "VIA_FIS_Validation_v3_1.py", "sha256_16": "77f21a1541bf8cda", "verdict": "IDENTICAL(第二次重傳)", "canon": "supportive modules/VIA_FlowSystem/VIA_FIS_Validation_v3.py"},
+  {"upload": "VIA_FIS_Backtest_Harness_1.py", "sha256_16": "cea5481f17f6d16e", "verdict": "IDENTICAL(第二次重傳)", "canon": "supportive modules/VIA_FlowSystem/VIA_FIS_Backtest_Harness.py"},
+  {"upload": "VIA_FlowSystem_OneShot_1.py", "sha256_16": "3f2f613521c9cbf8", "verdict": "IDENTICAL", "canon": "supportive modules/VIA_FlowSystem/VIA_FlowSystem_OneShot.py", "note": "庫內另有 VIA_FlowSystem_OneShot_v0101.py 新版並存(只增不減)"},
+  {"upload": "InvokeVPNSSelfBuild_2.ps1", "sha256_16": "8096b12a0930ca44", "verdict": "IDENTICAL", "canon": "supportive modules/VPNS/Invoke-VPNS-SelfBuild.ps1"}
+ ],
+ "conclusion": "五檔全 byte-identical 已在籍 — 零落籍零改動;BatchMailer 維持 SEND_QUARANTINED 隔離(紅線不回歸)",
+ "operator_verification": [
+  "via-sync"
+ ]
+}
