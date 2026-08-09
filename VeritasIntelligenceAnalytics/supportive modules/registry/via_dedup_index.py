@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-r"""VIA 整合去重引擎 v0104(ENG-049)— 操作員「整合優化」令
+r"""VIA 整合去重引擎 v0105(ENG-049)— 操作員「整合優化」令
 
 v0101 實戰修正(操作員 Downloads 掃描 Ctrl+C 誠實 FAIL):
   check 大檔預設略過(>200MB → SKIP_LARGE 判定,--all 才全查)— Downloads 常見
@@ -10,6 +10,9 @@ v0102「上船的資料去重留有用的」令:新 internal 動詞 — 庫內�
   USEFUL_UNIQUE=暫存區唯一正本 → 有用留用(候升籍)
   UPLOADS_ONLY_DUP=只在暫存區互重 / DUAL_CANON=正本區互重(只增不減,列示不動)
   全唯讀零刪除 — 出留用裁定表,清理永遠由人顯式決策。
+
+v0105 硬化令 OPTIMIZE:build 增量快取 — 前次索引之 path+size+mtime 命中者免重算
+  sha(VPNS Get-Sha12 快取先例);全新/變動檔才雜湊。重跑由全量降為增量。
 
 v0103 實戰修正(操作員 Downloads 全掃出兩真 bug):
   ①假紅線:隔離判定原為路徑含 quarantine 字串 → 檔名 _quarantine_gate_ 誤中,
@@ -64,16 +67,29 @@ def norm_name(name):
 
 
 def cmd_build():
-    by_sha, by_name, n = {}, {}, 0
+    cache = {}
+    if INDEX_P.exists():
+        try:
+            cache = json.loads(INDEX_P.read_text(encoding="utf-8")).get("stat", {})
+        except Exception:
+            cache = {}
+    by_sha, by_name, stat, n, hit = {}, {}, {}, 0, 0
     for dp, dns, fns in os.walk(ROOT):
         dns[:] = [d for d in dns if d not in EXCLUDE_DIRS]
         for fn in fns:
             p = Path(dp) / fn
+            rel = str(p.relative_to(ROOT))
             try:
-                sha = sha256_of(p)
+                st = p.stat()
+                key = [st.st_size, int(st.st_mtime_ns)]
+                c = cache.get(rel)
+                if c and c[0] == key[0] and c[1] == key[1]:
+                    sha = c[2]; hit += 1
+                else:
+                    sha = sha256_of(p)
             except Exception:
                 continue
-            rel = str(p.relative_to(ROOT))
+            stat[rel] = [key[0], key[1], sha]
             by_sha.setdefault(sha, []).append(rel)
             by_name.setdefault(norm_name(fn), []).append({"path": rel, "sha": sha})
             n += 1
@@ -81,8 +97,8 @@ def cmd_build():
     INDEX_P.write_text(json.dumps({
         "generated": datetime.now().isoformat(timespec="seconds"),
         "root": str(ROOT), "files": n,
-        "by_sha": by_sha, "by_name": by_name}, ensure_ascii=False), encoding="utf-8")
-    print("[索引] %d 檔入索引 → %s" % (n, INDEX_P))
+        "by_sha": by_sha, "by_name": by_name, "stat": stat}, ensure_ascii=False), encoding="utf-8")
+    print("[索引] %d 檔入索引(快取命中 %d,免重算)→ %s" % (n, hit, INDEX_P))
     print("[治理] 索引=可再生側車(不入 git);正本有增減後重跑 build 即新")
     return 0
 

@@ -1,0 +1,24 @@
+{
+ "record_id": "VIA_Hardening_Battery_Record_v0101",
+ "ts": "2026-08-11T04:20:00",
+ "operator_order": "TEST DEBUG OPTIMIZE TEST OPTIMIZE CONSOLIDATE TEST DEBUG USER-TEST DEBUG ACTIVATE TEST DEBUG TILL IT WORKS PERFECTLY(2026-08-11)",
+ "battery": {
+  "A_py_compile": "54 檔(WorkOps 引擎+MeetingLoop+VDF+dedup+Forge)→ 0 FAIL",
+  "B_ps1_AST": "六關鍵(板 v0125/ALL v0105/TrinityClosure/GapFill/MeetingLoop v005/VEGN v32)→ 0 錯",
+  "C_cmd_lint": "37 支啟動器 → 括號地雷 0;LF-only 11 支揪出並修(見 DEBUG)",
+  "D_selftest": "WorkOps 全鏈 7/7 FinalGate PASS",
+  "E_dedup": "build/internal/check/report 四動詞全綠(check 五判定路徑含隔離紅線)",
+  "F_redline": ".Send live 碼零命中(總收官基線)",
+  "G_meetingloop": "self-test gate PASS",
+  "H_shim": "板 v0125 DOM 33 斷言全過",
+  "I_json": "314 份 registry/manifest/record JSON 全解析 PASS"
+ },
+ "debug_fixes": [
+  "11 支 LF-only cmd 啟動器正規化 CRLF(via-all/via-code/via-shim/via-batch/via-tower/via-probe/via-vmt-init/via-sync/via-import/via-audit/via)— cmd.exe 對 LF-only 批次檔於括號塊/goto 有已知誤解析風險,先行排雷"
+ ],
+ "optimize": [
+  "ENG-049 v0105:build 增量快取(path+size+mtime 命中免重算 sha)— 容器實測 1.43s→0.29s(5763/5763 命中);操作員 OneDrive 碟收益更大;internal 判定數字驗證不變"
+ ],
+ "user_test": "操作員實機:via-sync → via-dedup build(看快取命中行)→ via-workops selftest → via-workops",
+ "activation": "全項綠燈即生效;無候修殘留"
+}
