@@ -210,9 +210,11 @@ def cmd_train():
 
 def _unparsed_docs():
     """與解析器同源取未解析件:mails.csv × scanrange body;parse_one=None 者。"""
-    from workops_reply_parser import load_params, load_scan_index, parse_one, read_csv
+    from workops_reply_parser import (load_params, load_scan_index, parse_one, read_csv,
+                                      load_corpus_bodies, body_for)
     mails = read_csv(OUT / "mails.csv")
     bodies, _ = load_scan_index()
+    corpus = load_corpus_bodies()
     params = load_params()
     items = []
     for r in mails:
@@ -221,7 +223,7 @@ def _unparsed_docs():
         conv = (r.get("ConversationID") or "").strip()
         if not conv:
             continue
-        b = bodies.get(conv, "")
+        b = body_for(bodies, corpus, conv, r.get("Subject"))
         if parse_one(r, b, params) is None:
             items.append({"conv": conv, "subj": (r.get("Subject") or "").strip(),
                           "from": (r.get("SenderEmail") or "").strip(),

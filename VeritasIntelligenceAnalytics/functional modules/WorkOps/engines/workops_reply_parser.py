@@ -1,5 +1,14 @@
 # -*- coding: utf-8 -*-
-r"""WorkOps 回覆解析引擎 v0104(ENG-029)— 規劃書 M3:回信 → 三層 fallback 解析 → 狀態事件
+r"""WorkOps 回覆解析引擎 v0105(ENG-029)— 規劃書 M3:回信 → 三層 fallback 解析 → 狀態事件
+
+v0105(操作員授權補強令:三方法齊上):
+  ①分母淨化 — 未解析只計「應答域」(RE/回覆前綴、已映射 THR、或我方已發追蹤之串;
+    bulk/系統寄件者剝除);域外通知另計 n_out 誠實列示,不再污染未解析 KPI。
+    域外信仍照常解析 — 有訊號照收事件,只是不佔未解析分母。
+  ②body 後備鏈 — scanrange 片段沒配到 conv 時退 corpus.csv(主旨正規化對映,
+    取最長 body)— A/Q/E/K 可判母體放大(實測 226/424 封有內文)。
+  ③主旨短覆 — body 空時取主旨尾段(剝 RE/FW/回覆/轉寄 前綴後之末段),
+    正規化 ≤ack_max_chars 且命中確認詞 → A 層「主旨短覆」。
 
 v0104(實機 FAIL 驅動熱修):cmd_parse 計數器原只開 V/T/K 三格 — A/Q/E 於
   操作員實機首度命中即 KeyError。補滿六層 + counts.get 防炸;彙總行顯示六層。
@@ -138,6 +147,34 @@ def load_scan_index():
     return m, outb
 
 
+REPLY_PFX_RE = re.compile(r"^\s*((re|fw|fwd|回覆|回复|轉寄|转发|答復|答复)\s*[::]\s*)+", re.I)
+
+
+def norm_subject(s):
+    """主旨正規化:剝 RE/FW/回覆 前綴 + 壓空白(body 後備鏈之對映鍵)。"""
+    return re.sub(r"\s+", "", REPLY_PFX_RE.sub("", str(s or ""))).lower()
+
+
+def load_corpus_bodies():
+    """v0105 body 後備鏈:corpus.csv 主旨正規化 → 最長 body。缺席誠實回空。"""
+    p = OUT / "deep" / "corpus" / "corpus.csv"
+    m = {}
+    for r in read_csv(p):
+        k = norm_subject(r.get("subject"))
+        b = (r.get("body") or "").strip()
+        if k and b and len(b) > len(m.get(k, "")):
+            m[k] = b
+    return m
+
+
+def body_for(bodies, corpus, conv, subject):
+    """取信體:scanrange conv 直配 → corpus 主旨後備。"""
+    b = bodies.get(conv, "")
+    if b:
+        return b
+    return corpus.get(norm_subject(subject), "")
+
+
 def detect_flags(row, body, params):
     """v0101:OOO 與風險語意(獨立於狀態判讀;flags 不覆蓋 V/T/K 結果)。"""
     text = ((row.get("Subject") or "") + "\n" + (body or "")).lower()
@@ -178,6 +215,14 @@ def parse_one(row, body, params):
         for t in params.get("ack_terms", []):
             if t.lower() in core.lower():
                 return "A", "已回覆確認", "ACK 短覆「%s」" % core[:12]
+    # v0105 ③主旨短覆:body 空時取主旨尾段(剝 RE/FW 前綴後之末段)
+    if not (body or "").strip():
+        tail = re.split(r"[-—:|/]", REPLY_PFX_RE.sub("", (row.get("Subject") or "")))[-1]
+        tcore = re.sub(r"[\s。,,!!??\~~\.…]+", "", tail)
+        if 0 < len(tcore) <= int(params.get("ack_max_chars", 12)):
+            for t in params.get("ack_terms", []):
+                if t.lower() in tcore.lower():
+                    return "A", "已回覆確認", "主旨短覆「%s」" % tcore[:12]
     # Q 問句層:含問號且短 → 對方提問(球在我方)
     if ("?" in (body or "") or "?" in (body or "")) and len(core) <= int(params.get("question_max_chars", 60)):
         return "Q", "對方提問", "問句回覆(需我方回答)"
@@ -223,12 +268,15 @@ def cmd_parse():
     led = load_json(LEDGER_P, {"map": {}})
     conv2thr = {k[4:]: v for k, v in led.get("map", {}).items() if k.startswith("THR|")}
     bodies, outbound = load_scan_index()
+    corpus = load_corpus_bodies()
+    from workops_lexicon import load_bulk_patterns, is_bulk
+    bulk_pats = load_bulk_patterns() + ["no-reply", "noreply", "donotreply", "newsletter", "epaper"]
     params = load_params()
     seen = load_seen()
     from datetime import datetime
     now = datetime.now().isoformat(timespec="seconds")
     counts = {"V": 0, "T": 0, "K": 0, "A": 0, "Q": 0, "E": 0}
-    n_un = n_dup = 0
+    n_un = n_dup = n_out = 0
     un_sample = []
     events = []
     flags = {}
@@ -251,7 +299,7 @@ def cmd_parse():
         if key in seen:
             n_dup += 1
             continue
-        b = bodies.get(conv, "")
+        b = body_for(bodies, corpus, conv, r.get("Subject"))
         ooo, risks, agent = detect_flags(r, b, params)
         thr0 = conv2thr.get(conv, "") or conv
         if ooo or risks:
@@ -265,6 +313,12 @@ def cmd_parse():
                 fl["risk_terms"] = sorted(set(fl.get("risk_terms", []) + risks))
         got = parse_one(r, b, params)
         if got is None:
+            # v0105 ①分母淨化:未解析只計應答域(RE 前綴/已映射 THR/我方已發追蹤);bulk 與域外通知另計
+            in_scope = (bool(REPLY_PFX_RE.match(r.get("Subject") or ""))
+                        or conv in conv2thr or thr0 in sent_stage)
+            if is_bulk(r.get("SenderEmail"), bulk_pats) or not in_scope:
+                n_out += 1
+                continue
             n_un += 1
             if len(un_sample) < 40:
                 un_sample.append({"thr": conv2thr.get(conv, ""), "subj": (r.get("Subject") or "")[:60],
@@ -301,14 +355,14 @@ def cmd_parse():
                 status[t] = {"status": e["status"], "layer": e["layer"],
                              "mail_date": e.get("mail_date", ""), "evidence": e.get("evidence", "")}
     tmp = STATUS_P.with_suffix(".tmp")
-    tmp.write_text(json.dumps({"version": "v0102", "updated": now, "status": status,
+    tmp.write_text(json.dumps({"version": "v0105", "updated": now, "status": status,
                                "flags": flags, "sent_stage": sent_stage,
-                               "unparsed": {"n": n_un, "sample": un_sample}},
+                               "unparsed": {"n": n_un, "sample": un_sample, "out_of_scope": n_out}},
                               ensure_ascii=False, indent=1), encoding="utf-8")
     tmp.replace(STATUS_P)
-    print("[解析] 新事件 %d(投票 %d · token %d · 關鍵詞 %d · ACK %d · 問句 %d · 集成 %d)· 已記略過 %d · 未解析 %d(誠實不猜)"
+    print("[解析] 新事件 %d(投票 %d · token %d · 關鍵詞 %d · ACK %d · 問句 %d · 集成 %d)· 已記略過 %d · 未解析 %d(應答域;誠實不猜)· 域外/系統信 %d 不計分母"
           % (len(events), counts["V"], counts["T"], counts["K"],
-             counts["A"], counts["Q"], counts["E"], n_dup, n_un))
+             counts["A"], counts["Q"], counts["E"], n_dup, n_un, n_out))
     n_ooo = sum(1 for f in flags.values() if f.get("ooo"))
     n_risk = sum(1 for f in flags.values() if f.get("risk"))
     if n_ooo or n_risk or sent_stage:
