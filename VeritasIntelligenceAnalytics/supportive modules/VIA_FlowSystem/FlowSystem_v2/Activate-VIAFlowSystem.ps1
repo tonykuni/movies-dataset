@@ -26,6 +26,7 @@ $script:TierMap  = Join-Path $script:Root "tier_flow.html"
 $script:MapSim   = Join-Path $script:Root "global_map_sim.html"
 $script:PerfTrend= Join-Path $script:Root "perf_trend.html"
 $script:Monitor  = Join-Path $script:Root "flow_monitor.html"
+$script:Hub     = Join-Path $script:Root "flow_hub.html"
 $script:Calib   = Join-Path $script:Root "data/output/calibration.json"
 
 function Resolve-PythonExe {
@@ -101,7 +102,11 @@ if (Test-Path $script:Calib) {
 }
 
 # --- front-end: open the synced HTML (LL#12 override: auto-open HTML allowed) ---
-if ((Test-Path $script:Report) -and (-not $NoOpen)) {
+if ((Test-Path $script:Hub) -and (-not $NoOpen)) {
+    # v0100R 介面整合令:只開整合 Hub 一窗(理論總覽+六視圖側欄切換),不再彈六窗
+    Write-Host ("[ui] opening HUB(one window) {0}" -f $script:Hub)
+    Start-Process $script:Hub
+} elseif ((Test-Path $script:Report) -and (-not $NoOpen)) {
     Write-Host ("[ui] opening {0}" -f $script:Report)
     Start-Process $script:Report
     if (Test-Path $script:WorldMap) {

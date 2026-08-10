@@ -25,6 +25,7 @@ import flow_bridge  # noqa: E402
 import flow_calibrate  # noqa: E402
 import flow_factors  # noqa: E402
 import flow_grid  # noqa: E402
+import flow_hub  # noqa: E402
 import flow_macro  # noqa: E402
 import flow_monitor  # noqa: E402
 import flow_perf  # noqa: E402
@@ -178,6 +179,10 @@ def main():
         r = flow_pillar_a.validate_a(_rows(panel))
         print("[validate-a] %s — %s" % (r["status"], r["reason"]))
         return 0
+    if cmd == "hub":
+        flow_hub.build_hub()
+        print("[hub] flow_hub.html(一窗到底:理論總覽+六視圖側欄切換)")
+        return 0
     if cmd == "macro":
         panel, _ = _panel()
         mo = flow_macro.build_overlay(_rows(panel))
@@ -260,10 +265,11 @@ def main():
         grid = json.loads((OUT / "grid.json").read_text(encoding="utf-8-sig"))
         fx = json.loads((OUT / "factors.json").read_text(encoding="utf-8-sig"))
         flow_ui.build_index(rows, cal, st, grid, fx, mo)
-        print("[ui] index.html + world_flow + tier_flow + global_map_sim + perf_trend + flow_monitor")
+        flow_hub.build_hub()
+        print("[ui] flow_hub.html(一窗)+ 六視圖(index/world/tier/sim/perf/monitor)")
         _ledger("all", st["solid"])
         return 0
-    print("未知命令:%s(可用:synth|selftest|autotest|calibrate|factors|run|validate-a|grid|macro|worldmap|sim|perf|monitor|status|ui|all|live|harden)" % cmd)
+    print("未知命令:%s(可用:synth|selftest|autotest|calibrate|factors|run|validate-a|grid|macro|hub|worldmap|sim|perf|monitor|status|ui|all|live|harden)" % cmd)
     return 2
 
 

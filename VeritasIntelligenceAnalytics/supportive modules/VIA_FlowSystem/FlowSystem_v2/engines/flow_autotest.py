@@ -83,6 +83,10 @@ def run():
     ok("nav_chain_six", all(nm in flow_ui.nav_strip("index.html")
        for nm in ("world_flow.html", "tier_flow.html", "global_map_sim.html",
                   "perf_trend.html", "flow_monitor.html")), "六介面互串")
+    import flow_hub
+    hub = flow_hub.build_hub(write=False)
+    ok("hub_one_window", all(k in hub for k in ("理論總覽", "判讀四象限", "三層驗證",
+       "引擎關聯", 'data-src="index.html"', 'data-src="flow_monitor.html"')), "一窗整合+理論圖全在")
 
     print("-" * 56)
     print("  [selftest 內嵌執行]")

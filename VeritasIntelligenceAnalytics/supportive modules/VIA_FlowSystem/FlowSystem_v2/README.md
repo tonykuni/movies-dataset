@@ -283,3 +283,18 @@ UI 新增硬化條與 `tHAC`/`lead` 指標;`harden` 命令現跑 19 測試。
 - **manager**:新 `macro` 命令,已串進 `all`/`live`;autotest 16/16(+macro_overlay_engine/
   macro_verdict_rule/ui_macro_card/nav_chain_six)。
 - 註:本節建於 v0100R 重建樹;原 session 檔到件依整合去重裁定合流。
+
+---
+
+## v0122R — 整合 Hub 一窗到底 + 理論總覽(2026-08-12 操作員令)
+
+「理論整合 所有跳出來的介面整合 用流程圖說明邏輯 圖示說明清楚邏輯清楚各項關聯清楚重整介面」:
+
+- **`flow_hub.py`(第 18 引擎)→ `flow_hub.html`**:固定左側欄(VRN 側欄規約同族)00-06
+  七頁一窗切換;六視圖 iframe 內嵌懶載(點到才載,啟動秒開;同資料夾離線)。
+  **啟動器自此只開 Hub 一窗** — Activate hub-first,不再彈六窗(hub 缺才退舊行為)。
+- **00 理論總覽(全 SVG 自含)**:①全鏈流程圖(資料側車→FIS 核心→校準迴圈→三層驗證→
+  宏觀對照→六視圖,箭頭標資料物)②判讀四象限(FIS×宏觀分;圖示=行動:✅順風流入/
+  ⚠️背離慎追/🌱轉折關注/🍂順風流出)③三層 SOLID AND 關係圖 ④引擎五層關聯圖
+  (資料→核心→驗證→呈現→編排;18 支誰餵誰誰把關誰)+ 核心公式四條(FIS/GRAM/宏觀分/評價 V)。
+- manager 新 `hub` 命令,all/live 鏈尾自動重生;autotest 17/17(+hub_one_window)。
