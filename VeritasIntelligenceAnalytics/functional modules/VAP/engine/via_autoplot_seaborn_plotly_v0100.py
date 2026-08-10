@@ -350,8 +350,8 @@ def demo_data(chart_id: str) -> Dict[str, Any]:
         return {"date": dates, "value": _walk(rng, n, 120.0, 3.2, 0.3),
                 "sel_start": 10, "sel_end": 24}
     if chart_id == "map":
-        return {"region": ["United States", "Germany", "Japan", "Taiwan", "United Kingdom",
-                           "France", "South Korea", "China"],
+        return {"region": ["USA", "DEU", "JPN", "TWN", "GBR", "FRA", "KOR", "CHN"],
+                "name": ["美國", "德國", "日本", "台灣", "英國", "法國", "南韓", "中國"],
                 "value": [round(rng.uniform(1.0, 5.0), 2) for _ in range(8)],
                 "change": [round(rng.uniform(-1.5, 1.5), 2) for _ in range(8)]}
     if chart_id == "roll":
@@ -496,6 +496,29 @@ def rule_number(meta: Dict[str, Any], pattern: str, fallback: float) -> float:
 def importance_color(spec: Spec, level: int) -> str:
     """經濟日曆重要度三階:紅(高)黃(中)綠(低)— 語意色 + via 色序之琥珀。"""
     return {3: spec.up, 2: spec.palette[1], 1: spec.down}.get(int(level), spec.neutral)
+
+
+# VAP-CH-16 地圖:常用國名 → ISO-3(plotly locationmode=ISO-3;country names 已被
+# plotly 標示棄用方向,三碼定位對未來版本免疫)
+_ISO3 = {
+    "united states": "USA", "germany": "DEU", "japan": "JPN", "taiwan": "TWN",
+    "united kingdom": "GBR", "france": "FRA", "south korea": "KOR", "china": "CHN",
+    "hong kong": "HKG", "singapore": "SGP", "canada": "CAN", "australia": "AUS",
+    "italy": "ITA", "spain": "ESP", "netherlands": "NLD", "switzerland": "CHE",
+    "india": "IND", "brazil": "BRA", "mexico": "MEX", "indonesia": "IDN",
+    "美國": "USA", "德國": "DEU", "日本": "JPN", "台灣": "TWN", "英國": "GBR",
+    "法國": "FRA", "南韓": "KOR", "中國": "CHN", "香港": "HKG", "新加坡": "SGP",
+}
+
+
+def to_iso3(region: str) -> str:
+    r = str(region).strip()
+    if re.fullmatch(r"[A-Za-z]{3}", r):
+        return r.upper()
+    key = r.lower()
+    if key in _ISO3:
+        return _ISO3[key]
+    raise VAPError("VAP-CH-16 地區 %r 無法解析為 ISO-3 — 請直接提供三碼(例:TWN/USA/DEU)" % region)
 
 # ============================================================================
 # §5 Seaborn / matplotlib 後端(靜態 PNG · export.png 規則)
@@ -1515,11 +1538,13 @@ class PlotlyBackend:
     def p_map(self, d, meta):
         s = self.spec
         tri = ["▲" if c >= 0 else "▼" for c in d["change"]]
+        names = d.get("name", d["region"])
         fig = self.go.Figure(self.go.Choropleth(
-            locations=d["region"], locationmode="country names", z=d["change"],
+            locations=[to_iso3(r) for r in d["region"]], locationmode="ISO-3",
+            z=d["change"],
             colorscale=[[p, c] for p, c in s.corr_scale], zmid=0,
-            text=["%s %s %+0.2f(水準 %s)" % (r, t, c, v)
-                  for r, t, c, v in zip(d["region"], tri, d["change"], d["value"])],
+            text=["%s %s %+0.2f(水準 %s)" % (n, t, c, v)
+                  for n, t, c, v in zip(names, tri, d["change"], d["value"])],
             hovertemplate="%{text}<extra></extra>",
             colorbar=dict(title="漲跌", thickness=12)))
         layout = self._layout(meta, hovermode="closest", showlegend=False)
