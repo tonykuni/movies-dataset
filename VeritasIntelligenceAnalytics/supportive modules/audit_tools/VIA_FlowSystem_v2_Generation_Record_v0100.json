@@ -1,0 +1,41 @@
+{
+ "record_id": "VIA_FlowSystem_v2_Generation_Record_v0100",
+ "ts": "2026-08-12T05:00:00",
+ "authority": "操作員令 2026-08-12「缺乏請生成,與u/i相互符合對其」— via-wf status 唯一缺席項 = FlowSystem v2 引擎樹 flow_*.py(0/16;原記候上傳)",
+ "method": "以 FlowSystem_v2/README.md(記錄至 v0120)為權威規格重建生成(AI 只整理不發明 — README 即該 session 留下的規格書);每檔檔頭標 v0100R,原 session 檔到件依整合去重裁定替換",
+ "engines_16": {
+  "flow_core.py": "FIS(z→100·tanh)· 雙估計器 stale-shares CONFLICT · #1 分割守衛 · #7 新生排除(confidence D)· #14 權重上限 0.25 · role 閘門(期貨/FX positioning 不進現貨池)· GRAM 雙形(標準化+raw)· RORO · snapshot(#5 幣別/#10 體制/#19 region=曝險非來源)",
+  "flow_validate.py": "rank IC(零依賴)· ICIR · t · #11 Newey-West HAC t · G004 五分位單調 · G008 LS Sharpe 扣成本 · G002 K=15 置換 null · #15 G010 lead_ratio 反身性分解 · evaluate 全閘",
+  "flow_calibrate.py": "train/OOS 切分 · grid(window×kappa×min_tier)· DEBUG 逐組記失敗 gate · best=ICIR 最高 · G009 OOS 同號顯著 · PROVED_VALID/NOT_VALID + calibrated_params 回寫",
+  "flow_manager.py": "16 動詞 CLI 編排 · synth(alpha 控結構)· run_ledger.jsonl append-only · 三層 status(SOLID 全綠才立)· all/live 全鏈",
+  "flow_selftest.py": "README v0103 涵蓋清單 14 項邊界測試",
+  "flow_autotest.py": "12 項:五硬化(split/inception/weight_cap/taxonomy_sens/falsifiability)+六引擎建構+selftest 內嵌",
+  "flow_pillar_a.py": "VAL-G001 對真值 rank-corr+符號;reference 缺=UNCALIBRATED 誠實降 NOT_SOLID(不假裝校準)",
+  "flow_factors.py": "三因子+noise probe;閘=|t|≥2 統計顯著(QA 中由 IC 門檻改為 t — 小樣本隨機不再誤收)",
+  "flow_roles.py": "monitor_role 閘門+分類存取(universe 單一事實源)",
+  "flow_bridge.py": "真實資料入口(daily_data/perf_prices/reference_flows 側車;零爬站只讀本地)",
+  "flow_grid.py": "Region×Sector(US direct·餘 proxy=錨點×US tilt 簡式)+ Fidelity 評分卡 10 類(weak 明標)",
+  "flow_ui.py": "index.html 三分頁+三層橫幅+tier ladder+GRAM+因子庫+硬化條;TOKENS=WorkOps v2 視覺鎖單一事實源(六 UI 共用)",
+  "flow_worldmap.py": "world_flow+tier_flow 自含 SVG 動畫;真實 panel 26 幀(date-key str 對齊)/無資料退情境",
+  "flow_sim.py": "global_map_sim 三維合一(區域/風險層/類型)+84 步時間軸+區間累積+評價 V+自動結論+ground_loadings(FM#1 載荷回歸,標 estimated/prior)",
+  "flow_perf.py": "正規化走勢(基準=100 可調)+主題分類五群+勾選過濾+範圍鈕+線粗規格;perf_prices.json 在位自動切真實",
+  "flow_monitor.py": "族群整合監控(方向+強度+sparkline)+採用項目專頁(70 檔 T1-T4/走勢標的/模擬節點/資料來源)"
+ },
+ "ui_alignment": "與 U/I 相互符合對齊:flow_ui.TOKENS 採 WorkOps v2 視覺鎖 token(bg #f2f1ec/paper/ink #1b1a17/line #dcdad3/teal #3d8f8f/via combo)· DM Mono kicker · 圓角 8/6 · RWD ≤760px · 零 CDN 全自含 — 六件 UI 同語彙",
+ "qa": {
+  "compile": "16 檔 py_compile 綠",
+  "selftest": "14/14 PASS",
+  "autotest": "12/12 PASS(含五硬化)",
+  "falsifiability_both_ends": "alpha=0 → NOT_VALID(0 組過,G003_icir 全滅)· alpha=0.35 → PROVED_VALID(IC 0.1721 · t 14.25 · OOS 同號)— 系統沒訊號報沒訊號,有訊號能證明",
+  "full_chain": "manager all → calibrate/run/factors/validate-a/grid/worldmap/sim/perf/monitor/status/ui 全通,六 UI 產出",
+  "playwright": "index/global_map_sim/flow_monitor 三頁零 pageerror,截圖目檢過",
+  "fixes_during_qa": ["noise 因子閘 IC 門檻→t 統計量(小樣本隨機不誤收)", "synth 傳導校準 0.0016→0.006(正向端也要能證明)", "synth 側車不冒充真實 bridge(source 欄誠實判別)"]
+ },
+ "honest_notes": [
+  "SOLID 現況=NOT_SOLID:Pillar A 真值(ICI/issuer NAV/CFTC COT)未接 — 這是誠實正確行為,非缺陷",
+  "worldmap/sim 以自含 SVG 實作(plotly 原版行為之等效離線線);原 session 檔到件替換",
+  "grid proxy 公式為 v0100R 簡式(0.5 錨點+0.5 tilt),原式到件替換",
+  "產物(data/+六 html)入 gitignore — manager all 隨時重生"
+ ],
+ "registry": "ENG-061;ledger 152"
+}

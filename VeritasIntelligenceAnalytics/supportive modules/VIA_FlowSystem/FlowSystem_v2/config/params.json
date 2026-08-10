@@ -1,0 +1,53 @@
+{
+ "_note": "v0100R 重建版(依 README v0120 規格重建;原 session 檔到件依整合去重裁定替換)",
+ "fis": {
+  "window": 20,
+  "kappa": 1.5,
+  "min_tier": "B",
+  "weight_cap": 0.25,
+  "inception_buffer": 20
+ },
+ "gates": {
+  "G002_null_p": 0.1,
+  "G003_ic_min": 0.02,
+  "G003_icir_min": 0.5,
+  "G003_t_min": 2.0,
+  "G004_quantile_mono": true,
+  "G008_ls_sharpe_min": 0.5,
+  "G008_cost_bps": 5,
+  "G009_oos_confirm": true,
+  "G010_lead_min": 0.5,
+  "G011_thac_min": 2.0
+ },
+ "calibration": {
+  "train_frac": 0.7,
+  "grid": {
+   "window": [
+    10,
+    20,
+    40
+   ],
+   "kappa": [
+    1.0,
+    1.5,
+    2.0
+   ],
+   "min_tier": [
+    "B",
+    "C"
+   ]
+  },
+  "objective": "icir",
+  "null_permutations": 15
+ },
+ "synthetic": {
+  "n_days": 260,
+  "alpha": 0.35,
+  "noise": 1.0,
+  "seed": 20260812
+ },
+ "gram": {
+  "kappa": 1.5,
+  "raw_threshold": 0.05
+ }
+}
