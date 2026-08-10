@@ -1,0 +1,819 @@
+{
+  "ssot_id": "SSOT_ChipWar",
+  "version": "v0.12.0",
+  "created": "2026-07-10",
+  "parent_codex": "VIA_Master_Codex.md v0500",
+  "governance": {
+    "append_only": true,
+    "mutation_policy": "INSERT only; corrections via new row with supersedes_row_id; hard delete requires quarantine token",
+    "temporal_discipline": "T-1: every fact row carries trade_date AND release_ts; joins to price/return use DuckDB ASOF JOIN on release_ts <= decision_ts",
+    "evidence_tiers": {
+      "T1": "official exchange raw file (TWSE/TPEx/TAIFEX/TDCC), checksum stored",
+      "T2": "official aggregate derived by VIA from T1",
+      "T3": "heuristic proxy (broker-branch attribution, foreign-branch labels) - corroboration only, never sole basis",
+      "T4": "synthetic placeholder for pipeline testing - MUST NOT enter live decisions"
+    },
+    "parse_gate": "parse_errors==0 AND schema_conformance==pass required before promotion from _generated/staging to live tree",
+    "completeness_honesty": "missing = NULL rendered as dash; synthetic fill forbidden outside T4-labeled test runs"
+  },
+  "actors": {
+    "foreign": {
+      "zh": "外資及陸資",
+      "role_hypothesis": "beta / direction leader in liquidity regime"
+    },
+    "invest_trust": {
+      "zh": "投信",
+      "role_hypothesis": "mid-small cap alpha leader in chip-war regime"
+    },
+    "dealer": {
+      "zh": "自營商",
+      "role_hypothesis": "hedging / market-making noise, split self vs hedge"
+    },
+    "margin_retail": {
+      "zh": "融資散戶",
+      "role_hypothesis": "momentum follower, contrarian signal at extremes"
+    },
+    "big_holders": {
+      "zh": "集保大戶(>=400/1000張)",
+      "role_hypothesis": "chip-lock; weekly, slow, structural"
+    },
+    "day_traders": {
+      "zh": "當沖",
+      "role_hypothesis": "marginal intraday pricing, heat proxy"
+    }
+  },
+  "tables": {
+    "flows_daily": {
+      "grain": "trade_date x scope(TAIEX|group|ticker) x actor",
+      "columns": {
+        "row_id": "BIGINT identity",
+        "trade_date": "DATE",
+        "release_ts": "TIMESTAMP  -- official publication time; TWSE inst. flows ~ T 16:00, usable T+1 open",
+        "scope_type": "VARCHAR  -- index|group|ticker",
+        "scope_id": "VARCHAR   -- ^TWII | VIA group name | TW ticker",
+        "actor": "VARCHAR",
+        "net_buy_twd": "DOUBLE",
+        "gross_buy_twd": "DOUBLE NULL",
+        "gross_sell_twd": "DOUBLE NULL",
+        "evidence_tier": "VARCHAR",
+        "evidence_status": "VARCHAR",
+        "src_checksum": "VARCHAR NULL",
+        "supersedes_row_id": "BIGINT NULL"
+      }
+    },
+    "futures_oi": {
+      "grain": "trade_date x contract x actor",
+      "columns": {
+        "row_id": "BIGINT",
+        "trade_date": "DATE",
+        "release_ts": "TIMESTAMP",
+        "contract": "VARCHAR  -- TX|MTX|TMF|stock_futures_agg",
+        "actor": "VARCHAR",
+        "long_oi": "DOUBLE",
+        "short_oi": "DOUBLE",
+        "net_oi": "DOUBLE",
+        "evidence_tier": "VARCHAR",
+        "evidence_status": "VARCHAR",
+        "supersedes_row_id": "BIGINT NULL"
+      },
+      "note": "spot-futures consistency check: foreign net_buy_twd sign vs TX net_oi sign; divergence flag = hedged/passive flow suspicion"
+    },
+    "margin_sbl": {
+      "grain": "trade_date x scope",
+      "columns": {
+        "row_id": "BIGINT",
+        "trade_date": "DATE",
+        "release_ts": "TIMESTAMP",
+        "scope_type": "VARCHAR",
+        "scope_id": "VARCHAR",
+        "margin_balance_twd": "DOUBLE",
+        "margin_chg_twd": "DOUBLE",
+        "short_balance_shares": "DOUBLE NULL",
+        "sbl_short_balance_shares": "DOUBLE NULL  -- 借券賣出餘額",
+        "day_trade_ratio": "DOUBLE NULL",
+        "evidence_tier": "VARCHAR",
+        "evidence_status": "VARCHAR",
+        "supersedes_row_id": "BIGINT NULL"
+      }
+    },
+    "tdcc_weekly": {
+      "grain": "week_end_date x ticker x bracket",
+      "columns": {
+        "row_id": "BIGINT",
+        "week_end_date": "DATE",
+        "release_ts": "TIMESTAMP  -- TDCC publishes following business day; ASOF only",
+        "ticker": "VARCHAR",
+        "bracket": "VARCHAR  -- <10 | 10-50 | ... | 400-600 | 600-800 | 800-1000 | >1000 (張)",
+        "holders": "BIGINT",
+        "shares": "DOUBLE",
+        "pct": "DOUBLE",
+        "evidence_tier": "VARCHAR",
+        "evidence_status": "VARCHAR",
+        "supersedes_row_id": "BIGINT NULL"
+      },
+      "derived": "big_holder_pct = sum(pct where bracket >= 400張); retail_holders = holders where bracket < 10張; distribution_flag = big_pct down AND retail_holders up"
+    },
+    "prices_daily": {
+      "grain": "trade_date x scope",
+      "columns": {
+        "row_id": "BIGINT",
+        "trade_date": "DATE",
+        "scope_type": "VARCHAR",
+        "scope_id": "VARCHAR",
+        "close_adj": "DOUBLE",
+        "ret_1d": "DOUBLE",
+        "volume_twd": "DOUBLE",
+        "evidence_tier": "VARCHAR",
+        "evidence_status": "VARCHAR"
+      }
+    },
+    "regime_daily": {
+      "grain": "trade_date (engine output, append-only)",
+      "columns": {
+        "row_id": "BIGINT",
+        "trade_date": "DATE",
+        "run_id": "VARCHAR",
+        "breadth_z": "DOUBLE",
+        "corr_z": "DOUBLE  -- avg pairwise corr of group returns, rolling",
+        "foreign_share_z": "DOUBLE",
+        "itrust_share_z": "DOUBLE",
+        "hhi_gain_z": "DOUBLE  -- concentration of gains across groups",
+        "margin_breadth_z": "DOUBLE",
+        "chipwar_score": "DOUBLE  -- 0=liquidity(資金盤) .. 1=chip-war(籌碼戰), logistic of weighted z",
+        "dominant_actor": "VARCHAR",
+        "dominant_ic_clean": "DOUBLE",
+        "evidence_tier": "VARCHAR"
+      }
+    },
+    "dominance_ic": {
+      "grain": "window_end_date x scope x actor x mode",
+      "columns": {
+        "row_id": "BIGINT",
+        "window_end_date": "DATE",
+        "run_id": "VARCHAR",
+        "scope_type": "VARCHAR",
+        "scope_id": "VARCHAR",
+        "actor": "VARCHAR",
+        "mode": "VARCHAR  -- clean(T-1 ASOF) | leaky(T+0 lookahead)",
+        "window_days": "INTEGER",
+        "fwd_horizon_days": "INTEGER",
+        "spearman_ic": "DOUBLE  -- scipy.stats.spearmanr ONLY (LL: never Pearson)",
+        "ic_orthogonal": "DOUBLE  -- incremental IC after sequential residualization",
+        "n_obs": "INTEGER",
+        "evidence_tier": "VARCHAR"
+      }
+    },
+    "macro_series": {
+      "grain": "obs_date x series_id",
+      "columns": {
+        "row_id": "BIGINT",
+        "obs_date": "DATE",
+        "release_ts": "TIMESTAMP  -- CRITICAL: M1B/M2 published ~25th of NEXT month; FRED weekly H.4.1 Thu 16:30 ET; ASOF on release_ts not obs_date",
+        "series_id": "VARCHAR",
+        "value": "DOUBLE",
+        "evidence_tier": "VARCHAR",
+        "evidence_status": "VARCHAR",
+        "supersedes_row_id": "BIGINT NULL  -- macro data gets REVISED; revision = new row"
+      },
+      "note": "macro revisions are the classic leak: first-release value vs revised value differ; store vintage via supersedes chain"
+    },
+    "fomo_daily": {
+      "grain": "trade_date",
+      "columns": {
+        "row_id": "BIGINT",
+        "trade_date": "DATE",
+        "run_id": "VARCHAR",
+        "margin_growth_z": "DOUBLE",
+        "daytrade_ratio_z": "DOUBLE",
+        "retail_holders_z": "DOUBLE  -- TDCC <10張戶數增速(週,ASOF)",
+        "volume_surge_z": "DOUBLE",
+        "newhigh_breadth_z": "DOUBLE",
+        "fomo_score": "DOUBLE  -- 0-100 composite",
+        "evidence_tier": "VARCHAR"
+      }
+    },
+    "concentration_daily": {
+      "grain": "trade_date (engine output, append-only)",
+      "columns": {
+        "row_id": "BIGINT",
+        "trade_date": "DATE",
+        "run_id": "VARCHAR",
+        "spread_cum": "DOUBLE  -- tech-trad 累積報酬價差",
+        "tech_flow_share": "DOUBLE  -- tech bloc share of |institutional flows|",
+        "tech_breadth_share": "DOUBLE  -- share of up-groups that are tech",
+        "opportunity_width": "DOUBLE  -- % groups with positive 20d momentum: LOW = limited choices",
+        "flow_hhi": "DOUBLE  -- HHI of |flows| across groups",
+        "crowding_index": "DOUBLE  -- 0-1 composite",
+        "evidence_tier": "VARCHAR"
+      }
+    },
+    "social_posts": [
+      {
+        "grain": "post_id (raw layer, append-only, immutable)",
+        "columns": {
+          "row_id": "BIGINT",
+          "post_id": "VARCHAR",
+          "platform": "VARCHAR  -- ptt_stock|dcard_stock|mobile01|cmoney|gtrends|youtube",
+          "posted_ts": "TIMESTAMP",
+          "fetched_ts": "TIMESTAMP  -- ASOF on fetched_ts: deleted posts leave holes, fetch time = knowledge time",
+          "title": "VARCHAR",
+          "body_hash": "VARCHAR  -- store hash + local blob, not raw text in SSOT",
+          "n_comments": "INTEGER",
+          "n_upvote": "INTEGER",
+          "n_downvote": "INTEGER",
+          "tickers_mentioned": "VARCHAR[]",
+          "groups_mentioned": "VARCHAR[]",
+          "lexicon_hits": "JSON  -- {boarding: n, capitulation: n, leverage: n, ...}",
+          "evidence_tier": "VARCHAR  -- T2 derived from public posts; NEVER T1 (self-reported, unverifiable)",
+          "evidence_status": "VARCHAR"
+        }
+      }
+    ],
+    "social_fomo_daily": {
+      "grain": "trade_date x platform",
+      "columns": {
+        "row_id": "BIGINT",
+        "trade_date": "DATE",
+        "run_id": "VARCHAR",
+        "platform": "VARCHAR",
+        "post_volume_z": "DOUBLE",
+        "comment_velocity_z": "DOUBLE",
+        "boarding_ratio": "DOUBLE  -- 上車/梭哈/all-in 詞頻佔比",
+        "capitulation_ratio": "DOUBLE  -- 畢業/認賠/融資斷頭 詞頻佔比",
+        "mention_hhi": "DOUBLE  -- 聊天室提及族群集中度 (cross-check bloc lane flow_hhi)",
+        "tech_mention_share": "DOUBLE",
+        "social_fomo": "DOUBLE  -- 0-100",
+        "extreme_flag": "VARCHAR  -- p95_greed | p5_fear | NULL (contrarian only at extremes)",
+        "evidence_tier": "VARCHAR"
+      }
+    },
+    "fomo_index_daily": {
+      "grain": "trade_date (engine output, append-only)",
+      "columns": {
+        "row_id": "BIGINT",
+        "trade_date": "DATE",
+        "run_id": "VARCHAR",
+        "fomo_index": "DOUBLE  -- 0-100 = 0.70*behavior + 0.30*social (frozen v0)",
+        "state": "VARCHAR  -- 恐慌|冷|溫|熱|過熱 (extreme override by social p95/p5)",
+        "froth_flag": "INTEGER  -- hype_divergence>1.5z",
+        "verdict": "VARCHAR  -- gate verdict of producing run",
+        "evidence_tier": "VARCHAR"
+      },
+      "gates": [
+        "G_ic<-0.05",
+        "G_mono<=1 inversion",
+        "G_null<0.05",
+        "G_oos same-sign [PROVISIONAL single-cut]"
+      ]
+    },
+    "xmkt_factor_ic": {
+      "grain": "window_end_date x factor x target x horizon x mode",
+      "columns": {
+        "row_id": "BIGINT",
+        "window_end_date": "DATE",
+        "run_id": "VARCHAR",
+        "factor": "VARCHAR",
+        "target": "VARCHAR  -- ^TWII|^GSPC",
+        "horizon_days": "INTEGER",
+        "mode": "VARCHAR  -- clean|leaky",
+        "spearman_ic": "DOUBLE",
+        "n_obs": "INTEGER",
+        "evidence_tier": "VARCHAR"
+      },
+      "session_ordering": "TWII closes 13:30 TST BEFORE US session opens: TW factor(t) may predict GSPC(t same-day US session) legally; TWII target must be t+1. Violating this ordering silently is the #1 cross-market leak."
+    },
+    "xmkt_walkforward": {
+      "grain": "eval_window_start x target x criteria",
+      "columns": {
+        "row_id": "BIGINT",
+        "eval_window_start": "DATE",
+        "run_id": "VARCHAR",
+        "target": "VARCHAR",
+        "criteria": "VARCHAR  -- max_icir|top_k|equal_w (selection rule applied on TRAIN window only)",
+        "train_days": "INTEGER",
+        "eval_days": "INTEGER",
+        "weights_json": "JSON",
+        "oos_ic": "DOUBLE",
+        "insample_best_ic": "DOUBLE  -- leaky benchmark for honesty gap",
+        "evidence_tier": "VARCHAR"
+      }
+    },
+    "fwd_earnings_weekly": {
+      "grain": "report_date (FactSet Earnings Insight weekly, Friday)",
+      "columns": {
+        "row_id": "BIGINT",
+        "report_date": "DATE",
+        "release_ts": "TIMESTAMP  -- publication Friday; usable next trading day",
+        "fwd_12m_pe": "DOUBLE",
+        "fwd_pe_5y_avg": "DOUBLE",
+        "fwd_pe_10y_avg": "DOUBLE",
+        "trailing_12m_pe": "DOUBLE",
+        "cy_curr_eps_growth_pct": "DOUBLE",
+        "cy_next_eps_growth_pct": "DOUBLE",
+        "cy_curr_eps_usd": "DOUBLE NULL",
+        "cy_next_eps_usd": "DOUBLE NULL  -- only when cited in Topic of Week",
+        "q_bottomup_eps_usd": "DOUBLE NULL",
+        "neg_guidance_n": "INTEGER NULL",
+        "pos_guidance_n": "INTEGER NULL",
+        "bottomup_target": "DOUBLE NULL",
+        "close_px": "DOUBLE NULL",
+        "src_url": "VARCHAR",
+        "sha256": "VARCHAR",
+        "evidence_tier": "VARCHAR",
+        "evidence_status": "VARCHAR"
+      },
+      "note": "fields regex-mined from PDF text; miss => NULL (completeness honesty). Revisions impossible: each PDF is immutable vintage = perfect point-in-time series"
+    },
+    "group_registry": {
+      "grain": "gid (twgc 三層分類 axis.chain.group)",
+      "columns": {
+        "gid": "VARCHAR PK",
+        "twgc": "VARCHAR  -- 10.10.10 三層碼",
+        "zh": "VARCHAR",
+        "axis": "INT",
+        "chain": "INT",
+        "group": "INT",
+        "effective_from": "DATE  -- **回測須以此做point-in-time篩選**",
+        "status": "VARCHAR",
+        "n_members": "INT",
+        "valid": "BOOLEAN",
+        "evidence": "VARCHAR",
+        "tier": "VARCHAR",
+        "members_verified": "BOOLEAN  -- 代號與市場別已查證",
+        "parent_gid": "VARCHAR NULL  -- 拆分來源, 供GV8獨立性檢定",
+        "validation_status": "VARCHAR  -- PASS/FAIL/PENDING/PRELIMINARY_SELECTION_BIASED"
+      },
+      "source": "tw_group_registry.json (29 groups as of 2026-07-18, append-only)",
+      "note": "族群主檔; 新增族群只append不刪除舊碼; twgc碼一經發放永不重用(append-only編碼)",
+      "constraints": [
+        "CHK_pit_membership: 回測日 < effective_from 的族群必須排除",
+        "CHK_members_nonzero: n_members=0 的族群不得進入 scanner 或流量聚合",
+        "CHK_members_verified: members_verified=FALSE 時該族群輸出須標註 UNVERIFIED",
+        "CHK_incremental_gate: GV7增量R²未通過者, 族群分類不得取代官方產業別"
+      ]
+    },
+    "rotation_snapshots": {
+      "grain": "(asof, gid) 每次輪動狀態快照",
+      "columns": {
+        "asof": "DATE",
+        "gid": "VARCHAR",
+        "state": "VARCHAR  -- LATENT/IGNITE/DIFFUSE/OVERHEAT/EBB",
+        "trapped": "DOUBLE  -- 套牢層0-1",
+        "lev": "DOUBLE  -- 槓桿密度0-1",
+        "narrative_type": "VARCHAR  -- quote/demand/lowbase/policy/defensive",
+        "evidence": "VARCHAR",
+        "tier": "VARCHAR"
+      },
+      "source": "tw_group_registry.json::rotation_snapshots (append-only 時序快照)",
+      "note": "append-only: 每次快照獨立列, 永不覆寫歷史狀態; VDF真值化時state從T2/T3→T1"
+    },
+    "investor_taxonomy": {
+      "grain": "investor_id (I1-I7)",
+      "columns": {
+        "investor_id": "VARCHAR PK",
+        "zh": "VARCHAR",
+        "role": "VARCHAR",
+        "n_indicators": "INT",
+        "priority": "VARCHAR",
+        "traps": "VARCHAR[]",
+        "layer": "VARCHAR  -- L1身分別/L2載體/L3規模/L4通路",
+        "parent_id": "VARCHAR NULL  -- 跨層歸因的父節點",
+        "mece_within_layer": "BOOLEAN",
+        "sum_allowed_with": "VARCHAR[]  -- 可安全加總的對象(同層); 跨層為NULL"
+      },
+      "source": "tw_investor_taxonomy.json (7類 · 35指標 · 33個T1官方源)",
+      "note": "投資人分類主檔; append-only, 新增類別不刪舊碼",
+      "constraints": [
+        "CHK_no_cross_layer_sum: 跨層節點禁止加總 (L1.2投信 + L2.1主動ETF = 重複)",
+        "CHK_layer_closure: 每層成員總和必須對回上層父節點總量",
+        "CHK_residual_sign: L2.4殘差與L1.2母集合反號時觸發歸因錯誤告警",
+        "CHK_unresolvable_flag: OV2委外代操必須帶 is_unresolvable_overlap=TRUE 旗標"
+      ]
+    },
+    "investor_flows_daily": {
+      "grain": "(trade_date, investor_id, ticker) 逐日逐檔逐主體",
+      "columns": {
+        "trade_date": "DATE",
+        "investor_id": "VARCHAR",
+        "ticker": "VARCHAR",
+        "net_shares": "BIGINT",
+        "net_value_twd": "BIGINT",
+        "position_pct": "DOUBLE NULL",
+        "src_indicator": "VARCHAR  -- I1.1/I3.1/I4.1 等",
+        "tier": "VARCHAR",
+        "asof_usable": "DATE  -- T+1",
+        "layer": "VARCHAR",
+        "parent_investor_id": "VARCHAR NULL",
+        "is_hedge": "BOOLEAN  -- 自營避險, scanner排除",
+        "is_index_rebal": "BOOLEAN  -- MSCI/FTSE再平衡窗口, scanner排除",
+        "is_new_launch_window": "BOOLEAN  -- 主動ETF建倉期, scanner排除",
+        "is_unresolvable_overlap": "BOOLEAN  -- 委外代操等不可分離部位"
+      },
+      "note": "ASOF T-1 強制: asof_usable = trade_date + 1 交易日; DuckDB ASOF JOIN 防洩漏"
+    },
+    "active_etf_holdings": {
+      "grain": "(disclosure_date, etf_code, ticker) 主動型ETF每日持股",
+      "columns": {
+        "disclosure_date": "DATE",
+        "etf_code": "VARCHAR",
+        "ticker": "VARCHAR",
+        "shares": "BIGINT",
+        "weight_pct": "DOUBLE",
+        "delta_shares": "BIGINT  -- vs 前一日",
+        "is_new_launch_window": "BOOLEAN  -- 募集建倉期旗標, 排除機械買盤"
+      },
+      "source": "各投信官網/集保 ETF 專區 (法規強制每日揭露)",
+      "note": "**最高價值資料源**: 全球罕見的日更機構持倉; 28檔近5,000億(2026/4)"
+    },
+    "etf_sync_signal": {
+      "grain": "(signal_date, ticker)",
+      "columns": {
+        "signal_date": "DATE",
+        "ticker": "VARCHAR",
+        "n_etf_adding": "INT",
+        "n_etf_reducing": "INT",
+        "net_consensus": "INT",
+        "total_delta_shares": "BIGINT",
+        "price_reaction_pct": "DOUBLE NULL",
+        "lead_window_days": "INT NULL  -- 由CCF估算"
+      },
+      "note": "同步訊號: ≥2檔主動ETF同期同向=經理人獨立收斂共識; 配合price_reaction判斷是否仍在佈局窗口"
+    },
+    "dual_index_daily": {
+      "grain": "(trade_date, index_code)  index_code ∈ {TWII, TPEx}",
+      "columns": {
+        "trade_date": "DATE",
+        "index_code": "VARCHAR",
+        "close": "DOUBLE",
+        "ret_pct": "DOUBLE",
+        "turnover_twd": "BIGINT",
+        "turnover_share": "DOUBLE  -- 佔兩市場合計",
+        "adv_count": "INT",
+        "dec_count": "INT",
+        "breadth": "DOUBLE  -- adv/(adv+dec)",
+        "margin_balance_twd": "BIGINT",
+        "margin_ratio_to_turnover": "DOUBLE",
+        "daytrade_ratio": "DOUBLE",
+        "asof_usable": "DATE  -- T+1"
+      },
+      "source": "TWSE (加權) + TPEx (櫃買); 兩市場各自提供三大法人/信用交易/當沖統計",
+      "note": "櫃買非加權縮小版, 投資人結構不同; 兩者背離本身即訊號"
+    },
+    "dual_index_derived": {
+      "grain": "trade_date",
+      "columns": {
+        "trade_date": "DATE",
+        "quan_gui_ratio": "DOUBLE  -- B1 權櫃比 = TWII/TPEx",
+        "qg_ratio_z": "DOUBLE  -- 滾動標準化",
+        "qg_turning_flag": "VARCHAR  -- PEAK_REVERSAL=內資進場訊號",
+        "breadth_gap": "DOUBLE  -- B2 加權廣度 − 櫃買廣度",
+        "tpex_turnover_share": "DOUBLE  -- B3",
+        "margin_divergence": "DOUBLE  -- B4 櫃買融資比重 − 上市融資比重",
+        "daytrade_gap": "DOUBLE  -- B5"
+      },
+      "note": "B1權櫃比為既有成熟指標: 高點反彈=內資法人進場佈局 [T2]"
+    },
+    "investor_index_attribution": {
+      "grain": "(trade_date, investor_id, index_code)",
+      "columns": {
+        "trade_date": "DATE",
+        "investor_id": "VARCHAR",
+        "index_code": "VARCHAR",
+        "weighted_flow_twd": "BIGINT  -- Σ(淨買超 × 指數權重)",
+        "flow_return_elasticity": "DOUBLE NULL  -- orthogonalized Spearman",
+        "contrib_pts_est": "DOUBLE NULL  -- 估計貢獻點數",
+        "ex_tsmc_variant": "DOUBLE NULL  -- 剔除台積電後(TWII歸因去集中化)",
+        "tier": "VARCHAR"
+      },
+      "method": "weighted_flow → orthogonalized Spearman(控制其他投資人同期流向) → ASOF T-1",
+      "negative_control": "隨機打亂flow序列重跑, 彈性應≈0; 顯著則有洩漏",
+      "honesty": "流量與報酬同時決定, 歸因≠因果; TWII歸因易被台積電主導故並列ex-TSMC版本"
+    },
+    "indicator_validation": {
+      "grain": "(indicator_id, test_id, asof)",
+      "columns": {
+        "indicator_id": "VARCHAR",
+        "test_id": "VARCHAR  -- VP6..VP11",
+        "asof": "DATE",
+        "n_obs": "INT",
+        "stat": "DOUBLE",
+        "p_value": "DOUBLE",
+        "p_adj_bh": "DOUBLE",
+        "ccf_peak_lag": "INT NULL  -- 負值=落後",
+        "incremental_ic": "DOUBLE NULL",
+        "verdict": "VARCHAR  -- PASS/FAIL/UNDERPOWERED",
+        "weight_in_scanner": "DOUBLE"
+      },
+      "note": "append-only 驗證結果; FAIL或UNDERPOWERED者 weight=0"
+    },
+    "industry_baseline": {
+      "grain": "(ticker, effective_from)",
+      "columns": {
+        "ticker": "VARCHAR",
+        "twse_industry_code": "VARCHAR",
+        "twse_industry_zh": "VARCHAR",
+        "market": "VARCHAR  -- 上市/上櫃",
+        "effective_from": "DATE"
+      },
+      "source": "TWSE 上市公司產業別 + TPEx 上櫃公司產業別",
+      "role": "**基準與控制變數**: 全覆蓋/長歷史/無前視; 自訂族群須證明增量解釋力(GV7)"
+    }
+  },
+  "endpoint_registry": {
+    "_note": "real fetches run on Tony's machine only; sandbox is HTTP 403 to all of these (sandbox honesty). All endpoints free/official.",
+    "twse_inst_daily_agg": {
+      "url": "https://www.twse.com.tw/rwd/zh/fund/BFI82U?response=json",
+      "cadence": "daily T ~16:00",
+      "tier": "T1"
+    },
+    "twse_inst_per_stock": {
+      "url": "https://www.twse.com.tw/rwd/zh/fund/T86?response=json&date={YYYYMMDD}&selectType=ALL",
+      "cadence": "daily",
+      "tier": "T1"
+    },
+    "twse_margin": {
+      "url": "https://www.twse.com.tw/rwd/zh/marginTrading/MI_MARGN?response=json&date={YYYYMMDD}&selectType=ALL",
+      "cadence": "daily",
+      "tier": "T1"
+    },
+    "twse_sbl": {
+      "url": "https://www.twse.com.tw/rwd/zh/marginTrading/TWT93U?response=json&date={YYYYMMDD}",
+      "cadence": "daily",
+      "tier": "T1"
+    },
+    "twse_daytrade": {
+      "url": "https://www.twse.com.tw/rwd/zh/afterTrading/TWTB4U?response=json&date={YYYYMMDD}",
+      "cadence": "daily",
+      "tier": "T1"
+    },
+    "taifex_inst_futures": {
+      "url": "https://www.taifex.com.tw/cht/3/futContractsDateDown",
+      "method": "POST form queryDate",
+      "cadence": "daily T ~15:00",
+      "tier": "T1"
+    },
+    "tdcc_dispersion": {
+      "url": "https://opendata.tdcc.com.tw/getOD.ashx?id=1-5",
+      "cadence": "weekly (Fri data, ~next biz day)",
+      "tier": "T1"
+    },
+    "tpex_inst_daily": {
+      "url": "https://www.tpex.org.tw/openapi/v1/tpex_3insti_daily_trading",
+      "cadence": "daily",
+      "tier": "T1"
+    },
+    "broker_branch": {
+      "url": null,
+      "note": "分點 data NOT free/official; if licensed, ingest as T3 corroboration only",
+      "tier": "T3"
+    },
+    "cbc_m1b_m2": {
+      "url": "https://cpx.cbc.gov.tw/api/... 或 https://www.cbc.gov.tw/tw/lp-644-1.html CSV",
+      "cadence": "monthly, published ~25th next month",
+      "tier": "T1",
+      "series": [
+        "TW_M1B_YOY",
+        "TW_M2_YOY"
+      ]
+    },
+    "fred_fed_liq": {
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=WALCL,WTREGEN,RRPONTSYD",
+      "cadence": "weekly Thu (H.4.1)",
+      "tier": "T1",
+      "derived": "FED_NET_LIQ = WALCL - WTREGEN - RRPONTSYD"
+    },
+    "fred_rates": {
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DFF,DGS10",
+      "cadence": "daily",
+      "tier": "T1"
+    },
+    "fred_dxy": {
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTWEXBGS",
+      "cadence": "daily(broad); DXY spot via yfinance DX-Y.NYB",
+      "tier": "T1"
+    },
+    "crude_wti": {
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILWTICO  | yfinance CL=F",
+      "cadence": "daily",
+      "tier": "T1"
+    },
+    "ici_fund_flows": {
+      "url": "https://www.ici.org/research/stats  weekly estimated flows CSV",
+      "cadence": "weekly Wed",
+      "tier": "T1",
+      "note": "free triangulation for global fund flows; EPFR is paid → NOT assumed"
+    },
+    "via_flowsystem": {
+      "url": "local: VIA-FlowSystem 32-ETF FIS snapshots",
+      "cadence": "daily",
+      "tier": "T2",
+      "note": "global flow proxy already in-house; join on trade_date"
+    },
+    "ptt_stock": {
+      "url": "https://www.ptt.cc/bbs/Stock/index.html (requests+bs4, over18 cookie) 或 PTT Web API JSON",
+      "cadence": "intraday crawl, daily agg",
+      "tier": "T2",
+      "note": "發文量/推噓比 = 台股散戶情緒經典 proxy"
+    },
+    "dcard_stock": {
+      "url": "https://www.dcard.tw/service/api/v2/forums/stock/posts",
+      "cadence": "intraday",
+      "tier": "T2"
+    },
+    "mobile01_inv": {
+      "url": "https://www.mobile01.com/topiclist.php?f=291 (crawl)",
+      "cadence": "daily",
+      "tier": "T2"
+    },
+    "google_trends": {
+      "url": "pytrends: 台積電/當沖/融資/股票開戶 zh-TW",
+      "cadence": "daily/weekly",
+      "tier": "T2"
+    },
+    "youtube_fin": {
+      "url": "YouTube Data API v3: 財經頻道 upload+view velocity",
+      "cadence": "daily",
+      "tier": "T2"
+    },
+    "line_telegram": {
+      "url": null,
+      "note": "私群不可觀測: 明確列為 BLIND, 禁止以 PTT 外推私群 (selection bias)",
+      "tier": "BLIND"
+    },
+    "factset_earnings_insight": {
+      "url": "https://advantage.factset.com/hubfs/Website/Resources%20Section/Research%20Desk/Earnings%20Insight/EarningsInsight_{MMDDYY}[A].pdf",
+      "cadence": "weekly Friday (holiday => Thu; occasional early publication)",
+      "tier": "T1",
+      "verified": "pattern confirmed by direct fetch: 040524A, 022825, 120525, 011626, 041026A",
+      "note": "public media-distribution PDFs; fetch politely 1 req/s with local cache, never re-download"
+    },
+    "rotation_engine_M4": {
+      "reads": "group_registry + rotation_snapshots[latest] + 報價序列(DDR4/MLCC) + 期貨OI + M3族群流量",
+      "outputs": "逐日五態機率 + 接棒分數(switch_score) + narrative falsifier 狀態",
+      "tier": "T4→T1(VDF接上後)",
+      "note": "輪動引擎M4; 讀SSOT族群主檔+最新快照; 五態機+接棒加權"
+    },
+    "investor_flow_sources": {
+      "TWSE": [
+        "T86 三大法人買賣超(個股)",
+        "BFI82U 彙總",
+        "MI_MARGN 融資融券",
+        "信用交易統計(整戶維持率)",
+        "當日沖銷交易統計",
+        "外資及陸資持股統計",
+        "盤中零股",
+        "權證統計"
+      ],
+      "TAIFEX": [
+        "三大法人期貨部位(外資台指期未平倉)",
+        "選擇權Put/Call部位"
+      ],
+      "TDCC集保": [
+        "股權分散表(週, 400張/1000張/<10張級距)",
+        "ETF專區持股"
+      ],
+      "MOPS公開資訊觀測站": [
+        "董監持股與質押月報",
+        "董監申讓公告",
+        "庫藏股"
+      ],
+      "央行": [
+        "USD/TWD 匯率",
+        "外匯存底月報"
+      ],
+      "勞動基金運用局": [
+        "四大基金月報(國內股票部位/收益率)",
+        "委外代操公告"
+      ],
+      "投信投顧公會": [
+        "投信持股月報",
+        "基金規模淨申贖",
+        "主動ETF規模"
+      ],
+      "券商分點": [
+        "主力進出(日)",
+        "官股券商買賣超(政府基金proxy)"
+      ],
+      "tier": "T1 全部官方公開源"
+    },
+    "smartmoney_scanner": {
+      "reads": "investor_flows_daily + active_etf_holdings + etf_sync_signal + group_registry + rotation_snapshots",
+      "gate": "flush未完成時凍結輸出(避免抓到護盤/攤平的假佈局)",
+      "outputs": "預判標的清單 + 指紋數 + 信度分數 + CCF領先窗口天數",
+      "tier": "T4→T1(VDF接上後)",
+      "layer_discipline": {
+        "primary": "L2.1 主動ETF每日持股",
+        "context": "L1.2 投信總量",
+        "rule": "同向=真佈局; 反向=其他載體反向操作, 訊號降權",
+        "excluded_flags": [
+          "is_hedge",
+          "is_index_rebal",
+          "is_new_launch_window"
+        ]
+      }
+    },
+    "dual_index_sources": {
+      "TWSE": [
+        "加權指數收盤",
+        "三大法人買賣超",
+        "信用交易",
+        "當沖統計",
+        "漲跌家數"
+      ],
+      "TPEx": [
+        "櫃買指數收盤",
+        "櫃買三大法人買賣超",
+        "櫃買信用交易",
+        "櫃買當沖",
+        "櫃買漲跌家數",
+        "上櫃ETF統計"
+      ],
+      "TAIFEX": [
+        "櫃買成分股比重(tPEXPropertion)"
+      ],
+      "tier": "T1 全部官方公開源",
+      "note": "**櫃買有獨立的法人/信用/當沖統計, 必須分市場抓取, 不可用上市資料代表全市場**"
+    }
+  },
+  "devil_advocate": [
+    "foreign net buy may be ETF passive creation or futures-hedge leg, not conviction: mandatory spot-futures consistency lane",
+    "institutional numbers are NET; internal wash volume invisible: gross + day-trade lanes required before intraday claims",
+    "TDCC weekly + delayed release: never use as intraday signal; ASOF release_ts enforced at schema level",
+    "attribution IC = explanatory dominance, NOT causality; reverse causality (price -> margin chase) expected; lagged design mitigates, does not eliminate",
+    "regime score weights are hand-set v0 constants: tracked as tech debt, must be re-fit by CPCV in Phase 3",
+    "M1B/M2 golden cross is MONTHLY with ~25d publication lag: as daily signal it is stale by construction; ASOF release_ts mandatory, never interpolate to daily",
+    "Fed net liquidity correlation with equities is regime-dependent folk-metric; treat as conditioning variable, not signal",
+    "FOMO composite components (margin, day-trade, retail holders) overlap with chipwar score inputs: document shared inputs to avoid double-counting one phenomenon as two confirmations",
+    "crude/DXY affect TW via terms-of-trade AND risk sentiment: sign is not stable across regimes; only lagged rank-IC decides, not narrative",
+    "limited-choices narrative vs measurement: opportunity_width must count RISK-ADJUSTED positive momentum, else a broad low-vol trad drift falsely widens the set",
+    "tech/trad bloc line is curation (T2): 重電 in trad would flip the spread sign in AI-capex regimes; hybrid bloc isolated on purpose",
+    "crowding_index correlating with chipwar_score may be mechanical (shared flow inputs): report shared-input overlap alongside the correlation",
+    "chatroom data is T2 at best: self-selected, bot-inflated, sarcasm(反串)-contaminated; sentiment classifiers trained on formal zh fail on PTT slang — lexicon must be PTT-native",
+    "deleted posts (自刪/版主刪) create survivorship holes: fetched_ts ASOF + periodic re-crawl diff to estimate deletion rate",
+    "social FOMO expected to LAG market: if it appears to LEAD, first suspect look-ahead in aggregation (posts after close counted same day)",
+    "mention_hhi vs flow_hhi cross-check: chatrooms talk about what already moved — high correlation is mechanical, only DIVERGENCE is informative (talk without flow = pure hype)",
+    "private LINE/Telegram rooms unobservable and plausibly where real 主力 chatter lives: public-chatroom FOMO measures RETAIL echo, never smart money",
+    "cross-market 'predictability' TW->SPX is often just the global factor plus session ordering: benchmark every factor against lagged SPX itself before claiming alpha",
+    "walk-forward optimizer IS an optimizer: selection criteria applied on train window only, and the WF-vs-insample gap must be reported every run; shrinking gap = growing overfit",
+    "multiple testing: factors x horizons x targets x criteria grid inflates false positives; report effective number of tests and demand ICIR not raw IC",
+    "FactSet weekly PDFs are immutable vintages: unlike FRED-style revisions this is inherently point-in-time, BUT report skips weeks (holidays) and occasionally publishes early — fetcher must tolerate date jitter, never interpolate missing Fridays",
+    "族群拆併風險: 矽晶圓(G026)從半導體拆出、記憶體封測(G029)從記憶體拆出=本週資金獨立性判斷(T2), 若獨立性是暫時的(漲價循環結束後重新併回)會造成twgc碼膨脹; 緩解=append-only下舊碼保留, 拆併僅新增不刪除, 以effective_from標記時效, 由M3實際流量相關性事後驗證拆分是否成立(負控制: 拆出族群與母族群流量相關性應顯著<1)",
+    "自營商買賣超必須拆分自行買賣 vs 避險: 把權證/ETF造市的對沖部位當成方向性看法, 是台股籌碼分析最常見的系統性錯誤",
+    "主動型ETF新募集建倉期(如00403A募800億)產生的機械式買盤 ≠ 經理人主動看多; 未加 is_new_launch_window 旗標會嚴重污染同步訊號",
+    "外資買賣超含ETF造市/避險/陸資/MSCI再平衡; 直接當外資觀點會在指數調整週產生假訊號",
+    "投資人行為順序(rotation_sequence)為T3結構假設, 8個節點的順序未經實證; VDF接上後須以CCF逐對驗證, 順序若與假設不符須推翻而非調參",
+    "分類軸混淆是本體論錯誤而非資料錯誤: v1.0把主動ETF(載體軸)與投信(身分軸)並列, 若未察覺會在scanner中把同一筆買盤計兩次, 使信度分數系統性高估. 四層階梯的代價是L2.4殘差項承擔全部歸因誤差; 若殘差反號即上游有誤, 此為內建自檢",
+    "政府PUT不對稱是先前S4分析的重大遺漏: 國安基金護盤集中權值股, 中小型無支撐[T2 2025/4實證]. 因此'介入使無序區37%→20%'僅適用TWII; 櫃買市場的斷頭無序化幾乎不受介入影響. 散戶持股集中中小型 → 護盤保住了指數但未保住散戶部位, 此為政府PUT效力評估的系統性高估來源",
+    "只看加權指數會被權值撐盤系統性誤導: 多數股票下跌但指數不動的情況下, 加權的'穩定'是倖存者偏誤. 監控必須雙指數並行, 且以櫃買廣度作為真實市場狀態的主要參考",
+    "櫃買歸因雜訊高於加權(成分股多而個別權重低), 需≥5日平滑; 但平滑會犧牲時效, 此為時效vs穩健的固有取捨, 不可用調參掩蓋",
+    "檢定力矛盾: 主動ETF被標為priority=HIGHEST但歷史最短(2025/5起~300日). 時序IC路徑下多重校正後最小可偵測|r|=0.255, 而金融訊號典型IC僅0.02-0.05(需~19年). **高概念價值≠可統計驗證**. 救援=橫斷面ICIR(需每日≥30檔)或事件研究(300-750事件, 可測d≥0.12), 但若兩者皆不適用, 該訊號只能以T3假設使用並明示不可驗證",
+    "月報類5指標(四大基金/投信月報/董監質押/定期定額/隱形槓桿)10年僅~120觀測, 多重校正後r_min=0.404, 結構性不可檢定 → 已降級CONTEXT_ONLY, 不得進入信度分數",
+    "35指標同時檢定時83%機率至少出現1個假顯著; 若未做FDR校正, scanner會系統性納入雜訊指標並對其產生信心 — 這種錯誤不報錯不崩潰, 只讓判斷越來越自信",
+    "族群分類的存在正當性未經檢定: 若GV7增量R²不顯著, 自訂族群僅是官方產業別的重貼標籤, 且額外承擔前視偏誤與6.3%選樣偏誤 → **比直接用官方產業別更糟**. 直覺貼近不構成保留理由",
+    "前視偏誤實例已存在: 矽晶圓/記憶體封測因2026-07觀察到獨立資金流才拆出(effective_from=2026-07-18). 任何早於此日的回測若使用該分類即為使用未來資訊; 已加CHK_pit_membership約束",
+    "族群層面板不可膨脹樣本: 29族群×n_days看似數萬觀測, 但同日跨族群高度相關, 有效自由度≈n_days. 以面板n計檢定力會系統性高估顯著性",
+    "v1.2更新引入自身缺陷: 新增4族群卻未同步建置成員(n_members=0), 而五態快照已給予這些族群狀態 → 有狀態無標的. 分類更新必須成員同步, 否則產生不可執行的訊號"
+  ],
+  "bloc_tags": {
+    "_note": "tech vs traditional two-bloc decomposition for narrow-market (limited choices) analysis; T2 curation",
+    "tech": [
+      "半導體",
+      "AI 伺服器",
+      "散熱",
+      "PCB",
+      "ABF 載板",
+      "記憶體",
+      "IC設計",
+      "ASIC 設計服務",
+      "矽智財 IP",
+      "網通設備",
+      "CPO 共封裝光學",
+      "光學",
+      "被動元件",
+      "電源管理",
+      "半導體設備",
+      "台積電擴廠",
+      "低軌衛星",
+      "資安/系統整合",
+      "BBU 備援電池"
+    ],
+    "traditional": [
+      "金融",
+      "貨櫃航運",
+      "散裝航運",
+      "航空",
+      "鋼鐵",
+      "條鋼",
+      "觀光餐飲",
+      "生技醫療"
+    ],
+    "hybrid_ai_adjacent": [
+      "重電",
+      "機器人",
+      "軍工航太",
+      "電動車"
+    ],
+    "hybrid_rule": "重電/機器人/軍工/EV 受 AI-capex 與國防外溢驅動: 歸因時單獨列 bloc, 不得偷併入 tech 灌水 tech breadth"
+  },
+  "generated": "2026-07-24T13:46:06"
+}

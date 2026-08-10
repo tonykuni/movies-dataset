@@ -1343,7 +1343,7 @@ def load_master_params(path: Optional[Union[str, Path]] = None,
     parser,sbom_db}（VMT_ROOT 環境變數覆寫 vmt_root）、run.{stop_on_error,
     timeout_sec_per_stage}。disabled 階段誠實列於 info["skipped"]。
     """
-    p = Path(path) if path else _default_master_params()
+    p = (Path(path) if path else _default_master_params()).resolve()
     if not p.exists():
         raise FileNotFoundError("master 參數檔不存在：%s" % p)
     data = json.loads(p.read_text(encoding="utf-8"))
@@ -1352,6 +1352,7 @@ def load_master_params(path: Optional[Union[str, Path]] = None,
     engines_dir = Path(paths.get("engines_dir") or root)
     if not engines_dir.is_absolute():
         engines_dir = root / engines_dir
+    engines_dir = engines_dir.resolve()  # 相對 params 路徑 + cwd=engines_dir 時避免路徑翻倍
     tmpl = {"parser": paths.get("parser", ""), "sbom_db": paths.get("sbom_db", "")}
     py = python_exe or sys.executable
     run_cfg = data.get("run", {})

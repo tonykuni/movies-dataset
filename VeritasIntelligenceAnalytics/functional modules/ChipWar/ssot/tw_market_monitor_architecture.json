@@ -1,0 +1,203 @@
+{
+  "schema": "tw_market_monitor_architecture",
+  "version": "v1.0",
+  "asof": "2026-07-18",
+  "purpose": "投資人資金流 → 雙指數(加權/櫃買) → 族群/個股輪動 的三層監控鏈",
+  "design_principle": "櫃買非加權的縮小版, 而是**不同投資人結構的市場**; 兩指數的背離本身即訊號",
+  "LA_investor_flow": {
+    "layer": "A 資金流",
+    "source": "tw_investor_taxonomy v1.1 四層階梯",
+    "outputs": [
+      "逐日逐檔逐主體淨流(investor_flows_daily)",
+      "主動ETF同步訊號(etf_sync_signal)"
+    ]
+  },
+  "LB_dual_index": {
+    "layer": "B 雙指數",
+    "note": "**核心新增層**",
+    "indices": {
+      "TWII": {
+        "zh": "發行量加權股價指數(上市)",
+        "src": "TWSE",
+        "character": "大型權值主導, 台積電權重極高, 波動較小",
+        "dominant_investors": [
+          "I1外資(權值股集中)",
+          "I2政府基金(護盤集中權值)",
+          "I5自營避險(權證多為權值)"
+        ],
+        "tier": "T1"
+      },
+      "TPEx": {
+        "zh": "櫃買指數(上櫃, OTC/TWC00)",
+        "src": "TPEx",
+        "character": "中小型成長股, 波動較大, **市場情緒參考指標**",
+        "dominant_investors": [
+          "I4投信(中小型alpha)",
+          "L3.2中實戶",
+          "L3.3散戶(融資比重高)"
+        ],
+        "tier": "T1",
+        "evidence": "加權常受權值撐盤失真(多數股票跌但指數不動), 櫃買較能反映真實廣度 [T2]"
+      }
+    },
+    "derived_indicators": [
+      {
+        "id": "B1",
+        "name": "權櫃比 TWII/TPEx",
+        "freq": "日",
+        "tier": "T1",
+        "read": "比值上升=權值撐盤中小遭殺(外資/政府主導); 比值下降=中小強(內資法人活躍/投機熱)",
+        "turning_point": "**權櫃比自高點反彈 = 內資法人開始進場佈局** [T2 既有成熟用法]",
+        "value": "HIGHEST — 內資vs外資力量對比的單一代理"
+      },
+      {
+        "id": "B2",
+        "name": "雙市場廣度差(上漲家數比)",
+        "freq": "日",
+        "tier": "T1",
+        "read": "加權漲但櫃買廣度弱 = 拉大出小(權值撐盤掩護中小出貨)"
+      },
+      {
+        "id": "B3",
+        "name": "雙市場成交值佔比",
+        "freq": "日",
+        "tier": "T1",
+        "read": "櫃買成交佔比上升=投機溫度升; 崩盤時佔比驟降=中小流動性枯竭"
+      },
+      {
+        "id": "B4",
+        "name": "雙市場融資餘額分離",
+        "freq": "日",
+        "tier": "T1",
+        "read": "櫃買融資比重高於上市 → **中小型斷頭風險系統性高於大盤所示**"
+      },
+      {
+        "id": "B5",
+        "name": "雙市場當沖比",
+        "freq": "日",
+        "tier": "T1",
+        "read": "櫃買當沖比=散戶投機直接溫度計"
+      }
+    ],
+    "asymmetric_government_put": {
+      "finding": "**政府PUT不對稱**: 國安基金買盤集中大型權值股, 中小型個股獲得支撐機會有限 [T2 2025/4實證]",
+      "implication": [
+        "加權指數被護住 ≠ 散戶持股被護住",
+        "護盤期間權櫃比會**擴大**(權值撐/中小殺), 此為介入的指紋",
+        "中小型股融資比重高+無政府支撐 = 追繳斷頭壓力集中於櫃買市場",
+        "**先前S4政府PUT分析須修正**: 無序區機率下降(37%→20%)僅適用TWII; TPEx的無序區機率幾乎不受介入影響"
+      ],
+      "monitor": "介入公告後3日內權櫃比是否擴大 → 確認不對稱效應正在發生"
+    }
+  },
+  "LC_rotation": {
+    "layer": "C 族群/個股輪動",
+    "source": "tw_group_registry v1.2 (29族群/五態機)",
+    "cross_market_distribution": {
+      "note": "族群橫跨兩市場, 分布不同 → 輪動訊號的出現順序不同",
+      "TWII_heavy": [
+        "半導體權值",
+        "金融",
+        "塑膠/傳產",
+        "鋼鐵",
+        "面板"
+      ],
+      "TPEx_heavy": [
+        "IC設計(部分)",
+        "生技",
+        "利基型電子",
+        "矽光子/CPO(部分)",
+        "軍工(部分)"
+      ],
+      "mixed": [
+        "記憶體",
+        "被動元件",
+        "散熱/PCB",
+        "重電",
+        "低軌衛星"
+      ]
+    },
+    "lead_lag_hypothesis": {
+      "tier": "T3 待驗證",
+      "claim": "輪動訊號在櫃買先出現(中小型先動,籌碼輕), 加權後確認(權值需大資金)",
+      "verify": "以CCF檢定 TPEx族群狀態轉換 vs TWII同族群狀態轉換的領先期數"
+    }
+  },
+  "attribution_method": {
+    "goal": "把指數變動歸因到投資人",
+    "step1": "weighted_flow_i = Σ(投資人在股票j的淨買超金額 × 股票j在指數的權重)",
+    "step2": "以 orthogonalized Spearman 估 flow→return 彈性, 控制其他投資人同期流向(避免重複歸因)",
+    "step3": "ASOF T-1: 盤後資料次一交易日方可用; DuckDB ASOF JOIN 強制",
+    "honesty": [
+      "流量與報酬同時決定, 歸因≠因果",
+      "權值股集中度高使TWII歸因易被單一標的主導(需報告台積電剔除後的版本)",
+      "櫃買成分股數多但個別權重低, 歸因雜訊較高, 需≥5日平滑"
+    ],
+    "negative_control": "對隨機打亂的flow序列重跑, 彈性應≈0; 若顯著則模型有洩漏"
+  },
+  "monitoring_cascade": [
+    {
+      "step": 1,
+      "watch": "LA 主動ETF同步訊號 + 投信連續買超",
+      "asks": "誰在買?"
+    },
+    {
+      "step": 2,
+      "watch": "LB 權櫃比方向 + 雙市場廣度差",
+      "asks": "錢流向大盤還是中小? 是真買還是拉大出小?"
+    },
+    {
+      "step": 3,
+      "watch": "LB4 雙市場融資分離",
+      "asks": "斷頭風險集中在哪個市場?"
+    },
+    {
+      "step": 4,
+      "watch": "LC 族群五態轉換(先看TPEx-heavy族群)",
+      "asks": "哪個族群在啟動?"
+    },
+    {
+      "step": 5,
+      "watch": "個股指紋掃描(scanner)",
+      "asks": "族群內哪幾檔是機構標的?"
+    }
+  ],
+  "key_divergences_dual_index": [
+    {
+      "id": "DX1",
+      "cond": "加權漲 + 櫃買跌 + 政府基金進場公告",
+      "read": "護盤不對稱進行中; 散戶持股仍在失血",
+      "value": "HIGHEST"
+    },
+    {
+      "id": "DX2",
+      "cond": "權櫃比自高點反彈",
+      "read": "內資法人開始佈局 → 底部訊號 [T2成熟用法]",
+      "value": "HIGHEST"
+    },
+    {
+      "id": "DX3",
+      "cond": "加權平盤 + 櫃買廣度惡化",
+      "read": "拉大出小; 權值撐盤掩護中小出貨",
+      "value": "HIGH"
+    },
+    {
+      "id": "DX4",
+      "cond": "櫃買融資餘額降幅 > 上市",
+      "read": "中小型flush進行中; 櫃買先落底",
+      "value": "HIGH"
+    },
+    {
+      "id": "DX5",
+      "cond": "外資賣TWII + 投信買TPEx",
+      "read": "外資撤/內資接, 籌碼在地化",
+      "value": "HIGH"
+    },
+    {
+      "id": "DX6",
+      "cond": "櫃買成交佔比驟降",
+      "read": "中小型流動性枯竭, 賣不掉≠沒賣壓",
+      "value": "MED"
+    }
+  ]
+}

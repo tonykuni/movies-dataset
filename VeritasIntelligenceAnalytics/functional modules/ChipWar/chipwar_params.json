@@ -1,0 +1,27 @@
+{
+  "_comment": "VIA ChipWar 全鏈參數檔 — VIA_WorkflowEngine master 動詞直跑。依賴序:chipwar(T4佔位鏈頭)→macro→bloc→social→fomo_index→xmkt→三報告→rotation→harness 驗收。stop_on_error=true:鏈式硬依賴,斷則止。",
+  "paths": {
+    "engines_dir": "engines"
+  },
+  "stages": [
+    {"id": "chipwar_head", "enabled": true, "script": "via_chipwar_engine.py",              "args": ["--mode", "synthetic"], "desc": "T4 佔位鏈頭:合成宇宙 duckdb + regime(真鏈頭未上傳)"},
+    {"id": "macro",        "enabled": true, "script": "via_macro_engine.py",                "args": ["--mode", "synthetic"], "desc": "資金盤根因層:M1B/M2·FED淨流動性·DXY·WTI lead-lag"},
+    {"id": "bloc",         "enabled": true, "script": "via_bloc_engine.py",                 "args": ["--mode", "synthetic"], "desc": "選擇有限:tech vs trad 集中度/機會寬度/crowding"},
+    {"id": "social",       "enabled": true, "script": "via_social_engine.py",               "args": ["--mode", "synthetic"], "desc": "聊天室 FOMO 第二通道:CCF/極值反向/純吹背離"},
+    {"id": "fomo_index",   "enabled": true, "script": "via_fomo_index_engine.py",           "args": ["--mode", "synthetic"], "desc": "統一 FOMO 指數 0-100 + 四驗證閘門"},
+    {"id": "xmkt",         "enabled": true, "script": "via_xmkt_engine.py",                 "args": ["--mode", "synthetic"], "desc": "跨市場因子實驗室:TWII/GSPC × 4 horizon + walk-forward"},
+    {"id": "social_report", "enabled": true, "script": "via_social_report.py",              "args": [],                      "desc": "聊天室 FOMO 報告(Visual Lock HTML)"},
+    {"id": "fomo_report",  "enabled": true, "script": "via_fomo_index_report.py",           "args": [],                      "desc": "FOMO 指數報告(Visual Lock HTML)"},
+    {"id": "xmkt_report",  "enabled": true, "script": "via_xmkt_report.py",                 "args": [],                      "desc": "跨市場實驗室報告(Visual Lock HTML)"},
+    {"id": "rotation",     "enabled": true, "script": "sector_rotation_capital_flow_engine.py", "args": [],                  "desc": "族群輪動+濫竽充數剔除引擎(獨立自測)"},
+    {"id": "govfund",      "enabled": true, "script": "VIA_GovFundEngine_v040.py",          "args": [],                      "desc": "政府護盤偵測 v040:LOEO+四世界對抗+5種子(獨立自驗8關)"},
+    {"id": "harness",      "enabled": true, "script": "via_test_harness.py",                "args": [],                      "desc": "L1 執行/序列化 + L2 方法論魔鬼斷言全鏈驗收"}
+  ],
+  "run": {
+    "stop_on_error": true,
+    "timeout_sec_per_stage": 300
+  },
+  "report": {
+    "state": "_generated/staging/_test_matrix.json"
+  }
+}
