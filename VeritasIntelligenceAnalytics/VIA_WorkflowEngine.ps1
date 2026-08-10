@@ -41,6 +41,17 @@ $BranchHint = 'claude/workflow-engine-libs-integration-pxsyv3'
 $Python = ''
 $EngineArgs = New-Object System.Collections.Generic.List[string]
 $RawArgs = @($args)
+# 互動式 PowerShell 會把未加引號的 a,b,c 解析成陣列(單一 $args 元素)—
+# 先攤平成逐一參數,否則 [string] 轉換會黏成一個含空格的 token。
+$Flat = New-Object System.Collections.Generic.List[object]
+foreach ($item in $RawArgs) {
+    if (($item -is [System.Array]) -and ($item -isnot [string])) {
+        foreach ($e in $item) { [void]$Flat.Add($e) }
+    } else {
+        [void]$Flat.Add($item)
+    }
+}
+$RawArgs = @($Flat.ToArray())
 $i = 0
 while ($i -lt $RawArgs.Count) {
     $tok = [string]$RawArgs[$i]

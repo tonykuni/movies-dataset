@@ -2414,8 +2414,9 @@ def main(argv: Optional[List[str]] = None) -> int:
                     k, v = pair.split("=", 1)
                     mapping[k.strip()] = v.strip()
                 cols = load_table(args.file, table=args.table, limit=args.limit)
-                ys = [t.strip() for tok in (args.y or [])
-                      for t in str(tok).split(",") if t.strip()]
+                # 逗號/空白皆拆:PowerShell 陣列語意可能把 a,b,c 黏成含空格單 token
+                ys = [t for tok in (args.y or [])
+                      for t in re.split(r"[,\s]+", str(tok)) if t.strip()]
                 data = build_chart_data(meta["id"], cols, x=args.x, ys=ys or None,
                                         group=args.group, mapping=mapping)
             elif args.data:
