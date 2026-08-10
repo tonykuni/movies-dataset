@@ -14,6 +14,7 @@ WRAPPER 動詞
   setup chipwar  安裝 ChipWar/MultiFactor 依賴 duckdb+scipy+scikit-learn+statsmodels
   all        backends → 工作流 selftest → VAP 繪圖 selftest 一鍵全驗證
   vap …      透傳 VAP seaborn+plotly 繪圖引擎（probe|list|spec|render|demo|selftest|columns）
+  talib …    透傳 TALib 指標引擎（probe|list|sample|compute|signals|chart|selftest;adj 鐵律）
   chipwar    跑 ChipWar 13 階段全鏈（籌碼戰五 lane + 報告 + harness + VAP 儀表板；可加 --dry-run）
   mf         跑 MultiFactor 共振引擎（= multifactor；可加 --dry-run）
   dashboard  只重生 ChipWar × VAP 儀表板並印 index 路徑
@@ -170,6 +171,7 @@ $MFParams      = Join-Path $PSScriptRoot 'functional modules\MultiFactor\mf_para
 $MFManifest    = Join-Path $PSScriptRoot 'functional modules\MultiFactor\engines\VIA_MF_ENGINE_SHA256_MANIFEST_v0100.json'
 $FlowV2Dir     = Join-Path $PSScriptRoot 'supportive modules\VIA_FlowSystem\FlowSystem_v2'
 $FlowV2Launch  = Join-Path $FlowV2Dir 'Activate-VIAFlowSystem.ps1'
+$TALibEngine   = Join-Path $PSScriptRoot 'functional modules\TALib\VIA_TALibEngine.py'
 
 function Invoke-VapHost {
     param([string[]]$A)
@@ -321,6 +323,16 @@ function Get-RestArgs {
     return @()
 }
 
+if ($Verb -eq 'talib') {
+    if (-not (Test-Path -LiteralPath $TALibEngine)) {
+        Write-Tag 'FAIL' 'TALib 引擎缺席（git pull 取回分支最新版）'
+        exit 1
+    }
+    $full = @($PyPre) + @($TALibEngine) + @(Get-RestArgs)
+    & $PyExe $full
+    exit $LASTEXITCODE
+}
+
 if ($Verb -eq 'chipwar') {
     if (-not (Test-Path -LiteralPath $ChipWarParams)) {
         Write-Tag 'FAIL' ('找不到 ChipWar 參數檔:{0}（git pull 取回分支最新版）' -f $ChipWarParams)
@@ -381,7 +393,8 @@ if ($Verb -eq 'status') {
         @{ n = 'ChipWar 儀表板產物 index';         p = $ChipWarIndex },
         @{ n = 'MultiFactor 參數檔';               p = $MFParams },
         @{ n = 'MultiFactor SHA256 manifest';      p = $MFManifest },
-        @{ n = 'FlowSystem v2 啟動器';             p = $FlowV2Launch }
+        @{ n = 'FlowSystem v2 啟動器';             p = $FlowV2Launch },
+        @{ n = 'TALib 指標引擎(adj 鐵律)';          p = $TALibEngine }
     )
     foreach ($r in $rows) {
         $mark = if (Test-Path -LiteralPath $r.p) { '在位' } else { '缺席' }
