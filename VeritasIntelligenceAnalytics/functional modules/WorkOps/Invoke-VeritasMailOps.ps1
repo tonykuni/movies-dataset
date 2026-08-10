@@ -151,19 +151,46 @@ function VO_Get {
 # ==========================================================================================
 # 04. TEMPLATE LIBRARY (scaffold + render) — subject on first line: <!-- SUBJECT: ... -->
 # ==========================================================================================
+function VO_BuildQuestionRows {
+    # v0116(操作員「郵件加入必問問題」令):必回題庫 JSON 化 — engines\mail_questions.json
+    # 為唯一題庫正本;加題/改選項只改 JSON,重建範本即生效。JSON 缺席=誠實回退內建五題。
+    param([switch]$WithNotes)
+    $qp = Join-Path $PSScriptRoot "engines\mail_questions.json"
+    $rows = ""
+    try {
+        $qb = Get-Content -LiteralPath $qp -Raw -Encoding UTF8 | ConvertFrom-Json
+        $i = 0
+        foreach ($q in $qb.questions) {
+            $i++
+            $opts = ($q.options | ForEach-Object { "○ " + $_ }) -join "　"
+            $rows += "      {0}. {1}： {2}<br/>`n" -f $i, $q.text, $opts
+            if ($WithNotes -and $q.note) {
+                $rows += "      <span style=""color:#64748b;font-size:11.5px;"">└ {0}</span><br/>`n" -f $q.note
+            }
+        }
+    } catch { $rows = "" }
+    if (-not $rows) {
+        $rows = @'
+      1. 目前狀態： ○ 進行中　○ 已完成　○ 卡關<br/>
+      2. 完成百分比： ○ 25%　○ 50%　○ 75%　○ 100%<br/>
+      3. 預計完成 ETA： ○ 今日　○ 明日　○ 本週　○ 其他：__________<br/>
+      4. 是否有阻礙 / 風險： ○ 無　○ 有：__________<br/>
+      5. 是否需要我協助： ○ 否　○ 是：__________<br/>
+'@
+    }
+    return $rows
+}
+
 function VO_GetDefaultTemplates {
-    $Answer = @'
+    $QRows = VO_BuildQuestionRows
+    $Answer = @"
       <table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:14px 0;width:100%;max-width:560px;">
         <tr><td style="background:#1e293b;color:#fff;font:700 13px 'Segoe UI',sans-serif;padding:8px 14px;border-radius:6px 6px 0 0;">請圈選或保留適用項後直接回覆(選項為主,幾乎免打字)</td></tr>
         <tr><td style="border:1px solid #e2e8f0;border-top:none;padding:12px 16px;font:400 13px 'Segoe UI',sans-serif;color:#1e293b;line-height:2.1;">
-          1. 目前狀態： ○ 進行中　○ 已完成　○ 卡關<br/>
-          2. 完成百分比： ○ 25%　○ 50%　○ 75%　○ 100%<br/>
-          3. 預計完成 ETA： ○ 今日　○ 明日　○ 本週　○ 其他：__________<br/>
-          4. 是否有阻礙 / 風險： ○ 無　○ 有：__________<br/>
-          5. 是否需要我協助： ○ 否　○ 是：__________<br/>
+$QRows
         </td></tr>
       </table>
-'@
+"@
     $Wrap = {
         param($Subject, $Lead, $Extra)
         @"
@@ -201,16 +228,9 @@ $Answer
     </td></tr>
   </table>
   <table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:12px 0;width:100%;">
-    <tr><td style="background:#334155;color:#fff;font:700 13px 'Segoe UI',sans-serif;padding:8px 14px;border-radius:6px 6px 0 0;">必回五題(圈選即可)</td></tr>
+    <tr><td style="background:#334155;color:#fff;font:700 13px 'Segoe UI',sans-serif;padding:8px 14px;border-radius:6px 6px 0 0;">__QHEADER__</td></tr>
     <tr><td style="border:1px solid #e2e8f0;border-top:none;padding:12px 16px;font-size:13px;line-height:2.2;">
-      1. 目前狀態: ○ 進行中 ○ 已完成 ○ 卡關<br/>
-      <span style="color:#64748b;font-size:11.5px;">└ 卡關請順帶在第 4 題說明原因,我來協助排除</span><br/>
-      2. 完成百分比: ○ 25% ○ 50% ○ 75% ○ 100%<br/>
-      3. 預計完成 ETA: ○ 今日 ○ 明日 ○ 本週 ○ 其他:__________<br/>
-      <span style="color:#64748b;font-size:11.5px;">└ 交期若需調整,直接填新日期即可,我會同步更新排程</span><br/>
-      4. 是否有阻礙 / 風險: ○ 無 ○ 有:__________<br/>
-      5. 是否需要我協助: ○ 否 ○ 是:__________<br/>
-      <span style="color:#64748b;font-size:11.5px;">└ 需要資源、需要向上反映、需要跨組協調,都算「是」</span>
+__QROWS__
     </td></tr>
   </table>
   <p>若能於 <b>明日中午前</b> 回覆,即可趕上本週彙整;若您已在會議或電話中說明,回「已口頭說明」即可留檔。謝謝!</p>
@@ -218,6 +238,13 @@ $Answer
   <p style="color:#94a3b8;font-size:11px;font-family:Consolas,monospace;">追蹤 {{ProjectCode}} {{CaseID}} · {{Date}} · 本信為 VIA WorkOps 產生之草稿,經本人確認後親自寄出</p>
 </div>
 '@
+    # v0116:豐富版必回題區塊由題庫 JSON 組裝(__QHEADER__/__QROWS__ 佔位替換)
+    $qhdr = "必回五題(圈選即可)"
+    try {
+        $qb2 = Get-Content -LiteralPath (Join-Path $PSScriptRoot "engines\mail_questions.json") -Raw -Encoding UTF8 | ConvertFrom-Json
+        if ($qb2.header) { $qhdr = [string]$qb2.header }
+    } catch { }
+    $RichApproval = $RichApproval.Replace("__QHEADER__", $qhdr).Replace("__QROWS__", (VO_BuildQuestionRows -WithNotes))
     # v0115 三段追蹤 T3:緊急升級範本(前兩段未獲回覆;建議 CC 主管由人自加 — 系統絕不代加代寄)
     $UrgentEscalation = @"
 <!-- SUBJECT: [緊急·第三次通知] {{ProjectCode}} {{ProjectName}} - 今日內需要您的回覆 -->
