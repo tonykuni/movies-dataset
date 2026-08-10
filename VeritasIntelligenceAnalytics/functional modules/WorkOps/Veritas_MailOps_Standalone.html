@@ -213,6 +213,12 @@
   function loadTemplates(){ try{ var r=localStorage.getItem(TPL_LS); if(r){ var d=JSON.parse(r); if(d&&d.length) return d; } }catch(e){} return seedTemplates(); }
   function saveTemplates(){ try{ localStorage.setItem(TPL_LS, JSON.stringify(templates)); }catch(e){} }
   function detectVars(t){ var s=(t.subject||'')+' '+(t.body||''); var m, set={}, re=/\{\{\s*([A-Za-z0-9_]+)\s*\}\}/g; while((m=re.exec(s))) set[m[1]]=1; return Object.keys(set); }
+
+  /* ---------------- 🔍 專案登錄庫 project registry (localStorage 狀態紀錄) ---------------- */
+  var REG_LS = 'via_mailops_projreg_v1';
+  function regLoad(){ try{ var r=localStorage.getItem(REG_LS); if(r){ var d=JSON.parse(r); if(d&&d.length!==undefined) return d; } }catch(e){} return []; }
+  function regSave(){ try{ localStorage.setItem(REG_LS, JSON.stringify(registry)); }catch(e){} }
+  var registry = regLoad();
   var SAMPLE_VARS={ ProjectCode:'PRJ-001', ProjectName:'日本合資案', MyName:'你的名字', Date:'2026/08/07' };
   function fillVars(str){ return (str||'').replace(/\{\{\s*([A-Za-z0-9_]+)\s*\}\}/g, function(_,k){ return SAMPLE_VARS[k]!=null?SAMPLE_VARS[k]:'〈'+k+'〉'; }); }
   function persist(){ try{ localStorage.setItem(LS, engine.serialize()); }catch(e){} }
@@ -260,6 +266,7 @@
       '<div style="height:8px"></div>'+
       navBtn('loaded', IC.folder({s:19}), '載入本機匯出 (你自己的 JSON)', loaded.mails.length+loaded.cases.length+loaded.stake.length)+
       navBtn('reconcile', IC.scale({s:19}), '對帳校準 · 控管表×郵件→建議', (loaded.control.length?loaded.control.length:0))+
+      navBtn('discover', IC.search({s:19}), '專案發掘 · 關鍵字→成案編號', registry.length)+
       navBtn('templates', IC.doc({s:19}), '範本庫管理 · 導入不寄出', 0)+
       navBtn('validate', IC.check({s:19}), '驗證中心 · 一鍵自檢', 0)+
       '<div style="flex:1"></div>'+
@@ -274,6 +281,7 @@
               : state.nav==='validate' ? validationView()
               : state.nav==='settings' ? settingsView()
               : state.nav==='reconcile' ? reconcileView()
+              : state.nav==='discover' ? discoverView()
               : state.nav==='templates' ? templatesView()
               : loadedView();
     return '<main class="grid-bg" style="flex:1;position:relative;overflow:hidden;display:flex">'+inner+'</main>';
@@ -854,6 +862,131 @@
     if(a==='clearappr'){ state.recAppr={}; render(); return; }
   }
 
+  /* ---------------- 🔍 專案發掘 Discover (email keywords → human-confirmed new projects) ---------------- */
+  var discState = { names:{}, kw:{} };  // transient per-session edits, keyed by cluster subject
+  var discCache = [];
+  function discNormSubj(s){ return (''+(s||'')).replace(/^((re|fw|fwd|回覆|轉寄|答复)[::]\s*)+/i,'').replace(/\s+/g,' ').trim(); }
+  function discKeywords(s){
+    var seen={}, out=[];
+    var add=function(x){ if(x && !seen[x]){ seen[x]=1; out.push(x); } };
+    (s.match(/[A-Za-z]{2,6}[-_]?\d{2,6}/g)||[]).forEach(add);            // code-like tokens
+    (s.match(/[一-鿿]{2,8}/g)||[]).forEach(add);                  // CJK runs
+    (s.match(/[A-Za-z]{4,}/g)||[]).forEach(function(x){ add(x.toLowerCase()); });
+    return out.slice(0,8);
+  }
+  function discCandidates(){
+    var groups={};
+    loaded.mails.forEach(function(m){
+      var ns=discNormSubj(m.Subject); if(!ns) return;
+      var hit=false;
+      loaded.control.forEach(function(c){ if((c.Code&&ns.indexOf(c.Code)>=0)||(c.Name&&ns.indexOf(c.Name)>=0)) hit=true; });
+      registry.forEach(function(r){
+        if((r.code&&ns.indexOf(r.code)>=0)||(r.name&&ns.indexOf(r.name)>=0)) hit=true;
+        (r.kws||[]).forEach(function(k){ if(k && ns.indexOf(k)>=0) hit=true; });   // confirmed keywords absorb their cluster
+      });
+      if(hit) return;
+      if(!groups[ns]) groups[ns]={subj:ns,count:0,last:''};
+      groups[ns].count++;
+      var d=m.EventDate||''; if(d>groups[ns].last) groups[ns].last=d;
+    });
+    return Object.keys(groups).map(function(k){ var g=groups[k]; g.kws=discKeywords(g.subj); return g; })
+      .sort(function(a,b){ return b.count-a.count || (b.last>a.last?1:-1); }).slice(0,40);
+  }
+  function nextProjCode(){
+    var maxN=0, prefix='PRJ-';
+    var scan=function(code){ var m=/^([A-Za-z]+)[-_]?(\d+)$/.exec((''+(code||'')).trim()); if(m){ var n=+m[2]; if(n>=maxN){ maxN=n; prefix=m[1]+'-'; } } };
+    loaded.control.forEach(function(c){ scan(c.Code); });
+    registry.forEach(function(r){ scan(r.code); });
+    var num=String(maxN+1); while(num.length<3) num='0'+num;
+    return prefix+num;
+  }
+  function discKwSel(subj, kws){
+    if(!discState.kw[subj]){ var d={}; kws.forEach(function(k,i){ d[k]= i<2; }); discState.kw[subj]=d; }  // default: top 2 selected
+    return discState.kw[subj];
+  }
+  function discoverView(){
+    discCache = discCandidates();
+    var hasData = loaded.mails.length>0;
+    var head='<div style="height:56px;flex:none;border-bottom:1px solid var(--line);padding:0 22px;display:flex;align-items:center;gap:12px;background:rgba(4,12,26,.5)">'+
+      '<h2 style="font-size:16px;font-weight:600;color:#fff;display:flex;align-items:center;gap:9px">'+IC.search({s:18})+' 專案發掘</h2>'+
+      '<span class="mono" style="font-size:10px;background:#0f1e34;border:1px solid var(--line2);color:var(--mut);padding:2px 8px;border-radius:5px">關鍵字→人工確認→自動編號→狀態紀錄</span>'+
+      '<span style="flex:1"></span>'+
+      '<button data-dact="exportctrl" class="mono" style="font-size:10px;color:var(--em2);background:#0f1e34;border:1px solid var(--line2);border-radius:8px;padding:7px 11px">⭳ 匯出更新版控管表</button>'+
+      '<button data-dact="exportreg" class="mono" style="font-size:10px;color:var(--mut);background:#0f1e34;border:1px solid var(--line2);border-radius:8px;padding:7px 11px">⭳ 登錄庫 JSON</button>'+
+    '</div>'+
+    '<div class="mono" style="font-size:10px;color:var(--mut2);background:var(--panel2);border-bottom:1px solid var(--line);padding:7px 22px">左側是郵件中<b style="color:var(--em2)">尚未對上任何專案</b>的主旨聚類。你點選關鍵字、改好案名、按「成案」→ 系統配下一個自動編號並存入本機登錄庫(狀態紀錄)。之後按「匯出更新版控管表」,由<b style="color:var(--em2)">你檢視後自行取代</b>原控管表 — 程式不直接改你的檔。</div>';
+
+    var candHtml;
+    if(!hasData){
+      candHtml='<div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--mut2)"><div style="opacity:.5">'+IC.search({s:40})+'</div><div style="font-size:13px;color:#cbd5e1">先到「載入」頁匯入郵件(mails),再回來發掘</div></div>';
+    } else if(!discCache.length){
+      candHtml='<div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--mut2)"><div style="opacity:.5">'+IC.check({s:40})+'</div><div style="font-size:13px;color:#cbd5e1">所有郵件主旨都已對上控管表或登錄庫 — 沒有新案候選</div></div>';
+    } else {
+      candHtml='<div style="flex:1;overflow-y:auto;padding:14px 18px">'+discCache.map(function(g,i){
+        var sel=discKwSel(g.subj, g.kws);
+        var name = discState.names[g.subj]!==undefined ? discState.names[g.subj] : g.subj;
+        return '<div style="background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px">'+
+          '<div style="display:flex;align-items:baseline;gap:8px;margin-bottom:7px">'+
+            '<span class="mono" style="font-size:9px;color:var(--mut2)">'+g.count+' 封 · 最後 '+esc((g.last||'').slice(0,10)||'—')+'</span>'+
+            '<span style="font-size:11px;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">'+esc(g.subj)+'</span>'+
+          '</div>'+
+          '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px">'+g.kws.map(function(k,ki){
+            var on=!!sel[k];
+            return '<button data-dkw="'+i+'|'+ki+'" style="font-size:10.5px;font-family:var(--mono);padding:3px 9px;border-radius:14px;border:1px solid '+(on?'rgba(16,185,129,.5)':'var(--line2)')+';color:'+(on?'var(--em2)':'var(--mut2)')+';background:'+(on?'rgba(16,185,129,.12)':'transparent')+'">'+esc(k)+'</button>';
+          }).join('')+'</div>'+
+          '<div style="display:flex;gap:8px;align-items:center">'+
+            '<input data-dname="'+i+'" value="'+esc(name)+'" placeholder="專案名稱(可修改)" style="flex:1;font:500 12px var(--sans);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:7px 10px;outline:none">'+
+            '<button data-dconf="'+i+'" style="display:flex;align-items:center;gap:5px;font-size:11.5px;background:rgba(16,185,129,.9);color:#fff;padding:7px 13px;border-radius:8px;font-weight:600;white-space:nowrap">'+IC.plus({s:12})+' 成案 '+esc(nextProjCode())+'</button>'+
+          '</div>'+
+        '</div>';
+      }).join('')+'</div>';
+    }
+
+    var regHtml = registry.length
+      ? '<div style="flex:1;overflow-y:auto">'+registry.slice().reverse().map(function(r){
+          return '<div style="padding:10px 14px;border-bottom:1px solid rgba(30,41,59,.5);display:flex;align-items:center;gap:10px">'+
+            '<span class="mono" style="font-size:10.5px;color:var(--em2);background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:5px;padding:2px 8px;white-space:nowrap">'+esc(r.code)+'</span>'+
+            '<div style="flex:1;min-width:0"><div style="font-size:12px;color:#e2e8f0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(r.name)+'</div>'+
+            '<div class="mono" style="font-size:9px;color:var(--mut2)">'+esc((r.kws||[]).join(' · '))+' · '+esc(r.srcCount||0)+' 封佐證 · '+esc(r.at||'')+'</div></div>'+
+            '<button data-dregdel="'+esc(r.code)+'" class="mono" style="font-size:9px;color:#e0899b;border:1px solid #3a2230;border-radius:5px;padding:3px 8px">移除</button>'+
+          '</div>';
+        }).join('')+'</div>'
+      : '<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--mut2)" class="mono" style="font-size:11px">尚無成案紀錄</div>';
+
+    return '<div class="fadein" style="flex:1;display:flex;flex-direction:column;position:relative;z-index:10;overflow:hidden">'+head+
+      '<div style="flex:1;display:flex;overflow:hidden">'+
+        '<div style="flex:1.4;display:flex;flex-direction:column;border-right:1px solid var(--line);overflow:hidden">'+
+          '<div class="mono" style="flex:none;font-size:9px;letter-spacing:1px;color:var(--mut2);text-transform:uppercase;padding:10px 18px 4px">候選聚類(未對上任何專案)</div>'+candHtml+'</div>'+
+        '<div style="flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--panel2)">'+
+          '<div class="mono" style="flex:none;font-size:9px;letter-spacing:1px;color:var(--mut2);text-transform:uppercase;padding:10px 18px 4px">已成案登錄庫('+registry.length+')· 本機狀態紀錄</div>'+regHtml+'</div>'+
+      '</div>'+
+    '</div>';
+  }
+  function discAction(a){
+    function q(v){ v=(v==null?'':''+v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+    if(a==='exportctrl'){
+      if(!loaded.control.length && !registry.length){ alert('沒有控管表也沒有成案紀錄可匯出。'); return; }
+      var lines=['ProjectCode,ProjectName,Owner,Status,Progress,DueDate,LastUpdated'];
+      loaded.control.forEach(function(c){ lines.push([q(c.Code),q(c.Name),q(c.Owner),q(c.Status),q(c.Progress),q(c.Due),q(c.Updated)].join(',')); });
+      registry.forEach(function(r){ lines.push([q(r.code),q(r.name),q(''),q('新案(待補)'),q(''),q(''),q(r.at)].join(',')); });
+      downloadText('control_sheet_updated.csv', lines.join('\n')+'\n', 'text/csv');
+      return;
+    }
+    if(a==='exportreg'){ downloadText('project_registry.json', JSON.stringify(registry,null,2), 'application/json'); return; }
+  }
+  function discConfirm(i){
+    var g=discCache[i]; if(!g) return;
+    var inp=D.querySelector('input[data-dname="'+i+'"]');
+    var name=(inp&&inp.value.trim()) || g.subj;
+    var sel=discKwSel(g.subj, g.kws);
+    var kws=g.kws.filter(function(k){ return sel[k]; });
+    if(!kws.length) kws=g.kws.slice(0,1);
+    registry.push({ code:nextProjCode(), name:name, kws:kws, srcCount:g.count, at:today() });
+    regSave();
+    delete discState.names[g.subj]; delete discState.kw[g.subj];
+    render();
+  }
+
   /* ---------------- ⚙ Settings (mouse-adjustable factor weights) ---------------- */
   function settingsView(){
     var W=settings.w;
@@ -1189,8 +1322,12 @@
 
   /* ============================= EVENTS ============================= */
   D.getElementById('app').addEventListener('click', function(e){
-    var t = e.target.closest('[data-act],[data-nav],[data-open],[data-addtask],[data-move],[data-ltab],[data-deck],[data-tsel],[data-tplsel],[data-tplact],[data-recact],[data-recappr]');
+    var t = e.target.closest('[data-act],[data-nav],[data-open],[data-addtask],[data-move],[data-ltab],[data-deck],[data-tsel],[data-tplsel],[data-tplact],[data-recact],[data-recappr],[data-dact],[data-dkw],[data-dconf],[data-dregdel]');
     if(!t) return;
+    if(t.dataset.dkw){ var dk=t.dataset.dkw.split('|'); var g=discCache[+dk[0]]; if(g){ var kw=g.kws[+dk[1]]; var sel=discKwSel(g.subj,g.kws); sel[kw]=!sel[kw]; render(); } return; }
+    if(t.dataset.dconf!==undefined && t.dataset.dconf!==''){ discConfirm(+t.dataset.dconf); return; }
+    if(t.dataset.dregdel){ var rc=t.dataset.dregdel; if(confirm('從登錄庫移除 '+rc+'?(不影響已匯出的檔案)')){ registry=registry.filter(function(r){return r.code!==rc;}); regSave(); render(); } return; }
+    if(t.dataset.dact){ discAction(t.dataset.dact); return; }
     if(t.dataset.recappr){ state.recAppr[t.dataset.recappr]=!state.recAppr[t.dataset.recappr]; render(); return; }
     if(t.dataset.recact){ recAction(t.dataset.recact); return; }
     if(t.dataset.tplsel){ state.tplSel=t.dataset.tplsel; render(); return; }
@@ -1215,6 +1352,8 @@
     if(e.target.id==='q'){ state.query=e.target.value; var f=D.activeElement, c=f&&f.selectionStart;
       // re-render inbox list only-ish: simplest is full render + refocus
       render(); var nq=D.getElementById('q'); if(nq){ nq.focus(); try{nq.setSelectionRange(c,c);}catch(_){} } return; }
+    var dn=e.target.getAttribute && e.target.getAttribute('data-dname');
+    if(dn!==null && dn!==undefined){ var dg=discCache[+dn]; if(dg) discState.names[dg.subj]=e.target.value; return; }
     var tf=e.target.getAttribute && e.target.getAttribute('data-tf');
     if(tf){
       var t=currentTpl(); if(!t) return;
