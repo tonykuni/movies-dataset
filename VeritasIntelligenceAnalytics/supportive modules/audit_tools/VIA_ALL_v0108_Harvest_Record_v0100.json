@@ -1,0 +1,22 @@
+{
+ "record_id": "VIA_ALL_v0108_Harvest_Record_v0100",
+ "ts": "2026-08-11T16:30:00",
+ "operator_order": "一個powershell code to handle all.(實機 wop apply FAIL ×2 — wop_confirm.csv 滯留 Downloads)",
+ "root_cause": "四種人工回件(WOP 確認檔/Gold Set/詞庫核對表/控管表)需手動搬檔到指定路徑 — 唯一殘存的人工搬運斷點",
+ "built": {
+  "[0f] 回件收割": "Downloads + repo 根 + VIA 根掃最新符合檔 → 自動歸位;瀏覽器序號名(檔名 (n))正規化;既有檔先 .bak;sha256 帳 harvest_ledger.json 防重吸;來源原檔零觸碰",
+  "[2e3] ML 迴圈": "sklearn 缺席誠實略過;adopt(冪等)→train→suggest;cluster 永不自動跑(防覆蓋操作員填寫中的核對表)",
+  "via-workops harvest": "新動詞 = ALL -HarvestOnly(動態解析最新版;只歸位即離開)"
+ },
+ "closed_loops": [
+  "WopConfirmQueue 下載 → all(0f 歸位 → 2c 自動吸收 apply)",
+  "Excel 另存 gold_set.csv → all(0f → 2e 自動實測)",
+  "lexicon_review 填建議狀態 → all(0f → 2e3 adopt 詞庫長大 → train/suggest 同輪更新)",
+  "控管表更新 → all(0f → 板段對帳)"
+ ],
+ "qa": "AST 0 錯;沙箱雙跑:首跑 3 件歸位(Downloads 序號名正規化/根目錄控管表),二跑 sha 帳全略誠實冪等;cmd CRLF+全形括號 0 隱患",
+ "operator_verification": [
+  "via-sync",
+  "via-workops all"
+ ]
+}
