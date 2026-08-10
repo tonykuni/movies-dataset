@@ -15,12 +15,13 @@ WRAPPER 動詞
   all        backends → 工作流 selftest → VAP 繪圖 selftest 一鍵全驗證
   vap …      透傳 VAP seaborn+plotly 繪圖引擎（probe|list|spec|render|demo|selftest|columns）
   talib …    透傳 TALib 指標引擎（probe|list|sample|compute|signals|chart|selftest;adj 鐵律）
+  theory     今日五引擎理論稽核 — PS 獨立甲骨文 14 斷言（自算期望值對質,非引擎自證）
   chipwar    跑 ChipWar 13 階段全鏈（籌碼戰五 lane + 報告 + harness + VAP 儀表板；可加 --dry-run）
   mf         跑 MultiFactor 共振引擎（= multifactor；可加 --dry-run）
   dashboard  只重生 ChipWar × VAP 儀表板並印 index 路徑
   flowsystem FlowSystem v2 一鍵（引擎未上傳時誠實回報待傳清單）
   status     全模組在位/缺席全景
-  everything 一支到底：all + chipwar + mf + status（本 session 全部建設一次驗完）
+  everything 一支到底：all + chipwar + mf + theory（本 session 全部建設一次驗完）
 
 引擎動詞（透傳）
   backends | demo [...] | sample | master [params.json] [--dry-run]
@@ -172,6 +173,7 @@ $MFManifest    = Join-Path $PSScriptRoot 'functional modules\MultiFactor\engines
 $FlowV2Dir     = Join-Path $PSScriptRoot 'supportive modules\VIA_FlowSystem\FlowSystem_v2'
 $FlowV2Launch  = Join-Path $FlowV2Dir 'Activate-VIAFlowSystem.ps1'
 $TALibEngine   = Join-Path $PSScriptRoot 'functional modules\TALib\VIA_TALibEngine.py'
+$TheoryAudit   = Join-Path $PSScriptRoot 'Test-VIA-TheoryAudit.ps1'
 
 function Invoke-VapHost {
     param([string[]]$A)
@@ -333,6 +335,16 @@ if ($Verb -eq 'talib') {
     exit $LASTEXITCODE
 }
 
+if ($Verb -eq 'theory') {
+    if (-not (Test-Path -LiteralPath $TheoryAudit)) {
+        Write-Tag 'FAIL' '理論稽核腳本缺席:Test-VIA-TheoryAudit.ps1（git pull 取回分支最新版）'
+        exit 1
+    }
+    if ($Python -ne '') { $env:VIA_PYTHON = $Python }
+    & $TheoryAudit
+    exit $LASTEXITCODE
+}
+
 if ($Verb -eq 'chipwar') {
     if (-not (Test-Path -LiteralPath $ChipWarParams)) {
         Write-Tag 'FAIL' ('找不到 ChipWar 參數檔:{0}（git pull 取回分支最新版）' -f $ChipWarParams)
@@ -394,7 +406,8 @@ if ($Verb -eq 'status') {
         @{ n = 'MultiFactor 參數檔';               p = $MFParams },
         @{ n = 'MultiFactor SHA256 manifest';      p = $MFManifest },
         @{ n = 'FlowSystem v2 啟動器';             p = $FlowV2Launch },
-        @{ n = 'TALib 指標引擎(adj 鐵律)';          p = $TALibEngine }
+        @{ n = 'TALib 指標引擎(adj 鐵律)';          p = $TALibEngine },
+        @{ n = '理論稽核 Test-VIA-TheoryAudit.ps1'; p = $TheoryAudit }
     )
     foreach ($r in $rows) {
         $mark = if (Test-Path -LiteralPath $r.p) { '在位' } else { '缺席' }
@@ -416,30 +429,39 @@ if ($Verb -eq 'status') {
 if ($Verb -eq 'everything') {
     Write-Host '━━ EVERYTHING:本 session 全部建設一支到底 ━━━━━━━━━━━━'
     $steps = @()
-    Write-Host '── [1/5] backends 十庫探測 ──'
+    Write-Host '── [1/6] backends 十庫探測 ──'
     $steps += @{ n = 'backends'; c = (Invoke-EngineHost @('backends')) }
-    Write-Host '── [2/5] 工作流 selftest ──'
+    Write-Host '── [2/6] 工作流 selftest ──'
     $steps += @{ n = 'workflow selftest'; c = (Invoke-EngineHost @('selftest')) }
-    Write-Host '── [3/5] VAP 繪圖 selftest ──'
+    Write-Host '── [3/6] VAP 繪圖 selftest ──'
     if ((Test-Path -LiteralPath $VapEngine) -and ((Test-PyModule 'seaborn') -or (Test-PyModule 'plotly'))) {
         $steps += @{ n = 'vap selftest'; c = (Invoke-VapHost @('selftest')) }
     } else {
         Write-Tag 'SKIP' 'VAP 引擎或繪圖庫缺席'
         $steps += @{ n = 'vap selftest'; c = -1 }
     }
-    Write-Host '── [4/5] ChipWar 13 階段全鏈 ──'
+    Write-Host '── [4/6] ChipWar 13 階段全鏈 ──'
     if ((Test-Path -LiteralPath $ChipWarParams) -and (Test-PyModule 'duckdb')) {
         $steps += @{ n = 'chipwar chain'; c = (Invoke-EngineHost @('master', $ChipWarParams)) }
     } else {
         Write-Tag 'SKIP' 'ChipWar 參數檔或 duckdb 缺席（setup chipwar 可裝依賴）'
         $steps += @{ n = 'chipwar chain'; c = -1 }
     }
-    Write-Host '── [5/5] MultiFactor 引擎 ──'
+    Write-Host '── [5/6] MultiFactor 引擎 ──'
     if ((Test-Path -LiteralPath $MFParams) -and (Test-PyModule 'scipy')) {
         $steps += @{ n = 'multifactor'; c = (Invoke-EngineHost @('master', $MFParams)) }
     } else {
         Write-Tag 'SKIP' 'MultiFactor 參數檔或 scipy 缺席'
         $steps += @{ n = 'multifactor'; c = -1 }
+    }
+    Write-Host '── [6/6] 理論稽核（PS 獨立甲骨文 14 斷言）──'
+    if (Test-Path -LiteralPath $TheoryAudit) {
+        if ($Python -ne '') { $env:VIA_PYTHON = $Python }
+        & $TheoryAudit
+        $steps += @{ n = 'theory audit'; c = $LASTEXITCODE }
+    } else {
+        Write-Tag 'SKIP' '理論稽核腳本缺席（git pull 取回分支最新版）'
+        $steps += @{ n = 'theory audit'; c = -1 }
     }
     Write-Host ''
     Write-Host '━━ EVERYTHING 總結 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
@@ -462,7 +484,7 @@ if ($Verb -eq 'everything') {
 if ($Verb -eq '') {
     Write-Host '════════════════════════════════════════════════════════'
     Write-Host (' VIA_WorkflowEngine 啟動器（Python {0} @ {1}）' -f $Py.Ver, $PyExe)
-    Write-Host ' wrapper：doctor|setup [vap|chipwar]|all|vap …|chipwar|mf|dashboard|flowsystem|status|everything'
+    Write-Host ' wrapper：doctor|setup [vap|chipwar]|all|vap …|talib …|theory|chipwar|mf|dashboard|flowsystem|status|everything'
     Write-Host '════════════════════════════════════════════════════════'
     $code = Invoke-EngineHost @()
     exit $code
