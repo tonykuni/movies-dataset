@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIA WorkOps — 自動分類準確度提升報告(降低校正率)</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--ink:#1e1d1a;--blue:#4c78a8;--teal:#439a9a;--red:#c96b5a;--green:#5a9e6f;--hair:#dbd9d3;--muted:#8a877f;--amber:#d9b95f;--purple:#7a5fa8}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:'DM Sans','Noto Sans CJK TC',sans-serif;font-size:15px;line-height:1.75}
+.wrap{max-width:1080px;margin:0 auto;padding:44px 32px 90px}
+.gradient-strip{height:5px;background:linear-gradient(90deg,#c96b5a,#d98e5f,#d9b95f,#5a9e6f,#439a9a,#4c78a8,#7a5fa8)}
+header{padding:36px 0 24px;border-bottom:2px solid var(--ink)}
+.seal{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;background:var(--red);color:#fff;font-family:'Syne',sans-serif;font-weight:800;font-size:24px;border-radius:3px;margin-right:14px;vertical-align:middle}
+h1{font-family:'Syne','Noto Sans CJK TC',sans-serif;font-weight:800;font-size:28px;display:inline-block;vertical-align:middle}
+.sub{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);margin-top:8px}
+h2{font-family:'Syne','Noto Sans CJK TC',sans-serif;font-weight:700;font-size:20px;margin:46px 0 6px;padding-top:18px;border-top:1px solid var(--hair)}
+h2 .no{font-family:'DM Mono',monospace;font-size:13px;color:var(--blue);margin-right:10px}
+h3{font-family:'Syne','Noto Sans CJK TC',sans-serif;font-weight:600;font-size:15.5px;margin:22px 0 8px}
+p{margin:10px 0}
+.card{background:var(--paper);border:1px solid var(--hair);border-radius:3px;padding:18px 22px;margin:14px 0}
+table{width:100%;border-collapse:collapse;background:var(--paper);margin:14px 0;font-size:13.5px}
+th{font-family:'DM Mono',monospace;font-size:11px;text-align:left;letter-spacing:.6px;color:var(--muted);border-bottom:2px solid var(--ink);padding:8px 12px;text-transform:uppercase}
+td{border-bottom:1px solid var(--hair);padding:9px 12px;vertical-align:top}
+tr:last-child td{border-bottom:1px solid var(--ink)}
+.mono{font-family:'DM Mono',monospace;font-size:12.5px}
+.tag{display:inline-block;font-family:'DM Mono',monospace;font-size:10.5px;padding:2px 8px;border-radius:2px;color:#fff;white-space:nowrap}
+.t-green{background:var(--green)}.t-blue{background:var(--blue)}.t-teal{background:var(--teal)}.t-red{background:var(--red)}.t-amber{background:var(--amber)}.t-purple{background:var(--purple)}.t-gray{background:var(--hair);color:var(--ink)}
+.lvl{display:flex;gap:10px;align-items:stretch;margin:8px 0;background:var(--paper);border:1px solid var(--hair);border-radius:3px;padding:12px 16px}
+.lvl .n{flex:0 0 74px;font-family:'DM Mono',monospace;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;border-radius:2px;color:#fff}
+.lvl .b{flex:1}
+.lvl .b b{font-size:14px}
+.lvl .b span{display:block;font-size:12.5px;color:var(--muted);margin-top:2px}
+.lvl .acc{flex:0 0 120px;text-align:right;font-family:'DM Mono',monospace;font-size:12px;align-self:center}
+.note{font-size:13px;color:var(--muted);border-left:2px solid var(--hair);padding-left:14px;margin:12px 0}
+.principle{background:#f4f7f4;border:1px solid var(--green);border-radius:3px;padding:14px 18px;margin:14px 0;font-size:13.5px}
+.principle b{color:var(--green)}
+.warn{background:#fdf6f4;border:1px solid var(--red);border-radius:3px;padding:14px 18px;margin:14px 0;font-size:13.5px}
+.warn b{color:var(--red)}
+ul{margin:8px 0 8px 22px}
+li{margin:5px 0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+footer{margin-top:56px;padding-top:14px;border-top:2px solid var(--ink);font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)}
+@media screen and (max-width:820px){.wrap{padding:22px 14px 60px}h1{font-size:20px;display:block;margin-top:10px}.grid2{grid-template-columns:1fr}.lvl{flex-wrap:wrap}.lvl .acc{flex:1 0 100%;text-align:left}table{display:block;overflow-x:auto}}
+@media print{body{background:#fff}.wrap{max-width:186mm;padding:8mm 0}.card,.lvl,tr{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="gradient-strip"></div>
+<div class="wrap">
+
+<header>
+  <span class="seal">準</span><h1>自動分類準確度提升報告<br>— 降低人工校正率</h1>
+  <div class="sub">VIA WorkOps · 2026/08/08 · 掛載目標:M1 wop_identifier / identifier_params.json · read-only · run-local</div>
+</header>
+
+<h2><span class="no">00</span>核心思路</h2>
+<p>校正率下降不是「模型更聰明」,而是<b>路由順序由精準至模糊</b>:讓確定性規則先攔截,統計歸納只當保底。每一層命中就終止,不再往下傳——進入人工候選池(names propose)的,只剩真正的未知郵件。</p>
+<div class="principle"><b>◎ 三條鐵律(與既有治理一致)</b><br>
+① 已核對名(names apply)永不被統計覆蓋——人工確認是最高真相。<br>
+② 規則優先於統計——<span class="mono">names add</span> 自建規則一律先於叢集歸納執行。<br>
+③ 每次校正都要「買到」永久性——確認過的 thread/名稱/代碼寫入對映表,同類下次直接命中,同一個錯誤永遠只改一次。</div>
+
+<h2><span class="no">01</span>八層路由瀑布(由精準至模糊)</h2>
+
+<div class="lvl"><div class="n" style="background:var(--ink)">L0</div><div class="b"><b>雜訊過濾池(黑名單)</b><span>行銷電子報/促銷/系統驗證信 → NOISE-MARKETING / SPAM-PROMO 專用槽直接攔截;促銷關鍵字(限時優惠/早鳥/抽獎/早報)自動降權</span></div><div class="acc">攔截後不進分類</div></div>
+<div class="lvl"><div class="n" style="background:var(--green)">L1</div><div class="b"><b>主旨/內文案號</b><span>[PRJ-###]/[THR-####]/[WOP-##] 主旨錨點;主旨漏帶時<b>內文代號補全</b>——引擎同時掃信體提取編號回掛</span></div><div class="acc" style="color:var(--green)">100%·零校正</div></div>
+<div class="lvl"><div class="n" style="background:var(--green)">L2</div><div class="b"><b>Thread 錨定繼承</b><span>In-Reply-To/References 解析;thr_case_map 曾被人工確認過的 thread,後續所有 Re/Fwd 直接繼承分類——即使對方亂改主旨</span></div><div class="acc" style="color:var(--green)">100%·確認過即永久</div></div>
+<div class="lvl"><div class="n" style="background:var(--teal)">L3</div><div class="b"><b>PRODUCT CODE</b><span>結構化郵件(銀行通知/訂單/發票/系統警示)regex 抽特徵碼 → 生成內部代碼(如 SINOPAC_DEBIT_PAY)→ 強制歸戶;主旨每期變動無妨,代碼不變</span></div><div class="acc" style="color:var(--teal)">98%+·設定一次免校正</div></div>
+<div class="lvl"><div class="n" style="background:var(--teal)">L4</div><div class="b"><b>組合規則引擎</b><span>names add 升級支援 AND/OR:寄件者網域 + 主旨關鍵字 + 附件特徵組合(@sinopac.com 且「消費通知」→ 永豐簽帳卡);徹底分開行銷信與正式通知</span></div><div class="acc" style="color:var(--teal)">98%+</div></div>
+<div class="lvl"><div class="n" style="background:var(--blue)">L5</div><div class="b"><b>網域白名單</b><span>寄件者網域 → 預設分類/案號對映表;系統信主旨常變、網域不變,第一層特徵最穩定</span></div><div class="acc" style="color:var(--blue)">95%+</div></div>
+<div class="lvl"><div class="n" style="background:var(--blue)">L6</div><div class="b"><b>已核對名模糊比對</b><span>與已核對名相似度 ≥ 門檻(建議 90%,rapidfuzz)自動判同案,不進候選;alias 字典吸收異體寫法(永豐 ↔ Sinopac ↔ 永豐銀行)</span></div><div class="acc" style="color:var(--blue)">高·隨核對累積上升</div></div>
+<div class="lvl"><div class="n" style="background:var(--amber)">L7</div><div class="b"><b>附件指紋</b><span>附件檔名規則/固定格式(電子交易明細單/發票 XML/結算報表)輔助歸類——分類依據不在主旨的信件由此補洞</span></div><div class="acc" style="color:#a8883d">輔助訊號</div></div>
+<div class="lvl"><div class="n" style="background:var(--red)">L8</div><div class="b"><b>統計/語意歸納(保底)</b><span>前七層皆未命中才進叢集歸納 → names propose 人工候選池(mouse-only 一鍵核對)</span></div><div class="acc" style="color:var(--red)">唯一產生校正之處</div></div>
+
+<p class="note">效果邏輯:校正率 = L8 的流量。前七層每攔截一封,人工候選池就少一封;P0 規則設定完成後,L8 只剩「真正第一次見到的郵件」。</p>
+
+<h2><span class="no">02</span>四個對映表 — 校正買永久性的落點</h2>
+<div class="grid2">
+<div class="card"><h3>thr_case_map(加權+衰減+雙向)</h3>
+<ul>
+<li><b>加權</b>:人工確認過的 THR↔CASE 對映權重=∞(永久錨定);統計推斷的對映帶信心分數</li>
+<li><b>時效衰減</b>:新互動權重高於舊紀錄,長期演進案件精準續接最新脈絡</li>
+<li><b>雙向增強</b>:同時記 THR↔PRODUCT CODE,同服務同類信歷史記憶直接命中</li>
+</ul></div>
+<div class="card"><h3>alias 字典(命名核對迴圈擴充)</h3>
+<ul>
+<li>核對表允許設別名/縮寫/異體字,一名多寫全部收斂到正典名</li>
+<li>names propose → 核對表改名 → names apply 迴圈不變;已核對名鎖定最高優先權</li>
+<li>OpenCC 繁簡正規化先行,再進比對</li>
+</ul></div>
+<div class="card"><h3>product_code_map(新增)</h3>
+<ul>
+<li>語法:<span class="mono">names add "永豐簽帳卡消費" --product-code "SINOPAC-DEBIT-NOTIF"</span></li>
+<li>regex 從 header/內文抽特徵(特店代號/交易類型/載具類別)自動生成內部代碼</li>
+<li>行銷雜訊也代碼化(NOISE-*):攔截即分類,不佔運算</li>
+</ul></div>
+<div class="card"><h3>domain_map(新增)</h3>
+<ul>
+<li>寄件者網域 → 預設分類/專案;與 S5 訊號源同源,升級為第一層確定性規則</li>
+<li>與關鍵字組成 AND 條件即為 L4 組合規則</li>
+<li>全部 JSON 參數,不改程式(參數 JSON · 模組 Python · UI HTML)</li>
+</ul></div>
+</div>
+
+<h2><span class="no">03</span>操作優先順序</h2>
+<table>
+<tr><th>優先</th><th>策略步驟</th><th>預期效果</th></tr>
+<tr><td><span class="tag t-red">P0 立即</span></td><td>對高頻日常郵件(銀行通知/訂單/定期報表)設 names add 規則 + 雜訊黑名單池</td><td><b>立即解決 70%+ 重複校正</b>;候選池瘦身,人工只看真未知</td></tr>
+<tr><td><span class="tag t-blue">P1 中期</span></td><td>發信帶代號習慣化 + names propose→apply 迴圈持續跑 + thread 確認錨定累積</td><td>特定案件追蹤命中率<b>趨近 100%</b>;歷史越厚越準</td></tr>
+<tr><td><span class="tag t-teal">P2 系統</span></td><td>網域+regex 組合規則、PRODUCT CODE 抽碼、附件指紋、alias 字典完備</td><td>徹底消除雜訊干擾;引擎專注核心專案;校正率壓到個位數 %</td></tr>
+</table>
+
+<h2><span class="no">04</span>與既有模組的接線</h2>
+<table>
+<tr><th>本報告機制</th><th>落點</th><th>改動</th></tr>
+<tr><td>八層路由順序</td><td class="mono">identifier_params.json → routing_priority[]</td><td>M1 增讀路由序列,逐層命中即終止</td></tr>
+<tr><td>四個對映表</td><td class="mono">thr_case_map / alias / product_code_map / domain_map</td><td>JSON 檔各自獨立,只增不減;確認寫回由 convergence 既有機制承接</td></tr>
+<tr><td>fuzzy 門檻/衰減參數</td><td class="mono">convergence_params.json</td><td>沿用 auto_accept 體系,加 fuzzy_threshold(0.90)與 recency_decay</td></tr>
+<tr><td>雜訊池</td><td class="mono">noise_rules.json + ③頁雜訊槽</td><td>L0 攔截件入專用槽可回顧,不是刪除(read-only 原則)</td></tr>
+<tr><td>內文代號補全</td><td class="mono">M3 reply_parser 共用 token 掃描器</td><td>主旨/信體同一套編號 regex,一處維護</td></tr>
+</table>
+
+<div class="warn"><b>⚠ 一個要守住的邊界:</b>L3–L5 的「強制歸戶」只適用確定性特徵(代碼/網域/規則)。任何相似度、統計、語意判斷(L6–L8)一律不強判——分歧或低信心就進 ASK,寧可多問一鍵,不可錯歸污染 thr_case_map 與 mining 的 Case ID。錯誤的永久錨定比校正更貴。</div>
+
+<h2><span class="no">05</span>成效追蹤(掛進週報 KPI)</h2>
+<table>
+<tr><th>指標</th><th>定義</th><th>目標軌跡</th></tr>
+<tr><td>校正率</td><td>進 names propose 候選的信 ÷ 總分類信</td><td>P0 後 −70% → P2 後個位數 %</td></tr>
+<tr><td>逐層命中分佈</td><td>L0–L8 各層攔截量(週報長條)</td><td>L8 佔比持續萎縮 = 系統在學</td></tr>
+<tr><td>永久錨定數</td><td>thr_case_map 人工確認累計</td><td>單調遞增;同錯不二改</td></tr>
+<tr><td>雜訊攔截量</td><td>L0 入槽件數</td><td>驗證黑名單有效性,誤攔可一鍵放行</td></tr>
+</table>
+
+<footer>VIA WorkOps · 自動分類準確度提升報告 v1.0 · 2026/08/08 · 掛載:M1/identifier_params.json · read-only · run-local · 準</footer>
+</div>
+</body>
+</html>
