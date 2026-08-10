@@ -1,0 +1,17 @@
+{
+  "_comment": "VIA MultiFactor Resonance SSOT Workbench — master 動詞參數檔。引擎自帶 --ssot/--out-base CLI,四檔皆原樣歸檔(SHA256 manifest 完整有效)。測試套件因硬編碼 /mnt/data 不入本檔(Windows 用 Invoke ps1;Linux 見 README symlink 法)。",
+  "paths": {
+    "engines_dir": "engines"
+  },
+  "stages": [
+    {"id": "mf_engine", "enabled": true, "script": "VIA_MultiFactor_TestValidateSim_Engine_v0100.py",
+     "args": ["--ssot", "../../../supportive modules/Dashboard_Format_Standardization/uploads/SSOT_VPT_ingest.json",
+              "--out-base", "../_generated/VIA_MF_ENGINE_RUNS"],
+     "desc": "多因子 測試·驗證·模擬 引擎 v0100(9因子×關連/顯著/領先/影響/反證/共振/隱形/模擬/准入)"}
+  ],
+  "run": {
+    "stop_on_error": true,
+    "timeout_sec_per_stage": 600
+  },
+  "report": {}
+}
