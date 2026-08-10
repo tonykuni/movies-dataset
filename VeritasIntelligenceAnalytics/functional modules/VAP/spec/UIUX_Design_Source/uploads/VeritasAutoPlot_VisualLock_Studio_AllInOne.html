@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VeritasAutoPlot · Visual Lock Chart Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+<style>
+:root{
+  --bg:#f5f4f0;--bg1:#edecea;--bg2:#e5e3df;--sf:#fff;--sf2:#fafaf8;
+  --bd:#dbd9d3;--bd2:#ccc9c1;
+  --bl:#4c78a8;--bl-l:#d0e1f0;--tl:#439a9a;--tl-l:#c8e6e6;
+  --gn:#5a9e6f;--gn-l:#cde8d5;--am:#c4943a;--am-l:#f5e2b8;
+  --co:#c96b5a;--co-l:#f5d0c8;--vi:#7a6daa;--vi-l:#dcd8f0;
+  --i0:#1e1d1a;--i1:#3d3c38;--i2:#6b6860;--i3:#9c9890;--i4:#c4c0b8;
+  --mo:'DM Mono',monospace;--sa:'DM Sans',system-ui,sans-serif;--hf:'Syne',system-ui,sans-serif;
+  --r:5px;--r2:8px;--r3:12px;--sh:0 1px 3px rgba(0,0,0,.06);--sh2:0 4px 12px rgba(0,0,0,.08)
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sa);background:var(--bg);color:var(--i0);font-size:11px;line-height:1.55}
+.w{max-width:1680px;margin:0 auto;padding:10px 14px}
+.hdr{background:linear-gradient(180deg,#fff 0%, #fcfbf8 100%);border:1px solid var(--bd);border-radius:var(--r3);padding:14px 16px;margin-bottom:8px;position:relative;overflow:hidden;display:flex;align-items:center;gap:12px}
+.hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#5b7fa6 0%, #6f93b8 22%, #6f9f9b 48%, #8a84b6 74%, #b59a68 100%)}
+.h1t{font-size:18px;font-weight:700;letter-spacing:-.5px}
+.h1t span{color:#5b7fa6}
+.h2t{color:#8c8881;font-size:10px;margin-top:1px}
+.hdr-right{margin-left:auto;display:flex;gap:6px;align-items:center}
+.sys-dot{width:8px;height:8px;border-radius:50%;background:var(--gn)}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font:500 9px var(--mo);border:1px solid var(--bd);background:var(--bg1);color:var(--i2)}
+.pt{display:flex;gap:2px;margin-bottom:8px;flex-wrap:wrap}
+.pt button{padding:8px 18px;border:1px solid var(--bd);border-radius:var(--r2) var(--r2) 0 0;background:var(--bg1);color:var(--i2);font:600 11px var(--sa);cursor:pointer;border-bottom:2px solid transparent;transition:.15s}
+.pt button.on{background:var(--sf);color:var(--bl);border-bottom-color:var(--bl);box-shadow:var(--sh)}
+.pg{display:none}.pg.on{display:block}
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:5px;margin-bottom:8px}
+.sc{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);padding:8px 10px;text-align:center}
+.sc .n{font-size:15px;font-weight:700;font-family:var(--mo)}
+.sc .l{font-size:8px;color:var(--i3);text-transform:uppercase;letter-spacing:.4px}
+.cd{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);margin-bottom:8px;overflow:hidden}
+.cd-h{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--bd);background:var(--sf2)}
+.cd-t{font-weight:600;font-size:11px;flex:1}
+.cd-b{padding:10px}
+.g-main{display:grid;grid-template-columns:340px 1fr;gap:8px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+@media(max-width:1150px){.g-main,.g2,.g3{grid-template-columns:1fr}}
+.pi,.ta,select{width:100%;padding:7px 8px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r);font:11px var(--mo);color:var(--i0)}
+.ta{min-height:74px;resize:vertical}
+.pi:focus,.ta:focus,select:focus{border-color:var(--bl);outline:none;box-shadow:0 0 0 2px rgba(76,120,168,.1)}
+.lab{font-size:9px;color:var(--i3);margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px;font-weight:600}
+.row{display:flex;gap:6px;align-items:center}
+.bn{padding:6px 10px;border:1px solid var(--bd);border-radius:var(--r);font:500 10px var(--sa);cursor:pointer;transition:.15s;background:var(--sf)}
+.bn:hover{border-color:var(--bl);color:var(--bl)}
+.bn.bp{background:var(--bl);color:#fff;border-color:var(--bl)}
+.bn.bg{background:var(--bg1)}
+.bn.gn{background:var(--gn);color:#fff;border-color:var(--gn)}
+.bn.am{background:var(--am);color:#fff;border-color:var(--am)}
+.bn.co{background:var(--co);color:#fff;border-color:var(--co)}
+.drop{border:1.5px dashed var(--bd2);border-radius:var(--r2);padding:14px;text-align:center;background:linear-gradient(180deg,var(--sf2),var(--sf));transition:.15s}
+.drop.drag{border-color:var(--bl);background:var(--bl-l)}
+.path-list{max-height:170px;overflow:auto;border:1px solid var(--bd);border-radius:var(--r);padding:6px;background:var(--sf2)}
+.path-item{display:flex;align-items:center;gap:6px;padding:5px 6px;border:1px solid var(--bd);border-radius:var(--r);margin-bottom:4px;background:var(--sf)}
+.path-item .ix{width:20px;color:var(--i3);font:9px var(--mo)}
+.path-item .tx{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font:10px var(--mo)}
+.path-item .tp{font:9px var(--mo);padding:1px 5px;border-radius:999px;background:var(--bg1);color:var(--i2)}
+.mx{width:100%;border-collapse:collapse;font-size:10px}
+.mx th{background:var(--bg1);padding:5px;text-align:left;font-weight:600;color:var(--i2);border-bottom:2px solid var(--bd);white-space:nowrap}
+.mx td{padding:5px;border-bottom:1px solid var(--bd);vertical-align:top}
+.mx code{font-family:var(--mo);font-size:9px;background:var(--bg1);padding:0 3px;border-radius:3px}
+.mw{max-height:300px;overflow:auto;border:1px solid var(--bd);border-radius:var(--r)}
+.chips{display:flex;gap:5px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;padding:4px 9px;border-radius:999px;font-size:10px;cursor:pointer;border:1px solid var(--bd);background:var(--sf);color:var(--i2)}
+.chip.active{background:var(--bl);border-color:var(--bl);color:#fff}
+.pv{height:520px;border:1px solid var(--bd);border-radius:var(--r2);overflow:hidden;background:var(--sf)}
+.footer{margin-top:8px;padding:8px 10px;background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);font-size:10px;color:var(--i3)}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:6px 8px}
+.kv .k{font-size:9px;color:var(--i3);text-transform:uppercase;letter-spacing:.4px;font-weight:600}
+.kv .v{font-size:10px;font-family:var(--mo);overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<div class="w">
+  <div class="hdr">
+    <div>
+      <div class="h1t"><span>Veritas</span>AutoPlot · Visual Lock Chart Studio</div>
+      <div class="h2t">VPN v3.5 視覺鎖定 × VeritasAutoPlot 多頁圖表工作台 × DuckDB / Parquet / Stack All-in-One</div>
+    </div>
+    <div class="hdr-right">
+      <span class="badge" style="background:#edf2f7;color:#5b7fa6;border-color:#d6dde6">LIGHT LOCK</span>
+      <span class="badge" style="background:#eef4f2;color:#5f8f8a;border-color:#d7e2de">DUCKDB / PARQUET</span>
+      <span class="badge" style="background:#f4f1f8;color:#7f78aa;border-color:#e1dbeb">HTML / PNG / SVG</span>
+      <span class="sys-dot"></span>
+    </div>
+  </div>
+
+  <div class="pt">
+    <button class="on" onclick="swPg(this,'pg1')">資料源總控</button>
+    <button onclick="swPg(this,'pg2')">圖塊設定器</button>
+    <button onclick="swPg(this,'pg3')">預覽與同軸堆疊</button>
+    <button onclick="swPg(this,'pg4')">匯出中心</button>
+  </div>
+
+  <div class="sg">
+    <div class="sc"><div class="n" id="kPaths">0</div><div class="l">已掛載資料路徑</div></div>
+    <div class="sc"><div class="n" id="kBlocks">3</div><div class="l">圖塊模板</div></div>
+    <div class="sc"><div class="n" id="kMode">STACK</div><div class="l">目前模式</div></div>
+    <div class="sc"><div class="n" id="kMeta">0</div><div class="l">已確認欄位</div></div>
+    <div class="sc"><div class="n" id="kOutput">HTML</div><div class="l">輸出格式</div></div>
+  </div>
+
+  <section id="pg1" class="pg on">
+    <div class="g-main">
+      <div>
+        <div class="cd">
+          <div class="cd-h"><div class="cd-t">資料來源位置 / 拖曳 / Window I/O 搜尋</div></div>
+          <div class="cd-b">
+            <div class="lab">DuckDB / Parquet 路徑</div>
+            <div class="row">
+              <input class="pi" id="pathInput" placeholder="貼上 .duckdb / .parquet / 資料夾路徑">
+              <button class="bn bp" onclick="addPath()">加入</button>
+            </div>
+            <div style="height:6px"></div>
+            <div class="row">
+              <button class="bn" onclick="mockWindowSearch()">Window I/O 搜尋確認</button>
+              <button class="bn" onclick="addDemoPaths()">示範路徑</button>
+              <button class="bn co" onclick="clearPaths()">清空</button>
+            </div>
+            <div style="height:8px"></div>
+            <div id="dropZone" class="drop">
+              <div style="font-weight:700">拖曳檔案或路徑清單到這裡</div>
+              <div style="font-size:10px;color:var(--i3);margin-top:2px">支援模擬掛載 DuckDB / Parquet / 資料夾；可先用假路徑檢查 UI 流程</div>
+            </div>
+            <div style="height:8px"></div>
+            <div class="path-list" id="pathList"></div>
+          </div>
+        </div>
+
+        <div class="cd">
+          <div class="cd-h"><div class="cd-t">資料源確認</div></div>
+          <div class="cd-b kv">
+            <div class="k">主要來源</div><div class="v" id="mainSource">未選取</div>
+            <div class="k">資料型別</div><div class="v" id="mainType">—</div>
+            <div class="k">資料表 / 檔名</div><div class="v" id="mainName">—</div>
+            <div class="k">最後確認時間</div><div class="v" id="confirmTime">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="cd">
+          <div class="cd-h"><div class="cd-t">時間 / 名稱 / 單位 / 資料值 / 中英文來源自動擷取確認</div></div>
+          <div class="cd-b">
+            <div class="g3">
+              <div><div class="lab">時間欄位</div><input class="pi" id="fldTime" value="date"></div>
+              <div><div class="lab">資料名稱欄位</div><input class="pi" id="fldName" value="ticker / name"></div>
+              <div><div class="lab">單位欄位</div><input class="pi" id="fldUnit" value="% / points / TWD"></div>
+            </div>
+            <div style="height:8px"></div>
+            <div class="g3">
+              <div><div class="lab">資料值欄位</div><input class="pi" id="fldValue" value="close / value"></div>
+              <div><div class="lab">來源中文</div><input class="pi" id="srcZh" value="台股資料庫"></div>
+              <div><div class="lab">來源英文</div><input class="pi" id="srcEn" value="Taiwan Market Database"></div>
+            </div>
+            <div style="height:8px"></div>
+            <div class="row">
+              <button class="bn bp" onclick="confirmMeta()">自動擷取確認</button>
+              <button class="bn" onclick="fillMetaDemo()">填入示範</button>
+            </div>
+            <div style="height:8px"></div>
+            <div class="mw">
+              <table class="mx" id="metaTable">
+                <thead><tr><th>#</th><th>欄位類別</th><th>值</th><th>狀態</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pg2" class="pg">
+    <div class="g-main">
+      <div>
+        <div class="cd">
+          <div class="cd-h"><div class="cd-t">圖塊清單</div></div>
+          <div class="cd-b">
+            <div class="row">
+              <button class="bn bp" onclick="addBlock()">新增圖塊</button>
+              <button class="bn" onclick="cloneBlock()">複製圖塊</button>
+              <button class="bn co" onclick="removeBlock()">刪除目前圖塊</button>
+            </div>
+            <div style="height:8px"></div>
+            <div class="path-list" id="blockList"></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="cd">
+          <div class="cd-h"><div class="cd-t">目前圖塊設定</div></div>
+          <div class="cd-b">
+            <div class="g3">
+              <div><div class="lab">圖塊名稱</div><input class="pi" id="blkName"></div>
+              <div><div class="lab">圖形類型</div>
+                <select id="blkType">
+                  <option>Line</option><option>Bar</option><option>Area</option><option>Scatter</option><option>K-Line</option><option>Heatmap</option>
+                </select>
+              </div>
+              <div><div class="lab">頁面位置</div>
+                <select id="blkPage"><option>頁 1</option><option>頁 2</option><option>頁 3</option></select>
+              </div>
+            </div>
+            <div style="height:8px"></div>
+            <div class="g3">
+              <div><div class="lab">X 欄位</div><input class="pi" id="blkX" value="date"></div>
+              <div><div class="lab">Y 欄位</div><input class="pi" id="blkY" value="close"></div>
+              <div><div class="lab">群組 / 次軸</div><input class="pi" id="blkG" value="ticker"></div>
+            </div>
+            <div style="height:8px"></div>
+            <div class="g2">
+              <div><div class="lab">資料過濾條件</div><textarea class="ta" id="blkFilter">ticker in ('2330.TW','0050.TW')</textarea></div>
+              <div><div class="lab">補充備註</div><textarea class="ta" id="blkNote">依 VPN visual lock 顯示，卡片樣式固定。</textarea></div>
+            </div>
+            <div style="height:8px"></div>
+            <div class="lab">視覺規格</div>
+            <div class="chips" id="styleChips">
+              <span class="chip active" data-chip="legend">Legend</span>
+              <span class="chip active" data-chip="grid">Grid</span>
+              <span class="chip" data-chip="rangeSlider">Range Slider</span>
+              <span class="chip active" data-chip="rightLabel">Right Label</span>
+              <span class="chip" data-chip="dualAxis">Dual Axis</span>
+              <span class="chip active" data-chip="hoverDetail">Hover Detail</span>
+            </div>
+            <div style="height:8px"></div>
+            <div class="row">
+              <button class="bn bp" onclick="saveBlock()">儲存圖塊</button>
+              <button class="bn" onclick="renderPreview()">更新預覽</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pg3" class="pg">
+    <div class="cd">
+      <div class="cd-h"><div class="cd-t">預覽與同時間軸堆疊模式</div></div>
+      <div class="cd-b">
+        <div class="row" style="margin-bottom:8px">
+          <button class="bn bp" onclick="setMode('single')">單圖</button>
+          <button class="bn" onclick="setMode('dual')">雙軸</button>
+          <button class="bn" onclick="setMode('stack')">同時間軸堆疊</button>
+          <button class="bn" onclick="setMode('kline')">K-Line</button>
+          <span class="badge" id="modeBadge">STACK</span>
+        </div>
+        <div id="chartPreview" class="pv"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pg4" class="pg">
+    <div class="g2">
+      <div class="cd">
+        <div class="cd-h"><div class="cd-t">輸出設定</div></div>
+        <div class="cd-b">
+          <div class="g3">
+            <div><div class="lab">輸出主格式</div>
+              <select id="outFmt">
+                <option>HTML</option><option>PNG</option><option>SVG</option><option>JPEG</option>
+              </select>
+            </div>
+            <div><div class="lab">檔名</div><input class="pi" id="outName" value="VeritasAutoPlot_VisualLock_Studio"></div>
+            <div><div class="lab">頁面模式</div>
+              <select id="outMode"><option>Multi-Page</option><option>Single-Page</option></select>
+            </div>
+          </div>
+          <div style="height:8px"></div>
+          <div class="row">
+            <button class="bn bp" onclick="exportHtml()">輸出 HTML</button>
+            <button class="bn am" onclick="downloadConfig()">匯出設定 JSON</button>
+            <button class="bn gn" onclick="snapshotPNG()">輸出圖檔指示</button>
+          </div>
+        </div>
+      </div>
+      <div class="cd">
+        <div class="cd-h"><div class="cd-t">輸出摘要</div></div>
+        <div class="cd-b">
+          <div class="kv">
+            <div class="k">圖塊數</div><div class="v" id="sumBlocks">3</div>
+            <div class="k">頁籤數</div><div class="v">4</div>
+            <div class="k">資料掛載</div><div class="v" id="sumPaths">0</div>
+            <div class="k">輸出狀態</div><div class="v" id="sumStatus">待輸出</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer">
+    這份原型主打的是：把 <code>VPN_v35_Dashboard (3).html</code> 的淺色 visual lock 轉成 VeritasAutoPlot 的多頁圖表工作台，並保留你原先需要的 Single / Dual / K-Line / Stack 概念，再加上 DuckDB / Parquet 路徑掛載、欄位確認、圖塊模板與輸出中心。
+  </div>
+</div>
+
+<script>
+const STATE = {
+  mode: 'stack',
+  paths: [],
+  meta: [],
+  selectedBlock: 0,
+  blocks: [
+    {name:'主圖 · 指數比較',type:'Line',page:'頁 1',x:'date',y:'close',group:'ticker',filter:"ticker in ('2330.TW','0050.TW')",note:'主圖比較',style:['legend','grid','rightLabel','hoverDetail']},
+    {name:'副圖 · 資金流',type:'Bar',page:'頁 2',x:'date',y:'flow',group:'market',filter:'market = TW',note:'資金流',style:['legend','grid']},
+    {name:'總覽 · 宏觀燈號',type:'Scatter',page:'頁 3',x:'date',y:'score',group:'macro',filter:'score is not null',note:'宏觀訊號',style:['hoverDetail','rightLabel']}
+  ]
+};
+
+function swPg(btn, id){
+  document.querySelectorAll('.pt button').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+}
+function notify(msg){ alert(msg); }
+
+function renderPaths(){
+  const el = document.getElementById('pathList');
+  el.innerHTML = STATE.paths.map((p,i)=>`
+    <div class="path-item" onclick="selectPath(${i})">
+      <div class="ix">${String(i+1).padStart(2,'0')}</div>
+      <div class="tx">${p.path}</div>
+      <div class="tp">${p.type}</div>
+    </div>`).join('') || '<div style="color:var(--i3);font-size:10px">尚未加入任何資料路徑</div>';
+  document.getElementById('kPaths').textContent = STATE.paths.length;
+  document.getElementById('sumPaths').textContent = STATE.paths.length;
+}
+function inferType(path){
+  const low = path.toLowerCase();
+  if(low.endsWith('.duckdb')) return 'DUCKDB';
+  if(low.endsWith('.parquet')) return 'PARQUET';
+  return 'FOLDER';
+}
+function addPath(){
+  const inp = document.getElementById('pathInput');
+  const v = inp.value.trim();
+  if(!v) return;
+  STATE.paths.push({path:v,type:inferType(v),added:new Date().toLocaleString('zh-TW')});
+  inp.value='';
+  renderPaths();
+}
+function addDemoPaths(){
+  [
+    'C:/Users/tonyk/OneDrive/Desktop/data/tw_market.duckdb',
+    'C:/Users/tonyk/OneDrive/Desktop/data/price_panel.parquet',
+    'C:/Users/tonyk/OneDrive/Desktop/data/factor_store/'
+  ].forEach(v=>STATE.paths.push({path:v,type:inferType(v),added:new Date().toLocaleString('zh-TW')}));
+  renderPaths();
+}
+function clearPaths(){
+  STATE.paths = [];
+  renderPaths();
+  document.getElementById('mainSource').textContent='未選取';
+  document.getElementById('mainType').textContent='—';
+  document.getElementById('mainName').textContent='—';
+  document.getElementById('confirmTime').textContent='—';
+}
+function selectPath(i){
+  const p = STATE.paths[i];
+  document.getElementById('mainSource').textContent = p.path;
+  document.getElementById('mainType').textContent = p.type;
+  document.getElementById('mainName').textContent = p.path.split(/[\\/]/).pop();
+  document.getElementById('confirmTime').textContent = new Date().toLocaleString('zh-TW');
+}
+function mockWindowSearch(){
+  if(!STATE.paths.length){ addDemoPaths(); }
+  selectPath(0);
+  notify('已完成 Window I/O 模擬搜尋確認');
+}
+function fillMetaDemo(){
+  document.getElementById('fldTime').value='trade_date';
+  document.getElementById('fldName').value='ticker_name';
+  document.getElementById('fldUnit').value='points';
+  document.getElementById('fldValue').value='adj_close';
+  document.getElementById('srcZh').value='台灣股票調整後價格資料';
+  document.getElementById('srcEn').value='Taiwan Equity Adjusted Close Dataset';
+}
+function confirmMeta(){
+  STATE.meta = [
+    ['時間欄位', document.getElementById('fldTime').value],
+    ['資料名稱欄位', document.getElementById('fldName').value],
+    ['單位欄位', document.getElementById('fldUnit').value],
+    ['資料值欄位', document.getElementById('fldValue').value],
+    ['來源中文', document.getElementById('srcZh').value],
+    ['來源英文', document.getElementById('srcEn').value]
+  ];
+  const tb = document.querySelector('#metaTable tbody');
+  tb.innerHTML = STATE.meta.map((r,i)=>`<tr><td>${i+1}</td><td>${r[0]}</td><td><code>${r[1]}</code></td><td>CONFIRMED</td></tr>`).join('');
+  document.getElementById('kMeta').textContent = STATE.meta.length;
+}
+function renderBlocks(){
+  const el = document.getElementById('blockList');
+  el.innerHTML = STATE.blocks.map((b,i)=>`
+    <div class="path-item" onclick="loadBlock(${i})" style="${i===STATE.selectedBlock?'border-color:var(--bl);background:var(--bl-l)':''}">
+      <div class="ix">${String(i+1).padStart(2,'0')}</div>
+      <div class="tx">${b.name}</div>
+      <div class="tp">${b.type}</div>
+    </div>`).join('');
+  document.getElementById('kBlocks').textContent = STATE.blocks.length;
+  document.getElementById('sumBlocks').textContent = STATE.blocks.length;
+}
+function loadBlock(i){
+  STATE.selectedBlock = i;
+  const b = STATE.blocks[i];
+  document.getElementById('blkName').value = b.name;
+  document.getElementById('blkType').value = b.type;
+  document.getElementById('blkPage').value = b.page;
+  document.getElementById('blkX').value = b.x;
+  document.getElementById('blkY').value = b.y;
+  document.getElementById('blkG').value = b.group;
+  document.getElementById('blkFilter').value = b.filter;
+  document.getElementById('blkNote').value = b.note;
+  document.querySelectorAll('#styleChips .chip').forEach(ch=>{
+    ch.classList.toggle('active', b.style.includes(ch.dataset.chip));
+  });
+  renderBlocks();
+}
+function readStyle(){
+  return [...document.querySelectorAll('#styleChips .chip.active')].map(x=>x.dataset.chip);
+}
+document.addEventListener('click', e=>{
+  if(e.target.matches('#styleChips .chip')) e.target.classList.toggle('active');
+});
+function saveBlock(){
+  const i = STATE.selectedBlock;
+  STATE.blocks[i] = {
+    name: document.getElementById('blkName').value,
+    type: document.getElementById('blkType').value,
+    page: document.getElementById('blkPage').value,
+    x: document.getElementById('blkX').value,
+    y: document.getElementById('blkY').value,
+    group: document.getElementById('blkG').value,
+    filter: document.getElementById('blkFilter').value,
+    note: document.getElementById('blkNote').value,
+    style: readStyle()
+  };
+  renderBlocks();
+  renderPreview();
+}
+function addBlock(){
+  STATE.blocks.push({name:'新圖塊',type:'Line',page:'頁 1',x:'date',y:'value',group:'series',filter:'',note:'',style:['legend','grid']});
+  STATE.selectedBlock = STATE.blocks.length-1;
+  renderBlocks();
+  loadBlock(STATE.selectedBlock);
+}
+function cloneBlock(){
+  const src = structuredClone(STATE.blocks[STATE.selectedBlock]);
+  src.name += ' · 複製';
+  STATE.blocks.push(src);
+  STATE.selectedBlock = STATE.blocks.length-1;
+  renderBlocks();
+  loadBlock(STATE.selectedBlock);
+}
+function removeBlock(){
+  if(STATE.blocks.length<=1) return;
+  STATE.blocks.splice(STATE.selectedBlock,1);
+  STATE.selectedBlock = Math.max(0, STATE.selectedBlock-1);
+  renderBlocks();
+  loadBlock(STATE.selectedBlock);
+}
+function setMode(mode){
+  STATE.mode = mode;
+  document.getElementById('modeBadge').textContent = mode.toUpperCase();
+  document.getElementById('kMode').textContent = mode.toUpperCase();
+  renderPreview();
+}
+function buildSeries(seed){
+  const x = [];
+  const y = [];
+  let v = seed;
+  for(let i=0;i<60;i++){
+    const d = new Date(2025,0,1+i);
+    x.push(d.toISOString().slice(0,10));
+    v += (Math.random()-0.45)*3;
+    y.push(Number(v.toFixed(2)));
+  }
+  return {x,y};
+}
+function renderPreview(){
+  const traces = [];
+  const s1 = buildSeries(100);
+  const s2 = buildSeries(70);
+  const s3 = buildSeries(25);
+  const mode = STATE.mode;
+  if(mode==='single'){
+    traces.push({x:s1.x,y:s1.y,type:'scatter',mode:'lines',name:STATE.blocks[0]?.name||'主圖'});
+  }else if(mode==='dual'){
+    traces.push({x:s1.x,y:s1.y,type:'scatter',mode:'lines',name:STATE.blocks[0]?.name||'主圖',yaxis:'y'});
+    traces.push({x:s2.x,y:s2.y,type:'bar',name:STATE.blocks[1]?.name||'副圖',yaxis:'y2',opacity:.45});
+  }else if(mode==='kline'){
+    const open = s1.y.map(v=>v+Math.random()*2-1);
+    const close = s1.y;
+    const high = close.map((v,i)=>Math.max(v,open[i])+Math.random()*2);
+    const low = close.map((v,i)=>Math.min(v,open[i])-Math.random()*2);
+    traces.push({x:s1.x,open,high,low,close,type:'candlestick',name:STATE.blocks[0]?.name||'K-Line'});
+  }else{
+    traces.push({x:s1.x,y:s1.y,type:'scatter',mode:'lines',name:STATE.blocks[0]?.name||'主圖',xaxis:'x',yaxis:'y'});
+    traces.push({x:s2.x,y:s2.y,type:'bar',name:STATE.blocks[1]?.name||'副圖',xaxis:'x2',yaxis:'y2',opacity:.5});
+    traces.push({x:s3.x,y:s3.y,type:'scatter',mode:'lines+markers',name:STATE.blocks[2]?.name||'總覽',xaxis:'x3',yaxis:'y3'});
+  }
+  const layout = {
+    paper_bgcolor:'#fff', plot_bgcolor:'#fff', margin:{l:50,r:28,t:22,b:36},
+    font:{family:'DM Sans, sans-serif', size:11, color:'#1e1d1a'},
+    legend:{orientation:'h',y:1.1,x:0},
+    xaxis:{domain: mode==='stack'?[0,1]:undefined, showgrid:true, gridcolor:'#edecea'},
+    yaxis:{domain: mode==='stack'?[0.42,1]:undefined, showgrid:true, gridcolor:'#edecea'},
+    xaxis2:{domain:[0,1],anchor:'y2',matches:'x'},
+    yaxis2:{domain:[0.22,0.40],showgrid:true,gridcolor:'#edecea'},
+    xaxis3:{domain:[0,1],anchor:'y3',matches:'x'},
+    yaxis3:{domain:[0.00,0.18],showgrid:true,gridcolor:'#edecea'},
+    title:{text:'Visual Lock Preview',x:0.01,font:{family:'Syne, sans-serif',size:16}}
+  };
+  Plotly.newPlot('chartPreview', traces, layout, {displayModeBar:false,responsive:true});
+}
+function exportHtml(){
+  const html = document.documentElement.outerHTML;
+  const blob = new Blob([html], {type:'text/html;charset=utf-8'});
+  const a = document.createElement('a');
+  const name = (document.getElementById('outName').value || 'VeritasAutoPlot_VisualLock_Studio') + '.html';
+  a.href = URL.createObjectURL(blob); a.download = name; a.click();
+  document.getElementById('sumStatus').textContent = 'HTML 已產生';
+  document.getElementById('kOutput').textContent = 'HTML';
+}
+function downloadConfig(){
+  const data = JSON.stringify(STATE,null,2);
+  const blob = new Blob([data], {type:'application/json;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'vap_visual_lock_config.json'; a.click();
+  document.getElementById('sumStatus').textContent = '設定 JSON 已產生';
+}
+function snapshotPNG(){
+  document.getElementById('outFmt').value='PNG';
+  document.getElementById('kOutput').textContent='PNG';
+  document.getElementById('sumStatus').textContent = '可接 Plotly.toImage() 匯出圖檔';
+  notify('此原型已留好 PNG / SVG 匯出接口');
+}
+function initDrop(){
+  const dz = document.getElementById('dropZone');
+  dz.addEventListener('dragover', e=>{e.preventDefault(); dz.classList.add('drag');});
+  dz.addEventListener('dragleave', ()=>dz.classList.remove('drag'));
+  dz.addEventListener('drop', e=>{
+    e.preventDefault(); dz.classList.remove('drag');
+    const text = e.dataTransfer.getData('text/plain').trim();
+    if(text){
+      text.split(/\r?\n/).filter(Boolean).forEach(v=>STATE.paths.push({path:v,type:inferType(v),added:new Date().toLocaleString('zh-TW')}));
+      renderPaths();
+    } else if(e.dataTransfer.files.length){
+      [...e.dataTransfer.files].forEach(f=>STATE.paths.push({path:f.name,type:inferType(f.name),added:new Date().toLocaleString('zh-TW')}));
+      renderPaths();
+    }
+  });
+}
+renderPaths();
+renderBlocks();
+loadBlock(0);
+renderPreview();
+initDrop();
+</script>
+</body>
+</html>
