@@ -269,7 +269,10 @@ def thin_labels(labels: Sequence[str], max_labels: int = 8) -> Tuple[List[int], 
         stride = max(1, (n - 1) // (max_labels - 1))
         idx = list(range(0, n, stride))
         if idx[-1] != n - 1:
-            idx.append(n - 1)
+            if (n - 1 - idx[-1]) < max(1, stride // 2):
+                idx[-1] = n - 1  # 尾標籤取代過近的前格 — 避免尾端兩標籤重疊
+            else:
+                idx.append(n - 1)
     return idx, [str(labels[i]) for i in idx]
 
 # ============================================================================
@@ -521,6 +524,240 @@ def to_iso3(region: str) -> str:
     raise VAPError("VAP-CH-16 地區 %r 無法解析為 ISO-3 — 請直接提供三碼(例:TWN/USA/DEU)" % region)
 
 # ============================================================================
+# §4b 真實資料接入層 — CSV/TSV/JSON/SQLite → dataShape(--x/--y/--group/--map)
+#     零第三方依賴(stdlib csv/sqlite3/json);數值自動轉型;缺欄誠實 FAIL
+# ============================================================================
+
+def load_table(path: Union[str, Path], table: Optional[str] = None,
+               limit: Optional[int] = None) -> Dict[str, List[Any]]:
+    """讀表格檔 → 欄位字典 dict[col] = [values...](保持列序)。"""
+    p = Path(path)
+    if not p.exists():
+        raise VAPError("資料檔不存在:%s" % p)
+    suffix = p.suffix.lower()
+    rows: List[Dict[str, Any]]
+    if suffix in (".csv", ".tsv"):
+        import csv as _csv
+        with open(p, encoding="utf-8-sig", newline="") as f:
+            rows = list(_csv.DictReader(f, delimiter="\t" if suffix == ".tsv" else ","))
+    elif suffix == ".json":
+        data = json.loads(p.read_text(encoding="utf-8"))
+        if isinstance(data, dict):  # 欄位字典直通
+            n = max((len(v) for v in data.values() if isinstance(v, list)), default=0)
+            return {k: list(v)[:limit or n] for k, v in data.items() if isinstance(v, list)}
+        rows = list(data)
+    elif suffix in (".sqlite", ".sqlite3", ".db"):
+        import sqlite3
+        con = sqlite3.connect(str(p))
+        try:
+            tables = [r[0] for r in con.execute(
+                "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")]
+            if not tables:
+                raise VAPError("SQLite 無資料表:%s" % p)
+            if table is None:
+                if len(tables) > 1:
+                    raise VAPError("SQLite 有多表 %s — 請用 --table 指定" % tables)
+                table = tables[0]
+            if table not in tables:
+                raise VAPError("--table %r 不存在(可用:%s)" % (table, tables))
+            cur = con.execute('SELECT * FROM "%s"' % table.replace('"', '""'))
+            names = [d[0] for d in cur.description]
+            rows = [dict(zip(names, r)) for r in cur.fetchall()]
+        finally:
+            con.close()
+    else:
+        raise VAPError("不支援的資料檔格式 %r(可用:.csv .tsv .json .sqlite)" % suffix)
+    if limit:
+        rows = rows[:limit]
+    if not rows:
+        raise VAPError("資料檔無資料列:%s" % p)
+    cols: Dict[str, List[Any]] = {k: [] for k in rows[0]}
+    for row in rows:
+        for k in cols:
+            cols[k].append(row.get(k))
+    return cols
+
+
+def _numeric(vals: Sequence[Any]) -> Optional[List[Optional[float]]]:
+    """整欄可轉數字 → floats(空值 None);否則 None(維持原字串欄)。"""
+    out: List[Optional[float]] = []
+    for v in vals:
+        if v is None or (isinstance(v, str) and not v.strip()):
+            out.append(None)
+            continue
+        try:
+            out.append(float(str(v).replace(",", "").strip()))
+        except ValueError:
+            return None
+    return out
+
+
+def _x_text(v: Any) -> str:
+    if isinstance(v, float) and v.is_integer():
+        return "%d" % int(v)
+    return str(v)
+
+
+def _sort_key(v: Any):
+    try:
+        return (0, float(str(v).replace(",", "")))
+    except ValueError:
+        return (1, str(v))
+
+# 各圖型的 X 欄與 Y 欄位序(--x/--y 依此對位;--map field=col 可逐欄指定)
+X_FIELD: Dict[str, str] = {
+    "line": "date", "area": "date", "bar": "label", "hbar": "label", "scatter": "x",
+    "sarea": "date", "sbar": "date", "sbar100": "date", "multi": "date", "gbar": "label",
+    "dline": "date", "dbarline": "date", "evtmx": "date", "brush": "date", "roll": "date",
+    "rollcorr": "date", "rollsharpe": "date", "sortino": "date", "alpha": "date",
+    "backtest": "lag", "intraday": "time", "candle": "date", "spotfut": "date",
+    "radar": "metric",
+}
+Y_FIELDS: Dict[str, List[str]] = {
+    "line": ["value"], "area": ["value"], "bar": ["value"], "hbar": ["value"],
+    "scatter": ["y"], "dline": ["left", "right"], "dbarline": ["bar", "line"],
+    "evtmx": ["value"], "brush": ["value"], "roll": ["return"],
+    "rollcorr": ["a", "b"], "rollsharpe": ["sharpe"], "sortino": ["sharpe", "sortino"],
+    "alpha": ["strategy", "benchmark", "excess"],
+    "backtest": ["rankIC", "tStat", "pValue"],
+    "intraday": ["price", "volume"],
+    "candle": ["open", "high", "low", "close", "volume"],
+    "spotfut": ["spot", "futures"], "radar": ["value", "benchmark"],
+}
+GROUP_KEY: Dict[str, str] = {"sarea": "groups", "sbar": "groups", "sbar100": "groups",
+                             "gbar": "groups", "multi": "panels"}
+OPTIONAL_Y: Dict[str, List[str]] = {"alpha": ["excess"], "backtest": ["pValue"]}
+JSON_ONLY = ("map", "econcal", "consensus")  # 結構化資料 → 請走 --data JSON
+
+
+def build_chart_data(chart_id: str, cols: Dict[str, List[Any]], x: Optional[str] = None,
+                     ys: Optional[Sequence[str]] = None, group: Optional[str] = None,
+                     mapping: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+    """欄位字典 → 該圖型的 dataShape(誠實 FAIL 列出所需欄位)。"""
+    mapping = dict(mapping or {})
+    ys = list(ys or [])
+    if chart_id in JSON_ONLY:
+        raise VAPError("圖型 %r 需結構化資料 — 請用 --data data.json(欄位見 list 動詞)" % chart_id)
+
+    def col_of(name: str, required: bool = True) -> Optional[List[Any]]:
+        if name not in cols:
+            if required:
+                raise VAPError("資料檔缺欄位 %r(在檔欄位:%s)" % (name, sorted(cols)))
+            return None
+        return cols[name]
+
+    def num_col(name: str) -> List[Optional[float]]:
+        vals = _numeric(col_of(name))
+        if vals is None:
+            raise VAPError("欄位 %r 含非數值,無法作為數值序列" % name)
+        return vals
+
+    # ── corrheat:--y 多欄 → 引擎計算相關矩陣 ──────────────────────────
+    if chart_id == "corrheat":
+        names = ys or [k for k in cols if _numeric(cols[k]) is not None]
+        if len(names) < 2:
+            raise VAPError("corrheat 需 ≥2 個數值欄(--y col1,col2,...)")
+        series = {}
+        for name in names:
+            series[name] = num_col(name)
+        keep = [i for i in range(len(next(iter(series.values()))))
+                if all(series[n][i] is not None for n in names)]
+        mat: List[List[float]] = []
+        for a in names:
+            row = []
+            for b in names:
+                xa = [series[a][i] for i in keep]
+                xb = [series[b][i] for i in keep]
+                n = len(keep)
+                ma, mb = sum(xa) / n, sum(xb) / n
+                cov = sum((p - ma) * (q - mb) for p, q in zip(xa, xb))
+                va = math.sqrt(sum((p - ma) ** 2 for p in xa))
+                vb = math.sqrt(sum((q - mb) ** 2 for q in xb))
+                row.append(round(cov / (va * vb), 4) if va > 0 and vb > 0 else 0.0)
+            mat.append(row)
+        return {"labels": names, "corr": mat}
+
+    if chart_id not in X_FIELD:
+        raise VAPError("圖型 %r 尚無檔案接入映射 — 請用 --data JSON" % chart_id)
+    x_field = X_FIELD[chart_id]
+    x_col = mapping.get(x_field, x)
+    if x_col is None and x_field in cols:
+        x_col = x_field  # 同名欄自動對位
+    if x_col is None:
+        raise VAPError("圖型 %r 需要 X 欄(--x <欄名> → %s)" % (chart_id, x_field))
+    x_raw = col_of(x_col)
+
+    # ── 群組型:--group 長格式樞紐 或 --y 多欄寬格式 ───────────────────
+    if chart_id in GROUP_KEY:
+        key = GROUP_KEY[chart_id]
+        if group:
+            if not ys:
+                raise VAPError("--group 長格式需配 --y <數值欄>")
+            g_raw = col_of(group)
+            v_raw = num_col(ys[0])
+            x_order: List[str] = []
+            seen = set()
+            for v in x_raw:
+                t = _x_text(v)
+                if t not in seen:
+                    seen.add(t)
+                    x_order.append(t)
+            x_order.sort(key=_sort_key)
+            idx = {t: i for i, t in enumerate(x_order)}
+            groups: Dict[str, List[float]] = {}  # dict 保插入序(首見順序)
+            for gv, xv, vv in zip(g_raw, x_raw, v_raw):
+                gname = str(gv)
+                if gname not in groups:
+                    groups[gname] = [0.0] * len(x_order)
+                if vv is not None:
+                    groups[gname][idx[_x_text(xv)]] += vv
+            return {"date" if x_field == "date" else "label": x_order, key: groups}
+        if not ys:
+            raise VAPError("群組圖需 --y col1,col2,...(寬格式)或 --group <分組欄> + --y <數值欄>")
+        xs = [_x_text(v) for v in x_raw]
+        return {"date" if x_field == "date" else "label": xs,
+                key: {name: [v if v is not None else 0.0 for v in num_col(name)] for name in ys}}
+
+    # ── 一般型:--map 優先,--y 依 Y_FIELDS 順序對位 ───────────────────
+    y_fields = Y_FIELDS[chart_id]
+    assign: Dict[str, str] = {}
+    for i, field in enumerate(y_fields):
+        if field in mapping:
+            assign[field] = mapping[field]
+        elif i < len(ys):
+            assign[field] = ys[i]
+        elif field in cols:
+            assign[field] = field
+    optional = set(OPTIONAL_Y.get(chart_id, []))
+    missing = [f for f in y_fields if f not in assign and f not in optional]
+    if missing:
+        raise VAPError("圖型 %r 缺數值欄 %s(--y 依序對位 %s,或 --map %s=<欄名>)"
+                       % (chart_id, missing, y_fields, missing[0]))
+    series = {f: num_col(c) for f, c in assign.items()}
+    numeric_x = chart_id in ("scatter", "backtest")  # xy 形/滯後軸:X 本身是數值
+    x_vals: Optional[List[Optional[float]]] = None
+    if numeric_x:
+        x_vals = _numeric(x_raw)
+        if x_vals is None:
+            raise VAPError("圖型 %r 的 X 欄 %r 需為數值欄" % (chart_id, x_col))
+    keep = [i for i in range(len(x_raw))
+            if all(v[i] is not None for v in series.values())
+            and (x_vals is None or x_vals[i] is not None)]
+    dropped = len(x_raw) - len(keep)
+    data: Dict[str, Any] = {x_field: ([x_vals[i] for i in keep] if numeric_x
+                                      else [_x_text(x_raw[i]) for i in keep])}
+    for f, vals in series.items():
+        data[f] = [vals[i] for i in keep]
+    if chart_id == "alpha" and "excess" not in data:
+        data["excess"] = [round(s - b, 6) for s, b in zip(data["strategy"], data["benchmark"])]
+    if dropped:
+        LOG_INFO = "資料列 %d 筆因缺值剔除(留 %d 筆)" % (dropped, len(keep))
+        print("  [INFO] %s" % LOG_INFO)
+    if not keep:
+        raise VAPError("剔除缺值後無資料列 — 檢查欄位對位是否正確")
+    return data
+
+# ============================================================================
 # §5 Seaborn / matplotlib 後端(靜態 PNG · export.png 規則)
 # ============================================================================
 
@@ -598,6 +835,21 @@ class SeabornBackend:
         ax.set_xticklabels(texts)
         return list(range(len(labels)))
 
+    def _widen_for_labels(self, ax, labels: Sequence[str], side: str = "left") -> None:
+        """真實資料大數值(十億級)標籤超出固定邊距 → 依最長標籤自動加寬該側。"""
+        longest = max((len(t) for t in labels), default=0)
+        if longest <= 7:
+            return
+        fig = ax.figure
+        width_px = fig.get_size_inches()[0] * 100.0
+        extra = (longest - 7) * 8.5 + 6  # ~8.5px/字元(tick 字級)+ 邊墊
+        if side == "left":
+            need = (self.spec.margins["left"] + extra) / width_px
+            fig.subplots_adjust(left=max(fig.subplotpars.left, need))
+        else:
+            need = 1.0 - (self.spec.margins["right"] + extra + 8) / width_px
+            fig.subplots_adjust(right=min(fig.subplotpars.right, need))
+
     def _y_ticks(self, ax, values: Sequence[float], include_zero: bool = False) -> List[float]:
         vals = [v for v in values if v is not None and math.isfinite(v)]
         if not vals:
@@ -606,18 +858,22 @@ class SeabornBackend:
         ax.set_yticks(ticks)
         ax.set_ylim(ticks[0], ticks[-1])
         step = ticks[1] - ticks[0]
-        ax.set_yticklabels([fmt_tick(t, step) for t in ticks])
+        texts = [fmt_tick(t, step) for t in ticks]
+        ax.set_yticklabels(texts)
+        self._widen_for_labels(ax, texts, "left")
         return ticks
 
     def _dual_ticks(self, axl, axr, lvals: Sequence[float], rvals: Sequence[float],
                     include_zero_r: bool = False) -> None:
         lt = ticks_for(min(lvals), max(lvals), self.spec)
         rt = ticks_for(min(rvals), max(rvals), self.spec, include_zero=include_zero_r)
-        for ax, ticks in ((axl, lt), (axr, rt)):
+        for ax, ticks, side in ((axl, lt, "left"), (axr, rt, "right")):
             ax.set_yticks(ticks)
             ax.set_ylim(ticks[0], ticks[-1])
             step = ticks[1] - ticks[0]
-            ax.set_yticklabels([fmt_tick(t, step) for t in ticks])
+            texts = [fmt_tick(t, step) for t in ticks]
+            ax.set_yticklabels(texts)
+            self._widen_for_labels(ax, texts, side)
         axr.grid(False)
 
     def _zero_axis(self, ax) -> None:
@@ -756,7 +1012,8 @@ class SeabornBackend:
             ax.set_yticklabels([fmt_tick(t, 25) for t in ticks])
         else:
             self._y_ticks(ax, totals + [0.0])
-        ax.legend(loc="upper left", ncols=min(4, len(names)), frameon=False)
+        ax.legend(loc="upper left", ncols=min(6, len(names)), frameon=False,
+                  fontsize=self.spec.font_size("legend") * (1.1 if len(names) > 8 else 1.15))
         self._title(fig, meta)
         return fig
 
@@ -1720,7 +1977,8 @@ class PlotlyBackend:
                         marker=dict(color=hex_to_rgba(s.palette[4], s.fill("barFaceDense")),
                                     line=dict(color=s.palette[4], width=s.bar_edge_width))),
             self._line_trace(x, d["tStat"], "t 統計量(右)", s.palette[0],
-                             text=["p=%s" % p for p in d["pValue"]], yaxis="y2")])
+                             text=(["p=%s" % p for p in d["pValue"]]
+                                   if d.get("pValue") else None), yaxis="y2")])
         fig.update_layout(**self._layout(
             meta, bargap=1 - s.bar_gap("normal"),
             xaxis=dict(tickmode="array", tickvals=x, ticktext=labels,
@@ -1953,6 +2211,29 @@ def selftest(spec: Spec, out_dir: Optional[Path] = None) -> int:
         assert fmt_tick(1250.0, 250) == "1,250"
         assert fmt_tick(0.2, 0.05) == "0.20"
     check("axis_math", axis_math)
+    # ②b 真實資料接入層(CSV → dataShape:轉型/剔缺/長格式樞紐/相關矩陣/誠實 FAIL)
+    def data_layer():
+        import tempfile as _tf
+        d = Path(_tf.mkdtemp(prefix="vap_data_"))
+        csv_p = d / "t.csv"
+        csv_p.write_text("year,gross,genre\n2001,10,A\n2002,20,A\n2001,5,B\n2002,,B\n",
+                         encoding="utf-8")
+        cols = load_table(csv_p)
+        assert _numeric(cols["gross"]) == [10.0, 20.0, 5.0, None]
+        assert _numeric(cols["genre"]) is None
+        line = build_chart_data("line", cols, x="year", ys=["gross"])
+        assert line["date"] == ["2001", "2002", "2001"] and line["value"] == [10.0, 20.0, 5.0]
+        piv = build_chart_data("sbar", cols, x="year", ys=["gross"], group="genre")
+        assert piv["date"] == ["2001", "2002"]
+        assert piv["groups"] == {"A": [10.0, 20.0], "B": [5.0, 0.0]}, piv["groups"]
+        ch = build_chart_data("corrheat", cols, ys=["year", "gross"])
+        assert ch["labels"] == ["year", "gross"] and abs(ch["corr"][0][1]) > 0.8
+        try:
+            build_chart_data("line", cols, x="nope", ys=["gross"])
+            raise AssertionError("缺欄未誠實 FAIL")
+        except VAPError:
+            pass
+    check("data_layer_csv", data_layer)
     # ③ SSOT 誠實 FAIL
     def spec_honesty():
         try:
@@ -2040,10 +2321,23 @@ def main(argv: Optional[List[str]] = None) -> int:
     r.add_argument("--chart", required=True, help="圖型 id 或 VAP-CH-NN 代碼")
     r.add_argument("--backend", default="both", choices=["seaborn", "plotly", "both"])
     r.add_argument("--data", help="輸入資料 JSON(欄位依 chartlib dataShape;缺省用示範資料)")
+    r.add_argument("--file", help="表格資料檔(.csv/.tsv/.json/.sqlite)— 真實資料接入")
+    r.add_argument("--table", help="SQLite 資料表名(多表時必填)")
+    r.add_argument("--x", help="X 欄名(日期/標籤/類別)")
+    r.add_argument("--y", help="數值欄名,逗號分隔依圖型欄位序對位(見 list 動詞 fields)")
+    r.add_argument("--group", help="長格式分組欄(配 --y 單一數值欄;群組圖用)")
+    r.add_argument("--map", dest="map_pairs", action="append", default=[],
+                   help="逐欄指定 field=欄名(可多次;優先於 --x/--y)")
+    r.add_argument("--limit", type=int, help="只取前 N 列")
     r.add_argument("--out", default="vap_out", help="輸出目錄")
     r.add_argument("--scale", type=int, help="PNG 縮放(預設依 SSOT export.png.scale)")
     r.add_argument("--plotlyjs", default="inline", choices=["inline", "directory", "cdn"],
                    help="plotly.js 佈署:inline=單檔自足(預設) directory=共用一份 cdn=線上")
+
+    co = sub.add_parser("columns", help="列出資料檔欄位與型別(接入前探查)")
+    co.add_argument("--file", required=True, help="表格資料檔(.csv/.tsv/.json/.sqlite)")
+    co.add_argument("--table", help="SQLite 資料表名")
+    co.add_argument("--limit", type=int, default=2000, help="型別推斷取樣列數(預設 2000)")
     d = sub.add_parser("demo", help="28 型全渲染 + 離線索引頁")
     d.add_argument("--out", default="vap_demo", help="輸出目錄")
     d.add_argument("--backend", default="both", choices=["seaborn", "plotly", "both"])
@@ -2094,10 +2388,41 @@ def main(argv: Optional[List[str]] = None) -> int:
         print(json.dumps(resolved, ensure_ascii=False, indent=2))
         return 0
 
+    if args.verb == "columns":
+        try:
+            cols = load_table(args.file, table=args.table, limit=args.limit)
+        except VAPError as e:
+            print("誠實 FAIL:%s" % e, file=sys.stderr)
+            return 1
+        n_rows = len(next(iter(cols.values())))
+        print("%s(取樣 %d 列)" % (args.file, n_rows))
+        for name, vals in cols.items():
+            kind = "數值" if _numeric(vals) is not None else "文字"
+            sample = ", ".join(_x_text(v)[:18] for v in vals[:3])
+            print("  %-28s %s  例:%s" % (name, kind, sample))
+        return 0
+
     if args.verb == "render":
         meta = spec.chart_meta(args.chart)
-        data = (json.loads(Path(args.data).read_text(encoding="utf-8"))
-                if args.data else demo_data(meta["id"]))
+        try:
+            if args.file:
+                mapping = {}
+                for pair in args.map_pairs:
+                    if "=" not in pair:
+                        raise VAPError("--map 需為 field=欄名,得到 %r" % pair)
+                    k, v = pair.split("=", 1)
+                    mapping[k.strip()] = v.strip()
+                cols = load_table(args.file, table=args.table, limit=args.limit)
+                data = build_chart_data(meta["id"], cols, x=args.x,
+                                        ys=[s.strip() for s in args.y.split(",")] if args.y else None,
+                                        group=args.group, mapping=mapping)
+            elif args.data:
+                data = json.loads(Path(args.data).read_text(encoding="utf-8"))
+            else:
+                data = demo_data(meta["id"])
+        except VAPError as e:
+            print("誠實 FAIL:%s" % e, file=sys.stderr)
+            return 1
         out_dir = Path(args.out)
         wanted = ["seaborn", "plotly"] if args.backend == "both" else [args.backend]
         rc = 0
