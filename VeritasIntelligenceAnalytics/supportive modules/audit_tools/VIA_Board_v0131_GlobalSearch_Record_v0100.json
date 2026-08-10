@@ -1,0 +1,21 @@
+{
+ "record_id": "VIA_Board_v0131_GlobalSearch_Record_v0100",
+ "ts": "2026-08-12T01:30:00",
+ "authority": "操作員標準授權令(自動補強)— 「next」啟動之 R3 輪;項目=候辦清單「板頂全域搜尋(ENG-039 into board)」",
+ "component": "functional modules/WorkOps/Invoke-VIA-WorkOps-CommandBoard-v0131.ps1(版前 v0130→v0131;ALL 動態解析自動吃新版)",
+ "features": [
+  "mast 頂列搜尋框:一框搜遍已嵌資料 — CASE(代號/名/負責人/狀態)、THR 追蹤(主旨/對象)、MAIL 收信、WOP 歸戶(名/串號)、DEC 決議、MLS 里程碑、CMT 承諾、關係人、DRAFT 草稿佇列",
+  "資料即索引:首次輸入時由 DATA 現場建索引(GSIX 惰性),零索引檔零外部依賴,全本地",
+  "互動:輸入即搜(前 40 筆,型別 chip 標示)· 點命中跳對應分頁(CASE 直開詳情窗 openDetail)· Enter=第一筆 · Esc=關閉 · /=聚焦(輸入框內不劫持)· 點外收合",
+  "i18n:zh/cn/en 各增四鍵 gsPh/gsN/gsNone/gsHint(只增不減);無命中誠實顯示引導文",
+  "視覺鎖不破:搜尋框插入 mast 既有 flex 佈局,側欄/分頁/矩陣零改動"
+ ],
+ "honest_scope": "此為 ENG-039 統一搜尋之「能力線上板」— 板內 JS 搜已嵌資料(各集合有上限,如 thr≤12/dec≤8);全文/歷史深搜仍走 CLI via-workops search,板不冒充全量。",
+ "qa": {
+  "pwsh_ast": "0 錯誤(並修正前次檢法:$e 未先宣告會使 [ref] 拋錯而誤報 AST-OK — 本輪起先宣告再驗)",
+  "node_check": "抽出 JS 語法綠",
+  "shim131": "15/15:placeholder i18n、六型別命中(THR/MAIL/CASE/WOP/DEC/CMT/人)、大小寫不敏感、無命中誠實文、Enter 跳轉收合、Esc 收合、空查詢不開、v0130 M7 出信稽核迴歸、今日/矩陣頁迴歸",
+  "playwright": "實輸「艾克米」2 命中(CASE+WOP chip)、Enter 開 CASE 詳情窗(mback.on=1)、/ 聚焦 gsq、pageerror 0;截圖 board131_search.png 目檢通過"
+ },
+ "governance": "唯讀;只增不減;在地化零雲端;版本前行含執行期 banner 字串(v0131);編號永不變。"
+}

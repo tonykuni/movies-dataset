@@ -1363,6 +1363,14 @@
    "component": "VAP chartlib v007:DuckDB/Parquet 掛載 + --sql 虛擬表 + 同時間軸堆疊多面板",
    "code": "ENG-VAP/授權簿末項",
    "note": "版前 v006→v007(正本不就地修改;via-vap 動態解析自動吃新版)。①.parquet/.duckdb 入 DB_SUFFIXES:duckdb 優先、pandas+pyarrow 後備、皆缺誠實 FAIL+一行安裝(py -m pip install --user duckdb);核心零依賴不變。②--sql:記憶體 duckdb 掛已發現 parquet/csv/tsv 為同名 view、.duckdb ATTACH 檔幹名可跨源 JOIN → 虛擬表 sql_result 直入全部繪圖動詞(--table 未指定自動選)。③--panels=VAP-CH-09 小圖家族新變體 stack1col(SSOT 1.1.4 登錄,不發明新碼):2–6 面板共用 X、各板獨立 Y+headroom+位數一致、每板各自變換、事件帶同步、十字線全高零 JS、X 標籤僅底板。④QA 抓到並修復兩真 bug:DuckDB DDL 預備參數不支援(路徑內嵌+跳脫)、不存在欄位默默畫全空序列(series/stack/panels 三家族補欄位在位+全空誠實閘)。QA:py_compile 綠;--list 双格式發現;三家族+誠實閘七案例全過;Playwright 截圖目檢兩張(3 面板 yoy+bar+bands、跨源 JOIN rebase100)通過;pandas 後備路徑實測(Decimal→float 正規化)。"
+  },
+  {
+   "ts": "2026-08-12T01:30:00",
+   "op": "UPGRADE",
+   "category": "介面",
+   "component": "指揮板 v0131:全域搜尋上板(ENG-039 能力線)",
+   "code": "ENG-025/ENG-039",
+   "note": "授權補強 R3(標準授權令仍有效)。版前 v0130→v0131(ALL 動態解析自動吃新版)。頂列搜尋框一框搜遍已嵌資料:CASE(代號/名/負責人)/THR(主旨/對象)/MAIL/WOP 歸戶/DEC/MLS/CMT/關係人/草稿佇列 — 資料即索引零索引檔,全本地。互動:輸入即搜前 40 筆+型別 chip;點命中跳對應分頁,CASE 直開詳情窗;Enter 跳第一筆、Esc 關閉、/ 聚焦(輸入框內不劫持);點外自動收合。i18n zh/cn/en 四鍵只增不減(gsPh/gsN/gsNone/gsHint);無命中誠實顯示。誠實註記:此為 ENG-039 統一搜尋之能力線上板(板內 JS 對已嵌資料),CLI 深搜(全文/歷史)仍走 via-workops search。QA:pwsh AST 0 錯(修正前次 [ref] 未宣告之假綠檢法);node --check 綠;shim131 15/15(含 v0130 M7 迴歸);Playwright 實測:輸入「艾克米」2 命中(CASE+WOP)、Enter 開詳情窗、/ 聚焦、零 pageerror;截圖目檢通過。視覺鎖不破(搜尋框插 mast 既有 flex,佈局零改動)。"
   }
  ]
 }
