@@ -81,7 +81,8 @@
     x:      function(o){return svg('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',o);},
     gear:   function(o){return svg('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',o);},
     doc:    function(o){return svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/>',o);},
-    scale:  function(o){return svg('<path d="M12 3v18"/><path d="M5 21h14"/><path d="M6 8h12"/><path d="M6 8l-3 6a3 3 0 0 0 6 0z"/><path d="M18 8l-3 6a3 3 0 0 0 6 0z"/>',o);}
+    scale:  function(o){return svg('<path d="M12 3v18"/><path d="M5 21h14"/><path d="M6 8h12"/><path d="M6 8l-3 6a3 3 0 0 0 6 0z"/><path d="M18 8l-3 6a3 3 0 0 0 6 0z"/>',o);},
+    grid:   function(o){return svg('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',o);}
   };
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 
@@ -265,6 +266,7 @@
       navBtn('ledger', IC.term({s:19}), '引擎總帳', 0)+
       '<div style="height:8px"></div>'+
       navBtn('loaded', IC.folder({s:19}), '載入本機匯出 (你自己的 JSON)', loaded.mails.length+loaded.cases.length+loaded.stake.length)+
+      navBtn('cards', IC.grid({s:19}), '專案卡總覽 · 燈號/下一步/倒數', (loaded.control.length+registry.length))+
       navBtn('reconcile', IC.scale({s:19}), '對帳校準 · 控管表×郵件→建議', (loaded.control.length?loaded.control.length:0))+
       navBtn('discover', IC.search({s:19}), '專案發掘 · 關鍵字→成案編號', registry.length)+
       navBtn('templates', IC.doc({s:19}), '範本庫管理 · 導入不寄出', 0)+
@@ -280,6 +282,7 @@
               : state.nav==='ledger' ? ledgerView()
               : state.nav==='validate' ? validationView()
               : state.nav==='settings' ? settingsView()
+              : state.nav==='cards' ? cardsView()
               : state.nav==='reconcile' ? reconcileView()
               : state.nav==='discover' ? discoverView()
               : state.nav==='templates' ? templatesView()
@@ -987,6 +990,106 @@
     render();
   }
 
+  /* ---------------- 🃏 專案卡總覽 Project Cards (status light · next step · ball · countdown) ---------------- */
+  function cardMatch(terms){
+    var count=0, lastDate=null, lastDir='', waiting=null;
+    var hit=function(subj){ subj=subj||''; for(var i=0;i<terms.length;i++){ if(terms[i] && subj.indexOf(terms[i])>=0) return true; } return false; };
+    loaded.mails.forEach(function(m){
+      if(hit(m.Subject)){ count++; var d=recParseDate(m.EventDate); if(d && (!lastDate||d>lastDate)){ lastDate=d; lastDir=(m.Direction||'').toUpperCase(); } }
+    });
+    loaded.pending.forEach(function(p){
+      var subj=recGet(p,['Subject','TITLE','NORMALIZED_TITLE','SUBJECT']);
+      if(hit(subj)){
+        var wd=recWaitDays(p); if(waiting===null||wd>waiting) waiting=wd;
+        var d=recParseDate(recGet(p,['SentOn','LAST_OUTBOUND','LastDate']));
+        if(d){ if(!lastDate||d>lastDate){ lastDate=d; lastDir='OUTBOUND'; } } else if(!lastDate){ lastDir='OUTBOUND'; }
+      }
+    });
+    return { count:count+(waiting!==null?1:0), lastDate:lastDate, lastDir:lastDir, waiting:waiting, has:(count>0||waiting!==null) };
+  }
+  function projCards(){
+    var cards=[];
+    loaded.control.forEach(function(c){ cards.push({ code:c.Code, name:c.Name, owner:c.Owner, status:c.Status, progress:c.Progress, due:c.Due, updated:c.Updated, next:c.Next, ball:c.Ball, terms:[c.Code,c.Name] }); });
+    registry.forEach(function(r){ cards.push({ code:r.code, name:r.name, owner:'', status:'新案(待補)', progress:'', due:'', updated:r.at, next:'', ball:'', terms:[r.code,r.name].concat(r.kws||[]) }); });
+    var now=new Date(); now.setHours(0,0,0,0);
+    return cards.map(function(c){
+      var ev=cardMatch(c.terms.filter(Boolean));
+      var sl=(c.status||'').toLowerCase();
+      var isDone=['已完成','完成','結案','closed','done','complete'].some(function(w){ return sl.indexOf(w.toLowerCase())>=0; });
+      var isStuck=['卡關','blocked','暫停','hold'].some(function(w){ return sl.indexOf(w.toLowerCase())>=0; });
+      var dueD=recParseDate(c.due);
+      var daysLeft=dueD?Math.ceil((dueD.getTime()-now.getTime())/86400000):null;
+      var updD=recParseDate(c.updated);
+      var stale=(ev.lastDate && ((updD && ev.lastDate>updD) || !updD));
+      var waiting=(ev.waiting!==null && ev.waiting>=3);
+      var light, lightW;
+      if(isDone){ light='done'; lightW=3; }
+      else if(isStuck || (daysLeft!==null&&daysLeft<0) || (ev.waiting!==null&&ev.waiting>=5)){ light='red'; lightW=0; }
+      else if(waiting || stale || (daysLeft!==null&&daysLeft<=2)){ light='yellow'; lightW=1; }
+      else { light='green'; lightW=2; }
+      var ball=c.ball, next=c.next;
+      if(!ball){ ball = isDone?'—' : (ev.lastDir==='OUTBOUND'&&ev.waiting!==null)?'對方' : ev.lastDir==='INBOUND'?'你' : '你'; }
+      if(!next){
+        next = isDone?'結案歸檔'
+          : isStuck?'排除阻礙(見備註)'
+          : (ev.lastDir==='OUTBOUND'&&ev.waiting!==null)?'等對方回覆'+(ev.waiting>=3?'(可補追)':'')
+          : ev.lastDir==='INBOUND'?'輪你回覆 / 更新控管表'
+          : '主動確認近況';
+      }
+      var pg=parseInt((''+(c.progress||'')).replace(/[^\d]/g,''),10); if(isNaN(pg)) pg=null;
+      return { code:c.code, name:c.name, owner:c.owner, status:c.status, light:light, lightW:lightW,
+        next:next, ball:ball, daysLeft:daysLeft, due:c.due, progress:pg,
+        waiting:ev.waiting, lastDate:recFmt(ev.lastDate), lastDir:ev.lastDir, msgs:ev.count };
+    }).sort(function(a,b){ return a.lightW-b.lightW || (a.daysLeft===null?999:a.daysLeft)-(b.daysLeft===null?999:b.daysLeft); });
+  }
+  var CARD_LIGHT={ red:{c:'#f87171',t:'需介入'}, yellow:{c:'#fbbf24',t:'注意'}, green:{c:'#34d399',t:'正常'}, done:{c:'#64748b',t:'已完成'} };
+  function cardsView(){
+    var cards=projCards();
+    var counts={}; cards.forEach(function(c){ counts[c.light]=(counts[c.light]||0)+1; });
+    var head='<div style="height:56px;flex:none;border-bottom:1px solid var(--line);padding:0 22px;display:flex;align-items:center;gap:12px;background:rgba(4,12,26,.5)">'+
+      '<h2 style="font-size:16px;font-weight:600;color:#fff;display:flex;align-items:center;gap:9px">'+IC.grid({s:18})+' 專案卡總覽</h2>'+
+      '<span class="mono" style="font-size:10px;background:#0f1e34;border:1px solid var(--line2);color:var(--mut);padding:2px 8px;border-radius:5px">卡在誰手上 · 下一步 · 來不來得及</span>'+
+      '<span style="flex:1"></span>'+
+      ['red','yellow','green','done'].filter(function(k){return counts[k];}).map(function(k){ var L=CARD_LIGHT[k];
+        return '<span style="display:flex;align-items:center;gap:5px;font-size:11px;color:'+L.c+'"><span style="width:8px;height:8px;border-radius:50%;background:'+L.c+'"></span>'+L.t+' '+counts[k]+'</span>'; }).join('')+
+    '</div>';
+    if(!cards.length){
+      return '<div class="fadein" style="flex:1;display:flex;flex-direction:column;position:relative;z-index:10;overflow:hidden">'+head+
+        '<div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--mut2)"><div style="opacity:.5">'+IC.grid({s:40})+'</div><div style="font-size:13px;color:#cbd5e1">先到「載入」頁匯入控管表(或在「專案發掘」成案),卡片會自動長出來</div></div></div>';
+    }
+    var body=cards.map(function(c){
+      var L=CARD_LIGHT[c.light];
+      var etaTxt = (c.daysLeft===null || c.light==='done') ? '' :
+        c.daysLeft<0 ? '<span style="color:#f87171;font-weight:700">逾期 '+(-c.daysLeft)+' 天</span>' :
+        c.daysLeft===0 ? '<span style="color:#f87171;font-weight:700">今天到期</span>' :
+        '<span style="color:'+(c.daysLeft<=2?'#fbbf24':'#94a3b8')+'">剩 '+c.daysLeft+' 天</span>';
+      var bar = c.progress===null?'' :
+        '<div style="display:flex;align-items:center;gap:7px;min-width:90px"><div style="flex:1;height:5px;background:rgba(148,163,184,.15);border-radius:3px;overflow:hidden"><div style="width:'+Math.min(100,c.progress)+'%;height:100%;background:'+(c.light==='done'?'#64748b':'var(--em)')+'"></div></div><span class="mono" style="font-size:9.5px;color:var(--mut)">'+c.progress+'%</span></div>';
+      var warn = (c.waiting!==null&&c.waiting>=3&&c.light!=='done') ? '<div style="font-size:10.5px;color:#fbbf24;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:6px;padding:4px 9px;margin-top:8px">⚠ 已寄出待回覆 '+c.waiting+' 天</div>' : '';
+      return '<div style="background:var(--panel2);border:1px solid var(--line);border-left:3px solid '+L.c+';border-radius:10px;padding:13px 15px;display:flex;flex-direction:column">'+
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'+
+          '<span style="width:9px;height:9px;border-radius:50%;background:'+L.c+';flex:none;box-shadow:0 0 8px '+L.c+'55"></span>'+
+          '<span class="mono" style="font-size:10px;color:var(--mut2)">'+esc(c.code||'—')+'</span>'+
+          '<span style="font-size:13px;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">'+esc(c.name||'(未命名)')+'</span>'+
+          '<span class="mono" style="font-size:9px;color:'+L.c+';border:1px solid '+L.c+'44;border-radius:10px;padding:1px 7px;white-space:nowrap">'+esc(c.status||'—')+'</span>'+
+        '</div>'+
+        '<div style="display:flex;align-items:center;gap:7px;margin-bottom:8px">'+
+          '<span style="font-size:12px;color:#e2e8f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">下一步:'+esc(c.next)+'</span>'+
+          '<span style="font-size:10.5px;font-weight:700;color:'+(c.ball==='你'?'#34d399':c.ball==='對方'?'#60a5fa':'var(--mut2)')+';background:'+(c.ball==='你'?'rgba(16,185,129,.1)':'rgba(96,165,250,.08)')+';border-radius:10px;padding:2px 9px;white-space:nowrap">🏀 '+esc(c.ball)+'</span>'+
+        '</div>'+
+        '<div style="display:flex;align-items:center;gap:12px;font-size:10.5px">'+
+          (c.due?('<span class="mono" style="color:var(--mut2)">⏳ '+esc(c.due)+' </span>'+etaTxt):'<span class="mono" style="color:var(--mut2)">無交期</span>')+
+          '<span style="flex:1"></span>'+bar+
+        '</div>'+warn+
+        '<div class="mono" style="font-size:9px;color:var(--mut2);margin-top:8px;border-top:1px solid rgba(30,41,59,.5);padding-top:7px">'+
+          esc(c.owner||'—')+' · 最後動靜 '+(c.lastDate?esc(c.lastDate)+' '+(c.lastDir==='OUTBOUND'?'你寄出':c.lastDir==='INBOUND'?'對方來信':''):(c.waiting!==null?'你寄出(等回覆)':'無佐證'))+' · '+c.msgs+' 封</div>'+
+      '</div>';
+    }).join('');
+    return '<div class="fadein" style="flex:1;display:flex;flex-direction:column;position:relative;z-index:10;overflow:hidden">'+head+
+      '<div style="flex:1;overflow-y:auto;padding:16px 20px"><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px">'+body+'</div></div>'+
+    '</div>';
+  }
+
   /* ---------------- ⚙ Settings (mouse-adjustable factor weights) ---------------- */
   function settingsView(){
     var W=settings.w;
@@ -1199,6 +1302,8 @@
       Progress:g(['Progress','progress','進度','完成','完成百分比']),
       Due:     g(['DueDate','due','ETA','交期','截止','預計完成']),
       Updated: g(['LastUpdated','last_updated','UpdatedAt','最後更新','更新日','更新日期']),
+      Next:    g(['NextStep','next','下一步','下一步行動']),
+      Ball:    g(['Ball','ball','球在誰','待誰行動']),
       _raw:r
     };
   }
