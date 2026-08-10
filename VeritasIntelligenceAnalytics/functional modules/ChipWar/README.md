@@ -25,11 +25,13 @@ I/O 契約重建之 **T4 佔位鏈頭**(合成宇宙 duckdb + regime;頭部有�
 ```
 
 產物落 `_generated/`(gitignored,可再生):`staging/*.json` + `staging/ssot_chipwar.duckdb`
-+ `reports/*.html`(Visual Lock)+ `staging/_test_matrix.json`(harness 驗收矩陣)。
++ `reports/*.html`(Visual Lock)+ `staging/_test_matrix.json`(harness 驗收矩陣)
++ **`reports/vap_dashboard/index.html`(ChipWar × VAP 圖庫儀表板:11 面板,靜態 PNG
+嵌頁 + 互動 plotly 版連結 + harness 驗收與 FOMO 四閘門摘要)**。
 路徑可用環境變數 `VIA_CHIPWAR_STAGING` / `VIA_CHIPWAR_REPORTS` 覆寫。
 
-首跑驗收(2026-08-10 本容器):**11/11 階段 SUCCESS · harness verdict ALL_PASS**
-(L1 六引擎 clean · L2 方法論斷言 8/8 · globalflow SKIP)。加入 govfund 後為 12 階段。
+首跑驗收(2026-08-10 本容器):**13/13 階段 SUCCESS · harness verdict ALL_PASS**
+(L1 六引擎 clean · L2 方法論斷言 8/8 · globalflow SKIP · VAP 儀表板 11/11 面板)。
 
 ## 目錄
 

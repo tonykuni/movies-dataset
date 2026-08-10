@@ -501,6 +501,23 @@ def importance_color(spec: Spec, level: int) -> str:
     return {3: spec.up, 2: spec.palette[1], 1: spec.down}.get(int(level), spec.neutral)
 
 
+def chart_title(meta: Dict[str, Any]) -> str:
+    """圖標題:code zh · en(use)— 空欄位自動省略(title 覆寫時 en/use 常為空)。"""
+    parts = [meta["code"], meta.get("zh", "")]
+    tail = " · %s" % meta["en"] if meta.get("en") else ""
+    use = "(%s)" % meta["use"] if meta.get("use") else ""
+    return ("%s %s%s%s" % (parts[0], parts[1], tail, use)).strip()
+
+
+def override_title(meta: Dict[str, Any], title: Optional[str]) -> Dict[str, Any]:
+    """title 覆寫:圖型重用於他域資料時,以自訂標題取代圖庫預設名(誠實標示)。"""
+    if not title:
+        return meta
+    m = dict(meta)
+    m["zh"], m["en"], m["use"] = title, "", ""
+    return m
+
+
 # VAP-CH-16 地圖:常用國名 → ISO-3(plotly locationmode=ISO-3;country names 已被
 # plotly 標示棄用方向,三碼定位對未來版本免疫)
 _ISO3 = {
@@ -546,6 +563,26 @@ def load_table(path: Union[str, Path], table: Optional[str] = None,
             n = max((len(v) for v in data.values() if isinstance(v, list)), default=0)
             return {k: list(v)[:limit or n] for k, v in data.items() if isinstance(v, list)}
         rows = list(data)
+    elif suffix == ".duckdb":
+        if not _module_available("duckdb"):
+            raise VAPError("讀 .duckdb 需要 duckdb — pip install duckdb")
+        import duckdb as _dd
+        con = _dd.connect(str(p), read_only=True)
+        try:
+            tables = [r[0] for r in con.execute("SHOW TABLES").fetchall()]
+            if not tables:
+                raise VAPError("DuckDB 無資料表:%s" % p)
+            if table is None:
+                if len(tables) > 1:
+                    raise VAPError("DuckDB 有多表 %s — 請用 --table 指定" % tables)
+                table = tables[0]
+            if table not in tables:
+                raise VAPError("--table %r 不存在(可用:%s)" % (table, tables))
+            cur = con.execute('SELECT * FROM "%s"' % table.replace('"', '""'))
+            names = [d[0] for d in cur.description]
+            rows = [dict(zip(names, r)) for r in cur.fetchall()]
+        finally:
+            con.close()
     elif suffix in (".sqlite", ".sqlite3", ".db"):
         import sqlite3
         con = sqlite3.connect(str(p))
@@ -566,7 +603,7 @@ def load_table(path: Union[str, Path], table: Optional[str] = None,
         finally:
             con.close()
     else:
-        raise VAPError("不支援的資料檔格式 %r(可用:.csv .tsv .json .sqlite)" % suffix)
+        raise VAPError("不支援的資料檔格式 %r(可用:.csv .tsv .json .sqlite .duckdb)" % suffix)
     if limit:
         rows = rows[:limit]
     if not rows:
@@ -826,7 +863,7 @@ class SeabornBackend:
         return fig, axes
 
     def _title(self, fig, meta: Dict[str, Any]) -> None:
-        fig.suptitle("%s %s · %s(%s)" % (meta["code"], meta["zh"], meta["en"], meta.get("use", "")),
+        fig.suptitle(chart_title(meta),
                      fontsize=self.spec.font_size("chartTitle") * 1.3, x=0.01, ha="left")
 
     def _seq_x(self, ax, labels: Sequence[str]) -> List[int]:
@@ -838,16 +875,17 @@ class SeabornBackend:
     def _widen_for_labels(self, ax, labels: Sequence[str], side: str = "left") -> None:
         """真實資料大數值(十億級)標籤超出固定邊距 → 依最長標籤自動加寬該側。"""
         longest = max((len(t) for t in labels), default=0)
-        if longest <= 7:
-            return
         fig = ax.figure
         width_px = fig.get_size_inches()[0] * 100.0
-        extra = (longest - 7) * 8.5 + 6  # ~8.5px/字元(tick 字級)+ 邊墊
         if side == "left":
-            need = (self.spec.margins["left"] + extra) / width_px
+            if longest <= 7:  # 左邊距 56px ≈ 7 字元內免調
+                return
+            need = (self.spec.margins["left"] + (longest - 7) * 8.5 + 6) / width_px
             fig.subplots_adjust(left=max(fig.subplotpars.left, need))
         else:
-            need = 1.0 - (self.spec.margins["right"] + extra + 8) / width_px
+            if longest <= 2:  # 右邊距僅 20px ≈ 2 字元;更長即需讓位
+                return
+            need = 1.0 - (self.spec.margins["right"] + (longest - 2) * 8.5 + 6) / width_px
             fig.subplots_adjust(right=min(fig.subplotpars.right, need))
 
     def _y_ticks(self, ax, values: Sequence[float], include_zero: bool = False) -> List[float]:
@@ -892,8 +930,8 @@ class SeabornBackend:
                     linewidth=s.bar_edge_width)
 
     # -- 渲染入口 -------------------------------------------------------------
-    def build(self, chart_id: str, data: Dict[str, Any]):
-        meta = self.spec.chart_meta(chart_id)
+    def build(self, chart_id: str, data: Dict[str, Any], title: Optional[str] = None):
+        meta = override_title(self.spec.chart_meta(chart_id), title)
         fn = getattr(self, "r_" + meta["id"], None)
         if fn is None:
             raise VAPError("seaborn 後端缺少圖型 %r 實作" % meta["id"])
@@ -901,8 +939,8 @@ class SeabornBackend:
         return fig, meta
 
     def render(self, chart_id: str, data: Dict[str, Any], out_path: Path,
-               scale: Optional[int] = None) -> Path:
-        fig, meta = self.build(chart_id, data)
+               scale: Optional[int] = None, title: Optional[str] = None) -> Path:
+        fig, meta = self.build(chart_id, data, title=title)
         out_path.parent.mkdir(parents=True, exist_ok=True)
         fig.savefig(out_path, dpi=100 * (scale or self.spec.png_scale),
                     facecolor=self.spec.get("export.png.background"))
@@ -1467,8 +1505,7 @@ class PlotlyBackend:
         s = self.spec
         m = s.margins
         base: Dict[str, Any] = dict(
-            title=dict(text="%s %s · %s(%s)" % (meta["code"], meta["zh"], meta["en"],
-                                                meta.get("use", "")),
+            title=dict(text=chart_title(meta),
                        font=dict(size=s.font_size("chartTitle") * 1.4), x=0.01),
             paper_bgcolor=s.paper, plot_bgcolor=s.plot_bg,
             margin=dict(t=m["top"] + 44, r=m["right"] + 12, b=m["bottom"] + 12, l=m["left"]),
@@ -1522,16 +1559,16 @@ class PlotlyBackend:
                                hovertemplate="%{text}<br>%{y}" if text else None)
 
     # -- 渲染入口 -------------------------------------------------------------
-    def build(self, chart_id: str, data: Dict[str, Any]):
-        meta = self.spec.chart_meta(chart_id)
+    def build(self, chart_id: str, data: Dict[str, Any], title: Optional[str] = None):
+        meta = override_title(self.spec.chart_meta(chart_id), title)
         fn = getattr(self, "p_" + meta["id"], None)
         if fn is None:
             raise VAPError("plotly 後端缺少圖型 %r 實作" % meta["id"])
         return fn(data, meta), meta
 
     def render(self, chart_id: str, data: Dict[str, Any], out_path: Path,
-               plotlyjs: Any = True) -> Path:
-        fig, meta = self.build(chart_id, data)
+               plotlyjs: Any = True, title: Optional[str] = None) -> Path:
+        fig, meta = self.build(chart_id, data, title=title)
         out_path.parent.mkdir(parents=True, exist_ok=True)
         fig.write_html(str(out_path), include_plotlyjs=plotlyjs, full_html=True)
         return out_path
@@ -2234,6 +2271,27 @@ def selftest(spec: Spec, out_dir: Optional[Path] = None) -> int:
         except VAPError:
             pass
     check("data_layer_csv", data_layer)
+    # ②c title 覆寫 + duckdb 讀取
+    def title_override():
+        m = override_title(spec.chart_meta("line"), "自訂標題測試")
+        assert chart_title(m) == "VAP-CH-01 自訂標題測試", chart_title(m)
+        assert chart_title(spec.chart_meta("line")).startswith("VAP-CH-01 折線圖 · Line(")
+    check("title_override", title_override)
+    def duckdb_load():
+        if not _module_available("duckdb"):
+            raise VAPUnsupported("duckdb 未安裝 — pip install duckdb")
+        import duckdb as _dd
+        import tempfile as _tf
+        d = Path(_tf.mkdtemp(prefix="vap_ddb_"))
+        db = d / "t.duckdb"
+        con = _dd.connect(str(db))
+        con.execute("CREATE TABLE prices(trade_date VARCHAR, ret DOUBLE)")
+        con.execute("INSERT INTO prices VALUES ('2026-01', 0.5), ('2026-02', -0.3)")
+        con.close()
+        cols = load_table(db)
+        line = build_chart_data("line", cols, x="trade_date", ys=["ret"])
+        assert line["value"] == [0.5, -0.3], line
+    check("duckdb_load", duckdb_load)
     # ③ SSOT 誠實 FAIL
     def spec_honesty():
         try:
@@ -2330,6 +2388,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     r.add_argument("--map", dest="map_pairs", action="append", default=[],
                    help="逐欄指定 field=欄名(可多次;優先於 --x/--y)")
     r.add_argument("--limit", type=int, help="只取前 N 列")
+    r.add_argument("--title", help="自訂圖標題(覆寫圖庫預設名;跨域重用圖型時誠實標示)")
     r.add_argument("--out", default="vap_out", help="輸出目錄")
     r.add_argument("--scale", type=int, help="PNG 縮放(預設依 SSOT export.png.scale)")
     r.add_argument("--plotlyjs", default="inline", choices=["inline", "directory", "cdn"],
@@ -2440,10 +2499,10 @@ def main(argv: Optional[List[str]] = None) -> int:
                 out = out_dir / ("%s_%s.%s" % (meta["code"].lower().replace("-", "_"),
                                                name, ext))
                 if name == "seaborn":
-                    cls(spec).render(meta["id"], data, out, scale=args.scale)
+                    cls(spec).render(meta["id"], data, out, scale=args.scale, title=args.title)
                 else:
                     mode = True if args.plotlyjs == "inline" else args.plotlyjs
-                    cls(spec).render(meta["id"], data, out, plotlyjs=mode)
+                    cls(spec).render(meta["id"], data, out, plotlyjs=mode, title=args.title)
                 print("[OK  ] %s × %s → %s" % (meta["code"], name, out))
             except VAPUnsupported as e:
                 print("[SKIP] %s × %s:%s" % (meta["code"], name, e))
