@@ -145,7 +145,27 @@ function VO_Get {
             if (-not [string]::IsNullOrWhiteSpace($v)) { return $v.Trim() }
         }
     }
+    # fuzzy pass: header CONTAINS a dictionary word (case-insensitive), e.g. "專案代號(必填)"
+    $props = @($Row.PSObject.Properties.Name)
+    foreach ($n in $Names) {
+        if ($n.Length -lt 2) { continue }
+        foreach ($p in $props) {
+            if ($p.ToLower().Contains($n.ToLower())) {
+                $v = [string]$Row.$p
+                if (-not [string]::IsNullOrWhiteSpace($v)) { return $v.Trim() }
+            }
+        }
+    }
     return ""
+}
+
+# 三段追蹤分級:T1 一般追蹤(+3天) / T2 積極跟進(+5天) / T3 緊急升級(+7天,建議 CC 主管)
+function VO_TStage {
+    param([int]$Days)
+    if ($Days -ge 7) { return "T3_Urgent" }
+    if ($Days -ge 5) { return "T2_FollowUp" }
+    if ($Days -ge 3) { return "T1_Track" }
+    return "T0_Standby"
 }
 
 # ==========================================================================================
@@ -179,71 +199,11 @@ $Answer
 </div>
 "@
     }
-    # v0113:豐富版必回選擇題(操作員令:範本內文寫得太過簡單)— 背景區塊+三種回覆方式+
-    # 每題補充說明+期限句;placeholders 由列欄位注入,缺席欄位由 Render 清空
-    $RichApproval = @'
-<!-- SUBJECT: [待回·選擇題] {{ProjectCode}} {{ProjectName}} - 請點投票鈕或圈選,一分鐘可回 -->
-<div style="font:400 13px/1.7 'Segoe UI','Microsoft JhengHei',sans-serif;color:#1e293b;max-width:660px;">
-  <p>Hi {{ProjectName}} 窗口,您好:</p>
-  <p>關於 <b>{{ProjectName}}</b>(案號 <span style="font-family:Consolas,monospace;">{{ProjectCode}}</span>)的目前進度,
-     我這邊正在彙整各案排程與資源配置,需要您更新一下狀態。這封信設計成<b>選擇題</b>,回覆幾乎不用打字。</p>
-  <table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:10px 0;width:100%;">
-    <tr><td style="background:#f1f5f9;border-left:4px solid #64748b;padding:8px 12px;font-size:12px;color:#475569;line-height:1.8;">
-      原信主旨:{{OrigSubject}}<br/>追蹤識別:{{CaseID}} · 已等候 {{WaitingDays}} 天 · 原寄出 {{SentOn}}
-    </td></tr>
-  </table>
-  <table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:12px 0;width:100%;">
-    <tr><td style="background:#1e293b;color:#fff;font:700 13px 'Segoe UI',sans-serif;padding:8px 14px;border-radius:6px 6px 0 0;">三種回覆方式,擇一即可(最快 10 秒)</td></tr>
-    <tr><td style="border:1px solid #e2e8f0;border-top:none;padding:12px 16px;font-size:13px;line-height:2.0;">
-      ① <b>最快 — 投票按鈕</b>:本信上方 Outlook「投票」列(進行中 / 已完成 / 卡關 / 需要協助),點一顆即回,零打字。<br/>
-      ② <b>回覆本信</b>:在下表把適用的 ○ 圈起、或刪去不適用的選項後送出。<br/>
-      ③ <b>一句話</b>:例「進行中,70%,週五完成」— 我來歸檔。
-    </td></tr>
-  </table>
-  <table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:12px 0;width:100%;">
-    <tr><td style="background:#334155;color:#fff;font:700 13px 'Segoe UI',sans-serif;padding:8px 14px;border-radius:6px 6px 0 0;">必回五題(圈選即可)</td></tr>
-    <tr><td style="border:1px solid #e2e8f0;border-top:none;padding:12px 16px;font-size:13px;line-height:2.2;">
-      1. 目前狀態: ○ 進行中 ○ 已完成 ○ 卡關<br/>
-      <span style="color:#64748b;font-size:11.5px;">└ 卡關請順帶在第 4 題說明原因,我來協助排除</span><br/>
-      2. 完成百分比: ○ 25% ○ 50% ○ 75% ○ 100%<br/>
-      3. 預計完成 ETA: ○ 今日 ○ 明日 ○ 本週 ○ 其他:__________<br/>
-      <span style="color:#64748b;font-size:11.5px;">└ 交期若需調整,直接填新日期即可,我會同步更新排程</span><br/>
-      4. 是否有阻礙 / 風險: ○ 無 ○ 有:__________<br/>
-      5. 是否需要我協助: ○ 否 ○ 是:__________<br/>
-      <span style="color:#64748b;font-size:11.5px;">└ 需要資源、需要向上反映、需要跨組協調,都算「是」</span>
-    </td></tr>
-  </table>
-  <p>若能於 <b>明日中午前</b> 回覆,即可趕上本週彙整;若您已在會議或電話中說明,回「已口頭說明」即可留檔。謝謝!</p>
-  <p>Best regards,<br/>{{MyName}}</p>
-  <p style="color:#94a3b8;font-size:11px;font-family:Consolas,monospace;">追蹤 {{ProjectCode}} {{CaseID}} · {{Date}} · 本信為 VIA WorkOps 產生之草稿,經本人確認後親自寄出</p>
-</div>
-'@
-    # v0115 三段追蹤 T3:緊急升級範本(前兩段未獲回覆;建議 CC 主管由人自加 — 系統絕不代加代寄)
-    $UrgentEscalation = @"
-<!-- SUBJECT: [緊急·第三次通知] {{ProjectCode}} {{ProjectName}} - 今日內需要您的回覆 -->
-<div style="font:400 13px/1.7 'Segoe UI','Microsoft JhengHei',sans-serif;color:#1e293b;max-width:660px;">
-  <p>Hi {{ProjectName}} 窗口,您好:</p>
-  <table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:10px 0;width:100%;">
-    <tr><td style="background:#fef2f2;border-left:4px solid #dc2626;padding:10px 14px;font-size:12.5px;color:#7f1d1d;line-height:1.8;">
-      <b>此為第三次通知。</b>關於「{{OrigSubject}}」(追蹤識別 {{CaseID}}),自 {{SentOn}} 寄出至今已 {{WaitingDays}} 天未獲回覆,
-      前兩次追蹤信亦未見回音。此案已影響後續排程,若今日內仍無回覆,我將需要向上反映以尋求協助排除。
-    </td></tr>
-  </table>
-  <p>仍然只需要幾秒:點本信上方的<b>投票按鈕</b>(進行中 / 已完成 / 卡關 / 需要協助),或直接回一句話即可。
-     若您已於電話/會議中說明,回「已口頭說明」即可留檔結案。</p>
-$Answer
-  <p style="color:#7f1d1d;"><b>請於今日下班前回覆。</b>若有任何困難,直接回「需要協助」,我來安排。謝謝!</p>
-  <p>Best regards,<br/>{{MyName}}</p>
-  <p style="color:#94a3b8;font-size:11px;font-family:Consolas,monospace;">追蹤 {{ProjectCode}} {{CaseID}} · {{Date}} · T3 升級通知 · 本信為草稿,經本人確認後親自寄出;如需 CC 主管由本人寄出時自行加入</p>
-</div>
-"@
     return @{
         "status_request"   = (& $Wrap "[追蹤] {{ProjectCode}} {{ProjectName}} - 進度確認" "想跟你確認 <b>{{ProjectName}}</b>({{ProjectCode}})目前的進度。" "")
         "eta_confirm"      = (& $Wrap "[追蹤] {{ProjectCode}} {{ProjectName}} - 交期確認" "想跟你再次確認 <b>{{ProjectName}}</b>({{ProjectCode}})的<b>預計完成 / 交期</b>是否仍如原訂。" "  <p style='color:#c0392b;'>如需調整交期,請於下方第 3 點圈選或填新日期並簡述原因。</p>")
         "blocker_check"    = (& $Wrap "[追蹤] {{ProjectCode}} {{ProjectName}} - 風險 / 阻礙盤點" "想確認 <b>{{ProjectName}}</b>({{ProjectCode}})目前是否有卡關或潛在風險,以便及早協助。" "")
         "approval_request" = (& $Wrap "[待核] {{ProjectCode}} {{ProjectName}} - 請確認 / 核准" "以下 <b>{{ProjectName}}</b>({{ProjectCode}})事項需要你確認或核准,煩請於下方圈選回覆。" "")
-        "approval_request_v2" = $RichApproval
-        "urgent_escalation" = $UrgentEscalation
         "followup"         = (& $Wrap "[再次追蹤] {{ProjectCode}} {{ProjectName}} - 尚未收到回覆" "先前關於 <b>{{ProjectName}}</b>({{ProjectCode}})的進度確認尚未收到你的回覆,再麻煩你抽空圈選一下,謝謝!" "")
         "followup_firm"    = (& $Wrap "[急件·再追] {{ProjectCode}} {{ProjectName}} - 需盡快回覆" "<b>{{ProjectName}}</b>({{ProjectCode}})的進度已影響後續排程,今天內需要你的回覆。麻煩直接圈選下列項目即可:" "  <p style='color:#c0392b;'>若有困難請於第 5 點勾『是』並說明,我來協助排除。</p>")
     }
@@ -279,10 +239,8 @@ PRJ-003,Q3 產線稽核,Tony,已完成,100%,2026/07/31,2026/07/30
 function VO_LoadTemplate {
     param([string]$Key)
     $File = Join-Path $TemplateDir ("TPL_{0}.html" -f $Key)
-    if (Test-Path -LiteralPath $File) { return (Get-Content -LiteralPath $File -Raw -Encoding UTF8) }
-    $Defaults = VO_GetDefaultTemplates          # v0113:檔案缺席退內建預設(檔案優先,可自行覆寫)
-    if ($Defaults.ContainsKey($Key)) { return [string]$Defaults[$Key] }
-    return $null
+    if (-not (Test-Path -LiteralPath $File)) { return $null }
+    return (Get-Content -LiteralPath $File -Raw -Encoding UTF8)
 }
 
 function VO_RenderTemplate {
@@ -300,8 +258,6 @@ function VO_RenderTemplate {
         $Subject = $Subject.Replace($Token, [string]$Values[$Key])
         $Body = $Body.Replace($Token, [string]$Values[$Key])
     }
-    $Subject = [regex]::Replace($Subject, "\{\{[A-Za-z]+\}\}", "")   # v0113:缺席欄位清空不留 token
-    $Body    = [regex]::Replace($Body, "\{\{[A-Za-z]+\}\}", "")
     return [pscustomobject]@{ Subject = $Subject; HtmlBody = $Body }
 }
 
@@ -352,7 +308,6 @@ function VO_Scan {
                     ConversationID = $conv
                     Unread         = [bool]$it.UnRead    # READ ONLY — value is observed, never assigned
                     Categories     = [string]$it.Categories
-                    VotingResponse = $(try { [string]$it.VotingResponse } catch { "" })   # READ ONLY(M3 回覆解析投票層)
                 }
                 $null = $mails.Add($row)
                 if ($from) {
@@ -384,13 +339,15 @@ function VO_Scan {
                 $replied = $false
                 if ($conv -and $inboxConv.ContainsKey($conv) -and $so) { if ($inboxConv[$conv] -gt $so) { $replied = $true } }
                 if (-not $replied) {
+                    $wd = if ($so) { [int]((Get-Date) - $so).TotalDays } else { 0 }
                     $null = $pending.Add([pscustomobject]@{
                         CASE_ID        = $conv
                         Subject        = [string]$it.Subject
                         LAST_DIRECTION = "OUTBOUND"
                         TO             = VO_FirstAddr $to
                         SentOn         = if ($so) { $so.ToString("yyyy/MM/dd HH:mm") } else { "" }
-                        WaitingDays    = if ($so) { [int]((Get-Date) - $so).TotalDays } else { 0 }
+                        WaitingDays    = $wd
+                        Stage          = VO_TStage $wd
                     })
                 }
             } catch { }
@@ -466,11 +423,11 @@ function VO_MatchEvidence {
 
 function VO_ReconcileRow {
     param($ControlRow, $Evidence)
-    $code = VO_Get $ControlRow @("ProjectCode","專案代號","案號","代號","Code")
-    $name = VO_Get $ControlRow @("ProjectName","專案名稱","案名","Name")
-    $owner = VO_Get $ControlRow @("Owner","負責人","窗口")
-    $status = VO_Get $ControlRow @("Status","狀態","進度狀態")
-    $updatedRaw = VO_Get $ControlRow @("LastUpdated","最後更新","更新日","更新日期")
+    $code = VO_Get $ControlRow @("ProjectCode","Trace_ID","WOP_ID","專案代號","案號","案件編號","追蹤碼","代號","Code")
+    $name = VO_Get $ControlRow @("ProjectName","專案名稱","案名","項目名稱","主題","Activity","Step_Name","Name")
+    $owner = VO_Get $ControlRow @("Owner","負責人","承辦人","窗口","對口","PM","Stakeholder")
+    $status = VO_Get $ControlRow @("Status","Current_Stage","狀態","進度狀態")
+    $updatedRaw = VO_Get $ControlRow @("LastUpdated","Last_Comm_Date","最後更新","最後通訊","更新日","更新日期")
     $updated = VO_ParseDate $updatedRaw
 
     $m = VO_MatchEvidence -Code $code -Name $name -Evidence $Evidence
@@ -498,10 +455,12 @@ function VO_ReconcileRow {
             $evidence = ("控管表狀態=已完成,但郵件最後活動 {0} {1} 晚於更新日 {2}" -f (VO_FmtDate $m.LastDate), $m.LastDir, $updatedRaw)
         }
         elseif ($isWaiting -and $m.LastDir -eq "OUTBOUND" -and -not $isDone) {
+            $stage = VO_TStage $m.Waiting
+            $tpl = if ($m.Waiting -ge 5) { "followup_firm" } else { "followup" }
             $confidence = "Pending Review"
             $field = "Status"
-            $proposed = "建議追蹤(已寄出待回覆 " + $m.Waiting + " 天)"
-            $evidence = ("最後一次為你寄出,已等待 {0} 天未見回覆;可用 [3]/[4] 建追蹤草稿" -f $m.Waiting)
+            $proposed = ("建議追蹤({0} · 已寄出待回覆 {1} 天)" -f $stage, $m.Waiting)
+            $evidence = ("最後一次為你寄出,已等待 {0} 天未見回覆;建議範本 {1},可用 [3]/[4] 建草稿{2}" -f $m.Waiting, $tpl, $(if ($stage -eq "T3_Urgent") { ",建議 CC 主管" } else { "" }))
         }
         elseif ($isNewer) {
             $confidence = "Stale"
@@ -620,12 +579,6 @@ function VO_Draft {
             if (($Row.PSObject.Properties.Name -contains "Cc") -and -not [string]::IsNullOrWhiteSpace($Row.Cc)) { $Mail.CC = [string]$Row.Cc }
             $Mail.HTMLBody = $Rendered.HtmlBody
             try { $Mail.Categories = $Category } catch { }
-            # v0112 追加:必回選擇題範本附 Outlook 原生投票按鈕(收件人點按即回,零打字)。
-            # 回覆 HTML 表單在收件端不作用(Outlook 剝除表單),投票鈕是唯一原生勾選 UI。
-            # 仍只建草稿(.Display/.Save),絕不 .Send;投票由收件人於原生介面操作。
-            if ($TemplateKey -like "approval_request*") {   # v0113:v2 豐富版同附投票鈕
-                try { $Mail.VotingOptions = "進行中;已完成;卡關;需要協助" } catch { }
-            }
 
             if ($OpenMode -eq "Display") { $Mail.Display($false) } else { $Mail.Save() }
             $Created++

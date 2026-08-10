@@ -766,8 +766,9 @@
       var waiting = (m.waiting!==null && m.waiting>=3);
       if(isDone && newer){ conf='Conflicted'; field='Status'; proposed='請人工判讀(標記已完成,但仍有較新郵件往來)';
         ev='控管表狀態=已完成,但郵件最後活動 '+recFmt(m.lastDate)+' '+m.lastDir+' 晚於更新日 '+updatedRaw; }
-      else if(waiting && m.lastDir==='OUTBOUND' && !isDone){ conf='Pending Review'; field='Status'; proposed='建議追蹤(已寄出待回覆 '+m.waiting+' 天)';
-        ev='最後一次為你寄出,已等待 '+m.waiting+' 天未見回覆;可到「範本庫」建追蹤草稿'; }
+      else if(waiting && m.lastDir==='OUTBOUND' && !isDone){ var st=tStage(m.waiting);
+        conf='Pending Review'; field='Status'; proposed='建議追蹤('+st.label+' · 已寄出待回覆 '+m.waiting+' 天)';
+        ev='最後一次為你寄出,已等待 '+m.waiting+' 天未見回覆;'+st.hint+',建議範本 '+st.tpl; }
       else if(newer){ conf='Stale'; field='LastUpdated'; proposed=recFmt(m.lastDate);
         ev='郵件最後活動 '+recFmt(m.lastDate)+'('+m.lastDir+')晚於控管表更新日 '+updatedRaw+';建議更新最後更新日'; }
       else { conf='Verified'; ev='郵件佐證與控管表一致(最後活動 '+recFmt(m.lastDate)+')'; }
@@ -1043,6 +1044,12 @@
     }).sort(function(a,b){ return a.lightW-b.lightW || (a.daysLeft===null?999:a.daysLeft)-(b.daysLeft===null?999:b.daysLeft); });
   }
   var CARD_LIGHT={ red:{c:'#f87171',t:'需介入'}, yellow:{c:'#fbbf24',t:'注意'}, green:{c:'#34d399',t:'正常'}, done:{c:'#64748b',t:'已完成'} };
+  /* 三段追蹤分級:T1 一般追蹤(+3天) / T2 積極跟進(+5天) / T3 緊急升級(+7天,建議 CC 主管) */
+  function tStage(days){
+    if(days>=7) return {k:'T3',label:'T3 緊急升級',icon:'🔴',tpl:'followup_firm',c:'#f87171',bg:'rgba(248,113,113,.1)',bd:'rgba(248,113,113,.3)',hint:'建議 CC 主管'};
+    if(days>=5) return {k:'T2',label:'T2 積極跟進',icon:'🟠',tpl:'followup_firm',c:'#fb923c',bg:'rgba(251,146,60,.1)',bd:'rgba(251,146,60,.3)',hint:'要求明確答覆'};
+    return {k:'T1',label:'T1 一般追蹤',icon:'🟡',tpl:'followup',c:'#fbbf24',bg:'rgba(245,158,11,.08)',bd:'rgba(245,158,11,.25)',hint:'友善提醒'};
+  }
   function cardsView(){
     var cards=projCards();
     var counts={}; cards.forEach(function(c){ counts[c.light]=(counts[c.light]||0)+1; });
@@ -1065,7 +1072,11 @@
         '<span style="color:'+(c.daysLeft<=2?'#fbbf24':'#94a3b8')+'">剩 '+c.daysLeft+' 天</span>';
       var bar = c.progress===null?'' :
         '<div style="display:flex;align-items:center;gap:7px;min-width:90px"><div style="flex:1;height:5px;background:rgba(148,163,184,.15);border-radius:3px;overflow:hidden"><div style="width:'+Math.min(100,c.progress)+'%;height:100%;background:'+(c.light==='done'?'#64748b':'var(--em)')+'"></div></div><span class="mono" style="font-size:9.5px;color:var(--mut)">'+c.progress+'%</span></div>';
-      var warn = (c.waiting!==null&&c.waiting>=3&&c.light!=='done') ? '<div style="font-size:10.5px;color:#fbbf24;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:6px;padding:4px 9px;margin-top:8px">⚠ 已寄出待回覆 '+c.waiting+' 天</div>' : '';
+      var warn='';
+      if(c.waiting!==null&&c.waiting>=3&&c.light!=='done'){
+        var st=tStage(c.waiting);
+        warn='<div style="font-size:10.5px;color:'+st.c+';background:'+st.bg+';border:1px solid '+st.bd+';border-radius:6px;padding:4px 9px;margin-top:8px">'+st.icon+' <b>'+st.label+'</b> · 已寄出待回覆 '+c.waiting+' 天 · 建議範本 <span class="mono">'+st.tpl+'</span></div>';
+      }
       return '<div style="background:var(--panel2);border:1px solid var(--line);border-left:3px solid '+L.c+';border-radius:10px;padding:13px 15px;display:flex;flex-direction:column">'+
         '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'+
           '<span style="width:9px;height:9px;border-radius:50%;background:'+L.c+';flex:none;box-shadow:0 0 8px '+L.c+'55"></span>'+
@@ -1250,10 +1261,10 @@
   }
   function classify(name, sample){
     var n=(name||'').toLowerCase();
-    // ---- 控管表 governing control sheet (explicit) ----
-    if(/control_sheet|controlsheet|governance|控管表|治理表|專案控管|master_?tracker/.test(n)) return 'control';
-    if((sample.ProjectCode!==undefined||sample['專案代號']!==undefined||sample['案號']!==undefined) &&
-       (sample.Status!==undefined||sample['狀態']!==undefined||sample.Owner!==undefined||sample['負責人']!==undefined)) return 'control';
+    // ---- 控管表 governing control sheet (explicit; strict headers so mail exports are never stolen) ----
+    if(/control_sheet|controlsheet|governance|控管表|治理表|專案控管|master_?tracker|wop_followup/.test(n)) return 'control';
+    if((sample.ProjectCode!==undefined||sample.Trace_ID!==undefined||sample.WOP_ID!==undefined||sample['專案代號']!==undefined||sample['案號']!==undefined||sample['案件編號']!==undefined||sample['追蹤碼']!==undefined) &&
+       (sample.Status!==undefined||sample.Current_Stage!==undefined||sample['狀態']!==undefined||sample.Owner!==undefined||sample.Stakeholder!==undefined||sample['負責人']!==undefined||sample['承辦人']!==undefined)) return 'control';
     // ---- VIA WorkOps v004 CSV outputs ----
     if(/pending/.test(n) || (sample.PENDING_STATUS!==undefined && sample.CASE_ID!==undefined)) return 'pending';
     if(/quality_check|quality_matrix/.test(n) || (sample.CHECK!==undefined && sample.RESULT!==undefined)) return 'qc';
@@ -1292,18 +1303,42 @@
   function firstAddr(s){ if(!s) return ''; return (''+s).split(/[;,]/)[0].trim(); }
   function normMailV004(r){ return { MailID:r.MAIL_FINGERPRINT||r.CASE_ID||'', Subject:r.TITLE||r.NORMALIZED_TITLE||'', EventDate:r.TIME||'', Direction:r.DIRECTION||'', Unread:(r.READ_STATUS==='UNREAD'), ConversationID:r.CASE_ID||'', SuggestedCategory:r.PRIMARY_CATEGORY||'', ConfirmedCategory:r.PRIMARY_CATEGORY||'', WorkflowStatus:r.PROCESS_STATUS||'', SenderEmail:r.FROM_ADDRESS||r.FROM||'', AttachmentCount:0 }; }
   function normStakeV004(r){ var em=r.CONTACT||r.STAKEHOLDER||''; var inb=num(r.INBOUND_COUNT), out=num(r.OUTBOUND_OR_TO_COUNT), cc=num(r.CC_COUNT); return { Email:em, Domain:((em.split('@')[1])||''), FromCount:inb, ToOrCcCount:out+cc, TotalTouches:inb+out+cc, LastDate:r.LAST_INBOUND||r.LAST_OUTBOUND||'' }; }
+  /* universal header dictionary — exact-first, then fuzzy substring, so any industry's sheet maps */
+  var CTRL_DICT = {
+    Code:    ['ProjectCode','project_code','Trace_ID','TraceID','WOP_ID','WOP','專案代號','案號','案件編號','追蹤碼','代號','Code','ID'],
+    Name:    ['ProjectName','project_name','專案名稱','案名','項目名稱','主題','Subject','Name','Activity','Step_Name'],
+    Owner:   ['Owner','owner','負責人','承辦人','窗口','對口','PM','單位','Stakeholder','Owner_Domain','PIC'],
+    Status:  ['Status','status','狀態','進度狀態','Current_Stage','Stage'],
+    Progress:['Progress','progress','進度','完成','完成百分比','完成率'],
+    Due:     ['DueDate','due','Deadline','ETA','交期','截止','預計完成','預計完成日','Target_Date','T3_Urgent_Date'],
+    Updated: ['LastUpdated','last_updated','UpdatedAt','最後更新','更新日','更新日期','Last_Comm_Date','最後通訊','Timestamp'],
+    Next:    ['NextStep','next','下一步','下一步行動','Next_Steps'],
+    Ball:    ['Ball','ball','球在誰','待誰行動']
+  };
+  function ctrlPick(r, field){
+    var keys=CTRL_DICT[field], rk=Object.keys(r);
+    for(var i=0;i<keys.length;i++){ var k=keys[i]; if(r[k]!==undefined && (''+r[k]).trim()!=='') return (''+r[k]).trim(); }
+    // fuzzy pass: header contains a dictionary word (case-insensitive), e.g. "專案代號(必填)" or "Owner Name"
+    for(var i=0;i<keys.length;i++){
+      var kw=keys[i].toLowerCase();
+      if(kw.length<2) continue;
+      for(var j=0;j<rk.length;j++){
+        if(rk[j].toLowerCase().indexOf(kw)>=0 && r[rk[j]]!==undefined && (''+r[rk[j]]).trim()!=='') return (''+r[rk[j]]).trim();
+      }
+    }
+    return '';
+  }
   function normControl(r){
-    var g=function(keys){ for(var i=0;i<keys.length;i++){ var k=keys[i]; if(r[k]!==undefined && (''+r[k]).trim()!=='') return (''+r[k]).trim(); } return ''; };
     return {
-      Code:    g(['ProjectCode','project_code','專案代號','案號','代號','Code']),
-      Name:    g(['ProjectName','project_name','專案名稱','案名','Name']),
-      Owner:   g(['Owner','owner','負責人','窗口','PIC']),
-      Status:  g(['Status','status','狀態','進度狀態']),
-      Progress:g(['Progress','progress','進度','完成','完成百分比']),
-      Due:     g(['DueDate','due','ETA','交期','截止','預計完成']),
-      Updated: g(['LastUpdated','last_updated','UpdatedAt','最後更新','更新日','更新日期']),
-      Next:    g(['NextStep','next','下一步','下一步行動']),
-      Ball:    g(['Ball','ball','球在誰','待誰行動']),
+      Code:    ctrlPick(r,'Code'),
+      Name:    ctrlPick(r,'Name'),
+      Owner:   ctrlPick(r,'Owner'),
+      Status:  ctrlPick(r,'Status'),
+      Progress:ctrlPick(r,'Progress'),
+      Due:     ctrlPick(r,'Due'),
+      Updated: ctrlPick(r,'Updated'),
+      Next:    ctrlPick(r,'Next'),
+      Ball:    ctrlPick(r,'Ball'),
       _raw:r
     };
   }
