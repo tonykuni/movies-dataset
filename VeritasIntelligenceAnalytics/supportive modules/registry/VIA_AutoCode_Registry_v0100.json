@@ -211,7 +211,16 @@
   "引擎|workops_consistency_guard_v0100": "ENG-052",
   "引擎|workops_project_health_v0100": "ENG-053",
   "引擎|workops_unified_work_register_v0100": "ENG-054",
-  "引擎|workops_ml_lab_v0100": "ENG-055"
+  "引擎|workops_ml_lab_v0100": "ENG-055",
+  "引擎|via_workflow_engine_v1": "ENG-056",
+  "引擎|vap_seaborn_plotly_v0100": "ENG-057",
+  "引擎|talib_engine_v0100": "ENG-058",
+  "引擎|multifactor_test_validate_sim_v0100": "ENG-059",
+  "引擎|chipwar_engine_family_v0100": "ENG-060",
+  "工具|flowsystem_v2_launcher": "TOOL-FLOW2",
+  "工具|registry_aio_v0105": "TOOL-REGAIO",
+  "工具|theory_audit_v0100": "TOOL-THEORY",
+  "工具|via_wf_cmd": "TOOL-WF"
  },
  "ledger": [
   {
@@ -1371,6 +1380,22 @@
    "component": "指揮板 v0131:全域搜尋上板(ENG-039 能力線)",
    "code": "ENG-025/ENG-039",
    "note": "授權補強 R3(標準授權令仍有效)。版前 v0130→v0131(ALL 動態解析自動吃新版)。頂列搜尋框一框搜遍已嵌資料:CASE(代號/名/負責人)/THR(主旨/對象)/MAIL/WOP 歸戶/DEC/MLS/CMT/關係人/草稿佇列 — 資料即索引零索引檔,全本地。互動:輸入即搜前 40 筆+型別 chip;點命中跳對應分頁,CASE 直開詳情窗;Enter 跳第一筆、Esc 關閉、/ 聚焦(輸入框內不劫持);點外自動收合。i18n zh/cn/en 四鍵只增不減(gsPh/gsN/gsNone/gsHint);無命中誠實顯示。誠實註記:此為 ENG-039 統一搜尋之能力線上板(板內 JS 對已嵌資料),CLI 深搜(全文/歷史)仍走 via-workops search。QA:pwsh AST 0 錯(修正前次 [ref] 未宣告之假綠檢法);node --check 綠;shim131 15/15(含 v0130 M7 迴歸);Playwright 實測:輸入「艾克米」2 命中(CASE+WOP)、Enter 開詳情窗、/ 聚焦、零 pageerror;截圖目檢通過。視覺鎖不破(搜尋框插 mast 既有 flex,佈局零改動)。"
+  },
+  {
+   "ts": "2026-08-12T02:30:00",
+   "op": "INTEGRATE",
+   "category": "整併",
+   "component": "session pxsyv3 分支整併(工作流引擎家族 46 檔)+ 全清冊實測",
+   "code": "ENG-056..060/TOOL-*",
+   "note": "操作員令:將 session_01MAPmvpmGxZRZYJw968GjeM(claude/workflow-engine-libs-integration-pxsyv3)整合進來。該分支已 rebase 至最新 main(基點 e808d02)→ 快轉合併零衝突、歷史零損;46 新檔+1 gitignore,與正本零路徑碰撞。紅線掃描:plotly 佈署預設 inline 零 CDN(cdn 僅顯式選項不預設)、TALib/ChipWar 零網路呼叫、無 .Send()/爬站 — 合規。新籍:ENG-056 VIA_WorkflowEngine v1.1.0(十庫典範,py+ps1 統一啟動器)、ENG-057 vap_seaborn_plotly(28 圖型雙後端)、ENG-058 TALib 64 指標(adj 鐵律)、ENG-059 MultiFactor 共振引擎、ENG-060 ChipWar 引擎家族(12 引擎+SSOT 三件)、TOOL-FLOW2/REGAIO/THEORY;新 bin 動詞 via-wf。容器實測全清冊:ChipWar harness L1 6/6+L2 8/8;TALib selftest 10P/1SKIP(talib 未裝誠實 SKIP);WorkflowEngine selftest 11P;seaborn/plotly selftest 65P/1SKIP;PS1 五件 AST 0 錯。缺陷發現並修復:MultiFactor 測試檔 v0100 寫死上傳期路徑 /mnt/data(任何機器不可跑)→ 版前 test v0101 動態解析同目錄 → ALL_TESTS_PASS;v0100 原檔不動。"
+  },
+  {
+   "ts": "2026-08-12T03:30:00",
+   "op": "UPGRADE",
+   "category": "整併",
+   "component": "重新整合輪:ALL v0110 + 板 v0132 流程帶 + UserTest v0100 + via-wf/清冊",
+   "code": "ENG-025/ENG-033/TOOL-UT",
+   "note": "操作員令四段全落地。①ALL v0110:新增 [2e5] 擴充模組健檢(七模組在位+八 Python 庫 importability→out\\module_probe.json,秒級)與 [2h] VAP 自動出圖(VDF db 有料即 --auto 前 6 張;無料誠實 SKIP)— 非必要案件全自動、WARN-continue 起始跑到底;修 0e 標籤沙箱六段→八段、run summary 版字 v0107→v0110。②板 v0132:十一頁全配「本頁流程」帶 — 步驟 chip+箭頭迷你流程圖,說明資料從哪來/你做什麼/產出去哪;i18n 三語 PF 結構;render() 末端單一掛點注入,十一個 rP* 零觸碰。③UserTest v0100(bin: via-usertest):依操作員實際步驟 U01-U12 逐段實測(git 同步/板產物/核心產物/口徑版本/VAP 發現+配對+面板實渲染/WF/TALib/ChipWar/MF 自測/模組側車),唯讀+沙箱、缺件誠實 SKIP,報告落 out\\usertest_report.json;容器實跑:OK 8 · SKIP 3(板/ALL 產物僅操作員機)· FAIL 0(U03 判定錨修正後)。④via-wf.cmd 動詞(WorkflowEngine 家族一鍵)+ 工具引擎清冊 VIA_Tool_Engine_Inventory_v0100.json(39 動詞×59 引擎×實測狀態)。QA:ALL/板/UserTest 三 PS1 AST 0 錯;板 shim132 16/16(含 v0131 全迴歸);Playwright 11 頁流程帶+EN 切換零 pageerror。"
   }
  ]
 }

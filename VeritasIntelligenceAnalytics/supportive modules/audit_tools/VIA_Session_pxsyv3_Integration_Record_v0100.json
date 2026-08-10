@@ -1,0 +1,30 @@
+{
+ "record_id": "VIA_Session_pxsyv3_Integration_Record_v0100",
+ "ts": "2026-08-12T03:30:00",
+ "authority": "操作員令 2026-08-12:「將 session_01MAPmvpmGxZRZYJw968GjeM 整合進來 將所有工具引擎註冊列清單測試檢視 重新將 vap/veritas workops 重新整合 所有非必要案件全部自動化 起始時間跑到底 依照使用者的使用步驟進行 user-test 每頁流程說明清楚流程圖等說明方法」",
+ "phase1_merge": {
+  "branch": "claude/workflow-engine-libs-integration-pxsyv3(該 session 已 rebase 至最新 main e808d02)",
+  "method": "git merge --ff-only — 快轉合併,15 commits 歷史零損,46 新檔+1 .gitignore,零路徑碰撞",
+  "redline_scan": "plotly 佈署預設 inline 零 CDN(cdn 僅顯式選項);TALib/ChipWar/WorkflowEngine 零網路呼叫;無 .Send()/爬站/自動改基底 — 合規",
+  "new_modules": ["ChipWar(12 引擎+SSOT 三件)", "MultiFactor(共振引擎+manifest)", "TALib(64 指標,adj 鐵律)", "VAP seaborn+plotly 28 圖型雙後端", "VIA_WorkflowEngine v1.1.0(py+ps1)", "FlowSystem v2", "Registry AIO v0105", "TheoryAudit"]
+ },
+ "phase2_registry_inventory_tests": {
+  "codes": "ENG-056 WorkflowEngine · ENG-057 vap_seaborn_plotly · ENG-058 TALib · ENG-059 MultiFactor · ENG-060 ChipWar family · TOOL-FLOW2/REGAIO/THEORY/WF/UT",
+  "inventory": "supportive modules/registry/VIA_Tool_Engine_Inventory_v0100.json — 39 bin 動詞 × 59 引擎(六群)× 本輪實測狀態",
+  "container_tests": "ChipWar L1 6/6+L2 8/8 · TALib 10P/1SKIP · WorkflowEngine 11P · seaborn/plotly 65P/1SKIP · PS1 五件 AST 0 錯",
+  "defect_fixed": "MultiFactor test v0100 寫死 /mnt/data 上傳期路徑(任何機器不可跑)→ 版前 test v0101 動態解析同目錄 → ALL_TESTS_PASS(v0100 原檔不動)"
+ },
+ "phase3_all_v0110": "非必要全自動+起始跑到底:[2e5] 模組健檢側車 module_probe.json(七模組+八庫,秒級) · [2h] VAP 自動出圖(有料 --auto 前 6 張/無料誠實 SKIP) · 0e 標籤八段修正 · run summary 版字 v0110 · 全段 WARN-continue 絕不卡斷",
+ "phase4_board_v0132": "每頁流程說明:十一頁「本頁流程」帶(步驟 chip+箭頭=迷你流程圖;資料從哪來→你做什麼→產出去哪);i18n zh/cn/en PF 結構;render() 單一掛點 afterbegin 注入,rP* 十一函數零觸碰;QA shim132 16/16+Playwright 11 帶+EN 切換零錯",
+ "phase5_usertest": {
+  "engine": "Invoke-VIA-UserTest-v0100.ps1 + bin/via-usertest.cmd(動態解析)",
+  "steps": "U01 git 同步 · U02 板產物 · U03 核心產物 · U04 口徑版本 · U05-07 VAP 發現/配對/面板實渲染 · U08-11 WF/TALib/ChipWar/MF 自測 · U12 模組側車",
+  "container_run": "OK 8 · SKIP 3(板/ALL 產物僅操作員機有;誠實列缺)· FAIL 0;報告 out/usertest_report.json;直譯器 py→python3 動態解析,容器/CI 亦可跑",
+  "governance": "全唯讀+沙箱輸出;缺件=SKIP 不冒充;-SkipHeavy 可略重型自測"
+ },
+ "honest_notes": [
+  "板 p6 系統矩陣尚未吸收 module_probe.json 為列(資料側車已就緒,板吸收=下輪)",
+  "seaborn/plotly 引擎與 chartlib 引擎並存:chartlib=零依賴 SVG 正線;seaborn/plotly=有庫時的 28 圖型全譜線 — 兩線各有定位,SSOT 同源,未合併是設計非遺漏",
+  "FlowSystem v2 之 17 檔引擎樹該 session 記錄為候上傳 — 到件依其 README 歸戶"
+ ]
+}
