@@ -298,3 +298,23 @@ UI 新增硬化條與 `tHAC`/`lead` 指標;`harden` 命令現跑 19 測試。
   ⚠️背離慎追/🌱轉折關注/🍂順風流出)③三層 SOLID AND 關係圖 ④引擎五層關聯圖
   (資料→核心→驗證→呈現→編排;18 支誰餵誰誰把關誰)+ 核心公式四條(FIS/GRAM/宏觀分/評價 V)。
 - manager 新 `hub` 命令,all/live 鏈尾自動重生;autotest 17/17(+hub_one_window)。
+
+---
+
+## v0123R — 宏觀對照 v2:14 因子全譜 + 自適應權重鐵律(2026-08-12 操作員令)
+
+「新台幣/日圓/英鎊/歐元/人民幣匯率 · 各區利率 · 長中短期公債殖利率 · 黃金現貨期貨 ·
+總經/貿易/財政/通膨 · 加密貨幣 — 重因素全部考量;任何參數權重全都是算出來的變動的不可固定」:
+
+- **14 因子/區**:五幣匯率動能 · 政策利差 · 2y/10y/30y 殖利差 + 期限斜率 · 黃金現貨動能
+  + 期現基差 · 總經 · 貿易收支 · 財政收支 · 通膨 · DXY · BTC(UK 區新增,13 區)。
+- **權重鐵律(核心)**:config 不再含任何因子權重(autotest 硬鎖)。
+  `weight_i(t) = 滾動 rank-IC(因子_i, 次期區域 FIS) / Σ|IC|`(帶號正規化,Σ|w|=1)
+  — **連因子方向都由 IC 符號決定,引擎零手寫符號**;視窗 {20,40,60} 逐區掃選(自適應);
+  樣本 < min_obs 之因子誠實閒置;全閒置=判讀留白「樣本不足」;每輪重算 — 權重是輸出不是設定。
+- **可稽**:macro_overlay.json 含 weights_table(逐區 window/weights/ICs)+ weights_derivation;
+  UI 卡逐區列主導因子 chips(權重×當前 z)。
+- **資料 schema v2**:長表 {date,series,value};series = FX_<區>/RATE_<區>/Y2/Y10/Y30/ECON/
+  TRADE/FISCAL/CPI_<區> + DXY/GOLD_SPOT/GOLD_FUT/BTC(側車零爬站;synth demo 注入相關結構
+  供權重推導示範,明標)。
+- autotest 20/20(+macro_no_fixed_weights/macro_weights_computed/macro_small_sample_honest)。

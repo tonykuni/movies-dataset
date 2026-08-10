@@ -1,19 +1,27 @@
 # -*- coding: utf-8 -*-
-"""VDF-FLOW-MACRO flow_macro.py — 宏觀對照層(v0100R;操作員 2026/08/12 令)。
+"""VDF-FLOW-MACRO flow_macro.py — 宏觀對照層 v2(自適應權重;操作員 2026/08/12 令)。
 
-全球各類各區 ETF 現金流 × 各地匯率/利率/美元指數/經濟強弱 → 資金流動強弱及方向判讀:
-  每區宏觀分 = w1·本幣動能 + w2·利差(區−美) + w3·經濟強度(PMI−50) − w4·美元逆風(DXY 走強×敏感區)
-  判讀:FIS 與宏觀分同號=順風(流入獲支撐/流出有理由);異號=背離(流入無宏觀支撐=慎追;
-       流出但宏觀轉佳=潛在轉折關注)。
-資料:data/input/macro_data.json 側車(bridge;零爬站);缺=合成 demo 明標 source=synthetic。
-產物:data/output/macro_overlay.json — flow_ui 吸收成「宏觀對照」卡。
+v2(重因素全考量 · 權重鐵律):
+  因子全譜:五幣匯率(TWD/JPY/GBP/EUR/CNH)· 各區政策利率 · 長中短期公債殖利率
+  (2y/10y/30y + 期限斜率)· 黃金現貨+期貨(動能+基差)· 總體經濟 · 貿易收支 ·
+  財政收支 · 通膨 · 美元指數 · 加密貨幣(BTC 風險胃納)— 13 因子/區。
+  **權重鐵律:任何參數權重全都是算出來的、變動的、不可固定** —
+    weight_i(t) = 滾動 rank-IC(因子_i, 次期區域 FIS) / Σ|IC|(帶號正規化)
+    · 連「方向」都由 IC 符號決定 — 引擎零手寫因子符號、零固定權重
+    · 視窗自適應:掃 {20,40,60} 取 |平均IC| 最高者(逐區各自選)
+    · 樣本 < min_obs 之因子誠實閒置(不進權重);全閒置=判讀留白「樣本不足」
+    · 每輪重算 → 權重是輸出不是設定;weights_derivation 全程可稽
+v1(2026/08/12):固定權重四因子 — 已依鐵律廢除,config 不再有 weights 鍵。
+資料:data/input/macro_data.json 側車 v2(records 長表 {date,series,value};零爬站);
+缺=合成 demo(注入與 FIS 相關結構供權重推導示範,明標 synthetic)。
+產物:data/output/macro_overlay.json — rows[].weights(前 N 主導因子)+ 全權重表。
 """
 import json
 import math
 import random
 from pathlib import Path
 
-from flow_core import bucket_fis, load_json, load_universe
+from flow_core import bucket_fis, load_json, load_universe, _mean, _std
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
@@ -21,103 +29,243 @@ CFG = ROOT / "config" / "macro.json"
 INP = ROOT / "data" / "input" / "macro_data.json"
 OUTP = ROOT / "data" / "output" / "macro_overlay.json"
 
+# 因子目錄:id → (中文名, 取值函數鍵);值一律轉動能/差分/z — 符號交給 IC,不手寫
+FACTORS = [
+    ("fx_mom", "本幣匯率動能"), ("rate_diff", "政策利差(區−美)"),
+    ("y2_diff", "短債殖利差 2y"), ("y10_diff", "長債殖利差 10y"),
+    ("y30_diff", "超長債殖利差 30y"), ("curve_slope", "期限斜率(10y−2y)"),
+    ("econ", "總體經濟強弱"), ("trade", "貿易收支"), ("fiscal", "財政收支"),
+    ("infl", "通膨"), ("dxy_mom", "美元指數動能"),
+    ("gold_mom", "黃金現貨動能"), ("gold_basis", "黃金期現基差"),
+    ("btc_mom", "加密貨幣動能"),
+]
+FX_NAME = {"Taiwan": "USDTWD", "Japan": "USDJPY", "Europe": "EURUSD", "UK": "GBPUSD",
+           "China": "USDCNH", "US": "DXY", "Korea": "USDKRW", "India": "USDINR",
+           "EM": "EEM_FX", "LatAm": "USDBRL", "AsiaExJP": "ADXY", "DM": "DXY",
+           "Global": "DXY"}
+
 
 def load_macro_cfg():
     return load_json(CFG, {}) or {}
 
 
-def _synth_macro(cfg, n=60, seed=17):
-    """合成 demo(明標):各區 fx/econ 隨機漫步 + DXY;真實側車到位即棄用。"""
+def _rank(xs):
+    order = sorted(range(len(xs)), key=lambda i: xs[i])
+    rk = [0.0] * len(xs)
+    for pos, i in enumerate(order):
+        rk[i] = pos
+    return rk
+
+
+def _rank_ic(a, b):
+    pairs = [(x, y) for x, y in zip(a, b)
+             if x is not None and y is not None and math.isfinite(x) and math.isfinite(y)]
+    if len(pairs) < 3:
+        return None, 0
+    ra, rb = _rank([p[0] for p in pairs]), _rank([p[1] for p in pairs])
+    ma, mb = _mean(ra), _mean(rb)
+    num = sum((x - ma) * (y - mb) for x, y in zip(ra, rb))
+    den = math.sqrt(sum((x - ma) ** 2 for x in ra) * sum((y - mb) ** 2 for y in rb))
+    return (num / den if den > 1e-12 else 0.0), len(pairs)
+
+
+def _mom(series, k=10):
+    out = [None] * len(series)
+    for i in range(k, len(series)):
+        a, b = series[i], series[i - k]
+        if a is not None and b not in (None, 0):
+            out[i] = (a / b - 1.0) * 100.0
+    return out
+
+
+def _z_last(vals, w=40):
+    v = [x for x in vals if x is not None][-w:]
+    if len(v) < 3:
+        return None
+    sd = _std(v)
+    return (v[-1] - _mean(v)) / sd if sd > 1e-9 else 0.0
+
+
+def _synth_macro(cfg, region_fis, seed=23):
+    """合成 demo(明標):所有 series 注入部分 FIS 相關結構 — 供自適應權重推導示範;
+    真實側車到位即棄用。長表 {date, series, value}。"""
     rng = random.Random(seed)
-    recs, dxy = [], []
-    v_dxy = 103.0
-    fxv = {r: 100.0 for r in cfg.get("regions", {})}
-    econ = {r: 50.0 + rng.uniform(-4, 4) for r in cfg.get("regions", {})}
-    for i in range(n):
-        d = "2026-%02d-%02d" % (5 + i // 28, 1 + i % 28)
-        v_dxy *= 1 + rng.gauss(0, 0.003)
-        dxy.append({"date": d, "value": round(v_dxy, 2)})
-        for r, rc in cfg.get("regions", {}).items():
-            fxv[r] *= 1 + rng.gauss(0, 0.004)
-            econ[r] = max(38.0, min(62.0, econ[r] + rng.gauss(0, 0.35)))
-            recs.append({"date": d, "region": r, "fx_rate": round(fxv[r], 3),
-                         "policy_rate": rc.get("policy_rate", 3.0),
-                         "econ_pmi": round(econ[r], 1)})
-    return {"source": "synthetic demo(真實側車 macro_data.json 到位即自動切換)",
-            "records": recs, "dxy": dxy}
+    regions = list(cfg.get("regions", {}).keys())
+    dates = sorted({d for rs in region_fis.values() for d in rs})
+    if not dates:
+        return {"source": "synthetic demo", "records": []}
+    recs = []
+    glob = {"DXY": 103.0, "GOLD_SPOT": 2400.0, "GOLD_FUT": 2415.0, "BTC": 62000.0}
+    state = {}
+    for r in regions:
+        state[r] = {"FX": 100.0, "RATE": rng.uniform(0.5, 6.0), "Y2": rng.uniform(1, 5),
+                    "Y10": rng.uniform(2, 6), "Y30": rng.uniform(2.5, 6.5),
+                    "ECON": 50.0, "TRADE": 0.0, "FISCAL": -2.0, "CPI": 2.5}
+    for i, d in enumerate(dates):
+        risk = _mean([list(region_fis.get(r, {}).values())[min(i, len(region_fis.get(r, {})) - 1)]
+                      if region_fis.get(r) else 0.0 for r in regions[:4]]) / 100.0
+        glob["DXY"] *= 1 + rng.gauss(-0.002 * risk, 0.003)
+        glob["GOLD_SPOT"] *= 1 + rng.gauss(-0.001 * risk, 0.004)
+        glob["GOLD_FUT"] = glob["GOLD_SPOT"] * (1 + rng.gauss(0.004, 0.002))
+        glob["BTC"] *= 1 + rng.gauss(0.004 * risk, 0.012)
+        for k, v in glob.items():
+            recs.append({"date": d, "series": k, "value": round(v, 3)})
+        for r in regions:
+            st = state[r]
+            f = region_fis.get(r, {})
+            fis_d = list(f.values())[min(i, len(f) - 1)] / 100.0 if f else 0.0
+            st["FX"] *= 1 + rng.gauss(0.001 * fis_d, 0.004)
+            st["ECON"] = max(38, min(62, st["ECON"] + rng.gauss(0.25 * fis_d, 0.3)))
+            st["TRADE"] += rng.gauss(0.1 * fis_d, 0.25)
+            st["FISCAL"] += rng.gauss(0.02 * fis_d, 0.08)
+            st["CPI"] = max(-1, min(9, st["CPI"] + rng.gauss(0, 0.05)))
+            st["Y2"] = max(0, st["Y2"] + rng.gauss(0, 0.02))
+            st["Y10"] = max(0, st["Y10"] + rng.gauss(0, 0.02))
+            st["Y30"] = max(0, st["Y30"] + rng.gauss(0, 0.015))
+            for k in ("FX", "RATE", "Y2", "Y10", "Y30", "ECON", "TRADE", "FISCAL", "CPI"):
+                recs.append({"date": d, "series": "%s_%s" % (k, r), "value": round(st[k], 4)})
+    return {"source": "synthetic demo(注入 FIS 相關結構供權重推導示範;接 macro_data.json 即真)",
+            "records": recs}
 
 
-def load_macro_data(cfg):
-    d = load_json(INP, None)
-    if d and d.get("records"):
-        return d, True
-    return _synth_macro(cfg), False
+def _series_map(data):
+    m = {}
+    for rec in data.get("records", []):
+        m.setdefault(str(rec["series"]), {})[str(rec["date"])] = rec["value"]
+    return m
 
 
-def _mom(vals, k=20):
-    """近 k 期動能 %。"""
-    v = [x for x in vals if x is not None]
-    if len(v) < 2:
-        return 0.0
-    tail = v[-min(k, len(v)):]
-    return (tail[-1] / tail[0] - 1.0) * 100.0 if tail[0] else 0.0
+def _aligned(smap, name, dates):
+    s = smap.get(name, {})
+    return [s.get(d) for d in dates]
+
+
+def _factor_series(smap, region, dates, us="US"):
+    """13+1 因子逐日序列(值層;符號交給 IC)。"""
+    fx = _aligned(smap, "FX_%s" % region, dates)
+    out = {"fx_mom": _mom(fx)}
+    for fid, key in (("rate_diff", "RATE"), ("y2_diff", "Y2"),
+                     ("y10_diff", "Y10"), ("y30_diff", "Y30")):
+        a = _aligned(smap, "%s_%s" % (key, region), dates)
+        b = _aligned(smap, "%s_%s" % (key, us), dates)
+        out[fid] = [None if (x is None or y is None) else x - y for x, y in zip(a, b)]
+    y2 = _aligned(smap, "Y2_%s" % region, dates)
+    y10 = _aligned(smap, "Y10_%s" % region, dates)
+    out["curve_slope"] = [None if (a is None or b is None) else b - a for a, b in zip(y2, y10)]
+    out["econ"] = _aligned(smap, "ECON_%s" % region, dates)
+    out["trade"] = _aligned(smap, "TRADE_%s" % region, dates)
+    out["fiscal"] = _aligned(smap, "FISCAL_%s" % region, dates)
+    out["infl"] = _aligned(smap, "CPI_%s" % region, dates)
+    out["dxy_mom"] = _mom(_aligned(smap, "DXY", dates))
+    gs = _aligned(smap, "GOLD_SPOT", dates)
+    gf = _aligned(smap, "GOLD_FUT", dates)
+    out["gold_mom"] = _mom(gs)
+    out["gold_basis"] = [None if (a in (None, 0) or b is None) else (b - a) / a * 100.0
+                         for a, b in zip(gs, gf)]
+    out["btc_mom"] = _mom(_aligned(smap, "BTC", dates))
+    return out
+
+
+def _adaptive_weights(fmat, fis_series, dates, windows, min_obs):
+    """權重鐵律核心:對每因子算滾動 rank-IC(因子_t vs FIS_{t+1});
+    視窗掃選(|平均加權IC| 最高);weight = IC/Σ|IC|(帶號)。全輸出可稽。"""
+    y_next = [fis_series.get(dates[i + 1]) if i + 1 < len(dates) else None
+              for i in range(len(dates))]
+    best = {"window": None, "score": -1, "ics": {}}
+    for w in windows:
+        ics = {}
+        for fid, _zh in FACTORS:
+            xs = fmat[fid][-w - 1:-1] if len(fmat[fid]) > w else fmat[fid][:-1]
+            ys = y_next[-w - 1:-1] if len(y_next) > w else y_next[:-1]
+            ic, n = _rank_ic(xs, ys)
+            if ic is not None and n >= min_obs:
+                ics[fid] = {"ic": round(ic, 4), "n": n}
+        score = _mean([abs(v["ic"]) for v in ics.values()]) if ics else -1
+        if score > best["score"]:
+            best = {"window": w, "score": score, "ics": ics}
+    tot = sum(abs(v["ic"]) for v in best["ics"].values())
+    weights = {}
+    if tot > 1e-9:
+        for fid, v in best["ics"].items():
+            weights[fid] = round(v["ic"] / tot, 4)
+    return weights, best
 
 
 def build_overlay(rows, write=True):
-    """rows = FIS panel rows;合成/真實宏觀 → 每區判讀矩陣。"""
     cfg = load_macro_cfg()
-    data, real = load_macro_data(cfg)
+    ad = cfg.get("adaptive", {})
+    windows = [int(x) for x in ad.get("windows", [20, 40, 60])]
+    min_obs = int(ad.get("min_obs", 20))
+    top_show = int(ad.get("top_show", 3))
     uni = load_universe()
-    w = cfg.get("weights", {})
-    us_rate = float(cfg.get("us_policy_rate", 4.25))
-    region_fis = bucket_fis(rows or [], lambda r, u: u.get("region", "US"), universe=uni)
-    by_r = {}
-    for rec in data.get("records", []):
-        by_r.setdefault(str(rec["region"]), []).append(rec)
-    dxy_vals = [x["value"] for x in data.get("dxy", [])]
-    dxy_mom = _mom(dxy_vals)
-    dxy_regime = "美元走強" if dxy_mom > 0.5 else ("美元走弱" if dxy_mom < -0.5 else "美元持平")
-    out_rows = []
-    for region, rc in cfg.get("regions", {}).items():
-        recs = sorted(by_r.get(region, []), key=lambda x: str(x["date"]))
-        if not recs:
+    zh_map = dict(FACTORS)
+    # 每區逐日 FIS 序列
+    by_d = {}
+    for r in rows or []:
+        by_d.setdefault(str(r["date"]), []).append(r)
+    dates = sorted(by_d)
+    region_fis = {}
+    for d in dates:
+        agg = bucket_fis(by_d[d], lambda r, u: u.get("region", "US"), universe=uni)
+        for reg, v in agg.items():
+            region_fis.setdefault(reg, {})[d] = v
+    data = load_json(INP, None)
+    real = bool(data and data.get("records") and
+                not str(data.get("source", "")).startswith("synthetic"))
+    if not (data and data.get("records")):
+        data = _synth_macro(cfg, region_fis)
+    smap = _series_map(data)
+    dxy_last = _mom(_aligned(smap, "DXY", dates))
+    dxy_m = next((v for v in reversed(dxy_last) if v is not None), 0.0)
+    dxy_regime = "美元走強" if dxy_m > 0.5 else ("美元走弱" if dxy_m < -0.5 else "美元持平")
+    out_rows, weights_table = [], {}
+    for region in cfg.get("regions", {}):
+        fis_s = region_fis.get(region, {})
+        fis = fis_s.get(dates[-1]) if dates else None
+        fmat = _factor_series(smap, region, dates)
+        weights, deriv = _adaptive_weights(fmat, fis_s, dates, windows, min_obs)
+        if not weights:
+            out_rows.append({"region": region, "fis": fis, "macro_score": None,
+                             "weights": [], "verdict": "樣本不足 — 權重未定,判讀留白(誠實)",
+                             "vk": "na", "window": None})
             continue
-        fx_m = _mom([r["fx_rate"] for r in recs])
-        if rc.get("fx_invert"):
-            fx_m = -fx_m  # USDxxx 上升=本幣貶 → 反號成「本幣動能」
-        rate_diff = float(recs[-1].get("policy_rate", 3.0)) - us_rate
-        econ_z = (float(recs[-1].get("econ_pmi", 50.0)) - 50.0)
-        headwind = max(0.0, dxy_mom) if rc.get("dxy_sensitive") else 0.0
-        score = (float(w.get("fx_momentum", .3)) * max(-3, min(3, fx_m)) / 3.0
-                 + float(w.get("rate_diff", .25)) * max(-4, min(4, rate_diff)) / 4.0
-                 + float(w.get("econ", .3)) * max(-8, min(8, econ_z)) / 8.0
-                 - float(w.get("dxy_headwind", .15)) * min(3, headwind) / 3.0) * 100.0
-        fis = region_fis.get(region)
+        w = deriv["window"]
+        score = 0.0
+        contrib = []
+        for fid, wt in weights.items():
+            z = _z_last(fmat[fid], w)
+            if z is None:
+                continue
+            score += wt * max(-3.0, min(3.0, z))
+            contrib.append({"f": fid, "zh": zh_map[fid], "w": wt,
+                            "z": round(z, 2), "c": round(wt * max(-3, min(3, z)), 3)})
+        score = round(100.0 * math.tanh(score), 1)
+        contrib.sort(key=lambda c: -abs(c["c"]))
+        weights_table[region] = {"window": w, "weights": weights,
+                                 "ics": deriv["ics"]}
         if fis is None:
             verdict, vk = "無流量樣本", "na"
         elif fis >= 0 and score >= 0:
             verdict, vk = "順風流入(宏觀支撐)", "ok"
         elif fis < 0 and score < 0:
             verdict, vk = "順風流出(宏觀同向)", "ok"
-        elif fis >= 0 and score < 0:
+        elif fis >= 0:
             verdict, vk = "背離:流入無宏觀支撐 — 慎追", "warn"
         else:
             verdict, vk = "背離:流出但宏觀轉佳 — 關注轉折", "turn"
-        out_rows.append({"region": region, "fis": fis,
-                         "fx_label": rc.get("fx", ""), "fx_momentum": round(fx_m, 2),
-                         "rate_diff": round(rate_diff, 2),
-                         "econ_label": rc.get("econ_label", ""), "econ": round(econ_z, 1),
-                         "macro_score": round(score, 1),
-                         "verdict": verdict, "vk": vk})
-    out_rows.sort(key=lambda r: -(abs(r["fis"]) if r["fis"] is not None else 0))
-    strength = sum(abs(r["fis"]) for r in out_rows if r["fis"] is not None) / (len([r for r in out_rows if r["fis"] is not None]) or 1)
-    result = {"version": "v0100R", "real_data": real,
-              "source": data.get("source", ""),
-              "dxy": {"momentum": round(dxy_mom, 2), "regime": dxy_regime},
-              "overall_strength": round(strength, 1),
-              "rows": out_rows,
-              "honest_note": "宏觀分=規則組合非預測;判讀口徑見 config/macro.json;"
-                             + ("真實側車資料" if real else "合成 demo — 接 macro_data.json 即真")}
+        out_rows.append({"region": region, "fis": fis, "macro_score": score,
+                         "weights": contrib[:top_show], "window": w,
+                         "n_factors": len(weights), "verdict": verdict, "vk": vk})
+    out_rows.sort(key=lambda r: -(abs(r["fis"]) if r["fis"] is not None else -1))
+    valid = [r for r in out_rows if r["fis"] is not None]
+    result = {"version": "v2", "real_data": real, "source": data.get("source", ""),
+              "dxy": {"momentum": round(dxy_m, 2), "regime": dxy_regime},
+              "overall_strength": round(_mean([abs(r["fis"]) for r in valid]) if valid else 0.0, 1),
+              "factor_catalog": [{"id": f, "zh": z} for f, z in FACTORS],
+              "rows": out_rows, "weights_table": weights_table,
+              "weights_derivation": "權重鐵律:weight_i = 滾動 rank-IC(因子_i, 次期區域 FIS)/Σ|IC|(帶號);"
+                                    "視窗自適應掃 %s;樣本<%d 之因子閒置;每輪重算 — 權重是輸出不是設定,連方向都由 IC 決定" % (windows, min_obs),
+              "honest_note": "宏觀分=自適應規則組合非預測;" + ("真實側車資料" if real else "合成 demo(注入相關結構供權重推導示範)— 接 macro_data.json 即真")}
     if write:
         OUTP.parent.mkdir(parents=True, exist_ok=True)
         OUTP.write_text(json.dumps(result, ensure_ascii=False, indent=1), encoding="utf-8")

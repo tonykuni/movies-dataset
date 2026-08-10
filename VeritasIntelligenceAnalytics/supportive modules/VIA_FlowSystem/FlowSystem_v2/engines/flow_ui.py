@@ -81,35 +81,38 @@ def nav_strip(current):
 
 
 def macro_card(mo):
-    """宏觀對照卡(flow_macro 產物 → 表格+判讀 badge)。"""
+    """宏觀對照卡 v2:自適應權重 — 主導因子(權重×z)入列;權重推導全程可稽。"""
     if not mo or not mo.get("rows"):
-        return ('<div class="card"><h3>宏觀對照 · 流向 × 匯率/利率/美元指數/經濟</h3>'
+        return ('<div class="card"><h3>宏觀對照 · 流向 × 匯率/利率/殖利率/黃金/總經/貿易/財政/通膨/加密</h3>'
                 '<div class="hint">macro_overlay.json 未產 — manager macro(或 all)後自動出現</div></div>')
     vk_cls = {"ok": "g", "warn": "r", "turn": "a", "na": ""}
-    h = ['<div class="card scroll"><h3>宏觀對照 · 資金流動強弱及方向(流向 × 匯率/利率/美元指數/經濟)</h3>']
+    h = ['<div class="card scroll"><h3>宏觀對照 · 資金流動強弱及方向 — 14 因子自適應權重(權重=算出·變動·不固定)</h3>']
     h.append('<div style="margin-bottom:6px"><span class="badge">%s(DXY 動能 %s%%)</span> '
              '<span class="badge">整體流動強度 %s</span> '
              '<span class="badge %s">%s</span></div>' %
              (esc(mo["dxy"]["regime"]), mo["dxy"]["momentum"], mo["overall_strength"],
               "g" if mo.get("real_data") else "a",
               "真實側車" if mo.get("real_data") else "合成 demo"))
-    h.append('<table><thead><tr><th>區域</th><th>FIS 流向</th><th>本幣動能</th><th>利差(−US)</th>'
-             '<th>經濟</th><th>宏觀分</th><th>判讀</th></tr></thead><tbody>')
+    h.append('<table><thead><tr><th>區域</th><th>FIS 流向</th><th>宏觀分</th><th>視窗</th>'
+             '<th>主導因子(權重=IC 算出 · z=當前值)</th><th>判讀</th></tr></thead><tbody>')
     for r in mo["rows"]:
         fis = r["fis"]
-        h.append('<tr><td><b>%s</b> <span class="hint">%s</span></td>'
+        chips = " ".join('<span class="badge">%s w%+.2f·z%+.1f</span>'
+                         % (esc(c["zh"]), c["w"], c["z"]) for c in (r.get("weights") or []))
+        h.append('<tr><td><b>%s</b></td>'
                  '<td class="mono" style="color:%s">%s</td>'
-                 '<td class="mono">%+.2f%%</td><td class="mono">%+.2f</td>'
-                 '<td class="mono">%s %+.1f</td>'
-                 '<td class="mono" style="color:%s">%+.1f</td>'
+                 '<td class="mono" style="color:%s">%s</td>'
+                 '<td class="mono">%s</td><td>%s</td>'
                  '<td><span class="badge %s">%s</span></td></tr>' %
-                 (esc(r["region"]), esc(r["fx_label"]),
+                 (esc(r["region"]),
                   _fis_color(fis or 0), ("%.1f" % fis) if fis is not None else "—",
-                  r["fx_momentum"], r["rate_diff"],
-                  esc(r["econ_label"]), r["econ"],
-                  _fis_color(r["macro_score"]), r["macro_score"],
+                  _fis_color(r["macro_score"] or 0),
+                  ("%+.1f" % r["macro_score"]) if r["macro_score"] is not None else "—",
+                  r.get("window") or "—", chips or '<span class="hint">(樣本不足,權重未定)</span>',
                   vk_cls.get(r["vk"], ""), esc(r["verdict"])))
-    h.append('</tbody></table><div class="hint">%s</div></div>' % esc(mo.get("honest_note", "")))
+    h.append('</tbody></table>')
+    h.append('<div class="hint">%s</div>' % esc(mo.get("weights_derivation", "")))
+    h.append('<div class="hint">%s</div></div>' % esc(mo.get("honest_note", "")))
     return "".join(h)
 
 

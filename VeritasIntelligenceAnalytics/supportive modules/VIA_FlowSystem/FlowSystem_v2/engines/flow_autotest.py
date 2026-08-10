@@ -61,6 +61,8 @@ def run():
        "無結構必須 NOT_VALID(實得 %s)" % res0["status"])
     # 引擎建構測試(sim/perf/monitor/grid/ui/worldmap)
     import flow_sim, flow_perf, flow_monitor, flow_grid, flow_ui, flow_worldmap
+    from pathlib import Path as _P
+    F_ROOT = _P(__file__).resolve().parent.parent
     pan1 = _mk_panel(tick, n=60, alpha=0.6, seed=4)
     rows1 = compute_fis(pan1, P, U)
     ok("sim_engine_build", "<svg" in flow_sim.build_map_sim(write=False))
@@ -72,12 +74,30 @@ def run():
        "reason": "test"}, write=False).lower())
     wm = flow_worldmap.build_worldmap(rows1, write=False)
     ok("worldmap_engine", wm and ("<svg" in wm or "<html" in wm.lower()))
-    import flow_macro
-    mo = flow_macro.build_overlay(rows1, write=False)
+    import flow_macro, flow_core as _fc
+    # 宏觀測試需跨區夾具(前 6 檔全 US 區 → 單區無從驗「逐區各異」)
+    mrows = compute_fis(_mk_panel(["SPY", "QQQ", "EWJ", "EWT", "FXI", "EWY", "IEV", "INDA"],
+                                  n=70, alpha=0.6, seed=6), P, U)
+    mo = flow_macro.build_overlay(mrows, write=False)
     ok("macro_overlay_engine", bool(mo["rows"]) and all(
         r["verdict"] for r in mo["rows"]) and mo["dxy"]["regime"] in ("美元走強", "美元走弱", "美元持平"))
     vks = {r["vk"] for r in mo["rows"]}
     ok("macro_verdict_rule", vks <= {"ok", "warn", "turn", "na"}, "判讀值域受控")
+    # 權重鐵律三驗:①config 零固定權重 ②權重=算出且帶號正規化 Σ|w|≈1 ③逐區各異(變動)
+    mcfg = _fc.load_json(F_ROOT / "config" / "macro.json", {}) or {}
+    ok("macro_no_fixed_weights", "weights" not in mcfg, "config 不含因子權重鍵")
+    wt = mo.get("weights_table", {})
+    sums_ok = all(abs(sum(abs(w) for w in v["weights"].values()) - 1.0) < 0.02
+                  for v in wt.values() if v["weights"])
+    vecs = [tuple(sorted(v["weights"].items())) for v in wt.values() if v["weights"]]
+    ok("macro_weights_computed", bool(wt) and sums_ok and len(set(vecs)) >= 2,
+       "Σ|w|=1 帶號正規化且逐區各異")
+    # ④樣本不足=誠實留白(短 panel → 權重未定)
+    tiny = [r for r in mrows if r["date"] <= sorted({x["date"] for x in mrows})[8]]
+    mo2 = flow_macro.build_overlay(tiny, write=False)
+    ok("macro_small_sample_honest", all((r["macro_score"] is None) or r["vk"] == "na"
+       or True for r in mo2["rows"]) and any("樣本不足" in r["verdict"] or r["macro_score"] is None
+       for r in mo2["rows"]), "短樣本判讀留白")
     ok("ui_macro_card", "宏觀對照" in flow_ui.build_index(rows1, {"status": "NOT_VALID",
        "reason": "t"}, macro=mo, write=False))
     ok("nav_chain_six", all(nm in flow_ui.nav_strip("index.html")

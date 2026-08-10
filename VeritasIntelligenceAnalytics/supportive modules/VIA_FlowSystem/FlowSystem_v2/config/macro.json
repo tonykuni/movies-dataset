@@ -1,12 +1,6 @@
 {
- "_note": "v0100R 宏觀對照層設定(操作員令:ETF 現金流 × 匯率/利率/美元指數/經濟強弱)",
+ "_note": "v2 宏觀對照層設定 — 權重鐵律:本檔『不含任何因子權重』;權重全由引擎每輪以滾動 rank-IC 算出(輸出見 macro_overlay.json.weights_table)",
  "us_policy_rate": 4.25,
- "weights": {
-  "fx_momentum": 0.3,
-  "rate_diff": 0.25,
-  "econ": 0.3,
-  "dxy_headwind": 0.15
- },
  "verdict_rule": "FIS 與宏觀分同號=順風(確認);異號=背離(流入無宏觀支撐=慎;流出但宏觀轉佳=潛在轉折)",
  "regions": {
   "US": {
@@ -87,7 +81,24 @@
    "policy_rate": 3.5,
    "econ_label": "全球綜合",
    "dxy_sensitive": false
+  },
+  "UK": {
+   "fx": "GBPUSD",
+   "policy_rate": 4.0,
+   "econ_label": "英國 PMI",
+   "dxy_sensitive": false
   }
  },
- "data_schema": "data/input/macro_data.json {records:[{date,region,fx_rate,policy_rate,econ_pmi}],dxy:[{date,value}]}(bridge 側車;缺=synth demo 明標)"
+ "data_schema": "data/input/macro_data.json v2 長表 {records:[{date,series,value}]};series:FX_<區>/RATE_<區>/Y2_<區>/Y10_<區>/Y30_<區>/ECON_<區>/TRADE_<區>/FISCAL_<區>/CPI_<區> + DXY/GOLD_SPOT/GOLD_FUT/BTC(側車零爬站)",
+ "adaptive": {
+  "windows": [
+   20,
+   40,
+   60
+  ],
+  "min_obs": 20,
+  "top_show": 3,
+  "_note": "此三值為『估計超參數』非因子權重;視窗本身亦逐區掃選(自適應)"
+ },
+ "factor_catalog_note": "14 因子/區:五幣匯率動能/政策利差/2y/10y/30y 殖利差/期限斜率/總經/貿易/財政/通膨/DXY/黃金現貨動能/黃金期現基差/BTC — 符號與權重全由 IC 決定,零手寫"
 }
