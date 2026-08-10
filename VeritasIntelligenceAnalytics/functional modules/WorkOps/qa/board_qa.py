@@ -62,9 +62,13 @@ def tier_design(board_src):
     drift = []
     if not DESIGN.exists():
         return [("design 正本在位", False, "design/Veritas_WorkOps_v2_hlock.dc.html 缺席")], drift
-    sha16 = hashlib.sha256(DESIGN.read_bytes()).hexdigest()[:16]
-    checks.append(("design 封印驗真", sha16 == DESIGN_SEAL16,
-                   "sha16 %s(板上封印 %s)" % (sha16, DESIGN_SEAL16)))
+    raw = DESIGN.read_bytes()
+    sha16 = hashlib.sha256(raw).hexdigest()[:16]
+    sha16n = hashlib.sha256(raw.replace(b"\r\n", b"\n")).hexdigest()[:16]
+    seal_ok = DESIGN_SEAL16 in (sha16, sha16n)
+    checks.append(("design 封印驗真(原始或換行正規化)", seal_ok,
+                   "sha16 %s / 正規化 %s(封印 %s;Windows checkout 之 CRLF 差異已豁免)"
+                   % (sha16, sha16n, DESIGN_SEAL16)))
     checks.append(("板記載同一封印", DESIGN_SEAL16 in board_src, "視覺鎖 v2 錨定同一正本"))
     design = DESIGN.read_text(encoding="utf-8", errors="replace")
     toks = _design_tokens(design)

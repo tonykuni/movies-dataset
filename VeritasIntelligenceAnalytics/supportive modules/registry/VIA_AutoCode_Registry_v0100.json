@@ -1441,6 +1441,14 @@
    "component": "R7:宏觀對照 v2 — 14 因子全譜 + 自適應權重鐵律(ENG-062)",
    "code": "ENG-062",
    "note": "操作員令:五幣匯率(TWD/JPY/GBP/EUR/CNH)/各區利率/長中短期公債殖利率(2y/10y/30y+期限斜率)/黃金現貨+期貨(動能+基差)/總經/貿易/財政/通膨/加密貨幣全考量;『任何參數權重全都是算出來的變動的不可固定』。落地:①14 因子/區×13 區(UK 新增);②權重鐵律 — config/macro.json 廢除 weights 鍵(autotest 硬鎖 macro_no_fixed_weights);weight_i=滾動 rank-IC(因子,次期區域 FIS)/Σ|IC| 帶號正規化,連方向都由 IC 決定零手寫符號;視窗 {20,40,60} 逐區自適應掃選;樣本<20 因子誠實閒置、全閒置判讀留白;每輪重算=權重是輸出;③可稽:weights_table(逐區 window/weights/ICs)+weights_derivation 入 JSON,UI 卡逐區主導因子 chips(w×z);④資料 schema v2 長表(FX/RATE/Y2/Y10/Y30/ECON/TRADE/FISCAL/CPI_<區>+DXY/GOLD_SPOT/GOLD_FUT/BTC 側車零爬站;synth 注入相關結構供推導示範明標);⑤QA:autotest 20/20(權重三鐵驗:config 零權重/Σ|w|=1 逐區各異/短樣本留白;夾具修跨區)·selftest 14/14·全鏈 all 13 區判讀·Playwright 卡片截圖目檢(逐區權重確實不同、UK 誠實留白)。"
+  },
+  {
+   "ts": "2026-08-12T11:00:00",
+   "op": "UPGRADE",
+   "category": "品質",
+   "component": "R8:效度×信度量測 + 誠實缺口卡 + U/I 全面白話化 + BoardQA CRLF 修",
+   "code": "ENG-062/TOOL-BQA",
+   "note": "操作員三問令。①效度量測=walk-forward 樣本外命中率(每步只用當步以前資料算權重打分,對隔天區域 FIS 方向計分;丟銅板=50% 基準);信度量測=對半重算權重相似度(前後兩段各算,排名相關)+判讀翻號頻率 — 三數字入儀表板卡附白話;合成 demo 下命中率 50%/相似 0.08/翻號 40%=誠實(示範資料無領先訊號,系統不裝懂;截圖存證)。②缺口卡 12 項白話+補法(真實資料/VIX/信用利差/油銅/流動性/資金面/政策行事曆/情緒/因子重疊/牛熊分段/FDR/季節性)只增不減。③白話化:SOLID 橫幅/權重推導/理論頁四公式全加【白話】行。④實機 bug 修:BoardQA 封印驗真在 Windows checkout FAIL(git CRLF 轉換改變 sha)→ 雙式 hash(原始 or 換行正規化)+.gitattributes *.dc.html -text 鎖位元組。QA:autotest 22/22(+2)·selftest 14/14·全鏈 13 區·Playwright 卡片截圖目檢。"
   }
  ]
 }

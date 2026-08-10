@@ -111,8 +111,47 @@ def macro_card(mo):
                   r.get("window") or "—", chips or '<span class="hint">(樣本不足,權重未定)</span>',
                   vk_cls.get(r["vk"], ""), esc(r["verdict"])))
     h.append('</tbody></table>')
+    h.append('<div class="hint">【白話】權重怎麼來?讓資料自己投票:過去一段時間哪個因子真的跟隔天資金流走得像,'
+             '它就分到多少話語權(連正負方向都由資料決定);每輪重算,絕不寫死。樣本不夠的因子先坐冷板凳,不亂給分。</div>')
     h.append('<div class="hint">%s</div>' % esc(mo.get("weights_derivation", "")))
     h.append('<div class="hint">%s</div></div>' % esc(mo.get("honest_note", "")))
+    return "".join(h)
+
+
+def vr_card(mo):
+    """效信度量測卡(白話):效度=判讀準不準(樣本外命中率);信度=說法穩不穩(對半相似+翻號率)。"""
+    vr = (mo or {}).get("validity_reliability")
+    if not vr:
+        return ""
+    hit = vr.get("validity_hit_rate")
+    sh = vr.get("reliability_split_half")
+    fl = vr.get("reliability_flip_rate")
+    cell = ('<div class="tcell"><div class="tv" style="color:%s">%s</div><div class="tk">%s</div></div>')
+    h = ['<div class="card"><h3>效度 × 信度 — 量出來的,不是說說</h3><div class="tgrid" style="display:flex;gap:12px;flex-wrap:wrap">']
+    h.append(cell % (TOKENS["up"] if (hit or 0) > 0.5 else TOKENS["mut"],
+                     ("%.0f%%" % (100 * hit)) if hit is not None else "樣本不足",
+                     "效度:樣本外命中率(丟銅板=50%%,n=%d)" % vr.get("validity_n", 0)))
+    h.append(cell % (TOKENS["teal"], ("%.2f" % sh) if sh is not None else "樣本不足",
+                     "信度:對半重算相似度(1=完全一致)"))
+    h.append(cell % (TOKENS["ink2"], ("%.0f%%" % (100 * fl)) if fl is not None else "—",
+                     "信度:判讀翻號頻率(越低越穩)"))
+    h.append('</div>')
+    h.append('<div class="hint" style="margin-top:8px">%s</div>' % esc(vr.get("plain", "")))
+    h.append('<div class="hint">%s</div></div>' % esc(vr.get("honest", "")))
+    return "".join(h)
+
+
+def gaps_card(mo):
+    """誠實缺口卡(白話):我們還沒考量什麼 + 怎麼補。"""
+    gaps = (mo or {}).get("gaps")
+    if not gaps:
+        return ""
+    h = ['<div class="card scroll"><h3>我們還沒考量什麼(誠實缺口 — 白話+補法)</h3>'
+         '<table><thead><tr><th>缺口</th><th>白話說明</th><th>怎麼補</th></tr></thead><tbody>']
+    for g in gaps:
+        h.append('<tr><td><b>%s</b></td><td>%s</td><td class="hint">%s</td></tr>'
+                 % (esc(g["name"]), esc(g["plain"]), esc(g["fix"])))
+    h.append('</tbody></table><div class="hint">缺口只增不減地列在這裡 — 補上一項劃掉一項,不藏。</div></div>')
     return "".join(h)
 
 
@@ -138,7 +177,9 @@ def build_index(rows, calib, status=None, grid=None, factors=None, macro=None, w
     for k in ("pillar_a", "pillar_b", "selftest"):
         v = layers.get(k, "SKIP")
         h.append('<span class="badge %s">%s %s</span> ' % (b(v), k.upper(), esc(v)))
-    h.append('<div class="hint">%s</div></div>' % esc(st.get("note", "")))
+    h.append('<div class="hint">%s</div>' % esc(st.get("note", "")))
+    h.append('<div class="hint">【白話】SOLID=三關全過才敢說系統可信:①量得準嗎(要真實對照資料)②預測得動嗎(過去實測)'
+             '③極端情況穩嗎(自我測試)。現在缺真實對照,所以誠實掛 NOT_SOLID — 不是壞了,是不裝懂。</div></div>')
     h.append('<div class="tabs"><button class="on" data-p="f1">Flow &amp; Validation</button>'
              '<button data-p="f2">Region × Sector</button><button data-p="f3">Fidelity</button></div>')
     # --- 分頁 1
@@ -153,6 +194,8 @@ def build_index(rows, calib, status=None, grid=None, factors=None, macro=None, w
              (_fis_color(sn.get("gram_score", 0)), sn.get("roro", 50), sn.get("roro", 50),
               TOKENS["teal"], sn.get("gram_score", 0), sn.get("gram_raw", 0), esc(sn.get("regime", ""))))
     h.append(macro_card(macro))
+    h.append(vr_card(macro))
+    h.append(gaps_card(macro))
     h.append('<div class="card"><h3>Risk-Tier Ladder + GRAM</h3><table><thead><tr><th>層</th><th>FIS</th><th></th></tr></thead><tbody>')
     for tname in ("T4", "T3", "T2", "T1"):
         v = sn.get("tier_fis", {}).get(tname, 0)

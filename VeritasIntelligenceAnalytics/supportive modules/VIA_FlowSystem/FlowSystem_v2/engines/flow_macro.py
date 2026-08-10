@@ -191,6 +191,87 @@ def _adaptive_weights(fmat, fis_series, dates, windows, min_obs):
     return weights, best
 
 
+# 誠實缺口清單(操作員「我們少考量甚麼」;白話一行+補法;只增不減)
+GAPS = [
+    ("真實資料", "現在是示範資料在跑 — 這是最大缺口", "把真實序列放進 macro_data.json 即接上"),
+    ("波動率 VIX", "市場怕不怕沒看 — 恐慌時資金行為不一樣", "加 VIX 與期限結構為因子"),
+    ("信用利差", "公司債借錢貴不貴沒看 — 這常比股市先反應", "加 HY−IG 利差因子"),
+    ("油價/商品", "只看了黃金 — 油銅是景氣的體溫計", "加 WTI/銅動能因子"),
+    ("流動性", "量沒看 — 只看方向不看深淺會誤判力道", "加成交量/買賣價差因子"),
+    ("資金面", "美元體系水位(RRP/準備金)沒看", "加 Fed 資金面序列"),
+    ("政策行事曆", "FOMC/CPI 公布日前後行為不同,系統不知道日曆", "加事件日旗標,事件窗另計"),
+    ("市場情緒", "散戶/選擇權情緒(Put-Call)沒看", "加情緒指標因子"),
+    ("因子重疊", "14 因子彼此有重疊(如利差與匯率相關)— 同一訊號可能被算兩次", "因子正交化或分群後再配權"),
+    ("牛熊分段", "權重是滾動算,但牛市熊市的有效因子本就不同", "依 regime 分段各自推導權重"),
+    ("多重檢定", "14 因子×13 區一起找關聯,總會撞到假訊號", "加 FDR 假發現率控制"),
+    ("季節性", "月底/季底資金例行移動沒排除", "加日曆效應校正"),
+]
+
+
+def _validity_reliability(region_fis, smap, dates, cfg, windows, min_obs):
+    """效度+信度量測(全算出、走樣本外,誠實):
+    效度 = walk-forward 命中率:只用 t 以前資料算權重+打分,對 t+1 FIS 方向 — 丟銅板=50%
+    信度 = ①對半重算:前 2/3 vs 後 2/3 各算權重,答案相似度(共同因子權重排名相關)
+           ②判讀穩定:walk-forward 中宏觀分翻號頻率(翻來翻去=不可靠)"""
+    hits = tries = flips = 0
+    halves = []
+    for region in cfg.get("regions", {}):
+        fis_s = region_fis.get(region, {})
+        if len(fis_s) < 34:
+            continue
+        prev_sign = None
+        for i in range(30, len(dates) - 1, 5):
+            sub = dates[:i + 1]
+            fmat = _factor_series(smap, region, sub)
+            w8, deriv = _adaptive_weights(fmat, fis_s, sub, windows, min_obs)
+            if not w8:
+                continue
+            score = 0.0
+            for fid, wt in w8.items():
+                z = _z_last(fmat[fid], deriv["window"])
+                if z is not None:
+                    score += wt * max(-3.0, min(3.0, z))
+            nxt = fis_s.get(dates[i + 1])
+            if nxt is None or abs(nxt) < 1e-9:
+                continue
+            tries += 1
+            if (score >= 0) == (nxt >= 0):
+                hits += 1
+            sgn = score >= 0
+            if prev_sign is not None and sgn != prev_sign:
+                flips += 1
+            prev_sign = sgn
+        k = len(dates)
+        a, _ = _adaptive_weights(_factor_series(smap, region, dates[:2 * k // 3]),
+                                 fis_s, dates[:2 * k // 3], windows, min_obs)
+        b, _ = _adaptive_weights(_factor_series(smap, region, dates[k // 3:]),
+                                 fis_s, dates[k // 3:], windows, min_obs)
+        common = set(a) & set(b)
+        if len(common) >= 4:
+            ra = _rank([a[f] for f in common])
+            rb = _rank([b[f] for f in common])
+            ma, mb = _mean(ra), _mean(rb)
+            num = sum((x - ma) * (y - mb) for x, y in zip(ra, rb))
+            den = math.sqrt(sum((x - ma) ** 2 for x in ra) * sum((y - mb) ** 2 for y in rb))
+            if den > 1e-12:
+                halves.append(num / den)
+    hit = (hits / tries) if tries else None
+    return {
+        "validity_hit_rate": round(hit, 3) if hit is not None else None,
+        "validity_n": tries,
+        "reliability_split_half": round(_mean(halves), 3) if halves else None,
+        "reliability_flip_rate": round(flips / tries, 3) if tries else None,
+        "plain": ("【白話】效度=判讀準不準:把時間切回過去,只用當時以前的資料打分,看隔天資金流方向有沒有跟上 — "
+                  "命中率 %s(丟銅板=50%%,樣本 %d 次)。信度=說法穩不穩:資料切前後兩段各算一次權重,"
+                  "兩份答案相似度 %s(1=完全一致);判讀翻號頻率 %s(越低越穩)。"
+                  % ("%.0f%%" % (100 * hit) if hit is not None else "樣本不足",
+                     tries,
+                     "%.2f" % _mean(halves) if halves else "樣本不足",
+                     ("%.0f%%" % (100 * flips / tries)) if tries else "—")),
+        "honest": "命中率為樣本外 walk-forward(每步只用當步以前的資料),非事後諸葛;樣本仍少,數字會隨資料增長收斂",
+    }
+
+
 def build_overlay(rows, write=True):
     cfg = load_macro_cfg()
     ad = cfg.get("adaptive", {})
@@ -258,7 +339,10 @@ def build_overlay(rows, write=True):
                          "n_factors": len(weights), "verdict": verdict, "vk": vk})
     out_rows.sort(key=lambda r: -(abs(r["fis"]) if r["fis"] is not None else -1))
     valid = [r for r in out_rows if r["fis"] is not None]
+    vr = _validity_reliability(region_fis, smap, dates, cfg, windows, min_obs)
     result = {"version": "v2", "real_data": real, "source": data.get("source", ""),
+              "validity_reliability": vr,
+              "gaps": [{"name": n, "plain": p, "fix": f} for n, p, f in GAPS],
               "dxy": {"momentum": round(dxy_m, 2), "regime": dxy_regime},
               "overall_strength": round(_mean([abs(r["fis"]) for r in valid]) if valid else 0.0, 1),
               "factor_catalog": [{"id": f, "zh": z} for f, z in FACTORS],

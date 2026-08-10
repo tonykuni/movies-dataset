@@ -95,6 +95,11 @@ def run():
     # ④樣本不足=誠實留白(短 panel → 權重未定)
     tiny = [r for r in mrows if r["date"] <= sorted({x["date"] for x in mrows})[8]]
     mo2 = flow_macro.build_overlay(tiny, write=False)
+    vr = mo.get("validity_reliability", {})
+    ok("macro_vr_measured", vr.get("validity_n", 0) > 0 and vr.get("validity_hit_rate") is not None
+       and "白話" in vr.get("plain", ""), "效度命中率+信度對半皆量出且附白話")
+    ok("macro_gaps_listed", len(mo.get("gaps", [])) >= 10 and all(
+       g.get("plain") and g.get("fix") for g in mo.get("gaps", [])), "缺口清單白話+補法全列")
     ok("macro_small_sample_honest", all((r["macro_score"] is None) or r["vk"] == "na"
        or True for r in mo2["rows"]) and any("樣本不足" in r["verdict"] or r["macro_score"] is None
        for r in mo2["rows"]), "短樣本判讀留白")
