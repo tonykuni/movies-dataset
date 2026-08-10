@@ -12,7 +12,7 @@ from pathlib import Path
 
 from flow_core import load_json
 from flow_bridge import load_perf_prices
-from flow_ui import TOKENS, COMBO
+from flow_ui import TOKENS, COMBO, nav_strip
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
@@ -89,6 +89,7 @@ svg{width:100%%;height:auto;display:block}
 </style></head><body><div class="wrap">
 <div class="kick">VIA FlowSystem v2(v0100R)· 資料來源:__SRC__</div>
 <h1>正規化走勢 — 基準=100 · 主題比 GICS 更貼近資金敘事</h1>
+__NAV__
 <div class="card"><div class="ctrl">
 <span>分類篩選</span><select id="gsel"></select>
 <button data-a="all">全選</button><button data-a="none">全不選</button>
@@ -158,7 +159,7 @@ document.querySelectorAll(".rb").forEach(function(b){b.addEventListener("click",
  b.classList.add("on");range=+b.dataset.r;render();});});
 picks();render();
 </script></div></body></html>""" % t
-    page = page.replace("__PAYLOAD__", json.dumps(payload, ensure_ascii=False)).replace("__SRC__", src)
+    page = page.replace("__NAV__", nav_strip("perf_trend.html")).replace("__PAYLOAD__", json.dumps(payload, ensure_ascii=False)).replace("__SRC__", src)
     if write:
         OUTP.write_text(page, encoding="utf-8")
     return page

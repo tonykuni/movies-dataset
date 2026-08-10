@@ -9,7 +9,7 @@ from pathlib import Path
 
 from flow_core import bucket_fis, load_json, load_universe
 from flow_sim import load_sim
-from flow_ui import TOKENS, esc
+from flow_ui import TOKENS, esc, nav_strip
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
@@ -66,6 +66,7 @@ def build_monitor(rows, write=True):
          '</style></head><body><div class="wrap">' % t]
     h.append('<div class="kick">VIA FlowSystem v2(v0100R)</div>')
     h.append('<h1>資金流動監控 — 族群整合 × 採用項目</h1>')
+    h.append(nav_strip('flow_monitor.html'))
     h.append('<div class="tabs"><button class="on" data-p="m1">族群整合監控</button>'
              '<button data-p="m2">實際採用項目</button></div>')
     # 分頁 1

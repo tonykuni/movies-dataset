@@ -62,7 +62,58 @@ def _fis_color(v):
     return TOKENS["up"] if v > 0 else (TOKENS["down"] if v < 0 else TOKENS["mut2"])
 
 
-def build_index(rows, calib, status=None, grid=None, factors=None, write=True):
+# v0100R 串連介面:六 UI 互跳導覽帶(同資料夾相對連結;各 build_* 共用)
+NAV_PAGES = [("index.html", "儀表板"), ("world_flow.html", "世界地圖"),
+             ("tier_flow.html", "風險階梯"), ("global_map_sim.html", "情境模擬"),
+             ("perf_trend.html", "走勢圖"), ("flow_monitor.html", "監控台")]
+
+
+def nav_strip(current):
+    chips = "".join(
+        '<a href="%s" style="text-decoration:none;font-size:11.5px;border:1px solid %s;'
+        'border-radius:6px;padding:4px 11px;%s">%s</a>'
+        % (f, TOKENS["line"],
+           ("background:%s;color:#fff;border-color:%s" % (TOKENS["ink"], TOKENS["ink"]))
+           if f == current else
+           ("background:%s;color:%s" % (TOKENS["paper"], TOKENS["ink2"])),
+           esc(n)) for f, n in NAV_PAGES)
+    return ('<div style="display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px">%s</div>' % chips)
+
+
+def macro_card(mo):
+    """宏觀對照卡(flow_macro 產物 → 表格+判讀 badge)。"""
+    if not mo or not mo.get("rows"):
+        return ('<div class="card"><h3>宏觀對照 · 流向 × 匯率/利率/美元指數/經濟</h3>'
+                '<div class="hint">macro_overlay.json 未產 — manager macro(或 all)後自動出現</div></div>')
+    vk_cls = {"ok": "g", "warn": "r", "turn": "a", "na": ""}
+    h = ['<div class="card scroll"><h3>宏觀對照 · 資金流動強弱及方向(流向 × 匯率/利率/美元指數/經濟)</h3>']
+    h.append('<div style="margin-bottom:6px"><span class="badge">%s(DXY 動能 %s%%)</span> '
+             '<span class="badge">整體流動強度 %s</span> '
+             '<span class="badge %s">%s</span></div>' %
+             (esc(mo["dxy"]["regime"]), mo["dxy"]["momentum"], mo["overall_strength"],
+              "g" if mo.get("real_data") else "a",
+              "真實側車" if mo.get("real_data") else "合成 demo"))
+    h.append('<table><thead><tr><th>區域</th><th>FIS 流向</th><th>本幣動能</th><th>利差(−US)</th>'
+             '<th>經濟</th><th>宏觀分</th><th>判讀</th></tr></thead><tbody>')
+    for r in mo["rows"]:
+        fis = r["fis"]
+        h.append('<tr><td><b>%s</b> <span class="hint">%s</span></td>'
+                 '<td class="mono" style="color:%s">%s</td>'
+                 '<td class="mono">%+.2f%%</td><td class="mono">%+.2f</td>'
+                 '<td class="mono">%s %+.1f</td>'
+                 '<td class="mono" style="color:%s">%+.1f</td>'
+                 '<td><span class="badge %s">%s</span></td></tr>' %
+                 (esc(r["region"]), esc(r["fx_label"]),
+                  _fis_color(fis or 0), ("%.1f" % fis) if fis is not None else "—",
+                  r["fx_momentum"], r["rate_diff"],
+                  esc(r["econ_label"]), r["econ"],
+                  _fis_color(r["macro_score"]), r["macro_score"],
+                  vk_cls.get(r["vk"], ""), esc(r["verdict"])))
+    h.append('</tbody></table><div class="hint">%s</div></div>' % esc(mo.get("honest_note", "")))
+    return "".join(h)
+
+
+def build_index(rows, calib, status=None, grid=None, factors=None, macro=None, write=True):
     sn = snapshot(rows) if rows else {"per_ticker": [], "bucket": {}, "asset_class": {},
                                       "roro": 50, "gram_score": 0, "gram_raw": 0,
                                       "regime": "NEUTRAL", "tier_fis": {}, "regime_market": "CALM"}
@@ -76,6 +127,7 @@ def build_index(rows, calib, status=None, grid=None, factors=None, write=True):
     h.append('<div class="kick">Veritas Intelligence Analytics · FlowSystem v2(v0100R)</div>')
     h.append('<h1>全球 ETF 資金流向與強度 — 自我驗證系統</h1>')
     h.append('<div class="sub">region=曝險非來源 · 驗證未過=誠實紅 · 零雲端自含</div>')
+    h.append(nav_strip("index.html"))
     # 三層狀態橫幅
     b = lambda okv: "g" if okv == "OK" else ("a" if okv == "SKIP" else "r")
     h.append('<div class="card"><h3>三層驗證 · SOLID 狀態</h3>')
@@ -97,6 +149,7 @@ def build_index(rows, calib, status=None, grid=None, factors=None, write=True):
              '<div class="hint">GRAM %s · raw %s · %s</div></div></div>' %
              (_fis_color(sn.get("gram_score", 0)), sn.get("roro", 50), sn.get("roro", 50),
               TOKENS["teal"], sn.get("gram_score", 0), sn.get("gram_raw", 0), esc(sn.get("regime", ""))))
+    h.append(macro_card(macro))
     h.append('<div class="card"><h3>Risk-Tier Ladder + GRAM</h3><table><thead><tr><th>層</th><th>FIS</th><th></th></tr></thead><tbody>')
     for tname in ("T4", "T3", "T2", "T1"):
         v = sn.get("tier_fis", {}).get(tname, 0)

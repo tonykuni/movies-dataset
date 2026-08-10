@@ -1,0 +1,93 @@
+{
+ "_note": "v0100R 宏觀對照層設定(操作員令:ETF 現金流 × 匯率/利率/美元指數/經濟強弱)",
+ "us_policy_rate": 4.25,
+ "weights": {
+  "fx_momentum": 0.3,
+  "rate_diff": 0.25,
+  "econ": 0.3,
+  "dxy_headwind": 0.15
+ },
+ "verdict_rule": "FIS 與宏觀分同號=順風(確認);異號=背離(流入無宏觀支撐=慎;流出但宏觀轉佳=潛在轉折)",
+ "regions": {
+  "US": {
+   "fx": "DXY",
+   "policy_rate": 4.25,
+   "econ_label": "ISM PMI",
+   "dxy_sensitive": false
+  },
+  "Europe": {
+   "fx": "EURUSD",
+   "policy_rate": 2.15,
+   "econ_label": "歐元區 PMI",
+   "dxy_sensitive": false
+  },
+  "Japan": {
+   "fx": "USDJPY",
+   "policy_rate": 0.75,
+   "econ_label": "日本 PMI",
+   "dxy_sensitive": false,
+   "fx_invert": true
+  },
+  "China": {
+   "fx": "USDCNH",
+   "policy_rate": 3.0,
+   "econ_label": "財新 PMI",
+   "dxy_sensitive": true,
+   "fx_invert": true
+  },
+  "Taiwan": {
+   "fx": "USDTWD",
+   "policy_rate": 2.0,
+   "econ_label": "台灣 PMI",
+   "dxy_sensitive": true,
+   "fx_invert": true
+  },
+  "Korea": {
+   "fx": "USDKRW",
+   "policy_rate": 2.5,
+   "econ_label": "韓國 PMI",
+   "dxy_sensitive": true,
+   "fx_invert": true
+  },
+  "India": {
+   "fx": "USDINR",
+   "policy_rate": 5.5,
+   "econ_label": "印度 PMI",
+   "dxy_sensitive": true,
+   "fx_invert": true
+  },
+  "EM": {
+   "fx": "EEM_FX",
+   "policy_rate": 6.0,
+   "econ_label": "EM 綜合",
+   "dxy_sensitive": true,
+   "fx_invert": true
+  },
+  "LatAm": {
+   "fx": "USDBRL",
+   "policy_rate": 10.5,
+   "econ_label": "巴西 PMI",
+   "dxy_sensitive": true,
+   "fx_invert": true
+  },
+  "AsiaExJP": {
+   "fx": "ADXY",
+   "policy_rate": 3.0,
+   "econ_label": "亞洲綜合",
+   "dxy_sensitive": true
+  },
+  "DM": {
+   "fx": "DXY",
+   "policy_rate": 3.0,
+   "econ_label": "DM 綜合",
+   "dxy_sensitive": false
+  },
+  "Global": {
+   "fx": "DXY",
+   "policy_rate": 3.5,
+   "econ_label": "全球綜合",
+   "dxy_sensitive": false
+  }
+ },
+ "data_schema": "data/input/macro_data.json {records:[{date,region,fx_rate,policy_rate,econ_pmi}],dxy:[{date,value}]}(bridge 側車;缺=synth demo 明標)"
+}

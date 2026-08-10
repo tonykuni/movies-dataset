@@ -10,7 +10,7 @@ from pathlib import Path
 
 from flow_core import bucket_fis, load_universe
 from flow_sim import load_sim, build_frames
-from flow_ui import TOKENS
+from flow_ui import TOKENS, nav_strip
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
@@ -33,7 +33,7 @@ def _frames_from_rows(rows, key):
     return frames
 
 
-def _page(title, payload, node_mode):
+def _page(title, payload, node_mode, current=""):
     t = dict(TOKENS)
     head = """<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>%s</title><style>
@@ -53,6 +53,7 @@ svg{width:100%%;height:auto;display:block}
     return (head.replace("%s", title, 1)
             + """<div class="kick">VIA FlowSystem v2(v0100R · 自含離線 · 零 CDN)</div>
 <h1>""" + title + """</h1>
+""" + nav_strip(current) + """
 <div class="card"><div class="ctrl"><button id="play">▶ 播放</button>
 <input type="range" id="tl" min="0" max="0" value="0"><span class="hint" id="ph"></span></div>
 <svg id="cv" viewBox="0 0 760 """ + ("470" if node_mode == "map" else "430") + """"></svg></div>
@@ -115,7 +116,7 @@ def build_worldmap(rows=None, write=True):
     payload = {"real": real, "frames": frames,
                "nodes": [{"key": n["id"], "name": n["name"], "lat": n["lat"], "lon": n["lon"]}
                          for n in regions]}
-    page = _page("世界地圖 · 動態資金流", payload, "map")
+    page = _page("世界地圖 · 動態資金流", payload, "map", "world_flow.html")
     if write:
         W_OUT.write_text(page, encoding="utf-8")
     return page
@@ -135,7 +136,7 @@ def build_tierflow(rows=None, write=True):
         real = False
     payload = {"real": real, "frames": frames,
                "nodes": [{"key": t["id"], "name": t["name"]} for t in tiers]}
-    page = _page("風險類別 · 動態資金階梯", payload, "tier")
+    page = _page("風險類別 · 動態資金階梯", payload, "tier", "tier_flow.html")
     if write:
         T_OUT.write_text(page, encoding="utf-8")
     return page

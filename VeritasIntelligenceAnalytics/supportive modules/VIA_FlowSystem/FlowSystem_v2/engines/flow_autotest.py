@@ -72,6 +72,17 @@ def run():
        "reason": "test"}, write=False).lower())
     wm = flow_worldmap.build_worldmap(rows1, write=False)
     ok("worldmap_engine", wm and ("<svg" in wm or "<html" in wm.lower()))
+    import flow_macro
+    mo = flow_macro.build_overlay(rows1, write=False)
+    ok("macro_overlay_engine", bool(mo["rows"]) and all(
+        r["verdict"] for r in mo["rows"]) and mo["dxy"]["regime"] in ("美元走強", "美元走弱", "美元持平"))
+    vks = {r["vk"] for r in mo["rows"]}
+    ok("macro_verdict_rule", vks <= {"ok", "warn", "turn", "na"}, "判讀值域受控")
+    ok("ui_macro_card", "宏觀對照" in flow_ui.build_index(rows1, {"status": "NOT_VALID",
+       "reason": "t"}, macro=mo, write=False))
+    ok("nav_chain_six", all(nm in flow_ui.nav_strip("index.html")
+       for nm in ("world_flow.html", "tier_flow.html", "global_map_sim.html",
+                  "perf_trend.html", "flow_monitor.html")), "六介面互串")
 
     print("-" * 56)
     print("  [selftest 內嵌執行]")

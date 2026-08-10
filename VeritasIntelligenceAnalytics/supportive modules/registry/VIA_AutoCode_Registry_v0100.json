@@ -222,7 +222,9 @@
   "工具|theory_audit_v0100": "TOOL-THEORY",
   "工具|via_wf_cmd": "TOOL-WF",
   "引擎|flowsystem_v2_engines_v0100R": "ENG-061",
-  "工具|board_qa_v0100": "TOOL-BQA"
+  "工具|board_qa_v0100": "TOOL-BQA",
+  "引擎|flow_macro_v0100R": "ENG-062",
+  "工具|spec_master_builder_v0100": "TOOL-SPEC"
  },
  "ledger": [
   {
@@ -1414,6 +1416,14 @@
    "component": "R4:flowsystem 空命令修+accuracy auto 基準+ALL v0111+板四層 QA(design 同步)",
    "code": "ENG-030/ENG-025/TOOL-BQA",
    "note": "操作員令三件。①實機 bug 修:via-wf flowsystem 委派空字串 -Cmd → Activate 端空值回 all 防禦(AST 綠)。②自製缺席 accuracy_report.json:benchmark v0101 新 auto 動詞 — kind=auto_baseline,accuracy 欄一律 null(Gate E 絕不冒充人工實測),內容=受控 harness/路由確定層佔比/解析六層分佈三源自動數字;gold_set.csv 在位時 auto 讓位 run;ALL v0111 [2e] 接線 — 產物自此永不缺席。③板四層 QA 套件(qa/board_qa.py+runner.mjs+system.mjs+fixture;動詞 via-boardqa):T1 unit(vm 直呼 esc/arr/fmt/t/gsBuild/pfStrip 7 測)T2 integration(11 頁/流程帶/搜尋/M7/側欄 7 測)T3 system(真瀏覽器 9 測:分頁/搜尋/詳情窗/EN 切換/零 pageerror;playwright 缺=誠實 SKIP)T4 design-sync(純 Python 任何機器可跑)。④U/I sync:設計正本 Veritas WorkOps v2(claude.ai/design)另存檔=既存 hlock 檔,sha16=4cb90a0bd31df637 與板上視覺鎖 v2 封印完全命中 → 歸戶 design/Veritas_WorkOps_v2_hlock.dc.html;抽驗發現正本為 Industry 設計系統(bg #f2f2f3/text #1d1f20/accent #5980a6/Barlow),板已採 accent #5980a6 為錨;T4 依 :root 動態抽 48 token 誠實量對齊:核心角色 4/5(漂移僅 accent-2 #728fab)、字體板未採 Barlow(板現行 JhengHei/DM Mono=既裁定)— 漂移入報告不硬紅;全面換裝=破視覺鎖需操作員明示裁定(報告內建此註記)。QA 過程修三件測試自身缺陷(esc 期望與板契約不符/ESM 不吃 NODE_PATH→PW_MODULE 後備/innerText 對隱藏頁回空→textContent)。終局:T1+2 14/14 · T3 9/9 · T4 7/7 全綠 → out/board_qa_report.json。"
+  },
+  {
+   "ts": "2026-08-12T08:00:00",
+   "op": "CREATE",
+   "category": "引擎",
+   "component": "R5:宏觀對照層(ENG-062)+ 六介面互串 + 母版最後一頁規格總覽(TOOL-SPEC)",
+   "code": "ENG-062/TOOL-SPEC",
+   "note": "操作員令三段。①宏觀對照:flow_macro.py+config/macro.json — 全球各類各區 ETF 現金流 × 匯率/利率/美元指數/經濟強弱 → 每區宏觀分+順風/背離判讀矩陣(流入無宏觀支撐=慎追/流出但宏觀轉佳=關注轉折);DXY regime;資料側車 macro_data.json 零爬站,缺=合成 demo 明標;儀表板新宏觀對照卡;manager macro 動詞入 all/live;autotest 16/16(+4)·selftest 14/14 全綠;Playwright 截圖目檢過。②串連所有工具及介面:flow_ui.nav_strip 六 UI 互跳導覽帶(離線相對連結),nav_chain_six 測試鎖行為。③母版最後一頁:build_spec_master_v0100.py(TOOL-SPEC;動詞 via-spec)由 canon SSOT 動態彙整六段規格 — VIA(母)registry/動詞/紅線、FlowSystem 17 引擎+驗證契約+宏觀、VDF 模組+v0160 三件套候上傳、VRN 模組+v0159 已驗真+視覺鎖側欄、VAP 28 圖型模板+ICON/繪圖管理(via combo/樣式/變換)、候上傳五檔清單;產物 VIA_Reports/VIA_Spec_Master_LastPage.html 自含零 CDN;VIA_ONE_Master_Overview 本體到件即掛為其最後一頁。④候上傳登記:操作員報五桌面路徑(MI_Code_Appendix(3)/Extraction_Matrix(14)/Global_Index_Macro_Tree(1)/TW_ETF_Group_Console(1)/ONE_Master_Overview(5))— 本體未達本 session,到件依整合去重裁定。README v0121R 節只增不減附記。"
   }
  ]
 }

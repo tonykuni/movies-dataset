@@ -265,3 +265,21 @@ UI 新增硬化條與 `tHAC`/`lead` 指標;`harden` 命令現跑 19 測試。
 - **族群整合監控(方向·強度·走勢 整合為一)**:每一族群(指數/美股主題ETF/台股主題族群/GICS產業)一列,整合「方向(近月動能 流入▲/流出▼)+ 強度(0–100 bar)+ 走勢(自基準日 %)+ 正規化軌跡 sparkline + 成分檔數」。
 - **資金流動 實際採用項目(專頁)**:從設定檔自動列出真正追蹤的標的——① FIS 資金流 ETF 宇宙(70檔依 T1–T4)② 正規化走勢採用標的(指數/美股主題ETF/台股主題個股/GICS/台股個股,含主題標籤)③ 情境模擬三維節點(區域10/層級4/類型8)④ 資料來源(TWSE T86/MI_MARGN/FRED/Yahoo/yfinance bridge + 時效規則)。明確區分「美股主題ETF vs 台股主題個股」。
 - 測試:autotest 23/23(新增 monitor_engine)· SOLID。
+
+---
+
+## v0121R — 宏觀對照層 + 六介面互串(v0100R 重建樹上新增;2026-08-12 操作員令)
+
+「先檢視全球各類各區ETF現金流搭配各地匯率利率美元指數經濟狀況強弱來觀察資金流動的強弱及方向 串連所有工具及介面」:
+
+- **`flow_macro.py`(第 17 引擎)+ `config/macro.json`**:12 區每區宏觀分 =
+  w1·本幣動能 + w2·利差(區−美) + w3·經濟強度(PMI−50) − w4·美元逆風(DXY×敏感區)。
+  **判讀矩陣**:FIS 與宏觀分同號=順風(流入獲支撐/流出有理由);異號=背離
+  (流入無宏觀支撐=慎追 / 流出但宏觀轉佳=關注轉折)。產物 `macro_overlay.json`,
+  儀表板新增「宏觀對照」卡(DXY regime chip + 12 區判讀表)。
+- **資料**:`data/input/macro_data.json` 側車(schema 見 config;零爬站);缺=合成 demo 明標。
+- **六介面互串**:`flow_ui.nav_strip()` — 儀表板/世界地圖/風險階梯/情境模擬/走勢圖/監控台
+  六頁頂端互跳導覽帶(同資料夾相對連結,離線可用)。
+- **manager**:新 `macro` 命令,已串進 `all`/`live`;autotest 16/16(+macro_overlay_engine/
+  macro_verdict_rule/ui_macro_card/nav_chain_six)。
+- 註:本節建於 v0100R 重建樹;原 session 檔到件依整合去重裁定合流。

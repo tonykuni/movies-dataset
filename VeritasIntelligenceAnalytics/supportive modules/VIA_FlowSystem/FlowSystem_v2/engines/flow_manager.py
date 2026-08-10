@@ -25,6 +25,7 @@ import flow_bridge  # noqa: E402
 import flow_calibrate  # noqa: E402
 import flow_factors  # noqa: E402
 import flow_grid  # noqa: E402
+import flow_macro  # noqa: E402
 import flow_monitor  # noqa: E402
 import flow_perf  # noqa: E402
 import flow_pillar_a  # noqa: E402
@@ -177,6 +178,12 @@ def main():
         r = flow_pillar_a.validate_a(_rows(panel))
         print("[validate-a] %s — %s" % (r["status"], r["reason"]))
         return 0
+    if cmd == "macro":
+        panel, _ = _panel()
+        mo = flow_macro.build_overlay(_rows(panel))
+        print("[macro] %s · %s · %d 區判讀 → macro_overlay.json" %
+              (mo["dxy"]["regime"], "真實側車" if mo["real_data"] else "合成 demo", len(mo["rows"])))
+        return 0
     if cmd == "grid":
         panel, _ = _panel()
         flow_grid.build_grid(_rows(panel))
@@ -218,7 +225,9 @@ def main():
             if (OUT / "factors.json").exists() else None
         st = json.loads((OUT / "status.json").read_text(encoding="utf-8-sig")) \
             if (OUT / "status.json").exists() else None
-        flow_ui.build_index(rows, cal, st, grid, fx)
+        mo = json.loads((OUT / "macro_overlay.json").read_text(encoding="utf-8-sig")) \
+            if (OUT / "macro_overlay.json").exists() else None
+        flow_ui.build_index(rows, cal, st, grid, fx, mo)
         print("[ui] index.html")
         return 0
     if cmd in ("all", "live"):
@@ -239,6 +248,8 @@ def main():
         pa = flow_pillar_a.validate_a(rows)
         print("[validate-a] %s" % pa["status"])
         flow_grid.build_grid(rows)
+        mo = flow_macro.build_overlay(rows)
+        print("[macro] %s · %d 區判讀" % (mo["dxy"]["regime"], len(mo["rows"])))
         flow_worldmap.build_worldmap(rows)
         flow_worldmap.build_tierflow(rows)
         flow_sim.build_map_sim(rows)
@@ -248,11 +259,11 @@ def main():
         cal = json.loads((OUT / "calibration.json").read_text(encoding="utf-8-sig"))
         grid = json.loads((OUT / "grid.json").read_text(encoding="utf-8-sig"))
         fx = json.loads((OUT / "factors.json").read_text(encoding="utf-8-sig"))
-        flow_ui.build_index(rows, cal, st, grid, fx)
+        flow_ui.build_index(rows, cal, st, grid, fx, mo)
         print("[ui] index.html + world_flow + tier_flow + global_map_sim + perf_trend + flow_monitor")
         _ledger("all", st["solid"])
         return 0
-    print("未知命令:%s(可用:synth|selftest|autotest|calibrate|factors|run|validate-a|grid|worldmap|sim|perf|monitor|status|ui|all|live|harden)" % cmd)
+    print("未知命令:%s(可用:synth|selftest|autotest|calibrate|factors|run|validate-a|grid|macro|worldmap|sim|perf|monitor|status|ui|all|live|harden)" % cmd)
     return 2
 
 

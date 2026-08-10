@@ -10,7 +10,7 @@ import math
 from pathlib import Path
 
 from flow_core import load_json, bucket_fis, load_universe
-from flow_ui import TOKENS, esc
+from flow_ui import TOKENS, esc, nav_strip
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
@@ -113,6 +113,7 @@ svg{width:100%%;height:auto;display:block}
 </style></head><body><div class="wrap">
 <div class="kick">VIA FlowSystem v2 · 情境模擬(v0100R · 情境推演非預測 · 載荷來源:__SRC__)</div>
 <h1>全球資金流動 — 時間軸 × 方向 × 區間累積 × 評價</h1>
+__NAV__
 <div class="card"><div class="ctrl">
 <button class="on" data-v="regions">🌍 區域</button><button data-v="tiers">📊 風險分類</button><button data-v="types">🏷️ 類型分類</button>
 <span style="margin-left:12px"></span>
@@ -200,7 +201,7 @@ document.getElementById("play").addEventListener("click",function(){
   document.getElementById("tl").value=cur;render();setTimeout(tick,90);})();});
 render();
 </script></div></body></html>""" % t
-    page = page.replace("__PAYLOAD__", json.dumps(payload, ensure_ascii=False))
+    page = page.replace("__NAV__", nav_strip("global_map_sim.html")).replace("__PAYLOAD__", json.dumps(payload, ensure_ascii=False))
     page = page.replace("__SRC__", src).replace("__UNC__", str(payload["unc"]))
     if write:
         OUTP.write_text(page, encoding="utf-8")
