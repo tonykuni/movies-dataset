@@ -221,7 +221,8 @@
   "工具|registry_aio_v0105": "TOOL-REGAIO",
   "工具|theory_audit_v0100": "TOOL-THEORY",
   "工具|via_wf_cmd": "TOOL-WF",
-  "引擎|flowsystem_v2_engines_v0100R": "ENG-061"
+  "引擎|flowsystem_v2_engines_v0100R": "ENG-061",
+  "工具|board_qa_v0100": "TOOL-BQA"
  },
  "ledger": [
   {
@@ -1405,6 +1406,14 @@
    "component": "FlowSystem v2 引擎樹 16 檔生成(v0100R 重建版)+ 全鏈實測",
    "code": "ENG-061",
    "note": "操作員令「缺乏請生成 與u/i相互符合對其」。via-wf status 唯一缺席項 flow_*.py 0/16 → 依 FlowSystem_v2/README.md(至 v0120)為權威規格重建生成 16 引擎:core(FIS+雙估計器+分割守衛+新生排除+權重上限+GRAM 雙形+role 閘門)/validate(G002-G011 含 HAC t+lead_ratio)/calibrate(grid+train/OOS+G009)/manager(16 動詞編排+synth+ledger)/selftest(14 項)/autotest(12 項含五硬化+反證)/pillar_a(真值缺=UNCALIBRATED 誠實降級)/factors(t≥2 統計閘,noise 必剔)/roles/bridge(零爬站只讀側車)/grid(Region×Sector+Fidelity)/ui/worldmap/sim(三維+評價+自動結論)/perf/monitor+configs 四件(universe 70 檔 T1=9/T2=15/T3=22/T4=24 實數)。U/I 全對齊 WorkOps v2 視覺鎖 token(flow_ui.TOKENS 單一事實源,六 UI 共用;零 CDN 自含+RWD)。實測:16 檔 py_compile 綠;selftest 14/14;autotest 12/12;反證保證兩端實證 — alpha=0 → NOT_VALID·alpha=0.35 → PROVED_VALID(IC 0.1721·t 14.25·OOS 同號);全鏈 all 六 UI 產出;Playwright 三頁零 pageerror 截圖目檢過。QA 修三件:noise 因子閘 IC→t 統計量;synth 傳導校準(正向端也要能證明);synth 側車不冒充真實 bridge(source 欄誠實判別)。誠實註記:v0100R=README 規格重建版,原 session 檔到件依整合去重裁定替換(檔頭有標);Pillar A 真值未接故 SOLID 誠實=NOT_SOLID。產物(data/+六 html)入 gitignore 可再生。"
+  },
+  {
+   "ts": "2026-08-12T06:30:00",
+   "op": "UPGRADE",
+   "category": "品質",
+   "component": "R4:flowsystem 空命令修+accuracy auto 基準+ALL v0111+板四層 QA(design 同步)",
+   "code": "ENG-030/ENG-025/TOOL-BQA",
+   "note": "操作員令三件。①實機 bug 修:via-wf flowsystem 委派空字串 -Cmd → Activate 端空值回 all 防禦(AST 綠)。②自製缺席 accuracy_report.json:benchmark v0101 新 auto 動詞 — kind=auto_baseline,accuracy 欄一律 null(Gate E 絕不冒充人工實測),內容=受控 harness/路由確定層佔比/解析六層分佈三源自動數字;gold_set.csv 在位時 auto 讓位 run;ALL v0111 [2e] 接線 — 產物自此永不缺席。③板四層 QA 套件(qa/board_qa.py+runner.mjs+system.mjs+fixture;動詞 via-boardqa):T1 unit(vm 直呼 esc/arr/fmt/t/gsBuild/pfStrip 7 測)T2 integration(11 頁/流程帶/搜尋/M7/側欄 7 測)T3 system(真瀏覽器 9 測:分頁/搜尋/詳情窗/EN 切換/零 pageerror;playwright 缺=誠實 SKIP)T4 design-sync(純 Python 任何機器可跑)。④U/I sync:設計正本 Veritas WorkOps v2(claude.ai/design)另存檔=既存 hlock 檔,sha16=4cb90a0bd31df637 與板上視覺鎖 v2 封印完全命中 → 歸戶 design/Veritas_WorkOps_v2_hlock.dc.html;抽驗發現正本為 Industry 設計系統(bg #f2f2f3/text #1d1f20/accent #5980a6/Barlow),板已採 accent #5980a6 為錨;T4 依 :root 動態抽 48 token 誠實量對齊:核心角色 4/5(漂移僅 accent-2 #728fab)、字體板未採 Barlow(板現行 JhengHei/DM Mono=既裁定)— 漂移入報告不硬紅;全面換裝=破視覺鎖需操作員明示裁定(報告內建此註記)。QA 過程修三件測試自身缺陷(esc 期望與板契約不符/ESM 不吃 NODE_PATH→PW_MODULE 後備/innerText 對隱藏頁回空→textContent)。終局:T1+2 14/14 · T3 9/9 · T4 7/7 全綠 → out/board_qa_report.json。"
   }
  ]
 }

@@ -1,0 +1,26 @@
+{
+ "record_id": "VIA_R4_BoardQA_DesignSync_Record_v0100",
+ "ts": "2026-08-12T06:30:00",
+ "authority": "操作員令:①via-wf flowsystem 實機爆空命令 ②「自製 缺席 accuracy_report.json」③「unit test integration test system test and build up html css javascript u/i sync with claude.ai/design Veritas WorkOps v2.dc.html」",
+ "fix_flowsystem": "Activate-VIAFlowSystem.ps1 增空值防禦(if -not $Cmd → all)— wrapper 委派空字串不再炸 back-end exit 2",
+ "accuracy_auto": {
+  "engine": "workops_accuracy_benchmark.py v0100→v0101(ENG-030;引擎檔內版遞增慣例)",
+  "verb": "auto — gold_set.csv 缺席時產 kind=auto_baseline 報告;assignment/status accuracy 一律 null(Gate E:絕不以自動指標冒充人工實測);內容=受控 harness verdict+路由 L0-L5 確定層佔比+回覆解析六層/應答域分佈",
+  "all_wiring": "ALL v0111 [2e]:gold 在位→run(kind=gold_measured)· 缺→auto — 產物清單自此永不缺席",
+  "precedence": "auto 在 gold_set.csv 在位時自動讓位 run;人工 Gold Set 永遠是唯一生產準確率權威"
+ },
+ "board_qa_suite": {
+  "files": ["qa/board_qa.py(協調器+T4;py 即跑)", "qa/board_qa_runner.mjs(T1 unit+T2 integration;node vm 零依賴)", "qa/board_qa_system.mjs(T3 真瀏覽器;playwright 缺=誠實 SKIP;PW_MODULE/PW_CHROMIUM 可注入)", "qa/fixture_board_data.json(固定夾具)", "bin/via-boardqa.cmd"],
+  "tiers": {"T1_unit": "esc/arr/fmt/t/gsBuild/pfStrip 7 測", "T2_integration": "11 頁渲染/流程帶 11/11/Σ M7/專案卡/搜尋命中/Esc/側欄 7 測", "T3_system": "分頁×4/搜尋/Enter 詳情窗/EN 切換/零 pageerror 9 測", "T4_design_sync": "封印驗真/板記載/token 抽取/accent 入板/角色對齊度/字體/FlowSystem 同語彙 7 檢"},
+  "final": "T1+2 14/14 · T3 9/9 · T4 7/7 全綠;報告 out/board_qa_report.json"
+ },
+ "design_sync_finding": {
+  "homed": "design/Veritas_WorkOps_v2_hlock.dc.html(claude.ai/design 分享頁之另存正本;既存掃描暫存區)",
+  "seal_verified": "sha16 4cb90a0bd31df637 = 板上視覺鎖 v2 封印 — 完全命中,錨定關係實證",
+  "design_system": "正本為 Industry 設計系統:bg #f2f2f3 · text #1d1f20 · accent #5980a6 · accent-2 #728fab · Barlow/Barlow Condensed · OKLCH 色階(48 tokens)",
+  "board_alignment": "板已採 accent #5980a6 為 v2 鎖實踐錨點;核心角色對齊 4/5(漂移僅 accent-2);字體板維持 JhengHei/DM Mono(既裁定)",
+  "governance_note": "T4 硬 FAIL 只掛封印與 accent;其餘漂移誠實入報告 — 板全面換裝 Industry 色票/Barlow=破既裁定視覺鎖,需操作員明示裁定後另開版(報告 drift_note 內建此提醒)"
+ },
+ "qa_self_fixes": ["esc 測試期望誤含引號逃逸(板契約=& < > 三字元)", "ESM import 不吃 NODE_PATH → PW_MODULE 環境變數後備", "innerText 對非當前分頁回空 → textContent"],
+ "registry": "TOOL-BQA;ledger 153"
+}

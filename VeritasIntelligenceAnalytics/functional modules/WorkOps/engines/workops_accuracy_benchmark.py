@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
-r"""WorkOps Gold Set 準確度基準 v0100(ENG-030)— v0200 RC 驗收 Gate E 補強落地
+r"""WorkOps Gold Set 準確度基準 v0101(ENG-030)— v0200 RC 驗收 Gate E 補強落地
+
+v0101(操作員「自製缺席 accuracy_report.json」令 2026/08/12):新 auto 動詞 —
+  gold_set.csv 缺席時產「自動基準版」accuracy_report.json:kind=auto_baseline,
+  assignment/status accuracy 一律 null(Gate E:絕不以信心分數/自動指標冒充人工實測),
+  內容=可自動實測之三源誠實數字:①受控案例 harness(26+4 全 PASS 即受控正確率 100%)
+  ②歸戶路由分佈(L0-L5 確定層佔比)③回覆解析六層命中/應答域未解析。
+  人工 gold_set.csv 到件 → run 覆蓋為正式版(kind=gold_measured)。
 
 操作員令(2026/08/09 整合補強):RC 驗收清單 Gate E —「以真實授權工作郵件建立人工核對
 Gold Set,跑 workops_accuracy_benchmark;絕不可只憑信心分數宣稱生產準確度」。
@@ -127,6 +134,7 @@ def cmd_run(csvpath):
                                "got": cur_st or "(無判讀)", "layer": lay})
     rep = {
         "ts": datetime.now().isoformat(timespec="seconds"),
+        "kind": "gold_measured",
         "gold_rows": n, "agree_blank": agree,
         "assignment_accuracy": round(wop_ok / wop_n, 4) if wop_n else None,
         "status_accuracy": round(st_ok / st_n, 4) if st_n else None,
@@ -152,11 +160,65 @@ def cmd_run(csvpath):
     return 0
 
 
+def cmd_auto():
+    """v0101 自動基準:gold 缺席時的誠實佔位實測 — 只列可自動量測之數字,絕不冒充人工實測。"""
+    if GOLD_P.exists():
+        print("[讓位] gold_set.csv 在位 — 走正式實測(run);auto 不覆蓋人工權威")
+        return cmd_run("")
+    harness = load_json(OUT / "accuracy_harness_report.json", {})
+    reg = load_json(REG_P, {})
+    rs = load_json(RS_P, {})
+    route = {}
+    for pj in (reg.get("projects") or {}).values():
+        for h in pj.get("history", []):
+            if h.get("action") == "ATTACH":
+                ev = (h.get("value", "").split(" · ", 1) + [""])[1]
+                tok = ev.split(" ")[0] if ev else "?"
+                route[tok] = route.get(tok, 0) + 1
+    n_route = sum(route.values())
+    det = sum(v for k, v in route.items() if k[:2] in ("L0", "L1", "L2", "L3", "L4", "L5"))
+    layers = {}
+    for e in (rs.get("status") or {}).values():
+        layers[e.get("layer", "?")] = layers.get(e.get("layer", "?"), 0) + 1
+    unp = (rs.get("unparsed") or {})
+    rep = {
+        "ts": datetime.now().isoformat(timespec="seconds"),
+        "kind": "auto_baseline",
+        "assignment_accuracy": None,
+        "status_accuracy": None,
+        "auto_baseline": {
+            "harness_controlled": {
+                "verdict": harness.get("verdict", "未跑"),
+                "note": "受控案例實測(26 案例+4 旗標)— 是受控語料正確率,非生產準確率"},
+            "routing": {"total": n_route, "deterministic_L0_L5": det,
+                        "deterministic_share": round(det / n_route, 4) if n_route else None,
+                        "by_layer": dict(sorted(route.items()))},
+            "reply_parse": {"judged_by_layer": layers,
+                            "unparsed_in_scope": unp.get("n"),
+                            "out_of_scope": unp.get("out_of_scope")},
+        },
+        "honest_note": "自動基準版(Gate E 留白):assignment/status accuracy=null — 生產準確率唯一權威仍是人工 Gold Set;"
+                       "本報告只列可自動量測之數字(受控 harness/路由分佈/解析分佈)。gold_set.csv 到件即由 run 覆蓋為 kind=gold_measured。",
+        "next_step": "①accuracy template ②Excel 核對 gold_set_template.csv 另存 gold_set.csv(同意留空)③重跑 all 自動實測",
+    }
+    OUT.mkdir(parents=True, exist_ok=True)
+    REP_P.write_text(json.dumps(rep, ensure_ascii=False, indent=1), encoding="utf-8")
+    print("[自動基準] harness=%s · 路由 %d 串(確定層 %s)· 解析層 %s · 未解析 %s(+域外 %s)" % (
+        rep["auto_baseline"]["harness_controlled"]["verdict"], n_route,
+        ("%.0f%%" % (100 * rep["auto_baseline"]["routing"]["deterministic_share"])) if n_route else "—",
+        sum(layers.values()), unp.get("n", "—"), unp.get("out_of_scope", "—")))
+    print("[誠實] accuracy=null 留白 — 人工 Gold Set 仍為唯一生產準確率權威(Gate E)")
+    print("[報告] → %s(kind=auto_baseline)" % REP_P)
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser(description="Gate E Gold Set 準確度基準(人工標註實測,絕不用信心分數冒充)")
-    ap.add_argument("command", nargs="?", default="template", choices=["template", "run"])
+    ap.add_argument("command", nargs="?", default="template", choices=["template", "run", "auto"])
     ap.add_argument("arg1", nargs="?", default="")
     a = ap.parse_args()
+    if a.command == "auto":
+        return cmd_auto()
     return cmd_template() if a.command == "template" else cmd_run(a.arg1)
 
 

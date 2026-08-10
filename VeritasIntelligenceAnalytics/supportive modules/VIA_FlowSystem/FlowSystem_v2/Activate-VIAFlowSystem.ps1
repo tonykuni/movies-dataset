@@ -15,6 +15,9 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+# v0100R fix: wrapper 委派可能傳入空字串 -Cmd — 空值一律回預設 all(實機 via-wf flowsystem 爆出)
+if (-not $Cmd) { $Cmd = "all" }
+
 $script:Root    = $PSScriptRoot
 $script:Manager = Join-Path $script:Root "engines/flow_manager.py"
 $script:Report  = Join-Path $script:Root "index.html"
