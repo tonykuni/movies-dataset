@@ -37,6 +37,9 @@ VIA_WorkflowEngine.py — 統一工作流引擎（Unified Workflow Engine, all-p
   backends   十庫在位探測報告（installed / fallback）
   demo       執行各典範示範（all | dag | saga | resume | fsm | graph | events |
              crew | decorators | cron | dsl | export）
+  sample     產生範例流程檔（run/export 立即可用）
+  master     執行 VIA Master Engine 參數檔（via_master_params.json 一份 JSON 管全部
+             Python 引擎：stages 順序鏈 + {parser}/{sbom_db} 接線；--dry-run 預覽）
   run        執行 YAML/JSON 工作流檔（--backend auto|native|prefect|...）
   export     將工作流檔轉出（--format dagu|kestra|argo|conductor|airflow|temporal|
              bpmn|reactflow|x6|n8n|mermaid|viewflow）
@@ -62,8 +65,9 @@ USAGE
 """
 from __future__ import annotations
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 __all__ = [
+    "load_master_params", "write_sample_flow",
     "TaskSpec", "TaskResult", "WorkflowSpec", "WorkflowContext", "WorkflowRun",
     "LocalDAGEngine", "RunStore", "StateMachine", "StateGraph", "END",
     "Event", "StartEvent", "StopEvent", "step", "EventWorkflow",
@@ -87,7 +91,7 @@ import traceback
 import uuid
 from collections import OrderedDict, deque
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Type, Union
 
@@ -125,11 +129,13 @@ _DEF_RUN_DIR = Path(os.environ.get("VIA_WFE_RUN_DIR", ".via_runs"))
 
 
 def _utcnow() -> str:
-    return datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+    # timezone-aware(Python 3.12+ 對 utcnow() 已棄用);字串格式維持不變
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
 
 
 def _new_run_id(prefix: str = "run") -> str:
-    return "%s_%s_%s" % (prefix, datetime.utcnow().strftime("%Y%m%d%H%M%S"), uuid.uuid4().hex[:8])
+    return "%s_%s_%s" % (prefix, datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S"),
+                         uuid.uuid4().hex[:8])
 
 
 # ============================================================================
@@ -191,6 +197,7 @@ class TaskSpec:
     compensate: Optional[Callable] = None
     params: Dict[str, Any] = field(default_factory=dict)
     description: str = ""
+    cwd: Optional[str] = None  # command 任務的工作目錄(master 階段用)
 
     def validate(self) -> None:
         if not self.name:
@@ -305,7 +312,7 @@ class WorkflowSpec:
                 "depends_on": list(t.depends_on), "retries": t.retries,
                 "retry_delay": t.retry_delay, "backoff": t.backoff, "timeout": t.timeout,
                 "condition": t.condition if isinstance(t.condition, str) else None,
-                "params": t.params, "description": t.description,
+                "params": t.params, "description": t.description, "cwd": t.cwd,
             } for t in self.tasks.values()],
         }
 
@@ -328,7 +335,7 @@ class WorkflowSpec:
                     timeout=td.get("timeout"),
                     condition=td.get("condition"),
                     params=dict(td.get("params", {})),
-                    description=td.get("description", ""))
+                    description=td.get("description", ""), cwd=td.get("cwd"))
         wf.validate()
         return wf
 
@@ -618,7 +625,7 @@ class LocalDAGEngine:
         import subprocess
         cmd = spec.command.format(**{**ctx.params, **spec.params}) if ("{" in spec.command) else spec.command
         proc = subprocess.run(cmd, shell=True, capture_output=True, text=True,
-                              timeout=spec.timeout)
+                              timeout=spec.timeout, cwd=spec.cwd or None)
         if proc.returncode != 0:
             raise RuntimeError("command exit=%d stderr=%s" % (proc.returncode, proc.stderr.strip()[:400]))
         return {"exit": proc.returncode, "stdout": proc.stdout.strip(), "stderr": proc.stderr.strip()}
@@ -1309,6 +1316,107 @@ def load_workflow_file(path: Union[str, Path],
     if not isinstance(data, dict):
         raise ValueError("工作流定義需為 mapping，得到 %r" % type(data))
     return WorkflowSpec.from_dict(data, fn_registry=fn_registry)
+
+# ============================================================================
+# §10b VIA Master Engine 參數檔（via_master_params.json）→ WorkflowSpec
+#      「一份 JSON 管全部 Python 引擎」— stages 順序鏈 + {parser}/{sbom_db} 接線
+# ============================================================================
+
+def _q(token: str) -> str:
+    """跨平台命令引號（cmd.exe 與 sh 皆收雙引號）。"""
+    if token and not any(c in token for c in ' "\''):
+        return token
+    return '"%s"' % token.replace('"', '\\"')
+
+
+def _default_master_params() -> Path:
+    return (Path(__file__).resolve().parent
+            / "functional modules" / "WorkOps" / "VMT" / "via_master_params.json")
+
+
+def load_master_params(path: Optional[Union[str, Path]] = None,
+                       python_exe: Optional[str] = None
+                       ) -> Tuple[WorkflowSpec, Dict[str, Any]]:
+    """載入 VIA Master Engine 參數檔 → 循序 WorkflowSpec + 解析資訊。
+
+    對應鍵：stages[].{id,enabled,script,args,desc}、paths.{vmt_root,engines_dir,
+    parser,sbom_db}（VMT_ROOT 環境變數覆寫 vmt_root）、run.{stop_on_error,
+    timeout_sec_per_stage}。disabled 階段誠實列於 info["skipped"]。
+    """
+    p = Path(path) if path else _default_master_params()
+    if not p.exists():
+        raise FileNotFoundError("master 參數檔不存在：%s" % p)
+    data = json.loads(p.read_text(encoding="utf-8"))
+    paths = data.get("paths", {})
+    root = Path(os.environ.get("VMT_ROOT") or paths.get("vmt_root") or p.parent)
+    engines_dir = Path(paths.get("engines_dir") or root)
+    if not engines_dir.is_absolute():
+        engines_dir = root / engines_dir
+    tmpl = {"parser": paths.get("parser", ""), "sbom_db": paths.get("sbom_db", "")}
+    py = python_exe or sys.executable
+    run_cfg = data.get("run", {})
+    wf = WorkflowSpec("via_master", description="VIA Master Engine（%s）" % p.name,
+                      max_parallel=1,
+                      on_failure="halt" if run_cfg.get("stop_on_error") else "continue")
+    stages_info: List[Dict[str, Any]] = []
+    skipped: List[str] = []
+    prev: Optional[str] = None
+    for st in data.get("stages", []):
+        sid = st["id"]
+        if not st.get("enabled", True):
+            skipped.append(sid)
+            continue
+        try:
+            args = [str(a).format(**tmpl) for a in st.get("args", [])]
+        except KeyError as e:
+            raise ValueError("stage %r 參數佔位符未知：%s（可用：%s）"
+                             % (sid, e, sorted(tmpl)))
+        script_path = engines_dir / st["script"]
+        cmd = " ".join([_q(py), _q(str(script_path))] + [_q(a) for a in args])
+        wf.task(sid, command=cmd, depends_on=[prev] if prev else [],
+                timeout=run_cfg.get("timeout_sec_per_stage"),
+                description=st.get("desc", ""), cwd=str(engines_dir))
+        stages_info.append({"id": sid, "script": st["script"],
+                            "script_exists": script_path.exists(),
+                            "desc": st.get("desc", ""), "command": cmd})
+        prev = sid
+    wf.validate()
+    info = {"params_file": str(p), "engines_dir": str(engines_dir),
+            "python": py, "skipped": skipped, "stages": stages_info,
+            "stop_on_error": bool(run_cfg.get("stop_on_error")),
+            "timeout_sec_per_stage": run_cfg.get("timeout_sec_per_stage"),
+            "report": data.get("report", {}), "integration": data.get("integration", {})}
+    return wf, info
+
+# ============================================================================
+# §10c 範例流程檔（sample）— 給 run/export 一個立即可用的入門檔
+# ============================================================================
+
+SAMPLE_FLOW: Dict[str, Any] = {
+    "name": "sample_flow",
+    "description": "VIA_WorkflowEngine 範例：prepare →（work_a ∥ work_b）→ finish",
+    "max_parallel": 2,
+    "steps": [
+        {"name": "prepare", "command": "echo prepare-ok"},
+        {"name": "work_a", "command": "echo A", "depends_on": ["prepare"]},
+        {"name": "work_b", "command": "echo B", "depends_on": ["prepare"],
+         "retry": {"limit": 2, "interval": 1}},
+        {"name": "finish", "command": "echo done", "depends_on": ["work_a", "work_b"],
+         "condition": "outputs['work_a']['exit'] == 0"},
+    ],
+}
+
+
+def write_sample_flow(out: Optional[str] = None) -> Path:
+    if _yaml is not None:
+        p = Path(out or "via_sample_flow.yaml")
+        p.write_text(_yaml.safe_dump(SAMPLE_FLOW, allow_unicode=True, sort_keys=False),
+                     encoding="utf-8")
+    else:
+        p = Path(out or "via_sample_flow.json")  # PyYAML 缺席 → JSON 同功能
+        p.write_text(json.dumps(SAMPLE_FLOW, ensure_ascii=False, indent=2),
+                     encoding="utf-8")
+    return p
 
 # ============================================================================
 # §11 匯出器（Exporters）— 產出各引擎「官方原生定義檔」與前端圖形 JSON
@@ -2317,6 +2425,15 @@ def main(argv: Optional[List[str]] = None) -> int:
     d.add_argument("which", nargs="?", default="all",
                    choices=["all"] + list(DEMOS), help="示範名（預設 all）")
 
+    sp = sub.add_parser("sample", help="產生範例流程檔（run/export 立即可用）")
+    sp.add_argument("-o", "--out", default=None, help="輸出檔（預設 via_sample_flow.yaml）")
+
+    ms = sub.add_parser("master", help="執行 VIA Master Engine 參數檔（一份 JSON 管全部引擎）")
+    ms.add_argument("params", nargs="?", default=None,
+                    help="via_master_params.json（預設自動找 WorkOps/VMT 下的正本）")
+    ms.add_argument("--dry-run", action="store_true", help="只列解析後的階段命令，不執行")
+    ms.add_argument("--python", default=None, help="階段用直譯器（預設當前 Python）")
+
     r = sub.add_parser("run", help="執行 YAML/JSON 工作流檔")
     r.add_argument("file")
     r.add_argument("--backend", default="auto",
@@ -2366,9 +2483,49 @@ def main(argv: Optional[List[str]] = None) -> int:
         print("\n全部 %d 個示範完成。" % len(names))
         return 0
 
+    if args.verb == "sample":
+        p = write_sample_flow(args.out)
+        print("已產生範例流程檔：%s" % p)
+        print("  執行：python VIA_WorkflowEngine.py run %s" % p)
+        print("  匯出：python VIA_WorkflowEngine.py export %s --format reactflow" % p)
+        return 0
+
+    if args.verb == "master":
+        try:
+            wf, info = load_master_params(args.params, python_exe=args.python)
+        except (FileNotFoundError, ValueError, json.JSONDecodeError) as e:
+            print("誠實 FAIL：%s" % e, file=sys.stderr)
+            return 1
+        print("VIA Master Engine：%s" % info["params_file"])
+        print("  engines_dir=%s · stop_on_error=%s · timeout/stage=%ss · 停用階段=%s"
+              % (info["engines_dir"], info["stop_on_error"],
+                 info["timeout_sec_per_stage"], info["skipped"] or "無"))
+        for st in info["stages"]:
+            mark = "在位" if st["script_exists"] else "缺席"
+            print("  [%s] %-12s %s — %s" % (mark, st["id"], st["script"], st["desc"]))
+        if args.dry_run:
+            print("（--dry-run：僅預覽，未執行。移除 --dry-run 即循序執行上列階段）")
+            return 0
+        missing = [st["id"] for st in info["stages"] if not st["script_exists"]]
+        if missing:
+            print("誠實 FAIL：階段腳本缺席 %s（engines_dir=%s）"
+                  % (missing, info["engines_dir"]), file=sys.stderr)
+            return 1
+        run = VIAWorkflowEngine().dag.run(wf)
+        print(json.dumps({"status": run.status, "run_id": run.run_id,
+                          "stages": {n: r.status for n, r in run.results.items()}},
+                         ensure_ascii=False, indent=2))
+        return 0 if run.ok else 1
+
     if args.verb == "run":
         eng = VIAWorkflowEngine()
-        wf = load_workflow_file(args.file)
+        try:
+            wf = load_workflow_file(args.file)
+        except (FileNotFoundError, ValueError, RuntimeError) as e:
+            print("誠實 FAIL：%s" % e, file=sys.stderr)
+            print("提示：先執行 `python VIA_WorkflowEngine.py sample` 產生範例流程檔",
+                  file=sys.stderr)
+            return 1
         if args.backend in ("auto", "native") and args.no_persist:
             run = eng.dag.run(wf, _parse_params(args.param), persist=False)
         else:
@@ -2378,12 +2535,22 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     if args.verb == "resume":
         eng = VIAWorkflowEngine()
-        run = eng.resume(args.file, args.run_id)
+        try:
+            run = eng.resume(args.file, args.run_id)
+        except (FileNotFoundError, ValueError, RuntimeError) as e:
+            print("誠實 FAIL：%s" % e, file=sys.stderr)
+            return 1
         print(json.dumps(run.to_dict(), ensure_ascii=False, indent=2))
         return 0 if run.ok else 1
 
     if args.verb == "export":
-        text = Exporters.export(load_workflow_file(args.file), args.format)
+        try:
+            text = Exporters.export(load_workflow_file(args.file), args.format)
+        except (FileNotFoundError, ValueError, RuntimeError) as e:
+            print("誠實 FAIL：%s" % e, file=sys.stderr)
+            print("提示：先執行 `python VIA_WorkflowEngine.py sample` 產生範例流程檔",
+                  file=sys.stderr)
+            return 1
         if args.out:
             Path(args.out).write_text(text, encoding="utf-8")
             print("已寫出 %s（%d bytes）" % (args.out, len(text)))

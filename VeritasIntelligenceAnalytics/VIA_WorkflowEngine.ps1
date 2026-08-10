@@ -8,20 +8,25 @@ VIA_WorkflowEngine.ps1 — Windows 一鍵啟動器（ONE POWERSHELL TO HANDLE AL
   4. 參數原樣透傳引擎全部動詞，外加三個 wrapper 動詞
 
 WRAPPER 動詞
-  doctor   環境診斷（interpreter / 引擎在位 / PyYAML / backends 探測）
-  setup    安裝選配依賴 PyYAML（--user）；十庫安裝指令僅列印、絕不代裝
-  all      backends → selftest 一鍵全驗證
+  doctor     環境診斷（interpreter / 兩引擎在位 / PyYAML / 繪圖庫 / SSOT）
+  setup      安裝選配依賴 PyYAML（--user）；十庫安裝指令僅列印、絕不代裝
+  setup vap  安裝繪圖後端 seaborn+plotly+pandas（--user；您明示才裝）
+  all        backends → 工作流 selftest → VAP 繪圖 selftest 一鍵全驗證
+  vap …      透傳 VAP seaborn+plotly 繪圖引擎（probe|list|spec|render|demo|selftest）
 
 引擎動詞（透傳）
-  backends | demo [all|dag|saga|resume|fsm|graph|events|crew|decorators|cron|dsl|export]
+  backends | demo [...] | sample | master [params.json] [--dry-run]
   run <file> [--backend ...] [--param k=v] | resume <file> <run_id>
   export <file> --format <fmt> [--out 檔案] | scaffold <target> | runs | selftest
 
 USAGE
   .\VIA_WorkflowEngine.ps1 all
-  .\VIA_WorkflowEngine.ps1 demo all
-  .\VIA_WorkflowEngine.ps1 run flow.yaml --backend native
-  .\VIA_WorkflowEngine.ps1 export flow.yaml --format dagu --out flow_dagu.yaml
+  .\VIA_WorkflowEngine.ps1 sample                                    # 先產生範例流程檔
+  .\VIA_WorkflowEngine.ps1 run via_sample_flow.yaml
+  .\VIA_WorkflowEngine.ps1 master --dry-run                          # VMT 九階段預覽
+  .\VIA_WorkflowEngine.ps1 vap probe                                 # 繪圖後端探測
+  .\VIA_WorkflowEngine.ps1 vap demo --out vap_demo                   # 28 圖型全渲染
+  .\VIA_WorkflowEngine.ps1 vap render --chart candle --backend both --out out
   .\VIA_WorkflowEngine.ps1 -Python C:\Python312\python.exe selftest   # 指定直譯器
 
   被 ExecutionPolicy 擋時：
@@ -136,6 +141,26 @@ function Invoke-EngineHost {
     return $LASTEXITCODE
 }
 
+# ── VAP seaborn+plotly 繪圖引擎（新平行引擎線）───────────────────────────
+$VapEngine = Join-Path $PSScriptRoot 'functional modules\VAP\engine\via_autoplot_seaborn_plotly_v0100.py'
+
+function Invoke-VapHost {
+    param([string[]]$A)
+    if (-not (Test-Path -LiteralPath $VapEngine)) {
+        Write-Tag 'FAIL' ('找不到 VAP 繪圖引擎：{0}（git pull 取回分支最新版）' -f $VapEngine)
+        return 1
+    }
+    $full = @($PyPre) + @($VapEngine) + @($A)
+    & $PyExe $full 2>&1 | Out-Host
+    return $LASTEXITCODE
+}
+
+function Test-PyModule {
+    param([string]$ModuleName)
+    & $PyExe (@($PyPre) + @('-c', ('import ' + $ModuleName))) 2>$null | Out-Null
+    return ($LASTEXITCODE -eq 0)
+}
+
 $Verb = ''
 if ($EngineArgs.Count -gt 0) { $Verb = ([string]$EngineArgs[0]).ToLowerInvariant() }
 
@@ -146,15 +171,42 @@ if ($Verb -eq 'doctor') {
     Write-Host '════════════════════════════════════════════════════════'
     Write-Tag 'OK  ' ('Python {0}  （{1} {2}）' -f $Py.Ver, $PyExe, ($PyPre -join ' '))
     Write-Tag 'OK  ' ('引擎  {0}' -f $EnginePath)
-    & $PyExe (@($PyPre) + @('-c', 'import yaml')) 2>$null | Out-Null
-    if ($LASTEXITCODE -eq 0) {
+    if (Test-PyModule 'yaml') {
         Write-Tag 'OK  ' 'PyYAML 在位（YAML DSL 已啟用）'
     } else {
         Write-Tag 'INFO' 'PyYAML 缺席 — JSON DSL 照常全功能；要 YAML 就跑：.\VIA_WorkflowEngine.ps1 setup'
     }
+    if (Test-Path -LiteralPath $VapEngine) {
+        Write-Tag 'OK  ' ('VAP 繪圖引擎  {0}' -f $VapEngine)
+        foreach ($mod in @('seaborn', 'plotly', 'pandas')) {
+            if (Test-PyModule $mod) {
+                Write-Tag 'OK  ' ('繪圖庫 {0} 在位' -f $mod)
+            } else {
+                Write-Tag 'INFO' ('繪圖庫 {0} 缺席 — 安裝：.\VIA_WorkflowEngine.ps1 setup vap' -f $mod)
+            }
+        }
+    } else {
+        Write-Tag 'INFO' 'VAP 繪圖引擎未在位（git pull 取回分支最新版）'
+    }
     Write-Host ''
     $code = Invoke-EngineHost @('backends')
+    if (Test-Path -LiteralPath $VapEngine) {
+        Write-Host ''
+        $null = Invoke-VapHost @('probe')
+    }
     exit $code
+}
+
+if ($Verb -eq 'setup' -and $EngineArgs.Count -ge 2 -and
+    ([string]$EngineArgs[1]).ToLowerInvariant() -eq 'vap') {
+    Write-Host '安裝 VAP 繪圖後端 seaborn + plotly + pandas（--user；您明示才裝）…'
+    & $PyExe (@($PyPre) + @('-m', 'pip', 'install', '--user', 'seaborn', 'plotly', 'pandas')) 2>&1 | Out-Host
+    if ($LASTEXITCODE -eq 0) {
+        Write-Tag 'OK  ' '繪圖後端安裝完成。試試：.\VIA_WorkflowEngine.ps1 vap selftest'
+        exit 0
+    }
+    Write-Tag 'FAIL' ('pip 回傳 exit={0} — 請檢查網路 / pip 環境' -f $LASTEXITCODE)
+    exit 1
 }
 
 if ($Verb -eq 'setup') {
@@ -181,27 +233,46 @@ if ($Verb -eq 'setup') {
 }
 
 if ($Verb -eq 'all') {
-    Write-Host '── [1/2] backends 十庫在位探測 ──────────────────────────'
+    Write-Host '── [1/3] backends 十庫在位探測 ──────────────────────────'
     $c1 = Invoke-EngineHost @('backends')
     Write-Host ''
-    Write-Host '── [2/2] selftest 全功能自我驗證 ────────────────────────'
+    Write-Host '── [2/3] 工作流引擎 selftest ────────────────────────────'
     $c2 = Invoke-EngineHost @('selftest')
     Write-Host ''
-    if (($c1 -eq 0) -and ($c2 -eq 0)) {
+    Write-Host '── [3/3] VAP 繪圖引擎 selftest（seaborn+plotly）─────────'
+    $c3 = 0
+    if (Test-Path -LiteralPath $VapEngine) {
+        if ((Test-PyModule 'seaborn') -or (Test-PyModule 'plotly')) {
+            $c3 = Invoke-VapHost @('selftest')
+        } else {
+            Write-Tag 'SKIP' '繪圖庫全缺席 — 誠實跳過（安裝：.\VIA_WorkflowEngine.ps1 setup vap）'
+        }
+    } else {
+        Write-Tag 'SKIP' 'VAP 繪圖引擎未在位（git pull 取回分支最新版）'
+    }
+    Write-Host ''
+    if (($c1 -eq 0) -and ($c2 -eq 0) -and ($c3 -eq 0)) {
         Write-Tag 'OK  ' 'ALL 綠燈。下一步範例：'
-        Write-Host '        .\VIA_WorkflowEngine.ps1 demo all'
-        Write-Host '        .\VIA_WorkflowEngine.ps1 run flow.yaml'
-        Write-Host '        .\VIA_WorkflowEngine.ps1 export flow.yaml --format reactflow'
+        Write-Host '        .\VIA_WorkflowEngine.ps1 sample                  # 產生範例流程檔'
+        Write-Host '        .\VIA_WorkflowEngine.ps1 run via_sample_flow.yaml'
+        Write-Host '        .\VIA_WorkflowEngine.ps1 master --dry-run        # VMT 九階段預覽'
+        Write-Host '        .\VIA_WorkflowEngine.ps1 vap demo --out vap_demo # 28 圖型全渲染'
         exit 0
     }
-    Write-Tag 'FAIL' ('backends exit={0}, selftest exit={1}' -f $c1, $c2)
-    if ($c2 -ne 0) { exit $c2 } else { exit $c1 }
+    Write-Tag 'FAIL' ('backends={0}, workflow selftest={1}, vap selftest={2}' -f $c1, $c2, $c3)
+    if ($c2 -ne 0) { exit $c2 } elseif ($c3 -ne 0) { exit $c3 } else { exit $c1 }
+}
+
+if ($Verb -eq 'vap') {
+    $rest = @()
+    if ($EngineArgs.Count -gt 1) { $rest = @($EngineArgs[1..($EngineArgs.Count - 1)]) }
+    exit (Invoke-VapHost $rest)
 }
 
 if ($Verb -eq '') {
     Write-Host '════════════════════════════════════════════════════════'
     Write-Host (' VIA_WorkflowEngine 啟動器（Python {0} @ {1}）' -f $Py.Ver, $PyExe)
-    Write-Host ' wrapper 動詞：doctor | setup | all    其餘動詞透傳引擎 ↓'
+    Write-Host ' wrapper 動詞：doctor | setup [vap] | all | vap …    其餘動詞透傳引擎 ↓'
     Write-Host '════════════════════════════════════════════════════════'
     $code = Invoke-EngineHost @()
     exit $code
