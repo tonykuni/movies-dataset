@@ -1355,6 +1355,14 @@
    "component": "reply_parser v0106 口徑正本化 + ml_lab v0101 分母對齊",
    "code": "ENG-029/ENG-055",
    "note": "授權補強 R2(標準授權令仍有效):帳上口徑差(ml suggest 分母 198 ≠ replies KPI 應答域 119)就此消除。①ENG-029 v0106:應答域判定抽為單一事實源 load_scope_context()+in_reply_scope()+build_sent_stage()(bulk 內建樣式常數化 BULK_BUILTIN);cmd_parse 改走同式,行為零變(v0105 ①分母淨化原式)。②ENG-055 v0101:_unparsed_docs 套口徑正本,suggest/cluster 母體只收應答域未解析件,域外/系統信誠實另計顯示於輸出行(口徑=replies KPI)。QA:py_compile 雙綠;accuracy harness 26+4 ALL PASS(-W error 乾淨);selftest 8/8(第 3 段實走新 load_scope_context 路徑);沙箱等價驗證(4 件夾具:RE 未解析→母體、bulk+域外→另計 2、關鍵詞命中→事件)全過。ML 永不直寫狀態不變。"
+  },
+  {
+   "ts": "2026-08-12T00:40:00",
+   "op": "UPGRADE",
+   "category": "引擎",
+   "component": "VAP chartlib v007:DuckDB/Parquet 掛載 + --sql 虛擬表 + 同時間軸堆疊多面板",
+   "code": "ENG-VAP/授權簿末項",
+   "note": "版前 v006→v007(正本不就地修改;via-vap 動態解析自動吃新版)。①.parquet/.duckdb 入 DB_SUFFIXES:duckdb 優先、pandas+pyarrow 後備、皆缺誠實 FAIL+一行安裝(py -m pip install --user duckdb);核心零依賴不變。②--sql:記憶體 duckdb 掛已發現 parquet/csv/tsv 為同名 view、.duckdb ATTACH 檔幹名可跨源 JOIN → 虛擬表 sql_result 直入全部繪圖動詞(--table 未指定自動選)。③--panels=VAP-CH-09 小圖家族新變體 stack1col(SSOT 1.1.4 登錄,不發明新碼):2–6 面板共用 X、各板獨立 Y+headroom+位數一致、每板各自變換、事件帶同步、十字線全高零 JS、X 標籤僅底板。④QA 抓到並修復兩真 bug:DuckDB DDL 預備參數不支援(路徑內嵌+跳脫)、不存在欄位默默畫全空序列(series/stack/panels 三家族補欄位在位+全空誠實閘)。QA:py_compile 綠;--list 双格式發現;三家族+誠實閘七案例全過;Playwright 截圖目檢兩張(3 面板 yoy+bar+bands、跨源 JOIN rebase100)通過;pandas 後備路徑實測(Decimal→float 正規化)。"
   }
  ]
 }

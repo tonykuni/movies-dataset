@@ -4,8 +4,8 @@
   "code": "VIA-SSOT-VAPLIB",
   "seal": "觀 · VIA-SEAL-GUAN",
   "name": "VeritasAutoPlot 圖庫定義 SSOT",
-  "version": "1.1.3",
-  "updated": "2026-08-11",
+  "version": "1.1.4",
+  "updated": "2026-08-12",
   "specRef": "ssot/vap_spec.json",
   "policy": "只增不減 · 每型唯一(同主題去重)· 新增圖型須配 VAP-CH 代碼"
  },
@@ -157,7 +157,16 @@
      "use": "多標的同軸比較",
      "override": {
       "grid": "2x2"
-     }
+     },
+     "variants": [
+      {
+       "id": "stack1col",
+       "zh": "直欄同步堆疊",
+       "en": "Stacked Sync Panels",
+       "since": "chartlib_v007",
+       "rule": "2–6 面板共用 X 縱向堆疊 · 各面板獨立 Y(headroom+位數一致鎖不變)· 每面板可各自套變換 · 事件帶全面板同步(標籤僅首板)· 懸停十字線全高(零 JS)· X 標籤僅底板 · :bar 僅限單序列面板"
+      }
+     ]
     },
     {
      "code": "VAP-CH-10",
@@ -492,7 +501,8 @@
   "FactSet (keyed)",
   "FRED",
   "EPFR",
-  "HKEX 港交所"
+  "HKEX 港交所",
+  "本地 DuckDB / Parquet(chartlib_v007 掛載 · duckdb 優先 pandas 後備 · 在地化零雲端)"
  ],
  "changelog": [
   {
@@ -524,6 +534,11 @@
    "version": "1.1.3",
    "date": "2026-08-11",
    "note": "操作員裁定(看 v005 樣張後):雙軸互比預設=折線 × 低間隙長條(low:因子 0.82 · 邊框 0.8 實線 · 填 0.8)— chartlib_v006 落地,--bar-style 未指定即 low;顯式參數仍可 seamless/tiny;workbench 同步。"
+  },
+  {
+   "version": "1.1.4",
+   "date": "2026-08-12",
+   "note": "授權簿末項落地(chartlib_v007):①DuckDB/Parquet 掛載(.parquet duckdb 優先→pandas+pyarrow 後備→誠實 FAIL+一行安裝;.duckdb 唯讀列全表)②--sql 虛擬表 sql_result(DDL 不吃預備參數→路徑內嵌單引號跳脫;ATTACH 以檔幹命名可 join)③--panels 同時間軸堆疊多面板=VAP-CH-09 新變體 stack1col(不發明新碼)④誠實閘補強:series/stack/panels 欄不存在或全空=FAIL 不默默畫空圖。核心零依賴不變 — 不碰新格式即免第三方庫。"
   }
  ],
  "transforms": {
@@ -573,6 +588,8 @@
     "第 5/6 序列(C4/C5 槽)虛線 6 3"
    ],
    "cap": "同圖 series ≤6;更多依規約摺疊或改 small multiples(VAP-CH-09)"
-  }
+  },
+  "panels": "CLI --panels \"欄1,欄2@變換;欄@變換:bar;...\" → VAP-CH-09 stack1col 變體;欄不存在/全空=誠實 FAIL",
+  "sql": "CLI --sql:duckdb 記憶體庫掛 parquet/csv/tsv 同名 view(.duckdb ATTACH 檔幹名)→ 虛擬表 sql_result;無 duckdb=誠實 FAIL+一行安裝;sqlite/json 不掛(誠實範圍)"
  }
 }

@@ -1,0 +1,37 @@
+{
+ "record_id": "VIA_VAP_DuckDB_Panels_Record_v0100",
+ "ts": "2026-08-12T00:45:00",
+ "authority": "操作員標準授權令(自動補強)+ 授權簿末項「DuckDB/Parquet 掛載 + 同時間軸堆疊多面板」— 操作員「下一步」啟動",
+ "engine": "functional modules/VAP/engine/via_autoplot_engine_chartlib_v007.py(版前 v006→v007;正本不動;bin/via-vap.cmd 動態解析自動吃新版)",
+ "features": [
+  {
+   "name": "Parquet/.duckdb 資料掛載",
+   "detail": "DB_SUFFIXES 增 .parquet/.duckdb。parquet:duckdb 優先(零拷貝掃描)→ pandas+pyarrow 後備 → 皆缺誠實 FAIL+一行安裝。.duckdb:唯讀連線 SHOW TABLES 列全表(表名=檔幹.表)。_native() 正規化 numpy 標量/date/Decimal。核心零依賴不變 — 不碰新格式即完全免第三方庫。"
+  },
+  {
+   "name": "--sql 虛擬表",
+   "detail": "duckdb 記憶體庫將已發現之 parquet/csv/tsv 掛為同名 view(非法字元轉 _),.duckdb ATTACH 檔幹名 → 可跨源 JOIN。查詢結果=虛擬表 sql_result 直入既有全部繪圖動詞;--table 未指定自動選 sql_result。無 duckdb=誠實 FAIL;sqlite/json 不掛(誠實範圍註記);失敗時列可用 view 清單。在地化零雲端。"
+  },
+  {
+   "name": "--panels 同時間軸堆疊多面板",
+   "detail": "VAP-CH-09 小圖家族新變體 stack1col(SSOT 1.1.4 登錄,不發明新碼)。語法 \"欄1,欄2@變換;欄@變換:bar;...\":2–6 面板共用 X 縱向堆疊;各面板獨立 Y 軸(v005 headroom + v004 位數一致鎖全承);每面板各自套 yoy/mom/rebase100/ma:N/ytd;事件帶 --bands 全面板同步(標籤僅首板);懸停十字線全高跨面板(CSS hover 零 JS);X 標籤僅底板;:bar 僅限單序列面板;end-label 防碰撞逐板獨立。"
+  }
+ ],
+ "bugs_found_and_fixed_by_qa": [
+  "DuckDB DDL(CREATE VIEW/ATTACH)不支援預備參數 → 路徑內嵌 + 單引號跳脫;ATTACH 改檔幹命名使跨源 JOIN 可讀",
+  "不存在欄位默默畫出全空序列(v003 起 series/stack 同病)→ _missing_columns 欄位在位檢查 + 全空面板誠實閘,三家族(series/stack/panels)一併補上 FAIL 出口"
+ ],
+ "qa": {
+  "py_compile": "PASS",
+  "discovery": "--list 同時發現 tw_stock_monthly.parquet 與 macro_lake.duckdb(cpi 表)",
+  "panels": "3 面板(close 原值 / close@yoy / volume:bar)+ 事件帶 → 成圖",
+  "sql_join": "parquet × .duckdb 跨源 JOIN → sql_result 36×3 → 2 面板(rebase100 / cpi_yoy)成圖",
+  "sql_pair": "--sql + --left/--right 既有配對動詞直用 sql_result",
+  "honest_gates": "單面板/多序列:bar/欄不存在(panels+series)/SQL 語法錯(列可用 view)六案例全部正確 FAIL rc=2",
+  "pandas_fallback": "封鎖 duckdb import 實測 pandas 路徑:36 列讀出、date→yyyy-MM-dd、Decimal→float",
+  "screenshots": "Playwright 兩張目檢:共用 X 對齊、各板獨立 Y、位數一致、headroom、零軸虛線(yoy 板)、端標、X 標籤僅底板 — 通過"
+ },
+ "ssot": "vap_chartlib.json meta 1.1.3→1.1.4:CH-09 增 variants[stack1col];dataSources 增本地 DuckDB/Parquet 線;transforms 增 panels/sql 規則;changelog 1.1.4。只增不減。",
+ "governance": "視覺鎖(via combo/線粗/透明度/軸距/5 刻度)零觸碰;正本不就地修改;在地化零雲端零 CDN;誠實 FAIL;動態解析鐵律(launcher 免改)。",
+ "backlog_note": "授權簿(自動補強清單)至此全數出清。"
+}
