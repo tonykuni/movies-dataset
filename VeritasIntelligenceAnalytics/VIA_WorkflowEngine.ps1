@@ -8,11 +8,18 @@ VIA_WorkflowEngine.ps1 — Windows 一鍵啟動器（ONE POWERSHELL TO HANDLE AL
   4. 參數原樣透傳引擎全部動詞，外加三個 wrapper 動詞
 
 WRAPPER 動詞
-  doctor     環境診斷（interpreter / 兩引擎在位 / PyYAML / 繪圖庫 / SSOT）
+  doctor     環境診斷（interpreter / 各引擎在位 / PyYAML / 繪圖庫 / SSOT / 模組）
   setup      安裝選配依賴 PyYAML（--user）；十庫安裝指令僅列印、絕不代裝
   setup vap  安裝繪圖後端 seaborn+plotly+pandas（--user；您明示才裝）
+  setup chipwar  安裝 ChipWar/MultiFactor 依賴 duckdb+scipy+scikit-learn+statsmodels
   all        backends → 工作流 selftest → VAP 繪圖 selftest 一鍵全驗證
-  vap …      透傳 VAP seaborn+plotly 繪圖引擎（probe|list|spec|render|demo|selftest）
+  vap …      透傳 VAP seaborn+plotly 繪圖引擎（probe|list|spec|render|demo|selftest|columns）
+  chipwar    跑 ChipWar 13 階段全鏈（籌碼戰五 lane + 報告 + harness + VAP 儀表板；可加 --dry-run）
+  mf         跑 MultiFactor 共振引擎（= multifactor；可加 --dry-run）
+  dashboard  只重生 ChipWar × VAP 儀表板並印 index 路徑
+  flowsystem FlowSystem v2 一鍵（引擎未上傳時誠實回報待傳清單）
+  status     全模組在位/缺席全景
+  everything 一支到底：all + chipwar + mf + status（本 session 全部建設一次驗完）
 
 引擎動詞（透傳）
   backends | demo [...] | sample | master [params.json] [--dry-run]
@@ -155,6 +162,15 @@ function Invoke-EngineHost {
 # ── VAP seaborn+plotly 繪圖引擎（新平行引擎線）───────────────────────────
 $VapEngine = Join-Path $PSScriptRoot 'functional modules\VAP\engine\via_autoplot_seaborn_plotly_v0100.py'
 
+# ── 本 session 各模組定位 ──────────────────────────────────────────────────
+$ChipWarParams = Join-Path $PSScriptRoot 'functional modules\ChipWar\chipwar_params.json'
+$ChipWarDash   = Join-Path $PSScriptRoot 'functional modules\ChipWar\engines\via_chipwar_vap_dashboard.py'
+$ChipWarIndex  = Join-Path $PSScriptRoot 'functional modules\ChipWar\_generated\reports\vap_dashboard\index.html'
+$MFParams      = Join-Path $PSScriptRoot 'functional modules\MultiFactor\mf_params.json'
+$MFManifest    = Join-Path $PSScriptRoot 'functional modules\MultiFactor\engines\VIA_MF_ENGINE_SHA256_MANIFEST_v0100.json'
+$FlowV2Dir     = Join-Path $PSScriptRoot 'supportive modules\VIA_FlowSystem\FlowSystem_v2'
+$FlowV2Launch  = Join-Path $FlowV2Dir 'Activate-VIAFlowSystem.ps1'
+
 function Invoke-VapHost {
     param([string[]]$A)
     if (-not (Test-Path -LiteralPath $VapEngine)) {
@@ -199,6 +215,14 @@ if ($Verb -eq 'doctor') {
     } else {
         Write-Tag 'INFO' 'VAP 繪圖引擎未在位（git pull 取回分支最新版）'
     }
+    foreach ($pair in @(@('ChipWar 13 階段', $ChipWarParams), @('MultiFactor 引擎', $MFParams),
+                        @('FlowSystem v2 啟動器', $FlowV2Launch))) {
+        if (Test-Path -LiteralPath $pair[1]) {
+            Write-Tag 'OK  ' ('{0} 在位' -f $pair[0])
+        } else {
+            Write-Tag 'INFO' ('{0} 缺席（git pull 或待上傳）' -f $pair[0])
+        }
+    }
     Write-Host ''
     $code = Invoke-EngineHost @('backends')
     if (Test-Path -LiteralPath $VapEngine) {
@@ -206,6 +230,18 @@ if ($Verb -eq 'doctor') {
         $null = Invoke-VapHost @('probe')
     }
     exit $code
+}
+
+if ($Verb -eq 'setup' -and $EngineArgs.Count -ge 2 -and
+    ([string]$EngineArgs[1]).ToLowerInvariant() -eq 'chipwar') {
+    Write-Host '安裝 ChipWar/MultiFactor 依賴 duckdb + scipy + scikit-learn + statsmodels（--user）…'
+    & $PyExe (@($PyPre) + @('-m', 'pip', 'install', '--user', 'duckdb', 'scipy', 'scikit-learn', 'statsmodels')) 2>&1 | Out-Host
+    if ($LASTEXITCODE -eq 0) {
+        Write-Tag 'OK  ' '依賴安裝完成。試試：.\VIA_WorkflowEngine.ps1 chipwar --dry-run'
+        exit 0
+    }
+    Write-Tag 'FAIL' ('pip 回傳 exit={0}' -f $LASTEXITCODE)
+    exit 1
 }
 
 if ($Verb -eq 'setup' -and $EngineArgs.Count -ge 2 -and
@@ -280,10 +316,140 @@ if ($Verb -eq 'vap') {
     exit (Invoke-VapHost $rest)
 }
 
+function Get-RestArgs {
+    if ($EngineArgs.Count -gt 1) { return @($EngineArgs[1..($EngineArgs.Count - 1)]) }
+    return @()
+}
+
+if ($Verb -eq 'chipwar') {
+    if (-not (Test-Path -LiteralPath $ChipWarParams)) {
+        Write-Tag 'FAIL' ('找不到 ChipWar 參數檔:{0}（git pull 取回分支最新版）' -f $ChipWarParams)
+        exit 1
+    }
+    exit (Invoke-EngineHost (@('master', $ChipWarParams) + (Get-RestArgs)))
+}
+
+if (($Verb -eq 'mf') -or ($Verb -eq 'multifactor')) {
+    if (-not (Test-Path -LiteralPath $MFParams)) {
+        Write-Tag 'FAIL' ('找不到 MultiFactor 參數檔:{0}（git pull 取回分支最新版）' -f $MFParams)
+        exit 1
+    }
+    exit (Invoke-EngineHost (@('master', $MFParams) + (Get-RestArgs)))
+}
+
+if ($Verb -eq 'dashboard') {
+    if (-not (Test-Path -LiteralPath $ChipWarDash)) {
+        Write-Tag 'FAIL' '找不到 ChipWar 儀表板引擎（git pull 取回分支最新版）'
+        exit 1
+    }
+    & $PyExe (@($PyPre) + @($ChipWarDash)) 2>&1 | Out-Host
+    $code = $LASTEXITCODE
+    if (($code -eq 0) -and (Test-Path -LiteralPath $ChipWarIndex)) {
+        Write-Tag 'OK  ' ('儀表板:{0}' -f $ChipWarIndex)
+    } elseif ($code -ne 0) {
+        Write-Tag 'INFO' '若 staging 缺件,先跑:.\VIA_WorkflowEngine.ps1 chipwar'
+    }
+    exit $code
+}
+
+if ($Verb -eq 'flowsystem') {
+    $engDir = Join-Path $FlowV2Dir 'engines'
+    $n = 0
+    if (Test-Path -LiteralPath $engDir) {
+        $n = @(Get-ChildItem -LiteralPath $engDir -Filter 'flow_*.py' -File -ErrorAction SilentlyContinue).Count
+    }
+    if ($n -lt 5) {
+        Write-Tag 'FAIL' ('FlowSystem v2 引擎未到位（flow_*.py 在位 {0}/16）— README 與啟動器已歸檔,' -f $n)
+        Write-Host '        請把 VIA_FlowSystem (2) 的 engines/config/data 檔案上傳(拖檔案或整包 zip),'
+        Write-Host '        到位後本動詞會自動委派 Activate-VIAFlowSystem.ps1 跑 synth→calibrate→run→ui。'
+        exit 1
+    }
+    Write-Tag 'OK  ' ('flow_*.py 在位 {0} 支 — 委派 Activate-VIAFlowSystem.ps1' -f $n)
+    & $FlowV2Launch @(Get-RestArgs)
+    exit $LASTEXITCODE
+}
+
+if ($Verb -eq 'status') {
+    Write-Host '════════════════════════════════════════════════════════'
+    Write-Host ' VIA 全模組在位/缺席全景（本 session 建設）'
+    Write-Host '════════════════════════════════════════════════════════'
+    $rows = @(
+        @{ n = '工作流引擎 VIA_WorkflowEngine.py';  p = $EnginePath },
+        @{ n = 'VAP seaborn+plotly 引擎(28型)';    p = $VapEngine },
+        @{ n = 'ChipWar 13 階段參數檔';            p = $ChipWarParams },
+        @{ n = 'ChipWar × VAP 儀表板引擎';         p = $ChipWarDash },
+        @{ n = 'ChipWar 儀表板產物 index';         p = $ChipWarIndex },
+        @{ n = 'MultiFactor 參數檔';               p = $MFParams },
+        @{ n = 'MultiFactor SHA256 manifest';      p = $MFManifest },
+        @{ n = 'FlowSystem v2 啟動器';             p = $FlowV2Launch }
+    )
+    foreach ($r in $rows) {
+        $mark = if (Test-Path -LiteralPath $r.p) { '在位' } else { '缺席' }
+        Write-Host ('  [{0}] {1}' -f $mark, $r.n)
+    }
+    $engDir = Join-Path $FlowV2Dir 'engines'
+    $n = 0
+    if (Test-Path -LiteralPath $engDir) {
+        $n = @(Get-ChildItem -LiteralPath $engDir -Filter 'flow_*.py' -File -ErrorAction SilentlyContinue).Count
+    }
+    Write-Host ('  [{0}] FlowSystem v2 引擎 flow_*.py（{1}/16;缺=待上傳）' -f ($(if ($n -ge 16) { '在位' } else { '缺席' })), $n)
+    foreach ($mod in @('yaml', 'seaborn', 'plotly', 'duckdb', 'scipy', 'sklearn')) {
+        $mark = if (Test-PyModule $mod) { '在位' } else { '缺席' }
+        Write-Host ('  [{0}] python 依賴 {1}' -f $mark, $mod)
+    }
+    exit 0
+}
+
+if ($Verb -eq 'everything') {
+    Write-Host '━━ EVERYTHING:本 session 全部建設一支到底 ━━━━━━━━━━━━'
+    $steps = @()
+    Write-Host '── [1/5] backends 十庫探測 ──'
+    $steps += @{ n = 'backends'; c = (Invoke-EngineHost @('backends')) }
+    Write-Host '── [2/5] 工作流 selftest ──'
+    $steps += @{ n = 'workflow selftest'; c = (Invoke-EngineHost @('selftest')) }
+    Write-Host '── [3/5] VAP 繪圖 selftest ──'
+    if ((Test-Path -LiteralPath $VapEngine) -and ((Test-PyModule 'seaborn') -or (Test-PyModule 'plotly'))) {
+        $steps += @{ n = 'vap selftest'; c = (Invoke-VapHost @('selftest')) }
+    } else {
+        Write-Tag 'SKIP' 'VAP 引擎或繪圖庫缺席'
+        $steps += @{ n = 'vap selftest'; c = -1 }
+    }
+    Write-Host '── [4/5] ChipWar 13 階段全鏈 ──'
+    if ((Test-Path -LiteralPath $ChipWarParams) -and (Test-PyModule 'duckdb')) {
+        $steps += @{ n = 'chipwar chain'; c = (Invoke-EngineHost @('master', $ChipWarParams)) }
+    } else {
+        Write-Tag 'SKIP' 'ChipWar 參數檔或 duckdb 缺席（setup chipwar 可裝依賴）'
+        $steps += @{ n = 'chipwar chain'; c = -1 }
+    }
+    Write-Host '── [5/5] MultiFactor 引擎 ──'
+    if ((Test-Path -LiteralPath $MFParams) -and (Test-PyModule 'scipy')) {
+        $steps += @{ n = 'multifactor'; c = (Invoke-EngineHost @('master', $MFParams)) }
+    } else {
+        Write-Tag 'SKIP' 'MultiFactor 參數檔或 scipy 缺席'
+        $steps += @{ n = 'multifactor'; c = -1 }
+    }
+    Write-Host ''
+    Write-Host '━━ EVERYTHING 總結 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
+    $bad = 0
+    foreach ($s in $steps) {
+        $mark = if ($s.c -eq 0) { 'PASS' } elseif ($s.c -eq -1) { 'SKIP' } else { $bad++; 'FAIL' }
+        Write-Host ('  [{0}] {1}' -f $mark, $s.n)
+    }
+    if (Test-Path -LiteralPath $ChipWarIndex) {
+        Write-Host ('  儀表板:{0}' -f $ChipWarIndex)
+    }
+    if ($bad -eq 0) {
+        Write-Tag 'OK  ' 'EVERYTHING 綠燈(SKIP 為誠實缺席,非失敗)'
+        exit 0
+    }
+    Write-Tag 'FAIL' ('{0} 步失敗' -f $bad)
+    exit 1
+}
+
 if ($Verb -eq '') {
     Write-Host '════════════════════════════════════════════════════════'
     Write-Host (' VIA_WorkflowEngine 啟動器（Python {0} @ {1}）' -f $Py.Ver, $PyExe)
-    Write-Host ' wrapper 動詞：doctor | setup [vap] | all | vap …    其餘動詞透傳引擎 ↓'
+    Write-Host ' wrapper：doctor|setup [vap|chipwar]|all|vap …|chipwar|mf|dashboard|flowsystem|status|everything'
     Write-Host '════════════════════════════════════════════════════════'
     $code = Invoke-EngineHost @()
     exit $code
