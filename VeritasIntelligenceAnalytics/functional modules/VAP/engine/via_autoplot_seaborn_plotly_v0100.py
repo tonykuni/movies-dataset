@@ -2324,7 +2324,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     r.add_argument("--file", help="表格資料檔(.csv/.tsv/.json/.sqlite)— 真實資料接入")
     r.add_argument("--table", help="SQLite 資料表名(多表時必填)")
     r.add_argument("--x", help="X 欄名(日期/標籤/類別)")
-    r.add_argument("--y", help="數值欄名,逗號分隔依圖型欄位序對位(見 list 動詞 fields)")
+    r.add_argument("--y", nargs="+", help="數值欄名(依圖型欄位序對位;逗號或空格分隔皆可 — "
+                                          "PowerShell 會把未加引號的逗號拆成多參數,本引擎兩者都收)")
     r.add_argument("--group", help="長格式分組欄(配 --y 單一數值欄;群組圖用)")
     r.add_argument("--map", dest="map_pairs", action="append", default=[],
                    help="逐欄指定 field=欄名(可多次;優先於 --x/--y)")
@@ -2413,8 +2414,9 @@ def main(argv: Optional[List[str]] = None) -> int:
                     k, v = pair.split("=", 1)
                     mapping[k.strip()] = v.strip()
                 cols = load_table(args.file, table=args.table, limit=args.limit)
-                data = build_chart_data(meta["id"], cols, x=args.x,
-                                        ys=[s.strip() for s in args.y.split(",")] if args.y else None,
+                ys = [t.strip() for tok in (args.y or [])
+                      for t in str(tok).split(",") if t.strip()]
+                data = build_chart_data(meta["id"], cols, x=args.x, ys=ys or None,
                                         group=args.group, mapping=mapping)
             elif args.data:
                 data = json.loads(Path(args.data).read_text(encoding="utf-8"))
