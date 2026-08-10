@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-r"""WorkOps ML 實驗室 v0100(ENG-055)— 操作員 apply ML/DL top10 local free libs 令
+r"""WorkOps ML 實驗室 v0101(ENG-055)— 操作員 apply ML/DL top10 local free libs 令
+
+v0101(授權補強 R2:分母口徑對齊):suggest/cluster 母體改用解析器 v0106
+  口徑正本(load_scope_context + in_reply_scope)— 只收應答域未解析件,
+  bulk/域外通知誠實另計不入母體;與 replies KPI 分母永遠同式同數。
 
 定位:V/T/K/A/Q/E 六層誠實解析「之後、之外」的機器學習建議層 —
 ML 永不直寫狀態;所有產出=人工圈選候選。解析器本體零改動。
@@ -95,7 +99,7 @@ def cmd_probe():
             print(" [%s] %-2s %-22s %s" % ("在位" if ok else "缺席", group, n, ver))
     n_ok = sum(1 for r in rows if r["present"])
     OUT.mkdir(parents=True, exist_ok=True)
-    PROBE_P.write_text(json.dumps({"version": "v0100", "engine_id": "ENG-055", "ts": now(),
+    PROBE_P.write_text(json.dumps({"version": "v0101", "engine_id": "ENG-055", "ts": now(),
                                    "present": n_ok, "total": len(rows), "libs": rows},
                                   ensure_ascii=False, indent=1), encoding="utf-8")
     print("========== 探測:%d/%d 在位(對照 docs/ML_DL_2026_Top10_Local_Free.md)==========" % (n_ok, len(rows)))
@@ -199,7 +203,7 @@ def cmd_train():
         pickle.dump({"pipe": pipe, "classes": sorted(cnt), "ts": now(),
                      "n": len(docs), "sources": srcs}, f)
     (MLDIR / "reply_model_meta.json").write_text(json.dumps(
-        {"version": "v0100", "engine_id": "ENG-055", "ts": now(), "n_docs": len(docs),
+        {"version": "v0101", "engine_id": "ENG-055", "ts": now(), "n_docs": len(docs),
          "classes": {k2: v for k2, v in cnt.items()}, "sources": srcs, "cv": cv_line,
          "governance": "詞庫泛化模型 — 建議層專用,永不直寫狀態"},
         ensure_ascii=False, indent=1), encoding="utf-8")
@@ -209,14 +213,17 @@ def cmd_train():
 
 
 def _unparsed_docs():
-    """與解析器同源取未解析件:mails.csv × scanrange body;parse_one=None 者。"""
+    """與解析器同源取未解析件:mails.csv × scanrange body;parse_one=None 者。
+    v0101:套解析器 v0106 應答域口徑正本 — 回傳 (應答域未解析件, 域外另計數)。"""
     from workops_reply_parser import (load_params, load_scan_index, parse_one, read_csv,
-                                      load_corpus_bodies, body_for)
+                                      load_corpus_bodies, body_for,
+                                      load_scope_context, in_reply_scope)
     mails = read_csv(OUT / "mails.csv")
-    bodies, _ = load_scan_index()
+    bodies, outbound = load_scan_index()
     corpus = load_corpus_bodies()
+    conv2thr, sent_stage, bulk_pats = load_scope_context(outbound=outbound)
     params = load_params()
-    items = []
+    items, n_out = [], 0
     for r in mails:
         if (r.get("Direction") or "").upper() not in ("", "INBOUND"):
             continue
@@ -225,10 +232,13 @@ def _unparsed_docs():
             continue
         b = body_for(bodies, corpus, conv, r.get("Subject"))
         if parse_one(r, b, params) is None:
+            if not in_reply_scope(r, conv2thr, sent_stage, bulk_pats):
+                n_out += 1
+                continue
             items.append({"conv": conv, "subj": (r.get("Subject") or "").strip(),
                           "from": (r.get("SenderEmail") or "").strip(),
                           "text": ((r.get("Subject") or "") + "\n" + b).strip()})
-    return items
+    return items, n_out
 
 
 def cmd_suggest():
@@ -241,9 +251,9 @@ def cmd_suggest():
     with io.open(MODEL_P, "rb") as f:
         M = pickle.load(f)
     pipe = M["pipe"]
-    items = _unparsed_docs()
+    items, n_out = _unparsed_docs()
     if not items:
-        print("[空] 無未解析件(或 out\\mails.csv 不在位)— 先跑 via-workops all")
+        print("[空] 應答域無未解析件(域外另計 %d;或 out\\mails.csv 不在位)— 先跑 via-workops all" % n_out)
         return 0
     proba = pipe.predict_proba([x["text"] for x in items])
     classes = list(pipe.classes_)
@@ -259,8 +269,8 @@ def cmd_suggest():
         w = csv.DictWriter(f, fieldnames=["ThrConv", "Subject", "Sender", "ML候選狀態", "機率", "採納(Y/留空)"])
         w.writeheader()
         w.writerows(rows)
-    print("[建議] 未解析 %d 件 → ML 候選 %d 件(機率 ≥ %.2f 才列;絕不直寫狀態)"
-          % (len(items), len(rows), th))
+    print("[建議] 應答域未解析 %d 件(域外/系統信 %d 不入母體;口徑=replies KPI)→ ML 候選 %d 件(機率 ≥ %.2f 才列;絕不直寫狀態)"
+          % (len(items), n_out, len(rows), th))
     if items and not rows:
         mx = max(max(pr) for pr in proba)
         print("[誠實] 全數未達門檻(本輪最高機率 %.2f)— 模型會隨事實流/Gold Set 標註長大;門檻在 config\\ml_params.json" % mx)
@@ -274,9 +284,10 @@ def cmd_cluster():
     from sklearn.cluster import KMeans
     from sklearn.feature_extraction.text import TfidfVectorizer
     c = cfg()
-    items = _unparsed_docs()
+    items, n_out = _unparsed_docs()
     if len(items) < int(c["cluster_min_docs"]):
-        print("[空] 未解析僅 %d 件(< %d)— 樣本不足不硬聚類" % (len(items), c["cluster_min_docs"]))
+        print("[空] 應答域未解析僅 %d 件(< %d;域外另計 %d)— 樣本不足不硬聚類"
+              % (len(items), c["cluster_min_docs"], n_out))
         return 0
     ng = tuple(int(x) for x in c["char_ngram"])
     vec = TfidfVectorizer(analyzer="char_wb", ngram_range=(max(2, ng[0]), max(3, ng[1])), min_df=2)
@@ -297,7 +308,7 @@ def cmd_cluster():
         w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
         w.writeheader()
         w.writerows(rows)
-    print("[聚類] 未解析 %d 件 → %d 群 → %s" % (len(items), k, LEXREV_P))
+    print("[聚類] 應答域未解析 %d 件(域外 %d 不入母體)→ %d 群 → %s" % (len(items), n_out, k, LEXREV_P))
     print("[下一步] Excel 填「建議狀態」欄(已完成/進行中/卡關/需要協助/對方提問)→ via-workops ml adopt")
     return 0
 

@@ -1,0 +1,28 @@
+{
+ "record_id": "VIA_Reinforcement_R2_Scope_Alignment_Record_v0100",
+ "ts": "2026-08-11T23:59:00",
+ "authority": "操作員標準授權令「可以授權你自動補強安裝導入工囊直到這幾個子系統非常完善」(仍有效)— 自主補強第二輪",
+ "problem": "帳上已記口徑差:ml suggest 母體(198)未套 v0105 應答域過濾,與 replies KPI(未解析 119 應答域 + 79 域外)分母不一致 — 同一「未解析」兩個數字,操作員讀數易混淆。",
+ "changes": [
+  {
+   "file": "functional modules/WorkOps/engines/workops_reply_parser.py",
+   "version": "v0105 → v0106",
+   "engine_id": "ENG-029",
+   "what": "應答域判定抽為單一事實源:load_scope_context(outbound=None) 回傳 (conv2thr, sent_stage, bulk_pats);in_reply_scope(row, ...) 與 v0105 ①分母淨化同式;build_sent_stage() 抽出已發段留痕;BULK_BUILTIN 常數化。cmd_parse 改走同式 — 行為零變,reply_status.json version 升 v0106(schema 不變)。"
+  },
+  {
+   "file": "functional modules/WorkOps/engines/workops_ml_lab.py",
+   "version": "v0100 → v0101",
+   "engine_id": "ENG-055",
+   "what": "_unparsed_docs() 套解析器口徑正本,回傳 (應答域未解析件, 域外另計數);suggest/cluster 母體只收應答域,輸出行誠實列域外數並標註「口徑=replies KPI」。ML 永不直寫狀態不變;probe/model meta version 字串同步 v0101(版前令含執行期版字教訓)。"
+  }
+ ],
+ "qa": {
+  "py_compile": "PASS(兩引擎)",
+  "accuracy_harness": "ALL PASS(26 案例 + 4 旗標;-W error 乾淨)",
+  "selftest": "8/8 段 PASS(第 3 段回覆解析實走新 load_scope_context 路徑)",
+  "sandbox_equivalence": "4 件夾具:RE 前綴未解析→母體 1、bulk(noreply)+域外通知→另計 2、關鍵詞命中→事件不入母體;in_reply_scope 正反例 assert 全過"
+ },
+ "expected_live_effect": "操作員實機 via-workops ml suggest / ml cluster 母體將由 198 收斂至與 replies 同口徑(上輪實測 119 應答域),輸出行顯示域外另計數 — 兩處讀數自此同式同數。",
+ "governance": "只增不減;版本前行(引擎檔內版遞增為本檔慣例);誠實分母;ML 建議層永不直寫狀態;零 Outlook 觸碰。"
+}

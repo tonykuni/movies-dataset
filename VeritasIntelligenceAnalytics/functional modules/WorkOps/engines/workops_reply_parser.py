@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
-r"""WorkOps 回覆解析引擎 v0105(ENG-029)— 規劃書 M3:回信 → 三層 fallback 解析 → 狀態事件
+r"""WorkOps 回覆解析引擎 v0106(ENG-029)— 規劃書 M3:回信 → 三層 fallback 解析 → 狀態事件
+
+v0106(授權補強 R2:口徑正本化):應答域判定抽為單一事實源 —
+  load_scope_context()(conv→THR 映射、已發段留痕、bulk 樣式)+ in_reply_scope()
+  (與 v0105 ①分母淨化同式)。cmd_parse 與 ENG-055 ml_lab 共用同一判定,
+  replies KPI 與 ml suggest/cluster 分母永遠一致(帳上口徑差 198≠119 就此消除)。
 
 v0105(操作員授權補強令:三方法齊上):
   ①分母淨化 — 未解析只計「應答域」(RE/回覆前綴、已映射 THR、或我方已發追蹤之串;
@@ -58,7 +63,7 @@ try:
 except Exception:
     pass
 
-from workops_lexicon import norm_subj  # noqa: E402(共用詞彙正本)
+from workops_lexicon import norm_subj, load_bulk_patterns, is_bulk  # noqa: E402(共用詞彙正本)
 
 HERE     = Path(__file__).resolve().parent
 WORKOPS  = HERE.parent
@@ -260,26 +265,11 @@ def load_seen():
     return seen
 
 
-def cmd_parse():
-    mails = read_csv(MAILS_P)
-    if not mails:
-        print("[FAIL] out\\mails.csv 不在位 — 先跑 via-workops(板掃描)")
-        return 1
-    led = load_json(LEDGER_P, {"map": {}})
-    conv2thr = {k[4:]: v for k, v in led.get("map", {}).items() if k.startswith("THR|")}
-    bodies, outbound = load_scan_index()
-    corpus = load_corpus_bodies()
-    from workops_lexicon import load_bulk_patterns, is_bulk
-    bulk_pats = load_bulk_patterns() + ["no-reply", "noreply", "donotreply", "newsletter", "epaper"]
-    params = load_params()
-    seen = load_seen()
-    from datetime import datetime
-    now = datetime.now().isoformat(timespec="seconds")
-    counts = {"V": 0, "T": 0, "K": 0, "A": 0, "Q": 0, "E": 0}
-    n_un = n_dup = n_out = 0
-    un_sample = []
-    events = []
-    flags = {}
+BULK_BUILTIN = ["no-reply", "noreply", "donotreply", "newsletter", "epaper"]
+
+
+def build_sent_stage(outbound, conv2thr):
+    """已發段留痕:OUTBOUND 主旨段前綴 → {thr: {stage, date}}(同串取最高段)。"""
     sent_stage = {}
     for conv, title, tm in outbound:
         for pfx, stg in STAGE_PREFIX:
@@ -289,6 +279,47 @@ def cmd_parse():
                 if cur is None or STAGE_RANK[stg] > STAGE_RANK[cur["stage"]]:
                     sent_stage[thr0] = {"stage": stg, "date": tm}
                 break
+    return sent_stage
+
+
+def load_scope_context(outbound=None):
+    """v0106 應答域口徑正本 — cmd_parse 與 ENG-055 ml_lab 共用同一判定基礎。
+    回傳 (conv2thr, sent_stage, bulk_pats);outbound 可注入避免重掃索引。"""
+    led = load_json(LEDGER_P, {"map": {}})
+    conv2thr = {k[4:]: v for k, v in led.get("map", {}).items() if k.startswith("THR|")}
+    if outbound is None:
+        _, outbound = load_scan_index()
+    return conv2thr, build_sent_stage(outbound, conv2thr), load_bulk_patterns() + BULK_BUILTIN
+
+
+def in_reply_scope(row, conv2thr, sent_stage, bulk_pats):
+    """應答域判定(v0105 ①分母淨化同式):bulk/系統寄件者=域外;
+    RE 前綴、已映射 THR、或我方已發追蹤之串=應答域。"""
+    if is_bulk(row.get("SenderEmail"), bulk_pats):
+        return False
+    conv = (row.get("ConversationID") or "").strip()
+    thr0 = conv2thr.get(conv, "") or conv
+    return (bool(REPLY_PFX_RE.match(row.get("Subject") or ""))
+            or conv in conv2thr or thr0 in sent_stage)
+
+
+def cmd_parse():
+    mails = read_csv(MAILS_P)
+    if not mails:
+        print("[FAIL] out\\mails.csv 不在位 — 先跑 via-workops(板掃描)")
+        return 1
+    bodies, outbound = load_scan_index()
+    corpus = load_corpus_bodies()
+    conv2thr, sent_stage, bulk_pats = load_scope_context(outbound=outbound)
+    params = load_params()
+    seen = load_seen()
+    from datetime import datetime
+    now = datetime.now().isoformat(timespec="seconds")
+    counts = {"V": 0, "T": 0, "K": 0, "A": 0, "Q": 0, "E": 0}
+    n_un = n_dup = n_out = 0
+    un_sample = []
+    events = []
+    flags = {}
     for r in mails:
         if (r.get("Direction") or "").upper() not in ("", "INBOUND"):
             continue
@@ -313,10 +344,8 @@ def cmd_parse():
                 fl["risk_terms"] = sorted(set(fl.get("risk_terms", []) + risks))
         got = parse_one(r, b, params)
         if got is None:
-            # v0105 ①分母淨化:未解析只計應答域(RE 前綴/已映射 THR/我方已發追蹤);bulk 與域外通知另計
-            in_scope = (bool(REPLY_PFX_RE.match(r.get("Subject") or ""))
-                        or conv in conv2thr or thr0 in sent_stage)
-            if is_bulk(r.get("SenderEmail"), bulk_pats) or not in_scope:
+            # ①分母淨化:未解析只計應答域;v0106 起判定抽為 in_reply_scope,與 ml_lab 共用同式
+            if not in_reply_scope(r, conv2thr, sent_stage, bulk_pats):
                 n_out += 1
                 continue
             n_un += 1
@@ -355,7 +384,7 @@ def cmd_parse():
                 status[t] = {"status": e["status"], "layer": e["layer"],
                              "mail_date": e.get("mail_date", ""), "evidence": e.get("evidence", "")}
     tmp = STATUS_P.with_suffix(".tmp")
-    tmp.write_text(json.dumps({"version": "v0105", "updated": now, "status": status,
+    tmp.write_text(json.dumps({"version": "v0106", "updated": now, "status": status,
                                "flags": flags, "sent_stage": sent_stage,
                                "unparsed": {"n": n_un, "sample": un_sample, "out_of_scope": n_out}},
                               ensure_ascii=False, indent=1), encoding="utf-8")
