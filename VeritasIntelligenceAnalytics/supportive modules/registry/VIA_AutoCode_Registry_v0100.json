@@ -2037,6 +2037,14 @@
    "code": "RESCUE-V0101+DOCX-V0101",
    "component": "救援引擎 PaddleOCR 3.x 自適應 v0101 + DOCX 引擎 10 地雷硬化 v0101(雙版本前進)",
    "note": "①救援 v0101(操作員機實爆:paddleocr 3.x 拒 show_log/棄 use_angle_cls):建構參數四梯嘗試(use_textline_orientation→use_angle_cls+show_log→use_angle_cls→lang)+辨識雙路(3.x predict rec_texts/rec_scores→2.x ocr item[1]);mock 兩型 API 單元注入驗證雙路皆過。②DOCX v0101 依貼文 10 地雷令逐一落防:E1 zip 簽章預檢(OLE2/.doc、PDF 偽裝誠實判)/E2 extract_image=False/E3 表頭 fillna+後綴去重/E4 巢狀 cell 遞迴攤平/E5 排版表閥值 SKIP_LAYOUT/E6 vMerge 原生/E7 NFKC+零寬字元拔除/E8 表頭 Jaccard≥0.5 配對防錯位/E9 主鍵自動偵測 join_columns/E10 千分位+to_numeric 統一(pandas 3.x 無 errors=ignore→coerce 無新 NaN 才採,實爆修正)。硬化煙測:OLE2 偽裝抓到/表頭 金額→金額_2/零寬字元正規後 0 差異/主鍵鎖定 項次/1,000≡1000 且僅 2000→2500 一列報異。附:操作員 via-docx 實跑 4 件華南 Memo 全 OK(docx2python 引擎,16-46 段落,無表格屬實)。"
+  },
+  {
+   "ts": "2026-08-14T08:30:00",
+   "op": "ADJUDICATE",
+   "category": "整合去重",
+   "code": "VRN-TREE-XCHECK/90",
+   "component": "Downloads 端 VRN 樹 90 件清單對帳(逐名 vs 倉庫全庫)",
+   "note": "操作員貼 Downloads\\VeritasIntelligenceAnalytics\\functional modules\\VRN 全清單(無文字=對帳令)。判定:①VRN 在庫 64 件(含 SSOT v1/v2 全套、三 freeze.lock ps1、Lane2/3 含 UserTest 雙版、VIS_VRN 工具、MDL140-143/073/188/190/192/193 模組 JSON/ps1、Invoke-VRN.ps1、Subsystem_Manifest;MDL004_v1/MDL005_v1 在 _superseded/20260804 原件區)。②_sha 鏡像副本 17 件:正本同名全在庫——上傳非必要(僅 hash 存證選項)。③實質缺席正本僅 2 件:VRN README.md + VRN config.template.json(VEF 規範件,與 VAP 家族同構;Downloads 有原件→候上傳,不代造)。④pip 內部雜件 7 件(table/reporter(s)/wheel_editable/metadata_editable/editable_legacy/installation_report .py)=pip 安裝器檔案誤置於 VRN 資料夾,非 VRN 資產——建議 Downloads 端自行清理,不入庫。附:操作員中途重貼之 rescue 爆錯為 v0100 舊版(v0101 修正已推未拉)。"
   }
  ]
 }
