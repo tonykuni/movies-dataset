@@ -35,9 +35,15 @@ def run():
         try:
             r = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
             ok = r.returncode == 0
-            tail = (r.stdout or r.stderr).strip().splitlines()[-1:] or [""]
+            out_txt = (r.stdout or r.stderr).strip()
+            tail = out_txt.splitlines()[-1:] or [""]
             print("  [%s] %s rc=%d · %s" % ("OK  " if ok else ("FAIL" if hard else "WARN"),
                                             name, r.returncode, tail[0][:90]))
+            if not ok:
+                # v0101R:紅站列明細行(遠端診斷可讀,不再只有尾行)
+                for ln in out_txt.splitlines():
+                    if "FAIL" in ln or "✗" in ln:
+                        print("      ↳ %s" % ln.strip()[:100])
             if not ok and hard:
                 n_fail += 1
         except Exception as e:

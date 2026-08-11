@@ -246,7 +246,9 @@
   "引擎|VDF_MDL002_YFinanceFetchingEngine_原始正本": "ENG-070",
   "引擎|VDF_MDL007_SSOTResolver_原始正本": "ENG-071",
   "引擎|VDF_MDL104_RegistryLoader_原始正本": "ENG-072",
-  "引擎|VDF_MDL105_CrossValidator_原始正本": "ENG-073"
+  "引擎|VDF_MDL105_CrossValidator_原始正本": "ENG-073",
+  "引擎|VDF_MDL201_GenerateFullRegistry_原始正本": "ENG-074",
+  "引擎|VDF_MDL303_RegistryActivation_原始正本": "ENG-075"
  },
  "ledger": [
   {
@@ -1566,6 +1568,14 @@
    "component": "VDF 四支 .py 原始正本歸位(MDL002/007/104/105)+ 位元組碼對帳完美吻合 + 跨代相容實證",
    "code": "ENG-070..073/VIA-DEDUP-20260812H",
    "note": "五件上傳(MDL104 兩份 5b61190f 全同去重)。①對帳:四支檔案大小與 _bytecode_originals pyc header source_size 逐位元組吻合(85299/54262/18249/19486)=位元組碼之原始碼本尊確證。②歸戶 functional modules/VDF/ 為正典;MDL002:67/MDL007:77 硬編碼 OneDrive BASE_DIR 上歸檔可攜補丁(工作站正本路徑優先,缺席退本地 db;內容零改,比照 FOMO canon+路徑補丁先例)。③實測:compile 4/4;MDL007 TickerResolver SSOT 解析 5/5(raw/.TWO/TT/0050 拒斥/canonical);MDL104 最小 registry 載入+dry-run 派發 3/3 ok;MDL105 交叉驗證 GREEN/RED 紅綠燈正確+四格式落檔 — 且落檔經本波重建 MDL101 完成=原始件×重建庫跨代相容實證;MDL002 import OK 三類面在位(實抓需網路+yfinance,誠實不跑)。④回歸:MDL301/302 皆 exit 0。⑤新候上傳:VDF_MDL403_RegistryFull.json+MDL402 sample(MDL104/105 預設所需;schema v1 在庫惟名稱差 _v1 後綴)。母頁 VDF 證據行更新;PKG-012 指針重生。」"
+  },
+  {
+   "ts": "2026-08-12T23:30:00",
+   "op": "DEDUP",
+   "category": "歸戶",
+   "component": "五件裁定+VDF registry 激活鏈落地全綠+MDL002 實機真資料確認",
+   "code": "ENG-074/075/VIA-DEDUP-20260812I",
+   "note": "①五件裁定全 SUPERSEDED:VDF_MDL201/303 兩件=庫內 registry 檔案庫副本正規化全同(e84832cb/fe35bcd1)→ 歸作業位 functional modules/VDF/(canon 位置補正,檔案庫副本留存);VRN_MDL003 兩件(互同 25257dd8)=v1.0.0 原版,庫內已是 v1.1.0 Polars 升級版(append-only 簽名全保)→讓位;VRN_MDL004_v1=v1.0.0,庫內 1.1.0 →讓位。②schema 檔名橋:registry/VDF_MDL401_RegistrySchema_v1.json 複本落 VDF/VDF_MDL401_RegistrySchema.json(201/303 預設名)。③激活鏈實測:MDL201 生成 178 items(原始 MDL002 MARKETS 175+情緒2+TW動態1;FRED 47+AKShare 13 缺=重建 MDL003 無內嵌 registry — 原始 VDF MDL003 1466 行版候上傳);MDL303 四階段全綠 exit 0(schema Draft-07 0 錯[jsonschema 補裝]·loader 178/178·crossvalidator 機理證,RED7=mock 引用未在冊 FRED 項=誠實部分態)。生成 403+registry_output 入 gitignore(再生物)。④實機里程碑存證:操作員 MDL302 ALL PERFECT 9 階段;MDL007 批次 2330/2317/3324 三檔 3/4 源全解析;MDL002 v17 實抓 315,328 列(170 標的)+TIER-2 流量 144,021 列+TIER-4 複合 2,161 日落 OneDrive — 誠實口徑:TIER-2 為量價 proxy(dvol/pv)非 AUM 申贖 flow_raw,不冒充真值;SOLID 真值路仍需 AUM/shares 史(etf_flow_precise)。⑤VRN_Pipeline_Runner v0101R:紅站列 FAIL 明細行(操作員機 SmokeTest rc=1 僅見尾行無從診斷→改列 ✗ 行;請操作員重跑取明細)。」"
   }
  ]
 }
