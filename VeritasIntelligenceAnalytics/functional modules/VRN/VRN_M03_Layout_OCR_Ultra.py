@@ -242,12 +242,7 @@ class PaddleOCREngine(BaseOCREngine):
         if not DEPS["paddleocr"]:
             return False
         try:
-            self._ocr = PaddleOCR(
-                use_angle_cls=True,
-                lang=self.lang,
-                show_log=False,
-                use_gpu=False
-            )
+            self._ocr = _via_paddle_build(lang=self.lang)
             self._initialized = True
             return True
         except Exception as e:
@@ -814,6 +809,23 @@ def health_check() -> Dict[str, Any]:
 # =============================================================================
 # § 7. CLI
 # =============================================================================
+
+
+
+# ── PaddleOCR 2.x/3.x 版本自適應建構(2026-08-12 3.x 相容令:該修改的部分要修改)──
+def _via_paddle_build(lang="ch"):
+    """3.x 拒收 show_log/棄用 use_angle_cls → 參數梯次嘗試;行為等價原呼叫。"""
+    from paddleocr import PaddleOCR as _P
+    _last = None
+    for _kw in ({"use_textline_orientation": True, "lang": lang},
+                {"use_angle_cls": True, "lang": lang, "show_log": False, "use_gpu": False},
+                {"use_angle_cls": True, "lang": lang},
+                {"lang": lang}):
+        try:
+            return _P(**_kw)
+        except (ValueError, TypeError) as _e:
+            _last = _e
+    raise _last
 
 if __name__ == "__main__":
     import argparse

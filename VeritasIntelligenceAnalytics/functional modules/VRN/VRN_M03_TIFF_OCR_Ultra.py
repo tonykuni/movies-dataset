@@ -439,7 +439,7 @@ class OCREngineManager:
         try:
             if engine == OCREngine.PADDLEOCR and HAS_PADDLEOCR:
                 from paddleocr import PaddleOCR
-                cls._engines[engine] = PaddleOCR(use_angle_cls=True, lang='ch', use_gpu=False, show_log=False)
+                cls._engines[engine] = _via_paddle_build(lang='ch')
                 cls._initialized.add(engine); return True
             if engine == OCREngine.EASYOCR and HAS_EASYOCR:
                 cls._engines[engine] = easyocr.Reader(['ch_tra', 'en'], gpu=False)
@@ -938,6 +938,23 @@ def main():
     
     parser.print_help()
     return 0
+
+
+
+# ── PaddleOCR 2.x/3.x 版本自適應建構(2026-08-12 3.x 相容令:該修改的部分要修改)──
+def _via_paddle_build(lang="ch"):
+    """3.x 拒收 show_log/棄用 use_angle_cls → 參數梯次嘗試;行為等價原呼叫。"""
+    from paddleocr import PaddleOCR as _P
+    _last = None
+    for _kw in ({"use_textline_orientation": True, "lang": lang},
+                {"use_angle_cls": True, "lang": lang, "show_log": False, "use_gpu": False},
+                {"use_angle_cls": True, "lang": lang},
+                {"lang": lang}):
+        try:
+            return _P(**_kw)
+        except (ValueError, TypeError) as _e:
+            _last = _e
+    raise _last
 
 if __name__ == "__main__":
     raise SystemExit(main())

@@ -615,7 +615,7 @@ class PaddleOCREngine(OCREngineBase):
         mapped_lang = lang_map.get(lang, lang)
         
         if self._ocr is None or self._current_lang != mapped_lang:
-            self._ocr = self._PaddleOCR(use_angle_cls=True, lang=mapped_lang, show_log=False)
+            self._ocr = self.__via_paddle_build(lang=mapped_lang)
             self._current_lang = mapped_lang
         
         return self._ocr
@@ -1206,6 +1206,23 @@ def main():
         test_results = manager.auto_test_all()
         print(manager.generate_status_report())
 
+
+
+
+# ── PaddleOCR 2.x/3.x 版本自適應建構(2026-08-12 3.x 相容令:該修改的部分要修改)──
+def _via_paddle_build(lang="ch"):
+    """3.x 拒收 show_log/棄用 use_angle_cls → 參數梯次嘗試;行為等價原呼叫。"""
+    from paddleocr import PaddleOCR as _P
+    _last = None
+    for _kw in ({"use_textline_orientation": True, "lang": lang},
+                {"use_angle_cls": True, "lang": lang, "show_log": False, "use_gpu": False},
+                {"use_angle_cls": True, "lang": lang},
+                {"lang": lang}):
+        try:
+            return _P(**_kw)
+        except (ValueError, TypeError) as _e:
+            _last = _e
+    raise _last
 
 if __name__ == "__main__":
     main()

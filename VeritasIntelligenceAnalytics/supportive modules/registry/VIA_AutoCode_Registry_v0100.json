@@ -2061,6 +2061,14 @@
    "code": "UPLOAD-WAVE/OCR-LEGO-8",
    "component": "OCR LEGO 家族 8 件歸戶+全數接加速器 + rescue v0103(PNG 路徑+DPI 降階)",
    "note": "①判定:MDL004_1(cedab45dd226)/MDL005_1(41989b76facc)≡倉庫根現役=原地已到位;六件首見歸戶 VRN:M03_Layout_OCR_Ultra v3.0(多引擎 fallback paddle→easy→tesseract→opencv→stub,TIFF-only Gate,Lego 介面)/M03_Chinese_OCR_LEGO_Ultra v2.2(級聯 OCR+智慧 Deskew+OpenCC 簡繁,LEGO 58 libs 冊)/M04_OCR_PostProcessor v2.0(price-parser+dateparser+camelot 金額日期表格擷取)/M03_TIFF_OCR_Ultra(cd6f127ce20d)/OCR_PostProcessing_Validation_System(5b3a2369d1be)/Complete_OCR_Engine_Registry(e7d8aab63ea0);py_compile 6/6。②令「所有引擎導入加速器」:TOOL-010 注入器對 6 新引擎注入支援/加速器錨點 6/6,compile 6/6+import 煙測 6/6(SSOT/Celeritas 實載),supaudit BRIDGE 7→13。③rescue 三爆定性:paddlex 補件成功、模型載入成功、倒在原生推理 predictor.run() Unknown exception=裸 numpy 大圖(2480x3509)不穩 → v0103 改存臨時 PNG 餵檔案路徑(paddlex 自理讀圖前處理)+DPI 降階梯 300→200→150 逐階重試,每階誠實印錯。"
+  },
+  {
+   "ts": "2026-08-14T11:00:00",
+   "op": "FIX",
+   "category": "工具",
+   "code": "OCR-3X-COMPAT+RESCUE-V0104",
+   "component": "OCR 家族 Paddle 3.x 相容補丁 5 檔 + v21 歸戶 + rescue v0104 mobile 加速版",
+   "note": "①判定:Layout 二上傳≡首上傳(0e9c8a2b0045)原地已到位;Chinese_OCR_LEGO v2.1(bd6635fa26bc)為 v2.2 前代→獨立版次歸戶+錨點注入(版本譜系並存只增不減)。②令「該修改的部分要修改」:_via_paddle_build 版本自適應建構器(3.x→2.x 四梯)打入 5 檔(Layout/v21/v22/TIFF/Complete_Registry;helper 插於 __main__ 守衛前保 CLI 直跑;MDL005 呼叫型不同誠實 SKIP);compile 6/6。③rescue 四輪實錄定性:300DPI 偵測段原生崩;200DPI 過偵測進辨識(重大進展)但 PP-OCRv5_server CPU 過慢遭操作員 Ctrl+C。v0104:預設 PP-OCRv5_mobile det/rec(CPU 快一量級)+關 doc 前處理(方向分類/UVDoc 攤平)+DPI 150 起跳升階梯 150→200→300+逐頁起跑進度;--server 可切回大模型。"
   }
  ]
 }
