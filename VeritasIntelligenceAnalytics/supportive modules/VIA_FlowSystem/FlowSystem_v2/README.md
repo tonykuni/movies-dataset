@@ -376,3 +376,23 @@ gitignore 不及子目錄)並掛入 Hub 側欄 07-11(flow_hub v0101R,懶載 ifra
 同回兩張原始會話截圖=原版設計參考存證(驗證圖版式/RORO 指針儀表板 NETFLOW·TRUST·FID 欄,
 W=126 κ=2 30 ETF)→ 候令升級參考,無明令不改本代版面。順修引擎關聯圖口徑 autotest 17→22。
 QA:autotest 22/22 · selftest 14/14 · Playwright 實測 07-11 五頁 Hub 內全載入。
+
+## v0127R — MarketFlow 原版四件+真值 schema 歸戶 + 安全稽核結案(2026-08-12 整合去重令)
+
+五件上傳+原始會話 7/2 安全稽核弧全文存證。歸戶 `uploads_original/`:marketflow_index
+v0111(b04bd7ef)/v0112(ea00e74b)與 integration_evidence v0111(887c54d3)/v0112(8123c5ba)
+(原始會話「MarketFlow + VDF/VRN All-in-One」儀表板與證據報告;儀表板 fetch /api/v1/* 需
+後端,file:// 下版面可見、資料欄誠實顯示載入錯誤)+ etf_flow_precise_schema.csv(c968bfc1,
+真值流量 schema:僅 AUM/shares 具證據才許寫 flow_raw — 空檔=誠實)。Hub v0102R 掛入
+12 MF 證據 / 13 MF 儀表板。
+
+**flow_bridge v0101R**:新增 `load_flow_precise()` — data/input/etf_flow_precise.csv 到位
+即轉為 Pillar A 真值格式 {snapshot_date,ticker,ref_flow}(濾無證據列);
+`load_reference_flows()` 於 JSON 缺席時自動後備此 CSV → 真值接入 SOLID 之路多一條正門。
+實測:空 schema→None 誠實;證據列→正確轉出;autotest 22/22。
+
+**安全稽核結案(原始會話 v019-v022 懸案)**:以現行正典逐行覆核 — 全樹唯一刪除操作為
+flow_manager.py `selftest_ok.flag.unlink()`(selftest 轉紅時撤自家 data/output 運行旗,
+可重生、非 source)= 原稽核 QUARANTINE_TO_RUN_LOCAL_ONLY 合格類;零 os.remove/rmtree/
+Stop-Process/taskkill/rm -rf。舊 Downloads 副本之 5 TrueHigh 屬 v1 樹,已由本 v0100R
+正典樹整代取代,啟動閘解除(Activate 可安全執行,實機 18 支全綠已驗)。

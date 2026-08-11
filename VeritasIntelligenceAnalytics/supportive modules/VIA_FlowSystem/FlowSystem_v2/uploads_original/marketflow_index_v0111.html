@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+	<title>Veritas MarketFlow Risk Intelligence Suite v0111</title>
+<style>
+:root{--bg:#f4f6f8;--card:#fff;--ink:#17212b;--muted:#65717e;--line:#d9e0e6;--green:#14866d;--blue:#2768bd;--amber:#b86b0c;--red:#c33d36;--violet:#6657bd}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,"Noto Sans TC","Segoe UI",sans-serif}
+header{background:#111a22;color:#f8fafc;padding:18px 28px;display:flex;gap:18px;align-items:center}header img{width:68px;height:68px;object-fit:contain}h1{font-size:21px;margin:0 0 4px}header p{margin:0;color:#adbac7;font-size:12px}
+main{padding:20px;max-width:1600px;margin:auto}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+button{border:0;border-radius:8px;background:var(--blue);color:#fff;padding:10px 16px;font-weight:650;cursor:pointer}.ghost{background:#53606c}.stamp{margin-left:auto;color:var(--muted);font-size:12px;padding:10px}
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:0 1px 2px #15202b0a}
+.metric .label{font-size:11px;color:var(--muted);text-transform:uppercase}.metric .value{font-size:26px;font-weight:720;margin-top:6px}.metric .sub{font-size:11px;color:var(--muted)}
+.wide{grid-column:span 3}.full{grid-column:1/-1}h2{font-size:14px;margin:0 0 10px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;border-bottom:1px solid var(--line);padding:7px 6px}th{color:var(--muted);font-weight:650}
+.pill{display:inline-block;border-radius:999px;padding:3px 7px;font-size:10px;font-weight:700}.GREEN,.PASS,.ROUND_PASS{background:#d9f2e9;color:#08745b}.YELLOW{background:#fff0cf;color:#8a5700}.RED,.FAIL{background:#ffe1df;color:#a52b25}
+.note{font-size:11px;color:var(--muted);line-height:1.55}.error{color:var(--red)}@media(max-width:1000px){.grid{grid-template-columns:repeat(2,1fr)}.wide{grid-column:span 2}}@media(max-width:620px){.grid{grid-template-columns:1fr}.wide{grid-column:span 1}.stamp{margin-left:0}}
+</style></head><body>
+	<header><div><h1>Veritas MarketFlow Risk Intelligence Suite v0111</h1><p>Global Capital Flow · Taiwan Rotation · FOMO · Cross-Asset Risk — REAL PRICE DATA · VDF/VRN VERIFIED · PROXY SIGNALS</p></div></header>
+<main><div class="toolbar"><button onclick="loadAll()">重新整理</button><button class="ghost" onclick="window.open('/api/v1/governance/gate')">Gate JSON</button><button class="ghost" onclick="window.open('/api/v1/status')">Status JSON</button><button class="ghost" onclick="window.open('/api/v1/runtime/status')">VDF/VRN JSON</button><span class="stamp" id="stamp">載入中…</span></div>
+<section class="grid">
+<div class="card metric"><div class="label">Governance Gate</div><div class="value" id="gate">—</div><div class="sub">fail-closed</div></div>
+<div class="card metric"><div class="label">Market Rows</div><div class="value" id="rows">—</div><div class="sub">DuckDB / Parquet</div></div>
+<div class="card metric"><div class="label">Tickers</div><div class="value" id="tickers">—</div><div class="sub">global + Taiwan</div></div>
+<div class="card metric"><div class="label">ETF Rows</div><div class="value" id="etfrows">—</div><div class="sub">proxy signals</div></div>
+	<div class="card metric"><div class="label">VDF Runtime</div><div class="value" id="vdf">—</div><div class="sub">DataHub read-only gate</div></div>
+	<div class="card metric"><div class="label">VRN Runtime</div><div class="value" id="vrn">—</div><div class="sub">5/5 core module bootstrap</div></div>
+	<div class="card metric"><div class="label">US / Global As-of</div><div class="value" id="usasof">—</div><div class="sub">SPY session · YYYY-MM-DD</div></div>
+	<div class="card metric"><div class="label">Taiwan As-of</div><div class="value" id="twasof">—</div><div class="sub">TW equity · YYYY-MM-DD</div></div>
+	<div class="card metric"><div class="label">Quality RED</div><div class="value" id="qred">—</div><div class="sub">must be zero</div></div>
+	<div class="card wide"><h2>跨資產複合訊號（SPY 有效交易日）</h2><table id="signals"><thead><tr><th>日期</th><th>Risk On/Off</th><th>HY Proxy</th><th>Growth-Value</th><th>EM Rotation</th><th>Semicon</th></tr></thead><tbody></tbody></table></div>
+	<div class="card wide"><h2>ETF 資金壓力代理</h2><table id="etfs"><thead><tr><th>Ticker</th><th>日期</th><th>1 Obs</th><th>5 Obs</th><th>20 Obs</th><th>Vol Chg</th><th>Dollar Vol</th><th>DVOL Ratio</th><th>PV Signal</th></tr></thead><tbody></tbody></table><p class="note">Obs = 有效交易觀測，不是曆日。PV Signal 由報酬方向與成交量日增幅 &gt; 20% 共同觸發；DVOL Ratio 僅供量能背景判讀。</p></div>
+	<div class="card wide"><h2>台股個股行情</h2><table id="taiwan"><thead><tr><th>Name (Ticker)</th><th>日期</th><th>Analysis Close</th><th>Price Method</th><th>Volume</th><th>Dollar Vol</th></tr></thead><tbody></tbody></table></div>
+	<div class="card wide"><h2>Historical-only Ticker</h2><table id="historical"><thead><tr><th>Ticker</th><th>最後有效日</th><th>Analysis Close</th><th>狀態</th></tr></thead><tbody></tbody></table></div>
+<div class="card wide"><h2>官方資料來源狀態</h2><table id="official"><thead><tr><th>來源</th><th>狀態</th><th>日期</th><th>正規化</th></tr></thead><tbody></tbody></table></div>
+<div class="card full"><h2>資料品質與方法邊界</h2><div id="quality"></div><p class="note">Dollar volume、價量背離、RS、Risk-On/Off 均為市場壓力代理，不等同 ETF creation/redemption 淨流量。只有 AUM 或 shares outstanding 具可靠歷史證據時才允許寫入 flow_raw。法人累積買賣超不得冒充持股率；融資維持率不得由不完整市場彙總欄位偽造。</p></div>
+</section></main>
+<script>
+const fmt=x=>x===null||x===undefined||Number.isNaN(Number(x))?'—':Number(x).toLocaleString(undefined,{maximumFractionDigits:4});
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function getj(u){const r=await fetch(u,{cache:'no-store'});if(!r.ok)throw new Error(`${u}: HTTP ${r.status}`);return r.json()}
+function renderRows(id,data,cols){document.querySelector(`#${id} tbody`).innerHTML=data.map(r=>`<tr>${cols.map(c=>`<td>${esc(c(r))}</td>`).join('')}</tr>`).join('')}
+async function loadAll(){try{
+	 const [s,g,rt,sg,e,tw,hist,off,q]=await Promise.all(['/api/v1/status','/api/v1/governance/gate','/api/v1/runtime/status','/api/v1/signals/latest','/api/v1/etf/flows','/api/v1/taiwan/latest','/api/v1/taiwan/historical-only','/api/v1/taiwan/official-status','/api/v1/quality'].map(getj));
+	 document.getElementById('gate').textContent=g.gate;document.getElementById('rows').textContent=fmt(s.market_rows);document.getElementById('tickers').textContent=fmt(s.tickers);document.getElementById('etfrows').textContent=fmt(s.etf_rows);document.getElementById('vdf').textContent=rt.vdf?.status||'BLOCKED';document.getElementById('vrn').textContent=rt.vrn?.status||'BLOCKED';document.getElementById('usasof').textContent=s.us_global_asof||'—';document.getElementById('twasof').textContent=s.taiwan_asof||'—';document.getElementById('qred').textContent=q.filter(x=>x.status==='RED').length;document.getElementById('stamp').textContent='更新 '+new Date().toLocaleString();
+ renderRows('signals',sg,[r=>r.date,r=>fmt(r.risk_on_off),r=>fmt(r.hy_spread_proxy),r=>fmt(r.growth_vs_value),r=>fmt(r.em_rotation),r=>fmt(r.semicon_momentum)]);
+	 renderRows('etfs',e,[r=>r.ticker,r=>r.date,r=>fmt(r.ret_1d),r=>fmt(r.ret_5d),r=>fmt(r.ret_20d),r=>fmt(r.vol_chg),r=>fmt(r.dollar_vol),r=>fmt(r.dvol_ratio),r=>r.pv_signal]);
+	 renderRows('taiwan',tw,[r=>(r.name?`${r.name} (${r.ticker})`:r.ticker),r=>r.date,r=>fmt(r.analysis_close),r=>r.analysis_price_method,r=>fmt(r.volume),r=>fmt(r.dollar_vol)]);
+	 renderRows('historical',hist,[r=>r.ticker,r=>r.date,r=>fmt(r.analysis_close),r=>r.historical_status]);
+ renderRows('official',off,[r=>r.source,r=>r.status,r=>r.date,r=>r.normalization]);
+ document.getElementById('quality').innerHTML='<table><thead><tr><th>Check</th><th>Status</th><th>Value</th><th>Threshold</th></tr></thead><tbody>'+q.map(r=>`<tr><td>${esc(r.check)}</td><td><span class="pill ${esc(r.status)}">${esc(r.status)}</span></td><td>${esc(r.value)}</td><td>${esc(r.threshold)}</td></tr>`).join('')+'</tbody></table>';
+ }catch(err){document.getElementById('stamp').innerHTML='<span class="error">'+esc(err.message)+'</span>'}}
+loadAll();setInterval(loadAll,60000);
+</script></body></html>

@@ -8,6 +8,8 @@
   (FIS × 宏觀分)③三層 SOLID 關係圖 ④引擎五層關聯圖 — 全 SVG 自含零 CDN。
 
 changelog:
+  v0102R 2026-08-11 二批歸戶:掛入 12 MarketFlow 證據(原版 v0112 靜態全渲)+ 13 MarketFlow
+    儀表板(原版 v0112;fetch /api/v1/* 需後端 — file:// 下版面可見、資料欄誠實顯示載入錯誤)。
   v0101R 2026-08-11 整合去重歸戶令:掛入 07-11 原版工件(uploads_original/:模擬終端/
     世界地圖/累積資金流/監控台/因子字典矩陣 — 原始會話產物,非本代引擎可重生,列冊保存);
     修引擎關聯圖標示 autotest 17→22(實測項數,cosmetic 口徑對齊)。
@@ -32,7 +34,9 @@ PAGES = [("theory", "00", "理論總覽", "THEORY", ""),
          ("worldorig", "08", "世界地圖(原版)", "WORLD ORIG", "uploads_original/world_flow_original.html"),
          ("cumorig", "09", "累積資金流(原版)", "CUM FLOW ORIG", "uploads_original/cumulative_flow_original.html"),
          ("monorig", "10", "監控台(原版)", "MONITOR ORIG", "uploads_original/flow_monitor_original.html"),
-         ("fdm", "11", "因子字典矩陣(原版)", "FACTOR DICT ORIG", "uploads_original/factor_dict_matrix_original.html")]
+         ("fdm", "11", "因子字典矩陣(原版)", "FACTOR DICT ORIG", "uploads_original/factor_dict_matrix_original.html"),
+         ("mfev", "12", "MarketFlow 證據(原版)", "MF EVIDENCE", "uploads_original/marketflow_evidence_v0112.html"),
+         ("mfdash", "13", "MarketFlow 儀表板(原版·需API)", "MF DASH", "uploads_original/marketflow_index_v0112.html")]
 
 
 def _node(x, y, w, h, icon, zh, en, color, sub=""):
