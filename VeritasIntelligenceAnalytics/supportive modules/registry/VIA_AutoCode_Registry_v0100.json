@@ -1909,6 +1909,14 @@
    "code": "TOOL-009",
    "component": "功能引擎×支援模組導入稽核 via_support_import_audit_v0100 + via-supaudit 動詞",
    "note": "令「確定所有功能性引擎都有導入支援性模組」。唯讀靜態稽核,四型合法導入態:BRIDGE(SupportBridge/錨點)/DIRECT(靜態 import)/DYNAMIC(importlib 插件載入,MDL004/005 §5 型——首輪掃描盲點,實測補上)/SSOT-DATA(vap_spec.json 資料層)。實測 79 引擎:BRIDGE 2·DIRECT 4·DYNAMIC 12·SSOT-DATA 3·NONE 58 → GAPS_FOUND。主線判讀:VRN MDL001-011 全數有(插件8/橋2/直連1)✅;VDF MDL001/002 直連✅,MDL003/004/005/006/007+工具鏈 MDL10x/20x/30x/501 未導入(自帶內部 registry 設計)→真缺口;VAP seaborn_plotly=SSOT-DATA✅,chartlib v007=視覺鎖 SSOT 內嵌自足設計(掃描口徑記 NONE,誠實註記非缺陷);其餘 NONE 多為 QA/工具/歷史版留存件。接橋方案已備:[VIA:ANCHOR:SUPPORT:BOOTSTRAP] 錨點區塊(MDL011 樣板,graceful 全退化不擋),原件已鏡像 engine/,下令即注入現役補丁版。存證 VIA_SupportImport_Audit_<ts>.json 落 audit_tools。"
+  },
+  {
+   "ts": "2026-08-13T23:00:00",
+   "op": "VERIFY",
+   "category": "驗證",
+   "code": "LIVE-BATCH/20260812",
+   "component": "操作員機四工具實戰全勝(TOOL-006/007/008/009 live 驗證)",
+   "note": "①via-batch -OCR:64 檔重擷取 3/3 OK(O1 MDL005 文字 107s/O2 MDL004 表格 252.7s/O3 DOCX 0.4s;docx 走 python-docx 梯次成功,操作員另補裝 docx2txt-0.9)——60 PDF 全數過 OCR 鏈,VRN 批次擷取里程碑。②via-datahub:v0101 NoStall 實證——工作站支援模組 bootstrap 確實 >180s(nostall=TIMEOUT_180s_KILLED 誠實截停),DB 檢查 8 項照跑,BLOCKED fail-closed 秒級完成,TIMEOUT 掛死根治確認;BLOCKED 原因誠實在列:no manifest/via_marketflow.duckdb 未建。③Invoke-VAP:3/3 OK(A1 1.8s/A2 0.2s 12 charts/A3 3.9s 65 PASS/1 SKIP),config 退 template 誠實註記如設計。④via-supaudit:79 引擎判定與容器完全一致(GAPS_FOUND,2/4/12/3/58),兩機存證 JSON 各自落 audit_tools。VDF MDL003-007 接橋案候令。"
   }
  ]
 }
