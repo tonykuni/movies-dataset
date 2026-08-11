@@ -40,6 +40,52 @@ USAGE
   python VDF_MDL005_TWStockFilter.py --no-pause            # CI 模式
 """
 
+# ===== [VIA:ANCHOR:SUPPORT:BOOTSTRAP:START] =====
+# 接橋補丁(2026-08-13 稽核令 TOOL-009 後續:功能引擎統一導入支援模組;
+#  graceful 全退化 — 橋/核心缺席零影響;不 eager 導入 Runtime_Bridge/EnvManager 重件)
+import sys as _via_sys
+from pathlib import Path as _via_Path
+
+def _via_bootstrap_support_paths():
+    try:
+        _self = _via_Path(__file__).resolve()
+        roots = [_self.parent]
+        p = _self.parent
+        for _ in range(4):
+            p = p.parent
+            roots.append(p)
+        for root in roots:
+            for name in ("supportive_module", "supportive modules"):
+                sup = root / name
+                if sup.is_dir():
+                    s = str(sup)
+                    if s not in _via_sys.path:
+                        _via_sys.path.insert(0, s)
+    except Exception:
+        pass
+
+_via_bootstrap_support_paths()
+try:
+    from VRN_SupportBridge import BRIDGE as _VIA_BRIDGE
+    _VIA_HAS_BRIDGE = True
+except Exception:
+    _VIA_BRIDGE = None
+    _VIA_HAS_BRIDGE = False
+try:
+    import VIA_SSOT_Unified as _VIA_SSOT
+except Exception:
+    _VIA_SSOT = None
+try:
+    import VeritasAegisNexus as _VIA_AEGIS
+except Exception:
+    _VIA_AEGIS = None
+try:
+    import VeritasCeleritas as _VIA_CELERITAS
+except Exception:
+    _VIA_CELERITAS = None
+# ===== [VIA:ANCHOR:SUPPORT:BOOTSTRAP:END] =====
+
+
 # =====================================================================================
 # 📋 ALL PARAMETERS ON TOP
 # =====================================================================================
