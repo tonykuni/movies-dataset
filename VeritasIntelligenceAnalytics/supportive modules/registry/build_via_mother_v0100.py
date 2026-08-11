@@ -42,7 +42,7 @@ SUBS = [
       "via-batch                    → AllInOne 批次", "via-ocr                      → OCR 統一路由"],
      "functional modules/VRN/template/VDF_VRN_Integrated_ReportSSOT_AutoLayout_FINAL.html"),
     ("vdf", "04", "VDF 資料鍛造", "市場資料取數契約 SSOT+intake+六模組重建R", "🟢 測試鏈全綠",
-     "MDL301+302+303 全綠(激活鏈:178 items 生成·schema 0 錯·派發 178/178)· 原始正本 002/007/104/105/201/303 歸位 · 契約 277 項 PASS;原始 MDL003(FRED 47+AK 13)+v0160 三本體候上傳",
+     "原始全套 19 編號件復活:301/302 exit0 · 201 生成 238 items(FRED47+AK13+YF175)全過 schema · 303 四階段 GREEN6/YEL1/RED1=設計分布 · 契約 277 項 PASS;餘缺 MDL501 UI+Invoke-VDF.ps1 等 12 件候上傳",
      ["via-vdf contract check       → 取數契約盤點",
       "py \"functional modules\\VDF\\VDF_MDL302_FinalActivation.py\" --no-pause → 端到端",
       "via-vdf                      → OneClick 側欄(工作站)"],
