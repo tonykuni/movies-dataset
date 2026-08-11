@@ -269,7 +269,8 @@
   "工具|Invoke-VRN-Batch-AllInOne-v0102": "TOOL-013",
   "工具|vrn_pdf_forensics_v0100": "TOOL-014",
   "工具|vrn_scan_ocr_rescue_v0100": "TOOL-015",
-  "工具|vrn_docx_engine_v0100": "TOOL-016"
+  "工具|vrn_docx_engine_v0100": "TOOL-016",
+  "工具|vrn_content_store_v0100": "TOOL-017"
  },
  "ledger": [
   {
@@ -2077,6 +2078,14 @@
    "code": "RECONCILE/64-COVERED",
    "component": "MQ-1560 掃描件救援成功 → 內容級對帳 64/64 COVERED(缺口歸零里程碑)",
    "note": "v0104 操作員機實戰全勝:mobile 模型自動下載、3.x 參數建構、150DPI 四頁全辨識(p1 184行/3,542字 · p2 125行/3,961 · p3 88行/9,119 · p4 52行/7,637 = 449 行/24,259 字元),併回主表(備份 pre_20260812_034138 留存,4,485→4,934 列)。via-reconcile 終判:64 記錄 COVERED — FULL 59/TEXT_ONLY 1/DOCX_TXT 4,NO_EXTRACTION 歸零。五輪攻堅鏈全程存證:①solo 補擷零輸出→②法醫判 IMAGE_ONLY_SCAN→③paddlex[ocr] 補件→④server 模型 CPU 過慢→⑤mobile+關前處理+150DPI 制勝。Mega-Prompt 三輪修正協議收束:第1輪判死因/第2輪按因處置/第3輪 64/64 驗收。TEXT_ONLY 1=MQ-1560 表格層候 PPStructure 鏈(誠實不假 FULL)。64 檔語料 SSOT 對帳戰線結案;下一棒=落庫版(歷史值蓋過預估值→via.duckdb)。"
+  },
+  {
+   "ts": "2026-08-14T12:20:00",
+   "op": "BUILD",
+   "category": "工具",
+   "code": "TOOL-017",
+   "component": "內容落庫引擎 vrn_content_store_v0100 + via-store(深水線①落庫版;64/64 綠燈後首寫生產庫)",
+   "note": "治理五鐵則:①dry-run 預設(--commit 才寫)②只增不減=只建 4 新表 vrn_report_content_canon/text_blocks/table_cells/store_log,22 現表零觸碰 ③寫前整檔備份 via.duckdb.pre_<ts>.bak ④upsert 冪等(同 source_document/pdf_name 剔舊插新)⑤vrn_store_log append-only 稽核。canon 64 筆(broker/report_date/type/tickers/target_prices/evidence_state/review_required/sha/provenance);text_blocks+table_cells 以 duckdb read_parquet 直入(工作站實量 4,934+168,927 列)。歷史值蓋過預估值界權註記:本層為報告內容正典,financialdata actual-vs-estimate 裁決屬 vrn_financial_actual_canonical 既有機制不越權。db 路徑:--db 覆寫+四候選探索(VRN/db、VDF/db、OneDrive dict)誠實列缺。容器全鏈測試:dry-run 零寫/commit 四表+備份/冪等重跑 64·2·1 零疊加(log 2 如設計)/既有表零觸碰 True/canon 樣本 MQ-1560→MACQUARIE·2026-05-20 真資料流通。"
   }
  ]
 }
