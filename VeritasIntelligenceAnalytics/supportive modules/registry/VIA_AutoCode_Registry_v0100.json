@@ -266,7 +266,8 @@
   "工具|via_panorama_six_v0100": "TOOL-011",
   "規格|VIA_SSOT_ConsistencyChecker_Spec_v0100": "SPEC-011",
   "工具|vrn_content_reconcile_v0100": "TOOL-012",
-  "工具|Invoke-VRN-Batch-AllInOne-v0102": "TOOL-013"
+  "工具|Invoke-VRN-Batch-AllInOne-v0102": "TOOL-013",
+  "工具|vrn_pdf_forensics_v0100": "TOOL-014"
  },
  "ledger": [
   {
@@ -2002,6 +2003,14 @@
    "code": "TOOL-013",
    "component": "單檔補擷車道 Invoke-VRN-Batch-AllInOne-v0102(-Only)+ 缺口 MQ-1560 定性",
    "note": "v0101 缺口診斷實跑定性:MQ-1560 20260520.pdf 於擷取庫存完全無列(最近似皆他檔、無包含關係)=引擎當輪零輸出,非檔名錯位。v0102(v0101 正本不動,無 -Only 完整委派):-Only <pattern> 單檔補擷——①匹配檔複製獨立 solo 收件夾②引擎只跑該夾(避免整夾重跑覆蓋 59 檔扁平表成果——關鍵風險點,設計即防)③合併回主表:主表先備份 .pre_<ts>.bak → 同 pdf_name 舊列剔除 → 追加新列 → parquet+csv 重寫(append-only 備份永留);log 尾段自動拉出該檔引擎自述(缺料原因誠實呈現)。容器驗證:AST PARSE OK;合併單元測試(4+3 列→6 列/舊壞列剔 1/備份在位/csv 同步)+ 零輸出誠實路皆過。候操作員:via-batch -OCR -Only \"MQ-1560*\" → via-reconcile 驗 64/64。"
+  },
+  {
+   "ts": "2026-08-14T05:50:00",
+   "op": "BUILD",
+   "category": "工具",
+   "code": "TOOL-014",
+   "component": "PDF 法醫探針 vrn_pdf_forensics_v0100 + via-pdfcheck(Mega-Prompt 第 1 輪:MQ-1560 死因判定)",
+   "note": "操作員實跑:solo 補擷 MDL005 20.3s/MDL004 8.7s 皆 exit 0 但 0 列——MQ-1560 對兩引擎隱形,對帳維持 63/64。Mega-Prompt(20 加速器三輪修正協議)貼回=本輪協議:第 1 輪全面性修正,在冊錯誤唯一=MQ-1560 零輸出。法醫探針五層:F1 檔案層(簽章/EOF)/F2 開檔層(fitz+pdfplumber 交叉/加密旗標)/F3 文字層逐頁字元/F4 影像層/F5 判決 六態(OK_TEXT/IMAGE_ONLY_SCAN/ENCRYPTED/CORRUPT_STRUCTURE/NOT_PDF/MISSING)各附處置建議。容器四案煙測:合法文字/純影像/損檔/偽 PDF 判決 4/4 正確。候操作員 via-pdfcheck \"MQ-1560*\" 回貼判決 → 第 2 輪順序性修正按因處置(IMAGE_ONLY→重 OCR 渲染路;ENCRYPTED→解密/重出;CORRUPT→spec-only 誠實除外)。"
   }
  ]
 }
