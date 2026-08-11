@@ -225,7 +225,17 @@
   "工具|board_qa_v0100": "TOOL-BQA",
   "引擎|flow_macro_v0100R": "ENG-062",
   "工具|spec_master_builder_v0100": "TOOL-SPEC",
-  "引擎|flow_hub_v0100R": "ENG-063"
+  "引擎|flow_hub_v0100R": "ENG-063",
+  "打包產品|VIA_Pack_WorkOpsBoard": "PKG-009",
+  "打包產品|VIA_Pack_VAP": "PKG-010",
+  "打包產品|VIA_Pack_VRN": "PKG-011",
+  "打包產品|VIA_Pack_VDF": "PKG-012",
+  "打包產品|VIA_Pack_ChipWar": "PKG-013",
+  "打包產品|VIA_Pack_MultiFactor": "PKG-014",
+  "打包產品|VIA_Pack_TALib": "PKG-015",
+  "支援性工具|via_input_precheck_v0100": "TOOL-PRECHK",
+  "支援性工具|Install_VIA_Product_v0100": "TOOL-INSTALL",
+  "支援性工具|build_via_mother_v0100": "TOOL-MOTHER"
  },
  "ledger": [
   {
@@ -1497,6 +1507,14 @@
    "component": "母系統模組化商品化規劃正本 v0100 + 全庫資源/功能盤點矩陣",
    "code": "PLN-20260812-PKG",
    "note": "操作員大令(清點+商品化+母頁規劃;明示「開始之前先規劃頁面與左panel」)→ 本輪交規劃正本 functional modules/VIA_Mother_Productization_Plan_v0100.md:①盤點 — 功能性 7 支(WorkOps/VAP 🟢生產·ChipWar/MultiFactor/TALib 🟢已驗·VRN/VDF 🟡)+居 supportive 之子系統(FlowSystem 🟢/VMT/VTR 🟡);資源性 60 目錄分 8 族對映服務對象(治理/入口/引擎/環境/UI/規則/nexuscore/待整理🔴)。②商品化規範:沿用既有 PKG-001..008 編號(整合去重不另立),每商品指針檔(contents sha256 舉證+install 規約+shared_supportive 去重組合)+安裝器規約(PS7+/python 自動布建 C:\\VeritasIntelligenceAnalytics 基座/bin 動詞/開第一頁)。③頁面規約:三段式(P1 消費者頁=設定+輸入現況+輸入前檢查+運作結果;矩陣頁;末頁可隱藏)母頁/子系統同構;左 panel 草案(00 母頁+01-08 子系統+90 商品目錄+91 規格母版+底部誠實燈);flow_hub=規約先行實作,母頁=擴大版。視覺候操作員介面連結到件鎖定。施工順序 5 步候「下一步」。"
+  },
+  {
+   "ts": "2026-08-12T18:30:00",
+   "op": "BUILD",
+   "category": "商品化",
+   "component": "商品化加速波:七商品指針+通用安裝器+輸入前檢查+待整理清冊+母頁 v0100(FlowSystem 依令未列)",
+   "code": "PKG-009..015/TOOL-PRECHK/TOOL-INSTALL/TOOL-MOTHER",
+   "note": "操作員令「FlowSystem 先不列入,其他加速完整進行」。①七商品領號 PKG-009..015(WorkOps母版/VAP/VRN/VDF/ChipWar/MultiFactor/TALib;沿用既有 PKG 系列),指針產生器 build_pkg_pointers_v0100.py 生 pkg_pointers/*.json — 內容物 path+sha256 舉證(275/108/131/37/20/8/5 件;超大檔誠實 SKIP_LARGE;__pycache__/暫存/重生物排除),install 規約(ps_min 7.0/python 3.10/pip/bin_verbs)+shared_supportive 共用族+base=C:\\VeritasIntelligenceAnalytics+P1 規約+precheck 三查。②通用安裝器 Install-VIA-Product-v0100.ps1(AST OK;Linux pwsh DryRun 實測 PKG-014:環境檢查→pip 缺才裝→基座布建→內容物落位+sha 驗真→動詞檢核→開第一頁;不刪除不覆蓋既有)。③輸入前檢查共用件 via_input_precheck_v0100.py+via-precheck 動詞(selftest 3/3:整列重複/鍵重複/缺值/路徑;乾淨檔零誤報)。④待整理族清冊 unsorted_inventory_v0100.json(報告only:_inbox 611 件 32MB 為大宗)。⑤母頁 VIA_Mother.html+build_via_mother_v0100.py+via-mother 動詞:三段式規約落地(P1 設定+現況+precheck+誠實燈;90 商品矩陣+資源8族×功能對映;91 規格母版 iframe;末頁預設隱藏 toggle;子系統頁 01-07 同構 lite 各附動詞+在庫 UI 懶載 iframe/誠實缺席);左 panel 00+01-07+90/91,FlowSystem 依令未列;配色=WorkOps v2 佔位候視覺鎖。QA:Playwright 母頁 17/17(十鈕/無FlowSystem/三表/切頁九頁/懶載/商品矩陣/toggle/零 pageerror)。"
   }
  ]
 }
