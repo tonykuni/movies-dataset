@@ -264,7 +264,8 @@
   "工具|via_support_import_audit_v0100": "TOOL-009",
   "工具|via_support_bridge_inject_v0100": "TOOL-010",
   "工具|via_panorama_six_v0100": "TOOL-011",
-  "規格|VIA_SSOT_ConsistencyChecker_Spec_v0100": "SPEC-011"
+  "規格|VIA_SSOT_ConsistencyChecker_Spec_v0100": "SPEC-011",
+  "工具|vrn_content_reconcile_v0100": "TOOL-012"
  },
  "ledger": [
   {
@@ -1976,6 +1977,14 @@
    "code": "SIX-GREEN/LIVE",
    "component": "via-six 操作員機 GREEN·Hydra 0(六道全綠;L6 清掃兩機一致收口)",
    "note": "操作員機 20260812_022429:L1 契約 390 項零重複/L2 v2 64 筆 schema 全過+超集零漂移/L3 spec 1.0.0+chartlib 1.1.4 28 圖型/L4 台帳 217 筆零重碼/L5 主線導入全覆蓋/L6 動態解析鐵律全數合規——與容器逐檔一致。清掃前後對照完整存證(022142 YELLOW·Hydra 2 → 022429 GREEN·Hydra 0)。全庫啟動器自此 100% 動態解析。"
+  },
+  {
+   "ts": "2026-08-14T04:10:00",
+   "op": "BUILD",
+   "category": "工具",
+   "code": "TOOL-012",
+   "component": "OCR 擷取×SSOT v2 內容級對帳器 vrn_content_reconcile_v0100 + via-reconcile 動詞(深水線①首版)",
+   "note": "唯讀報告型零落庫(落庫版候對帳綠燈)。三層:A 覆蓋層 64 記錄×擷取產物在位(鍵=pdf_name↔source_document,依 MDL005/004 落檔規格 VRN_MDL005_Text/VRN_MDL004_Tables 實查);B 內容層目標價猜值於文字塊可尋性(資訊級不判死);C 分佈 FULL/TEXT_ONLY/TABLE_ONLY/DOCX_TXT/NO_EXTRACTION。pandas 缺退 CSV;staging 缺席誠實列缺。容器雙路煙測:空 staging→64 NO_EXTRACTION 誠實;合成 staging(2 PDF+4 DOCX 種子)→FULL 1/TEXT_ONLY 1/DOCX_TXT 4/NO_EXTRACTION 58 匹配邏輯精準。真實對帳候操作員機跑(staging/ocr_out 實產物僅在工作站);依 v0101 進件教訓,首輪實跑結果回貼後校準 v0101。輸出視覺鎖矩陣+JSON 於 VIA_Reports\\vrn_reconcile_runs。"
   }
  ]
 }
