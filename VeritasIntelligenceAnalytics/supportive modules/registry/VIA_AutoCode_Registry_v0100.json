@@ -265,7 +265,8 @@
   "工具|via_support_bridge_inject_v0100": "TOOL-010",
   "工具|via_panorama_six_v0100": "TOOL-011",
   "規格|VIA_SSOT_ConsistencyChecker_Spec_v0100": "SPEC-011",
-  "工具|vrn_content_reconcile_v0100": "TOOL-012"
+  "工具|vrn_content_reconcile_v0100": "TOOL-012",
+  "工具|Invoke-VRN-Batch-AllInOne-v0102": "TOOL-013"
  },
  "ledger": [
   {
@@ -1993,6 +1994,14 @@
    "code": "RECONCILE/LIVE-63-64",
    "component": "內容級對帳操作員機首跑 63/64 覆蓋 + v0101 缺口診斷版",
    "note": "實跑(20260812_023855):mdl005 文字塊 4,485 · mdl004 表格列 168,927 · docx_txt 4;分佈 FULL 59/DOCX_TXT 4/NO_EXTRACTION 1 — 60 PDF 中 59 檔文字+表格雙全,僅 1 筆無擷取匹配(v0100 摘要未點名)。版本前進 v0101(正本不動):缺口終端點名+difflib 最近似 pdf_name 候選+contains 關係檢測,自證錯位原因(檔名截斷/特殊字元/引擎未處理三種假設可判別);合成煙測診斷輸出驗證 OK。候操作員 via-reconcile 重跑回貼缺口診斷 → 判因後出落庫版。"
+  },
+  {
+   "ts": "2026-08-14T05:10:00",
+   "op": "BUILD",
+   "category": "工具",
+   "code": "TOOL-013",
+   "component": "單檔補擷車道 Invoke-VRN-Batch-AllInOne-v0102(-Only)+ 缺口 MQ-1560 定性",
+   "note": "v0101 缺口診斷實跑定性:MQ-1560 20260520.pdf 於擷取庫存完全無列(最近似皆他檔、無包含關係)=引擎當輪零輸出,非檔名錯位。v0102(v0101 正本不動,無 -Only 完整委派):-Only <pattern> 單檔補擷——①匹配檔複製獨立 solo 收件夾②引擎只跑該夾(避免整夾重跑覆蓋 59 檔扁平表成果——關鍵風險點,設計即防)③合併回主表:主表先備份 .pre_<ts>.bak → 同 pdf_name 舊列剔除 → 追加新列 → parquet+csv 重寫(append-only 備份永留);log 尾段自動拉出該檔引擎自述(缺料原因誠實呈現)。容器驗證:AST PARSE OK;合併單元測試(4+3 列→6 列/舊壞列剔 1/備份在位/csv 同步)+ 零輸出誠實路皆過。候操作員:via-batch -OCR -Only \"MQ-1560*\" → via-reconcile 驗 64/64。"
   }
  ]
 }
