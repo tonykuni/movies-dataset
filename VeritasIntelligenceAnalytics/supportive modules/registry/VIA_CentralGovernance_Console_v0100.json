@@ -3,70 +3,195 @@
  "name": "VIA Central Governance Console · 中央治理台功能正典",
  "design_basis": "Veritas Header.dc(新版)1a:中央治理 · 自演化 SSOT · 編碼引擎 · 中央參數註冊處",
  "asof": "2026-08-13",
- "policy": ["append-only 只增不減", "編號永不變", "凍結正本零觸碰", "誠實 OK/FAIL 不卡斷",
-            "動態解析最新版(嚴禁寫死版號)", "絕不代寄 · 唯讀原件 · 零 CDN 離線"],
- "sections": [
-  {"key": "ledger", "zh": "登錄簿治理", "en": "REGISTRY LEDGER", "functions": [
-   {"id": "GOV-01", "zh": "自動編碼台帳(append-only)", "verb": "via-number",
-    "engine_glob": "supportive modules/registry/via_number_engine_v0*.py",
-    "data": "supportive modules/registry/VIA_AutoCode_Registry_v0100.json",
-    "note": "components+ledger;核發永不回收;ENG-077"},
-   {"id": "GOV-02", "zh": "商品指針+安裝鏈(綁機/DEFAULT)", "verb": "via-pack",
-    "engine_glob": "supportive modules/registry/Install-VIA-Product-v0*.ps1",
-    "data": "supportive modules/registry/pkg_pointers/",
-    "note": "PKG 指針 sha256 舉證;Bootstrap-VIA-FreshPC 裸機鏈=TOOL-001"}]},
-  {"key": "ssot", "zh": "自演化 SSOT", "en": "AUTO-EVOLVING SSOT", "functions": [
-   {"id": "GOV-03", "zh": "SSOT 演化提案(凍結零觸碰)", "verb": "via-ssot-evolve",
-    "engine_glob": "supportive modules/registry/via_ssot_evolve_v0*.py",
-    "data": "supportive modules/registry/ssot_evolution/",
-    "note": "真實資料掃候選碼→版本遞增提案附出處;ENG-078"},
-   {"id": "GOV-04", "zh": "SSOT 凍結鎖稽核", "verb": "via-audit",
-    "engine_glob": "supportive modules/20_Registry_SSOT/VIA_SSOT_Unified.py",
-    "data": "*.freeze.lock.json",
-    "note": "凍結件唯讀;TW_TICKER_REGEX 鎖定式"}]},
-  {"key": "coding", "zh": "編碼引擎", "en": "CODING ENGINE", "functions": [
-   {"id": "GOV-05", "zh": "blake2s 自動給碼(VIA-TYPE-hash6)", "verb": "—",
-    "engine_glob": "functional modules/VDF/registry/VIA_VDF_Fetch_Contract.json",
-    "data": "instrument_symbol_map + 390 項總冊",
-    "note": "code=VIA-TYPE-blake2s(TYPE|name|context,3);零碰撞驗證"},
-   {"id": "GOV-06", "zh": "取數契約管理(增減/驗證)", "verb": "via-vdf contract",
-    "engine_glob": "functional modules/VDF/VDF_MDL501_FetchContractManager.py",
-    "data": "functional modules/VDF/registry/VIA_VDF_Fetch_Contract.json",
-    "note": "check/list/diff/add/remove/setstatus;17 域 390 項"}]},
-  {"key": "params", "zh": "中央參數註冊處", "en": "CENTRAL PARAM REGISTRY", "functions": [
-   {"id": "GOV-07", "zh": "全系統 4 參數契約", "verb": "—",
-    "engine_glob": "functional modules/VDF/registry/VIA_VDF_Fetch_Contract.json",
-    "data": "parameter_contract(P1 ticker 字典/P2 財報標的/P3 START_DATE/P4 FRED KEY)",
-    "note": "唯一可變參數面;其餘代碼表固定"},
-   {"id": "GOV-08", "zh": "綁機實例+DEFAULT 落檔", "verb": "—",
-    "engine_glob": "supportive modules/registry/Install-VIA-Product-v0*.ps1",
-    "data": "_instance/VIA_Instance.json + VIA_Defaults.json",
-    "note": "machine_id=sha256(MachineGuid+電腦名);組合號 VIA-C-*"}]},
-  {"key": "quality", "zh": "品質閘門", "en": "QUALITY GATES", "functions": [
-   {"id": "GOV-09", "zh": "輸入前檢查(先擋後跑)", "verb": "via-precheck",
-    "engine_glob": "supportive modules/registry/via_input_precheck_v0*.py",
-    "data": "—",
-    "note": "重複/缺欄/缺值/路徑"},
-   {"id": "GOV-10", "zh": "VRN 進件矩陣(歷史蓋預估)", "verb": "via-vrn-intake",
-    "engine_glob": "functional modules/VRN/vrn_input_matrix_validator_v0*.py",
-    "data": "functional modules/VRN/input/incoming/",
-    "note": "規格矩陣+四閘+SUPERSEDED_BY_ACTUAL;ENG-079"},
-   {"id": "GOV-11", "zh": "三子系統統包驗證", "verb": "via-vapvdf",
-    "engine_glob": "Invoke-VIA-VAPVDF-ALL-v0*.ps1",
-    "data": "VIA_Reports/vapvdf_runs/",
-    "note": "九站+跳出 SUMMARY MATRIX;TOOL-003"}]},
-  {"key": "mother", "zh": "母版管理", "en": "MOTHER TEMPLATE MGMT", "functions": [
-   {"id": "GOV-12", "zh": "母頁+子模板連鎖重生", "verb": "via-mother",
-    "engine_glob": "supportive modules/registry/build_via_mother_v0*.py",
-    "data": "VIA_Mother.html + subsystem_pages/",
-    "note": "視覺鎖 Veritas Header;LF 固定;內容未變不重寫;TOOL-MOTHER+TOOL-002"},
-   {"id": "GOV-13", "zh": "治理台功能矩陣(本 JSON 導入)", "verb": "via-console",
-    "engine_glob": "supportive modules/registry/via_governance_console_v0*.py",
-    "data": "supportive modules/registry/VIA_CentralGovernance_Console_v0100.json",
-    "note": "母版由本 JSON 資料驅動渲染;輔助工具驗證引擎在位"}]}
+ "policy": [
+  "append-only 只增不減",
+  "編號永不變",
+  "凍結正本零觸碰",
+  "誠實 OK/FAIL 不卡斷",
+  "動態解析最新版(嚴禁寫死版號)",
+  "絕不代寄 · 唯讀原件 · 零 CDN 離線"
  ],
- "red_lines": ["系統不可代為發送(.Send() never)", "Outlook 原件唯讀零觸碰", "編號永不變",
-               "基底零觸碰(freeze.lock)", "只增不減", "不爬站(VDF 為唯一取數層)",
-               "在地化零 CDN", "secrets 只走環境變數", "Gate E 不以自動指標冒充人工實測",
-               "no_fake_fill"]
+ "sections": [
+  {
+   "key": "ledger",
+   "zh": "登錄簿治理",
+   "en": "REGISTRY LEDGER",
+   "functions": [
+    {
+     "id": "GOV-01",
+     "zh": "自動編碼台帳(append-only)",
+     "verb": "via-number",
+     "engine_glob": "supportive modules/registry/via_number_engine_v0*.py",
+     "data": "supportive modules/registry/VIA_AutoCode_Registry_v0100.json",
+     "note": "components+ledger;核發永不回收;ENG-077"
+    },
+    {
+     "id": "GOV-02",
+     "zh": "商品指針+安裝鏈(綁機/DEFAULT)",
+     "verb": "via-pack",
+     "engine_glob": "supportive modules/registry/Install-VIA-Product-v0*.ps1",
+     "data": "supportive modules/registry/pkg_pointers/",
+     "note": "PKG 指針 sha256 舉證;Bootstrap-VIA-FreshPC 裸機鏈=TOOL-001"
+    }
+   ]
+  },
+  {
+   "key": "ssot",
+   "zh": "自演化 SSOT",
+   "en": "AUTO-EVOLVING SSOT",
+   "functions": [
+    {
+     "id": "GOV-03",
+     "zh": "SSOT 演化提案(凍結零觸碰)",
+     "verb": "via-ssot-evolve",
+     "engine_glob": "supportive modules/registry/via_ssot_evolve_v0*.py",
+     "data": "supportive modules/registry/ssot_evolution/",
+     "note": "真實資料掃候選碼→版本遞增提案附出處;ENG-078"
+    },
+    {
+     "id": "GOV-04",
+     "zh": "SSOT 凍結鎖稽核",
+     "verb": "via-audit",
+     "engine_glob": "supportive modules/20_Registry_SSOT/VIA_SSOT_Unified.py",
+     "data": "*.freeze.lock.json",
+     "note": "凍結件唯讀;TW_TICKER_REGEX 鎖定式"
+    }
+   ]
+  },
+  {
+   "key": "coding",
+   "zh": "編碼引擎",
+   "en": "CODING ENGINE",
+   "functions": [
+    {
+     "id": "GOV-05",
+     "zh": "blake2s 自動給碼(VIA-TYPE-hash6)",
+     "verb": "—",
+     "engine_glob": "functional modules/VDF/registry/VIA_VDF_Fetch_Contract.json",
+     "data": "instrument_symbol_map + 390 項總冊",
+     "note": "code=VIA-TYPE-blake2s(TYPE|name|context,3);零碰撞驗證"
+    },
+    {
+     "id": "GOV-06",
+     "zh": "取數契約管理(增減/驗證)",
+     "verb": "via-vdf contract",
+     "engine_glob": "functional modules/VDF/VDF_MDL501_FetchContractManager.py",
+     "data": "functional modules/VDF/registry/VIA_VDF_Fetch_Contract.json",
+     "note": "check/list/diff/add/remove/setstatus;17 域 390 項"
+    }
+   ]
+  },
+  {
+   "key": "params",
+   "zh": "中央參數註冊處",
+   "en": "CENTRAL PARAM REGISTRY",
+   "functions": [
+    {
+     "id": "GOV-07",
+     "zh": "全系統 4 參數契約",
+     "verb": "—",
+     "engine_glob": "functional modules/VDF/registry/VIA_VDF_Fetch_Contract.json",
+     "data": "parameter_contract(P1 ticker 字典/P2 財報標的/P3 START_DATE/P4 FRED KEY)",
+     "note": "唯一可變參數面;其餘代碼表固定"
+    },
+    {
+     "id": "GOV-08",
+     "zh": "綁機實例+DEFAULT 落檔",
+     "verb": "—",
+     "engine_glob": "supportive modules/registry/Install-VIA-Product-v0*.ps1",
+     "data": "_instance/VIA_Instance.json + VIA_Defaults.json",
+     "note": "machine_id=sha256(MachineGuid+電腦名);組合號 VIA-C-*"
+    }
+   ]
+  },
+  {
+   "key": "quality",
+   "zh": "品質閘門",
+   "en": "QUALITY GATES",
+   "functions": [
+    {
+     "id": "GOV-09",
+     "zh": "輸入前檢查(先擋後跑)",
+     "verb": "via-precheck",
+     "engine_glob": "supportive modules/registry/via_input_precheck_v0*.py",
+     "data": "—",
+     "note": "重複/缺欄/缺值/路徑"
+    },
+    {
+     "id": "GOV-10",
+     "zh": "VRN 進件矩陣(歷史蓋預估)",
+     "verb": "via-vrn-intake",
+     "engine_glob": "functional modules/VRN/vrn_input_matrix_validator_v0*.py",
+     "data": "functional modules/VRN/input/incoming/",
+     "note": "規格矩陣+四閘+SUPERSEDED_BY_ACTUAL;ENG-079"
+    },
+    {
+     "id": "GOV-11",
+     "zh": "三子系統統包驗證",
+     "verb": "via-vapvdf",
+     "engine_glob": "Invoke-VIA-VAPVDF-ALL-v0*.ps1",
+     "data": "VIA_Reports/vapvdf_runs/",
+     "note": "九站+跳出 SUMMARY MATRIX;TOOL-003"
+    }
+   ]
+  },
+  {
+   "key": "mother",
+   "zh": "母版管理",
+   "en": "MOTHER TEMPLATE MGMT",
+   "functions": [
+    {
+     "id": "GOV-12",
+     "zh": "母頁+子模板連鎖重生",
+     "verb": "via-mother",
+     "engine_glob": "supportive modules/registry/build_via_mother_v0*.py",
+     "data": "VIA_Mother.html + subsystem_pages/",
+     "note": "視覺鎖 Veritas Header;LF 固定;內容未變不重寫;TOOL-MOTHER+TOOL-002"
+    },
+    {
+     "id": "GOV-13",
+     "zh": "治理台功能矩陣(本 JSON 導入)",
+     "verb": "via-console",
+     "engine_glob": "supportive modules/registry/via_governance_console_v0*.py",
+     "data": "supportive modules/registry/VIA_CentralGovernance_Console_v0100.json",
+     "note": "母版由本 JSON 資料驅動渲染;輔助工具驗證引擎在位"
+    }
+   ]
+  },
+  {
+   "key": "env",
+   "zh": "環境治理",
+   "en": "ENV GOVERNANCE",
+   "functions": [
+    {
+     "id": "GOV-14",
+     "zh": "安裝衝突治理(EnvManager 閘道)",
+     "verb": "via-envmgr",
+     "engine_glob": "supportive modules/VIA_EnvManager.py",
+     "data": "—",
+     "note": "conflicts/plan-install/execute-install/rebuild plan;Gatekeeper:base 擋 MEDIUM/HIGH·via_core 白名單·新工具先過 EnvManager;append-only 快照"
+    },
+    {
+     "id": "GOV-15",
+     "zh": "EngineForge 沙箱配置(dry-run 政策)",
+     "verb": "—",
+     "engine_glob": "supportive modules/VIA_EngineForge_Config.template.json",
+     "data": "—",
+     "note": "SandboxDryRun 模式;db_write=false;衝突修復先沙箱後放行(操作員令:安裝衝突用此二件解決)"
+    }
+   ]
+  }
+ ],
+ "red_lines": [
+  "系統不可代為發送(.Send() never)",
+  "Outlook 原件唯讀零觸碰",
+  "編號永不變",
+  "基底零觸碰(freeze.lock)",
+  "只增不減",
+  "不爬站(VDF 為唯一取數層)",
+  "在地化零 CDN",
+  "secrets 只走環境變數",
+  "Gate E 不以自動指標冒充人工實測",
+  "no_fake_fill"
+ ]
 }
