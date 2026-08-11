@@ -1833,6 +1833,14 @@
    "code": "ENVMGR-ROUTER-v0100",
    "component": "via-envmgr 路由 Python 化(操作員第二跑仍出 canon JSON=batch 路由未生效)+收帳",
    "note": "①收帳:操作員 conflicts canon 輕讀秒回 BASE_MISSING WARN(C:\\Users\\tonyk\\envs 不存在=誠實空盤,非卡段路徑);先前卡段應為首次全狀態建置。②但 6338c03 後第二跑仍出 canon JSON 無 NoStall 橫幅=batch 分支路由在其機未生效(遠端不可證因;同型 goto/label 於 via-vrn-intake 實證可用,不再猜)。根除法:via_envmgr_router_v0100.py — 路由邏輯全移 Python(conflicts/scan→NoStall 動態最新,餘→正本直呼),每層印 [router] 橫幅可稽核;via-envmgr.cmd 降為零分支一行(dir 動態解析 router)。容器雙徑實測:conflicts→router 橫幅→NoStall 30 環境 1s;rebuild-candidates→正本直呼 ok。"
+  },
+  {
+   "ts": "2026-08-13T16:10:00",
+   "op": "VERIFY",
+   "category": "環境治理",
+   "code": "ENVMGR-NOSTALL/LIVE",
+   "component": "NoStall 實戰全勝(操作員機):15 真實環境 29 秒完盤",
+   "note": "[router] 橫幅雙層現形→NoStall 加速層生效;操作員機 15 個真實環境(core_312/ia_ml/ia_supportive… via_ 家族)20 工作器 29s 完盤 OK 15/TIMEOUT 0/ERROR 0(串行基準=每環境最長 ~9 分,總量級=小時→半分鐘);進度條動態幀實見;存證 ConflictReport_NoStall_20260811_233459.json。衝突判讀:BASE_MISSING WARN=EnvManager 期望一個名為 base 的基準環境作 base vs via_ 比對,其機 15 環境皆 via_ 家族無 base 名 → 誠實 WARN 非故障;要啟用比對可建 base 環境或 alias 映射,否則維持 WARN 可接受。前回 batch 路由未生效之因隨 Python 路由器根除法一併封存(不再究因,層層橫幅永久可稽)。環境治理鏈(GOV-14)至此端到端實戰閉環。"
   }
  ]
 }
