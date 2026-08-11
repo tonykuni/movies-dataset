@@ -1742,6 +1742,14 @@
    "code": "ENG-079/v0101",
    "component": "via-vrn-intake 自動導入版+驗證引擎 v0101(操作員問:開哪個資料夾→報告已移入即自動導入)",
    "note": "①動詞解析序改四段:參數指定→functional modules\\VRN\\input\\incoming 有件即【自動導入】(免選擇,操作員已移入之報告資料夾)→input\\ 有件→才彈 Windows 資料夾選擇器。②引擎 v0101(版本前行,動詞 dir /b /o:n 自動抓新):報告 PDF 一等公民 — .pdf 記完整規格(大小/sha12)分類 REPORT_PDF、驗證狀態=候 OCR 鏈(via-ocr),不作 WARN;修一蟲:PDF 因 rows=None 被硬派 OTHER → 分類改依 verdict 判 INVALID 否則一律 classify()。活測 6 檔:PDF 正確標 REPORT_PDF 候 OCR;csv/json 五檔行為與 v0100 一致(SUPERSEDED 2/ESTIMATE_ONLY 4 不變)。"
+  },
+  {
+   "ts": "2026-08-13T11:20:00",
+   "op": "FIX",
+   "category": "VRN",
+   "code": "ENG-079/v0102",
+   "component": "驗證引擎 v0102 二進位修正(操作員 64 檔實跑全 FAIL 揭露真蟲)",
+   "note": "根因:v0101 對 .pdf 的處理放在文字解碼之後 — 真 PDF 二進位 utf-8/cp950 解碼必敗即早退 FAIL,PDF 分支永不觸達(容器測試用 ASCII 假 PDF 測不出;操作員 incoming 64 件真報告全滅=誠實實測價值)。v0102:二進位文件(.pdf/.docx/.doc/.xlsx/.pptx/.zip)於解碼前先攔 — 規格照錄(大小/sha12)直接分類;.docx 新增 REPORT_DOC 類候解析鏈(華南投顧 Memo docx 實例);docstring 逃逸警告修(raw string)。真二進位活測 8 檔:PDF→REPORT_PDF 候 OCR、docx→REPORT_DOC、csv 五檔行為與前版一致(SUPERSEDED 2/ESTIMATE_ONLY 4)。版本前行 v0100/0101 留位,動詞自動抓 v0102。"
   }
  ]
 }
