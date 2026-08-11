@@ -258,7 +258,8 @@
   "工具|Invoke-VIA-VAPVDF-ALL 統包器": "TOOL-003",
   "工具|via_governance_console Console輔助工具": "TOOL-004",
   "工具|via_envmgr_nostall EnvManager加速包覆器": "TOOL-006",
-  "工具|Invoke-VRN-Batch-AllInOne-v0101": "TOOL-006"
+  "工具|Invoke-VRN-Batch-AllInOne-v0101": "TOOL-006",
+  "工具|VDF_DataHub_Orchestrator_v0101": "TOOL-007"
  },
  "ledger": [
   {
@@ -1866,6 +1867,22 @@
    "code": "TOOL-006",
    "component": "VRN OCR 批次車道 Invoke-VRN-Batch-AllInOne-v0101.ps1(64 檔重擷取接線)",
    "note": "版本前進(v0100 正本零觸碰):無 -OCR 完整委派 v0100 No-OCR 車道;-OCR 走重擷取三段 O1 MDL005 文字(雙引擎共識 T01-T20)/O2 MDL004 表格(雙引擎投票 F01-F20)/O3 DOCX 解析鏈(docx2txt→python-docx 梯次,末梯規格存證+補件指引不空手)。硬逾時 5400s/段 kill、誠實 OK/FAIL/TIMEOUT 不卡斷、視覺鎖 SUMMARY MATRIX 彈窗+JSON 存證於 VIA_Reports\\vrn_ocr_runs。via-batch.cmd 根治寫死版號違規→dir /b /o:n 動態解析。python 動態解析 via_core_312→py→python→python3。容器煙測:AST PARSE OK;實跑抓到 -WindowStyle 非 Windows 不支援→條件參數修復;種子 docx 全鏈驗證 O1 OK 20.4s/O2 OK 2.5s/O3 誠實 spec-only(容器缺 docx2txt,工作站候 via-envmgr plan-install docx2txt)。另錄:VDF_DataHub_Orchestrator.py 僅存工作站 OneDrive(30,179B 2026-04-16),倉庫無本體,TIMEOUT 修復候原件上傳。"
+  },
+  {
+   "ts": "2026-08-13T20:40:00",
+   "op": "ADJUDICATE",
+   "category": "整合去重",
+   "code": "UPLOAD-WAVE/DATAHUB-MDL011-5",
+   "component": "第四波 5 件歸戶:DataHub Orchestrator 原件+MDL011 補號+根層資料對",
+   "note": "全數首見歸戶(倉庫原無):①VDF_DataHub_Orchestrator.py(e9f2e9dcf286,8,051B,較工作站清單 30,179B 為新精簡版)→VDF;py_compile OK;容器實測誠實 fail-closed BLOCKED 8 checks。②VRN_MDL011_..Confidence_Method_Review JSON(b7aa8ae1b0be,21.99MB)→VDF 補 010/012 缺號,JSON 解析 OK(Version/GeneratedAt/Base/ReadOnly/Mutation/DbWrite)。③VRN_MDL011_DailyFetcher.py(80524f8a3666,19,098B)→VRN,py_compile OK,MDL011 缺席除名。④StockReportFinancialData.json(7776499a0b0b,944KB,兩次上傳同雜湊)→VDF 根層資料對,list[1419] 解析 OK。TIMEOUT 根因診斷:正本主程序內 bootstrap 7 重支援模組(含 EnvManager,與 via-envmgr 卡斷同源)。"
+  },
+  {
+   "ts": "2026-08-13T20:50:00",
+   "op": "BUILD",
+   "category": "工具",
+   "code": "TOOL-007",
+   "component": "VDF_DataHub_Orchestrator_v0101(NoStall 版)+ via-datahub 動詞",
+   "note": "正本零觸碰版本前進:①支援模組導入丟子程序 --import-worker,硬逾時 --supportive-timeout(預設 180s)到點 kill→誠實 nostall=TIMEOUT_Ns_KILLED,主流程不卡斷續跑 DB 檢查,整體 status 仍 fail-closed 誠實判;②--skip-supportive 誠實 SKIPPED 不假綠;③DB 檢查段 runtime 注入重用正本 def_bootstrap(檔案零觸碰)。via-datahub.cmd:dir /b /o:n 動態解析最新版+無參數 DEFAULT(data-root=VDF\\db)。容器三路煙測:normal BLOCKED 誠實/skip SKIPPED_BY_FLAG/TIMEOUT 分支單元注入驗證 TIMEOUT_180s_KILLED OK。誠實註記:此件為唯讀就緒閘(heartbeat),канonical_mutation=False;20 表填充另由 MDL003/005/006 實抓+loader 落庫,就緒閘只驗不寫;其檢查對象為 via_marketflow.duckdb(market_daily/etf_daily/etf_signals/stock_price),非 via.duckdb 22 表庫。"
   }
  ]
 }
