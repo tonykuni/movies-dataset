@@ -31,6 +31,7 @@ OUTP = ROOT / "data" / "output" / "macro_overlay.json"
 
 # 因子目錄:id → (中文名, 取值函數鍵);值一律轉動能/差分/z — 符號交給 IC,不手寫
 FACTORS = [
+    ("flow_mom", "資金流自身動能"), ("flow_chg", "資金流變化率"),
     ("fx_mom", "本幣匯率動能"), ("rate_diff", "政策利差(區−美)"),
     ("y2_diff", "短債殖利差 2y"), ("y10_diff", "長債殖利差 10y"),
     ("y30_diff", "超長債殖利差 30y"), ("curve_slope", "期限斜率(10y−2y)"),
@@ -39,6 +40,26 @@ FACTORS = [
     ("gold_mom", "黃金現貨動能"), ("gold_basis", "黃金期現基差"),
     ("btc_mom", "加密貨幣動能"),
 ]
+
+# 為何用它(每因子一行白話 — 操作員「用何指標判讀 為何用他」)
+WHY = {
+    "flow_mom": "錢有慣性:今天在流入的地方,明天多半還在流入 — 文獻與實務最穩的單一預測子",
+    "flow_chg": "慣性之外看加速度:流入正在加速還是減速,抓轉折比水位早",
+    "fx_mom": "本幣走強通常伴隨外資匯入 — 匯率是資金進出的即時腳印",
+    "rate_diff": "利差=錢的地心引力:哪邊利率高(相對美國),游資往哪邊爬",
+    "y2_diff": "短債殖利差反映貨幣政策預期差 — 快錢對它最敏感",
+    "y10_diff": "長債殖利差反映長期資金配置吸引力",
+    "y30_diff": "超長端看保險/退休金等超長線資金的動向",
+    "curve_slope": "殖利率曲線斜率=景氣預期:倒掛常先於資金避險",
+    "econ": "經濟強弱(PMI)決定基本面資金要不要來",
+    "trade": "貿易順差=經常帳美元流入的底盤",
+    "fiscal": "財政赤字擴大會擠壓債市、影響主權資金信心",
+    "infl": "通膨決定實質報酬 — 錢怕被通膨吃掉",
+    "dxy_mom": "美元走強=全球資金抽回美元體系,新興區首當其衝",
+    "gold_mom": "黃金是避險體溫計:金價急漲=資金在躲",
+    "gold_basis": "期現基差看槓桿投機情緒(期貨溢價擴大=投機加碼)",
+    "btc_mom": "加密是風險胃納的極端哨兵:BTC 衝=最敢衝的錢出動了",
+}
 FX_NAME = {"Taiwan": "USDTWD", "Japan": "USDJPY", "Europe": "EURUSD", "UK": "GBPUSD",
            "China": "USDCNH", "US": "DXY", "Korea": "USDKRW", "India": "USDINR",
            "EM": "EEM_FX", "LatAm": "USDBRL", "AsiaExJP": "ADXY", "DM": "DXY",
@@ -78,8 +99,15 @@ def _mom(series, k=10):
     return out
 
 
-def _z_last(vals, w=40):
+NO_Z = {"flow_mom", "flow_chg"}  # 已是分數單位(FIS 本身=標準化分數)— 二次 z 會洗掉水準/慣性資訊
+
+
+def _z_last(vals, w=40, fid=None):
     v = [x for x in vals if x is not None][-w:]
+    if not v:
+        return None
+    if fid in NO_Z:
+        return max(-3.0, min(3.0, 3.0 * v[-1] / 100.0))  # 等值刻度,保留水準符號
     if len(v) < 3:
         return None
     sd = _std(v)
@@ -140,10 +168,14 @@ def _aligned(smap, name, dates):
     return [s.get(d) for d in dates]
 
 
-def _factor_series(smap, region, dates, us="US"):
-    """13+1 因子逐日序列(值層;符號交給 IC)。"""
+def _factor_series(smap, region, dates, us="US", fis_series=None):
+    """16 因子逐日序列(值層;符號交給 IC)。flow_mom/flow_chg=資金流自身動能(AR 慣性,walk-forward 合法:只用 t 當下)。"""
     fx = _aligned(smap, "FX_%s" % region, dates)
     out = {"fx_mom": _mom(fx)}
+    fs = [(fis_series or {}).get(d) for d in dates]
+    out["flow_mom"] = fs
+    out["flow_chg"] = [None if (a is None or b is None) else a - b
+                       for a, b in zip(fs, [None] + fs[:-1])]
     for fid, key in (("rate_diff", "RATE"), ("y2_diff", "Y2"),
                      ("y10_diff", "Y10"), ("y30_diff", "Y30")):
         a = _aligned(smap, "%s_%s" % (key, region), dates)
@@ -166,29 +198,52 @@ def _factor_series(smap, region, dates, us="US"):
     return out
 
 
-def _adaptive_weights(fmat, fis_series, dates, windows, min_obs):
-    """權重鐵律核心:對每因子算滾動 rank-IC(因子_t vs FIS_{t+1});
-    視窗掃選(|平均加權IC| 最高);weight = IC/Σ|IC|(帶號)。全輸出可稽。"""
+def _t_of_ic(ic, n):
+    if n < 4 or abs(ic) >= 1.0:
+        return 0.0
+    return ic * math.sqrt((n - 2) / max(1e-9, 1.0 - ic * ic))
+
+
+def _adaptive_weights(fmat, fis_series, dates, windows, min_obs, t_gate=1.5):
+    """權重鐵律核心 v2(準確度三升級):
+    ①顯著閘:|t(IC)| < t_gate 之因子閒置(雜訊不給話語權 — FDR-lite)
+    ②收縮:IC×n/(n+20) 向 0 收縮(小樣本不給大權重,防過擬合)
+    ③三視窗「集成」取代單視窗挑選(挑最好=過擬合;平均=穩)— 信度↑
+    weight = 收縮IC/Σ|收縮IC|(帶號);全輸出可稽,仍是每輪算出、絕不固定。"""
     y_next = [fis_series.get(dates[i + 1]) if i + 1 < len(dates) else None
               for i in range(len(dates))]
-    best = {"window": None, "score": -1, "ics": {}}
+    ens = {}
+    detail = {}
+    n_win = 0
     for w in windows:
         ics = {}
         for fid, _zh in FACTORS:
             xs = fmat[fid][-w - 1:-1] if len(fmat[fid]) > w else fmat[fid][:-1]
             ys = y_next[-w - 1:-1] if len(y_next) > w else y_next[:-1]
             ic, n = _rank_ic(xs, ys)
-            if ic is not None and n >= min_obs:
-                ics[fid] = {"ic": round(ic, 4), "n": n}
-        score = _mean([abs(v["ic"]) for v in ics.values()]) if ics else -1
-        if score > best["score"]:
-            best = {"window": w, "score": score, "ics": ics}
-    tot = sum(abs(v["ic"]) for v in best["ics"].values())
+            if ic is None or n < min_obs:
+                continue
+            t = _t_of_ic(ic, n)
+            if abs(t) < t_gate:
+                detail.setdefault(fid, []).append({"w": w, "ic": round(ic, 4), "t": round(t, 2), "gate": "閒置(未達顯著)"})
+                continue
+            shrunk = ic * n / (n + 20.0)
+            ics[fid] = shrunk
+            detail.setdefault(fid, []).append({"w": w, "ic": round(ic, 4), "t": round(t, 2), "shrunk": round(shrunk, 4)})
+        if ics:
+            n_win += 1
+            for fid, v in ics.items():
+                ens[fid] = ens.get(fid, 0.0) + v
     weights = {}
-    if tot > 1e-9:
-        for fid, v in best["ics"].items():
-            weights[fid] = round(v["ic"] / tot, 4)
-    return weights, best
+    if n_win:
+        for fid in list(ens):
+            ens[fid] /= n_win
+        tot = sum(abs(v) for v in ens.values())
+        if tot > 1e-9:
+            weights = {fid: round(v / tot, 4) for fid, v in ens.items()}
+    return weights, {"window": "ens%s" % windows, "ics": {k: {"ic": round(v, 4), "n": min_obs}
+                                                          for k, v in ens.items()},
+                     "detail": detail, "n_windows": n_win, "t_gate": t_gate}
 
 
 # 誠實缺口清單(操作員「我們少考量甚麼」;白話一行+補法;只增不減)
@@ -215,6 +270,7 @@ def _validity_reliability(region_fis, smap, dates, cfg, windows, min_obs):
            ②判讀穩定:walk-forward 中宏觀分翻號頻率(翻來翻去=不可靠)"""
     hits = tries = flips = 0
     halves = []
+    scored = []  # (|score|, hit) — 強度校準:強訊號應更準
     for region in cfg.get("regions", {}):
         fis_s = region_fis.get(region, {})
         if len(fis_s) < 34:
@@ -222,29 +278,32 @@ def _validity_reliability(region_fis, smap, dates, cfg, windows, min_obs):
         prev_sign = None
         for i in range(30, len(dates) - 1, 5):
             sub = dates[:i + 1]
-            fmat = _factor_series(smap, region, sub)
+            fmat = _factor_series(smap, region, sub, fis_series=fis_s)
             w8, deriv = _adaptive_weights(fmat, fis_s, sub, windows, min_obs)
             if not w8:
                 continue
             score = 0.0
+            zw = int(_mean(windows))
             for fid, wt in w8.items():
-                z = _z_last(fmat[fid], deriv["window"])
+                z = _z_last(fmat[fid], zw, fid)
                 if z is not None:
                     score += wt * max(-3.0, min(3.0, z))
             nxt = fis_s.get(dates[i + 1])
             if nxt is None or abs(nxt) < 1e-9:
                 continue
             tries += 1
-            if (score >= 0) == (nxt >= 0):
+            hit_i = (score >= 0) == (nxt >= 0)
+            if hit_i:
                 hits += 1
+            scored.append((abs(score), hit_i))
             sgn = score >= 0
             if prev_sign is not None and sgn != prev_sign:
                 flips += 1
             prev_sign = sgn
         k = len(dates)
-        a, _ = _adaptive_weights(_factor_series(smap, region, dates[:2 * k // 3]),
+        a, _ = _adaptive_weights(_factor_series(smap, region, dates[:2 * k // 3], fis_series=fis_s),
                                  fis_s, dates[:2 * k // 3], windows, min_obs)
-        b, _ = _adaptive_weights(_factor_series(smap, region, dates[k // 3:]),
+        b, _ = _adaptive_weights(_factor_series(smap, region, dates[k // 3:], fis_series=fis_s),
                                  fis_s, dates[k // 3:], windows, min_obs)
         common = set(a) & set(b)
         if len(common) >= 4:
@@ -256,7 +315,16 @@ def _validity_reliability(region_fis, smap, dates, cfg, windows, min_obs):
             if den > 1e-12:
                 halves.append(num / den)
     hit = (hits / tries) if tries else None
+    hs = hw = None
+    if len(scored) >= 30:
+        scored.sort(key=lambda x: x[0])
+        k3 = len(scored) // 3
+        weak, strong = scored[:k3], scored[-k3:]
+        hw = sum(1 for _, h in weak if h) / len(weak)
+        hs = sum(1 for _, h in strong if h) / len(strong)
     return {
+        "hit_strong": round(hs, 3) if hs is not None else None,
+        "hit_weak": round(hw, 3) if hw is not None else None,
         "validity_hit_rate": round(hit, 3) if hit is not None else None,
         "validity_n": tries,
         "reliability_split_half": round(_mean(halves), 3) if halves else None,
@@ -267,7 +335,9 @@ def _validity_reliability(region_fis, smap, dates, cfg, windows, min_obs):
                   % ("%.0f%%" % (100 * hit) if hit is not None else "樣本不足",
                      tries,
                      "%.2f" % _mean(halves) if halves else "樣本不足",
-                     ("%.0f%%" % (100 * flips / tries)) if tries else "—")),
+                     ("%.0f%%" % (100 * flips / tries)) if tries else "—")
+                  + ("強度校準:強訊號命中 %.0f%% vs 弱訊號 %.0f%%(強>弱=分數大小有意義,可依強度分配注意力)。"
+                     % (100 * hs, 100 * hw) if hs is not None else "")),
         "honest": "命中率為樣本外 walk-forward(每步只用當步以前的資料),非事後諸葛;樣本仍少,數字會隨資料增長收斂",
     }
 
@@ -303,7 +373,7 @@ def build_overlay(rows, write=True):
     for region in cfg.get("regions", {}):
         fis_s = region_fis.get(region, {})
         fis = fis_s.get(dates[-1]) if dates else None
-        fmat = _factor_series(smap, region, dates)
+        fmat = _factor_series(smap, region, dates, fis_series=fis_s)
         weights, deriv = _adaptive_weights(fmat, fis_s, dates, windows, min_obs)
         if not weights:
             out_rows.append({"region": region, "fis": fis, "macro_score": None,
@@ -311,10 +381,11 @@ def build_overlay(rows, write=True):
                              "vk": "na", "window": None})
             continue
         w = deriv["window"]
+        zw = int(_mean(windows))
         score = 0.0
         contrib = []
         for fid, wt in weights.items():
-            z = _z_last(fmat[fid], w)
+            z = _z_last(fmat[fid], zw, fid)
             if z is None:
                 continue
             score += wt * max(-3.0, min(3.0, z))
@@ -345,7 +416,7 @@ def build_overlay(rows, write=True):
               "gaps": [{"name": n, "plain": p, "fix": f} for n, p, f in GAPS],
               "dxy": {"momentum": round(dxy_m, 2), "regime": dxy_regime},
               "overall_strength": round(_mean([abs(r["fis"]) for r in valid]) if valid else 0.0, 1),
-              "factor_catalog": [{"id": f, "zh": z} for f, z in FACTORS],
+              "factor_catalog": [{"id": f, "zh": z, "why": WHY.get(f, "")} for f, z in FACTORS],
               "rows": out_rows, "weights_table": weights_table,
               "weights_derivation": "權重鐵律:weight_i = 滾動 rank-IC(因子_i, 次期區域 FIS)/Σ|IC|(帶號);"
                                     "視窗自適應掃 %s;樣本<%d 之因子閒置;每輪重算 — 權重是輸出不是設定,連方向都由 IC 決定" % (windows, min_obs),

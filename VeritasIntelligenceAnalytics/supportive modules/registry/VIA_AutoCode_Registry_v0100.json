@@ -1449,6 +1449,14 @@
    "component": "R8:效度×信度量測 + 誠實缺口卡 + U/I 全面白話化 + BoardQA CRLF 修",
    "code": "ENG-062/TOOL-BQA",
    "note": "操作員三問令。①效度量測=walk-forward 樣本外命中率(每步只用當步以前資料算權重打分,對隔天區域 FIS 方向計分;丟銅板=50% 基準);信度量測=對半重算權重相似度(前後兩段各算,排名相關)+判讀翻號頻率 — 三數字入儀表板卡附白話;合成 demo 下命中率 50%/相似 0.08/翻號 40%=誠實(示範資料無領先訊號,系統不裝懂;截圖存證)。②缺口卡 12 項白話+補法(真實資料/VIX/信用利差/油銅/流動性/資金面/政策行事曆/情緒/因子重疊/牛熊分段/FDR/季節性)只增不減。③白話化:SOLID 橫幅/權重推導/理論頁四公式全加【白話】行。④實機 bug 修:BoardQA 封印驗真在 Windows checkout FAIL(git CRLF 轉換改變 sha)→ 雙式 hash(原始 or 換行正規化)+.gitattributes *.dc.html -text 鎖位元組。QA:autotest 22/22(+2)·selftest 14/14·全鏈 13 區·Playwright 卡片截圖目檢。"
+  },
+  {
+   "ts": "2026-08-12T12:30:00",
+   "op": "UPGRADE",
+   "category": "引擎",
+   "component": "R9:現金流判讀準確度實測提升(54% vs 反證 47%)+ accuracy 動詞 + FOMO 兩件裁定",
+   "code": "ENG-062/VIA-DEDUP-20260812A",
+   "note": "①準確度工程:因子+2(flow_mom 流量慣性/flow_chg 加速度,附 WHY 白話理由目錄→判讀指標與理由卡);權重引擎三升級(t 顯著閘 1.5/IC 收縮 n/(n+20)/三視窗集成棄挑選)→信度對半 0.08→0.57;NO_Z 規則(分數單位因子不二次標準化 — 診斷出 z 轉換洗掉慣性資訊之根因);synth 補真實特性 flow_rho=0.35(真實 ETF 流量具正自相關;原 iid demo 之日級方向預測數學上限=50%,先前 47-50%=誠實)。②實測兩端:反證 rho=0→47.3%(n=509,≈丟銅板)·正向 rho=0.35→54.0%(n=528;強 54.0%>弱 51.1%;理論天花板~61%)— PASS。③新 manager accuracy 動詞一鍵重測兩端(修 __main__ 雙實例 monkeypatch 假綠隱患→顯式 rho_override;首輪即被抓:反證誤跑 0.54 於容差內險過)。④上傳裁定:via_fomo_index_engine_1.py sha16=0c3927a1=canon 檔頭所記原始上傳本尊(canon=原始+歸檔路徑補丁)→SUPERSEDED 免歸戶;VIA_FOMO_Index_Report_3.html(sha16 768ab56b,含 Google Fonts CDN)=產物樣張非 runtime→歸戶 ChipWar/docs/VIA_FOMO_Index_Report_sample_20260812.html。autotest 22/22·selftest 14/14。"
   }
  ]
 }

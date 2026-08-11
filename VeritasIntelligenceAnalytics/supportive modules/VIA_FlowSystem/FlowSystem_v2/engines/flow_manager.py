@@ -43,9 +43,11 @@ def _ledger(event, detail=""):
                             "event": event, "detail": detail}, ensure_ascii=False) + "\n")
 
 
-def cmd_synth():
-    """依 params.synthetic 產 daily_data.json(alpha 控 flow→return 結構;=0 供反證)。"""
-    p = load_params()
+def cmd_synth(rho_override=None):
+    """依 params.synthetic 產 daily_data.json(alpha 控結構;rho_override 供 accuracy 反證,免打補丁防 __main__ 雙實例假綠)。"""
+    p = json.loads(json.dumps(load_params()))
+    if rho_override is not None:
+        p["synthetic"]["flow_rho"] = rho_override
     s = p.get("synthetic", {})
     uni = load_universe()
     rng = random.Random(int(s.get("seed", 42)))
@@ -59,13 +61,15 @@ def cmd_synth():
         if d.weekday() < 5:
             dates.append(str(d))
         d += dt.timedelta(days=1)
+    rho = float(s.get("flow_rho", 0.0))  # 流量慣性(真實特性;=0 供反證)
     records = []
     for t, u in uni.items():
         close = rng.uniform(20, 500)
         sh = rng.uniform(5e6, 5e8)
         pend = 0.0
+        dsh = 0.0
         for i, ds in enumerate(dates):
-            dsh = rng.gauss(0, sh * 0.004)
+            dsh = rho * dsh + rng.gauss(0, sh * 0.004 * (1.0 - rho * rho) ** 0.5)
             sh = max(1e5, sh + dsh)
             drift = alpha * (pend / (sh * 0.004)) * 0.006 if sh else 0.0  # 傳導校準:alpha=0.35 可測·alpha=0 必紅
             pend = dsh
@@ -76,7 +80,7 @@ def cmd_synth():
     (INP / "daily_data.json").write_text(
         json.dumps({"source": "synthetic v0100R(alpha=%s)" % alpha, "records": records},
                    ensure_ascii=False), encoding="utf-8")
-    print("[synth] %d 檔 × %d 日(alpha=%s)→ data/input/daily_data.json" % (len(uni), n, alpha))
+    print("[synth] %d 檔 × %d 日(alpha=%s · flow_rho=%s 流量慣性=真實特性)→ data/input/daily_data.json" % (len(uni), n, alpha, rho))
     _ledger("synth", "alpha=%s n=%d" % (alpha, n))
     return 0
 
@@ -179,6 +183,23 @@ def main():
         r = flow_pillar_a.validate_a(_rows(panel))
         print("[validate-a] %s — %s" % (r["status"], r["reason"]))
         return 0
+    if cmd == "accuracy":
+        # 兩端實證一鍵重測:反證(rho=0 必≈50%)+ 正向(rho 現值 命中>53% 且 強≥弱)
+        base = json.loads(json.dumps(load_params()))
+        cmd_synth(rho_override=0.0)
+        r0 = flow_macro.build_overlay(compute_fis(flow_bridge.load_daily(), base), write=False)
+        v0 = r0["validity_reliability"]
+        print("[反證 rho=0  ] 命中 %s(n=%d)— 需≈0.50(無慣性=不可測,系統不裝懂)" % (v0["validity_hit_rate"], v0["validity_n"]))
+        cmd_synth()
+        r1 = flow_macro.build_overlay(compute_fis(flow_bridge.load_daily(), base), write=False)
+        v1 = r1["validity_reliability"]
+        print("[正向 rho=%s] 命中 %s · 強 %s vs 弱 %s · 對半信度 %s" %
+              (base["synthetic"].get("flow_rho"), v1["validity_hit_rate"], v1["hit_strong"], v1["hit_weak"], v1["reliability_split_half"]))
+        ok0 = abs((v0["validity_hit_rate"] or 0.5) - 0.5) < 0.06
+        ok1 = (v1["validity_hit_rate"] or 0) >= 0.53 and (v1["hit_strong"] or 0) >= (v1["hit_weak"] or 1)
+        print("[判定] %s — 反證 %s · 提升 %s(真實資料到位後以此動詞持續追蹤)" %
+              ("PASS" if (ok0 and ok1) else "FAIL", "過" if ok0 else "未過", "過" if ok1 else "未過"))
+        return 0 if (ok0 and ok1) else 1
     if cmd == "hub":
         flow_hub.build_hub()
         print("[hub] flow_hub.html(一窗到底:理論總覽+六視圖側欄切換)")
@@ -269,7 +290,7 @@ def main():
         print("[ui] flow_hub.html(一窗)+ 六視圖(index/world/tier/sim/perf/monitor)")
         _ledger("all", st["solid"])
         return 0
-    print("未知命令:%s(可用:synth|selftest|autotest|calibrate|factors|run|validate-a|grid|macro|hub|worldmap|sim|perf|monitor|status|ui|all|live|harden)" % cmd)
+    print("未知命令:%s(可用:synth|selftest|autotest|calibrate|factors|run|validate-a|grid|macro|accuracy|hub|worldmap|sim|perf|monitor|status|ui|all|live|harden)" % cmd)
     return 2
 
 

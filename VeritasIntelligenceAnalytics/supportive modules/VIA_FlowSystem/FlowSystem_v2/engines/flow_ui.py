@@ -141,6 +141,21 @@ def vr_card(mo):
     return "".join(h)
 
 
+def why_card(mo):
+    """判讀指標與理由卡:16 因子 — 用什麼判讀、為何用它(白話)。"""
+    cat = (mo or {}).get("factor_catalog")
+    if not cat:
+        return ""
+    h = ['<div class="card scroll"><h3>判讀指標與理由 — 用什麼看資金流,為何用它</h3>'
+         '<table><thead><tr><th>指標</th><th>為何用它(白話)</th></tr></thead><tbody>']
+    for c in cat:
+        h.append('<tr><td><b>%s</b> <span class="hint mono">%s</span></td><td>%s</td></tr>'
+                 % (esc(c["zh"]), esc(c["id"]), esc(c.get("why", ""))))
+    h.append('</tbody></table><div class="hint">每個指標的「話語權」由資料每輪投票決定(見上方權重);'
+             '沒通過顯著檢定的指標當輪閒置 — 有理由進場,沒證據就坐下。</div></div>')
+    return "".join(h)
+
+
 def gaps_card(mo):
     """誠實缺口卡(白話):我們還沒考量什麼 + 怎麼補。"""
     gaps = (mo or {}).get("gaps")
@@ -195,6 +210,7 @@ def build_index(rows, calib, status=None, grid=None, factors=None, macro=None, w
               TOKENS["teal"], sn.get("gram_score", 0), sn.get("gram_raw", 0), esc(sn.get("regime", ""))))
     h.append(macro_card(macro))
     h.append(vr_card(macro))
+    h.append(why_card(macro))
     h.append(gaps_card(macro))
     h.append('<div class="card"><h3>Risk-Tier Ladder + GRAM</h3><table><thead><tr><th>層</th><th>FIS</th><th></th></tr></thead><tbody>')
     for tname in ("T4", "T3", "T2", "T1"):
