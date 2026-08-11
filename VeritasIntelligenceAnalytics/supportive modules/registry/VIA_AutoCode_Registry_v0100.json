@@ -253,7 +253,8 @@
   "引擎|via_number_engine_v0100 自動編號引擎": "ENG-077",
   "引擎|via_ssot_evolve_v0100 SSOT自動演化引擎": "ENG-078",
   "工具|Bootstrap-VIA-FreshPC 裸機引導鏈": "TOOL-001",
-  "工具|build_subsystem_pages_v0100 子系統分開模板產生器": "TOOL-002"
+  "工具|build_subsystem_pages_v0100 子系統分開模板產生器": "TOOL-002",
+  "引擎|vrn_input_matrix_validator_v0100 VRN輸入矩陣驗證引擎": "ENG-079"
  },
  "ledger": [
   {
@@ -1717,6 +1718,22 @@
    "code": "VDF/DB-STATUS-v0100",
    "component": "資料庫現況摘要矩陣報告(操作員令:detailed well-organized summary matrix)",
    "note": "VIA_Reports/VDF_Database_Status_Matrix_v0100.html — 實測/宣告/推估三層誠實口徑七節矩陣:A 生產庫 via.duckdb 22 表實況(MDL272 存證:已灌 2 表=VRN 正典 1,861+27 列,餘 20 表 schema-only 候 Orchestrator 灌入)· B 實測產出層(MDL002 315,328 列/TIER-2 144,021 proxy/TIER-4 2,161 天/MDL302 ALL PERFECT×2/movies sqlite 錨)· C 總冊 17 域×狀態矩陣(390 · 296/75/19,分布條)· D 可得性五層 · E 四參數契約(P4 未設=78 項不可得誠實紅)· F 落地規模推估 ~8.2M 列(FRED/共識未計)· G 誠實邊界(TIER-2 非 AUM 真流/Orchestrator TIMEOUT/未測≠正常/推估非實際)。視覺鎖樣式零 CDN;Playwright 6 表/8 KPI/零錯誤。"
+  },
+  {
+   "ts": "2026-08-11T14:04:51",
+   "op": "ISSUE",
+   "category": "編號",
+   "component": "引擎|vrn_input_matrix_validator_v0100 VRN輸入矩陣驗證引擎",
+   "code": "ENG-079",
+   "note": "自動編號引擎核發:ENG 族第 79 號(掃描既用 78 個;append-only 永不回收)。"
+  },
+  {
+   "ts": "2026-08-13T10:20:00",
+   "op": "BUILD",
+   "category": "VDF+VRN",
+   "code": "VDF/FETCHONE-R2+ENG-079",
+   "component": "總冊二波整合+VRN 輸入矩陣驗證引擎(操作員令:VRN 一起進行)",
+   "note": "①契約 JSON 二波(append-only):instrument_symbol_map 8 組 42 項(原油 6/貴金屬 5/工業大宗 6/匯率 8 含人民幣在岸離岸分列/美債殖利率 6/波動率 3/加密 4/運價景氣 4;現貨×期貨逐檔;原油氣無真現貨誠實標註 EIA spot/ETF 代理+isFuturesProxy)· selection_model 雙勾選互斥(藍 SSOT 長期維護:去重 by[code,date,series]/分區 domain·freq·year/zstd/upsert;琥珀 AD-HOC 快照:snappy)+三格式匯出(PARQUET 作業清單/CSV/GSheet TSV)· P1 字典勘誤(2317.HK·ARM.L 幽靈刪除)+.SS/.SZ 陸股組;contract check 維持 PASS 390。②ENG-079 vrn_input_matrix_validator_v0100 + via-vrn-intake 動詞(無參數=PS FolderBrowserDialog Windows I/O 選資料夾):總輸入矩陣逐檔規格(型/大小/sha12/列欄/編碼)→擷取驗證四閘(key欄/time欄/整列重複/空值率)→分類 BASICINFO/FINANCIALDATA/ESTIMATE→「歷史值蓋過預估值」對帳(唯讀報告 only 零改寫)→JSON+視覺鎖狀態頁。活測 5 檔:actual OK/basicinfo WARN(無期別欄誠實)/estimate 命中 SUPERSEDED_BY_ACTUAL 2+ESTIMATE_ONLY 4/重複列揪出/壞 JSON FAIL;rc=1 誠實紅;狀態頁 Playwright 零錯誤。總冊 HTML(三修+字典+勾選版)原件候上傳。"
   }
  ]
 }

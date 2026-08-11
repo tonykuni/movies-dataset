@@ -7237,7 +7237,9 @@
     "000660.KS": "SK 海力士",
     "1211.HK": "比亞迪",
     "ASML.AS": "艾司摩爾"
-   }
+   },
+   "suffix_rules_v2": ".TW 上市 · .TWO 上櫃 · .HK 港 · .T 日 · .KS/.KQ 韓 · .AS/.L/.DE/.PA 歐;純數字4碼自動判台股補後綴;自動大寫去重;.SS/.SZ 陸股(SSE/SZSE 分組)",
+   "dictionary_errata": "2317.HK 與 ARM.L 幽靈項已刪(字典無名項複驗=0);2317→2317.TW 鴻海;600519.SS 歸 cn 組"
   },
   "P2_financial_default": {
    "role": "財報預設標的;台股走 MOPS,美股走 yfinance",
@@ -7304,6 +7306,281 @@
    "asof": "2026-08-13",
    "note": "277→390 整合(操作員令:只增不減去重高度整合);+px10 日韓 · +cm8 原油鏈 · +gl25 全球分項 · +ef15 主動海外/債券家族 · 新域 ai17/mx25/fq13;新增 parameter_contract/availability_audit/cockpit_integration 三節;既有 277 項零改動",
    "prev_asof": "2026-08-09"
+  },
+  {
+   "asof": "2026-08-13",
+   "note": "總冊二波:instrument_symbol_map 8 組 42 項(現貨×期貨逐檔;原油氣無真現貨誠實標註)· selection_model 雙勾選 SSOT/AD-HOC+三格式匯出 · P1 字典勘誤+.SS/.SZ 陸股組;UI 三修(--grey token/按鍵族/幽靈列)記錄於總冊 HTML(候上傳)"
   }
- ]
+ ],
+ "instrument_symbol_map": {
+  "note": "非股票標的字典 · 現貨與期貨代碼逐檔寫明(操作員總冊 2026-08-13 版);原油/天然氣無真現貨行情,一律 EIA 官方 spot 或 ETF 代理並帶 isFuturesProxy+rollDecayFlag(CM-25),不混稱現貨。",
+  "groups": [
+   {
+    "group": "原油",
+    "items": [
+     {
+      "name": "Brent 期貨",
+      "symbol": "BZ=F",
+      "spot": "EIA Brent Spot(BNO 僅代理)"
+     },
+     {
+      "name": "WTI 期貨",
+      "symbol": "CL=F",
+      "spot": "EIA Cushing WTI Spot(USO 僅代理)"
+     },
+     {
+      "name": "WTI 期貨曲線 M2·M3",
+      "symbol": "CL=F M2/M3",
+      "spot": "—(曲線)"
+     },
+     {
+      "name": "Brent–WTI 價差",
+      "symbol": "BZ=F − CL=F",
+      "spot": "推導"
+     },
+     {
+      "name": "天然氣",
+      "symbol": "NG=F",
+      "spot": "EIA spot(無真現貨行情)"
+     },
+     {
+      "name": "汽油/熱燃油",
+      "symbol": "RB=F · HO=F",
+      "spot": "EIA spot"
+     }
+    ]
+   },
+   {
+    "group": "貴金屬",
+    "items": [
+     {
+      "name": "黃金",
+      "symbol": "GC=F",
+      "spot": "XAUUSD=X + LBMA 定盤"
+     },
+     {
+      "name": "白銀",
+      "symbol": "SI=F",
+      "spot": "XAGUSD=X"
+     },
+     {
+      "name": "白金",
+      "symbol": "PL=F",
+      "spot": "—"
+     },
+     {
+      "name": "鈀",
+      "symbol": "PA=F",
+      "spot": "—"
+     },
+     {
+      "name": "ETF 實物噸數",
+      "symbol": "GLD/SLV issuer 揭露",
+      "spot": "實物持有量"
+     }
+    ]
+   },
+   {
+    "group": "工業金屬與大宗",
+    "items": [
+     {
+      "name": "銅",
+      "symbol": "HG=F",
+      "spot": "LME Cash + AkShare 滬銅"
+     },
+     {
+      "name": "鋁/鎳/鋅",
+      "symbol": "LME 3M",
+      "spot": "AkShare 滬鋁/滬鎳/滬鋅"
+     },
+     {
+      "name": "鐵礦砂",
+      "symbol": "大商所 i 主連(AkShare)",
+      "spot": "—"
+     },
+     {
+      "name": "穀物",
+      "symbol": "ZC=F · ZW=F · ZS=F",
+      "spot": "—"
+     },
+     {
+      "name": "豆油/豆粉",
+      "symbol": "ZL=F · ZM=F",
+      "spot": "—"
+     },
+     {
+      "name": "軟商品",
+      "symbol": "SB=F · KC=F · CC=F · CT=F",
+      "spot": "糖咖啡可可棉花"
+     }
+    ]
+   },
+   {
+    "group": "匯率",
+    "items": [
+     {
+      "name": "美元指數",
+      "symbol": "DX-Y.NYB + DX=F",
+      "spot": "—"
+     },
+     {
+      "name": "新台幣",
+      "symbol": "TWD=X",
+      "spot": "—"
+     },
+     {
+      "name": "日圓",
+      "symbol": "JPY=X",
+      "spot": "—"
+     },
+     {
+      "name": "歐元",
+      "symbol": "EURUSD=X",
+      "spot": "—"
+     },
+     {
+      "name": "英鎊",
+      "symbol": "GBPUSD=X",
+      "spot": "—"
+     },
+     {
+      "name": "人民幣在岸",
+      "symbol": "CNY=X",
+      "spot": "外匯交易中心中間價(AkShare)"
+     },
+     {
+      "name": "人民幣離岸",
+      "symbol": "CNH=X",
+      "spot": "—"
+     },
+     {
+      "name": "在岸離岸價差",
+      "symbol": "CNH−CNY",
+      "spot": "推導"
+     }
+    ]
+   },
+   {
+    "group": "美債殖利率",
+    "items": [
+     {
+      "name": "短端",
+      "symbol": "^IRX + DGS1MO/3MO/6MO",
+      "spot": "FRED"
+     },
+     {
+      "name": "1-3 年",
+      "symbol": "DGS1/2/3",
+      "spot": "FRED"
+     },
+     {
+      "name": "5-10 年",
+      "symbol": "^FVX/^TNX + DGS5/7/10",
+      "spot": "FRED"
+     },
+     {
+      "name": "20-30 年",
+      "symbol": "^TYX + DGS20/30",
+      "spot": "FRED"
+     },
+     {
+      "name": "利差",
+      "symbol": "T10Y2Y · T10Y3M",
+      "spot": "FRED"
+     },
+     {
+      "name": "TIPS/損益兩平",
+      "symbol": "DFII10 · T10YIE",
+      "spot": "FRED"
+     }
+    ]
+   },
+   {
+    "group": "波動率",
+    "items": [
+     {
+      "name": "VIX",
+      "symbol": "^VIX + VX=F",
+      "spot": "—"
+     },
+     {
+      "name": "VVIX/SKEW/MOVE",
+      "symbol": "^VVIX · ^SKEW · MOVE",
+      "spot": "—"
+     },
+     {
+      "name": "VIX 期限結構",
+      "symbol": "VX=F 曲線",
+      "spot": "—"
+     }
+    ]
+   },
+   {
+    "group": "加密",
+    "items": [
+     {
+      "name": "BTC",
+      "symbol": "BTC-USD + CME BTC=F",
+      "spot": "—"
+     },
+     {
+      "name": "ETH",
+      "symbol": "ETH-USD + ETH=F",
+      "spot": "—"
+     },
+     {
+      "name": "五主流幣",
+      "symbol": "BTC/ETH/SOL/BNB/XRP-USD",
+      "spot": "—"
+     },
+     {
+      "name": "現貨 ETF",
+      "symbol": "IBIT/FBTC… 11+9 檔",
+      "spot": "issuer 持幣揭露"
+     }
+    ]
+   },
+   {
+    "group": "運價景氣",
+    "items": [
+     {
+      "name": "BDI",
+      "symbol": "AkShare BDI",
+      "spot": "—"
+     },
+     {
+      "name": "SCFI",
+      "symbol": "AkShare SCFI",
+      "spot": "—"
+     },
+     {
+      "name": "台股指數",
+      "symbol": "^TWII · ^TWOII",
+      "spot": "—"
+     },
+     {
+      "name": "費半",
+      "symbol": "^SOX",
+      "spot": "—"
+     }
+    ]
+   }
+  ]
+ },
+ "selection_model": {
+  "note": "總冊資料表首欄雙勾選(互斥),選取持久化 localStorage:vdf_selection;未選取按匯出即擋下",
+  "ssot_longterm": {
+   "label": "藍勾 · 長期維護 SSOT",
+   "policy": "自 START_DATE 納長期庫;每批自動更新·補不足·去重 by[code,date,series];分區 domain/freq/year;zstd;write_to_dataset 增量 upsert;落點 vdf_lake/ssot/<domain>/<code>/"
+  },
+  "adhoc": {
+   "label": "琥珀勾 · 臨時擷取 AD-HOC",
+   "policy": "一次性快照;不進長期庫不排更新;分區 by code;snappy;write_table"
+  },
+  "export_formats": {
+   "PARQUET": "瀏覽器不產二進位 → 輸出 VDF_ssot_parquet_job_N.json 作業清單交 vdf_api 寫入",
+   "CSV": "直接下載 9 欄",
+   "GOOGLE_SHEET": "TSV 剪貼簿+開新試算表"
+  }
+ }
 }
