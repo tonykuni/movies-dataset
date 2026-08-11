@@ -1985,6 +1985,14 @@
    "code": "TOOL-012",
    "component": "OCR 擷取×SSOT v2 內容級對帳器 vrn_content_reconcile_v0100 + via-reconcile 動詞(深水線①首版)",
    "note": "唯讀報告型零落庫(落庫版候對帳綠燈)。三層:A 覆蓋層 64 記錄×擷取產物在位(鍵=pdf_name↔source_document,依 MDL005/004 落檔規格 VRN_MDL005_Text/VRN_MDL004_Tables 實查);B 內容層目標價猜值於文字塊可尋性(資訊級不判死);C 分佈 FULL/TEXT_ONLY/TABLE_ONLY/DOCX_TXT/NO_EXTRACTION。pandas 缺退 CSV;staging 缺席誠實列缺。容器雙路煙測:空 staging→64 NO_EXTRACTION 誠實;合成 staging(2 PDF+4 DOCX 種子)→FULL 1/TEXT_ONLY 1/DOCX_TXT 4/NO_EXTRACTION 58 匹配邏輯精準。真實對帳候操作員機跑(staging/ocr_out 實產物僅在工作站);依 v0101 進件教訓,首輪實跑結果回貼後校準 v0101。輸出視覺鎖矩陣+JSON 於 VIA_Reports\\vrn_reconcile_runs。"
+  },
+  {
+   "ts": "2026-08-14T04:40:00",
+   "op": "VERIFY",
+   "category": "驗證",
+   "code": "RECONCILE/LIVE-63-64",
+   "component": "內容級對帳操作員機首跑 63/64 覆蓋 + v0101 缺口診斷版",
+   "note": "實跑(20260812_023855):mdl005 文字塊 4,485 · mdl004 表格列 168,927 · docx_txt 4;分佈 FULL 59/DOCX_TXT 4/NO_EXTRACTION 1 — 60 PDF 中 59 檔文字+表格雙全,僅 1 筆無擷取匹配(v0100 摘要未點名)。版本前進 v0101(正本不動):缺口終端點名+difflib 最近似 pdf_name 候選+contains 關係檢測,自證錯位原因(檔名截斷/特殊字元/引擎未處理三種假設可判別);合成煙測診斷輸出驗證 OK。候操作員 via-reconcile 重跑回貼缺口診斷 → 判因後出落庫版。"
   }
  ]
 }
