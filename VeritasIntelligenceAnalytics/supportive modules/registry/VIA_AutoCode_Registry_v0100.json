@@ -260,7 +260,8 @@
   "工具|via_envmgr_nostall EnvManager加速包覆器": "TOOL-006",
   "工具|Invoke-VRN-Batch-AllInOne-v0101": "TOOL-006",
   "工具|VDF_DataHub_Orchestrator_v0101": "TOOL-007",
-  "工具|Invoke-VAP": "TOOL-008"
+  "工具|Invoke-VAP": "TOOL-008",
+  "工具|via_support_import_audit_v0100": "TOOL-009"
  },
  "ledger": [
   {
@@ -1900,6 +1901,14 @@
    "code": "TOOL-008",
    "component": "VAP 正門入口 Invoke-VAP.ps1 + VEF SSOT 結構補齊(README 規範件落地)",
    "note": "操作員令「沒有的話就做一個」:README(VEF Repair Orchestrator 產)規範之 Invoke-VAP.ps1 原件不存在→依規範建置。①三段順跑與 via-vapvdf A1-A3 完全同呼叫式(Get-Newest 動態解析,嚴禁寫死版號):A1 probe/A2 chartlib --demo --auto/A3 selftest;②config.json 優先缺席退 config.template.json 誠實註記;③originals append-only:所有寫出進 tools\\RUN_<ts>\\(gitignore RUN_*);④-Quick/-SkipCharts;誠實逐段 OK/FAIL/SKIP 不卡斷+終端矩陣+vap_run_summary.json 存證。結構補齊:ASSETS/gateway/tools(.gitkeep);INPUT/OUTPUT 由既有 input/output 於 Windows 大小寫不敏感滿足(不另建避免 Linux 端重複目錄)。容器實測:AST PARSE OK;-SkipCharts 路 OK2/SKIP1;全跑 3/3 OK(A1 2s/A2 0.3s/A3 6.4s 65 PASS/1 SKIP);RUN 產物驗後清除。"
+  },
+  {
+   "ts": "2026-08-13T22:30:00",
+   "op": "AUDIT",
+   "category": "工具",
+   "code": "TOOL-009",
+   "component": "功能引擎×支援模組導入稽核 via_support_import_audit_v0100 + via-supaudit 動詞",
+   "note": "令「確定所有功能性引擎都有導入支援性模組」。唯讀靜態稽核,四型合法導入態:BRIDGE(SupportBridge/錨點)/DIRECT(靜態 import)/DYNAMIC(importlib 插件載入,MDL004/005 §5 型——首輪掃描盲點,實測補上)/SSOT-DATA(vap_spec.json 資料層)。實測 79 引擎:BRIDGE 2·DIRECT 4·DYNAMIC 12·SSOT-DATA 3·NONE 58 → GAPS_FOUND。主線判讀:VRN MDL001-011 全數有(插件8/橋2/直連1)✅;VDF MDL001/002 直連✅,MDL003/004/005/006/007+工具鏈 MDL10x/20x/30x/501 未導入(自帶內部 registry 設計)→真缺口;VAP seaborn_plotly=SSOT-DATA✅,chartlib v007=視覺鎖 SSOT 內嵌自足設計(掃描口徑記 NONE,誠實註記非缺陷);其餘 NONE 多為 QA/工具/歷史版留存件。接橋方案已備:[VIA:ANCHOR:SUPPORT:BOOTSTRAP] 錨點區塊(MDL011 樣板,graceful 全退化不擋),原件已鏡像 engine/,下令即注入現役補丁版。存證 VIA_SupportImport_Audit_<ts>.json 落 audit_tools。"
   }
  ]
 }
