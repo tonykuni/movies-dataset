@@ -2029,6 +2029,14 @@
    "code": "TOOL-016",
    "component": "DOCX 深度解析引擎 vrn_docx_engine_v0100 + via-docx(貼文規格 VIA 落地)",
    "note": "操作員貼文(Gemini 對話:Word 文字表格擷取修復驗證對照)按令建引擎,只整理不發明。擷取梯:docx2python(合併格最強)→python-docx→內建 XML 末梯(純標準庫 zipfile+ElementTree 解 word/document.xml 含 vMerge 續格判定;永不空手——via-ocr 末梯精神)。修復三式照貼文原方:空字串→NA/ffill 垂直合併格填補(pandas 缺退純 python ffill)/空白正規化+media 佔位符清除;表頭唯一性檢核後升格(重複誠實保留數字欄名)。驗證:矩形性補齊/空值率(承進件矩陣口徑)。對照梯 --compare:datacompy→pandas.compare→difflib 末梯;文字層 Differ diff。輸出 staging/ocr_out/docx_struct/<stem>/(text.txt+table_N.csv/parquet+summary.json)。容器全鏈煙測:合成 docx(3x3 表含 vMerge)builtin_xml 引擎解析 OK/ffill 填補 1 格實證(MQ 下填)/表頭升格/對照模式抓到 1104→1300 竄改+表格 1 列差異(pandas.compare 退路)。DOCX 解析鏈自此由 raw-text(docx2txt)升級為結構化(文字+表格+修復+驗證);4 件華南投顧 Memo 候操作員實跑。"
+  },
+  {
+   "ts": "2026-08-14T07:50:00",
+   "op": "FIX",
+   "category": "工具",
+   "code": "RESCUE-V0101+DOCX-V0101",
+   "component": "救援引擎 PaddleOCR 3.x 自適應 v0101 + DOCX 引擎 10 地雷硬化 v0101(雙版本前進)",
+   "note": "①救援 v0101(操作員機實爆:paddleocr 3.x 拒 show_log/棄 use_angle_cls):建構參數四梯嘗試(use_textline_orientation→use_angle_cls+show_log→use_angle_cls→lang)+辨識雙路(3.x predict rec_texts/rec_scores→2.x ocr item[1]);mock 兩型 API 單元注入驗證雙路皆過。②DOCX v0101 依貼文 10 地雷令逐一落防:E1 zip 簽章預檢(OLE2/.doc、PDF 偽裝誠實判)/E2 extract_image=False/E3 表頭 fillna+後綴去重/E4 巢狀 cell 遞迴攤平/E5 排版表閥值 SKIP_LAYOUT/E6 vMerge 原生/E7 NFKC+零寬字元拔除/E8 表頭 Jaccard≥0.5 配對防錯位/E9 主鍵自動偵測 join_columns/E10 千分位+to_numeric 統一(pandas 3.x 無 errors=ignore→coerce 無新 NaN 才採,實爆修正)。硬化煙測:OLE2 偽裝抓到/表頭 金額→金額_2/零寬字元正規後 0 差異/主鍵鎖定 項次/1,000≡1000 且僅 2000→2500 一列報異。附:操作員 via-docx 實跑 4 件華南 Memo 全 OK(docx2python 引擎,16-46 段落,無表格屬實)。"
   }
  ]
 }
