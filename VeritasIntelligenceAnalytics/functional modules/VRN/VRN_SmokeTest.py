@@ -69,6 +69,9 @@ def run():
             tag(True, "OCR 依賴 %s" % dep)
         except ImportError:
             tag(False, "OCR 依賴 %s 缺 — 工作站配置(誠實 WARN 不擋)" % dep, hard=False)
+        except Exception as e:  # 依賴自身損壞(如 torch.nn 缺失)— 誠實列根因,不炸穿
+            tag(False, "OCR 依賴 %s 損壞:%s: %s(誠實 WARN 不擋;修復後重跑)"
+                % (dep, type(e).__name__, str(e)[:80]), hard=False)
     print("-" * 46)
     print("  SmokeTest:%d OK / %d FAIL" % (n_ok, n_fail))
     return 0 if n_fail == 0 else 1

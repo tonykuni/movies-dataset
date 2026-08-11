@@ -1775,6 +1775,14 @@
    "code": "TOOL-003/v0101",
    "component": "統包器 v0101:VRN 併入(九站)+ 自動跳出 SUMMARY MATRIX 專業報告(操作員令)",
    "note": "①收帳:操作員機 via-vapvdf v0100 六站 6/6 OK(302 真環境 ALL PERFECT 3.98s/303 4/4 238 items/selftest 65 PASS)。②v0101(版本前行,動詞同 glob 自動抓新):VRN 三站併入 — R1 SmokeTest/R2 Panorama XCheck/R3 進件矩陣驗證(動態最新 validator 掃 input\\incoming);九站三子系統,開關 -SkipVRN 增列、-NoOpen 排程用。③跑完自動跳出 HTML SUMMARY MATRIX(Windows Start-Process;報告落 VIA_Reports/vapvdf_runs/trio_matrix_<ts>.html):字級縮小 clamp(9.5-11px)自動調整、三子系統墨底襯線群組列、verdict 膠囊、timing 松綠條、六格 KPI、ALL GREEN/FAIL 大標 — 專業緊湊版式;視覺鎖零 CDN。容器實測九站 9/9 OK 30s(VRN R1 5.1s/R2 0.1s/R3 空進件誠實 0 檔 OK);AST OK;報告 Playwright 3 群組列零錯誤。"
+  },
+  {
+   "ts": "2026-08-13T13:00:00",
+   "op": "FIX",
+   "category": "VRN",
+   "code": "TOOL-003/v0102",
+   "component": "VRN 硬紅根因終於落網+三修(操作員 trio 首跑 8/1 揭露)",
+   "note": "【硬紅根因】積欠數週的 VRN SmokeTest rc=1 全 traceback 到手:paddleocr→paddlex→modelscope→torch_utils.py:360 AttributeError: module 'torch' has no attribute 'nn' — 操作員工作站 torch 安裝損壞/被遮蔽,非 VRN 程式問題。三修:①VRN_SmokeTest OCR 依賴迴圈原僅接 ImportError,AttributeError 逃逸炸穿測試 → 補 except Exception 誠實 WARN 帶根因型別+訊息(hard=False 不擋;修復後重跑);②panorama_xcheck v111(版本前行):非互動 stdin 免按 Enter(isatty 守衛;原 27.3s 卡鍵);③統包 v0102:R1/R2 帶 --no-pause。容器 VRN-only 實測 3/3 OK 1 秒(原卡 180s+)。工作站 torch 修復令(候操作員執行):py -m pip install --user --force-reinstall torch。附帶收帳:操作員 trio 其餘八站全綠(302 ALL PERFECT 2.70s/303 4/4/R3 64 檔矩陣/selftest 65 PASS);R2 誠實 WARN 存證:SSOT v1 60 筆 vs v2 0 筆不一致(既知,無硬矛盾)。"
   }
  ]
 }
