@@ -1481,6 +1481,14 @@
    "component": "四系統對接前總檢(母版/VRN/VDF/VAP)— 補遺三",
    "code": "AUD-20260812-DOCK",
    "note": "操作員「先暫停,檢查母版及VRN/VDF/VAP完成與整合,準備對接U/I」令。本輪 Linux 實測:母版 BoardQA 四層全綠(14/14+9/9+封印4cb90a0b)+spec master 6段 OK=就緒;VAP v007 demo/auto/--sql/--panels 全過+SSOT 1.1.4=引擎層就緒(Workbench cdn.plot.ly 違在地化鐵律候修;3件UI候上傳);VRN 核心完成(MDL001-008 compile 全過·manifest 9/9·HealthCheck 曾 89 PASS·53 凍結鎖)但 ALL:203 VRN_GO.ps1 斷鏈+README 缺3檔+板零磁貼+FactSet stub+入口12支蔓生;VDF 半成:MDL501 契約 277 項 check PASS+movies intake DryRun GREEN,但 v0160 三本體全缺確證(全庫無 sha 命中)+README 21 模組缺 11(含 MDL101 致 MDL301/302 exit 0 假綠)+零凍結鎖+零 VisualLock+板零磁貼+FlowSystem「待VDF」懸空。對接準備清單 5 項入補遺三(母版對接列/VAP 內嵌化/VRN 斷鏈修/VDF 誠實化+候上傳令/磁貼與封印補齊)。詳 VIA_Architecture_Progress_v0100.md 補遺三。"
+  },
+  {
+   "ts": "2026-08-12T16:30:00",
+   "op": "INTEGRATE",
+   "category": "引擎",
+   "component": "seaborn/plotly 引擎正式導入 VAP + 跨子系統開放(via-plot)",
+   "code": "ENG-057/TOOL-PLOT",
+   "note": "操作員問「昨天 Workflow/seaborn+plotly 引擎有無導入VAP?」+令「也可用於其他子系統」。查驗:引擎檔在 VAP/engine(ENG-057)且 via-wf 已透傳,但三缺口 — ①VIA_WorkflowEngine.ps1:165 寫死 v0100 版號違動態解析鐵律→改 Get-ChildItem 取最新(AST OK);②VAP manifest 零登載→artifacts 追加 seaborn_plotly v0100+chartlib v007 兩線(sha256 記錄;artifacts 9→11);③bin/ 無直達動詞→新增 via-plot.cmd(動態解析,透傳全動詞;--file csv/tsv/json/sqlite=任何子系統資料可餵,SSOT 自動向上尋)。實測:selftest 65 PASS/1 SKIP/0 FAIL(seaborn 0.13.2+plotly 6.9.0);跨系統雙實證 — VDF demo_tw_stock_monthly.csv→CH-01 線圖(PNG+inline HTML)·MultiFactor simulation_ledger.csv→CH-03 柱圖;欄位錯給時誠實 FAIL 並列實有欄位。同回兩件上傳 VDF_MDL301/302 與庫內正典位元組全同(0036d630/6e36b665)=SUPERSEDED 免歸戶。"
   }
  ]
 }

@@ -161,8 +161,11 @@ function Invoke-EngineHost {
     return $LASTEXITCODE
 }
 
-# ── VAP seaborn+plotly 繪圖引擎（新平行引擎線）───────────────────────────
-$VapEngine = Join-Path $PSScriptRoot 'functional modules\VAP\engine\via_autoplot_seaborn_plotly_v0100.py'
+# ── VAP seaborn+plotly 繪圖引擎（新平行引擎線;動態解析鐵律:取最新版,嚴禁寫死版號）──
+$VapEngineDir = Join-Path $PSScriptRoot 'functional modules\VAP\engine'
+$VapEngine = Get-ChildItem -LiteralPath $VapEngineDir -Filter 'via_autoplot_seaborn_plotly_v0*.py' -ErrorAction SilentlyContinue |
+    Sort-Object Name | Select-Object -Last 1 -ExpandProperty FullName
+if (-not $VapEngine) { $VapEngine = Join-Path $VapEngineDir 'via_autoplot_seaborn_plotly_v0100.py' }
 
 # ── 本 session 各模組定位 ──────────────────────────────────────────────────
 $ChipWarParams = Join-Path $PSScriptRoot 'functional modules\ChipWar\chipwar_params.json'
