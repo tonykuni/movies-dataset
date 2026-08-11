@@ -1,0 +1,39 @@
+{
+  "spec_id": "VIA-SSOT-CONSISTENCY-CHECKER/1.0",
+  "origin": "操作員貼文整合(2026-08-12;SYSTEM MANAGER Plug-in 規格)— 只整理不發明",
+  "plugin": {
+    "plugin_id": "ssot_consistency_checker",
+    "version": "1.0.0",
+    "type": "governance",
+    "description": "Validates SSOT alignment across VRN/VDF/VAP database engine matrices.",
+    "capabilities": [
+      "entity_validation", "field_alignment", "type_mapping_check",
+      "nullable_vs_required_check", "extra_field_detection", "missing_field_detection",
+      "hydra_risk_integration", "quantity_validation", "visual_matrix_generation"
+    ],
+    "status_indicators": ["green", "yellow", "red"]
+  },
+  "hydra_scoring": {
+    "rules": [
+      {"issue": "missing_entity", "score": 3},
+      {"issue": "missing_required_field", "score": 2},
+      {"issue": "type_mismatch_shared_field", "score": 2},
+      {"issue": "extra_field", "score": 1},
+      {"issue": "nullable_vs_required_mismatch", "score": 1}
+    ],
+    "bands": {"green": "0-1", "yellow": "2-4", "red": "5+"},
+    "system_bands": {"green": "<3", "yellow": "3-9", "red": ">=10"}
+  },
+  "workflow": [
+    "load SSOT", "load database engine matrix", "build entity map",
+    "per-table: entity/required/extra/type/nullable checks",
+    "compute alignment + hydra scores", "aggregate system RYG",
+    "generate visual matrix", "output JSON report"
+  ],
+  "via_adaptation_note": "貼文原型為 Node.js/實體-欄位對照;VIA 落地首版(via_panorama_six)以六條唯讀車道對現有 SSOT 資產實查(VDF 契約/VRN v2 schema 驗證/VAP spec/台帳/支援導入/啟動器鐵律),Hydra 計分沿用本規格分級;實體級 DB matrix 對照候 database_engine_matrix.json 原件到齊再擴。",
+  "co_pasted_material_disposition": {
+    "mega_prompt_20_accelerators": "治理原則與現行 VIA 常規重合(三輪修正/沙盒/矩陣/NoStall 20 加速器已實作)— 存錄於本檔不另建",
+    "nodejs_ci_yaml": "Node/CI 版不落地(VIA 棧=py+ps1);邏輯已轉譯至 via_panorama_six",
+    "html_matrix_template": "視覺鎖皮膚既有,不採外部模板"
+  }
+}

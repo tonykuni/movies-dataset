@@ -258,11 +258,13 @@
   "工具|Invoke-VIA-VAPVDF-ALL 統包器": "TOOL-003",
   "工具|via_governance_console Console輔助工具": "TOOL-004",
   "工具|via_envmgr_nostall EnvManager加速包覆器": "TOOL-006",
-  "工具|Invoke-VRN-Batch-AllInOne-v0101": "TOOL-006",
+  "工具|Invoke-VRN-Batch-AllInOne-v0101": "TOOL-005",
   "工具|VDF_DataHub_Orchestrator_v0101": "TOOL-007",
   "工具|Invoke-VAP": "TOOL-008",
   "工具|via_support_import_audit_v0100": "TOOL-009",
-  "工具|via_support_bridge_inject_v0100": "TOOL-010"
+  "工具|via_support_bridge_inject_v0100": "TOOL-010",
+  "工具|via_panorama_six_v0100": "TOOL-011",
+  "規格|VIA_SSOT_ConsistencyChecker_Spec_v0100": "SPEC-011"
  },
  "ledger": [
   {
@@ -1950,6 +1952,14 @@
    "code": "SSOT-V2/RECORDS64-PROMOTE",
    "component": "VRN ResearchReport SSOT v2 升格 60→64 筆 + XCheck v112(v2 計數修正+超集判準)",
    "note": "落庫鏈接續(64 檔語料):①查證 generations/records64.v0155(2f771c00c6dd8d6e)為乾淨超集——現行 v2 60 筆 record_hash 逐筆一致 + 新增正好 4 件 DOCX(華南投顧 2762/3038/3675/4153 Memo),即 64 檔語料的 SSOT 落庫件;②只增不減:升格前現狀快照存 generations/records60.pre_promote.f124bc875468191e.jsonl;③升格 records64→現役 v2.jsonl(64 筆,uniq source_document 64)。XCheck 假警根治:v111 讀 v2/*.json(抓到 2 個 schema 檔記 0 筆)→v112 版本前進(v111 正本不動):讀現役 .v2.jsonl+判準改「v2⊇v1 超集+共同鍵零漂移」(v2 現役線允許超前 v1 legacy 凍結線)。實測:[OK] v1 60⊆v2 64 超前 4 件零漂移,多週 WARN 除役(修根因非壓警訊)。trio R2 將自動解析 v112。"
+  },
+  {
+   "ts": "2026-08-14T02:30:00",
+   "op": "AUDIT",
+   "category": "工具",
+   "code": "TOOL-011",
+   "component": "全景式分析六獨立流程 via_panorama_six_v0100 + via-six 動詞 + ConsistencyChecker 規格歸戶",
+   "note": "令「全景式分析 六個獨立流程 不影響系統健康 不引發九頭龍風險 向前推進」。①貼文規格歸戶:VIA_SSOT_ConsistencyChecker_Spec_v0100.json(SPEC-011;Hydra 計分 3/2/2/1/1、車道 0-1綠/2-4黃/5+紅、系統 <3綠/3-9黃/≥10紅;Node/CI 版不落地=VIA 棧 py+ps1,Mega-Prompt 治理原則與現行常規重合存錄不另建)。②TOOL-011 六車道全唯讀互不共檔(讀不寫=零 Hydra):L1 VDF 契約/L2 VRN v2 schema 逐筆驗證/L3 VAP spec/L4 台帳/L5 supaudit 復用/L6 啟動器鐵律。容器首跑實斬三發現:(a)L2 64/64 筆全過 jsonschema(v2 store 品質實證);(b)L4 揪出台帳真重碼 TOOL-006 雙持有(via_envmgr_nostall 先發 vs Batch v0101 後發)→勘誤:先發先得,nostall 保 TOOL-006,Batch v0101 移空號 TOOL-005(歷史 ledger 條目 205 append-only 不改,以本條勘誤為準);(c)L6 揪出 15 處舊啟動器寫死版號(via-bridge/via-code/via-envfix 等)=技術債清單候令清掃。L3 鍵位修正(meta.version/groups 合計 28 圖型)。"
   }
  ]
 }
