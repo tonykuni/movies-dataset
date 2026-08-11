@@ -215,7 +215,12 @@ document.querySelector('#pg-home .tin').insertAdjacentHTML('beforeend', %(docs)s
 </script></body></html>""" % dict(T, nav="".join(nav), home=home, subpages="".join(subpages),
                                   pkgs_pg=pkgs_pg, spec_pg=spec_pg, n_ledger=n_ledger,
                                   docs=json.dumps(docs, ensure_ascii=False))
-    OUT.write_text(page, encoding="utf-8")
+    # 位元組穩定寫出:LF 固定(Windows 預設 CRLF 會弄髒追蹤檔→git pull 被擋)+內容未變不重寫
+    data = page.encode("utf-8")
+    if OUT.exists() and OUT.read_bytes() == data:
+        print("[母頁] 內容未變 — 不重寫(避免弄髒工作樹)· %s" % OUT)
+        return 0
+    OUT.write_bytes(data)
     print("[母頁] %s(%d KB · 左panel 00+01-07+90/91 · FlowSystem 依令未列)" % (OUT, len(page) // 1024))
     return 0
 
