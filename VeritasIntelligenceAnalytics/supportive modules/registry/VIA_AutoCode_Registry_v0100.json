@@ -254,7 +254,8 @@
   "引擎|via_ssot_evolve_v0100 SSOT自動演化引擎": "ENG-078",
   "工具|Bootstrap-VIA-FreshPC 裸機引導鏈": "TOOL-001",
   "工具|build_subsystem_pages_v0100 子系統分開模板產生器": "TOOL-002",
-  "引擎|vrn_input_matrix_validator_v0100 VRN輸入矩陣驗證引擎": "ENG-079"
+  "引擎|vrn_input_matrix_validator_v0100 VRN輸入矩陣驗證引擎": "ENG-079",
+  "工具|Invoke-VIA-VAPVDF-ALL 統包器": "TOOL-003"
  },
  "ledger": [
   {
@@ -1750,6 +1751,22 @@
    "code": "ENG-079/v0102",
    "component": "驗證引擎 v0102 二進位修正(操作員 64 檔實跑全 FAIL 揭露真蟲)",
    "note": "根因:v0101 對 .pdf 的處理放在文字解碼之後 — 真 PDF 二進位 utf-8/cp950 解碼必敗即早退 FAIL,PDF 分支永不觸達(容器測試用 ASCII 假 PDF 測不出;操作員 incoming 64 件真報告全滅=誠實實測價值)。v0102:二進位文件(.pdf/.docx/.doc/.xlsx/.pptx/.zip)於解碼前先攔 — 規格照錄(大小/sha12)直接分類;.docx 新增 REPORT_DOC 類候解析鏈(華南投顧 Memo docx 實例);docstring 逃逸警告修(raw string)。真二進位活測 8 檔:PDF→REPORT_PDF 候 OCR、docx→REPORT_DOC、csv 五檔行為與前版一致(SUPERSEDED 2/ESTIMATE_ONLY 4)。版本前行 v0100/0101 留位,動詞自動抓 v0102。"
+  },
+  {
+   "ts": "2026-08-11T14:24:33",
+   "op": "ISSUE",
+   "category": "編號",
+   "component": "工具|Invoke-VIA-VAPVDF-ALL 統包器",
+   "code": "TOOL-003",
+   "note": "自動編號引擎核發:TOOL 族第 3 號(掃描既用 2 個;append-only 永不回收)。"
+  },
+  {
+   "ts": "2026-08-13T11:50:00",
+   "op": "BUILD",
+   "category": "VAP+VDF",
+   "code": "TOOL-003",
+   "component": "一支 PowerShell 統包 VAP & VDF 全流程(操作員令)+ 64 檔 intake 全綠收帳",
+   "note": "①操作員端 via-vrn-intake 重跑 64 檔 OK 64/FAIL 0(REPORT_PDF 60 候 OCR+REPORT_DOC 4 候解析)= v0102 二進位修正實戰確認,VRN 進件矩陣正式運轉。②TOOL-003 Invoke-VIA-VAPVDF-ALL-v0100.ps1 + via-vapvdf 動詞:六站順跑(V1 契約盤點/V2 MDL302 全驗/V3 MDL303 活化/A1 引擎探測/A2 chartlib 零依賴出圖/A3 seaborn·plotly selftest),誠實逐站 OK/FAIL 不卡斷,-Quick/-SkipVDF/-SkipVAP 開關,動態解析最新版引擎與統包器自身(dir 排序),末尾總結矩陣+存證 JSON 落 VIA_Reports/vapvdf_runs/。容器實測 FULL 六站 6/6 OK(0.9/36.2/2/12.9/0.3/8.7s;selftest 65 PASS/1 SKIP/0 FAIL);AST OK。"
   }
  ]
 }
