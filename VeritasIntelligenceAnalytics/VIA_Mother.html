@@ -33,12 +33,58 @@ th{color:#6b6860;font-weight:700;font-size:11px}
 iframe{width:100%;height:62vh;border:1px solid #dbd9d3;border-radius:6px;background:#fbfaf7}
 .toggle{font-size:11px;color:#24457f;cursor:pointer;text-decoration:underline}
 h3::before{content:"";display:inline-block;width:7px;height:7px;background:#9e2b25;border-radius:1px;margin-right:7px;vertical-align:1px}
+/* ── v0102 現代動畫(prefers-reduced-motion 全尊重) ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.pg.on .tin{animation:fadeUp .32s ease-out}
+.card{transition:box-shadow .18s ease,transform .18s ease}
+.card:hover{box-shadow:0 4px 14px rgba(27,26,23,.09);transform:translateY(-2px)}
+.nav button{transition:background .15s ease,border-color .15s ease,color .15s ease}
+button,select{transition:background .15s ease,border-color .15s ease}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* ── v0102 流式字階(桌機→手機同份 HTML 自動最佳化) ── */
+body{font-size:clamp(12px,.6vw + 10.5px,13.5px)}
+.card h3{font-size:clamp(13px,.7vw + 11px,15.5px)}
+.brand h2{font-size:clamp(14px,.8vw + 11px,17px)}
+table{font-size:clamp(11px,.55vw + 9.8px,12.5px)}
+/* ── v0102 滑鼠互動件:下拉/拖曳/組合 ── */
+select{padding:7px 10px;border:1px solid #dbd9d3;border-radius:6px;background:#ffffff;color:#33403f;font-family:inherit;font-size:12px;cursor:pointer;min-width:150px}
+select:hover{border-color:#3c6660}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.btn{padding:7px 14px;border:1px solid #dbd9d3;border-radius:6px;background:#ffffff;color:#33403f;font-family:inherit;font-size:12px;cursor:pointer}
+.btn:hover{background:#fbfaf7;border-color:#3c6660}
+.btn.pri{background:#9e2b25;border-color:#9e2b25;color:#fff}
+.btn.pri:hover{filter:brightness(1.08)}
+.drop{border:2px dashed #dbd9d3;border-radius:8px;padding:22px;text-align:center;color:#6b6860;transition:border-color .18s ease,background .18s ease;cursor:default}
+.drop.over{border-color:#9e2b25;background:#fbfaf7;color:#1b1a17}
+.drop ul{list-style:none;margin-top:8px;text-align:left}
+.drop li{font-family:'SFMono-Regular',Consolas,monospace;font-size:11px;padding:2px 0;color:#33403f}
+.combo label{display:inline-flex;align-items:center;gap:5px;border:1px solid #dbd9d3;border-radius:6px;padding:6px 10px;margin:3px 4px 3px 0;cursor:pointer;font-size:12px;background:#ffffff}
+.combo label:hover{border-color:#3c6660}
+.combo input{accent-color:#9e2b25;cursor:pointer}
+.combo .serial{font-family:'SFMono-Regular',Consolas,monospace;color:#9e2b25;font-weight:700;font-size:13px}
+/* ── v0102 響應式:手機垂直長方形自動最佳化 ── */
+@media (max-width:760px){
+ body{flex-direction:column;overflow:auto;height:auto}
+ .sb{width:100%;height:auto;border-right:0;border-bottom:2px solid #dbd9d3}
+ .brand{padding:12px 14px 8px}
+ .nav{display:flex;overflow-x:auto;padding:6px;gap:4px}
+ .nav button{flex:none;width:auto;margin-bottom:0;white-space:nowrap;padding:7px 10px}
+ .nav .en{display:none}
+ .nav .sep{display:none}
+ .foot{display:none}
+ .main{height:auto;overflow:visible}
+ .pg{height:auto}
+ .pg.on{display:block}
+ .tin{height:auto;overflow:visible;padding:12px}
+ iframe{height:48vh}
+ select{min-width:0;flex:1}
+}
 </style></head><body>
 <aside class="sb">
 <div class="brand"><span class="seal">理</span><div class="k">Veritas Intelligence Analytics</div>
-<h2>VIA 母系統</h2><div class="bar"></div><p>MOTHER · ONE WINDOW · v0101</p></div>
+<h2>VIA 母系統</h2><div class="bar"></div><p>MOTHER · ONE WINDOW · v0102</p></div>
 <div class="nav"><button class="nv on" data-p="home"><span class="n">00</span><span>母頁<span class="en">CONSUMER</span></span></button><button class="nv" data-p="workops"><span class="n">01</span><span>WorkOps 母版<span class="en">WORKOPS</span></span></button><button class="nv" data-p="vap"><span class="n">02</span><span>VAP 繪圖<span class="en">VAP</span></span></button><button class="nv" data-p="vrn"><span class="n">03</span><span>VRN 研報<span class="en">VRN</span></span></button><button class="nv" data-p="vdf"><span class="n">04</span><span>VDF 資料鍛造<span class="en">VDF</span></span></button><button class="nv" data-p="chipwar"><span class="n">05</span><span>ChipWar<span class="en">CHIPWAR</span></span></button><button class="nv" data-p="multifactor"><span class="n">06</span><span>MultiFactor<span class="en">MULTIFACTOR</span></span></button><button class="nv" data-p="talib"><span class="n">07</span><span>TALib<span class="en">TALIB</span></span></button><div class="sep">治理</div><button class="nv" data-p="pkgs"><span class="n">90</span><span>商品目錄<span class="en">PKG MATRIX</span></span></button><button class="nv" data-p="spec"><span class="n">91</span><span>規格母版<span class="en">SPEC MASTER</span></span></button></div>
-<div class="foot">誠實燈:登錄簿 177 筆 · 零 CDN 離線 · 視覺鎖已換膚(Veritas Header)<br>
+<div class="foot">誠實燈:登錄簿 181 筆 · 零 CDN 離線 · 視覺鎖已換膚(Veritas Header)<br>
 <span class="toggle" onclick="var d=document.getElementById('docs');d.style.display=d.style.display=='none'?'block':'none'">末頁說明 顯示/隱藏</span></div>
 </aside>
 <div class="main"><div class="pg on" id="pg-home"><div class="tin">
@@ -47,7 +93,7 @@ h3::before{content:"";display:inline-block;width:7px;height:7px;background:#9e2b
 <tr><td>基座 base</td><td class="mono">C:\VeritasIntelligenceAnalytics</td><td>首次導入即定;所有商品落此</td></tr>
 <tr><td>環境需求</td><td class="mono">PowerShell 7+ · Python 3.10+</td><td>安裝器自動檢查/引導安裝</td></tr>
 <tr><td>安裝指令</td><td class="mono">pwsh -File Install-VIA-Product-v0100.ps1 -Pointer &lt;指針&gt;</td><td>全自動;僅商品代碼增減交您</td></tr>
-<tr><td>登錄簿</td><td class="mono">177 筆 append-only</td><td>編號永不變 · 現有代碼 sha256 舉證於指針</td></tr></table>
+<tr><td>登錄簿</td><td class="mono">181 筆 append-only</td><td>編號永不變 · 現有代碼 sha256 舉證於指針</td></tr></table>
 <h3 style="margin-top:12px">② 輸入前檢查(先擋後跑)</h3>
 <div class="cmd">via-precheck --file 資料.csv --key date,ticker --required close</div>
 <p class="small">偵測:重複輸入(整列/鍵欄)· 缺欄缺值 · 路徑不存在 — 有問題誠實列出再放行。</p></div>
@@ -56,21 +102,39 @@ h3::before{content:"";display:inline-block;width:7px;height:7px;background:#9e2b
 <p class="small">增減商品=執行/移除對應指針安裝;共用資源族自動去重。FlowSystem(PKG-005)本波操作員令先不列入。</p></div>
 <div class="card"><h3>④ 運作後結果(誠實燈 — 本會話實測/存證)</h3>
 <table><tr><th>#</th><th>子系統</th><th>狀態</th><th>證據</th></tr><tr><td class="mono">01</td><td>WorkOps 母版</td><td>🟢 生產</td><td class="small">BoardQA 四層全綠(unit+integration 14/14 · system 9/9 · 封印驗真)</td></tr><tr><td class="mono">02</td><td>VAP 繪圖</td><td>🟢 生產</td><td class="small">chartlib v007 端到端+--sql/--panels;seaborn/plotly selftest 65 PASS;跨系統實渲(VDF/MultiFactor)</td></tr><tr><td class="mono">03</td><td>VRN 研報</td><td>🟢 測試鏈全綠</td><td class="small">SmokeTest 11/0 · Pipeline Runner 全綠 · XCheck 無硬矛盾 · 53 凍結鎖 · 正典入口已宣告(OCR 語料在工作站)</td></tr><tr><td class="mono">04</td><td>VDF 資料鍛造</td><td>🟢 測試鏈全綠</td><td class="small">原始全套 19 編號件復活:301/302 exit0 · 201 生成 238 items(FRED47+AK13+YF175)全過 schema · 303 四階段 GREEN6/YEL1/RED1=設計分布 · 契約 277 項 PASS;餘缺 MDL501 UI+Invoke-VDF.ps1 等 12 件候上傳</td></tr><tr><td class="mono">05</td><td>ChipWar</td><td>🟢 已驗</td><td class="small">harness L1 6/6+L2 8/8 存證;FOMO 報告樣張在庫</td></tr><tr><td class="mono">06</td><td>MultiFactor</td><td>🟢 已驗</td><td class="small">test v0101 過;simulation_ledger 已被 via-plot 跨系統實渲</td></tr><tr><td class="mono">07</td><td>TALib</td><td>🟢 已驗</td><td class="small">64 指標全測過;一律還原價</td></tr></table></div>
+<div class="card"><h3>⑤ 指令組合器(滑鼠即全部 — 下拉選好即得)</h3>
+<div class="btnrow"><select id="selSub" aria-label="子系統"></select>
+<select id="selVerb" aria-label="動詞"></select></div>
+<div class="cmd" id="composerCmd">← 先選子系統與動詞</div>
+<div class="btnrow"><button class="btn pri" id="btnCopy">📋 複製指令</button>
+<button class="btn" id="btnBat">💾 下載批次檔(.cmd 雙擊即跑)</button>
+<span class="small" id="copyMsg"></span></div>
+<p class="small">HTML 直接下指令三徑:①複製貼 PowerShell ②下載 .cmd 雙擊 ③桌面橋(候補,localhost 限定)。</p></div>
+<div class="card"><h3>⑥ 輸入資料(Windows 拖曳式加入)</h3>
+<div class="drop" id="dropzone">將 csv / json / parquet 檔<b>拖曳到此</b>(或點擊選檔)
+<input type="file" id="filePick" multiple style="display:none"><ul id="dropList"></ul></div>
+<div class="cmd" id="precheckCmd" style="display:none"></div>
+<p class="small">拖入即列清單並自動生成 via-precheck 指令(輸入前檢查:重複/缺欄/缺值,先擋後跑)。瀏覽器只交檔名不交路徑 — 檔在何處就在該目錄跑指令。</p></div>
+<div class="card combo"><h3>⑦ 商品組合(勾選=組合;組合號即時算)</h3>
+<div id="comboBox"><label><input type="checkbox" value="PKG-009"><span class="mono">PKG-009</span> WorkOps 母版(郵件×專案治理+指揮板)</label><label><input type="checkbox" value="PKG-010"><span class="mono">PKG-010</span> VAP 繪圖(chartlib+seaborn/plotly 雙線+SSOT)</label><label><input type="checkbox" value="PKG-011"><span class="mono">PKG-011</span> VRN 研報萃取治理(OCR/表格還原/交叉驗證)</label><label><input type="checkbox" value="PKG-012"><span class="mono">PKG-012</span> VDF 資料鍛造(取數契約 SSOT+intake)</label><label><input type="checkbox" value="PKG-013"><span class="mono">PKG-013</span> ChipWar 晶片戰情指標族</label><label><input type="checkbox" value="PKG-014"><span class="mono">PKG-014</span> MultiFactor 多因子驗證模擬</label><label><input type="checkbox" value="PKG-015"><span class="mono">PKG-015</span> TALib 技術指標 64 式</label></div>
+<p style="margin-top:8px">組合號:<span class="serial" id="comboSerial">(未勾選)</span>
+<span class="small">· 安裝時與本機 machine_id 綁定成正式序號(_instance\VIA_Instance.json)</span></p>
+<div class="cmd" id="comboCmd" style="display:none"></div></div>
 </div></div><div class="pg" id="pg-workops"><div class="tin">
 <div class="card"><h3>01 WorkOps 母版 — 郵件×專案治理+指揮板</h3><p>🟢 生產 · <span class="small">BoardQA 四層全綠(unit+integration 14/14 · system 9/9 · 封印驗真)</span></p>
-<h3 style="margin-top:10px">操作動詞</h3><div class="cmd">via-workops board   → 產最新指揮板(開啟 run 目錄內 VIA_WorkOps_CommandBoard.html)</div><div class="cmd">via-boardqa         → 四層品保</div><div class="cmd">via-usertest        → U01-U12 使用者旅程</div></div><div class="card"><h3>介面(在庫正本)</h3><iframe data-src="functional modules/WorkOps/VIA_WorkOps_主力包與對照卡_v002.html" title="WorkOps 母版"></iframe></div></div></div><div class="pg" id="pg-vap"><div class="tin">
+<h3 style="margin-top:10px">操作動詞</h3><div class="cmd">via-workops board   → 產最新指揮板(開啟 run 目錄內 VIA_WorkOps_CommandBoard.html)</div><div class="cmd">via-boardqa         → 四層品保</div><div class="cmd">via-usertest        → U01-U12 使用者旅程</div></div><div class="card"><h3>介面(子系統分開模板 · 視覺鎖)</h3><iframe data-src="supportive modules/ui_support/subsystem_pages/VIA_Sub_workops.html" title="WorkOps 母版"></iframe></div></div></div><div class="pg" id="pg-vap"><div class="tin">
 <div class="card"><h3>02 VAP 繪圖 — chartlib+seaborn/plotly 雙線+SSOT 28 圖型</h3><p>🟢 生產 · <span class="small">chartlib v007 端到端+--sql/--panels;seaborn/plotly selftest 65 PASS;跨系統實渲(VDF/MultiFactor)</span></p>
-<h3 style="margin-top:10px">操作動詞</h3><div class="cmd">via-vap --demo --auto        → 零依賴 SVG 線出圖</div><div class="cmd">via-plot probe ・ via-plot demo --out vap_demo → 28 型全譜</div><div class="cmd">via-plot render --chart line --file &lt;任何子系統csv/sqlite&gt; --x 欄 --y 欄</div></div><div class="card"><h3>介面(在庫正本)</h3><iframe data-src="functional modules/VAP/ui/VAP_Workbench_v010.html" title="VAP 繪圖"></iframe></div></div></div><div class="pg" id="pg-vrn"><div class="tin">
+<h3 style="margin-top:10px">操作動詞</h3><div class="cmd">via-vap --demo --auto        → 零依賴 SVG 線出圖</div><div class="cmd">via-plot probe ・ via-plot demo --out vap_demo → 28 型全譜</div><div class="cmd">via-plot render --chart line --file &lt;任何子系統csv/sqlite&gt; --x 欄 --y 欄</div></div><div class="card"><h3>介面(子系統分開模板 · 視覺鎖)</h3><iframe data-src="supportive modules/ui_support/subsystem_pages/VIA_Sub_vap.html" title="VAP 繪圖"></iframe></div></div></div><div class="pg" id="pg-vrn"><div class="tin">
 <div class="card"><h3>03 VRN 研報 — 研報 OCR/表格還原/交叉驗證治理</h3><p>🟢 測試鏈全綠 · <span class="small">SmokeTest 11/0 · Pipeline Runner 全綠 · XCheck 無硬矛盾 · 53 凍結鎖 · 正典入口已宣告(OCR 語料在工作站)</span></p>
-<h3 style="margin-top:10px">操作動詞</h3><div class="cmd">via-probe / via-extract      → 內容萃取(dry-run 預設)</div><div class="cmd">via-batch                    → AllInOne 批次</div><div class="cmd">via-ocr                      → OCR 統一路由</div></div><div class="card"><h3>介面(在庫正本)</h3><iframe data-src="functional modules/VRN/template/VDF_VRN_Integrated_ReportSSOT_AutoLayout_FINAL.html" title="VRN 研報"></iframe></div></div></div><div class="pg" id="pg-vdf"><div class="tin">
+<h3 style="margin-top:10px">操作動詞</h3><div class="cmd">via-probe / via-extract      → 內容萃取(dry-run 預設)</div><div class="cmd">via-batch                    → AllInOne 批次</div><div class="cmd">via-ocr                      → OCR 統一路由</div></div><div class="card"><h3>介面(子系統分開模板 · 視覺鎖)</h3><iframe data-src="supportive modules/ui_support/subsystem_pages/VIA_Sub_vrn.html" title="VRN 研報"></iframe></div></div></div><div class="pg" id="pg-vdf"><div class="tin">
 <div class="card"><h3>04 VDF 資料鍛造 — 市場資料取數契約 SSOT+intake+六模組重建R</h3><p>🟢 測試鏈全綠 · <span class="small">原始全套 19 編號件復活:301/302 exit0 · 201 生成 238 items(FRED47+AK13+YF175)全過 schema · 303 四階段 GREEN6/YEL1/RED1=設計分布 · 契約 277 項 PASS;餘缺 MDL501 UI+Invoke-VDF.ps1 等 12 件候上傳</span></p>
-<h3 style="margin-top:10px">操作動詞</h3><div class="cmd">via-vdf contract check       → 取數契約盤點</div><div class="cmd">py "functional modules\VDF\VDF_MDL302_FinalActivation.py" --no-pause → 端到端</div><div class="cmd">via-vdf                      → OneClick 側欄(工作站)</div></div><div class="card"><h3>介面(在庫正本)</h3><iframe data-src="functional modules/VDF/VDF_VRN_Integrated_ReportSSOT_AutoLayout_FINAL.html" title="VDF 資料鍛造"></iframe></div></div></div><div class="pg" id="pg-chipwar"><div class="tin">
+<h3 style="margin-top:10px">操作動詞</h3><div class="cmd">via-vdf contract check       → 取數契約盤點</div><div class="cmd">py "functional modules\VDF\VDF_MDL302_FinalActivation.py" --no-pause → 端到端</div><div class="cmd">via-vdf                      → OneClick 側欄(工作站)</div></div><div class="card"><h3>介面(子系統分開模板 · 視覺鎖)</h3><iframe data-src="supportive modules/ui_support/subsystem_pages/VIA_Sub_vdf.html" title="VDF 資料鍛造"></iframe></div></div></div><div class="pg" id="pg-chipwar"><div class="tin">
 <div class="card"><h3>05 ChipWar — 晶片戰情 12 引擎指標族</h3><p>🟢 已驗 · <span class="small">harness L1 6/6+L2 8/8 存證;FOMO 報告樣張在庫</span></p>
-<h3 style="margin-top:10px">操作動詞</h3><div class="cmd">via-wf chipwar               → 戰情儀表板(工作站產 _generated)</div></div><div class="card"><h3>介面(在庫正本)</h3><iframe data-src="functional modules/ChipWar/docs/VIA_FOMO_Index_Report_sample_20260812.html" title="ChipWar"></iframe></div></div></div><div class="pg" id="pg-multifactor"><div class="tin">
+<h3 style="margin-top:10px">操作動詞</h3><div class="cmd">via-wf chipwar               → 戰情儀表板(工作站產 _generated)</div></div><div class="card"><h3>介面(子系統分開模板 · 視覺鎖)</h3><iframe data-src="supportive modules/ui_support/subsystem_pages/VIA_Sub_chipwar.html" title="ChipWar"></iframe></div></div></div><div class="pg" id="pg-multifactor"><div class="tin">
 <div class="card"><h3>06 MultiFactor — 多因子驗證模擬</h3><p>🟢 已驗 · <span class="small">test v0101 過;simulation_ledger 已被 via-plot 跨系統實渲</span></p>
-<h3 style="margin-top:10px">操作動詞</h3><div class="cmd">via-wf multifactor           → 驗證模擬鏈</div></div><div class="card"><h3>介面</h3><p class="small">本子系統無獨立追蹤 UI —以命令列動詞+產出報告呈現(誠實缺席,不佔位假圖)。</p></div></div></div><div class="pg" id="pg-talib"><div class="tin">
+<h3 style="margin-top:10px">操作動詞</h3><div class="cmd">via-wf multifactor           → 驗證模擬鏈</div></div><div class="card"><h3>介面(子系統分開模板 · 視覺鎖)</h3><iframe data-src="supportive modules/ui_support/subsystem_pages/VIA_Sub_multifactor.html" title="MultiFactor"></iframe></div></div></div><div class="pg" id="pg-talib"><div class="tin">
 <div class="card"><h3>07 TALib — 技術指標 64 式(adj 鐵律)</h3><p>🟢 已驗 · <span class="small">64 指標全測過;一律還原價</span></p>
-<h3 style="margin-top:10px">操作動詞</h3><div class="cmd">via-wf talib                 → 指標批跑</div></div><div class="card"><h3>介面</h3><p class="small">本子系統無獨立追蹤 UI —以命令列動詞+產出報告呈現(誠實缺席,不佔位假圖)。</p></div></div></div><div class="pg" id="pg-pkgs"><div class="tin">
+<h3 style="margin-top:10px">操作動詞</h3><div class="cmd">via-wf talib                 → 指標批跑</div></div><div class="card"><h3>介面(子系統分開模板 · 視覺鎖)</h3><iframe data-src="supportive modules/ui_support/subsystem_pages/VIA_Sub_talib.html" title="TALib"></iframe></div></div></div><div class="pg" id="pg-pkgs"><div class="tin">
 <div class="card"><h3>商品目錄矩陣(PKG;編號永不變 · 指針=內容物 sha256 舉證)</h3>
 <table><tr><th>編號</th><th>商品</th><th>件</th><th>大小</th><th>動詞</th><th>指針</th></tr><tr><td class="mono">PKG-009</td><td>WorkOps 母版(郵件×專案治理+指揮板)</td><td class="r">275</td><td class="r">8,732 KB</td><td class="mono small">via-workops, via-boardqa, via-usertest</td><td class="mono small">supportive modules/registry/pkg_pointers/PKG_009_Pointer.json</td></tr><tr><td class="mono">PKG-010</td><td>VAP 繪圖(chartlib+seaborn/plotly 雙線+SSOT)</td><td class="r">108</td><td class="r">71,588 KB</td><td class="mono small">via-vap, via-plot</td><td class="mono small">supportive modules/registry/pkg_pointers/PKG_010_Pointer.json</td></tr><tr><td class="mono">PKG-011</td><td>VRN 研報萃取治理(OCR/表格還原/交叉驗證)</td><td class="r">135</td><td class="r">31,455 KB</td><td class="mono small">via-batch, via-shim, via-probe, via-extract, via-ocr</td><td class="mono small">supportive modules/registry/pkg_pointers/PKG_011_Pointer.json</td></tr><tr><td class="mono">PKG-012</td><td>VDF 資料鍛造(取數契約 SSOT+intake)</td><td class="r">60</td><td class="r">1,973 KB</td><td class="mono small">via-vdf</td><td class="mono small">supportive modules/registry/pkg_pointers/PKG_012_Pointer.json</td></tr><tr><td class="mono">PKG-013</td><td>ChipWar 晶片戰情指標族</td><td class="r">20</td><td class="r">229 KB</td><td class="mono small">via-wf</td><td class="mono small">supportive modules/registry/pkg_pointers/PKG_013_Pointer.json</td></tr><tr><td class="mono">PKG-014</td><td>MultiFactor 多因子驗證模擬</td><td class="r">8</td><td class="r">61 KB</td><td class="mono small">via-wf</td><td class="mono small">supportive modules/registry/pkg_pointers/PKG_014_Pointer.json</td></tr><tr><td class="mono">PKG-015</td><td>TALib 技術指標 64 式</td><td class="r">5</td><td class="r">3,239 KB</td><td class="mono small">via-wf</td><td class="mono small">supportive modules/registry/pkg_pointers/PKG_015_Pointer.json</td></tr></table>
 <p class="small">既有 PKG-001…008 沿用(005=FlowSystem 本波不列入);組合安裝時 shared_supportive 共用族去重。</p></div>
@@ -93,5 +157,66 @@ document.querySelectorAll('.nav button').forEach(function(b){
   var f=pg.querySelector('iframe');
   if(f&&!f.src)f.src=f.dataset.src; /* 懶載 */
  });});
-document.querySelector('#pg-home .tin').insertAdjacentHTML('beforeend', "<div class=\"card\" id=\"docs\" style=\"display:none\"><h3>末頁 · 說明/規格(預設隱藏)</h3>\n<ul><li>三段式規約:P1 消費者頁=設定+現況+輸入前檢查+結果;矩陣頁;末頁可隱藏(本區)。</li>\n<li>視覺鎖<b>已換膚</b>:VAP/spec/UIUX_Design_Source/Veritas Header copy.dc.html(印章紅 #9e2b25 · 松綠 #3c6660 · 紙墨基調 · 襯線標題;本機字族零 CDN)。</li>\n<li>紅線:絕不代寄 · 唯讀原件 · 編號永不變 · 只增不減 · 零 CDN 離線 · 誠實 OK/FAIL。</li>\n<li>規劃正本:functional modules/VIA_Mother_Productization_Plan_v0100.md · 大架構:VIA_Architecture_Progress_v0100.md</li></ul></div>");
+document.querySelector('#pg-home .tin').insertAdjacentHTML('beforeend', "<div class=\"card\" id=\"docs\" style=\"display:none\"><h3>末頁 · 說明/規格(預設隱藏)</h3>\n<ul><li>三段式規約:P1 消費者頁=設定+現況+輸入前檢查+結果;矩陣頁;末頁可隱藏(本區)。</li>\n<li>視覺鎖<b>已換膚</b>:VAP/spec/UIUX_Design_Source/Veritas Header copy.dc.html(印章紅 #9e2b25 · 松綠 #3c6660 · 紙墨基調 · 襯線標題;本機字族零 CDN)。</li>\n<li>v0102 全自動化互動:響應式雙形(桌機橫/手機直)· 現代動畫(reduced-motion 尊重)· 流式字階 · 下拉指令組合器 · 拖曳輸入+precheck · 商品組合號綁機 · 批次檔下載。</li>\n<li>全新電腦:Bootstrap-VIA-FreshPC-v0100.cmd 一鍵(自動裝 PS7+Python → 交棒安裝器 → 衝突掃描 → 綁機 → DEFAULT 落檔 → 開母頁)。</li>\n<li>紅線:絕不代寄 · 唯讀原件 · 編號永不變 · 只增不減 · 零 CDN 離線 · 誠實 OK/FAIL。</li>\n<li>規劃正本:functional modules/VIA_Mother_Productization_Plan_v0100.md · 大架構:VIA_Architecture_Progress_v0100.md</li></ul></div>");
+/* ── v0102 指令組合器(下拉即得;滑鼠即全部) ── */
+var COMPOSER={"workops": {"zh": "WorkOps 母版", "cmds": ["via-workops board   → 產最新指揮板(開啟 run 目錄內 VIA_WorkOps_CommandBoard.html)", "via-boardqa         → 四層品保", "via-usertest        → U01-U12 使用者旅程"]}, "vap": {"zh": "VAP 繪圖", "cmds": ["via-vap --demo --auto        → 零依賴 SVG 線出圖", "via-plot probe ・ via-plot demo --out vap_demo → 28 型全譜", "via-plot render --chart line --file <任何子系統csv/sqlite> --x 欄 --y 欄"]}, "vrn": {"zh": "VRN 研報", "cmds": ["via-probe / via-extract      → 內容萃取(dry-run 預設)", "via-batch                    → AllInOne 批次", "via-ocr                      → OCR 統一路由"]}, "vdf": {"zh": "VDF 資料鍛造", "cmds": ["via-vdf contract check       → 取數契約盤點", "py \"functional modules\\VDF\\VDF_MDL302_FinalActivation.py\" --no-pause → 端到端", "via-vdf                      → OneClick 側欄(工作站)"]}, "chipwar": {"zh": "ChipWar", "cmds": ["via-wf chipwar               → 戰情儀表板(工作站產 _generated)"]}, "multifactor": {"zh": "MultiFactor", "cmds": ["via-wf multifactor           → 驗證模擬鏈"]}, "talib": {"zh": "TALib", "cmds": ["via-wf talib                 → 指標批跑"]}};
+var selSub=document.getElementById('selSub'),selVerb=document.getElementById('selVerb'),
+    cbox=document.getElementById('composerCmd');
+Object.keys(COMPOSER).forEach(function(pid){
+ var o=document.createElement('option');o.value=pid;o.textContent=COMPOSER[pid].zh;selSub.appendChild(o);});
+function fillVerbs(){
+ selVerb.innerHTML='';
+ COMPOSER[selSub.value].cmds.forEach(function(c){
+  var cmd=c.split('→')[0].trim();
+  var o=document.createElement('option');o.value=cmd;o.textContent=cmd;selVerb.appendChild(o);});
+ showCmd();}
+function showCmd(){cbox.textContent=selVerb.value||'';}
+selSub.addEventListener('change',fillVerbs);selVerb.addEventListener('change',showCmd);
+fillVerbs();
+function toClip(t,msgEl){
+ function done(ok){if(msgEl)msgEl.textContent=ok?'已複製 ✓':'複製失敗 — 請手動選取';}
+ if(navigator.clipboard&&navigator.clipboard.writeText){
+  navigator.clipboard.writeText(t).then(function(){done(true);},function(){legacy();});}
+ else legacy();
+ function legacy(){var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);
+  ta.select();var ok=false;try{ok=document.execCommand('copy');}catch(e){}
+  document.body.removeChild(ta);done(ok);}}
+document.getElementById('btnCopy').addEventListener('click',function(){
+ toClip(cbox.textContent,document.getElementById('copyMsg'));});
+document.getElementById('btnBat').addEventListener('click',function(){
+ var body='@echo off\r\nrem VIA 母頁指令批次(自動生成)\r\n'+cbox.textContent+'\r\npause\r\n';
+ var b=new Blob([body],{type:'text/plain'});var a=document.createElement('a');
+ a.href=URL.createObjectURL(b);a.download='via_run.cmd';a.click();URL.revokeObjectURL(a.href);});
+/* ── v0102 Windows 拖曳式輸入 ── */
+var dz=document.getElementById('dropzone'),dl=document.getElementById('dropList'),
+    pk=document.getElementById('filePick'),pc=document.getElementById('precheckCmd');
+['dragenter','dragover'].forEach(function(ev){dz.addEventListener(ev,function(e){
+ e.preventDefault();dz.classList.add('over');});});
+['dragleave','drop'].forEach(function(ev){dz.addEventListener(ev,function(e){
+ e.preventDefault();dz.classList.remove('over');});});
+function listFiles(files){
+ dl.innerHTML='';var cmds=[];
+ Array.prototype.forEach.call(files,function(f){
+  var li=document.createElement('li');
+  li.textContent='▣ '+f.name+' ('+Math.max(1,Math.round(f.size/1024))+' KB)';
+  dl.appendChild(li);
+  cmds.push('via-precheck --file "'+f.name+'"');});
+ if(cmds.length){pc.style.display='block';pc.textContent=cmds.join(' && ');}}
+dz.addEventListener('drop',function(e){if(e.dataTransfer)listFiles(e.dataTransfer.files);});
+dz.addEventListener('click',function(){pk.click();});
+pk.addEventListener('change',function(){listFiles(pk.files);});
+/* ── v0102 商品組合號(FNV-1a 決定性;安裝時綁 machine_id) ── */
+function fnv(s){var h=2166136261;for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);
+ h=Math.imul(h,16777619)>>>0;}return('0000000'+h.toString(16)).slice(-8);}
+var comboBox=document.getElementById('comboBox'),serial=document.getElementById('comboSerial'),
+    ccmd=document.getElementById('comboCmd');
+comboBox.addEventListener('change',function(){
+ var sel=Array.prototype.map.call(comboBox.querySelectorAll('input:checked'),
+  function(i){return i.value;}).sort();
+ if(!sel.length){serial.textContent='(未勾選)';ccmd.style.display='none';return;}
+ serial.textContent='VIA-C-'+fnv(sel.join('+')).toUpperCase();
+ var lines=sel.map(function(c){
+  return 'pwsh -File Install-VIA-Product-v0101.ps1 -Pointer ".\\pkg_pointers\\'+c.replace('-','_')+'_Pointer.json"';});
+ ccmd.style.display='block';
+ ccmd.textContent='rem 全新電腦先跑:Bootstrap-VIA-FreshPC-v0100.cmd <任一指針>　然後:\r\n'+lines.join('\r\n');});
 </script></body></html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>05 ChipWar · VIA 子系統模板</title><style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f2f1ec;color:#33403f;font-family:"Microsoft JhengHei","Segoe UI",system-ui,sans-serif;font-size:clamp(12px,.6vw + 10.5px,13.5px);padding:14px 18px;max-width:1080px;margin:0 auto}
+.mast{display:flex;align-items:flex-end;gap:14px;border-bottom:1px solid #dbd9d3;padding-bottom:11px;margin-bottom:14px}
+.seal{width:38px;height:38px;background:#9e2b25;border-radius:5px;color:#f2f1ec;font-family:'Noto Serif CJK TC','Songti TC','PMingLiU','SimSun',serif;font-weight:600;font-size:21px;line-height:38px;text-align:center;flex:none}
+.mast .num{font-family:'SFMono-Regular',Consolas,monospace;font-size:10px;letter-spacing:.16em;color:#6b6860;text-transform:uppercase}
+.mast h1{font-family:'Cormorant Garamond',Georgia,'Noto Serif CJK TC','Songti TC','PMingLiU',serif;font-size:clamp(16px,1.2vw + 12px,21px);font-weight:500;letter-spacing:.055em;color:#1b1a17;line-height:1.15}
+.mast .zh{font-size:12px;color:#6b6860;margin-top:2px}
+.mast .st{margin-left:auto;font-family:'SFMono-Regular',Consolas,monospace;font-size:11px;color:#3d7a52;white-space:nowrap}
+.bar{height:4px;border-radius:2px;background:#3c6660;width:56px;margin:6px 0 0}
+.card{background:#ffffff;border:1px solid #dbd9d3;border-radius:8px;padding:13px 16px;margin-bottom:12px;box-shadow:0 1px 2px rgba(27,26,23,.04);transition:box-shadow .18s ease,transform .18s ease}
+.card:hover{box-shadow:0 4px 14px rgba(27,26,23,.09);transform:translateY(-2px)}
+.card h3{font-family:'Cormorant Garamond',Georgia,'Noto Serif CJK TC','Songti TC','PMingLiU',serif;font-size:14px;font-weight:600;color:#1b1a17;margin-bottom:8px;border-bottom:2px solid #dbd9d3;padding-bottom:5px}
+h3::before{content:"";display:inline-block;width:7px;height:7px;background:#9e2b25;border-radius:1px;margin-right:7px;vertical-align:1px}
+.cmdrow{display:flex;gap:8px;align-items:flex-start;margin:5px 0}
+.cmd{flex:1;font-family:'SFMono-Regular',Consolas,monospace;font-size:11.5px;background:#fbfaf7;border:1px solid #ebe9e3;border-left:3px solid #3c6660;border-radius:6px;padding:7px 10px;user-select:all;word-break:break-all}
+.btn{padding:6px 12px;border:1px solid #dbd9d3;border-radius:6px;background:#ffffff;color:#33403f;font-family:inherit;font-size:11.5px;cursor:pointer;flex:none;transition:background .15s ease,border-color .15s ease}
+.btn:hover{background:#fbfaf7;border-color:#3c6660}
+.btn.pri{background:#9e2b25;border-color:#9e2b25;color:#fff}
+.small{font-size:11px;color:#6b6860}
+.drop{border:2px dashed #dbd9d3;border-radius:8px;padding:18px;text-align:center;color:#6b6860;transition:border-color .18s ease,background .18s ease}
+.drop.over{border-color:#9e2b25;background:#fbfaf7;color:#1b1a17}
+.drop ul{list-style:none;margin-top:8px;text-align:left}
+.drop li{font-family:'SFMono-Regular',Consolas,monospace;font-size:11px;padding:2px 0;color:#33403f}
+a.link{color:#24457f}
+.ft{font-family:'SFMono-Regular',Consolas,monospace;font-size:9.5px;color:#6b6860;border-top:1px solid #dbd9d3;padding-top:9px;margin-top:16px;text-align:center}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+body{animation:fadeUp .32s ease-out}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:760px){body{padding:10px}.mast{flex-wrap:wrap}.mast .st{margin-left:0;width:100%}}
+</style></head><body>
+<div class="mast"><span class="seal">理</span>
+<div><div class="num">Veritas Intelligence Analytics · 05 CHIPWAR</div>
+<h1>CHIPWAR INTELLIGENCE DASHBOARD</h1><div class="zh">ChipWar — 晶片戰情 12 引擎指標族</div><div class="bar"></div></div>
+<div class="st">🟢 已驗</div></div>
+<div class="card"><h3>證據(誠實燈 — 實測/存證口徑)</h3><p class="small">harness L1 6/6+L2 8/8 存證;FOMO 報告樣張在庫</p></div>
+<div class="card"><h3>功能動詞(滑鼠一鍵複製)</h3><div class="cmdrow"><div class="cmd">via-wf chipwar</div><button class="btn">複製</button></div>
+<p class="small">複製後貼 PowerShell 執行;或於母頁指令組合器下載 .cmd 批次。</p></div>
+<div class="card"><h3>輸入資料(拖曳式加入 → 輸入前檢查)</h3>
+<div class="drop" id="dz">csv / json / parquet <b>拖曳到此</b><ul id="dl"></ul></div>
+<div class="cmd" id="pc" style="display:none;margin-top:6px"></div></div>
+<div class="card"><h3>正典深層介面(在庫正本)</h3><p><a class="link" href="../../../functional%20modules/ChipWar/docs/VIA_FOMO_Index_Report_sample_20260812.html">functional modules/ChipWar/docs/VIA_FOMO_Index_Report_sample_20260812.html</a></p></div>
+<div class="ft">VIA 子系統模板 · 05 ChipWar · 視覺鎖 Veritas Header · 零 CDN 離線 · 母頁一窗返回</div>
+<script>
+document.querySelectorAll('.cmdrow .btn').forEach(function(b){
+ b.addEventListener('click',function(){
+  var t=b.parentElement.querySelector('.cmd').textContent;
+  function done(ok){b.textContent=ok?'已複製 ✓':'失敗';setTimeout(function(){b.textContent='複製';},1500);}
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+   navigator.clipboard.writeText(t).then(function(){done(true);},function(){done(false);});}
+  else{var ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();
+   var ok=false;try{ok=document.execCommand('copy');}catch(e){}
+   document.body.removeChild(ta);done(ok);}});});
+var dz=document.getElementById('dz'),dl=document.getElementById('dl'),pc=document.getElementById('pc');
+['dragenter','dragover'].forEach(function(ev){dz.addEventListener(ev,function(e){e.preventDefault();dz.classList.add('over');});});
+['dragleave','drop'].forEach(function(ev){dz.addEventListener(ev,function(e){e.preventDefault();dz.classList.remove('over');});});
+dz.addEventListener('drop',function(e){
+ if(!e.dataTransfer)return;dl.innerHTML='';var cs=[];
+ Array.prototype.forEach.call(e.dataTransfer.files,function(f){
+  var li=document.createElement('li');li.textContent='▣ '+f.name;dl.appendChild(li);
+  cs.push('via-precheck --file "'+f.name+'"');});
+ if(cs.length){pc.style.display='block';pc.textContent=cs.join(' && ');}});
+</script></body></html>
