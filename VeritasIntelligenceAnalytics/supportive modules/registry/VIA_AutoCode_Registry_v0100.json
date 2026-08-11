@@ -235,7 +235,14 @@
   "打包產品|VIA_Pack_TALib": "PKG-015",
   "支援性工具|via_input_precheck_v0100": "TOOL-PRECHK",
   "支援性工具|Install_VIA_Product_v0100": "TOOL-INSTALL",
-  "支援性工具|build_via_mother_v0100": "TOOL-MOTHER"
+  "支援性工具|build_via_mother_v0100": "TOOL-MOTHER",
+  "引擎|VDF_MDL101_OutputManager_v100R": "ENG-064",
+  "引擎|VDF_MDL001_TWUniverseVerify_v100R": "ENG-065",
+  "引擎|VDF_MDL003_SentimentMacroEngine_v100R": "ENG-066",
+  "引擎|VDF_MDL005_TWStockFilter_v100R": "ENG-067",
+  "引擎|VDF_MDL006_FinancialModel_v100R": "ENG-068",
+  "引擎|VDF_MDL103_MasterRegistry_v100R": "ENG-069",
+  "功能性工具|VRN_SmokeTest_PipelineRunner_XCheck_v0100R": "FNT-002"
  },
  "ledger": [
   {
@@ -1515,6 +1522,14 @@
    "component": "商品化加速波:七商品指針+通用安裝器+輸入前檢查+待整理清冊+母頁 v0100(FlowSystem 依令未列)",
    "code": "PKG-009..015/TOOL-PRECHK/TOOL-INSTALL/TOOL-MOTHER",
    "note": "操作員令「FlowSystem 先不列入,其他加速完整進行」。①七商品領號 PKG-009..015(WorkOps母版/VAP/VRN/VDF/ChipWar/MultiFactor/TALib;沿用既有 PKG 系列),指針產生器 build_pkg_pointers_v0100.py 生 pkg_pointers/*.json — 內容物 path+sha256 舉證(275/108/131/37/20/8/5 件;超大檔誠實 SKIP_LARGE;__pycache__/暫存/重生物排除),install 規約(ps_min 7.0/python 3.10/pip/bin_verbs)+shared_supportive 共用族+base=C:\\VeritasIntelligenceAnalytics+P1 規約+precheck 三查。②通用安裝器 Install-VIA-Product-v0100.ps1(AST OK;Linux pwsh DryRun 實測 PKG-014:環境檢查→pip 缺才裝→基座布建→內容物落位+sha 驗真→動詞檢核→開第一頁;不刪除不覆蓋既有)。③輸入前檢查共用件 via_input_precheck_v0100.py+via-precheck 動詞(selftest 3/3:整列重複/鍵重複/缺值/路徑;乾淨檔零誤報)。④待整理族清冊 unsorted_inventory_v0100.json(報告only:_inbox 611 件 32MB 為大宗)。⑤母頁 VIA_Mother.html+build_via_mother_v0100.py+via-mother 動詞:三段式規約落地(P1 設定+現況+precheck+誠實燈;90 商品矩陣+資源8族×功能對映;91 規格母版 iframe;末頁預設隱藏 toggle;子系統頁 01-07 同構 lite 各附動詞+在庫 UI 懶載 iframe/誠實缺席);左 panel 00+01-07+90/91,FlowSystem 依令未列;配色=WorkOps v2 佔位候視覺鎖。QA:Playwright 母頁 17/17(十鈕/無FlowSystem/三表/切頁九頁/懶載/商品矩陣/toggle/零 pageerror)。"
+  },
+  {
+   "ts": "2026-08-12T19:30:00",
+   "op": "BUILD",
+   "category": "引擎",
+   "component": "完成全部令:VDF 六模組重建R+測試鏈誠實化全綠 · VRN 三檢件重建+正典入口宣告",
+   "code": "ENG-064..069/FNT-002/VIA-DEDUP-20260812D",
+   "note": "操作員引母頁兩黃燈下「完成全部」令。①VDF 實況:樹內僅 004/102/301/302/501 — 依上傳測試檔(301/302,經比對=庫內正典位元組全同)所定契約重建六支:MDL101 OutputManager(5 格式統一輸出;status_summary/enable_* 旗標/空表誠實零輸出/CSV utf-8-sig BOM/JSON datetime 可攜/DuckDB 單檔多表)·MDL001-VRF(TWSE/TPEX OpenAPI+SSOT regex 驗證,離線誠實 FAIL)·MDL003(AAII/CNN F&G/FRED/AKShare 四 fetcher 可 patch,失敗記 errors 回空)·MDL005(YF Consensus+FactSet 誠實 stub)·MDL006(5y 史+三大報表×2頻+比率+估值+PE/PB Band 統計與 Plotly 內嵌圖零 CDN)·MDL103(33 模組 5 類註冊+在庫健康)。全標重建R:工作站正本到件即整合去重讓位。②MDL301/302 誠實化 v1.1.0(就地版本前進+changelog):硬紅→exit 非零,修假綠。實測:MDL301 硬閘全綠 exit 0(OM 4 格式實寫·Upgrader retrofit·7/7 在位);MDL302 九階段全綠 exit 0(imports 7/7·pipeline 6 模組·完整性 80/80·跨模組 7/7·edge 4/4)。③VRN 三缺檔重建R(README 帳實對齊):SmokeTest 11/0(SSOT 搜尋面修至 SSOT//registry 子目錄)·Pipeline Runner 全綠(dry-run 委派鏈,語料缺=誠實 WARN)·panorama_xcheck v110R(SSOT v1 60 筆 vs v2 誠實 WARN·manifest 抽核·規則層 22 模組)。④VRN manifest 宣告 canonical_entrypoints(蔓生不刪以宣告定正典;VRN_GO 斷鏈裁定=legacy 凍結存證,現行路徑 via-all/OneClick 取代)。⑤母頁狀態更新:VRN/VDF 🟡→🟢 測試鏈全綠(Playwright 17/17);PKG-011/012 指針重生(VDF 37→43 件)。候上傳存量誠實列名:VDF MDL002/007/104/105/201/303+v0160 三本體+VisualLock;VRN OCR 語料與 v0156 intake。"
   }
  ]
 }

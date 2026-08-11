@@ -5,7 +5,9 @@ r"""
   VDF_MDL302_FinalActivation.py
 ================================================================================
   VERITAS DATA FRAMEWORK · 全系統最終端到端啟動測試
-  Version    : 1.0.0   |   Module ID : VDF-FAT-001
+  Version    : 1.1.0   |   Module ID : VDF-FAT-001
+  changelog v1.1.0(2026-08-12 誠實化令):任一 phase 硬紅(import 缺/模組失敗/
+    完整性 FAIL/整合測試 FAIL/edge FAIL)→ exit 非零 — 修假綠。
 
   ROLE
   ────────────────────────────────────────────────────────────────────────────
@@ -1007,7 +1009,15 @@ def main():
     # Phase 8 = grand summary
 
     print_grand_summary(deps, imports, mock, sandbox)
-    return 0
+    # v1.1.0 誠實退出:任一硬紅 → 非零
+    hard_ok = (all(r["ok"] for r in imports)
+               and all(r.get("ok") for r in MODULE_RESULTS.values())
+               and all(r["ok"] for r in INTEGRITY_RESULTS)
+               and all(r["ok"] for r in INTEGRATION_RESULTS)
+               and all(r["ok"] for r in EDGE_CASE_RESULTS))
+    if not hard_ok:
+        print("\n❌ 硬閘未全綠 → exit 1(誠實;明細見上)")
+    return 0 if hard_ok else 1
 
 
 if __name__ == "__main__":

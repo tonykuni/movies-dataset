@@ -5,7 +5,10 @@ r"""
   VDF_MDL301_SystemTest.py
 ================================================================================
   VERITAS DATA FRAMEWORK · 全系統整合測試 + Grand Rich Summary
-  Version    : 1.0.0   |   Module ID : VDF-SYSTEST-001
+  Version    : 1.1.0   |   Module ID : VDF-SYSTEST-001
+  changelog v1.1.0(2026-08-12 誠實化令):硬閘失敗時 exit 非零 — 修「內部 ❌ 仍
+    exit 0」假綠(硬閘=OutputManager 匯入+實測、Upgrader 實測、模組檔在位、pandas;
+    yfinance/plotly/gspread 屬執行期選配=警告不擋)。
 
   跑 6 個 VDF Active 模組的整合健康檢查, 用 Rich 印 8 個 summary tables:
     [1] 套件依賴矩陣
@@ -443,7 +446,12 @@ def main():
 
     print("\n📋 Phase 5: Grand Rich Summary Matrix\n")
     print_grand_summary(deps, om_test, upg_test, files)
-    return 0
+    # v1.1.0 誠實退出:硬閘任一紅 → 非零(不再假綠)
+    hard_ok = (PANDAS and OM_OK and om_test.get("ok") and upg_test.get("ok")
+               and all(f["exists"] for f in files))
+    if not hard_ok:
+        print("\n❌ 硬閘未全綠 → exit 1(誠實;明細見上)")
+    return 0 if hard_ok else 1
 
 
 if __name__ == "__main__":
