@@ -358,3 +358,21 @@ UI 新增硬化條與 `tHAC`/`lead` 指標;`harden` 命令現跑 19 測試。
   正向端 rho=0.35 → **54.0%**(強 54.0% > 弱 51.1%;理論天花板 ~61%)· 兩端 PASS。
 - **新命令 `accuracy`**:一鍵重跑兩端實證(顯式 rho_override,修 __main__ 雙實例補丁假綠隱患)。
   真實資料到位後以此動詞持續追蹤實際準確度。
+
+## v0126R — 原始會話五件原版工件歸戶 + Hub 07-11 掛入(2026-08-12 整合去重令)
+
+六件上傳(無文字=裁定令)。cumulative_flow 兩件位元組全同(sha16 9b341923)去重保留一件;
+五件皆原始會話正典產物、非本代引擎可重生 → 歸戶 `uploads_original/`(追蹤;root *.html
+gitignore 不及子目錄)並掛入 Hub 側欄 07-11(flow_hub v0101R,懶載 iframe):
+
+| # | 頁 | 檔 | sha16 | 說明 |
+|---|----|----|-------|------|
+| 07 | 模擬終端(原版) | via_flowsim.html | 7d372ca0 | 現貨資金流→價格動態模擬,8 情境×7 商品(含台指期/期貨基差/外資買賣超),自含零 CDN |
+| 08 | 世界地圖(原版) | world_flow_original.html | be4f2876 | 世界資金流地圖動畫,inline Plotly v3.6.0(內嵌非 CDN) |
+| 09 | 累積資金流(原版) | cumulative_flow_original.html | 9b341923 | 累積資金流曲線,inline Plotly |
+| 10 | 監控台(原版) | flow_monitor_original.html | c2ff8be6 | 資金流動採用項目+族群整合監控原版 |
+| 11 | 因子字典矩陣(原版) | factor_dict_matrix_original.html | aee4ee50 | 30 因子優化流程定位(Google Fonts CDN=參考樣張,離線優雅降級) |
+
+同回兩張原始會話截圖=原版設計參考存證(驗證圖版式/RORO 指針儀表板 NETFLOW·TRUST·FID 欄,
+W=126 κ=2 30 ETF)→ 候令升級參考,無明令不改本代版面。順修引擎關聯圖口徑 autotest 17→22。
+QA:autotest 22/22 · selftest 14/14 · Playwright 實測 07-11 五頁 Hub 內全載入。

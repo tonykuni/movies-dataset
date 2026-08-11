@@ -1,11 +1,17 @@
 # -*- coding: utf-8 -*-
-"""VDF-FLOW-HUB flow_hub.py — 單一視窗整合 Hub + 理論總覽(v0100R;操作員「介面整合」令)。
+"""VDF-FLOW-HUB flow_hub.py — 單一視窗整合 Hub + 理論總覽(v0101R;操作員「介面整合」令)。
 
 「所有跳出來的介面整合 · 用流程圖說明邏輯 · 圖示/邏輯/關聯清楚 · 重整介面」:
   一窗到底:固定左側欄(VRN 側欄規約同族)+ 右側內嵌六視圖(iframe 同資料夾離線);
   啟動器自此只開本頁,不再彈六窗。
   00 理論總覽:①全鏈流程圖(資料→FIS→校準→三層驗證→宏觀→六視圖)②判讀四象限圖
   (FIS × 宏觀分)③三層 SOLID 關係圖 ④引擎五層關聯圖 — 全 SVG 自含零 CDN。
+
+changelog:
+  v0101R 2026-08-11 整合去重歸戶令:掛入 07-11 原版工件(uploads_original/:模擬終端/
+    世界地圖/累積資金流/監控台/因子字典矩陣 — 原始會話產物,非本代引擎可重生,列冊保存);
+    修引擎關聯圖標示 autotest 17→22(實測項數,cosmetic 口徑對齊)。
+  v0100R 初版:一窗 Hub + 理論總覽四圖。
 """
 from pathlib import Path
 
@@ -21,7 +27,12 @@ PAGES = [("theory", "00", "理論總覽", "THEORY", ""),
          ("tier", "03", "風險階梯", "RISK LADDER", "tier_flow.html"),
          ("sim", "04", "情境模擬", "SCENARIO SIM", "global_map_sim.html"),
          ("perf", "05", "走勢圖", "PERF TREND", "perf_trend.html"),
-         ("mon", "06", "監控台", "MONITOR", "flow_monitor.html")]
+         ("mon", "06", "監控台", "MONITOR", "flow_monitor.html"),
+         ("flowsim", "07", "模擬終端(原版)", "FLOW SIM ORIG", "uploads_original/via_flowsim.html"),
+         ("worldorig", "08", "世界地圖(原版)", "WORLD ORIG", "uploads_original/world_flow_original.html"),
+         ("cumorig", "09", "累積資金流(原版)", "CUM FLOW ORIG", "uploads_original/cumulative_flow_original.html"),
+         ("monorig", "10", "監控台(原版)", "MONITOR ORIG", "uploads_original/flow_monitor_original.html"),
+         ("fdm", "11", "因子字典矩陣(原版)", "FACTOR DICT ORIG", "uploads_original/factor_dict_matrix_original.html")]
 
 
 def _node(x, y, w, h, icon, zh, en, color, sub=""):
@@ -133,7 +144,7 @@ def svg_engine_layers():
     layers = [
         ("資料層", t["blue"], ["bridge 側車入口", "roles 閘門/分類"]),
         ("核心層", t["teal"], ["core FIS", "validate 閘", "calibrate 校準", "factors 因子", "macro 宏觀"]),
-        ("驗證層", t["amber"], ["selftest 14", "autotest 17", "pillar_a 真值"]),
+        ("驗證層", t["amber"], ["selftest 14", "autotest 22", "pillar_a 真值"]),
         ("呈現層", t["violet"], ["ui 儀表板", "grid 網格", "worldmap 地圖", "sim 模擬", "perf 走勢", "monitor 監控", "hub 一窗"]),
         ("編排", t["ink"], ["manager 18 動詞"]),
     ]

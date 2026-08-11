@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA · 現貨資金流 → 價格 動態模擬終端</title>
+<style>
+:root{--bg:#f5f4f0;--sf:#fff;--bd:#dbd9d3;--ink:#1e1d1a;--ink2:#6b6860;
+--gr:#9c9890;--up:#c96b5a;--dn:#5a9e6f;--bl:#4c78a8;--tl:#439a9a;--amber:#c4943a;--seal:#b5291a;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Sans CJK TC","Noto Sans TC","DM Sans",system-ui,sans-serif;padding:22px;max-width:1240px;margin:0 auto}
+h1{font-size:20px;font-weight:800}
+.sub{color:var(--gr);font-size:12px;margin-top:3px}
+.card{background:var(--sf);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin-top:14px}
+.k{font-size:11px;color:var(--ink2);text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.scens{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.scen{padding:7px 13px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;
+border:1px solid var(--bd);background:var(--bg);color:var(--ink2);transition:.12s}
+.scen.on{background:var(--seal);color:#fff;border-color:var(--seal)}
+.btn{padding:7px 13px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--bd);background:var(--sf);color:var(--ink)}
+.top{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:14px;margin-top:14px}
+@media(max-width:820px){.top{grid-template-columns:1fr}}
+.factbar{position:relative;height:18px;margin:5px 0;background:#eceae6;border-radius:3px}
+.factbar > div{position:absolute;top:0;bottom:0;border-radius:3px}
+.factlab{display:flex;justify-content:space-between;font-size:11px;font-family:"DM Mono",monospace}
+.big{font-size:30px;font-weight:800;font-family:"DM Mono",monospace}
+.badge{display:inline-block;padding:4px 12px;border-radius:20px;font-weight:800;font-size:13px;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:6px}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.inst{border:1px solid var(--bd);border-radius:9px;padding:11px 13px;background:var(--sf);position:relative}
+.inst .nm{font-weight:800;font-size:14px}
+.inst .un{font-size:10px;color:var(--gr)}
+.inst .px{font-family:"DM Mono",monospace;font-weight:800;font-size:18px}
+.inst .chg{font-family:"DM Mono",monospace;font-weight:700;font-size:13px}
+.fisbar{position:relative;height:16px;margin:6px 0;border-radius:3px;background:#eceae6}
+.fisbar .mid{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--gr)}
+.fisbar .fl{position:absolute;top:2px;height:12px;border-radius:2px}
+.row2{display:flex;justify-content:space-between;font-size:11px;font-family:"DM Mono",monospace;color:var(--ink2);margin-top:3px}
+.grp{font-size:12px;font-weight:800;color:var(--seal);margin:14px 0 2px;letter-spacing:1px}
+.arrow{font-size:15px;font-weight:800}
+.tw{background:linear-gradient(0deg,#fbf7f0,#fff)}
+.tag{font-size:9px;padding:1px 5px;border-radius:3px;background:#efeee9;color:var(--ink2)}
+.muted{color:var(--gr);font-size:11px}
+.legend{font-size:10px;color:var(--gr);margin-top:4px}
+</style></head><body>
+
+<h1>VIA · 現貨資金流 → 價格 動態模擬終端</h1>
+<div class="sub">選總經情境 → 系統以 FIS 標準化資金流 + 跨標的傳導,模擬流向強度與價格路徑 · 台股紅=漲/流入 綠=跌/流出 · 期貨=持倉/基差(非現貨申贖)</div>
+
+<div class="card">
+  <div class="k">總體經濟情境</div>
+  <div class="scens" id="scens"></div>
+  <div style="margin-top:10px"><span class="btn" id="reroll">▶ 重新模擬</span>
+    <span class="muted" id="seedinfo" style="margin-left:8px"></span></div>
+</div>
+
+<div class="top">
+  <div class="card">
+    <div class="k">情境因子向量</div>
+    <div id="factors" style="margin-top:8px"></div>
+  </div>
+  <div class="card" style="text-align:center">
+    <div class="k">GRAM 風險偏好動能</div>
+    <div id="gramb" class="badge" style="margin-top:8px"></div>
+    <div class="big" id="grams" style="margin-top:6px"></div>
+    <div class="muted">T3+T4 投機 − T1+T2 避險</div>
+  </div>
+  <div class="card" style="text-align:center">
+    <div class="k">美元體制 (DXY)</div>
+    <div id="usdb" class="badge" style="margin-top:8px"></div>
+    <div class="big" id="usdv" style="margin-top:6px"></div>
+    <div class="muted">商品與新興股的總開關</div>
+  </div>
+</div>
+
+<div id="board"></div>
+
+<div class="card">
+  <div class="legend">
+  方法論:flowᵢ = Σ 因子載荷ᵢⱼ × 情境因子ⱼ → FISᵢ = 100·tanh(flow/1.5) 有界標準化;價格路徑 = 漂移(elasticity×flow) + 動能 + 均值回歸 + 雜訊。
+  台股(台指期/台灣加權/櫃買)用真實現金流概念:成交金額(現金流)= 價格×成交量,外資買賣超 = f(風險, 美元);商品/DXY 為期貨持倉/基差,基差隨 |flow| 與 backwardation/contango 變化。
+  此為情境推演,非預測;接真實資料時把模擬 flow 換成 TWSE/TPEx 成交金額與三大法人、CFTC COT 即可。
+  </div>
+</div>
+
+<script>
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const fmt=(x,d=1)=>(x==null?"—":(x>=0?"+":"")+Number(x).toFixed(d));
+const col=x=>x==null?"var(--gr)":(x>=0?"var(--up)":"var(--dn)");
+
+const SCEN={
+ "Risk-On 風險偏好":{RISK:1.0,USD:-0.4,INFL:0.1,GEO:-0.2},
+ "Risk-Off 避險":{RISK:-1.0,USD:0.6,INFL:-0.1,GEO:0.3},
+ "Fed 寬鬆":{RISK:0.6,USD:-0.7,INFL:0.3,GEO:0.0},
+ "Fed 鷹派":{RISK:-0.5,USD:0.8,INFL:-0.4,GEO:0.0},
+ "地緣衝擊":{RISK:-0.6,USD:0.3,INFL:0.5,GEO:1.0},
+ "再通膨":{RISK:0.7,USD:-0.2,INFL:0.9,GEO:0.0},
+ "停滯性通膨":{RISK:-0.7,USD:0.2,INFL:0.8,GEO:0.3},
+ "美元擠壓":{RISK:-0.3,USD:1.0,INFL:-0.2,GEO:0.2},
+};
+const FKEYS=["RISK","USD","INFL","GEO"];
+const FCOL={RISK:"var(--bl)",USD:"var(--amber)",INFL:"var(--up)",GEO:"var(--seal)"};
+
+const INST=[
+ {id:"WTI",nm:"WTI 原油",grp:"能源 ENERGY",base:78,unit:"$/bbl",fut:true,carry:-1,
+  load:{RISK:0.5,USD:-0.6,INFL:0.7,GEO:0.8},elas:0.9,tier:"T3"},
+ {id:"BRENT",nm:"Brent 原油",grp:"能源 ENERGY",base:82,unit:"$/bbl",fut:true,carry:-1,
+  load:{RISK:0.45,USD:-0.55,INFL:0.65,GEO:0.95},elas:0.9,tier:"T3"},
+ {id:"GOLD",nm:"黃金 Gold",grp:"貴金屬 METALS",base:2350,unit:"$/oz",fut:true,carry:1,
+  load:{RISK:-0.2,USD:-0.7,INFL:0.5,GEO:0.9},elas:0.7,tier:"T1"},
+ {id:"TX",nm:"台指期 TX",grp:"台灣 TAIWAN",base:23000,unit:"點",fut:true,carry:0,tw:true,
+  load:{RISK:0.9,USD:-0.5,INFL:-0.1,GEO:-0.3},elas:1.0,tier:"T4"},
+ {id:"TAIEX",nm:"台灣加權指數",grp:"台灣 TAIWAN",base:23000,unit:"點",fut:false,tw:true,
+  load:{RISK:0.8,USD:-0.5,INFL:-0.1,GEO:-0.3},elas:0.9,tier:"T4"},
+ {id:"TPEX",nm:"櫃買指數 TPEx",grp:"台灣 TAIWAN",base:255,unit:"點",fut:false,tw:true,
+  load:{RISK:1.0,USD:-0.4,INFL:0.0,GEO:-0.4},elas:1.1,tier:"T4"},
+ {id:"DXY",nm:"美元指數 DXY",grp:"匯率 FX",base:104,unit:"",fut:false,
+  load:{RISK:-0.3,USD:1.0,INFL:-0.2,GEO:0.3},elas:0.5,tier:"T1"},
+];
+
+let curScen="Risk-On 風險偏好", seed=11;
+
+function drive(inst,s){return FKEYS.reduce((a,k)=>a+(inst.load[k]||0)*(s[k]||0),0);}
+function fis(flow){return 100*Math.tanh(flow/1.5);}
+
+function pricePath(inst,flow,rng){
+  const N=64, p=[inst.base]; let v=inst.base, mom=0;
+  const drift=inst.elas*flow*0.0016;
+  for(let t=1;t<N;t++){
+    mom=0.6*mom+0.4*drift;
+    const ret=mom+(inst.base-v)/inst.base*0.01+(rng()-0.5)*0.012;
+    v=v*(1+ret); p.push(v);
+  }
+  return p;
+}
+function spark(p,c,w=210,h=46){
+  const mn=Math.min(...p),mx=Math.max(...p),rg=(mx-mn)||1;
+  const pts=p.map((y,i)=>`${(i/(p.length-1)*w).toFixed(1)},${(h-(y-mn)/rg*h).toFixed(1)}`).join(" ");
+  const last=p[p.length-1], y0=(h-(p[0]-mn)/rg*h);
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="display:block">
+    <polyline points="${pts}" fill="none" stroke="${c}" stroke-width="1.8"/>
+    <line x1="0" y1="${y0}" x2="${w}" y2="${y0}" stroke="var(--bd)" stroke-dasharray="2 3" stroke-width="0.8"/>
+  </svg>`;
+}
+
+function render(){
+  const s=SCEN[curScen];
+  // scenario buttons
+  document.getElementById("scens").innerHTML=Object.keys(SCEN).map(k=>
+    `<span class="scen ${k===curScen?'on':''}" data-s="${k}">${k}</span>`).join("");
+  document.querySelectorAll(".scen").forEach(e=>e.onclick=()=>{curScen=e.dataset.s;render();});
+  document.getElementById("seedinfo").textContent="seed "+seed;
+
+  // factor vector
+  document.getElementById("factors").innerHTML=FKEYS.map(k=>{
+    const v=s[k], w=Math.abs(v)*50, left=v>=0?50:50-w;
+    return `<div class="factlab"><span>${k}</span><span style="color:${col(v)}">${fmt(v,1)}</span></div>
+      <div class="factbar"><div style="left:${left}%;width:${w}%;background:${FCOL[k]};opacity:.85"></div>
+      <div style="position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--gr)"></div></div>`;
+  }).join("");
+
+  const rng=mulberry32(seed + Object.keys(SCEN).indexOf(curScen)*1000);
+  const data=INST.map(i=>{const f=drive(i,s);return{i,f,fisv:fis(f),path:pricePath(i,f,rng)};});
+
+  // GRAM (tier-weighted, std)
+  const tf={};data.forEach(d=>{tf[d.i.tier]=(tf[d.i.tier]||0)+d.fisv;});
+  const risk=(tf.T3||0)+(tf.T4||0), safe=(tf.T1||0)+(tf.T2||0);
+  const gram=Math.round(100*Math.tanh((risk-safe)/2/120));
+  const gon=gram>15,goff=gram<-15;
+  const gb=document.getElementById("gramb");
+  gb.textContent=gon?"RISK-ON":goff?"RISK-OFF":"NEUTRAL";
+  gb.style.background=gon?"var(--up)":goff?"var(--dn)":"var(--gr)";
+  const gs=document.getElementById("grams");gs.textContent=fmt(gram,0);gs.style.color=col(gram);
+  // USD regime
+  const dxy=data.find(d=>d.i.id==="DXY"), dchg=(dxy.path[63]/dxy.path[0]-1)*100;
+  const ub=document.getElementById("usdb");
+  const ustr=dchg>0.3, usweak=dchg<-0.3;
+  ub.textContent=ustr?"USD 走強":usweak?"USD 走弱":"USD 持平";
+  ub.style.background=ustr?"var(--amber)":usweak?"var(--tl)":"var(--gr)";
+  document.getElementById("usdv").textContent=fmt(dxy.path[63],1);
+  document.getElementById("usdv").style.color=col(dchg);
+
+  // instrument board grouped
+  const groups=[...new Set(INST.map(i=>i.grp))];
+  let html="";
+  groups.forEach(g=>{
+    html+=`<div class="grp">${g}</div><div class="grid">`;
+    data.filter(d=>d.i.grp===g).forEach(d=>{
+      const i=d.i, chg=(d.path[63]/d.path[0]-1)*100, last=d.path[63];
+      const fw=Math.abs(d.fisv)/100*48, fl=d.fisv>=0?50:50-fw;
+      const arrow=d.fisv>=0?'▲':'▼';
+      let extra="";
+      if(i.fut){
+        const basisPct=(i.carry||0)*(0.3+Math.abs(d.f)*0.4) + (i.id==="TX"? (d.f*0.15):0);
+        const futp=last*(1+basisPct/100);
+        const bsign=basisPct>=0?"contango 正價差":"backwardation 逆價差";
+        extra+=`<div class="row2"><span>現貨 ${last.toFixed(i.base>1000?0:2)}</span>
+          <span>期貨 ${futp.toFixed(i.base>1000?0:2)}</span>
+          <span style="color:${col(basisPct)}">${fmt(basisPct,2)}% ${i.carry?bsign:''}</span></div>`;
+      }
+      if(i.tw){
+        const volBase=i.id==="TPEX"?1.8:i.id==="TX"?12:4.2; // 兆元 turnover scale proxy
+        const vol=volBase*(1+Math.abs(d.f)*0.45)*(0.9+rng()*0.2);
+        const turnover=vol; // 成交金額(現金流) 直接以兆元計
+        const foreign=( s.RISK*0.6 - s.USD*0.5 )*350; // 外資買賣超 億元
+        extra+=`<div class="row2"><span>成交量 ${(vol*100).toFixed(0)}億股估</span>
+          <span>現金流 ${turnover.toFixed(2)}兆</span></div>
+          <div class="row2"><span>外資買賣超</span>
+          <span style="color:${col(foreign)};font-weight:800">${fmt(foreign,0)} 億</span></div>`;
+      }
+      html+=`<div class="inst ${i.tw?'tw':''}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div><span class="nm">${i.nm}</span> <span class="tag">${i.tier}</span><div class="un">${i.unit}</div></div>
+          <div style="text-align:right"><div class="px">${last.toFixed(i.base>1000?0:2)}</div>
+            <div class="chg" style="color:${col(chg)}">${arrow} ${fmt(chg,2)}%</div></div>
+        </div>
+        <div class="fisbar"><div class="mid"></div>
+          <div class="fl" style="left:${fl}%;width:${fw}%;background:${col(d.fisv)}"></div></div>
+        <div class="row2"><span>資金流強度 FIS</span>
+          <span style="color:${col(d.fisv)};font-weight:800">${fmt(d.fisv,0)}</span></div>
+        ${spark(d.path,col(chg))}
+        ${extra}
+      </div>`;
+    });
+    html+=`</div>`;
+  });
+  document.getElementById("board").innerHTML=html;
+}
+document.getElementById("reroll").onclick=()=>{seed=Math.floor(Math.random()*99999);render();};
+render();
+</script></body></html>
