@@ -259,7 +259,8 @@
   "工具|via_governance_console Console輔助工具": "TOOL-004",
   "工具|via_envmgr_nostall EnvManager加速包覆器": "TOOL-006",
   "工具|Invoke-VRN-Batch-AllInOne-v0101": "TOOL-006",
-  "工具|VDF_DataHub_Orchestrator_v0101": "TOOL-007"
+  "工具|VDF_DataHub_Orchestrator_v0101": "TOOL-007",
+  "工具|Invoke-VAP": "TOOL-008"
  },
  "ledger": [
   {
@@ -1891,6 +1892,14 @@
    "code": "UPLOAD-WAVE/VAP-ATIER-8",
    "component": "第五+六波 VAP 家族 8 件歸戶(UI 檔/README/config/稽核 JSON)",
    "note": "原地已到位 6 件:VAP_Workbench_v005.html(22e6ef1b9ed0≡spec/UIUX_Design_Source/uploads 存件)、VAP_Workbench_v009_4.html(98ab67ccdb15≡v009_variant_20260805 存件;ui/v009 為另一較大建置,兩線並存只增不減)、vap_panorama_maturity_summary/payload+vap_v8_master_summary/payload 四 JSON(與 audit_tools 存件唯一差異=檔尾換行,內容全等;同 run 同時戳驗證)。新歸戶 2 件:VAP README.md(5664caba56e3,VEF Repair Orchestrator 20260811_153712 產)→functional modules/VAP/;config.template.json(080a37791511,JSON VALID)→同處。誠實註記:README 所指 Invoke-VAP.ps1 入口與 INPUT/OUTPUT/ASSETS/gateway 結構於倉庫 VAP 尚未在位(現行結構 db/engine/input/output/qa/spec/temp/template/ui)——屬 VEF 規範化目標態,候原件到齊或下令對齊,不先行改結構。"
+  },
+  {
+   "ts": "2026-08-13T21:50:00",
+   "op": "BUILD",
+   "category": "工具",
+   "code": "TOOL-008",
+   "component": "VAP 正門入口 Invoke-VAP.ps1 + VEF SSOT 結構補齊(README 規範件落地)",
+   "note": "操作員令「沒有的話就做一個」:README(VEF Repair Orchestrator 產)規範之 Invoke-VAP.ps1 原件不存在→依規範建置。①三段順跑與 via-vapvdf A1-A3 完全同呼叫式(Get-Newest 動態解析,嚴禁寫死版號):A1 probe/A2 chartlib --demo --auto/A3 selftest;②config.json 優先缺席退 config.template.json 誠實註記;③originals append-only:所有寫出進 tools\\RUN_<ts>\\(gitignore RUN_*);④-Quick/-SkipCharts;誠實逐段 OK/FAIL/SKIP 不卡斷+終端矩陣+vap_run_summary.json 存證。結構補齊:ASSETS/gateway/tools(.gitkeep);INPUT/OUTPUT 由既有 input/output 於 Windows 大小寫不敏感滿足(不另建避免 Linux 端重複目錄)。容器實測:AST PARSE OK;-SkipCharts 路 OK2/SKIP1;全跑 3/3 OK(A1 2s/A2 0.3s/A3 6.4s 65 PASS/1 SKIP);RUN 產物驗後清除。"
   }
  ]
 }
