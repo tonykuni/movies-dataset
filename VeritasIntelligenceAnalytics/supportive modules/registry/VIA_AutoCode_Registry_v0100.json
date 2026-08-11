@@ -1473,6 +1473,14 @@
    "component": "MarketFlow 原版四件+etf_flow_precise 真值 schema 歸戶 + flow_bridge 真值入口 + 安全稽核結案",
    "code": "VIA-DEDUP-20260812C/ENG-063",
    "note": "五件上傳無文字=裁定令+原始會話 7/2 安全稽核弧全文存證。①歸戶 uploads_original/:marketflow_index_v0111(b04bd7ef)/v0112(ea00e74b)+marketflow_evidence_v0111(887c54d3)/v0112(8123c5ba)(MarketFlow+VDF/VRN All-in-One 原版;index 為 API 驅動需後端,file:// 版面可見資料欄誠實報錯)+etf_flow_precise_schema.csv(c968bfc1:date,ticker,aum,shares_outstanding,nav_per_share,ret_1d,flow_raw,flow_method,source,evidence_status;0 資料列=原鐵律「無 AUM/shares 證據不偽造 flow」之誠實空)。②Hub v0102R 掛 12 MF 證據/13 MF 儀表板(Playwright 驗載入)。③flow_bridge v0101R:load_flow_precise() 證據列→{snapshot_date,ticker,ref_flow};load_reference_flows() JSON 缺席自動後備 CSV — 真值接入 SOLID 多一正門;實測空檔 None 誠實/證據列轉出正確。④安全稽核結案:原始會話 v021 五條 TrueHigh 懸案,以現行正典逐行覆核 — 全樹唯一刪除=flow_manager selftest_ok.flag.unlink()(撤自家運行旗,QUARANTINE_TO_RUN_LOCAL_ONLY 合格類),零 os.remove/rmtree/Stop-Process/taskkill;舊 Downloads v1 副本已被 v0100R 正典整代取代,啟動閘解除。QA:autotest 22/22·selftest 14/14。"
+  },
+  {
+   "ts": "2026-08-12T15:30:00",
+   "op": "AUDIT",
+   "category": "治理",
+   "component": "四系統對接前總檢(母版/VRN/VDF/VAP)— 補遺三",
+   "code": "AUD-20260812-DOCK",
+   "note": "操作員「先暫停,檢查母版及VRN/VDF/VAP完成與整合,準備對接U/I」令。本輪 Linux 實測:母版 BoardQA 四層全綠(14/14+9/9+封印4cb90a0b)+spec master 6段 OK=就緒;VAP v007 demo/auto/--sql/--panels 全過+SSOT 1.1.4=引擎層就緒(Workbench cdn.plot.ly 違在地化鐵律候修;3件UI候上傳);VRN 核心完成(MDL001-008 compile 全過·manifest 9/9·HealthCheck 曾 89 PASS·53 凍結鎖)但 ALL:203 VRN_GO.ps1 斷鏈+README 缺3檔+板零磁貼+FactSet stub+入口12支蔓生;VDF 半成:MDL501 契約 277 項 check PASS+movies intake DryRun GREEN,但 v0160 三本體全缺確證(全庫無 sha 命中)+README 21 模組缺 11(含 MDL101 致 MDL301/302 exit 0 假綠)+零凍結鎖+零 VisualLock+板零磁貼+FlowSystem「待VDF」懸空。對接準備清單 5 項入補遺三(母版對接列/VAP 內嵌化/VRN 斷鏈修/VDF 誠實化+候上傳令/磁貼與封印補齊)。詳 VIA_Architecture_Progress_v0100.md 補遺三。"
   }
  ]
 }

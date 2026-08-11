@@ -82,3 +82,54 @@ WorkOps 衝刺:ENG-028 WOP 識別(八層路由/學習迴圈/87 案實戰)→ ENG
   共用資產經 Shared_Lexicon_Registry 登記;結案=基線封存非停用,重跑 via-closure 落新基線。
 - 待操作員:控管表(嚴格提示詞)· Gold Set 首測 · VMT via-vmt-init;候令:VTR 模型層/JS、
   RC 產品線 payload、Graph(IT 核准後)。
+
+## 補遺三(2026-08-12 操作員「先暫停,檢查 VIA母版及 VRN/VDF/VAP 是否完成並整合完,準備對接U/I」令)
+
+四系統對接前總檢 — 本輪 Linux 實測 + 兩路全庫深掃。誠實判定:**母版就緒、VAP 引擎層就緒、
+VRN 核心完好但接縫有斷鏈、VDF 缺件最多未達整合完**。
+
+### 總表
+
+| 系統 | 本輪實測 | 完成度判定 | 對接U/I就緒 |
+|---|---|---|---|
+| **VIA母版 v0132** | BoardQA 四層全綠(unit+integration 14/14 · system 真瀏覽器 9/9 · 封印 4cb90a0b 驗真);spec master 6 段重建 OK | **完成** | **就緒** — 但板上尚無四子系統磁貼/連結(對接主幹缺) |
+| **VAP v007** | demo→auto 三圖→index OK;--sql DuckDB 虛表 OK;--panels 三面板 OK;seaborn/plotly 引擎可載;SSOT 1.1.4 | **引擎層完成** | **有條件** — Workbench v009/v010 用 cdn.plot.ly+Google Fonts 違在地化鐵律(離線圖斷);編排層 orchestrator.js 105 行骨架;3 件 UI 候上傳 |
+| **VRN** | MDL001-008 全 py_compile 過 · manifest 9/9 hash lock · HealthCheck Linux 可跑(曾 89 PASS/0 FAIL READY)· 53 凍結鎖=全庫最嚴 | **核心完成(執行端在工作站)** | **有條件** — 斷鏈與蔓生見下 |
+| **VDF** | MDL501 契約 check PASS(14 域 277 項:ok 217/proxy 45/todo 15)· movies intake DryRun GREEN · MDL301/302 可跑但內部 ❌(見下) | **半成 — 骨架治理好,本體缺件多** | **未就緒** |
+
+### 各系統誠實缺口(本輪查實,file:line 級)
+
+**VRN**(核心穩,接縫傷):
+1. `Invoke-VIA-ALL.ps1:203/439` 指向 `VRN/VRN_GO.ps1` — 檔案全庫不存在,ALL 該站必 FAIL(斷鏈)。
+2. README 載 27 檔,實樹缺 3 支:`VRN_SmokeTest.py`/`VRN_Pipeline_Runner.py`/`panorama_xcheck_v110.py`(帳實不符)。
+3. 母版 45 支板腳本零 VRN 磁貼;VAP 僅收其 v0159 設計源(樣式線,無資料線)。
+4. `VRN_Finalize_Core_v2_1.py:479` FactSet 橋= STUB(交叉驗證一臂未實作)。
+5. 入口蔓生 ≥12 支 AIO 並存(v139G 硬編碼死路徑;Finalize_AIO_v2 檔頭仍寫 v1)— canon 未標。
+6. 規則層 5 支草稿無凍結鎖(TickerRegex SSOT 過渡中);runtime 槽(input/output/db)全空=本 checkout 未實跑。
+
+**VDF**(缺件最多):
+1. **v0160 三本體全缺確證** — manifest 在籍(14cf1344/fb01cd25/57e03031)但全庫無任一檔命中此 sha;僅後續變體 v0160A/B/C 在位。登錄簿 :1363 已誠實在案=候上傳(工作站正本)。
+2. README 21 模組缺 11:MDL002/007/**101(OutputManager — 眾寫入端所依)**/103/104/105/201/303/501控制台HTML 等。
+3. **MDL301/302 假綠**:exit 0 但內部 Imports 0/7、兩項自測 ❌(肇因 MDL101 缺)— 任何以退出碼把關的 CI 皆抓不到。
+4. 全 VDF 樹零 `.freeze.lock.json`(VRN 有 53)— 無凍結正本記號;亦無 VisualLock 封印(VRN/WorkOps 皆有)。
+5. 板零磁貼;治理 runtime SSOT 零引用;FlowSystem 個股角色欄明標「**待VDF**」= 接縫懸空。
+6. Windows 硬編碼:MDL004:64/MDL102:35 `C:\Users\tonyk\OneDrive...`;Consolidator.ps1 `$Execute=$true` 具真搬移(勿在 Linux 端碰)。
+
+**VAP**:
+1. Workbench v009/v010 `cdn.plot.ly/plotly-2.35.0` + Google Fonts — runtime U/I 違在地化鐵律。
+2. 3 件候上傳:GuardedDynamicSandbox-v0109.ps1 / VIA_VAP_Chart_Library_Builder.html / VIA_VAP_System.html(UI 版)。
+3. 編排層薄(vap_orchestrator.js 骨架)。
+
+**母版**:
+1. 板未串四子系統與 FlowSystem hub(板內 flow_hub 引用 0;VAP 僅 Note Pro 一線;VRN/VDF 零)— 「所有介面互通」缺母幹線。
+2. 板亦未連 spec master 最後一頁(Spec_Master 引用 0)。
+
+### 對接U/I 準備清單(候令,依優先)
+
+1. **母版對接列**:板新增「子系統」磁貼帶 — flow_hub.html / VAP output index+Workbench / VRN 報告 Grid / VDF v3.5 維運平台 HTML / VIA_Spec_Master_LastPage.html(一板通達全系統)。
+2. **VAP 在地化**:Workbench plotly 內嵌化+字體降級(比照 FlowSystem inline 先例)。
+3. **VRN 斷鏈修**:ALL 之 VRN_GO 站改指現行入口(Batch-AllInOne-v0100 或 Guarded-Entry v217)或誠實除名;README 對帳;canon 入口標記。
+4. **VDF 假綠改誠實**:MDL301/302 內部 ❌ 時 exit 非零;缺件清單(11 模組+v0160 三本體)= 工作站候上傳令。
+5. VDF/VRN 板磁貼與 VisualLock 補齊(VDF 無封印)。
+
+紅線不動:候上傳件正本在工作站,AI 只整理不發明 — 不代生 v0160 三本體與 VRN 缺檔。
