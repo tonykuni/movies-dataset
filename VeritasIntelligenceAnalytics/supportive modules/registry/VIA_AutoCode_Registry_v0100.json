@@ -256,7 +256,8 @@
   "工具|build_subsystem_pages_v0100 子系統分開模板產生器": "TOOL-002",
   "引擎|vrn_input_matrix_validator_v0100 VRN輸入矩陣驗證引擎": "ENG-079",
   "工具|Invoke-VIA-VAPVDF-ALL 統包器": "TOOL-003",
-  "工具|via_governance_console Console輔助工具": "TOOL-004"
+  "工具|via_governance_console Console輔助工具": "TOOL-004",
+  "工具|via_envmgr_nostall EnvManager加速包覆器": "TOOL-006"
  },
  "ledger": [
   {
@@ -1808,6 +1809,22 @@
    "code": "GOV-14/15",
    "component": "環境治理節併入 Console(操作員令:安裝衝突用 EnvManager+EngineForge 解決)+ 三收帳",
    "note": "①收帳:操作員 trio v0102 九站 9/9 全綠 13.9s(SmokeTest 12 OK/0 FAIL,paddleocr 誠實 WARN 不擋=修法實戰確認);via-console 13/13;torch 2.13.0 已重裝。②Console JSON 增節 env 環境治理:GOV-14 安裝衝突治理(via-envmgr 新動詞→VIA_EnvManager.py 正本唯讀呼叫;conflicts/plan-install/execute-install/rebuild;Gatekeeper base 擋 MEDIUM/HIGH·白名單·新工具先過)+GOV-15 EngineForge 沙箱配置(SandboxDryRun·db_write=false·先沙箱後放行);資料驅動=母頁自動上頁 15 功能,via-console 15/15 引擎缺 0,容器 envmgr conflicts 實跑 rc=0(誠實 BASE_MISSING WARN)。③操作員衝突牆判讀存證:torch 修復完成;殘餘衝突屬環境熵(easyocr/doctr 缺 torchvision·gradio/streamlit 釘 pandas<3 與 VIA 主線 pandas 3.0.2 相衝)— 與 VIA 運行鏈無涉,處置走 GOV-14 閘道(plan-install 先出計畫,execute 過 Gatekeeper)。"
+  },
+  {
+   "ts": "2026-08-13T15:00:00",
+   "op": "BUILD",
+   "category": "環境治理",
+   "code": "TOOL-005/ENVMGR-NOSTALL",
+   "component": "EnvManager NoStall 加速包覆器(操作員:conflicts 卡段→20 加速器+不卡斷動態進度條)+二件全同裁決",
+   "note": "①卡段根因:EnvManager 每環境串行 pip check 180s+pip list 240s+import 探針 120s/個,零輸出=分鐘級靜默。②via_envmgr_nostall_v0100.py(正本零觸碰,唯讀 import 復用函式):快速 fs 環境發現→20 工作器 ThreadPool(--workers 可調)每環境獨立子行程+硬逾時可殺(--task-timeout 預設 150s)→單行動態進度條(bar+spinner+進行中環境名,0.3s 刷新絕不靜默)→誠實 OK/TIMEOUT/ERROR 逐列→衝突判定復用 def_find_base_and_via_conflicts→append-only 存證 ConflictReport_NoStall_<ts>.json(不搶正本檔名);--env-root 覆寫口。修二蟲:sys.modules 未註冊致 dataclass 型別解析炸;合成 30 環境需 pyvenv.cfg 判準。實測:30 環境 20 工作器 1 秒完盤 30/30 OK+衝突 1(誠實 BASE_MISSING)。via-envmgr.cmd:conflicts/scan 走 NoStall(缺席回退正本直呼誠實警告),其餘命令(plan/execute/…)直呼正本。③二上傳(VIA_EnvManager.py 11d33140/EngineForge 模板 b14ba666)與庫內正本位元組全同=原地已到位零動作。_via_envmanager_output/ 入 gitignore(run 產物)。"
+  },
+  {
+   "ts": "2026-08-11T15:10:19",
+   "op": "ISSUE",
+   "category": "編號",
+   "component": "工具|via_envmgr_nostall EnvManager加速包覆器",
+   "code": "TOOL-006",
+   "note": "自動編號引擎核發:TOOL 族第 6 號(掃描既用 5 個;append-only 永不回收)。"
   }
  ]
 }
