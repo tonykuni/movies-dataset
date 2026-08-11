@@ -42,7 +42,7 @@ SUBS = [
       "via-batch                    → AllInOne 批次", "via-ocr                      → OCR 統一路由"],
      "functional modules/VRN/template/VDF_VRN_Integrated_ReportSSOT_AutoLayout_FINAL.html"),
     ("vdf", "04", "VDF 資料鍛造", "市場資料取數契約 SSOT+intake+六模組重建R", "🟢 測試鏈全綠",
-     "MDL301 硬閘全綠 · MDL302 九階段全綠(80/80 完整性·7/7 整合·4/4 edge)· 契約 277 項 PASS;v0160 三本體+MDL002/007 等候上傳",
+     "MDL301+302 全綠 · 原始正本 MDL002/007/104/105 歸位實測過(SSOT 解析·dry-run 派發·交叉驗證紅綠燈)· 契約 277 項 PASS;v0160 三本體+MDL402/403 registry 候上傳",
      ["via-vdf contract check       → 取數契約盤點",
       "py \"functional modules\\VDF\\VDF_MDL302_FinalActivation.py\" --no-pause → 端到端",
       "via-vdf                      → OneClick 側欄(工作站)"],
