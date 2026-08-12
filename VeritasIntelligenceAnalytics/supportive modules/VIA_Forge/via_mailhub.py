@@ -19,7 +19,8 @@ import via_connect as _C
 import via_project as _P
 import via_ops as _O
 import via_signal as _SG
-import via_rebuild as _RB
+# 2026-08-12 真環拆解令(sysman C4):via_rebuild 頂層互引成載入環——
+# 改於 work_rebuild() 內 lazy 導入(用點本就延遲初始化,行為零改變)
 
 
 class MailHubEngine:
@@ -64,6 +65,7 @@ class MailHubEngine:
     # --- \u5de5\u4f5c\u91cd\u5efa (rebuild) ---
     def work_rebuild(self, records, control_sheet=None, control_data=None):
         if getattr(self, "_rebuild", None) is None:
+            import via_rebuild as _RB  # lazy:拆頂層互引載入環(2026-08-12)
             self._rebuild = _RB.RebuildEngine(self.cfg)
         return self._rebuild.rebuild(records, control_sheet=control_sheet, control_data=control_data)
 

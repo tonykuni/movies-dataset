@@ -2144,6 +2144,13 @@
    "kind": "工具",
    "note": "工作站 567.1s 實錄根因雙修:⑤C3 逾時根因=xcheck 尾段 input() 停等(工作站 tty 子行程停等 180s 被殺×3 輪=540s)→傳 --no-pause + stdin=DEVNULL 雙保險;⑥C4 假環肅清=import 環只計模組層(函式內 lazy 載入無環;Aegis↔SSOT 實鑑雙向 lazy=假環肅清,mailhub↔rebuild 雙向模組層=真環保留建議)。容器 28.9s·發現 3→1。",
    "ts": "2026-08-12"
+  },
+  {
+   "code": "TOOL-018",
+   "name": "forge_import_cycle_拆解",
+   "kind": "修正",
+   "note": "sysman 唯一存留發現處置:via_mailhub↔via_rebuild 頂層互引真環——mailhub 側 import 移入 work_rebuild()(用點本就延遲初始化,行為零改變;rebuild 側零觸碰)。沙盒雙向載入序實測 OK;sysman 覆核 系統 GREEN·發現 0·16.9s。三輪協議首次全綠收官。",
+   "ts": "2026-08-12"
   }
  ]
 }
