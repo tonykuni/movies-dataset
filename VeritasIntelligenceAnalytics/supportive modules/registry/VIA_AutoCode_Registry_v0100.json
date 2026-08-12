@@ -2463,6 +2463,20 @@
    "kind": "工具",
    "note": "醫生裁決分層修:互撞只算「同層多件」——工作站使用者層已清至統包單件(opencv-contrib-python-headless 5.0.0.93)+系統層 opencv-python 4.13 被遮蔽+活體 niBlackThreshold True,舊 v0101 仍判 RED 屬誤判;新增 GREEN_SHADOWED(遮蔽即勝,非病;根除擇需提權)。容器 YELLOW_ABSENT 誠實照舊。",
    "ts": "2026-08-12"
+  },
+  {
+   "code": "TOOL-030",
+   "name": "via_env_plan_v0100",
+   "kind": "工具",
+   "note": "操作員令(先寫計畫、先測可行、零風險才安裝)落地:三段零風險——①環境快照唯讀全景(層/衝突/cv2 家族/關鍵庫/java·tesseract/模型快取/磁碟);②分段安裝計畫(現階段 4 段:paddleocr[doc-parser]/unstructured.pytesseract/docling 擇需/pypdf 選邊候裁,各附理由+風險預判);③pip install --dry-run 只解析不落地逐段實測——核心庫變版=YELLOW、cv2 家族再進入=RED 互撞回歸、已滿足=NOOP GREEN、失敗誠實 FAIL;GREEN 段才印 via-install 執行令,YELLOW/RED 候裁不代決。dry-run 連 PyPI=網路行為過同意閘(未同意 NOT_RUN 誠實)。動詞 via-plan(--offline/--stage N)。容器測:offline 誠實跳測+同意後段2 實測 GREEN 給令。自測矩陣 v0103 加第 20 站(offline 零網路)。另:上傳 VIA_EnvManager.py 裁決=與正本正規化後逐行全同(僅 3 CRLF 換行符差)→讓位零動作。",
+   "ts": "2026-08-12"
+  },
+  {
+   "code": "TOOL-025",
+   "name": "via_selftest_grid_v0103",
+   "kind": "工具",
+   "note": "自測矩陣 v0102→v0103:新增第 20 站 via_env_plan --offline(快照+計畫,零網路 rc0)。",
+   "ts": "2026-08-12"
   }
  ]
 }
