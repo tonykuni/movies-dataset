@@ -1,0 +1,473 @@
+{
+ "schema": "VIA.Lessons.v1",
+ "append_only": true,
+ "note": "教訓帳本:RUN/GOLDEN 由 via-lessons 收割自動入帳;ROOT_CAUSE 預載實戰規則+操作員手記(--record)",
+ "entries": [
+  {
+   "id": "RC-01",
+   "sig": "原生崩潰 rc=3221225477(0xC0000005)且 cv2 家族多變體/新大版在境",
+   "cause": "cv2 二進位互撞或 OpenCV 5.x 與 paddle 鏈不合(實案:contrib 5.0.0.93 崩於 PP-Chart2Table)",
+   "fix": "錨定單變體 opencv-contrib-python<5;其餘變體全移除;裝回走 via-plan dry-run 先驗",
+   "match": {
+    "factor": "CV2_OFF_ANCHOR"
+   },
+   "source": "workstation-20260812",
+   "kind": "ROOT_CAUSE"
+  },
+  {
+   "id": "RC-02",
+   "sig": "pip uninstall 炸 WinError 5 存取被拒(路徑在 C:\\Python313\\Lib\\site-packages)",
+   "cause": "套件住系統層 site-packages,無提權 pip 不可寫;或 python 行程仍載著該件",
+   "fix": "A 管理員視窗(Start-Process pwsh -Verb RunAs)再解除安裝;B 免提權:--user 裝錨定版,使用者層遮蔽系統層(安裝閘 GREEN_SHADOWED 家規);先關占用 python 行程",
+   "match": null,
+   "source": "workstation-20260813",
+   "kind": "ROOT_CAUSE"
+  },
+  {
+   "id": "RC-03",
+   "sig": "缺件表出現 enum34(bezier 等古件所要)",
+   "cause": "enum34 是 py2 時代 backport;py3 安裝會遮蔽標準庫 enum,全域炸機",
+   "fix": "絕不安裝 enum34;移除要求者(如 bezier 0.3.0)或無視該條",
+   "match": {
+    "missing_pkg": "enum34"
+   },
+   "source": "workstation-20260813",
+   "kind": "ROOT_CAUSE"
+  },
+  {
+   "id": "RC-04",
+   "sig": "gradio/streamlit 等 UI 框架舊上限釘(pandas<3/pillow<12/packaging<26)拖累 base",
+   "cause": "UI 框架釘版保守,與新版資料線衝突;為單件降級全 base 會連鎖倒退",
+   "fix": "隔離拉後腿者入專屬環境(UI 環境),base 保持新版線;不降級",
+   "match": {
+    "mismatch_by_any": [
+     "gradio",
+     "streamlit"
+    ]
+   },
+   "source": "workstation-20260813",
+   "kind": "ROOT_CAUSE"
+  },
+  {
+   "id": "RC-05",
+   "sig": "死釘 ==(如 hanlp 要 toposort==1.5)與現裝版對撞",
+   "cause": "上游 exact-pin 不容任何他版;同環境無解",
+   "fix": "死釘者單獨隔離環境;或候裁選邊(via-deps --why 看全部需求方再裁)",
+   "match": {
+    "mismatch_by_any": [
+     "hanlp"
+    ]
+   },
+   "source": "workstation-20260813",
+   "kind": "ROOT_CAUSE"
+  },
+  {
+   "id": "RC-06",
+   "sig": "多層同名(user-site 疊 system-site;akshare 雙版等)",
+   "cause": "同件兩層並存,首見層勝→實際生效版與想像不同,升級像沒生效",
+   "fix": "via-install --doctor 深診遮蔽關係;保留一層(通常使用者層),另層提權清理",
+   "match": {
+    "factor": "DUP_LAYERS"
+   },
+   "source": "workstation-20260813",
+   "kind": "ROOT_CAUSE"
+  },
+  {
+   "id": "RC-07",
+   "sig": "BASE 藏 MEDIUM/HIGH 風險庫(672 件大鍋)",
+   "cause": "base 當萬用鍋違反政策;任何單件衝突全域擴散",
+   "fix": "段 base_opt 遷出封鎖級至專屬環境;base 只留工具鏈+LOW;移除端候裁",
+   "match": {
+    "factor": "BASE_POLLUTION"
+   },
+   "source": "workstation-20260813",
+   "kind": "ROOT_CAUSE"
+  },
+  {
+   "id": "RC-08",
+   "sig": "單環境高風險庫 ≥3 件混居(via_core_312 曾 11 件)",
+   "cause": "重械同鍋,二進位/依賴面互撞機率乘積式上升",
+   "fix": "混居拆分:每高風險家族專屬環境(paddle_311/camelot_311 用途路由)",
+   "match": {
+    "factor": "HIGH_RISK_PRESENT"
+   },
+   "source": "workstation-20260813",
+   "kind": "ROOT_CAUSE"
+  },
+  {
+   "id": "RC-09",
+   "sig": "指令報 The system cannot find the file specified(如 via-install)",
+   "cause": "PATH 同名先佔:舊目錄(Downloads VIA)同名 .cmd 先於新 repo bin 被解析,其內部又找不到新檔",
+   "fix": "新 bin 前置:$env:Path = \"<repo>\\bin;\" + $env:Path;或全路徑呼叫 & \"<repo>\\bin\\via-install.cmd\"",
+   "match": null,
+   "source": "workstation-20260813",
+   "kind": "ROOT_CAUSE"
+  },
+  {
+   "id": "RC-10",
+   "sig": "importlib exec_module 載入含 dataclass+future annotations 模組炸 AttributeError NoneType __dict__",
+   "cause": "exec_module 前未掛 sys.modules,dataclass 回查模組名得 None",
+   "fix": "spec 載入一律先 sys.modules[name]=m 再 exec;失敗時 pop 回收(已修 via_env_rebuild v0102)",
+   "match": null,
+   "source": "container-20260812",
+   "kind": "ROOT_CAUSE"
+  },
+  {
+   "id": "RC-11",
+   "sig": "pip --dry-run 配 --quiet 判讀恆 NOOP",
+   "cause": "--quiet 吞掉 Would install 行,穩定性比對比到空集合",
+   "fix": "dry-run 不加 --quiet;解析清單以 Would install 行為準(已修)",
+   "match": null,
+   "source": "container-20260812",
+   "kind": "ROOT_CAUSE"
+  },
+  {
+   "id": "RC-12",
+   "sig": "多個 numpy 大版丟同一次解析→ResolutionImpossible",
+   "cause": "互斥版本不可同鍋;支架各屬不同環境本應分測",
+   "fix": "實測分靶:每目標環境獨立 dry-run(已修 _dry_groups)",
+   "match": null,
+   "source": "container-20260812",
+   "kind": "ROOT_CAUSE"
+  },
+  {
+   "id": "RC-13",
+   "sig": "退役環境改名 __retire 仍被掃紅",
+   "cause": "名仍以 via_ 開頭,管理前綴掃描持續納管",
+   "fix": "退役名用 _retire_ 前綴退出前綴圈,自然除名(已修 v0101 切換令)",
+   "match": null,
+   "source": "container-20260812",
+   "kind": "ROOT_CAUSE"
+  },
+  {
+   "id": "RC-14",
+   "sig": "dry-run 於本機已裝件時報「已全滿足」但旁建目標其實是空境",
+   "cause": "以本解譯器代測未加 --ignore-installed,已裝件遮蔽真實安裝清單",
+   "fix": "dry-run 一律 --ignore-installed 空境視角(已修 v0101)",
+   "match": null,
+   "source": "container-20260812",
+   "kind": "ROOT_CAUSE"
+  },
+  {
+   "id": "RC-15",
+   "sig": "venv 目錄改名後 console 捷徑(entry points)壞死",
+   "cause": "Scripts 內 exe/shebang 內嵌絕對路徑,改名即斷",
+   "fix": "切換優先別名法(EnvManager 別名冊改指);改名法後以 python -m 呼叫或重灌 entry points",
+   "match": null,
+   "source": "container-20260812",
+   "kind": "ROOT_CAUSE"
+  },
+  {
+   "kind": "SKIP",
+   "pkg": "enum34",
+   "scope": "everywhere",
+   "why": "py3 安裝即遮蔽 stdlib enum 全域炸機;要求者(bezier 古件)退役",
+   "ruled": "operator+engine",
+   "ts": "20260813"
+  },
+  {
+   "kind": "SKIP",
+   "pkg": "opencv-python",
+   "scope": "everywhere",
+   "why": "操作員裁:屢衝突變體;與 contrib 錨互撞,永不再裝",
+   "ruled": "operator-20260813",
+   "ts": "20260813"
+  },
+  {
+   "kind": "SKIP",
+   "pkg": "opencv-python-headless",
+   "scope": "everywhere",
+   "why": "操作員裁:屢衝突變體;名義需求者(albucore/easyocr/camelot)遷 OCR 專屬環境吃 contrib 錨",
+   "ruled": "operator-20260813",
+   "ts": "20260813"
+  },
+  {
+   "kind": "SKIP",
+   "pkg": "opencv-contrib-python",
+   "scope": "base",
+   "why": "操作員裁:cv 系不好裝屢生衝突不再入 base;僅 OCR 專屬環境(paddle_311 類)經 via-plan 驗綠才准裝",
+   "ruled": "operator-20260813",
+   "ts": "20260813"
+  },
+  {
+   "kind": "RUN",
+   "engine": "via-deps",
+   "run": "20260812_143039",
+   "verdict": "GREEN",
+   "mismatch_n": 0,
+   "missing_n": 0,
+   "dup_n": 0,
+   "mirror": "official",
+   "src": "DEPS_20260812_143039.json",
+   "ts": "20260812_165538"
+  },
+  {
+   "kind": "RUN",
+   "engine": "via-deps",
+   "run": "20260812_143103",
+   "verdict": "RED",
+   "mismatch_n": 1,
+   "missing_n": 1,
+   "dup_n": 1,
+   "mirror": "official",
+   "src": "DEPS_20260812_143103.json",
+   "ts": "20260812_165538"
+  },
+  {
+   "kind": "RUN",
+   "engine": "via-deps",
+   "run": "20260812_162311",
+   "verdict": "GREEN",
+   "mismatch_n": 0,
+   "missing_n": 0,
+   "dup_n": 0,
+   "mirror": "official",
+   "src": "DEPS_20260812_162311.json",
+   "ts": "20260812_165538"
+  },
+  {
+   "kind": "RUN",
+   "engine": "via-deps",
+   "run": "20260812_162359",
+   "verdict": "GREEN",
+   "mismatch_n": 0,
+   "missing_n": 0,
+   "dup_n": 0,
+   "mirror": "official",
+   "src": "DEPS_20260812_162359.json",
+   "ts": "20260812_165538"
+  },
+  {
+   "kind": "RUN",
+   "engine": "via-deps",
+   "run": "20260812_164335",
+   "verdict": "RED",
+   "mismatch_n": 1,
+   "missing_n": 1,
+   "dup_n": 1,
+   "mirror": "official",
+   "src": "DEPS_20260812_164335.json",
+   "ts": "20260812_165538"
+  },
+  {
+   "kind": "RUN",
+   "engine": "via-rebuild",
+   "run": "20260812_150419",
+   "verdict": "RED",
+   "envs_ok": 2,
+   "envs_bad": 2,
+   "stages_n": 3,
+   "greens_n": 0,
+   "bad_envs": [
+    "paddle_311",
+    "via_core"
+   ],
+   "src": "REBUILD_20260812_150419.json",
+   "ts": "20260812_165538"
+  },
+  {
+   "kind": "GOLDEN_ENV",
+   "env": "BASE",
+   "python": "3.11.15",
+   "dists_n": 36,
+   "fp": "BASE|3.11.15|36",
+   "run": "20260812_150419",
+   "src": "REBUILD_20260812_150419.json",
+   "note": "無衝突基線;件級詳單見該次 REBUILD 存證",
+   "ts": "20260812_165538"
+  },
+  {
+   "kind": "GOLDEN_ENV",
+   "env": "via_vrn",
+   "python": "3.11.15",
+   "dists_n": 2,
+   "fp": "via_vrn|3.11.15|2",
+   "run": "20260812_150419",
+   "src": "REBUILD_20260812_150419.json",
+   "note": "無衝突基線;件級詳單見該次 REBUILD 存證",
+   "ts": "20260812_165538"
+  },
+  {
+   "kind": "RUN",
+   "engine": "via-rebuild",
+   "run": "20260812_150515",
+   "verdict": "RED",
+   "envs_ok": 2,
+   "envs_bad": 2,
+   "stages_n": 4,
+   "greens_n": 3,
+   "bad_envs": [
+    "paddle_311",
+    "via_core"
+   ],
+   "src": "REBUILD_20260812_150515.json",
+   "ts": "20260812_165538"
+  },
+  {
+   "kind": "RUN",
+   "engine": "via-rebuild",
+   "run": "20260812_150831",
+   "verdict": "RED",
+   "envs_ok": 2,
+   "envs_bad": 2,
+   "stages_n": 4,
+   "greens_n": 4,
+   "bad_envs": [
+    "paddle_311",
+    "via_core"
+   ],
+   "src": "REBUILD_20260812_150831.json",
+   "ts": "20260812_165538"
+  },
+  {
+   "kind": "RUN",
+   "engine": "via-rebuild",
+   "run": "20260812_150943",
+   "verdict": "RED",
+   "envs_ok": 2,
+   "envs_bad": 2,
+   "stages_n": 4,
+   "greens_n": 4,
+   "bad_envs": [
+    "paddle_311",
+    "via_core"
+   ],
+   "src": "REBUILD_20260812_150943.json",
+   "ts": "20260812_165538"
+  },
+  {
+   "kind": "RUN",
+   "engine": "via-rebuild",
+   "run": "20260812_160009",
+   "verdict": "RED",
+   "envs_ok": 0,
+   "envs_bad": 1,
+   "stages_n": 1,
+   "greens_n": 1,
+   "bad_envs": [
+    "via_light"
+   ],
+   "src": "REBUILD_20260812_160009.json",
+   "ts": "20260812_165538"
+  },
+  {
+   "kind": "RUN",
+   "engine": "via-rebuild",
+   "run": "20260812_160040",
+   "verdict": "RED",
+   "envs_ok": 0,
+   "envs_bad": 1,
+   "stages_n": 1,
+   "greens_n": 1,
+   "bad_envs": [
+    "via_light"
+   ],
+   "src": "REBUILD_20260812_160040.json",
+   "ts": "20260812_165538"
+  },
+  {
+   "kind": "RUN",
+   "engine": "via-rebuild",
+   "run": "20260812_160104",
+   "verdict": "RED",
+   "envs_ok": 2,
+   "envs_bad": 1,
+   "stages_n": 1,
+   "greens_n": 0,
+   "bad_envs": [
+    "via_light"
+   ],
+   "src": "REBUILD_20260812_160104.json",
+   "ts": "20260812_165538"
+  },
+  {
+   "kind": "GOLDEN_ENV",
+   "env": "via_light__rb20260812_160040",
+   "python": "3.11.15",
+   "dists_n": 7,
+   "fp": "via_light__rb20260812_160040|3.11.15|7",
+   "run": "20260812_160104",
+   "src": "REBUILD_20260812_160104.json",
+   "note": "無衝突基線;件級詳單見該次 REBUILD 存證",
+   "ts": "20260812_165538"
+  },
+  {
+   "kind": "RUN",
+   "engine": "via-rebuild",
+   "run": "20260812_162313",
+   "verdict": "RED",
+   "envs_ok": 1,
+   "envs_bad": 1,
+   "stages_n": 1,
+   "greens_n": 1,
+   "bad_envs": [
+    "via_light"
+   ],
+   "src": "REBUILD_20260812_162313.json",
+   "ts": "20260812_165538"
+  },
+  {
+   "kind": "RUN",
+   "engine": "via-rebuild",
+   "run": "20260812_162324",
+   "verdict": "RED",
+   "envs_ok": 2,
+   "envs_bad": 1,
+   "stages_n": 1,
+   "greens_n": 0,
+   "bad_envs": [
+    "via_light"
+   ],
+   "src": "REBUILD_20260812_162324.json",
+   "ts": "20260812_165538"
+  },
+  {
+   "kind": "GOLDEN_ENV",
+   "env": "via_light__rb20260812_162313",
+   "python": "3.11.15",
+   "dists_n": 7,
+   "fp": "via_light__rb20260812_162313|3.11.15|7",
+   "run": "20260812_162324",
+   "src": "REBUILD_20260812_162324.json",
+   "note": "無衝突基線;件級詳單見該次 REBUILD 存證",
+   "ts": "20260812_165538"
+  },
+  {
+   "kind": "RUN",
+   "engine": "via-rebuild",
+   "run": "20260812_162359",
+   "verdict": "GREEN",
+   "envs_ok": 2,
+   "envs_bad": 0,
+   "stages_n": 0,
+   "greens_n": 0,
+   "bad_envs": [],
+   "src": "REBUILD_20260812_162359.json",
+   "ts": "20260812_165538"
+  },
+  {
+   "kind": "GOLDEN_ENV",
+   "env": "via_light",
+   "python": "3.11.15",
+   "dists_n": 7,
+   "fp": "via_light|3.11.15|7",
+   "run": "20260812_162359",
+   "src": "REBUILD_20260812_162359.json",
+   "note": "無衝突基線;件級詳單見該次 REBUILD 存證",
+   "ts": "20260812_165538"
+  },
+  {
+   "kind": "GOLDEN_FLEET",
+   "envs": [
+    "BASE@3.11.15",
+    "via_light@3.11.15"
+   ],
+   "n": 2,
+   "fp": "BASE@3.11.15|via_light@3.11.15",
+   "run": "20260812_162359",
+   "src": "REBUILD_20260812_162359.json",
+   "note": "多環境多工具全綠一次達陣——改進起點",
+   "ts": "20260812_165538"
+  }
+ ]
+}

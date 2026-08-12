@@ -2540,6 +2540,20 @@
    "kind": "工具",
    "note": "母版導入根因修:_load_by_path 於 exec_module 前先掛 sys.modules(EnvManager 用 dataclass+future annotations,未掛載時 dataclass 回查 sys.modules 得 None 而炸,遭 graceful 吞成誤報「母版:缺」)。修後工作站真吃母版政策(HIGH/MED 表/白名單/含 VHB_System 等全部環境根);t12 增母版真導入斷言(VIS-ENV 機碼)。工作站首戰實績:14 境盤點 11 綠 3 紅(BASE/via_core_312/via_extract_312),cv2 三變體齊撞確診,numpy 1/2 跨境分歧確診,4 段計畫全出。13 檢全綠。",
    "ts": "2026-08-13"
+  },
+  {
+   "code": "TOOL-034",
+   "name": "via_lessons_v0100",
+   "kind": "工具",
+   "note": "教訓帳本引擎(via-lessons;LESSON-LEARNED):純收割零耦合——掃 depsuper/rebuild 存證蒸餾入帳(冪等零重複);DETAILED RESULT MATRIX+ROOT CAUSES & SOLUTIONS 印示並落 .log;OK 單境指紋+全艦隊無衝突自動記 GOLDEN 基線(改進起點,基線差異=回歸獵源);預載 15 條實戰規則(cv2 崩潰/WinError5 系統層/enum34 陷阱/UI 舊釘/死釘/多層遮蔽/BASE 污染/混居/PATH 先佔/sys.modules/…)+證據命中標記;--record 操作員手記;SKIP 拒裝名單 4 條(操作員裁:enum34+opencv-python+headless 全域拒;contrib 錨拒入 base)。容器實收割 21 筆+艦隊基線觸發+冪等 0 筆重收;10 檢全綠;矩陣 v0106 站 23。",
+   "ts": "2026-08-13"
+  },
+  {
+   "code": "TOOL-032",
+   "name": "via_env_rebuild_v0103",
+   "kind": "工具",
+   "note": "拒裝名單接軌:讀教訓帳本 SKIP 條目,重建配方/隔離目標自動剔 scope=everywhere 件並誠實列示「拒:」;scope=base(cv2 錨)僅拒入 base,OCR 專屬環境驗綠仍可進——落實操作員令「屢衝突工具不再裝」。14 檢全綠(增拒裝剔除站)。",
+   "ts": "2026-08-13"
   }
  ]
 }
