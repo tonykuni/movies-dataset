@@ -2407,6 +2407,13 @@
    "kind": "工具",
    "note": "補齊令②:對帳矩陣 4 支 DOCX Memo 文字塊/表格列=0——via-docx 產物(docx_struct/text.txt+table_N.csv)未併主表。本引擎摺入 MDL005/MDL004:dry-run 預設/--commit 寫/寫前 .pre bak/冪等剔同 pdf_name/欄位自適應缺欄誠實 None/逐檔誠實矩陣/零產物誠實停。動詞 via-docxmerge。容器合成 fixture 全循環綠(dry→commit 新建 2+4→冪等重跑 剔舊+備份);容器 pyarrow 退場曾噪一次 terminate(無資料損,誠實記)。",
    "ts": "2026-08-12"
+  },
+  {
+   "code": "TOOL-017",
+   "name": "vrn_content_store_v0106",
+   "kind": "工具",
+   "note": "工作站 --commit FAIL WinError 32 根因修(第四個 Windows 才現形缺陷):v0105 先開 duckdb 寫入連線後才 shutil.copy2 備份——DuckDB 寫入連線於 Windows 持排他鎖,自己鎖死自己的備份複製(容器 Linux 不排他故未現形;首次非新建 commit 才走到此路)。修=寫前整檔備份移至 duckdb.connect 之前(fresh 新建誠實跳過)。容器三態綠:dry-run 計畫/commit 備份先行+64 正典+稽核 1/冪等重跑。誠實回滾機制上輪已正確運作(備份未動、庫未損)。",
+   "ts": "2026-08-12"
   }
  ]
 }
