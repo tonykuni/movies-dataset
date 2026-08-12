@@ -1,0 +1,179 @@
+{
+ "schema": "VIA.MasterGovernance.v1",
+ "updated_at": "20260812_072218",
+ "red_lines": [
+  "凍結件零觸碰(freeze.lock)",
+  "只增不減(append-only)",
+  "正本不就地修改(版本前進)",
+  "編號永不變(先發先得)",
+  "金鑰只走環境變數(永不落檔/落庫/入 commit)",
+  "不爬站 · 零 CDN(自家資產)",
+  "上傳原件唯讀封存(_sha 鏡像 byte-exact)",
+  "Outlook 原件唯讀 · .Send() 永不",
+  "誠實 OK/FAIL 不卡斷 · 不假綠",
+  "AI 只整理不發明"
+ ],
+ "iron_rules": [
+  "動態解析鐵律:啟動器 dir /b /o:n 取最新版,嚴禁寫死版號",
+  "dry-run 預設:落庫/改檔類引擎 --commit 才寫",
+  "三輪協議 ≤3 輪(sysman);高風險節點→建議不自動修正",
+  "每 commit 雙推 main + claude/via-system-followup-tz7k9t",
+  "台帳登錄:所有功能/工具/模組自動編號(TOOL/ENG/SPEC 先發先得)"
+ ],
+ "subsystems": {
+  "VRN": {
+   "zh": "研究報告情報台",
+   "color": "#2c4f4a",
+   "mission": "券商研究報告 收件→鑑識→OCR→對帳→SSOT→落庫 全鏈",
+   "verbs": [
+    "via-batch",
+    "via-pdfcheck",
+    "via-rescue",
+    "via-docx",
+    "via-reconcile",
+    "via-store",
+    "via-ocr"
+   ],
+   "stores": [
+    "SSOT v2 64 筆",
+    "via.duckdb 4 表(canon/text/cells/log)",
+    "staging/ocr_out"
+   ],
+   "ui_sections": [
+    "收件矩陣",
+    "鑑識判決(pdfcheck)",
+    "OCR 救援鏈",
+    "對帳覆蓋 64/64",
+    "落庫稽核"
+   ]
+  },
+  "VDF": {
+   "zh": "市場數據鍛造台",
+   "color": "#31506f",
+   "mission": "市場/ETF/總經數據 抓取→鍛造→訊號→庫 全鏈",
+   "verbs": [
+    "via-datahub",
+    "via-vdf",
+    "via-flow",
+    "via-plot",
+    "via-forge"
+   ],
+   "stores": [
+    "via_marketflow.duckdb(候建)",
+    "market.duckdb",
+    "VDF_ACTIVE_SCHEMA"
+   ],
+   "ui_sections": [
+    "數據心跳(datahub)",
+    "抓取鏈狀態",
+    "訊號燈板",
+    "圖表快照"
+   ]
+  },
+  "VAP": {
+   "zh": "視覺分析台",
+   "color": "#6f5c31",
+   "mission": "MacroMicro 式分析圖庫 28 型 + 面板 + SQL 虛擬表",
+   "verbs": [
+    "via-vap",
+    "Invoke-VAP",
+    "via-plot"
+   ],
+   "stores": [
+    "vap_intelligence.duckdb(_warehouse)",
+    "VAP Spec SSOT v1.0.0",
+    "圖型冊 28 型"
+   ],
+   "ui_sections": [
+    "圖型冊",
+    "工作台 RUN",
+    "Spec SSOT 對照",
+    "面板組合器"
+   ]
+  }
+ },
+ "product_rules": {
+  "packer": "via-pack(v0103 既有:產品號+單機綁定+封面U/I;entry_newest 動態跟版)",
+  "rule": "一商品一碼鎖一機:machine_id=sha256(MachineGuid+電腦名) · 商品組合號=sha256(組合+machine_id)[:12]",
+  "fresh_pc": "Bootstrap-VIA-FreshPC-v0100.cmd → Install-VIA-Product-v0101.ps1(PS7 自救+pip+綁機 全自動)",
+  "combos": [
+   "VRN 單品",
+   "VDF 單品",
+   "VAP 單品",
+   "VRN+VDF",
+   "全家桶 VRN+VDF+VAP"
+  ]
+ },
+ "verbs": {
+  "via-all": "VIA full interactive stack: VDF + VAP + VRN preflight + Tower (no long-running disk audits)",
+  "via-audit": "VIA long-running audits: TurboOptimizer SafeAudit + Panorama + Polyglot (expect many minutes)",
+  "via-batch": "VRN batch 統一入口 — 動態解析最新版(鐵律:嚴禁寫死版號)",
+  "via-boardqa": "VIA BoardQA — 指揮板四層測試(unit/integration/system/design-sync;缺工具誠實 SKIP)",
+  "via-bridge": "Command Bridge v0100:一鍵前後端對接(後端 B1-B5 探測 + test/debug 三輪 + 多 TAB 狀態矩陣首頁 UI;run-local)",
+  "via-closeout-ui": "五系統收官總覽 U/I(單檔離線)— 動態解析最新版,嚴禁寫死版號",
+  "via-closure": "VDF·VRN·VAP 結案器轉發 — 盤點+封存基線(唯讀;快照 append-only;可重跑)",
+  "via-code": "自動識別編號器(全域編碼註冊中心):via-code <類別> <元件名> [suffix] / via-code --list / via-code --register <類別> <前綴> [padding]",
+  "via-console": "中央治理台 Console — 功能正典 JSON 載入+引擎/動詞/資料在位驗證(動態解析最新版,嚴禁寫死版號)",
+  "via-datahub": "VDF DataHub 心跳/就緒閘 — 動態解析最新版(鐵律:嚴禁寫死版號)",
+  "via-dedup": "ENG-049 整合去重引擎(整合優化令):把去重鐵律產品化,本機判定免上傳",
+  "via-docx": "DOCX 深度解析引擎(文字+表格 擷取-修復-驗證對照)— 動態解析最新版(鐵律)",
+  "via-envfix": "EnvFix v0102:已就緒不動+check差分;-RepairBase 補 base 存量缺件(wheel限定;-IncludeHeavy 連 torch 家族);回退=改指 v0101",
+  "via-envmgr": "中央環境治理 EnvManager 閘道 — 零分支:一律交 Python 路由器(動態解析最新版;層層印橫幅可稽核)",
+  "via-extract": "VRN 內容級擷取 v0101 ACTIVE(啟用交易 2026-08-05):dry-run 預設;--commit 落地 append-only store;回退=改指 candidate",
+  "via-fis": "FIS 驗證 harness v3:E1/E2/E3 實驗+Matrix 報告(需 scipy/numpy:py -m pip install scipy;run-local 於 VIA_Reports\\fis_run)",
+  "via-flow": "FlowSystem OneShot v0101(Porcelain 表面;漲跌色功能語意保留;run-local VIA_Reports\\flow_run;回退=改指 VIA_FlowSystem_OneShot.py",
+  "via-forge": "VIA_Forge v002(啟動線修正):裸打改起「活」工作台 — 本機服務+瀏覽器,前端 19 端點全接真後端",
+  "via-gapfill": "GapFill Stage-2 一支到底轉發 — 找包→盤點→QA 復驗→晉升(不覆蓋)→推送(動態解析最新版)",
+  "via-gov": "中央治理引擎 CGE v0401:TAB 多頁儀表板+大表分段+設計鎖刊頭(治);dry-run 預設;--commit;--fetch-tw;回退=改指 v0400",
+  "via-if": "VIA-IF 產業預測 P1 整合引擎 v0100:唯讀掃描+append-only 輸出(--selftest 自檢;輸出進 VIA_Reports\\if_out)",
+  "via-import": "manifest-driven Downloads import (newest manifest by default; -Manifest IMPORT_x.json to pick)",
+  "via-master": "母版管理中樞(central governance SSOT JSON + 入口 UI + 三子系統 UI;動詞表自動進化)— 動態解析最新版(鐵律)",
+  "via-meetingloop": "MeetingLoop 會議循環引擎轉發 — 動態解析最新版(嚴禁寫死版號);DraftOnly 絕不代寄",
+  "via-mega": "公定處理模式 v0108:三輪全景 14 域 + 巢狀 git repo 圍堵(自帶 .git 之子目錄=外來 clone,整棵跳過);回退=改指 via_mega_engine_v0108.py",
+  "via-mother": "VIA 母頁一鍵 — 重生母頁(矩陣資料最新)後開啟(動態解析最新版產生器,嚴禁寫死版號)",
+  "via-note": "VIA Note Pro 單機筆記(FNT-001)— 雙擊即用;全資料在瀏覽器 localStorage;零網路零安裝零伺服器",
+  "via-number": "VIA 自動編號引擎 — 下一號預覽/核發(動態解析最新版,嚴禁寫死版號)",
+  "via-ocr": "VIA OCR 統一路由器 v0100(ENG-026):全平台 OCR/擷取引擎的探測·裁決·薄執行(全本機免費)",
+  "via-one": "全系統總啟動器 v0112:十四階段(WORKOPS=指揮板一支到底)或 -Only <鍵>",
+  "via-pack": "子系統獨立打包器 v0103:entry_newest pattern 取最新引擎(升版自動跟進)+產品號+單機綁定+封面U/I;回退=改指 via_pack_engine_v0102.py",
+  "via-pdfcheck": "PDF 法醫探針(唯讀;零輸出檔死因判定)— 動態解析最新版(鐵律)",
+  "via-pipe": "VIA 統一輪動引擎(回測+自演化+證偽):py via_pipeline --demo;誠實前提=需同伴檔 rotation_engine.py(本批未含,待補)+numpy/pandas",
+  "via-plot": "VIA 跨子系統繪圖動詞 — seaborn+plotly 引擎線(28 圖型全譜;動態解析最新版,嚴禁寫死版號)",
+  "via-precheck": "VIA 輸入前檢查動詞 — 重複輸入/缺欄/路徑存在(先擋後跑;動態解析最新版,嚴禁寫死版號)",
+  "via-probe": "VRN 內容級擷取 Stage-0 可行性探測(唯讀,不寫 SSOT):via-probe [PDF資料夾] [--limit N]",
+  "via-provision": "首啟布建精靈+機況體檢(初次啟動詢問存放位置;--check 體檢存安裝計畫;--fresh 新機鏈指路)— 動態解析最新版(鐵律)",
+  "via-reconcile": "OCR 擷取 x SSOT v2 內容級對帳(唯讀零落庫)— 動態解析最新版(鐵律)",
+  "via-rescue": "純影像掃描件 OCR 救援(fitz 渲染→paddleocr→併回主表)— 動態解析最新版(鐵律)",
+  "via-shim": "TickerRegex v0100 shimmed entry: via-shim -Target <file> [-DryRun] [-Args ...]",
+  "via-six": "全景式分析六獨立流程(唯讀零九頭龍)— 動態解析最新版(鐵律:嚴禁寫死版號)",
+  "via-spec": "VIA Spec — 母版最後一頁全系統規格總覽生成(canon SSOT 動態彙整;零手寫數字)",
+  "via-ssot-evolve": "SSOT 自動演化引擎 — 真實資料掃候選碼寫提案版(凍結正本零觸碰;動態解析最新版)",
+  "via-storage": "Storage Optimizer AIO(session storage-architecture 整合):自足式單檔 PS(內嵌引擎+HttpListener+GUI;env bootstrap+port fallb",
+  "via-store": "對帳綠燈內容落庫 via.duckdb(dry-run 預設;--commit 才寫;現表零觸碰)— 動態解析最新版(鐵律)",
+  "via-supaudit": "功能引擎 x 支援模組導入稽核(唯讀)— 動態解析最新版(鐵律:嚴禁寫死版號)",
+  "via-sync": "sync repo (fetch + merge claude branch + push main)",
+  "via-sysman": "SYSTEM MANAGER 三輪全景協議(Mega-Prompt 最終整合版;20 加速器)— 動態解析最新版(鐵律)",
+  "via-tower": "VIA Control Tower (HTML console at 127.0.0.1:8765)",
+  "via-trinity": "功能三系整合模板(VIA>鍛研鑑,Porcelain,22 綁定槽)",
+  "via-ui": "UI Hub 活化版 v0108:WorkOps 磚=統合指揮板(WorkOps×VMT) + Workbench 視覺鎖(DesignLock v0102)+一點直入;py 失敗回退靜態 v0108",
+  "via-usertest": "VIA UserTest — 使用者旅程逐段實測(唯讀;缺件誠實 SKIP)— 動態解析最新版;嚴禁寫死版號",
+  "via-vap": "VIA VAP 一鍵繪圖啟動器 — 動態解析最新 chartlib 引擎;嚴禁寫死版號",
+  "via-vapvdf": "VAP+VDF 一支統包 — 六站順跑誠實矩陣(動態解析最新版統包器,嚴禁寫死版號)",
+  "via-vdf": "v0160C 一般瀏覽器 HTML U/I(本機 HTTP 橋) · 回退: v0102=HTA 設計鎖刊頭 / v0101=v0160A 原版",
+  "via-vmt-init": "VMT 資料層 bootstrap(不足的部分補上):以 repo 內 OneShot 對準 VMT 根目錄執行",
+  "via-vmt": "VMT SuperBOM 總指揮 v0103(Porcelain 刊頭;問卷->附件->收斂->CPM,缺件優雅略過;回退=改指 via_master_engine_v0102.py)",
+  "via-vrn-intake": "VRN 輸入矩陣驗證 — 自動導入版:預設=VRN input\\incoming(報告已移入即自動掃,免選擇)",
+  "via-vtr": "VTR 會議紀錄修復引擎轉發器 — 子系統正本在 functional modules\\WorkOps\\VTR",
+  "via-wf": "VIA WF 統一工作流啟動器 — 新模組家族一鍵(WorkflowEngine/ChipWar/TALib/MultiFactor/FlowSystem)",
+  "via-workops": "WorkOps × Mail Tracker 統合指揮板 v0104（一系統四頁:專案/追蹤哨/範疇關係人/VMT;負載對照;絕不代寄）",
+  "via": "VIA one-click (default: sync + VDF + VAP + open UIs)"
+ },
+ "entry": {
+  "hub_ui": "VIA_Reports/VIA_Master_Hub.html",
+  "sub_ui": {
+   "VRN": "VIA_Reports/VIA_UI_VRN.html",
+   "VDF": "VIA_Reports/VIA_UI_VDF.html",
+   "VAP": "VIA_Reports/VIA_UI_VAP.html"
+  }
+ }
+}

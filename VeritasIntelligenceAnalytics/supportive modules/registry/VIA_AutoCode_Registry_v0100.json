@@ -272,7 +272,9 @@
   "工具|vrn_docx_engine_v0100": "TOOL-016",
   "工具|vrn_content_store_v0100": "TOOL-017",
   "工具|系統管理三輪協議": "TOOL-018",
-  "支援|網路支援模組": "TOOL-019"
+  "支援|網路支援模組": "TOOL-019",
+  "工具|首啟布建精靈": "TOOL-020",
+  "工具|母版管理中樞": "TOOL-021"
  },
  "ledger": [
   {
@@ -2150,6 +2152,20 @@
    "name": "forge_import_cycle_拆解",
    "kind": "修正",
    "note": "sysman 唯一存留發現處置:via_mailhub↔via_rebuild 頂層互引真環——mailhub 側 import 移入 work_rebuild()(用點本就延遲初始化,行為零改變;rebuild 側零觸碰)。沙盒雙向載入序實測 OK;sysman 覆核 系統 GREEN·發現 0·16.9s。三輪協議首次全綠收官。",
+   "ts": "2026-08-12"
+  },
+  {
+   "code": "TOOL-020",
+   "name": "via_provision_v0100",
+   "kind": "工具",
+   "note": "首啟布建精靈+機況體檢:初次啟動互動詢問系統存放位置(非互動誠實指路 --root)→依規畫布建 9 夾骨架(只增不減)+機碼 sha256(電腦名+平台)[:16] 落 VIA_Deploy_Config.json(單機檔,gitignore);--check 依系統需求體檢(PS7/Python/libs 三級/env/pip 衝突/EngineForge 模板/EnvManager/正典庫/配置)存 VIA_Install_Plan_<ts>.json+補裝令;--fresh 指路既有 FreshPC 鏈不重造。PATH 印令不代改(--auto 才執行)。",
+   "ts": "2026-08-12"
+  },
+  {
+   "code": "TOOL-021",
+   "name": "via_master_hub_v0100",
+   "kind": "工具",
+   "note": "母版管理中樞:central governance SSOT 存 JSON(紅線 10/鐵則 5/三子系統定義/商品規則/動詞總表)——動詞表每跑自動從 bin/*.cmd 重掃(持續更新進化自動),既有鍵只增不減;生成入口 UI VIA_Master_Hub.html+三子系統 UI 藍圖(VRN 情報台/VDF 鍛造台/VAP 視覺台)互相連結;商品打包重用 via-pack v0103(一商品一碼鎖一機:machine_id+組合號)+FreshPC 鏈,不重造。",
    "ts": "2026-08-12"
   }
  ]
