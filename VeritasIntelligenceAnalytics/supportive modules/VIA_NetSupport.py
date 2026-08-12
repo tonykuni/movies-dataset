@@ -10,6 +10,8 @@ VIA_NetSupport — 網路支援模組(輔助性工具;graceful 全退化)
   ③ 憑證/金鑰只走環境變數 — 本模組永不落鍵
   ④ graceful — requests 缺席/離線時全退化 None,引擎行為零改變
   ⑤ 代理感知 — 尊重 HTTPS_PROXY/REQUESTS_CA_BUNDLE 環境,不停用驗證
+  ⑥ 同意閘(2026-08-12 規定)— 網路工具開啟使用前須經操作員同意:
+     環境變數 VIA_NET_CONSENT=YES 才發包;未同意一律 None+誠實告示
 介面:
   net_ok()                     → bool 網路棧可用性(不發包,只驗依賴)
   get_session()                → requests.Session|None(重試+退避內建)
@@ -25,6 +27,11 @@ import time
 _UA = "VIA-NetSupport/0100 (internal-engine)"
 
 
+def net_consent() -> bool:
+    """操作員同意閘:VIA_NET_CONSENT=YES/1/TRUE 才視為已同意(紅線)。"""
+    return os.environ.get("VIA_NET_CONSENT", "").upper() in ("YES", "1", "TRUE")
+
+
 def net_ok() -> bool:
     try:
         import requests  # noqa: F401
@@ -34,7 +41,10 @@ def net_ok() -> bool:
 
 
 def get_session():
-    """代理感知 Session;requests 缺席回 None(graceful)。"""
+    """代理感知 Session;未經同意/requests 缺席回 None(graceful)。"""
+    if not net_consent():
+        print("  [同意閘] 網路工具未經操作員同意——setx VIA_NET_CONSENT YES 後新視窗生效(紅線)")
+        return None
     try:
         import requests
     except ImportError:
@@ -82,4 +92,4 @@ def fetch_text(url: str, **kw):
 
 
 if __name__ == "__main__":
-    print(f"VIA_NetSupport · net_ok={net_ok()} · proxy={'在' if os.environ.get('HTTPS_PROXY') else '無'}")
+    print(f"VIA_NetSupport · net_ok={net_ok()} · 同意閘={'已同意' if net_consent() else '未同意(預設關)'} · proxy={'在' if os.environ.get('HTTPS_PROXY') else '無'}")

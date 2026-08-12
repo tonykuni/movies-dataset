@@ -275,7 +275,8 @@
   "支援|網路支援模組": "TOOL-019",
   "工具|首啟布建精靈": "TOOL-020",
   "工具|母版管理中樞": "TOOL-021",
-  "規格|UI範本模板": "SPEC-012"
+  "規格|UI範本模板": "SPEC-012",
+  "工具|安裝治理閘": "TOOL-022"
  },
  "ledger": [
   {
@@ -2230,6 +2231,34 @@
    "name": "via_system_manager_v0103",
    "kind": "工具",
    "note": "報告層改用 UI 範本 v0100(分析邏輯零變更);容器實測 GREEN·22.7s。工作站 v0102 實錄收官:GREEN·發現 0·26.0s(938.8→567.1→18.2→26 全程三代根因修復)。",
+   "ts": "2026-08-12"
+  },
+  {
+   "code": "TOOL-021",
+   "name": "uploads_dedup_20260812_四件_五批",
+   "kind": "整合去重",
+   "note": "四件裁決:VeritasCeleritas(ef2398ce)/VeritasAegisNexus(25973bfd)/VIA_EngineForge_Config.template v0.6.0(b14ba666)/VIA_EnvManager(11d33140)全數與 supportive modules 正本 hash 全同→讓位零動作。儲存規定引用之八支輔助件盤點:全在庫(SSOT_Unified/Panorama_AST_RuntimeInjector/RegistryCore_v1/Runtime_Bridge_AIO/SafePolyglot README+StaticValidation/EngineForge/EnvManager)。",
+   "ts": "2026-08-12"
+  },
+  {
+   "code": "TOOL-022",
+   "name": "via_install_gate_v0100",
+   "kind": "工具",
+   "note": "安裝治理閘(儲存規定令):①EngineForge 模板 policy 讀示遵行 ②裝前/後 pip check 快照對比新增衝突誠實列示 ③VIA_Lib_Registry_v0100.json append-only 註冊(單機檔 gitignore——lib registry 升一級 SSOT,防 pull 卡檔)④裝後 import 煙測+五輔助模組 graceful 導入驗;--check-only 零安裝模式。容器實測:政策讀取/零衝突 base/輔助 5 全 OK/註冊第 1 筆。",
+   "ts": "2026-08-12"
+  },
+  {
+   "code": "TOOL-019",
+   "name": "VIA_NetSupport_同意閘",
+   "kind": "修正",
+   "note": "儲存規定令:網路工具開啟使用前先問操作員同意——get_session 前置 net_consent() 閘(VIA_NET_CONSENT=YES/1/TRUE 才發包;未同意一律 None+誠實告示 setx 指引)。方向更保守(預設關);容器雙態實測:未同意=閘住、YES=放行。",
+   "ts": "2026-08-12"
+  },
+  {
+   "code": "TOOL-021",
+   "name": "via_master_hub_v0103",
+   "kind": "工具",
+   "note": "儲存規定條文入 SSOT:紅線 11「網路工具啟用前先經操作員同意(VIA_NET_CONSENT)」;鐵則 7「安裝一律 via-install 過 EngineForge+EnvManager 閘,註冊 VIA_Lib_Registry 並導入輔助模組」。",
    "ts": "2026-08-12"
   }
  ]
