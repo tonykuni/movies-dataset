@@ -33,8 +33,9 @@
 from __future__ import annotations
 
 # ===== [VIA:ANCHOR:SUPPORT:BOOTSTRAP:START] =====
-# 接橋補丁(2026-08-13 稽核令 TOOL-009 後續:功能引擎統一導入支援模組;
-#  graceful 全退化 — 橋/核心缺席零影響;不 eager 導入 Runtime_Bridge/EnvManager 重件)
+# 接橋補丁 v2(2026-08-12 令:引擎統一導入 輔助/加速器/網路/自動編號;
+#  導入一律 bridge-first 過橋;graceful 全退化 — 缺席零影響;
+#  不 eager 導入 Runtime_Bridge/EnvManager 重件)
 import sys as _via_sys
 from pathlib import Path as _via_Path
 
@@ -63,18 +64,42 @@ try:
 except Exception:
     _VIA_BRIDGE = None
     _VIA_HAS_BRIDGE = False
+
+def _via_load(_name):
+    # 統一導入閘:先過橋(輔助性工具),橋缺退直導,再缺落 None(graceful)
+    try:
+        if _VIA_BRIDGE is not None:
+            for _fn in ("load", "get", "require"):
+                _f = getattr(_VIA_BRIDGE, _fn, None)
+                if callable(_f):
+                    try:
+                        _m = _f(_name)
+                    except Exception:
+                        _m = None
+                    if _m is not None:
+                        return _m
+    except Exception:
+        pass
+    try:
+        return __import__(_name)
+    except Exception:
+        return None
+
+_VIA_SSOT = _via_load("VIA_SSOT_Unified")
+_VIA_AEGIS = _via_load("VeritasAegisNexus")
+_VIA_CELERITAS = _via_load("VeritasCeleritas")
+_VIA_ACCEL = _via_load("VIA_SuperAccel_Module")   # 加速器(工作站候上傳;graceful)
+_VIA_NET = _via_load("VIA_NetSupport")            # 網路支援模組
+_VIA_REGCORE = _via_load("VIA_RegistryCore_v1")   # 自動編號核心(工作站候上傳;graceful)
 try:
-    import VIA_SSOT_Unified as _VIA_SSOT
+    if _VIA_REGCORE is not None:  # 自動編號:標準介面任一,全護欄不擲例外
+        for _fn in ("auto_register", "ensure_code", "register_module"):
+            _f = getattr(_VIA_REGCORE, _fn, None)
+            if callable(_f):
+                _f(__file__)
+                break
 except Exception:
-    _VIA_SSOT = None
-try:
-    import VeritasAegisNexus as _VIA_AEGIS
-except Exception:
-    _VIA_AEGIS = None
-try:
-    import VeritasCeleritas as _VIA_CELERITAS
-except Exception:
-    _VIA_CELERITAS = None
+    pass
 # ===== [VIA:ANCHOR:SUPPORT:BOOTSTRAP:END] =====
 
 __version__ = "1.0.0"
