@@ -1,3 +1,3 @@
 @echo off
-rem VIA 統一輪動引擎(回測+自演化+證偽):py via_pipeline --demo;誠實前提=需同伴檔 rotation_engine.py(本批未含,待補)+numpy/pandas
+rem VIA 統一輪動引擎(回測+自演化+證偽):py via_pipeline --demo;四件齊(rotation_engine/devils_advocate/via_io 已在庫)· v2 錨已注 · 容器全鏈實測綠(誠實裁決制)
 py "%~dp0..\supportive modules\VIA_Pipeline\via_pipeline.py" --demo %*
