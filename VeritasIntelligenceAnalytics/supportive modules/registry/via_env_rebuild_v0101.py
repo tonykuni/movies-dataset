@@ -507,12 +507,13 @@ def dryrun_stage(stage: dict, mirror_url: str, rounds_n: int) -> dict:
 def swap_commands(env_name: str, newenv: str) -> dict:
     """旁建驗綠後之切換候裁令(可自測):A 別名法(推薦)/B 改名法(附警語)。"""
     old = str(Path(newenv).parent / env_name)
+    retire = str(Path(newenv).parent / f"_retire_{env_name}")  # 底線前綴=退出管理前綴,掃描自然除名
     return {
         "alias": f"EnvManager 別名冊(VIA_Env_Alias_Map):{env_name} → {Path(newenv).name}"
                  "(路由/工具改指新境,零檔案移動,可即回退)",
-        "ps": [f'Rename-Item -LiteralPath "{old}" "{env_name}__retire"',
+        "ps": [f'Rename-Item -LiteralPath "{old}" "{Path(retire).name}"',
                f'Rename-Item -LiteralPath "{newenv}" "{env_name}"'],
-        "sh": [f'mv "{old}" "{old}__retire"', f'mv "{newenv}" "{old}"'],
+        "sh": [f'mv "{old}" "{retire}"', f'mv "{newenv}" "{old}"'],
     }
 
 
@@ -762,7 +763,7 @@ def cmd_selftest() -> int:
         assert "pip check" in sh and "set -e" in sh
         sw = swap_commands("via_demo", "/e/via_demo__rbTS")
         assert any("Rename-Item" in c for c in sw["ps"]) and "via_demo" in sw["alias"]
-        assert sw["sh"][0] == 'mv "/e/via_demo" "/e/via_demo__retire"'
+        assert sw["sh"][0] == 'mv "/e/via_demo" "/e/_retire_via_demo"'  # 退役名退出 via_ 前綴=除名掃描
 
     def t11():
         assert _managed("via_core") and _managed("paddle_311") and _managed("BASE".lower()) \
