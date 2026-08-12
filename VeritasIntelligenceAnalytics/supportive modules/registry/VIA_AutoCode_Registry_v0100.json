@@ -2428,6 +2428,13 @@
    "kind": "工具",
    "note": "自測矩陣 v0101→v0102:新增第 19 站「表格統包車道矩陣」(TOOL-029 唯讀可用性探測 rc0)。容器 --fast:OK 12 · FAIL 0 · SKIP 5(環境缺件誠實)。",
    "ts": "2026-08-12"
+  },
+  {
+   "code": "TOOL-029",
+   "name": "vrn_table_omni_v0101",
+   "kind": "工具",
+   "note": "工作站首戰 MQ-1560 回饋修(三缺陷+兩強化):①ppstructure API 斷點——paddleocr 3.x 移除 PPStructure 改 PPStructureV3;雙軌支援 2.x/3.x(V3 pipeline 直餵 PDF+HTML 產物遞迴收割解析)。②視覺車道模型下載鎖同意閘——ppstructure/docling 首跑需下載模型權重屬網路行為(紅線):模型未快取+VIA_NET_CONSENT 未同意=誠實 SKIP_同意閘不發包。③缺件提示——ximgproc→opencv-contrib-python、pi_heif→pi-heif(FAIL 附修復令)。④掃描件前診——fitz 逐頁探文字層;MQ-1560 確診圖片件,文字車道 0 屬預期,交叉共識分軌(掃描件以視覺軌裁決)不誤判。⑤--selftest 三檢(HTML 解析/數位原生擷取/掃描件前診;合成件零網路)。容器 3/3 全綠。",
+   "ts": "2026-08-12"
   }
  ]
 }
