@@ -270,7 +270,8 @@
   "工具|vrn_pdf_forensics_v0100": "TOOL-014",
   "工具|vrn_scan_ocr_rescue_v0100": "TOOL-015",
   "工具|vrn_docx_engine_v0100": "TOOL-016",
-  "工具|vrn_content_store_v0100": "TOOL-017"
+  "工具|vrn_content_store_v0100": "TOOL-017",
+  "工具|內容落庫引擎": "TOOL-017"
  },
  "ledger": [
   {
@@ -2086,6 +2087,13 @@
    "code": "TOOL-017",
    "component": "內容落庫引擎 vrn_content_store_v0100 + via-store(深水線①落庫版;64/64 綠燈後首寫生產庫)",
    "note": "治理五鐵則:①dry-run 預設(--commit 才寫)②只增不減=只建 4 新表 vrn_report_content_canon/text_blocks/table_cells/store_log,22 現表零觸碰 ③寫前整檔備份 via.duckdb.pre_<ts>.bak ④upsert 冪等(同 source_document/pdf_name 剔舊插新)⑤vrn_store_log append-only 稽核。canon 64 筆(broker/report_date/type/tickers/target_prices/evidence_state/review_required/sha/provenance);text_blocks+table_cells 以 duckdb read_parquet 直入(工作站實量 4,934+168,927 列)。歷史值蓋過預估值界權註記:本層為報告內容正典,financialdata actual-vs-estimate 裁決屬 vrn_financial_actual_canonical 既有機制不越權。db 路徑:--db 覆寫+四候選探索(VRN/db、VDF/db、OneDrive dict)誠實列缺。容器全鏈測試:dry-run 零寫/commit 四表+備份/冪等重跑 64·2·1 零疊加(log 2 如設計)/既有表零觸碰 True/canon 樣本 MQ-1560→MACQUARIE·2026-05-20 真資料流通。"
+  },
+  {
+   "code": "TOOL-017",
+   "name": "vrn_content_store_v0101",
+   "kind": "工具",
+   "note": "候選路徑勘誤:正典 primary_duckdb 出自 MDL025 vrn_production_home(OneDrive module/VeritasDataForge/data/via.duckdb);次候選 D:/VIA;v0100 四舊候選保留;驗證段只數實建表(來源缺誠實跳過)。落庫邏輯零變更;容器全路徑重測綠。",
+   "ts": "2026-08-12"
   }
  ]
 }
