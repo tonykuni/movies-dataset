@@ -1,0 +1,79 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA UI Template · SysMan 基準 v0100</title><style>
+:root{--bg:#f4f3ef;--paper:#fff;--ink:#1b1a17;--mut:#6b6860;--line:#dbd9d3;--soft:#ebe9e3;
+ --g:#2c4f4a;--gbg:#e6efec;--o:#6f5c31;--obg:#f2ecdd;--r:#9e2b25;--rbg:#f3e7e6;
+ --grad:linear-gradient(90deg,#2c4f4a,#5b8a83)}
+*{box-sizing:border-box}
+body{font-family:'Segoe UI','Noto Sans TC',Arial,sans-serif;font-size:11.5px;background:var(--bg);
+ color:var(--ink);margin:18px auto;max-width:1100px;padding:0 14px;line-height:1.5}
+h1{font-size:17px;letter-spacing:.05em;margin:2px 0}
+.mast{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+ border-bottom:2px solid var(--ink);padding-bottom:8px;margin-bottom:12px}
+.num{font-family:Consolas,monospace;font-size:9.5px;letter-spacing:.14em;color:var(--mut);text-transform:uppercase}
+.st{font-family:Consolas,monospace;font-size:12px;font-weight:700}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:8px;margin:8px 0}
+.kpi{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:8px 12px;text-align:center}
+.kpi b{display:block;font-size:16px}
+.kpi .l{font-family:Consolas,monospace;font-size:8px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--paper);margin:6px 0}
+table{width:100%;border-collapse:collapse;font-size:10.5px}
+th,td{border-bottom:1px solid var(--soft);padding:4px 8px;text-align:left;vertical-align:top}
+th{font-family:Consolas,monospace;font-size:8.5px;text-transform:uppercase;letter-spacing:.06em;
+ color:var(--mut);background:var(--paper);position:sticky;top:0}
+.wrap{word-wrap:break-word;overflow-wrap:anywhere;max-width:520px;white-space:normal}
+.r{text-align:right}.mono{font-family:Consolas,monospace;font-size:.95em}.small{font-size:9.5px;color:var(--mut)}
+.tag{display:inline-block;padding:1px 7px;border-radius:8px;font-family:Consolas,monospace;font-size:8.5px;font-weight:700}
+.tag.g{background:var(--gbg);color:var(--g)}.tag.o{background:var(--obg);color:var(--o)}.tag.r{background:var(--rbg);color:var(--r)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.dot.g{background:var(--g)}.dot.o{background:#c4943a}.dot.r{background:var(--r)}
+.gbg td{background:#f4faf7}.obg td{background:#fbf7ea}.rbg td{background:#fbf0ef}
+details{background:var(--paper);border:1px solid var(--line);border-radius:8px;margin:10px 0;padding:0 12px 8px}
+summary{cursor:pointer;font-weight:700;font-size:12.5px;padding:9px 0;list-style-position:inside}
+summary::marker{color:var(--mut)}
+.sechead{font-size:12.5px;font-weight:700;margin:16px 0 4px;border-left:3px solid var(--ink);padding-left:7px}
+.pw{display:inline-block;width:170px;height:8px;background:#e4e2dc;border-radius:5px;overflow:hidden;vertical-align:middle;margin-left:8px}
+.pb{height:100%;width:0;background:var(--grad);border-radius:5px;animation:fill 1.2s ease forwards}
+@keyframes fill{to{width:100%}}
+.filter{font-family:Consolas,monospace;font-size:10px;padding:5px 9px;border:1px solid var(--line);
+ border-radius:5px;width:230px;max-width:100%;margin:4px 0}
+.nl{font-family:Consolas,monospace;font-size:9px;color:var(--mut);padding:1px 0}
+.foot{font-family:Consolas,monospace;font-size:9px;color:var(--mut);text-align:center;padding:10px 0}
+@media(max-width:720px){body{margin:8px auto}.kpis{grid-template-columns:repeat(auto-fit,minmax(96px,1fr))}.wrap{max-width:none}}
+@media print{details{page-break-inside:avoid}summary{pointer-events:none}.filter{display:none}}
+</style><script>
+function viaFilter(inp,tbodyId){var q=(inp.value||'').toLowerCase();
+ var rows=document.getElementById(tbodyId).rows;
+ for(var i=0;i<rows.length;i++){rows[i].style.display=
+  rows[i].textContent.toLowerCase().indexOf(q)>=0?'':'none';}}
+</script></head><body>
+<div class="mast"><div><div class="num">VIA UI TEMPLATE v0100 · SYSMAN 基準 · 範本模板(操作員令 2026-08-12)</div>
+<h1>VIA UI 範本模板 · 元件冊</h1></div>
+<div class="st" style="color:var(--g)"><span class="dot g"></span>TEMPLATE READY</div></div>
+<div class="small">全系 UI 以本範本為基準:CSS Grid KPI(auto-fit 彈性欄)· 折疊區塊(彈性 layout)·
+表格橫滾容器+黏性表頭+自動換行 · 紅黃綠燈(點+標籤雙態)· 動態進度條 · JS 即時過濾 · 響應式斷點 · 列印友善。</div>
+<div class="sechead">① KPI 卡(grid auto-fit)</div>
+<div class="kpis"><div class="kpi"><b>161</b><span class="l">MODULE</span></div>
+<div class="kpi"><b>7,854</b><span class="l">ENGINE</span></div>
+<div class="kpi"><b>5,953</b><span class="l">FUNCTION-LIB</span></div>
+<div class="kpi"><b>76</b><span class="l">OTHERS</span></div></div>
+<div class="sechead">② 紅黃綠燈(點+標籤)</div>
+<p><span class="dot g"></span><span class="tag g">GREEN</span>&nbsp;
+<span class="dot o"></span><span class="tag o">YELLOW</span>&nbsp;
+<span class="dot r"></span><span class="tag r">RED</span></p>
+<div class="sechead">③ 矩陣表(橫滾+黏性表頭+燈底色+換行)</div>
+<div class="scroll"><table><tr><th>類</th><th>項</th><th>明細</th></tr>
+<tr class="gbg"><td><span class="dot g"></span>PASS</td><td>樣例綠列</td><td class="wrap">誠實實測通過</td></tr>
+<tr class="obg"><td><span class="dot o"></span>WARN</td><td>樣例黃列</td><td class="wrap">建議項(高風險→建議不自動修)</td></tr>
+<tr class="rbg"><td><span class="dot r"></span>FAIL</td><td>樣例紅列</td><td class="wrap">硬紅——誠實停止,不假綠</td></tr></table></div>
+<div class="sechead">④ 折疊區塊 + 動態進度條</div>
+<details open><summary>樣例折疊段 <span class="pw"><span class="pb"></span></span></summary>
+<div class="small">點標題折疊/展開;details 原生零 JS,列印自動展開。</div></details>
+<div class="sechead">⑤ JS 即時過濾</div>
+<input class="filter" placeholder="即時過濾…" oninput="viaFilter(this,'demoBody')">
+<div class="scroll"><table><tr><th>動詞</th><th>說明</th></tr><tbody id="demoBody">
+<tr><td class="mono">via-sysman</td><td>三輪協議</td></tr>
+<tr><td class="mono">via-store</td><td>內容落庫</td></tr>
+<tr><td class="mono">via-pipe</td><td>輪動證偽</td></tr></tbody></table></div>
+<div class="foot">VERITAS INTELLIGENCE ANALYTICS · UI 範本模板 v0100 · 沿用:複製 TPL_CSS/TPL_JS 或引本檔為視覺鎖</div>
+</body></html>
