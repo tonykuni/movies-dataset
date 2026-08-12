@@ -2414,6 +2414,20 @@
    "kind": "工具",
    "note": "工作站 --commit FAIL WinError 32 根因修(第四個 Windows 才現形缺陷):v0105 先開 duckdb 寫入連線後才 shutil.copy2 備份——DuckDB 寫入連線於 Windows 持排他鎖,自己鎖死自己的備份複製(容器 Linux 不排他故未現形;首次非新建 commit 才走到此路)。修=寫前整檔備份移至 duckdb.connect 之前(fresh 新建誠實跳過)。容器三態綠:dry-run 計畫/commit 備份先行+64 正典+稽核 1/冪等重跑。誠實回滾機制上輪已正確運作(備份未動、庫未損)。",
    "ts": "2026-08-12"
+  },
+  {
+   "code": "TOOL-029",
+   "name": "vrn_table_omni_v0100",
+   "kind": "工具",
+   "note": "操作員令:本地免費表格函式庫統包一具引擎(選型目錄十五款)。治理裁定:本地免費者實作=9 車道(pymupdf 基座 find_tables+pdfplumber+camelot lattice→stream+tabula 需Java+img2table+docling+unstructured+ppstructure+deepseek_ocr 權重未備誠實 NOT_READY);雲端/商用 7 款(llamaparse/reducto/textract/azure/google/nanonets/abbyy)非本地免費——列管不實作,鎖網路同意閘+金鑰只走環境變數(紅線)。統一正規化契約+CSV 逐表存證 VIA_Reports/tableomni_runs/+≥2 車道交叉共識對帳;缺件誠實 NOT_INSTALLED 零假綠;安裝一律經 via-install 閘;唯讀零寫主表。動詞 via-tables。容器測:矩陣 1/9(pymupdf)+合成格線 PDF 擷取 1 表 12 格 CSV 正確。直接對治 MQ-1560 TEXT_ONLY(表格層 0)。",
+   "ts": "2026-08-12"
+  },
+  {
+   "code": "TOOL-025",
+   "name": "via_selftest_grid_v0102",
+   "kind": "工具",
+   "note": "自測矩陣 v0101→v0102:新增第 19 站「表格統包車道矩陣」(TOOL-029 唯讀可用性探測 rc0)。容器 --fast:OK 12 · FAIL 0 · SKIP 5(環境缺件誠實)。",
+   "ts": "2026-08-12"
   }
  ]
 }
