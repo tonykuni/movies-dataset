@@ -1,0 +1,60 @@
+{
+  "schema": "VIA_V0140B_WINDOWS_FILE_HANDLE_RULES_V1",
+  "version": "v0140B-WH1",
+  "maximum_bytes_per_successful_probe": 65536,
+  "maximum_content_open_attempts": 5,
+  "maximum_parallel_content_opens": 1,
+  "expected_subsystems": ["VRN", "VDF", "VAP"],
+  "windows_file_attributes": {
+    "READONLY": 1,
+    "HIDDEN": 2,
+    "SYSTEM": 4,
+    "DIRECTORY": 16,
+    "ARCHIVE": 32,
+    "NORMAL": 128,
+    "TEMPORARY": 256,
+    "SPARSE_FILE": 512,
+    "REPARSE_POINT": 1024,
+    "COMPRESSED": 2048,
+    "OFFLINE": 4096,
+    "ENCRYPTED": 16384,
+    "RECALL_ON_OPEN": 262144,
+    "RECALL_ON_DATA_ACCESS": 4194304
+  },
+  "implicit_hydration_block_flags": [
+    "OFFLINE",
+    "RECALL_ON_OPEN",
+    "RECALL_ON_DATA_ACCESS"
+  ],
+  "probe_order": [
+    "H01",
+    "H02",
+    "H03",
+    "H04",
+    "H05",
+    "H06"
+  ],
+  "success_requirement": {
+    "terminal_engines": 6,
+    "cross_subsystem_rows": 18,
+    "minimum_successful_content_opens": 1,
+    "minimum_source_bytes_read": 1,
+    "hydra_violations": 0,
+    "network_requests": 0,
+    "source_hashes": 0,
+    "source_writes": 0,
+    "source_copies": 0,
+    "source_content_artifacts": 0,
+    "canonical_runtime_executions": 0,
+    "registry_writes": 0,
+    "patch_applications": 0,
+    "candidate_promotions": 0
+  },
+  "strategy_preference": [
+    "H02",
+    "H03",
+    "H04",
+    "H05",
+    "H06"
+  ]
+}
