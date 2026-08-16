@@ -159,5 +159,68 @@ class TestDataLayer(unittest.TestCase):
         self.assertEqual(days[-1], dt.date(2026, 8, 14))
 
 
+class TestCsvHardening(unittest.TestCase):
+    def _write(self, name, text):
+        import tempfile, os
+        fd, path = tempfile.mkstemp(suffix=name)
+        with os.fdopen(fd, "w", encoding="utf-8", newline="") as fh:
+            fh.write(text)
+        self.addCleanup(os.unlink, path)
+        return path
+
+    def test_nonfinite_cells_become_none_then_ffill(self):
+        p = self._write("p.csv", "date,SPY\n2026-08-10,100\n2026-08-11,NaN\n"
+                                 "2026-08-12,\n2026-08-13,inf\n2026-08-14,102\n")
+        m = dl.load_csv_wide(p)
+        # NaN/空值/inf 皆視為缺值 → 向前補 100，最後回到 102
+        self.assertEqual(m.prices["SPY"], [100.0, 100.0, 100.0, 100.0, 102.0])
+
+    def test_unsorted_dates_raise(self):
+        p = self._write("u.csv", "date,SPY\n2026-08-14,100\n2026-08-12,99\n")
+        with self.assertRaises(ValueError):
+            dl.load_csv_wide(p)
+
+    def test_duplicate_dates_raise(self):
+        p = self._write("d.csv", "date,SPY\n2026-08-14,100\n2026-08-14,101\n")
+        with self.assertRaises(ValueError):
+            dl.load_csv_wide(p)
+
+    def test_weekly_macro_asof_alignment(self):
+        prices = ["date,SPY"]
+        macro = ["date,DGS10"]
+        import datetime as dt
+        days = dl.business_days_back(dt.date(2026, 8, 14), 20)
+        for i, d in enumerate(days):
+            prices.append("%s,%d" % (d.isoformat(), 100 + i))
+            if i % 5 == 0:
+                macro.append("%s,%.2f" % (d.isoformat(), 4.0 + i * 0.01))
+        p = self._write("p.csv", "\n".join(prices) + "\n")
+        q = self._write("m.csv", "\n".join(macro) + "\n")
+        m = dl.load_csv_wide(p, q)
+        self.assertEqual(len(m.macro["DGS10"]), len(m.dates))
+        # 第 0 天有錨；第 3 天沿用第 0 天錨值；第 5 天換新錨
+        self.assertAlmostEqual(m.macro["DGS10"][3], 4.00)
+        self.assertAlmostEqual(m.macro["DGS10"][5], 4.05)
+        self.assertAlmostEqual(m.macro["DGS10"][-1], m.macro["DGS10"][15])
+
+
+class TestShortDataGracefulDegrade(unittest.TestCase):
+    def test_40d_end_to_end_renders(self):
+        import run_monitor as rm
+        from engine import report as rp
+        cfg = dl.load_config()
+        cfg_path = Path(__file__).resolve().parents[1] / "config" / \
+            "global_etf_risk_config.json"
+        m = dl.generate_demo(cfg, asof="2026-08-14", days=40, seed=1)
+        ds = rm.build_dataset(cfg, cfg_path, m)
+        # 暖機不足的分數應為 None + pending 帶，而非假數字
+        self.assertIsNone(ds["scores"]["commodity_inflation"]["risk"])
+        self.assertEqual(ds["scores"]["commodity_inflation"]["band"]["id"],
+                         "pending")
+        html = rp.render_dashboard(ds)
+        self.assertIn("<!DOCTYPE html>", html)
+        self.assertIn("—", html)
+
+
 if __name__ == "__main__":
     unittest.main()

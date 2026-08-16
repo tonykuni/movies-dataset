@@ -21,6 +21,7 @@ UTF-8 no BOM；demo=T4 SYNTHETIC 全程掛標。
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -189,6 +190,19 @@ def run_pipeline(args):
             return 2
         market = dl.load_csv_wide(args.prices, args.macro,
                                   macro_series=config["def_macro_series"])
+        # fail-closed 前置驗證：缺檔缺欄要一次講清楚，不留深層 traceback
+        missing_t = [u["ticker"] for u in dl.universe_tickers(config)
+                     if u["ticker"] not in market.prices]
+        missing_m = [s for s in config["def_macro_series"]
+                     if s not in market.macro]
+        if missing_t or missing_m:
+            if missing_t:
+                print("[FAIL] prices CSV 缺 universe ticker（%d）：%s"
+                      % (len(missing_t), ", ".join(missing_t)), file=sys.stderr)
+            if missing_m:
+                print("[FAIL] macro CSV 缺序列：%s" % ", ".join(missing_m),
+                      file=sys.stderr)
+            return 2
     else:
         market = dl.generate_demo(config, asof=args.asof, days=args.days,
                                   seed=args.seed)
@@ -321,7 +335,18 @@ def selftest():
     return 0 if fails == 0 else 1
 
 
+def _utf8_console_guard():
+    """Windows 舊主控台（cp950 等）防炸：無法編碼的字元以替代字輸出，EXIT 碼不變。"""
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(errors="replace")
+            except Exception:
+                pass
+
+
 def main(argv=None):
+    _utf8_console_guard()
     ap = argparse.ArgumentParser(description="VIA MDL009 全球 ETF 風險同步觀測引擎")
     ap.add_argument("--source", choices=["demo", "csv"], default="demo")
     ap.add_argument("--prices", help="寬表價格 CSV（date + ticker 欄）")
@@ -336,7 +361,14 @@ def main(argv=None):
     args = ap.parse_args(argv)
     if args.selftest:
         return selftest()
-    return run_pipeline(args)
+    try:
+        return run_pipeline(args)
+    except Exception as exc:                                   # noqa: BLE001
+        if os.environ.get("VIA_DEBUG"):
+            raise
+        print("[FAIL] %s: %s" % (type(exc).__name__, exc), file=sys.stderr)
+        print("[HINT] 設 VIA_DEBUG=1 可看完整 traceback", file=sys.stderr)
+        return 2
 
 
 if __name__ == "__main__":

@@ -94,10 +94,20 @@ def load_csv_wide(prices_csv, macro_csv=None, macro_series=None):
             dates.append(row[0].strip())
             for i, h in enumerate(header[1:], start=1):
                 raw = row[i].strip() if i < len(row) else ""
-                try:
-                    cols[h].append(float(raw)) if raw else cols[h].append(None)
-                except ValueError:
-                    cols[h].append(None)
+                val = None
+                if raw:
+                    try:
+                        v = float(raw)
+                        # NaN/inf 一律視為缺值：不得穿透進窗口計算
+                        val = v if math.isfinite(v) else None
+                    except ValueError:
+                        val = None
+                cols[h].append(val)
+        for i in range(len(dates) - 1):
+            if dates[i] >= dates[i + 1]:
+                raise ValueError(
+                    "CSV 日期需嚴格升冪且不重複（%s：第 %d 列 %s >= %s）"
+                    % (path, i + 2, dates[i], dates[i + 1]))
         return dates, {k: _ffill(v) for k, v in cols.items()}
 
     dates, prices = read(prices_csv)
