@@ -296,6 +296,18 @@ def selftest():
           for d in ds["devil_panel"]),
       "devil_flags=%d" % len(ds["devil_panel"]))
 
+    # 多種子穩健性（房規）：腳本 regime 在 5 種子中至少 4 次為 Top1
+    seed_hits, seed_tops = 0, []
+    for sd in (1, 2, 3, 5, 7):
+        msd = dl.generate_demo(config, asof="2026-08-14", days=400, seed=sd)
+        dsd = build_dataset(config, config_path, msd)
+        top = dsd["regime"]["top"]["id"]
+        seed_tops.append("%d:%s" % (sd, "✓" if top ==
+                                    msd.provenance["scripted_regime_at_asof"] else top))
+        seed_hits += (top == msd.provenance["scripted_regime_at_asof"])
+    T("S16 多種子Regime穩健(>=4/5)", seed_hits >= 4,
+      "hits=%d/5 [%s]" % (seed_hits, " ".join(seed_tops)))
+
     fails = sum(1 for _, ok, _ in R if not ok)
     print("=" * 74)
     print("VIA %s %s | SELFTEST | 純標準庫 · T4 SYNTHETIC 驗收世界" %
