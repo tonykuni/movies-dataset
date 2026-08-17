@@ -67,25 +67,54 @@ def def_build_payload() -> dict:
 
     # ---- 指數分頁:每群鏈接指數 + 實質成交額(億) ----
     flows_idx = flows.set_index(["Group", "Date"])
+    sig_code = {"HOLD": 0, "DYNAMIC_SETUP": 1, "DYNAMIC_BUY": 2, "DYNAMIC_EXIT": 3}
     index_map = {}
     for g in groups:
         sub = chained[chained["Group"] == g].sort_values("Date")
-        turn = []
-        smart = []
+        turn, f_for, f_dea, f_tru, sigs = [], [], [], [], []
         for d in sub["Date"]:
             try:
-                turn.append(r2(flows_idx.loc[(g, d), "GroupRealTurnover"] / 1e8))
-                smart.append(r2(flows_idx.loc[(g, d), "SmartMoneyNet"] / 1e8))
+                row = flows_idx.loc[(g, d)]
+                turn.append(r2(row["GroupRealTurnover"] / 1e8))
+                f_for.append(r2(row["ForeignNet"] / 1e8))
+                f_dea.append(r2(row["DealerNet"] / 1e8))
+                f_tru.append(r2(row["TrustNet"] / 1e8))
+                sigs.append(sig_code.get(str(row["StrategySignal"]), 0))
             except KeyError:
                 turn.append(None)
-                smart.append(None)
+                f_for.append(None)
+                f_dea.append(None)
+                f_tru.append(None)
+                sigs.append(0)
         index_map[g] = {
             "px": [r2(v) for v in sub["ChainedIndex"]],
             "ret": [r4(v) for v in sub["BasketRet"]],
             "turn": turn,
-            "flow": smart,
+            "fF": f_for,
+            "fD": f_dea,
+            "fT": f_tru,
+            "sig": sigs,
             "n": [int(v) for v in sub["ActiveCount"]],
         }
+
+    # ---- 每群交易標記與勝率(取自主測交易帳本,進場▲/出場▼) ----
+    trade_marks: dict = {g: [] for g in groups}
+    trade_stats: dict = {}
+    for g, sub in trade_ledger.groupby("Group"):
+        rets = sub["NetReturn"].to_numpy(dtype=float)
+        wins = int((rets > 0).sum())
+        trade_stats[g] = {
+            "n": int(len(rets)),
+            "win": wins,
+            "wr": r4(wins / len(rets)) if len(rets) else None,
+            "avg": r4(float(rets.mean())) if len(rets) else None,
+        }
+        for _, t in sub.iterrows():
+            trade_marks[str(g)].append({
+                "in": t["EntryDate"].strftime("%y-%m-%d"),
+                "out": t["ExitDate"].strftime("%y-%m-%d"),
+                "ret": r4(t["NetReturn"]),
+            })
 
     # ---- 資金位移分頁:近 N 日四路資金 + 熱力圖矩陣 ----
     flow_dates = sorted(flows["Date"].unique().tolist())[-FLOW_TAIL_DAYS:]
@@ -191,6 +220,8 @@ def def_build_payload() -> dict:
         "heat": heat,
         "rrg": rrg,
         "roles": role_matrix,
+        "tradeMarks": trade_marks,
+        "tradeStats": trade_stats,
         "backtest": [
             {k: (r4(v) if isinstance(v, (int, float, np.floating)) and not isinstance(v, (bool, np.bool_)) else (bool(v) if isinstance(v, (bool, np.bool_)) else v)) for k, v in row.items()}
             for row in backtest.to_dict("records")
@@ -277,8 +308,16 @@ section{display:none}section.on{display:block}
 
 <section id="sec-index">
  <div class="bar" id="idx-tabs"></div>
- <div class="card"><svg id="idx-chart" viewBox="0 0 1140 500" width="100%"></svg></div>
- <div class="card"><h2>全族群現況</h2><div class="scroll"><table id="idx-table"></table></div></div>
+ <div class="card">
+  <div class="legend"><span><span style="color:var(--up);font-weight:900">▲</span>進場訊號(回測實際成交)</span>
+   <span><span style="color:var(--up);font-weight:900">▼</span>出場·獲利</span>
+   <span><span style="color:var(--dn);font-weight:900">▼</span>出場·虧損</span>
+   <span><span class="sw" style="background:var(--fF)"></span>外資</span>
+   <span><span class="sw" style="background:var(--fD)"></span>自營</span>
+   <span><span class="sw" style="background:var(--fT)"></span>投信</span>
+   <span class="sub">(三大法人淨流均已扣除當沖)</span></div>
+  <svg id="idx-chart" viewBox="0 0 1140 500" width="100%"></svg></div>
+ <div class="card"><h2>全族群現況 — 分類 × 指數 × 訊號 × 回測勝率</h2><div class="scroll"><table id="idx-table"></table></div></div>
 </section>
 
 <section id="sec-flow">
@@ -384,7 +423,8 @@ let curGroup=D.groups[0];
 function renderIdxTabs(){$("idx-tabs").innerHTML=D.groups.map(g=>`<span class="sb ${g===curGroup?'on':''}" data-g="${g}">${short(g)}</span>`).join("");
  document.querySelectorAll("#idx-tabs .sb").forEach(e=>e.onclick=()=>{curGroup=e.dataset.g;renderIdxTabs();drawIndex();drawFlowDetail();});}
 function drawIndex(){
- const I=D.index[curGroup],px=I.px,turn=I.turn,flow=I.flow,n=px.length;
+ const I=D.index[curGroup],px=I.px,turn=I.turn,n=px.length;
+ const flow=px.map((_,i)=>((I.fF[i]||0)+(I.fD[i]||0)+(I.fT[i]||0)));
  const W=1140,L=56,R=14,T=24,PB=280,VB=340,FT=360,FB=470;
  const vals=px.filter(v=>v!==null);
  const mn=Math.min(...vals),mx=Math.max(...vals),pad=(mx-mn)*0.08||1;
@@ -406,36 +446,59 @@ function drawIndex(){
  const last=px[n-1],chg=(last/px[n-2]-1)*100;
  s+=`<text x="${W-R}" y="${Y(last)-6}" text-anchor="end" class="mono" style="font-size:12px;font-weight:700;fill:${chg>=0?UP:DN}">${last.toFixed(1)} (${chg>=0?"+":""}${chg.toFixed(2)}%)</text>`;
  s+=`<text x="${L}" y="${T-8}" class="evlab">${curGroup} · 鏈接指數(錨定 ${D.meta.baseDate}=100,√實質成交額加權,剔除 LAGGARD) · 視窗 2025-01-02 → 今</text>`;
- // 下帶:現金流入流出(四路主力合計淨流,億;獨立座標,零軸置中)。
- const fv=flow.filter(v=>v!==null&&isFinite(v)).map(Math.abs);
- const fmax=fv.length?Math.max(0.5,quant(fv,0.99)):1;
+ // 進出場標記(主測交易帳本):進場▲紅、出場▼(獲利紅/虧損青綠)。
+ const marks=D.tradeMarks[curGroup]||[];
+ marks.forEach(m=>{
+  const ei=D.dates.indexOf(m.in),xi=D.dates.indexOf(m.out);
+  if(ei>=0&&px[ei]!==null){const x=X(ei),y=Y(px[ei]);
+   s+=`<path d="M ${x} ${y-16} l 5 8 l -10 0 Z" fill="${UP}" stroke="#fff" stroke-width="1"><title>進場 ${m.in}</title></path>`;}
+  if(xi>=0&&px[xi]!==null){const x=X(xi),y=Y(px[xi]);const win=m.ret>=0;
+   s+=`<path d="M ${x} ${y+16} l 5 -8 l -10 0 Z" fill="${win?UP:DN}" stroke="#fff" stroke-width="1"><title>出場 ${m.out} · 淨報酬 ${(m.ret*100).toFixed(2)}%</title></path>`;}
+ });
+ // 下帶:三大法人(扣當沖)每日淨流堆疊柱(外資/自營/投信;獨立座標,零軸置中)。
+ const keys3=["fF","fD","fT"],C3={fF:"#3b6fc4",fD:"#b57f1f",fT:"#0f9678"},N3={fF:"外資",fD:"自營",fT:"投信"};
+ let fmax=1;
+ for(let i=0;i<n;i++){let p=0,q=0;keys3.forEach(k=>{const v=I[k][i]||0;if(v>=0)p+=v;else q-=v;});fmax=Math.max(fmax,p,q);}
+ fmax=Math.max(0.5,Math.min(fmax,quant(px.map((_,i)=>{let p=0,q=0;keys3.forEach(k=>{const v=I[k][i]||0;if(v>=0)p+=v;else q-=v;});return Math.max(p,q);}),0.99)));
  const fmid=(FT+FB)/2,fscale=(FB-FT)/2/fmax;
  s+=`<line x1="${L}" y1="${fmid}" x2="${W-R}" y2="${fmid}" stroke="#dbd9d3"/>`;
  s+=`<text x="${L-6}" y="${FT+8}" text-anchor="end" class="evlab">+${fmax.toFixed(0)}</text>`;
  s+=`<text x="${L-6}" y="${FB}" text-anchor="end" class="evlab">-${fmax.toFixed(0)}</text>`;
- s+=`<text x="${L+4}" y="${FT-6}" class="evlab">現金流入(紅,上)/流出(青綠,下) — 四路主力合計淨流(億,獨立座標)</text>`;
- for(let i=0;i<n;i++){const v=flow[i];if(v===null||!isFinite(v))continue;
-  const h=Math.min(Math.abs(v)*fscale,(FB-FT)/2);
-  if(v>=0)s+=`<rect x="${X(i)-0.7}" y="${fmid-h}" width="1.4" height="${Math.max(0.5,h)}" fill="${UP}" fill-opacity="0.8"/>`;
-  else s+=`<rect x="${X(i)-0.7}" y="${fmid}" width="1.4" height="${Math.max(0.5,h)}" fill="${DN}" fill-opacity="0.8"/>`;}
+ s+=`<text x="${L+4}" y="${FT-6}" class="evlab">三大法人淨流堆疊(扣當沖,億,獨立座標) — <tspan fill="#3b6fc4">■外資</tspan> <tspan fill="#b57f1f">■自營</tspan> <tspan fill="#0f9678">■投信</tspan> · 上=流入/下=流出</text>`;
+ for(let i=0;i<n;i++){let up=0,dn2=0;
+  keys3.forEach(k=>{const v=I[k][i];if(v===null||!isFinite(v))return;
+   const h=Math.min(Math.abs(v)*fscale,(FB-FT)/2);
+   if(v>=0){s+=`<rect x="${X(i)-0.8}" y="${Math.max(FT,fmid-up-h)}" width="1.6" height="${Math.max(0.4,Math.min(h,fmid-FT-up))}" fill="${C3[k]}"/>`;up+=h;}
+   else{s+=`<rect x="${X(i)-0.8}" y="${fmid+dn2}" width="1.6" height="${Math.max(0.4,Math.min(h,FB-fmid-dn2))}" fill="${C3[k]}"/>`;dn2+=h;}});}
  s+=`<rect id="idx-hover" x="${L}" y="${T}" width="${W-L-R}" height="${FB-T}" fill="transparent"/>`;
  $("idx-chart").innerHTML=s;
  const hov=$("idx-hover");
  hov.onmousemove=ev=>{const r=hov.getBoundingClientRect();
   const i=Math.max(0,Math.min(n-1,Math.round((ev.clientX-r.left)/r.width*(n-1))));
-  showTip(ev,`${D.dates[i]}  ${curGroup}\n指數 ${px[i]===null?"—":px[i].toFixed(1)}   量 ${turn[i]===null?"—":turn[i].toFixed(1)}億\n資金淨流 ${flow[i]===null?"—":(flow[i]>=0?"+":"")+flow[i].toFixed(1)}億\n成分 ${I.n[i]} 檔   日報酬 ${(I.ret[i]*100).toFixed(2)}%`);};
+  const fx=(k)=>I[k][i]===null?"—":((I[k][i]>=0?"+":"")+I[k][i].toFixed(1));
+  const sigName=["HOLD","SETUP","BUY","EXIT"][I.sig[i]||0];
+  showTip(ev,`${D.dates[i]}  ${curGroup}\n指數 ${px[i]===null?"—":px[i].toFixed(1)}   量 ${turn[i]===null?"—":turn[i].toFixed(1)}億   訊號 ${sigName}\n外資 ${fx("fF")}   自營 ${fx("fD")}   投信 ${fx("fT")}   合計 ${(flow[i]>=0?"+":"")+flow[i].toFixed(1)}億\n成分 ${I.n[i]} 檔   日報酬 ${(I.ret[i]*100).toFixed(2)}%`);};
  hov.onmouseleave=hideTip;
 }
 function renderIdxTable(){
- let h="<thead><tr><th>族群</th><th class='num'>指數</th><th class='num'>3D 漲跌%</th><th class='num'>3D 位移 pct-pt</th><th>資金狀態</th><th>訊號</th><th class='num'>成分檔數</th></tr></thead><tbody>";
+ const roleMap={};D.roles.forEach(r=>roleMap[r.g]=r);
+ let h="<thead><tr><th>族群</th><th class='num'>分類 L/P/M/G剔</th><th class='num'>指數</th><th class='num'>3D 漲跌%</th><th class='num'>3D 位移</th><th>資金狀態</th><th>訊號</th><th class='num'>回測筆數</th><th class='num'>勝率%</th><th class='num'>均筆報酬%</th><th class='num'>成分</th></tr></thead><tbody>";
  for(const g of D.groups){const I=D.index[g],px=I.px,n=px.length;
   const r3=(px[n-1]/px[Math.max(0,n-4)]-1)*100;
   const F=D.flows[g],fn=F.velocity.length;
   const vel=F.velocity[fn-1],st=F.state[fn-1],sg=F.signal[fn-1];
-  h+=`<tr style="${g===curGroup?'background:#faf9f4':''}"><td style="font-weight:700">${g}</td><td class="num">${px[n-1].toFixed(1)}</td>`+
+  const ro=roleMap[g]||{L:0,P:0,M:0,G:0};
+  const ts=D.tradeStats[g];
+  const wrTxt=ts&&ts.wr!==null?`<span style="color:${ts.wr>=0.5?UP:DN};font-weight:700">${(ts.wr*100).toFixed(0)}</span>`:"—";
+  const avgTxt=ts&&ts.avg!==null?`<span style="color:${ts.avg>=0?UP:DN}">${(ts.avg*100).toFixed(2)}</span>`:"—";
+  h+=`<tr style="${g===curGroup?'background:#faf9f4':''}"><td style="font-weight:700">${g}</td>`+
+   `<td class="num mono" style="font-size:10.5px"><span style="color:${UP}">${ro.L}</span>/${ro.P}/${ro.M}/<span style="color:${DN}">${ro.G}</span></td>`+
+   `<td class="num">${px[n-1].toFixed(1)}</td>`+
    `<td class="num" style="color:${r3>=0?UP:DN};font-weight:700">${r3>=0?"+":""}${r3.toFixed(2)}</td>`+
-   `<td class="num" style="color:${(vel||0)>=0?UP:DN}">${vel===null?"—":(vel>=0?"+":"")+vel.toFixed(3)}</td>`+
-   `<td>${stateLabel(st)}</td><td>${sigPill(sg)}</td><td class="num">${I.n[n-1]}</td></tr>`;}
+   `<td class="num" style="color:${(vel||0)>=0?UP:DN}">${vel===null?"—":(vel>=0?"+":"")+vel.toFixed(2)}</td>`+
+   `<td>${stateLabel(st)}</td><td>${sigPill(sg)}</td>`+
+   `<td class="num">${ts?ts.n:"—"}</td><td class="num">${wrTxt}</td><td class="num">${avgTxt}</td>`+
+   `<td class="num">${I.n[n-1]}</td></tr>`;}
  $("idx-table").innerHTML=h+"</tbody>";
 }
 
