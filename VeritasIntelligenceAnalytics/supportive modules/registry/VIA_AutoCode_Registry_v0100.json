@@ -2589,6 +2589,34 @@
    "kind": "工具",
    "note": "工作站實戰修:40,180 件全晉升 holds=0 後,Round 2 JSON 驗證道 throw——ConvertFrom-Json 遇『空字串屬性名』(合法 JSON,PS 需 -AsHashTable)即拋,並觸發整批回滾(該腳本 catch=rollback+rethrow)。該道為純可解析性檢查(結果 Out-Null 丟棄),補 -AsHashTable 零行為改變、真壞 JSON 照 catch;違反其自身『單檔錯誤轉 HOLD 不中斷』哲學之處以最小補丁矯正。內嵌 gzip+Base64 載荷已重封裝、SHA-256 常數同步重算(3ACC…→1528…),解包自證通過+外殼 AST 0 錯。倉內 JSON 掃無空鍵——禍首在舊樹側,屬合法內容不改資料。via-govroot 動態最新自動解析 v0104。",
    "ts": "2026-08-17"
+  },
+  {
+   "code": "TOOL-037",
+   "name": "VIA_ContractEngine_v0200(跨會話導入)",
+   "kind": "工具",
+   "note": "INTEGRATE 令:契約介面引擎 v0.2.0 整包收編——SSOT Singleton Registry(Writer-Preferring RW Lock)/SQLite 不可變 URN/DAG 拓撲 setup+逆拓撲 teardown+dependent guard/AST 零執行 Watchdog(DISCOVERED 不 import)/Pydantic 前置驗證(DI 前拒絕)/Digital Twin 契約 UI(data-via-* 語意 selector)。歸巢 supportive modules/VIA_ContractEngine_v0200/(zip 原始包 byte-exact 封存 _upload_original/);四件單獨上傳(TEST_EVIDENCE/LESSONS_LEARNED/執行計畫/契約 Console)與 zip 內全同→讓位。容器實測:pytest 32/32 PASS+CLI demo 全鏈 SUCCESS(twin 為 demo 內建,無獨立子命令——誠實記)。動詞 via-contract(demo);selftest_entry.py 供矩陣站(依賴缺 rc3=env SKIP 誠實)。",
+   "ts": "2026-08-17"
+  },
+  {
+   "code": "SPEC-015",
+   "name": "VIA_Central_Governance_Complete_Execution_Plan_20260817",
+   "kind": "規範",
+   "note": "完整整合/測試/修復/受控啟用計畫 v1.1.0 結構化收容(registry/):T0-T9 全域閘+S01-S12 子系統閘+六流程十二通道+20 加速器四段狀態(DECLARED→DETECTED→EXERCISED→PASSED)+30 項 TPL 離線回歸+P0 三項(R06 205 筆 OHLC/v0162 E2E/v0163A 入口仲裁)+MP-001~034 需求追溯 34/34+Definition of Done。狀態誠實:HOLD_REMEDIATION_REQUIRED/NOT_ACTIVATED;另會話 14 條 LL 教訓隨包收容。",
+   "ts": "2026-08-17"
+  },
+  {
+   "code": "TOOL-038",
+   "name": "via_cmdlog_v0100",
+   "kind": "工具",
+   "note": "常備令①(2026-08-17)落地:執行任何指令因錯誤中斷,此前紀錄必留 LOGS——via-run 留痕包裝器:逐行「先落檔再上螢幕」(行緩衝即時 flush),崩潰/Ctrl+C/外殺當下 LOG 已含此前全部;三態終線(EXIT rc/INTERRUPTED/SPAWN_FAIL)+時戳耗時;rc 原樣透傳;stdin DEVNULL 防 input() 卡死。容器測:rc=7 透傳 PASS+外殺情境中斷前 24 行留存 PASS。矩陣 v0106 +2 站(25 站 OK17·FAIL0)。",
+   "ts": "2026-08-17"
+  },
+  {
+   "code": "RULE-20260817B",
+   "name": "PowerShell 一鍵器常備契約",
+   "kind": "規範",
+   "note": "常備令②:每支 PowerShell 一鍵器必帶 20 加速器(A01-A20 四段狀態)+不卡斷(A18:非阻塞/心跳/永不 exit 不關窗/逾時斷路誠實 TIMEOUT)+動態進度條(A16:加權階段 0-100% 單調遞增)。既有 via-govroot v0104 已符;via-enter 快速道具 def_Say 階段流;後續新 PS 工具一律照此契約造。搭配常備令① via-run 留痕包裝,中斷不失紀錄。",
+   "ts": "2026-08-17"
   }
  ]
 }
