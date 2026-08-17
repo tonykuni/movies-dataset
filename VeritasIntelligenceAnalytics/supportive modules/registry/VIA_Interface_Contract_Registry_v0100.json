@@ -82941,6 +82941,1269 @@
    },
    "ts": "20260817_195222",
    "drift_count": 0
+  },
+  "VIA-IFACE-1190": {
+   "urn": "VIA-IFACE-1190",
+   "rel": "functional modules/VMT/engines/vmt_ai_triage.py",
+   "subsystem": "OTHER",
+   "desc": "============================================================================",
+   "contract": {
+    "syntax": "OK",
+    "desc": "============================================================================",
+    "functions": [
+     {
+      "name": "_checkbox_option",
+      "args": [
+       "body"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "triage_one",
+      "args": [
+       "mail",
+       "llm",
+       "base_date"
+      ],
+      "defaults": 2
+     },
+     {
+      "name": "run",
+      "args": [
+       "ws",
+       "commit",
+       "use_llm",
+       "no_open",
+       "base_date"
+      ],
+      "defaults": 4
+     },
+     {
+      "name": "load_triage",
+      "args": [
+       "ws"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "_report",
+      "args": [
+       "ws",
+       "rows",
+       "held",
+       "commit"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "main",
+      "args": [],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [
+     "--llm"
+    ],
+    "has_main": true,
+    "imports": [
+     "__future__",
+     "argparse",
+     "datetime",
+     "json",
+     "pathlib",
+     "re",
+     "sys",
+     "vmt_core",
+     "vmt_lang",
+     "vmt_outlook_intake"
+    ]
+   },
+   "ts": "20260817_195817",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1191": {
+   "urn": "VIA-IFACE-1191",
+   "rel": "functional modules/VMT/engines/vmt_core.py",
+   "subsystem": "OTHER",
+   "desc": "============================================================================",
+   "contract": {
+    "syntax": "OK",
+    "desc": "============================================================================",
+    "functions": [
+     {
+      "name": "_default_root",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "now_iso",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "today",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "md5_bytes",
+      "args": [
+       "b"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "fingerprint",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "norm_case",
+      "args": [
+       "s"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "clip",
+      "args": [
+       "s",
+       "n"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "banner",
+      "args": [
+       "title",
+       "subtitle"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "mode_label",
+      "args": [
+       "commit"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "read_jsonl",
+      "args": [
+       "path"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "append_jsonl",
+      "args": [
+       "path",
+       "rec",
+       "durable"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "atomic_write_text",
+      "args": [
+       "path",
+       "text",
+       "backups"
+      ],
+      "defaults": 1
+     }
+    ],
+    "classes": {
+     "Workspace": 17,
+     "Ledger": 4,
+     "EventLog": 5,
+     "Quarantine": 4,
+     "LocalLLM": 4,
+     "EngineResult": 1
+    },
+    "cli_flags": [
+     "--commit",
+     "--no-open",
+     "--root"
+    ],
+    "has_main": false,
+    "imports": [
+     "__future__",
+     "dataclasses",
+     "datetime",
+     "hashlib",
+     "json",
+     "os",
+     "pathlib",
+     "re",
+     "shutil",
+     "typing",
+     "urllib"
+    ]
+   },
+   "ts": "20260817_195817",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1192": {
+   "urn": "VIA-IFACE-1192",
+   "rel": "functional modules/VMT/engines/vmt_dashboard.py",
+   "subsystem": "OTHER",
+   "desc": "============================================================================",
+   "contract": {
+    "syntax": "OK",
+    "desc": "============================================================================",
+    "functions": [
+     {
+      "name": "run",
+      "args": [
+       "ws",
+       "commit",
+       "no_open",
+       "as_of"
+      ],
+      "defaults": 3
+     },
+     {
+      "name": "_report",
+      "args": [
+       "ws",
+       "as_of",
+       "rows",
+       "counts",
+       "overdue",
+       "open_rows",
+       "pending",
+       "p"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "main",
+      "args": [],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [
+     "--as-of"
+    ],
+    "has_main": true,
+    "imports": [
+     "__future__",
+     "argparse",
+     "collections",
+     "datetime",
+     "pathlib",
+     "sys",
+     "vmt_ai_triage",
+     "vmt_core",
+     "vmt_outlook_intake",
+     "vmt_sla_engine",
+     "vmt_task_ssot"
+    ]
+   },
+   "ts": "20260817_195817",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1193": {
+   "urn": "VIA-IFACE-1193",
+   "rel": "functional modules/VMT/engines/vmt_extract_tasks.py",
+   "subsystem": "OTHER",
+   "desc": "============================================================================",
+   "contract": {
+    "syntax": "OK",
+    "desc": "============================================================================",
+    "functions": [
+     {
+      "name": "_clean_title",
+      "args": [
+       "subject"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "_urgency_from_due",
+      "args": [
+       "due",
+       "base",
+       "default"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "from_mails",
+      "args": [
+       "ws",
+       "me"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "from_minutes",
+      "args": [
+       "ws",
+       "include_questions"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "find_duplicates",
+      "args": [
+       "candidates",
+       "existing"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "run",
+      "args": [
+       "ws",
+       "me",
+       "commit",
+       "no_open",
+       "include_questions"
+      ],
+      "defaults": 4
+     },
+     {
+      "name": "_report",
+      "args": [
+       "ws",
+       "created",
+       "dups",
+       "incomplete",
+       "total",
+       "commit"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "main",
+      "args": [],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [
+     "--include-questions",
+     "--me"
+    ],
+    "has_main": true,
+    "imports": [
+     "__future__",
+     "argparse",
+     "datetime",
+     "json",
+     "pathlib",
+     "re",
+     "sys",
+     "vmt_ai_triage",
+     "vmt_core",
+     "vmt_lang",
+     "vmt_projects",
+     "vmt_task_ssot"
+    ]
+   },
+   "ts": "20260817_195817",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1194": {
+   "urn": "VIA-IFACE-1194",
+   "rel": "functional modules/VMT/engines/vmt_lang.py",
+   "subsystem": "OTHER",
+   "desc": "============================================================================",
+   "contract": {
+    "syntax": "OK",
+    "desc": "============================================================================",
+    "functions": [
+     {
+      "name": "split_sentences",
+      "args": [
+       "text",
+       "max_len"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "zh2int",
+      "args": [
+       "s"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "_monday",
+      "args": [
+       "d"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "_month_end",
+      "args": [
+       "d"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "_add_months",
+      "args": [
+       "d",
+       "n"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "resolve_due",
+      "args": [
+       "text",
+       "base"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "_hit",
+      "args": [
+       "text",
+       "cues"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "classify_mail",
+      "args": [
+       "subject",
+       "body",
+       "has_checkbox_reply"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "classify_sentence",
+      "args": [
+       "text",
+       "is_chair",
+       "base_date"
+      ],
+      "defaults": 2
+     },
+     {
+      "name": "strip_fillers",
+      "args": [
+       "text"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "to_traditional",
+      "args": [
+       "text",
+       "config"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "_ratio",
+      "args": [
+       "a",
+       "b"
+      ],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [],
+    "has_main": false,
+    "imports": [
+     "__future__",
+     "calendar",
+     "datetime",
+     "difflib",
+     "opencc",
+     "rapidfuzz",
+     "re",
+     "typing"
+    ]
+   },
+   "ts": "20260817_195817",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1195": {
+   "urn": "VIA-IFACE-1195",
+   "rel": "functional modules/VMT/engines/vmt_mail_composer.py",
+   "subsystem": "OTHER",
+   "desc": "============================================================================",
+   "contract": {
+    "syntax": "OK",
+    "desc": "============================================================================",
+    "functions": [
+     {
+      "name": "compose",
+      "args": [
+       "reminder",
+       "sender_name",
+       "as_of",
+       "roster"
+      ],
+      "defaults": 3
+     },
+     {
+      "name": "_outlook_draft",
+      "args": [
+       "mail",
+       "send"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "run",
+      "args": [
+       "ws",
+       "commit",
+       "no_open",
+       "draft",
+       "send",
+       "as_of",
+       "sender_name",
+       "me"
+      ],
+      "defaults": 8
+     },
+     {
+      "name": "_report",
+      "args": [
+       "ws",
+       "mails",
+       "self_todo",
+       "unassigned",
+       "commit",
+       "draft",
+       "send"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "main",
+      "args": [],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [
+     "--as-of",
+     "--draft",
+     "--me",
+     "--send",
+     "--sender"
+    ],
+    "has_main": true,
+    "imports": [
+     "__future__",
+     "argparse",
+     "datetime",
+     "pathlib",
+     "sys",
+     "vmt_core",
+     "vmt_sla_engine",
+     "vmt_task_ssot",
+     "win32com"
+    ]
+   },
+   "ts": "20260817_195817",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1196": {
+   "urn": "VIA-IFACE-1196",
+   "rel": "functional modules/VMT/engines/vmt_meeting_minutes.py",
+   "subsystem": "OTHER",
+   "desc": "============================================================================",
+   "contract": {
+    "syntax": "OK",
+    "desc": "============================================================================",
+    "functions": [
+     {
+      "name": "load_transcript",
+      "args": [
+       "src"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "segment",
+      "args": [
+       "segs",
+       "speaker_map",
+       "max_len"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "flag_hallucinations",
+      "args": [
+       "utts",
+       "no_speech_max"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "clean",
+      "args": [
+       "utts",
+       "vocab",
+       "traditional"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "_roster_index",
+      "args": [
+       "roster"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "_names_in",
+      "args": [
+       "text",
+       "idx"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "resolve_subjects",
+      "args": [
+       "utts",
+       "roster"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "tag_utterances",
+      "args": [
+       "utts",
+       "chair",
+       "base_date"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "_shingles",
+      "args": [
+       "s",
+       "n"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "agenda_hits",
+      "args": [
+       "text",
+       "agenda",
+       "threshold"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "split_topics",
+      "args": [
+       "utts",
+       "agenda",
+       "chair",
+       "gap"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "_derive_title",
+      "args": [
+       "first_line"
+      ],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [
+     "---",
+     "--config",
+     "--transcript"
+    ],
+    "has_main": true,
+    "imports": [
+     "__future__",
+     "argparse",
+     "datetime",
+     "json",
+     "pathlib",
+     "re",
+     "sys",
+     "vmt_core",
+     "vmt_lang"
+    ]
+   },
+   "ts": "20260817_195817",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1197": {
+   "urn": "VIA-IFACE-1197",
+   "rel": "functional modules/VMT/engines/vmt_outlook_intake.py",
+   "subsystem": "OTHER",
+   "desc": "============================================================================",
+   "contract": {
+    "syntax": "OK",
+    "desc": "============================================================================",
+    "functions": [
+     {
+      "name": "thread_key",
+      "args": [
+       "subject",
+       "case"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "normalize_mail",
+      "args": [
+       "raw",
+       "source"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "source_outlook",
+      "args": [
+       "days_back"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "_parse_eml",
+      "args": [
+       "data"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "source_folder",
+      "args": [
+       "inbox"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "source_sample",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "run",
+      "args": [
+       "ws",
+       "source",
+       "days_back",
+       "commit",
+       "no_open"
+      ],
+      "defaults": 4
+     },
+     {
+      "name": "load_mails",
+      "args": [
+       "ws"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "_report",
+      "args": [
+       "ws",
+       "rows",
+       "dup",
+       "src",
+       "commit"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "main",
+      "args": [],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [
+     "--days-back",
+     "--source"
+    ],
+    "has_main": true,
+    "imports": [
+     "__future__",
+     "argparse",
+     "datetime",
+     "email",
+     "json",
+     "os",
+     "pathlib",
+     "re",
+     "sys",
+     "vmt_core",
+     "win32com"
+    ]
+   },
+   "ts": "20260817_195817",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1198": {
+   "urn": "VIA-IFACE-1198",
+   "rel": "functional modules/VMT/engines/vmt_pipeline.py",
+   "subsystem": "OTHER",
+   "desc": "============================================================================",
+   "contract": {
+    "syntax": "OK",
+    "desc": "============================================================================",
+    "functions": [
+     {
+      "name": "run",
+      "args": [
+       "ws",
+       "commit",
+       "no_open",
+       "transcript",
+       "meeting_config",
+       "source",
+       "use_llm",
+       "me"
+      ],
+      "defaults": 11
+     },
+     {
+      "name": "main",
+      "args": [],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [
+     "--as-of",
+     "--commit",
+     "--demo",
+     "--draft",
+     "--llm",
+     "--me",
+     "--meeting-config",
+     "--no-open",
+     "--root",
+     "--send",
+     "--source",
+     "--transcript"
+    ],
+    "has_main": true,
+    "imports": [
+     "__future__",
+     "argparse",
+     "datetime",
+     "json",
+     "pathlib",
+     "sys",
+     "vmt_ai_triage",
+     "vmt_core",
+     "vmt_dashboard",
+     "vmt_extract_tasks",
+     "vmt_mail_composer",
+     "vmt_meeting_minutes",
+     "vmt_outlook_intake",
+     "vmt_projects",
+     "vmt_reply_parser",
+     "vmt_sla_engine"
+    ]
+   },
+   "ts": "20260817_195817",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1199": {
+   "urn": "VIA-IFACE-1199",
+   "rel": "functional modules/VMT/engines/vmt_projects.py",
+   "subsystem": "OTHER",
+   "desc": "============================================================================",
+   "contract": {
+    "syntax": "OK",
+    "desc": "============================================================================",
+    "functions": [
+     {
+      "name": "parse_code",
+      "args": [
+       "text"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "strip_code",
+      "args": [
+       "name"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "load_projects",
+      "args": [
+       "ws"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "resolve_project",
+      "args": [
+       "text",
+       "ws"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "scan",
+      "args": [
+       "ws"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "run",
+      "args": [
+       "ws",
+       "commit",
+       "no_open"
+      ],
+      "defaults": 2
+     },
+     {
+      "name": "_report",
+      "args": [
+       "ws",
+       "plan",
+       "encoded",
+       "commit"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "main",
+      "args": [],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [],
+    "has_main": true,
+    "imports": [
+     "__future__",
+     "argparse",
+     "os",
+     "pathlib",
+     "re",
+     "sys",
+     "vmt_core"
+    ]
+   },
+   "ts": "20260817_195817",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1200": {
+   "urn": "VIA-IFACE-1200",
+   "rel": "functional modules/VMT/engines/vmt_reply_parser.py",
+   "subsystem": "OTHER",
+   "desc": "============================================================================",
+   "contract": {
+    "syntax": "OK",
+    "desc": "============================================================================",
+    "functions": [
+     {
+      "name": "parse_reply",
+      "args": [
+       "mail",
+       "base_date"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "run",
+      "args": [
+       "ws",
+       "commit",
+       "no_open",
+       "base_date"
+      ],
+      "defaults": 3
+     },
+     {
+      "name": "_report",
+      "args": [
+       "ws",
+       "applied",
+       "unmatched",
+       "skipped",
+       "commit"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "main",
+      "args": [],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [],
+    "has_main": true,
+    "imports": [
+     "__future__",
+     "argparse",
+     "datetime",
+     "pathlib",
+     "re",
+     "sys",
+     "vmt_core",
+     "vmt_lang",
+     "vmt_outlook_intake",
+     "vmt_task_ssot"
+    ]
+   },
+   "ts": "20260817_195817",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1201": {
+   "urn": "VIA-IFACE-1201",
+   "rel": "functional modules/VMT/engines/vmt_sla_engine.py",
+   "subsystem": "OTHER",
+   "desc": "============================================================================",
+   "contract": {
+    "syntax": "OK",
+    "desc": "============================================================================",
+    "functions": [
+     {
+      "name": "_days_since",
+      "args": [
+       "ts",
+       "as_of"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "_last_mail_ts",
+      "args": [
+       "state"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "sla_table",
+      "args": [
+       "ws"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "plan",
+      "args": [
+       "ws",
+       "as_of"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "run",
+      "args": [
+       "ws",
+       "commit",
+       "no_open",
+       "as_of"
+      ],
+      "defaults": 3
+     },
+     {
+      "name": "_report",
+      "args": [
+       "ws",
+       "p",
+       "commit"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "main",
+      "args": [],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [
+     "--as-of"
+    ],
+    "has_main": true,
+    "imports": [
+     "__future__",
+     "argparse",
+     "datetime",
+     "pathlib",
+     "sys",
+     "vmt_core",
+     "vmt_task_ssot"
+    ]
+   },
+   "ts": "20260817_195817",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1202": {
+   "urn": "VIA-IFACE-1202",
+   "rel": "functional modules/VMT/engines/vmt_task_ssot.py",
+   "subsystem": "OTHER",
+   "desc": "============================================================================",
+   "contract": {
+    "syntax": "OK",
+    "desc": "============================================================================",
+    "functions": [
+     {
+      "name": "task_fingerprint",
+      "args": [
+       "source_type",
+       "ref",
+       "cite",
+       "title"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "build_task",
+      "args": [
+       "title",
+       "owner",
+       "due",
+       "urgency",
+       "source_type",
+       "ref",
+       "cite",
+       "case"
+      ],
+      "defaults": 4
+     },
+     {
+      "name": "create_tasks",
+      "args": [
+       "ws",
+       "candidates",
+       "commit"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "load_tasks",
+      "args": [
+       "ws"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "derive_states",
+      "args": [
+       "ws",
+       "events",
+       "as_of"
+      ],
+      "defaults": 2
+     },
+     {
+      "name": "open_tasks",
+      "args": [
+       "ws",
+       "as_of"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "run",
+      "args": [
+       "ws",
+       "commit",
+       "no_open",
+       "as_of"
+      ],
+      "defaults": 3
+     },
+     {
+      "name": "_report",
+      "args": [
+       "ws",
+       "rows",
+       "counts",
+       "commit"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "main",
+      "args": [],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [],
+    "has_main": true,
+    "imports": [
+     "__future__",
+     "argparse",
+     "datetime",
+     "pathlib",
+     "sys",
+     "vmt_core"
+    ]
+   },
+   "ts": "20260817_195817",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1203": {
+   "urn": "VIA-IFACE-1203",
+   "rel": "functional modules/VMT/tests/test_vmt_engines.py",
+   "subsystem": "OTHER",
+   "desc": "VMT 引擎測試 — 標準庫 unittest, 無外部相依。",
+   "contract": {
+    "syntax": "OK",
+    "desc": "VMT 引擎測試 — 標準庫 unittest, 無外部相依。",
+    "functions": [],
+    "classes": {
+     "TempWS": 2,
+     "TestLang": 9,
+     "TestMinutes": 9,
+     "TestClosedLoop": 16,
+     "TestGovernance": 5,
+     "TestDurability": 3,
+     "TestProjects": 7
+    },
+    "cli_flags": [],
+    "has_main": true,
+    "imports": [
+     "__future__",
+     "datetime",
+     "json",
+     "os",
+     "pathlib",
+     "shutil",
+     "sys",
+     "tempfile",
+     "unittest",
+     "vmt_ai_triage",
+     "vmt_core",
+     "vmt_extract_tasks",
+     "vmt_lang",
+     "vmt_mail_composer",
+     "vmt_meeting_minutes",
+     "vmt_outlook_intake",
+     "vmt_pipeline",
+     "vmt_projects",
+     "vmt_reply_parser",
+     "vmt_sla_engine",
+     "vmt_task_ssot"
+    ]
+   },
+   "ts": "20260817_195817",
+   "drift_count": 0
   }
  },
  "drift_ledger": [
