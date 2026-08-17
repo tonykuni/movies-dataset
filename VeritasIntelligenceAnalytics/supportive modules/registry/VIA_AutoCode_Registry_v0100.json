@@ -2869,6 +2869,20 @@
    "kind": "收編",
    "note": "工作站實跑證據(CMDLOG_20260818_051802/051849):第一輪 1228 件掃→1067 件歸位(Registered 823·Archived 244·HOLD 161 零搬動·語法敗 42 不收編);第二輪重掃殘 161→再收 68(含 (1) 副本再裁決為新 PLUG:PromptInjection(1)=VIA-PLUG-0748、v0140G/I/J/K 系列、ActiveETF Console/Matrix 家族;VIA-CORE-0079=v0140J 十二車道全景)——HOLD 殘 93、語法敗 42 維持不動。註冊表 VIA_Intake_Registry_v0100.json append-only;undo 單×2(051802/051850)可整批還原。URN 至 VIA-PLUG-0760+VIA-CORE-0079。續辦:工作站 selftest 誤跑舊 v0106(25 站)經操作員中斷(留痕生效)——因未拉今日 v0107-v0109 推送;先 via-enter(拉+自癒)再 via-run via-selftest 即得 35 站新棋盤,將自動覆蓋收編新件。語法敗 42/HOLD 93 修復與裁決候令。",
    "ts": "2026-08-18"
+  },
+  {
+   "code": "TOOL-049",
+   "name": "表格缺口多方案總攻指揮 vrn_gap_multirescue + via-rescuegap",
+   "kind": "工具",
+   "note": "操作員問(還沒擷取成功的怎麼處理?多個解決方案引擎):讀主表自動找「有文字零表格」缺口(現況=MQ-1560 掃描件+4 Memo docx),逐檔驅動既有多方案鏈——.pdf:A1 digital(pdfplumber+camelot)→A2 img2table(EasyOCR)→A3 ppstructure,先得非零即停,全零轉 SCAN_RESCUE 候選;.docx:SDX 直測表骨→有表自動拷 office_in+(--commit)驅動 officemerge 落庫,零表=PURE_TEXT 定讞候證(誠實:本無表非失敗)。終局四態 RESOLVED/PURE_TEXT/SCAN_RESCUE_CANDIDATE/UNRESOLVED;每方案子行程+逾時不卡斷;存證 MULTIRESCUE_*.json。自測 4/4;容器 dry=T005 缺誠實 SKIP。grid v0109→v0110 增第 36 站(fast OK 28·FAIL 0)。",
+   "ts": "2026-08-18"
+  },
+  {
+   "code": "UPG-20260818F",
+   "name": "omni v0105 視覺車道 DPI=300 高品質轉檔+加速器採納稽核",
+   "kind": "升級",
+   "note": "操作員令(TRANSFORM TO OPTIMIZING HIGH QUALITY PDF WITH DPI=300 AND FETCH?+確認引擎導入支援模組尤其加速器):①vrn_table_omni v0104→v0105——視覺車道 get_pixmap DPI 200→預設 300(--dpi 72-600 可覆寫),掃描件辨識品質升級;自測 4/4。②加速器採納稽核(iface 合約冊 imports 零執行實值):functional 引擎 365 件,支援模組直導入 10 件(2%),VeritasCeleritas 直用 4 件;fetch 型引擎 35 件(requests/yfinance/FinMind)=加速器橋候選名單,已存 VIA_Accelerator_Adoption_Audit_v0100.json。誠實裁決:355 件未導入多屬自足型 graceful 設計非缺陷;大規模就地注入違「正本不就地修改」——採既有 VDF_MDL001_Supportive_Bridge 注入道(vdf_fetch 快取/重試/去重)對 35 件 fetch 引擎分批橋接=候操作員令。PS 一鍵器 20 加速器照常備令Ⅱ另軌全帶。",
+   "ts": "2026-08-18"
   }
  ]
 }
