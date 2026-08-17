@@ -19,6 +19,8 @@
       [5] LIVEWIRE       接線合約轉接層(fail-closed/SSOT 對帳)
       [5b] ETF-CONSOLES  ETF 雙主控台收證(ActiveStockETF + GlobalETFFlow;
                          selftest + 本機 mock 整合測試,LiveData 邊界零外網)
+      [5c] CHIPWAR-REV   籌碼戰四引擎(GovFund/SectorWhale/FinMind/Console 全循環)
+                         + 月營收 twrevenue(selftest + demo 合成端到端)
       [6] DASHBOARD      ALL-IN-ONE 七分頁儀表板 + VAP 軸鎖合規
       [7] MASTER-VALIDATE套件級主驗證(UNIT→DEBUG→OPTIMIZE→INTEGRATE→SYSTEM→USER→ACTIVATE)
       [8] GATE-MATRIX    讀取各 run 總結,輸出最終矩陣;任一 Gate 未過即 fail-closed
@@ -72,7 +74,12 @@ $Engines = @(
     "VIA_ActiveStockETF.py",
     "VIA_ActiveStockETF_mocktest.py",
     "VIA_GlobalETFFlow.py",
-    "VIA_ETF_Consoles_Evidence_v0100.py"
+    "VIA_ETF_Consoles_Evidence_v0100.py",
+    "VIA_FinMind_Ingest_v010.py",
+    "VIA_SectorWhaleEngine_v020.py",
+    "VIA_GovFundEngine_v040.py",
+    "VIA_ChipWar_Console_v010.py",
+    "VIA_ChipWar_Revenue_Evidence_v0100.py"
 )
 $TestFiles = @(
     "test_VIA_GroupIndex_EnvPreflight_v0100.py",
@@ -81,7 +88,8 @@ $TestFiles = @(
     "test_VIA_SectorFlow_Dashboard_Builder_v0100.py",
     "test_VIA_LiveWire_ContractAdapter_v0100.py",
     "test_VIA_VAP_AxisLock_v0100.py",
-    "test_VIA_ETF_Consoles_v0100.py"
+    "test_VIA_ETF_Consoles_v0100.py",
+    "test_VIA_ChipWar_Revenue_v0100.py"
 )
 
 function def_ResolveViaPython {
@@ -249,6 +257,8 @@ function def_Main {
             def_InvokePython -Label "LIVEWIRE contract adapter (fail-closed + SSOT reconcile)" -Percent 64 -Arguments @("VIA_LiveWire_ContractAdapter_v0100.py")
             # [5b] ETF-CONSOLES(selftest + 本機 mock 整合;約 6-8 分鐘)
             def_InvokePython -Label "ETF-CONSOLES evidence (ActiveStockETF + GlobalETFFlow, 142 checks)" -Percent 70 -Arguments @("VIA_ETF_Consoles_Evidence_v0100.py")
+            # [5c] CHIPWAR + REVENUE(四引擎全循環 + 月營收 selftest/demo)
+            def_InvokePython -Label "CHIPWAR-REVENUE evidence (GovFund/SectorWhale/FinMind/Console + twrevenue)" -Percent 72 -Arguments @("VIA_ChipWar_Revenue_Evidence_v0100.py")
             # [6] DASHBOARD
             def_InvokePython -Label "DASHBOARD builder (7 tabs + VAP axis lock)" -Percent 74 -Arguments @("VIA_SectorFlow_Dashboard_Builder_v0100.py")
         }
@@ -266,6 +276,7 @@ function def_Main {
             @{ Name = "TradeBT";     Json = Join-Path $EvidenceDir "RUN_SECTORFLOW_TRADE_V0100\trade_run_summary.json";    Field = "Status";     Expect = "TRADE_BACKTEST_PASS" },
             @{ Name = "LiveWire";    Json = Join-Path $EvidenceDir "RUN_LIVEWIRE_ADAPTER_V0100\adapter_run_summary.json";  Field = "Status";     Expect = "ADAPTER_VERIFIED_FAIL_CLOSED" },
             @{ Name = "ETFConsoles"; Json = Join-Path $EvidenceDir "RUN_ETF_CONSOLES_V0100\etf_consoles_summary.json";     Field = "Status";     Expect = "ETF_CONSOLES_PASS" },
+            @{ Name = "ChipWarRev";  Json = Join-Path $EvidenceDir "RUN_CHIPWAR_REVENUE_V0100\chipwar_revenue_summary.json"; Field = "Status";     Expect = "CHIPWAR_REVENUE_PASS" },
             @{ Name = "MasterSuite"; Json = Join-Path $EvidenceDir "RUN_MASTER_VALIDATION_V0100\master_run_summary.json";  Field = "Status";     Expect = "CONTROLLED_SUITE_ACTIVATION_PASS" }
         )
         $blocked = @()

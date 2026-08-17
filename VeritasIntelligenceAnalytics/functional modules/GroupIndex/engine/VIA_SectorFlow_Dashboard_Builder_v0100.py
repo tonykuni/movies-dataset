@@ -131,7 +131,9 @@ def def_write_vap_compliance() -> None:
         "PropertyChecks": {k: bool(cdf[k].all()) for k in cdf.columns},
         "PropertySamples": int(len(cdf)),
         "LedgerRows": int(len(ledger)),
-        "SpecLineage": "v017 → v018 對照:40/40 代碼、規則、軸契約完全一致(v018 為重發版,依 APPEND_ONLY_VERSION_ARCHIVE_RESTORE 採 v018)",
+        "SpecLineage": ("v015 → v017 → v018 對照:40/40 代碼、規則、軸契約完全一致"
+                        "(v015/v017 僅 sourceEvidence 版本戳不同;v018 為現行版,"
+                        "依 APPEND_ONLY_VERSION_ARCHIVE_RESTORE 採 v018,舊版免整合)"),
         "ReferenceArtifacts": [
             "VAP_Workbench_v018.html(reviewed)",
             "VIA_VAP_All_Chart_Specs_v017.{html,csv} + v017 QA Report + 40 Structural Snapshots(reviewed, superseded by v018)",

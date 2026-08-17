@@ -36,8 +36,14 @@ def test_ps1_references_all_engines_and_tests() -> None:
         "VIA_ActiveStockETF_mocktest.py",
         "VIA_GlobalETFFlow.py",
         "VIA_ETF_Consoles_Evidence_v0100.py",
+        "VIA_FinMind_Ingest_v010.py",
+        "VIA_SectorWhaleEngine_v020.py",
+        "VIA_GovFundEngine_v040.py",
+        "VIA_ChipWar_Console_v010.py",
+        "VIA_ChipWar_Revenue_Evidence_v0100.py",
         "test_VIA_VAP_AxisLock_v0100.py",
         "test_VIA_ETF_Consoles_v0100.py",
+        "test_VIA_ChipWar_Revenue_v0100.py",
     ]:
         assert name in TEXT, name
         assert PS1.with_name(name).exists(), f"referenced file missing: {name}"
@@ -47,10 +53,10 @@ def test_ps1_gate_matrix_covers_four_runs() -> None:
     for token in [
         "RUN_SECTORFLOW_V0100", "RUN_SECTORFLOW_TRADE_V0100",
         "RUN_LIVEWIRE_ADAPTER_V0100", "RUN_ETF_CONSOLES_V0100",
-        "RUN_MASTER_VALIDATION_V0100",
+        "RUN_CHIPWAR_REVENUE_V0100", "RUN_MASTER_VALIDATION_V0100",
         "CONTROLLED_ACTIVATION_PASS", "TRADE_BACKTEST_PASS",
         "ADAPTER_VERIFIED_FAIL_CLOSED", "ETF_CONSOLES_PASS",
-        "CONTROLLED_SUITE_ACTIVATION_PASS",
+        "CHIPWAR_REVENUE_PASS", "CONTROLLED_SUITE_ACTIVATION_PASS",
     ]:
         assert token in TEXT, token
 
