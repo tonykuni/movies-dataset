@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-via_selftest_grid_v0105 — 全面自測矩陣(+依賴重建站)
+via_selftest_grid_v0105 — 全面自測矩陣(雙會話站點合流)
 ====================================================================
 v0100→v0101:新增第 18 站 SuperDocExtractor selftest(導入自會話
 016d7f;15 檢全綠基準)。
@@ -11,8 +11,9 @@ v0102→v0103:新增第 20 站 via_env_plan --offline(TOOL-030;快照+
 計畫零網路 rc0)。
 v0103→v0104:新增第 21 站 via_dep_super --selftest(TOOL-031;
 PEP440 判定器+圖譜衝突掃描 15 檢,零網路零環境依賴 rc0)。
-v0104→v0105:新增第 22 站 via_env_rebuild --selftest(TOOL-032;
-政策風險因子+重建配方+分靶實測判讀 13 檢,零網路 rc0)。
+v0104→v0105:雙會話合流——撞版勘誤(本會話曾誤覆寫 v0104,已回復
+他方正本):+第 22 站表格統包 --selftest(TOOL-029 四檢)+第 23 站
+收編管線 dry(TOOL-036;掃描根缺=env SKIP 誠實)。
 操作員令(2026-08-12):全面測試修正 till all work perfectly。
 原則:
   ① 全站安全模式 — 只跑唯讀/dry-run/selftest/文件模式;零 --commit 零網路
@@ -20,7 +21,7 @@ v0104→v0105:新增第 22 站 via_env_rebuild --selftest(TOOL-032;
   ③ 期望制 — 每站宣告期望 rc(rc0=須 0;doc=無參印說明 rc∈{0,2};
      env=環境依賴,缺件 rc≠0 記 SKIP 不記 FAIL)
   ④ 存證 — VIA_Reports/selftest_runs/GRID_<ts>.json
-用法:via-selftest            → 全矩陣(22 站)
+用法:via-selftest            → 全矩陣(23 站)
      via-selftest --fast     → 略過重站(sysman/pipe)
 """
 from __future__ import annotations
@@ -73,7 +74,8 @@ def battery(fast: bool):
     add("表格統包車道矩陣", newest("vrn_table_omni_v0*.py", VRN), [], "rc0", 120)
     add("環境計畫快照(offline)", newest("via_env_plan_v0*.py", HERE), ["--offline"], "rc0", 300)
     add("依賴統包 15 檢", newest("via_dep_super_v0*.py", HERE), ["--selftest"], "rc0", 300)
-    add("重建計畫 13 檢", newest("via_env_rebuild_v0*.py", HERE), ["--selftest"], "rc0", 300)
+    add("表格統包四檢自測", newest("vrn_table_omni_v0*.py", VRN), ["--selftest"], "rc0", 180)
+    add("收編管線(dry)", newest("via_intake_v0*.py", HERE), [], "env", 300)
     add("selftest grid(自指:文件)", None, [], "doc", 10)  # 佔位:自身以 --fast 遞迴屬禁,列 SKIP
     return B
 
