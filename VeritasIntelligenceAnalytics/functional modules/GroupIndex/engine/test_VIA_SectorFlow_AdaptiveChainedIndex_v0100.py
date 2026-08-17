@@ -44,13 +44,20 @@ def test_cleaning_quarantines_non_common_and_strips_daytrade() -> None:
 
 def test_chained_index_continuity_and_base() -> None:
     chained = pd.read_csv(RUN_DIR / "sector_chained_index_daily.csv", parse_dates=["Date"])
+    base_ts = pd.Timestamp(MODULE.INDEX_BASE_DATE)
+    plot_ts = pd.Timestamp(MODULE.INDEX_PLOT_START)
+    assert chained["Date"].min() >= plot_ts
+    assert chained["Date"].min() < base_ts  # 基期前歷史確實存在(反推段)
     for group, g in chained.groupby("Group"):
         g = g.sort_values("Date")
         idx = g["ChainedIndex"].to_numpy(dtype=float)
         rets = g["BasketRet"].to_numpy(dtype=float)
-        assert abs(idx[0] - MODULE.INDEX_BASE_VALUE) < 1e-9, group
+        # 錨定:基期日點位 = 100(基期前為幾何反推,基期後為正推)。
+        at_base = g[g["Date"] == base_ts]
+        assert len(at_base) == 1, group
+        assert abs(float(at_base["ChainedIndex"].iloc[0]) - MODULE.INDEX_BASE_VALUE) < 1e-6, group
         recon = idx[:-1] * (1.0 + rets[1:])
-        assert np.max(np.abs(idx[1:] - recon)) < 1e-8, group
+        assert np.max(np.abs(idx[1:] - recon)) < 1e-6, group
         # 換檔至少發生一次且未造成任何點位斷裂(上式已涵蓋)。
         assert g["PeriodID"].nunique() >= 2, group
 

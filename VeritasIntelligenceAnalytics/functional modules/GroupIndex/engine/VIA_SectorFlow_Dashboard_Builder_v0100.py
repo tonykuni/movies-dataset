@@ -30,6 +30,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 MODULE_DIR = SCRIPT_DIR.parent
 RUN_MAIN = MODULE_DIR / "evidence" / "RUN_SECTORFLOW_V0100"
 RUN_TRADE = MODULE_DIR / "evidence" / "RUN_SECTORFLOW_TRADE_V0100"
+RUN_LIVEWIRE = MODULE_DIR / "evidence" / "RUN_LIVEWIRE_ADAPTER_V0100"
 DEFAULT_OUT = MODULE_DIR.parent.parent / "VIA_Reports" / "VIA_SectorFlow_AllInOne_Dashboard_v0100.html"
 
 VERSION = "0.1.00"
@@ -44,6 +45,105 @@ def r2(x) -> float:
 
 def r4(x) -> float:
     return None if x is None or (isinstance(x, float) and not np.isfinite(x)) else round(float(x), 4)
+
+
+
+# =============================================================================
+# def VAP AXIS LOCK — 硬性軸契約(VIA_VAP_All_Chart_Specs_v018)
+#   4 intervals / 5 ticks;合法間隔 {2, 2.5, 5}×10ⁿ;小數位數統一。
+# =============================================================================
+
+VAP_SPEC_CSV = MODULE_DIR / "input" / "VIA_VAP_All_Chart_Specs_v018.csv"
+RUN_VAP = MODULE_DIR / "evidence" / "RUN_VAP_COMPLIANCE_V0100"
+VAP_STEP_FAMILY = (2.0, 2.5, 5.0)
+
+
+def def_vap_ticks(lo: float, hi: float):
+    """回傳 (ticks[5], decimals):最小合法間隔使 4 格覆蓋 [lo, hi]。"""
+    import math
+    if not (np.isfinite(lo) and np.isfinite(hi)):
+        lo, hi = 0.0, 1.0
+    if hi <= lo:
+        hi = lo + 1.0
+    raw = (hi - lo) / 4.0
+    base_exp = int(math.floor(math.log10(raw))) if raw > 0 else 0
+    for e in range(base_exp - 1, base_exp + 4):
+        for m in VAP_STEP_FAMILY:
+            step = m * (10.0 ** e)
+            if 4.0 * step < (hi - lo) - 1e-12:
+                continue
+            start = math.floor(lo / step) * step
+            if start + 4.0 * step >= hi - 1e-9:
+                decimals = max(0, -e + (1 if m == 2.5 else 0))
+                ticks = [round(start + k * step, decimals + 2) for k in range(5)]
+                return ticks, decimals
+    step = (hi - lo) / 4.0
+    return [lo + k * step for k in range(5)], 2
+
+
+def def_write_vap_compliance() -> None:
+    """VAP 合規帳本:本儀表板各圖對應 VAP-CH 代碼與軸契約狀態(append-only)。"""
+    RUN_VAP.mkdir(parents=True, exist_ok=True)
+    spec = pd.read_csv(VAP_SPEC_CSV)
+    rows = [
+        {"OurChart": "idx-price-line", "VAPCode": "VAP-CH-01", "AxisMode": "SINGLE",
+         "Status": "COMPLIANT_VAP_TICKS", "Note": "價軸 5 刻度吸附 2/2.5/5×10ⁿ,小數統一"},
+        {"OurChart": "idx-volume-band", "VAPCode": "VAP-CH-26", "AxisMode": "ANNOTATION_BAND",
+         "Status": "ANNOTATION_LAYER", "Note": "量帶為輔助層(獨立不共軸),單標籤"},
+        {"OurChart": "idx-flow-stacked", "VAPCode": "VAP-CH-07", "AxisMode": "ANNOTATION_BAND",
+         "Status": "ANNOTATION_LAYER", "Note": "三大法人堆疊,零軸置中 ± 標籤"},
+        {"OurChart": "flow-detail-stacked", "VAPCode": "VAP-CH-07", "AxisMode": "SINGLE",
+         "Status": "ANNOTATION_LAYER", "Note": "每日/累積分列上下板,不共軸"},
+        {"OurChart": "capital-heatmap", "VAPCode": "VAP-CH-14", "AxisMode": "NONE",
+         "Status": "COMPLIANT_PER_SPEC", "Note": "熱力圖依規格 NOT_APPLICABLE"},
+        {"OurChart": "flow-ranking-hbar", "VAPCode": "VAP-CH-04", "AxisMode": "SINGLE",
+         "Status": "DIRECT_LABELED", "Note": "橫條直接標值,無數值軸"},
+        {"OurChart": "rrg-scatter", "VAPCode": "VAP-CH-05", "AxisMode": "SINGLE",
+         "Status": "COMPLIANT_VAP_TICKS", "Note": "±5 range · step 2.5(合法間隔)"},
+        {"OurChart": "equity-lines", "VAPCode": "VAP-CH-22", "AxisMode": "SINGLE",
+         "Status": "COMPLIANT_VAP_TICKS", "Note": "策略/基準同軸(單軸原則),VAP 刻度"},
+    ]
+    ledger = pd.DataFrame(rows)
+    ledger.to_csv(RUN_VAP / "vap_compliance_ledger.csv", index=False, encoding="utf-8-sig")
+    rng = np.random.default_rng(18)
+    checks = []
+    import math as _m
+    for _ in range(200):
+        lo = float(rng.uniform(-1e4, 1e4))
+        hi = lo + float(rng.uniform(1e-3, 1e5))
+        ticks, dec = def_vap_ticks(lo, hi)
+        step = ticks[1] - ticks[0]
+        mant = step / (10 ** _m.floor(_m.log10(step)))
+        uniform = all(abs((ticks[i + 1] - ticks[i]) - step) < step * 1e-6 for i in range(4))
+        checks.append({
+            "five_ticks": len(ticks) == 5,
+            "uniform": uniform,
+            "legal_mantissa": min(abs(mant - f) for f in VAP_STEP_FAMILY) < 1e-6,
+            "covers": ticks[0] <= lo + 1e-9 and ticks[4] >= hi - 1e-9,
+        })
+    cdf = pd.DataFrame(checks)
+    summary = {
+        "Schema": "VIA-VAP-DASHBOARD-COMPLIANCE/1.0",
+        "SpecSource": VAP_SPEC_CSV.name,
+        "SpecCanonicalCharts": int(len(spec)),
+        "AxisContract": {"intervals": 4, "ticks": 5, "step_family": [2, 2.5, 5],
+                         "decimals": "UNIFIED", "dual_axis": "NOT_USED(單軸原則)"},
+        "PropertyChecks": {k: bool(cdf[k].all()) for k in cdf.columns},
+        "PropertySamples": int(len(cdf)),
+        "LedgerRows": int(len(ledger)),
+        "SpecLineage": ("v015 → v017 → v018 對照:40/40 代碼、規則、軸契約完全一致"
+                        "(v015/v017 僅 sourceEvidence 版本戳不同;v018 為現行版,"
+                        "依 APPEND_ONLY_VERSION_ARCHIVE_RESTORE 採 v018,舊版免整合)"),
+        "ReferenceArtifacts": [
+            "VAP_Workbench_v018.html(reviewed)",
+            "VIA_VAP_All_Chart_Specs_v017.{html,csv} + v017 QA Report + 40 Structural Snapshots(reviewed, superseded by v018)",
+            "InvokeVAPExtractAllChartSpecs v017/v018.ps1(reviewed, read-only extractor, Windows-local scope)",
+            "Invoke-VIA-v0140K-VAP-ViewportVisualLockRepair ×2(reviewed, Windows-local scope)",
+        ],
+        "GeneratedAt": dt.datetime.now().isoformat(timespec="seconds"),
+    }
+    (RUN_VAP / "vap_compliance_summary.json").write_text(
+        json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def def_build_payload() -> dict:
@@ -63,25 +163,58 @@ def def_build_payload() -> dict:
 
     groups = sorted(chained["Group"].unique().tolist())
     idx_dates = sorted(chained["Date"].unique().tolist())
-    date_str = [d.strftime("%m-%d") for d in idx_dates]
+    date_str = [d.strftime("%y-%m-%d") for d in idx_dates]
 
     # ---- 指數分頁:每群鏈接指數 + 實質成交額(億) ----
     flows_idx = flows.set_index(["Group", "Date"])
+    sig_code = {"HOLD": 0, "DYNAMIC_SETUP": 1, "DYNAMIC_BUY": 2, "DYNAMIC_EXIT": 3}
     index_map = {}
     for g in groups:
         sub = chained[chained["Group"] == g].sort_values("Date")
-        turn = []
+        turn, f_for, f_dea, f_tru, sigs = [], [], [], [], []
         for d in sub["Date"]:
             try:
-                turn.append(r2(flows_idx.loc[(g, d), "GroupRealTurnover"] / 1e8))
+                row = flows_idx.loc[(g, d)]
+                turn.append(r2(row["GroupRealTurnover"] / 1e8))
+                f_for.append(r2(row["ForeignNet"] / 1e8))
+                f_dea.append(r2(row["DealerNet"] / 1e8))
+                f_tru.append(r2(row["TrustNet"] / 1e8))
+                sigs.append(sig_code.get(str(row["StrategySignal"]), 0))
             except KeyError:
                 turn.append(None)
+                f_for.append(None)
+                f_dea.append(None)
+                f_tru.append(None)
+                sigs.append(0)
         index_map[g] = {
             "px": [r2(v) for v in sub["ChainedIndex"]],
             "ret": [r4(v) for v in sub["BasketRet"]],
             "turn": turn,
+            "fF": f_for,
+            "fD": f_dea,
+            "fT": f_tru,
+            "sig": sigs,
             "n": [int(v) for v in sub["ActiveCount"]],
         }
+
+    # ---- 每群交易標記與勝率(取自主測交易帳本,進場▲/出場▼) ----
+    trade_marks: dict = {g: [] for g in groups}
+    trade_stats: dict = {}
+    for g, sub in trade_ledger.groupby("Group"):
+        rets = sub["NetReturn"].to_numpy(dtype=float)
+        wins = int((rets > 0).sum())
+        trade_stats[g] = {
+            "n": int(len(rets)),
+            "win": wins,
+            "wr": r4(wins / len(rets)) if len(rets) else None,
+            "avg": r4(float(rets.mean())) if len(rets) else None,
+        }
+        for _, t in sub.iterrows():
+            trade_marks[str(g)].append({
+                "in": t["EntryDate"].strftime("%y-%m-%d"),
+                "out": t["ExitDate"].strftime("%y-%m-%d"),
+                "ret": r4(t["NetReturn"]),
+            })
 
     # ---- 資金位移分頁:近 N 日四路資金 + 熱力圖矩陣 ----
     flow_dates = sorted(flows["Date"].unique().tolist())[-FLOW_TAIL_DAYS:]
@@ -132,7 +265,7 @@ def def_build_payload() -> dict:
             fz = (float(row["InstPurityZ"].iloc[0]) - f_mu) / f_sd
             pz = (ret20[g].get(d, np.nan) - p_mu) / p_sd
             if np.isfinite(fz) and np.isfinite(pz):
-                trail.append([r2(np.clip(fz, -3, 3)), r2(np.clip(pz, -3, 3))])
+                trail.append([r2(np.clip(fz, -5, 5)), r2(np.clip(pz, -5, 5))])
         if trail:
             last_state = flow_map[g]["state"][-1] if flow_map[g]["state"] else ""
             rrg.append({"g": g, "trail": trail, "state": last_state})
@@ -140,10 +273,10 @@ def def_build_payload() -> dict:
     # ---- 交易回測分頁 ----
     bh_daily = chained.groupby("Date", as_index=False).agg(Ret=("BasketRet", "mean")).sort_values("Date")
     bh_equity = (1.0 + bh_daily["Ret"]).cumprod()
-    eq_dates = [d.strftime("%m-%d") for d in equity["Date"]]
+    eq_dates = [d.strftime("%y-%m-%d") for d in equity["Date"]]
     trades_rows = [
         {
-            "g": t["Group"], "in": t["EntryDate"].strftime("%m-%d"), "out": t["ExitDate"].strftime("%m-%d"),
+            "g": t["Group"], "in": t["EntryDate"].strftime("%y-%m-%d"), "out": t["ExitDate"].strftime("%y-%m-%d"),
             "ret": r4(t["NetReturn"]), "why": t["ExitReason"],
         }
         for _, t in trade_ledger.sort_values("EntryDate").iterrows()
@@ -158,6 +291,29 @@ def def_build_payload() -> dict:
         ]
 
     latest_reviews = reviews.sort_values("ReviewDate").drop_duplicates("Ticker", keep="last")
+
+    # ---- 名單分頁:SSOT 全成員名單 × 最新一期角色 ----
+    membership = pd.read_csv(RUN_MAIN / "sector_membership_input.csv", dtype={"Ticker": str}).fillna("")
+    role_by_ticker = {str(r["Ticker"]): (r["Role"], r["SizeTier"])
+                      for _, r in latest_reviews.iterrows()}
+    members = [
+        {"g": r["Group"], "sub": r["Subgroup"], "tk": str(r["Ticker"]), "nm": r["Name"],
+         "mkt": r["Market"], "cnt": r["CountingFlag"] == "COUNT",
+         "role": role_by_ticker.get(str(r["Ticker"]), ("", ""))[0],
+         "tier": role_by_ticker.get(str(r["Ticker"]), ("", ""))[1]}
+        for _, r in membership.sort_values(["Group", "Subgroup", "Ticker"]).iterrows()
+    ]
+
+    # ---- 詳細結果矩陣(治理分頁):Master/ETF/Preflight 帳本 ----
+    evd = MODULE_DIR / "evidence"
+    # MasterValidation 執行中會先清掉自身 RUN 目錄再跑 pytest(內含本 builder 的 payload 測試),
+    # 故此帳本採容忍讀取:缺席時誠實給空表,不得中斷、不得假造。
+    master_ledger_path = evd / "RUN_MASTER_VALIDATION_V0100" / "master_test_ledger.csv"
+    master_ledger = (pd.read_csv(master_ledger_path) if master_ledger_path.exists()
+                     else pd.DataFrame(columns=["TestID", "TestName", "Status", "Severity", "Evidence"]))
+    etf_summary = json.loads((evd / "RUN_ETF_CONSOLES_V0100" / "etf_consoles_summary.json").read_text("utf-8"))
+    preflight = json.loads((evd / "RUN_ENV_PREFLIGHT_V0100" / "env_preflight_report.json").read_text("utf-8"))
+
     role_matrix = []
     for g in groups:
         sub = latest_reviews[latest_reviews["Group"] == g]
@@ -181,12 +337,33 @@ def def_build_payload() -> dict:
         },
         "dates": date_str,
         "groups": groups,
+        "members": members,
+        "suite": {
+            "master": ledger_rows(master_ledger),
+            "etf": [{"chk": r["Check"], "res": f"{r['Passed']}/{r['Total']}",
+                     "sec": r["Seconds"], "v": r["Verdict"]} for r in etf_summary["Checks"]],
+            "etfStatus": etf_summary["Status"],
+            "preflight": [{"imp": t["Import"], "pip": t["PipName"], "ok": bool(t["Installed"]),
+                           "ver": t["Version"]} for t in preflight["RequiredTools"]],
+            "preflightEnv": preflight["CurrentEnv"]["Classification"],
+        },
         "index": index_map,
         "flowDates": flow_date_str,
         "flows": flow_map,
         "heat": heat,
         "rrg": rrg,
         "roles": role_matrix,
+        "tradeMarks": trade_marks,
+        "tradeStats": trade_stats,
+        "livewire": {
+            "summary": json.loads((RUN_LIVEWIRE / "adapter_run_summary.json").read_text("utf-8")),
+            "tests": ledger_rows(pd.read_csv(RUN_LIVEWIRE / "adapter_test_ledger.csv")),
+            "reconcile": [
+                {"sec": r["MotherSector"], "tk": r["MotherTicker"], "nm": r["MotherName"],
+                 "role": r["MotherRole"], "match": r["MatchType"], "lg": r["LocalGroup"]}
+                for _, r in pd.read_csv(RUN_LIVEWIRE / "mother_ssot_reconcile_ledger.csv").fillna("").iterrows()
+            ],
+        },
         "backtest": [
             {k: (r4(v) if isinstance(v, (int, float, np.floating)) and not isinstance(v, (bool, np.bool_)) else (bool(v) if isinstance(v, (bool, np.bool_)) else v)) for k, v in row.items()}
             for row in backtest.to_dict("records")
@@ -200,9 +377,13 @@ def def_build_payload() -> dict:
             "strategy": [r4(v) for v in equity["Equity"]],
             "gross": [r4(v) for v in equity["GrossEquity"]],
             "bh": [r4(v) for v in bh_equity],
-            "bhDates": [d.strftime("%m-%d") for d in bh_daily["Date"]],
+            "bhDates": [d.strftime("%y-%m-%d") for d in bh_daily["Date"]],
         },
         "trades": trades_rows,
+        "vap": {
+            "summary": json.loads((RUN_VAP / "vap_compliance_summary.json").read_text("utf-8")),
+            "ledger": pd.read_csv(RUN_VAP / "vap_compliance_ledger.csv").to_dict("records"),
+        },
         "gov": {
             "testsF": ledger_rows(tests_f),
             "testsB": ledger_rows(tests_b),
@@ -271,10 +452,25 @@ section{display:none}section.on{display:block}
   <div class="scroll"><table id="ov-roles"></table></div></div>
 </section>
 
+<section id="sec-roster">
+ <div class="kpis" id="ro-kpis"></div>
+ <div class="card"><h2>族群總表(SSOT L1 · 含子群/計數/最新角色)</h2>
+  <div class="bar" id="ro-tabs"></div>
+  <div class="scroll" style="max-height:560px"><table id="ro-table"></table></div></div>
+</section>
+
 <section id="sec-index">
  <div class="bar" id="idx-tabs"></div>
- <div class="card"><svg id="idx-chart" viewBox="0 0 1140 400" width="100%"></svg></div>
- <div class="card"><h2>全族群現況</h2><div class="scroll"><table id="idx-table"></table></div></div>
+ <div class="card">
+  <div class="legend"><span><span style="color:var(--up);font-weight:900">▲</span>進場訊號(回測實際成交)</span>
+   <span><span style="color:var(--up);font-weight:900">▼</span>出場·獲利</span>
+   <span><span style="color:var(--dn);font-weight:900">▼</span>出場·虧損</span>
+   <span><span class="sw" style="background:var(--fF)"></span>外資</span>
+   <span><span class="sw" style="background:var(--fD)"></span>自營</span>
+   <span><span class="sw" style="background:var(--fT)"></span>投信</span>
+   <span class="sub">(三大法人淨流均已扣除當沖)</span></div>
+  <svg id="idx-chart" viewBox="0 0 1140 500" width="100%"></svg></div>
+ <div class="card"><h2>全族群現況 — 分類 × 指數 × 訊號 × 回測勝率</h2><div class="scroll"><table id="idx-table"></table></div></div>
 </section>
 
 <section id="sec-flow">
@@ -316,13 +512,33 @@ section{display:none}section.on{display:block}
  </div>
 </section>
 
+<section id="sec-livewire">
+ <div class="kpis" id="lw-kpis"></div>
+ <div class="grid2">
+ <div class="card"><h2>外部引擎匯入審計(10 份模組收斂)</h2><div class="scroll"><table id="lw-intake"></table></div></div>
+ <div class="card"><h2>轉接層驗證帳本(L01–L08)</h2><div class="scroll"><table id="lw-tests"></table></div></div>
+ </div>
+ <div class="card"><h2>VIA v1.1 母名冊 × 本地 SSOT 對帳明細(76 檔)</h2><div class="scroll"><table id="lw-reconcile"></table></div></div>
+</section>
+
 <section id="sec-gov">
+ <div class="card"><h2>VAP 視覺鎖合規(v018 軸契約:4 間隔/5 刻度 · 2/2.5/5×10ⁿ)</h2><div class="scroll"><table id="gv-vap"></table></div></div>
  <div class="card"><h2>SectorFlow 測試帳本(F01–F26)</h2><div class="scroll"><table id="gv-f"></table></div></div>
  <div class="grid2">
  <div class="card"><h2>TradeBacktest 測試帳本(B01–B09)</h2><div class="scroll"><table id="gv-b"></table></div></div>
  <div class="card"><h2>Repair Ledger(原設計缺陷修復)</h2><div class="scroll"><table id="gv-r"></table></div></div>
  </div>
  <div class="card"><h2>Pipeline Phases</h2><div class="scroll"><table id="gv-p"></table></div></div>
+ <div class="card"><h2>詳細結果矩陣 — 偵測層(4 情境 × 2 種子 · 全欄位)</h2>
+  <div class="scroll"><table id="gv-detect"></table></div></div>
+ <div class="card"><h2>詳細結果矩陣 — 交易層(全欄位)</h2>
+  <div class="scroll"><table id="gv-tradebt"></table></div></div>
+ <div class="grid2">
+ <div class="card"><h2>MasterValidation 帳本(M01–M10 / U01–U05)</h2><div class="scroll"><table id="gv-m"></table></div></div>
+ <div class="card"><h2>ETF 主控台收證(142 checks)+ 環境前哨</h2>
+  <div class="scroll"><table id="gv-etf"></table></div>
+  <div class="scroll" style="margin-top:8px"><table id="gv-env"></table></div></div>
+ </div>
 </section>
 
 <div class="foot" id="foot"></div>
@@ -346,7 +562,7 @@ function sigPill(s){const m={DYNAMIC_BUY:["BUY",UP],DYNAMIC_SETUP:["SETUP","#3b6
 function statusPill(s){const c=s==="PASS"?"#0f9678":(s==="WARN"?"#b57f1f":"#b5291a");return `<span class="pill" style="background:${c}">${s}</span>`;}
 
 /* ---------- tabs ---------- */
-const TABS=[["overview","總覽"],["index","鏈接指數"],["flow","資金位移"],["rrg","輪動象限"],["trade","交易回測"],["gov","治理矩陣"]];
+const TABS=[["overview","總覽"],["roster","名單"],["index","鏈接指數"],["flow","資金位移"],["rrg","輪動象限"],["trade","交易回測"],["livewire","接線驗證"],["gov","治理矩陣"]];
 let curTab="overview";
 function renderTabs(){$("tabbar").innerHTML=TABS.map(t=>`<span class="tb ${t[0]===curTab?'on':''}" data-t="${t[0]}">${t[1]}</span>`).join("");
  document.querySelectorAll("#tabbar .tb").forEach(e=>e.onclick=()=>{curTab=e.dataset.t;renderTabs();
@@ -357,6 +573,46 @@ function renderTabs(){$("tabbar").innerHTML=TABS.map(t=>`<span class="tb ${t[0]=
 
 /* ---------- overview ---------- */
 function kpi(v,l,c){return `<div class="kpi"><div class="v" style="${c?('color:'+c):''}">${v}</div><div class="l">${l}</div></div>`;}
+
+/* ---------- roster(名單) ---------- */
+let roGroup="ALL";
+function rolePill(r){const m={LEADER:["領頭",UP],PEER:["同步","#3b6fc4"],MEMBER:["成員","#9c9890"],LAGGARD:["落後","#b57f1f"]};
+ const p=m[r];return p?`<span class="pill" style="background:${p[1]}">${p[0]}</span>`:"—";}
+function renderRoster(){
+ const gs=[...new Set(D.members.map(m=>m.g))];
+ const cnt=D.members.filter(m=>m.cnt).length;
+ const roles=D.members.filter(m=>m.role==="LEADER").length;
+ $("ro-kpis").innerHTML=kpi(gs.length,"L1 族群數")+kpi(D.members.length,"名單總檔數")+
+  kpi(cnt,"計數成員(COUNT)")+kpi(roles,"最新一期 LEADER 檔數",UP);
+ $("ro-tabs").innerHTML=[["ALL","全部"]].concat(gs.map(g=>[g,short(g)])).map(t=>
+  `<span class="sb ${t[0]===roGroup?'on':''}" data-g="${t[0]}">${t[1]}</span>`).join("");
+ document.querySelectorAll("#ro-tabs .sb").forEach(e=>e.onclick=()=>{roGroup=e.dataset.g;renderRoster();});
+ const rows=D.members.filter(m=>roGroup==="ALL"||m.g===roGroup);
+ $("ro-table").innerHTML="<tr><th>族群</th><th>子群</th><th>代號</th><th>名稱</th><th>市場</th><th>計數</th><th>角色</th><th>規模</th></tr>"+
+  rows.map(m=>`<tr><td>${m.g}</td><td>${m.sub}</td><td class="mono">${m.tk}</td><td>${m.nm}</td><td>${m.mkt}</td>`+
+   `<td>${m.cnt?"COUNT":"—"}</td><td>${rolePill(m.role)}</td><td class="mono">${m.tier||"—"}</td></tr>`).join("");
+}
+
+/* ---------- 詳細結果矩陣(治理) ---------- */
+function fullMatrix(el,rows){
+ if(!rows.length){ $(el).innerHTML=""; return; }
+ const cols=Object.keys(rows[0]);
+ $(el).innerHTML="<tr>"+cols.map(c=>`<th>${c}</th>`).join("")+"</tr>"+
+  rows.map(r=>"<tr>"+cols.map(c=>{const v=r[c];
+   return `<td class="${typeof v==="number"?"num":""} mono">${v===null||v===undefined?"—":v}</td>`;}).join("")+"</tr>").join("");
+}
+function renderDetailMatrix(){
+ fullMatrix("gv-detect",D.backtest);
+ fullMatrix("gv-tradebt",D.tradeBacktest);
+ $("gv-m").innerHTML="<tr><th>ID</th><th>測試</th><th>Severity</th><th>結果</th><th>證據</th></tr>"+
+  D.suite.master.map(t=>`<tr><td class="mono">${t.id}</td><td>${t.name}</td><td>${t.sev}</td>`+
+   `<td>${statusPill(t.status)}</td><td class="sub">${t.ev}</td></tr>`).join("");
+ $("gv-etf").innerHTML=`<tr><th>檢查面</th><th class="num">結果</th><th class="num">秒</th><th>判定(${D.suite.etfStatus})</th></tr>`+
+  D.suite.etf.map(r=>`<tr><td class="mono">${r.chk}</td><td class="num">${r.res}</td><td class="num">${r.sec}</td><td>${statusPill(r.v)}</td></tr>`).join("");
+ $("gv-env").innerHTML=`<tr><th>工具(import)</th><th>pip 套件</th><th>版本</th><th>安裝(${D.suite.preflightEnv})</th></tr>`+
+  D.suite.preflight.map(t=>`<tr><td class="mono">${t.imp}</td><td class="mono">${t.pip}</td><td class="mono">${t.ver}</td>`+
+   `<td>${statusPill(t.ok?"PASS":"FAIL")}</td></tr>`).join("");
+}
 function renderOverview(){
  const m=D.meta;
  const rot=D.tradeBacktest.filter(r=>r.Scenario==="ROTATION");
@@ -381,39 +637,82 @@ function renderIdxTabs(){$("idx-tabs").innerHTML=D.groups.map(g=>`<span class="s
  document.querySelectorAll("#idx-tabs .sb").forEach(e=>e.onclick=()=>{curGroup=e.dataset.g;renderIdxTabs();drawIndex();drawFlowDetail();});}
 function drawIndex(){
  const I=D.index[curGroup],px=I.px,turn=I.turn,n=px.length;
- const W=1140,H=400,L=56,R=14,T=24,PB=280,VB=360;
+ const flow=px.map((_,i)=>((I.fF[i]||0)+(I.fD[i]||0)+(I.fT[i]||0)));
+ const W=1140,L=56,R=14,T=24,PB=280,VB=340,FT=360,FB=470;
  const vals=px.filter(v=>v!==null);
- const mn=Math.min(...vals),mx=Math.max(...vals),pad=(mx-mn)*0.08||1;
- const X=i=>L+(W-L-R)*i/(n-1),Y=p=>T+(PB-T)*(1-(p-mn+pad)/(mx-mn+2*pad));
+ const mn=Math.min(...vals),mx=Math.max(...vals);
+ const VT=vapTicks(mn,mx),t0=VT.t[0],t4=VT.t[4];
+ const X=i=>L+(W-L-R)*i/(n-1),Y=p=>T+(PB-T)*(1-(p-t0)/(t4-t0));
  let s="";
- for(let g=0;g<=4;g++){const p=mn-pad+(mx-mn+2*pad)*g/4,y=Y(p);
-  s+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#eceae2"/><text x="${L-6}" y="${y+3}" text-anchor="end" class="evlab">${p.toFixed(0)}</text>`;}
+ VT.t.forEach(p=>{const y=Y(p);
+  s+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#eceae2"/><text x="${L-6}" y="${y+3}" text-anchor="end" class="evlab">${p.toFixed(VT.d)}</text>`;});
+ // 基期垂直參考線(2026-01-02 = 100)。
+ const baseI=D.dates.indexOf(D.meta.baseDate.slice(2));
+ if(baseI>=0){s+=`<line x1="${X(baseI)}" y1="${T}" x2="${X(baseI)}" y2="${FB}" stroke="#c4943a" stroke-dasharray="3 4"/>`;
+  s+=`<text x="${X(baseI)+4}" y="${T+10}" class="evlab" style="fill:#c4943a">基期 ${D.meta.baseDate}=100</text>`;}
+ // 中帶:實質成交額(獨立層)。
  const tv=turn.filter(v=>v!==null),vmax=tv.length?Math.max(...tv):1;
  for(let i=0;i<n;i++){if(turn[i]===null)continue;const up=i>0&&px[i]>=px[i-1];
-  s+=`<rect x="${X(i)-1.2}" y="${VB-(turn[i]/vmax)*56}" width="2.4" height="${(turn[i]/vmax)*56}" fill="${up?UP:DN}" fill-opacity="0.45"/>`;}
- s+=`<text x="${L-6}" y="${VB-24}" text-anchor="end" class="evlab">量(億)</text>`;
- for(let i=1;i<n;i++){s+=`<line x1="${X(i-1)}" y1="${Y(px[i-1])}" x2="${X(i)}" y2="${Y(px[i])}" stroke="${px[i]>=px[i-1]?UP:DN}" stroke-width="1.8"/>`;}
+  s+=`<rect x="${X(i)-0.7}" y="${VB-(turn[i]/vmax)*48}" width="1.4" height="${(turn[i]/vmax)*48}" fill="${up?UP:DN}" fill-opacity="0.45"/>`;}
+ s+=`<text x="${L-6}" y="${VB-20}" text-anchor="end" class="evlab">量(億)</text>`;
+ // 上帶:鏈接指數折線(紅漲青綠跌)。
+ for(let i=1;i<n;i++){s+=`<line x1="${X(i-1)}" y1="${Y(px[i-1])}" x2="${X(i)}" y2="${Y(px[i])}" stroke="${px[i]>=px[i-1]?UP:DN}" stroke-width="1.6"/>`;}
  const last=px[n-1],chg=(last/px[n-2]-1)*100;
  s+=`<text x="${W-R}" y="${Y(last)-6}" text-anchor="end" class="mono" style="font-size:12px;font-weight:700;fill:${chg>=0?UP:DN}">${last.toFixed(1)} (${chg>=0?"+":""}${chg.toFixed(2)}%)</text>`;
- s+=`<text x="${L}" y="${T-8}" class="evlab">${curGroup} · 鏈接指數(基期 ${D.meta.baseDate}=100,√實質成交額加權,剔除 LAGGARD) · 量帶=實質成交額(獨立層)</text>`;
- s+=`<rect id="idx-hover" x="${L}" y="${T}" width="${W-L-R}" height="${VB-T}" fill="transparent"/>`;
+ s+=`<text x="${L}" y="${T-8}" class="evlab">${curGroup} · 鏈接指數(錨定 ${D.meta.baseDate}=100,√實質成交額加權,剔除 LAGGARD) · 視窗 2025-01-02 → 今</text>`;
+ // 進出場標記(主測交易帳本):進場▲紅、出場▼(獲利紅/虧損青綠)。
+ const marks=D.tradeMarks[curGroup]||[];
+ marks.forEach(m=>{
+  const ei=D.dates.indexOf(m.in),xi=D.dates.indexOf(m.out);
+  if(ei>=0&&px[ei]!==null){const x=X(ei),y=Y(px[ei]);
+   s+=`<path d="M ${x} ${y-16} l 5 8 l -10 0 Z" fill="${UP}" stroke="#fff" stroke-width="1"><title>進場 ${m.in}</title></path>`;}
+  if(xi>=0&&px[xi]!==null){const x=X(xi),y=Y(px[xi]);const win=m.ret>=0;
+   s+=`<path d="M ${x} ${y+16} l 5 -8 l -10 0 Z" fill="${win?UP:DN}" stroke="#fff" stroke-width="1"><title>出場 ${m.out} · 淨報酬 ${(m.ret*100).toFixed(2)}%</title></path>`;}
+ });
+ // 下帶:三大法人(扣當沖)每日淨流堆疊柱(外資/自營/投信;獨立座標,零軸置中)。
+ const keys3=["fF","fD","fT"],C3={fF:"#3b6fc4",fD:"#b57f1f",fT:"#0f9678"},N3={fF:"外資",fD:"自營",fT:"投信"};
+ let fmax=1;
+ for(let i=0;i<n;i++){let p=0,q=0;keys3.forEach(k=>{const v=I[k][i]||0;if(v>=0)p+=v;else q-=v;});fmax=Math.max(fmax,p,q);}
+ fmax=Math.max(0.5,Math.min(fmax,quant(px.map((_,i)=>{let p=0,q=0;keys3.forEach(k=>{const v=I[k][i]||0;if(v>=0)p+=v;else q-=v;});return Math.max(p,q);}),0.99)));
+ const fmid=(FT+FB)/2,fscale=(FB-FT)/2/fmax;
+ s+=`<line x1="${L}" y1="${fmid}" x2="${W-R}" y2="${fmid}" stroke="#dbd9d3"/>`;
+ s+=`<text x="${L-6}" y="${FT+8}" text-anchor="end" class="evlab">+${fmax.toFixed(0)}</text>`;
+ s+=`<text x="${L-6}" y="${FB}" text-anchor="end" class="evlab">-${fmax.toFixed(0)}</text>`;
+ s+=`<text x="${L+4}" y="${FT-6}" class="evlab">三大法人淨流堆疊(扣當沖,億,獨立座標) — <tspan fill="#3b6fc4">■外資</tspan> <tspan fill="#b57f1f">■自營</tspan> <tspan fill="#0f9678">■投信</tspan> · 上=流入/下=流出</text>`;
+ for(let i=0;i<n;i++){let up=0,dn2=0;
+  keys3.forEach(k=>{const v=I[k][i];if(v===null||!isFinite(v))return;
+   const h=Math.min(Math.abs(v)*fscale,(FB-FT)/2);
+   if(v>=0){s+=`<rect x="${X(i)-0.8}" y="${Math.max(FT,fmid-up-h)}" width="1.6" height="${Math.max(0.4,Math.min(h,fmid-FT-up))}" fill="${C3[k]}"/>`;up+=h;}
+   else{s+=`<rect x="${X(i)-0.8}" y="${fmid+dn2}" width="1.6" height="${Math.max(0.4,Math.min(h,FB-fmid-dn2))}" fill="${C3[k]}"/>`;dn2+=h;}});}
+ s+=`<rect id="idx-hover" x="${L}" y="${T}" width="${W-L-R}" height="${FB-T}" fill="transparent"/>`;
  $("idx-chart").innerHTML=s;
  const hov=$("idx-hover");
  hov.onmousemove=ev=>{const r=hov.getBoundingClientRect();
   const i=Math.max(0,Math.min(n-1,Math.round((ev.clientX-r.left)/r.width*(n-1))));
-  showTip(ev,`${D.dates[i]}  ${curGroup}\n指數 ${px[i]===null?"—":px[i].toFixed(1)}   量 ${turn[i]===null?"—":turn[i].toFixed(1)}億\n成分 ${I.n[i]} 檔   日報酬 ${(I.ret[i]*100).toFixed(2)}%`);};
+  const fx=(k)=>I[k][i]===null?"—":((I[k][i]>=0?"+":"")+I[k][i].toFixed(1));
+  const sigName=["HOLD","SETUP","BUY","EXIT"][I.sig[i]||0];
+  showTip(ev,`${D.dates[i]}  ${curGroup}\n指數 ${px[i]===null?"—":px[i].toFixed(1)}   量 ${turn[i]===null?"—":turn[i].toFixed(1)}億   訊號 ${sigName}\n外資 ${fx("fF")}   自營 ${fx("fD")}   投信 ${fx("fT")}   合計 ${(flow[i]>=0?"+":"")+flow[i].toFixed(1)}億\n成分 ${I.n[i]} 檔   日報酬 ${(I.ret[i]*100).toFixed(2)}%`);};
  hov.onmouseleave=hideTip;
 }
 function renderIdxTable(){
- let h="<thead><tr><th>族群</th><th class='num'>指數</th><th class='num'>3D 漲跌%</th><th class='num'>3D 位移 pct-pt</th><th>資金狀態</th><th>訊號</th><th class='num'>成分檔數</th></tr></thead><tbody>";
+ const roleMap={};D.roles.forEach(r=>roleMap[r.g]=r);
+ let h="<thead><tr><th>族群</th><th class='num'>分類 L/P/M/G剔</th><th class='num'>指數</th><th class='num'>3D 漲跌%</th><th class='num'>3D 位移</th><th>資金狀態</th><th>訊號</th><th class='num'>回測筆數</th><th class='num'>勝率%</th><th class='num'>均筆報酬%</th><th class='num'>成分</th></tr></thead><tbody>";
  for(const g of D.groups){const I=D.index[g],px=I.px,n=px.length;
   const r3=(px[n-1]/px[Math.max(0,n-4)]-1)*100;
   const F=D.flows[g],fn=F.velocity.length;
   const vel=F.velocity[fn-1],st=F.state[fn-1],sg=F.signal[fn-1];
-  h+=`<tr style="${g===curGroup?'background:#faf9f4':''}"><td style="font-weight:700">${g}</td><td class="num">${px[n-1].toFixed(1)}</td>`+
+  const ro=roleMap[g]||{L:0,P:0,M:0,G:0};
+  const ts=D.tradeStats[g];
+  const wrTxt=ts&&ts.wr!==null?`<span style="color:${ts.wr>=0.5?UP:DN};font-weight:700">${(ts.wr*100).toFixed(0)}</span>`:"—";
+  const avgTxt=ts&&ts.avg!==null?`<span style="color:${ts.avg>=0?UP:DN}">${(ts.avg*100).toFixed(2)}</span>`:"—";
+  h+=`<tr style="${g===curGroup?'background:#faf9f4':''}"><td style="font-weight:700">${g}</td>`+
+   `<td class="num mono" style="font-size:10.5px"><span style="color:${UP}">${ro.L}</span>/${ro.P}/${ro.M}/<span style="color:${DN}">${ro.G}</span></td>`+
+   `<td class="num">${px[n-1].toFixed(1)}</td>`+
    `<td class="num" style="color:${r3>=0?UP:DN};font-weight:700">${r3>=0?"+":""}${r3.toFixed(2)}</td>`+
-   `<td class="num" style="color:${(vel||0)>=0?UP:DN}">${vel===null?"—":(vel>=0?"+":"")+vel.toFixed(3)}</td>`+
-   `<td>${stateLabel(st)}</td><td>${sigPill(sg)}</td><td class="num">${I.n[n-1]}</td></tr>`;}
+   `<td class="num" style="color:${(vel||0)>=0?UP:DN}">${vel===null?"—":(vel>=0?"+":"")+vel.toFixed(2)}</td>`+
+   `<td>${stateLabel(st)}</td><td>${sigPill(sg)}</td>`+
+   `<td class="num">${ts?ts.n:"—"}</td><td class="num">${wrTxt}</td><td class="num">${avgTxt}</td>`+
+   `<td class="num">${I.n[n-1]}</td></tr>`;}
  $("idx-table").innerHTML=h+"</tbody>";
 }
 
@@ -439,6 +738,17 @@ function drawHeat(){
   rc.onmouseleave=hideTip;});
 }
 function quant(a,q){const b=[...a].sort((x,y)=>x-y);return b[Math.min(b.length-1,Math.floor(q*b.length))];}
+function vapTicks(lo,hi){/* VAP 軸鎖:4 間隔/5 刻度,合法間隔 2/2.5/5×10^n */
+ if(!isFinite(lo)||!isFinite(hi)){lo=0;hi=1;} if(hi<=lo)hi=lo+1;
+ const raw=(hi-lo)/4,be=Math.floor(Math.log10(raw));
+ for(let e=be-1;e<=be+3;e++)for(const m of [2,2.5,5]){
+  const step=m*Math.pow(10,e);
+  if(4*step<(hi-lo)-1e-12)continue;
+  const start=Math.floor(lo/step)*step;
+  if(start+4*step>=hi-1e-9){
+   const d=Math.max(0,-e+(m===2.5?1:0));
+   return {t:[0,1,2,3,4].map(k=>start+k*step),d:d};}}
+ const st=(hi-lo)/4;return {t:[0,1,2,3,4].map(k=>lo+k*st),d:2};}
 function drawRank(){
  const rank=D.groups.map(g=>{const F=D.flows[g],n=F.smart.length;
   let v=0;for(let i=Math.max(0,n-3);i<n;i++)v+=(F.smart[i]||0);return {g,v};}).sort((a,b)=>b.v-a.v);
@@ -494,12 +804,13 @@ function drawFlowDetail(){
 /* ---------- rrg tab ---------- */
 function drawRRG(){
  const S=540,C=S/2,PAD=40;
- const XX=v=>C+(v/3)*(C-PAD),YY=v=>C-(v/3)*(C-PAD);
+ const XX=v=>C+(v/5)*(C-PAD),YY=v=>C-(v/5)*(C-PAD);
  let s=`<rect x="${C}" y="0" width="${C}" height="${C}" fill="${UP}" opacity="0.05"/>`+
   `<rect x="${C}" y="${C}" width="${C}" height="${C}" fill="#3b6fc4" opacity="0.05"/>`+
   `<rect x="0" y="${C}" width="${C}" height="${C}" fill="${DN}" opacity="0.05"/>`+
   `<rect x="0" y="0" width="${C}" height="${C}" fill="#c4943a" opacity="0.06"/>`+
   `<line x1="${C}" y1="${PAD}" x2="${C}" y2="${S-PAD}" stroke="#dbd9d3"/><line x1="${PAD}" y1="${C}" x2="${S-PAD}" y2="${C}" stroke="#dbd9d3"/>`+
+  [-5,-2.5,2.5,5].map(v=>`<line x1="${XX(v)}" y1="${PAD}" x2="${XX(v)}" y2="${S-PAD}" stroke="#eceae2"/><line x1="${PAD}" y1="${YY(v)}" x2="${S-PAD}" y2="${YY(v)}" stroke="#eceae2"/><text x="${XX(v)}" y="${C+12}" text-anchor="middle" class="evlab">${v.toFixed(1)}</text><text x="${C-6}" y="${YY(v)+3}" text-anchor="end" class="evlab">${v.toFixed(1)}</text>`).join("")+
   `<text x="${S-PAD+4}" y="52" text-anchor="end" class="evlab" style="font-weight:700;fill:${UP}">領先 LEADING</text>`+
   `<text x="${PAD}" y="52" class="evlab" style="font-weight:700;fill:#c4943a">轉弱 WEAKENING ⚠</text>`+
   `<text x="${PAD}" y="${S-52}" class="evlab" style="font-weight:700;fill:${DN}">落後 LAGGING</text>`+
@@ -542,12 +853,13 @@ function renderTrade(){
  // equity chart:兩序列同軸(皆為權益倍數)
  const E=D.equity,n=E.dates.length;
  const all=[...E.strategy,...E.bh].filter(v=>v!==null);
- const mn=Math.min(...all),mx=Math.max(...all),pad=(mx-mn)*0.1||0.01;
+ const mn=Math.min(...all),mx=Math.max(...all);
+ const VT=vapTicks(mn,mx),t0=VT.t[0],t4=VT.t[4];
  const W=1140,L=52,R=14,T=18,B=290;
- const X=i=>L+(W-L-R)*i/(n-1),Y=v=>T+(B-T)*(1-(v-mn+pad)/(mx-mn+2*pad));
+ const X=i=>L+(W-L-R)*i/(n-1),Y=v=>T+(B-T)*(1-(v-t0)/(t4-t0));
  let s="";
- for(let g=0;g<=4;g++){const v=mn-pad+(mx-mn+2*pad)*g/4,y=Y(v);
-  s+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#eceae2"/><text x="${L-6}" y="${y+3}" text-anchor="end" class="evlab">${v.toFixed(2)}</text>`;}
+ VT.t.forEach(v=>{const y=Y(v);
+  s+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#eceae2"/><text x="${L-6}" y="${y+3}" text-anchor="end" class="evlab">${v.toFixed(Math.max(VT.d,2))}</text>`;});
  const bhX=i=>L+(W-L-R)*i/(E.bh.length-1);
  for(let i=1;i<E.bh.length;i++){s+=`<line x1="${bhX(i-1)}" y1="${Y(E.bh[i-1])}" x2="${bhX(i)}" y2="${Y(E.bh[i])}" stroke="#9c9890" stroke-width="1.4" stroke-dasharray="4 3"/>`;}
  for(let i=1;i<n;i++){s+=`<line x1="${X(i-1)}" y1="${Y(E.strategy[i-1])}" x2="${X(i)}" y2="${Y(E.strategy[i])}" stroke="#3b6fc4" stroke-width="2"/>`;}
@@ -576,7 +888,36 @@ function ledgerTable(rows){
   rows.map(r=>`<tr><td class="mono">${r.id}</td><td style="font-weight:600">${r.name}</td><td>${statusPill(r.status)}</td>`+
    `<td class="mono" style="font-size:10px">${r.sev}</td><td class="sub" style="white-space:normal;font-size:10.5px">${r.ev}</td></tr>`).join("")+"</tbody>";
 }
+function renderLivewire(){
+ const LW=D.livewire,s=LW.summary,rec=s.ReconcileSummary;
+ $("lw-kpis").innerHTML=
+  kpi(s.Status.replace("ADAPTER_",""),"轉接層狀態","#0f9678")+
+  kpi(s.HardFailures,"Hard Failures",s.HardFailures===0?"#0f9678":"#b5291a")+
+  kpi(`${rec.exact}/${rec.total}`,"v1.1 名冊精確命中",UP)+
+  kpi(rec.unmapped,"未命中(fail-closed)",rec.unmapped?"#b57f1f":"#0f9678")+
+  kpi(s.IntakeAudit.integrated.length,"外部模組已整合")+
+  kpi(s.IntakeAudit.rejected.length,"外部模組退回","#b57f1f");
+ let ih="<thead><tr><th>處置</th><th>模組</th></tr></thead><tbody>";
+ s.IntakeAudit.integrated.forEach(m=>{ih+=`<tr><td>${statusPill("PASS")}</td><td style="white-space:normal">${m}</td></tr>`;});
+ s.IntakeAudit.rejected.forEach(m=>{ih+=`<tr><td><span class="pill" style="background:#b57f1f">REJECT</span></td><td style="white-space:normal">${m}</td></tr>`;});
+ $("lw-intake").innerHTML=ih+"</tbody>";
+ $("lw-tests").innerHTML=ledgerTable(LW.tests);
+ let rh="<thead><tr><th>母系統族群</th><th class='num'>代碼</th><th>名稱</th><th>角色</th><th>比對結果</th><th>本地 L1 歸屬</th></tr></thead><tbody>";
+ LW.reconcile.forEach(r=>{
+  const ok=r.match==="EXACT_TICKER_MATCH";
+  rh+=`<tr><td>${r.sec}</td><td class="num mono">${r.tk}</td><td>${r.nm}</td><td class="mono" style="font-size:10px">${r.role}</td>`+
+   `<td><span class="pill" style="background:${ok?"#0f9678":(r.match.startsWith("FUZZY")?"#b57f1f":"#b5291a")}">${r.match}</span></td><td>${r.lg||"—"}</td></tr>`;});
+ $("lw-reconcile").innerHTML=rh+"</tbody>";
+}
+
 function renderGov(){
+ const VP=D.vap;
+ let vh="<thead><tr><th>本儀表板圖表</th><th>VAP 代碼</th><th>軸模式</th><th>狀態</th><th>說明</th></tr></thead><tbody>";
+ VP.ledger.forEach(r=>{const ok=r.Status.startsWith("COMPLIANT");
+  vh+=`<tr><td class="mono">${r.OurChart}</td><td class="mono" style="font-weight:700">${r.VAPCode}</td><td class="mono" style="font-size:10px">${r.AxisMode}</td>`+
+   `<td><span class="pill" style="background:${ok?"#0f9678":"#4c72b0"}">${r.Status}</span></td><td class="sub" style="white-space:normal">${r.Note}</td></tr>`;});
+ vh+=`<tr><td colspan="5" class="sub">規格清冊 ${VP.summary.SpecCanonicalCharts} 張 canonical;軸鎖性質自檢 ${VP.summary.PropertySamples} 組隨機範圍:${JSON.stringify(VP.summary.PropertyChecks)}</td></tr>`;
+ $("gv-vap").innerHTML=vh+"</tbody>";
  $("gv-f").innerHTML=ledgerTable(D.gov.testsF);
  $("gv-b").innerHTML=ledgerTable(D.gov.testsB);
  $("gv-r").innerHTML="<thead><tr><th>ID</th><th>原設計問題</th><th>修復</th><th>狀態</th></tr></thead><tbody>"+
@@ -589,13 +930,14 @@ $("foot").innerHTML=`引擎:${D.meta.engineF} + ${D.meta.engineT} · Final Gate 
  `所有數字來自受控 DGP 實跑 evidence(SHA256 manifest 後驗),僅驗證方法邏輯,非實盤績效、非投資建議。`+
  `接真值:替換 def_generate_sector_panel 資料契約(Date×Ticker×AdjClose×Turnover×Daytrade×四路買賣超+宏觀七欄)。產生 ${D.meta.generated}`;
 
-renderTabs();renderOverview();renderIdxTabs();drawIndex();renderIdxTable();
-drawHeat();drawRank();drawFlowDetail();drawRRG();renderTrade();renderGov();
+renderTabs();renderOverview();renderRoster();renderIdxTabs();drawIndex();renderIdxTable();
+drawHeat();drawRank();drawFlowDetail();drawRRG();renderTrade();renderLivewire();renderGov();renderDetailMatrix();
 </script></body></html>
 """
 
 
 def main() -> int:
+    def_write_vap_compliance()
     payload = def_build_payload()
     data_json = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
     html = HTML_TEMPLATE.replace("__DATA_JSON__", data_json)

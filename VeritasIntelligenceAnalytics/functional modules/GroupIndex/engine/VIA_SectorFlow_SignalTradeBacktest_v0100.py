@@ -62,6 +62,9 @@ ATR_WINDOW = 14
 ATR_TRAIL_MULT = 1.5           # 移動停利 ATR 倍數
 ATR_HARD_MULT = 1.5            # 硬止損 ATR 倍數
 NULL_SHIFTS = 20               # circular-shift 置換次數
+SIGNAL_CONFIRM_DAYS = 2        # BUY 進場確認:多頭訊號須連續 N 日(打掉單日假點火)
+SETUP_CONFIRM_DAYS = 4         # SETUP 底倉確認:偷買訊號須更長持續性(真實鎖碼視窗 20-50 日)
+REENTRY_COOLDOWN_DAYS = 3      # 出場後冷卻 N 日再准進場(防 whipsaw churn)
 PLOT_DPI = 140
 
 
@@ -110,24 +113,35 @@ def def_simulate_group_trades(g: pd.DataFrame) -> Tuple[pd.DataFrame, List[Dict[
 
     levels = g["ChainedIndex"].to_numpy(dtype=float)
     signals = g["StrategySignal"].to_numpy()
+    states = g["MigrationState"].to_numpy() if "MigrationState" in g.columns else np.array([""] * n)
     mults = g["ExposureMultiplier"].to_numpy(dtype=float)
     atrs = g["AtrPct"].to_numpy(dtype=float)
     dates = g["Date"].to_numpy()
+    bull_streak = 0      # 多頭訊號連續日數(進場確認濾網)
+    cooldown = 0         # 出場後冷卻(防 whipsaw)
 
     for t in range(n):
         level = levels[t]
         atr = atrs[t] if np.isfinite(atrs[t]) else 0.0
+        bull_streak = bull_streak + 1 if signals[t] in ("DYNAMIC_BUY", "DYNAMIC_SETUP") else 0
+        if cooldown > 0:
+            cooldown -= 1
         # 停損/停利檢查(以 t 日收盤價評估,t+1 生效)。
         stop_hit = False
         if position > 0 and np.isfinite(entry_level):
             peak_level = max(peak_level, level)
-            trail = peak_level * (1.0 - ATR_TRAIL_MULT * atr)
-            hard = entry_level * (1.0 - ATR_HARD_MULT * atr)
+            # 等風險停損:部位低於半倉(SETUP 底倉)時停損帶放寬一倍
+            # (0.25 倉 × 3.0 ATR 之美元風險 < 1.0 倉 × 1.5 ATR,風險不升反降)。
+            widen = 2.0 if position < 0.5 * FULL_FRACTION else 1.0
+            trail = peak_level * (1.0 - ATR_TRAIL_MULT * widen * atr)
+            hard = entry_level * (1.0 - ATR_HARD_MULT * widen * atr)
             stop_hit = level <= max(trail, hard)
 
         sig = signals[t]
         new_position = position
         if sig == "DYNAMIC_EXIT" or stop_hit or mults[t] <= 0.0:
+            # EXIT 訊號僅由宏觀熔斷或 OUTFLOW_DRAINING 觸發(引擎端已無
+            # 噪音型 EXIT),故此處一律平倉;停損另行生效。
             new_position = 0.0
         elif sig == "DYNAMIC_BUY":
             new_position = FULL_FRACTION * mults[t]
@@ -137,12 +151,19 @@ def def_simulate_group_trades(g: pd.DataFrame) -> Tuple[pd.DataFrame, List[Dict[
             # HOLD:維持倉位但依宏觀乘數封頂。
             new_position = min(position, FULL_FRACTION * mults[t]) if position > 0 else 0.0
 
+        # 進場確認閘門:自空手建倉須通過連續訊號確認且不在冷卻期;
+        # SETUP(僅偷買證據)須比 BUY(吸金+爆量雙證據)更長的持續性確認。
+        if position <= 0 and new_position > 0:
+            need = SIGNAL_CONFIRM_DAYS if sig == "DYNAMIC_BUY" else SETUP_CONFIRM_DAYS
+            if bull_streak < need or cooldown > 0:
+                new_position = 0.0
         if position <= 0 and new_position > 0:
             entry_level = level
             peak_level = level
             entry_date = dates[t]
             entry_index_level = level
         if position > 0 and new_position <= 0 and np.isfinite(entry_index_level) and entry_index_level > 0:
+            cooldown = REENTRY_COOLDOWN_DAYS
             trades.append({
                 "Group": g["Group"].iloc[0],
                 "EntryDate": entry_date,
@@ -459,6 +480,7 @@ def def_run_pipeline(out_dir: Path, run_tag: str) -> Dict[str, Any]:
         "HardFailures": hard,
         "ReviewWarnings": warn,
         "CostModel": {"FeeRate": FEE_RATE, "TaxRate": TAX_RATE, "SlippageRate": SLIPPAGE_RATE},
+        "AccuracyFilters": {"SignalConfirmDays": SIGNAL_CONFIRM_DAYS, "SetupConfirmDays": SETUP_CONFIRM_DAYS, "ReentryCooldownDays": REENTRY_COOLDOWN_DAYS},
         "Execution": "T_PLUS_ONE",
         "NullShifts": NULL_SHIFTS,
         "Policy": "research-only / controlled-DGP / no network / no order execution",
