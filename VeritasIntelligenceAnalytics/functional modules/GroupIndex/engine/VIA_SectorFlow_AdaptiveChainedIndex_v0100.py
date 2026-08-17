@@ -71,9 +71,11 @@ DEFAULT_OUT_DIR = MODULE_DIR / "evidence"
 DEFAULT_PLOT_DIR = MODULE_DIR / "output"
 DEFAULT_RUN_TAG = "RUN_SECTORFLOW_V0100"
 
-# 時間結構:burn-in(供 H1 定審回看)+ 指數基期 2026-01-02 = 100。
-PANEL_START = "2025-10-01"
-PANEL_END = "2026-09-18"
+# 時間結構:burn-in(供 2025 H1 定審回看)+ 繪圖視窗 2025-01-02 起 +
+# 指數錨定基期 2026-01-02 = 100(基期前歷史以幾何鏈接反推,基期後正推)。
+PANEL_START = "2024-10-01"
+PANEL_END = "2026-08-14"
+INDEX_PLOT_START = "2025-01-02"
 INDEX_BASE_DATE = "2026-01-02"
 INDEX_BASE_VALUE = 100.0
 REVIEW_LOOKBACK = 60            # 定審回看交易日數(資源限制,非市場紅線)
@@ -848,9 +850,13 @@ def def_build_chained_indices(
     residualized: pd.DataFrame,
     pools_by_period: Mapping[str, pd.DataFrame],
     schedule: pd.DataFrame,
-    base_date: pd.Timestamp,
+    plot_start: pd.Timestamp,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """回傳 (long-format 指數, 連續性稽核表)。"""
+    """回傳 (long-format 指數, 連續性稽核表)。
+
+    鏈接自 plot_start 起算,最後整體重錨定使 INDEX_BASE_DATE 當日 = INDEX_BASE_VALUE
+    (基期前歷史等價於幾何反推;縮放不破壞遞迴連續性)。
+    """
     frames: List[pd.DataFrame] = []
     for _, srow in schedule.iterrows():
         pid = f"{srow['Year']}_{srow['Half']}"
@@ -858,7 +864,7 @@ def def_build_chained_indices(
         if pool is None:
             continue
         seg = residualized[
-            (residualized["Date"] >= max(srow["FirstTradingDay"], base_date))
+            (residualized["Date"] >= max(srow["FirstTradingDay"], plot_start))
             & (residualized["Date"] <= srow["LastTradingDay"])
         ]
         seg = seg.merge(pool[["Group", "Ticker", "Role"]], on=["Group", "Ticker"], how="inner")
@@ -882,12 +888,21 @@ def def_build_chained_indices(
         PeriodID=("PeriodID", "first"),
     ).sort_values(["Group", "Date"], ignore_index=True)
 
-    # 基期首日報酬定義為 0(點位 = 100),之後幾何連乘。
+    # 鏈接首日報酬定義為 0,之後幾何連乘;再重錨定使基期日 = INDEX_BASE_VALUE。
     first_date = daily.groupby("Group")["Date"].transform("min")
     daily.loc[daily["Date"] == first_date, "BasketRet"] = 0.0
     daily["ChainedIndex"] = (
         (1.0 + daily["BasketRet"]).groupby(daily["Group"]).cumprod() * INDEX_BASE_VALUE
     )
+    base_ts = pd.Timestamp(INDEX_BASE_DATE)
+    rescale_parts: List[pd.DataFrame] = []
+    for group, g in daily.groupby("Group", sort=False):
+        g = g.sort_values("Date")
+        at_base = g[g["Date"] >= base_ts]
+        anchor = float(at_base["ChainedIndex"].iloc[0]) if not at_base.empty else float(g["ChainedIndex"].iloc[-1])
+        g = g.assign(ChainedIndex=g["ChainedIndex"] * (INDEX_BASE_VALUE / anchor))
+        rescale_parts.append(g)
+    daily = pd.concat(rescale_parts, ignore_index=True)
 
     # 連續性稽核:I_t 必須恆等於 I_{t-1}*(1+R_t);換檔日 gap 為 0。
     audit_rows: List[Dict[str, Any]] = []
@@ -922,7 +937,7 @@ def def_naive_rebase_gap(residualized: pd.DataFrame, pools_by_period: Mapping[st
             continue
         switch_day = srow["FirstTradingDay"]
         hist = residualized[residualized["Date"] <= switch_day]
-        base = hist[hist["Date"] >= pd.Timestamp(INDEX_BASE_DATE)]
+        base = hist[hist["Date"] >= pd.Timestamp(INDEX_PLOT_START)]
         if base.empty:
             continue
         for group in curr_pool["Group"].drop_duplicates():
@@ -1104,7 +1119,7 @@ def def_analyze_scenario(membership: pd.DataFrame, seed: int, scenario: str) -> 
     ortho = def_orthogonality_audit(residualized, bundle["macro"])
 
     schedule = def_semi_annual_schedule(pd.DatetimeIndex(bundle["dates"]))
-    base_date = pd.Timestamp(INDEX_BASE_DATE)
+    plot_start = pd.Timestamp(INDEX_PLOT_START)
     schedule = schedule[schedule["FirstTradingDay"] >= pd.Timestamp(PANEL_START)]
 
     prev_tiers: Dict[str, str] = {}
@@ -1126,7 +1141,7 @@ def def_analyze_scenario(membership: pd.DataFrame, seed: int, scenario: str) -> 
         members = members.assign(PeriodID=pid)
         review_frames.append(members)
 
-    chained, continuity_audit = def_build_chained_indices(residualized, pools_by_period, schedule, base_date)
+    chained, continuity_audit = def_build_chained_indices(residualized, pools_by_period, schedule, plot_start)
     naive_gap = def_naive_rebase_gap(clean, pools_by_period, schedule)
     flows, flow_meta = def_sector_flow_metrics(clean, macro_regime, seed)
     criteria_meta.extend(flow_meta)
@@ -1573,10 +1588,11 @@ def def_build_test_ledger(
     add("F09", "鏈接指數幾何連續性(含換檔日 gap=0)", continuity_all, "HARD",
         backtest[["Scenario", "Seed", "ContinuityPass"]].to_json(orient="records"))
     chained = main["chained"]
-    base_rows = chained[chained["Date"] == chained.groupby("Group")["Date"].transform("min")]
-    base_ok = bool(np.isclose(base_rows["ChainedIndex"], INDEX_BASE_VALUE).all())
-    add("F10", f"指數基期 {INDEX_BASE_DATE} = {INDEX_BASE_VALUE:.0f}", base_ok, "HARD",
-        f"base_rows={len(base_rows)}")
+    base_rows = chained[chained["Date"] == pd.Timestamp(INDEX_BASE_DATE)]
+    base_ok = bool(len(base_rows) > 0 and np.isclose(base_rows["ChainedIndex"], INDEX_BASE_VALUE).all())
+    plot_ok = bool(chained["Date"].min() >= pd.Timestamp(INDEX_PLOT_START))
+    add("F10", f"指數錨定 {INDEX_BASE_DATE} = {INDEX_BASE_VALUE:.0f} 且視窗自 {INDEX_PLOT_START} 起", base_ok and plot_ok, "HARD",
+        f"base_rows={len(base_rows)} plot_min={chained['Date'].min().date()}")
     naive_worse = bool((backtest["NaiveRebaseMaxGap"] > 0.0).any())
     add("F11", "固定基期重算法存在人工跳空(鏈接法必要性證據)", naive_worse, "HARD",
         backtest[["Scenario", "NaiveRebaseMaxGap"]].round(4).to_json(orient="records"))

@@ -63,7 +63,7 @@ def def_build_payload() -> dict:
 
     groups = sorted(chained["Group"].unique().tolist())
     idx_dates = sorted(chained["Date"].unique().tolist())
-    date_str = [d.strftime("%m-%d") for d in idx_dates]
+    date_str = [d.strftime("%y-%m-%d") for d in idx_dates]
 
     # ---- 指數分頁:每群鏈接指數 + 實質成交額(億) ----
     flows_idx = flows.set_index(["Group", "Date"])
@@ -71,15 +71,19 @@ def def_build_payload() -> dict:
     for g in groups:
         sub = chained[chained["Group"] == g].sort_values("Date")
         turn = []
+        smart = []
         for d in sub["Date"]:
             try:
                 turn.append(r2(flows_idx.loc[(g, d), "GroupRealTurnover"] / 1e8))
+                smart.append(r2(flows_idx.loc[(g, d), "SmartMoneyNet"] / 1e8))
             except KeyError:
                 turn.append(None)
+                smart.append(None)
         index_map[g] = {
             "px": [r2(v) for v in sub["ChainedIndex"]],
             "ret": [r4(v) for v in sub["BasketRet"]],
             "turn": turn,
+            "flow": smart,
             "n": [int(v) for v in sub["ActiveCount"]],
         }
 
@@ -140,10 +144,10 @@ def def_build_payload() -> dict:
     # ---- 交易回測分頁 ----
     bh_daily = chained.groupby("Date", as_index=False).agg(Ret=("BasketRet", "mean")).sort_values("Date")
     bh_equity = (1.0 + bh_daily["Ret"]).cumprod()
-    eq_dates = [d.strftime("%m-%d") for d in equity["Date"]]
+    eq_dates = [d.strftime("%y-%m-%d") for d in equity["Date"]]
     trades_rows = [
         {
-            "g": t["Group"], "in": t["EntryDate"].strftime("%m-%d"), "out": t["ExitDate"].strftime("%m-%d"),
+            "g": t["Group"], "in": t["EntryDate"].strftime("%y-%m-%d"), "out": t["ExitDate"].strftime("%y-%m-%d"),
             "ret": r4(t["NetReturn"]), "why": t["ExitReason"],
         }
         for _, t in trade_ledger.sort_values("EntryDate").iterrows()
@@ -200,7 +204,7 @@ def def_build_payload() -> dict:
             "strategy": [r4(v) for v in equity["Equity"]],
             "gross": [r4(v) for v in equity["GrossEquity"]],
             "bh": [r4(v) for v in bh_equity],
-            "bhDates": [d.strftime("%m-%d") for d in bh_daily["Date"]],
+            "bhDates": [d.strftime("%y-%m-%d") for d in bh_daily["Date"]],
         },
         "trades": trades_rows,
         "gov": {
@@ -273,7 +277,7 @@ section{display:none}section.on{display:block}
 
 <section id="sec-index">
  <div class="bar" id="idx-tabs"></div>
- <div class="card"><svg id="idx-chart" viewBox="0 0 1140 400" width="100%"></svg></div>
+ <div class="card"><svg id="idx-chart" viewBox="0 0 1140 500" width="100%"></svg></div>
  <div class="card"><h2>全族群現況</h2><div class="scroll"><table id="idx-table"></table></div></div>
 </section>
 
@@ -380,28 +384,46 @@ let curGroup=D.groups[0];
 function renderIdxTabs(){$("idx-tabs").innerHTML=D.groups.map(g=>`<span class="sb ${g===curGroup?'on':''}" data-g="${g}">${short(g)}</span>`).join("");
  document.querySelectorAll("#idx-tabs .sb").forEach(e=>e.onclick=()=>{curGroup=e.dataset.g;renderIdxTabs();drawIndex();drawFlowDetail();});}
 function drawIndex(){
- const I=D.index[curGroup],px=I.px,turn=I.turn,n=px.length;
- const W=1140,H=400,L=56,R=14,T=24,PB=280,VB=360;
+ const I=D.index[curGroup],px=I.px,turn=I.turn,flow=I.flow,n=px.length;
+ const W=1140,L=56,R=14,T=24,PB=280,VB=340,FT=360,FB=470;
  const vals=px.filter(v=>v!==null);
  const mn=Math.min(...vals),mx=Math.max(...vals),pad=(mx-mn)*0.08||1;
  const X=i=>L+(W-L-R)*i/(n-1),Y=p=>T+(PB-T)*(1-(p-mn+pad)/(mx-mn+2*pad));
  let s="";
  for(let g=0;g<=4;g++){const p=mn-pad+(mx-mn+2*pad)*g/4,y=Y(p);
   s+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#eceae2"/><text x="${L-6}" y="${y+3}" text-anchor="end" class="evlab">${p.toFixed(0)}</text>`;}
+ // 基期垂直參考線(2026-01-02 = 100)。
+ const baseI=D.dates.indexOf(D.meta.baseDate.slice(2));
+ if(baseI>=0){s+=`<line x1="${X(baseI)}" y1="${T}" x2="${X(baseI)}" y2="${FB}" stroke="#c4943a" stroke-dasharray="3 4"/>`;
+  s+=`<text x="${X(baseI)+4}" y="${T+10}" class="evlab" style="fill:#c4943a">基期 ${D.meta.baseDate}=100</text>`;}
+ // 中帶:實質成交額(獨立層)。
  const tv=turn.filter(v=>v!==null),vmax=tv.length?Math.max(...tv):1;
  for(let i=0;i<n;i++){if(turn[i]===null)continue;const up=i>0&&px[i]>=px[i-1];
-  s+=`<rect x="${X(i)-1.2}" y="${VB-(turn[i]/vmax)*56}" width="2.4" height="${(turn[i]/vmax)*56}" fill="${up?UP:DN}" fill-opacity="0.45"/>`;}
- s+=`<text x="${L-6}" y="${VB-24}" text-anchor="end" class="evlab">量(億)</text>`;
- for(let i=1;i<n;i++){s+=`<line x1="${X(i-1)}" y1="${Y(px[i-1])}" x2="${X(i)}" y2="${Y(px[i])}" stroke="${px[i]>=px[i-1]?UP:DN}" stroke-width="1.8"/>`;}
+  s+=`<rect x="${X(i)-0.7}" y="${VB-(turn[i]/vmax)*48}" width="1.4" height="${(turn[i]/vmax)*48}" fill="${up?UP:DN}" fill-opacity="0.45"/>`;}
+ s+=`<text x="${L-6}" y="${VB-20}" text-anchor="end" class="evlab">量(億)</text>`;
+ // 上帶:鏈接指數折線(紅漲青綠跌)。
+ for(let i=1;i<n;i++){s+=`<line x1="${X(i-1)}" y1="${Y(px[i-1])}" x2="${X(i)}" y2="${Y(px[i])}" stroke="${px[i]>=px[i-1]?UP:DN}" stroke-width="1.6"/>`;}
  const last=px[n-1],chg=(last/px[n-2]-1)*100;
  s+=`<text x="${W-R}" y="${Y(last)-6}" text-anchor="end" class="mono" style="font-size:12px;font-weight:700;fill:${chg>=0?UP:DN}">${last.toFixed(1)} (${chg>=0?"+":""}${chg.toFixed(2)}%)</text>`;
- s+=`<text x="${L}" y="${T-8}" class="evlab">${curGroup} · 鏈接指數(基期 ${D.meta.baseDate}=100,√實質成交額加權,剔除 LAGGARD) · 量帶=實質成交額(獨立層)</text>`;
- s+=`<rect id="idx-hover" x="${L}" y="${T}" width="${W-L-R}" height="${VB-T}" fill="transparent"/>`;
+ s+=`<text x="${L}" y="${T-8}" class="evlab">${curGroup} · 鏈接指數(錨定 ${D.meta.baseDate}=100,√實質成交額加權,剔除 LAGGARD) · 視窗 2025-01-02 → 今</text>`;
+ // 下帶:現金流入流出(四路主力合計淨流,億;獨立座標,零軸置中)。
+ const fv=flow.filter(v=>v!==null&&isFinite(v)).map(Math.abs);
+ const fmax=fv.length?Math.max(0.5,quant(fv,0.99)):1;
+ const fmid=(FT+FB)/2,fscale=(FB-FT)/2/fmax;
+ s+=`<line x1="${L}" y1="${fmid}" x2="${W-R}" y2="${fmid}" stroke="#dbd9d3"/>`;
+ s+=`<text x="${L-6}" y="${FT+8}" text-anchor="end" class="evlab">+${fmax.toFixed(0)}</text>`;
+ s+=`<text x="${L-6}" y="${FB}" text-anchor="end" class="evlab">-${fmax.toFixed(0)}</text>`;
+ s+=`<text x="${L+4}" y="${FT-6}" class="evlab">現金流入(紅,上)/流出(青綠,下) — 四路主力合計淨流(億,獨立座標)</text>`;
+ for(let i=0;i<n;i++){const v=flow[i];if(v===null||!isFinite(v))continue;
+  const h=Math.min(Math.abs(v)*fscale,(FB-FT)/2);
+  if(v>=0)s+=`<rect x="${X(i)-0.7}" y="${fmid-h}" width="1.4" height="${Math.max(0.5,h)}" fill="${UP}" fill-opacity="0.8"/>`;
+  else s+=`<rect x="${X(i)-0.7}" y="${fmid}" width="1.4" height="${Math.max(0.5,h)}" fill="${DN}" fill-opacity="0.8"/>`;}
+ s+=`<rect id="idx-hover" x="${L}" y="${T}" width="${W-L-R}" height="${FB-T}" fill="transparent"/>`;
  $("idx-chart").innerHTML=s;
  const hov=$("idx-hover");
  hov.onmousemove=ev=>{const r=hov.getBoundingClientRect();
   const i=Math.max(0,Math.min(n-1,Math.round((ev.clientX-r.left)/r.width*(n-1))));
-  showTip(ev,`${D.dates[i]}  ${curGroup}\n指數 ${px[i]===null?"—":px[i].toFixed(1)}   量 ${turn[i]===null?"—":turn[i].toFixed(1)}億\n成分 ${I.n[i]} 檔   日報酬 ${(I.ret[i]*100).toFixed(2)}%`);};
+  showTip(ev,`${D.dates[i]}  ${curGroup}\n指數 ${px[i]===null?"—":px[i].toFixed(1)}   量 ${turn[i]===null?"—":turn[i].toFixed(1)}億\n資金淨流 ${flow[i]===null?"—":(flow[i]>=0?"+":"")+flow[i].toFixed(1)}億\n成分 ${I.n[i]} 檔   日報酬 ${(I.ret[i]*100).toFixed(2)}%`);};
  hov.onmouseleave=hideTip;
 }
 function renderIdxTable(){
