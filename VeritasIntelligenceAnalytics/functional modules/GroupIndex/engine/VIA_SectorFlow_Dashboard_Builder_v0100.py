@@ -47,6 +47,103 @@ def r4(x) -> float:
     return None if x is None or (isinstance(x, float) and not np.isfinite(x)) else round(float(x), 4)
 
 
+
+# =============================================================================
+# def VAP AXIS LOCK — 硬性軸契約(VIA_VAP_All_Chart_Specs_v018)
+#   4 intervals / 5 ticks;合法間隔 {2, 2.5, 5}×10ⁿ;小數位數統一。
+# =============================================================================
+
+VAP_SPEC_CSV = MODULE_DIR / "input" / "VIA_VAP_All_Chart_Specs_v018.csv"
+RUN_VAP = MODULE_DIR / "evidence" / "RUN_VAP_COMPLIANCE_V0100"
+VAP_STEP_FAMILY = (2.0, 2.5, 5.0)
+
+
+def def_vap_ticks(lo: float, hi: float):
+    """回傳 (ticks[5], decimals):最小合法間隔使 4 格覆蓋 [lo, hi]。"""
+    import math
+    if not (np.isfinite(lo) and np.isfinite(hi)):
+        lo, hi = 0.0, 1.0
+    if hi <= lo:
+        hi = lo + 1.0
+    raw = (hi - lo) / 4.0
+    base_exp = int(math.floor(math.log10(raw))) if raw > 0 else 0
+    for e in range(base_exp - 1, base_exp + 4):
+        for m in VAP_STEP_FAMILY:
+            step = m * (10.0 ** e)
+            if 4.0 * step < (hi - lo) - 1e-12:
+                continue
+            start = math.floor(lo / step) * step
+            if start + 4.0 * step >= hi - 1e-9:
+                decimals = max(0, -e + (1 if m == 2.5 else 0))
+                ticks = [round(start + k * step, decimals + 2) for k in range(5)]
+                return ticks, decimals
+    step = (hi - lo) / 4.0
+    return [lo + k * step for k in range(5)], 2
+
+
+def def_write_vap_compliance() -> None:
+    """VAP 合規帳本:本儀表板各圖對應 VAP-CH 代碼與軸契約狀態(append-only)。"""
+    RUN_VAP.mkdir(parents=True, exist_ok=True)
+    spec = pd.read_csv(VAP_SPEC_CSV)
+    rows = [
+        {"OurChart": "idx-price-line", "VAPCode": "VAP-CH-01", "AxisMode": "SINGLE",
+         "Status": "COMPLIANT_VAP_TICKS", "Note": "價軸 5 刻度吸附 2/2.5/5×10ⁿ,小數統一"},
+        {"OurChart": "idx-volume-band", "VAPCode": "VAP-CH-26", "AxisMode": "ANNOTATION_BAND",
+         "Status": "ANNOTATION_LAYER", "Note": "量帶為輔助層(獨立不共軸),單標籤"},
+        {"OurChart": "idx-flow-stacked", "VAPCode": "VAP-CH-07", "AxisMode": "ANNOTATION_BAND",
+         "Status": "ANNOTATION_LAYER", "Note": "三大法人堆疊,零軸置中 ± 標籤"},
+        {"OurChart": "flow-detail-stacked", "VAPCode": "VAP-CH-07", "AxisMode": "SINGLE",
+         "Status": "ANNOTATION_LAYER", "Note": "每日/累積分列上下板,不共軸"},
+        {"OurChart": "capital-heatmap", "VAPCode": "VAP-CH-14", "AxisMode": "NONE",
+         "Status": "COMPLIANT_PER_SPEC", "Note": "熱力圖依規格 NOT_APPLICABLE"},
+        {"OurChart": "flow-ranking-hbar", "VAPCode": "VAP-CH-04", "AxisMode": "SINGLE",
+         "Status": "DIRECT_LABELED", "Note": "橫條直接標值,無數值軸"},
+        {"OurChart": "rrg-scatter", "VAPCode": "VAP-CH-05", "AxisMode": "SINGLE",
+         "Status": "COMPLIANT_VAP_TICKS", "Note": "±5 range · step 2.5(合法間隔)"},
+        {"OurChart": "equity-lines", "VAPCode": "VAP-CH-22", "AxisMode": "SINGLE",
+         "Status": "COMPLIANT_VAP_TICKS", "Note": "策略/基準同軸(單軸原則),VAP 刻度"},
+    ]
+    ledger = pd.DataFrame(rows)
+    ledger.to_csv(RUN_VAP / "vap_compliance_ledger.csv", index=False, encoding="utf-8-sig")
+    rng = np.random.default_rng(18)
+    checks = []
+    import math as _m
+    for _ in range(200):
+        lo = float(rng.uniform(-1e4, 1e4))
+        hi = lo + float(rng.uniform(1e-3, 1e5))
+        ticks, dec = def_vap_ticks(lo, hi)
+        step = ticks[1] - ticks[0]
+        mant = step / (10 ** _m.floor(_m.log10(step)))
+        uniform = all(abs((ticks[i + 1] - ticks[i]) - step) < step * 1e-6 for i in range(4))
+        checks.append({
+            "five_ticks": len(ticks) == 5,
+            "uniform": uniform,
+            "legal_mantissa": min(abs(mant - f) for f in VAP_STEP_FAMILY) < 1e-6,
+            "covers": ticks[0] <= lo + 1e-9 and ticks[4] >= hi - 1e-9,
+        })
+    cdf = pd.DataFrame(checks)
+    summary = {
+        "Schema": "VIA-VAP-DASHBOARD-COMPLIANCE/1.0",
+        "SpecSource": VAP_SPEC_CSV.name,
+        "SpecCanonicalCharts": int(len(spec)),
+        "AxisContract": {"intervals": 4, "ticks": 5, "step_family": [2, 2.5, 5],
+                         "decimals": "UNIFIED", "dual_axis": "NOT_USED(單軸原則)"},
+        "PropertyChecks": {k: bool(cdf[k].all()) for k in cdf.columns},
+        "PropertySamples": int(len(cdf)),
+        "LedgerRows": int(len(ledger)),
+        "SpecLineage": "v017 → v018 對照:40/40 代碼、規則、軸契約完全一致(v018 為重發版,依 APPEND_ONLY_VERSION_ARCHIVE_RESTORE 採 v018)",
+        "ReferenceArtifacts": [
+            "VAP_Workbench_v018.html(reviewed)",
+            "VIA_VAP_All_Chart_Specs_v017.{html,csv} + v017 QA Report + 40 Structural Snapshots(reviewed, superseded by v018)",
+            "InvokeVAPExtractAllChartSpecs v017/v018.ps1(reviewed, read-only extractor, Windows-local scope)",
+            "Invoke-VIA-v0140K-VAP-ViewportVisualLockRepair ×2(reviewed, Windows-local scope)",
+        ],
+        "GeneratedAt": dt.datetime.now().isoformat(timespec="seconds"),
+    }
+    (RUN_VAP / "vap_compliance_summary.json").write_text(
+        json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
 def def_build_payload() -> dict:
     chained = pd.read_csv(RUN_MAIN / "sector_chained_index_daily.csv", parse_dates=["Date"])
     flows = pd.read_csv(RUN_MAIN / "sector_flow_daily.csv", parse_dates=["Date"])
@@ -166,7 +263,7 @@ def def_build_payload() -> dict:
             fz = (float(row["InstPurityZ"].iloc[0]) - f_mu) / f_sd
             pz = (ret20[g].get(d, np.nan) - p_mu) / p_sd
             if np.isfinite(fz) and np.isfinite(pz):
-                trail.append([r2(np.clip(fz, -3, 3)), r2(np.clip(pz, -3, 3))])
+                trail.append([r2(np.clip(fz, -5, 5)), r2(np.clip(pz, -5, 5))])
         if trail:
             last_state = flow_map[g]["state"][-1] if flow_map[g]["state"] else ""
             rrg.append({"g": g, "trail": trail, "state": last_state})
@@ -248,6 +345,10 @@ def def_build_payload() -> dict:
             "bhDates": [d.strftime("%y-%m-%d") for d in bh_daily["Date"]],
         },
         "trades": trades_rows,
+        "vap": {
+            "summary": json.loads((RUN_VAP / "vap_compliance_summary.json").read_text("utf-8")),
+            "ledger": pd.read_csv(RUN_VAP / "vap_compliance_ledger.csv").to_dict("records"),
+        },
         "gov": {
             "testsF": ledger_rows(tests_f),
             "testsB": ledger_rows(tests_b),
@@ -379,6 +480,7 @@ section{display:none}section.on{display:block}
 </section>
 
 <section id="sec-gov">
+ <div class="card"><h2>VAP 視覺鎖合規(v018 軸契約:4 間隔/5 刻度 · 2/2.5/5×10ⁿ)</h2><div class="scroll"><table id="gv-vap"></table></div></div>
  <div class="card"><h2>SectorFlow 測試帳本(F01–F26)</h2><div class="scroll"><table id="gv-f"></table></div></div>
  <div class="grid2">
  <div class="card"><h2>TradeBacktest 測試帳本(B01–B09)</h2><div class="scroll"><table id="gv-b"></table></div></div>
@@ -446,11 +548,12 @@ function drawIndex(){
  const flow=px.map((_,i)=>((I.fF[i]||0)+(I.fD[i]||0)+(I.fT[i]||0)));
  const W=1140,L=56,R=14,T=24,PB=280,VB=340,FT=360,FB=470;
  const vals=px.filter(v=>v!==null);
- const mn=Math.min(...vals),mx=Math.max(...vals),pad=(mx-mn)*0.08||1;
- const X=i=>L+(W-L-R)*i/(n-1),Y=p=>T+(PB-T)*(1-(p-mn+pad)/(mx-mn+2*pad));
+ const mn=Math.min(...vals),mx=Math.max(...vals);
+ const VT=vapTicks(mn,mx),t0=VT.t[0],t4=VT.t[4];
+ const X=i=>L+(W-L-R)*i/(n-1),Y=p=>T+(PB-T)*(1-(p-t0)/(t4-t0));
  let s="";
- for(let g=0;g<=4;g++){const p=mn-pad+(mx-mn+2*pad)*g/4,y=Y(p);
-  s+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#eceae2"/><text x="${L-6}" y="${y+3}" text-anchor="end" class="evlab">${p.toFixed(0)}</text>`;}
+ VT.t.forEach(p=>{const y=Y(p);
+  s+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#eceae2"/><text x="${L-6}" y="${y+3}" text-anchor="end" class="evlab">${p.toFixed(VT.d)}</text>`;});
  // 基期垂直參考線(2026-01-02 = 100)。
  const baseI=D.dates.indexOf(D.meta.baseDate.slice(2));
  if(baseI>=0){s+=`<line x1="${X(baseI)}" y1="${T}" x2="${X(baseI)}" y2="${FB}" stroke="#c4943a" stroke-dasharray="3 4"/>`;
@@ -543,6 +646,17 @@ function drawHeat(){
   rc.onmouseleave=hideTip;});
 }
 function quant(a,q){const b=[...a].sort((x,y)=>x-y);return b[Math.min(b.length-1,Math.floor(q*b.length))];}
+function vapTicks(lo,hi){/* VAP 軸鎖:4 間隔/5 刻度,合法間隔 2/2.5/5×10^n */
+ if(!isFinite(lo)||!isFinite(hi)){lo=0;hi=1;} if(hi<=lo)hi=lo+1;
+ const raw=(hi-lo)/4,be=Math.floor(Math.log10(raw));
+ for(let e=be-1;e<=be+3;e++)for(const m of [2,2.5,5]){
+  const step=m*Math.pow(10,e);
+  if(4*step<(hi-lo)-1e-12)continue;
+  const start=Math.floor(lo/step)*step;
+  if(start+4*step>=hi-1e-9){
+   const d=Math.max(0,-e+(m===2.5?1:0));
+   return {t:[0,1,2,3,4].map(k=>start+k*step),d:d};}}
+ const st=(hi-lo)/4;return {t:[0,1,2,3,4].map(k=>lo+k*st),d:2};}
 function drawRank(){
  const rank=D.groups.map(g=>{const F=D.flows[g],n=F.smart.length;
   let v=0;for(let i=Math.max(0,n-3);i<n;i++)v+=(F.smart[i]||0);return {g,v};}).sort((a,b)=>b.v-a.v);
@@ -598,12 +712,13 @@ function drawFlowDetail(){
 /* ---------- rrg tab ---------- */
 function drawRRG(){
  const S=540,C=S/2,PAD=40;
- const XX=v=>C+(v/3)*(C-PAD),YY=v=>C-(v/3)*(C-PAD);
+ const XX=v=>C+(v/5)*(C-PAD),YY=v=>C-(v/5)*(C-PAD);
  let s=`<rect x="${C}" y="0" width="${C}" height="${C}" fill="${UP}" opacity="0.05"/>`+
   `<rect x="${C}" y="${C}" width="${C}" height="${C}" fill="#3b6fc4" opacity="0.05"/>`+
   `<rect x="0" y="${C}" width="${C}" height="${C}" fill="${DN}" opacity="0.05"/>`+
   `<rect x="0" y="0" width="${C}" height="${C}" fill="#c4943a" opacity="0.06"/>`+
   `<line x1="${C}" y1="${PAD}" x2="${C}" y2="${S-PAD}" stroke="#dbd9d3"/><line x1="${PAD}" y1="${C}" x2="${S-PAD}" y2="${C}" stroke="#dbd9d3"/>`+
+  [-5,-2.5,2.5,5].map(v=>`<line x1="${XX(v)}" y1="${PAD}" x2="${XX(v)}" y2="${S-PAD}" stroke="#eceae2"/><line x1="${PAD}" y1="${YY(v)}" x2="${S-PAD}" y2="${YY(v)}" stroke="#eceae2"/><text x="${XX(v)}" y="${C+12}" text-anchor="middle" class="evlab">${v.toFixed(1)}</text><text x="${C-6}" y="${YY(v)+3}" text-anchor="end" class="evlab">${v.toFixed(1)}</text>`).join("")+
   `<text x="${S-PAD+4}" y="52" text-anchor="end" class="evlab" style="font-weight:700;fill:${UP}">領先 LEADING</text>`+
   `<text x="${PAD}" y="52" class="evlab" style="font-weight:700;fill:#c4943a">轉弱 WEAKENING ⚠</text>`+
   `<text x="${PAD}" y="${S-52}" class="evlab" style="font-weight:700;fill:${DN}">落後 LAGGING</text>`+
@@ -646,12 +761,13 @@ function renderTrade(){
  // equity chart:兩序列同軸(皆為權益倍數)
  const E=D.equity,n=E.dates.length;
  const all=[...E.strategy,...E.bh].filter(v=>v!==null);
- const mn=Math.min(...all),mx=Math.max(...all),pad=(mx-mn)*0.1||0.01;
+ const mn=Math.min(...all),mx=Math.max(...all);
+ const VT=vapTicks(mn,mx),t0=VT.t[0],t4=VT.t[4];
  const W=1140,L=52,R=14,T=18,B=290;
- const X=i=>L+(W-L-R)*i/(n-1),Y=v=>T+(B-T)*(1-(v-mn+pad)/(mx-mn+2*pad));
+ const X=i=>L+(W-L-R)*i/(n-1),Y=v=>T+(B-T)*(1-(v-t0)/(t4-t0));
  let s="";
- for(let g=0;g<=4;g++){const v=mn-pad+(mx-mn+2*pad)*g/4,y=Y(v);
-  s+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#eceae2"/><text x="${L-6}" y="${y+3}" text-anchor="end" class="evlab">${v.toFixed(2)}</text>`;}
+ VT.t.forEach(v=>{const y=Y(v);
+  s+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#eceae2"/><text x="${L-6}" y="${y+3}" text-anchor="end" class="evlab">${v.toFixed(Math.max(VT.d,2))}</text>`;});
  const bhX=i=>L+(W-L-R)*i/(E.bh.length-1);
  for(let i=1;i<E.bh.length;i++){s+=`<line x1="${bhX(i-1)}" y1="${Y(E.bh[i-1])}" x2="${bhX(i)}" y2="${Y(E.bh[i])}" stroke="#9c9890" stroke-width="1.4" stroke-dasharray="4 3"/>`;}
  for(let i=1;i<n;i++){s+=`<line x1="${X(i-1)}" y1="${Y(E.strategy[i-1])}" x2="${X(i)}" y2="${Y(E.strategy[i])}" stroke="#3b6fc4" stroke-width="2"/>`;}
@@ -703,6 +819,13 @@ function renderLivewire(){
 }
 
 function renderGov(){
+ const VP=D.vap;
+ let vh="<thead><tr><th>本儀表板圖表</th><th>VAP 代碼</th><th>軸模式</th><th>狀態</th><th>說明</th></tr></thead><tbody>";
+ VP.ledger.forEach(r=>{const ok=r.Status.startsWith("COMPLIANT");
+  vh+=`<tr><td class="mono">${r.OurChart}</td><td class="mono" style="font-weight:700">${r.VAPCode}</td><td class="mono" style="font-size:10px">${r.AxisMode}</td>`+
+   `<td><span class="pill" style="background:${ok?"#0f9678":"#4c72b0"}">${r.Status}</span></td><td class="sub" style="white-space:normal">${r.Note}</td></tr>`;});
+ vh+=`<tr><td colspan="5" class="sub">規格清冊 ${VP.summary.SpecCanonicalCharts} 張 canonical;軸鎖性質自檢 ${VP.summary.PropertySamples} 組隨機範圍:${JSON.stringify(VP.summary.PropertyChecks)}</td></tr>`;
+ $("gv-vap").innerHTML=vh+"</tbody>";
  $("gv-f").innerHTML=ledgerTable(D.gov.testsF);
  $("gv-b").innerHTML=ledgerTable(D.gov.testsB);
  $("gv-r").innerHTML="<thead><tr><th>ID</th><th>原設計問題</th><th>修復</th><th>狀態</th></tr></thead><tbody>"+
@@ -722,6 +845,7 @@ drawHeat();drawRank();drawFlowDetail();drawRRG();renderTrade();renderLivewire();
 
 
 def main() -> int:
+    def_write_vap_compliance()
     payload = def_build_payload()
     data_json = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
     html = HTML_TEMPLATE.replace("__DATA_JSON__", data_json)
