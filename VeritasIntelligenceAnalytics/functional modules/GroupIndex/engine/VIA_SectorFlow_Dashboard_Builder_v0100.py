@@ -30,6 +30,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 MODULE_DIR = SCRIPT_DIR.parent
 RUN_MAIN = MODULE_DIR / "evidence" / "RUN_SECTORFLOW_V0100"
 RUN_TRADE = MODULE_DIR / "evidence" / "RUN_SECTORFLOW_TRADE_V0100"
+RUN_LIVEWIRE = MODULE_DIR / "evidence" / "RUN_LIVEWIRE_ADAPTER_V0100"
 DEFAULT_OUT = MODULE_DIR.parent.parent / "VIA_Reports" / "VIA_SectorFlow_AllInOne_Dashboard_v0100.html"
 
 VERSION = "0.1.00"
@@ -222,6 +223,15 @@ def def_build_payload() -> dict:
         "roles": role_matrix,
         "tradeMarks": trade_marks,
         "tradeStats": trade_stats,
+        "livewire": {
+            "summary": json.loads((RUN_LIVEWIRE / "adapter_run_summary.json").read_text("utf-8")),
+            "tests": ledger_rows(pd.read_csv(RUN_LIVEWIRE / "adapter_test_ledger.csv")),
+            "reconcile": [
+                {"sec": r["MotherSector"], "tk": r["MotherTicker"], "nm": r["MotherName"],
+                 "role": r["MotherRole"], "match": r["MatchType"], "lg": r["LocalGroup"]}
+                for _, r in pd.read_csv(RUN_LIVEWIRE / "mother_ssot_reconcile_ledger.csv").fillna("").iterrows()
+            ],
+        },
         "backtest": [
             {k: (r4(v) if isinstance(v, (int, float, np.floating)) and not isinstance(v, (bool, np.bool_)) else (bool(v) if isinstance(v, (bool, np.bool_)) else v)) for k, v in row.items()}
             for row in backtest.to_dict("records")
@@ -359,6 +369,15 @@ section{display:none}section.on{display:block}
  </div>
 </section>
 
+<section id="sec-livewire">
+ <div class="kpis" id="lw-kpis"></div>
+ <div class="grid2">
+ <div class="card"><h2>外部引擎匯入審計(10 份模組收斂)</h2><div class="scroll"><table id="lw-intake"></table></div></div>
+ <div class="card"><h2>轉接層驗證帳本(L01–L08)</h2><div class="scroll"><table id="lw-tests"></table></div></div>
+ </div>
+ <div class="card"><h2>VIA v1.1 母名冊 × 本地 SSOT 對帳明細(76 檔)</h2><div class="scroll"><table id="lw-reconcile"></table></div></div>
+</section>
+
 <section id="sec-gov">
  <div class="card"><h2>SectorFlow 測試帳本(F01–F26)</h2><div class="scroll"><table id="gv-f"></table></div></div>
  <div class="grid2">
@@ -389,7 +408,7 @@ function sigPill(s){const m={DYNAMIC_BUY:["BUY",UP],DYNAMIC_SETUP:["SETUP","#3b6
 function statusPill(s){const c=s==="PASS"?"#0f9678":(s==="WARN"?"#b57f1f":"#b5291a");return `<span class="pill" style="background:${c}">${s}</span>`;}
 
 /* ---------- tabs ---------- */
-const TABS=[["overview","總覽"],["index","鏈接指數"],["flow","資金位移"],["rrg","輪動象限"],["trade","交易回測"],["gov","治理矩陣"]];
+const TABS=[["overview","總覽"],["index","鏈接指數"],["flow","資金位移"],["rrg","輪動象限"],["trade","交易回測"],["livewire","接線驗證"],["gov","治理矩陣"]];
 let curTab="overview";
 function renderTabs(){$("tabbar").innerHTML=TABS.map(t=>`<span class="tb ${t[0]===curTab?'on':''}" data-t="${t[0]}">${t[1]}</span>`).join("");
  document.querySelectorAll("#tabbar .tb").forEach(e=>e.onclick=()=>{curTab=e.dataset.t;renderTabs();
@@ -661,6 +680,28 @@ function ledgerTable(rows){
   rows.map(r=>`<tr><td class="mono">${r.id}</td><td style="font-weight:600">${r.name}</td><td>${statusPill(r.status)}</td>`+
    `<td class="mono" style="font-size:10px">${r.sev}</td><td class="sub" style="white-space:normal;font-size:10.5px">${r.ev}</td></tr>`).join("")+"</tbody>";
 }
+function renderLivewire(){
+ const LW=D.livewire,s=LW.summary,rec=s.ReconcileSummary;
+ $("lw-kpis").innerHTML=
+  kpi(s.Status.replace("ADAPTER_",""),"轉接層狀態","#0f9678")+
+  kpi(s.HardFailures,"Hard Failures",s.HardFailures===0?"#0f9678":"#b5291a")+
+  kpi(`${rec.exact}/${rec.total}`,"v1.1 名冊精確命中",UP)+
+  kpi(rec.unmapped,"未命中(fail-closed)",rec.unmapped?"#b57f1f":"#0f9678")+
+  kpi(s.IntakeAudit.integrated.length,"外部模組已整合")+
+  kpi(s.IntakeAudit.rejected.length,"外部模組退回","#b57f1f");
+ let ih="<thead><tr><th>處置</th><th>模組</th></tr></thead><tbody>";
+ s.IntakeAudit.integrated.forEach(m=>{ih+=`<tr><td>${statusPill("PASS")}</td><td style="white-space:normal">${m}</td></tr>`;});
+ s.IntakeAudit.rejected.forEach(m=>{ih+=`<tr><td><span class="pill" style="background:#b57f1f">REJECT</span></td><td style="white-space:normal">${m}</td></tr>`;});
+ $("lw-intake").innerHTML=ih+"</tbody>";
+ $("lw-tests").innerHTML=ledgerTable(LW.tests);
+ let rh="<thead><tr><th>母系統族群</th><th class='num'>代碼</th><th>名稱</th><th>角色</th><th>比對結果</th><th>本地 L1 歸屬</th></tr></thead><tbody>";
+ LW.reconcile.forEach(r=>{
+  const ok=r.match==="EXACT_TICKER_MATCH";
+  rh+=`<tr><td>${r.sec}</td><td class="num mono">${r.tk}</td><td>${r.nm}</td><td class="mono" style="font-size:10px">${r.role}</td>`+
+   `<td><span class="pill" style="background:${ok?"#0f9678":(r.match.startsWith("FUZZY")?"#b57f1f":"#b5291a")}">${r.match}</span></td><td>${r.lg||"—"}</td></tr>`;});
+ $("lw-reconcile").innerHTML=rh+"</tbody>";
+}
+
 function renderGov(){
  $("gv-f").innerHTML=ledgerTable(D.gov.testsF);
  $("gv-b").innerHTML=ledgerTable(D.gov.testsB);
@@ -675,7 +716,7 @@ $("foot").innerHTML=`引擎:${D.meta.engineF} + ${D.meta.engineT} · Final Gate 
  `接真值:替換 def_generate_sector_panel 資料契約(Date×Ticker×AdjClose×Turnover×Daytrade×四路買賣超+宏觀七欄)。產生 ${D.meta.generated}`;
 
 renderTabs();renderOverview();renderIdxTabs();drawIndex();renderIdxTable();
-drawHeat();drawRank();drawFlowDetail();drawRRG();renderTrade();renderGov();
+drawHeat();drawRank();drawFlowDetail();drawRRG();renderTrade();renderLivewire();renderGov();
 </script></body></html>
 """
 
