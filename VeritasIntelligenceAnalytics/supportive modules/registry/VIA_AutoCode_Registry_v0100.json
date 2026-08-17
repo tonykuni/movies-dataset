@@ -2617,6 +2617,20 @@
    "kind": "規範",
    "note": "常備令②:每支 PowerShell 一鍵器必帶 20 加速器(A01-A20 四段狀態)+不卡斷(A18:非阻塞/心跳/永不 exit 不關窗/逾時斷路誠實 TIMEOUT)+動態進度條(A16:加權階段 0-100% 單調遞增)。既有 via-govroot v0104 已符;via-enter 快速道具 def_Say 階段流;後續新 PS 工具一律照此契約造。搭配常備令① via-run 留痕包裝,中斷不失紀錄。",
    "ts": "2026-08-17"
+  },
+  {
+   "code": "TOOL-039",
+   "name": "via_registry_unionmerge_v0100",
+   "kind": "工具",
+   "note": "帳本 JSON 聯集解衝突助手:多會話 append-only ledger 為永恆衝突點——自動化「雙方全保留」:git index 三態讀 ours/theirs,ledger=ours 全序+theirs 補缺條(dict 全等判重),components=ours 優先補缺鍵,寫前 JSON 自驗,git add 標記已解;任一側非法 JSON=HOLD 不動。容器真衝突夾具:分岔兩側各 append→合併撞→助手解→斷言雙方零丟失+無殘留 PASS。",
+   "ts": "2026-08-17"
+  },
+  {
+   "code": "TOOL-035",
+   "name": "Invoke-VIA-Enter-v0101",
+   "kind": "工具",
+   "note": "ONE POWERSHELL TO HANDLE ALL 令:進場器+Git 自癒鏈統包——⑦未完成合併自動處置(唯帳本檔衝突=聯集助手+commit --no-edit 續完;其他=merge --abort 回合併前態零損;分支非 main 自動切回,擋路 AUTOSTASH 具名可還原;pull 後新衝突同規則);⑧Transcript 全程留痕(常備令①);⑨階段加權進度條 0-100%+零 Read-Host 永不 exit(常備令②)。rebase/cherry-pick 罕見態誠實 HOLD 不自動動。AST 0 錯+容器煙測綠。",
+   "ts": "2026-08-17"
   }
  ]
 }
