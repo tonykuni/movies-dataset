@@ -162,7 +162,7 @@ p.on('pageerror', e => errs.push(String(e)));
 p.on('console', m => {{ if (m.type() === 'error') errs.push(m.text()); }});
 await p.goto('{dash_url}');
 await p.waitForTimeout(600);
-const tabs = ['overview','index','flow','rrg','trade','livewire','gov'];
+const tabs = ['overview','roster','index','flow','rrg','trade','livewire','gov'];
 let visible = 0;
 for (const t of tabs) {{
   await p.click(`[data-t="${{t}}"]`);
@@ -176,12 +176,12 @@ await b.close();
         sp = subprocess.run(["node", str(smoke_js)], cwd=smoke_dir, capture_output=True, text=True, timeout=180)
         try:
             out = json.loads((sp.stdout or "").strip().splitlines()[-1])
-            ok = sp.returncode == 0 and out.get("jsErrors") == 0 and out.get("tabsVisible") == 7
+            ok = sp.returncode == 0 and out.get("jsErrors") == 0 and out.get("tabsVisible") == 8
             smoke_status = "PASS" if ok else "FAIL"
             smoke_detail = json.dumps(out)
         except Exception as exc:
             smoke_status, smoke_detail = "FAIL", f"{type(exc).__name__}: {sp.stderr[:120]}"
-    add("M10", "SYSTEM-TEST:Chromium 七分頁零 JS 錯誤", smoke_status == "PASS",
+    add("M10", "SYSTEM-TEST:Chromium 八分頁零 JS 錯誤", smoke_status == "PASS",
         "HARD" if smoke_status != "SKIPPED_DEPENDENCY" else "REVIEW", smoke_detail)
     phase("SYSTEM-TEST", smoke_status if smoke_status != "SKIPPED_DEPENDENCY" else "SKIP", smoke_detail)
 

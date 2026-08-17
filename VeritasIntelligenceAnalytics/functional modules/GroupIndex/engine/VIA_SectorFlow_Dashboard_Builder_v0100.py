@@ -289,6 +289,29 @@ def def_build_payload() -> dict:
         ]
 
     latest_reviews = reviews.sort_values("ReviewDate").drop_duplicates("Ticker", keep="last")
+
+    # ---- 名單分頁:SSOT 全成員名單 × 最新一期角色 ----
+    membership = pd.read_csv(RUN_MAIN / "sector_membership_input.csv", dtype={"Ticker": str}).fillna("")
+    role_by_ticker = {str(r["Ticker"]): (r["Role"], r["SizeTier"])
+                      for _, r in latest_reviews.iterrows()}
+    members = [
+        {"g": r["Group"], "sub": r["Subgroup"], "tk": str(r["Ticker"]), "nm": r["Name"],
+         "mkt": r["Market"], "cnt": r["CountingFlag"] == "COUNT",
+         "role": role_by_ticker.get(str(r["Ticker"]), ("", ""))[0],
+         "tier": role_by_ticker.get(str(r["Ticker"]), ("", ""))[1]}
+        for _, r in membership.sort_values(["Group", "Subgroup", "Ticker"]).iterrows()
+    ]
+
+    # ---- 詳細結果矩陣(治理分頁):Master/ETF/Preflight 帳本 ----
+    evd = MODULE_DIR / "evidence"
+    # MasterValidation 執行中會先清掉自身 RUN 目錄再跑 pytest(內含本 builder 的 payload 測試),
+    # 故此帳本採容忍讀取:缺席時誠實給空表,不得中斷、不得假造。
+    master_ledger_path = evd / "RUN_MASTER_VALIDATION_V0100" / "master_test_ledger.csv"
+    master_ledger = (pd.read_csv(master_ledger_path) if master_ledger_path.exists()
+                     else pd.DataFrame(columns=["TestID", "TestName", "Status", "Severity", "Evidence"]))
+    etf_summary = json.loads((evd / "RUN_ETF_CONSOLES_V0100" / "etf_consoles_summary.json").read_text("utf-8"))
+    preflight = json.loads((evd / "RUN_ENV_PREFLIGHT_V0100" / "env_preflight_report.json").read_text("utf-8"))
+
     role_matrix = []
     for g in groups:
         sub = latest_reviews[latest_reviews["Group"] == g]
@@ -312,6 +335,16 @@ def def_build_payload() -> dict:
         },
         "dates": date_str,
         "groups": groups,
+        "members": members,
+        "suite": {
+            "master": ledger_rows(master_ledger),
+            "etf": [{"chk": r["Check"], "res": f"{r['Passed']}/{r['Total']}",
+                     "sec": r["Seconds"], "v": r["Verdict"]} for r in etf_summary["Checks"]],
+            "etfStatus": etf_summary["Status"],
+            "preflight": [{"imp": t["Import"], "pip": t["PipName"], "ok": bool(t["Installed"]),
+                           "ver": t["Version"]} for t in preflight["RequiredTools"]],
+            "preflightEnv": preflight["CurrentEnv"]["Classification"],
+        },
         "index": index_map,
         "flowDates": flow_date_str,
         "flows": flow_map,
@@ -417,6 +450,13 @@ section{display:none}section.on{display:block}
   <div class="scroll"><table id="ov-roles"></table></div></div>
 </section>
 
+<section id="sec-roster">
+ <div class="kpis" id="ro-kpis"></div>
+ <div class="card"><h2>族群總表(SSOT L1 · 含子群/計數/最新角色)</h2>
+  <div class="bar" id="ro-tabs"></div>
+  <div class="scroll" style="max-height:560px"><table id="ro-table"></table></div></div>
+</section>
+
 <section id="sec-index">
  <div class="bar" id="idx-tabs"></div>
  <div class="card">
@@ -487,6 +527,16 @@ section{display:none}section.on{display:block}
  <div class="card"><h2>Repair Ledger(原設計缺陷修復)</h2><div class="scroll"><table id="gv-r"></table></div></div>
  </div>
  <div class="card"><h2>Pipeline Phases</h2><div class="scroll"><table id="gv-p"></table></div></div>
+ <div class="card"><h2>詳細結果矩陣 — 偵測層(4 情境 × 2 種子 · 全欄位)</h2>
+  <div class="scroll"><table id="gv-detect"></table></div></div>
+ <div class="card"><h2>詳細結果矩陣 — 交易層(全欄位)</h2>
+  <div class="scroll"><table id="gv-tradebt"></table></div></div>
+ <div class="grid2">
+ <div class="card"><h2>MasterValidation 帳本(M01–M10 / U01–U05)</h2><div class="scroll"><table id="gv-m"></table></div></div>
+ <div class="card"><h2>ETF 主控台收證(142 checks)+ 環境前哨</h2>
+  <div class="scroll"><table id="gv-etf"></table></div>
+  <div class="scroll" style="margin-top:8px"><table id="gv-env"></table></div></div>
+ </div>
 </section>
 
 <div class="foot" id="foot"></div>
@@ -510,7 +560,7 @@ function sigPill(s){const m={DYNAMIC_BUY:["BUY",UP],DYNAMIC_SETUP:["SETUP","#3b6
 function statusPill(s){const c=s==="PASS"?"#0f9678":(s==="WARN"?"#b57f1f":"#b5291a");return `<span class="pill" style="background:${c}">${s}</span>`;}
 
 /* ---------- tabs ---------- */
-const TABS=[["overview","總覽"],["index","鏈接指數"],["flow","資金位移"],["rrg","輪動象限"],["trade","交易回測"],["livewire","接線驗證"],["gov","治理矩陣"]];
+const TABS=[["overview","總覽"],["roster","名單"],["index","鏈接指數"],["flow","資金位移"],["rrg","輪動象限"],["trade","交易回測"],["livewire","接線驗證"],["gov","治理矩陣"]];
 let curTab="overview";
 function renderTabs(){$("tabbar").innerHTML=TABS.map(t=>`<span class="tb ${t[0]===curTab?'on':''}" data-t="${t[0]}">${t[1]}</span>`).join("");
  document.querySelectorAll("#tabbar .tb").forEach(e=>e.onclick=()=>{curTab=e.dataset.t;renderTabs();
@@ -521,6 +571,46 @@ function renderTabs(){$("tabbar").innerHTML=TABS.map(t=>`<span class="tb ${t[0]=
 
 /* ---------- overview ---------- */
 function kpi(v,l,c){return `<div class="kpi"><div class="v" style="${c?('color:'+c):''}">${v}</div><div class="l">${l}</div></div>`;}
+
+/* ---------- roster(名單) ---------- */
+let roGroup="ALL";
+function rolePill(r){const m={LEADER:["領頭",UP],PEER:["同步","#3b6fc4"],MEMBER:["成員","#9c9890"],LAGGARD:["落後","#b57f1f"]};
+ const p=m[r];return p?`<span class="pill" style="background:${p[1]}">${p[0]}</span>`:"—";}
+function renderRoster(){
+ const gs=[...new Set(D.members.map(m=>m.g))];
+ const cnt=D.members.filter(m=>m.cnt).length;
+ const roles=D.members.filter(m=>m.role==="LEADER").length;
+ $("ro-kpis").innerHTML=kpi(gs.length,"L1 族群數")+kpi(D.members.length,"名單總檔數")+
+  kpi(cnt,"計數成員(COUNT)")+kpi(roles,"最新一期 LEADER 檔數",UP);
+ $("ro-tabs").innerHTML=[["ALL","全部"]].concat(gs.map(g=>[g,short(g)])).map(t=>
+  `<span class="sb ${t[0]===roGroup?'on':''}" data-g="${t[0]}">${t[1]}</span>`).join("");
+ document.querySelectorAll("#ro-tabs .sb").forEach(e=>e.onclick=()=>{roGroup=e.dataset.g;renderRoster();});
+ const rows=D.members.filter(m=>roGroup==="ALL"||m.g===roGroup);
+ $("ro-table").innerHTML="<tr><th>族群</th><th>子群</th><th>代號</th><th>名稱</th><th>市場</th><th>計數</th><th>角色</th><th>規模</th></tr>"+
+  rows.map(m=>`<tr><td>${m.g}</td><td>${m.sub}</td><td class="mono">${m.tk}</td><td>${m.nm}</td><td>${m.mkt}</td>`+
+   `<td>${m.cnt?"COUNT":"—"}</td><td>${rolePill(m.role)}</td><td class="mono">${m.tier||"—"}</td></tr>`).join("");
+}
+
+/* ---------- 詳細結果矩陣(治理) ---------- */
+function fullMatrix(el,rows){
+ if(!rows.length){ $(el).innerHTML=""; return; }
+ const cols=Object.keys(rows[0]);
+ $(el).innerHTML="<tr>"+cols.map(c=>`<th>${c}</th>`).join("")+"</tr>"+
+  rows.map(r=>"<tr>"+cols.map(c=>{const v=r[c];
+   return `<td class="${typeof v==="number"?"num":""} mono">${v===null||v===undefined?"—":v}</td>`;}).join("")+"</tr>").join("");
+}
+function renderDetailMatrix(){
+ fullMatrix("gv-detect",D.backtest);
+ fullMatrix("gv-tradebt",D.tradeBacktest);
+ $("gv-m").innerHTML="<tr><th>ID</th><th>測試</th><th>Severity</th><th>結果</th><th>證據</th></tr>"+
+  D.suite.master.map(t=>`<tr><td class="mono">${t.id}</td><td>${t.name}</td><td>${t.sev}</td>`+
+   `<td>${statusPill(t.status)}</td><td class="sub">${t.ev}</td></tr>`).join("");
+ $("gv-etf").innerHTML=`<tr><th>檢查面</th><th class="num">結果</th><th class="num">秒</th><th>判定(${D.suite.etfStatus})</th></tr>`+
+  D.suite.etf.map(r=>`<tr><td class="mono">${r.chk}</td><td class="num">${r.res}</td><td class="num">${r.sec}</td><td>${statusPill(r.v)}</td></tr>`).join("");
+ $("gv-env").innerHTML=`<tr><th>工具(import)</th><th>pip 套件</th><th>版本</th><th>安裝(${D.suite.preflightEnv})</th></tr>`+
+  D.suite.preflight.map(t=>`<tr><td class="mono">${t.imp}</td><td class="mono">${t.pip}</td><td class="mono">${t.ver}</td>`+
+   `<td>${statusPill(t.ok?"PASS":"FAIL")}</td></tr>`).join("");
+}
 function renderOverview(){
  const m=D.meta;
  const rot=D.tradeBacktest.filter(r=>r.Scenario==="ROTATION");
@@ -838,8 +928,8 @@ $("foot").innerHTML=`引擎:${D.meta.engineF} + ${D.meta.engineT} · Final Gate 
  `所有數字來自受控 DGP 實跑 evidence(SHA256 manifest 後驗),僅驗證方法邏輯,非實盤績效、非投資建議。`+
  `接真值:替換 def_generate_sector_panel 資料契約(Date×Ticker×AdjClose×Turnover×Daytrade×四路買賣超+宏觀七欄)。產生 ${D.meta.generated}`;
 
-renderTabs();renderOverview();renderIdxTabs();drawIndex();renderIdxTable();
-drawHeat();drawRank();drawFlowDetail();drawRRG();renderTrade();renderLivewire();renderGov();
+renderTabs();renderOverview();renderRoster();renderIdxTabs();drawIndex();renderIdxTable();
+drawHeat();drawRank();drawFlowDetail();drawRRG();renderTrade();renderLivewire();renderGov();renderDetailMatrix();
 </script></body></html>
 """
 

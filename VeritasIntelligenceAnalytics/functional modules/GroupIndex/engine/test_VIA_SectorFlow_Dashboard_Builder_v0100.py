@@ -33,8 +33,12 @@ def test_dashboard_html_self_contained() -> None:
     out = MODULE.DEFAULT_OUT
     assert out.exists(), "run builder first"
     html = out.read_text("utf-8")
-    for tab in ["總覽", "鏈接指數", "資金位移", "輪動象限", "交易回測", "治理矩陣"]:
+    for tab in ["總覽", "名單", "鏈接指數", "資金位移", "輪動象限", "交易回測", "治理矩陣"]:
         assert tab in html, tab
+    # 名單與詳細結果矩陣required tokens
+    for token in ["sec-roster", "ro-table", "gv-detect", "gv-tradebt", "gv-m", "gv-etf", "gv-env",
+                  '"members":', '"suite":', "詳細結果矩陣"]:
+        assert token in html, token
     # 零外部資產:無 http(s) 連結的 script/link/img。
     assert not re.search(r'<(script|link|img)[^>]+(src|href)="https?://', html)
     # 資料已嵌入。
