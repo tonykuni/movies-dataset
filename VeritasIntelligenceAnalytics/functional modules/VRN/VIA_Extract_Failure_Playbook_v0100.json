@@ -1,0 +1,112 @@
+{
+ "schema": "VIA.ExtractFailurePlaybook.v1",
+ "ts": "2026-08-18",
+ "source": "操作員令 TOP 15 POTENTIAL FAILURES & SOLUTIONS",
+ "items": [
+  {
+   "id": 1,
+   "name": "隱形表(無框線)",
+   "solution": "camelot flavor=stream 白位距重建",
+   "status": "IMPLEMENTED",
+   "where": "TOOL-029 omni:camelot lattice→stream 雙模自動降階"
+  },
+  {
+   "id": 2,
+   "name": "亂碼/Mojibake(字型編碼壞)",
+   "solution": "亂碼率偵測→OCR fallback",
+   "status": "IMPLEMENTED",
+   "where": "TOOL-050 text_omni:mojibake_score>15%→OCR_FALLBACK_CANDIDATE 註記"
+  },
+  {
+   "id": 3,
+   "name": "巨型 xlsx OOM",
+   "solution": "read_only 串流模式",
+   "status": "IMPLEMENTED",
+   "where": "TOOL-050 L03:openpyxl read_only=True+data_only 逐列"
+  },
+  {
+   "id": 4,
+   "name": "合併格錯位",
+   "solution": "forward-fill 主格值下拷",
+   "status": "IMPLEMENTED",
+   "where": "TOOL-026 SDX:合併格還原(15 檢之一);TOOL-050 L10 橋接"
+  },
+  {
+   "id": 5,
+   "name": "多欄橫讀混行",
+   "solution": "blocks 排序後串接",
+   "status": "IMPLEMENTED",
+   "where": "TOOL-050 L01:get_text('blocks', sort=True)"
+  },
+  {
+   "id": 6,
+   "name": "頁首頁尾/註解盲區",
+   "solution": "sections.header/footer 顯式迴圈",
+   "status": "IMPLEMENTED",
+   "where": "TOOL-050 L02:本文+全 sections 頁首頁尾補抓"
+  },
+  {
+   "id": 7,
+   "name": "原生 binary 依賴地獄",
+   "solution": "容器化/預檢",
+   "status": "IMPLEMENTED_VARIANT",
+   "where": "全家 graceful 可用性探測(YELLOW_ABSENT 誠實)+via-install 同意閘+via-plan 分段 dry-run(不採 Docker,採預檢)"
+  },
+  {
+   "id": 8,
+   "name": "SharedStrings 膨脹拖慢",
+   "solution": "直讀 zip 內 XML 串流",
+   "status": "REGISTERED",
+   "where": "候補道:L03 read_only 已緩解;極端件才需 raw-XML 道(冊記候令)"
+  },
+  {
+   "id": 9,
+   "name": "格內多行斷列",
+   "solution": "斷行正規化 token 化",
+   "status": "IMPLEMENTED",
+   "where": "TOOL-026 SDX:參差列修復+數值等價;TOOL-045 article:CJK 斷行黏合"
+  },
+  {
+   "id": 10,
+   "name": "巢狀表遞迴爆",
+   "solution": "XML 樹遞迴先抽最深層",
+   "status": "REGISTERED",
+   "where": "候補道:SDX/pydocx 平面表已覆蓋;巢狀件現況零遇例(冊記候令)"
+  },
+  {
+   "id": 11,
+   "name": "掃描件旋轉歪斜",
+   "solution": "OSD 偵測+仿射轉正",
+   "status": "PARTIAL",
+   "where": "TOOL-028 rescue:逐頁升階道;OSD 自動轉正=候補(冊記)"
+  },
+  {
+   "id": 12,
+   "name": "zip 炸彈",
+   "solution": "膨脹比+絕對上限閘",
+   "status": "IMPLEMENTED",
+   "where": "TOOL-050 guard_zipbomb:200x 比+500MB 上限,超標即斷"
+  },
+  {
+   "id": 13,
+   "name": "加密檔掛死行程",
+   "solution": "加密預檢 fail-fast",
+   "status": "IMPLEMENTED",
+   "where": "TOOL-050 guard_encrypted:fitz needs_pass 即斷"
+  },
+  {
+   "id": 14,
+   "name": "浮動圖形文字框漏抓",
+   "solution": "drawing 層/w:drawing 節點",
+   "status": "REGISTERED",
+   "where": "候補道:page.get_drawings()/docx XML 掃(冊記候令)"
+  },
+  {
+   "id": 15,
+   "name": "批次記憶體洩漏",
+   "solution": "微行程隔離+gc",
+   "status": "IMPLEMENTED",
+   "where": "TOOL-029/049:重車道全子行程隔離(進程終即釋);TOOL-018 sysman 分輪快照"
+  }
+ ]
+}
