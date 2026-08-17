@@ -113,6 +113,7 @@ def def_simulate_group_trades(g: pd.DataFrame) -> Tuple[pd.DataFrame, List[Dict[
 
     levels = g["ChainedIndex"].to_numpy(dtype=float)
     signals = g["StrategySignal"].to_numpy()
+    states = g["MigrationState"].to_numpy() if "MigrationState" in g.columns else np.array([""] * n)
     mults = g["ExposureMultiplier"].to_numpy(dtype=float)
     atrs = g["AtrPct"].to_numpy(dtype=float)
     dates = g["Date"].to_numpy()
@@ -139,6 +140,8 @@ def def_simulate_group_trades(g: pd.DataFrame) -> Tuple[pd.DataFrame, List[Dict[
         sig = signals[t]
         new_position = position
         if sig == "DYNAMIC_EXIT" or stop_hit or mults[t] <= 0.0:
+            # EXIT 訊號僅由宏觀熔斷或 OUTFLOW_DRAINING 觸發(引擎端已無
+            # 噪音型 EXIT),故此處一律平倉;停損另行生效。
             new_position = 0.0
         elif sig == "DYNAMIC_BUY":
             new_position = FULL_FRACTION * mults[t]

@@ -78,7 +78,7 @@ PANEL_END = "2026-08-14"
 INDEX_PLOT_START = "2025-01-02"
 INDEX_BASE_DATE = "2026-01-02"
 INDEX_BASE_VALUE = 100.0
-REVIEW_LOOKBACK = 60            # 定審回看交易日數(資源限制,非市場紅線)
+REVIEW_LOOKBACK = 90            # 定審回看交易日數(lag 辨識訊噪比;資源限制,非市場紅線)
 
 CONTROLLED_SEEDS = [17, 20260817]
 CONTROLLED_SCENARIOS = ["ROTATION", "MARKET_TIDE", "STEALTH_ACCUMULATION", "DRAIN"]
@@ -799,12 +799,13 @@ def def_review_roles(
         lead_state = r["REVIEW_LEADERSHIPState"]
         if not np.isfinite(lag):
             roles.append("MEMBER")
-        elif lead_state == "HIGH" and lag > 0 and r["ExcessAlpha"] > 0:
+        elif lag > 0 and lead_state != "LOW" and r["ExcessAlpha"] > 0:
+            # 領先方向 + 領先證據非低群 + 超額 Alpha 正向 → LEADER
+            # (原版要求 lead_state 嚴格 HIGH,GMM 二元件時 HIGH 簇過窄,
+            #  造成 LEADER 召回近零;放寬至「非 LOW」仍為資料導出狀態。)
             roles.append("LEADER")
-        elif sync_state in {"HIGH", "MIXED"} and lag == 0:
+        elif lag == 0 and sync_state != "LOW":
             roles.append("PEER")
-        elif lag < 0 and sync_state == "LOW" and lead_state == "LOW":
-            roles.append("LAGGARD")
         elif lag < 0:
             roles.append("LAGGARD")
         else:
