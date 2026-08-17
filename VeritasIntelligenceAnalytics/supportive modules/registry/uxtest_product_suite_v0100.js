@@ -1,7 +1,7 @@
 const { chromium } = require('playwright');
 const BASE = 'file:///home/user/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/product_ui/';
 (async () => {
-  const browser = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+  const browser = await chromium.launch({ executablePath: process.env.PW_CHROME || '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
   const page = await browser.newPage({ viewport: { width: 1600, height: 900 } });
   const R = []; const c = (n, ok, note) => R.push([ok ? 'PASS' : 'FAIL', n, note || '']);
   const ext = []; page.on('request', r => { if (!r.url().startsWith('file://')) ext.push(r.url()); });
