@@ -46,6 +46,7 @@ PYTEST_FILES = [
     "test_VIA_SectorFlow_Dashboard_Builder_v0100.py",
     "test_VIA_LiveWire_ContractAdapter_v0100.py",
     "test_VIA_VAP_AxisLock_v0100.py",
+    "test_VIA_ETF_Consoles_v0100.py",
 ]
 SMOKE_DIR_CANDIDATES = [
     Path("/tmp/claude-0/-home-user-movies-dataset/9abe56e7-fb43-5860-8b32-d5fe7a718553/scratchpad"),
@@ -83,7 +84,7 @@ def def_run_master_validation() -> Dict[str, Any]:
     )
     unit_ok = proc.returncode == 0
     tail = (proc.stdout or "").strip().splitlines()[-1] if proc.stdout else ""
-    add("M01", "UNIT-TEST:pytest 六套件全過", unit_ok, "HARD", tail)
+    add("M01", "UNIT-TEST:pytest 七套件全過", unit_ok, "HARD", tail)
     phase("UNIT-TEST", "PASS" if unit_ok else "FAIL", tail)
 
     # ---------------- DEBUG:三 run manifest 重驗(不可變性) ----------------
