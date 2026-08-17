@@ -49,6 +49,7 @@ PYTEST_FILES = [
 ]
 SMOKE_DIR_CANDIDATES = [
     Path("/tmp/claude-0/-home-user-movies-dataset/9abe56e7-fb43-5860-8b32-d5fe7a718553/scratchpad"),
+    MODULE_DIR / "smoke_tooling",   # Windows 本機:由 OneClick [S3] SMOKE-TOOLING 準備 playwright-core
 ]
 
 
@@ -141,14 +142,24 @@ def def_run_master_validation() -> Dict[str, Any]:
     if smoke_dir is not None:
         # ESM import 以腳本所在位置解析 node_modules,故腳本必須寫入 smoke_dir。
         smoke_js = smoke_dir / "master_system_smoke.mjs"
+        dash_url = "file:///" + DASHBOARD.as_posix().lstrip("/")
         smoke_js.write_text(f'''
 import {{ chromium }} from 'playwright-core';
-const b = await chromium.launch({{ executablePath: '/opt/pw-browsers/chromium' }});
+import fs from 'node:fs';
+// 瀏覽器解析:沙盒用預裝 Chromium;Windows 本機退回系統 Edge → Chrome(playwright-core channel)
+async function launchAny() {{
+  if (fs.existsSync('/opt/pw-browsers/chromium')) {{
+    return chromium.launch({{ executablePath: '/opt/pw-browsers/chromium' }});
+  }}
+  try {{ return await chromium.launch({{ channel: 'msedge' }}); }}
+  catch {{ return chromium.launch({{ channel: 'chrome' }}); }}
+}}
+const b = await launchAny();
 const p = await b.newPage({{ viewport: {{ width: 1280, height: 900 }} }});
 const errs = [];
 p.on('pageerror', e => errs.push(String(e)));
 p.on('console', m => {{ if (m.type() === 'error') errs.push(m.text()); }});
-await p.goto('file://{DASHBOARD}');
+await p.goto('{dash_url}');
 await p.waitForTimeout(600);
 const tabs = ['overview','index','flow','rrg','trade','livewire','gov'];
 let visible = 0;

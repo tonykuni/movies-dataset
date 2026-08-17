@@ -54,8 +54,25 @@ def test_ps1_fail_closed_and_governance() -> None:
     assert TEXT.count("throw") >= 4                       # compile/unit/engine/gate 全 fail-closed
     assert "$LASTEXITCODE -ne 0" in TEXT
     assert "exit $exitCode" in TEXT
-    for p in ["$PythonExe", "$EnforceEnv", "$SkipEngines", "$OpenHtml", "$KeepOpen"]:
+    for p in ["$PythonExe", "$EnforceEnv", "$SyncRepo", "$ResetEvidence", "$SetupSmoke",
+              "$SkipEngines", "$OpenHtml", "$KeepOpen"]:
         assert p in TEXT, p
+
+
+def test_ps1_sync_hash_smoke_segments_contract() -> None:
+    # [S1] GIT-SYNC:evidence 還原 + 分支同步 + launcher 自我更新重執行
+    assert "def_SyncRepo" in TEXT
+    assert "claude/via-group-classification-index-5h274b" in TEXT
+    assert "git -C $RepoRoot restore" in TEXT
+    assert "VIA_ONECLICK_RESYNCED" in TEXT
+    # [S2] HASH-AUDIT:git 乾淨度 + SHA-256 列印
+    assert "def_HashAudit" in TEXT
+    assert "status --porcelain" in TEXT
+    assert "Get-FileHash" in TEXT
+    # [S3] SMOKE-TOOLING:playwright-core 只裝進 smoke_tooling
+    assert "def_SmokeTooling" in TEXT
+    assert "smoke_tooling" in TEXT
+    assert "playwright-core" in TEXT
 
 
 def test_ps1_env_preflight_segment_contract() -> None:
