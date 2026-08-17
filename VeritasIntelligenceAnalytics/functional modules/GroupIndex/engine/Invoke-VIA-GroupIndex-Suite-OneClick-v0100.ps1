@@ -6,8 +6,9 @@
 .DESCRIPTION
     單一入口統包執行 GroupIndex 五引擎完整交付節奏:
 
-      [1] COMPILE-GATE   六份 Python 引擎 py_compile
-      [2] UNIT-TEST      pytest 五套件(27 tests)
+      [0] ENV-PREFLIGHT  via_ 環境治理前哨(自動解析 via_core python + EnvManager 契約檢核)
+      [1] COMPILE-GATE   Python 引擎 py_compile
+      [2] UNIT-TEST      pytest 六套件
       [3] SECTORFLOW     族群指數/資金流引擎(TEST→DEBUG→OPTIMIZE→BACK-TEST→CONSOLIDATE 收斂迴圈)
       [4] TRADE-BACKTEST 訊號交易層回測(T+1/成本/置換 null)
       [5] LIVEWIRE       接線合約轉接層(fail-closed/SSOT 對帳)
@@ -17,7 +18,8 @@
 
     治理不變項:零網路、零下單、append-only、fail-closed、不可變 manifest。
 
-.PARAMETER PythonExe   Python 直譯器(預設 python)
+.PARAMETER PythonExe   Python 直譯器(預設 python;自動優先解析 C:\Users\<u>\envs\via_* 管理環境)
+.PARAMETER EnforceEnv  1=非 via_ 管理環境即 fail-closed(預設 1;沙盒/CI 可設 0 改報告模式)
 .PARAMETER SkipEngines 只跑驗證(UNIT-TEST + MASTER-VALIDATE),不重跑引擎
 .PARAMETER OpenHtml    完成後開啟儀表板(1=開啟)
 .PARAMETER KeepOpen    結束後保留視窗等待 Enter
@@ -28,6 +30,7 @@
 [CmdletBinding()]
 param(
     [string]$PythonExe = "python",
+    [int]$EnforceEnv = 1,
     [int]$SkipEngines = 0,
     [int]$OpenHtml = 1,
     [int]$KeepOpen = 1
@@ -43,6 +46,7 @@ $EvidenceDir = Join-Path $ModuleDir "evidence"
 $DashboardHtml = Join-Path (Split-Path (Split-Path $ModuleDir -Parent) -Parent) "VIA_Reports\VIA_SectorFlow_AllInOne_Dashboard_v0100.html"
 
 $Engines = @(
+    "VIA_GroupIndex_EnvPreflight_v0100.py",
     "VIA_SectorFlow_AdaptiveChainedIndex_v0100.py",
     "VIA_SectorFlow_SignalTradeBacktest_v0100.py",
     "VIA_LiveWire_ContractAdapter_v0100.py",
@@ -50,12 +54,28 @@ $Engines = @(
     "VIA_GroupIndex_MasterValidation_v0100.py"
 )
 $TestFiles = @(
+    "test_VIA_GroupIndex_EnvPreflight_v0100.py",
     "test_VIA_SectorFlow_AdaptiveChainedIndex_v0100.py",
     "test_VIA_SectorFlow_SignalTradeBacktest_v0100.py",
     "test_VIA_SectorFlow_Dashboard_Builder_v0100.py",
     "test_VIA_LiveWire_ContractAdapter_v0100.py",
     "test_VIA_VAP_AxisLock_v0100.py"
 )
+
+function def_ResolveViaPython {
+    # via_ 管理環境自動解析(候選順序沿用 Invoke-VeritasNexusCore.ps1 契約)
+    param([string]$Requested)
+    if ($Requested -ne "python") { return $Requested }   # 使用者顯式指定 → 尊重不覆寫
+    $candidates = @(
+        (Join-Path $env:USERPROFILE "envs\via_groupindex_312\Scripts\python.exe"),
+        (Join-Path $env:USERPROFILE "envs\via_core_313\Scripts\python.exe"),
+        (Join-Path $env:USERPROFILE "envs\via_core_312\Scripts\python.exe")
+    )
+    foreach ($candidate in $candidates) {
+        if (Test-Path -LiteralPath $candidate) { return $candidate }
+    }
+    return $Requested
+}
 
 function def_WriteBanner {
     param([string]$Title)
@@ -89,8 +109,15 @@ function def_ReadJson {
 
 function def_Main {
     def_WriteBanner "VERITAS INTELLIGENCE ANALYTICS · GROUPINDEX SUITE · ONE POWERSHELL TO HANDLE ALL · v0100"
+    $script:PythonExe = def_ResolveViaPython -Requested $PythonExe
+    Write-Host "def Python : $PythonExe" -ForegroundColor White
     Push-Location $EngineDir
     try {
+        # [0] ENV-PREFLIGHT — via_ 環境治理前哨(VIA_EnvManager 契約;EnforceEnv=1 時 fail-closed)
+        $preflightArgs = @("VIA_GroupIndex_EnvPreflight_v0100.py")
+        if ($EnforceEnv -eq 1) { $preflightArgs += "--enforce" }
+        def_InvokePython -Label "ENV-PREFLIGHT (via_ governance · EnvManager contract)" -Percent 3 -Arguments $preflightArgs
+
         # [1] COMPILE-GATE
         foreach ($engine in $Engines) {
             if (-not (Test-Path -LiteralPath (Join-Path $EngineDir $engine))) { throw "Engine missing: $engine" }

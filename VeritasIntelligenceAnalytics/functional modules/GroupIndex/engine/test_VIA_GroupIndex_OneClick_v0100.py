@@ -25,6 +25,8 @@ def test_ps1_balanced_delimiters() -> None:
 
 def test_ps1_references_all_engines_and_tests() -> None:
     for name in [
+        "VIA_GroupIndex_EnvPreflight_v0100.py",
+        "test_VIA_GroupIndex_EnvPreflight_v0100.py",
         "VIA_SectorFlow_AdaptiveChainedIndex_v0100.py",
         "VIA_SectorFlow_SignalTradeBacktest_v0100.py",
         "VIA_LiveWire_ContractAdapter_v0100.py",
@@ -52,5 +54,14 @@ def test_ps1_fail_closed_and_governance() -> None:
     assert TEXT.count("throw") >= 4                       # compile/unit/engine/gate 全 fail-closed
     assert "$LASTEXITCODE -ne 0" in TEXT
     assert "exit $exitCode" in TEXT
-    for p in ["$PythonExe", "$SkipEngines", "$OpenHtml", "$KeepOpen"]:
+    for p in ["$PythonExe", "$EnforceEnv", "$SkipEngines", "$OpenHtml", "$KeepOpen"]:
         assert p in TEXT, p
+
+
+def test_ps1_env_preflight_segment_contract() -> None:
+    # [0] ENV-PREFLIGHT:via_ python 自動解析 + EnvManager 契約 enforce
+    assert "def_ResolveViaPython" in TEXT
+    for candidate in ["via_groupindex_312", "via_core_313", "via_core_312"]:
+        assert candidate in TEXT, candidate
+    assert "--enforce" in TEXT
+    assert "ENV-PREFLIGHT" in TEXT

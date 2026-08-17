@@ -40,6 +40,7 @@ DASHBOARD = MODULE_DIR.parent.parent / "VIA_Reports" / "VIA_SectorFlow_AllInOne_
 VERSION = "0.1.00"
 MAX_ITERATIONS = 3
 PYTEST_FILES = [
+    "test_VIA_GroupIndex_EnvPreflight_v0100.py",
     "test_VIA_SectorFlow_AdaptiveChainedIndex_v0100.py",
     "test_VIA_SectorFlow_SignalTradeBacktest_v0100.py",
     "test_VIA_SectorFlow_Dashboard_Builder_v0100.py",
@@ -81,7 +82,7 @@ def def_run_master_validation() -> Dict[str, Any]:
     )
     unit_ok = proc.returncode == 0
     tail = (proc.stdout or "").strip().splitlines()[-1] if proc.stdout else ""
-    add("M01", "UNIT-TEST:pytest 五套件全過", unit_ok, "HARD", tail)
+    add("M01", "UNIT-TEST:pytest 六套件全過", unit_ok, "HARD", tail)
     phase("UNIT-TEST", "PASS" if unit_ok else "FAIL", tail)
 
     # ---------------- DEBUG:三 run manifest 重驗(不可變性) ----------------
