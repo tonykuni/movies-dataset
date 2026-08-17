@@ -2582,6 +2582,13 @@
    "kind": "工具",
    "note": "撞版勘誤+雙會話合流:本會話曾誤覆寫依賴治理會話之 v0104(+依賴統包站)——已 git checkout 回復他方正本,雙方站點合流 v0105(23 站=21 站+表格統包四檢+收編管線 dry env)。容器 --fast:OK 15·FAIL 0·SKIP 6(全環境缺件誠實)。教訓:合併他會話後造版前先查同名版號(先發先得適用於版號)。",
    "ts": "2026-08-17"
+  },
+  {
+   "code": "TOOL-034",
+   "name": "Invoke-VIA-Central-Governance-OneClick-v0104",
+   "kind": "工具",
+   "note": "工作站實戰修:40,180 件全晉升 holds=0 後,Round 2 JSON 驗證道 throw——ConvertFrom-Json 遇『空字串屬性名』(合法 JSON,PS 需 -AsHashTable)即拋,並觸發整批回滾(該腳本 catch=rollback+rethrow)。該道為純可解析性檢查(結果 Out-Null 丟棄),補 -AsHashTable 零行為改變、真壞 JSON 照 catch;違反其自身『單檔錯誤轉 HOLD 不中斷』哲學之處以最小補丁矯正。內嵌 gzip+Base64 載荷已重封裝、SHA-256 常數同步重算(3ACC…→1528…),解包自證通過+外殼 AST 0 錯。倉內 JSON 掃無空鍵——禍首在舊樹側,屬合法內容不改資料。via-govroot 動態最新自動解析 v0104。",
+   "ts": "2026-08-17"
   }
  ]
 }
