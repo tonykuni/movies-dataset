@@ -3044,6 +3044,13 @@
    "kind": "確認+修復",
    "note": "①操作員問:VRN BASIC INFO/FINANCIAL DATA 驗證是否在驗證引擎內——確認在位:MDL006 ConsolidatorAndPhaseValidator 持 BASIC_INFO_COLS 15 欄 schema(ticker/雙格式代碼/company_name/report_date/broker/rating/target_price/report_code/confidence)+FINANCIAL_DATA_COLS 14 欄+compare_phases() phase1/phase2 雙相對照(n_fin_mismatch+mismatch_details 逐筆);MDL008 CrossValidator 持 Step7-11 財務驗證鏈(單位統一/歷史對照 報告vs MOPS/不一致 fallback chain/預測自洽/信心分數),輸入 MDL006 相列+MDL007 API(MOPS/TWSE/yfinance)。②工作站 --refresh 實測「SuperAccel 未載」根因=三 flow ETF 引擎手寫簡式橋無 sys.path 引導→升級為正典路徑引導橋(對齊 MDL008 自動橋);裸 cwd 實測 SuperAccel 載入+同意閘正確攔截。③新 bug 修:SuperAccel.fetch 同意閘拒絕回 None 不拋例外→cmd_refresh 加 None 閘誠實 SKIP rc0(原 decode 崩 rc2)。三引擎 selftest 6/6×3;grid OK40·FAIL0。",
    "ts": "2026-08-18"
+  },
+  {
+   "code": "TOOL-063",
+   "name": "via_central_gov_v0100 — VIA Central Governance Console(中央治理主控台)",
+   "kind": "引擎",
+   "note": "操作員令(批22 Mega-Prompt:中央 SSOT 規範庫+同義字/Regex 治理中心/三輪全景式分析/Zero-Hydra/HTML UI Matrix 小字體四分區紅黃綠燈/非阻塞 PS 啟動器/母子系統同步收尾驗證)。落地:①三輪全景式——R1 全倉 ast.parse 掃描 1,321 件+MODULE/ENGINE/FUNCTION-LIB/OTHERS 四分區;R2 中央 SSOT 規範庫 8 冊對齊(命名冊/介面冊/台帳/PS封存冊/字庫/VDF參數/雙ETF冊)+Regex 治理中心 7 LOCKED 規則集中(TW_TICKER/YEAR_SUSPECT/VERSION_SUFFIX/PRODUCT_CODE 等,owner 對映)+同義字 7 正規鍵(評等/資金流/EPS/目標價)+Hydra fan-in 偵測(只建議不盲修);R3 紅黃綠燈聚合(誠實三色:GRP 黃=既知語法敗鏡像候令件)。②HTML Matrix 理印紙墨:12px 小字體/表格自適應+word-break 換行/四分區/動態進度條 sweep/動態說明三輪敘述/零 CDN。③20 加速器實存盤點(15 PS 加速器+5 家族,不虛報)。④可插拔子系統名錄 7 槽(VRN/VDF/VAP/FLOW/VME/CHW/GRP)。⑤非阻塞 Invoke-VIA-CentralGov ps1(Start-Process UI 不阻塞)+bin/via-cgc.cmd(原擬 via-gov 撞名既有 CGE 動詞——先發先得,已恢復原檔改名 cgc)。selftest 8/8;grid v0118=49 站全量收尾驗證 OK43·FAIL0·SKIP6。",
+   "ts": "2026-08-18"
   }
  ]
 }
