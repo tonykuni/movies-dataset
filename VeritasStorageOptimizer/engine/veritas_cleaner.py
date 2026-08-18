@@ -16,6 +16,14 @@ TEMP_EXTENSIONS = {".tmp", ".log", ".cache", ".bak", ".old", ".temp", ".swp", ".
 PROTECTED_DIRS = {".git", ".svn", ".venv", "node_modules", "site-packages", "$RECYCLE.BIN", "System Volume Information"}
 DUP_MIN_BYTES = 1024  # 重複比對的最小檔案容量門檻
 PROTECT_MARKER = ".veritas_protect"  # 使用者放置的「此區不可動」標記檔
+# 編程副產物:建置/測試工具可隨時重新生成的快取與編譯殘留
+CODING_JUNK_DIRS = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", ".ipynb_checkpoints"}
+CODING_JUNK_EXTENSIONS = {".pyc", ".pyo"}
+
+
+def in_junk_dir(root: str) -> bool:
+    """路徑中任一層目錄名屬於編程垃圾清單即為 True。"""
+    return any(part in CODING_JUNK_DIRS for part in Path(root).parts)
 
 
 def is_skipped_dir(parent: str, name: str) -> bool:
@@ -90,12 +98,19 @@ def execute_cleanup(target_dir: str, size_threshold_mb: float, dry_run: bool = T
         # 排除保護目錄 / symlink / Python 虛擬環境
         dirs[:] = [d for d in dirs if not is_skipped_dir(root, d)]
 
+        dir_is_junk = in_junk_dir(root)
         for file in files:
             file_path = Path(root) / file
 
             try:
                 file_size = file_path.stat().st_size
             except (PermissionError, OSError):
+                continue
+
+            # 策略 0: 編程垃圾——快取目錄內容與 .pyc/.pyo 編譯殘留
+            if dir_is_junk or file_path.suffix.lower() in CODING_JUNK_EXTENSIONS:
+                files_to_remove.append((file_path, file_size, "Coding Junk"))
+                freed_bytes += file_size
                 continue
 
             # 策略 1: 刪除副檔名為暫存檔的檔案
@@ -110,14 +125,15 @@ def execute_cleanup(target_dir: str, size_threshold_mb: float, dry_run: bool = T
                 freed_bytes += file_size
                 continue
 
-            # 策略 3: 為重複檔案比對收集「檔案大小相同的群組」
+            # 策略 3: 為重複檔案比對收集「副檔名相同 + 大小相同」的候選群組
+            # 複合鍵讓群組更小,實際需要 Hash 的檔案更少(省記憶體與 I/O)
             # 小於 DUP_MIN_BYTES 的檔案不列入:刪除近乎零容量的「重複檔」
             # 釋放不了空間,卻常是 __init__.py / .gitkeep 等結構性檔案
             if file_size >= DUP_MIN_BYTES:
-                size_groups.setdefault(file_size, []).append(file_path)
+                size_groups.setdefault((file_path.suffix.lower(), file_size), []).append(file_path)
 
-    # Pass 2: 針對容量相同的候選群組進行 Hash 比對
-    for file_size, candidate_paths in size_groups.items():
+    # Pass 2: 針對「同副檔名 + 同容量」候選群組進行串流 Hash 比對
+    for (_ext, file_size), candidate_paths in size_groups.items():
         if len(candidate_paths) < 2:
             continue
 

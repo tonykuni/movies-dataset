@@ -55,6 +55,12 @@ function buildSandbox(root) {
   fs.mkdirSync(path.join(sand, 'keepzone'), { recursive: true });
   fs.writeFileSync(path.join(sand, 'keepzone', '.veritas_protect'), '');
   fs.writeFileSync(path.join(sand, 'keepzone', 'zonejunk.tmp'), 'zone temp');
+  fs.mkdirSync(path.join(sand, '__pycache__'), { recursive: true });
+  fs.writeFileSync(path.join(sand, '__pycache__', 'mod.cpython-311.pyc'), 'bytecode');
+  fs.writeFileSync(path.join(sand, 'legacy.pyc'), 'old bytecode');
+  const pair = Buffer.alloc(2048, 9);
+  fs.writeFileSync(path.join(sand, 'pair_a.dat'), pair);
+  fs.writeFileSync(path.join(sand, 'pair_b.txt'), pair);
   return sand;
 }
 
@@ -100,6 +106,8 @@ function buildSandbox(root) {
       ok(`[${engine}] skips protected .git`, !items.some(i => i.path.includes('.git')));
       ok(`[${engine}] skips python venv (pyvenv.cfg)`, !items.some(i => i.path.includes('fake_env')));
       ok(`[${engine}] skips .veritas_protect zone`, !items.some(i => i.path.includes('keepzone')));
+      ok(`[${engine}] marks coding junk`, items.some(i => i.reason === 'Coding Junk' && i.path.includes('__pycache__')) && items.some(i => i.reason === 'Coding Junk' && i.path.includes('legacy.pyc')));
+      ok(`[${engine}] cross-ext same-size twins not marked`, !items.some(i => /pair_[ab]\./.test(i.path)));
       ok(`[${engine}] reports freed size`, /MB/.test(d.json.freedHuman));
       ok(`[${engine}] audit log written`, d.json.logPath && fs.existsSync(d.json.logPath));
       ok(`[${engine}] dry-run deletes nothing`,
@@ -127,6 +135,8 @@ function buildSandbox(root) {
     ok('live run kept protected .git content', fs.existsSync(path.join(sandLive, '.git', 'protected.tmp')));
     ok('live run kept venv content', fs.existsSync(path.join(sandLive, 'fake_env', 'venvjunk.tmp')));
     ok('live run kept .veritas_protect zone', fs.existsSync(path.join(sandLive, 'keepzone', 'zonejunk.tmp')));
+    ok('live run removed coding junk', !fs.existsSync(path.join(sandLive, 'legacy.pyc')) && !fs.existsSync(path.join(sandLive, '__pycache__', 'mod.cpython-311.pyc')));
+    ok('live run kept cross-ext twins', fs.existsSync(path.join(sandLive, 'pair_a.dat')) && fs.existsSync(path.join(sandLive, 'pair_b.txt')));
     const guardMarker = await api('/api/run', { dir: path.join(sandLive, 'keepzone'), maxMB: 200, engine: 'ps', execute: true });
     ok('guard refuses protect-marked target', guardMarker.json.ok === false && /veritas_protect/.test(guardMarker.json.error));
     ok('live run removed empty dir', !fs.existsSync(path.join(sandLive, 'sub', 'empty_dir')));

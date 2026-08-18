@@ -10,8 +10,8 @@ VeritasStorageOptimizer/
 │   ├── veritas_cleaner.py    # Python 引擎 (僅標準庫)
 │   └── veritas_cleaner.js    # Node.js 引擎 (Node v18+, 零 npm 套件)
 ├── tests/
-│   ├── e2e_apitest.js        # 零相依 e2e:Python GUI 後端完整 API 契約 (51 assertions)
-│   ├── e2e_ps_usertest.js    # 零相依 e2e:pwsh AIO 後端 + 三引擎 + 實刪 (72 assertions)
+│   ├── e2e_apitest.js        # 零相依 e2e:Python GUI 後端完整 API 契約 (57 assertions)
+│   ├── e2e_ps_usertest.js    # 零相依 e2e:pwsh AIO 後端 + 三引擎 + 實刪 (80 assertions)
 │   └── ps_lint.py            # PS7 靜態分析 (here-string / 括號平衡 / LL 規則)
 ├── logs/                     # append-only 活動日誌 + 每次執行的稽核日誌 (git 忽略)
 └── README.md
@@ -34,7 +34,7 @@ pwsh -File VeritasStorageOptimizer_AllInOne.ps1 -Port 9000 -NoBrowser
 pwsh -File VeritasStorageOptimizer_AllInOne.ps1 -Dir D:\Downloads -MaxMB 500
 pwsh -File VeritasStorageOptimizer_AllInOne.ps1 -Dir D:\Downloads -MaxMB 500 -Execute
 
-# 內嵌自我測試 (35 assertions)
+# 內嵌自我測試 (40 assertions)
 pwsh -File VeritasStorageOptimizer_AllInOne.ps1 -SelfTest
 
 # ★ 一鍵全專案測試鏈:靜態分析 + PS 自測 + Python 自測 + 兩套 e2e
@@ -46,8 +46,8 @@ pwsh -File VeritasStorageOptimizer_AllInOne.ps1 -TestAll
 安裝指引後結束。
 
 測試鏈(`-TestAll` 一鍵執行,全部通過):`tests/ps_lint.py` 靜態分析 0 錯誤 →
-pwsh AST 解析 0 錯誤 → `-SelfTest` 35/35 → `veritas_gui.py --self-test` 17/17 →
-`tests/e2e_apitest.js` 51/51 → `tests/e2e_ps_usertest.js` 真實後端 72/72
+pwsh AST 解析 0 錯誤 → `-SelfTest` 40/40 → `veritas_gui.py --self-test` 17/17 →
+`tests/e2e_apitest.js` 57/57 → `tests/e2e_ps_usertest.js` 真實後端 80/80
 (三引擎 Dry-Run、防護 Guard、實體刪除、巢狀空目錄連鎖清除、Unicode 檔名、
 symlink 循環/逃逸圍堵、非法閾值伺服器端拒絕、單元素 JSON 陣列形狀、
 300 檔案規模化精確重複比對、404 / shutdown 契約)。缺少對應直譯器的套件
@@ -84,21 +84,25 @@ symlink 循環/逃逸圍堵、非法閾值伺服器端拒絕、單元素 JSON �
 
 | 設計 | 說明 |
 |---|---|
-| 二階段重複檔案比對 (2-Pass Hash Filtering) | 僅對「檔案大小相同」的候選群組計算 MD5,避免無謂 I/O |
-| 串流分頁雜湊 (Streaming Chunk Hashing) | 固定 64 KB Chunk / Stream 讀取,數 GB 大檔也不會 OOM |
+| 二階段重複檔案比對 (2-Pass Hash Filtering) | 僅對「**副檔名相同 + 容量相同**」的候選群組計算 MD5;複合鍵讓群組更小,實際需要 Hash 的檔案大幅減少(省記憶體與 I/O),也杜絕「不同格式恰好同大小同內容」的誤殺 |
+| 串流分頁雜湊 (Streaming Chunk Hashing) | 固定 64 KB Chunk / Stream 讀取,數 GB 大檔也不會 OOM;掃描全程恆定記憶體,適合在啟動 OCR / NLP 等吃資源工具前先行清理 |
 | 預設安全試執行 (Dry-Run Safety Mode) | 預設僅輸出預計刪除清單與可釋放容量;實體刪除需顯式切換模式 + 前端二次確認 |
 | 關鍵系統路徑過濾 (System Protection) | 引擎跳過 `.git` `.svn` `.venv` `node_modules` `site-packages` `$RECYCLE.BIN` `System Volume Information`,以及**任何含 `pyvenv.cfg` 的 Python 虛擬環境**(各 venv 內含大量相同套件檔,跨 venv 去重會毀掉環境);GUI 後端另拒絕根目錄、家目錄與其上層 |
 | 使用者保護標記 (Protect Marker) | 在資料夾內放置空檔案 **`.veritas_protect`**,三引擎即將該資料夾整個跳過(不掃描、不刪除、不去重);直接以該資料夾為目標時 Guard 一律拒絕。適合鎖定「絕對不可動」的專案區,例如 `New-Item -ItemType File 路徑\.veritas_protect` |
 | 稽核日誌 (Audit Trail) | GUI 活動採 append-only 日誌;每次掃描/清理各產生獨立稽核檔 |
 
-清理策略(兩引擎一致):
+清理策略(三引擎一致):
 
+0. **編程垃圾 (Coding Junk)** — 建置/測試工具可隨時重新生成的快取與編譯殘留:
+   `__pycache__` `.pytest_cache` `.mypy_cache` `.ruff_cache` `.ipynb_checkpoints`
+   目錄整棵標記,加上散落的 `.pyc` `.pyo` 檔;venv 與保護區內的一律不碰
 1. **暫存檔** — 副檔名 `.tmp .log .cache .bak .old .temp .swp .dmp` 標記刪除
 2. **超大檔案** — 超過閾值(預設 200 MB)標記刪除
-3. **重複檔案** — 同容量群組經串流 MD5 比對後,保留第一份、標記其餘副本;
-   **小於 1 KB 的檔案一律不列入重複比對**(刪除近乎零容量的「重複檔」釋放不了
-   空間,卻常是 `__init__.py`、`.gitkeep`、stdout 停留檔等跨專案的結構性檔案)
-4. **空資料夾** — 由下而上遞迴清除(Python 引擎)
+3. **重複檔案** — 「**同副檔名 + 同容量**」群組經串流 MD5 比對後,保留第一份、
+   標記其餘副本;**小於 1 KB 的檔案一律不列入重複比對**(刪除近乎零容量的
+   「重複檔」釋放不了空間,卻常是 `__init__.py`、`.gitkeep`、stdout 停留檔等
+   跨專案的結構性檔案)
+4. **空資料夾** — 由下而上遞迴清除(Python / PS 引擎)
 
 ## GUI 桌面應用程式
 
@@ -133,7 +137,7 @@ python veritas_gui.py --no-browser        # 不自動開啟瀏覽器
 # 內嵌自我測試 (17 assertions):Token 替換、防護 Guard、輸出解析、沙盒 Dry-Run/Execute 往返
 python veritas_gui.py --self-test
 
-# 零相依 e2e 測試 (51 assertions):啟動真實後端,驗證前端頁面、/api/env、
+# 零相依 e2e 測試 (57 assertions):啟動真實後端,驗證前端頁面、/api/env、
 # 雙引擎 Dry-Run、防護 Guard、實體刪除、symlink 圍堵與 404 契約
 node tests/e2e_apitest.js
 ```

@@ -75,6 +75,12 @@ function buildSandbox() {
   fs.mkdirSync(path.join(sand, 'keepzone'), { recursive: true });
   fs.writeFileSync(path.join(sand, 'keepzone', '.veritas_protect'), '');
   fs.writeFileSync(path.join(sand, 'keepzone', 'zonejunk.tmp'), 'zone temp');
+  fs.mkdirSync(path.join(sand, '__pycache__'), { recursive: true });
+  fs.writeFileSync(path.join(sand, '__pycache__', 'mod.cpython-311.pyc'), 'bytecode');
+  fs.writeFileSync(path.join(sand, 'legacy.pyc'), 'old bytecode');
+  const pair = Buffer.alloc(2048, 9);
+  fs.writeFileSync(path.join(sand, 'pair_a.dat'), pair);
+  fs.writeFileSync(path.join(sand, 'pair_b.txt'), pair);
   return { root, sand };
 }
 
@@ -117,6 +123,8 @@ function buildSandbox() {
       ok(`[${engine}] skips protected .git`, !(d.json.items || []).some(i => i.path.includes('.git')));
       ok(`[${engine}] skips python venv (pyvenv.cfg)`, !(d.json.items || []).some(i => i.path.includes('fake_env')));
       ok(`[${engine}] skips .veritas_protect zone`, !(d.json.items || []).some(i => i.path.includes('keepzone')));
+      ok(`[${engine}] marks coding junk`, (d.json.items || []).some(i => i.reason === 'Coding Junk' && i.path.includes('__pycache__')) && (d.json.items || []).some(i => i.reason === 'Coding Junk' && i.path.includes('legacy.pyc')));
+      ok(`[${engine}] cross-ext same-size twins not marked`, !(d.json.items || []).some(i => /pair_[ab]\./.test(i.path)));
       ok(`[${engine}] reports freed size`, /MB/.test(d.json.freedHuman));
       ok(`[${engine}] audit log written`, d.json.logPath && fs.existsSync(d.json.logPath));
       ok(`[${engine}] dry-run deletes nothing`, fs.existsSync(path.join(sand, 'junk.tmp')) && fs.existsSync(path.join(sand, 'bigfile.bin')));
@@ -142,6 +150,8 @@ function buildSandbox() {
     ok('live run kept protected .git content', fs.existsSync(path.join(sand, '.git', 'protected.tmp')));
     ok('live run kept venv content', fs.existsSync(path.join(sand, 'fake_env', 'venvjunk.tmp')));
     ok('live run kept .veritas_protect zone', fs.existsSync(path.join(sand, 'keepzone', 'zonejunk.tmp')));
+    ok('live run removed coding junk', !fs.existsSync(path.join(sand, 'legacy.pyc')) && !fs.existsSync(path.join(sand, '__pycache__', 'mod.cpython-311.pyc')));
+    ok('live run kept cross-ext twins', fs.existsSync(path.join(sand, 'pair_a.dat')) && fs.existsSync(path.join(sand, 'pair_b.txt')));
     ok('live run removed empty dir', !fs.existsSync(path.join(sand, 'sub', 'empty_dir')));
 
     // ---- hardening: invalid threshold rejected server-side ---------------------

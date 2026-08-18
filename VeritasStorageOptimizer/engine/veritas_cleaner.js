@@ -13,6 +13,10 @@ const PROTECTED_DIRS = new Set(['.git', '.svn', '.venv', 'node_modules', 'site-p
 // while near-empty twins (__init__.py, .gitkeep, stdout stubs) are structural.
 const DUP_MIN_BYTES = 1024;
 
+// Coding byproducts: caches and compiled leftovers that tooling regenerates.
+const CODING_JUNK_DIRS = new Set(['__pycache__', '.pytest_cache', '.mypy_cache', '.ruff_cache', '.ipynb_checkpoints']);
+const CODING_JUNK_EXTENSIONS = new Set(['.pyc', '.pyo']);
+
 // User-placed marker: any directory containing this file is off-limits to
 // every strategy, letting users pin "do not touch" zones inside a scan.
 const PROTECT_MARKER = '.veritas_protect';
@@ -78,7 +82,7 @@ async function scanDirectory(dirPath, sizeThresholdMB, executeLive = false, logF
     console.log(`=== Node.js Storage Purger Scan: ${absoluteTarget} ===`);
     console.log(`Mode: ${executeLive ? 'LIVE_EXECUTION' : 'DRY_RUN (Safe Preview)'}`);
 
-    function walkSync(currentDir) {
+    function walkSync(currentDir, inJunk) {
         let entries = [];
         try {
             entries = fs.readdirSync(currentDir, { withFileTypes: true });
@@ -89,12 +93,18 @@ async function scanDirectory(dirPath, sizeThresholdMB, executeLive = false, logF
             const fullPath = path.join(currentDir, entry.name);
             if (entry.isDirectory()) {
                 if (!isSkippedDir(fullPath, entry.name)) {
-                    walkSync(fullPath);
+                    walkSync(fullPath, inJunk || CODING_JUNK_DIRS.has(entry.name));
                 }
             } else if (entry.isFile()) {
                 try {
                     const stats = fs.statSync(fullPath);
                     const ext = path.extname(entry.name).toLowerCase();
+                    // 0. 編程垃圾——快取目錄內容與 .pyc/.pyo 編譯殘留
+                    if (inJunk || CODING_JUNK_EXTENSIONS.has(ext)) {
+                        itemsToRemove.push({ path: fullPath, size: stats.size, reason: 'Coding Junk' });
+                        totalFreedBytes += stats.size;
+                        continue;
+                    }
                     // 1. 暫存檔
                     if (TEMP_EXTENSIONS.has(ext)) {
                         itemsToRemove.push({ path: fullPath, size: stats.size, reason: 'Temp File' });
@@ -107,12 +117,14 @@ async function scanDirectory(dirPath, sizeThresholdMB, executeLive = false, logF
                         totalFreedBytes += stats.size;
                         continue;
                     }
-                    // 3. 收集相同容量者待驗證 Hash
+                    // 3. 收集「同副檔名 + 同容量」候選待驗證 Hash——複合鍵讓群組
+                    //    更小,需要 Hash 的檔案更少(省記憶體與 I/O)
                     if (stats.size >= DUP_MIN_BYTES) {
-                        if (!sizeGroups.has(stats.size)) {
-                            sizeGroups.set(stats.size, []);
+                        const key = ext + '|' + stats.size;
+                        if (!sizeGroups.has(key)) {
+                            sizeGroups.set(key, { size: stats.size, paths: [] });
                         }
-                        sizeGroups.get(stats.size).push(fullPath);
+                        sizeGroups.get(key).paths.push(fullPath);
                     }
                 } catch (err) {
                     // 權限缺失或檔名例外跳過
@@ -121,10 +133,11 @@ async function scanDirectory(dirPath, sizeThresholdMB, executeLive = false, logF
         }
     }
 
-    walkSync(absoluteTarget);
+    walkSync(absoluteTarget, false);
 
-    // 比對重複檔案 (2-Pass: 僅對容量相同的群組計算 Hash)
-    for (const [size, filePaths] of sizeGroups.entries()) {
+    // 比對重複檔案 (2-Pass: 僅對「同副檔名 + 同容量」群組計算 Hash)
+    for (const group of sizeGroups.values()) {
+        const { size, paths: filePaths } = group;
         if (filePaths.length < 2) continue;
         const hashMap = new Map();
         for (const filePath of filePaths) {

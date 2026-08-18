@@ -57,6 +57,11 @@ $script:Stop       = $false
 
 $script:TempExtensions = @('.tmp', '.log', '.cache', '.bak', '.old', '.temp', '.swp', '.dmp')
 $script:ProtectedDirs  = @('.git', '.svn', '.venv', 'node_modules', 'site-packages', '$RECYCLE.BIN', 'System Volume Information')
+# Coding byproducts: caches and compiled leftovers that build/test tooling
+# regenerates on demand. Directories are matched per path component, so a
+# junk dir anywhere under the target marks its whole subtree.
+$script:CodingJunkDirs = @('__pycache__', '.pytest_cache', '.mypy_cache', '.ruff_cache', '.ipynb_checkpoints')
+$script:CodingJunkExtensions = @('.pyc', '.pyo')
 # Files below this size never enter duplicate detection: deleting them frees
 # ~no space, yet near-empty twins are often structural (__init__.py, .gitkeep,
 # 1-byte stdout stubs) and removing "duplicates" across projects breaks them.
@@ -173,13 +178,25 @@ function Get-EmptyDirectories {
     return $empty
 }
 
+function Test-JunkDir {
+    # True when any path component is a coding-junk directory name.
+    param([string]$Path)
+    foreach ($part in $Path.Split([System.IO.Path]::DirectorySeparatorChar, [System.IO.Path]::AltDirectorySeparatorChar)) {
+        if ($script:CodingJunkDirs -contains $part) { return $true }
+    }
+    return $false
+}
+
 function Invoke-VeritasScan {
-    # Pass 1: fault-tolerant walk classifying temp / oversize files and
-    # collecting same-size candidate groups. Pass 2: streaming-hash only the
-    # candidate groups (2-pass filtering). Returns items + empty dirs.
+    # Pass 1: fault-tolerant walk classifying coding-junk / temp / oversize
+    # files and collecting (extension, size) candidate groups. Pass 2:
+    # streaming-hash only those groups. Keying candidates by extension AND
+    # size (not size alone) keeps groups small, so far fewer files are ever
+    # hashed - lower memory and I/O on large trees.
     param([string]$Root, [long]$LimitBytes)
     $items = [System.Collections.Generic.List[object]]::new()
     $groups = @{}
+    $groupSize = @{}
     $freed = [long]0
 
     $stack = [System.Collections.Generic.Stack[string]]::new()
@@ -192,11 +209,17 @@ function Invoke-VeritasScan {
                 $stack.Push($s)
             }
         } catch {}
+        $dirIsJunk = Test-JunkDir -Path $d
         try {
             foreach ($f in [System.IO.Directory]::EnumerateFiles($d)) {
                 $fi = $null
                 try { $fi = [System.IO.FileInfo]::new($f) } catch { continue }
                 $ext = $fi.Extension.ToLowerInvariant()
+                if ($dirIsJunk -or $script:CodingJunkExtensions -contains $ext) {
+                    $items.Add([pscustomobject]@{ path = $f; size = (Format-Size $fi.Length); reason = 'Coding Junk' })
+                    $freed += $fi.Length
+                    continue
+                }
                 if ($script:TempExtensions -contains $ext) {
                     $items.Add([pscustomobject]@{ path = $f; size = (Format-Size $fi.Length); reason = 'Temp File' })
                     $freed += $fi.Length
@@ -208,16 +231,18 @@ function Invoke-VeritasScan {
                     continue
                 }
                 if ($fi.Length -ge $script:DupMinBytes) {
-                    if (-not $groups.Contains($fi.Length)) { $groups[$fi.Length] = [System.Collections.Generic.List[string]]::new() }
-                    $groups[$fi.Length].Add($f)
+                    $key = ($ext + '|' + [string]$fi.Length)
+                    if (-not $groups.Contains($key)) { $groups[$key] = [System.Collections.Generic.List[string]]::new(); $groupSize[$key] = $fi.Length }
+                    $groups[$key].Add($f)
                 }
             }
         } catch {}
     }
 
-    foreach ($size in @($groups.Keys)) {
-        $paths = $groups[$size]
+    foreach ($key in @($groups.Keys)) {
+        $paths = $groups[$key]
         if ($paths.Count -lt 2) { continue }
+        $size = [long]$groupSize[$key]
         $seen = @{}
         foreach ($p in $paths) {
             $h = Get-StreamHash -Path $p
@@ -614,6 +639,12 @@ function Invoke-SelfTest {
     New-Item -ItemType Directory -Path (Join-Path $sand 'keepzone') -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $sand 'keepzone/.veritas_protect') -Value ''
     Set-Content -LiteralPath (Join-Path $sand 'keepzone/zonejunk.tmp') -Value 'zone temp'
+    New-Item -ItemType Directory -Path (Join-Path $sand '__pycache__') -Force | Out-Null
+    Set-Content -LiteralPath (Join-Path $sand '__pycache__/mod.cpython-311.pyc') -Value 'bytecode'
+    Set-Content -LiteralPath (Join-Path $sand 'legacy.pyc') -Value 'old bytecode'
+    $pairBytes = [byte[]]::new(2048)
+    [System.IO.File]::WriteAllBytes((Join-Path $sand 'pair_a.dat'), $pairBytes)
+    [System.IO.File]::WriteAllBytes((Join-Path $sand 'pair_b.txt'), $pairBytes)
     New-Item -ItemType Directory -Path (Join-Path $sand 'nest/inner') -Force | Out-Null
     Set-Content -LiteralPath (Join-Path $sand 'nest/inner/only.tmp') -Value 'cascade me'
 
@@ -632,6 +663,9 @@ function Invoke-SelfTest {
     Add-Test 'Dry-run marks oversize file'    ($reasons.Contains('Over Limit'))
     Add-Test 'Dry-run marks duplicate'        ($reasons.Contains('Duplicate of'))
     Add-Test 'Dry-run ignores tiny duplicates' (@($dry.items | Where-Object { $_.path.Contains('stub_') }).Count -eq 0)
+    Add-Test 'Dry-run marks coding junk dir'  (@($dry.items | Where-Object { $_.reason -eq 'Coding Junk' -and $_.path.Contains('__pycache__') }).Count -eq 1)
+    Add-Test 'Dry-run marks compiled leftover' (@($dry.items | Where-Object { $_.reason -eq 'Coding Junk' -and $_.path.Contains('legacy.pyc') }).Count -eq 1)
+    Add-Test 'Dry-run keeps cross-ext twins'  (@($dry.items | Where-Object { $_.path.Contains('pair_') }).Count -eq 0)
     Add-Test 'Dry-run skips protected .git'   (-not (@($dry.items | Where-Object { $_.path.Contains('.git') }).Count -gt 0))
     Add-Test 'Dry-run skips python venv'      (@($dry.items | Where-Object { $_.path.Contains('fake_env') }).Count -eq 0)
     Add-Test 'Dry-run skips protect-marker zone' (@($dry.items | Where-Object { $_.path.Contains('keepzone') }).Count -eq 0)
@@ -650,6 +684,8 @@ function Invoke-SelfTest {
     Add-Test 'Execute keeps protected .git'   (Test-Path -LiteralPath (Join-Path $sand '.git/protected.tmp'))
     Add-Test 'Execute keeps venv content'     (Test-Path -LiteralPath (Join-Path $sand 'fake_env/venvjunk.tmp'))
     Add-Test 'Execute keeps protect-marker zone' (Test-Path -LiteralPath (Join-Path $sand 'keepzone/zonejunk.tmp'))
+    Add-Test 'Execute removes coding junk'    ((-not (Test-Path -LiteralPath (Join-Path $sand '__pycache__'))) -and (-not (Test-Path -LiteralPath (Join-Path $sand 'legacy.pyc'))))
+    Add-Test 'Execute keeps cross-ext twins'  ((Test-Path -LiteralPath (Join-Path $sand 'pair_a.dat')) -and (Test-Path -LiteralPath (Join-Path $sand 'pair_b.txt')))
     Add-Test 'Execute removes empty dir'      (-not (Test-Path -LiteralPath (Join-Path $sand 'sub/empty_dir')))
     Add-Test 'Execute cascades nested empties' (-not (Test-Path -LiteralPath (Join-Path $sand 'nest')))
 
