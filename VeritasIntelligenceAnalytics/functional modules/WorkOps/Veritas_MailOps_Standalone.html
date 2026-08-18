@@ -186,7 +186,10 @@
   var sampleIdx = 0;
 
   /* ============================= STATE + BOOT ============================= */
-  var engine, state = { nav:'today', selected:null, query:'', loadedTab:'mails', loadErr:'', tplSel:null, recAppr:{} };
+  var engine, state = { nav:'today', selected:null, query:'', loadedTab:'mails', loadErr:'', tplSel:null, recAppr:{}, draft:null };
+  var MYNAME_LS='via_mailops_myname_v1';
+  function myName(){ try{ return localStorage.getItem(MYNAME_LS)||''; }catch(e){ return ''; } }
+  function setMyName(v){ try{ localStorage.setItem(MYNAME_LS, v||''); }catch(e){} }
   // Real exported data (your own mailbox metadata). Kept in MEMORY ONLY — never
   // written to localStorage, since it may contain real mail bodies.
   var loaded = { mails:[], cases:[], stake:[], pending:[], qc:[], control:[], kwcand:[], at:null, files:[] };
@@ -244,7 +247,7 @@
 
   /* ============================= RENDER ============================= */
   function render(){
-    D.getElementById('app').innerHTML = header() + '<div style="display:flex;flex:1;overflow:hidden">' + sidebar() + main() + '</div>';
+    D.getElementById('app').innerHTML = header() + '<div style="display:flex;flex:1;overflow:hidden">' + sidebar() + main() + '</div>' + draftOverlay();
   }
 
   function header(){
@@ -1009,6 +1012,65 @@
     render();
   }
 
+  /* ---------------- ✉ 一鍵備草稿 One-click draft prep (copy → paste to Outlook; you send) ---------------- */
+  function htmlToText(html){
+    var d=D.createElement('div'); d.innerHTML=(html||'').replace(/<\/(p|div|tr|h[1-6]|li)>/gi,'\n').replace(/<br\s*\/?>/gi,'\n');
+    var t=d.textContent||d.innerText||''; return t.replace(/\n{3,}/g,'\n\n').replace(/[ \t]+\n/g,'\n').trim();
+  }
+  function draftPrep(code){
+    var name='', waiting=null;
+    loaded.control.forEach(function(c){ if(c.Code===code) name=c.Name; });
+    if(!name) registry.forEach(function(r){ if(r.code===code) name=r.name; });
+    // waiting days from pending evidence to pick T-stage
+    var ev=cardMatch([code,name].filter(Boolean));
+    waiting=ev.waiting;
+    var order = (waiting!==null && waiting>=5) ? ['followup_firm','followup','status_request']
+              : (waiting!==null && waiting>=3) ? ['followup','status_request']
+              : ['status_request'];
+    var byKey={}; templates.forEach(function(t){ byKey[t.key]=t; });
+    var tpl=null; for(var i=0;i<order.length && !tpl;i++){ if(byKey[order[i]]) tpl=byKey[order[i]]; }
+    if(!tpl) tpl=templates[0];
+    var vals={ ProjectCode:code||'', ProjectName:name||'', MyName:myName()||'〈你的名字〉', Date:today() };
+    var fill=function(s){ return (s||'').replace(/\{\{\s*([A-Za-z0-9_]+)\s*\}\}/g,function(_,k){ return vals[k]!=null?vals[k]:'〈'+k+'〉'; }); };
+    state.draft={ code:code, name:name, subject:fill(tpl.subject), html:fill(tpl.body), text:htmlToText(fill(tpl.body)),
+      stage: waiting!==null?tStage(waiting).label:'首次追蹤', tplName:tpl.name };
+    render();
+  }
+  function draftOverlay(){
+    var d=state.draft; if(!d) return '';
+    return '<div id="draftmodal" style="position:fixed;inset:0;z-index:130;background:rgba(2,6,23,.72);display:flex;align-items:center;justify-content:center;padding:5vh 4vw" data-dfclose="bg">'+
+      '<div style="width:100%;max-width:680px;max-height:90vh;overflow:auto;background:var(--panel);border:1px solid var(--line2);border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.5)" data-dfstop="1">'+
+        '<div style="display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)">'+
+          IC.doc({s:16})+'<span style="font-size:14px;font-weight:700;color:#fff">備追蹤草稿</span>'+
+          '<span class="mono" style="font-size:10px;color:var(--em2);background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:5px;padding:2px 8px">'+esc(d.code)+' · '+esc(d.stage)+' · '+esc(d.tplName)+'</span>'+
+          '<span style="flex:1"></span><button data-dfact="close" style="color:var(--mut);font-size:18px;line-height:1;padding:2px 6px">'+IC.x({s:16})+'</button>'+
+        '</div>'+
+        '<div style="padding:16px 18px">'+
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><span class="mono" style="font-size:10px;color:var(--mut2);width:56px">你的名字</span>'+
+            '<input data-dfname value="'+esc(myName())+'" placeholder="填一次,之後自動帶入署名" style="flex:1;font-size:12px;background:var(--panel2);color:#e2e8f0;border:1px solid var(--line);border-radius:7px;padding:7px 10px;outline:none"></div>'+
+          '<div class="mono" style="font-size:9px;color:var(--mut2);margin-bottom:4px">主旨</div>'+
+          '<div style="display:flex;gap:8px;margin-bottom:12px"><input id="dfsubj" readonly value="'+esc(d.subject)+'" style="flex:1;font-size:12.5px;background:var(--panel2);color:#fff;border:1px solid var(--line);border-radius:7px;padding:8px 10px;outline:none"><button data-dfact="copysubj" class="mono" style="font-size:10px;color:var(--em2);border:1px solid var(--line2);border-radius:7px;padding:0 12px;white-space:nowrap">複製主旨</button></div>'+
+          '<div class="mono" style="font-size:9px;color:var(--mut2);margin-bottom:4px">內文(純文字,貼進 Outlook 後可再排版)</div>'+
+          '<textarea id="dftext" readonly style="width:100%;height:230px;font:400 12px/1.7 \'Segoe UI\',sans-serif;color:#e2e8f0;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:10px;resize:vertical;outline:none">'+esc(d.text)+'</textarea>'+
+          '<div style="display:flex;gap:8px;margin-top:12px;align-items:center">'+
+            '<button data-dfact="copytext" style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;background:rgba(16,185,129,.9);color:#fff;padding:9px 14px;border-radius:8px">'+IC.check({s:13})+' 複製內文</button>'+
+            '<button data-dfact="opentpl" class="mono" style="font-size:11px;color:var(--mut);border:1px solid var(--line2);border-radius:8px;padding:9px 12px">在範本庫編輯</button>'+
+            '<span id="dfmsg" class="mono" style="font-size:10px;color:var(--em2)"></span>'+
+            '<span style="flex:1"></span>'+
+            '<span class="mono" style="font-size:9px;color:var(--mut2)">複製後貼進 Outlook,你檢視再親自寄</span>'+
+          '</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }
+  function draftCopy(which){
+    var el=D.getElementById(which==='subj'?'dfsubj':'dftext'); if(!el) return;
+    el.select(); el.setSelectionRange(0, el.value.length);
+    var ok=false; try{ ok=D.execCommand('copy'); }catch(e){}
+    if(!ok && navigator.clipboard){ try{ navigator.clipboard.writeText(el.value); ok=true; }catch(e){} }
+    var m=D.getElementById('dfmsg'); if(m){ m.textContent = ok?'✓ 已複製到剪貼簿':'請手動選取後 Ctrl+C'; setTimeout(function(){ if(m) m.textContent=''; },2500); }
+  }
+
   /* ---------------- ☀ 今日焦點 Today (cross-cutting action digest) ---------------- */
   function todayView(){
     var cards = (loaded.control.length||registry.length) ? projCards() : [];
@@ -1035,11 +1097,12 @@
     var line=function(c, accent){
       var eta = c.daysLeft===null?'':c.daysLeft<0?('<span style="color:#f87171">逾期'+(-c.daysLeft)+'天</span>'):c.daysLeft===0?'<span style="color:#f87171">今天到期</span>':('剩'+c.daysLeft+'天');
       var stg = (c.waiting!==null&&c.waiting>=3)?(' · '+tStage(c.waiting).label):'';
-      return '<div data-nav="cards" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border-left:3px solid '+accent+';background:var(--panel2);margin-bottom:6px">'+
-        '<span class="mono" style="font-size:10px;color:var(--mut2);width:64px;flex:none">'+esc(c.code||'—')+'</span>'+
-        '<span style="font-size:12.5px;color:#fff;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(c.name||'(未命名)')+'</span>'+
+      var canDraft = c.ball==='對方' || (c.waiting!==null && c.waiting>=3);
+      return '<div style="display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;border-left:3px solid '+accent+';background:var(--panel2);margin-bottom:6px">'+
+        '<span data-nav="cards" style="cursor:pointer;font-size:12.5px;color:#fff;font-weight:600;flex:1;display:flex;align-items:center;gap:10px;overflow:hidden"><span class="mono" style="font-size:10px;color:var(--mut2);width:64px;flex:none">'+esc(c.code||'—')+'</span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(c.name||'(未命名)')+'</span></span>'+
         '<span style="font-size:11px;color:#cbd5e1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px">'+esc(c.next)+stg+'</span>'+
         '<span class="mono" style="font-size:10px;color:var(--mut)">'+eta+'</span>'+actorTag(c)+
+        (canDraft&&c.code?'<button data-draft="'+esc(c.code)+'" class="mono" title="一鍵備追蹤草稿" style="font-size:10px;color:var(--em2);border:1px solid var(--line2);border-radius:6px;padding:4px 8px;white-space:nowrap">✉ 備草稿</button>':'')+
       '</div>';
     };
     var body='<div style="flex:1;overflow-y:auto;padding:16px 22px">';
@@ -1165,8 +1228,10 @@
           (c.due?('<span class="mono" style="color:var(--mut2)">⏳ '+esc(c.due)+' </span>'+etaTxt):'<span class="mono" style="color:var(--mut2)">無交期</span>')+
           '<span style="flex:1"></span>'+bar+
         '</div>'+warn+
-        '<div class="mono" style="font-size:9px;color:var(--mut2);margin-top:8px;border-top:1px solid rgba(30,41,59,.5);padding-top:7px">'+
-          esc(c.owner||'—')+' · 最後動靜 '+(c.lastDate?esc(c.lastDate)+' '+(c.lastDir==='OUTBOUND'?'你寄出':c.lastDir==='INBOUND'?'對方來信':''):(c.waiting!==null?'你寄出(等回覆)':'無佐證'))+' · '+c.msgs+' 封</div>'+
+        '<div class="mono" style="font-size:9px;color:var(--mut2);margin-top:8px;border-top:1px solid rgba(30,41,59,.5);padding-top:7px;display:flex;align-items:center;gap:8px">'+
+          '<span style="flex:1">'+esc(c.owner||'—')+' · 最後動靜 '+(c.lastDate?esc(c.lastDate)+' '+(c.lastDir==='OUTBOUND'?'你寄出':c.lastDir==='INBOUND'?'對方來信':''):(c.waiting!==null?'你寄出(等回覆)':'無佐證'))+' · '+c.msgs+' 封</span>'+
+          (c.light!=='done'&&c.code?'<button data-draft="'+esc(c.code)+'" title="一鍵備追蹤草稿" style="font-size:10px;color:var(--em2);border:1px solid var(--line2);border-radius:6px;padding:3px 8px;white-space:nowrap">✉ 備草稿</button>':'')+
+        '</div>'+
       '</div>';
     }).join('');
     return '<div class="fadein" style="flex:1;display:flex;flex-direction:column;position:relative;z-index:10;overflow:hidden">'+head+
@@ -1819,8 +1884,16 @@
 
   /* ============================= EVENTS ============================= */
   D.getElementById('app').addEventListener('click', function(e){
-    var t = e.target.closest('[data-act],[data-nav],[data-open],[data-addtask],[data-move],[data-ltab],[data-deck],[data-tsel],[data-tplsel],[data-tplact],[data-recact],[data-recappr],[data-dact],[data-dkw],[data-dconf],[data-dregdel],[data-kwact],[data-kwacc],[data-kwrej],[data-rpappr],[data-rpact]');
+    var t = e.target.closest('[data-act],[data-nav],[data-open],[data-addtask],[data-move],[data-ltab],[data-deck],[data-tsel],[data-tplsel],[data-tplact],[data-recact],[data-recappr],[data-dact],[data-dkw],[data-dconf],[data-dregdel],[data-kwact],[data-kwacc],[data-kwrej],[data-rpappr],[data-rpact],[data-draft],[data-dfact],[data-dfclose]');
     if(!t) return;
+    if(t.dataset.draft){ draftPrep(t.dataset.draft); return; }
+    if(t.dataset.dfclose==='bg' && e.target===t){ state.draft=null; render(); return; }
+    if(t.dataset.dfact){ var a=t.dataset.dfact;
+      if(a==='close'){ state.draft=null; render(); }
+      else if(a==='copysubj'){ draftCopy('subj'); }
+      else if(a==='copytext'){ draftCopy('text'); }
+      else if(a==='opentpl'){ state.draft=null; state.nav='templates'; render(); }
+      return; }
     if(t.dataset.kwacc!==undefined && t.dataset.kwacc!==''){ kwCommit(+t.dataset.kwacc,'accept'); return; }
     if(t.dataset.kwrej!==undefined && t.dataset.kwrej!==''){ kwCommit(+t.dataset.kwrej,'reject'); return; }
     if(t.dataset.kwact){ kwAction(t.dataset.kwact); return; }
@@ -1856,6 +1929,7 @@
       render(); var nq=D.getElementById('q'); if(nq){ nq.focus(); try{nq.setSelectionRange(c,c);}catch(_){} } return; }
     var dn=e.target.getAttribute && e.target.getAttribute('data-dname');
     if(dn!==null && dn!==undefined){ var dg=discCache[+dn]; if(dg) discState.names[dg.subj]=e.target.value; return; }
+    if(e.target.hasAttribute && e.target.hasAttribute('data-dfname')){ setMyName(e.target.value); return; }
     if(e.target.getAttribute && e.target.getAttribute('data-rptext')!==null && e.target.hasAttribute('data-rptext')){ replyState.text=e.target.value; return; }
     var ka=e.target.getAttribute && e.target.getAttribute('data-kwalias');
     if(ka!==null && ka!==undefined){ var kr=kwCandRows()[+ka]; if(kr){ (kwState.edits[kr.canon]=kwState.edits[kr.canon]||{}).alias=e.target.value; } return; }
