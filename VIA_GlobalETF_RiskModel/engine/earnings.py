@@ -79,10 +79,20 @@ def build_earnings_ledger(market, config, fundamentals, snapshots, usd_stress_ri
 
         # staleness / carry-forward 狀態
         stale_days = (asof - _dt.date.fromisoformat(pub_date)).days
-        stale_state, stale_status = _staleness_state(stale_days, carry_cfg)
-        machine_state = ("CARRY_FORWARD_ACTIVE" if stale_state in ("FRESH", "USABLE")
-                         else "STALE_WARNING" if stale_state == "STALE_WARNING"
-                         else "NEEDS_SOURCE_REFRESH")
+        if stale_days < 0:
+            # 未來日期不是「新鮮」，是資料錯誤：來源日期打錯或時區/格式問題
+            stale_state, stale_status = "FUTURE_DATED", "critical"
+            machine_state = "NEEDS_SOURCE_REVIEW"
+            devil.append({"flag": "publish_date_in_future",
+                          "detail": "發布日 %s 晚於 asof %s（%d 天）——日期錯置，"
+                                    "本列不得用於當前估值" % (pub_date, market.asof,
+                                                              -stale_days)})
+        else:
+            stale_state, stale_status = _staleness_state(stale_days, carry_cfg)
+            machine_state = ("CARRY_FORWARD_ACTIVE"
+                             if stale_state in ("FRESH", "USABLE")
+                             else "STALE_WARNING" if stale_state == "STALE_WARNING"
+                             else "NEEDS_SOURCE_REFRESH")
 
         # 每日重算估值：用 proxy ETF 總報酬比推指數位移（標 Der + devil 註記）
         proxy = proxy_map.get(idx)

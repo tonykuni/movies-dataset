@@ -361,8 +361,8 @@ def _sec_fragility(frag, regional):
                     "<td class='num' style='background:%s'>%s</td></tr>"
                     % (esc(r["name_zh"]), esc(r["etf"] or ""), flag,
                        fmt_num(r["composite"], 0), _chip(b["label_zh"], b["status"]),
-                       dv("debt_gdp"), dv("fiscal_balance_gdp"),
-                       dv("current_account_gdp"), dv("external_debt_gni"),
+                       esc(dv("debt_gdp")), esc(dv("fiscal_balance_gdp")),
+                       esc(dv("current_account_gdp")), esc(dv("external_debt_gni")),
                        _heat(r["etf_ret20"], 0.08), fmt_pct(r["etf_ret20"], 1)))
     reg_rows = []
     for r in regional:
@@ -589,5 +589,6 @@ def config_hash(config_path):
 
 
 def make_run_id(prefix="RUN", suffix="VIA_GLOBAL_ETF_RISK"):
-    stamp = _dt.datetime.now().strftime("%Y%m%d_%H%M%S")
+    # 微秒精度：同秒重跑不得碰撞（append-only：run 目錄永不互相覆寫）
+    stamp = _dt.datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     return "%s_%s_%s" % (prefix, stamp, suffix)

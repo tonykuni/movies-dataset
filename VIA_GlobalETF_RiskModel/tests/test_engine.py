@@ -204,6 +204,60 @@ class TestCsvHardening(unittest.TestCase):
         self.assertAlmostEqual(m.macro["DGS10"][-1], m.macro["DGS10"][15])
 
 
+class TestRoundThreeHardening(unittest.TestCase):
+    def test_run_id_unique_within_second(self):
+        from engine import report as rp
+        ids = {rp.make_run_id() for _ in range(50)}
+        self.assertEqual(len(ids), 50)
+
+    def test_future_publish_date_flagged_not_fresh(self):
+        cfg = TestEarningsCarryForward.CFG
+        fnd = TestEarningsCarryForward.FUND
+        from engine.earnings import build_earnings_ledger
+        snap = [{"source_name": "T", "index_name": "IDX", "region": "X",
+                 "source_publish_date": "2026-12-31", "index_level_used": 2000.0,
+                 "published_forward_pe": 20.0, "forward_horizon": "NTM",
+                 "index_type": "price"}]
+        led = build_earnings_ledger(mini_market(), cfg, fnd, snap, 50.0)
+        r = led["active"][0]
+        self.assertEqual(r["staleness"]["state"], "FUTURE_DATED")
+        self.assertEqual(r["carry_forward_state"], "NEEDS_SOURCE_REVIEW")
+        self.assertIn("publish_date_in_future",
+                      [d["flag"] for d in r["devil_warnings"]])
+
+    def test_fragility_dirty_values_skipped_not_crash(self):
+        from engine.factors import FactorPanel
+        from engine.scores import compute_fragility
+        cfg = dl.load_config()
+        panel = FactorPanel(mini_market(up="SPY", down="EWT"), benchmark="ACWI")
+        fnd = {"US": {"name_zh": "美國", "etf": "SPY",
+                      "debt_gdp": "<script>alert(1)</script>",
+                      "fiscal_balance_gdp": -6.5},
+               "TW": {"name_zh": "台灣", "etf": "EWT",
+                      "debt_gdp": 27.0, "fiscal_balance_gdp": True}}
+        rows = compute_fragility(panel, cfg, fnd)
+        by = {r["country"]: r for r in rows}
+        # 字串/bool 欄位被跳過而非崩潰；乾淨欄位照算
+        self.assertNotIn("debt_gdp", by["US"]["detail"])
+        self.assertNotIn("fiscal_balance_gdp", by["TW"]["detail"])
+        self.assertIn("fiscal_balance_gdp", by["US"]["detail"])
+        self.assertIn("debt_gdp", by["TW"]["detail"])
+
+    def test_config_only_ticker_extension(self):
+        import copy
+        import run_monitor as rm
+        cfg = copy.deepcopy(dl.load_config())
+        cfg["def_etf_universe"]["emerging_markets"].append(
+            {"ticker": "KWEB", "name": "中國互聯網", "region": "China",
+             "haven_level": 4})
+        cfg_path = Path(__file__).resolve().parents[1] / "config" / \
+            "global_etf_risk_config.json"
+        m = dl.generate_demo(cfg, asof="2026-08-14", days=300, seed=7)
+        ds = rm.build_dataset(cfg, cfg_path, m)
+        tickers = [r["ticker"] for rows in ds["heatmap"].values() for r in rows]
+        self.assertIn("KWEB", tickers)
+
+
 class TestShortDataGracefulDegrade(unittest.TestCase):
     def test_40d_end_to_end_renders(self):
         import run_monitor as rm

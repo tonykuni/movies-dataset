@@ -174,6 +174,15 @@ def compute_regional_potential(panel, config, fundamentals):
     return rows
 
 
+def _num(v):
+    """數值防線：只接受有限 int/float（bool 除外），其餘（字串/None/NaN）一律 None。
+    fundamentals 是使用者手編 JSON，髒值不得穿透進百分位計算或 HTML。"""
+    if isinstance(v, bool) or not isinstance(v, (int, float)):
+        return None
+    import math as _m
+    return float(v) if _m.isfinite(v) else None
+
+
 def compute_fragility(panel, config, fundamentals):
     """[MCFL-M20-C21-F206] 國家財政/外部脆弱度：
     對 fundamentals 每欄取跨國百分位（higher/lower_is_riskier 決定方向），
@@ -184,13 +193,14 @@ def compute_fragility(panel, config, fundamentals):
     bands = spec["bands"]
     countries = {k: v for k, v in fundamentals.items() if isinstance(v, dict)}
     fields = hi + lo
-    pools = {f: [c.get(f) for c in countries.values() if c.get(f) is not None]
+    pools = {f: [x for c in countries.values()
+                 if (x := _num(c.get(f))) is not None]
              for f in fields}
     rows = []
     for name, c in countries.items():
         pcts, detail = [], {}
         for f in fields:
-            v = c.get(f)
+            v = _num(c.get(f))
             if v is None or not pools[f]:
                 continue
             pct = mk.percentile_rank(v, pools[f])
