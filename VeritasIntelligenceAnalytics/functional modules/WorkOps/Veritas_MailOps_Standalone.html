@@ -82,7 +82,8 @@
     gear:   function(o){return svg('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',o);},
     doc:    function(o){return svg('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/>',o);},
     scale:  function(o){return svg('<path d="M12 3v18"/><path d="M5 21h14"/><path d="M6 8h12"/><path d="M6 8l-3 6a3 3 0 0 0 6 0z"/><path d="M18 8l-3 6a3 3 0 0 0 6 0z"/>',o);},
-    grid:   function(o){return svg('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',o);}
+    grid:   function(o){return svg('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',o);},
+    tag:    function(o){return svg('<path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L3 13V3h10l7.59 7.59a2 2 0 0 1 0 2.82z"/><circle cx="7.5" cy="7.5" r="1.5" fill="currentColor"/>',o);}
   };
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 
@@ -188,7 +189,7 @@
   var engine, state = { nav:'inbox', selected:null, query:'', loadedTab:'mails', loadErr:'', tplSel:null, recAppr:{} };
   // Real exported data (your own mailbox metadata). Kept in MEMORY ONLY — never
   // written to localStorage, since it may contain real mail bodies.
-  var loaded = { mails:[], cases:[], stake:[], pending:[], qc:[], control:[], at:null, files:[] };
+  var loaded = { mails:[], cases:[], stake:[], pending:[], qc:[], control:[], kwcand:[], at:null, files:[] };
   var deck = { open:false, idx:0, slides:[] };
   var trackState = { sel:null };
   var SET_LS = 'via_mailops_settings_v1';
@@ -220,6 +221,15 @@
   function regLoad(){ try{ var r=localStorage.getItem(REG_LS); if(r){ var d=JSON.parse(r); if(d&&d.length!==undefined) return d; } }catch(e){} return []; }
   function regSave(){ try{ localStorage.setItem(REG_LS, JSON.stringify(registry)); }catch(e){} }
   var registry = regLoad();
+
+  /* ---------------- 🏷 關鍵字詞庫 lexicon (reviewed keyword dictionary, persisted) ---------------- */
+  var LEX_LS = 'via_mailops_lexicon_v1';
+  function lexLoad(){ try{ var r=localStorage.getItem(LEX_LS); if(r){ var d=JSON.parse(r); if(d&&d.length!==undefined) return d; } }catch(e){} return []; }
+  function lexSave(){ try{ localStorage.setItem(LEX_LS, JSON.stringify(lexicon)); }catch(e){} }
+  var lexicon = lexLoad();
+  var LEX_CATS = ['專案','人名/對口','公司/單位','產品/系統','地區','財務/金額','其他'];
+  function lexTerms(){ var t=[]; lexicon.forEach(function(x){ if(x.status==='accept'){ t.push(x.canonical); (x.aliases||[]).forEach(function(a){ if(a) t.push(a); }); } }); return t; }
+  function lexFind(term){ var lo=(''+term).toLowerCase(); for(var i=0;i<lexicon.length;i++){ var x=lexicon[i]; if(x.status!=='accept') continue; if((''+x.canonical).toLowerCase()===lo) return x; if((x.aliases||[]).some(function(a){return (''+a).toLowerCase()===lo;})) return x; } return null; }
   var SAMPLE_VARS={ ProjectCode:'PRJ-001', ProjectName:'日本合資案', MyName:'你的名字', Date:'2026/08/07' };
   function fillVars(str){ return (str||'').replace(/\{\{\s*([A-Za-z0-9_]+)\s*\}\}/g, function(_,k){ return SAMPLE_VARS[k]!=null?SAMPLE_VARS[k]:'〈'+k+'〉'; }); }
   function persist(){ try{ localStorage.setItem(LS, engine.serialize()); }catch(e){} }
@@ -269,6 +279,7 @@
       navBtn('cards', IC.grid({s:19}), '專案卡總覽 · 燈號/下一步/倒數', (loaded.control.length+registry.length))+
       navBtn('reconcile', IC.scale({s:19}), '對帳校準 · 控管表×郵件→建議', (loaded.control.length?loaded.control.length:0))+
       navBtn('discover', IC.search({s:19}), '專案發掘 · 關鍵字→成案編號', registry.length)+
+      navBtn('keyword', IC.tag({s:19}), '關鍵字審核 · 候選→詞庫', (lexicon.filter(function(x){return x.status==='accept';}).length))+
       navBtn('templates', IC.doc({s:19}), '範本庫管理 · 導入不寄出', 0)+
       navBtn('validate', IC.check({s:19}), '驗證中心 · 一鍵自檢', 0)+
       '<div style="flex:1"></div>'+
@@ -285,6 +296,7 @@
               : state.nav==='cards' ? cardsView()
               : state.nav==='reconcile' ? reconcileView()
               : state.nav==='discover' ? discoverView()
+              : state.nav==='keyword' ? keywordView()
               : state.nav==='templates' ? templatesView()
               : loadedView();
     return '<main class="grid-bg" style="flex:1;position:relative;overflow:hidden;display:flex">'+inner+'</main>';
@@ -905,7 +917,7 @@
     return prefix+num;
   }
   function discKwSel(subj, kws){
-    if(!discState.kw[subj]){ var d={}; kws.forEach(function(k,i){ d[k]= i<2; }); discState.kw[subj]=d; }  // default: top 2 selected
+    if(!discState.kw[subj]){ var d={}; kws.forEach(function(k,i){ d[k]= !!lexFind(k) || i<2; }); discState.kw[subj]=d; }  // default: reviewed-lexicon terms + top 2
     return discState.kw[subj];
   }
   function discoverView(){
@@ -935,8 +947,8 @@
             '<span style="font-size:11px;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">'+esc(g.subj)+'</span>'+
           '</div>'+
           '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px">'+g.kws.map(function(k,ki){
-            var on=!!sel[k];
-            return '<button data-dkw="'+i+'|'+ki+'" style="font-size:10.5px;font-family:var(--mono);padding:3px 9px;border-radius:14px;border:1px solid '+(on?'rgba(16,185,129,.5)':'var(--line2)')+';color:'+(on?'var(--em2)':'var(--mut2)')+';background:'+(on?'rgba(16,185,129,.12)':'transparent')+'">'+esc(k)+'</button>';
+            var on=!!sel[k]; var known=lexFind(k);
+            return '<button data-dkw="'+i+'|'+ki+'" title="'+(known?'詞庫已確認 · '+esc(known.category):'')+'" style="font-size:10.5px;font-family:var(--mono);padding:3px 9px;border-radius:14px;border:1px solid '+(on?'rgba(16,185,129,.5)':'var(--line2)')+';color:'+(on?'var(--em2)':'var(--mut2)')+';background:'+(on?'rgba(16,185,129,.12)':'transparent')+'">'+(known?'✓ ':'')+esc(k)+'</button>';
           }).join('')+'</div>'+
           '<div style="display:flex;gap:8px;align-items:center">'+
             '<input data-dname="'+i+'" value="'+esc(name)+'" placeholder="專案名稱(可修改)" style="flex:1;font:500 12px var(--sans);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:7px 10px;outline:none">'+
@@ -1099,6 +1111,112 @@
     return '<div class="fadein" style="flex:1;display:flex;flex-direction:column;position:relative;z-index:10;overflow:hidden">'+head+
       '<div style="flex:1;overflow-y:auto;padding:16px 20px"><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px">'+body+'</div></div>'+
     '</div>';
+  }
+
+  /* ---------------- 🏷 關鍵字審核 Keyword Review (candidates → reviewed lexicon → feeds discovery) ---------------- */
+  var kwState = { edits:{} };  // transient per-session edits keyed by canonical
+  function kwGuessCat(term){
+    var t=(''+term);
+    if(/^[A-Za-z]{2,6}[-_]?\d{2,6}$/.test(t) || /(PRJ|WOP|案|專案)/.test(t)) return '專案';
+    if(/(公司|株式|Inc|Ltd|Corp|GmbH|有限|集團|銀行|Page)/i.test(t)) return '公司/單位';
+    if(/(系統|平台|ERP|CRM|API|系統|模組|SheetJS|Playwright|Selenium)/i.test(t)) return '產品/系統';
+    if(/(金額|報價|合約|付款|發票|價|費|NT\$|USD)/.test(t)) return '財務/金額';
+    return '其他';
+  }
+  function kwCandRows(){
+    // normalize uploaded keyword-candidate CSV to a review model; protected tokens (codes/nums) never auto-edited
+    return loaded.kwcand.map(function(r){
+      var canon = recGet(r,['canonical','Canonical','keyword','詞','正式名稱']) || '';
+      var hit = parseInt(recGet(r,['hit_count','hits','出現次數']),10); if(isNaN(hit)) hit=0;
+      var docs= parseInt(recGet(r,['document_count','doc_count','文件數']),10); if(isNaN(docs)) docs=0;
+      var note= recGet(r,['review_note','note','備註']);
+      var existing = lexFind(canon);
+      var ed = kwState.edits[canon] || {};
+      return { canon:canon, hit:hit, docs:docs, note:note,
+        cat: ed.cat!==undefined?ed.cat:(existing?existing.category:kwGuessCat(canon)),
+        alias: ed.alias!==undefined?ed.alias:(existing?(existing.aliases||[]).join(', '):''),
+        weight: ed.weight!==undefined?ed.weight:(existing?existing.weight:50),
+        status: existing?existing.status:(ed.status||'pending') };
+    }).sort(function(a,b){ return b.hit-a.hit; });
+  }
+  function keywordView(){
+    var rows = kwCandRows();
+    var accepted = lexicon.filter(function(x){return x.status==='accept';});
+    var head='<div style="height:56px;flex:none;border-bottom:1px solid var(--line);padding:0 22px;display:flex;align-items:center;gap:12px;background:rgba(4,12,26,.5)">'+
+      '<h2 style="font-size:16px;font-weight:600;color:#fff;display:flex;align-items:center;gap:9px">'+IC.tag({s:18})+' 關鍵字審核</h2>'+
+      '<span class="mono" style="font-size:10px;background:#0f1e34;border:1px solid var(--line2);color:var(--mut);padding:2px 8px;border-radius:5px">候選→人工確認正式名稱/別名/分類/權重→回饋比對引擎</span>'+
+      '<span style="flex:1"></span>'+
+      '<button data-kwact="loadcsv" style="display:flex;align-items:center;gap:5px;font-size:12px;background:rgba(96,165,250,.9);color:#fff;padding:7px 12px;border-radius:8px;font-weight:600">'+IC.folder({s:13})+' 載入候選 CSV</button>'+
+      '<button data-kwact="exportlex" class="mono" style="font-size:10px;color:var(--em2);background:#0f1e34;border:1px solid var(--line2);border-radius:8px;padding:7px 11px">⭳ 匯出詞庫</button>'+
+    '</div>'+
+    '<div class="mono" style="font-size:10px;color:var(--mut2);background:var(--panel2);border-bottom:1px solid var(--line);padding:7px 22px">審核採「保守修正」:候選代號/數字視為<b style="color:var(--em2)">受保護 token</b>,不自動改寫;你確認分類與別名後<b style="color:var(--em2)">採納</b>的詞才進詞庫,並回饋到「專案發掘」的關鍵字比對。原檔不動、不寄信。</div>';
+
+    if(!loaded.kwcand.length && !accepted.length){
+      return '<div class="fadein" style="flex:1;display:flex;flex-direction:column;position:relative;z-index:10;overflow:hidden">'+head+
+        '<div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--mut2)">'+
+        '<div style="opacity:.5">'+IC.tag({s:42})+'</div>'+
+        '<div style="font-size:14px;color:#cbd5e1">尚未載入關鍵字候選</div>'+
+        '<div class="mono" style="font-size:11px;max-width:440px;text-align:center;line-height:1.7">載入 Text Intelligence 匯出的 keyword_candidates CSV(欄位:canonical / hit_count / document_count / suggested_action)。審核後成為詞庫,強化專案自動歸戶。</div>'+
+        '<button data-kwact="loadcsv" style="display:flex;align-items:center;gap:6px;font-size:12px;background:rgba(96,165,250,.9);color:#fff;padding:9px 16px;border-radius:9px;font-weight:600;margin-top:4px">'+IC.folder({s:14})+' 載入候選 CSV</button>'+
+        '</div></div>';
+    }
+
+    var catOpts=function(sel){ return LEX_CATS.map(function(c){ return '<option'+(c===sel?' selected':'')+'>'+esc(c)+'</option>'; }).join(''); };
+    var body=rows.map(function(r,i){
+      var st=r.status;
+      var rowBg = st==='accept'?'rgba(16,185,129,.06)':st==='reject'?'rgba(148,163,184,.04)':'transparent';
+      return '<tr style="border-bottom:1px solid rgba(30,41,59,.5);background:'+rowBg+'">'+
+        '<td style="padding:8px 10px;vertical-align:middle"><div style="font-size:12.5px;color:#fff;font-weight:600">'+esc(r.canon)+'</div><div class="mono" style="font-size:9px;color:var(--mut2)">'+r.hit+' 次 · '+r.docs+' 文件</div></td>'+
+        '<td style="padding:8px 8px;vertical-align:middle"><select data-kwcat="'+i+'" style="font-size:11px;background:var(--bg);color:#e2e8f0;border:1px solid var(--line);border-radius:6px;padding:4px 6px;outline:none">'+catOpts(r.cat)+'</select></td>'+
+        '<td style="padding:8px 8px;vertical-align:middle"><input data-kwalias="'+i+'" value="'+esc(r.alias)+'" placeholder="別名, 逗號分隔" style="width:100%;font-size:11px;background:var(--bg);color:#e2e8f0;border:1px solid var(--line);border-radius:6px;padding:5px 7px;outline:none"></td>'+
+        '<td style="padding:8px 8px;vertical-align:middle;white-space:nowrap"><input type="range" min="0" max="100" step="10" value="'+r.weight+'" data-kwwt="'+i+'" style="width:80px;accent-color:var(--em);vertical-align:middle"><span class="mono" style="font-size:9px;color:var(--em2);margin-left:5px">'+r.weight+'</span></td>'+
+        '<td style="padding:8px 10px;vertical-align:middle;text-align:right;white-space:nowrap">'+
+          '<button data-kwacc="'+i+'" style="font-size:10px;font-weight:600;color:'+(st==='accept'?'#04101a':'var(--em2)')+';background:'+(st==='accept'?'var(--em)':'transparent')+';border:1px solid '+(st==='accept'?'var(--em)':'var(--line2)')+';border-radius:6px;padding:5px 10px;margin-right:4px">採納</button>'+
+          '<button data-kwrej="'+i+'" style="font-size:10px;color:'+(st==='reject'?'#04101a':'var(--mut)')+';background:'+(st==='reject'?'#94a3b8':'transparent')+';border:1px solid var(--line2);border-radius:6px;padding:5px 10px">排除</button>'+
+        '</td>'+
+      '</tr>';
+    }).join('');
+
+    return '<div class="fadein" style="flex:1;display:flex;flex-direction:column;position:relative;z-index:10;overflow:hidden">'+head+
+      '<div style="flex:none;padding:9px 22px;display:flex;gap:8px;align-items:center;border-bottom:1px solid var(--line)">'+
+        '<span class="mono" style="font-size:10px;color:var(--mut)">候選 '+rows.length+' · 已採納詞庫 '+accepted.length+'</span>'+
+        (rows.length?'<span style="flex:1"></span><button data-kwact="acceptall" class="mono" style="font-size:10px;color:var(--em2);border:1px solid var(--line2);border-radius:6px;padding:5px 10px">全部採納</button><button data-kwact="clearlex" class="mono" style="font-size:10px;color:#e0899b;border:1px solid #3a2230;border-radius:6px;padding:5px 10px">清空詞庫</button>':'')+
+      '</div>'+
+      '<div style="flex:1;overflow:auto"><table style="width:100%;border-collapse:collapse">'+
+        '<thead><tr>'+th('關鍵字 / 熱度')+th('分類')+th('別名')+th('權重')+th('處置',{a:'right'})+'</tr></thead>'+
+        '<tbody>'+body+'</tbody></table></div>'+
+    '</div>';
+  }
+  function kwCommit(i, status){
+    var rows=kwCandRows(); var r=rows[i]; if(!r) return;
+    var aliases=(r.alias||'').split(/[,，;；]/).map(function(s){return s.trim();}).filter(Boolean);
+    var idx=-1; for(var j=0;j<lexicon.length;j++){ if(lexicon[j].canonical===r.canon){ idx=j; break; } }
+    var entry={ canonical:r.canon, aliases:aliases, category:r.cat, weight:r.weight, status:status, at:today() };
+    if(idx>=0) lexicon[idx]=entry; else lexicon.push(entry);
+    delete kwState.edits[r.canon];
+    lexSave(); render();
+  }
+  function kwAction(a){
+    if(a==='loadcsv'){ var inp=D.createElement('input'); inp.type='file'; inp.accept='.csv,text/csv'; inp.onchange=function(){ ingestFiles(inp.files); }; inp.click(); return; }
+    if(a==='exportlex'){
+      var acc=lexicon.filter(function(x){return x.status==='accept';});
+      if(!acc.length){ alert('詞庫是空的(尚無採納的關鍵字)。'); return; }
+      function q(v){ v=(v==null?'':''+v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+      var csv='canonical,category,weight,aliases\n'+acc.map(function(x){ return [q(x.canonical),q(x.category),q(x.weight),q((x.aliases||[]).join('|'))].join(','); }).join('\n')+'\n';
+      downloadText('confirmed_keywords.csv', csv, 'text/csv');
+      downloadText('confirmed_keywords.json', JSON.stringify(acc,null,2), 'application/json');
+      return;
+    }
+    if(a==='acceptall'){ var rows=kwCandRows(); rows.forEach(function(r,i){ if(r.status!=='reject') kwCommitSilent(i,'accept'); }); lexSave(); render(); return; }
+    if(a==='clearlex'){ if(confirm('清空整個關鍵字詞庫?(候選 CSV 不受影響)')){ lexicon=[]; lexSave(); render(); } return; }
+  }
+  function kwCommitSilent(i, status){
+    var rows=kwCandRows(); var r=rows[i]; if(!r) return;
+    var aliases=(r.alias||'').split(/[,，;；]/).map(function(s){return s.trim();}).filter(Boolean);
+    var idx=-1; for(var j=0;j<lexicon.length;j++){ if(lexicon[j].canonical===r.canon){ idx=j; break; } }
+    var entry={ canonical:r.canon, aliases:aliases, category:r.cat, weight:r.weight, status:status, at:today() };
+    if(idx>=0) lexicon[idx]=entry; else lexicon.push(entry);
+    delete kwState.edits[r.canon];
   }
 
   /* ---------------- ⚙ Settings (mouse-adjustable factor weights) ---------------- */
@@ -1265,6 +1383,8 @@
     if(/control_sheet|controlsheet|governance|控管表|治理表|專案控管|master_?tracker|wop_followup/.test(n)) return 'control';
     if((sample.ProjectCode!==undefined||sample.Trace_ID!==undefined||sample.WOP_ID!==undefined||sample['專案代號']!==undefined||sample['案號']!==undefined||sample['案件編號']!==undefined||sample['追蹤碼']!==undefined) &&
        (sample.Status!==undefined||sample.Current_Stage!==undefined||sample['狀態']!==undefined||sample.Owner!==undefined||sample.Stakeholder!==undefined||sample['負責人']!==undefined||sample['承辦人']!==undefined)) return 'control';
+    // ---- 關鍵字候選(Text Intelligence keyword candidates)----
+    if(/keyword_candidate|keyword_candidates|text_intelligence/.test(n) || (sample.canonical!==undefined && (sample.keyword_id!==undefined||sample.hit_count!==undefined||sample.suggested_action!==undefined))) return 'kwcand';
     // ---- VIA WorkOps v004 CSV outputs ----
     if(/pending/.test(n) || (sample.PENDING_STATUS!==undefined && sample.CASE_ID!==undefined)) return 'pending';
     if(/quality_check|quality_matrix/.test(n) || (sample.CHECK!==undefined && sample.RESULT!==undefined)) return 'qc';
@@ -1353,6 +1473,7 @@
     if(kind==='ignore') return;
     if(kind==='pending'){ loaded.pending=arr; }
     else if(kind==='control'){ loaded.control=arr.map(normControl); state.recAppr={}; }
+    else if(kind==='kwcand'){ loaded.kwcand=arr; }
     else if(kind==='qc'){ loaded.qc=arr; }
     else if(kind==='mails'){ loaded.mails=arr.map(function(r){ return isV004Mail(r)?normMailV004(r): isFetchMail(r)?normMailFetch(r): r; }); }
     else if(kind==='stake'){ loaded.stake=arr.map(function(r){ return isV004Stake(r)?normStakeV004(r):r; }); }
@@ -1462,8 +1583,11 @@
 
   /* ============================= EVENTS ============================= */
   D.getElementById('app').addEventListener('click', function(e){
-    var t = e.target.closest('[data-act],[data-nav],[data-open],[data-addtask],[data-move],[data-ltab],[data-deck],[data-tsel],[data-tplsel],[data-tplact],[data-recact],[data-recappr],[data-dact],[data-dkw],[data-dconf],[data-dregdel]');
+    var t = e.target.closest('[data-act],[data-nav],[data-open],[data-addtask],[data-move],[data-ltab],[data-deck],[data-tsel],[data-tplsel],[data-tplact],[data-recact],[data-recappr],[data-dact],[data-dkw],[data-dconf],[data-dregdel],[data-kwact],[data-kwacc],[data-kwrej]');
     if(!t) return;
+    if(t.dataset.kwacc!==undefined && t.dataset.kwacc!==''){ kwCommit(+t.dataset.kwacc,'accept'); return; }
+    if(t.dataset.kwrej!==undefined && t.dataset.kwrej!==''){ kwCommit(+t.dataset.kwrej,'reject'); return; }
+    if(t.dataset.kwact){ kwAction(t.dataset.kwact); return; }
     if(t.dataset.dkw){ var dk=t.dataset.dkw.split('|'); var g=discCache[+dk[0]]; if(g){ var kw=g.kws[+dk[1]]; var sel=discKwSel(g.subj,g.kws); sel[kw]=!sel[kw]; render(); } return; }
     if(t.dataset.dconf!==undefined && t.dataset.dconf!==''){ discConfirm(+t.dataset.dconf); return; }
     if(t.dataset.dregdel){ var rc=t.dataset.dregdel; if(confirm('從登錄庫移除 '+rc+'?(不影響已匯出的檔案)')){ registry=registry.filter(function(r){return r.code!==rc;}); regSave(); render(); } return; }
@@ -1477,7 +1601,7 @@
     if(t.dataset.act==='inject'){ var s=SAMPLES[sampleIdx%SAMPLES.length]; sampleIdx++; var a=engine.ingest({sender:s.sender,subject:s.subject,body:s.body,time:'Just Now'}); if(a) state.selected=a.id; state.nav='inbox'; persist(); render(); return; }
     if(t.dataset.act==='reset'){ if(confirm('清除本機示範資料並重新載入種子資料？')){ try{localStorage.removeItem(LS);}catch(e){} sampleIdx=0; boot(); } return; }
     if(t.dataset.act==='pickjson'){ var inp=D.createElement('input'); inp.type='file'; inp.accept='.json,application/json'; inp.multiple=true; inp.onchange=function(){ ingestFiles(inp.files); }; inp.click(); return; }
-    if(t.dataset.act==='clearjson'){ loaded={mails:[],cases:[],stake:[],pending:[],qc:[],control:[],at:null,files:[]}; trackState.sel=null; state.recAppr={}; state.loadErr=''; render(); return; }
+    if(t.dataset.act==='clearjson'){ loaded={mails:[],cases:[],stake:[],pending:[],qc:[],control:[],kwcand:[],at:null,files:[]}; trackState.sel=null; state.recAppr={}; state.loadErr=''; render(); return; }
     if(t.dataset.act==='exportcsv'){ exportTrackCsv(); return; }
     if(t.dataset.act==='runval'){ render(); return; }
     if(t.dataset.act==='resetset'){ settings=JSON.parse(JSON.stringify(DEFAULT_SET)); saveSettings(); trackState.sel=null; render(); return; }
@@ -1494,6 +1618,10 @@
       render(); var nq=D.getElementById('q'); if(nq){ nq.focus(); try{nq.setSelectionRange(c,c);}catch(_){} } return; }
     var dn=e.target.getAttribute && e.target.getAttribute('data-dname');
     if(dn!==null && dn!==undefined){ var dg=discCache[+dn]; if(dg) discState.names[dg.subj]=e.target.value; return; }
+    var ka=e.target.getAttribute && e.target.getAttribute('data-kwalias');
+    if(ka!==null && ka!==undefined){ var kr=kwCandRows()[+ka]; if(kr){ (kwState.edits[kr.canon]=kwState.edits[kr.canon]||{}).alias=e.target.value; } return; }
+    var kw=e.target.getAttribute && e.target.getAttribute('data-kwwt');
+    if(kw!==null && kw!==undefined){ var kr2=kwCandRows()[+kw]; if(kr2){ (kwState.edits[kr2.canon]=kwState.edits[kr2.canon]||{}).weight=+e.target.value; var sp=e.target.nextElementSibling; if(sp) sp.textContent=e.target.value; } return; }
     var tf=e.target.getAttribute && e.target.getAttribute('data-tf');
     if(tf){
       var t=currentTpl(); if(!t) return;
@@ -1523,6 +1651,9 @@
     if(e.target.getAttribute && e.target.getAttribute('data-wt')!=null){
       settings.w[e.target.getAttribute('data-wt')] = (+e.target.value)/100; saveSettings();
       trackState.sel=null; render();
+    }
+    if(e.target.getAttribute && e.target.getAttribute('data-kwcat')!=null){
+      var kr=kwCandRows()[+e.target.getAttribute('data-kwcat')]; if(kr){ (kwState.edits[kr.canon]=kwState.edits[kr.canon]||{}).cat=e.target.value; }
     }
   });
 
