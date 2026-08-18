@@ -23,11 +23,20 @@
 """
 from __future__ import annotations
 
-# [VIA:ACCEL-BRIDGE:v0100] 加速器橋(優雅降級)
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(路徑引導版;graceful 零行為變更) =====
 try:
-    import VIA_SuperAccel_Module as VIA_ACCEL
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # accel_map/fetch/pip_install/run_fast
 except Exception:
-    VIA_ACCEL = None
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 
 import json
 import math
@@ -91,6 +100,9 @@ def cmd_refresh() -> int:
         raw = VIA_ACCEL.fetch(ENDPOINTS["twse_etf_list"], timeout=30)
     except Exception as e:
         print(f"  [SKIP] 線上更新未成:{e}(同意閘未開或網路不可達;清單維持既有態,誠實)")
+        return 0
+    if not raw:  # fetch 同意閘拒絕/失敗時回 None 不拋例外
+        print("  [SKIP] 線上更新未成:同意閘未開或無回應(清單維持既有態,誠實)")
         return 0
     try:
         rows = json.loads(raw if isinstance(raw, str) else raw.decode("utf-8"))

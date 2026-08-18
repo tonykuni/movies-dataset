@@ -3037,6 +3037,13 @@
    "kind": "升級",
    "note": "工作站候審清單暴露兩缺陷:①年份誤抓(「台股(2026)」「股癌(2023)」——2021-2030 與年份撞區);②前綴雜訊黏連(「例如台泥」「金融股如永豐金」)。v0101 版本前進修復:年份閘 202[1-9]|2030 不自動抓(對齊 VRN_Summarizer LOCKED 規則;代價誠實聲明:燁輝2023/千興2025 等真個股年區碼須手動補);名稱清洗(剝前綴 如/例如/含/與/及/像/即/在/為/若+長度2-4容-KY+停用詞閘);--requalify 對既有候審重跑品質閘→不合格 REJECTED 留痕零刪除可翻案,前綴可救者清洗保留原名入 aliases。selftest 8→10 檢(品質閘檢:髒樣本全擋+台泥/台中銀/永豐金/慧洋-KY 救回;再鑑定檢)。倉內正庫執行:駁 46 · 留 70;grid 動態解析自動升 v0101 全綠。啟動器 via-lexicon 動態最新免改。",
    "ts": "2026-08-18"
+  },
+  {
+   "code": "QA-20260818J",
+   "name": "驗證確認(VRN BASIC INFO/FINANCIAL DATA)+ETF 三引擎橋引導修復",
+   "kind": "確認+修復",
+   "note": "①操作員問:VRN BASIC INFO/FINANCIAL DATA 驗證是否在驗證引擎內——確認在位:MDL006 ConsolidatorAndPhaseValidator 持 BASIC_INFO_COLS 15 欄 schema(ticker/雙格式代碼/company_name/report_date/broker/rating/target_price/report_code/confidence)+FINANCIAL_DATA_COLS 14 欄+compare_phases() phase1/phase2 雙相對照(n_fin_mismatch+mismatch_details 逐筆);MDL008 CrossValidator 持 Step7-11 財務驗證鏈(單位統一/歷史對照 報告vs MOPS/不一致 fallback chain/預測自洽/信心分數),輸入 MDL006 相列+MDL007 API(MOPS/TWSE/yfinance)。②工作站 --refresh 實測「SuperAccel 未載」根因=三 flow ETF 引擎手寫簡式橋無 sys.path 引導→升級為正典路徑引導橋(對齊 MDL008 自動橋);裸 cwd 實測 SuperAccel 載入+同意閘正確攔截。③新 bug 修:SuperAccel.fetch 同意閘拒絕回 None 不拋例外→cmd_refresh 加 None 閘誠實 SKIP rc0(原 decode 崩 rc2)。三引擎 selftest 6/6×3;grid OK40·FAIL0。",
+   "ts": "2026-08-18"
   }
  ]
 }
