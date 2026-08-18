@@ -1,0 +1,72 @@
+{
+  "schema": "VIA_V0140B_WINDOWS_FILE_HANDLE_ACQUISITION_SANDBOX_VALIDATION_READ_ONLY_CONTRACT_V1",
+  "version": "v0140B-WH1",
+  "title": "VIA v0140B Windows File Handle Acquisition Sandbox Validation Read Only",
+  "approval_token": "VIA_APPROVE_V0140B_WINDOWS_FILE_HANDLE_ACQUISITION_SANDBOX_VALIDATION_READ_ONLY",
+  "predecessor_gate": "VIA_V0140B_CROSS_SUBSYSTEM_SIX_ENGINE_LOCAL_READER_PATH_REPAIR_PROPOSAL_PASS_READY_NO_SYSTEM_MUTATION",
+  "approval_scope": "SEQUENTIAL_BOUNDED_HANDLE_ACQUISITION_EVIDENCE_ONLY",
+  "target_issue": {
+    "candidate_name": "Standardized_Prices.csv",
+    "reported_error": "OSError: [Errno 22] Invalid argument",
+    "confirmed_boundary": "BUILTIN_BINARY_OPEN_BEFORE_CSV_PARSE",
+    "source_role": "GOVERNED_LOCAL_CANDIDATE"
+  },
+  "coordination_model": {
+    "engine_count": 6,
+    "subsystems": ["VRN", "VDF", "VAP"],
+    "execution": "SEQUENTIAL_POWERSHELL7_PROCESS_ISOLATION",
+    "topology": ["H01", "H02", "H03", "H04", "H05", "H06"],
+    "content_read_guard_owner": "H01",
+    "aggregation": "AFTER_ALL_SIX_TERMINAL_ONLY",
+    "lane_to_lane_read": 0,
+    "lane_to_lane_write": 0,
+    "coordinator_passes_immutable_guard": true,
+    "shared_mutable_state": 0,
+    "cross_subsystem_matrix_rows": 18
+  },
+  "engines": [
+    {"id": "H01", "name": "ONEDRIVE_ATTRIBUTE_RECALL_PREFLIGHT", "runtime": "PYTHON", "content_open": false, "maximum_attempts": 0, "output_owner": "lanes/H01_ONEDRIVE_ATTRIBUTE_RECALL_PREFLIGHT"},
+    {"id": "H02", "name": "PYTHON_PATHLIB_BINARY_OPEN", "runtime": "PYTHON", "content_open": true, "maximum_attempts": 1, "output_owner": "lanes/H02_PYTHON_PATHLIB_BINARY_OPEN"},
+    {"id": "H03", "name": "PYTHON_OS_OPEN_BINARY", "runtime": "PYTHON", "content_open": true, "maximum_attempts": 1, "output_owner": "lanes/H03_PYTHON_OS_OPEN_BINARY"},
+    {"id": "H04", "name": "WIN32_CREATEFILEW_EXACT", "runtime": "PYTHON_CTYPES", "content_open": true, "maximum_attempts": 1, "output_owner": "lanes/H04_WIN32_CREATEFILEW_EXACT"},
+    {"id": "H05", "name": "WIN32_CREATEFILEW_EXTENDED_PATH", "runtime": "PYTHON_CTYPES", "content_open": true, "maximum_attempts": 1, "output_owner": "lanes/H05_WIN32_CREATEFILEW_EXTENDED_PATH"},
+    {"id": "H06", "name": "DOTNET_FILESTREAM_EXACT", "runtime": "PYTHON_TO_POWERSHELL_DOTNET", "content_open": true, "maximum_attempts": 1, "output_owner": "lanes/H06_DOTNET_FILESTREAM_EXACT"}
+  ],
+  "allowed_operations": {
+    "source_path_metadata_read": true,
+    "source_open_attempt_if_guard_safe": true,
+    "bounded_source_bytes_read_without_persistence": true,
+    "run_local_evidence_write": true,
+    "package_artifact_read_and_hash": true,
+    "predecessor_record_read": true,
+    "powershell_ast_validation": true
+  },
+  "prohibited_operations": {
+    "network_request": true,
+    "explicit_hydration": true,
+    "implicit_hydration_when_recall_flagged": true,
+    "pin_or_unpin": true,
+    "source_hash": true,
+    "source_content_persistence": true,
+    "source_write": true,
+    "source_copy": true,
+    "source_rename": true,
+    "source_delete": true,
+    "canonical_runtime_execution": true,
+    "registry_write": true,
+    "existing_artifact_mutation": true,
+    "patch_application": true,
+    "candidate_promotion": true,
+    "parallel_source_open": true
+  },
+  "completion_gates": [
+    "VIA_V0140B_WINDOWS_FILE_HANDLE_ACQUISITION_SANDBOX_VALIDATION_PASS_HANDLE_EVIDENCE_READY_NO_SYSTEM_MUTATION",
+    "VIA_V0140B_WINDOWS_FILE_HANDLE_ACQUISITION_SANDBOX_VALIDATION_HOLD_ALL_HANDLE_STRATEGIES_FAILED_NO_SYSTEM_MUTATION",
+    "VIA_V0140B_WINDOWS_FILE_HANDLE_ACQUISITION_SANDBOX_VALIDATION_HOLD_IMPLICIT_HYDRATION_RISK_NO_SYSTEM_MUTATION",
+    "VIA_V0140B_WINDOWS_FILE_HANDLE_ACQUISITION_SANDBOX_VALIDATION_HOLD_FAIL_CLOSED"
+  ],
+  "next_gate_after_pass": "V0140B_LOCAL_CANDIDATE_READER_PATH_PATCH_SANDBOX_VALIDATION_SEQUENTIAL",
+  "next_gate_after_all_failed": "V0140B_WINDOWS_HANDLE_FAILURE_MANUAL_EVIDENCE_REVIEW",
+  "next_gate_after_hydration_risk": "V0140B_ONEDRIVE_PLACEHOLDER_AND_REPARSE_STATE_MANUAL_REVIEW",
+  "generated_utc": "2026-08-16T00:00:00Z"
+}
