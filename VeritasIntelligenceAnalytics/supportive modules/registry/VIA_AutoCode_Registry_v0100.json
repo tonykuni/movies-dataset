@@ -3009,6 +3009,27 @@
    "kind": "裁決",
    "note": "①VRN_Summarizer_v1.py:倉內無 vrn_summarizer 撞名→獨立新件收容(py_compile OK;加速橋入;命名冊 VRN_ENG062)。一黃旗列管:五點缺句時落預設填充語(「同業中具競爭優勢。」等)未標註自動生成——誠實隱憂,修繕候令(version-forward)。②兩份知識 docx 收容 knowledge/source_docs/(檔名亂碼依內容命名:TW_HotGroups_IndicatorStocks_2023_2025=台股熱門族群/指標股/波動區間總表;InfoInterpretation_4Sources_SOP=資訊解讀四大類來源摘要 SOP)——即 TOOL-059 建庫源。③pycompile_VRN_MDL290 stdout 空檔=工作站編譯乾淨證據→evidence_uploads 留痕(MDL290 為工作站側件,倉內未見)。",
    "ts": "2026-08-18"
+  },
+  {
+   "code": "TOOL-060",
+   "name": "flow_tw_active_etf — 台灣主動式 ETF 清單+申贖資金流引擎",
+   "kind": "引擎",
+   "note": "操作員令(批21:台灣主動式ETF清單更新及數據擷取全自動;三大法人買賣超含主動式台股ETF資金流)。清單 SSOT TW_Active_ETF_Registry_v0100.json:種子 3 檔(00980A 統一/00981A 群益/00982A 野村)誠實標 SEED_KNOWN+verify_required——--refresh 官方 TWSE OpenAPI 名錄(非爬站;經 SuperAccel 同意閘 VIA_NET_CONSENT)為準,校驗後升 VERIFIED_OPENAPI。--ingest JSON-rows(nav/units_out/三大法人三欄)去重入庫;--flows 申贖流≈Δ在外單位×NAV,方向+%AUM+橫斷z;缺值/樣本<2 誠實不算。selftest 6/6;命名冊 FLOW_ENG023。",
+   "ts": "2026-08-18"
+  },
+  {
+   "code": "TOOL-061",
+   "name": "flow_global_etf_flowscope — 全球 ETF 跨資產資金流觀察引擎",
+   "kind": "引擎",
+   "note": "操作員令(批21:全球ETF觀察資金流進流出與規模;各區股市/商品/債券/黃金/比特幣/房地產可衡量方向及規模)。宇宙 SSOT 五資產類 23 檔(股市八區 SPY/VGK/EWJ/EEM/MCHI/INDA/EWY/0050.TW;債 TLT/IEF/LQD/HYG/AGG;商品 GLD/SLV/USO/DBC;BTC IBIT/FBTC/BITO;房地產 VNQ/VNQI/REET)。流分解 flow≈ΔAUM−AUM_prev×ret(扣市值效果=淨申贖);方向=sign、規模=%AUM+類內z+類別聚合;純市值漲=零流不誤判(selftest 驗證)。數據餵入制,引擎不捏數。selftest 6/6;命名冊 FLOW_ENG021。",
+   "ts": "2026-08-18"
+  },
+  {
+   "code": "TOOL-062",
+   "name": "flow_group_taxonomy — 台股族群三分類+族群指數繪製方法論引擎",
+   "kind": "引擎",
+   "note": "操作員令(批21:台股族群分類方法論三種分類;族群指數繪製方法論)。C1 供應鏈/題材(讀 TOOL-059 知識庫 K6 樹現行 14 枝);C2 官方 TWSE 產業別 27 類對映(官方校驗道同意閘);C3 量價輪動四象限(20日報酬z×成交值z:領漲放量/領漲縮量/回檔放量/回檔縮量;sklearn 在位可升 k-means 誠實降級)。族群指數:base100 等權(每日再平衡)/市值加權/成交值加權三式,--chartspec 輸出 VAP 圖規 JSON(VIA_Reports/flow_groupindex_chartspec.json,via-vap 可繪)。VDF 整合煙測:流結果 rows 經 vdf_output_hub write_all csv+sqlite 雙 OK。selftest 6/6;命名冊 FLOW_ENG022。grid v0117=48 站 OK40·FAIL0。",
+   "ts": "2026-08-18"
   }
  ]
 }
