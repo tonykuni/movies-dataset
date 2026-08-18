@@ -122,9 +122,16 @@ def cmd_refresh() -> int:
                 e["status"] = "VERIFIED_OPENAPI"
         reg["as_of"] = NOW
         reg["verify_required"] = any(e.get("status") == "SEED_KNOWN" for e in reg["etfs"])
-        reg["history"].append({"op": "refresh", "ts": NOW, "new": n_new})
+        reg["history"].append({"op": "refresh", "ts": NOW, "new": n_new,
+                               "rows_fetched": len(rows)})
         save_registry(reg)
-        print(f"  [更新] 官方名錄比對完成 · 新增 {n_new} · 總 {len(reg['etfs'])} 檔")
+        n_ver = sum(1 for e in reg["etfs"] if e.get("status") == "VERIFIED_OPENAPI")
+        n_seed = sum(1 for e in reg["etfs"] if e.get("status") == "SEED_KNOWN")
+        print(f"  [更新] 名錄收 {len(rows)} 筆 · 新增 {n_new} · 總 {len(reg['etfs'])} 檔"
+              f"(VERIFIED {n_ver} · 種子候校驗 {n_seed})")
+        if n_ver == 0:
+            print("  [診斷] 零筆校驗成——端點資料集可能非 ETF 名錄或欄名不符;"
+                  "首筆欄名:" + (",".join(list(rows[0].keys())[:6]) if rows else "空"))
         return 0
     except Exception as e:
         print(f"  [FAIL] 名錄解析:{e}")
