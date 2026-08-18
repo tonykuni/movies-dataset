@@ -280,6 +280,8 @@
       navBtn('reconcile', IC.scale({s:19}), '對帳校準 · 控管表×郵件→建議', (loaded.control.length?loaded.control.length:0))+
       navBtn('discover', IC.search({s:19}), '專案發掘 · 關鍵字→成案編號', registry.length)+
       navBtn('keyword', IC.tag({s:19}), '關鍵字審核 · 候選→詞庫', (lexicon.filter(function(x){return x.status==='accept';}).length))+
+      navBtn('reply', IC.term({s:19}), '回覆迴路 · 貼回覆→狀態更新建議', 0)+
+      navBtn('pm', IC.zap({s:19}), '流程探勘 · 瓶頸/等待/工期', 0)+
       navBtn('templates', IC.doc({s:19}), '範本庫管理 · 導入不寄出', 0)+
       navBtn('validate', IC.check({s:19}), '驗證中心 · 一鍵自檢', 0)+
       '<div style="flex:1"></div>'+
@@ -297,6 +299,8 @@
               : state.nav==='reconcile' ? reconcileView()
               : state.nav==='discover' ? discoverView()
               : state.nav==='keyword' ? keywordView()
+              : state.nav==='reply' ? replyView()
+              : state.nav==='pm' ? pmView()
               : state.nav==='templates' ? templatesView()
               : loadedView();
     return '<main class="grid-bg" style="flex:1;position:relative;overflow:hidden;display:flex">'+inner+'</main>';
@@ -1219,6 +1223,181 @@
     delete kwState.edits[r.canon];
   }
 
+  /* ---------------- ↩ 回覆迴路 Reply Loop (parse replies → status-update proposals; never auto-write) ---------------- */
+  var replyState = { text:'', appr:{} };
+  var REPLY_OPT = { '1':{label:'已完成',status:'已完成'}, '2':{label:'需補資料',status:'需補資料'}, '3':{label:'需澄清',status:'需澄清'}, '4':{label:'需延長',status:'進行中(延長)'} };
+  function replyKnownCode(s){
+    // match against control/registry codes, else generic CODE-#### pattern
+    var found='';
+    loaded.control.forEach(function(c){ if(c.Code && s.indexOf(c.Code)>=0) found=c.Code; });
+    registry.forEach(function(r){ if(r.code && s.indexOf(r.code)>=0) found=r.code; });
+    if(found) return found;
+    var m=s.match(/\b([A-Za-z]{2,5}[-_]\d{2,6})\b/); return m?m[1]:'';
+  }
+  function replyNameFor(code){
+    var n=''; loaded.control.forEach(function(c){ if(c.Code===code) n=c.Name; });
+    if(!n) registry.forEach(function(r){ if(r.code===code) n=r.name; });
+    return n;
+  }
+  function replyParseBlock(b){
+    var code=replyKnownCode(b);
+    var opt=''; var m=b.match(/選項\s*[:：]\s*([1-4])/); if(m) opt=m[1];
+    var status='';
+    if(opt) status=REPLY_OPT[opt].status;
+    else { // loose: status words / circled choice
+      if(/[●○\[\(【][ ]*[xXvV✓]?[ ]*已完成|已完成\s*[✓●]/.test(b)||/\b已完成\b/.test(b)&&/[●✓]/.test(b)) status='已完成';
+      else if(/卡關|blocked/i.test(b)) status='卡關';
+      else if(/進行中/.test(b)) status='進行中';
+    }
+    var eta=''; var e=b.match(/(?:ETA|交期|預計完成|完成日)\s*[:：]?\s*(\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2})/); if(e) eta=e[1];
+    else { var e2=b.match(/\b(\d{4}[\/\-]\d{1,2}[\/\-]\d{1,2})\b/); if(e2) eta=e2[1]; }
+    var pct=''; var pc=b.match(/(\d{1,3})\s*%/); if(pc) pct=pc[1]+'%';
+    var reason=''; var r=b.match(/(?:原因|說明|備註|阻礙|reason)\s*[:：]\s*(.+)/i); if(r) reason=r[1].trim().slice(0,80);
+    var blocked=/阻礙[^無]*有|有阻礙|卡關|blocked/i.test(b);
+    if(!code && !opt && !status && !eta) return null;
+    return { code:code, name:replyNameFor(code), opt:opt, status:status, eta:eta, pct:pct, reason:reason, blocked:blocked, raw:b.trim().slice(0,140) };
+  }
+  function parseReplies(text){
+    if(!text||!text.trim()) return [];
+    // split on the VMT token OR blank lines, so mixed token/loose-text input stays separated
+    var blocks=text.split(/==VMT-REPLY==|\n\s*\n+/).map(function(s){return s.trim();}).filter(Boolean);
+    var out=[]; blocks.forEach(function(b,i){ var p=replyParseBlock(b); if(p){ p.id='rep_'+i; out.push(p); } });
+    return out;
+  }
+  function replyView(){
+    var parsed=parseReplies(replyState.text);
+    var matched=parsed.filter(function(p){return p.code;});
+    var head='<div style="height:56px;flex:none;border-bottom:1px solid var(--line);padding:0 22px;display:flex;align-items:center;gap:12px;background:rgba(4,12,26,.5)">'+
+      '<h2 style="font-size:16px;font-weight:600;color:#fff;display:flex;align-items:center;gap:9px">'+IC.term({s:18})+' 回覆迴路</h2>'+
+      '<span class="mono" style="font-size:10px;background:#0f1e34;border:1px solid var(--line2);color:var(--mut);padding:2px 8px;border-radius:5px">貼上對方回覆→解析→狀態更新建議(不自動寫回)</span>'+
+      '<span style="flex:1"></span>'+
+      '<button data-rpact="sample" class="mono" style="font-size:10px;color:var(--mut);background:#0f1e34;border:1px solid var(--line2);border-radius:8px;padding:7px 11px">插入範例</button>'+
+      '<button data-rpact="export" class="mono" style="font-size:10px;color:var(--em2);background:#0f1e34;border:1px solid var(--line2);border-radius:8px;padding:7px 11px">⭳ 匯出已採納更新</button>'+
+    '</div>'+
+    '<div class="mono" style="font-size:10px;color:var(--mut2);background:var(--panel2);border-bottom:1px solid var(--line);padding:7px 22px">把對方回信內容貼進左框(支援 <b style="color:var(--em2)">==VMT-REPLY==</b> token 或含案號+○選擇題的純文字)。系統解析成狀態更新<b style="color:var(--em2)">建議</b>,你勾選採納後匯出,自行套回控管表 — 不自動改檔、不寄信。</div>';
+
+    var left='<div style="flex:1;display:flex;flex-direction:column;border-right:1px solid var(--line);min-width:0">'+
+      '<div class="mono" style="flex:none;font-size:9px;letter-spacing:1px;color:var(--mut2);text-transform:uppercase;padding:10px 16px 4px">貼上回覆內容</div>'+
+      '<textarea data-rptext spellcheck="false" placeholder="例:&#10;==VMT-REPLY== PRJ-002 | 選項:4 | ETA:2026/08/25 | 原因:等對方法務用印&#10;&#10;或直接貼含案號與○選擇題的回信純文字…" style="flex:1;margin:0 16px 16px;font:400 12px/1.6 var(--mono);color:#cbd5e1;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:12px;resize:none;outline:none">'+esc(replyState.text)+'</textarea></div>';
+
+    var rightBody;
+    if(!parsed.length){
+      rightBody='<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--mut2);font-size:12px" class="mono">解析結果會顯示在這裡</div>';
+    } else {
+      rightBody='<div style="flex:1;overflow-y:auto;padding:8px 16px">'+parsed.map(function(p){
+        var ok=!!p.code; var on=!!replyState.appr[p.id];
+        return '<div style="background:var(--panel2);border:1px solid '+(ok?'var(--line)':'#3a2230')+';border-radius:9px;padding:11px 13px;margin-bottom:9px">'+
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'+
+            (ok?'<span data-rpappr="'+p.id+'" style="cursor:pointer;width:18px;height:18px;border-radius:5px;border:1.5px solid '+(on?'var(--em)':'var(--line2)')+';background:'+(on?'var(--em)':'transparent')+';display:inline-flex;align-items:center;justify-content:center;flex:none">'+(on?'<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#04101a" stroke-width="3.4" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg>':'')+'</span>':'<span style="color:#e0899b;font-size:11px">⚠ 無案號</span>')+
+            '<span class="mono" style="font-size:11px;color:var(--em2)">'+esc(p.code||'—')+'</span>'+
+            '<span style="font-size:12px;color:#fff;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">'+esc(p.name||'(未在控管表/登錄庫)')+'</span>'+
+          '</div>'+
+          '<div style="display:flex;gap:7px;flex-wrap:wrap;font-size:10.5px">'+
+            (p.status?'<span style="color:#e2e8f0;background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.3);border-radius:10px;padding:2px 8px">狀態→'+esc(p.status)+'</span>':'')+
+            (p.eta?'<span style="color:#e2e8f0;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:10px;padding:2px 8px">ETA→'+esc(p.eta)+'</span>':'')+
+            (p.pct?'<span class="mono" style="color:var(--mut);border:1px solid var(--line2);border-radius:10px;padding:2px 8px">'+esc(p.pct)+'</span>':'')+
+            (p.blocked?'<span style="color:#f87171;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);border-radius:10px;padding:2px 8px">有阻礙</span>':'')+
+          '</div>'+
+          (p.reason?'<div class="mono" style="font-size:9.5px;color:var(--mut2);margin-top:6px">原因:'+esc(p.reason)+'</div>':'')+
+        '</div>';
+      }).join('')+'</div>';
+    }
+
+    return '<div class="fadein" style="flex:1;display:flex;flex-direction:column;position:relative;z-index:10;overflow:hidden">'+head+
+      '<div style="flex:1;display:flex;overflow:hidden">'+left+
+        '<div style="flex:1;display:flex;flex-direction:column;overflow:hidden;background:rgba(4,12,26,.3);min-width:0">'+
+          '<div class="mono" style="flex:none;font-size:9px;letter-spacing:1px;color:var(--mut2);text-transform:uppercase;padding:10px 16px 4px">解析結果 · 對上案號 '+matched.length+' / '+parsed.length+'</div>'+rightBody+'</div>'+
+      '</div>'+
+    '</div>';
+  }
+  function replyAction(a){
+    if(a==='sample'){
+      replyState.text='==VMT-REPLY== '+(loaded.control[0]?loaded.control[0].Code:'PRJ-001')+' | 選項:1 | ETA:2026/08/20 | 原因:已完成並交付\n\n==VMT-REPLY== '+(loaded.control[1]?loaded.control[1].Code:'PRJ-002')+' | 選項:4 | ETA:2026/08/25 | 原因:等對方法務用印\n\n關於 PRJ-003 目前 ● 進行中 完成 60% 預計完成 2026/09/01 阻礙:有 缺零件';
+      replyState.appr={}; render(); return;
+    }
+    if(a==='export'){
+      var parsed=parseReplies(replyState.text).filter(function(p){ return p.code && replyState.appr[p.id]; });
+      if(!parsed.length){ alert('尚未勾選任何「對上案號」的回覆更新。'); return; }
+      function q(v){ v=(v==null?'':''+v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v; }
+      var out='ProjectCode,ProjectName,NewStatus,NewETA,Progress,Blocked,Reason,Decision\n'+parsed.map(function(p){
+        return [q(p.code),q(p.name),q(p.status),q(p.eta),q(p.pct),q(p.blocked?'Y':''),q(p.reason),q('採納')].join(',');
+      }).join('\n')+'\n';
+      downloadText('reply_updates_approved.csv', out, 'text/csv');
+      return;
+    }
+  }
+
+  /* ---------------- 📈 流程探勘 Process Mining (Case/Activity/Timestamp → DFG · waits · bottleneck) ---------------- */
+  function pmEvents(){
+    // build events from loaded mails: case = matched project (control/registry) or ConversationID; activity = direction; ts = EventDate
+    var evs=[];
+    loaded.mails.forEach(function(m){
+      var subj=m.Subject||''; var caseId='';
+      loaded.control.forEach(function(c){ if((c.Code&&subj.indexOf(c.Code)>=0)||(c.Name&&subj.indexOf(c.Name)>=0)) caseId=c.Code||c.Name; });
+      if(!caseId) registry.forEach(function(r){ if((r.code&&subj.indexOf(r.code)>=0)||(r.name&&subj.indexOf(r.name)>=0)) caseId=r.code; });
+      if(!caseId) caseId=m.ConversationID||'';
+      if(!caseId) return;
+      var d=recParseDate(m.EventDate); if(!d) return;
+      var act=(m.Direction||'').toUpperCase()==='OUTBOUND'?'我方寄出':(m.Direction||'').toUpperCase()==='INBOUND'?'對方回覆':(m.SuggestedCategory||m.ConfirmedCategory||'事件');
+      evs.push({ caseId:caseId, act:act, t:d.getTime(), cat:(m.ConfirmedCategory||m.SuggestedCategory||'') });
+    });
+    return evs;
+  }
+  function pmMine(){
+    var evs=pmEvents();
+    var byCase={}; evs.forEach(function(e){ (byCase[e.caseId]=byCase[e.caseId]||[]).push(e); });
+    var trans={}, actFreq={}, durations=[];
+    Object.keys(byCase).forEach(function(cid){
+      var seq=byCase[cid].sort(function(a,b){return a.t-b.t;});
+      durations.push({ caseId:cid, days:(seq[seq.length-1].t-seq[0].t)/86400000, n:seq.length });
+      seq.forEach(function(e){ actFreq[e.act]=(actFreq[e.act]||0)+1; });
+      for(var i=0;i<seq.length-1;i++){
+        var key=seq[i].act+' → '+seq[i+1].act;
+        var wait=(seq[i+1].t-seq[i].t)/86400000;
+        if(!trans[key]) trans[key]={key:key,count:0,totWait:0};
+        trans[key].count++; trans[key].totWait+=wait;
+      }
+    });
+    var edges=Object.keys(trans).map(function(k){ var t=trans[k]; return {key:k,count:t.count,avgWait:t.totWait/t.count}; })
+      .sort(function(a,b){ return b.avgWait-a.avgWait; });
+    return { cases:Object.keys(byCase).length, events:evs.length, edges:edges,
+      acts:Object.keys(actFreq).map(function(a){return {act:a,n:actFreq[a]};}).sort(function(a,b){return b.n-a.n;}),
+      durations:durations.sort(function(a,b){return b.days-a.days;}) };
+  }
+  function pmView(){
+    var m=pmMine();
+    var head='<div style="height:56px;flex:none;border-bottom:1px solid var(--line);padding:0 22px;display:flex;align-items:center;gap:12px;background:rgba(4,12,26,.5)">'+
+      '<h2 style="font-size:16px;font-weight:600;color:#fff;display:flex;align-items:center;gap:9px">'+IC.zap({s:18})+' 流程探勘</h2>'+
+      '<span class="mono" style="font-size:10px;background:#0f1e34;border:1px solid var(--line2);color:var(--mut);padding:2px 8px;border-radius:5px">Case · Activity · Timestamp → 轉移/等待/瓶頸</span>'+
+      '<span style="flex:1"></span><span class="mono" style="font-size:10px;color:var(--mut)">'+m.cases+' 案 · '+m.events+' 事件</span>'+
+    '</div>';
+    if(!m.events){
+      return '<div class="fadein" style="flex:1;display:flex;flex-direction:column;position:relative;z-index:10;overflow:hidden">'+head+
+        '<div style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--mut2)"><div style="opacity:.5">'+IC.zap({s:40})+'</div><div style="font-size:13px;color:#cbd5e1">先到「載入」頁匯入郵件(mails)並確保有控管表/登錄庫可對案,再回來探勘</div></div></div>';
+    }
+    var maxWait=m.edges.length?m.edges[0].avgWait:1;
+    var edgeRows=m.edges.map(function(e,i){
+      var isBottleneck=i===0;
+      return '<tr style="border-bottom:1px solid rgba(30,41,59,.5)">'+
+        '<td style="padding:8px 10px;font-size:12px;color:#e2e8f0">'+(isBottleneck?'<span title="最大瓶頸" style="color:#f87171">🔥 </span>':'')+esc(e.key)+'</td>'+
+        '<td style="padding:8px 10px;text-align:center;color:var(--mut);font-size:11px" class="mono">'+e.count+'</td>'+
+        '<td style="padding:8px 10px;min-width:140px"><div style="display:flex;align-items:center;gap:7px"><div style="flex:1;height:6px;background:rgba(148,163,184,.15);border-radius:3px;overflow:hidden"><div style="width:'+Math.max(3,Math.round(e.avgWait/maxWait*100))+'%;height:100%;background:'+(isBottleneck?'#f87171':'var(--amber)')+'"></div></div><span class="mono" style="font-size:10px;color:'+(isBottleneck?'#f87171':'var(--mut)')+'">'+e.avgWait.toFixed(1)+' 天</span></div></td>'+
+      '</tr>';
+    }).join('');
+    var actRows=m.acts.map(function(a){ return '<div style="display:flex;align-items:center;gap:8px;padding:5px 0"><span style="font-size:11.5px;color:#cbd5e1;flex:1">'+esc(a.act)+'</span><span class="mono" style="font-size:10px;color:var(--em2)">'+a.n+'</span></div>'; }).join('');
+    var durRows=m.durations.slice(0,10).map(function(d){ return '<div style="display:flex;align-items:center;gap:8px;padding:5px 0"><span class="mono" style="font-size:10px;color:var(--mut2);width:80px">'+esc(d.caseId).slice(0,12)+'</span><span style="font-size:11px;color:#cbd5e1;flex:1">'+d.days.toFixed(1)+' 天 · '+d.n+' 事件</span></div>'; }).join('');
+    return '<div class="fadein" style="flex:1;display:flex;flex-direction:column;position:relative;z-index:10;overflow:hidden">'+head+
+      '<div style="flex:1;overflow-y:auto;padding:18px 22px">'+
+        '<div style="font-size:12px;font-weight:700;color:var(--mut);letter-spacing:.5px;margin-bottom:8px">活動轉移 DFG · 依平均等待排序(瓶頸在最上)</div>'+
+        '<div style="background:var(--panel2);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:18px"><table style="width:100%;border-collapse:collapse"><thead><tr>'+th('轉移(A → B)')+th('次數',{a:'center'})+th('平均等待')+'</tr></thead><tbody>'+edgeRows+'</tbody></table></div>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">'+
+          '<div style="background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 16px"><div style="font-size:11px;font-weight:700;color:var(--mut);margin-bottom:6px">活動頻率</div>'+actRows+'</div>'+
+          '<div style="background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 16px"><div style="font-size:11px;font-weight:700;color:var(--mut);margin-bottom:6px">案件工期(前 10 長)</div>'+durRows+'</div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }
+
   /* ---------------- ⚙ Settings (mouse-adjustable factor weights) ---------------- */
   function settingsView(){
     var W=settings.w;
@@ -1583,11 +1762,13 @@
 
   /* ============================= EVENTS ============================= */
   D.getElementById('app').addEventListener('click', function(e){
-    var t = e.target.closest('[data-act],[data-nav],[data-open],[data-addtask],[data-move],[data-ltab],[data-deck],[data-tsel],[data-tplsel],[data-tplact],[data-recact],[data-recappr],[data-dact],[data-dkw],[data-dconf],[data-dregdel],[data-kwact],[data-kwacc],[data-kwrej]');
+    var t = e.target.closest('[data-act],[data-nav],[data-open],[data-addtask],[data-move],[data-ltab],[data-deck],[data-tsel],[data-tplsel],[data-tplact],[data-recact],[data-recappr],[data-dact],[data-dkw],[data-dconf],[data-dregdel],[data-kwact],[data-kwacc],[data-kwrej],[data-rpappr],[data-rpact]');
     if(!t) return;
     if(t.dataset.kwacc!==undefined && t.dataset.kwacc!==''){ kwCommit(+t.dataset.kwacc,'accept'); return; }
     if(t.dataset.kwrej!==undefined && t.dataset.kwrej!==''){ kwCommit(+t.dataset.kwrej,'reject'); return; }
     if(t.dataset.kwact){ kwAction(t.dataset.kwact); return; }
+    if(t.dataset.rpappr){ replyState.appr[t.dataset.rpappr]=!replyState.appr[t.dataset.rpappr]; render(); return; }
+    if(t.dataset.rpact){ replyAction(t.dataset.rpact); return; }
     if(t.dataset.dkw){ var dk=t.dataset.dkw.split('|'); var g=discCache[+dk[0]]; if(g){ var kw=g.kws[+dk[1]]; var sel=discKwSel(g.subj,g.kws); sel[kw]=!sel[kw]; render(); } return; }
     if(t.dataset.dconf!==undefined && t.dataset.dconf!==''){ discConfirm(+t.dataset.dconf); return; }
     if(t.dataset.dregdel){ var rc=t.dataset.dregdel; if(confirm('從登錄庫移除 '+rc+'?(不影響已匯出的檔案)')){ registry=registry.filter(function(r){return r.code!==rc;}); regSave(); render(); } return; }
@@ -1618,6 +1799,7 @@
       render(); var nq=D.getElementById('q'); if(nq){ nq.focus(); try{nq.setSelectionRange(c,c);}catch(_){} } return; }
     var dn=e.target.getAttribute && e.target.getAttribute('data-dname');
     if(dn!==null && dn!==undefined){ var dg=discCache[+dn]; if(dg) discState.names[dg.subj]=e.target.value; return; }
+    if(e.target.getAttribute && e.target.getAttribute('data-rptext')!==null && e.target.hasAttribute('data-rptext')){ replyState.text=e.target.value; return; }
     var ka=e.target.getAttribute && e.target.getAttribute('data-kwalias');
     if(ka!==null && ka!==undefined){ var kr=kwCandRows()[+ka]; if(kr){ (kwState.edits[kr.canon]=kwState.edits[kr.canon]||{}).alias=e.target.value; } return; }
     var kw=e.target.getAttribute && e.target.getAttribute('data-kwwt');
