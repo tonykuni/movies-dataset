@@ -22,6 +22,20 @@ ML 永不直寫狀態;所有產出=人工圈選候選。解析器本體零改動
 治理:模型/建議/聚類全落 out/(可再生側車);行為參數全 config/ml_params.json;
 依賴缺席=誠實 FAIL + 一行安裝指令;sentence-transformers 在位時自動升級語意嵌入。
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(全引擎導入令 2026-08-18;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # accel_map/fetch/pip_install/run_fast
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 import argparse
 import csv
 import io

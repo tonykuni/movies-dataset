@@ -9,6 +9,20 @@ r"""board_qa.py v0100 — 指揮板四層測試(操作員「unit/integration/sys
                       (seal 4cb90a0bd31df637)之色票/字體/封印 — 純 Python 任何機器可跑
 產物:out/board_qa_report.json。動態解析最新板;嚴禁寫死版號。
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(全引擎導入令 2026-08-18;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # accel_map/fetch/pip_install/run_fast
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 import hashlib
 import json
 import re

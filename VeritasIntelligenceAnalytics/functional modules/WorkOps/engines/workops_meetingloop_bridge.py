@@ -8,6 +8,20 @@ MeetingLoop 每輪 run 的「決議/行動」自動併入 WorkOps 對帳迴圈:
 會議中人已確認之決議=人工確認等級,直接入帳;行動只彙整不代辦。全程 append-only。
 動詞:pull(預設)/ status。via-workops mtg。
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(全引擎導入令 2026-08-18;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # accel_map/fetch/pip_install/run_fast
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 import csv, hashlib, io, json, subprocess, sys
 from datetime import datetime
 from pathlib import Path

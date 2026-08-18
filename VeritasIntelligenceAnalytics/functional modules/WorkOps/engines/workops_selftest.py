@@ -20,6 +20,20 @@ L1/L2/S3/S4/風險/OOO/ACK/集成)→ 逐引擎 subprocess 實跑 → 斷言產�
 失敗不中斷其餘段(不卡斷);FinalGate=PASS 才可宣稱鏈路無誤。
 動詞:run(預設)。via-workops selftest。
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(全引擎導入令 2026-08-18;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # accel_map/fetch/pip_install/run_fast
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 import io, json, csv, shutil, sqlite3, subprocess, sys, tempfile
 from datetime import datetime
 from pathlib import Path

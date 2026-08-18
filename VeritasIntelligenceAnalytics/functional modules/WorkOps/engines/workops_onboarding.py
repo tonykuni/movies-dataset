@@ -5,6 +5,20 @@ r"""Veritas WorkOps 首跑狀態機 v0100 — GapFill 自建路 B(裁定序 B;�
 命名核對→Gold Set→節奏排程。衍生態落 out/onboarding_state.json(每跑重算)。
 動詞:build(預設)。via-workops onboard。UI 首跑精靈(重規劃 §4.1)可直讀此檔。
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(全引擎導入令 2026-08-18;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # accel_map/fetch/pip_install/run_fast
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 import json, sys
 from datetime import datetime
 from pathlib import Path

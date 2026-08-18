@@ -16,6 +16,20 @@ VIA ChipWar Chain Head (T4 placeholder) — 合成宇宙 + regime
   phase2(2025-11-15→) 籌碼戰:tech 集中上攻、trad 走平、流量集中投信、score 高
 族群清單讀 ssot/SSOT_ChipWar_Schema.json 之 bloc_tags(19 tech + 8 trad + 4 hybrid = 31)。
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(全引擎導入令 2026-08-18;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # accel_map/fetch/pip_install/run_fast
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 import datetime as dt
 import json
 import os
