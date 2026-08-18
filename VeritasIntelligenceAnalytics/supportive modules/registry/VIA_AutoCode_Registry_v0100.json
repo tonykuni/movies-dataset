@@ -3128,6 +3128,13 @@
    "kind": "升級",
    "note": "工作站 via-rebuild --selftest 直測揪出:t10「執行檔+切換令」AssertionError。真因=swap_commands 用 Path(newenv).parent 組路徑,Windows 上產反斜線(\\e\\via_demo),與 sh 令期望正斜線字串不符——平台分隔符差,引擎功能(Rename-Item ps 令)無恙。v0104 版本前進:old/retire 一律 .replace(反斜線→正斜線)正規化,sh 令走 posix 分隔、ps 令兩制式皆容;容器 14/14;工作站候拉新驗證。至此工作站 L4 grid FAIL 2 全數結案(語法救援=PEP 701 版差已由 v0102 清;重建計畫=本修)——重跑 via-atlas --ladder 應六級全綠。",
    "ts": "2026-08-19"
+  },
+  {
+   "code": "QA-20260819D",
+   "name": "工作站全面收官驗收:六級測試梯全綠+重建 14/14+舊根導入確認 5,276/5,309",
+   "kind": "驗收",
+   "note": "工作站 HEAD c17eaa5 實錄:①via-rebuild --selftest 14/14(v0104 Windows 反斜線修生效,t10 執行檔+切換令 OK);②via-atlas --ladder 六級全綠 OK6·FAIL0,L4 grid=OK 49·FAIL 0·SKIP 3(工作站站數多於容器,環境較全);L4 FAIL 2 懸案全結。③via-wrapup --supconfirm 舊根 supportive modules 5,309 件:已導入 5,276(99.4%,含改名/搬移後 hash 對上)·未導入 33——可見 20 件全為 Dashboard_Format_Standardization/*.dc.html 設計資產(Chart Library/Dashboard Standard/Commodities/Global Macro/Note Pro/PMBOK Deck/Risk Engine v10 Deck 等),另 13 件候清單抽取;收容波候操作員跑 robocopy+具名 add 一鍵(容器不可達工作站 Downloads)。",
+   "ts": "2026-08-19"
   }
  ]
 }
