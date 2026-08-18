@@ -3247,6 +3247,20 @@
    "kind": "工具",
    "note": "AI 只整理不發明——三冊全收割自倉內正本,逐條標來源:①VRN_Broker_Dict_v0100.json=29 家券商→縮寫(正本 Summarizer BROKER_ABBR_DICT);②VRN_FinData_Synonym_v0100.json=153 canonical 財務數據中英同義(四源合流:InvestmentRegexPattern 庫 140 項 zh/en/regex+MDL007 MOPS_ACCOUNT_MAP 官方科目名+MDL008 SYNONYM_FALLBACK 別名+方法冊 def05;多源並列 12 項 sources 標註不仲裁);③VRN_FinStatement_Synonym_v0100.json=7 表(四大表+比率/每股/附註)中英名+141 科目歸屬。NUMBER_PATTERNS=裸 regex 數字格式非同義字,型別閘誠實跳過。動詞 via-finlex(--build/--ask/--selftest);--ask 中英同義反查 canonical(毛利→gross_profit 四源、凱基→KGI)。八檢 8/8;三冊入中央參數樞紐 v0102(20 冊 OK·48,084 葉·衝突 0);grid v0126=58 站 OK50·FAIL0。",
    "ts": "2026-08-19"
+  },
+  {
+   "code": "TOOL-072B",
+   "name": "財務字庫收割 v0101 十源合流(批45 五件+批46 三件上傳擴源)",
+   "kind": "工具",
+   "note": "批45 收容五件:financial_classification_rules(VeritasSynonymEngine v3.0→VRN)/financial_data_standardization(合併損傷件:class 先於 imports 致 import NameError,AST 零執行收割,黃旗:__main__ 引用未存在 API)/enhanced_part1_financial_1_(PDF 財務件處理→VRN)/ultra_financial_tool(yfinance 增量擷取工具→VDF;實跑受同意閘)/financial_metrics_mapping.md(57 指標對照→source_docs)。批46 收容:VRN_Financial_Synonyms_SSOT(五錨同義冊)/VETF_VIS_VRN_FinancialSSOT_v0608.py.freeze.lock.json(第三老根 VETF 凍結鎖→70_VRN_Rules 並存);VIS_VRN_FinancialSSOT_v05910 上傳=橋前原文讓位。字庫戰果:findata 178→196 canonical·多源 73 項·field_map(twse_tpex/twstock/yfinance)、broker 29+extended 32(aliases/country/type)、新冊 VRN_Rating_Dict(四級+六集)+VRN_TickerDate_Regex(38 式,TW 寬鬆式掛 LOOSE_ 不入 LOCKED 圈)、帳目 SSOT 61 科目(uid 標記,凍結件唯讀)、Synonyms_SSOT 66 別名。params v0103=22 冊·50,172 葉·衝突 0·DRIFT 0(對齊檢精修:鍵尾段全等才比,變體名不誤觸);十四檢 14/14;grid v0127 OK50·FAIL0。",
+   "ts": "2026-08-19"
+  },
+  {
+   "code": "QA-20260819N",
+   "name": "凍結完整性異常入帳:VIS_VRN_FinancialSSOT_v0608 現行 sha≠其凍結鎖記載(候操作員裁決)",
+   "kind": "稽核",
+   "note": "倉內 70_VRN_Rules/VIS_VRN_FinancialSSOT_v0608.py 現行 sha256=582f2a6fab8fd808…(無加速器橋,83 行);其倉內凍結鎖與批46 上傳之 VETF 鎖皆記載 sha256=6f57063354728310…(84 行,FREEZE_OK 2026-06-08)。即:凍結後內容曾於上游變動(非本會話所為;本會話僅唯讀收割)。零觸碰紅線:不修不復原,兩鎖並存存證,候操作員裁決(選項:a 認可現行版並重立鎖;b 自老根尋回 6f5706 原文並存;c 維持現狀觀察)。",
+   "ts": "2026-08-19"
   }
  ]
 }
