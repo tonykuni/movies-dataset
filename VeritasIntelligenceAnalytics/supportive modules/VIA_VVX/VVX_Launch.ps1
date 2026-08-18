@@ -5,7 +5,7 @@
 #  seaborn / Chart.js / ECharts figure intact at a standardized W x H, finds
 #  time-axis + colors + plotting conventions, then auto-opens an HTML gallery
 #  AND the panoramic fix-matrix report.
-#  Modules : M01 VVX_Extractor.py  M02 vvx_gallery.js  M03 VVX_Gallery.html
+#  Modules : M01 SUP_MDL165_VVXExtractor.py  M02 vvx_gallery.js  M03 VVX_Gallery.html
 #            M04 VVX_FixReport.html
 #  10 accelerators : ACC01..ACC10.
 #  Rules : UTF-8 No BOM, append-only, full cmdlets, no aliases, no block
@@ -58,7 +58,7 @@ function Write-VvxFile {
 $script:PY_EXTRACTOR = @'
 # -*- coding: utf-8 -*-
 # ============================================================================
-#  VVX_Extractor.py  -  Veritas Viz eXtractor  (VIA / VPN family)
+#  SUP_MDL165_VVXExtractor.py  -  Veritas Viz eXtractor  (VIA / VPN family)
 #  M01 : multi-engine chart detector + per-figure spec + intact single-chart pull
 #  Engines : Plotly / Dash(=Plotly) / matplotlib+seaborn (PNG|SVG) /
 #            Chart.js / ECharts / Bokeh / generic inline-SVG & base64-image
@@ -730,7 +730,7 @@ if __name__ == "__main__":
 $script:JS_GALLERY = @'
 /* ==========================================================================
  *  vvx_gallery.js  -  Veritas Viz eXtractor  (VIA / VPN family)
- *  M02 : render chart-spec gallery from VVX_Extractor.py JSON.
+ *  M02 : render chart-spec gallery from SUP_MDL165_VVXExtractor.py JSON.
  *        live-embeds each intact single chart (.html iframe / .svg / .png)
  *        beside a full spec panel (std W×H, time-axis, colors, conventions).
  * ======================================================================== */
@@ -1256,7 +1256,7 @@ if (-not (Test-Path -LiteralPath $script:Root)) {
     New-Item -ItemType Directory -Path $script:Root -Force | Out-Null
 }
 $null = New-Item -ItemType Directory -Path (Join-Path $script:Root 'charts') -Force
-Write-VvxFile (Join-Path $script:Root 'VVX_Extractor.py') $script:PY_EXTRACTOR
+Write-VvxFile (Join-Path $script:Root 'SUP_MDL165_VVXExtractor.py') $script:PY_EXTRACTOR
 Write-VvxFile (Join-Path $script:Root 'vvx_gallery.js')   $script:JS_GALLERY
 Write-VvxFile (Join-Path $script:Root 'VVX_Gallery.html') $script:HTML_GALLERY
 Write-VvxFile (Join-Path $script:Root 'VVX_FixReport.html') $script:HTML_REPORT
@@ -1330,7 +1330,7 @@ if ($null -eq $script:PyExe) {
 Add-Log ('python   : ' + ($script:PyExe + ' ' + $script:PyLead).Trim()) 'DarkGray'
 
 # ---- ACC06 : run extractor via ProcessStartInfo -----------------------------
-$script:ReaderPy = Join-Path $script:Root 'VVX_Extractor.py'
+$script:ReaderPy = Join-Path $script:Root 'SUP_MDL165_VVXExtractor.py'
 $recurseArg = ''
 if ($Recurse) { $recurseArg = ' --recurse' }
 $argStr = ($script:PyLead + ' "' + $script:ReaderPy + '" --scan "' + $script:Scan +

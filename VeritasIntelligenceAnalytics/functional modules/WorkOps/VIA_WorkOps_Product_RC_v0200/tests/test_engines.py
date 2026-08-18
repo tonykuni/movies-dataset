@@ -48,7 +48,7 @@ def test_registration_and_fusion():
     assert c1["user_confirmation_required"] is True
 def test_reply_builder():
     reset(); shutil.copy(FIX/"followup_state.json",OUT/"followup_state.json")
-    r=run("workops_mandatory_reply_builder.py","build"); assert r.returncode==0, r.stderr
+    r=run("VIA_ENG120_WorkopsMandatoryReplyBuilder.py","build"); assert r.returncode==0, r.stderr
     d=json.loads(r.stdout); assert d["count"]==1
     item=d["items"][0]
     assert item["send_allowed"] is False

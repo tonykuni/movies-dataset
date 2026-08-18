@@ -39,9 +39,9 @@ if ($onMain -or -not (git ls-remote --heads origin $feat)) {
 
 # ---------- 2) VDF intake → AutoPlot ----------
 $py = if (Get-Command py -ErrorAction SilentlyContinue) { 'py' } else { 'python' }
-& $py "$fm\VDF\engine\vdf_movies_intake_v001.py" --base $via --source "$repo\data" --mode Refresh
+& $py "$fm\VDF\engine\VDF_ENG042_MoviesIntake_v001.py" --base $via --source "$repo\data" --mode Refresh
 if ($LASTEXITCODE -ne 0) { Write-Host "[STOP] VDF 未過閘" -ForegroundColor Red; return }
-& $py "$fm\VAP\engine\via_autoplot_engine_v001.py" --base $via --auto --max-charts 40
+& $py "$fm\VAP\engine\VAP_ENG002_AutoplotEngine_v001.py" --base $via --auto --max-charts 40
 if ($LASTEXITCODE -ne 0) { Write-Host "[STOP] AutoPlot 失敗" -ForegroundColor Red; return }
 
 # ---------- 3) 開啟 UI(v010 主力;v009 canonical 保留不開) ----------
@@ -96,7 +96,7 @@ if ($VRN) {
 
 # ---------- 4.8) 可選:Control Tower(HTML 控制台,全部動作變按鈕) ----------
 if ($Tower) {
-    $towerPy = Join-Path $via 'supportive modules\VIA_Control_Tower\via_control_tower.py'
+    $towerPy = Join-Path $via 'supportive modules\VIA_Control_Tower\SUP_MDL115_ControlTower.py'
     Write-Host "`n[RUN] VIA Control Tower → http://127.0.0.1:8765" -ForegroundColor Cyan
     Start-Process $py -ArgumentList ('"' + $towerPy + '" --base "' + $via + '"') -WindowStyle Hidden
     Start-Sleep -Seconds 2

@@ -24,7 +24,7 @@ import sys
 import numpy as np
 import pandas as pd
 
-MODULE_PATH = Path(__file__).with_name("VIA_SectorFlow_AdaptiveChainedIndex_v0100.py")
+MODULE_PATH = Path(__file__).with_name("GRP_ENG012_SectorFlowAdaptiveChainedIndex_v0100.py")
 SPEC = importlib.util.spec_from_file_location("via_sectorflow_v0100", MODULE_PATH)
 MODULE = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = MODULE

@@ -48,8 +48,8 @@ def test_accuracy_hard_gates():
     (out/"milestone_registry.jsonl").write_text(
       json.dumps({"project_id":"PRJ-20260809-000001","milestone_id":"M1","status":"COMPLETED"})+"\n"+
       json.dumps({"project_id":"PRJ-20260809-000001","milestone_id":"M2","status":"OPEN"})+"\n",encoding="utf-8")
-    integ=run(eng,tmp,"workops_evidence_integrity_guard.py","build")
-    cal=run(eng,tmp,"workops_confidence_calibrator.py","build")
+    integ=run(eng,tmp,"VIA_ENG114_WorkopsEvidenceIntegrityGuard.py","build")
+    cal=run(eng,tmp,"VIA_ENG111_WorkopsConfidenceCalibrator.py","build")
     prog=run(eng,tmp,"workops_progress_estimator.py","build")
     health=run(eng,tmp,"workops_project_health.py","build")
     assert integ["fail_closed"]==1

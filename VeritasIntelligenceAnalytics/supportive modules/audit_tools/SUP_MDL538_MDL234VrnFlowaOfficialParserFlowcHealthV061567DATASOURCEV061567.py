@@ -481,7 +481,7 @@ def def_flow_c_health(supportive_dir: Path, vrn_root: Path, run_root: Path, run_
         "VIA_Panorama_AST_RuntimeInjector.py",
         "VIS_VRN_NewReportCompatibilityGate_v01.py",
         "VIS_VRN_MasterRegistryBridge_v0611.py",
-        "VIS_VRN_BrokerAnalystAdapters_v06146.py",
+        "SUP_MDL016_VISVRNBrokerAnalystAdaptersV06146.py",
     ]
 
     module_rows = [def_scan_python_module(supportive_dir / name) for name in supportive_names]

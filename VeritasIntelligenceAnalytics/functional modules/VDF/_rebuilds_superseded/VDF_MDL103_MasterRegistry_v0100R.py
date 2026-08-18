@@ -43,12 +43,12 @@ BASE_DIR = str(Path(__file__).parent / "db")
 MODULES = (
     [("VDF-MDL001-VRF", "TW Universe Verifier", "VDF Active", "VDF_MDL001_TWUniverseVerify.py"),
      ("VDF-MDL003", "Sentiment + Macro Engine", "VDF Active", "VDF_MDL003_SentimentMacroEngine.py"),
-     ("VDF-MDL004", "TW Full Market Engine", "VDF Active", "VDF_MDL004_TWFullMarketEngine.py"),
+     ("VDF-MDL004", "TW Full Market Engine", "VDF Active", "VDF_ENG006_MDL004TWFullMarketEngine.py"),
      ("VDF-MDL005", "TW Stock Filter + Consensus", "VDF Active", "VDF_MDL005_TWStockFilter.py"),
      ("VDF-MDL006", "Financial Model + PE/PB Band", "VDF Active", "VDF_MDL006_FinancialModel.py"),
      ("VDF-MASTER-REG", "Master Registry", "VDF Active", "VDF_MDL103_MasterRegistry.py"),
      ("VDF-OM-CORE", "OutputManager (shared lib)", "VDF Active", "VDF_MDL101_OutputManager.py"),
-     ("VDF-UPGRADER", "Format Retrofit Upgrader", "VDF Active", "VDF_MDL102_FormatUpgrader.py")]
+     ("VDF-UPGRADER", "Format Retrofit Upgrader", "VDF Active", "VDF_ENG011_MDL102FormatUpgrader.py")]
     + [("VDF-LEG-%02d" % i, n, "VDF Legacy", "") for i, n in enumerate(
         ["D2-FRED", "D2-YF", "D2-Data", "D2-Global", "D2-Integrated",
          "E0-Bootstrap", "E1-Fetch", "E2-Normalize", "E3-Validate", "E4-Publish",

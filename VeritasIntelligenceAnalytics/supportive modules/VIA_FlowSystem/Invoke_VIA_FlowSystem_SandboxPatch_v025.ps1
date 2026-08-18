@@ -219,7 +219,7 @@ try {
 
     $patchSpecs = @(
         [pscustomobject]@{
-            RelativePath = "engines\flow_autotest.py"
+            RelativePath = "engines\FLOW_ENG001_FlowAutotest.py"
             Replacements = @(
                 [pscustomobject]@{ Before = "        out = ROOT / `"_test_sim.html`"";  After = "        out = _sandbox_tmp(`"_test_sim.html`")" },
                 [pscustomobject]@{ Before = "        out = ROOT / `"_test_perf.html`""; After = "        out = _sandbox_tmp(`"_test_perf.html`")" },

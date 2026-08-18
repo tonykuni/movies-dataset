@@ -103,7 +103,7 @@ def cmd_apply(confirm):
     if not bks:
         print("[拒絕] 無任何備份 — 先 via-workops backup(特別門②)")
         return 1
-    r = subprocess.run([sys.executable, str(HERE / "workops_backup.py"), "verify", str(bks[-1])],
+    r = subprocess.run([sys.executable, str(HERE / "VIA_ENG061_WorkopsBackup.py"), "verify", str(bks[-1])],
                        capture_output=True, text=True)
     if r.returncode != 0:
         print("[拒絕] 最新備份 verify 未過 — 不在可回復狀態,拒刪(特別門③)")

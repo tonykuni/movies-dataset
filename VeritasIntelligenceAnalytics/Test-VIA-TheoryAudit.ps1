@@ -47,11 +47,11 @@ if ($PyExe -eq '') { Write-Host '誠實 FAIL:找不到 Python 3'; exit 1 }
 
 $Root = $PSScriptRoot
 $WF   = Join-Path $Root 'VIA_WorkflowEngine.py'
-$VAP  = Join-Path $Root 'functional modules\VAP\engine\via_autoplot_seaborn_plotly_v0100.py'
+$VAP  = Join-Path $Root 'functional modules\VAP\engine\VAP_ENG003_AutoplotSeabornPlotly_v0100.py'
 $SPEC = Join-Path $Root 'functional modules\VAP\spec\ssot\vap_spec.json'
 $CW   = Join-Path $Root 'functional modules\ChipWar'
 $MF   = Join-Path $Root 'functional modules\MultiFactor'
-$TA   = Join-Path $Root 'functional modules\TALib\VIA_TALibEngine.py'
+$TA   = Join-Path $Root 'functional modules\TALib\VIA_ENG003_TALibEngine.py'
 $Tmp  = Join-Path ([System.IO.Path]::GetTempPath()) ("via_theory_" + (Get-Date -Format 'HHmmss'))
 New-Item -ItemType Directory -Path $Tmp -Force | Out-Null
 

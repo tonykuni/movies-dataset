@@ -94,7 +94,7 @@ def def_supportive_check(support_dir: Path) -> list[dict]:
         "Invoke-VIA-PanoramaHardGateSafeFix.ps1",
         "Invoke-VIA-SupportiveHardGate.ps1",
         "VIA_HardGate_SealEngine.py",
-        "VIA_RuntimeImportFirewall.py",
+        "SUP_MDL001_RuntimeImportFirewall.py",
         "VIA_RegistryCore_v1.py",
         "VIA_Runtime_Bridge_All_in_One.py",
         "VIS_InstallHealthRegistry.py",

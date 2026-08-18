@@ -223,26 +223,26 @@ def cmd_ladder() -> int:
 
     def unit():
         n = 0
-        for pat in ("via_rename_engine_v0*.py", "via_syntax_rescue_v0*.py"):
+        for pat in ("CGC_MDL077_RenameEngine_v0*.py", "CGC_MDL076_SyntaxRescue_v0*.py"):
             eng = _newest(pat, HERE)
             rc, _ = _run([str(eng), "--selftest"])
             n += int(rc == 0)
         return n == 2, f"代表性引擎 selftest {n}/2"
 
     def integration():
-        hub = _newest("vdf_output_hub_v0*.py", VIA / "functional modules/VDF")
+        hub = _newest("VDF_ENG045_OutputHub_v0*.py", VIA / "functional modules/VDF")
         rc, _ = _run([str(hub), "--selftest"], timeout=600)
         return rc == 0, "VDF 輸出樞紐(跨格式六道)"
 
     def subsystem():
         fs = VIA / "supportive modules/VIA_FlowSystem/FlowSystem_v2/engines/flow_selftest.py"
         rc1, _ = _run([str(fs)], timeout=600) if fs.exists() else (1, "")
-        pu = _newest("via_product_ui_v0*.py", HERE)
+        pu = _newest("CGC_MDL072_ProductUi_v0*.py", HERE)
         rc2, _ = _run([str(pu), "--selftest"], timeout=600)
         return rc1 == 0 and rc2 == 0, "FlowSystem 14 檢+產品門面"
 
     def system():
-        g = _newest("via_selftest_grid_v0*.py", HERE)
+        g = _newest("CGC_MDL064_SelftestGrid_v0*.py", HERE)
         rc, out = _run([str(g), "--fast"], timeout=1800)
         tail = [l for l in out.splitlines() if "[計]" in l]
         return rc == 0 and "FAIL 0" in (tail[-1] if tail else ""), \

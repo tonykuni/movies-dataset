@@ -17,7 +17,7 @@ try {
 
 # G1 SSOT artifacts present and parseable
 $ssot = Join-Path $via "supportive modules\ssot\VRN_TickerRegexSSOT_v0100.json"
-$mod  = Join-Path $via "supportive modules\70_VRN_Rules\VIS_VRN_TickerFilenameSSOT_v0100.py"
+$mod  = Join-Path $via "supportive modules\70_VRN_Rules\SUP_MDL030_VISVRNTickerFilenameSSOT_v0100.py"
 $cen  = Join-Path $via "supportive modules\audit_tools\TickerRegex_LegacyDebt_Census_v0100.json"
 $j = Get-Content -LiteralPath $ssot -Raw -Encoding UTF8 | ConvertFrom-Json
 $c = Get-Content -LiteralPath $cen  -Raw -Encoding UTF8 | ConvertFrom-Json

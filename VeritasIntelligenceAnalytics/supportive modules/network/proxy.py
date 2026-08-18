@@ -10,7 +10,7 @@ def connection_requires_http_tunnel(
     :param URL proxy_url:
         URL of the proxy.
     :param ProxyConfig proxy_config:
-        Proxy configuration from poolmanager.py
+        Proxy configuration from SUP_MDL354_Poolmanager.py
     :param str destination_scheme:
         The scheme of the destination. (i.e https, http, etc)
     """

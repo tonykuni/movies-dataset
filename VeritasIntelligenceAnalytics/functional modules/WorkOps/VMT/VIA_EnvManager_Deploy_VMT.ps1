@@ -277,7 +277,7 @@ $pkgList = @()
 if ($fr.code -eq 0) { $pkgList = @($fr.out -split "`n" | Where-Object { $_.Trim().Length -gt 0 }) }
 
 if (-not $EnginePath -or -not (Test-Path $EnginePath)) {
-    $guess = Join-Path (Split-Path -Parent $PSCommandPath) 'vmt_process_mining.py'
+    $guess = Join-Path (Split-Path -Parent $PSCommandPath) 'VIA_ENG024_VmtProcessMining.py'
     if (Test-Path $guess) { $EnginePath = $guess }
 }
 $runnerPath = Join-Path $EnvRoot ('Run-VMT-ProcessMining.ps1')

@@ -57,7 +57,7 @@ def get_runnable_pip() -> str:
         # case, we can use that directly.
         return str(source)
 
-    return os.fsdecode(source / "__pip-runner__.py")
+    return os.fsdecode(source / "SUP_MDL579_PipRunner.py")
 
 
 def _get_system_sitepackages() -> set[str]:

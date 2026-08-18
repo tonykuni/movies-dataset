@@ -64,11 +64,11 @@ Invoke-Stage "0b graphviz 可攜版(DFG 圖)" {
     if ($dotP -or (Get-Command dot -ErrorAction SilentlyContinue)) {
         Write-Host "  dot 已就位 — 免下載" -ForegroundColor Green
     } else {
-        & py (Join-Path $Engines "workops_graphviz_setup.py") install
+        & py (Join-Path $Engines "VIA_ENG070_WorkopsGraphvizSetup.py") install
     }
 }
 Invoke-Stage "0c EnvManager 健檢(落 out\envmanager\)" {
-    & py (Join-Path $Engines "workops_envmanager_bridge.py") health
+    & py (Join-Path $Engines "VIA_ENG069_WorkopsEnvmanagerBridge.py") health
 }
 
 # ---------- [1] 指揮板 ----------

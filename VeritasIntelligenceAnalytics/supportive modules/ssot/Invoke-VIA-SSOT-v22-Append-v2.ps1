@@ -54,10 +54,10 @@ function Get-Python {
 function Find-PatchFile {
     if ($PatchFile -and (Test-Path -LiteralPath $PatchFile)) { return $PatchFile }
     $candidates = @(
-        "$env:USERPROFILE\Downloads\VIA_SSOT_Unified_v22_synonyms_patch.py",
-        "$env:USERPROFILE\OneDrive\Desktop\VIA_SSOT_Unified_v22_synonyms_patch.py",
-        "$env:USERPROFILE\Desktop\VIA_SSOT_Unified_v22_synonyms_patch.py",
-        ".\VIA_SSOT_Unified_v22_synonyms_patch.py"
+        "$env:USERPROFILE\Downloads\SUP_MDL655_SSOTUnifiedV22SynonymsPatch.py",
+        "$env:USERPROFILE\OneDrive\Desktop\SUP_MDL655_SSOTUnifiedV22SynonymsPatch.py",
+        "$env:USERPROFILE\Desktop\SUP_MDL655_SSOTUnifiedV22SynonymsPatch.py",
+        ".\SUP_MDL655_SSOTUnifiedV22SynonymsPatch.py"
     )
     foreach ($p in $candidates) {
         if (Test-Path -LiteralPath $p) { return $p }

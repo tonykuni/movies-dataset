@@ -78,14 +78,14 @@ Invoke-Stage "0b graphviz 可攜版(DFG 圖)" {
     if ($dotP -or (Get-Command dot -ErrorAction SilentlyContinue)) {
         Write-Host "  dot 已就位 — 免下載" -ForegroundColor Green
     } else {
-        & py (Join-Path $Engines "workops_graphviz_setup.py") install
+        & py (Join-Path $Engines "VIA_ENG070_WorkopsGraphvizSetup.py") install
     }
 }
 Invoke-Stage "0c EnvManager 健檢(落 out\envmanager\)" {
-    & py (Join-Path $Engines "workops_envmanager_bridge.py") health
+    & py (Join-Path $Engines "VIA_ENG069_WorkopsEnvmanagerBridge.py") health
 }
 Invoke-Stage "0d OCR 十段探測快照(ENG-026)" {
-    $router = Join-Path (Split-Path (Split-Path $WorkOps -Parent) -Parent) "supportive modules\VIA_OCR_Router\via_ocr_router.py"
+    $router = Join-Path (Split-Path (Split-Path $WorkOps -Parent) -Parent) "supportive modules\VIA_OCR_Router\SUP_MDL146_OcrRouter.py"
     $probeOut = Join-Path $WorkOps "out\ocr_probe.json"
     & py $router probe | Tee-Object -Variable probeLines | Select-Object -Last 1 | Write-Host
     ($probeLines | Select-Object -SkipLast 1) -join "`n" | Set-Content -LiteralPath $probeOut -Encoding UTF8
@@ -113,10 +113,10 @@ if ($SkipDeep) {
 # ---------- [2b] WOP 專案歸戶(ENG-028)----------
 Invoke-Stage "2b WOP 專案歸戶(確認檔自動吸收→融合→賦號)" {
     if (Test-Path -LiteralPath (Join-Path $WorkOps "out\wop_confirm.csv")) {
-        & py (Join-Path $Engines "workops_wop_identifier.py") apply
+        & py (Join-Path $Engines "VIA_ENG087_WorkopsWopIdentifier.py") apply
     }
     if (Test-Path -LiteralPath (Join-Path $WorkOps "out\mails.csv")) {
-        & py (Join-Path $Engines "workops_wop_identifier.py") propose
+        & py (Join-Path $Engines "VIA_ENG087_WorkopsWopIdentifier.py") propose
     } else {
         Write-Host "  掃描語料尚缺(out\mails.csv)— 板段成功後下次跑即歸戶" -ForegroundColor DarkYellow
     }
@@ -125,8 +125,8 @@ Invoke-Stage "2b WOP 專案歸戶(確認檔自動吸收→融合→賦號)" {
 # ---------- [2c] 決策 KPI ----------
 Invoke-Stage "2c 決策 KPI 快照(ENG-027)" {
     if (Test-Path -LiteralPath (Join-Path $WorkOps "out\decision_log.db")) {
-        & py (Join-Path $Engines "workops_decision_log.py") report
-        & py (Join-Path $Engines "workops_decision_log.py") export
+        & py (Join-Path $Engines "VIA_ENG068_WorkopsDecisionLog.py") report
+        & py (Join-Path $Engines "VIA_ENG068_WorkopsDecisionLog.py") export
     } else {
         Write-Host "  決策帳本尚空 — via-workops decisions add 開始記錄(會議範本:docs\Meeting_Minutes_Template.md)" -ForegroundColor DarkYellow
     }

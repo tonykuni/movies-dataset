@@ -37,9 +37,9 @@ $script:PYTHON_CANDIDATES = @(
 if (-not $PatchFile) {
     # Auto-locate patch file in common spots
     $candidates = @(
-        "C:\Users\tonyk\OneDrive\Desktop\VIA_SSOT_Unified_v22_synonyms_patch.py",
-        "C:\Users\tonyk\Downloads\VIA_SSOT_Unified_v22_synonyms_patch.py",
-        ".\VIA_SSOT_Unified_v22_synonyms_patch.py"
+        "C:\Users\tonyk\OneDrive\Desktop\SUP_MDL655_SSOTUnifiedV22SynonymsPatch.py",
+        "C:\Users\tonyk\Downloads\SUP_MDL655_SSOTUnifiedV22SynonymsPatch.py",
+        ".\SUP_MDL655_SSOTUnifiedV22SynonymsPatch.py"
     )
     foreach ($p in $candidates) {
         if (Test-Path -LiteralPath $p) { $PatchFile = $p; break }

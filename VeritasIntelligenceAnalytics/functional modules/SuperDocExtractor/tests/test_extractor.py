@@ -3,7 +3,7 @@
     cd SuperDocExtractor && python -m pytest tests/ -v
 
 The same checks also run without pytest via:
-    python super_extract.py selftest
+    python PLG_ENG001_SuperExtract.py selftest
 """
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(全引擎導入令 2026-08-18;graceful 零行為變更) =====
 try:

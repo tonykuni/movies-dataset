@@ -10,7 +10,7 @@ Invoke-VIA-Bridge v0100 — 一支 PowerShell:前後端對接 + test/debug 迴�
 param([int]$MaxRounds = 3)
 $ErrorActionPreference = "Continue"
 $VIA = $PSScriptRoot
-$Engine = Join-Path $VIA "supportive modules\VIA_Governance_Runtime\via_bridge_engine_v0100.py"
+$Engine = Join-Path $VIA "supportive modules\VIA_Governance_Runtime\SUP_MDL140_BridgeEngine_v0100.py"
 $StateJson = Join-Path $VIA "VIA_Reports\bridge_state.json"
 $FrontEnd = Join-Path $VIA "VIA_Reports\VIA_CommandBridge.html"
 $Results = @()

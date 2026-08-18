@@ -16,7 +16,7 @@ $FollowScript=Join-Path $InstallRoot "Run-DailyFollowup.ps1"
 #requires -Version 7.0
 Set-Location '$($AppRoot.Replace("'","''"))'
 & '$($Python.Replace("'","''"))' 'engines\workops_followup_pack_builder.py' build --language zh-TW
-& '$($Python.Replace("'","''"))' 'engines\workops_watchlist_prioritizer.py' build
+& '$($Python.Replace("'","''"))' 'engines\VIA_ENG142_WorkopsWatchlistPrioritizer.py' build
 "@ | Set-Content $FollowScript -Encoding UTF8
 
 $BackupScript=Join-Path $InstallRoot "Run-DailyBackup.ps1"

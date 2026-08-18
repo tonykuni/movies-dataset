@@ -26,7 +26,7 @@ for /f "delims=" %%f in ('dir /b /a-d "%CAND%" 2^>nul') do (
 exit /b 1
 
 :run
-for /f "delims=" %%f in ('dir /b /o:n "%VRNROOT%\vrn_input_matrix_validator_v0*.py"') do set "V_ENG=%%f"
+for /f "delims=" %%f in ('dir /b /o:n "%VRNROOT%\VRN_ENG054_InputMatrixValidator_v0*.py"') do set "V_ENG=%%f"
 if not defined V_ENG (
   echo [FAIL] 驗證引擎不在位 — via-sync 後重試
   exit /b 1

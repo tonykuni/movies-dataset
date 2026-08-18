@@ -16,7 +16,7 @@ Write-Host "[2/3] building VeritasPulse.exe (onefile, windowed)" -ForegroundColo
 py -3.11 -m PyInstaller --noconfirm --onefile --windowed `
   --name VeritasPulse `
   --add-data "$app;." `
-  "vpl_desktop.py"
+  "VIA_ENG151_VplDesktop.py"
 
 Write-Host "[3/3] done -> dist\VeritasPulse.exe" -ForegroundColor Green
 Start-Process (Join-Path $here "dist")

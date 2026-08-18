@@ -36,7 +36,7 @@ $OutputEncoding = [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 $ErrorActionPreference = "Stop"
 Set-Location $WorkDir
 
-$PyFiles = @("via_io.py","twse_chip_scraper.py","rotation_engine.py","devils_advocate.py","via_pipeline.py")
+$PyFiles = @("via_io.py","SUP_MDL603_TwseChipScraper.py","rotation_engine.py","devils_advocate.py","SUP_MDL152_Pipeline.py")
 $Results = [System.Collections.Generic.List[object]]::new()
 
 function Step([string]$Name, [scriptblock]$Action) {
@@ -67,7 +67,7 @@ try {
 
   # ③ 真實籌碼(可略)
   if (-not $SkipScraper) {
-    Step "twse_chip_scraper" { & $Python twse_chip_scraper.py $Stock $Days | Out-Host }
+    Step "twse_chip_scraper" { & $Python SUP_MDL603_TwseChipScraper.py $Stock $Days | Out-Host }
   } else { Write-Host "`n[skip] twse_chip_scraper(-SkipScraper)" -ForegroundColor Yellow }
 
   # ④ 輪動引擎
@@ -85,7 +85,7 @@ try {
 
   # ⑥ 統一 pipeline(回測+自演化+自我除錯+裁決+多格式輸出)
   Step "via_pipeline" {
-    $pyargs = @("via_pipeline.py","--out",$Out,"--export",$Export)
+    $pyargs = @("SUP_MDL152_Pipeline.py","--out",$Out,"--export",$Export)
     if ($Demo -or -not $Prices) { $pyargs += "--demo" } else { $pyargs += @("--prices",$Prices); if ($Themes){$pyargs+=@("--themes",$Themes)} }
     & $Python @args | Out-Host
   }

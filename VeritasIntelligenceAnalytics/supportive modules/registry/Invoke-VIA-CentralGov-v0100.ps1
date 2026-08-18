@@ -8,7 +8,7 @@ New-Item -ItemType Directory -Force -Path $logd | Out-Null
 $log = Join-Path $logd ("PSLAUNCH_{0}.log" -f (Get-Date -Format 'yyyyMMdd_HHmmss'))
 Start-Transcript -Path $log | Out-Null
 try {
-    $eng = Get-ChildItem -Path $PSScriptRoot -Filter 'via_central_gov_v0*.py' |
+    $eng = Get-ChildItem -Path $PSScriptRoot -Filter 'CGC_MDL075_CentralGov_v0*.py' |
         Sort-Object Name | Select-Object -Last 1   # 動態解析最新版(鐵律)
     Write-Host ("[GOV] 引擎:{0}" -f $eng.Name)
     & py $eng.FullName --no-open

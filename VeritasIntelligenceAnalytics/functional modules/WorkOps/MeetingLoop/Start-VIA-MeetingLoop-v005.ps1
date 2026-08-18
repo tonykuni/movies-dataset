@@ -22,9 +22,9 @@ $ErrorActionPreference = "Stop"
 # =============================================================================
 
 $BaseDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$Engine = Join-Path $BaseDir "via_meetingloop_engine.py"
+$Engine = Join-Path $BaseDir "VIA_ENG019_MeetingloopEngine.py"
 $Installer = Join-Path $BaseDir "Install-VIA-DataEnvironment-v005.ps1"
-$DataAcceptance = Join-Path $BaseDir "via_duck_parquet_acceptance.py"
+$DataAcceptance = Join-Path $BaseDir "VIA_ENG018_DuckParquetAcceptance.py"
 $FullAcceptance = Join-Path $BaseDir "Test-VIA-FullUXDataAcceptance-v005.ps1"
 $RunsDir = Join-Path $BaseDir "runs"
 $DataPython = Join-Path $env:USERPROFILE "envs\via_meeting_data_312\Scripts\python.exe"

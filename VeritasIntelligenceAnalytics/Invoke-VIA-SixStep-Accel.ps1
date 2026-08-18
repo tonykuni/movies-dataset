@@ -91,9 +91,9 @@ Step "B v0111R2" "PASS" "elapsed=$([int]$swB.Elapsed.TotalSeconds)s log=$u3log"
 # ===== Stage D import recovered VDF/data-layer modules (hash-dedupe, append-only) =====
 $swD = [Diagnostics.Stopwatch]::StartNew()
 $dl = "$env:USERPROFILE\Downloads"
-$recover = @("VDF_MDL001_TWUniverse_Verify.py","VDF_MDL003_SentimentMacroEngine.py",
+$recover = @("VDF_ENG031_MDL001TWUniverseVerify.py","VDF_MDL003_SentimentMacroEngine.py",
              "VDF_MDL005_TWStockFilter.py","VDF_MDL006_FinancialModel.py",
-             "VIA_TW_Universe_Builder.py","VIA_Inject.py")
+             "VDF_ENG040_TWUniverseBuilder.py","VDF_ENG039_Inject.py")
 $dstDir = Join-Path $via "functional modules\VDF\engine"
 New-Item -ItemType Directory -Force -Path $dstDir | Out-Null
 Rec "===== Stage D recovered-module import ====="

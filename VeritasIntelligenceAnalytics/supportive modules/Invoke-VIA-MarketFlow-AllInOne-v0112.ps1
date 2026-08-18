@@ -70,8 +70,8 @@ $AUTHORITY_ACCEPTED = [ordered]@{
     "Invoke-VIA-ActivationGateway-Stable.ps1" = "supportive modules/audit_tools/Invoke-VIA-ActivationGateway-Stable.ps1"
     "Invoke-VIA-ALL.ps1" = "supportive modules/60_PowerShell_Entry_Internal/Invoke-VIA-ALL.ps1"
     "Invoke-VIA-UnifiedInputGateway.ps1" = "supportive modules/ssot/Invoke-VIA-UnifiedInputGateway.ps1"
-    "vap_panorama_maturity_optimizer.py" = "supportive modules/audit_tools/vap_panorama_maturity_optimizer.py"
-    "vap_warehouse_v5_next3_builder.py" = "supportive modules/ui_support/vap_warehouse_v5_next3_builder.py"
+    "SUP_MDL557_PanoramaMaturityOptimizer.py" = "supportive modules/audit_tools/SUP_MDL557_PanoramaMaturityOptimizer.py"
+    "SUP_MDL730_WarehouseV5Next3Builder.py" = "supportive modules/ui_support/SUP_MDL730_WarehouseV5Next3Builder.py"
     "VIA_ActivationGateway_Manifest.json" = "supportive modules/registry/VIA_ActivationGateway_Manifest.json"
 }
 $AUTHORITY_EXCLUDED = [ordered]@{
@@ -976,7 +976,7 @@ function def_InvokeVdfVrnStartup {
     def_WriteJson -Data $StageRows -Path (Join-Path $EvidenceDir "05_runtime_core_stage.json") -Depth 20
     $StageRed = @($StageRows | Where-Object { $_.Status -like "RED*" }).Count
 
-    $VdfPath = Join-Path $CoreStageDir "VDF_DataHub_Orchestrator.py"
+    $VdfPath = Join-Path $CoreStageDir "VDF_ENG001_DataHubOrchestrator.py"
     $VrnProbePath = Join-Path $CoreStageDir "VRN_Runtime_Orchestrator.py"
     def_WriteUtf8NoBom -Path $VdfPath -Content (def_GetVdfOrchestratorPython)
     def_WriteUtf8NoBom -Path $VrnProbePath -Content (def_GetVrnRuntimeProbePython)

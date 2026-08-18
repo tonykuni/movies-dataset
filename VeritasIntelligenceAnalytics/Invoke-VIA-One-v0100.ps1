@@ -23,11 +23,11 @@ Write-Host ("[加速器] " + ($Accelerators -join " · ")) -ForegroundColor Dark
 
 $Stages = @(
     @{ Name = "SYNC 同步 repo";              Kind = "ps";  Target = (Join-Path $Bin "via-sync.ps1") },
-    @{ Name = "MEGA 三輪全景分析(分區 Matrix)"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_Governance_Runtime\via_mega_engine_v0103.py") },
-    @{ Name = "VMT 總指揮 9 階段";            Kind = "py";  Target = (Join-Path $Root "supportive modules\VMT_SuperBOM\via_master_engine_v0102.py"); Args = @("--no-open") },
-    @{ Name = "CGE 中央治理 dry-run";         Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_Central_Governance\VIA_CentralGovernanceEngine_v0401.py"); Args = @("--workdir", ($env:VMT_ROOT ?? "C:\VIA\VeritasMailTracker")) },
-    @{ Name = "VRN 內容探測(唯讀 GO gate)";   Kind = "py";  Target = (Join-Path $Root "functional modules\VRN\vrn_content_probe_v0100.py"); Args = @("--no-open") },
-    @{ Name = "VRN 內容擷取 dry-run";         Kind = "py";  Target = (Join-Path $Root "functional modules\VRN\vrn_content_extract_candidate_v0100.py") },
+    @{ Name = "MEGA 三輪全景分析(分區 Matrix)"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_Governance_Runtime\SUP_MDL142_MegaEngine_v0103.py") },
+    @{ Name = "VMT 總指揮 9 階段";            Kind = "py";  Target = (Join-Path $Root "supportive modules\VMT_SuperBOM\VIA_ENG021_MasterEngine_v0102.py"); Args = @("--no-open") },
+    @{ Name = "CGE 中央治理 dry-run";         Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_Central_Governance\CGC_MDL001_CentralGovernanceEngine_v0401.py"); Args = @("--workdir", ($env:VMT_ROOT ?? "C:\VIA\VeritasMailTracker")) },
+    @{ Name = "VRN 內容探測(唯讀 GO gate)";   Kind = "py";  Target = (Join-Path $Root "functional modules\VRN\VRN_ENG048_ContentProbe_v0100.py"); Args = @("--no-open") },
+    @{ Name = "VRN 內容擷取 dry-run";         Kind = "py";  Target = (Join-Path $Root "functional modules\VRN\VRN_ENG046_ContentExtractCandidate_v0100.py") },
     @{ Name = "UI HUB 開啟七介面樞紐";        Kind = "open"; Target = (Join-Path $Root "supportive modules\ui_support\VIA_UI_Hub_v0100.html") }
 )
 

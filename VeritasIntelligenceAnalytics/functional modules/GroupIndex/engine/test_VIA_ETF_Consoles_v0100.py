@@ -2,7 +2,7 @@
 """ETF 雙主控台(ActiveStockETF / GlobalETFFlow)整合契約測試。
 
 離線執行:selftest 全過 + 證據誠實(永不產生 Syn)+ 與 GroupIndex 宇宙不重疊。
-mocktest(本機 HTTP mock 驅動真管線)由 VIA_ETF_Consoles_Evidence_v0100.py 收證。
+mocktest(本機 HTTP mock 驅動真管線)由 GRP_ENG005_ETFConsolesEvidence_v0100.py 收證。
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(全引擎導入令 2026-08-18;graceful 零行為變更) =====

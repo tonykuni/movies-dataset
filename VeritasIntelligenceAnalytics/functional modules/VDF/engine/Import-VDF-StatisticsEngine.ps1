@@ -25,7 +25,7 @@ $script:LogDir = Join-Path $script:VdfDir "_vdf_logs\$script:RunId"
 $script:ReportDir = Join-Path $script:VdfDir "_vdf_reports\engine_import"
 
 $script:EngineFileName = "VRN_TAEngine_v01.py"
-$script:PriceHelperFileName = "vdf_price_fetch.py"
+$script:PriceHelperFileName = "SUP_MDL630_PriceFetch.py"
 
 $script:RegistryJson = Join-Path $script:RegistryDir "VDF_Engine_Registry.json"
 $script:RegistryCsv = Join-Path $script:RegistryDir "VDF_Engine_Registry.csv"

@@ -19,6 +19,6 @@ Write-Host "def Veritas WorkOps" -ForegroundColor Cyan
 Write-Host "def AppRoot : $AppRoot"
 Write-Host "def Python  : $Python"
 Write-Host "def URL     : http://127.0.0.1:8775/"
-Start-Process -FilePath $Python -ArgumentList @("engines\workops_api_server.py") -WorkingDirectory $AppRoot
+Start-Process -FilePath $Python -ArgumentList @("engines\VIA_ENG105_WorkopsApiServer.py") -WorkingDirectory $AppRoot
 Start-Sleep -Milliseconds 900
 Start-Process "http://127.0.0.1:8775/"

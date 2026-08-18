@@ -66,20 +66,20 @@ $DashboardHtml = Join-Path (Split-Path (Split-Path $ModuleDir -Parent) -Parent) 
 
 $Engines = @(
     "VIA_GroupIndex_EnvPreflight_v0100.py",
-    "VIA_SectorFlow_AdaptiveChainedIndex_v0100.py",
-    "VIA_SectorFlow_SignalTradeBacktest_v0100.py",
-    "VIA_LiveWire_ContractAdapter_v0100.py",
-    "VIA_SectorFlow_Dashboard_Builder_v0100.py",
-    "VIA_GroupIndex_MasterValidation_v0100.py",
+    "GRP_ENG012_SectorFlowAdaptiveChainedIndex_v0100.py",
+    "GRP_ENG014_SectorFlowSignalTradeBacktest_v0100.py",
+    "GRP_ENG011_LiveWireContractAdapter_v0100.py",
+    "GRP_ENG013_SectorFlowDashboardBuilder_v0100.py",
+    "GRP_ENG010_GroupIndexMasterValidation_v0100.py",
     "VIA_ActiveStockETF.py",
-    "VIA_ActiveStockETF_mocktest.py",
+    "GRP_ENG002_ActiveStockETFMocktest.py",
     "VIA_GlobalETFFlow.py",
-    "VIA_ETF_Consoles_Evidence_v0100.py",
+    "GRP_ENG005_ETFConsolesEvidence_v0100.py",
     "VIA_FinMind_Ingest_v010.py",
     "VIA_SectorWhaleEngine_v020.py",
     "VIA_GovFundEngine_v040.py",
     "VIA_ChipWar_Console_v010.py",
-    "VIA_ChipWar_Revenue_Evidence_v0100.py"
+    "GRP_ENG004_ChipWarRevenueEvidence_v0100.py"
 )
 $TestFiles = @(
     "test_VIA_GroupIndex_EnvPreflight_v0100.py",
@@ -151,7 +151,7 @@ function def_HashAudit {
     foreach ($f in @(
             "Invoke-VIA-GroupIndex-Suite-OneClick-v0100.ps1",
             "VIA_GroupIndex_EnvPreflight_v0100.py",
-            "VIA_GroupIndex_MasterValidation_v0100.py")) {
+            "GRP_ENG010_GroupIndexMasterValidation_v0100.py")) {
         $h = (Get-FileHash -LiteralPath (Join-Path $EngineDir $f) -Algorithm SHA256).Hash
         Write-Host ("def   SHA256 {0}…  {1}" -f $h.Substring(0, 16), $f)
     }
@@ -250,24 +250,24 @@ function def_Main {
 
         if ($SkipEngines -ne 1) {
             # [3] SECTORFLOW
-            def_InvokePython -Label "SECTORFLOW engine (index + flows + 4-scenario backtest)" -Percent 32 -Arguments @("VIA_SectorFlow_AdaptiveChainedIndex_v0100.py")
+            def_InvokePython -Label "SECTORFLOW engine (index + flows + 4-scenario backtest)" -Percent 32 -Arguments @("GRP_ENG012_SectorFlowAdaptiveChainedIndex_v0100.py")
             # [4] TRADE-BACKTEST
-            def_InvokePython -Label "TRADE-BACKTEST engine (T+1 + costs + permutation null)" -Percent 52 -Arguments @("VIA_SectorFlow_SignalTradeBacktest_v0100.py")
+            def_InvokePython -Label "TRADE-BACKTEST engine (T+1 + costs + permutation null)" -Percent 52 -Arguments @("GRP_ENG014_SectorFlowSignalTradeBacktest_v0100.py")
             # [5] LIVEWIRE
-            def_InvokePython -Label "LIVEWIRE contract adapter (fail-closed + SSOT reconcile)" -Percent 64 -Arguments @("VIA_LiveWire_ContractAdapter_v0100.py")
+            def_InvokePython -Label "LIVEWIRE contract adapter (fail-closed + SSOT reconcile)" -Percent 64 -Arguments @("GRP_ENG011_LiveWireContractAdapter_v0100.py")
             # [5b] ETF-CONSOLES(selftest + 本機 mock 整合;約 6-8 分鐘)
-            def_InvokePython -Label "ETF-CONSOLES evidence (ActiveStockETF + GlobalETFFlow, 142 checks)" -Percent 70 -Arguments @("VIA_ETF_Consoles_Evidence_v0100.py")
+            def_InvokePython -Label "ETF-CONSOLES evidence (ActiveStockETF + GlobalETFFlow, 142 checks)" -Percent 70 -Arguments @("GRP_ENG005_ETFConsolesEvidence_v0100.py")
             # [5c] CHIPWAR + REVENUE(四引擎全循環 + 月營收 selftest/demo)
-            def_InvokePython -Label "CHIPWAR-REVENUE evidence (GovFund/SectorWhale/FinMind/Console + twrevenue)" -Percent 72 -Arguments @("VIA_ChipWar_Revenue_Evidence_v0100.py")
+            def_InvokePython -Label "CHIPWAR-REVENUE evidence (GovFund/SectorWhale/FinMind/Console + twrevenue)" -Percent 72 -Arguments @("GRP_ENG004_ChipWarRevenueEvidence_v0100.py")
             # [6] DASHBOARD
-            def_InvokePython -Label "DASHBOARD builder (7 tabs + VAP axis lock)" -Percent 74 -Arguments @("VIA_SectorFlow_Dashboard_Builder_v0100.py")
+            def_InvokePython -Label "DASHBOARD builder (7 tabs + VAP axis lock)" -Percent 74 -Arguments @("GRP_ENG013_SectorFlowDashboardBuilder_v0100.py")
         }
         else {
             def_WriteStep -Percent 60 -Message "SkipEngines=1 → 只跑驗證(引擎 evidence 沿用現存)" -Status "SKIP"
         }
 
         # [7] MASTER-VALIDATE
-        def_InvokePython -Label "MASTER-VALIDATE (UNIT→DEBUG→OPTIMIZE→INTEGRATE→SYSTEM→USER→ACTIVATE)" -Percent 88 -Arguments @("VIA_GroupIndex_MasterValidation_v0100.py")
+        def_InvokePython -Label "MASTER-VALIDATE (UNIT→DEBUG→OPTIMIZE→INTEGRATE→SYSTEM→USER→ACTIVATE)" -Percent 88 -Arguments @("GRP_ENG010_GroupIndexMasterValidation_v0100.py")
 
         # [8] GATE-MATRIX
         def_WriteStep -Percent 95 -Message "GATE-MATRIX 讀取各 run 總結"

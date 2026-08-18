@@ -36,7 +36,7 @@ def t_compile():
     mods = ["vpl/theme.py","vpl/registry.py","vpl/core/store.py","vpl/core/archive.py",
             "vpl/core/env_arrange.py","vpl/charts/optimize.py","vpl/ppt/generate.py",
             "vpl/meeting/minutes_doc.py","vpl/meeting/excel_template.py",
-            "vpl/app/build_app.py","build_all.py","build_deck.py","selftest.py"]
+            "vpl/app/build_app.py","build_all.py","VIA_ENG150_BuildDeck.py","selftest.py"]
     for m in mods: py_compile.compile(m, doraise=True)
     return f"{len(mods)} modules compile"
 

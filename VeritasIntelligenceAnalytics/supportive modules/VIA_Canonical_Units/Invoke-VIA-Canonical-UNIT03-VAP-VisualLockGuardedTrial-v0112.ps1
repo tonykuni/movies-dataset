@@ -9,7 +9,7 @@
  file-level SHA256 gate - per-replacement exact-count gate (fail-closed).
 ===================================================================== #>
 param(
-    [string]$Candidate = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VAP\engine\via_autoplot_engine_v001.py",
+    [string]$Candidate = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VAP\engine\VAP_ENG002_AutoplotEngine_v001.py",
     [string]$ExpectedSha = "2AE164B5082B2113E12C4D1BCD8D73E97C66010F602E01F4A81D8E4B53689EEC"
 )
 Set-StrictMode -Off

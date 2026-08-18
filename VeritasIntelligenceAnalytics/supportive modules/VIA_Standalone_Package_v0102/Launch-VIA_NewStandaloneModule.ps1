@@ -51,7 +51,7 @@ function def_FindPython {
 
 function def_InvokeRuntimeProbe {
     $python = def_FindPython
-    $bootstrap = Join-Path $def_PARAM_SupportPyDir "VIA_Standalone_Bootstrap.py"
+    $bootstrap = Join-Path $def_PARAM_SupportPyDir "SUP_MDL160_StandaloneBootstrap.py"
 
     if ([string]::IsNullOrWhiteSpace($python)) {
         Write-Host "[WARN] Python not found." -ForegroundColor Yellow

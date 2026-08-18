@@ -53,7 +53,7 @@ import pandas as pd
 import openpyxl
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-ENGINE_PATH = SCRIPT_DIR / "VIA_ThreeList_Grouping_DynamicValidationPipeline_v0201.py"
+ENGINE_PATH = SCRIPT_DIR / "GRP_ENG016_ThreeListGroupingDynamicValidationPipeline_v0201.py"
 DEFAULT_SSOT = SCRIPT_DIR.parent / "input" / "VIA_TW_SubGroup_SSOT_v0100.xlsx"
 DEFAULT_OUT = SCRIPT_DIR.parent / "evidence" / "RUN_SUBGROUP_SANDBOX_V0100"
 PLOT_OUT = SCRIPT_DIR.parent / "output" / "RUN_SUBGROUP_SANDBOX_V0100_plots"

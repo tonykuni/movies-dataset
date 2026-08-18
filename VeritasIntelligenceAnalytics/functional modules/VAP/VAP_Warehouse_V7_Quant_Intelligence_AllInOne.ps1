@@ -83,7 +83,7 @@ function def_New-RunLayout {
     $script:STATE.RunDir = Join-Path $script:CFG.OutputRoot $script:STATE.RunId
     New-Item -ItemType Directory -Force -Path $script:STATE.RunDir | Out-Null
 
-    $script:STATE.BuilderPy = Join-Path $script:STATE.RunDir "vap_warehouse_v7_quant_builder.py"
+    $script:STATE.BuilderPy = Join-Path $script:STATE.RunDir "SUP_MDL732_WarehouseV7QuantBuilder.py"
     $script:STATE.HtmlPath = Join-Path $script:STATE.RunDir "VAP_Warehouse_V7_Quant_Intelligence_Report.html"
     $script:STATE.SummaryJson = Join-Path $script:STATE.RunDir "vap_warehouse_v7_quant_summary.json"
     $script:STATE.PayloadJson = Join-Path $script:STATE.RunDir "vap_warehouse_v7_quant_payload.json"

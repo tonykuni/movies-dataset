@@ -27,11 +27,11 @@ if "%~1"=="" (
   call pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\engines\%%WOPS_DEEP%%" %2 %3 %4 %5 %6 %7 %8 %9
 ) else if /i "%~1"=="decisions" (
   rem 決策追蹤（ENG-027）:decisions add "決議" 負責人 [截止] [THR-#] [會議碼] / list / start|done|block DEC-# / report / export
-  py "%~dp0..\functional modules\WorkOps\engines\workops_decision_log.py" %2 %3 %4 %5 %6 %7
+  py "%~dp0..\functional modules\WorkOps\engines\VIA_ENG068_WorkopsDecisionLog.py" %2 %3 %4 %5 %6 %7
 ) else if /i "%~1"=="accuracy" (
   rem Gate E 準確度:accuracy=template 產核對樣板 | accuracy run=Gold Set 實測計分 | accuracy harness=ENG-050 受控驗證
   if /i "%~2"=="harness" (
-    py "%~dp0..\functional modules\WorkOps\engines\workops_accuracy_harness.py" %3
+    py "%~dp0..\functional modules\WorkOps\engines\VIA_ENG059_WorkopsAccuracyHarness.py" %3
   ) else (
     py "%~dp0..\functional modules\WorkOps\engines\workops_accuracy_benchmark.py" %2 %3
   )
@@ -53,32 +53,32 @@ if "%~1"=="" (
   call pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\%%WOPS_ALL%%" -HarvestOnly
 ) else if /i "%~1"=="ml" (
   rem ENG-055 ML 實驗室:probe=二十庫探測 setup=裝核心 train=詞庫泛化模型 suggest=未解析候選 cluster=聚類提詞 adopt=人核詞寫回 — ML 只建議永不自判
-  py "%~dp0..\functional modules\WorkOps\engines\workops_ml_lab.py" %2
+  py "%~dp0..\functional modules\WorkOps\engines\VIA_ENG075_WorkopsMlLab.py" %2
 ) else if /i "%~1"=="backup" (
   rem L06 安全車道:backup=備份側車正本 | verify=雜湊驗證 | restore=只還原到暫存
-  py "%~dp0..\functional modules\WorkOps\engines\workops_backup.py" %2 %3
+  py "%~dp0..\functional modules\WorkOps\engines\VIA_ENG061_WorkopsBackup.py" %2 %3
 ) else if /i "%~1"=="selftest" (
   rem ENG-032 全鏈自測：沙箱實跑五段，正本零觸碰；FinalGate=PASS 才可宣稱鏈路無誤
-  py "%~dp0..\functional modules\WorkOps\engines\workops_selftest.py"
+  py "%~dp0..\functional modules\WorkOps\engines\VIA_ENG081_WorkopsSelftest.py"
 ) else if /i "%~1"=="replies" (
   rem M3 回覆解析:replies=parse 三層判讀 | replies status=現況
   py "%~dp0..\functional modules\WorkOps\engines\workops_reply_parser.py" %2
 ) else if /i "%~1"=="wop" (
   rem WOP 專案歸戶:wop=propose 提議歸戶 | apply 套用確認檔 | list 專案清單 | status 即況 | domains 網域收割
-  py "%~dp0..\functional modules\WorkOps\engines\workops_wop_identifier.py" %2 %3
+  py "%~dp0..\functional modules\WorkOps\engines\VIA_ENG087_WorkopsWopIdentifier.py" %2 %3
 ) else if /i "%~1"=="names" (
   rem 命名核對:names propose（提議）| apply（核對表寫回）| add 名稱 關鍵字（自建歸類）| names（現況）
-  py "%~dp0..\functional modules\WorkOps\engines\workops_namer.py" %2 %3 %4 %5
+  py "%~dp0..\functional modules\WorkOps\engines\VIA_ENG076_WorkopsNamer.py" %2 %3 %4 %5
 ) else if /i "%~1"=="slides" (
   rem ENG-033 自動簡報:板資料合成週報 slides;產完自動開啟;Ctrl+P 列印即簡報
-  py "%~dp0..\functional modules\WorkOps\engines\workops_slides.py"
+  py "%~dp0..\functional modules\WorkOps\engines\VIA_ENG082_WorkopsSlides.py"
   start "" "%~dp0..\functional modules\WorkOps\out\VIA_WorkOps_Slides.html"
 ) else if /i "%~1"=="mtg" (
   rem ENG-048 會議對帳橋:MeetingLoop 決議→DEC 帳（冪等）· 未完行動→TO-DO 會議行動批;mtg=pull | status
-  py "%~dp0..\functional modules\WorkOps\engines\workops_meetingloop_bridge.py" %2
+  py "%~dp0..\functional modules\WorkOps\engines\VIA_ENG073_WorkopsMeetingloopBridge.py" %2
 ) else if /i "%~1"=="todo" (
   rem ENG-046 每日 TO-DO:同類一口氣批次（前日16:00 寄出/11:00 收件/16:00 前急追）+AI 代筆提示
-  py "%~dp0..\functional modules\WorkOps\engines\workops_daily_todo.py"
+  py "%~dp0..\functional modules\WorkOps\engines\VIA_ENG067_WorkopsDailyTodo.py"
 ) else if /i "%~1"=="search" (
   rem 統一搜尋（唯讀跨九側車）:search 關鍵字 [關鍵字2]
   py "%~dp0..\functional modules\WorkOps\engines\workops_unified_search.py" %2 %3 %4 %5 %6 %7 %8 %9
@@ -102,19 +102,19 @@ if "%~1"=="" (
   py "%~dp0..\functional modules\WorkOps\engines\workops_onboarding.py" %2 %3 %4 %5 %6 %7 %8 %9
 ) else if /i "%~1"=="auditpack" (
   rem ENG-036 稽核包:全系統證據+現場紅線掃描 → 帶 sha256 manifest 之 zip（IT/主管交件）
-  py "%~dp0..\functional modules\WorkOps\engines\workops_audit_bundle.py"
+  py "%~dp0..\functional modules\WorkOps\engines\VIA_ENG060_WorkopsAuditBundle.py"
 ) else if /i "%~1"=="matrix" (
   rem ENG-037 總結矩陣:成果×側車×DB 全盤點 → out\VIA_Summary_Matrix.html;產完自動開啟
-  py "%~dp0..\functional modules\WorkOps\engines\workops_summary_matrix.py"
+  py "%~dp0..\functional modules\WorkOps\engines\VIA_ENG083_WorkopsSummaryMatrix.py"
   start "" "%~dp0..\functional modules\WorkOps\out\VIA_Summary_Matrix.html"
 ) else if /i "%~1"=="vtr" (
   rem VTR 會議紀錄修復引擎:裸打=All 全套驗證;Doctor Lexicon Test Manifest Restore Inspect Replay 傳遞
   pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\VTR\Invoke-VTR.ps1" %2 %3 %4 %5 %6 %7 %8 %9
 ) else if /i "%~1"=="bridge" (
-  py "%~dp0..\functional modules\WorkOps\engines\workops_corpus_bridge.py" %2 %3 %4 %5 %6
+  py "%~dp0..\functional modules\WorkOps\engines\VIA_ENG066_WorkopsCorpusBridge.py" %2 %3 %4 %5 %6
 ) else if /i "%~1"=="engine" (
   shift
-  py "%~dp0..\functional modules\WorkOps\engines\email_super_engine.py" %2 %3 %4 %5 %6 %7 %8 %9
+  py "%~dp0..\functional modules\WorkOps\engines\VIA_ENG056_EmailSuperEngine.py" %2 %3 %4 %5 %6 %7 %8 %9
 ) else if /i "%~1"=="pmsetup" (
   for /f "delims=" %%f in ('dir /b /o:n "%~dp0..\functional modules\WorkOps\engines\Invoke-VIA-WorkOps-PmSetup-v0*.ps1"') do set "WOPS_PMS=%%f"
   call pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\engines\%%WOPS_PMS%%" %2
@@ -123,18 +123,18 @@ if "%~1"=="" (
   pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\supportive modules\VIA_Forge\Start-VIA.ps1"
 ) else if /i "%~1"=="dotsetup" (
   rem graphviz 可攜式取得（免 winget/管理員）:via-workops dotsetup → 狀態;dotsetup install → 下載+驗證+解壓
-  py "%~dp0..\functional modules\WorkOps\engines\workops_graphviz_setup.py" %2 %3
+  py "%~dp0..\functional modules\WorkOps\engines\VIA_ENG070_WorkopsGraphvizSetup.py" %2 %3
 ) else if /i "%~1"=="envmgr" (
   rem 中央環境治理直達:via-workops envmgr health | plan pm4py | install pm4py --wheels-only
-  py "%~dp0..\functional modules\WorkOps\engines\workops_envmanager_bridge.py" %2 %3 %4 %5 %6
+  py "%~dp0..\functional modules\WorkOps\engines\VIA_ENG069_WorkopsEnvmanagerBridge.py" %2 %3 %4 %5 %6
 ) else if /i "%~1"=="analytics" (
   if exist "%~dp0..\functional modules\WorkOps\engines\.venv_pm\Scripts\python.exe" (
-    "%~dp0..\functional modules\WorkOps\engines\.venv_pm\Scripts\python.exe" "%~dp0..\functional modules\WorkOps\engines\engine_analytics.py" %2 %3 %4 %5
+    "%~dp0..\functional modules\WorkOps\engines\.venv_pm\Scripts\python.exe" "%~dp0..\functional modules\WorkOps\engines\VIA_ENG057_EngineAnalytics.py" %2 %3 %4 %5
   ) else (
-    py "%~dp0..\functional modules\WorkOps\engines\engine_analytics.py" %2 %3 %4 %5
+    py "%~dp0..\functional modules\WorkOps\engines\VIA_ENG057_EngineAnalytics.py" %2 %3 %4 %5
   )
 ) else if /i "%~1"=="actiondb" (
-  py "%~dp0..\functional modules\WorkOps\engines\email_action_db.py" %2 %3 %4 %5
+  py "%~dp0..\functional modules\WorkOps\engines\VIA_ENG055_EmailActionDb.py" %2 %3 %4 %5
 ) else if /i "%~1"=="scanrange" (
   pwsh -NoLogo -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\functional modules\WorkOps\engines\Invoke-VIA-Outlook-TimeRange-ReadOnly.ps1" %2 %3 %4 %5 %6
 ) else if /i "%~1"=="matrixsync" (

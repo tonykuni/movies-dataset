@@ -6,8 +6,8 @@
 .DESCRIPTION
   在 VRN 生產資料夾單擊執行：
     1. HardGate 7-tool BOOT_PRECHECK
-    2. VRN_HealthCheck.py — 25 檔完整性 + 跨模組規則一致性
-    3. ACTIVATE_AND_CROSS_VALIDATE.py — 雙組獨立資料集交叉驗證
+    2. VRN_ENG008_HealthCheck.py — 25 檔完整性 + 跨模組規則一致性
+    3. VRN_ENG001_ACTIVATEANDCROSSVALIDATE.py — 雙組獨立資料集交叉驗證
     4. 自動開啟 HTML 報告
 
 .PARAMETER VrnDir
@@ -139,8 +139,8 @@ Write-VIAStatus "OK" "Python: $pyCheck"
 
 # Check core scripts present
 $REQUIRED_SCRIPTS = @(
-    "VRN_HealthCheck.py",
-    "ACTIVATE_AND_CROSS_VALIDATE.py",
+    "VRN_ENG008_HealthCheck.py",
+    "VRN_ENG001_ACTIVATEANDCROSSVALIDATE.py",
     "VIA_HardGate_BootPrecheck.py"
 )
 $missingScripts = @()
@@ -160,9 +160,9 @@ Write-VIAStatus "OK" "All $($REQUIRED_SCRIPTS.Count) required scripts present"
 
 $healthCheckOK = $true
 if (-not $SkipHealthCheck) {
-    Write-VIASection "Phase 1: VRN_HealthCheck.py"
+    Write-VIASection "Phase 1: VRN_ENG008_HealthCheck.py"
 
-    $hcScript = Join-Path $VrnDir "VRN_HealthCheck.py"
+    $hcScript = Join-Path $VrnDir "VRN_ENG008_HealthCheck.py"
     $t0 = Get-Date
     & $Python $PythonArgs $hcScript --vrn-dir $VrnDir
     $t1 = Get-Date
@@ -197,9 +197,9 @@ if (-not $SkipHealthCheck) {
 
 $activateOK = $true
 if (-not $SkipActivate) {
-    Write-VIASection "Phase 2: ACTIVATE_AND_CROSS_VALIDATE.py"
+    Write-VIASection "Phase 2: VRN_ENG001_ACTIVATEANDCROSSVALIDATE.py"
 
-    $cvScript = Join-Path $VrnDir "ACTIVATE_AND_CROSS_VALIDATE.py"
+    $cvScript = Join-Path $VrnDir "VRN_ENG001_ACTIVATEANDCROSSVALIDATE.py"
     $t0 = Get-Date
     Push-Location $VrnDir
     try {

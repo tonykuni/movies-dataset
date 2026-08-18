@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # rotation_engine.py v0100(ENG-024)— via-pipe 同伴檔補齊:族群輪動引擎整合轉接
 #
-# 背景(操作員 2026/08/08 整合去重優化令):via_pipeline.py 自歸家日起等待同伴檔
+# 背景(操作員 2026/08/08 整合去重優化令):SUP_MDL152_Pipeline.py 自歸家日起等待同伴檔
 #   rotation_engine.py(介面:rebase100/log_ret/debeta/classify_and_prune/make_demo/
 #   THEMES/MARKET_COL/CORR_KEEP)。操作員上傳之族群輪動資金流引擎經 hash 鑑識
 #   與庫內 VDF/engine/candidates/sector_rotation_capital_flow_engine.py 逐位元組相同

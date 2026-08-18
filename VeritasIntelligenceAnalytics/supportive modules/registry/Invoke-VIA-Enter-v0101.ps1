@@ -60,7 +60,7 @@ function def_HealMerge([string]$Phase) {
     if ($um.Count -eq 0) { return $true }
     def_Say "INFO" "$Phase:未解衝突 $($um.Count) 檔:$($um -join ' · ')"
     if ($um.Count -eq 1 -and $um[0] -eq $RegistryRel) {
-        $helper = Get-ChildItem $REG -Filter "via_registry_unionmerge_v0*.py" | Sort-Object Name | Select-Object -Last 1
+        $helper = Get-ChildItem $REG -Filter "CGC_MDL063_RegistryUnionmerge_v0*.py" | Sort-Object Name | Select-Object -Last 1
         if ($helper) {
             & $(if (Get-Command py -ErrorAction SilentlyContinue) { "py" } else { "python3" }) $helper.FullName
             if ((def_Unmerged).Count -eq 0) {

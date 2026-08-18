@@ -66,7 +66,7 @@ $script:DELIVERY_FILES = @(
         Description = "SSOT v22 同義字 auto-append PS7 wrapper"
     },
     @{
-        Name        = "VIA_SSOT_Unified_v22_synonyms_patch.py"
+        Name        = "SUP_MDL655_SSOTUnifiedV22SynonymsPatch.py"
         Role        = "ssot_patch"
         Required    = $true
         Description = "SSOT 同義字 patch(55 keys / 361 synonyms)"
@@ -219,7 +219,7 @@ function Invoke-SSOTStep {
     }
 
     $wrapper = $script:PIPELINE_STATE.found_files["Invoke-VIA-SSOT-v22-Append-v2.ps1"]
-    $patch   = $script:PIPELINE_STATE.found_files["VIA_SSOT_Unified_v22_synonyms_patch.py"]
+    $patch   = $script:PIPELINE_STATE.found_files["SUP_MDL655_SSOTUnifiedV22SynonymsPatch.py"]
 
     Write-Section "STEP 1/2 · Applying SSOT v22 Synonyms"
 

@@ -5,7 +5,7 @@ param(
     [string]$DownloadsRoot = 'C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics',
     [string]$RepoProjectRoot = 'C:\Users\tonyk\movies-dataset\VeritasIntelligenceAnalytics',
     [string]$ReportRoot = "$env:USERPROFILE\VIA_Reports",
-    [string]$RelativeEnginePath = 'functional modules\VAP\engine\via_autoplot_engine_v001.py',
+    [string]$RelativeEnginePath = 'functional modules\VAP\engine\VAP_ENG002_AutoplotEngine_v001.py',
     [string]$RequiredAdjudicationGate = 'UNIT03_VISUAL_SEMANTIC_REVIEW_BLOCKED',
     [double]$ObservedFillOpacity = 0.40,
     [double]$RequiredFillOpacity = 0.75,

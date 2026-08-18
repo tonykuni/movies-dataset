@@ -13,7 +13,7 @@ try {
     def_Step "Preflight" 5
     if ($PSVersionTable.PSVersion.Major -lt 7) { throw "PowerShell 7+ required." }
     $Source = Split-Path -Parent $PSScriptRoot
-    if (-not (Test-Path (Join-Path $Source "engines\workops_api_server.py"))) { throw "Invalid WorkOps package source." }
+    if (-not (Test-Path (Join-Path $Source "engines\VIA_ENG105_WorkopsApiServer.py"))) { throw "Invalid WorkOps package source." }
 
     def_Step "Prepare install root" 15
     New-Item -ItemType Directory -Force -Path $InstallRoot | Out-Null
@@ -102,9 +102,9 @@ try {
 
     Push-Location $AppRoot
     try {
-        & $Vpy "engines\workops_ssot_store.py" snapshot | Out-Null
+        & $Vpy "engines\VIA_ENG136_WorkopsSsotStore.py" snapshot | Out-Null
         & $Vpy "engines\workops_module_lifecycle_manager.py" health | Out-Null
-        & $Vpy "engines\workops_diagnostics.py" build | Out-Null
+        & $Vpy "engines\VIA_ENG113_WorkopsDiagnostics.py" build | Out-Null
     } finally { Pop-Location }
 
     def_Step "Create launcher" 85
@@ -115,7 +115,7 @@ try {
 `$AppRoot = '$($AppRoot.Replace("'","''"))'
 `$Python = '$($Vpy.Replace("'","''"))'
 Set-Location `$AppRoot
-Start-Process -FilePath `$Python -ArgumentList @('engines\workops_api_server.py') -WorkingDirectory `$AppRoot
+Start-Process -FilePath `$Python -ArgumentList @('engines\VIA_ENG105_WorkopsApiServer.py') -WorkingDirectory `$AppRoot
 Start-Sleep -Milliseconds 900
 Start-Process 'http://127.0.0.1:8775/'
 "@ | Set-Content -Path $Launcher -Encoding UTF8

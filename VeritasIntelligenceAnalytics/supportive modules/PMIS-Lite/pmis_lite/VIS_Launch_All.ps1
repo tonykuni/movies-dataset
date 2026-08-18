@@ -20,10 +20,10 @@ Write-Host ''
 if (-not (Test-Path -LiteralPath $OutDir)) {
     New-Item -ItemType Directory -Path $OutDir -Force | Out-Null
 }
-$script:DriverPath = Join-Path $PkgParent 'via_launch_driver.py'
+$script:DriverPath = Join-Path $PkgParent 'SUP_MDL112_LaunchDriver.py'
 if (-not (Test-Path -LiteralPath $script:DriverPath)) {
     Write-Host "找不到驅動器: ${script:DriverPath}" -ForegroundColor Red
-    Write-Host '請確認 PkgParent 指向含 via_launch_driver.py 與 pmis_lite 的資料夾。' -ForegroundColor Yellow
+    Write-Host '請確認 PkgParent 指向含 SUP_MDL112_LaunchDriver.py 與 pmis_lite 的資料夾。' -ForegroundColor Yellow
     return
 }
 

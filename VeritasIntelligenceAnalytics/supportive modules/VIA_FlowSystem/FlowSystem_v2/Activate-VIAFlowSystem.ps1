@@ -19,7 +19,7 @@ $ErrorActionPreference = "Stop"
 if (-not $Cmd) { $Cmd = "all" }
 
 $script:Root    = $PSScriptRoot
-$script:Manager = Join-Path $script:Root "engines/flow_manager.py"
+$script:Manager = Join-Path $script:Root "engines/FLOW_ENG009_FlowManager.py"
 $script:Report  = Join-Path $script:Root "index.html"
 $script:WorldMap = Join-Path $script:Root "world_flow.html"
 $script:TierMap  = Join-Path $script:Root "tier_flow.html"

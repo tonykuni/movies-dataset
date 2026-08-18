@@ -53,8 +53,8 @@ $matched | ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination $sol
 $py = @("$env:USERPROFILE\envs\via_core_312\Scripts\python.exe", "py", "python", "python3") |
       Where-Object { (($_ -match '\\') -and (Test-Path $_)) -or (($_ -notmatch '\\') -and (Get-Command $_ -ErrorAction SilentlyContinue)) } |
       Select-Object -First 1
-$eng005 = Join-Path $vrn "VRN_MDL005_OCRFetchingPDFText.py"
-$eng004 = Join-Path $vrn "VRN_MDL004_OCR_FetchingPDFTable.py"
+$eng005 = Join-Path $vrn "VRN_ENG018_MDL005OCRFetchingPDFText.py"
+$eng004 = Join-Path $vrn "VRN_ENG017_MDL004OCRFetchingPDFTable.py"
 
 function Run-Solo([string]$Name, [string]$Eng, [string[]]$EngArgs) {
     $log = Join-Path $repDir "solo_$($Name)_$ts.log"

@@ -180,7 +180,7 @@ function def_Main {
     }
 
     $config = def_ResolveFileBeside $ConfigPath $scriptDir "via_if_config.json"
-    $engine = def_ResolveFileBeside $EnginePath $scriptDir "via_if_engine.py"
+    $engine = def_ResolveFileBeside $EnginePath $scriptDir "SUP_MDL144_IfEngine.py"
     $cfg = Get-Content -LiteralPath $config -Raw -Encoding UTF8 | ConvertFrom-Json
 
     $roots = def_Prop $cfg "roots" $null
@@ -200,7 +200,7 @@ function def_Main {
     def_Progress 2 6 "Scaffold ready"
 
     $py = def_ResolvePython $PythonExe
-    $deployedEngine = def_DeployAsset $engine (Join-Path $sysDir "01_engines") "via_if_engine.py"
+    $deployedEngine = def_DeployAsset $engine (Join-Path $sysDir "01_engines") "SUP_MDL144_IfEngine.py"
     $null = def_DeployAsset $config (Join-Path $sysDir "00_config") "via_if_config.json"
     def_Progress 3 6 "Assets deployed (append-only)"
 

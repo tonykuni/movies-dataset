@@ -24,7 +24,7 @@ import sys
 import numpy as np
 import pandas as pd
 
-MODULE_PATH = Path(__file__).with_name("VIA_SectorFlow_Dashboard_Builder_v0100.py")
+MODULE_PATH = Path(__file__).with_name("GRP_ENG013_SectorFlowDashboardBuilder_v0100.py")
 SPEC = importlib.util.spec_from_file_location("via_dashboard_vap", MODULE_PATH)
 MODULE = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = MODULE

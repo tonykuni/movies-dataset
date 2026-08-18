@@ -57,7 +57,7 @@ HOLD_FRAGS = ("_sha", "_review_quarantine", "__pycache__", "/vendor/",
               "package_samples", "/docs/", "quarantine", ".venv",
               "site-packages", "_via_mother_root_reconciliation_runs",
               "/rollback/", "/evidence", "knowledge/source_docs",
-              "freeze", "_syntaxfix_")
+              "freeze", "_syntaxfix_", "rename_runs")
 REF_EXTS = (".py", ".cmd", ".ps1")
 
 
@@ -205,9 +205,11 @@ def undo(root: Path, ledger_path=None):
     bdir = root / run["backup_dir"] if run.get("backup_dir") else None
     if bdir and bdir.exists():
         import shutil
+        new2old = {r["new"]: r["old"] for r in run.get("renames", [])}
         for f in bdir.rglob("*"):
             if f.is_file():
-                shutil.copy2(f, root / f.relative_to(bdir))
+                rel = str(f.relative_to(bdir)).replace("\\", "/")
+                shutil.copy2(f, root / new2old.get(rel, rel))
         undone.append({"restored_edits": len(run.get("edits", {}))})
     run["undone_at"] = NOW
     lp.write_text(json.dumps(led, ensure_ascii=False, indent=1), encoding="utf-8")
@@ -249,7 +251,11 @@ def commit_risky(root, reg, scope, reg_path=None, ledger_path=None, hold_frags=H
     backed = {}
     run = {"ts": NOW, "mode": "risky", "run_scope": scope or "ALL",
            "renames": [], "edits": {}, "backup_dir": str(bak_dir.relative_to(root))}
-    base_count = _Counter(strip_ver(Path(r["old"]).stem)[0] for r in rows if r.get("old"))
+    _fam_of_base = {}
+    for _r in rows:
+        if _r.get("old"):
+            _fam_of_base.setdefault(strip_ver(Path(_r["old"]).stem)[0], set()).add(_r["family"])
+    base_count = _Counter({b: len(fs) for b, fs in _fam_of_base.items()})
     n_ok = n_hold = n_fail = 0
 
     def backup(rp):
@@ -269,6 +275,16 @@ def commit_risky(root, reg, scope, reg_path=None, ledger_path=None, hold_frags=H
         if len(base_old) < 10 or base_count[base_old] > 1:
             n_hold += 1
             continue                      # HOLD_AMBIGUOUS:短字幹/同字幹禁自動
+        if ((root / old_rp).parent / "__init__.py").exists():
+            n_hold += 1
+            continue                      # HOLD_PACKAGE:套件內檔名=API(相對匯入)
+        import re as _re2
+        _imp_rx = _re2.compile(r"(?m)^\s*(?:import|from)\s+(?:"
+                               + _re2.escape(Path(old_rp).stem) + "|"
+                               + _re2.escape(base_old) + r")(?![A-Za-z0-9_])")
+        if any(_imp_rx.search(txt) for rp2, txt in idx.items() if rp2 != old_rp):
+            n_hold += 1
+            continue                      # HOLD_IMPORTED:被 import 者=模組身分,改名需別名語意
         srcp = root / old_rp
         if not srcp.exists() or (root / new_rp).exists():
             continue
@@ -437,53 +453,58 @@ def selftest() -> int:
             ok += 1; print("  [PASS] 語法敗件不改(候 via-fixsyntax,parse 閘)")
         else:
             print("  [FAIL] parse 閘")
-    # 8-10 二期(加固版)
+    # 8-10 二期(加固版:glob 專屬可名/import·套件·短字幹三 HOLD/undo 映射)
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)
         (root / "eng").mkdir(); (root / "bin").mkdir(); (root / "VIA_Reports").mkdir()
         (root / "eng" / ("rotation_flywheel" + "_v0100.py")).write_text("R = 1\n", encoding="utf-8")
-        (root / "eng/sector_rotation_flywheel_extra.py").write_text(
-            "import rotation_flywheel_v0100\nS = 2\n", encoding="utf-8")
         gl = '("rotation_flywheel' + '_v0*.py")'
-        (root / "bin/run-rot.cmd").write_text(
-            "for %%f in " + gl + " do py %%f\n", encoding="utf-8")
+        (root / "bin/run-rot.cmd").write_text("for %%f in " + gl + " do py %%f\n", encoding="utf-8")
+        (root / "eng/rotation_gearbox_v0100.py").write_text("G = 1\n", encoding="utf-8")
+        (root / "eng/uses_gearbox.py").write_text("import rotation_gearbox_v0100\n", encoding="utf-8")
+        (root / "eng/pkgzone").mkdir()
+        (root / "eng/pkgzone/__init__.py").write_text("", encoding="utf-8")
+        (root / "eng/pkgzone/availability_probe.py").write_text("A = 1\n", encoding="utf-8")
         (root / "eng/tiny.py").write_text("T = 1\n", encoding="utf-8")
         reg2 = {"items": {
             "eng/rotation_flywheel": {"sys": "SYS", "kind": "ENG", "num": 5,
                                       "canonical": "SYS_ENG005_RotationFlywheel",
                                       "members": ["eng/rotation_flywheel_v0100.py"]},
-            "eng/sector_rotation_flywheel_extra": {"sys": "SYS", "kind": "ENG", "num": 6,
-                                                   "canonical": "SYS_ENG006_SectorRotationFlywheelExtra",
-                                                   "members": ["eng/sector_rotation_flywheel_extra.py"]},
-            "eng/tiny": {"sys": "SYS", "kind": "ENG", "num": 7,
-                         "canonical": "SYS_ENG007_Tiny", "members": ["eng/tiny.py"]},
-        }, "counters": {"SYS_ENG": 7}}
+            "eng/rotation_gearbox": {"sys": "SYS", "kind": "ENG", "num": 6,
+                                     "canonical": "SYS_ENG006_RotationGearbox",
+                                     "members": ["eng/rotation_gearbox_v0100.py"]},
+            "eng/pkgzone/availability_probe": {"sys": "SYS", "kind": "ENG", "num": 7,
+                                               "canonical": "SYS_ENG007_AvailabilityProbe",
+                                               "members": ["eng/pkgzone/availability_probe.py"]},
+            "eng/tiny": {"sys": "SYS", "kind": "ENG", "num": 8,
+                         "canonical": "SYS_ENG008_Tiny", "members": ["eng/tiny.py"]},
+            "eng/uses_gearbox": {"sys": "SYS", "kind": "ENG", "num": 9,
+                                 "canonical": "SYS_ENG009_UsesGearbox",
+                                 "members": ["eng/uses_gearbox.py"]},
+        }, "counters": {"SYS_ENG": 9}}
         (root / "bin/use-tiny.cmd").write_text("py tiny.py\n", encoding="utf-8")
+        (root / "bin/use-pkg.cmd").write_text("py availability_probe.py\n", encoding="utf-8")
         lp2 = root / "ledger.json"
         run, n_ok2, n_hold2, n_f2 = commit_risky(root, reg2, None, ledger_path=lp2,
                                                  hold_frags=("__pycache__", "VIA_Reports"))
-        impf = root / "eng/sector_rotation_flywheel_extra.py"
-        if not impf.exists():
-            impf = root / "eng/SYS_ENG006_SectorRotationFlywheelExtra.py"
-        imp = impf.read_text(encoding="utf-8")
         cmdt = (root / "bin/run-rot.cmd").read_text(encoding="utf-8")
         if (root / "eng/SYS_ENG005_RotationFlywheel_v0100.py").exists() and \
-                "import SYS_ENG005_RotationFlywheel_v0100" in imp and \
                 "SYS_ENG005_RotationFlywheel_v0*.py" in cmdt:
-            ok += 1; print("  [PASS] 二期:更名+import+glob 三線原子改寫")
+            ok += 1; print("  [PASS] 二期:glob 專屬引用族更名+啟動器原子改寫")
         else:
             print(f"  [FAIL] 二期改寫 {cmdt!r}")
-        tiny_ok = (root / "eng/tiny.py").exists() and n_hold2 >= 1 and \
-            "py tiny.py" in (root / "bin/use-tiny.cmd").read_text(encoding="utf-8")
-        if tiny_ok and "SectorRotationFlywheelExtra" not in cmdt:
-            ok += 1; print("  [PASS] 白名單閘:短字幹 HOLD_AMBIGUOUS+子字串零誤傷")
+        held_ok = (root / "eng/rotation_gearbox_v0100.py").exists() \
+            and (root / "eng/pkgzone/availability_probe.py").exists() \
+            and (root / "eng/tiny.py").exists() and n_hold2 >= 3 \
+            and "import rotation_gearbox_v0100" in (root / "eng/uses_gearbox.py").read_text(encoding="utf-8")
+        if held_ok:
+            ok += 1; print("  [PASS] 三 HOLD:被 import 者/套件內檔/短字幹全數零觸碰")
         else:
-            print("  [FAIL] 白名單閘")
+            print(f"  [FAIL] HOLD 態 n_hold={n_hold2}")
         undo(root, ledger_path=lp2)
-        rest = root / "eng/sector_rotation_flywheel_extra.py"
-        if (root / "eng/rotation_flywheel_v0100.py").exists() and rest.exists() and \
-                "import rotation_flywheel_v0100" in rest.read_text(encoding="utf-8"):
-            ok += 1; print("  [PASS] 二期 undo 全還原")
+        if (root / "eng/rotation_flywheel_v0100.py").exists() and \
+                "rotation_flywheel_v0*.py" in (root / "bin/run-rot.cmd").read_text(encoding="utf-8"):
+            ok += 1; print("  [PASS] 二期 undo 全還原(new→old 映射)")
         else:
             print("  [FAIL] 二期 undo")
     print(f"  [計] {ok}/{total} 檢通過")

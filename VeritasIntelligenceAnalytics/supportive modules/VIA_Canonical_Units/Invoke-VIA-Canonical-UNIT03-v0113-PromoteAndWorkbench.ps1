@@ -5,16 +5,16 @@
  P1 promote  : re-derive the eight-site 0.4->0.75 patch from the PINNED
                source (SHA 2AE164B5...), cross-check byte-equality with
                the v0112 run-local artifact, then write ONE NEW repo file
-               via_autoplot_engine_chartlib_v002.py (append-only - never
+               VAP_ENG001_AutoplotEngineChartlib_v002.py (append-only - never
                overwrites; existing-but-different aborts).
  P2 workbench: import the promoted module in an isolated cwd, verify
                write_workbench exists; call it only if every parameter
                has a default (else static-verify only). 60s job timeout.
  P3 ship     : commit + push main with backoff, transaction record JSON.
- Canonical via_autoplot_engine_v001.py untouched. Fail-closed throughout.
+ Canonical VAP_ENG002_AutoplotEngine_v001.py untouched. Fail-closed throughout.
 ===================================================================== #>
 param(
-    [string]$Candidate  = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VAP\engine\via_autoplot_engine_v001.py",
+    [string]$Candidate  = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VAP\engine\VAP_ENG002_AutoplotEngine_v001.py",
     [string]$ExpectedSha = "2AE164B5082B2113E12C4D1BCD8D73E97C66010F602E01F4A81D8E4B53689EEC"
 )
 Set-StrictMode -Off
@@ -65,11 +65,11 @@ if ($priorFile -and (Test-Path -LiteralPath $priorFile)) {
 }
 
 # ---- P1.4 append-only write of the promoted file ----
-$destRel = "VeritasIntelligenceAnalytics/functional modules/VAP/engine/via_autoplot_engine_chartlib_v002.py"
+$destRel = "VeritasIntelligenceAnalytics/functional modules/VAP/engine/VAP_ENG001_AutoplotEngineChartlib_v002.py"
 $dest = Join-Path $repo $destRel
 $hdr = "# PROMOTED by UNIT03 v0113 $ts from Chart Library Builder candidate (SHA $ExpectedSha)`n" +
        "# Eight-site visual-lock repair 0.4 -> 0.75 per v0111R2 adjudication + v0112 guarded trial (all gates PASS).`n" +
-       "# Canonical via_autoplot_engine_v001.py is unaffected. Do not edit in place - version forward instead.`n"
+       "# Canonical VAP_ENG002_AutoplotEngine_v001.py is unaffected. Do not edit in place - version forward instead.`n"
 $final = $hdr + $text
 if (Test-Path -LiteralPath $dest) {
     $existing = [IO.File]::ReadAllText($dest, [Text.UTF8Encoding]::new($false))

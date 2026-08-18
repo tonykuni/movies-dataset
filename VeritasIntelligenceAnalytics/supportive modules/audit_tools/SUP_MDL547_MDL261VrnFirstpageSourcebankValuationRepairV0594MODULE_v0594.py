@@ -612,7 +612,7 @@ def def_supportive_matrix(cfg: dict) -> list[dict]:
         cfg["supportive_dir"] / "Invoke-VIA-ALL.ps1",
         cfg["supportive_dir"] / "Invoke-VIA-SupportiveHardGate.ps1",
         cfg["supportive_dir"] / "VIA_Panorama_AST_RuntimeInjector.py",
-        cfg["supportive_dir"] / "VIA_RuntimeImportFirewall.py",
+        cfg["supportive_dir"] / "SUP_MDL001_RuntimeImportFirewall.py",
     ]
     rows = []
     for p in files:

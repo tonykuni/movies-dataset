@@ -46,7 +46,7 @@ CHARTSPEC = REPORTS / "flow_groupindex_chartspec.json"
 
 VRN_CHAIN = [
     ("MDL003 TableRestorer", "functional modules/VRN/VRN_MDL003_TableRestorer.py", "報告表格重建(phase1)"),
-    ("MDL004 OCR Table", "functional modules/VRN/VRN_MDL004_OCR_FetchingPDFTable.py", "OCR 表格擷取(phase2)"),
+    ("MDL004 OCR Table", "functional modules/VRN/VRN_ENG017_MDL004OCRFetchingPDFTable.py", "OCR 表格擷取(phase2)"),
     ("MDL006 Consolidator", "functional modules/VRN/VRN_MDL006_ConsolidatorAndPhaseValidator.py", "BASIC/FIN 整併+雙相對照 compare_phases"),
     ("MDL007 APIDataFetcher", "functional modules/VRN/VRN_MDL007_APIDataFetcher.py", "MOPS/TWSE/yfinance 真值源"),
     ("MDL008 CrossValidator", "functional modules/VRN/VRN_MDL008_CrossValidator.py", "Step7-11 交叉驗證+信心分數"),

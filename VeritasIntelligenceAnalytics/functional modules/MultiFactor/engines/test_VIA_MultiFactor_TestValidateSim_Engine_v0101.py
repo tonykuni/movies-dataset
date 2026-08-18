@@ -21,7 +21,7 @@ import sys
 from pathlib import Path
 
 # v0101 版本前送:引擎路徑動態解析(同目錄兄弟檔)— 修 v0100 寫死 /mnt/data 之上傳期路徑,任何機器可跑
-ENGINE_PATH = Path(__file__).resolve().parent / 'VIA_MultiFactor_TestValidateSim_Engine_v0100.py'
+ENGINE_PATH = Path(__file__).resolve().parent / 'VIA_ENG001_MultiFactorTestValidateSimEngine_v0100.py'
 
 spec = importlib.util.spec_from_file_location('via_engine', ENGINE_PATH)
 mod = importlib.util.module_from_spec(spec)

@@ -43,7 +43,7 @@ $Engines = [ordered]@{
         registry = 'UnifiedSpec.json'
         output   = 'UnifiedSpec.json'
         tasks    = [ordered]@{
-            ExtractAll      = @{ tool='VHS_Reader.py';          args={ param($s,$o) @('--scan',$s,'--out',(Join-Path $o 'vhs_specs.json'),'--registry',$Registry) } }
+            ExtractAll      = @{ tool='SUP_MDL164_VHSReader.py';          args={ param($s,$o) @('--scan',$s,'--out',(Join-Path $o 'vhs_specs.json'),'--registry',$Registry) } }
             ThreeBucket     = @{ tool='VAP_TemplateIngestor.py'; args={ param($s,$o) @('--scan',$s,'--out',(Join-Path $o 'VAP_template_index.json')) } }
         }
     }
@@ -51,14 +51,14 @@ $Engines = [ordered]@{
         registry = 'VisualRegistry.json'
         output   = 'VisualRegistry.json'
         tasks    = [ordered]@{
-            ExtractChartSpec = @{ tool='VVX_Extractor.py';       args={ param($s,$o) @('--scan',$s,'--out',$o,'--recurse') } }
+            ExtractChartSpec = @{ tool='SUP_MDL165_VVXExtractor.py';       args={ param($s,$o) @('--scan',$s,'--out',$o,'--recurse') } }
         }
     }
     Layout = @{
         registry = 'LayoutRegistry.json'
         output   = 'LayoutRegistry.json'
         tasks    = [ordered]@{
-            ExtractLayout = @{ tool='VHS_Reader.py'; args={ param($s,$o) @('--scan',$s,'--out',(Join-Path $o 'layout_specs.json'),'--registry',$Registry) } }
+            ExtractLayout = @{ tool='SUP_MDL164_VHSReader.py'; args={ param($s,$o) @('--scan',$s,'--out',(Join-Path $o 'layout_specs.json'),'--registry',$Registry) } }
         }
     }
     Interaction = @{

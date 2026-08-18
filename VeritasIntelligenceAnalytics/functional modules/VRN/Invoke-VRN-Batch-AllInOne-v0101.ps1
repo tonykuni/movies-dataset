@@ -49,8 +49,8 @@ foreach ($d in @($stageRt,$t005,$t004,$tdocx,$repDir)) { New-Item -ItemType Dire
 $py = @("$env:USERPROFILE\envs\via_core_312\Scripts\python.exe","py","python","python3") |
       Where-Object { ($_ -notmatch '\\') -and (Get-Command $_ -ErrorAction SilentlyContinue) -or (($_ -match '\\') -and (Test-Path $_)) } |
       Select-Object -First 1
-$eng005 = Join-Path $vrn "VRN_MDL005_OCRFetchingPDFText.py"
-$eng004 = Join-Path $vrn "VRN_MDL004_OCR_FetchingPDFTable.py"
+$eng005 = Join-Path $vrn "VRN_ENG018_MDL005OCRFetchingPDFText.py"
+$eng004 = Join-Path $vrn "VRN_ENG017_MDL004OCRFetchingPDFTable.py"
 
 $pdfs = @(Get-ChildItem -LiteralPath $inbox -Filter *.pdf  -File -ErrorAction SilentlyContinue)
 $docx = @(Get-ChildItem -LiteralPath $inbox -Filter *.doc* -File -ErrorAction SilentlyContinue)

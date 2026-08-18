@@ -17,7 +17,7 @@ $ErrorActionPreference = "Stop"
 # =============================================================================
 
 $BaseDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$Engine = Join-Path $BaseDir "via_meetingloop_engine.py"
+$Engine = Join-Path $BaseDir "VIA_ENG019_MeetingloopEngine.py"
 $RunsDir = Join-Path $BaseDir "runs"
 $PythonCandidates = @(
     "C:\Python313\python.exe",

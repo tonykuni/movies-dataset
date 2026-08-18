@@ -122,7 +122,7 @@ MODULE_REGISTRY = [
      "lines": 1466, "last_updated": "2026-06-01"},
 
     {"mdl_id": "VDF-MDL004",     "category": "VDF Active",  "subcategory": "FullMarket",
-     "name": "TW Full Market Engine",   "file": "VDF_MDL004_TWFullMarketEngine.py",
+     "name": "TW Full Market Engine",   "file": "VDF_ENG006_MDL004TWFullMarketEngine.py",
      "version": "2.0.0",                "status": "Production",
      "role": "TW 全市場 ~1,900 檔 · Daily Quote + SMA + AvgVol + MCap + Consensus",
      "registry_items": "TWSE/TPEX OpenAPI + YF bulk + YF consensus + FactSet stub",
@@ -281,7 +281,7 @@ MODULE_REGISTRY = [
      "lines": 471, "last_updated": "Earlier"},
 
     {"mdl_id": "VRN-MDL011",     "category": "VRN Active",  "subcategory": "Daily",
-     "name": "Daily Fetcher",       "file": "VRN_MDL011_DailyFetcher.py",
+     "name": "Daily Fetcher",       "file": "VRN_ENG023_MDL011DailyFetcher.py",
      "version": "1.0.0",            "status": "Stable",
      "role": "BRIDGE.aegis_* + Celeritas parallel + yfinance fallback",
      "registry_items": "—",

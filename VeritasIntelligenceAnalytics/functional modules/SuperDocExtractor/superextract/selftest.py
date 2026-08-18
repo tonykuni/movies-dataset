@@ -1,7 +1,7 @@
 """End-to-end selftest: generate pathological samples, run the full
 extract -> repair -> validate -> compare pipeline, assert the outcomes.
 
-    python super_extract.py selftest [--keep DIR]
+    python PLG_ENG001_SuperExtract.py selftest [--keep DIR]
 
 Every check maps to a documented real-world failure mode (merged cells,
 tracked changes, nested tables, encodings, ragged CSVs, fake extensions...).

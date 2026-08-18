@@ -5,7 +5,7 @@
    canonical source -> run-local shimmed copy -> execute the copy.
  Canonical files are never written. Old entries keep working unchanged.
  Usage:
-   pwsh -File Invoke-VRN-Shimmed-Entry-v0100.ps1 -Target ".\VRN_MDL001_StockReportPipeline.py" [-Args @("--flag","v")]
+   pwsh -File Invoke-VRN-Shimmed-Entry-v0100.ps1 -Target ".\VRN_ENG014_MDL001StockReportPipeline.py" [-Args @("--flag","v")]
 ===================================================================== #>
 param(
     [Parameter(Mandatory)][string]$Target,
@@ -16,8 +16,8 @@ Set-StrictMode -Off
 $ErrorActionPreference = "Continue"
 $via  = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent | Join-Path -ChildPath "VeritasIntelligenceAnalytics"
 if (-not (Test-Path $via)) { $via = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent }
-$shim = Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) "VeritasIntelligenceAnalytics\supportive modules\70_VRN_Rules\VIS_VRN_TickerRegexShim_v0100.py"
-if (-not (Test-Path -LiteralPath $shim)) { $shim = Join-Path (Split-Path $PSScriptRoot -Parent) "..\supportive modules\70_VRN_Rules\VIS_VRN_TickerRegexShim_v0100.py" }
+$shim = Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) "VeritasIntelligenceAnalytics\supportive modules\70_VRN_Rules\SUP_MDL031_VISVRNTickerRegexShim_v0100.py"
+if (-not (Test-Path -LiteralPath $shim)) { $shim = Join-Path (Split-Path $PSScriptRoot -Parent) "..\supportive modules\70_VRN_Rules\SUP_MDL031_VISVRNTickerRegexShim_v0100.py" }
 $ts = Get-Date -Format "yyyyMMdd_HHmmss"
 $runDir = Join-Path $env:USERPROFILE "VIA_Reports\_shim_runs\$ts"
 New-Item -ItemType Directory -Force -Path $runDir | Out-Null

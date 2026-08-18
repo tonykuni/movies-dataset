@@ -1,11 +1,11 @@
 """Command-line interface.
 
-    python super_extract.py doctor
-    python super_extract.py extract  FILE  [-o OUTDIR] [--engine E] [--encoding ENC] ...
-    python super_extract.py validate FILE
-    python super_extract.py compare  OLD NEW [--key COL] [-o OUTDIR] [--html]
-    python super_extract.py crosscheck FILE.docx
-    python super_extract.py selftest [--keep DIR]
+    python PLG_ENG001_SuperExtract.py doctor
+    python PLG_ENG001_SuperExtract.py extract  FILE  [-o OUTDIR] [--engine E] [--encoding ENC] ...
+    python PLG_ENG001_SuperExtract.py validate FILE
+    python PLG_ENG001_SuperExtract.py compare  OLD NEW [--key COL] [-o OUTDIR] [--html]
+    python PLG_ENG001_SuperExtract.py crosscheck FILE.docx
+    python PLG_ENG001_SuperExtract.py selftest [--keep DIR]
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(全引擎導入令 2026-08-18;graceful 零行為變更) =====

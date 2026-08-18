@@ -55,14 +55,14 @@ Write-Host "=== VIA AllGreen 一鍵統包 v0100 · $TS · 唯讀/dry-run · 建�
 
 # ① TEST — 全面自測矩陣(18 站)
 Write-Host "── ① TEST(自測矩陣)──"
-$grid = def_Newest "via_selftest_grid_v0*.py" $REG
+$grid = def_Newest "CGC_MDL064_SelftestGrid_v0*.py" $REG
 def_Stage "selftest_grid" @($grid, $(if ($SkipHeavy) { "--fast" }))
 # ② DEBUG
 def_Debug "①後"
 
 # ③ OPTIMIZE — 同步巡航(五站併發=牆鐘最佳化)
 Write-Host "── ③ OPTIMIZE(同步巡航)──"
-$auto = def_Newest "via_auto_pilot_v0*.py" $REG
+$auto = def_Newest "CGC_MDL042_AutoPilot_v0*.py" $REG
 def_Stage "auto_pilot_parallel" @($auto)
 # ④⑤ TEST+DEBUG
 def_Debug "③後"
@@ -94,7 +94,7 @@ def_Debug "⑥後"
 
 # ⑨ GENERATE U/I — Console 七頁重生
 Write-Host "── ⑨ GENERATE U/I(Console)──"
-$hub = def_Newest "via_master_hub_v0*.py" $REG
+$hub = def_Newest "CGC_MDL059_MasterHub_v0*.py" $REG
 def_Stage "console_7pages" @($hub, "--no-open")
 
 # ⑩ USER-TEST — 開 Console(使用者旅程入口);NoOpen 則印路徑

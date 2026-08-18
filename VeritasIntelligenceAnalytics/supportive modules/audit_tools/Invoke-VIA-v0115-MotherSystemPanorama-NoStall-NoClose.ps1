@@ -3,7 +3,7 @@ $env:PYTHONUTF8 = "1"
 $env:PYTHONIOENCODING = "utf-8"
 
 $Base = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics"
-$ManagerPy = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\_via_mother_system_manager\VIA_MotherSystemManager_v0115.py"
+$ManagerPy = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\_via_mother_system_manager\SUP_MDL506_MotherSystemManager_v0115.py"
 $RunRoot = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_integration_v0115_mother_system_panorama"
 $RunId = "RUN_{0}_VIA_v0115_MOTHER_SYSTEM_PANORAMA_IAM" -f (Get-Date -Format "yyyyMMdd_HHmmss")
 $RunDir = Join-Path $RunRoot $RunId

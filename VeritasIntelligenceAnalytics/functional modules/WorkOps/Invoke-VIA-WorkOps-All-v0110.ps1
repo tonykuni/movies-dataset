@@ -192,14 +192,14 @@ Invoke-Stage "0b graphviz 可攜版(DFG 圖)" {
     if ($dotP -or (Get-Command dot -ErrorAction SilentlyContinue)) {
         Write-Host "  dot 已就位 — 免下載" -ForegroundColor Green
     } else {
-        & py (Join-Path $Engines "workops_graphviz_setup.py") install
+        & py (Join-Path $Engines "VIA_ENG070_WorkopsGraphvizSetup.py") install
     }
 }
 Invoke-Stage "0c EnvManager 健檢(落 out\envmanager\)" {
-    & py (Join-Path $Engines "workops_envmanager_bridge.py") health
+    & py (Join-Path $Engines "VIA_ENG069_WorkopsEnvmanagerBridge.py") health
 }
 Invoke-Stage "0d OCR 十段探測快照(ENG-026)" {
-    $router = Join-Path (Split-Path (Split-Path $WorkOps -Parent) -Parent) "supportive modules\VIA_OCR_Router\via_ocr_router.py"
+    $router = Join-Path (Split-Path (Split-Path $WorkOps -Parent) -Parent) "supportive modules\VIA_OCR_Router\SUP_MDL146_OcrRouter.py"
     $probeOut = Join-Path $WorkOps "out\ocr_probe.json"
     & py $router probe | Tee-Object -Variable probeLines | Select-Object -Last 1 | Write-Host
     ($probeLines | Select-Object -SkipLast 1) -join "`n" | Set-Content -LiteralPath $probeOut -Encoding UTF8
@@ -211,7 +211,7 @@ if ($SkipSelftest) {
     $Stages.Add([pscustomobject]@{ 段 = "0e 全鏈自測(沙箱八段)"; 結果 = "SKIP"; 秒 = 0 })
 } else {
     Invoke-Stage "0e 全鏈自測(ENG-032 沙箱八段;正本零觸碰)" {
-        & py (Join-Path $Engines "workops_selftest.py")
+        & py (Join-Path $Engines "VIA_ENG081_WorkopsSelftest.py")
     }
 }
 
@@ -246,10 +246,10 @@ Invoke-Stage "2b 回覆解析(投票/token/關鍵詞三層;未中誠實)" {
 # ---------- [2c] WOP 專案歸戶(ENG-028)----------
 Invoke-Stage "2c WOP 專案歸戶(確認檔自動吸收→融合→賦號)" {
     if (Test-Path -LiteralPath (Join-Path $WorkOps "out\wop_confirm.csv")) {
-        & py (Join-Path $Engines "workops_wop_identifier.py") apply
+        & py (Join-Path $Engines "VIA_ENG087_WorkopsWopIdentifier.py") apply
     }
     if (Test-Path -LiteralPath (Join-Path $WorkOps "out\mails.csv")) {
-        & py (Join-Path $Engines "workops_wop_identifier.py") propose
+        & py (Join-Path $Engines "VIA_ENG087_WorkopsWopIdentifier.py") propose
     } else {
         Write-Host "  掃描語料尚缺(out\mails.csv)— 板段成功後下次跑即歸戶" -ForegroundColor DarkYellow
     }
@@ -258,8 +258,8 @@ Invoke-Stage "2c WOP 專案歸戶(確認檔自動吸收→融合→賦號)" {
 # ---------- [2d] 決策 KPI ----------
 Invoke-Stage "2d 決策 KPI 快照(ENG-027)" {
     if (Test-Path -LiteralPath (Join-Path $WorkOps "out\decision_log.db")) {
-        & py (Join-Path $Engines "workops_decision_log.py") report
-        & py (Join-Path $Engines "workops_decision_log.py") export
+        & py (Join-Path $Engines "VIA_ENG068_WorkopsDecisionLog.py") report
+        & py (Join-Path $Engines "VIA_ENG068_WorkopsDecisionLog.py") export
     } else {
         Write-Host "  決策帳本尚空 — via-workops decisions add 開始記錄(會議範本:docs\Meeting_Minutes_Template.md)" -ForegroundColor DarkYellow
     }
@@ -296,10 +296,10 @@ Invoke-Stage "2e3 ML 迴圈:adopt(冪等)→train→suggest(絕不自動 cluster
         return
     }
     if (Test-Path -LiteralPath (Join-Path $WorkOps "out\lexicon_review.csv")) {
-        & py (Join-Path $Engines "workops_ml_lab.py") adopt
+        & py (Join-Path $Engines "VIA_ENG075_WorkopsMlLab.py") adopt
     }
-    & py (Join-Path $Engines "workops_ml_lab.py") train
-    & py (Join-Path $Engines "workops_ml_lab.py") suggest
+    & py (Join-Path $Engines "VIA_ENG075_WorkopsMlLab.py") train
+    & py (Join-Path $Engines "VIA_ENG075_WorkopsMlLab.py") suggest
 }
 
 # ---------- [2e5] 擴充模組健檢(v0110;秒級盤點,缺席誠實列缺不中斷)----------
@@ -307,12 +307,12 @@ Invoke-Stage "2e5 擴充模組健檢(WF/ChipWar/TALib/MF/FlowSystem 在位+Pytho
     $probe = [ordered]@{ ts = (Get-Date).ToString("yyyy-MM-ddTHH:mm:ss"); modules = [ordered]@{}; pylibs = [ordered]@{} }
     $modMap = [ordered]@{
         WorkflowEngine = (Join-Path $ViaRoot "VIA_WorkflowEngine.py")
-        ChipWar        = (Join-Path $ViaRoot "functional modules\ChipWar\engines\via_chipwar_engine.py")
-        TALib          = (Join-Path $ViaRoot "functional modules\TALib\VIA_TALibEngine.py")
-        MultiFactor    = (Join-Path $ViaRoot "functional modules\MultiFactor\engines\VIA_MultiFactor_TestValidateSim_Engine_v0100.py")
+        ChipWar        = (Join-Path $ViaRoot "functional modules\ChipWar\engines\CHW_ENG015_ChipwarEngine.py")
+        TALib          = (Join-Path $ViaRoot "functional modules\TALib\VIA_ENG003_TALibEngine.py")
+        MultiFactor    = (Join-Path $ViaRoot "functional modules\MultiFactor\engines\VIA_ENG001_MultiFactorTestValidateSimEngine_v0100.py")
         FlowSystemV2   = (Join-Path $ViaRoot "supportive modules\VIA_FlowSystem\FlowSystem_v2\Activate-VIAFlowSystem.ps1")
-        VAP_chartlib   = $(if (Get-NewestScript (Join-Path $ViaRoot "functional modules\VAP\engine") "via_autoplot_engine_chartlib_v0*.py") { "OK" } else { "" })
-        VAP_seaborn    = (Join-Path $ViaRoot "functional modules\VAP\engine\via_autoplot_seaborn_plotly_v0100.py")
+        VAP_chartlib   = $(if (Get-NewestScript (Join-Path $ViaRoot "functional modules\VAP\engine") "VAP_ENG001_AutoplotEngineChartlib_v0*.py") { "OK" } else { "" })
+        VAP_seaborn    = (Join-Path $ViaRoot "functional modules\VAP\engine\VAP_ENG003_AutoplotSeabornPlotly_v0100.py")
     }
     foreach ($k in $modMap.Keys) {
         $v = $modMap[$k]
@@ -332,10 +332,10 @@ Invoke-Stage "2e5 擴充模組健檢(WF/ChipWar/TALib/MF/FlowSystem 在位+Pytho
 
 # ---------- [2f] 側車備份+驗證(ENG-031)----------
 Invoke-Stage "2f 側車備份+驗證(20 項正本 zip+sha256)" {
-    & py (Join-Path $Engines "workops_backup.py") backup
+    & py (Join-Path $Engines "VIA_ENG061_WorkopsBackup.py") backup
     $bkDir = Join-Path $WorkOps "out\backups"
     $newest = Get-ChildItem -Path $bkDir -Filter "*.zip" -File -ErrorAction SilentlyContinue | Sort-Object Name | Select-Object -Last 1
-    if ($newest) { & py (Join-Path $Engines "workops_backup.py") verify $newest.FullName }
+    if ($newest) { & py (Join-Path $Engines "VIA_ENG061_WorkopsBackup.py") verify $newest.FullName }
     else { Write-Host "  [FAIL] 備份 zip 未產生" -ForegroundColor Red; $global:LASTEXITCODE = 1 }
 }
 
@@ -348,7 +348,7 @@ Invoke-Stage "2g 板末刷(歸戶/解析/準確度吸收後重生十面板)" {
 
 # ---------- [2h] VAP 自動出圖(v0110 非必要自動化;無資料誠實 SKIP)----------
 Invoke-Stage "2h VAP 自動出圖(VDF db 有料即 --auto 前 6 張;無料誠實略過)" {
-    $vapEng = Get-NewestScript (Join-Path $ViaRoot "functional modules\VAP\engine") "via_autoplot_engine_chartlib_v0*.py"
+    $vapEng = Get-NewestScript (Join-Path $ViaRoot "functional modules\VAP\engine") "VAP_ENG001_AutoplotEngineChartlib_v0*.py"
     if (-not $vapEng) { Write-Host "  chartlib 不在位 — 略過" -ForegroundColor DarkYellow; $global:LASTEXITCODE = 0; return }
     $dbRoots = @((Join-Path $ViaRoot "functional modules\VDF\db"), (Join-Path $ViaRoot "VDF\db"))
     $hasData = $false

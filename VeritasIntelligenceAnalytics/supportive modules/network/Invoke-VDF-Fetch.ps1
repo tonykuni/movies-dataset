@@ -13,7 +13,7 @@ function Invoke-VDF-Fetch {
     $FetchManifest = "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_PRODUCTION_FETCH_CONTROLLER_v016_20260609_220337\\registry\\VDF_ProductionFetchManifest_v016.json"
     $FetchResult = "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_PRODUCTION_FETCH_CONTROLLER_v016_20260609_220337\\runtime\\vdf_production_fetch_result_v016.json"
     $HtmlReport = "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_PRODUCTION_FETCH_CONTROLLER_v016_20260609_220337\\report\\VDF_ProductionFetchController_Report_v016.html"
-    $PythonController = "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_PRODUCTION_FETCH_CONTROLLER_v016_20260609_220337\\runtime\\vdf_production_fetch_controller_v016.py"
+    $PythonController = "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics\\dict\\VDF\\_active\\VDF_PRODUCTION_FETCH_CONTROLLER_v016_20260609_220337\\runtime\\SUP_MDL631_ProductionFetchController_v016.py"
 
     if ($Action -eq "status") {
         [pscustomobject]@{

@@ -3,7 +3,7 @@
 ==============================================================================
   VHS_Launch.ps1  -  Veritas HTML Spec Reader  (VIA / VPN family)
   One paste-and-run PS7 launcher.
-    M01 VHS_Reader.py        full-spec extractor + LOCK/EDITABLE classifier
+    M01 SUP_MDL164_VHSReader.py        full-spec extractor + LOCK/EDITABLE classifier
     M02 vhs_extract.js       matrix render + LIVE computed-style extraction
     M03 VHS_ControlCenter    VPN v3.5 dark enterprise viewer
     Registry  VHS_LockRegistry.json   editable lock rules (append-only)
@@ -44,7 +44,7 @@ function Write-Step {
 $script:PY_READER = @'
 # -*- coding: utf-8 -*-
 # ============================================================================
-#  VHS_Reader.py  -  Veritas HTML Spec Reader  (VIA / VPN family)
+#  SUP_MDL164_VHSReader.py  -  Veritas HTML Spec Reader  (VIA / VPN family)
 #  M01 : HTML U/I full-spec extractor + LOCK/EDITABLE classifier
 #  Stdlib only (re, json, pathlib, html.parser, argparse, datetime, hashlib)
 #  Append-only (zhi-zeng-bu-jian). UTF-8 No BOM in/out.
@@ -400,7 +400,7 @@ if __name__ == "__main__":
 $script:JS_EXTRACT = @'
 /* ==========================================================================
  *  vhs_extract.js  -  Veritas HTML Spec Reader  (VIA / VPN family)
- *  M02 : render static spec matrix (from VHS_Reader.py JSON)
+ *  M02 : render static spec matrix (from SUP_MDL164_VHSReader.py JSON)
  *        + LIVE computed-style extraction via hidden iframe
  *  No external deps. Reads ./vhs_specs.json served by the PS7 HttpListener.
  * ======================================================================== */
@@ -882,7 +882,7 @@ if (-not (Test-Path -LiteralPath $script:SampleDir)) {
     New-Item -ItemType Directory -Path $script:SampleDir -Force | Out-Null
 }
 
-Write-VhsFile (Join-Path $script:Root 'VHS_Reader.py')          $script:PY_READER
+Write-VhsFile (Join-Path $script:Root 'SUP_MDL164_VHSReader.py')          $script:PY_READER
 Write-VhsFile (Join-Path $script:Root 'vhs_extract.js')         $script:JS_EXTRACT
 Write-VhsFile (Join-Path $script:Root 'VHS_ControlCenter.html') $script:HTML_CC
 Write-VhsFile (Join-Path $script:Root 'VHS_LockRegistry.json')  $script:JSON_REGISTRY
@@ -933,7 +933,7 @@ Write-Step ('python    -> ' + ($script:PyExe + ' ' + $script:PyLead).Trim()) 'Da
 
 # ---- 3. run the extractor (ProcessStartInfo) ------------------------------
 $script:OutJson = Join-Path $script:Root 'vhs_specs.json'
-$script:ReaderPy = Join-Path $script:Root 'VHS_Reader.py'
+$script:ReaderPy = Join-Path $script:Root 'SUP_MDL164_VHSReader.py'
 $script:RegPath = Join-Path $script:Root 'VHS_LockRegistry.json'
 $argStr = ($script:PyLead + ' "' + $script:ReaderPy + '" --scan "' + $script:Scan +
            '" --out "' + $script:OutJson + '" --registry "' + $script:RegPath + '"').Trim()

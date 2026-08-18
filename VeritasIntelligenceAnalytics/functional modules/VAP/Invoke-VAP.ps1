@@ -49,14 +49,14 @@ Write-Host "  [run]    $run" -ForegroundColor DarkGray
 
 # ── 三段(與 via-vapvdf A1-A3 完全同式)────────────────────────────────
 $stages = @()
-$stages += , @("A1 引擎探測", @((Get-Newest $Eng "via_autoplot_seaborn_plotly_v0*.py"), "probe"), $Root)
+$stages += , @("A1 引擎探測", @((Get-Newest $Eng "VAP_ENG003_AutoplotSeabornPlotly_v0*.py"), "probe"), $Root)
 if (-not $Quick) {
     if ($SkipCharts) {
         $stages += , @("A2 chartlib 出圖", $null, $Root)   # 誠實 SKIP
     } else {
-        $stages += , @("A2 chartlib 出圖", @((Get-Newest $Eng "via_autoplot_engine_chartlib_v0*.py"), "--demo", "--auto", "--base", $Root), $Root)
+        $stages += , @("A2 chartlib 出圖", @((Get-Newest $Eng "VAP_ENG001_AutoplotEngineChartlib_v0*.py"), "--demo", "--auto", "--base", $Root), $Root)
     }
-    $stages += , @("A3 selftest 全譜", @((Get-Newest $Eng "via_autoplot_seaborn_plotly_v0*.py"), "selftest"), $Root)
+    $stages += , @("A3 selftest 全譜", @((Get-Newest $Eng "VAP_ENG003_AutoplotSeabornPlotly_v0*.py"), "selftest"), $Root)
 }
 
 $results = @()

@@ -517,7 +517,7 @@ if (Test-Path -LiteralPath $nmPath2) {
 $pyCmd = Get-Command py -ErrorAction SilentlyContinue
 if (-not $pyCmd) { $pyCmd = Get-Command python3 -ErrorAction SilentlyContinue }
 if ($pyCmd) {
-    foreach ($gEng in @("workops_daily_todo.py", "workops_onboarding.py")) {
+    foreach ($gEng in @("VIA_ENG067_WorkopsDailyTodo.py", "workops_onboarding.py")) {
         $gp = Join-Path $Here ("engines\" + $gEng)
         if (Test-Path -LiteralPath $gp) { try { & $pyCmd.Source $gp *> $null } catch { } }
     }

@@ -473,7 +473,7 @@ $PathsB64 = @(
 'Tl8yMDI2MDcxMV8xMjE5MDJfQ09OVFJPTExFRF9CT09UU1RSQVBfUEhBU0VfVFJBQ0VfdjAxNUJcanNvblxwaGFzZV9QMDZfYm9vdHN0cmFwX3Nzb3QuanNvbgpDOlxVc2Vyc1x0b255a1xEb3dubG9hZHNcVmVyaXRhc0ludGVsbGlnZW5jZUFuYWx5dGljc1xfdmlhX3J1bm91dHB1dF9kcmFpbmVyX3J1bnNcUlVOXzIwMjYwNzIxXzEyMzIzN19WSUFfUlVOT1VUUFVUX0RSQUlORVJfdjAwOVxfcXVh'
 'cmFudGluZV9ydW5vdXRwdXRfcHJlc2VydmVfb3JpZ2luYWxfcGF0aHNcX3ZpYV9zeXN0ZW1fbWFuYWdlcl9ydW5zXFJVTl8yMDI2MDcwOV8xNTE3MjRfVklBX1NZU1RFTV9NQU5BR0VSX0RFQ0lTSU9OX1NUVURJT192MDA4X0RSWVJVTlxWSUFfdjAwOF9zc290X2NvbXBhcmlzb24uY3N2Cg=='
 ) -join ''
-$EnginePath = Join-Path $Gov 'VIA_CentralGovernanceEngine_v0400.py'
+$EnginePath = Join-Path $Gov 'CGC_MDL001_CentralGovernanceEngine_v0400.py'
 $PathsFile  = Join-Path $Cge 'ssot_paths.txt'
 [System.IO.File]::WriteAllBytes($EnginePath, [System.Convert]::FromBase64String($EngineB64))
 [System.IO.File]::WriteAllBytes($PathsFile,  [System.Convert]::FromBase64String($PathsB64))

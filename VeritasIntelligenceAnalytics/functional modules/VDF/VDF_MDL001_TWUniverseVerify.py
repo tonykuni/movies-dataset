@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 r"""
 ================================================================================
-  VDF_MDL001_TWUniverse_Verify.py
+  VDF_ENG031_MDL001TWUniverseVerify.py
 ================================================================================
   VERITAS DATA FRAMEWORK · MDL001 補助
   Version    : 1.0.0   |   Module ID : VDF-MDL001-VRF-001
@@ -32,9 +32,9 @@ r"""
 
 USAGE
 ================================================================================
-  python VDF_MDL001_TWUniverse_Verify.py            # 完整抓 + 驗證
-  python VDF_MDL001_TWUniverse_Verify.py --dryrun   # 不抓網,只跑 regex 自我驗證
-  python VDF_MDL001_TWUniverse_Verify.py --no-pause # CI/批次模式
+  python VDF_ENG031_MDL001TWUniverseVerify.py            # 完整抓 + 驗證
+  python VDF_ENG031_MDL001TWUniverseVerify.py --dryrun   # 不抓網,只跑 regex 自我驗證
+  python VDF_ENG031_MDL001TWUniverseVerify.py --no-pause # CI/批次模式
 """
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(全引擎導入令 2026-08-18;graceful 零行為變更) =====
 try:

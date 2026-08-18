@@ -83,7 +83,7 @@ def _newest(pattern: str, root: Path) -> Path | None:
 
 
 # ── 搭配載入:via-deps 判定器(必備)+ EnvManager 政策母版(graceful)──
-_dep_path = _newest("via_dep_super_v0*.py", HERE)
+_dep_path = _newest("CGC_MDL046_DepSuper_v0*.py", HERE)
 DEP = _load_by_path("via_dep_super_latest", _dep_path) if _dep_path else None
 EM = _load_by_path("VIA_EnvManager_policy", SUP / "VIA_EnvManager.py")
 

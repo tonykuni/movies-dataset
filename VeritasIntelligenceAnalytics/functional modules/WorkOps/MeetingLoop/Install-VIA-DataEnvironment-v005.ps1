@@ -15,7 +15,7 @@ $ErrorActionPreference = "Stop"
 $BaseDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $EnvRoot = Join-Path $env:USERPROFILE "envs\via_meeting_data_312"
 $Requirements = Join-Path $BaseDir "requirements-data-lock.txt"
-$Acceptance = Join-Path $BaseDir "via_duck_parquet_acceptance.py"
+$Acceptance = Join-Path $BaseDir "VIA_ENG018_DuckParquetAcceptance.py"
 $StatePath = Join-Path $EnvRoot ".via_environment_state.json"
 $PythonCandidates = @(
     "C:\Python312\python.exe",

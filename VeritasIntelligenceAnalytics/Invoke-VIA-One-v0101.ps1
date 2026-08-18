@@ -28,14 +28,14 @@ Write-Host ("[加速器] " + ($Accelerators -join " · ")) -ForegroundColor Dark
 
 $Stages = @(
     @{ Name = "SYNC 同步 repo";                Kind = "ps";  Target = (Join-Path $Bin "via-sync.ps1") },
-    @{ Name = "MEGA 三輪全景 v0106(Porcelain)"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_Governance_Runtime\via_mega_engine_v0106.py") },
-    @{ Name = "VMT 總指揮 9 階段";              Kind = "py";  Target = (Join-Path $Root "supportive modules\VMT_SuperBOM\via_master_engine_v0102.py"); Args = @("--no-open") },
-    @{ Name = "CGE 中央治理 dry-run";           Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_Central_Governance\VIA_CentralGovernanceEngine_v0401.py"); Args = @("--workdir", ($env:VMT_ROOT ?? "C:\VIA\VeritasMailTracker")) },
-    @{ Name = "VRN 內容探測(唯讀 GO gate)";     Kind = "py";  Target = (Join-Path $Root "functional modules\VRN\vrn_content_probe_v0100.py"); Args = @("--no-open") },
-    @{ Name = "VRN 內容擷取 dry-run(v0101)";    Kind = "py";  Target = (Join-Path $Root "functional modules\VRN\vrn_content_extract_v0101.py") },
-    @{ Name = "FLOW 系統 OneShot(自產 UI)";     Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_FlowSystem\VIA_FlowSystem_OneShot.py"); Cwd = (Join-Path $Reports "flow_run") },
-    @{ Name = "IF 產業預測 selftest";           Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_IF_Engine\via_if_engine.py"); Args = @("--selftest") },
-    @{ Name = "FIS 驗證 harness(需 scipy)";     Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_FlowSystem\VIA_FIS_Validation_v3.py"); Cwd = (Join-Path $Reports "fis_run"); Optional = $true },
+    @{ Name = "MEGA 三輪全景 v0106(Porcelain)"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_Governance_Runtime\SUP_MDL142_MegaEngine_v0106.py") },
+    @{ Name = "VMT 總指揮 9 階段";              Kind = "py";  Target = (Join-Path $Root "supportive modules\VMT_SuperBOM\VIA_ENG021_MasterEngine_v0102.py"); Args = @("--no-open") },
+    @{ Name = "CGE 中央治理 dry-run";           Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_Central_Governance\CGC_MDL001_CentralGovernanceEngine_v0401.py"); Args = @("--workdir", ($env:VMT_ROOT ?? "C:\VIA\VeritasMailTracker")) },
+    @{ Name = "VRN 內容探測(唯讀 GO gate)";     Kind = "py";  Target = (Join-Path $Root "functional modules\VRN\VRN_ENG048_ContentProbe_v0100.py"); Args = @("--no-open") },
+    @{ Name = "VRN 內容擷取 dry-run(v0101)";    Kind = "py";  Target = (Join-Path $Root "functional modules\VRN\VRN_ENG047_ContentExtract_v0101.py") },
+    @{ Name = "FLOW 系統 OneShot(自產 UI)";     Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_FlowSystem\FLOW_MDL003_FlowSystemOneShot.py"); Cwd = (Join-Path $Reports "flow_run") },
+    @{ Name = "IF 產業預測 selftest";           Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_IF_Engine\SUP_MDL144_IfEngine.py"); Args = @("--selftest") },
+    @{ Name = "FIS 驗證 harness(需 scipy)";     Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_FlowSystem\FLOW_MDL002_FISValidationV3.py"); Cwd = (Join-Path $Reports "fis_run"); Optional = $true },
     @{ Name = "UI HUB 十二介面樞紐 v0104";      Kind = "open"; Target = (Join-Path $Root "supportive modules\ui_support\VIA_UI_Hub_v0104.html") }
 )
 

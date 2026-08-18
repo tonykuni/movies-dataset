@@ -8,7 +8,7 @@
    最新 win64 ZIP + sha256 驗證),winget 降為替代方案。analytics 執行期自動接上
    可攜式 dot,免動系統 PATH、免重開終端。
  v0102(操作員指示:用 VIA_EnvManager.py 來試試能否成功安裝):
-   安裝不再由本檔直呼 pip,而是經 workops_envmanager_bridge.py 送入平台中央
+   安裝不再由本檔直呼 pip,而是經 VIA_ENG069_WorkopsEnvmanagerBridge.py 送入平台中央
    環境治理核心 VIA_EnvManager 的 gatekeeper:plan-install 決策(風險分級/目標環境
    /封鎖理由)→ 以其產生之命令執行(pip install + pip check)→ 決策與逐命令結果
    落 WorkOps\out\envmanager\ JSON。EnvManager 正本零改動(橋於執行期覆蓋治理範圍
@@ -24,7 +24,7 @@ $ErrorActionPreference = "Continue"
 $Here   = $PSScriptRoot
 $Venv   = Join-Path $Here ".venv_pm"
 $VPy    = Join-Path $Venv "Scripts\python.exe"
-$Bridge = Join-Path $Here "workops_envmanager_bridge.py"
+$Bridge = Join-Path $Here "VIA_ENG069_WorkopsEnvmanagerBridge.py"
 
 Write-Host "==========================================================" -ForegroundColor DarkCyan
 Write-Host "  WorkOps PmSetup v0103  |  VIA_EnvManager 中央治理安裝" -ForegroundColor Cyan

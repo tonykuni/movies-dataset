@@ -122,7 +122,7 @@ VDF_ACTIVE_MODULES = [
      "registry_items": "(library)",
      "key_capability": "5 格式統一輸出 (Parquet+DuckDB+CSV+JSON+GSheet)"},
     {"id": "VDF-UPGRADER",   "name": "Format Retrofit Upgrader",
-     "file": "VDF_MDL102_FormatUpgrader.py",
+     "file": "VDF_ENG011_MDL102FormatUpgrader.py",
      "lines": 312,  "tables": [],
      "registry_items": "MDL001/002/etc 既有輸出",
      "key_capability": "Retrofit MDL001/002 不改原始碼加 DuckDB+JSON+GSheet"},
@@ -213,7 +213,7 @@ def test_upgrader():
                 df.to_parquet(d / f"{name}.parquet", index=False)
 
             # Import & run Upgrader
-            spec = importlib.util.spec_from_file_location("u", str(HERE / "VDF_MDL102_FormatUpgrader.py"))
+            spec = importlib.util.spec_from_file_location("u", str(HERE / "VDF_ENG011_MDL102FormatUpgrader.py"))
             u = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(u)
             u.BASE_DIR = str(tmp_path)
@@ -327,7 +327,7 @@ def print_grand_summary(deps, om_test, upg_test, files):
     for r in rows: t.add_row(*r)
     console.print(t)
     console.print("[dim]   ⚠️stub = GSheet 已實作但需填 GSHEET_CREDENTIAL_PATH + ID 才啟用[/dim]")
-    console.print("[dim]   ✅(via Upg) = MDL001/002 原本只 Parquet+CSV, 跑 VDF_MDL102_FormatUpgrader.py 後補齊[/dim]")
+    console.print("[dim]   ✅(via Upg) = MDL001/002 原本只 Parquet+CSV, 跑 VDF_ENG011_MDL102FormatUpgrader.py 後補齊[/dim]")
 
     # ─ Table 5: Registry 項目盤點 ─
     t = Table(title="📊 [bold]5. Registry 項目盤點 (擷取目標)[/bold]",
@@ -395,7 +395,7 @@ def print_grand_summary(deps, om_test, upg_test, files):
         ("VDF_MDL006_FinancialModel.py",       1385, "三大報表 + PE/PB Band Charts"),
         ("VDF_MDL103_MasterRegistry.py",              723,  "全生態 31 模組註冊"),
         ("VDF_MDL101_OutputManager.py",               326,  "共用 5 格式輸出函式庫"),
-        ("VDF_MDL102_FormatUpgrader.py",              312,  "Retrofit MDL001/002 多格式升級"),
+        ("VDF_ENG011_MDL102FormatUpgrader.py",              312,  "Retrofit MDL001/002 多格式升級"),
         ("VIA_DataModule_Controller_v2.html",  686,  "全生態 UI (8 tabs)"),
         ("sample_2330_pe_band.html",           "—",  "範例 PE Band Plotly chart"),
         ("sample_NVDA_pb_band.html",           "—",  "範例 PB Band Plotly chart"),

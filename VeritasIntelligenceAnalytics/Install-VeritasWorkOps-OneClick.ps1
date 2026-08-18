@@ -131,7 +131,7 @@ if ($Pwsh) {
 # ---- [6/8] graphviz 可攜版(dotsetup 引擎;sha256 驗證)-----------------
 $ok6 = $false
 if ($Py) {
-    & $Py (Join-Path $Engines "workops_graphviz_setup.py") install
+    & $Py (Join-Path $Engines "VIA_ENG070_WorkopsGraphvizSetup.py") install
     $ok6 = ($LASTEXITCODE -eq 0)
 }
 Step "6/8 graphviz 可攜版" $ok6 "dotsetup(免 winget/管理員)"
@@ -161,7 +161,7 @@ if ($NoSchedule) {
 if ($SkipSelftest) {
     Step "8/8 全鏈自測" $true "略過(-SkipSelftest)"
 } elseif ($Py) {
-    & $Py (Join-Path $Engines "workops_selftest.py")
+    & $Py (Join-Path $Engines "VIA_ENG081_WorkopsSelftest.py")
     Step "8/8 全鏈自測" ($LASTEXITCODE -eq 0) "FinalGate(詳 out\selftest_report.json)"
 } else {
     Step "8/8 全鏈自測" $false "無 Python 可執行(承上段)"

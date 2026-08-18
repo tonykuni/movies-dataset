@@ -48,13 +48,13 @@ def test_missing_guard_blocks_weak_close():
     for c in d["cards"]:
         if c["state_code"]=="DONE_CANDIDATE": c["evidence"]=""
     (OUT/"followup_state.json").write_text(json.dumps(d,ensure_ascii=False),encoding="utf-8")
-    r=run("workops_missing_information_guard.py","scan"); assert r.returncode==0,r.stderr
+    r=run("VIA_ENG123_WorkopsMissingInformationGuard.py","scan"); assert r.returncode==0,r.stderr
     m=json.loads(r.stdout)
     close=next(x for x in m["items"] if x["state_code"]=="DONE_CANDIDATE")
     assert close["gate"]=="BLOCK_CLOSE" and "evidence" in close["missing"]
 def test_card_aggregator():
     reset(); seed_projects()
-    assert run("workops_missing_information_guard.py","scan").returncode==0
+    assert run("VIA_ENG123_WorkopsMissingInformationGuard.py","scan").returncode==0
     assert run("workops_followup_pack_builder.py","build","--language","zh-TW").returncode==0
     r=run("workops_project_card_aggregator.py","build"); assert r.returncode==0,r.stderr
     d=json.loads(r.stdout); assert d["count"]==3

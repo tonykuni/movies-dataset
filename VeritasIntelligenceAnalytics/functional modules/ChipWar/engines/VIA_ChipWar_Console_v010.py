@@ -41,7 +41,7 @@ ENGINES={
                  "sources":["分點殘差","三大法人","官股"],"paid_dep":False},
  "E3_FinMindIngest":{"file":"VIA_FinMind_Ingest_v010.py","tier":"FREE_READY",
                  "sources":["FinMind免費600/hr"],"paid_dep":False},
- "E4_Rotation": {"file":"VIA_RotationEngine_v010.py","tier":"FREE_READY",
+ "E4_Rotation": {"file":"CHW_ENG005_RotationEngine_v010.py","tier":"FREE_READY",
                  "sources":["族群殘差流","族群指數","超額報酬"],"paid_dep":False},
  "E5_MarginFOMO":{"file":"VIA_MarginFOMO_v020.py","tier":"FREE_READY",
                  "sources":["融資水位","維持率","領先指數LeadFOMO"],"paid_dep":False},

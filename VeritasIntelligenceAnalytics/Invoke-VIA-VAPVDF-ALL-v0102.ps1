@@ -27,25 +27,25 @@ $py = Get-Py
 Write-Host "=== VIA 三子系統統包 v0102 · VDF+VRN+VAP · python=$py · $(if($Quick){'QUICK'}else{'FULL'}) ==="
 $stages = @()
 if (-not $SkipVDF) {
-    $stages += , @("VDF", "V1 契約盤點", @((Get-Newest $VDF "VDF_MDL501_FetchContractManager.py"), "check"), $VDF)
+    $stages += , @("VDF", "V1 契約盤點", @((Get-Newest $VDF "VDF_ENG019_MDL501FetchContractManager.py"), "check"), $VDF)
     if (-not $Quick) {
-        $stages += , @("VDF", "V2 302 全系統驗證", @((Get-Newest $VDF "VDF_MDL302_FinalActivation.py"), "--no-pause"), $VDF)
+        $stages += , @("VDF", "V2 302 全系統驗證", @((Get-Newest $VDF "VDF_ENG017_MDL302FinalActivation.py"), "--no-pause"), $VDF)
         $stages += , @("VDF", "V3 303 Registry 活化", @((Get-Newest $VDF "VDF_MDL303_RegistryActivation.py"), "--no-pause"), $VDF)
     }
 }
 if (-not $SkipVRN) {
-    $stages += , @("VRN", "R1 SmokeTest", @((Get-Newest $VRN "VRN_SmokeTest.py"), "--no-pause"), $VRN)
+    $stages += , @("VRN", "R1 SmokeTest", @((Get-Newest $VRN "VRN_ENG028_SmokeTest.py"), "--no-pause"), $VRN)
     if (-not $Quick) {
         $stages += , @("VRN", "R2 Panorama XCheck", @((Get-Newest $VRN "panorama_xcheck_v*.py"), "--no-pause"), $VRN)
         $inc = Join-Path $VRN "input\incoming"
-        $stages += , @("VRN", "R3 進件矩陣驗證", @((Get-Newest $VRN "vrn_input_matrix_validator_v0*.py"), $inc), $VRN)
+        $stages += , @("VRN", "R3 進件矩陣驗證", @((Get-Newest $VRN "VRN_ENG054_InputMatrixValidator_v0*.py"), $inc), $VRN)
     }
 }
 if (-not $SkipVAP) {
-    $stages += , @("VAP", "A1 引擎探測", @((Get-Newest $VAPE "via_autoplot_seaborn_plotly_v0*.py"), "probe"), $Root)
+    $stages += , @("VAP", "A1 引擎探測", @((Get-Newest $VAPE "VAP_ENG003_AutoplotSeabornPlotly_v0*.py"), "probe"), $Root)
     if (-not $Quick) {
-        $stages += , @("VAP", "A2 chartlib 出圖", @((Get-Newest $VAPE "via_autoplot_engine_chartlib_v0*.py"), "--demo", "--auto", "--base", $Root), $Root)
-        $stages += , @("VAP", "A3 selftest 全譜", @((Get-Newest $VAPE "via_autoplot_seaborn_plotly_v0*.py"), "selftest"), $Root)
+        $stages += , @("VAP", "A2 chartlib 出圖", @((Get-Newest $VAPE "VAP_ENG001_AutoplotEngineChartlib_v0*.py"), "--demo", "--auto", "--base", $Root), $Root)
+        $stages += , @("VAP", "A3 selftest 全譜", @((Get-Newest $VAPE "VAP_ENG003_AutoplotSeabornPlotly_v0*.py"), "selftest"), $Root)
     }
 }
 

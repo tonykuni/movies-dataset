@@ -524,7 +524,7 @@ function Find-VdfPythonEntrypoint {
     }
 
     $orchestratorNames = @(
-        "VDF_DataHub_Orchestrator.py",
+        "VDF_ENG001_DataHubOrchestrator.py",
         "vdf_orchestrator.py",
         "main.py"
     )

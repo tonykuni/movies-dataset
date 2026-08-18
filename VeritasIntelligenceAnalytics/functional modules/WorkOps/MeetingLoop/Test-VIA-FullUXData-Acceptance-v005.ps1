@@ -13,8 +13,8 @@ $ErrorActionPreference = "Stop"
 
 $BaseDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $EnvPython = Join-Path $env:USERPROFILE "envs\via_meeting_data_312\Scripts\python.exe"
-$Engine = Join-Path $BaseDir "via_meetingloop_engine.py"
-$Acceptance = Join-Path $BaseDir "via_duck_parquet_acceptance.py"
+$Engine = Join-Path $BaseDir "VIA_ENG019_MeetingloopEngine.py"
+$Acceptance = Join-Path $BaseDir "VIA_ENG018_DuckParquetAcceptance.py"
 $DataReport = Join-Path $BaseDir "DATA_ENV_ACCEPTANCE_REPORT.json"
 $UxPayload = Join-Path $BaseDir "UX_DUCKDB_PAYLOAD.json"
 $FinalReport = Join-Path $BaseDir "FULL_UX_DATA_ACCEPTANCE_REPORT.json"

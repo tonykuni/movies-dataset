@@ -54,8 +54,8 @@ if ($null -eq $Py) {
   Write-Host "  ✗ Python 解譯器缺(py/python/python3 皆未尋獲)——誠實停" -ForegroundColor Red
   exit 2
 }
-$DepEng = Get-NewestEngine "via_dep_super_v0*.py"
-$RebEng = Get-NewestEngine "via_env_rebuild_v0*.py"
+$DepEng = Get-NewestEngine "CGC_MDL046_DepSuper_v0*.py"
+$RebEng = Get-NewestEngine "CGC_MDL050_EnvRebuild_v0*.py"
 if ((-not $DepEng) -or (-not $RebEng)) {
   Write-Host "  ✗ 引擎缺(via_dep_super/via_env_rebuild 未尋獲)——誠實停" -ForegroundColor Red
   exit 2
