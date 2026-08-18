@@ -108,17 +108,31 @@ def cmd_refresh() -> int:
         rows = json.loads(raw if isinstance(raw, str) else raw.decode("utf-8"))
         n_new = 0
         known = {e["ticker"] for e in reg["etfs"]}
+
+        def _code(r):  # 欄名多對映:證券名錄/投信基金名錄兩制式並容(工作站實測回饋)
+            for k in ("證券代號", "基金代號", "Code", "FundCode"):
+                v = str(r.get(k, "")).strip()
+                if v:
+                    return v
+            return ""
+
+        def _name(r):
+            for k in ("證券名稱", "基金簡稱", "基金中文名稱", "Name", "FundName"):
+                v = str(r.get(k, "")).strip()
+                if v:
+                    return v
+            return ""
+
         for r in rows:
-            code = str(r.get("證券代號", r.get("Code", ""))).strip()
-            name = str(r.get("證券名稱", r.get("Name", ""))).strip()
-            # 主動式台股 ETF:代號尾 A 且名稱含「主動」
+            code, name = _code(r), _name(r)
+            # 主動式台股 ETF:代號尾 A 且任一名稱欄含「主動」
             if code.endswith("A") and "主動" in name and code not in known:
                 reg["etfs"].append({"ticker": code, "name": name, "issuer": "",
                                     "status": "VERIFIED_OPENAPI"})
                 n_new += 1
+        codes_in_rows = {_code(r) for r in rows}
         for e in reg["etfs"]:
-            if e.get("status") == "SEED_KNOWN" and any(
-                    str(r.get("證券代號", "")).strip() == e["ticker"] for r in rows):
+            if e.get("status") == "SEED_KNOWN" and e["ticker"] in codes_in_rows:
                 e["status"] = "VERIFIED_OPENAPI"
         reg["as_of"] = NOW
         reg["verify_required"] = any(e.get("status") == "SEED_KNOWN" for e in reg["etfs"])
