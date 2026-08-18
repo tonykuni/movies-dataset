@@ -12404,35 +12404,98 @@
    "desc": "panorama_xcheck_v110.py — 全景交叉核對(v110R 重建;README 載明「full 8-module dataflow」",
    "contract": {
     "syntax": "OK",
-    "desc": "panorama_xcheck_v110.py — 全景交叉核對(v110R 重建;README 載明「full 8-module dataflow」",
+    "desc": "panorama_xcheck_v110.py — VRN 全景式交叉核對驗證微型 Pipeline",
     "functions": [
      {
-      "name": "_load",
+      "name": "_mock_fetch_one_ticker",
       "args": [
-       "p"
+       "self",
+       "ticker",
+       "report_year"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "_badge",
+      "args": [
+       "cls"
       ],
       "defaults": 0
      },
      {
-      "name": "run",
-      "args": [],
+      "name": "_kv_table",
+      "args": [
+       "d"
+      ],
       "defaults": 0
+     },
+     {
+      "name": "_module_panel",
+      "args": [
+       "mid",
+       "m",
+       "extras"
+      ],
+      "defaults": 1
      }
     ],
     "classes": {},
-    "cli_flags": [
-     "--no-pause"
-    ],
-    "has_main": true,
+    "cli_flags": [],
+    "has_main": false,
     "imports": [
-     "hashlib",
+     "MDL001_Conv_v110",
+     "MDL002_v110",
+     "MDL006_v110",
+     "MDL007_v110",
+     "MDL008_v110",
+     "VIA_HardGate_BootPrecheck",
+     "VIA_SuperAccel_Module",
      "json",
+     "os",
      "pathlib",
-     "sys"
+     "shutil",
+     "sys",
+     "tempfile",
+     "time",
+     "typing"
     ]
    },
-   "ts": "20260817_190548",
-   "drift_count": 0
+   "ts": "20260818_111658",
+   "drift_count": 1,
+   "history": [
+    {
+     "ts": "20260817_190548",
+     "contract": {
+      "syntax": "OK",
+      "desc": "panorama_xcheck_v110.py — 全景交叉核對(v110R 重建;README 載明「full 8-module dataflow」",
+      "functions": [
+       {
+        "name": "_load",
+        "args": [
+         "p"
+        ],
+        "defaults": 0
+       },
+       {
+        "name": "run",
+        "args": [],
+        "defaults": 0
+       }
+      ],
+      "classes": {},
+      "cli_flags": [
+       "--no-pause"
+      ],
+      "has_main": true,
+      "imports": [
+       "hashlib",
+       "json",
+       "pathlib",
+       "sys"
+      ]
+     }
+    }
+   ]
   },
   "VIA-IFACE-0143": {
    "urn": "VIA-IFACE-0143",
@@ -90584,6 +90647,1288 @@
    },
    "ts": "20260818_103605",
    "drift_count": 0
+  },
+  "VIA-IFACE-1292": {
+   "urn": "VIA-IFACE-1292",
+   "rel": "functional modules/VDF/VDF_MDLXXX_YFinanceGlobalDataFetcher.py",
+   "subsystem": "VDF",
+   "desc": "🚀 簡化金融數據工具 v4.0 - 完全可用版本",
+   "contract": {
+    "syntax": "OK",
+    "desc": "🚀 簡化金融數據工具 v4.0 - 完全可用版本",
+    "functions": [
+     {
+      "name": "check_and_install_dependencies",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "main",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "interactive_menu",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "view_existing_data",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "cleanup_backups",
+      "args": [],
+      "defaults": 0
+     }
+    ],
+    "classes": {
+     "FileManager": 5,
+     "DataValidator": 2,
+     "FinancialDataFetcher": 7,
+     "TaiwanFinancialTool": 5
+    },
+    "cli_flags": [
+     "--menu"
+    ],
+    "has_main": true,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "datetime",
+     "json",
+     "numpy",
+     "os",
+     "pandas",
+     "pathlib",
+     "pyarrow",
+     "random",
+     "rich",
+     "shutil",
+     "subprocess",
+     "sys",
+     "time",
+     "traceback",
+     "typing",
+     "warnings",
+     "yfinance"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1293": {
+   "urn": "VIA-IFACE-1293",
+   "rel": "functional modules/VDF/vdf_output_hub_v0100.py",
+   "subsystem": "VDF",
+   "desc": "vdf_output_hub_v0100 — VDF 統一參數+全格式輸出樞紐(TOOL-058;操作員令 2026-08-18)",
+   "contract": {
+    "syntax": "OK",
+    "desc": "vdf_output_hub_v0100 — VDF 統一參數+全格式輸出樞紐(TOOL-058;操作員令 2026-08-18)",
+    "functions": [
+     {
+      "name": "load_params",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "_bak",
+      "args": [
+       "p"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "write_all",
+      "args": [
+       "rows",
+       "table",
+       "formats",
+       "outdir"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "summary",
+      "args": [
+       "matrix"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "selftest",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "main",
+      "args": [],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [
+     "--formats",
+     "--selftest"
+    ],
+    "has_main": true,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "__future__",
+     "csv",
+     "datetime",
+     "duckdb",
+     "json",
+     "pandas",
+     "pathlib",
+     "sqlite3",
+     "sys"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1294": {
+   "urn": "VIA-IFACE-1294",
+   "rel": "functional modules/VRN/panorama_xcheck_v110_shaa9stub110R.py",
+   "subsystem": "VRN",
+   "desc": "panorama_xcheck_v110.py — 全景交叉核對(v110R 重建;README 載明「full 8-module dataflow」",
+   "contract": {
+    "syntax": "OK",
+    "desc": "panorama_xcheck_v110.py — 全景交叉核對(v110R 重建;README 載明「full 8-module dataflow」",
+    "functions": [
+     {
+      "name": "_load",
+      "args": [
+       "p"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "run",
+      "args": [],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [
+     "--no-pause"
+    ],
+    "has_main": true,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "hashlib",
+     "json",
+     "pathlib",
+     "sys"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1295": {
+   "urn": "VIA-IFACE-1295",
+   "rel": "functional modules/VeritasPulse/build_all.py",
+   "subsystem": "OTHER",
+   "desc": "VeritasPulse — build everything (interactive app + project deck).",
+   "contract": {
+    "syntax": "OK",
+    "desc": "VeritasPulse — build everything (interactive app + project deck).",
+    "functions": [
+     {
+      "name": "main",
+      "args": [],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [
+     "--db",
+     "--out",
+     "--pid"
+    ],
+    "has_main": true,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "argparse",
+     "os",
+     "pathlib",
+     "sys",
+     "time",
+     "vpl"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1296": {
+   "urn": "VIA-IFACE-1296",
+   "rel": "functional modules/VeritasPulse/build_deck.py",
+   "subsystem": "OTHER",
+   "desc": "VeritasPulse — one-shot project deck builder.",
+   "contract": {
+    "syntax": "OK",
+    "desc": "VeritasPulse — one-shot project deck builder.",
+    "functions": [
+     {
+      "name": "main",
+      "args": [],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [
+     "--db",
+     "--out",
+     "--pid"
+    ],
+    "has_main": true,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "argparse",
+     "os",
+     "pathlib",
+     "sys",
+     "time",
+     "vpl"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1297": {
+   "urn": "VIA-IFACE-1297",
+   "rel": "functional modules/VeritasPulse/desktop/vpl_desktop.py",
+   "subsystem": "OTHER",
+   "desc": "VeritasPulse desktop launcher — wraps the single-file app in a native window.",
+   "contract": {
+    "syntax": "OK",
+    "desc": "VeritasPulse desktop launcher — wraps the single-file app in a native window.",
+    "functions": [
+     {
+      "name": "app_path",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "main",
+      "args": [],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [],
+    "has_main": true,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "os",
+     "pathlib",
+     "sys",
+     "webview"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1298": {
+   "urn": "VIA-IFACE-1298",
+   "rel": "functional modules/VeritasPulse/selftest.py",
+   "subsystem": "OTHER",
+   "desc": "VeritasPulse — consolidated self-test (test/debug/consolidate/activate).",
+   "contract": {
+    "syntax": "OK",
+    "desc": "VeritasPulse — consolidated self-test (test/debug/consolidate/activate).",
+    "functions": [
+     {
+      "name": "check",
+      "args": [
+       "name",
+       "fn"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "t_compile",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "t_store",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "t_archive",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "t_minutes",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "t_env_arrange",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "t_deck",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "t_app",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "t_meeting_docs",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "t_config_pwa",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "t_deploy_gate",
+      "args": [],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [],
+    "has_main": false,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "duckdb",
+     "importlib",
+     "json",
+     "os",
+     "pathlib",
+     "py_compile",
+     "re",
+     "sys",
+     "time",
+     "traceback",
+     "vpl"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1299": {
+   "urn": "VIA-IFACE-1299",
+   "rel": "functional modules/VeritasPulse/vpl/__init__.py",
+   "subsystem": "OTHER",
+   "desc": "無說明(候補)",
+   "contract": {
+    "syntax": "OK",
+    "desc": "無說明(候補)",
+    "functions": [],
+    "classes": {},
+    "cli_flags": [],
+    "has_main": false,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "pathlib",
+     "sys"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1300": {
+   "urn": "VIA-IFACE-1300",
+   "rel": "functional modules/VeritasPulse/vpl/app/__init__.py",
+   "subsystem": "OTHER",
+   "desc": "無說明(候補)",
+   "contract": {
+    "syntax": "OK",
+    "desc": "無說明(候補)",
+    "functions": [],
+    "classes": {},
+    "cli_flags": [],
+    "has_main": false,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "pathlib",
+     "sys"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1301": {
+   "urn": "VIA-IFACE-1301",
+   "rel": "functional modules/VeritasPulse/vpl/app/build_app.py",
+   "subsystem": "OTHER",
+   "desc": "VPL-APP · single-file application generator.",
+   "contract": {
+    "syntax": "OK",
+    "desc": "VPL-APP · single-file application generator.",
+    "functions": [
+     {
+      "name": "_modules",
+      "args": [
+       "cfg"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "build",
+      "args": [
+       "db_path",
+       "out_dir",
+       "out_name",
+       "project_id"
+      ],
+      "defaults": 3
+     }
+    ],
+    "classes": {},
+    "cli_flags": [
+     "--db",
+     "--out"
+    ],
+    "has_main": true,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "argparse",
+     "core",
+     "json",
+     "os",
+     "pathlib",
+     "sys"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1302": {
+   "urn": "VIA-IFACE-1302",
+   "rel": "functional modules/VeritasPulse/vpl/charts/__init__.py",
+   "subsystem": "OTHER",
+   "desc": "無說明(候補)",
+   "contract": {
+    "syntax": "OK",
+    "desc": "無說明(候補)",
+    "functions": [],
+    "classes": {},
+    "cli_flags": [],
+    "has_main": false,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "pathlib",
+     "sys"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1303": {
+   "urn": "VIA-IFACE-1303",
+   "rel": "functional modules/VeritasPulse/vpl/charts/optimize.py",
+   "subsystem": "OTHER",
+   "desc": "VPL-I02/I03 chart engine with an 'auto-optimize' pass.",
+   "contract": {
+    "syntax": "OK",
+    "desc": "VPL-I02/I03 chart engine with an 'auto-optimize' pass.",
+    "functions": [
+     {
+      "name": "optimize",
+      "args": [
+       "ax",
+       "grid"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "_save",
+      "args": [
+       "fig",
+       "out_dir",
+       "name",
+       "w",
+       "h"
+      ],
+      "defaults": 2
+     },
+     {
+      "name": "_d",
+      "args": [
+       "s"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "gantt",
+      "args": [
+       "tasks",
+       "out_dir"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "budget",
+      "args": [
+       "rows",
+       "out_dir"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "risk_heatmap",
+      "args": [
+       "risks",
+       "out_dir"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "stakeholders",
+      "args": [
+       "rows",
+       "out_dir"
+      ],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [],
+    "has_main": false,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "datetime",
+     "matplotlib",
+     "numpy",
+     "os",
+     "pathlib",
+     "sys"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1304": {
+   "urn": "VIA-IFACE-1304",
+   "rel": "functional modules/VeritasPulse/vpl/config.py",
+   "subsystem": "OTHER",
+   "desc": "VPL-CFG · central configuration surface.",
+   "contract": {
+    "syntax": "OK",
+    "desc": "VPL-CFG · central configuration surface.",
+    "functions": [
+     {
+      "name": "load",
+      "args": [
+       "out_dir"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "write_default",
+      "args": [
+       "out_dir"
+      ],
+      "defaults": 1
+     }
+    ],
+    "classes": {},
+    "cli_flags": [],
+    "has_main": false,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "json",
+     "os",
+     "pathlib",
+     "sys"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1305": {
+   "urn": "VIA-IFACE-1305",
+   "rel": "functional modules/VeritasPulse/vpl/core/__init__.py",
+   "subsystem": "OTHER",
+   "desc": "無說明(候補)",
+   "contract": {
+    "syntax": "OK",
+    "desc": "無說明(候補)",
+    "functions": [],
+    "classes": {},
+    "cli_flags": [],
+    "has_main": false,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "pathlib",
+     "sys"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1306": {
+   "urn": "VIA-IFACE-1306",
+   "rel": "functional modules/VeritasPulse/vpl/core/archive.py",
+   "subsystem": "OTHER",
+   "desc": "VPL-C05 · Storage policy + archive (Parquet / JSON / DuckDB).",
+   "contract": {
+    "syntax": "OK",
+    "desc": "VPL-C05 · Storage policy + archive (Parquet / JSON / DuckDB).",
+    "functions": [
+     {
+      "name": "_rows",
+      "args": [
+       "db_path",
+       "table"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "archive",
+      "args": [
+       "db_path",
+       "out_dir"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "generate_minutes",
+      "args": [
+       "db_path",
+       "out_dir",
+       "meeting_id"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "export_csv",
+      "args": [
+       "db_path",
+       "out_dir"
+      ],
+      "defaults": 1
+     }
+    ],
+    "classes": {},
+    "cli_flags": [
+     "--db",
+     "--out"
+    ],
+    "has_main": true,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "__future__",
+     "argparse",
+     "csv",
+     "duckdb",
+     "json",
+     "os",
+     "pathlib",
+     "pyarrow",
+     "store",
+     "sys"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1307": {
+   "urn": "VIA-IFACE-1307",
+   "rel": "functional modules/VeritasPulse/vpl/core/env_arrange.py",
+   "subsystem": "OTHER",
+   "desc": "VPL-C00 · Environment Arrangement (with Veritas supportive tools).",
+   "contract": {
+    "syntax": "OK",
+    "desc": "VPL-C00 · Environment Arrangement (with Veritas supportive tools).",
+    "functions": [
+     {
+      "name": "_now",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "_load",
+      "args": [
+       "module_name",
+       "root"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "arrange",
+      "args": [
+       "supportive_root",
+       "preferred_env",
+       "out_dir",
+       "execute"
+      ],
+      "defaults": 4
+     },
+     {
+      "name": "_local_registry",
+      "args": [
+       "path",
+       "records"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "_render_html",
+      "args": [
+       "rep"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "deploy",
+      "args": [
+       "supportive_root",
+       "preferred_env",
+       "out_dir",
+       "dry_run"
+      ],
+      "defaults": 4
+     },
+     {
+      "name": "_render_deploy_html",
+      "args": [
+       "d"
+      ],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [
+     "--deploy",
+     "--env",
+     "--execute",
+     "--live",
+     "--out",
+     "--root"
+    ],
+    "has_main": true,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "__future__",
+     "argparse",
+     "datetime",
+     "importlib",
+     "json",
+     "os",
+     "pathlib",
+     "sys"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1308": {
+   "urn": "VIA-IFACE-1308",
+   "rel": "functional modules/VeritasPulse/vpl/core/store.py",
+   "subsystem": "OTHER",
+   "desc": "VPL-C01 Registry + VPL-C03 LocalStore.",
+   "contract": {
+    "syntax": "OK",
+    "desc": "VPL-C01 Registry + VPL-C03 LocalStore.",
+    "functions": [
+     {
+      "name": "connect",
+      "args": [
+       "db_path"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "init_db",
+      "args": [
+       "db_path",
+       "seed"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "load_project",
+      "args": [
+       "db_path",
+       "project_id"
+      ],
+      "defaults": 1
+     }
+    ],
+    "classes": {},
+    "cli_flags": [],
+    "has_main": false,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "datetime",
+     "json",
+     "os",
+     "pathlib",
+     "sqlite3",
+     "sys"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1309": {
+   "urn": "VIA-IFACE-1309",
+   "rel": "functional modules/VeritasPulse/vpl/meeting/__init__.py",
+   "subsystem": "OTHER",
+   "desc": "無說明(候補)",
+   "contract": {
+    "syntax": "OK",
+    "desc": "無說明(候補)",
+    "functions": [],
+    "classes": {},
+    "cli_flags": [],
+    "has_main": false,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "pathlib",
+     "sys"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1310": {
+   "urn": "VIA-IFACE-1310",
+   "rel": "functional modules/VeritasPulse/vpl/meeting/excel_template.py",
+   "subsystem": "OTHER",
+   "desc": "VPL-XLS · transcript-review Excel template (reduce manual classification).",
+   "contract": {
+    "syntax": "OK",
+    "desc": "VPL-XLS · transcript-review Excel template (reduce manual classification).",
+    "functions": [
+     {
+      "name": "build",
+      "args": [
+       "db_path",
+       "out_dir",
+       "meeting_id"
+      ],
+      "defaults": 1
+     }
+    ],
+    "classes": {},
+    "cli_flags": [],
+    "has_main": false,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "core",
+     "openpyxl",
+     "os",
+     "pathlib",
+     "sys"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1311": {
+   "urn": "VIA-IFACE-1311",
+   "rel": "functional modules/VeritasPulse/vpl/meeting/minutes_doc.py",
+   "subsystem": "OTHER",
+   "desc": "VPL-MIN · professional, visual-locked Meeting Minutes (HTML + PDF).",
+   "contract": {
+    "syntax": "OK",
+    "desc": "VPL-MIN · professional, visual-locked Meeting Minutes (HTML + PDF).",
+    "functions": [
+     {
+      "name": "_doc_css",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "_render_html",
+      "args": [
+       "meeting",
+       "mins",
+       "segs",
+       "mode"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "build",
+      "args": [
+       "db_path",
+       "out_dir",
+       "mode",
+       "meeting_id"
+      ],
+      "defaults": 2
+     },
+     {
+      "name": "_optimize_pdf",
+      "args": [
+       "path"
+      ],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [],
+    "has_main": false,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "__future__",
+     "core",
+     "datetime",
+     "html",
+     "os",
+     "pathlib",
+     "pikepdf",
+     "sys",
+     "weasyprint"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1312": {
+   "urn": "VIA-IFACE-1312",
+   "rel": "functional modules/VeritasPulse/vpl/ppt/__init__.py",
+   "subsystem": "OTHER",
+   "desc": "無說明(候補)",
+   "contract": {
+    "syntax": "OK",
+    "desc": "無說明(候補)",
+    "functions": [],
+    "classes": {},
+    "cli_flags": [],
+    "has_main": false,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "pathlib",
+     "sys"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1313": {
+   "urn": "VIA-IFACE-1313",
+   "rel": "functional modules/VeritasPulse/vpl/ppt/generate.py",
+   "subsystem": "OTHER",
+   "desc": "VPL-OUT · Project PPT generator (python-pptx).",
+   "contract": {
+    "syntax": "OK",
+    "desc": "VPL-OUT · Project PPT generator (python-pptx).",
+    "functions": [
+     {
+      "name": "_rgb",
+      "args": [
+       "hexs"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "_fill",
+      "args": [
+       "shape",
+       "hexs"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "_text",
+      "args": [
+       "box",
+       "runs",
+       "align",
+       "anchor",
+       "space"
+      ],
+      "defaults": 3
+     },
+     {
+      "name": "_dot",
+      "args": [
+       "slide",
+       "x",
+       "y",
+       "size",
+       "color"
+      ],
+      "defaults": 2
+     },
+     {
+      "name": "_bg",
+      "args": [
+       "slide",
+       "hexs"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "_blank",
+      "args": [
+       "prs"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "title_slide",
+      "args": [
+       "prs",
+       "p"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "_kpi_card",
+      "args": [
+       "s",
+       "x",
+       "y",
+       "w",
+       "label",
+       "value",
+       "sub",
+       "accent"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "snapshot_slide",
+      "args": [
+       "prs",
+       "p"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "chart_slide",
+      "args": [
+       "prs",
+       "title",
+       "sub",
+       "img",
+       "img_w",
+       "side_runs"
+      ],
+      "defaults": 2
+     },
+     {
+      "name": "closing_slide",
+      "args": [
+       "prs",
+       "p"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "build",
+      "args": [
+       "project",
+       "out_dir",
+       "out_name"
+      ],
+      "defaults": 1
+     }
+    ],
+    "classes": {},
+    "cli_flags": [],
+    "has_main": false,
+    "imports": [
+     "PIL",
+     "VIA_SuperAccel_Module",
+     "charts",
+     "datetime",
+     "os",
+     "pathlib",
+     "pptx",
+     "sys"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1314": {
+   "urn": "VIA-IFACE-1314",
+   "rel": "functional modules/VeritasPulse/vpl/registry.py",
+   "subsystem": "OTHER",
+   "desc": "VeritasPulse module registry.",
+   "contract": {
+    "syntax": "OK",
+    "desc": "VeritasPulse module registry.",
+    "functions": [
+     {
+      "name": "enabled_modules",
+      "args": [],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [],
+    "has_main": false,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "pathlib",
+     "sys"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1315": {
+   "urn": "VIA-IFACE-1315",
+   "rel": "functional modules/VeritasPulse/vpl/theme.py",
+   "subsystem": "OTHER",
+   "desc": "VeritasPulse (VPL) — VIA Visual Lock v1 theme tokens.",
+   "contract": {
+    "syntax": "OK",
+    "desc": "VeritasPulse (VPL) — VIA Visual Lock v1 theme tokens.",
+    "functions": [
+     {
+      "name": "mpl",
+      "args": [
+       "c"
+      ],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [],
+    "has_main": false,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "pathlib",
+     "sys"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1316": {
+   "urn": "VIA-IFACE-1316",
+   "rel": "supportive modules/registry/via_accel_bridge_v0100.py",
+   "subsystem": "CGC",
+   "desc": "via_accel_bridge_v0100 — 全引擎加速器橋(TOOL-057;操作員令 2026-08-18)",
+   "contract": {
+    "syntax": "OK",
+    "desc": "via_accel_bridge_v0100 — 全引擎加速器橋(TOOL-057;操作員令 2026-08-18)",
+    "functions": [
+     {
+      "name": "targets",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "insert_line",
+      "args": [
+       "src"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "bridge_source",
+      "args": [
+       "src"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "run",
+      "args": [
+       "commit"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "selftest",
+      "args": [],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [
+     "--commit",
+     "--selftest"
+    ],
+    "has_main": true,
+    "imports": [
+     "__future__",
+     "ast",
+     "datetime",
+     "json",
+     "pathlib",
+     "sys"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1317": {
+   "urn": "VIA-IFACE-1317",
+   "rel": "supportive modules/registry/via_selftest_grid_v0115.py",
+   "subsystem": "CGC",
+   "desc": "via_selftest_grid_v0115 — 全面自測矩陣(+VDF 輸出樞紐站)",
+   "contract": {
+    "syntax": "OK",
+    "desc": "via_selftest_grid_v0115 — 全面自測矩陣(+VDF 輸出樞紐站)",
+    "functions": [
+     {
+      "name": "newest",
+      "args": [
+       "pattern",
+       "root"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "battery",
+      "args": [
+       "fast"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "run_one",
+      "args": [
+       "b"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "main",
+      "args": [],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [
+     "--check",
+     "--check-only",
+     "--demo",
+     "--dry",
+     "--fast",
+     "--list",
+     "--no-open",
+     "--no-pause",
+     "--offline",
+     "--selftest"
+    ],
+    "has_main": true,
+    "imports": [
+     "__future__",
+     "datetime",
+     "json",
+     "pathlib",
+     "subprocess",
+     "sys",
+     "time"
+    ]
+   },
+   "ts": "20260818_111658",
+   "drift_count": 0
   }
  },
  "drift_ledger": [
@@ -90591,6 +91936,12 @@
    "ts": "20260817_195222",
    "urn": "VIA-IFACE-0015",
    "rel": "functional modules/GroupIndex/engine/VIA_SectorFlow_Dashboard_Builder_v0100.py",
+   "note": "CONTRACT_DRIFT:簽名/旗標/說明變——新約入冊,舊約留 history"
+  },
+  {
+   "ts": "20260818_111658",
+   "urn": "VIA-IFACE-0142",
+   "rel": "functional modules/VRN/panorama_xcheck_v110.py",
    "note": "CONTRACT_DRIFT:簽名/旗標/說明變——新約入冊,舊約留 history"
   }
  ]

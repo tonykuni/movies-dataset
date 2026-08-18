@@ -2981,6 +2981,20 @@
    "kind": "裁決",
    "note": "操作員令(VRN 引擎再整合重整一次):17 件上傳(批間重複 3 對→14 唯一)對橋前正典逐件 hash 裁決:①MDL001 Converter/MDL001 StockReportPipeline(_3)/MDL002-008 全家+9 件=正典 byte-exact 全同→讓位(VRN MDL 管線家族倉內已正典化)。②panorama_xcheck_v110 上傳 30,394B=正典 v110R 重建 stub(4,004B)自載條款「工作站正本候上傳到件即讓位」之正本到件→stub 鏡像保存(_shaa9stub110R)+正本就位 panorama_xcheck_v110.py(編譯 OK+補橋);v111/v112 沿革不動。③ACTIVATE_AND_CROSS_VALIDATE 上傳=446+/453− 重寫(非明確後繼)→_shab1340658 鏡像候裁。④StockReportPipeline_1(124,833B<正典 140,357B)=舊修訂→_sha45136e4d 鏡像。⑤cross_validation_summary.json+panorama_summary.json=工作站運行證據→VRN/evidence_uploads/。加速器橋冪等實證:重跑已橋 384 全跳、僅新正本橋 1。",
    "ts": "2026-08-18"
+  },
+  {
+   "code": "TOOL-058",
+   "name": "vdf_output_hub_v0100 — VDF 輸出樞紐(統一參數 SSOT+六格式輸出+讀回驗證+矩陣摘要)",
+   "kind": "引擎",
+   "note": "操作員令(批19:先整合所有 vdf 輸入參數/輸出資料庫規劃可選 parquet/csv/duckdb/google sheet/sqlite/sql 但輸出都可輸出/引擎內資料跑 JSON 連 SSOT/自動註冊/運作結果資料庫矩陣詳細摘要)。落地:①統一輸入參數 SSOT 自動生成 VDF_Unified_Params_v0100.json(period/interval/市場宇宙/重試/快取/誠實規則:模擬值必須欄名帶 _SIM 後綴,禁無標註)。②JSON-rows 引擎內部合約 → write_all() 六車道:parquet(pandas 讀回驗證)/csv(utf-8-sig 防 Excel 亂碼)/duckdb(temp-json→read_json_auto 參數化)/sqlite(stdlib)/sql(INSERT dump '' 逃逸)/gsheet(COMPAT_CSV 誠實——真 Sheets API 為雲道,候同意閘+OAuth,名錄註記不假綠)。③每格式讀回驗證+逐格式×逐表運作結果矩陣 summary()。④零刪除 .pre_<ts>.bak;輸出根倉內非 OneDrive。selftest 7/7(首輪 6/7:duckdb read_json_auto 誤餵行內字串→改臨時檔路徑後綠)。啟動器 bin/via-vdfout.cmd(動態最新);grid v0115 第 44 站;命名冊 VDF_ENG045_OutputHub;加速橋已入。",
+   "ts": "2026-08-18"
+  },
+  {
+   "code": "INTAKE-20260818F",
+   "name": "批19 上傳收容:VDF_MDLXXX_YFinanceGlobalDataFetcher(三紅旗列管)",
+   "kind": "裁決",
+   "note": "上傳 VDF_MDLXXXYFinanceGlobaDataFetcher.py 收容為 functional modules/VDF/VDF_MDLXXX_YFinanceGlobalDataFetcher.py(獨立新件無正典撞名;py_compile OK;加速橋已入;命名冊自動編 VDF_ENG044,MDLXXX 未自編號故無撞號)。三紅旗列管(誠實標註,不改正本 version-forward 原則):①BASE_DIR 寫死 OneDrive 路徑(違「儲存不落 OneDrive」——倉內執行需改道,TOOL-058 輸出樞紐以倉內根取代其輸出層)。②互動 input() 提示(違自動化不卡斷——批次道須以參數 SSOT 取代)。③TAIWAN_SIMULATION 隨機生成三大法人/融資/當沖假數據無 _SIM 標註(違誠實原則——統一參數 SSOT 已立規:模擬值必須欄名帶 _SIM 後綴)。修繕版候令(version-forward 新版,不就地改)。",
+   "ts": "2026-08-18"
   }
  ]
 }
