@@ -91929,6 +91929,290 @@
    },
    "ts": "20260818_111658",
    "drift_count": 0
+  },
+  "VIA-IFACE-1318": {
+   "urn": "VIA-IFACE-1318",
+   "rel": "functional modules/VRN/VRN_Summarizer_v1.py",
+   "subsystem": "VRN",
+   "desc": "╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗",
+   "contract": {
+    "syntax": "OK",
+    "desc": "╔══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗",
+    "functions": [
+     {
+      "name": "get_version",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "get_libs_status",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "summarize_report",
+      "args": [
+       "ticker",
+       "first_page_text",
+       "remaining_text"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "main",
+      "args": [],
+      "defaults": 0
+     }
+    ],
+    "classes": {
+     "ReportSummary": 3,
+     "AdjCloseFetcher": 3,
+     "KeywordExtractor": 6,
+     "ExtractiveSummarizer": 3,
+     "CategorySentenceExtractor": 3,
+     "ValuationMethodDetector": 1,
+     "ReportCodeGenerator": 1,
+     "VRN_Summarizer": 4
+    },
+    "cli_flags": [
+     "---",
+     "--status",
+     "--test",
+     "--ticker"
+    ],
+    "has_main": true,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "argparse",
+     "collections",
+     "dataclasses",
+     "datetime",
+     "enum",
+     "hashlib",
+     "json",
+     "keybert",
+     "numpy",
+     "os",
+     "pandas",
+     "pathlib",
+     "rapidfuzz",
+     "re",
+     "requests",
+     "rich",
+     "sentence_transformers",
+     "sklearn",
+     "sumy",
+     "sys",
+     "time",
+     "tqdm",
+     "transformers",
+     "typing",
+     "warnings",
+     "yake",
+     "yfinance"
+    ]
+   },
+   "ts": "20260818_122607",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1319": {
+   "urn": "VIA-IFACE-1319",
+   "rel": "functional modules/VRN/vrn_lexicon_v0100.py",
+   "subsystem": "VRN",
+   "desc": "vrn_lexicon_v0100 — 中英文字庫+知識樹引擎(TOOL-059)",
+   "contract": {
+    "syntax": "OK",
+    "desc": "vrn_lexicon_v0100 — 中英文字庫+知識樹引擎(TOOL-059)",
+    "functions": [
+     {
+      "name": "_log",
+      "args": [
+       "msg"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "read_docx_text",
+      "args": [
+       "p"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "read_any_text",
+      "args": [
+       "p"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "load_lex",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "save_lex",
+      "args": [
+       "lex"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "add_entry",
+      "args": [
+       "lex",
+       "zh",
+       "en",
+       "node",
+       "status",
+       "source",
+       "aliases"
+      ],
+      "defaults": 1
+     },
+     {
+      "name": "ensure_tree",
+      "args": [
+       "lex"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "classify",
+      "args": [
+       "text"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "harvest_stocks",
+      "args": [
+       "lex",
+       "text",
+       "source"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "cmd_build",
+      "args": [],
+      "defaults": 0
+     },
+     {
+      "name": "cmd_ingest",
+      "args": [
+       "path"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "_fuzzy",
+      "args": [
+       "a",
+       "b"
+      ],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [
+     "--approve",
+     "--ask",
+     "--build",
+     "--help",
+     "--ingest",
+     "--merge",
+     "--reject",
+     "--review",
+     "--selftest",
+     "--status",
+     "--template",
+     "--tree"
+    ],
+    "has_main": true,
+    "imports": [
+     "VIA_SuperAccel_Module",
+     "collections",
+     "datetime",
+     "difflib",
+     "json",
+     "pathlib",
+     "rapidfuzz",
+     "re",
+     "sklearn",
+     "sumy",
+     "sys",
+     "tempfile",
+     "yake",
+     "zipfile"
+    ]
+   },
+   "ts": "20260818_122607",
+   "drift_count": 0
+  },
+  "VIA-IFACE-1320": {
+   "urn": "VIA-IFACE-1320",
+   "rel": "supportive modules/registry/via_selftest_grid_v0116.py",
+   "subsystem": "CGC",
+   "desc": "via_selftest_grid_v0116 — 全面自測矩陣(+字庫知識樹站)",
+   "contract": {
+    "syntax": "OK",
+    "desc": "via_selftest_grid_v0116 — 全面自測矩陣(+字庫知識樹站)",
+    "functions": [
+     {
+      "name": "newest",
+      "args": [
+       "pattern",
+       "root"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "battery",
+      "args": [
+       "fast"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "run_one",
+      "args": [
+       "b"
+      ],
+      "defaults": 0
+     },
+     {
+      "name": "main",
+      "args": [],
+      "defaults": 0
+     }
+    ],
+    "classes": {},
+    "cli_flags": [
+     "--check",
+     "--check-only",
+     "--demo",
+     "--dry",
+     "--fast",
+     "--list",
+     "--no-open",
+     "--no-pause",
+     "--offline",
+     "--selftest"
+    ],
+    "has_main": true,
+    "imports": [
+     "__future__",
+     "datetime",
+     "json",
+     "pathlib",
+     "subprocess",
+     "sys",
+     "time"
+    ]
+   },
+   "ts": "20260818_122607",
+   "drift_count": 0
   }
  },
  "drift_ledger": [
