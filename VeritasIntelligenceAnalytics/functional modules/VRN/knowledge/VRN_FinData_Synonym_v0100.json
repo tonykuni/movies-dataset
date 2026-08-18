@@ -1,9 +1,10 @@
 {
  "schema": "VIA.VRN.FinDataSynonym.v1",
- "generated": "2026-08-18 23:36:35",
+ "generated": "2026-08-18 23:52:01",
  "policy": "中英文同義字庫;多源並列 sources 標註不仲裁;收割自倉內正本",
- "count": 199,
- "multi_source": 73,
+ "count": 195,
+ "multi_source": 71,
+ "folded": 4,
  "metrics": {
   "cash": {
    "zh": "現金及約當現金",
@@ -3567,61 +3568,6 @@
     "InvestmentRegexPattern_VALIDATED.py"
    ]
   },
-  "eps_basic": {
-   "zh": "基本每股盈餘",
-   "en": "Basic EPS",
-   "synonyms_zh": [
-    "基本每股(?:淨)?(?:利|損)",
-    "基本每股盈餘",
-    "每股盈餘[（\\(]基本[）\\)]"
-   ],
-   "synonyms_en": [
-    "basic\\s*(?:earnings?\\s*per\\s*share|EPS)",
-    "basic eps"
-   ],
-   "patterns": [
-    "基本每股盈餘",
-    "基本每股(?:淨)?(?:利|損)",
-    "每股盈餘[（\\(]基本[）\\)]",
-    "basic\\s*(?:earnings?\\s*per\\s*share|EPS)"
-   ],
-   "statement": "PER_SHARE",
-   "category": "PER_SHARE",
-   "unit": "元",
-   "validation_level": "CRITICAL",
-   "sources": [
-    "InvestmentRegexPattern_VALIDATED.py",
-    "VRN_Financial_Synonyms_SSOT.py"
-   ]
-  },
-  "eps_diluted": {
-   "zh": "稀釋每股盈餘",
-   "en": "Diluted EPS",
-   "synonyms_zh": [
-    "每股盈餘[（\\(]稀釋[）\\)]",
-    "稀釋每股(?:淨)?(?:利|損)",
-    "稀釋每股盈餘",
-    "稀釋eps"
-   ],
-   "synonyms_en": [
-    "diluted\\s*(?:earnings?\\s*per\\s*share|EPS)",
-    "diluted eps"
-   ],
-   "patterns": [
-    "稀釋每股盈餘",
-    "稀釋每股(?:淨)?(?:利|損)",
-    "每股盈餘[（\\(]稀釋[）\\)]",
-    "diluted\\s*(?:earnings?\\s*per\\s*share|EPS)"
-   ],
-   "statement": "PER_SHARE",
-   "category": "PER_SHARE",
-   "unit": "元",
-   "validation_level": "CRITICAL",
-   "sources": [
-    "InvestmentRegexPattern_VALIDATED.py",
-    "VRN_Financial_Synonyms_SSOT.py"
-   ]
-  },
   "book_value_per_share": {
    "zh": "每股淨值",
    "en": "Book Value Per Share",
@@ -3853,13 +3799,15 @@
     "per",
     "pe ratio",
     "pe",
-    "price to earnings"
+    "price to earnings",
+    "PE Ratio"
    ],
    "patterns": [
     "本益比",
     "市盈率",
     "P/?E\\s*ratio",
-    "price[- ]?(?:to[- ]?)?earnings?\\s*ratio"
+    "price[- ]?(?:to[- ]?)?earnings?\\s*ratio",
+    "(本益比|P/E|PE\\s+Ratio|PER|市盈率|trailingPE|forwardPE|股價盈餘比)"
    ],
    "statement": "PER_SHARE",
    "category": "PER_SHARE",
@@ -3869,13 +3817,18 @@
     "InvestmentRegexPattern_VALIDATED.py",
     "financial_metrics_mapping.md",
     "VIS_VRN_FinancialSSOT_v0608.py",
-    "VRN_Financial_Synonyms_SSOT.py"
+    "VRN_Financial_Synonyms_SSOT.py",
+    "financial_classification_rules.py"
    ],
    "field_map": {
     "twstock": "pe_ratio",
-    "yfinance": "trailingPE"
+    "yfinance": "trailingPE",
+    "twse_tpex": "本益比"
    },
-   "vrn_uid": "VRN_FIN_0053"
+   "vrn_uid": "VRN_FIN_0053",
+   "merged_from": [
+    "pe"
+   ]
   },
   "pb_ratio": {
    "zh": "股價淨值比",
@@ -3896,13 +3849,15 @@
     "pbr",
     "pb ratio",
     "pb",
-    "price to book"
+    "price to book",
+    "PB Ratio"
    ],
    "patterns": [
     "股價淨值比",
     "市淨率",
     "P/?B\\s*ratio",
-    "price[- ]?(?:to[- ]?)?book\\s*ratio"
+    "price[- ]?(?:to[- ]?)?book\\s*ratio",
+    "(股價淨值比|P/B|PB\\s+Ratio|PBR|市淨率|priceToBook|市價淨值比)"
    ],
    "statement": "PER_SHARE",
    "category": "PER_SHARE",
@@ -3912,13 +3867,18 @@
     "InvestmentRegexPattern_VALIDATED.py",
     "financial_metrics_mapping.md",
     "VIS_VRN_FinancialSSOT_v0608.py",
-    "VRN_Financial_Synonyms_SSOT.py"
+    "VRN_Financial_Synonyms_SSOT.py",
+    "financial_classification_rules.py"
    ],
    "field_map": {
     "twstock": "pb_ratio",
-    "yfinance": "priceToBook"
+    "yfinance": "priceToBook",
+    "twse_tpex": "股價淨值比"
    },
-   "vrn_uid": "VRN_FIN_0054"
+   "vrn_uid": "VRN_FIN_0054",
+   "merged_from": [
+    "pb"
+   ]
   },
   "ps_ratio": {
    "zh": "股價營收比",
@@ -4234,7 +4194,7 @@
    }
   },
   "opex": {
-   "zh": "",
+   "zh": "營業費用合計",
    "en": "",
    "synonyms_zh": [
     "營業費用合計"
@@ -4250,7 +4210,8 @@
    ],
    "mops_official": [
     "營業費用合計"
-   ]
+   ],
+   "zh_backfilled": true
   },
   "pretax_income": {
    "zh": "稅前純益",
@@ -4297,8 +4258,8 @@
    "vrn_uid": "VRN_FIN_0005"
   },
   "eps": {
-   "zh": "",
-   "en": "",
+   "zh": "基本每股盈餘",
+   "en": "basic_eps",
    "synonyms_zh": [
     "基本每股盈餘",
     "每股盈餘",
@@ -4331,7 +4292,9 @@
     "diluted_eps",
     "earnings_per_share"
    ],
-   "vrn_uid": "VRN_FIN_0055"
+   "vrn_uid": "VRN_FIN_0055",
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "diluted_eps": {
    "zh": "稀釋每股盈餘",
@@ -4340,24 +4303,35 @@
     "稀釋每股盈餘",
     "完全稀釋EPS",
     "稀釋後每股盈餘",
-    "調整後EPS"
+    "調整後EPS",
+    "每股盈餘[（\\(]稀釋[）\\)]",
+    "稀釋每股(?:淨)?(?:利|損)",
+    "稀釋eps"
    ],
    "synonyms_en": [
     "Diluted EPS",
     "FD EPS",
-    "EPSd"
+    "EPSd",
+    "diluted\\s*(?:earnings?\\s*per\\s*share|EPS)",
+    "diluted eps"
    ],
    "patterns": [
-    "(稀釋每股盈餘|Diluted\\s+EPS|完全稀釋EPS|EPSd|dilutedEPS|dilutedEps|FD\\s*EPS|稀釋後每股盈餘)"
+    "(稀釋每股盈餘|Diluted\\s+EPS|完全稀釋EPS|EPSd|dilutedEPS|dilutedEps|FD\\s*EPS|稀釋後每股盈餘)",
+    "稀釋每股盈餘",
+    "稀釋每股(?:淨)?(?:利|損)",
+    "每股盈餘[（\\(]稀釋[）\\)]",
+    "diluted\\s*(?:earnings?\\s*per\\s*share|EPS)"
    ],
-   "statement": "",
-   "category": "",
-   "unit": "",
+   "statement": "PER_SHARE",
+   "category": "PER_SHARE",
+   "unit": "元",
    "validation_level": "",
    "sources": [
     "VRN_MDL007_APIDataFetcher.py",
     "financial_classification_rules.py",
-    "financial_metrics_mapping.md"
+    "financial_metrics_mapping.md",
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VRN_Financial_Synonyms_SSOT.py"
    ],
    "mops_official": [
     "稀釋每股盈餘"
@@ -4366,7 +4340,10 @@
     "twse_tpex": "稀釋每股盈餘",
     "twstock": "diluted_eps",
     "yfinance": "dilutedEps"
-   }
+   },
+   "merged_from": [
+    "eps_diluted"
+   ]
   },
   "current_assets": {
    "zh": "流動資產",
@@ -4597,8 +4574,8 @@
    "vrn_uid": "VRN_FIN_0032"
   },
   "operating_cost": {
-   "zh": "",
-   "en": "",
+   "zh": "銷貨成本",
+   "en": "COGS",
    "synonyms_zh": [
     "銷貨成本",
     "營業成本"
@@ -4613,7 +4590,9 @@
    "validation_level": "",
    "sources": [
     "VRN_Method_SSOT_v0100.json"
-   ]
+   ],
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "basic_eps": {
    "zh": "基本每股盈餘",
@@ -4623,31 +4602,44 @@
     "基本每股盈餘",
     "每股稅後盈餘",
     "每股淨利",
-    "每股純益"
+    "每股純益",
+    "基本每股(?:淨)?(?:利|損)",
+    "每股盈餘[（\\(]基本[）\\)]"
    ],
    "synonyms_en": [
     "EPS",
     "Basic EPS",
     "Adj. EPS",
-    "ModelWare EPS"
+    "ModelWare EPS",
+    "basic\\s*(?:earnings?\\s*per\\s*share|EPS)",
+    "basic eps"
    ],
    "patterns": [
-    "(每股盈餘|Basic\\s+EPS|EPS|基本每股盈餘|EPSb|basicEPS|basicEps|basicEarningsPerShare|每股稅後盈餘|每股淨利)"
+    "(每股盈餘|Basic\\s+EPS|EPS|基本每股盈餘|EPSb|basicEPS|basicEps|basicEarningsPerShare|每股稅後盈餘|每股淨利)",
+    "基本每股盈餘",
+    "基本每股(?:淨)?(?:利|損)",
+    "每股盈餘[（\\(]基本[）\\)]",
+    "basic\\s*(?:earnings?\\s*per\\s*share|EPS)"
    ],
-   "statement": "",
-   "category": "",
-   "unit": "",
+   "statement": "PER_SHARE",
+   "category": "PER_SHARE",
+   "unit": "元",
    "validation_level": "",
    "sources": [
     "VRN_Method_SSOT_v0100.json",
     "financial_classification_rules.py",
-    "financial_metrics_mapping.md"
+    "financial_metrics_mapping.md",
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VRN_Financial_Synonyms_SSOT.py"
    ],
    "field_map": {
     "twse_tpex": "基本每股盈餘",
     "twstock": "eps",
     "yfinance": "basicEps"
-   }
+   },
+   "merged_from": [
+    "eps_basic"
+   ]
   },
   "operating_expenses": {
    "zh": "營業費用",
@@ -4690,8 +4682,8 @@
    ]
   },
   "dps": {
-   "zh": "",
-   "en": "",
+   "zh": "每股現金股利",
+   "en": "DPS",
    "synonyms_zh": [
     "每股現金股利",
     "股息",
@@ -4725,7 +4717,9 @@
     "twstock": "dividend",
     "yfinance": "dividendRate"
    },
-   "vrn_uid": "VRN_FIN_0058"
+   "vrn_uid": "VRN_FIN_0058",
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "ppe": {
    "zh": "不動產廠房設備",
@@ -4768,8 +4762,8 @@
    "vrn_uid": "VRN_FIN_0015"
   },
   "total_debt": {
-   "zh": "",
-   "en": "",
+   "zh": "總負債",
+   "en": "Total Debt",
    "synonyms_zh": [
     "總負債",
     "借款總額"
@@ -4792,7 +4786,9 @@
     "twse_tpex": "借款",
     "twstock": "total_debt",
     "yfinance": "totalDebt"
-   }
+   },
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "short_term_debt": {
    "zh": "短期借款",
@@ -4859,8 +4855,8 @@
    }
   },
   "bvps": {
-   "zh": "",
-   "en": "",
+   "zh": "每股淨值",
+   "en": "BVPS",
    "synonyms_zh": [
     "每股淨值",
     "每股帳面價值",
@@ -4889,7 +4885,9 @@
     "twstock": "bvps",
     "yfinance": "bookValue"
    },
-   "vrn_uid": "VRN_FIN_0056"
+   "vrn_uid": "VRN_FIN_0056",
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "shares_outstanding": {
    "zh": "普通股流通股數",
@@ -4953,8 +4951,8 @@
    }
   },
   "fcf": {
-   "zh": "",
-   "en": "",
+   "zh": "自由現金流",
+   "en": "FCF",
    "synonyms_zh": [
     "自由現金流",
     "自由現金流量"
@@ -4984,7 +4982,9 @@
    "validation_rules": [
     "currency_format",
     "calculated_from_operating_minus_capex"
-   ]
+   ],
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "net_margin": {
    "zh": "淨利率",
@@ -5020,8 +5020,8 @@
    "vrn_uid": "VRN_FIN_0045"
   },
   "yoy": {
-   "zh": "",
-   "en": "",
+   "zh": "年增率",
+   "en": "YoY",
    "synonyms_zh": [
     "年增率",
     "同比增長",
@@ -5044,11 +5044,13 @@
    "field_map": {
     "twse_tpex": "年增率",
     "twstock": "yoy"
-   }
+   },
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "qoq": {
-   "zh": "",
-   "en": "",
+   "zh": "季增率",
+   "en": "QoQ",
    "synonyms_zh": [
     "季增率",
     "環比增長"
@@ -5070,68 +5072,13 @@
    "field_map": {
     "twse_tpex": "季增率",
     "twstock": "qoq"
-   }
-  },
-  "pe": {
-   "zh": "",
-   "en": "",
-   "synonyms_zh": [
-    "本益比",
-    "市盈率",
-    "股價盈餘比"
-   ],
-   "synonyms_en": [
-    "P/E",
-    "PE Ratio",
-    "PER"
-   ],
-   "patterns": [
-    "(本益比|P/E|PE\\s+Ratio|PER|市盈率|trailingPE|forwardPE|股價盈餘比)"
-   ],
-   "statement": "",
-   "category": "",
-   "unit": "",
-   "validation_level": "",
-   "sources": [
-    "financial_classification_rules.py"
-   ],
-   "field_map": {
-    "twse_tpex": "本益比",
-    "twstock": "pe_ratio",
-    "yfinance": "trailingPE"
-   }
-  },
-  "pb": {
-   "zh": "",
-   "en": "",
-   "synonyms_zh": [
-    "股價淨值比",
-    "市淨率"
-   ],
-   "synonyms_en": [
-    "P/B",
-    "PB Ratio",
-    "PBR"
-   ],
-   "patterns": [
-    "(股價淨值比|P/B|PB\\s+Ratio|PBR|市淨率|priceToBook|市價淨值比)"
-   ],
-   "statement": "",
-   "category": "",
-   "unit": "",
-   "validation_level": "",
-   "sources": [
-    "financial_classification_rules.py"
-   ],
-   "field_map": {
-    "twse_tpex": "股價淨值比",
-    "twstock": "pb_ratio",
-    "yfinance": "priceToBook"
-   }
+   },
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "ps": {
-   "zh": "",
-   "en": "",
+   "zh": "股價營收比",
+   "en": "P/S",
    "synonyms_zh": [
     "股價營收比",
     "市銷率"
@@ -5155,7 +5102,9 @@
     "twse_tpex": "股價營收比",
     "twstock": "ps_ratio",
     "yfinance": "priceToSales"
-   }
+   },
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "debt_to_equity": {
    "zh": "負債權益比",
@@ -5396,8 +5345,8 @@
    }
   },
   "operating_expense": {
-   "zh": "",
-   "en": "",
+   "zh": "營業費用",
+   "en": "Operating Expense",
    "synonyms_zh": [
     "營業費用"
    ],
@@ -5416,11 +5365,13 @@
    "sources": [
     "VIS_VRN_FinancialSSOT_v0608.py"
    ],
-   "vrn_uid": "VRN_FIN_0004"
+   "vrn_uid": "VRN_FIN_0004",
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "depreciation_and_amortization": {
-   "zh": "",
-   "en": "",
+   "zh": "折舊及攤銷",
+   "en": "Depreciation And Amortization",
    "synonyms_zh": [
     "折舊及攤銷"
    ],
@@ -5437,11 +5388,13 @@
    "sources": [
     "VIS_VRN_FinancialSSOT_v0608.py"
    ],
-   "vrn_uid": "VRN_FIN_0009"
+   "vrn_uid": "VRN_FIN_0009",
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "long_term_investments": {
-   "zh": "",
-   "en": "",
+   "zh": "長期投資",
+   "en": "Long Term Investments",
    "synonyms_zh": [
     "長期投資",
     "長期投資合計"
@@ -5459,11 +5412,13 @@
    "sources": [
     "VIS_VRN_FinancialSSOT_v0608.py"
    ],
-   "vrn_uid": "VRN_FIN_0016"
+   "vrn_uid": "VRN_FIN_0016",
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "other_non_current_assets": {
-   "zh": "",
-   "en": "",
+   "zh": "其他非流動資產",
+   "en": "Other Non Current Assets",
    "synonyms_zh": [
     "其他非流動資產",
     "其它非流動資產"
@@ -5480,11 +5435,13 @@
    "sources": [
     "VIS_VRN_FinancialSSOT_v0608.py"
    ],
-   "vrn_uid": "VRN_FIN_0017"
+   "vrn_uid": "VRN_FIN_0017",
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "non_current_liabilities": {
-   "zh": "",
-   "en": "",
+   "zh": "非流動負債",
+   "en": "Non Current Liabilities",
    "synonyms_zh": [
     "非流動負債",
     "其他非流動負債"
@@ -5502,11 +5459,13 @@
    "sources": [
     "VIS_VRN_FinancialSSOT_v0608.py"
    ],
-   "vrn_uid": "VRN_FIN_0023"
+   "vrn_uid": "VRN_FIN_0023",
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "parent_equity": {
-   "zh": "",
-   "en": "",
+   "zh": "母公司業主權益",
+   "en": "Parent Equity",
    "synonyms_zh": [
     "母公司業主權益",
     "歸屬母公司業主權益"
@@ -5524,11 +5483,13 @@
    "sources": [
     "VIS_VRN_FinancialSSOT_v0608.py"
    ],
-   "vrn_uid": "VRN_FIN_0027"
+   "vrn_uid": "VRN_FIN_0027",
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "total_liabilities_and_equity": {
-   "zh": "",
-   "en": "",
+   "zh": "負債及權益總計",
+   "en": "Total Liabilities And Equity",
    "synonyms_zh": [
     "負債及權益總計",
     "負債和權益總計"
@@ -5545,11 +5506,13 @@
    "sources": [
     "VIS_VRN_FinancialSSOT_v0608.py"
    ],
-   "vrn_uid": "VRN_FIN_0029"
+   "vrn_uid": "VRN_FIN_0029",
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "capital_expenditure": {
-   "zh": "",
-   "en": "",
+   "zh": "資本支出",
+   "en": "Capital Expenditure",
    "synonyms_zh": [
     "資本支出",
     "資本支出淨額"
@@ -5567,11 +5530,13 @@
    "sources": [
     "VIS_VRN_FinancialSSOT_v0608.py"
    ],
-   "vrn_uid": "VRN_FIN_0033"
+   "vrn_uid": "VRN_FIN_0033",
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "working_capital_change": {
-   "zh": "",
-   "en": "",
+   "zh": "營運資金變動",
+   "en": "Working Capital Change",
    "synonyms_zh": [
     "營運資金變動"
    ],
@@ -5588,11 +5553,13 @@
    "sources": [
     "VIS_VRN_FinancialSSOT_v0608.py"
    ],
-   "vrn_uid": "VRN_FIN_0038"
+   "vrn_uid": "VRN_FIN_0038",
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "long_term_investment_change": {
-   "zh": "",
-   "en": "",
+   "zh": "長期投資變動",
+   "en": "Long Term Investment Change",
    "synonyms_zh": [
     "長期投資變動"
    ],
@@ -5609,11 +5576,13 @@
    "sources": [
     "VIS_VRN_FinancialSSOT_v0608.py"
    ],
-   "vrn_uid": "VRN_FIN_0039"
+   "vrn_uid": "VRN_FIN_0039",
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "debt_change": {
-   "zh": "",
-   "en": "",
+   "zh": "長借公司債變動",
+   "en": "Debt Change",
    "synonyms_zh": [
     "長借公司債變動",
     "長借/公司債變動"
@@ -5630,11 +5599,13 @@
    "sources": [
     "VIS_VRN_FinancialSSOT_v0608.py"
    ],
-   "vrn_uid": "VRN_FIN_0040"
+   "vrn_uid": "VRN_FIN_0040",
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "cash_dividend_paid": {
-   "zh": "",
-   "en": "",
+   "zh": "發放現金股利",
+   "en": "Cash Dividend Paid",
    "synonyms_zh": [
     "發放現金股利"
    ],
@@ -5651,11 +5622,13 @@
    "sources": [
     "VIS_VRN_FinancialSSOT_v0608.py"
    ],
-   "vrn_uid": "VRN_FIN_0041"
+   "vrn_uid": "VRN_FIN_0041",
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "cash_capital_increase": {
-   "zh": "",
-   "en": "",
+   "zh": "現金增資",
+   "en": "Cash Capital Increase",
    "synonyms_zh": [
     "現金增資"
    ],
@@ -5671,11 +5644,13 @@
    "sources": [
     "VIS_VRN_FinancialSSOT_v0608.py"
    ],
-   "vrn_uid": "VRN_FIN_0042"
+   "vrn_uid": "VRN_FIN_0042",
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "cfps": {
-   "zh": "",
-   "en": "",
+   "zh": "每股現金流",
+   "en": "CFPS",
    "synonyms_zh": [
     "每股現金流"
    ],
@@ -5692,11 +5667,13 @@
    "sources": [
     "VIS_VRN_FinancialSSOT_v0608.py"
    ],
-   "vrn_uid": "VRN_FIN_0057"
+   "vrn_uid": "VRN_FIN_0057",
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "sales_yoy": {
-   "zh": "",
-   "en": "",
+   "zh": "營收年增率",
+   "en": "Sales YoY",
    "synonyms_zh": [
     "營收年增率"
    ],
@@ -5713,11 +5690,13 @@
    "sources": [
     "VIS_VRN_FinancialSSOT_v0608.py"
    ],
-   "vrn_uid": "VRN_FIN_0059"
+   "vrn_uid": "VRN_FIN_0059",
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "eps_yoy": {
-   "zh": "",
-   "en": "",
+   "zh": "eps年增率",
+   "en": "EPS YoY",
    "synonyms_zh": [
     "eps年增率"
    ],
@@ -5733,11 +5712,13 @@
    "sources": [
     "VIS_VRN_FinancialSSOT_v0608.py"
    ],
-   "vrn_uid": "VRN_FIN_0060"
+   "vrn_uid": "VRN_FIN_0060",
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "sales_qoq": {
-   "zh": "",
-   "en": "",
+   "zh": "營收季增率",
+   "en": "Sales QoQ",
    "synonyms_zh": [
     "營收季增率"
    ],
@@ -5754,11 +5735,13 @@
    "sources": [
     "VIS_VRN_FinancialSSOT_v0608.py"
    ],
-   "vrn_uid": "VRN_FIN_0061"
+   "vrn_uid": "VRN_FIN_0061",
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "eps_qoq": {
-   "zh": "",
-   "en": "",
+   "zh": "eps季增率",
+   "en": "EPS QoQ",
    "synonyms_zh": [
     "eps季增率"
    ],
@@ -5774,11 +5757,13 @@
    "sources": [
     "VIS_VRN_FinancialSSOT_v0608.py"
    ],
-   "vrn_uid": "VRN_FIN_0062"
+   "vrn_uid": "VRN_FIN_0062",
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "op_profit": {
-   "zh": "",
-   "en": "",
+   "zh": "營業利益",
+   "en": "operating profit",
    "synonyms_zh": [
     "營業利益",
     "營業獲利"
@@ -5794,11 +5779,13 @@
    "validation_level": "",
    "sources": [
     "VRN_Financial_Synonyms_SSOT.py"
-   ]
+   ],
+   "zh_backfilled": true,
+   "en_backfilled": true
   },
   "ebit": {
    "zh": "",
-   "en": "",
+   "en": "ebit",
    "synonyms_zh": [],
    "synonyms_en": [
     "ebit"
@@ -5810,11 +5797,12 @@
    "validation_level": "",
    "sources": [
     "VRN_Financial_Synonyms_SSOT.py"
-   ]
+   ],
+   "en_backfilled": true
   },
   "ocf": {
-   "zh": "",
-   "en": "",
+   "zh": "營業現金流",
+   "en": "operating cash flow",
    "synonyms_zh": [
     "營業現金流"
    ],
@@ -5828,7 +5816,9 @@
    "validation_level": "",
    "sources": [
     "VRN_Financial_Synonyms_SSOT.py"
-   ]
+   ],
+   "zh_backfilled": true,
+   "en_backfilled": true
   }
  }
 }
