@@ -1,0 +1,373 @@
+{
+ "schema": "VIA.CentralParamsSSOT.v1",
+ "generated": "2026-08-18 21:58:00",
+ "policy": "指標索引冊;單一真相留原冊不搬家;衝突=建議燈候操作員裁決",
+ "books_total": 16,
+ "books_ok": 16,
+ "books_missing": 0,
+ "books_fail": 0,
+ "leaf_total": 45272,
+ "conflicts": [],
+ "locked_alignment": [
+  {
+   "name": "PRODUCT_CODE",
+   "state": "ALIGNED",
+   "pattern": "^VIA-[A-Z0-9]{4}-[A-Z0-9]{4}$",
+   "drift": []
+  },
+  {
+   "name": "TW_ACTIVE_ETF",
+   "state": "ALIGNED",
+   "pattern": "^\\d{5}A$",
+   "drift": []
+  },
+  {
+   "name": "TW_BLOOMBERG",
+   "state": "ALIGNED",
+   "pattern": "^[1-9]\\d{3}\\s*TT$",
+   "drift": []
+  },
+  {
+   "name": "TW_TICKER_LOCKED",
+   "state": "ALIGNED",
+   "pattern": "^(?:[1-9]\\d{3})$|^(?!202[1-9]|2030)\\d{4}$",
+   "drift": []
+  },
+  {
+   "name": "TW_YFINANCE",
+   "state": "ALIGNED",
+   "pattern": "^[1-9]\\d{3}\\.(TW|TWO)$",
+   "drift": []
+  },
+  {
+   "name": "VERSION_SUFFIX",
+   "state": "ALIGNED",
+   "pattern": "[_-]v?\\d{2,4}[a-z]?$",
+   "drift": []
+  },
+  {
+   "name": "YEAR_SUSPECT",
+   "state": "ALIGNED",
+   "pattern": "^(?:202[1-9]|2030)$",
+   "drift": []
+  }
+ ],
+ "books": [
+  {
+   "id": "SYNONYM_REGEX",
+   "domain": "LOCKED",
+   "path": "supportive modules/registry/VIA_Central_Synonym_Regex_v0100.json",
+   "note": "Regex 治理中心(7 LOCKED+7 同義集)",
+   "conflict_scope": true,
+   "sha256": "ad449d70f155e255b61a6d7eb0b11c212c2774ffe281c56886524134d7d4e8af",
+   "bytes": 1943,
+   "state": "OK",
+   "leaf_count": 64,
+   "truncated": false,
+   "top_keys": [
+    "schema",
+    "policy",
+    "regex",
+    "synonyms"
+   ]
+  },
+  {
+   "id": "BRAND_SSOT",
+   "domain": "LOCKED",
+   "path": "supportive modules/registry/VIA_Brand_SSOT_v0100.json",
+   "note": "品牌銘言 Observa·Intellege·Praevide",
+   "conflict_scope": true,
+   "sha256": "94613004feb460a2ed4a393b919cc722cb5d8773a5bcb4ccf28c9b29bc44b1cb",
+   "bytes": 617,
+   "state": "OK",
+   "leaf_count": 9,
+   "truncated": false,
+   "top_keys": [
+    "schema",
+    "policy",
+    "brand",
+    "visual_lock_ref"
+   ]
+  },
+  {
+   "id": "VDF_UNIFIED",
+   "domain": "CONFIG",
+   "path": "functional modules/VDF/VDF_Unified_Params_v0100.json",
+   "note": "VDF 統一輸入參數+六格式輸出樞紐",
+   "conflict_scope": true,
+   "sha256": "c977d374c1387691d3a9bd95e8638711c8103224055b91c4171b3416fde05469",
+   "bytes": 964,
+   "state": "OK",
+   "leaf_count": 28,
+   "truncated": false,
+   "top_keys": [
+    "schema",
+    "note",
+    "time",
+    "fetch",
+    "markets",
+    "output",
+    "honesty"
+   ]
+  },
+  {
+   "id": "FLOW_PARAMS",
+   "domain": "CONFIG",
+   "path": "supportive modules/VIA_FlowSystem/FlowSystem_v2/config/params.json",
+   "note": "FlowSystem 主參數",
+   "conflict_scope": true,
+   "sha256": "39b20dd495f4e3dda4e380ba462abdf4a14959e81a67f011ee62439abdd9180a",
+   "bytes": 1049,
+   "state": "OK",
+   "leaf_count": 35,
+   "truncated": false,
+   "top_keys": [
+    "_note",
+    "fis",
+    "gates",
+    "calibration",
+    "synthetic",
+    "gram"
+   ]
+  },
+  {
+   "id": "FLOW_TW_ETF",
+   "domain": "CONFIG",
+   "path": "supportive modules/VIA_FlowSystem/FlowSystem_v2/config/TW_Active_ETF_Registry_v0100.json",
+   "note": "台灣主動式 ETF 清單 SSOT",
+   "conflict_scope": true,
+   "sha256": "3ddc1ce705c09741e6f4a46f776f6720c0306a0ad006e4a8844702d38dc17f6d",
+   "bytes": 749,
+   "state": "OK",
+   "leaf_count": 18,
+   "truncated": false,
+   "top_keys": [
+    "schema",
+    "as_of",
+    "verify_required",
+    "note",
+    "etfs",
+    "endpoints",
+    "history"
+   ]
+  },
+  {
+   "id": "FLOW_GLOBAL_ETF",
+   "domain": "CONFIG",
+   "path": "supportive modules/VIA_FlowSystem/FlowSystem_v2/config/Global_ETF_Universe_v0100.json",
+   "note": "全球 ETF 五類宇宙",
+   "conflict_scope": true,
+   "sha256": "7910c18c4169696f7a532fe602fd2f88eb205a788628cf4cb35ce2d3a2c8e879",
+   "bytes": 1007,
+   "state": "OK",
+   "leaf_count": 28,
+   "truncated": false,
+   "top_keys": [
+    "schema",
+    "note",
+    "classes",
+    "methodology"
+   ]
+  },
+  {
+   "id": "FLOW_UNIVERSE",
+   "domain": "CONFIG",
+   "path": "supportive modules/VIA_FlowSystem/FlowSystem_v2/config/universe.json",
+   "note": "FlowSystem 標的宇宙",
+   "conflict_scope": true,
+   "sha256": "4d855f83b92149960564c5f27f6528ee821fc5c8ce82353a0299735d096bc869",
+   "bytes": 16700,
+   "state": "OK",
+   "leaf_count": 701,
+   "truncated": false,
+   "top_keys": [
+    "_note",
+    "etfs"
+   ]
+  },
+  {
+   "id": "FLOW_MACRO",
+   "domain": "CONFIG",
+   "path": "supportive modules/VIA_FlowSystem/FlowSystem_v2/config/macro.json",
+   "note": "宏觀疊圖參數",
+   "conflict_scope": true,
+   "sha256": "f3c4eb6d9d020f61b136412b42c0408dffcc8b9ce0646d4ef9e19a7d399d7294",
+   "bytes": 2677,
+   "state": "OK",
+   "leaf_count": 70,
+   "truncated": false,
+   "top_keys": [
+    "_note",
+    "us_policy_rate",
+    "verdict_rule",
+    "regions",
+    "data_schema",
+    "adaptive",
+    "factor_catalog_note"
+   ]
+  },
+  {
+   "id": "FLOW_SIM",
+   "domain": "CONFIG",
+   "path": "supportive modules/VIA_FlowSystem/FlowSystem_v2/config/sim.json",
+   "note": "模擬參數",
+   "conflict_scope": true,
+   "sha256": "17e3f448ebe535ad64dc8329bebfc9eb9b6e60e0de61053a2355cbbb32e1318b",
+   "bytes": 3621,
+   "state": "OK",
+   "leaf_count": 170,
+   "truncated": false,
+   "top_keys": [
+    "_note",
+    "factors",
+    "keyframes",
+    "regions",
+    "tiers",
+    "types",
+    "valuation",
+    "steps",
+    "span_days"
+   ]
+  },
+  {
+   "id": "FLOW_PERF",
+   "domain": "CONFIG",
+   "path": "supportive modules/VIA_FlowSystem/FlowSystem_v2/config/perf.json",
+   "note": "績效參數",
+   "conflict_scope": true,
+   "sha256": "1839b1cde1bb7619968c06c8f14f062ff5092de8900d9fe686c543879e4b70ee",
+   "bytes": 1935,
+   "state": "OK",
+   "leaf_count": 74,
+   "truncated": false,
+   "top_keys": [
+    "_note",
+    "base_date",
+    "groups",
+    "line_width"
+   ]
+  },
+  {
+   "id": "VRN_LEXICON",
+   "domain": "KNOWLEDGE",
+   "path": "functional modules/VRN/knowledge/VRN_Lexicon_v0100.json",
+   "note": "中英文字庫+K1-K8 知識樹(162 條級)",
+   "conflict_scope": false,
+   "sha256": "a69b1d2c32451b6a232eed24ce782e3772ac1f201cb6d87726c1aa570726cc32",
+   "bytes": 50775,
+   "state": "OK",
+   "leaf_count": 1497,
+   "truncated": false,
+   "top_keys": [
+    "schema",
+    "policy",
+    "tree",
+    "entries",
+    "history",
+    "counters"
+   ]
+  },
+  {
+   "id": "VRN_DIGEST",
+   "domain": "CONFIG",
+   "path": "functional modules/VRN/knowledge/VRN_Digest_Params_v0100.json",
+   "note": "個股報告摘要批跑參數(TOOL-070)",
+   "conflict_scope": true,
+   "sha256": "100f2edf98d4d5f2f2e6473afe830562135dde26d5a587f51ed47eeb32450357",
+   "bytes": 1293,
+   "state": "OK",
+   "leaf_count": 25,
+   "truncated": false,
+   "top_keys": [
+    "schema",
+    "policy",
+    "first_page_chars",
+    "extensions",
+    "filler_tag",
+    "filler_phrases",
+    "point1_fallback_regex",
+    "meta_patterns",
+    "tw_ticker_locked",
+    "year_suspect",
+    "output_root",
+    "ui_name"
+   ]
+  },
+  {
+   "id": "FINAL_PARAMS",
+   "domain": "REGISTRY",
+   "path": "supportive modules/registry/VIA_FinalParameters_CanonicalRegistry.json",
+   "note": "歷史最終參數正典冊",
+   "conflict_scope": false,
+   "sha256": "6a0b665788efa5ac1e859ba1e15106d3eb704b888aa5b47d4adadb3f15e2410d",
+   "bytes": 27374475,
+   "state": "OK",
+   "leaf_count": 20000,
+   "truncated": true,
+   "top_keys": [
+    "rows",
+    "schema_version"
+   ]
+  },
+  {
+   "id": "AUTOCODE_REG",
+   "domain": "REGISTRY",
+   "path": "supportive modules/registry/VIA_AutoCode_Registry_v0100.json",
+   "note": "自動編號命名冊(append-only;編號永不變)",
+   "conflict_scope": false,
+   "sha256": "3782c89a9a88ad0957ac1ebd41d3d1b140d8382a245d0bed2b2f801106a2a77d",
+   "bytes": 304559,
+   "state": "OK",
+   "leaf_count": 2367,
+   "truncated": false,
+   "top_keys": [
+    "registry_id",
+    "append_only",
+    "coexisting_namespaces",
+    "categories",
+    "components",
+    "ledger"
+   ]
+  },
+  {
+   "id": "IFACE_REG",
+   "domain": "REGISTRY",
+   "path": "supportive modules/registry/VIA_Interface_Contract_Registry_v0100.json",
+   "note": "介面契約冊(2,000+ 模組)",
+   "conflict_scope": false,
+   "sha256": "2bab6812b7291eeba1904484e89f383cbc172bd1d6c2a88fa495bd92146d776a",
+   "bytes": 2648163,
+   "state": "OK",
+   "leaf_count": 20000,
+   "truncated": true,
+   "top_keys": [
+    "schema",
+    "namespace",
+    "modules",
+    "drift_ledger"
+   ]
+  },
+  {
+   "id": "MASTER_GOV_LOCAL",
+   "domain": "REGISTRY",
+   "path": "supportive modules/registry/VIA_MasterGovernance_SSOT_v0100.local.json",
+   "note": "主治理冊(工作站 .local;容器缺=誠實 MISSING)",
+   "conflict_scope": false,
+   "sha256": "4456d45d8f6fbcb9abf2b0dd8f5e3ff7d702961e4fbdd37fb01f281eaa2eb316",
+   "bytes": 19133,
+   "state": "OK",
+   "leaf_count": 186,
+   "truncated": false,
+   "top_keys": [
+    "schema",
+    "updated_at",
+    "red_lines",
+    "iron_rules",
+    "subsystems",
+    "product_rules",
+    "verbs",
+    "entry"
+   ]
+  }
+ ]
+}
