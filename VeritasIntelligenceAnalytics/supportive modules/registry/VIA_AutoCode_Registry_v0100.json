@@ -3289,6 +3289,13 @@
    "kind": "稽核",
    "note": "工作站 via-digest 真券商報告庫 64 份(MS/GS/JPM/Citi/UBS/Daiwa/CLSA/凱基/華南/兆豐/統一/CTBC/台新/國泰)首跑全鏈通:摘要 63+VDF 六格式 63 列讀回綠。品質債候修(Sequence-Dependent,動 digest/Summarizer 邊界候指名令):①標題抽取吃免責聲明/頁眉(「本報告純屬研究性質…」「請參見末頁重要披露」金管字號等)——宜加免責聲明黑名單濾行;②產業報/晨報/日港美股報誤掛個股 ticker(凱基日股→9984 誤配 .TW、港股→3750、第三場半導體→2020;宜引入報告類型分類 def02+非台股市場閘);③yfinance 全部強制 .TW 後綴,櫃買/下市件報 possibly delisted(宜 TWSE/TPEX 名單判市場,Summarizer _to_yf_ticker 已支援 market 參數未被餵);④評等/目標價命中率低(多數 —,regex 僅認制式「評等:/目標價:」;宜接 finlex 評等冊+多式 regex);⑤pypdf「Ignoring wrong pointing object」噪音宜捕捉。另:工作站 via-wrapup --battery 該次命令尾誤鍵「]」僅印用法未真跑,候重貼。",
    "ts": "2026-08-19"
+  },
+  {
+   "code": "QA-20260819Q",
+   "name": "批50 電池雙紅定讞並修:grid FAIL=rebuild 混態斷版/cgc RED=排除區窄版誤掃回滾快照",
+   "kind": "落地",
+   "note": "證據(操作員貼回):①grid FAIL 1=重建計畫自測 13/14——根因:正典家族僅至 CGC_MDL050_EnvRebuild_v0103(無 Windows 正斜線修),14/14 修正版躺在未改名 via_env_rebuild_v0104.py,glob 抓正典名永遠跑舊版;Linux 不觸發路徑 bug 故容器綠工作站紅(雙端不對稱實證)。修:v0104 內容接軌正典名 CGC_MDL050_EnvRebuild_v0104.py(原件留位只增不減);容器 14/14。②cgc OTHERS 異常 40 RED=全數 _via_mother_root_reconciliation_runs/RUN_20260817…/rollback/rb-*.py 回滾 byte 快照(收容件非現役,語法壞屬預期;該夾工作站 untracked 容器無,故容器 GREEN)——根因:CGC_MDL075_CentralGov_v0101 SKIP_FRAGS 僅舊窄版 7 項。修:v0102 排除區補齊全計畫共識 14 項(+.venv/site-packages/_via_mother_root_reconciliation_runs/rollback/evidence/_syntaxfix_/rename_runs);容器全掃 GREEN(OTHERS 2,568→198)。grid FAST OK50·FAIL0。工作站候復驗:pull 後 via-run via-wrapup --battery 預期六道全 OK。",
+   "ts": "2026-08-19"
   }
  ]
 }
