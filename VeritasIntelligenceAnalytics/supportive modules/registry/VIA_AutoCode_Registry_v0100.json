@@ -3387,6 +3387,13 @@
    "kind": "工具",
    "note": "「漲跌幅是透過 VDF 每天抓新數據 不必驗 要驗要抓 先 MAPPING DATA 再驗算」:矩陣列先按 Ticker 映射最新 digest_vdf_rows.csv(工作站每日 --vdf 刷新),ADJ 取 VDF 新鮮值(ADJ源=VDF 綠標;映射不到=矩陣舊值誠實標);驗算對象=映射後數據,上漲%以新鮮 ADJ 重算(upside_fresh),舊載 upside 依令不再對照驗證(同源循環)僅並列顯示。schema VIA.FinAudit.v2(+vdf_source/vdf_mapped/adj_src)。十檢 10/10(⑧映射覆蓋 500→PE40·upside-50/⑩批跑映射 400→-37.5%)。批63 讓位一件:InvestmentRegexPattern 再上傳(965c033e)=既判橋前原文,零動作。",
    "ts": "2026-08-19 08:06"
+  },
+  {
+   "code": "TOOL-070G",
+   "name": "digest v0105+四件操作員核定 regex 收容(批64 令)",
+   "kind": "落地",
+   "note": "令「VRN只擷取台灣各股報告其他類型不用;券商名稱簡稱中英文縮寫可在FILENAME及內文採取局部識別」。收容四包(貼文轉錄,自跑全過):VRN_OperatorRegex_NameEmail_v0100(中文名含·．/企業Email三段解析)/TaipeiPhone_v0100(02 國內外+分機)/HKPhone_v0100(852 固網手機判別)/TWTicker_v0100(4-5 碼統一式+OTC 區段 3·4·5·6·8+自動校正)。digest v0105:①券商四道疊加=Summarizer 中文簡稱 hay 掃+檔名首段縮寫 broker_prefix_map(MS/GS/JP/Citi/CLST/Daiwa/UBS/MQ/GF/KGI/CTBC,中央參數冊,src=檔名縮寫)+TW02 BROKER_PATTERNS+EMAIL 域名;②市場判定四道=明示>官方冊>OTC 區段啟發式(操作員核定,冊缺時後備)>TWSE 預設;③src 次序債修(setdefault 不再清標記)。十八檢 18/18(⑰MS/Daiwa 縮寫⑱冊>明示>啟發式優先序)。非台股(日股9984/港股3750)由官方冊閘擋(不在 TWSE/TPEX 冊=SKIP)。",
+   "ts": "2026-08-19 09:09"
   }
  ]
 }
