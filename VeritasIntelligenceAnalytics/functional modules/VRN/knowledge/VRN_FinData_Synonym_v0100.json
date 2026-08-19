@@ -1,9 +1,9 @@
 {
  "schema": "VIA.VRN.FinDataSynonym.v1",
- "generated": "2026-08-18 23:52:01",
+ "generated": "2026-08-19 00:04:01",
  "policy": "中英文同義字庫;多源並列 sources 標註不仲裁;收割自倉內正本",
  "count": 195,
- "multi_source": 71,
+ "multi_source": 105,
  "folded": 4,
  "metrics": {
   "cash": {
@@ -4174,14 +4174,15 @@
    "patterns": [
     "(營業成本|Cost\\s+of\\s+Revenue|COGS|Cost\\s+of\\s+Goods\\s+Sold|銷貨成本|costOfRevenue|costOfGoodsSold|直接成本|製造成本)"
    ],
-   "statement": "",
+   "statement": "INCOME_STATEMENT",
    "category": "",
    "unit": "",
    "validation_level": "",
    "sources": [
     "VRN_MDL007_APIDataFetcher.py",
     "financial_classification_rules.py",
-    "financial_metrics_mapping.md"
+    "financial_metrics_mapping.md",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "mops_official": [
     "營業成本合計",
@@ -4191,27 +4192,29 @@
     "twse_tpex": "營業成本",
     "twstock": "cost",
     "yfinance": "costOfRevenue"
-   }
+   },
+   "operator_filled": true
   },
   "opex": {
    "zh": "營業費用合計",
-   "en": "",
+   "en": "Operating Expenses Total (Opex)",
    "synonyms_zh": [
     "營業費用合計"
    ],
    "synonyms_en": [],
    "patterns": [],
-   "statement": "",
+   "statement": "INCOME_STATEMENT",
    "category": "",
    "unit": "",
    "validation_level": "",
    "sources": [
-    "VRN_MDL007_APIDataFetcher.py"
+    "VRN_MDL007_APIDataFetcher.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "mops_official": [
     "營業費用合計"
    ],
-   "zh_backfilled": true
+   "operator_filled": true
   },
   "pretax_income": {
    "zh": "稅前純益",
@@ -4236,7 +4239,7 @@
    "patterns": [
     "(稅前純益|Pre-tax\\s+Income|EBT|Earnings\\s+Before\\s+Tax|稅前盈餘|pretaxIncome|incomeBeforeTax|稅前利益)"
    ],
-   "statement": "",
+   "statement": "INCOME_STATEMENT",
    "category": "",
    "unit": "mn TWD",
    "validation_level": "",
@@ -4245,7 +4248,8 @@
     "VRN_Method_SSOT_v0100.json",
     "financial_classification_rules.py",
     "financial_metrics_mapping.md",
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "mops_official": [
     "稅前淨利（淨損）"
@@ -4255,11 +4259,12 @@
     "twstock": "pretax_income",
     "yfinance": "incomeBeforeTax"
    },
-   "vrn_uid": "VRN_FIN_0005"
+   "vrn_uid": "VRN_FIN_0005",
+   "operator_filled": true
   },
   "eps": {
    "zh": "基本每股盈餘",
-   "en": "basic_eps",
+   "en": "Basic EPS",
    "synonyms_zh": [
     "基本每股盈餘",
     "每股盈餘",
@@ -4274,7 +4279,7 @@
     "earnings per share"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "PER_SHARE",
    "category": "",
    "unit": "TWD",
    "validation_level": "",
@@ -4282,7 +4287,8 @@
     "VRN_MDL007_APIDataFetcher.py",
     "VRN_MDL008_CrossValidator.py",
     "VIS_VRN_FinancialSSOT_v0608.py",
-    "VRN_Financial_Synonyms_SSOT.py"
+    "VRN_Financial_Synonyms_SSOT.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "mops_official": [
     "基本每股盈餘"
@@ -4293,8 +4299,7 @@
     "earnings_per_share"
    ],
    "vrn_uid": "VRN_FIN_0055",
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "diluted_eps": {
    "zh": "稀釋每股盈餘",
@@ -4364,7 +4369,7 @@
    "patterns": [
     "(流動資產|Current\\s+Assets|短期資產|currentAssets|流動資產總額|流動資產合計)"
    ],
-   "statement": "",
+   "statement": "BALANCE_SHEET",
    "category": "",
    "unit": "mn TWD",
    "validation_level": "",
@@ -4373,7 +4378,8 @@
     "financial_classification_rules.py",
     "financial_data_standardization.py(AST)",
     "financial_metrics_mapping.md",
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "mops_official": [
     "流動資產合計"
@@ -4387,7 +4393,8 @@
     "must_be_positive",
     "currency_format"
    ],
-   "vrn_uid": "VRN_FIN_0013"
+   "vrn_uid": "VRN_FIN_0013",
+   "operator_filled": true
   },
   "current_liabilities": {
    "zh": "流動負債",
@@ -4408,7 +4415,7 @@
    "patterns": [
     "(流動負債|Current\\s+Liabilities|短期負債|currentLiabilities|流動負債總額)"
    ],
-   "statement": "",
+   "statement": "BALANCE_SHEET",
    "category": "",
    "unit": "mn TWD",
    "validation_level": "",
@@ -4417,7 +4424,8 @@
     "financial_classification_rules.py",
     "financial_data_standardization.py(AST)",
     "financial_metrics_mapping.md",
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "mops_official": [
     "流動負債合計"
@@ -4431,7 +4439,8 @@
     "must_be_positive",
     "currency_format"
    ],
-   "vrn_uid": "VRN_FIN_0021"
+   "vrn_uid": "VRN_FIN_0021",
+   "operator_filled": true
   },
   "operating_cf": {
    "zh": "營業活動現金流",
@@ -4456,7 +4465,7 @@
    "patterns": [
     "(營業活動現金流|Operating\\s+Cash\\s+Flow|CFO|OCF|operatingCashflow|營運現金流|營業現金流量)"
    ],
-   "statement": "",
+   "statement": "CASH_FLOW",
    "category": "",
    "unit": "mn TWD",
    "validation_level": "",
@@ -4465,7 +4474,8 @@
     "financial_classification_rules.py",
     "financial_data_standardization.py(AST)",
     "financial_metrics_mapping.md",
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "mops_official": [
     "營業活動之淨現金流入（出）"
@@ -4478,7 +4488,8 @@
    "validation_rules": [
     "currency_format"
    ],
-   "vrn_uid": "VRN_FIN_0030"
+   "vrn_uid": "VRN_FIN_0030",
+   "operator_filled": true
   },
   "investing_cf": {
    "zh": "投資活動現金流",
@@ -4501,7 +4512,7 @@
    "patterns": [
     "(投資活動現金流|Investing\\s+Cash\\s+Flow|CFI|investingCashflow|投資現金流)"
    ],
-   "statement": "",
+   "statement": "CASH_FLOW",
    "category": "",
    "unit": "mn TWD",
    "validation_level": "",
@@ -4510,7 +4521,8 @@
     "financial_classification_rules.py",
     "financial_data_standardization.py(AST)",
     "financial_metrics_mapping.md",
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "mops_official": [
     "投資活動之淨現金流入（出）"
@@ -4523,7 +4535,8 @@
    "validation_rules": [
     "currency_format"
    ],
-   "vrn_uid": "VRN_FIN_0031"
+   "vrn_uid": "VRN_FIN_0031",
+   "operator_filled": true
   },
   "financing_cf": {
    "zh": "籌資活動現金流",
@@ -4549,7 +4562,7 @@
    "patterns": [
     "(籌資活動現金流|Financing\\s+Cash\\s+Flow|CFF|financingCashflow|融資現金流|理財活動現金流)"
    ],
-   "statement": "",
+   "statement": "CASH_FLOW",
    "category": "",
    "unit": "mn TWD",
    "validation_level": "",
@@ -4558,7 +4571,8 @@
     "financial_classification_rules.py",
     "financial_data_standardization.py(AST)",
     "financial_metrics_mapping.md",
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "mops_official": [
     "籌資活動之淨現金流入（出）"
@@ -4571,11 +4585,12 @@
    "validation_rules": [
     "currency_format"
    ],
-   "vrn_uid": "VRN_FIN_0032"
+   "vrn_uid": "VRN_FIN_0032",
+   "operator_filled": true
   },
   "operating_cost": {
    "zh": "銷貨成本",
-   "en": "COGS",
+   "en": "Cost of Goods Sold (COGS)",
    "synonyms_zh": [
     "銷貨成本",
     "營業成本"
@@ -4584,15 +4599,15 @@
     "COGS"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "INCOME_STATEMENT",
    "category": "",
    "unit": "",
    "validation_level": "",
    "sources": [
-    "VRN_Method_SSOT_v0100.json"
+    "VRN_Method_SSOT_v0100.json",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "basic_eps": {
    "zh": "基本每股盈餘",
@@ -4662,14 +4677,15 @@
    "patterns": [
     "(營業費用|Operating\\s+Expenses|OpEx|SG&A|營業費用合計|operatingExpenses|totalOperatingExpenses|營運費用|管銷費用)"
    ],
-   "statement": "",
+   "statement": "INCOME_STATEMENT",
    "category": "",
    "unit": "",
    "validation_level": "",
    "sources": [
     "financial_classification_rules.py",
     "financial_data_standardization.py(AST)",
-    "financial_metrics_mapping.md"
+    "financial_metrics_mapping.md",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "field_map": {
     "twse_tpex": "營業費用",
@@ -4679,11 +4695,12 @@
    "validation_rules": [
     "must_be_positive",
     "currency_format"
-   ]
+   ],
+   "operator_filled": true
   },
   "dps": {
    "zh": "每股現金股利",
-   "en": "DPS",
+   "en": "DPS (Dividend Per Share)",
    "synonyms_zh": [
     "每股現金股利",
     "股息",
@@ -4703,14 +4720,15 @@
    "patterns": [
     "(每股現金股利|DPS|Dividend\\s+per\\s+share|股息|現金股利|dividendRate|每股派息|CashDividendPerShare)"
    ],
-   "statement": "",
+   "statement": "PER_SHARE",
    "category": "",
    "unit": "TWD",
    "validation_level": "",
    "sources": [
     "financial_classification_rules.py",
     "VIS_VRN_FinancialSSOT_v0608.py",
-    "VRN_Financial_Synonyms_SSOT.py"
+    "VRN_Financial_Synonyms_SSOT.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "field_map": {
     "twse_tpex": "每股現金股利",
@@ -4718,8 +4736,7 @@
     "yfinance": "dividendRate"
    },
    "vrn_uid": "VRN_FIN_0058",
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "ppe": {
    "zh": "不動產廠房設備",
@@ -4745,21 +4762,23 @@
    "patterns": [
     "(不動產廠房設備|PPE|Property\\s+Plant\\s+Equipment|固定資產|propertyPlantEquipment|廠房設備)"
    ],
-   "statement": "",
+   "statement": "BALANCE_SHEET",
    "category": "",
    "unit": "mn TWD",
    "validation_level": "",
    "sources": [
     "financial_classification_rules.py",
     "financial_metrics_mapping.md",
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "field_map": {
     "twse_tpex": "不動產、廠房及設備",
     "twstock": "ppe",
     "yfinance": "propertyPlantEquipment"
    },
-   "vrn_uid": "VRN_FIN_0015"
+   "vrn_uid": "VRN_FIN_0015",
+   "operator_filled": true
   },
   "total_debt": {
    "zh": "總負債",
@@ -4780,15 +4799,15 @@
    "unit": "",
    "validation_level": "",
    "sources": [
-    "financial_classification_rules.py"
+    "financial_classification_rules.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "field_map": {
     "twse_tpex": "借款",
     "twstock": "total_debt",
     "yfinance": "totalDebt"
    },
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "short_term_debt": {
    "zh": "短期借款",
@@ -4808,21 +4827,23 @@
    "patterns": [
     "(短期借款|Short\\s+Term\\s+Debt|shortTermDebt|短期負債)"
    ],
-   "statement": "",
+   "statement": "BALANCE_SHEET",
    "category": "",
    "unit": "mn TWD",
    "validation_level": "",
    "sources": [
     "financial_classification_rules.py",
     "financial_metrics_mapping.md",
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "field_map": {
     "twse_tpex": "短期借款",
     "twstock": "short_term_debt",
     "yfinance": "shortTermDebt"
    },
-   "vrn_uid": "VRN_FIN_0020"
+   "vrn_uid": "VRN_FIN_0020",
+   "operator_filled": true
   },
   "long_term_debt": {
    "zh": "長期借款",
@@ -4840,23 +4861,25 @@
    "patterns": [
     "(長期借款|Long\\s+Term\\s+Debt|longTermDebt|長期負債)"
    ],
-   "statement": "",
+   "statement": "BALANCE_SHEET",
    "category": "",
    "unit": "",
    "validation_level": "",
    "sources": [
     "financial_classification_rules.py",
-    "financial_metrics_mapping.md"
+    "financial_metrics_mapping.md",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "field_map": {
     "twse_tpex": "長期借款",
     "twstock": "long_term_debt",
     "yfinance": "longTermDebt"
-   }
+   },
+   "operator_filled": true
   },
   "bvps": {
    "zh": "每股淨值",
-   "en": "BVPS",
+   "en": "BVPS (Book Value Per Share)",
    "synonyms_zh": [
     "每股淨值",
     "每股帳面價值",
@@ -4872,13 +4895,14 @@
    "patterns": [
     "(每股淨值|BVPS|Book\\s+Value\\s+Per\\s+Share|每股帳面價值|bookValuePerShare|NAV\\s+per\\s+share|股東權益每股淨值)"
    ],
-   "statement": "",
+   "statement": "PER_SHARE",
    "category": "",
    "unit": "TWD",
    "validation_level": "",
    "sources": [
     "financial_classification_rules.py",
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "field_map": {
     "twse_tpex": "每股淨值",
@@ -4886,8 +4910,7 @@
     "yfinance": "bookValue"
    },
    "vrn_uid": "VRN_FIN_0056",
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "shares_outstanding": {
    "zh": "普通股流通股數",
@@ -4952,7 +4975,7 @@
   },
   "fcf": {
    "zh": "自由現金流",
-   "en": "FCF",
+   "en": "Free Cash Flow (FCF)",
    "synonyms_zh": [
     "自由現金流",
     "自由現金流量"
@@ -4966,14 +4989,15 @@
    "patterns": [
     "(自由現金流|FCF|Free\\s+Cash\\s+Flow|freeCashflow|自由現金流量)"
    ],
-   "statement": "",
+   "statement": "CASH_FLOW",
    "category": "",
    "unit": "",
    "validation_level": "",
    "sources": [
     "financial_classification_rules.py",
     "financial_data_standardization.py(AST)",
-    "VRN_Financial_Synonyms_SSOT.py"
+    "VRN_Financial_Synonyms_SSOT.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "field_map": {
     "twstock": "fcf",
@@ -4983,8 +5007,7 @@
     "currency_format",
     "calculated_from_operating_minus_capex"
    ],
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "net_margin": {
    "zh": "淨利率",
@@ -5003,25 +5026,27 @@
    "patterns": [
     "(淨利率|Net\\s+Margin|Net\\s+Profit\\s+Margin|NPM|profitMargin|純益率|稅後淨利率)"
    ],
-   "statement": "",
+   "statement": "RATIO",
    "category": "",
    "unit": "%",
    "validation_level": "",
    "sources": [
     "financial_classification_rules.py",
     "financial_metrics_mapping.md",
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "field_map": {
     "twse_tpex": "淨利率",
     "twstock": "net_margin",
     "yfinance": "profitMargins"
    },
-   "vrn_uid": "VRN_FIN_0045"
+   "vrn_uid": "VRN_FIN_0045",
+   "operator_filled": true
   },
   "yoy": {
    "zh": "年增率",
-   "en": "YoY",
+   "en": "Year over Year (YoY)",
    "synonyms_zh": [
     "年增率",
     "同比增長",
@@ -5039,18 +5064,18 @@
    "unit": "",
    "validation_level": "",
    "sources": [
-    "financial_classification_rules.py"
+    "financial_classification_rules.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "field_map": {
     "twse_tpex": "年增率",
     "twstock": "yoy"
    },
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "qoq": {
    "zh": "季增率",
-   "en": "QoQ",
+   "en": "Quarter over Quarter (QoQ)",
    "synonyms_zh": [
     "季增率",
     "環比增長"
@@ -5067,18 +5092,18 @@
    "unit": "",
    "validation_level": "",
    "sources": [
-    "financial_classification_rules.py"
+    "financial_classification_rules.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "field_map": {
     "twse_tpex": "季增率",
     "twstock": "qoq"
    },
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "ps": {
    "zh": "股價營收比",
-   "en": "P/S",
+   "en": "Price to Sales (P/S)",
    "synonyms_zh": [
     "股價營收比",
     "市銷率"
@@ -5091,20 +5116,20 @@
    "patterns": [
     "(股價營收比|P/S|PS\\s+Ratio|PSR|市銷率|priceToSales)"
    ],
-   "statement": "",
+   "statement": "PER_SHARE",
    "category": "",
    "unit": "",
    "validation_level": "",
    "sources": [
-    "financial_classification_rules.py"
+    "financial_classification_rules.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "field_map": {
     "twse_tpex": "股價營收比",
     "twstock": "ps_ratio",
     "yfinance": "priceToSales"
    },
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "debt_to_equity": {
    "zh": "負債權益比",
@@ -5122,19 +5147,21 @@
    "patterns": [
     "(負債權益比|Debt\\s+to\\s+Equity|D/E\\s+Ratio|debtToEquity|負債對權益比率|槓桿比率)"
    ],
-   "statement": "",
+   "statement": "RATIO",
    "category": "",
    "unit": "",
    "validation_level": "",
    "sources": [
     "financial_classification_rules.py",
-    "financial_metrics_mapping.md"
+    "financial_metrics_mapping.md",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "field_map": {
     "twse_tpex": "負債權益比",
     "twstock": "debt_to_equity",
     "yfinance": "debtToEquity"
-   }
+   },
+   "operator_filled": true
   },
   "tax_expense": {
    "zh": "所得稅費用",
@@ -5150,18 +5177,20 @@
     "Tax Expense"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "INCOME_STATEMENT",
    "category": "",
    "unit": "",
    "validation_level": "",
    "sources": [
-    "financial_metrics_mapping.md"
+    "financial_metrics_mapping.md",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "field_map": {
     "twse_tpex": "所得稅費用（利益）",
     "twstock": "tax_expense",
     "yfinance": "incomeTaxExpense"
-   }
+   },
+   "operator_filled": true
   },
   "share_capital": {
    "zh": "股本",
@@ -5177,18 +5206,20 @@
     "Share Capital"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "BALANCE_SHEET",
    "category": "",
    "unit": "",
    "validation_level": "",
    "sources": [
-    "financial_metrics_mapping.md"
+    "financial_metrics_mapping.md",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "field_map": {
     "twse_tpex": "股本",
     "twstock": "share_capital",
     "yfinance": "commonStock"
-   }
+   },
+   "operator_filled": true
   },
   "shareholders_equity": {
    "zh": "股東權益",
@@ -5205,18 +5236,20 @@
     "Book Value"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "BALANCE_SHEET",
    "category": "",
    "unit": "",
    "validation_level": "",
    "sources": [
-    "financial_metrics_mapping.md"
+    "financial_metrics_mapping.md",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "field_map": {
     "twse_tpex": "權益總計",
     "twstock": "shareholders_equity",
     "yfinance": "totalEquity"
-   }
+   },
+   "operator_filled": true
   },
   "free_cashflow": {
    "zh": "自由現金流",
@@ -5230,17 +5263,19 @@
     "FCF"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "CASH_FLOW",
    "category": "",
    "unit": "",
    "validation_level": "",
    "sources": [
-    "financial_metrics_mapping.md"
+    "financial_metrics_mapping.md",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "field_map": {
     "twstock": "free_cashflow",
     "yfinance": "freeCashflow"
-   }
+   },
+   "operator_filled": true
   },
   "cashflow_per_share": {
    "zh": "每股現金流",
@@ -5254,16 +5289,18 @@
     "CFPS"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "PER_SHARE",
    "category": "",
    "unit": "",
    "validation_level": "",
    "sources": [
-    "financial_metrics_mapping.md"
+    "financial_metrics_mapping.md",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "field_map": {
     "twstock": "cashflow_per_share"
-   }
+   },
+   "operator_filled": true
   },
   "sales_per_share": {
    "zh": "每股營收",
@@ -5277,16 +5314,18 @@
     "Revenue Per Share"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "PER_SHARE",
    "category": "",
    "unit": "",
    "validation_level": "",
    "sources": [
-    "financial_metrics_mapping.md"
+    "financial_metrics_mapping.md",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "field_map": {
     "twstock": "sales_per_share"
-   }
+   },
+   "operator_filled": true
   },
   "diluted_shares": {
    "zh": "完全稀釋後股數",
@@ -5302,18 +5341,20 @@
     "Total diluted shares"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "PER_SHARE",
    "category": "",
    "unit": "",
    "validation_level": "",
    "sources": [
-    "financial_metrics_mapping.md"
+    "financial_metrics_mapping.md",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "field_map": {
     "twse_tpex": "稀釋後股數",
     "twstock": "diluted_shares",
     "yfinance": "dilutedAverageShares"
-   }
+   },
+   "operator_filled": true
   },
   "period": {
    "zh": "年份/期間",
@@ -5358,20 +5399,20 @@
     "selling general administrative"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "INCOME_STATEMENT",
    "category": "",
    "unit": "mn TWD",
    "validation_level": "",
    "sources": [
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0004",
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "depreciation_and_amortization": {
    "zh": "折舊及攤銷",
-   "en": "Depreciation And Amortization",
+   "en": "Depreciation and Amortization",
    "synonyms_zh": [
     "折舊及攤銷"
    ],
@@ -5381,16 +5422,16 @@
     "depreciation and amortization"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "CASH_FLOW",
    "category": "",
    "unit": "mn TWD",
    "validation_level": "",
    "sources": [
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0009",
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "long_term_investments": {
    "zh": "長期投資",
@@ -5405,20 +5446,20 @@
     "long-term investments"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "BALANCE_SHEET",
    "category": "",
    "unit": "mn TWD",
    "validation_level": "",
    "sources": [
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0016",
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "other_non_current_assets": {
    "zh": "其他非流動資產",
-   "en": "Other Non Current Assets",
+   "en": "Other Non-current Assets",
    "synonyms_zh": [
     "其他非流動資產",
     "其它非流動資產"
@@ -5428,16 +5469,16 @@
     "other non current assets"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "BALANCE_SHEET",
    "category": "",
    "unit": "mn TWD",
    "validation_level": "",
    "sources": [
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0017",
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "non_current_liabilities": {
    "zh": "非流動負債",
@@ -5452,16 +5493,16 @@
     "non current liabilities"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "BALANCE_SHEET",
    "category": "",
    "unit": "mn TWD",
    "validation_level": "",
    "sources": [
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0023",
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "parent_equity": {
    "zh": "母公司業主權益",
@@ -5476,20 +5517,20 @@
     "equity attributable to owners of parent"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "BALANCE_SHEET",
    "category": "",
    "unit": "mn TWD",
    "validation_level": "",
    "sources": [
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0027",
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "total_liabilities_and_equity": {
    "zh": "負債及權益總計",
-   "en": "Total Liabilities And Equity",
+   "en": "Total Liabilities and Equity",
    "synonyms_zh": [
     "負債及權益總計",
     "負債和權益總計"
@@ -5499,16 +5540,16 @@
     "total liabilities and equity"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "BALANCE_SHEET",
    "category": "",
    "unit": "mn TWD",
    "validation_level": "",
    "sources": [
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0029",
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "capital_expenditure": {
    "zh": "資本支出",
@@ -5523,16 +5564,16 @@
     "capital expenditure"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "CASH_FLOW",
    "category": "",
    "unit": "mn TWD",
    "validation_level": "",
    "sources": [
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0033",
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "working_capital_change": {
    "zh": "營運資金變動",
@@ -5546,16 +5587,16 @@
     "change in working capital"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "CASH_FLOW",
    "category": "",
    "unit": "mn TWD",
    "validation_level": "",
    "sources": [
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0038",
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "long_term_investment_change": {
    "zh": "長期投資變動",
@@ -5569,16 +5610,16 @@
     "change in long term investment"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "CASH_FLOW",
    "category": "",
    "unit": "mn TWD",
    "validation_level": "",
    "sources": [
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0039",
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "debt_change": {
    "zh": "長借公司債變動",
@@ -5592,16 +5633,16 @@
     "debt change"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "CASH_FLOW",
    "category": "",
    "unit": "mn TWD",
    "validation_level": "",
    "sources": [
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0040",
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "cash_dividend_paid": {
    "zh": "發放現金股利",
@@ -5615,16 +5656,16 @@
     "cash dividend paid"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "CASH_FLOW",
    "category": "",
    "unit": "mn TWD",
    "validation_level": "",
    "sources": [
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0041",
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "cash_capital_increase": {
    "zh": "現金增資",
@@ -5637,20 +5678,20 @@
     "cash capital increase"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "EQUITY_CHANGE",
    "category": "",
    "unit": "mn TWD",
    "validation_level": "",
    "sources": [
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0042",
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "cfps": {
    "zh": "每股現金流",
-   "en": "CFPS",
+   "en": "CFPS (Cash Flow Per Share)",
    "synonyms_zh": [
     "每股現金流"
    ],
@@ -5660,20 +5701,20 @@
     "cash flow per share"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "PER_SHARE",
    "category": "",
    "unit": "TWD",
    "validation_level": "",
    "sources": [
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0057",
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "sales_yoy": {
    "zh": "營收年增率",
-   "en": "Sales YoY",
+   "en": "Sales Year over Year",
    "synonyms_zh": [
     "營收年增率"
    ],
@@ -5688,11 +5729,11 @@
    "unit": "%",
    "validation_level": "",
    "sources": [
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0059",
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "eps_yoy": {
    "zh": "eps年增率",
@@ -5705,20 +5746,20 @@
     "eps yoy"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "PER_SHARE",
    "category": "",
    "unit": "%",
    "validation_level": "",
    "sources": [
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0060",
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "sales_qoq": {
    "zh": "營收季增率",
-   "en": "Sales QoQ",
+   "en": "Sales Quarter over Quarter",
    "synonyms_zh": [
     "營收季增率"
    ],
@@ -5733,11 +5774,11 @@
    "unit": "%",
    "validation_level": "",
    "sources": [
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0061",
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "eps_qoq": {
    "zh": "eps季增率",
@@ -5750,20 +5791,20 @@
     "eps qoq"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "PER_SHARE",
    "category": "",
    "unit": "%",
    "validation_level": "",
    "sources": [
-    "VIS_VRN_FinancialSSOT_v0608.py"
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
    "vrn_uid": "VRN_FIN_0062",
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "op_profit": {
    "zh": "營業利益",
-   "en": "operating profit",
+   "en": "Operating Profit",
    "synonyms_zh": [
     "營業利益",
     "營業獲利"
@@ -5773,36 +5814,37 @@
     "operating income"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "INCOME_STATEMENT",
    "category": "",
    "unit": "",
    "validation_level": "",
    "sources": [
-    "VRN_Financial_Synonyms_SSOT.py"
+    "VRN_Financial_Synonyms_SSOT.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   },
   "ebit": {
    "zh": "",
-   "en": "ebit",
+   "en": "EBIT",
    "synonyms_zh": [],
    "synonyms_en": [
     "ebit"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "INCOME_STATEMENT",
    "category": "",
    "unit": "",
    "validation_level": "",
    "sources": [
-    "VRN_Financial_Synonyms_SSOT.py"
+    "VRN_Financial_Synonyms_SSOT.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
-   "en_backfilled": true
+   "operator_filled": true
   },
   "ocf": {
    "zh": "營業現金流",
-   "en": "operating cash flow",
+   "en": "Operating Cash Flow (OCF)",
    "synonyms_zh": [
     "營業現金流"
    ],
@@ -5810,15 +5852,15 @@
     "operating cash flow"
    ],
    "patterns": [],
-   "statement": "",
+   "statement": "CASH_FLOW",
    "category": "",
    "unit": "",
    "validation_level": "",
    "sources": [
-    "VRN_Financial_Synonyms_SSOT.py"
+    "VRN_Financial_Synonyms_SSOT.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
    ],
-   "zh_backfilled": true,
-   "en_backfilled": true
+   "operator_filled": true
   }
  }
 }
