@@ -173,6 +173,7 @@ def battery(fast: bool):
     add("年度擷取器十檢", newest("vrn_fin_extract_v0*.py", VRN), ["--selftest"], "rc0", 180)
     add("統包網路工具十檢", newest("via_net_unified_v0*.py", HERE.parent / "network"), ["--selftest"], "rc0", 120)
     add("VAP 圖規鎖八檢", newest("vap_spec_guard_v0*.py", VIA / "functional modules/VAP"), ["--selftest"], "rc0", 120)
+    add("統一U/I套件六檢", newest("via_ui_kit_v0*.py", HERE), ["--selftest"], "rc0", 120)
     add("族群流模擬30測試", VIA / "functional modules/GroupIndex/flow_simulation_v0400/run_tests.py", [], "rc0", 300, heavy=True)
     add("VRN 方法核十二檢", newest("vrn_method_kernel_v0*.py", VRN), ["--selftest"], "rc0", 120)
     add("財務字庫十四檢", newest("vrn_finlex_v0*.py", VRN), ["--selftest"], "rc0", 180)
