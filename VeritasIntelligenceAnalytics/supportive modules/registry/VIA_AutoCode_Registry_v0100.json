@@ -3373,6 +3373,20 @@
    "kind": "落地",
    "note": "讓位三件(零動作,hash 入帳):①MDL242 row_level_join_repair(b86e30abf72473c4)=SUP_MDL541 byte 全同②MDL257 name_short_financial_validation(a3e029e9c3a1cdd3)=SUP_MDL545 byte 全同③InvestmentRegexPattern_VALIDATED(965c033ed23eca5a)=倉內現行版 CRLF 正規化+去橋後 sha 全等(9961edcac8453977)=橋前原文,判準體系新例:行尾正規化疊去橋比對。收容一件:VETF_VIS_VRN_FinancialSSOT_v0608.py(582f2a6fab8fd808,83 行)→70_VRN_Rules/——倉內原只有其 freeze.lock(記 6f57063354…84 行)無本體;上傳本體與 VIS_VRN_FinancialSSOT_v0608.py 現行內容 byte 全同=QA-20260819N 凍結異常補證(現行 582f2a 版有雙檔名實體,鎖記 6f5706 版上游已不存;freeze.lock 零觸碰,仍候操作員三選 a 認可重立鎖/b 老根尋回/c 觀察)。",
    "ts": "2026-08-19 07:58"
+  },
+  {
+   "code": "TOOL-070F",
+   "name": "digest v0104:報告類型雙閘+TP 黃旗(批62,工作站 64 份真跑證據定讞)",
+   "kind": "工具",
+   "note": "①類型閘:non_stock_keywords(晨會/晨間/盤勢/早報/日股/港股/美股/期貨/產業/趨勢/展望/解盤/講座/Insights/Thoughts on,中央參數冊)命中檔名=SKIP:非個股報告(類型)。②官方冊閘:冊≥1000(工作站 3967 檔生效,容器種子 3 檔不誤觸)且代碼不在冊=SKIP:非個股報告(不在官方冊)——2730/3110 類雜訊代碼債(GS-AI PCB/MS-Thermal/Daiwa-PCB 等)官方 SSOT 定生死。③TP 黃旗:|上漲%|>80=tp_suspect 誠實標記值不改(6533 TP=3.0→-98.79% 誤抽即時可見)。十六檢 16/16(⑮雙閘/⑯黃旗)。",
+   "ts": "2026-08-19 08:06"
+  },
+  {
+   "code": "TOOL-078B",
+   "name": "finaudit v0101:先 MAPPING 再驗算(批63 令)",
+   "kind": "工具",
+   "note": "「漲跌幅是透過 VDF 每天抓新數據 不必驗 要驗要抓 先 MAPPING DATA 再驗算」:矩陣列先按 Ticker 映射最新 digest_vdf_rows.csv(工作站每日 --vdf 刷新),ADJ 取 VDF 新鮮值(ADJ源=VDF 綠標;映射不到=矩陣舊值誠實標);驗算對象=映射後數據,上漲%以新鮮 ADJ 重算(upside_fresh),舊載 upside 依令不再對照驗證(同源循環)僅並列顯示。schema VIA.FinAudit.v2(+vdf_source/vdf_mapped/adj_src)。十檢 10/10(⑧映射覆蓋 500→PE40·upside-50/⑩批跑映射 400→-37.5%)。批63 讓位一件:InvestmentRegexPattern 再上傳(965c033e)=既判橋前原文,零動作。",
+   "ts": "2026-08-19 08:06"
   }
  ]
 }
