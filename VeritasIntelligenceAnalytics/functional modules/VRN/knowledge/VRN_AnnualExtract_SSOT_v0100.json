@@ -1,0 +1,1086 @@
+{
+ "schema": "VIA.AnnualExtract.v1",
+ "source": "批69 操作員核定貼文 2026-08-19(四板塊年度分析擷取表格+跨平台同義字+年度 REGEX+公式)",
+ "note": "MOPS 認明「合計」;應收/存貨取「淨額」;權益與 ROE/BVPS 以「歸屬於母公司業主之權益」為準;稀釋 EPS 為主;連續 3-5 年",
+ "year_regex": {
+  "gregorian": "\\b(?:19|20)\\d{2}\\b",
+  "zh_suffix": "\\d{3,4}(?=年度?|年)",
+  "roc": "\\b\\d{3}\\b",
+  "fiscal": "(?i)FY\\s?\\d{2,4}",
+  "abbr": "'\\d{2}\\b",
+  "quarter_zh": "(\\d{3,4})年第?([1-4一二三四])季",
+  "quarter_us": "\\b(\\d{4})[-\\s]?Q([1-4])\\b",
+  "ended": "(?i)(?:ended)\\s+.{0,20}?(\\d{4})"
+ },
+ "blocks": {
+  "IS": "損益表",
+  "BS": "資產負債表",
+  "CF": "現金流量表",
+  "RATIO": "比率分析",
+  "PERSHARE": "每股分析",
+  "VALUATION": "評價分析"
+ },
+ "items": [
+  {
+   "key": "revenue",
+   "block": "IS",
+   "fin": "revenue",
+   "zh": [
+    "營業收入合計",
+    "收入總計",
+    "營業收入",
+    "營收",
+    "營業額",
+    "銷售額"
+   ],
+   "en": [
+    "Total Revenue",
+    "Operating Revenue",
+    "Net Sales",
+    "Revenue",
+    "Sales",
+    "Turnover"
+   ]
+  },
+  {
+   "key": "cogs",
+   "block": "IS",
+   "fin": "cogs",
+   "zh": [
+    "營業成本合計",
+    "銷貨成本",
+    "營業成本"
+   ],
+   "en": [
+    "Cost of Revenue",
+    "Cost of Goods Sold",
+    "COGS",
+    "Cost of Sales"
+   ]
+  },
+  {
+   "key": "gross_profit",
+   "block": "IS",
+   "fin": "gross_profit",
+   "zh": [
+    "營業毛利(利益)",
+    "營業毛利",
+    "銷貨毛利"
+   ],
+   "en": [
+    "Gross Profit",
+    "Gross Earnings"
+   ]
+  },
+  {
+   "key": "opex",
+   "block": "IS",
+   "fin": "opex",
+   "zh": [
+    "營業費用合計",
+    "營業費用"
+   ],
+   "en": [
+    "Total Operating Expenses",
+    "Operating Expenses",
+    "SG&A",
+    "OPEX"
+   ]
+  },
+  {
+   "key": "operating_income",
+   "block": "IS",
+   "fin": "operating_income",
+   "zh": [
+    "營業利益(損失)",
+    "營業利益"
+   ],
+   "en": [
+    "Operating Income",
+    "Operating Profit",
+    "Earnings From Operations",
+    "EBIT"
+   ]
+  },
+  {
+   "key": "nonop",
+   "block": "IS",
+   "zh": [
+    "營業外收入及支出合計",
+    "業外損益",
+    "營業外收支"
+   ],
+   "en": [
+    "Total Non Operating Income/Expense",
+    "Other Income",
+    "Non-operating Items"
+   ]
+  },
+  {
+   "key": "pretax_income",
+   "block": "IS",
+   "zh": [
+    "繼續營業單位稅前淨利(損失)",
+    "稅前淨利",
+    "本期稅前淨利"
+   ],
+   "en": [
+    "Pretax Income",
+    "Income Before Taxes",
+    "EBT"
+   ]
+  },
+  {
+   "key": "tax",
+   "block": "IS",
+   "zh": [
+    "所得稅費用(利益)",
+    "所得稅費用"
+   ],
+   "en": [
+    "Tax Provision",
+    "Income Tax Expense",
+    "Income Taxes"
+   ]
+  },
+  {
+   "key": "net_income",
+   "block": "IS",
+   "fin": "net_income",
+   "zh": [
+    "母公司業主淨利",
+    "本期淨利(損失)",
+    "本期淨利",
+    "稅後淨利",
+    "淨利",
+    "純益"
+   ],
+   "en": [
+    "Net Income Common Stockholders",
+    "Net Income",
+    "Net Profit",
+    "Net Earnings",
+    "Bottom-line"
+   ]
+  },
+  {
+   "key": "cash",
+   "block": "BS",
+   "zh": [
+    "現金及約當現金"
+   ],
+   "en": [
+    "Cash And Cash Equivalents",
+    "Cash"
+   ]
+  },
+  {
+   "key": "st_investments",
+   "block": "BS",
+   "zh": [
+    "透過損益按公允價值衡量之金融資產-流動",
+    "短期投資"
+   ],
+   "en": [
+    "Short Term Investments",
+    "Marketable Securities",
+    "Available For Sale Securities"
+   ]
+  },
+  {
+   "key": "receivables",
+   "block": "BS",
+   "zh": [
+    "應收帳款淨額",
+    "應收帳款"
+   ],
+   "en": [
+    "Accounts Receivable",
+    "Receivables",
+    "Trade Receivables"
+   ]
+  },
+  {
+   "key": "inventory",
+   "block": "BS",
+   "zh": [
+    "存貨淨額",
+    "存貨"
+   ],
+   "en": [
+    "Inventory",
+    "Inventories",
+    "Stock"
+   ]
+  },
+  {
+   "key": "prepaid",
+   "block": "BS",
+   "zh": [
+    "預付款項"
+   ],
+   "en": [
+    "Prepaid Expenses",
+    "Prepayment",
+    "Deferred Charges"
+   ]
+  },
+  {
+   "key": "current_assets",
+   "block": "BS",
+   "fin": "current_assets",
+   "zh": [
+    "流動資產合計",
+    "流動資產"
+   ],
+   "en": [
+    "Total Current Assets",
+    "Current Assets"
+   ]
+  },
+  {
+   "key": "lt_investments",
+   "block": "BS",
+   "zh": [
+    "採用權益法之投資",
+    "透過其他綜合損益按公允價值衡量之金融資產-非流動",
+    "長期投資"
+   ],
+   "en": [
+    "Long Term Investments",
+    "Equity Method Investments",
+    "Investment in Affiliates"
+   ]
+  },
+  {
+   "key": "ppe",
+   "block": "BS",
+   "zh": [
+    "不動產、廠房及設備",
+    "固定資產"
+   ],
+   "en": [
+    "Property Plant And Equipment",
+    "PP&E",
+    "Fixed Assets"
+   ]
+  },
+  {
+   "key": "rou",
+   "block": "BS",
+   "zh": [
+    "使用權資產"
+   ],
+   "en": [
+    "Right-of-Use Assets",
+    "Leased Assets"
+   ]
+  },
+  {
+   "key": "inv_property",
+   "block": "BS",
+   "zh": [
+    "投資性不動產"
+   ],
+   "en": [
+    "Investment Property",
+    "Real Estate Investments"
+   ]
+  },
+  {
+   "key": "intangibles",
+   "block": "BS",
+   "zh": [
+    "無形資產"
+   ],
+   "en": [
+    "Intangible Assets",
+    "Intangibles"
+   ]
+  },
+  {
+   "key": "goodwill",
+   "block": "BS",
+   "zh": [
+    "商譽"
+   ],
+   "en": [
+    "Goodwill"
+   ]
+  },
+  {
+   "key": "dta",
+   "block": "BS",
+   "zh": [
+    "遞延所得稅資產"
+   ],
+   "en": [
+    "Deferred Tax Assets",
+    "DTA"
+   ]
+  },
+  {
+   "key": "noncurrent_assets",
+   "block": "BS",
+   "zh": [
+    "非流動資產合計",
+    "非流動資產"
+   ],
+   "en": [
+    "Total Non-Current Assets",
+    "Long-term Assets"
+   ]
+  },
+  {
+   "key": "assets",
+   "block": "BS",
+   "fin": "assets",
+   "zh": [
+    "資產總額",
+    "資產總計"
+   ],
+   "en": [
+    "Total Assets"
+   ]
+  },
+  {
+   "key": "st_debt",
+   "block": "BS",
+   "zh": [
+    "短期借款",
+    "短期銀行借款"
+   ],
+   "en": [
+    "Short Term Debt",
+    "Current Debt",
+    "Notes Payable - Short Term"
+   ]
+  },
+  {
+   "key": "cpltd",
+   "block": "BS",
+   "zh": [
+    "一年內到期長期負債"
+   ],
+   "en": [
+    "Current Portion of Long Term Debt",
+    "Current Maturity of Long-Term Debt"
+   ]
+  },
+  {
+   "key": "accounts_payable",
+   "block": "BS",
+   "zh": [
+    "應付帳款"
+   ],
+   "en": [
+    "Accounts Payable",
+    "Trade Payables"
+   ]
+  },
+  {
+   "key": "other_payables",
+   "block": "BS",
+   "zh": [
+    "其他應付款",
+    "應付費用"
+   ],
+   "en": [
+    "Other Payables",
+    "Accrued Expenses",
+    "Accrued Liabilities"
+   ]
+  },
+  {
+   "key": "contract_liab",
+   "block": "BS",
+   "zh": [
+    "合約負債-流動",
+    "預收貨款"
+   ],
+   "en": [
+    "Deferred Revenue",
+    "Unearned Revenue",
+    "Contract Liabilities"
+   ]
+  },
+  {
+   "key": "current_liab",
+   "block": "BS",
+   "fin": "current_liab",
+   "zh": [
+    "流動負債合計",
+    "流動負債"
+   ],
+   "en": [
+    "Total Current Liabilities",
+    "Current Liabilities"
+   ]
+  },
+  {
+   "key": "lt_debt",
+   "block": "BS",
+   "zh": [
+    "長期借款",
+    "非流動銀行借款"
+   ],
+   "en": [
+    "Long Term Debt",
+    "Long-Term Bank Loans"
+   ]
+  },
+  {
+   "key": "bonds",
+   "block": "BS",
+   "zh": [
+    "應付公司債"
+   ],
+   "en": [
+    "Bonds Payable",
+    "Corporate Bonds"
+   ]
+  },
+  {
+   "key": "lease_liab",
+   "block": "BS",
+   "zh": [
+    "租賃負債-非流動"
+   ],
+   "en": [
+    "Long Term Lease Liabilities",
+    "Non-Current Lease Obligations"
+   ]
+  },
+  {
+   "key": "dtl",
+   "block": "BS",
+   "zh": [
+    "遞延所得稅負債"
+   ],
+   "en": [
+    "Deferred Tax Liabilities",
+    "DTL"
+   ]
+  },
+  {
+   "key": "liabilities",
+   "block": "BS",
+   "fin": "liabilities",
+   "zh": [
+    "負債總額",
+    "負債總計"
+   ],
+   "en": [
+    "Total Liabilities"
+   ]
+  },
+  {
+   "key": "capital_stock",
+   "block": "BS",
+   "zh": [
+    "普通股股本",
+    "股本"
+   ],
+   "en": [
+    "Common Stock",
+    "Share Capital",
+    "Capital Stock",
+    "Issued Capital"
+   ]
+  },
+  {
+   "key": "capital_surplus",
+   "block": "BS",
+   "zh": [
+    "資本公積"
+   ],
+   "en": [
+    "Capital Surplus",
+    "Additional Paid-in Capital",
+    "APIC",
+    "Share Premium"
+   ]
+  },
+  {
+   "key": "legal_reserve",
+   "block": "BS",
+   "zh": [
+    "法定盈餘公積"
+   ],
+   "en": [
+    "Legal Reserve",
+    "Statutory Reserve"
+   ]
+  },
+  {
+   "key": "retained_earnings",
+   "block": "BS",
+   "zh": [
+    "未分配盈餘",
+    "保留盈餘合計",
+    "保留盈餘"
+   ],
+   "en": [
+    "Retained Earnings",
+    "Accumulated Deficit",
+    "Retained Profits"
+   ]
+  },
+  {
+   "key": "treasury",
+   "block": "BS",
+   "zh": [
+    "庫藏股票"
+   ],
+   "en": [
+    "Treasury Stock",
+    "Treasury Shares"
+   ]
+  },
+  {
+   "key": "parent_equity",
+   "block": "BS",
+   "fin": "equity",
+   "zh": [
+    "歸屬於母公司業主之權益總計",
+    "歸屬於母公司業主之權益"
+   ],
+   "en": [
+    "Total Stockholders' Equity",
+    "Stockholders' Equity",
+    "Parent Company Shareholders' Equity"
+   ]
+  },
+  {
+   "key": "nci",
+   "block": "BS",
+   "zh": [
+    "非控制權益",
+    "少數股東權益"
+   ],
+   "en": [
+    "Non-Controlling Interest",
+    "Minority Interest"
+   ]
+  },
+  {
+   "key": "equity_total",
+   "block": "BS",
+   "zh": [
+    "權益總額",
+    "權益總計"
+   ],
+   "en": [
+    "Total Equity",
+    "Total Shareholders' Equity",
+    "Net Worth",
+    "Net Assets"
+   ]
+  },
+  {
+   "key": "depreciation",
+   "block": "CF",
+   "zh": [
+    "折舊費用"
+   ],
+   "en": [
+    "Depreciation & Amortization",
+    "Depreciation"
+   ]
+  },
+  {
+   "key": "amortization",
+   "block": "CF",
+   "zh": [
+    "攤銷費用"
+   ],
+   "en": [
+    "Amortization",
+    "Amortization of Intangibles"
+   ]
+  },
+  {
+   "key": "wc_change",
+   "block": "CF",
+   "zh": [
+    "營運資產及負債之淨變動"
+   ],
+   "en": [
+    "Change In Working Capital",
+    "Changes in Operating Assets and Liabilities"
+   ]
+  },
+  {
+   "key": "cfo",
+   "block": "CF",
+   "fin": "cfo",
+   "zh": [
+    "營業活動之淨現金流入(流出)",
+    "營業活動淨現金流入",
+    "營運現金流"
+   ],
+   "en": [
+    "Operating Cash Flow",
+    "Cash Provided by Operating Activities",
+    "CFO"
+   ]
+  },
+  {
+   "key": "capex",
+   "block": "CF",
+   "zh": [
+    "取得不動產、廠房及設備",
+    "資本支出"
+   ],
+   "en": [
+    "Capital Expenditure",
+    "Purchase of Property, Plant and Equipment",
+    "CapEx"
+   ]
+  },
+  {
+   "key": "cfi",
+   "block": "CF",
+   "fin": "cfi",
+   "zh": [
+    "投資活動之淨現金流入(流出)",
+    "投資活動淨現金流入",
+    "投資現金流"
+   ],
+   "en": [
+    "Investing Cash Flow",
+    "Cash Used in Investing Activities",
+    "CFI"
+   ]
+  },
+  {
+   "key": "dividends_paid",
+   "block": "CF",
+   "zh": [
+    "發放現金股利"
+   ],
+   "en": [
+    "Cash Dividends Paid",
+    "Dividends Paid"
+   ]
+  },
+  {
+   "key": "cff",
+   "block": "CF",
+   "fin": "cff",
+   "zh": [
+    "籌資活動之淨現金流入(流出)",
+    "籌資活動淨現金流入",
+    "理財現金流",
+    "融資活動現金流"
+   ],
+   "en": [
+    "Financing Cash Flow",
+    "Cash From Financing Activities",
+    "CFF"
+   ]
+  },
+  {
+   "key": "fcf",
+   "block": "CF",
+   "zh": [
+    "自由現金流量"
+   ],
+   "en": [
+    "Free Cash Flow",
+    "FCF"
+   ]
+  },
+  {
+   "key": "basic_eps",
+   "block": "PERSHARE",
+   "fin": "eps",
+   "zh": [
+    "基本每股盈餘合計",
+    "基本每股盈餘"
+   ],
+   "en": [
+    "Basic EPS",
+    "Net Income per Share - Basic",
+    "EPS - Basic"
+   ]
+  },
+  {
+   "key": "diluted_eps",
+   "block": "PERSHARE",
+   "zh": [
+    "稀釋每股盈餘合計",
+    "稀釋每股盈餘",
+    "攤薄每股收益"
+   ],
+   "en": [
+    "Diluted EPS",
+    "Fully Diluted EPS",
+    "Earnings per Share - Diluted"
+   ]
+  },
+  {
+   "key": "bvps",
+   "block": "PERSHARE",
+   "fin": "bvps",
+   "zh": [
+    "每股參考淨值",
+    "每股淨值"
+   ],
+   "en": [
+    "Book Value Per Share",
+    "BVPS",
+    "Net Asset Value per Share"
+   ]
+  },
+  {
+   "key": "cfps",
+   "block": "PERSHARE",
+   "zh": [
+    "每股營業現金流量"
+   ],
+   "en": [
+    "Operating Cash Flow Per Share",
+    "CFPS",
+    "Cash Flow Per Share"
+   ]
+  },
+  {
+   "key": "dps_cash",
+   "block": "PERSHARE",
+   "zh": [
+    "每股現金股利",
+    "現金股利"
+   ],
+   "en": [
+    "Dividend Per Share",
+    "DPS",
+    "Cash Dividends"
+   ]
+  },
+  {
+   "key": "rev_ps",
+   "block": "PERSHARE",
+   "zh": [
+    "每股營業收入",
+    "每股營收",
+    "每股銷售額"
+   ],
+   "en": [
+    "Revenue Per Share",
+    "Sales Per Share"
+   ]
+  },
+  {
+   "key": "gross_margin",
+   "block": "RATIO",
+   "fin": "gross_margin",
+   "zh": [
+    "營業毛利率",
+    "毛利率"
+   ],
+   "en": [
+    "Gross Margin"
+   ]
+  },
+  {
+   "key": "op_margin",
+   "block": "RATIO",
+   "zh": [
+    "營業利益率"
+   ],
+   "en": [
+    "Operating Margin"
+   ]
+  },
+  {
+   "key": "net_margin",
+   "block": "RATIO",
+   "zh": [
+    "稅後淨利率",
+    "淨利率"
+   ],
+   "en": [
+    "Net Margin",
+    "Net Profit Margin"
+   ]
+  },
+  {
+   "key": "roe",
+   "block": "RATIO",
+   "fin": "roe",
+   "zh": [
+    "股東權益報酬率",
+    "ROE"
+   ],
+   "en": [
+    "Return on Equity",
+    "ROE"
+   ]
+  },
+  {
+   "key": "roa",
+   "block": "RATIO",
+   "zh": [
+    "資產報酬率",
+    "ROA"
+   ],
+   "en": [
+    "Return on Assets",
+    "ROA"
+   ]
+  },
+  {
+   "key": "dso",
+   "block": "RATIO",
+   "zh": [
+    "應收帳款週轉天數",
+    "平均收現天數",
+    "應收帳款周轉天數"
+   ],
+   "en": [
+    "Days Sales Outstanding",
+    "DSO",
+    "Average Collection Period",
+    "Days Receivable"
+   ]
+  },
+  {
+   "key": "dio",
+   "block": "RATIO",
+   "zh": [
+    "存貨週轉天數",
+    "平均銷貨天數",
+    "存貨周轉天數",
+    "存貨變現天數"
+   ],
+   "en": [
+    "Days Inventory Outstanding",
+    "DIO",
+    "Days Sales of Inventory",
+    "DSI"
+   ]
+  },
+  {
+   "key": "dpo",
+   "block": "RATIO",
+   "zh": [
+    "應付帳款付現天數",
+    "應付帳款周轉天數"
+   ],
+   "en": [
+    "Days Payable Outstanding",
+    "DPO",
+    "Average Payment Period"
+   ]
+  },
+  {
+   "key": "ccc",
+   "block": "RATIO",
+   "zh": [
+    "現金循環週期",
+    "現金周轉週期"
+   ],
+   "en": [
+    "Cash Conversion Cycle",
+    "CCC",
+    "Net Operating Cycle"
+   ]
+  },
+  {
+   "key": "inv_turnover",
+   "block": "RATIO",
+   "zh": [
+    "存貨週轉率",
+    "存貨週轉次數",
+    "存貨周轉率"
+   ],
+   "en": [
+    "Inventory Turnover",
+    "Stock Turnover"
+   ]
+  },
+  {
+   "key": "ar_turnover",
+   "block": "RATIO",
+   "zh": [
+    "應收帳款週轉率",
+    "應收帳款及應收票據週轉率",
+    "應收帳款周轉率"
+   ],
+   "en": [
+    "Receivables Turnover",
+    "Accounts Receivable Turnover",
+    "A/R Turnover Ratio"
+   ]
+  },
+  {
+   "key": "asset_turnover",
+   "block": "RATIO",
+   "fin": "asset_turnover",
+   "zh": [
+    "總資產週轉率",
+    "資產週轉率",
+    "總資產周轉率"
+   ],
+   "en": [
+    "Asset Turnover",
+    "Total Asset Turnover Ratio"
+   ]
+  },
+  {
+   "key": "fixed_asset_turnover",
+   "block": "RATIO",
+   "zh": [
+    "固定資產週轉率"
+   ],
+   "en": [
+    "Fixed Asset Turnover",
+    "PP&E Turnover"
+   ]
+  },
+  {
+   "key": "debt_ratio",
+   "block": "RATIO",
+   "zh": [
+    "負債比率"
+   ],
+   "en": [
+    "Debt Ratio"
+   ]
+  },
+  {
+   "key": "current_ratio",
+   "block": "RATIO",
+   "fin": "current_ratio",
+   "zh": [
+    "流動比率"
+   ],
+   "en": [
+    "Current Ratio"
+   ]
+  },
+  {
+   "key": "pe",
+   "block": "VALUATION",
+   "zh": [
+    "本益比",
+    "市盈率"
+   ],
+   "en": [
+    "PE Ratio",
+    "Trailing P/E",
+    "Forward P/E",
+    "Price/Earnings Multiple"
+   ]
+  },
+  {
+   "key": "pb",
+   "block": "VALUATION",
+   "zh": [
+    "股價淨值比",
+    "市淨率"
+   ],
+   "en": [
+    "Price/Book Ratio",
+    "P/B Ratio",
+    "Price-to-Book Value"
+   ]
+  },
+  {
+   "key": "div_yield",
+   "block": "VALUATION",
+   "zh": [
+    "殖利率",
+    "現金股利殖利率",
+    "股息率",
+    "現金股息殖利率"
+   ],
+   "en": [
+    "Dividend Yield",
+    "Forward Annual Dividend Yield",
+    "Dividend-to-Price Ratio"
+   ]
+  },
+  {
+   "key": "payout",
+   "block": "VALUATION",
+   "zh": [
+    "現金股利發放率",
+    "現金配發率",
+    "配發率"
+   ],
+   "en": [
+    "Payout Ratio"
+   ]
+  },
+  {
+   "key": "ps",
+   "block": "VALUATION",
+   "zh": [
+    "股價營收比",
+    "市銷率"
+   ],
+   "en": [
+    "Price/Sales Ratio",
+    "P/S Ratio",
+    "Price-to-Revenue Ratio"
+   ]
+  },
+  {
+   "key": "ev_ebitda",
+   "block": "VALUATION",
+   "zh": [
+    "企業價值倍數",
+    "EV/EBITDA 倍數"
+   ],
+   "en": [
+    "Enterprise Value/EBITDA",
+    "EV/EBITDA Multiple"
+   ]
+  }
+ ],
+ "formulas": {
+  "fcf": "CFO + CapEx(CapEx 以流出負數表示,故用加號)",
+  "current_ratio": "流動資產合計 / 流動負債合計(>150%~200% 健康)",
+  "inv_turnover": "營業成本 / 平均存貨;DIO=365/存貨周轉率",
+  "ar_turnover": "營業收入 / 平均應收帳款;DSO=365/應收周轉率",
+  "ccc": "DIO + DSO - DPO",
+  "asset_turnover": "營業收入 / 平均資產總額",
+  "basic_eps": "(母公司業主淨利 - 特別股股利) / 加權平均流通股數",
+  "bvps": "歸屬於母公司業主之權益總計 / 期末流通股數(勿用權益總額)",
+  "shares_tw": "期末流通在外股數 = 普通股股本 / 10(台灣面額 10 元,彈性面額特例除外)",
+  "roe": "母公司業主淨利 / 歸屬於母公司業主之權益(>15% 佳)",
+  "pe": "股價 / EPS",
+  "pb": "股價 / BVPS",
+  "div_yield": "DPS / 股價 ×100%",
+  "payout": "每股現金股利 / EPS",
+  "ev": "市值 + 總負債 - 現金及約當現金",
+  "ebitda": "營業利益 + 折舊 + 攤銷",
+  "bad_debt": "有息負債 = 短期借款+一年內到期長期負債+長期借款+應付公司債",
+  "good_debt": "無息負債 = 合約負債(預收貨款)+應付帳款"
+ },
+ "financial_mapping": {
+  "營業收入合計": "Revenue",
+  "Total Revenue": "Revenue",
+  "營業收入": "Revenue",
+  "本期淨利（損失）": "Net_Income",
+  "Net Income": "Net_Income",
+  "母公司業主淨利": "Net_Income",
+  "現金及約當現金": "Cash",
+  "Cash And Cash Equivalents": "Cash",
+  "存貨": "Inventory",
+  "Inventory": "Inventory",
+  "存貨淨額": "Inventory",
+  "歸屬於母公司業主之權益總計": "Equity",
+  "Total Stockholders' Equity": "Equity",
+  "短期借款": "Short_Term_Debt",
+  "Short Term Debt": "Short_Term_Debt",
+  "合約負債－流動": "Contract_Liabilities",
+  "Deferred Revenue": "Contract_Liabilities",
+  "營業活動之淨現金流入（流出）": "CFO",
+  "Operating Cash Flow": "CFO",
+  "取得不動產、廠房及設備": "CapEx",
+  "Capital Expenditure": "CapEx"
+ }
+}
