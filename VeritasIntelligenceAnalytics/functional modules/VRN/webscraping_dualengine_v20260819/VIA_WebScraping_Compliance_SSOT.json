@@ -1,0 +1,32 @@
+{
+  "schema_version": "1.0.0",
+  "required_consent_token": "I_ACCEPT_RESPONSIBLE_SCRAPING",
+  "default_user_agent": "VIA-ResearchBot/1.0 (+contact-required-before-production)",
+  "risk_notice": [
+    "服務條款可能限制自動化擷取；自動掃描不能取代法律審查。",
+    "不得繞過登入、付費牆、CAPTCHA、WAF 或其他存取控制。",
+    "受著作權保護的內容不得在缺乏合法依據時大量重製或再散布。",
+    "個人資料須依用途、法源、保存期限及最小化原則處理。",
+    "請求頻率過高可能造成服務干擾、封鎖與法律風險。",
+    "網頁改版、惡意內容與抽取錯位可能污染投資資料與模型。"
+  ],
+  "terms_link_patterns": ["terms", "conditions", "legal", "acceptable-use", "服務條款", "使用條款", "法律聲明"],
+  "terms_prohibition_patterns": [
+    "prohibit(?:ed|s)?\\s+(?:the\\s+)?use\\s+of\\s+(?:any\\s+)?(?:robot|spider|scraper|crawler)",
+    "no\\s+(?:automated|robotic)\\s+(?:access|means|collection)",
+    "may\\s+not\\s+(?:scrape|crawl|spider|data mine)",
+    "禁止.{0,12}(?:自動化|爬蟲|擷取|抓取|資料探勘)",
+    "不得.{0,12}(?:自動化|爬蟲|擷取|抓取|資料探勘)",
+    "未經.{0,12}(?:授權|同意).{0,12}(?:擷取|抓取|自動化)"
+  ],
+  "block_page_patterns": ["captcha", "verify you are human", "access denied", "unusual traffic", "cloudflare.*challenge"],
+  "pii": {
+    "email": "(?<![\\w.+-])[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}(?![\\w.-])",
+    "tw_mobile": "(?<!\\d)(?:09\\d{2}|\\+?886[ -]?9\\d{2})[ -]?\\d{3}[ -]?\\d{3}(?!\\d)",
+    "tw_id_candidate": "(?<![A-Z0-9])[A-Z][1289]\\d{8}(?![A-Z0-9])",
+    "credit_card_candidate": "(?<!\\d)(?:\\d[ -]?){13,19}(?!\\d)"
+  },
+  "minimum_delay_seconds": 1.0,
+  "maximum_concurrency_per_domain": 2,
+  "terms_high_risk_threshold": 1
+}

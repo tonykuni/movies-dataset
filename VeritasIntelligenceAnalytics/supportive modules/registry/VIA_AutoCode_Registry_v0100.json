@@ -3394,6 +3394,34 @@
    "kind": "落地",
    "note": "令「VRN只擷取台灣各股報告其他類型不用;券商名稱簡稱中英文縮寫可在FILENAME及內文採取局部識別」。收容四包(貼文轉錄,自跑全過):VRN_OperatorRegex_NameEmail_v0100(中文名含·．/企業Email三段解析)/TaipeiPhone_v0100(02 國內外+分機)/HKPhone_v0100(852 固網手機判別)/TWTicker_v0100(4-5 碼統一式+OTC 區段 3·4·5·6·8+自動校正)。digest v0105:①券商四道疊加=Summarizer 中文簡稱 hay 掃+檔名首段縮寫 broker_prefix_map(MS/GS/JP/Citi/CLST/Daiwa/UBS/MQ/GF/KGI/CTBC,中央參數冊,src=檔名縮寫)+TW02 BROKER_PATTERNS+EMAIL 域名;②市場判定四道=明示>官方冊>OTC 區段啟發式(操作員核定,冊缺時後備)>TWSE 預設;③src 次序債修(setdefault 不再清標記)。十八檢 18/18(⑰MS/Daiwa 縮寫⑱冊>明示>啟發式優先序)。非台股(日股9984/港股3750)由官方冊閘擋(不在 TWSE/TPEX 冊=SKIP)。",
    "ts": "2026-08-19 09:09"
+  },
+  {
+   "code": "TOOL-080",
+   "name": "統包唯一網路工具 via_net_unified_v0100+via-net(批66 令)",
+   "kind": "工具",
+   "note": "「爬蟲工具與網路工具整合唯一工具功能只增不減但受到法遵機制制約」:批65 收容之爬蟲雙引擎包(11 件+法遵 v0101 容器修版=f-string 反斜線 Py3.11 修,正本原樣)與 SuperAccel 統包一口,各件原樣只調度不改寫。法遵雙閘 fail-closed:閘一 VIA_NET_CONSENT=YES(鐵律永不代設)+閘二 VIA_SCRAPE_CONSENT token+def_validate_consent 用途法源審查;任一閉=誠實拒絕零網路;Playwright 引擎僅盤點不啟動。零網路動詞常開:--check/--scan-terms/--redact/--classify(40 型)。ACCEL 橋掛載。十檢 10/10(⑧未設環境=DENY/④PII 遮罩/⑥TW ID+Luhn)。",
+   "ts": "2026-08-19 11:06"
+  },
+  {
+   "code": "TOOL-070H",
+   "name": "digest v0106:分析師三道+中文簡稱+BROKER 縮寫+標題摘要+40 型分類閘(批65 令)",
+   "kind": "工具",
+   "note": "①分析師三道=錨定標籤>職稱/EMAIL 鄰近窗中文名(analyst_stopwords 濾)>EMAIL @ 前英文名(去數字 .轉空格 title 化);②名用中文簡稱=官方冊>檔名中文 token(name_stopwords 濾)>報告文;③BROKER 英文縮寫顯示 broker_abbr_display 23 對映(MS/GS/JPM/KGI/Yuanta/Mega/HuaNan…,JSON 雙留);④矩陣末欄=標題+五點第一點併列;⑤40 型分類器加層(scope 非 COMPANY 且信心≥0.6=SKIP;UNCLASSIFIED 誠實不擋,關鍵詞閘為主)。non_stock_keywords+晨報/晨訊/盤前。二十檢 20/20。",
+   "ts": "2026-08-19 11:06"
+  },
+  {
+   "code": "TOOL-078C",
+   "name": "finaudit v0102:全式+異常矩陣(批65 令)",
+   "kind": "工具",
+   "note": "「另一個矩陣列出所有財報數據驗證結果 列異常值」:逐列逐式攤平 all_checks,異常=驗算 FAIL+digest TP 黃旗,置頂另立矩陣(rich 前 80 式,全量 JSON/U/I);全表 --fin 稽核併入。十一檢 11/11。",
+   "ts": "2026-08-19 11:06"
+  },
+  {
+   "code": "GRID-0132",
+   "name": "全面自測矩陣 v0132:+統包網路工具站(66 站)",
+   "kind": "工具",
+   "note": "digest/finaudit 站 glob 自動接 v0106/v0102。容器 FAST:OK58·FAIL0·SKIP6。批65 收容:webscraping_dualengine_v20260819 包 11 件(雙引擎 Py/JS+治理控制器+法遵+40 型分類器+SSOT×2+README+package.json)——紅線不變:不爬站,引擎收容不啟用,真實抓取僅官方 OpenAPI 經同意閘。",
+   "ts": "2026-08-19 11:06"
   }
  ]
 }
