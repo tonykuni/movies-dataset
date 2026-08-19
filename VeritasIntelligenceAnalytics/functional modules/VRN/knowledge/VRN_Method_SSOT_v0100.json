@@ -2,7 +2,13 @@
  "schema": "VIA.VRN.MethodSSOT.v1",
  "title": "VRN 券商報告資料識別與財務對照方法(def01-20)",
  "policy": "券商報告內容保留原貌;TWSE/TPEX 官方資料=實績 SSOT;任何差異不得直接覆寫原始資料;任何修改可追溯",
- "method_pillars": ["五區抽取", "雙層保存", "官方對照", "算術勾稽", "證據仲裁"],
+ "method_pillars": [
+  "五區抽取",
+  "雙層保存",
+  "官方對照",
+  "算術勾稽",
+  "證據仲裁"
+ ],
  "def01_field_record_layers": {
   "raw_value": "報告原始值,永不覆寫",
   "normalized_value": "標準化後的券商值",
@@ -12,88 +18,318 @@
   "validation_status": "PASS/WARN/FAIL/REVIEW_REQUIRED",
   "evidence": "頁碼、座標、表格、欄列、來源網址與資料日期"
  },
- "def01_pipeline": ["MDL001 Converter", "MDL002 LayoutExtractor", "MDL003 TableRestorer",
-  "MDL005 BasicInfo", "MDL006 Narrative/Consolidator", "MDL007 DataNormalizer/APIFetcher",
-  "MDL008 CrossValidator", "TrustScore/ValidationStatus/ReviewQueue"],
+ "def01_pipeline": [
+  "MDL001 Converter",
+  "MDL002 LayoutExtractor",
+  "MDL003 TableRestorer",
+  "MDL005 BasicInfo",
+  "MDL006 Narrative/Consolidator",
+  "MDL007 DataNormalizer/APIFetcher",
+  "MDL008 CrossValidator",
+  "TrustScore/ValidationStatus/ReviewQueue"
+ ],
  "def02_title": {
-  "zone_priority": ["PDF metadata Title", "第一頁上方25%區域", "最大/次大字型", "券商模板標題座標", "前三行含公司+代碼+類型"],
+  "zone_priority": [
+   "PDF metadata Title",
+   "第一頁上方25%區域",
+   "最大/次大字型",
+   "券商模板標題座標",
+   "前三行含公司+代碼+類型"
+  ],
   "no_first_line_assumption": true,
-  "normalize_steps": ["全形轉半形", "Unicode NFKC", "異體字修正", "移除重複空格與不可見字元",
-   "統一破折號/冒號/括號", "保留原始大小寫版", "金額/百分比/負號不可刪", "數值版另建原文保留"],
-  "segment_order": ["公司名稱", "股票代碼", "市場", "報告類型", "核心觀點", "評等變動", "目標價變動"],
-  "tw_ticker": {"digits": 4, "first_digit_nonzero": true, "year_exclusion": "2021-2030",
-   "official_list_check": "TWSE/TPEX 普通股名單必比對", "market_suffix": {"TWSE": ".TW", "TPEX": ".TWO", "bloomberg": " TT"},
-   "market_unknown_no_generate": true, "multi_ticker_first_not_assumed_subject": true}
+  "normalize_steps": [
+   "全形轉半形",
+   "Unicode NFKC",
+   "異體字修正",
+   "移除重複空格與不可見字元",
+   "統一破折號/冒號/括號",
+   "保留原始大小寫版",
+   "金額/百分比/負號不可刪",
+   "數值版另建原文保留"
+  ],
+  "segment_order": [
+   "公司名稱",
+   "股票代碼",
+   "市場",
+   "報告類型",
+   "核心觀點",
+   "評等變動",
+   "目標價變動"
+  ],
+  "tw_ticker": {
+   "digits": 4,
+   "first_digit_nonzero": true,
+   "year_exclusion": "2021-2030",
+   "official_list_check": "TWSE/TPEX 普通股名單必比對",
+   "market_suffix": {
+    "TWSE": ".TW",
+    "TPEX": ".TWO",
+    "bloomberg": " TT"
+   },
+   "market_unknown_no_generate": true,
+   "multi_ticker_first_not_assumed_subject": true
+  }
  },
  "def02_report_types": {
-  "COMPANY_UPDATE": ["公司更新", "Company Update"],
-  "INITIATION": ["初次評等", "Initiation"],
-  "EARNINGS_REVIEW": ["財報快評", "Results Review"],
-  "CONFERENCE_CALL": ["法說會重點", "Conference Call"],
-  "INDUSTRY_REPORT": ["產業報告", "Sector Report"],
-  "MORNING_NOTE": ["投資晨報", "Morning Note"],
-  "TARGET_PRICE_CHANGE": ["目標價調整"],
-  "RATING_CHANGE": ["評等調整"],
+  "COMPANY_UPDATE": [
+   "公司更新",
+   "Company Update"
+  ],
+  "INITIATION": [
+   "初次評等",
+   "Initiation"
+  ],
+  "EARNINGS_REVIEW": [
+   "財報快評",
+   "Results Review"
+  ],
+  "CONFERENCE_CALL": [
+   "法說會重點",
+   "Conference Call"
+  ],
+  "INDUSTRY_REPORT": [
+   "產業報告",
+   "Sector Report"
+  ],
+  "MORNING_NOTE": [
+   "投資晨報",
+   "Morning Note"
+  ],
+  "TARGET_PRICE_CHANGE": [
+   "目標價調整"
+  ],
+  "RATING_CHANGE": [
+   "評等調整"
+  ],
   "ambiguous_rule": "無法唯一分類=保留候選+信心分數,不強制選一"
  },
  "def03_firstpage_zones": {
-  "TopHeader": ["券商", "研究部門", "報告日期"],
-  "TitleZone": ["公司名稱", "Ticker", "報告標題"],
-  "RatingBox": ["評等", "目標價", "現價", "上漲空間"],
-  "AnalystBox": ["分析師", "電子郵件", "證照資訊"],
-  "KeyMetrics": ["EPS", "PE", "PB", "ROE", "營收與獲利摘要"],
-  "SummaryBox": ["投資結論", "催化劑", "風險"],
-  "Footer": ["法律聲明", "頁碼", "版本資訊"]
+  "TopHeader": [
+   "券商",
+   "研究部門",
+   "報告日期"
+  ],
+  "TitleZone": [
+   "公司名稱",
+   "Ticker",
+   "報告標題"
+  ],
+  "RatingBox": [
+   "評等",
+   "目標價",
+   "現價",
+   "上漲空間"
+  ],
+  "AnalystBox": [
+   "分析師",
+   "電子郵件",
+   "證照資訊"
+  ],
+  "KeyMetrics": [
+   "EPS",
+   "PE",
+   "PB",
+   "ROE",
+   "營收與獲利摘要"
+  ],
+  "SummaryBox": [
+   "投資結論",
+   "催化劑",
+   "風險"
+  ],
+  "Footer": [
+   "法律聲明",
+   "頁碼",
+   "版本資訊"
+  ]
  },
  "def03_basicinfo_governance": {
   "locked_column_order": true,
-  "from_report": ["Report Date", "Report Code", "Broker", "Analyst", "Ticker"],
+  "from_report": [
+   "Report Date",
+   "Report Code",
+   "Broker",
+   "Analyst",
+   "Ticker"
+  ],
   "ticker_gate": "TW_TICKER_REGEX+官方名單",
   "name_source": "ticker↔company name SSOT 對照",
-  "broker_view_no_overwrite": ["Rating", "Target Price"],
+  "broker_view_no_overwrite": [
+   "Rating",
+   "Target Price"
+  ],
   "official_first": "實際財務數據",
   "validation_status_writer": "僅 MDL008 驗證階段"
  },
  "def03_rating": {
-  "layers": ["rating_raw", "rating_normalized", "rating_action"],
-  "actions": ["INITIATE", "UPGRADE", "DOWNGRADE", "MAINTAIN", "SUSPEND", "NOT_RATED"],
-  "target_price_fields": ["原始目標價", "前次目標價", "新目標價", "幣別", "目標價期間",
-   "現價", "現價日期", "報告宣稱上漲空間", "VRN 重算上漲空間"],
+  "layers": [
+   "rating_raw",
+   "rating_normalized",
+   "rating_action"
+  ],
+  "actions": [
+   "INITIATE",
+   "UPGRADE",
+   "DOWNGRADE",
+   "MAINTAIN",
+   "SUSPEND",
+   "NOT_RATED"
+  ],
+  "target_price_fields": [
+   "原始目標價",
+   "前次目標價",
+   "新目標價",
+   "幣別",
+   "目標價期間",
+   "現價",
+   "現價日期",
+   "報告宣稱上漲空間",
+   "VRN 重算上漲空間"
+  ],
   "upside_formula": "(TargetPrice-CurrentPrice)/CurrentPrice",
-  "worked_example": {"target": 1450, "current": 1200, "upside_pct": 20.8333,
-   "reported_21_verdict": "合理四捨五入", "reported_25_verdict": "標記差異"}
+  "worked_example": {
+   "target": 1450,
+   "current": 1200,
+   "upside_pct": 20.8333,
+   "reported_21_verdict": "合理四捨五入",
+   "reported_25_verdict": "標記差異"
+  }
  },
- "def04_narrative_sections": ["INVESTMENT_THESIS", "EARNINGS_REVIEW", "REVENUE_OUTLOOK",
-  "MARGIN_OUTLOOK", "EPS_FORECAST", "VALUATION", "TARGET_PRICE_RATIONALE", "CATALYST",
-  "RISK", "INDUSTRY", "SUPPLY_DEMAND", "CAPEX", "MANAGEMENT_GUIDANCE"],
- "def04_number_link_fields": ["metric", "period", "value", "unit", "actual_flag",
-  "growth_type", "growth_value", "evidence(page+bbox+sentence)"],
+ "def04_narrative_sections": [
+  "INVESTMENT_THESIS",
+  "EARNINGS_REVIEW",
+  "REVENUE_OUTLOOK",
+  "MARGIN_OUTLOOK",
+  "EPS_FORECAST",
+  "VALUATION",
+  "TARGET_PRICE_RATIONALE",
+  "CATALYST",
+  "RISK",
+  "INDUSTRY",
+  "SUPPLY_DEMAND",
+  "CAPEX",
+  "MANAGEMENT_GUIDANCE"
+ ],
+ "def04_number_link_fields": [
+  "metric",
+  "period",
+  "value",
+  "unit",
+  "actual_flag",
+  "growth_type",
+  "growth_value",
+  "evidence(page+bbox+sentence)"
+ ],
  "def04_no_invention": "「成長強勁」「顯著改善」等描述不得自行轉成數值",
- "def05_table_identity": ["報表類型(IS/BS/CF/RATIO)", "單季/累計/半年/全年", "合併/個體",
-  "實績/預估/混合", "原幣/換算幣", "千元/百萬/億", "是否重編", "含百分比欄", "曆年/非曆年"],
+ "def05_table_identity": [
+  "報表類型(IS/BS/CF/RATIO)",
+  "單季/累計/半年/全年",
+  "合併/個體",
+  "實績/預估/混合",
+  "原幣/換算幣",
+  "千元/百萬/億",
+  "是否重編",
+  "含百分比欄",
+  "曆年/非曆年"
+ ],
  "def05_canonical_fields": {
-  "revenue": ["營收", "Revenue", "Sales", "營業收入"],
-  "operating_cost": ["銷貨成本", "COGS", "營業成本"],
-  "gross_profit": ["毛利", "Gross Profit", "營業毛利"],
-  "operating_income": ["營業利益", "OP"],
-  "pretax_income": ["稅前淨利", "PBT"],
-  "net_income": ["稅後淨利", "Net Income", "本期淨利"],
-  "net_income_parent": ["歸母淨利", "母公司業主淨利"],
-  "basic_eps": ["每股盈餘", "EPS", "基本每股盈餘"],
+  "revenue": [
+   "營收",
+   "Revenue",
+   "Sales",
+   "營業收入"
+  ],
+  "operating_cost": [
+   "銷貨成本",
+   "COGS",
+   "營業成本"
+  ],
+  "gross_profit": [
+   "毛利",
+   "Gross Profit",
+   "營業毛利"
+  ],
+  "operating_income": [
+   "營業利益",
+   "OP"
+  ],
+  "pretax_income": [
+   "稅前淨利",
+   "PBT"
+  ],
+  "net_income": [
+   "稅後淨利",
+   "Net Income",
+   "本期淨利"
+  ],
+  "net_income_parent": [
+   "歸母淨利",
+   "母公司業主淨利"
+  ],
+  "basic_eps": [
+   "每股盈餘",
+   "EPS",
+   "基本每股盈餘"
+  ],
   "unmappable_rule": "REVIEW_REQUIRED,不得猜測併入相似欄位"
  },
- "def05_unit_record": ["raw_value", "raw_unit", "normalized_value", "normalized_unit",
-  "unit_multiplier", "currency"],
- "def05_percent_rule": {"raw": "25.6%", "calc": 0.256, "display": "25.6%", "no_mixing": true},
- "def06_join_keys": ["tw_ticker", "market", "fiscal_year", "fiscal_quarter", "period_type",
-  "statement_type", "consolidation_scope", "currency", "restatement_version"],
- "def06_period_types": ["QUARTER", "YTD", "HALF_YEAR", "FY"],
+ "def05_unit_record": [
+  "raw_value",
+  "raw_unit",
+  "normalized_value",
+  "normalized_unit",
+  "unit_multiplier",
+  "currency"
+ ],
+ "def05_percent_rule": {
+  "raw": "25.6%",
+  "calc": 0.256,
+  "display": "25.6%",
+  "no_mixing": true
+ },
+ "def06_join_keys": [
+  "tw_ticker",
+  "market",
+  "fiscal_year",
+  "fiscal_quarter",
+  "period_type",
+  "statement_type",
+  "consolidation_scope",
+  "currency",
+  "restatement_version"
+ ],
+ "def06_period_types": [
+  "QUARTER",
+  "YTD",
+  "HALF_YEAR",
+  "FY"
+ ],
  "def06_source_priority": {
-  "歷史財務實績": ["TWSE/TPEX/MOPS", "公司公告", "券商報告"],
-  "EPS預估": ["券商報告", "共識資料", "引擎推估"],
-  "評等目標價": ["券商報告", "券商修正版", "官方不覆寫"],
-  "公司名稱與市場": ["官方普通股名單", "SSOT映射", "券商報告"],
-  "現價": ["指定價格資料SSOT", "YFinance", "券商報告首頁"],
+  "歷史財務實績": [
+   "TWSE/TPEX/MOPS",
+   "公司公告",
+   "券商報告"
+  ],
+  "EPS預估": [
+   "券商報告",
+   "共識資料",
+   "引擎推估"
+  ],
+  "評等目標價": [
+   "券商報告",
+   "券商修正版",
+   "官方不覆寫"
+  ],
+  "公司名稱與市場": [
+   "官方普通股名單",
+   "SSOT映射",
+   "券商報告"
+  ],
+  "現價": [
+   "指定價格資料SSOT",
+   "YFinance",
+   "券商報告首頁"
+  ],
   "dual_keep": "官方值與券商值並列保存,不得把券商表格改成官方值"
  },
  "def07_income_arithmetic": {
@@ -105,7 +341,11 @@
  },
  "def08_balance_identity": {
   "core": "資產總額=負債總額+權益總額",
-  "sub": ["流動+非流動=資產總額", "流動負債+非流動負債=負債總額", "母公司權益+非控制權益=權益總額"],
+  "sub": [
+   "流動+非流動=資產總額",
+   "流動負債+非流動負債=負債總額",
+   "母公司權益+非控制權益=權益總額"
+  ],
   "gap_rule": "BalanceGap 僅來自千→百萬四捨五入=容忍;超門檻=FAIL"
  },
  "def09_cashflow_identity": {
@@ -114,50 +354,93 @@
   "fcf": "FCF=營業CF-資本支出;capex 已負列則相加;引擎用 capex_absolute 避免符號錯誤"
  },
  "def10_margin_rules": {
-  "gross_margin": "營業毛利/營業收入", "operating_margin": "營業利益/營業收入",
-  "pretax_margin": "稅前淨利/營業收入", "net_margin": "歸母淨利/營業收入",
+  "gross_margin": "營業毛利/營業收入",
+  "operating_margin": "營業利益/營業收入",
+  "pretax_margin": "稅前淨利/營業收入",
+  "net_margin": "歸母淨利/營業收入",
   "same_period_only": "2026Q2 毛利÷2026Q2 營收;H1 不得除以 Q2;年度獲利不得除以單季營收"
  },
  "def11_growth": {
-  "yoy": "(本期-去年同期)/|去年同期|", "qoq": "(本季-前季)/|前季|",
-  "states": {"pos_to_pos": "NORMAL", "neg_to_pos": "TURNAROUND_TO_PROFIT",
-   "pos_to_neg": "TURNAROUND_TO_LOSS", "neg_to_neg": "NEG_TO_NEG_ANNOTATED",
-   "zero_base": "NOT_COMPUTABLE_ZERO_BASE", "null_base": "NOT_COMPUTABLE_NULL_BASE"},
+  "yoy": "(本期-去年同期)/|去年同期|",
+  "qoq": "(本季-前季)/|前季|",
+  "states": {
+   "pos_to_pos": "NORMAL",
+   "neg_to_pos": "TURNAROUND_TO_PROFIT",
+   "pos_to_neg": "TURNAROUND_TO_LOSS",
+   "neg_to_neg": "NEG_TO_NEG_ANNOTATED",
+   "zero_base": "NOT_COMPUTABLE_ZERO_BASE",
+   "null_base": "NOT_COMPUTABLE_NULL_BASE"
+  },
   "zero_base_no_epsilon": "分母為零禁用極小值代替,不得輸出無限大"
  },
  "def12_eps": {
   "basic": "歸母普通股股東淨利/加權平均流通普通股股數",
   "diluted": "調整後歸母淨利/稀釋後加權平均股數",
-  "reasonableness_not_equality": ["員工認股權", "可轉債", "庫藏股", "停業單位", "特別股股利",
-   "股本變動", "分割/除權追溯", "簡化平均股數"],
+  "reasonableness_not_equality": [
+   "員工認股權",
+   "可轉債",
+   "庫藏股",
+   "停業單位",
+   "特別股股利",
+   "股本變動",
+   "分割/除權追溯",
+   "簡化平均股數"
+  ],
   "no_overwrite_official": true
  },
  "def13_ratios": {
-  "roe": "歸母淨利/平均母公司業主權益", "avg_equity": "(期初+期末)/2",
-  "roa": "本期淨利/平均資產總額", "debt_ratio": "負債總額/資產總額",
-  "current_ratio": "流動資產/流動負債", "quick_ratio": "(流動資產-存貨-預付)/流動負債",
+  "roe": "歸母淨利/平均母公司業主權益",
+  "avg_equity": "(期初+期末)/2",
+  "roa": "本期淨利/平均資產總額",
+  "debt_ratio": "負債總額/資產總額",
+  "current_ratio": "流動資產/流動負債",
+  "quick_ratio": "(流動資產-存貨-預付)/流動負債",
   "annualized_label": "單季年化 ROE 必標 ANNUALIZED,不可與官方年度混用"
  },
  "def14_forecast_checks": {
-  "gross": "ForecastRevenue×ForecastGrossMargin", "op": "ForecastRevenue×ForecastOperatingMargin",
+  "gross": "ForecastRevenue×ForecastGrossMargin",
+  "op": "ForecastRevenue×ForecastOperatingMargin",
   "implied_eps": "ForecastParentNetIncome/ForecastDilutedShares",
-  "pe_split": {"current_price_pe": "current_price/forecast_eps", "target_price_pe": "target_price/forecast_eps",
-   "not_same_multiple": true},
+  "pe_split": {
+   "current_price_pe": "current_price/forecast_eps",
+   "target_price_pe": "target_price/forecast_eps",
+   "not_same_multiple": true
+  },
   "no_official_future_overwrite": true
  },
  "def15_tolerance": {
   "formula": "Tolerance=max(AbsoluteTolerance, RelativeTolerance×max(|A|,|B|))",
-  "judge": {"PASS": "Diff<=Tol", "WARN": "Tol<Diff<=3×Tol", "FAIL": "Diff>3×Tol"},
-  "by_type": {"金額": "同單位後比較容許四捨五入", "百分比": "百分點差非百分比差",
-   "EPS": "依小數位與股數差", "股數": "允許分割與加權期間差", "財務恆等式": "單位越大容忍相應提高",
-   "目標價": "不驗官方真值只驗推導一致"},
-  "worked_example": {"reported_margin": 35.2, "recalc_margin": 35.16, "diff_pct_point": 0.04, "not": "0.11%"}
+  "judge": {
+   "PASS": "Diff<=Tol",
+   "WARN": "Tol<Diff<=3×Tol",
+   "FAIL": "Diff>3×Tol"
+  },
+  "by_type": {
+   "金額": "同單位後比較容許四捨五入",
+   "百分比": "百分點差非百分比差",
+   "EPS": "依小數位與股數差",
+   "股數": "允許分割與加權期間差",
+   "財務恆等式": "單位越大容忍相應提高",
+   "目標價": "不驗官方真值只驗推導一致"
+  },
+  "worked_example": {
+   "reported_margin": 35.2,
+   "recalc_margin": 35.16,
+   "diff_pct_point": 0.04,
+   "not": "0.11%"
+  }
  },
  "def16_null_semantics": {
-  "NULL": "找不到資料,不可自動改 0", "0": "明確揭露為零", "-": "依表格註解判定",
-  "NA": "不適用", "NM": "無意義", "divide_by_zero": "回傳不可計算狀態",
-  "paren_negative": "(123)→-123", "triangle_sign": "△/▲依券商模板字典判定方向",
-  "multiple_not_pct": "1.2x/1.2倍保存為倍數不可轉 120%", "pct_internal": "12.3%→0.123"
+  "NULL": "找不到資料,不可自動改 0",
+  "0": "明確揭露為零",
+  "-": "依表格註解判定",
+  "NA": "不適用",
+  "NM": "無意義",
+  "divide_by_zero": "回傳不可計算狀態",
+  "paren_negative": "(123)→-123",
+  "triangle_sign": "△/▲依券商模板字典判定方向",
+  "multiple_not_pct": "1.2x/1.2倍保存為倍數不可轉 120%",
+  "pct_internal": "12.3%→0.123"
  },
  "def17_arbitration": {
   "券商歷史實績≠官方實績": "官方值 canonical,券商值保留",
@@ -170,16 +453,43 @@
   "原始≠重編": "最新重編版 canonical,舊版保留版本鏈"
  },
  "def18_quarter_conversion": {
-  "formulas": {"Q2": "H1-Q1", "Q3": "9M-H1", "Q4": "FY-9M"},
-  "allowed": {"損益表": true, "現金流量表": true, "資產負債表": false,
-   "每股盈餘": "近似參考(加權股數不同)", "財務比率": false},
+  "formulas": {
+   "Q2": "H1-Q1",
+   "Q3": "9M-H1",
+   "Q4": "FY-9M"
+  },
+  "allowed": {
+   "損益表": true,
+   "現金流量表": true,
+   "資產負債表": false,
+   "每股盈餘": "近似參考(加權股數不同)",
+   "財務比率": false
+  },
   "bs_reason": "資產負債表是期末存量,不可用減法取得單季值"
  },
- "def19_validation_statuses": ["PASS_EXACT", "PASS_TOLERANCE", "PASS_OFFICIAL_MATCH",
-  "WARN_ROUNDING", "WARN_PERIOD_AMBIGUOUS", "WARN_UNIT_AMBIGUOUS", "FAIL_ARITHMETIC",
-  "FAIL_OFFICIAL_MISMATCH", "FAIL_ENTITY_MISMATCH", "REVIEW_REQUIRED", "NOT_COMPUTABLE"],
+ "def19_validation_statuses": [
+  "PASS_EXACT",
+  "PASS_TOLERANCE",
+  "PASS_OFFICIAL_MATCH",
+  "WARN_ROUNDING",
+  "WARN_PERIOD_AMBIGUOUS",
+  "WARN_UNIT_AMBIGUOUS",
+  "FAIL_ARITHMETIC",
+  "FAIL_OFFICIAL_MISMATCH",
+  "FAIL_ENTITY_MISMATCH",
+  "REVIEW_REQUIRED",
+  "NOT_COMPUTABLE"
+ ],
  "def19_trust_score": {
-  "weights": ["Layout", "Entity", "Period", "Unit", "Arithmetic", "OfficialMatch", "EvidenceCompleteness"],
+  "weights": [
+   "Layout",
+   "Entity",
+   "Period",
+   "Unit",
+   "Arithmetic",
+   "OfficialMatch",
+   "EvidenceCompleteness"
+  ],
   "fail_closed": "公司代碼/期間/幣別/合併範圍錯配,總分再高也必須 fail-closed"
  },
  "def20_output_tables": {
@@ -188,5 +498,72 @@
   "vrn_narrative_facts": "主文論點/數字/風險/證據",
   "vrn_financial_facts": "原始值/標準值/期間/單位/實績預估",
   "vrn_validation_evidence": "官方值/重算值/差異/容忍值/仲裁結果"
+ },
+ "def21_period_aware_field": {
+  "_appended": "批52 操作員頒定(append-only;執行載體=VIA_Central_SSOT_Contract_Sync_Engine def_parse_period)",
+  "principle": "指標名稱與期間表示分開解析;年度/季/半年/滾動前後綴皆容;2026E TP 綁定須同欄/同表頭層級/明確句法範圍,否則 REVIEW_REQUIRED",
+  "field_record": [
+   "RawText",
+   "MetricCode",
+   "PeriodRaw",
+   "CalendarType(CALENDAR_YEAR/FISCAL_YEAR/ROC_YEAR)",
+   "PeriodType(YEAR/HALF_YEAR/QUARTER/LTM/NTM/SPOT)",
+   "Year",
+   "Quarter",
+   "HalfYear",
+   "IsForecast",
+   "IsActual",
+   "IsTrailing",
+   "IsForward"
+  ],
+  "status_suffix": {
+   "A": "ACTUAL",
+   "E": "ESTIMATE",
+   "F": "FORECAST",
+   "P": "PRELIMINARY",
+   "R": "REVISED",
+   "C": "CONSENSUS"
+  },
+  "quarter_alias": {
+   "第一季": 1,
+   "第1季": 1,
+   "首季": 1,
+   "第二季": 2,
+   "第三季": 3,
+   "第四季": 4,
+   "末季": 4
+  },
+  "half_alias": {
+   "H1/1H/上半年/上半/前半年": 1,
+   "H2/2H/下半年/下半/後半年": 2
+  },
+  "rolling": [
+   "LTM",
+   "TTM",
+   "NTM",
+   "F12M",
+   "FY1",
+   "FY2",
+   "CY1",
+   "CY2(相對期間須存 AsOfDate)"
+  ],
+  "roc_year": "民國年+1911;FY 實際起訖須結合公司財年結束月份;2026年度=UNRESOLVED_YEAR 候源判",
+  "parse_order": [
+   "保留原文",
+   "NFKC 正規化",
+   "民國/西元/FY/CY",
+   "季/半年/年度/滾動",
+   "AEFPRC 狀態",
+   "指標詞分離",
+   "幣別數值",
+   "財年起訖",
+   "無法唯一=REVIEW_REQUIRED"
+  ],
+  "worked_examples": {
+   "2026Q1E Target Price": "2026-Q1 ESTIMATE",
+   "115Q4E": "2026-Q4 ESTIMATE(民國)",
+   "FY27E TP": "FY2027 ESTIMATE",
+   "Target Price 1Q26E": "2026-Q1 ESTIMATE"
+  }
  }
 }
