@@ -3520,6 +3520,20 @@
    "kind": "落地",
    "note": "預對帳:4 件 PRESENT(v0116 DryRunPlan+v0116B-A PreviewCopy Hotfix 在 ui_support/;v0116C ValidationSeal+v0116D PatchPlan 在 audit_tools/——舊根頂層 vs 倉內歸類位=MOVED 候選,hash 由 oldscan 定讞);4 件 MISSING 候收容=審批鏈後段 v0116E OperatorApprovalPackage/v0116F OperatorDecisionIntake/v0116F2 ApprovalGapReview/v0116F3 OperatorDecisionRecommendation(全鏈 NoApply/NoWriteback/NoClose 治理式)。此四件為工作站側實體,由 via-oldscan --apply 自動抓回(頂層非產物區,毋須 --with-artifacts 旗標)。",
    "ts": "2026-08-19 17:56"
+  },
+  {
+   "code": "TOOL-086F",
+   "name": "批81 oldscan v0102:卡斷根因三修(舊根側并行+免重複雜湊+25 工可調)",
+   "kind": "工具",
+   "note": "工作站真跑證據定讞:v0100 對舊根 145k 件串行雜湊零輸出=卡斷主因(操作員 ^C×2);SAME 判定對 target 重複整檔雜湊=倉側白算一遍。v0102:①scan() 舊根盤點 sweep+ThreadPool 并行雜湊+單行進度條(全程不卡斷);②build_repo_index 回 {sha:[rel]}+{rel:sha} 雙映射,SAME 判定直查零第二次雜湊;③VIA_OLDSCAN_WORKERS 環境變數(批81 令 25 個加速器)未設=CPU-1;④存證 JSON 錨定 --repo 唯一正典 VIA_Reports/oldroot_runs/(不再落舊克隆);⑤apply 亦進度條;⑥undo 讀 manifest 內 repo 欄。自測擴為十二檢 12/12(⑪ 加速器數可調 ⑫ 存證錨定 repo)。cmd/grid glob 自動接 v0102。",
+   "ts": "2026-08-19 18:34"
+  },
+  {
+   "code": "TOOL-087",
+   "name": "批81 唯一文件夾整併統包器 Invoke-VIA-UnifyOneFolder-v0100.ps1(INTEGRATE ALL INTO ONE PS)",
+   "kind": "工具",
+   "note": "令「卡斷修復不卡斷+25個POWERSHELL加速器+動態進度條+改為新舊路徑文件夾+不開新視窗自動完成一切+INTEGRATE ALL INTO ONE PS CODE」。單一 PS7 檔十一步全自動:S1 前檢(py/git 解析+VIA_OLDSCAN_WORKERS=25 注入+fd/rg Rust 加速器偵測 graceful+PATH 錨定新正典 bin=修舊 bin 誤掛);S2 git 自救(工作站實證 pull 被 env_preflight_report.json 本地變更擋下→stash push -u 保全零刪除+pull 退避重試 2/4/8/16s);S3 glob 動態解析最新 oldscan;S4 舊克隆 VIA 樹 --apply --with-artifacts;S5 舊 Downloads VIA 夾 --apply;S6 manifest 具名入庫(禁 add -A:--pathspec-from-file 逐檔來自 oldscan manifest,git check-ignore 濾出 gitignore 區=留本地誠實記數);S7 commit 標準尾標;S8 雙推 main+claude;S9 flowops --refresh-equity;S10 battery(看門狗逾時 Kill 樹截停=不卡斷,rc124 誠實 FAIL);S11 誠實三態矩陣+JSON 存證 unify_runs/。-Plan 唯讀演練。全程 -NoNewWindow+Write-Progress 動態進度。新舊路徑固定參數化:NewRepo=Downloads\\movies-dataset(唯一正典)/OldClone=movies-dataset 舊克隆/OldVia=Downloads\\VeritasIntelligenceAnalytics。容器無 pwsh=AST 驗證 SKIP(誠實),工作站 PS7 首跑即驗。",
+   "ts": "2026-08-19 18:34"
   }
  ]
 }
