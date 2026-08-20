@@ -3611,6 +3611,41 @@
    "kind": "工具",
    "note": "工作站實證:v0504 654 行 $file.functions=@($fnList) 於 -WorkRoot 錨定唯一正典跑至 PS AST 段拋 Argument types do not match——$file 來自 ConvertFrom-Json,反序列化屬性型別鎖定,陣列直賦失敗。v0505:PS AST 段全部屬性變更改 Add-Member -NotePropertyName -Force(functions/parse_ok/parse_error 三處+catch 分支),行為零變更;HTML 刊頭 v0505 可辨識。內嵌引擎 63 件攝入已實證 OK(崩點僅在 PS 側)。",
    "ts": "2026-08-20 14:36"
+  },
+  {
+   "code": "TOOL-086K",
+   "kind": "落地",
+   "ts": "2026-08-20 15:32",
+   "name": "批87 唯一文件夾整併戰報定讞:工作站首次自主 commit+雙推 29,619 件(4c38c22)",
+   "note": "unify v0102 全鏈:S5 範圍閘 apply→S6 staging 30,114(gitignore 濾出 3;git add rc≠0 記 FAIL 但 staging 實成,候查殘因)→S7 commit→S8 雙推 259.65MiB 成功→S9 個股冊 1985 檔→S10 battery OK5/FAIL1(grid 全域一站紅,候 GRID_20260820_225958.json 貼回定位)。機轉驗屍:S2a stash -u 把 07:10 S4 抓回未 commit 的未追蹤件捲進 stash→S5 重判 MISSING 落 3 萬件(結果無害,S4 範圍內資料以另一途入庫;stash=保險箱零刪除)。殘債記帳:①雙 _sha 尾綴鏡像(舊樹既有 _sha 名再鏡像)=外觀債候清理裁決;②supportive 根層 VeritasCeleritas.py 與 accelerator/ 本體 byte 全同(ef2398ce)=判準一讓位候裁;③工作站 stash 堆含 S4 抓回件,由 v0103 重跑 S4 正途入庫,stash 不 pop 避衝突。"
+  },
+  {
+   "code": "TOOL-091",
+   "kind": "工具",
+   "ts": "2026-08-20 15:32",
+   "name": "批87 py 加速啟動器 via_py_celeritas_launcher+via-py(Celeritas 常駐)",
+   "note": "令「py 指令一定要透過 VeritasCeleritas 導入加速器全部都要」。機制:SUP 入 path(無遮蔽已驗)+spec_from_file_location 直載 Celeritas(accelerator/→根層雙候選)常駐 sys.modules→runpy 同進程執行目標腳本 argv 原樣;缺席 graceful 直跑誠實印註。四檢 4/4(掛載/同進程可見/argv/xbatch 原語)。CodexNexus=PS 側加速道由 PS 工具鏈承接。grid v0139 第 76 站。"
+  },
+  {
+   "code": "QA-20260820C",
+   "kind": "QA",
+   "ts": "2026-08-20 15:32",
+   "name": "Hydra 地雷:accelerator/subprocess.py 遮蔽標準庫(pip 內部件散落)",
+   "note": "supportive modules/accelerator/subprocess.py 實為 pip._internal.utils.subprocess 散落收容件(248 行,import pip._vendor),與標準庫同名——任何把 accelerator/ 插入 sys.path 或以其為 cwd 的 python 都會循環匯入炸裂(容器實證 traceback)。處置:launcher 改 spec 直載絕不入 path(已免疫);散件本身零刪除零改名,候操作員三選:a 改名 pip_subprocess_shaXXXX.py 隔離 b 移 quarantine 夾 c 維持現狀(僅記帳)。SUP 根層已驗零遮蔽。"
+  },
+  {
+   "code": "TOOL-087D",
+   "kind": "工具",
+   "ts": "2026-08-20 15:32",
+   "name": "批87 統包器 v0103:stash 鐵則(未追蹤永不 stash)+Celeritas 路由",
+   "note": "①S2a 改追蹤檔限定 stash(--untracked-files=no 偵測;未追蹤含前輪抓回件永不 stash=保全);pull 被未追蹤擋=誠實 FAIL 出指引;②S4/S5 oldscan 經 via_py_celeritas_launcher 執行(glob 最新;缺席 graceful);③下一輪不帶 -SkipOldClone 重跑 S4=stash 中抓回件之正途入庫(冪等 SAME 讓位)。"
+  },
+  {
+   "code": "TOOL-092",
+   "kind": "收容",
+   "ts": "2026-08-20 15:32",
+   "name": "批87 PS 加速別名冊 Top25 收容(VIA_PS_Accel_Aliases_v0100)",
+   "note": "操作員核定五場景 25 別名+三再加速技巧。治理界線誠實:別名=互動終端提速;.ps1 腳本內依 Console LL_NO_ALIAS 閘續用全名;rm/del 在 VIA 樹內受零刪除鐵律約束;irm/winget 網路動詞受 via-net 同意閘制約。與 fd/rg+WORKERS 環境變數併為工作站加速三件套。"
   }
  ]
 }
