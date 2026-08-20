@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VeritasArchivum • 智能專案平台</title>
+  <link id="favicon" rel="icon" type="image/png" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%231a3a2a' width='100' height='100' rx='12'/%3E%3Ctext x='50' y='65' text-anchor='middle' fill='%234ade80' font-size='50' font-weight='bold'%3EVA%3C/text%3E%3C/svg%3E">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  
+  <style>
+    :root {
+      --bg: #f5f5f5; --bg-white: #ffffff; --border: #e0e0e0;
+      --text: #333333; --text-light: #666666; --text-lighter: #999999;
+      --header-bg: linear-gradient(135deg, #1a3a2a 0%, #0d2818 50%, #0a1f14 100%);
+      --header-text: #ffffff; --header-text-light: rgba(255,255,255,0.75);
+      --accent: #4ade80; --accent-dark: #22c55e; --accent-light: rgba(74,222,128,0.15);
+      --blue: #3b82f6; --orange: #f59e0b; --red: #ef4444; --purple: #8b5cf6;
+      --sans: 'Inter', 'Noto Sans TC', -apple-system, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --display: 'Playfair Display', Georgia, serif;
+    }
+    
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; }
+    
+    /* ===== HEADER ===== */
+    .header { background: var(--header-bg); padding: 20px 28px; position: relative; }
+    .header::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse 800px 400px at 20% 50%, rgba(74,222,128,0.08), transparent), radial-gradient(ellipse 600px 300px at 80% 30%, rgba(34,197,94,0.05), transparent); pointer-events:none; }
+    .header-inner { position:relative; max-width:1400px; margin:0 auto; display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:24px; }
+    
+    .logo-section { display:flex; align-items:center; gap:16px; }
+    .logo-wrap { width:72px; height:72px; display:flex; align-items:center; justify-content:center; }
+    .logo { max-width:100%; max-height:100%; object-fit:contain; filter:drop-shadow(0 2px 8px rgba(0,0,0,0.3)); }
+    
+    .brand-section { display:flex; flex-direction:column; gap:4px; }
+    .brand-line1 { display:flex; align-items:baseline; gap:4px; }
+    .brand-name { font-family:var(--display); font-size:36px; font-weight:700; color:var(--header-text); letter-spacing:0.01em; }
+    .brand-tm { font-size:14px; color:var(--header-text-light); vertical-align:super; }
+    .brand-line2 { font-size:12px; font-weight:500; letter-spacing:0.2em; color:var(--header-text-light); text-transform:uppercase; }
+    .brand-line3 { font-family:var(--display); font-size:13px; font-style:italic; letter-spacing:0.06em; color:rgba(255,255,255,0.5); }
+    
+    .header-actions { display:flex; gap:10px; }
+    .h-btn { padding:10px 18px; border-radius:6px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.1); color:var(--header-text-light); font-size:13px; font-weight:500; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:6px; }
+    .h-btn:hover { background:rgba(255,255,255,0.2); color:var(--header-text); border-color:rgba(255,255,255,0.4); }
+    .h-btn.primary { background:var(--accent); color:#0a1f14; border-color:var(--accent); font-weight:600; }
+    .h-btn.primary:hover { background:var(--accent-dark); }
+    
+    /* ===== STATUS BAR ===== */
+    .status-bar { background:var(--bg-white); border-bottom:1px solid var(--border); padding:10px 28px; display:flex; align-items:center; justify-content:space-between; }
+    .status-left { display:flex; align-items:center; gap:20px; font-size:13px; }
+    .status-item { display:flex; align-items:center; gap:6px; color:var(--text-light); }
+    .status-dot { width:8px; height:8px; border-radius:50%; }
+    .status-dot.green { background:#4ade80; box-shadow:0 0 6px rgba(74,222,128,0.5); }
+    .status-dot.yellow { background:#facc15; }
+    .status-dot.red { background:#f87171; }
+    .status-value { font-family:var(--mono); color:var(--text); }
+    .status-right { display:flex; align-items:center; gap:12px; }
+    .status-btn { padding:6px 12px; border-radius:4px; border:1px solid var(--border); background:var(--bg-white); color:var(--text-light); font-size:12px; cursor:pointer; transition:all 0.15s; }
+    .status-btn:hover { border-color:var(--accent); color:var(--accent); }
+    
+    /* ===== MAIN LAYOUT ===== */
+    .main-layout { display:grid; grid-template-columns:260px 1fr 300px; min-height:calc(100vh - 140px); }
+    
+    /* Sidebar */
+    .sidebar { background:var(--bg-white); border-right:1px solid var(--border); display:flex; flex-direction:column; }
+    .sidebar-header { padding:16px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+    .sidebar-title { font-size:14px; font-weight:600; display:flex; align-items:center; gap:8px; }
+    .sidebar-add { width:26px; height:26px; border-radius:6px; border:1px solid var(--border); background:var(--bg); color:var(--text-light); font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .sidebar-add:hover { background:var(--accent); color:white; border-color:var(--accent); }
+    
+    .project-list { flex:1; overflow-y:auto; padding:8px; }
+    .project-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:8px; cursor:pointer; margin-bottom:4px; border:1px solid transparent; transition:all 0.15s; }
+    .project-item:hover { background:var(--bg); border-color:var(--border); }
+    .project-item.active { background:var(--accent-light); border-color:var(--accent); }
+    .project-icon { font-size:18px; }
+    .project-info { flex:1; min-width:0; }
+    .project-name { font-size:13px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .project-meta { font-size:11px; color:var(--text-lighter); margin-top:2px; }
+    .project-code { font-family:var(--mono); font-size:10px; color:var(--accent); background:var(--accent-light); padding:2px 6px; border-radius:4px; }
+    
+    .sidebar-section { padding:12px 16px; border-top:1px solid var(--border); }
+    .section-title { font-size:11px; font-weight:600; color:var(--text-lighter); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:10px; }
+    .tools-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:6px; }
+    .tool-btn { padding:10px 8px; border-radius:6px; border:1px solid var(--border); background:var(--bg); text-align:center; cursor:pointer; transition:all 0.15s; }
+    .tool-btn:hover { border-color:var(--accent); transform:translateY(-1px); }
+    .tool-icon { font-size:18px; }
+    .tool-label { font-size:10px; color:var(--text-light); margin-top:2px; }
+    
+    /* ===== MAIN CONTENT ===== */
+    .main-content { background:var(--bg); padding:20px; overflow-y:auto; }
+    .content-card { background:var(--bg-white); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    .content-header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--border); background:var(--bg); }
+    .content-title { display:flex; align-items:center; gap:10px; font-size:15px; font-weight:600; }
+    .content-badge { font-size:11px; padding:3px 10px; border-radius:4px; background:var(--accent); color:white; font-weight:500; }
+    .content-body { padding:20px; }
+    
+    /* Welcome */
+    .welcome { text-align:center; padding:50px 20px; }
+    .welcome-icon { font-size:56px; margin-bottom:16px; }
+    .welcome-title { font-size:22px; font-weight:600; margin-bottom:8px; }
+    .welcome-desc { color:var(--text-light); margin-bottom:20px; line-height:1.6; font-size:14px; }
+    .welcome-btn { display:inline-flex; align-items:center; gap:8px; padding:12px 24px; border-radius:8px; border:none; background:var(--accent); color:#0a1f14; font-size:14px; font-weight:600; cursor:pointer; }
+    .welcome-btn:hover { background:var(--accent-dark); }
+    
+    /* Project View */
+    .project-header-row { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid var(--border); }
+    .project-title-wrap { display:flex; align-items:center; gap:14px; }
+    .project-title-icon { font-size:32px; }
+    .project-title-code { font-family:var(--mono); font-size:12px; color:var(--accent); background:var(--accent-light); padding:3px 8px; border-radius:4px; display:inline-block; margin-bottom:4px; }
+    .project-title-name { font-size:22px; font-weight:700; }
+    .project-title-desc { font-size:13px; color:var(--text-light); margin-top:4px; }
+    .action-btn { padding:8px 14px; border-radius:6px; border:1px solid var(--border); background:var(--bg-white); color:var(--text-light); font-size:12px; cursor:pointer; transition:all 0.15s; }
+    .action-btn:hover { border-color:var(--accent); color:var(--accent); }
+    .action-btn.primary { background:var(--accent); color:white; border-color:var(--accent); }
+    
+    /* Blocks */
+    .blocks-list { margin-top:16px; }
+    .block-item { background:var(--bg); border:1px solid var(--border); border-radius:8px; margin-bottom:10px; overflow:hidden; }
+    .block-header { display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:var(--bg-white); border-bottom:1px solid var(--border); }
+    .block-title { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:500; }
+    .block-code { font-family:var(--mono); font-size:10px; font-weight:600; padding:2px 6px; border-radius:3px; color:white; }
+    .block-code.toggle { background:var(--purple); }
+    .block-code.code { background:var(--accent-dark); }
+    .block-code.page { background:var(--blue); }
+    .block-code.note { background:var(--orange); }
+    .block-type { font-size:9px; padding:2px 6px; border-radius:3px; background:var(--border); color:var(--text-light); text-transform:uppercase; }
+    .block-actions { display:flex; gap:4px; }
+    .block-btn { width:24px; height:24px; border-radius:4px; border:1px solid var(--border); background:var(--bg-white); color:var(--text-lighter); font-size:11px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .block-btn:hover { background:var(--text); color:white; border-color:var(--text); }
+    .block-btn.delete:hover { background:var(--red); border-color:var(--red); }
+    .block-body { padding:14px; }
+    .block-body pre { margin:0; border-radius:6px; }
+    .block-body code { font-family:var(--mono); font-size:12px; line-height:1.6; }
+    .block-content { font-size:13px; line-height:1.7; white-space:pre-wrap; }
+    .block-note-text { margin-top:10px; font-size:12px; color:var(--text-light); }
+    
+    .add-block-row { display:flex; gap:8px; margin-top:16px; }
+    .add-block-btn { flex:1; padding:12px; border-radius:6px; border:2px dashed var(--border); background:transparent; color:var(--text-light); font-size:12px; font-weight:500; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; }
+    .add-block-btn:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-light); }
+    
+    /* ===== RIGHT PANEL ===== */
+    .right-panel { background:var(--bg-white); border-left:1px solid var(--border); display:flex; flex-direction:column; }
+    .panel-section { padding:14px; border-bottom:1px solid var(--border); }
+    .panel-title { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; margin-bottom:10px; }
+    .log-list { font-size:12px; max-height:200px; overflow-y:auto; }
+    .log-item { display:flex; align-items:flex-start; gap:6px; padding:4px 0; }
+    .log-check { color:#4ade80; }
+    .log-warn { color:#facc15; }
+    .log-error { color:#f87171; }
+    .log-info { color:#3b82f6; }
+    .log-text { color:var(--text-light); flex:1; }
+    .log-time { font-family:var(--mono); font-size:10px; color:var(--text-lighter); }
+    
+    .summary-stat { display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--border); font-size:12px; }
+    .summary-stat:last-child { border-bottom:none; }
+    .summary-label { color:var(--text-light); }
+    .summary-value { font-weight:600; font-family:var(--mono); }
+    
+    /* ===== SETTINGS VIEW ===== */
+    .settings-section { margin-bottom:24px; }
+    .settings-title { font-size:14px; font-weight:600; margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; }
+    .settings-row { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+    .settings-label { font-size:13px; color:var(--text-light); min-width:120px; }
+    .settings-input { flex:1; padding:10px 12px; border:1px solid var(--border); border-radius:6px; font-size:13px; font-family:var(--mono); }
+    .settings-input:focus { outline:none; border-color:var(--accent); }
+    .settings-hint { font-size:11px; color:var(--text-lighter); margin-top:4px; }
+    
+    .logo-preview { display:flex; align-items:center; gap:20px; padding:16px; background:var(--bg); border-radius:8px; border:1px solid var(--border); }
+    .logo-preview-img { width:80px; height:80px; object-fit:contain; background:var(--header-bg); border-radius:8px; padding:8px; }
+    .logo-preview-info { flex:1; }
+    .logo-preview-name { font-weight:500; margin-bottom:4px; }
+    .logo-preview-size { font-size:12px; color:var(--text-lighter); }
+    .logo-actions { display:flex; gap:8px; margin-top:10px; }
+    
+    .backup-actions { display:flex; gap:10px; flex-wrap:wrap; }
+    .backup-btn { padding:12px 20px; border-radius:6px; border:1px solid var(--border); background:var(--bg-white); color:var(--text); font-size:13px; cursor:pointer; display:flex; align-items:center; gap:8px; transition:all 0.15s; }
+    .backup-btn:hover { border-color:var(--accent); }
+    .backup-btn.primary { background:var(--accent); color:white; border-color:var(--accent); }
+    
+    /* ===== MODALS ===== */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center; z-index:200; }
+    .modal-overlay.show { display:flex; }
+    .modal { background:var(--bg-white); border-radius:10px; width:90%; max-width:500px; max-height:80vh; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+    .modal-header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--border); }
+    .modal-title { font-size:15px; font-weight:600; }
+    .modal-close { width:28px; height:28px; border-radius:6px; border:none; background:transparent; color:var(--text-light); font-size:18px; cursor:pointer; }
+    .modal-close:hover { background:var(--bg); }
+    .modal-body { padding:18px; overflow-y:auto; max-height:calc(80vh - 120px); }
+    .form-group { margin-bottom:14px; }
+    .form-label { display:block; font-size:12px; font-weight:500; margin-bottom:5px; }
+    .form-input, .form-textarea, .form-select { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:6px; font-size:13px; font-family:var(--sans); outline:none; }
+    .form-input:focus, .form-textarea:focus, .form-select:focus { border-color:var(--accent); }
+    .form-textarea { min-height:100px; resize:vertical; font-family:var(--mono); }
+    .modal-footer { display:flex; justify-content:flex-end; gap:8px; padding:14px 18px; border-top:1px solid var(--border); background:var(--bg); }
+    
+    .toast { position:fixed; bottom:20px; right:20px; padding:12px 20px; background:#1f2937; color:white; border-radius:8px; font-size:13px; transform:translateY(100px); opacity:0; transition:all 0.3s; z-index:300; }
+    .toast.show { transform:translateY(0); opacity:1; }
+    
+    @media (max-width:1100px) { .main-layout { grid-template-columns:240px 1fr; } .right-panel { display:none; } }
+    @media (max-width:800px) { .main-layout { grid-template-columns:1fr; } .sidebar { display:none; } .brand-name { font-size:24px; } .header-inner { grid-template-columns:auto 1fr; } }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo-section">
+        <div class="logo-wrap">
+          <img class="logo" id="siteLogo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%231a3a2a' width='100' height='100' rx='12'/%3E%3Ctext x='50' y='65' text-anchor='middle' fill='%234ade80' font-size='40' font-weight='bold'%3EVA%3C/text%3E%3C/svg%3E" alt="Logo">
+        </div>
+      </div>
+      <div class="brand-section">
+        <div class="brand-line1"><span class="brand-name">VeritasArchivum</span><span class="brand-tm">™</span></div>
+        <div class="brand-line2">VERITAS INTELLIGENCE SYSTEM</div>
+        <div class="brand-line3">Notitia • Exactitudo • Integratio</div>
+      </div>
+      <div class="header-actions">
+        <button class="h-btn" onclick="showSettings()">⚙️ Settings</button>
+        <button class="h-btn primary" onclick="openModal('project')">＋ New Project</button>
+      </div>
+    </div>
+  </header>
+  
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <div class="status-left">
+      <div class="status-item"><span class="status-dot green"></span><span>System Ready</span></div>
+      <div class="status-item">📁 Base: <span class="status-value" id="statusBase">Not Set</span></div>
+      <div class="status-item">📊 Projects: <span class="status-value" id="statusProjects">0</span></div>
+    </div>
+    <div class="status-right">
+      <button class="status-btn" onclick="backupAll()">📦 Backup All</button>
+      <button class="status-btn" onclick="restoreBackup()">📥 Restore</button>
+    </div>
+  </div>
+  
+  <!-- Main Layout -->
+  <div class="main-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <span class="sidebar-title">📂 Projects</span>
+        <button class="sidebar-add" onclick="openModal('project')">＋</button>
+      </div>
+      <div class="project-list" id="projectList"></div>
+      <div class="sidebar-section">
+        <div class="section-title">🔧 Tools</div>
+        <div class="tools-grid">
+          <div class="tool-btn" onclick="openTool('notes')"><div class="tool-icon">📝</div><div class="tool-label">Notes</div></div>
+          <div class="tool-btn" onclick="openTool('data')"><div class="tool-icon">📊</div><div class="tool-label">Data</div></div>
+          <div class="tool-btn" onclick="openTool('plot')"><div class="tool-icon">📈</div><div class="tool-label">Plot</div></div>
+          <div class="tool-btn" onclick="openTool('db')"><div class="tool-icon">🗄️</div><div class="tool-label">DB</div></div>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="content-card">
+        <!-- Welcome View -->
+        <div id="welcomeView">
+          <div class="content-header">
+            <div class="content-title">🏠 Home <span class="content-badge">Welcome</span></div>
+          </div>
+          <div class="content-body">
+            <div class="welcome">
+              <div class="welcome-icon">📜</div>
+              <div class="welcome-title">Welcome to VeritasArchivum</div>
+              <div class="welcome-desc">智能專案管理平台 Smart Project Archive<br>請先到 Settings 設定資料儲存位置</div>
+              <button class="welcome-btn" onclick="showSettings()">⚙️ Open Settings</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Settings View -->
+        <div id="settingsView" style="display:none;">
+          <div class="content-header">
+            <div class="content-title">⚙️ Settings 設定 <span class="content-badge">Configuration</span></div>
+            <button class="action-btn" onclick="goHome()">← Back</button>
+          </div>
+          <div class="content-body">
+            <!-- Base Location -->
+            <div class="settings-section">
+              <div class="settings-title">📁 Base Location 資料儲存位置</div>
+              <div class="settings-row">
+                <input class="settings-input" id="settingsBase" placeholder="e.g., C:\\Users\\tonyk\\OneDrive\\Desktop\\VeritasArchivum">
+                <button class="action-btn primary" onclick="saveBasePath()">Save</button>
+              </div>
+              <div class="settings-hint">專案將儲存於此路徑。每個專案獨立一個 .json 檔案。</div>
+              <div class="settings-hint">Projects will be saved to this path. Each project as separate .json file.</div>
+            </div>
+            
+            <!-- Logo Settings -->
+            <div class="settings-section">
+              <div class="settings-title">🖼️ Logo 設定</div>
+              <div class="logo-preview">
+                <img class="logo-preview-img" id="logoPreview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%231a3a2a' width='100' height='100' rx='12'/%3E%3Ctext x='50' y='65' text-anchor='middle' fill='%234ade80' font-size='40' font-weight='bold'%3EVA%3C/text%3E%3C/svg%3E" alt="Logo Preview">
+                <div class="logo-preview-info">
+                  <div class="logo-preview-name" id="logoName">Default Logo</div>
+                  <div class="logo-preview-size" id="logoSize">SVG Vector</div>
+                  <div class="logo-actions">
+                    <label class="action-btn primary" style="cursor:pointer;">
+                      📤 Upload PNG
+                      <input type="file" accept="image/png,image/svg+xml,image/webp" style="display:none" onchange="uploadLogo(event)">
+                    </label>
+                    <button class="action-btn" onclick="resetLogo()">Reset Default</button>
+                  </div>
+                </div>
+              </div>
+              <div class="settings-hint" style="margin-top:10px;">支援去背 PNG、SVG、WebP。Logo 將同時用於頁面標題和瀏覽器圖示 (Favicon)。</div>
+            </div>
+            
+            <!-- Backup & Restore -->
+            <div class="settings-section">
+              <div class="settings-title">💾 Backup & Restore 備份與還原</div>
+              <div class="backup-actions">
+                <button class="backup-btn" onclick="backupAll()">📦 Backup All Projects 備份全部</button>
+                <button class="backup-btn" onclick="restoreBackup()">📥 Restore from Backup 還原</button>
+                <button class="backup-btn" onclick="exportSettings()">⚙️ Export Settings 匯出設定</button>
+                <button class="backup-btn" onclick="importSettings()">📂 Import Settings 匯入設定</button>
+              </div>
+            </div>
+            
+            <!-- Storage Info -->
+            <div class="settings-section">
+              <div class="settings-title">📊 Storage Info 儲存資訊</div>
+              <div class="summary-stat"><span class="summary-label">Total Projects</span><span class="summary-value" id="settingsProjectCount">0</span></div>
+              <div class="summary-stat"><span class="summary-label">Total Blocks</span><span class="summary-value" id="settingsBlockCount">0</span></div>
+              <div class="summary-stat"><span class="summary-label">Storage Used</span><span class="summary-value" id="settingsStorageUsed">0 KB</span></div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Project View -->
+        <div id="projectView" style="display:none;">
+          <div class="content-header">
+            <div class="content-title"><span id="viewIcon">📁</span> <span id="viewName">Project</span> <span class="content-badge" id="viewCode">PRJ-001</span></div>
+            <div style="display:flex;gap:8px;">
+              <button class="action-btn" onclick="saveProjectFile()">💾 Save File</button>
+              <button class="action-btn" onclick="exportProject()">📤 Export</button>
+              <button class="action-btn" onclick="deleteProject()">🗑️ Delete</button>
+            </div>
+          </div>
+          <div class="content-body">
+            <div class="project-header-row">
+              <div class="project-title-wrap">
+                <span class="project-title-icon" id="projIcon">📁</span>
+                <div>
+                  <div class="project-title-code" id="projCode">PRJ-001</div>
+                  <div class="project-title-name" id="projName">Project Name</div>
+                  <div class="project-title-desc" id="projDesc">Description</div>
+                </div>
+              </div>
+              <button class="action-btn" onclick="editProject()">✏️ Edit</button>
+            </div>
+            <div class="blocks-list" id="blocksList"></div>
+            <div class="add-block-row">
+              <button class="add-block-btn" onclick="openBlockModal('toggle')">▸ Toggle</button>
+              <button class="add-block-btn" onclick="openBlockModal('code')">🐍 Code</button>
+              <button class="add-block-btn" onclick="openBlockModal('page')">📄 Page</button>
+              <button class="add-block-btn" onclick="openBlockModal('note')">📝 Note</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    
+    <!-- Right Panel -->
+    <aside class="right-panel">
+      <div class="panel-section">
+        <div class="panel-title">🔔 Live Log</div>
+        <div class="log-list" id="logList"><div class="log-item"><span class="log-text">Ready...</span></div></div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-title">📊 Summary</div>
+        <div class="summary-stat"><span class="summary-label">Projects</span><span class="summary-value" id="summaryProjects">0</span></div>
+        <div class="summary-stat"><span class="summary-label">Blocks</span><span class="summary-value" id="summaryBlocks">0</span></div>
+        <div class="summary-stat"><span class="summary-label">Last Save</span><span class="summary-value" id="summaryLastSave">--</span></div>
+      </div>
+    </aside>
+  </div>
+  
+  <!-- Modal: Project -->
+  <div class="modal-overlay" id="modalProject">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">📁 New Project</span>
+        <button class="modal-close" onclick="closeModal('project')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Project Name 專案名稱</label>
+          <input class="form-input" id="inputProjName" placeholder="Enter project name...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Icon 圖示</label>
+          <select class="form-select" id="inputProjIcon">
+            <option value="📁">📁 Folder</option>
+            <option value="🐍">🐍 Python</option>
+            <option value="📊">📊 Data</option>
+            <option value="🔬">🔬 Research</option>
+            <option value="💡">💡 Idea</option>
+            <option value="📈">📈 Finance</option>
+            <option value="🌐">🌐 Web</option>
+            <option value="🔧">🔧 Tool</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description 描述</label>
+          <input class="form-input" id="inputProjDesc" placeholder="Brief description...">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="action-btn" onclick="closeModal('project')">Cancel</button>
+        <button class="action-btn primary" onclick="saveProject()">Create</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Modal: Block -->
+  <div class="modal-overlay" id="modalBlock">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title" id="blockModalTitle">Add Block</span>
+        <button class="modal-close" onclick="closeModal('block')">✕</button>
+      </div>
+      <div class="modal-body" id="blockModalBody"></div>
+      <div class="modal-footer">
+        <button class="action-btn" onclick="closeModal('block')">Cancel</button>
+        <button class="action-btn primary" onclick="saveBlock()">Add</button>
+      </div>
+    </div>
+  </div>
+  
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    const STORAGE_KEY = 'veritas-archivum-config';
+    const PROJECTS_KEY = 'veritas-archivum-projects';
+    
+    const DEFAULT_LOGO = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%231a3a2a' width='100' height='100' rx='12'/%3E%3Ctext x='50' y='65' text-anchor='middle' fill='%234ade80' font-size='40' font-weight='bold'%3EVA%3C/text%3E%3C/svg%3E";
+    
+    const STATE = {
+      config: { basePath: '', logo: null, logoName: 'Default Logo' },
+      projects: [],
+      currentProject: null,
+      counters: { project: 0 },
+      pendingBlockType: null,
+      logs: []
+    };
+    
+    // ===== STORAGE =====
+    const Store = {
+      saveConfig() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          basePath: STATE.config.basePath,
+          logo: STATE.config.logo,
+          logoName: STATE.config.logoName,
+          counters: STATE.counters
+        }));
+      },
+      loadConfig() {
+        const d = localStorage.getItem(STORAGE_KEY);
+        if (d) {
+          const p = JSON.parse(d);
+          STATE.config.basePath = p.basePath || '';
+          STATE.config.logo = p.logo;
+          STATE.config.logoName = p.logoName || 'Default Logo';
+          STATE.counters = p.counters || { project: 0 };
+          
+          if (STATE.config.logo) {
+            $('siteLogo').src = STATE.config.logo;
+            $('logoPreview').src = STATE.config.logo;
+            $('favicon').href = STATE.config.logo;
+          }
+          $('settingsBase').value = STATE.config.basePath;
+          $('logoName').textContent = STATE.config.logoName;
+        }
+        updateStatus();
+      },
+      saveProjects() {
+        localStorage.setItem(PROJECTS_KEY, JSON.stringify(STATE.projects));
+        updateStatus();
+        updateSummary();
+      },
+      loadProjects() {
+        const d = localStorage.getItem(PROJECTS_KEY);
+        if (d) STATE.projects = JSON.parse(d) || [];
+        updateStatus();
+        updateSummary();
+      }
+    };
+    
+    // ===== UTILS =====
+    const U = {
+      id: () => 'id' + Date.now() + Math.random().toString(36).substr(2,6),
+      now: () => new Date().toISOString(),
+      time: () => new Date().toLocaleTimeString('zh-TW', {hour:'2-digit', minute:'2-digit', second:'2-digit'}),
+      date: s => s ? new Date(s).toLocaleDateString('zh-TW') : '--',
+      toast: msg => { const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); },
+      esc: t => { const d=document.createElement('div'); d.textContent=t||''; return d.innerHTML; },
+      pad: n => String(n).padStart(2,'0'),
+      size: bytes => bytes < 1024 ? bytes + ' B' : (bytes/1024).toFixed(1) + ' KB'
+    };
+    
+    // ===== LOGGING =====
+    function addLog(text, type='info') {
+      STATE.logs.unshift({ text, type, time: U.time() });
+      if (STATE.logs.length > 15) STATE.logs.pop();
+      renderLogs();
+    }
+    
+    function renderLogs() {
+      $('logList').innerHTML = STATE.logs.map(l => `
+        <div class="log-item">
+          <span class="log-${l.type}">${{check:'✅',warn:'⚠️',error:'❌',info:'🔵'}[l.type]||'🔵'}</span>
+          <span class="log-text">${U.esc(l.text)}</span>
+        </div>
+      `).join('') || '<div class="log-item"><span class="log-text">Ready...</span></div>';
+    }
+    
+    function updateStatus() {
+      $('statusBase').textContent = STATE.config.basePath ? STATE.config.basePath.split('\\').pop() || STATE.config.basePath : 'Not Set';
+      $('statusProjects').textContent = STATE.projects.length;
+    }
+    
+    function updateSummary() {
+      const totalBlocks = STATE.projects.reduce((s,p) => s + (p.blocks?.length||0), 0);
+      $('summaryProjects').textContent = STATE.projects.length;
+      $('summaryBlocks').textContent = totalBlocks;
+      $('summaryLastSave').textContent = U.time();
+      $('settingsProjectCount').textContent = STATE.projects.length;
+      $('settingsBlockCount').textContent = totalBlocks;
+      
+      const used = new Blob([JSON.stringify(STATE.projects)]).size;
+      $('settingsStorageUsed').textContent = U.size(used);
+    }
+    
+    // ===== VIEWS =====
+    function goHome() {
+      STATE.currentProject = null;
+      $('welcomeView').style.display = 'block';
+      $('settingsView').style.display = 'none';
+      $('projectView').style.display = 'none';
+      renderProjects();
+    }
+    
+    function showSettings() {
+      $('welcomeView').style.display = 'none';
+      $('settingsView').style.display = 'block';
+      $('projectView').style.display = 'none';
+      $('settingsBase').value = STATE.config.basePath;
+      updateSummary();
+    }
+    
+    // ===== SETTINGS =====
+    function saveBasePath() {
+      const path = $('settingsBase').value.trim();
+      STATE.config.basePath = path;
+      Store.saveConfig();
+      updateStatus();
+      addLog(`Base path set: ${path.split('\\').pop()}`, 'check');
+      U.toast('Base path saved');
+    }
+    
+    function uploadLogo(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = ev => {
+        STATE.config.logo = ev.target.result;
+        STATE.config.logoName = file.name;
+        
+        $('siteLogo').src = STATE.config.logo;
+        $('logoPreview').src = STATE.config.logo;
+        $('favicon').href = STATE.config.logo;
+        $('logoName').textContent = file.name;
+        $('logoSize').textContent = U.size(file.size);
+        
+        Store.saveConfig();
+        addLog(`Logo uploaded: ${file.name}`, 'check');
+        U.toast('Logo updated');
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    function resetLogo() {
+      STATE.config.logo = null;
+      STATE.config.logoName = 'Default Logo';
+      
+      $('siteLogo').src = DEFAULT_LOGO;
+      $('logoPreview').src = DEFAULT_LOGO;
+      $('favicon').href = DEFAULT_LOGO;
+      $('logoName').textContent = 'Default Logo';
+      $('logoSize').textContent = 'SVG Vector';
+      
+      Store.saveConfig();
+      addLog('Logo reset to default', 'info');
+      U.toast('Logo reset');
+    }
+    
+    // ===== BACKUP =====
+    function backupAll() {
+      const backup = {
+        version: '1.0',
+        exportedAt: U.now(),
+        config: STATE.config,
+        counters: STATE.counters,
+        projects: STATE.projects
+      };
+      
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `VeritasArchivum-Backup-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      
+      addLog('Full backup created', 'check');
+      U.toast('Backup downloaded');
+    }
+    
+    function restoreBackup() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = ev => {
+          try {
+            const data = JSON.parse(ev.target.result);
+            
+            if (data.config) {
+              STATE.config = data.config;
+              if (STATE.config.logo) {
+                $('siteLogo').src = STATE.config.logo;
+                $('logoPreview').src = STATE.config.logo;
+                $('favicon').href = STATE.config.logo;
+              }
+              $('settingsBase').value = STATE.config.basePath || '';
+              Store.saveConfig();
+            }
+            
+            if (data.counters) STATE.counters = data.counters;
+            if (data.projects) {
+              STATE.projects = data.projects;
+              Store.saveProjects();
+            }
+            
+            renderProjects();
+            goHome();
+            addLog(`Restored ${STATE.projects.length} projects`, 'check');
+            U.toast('Backup restored');
+          } catch (err) {
+            addLog('Restore failed: invalid file', 'error');
+            U.toast('Restore failed');
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+    
+    function exportSettings() {
+      const settings = { config: STATE.config, counters: STATE.counters };
+      const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'VeritasArchivum-Settings.json';
+      a.click();
+      addLog('Settings exported', 'check');
+    }
+    
+    function importSettings() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = ev => {
+          try {
+            const data = JSON.parse(ev.target.result);
+            if (data.config) {
+              STATE.config = data.config;
+              if (STATE.config.logo) {
+                $('siteLogo').src = STATE.config.logo;
+                $('logoPreview').src = STATE.config.logo;
+                $('favicon').href = STATE.config.logo;
+              }
+              Store.saveConfig();
+              showSettings();
+              addLog('Settings imported', 'check');
+              U.toast('Settings imported');
+            }
+          } catch (err) {
+            U.toast('Import failed');
+          }
+        };
+        reader.readAsText(file);
+      };
+      input.click();
+    }
+    
+    // ===== PROJECTS =====
+    function renderProjects() {
+      const list = $('projectList');
+      if (STATE.projects.length === 0) {
+        list.innerHTML = '<div style="padding:16px;color:var(--text-lighter);font-size:12px;text-align:center;">No projects yet</div>';
+        return;
+      }
+      
+      list.innerHTML = STATE.projects.map(p => `
+        <div class="project-item ${STATE.currentProject?.id === p.id ? 'active' : ''}" onclick="selectProject('${p.id}')">
+          <span class="project-icon">${p.icon}</span>
+          <div class="project-info">
+            <div class="project-name">${U.esc(p.name)}</div>
+            <div class="project-meta">${p.blocks?.length||0} blocks</div>
+          </div>
+          <span class="project-code">${p.code}</span>
+        </div>
+      `).join('');
+    }
+    
+    function saveProject() {
+      const name = $('inputProjName').value.trim();
+      const icon = $('inputProjIcon').value;
+      const desc = $('inputProjDesc').value.trim();
+      
+      if (!name) { U.toast('Enter project name'); return; }
+      
+      STATE.counters.project++;
+      const code = `PRJ-${U.pad(STATE.counters.project)}`;
+      
+      const project = {
+        id: U.id(),
+        code,
+        name,
+        icon,
+        desc,
+        blocks: [],
+        createdAt: U.now(),
+        updatedAt: U.now()
+      };
+      
+      STATE.projects.push(project);
+      Store.saveProjects();
+      Store.saveConfig();
+      renderProjects();
+      closeModal('project');
+      selectProject(project.id);
+      
+      $('inputProjName').value = '';
+      $('inputProjDesc').value = '';
+      
+      addLog(`Project ${code} created`, 'check');
+      U.toast(`Project ${code} created`);
+    }
+    
+    function selectProject(id) {
+      STATE.currentProject = STATE.projects.find(p => p.id === id);
+      renderProjects();
+      showProjectView();
+    }
+    
+    function showProjectView() {
+      const p = STATE.currentProject;
+      if (!p) return;
+      
+      $('welcomeView').style.display = 'none';
+      $('settingsView').style.display = 'none';
+      $('projectView').style.display = 'block';
+      
+      $('viewIcon').textContent = p.icon;
+      $('viewName').textContent = p.name;
+      $('viewCode').textContent = p.code;
+      $('projIcon').textContent = p.icon;
+      $('projCode').textContent = p.code;
+      $('projName').textContent = p.name;
+      $('projDesc').textContent = p.desc || 'No description';
+      
+      renderBlocks();
+    }
+    
+    function editProject() {
+      const p = STATE.currentProject;
+      if (!p) return;
+      const newName = prompt('Project Name:', p.name);
+      if (newName?.trim()) {
+        p.name = newName.trim();
+        p.updatedAt = U.now();
+        Store.saveProjects();
+        renderProjects();
+        showProjectView();
+      }
+    }
+    
+    function deleteProject() {
+      if (!STATE.currentProject) return;
+      if (!confirm('Delete this project?')) return;
+      
+      const code = STATE.currentProject.code;
+      STATE.projects = STATE.projects.filter(p => p.id !== STATE.currentProject.id);
+      Store.saveProjects();
+      goHome();
+      renderProjects();
+      addLog(`Project ${code} deleted`, 'warn');
+      U.toast('Project deleted');
+    }
+    
+    // Save single project as file
+    function saveProjectFile() {
+      const p = STATE.currentProject;
+      if (!p) return;
+      
+      const blob = new Blob([JSON.stringify(p, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${p.code}-${p.name.replace(/[^a-zA-Z0-9]/g, '_')}.json`;
+      a.click();
+      
+      addLog(`Saved: ${p.code}.json`, 'check');
+      U.toast('Project file saved');
+    }
+    
+    function exportProject() {
+      saveProjectFile();
+    }
+    
+    // ===== BLOCKS =====
+    function renderBlocks() {
+      const list = $('blocksList');
+      const blocks = STATE.currentProject?.blocks || [];
+      
+      if (blocks.length === 0) {
+        list.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-lighter);font-size:13px;">No blocks yet</div>';
+        return;
+      }
+      
+      list.innerHTML = blocks.map(b => {
+        let content = '';
+        if (b.type === 'code') {
+          content = `<pre><code class="language-${b.lang||'python'}">${U.esc(b.content)}</code></pre>`;
+        } else {
+          content = `<div class="block-content">${U.esc(b.content)}</div>`;
+        }
+        
+        return `
+          <div class="block-item">
+            <div class="block-header">
+              <div class="block-title">
+                <span class="block-code ${b.type}">${b.blockCode||''}</span>
+                <span class="block-type">${b.type}</span>
+                ${U.esc(b.title||'')}
+              </div>
+              <div class="block-actions">
+                <button class="block-btn" onclick="moveBlock('${b.id}',-1)">↑</button>
+                <button class="block-btn" onclick="moveBlock('${b.id}',1)">↓</button>
+                <button class="block-btn delete" onclick="deleteBlock('${b.id}')">✕</button>
+              </div>
+            </div>
+            <div class="block-body">
+              ${content}
+              ${b.note ? `<div class="block-note-text">📌 ${U.esc(b.note)}</div>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      hljs.highlightAll();
+    }
+    
+    function openBlockModal(type) {
+      STATE.pendingBlockType = type;
+      $('blockModalTitle').textContent = {toggle:'Add Toggle',code:'Add Code',page:'Add Page',note:'Add Note'}[type] || 'Add Block';
+      
+      let html = `
+        <div class="form-group">
+          <label class="form-label">Section 章節編號</label>
+          <input class="form-input" id="blockSection" placeholder="0, 1, 2..." value="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Title 標題</label>
+          <input class="form-input" id="blockTitle" placeholder="Enter title...">
+        </div>
+      `;
+      
+      if (type === 'code') {
+        html += `
+          <div class="form-group">
+            <label class="form-label">Language</label>
+            <select class="form-select" id="blockLang">
+              <option value="python">Python</option>
+              <option value="javascript">JavaScript</option>
+              <option value="sql">SQL</option>
+              <option value="bash">Bash</option>
+              <option value="powershell">PowerShell</option>
+            </select>
+          </div>
+        `;
+      }
+      
+      html += `
+        <div class="form-group">
+          <label class="form-label">Content 內容</label>
+          <textarea class="form-textarea" id="blockContent" placeholder="${type==='code'?'# Code...':'Content...'}" style="${type!=='code'?'font-family:var(--sans);':''}"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Note 備註</label>
+          <input class="form-input" id="blockNote" placeholder="Optional note...">
+        </div>
+      `;
+      
+      $('blockModalBody').innerHTML = html;
+      openModal('block');
+    }
+    
+    function saveBlock() {
+      const type = STATE.pendingBlockType;
+      const p = STATE.currentProject;
+      if (!p || !type) return;
+      
+      const section = $('blockSection')?.value || '0';
+      const title = $('blockTitle')?.value || '';
+      const content = $('blockContent')?.value || '';
+      const lang = $('blockLang')?.value || 'python';
+      const note = $('blockNote')?.value || '';
+      
+      if (!title && !content) { U.toast('Enter title or content'); return; }
+      
+      const count = p.blocks.filter(b => b.section === section).length;
+      const blockCode = `${section}-${count + 1}`;
+      
+      p.blocks.push({
+        id: U.id(),
+        type,
+        blockCode,
+        section,
+        title: title || `${type} ${blockCode}`,
+        content,
+        lang: type === 'code' ? lang : undefined,
+        note,
+        createdAt: U.now()
+      });
+      
+      p.updatedAt = U.now();
+      Store.saveProjects();
+      renderBlocks();
+      closeModal('block');
+      
+      addLog(`Block ${blockCode} added`, 'check');
+      U.toast(`Block ${blockCode} added`);
+    }
+    
+    function moveBlock(id, dir) {
+      const p = STATE.currentProject;
+      if (!p) return;
+      const blocks = p.blocks;
+      const idx = blocks.findIndex(b => b.id === id);
+      const newIdx = idx + dir;
+      if (newIdx < 0 || newIdx >= blocks.length) return;
+      [blocks[idx], blocks[newIdx]] = [blocks[newIdx], blocks[idx]];
+      Store.saveProjects();
+      renderBlocks();
+    }
+    
+    function deleteBlock(id) {
+      const p = STATE.currentProject;
+      if (!p || !confirm('Delete block?')) return;
+      p.blocks = p.blocks.filter(b => b.id !== id);
+      p.updatedAt = U.now();
+      Store.saveProjects();
+      renderBlocks();
+      addLog('Block deleted', 'warn');
+    }
+    
+    // ===== MODAL =====
+    function openModal(type) { $(`modal${type.charAt(0).toUpperCase()+type.slice(1)}`).classList.add('show'); }
+    function closeModal(type) { $(`modal${type.charAt(0).toUpperCase()+type.slice(1)}`).classList.remove('show'); }
+    
+    // ===== TOOLS =====
+    function openTool(name) {
+      const files = {notes:'vrn-notes-module.html',data:'vrn-data-module.html',plot:'vrn-plot-module.html',db:'vrn-db-module.html'};
+      window.open(files[name], '_blank');
+    }
+    
+    // ===== INIT =====
+    document.addEventListener('DOMContentLoaded', () => {
+      Store.loadConfig();
+      Store.loadProjects();
+      renderProjects();
+      addLog('System initialized', 'check');
+    });
+  </script>
+</body>
+</html>

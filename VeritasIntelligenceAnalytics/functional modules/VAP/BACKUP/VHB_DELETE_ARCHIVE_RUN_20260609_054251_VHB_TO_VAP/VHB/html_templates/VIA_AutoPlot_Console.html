@@ -1,0 +1,718 @@
+<!doctype html>
+<!--
+================================================================================
+ VIA TEMPLATE · VeritasAutoPlot Console · Page 1 (VAP Studio)
+================================================================================
+ ASSET_ID       : AST-HTML-TPL-VIA-VAP-100-001
+ DISPLAY        : SYS_VIA.MDL100.TPL-AUTOPLOT-STUDIO
+ VERSION        : 1.1.1            STATUS : stable · 19/19 headless · 18/18 compliance
+ LANGUAGE       : HTML5 / CSS3 / Vanilla JS (ES2020) / Plotly 2.35.2
+ ANCHORS        : VAP-HEAD / VAP-STYLE / VAP-BRAND / VAP-IO / VAP-TABS
+                  VAP-SIDE / VAP-MAIN / VAP-PG-BUILDER / VAP-PG-GALLERY
+                  VAP-PG-OUTPUT / VAP-PG-SOURCES / VAP-FOOT / VAP-SCRIPT
+ FILL SLOTS     : VAOS-FILL-SLOT::PLOTLY  VAOS-FILL-SLOT::DICT  VAOS-FILL-SLOT::FIGS
+ V1.1.1 FIXES   : tab-click delegation restored · offline-safe Plotly guard +
+                  placeholder + readiness poll · narrow-header wrap (title no
+                  longer collapses to 0w) · fitOne skips collapsed/hidden nodes
+                  · keyboard tab a11y (role/aria-selected/arrows)
+ V1.1 UPGRADE   : modular type-scale (8-step hierarchy) · fit-to-box auto-shrink
+                  (字不可大於框) · auto-fit responsive grids · ResizeObserver
+                  · draggable matrix-dashboard panels (pointer reorder) · Auto-Fit btn
+ LOCK ANCESTOR  : VIA Visual Lock v1 · VIA_ActiveETF_Console · VIA_DataModule_Controller_v2
+ PLOTLY RULES   : displayModeBar:false · fixedrange:true · dragmode:false · bar opacity 0.8
+ TW INVERSION   : UP = RED (--up) · DOWN = GREEN (--dn)
+================================================================================
+-->
+<html lang="zh-Hant" data-locked="2026-06-06 00:00:00">
+<!-- ANCHOR:VAP-HEAD -->
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VeritasAutoPlot Console · VIA</title>
+<meta name="theme-color" content="#4c78a8">
+<meta name="description" content="VeritasAutoPlot — 資料字典自動擷取 × 視覺化建構 × 多格式輸出 × 多來源可得性對照">
+<meta name="vaos:asset-id" content="AST-HTML-TPL-VIA-VAP-100-001">
+<meta name="vaos:family" content="VIA_VAP_Studio">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- VAOS-FILL-SLOT::PLOTLY  (injector replaces CDN tag with inline plotly.min.js for offline safety) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.35.2/plotly.min.js"></script>
+
+<!-- ANCHOR:VAP-STYLE -->
+<style>
+:root{
+  --bg:#f5f4f0;--pane:#fbfaf7;--sf:#fff;--sf2:#fafaf8;--line:#dbd9d3;--line2:#e7e5df;
+  --ink:#1e1d1a;--i1:#3d3c38;--sub:#6f6d66;--mut:#9a978f;--i4:#c4c0b8;
+  --bl:#4c78a8;--bl-l:#d0e1f0;--tl:#439a9a;--tl-l:#c8e6e6;--gn:#4f8a5b;--gn-l:#cde8d5;
+  --am:#c8902f;--am-l:#f5e2b8;--rd:#c0584e;--co:#c96b5a;--co-l:#f5d0c8;--vi:#7a6cae;--vi-l:#dcd8f0;--ro:#b05580;
+  --sb1:#4c72b0;--sb2:#439a9a;--sb3:#55a868;--sb4:#64b5cd;
+  --up:#c0392b;--dn:#2e7d52;--up-l:#f5d0c8;--dn-l:#cde8d5;
+  --syne:'Syne',sans-serif;--sans:'DM Sans',system-ui,sans-serif;--mono:'DM Mono',ui-monospace,monospace;
+  --side:240px;--rail:48px;--t:.3s cubic-bezier(.2,.7,.3,1);
+  --r:6px;--r2:8px;--sh:0 1px 3px rgba(0,0,0,.06);--sh2:0 4px 14px rgba(0,0,0,.09);
+
+  /* ===== TYPE SCALE · 8-step hierarchy (minor-third-ish, fluid, capped) ===== */
+  /* h1 > page > value > title > body > sm > cap > micro  — never inverts */
+  --fs-micro: clamp(7.5px, .35vw + 6px, 8.5px);   /* table micro / chips     */
+  --fs-cap:   clamp(8.5px, .40vw + 6.5px, 9.5px); /* captions / units        */
+  --fs-sm:    clamp(9.5px, .45vw + 7px, 10.5px);  /* secondary / mono small  */
+  --fs-body:  clamp(10px,  .50vw + 7.5px, 11px);  /* base body               */
+  --fs-ttl:   clamp(11px,  .65vw + 7.5px, 12.5px);/* card / section title    */
+  --fs-val:   clamp(12.5px,.95vw + 7px, 15.5px);  /* KPI value (Syne)        */
+  --fs-pg:    clamp(13.5px,1.15vw + 7px, 16.5px); /* page heading            */
+  --fs-h1:    clamp(15px,  1.45vw + 7px, 21px);   /* brand                   */
+}
+*{box-sizing:border-box;margin:0;padding:0;min-width:0}   /* min-width:0 → flex/grid children may shrink, text never forces overflow */
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:var(--fs-body);line-height:1.45;-webkit-font-smoothing:antialiased;overflow:hidden}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.hidden{display:none!important}
+.wrap{display:flex;flex-direction:column;height:100vh}
+/* fit-to-box guard: single-line elements clip rather than overflow; JS .fit then shrinks font */
+.clip{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+
+/* ===== brand header ===== */
+.brand{position:relative;background:var(--pane);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:14px;padding:9px 18px;z-index:4}
+.brand::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--rd),var(--am),var(--sb3),var(--sb2),var(--bl),var(--vi));background-size:200% 100%;animation:ribbon 11s linear infinite}
+@keyframes ribbon{to{background-position:200% 0}}
+.bl{display:flex;align-items:center;gap:13px;flex:1 1 auto;overflow:hidden}
+.crest{width:46px;height:46px;flex:none;border-radius:11px;background:linear-gradient(135deg,#23405f,var(--vi));display:grid;place-items:center;color:#fff;font-family:var(--syne);font-weight:800;font-size:13px;letter-spacing:.5px;box-shadow:0 2px 9px rgba(76,120,168,.32)}
+.titles{display:flex;flex-direction:column;gap:1px;overflow:hidden}
+.h1{font-family:var(--syne);font-weight:800;font-size:var(--fs-h1);letter-spacing:-.4px;line-height:1.06;background:linear-gradient(92deg,var(--sb1),var(--sb4) 40%,var(--sb2) 66%,var(--sb3));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:var(--sb1)}
+.h2{font-family:var(--syne);font-weight:700;font-size:var(--fs-cap);letter-spacing:2px;color:var(--sub);text-transform:uppercase}
+.h3{font-family:var(--mono);font-size:var(--fs-cap);color:var(--mut)}
+.br{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none}
+.rrow{display:flex;align-items:center;gap:8px}
+.meta{font-family:var(--mono);font-size:var(--fs-micro);color:var(--mut);text-align:right;white-space:nowrap;line-height:1.5}
+.dl{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:var(--fs-micro);font-weight:500;padding:2px 8px;border:1px solid var(--gn);border-radius:5px;color:var(--gn);background:var(--gn-l)}
+.dl i{width:6px;height:6px;border-radius:50%;background:var(--gn);animation:beat 1.8s ease-in-out infinite}
+@keyframes beat{0%,100%{box-shadow:0 0 0 0 rgba(79,138,91,.45)}50%{box-shadow:0 0 0 5px rgba(79,138,91,0)}}
+.btn{font-family:var(--sans);font-weight:700;font-size:var(--fs-sm);border:1px solid var(--line);border-radius:7px;padding:6px 11px;cursor:pointer;background:var(--sf);color:var(--ink);transition:transform .08s,border-color .15s,color .15s;white-space:nowrap}
+.btn:hover{border-color:var(--bl);color:var(--bl)}.btn:active{transform:scale(.95)}
+.btn.primary{background:linear-gradient(92deg,var(--bl),var(--tl));color:#fff;border-color:transparent}
+.btn.primary:hover{filter:brightness(1.06);color:#fff}
+.btn .ic{margin-right:5px}
+.btn.lock.on{background:var(--rd);color:#fff;border-color:var(--rd)}
+.hamburger{display:none;width:34px;height:34px;border:1px solid var(--line);border-radius:7px;background:var(--sf);cursor:pointer;color:var(--bl);font-size:15px;align-items:center;justify-content:center;flex:none}
+
+/* ===== IO / BASE bar ===== */
+.io{background:var(--pane);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:7px 18px;z-index:3;flex-wrap:wrap}
+.io label{font-family:var(--mono);font-size:var(--fs-cap);color:var(--mut);text-transform:uppercase;letter-spacing:.6px}
+.io input{font-family:var(--mono);font-size:var(--fs-sm);padding:5px 9px;border:1px solid var(--line);border-radius:6px;background:var(--sf);color:var(--ink);width:380px;max-width:42vw}
+.io input:focus{outline:none;border-color:var(--bl)}
+.io input.frozen{background:#f0efe9;color:var(--sub);border-style:dashed}
+.io .iobtn{font-family:var(--sans);font-weight:700;font-size:var(--fs-sm);border:1px solid var(--line);border-radius:6px;padding:5px 10px;cursor:pointer;background:var(--sf)}
+.io .iobtn:hover{border-color:var(--bl);color:var(--bl)}
+.io .iobtn.af{border-color:var(--tl);color:var(--tl)}
+.io .conn{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:var(--fs-sm);color:var(--gn)}
+.io .conn i{width:7px;height:7px;border-radius:50%;background:var(--gn)}
+.io .hint{font-family:var(--mono);font-size:var(--fs-micro);color:var(--mut);margin-left:auto}
+
+/* ===== tabs ===== */
+.tabs{display:flex;gap:2px;background:var(--pane);border-bottom:1px solid var(--line);padding:0 14px;position:relative;z-index:3;overflow-x:auto}
+.tab{font-family:var(--syne);font-weight:700;font-size:var(--fs-ttl);padding:9px 15px 10px;cursor:pointer;color:var(--sub);border:none;background:none;position:relative;white-space:nowrap}
+.tab:hover{color:var(--ink)}.tab.on{color:var(--bl)}
+.tab .num{font-family:var(--mono);font-size:var(--fs-micro);color:var(--mut);margin-right:5px}
+.tabink{position:absolute;bottom:0;height:2.5px;background:linear-gradient(90deg,var(--bl),var(--tl));border-radius:2px;transition:left .3s,width .3s}
+
+/* ===== body grid ===== */
+.body{flex:1;display:grid;grid-template-columns:var(--side) 1fr;min-height:0;position:relative;z-index:1;transition:grid-template-columns var(--t)}
+.body.collapsed{grid-template-columns:var(--rail) 1fr}
+.scrim{display:none}
+
+/* ===== sidebar ===== */
+.side{background:var(--pane);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.side-top{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line2)}
+.side-top .bd2{font-family:var(--syne);font-weight:800;font-size:var(--fs-ttl)}
+.side-top .bd2 small{display:block;font-family:var(--mono);font-weight:400;font-size:var(--fs-micro);color:var(--mut)}
+.collapse{margin-left:auto;width:26px;height:26px;border:1px solid var(--line);border-radius:6px;background:var(--sf);cursor:pointer;display:grid;place-items:center;color:var(--sub);transition:var(--t);flex:none}
+.collapse:hover{border-color:var(--bl);color:var(--bl)}.collapse svg{width:13px;height:13px;transition:var(--t)}
+.collapsed .collapse svg{transform:rotate(180deg)}
+.scroll{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:13px}
+.scroll::-webkit-scrollbar{width:6px}.scroll::-webkit-scrollbar-thumb{background:#ccc9c1;border-radius:3px}
+.collapsed .side-top .bd2,.collapsed .scroll{display:none}.collapsed .side-top{justify-content:center;padding:9px 0}
+.sec .sl{font-family:var(--mono);font-size:var(--fs-micro);color:var(--mut);text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.sec .sl i{width:6px;height:6px;border-radius:2px;flex:none}
+.srcrow{display:flex;align-items:center;gap:7px;padding:4px 7px;border-radius:6px;cursor:pointer;font-family:var(--mono);font-size:var(--fs-sm);color:var(--sub);border:1px solid transparent}
+.srcrow:hover{background:var(--sf);border-color:var(--line2)}
+.srcrow.on{color:var(--ink);background:var(--sf);border-color:var(--line)}
+.srcrow .dot{width:8px;height:8px;border-radius:2px;flex:none}
+.srcrow .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.srcrow .ct{margin-left:auto;font-size:var(--fs-micro);color:var(--mut);flex:none}
+.fileitem{display:flex;flex-direction:column;gap:2px;padding:5px 8px;border:1px solid var(--line2);border-radius:6px;background:var(--sf);cursor:pointer}
+.fileitem:hover{border-color:var(--tl)}
+.fileitem .fn{font-family:var(--mono);font-size:var(--fs-sm);color:var(--ink);display:flex;align-items:center;gap:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fileitem .fm{font-family:var(--mono);font-size:var(--fs-micro);color:var(--mut);display:flex;gap:6px;flex-wrap:wrap}
+.chipfmt{font-family:var(--mono);font-size:var(--fs-micro);padding:0 5px;border-radius:4px;border:1px solid var(--line);color:var(--sub)}
+.chipfmt.parquet{background:var(--bl-l);color:var(--bl);border-color:transparent}
+.chipfmt.duckdb{background:var(--vi-l);color:var(--vi);border-color:transparent}
+.chipfmt.csv{background:var(--am-l);color:var(--am);border-color:transparent}
+.chipfmt.gsheet{background:var(--gn-l);color:var(--gn);border-color:transparent}
+.field{display:flex;flex-direction:column;gap:4px}
+.field select{font-family:var(--mono);font-size:var(--fs-sm);padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--sf);color:var(--ink);max-width:100%}
+.tgl{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:var(--fs-sm);color:var(--sub);cursor:pointer}
+.tgl .sw{width:30px;height:16px;border-radius:9px;background:var(--line);position:relative;transition:var(--t);flex:none}
+.tgl .sw::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:#fff;transition:var(--t);box-shadow:var(--sh)}
+.tgl.on .sw{background:var(--gn)}.tgl.on .sw::after{left:16px}
+
+/* ===== main ===== */
+.main{overflow:auto;padding:13px 16px 18px;min-height:0}
+.main::-webkit-scrollbar{width:8px}.main::-webkit-scrollbar-thumb{background:#ccc9c1;border-radius:4px}
+.page{display:none;animation:fade .25s}.page.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.pg-h{display:flex;align-items:baseline;gap:10px;margin-bottom:11px;flex-wrap:wrap}
+.pg-h .t{font-family:var(--syne);font-weight:800;font-size:var(--fs-pg)}
+.pg-h .s{font-family:var(--mono);font-size:var(--fs-cap);color:var(--mut)}
+.pg-h .tag{font-family:var(--mono);font-size:var(--fs-micro);padding:2px 7px;border-radius:5px;background:var(--bl-l);color:var(--bl);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.cd{background:var(--pane);border:1px solid var(--line);border-radius:var(--r2);overflow:hidden;display:flex;flex-direction:column}
+.cd-h{padding:7px 12px;border-bottom:1px solid var(--line2);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cd-h .t{font-family:var(--syne);font-weight:700;font-size:var(--fs-ttl);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cd-h .u{font-family:var(--mono);font-size:var(--fs-micro);color:var(--mut);white-space:nowrap;flex:none}
+.cd-i{padding:10px 12px;flex:1;min-height:0}
+
+/* auto-fit grids (版面自動優化) */
+.grid{display:grid;gap:10px}
+.g-kpi{grid-template-columns:repeat(auto-fit,minmax(118px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.kpi{position:relative}
+.kpi .k{font-family:var(--mono);font-size:var(--fs-micro);color:var(--mut);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi .v{font-family:var(--syne);font-weight:800;font-size:var(--fs-val);margin-top:3px;line-height:1.05;white-space:nowrap}
+.kpi .d{font-family:var(--mono);font-size:var(--fs-micro);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.up{color:var(--up)}.dn{color:var(--dn)}.mut{color:var(--mut)}
+
+/* drag handle + draggable matrix dashboard */
+.dh{position:absolute;top:5px;right:6px;width:16px;height:16px;border-radius:4px;display:grid;place-items:center;color:var(--i4);cursor:grab;font-size:10px;line-height:1;opacity:0;transition:opacity .15s;touch-action:none}
+.cd:hover .dh,.galcard:hover .dh{opacity:1}
+.dh:active{cursor:grabbing}
+.drag.dragging{opacity:.35;box-shadow:var(--sh2)}
+.ph{border:1.5px dashed var(--bl);border-radius:var(--r2);background:var(--bl-l);opacity:.5}
+body.locked .dh{display:none}
+
+/* builder */
+.builder{display:grid;grid-template-columns:minmax(0,1fr) 268px;gap:10px;align-items:start}
+@media(max-width:1100px){.builder{grid-template-columns:1fr}}
+.plot{width:100%;height:360px}
+.palette{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.ptype{border:1px solid var(--line);border-radius:7px;background:var(--sf);padding:8px;cursor:pointer;text-align:center;transition:border-color .15s,transform .08s;overflow:hidden}
+.ptype:hover{border-color:var(--bl)}.ptype:active{transform:scale(.97)}
+.ptype.on{border-color:var(--bl);background:var(--bl-l)}
+.ptype svg{width:100%;height:32px;display:block;margin-bottom:5px}
+.ptype .pn{font-family:var(--sans);font-weight:700;font-size:var(--fs-sm);color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ptype .pe{font-family:var(--mono);font-size:var(--fs-micro);color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.style-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid var(--line2)}
+.style-row:last-child{border-bottom:none}
+.style-row label{font-family:var(--mono);font-size:var(--fs-sm);color:var(--sub);white-space:nowrap}
+.style-row input[type=range]{width:96px;flex:none}
+.swrow{display:flex;gap:4px;flex:none}
+.sw{width:16px;height:16px;border-radius:4px;border:1.5px solid #fff;cursor:pointer;box-shadow:0 0 0 1px var(--line)}
+.sw.on{box-shadow:0 0 0 2px var(--bl)}
+
+/* gallery */
+.gal{display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:10px}
+.galcard{position:relative}
+.galcard .gp{width:100%;height:148px}
+.galcard .desc{font-family:var(--mono);font-size:var(--fs-micro);color:var(--sub);line-height:1.6}
+.galcard .fit-tag{display:inline-block;font-family:var(--mono);font-size:var(--fs-micro);padding:1px 6px;border-radius:4px;background:var(--tl-l);color:var(--tl);margin-top:4px}
+
+/* output */
+.fmtgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:9px}
+.fmt{border:1px solid var(--line);border-radius:8px;background:var(--sf);padding:12px 10px;text-align:center;cursor:pointer;transition:border-color .15s}
+.fmt:hover{border-color:var(--bl)}.fmt.on{border-color:var(--bl);background:var(--bl-l)}
+.fmt .fi{font-family:var(--syne);font-weight:800;font-size:var(--fs-pg);color:var(--bl)}
+.fmt .fl{font-family:var(--mono);font-size:var(--fs-micro);color:var(--mut);margin-top:4px;white-space:nowrap}
+.fmt.on .fl{color:var(--bl)}
+.slot{display:flex;align-items:center;gap:8px;padding:7px 9px;border:1px solid var(--line2);border-radius:7px;background:var(--sf);font-family:var(--mono);font-size:var(--fs-sm);color:var(--sub);position:relative}
+.slot .sg{font-family:var(--syne);font-weight:800;font-size:var(--fs-sm);color:var(--bl);flex:none}
+.slot .sx{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slot.empty{border-style:dashed;color:var(--mut);justify-content:center}
+
+/* tables */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:var(--fs-sm)}
+th{font-family:var(--mono);font-size:var(--fs-micro);color:var(--mut);text-transform:uppercase;text-align:center;padding:6px 7px;border-bottom:1px solid var(--line);font-weight:500;white-space:nowrap;position:sticky;top:0;background:var(--pane);z-index:2}
+th.lft,td.lft{text-align:left}
+td{padding:6px 7px;border-bottom:1px solid var(--line2);font-variant-numeric:tabular-nums;text-align:center;white-space:nowrap}
+td.lft{font-family:var(--sans);font-weight:500;color:var(--ink)}
+tr:hover td{background:var(--sf)}
+.av{display:inline-block;width:100%;font-family:var(--mono);font-size:var(--fs-sm);padding:2px 0;border-radius:4px}
+.av.ok{background:var(--gn-l);color:var(--gn)}.av.adj{background:var(--bl-l);color:var(--bl)}
+.av.part{background:var(--am-l);color:var(--am)}.av.no{background:#efeae6;color:var(--mut)}
+.testbtn{font-family:var(--mono);font-size:var(--fs-micro);border:1px solid var(--line);border-radius:5px;background:var(--sf);padding:3px 8px;cursor:pointer;color:var(--sub)}
+.testbtn:hover{border-color:var(--bl);color:var(--bl)}
+.note{font-family:var(--mono);font-size:var(--fs-sm);margin-top:10px;padding:8px 11px;background:var(--am-l);border:1px solid var(--am);border-radius:6px;color:#8a6519;line-height:1.6}
+
+.ft{font-family:var(--mono);font-size:var(--fs-micro);color:var(--mut);padding:9px 18px;border-top:1px solid var(--line);background:var(--pane);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+
+/* responsive */
+@media(max-width:900px){
+  .hamburger{display:inline-flex}
+  .brand{flex-wrap:wrap}
+  .bl{flex:1 1 100%}
+  .br{width:100%;flex-direction:row;align-items:center;justify-content:flex-end}
+  .body{grid-template-columns:1fr}
+  .side{position:fixed;top:0;left:0;height:100vh;width:272px;z-index:40;transform:translateX(-100%);transition:transform .3s cubic-bezier(.2,.7,.3,1);box-shadow:2px 0 18px rgba(0,0,0,.18)}
+  .body.navopen .side{transform:none}
+  .body.navopen .scrim{display:block;position:fixed;inset:0;z-index:35;background:rgba(0,0,0,.28)}
+  .collapsed .side{transform:translateX(-100%)}
+  .builder{grid-template-columns:1fr}
+  .io input{width:170px;max-width:46vw}.io .hint{display:none}
+}
+@media(max-width:540px){.h2,.h3{display:none}}
+@media(prefers-reduced-motion:reduce){.brand::before{animation:none}.dl i{animation:none}*{transition-duration:.001ms!important}}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <!-- ANCHOR:VAP-BRAND -->
+  <header class="brand">
+    <div class="bl">
+      <button class="hamburger" onclick="toggleNav()" aria-label="menu">&#9776;</button>
+      <div class="crest">VAP</div>
+      <div class="titles">
+        <div class="h1 fit clip">VeritasAutoPlot</div>
+        <div class="h2 clip">Veritas Intelligence Analytics · Visualization Engine</div>
+        <div class="h3 clip">資料字典自動擷取 · 多型態圖表建構 · 多格式輸出 · 多來源可得性對照</div>
+      </div>
+    </div>
+    <div class="br">
+      <div class="rrow">
+        <span class="dl"><i></i>DATA-LOCKED</span>
+        <span class="meta">AST-HTML-TPL-VIA-VAP-100-001<br>v1.1.1 · TPE 2026-06-06</span>
+      </div>
+      <div class="rrow">
+        <button class="btn primary" onclick="run(event)"><span class="ic">&#9654;</span>Run AutoPlot</button>
+        <button class="btn" onclick="showPage('output')"><span class="ic">&#10515;</span>Export</button>
+        <button class="btn lock" id="lockBtn" onclick="toggleLock()"><span class="ic">&#9919;</span>Lock</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ANCHOR:VAP-IO -->
+  <div class="io">
+    <label>BASE</label>
+    <input id="basePath" value="C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\data_dict\" spellcheck="false">
+    <button class="iobtn" onclick="freezeBase()">Freeze</button>
+    <button class="iobtn af" onclick="autoFit()">&#9783; Auto-Fit 版面</button>
+    <span class="conn"><i></i>connected · 6 sources · 41 series</span>
+    <span class="hint">parquet / duckdb / csv / json / yaml / gsheet · trim-on-ingest · auto date·name·freq·value·source</span>
+  </div>
+
+  <!-- ANCHOR:VAP-TABS -->
+  <nav class="tabs" id="tabs">
+    <button class="tab on" data-pg="builder"><span class="num">01</span>建構 Builder</button>
+    <button class="tab"     data-pg="gallery"><span class="num">02</span>展現方式 Gallery</button>
+    <button class="tab"     data-pg="output"><span class="num">03</span>輸出 Output</button>
+    <button class="tab"     data-pg="sources"><span class="num">04</span>資料源 Data Sources</button>
+    <div class="tabink" id="tabink"></div>
+  </nav>
+
+  <div class="body" id="bodyGrid">
+    <div class="scrim" onclick="toggleNav()"></div>
+
+    <!-- ANCHOR:VAP-SIDE -->
+    <aside class="side">
+      <div class="side-top">
+        <div class="bd2">資料字典<small>DATA DICTIONARY</small></div>
+        <button class="collapse" onclick="toggleSide()" aria-label="collapse">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+      </div>
+      <div class="scroll">
+        <div class="sec">
+          <div class="sl"><i style="background:var(--bl)"></i>來源 SOURCES</div>
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <div class="srcrow on"><span class="dot" style="background:var(--bl)"></span><span class="nm">OneDrive</span><span class="ct">23</span></div>
+            <div class="srcrow"><span class="dot" style="background:var(--tl)"></span><span class="nm">Dropbox</span><span class="ct">6</span></div>
+            <div class="srcrow"><span class="dot" style="background:var(--gn)"></span><span class="nm">Google Drive</span><span class="ct">5</span></div>
+            <div class="srcrow"><span class="dot" style="background:var(--am)"></span><span class="nm">Google Sheet</span><span class="ct">4</span></div>
+            <div class="srcrow"><span class="dot" style="background:var(--vi)"></span><span class="nm">Notion</span><span class="ct">3</span></div>
+            <div class="srcrow"><span class="dot" style="background:var(--ro)"></span><span class="nm">Local / DuckDB</span><span class="ct">&mdash;</span></div>
+          </div>
+        </div>
+        <div class="sec">
+          <div class="sl"><i style="background:var(--tl)"></i>偵測檔案 DETECTED</div>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <div class="fileitem"><div class="fn">&#128230; tw_ohlcv_adj.parquet</div><div class="fm"><span class="chipfmt parquet">parquet</span>date · ticker · adj_close · D</div></div>
+            <div class="fileitem"><div class="fn">&#129414; macro_us.duckdb</div><div class="fm"><span class="chipfmt duckdb">duckdb</span>date · series · value · M</div></div>
+            <div class="fileitem"><div class="fn">&#128196; bdi_family.csv</div><div class="fm"><span class="chipfmt csv">csv</span>big5&rarr;utf8 · date · index · D</div></div>
+            <div class="fileitem"><div class="fn">&#128209; active_etf_seed.gsheet</div><div class="fm"><span class="chipfmt gsheet">gsheet</span>ticker · name · status</div></div>
+          </div>
+        </div>
+        <div class="sec">
+          <div class="sl"><i style="background:var(--am)"></i>基準 BENCHMARK</div>
+          <div class="field"><select id="benchSel"><option>^TWII · 台股加權</option><option>^GSPC · S&amp;P 500</option><option>^SOX · 費半</option><option>+ 新增…</option></select></div>
+        </div>
+        <div class="sec">
+          <div class="sl"><i style="background:var(--vi)"></i>無風險利率 RFR</div>
+          <div class="field"><select id="rfrSel"><option>TW 10Y 公債殖利率</option><option>^TNX · US 10Y</option><option>+ 新增…</option></select></div>
+        </div>
+        <div class="sec">
+          <div class="sl"><i style="background:var(--gn)"></i>技術指標來源</div>
+          <div class="tgl on" onclick="this.classList.toggle('on')"><span class="sw"></span>TA-Lib · Adj 優先（無則用一般）</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ANCHOR:VAP-MAIN -->
+    <main class="main">
+
+      <!-- ANCHOR:VAP-PG-BUILDER -->
+      <section class="page on" data-pg="builder">
+        <div class="pg-h"><div class="t">建構 Builder</div><div class="s">選資料 → 選展現方式 → 微調樣式 → 生成 → 加入模板</div><span class="tag" id="bTag">展現方式：雙軸折線 · 價格 + 量</span></div>
+        <div class="grid g-kpi dgrid" id="kpiGrid" style="margin-bottom:11px">
+          <div class="cd kpi drag"><span class="dh" title="拖曳重排">&#9783;</span><div class="cd-i"><div class="k">Series</div><div class="v fit">41</div><div class="d mut">6 sources</div></div></div>
+          <div class="cd kpi drag"><span class="dh">&#9783;</span><div class="cd-i"><div class="k">Selected</div><div class="v fit">1</div><div class="d mut">2330.TW adj</div></div></div>
+          <div class="cd kpi drag"><span class="dh">&#9783;</span><div class="cd-i"><div class="k">Last</div><div class="v fit">1,085</div><div class="d up">&#9650; +1.4%</div></div></div>
+          <div class="cd kpi drag"><span class="dh">&#9783;</span><div class="cd-i"><div class="k">Freq</div><div class="v fit">D</div><div class="d mut">forward-fill</div></div></div>
+          <div class="cd kpi drag"><span class="dh">&#9783;</span><div class="cd-i"><div class="k">Bench</div><div class="v fit">^TWII</div><div class="d mut">β 1.18</div></div></div>
+          <div class="cd kpi drag"><span class="dh">&#9783;</span><div class="cd-i"><div class="k">Engine</div><div class="v fit">Plotly</div><div class="d mut">2.35.2</div></div></div>
+        </div>
+
+        <div class="builder">
+          <div class="cd preview">
+            <div class="cd-h"><div class="t">即時預覽 · Live Preview</div><div class="u">one asset / chart · fixedrange · TW inversion</div></div>
+            <div class="cd-i"><div id="plotPreview" class="plot" role="img" aria-label="preview chart"></div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div class="cd">
+              <div class="cd-h"><div class="t">展現方式 · Chart Type</div></div>
+              <div class="cd-i"><div class="palette" id="palette"></div></div>
+            </div>
+            <div class="cd">
+              <div class="cd-h"><div class="t">樣式 · Style</div></div>
+              <div class="cd-i">
+                <div class="style-row"><label>線寬 width</label><input type="range" min="1" max="5" value="2" oninput="restyle()"></div>
+                <div class="style-row"><label>透明度 opacity</label><input type="range" min="20" max="100" value="80" oninput="restyle()"></div>
+                <div class="style-row"><label>顏色 color</label>
+                  <div class="swrow">
+                    <span class="sw on" style="background:var(--sb1)" onclick="pickSw(this)"></span>
+                    <span class="sw" style="background:var(--sb2)" onclick="pickSw(this)"></span>
+                    <span class="sw" style="background:var(--sb3)" onclick="pickSw(this)"></span>
+                    <span class="sw" style="background:var(--am)" onclick="pickSw(this)"></span>
+                    <span class="sw" style="background:var(--vi)" onclick="pickSw(this)"></span>
+                  </div>
+                </div>
+                <div class="style-row"><label>堆疊 / 覆蓋</label>
+                  <div class="seg" style="width:120px;display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden"><button class="on" style="flex:1;border:none;background:var(--bl);color:#fff;padding:5px 0;font-family:var(--mono);font-size:var(--fs-sm);cursor:pointer" onclick="segPick(this)">覆蓋</button><button style="flex:1;border:none;background:var(--sf);color:var(--sub);padding:5px 0;font-family:var(--mono);font-size:var(--fs-sm);cursor:pointer" onclick="segPick(this)">堆疊</button></div>
+                </div>
+                <div class="style-row"><label>識別性增強</label><div class="tgl on" onclick="this.classList.toggle('on')"><span class="sw"></span></div></div>
+              </div>
+            </div>
+            <button class="btn primary" style="width:100%;justify-content:center" onclick="alert('已加入模板槽位 · 可至輸出頁拖曳重排')">＋ 加入模板 Add to Template</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ANCHOR:VAP-PG-GALLERY -->
+      <section class="page" data-pg="gallery">
+        <div class="pg-h"><div class="t">展現方式 Gallery</div><div class="s">每種展現方式對應其最適資料類型 · Plotly / Seaborn · 卡片可拖曳重排</div></div>
+        <div class="gal dgrid" id="gallery"></div>
+      </section>
+
+      <!-- ANCHOR:VAP-PG-OUTPUT -->
+      <section class="page" data-pg="output">
+        <div class="pg-h"><div class="t">輸出 Output</div><div class="s">VeritasAutoPpt 管理 BASE · dict 資料庫連結 · 輸出格式</div></div>
+        <div class="cd" style="margin-bottom:10px">
+          <div class="cd-h"><div class="t">輸出格式 · Output Format</div><div class="u">single fig 或 整頁模板</div></div>
+          <div class="cd-i">
+            <div class="fmtgrid">
+              <div class="fmt on" onclick="pickFmt(this)"><div class="fi">{ }</div><div class="fl">HTML · 互動</div></div>
+              <div class="fmt" onclick="pickFmt(this)"><div class="fi">&#9638;</div><div class="fl">PNG · 點陣</div></div>
+              <div class="fmt" onclick="pickFmt(this)"><div class="fi">&#9672;</div><div class="fl">SVG · 向量</div></div>
+              <div class="fmt" onclick="pickFmt(this)"><div class="fi">&#9097;</div><div class="fl">PDF · 報告</div></div>
+              <div class="fmt" onclick="pickFmt(this)"><div class="fi">&#9636;</div><div class="fl">PPT · 簡報</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="grid g2">
+          <div class="cd">
+            <div class="cd-h"><div class="t">模板槽位 · Template Slots</div><div class="u">drag-to-arrange · 自動 / 手動 排版</div></div>
+            <div class="cd-i"><div class="dgrid" id="slots" style="display:flex;flex-direction:column;gap:6px">
+              <div class="slot drag"><span class="dh" style="position:static;opacity:.55">&#9783;</span><span class="sg">①</span><span class="sx">雙軸折線 · 2330.TW × Volume</span></div>
+              <div class="slot drag"><span class="dh" style="position:static;opacity:.55">&#9783;</span><span class="sg">②</span><span class="sx">單軸折線 · 標準化 base=100（10檔）</span></div>
+              <div class="slot drag"><span class="dh" style="position:static;opacity:.55">&#9783;</span><span class="sg">③</span><span class="sx">堆疊低空隙直條 · 法人買賣超</span></div>
+              <div class="slot drag"><span class="dh" style="position:static;opacity:.55">&#9783;</span><span class="sg">④</span><span class="sx">熱力圖 · 月報酬矩陣</span></div>
+              <div class="slot empty">＋ 空槽 · drop here</div>
+            </div></div>
+          </div>
+          <div class="cd">
+            <div class="cd-h"><div class="t">VeritasAutoPpt · BASE 管理</div><div class="u">主業 · dict DB 連結</div></div>
+            <div class="cd-i mono" style="font-size:var(--fs-sm);color:var(--sub);line-height:1.9">
+              base&nbsp;&nbsp;: data_dict/<br>
+              dict&nbsp;&nbsp;: 6 sources · 41 series<br>
+              theme : VIA Visual Lock v1<br>
+              plotly: 2.35.2 · include_plotlyjs=True<br>
+              layout: auto-fit + manual override<br>
+              <span class="mut">→ output/VAP_*.{html|png|svg|pdf|pptx}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ANCHOR:VAP-PG-SOURCES -->
+      <section class="page" data-pg="sources">
+        <div class="pg-h"><div class="t">資料源 Data Sources</div><div class="s">資料可得性彙總 · 分商品類型 · 多來源擷取對照測試</div><span class="tag">availability × cross-check</span></div>
+        <div class="grid g-kpi dgrid" style="margin-bottom:11px">
+          <div class="cd kpi drag"><span class="dh">&#9783;</span><div class="cd-i"><div class="k">商品類別</div><div class="v fit">10</div><div class="d mut">classes</div></div></div>
+          <div class="cd kpi drag"><span class="dh">&#9783;</span><div class="cd-i"><div class="k">資料來源</div><div class="v fit">7</div><div class="d mut">sources</div></div></div>
+          <div class="cd kpi drag"><span class="dh">&#9783;</span><div class="cd-i"><div class="k">可得</div><div class="v fit">48</div><div class="d dn">covered</div></div></div>
+          <div class="cd kpi drag"><span class="dh">&#9783;</span><div class="cd-i"><div class="k">部分</div><div class="v fit">9</div><div class="d" style="color:var(--am)">partial</div></div></div>
+          <div class="cd kpi drag"><span class="dh">&#9783;</span><div class="cd-i"><div class="k">無</div><div class="v fit">13</div><div class="d mut">none</div></div></div>
+          <div class="cd kpi drag"><span class="dh">&#9783;</span><div class="cd-i"><div class="k">對照通過</div><div class="v fit">96%</div><div class="d dn">cross-check</div></div></div>
+        </div>
+        <div class="cd" style="margin-bottom:10px">
+          <div class="cd-h"><div class="t">可得性矩陣 · Availability Matrix</div><div class="u">✓Adj · ✓ · ◐部分 · ·無 · 點 Test 驗證</div></div>
+          <div class="cd-i tbl-wrap">
+            <table id="availTbl">
+              <thead><tr>
+                <th class="lft">商品類型 / 來源</th>
+                <th>yfinance</th><th>TWSE/TPEX</th><th>AKShare</th><th>FRED</th><th>GSheet</th><th>Local PQ/DuckDB</th><th></th>
+              </tr></thead>
+              <tbody><!-- VAOS-FILL-SLOT::DICT → rows injected from real dict --></tbody>
+            </table>
+            <div class="note">設計決策：指數(^)無 Adj Close · 個股/ETF 用 auto_adjust=False 取 Adj · 期貨(=F)會合約換月 · 外匯(=X) Close=即期匯率 · 加密 24/7 Close=Adj · 台股籌碼僅 TWSE/TPEX API · 台股指數改用 TWSE/TPEX API。</div>
+          </div>
+        </div>
+        <div class="grid g2">
+          <div class="cd">
+            <div class="cd-h"><div class="t">多來源對照 · Cross-Check</div><div class="u">同序列多來源 → 偏離度</div></div>
+            <div class="cd-i"><div id="plotXcheck" class="plot" style="height:230px" role="img" aria-label="cross check chart"></div></div>
+          </div>
+          <div class="cd">
+            <div class="cd-h"><div class="t">對照結果 · Divergence Report</div><div class="u">|Δ| 門檻 0.5%</div></div>
+            <div class="cd-i tbl-wrap">
+              <table>
+                <thead><tr><th class="lft">序列</th><th>來源 A</th><th>來源 B</th><th>max |Δ|</th><th>狀態</th></tr></thead>
+                <tbody>
+                  <tr><td class="lft">2330.TW close</td><td>yfinance</td><td>TWSE</td><td class="mono">0.02%</td><td><span class="av ok">PASS</span></td></tr>
+                  <tr><td class="lft">^TWII level</td><td>yfinance</td><td>TWSE MI</td><td class="mono">0.41%</td><td><span class="av ok">PASS</span></td></tr>
+                  <tr><td class="lft">USDTWD</td><td>yfinance</td><td>FRED</td><td class="mono">0.07%</td><td><span class="av ok">PASS</span></td></tr>
+                  <tr><td class="lft">BDI</td><td>AKShare</td><td>CSV</td><td class="mono">0.00%</td><td><span class="av ok">PASS</span></td></tr>
+                  <tr><td class="lft">US 10Y (^TNX)</td><td>yfinance</td><td>FRED DGS10</td><td class="mono">0.63%</td><td><span class="av part">CHECK</span></td></tr>
+                  <tr><td class="lft">GC=F gold</td><td>yfinance</td><td>&mdash;</td><td class="mono">n/a</td><td><span class="av no">SINGLE</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ANCHOR:VAP-FOOT -->
+  <footer class="ft">
+    <span>VeritasAutoPlot · VIA Visual Lock v1 · Syne / DM Sans / DM Mono · Plotly 2.35.2 · v1.1.1 · offline-safe</span>
+    <span>TW inversion UP=red DOWN=green · fixedrange · one asset / chart · ADJ · TA-Lib · fit-to-box · draggable</span>
+  </footer>
+</div>
+
+<!-- ANCHOR:VAP-SCRIPT -->
+<script>
+const css=k=>getComputedStyle(document.documentElement).getPropertyValue(k).trim();
+const C={bl:css('--sb1'),tl:css('--sb2'),gn:css('--sb3'),sky:css('--sb4'),am:css('--am'),vi:css('--vi'),up:css('--up'),dn:css('--dn'),ink:css('--ink'),mut:css('--mut'),line:css('--line2')};
+const PCFG={displayModeBar:false,responsive:true};
+/* guarded plot: tolerates Plotly CDN failure / late load (offline-safe template) */
+let _pend=false;
+function PL(target,data,lay){
+  const el=typeof target==='string'?document.getElementById(target):target;
+  if(!el)return;
+  if(window.Plotly&&Plotly.react){delete el.dataset.ph;try{Plotly.react(el,data,lay,PCFG);}catch(e){console.warn('plotly',e);}}
+  else{_pend=true;if(!el.dataset.ph){el.dataset.ph='1';el.innerHTML='<div style="height:100%;display:grid;place-items:center;font-family:var(--mono);font-size:var(--fs-micro);color:var(--mut)">chart engine loading…</div>';}}
+}
+function redrawActive(){
+  const pg=(document.querySelector('.tab.on')||{}).dataset?(document.querySelector('.tab.on')).dataset.pg:null;
+  document.querySelectorAll('[data-ph]').forEach(e=>{delete e.dataset.ph;e.innerHTML='';});
+  if(pg==='builder')drawPreview();else if(pg==='gallery')buildGallery();else if(pg==='sources'){buildAvail();drawXcheck();}
+}
+(function waitPlotly(){if(window.Plotly&&Plotly.react){if(_pend){_pend=false;redrawActive();}}else setTimeout(waitPlotly,150);})();
+const baseLay=()=>({margin:{l:42,r:42,t:8,b:26},paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',
+  font:{family:"'DM Mono',monospace",size:9,color:C.mut},showlegend:false,
+  xaxis:{fixedrange:true,gridcolor:C.line,zeroline:false,tickfont:{size:8}},
+  yaxis:{fixedrange:true,gridcolor:C.line,zeroline:false,tickfont:{size:8}},dragmode:false});
+
+/* demo data — overridable: VAOS-FILL-SLOT::FIGS */
+const N=60, days=[...Array(N)].map((_,i)=>'D'+i);
+function walk(seed,drift){let v=100,a=[];for(let i=0;i<N;i++){seed=(seed*9301+49297)%233280;v*=1+((seed/233280-0.5)*0.03)+drift;a.push(+v.toFixed(2));}return a;}
+const price=walk(7,0.001), vol=days.map((_,i)=>Math.round(40+30*Math.abs(Math.sin(i/4))+(i%5)*4));
+const lineA=walk(11,0.0008), lineB=walk(29,-0.0006), lineC=walk(53,0.0012);
+
+let swColor=C.bl, swWidth=2, swOpacity=0.8, currentType='dual';
+
+function buildData(type){
+  const up=price.map((v,i)=>i&&v>=price[i-1]);let data,lay=baseLay();
+  if(type==='dual'){
+    data=[{type:'bar',x:days,y:vol,marker:{color:up.map(u=>u?C.up:C.dn),opacity:0.45},yaxis:'y2'},
+          {type:'scatter',mode:'lines',x:days,y:price,line:{color:swColor,width:swWidth}}];
+    lay.yaxis2={overlaying:'y',side:'right',fixedrange:true,showgrid:false,tickfont:{size:8}};
+  }else if(type==='single'){
+    data=[{type:'scatter',mode:'lines',x:days,y:lineA.map(v=>v/lineA[0]*100),line:{color:C.bl,width:swWidth}},
+          {type:'scatter',mode:'lines',x:days,y:lineB.map(v=>v/lineB[0]*100),line:{color:C.am,width:swWidth}},
+          {type:'scatter',mode:'lines',x:days,y:lineC.map(v=>v/lineC[0]*100),line:{color:C.gn,width:swWidth,dash:'dot'}}];
+  }else if(type==='barlow'||type==='barno'){
+    data=[{type:'bar',x:days,y:price.map(v=>v-100),marker:{color:price.map((v,i)=>i&&v>=price[i-1]?C.up:C.dn),opacity:swOpacity}}];
+    lay.bargap=type==='barno'?0:0.18;
+  }else if(type==='stacklow'||type==='stackno'){
+    data=[{type:'bar',x:days,y:lineA.map(v=>v/40),marker:{color:C.bl,opacity:swOpacity}},
+          {type:'bar',x:days,y:lineB.map(v=>v/55),marker:{color:C.am,opacity:swOpacity}},
+          {type:'bar',x:days,y:lineC.map(v=>v/70),marker:{color:C.vi,opacity:swOpacity}}];
+    lay.barmode='stack';lay.bargap=type==='stackno'?0:0.18;
+  }else if(type==='heat'){
+    const z=[...Array(8)].map(()=>[...Array(12)].map(()=>+((Math.random()-0.45)*8).toFixed(1)));
+    data=[{type:'heatmap',z,colorscale:[[0,C.dn],[0.5,'#f5f4f0'],[1,C.up]],showscale:false}];lay.margin={l:36,r:10,t:8,b:24};
+  }else if(type==='tree'){
+    const xs=[1,2,3,4,5,6];data=[{type:'scatter',mode:'markers+text',x:xs,y:xs.map(()=>0),text:['台積','聯發','鴻海','日月光','聯電','台達'],textposition:'bottom center',marker:{size:9,color:C.bl},textfont:{size:7}}];
+    const sh=[];const lk=(a,b,h)=>sh.push({type:'path',path:`M ${a} 0 L ${a} ${h} L ${b} ${h} L ${b} 0`,line:{color:C.mut,width:1}});
+    lk(1,2,1.2);lk(3,4,1);lk(1.5,3.5,2.2);lk(5,6,1.4);lk(2.5,5.5,3.2);
+    lay.shapes=sh;lay.yaxis.range=[-0.6,3.8];lay.yaxis.showticklabels=false;lay.xaxis.showticklabels=false;
+  }
+  return {data,lay};
+}
+function drawPreview(type){type=type||currentType;const{data,lay}=buildData(type);PL('plotPreview',data,lay);}
+function pickSw(el){document.querySelectorAll('.swrow .sw').forEach(s=>s.classList.remove('on'));el.classList.add('on');swColor=getComputedStyle(el).backgroundColor;drawPreview();}
+function restyle(){const r=document.querySelectorAll('.style-row input[type=range]');swWidth=+r[0].value;swOpacity=+r[1].value/100;drawPreview();}
+function segPick(b){[...b.parentNode.children].forEach(x=>{x.classList.remove('on');x.style.background='var(--sf)';x.style.color='var(--sub)';});b.classList.add('on');b.style.background='var(--bl)';b.style.color='#fff';}
+function pickFmt(el){el.parentNode.querySelectorAll('.fmt').forEach(x=>x.classList.remove('on'));el.classList.add('on');}
+
+const TYPES=[
+  {id:'single',n:'單軸折線',e:'multi-line norm',fit:'時間序列 · 同量級多指標',svg:'<polyline points="2,28 12,18 22,22 32,10 42,14 52,4" fill="none" stroke="#4c72b0" stroke-width="2"/><polyline points="2,30 12,26 22,20 32,24 42,16 52,18" fill="none" stroke="#c8902f" stroke-width="2"/>'},
+  {id:'dual',n:'雙軸折線',e:'price + volume',fit:'兩個不同量級 · 價×量',svg:'<rect x="4" y="20" width="6" height="12" fill="#c0392b" opacity=".4"/><rect x="14" y="16" width="6" height="16" fill="#2e7d52" opacity=".4"/><rect x="24" y="22" width="6" height="10" fill="#c0392b" opacity=".4"/><rect x="34" y="12" width="6" height="20" fill="#c0392b" opacity=".4"/><rect x="44" y="18" width="6" height="14" fill="#2e7d52" opacity=".4"/><polyline points="4,24 16,18 28,20 40,8 50,12" fill="none" stroke="#4c72b0" stroke-width="2"/>'},
+  {id:'barlow',n:'低空隙直條',e:'category cmp',fit:'分類數值比較',svg:'<rect x="4" y="14" width="9" height="18" fill="#c0392b" opacity=".8"/><rect x="17" y="20" width="9" height="12" fill="#2e7d52" opacity=".8"/><rect x="30" y="8" width="9" height="24" fill="#c0392b" opacity=".8"/><rect x="43" y="18" width="9" height="14" fill="#c0392b" opacity=".8"/>'},
+  {id:'barno',n:'無空隙直條',e:'dense series',fit:'密集時間序列',svg:'<rect x="2" y="16" width="10" height="16" fill="#c0392b" opacity=".8"/><rect x="12" y="22" width="10" height="10" fill="#2e7d52" opacity=".8"/><rect x="22" y="10" width="10" height="22" fill="#c0392b" opacity=".8"/><rect x="32" y="14" width="10" height="18" fill="#c0392b" opacity=".8"/><rect x="42" y="20" width="10" height="12" fill="#2e7d52" opacity=".8"/>'},
+  {id:'stacklow',n:'堆疊低空隙',e:'composition',fit:'組成（含間隙）',svg:'<rect x="6" y="20" width="11" height="12" fill="#4c72b0"/><rect x="6" y="12" width="11" height="8" fill="#c8902f"/><rect x="22" y="22" width="11" height="10" fill="#4c72b0"/><rect x="22" y="14" width="11" height="8" fill="#c8902f"/><rect x="38" y="16" width="11" height="16" fill="#4c72b0"/><rect x="38" y="10" width="11" height="6" fill="#c8902f"/>'},
+  {id:'stackno',n:'堆疊無空隙',e:'flow share',fit:'流量占比（無隙）',svg:'<rect x="4" y="18" width="16" height="14" fill="#4c72b0"/><rect x="4" y="10" width="16" height="8" fill="#7a6cae"/><rect x="20" y="20" width="16" height="12" fill="#4c72b0"/><rect x="20" y="13" width="16" height="7" fill="#7a6cae"/><rect x="36" y="15" width="16" height="17" fill="#4c72b0"/><rect x="36" y="8" width="16" height="7" fill="#7a6cae"/>'},
+  {id:'heat',n:'熱力圖',e:'corr / matrix',fit:'相關矩陣 · 月報酬',svg:'<g>'+[0,1,2].map(r=>[0,1,2,3].map(c=>`<rect x="${4+c*12}" y="${6+r*9}" width="11" height="8" fill="${['#c0392b','#e8b4a8','#f5f4f0','#a8cdb0','#2e7d52'][(r*4+c)%5]}"/>`).join('')).join('')+'</g>'},
+  {id:'tree',n:'波動相關樹狀',e:'cluster · 可刪',fit:'族群分群（族群性低可刪）',svg:'<path d="M8 30 L8 18 L20 18 L20 30" fill="none" stroke="#9a978f" stroke-width="1.2"/><path d="M14 18 L14 8 L40 8 L40 22" fill="none" stroke="#9a978f" stroke-width="1.2"/><path d="M34 22 L34 14 L46 14 L46 30" fill="none" stroke="#9a978f" stroke-width="1.2"/><circle cx="8" cy="30" r="2.5" fill="#4c72b0"/><circle cx="20" cy="30" r="2.5" fill="#4c72b0"/><circle cx="34" cy="30" r="2.5" fill="#4c72b0"/><circle cx="46" cy="30" r="2.5" fill="#4c72b0"/>'}
+];
+function buildPalette(){
+  document.getElementById('palette').innerHTML=TYPES.map(t=>
+    `<div class="ptype${t.id===currentType?' on':''}" data-t="${t.id}" onclick="selType('${t.id}')">
+       <svg viewBox="0 0 54 36">${t.svg}</svg><div class="pn">${t.n}</div><div class="pe">${t.e}</div></div>`).join('');
+}
+function selType(id){currentType=id;document.querySelectorAll('.ptype').forEach(p=>p.classList.toggle('on',p.dataset.t===id));
+  const t=TYPES.find(x=>x.id===id);document.getElementById('bTag').textContent='展現方式：'+t.n+' · '+t.fit;drawPreview(id);}
+
+function buildGallery(){
+  document.getElementById('gallery').innerHTML=TYPES.map(t=>
+    `<div class="cd galcard drag"><span class="dh" title="拖曳重排">&#9783;</span>
+      <div class="cd-h"><div class="t">${t.n}</div><div class="u">${t.e}</div></div>
+      <div class="cd-i"><div class="gp" id="g_${t.id}" role="img" aria-label="${t.n}"></div>
+        <div class="desc">適用：${t.fit}</div><span class="fit-tag">Plotly · Seaborn</span></div></div>`).join('');
+  TYPES.forEach(t=>{const{data,lay}=buildData(t.id);lay.margin={l:34,r:t.id==='dual'?30:14,t:6,b:t.id==='heat'||t.id==='tree'?14:18};PL('g_'+t.id,data,lay);});
+  makeSortable(document.getElementById('gallery'));
+}
+
+const ASSETS=[
+  ['台股個股','adj','ok','no','no','no','adj'],['台股指數','part','ok','no','no','no','adj'],
+  ['國際指數','part','no','no','no','no','part'],['ETF','adj','part','no','no','part','adj'],
+  ['外匯 FX','ok','no','no','ok','no','ok'],['大宗/期貨','ok','no','part','no','no','ok'],
+  ['債券殖利率','ok','no','no','ok','no','ok'],['加密貨幣','adj','no','no','no','no','ok'],
+  ['台股籌碼','no','ok','no','no','part','adj'],['宏觀 Macro','no','no','part','ok','part','ok']
+];
+const LB={adj:['adj','✓ Adj'],ok:['ok','✓'],part:['part','◐'],no:['no','·']};
+function buildAvail(){
+  document.querySelector('#availTbl tbody').innerHTML=ASSETS.map(r=>{
+    const cells=r.slice(1).map(s=>`<td><span class="av ${LB[s][0]}">${LB[s][1]}</span></td>`).join('');
+    return `<tr><td class="lft">${r[0]}</td>${cells}<td><button class="testbtn" onclick="testRow(this)">Test</button></td></tr>`;}).join('');
+}
+function testRow(b){b.textContent='…';setTimeout(()=>{b.textContent='✓ '+(94+Math.floor(Math.random()*6))+'%';b.style.color='var(--gn)';b.style.borderColor='var(--gn)';},500);}
+function drawXcheck(){
+  const a=walk(101,0.0009),b=a.map((v,i)=>+(v*(1+(Math.sin(i/3)*0.004))).toFixed(2));const lay=baseLay();lay.margin={l:40,r:10,t:6,b:22};
+  PL('plotXcheck',[{type:'scatter',mode:'lines',x:days,y:a,line:{color:C.bl,width:2}},{type:'scatter',mode:'lines',x:days,y:b,line:{color:C.am,width:1.5,dash:'dot'}}],lay);
+}
+
+/* ===== fit-to-box: 字不可大於框 ===== */
+function fitOne(el){
+  el.style.fontSize='';
+  if(el.clientWidth<2||el.offsetParent===null)return;   /* collapsed or hidden — skip */
+  let fs=parseFloat(getComputedStyle(el).fontSize),guard=60;
+  while(el.scrollWidth>el.clientWidth+0.5 && fs>6 && guard-->0){fs-=0.5;el.style.fontSize=fs+'px';}
+}
+function fitAll(){document.querySelectorAll('.fit').forEach(fitOne);}
+
+/* ===== auto-fit layout + resize plots ===== */
+function resizePlots(){if(!(window.Plotly&&Plotly.Plots))return;document.querySelectorAll('.plot,.gp').forEach(el=>{if(el && el.offsetParent!==null && !el.dataset.ph){try{Plotly.Plots.resize(el);}catch(e){}}});}
+function autoFit(){fitAll();resizePlots();moveInk();}
+
+/* ===== draggable matrix dashboard (pointer reorder) ===== */
+function makeSortable(box){
+  box.querySelectorAll('.drag').forEach(it=>{
+    if(it._sortable)return; it._sortable=1;
+    const handle=it.querySelector('.dh')||it;
+    handle.addEventListener('pointerdown',e=>{
+      if(document.body.classList.contains('locked'))return;
+      e.preventDefault();
+      const r=it.getBoundingClientRect(),ox=e.clientX-r.left,oy=e.clientY-r.top;
+      const ph=document.createElement('div');ph.className='ph';ph.style.width=r.width+'px';ph.style.height=r.height+'px';
+      it.classList.add('dragging');
+      it.style.position='fixed';it.style.zIndex='999';it.style.pointerEvents='none';it.style.width=r.width+'px';
+      it.style.left=r.left+'px';it.style.top=r.top+'px';
+      box.insertBefore(ph,it.nextSibling);
+      const mv=ev=>{
+        it.style.left=(ev.clientX-ox)+'px';it.style.top=(ev.clientY-oy)+'px';
+        for(const s of [...box.children]){
+          if(s===it||s===ph||!s.classList.contains('drag'))continue;
+          const sr=s.getBoundingClientRect();
+          if(ev.clientX>=sr.left&&ev.clientX<=sr.right&&ev.clientY>=sr.top&&ev.clientY<=sr.bottom){
+            const after=ev.clientX>sr.left+sr.width/2;
+            box.insertBefore(ph,after?s.nextSibling:s);break;
+          }
+        }
+      };
+      const up=()=>{
+        document.removeEventListener('pointermove',mv);document.removeEventListener('pointerup',up);
+        it.classList.remove('dragging');
+        it.style.position='';it.style.zIndex='';it.style.pointerEvents='';it.style.width='';it.style.left='';it.style.top='';
+        box.insertBefore(it,ph);ph.remove();autoFit();
+      };
+      document.addEventListener('pointermove',mv);document.addEventListener('pointerup',up);
+    });
+  });
+}
+
+/* ===== tabs / nav / lock ===== */
+function showPage(pg){
+  document.querySelectorAll('.tab').forEach(t=>{const on=t.dataset.pg===pg;t.classList.toggle('on',on);t.setAttribute('aria-selected',on);});
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.dataset.pg===pg));
+  moveInk();
+  if(pg==='gallery')buildGallery();
+  if(pg==='builder')drawPreview();
+  if(pg==='sources'){buildAvail();drawXcheck();}
+  requestAnimationFrame(autoFit);
+}
+function moveInk(){const a=document.querySelector('.tab.on'),ink=document.getElementById('tabink');if(!a)return;ink.style.left=a.offsetLeft+'px';ink.style.width=a.offsetWidth+'px';}
+function toggleSide(){document.getElementById('bodyGrid').classList.toggle('collapsed');requestAnimationFrame(autoFit);}
+function toggleNav(){document.getElementById('bodyGrid').classList.toggle('navopen');}
+function toggleLock(){const b=document.getElementById('lockBtn');b.classList.toggle('on');document.body.classList.toggle('locked',b.classList.contains('on'));}
+function freezeBase(){const i=document.getElementById('basePath');i.classList.toggle('frozen');i.readOnly=i.classList.contains('frozen');}
+function run(e){const b=e.target.closest('.btn'),o=b.innerHTML;b.innerHTML='<span class="ic">&#9204;</span>Running…';setTimeout(()=>{b.innerHTML=o;showPage('builder');},700);}
+
+/* ===== boot ===== */
+buildPalette();
+/* tab navigation (delegated) + keyboard a11y */
+(function(){
+  const tabs=document.getElementById('tabs');
+  tabs.addEventListener('click',e=>{const t=e.target.closest('.tab');if(t)showPage(t.dataset.pg);});
+  tabs.querySelectorAll('.tab').forEach((t,i,arr)=>{
+    t.setAttribute('role','tab');t.tabIndex=0;
+    t.addEventListener('keydown',ev=>{
+      if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();showPage(t.dataset.pg);}
+      else if(ev.key==='ArrowRight'||ev.key==='ArrowLeft'){ev.preventDefault();const n=(i+(ev.key==='ArrowRight'?1:arr.length-1))%arr.length;arr[n].focus();showPage(arr[n].dataset.pg);}
+    });
+  });
+})();
+window.addEventListener('load',()=>{
+  drawPreview();moveInk();fitAll();
+  makeSortable(document.getElementById('kpiGrid'));
+  makeSortable(document.getElementById('slots'));
+  document.querySelectorAll('.page[data-pg=sources] .dgrid').forEach(makeSortable);
+});
+let rT;window.addEventListener('resize',()=>{clearTimeout(rT);rT=setTimeout(autoFit,120);});
+if(window.ResizeObserver){const ro=new ResizeObserver(()=>{clearTimeout(rT);rT=setTimeout(autoFit,120);});ro.observe(document.querySelector('.main'));}
+
+/* VAOS-FILL-SLOT::FIGS — injector appends Plotly.react(...) overrides here for real data */
+</script>
+</body>
+</html>

@@ -1,0 +1,370 @@
+from __future__ import annotations
+import csv, html, json, re, sqlite3, traceback
+from dataclasses import asdict, dataclass
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List
+
+# def PARAMETERS
+def_PARAM_BASE_ROOT = Path(r"C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VAP")
+def_PARAM_INPUT_ROOT = Path(r"C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VAP\\_input")
+def_PARAM_TEMPLATE_ROOT = Path(r"C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VAP\\_templates")
+def_PARAM_OUTPUT_ROOT = Path(r"C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VAP\\_output")
+def_PARAM_REGISTRY_ROOT = Path(r"C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VAP\\_registry")
+def_PARAM_HTML_PATH = Path(r"C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VAP\\_output\\VAP_BASE_HOME_IO_20260506_210324\\VAP_Base_Home_WindowsIO_TemplateLibrary.html")
+def_PARAM_DB_PATH = Path(r"C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VAP\\_registry\\vap_data_intake_registry.sqlite")
+def_PARAM_MANIFEST_PATH = Path(r"C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VAP\\_output\\VAP_BASE_HOME_IO_20260506_210324\\vap_base_home_manifest.json")
+def_PARAM_MATRIX_CSV = Path(r"C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VAP\\_output\\VAP_BASE_HOME_IO_20260506_210324\\vap_data_header_matrix.csv")
+def_PARAM_SUMMARY_JSON = Path(r"C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VAP\\_output\\VAP_BASE_HOME_IO_20260506_210324\\vap_base_home_summary.json")
+def_PARAM_MAX_SAMPLE_ROWS = int("30")
+def_PARAM_MAX_SCAN_FILES = int("500")
+def_PARAM_ALLOWED_EXTS = {".csv",".json",".jsonl",".html",".htm",".parquet",".txt"}
+
+def_PARAM_BUILTIN_TEMPLATES = [
+    {"template_id":"VAP_TPL_SINGLE_LINE_001","name":"單圖折線 Auto X/Y","kind":"single_line","required":["date","value"],"desc":"價格、指標、風險數值。"},
+    {"template_id":"VAP_TPL_SINGLE_BAR_002","name":"單圖柱狀 Volume/Flow","kind":"single_bar","required":["date","value"],"desc":"成交量、資金流、增減量。"},
+    {"template_id":"VAP_TPL_DUAL_AXIS_003","name":"雙軸和諧 Price + Flow","kind":"dual_axis","required":["date","left_value","right_value"],"desc":"雙軸圖，冷暖色分軸。"},
+    {"template_id":"VAP_TPL_STACK_TIMELINE_004","name":"同時間軸堆圖 Multi Lane","kind":"stacked_timeline","required":["date","series","value"],"desc":"價格、量、籌碼、技術指標同軸分析。"},
+    {"template_id":"VAP_TPL_SCATTER_005","name":"散佈圖 Correlation","kind":"scatter","required":["x","y"],"desc":"連動性、相關性、雙因子散佈。"},
+    {"template_id":"VAP_TPL_HEATMAP_006","name":"熱力圖 Rolling/Matrix","kind":"heatmap","required":["x","y","z"],"desc":"rolling correlation、lag matrix、風險矩陣。"},
+]
+
+# def DATA
+@dataclass
+class def_DataAsset:
+    asset_id: str
+    file_name: str
+    path: str
+    ext: str
+    kind: str
+    size: int
+    modified: str
+    headers: List[str]
+    header_count: int
+    sample_rows: List[Dict[str, Any]]
+    row_count_estimate: int
+    recommended_template: str
+    confidence: int
+    status: str
+    detail: str
+
+@dataclass
+class def_TemplateAsset:
+    template_id: str
+    name: str
+    kind: str
+    source: str
+    path: str
+    required_columns: List[str]
+    description: str
+    status: str
+
+# def UTILS
+def def_now() -> str:
+    return datetime.now().isoformat(timespec="seconds")
+
+def def_read_text(path_value: Path) -> str:
+    try:
+        return path_value.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        return path_value.read_text(encoding="utf-8", errors="replace")
+    except Exception:
+        return ""
+
+def def_slug(value: str) -> str:
+    return re.sub(r"[^A-Za-z0-9_]+", "_", value).strip("_")[:80] or "asset"
+
+def def_write_json(path_value: Path, payload: Any) -> None:
+    path_value.parent.mkdir(parents=True, exist_ok=True)
+    path_value.write_text(json.dumps(payload, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
+
+def def_kind(path_value: Path) -> str:
+    return {
+        ".csv":"csv_table",".json":"json_data",".jsonl":"jsonl_data",
+        ".html":"html_template_or_report",".htm":"html_template_or_report",
+        ".parquet":"parquet_table",".txt":"text_data",
+    }.get(path_value.suffix.lower(), "unknown")
+
+# def EXTRACTORS
+def def_extract_csv(path_value: Path) -> Dict[str, Any]:
+    encodings = ["utf-8-sig","utf-8","cp950","big5"]
+    last = ""
+    for enc in encodings:
+        try:
+            rows, count = [], 0
+            with path_value.open("r", encoding=enc, errors="replace", newline="") as f:
+                sample = f.read(4096); f.seek(0)
+                try: dialect = csv.Sniffer().sniff(sample) if sample.strip() else csv.excel
+                except Exception: dialect = csv.excel
+                reader = csv.DictReader(f, dialect=dialect)
+                headers = list(reader.fieldnames or [])
+                for row in reader:
+                    count += 1
+                    if len(rows) < def_PARAM_MAX_SAMPLE_ROWS:
+                        rows.append({str(k): v for k, v in row.items()})
+                return {"headers":headers,"sample_rows":rows,"row_count_estimate":count,"detail":"encoding="+enc}
+        except Exception as exc:
+            last = str(exc)
+    return {"headers":[],"sample_rows":[],"row_count_estimate":0,"detail":"CSV_FAIL="+last}
+
+def def_extract_json(path_value: Path) -> Dict[str, Any]:
+    text = def_read_text(path_value).strip()
+    if not text:
+        return {"headers":[],"sample_rows":[],"row_count_estimate":0,"detail":"EMPTY"}
+    try:
+        if path_value.suffix.lower() == ".jsonl":
+            rows = [json.loads(x) for x in text.splitlines() if x.strip()]
+            rows = [x for x in rows if isinstance(x, dict)]
+            headers = sorted({str(k) for r in rows for k in r.keys()})
+            return {"headers":headers,"sample_rows":rows[:def_PARAM_MAX_SAMPLE_ROWS],"row_count_estimate":len(rows),"detail":"jsonl"}
+        payload = json.loads(text)
+        if isinstance(payload, list):
+            rows = [x for x in payload if isinstance(x, dict)]
+            headers = sorted({str(k) for r in rows for k in r.keys()})
+            return {"headers":headers,"sample_rows":rows[:def_PARAM_MAX_SAMPLE_ROWS],"row_count_estimate":len(rows),"detail":"json_list"}
+        if isinstance(payload, dict):
+            for key in ["data","rows","records","items"]:
+                if isinstance(payload.get(key), list):
+                    rows = [x for x in payload[key] if isinstance(x, dict)]
+                    headers = sorted({str(k) for r in rows for k in r.keys()})
+                    return {"headers":headers,"sample_rows":rows[:def_PARAM_MAX_SAMPLE_ROWS],"row_count_estimate":len(rows),"detail":"json_dict_rows"}
+            return {"headers":sorted(map(str,payload.keys())),"sample_rows":[payload],"row_count_estimate":1,"detail":"json_dict"}
+    except Exception as exc:
+        return {"headers":[],"sample_rows":[],"row_count_estimate":0,"detail":"JSON_FAIL="+str(exc)}
+    return {"headers":[],"sample_rows":[],"row_count_estimate":0,"detail":"JSON_UNKNOWN"}
+
+def def_extract_html(path_value: Path) -> Dict[str, Any]:
+    text = def_read_text(path_value)
+    m = re.search(r"<title[^>]*>(.*?)</title>", text, flags=re.I|re.S)
+    title = re.sub(r"\s+", " ", m.group(1)).strip() if m else path_value.stem
+    ids = re.findall(r"id=[\"']([^\"']+)[\"']", text, flags=re.I)
+    classes = re.findall(r"class=[\"']([^\"']+)[\"']", text, flags=re.I)
+    sample = {"title": title, "ids": ", ".join(ids[:20]), "classes": ", ".join(classes[:20]), "plotly_present": "plotly" in text.lower(), "script_count": len(re.findall(r"<script", text, flags=re.I))}
+    return {"headers":["title","ids","classes","plotly_present","script_count"],"sample_rows":[sample],"row_count_estimate":1,"detail":"html_meta"}
+
+def def_extract_parquet(path_value: Path) -> Dict[str, Any]:
+    try:
+        import pandas as pd
+        df = pd.read_parquet(path_value)
+        sample_df = df.head(def_PARAM_MAX_SAMPLE_ROWS).astype(object)
+        sample_df = sample_df.where(pd.notnull(sample_df), None)
+        return {"headers":[str(c) for c in df.columns],"sample_rows":sample_df.to_dict(orient="records"),"row_count_estimate":int(len(df)),"detail":"pandas_parquet"}
+    except Exception as exc:
+        return {"headers":[],"sample_rows":[],"row_count_estimate":0,"detail":"PARQUET_FAIL="+str(exc)}
+
+def def_extract_text(path_value: Path) -> Dict[str, Any]:
+    lines = def_read_text(path_value).splitlines()
+    first = lines[0] if lines else ""
+    headers = [x.strip() for x in first.split(",")] if "," in first else ["line"]
+    return {"headers":headers,"sample_rows":[{"line":x} for x in lines[:def_PARAM_MAX_SAMPLE_ROWS]],"row_count_estimate":len(lines),"detail":"text"}
+
+def def_extract_file(path_value: Path) -> Dict[str, Any]:
+    ext = path_value.suffix.lower()
+    if ext == ".csv": return def_extract_csv(path_value)
+    if ext in [".json",".jsonl"]: return def_extract_json(path_value)
+    if ext in [".html",".htm"]: return def_extract_html(path_value)
+    if ext == ".parquet": return def_extract_parquet(path_value)
+    if ext == ".txt": return def_extract_text(path_value)
+    return {"headers":[],"sample_rows":[],"row_count_estimate":0,"detail":"unsupported"}
+
+# def RECOMMEND
+def def_norm_headers(headers: List[str]) -> List[str]:
+    return [re.sub(r"[^a-z0-9]+", "_", str(h).lower()).strip("_") for h in headers]
+
+def def_recommend(headers: List[str], kind: str) -> Dict[str, Any]:
+    hs = set(def_norm_headers(headers))
+    date_like = bool(hs & {"date","trade_date","time","datetime","normalized_date"})
+    price_like = bool(hs & {"close","adj_close","adjclose","price","value","index"})
+    volume_like = bool(hs & {"volume","vol","turnover"})
+    flow_like = bool(hs & {"net_buy","net_amount","foreign_net","flow","dealer_net"})
+    if kind == "html_template_or_report": return {"template_id":"VAP_TPL_IMPORTED_HTML","confidence":85}
+    if {"x","y","z"} <= hs or "corr" in hs or "correlation" in hs: return {"template_id":"VAP_TPL_HEATMAP_006","confidence":90}
+    if {"x","y"} <= hs and not date_like: return {"template_id":"VAP_TPL_SCATTER_005","confidence":88}
+    if date_like and price_like and (volume_like or flow_like): return {"template_id":"VAP_TPL_DUAL_AXIS_003","confidence":92}
+    if date_like and len(headers) >= 4: return {"template_id":"VAP_TPL_STACK_TIMELINE_004","confidence":86}
+    if date_like and price_like: return {"template_id":"VAP_TPL_SINGLE_LINE_001","confidence":82}
+    if volume_like or flow_like: return {"template_id":"VAP_TPL_SINGLE_BAR_002","confidence":72}
+    return {"template_id":"VAP_TPL_SINGLE_LINE_001","confidence":55}
+
+# def SCAN
+def def_scan_data() -> List[def_DataAsset]:
+    files = []
+    for root in [def_PARAM_INPUT_ROOT, def_PARAM_BASE_ROOT]:
+        if root.exists():
+            for p in root.rglob("*"):
+                if len(files) >= def_PARAM_MAX_SCAN_FILES: break
+                if p.is_file() and p.suffix.lower() in def_PARAM_ALLOWED_EXTS:
+                    if "_output" in str(p).lower() and root == def_PARAM_BASE_ROOT: continue
+                    files.append(p)
+    seen, out = set(), []
+    for p in files:
+        s = str(p).lower()
+        if s not in seen:
+            seen.add(s); out.append(p)
+
+    assets = []
+    for i, p in enumerate(out, 1):
+        try:
+            kind = def_kind(p); e = def_extract_file(p); r = def_recommend(e["headers"], kind)
+            assets.append(def_DataAsset(
+                asset_id=f"VAP_DATA_{i:05d}_{def_slug(p.stem)}", file_name=p.name, path=str(p), ext=p.suffix.lower(), kind=kind,
+                size=p.stat().st_size, modified=datetime.fromtimestamp(p.stat().st_mtime).isoformat(timespec="seconds"),
+                headers=e["headers"], header_count=len(e["headers"]), sample_rows=e["sample_rows"], row_count_estimate=int(e["row_count_estimate"]),
+                recommended_template=r["template_id"], confidence=int(r["confidence"]), status="OK" if e["headers"] else "WARN", detail=e["detail"]))
+        except Exception as exc:
+            assets.append(def_DataAsset(f"VAP_DATA_{i:05d}_{def_slug(p.stem)}",p.name,str(p),p.suffix.lower(),"error",0,"",[],0,[],0,"",0,"ERROR",str(exc)))
+    return assets
+
+def def_scan_templates() -> List[def_TemplateAsset]:
+    templates = []
+    for t in def_PARAM_BUILTIN_TEMPLATES:
+        templates.append(def_TemplateAsset(t["template_id"],t["name"],t["kind"],"builtin","",t["required"],t["desc"],"READY"))
+    seen, idx = set(), 0
+    for root in [def_PARAM_BASE_ROOT, def_PARAM_TEMPLATE_ROOT]:
+        if not root.exists(): continue
+        for p in root.rglob("*.html"):
+            name_l = p.name.lower()
+            if not any(k in name_l for k in ["vap","plot","chart","template","visual","dashboard"]): continue
+            s = str(p).lower()
+            if s in seen: continue
+            seen.add(s); idx += 1
+            text = def_read_text(p)
+            m = re.search(r"<title[^>]*>(.*?)</title>", text, flags=re.I|re.S)
+            title = re.sub(r"\s+", " ", m.group(1)).strip() if m else p.stem
+            templates.append(def_TemplateAsset(f"VAP_IMPORTED_HTML_{idx:04d}",title,"imported_plotly_html" if "plotly" in text.lower() else "imported_html","existing_html",str(p),[],"既有 HTML / 圖模板，自動納入模板庫。","DISCOVERED"))
+    return templates
+
+# def DB
+def def_upsert_db(data_assets: List[def_DataAsset], template_assets: List[def_TemplateAsset]) -> None:
+    def_PARAM_DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    con = sqlite3.connect(def_PARAM_DB_PATH)
+    con.execute("CREATE TABLE IF NOT EXISTS data_assets (asset_id TEXT PRIMARY KEY, file_name TEXT, path TEXT, ext TEXT, kind TEXT, size INTEGER, modified TEXT, headers_json TEXT, header_count INTEGER, sample_json TEXT, row_count_estimate INTEGER, recommended_template TEXT, confidence INTEGER, status TEXT, detail TEXT, indexed_at TEXT)")
+    con.execute("CREATE TABLE IF NOT EXISTS template_assets (template_id TEXT PRIMARY KEY, name TEXT, kind TEXT, source TEXT, path TEXT, required_columns_json TEXT, description TEXT, status TEXT, indexed_at TEXT)")
+    now = def_now()
+    for a in data_assets:
+        con.execute("INSERT OR REPLACE INTO data_assets VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",(a.asset_id,a.file_name,a.path,a.ext,a.kind,a.size,a.modified,json.dumps(a.headers,ensure_ascii=False),a.header_count,json.dumps(a.sample_rows,ensure_ascii=False,default=str),a.row_count_estimate,a.recommended_template,a.confidence,a.status,a.detail,now))
+    for t in template_assets:
+        con.execute("INSERT OR REPLACE INTO template_assets VALUES (?,?,?,?,?,?,?,?,?)",(t.template_id,t.name,t.kind,t.source,t.path,json.dumps(t.required_columns,ensure_ascii=False),t.description,t.status,now))
+    con.commit(); con.close()
+
+def def_write_matrix(data_assets: List[def_DataAsset]) -> None:
+    def_PARAM_MATRIX_CSV.parent.mkdir(parents=True, exist_ok=True)
+    with def_PARAM_MATRIX_CSV.open("w", encoding="utf-8-sig", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=["asset_id","file_name","path","ext","kind","header_count","headers","row_count_estimate","recommended_template","confidence","status","detail"])
+        writer.writeheader()
+        for a in data_assets:
+            writer.writerow({"asset_id":a.asset_id,"file_name":a.file_name,"path":a.path,"ext":a.ext,"kind":a.kind,"header_count":a.header_count,"headers":" | ".join(a.headers),"row_count_estimate":a.row_count_estimate,"recommended_template":a.recommended_template,"confidence":a.confidence,"status":a.status,"detail":a.detail})
+
+# def HTML
+def def_sample_table(headers: List[str], rows: List[Dict[str, Any]]) -> str:
+    if not headers or not rows:
+        return "<div class='small'>No sample data yet.</div>"
+    head = "".join(f"<th>{html.escape(str(h))}</th>" for h in headers)
+    body = "".join("<tr>" + "".join(f"<td>{html.escape(str(r.get(h,'')))}</td>" for h in headers) + "</tr>" for r in rows)
+    return f"<div style='overflow:auto;max-height:580px'><table><thead><tr>{head}</tr></thead><tbody>{body}</tbody></table></div>"
+
+def def_build_html(data_assets: List[def_DataAsset], template_assets: List[def_TemplateAsset], summary: Dict[str, Any]) -> str:
+    data_json = html.escape(json.dumps([asdict(x) for x in data_assets], ensure_ascii=False, default=str))
+    tpl_json = html.escape(json.dumps([asdict(x) for x in template_assets], ensure_ascii=False, default=str))
+    manifest_json = html.escape(json.dumps(summary, ensure_ascii=False, indent=2, default=str))
+    asset_rows = []
+    for a in data_assets[:300]:
+        cls = "ok" if a.status == "OK" else ("warn" if a.status == "WARN" else "bad")
+        asset_rows.append(f"<tr onclick=\"def_selectAsset('{html.escape(a.asset_id)}')\"><td><code>{html.escape(a.asset_id)}</code></td><td>{html.escape(a.file_name)}</td><td>{html.escape(a.kind)}</td><td>{a.header_count}</td><td>{html.escape(', '.join(a.headers[:8]))}</td><td>{html.escape(a.recommended_template)}</td><td>{a.confidence}</td><td><span class='badge {cls}'>{html.escape(a.status)}</span></td></tr>")
+    tpl_cards = []
+    for t in template_assets[:100]:
+        tpl_cards.append(f"<div class='tpl-card' onclick=\"def_selectTemplate('{html.escape(t.template_id)}')\"><div class='tpl-id'>{html.escape(t.template_id)}</div><div class='tpl-name'>{html.escape(t.name)}</div><div class='tpl-meta'>{html.escape(t.kind)} · {html.escape(t.source)}</div><div class='tpl-desc'>{html.escape(t.description)}</div></div>")
+    first = asdict(data_assets[0]) if data_assets else {}
+    sample_table = def_sample_table(first.get("headers", []), first.get("sample_rows", []))
+
+    return f"""<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VeritasAutoPlot Base Home Windows I/O</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<style>
+:root{{--bg:#f5f4f0;--bg1:#eceae4;--sf:#fff;--sf2:#faf9f6;--bd:#d9d5ca;--ink:#1e1d1a;--i2:#646057;--i3:#918c82;--blue:#4c78a8;--teal:#439a9a;--green:#5a9e6f;--amber:#c4943a;--coral:#c96b5a;--violet:#7a6daa;--mono:"Cascadia Mono","Consolas",monospace;--sans:"Segoe UI","Noto Sans TC",system-ui,sans-serif;}}
+*{{box-sizing:border-box}}body{{margin:0;background:linear-gradient(135deg,#f5f4f0,#eceae4);font-family:var(--sans);font-size:12px;color:var(--ink)}}.app{{max-width:1760px;margin:0 auto;padding:10px 12px 18px}}.top{{position:sticky;top:0;z-index:50;background:rgba(245,244,240,.92);backdrop-filter:blur(16px);padding-bottom:8px}}.hero{{background:var(--sf);border:1px solid var(--bd);border-radius:14px;box-shadow:0 1px 3px rgba(0,0,0,.05);overflow:hidden}}.hero:before{{content:"";display:block;height:4px;background:linear-gradient(90deg,var(--blue),var(--teal),var(--violet),var(--amber),var(--coral))}}.heroIn{{display:grid;grid-template-columns:42px 1fr auto;gap:10px;align-items:center;padding:11px 13px}}.logo{{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#182a42,var(--blue));color:#fff;display:grid;place-items:center;font:900 12px var(--mono)}}h1{{font-size:18px;margin:0}}.sub1{{font:800 10px var(--mono);color:var(--blue);letter-spacing:.7px}}.sub2,.small{{font-size:10px;color:var(--i3)}}.btn{{border:1px solid var(--bd);background:var(--sf);border-radius:8px;padding:6px 10px;font-size:11px;font-weight:800;cursor:pointer}}.btn.primary{{background:var(--blue);color:#fff;border-color:var(--blue)}}.status{{display:inline-flex;gap:6px;align-items:center;border-radius:99px;padding:4px 8px;background:#d8ecd8;color:var(--green);font:800 9px var(--mono)}}.dot{{width:8px;height:8px;border-radius:50%;background:var(--green)}}.tabs{{display:flex;gap:4px;flex-wrap:wrap;margin-top:7px}}.tab{{border:1px solid var(--bd);background:rgba(255,255,255,.7);padding:7px 12px;border-radius:9px;font-size:10.5px;font-weight:850;color:var(--i2);cursor:pointer}}.tab.on{{background:var(--ink);color:white;border-color:var(--ink)}}.page{{display:none}}.page.on{{display:block}}.grid-main{{display:grid;grid-template-columns:320px minmax(420px,1fr) 360px;gap:8px}}@media(max-width:1280px){{.grid-main{{grid-template-columns:1fr}}}}.grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:8px}}.card{{background:var(--sf);border:1px solid var(--bd);border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.05);overflow:hidden;margin-bottom:8px}}.cardH{{display:flex;align-items:center;gap:8px;background:var(--sf2);border-bottom:1px solid var(--bd);padding:8px 10px}}.ico{{width:25px;height:25px;border-radius:7px;display:grid;place-items:center;background:#d8e6f4;color:var(--blue);font-weight:900}}.cardT{{font-weight:900;font-size:12px;flex:1}}.cardSub{{font:800 9px var(--mono);color:var(--i3);background:var(--bg1);padding:2px 6px;border-radius:99px}}.cardB{{padding:10px}}.kpi{{border:1px solid var(--bd);border-left:4px solid var(--blue);border-radius:9px;padding:8px;background:var(--sf)}}.kpi .k{{font-size:9px;color:var(--i3);font-weight:900;text-transform:uppercase}}.kpi .v{{font:900 20px var(--mono);color:var(--blue)}}.input,.select{{width:100%;border:1px solid var(--bd);background:var(--sf);border-radius:8px;padding:7px 8px;font-size:11px}}.label{{font-size:9px;color:var(--i3);font-weight:900;text-transform:uppercase;margin:7px 0 3px}}.drop{{border:2px dashed #c6c0b4;background:var(--sf2);border-radius:12px;padding:18px;text-align:center}}.dropIcon{{font-size:28px}}.dropMain{{font-weight:900}}.dropSub{{font-size:10px;color:var(--i3)}}table{{width:100%;border-collapse:collapse;font-size:10.5px}}th{{position:sticky;top:0;background:var(--bg1);border-bottom:2px solid var(--bd);padding:6px;text-align:left;z-index:2}}td{{border-bottom:1px solid var(--bd);padding:6px;vertical-align:top}}tr:hover td{{background:rgba(76,120,168,.045);cursor:pointer}}code{{font-family:var(--mono);font-size:10px;background:var(--bg1);border:1px solid var(--bd);border-radius:5px;padding:1px 5px}}.badge{{display:inline-flex;padding:2px 6px;border-radius:5px;font:800 9px var(--mono)}}.badge.ok{{background:#d8ecd8;color:var(--green)}}.badge.warn{{background:#f3dfb4;color:var(--amber)}}.badge.bad{{background:#f1cec6;color:var(--coral)}}.tpl-grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px}}.tpl-card{{border:1px solid var(--bd);border-radius:10px;background:var(--sf2);padding:9px;cursor:pointer}}.tpl-id{{font:800 9px var(--mono);color:var(--blue)}}.tpl-name{{font-weight:900;font-size:12px;margin-top:3px}}.tpl-meta{{font:800 9px var(--mono);color:var(--i3);margin-top:2px}}.tpl-desc{{font-size:10px;color:var(--i2);margin-top:6px}}.plot{{height:430px;border:1px solid var(--bd);border-radius:10px;overflow:hidden;background:#fff}}.pathBox{{font-family:var(--mono);font-size:10px;color:var(--i2);background:var(--bg1);border:1px solid var(--bd);border-radius:8px;padding:7px;word-break:break-all}}.progress{{height:7px;background:#e2dfd7;border-radius:99px;overflow:hidden;margin-top:8px}}.bar{{height:100%;width:100%;background:linear-gradient(90deg,var(--blue),var(--teal),var(--green));animation:load 1s ease-out}}@keyframes load{{from{{width:0}}}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+<section class="hero"><div class="heroIn"><div class="logo">VAP</div><div><h1>VeritasAutoPlot Base Home</h1><div class="sub1">VERITAS INTELLIGENCE ANALYTICS</div><div class="sub2">VAP BASE HOME · WINDOWS I/O DATA INTAKE · TEMPLATE LIBRARY</div></div><div><span class="status"><span class="dot"></span>WINDOWS I/O READY</span> <button class="btn primary" onclick="def_autoRender()">Auto Render</button></div></div></section>
+<nav class="tabs"><button class="tab on" onclick="def_page(this,'pg-home')">01 首頁 Base</button><button class="tab" onclick="def_page(this,'pg-intake')">02 Windows I/O 輸入</button><button class="tab" onclick="def_page(this,'pg-headers')">03 Header / 資料庫</button><button class="tab" onclick="def_page(this,'pg-templates')">04 圖模板庫</button><button class="tab" onclick="def_page(this,'pg-plot')">05 單圖工具</button><button class="tab" onclick="def_page(this,'pg-manifest')">06 Manifest</button></nav>
+</header>
+<main style="margin-top:8px">
+<section class="page on" id="pg-home"><div class="grid-main"><aside><div class="card"><div class="cardH"><div class="ico">⌂</div><div class="cardT">Base Root</div><div class="cardSub">BASE</div></div><div class="cardB"><div class="label">Base</div><div class="pathBox">{html.escape(str(def_PARAM_BASE_ROOT))}</div><div class="label">Input</div><div class="pathBox">{html.escape(str(def_PARAM_INPUT_ROOT))}</div><div class="label">Database</div><div class="pathBox">{html.escape(str(def_PARAM_DB_PATH))}</div></div></div><div class="grid"><div class="kpi"><div class="k">Data</div><div class="v">{len(data_assets)}</div></div><div class="kpi" style="border-left-color:var(--teal)"><div class="k">Templates</div><div class="v" style="color:var(--teal)">{len(template_assets)}</div></div><div class="kpi" style="border-left-color:var(--green)"><div class="k">Indexed</div><div class="v" style="color:var(--green)">{summary['indexed_ok']}</div></div></div></aside><section><div class="card"><div class="cardH"><div class="ico">↥</div><div class="cardT">Windows I/O 輸入式拖曳</div><div class="cardSub">INTAKE</div></div><div class="cardB"><div class="drop"><div class="dropIcon">▣</div><div class="dropMain">把 CSV / JSON / HTML / Parquet 放進 InputRoot</div><div class="dropSub">瀏覽器拖曳不能可靠取得完整 Windows 路徑；本系統用 PowerShell 本機 I/O 掃描橋接，自動擷取 header 與樣本資料。</div></div><div class="progress"><div class="bar"></div></div></div></div><div class="card"><div class="cardH"><div class="ico">📈</div><div class="cardT">首頁自動單圖預覽</div><div class="cardSub">AUTO</div></div><div class="cardB"><div class="plot" id="homePlot"></div></div></div></section><aside><div class="card"><div class="cardH"><div class="ico">☑</div><div class="cardT">自動決策</div><div class="cardSub">NO MANUAL</div></div><div class="cardB"><div class="small">Date+Close → 單圖；Date+Price+Volume/Flow → 雙軸；Date+多欄 → 堆圖；X+Y → 散佈；X+Y+Z → 熱圖。</div></div></div><div class="card"><div class="cardH"><div class="ico">▤</div><div class="cardT">目前選取</div><div class="cardSub">STATE</div></div><div class="cardB"><div class="label">Asset</div><div class="pathBox" id="selectedAsset">AUTO</div><div class="label">Template</div><div class="pathBox" id="selectedTemplate">AUTO</div></div></div></aside></div></section>
+<section class="page" id="pg-intake"><div class="card"><div class="cardH"><div class="ico">⇄</div><div class="cardT">Windows I/O Intake Matrix</div><div class="cardSub">SCAN</div></div><div class="cardB" style="overflow:auto;max-height:650px"><table><thead><tr><th>Asset ID</th><th>File</th><th>Kind</th><th>Headers</th><th>Header Sample</th><th>Template</th><th>Conf</th><th>Status</th></tr></thead><tbody>{''.join(asset_rows) if asset_rows else '<tr><td colspan="8">No input data yet. Put files into InputRoot and rerun PS1.</td></tr>'}</tbody></table></div></div></section>
+<section class="page" id="pg-headers"><div class="card"><div class="cardH"><div class="ico">▦</div><div class="cardT">Header / Sample Data</div><div class="cardSub">AUTO EXTRACT</div></div><div class="cardB" id="sampleBox">{sample_table}</div></div><div class="card"><div class="cardH"><div class="ico">DB</div><div class="cardT">SQLite Index</div><div class="cardSub">LOCAL</div></div><div class="cardB"><div class="pathBox">{html.escape(str(def_PARAM_DB_PATH))}</div></div></div></section>
+<section class="page" id="pg-templates"><div class="card"><div class="cardH"><div class="ico">◆</div><div class="cardT">內建 + 既有圖模板庫</div><div class="cardSub">TEMPLATE LIB</div></div><div class="cardB"><div class="tpl-grid">{''.join(tpl_cards)}</div></div></div></section>
+<section class="page" id="pg-plot"><div class="grid-main"><aside><div class="card"><div class="cardH"><div class="ico">⚙</div><div class="cardT">單圖模板控制</div><div class="cardSub">AUTO</div></div><div class="cardB"><div class="label">Asset</div><select class="select" id="assetSelect" onchange="def_selectAsset(this.value);def_autoRender()"></select><div class="label">Template</div><select class="select" id="tplSelect" onchange="def_selectTemplate(this.value);def_autoRender()"></select><div class="label">X Column</div><select class="select" id="xCol" onchange="def_autoRender()"></select><div class="label">Y Column</div><select class="select" id="yCol" onchange="def_autoRender()"></select><button class="btn primary" style="margin-top:8px;width:100%" onclick="def_autoRender()">Render</button></div></div></aside><section style="grid-column:span 2"><div class="card"><div class="cardH"><div class="ico">📊</div><div class="cardT">既有單圖模板抓取資料 Auto Plot</div><div class="cardSub">PLOTLY</div></div><div class="cardB"><div class="plot" style="height:620px" id="mainPlot"></div></div></div></section></div></section>
+<section class="page" id="pg-manifest"><div class="card"><div class="cardH"><div class="ico">JSON</div><div class="cardT">Manifest</div><div class="cardSub">SSOT</div></div><div class="cardB"><pre style="white-space:pre-wrap;background:#1e1d1a;color:#f5f4f0;padding:12px;border-radius:10px;overflow:auto;max-height:650px">{manifest_json}</pre></div></div></section>
+</main></div>
+<script id="vap-data-json" type="application/json">{data_json}</script>
+<script id="vap-template-json" type="application/json">{tpl_json}</script>
+<script>
+const def_DATA = JSON.parse(document.getElementById("vap-data-json").textContent || "[]");
+const def_TEMPLATES = JSON.parse(document.getElementById("vap-template-json").textContent || "[]");
+let def_STATE = {{assetId: def_DATA[0]?.asset_id || "", templateId: def_DATA[0]?.recommended_template || def_TEMPLATES[0]?.template_id || ""}};
+function def_page(btn,id){{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("on"));document.querySelectorAll(".page").forEach(x=>x.classList.remove("on"));btn.classList.add("on");document.getElementById(id).classList.add("on");setTimeout(def_autoRender,80);}}
+function def_norm(s){{return String(s||"").toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_|_$/g,"");}}
+function def_asset(){{return def_DATA.find(x=>x.asset_id===def_STATE.assetId) || def_DATA[0] || {{headers:[],sample_rows:[]}};}}
+function def_template(){{return def_TEMPLATES.find(x=>x.template_id===def_STATE.templateId) || def_TEMPLATES[0] || {{kind:"single_line"}};}}
+function def_initSelects(){{const aSel=document.getElementById("assetSelect");const tSel=document.getElementById("tplSelect");if(aSel){{aSel.innerHTML=def_DATA.map(a=>`<option value="${{a.asset_id}}">${{a.file_name}} · ${{a.recommended_template}}</option>`).join("");aSel.value=def_STATE.assetId;}}if(tSel){{tSel.innerHTML=def_TEMPLATES.map(t=>`<option value="${{t.template_id}}">${{t.name}}</option>`).join("");tSel.value=def_STATE.templateId;}}def_refreshColumns();}}
+function def_refreshColumns(){{const a=def_asset();const x=document.getElementById("xCol");const y=document.getElementById("yCol");if(!x||!y)return;const headers=a.headers||[];x.innerHTML=headers.map(h=>`<option value="${{h}}">${{h}}</option>`).join("");y.innerHTML=headers.map(h=>`<option value="${{h}}">${{h}}</option>`).join("");const norm=headers.map(h=>[h,def_norm(h)]);const xHit=norm.find(([h,n])=>["date","trade_date","time","datetime","normalized_date","x"].includes(n));const yHit=norm.find(([h,n])=>["adj_close","close","price","value","index","y"].includes(n))||norm.find(([h,n])=>!["date","trade_date","time","datetime"].includes(n));if(xHit)x.value=xHit[0];if(yHit)y.value=yHit[0];}}
+function def_selectAsset(id){{def_STATE.assetId=id;const a=def_asset();if(a.recommended_template)def_STATE.templateId=a.recommended_template;document.getElementById("selectedAsset").textContent=id||"AUTO";document.getElementById("selectedTemplate").textContent=def_STATE.templateId||"AUTO";def_initSelects();def_renderSample();}}
+function def_selectTemplate(id){{def_STATE.templateId=id;document.getElementById("selectedTemplate").textContent=id||"AUTO";const s=document.getElementById("tplSelect");if(s)s.value=id;}}
+function def_renderSample(){{const a=def_asset();const box=document.getElementById("sampleBox");if(!box)return;const hs=a.headers||[];const rows=a.sample_rows||[];if(!hs.length||!rows.length){{box.innerHTML="<div class='small'>No sample data.</div>";return;}}box.innerHTML=`<div style="overflow:auto;max-height:580px"><table><thead><tr>${{hs.map(h=>`<th>${{h}}</th>`).join("")}}</tr></thead><tbody>${{rows.map(r=>`<tr>${{hs.map(h=>`<td>${{r[h] ?? ""}}</td>`).join("")}}</tr>`).join("")}}</tbody></table></div>`;}}
+function def_num(v,i){{const n=Number(String(v??"").replace(/,/g,""));return Number.isFinite(n)?n:i;}}
+function def_autoRender(){{def_renderPlot("mainPlot");def_renderPlot("homePlot");}}
+function def_renderPlot(target){{const el=document.getElementById(target);if(!el)return;const a=def_asset();const tpl=def_template();const rows=a.sample_rows||[];const headers=a.headers||[];if(!rows.length||!headers.length){{Plotly.react(target,[{{x:[1,2,3,4],y:[100,102,101,105],type:"scatter",mode:"lines",name:"Demo"}}],def_layout("No input data Demo"),{{responsive:true,displayModeBar:false}});return;}}let xCol=document.getElementById("xCol")?.value;let yCol=document.getElementById("yCol")?.value;if(!xCol||!headers.includes(xCol))xCol=headers.find(h=>["date","trade_date","time","datetime","normalized_date","x"].includes(def_norm(h)))||headers[0];if(!yCol||!headers.includes(yCol))yCol=headers.find(h=>["adj_close","close","price","value","index","y"].includes(def_norm(h)))||headers.find(h=>h!==xCol)||headers[0];const x=rows.map((r,i)=>r[xCol]??i);const y=rows.map((r,i)=>def_num(r[yCol],i));let traces=[];if((tpl.kind||"").includes("bar"))traces=[{{x,y,type:"bar",name:yCol,marker:{{color:"#439a9a"}}}}];else if((tpl.kind||"").includes("scatter"))traces=[{{x:rows.map((r,i)=>def_num(r[xCol],i)),y,type:"scatter",mode:"markers",name:yCol,marker:{{color:"#4c78a8",size:7}}}}];else traces=[{{x,y,type:"scatter",mode:"lines+markers",name:yCol,line:{{color:"#4c78a8",width:2}},marker:{{size:5}}}}];Plotly.react(target,traces,def_layout(`${{a.file_name||"Data"}} - ${{tpl.name||a.recommended_template||"Auto Plot"}}`),{{responsive:true,displayModeBar:false}});}}
+function def_layout(title){{return {{title:{{text:title,font:{{size:14,color:"#34342f"}}}},paper_bgcolor:"#ffffff",plot_bgcolor:"#faf9f6",margin:{{l:54,r:28,t:48,b:46}},hovermode:"x unified",xaxis:{{gridcolor:"#e2dfd7",tickfont:{{size:10,color:"#646057"}}}},yaxis:{{gridcolor:"#e2dfd7",tickfont:{{size:10,color:"#646057"}}}},font:{{family:"Segoe UI, Noto Sans TC, sans-serif",size:11,color:"#1e1d1a"}}}};}}
+document.addEventListener("DOMContentLoaded",()=>{{def_initSelects();def_renderSample();def_autoRender();}});
+window.addEventListener("resize",()=>setTimeout(def_autoRender,120));
+</script>
+</body>
+</html>"""
+
+# def MAIN
+def def_main() -> int:
+    for p in [def_PARAM_BASE_ROOT, def_PARAM_INPUT_ROOT, def_PARAM_TEMPLATE_ROOT, def_PARAM_OUTPUT_ROOT, def_PARAM_REGISTRY_ROOT]:
+        p.mkdir(parents=True, exist_ok=True)
+    data_assets = def_scan_data()
+    template_assets = def_scan_templates()
+    def_upsert_db(data_assets, template_assets)
+    def_write_matrix(data_assets)
+    summary = {
+        "generated_at": def_now(),
+        "base_root": str(def_PARAM_BASE_ROOT),
+        "input_root": str(def_PARAM_INPUT_ROOT),
+        "template_root": str(def_PARAM_TEMPLATE_ROOT),
+        "output_root": str(def_PARAM_OUTPUT_ROOT),
+        "db_path": str(def_PARAM_DB_PATH),
+        "html_path": str(def_PARAM_HTML_PATH),
+        "matrix_csv": str(def_PARAM_MATRIX_CSV),
+        "data_assets": len(data_assets),
+        "template_assets": len(template_assets),
+        "indexed_ok": sum(1 for x in data_assets if x.status == "OK"),
+        "warnings": sum(1 for x in data_assets if x.status != "OK"),
+    }
+    manifest = {"summary":summary,"data_assets":[asdict(x) for x in data_assets],"template_assets":[asdict(x) for x in template_assets]}
+    def_write_json(def_PARAM_MANIFEST_PATH, manifest)
+    def_write_json(def_PARAM_SUMMARY_JSON, summary)
+    def_PARAM_HTML_PATH.parent.mkdir(parents=True, exist_ok=True)
+    def_PARAM_HTML_PATH.write_text(def_build_html(data_assets, template_assets, summary), encoding="utf-8")
+    print(json.dumps(summary, ensure_ascii=False, indent=2, default=str))
+    return 0
+
+if __name__ == "__main__":
+    try:
+        _code = def_main()
+        raise SystemExit(_code)
+    except SystemExit as _sx:
+        if getattr(_sx, "code", 0) not in (0, None):
+            raise
+    except BaseException:
+        print(traceback.format_exc())
+        raise

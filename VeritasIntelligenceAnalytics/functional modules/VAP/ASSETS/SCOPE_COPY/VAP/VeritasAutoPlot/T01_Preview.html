@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VeritasAutoPlot™ T01 — Single Axis Preview</title>
+<script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+<style>
+:root{
+  --sb-blue:#4C72B0;--sb-orange:#DD8452;--sb-green:#55A868;--sb-red:#C44E52;
+  --sb-purple:#8172B3;--sb-brown:#937860;--sb-pink:#DA8BC3;--sb-gray:#8C8C8C;
+  --sb-yellow:#CCB974;--sb-cyan:#64B5CD;
+  --bg:#FFFFFF;--bg2:#F7F6F3;--bg3:#EFEEE9;
+  --tx1:#37352F;--tx2:#6B6B6B;--tx3:#9B9A97;--bd:#E8E7E4;
+  --font:'Inter','Noto Sans TC',-apple-system,sans-serif;
+  --radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg2);color:var(--tx1);min-height:100vh;padding:24px}
+.header{text-align:center;margin-bottom:20px}
+.header h1{font-size:clamp(16px,2.5vw,22px);font-weight:600;color:var(--tx1);letter-spacing:-.3px}
+.header .sub{font-size:13px;color:var(--tx3);margin-top:4px}
+.card{background:var(--bg);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--bd);padding:20px;margin-bottom:16px}
+.ctrl-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:16px}
+.ctrl-group{display:flex;align-items:center;gap:6px}
+.ctrl-group label{font-size:12px;color:var(--tx2);white-space:nowrap}
+select,input[type=color],input[type=number]{font-family:var(--font);font-size:12px;border:1px solid var(--bd);border-radius:4px;padding:4px 8px;background:var(--bg);color:var(--tx1);outline:none}
+select:focus,input:focus{border-color:var(--sb-blue)}
+input[type=color]{width:28px;height:28px;padding:2px;cursor:pointer}
+input[type=number]{width:60px}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;cursor:pointer;border:1px solid var(--bd);background:var(--bg);transition:.15s;user-select:none}
+.chip.active{background:var(--sb-blue);color:#fff;border-color:var(--sb-blue)}
+.chip:hover{background:var(--bg3)}.chip.active:hover{background:#3a5f96}
+#chart{width:100%;height:clamp(400px,58vh,700px)}
+.footer{text-align:center;font-size:11px;color:var(--tx3);margin-top:12px}
+@media(max-width:768px){body{padding:12px}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>VeritasAutoPlot™ T01 — Single Axis (S&P 500)</h1>
+  <div class="sub">Realistic preview · 2022-01 ~ 2025-02</div>
+</div>
+
+<div class="card">
+  <div class="ctrl-row">
+    <div class="ctrl-group"><label>Chart</label>
+      <select id="selType" onchange="render()"><option value="lines">Line</option><option value="area">Area</option><option value="markers">Scatter</option><option value="lines+markers">Line+Marker</option></select>
+    </div>
+    <div class="ctrl-group"><label>Color</label><input type="color" id="clrMain" value="#4C72B0" onchange="render()"></div>
+    <div class="ctrl-group"><label>Width</label><input type="number" id="numWidth" value="2" min="0.5" max="6" step="0.5" onchange="render()"></div>
+    <span class="chip active" id="chipGrid" onclick="toggle(this);render()">Grid</span>
+    <span class="chip" id="chipLog" onclick="toggle(this);render()">Log Y</span>
+    <span class="chip active" id="chipHL" onclick="toggle(this);render()">High/Low</span>
+  </div>
+  <div id="chart"></div>
+</div>
+<div class="footer">VeritasAutoPlot™ · T01 Single Axis · Data: Simulated S&P 500</div>
+
+<script>
+/* ═══ Realistic S&P 500 path: 2022-01 ~ 2025-02 ═══ */
+function genSP500(){
+  const dates=[],vals=[];
+  // Approximate monthly anchors (S&P 500)
+  const anchors=[
+    ['2022-01-03',4796],['2022-02-01',4546],['2022-03-01',4374],['2022-04-01',4530],
+    ['2022-05-02',4155],['2022-06-01',4132],['2022-06-17',3666],['2022-07-01',3825],
+    ['2022-08-01',4130],['2022-08-16',4305],['2022-09-01',3955],['2022-10-13',3577],
+    ['2022-11-01',3871],['2022-12-01',4080],['2022-12-30',3839],
+    ['2023-01-03',3824],['2023-02-01',4119],['2023-02-02',4180],['2023-03-01',3970],
+    ['2023-03-13',3855],['2023-04-03',4124],['2023-05-01',4167],['2023-06-01',4282],
+    ['2023-06-16',4409],['2023-07-03',4450],['2023-07-27',4607],['2023-08-01',4576],
+    ['2023-09-01',4515],['2023-10-02',4288],['2023-10-27',4117],['2023-11-01',4237],
+    ['2023-11-24',4559],['2023-12-01',4594],['2023-12-28',4783],
+    ['2024-01-02',4742],['2024-01-19',4839],['2024-02-01',4906],['2024-02-23',5088],
+    ['2024-03-01',5137],['2024-03-28',5254],['2024-04-01',5243],['2024-04-19',4967],
+    ['2024-05-01',5018],['2024-05-23',5307],['2024-06-03',5283],['2024-06-18',5487],
+    ['2024-07-01',5475],['2024-07-16',5667],['2024-08-01',5522],['2024-08-05',5186],
+    ['2024-08-30',5648],['2024-09-03',5648],['2024-09-19',5713],['2024-10-01',5699],
+    ['2024-10-18',5864],['2024-11-01',5728],['2024-11-11',6001],['2024-11-29',6032],
+    ['2024-12-02',6047],['2024-12-06',6090],['2024-12-18',5872],['2024-12-31',5881],
+    ['2025-01-02',5906],['2025-01-17',5996],['2025-01-24',6101],['2025-02-07',6025],
+    ['2025-02-14',6068],
+  ];
+  // Interpolate daily with small noise
+  for(let ai=0;ai<anchors.length-1;ai++){
+    const d0=new Date(anchors[ai][0]),d1=new Date(anchors[ai+1][0]);
+    const v0=anchors[ai][1],v1=anchors[ai+1][1];
+    let d=new Date(d0);
+    while(d<d1){
+      if(d.getDay()!==0&&d.getDay()!==6){
+        const t=(d-d0)/(d1-d0);
+        const base=v0+(v1-v0)*t;
+        const noise=base*(Math.random()-.5)*0.006;
+        dates.push(d.toISOString().slice(0,10));
+        vals.push(+(base+noise).toFixed(2));
+      }
+      d=new Date(d.getTime()+864e5);
+    }
+  }
+  // Add last anchor
+  dates.push(anchors[anchors.length-1][0]);
+  vals.push(anchors[anchors.length-1][1]);
+  return{dates,vals};
+}
+const D=genSP500();
+
+function gc(id){return document.getElementById(id).classList.contains('active')}
+function toggle(el){el.classList.toggle('active')}
+
+function render(){
+  const type=document.getElementById('selType').value;
+  const clr=document.getElementById('clrMain').value;
+  const w=+document.getElementById('numWidth').value;
+  const showGrid=gc('chipGrid'),logY=gc('chipLog'),showHL=gc('chipHL');
+  const fill=type==='area'?'tozeroy':'none';
+  const mode=type==='area'?'lines':type;
+
+  const trace={x:D.dates,y:D.vals,type:'scatter',mode:mode,name:'S&P 500',
+    line:{color:clr,width:w,shape:'spline'},fill:fill,fillcolor:clr+'18',marker:{size:3,color:clr}};
+
+  const layout={
+    title:{text:'S&P 500 Index (^GSPC)',font:{family:'Inter,Noto Sans TC',size:16,color:'#37352F'},x:0.01,xanchor:'left'},
+    paper_bgcolor:'#FFF',plot_bgcolor:'#FFF',
+    margin:{t:55,r:40,b:55,l:65},
+    xaxis:{showgrid:false,linecolor:'#E8E7E4',tickfont:{size:11,color:'#6B6B6B'},dtick:'M3',tickformat:'%Y-%m'},
+    yaxis:{showgrid:showGrid,gridcolor:showGrid?'#F0EFEC':'transparent',linecolor:'#E8E7E4',tickfont:{size:11,color:'#6B6B6B'},separatethousands:true,
+      type:logY?'log':'linear'},
+    hovermode:'x unified',hoverlabel:{bgcolor:'rgba(255,255,255,.95)',bordercolor:'#E8E7E4',font:{size:12,family:'Inter'}},
+    legend:{orientation:'h',y:1.08,x:0,font:{size:11}},
+    annotations:[],shapes:[]
+  };
+
+  if(showHL){
+    const mx=D.vals.indexOf(Math.max(...D.vals));
+    const mn=D.vals.indexOf(Math.min(...D.vals));
+    layout.annotations.push(
+      {x:D.dates[mx],y:D.vals[mx],text:'▲ High: '+D.vals[mx].toLocaleString()+'\n'+D.dates[mx],
+       showarrow:true,arrowhead:0,ax:40,ay:-35,font:{size:10,color:'#55A868',weight:700},
+       bgcolor:'rgba(255,255,255,.92)',bordercolor:'#55A868',borderwidth:1,borderpad:4},
+      {x:D.dates[mn],y:D.vals[mn],text:'▼ Low: '+D.vals[mn].toLocaleString()+'\n'+D.dates[mn]+'\nDD: '+(((D.vals[mn]-D.vals[mx])/D.vals[mx])*100).toFixed(1)+'%',
+       showarrow:true,arrowhead:0,ax:-40,ay:40,font:{size:10,color:'#C44E52',weight:700},
+       bgcolor:'rgba(255,255,255,.92)',bordercolor:'#C44E52',borderwidth:1,borderpad:4}
+    );
+  }
+
+  Plotly.react('chart',[trace],layout,{responsive:true,displayModeBar:false});
+}
+render();
+</script>
+</body>
+</html>

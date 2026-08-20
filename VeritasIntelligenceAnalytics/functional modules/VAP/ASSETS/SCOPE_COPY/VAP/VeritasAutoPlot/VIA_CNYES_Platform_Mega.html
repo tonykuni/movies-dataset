@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIA 台股分析平台 | 2330 台積電 | cnyes.com Style</title>
+    
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+/* ═══════════════════════════════════════════════════════════════════════════════
+   VIA CNYES PLATFORM MEGA
+   Reference: cnyes.com DevTools
+   - Container: 898.67 × 578.18
+   - Font: 14px Lato, "Noto Sans TC", "Pingfang TC"
+   - Text Color: #848D97, #37352F
+   - Background: #FFFFFF, #F6F8FC
+   - Industry Chain Padding: 16px 6px 6px
+═══════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+    --bg-page: #F6F8FC;
+    --bg-card: #FFFFFF;
+    --bg-hover: #F0F2F5;
+    --bg-highlight: #FFF8E1;
+    --bg-estimate: #FFFFFF;
+    
+    --text-primary: #37352F;
+    --text-secondary: #848D97;
+    --text-muted: #A0A8B0;
+    --text-link: #3B82F6;
+    
+    --chart-up: #E15241;
+    --chart-down: #22AB94;
+    --chart-foreign: #5B9BD5;
+    --chart-trust: #FFC000;
+    --chart-dealer: #ED7D31;
+    
+    --accent-red: #E15241;
+    --accent-blue: #3B82F6;
+    --accent-orange: #F59E0B;
+    
+    --border-light: #E5E7EB;
+    --border-medium: #D1D5DB;
+    
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
+    
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    font-family: 'Lato', 'Noto Sans TC', 'Pingfang TC', -apple-system, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-primary);
+    background: var(--bg-page);
+    min-height: 100vh;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   LAYOUT - Matching cnyes.com container: 898.67 × 578.18
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.app {
+    max-width: 1800px;
+    margin: 0 auto;
+    padding: 16px;
+}
+
+/* ─── Header ─── */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    margin-bottom: 16px;
+    box-shadow: var(--shadow-sm);
+}
+
+.stock-main {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.stock-badge {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+}
+
+.stock-symbol {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.stock-name {
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.stock-tags {
+    display: flex;
+    gap: 8px;
+}
+
+.tag {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.tag-blue { background: #E3F2FD; color: #1976D2; }
+.tag-orange { background: #FFF3E0; color: #E65100; }
+.tag-green { background: #E8F5E9; color: #2E7D32; }
+
+.sync-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #E8F5E9;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #2E7D32;
+    font-weight: 500;
+}
+
+.sync-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #4CAF50;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.9); }
+}
+
+.price-box {
+    text-align: right;
+}
+
+.price-current {
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--chart-up);
+    letter-spacing: -1px;
+}
+
+.price-change {
+    font-size: 18px;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.up { color: var(--chart-up); }
+.down { color: var(--chart-down); }
+
+/* ─── Stats Grid ─── */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 12px;
+    padding: 16px 20px;
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    margin-bottom: 16px;
+    box-shadow: var(--shadow-sm);
+}
+
+.stat-cell {
+    text-align: center;
+    padding: 8px 4px;
+    border-right: 1px solid var(--border-light);
+}
+
+.stat-cell:last-child {
+    border-right: none;
+}
+
+.stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* ─── Navigation Tabs ─── */
+.nav-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 6px;
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    margin-bottom: 16px;
+    box-shadow: var(--shadow-sm);
+    overflow-x: auto;
+}
+
+.nav-tab {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.nav-tab:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.nav-tab.active {
+    background: var(--accent-red);
+    color: white;
+}
+
+/* ─── Main Layout ─── */
+.main-layout {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 16px;
+}
+
+/* ─── Card Section ─── */
+.card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    margin-bottom: 16px;
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-title::before {
+    content: '';
+    width: 4px;
+    height: 18px;
+    background: var(--accent-red);
+    border-radius: 2px;
+}
+
+.card-subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+.card-tabs {
+    display: flex;
+    gap: 4px;
+}
+
+.card-tab {
+    padding: 6px 14px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: all 0.15s;
+}
+
+.card-tab:hover {
+    background: var(--bg-hover);
+}
+
+.card-tab.active {
+    color: var(--accent-red);
+    font-weight: 600;
+    background: rgba(225, 82, 65, 0.08);
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-body.no-pad {
+    padding: 0;
+}
+
+/* ─── Chart Container - 898.67 × 578.18 reference ─── */
+.chart-box {
+    width: 100%;
+    height: 350px;
+}
+
+.chart-box.large {
+    height: 450px;
+}
+
+.chart-box.small {
+    height: 250px;
+}
+
+/* ─── Estimate Table (市場預估目標) - from screenshot ─── */
+.estimate-section {
+    margin: 12px 0 0;
+    padding: 12px;
+    background: var(--bg-estimate);
+    border-radius: var(--radius-md);
+}
+
+.estimate-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.estimate-table th {
+    padding: 14px 20px;
+    text-align: center;
+    font-weight: 500;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.estimate-table th.highlight {
+    background: var(--bg-highlight);
+    color: var(--chart-up);
+    font-weight: 600;
+}
+
+.estimate-table td {
+    padding: 14px 20px;
+    text-align: center;
+    border-bottom: 1px solid var(--border-light);
+    font-weight: 500;
+}
+
+.estimate-table td.highlight {
+    background: var(--bg-highlight);
+    color: var(--chart-up);
+    font-weight: 600;
+}
+
+.estimate-table .row-label {
+    text-align: left;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.estimate-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* ─── Industry Chain Table (產業鏈) - padding: 16px 6px 6px ─── */
+.chain-section {
+    padding: 16px 6px 6px;
+}
+
+.chain-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.chain-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 500;
+    color: var(--text-muted);
+    background: var(--bg-page);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.chain-table th:nth-child(3),
+.chain-table th:nth-child(4),
+.chain-table th:nth-child(5) {
+    text-align: right;
+}
+
+.chain-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.chain-table tr:hover td {
+    background: var(--bg-hover);
+}
+
+.chain-table .star-btn {
+    color: #FFC107;
+    font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.15s;
+}
+
+.chain-table .star-btn:hover {
+    transform: scale(1.2);
+}
+
+.chain-table .stock-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.chain-table .price {
+    text-align: right;
+    font-weight: 600;
+}
+
+.chain-table .change {
+    text-align: right;
+    font-weight: 500;
+}
+
+.chain-table .change.up { color: var(--chart-up); }
+.chain-table .change.down { color: var(--chart-down); }
+
+.chain-table .market-cap {
+    text-align: right;
+    color: var(--text-secondary);
+}
+
+/* ─── Five Levels (五檔報價) ─── */
+.five-levels {
+    font-size: 14px;
+}
+
+.level-row {
+    display: grid;
+    grid-template-columns: 50px 1fr 90px;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-light);
+    align-items: center;
+}
+
+.level-row:last-child {
+    border-bottom: none;
+}
+
+.level-label {
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.level-label.sell { color: var(--chart-down); }
+.level-label.buy { color: var(--chart-up); }
+
+.level-price {
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.level-volume {
+    text-align: right;
+    color: var(--text-secondary);
+}
+
+.level-divider {
+    border-top: 2px solid var(--border-medium);
+    margin: 8px 0;
+}
+
+/* ─── Ratio Bar ─── */
+.ratio-section {
+    margin-top: 16px;
+}
+
+.ratio-bar {
+    display: flex;
+    height: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.ratio-inner {
+    background: var(--chart-down);
+    transition: width 0.3s;
+}
+
+.ratio-outer {
+    background: var(--chart-up);
+    transition: width 0.3s;
+}
+
+.ratio-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+/* ─── Info Grid ─── */
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 24px;
+    font-size: 13px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.info-row:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    color: var(--text-muted);
+}
+
+.info-value {
+    font-weight: 600;
+    text-align: right;
+}
+
+/* ─── News List ─── */
+.news-item {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border-light);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.news-item:hover {
+    background: var(--bg-hover);
+}
+
+.news-item:last-child {
+    border-bottom: none;
+}
+
+.news-title {
+    font-size: 14px;
+    color: var(--text-primary);
+    line-height: 1.5;
+    margin-bottom: 6px;
+}
+
+.news-date {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* ─── Toggle Group ─── */
+.toggle-group {
+    display: flex;
+    gap: 2px;
+    background: var(--bg-page);
+    padding: 3px;
+    border-radius: var(--radius-sm);
+}
+
+.toggle-btn {
+    padding: 6px 14px;
+    font-size: 12px;
+    border: none;
+    background: transparent;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.toggle-btn:hover {
+    background: var(--bg-hover);
+}
+
+.toggle-btn.active {
+    background: var(--accent-red);
+    color: white;
+}
+
+/* ─── Legend ─── */
+.chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    padding: 12px;
+    border-top: 1px solid var(--border-light);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
+/* ─── Grid Helpers ─── */
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+/* ─── Page Content ─── */
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Sidebar ─── */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* ─── Link Style ─── */
+.more-link {
+    font-size: 13px;
+    color: var(--accent-red);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.more-link:hover {
+    text-decoration: underline;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 1400px) {
+    .main-layout {
+        grid-template-columns: 1fr 350px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .main-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .grid-2, .grid-3 {
+        grid-template-columns: 1fr;
+    }
+}
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         HEADER
+    ═══════════════════════════════════════════════════════════════════════ -->
+    <header class="header">
+        <div class="stock-main">
+            <div class="stock-badge">
+                <span class="stock-symbol">2330</span>
+                <span class="stock-name">台積電</span>
+            </div>
+            <div class="stock-tags">
+                <span class="tag tag-blue">上市</span>
+                <span class="tag tag-orange">半導體業</span>
+            </div>
+            <div class="sync-badge">
+                <span class="sync-dot"></span>
+                <span>✓ 資料同步中 (cnyes.com) 2026/01/06</span>
+            </div>
+        </div>
+        <div class="price-box">
+            <div class="price-current">1,705.00</div>
+            <div class="price-change up">▲ 35.00 (+2.10%)</div>
+        </div>
+    </header>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         STATS GRID
+    ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="stats-grid">
+        <div class="stat-cell">
+            <div class="stat-label">今開</div>
+            <div class="stat-value">1,645.00</div>
+        </div>
+        <div class="stat-cell">
+            <div class="stat-label">最高</div>
+            <div class="stat-value up">1,705.00</div>
+        </div>
+        <div class="stat-cell">
+            <div class="stat-label">最低</div>
+            <div class="stat-value">1,645.00</div>
+        </div>
+        <div class="stat-cell">
+            <div class="stat-label">昨收</div>
+            <div class="stat-value">1,670.00</div>
+        </div>
+        <div class="stat-cell">
+            <div class="stat-label">成交量</div>
+            <div class="stat-value">54,073</div>
+        </div>
+        <div class="stat-cell">
+            <div class="stat-label">成交額</div>
+            <div class="stat-value">908.50億</div>
+        </div>
+        <div class="stat-cell">
+            <div class="stat-label">本益比</div>
+            <div class="stat-value">27.86</div>
+        </div>
+        <div class="stat-cell">
+            <div class="stat-label">市值</div>
+            <div class="stat-value">44.22兆</div>
+        </div>
+        <div class="stat-cell">
+            <div class="stat-label">近四季EPS</div>
+            <div class="stat-value">61.20</div>
+        </div>
+        <div class="stat-cell">
+            <div class="stat-label">毛利率</div>
+            <div class="stat-value">59.45%</div>
+        </div>
+        <div class="stat-cell">
+            <div class="stat-label">年股利</div>
+            <div class="stat-value">19.00</div>
+        </div>
+        <div class="stat-cell">
+            <div class="stat-label">殖利率</div>
+            <div class="stat-value">1.14%</div>
+        </div>
+    </div>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         NAVIGATION
+    ═══════════════════════════════════════════════════════════════════════ -->
+    <nav class="nav-tabs">
+        <button class="nav-tab active" onclick="showPage('overview')">總覽</button>
+        <button class="nav-tab" onclick="showPage('chart')">線圖</button>
+        <button class="nav-tab" onclick="showPage('chip')">籌碼</button>
+        <button class="nav-tab" onclick="showPage('dividend')">股利</button>
+        <button class="nav-tab" onclick="showPage('performance')">績效</button>
+        <button class="nav-tab" onclick="showPage('estimate')">預估</button>
+        <button class="nav-tab" onclick="showPage('finance')">財報</button>
+        <button class="nav-tab" onclick="showPage('profile')">簡介</button>
+        <button class="nav-tab" onclick="showPage('concept')">概念</button>
+        <button class="nav-tab" onclick="showPage('news')">新聞</button>
+        <button class="nav-tab" onclick="showPage('fund')">基金</button>
+    </nav>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         PAGE: 總覽 (OVERVIEW)
+    ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="page active" id="page-overview">
+        <div class="main-layout">
+            <div class="main-content">
+                <!-- K線圖 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">K線圖</div>
+                        <div class="card-tabs">
+                            <button class="card-tab">分時</button>
+                            <button class="card-tab active">日K</button>
+                            <button class="card-tab">週K</button>
+                            <button class="card-tab">月K</button>
+                            <button class="card-tab">5分</button>
+                            <button class="card-tab">15分</button>
+                            <button class="card-tab">30分</button>
+                            <button class="card-tab">60分</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-box large" id="chartKline"></div>
+                    </div>
+                </div>
+                
+                <!-- 市場預估目標 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title">市場預估目標</div>
+                            <div class="card-subtitle" style="margin-top: 4px; margin-left: 14px;">FactSet 目前有 35 位分析師對於 台積電 提出估值</div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-box small" id="chartEstimate"></div>
+                        <div class="estimate-section">
+                            <table class="estimate-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 80px;"></th>
+                                        <th>2026</th>
+                                        <th class="highlight">2027</th>
+                                        <th>2028</th>
+                                        <th>2029</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="row-label">中位數</td>
+                                        <td>77.79</td>
+                                        <td class="highlight">95.00</td>
+                                        <td>108.20</td>
+                                        <td>121.53</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="row-label">最高價</td>
+                                        <td>96.97</td>
+                                        <td class="highlight">120.21</td>
+                                        <td>111.71</td>
+                                        <td>121.53</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="row-label">最低價</td>
+                                        <td>69.51</td>
+                                        <td class="highlight">81.90</td>
+                                        <td>104.69</td>
+                                        <td>121.53</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 產業鏈 (Industry Chain) - padding: 16px 6px 6px -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">產業鏈</div>
+                        <div class="card-tabs">
+                            <button class="card-tab active">競爭者</button>
+                            <button class="card-tab">供應商</button>
+                            <button class="card-tab">客戶</button>
+                            <button class="card-tab">轉投資</button>
+                        </div>
+                    </div>
+                    <div class="card-body no-pad">
+                        <div class="chain-section">
+                            <table class="chain-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50px;">自選</th>
+                                        <th>名稱</th>
+                                        <th>最新價</th>
+                                        <th>漲跌(%)</th>
+                                        <th>市值</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="chainTableBody">
+                                    <!-- Generated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ═══════════════════════════════════════════════════════════════
+                 SIDEBAR
+            ═══════════════════════════════════════════════════════════════ -->
+            <div class="sidebar">
+                <!-- 五檔報價 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">五檔報價</div>
+                        <div class="card-tabs">
+                            <button class="card-tab active">五檔</button>
+                            <button class="card-tab">分價</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="five-levels">
+                            <div class="level-row">
+                                <span class="level-label sell">賣5</span>
+                                <span class="level-price">1,725.00</span>
+                                <span class="level-volume">214</span>
+                            </div>
+                            <div class="level-row">
+                                <span class="level-label sell">賣4</span>
+                                <span class="level-price">1,720.00</span>
+                                <span class="level-volume">776</span>
+                            </div>
+                            <div class="level-row">
+                                <span class="level-label sell">賣3</span>
+                                <span class="level-price">1,715.00</span>
+                                <span class="level-volume">1,541</span>
+                            </div>
+                            <div class="level-row">
+                                <span class="level-label sell">賣2</span>
+                                <span class="level-price">1,710.00</span>
+                                <span class="level-volume">1,205</span>
+                            </div>
+                            <div class="level-row">
+                                <span class="level-label sell">賣1</span>
+                                <span class="level-price">1,705.00</span>
+                                <span class="level-volume">858</span>
+                            </div>
+                            <div class="level-divider"></div>
+                            <div class="level-row">
+                                <span class="level-label buy">買1</span>
+                                <span class="level-price">1,700.00</span>
+                                <span class="level-volume">139</span>
+                            </div>
+                            <div class="level-row">
+                                <span class="level-label buy">買2</span>
+                                <span class="level-price">1,695.00</span>
+                                <span class="level-volume">84</span>
+                            </div>
+                            <div class="level-row">
+                                <span class="level-label buy">買3</span>
+                                <span class="level-price">1,690.00</span>
+                                <span class="level-volume">540</span>
+                            </div>
+                            <div class="level-row">
+                                <span class="level-label buy">買4</span>
+                                <span class="level-price">1,685.00</span>
+                                <span class="level-volume">595</span>
+                            </div>
+                            <div class="level-row">
+                                <span class="level-label buy">買5</span>
+                                <span class="level-price">1,680.00</span>
+                                <span class="level-volume">991</span>
+                            </div>
+                        </div>
+                        
+                        <div class="ratio-section">
+                            <div class="ratio-bar">
+                                <div class="ratio-inner" style="width: 33.9%;"></div>
+                                <div class="ratio-outer" style="width: 66.1%;"></div>
+                            </div>
+                            <div class="ratio-labels">
+                                <span>內盤 33.9%</span>
+                                <span>外盤 66.1%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 基本資訊 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">詳細報價</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-grid">
+                            <div class="info-row">
+                                <span class="info-label">振幅</span>
+                                <span class="info-value">3.59%</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">週轉率</span>
+                                <span class="info-value">0.18%</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">漲停價</span>
+                                <span class="info-value up">1,835.00</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">跌停價</span>
+                                <span class="info-value down">1,505.00</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">52週高</span>
+                                <span class="info-value up">1,705.00</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">52週低</span>
+                                <span class="info-value">780.00</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">每股淨值</span>
+                                <span class="info-value">192.74</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">本淨比</span>
+                                <span class="info-value">8.84</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">發行股數</span>
+                                <span class="info-value">259.33億</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">內盤量</span>
+                                <span class="info-value">15,177</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">外盤量</span>
+                                <span class="info-value">29,599</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">季均量</span>
+                                <span class="info-value">33,012</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 新聞快訊 -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">新聞快訊</div>
+                        <a href="#" class="more-link">看更多 →</a>
+                    </div>
+                    <div class="card-body no-pad">
+                        <div class="news-item">
+                            <div class="news-title">緯穎擴大德州廠投資 斥資10.23億元進行建築物改良</div>
+                            <div class="news-date">01/02</div>
+                        </div>
+                        <div class="news-item">
+                            <div class="news-title">台美關稅談判進入最後階段 龔明鑫：雙方已有共識只差「這一步」</div>
+                            <div class="news-date">01/02</div>
+                        </div>
+                        <div class="news-item">
+                            <div class="news-title">〈2025封關〉千金股飆高！股王信驊抱股一張年賺近400萬元、勤誠飆漲277%</div>
+                            <div class="news-date">12/31</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         PAGE: 籌碼 (CHIP)
+    ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-chip">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">三大法人買賣超</div>
+                <div class="card-tabs">
+                    <button class="card-tab active">三大法人</button>
+                    <button class="card-tab">八大官股</button>
+                    <button class="card-tab">主力券商</button>
+                    <button class="card-tab">資金流向</button>
+                    <button class="card-tab">券資變化</button>
+                </div>
+                <div class="toggle-group">
+                    <button class="toggle-btn active">單日</button>
+                    <button class="toggle-btn">累積</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chart-box large" id="chartInstitutional"></div>
+            </div>
+            <div class="chart-legend">
+                <div class="legend-item"><div class="legend-dot" style="background: #5B9BD5;"></div><span>外資</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background: #FFC000;"></div><span>投信</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background: #ED7D31;"></div><span>自營</span></div>
+            </div>
+        </div>
+        
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">資金流向</div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-box" id="chartCapital"></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">券資變化</div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-box" id="chartMargin"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">籌碼熱力圖</div>
+            </div>
+            <div class="card-body">
+                <div class="chart-box large" id="chartHeatmap"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         PAGE: 預估 (ESTIMATE)
+    ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-estimate">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">EPS 預估趨勢</div>
+            </div>
+            <div class="card-body">
+                <div class="chart-box large" id="chartEPSForecast"></div>
+            </div>
+        </div>
+        
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">分析師評等分布</div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-box" id="chartRating"></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">目標價分布</div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-box" id="chartTargetPrice"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         PAGE: 概念 (CONCEPT)
+    ═══════════════════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-concept">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">供應鏈關係圖</div>
+            </div>
+            <div class="card-body">
+                <div class="chart-box large" id="chartSupplyChain"></div>
+            </div>
+        </div>
+        
+        <div class="grid-3">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">競爭者</div>
+                </div>
+                <div class="card-body no-pad">
+                    <table class="chain-table" id="competitorTable"></table>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">供應商</div>
+                </div>
+                <div class="card-body no-pad">
+                    <table class="chain-table" id="supplierTable"></table>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">客戶</div>
+                </div>
+                <div class="card-body no-pad">
+                    <table class="chain-table" id="customerTable"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Other Pages -->
+    <div class="page" id="page-chart">
+        <div class="card">
+            <div class="card-body">
+                <div class="chart-box" style="height: 600px;" id="chartFullKline"></div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="page" id="page-dividend"><div class="card"><div class="card-body" style="text-align: center; padding: 40px; color: var(--text-muted);">股利頁面開發中...</div></div></div>
+    <div class="page" id="page-performance"><div class="card"><div class="card-body" style="text-align: center; padding: 40px; color: var(--text-muted);">績效頁面開發中...</div></div></div>
+    <div class="page" id="page-finance"><div class="card"><div class="card-body" style="text-align: center; padding: 40px; color: var(--text-muted);">財報頁面開發中...</div></div></div>
+    <div class="page" id="page-profile"><div class="card"><div class="card-body" style="text-align: center; padding: 40px; color: var(--text-muted);">簡介頁面開發中...</div></div></div>
+    <div class="page" id="page-news"><div class="card"><div class="card-body" style="text-align: center; padding: 40px; color: var(--text-muted);">新聞頁面開發中...</div></div></div>
+    <div class="page" id="page-fund"><div class="card"><div class="card-body" style="text-align: center; padding: 40px; color: var(--text-muted);">基金頁面開發中...</div></div></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// VIA CNYES PLATFORM MEGA - ENGINE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const COLORS = {
+    up: '#E15241',
+    down: '#22AB94',
+    foreign: '#5B9BD5',
+    trust: '#FFC000',
+    dealer: '#ED7D31',
+};
+
+const LAYOUT = {
+    paper_bgcolor: 'white',
+    plot_bgcolor: 'white',
+    font: { family: 'Lato, Noto Sans TC', size: 12, color: '#37352F' },
+    margin: { t: 20, r: 40, b: 40, l: 50 },
+    showlegend: false,
+    hovermode: 'x unified',
+    xaxis: { gridcolor: '#E5E7EB', linecolor: '#E5E7EB', tickfont: { size: 11, color: '#848D97' } },
+    yaxis: { gridcolor: '#E5E7EB', linecolor: '#E5E7EB', tickfont: { size: 11, color: '#848D97' }, zeroline: true, zerolinecolor: '#D1D5DB' },
+};
+
+// Industry Chain Data (from cnyes.com)
+const CHAIN_DATA = {
+    competitors: [
+        { name: '台達電', price: 1050.00, change: 3.96, cap: '2.73兆' },
+        { name: '聯發科', price: 1485.00, change: -0.67, cap: '2.38兆' },
+        { name: '日月光投控', price: 271.50, change: 3.04, cap: '1.20兆' },
+        { name: '鴻勁', price: 3260.00, change: -2.40, cap: '5,865.72億' },
+        { name: '致茂', price: 856.00, change: 5.55, cap: '3,640.24億' },
+    ],
+    suppliers: [
+        { name: '家登', price: 485.00, change: 2.11, cap: '620億' },
+        { name: '弘塑', price: 1580.00, change: 1.28, cap: '380億' },
+        { name: '辛耘', price: 420.00, change: -0.94, cap: '290億' },
+        { name: '帆宣', price: 285.00, change: 1.78, cap: '250億' },
+    ],
+    customers: [
+        { name: 'Apple', price: 248.50, change: 1.23, cap: '3.8T USD' },
+        { name: 'NVIDIA', price: 138.20, change: 2.45, cap: '3.4T USD' },
+        { name: 'AMD', price: 122.80, change: -1.12, cap: '200B USD' },
+        { name: 'Qualcomm', price: 158.40, change: 0.89, cap: '175B USD' },
+    ],
+};
+
+// Page Navigation
+function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    
+    document.getElementById('page-' + id).classList.add('active');
+    event.target.classList.add('active');
+    
+    // Render on demand
+    if (id === 'chip') renderChipCharts();
+    if (id === 'estimate') renderEstimateCharts();
+    if (id === 'concept') renderConceptCharts();
+    if (id === 'chart') renderFullKline();
+}
+
+// Generate Dates
+function genDates(n = 60) {
+    const dates = [];
+    const start = new Date('2025-10-01');
+    for (let i = 0; i < n * 1.5; i++) {
+        const d = new Date(start);
+        d.setDate(d.getDate() + i);
+        if (d.getDay() !== 0 && d.getDay() !== 6) {
+            dates.push(d.toISOString().split('T')[0]);
+            if (dates.length >= n) break;
+        }
+    }
+    return dates;
+}
+
+// Render Chain Table
+function renderChainTable() {
+    const tbody = document.getElementById('chainTableBody');
+    CHAIN_DATA.competitors.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><span class="star-btn">☆</span></td>
+            <td class="stock-name">${item.name}</td>
+            <td class="price">${item.price.toFixed(2)}</td>
+            <td class="change ${item.change >= 0 ? 'up' : 'down'}">${item.change >= 0 ? '+' : ''}${item.change.toFixed(2)}%</td>
+            <td class="market-cap">${item.cap}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// Render K-Line
+function renderKline() {
+    const dates = genDates(80);
+    const n = dates.length;
+    let price = 1500;
+    const open = [], high = [], low = [], close = [], volume = [];
+    
+    for (let i = 0; i < n; i++) {
+        const change = (Math.random() - 0.45) * 35;
+        const o = price;
+        const c = price + change;
+        const h = Math.max(o, c) + Math.random() * 15;
+        const l = Math.min(o, c) - Math.random() * 15;
+        open.push(o);
+        close.push(c);
+        high.push(h);
+        low.push(l);
+        volume.push(Math.floor(30000 + Math.random() * 40000));
+        price = c;
+    }
+    
+    // MA calculation
+    const calcMA = (data, period) => data.map((_, i) => {
+        if (i < period - 1) return null;
+        let sum = 0;
+        for (let j = 0; j < period; j++) sum += data[i - j];
+        return sum / period;
+    });
+    
+    Plotly.newPlot('chartKline', [
+        { type: 'candlestick', x: dates, open, high, low, close, increasing: { line: { color: COLORS.up } }, decreasing: { line: { color: COLORS.down } }, yaxis: 'y' },
+        { type: 'scatter', mode: 'lines', x: dates, y: calcMA(close, 5), line: { color: '#FFEB3B', width: 1 }, yaxis: 'y' },
+        { type: 'scatter', mode: 'lines', x: dates, y: calcMA(close, 20), line: { color: '#388E3C', width: 1 }, yaxis: 'y' },
+        { type: 'scatter', mode: 'lines', x: dates, y: calcMA(close, 60), line: { color: '#1976D2', width: 1 }, yaxis: 'y' },
+        { type: 'bar', x: dates, y: volume, marker: { color: close.map((c, i) => i === 0 ? COLORS.up : (c >= close[i-1] ? COLORS.up : COLORS.down)), opacity: 0.5 }, yaxis: 'y2' },
+    ], {
+        ...LAYOUT,
+        xaxis: { ...LAYOUT.xaxis, rangeslider: { visible: false } },
+        yaxis: { ...LAYOUT.yaxis, domain: [0.22, 1], side: 'right' },
+        yaxis2: { domain: [0, 0.18], gridcolor: '#E5E7EB', side: 'right' },
+    }, { responsive: true, displayModeBar: false });
+}
+
+// Render Estimate Chart
+function renderEstimateChart() {
+    const years = ['2024', '2025', '2026', '2027', '2028', '2029'];
+    const median = [61.2, 70.5, 77.79, 95.00, 108.20, 121.53];
+    const high = [61.2, 75.2, 96.97, 120.21, 111.71, 121.53];
+    const low = [61.2, 65.8, 69.51, 81.90, 104.69, 121.53];
+    
+    Plotly.newPlot('chartEstimate', [
+        { type: 'scatter', mode: 'lines', x: years, y: high, line: { color: COLORS.foreign, width: 1, dash: 'dot' }, fill: 'none' },
+        { type: 'scatter', mode: 'lines+markers', x: years, y: median, line: { color: COLORS.up, width: 2 }, marker: { size: 8 }, fill: 'tonexty', fillcolor: 'rgba(91, 155, 213, 0.15)' },
+        { type: 'scatter', mode: 'lines', x: years, y: low, line: { color: COLORS.down, width: 1, dash: 'dot' } },
+    ], { ...LAYOUT, showlegend: false }, { responsive: true, displayModeBar: false });
+}
+
+// Render Chip Charts
+function renderChipCharts() {
+    const dates = genDates(40);
+    const n = dates.length;
+    
+    // Institutional
+    Plotly.newPlot('chartInstitutional', [
+        { type: 'bar', x: dates, y: Array.from({ length: n }, () => Math.floor(Math.random() * 50000 - 35000)), name: '外資', marker: { color: COLORS.foreign } },
+        { type: 'bar', x: dates, y: Array.from({ length: n }, () => Math.floor(Math.random() * 6000 - 2500)), name: '投信', marker: { color: COLORS.trust } },
+        { type: 'bar', x: dates, y: Array.from({ length: n }, () => Math.floor(Math.random() * 8000 - 4000)), name: '自營', marker: { color: COLORS.dealer } },
+    ], { ...LAYOUT, barmode: 'relative' }, { responsive: true, displayModeBar: false });
+    
+    // Capital Flow
+    Plotly.newPlot('chartCapital', [{
+        type: 'bar',
+        x: ['1日', '3日', '5日', '10日', '1個月'],
+        y: [324, 1950, 2200, 3400, 2900],
+        marker: { color: COLORS.up, opacity: 0.85 },
+        text: ['324億', '1,950億', '2,200億', '3,400億', '2,900億'],
+        textposition: 'outside',
+    }], LAYOUT, { responsive: true, displayModeBar: false });
+    
+    // Margin
+    Plotly.newPlot('chartMargin', [
+        { type: 'bar', x: ['1日', '3日', '5日', '10日', '1個月'], y: [-658, 850, 250, -150, 2850], name: '融資', marker: { color: COLORS.up } },
+        { type: 'bar', x: ['1日', '3日', '5日', '10日', '1個月'], y: [19, 200, 300, 350, 300], name: '融券', marker: { color: COLORS.down } },
+    ], { ...LAYOUT, barmode: 'group' }, { responsive: true, displayModeBar: false });
+    
+    // Heatmap
+    const heatDates = genDates(20);
+    const categories = ['外資', '投信', '自營', '八大官股', '主力券商', '融資', '融券'];
+    const heatData = categories.map(() => heatDates.map(() => Math.floor(Math.random() * 20000 - 10000)));
+    
+    Plotly.newPlot('chartHeatmap', [{
+        type: 'heatmap',
+        x: heatDates,
+        y: categories,
+        z: heatData,
+        colorscale: [[0, COLORS.down], [0.5, '#FFFFFF'], [1, COLORS.up]],
+        showscale: true,
+        colorbar: { title: '買賣超', ticksuffix: '張' },
+    }], { ...LAYOUT, margin: { ...LAYOUT.margin, l: 80 } }, { responsive: true, displayModeBar: false });
+}
+
+// Render Estimate Charts
+function renderEstimateCharts() {
+    const quarters = ['2024Q1', '2024Q2', '2024Q3', '2024Q4', '2025Q1', '2025Q2', '2025Q3', '2025Q4', '2026Q1', '2026Q2'];
+    const actual = [9.20, 10.10, 12.90, 17.44, null, null, null, null, null, null];
+    const forecast = [null, null, null, null, 16.5, 17.8, 19.2, 20.5, 19.0, 20.2];
+    
+    Plotly.newPlot('chartEPSForecast', [
+        { type: 'bar', x: quarters, y: actual, name: '實際', marker: { color: COLORS.trust } },
+        { type: 'bar', x: quarters, y: forecast, name: '預估', marker: { color: 'rgba(255, 192, 0, 0.5)' } },
+    ], { ...LAYOUT, barmode: 'overlay' }, { responsive: true, displayModeBar: false });
+    
+    // Rating
+    Plotly.newPlot('chartRating', [{
+        type: 'pie',
+        values: [25, 8, 2, 0, 0],
+        labels: ['強力買進', '買進', '持有', '賣出', '強力賣出'],
+        marker: { colors: ['#4CAF50', '#8BC34A', '#FFC107', '#FF9800', '#F44336'] },
+        hole: 0.5,
+        textinfo: 'label+percent',
+        textposition: 'outside',
+    }], { ...LAYOUT, showlegend: false }, { responsive: true, displayModeBar: false });
+    
+    // Target Price
+    Plotly.newPlot('chartTargetPrice', [{
+        type: 'histogram',
+        x: Array.from({ length: 35 }, () => 1400 + Math.random() * 600),
+        marker: { color: COLORS.foreign, opacity: 0.8 },
+        nbinsx: 12,
+    }], { ...LAYOUT, xaxis: { ...LAYOUT.xaxis, title: '目標價' }, yaxis: { ...LAYOUT.yaxis, title: '分析師人數' } }, { responsive: true, displayModeBar: false });
+}
+
+// Render Concept Charts
+function renderConceptCharts() {
+    // Supply Chain Sankey
+    Plotly.newPlot('chartSupplyChain', [{
+        type: 'sankey',
+        node: {
+            label: ['供應商群', '台積電', '客戶群', '家登', '弘塑', '辛耘', 'Apple', 'NVIDIA', 'AMD', 'Qualcomm'],
+            color: [COLORS.foreign, COLORS.up, COLORS.down, COLORS.foreign, COLORS.foreign, COLORS.foreign, COLORS.down, COLORS.down, COLORS.down, COLORS.down],
+            pad: 15,
+            thickness: 20,
+        },
+        link: {
+            source: [3, 4, 5, 1, 1, 1, 1],
+            target: [1, 1, 1, 6, 7, 8, 9],
+            value: [30, 25, 15, 45, 40, 20, 15],
+            color: 'rgba(0,0,0,0.1)',
+        },
+    }], { ...LAYOUT, margin: { t: 20, r: 20, b: 20, l: 20 } }, { responsive: true, displayModeBar: false });
+    
+    // Tables
+    const renderTable = (id, data) => {
+        const table = document.getElementById(id);
+        table.innerHTML = `
+            <thead>
+                <tr>
+                    <th>名稱</th>
+                    <th style="text-align: right;">漲跌</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${data.map(item => `
+                    <tr>
+                        <td class="stock-name">${item.name}</td>
+                        <td class="change ${item.change >= 0 ? 'up' : 'down'}" style="text-align: right;">${item.change >= 0 ? '+' : ''}${item.change.toFixed(2)}%</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        `;
+    };
+    
+    renderTable('competitorTable', CHAIN_DATA.competitors);
+    renderTable('supplierTable', CHAIN_DATA.suppliers);
+    renderTable('customerTable', CHAIN_DATA.customers);
+}
+
+// Full Kline
+function renderFullKline() {
+    const dates = genDates(150);
+    const n = dates.length;
+    let price = 1100;
+    const open = [], high = [], low = [], close = [], volume = [];
+    
+    for (let i = 0; i < n; i++) {
+        const change = (Math.random() - 0.45) * 30;
+        const o = price;
+        const c = price + change;
+        open.push(o);
+        close.push(c);
+        high.push(Math.max(o, c) + Math.random() * 15);
+        low.push(Math.min(o, c) - Math.random() * 15);
+        volume.push(Math.floor(30000 + Math.random() * 40000));
+        price = c;
+    }
+    
+    Plotly.newPlot('chartFullKline', [
+        { type: 'candlestick', x: dates, open, high, low, close, increasing: { line: { color: COLORS.up } }, decreasing: { line: { color: COLORS.down } }, yaxis: 'y' },
+        { type: 'bar', x: dates, y: volume, marker: { color: close.map((c, i) => i === 0 ? COLORS.up : (c >= close[i-1] ? COLORS.up : COLORS.down)), opacity: 0.5 }, yaxis: 'y2' },
+    ], {
+        ...LAYOUT,
+        height: 600,
+        xaxis: { ...LAYOUT.xaxis, rangeslider: { visible: false } },
+        yaxis: { ...LAYOUT.yaxis, domain: [0.18, 1], side: 'right' },
+        yaxis2: { domain: [0, 0.14], gridcolor: '#E5E7EB', side: 'right' },
+    }, { responsive: true, displayModeBar: false });
+}
+
+// Tab click handlers
+document.querySelectorAll('.card-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        tab.parentElement.querySelectorAll('.card-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+    });
+});
+
+document.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        btn.parentElement.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    });
+});
+
+// Star toggle
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('star-btn')) {
+        e.target.textContent = e.target.textContent === '☆' ? '★' : '☆';
+    }
+});
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    renderChainTable();
+    renderKline();
+    renderEstimateChart();
+});
+</script>
+
+</body>
+</html>

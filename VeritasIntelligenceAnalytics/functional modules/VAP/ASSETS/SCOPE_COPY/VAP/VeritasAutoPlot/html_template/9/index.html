@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+   ______                            __
+  / ____/___  ____ ___  ____  __  __/ /____  _____
+ / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
+/ /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
+\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
+                    /_/
+        Created with Perplexity Computer
+        https://www.perplexity.ai/computer
+-->
+<meta name="generator" content="Perplexity Computer">
+<meta name="author" content="Perplexity Computer">
+<meta property="og:see_also" content="https://www.perplexity.ai/computer">
+<link rel="author" href="https://www.perplexity.ai/computer">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCOTUS Analytics — Supreme Court Database Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<link rel="stylesheet" href="./base.css">
+<link rel="stylesheet" href="./style.css">
+<link rel='stylesheet' href='../VAP_THEME.css'><link rel='stylesheet' href='../VAP_RESPONSIVE.css'></head>
+<body>
+<div class="dashboard">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="SCOTUS Analytics">
+        <rect x="2" y="22" width="28" height="4" rx="1" fill="currentColor"/>
+        <rect x="4" y="6" width="4" height="16" rx="1" fill="currentColor" opacity="0.7"/>
+        <rect x="14" y="6" width="4" height="16" rx="1" fill="currentColor" opacity="0.7"/>
+        <rect x="24" y="6" width="4" height="16" rx="1" fill="currentColor" opacity="0.7"/>
+        <path d="M3 6 L16 1 L29 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+      <span class="logo-text">SCOTUS</span>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-view="ideology" aria-label="Ideology Timeline">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>
+        <span>Ideology</span>
+      </button>
+      <button class="nav-item" data-view="alignment" aria-label="Voting Alignment">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        <span>Alignment</span>
+      </button>
+      <button class="nav-item" data-view="explorer" aria-label="Case Explorer">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <span>Cases</span>
+      </button>
+      <button class="nav-item" data-view="predict" aria-label="Predict the Court">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        <span>Predict</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <button data-theme-toggle aria-label="Toggle theme">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <span class="sidebar-credit">9,341 cases · 1946–2024</span>
+    </div>
+  </aside>
+
+  <!-- Header -->
+  <header class="header" id="header">
+    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+    <div class="header-content">
+      <h1 id="viewTitle">Justice Ideology Timeline</h1>
+      <p id="viewSubtitle" class="header-subtitle">Ideological drift of Supreme Court justices from 1946 to present</p>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main" id="main">
+    <!-- Ideology View -->
+    <section class="view active" id="view-ideology">
+      <div class="controls-bar">
+        <div class="control-group">
+          <label class="control-label">Era</label>
+          <select id="ideologyEra" class="control-select">
+            <option value="all">All Eras (1946–2024)</option>
+            <option value="vinson">Vinson Court (1946–1953)</option>
+            <option value="warren">Warren Court (1953–1969)</option>
+            <option value="burger">Burger Court (1969–1986)</option>
+            <option value="rehnquist">Rehnquist Court (1986–2005)</option>
+            <option value="roberts">Roberts Court (2005–present)</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label class="control-label">Highlight</label>
+          <select id="ideologyHighlight" class="control-select">
+            <option value="none">None</option>
+          </select>
+        </div>
+      </div>
+      <div class="chart-container" id="ideologyChart"></div>
+      <div class="chart-legend" id="ideologyLegend"></div>
+    </section>
+
+    <!-- Alignment View -->
+    <section class="view" id="view-alignment">
+      <div class="controls-bar">
+        <div class="control-group">
+          <label class="control-label">Decade</label>
+          <select id="alignmentDecade" class="control-select"></select>
+        </div>
+        <div class="control-group">
+          <label class="control-label">Sort by</label>
+          <select id="alignmentSort" class="control-select">
+            <option value="ideology">Ideology (L→R)</option>
+            <option value="name">Name (A→Z)</option>
+          </select>
+        </div>
+      </div>
+      <div class="chart-container heatmap-container" id="alignmentChart"></div>
+      <div class="alignment-tooltip" id="alignmentTooltip"></div>
+    </section>
+
+    <!-- Case Explorer View -->
+    <section class="view" id="view-explorer">
+      <div class="controls-bar explorer-controls">
+        <div class="control-group search-group">
+          <input type="text" id="caseSearch" class="control-input" placeholder="Search cases..." aria-label="Search cases">
+        </div>
+        <div class="control-group">
+          <label class="control-label">Issue Area</label>
+          <select id="caseIssue" class="control-select">
+            <option value="all">All Issues</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label class="control-label">Direction</label>
+          <select id="caseDirection" class="control-select">
+            <option value="all">All</option>
+            <option value="1">Conservative</option>
+            <option value="2">Liberal</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label class="control-label">Term Range</label>
+          <div class="range-inputs">
+            <input type="number" id="termStart" class="control-input small" min="1946" max="2024" value="1946">
+            <span class="range-sep">–</span>
+            <input type="number" id="termEnd" class="control-input small" min="1946" max="2024" value="2024">
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label">Unanimous</label>
+          <select id="caseUnanimous" class="control-select">
+            <option value="all">All</option>
+            <option value="yes">Unanimous only</option>
+            <option value="no">Split only</option>
+          </select>
+        </div>
+      </div>
+      <div class="explorer-stats" id="explorerStats"></div>
+      <div class="explorer-charts" id="explorerCharts"></div>
+      <div class="table-wrapper">
+        <table class="data-table" id="caseTable">
+          <thead>
+            <tr>
+              <th data-sort="term" class="sortable">Term</th>
+              <th data-sort="name" class="sortable">Case Name</th>
+              <th data-sort="issueArea" class="sortable">Issue Area</th>
+              <th data-sort="direction" class="sortable">Direction</th>
+              <th data-sort="margin" class="sortable">Vote</th>
+              <th data-sort="chief" class="sortable">Chief</th>
+            </tr>
+          </thead>
+          <tbody id="caseTableBody"></tbody>
+        </table>
+      </div>
+      <div class="pagination" id="pagination"></div>
+    </section>
+
+    <!-- Predict View -->
+    <section class="view" id="view-predict">
+      <div class="predict-layout">
+        <div class="predict-form">
+          <h2 class="predict-title">Predict the Court</h2>
+          <p class="predict-desc">Estimate how the current Court might rule based on historical voting patterns.</p>
+          
+          <div class="form-group">
+            <label class="form-label">Issue Area</label>
+            <select id="predictIssue" class="control-select">
+              <option value="">Select an issue area...</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Ideological Lean of Petitioner's Argument</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="predictLean" value="liberal"> Liberal
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="predictLean" value="conservative" checked> Conservative
+              </label>
+            </div>
+          </div>
+          
+          <button id="predictBtn" class="predict-btn">Predict Outcome</button>
+        </div>
+        
+        <div class="predict-results" id="predictResults">
+          <div class="predict-placeholder">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            <p>Select an issue area and run the prediction</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="predict-history" id="predictHistory">
+        <h3 class="predict-section-title">Historical Context</h3>
+        <div class="history-cards" id="historyCards"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer class="site-footer">
+  <span>Data: Supreme Court Database (scdb.wustl.edu) · 1946–2024 Terms</span>
+  <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a>
+</footer>
+
+<script src="./app.js"></script>
+</body>
+</html>
+

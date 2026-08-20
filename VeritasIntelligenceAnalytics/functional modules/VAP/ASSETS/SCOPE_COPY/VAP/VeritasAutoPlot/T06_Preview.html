@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VeritasAutoPlot™ T06 — Dashboard Preview</title>
+<script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+<style>
+:root{--sb-blue:#4C72B0;--sb-orange:#DD8452;--sb-green:#55A868;--sb-red:#C44E52;--sb-purple:#8172B3;--sb-brown:#937860;--sb-pink:#DA8BC3;--sb-gray:#8C8C8C;--sb-yellow:#CCB974;--sb-cyan:#64B5CD;--up:#C44E52;--dn:#55A868;--bg:#FFF;--bg2:#F7F6F3;--bg3:#EFEEE9;--tx1:#37352F;--tx2:#6B6B6B;--tx3:#9B9A97;--bd:#E8E7E4;--font:'Inter','Noto Sans TC',-apple-system,sans-serif;--mono:'JetBrains Mono',Consolas,monospace;--radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08)}
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:var(--font);background:var(--bg2);color:var(--tx1);padding:20px}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.header h1{font-size:clamp(15px,2.2vw,20px);font-weight:600;letter-spacing:-.3px}.header .sub{font-size:12px;color:var(--tx3)}.header .meta{font-size:11px;color:var(--tx3);font-family:var(--mono)}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
+.kpi{background:var(--bg);border:1px solid var(--bd);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow)}.kpi .label{font-size:11px;color:var(--tx3);margin-bottom:3px}.kpi .value{font-size:clamp(18px,2.5vw,26px);font-weight:700;font-family:var(--mono);line-height:1.1}.kpi .delta{font-size:12px;margin-top:3px;font-weight:600}.kpi .delta.up{color:var(--up)}.kpi .delta.dn{color:var(--dn)}
+.chart-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:14px}
+.chart-card{background:var(--bg);border:1px solid var(--bd);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);min-height:280px}.chart-card.full{grid-column:1/-1}
+.chart-card h3{font-size:13px;font-weight:600;color:var(--tx1);margin-bottom:6px;display:flex;align-items:center;gap:6px}.chart-card h3 .badge{font-size:10px;padding:2px 7px;border-radius:10px;background:var(--bg3);color:var(--tx2)}
+.chart-box{width:100%;height:300px}.chart-box.tall{height:400px}
+.footer{text-align:center;font-size:11px;color:var(--tx3);margin-top:12px;padding-top:10px;border-top:1px solid var(--bd)}
+@media(max-width:900px){.chart-grid{grid-template-columns:1fr}.chart-box{height:260px}}
+@media(max-width:600px){body{padding:10px}.kpi-row{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div><h1>VeritasAutoPlot™ T06 — Market Dashboard</h1><div class="sub">台積電 2330.TW + 全球指數相關性 + 月報酬日曆 · 實質數據風格</div></div>
+  <div class="meta" id="metaTime"></div>
+</div>
+<div class="kpi-row" id="kpiRow"></div>
+<div class="chart-grid">
+  <div class="chart-card full"><h3>台積電 (2330.TW) K線 + SMA5/20 + Volume <span class="badge">技術分析</span></h3><div class="chart-box tall" id="chCandle"></div></div>
+  <div class="chart-card"><h3>TWII vs VIX — 雙軸 <span class="badge">雙軸</span></h3><div class="chart-box" id="chDual"></div></div>
+  <div class="chart-card"><h3>RSI(14) + MACD(12,26,9) <span class="badge">堆疊</span></h3><div class="chart-box" id="chStack"></div></div>
+  <div class="chart-card"><h3>全球指數相關性 <span class="badge">熱力圖</span></h3><div class="chart-box" id="chHeat"></div></div>
+  <div class="chart-card"><h3>TWII 月報酬率 <span class="badge">月曆</span></h3><div class="chart-box" id="chCal"></div></div>
+</div>
+<div class="footer">VeritasAutoPlot™ · T06 Dashboard · Notion × MUJI × Seaborn · Simulated Realistic Data</div>
+
+<script>
+const SB={bl:'#4C72B0',or:'#DD8452',gn:'#55A868',rd:'#C44E52',pu:'#8172B3',br:'#937860',pk:'#DA8BC3',gy:'#8C8C8C',yl:'#CCB974',cy:'#64B5CD'};
+const CFG={responsive:true,displayModeBar:false};
+function BL(extra={}){return Object.assign({paper_bgcolor:'#FFF',plot_bgcolor:'#FFF',margin:{t:30,r:40,b:40,l:55},xaxis:{showgrid:false,linecolor:'#E8E7E4',tickfont:{size:9,color:'#6B6B6B'}},yaxis:{showgrid:true,gridcolor:'#F0EFEC',linecolor:'#E8E7E4',tickfont:{size:9,color:'#6B6B6B'},separatethousands:true},hovermode:'x unified',hoverlabel:{bgcolor:'rgba(255,255,255,.95)',bordercolor:'#E8E7E4',font:{size:11}},legend:{orientation:'h',y:1.12,x:0,font:{size:9}},shapes:[],annotations:[]},extra);}
+
+/* ═══ TSMC-like OHLCV ═══ */
+function genTSMC(){
+  const anchors=[['2024-07-01',965],['2024-07-11',1080],['2024-07-19',1035],['2024-07-31',935],['2024-08-05',850],['2024-08-12',920],['2024-08-30',960],['2024-09-13',930],['2024-09-30',985],['2024-10-15',1025],['2024-10-31',1020],['2024-11-12',1055],['2024-11-29',1050],['2024-12-13',1090],['2024-12-31',1060],['2025-01-10',1100],['2025-01-22',1120],['2025-02-03',1035],['2025-02-14',1050]];
+  const dates=[],open=[],high=[],low=[],close=[],vol=[];
+  for(let ai=0;ai<anchors.length-1;ai++){
+    const d0=new Date(anchors[ai][0]),d1=new Date(anchors[ai+1][0]),v0=anchors[ai][1],v1=anchors[ai+1][1];
+    let d=new Date(d0);while(d<d1){if(d.getDay()!==0&&d.getDay()!==6){const t=(d-d0)/(d1-d0);const c0=v0+(v1-v0)*t;const n=c0*(Math.random()-.5)*0.012;const cl=+(c0+n).toFixed(0);const op=+(cl+(Math.random()-.5)*cl*0.01).toFixed(0);dates.push(d.toISOString().slice(0,10));open.push(op);high.push(Math.max(op,cl)+Math.round(Math.random()*8));low.push(Math.min(op,cl)-Math.round(Math.random()*8));close.push(cl);vol.push(Math.round(20000+Math.random()*40000));}d=new Date(d.getTime()+864e5);}
+  }
+  dates.push(anchors[anchors.length-1][0]);const lc=anchors[anchors.length-1][1];open.push(lc-3);high.push(lc+6);low.push(lc-7);close.push(lc);vol.push(30000);
+  return{dates,open,high,low,close,vol};
+}
+const D=genTSMC();
+
+/* ═══ TWII + VIX ═══ */
+function genTWII(){
+  const a=[['2024-07-01',23200],['2024-07-11',24390],['2024-08-05',19830],['2024-09-02',22057],['2024-10-01',22325],['2024-11-01',22687],['2024-12-31',22987],['2025-01-20',23140],['2025-02-14',22700]];
+  const v=[['2024-07-01',13],['2024-07-11',12],['2024-08-05',65],['2024-09-02',15],['2024-10-01',19],['2024-11-01',22],['2024-12-31',17],['2025-01-20',15],['2025-02-14',16]];
+  function interp(anch){const dd=[],vv=[];for(let i=0;i<anch.length-1;i++){const d0=new Date(anch[i][0]),d1=new Date(anch[i+1][0]),v0=anch[i][1],v1=anch[i+1][1];let d=new Date(d0);while(d<d1){if(d.getDay()!==0&&d.getDay()!==6){const t=(d-d0)/(d1-d0);dd.push(d.toISOString().slice(0,10));vv.push(+(v0+(v1-v0)*t+v0*(Math.random()-.5)*.004).toFixed(1));}d=new Date(d.getTime()+864e5);}}dd.push(anch[anch.length-1][0]);vv.push(anch[anch.length-1][1]);return{dates:dd,vals:vv};}
+  const tw=interp(a),vx=interp(v);const vm=new Map(vx.dates.map((d,i)=>[d,vx.vals[i]]));const av=[];let lv=15;tw.dates.forEach(d=>{if(vm.has(d))lv=vm.get(d);av.push(lv);});
+  return{dates:tw.dates,twii:tw.vals,vix:av};
+}
+const TW=genTWII();
+
+function sma(a,p){return a.map((_,i)=>i<p-1?null:a.slice(i-p+1,i+1).reduce((s,v)=>s+v,0)/p);}
+function ema(a,p){const k=2/(p+1);const r=[a[0]];for(let i=1;i<a.length;i++)r.push(a[i]*k+r[i-1]*(1-k));return r;}
+function rsi(a,p=14){const g=[0],l=[0];for(let i=1;i<a.length;i++){const d=a[i]-a[i-1];g.push(d>0?d:0);l.push(d<0?-d:0);}let ag=g.slice(1,p+1).reduce((s,v)=>s+v,0)/p;let al=l.slice(1,p+1).reduce((s,v)=>s+v,0)/p;const r=Array(p).fill(null);r.push(al===0?100:+(100-100/(1+ag/al)).toFixed(2));for(let i=p+1;i<a.length;i++){ag=(ag*(p-1)+g[i])/p;al=(al*(p-1)+l[i])/p;r.push(al===0?100:+(100-100/(1+ag/al)).toFixed(2));}return r;}
+function macd(a,f=12,s=26,sig=9){const ef=ema(a,f),es=ema(a,s);const line=ef.map((v,i)=>+(v-es[i]).toFixed(4));const signal=ema(line,sig);const hist=line.map((v,i)=>+(v-signal[i]).toFixed(4));return{line,signal,hist};}
+
+function renderAll(){
+  document.getElementById('metaTime').textContent='Updated: '+new Date().toLocaleString('zh-TW');
+  const last=D.close[D.close.length-1],prev=D.close[D.close.length-2];
+  const chg=last-prev,chgPct=chg/prev*100;
+  const hi=Math.max(...D.high),lo=Math.min(...D.low);
+  const avgVol=Math.round(D.vol.reduce((s,v)=>s+v,0)/D.vol.length);
+  const latestRSI=rsi(D.close).filter(v=>v!==null).pop();
+  const twiiLast=Math.round(TW.twii[TW.twii.length-1]);
+  const vixLast=TW.vix[TW.vix.length-1].toFixed(1);
+
+  const kpis=[
+    {label:'台積電 收盤',value:last.toLocaleString()+' TWD',delta:(chg>=0?'+':'')+chgPct.toFixed(2)+'%',up:chg>=0},
+    {label:'TWII',value:twiiLast.toLocaleString(),delta:'加權指數',up:true},
+    {label:'VIX',value:vixLast,delta:vixLast>25?'⚠ 高波動':'正常',up:vixLast<=25},
+    {label:'台積電 High',value:hi.toLocaleString()+' TWD',delta:'期間最高',up:true},
+    {label:'台積電 Low',value:lo.toLocaleString()+' TWD',delta:'DD: '+((lo-hi)/hi*100).toFixed(1)+'%',up:false},
+    {label:'RSI(14)',value:latestRSI.toFixed(1),delta:latestRSI>70?'超買':latestRSI<30?'超賣':'中性',up:latestRSI<=70},
+  ];
+  document.getElementById('kpiRow').innerHTML=kpis.map(k=>`<div class="kpi"><div class="label">${k.label}</div><div class="value">${k.value}</div><div class="delta ${k.up?'up':'dn'}">${k.delta}</div></div>`).join('');
+
+  /* ═══ 1. Candlestick ═══ */
+  const mx=D.high.indexOf(hi),mn=D.low.indexOf(lo);
+  const vc=D.close.map((c,i)=>c>=D.open[i]?SB.rd+'88':SB.gn+'88');
+  Plotly.newPlot('chCandle',[
+    {type:'candlestick',x:D.dates,open:D.open,high:D.high,low:D.low,close:D.close,name:'2330',yaxis:'y',
+      increasing:{line:{color:SB.rd},fillcolor:SB.rd},decreasing:{line:{color:SB.gn},fillcolor:SB.gn}},
+    {type:'scatter',mode:'lines',x:D.dates,y:sma(D.close,5),name:'SMA5',yaxis:'y',line:{color:SB.or,width:1.1},connectgaps:true},
+    {type:'scatter',mode:'lines',x:D.dates,y:sma(D.close,20),name:'SMA20',yaxis:'y',line:{color:SB.bl,width:1.1},connectgaps:true},
+    {type:'bar',x:D.dates,y:D.vol,yaxis:'y2',marker:{color:vc},showlegend:false},
+  ],Object.assign(BL(),{
+    xaxis:{showgrid:false,linecolor:'#E8E7E4',tickfont:{size:9},rangeslider:{visible:false},dtick:'M1',tickformat:'%Y-%m-%d'},
+    yaxis:{domain:[0.20,1],showgrid:true,gridcolor:'#F0EFEC',tickfont:{size:9},separatethousands:true,title:{text:'TWD',font:{size:10}}},
+    yaxis2:{domain:[0,0.16],showgrid:false,tickfont:{size:8,color:SB.gy},title:{text:'Vol',font:{size:8,color:SB.gy}}},
+    annotations:[
+      {x:D.dates[mx],y:hi,text:'▲ '+hi.toLocaleString(),showarrow:true,arrowhead:0,ax:40,ay:-28,font:{size:9,color:SB.rd,weight:700},bgcolor:'rgba(255,255,255,.92)',bordercolor:SB.rd,borderwidth:1,borderpad:3},
+      {x:D.dates[mn],y:lo,text:'▼ '+lo.toLocaleString()+'\nDD:'+((lo-hi)/hi*100).toFixed(1)+'%',showarrow:true,arrowhead:0,ax:-40,ay:30,font:{size:9,color:SB.gn,weight:700},bgcolor:'rgba(255,255,255,.92)',bordercolor:SB.gn,borderwidth:1,borderpad:3},
+    ],
+    shapes:[{type:'rect',xref:'x',yref:'paper',x0:'2024-08-01',x1:'2024-08-12',y0:0,y1:1,fillcolor:'#7f7f7f',opacity:.12,line:{width:0}},{type:'line',xref:'x',yref:'paper',x0:'2024-08-05',x1:'2024-08-05',y0:0,y1:1,line:{color:SB.rd,width:1,dash:'dash'}}],
+  }),CFG);
+
+  /* ═══ 2. Dual Axis ═══ */
+  Plotly.newPlot('chDual',[
+    {x:TW.dates,y:TW.twii,type:'scatter',mode:'lines',name:'TWII',yaxis:'y',line:{color:SB.bl,width:2}},
+    {x:TW.dates,y:TW.vix,type:'scatter',mode:'lines',name:'VIX',yaxis:'y2',line:{color:SB.or,width:1.2},opacity:.5},
+  ],BL({
+    yaxis:{showgrid:true,gridcolor:'#F0EFEC',tickfont:{size:9,color:SB.bl},separatethousands:true,title:{text:'TWII',font:{size:10,color:SB.bl}}},
+    yaxis2:{overlaying:'y',side:'right',showgrid:false,tickfont:{size:9,color:SB.or},title:{text:'VIX',font:{size:10,color:SB.or}}},
+    shapes:[{type:'rect',xref:'x',yref:'paper',x0:'2024-07-30',x1:'2024-08-12',y0:0,y1:1,fillcolor:'#7f7f7f',opacity:.12,line:{width:0}}],
+    annotations:[{x:'2024-08-01',y:1.03,xref:'x',yref:'paper',text:'日圓套利崩盤',showarrow:false,font:{size:9,color:'#7f7f7f',weight:600},xanchor:'left'}],
+  }),CFG);
+
+  /* ═══ 3. RSI + MACD ═══ */
+  const rv=rsi(D.close);const m=macd(D.close);
+  Plotly.newPlot('chStack',[
+    {type:'scatter',mode:'lines',x:D.dates,y:rv,name:'RSI(14)',yaxis:'y',line:{color:SB.pu,width:1.3}},
+    {type:'bar',x:D.dates,y:m.hist,name:'MACD Hist',yaxis:'y2',marker:{color:m.hist.map(v=>v>=0?SB.rd+'99':SB.gn+'99')},showlegend:false},
+    {type:'scatter',mode:'lines',x:D.dates,y:m.line,name:'MACD',yaxis:'y2',line:{color:SB.bl,width:1}},
+    {type:'scatter',mode:'lines',x:D.dates,y:m.signal,name:'Signal',yaxis:'y2',line:{color:SB.or,width:.9,dash:'dash'}},
+  ],BL({
+    yaxis:{domain:[0.55,1],range:[0,100],showgrid:true,gridcolor:'#F0EFEC',title:{text:'RSI',font:{size:9}},tickfont:{size:8}},
+    yaxis2:{domain:[0,0.48],showgrid:true,gridcolor:'#F0EFEC',title:{text:'MACD',font:{size:9}},tickfont:{size:8}},
+    shapes:[{type:'line',xref:'paper',yref:'y',x0:0,x1:1,y0:70,y1:70,line:{color:SB.rd,width:.7,dash:'dot'}},{type:'line',xref:'paper',yref:'y',x0:0,x1:1,y0:30,y1:30,line:{color:SB.gn,width:.7,dash:'dot'}}],
+  }),CFG);
+
+  /* ═══ 4. Correlation Heatmap ═══ */
+  const labels=['S&P500','DJI','NASDAQ','SOX','TWII','USD','Gold','Oil'];
+  const z=[[1,.97,.96,.88,.71,.12,-.15,.42],[.97,1,.93,.82,.68,.16,-.12,.40],[.96,.93,1,.91,.74,.08,-.18,.38],[.88,.82,.91,1,.79,.03,-.20,.33],[.71,.68,.74,.79,1,-.08,-.05,.28],[.12,.16,.08,.03,-.08,1,-.52,.22],[-.15,-.12,-.18,-.20,-.05,-.52,1,-.08],[.42,.40,.38,.33,.28,.22,-.08,1]];
+  const ha=[];for(let yi=0;yi<z.length;yi++)for(let xi=0;xi<z[yi].length;xi++)ha.push({x:xi,y:yi,text:z[yi][xi].toFixed(2),showarrow:false,font:{size:9,color:Math.abs(z[yi][xi])>.55?'#FFF':'#37352F'}});
+  Plotly.newPlot('chHeat',[{type:'heatmap',x:labels,y:labels,z:z,colorscale:[[0,'#4C72B0'],[.5,'#FFF'],[1,'#C44E52']],zmin:-1,zmax:1,showscale:true,colorbar:{thickness:12,len:.6,tickfont:{size:8}},xgap:2,ygap:2,hovertemplate:'%{x} ↔ %{y}: %{z:.2f}<extra></extra>'}],
+    BL({margin:{t:20,r:70,b:70,l:70},annotations:ha,xaxis:{tickangle:-45,tickfont:{size:9}},yaxis:{autorange:'reversed',tickfont:{size:9}}}),CFG);
+
+  /* ═══ 5. Calendar Returns ═══ */
+  const years=['2020','2021','2022','2023','2024'];
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  // Approximate TWII monthly returns (%)
+  const cz=[
+    [-4.2,-2.1,-14.8,10.6,0.8,6.1,5.7,3.2,2.3,5.1,9.8,5.5],
+    [2.7,1.3,1.8,2.5,0.2,-0.5,3.1,-0.8,0.2,0.5,-1.2,2.0],
+    [1.7,0.5,-3.8,1.2,-7.3,-10.2,5.8,-1.5,-7.8,-3.2,9.5,0.3],
+    [0.7,1.5,-3.0,2.8,5.2,6.8,3.5,-2.1,-4.3,-2.5,6.2,4.1],
+    [2.1,8.2,3.5,3.8,2.2,5.8,1.7,-7.0,4.2,1.3,-2.0,1.3],
+  ];
+  const ca=[];for(let yi=0;yi<cz.length;yi++)for(let xi=0;xi<cz[yi].length;xi++)ca.push({x:months[xi],y:years[yi],text:cz[yi][xi].toFixed(1)+'%',showarrow:false,font:{size:9,color:Math.abs(cz[yi][xi])>7?'#FFF':'#37352F'}});
+  Plotly.newPlot('chCal',[{type:'heatmap',x:months,y:years,z:cz,colorscale:[[0,'#55A868'],[.35,'#F7F6F3'],[.65,'#F7F6F3'],[1,'#C44E52']],zmin:-15,zmax:15,showscale:true,colorbar:{thickness:12,len:.6,ticksuffix:'%',tickfont:{size:8}},xgap:2,ygap:2}],
+    BL({margin:{t:20,r:70,b:50,l:55},annotations:ca,xaxis:{tickfont:{size:9}},yaxis:{tickfont:{size:9}}}),CFG);
+}
+renderAll();
+</script>
+</body>
+</html>

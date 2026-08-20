@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!--
+   ______                            __
+  / ____/___  ____ ___  ____  __  __/ /____  _____
+ / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
+/ /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
+\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
+                    /_/
+        Created with Perplexity Computer
+        https://www.perplexity.ai/computer
+-->
+<meta name="generator" content="Perplexity Computer">
+<meta name="author" content="Perplexity Computer">
+<meta property="og:see_also" content="https://www.perplexity.ai/computer">
+<link rel="author" href="https://www.perplexity.ai/computer">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Data Center Global Map — 2024-2026</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <svg class="logo" width="28" height="28" viewBox="0 0 28 28" fill="none" aria-label="AI Data Centers Logo">
+          <rect x="2" y="2" width="24" height="24" rx="4" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="9" cy="9" r="2.5" fill="currentColor" opacity="0.9"/>
+          <circle cx="19" cy="9" r="2.5" fill="currentColor" opacity="0.6"/>
+          <circle cx="9" cy="19" r="2.5" fill="currentColor" opacity="0.6"/>
+          <circle cx="19" cy="19" r="2.5" fill="currentColor" opacity="0.9"/>
+          <line x1="11.5" y1="9" x2="16.5" y2="9" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+          <line x1="11.5" y1="19" x2="16.5" y2="19" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+          <line x1="9" y1="11.5" x2="9" y2="16.5" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+          <line x1="19" y1="11.5" x2="19" y2="16.5" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+        </svg>
+        <h1 class="header-title">AI Data Centers</h1>
+        <span class="header-badge" id="countBadge">0 facilities</span>
+      </div>
+      <div class="header-right">
+        <div class="search-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="searchInput" placeholder="Search company, location..." autocomplete="off">
+        </div>
+      </div>
+    </header>
+
+    <!-- Filters -->
+    <div class="filters-bar">
+      <div class="filter-group">
+        <span class="filter-label">Status</span>
+        <div class="filter-chips" id="statusFilters">
+          <button class="chip active" data-filter="all">All</button>
+          <button class="chip" data-filter="under_construction"><span class="dot dot-construction"></span>Under Construction</button>
+          <button class="chip" data-filter="announced"><span class="dot dot-announced"></span>Announced</button>
+          <button class="chip" data-filter="planned"><span class="dot dot-planned"></span>Planned</button>
+          <button class="chip" data-filter="operational"><span class="dot dot-operational"></span>Operational</button>
+        </div>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Company</span>
+        <select id="companyFilter" class="filter-select">
+          <option value="all">All Companies</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <span class="filter-label">Region</span>
+        <select id="regionFilter" class="filter-select">
+          <option value="all">All Regions</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Map -->
+    <div id="map"></div>
+
+    <!-- Stats Panel -->
+    <div class="stats-panel" id="statsPanel">
+      <button class="stats-toggle" id="statsToggle" aria-label="Toggle statistics">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+        <span>Stats</span>
+      </button>
+      <div class="stats-content" id="statsContent">
+        <div class="stat-row">
+          <span class="stat-label">Total Facilities</span>
+          <span class="stat-value" id="statTotal">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Under Construction</span>
+          <span class="stat-value" id="statConstruction">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Total Investment</span>
+          <span class="stat-value" id="statInvestment">$0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Top Company</span>
+          <span class="stat-value" id="statTopCompany">-</span>
+        </div>
+        <div class="stat-divider"></div>
+        <h4 class="stat-section-title">By Region</h4>
+        <div id="regionStats"></div>
+        <div class="stat-divider"></div>
+        <h4 class="stat-section-title">Top Companies</h4>
+        <div id="companyStats"></div>
+      </div>
+    </div>
+
+    <!-- Detail Panel -->
+    <div class="detail-panel" id="detailPanel">
+      <button class="detail-close" id="detailClose" aria-label="Close details">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <div class="detail-content" id="detailContent"></div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <span>Data compiled March 2026 from public announcements and reporting</span>
+      <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a>
+    </footer>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

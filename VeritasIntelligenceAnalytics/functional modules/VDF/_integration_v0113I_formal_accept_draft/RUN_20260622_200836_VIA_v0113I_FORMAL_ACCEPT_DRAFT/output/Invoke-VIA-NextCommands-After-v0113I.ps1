@@ -1,0 +1,18 @@
+Start-Process "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0113I_formal_accept_draft\RUN_20260622_200836_VIA_v0113I_FORMAL_ACCEPT_DRAFT\report\VIA_v0113I_FormalAcceptDraft_Report.html"
+Start-Process "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0113I_formal_accept_draft\RUN_20260622_200836_VIA_v0113I_FORMAL_ACCEPT_DRAFT\output"
+Start-Process "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0113I_formal_accept_draft\RUN_20260622_200836_VIA_v0113I_FORMAL_ACCEPT_DRAFT\_user_edit_formal_accept_draft"
+
+Import-Csv "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0113I_formal_accept_draft\RUN_20260622_200836_VIA_v0113I_FORMAL_ACCEPT_DRAFT\output\VIA_v0113I_ReadinessGate.csv" | Format-Table -AutoSize
+Import-Csv "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0113I_formal_accept_draft\RUN_20260622_200836_VIA_v0113I_FORMAL_ACCEPT_DRAFT\output\VIA_v0113I_EdgeReviewBoard.csv" | Format-Table -AutoSize
+
+Start-Process "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0113I_formal_accept_draft\RUN_20260622_200836_VIA_v0113I_FORMAL_ACCEPT_DRAFT\_user_edit_formal_accept_draft\VIA_v0113I_USER_EDIT_P0_FormalAcceptDraft.csv"
+Start-Process "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0113I_formal_accept_draft\RUN_20260622_200836_VIA_v0113I_FORMAL_ACCEPT_DRAFT\_user_edit_formal_accept_draft\VIA_v0113I_USER_EDIT_P1_FormalAcceptDraft.csv"
+
+# Manual promotion:
+# Copy def_group_user_accept_draft into def_group_user_accept for accepted P0 rows.
+# Copy def_selected_group_canonical_value_draft into def_selected_group_canonical_value.
+# Copy def_alias_user_accept_draft into def_alias_user_accept for accepted P1 rows.
+# Copy def_selected_alias_value_draft into def_selected_alias_value.
+#
+# Then run:
+pwsh -NoProfile -NoExit -ExecutionPolicy Bypass -File "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0113I_formal_accept_draft\RUN_20260622_200836_VIA_v0113I_FORMAL_ACCEPT_DRAFT\output\Invoke-VIA-v0113J-Precheck-After-v0113I.ps1"
