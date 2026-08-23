@@ -22,6 +22,20 @@ VPNS AST Symbol Engine  ·  vpns_ast_symbol_engine.py
 MAP.json 格式:
   { "renames": [ {"old":"def_FooBar","new":"def_foo_bar"}, ... ] }
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 import os, sys, ast, json, hashlib, argparse, datetime, shutil
 
 APPLY_TOKEN = "APPROVE_VPNS_AST_RENAME"

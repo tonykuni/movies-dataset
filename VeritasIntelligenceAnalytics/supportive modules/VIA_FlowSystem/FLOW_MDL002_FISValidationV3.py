@@ -6,6 +6,20 @@
   E3 多源 fusion:ETF流 + positioning(COT型) → 實測IC加權融合 > 任一單源(OOS)
 受控 DGP(沙盒無行情真值);同介面換真值即真回測。輸出 Visual Lock matrix HTML 報告。
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 import numpy as np, io, os, json, datetime
 from scipy.stats import rankdata, norm, ttest_1samp
 from numpy.lib.stride_tricks import sliding_window_view

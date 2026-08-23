@@ -6,6 +6,20 @@
 零 CDN 單檔;配色=WorkOps v2 視覺鎖佔位,候操作員介面連結到件即換膚(風格鎖+色鎖)。
 產出:<VIA根>/VIA_Mother.html(追蹤;pull 即開)。資料源:pkg_pointers/ + 登錄簿 + 盤點正本。
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 import json
 import sys
 from pathlib import Path

@@ -18,6 +18,20 @@ twse_chip_scraper.py  —  VIA 籌碼分析平台 真實資料抓取後端
    是否正確;若 TWSE 改版,只需調整 _COLS 關鍵字即可,不必動主流程。
    上櫃(TPEX)股票見檔尾 fetch_tpex_t86() 骨架(端點不同)。
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 import sys, json, time, datetime as dt
 from pathlib import Path
 import requests

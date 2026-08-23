@@ -30,6 +30,20 @@ v0103 實戰修正(操作員 Downloads 全掃出兩真 bug):
   report         去重戰役總表 HTML(讀 audit_tools/VIA_ModuleDedup_Homing_Record_v0100.json)
 全唯讀不動正本;只寫 VIA_Reports/dedup/ 下產物。zero 外部依賴(stdlib)。
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 import hashlib, json, os, re, sys
 from datetime import datetime
 from pathlib import Path

@@ -9,6 +9,20 @@ def VIA · Free Consensus-Like EPS Fetcher
 3) Alpha Vantage Free：主要適合 quarterly estimatedEPS / earnings calendar，不是完整年度 FY1/FY2/FY3 consensus。
 4) FactSet / Refinitiv / Visible Alpha / Bloomberg 等正式 consensus estimates 通常不是免費資料，本程式不繞過授權。
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 
 # ============================================================
 # def 00 · PARAMETERS
