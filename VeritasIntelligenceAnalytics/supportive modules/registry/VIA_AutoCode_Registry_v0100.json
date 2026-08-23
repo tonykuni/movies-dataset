@@ -3786,6 +3786,13 @@
    "ts": "2026-08-23 21:20",
    "name": "批104 VDF-390 擷取總冊收容+ENG046 轉錄引擎+台股個股日表 schema+37 檔主動 ETF 清冊同步(3 名碼衝突逮出)",
    "note": "①VDF_FetchOne_Matrix_SSOT_v0100.md=操作員矩陣原樣收容(17 段;含治理規則:Adj 優先/缺值頻率對齊/權威層級/憑證四層表/期貨現貨對映)。②VDF_ENG046_FetchMatrixRegistry(八檢 8/8):md→結構化 registry 機器轉錄,實算 390 項=DONE 296/PROXY 75/TODO 19(冊名 VDF-390 正合;宣告值並列存證不冒充)。③VDF_TWEquity_DailyRow_Schema_v0100.json=批104 header 令落冊 26 欄(date/ticker/yf/bbg/name/OHLC/量值/三大法人×4/融資融券/券資比/雙維持率(推估標記)/當沖×3+yfinance 段 close·adj·volume 串成一行;join=date+ticker,FQ-09 T+1 ASOF 紀律);加權/櫃買指數=TWSE/TPEX 官方源存獨立庫 VDF_TWIndex_Daily(不以 ^TWII 代官方層)。④--sync-etf:FlowSystem TW_Active_ETF_Registry 3→37 碼(24 台股+6 海外+7 債券;34 檔 PENDING_VERIFY);自動驗證逮出 3 檔名碼對映衝突(種子冊 00980A=統一 vs 矩陣 00980A=野村臺灣優選等)→CONFLICT_PENDING_VERIFY 原地標記零刪除,候 TWSE OpenAPI 實連定奪(工作站波);二跑冪等缺 0。台股個股自動清單=FN-00 全上市櫃,狀態=待驗證(容器零外呼誠實邊界)。"
+  },
+  {
+   "code": "TOOL-106",
+   "kind": "工具+修復",
+   "ts": "2026-08-23 22:30",
+   "name": "批105 全鏈:PY 橋覆蓋審計 100%+CodexNexus v0101 Celeritas 導入鏈+20 失敗模式冊+sysman v0110 存證冊道+4 紅 4 寫死清零→Gate GREEN+grid 72 OK/0 FAIL",
+   "note": "①橋審計:注入器實跑 1,694 活件全數已橋(檔內 ACCEL-BRIDGE 或 Celeritas 啟動鏈=雙軌覆蓋;後驗敗 0);跳過區=存證政策(_sha 鏡像/檢疫/docs/evidence)。②Invoke-VeritasCodexNexus-v0101(正本零觸碰):Invoke-PyTool 改走 via_py_celeritas_launcher(glob 最新版)=每 py 指令先掛加速器;Python 解析鏈 python→py→python3;PS5.1 ArgumentList 備援;UTF-8+PYTHONIOENCODING;-TimeoutSec NoStall;OneDrive 0-byte 占位偵測;async 雙管防死鎖;dot-source VIA_PS_Accel_Module;靜檢 14/14(容器無 pwsh=誠實邊界,實跑候工作站)。③操作員令 20 失敗模式:VIA_CodexNexus_FailureModes_v0100.json(FM-01~20;帶碼備援 17+程序 3)。④sysman 紅燈修復戰:4 語法紅→TW01/TW02/intake 件入存證冊 v0101(sysman v0110 新 PY 存證冊列管道,比照 PS ⑭;對帳一致)+WebScraping f-string 反斜線=PEP701 版本閘入 Syntax_Gate_Register(ThreeList 前例)+真修 VIA_WebScraping_Compliance_syntaxfix_v0100.py(_card_last4 提升,AST 過);⑤L6 黃燈:via-cgc/subsys/takeover/vdfin 四處寫死版號→dir /b 動態解析,殘留 0。⑥終態:sysman Gate GREEN_SANDBOX_STABLE+grid 全矩陣 OK 72·FAIL 0·SKIP 6=介面/整合驗證綠。"
   }
  ]
 }
