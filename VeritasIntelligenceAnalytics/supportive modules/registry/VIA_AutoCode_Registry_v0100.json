@@ -3891,6 +3891,13 @@
    "ts": "2026-08-24 16:40",
    "name": "批120 VRN 真檔實測→逮 Bug→digest v0110 多代碼綜合文件閘→22/22 回歸綠+finaudit 12/12+Matrix 報告 R2 改版",
    "note": "操作員存報告至 Claude 專案(知識庫檔不入沙盒=誠實邊界,附件方式才會到);以手上真檔 2 件 docx 實測:①逮到真 Bug=族群彙整筆記(59 有效代碼)被誤判「永豐·台積電個股報告」——多代碼文件錨定首碼+內文誤抓券商/評等,目標價/分析師/日期全空。②修復 digest v0110:multi_doc_gate(≥5 碼∧關鍵欄零支撐∧主碼不主導→SKIP 具名;支撐任一在或主碼≥2×次高且≥3 次→放行=真報告不誤殺);重測 2 件全數正確 SKIP。③二十二檢 22/22(新增閘三態檢:殺綜合/放支撐/放主導;過程修 selftest regex 轉義層+計數字樣兩小蟲)。④finaudit v0105 十二檢 12/12=財務驗算道綠。⑤Matrix 報告 R2 同址改版(+VRN 實測區+財務驗證區+PENDING 指引:真券商報告請用訊息附件傳)。cmd/grid glob 自動接 v0110。"
+  },
+  {
+   "code": "TOOL-121",
+   "kind": "實測+修復",
+   "ts": "2026-08-24 17:10",
+   "name": "批121 三券商真件實測(中信×2/大和/華夏memo)→digest v0111 六債修→4/4 與真值全符+26/26 回歸綠+Matrix 報告 R3+三券商冊回填",
+   "note": "操作員附件送達四真件(貿聯 3665B CTBC 2026/08/24、台積電 2330B CTBC 2024/06/12、大和 Daiwa1815 富喬英文快訊 2026/08/21、華夏 1305 法說 Memo docx;PDF 版權件置 scratchpad 不入 git)。首跑 v0110 六品質債→v0111 根因修:①PDF 抽取道 pymupdf(fitz)閱讀序優先+pypdf 後備+數字接合正規化(pypdf 版面重排「2, 275」致 3665 TP 誤抽 2.0,真值 2,775)②參數冊 target_price 加 (?<!前次) 負向回顧+TW02 TP 層同閘(前次目標價 2,720/848 排除)③報告日:fitz 正序即中+檔名 6 碼 YYMMDD 後備(CTBC240612→2024-06-12)④broker 檔名逐段字首英文 token 對映(Daiwa1815→Daiwa→大和)⑤分析師 EMAIL 窗優先+stopwords 冊補 個股/大盤/走勢/指數/漲幅/收盤(「個股與大盤走勢(%)」圖表標題誤擷案;真值 許哲豪/竺貽根 均在 email 旁)⑥種子官方冊補 貿聯-KY 3665 TWSE/華夏 1305 TWSE/富喬 1815(市場別候官方 OpenAPI 校驗誠實留空)。加碼第七債:TW02 評等抗噪閘——純 ASCII 評等須前置 20 字內有評等標籤;殺三雜訊源(大和「reduce the supply chain」內文動詞、第4頁評等分布表「Rating Percentage of total Buy* 72.63%」、華夏 memo「反傾銷稅(ADD)」),大和原件 Target price: n.a.=TP/評等誠實留空與原件全符。財務驗算離線自洽:3665 (2775-2275)/2275=21.98%=報告載值✓;2330 (1230-883)/883=39.30%=報告載值✓。重測 run DIGEST_20260824_170557:4/4 OK 九欄全符真值;二十六檢 26/26(新增㉓fitz優先道/㉔前次排除/㉕token+YYMMDD/㉖抗噪+EMAIL窗)。VRN_ThreeBroker_TestList 三槽回填 TESTED;Matrix 報告 R3 同址改版(批121 專區:basic info+financial validation+六債修表);broker_abbr_display 補 中信→CTBC。"
   }
  ]
 }
