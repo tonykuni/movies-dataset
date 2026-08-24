@@ -3898,6 +3898,13 @@
    "ts": "2026-08-24 17:10",
    "name": "批121 三券商真件實測(中信×2/大和/華夏memo)→digest v0111 六債修→4/4 與真值全符+26/26 回歸綠+Matrix 報告 R3+三券商冊回填",
    "note": "操作員附件送達四真件(貿聯 3665B CTBC 2026/08/24、台積電 2330B CTBC 2024/06/12、大和 Daiwa1815 富喬英文快訊 2026/08/21、華夏 1305 法說 Memo docx;PDF 版權件置 scratchpad 不入 git)。首跑 v0110 六品質債→v0111 根因修:①PDF 抽取道 pymupdf(fitz)閱讀序優先+pypdf 後備+數字接合正規化(pypdf 版面重排「2, 275」致 3665 TP 誤抽 2.0,真值 2,775)②參數冊 target_price 加 (?<!前次) 負向回顧+TW02 TP 層同閘(前次目標價 2,720/848 排除)③報告日:fitz 正序即中+檔名 6 碼 YYMMDD 後備(CTBC240612→2024-06-12)④broker 檔名逐段字首英文 token 對映(Daiwa1815→Daiwa→大和)⑤分析師 EMAIL 窗優先+stopwords 冊補 個股/大盤/走勢/指數/漲幅/收盤(「個股與大盤走勢(%)」圖表標題誤擷案;真值 許哲豪/竺貽根 均在 email 旁)⑥種子官方冊補 貿聯-KY 3665 TWSE/華夏 1305 TWSE/富喬 1815(市場別候官方 OpenAPI 校驗誠實留空)。加碼第七債:TW02 評等抗噪閘——純 ASCII 評等須前置 20 字內有評等標籤;殺三雜訊源(大和「reduce the supply chain」內文動詞、第4頁評等分布表「Rating Percentage of total Buy* 72.63%」、華夏 memo「反傾銷稅(ADD)」),大和原件 Target price: n.a.=TP/評等誠實留空與原件全符。財務驗算離線自洽:3665 (2775-2275)/2275=21.98%=報告載值✓;2330 (1230-883)/883=39.30%=報告載值✓。重測 run DIGEST_20260824_170557:4/4 OK 九欄全符真值;二十六檢 26/26(新增㉓fitz優先道/㉔前次排除/㉕token+YYMMDD/㉖抗噪+EMAIL窗)。VRN_ThreeBroker_TestList 三槽回填 TESTED;Matrix 報告 R3 同址改版(批121 專區:basic info+financial validation+六債修表);broker_abbr_display 補 中信→CTBC。"
+  },
+  {
+   "code": "TOOL-122",
+   "kind": "引擎升級",
+   "ts": "2026-08-24 17:55",
+   "name": "批122 digest v0112 首頁版面語意抽取:字級階層大標/主題句+檔名核對+四點排式+免責尾段裁切;真件 4/4 零回歸+29/29 綠",
+   "note": "操作員令:報告第一頁上方左右=資訊欄位區(表格或文字,多數資訊在此);中間本文字體分大中小粗細——最大字=個股名+代號(三代號其一或其二)可與 filename 核對;次大=不含個股不含代號的主題一句話;內文一評價/二獲利營運/其他整合兩點放三四(Summarizer 五點已有說明)。落地:①extract_page1_layout(fitz dict 逐行字級排序):最大字階層取「名稱 (代號 TT)」式大標(LOCKED+年區閘),次大階層取主題句(濾 目標價/收盤價/評等/Target price 等資訊欄標籤+名碼+<6字);實測三 PDF 全中(16pt「貿聯 (3665 TT)」→13pt「2Q26 獲利創新高,AI 及半導體設備動能強勁」;台積電「一個人的武林地位難撼動,2 奈米將再現競爭優勢」;大和 19.6pt「Fulltech Fiber Glass (1815 TT)」→「Riding on product optimisation trend」,「Target price: n.a.」標籤正確濾除)。②title_check 大標↔檔名錨碼核對(相符/不符/無大標/大標補錨);headline/topic 以真標題覆寫 Summarizer 關鍵詞湊題;大標名為官方冊缺席時之名稱後備。③compose_points4 四點排式:一評價(P3估值)/二獲利營運(P2成長)/三其他=結論+同業(P1+P4)/四其他=風險(P5);Summarizer 五點正本零觸碰,md 附四點排式段+矩陣末欄改列。④_trim_disclosure 免責尾段裁切(>20% 位置節首標記起裁;CTBC 評等定義表@88-93%、大和法遵段@26% 起佔全文 74%,Summarizer 選句雜訊源;首頁「See important disclosures」引用<20% 不誤裁)——裁後 3665 評價/結論點自 UW 評等定義雜訊回正為「2,775 元,維持買進之投資評等建議」。真件重跑 DIGEST_20260824_174512→174x:4/4 PASS 批121 九欄+title_check 零回歸;自測二十九檢 29/29(㉗字級抽取/㉘四點排式/㉙裁切)。已知債(誠實):英文報告(大和)四點選句品質受 Summarizer 中文句法傾向限制=引擎側未來波;memo docx 無字級資訊=無大標誠實。"
   }
  ]
 }
