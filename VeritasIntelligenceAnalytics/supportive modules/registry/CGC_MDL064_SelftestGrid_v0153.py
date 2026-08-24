@@ -72,6 +72,21 @@ VIA_Central_SSOT_Contract_Sync_Engine:期間解析/評等目標價別名/
 fail-closed 閘)+第 62 站族群量價引擎 self-test(收容件 GroupIndex
 量價波動;合成走查)——62 站。
 執行器新增 pycode 站型(標準庫內聯檢,零外部檔)。
+v0137→v0138(批83):+第 75 站介面自湊引擎十四檢(TOOL-089 模組對
+模組 mapping/connecting/syncing/activate;O_EXCL 跨平台鎖/原子寫入/
+WAL 版本閘防迴圈/輪詢監聽防自觸發)——75 站。
+v0138→v0139(批87):+第 76 站 py 加速啟動器四檢(TOOL-091 Celeritas
+常駐 runpy;spec_from_file_location 直載=繞開 accelerator/subprocess.py
+遮蔽地雷 QA-20260820C)——76 站。
+v0139→v0140(批88):+第 77 站 VDF 整合輸入介面矩陣十三檢(TOOL-093
+五分區活冊:INTL 增減項目/個股+TW 財報單季累計年度+VRN 路徑三重點
++堆圖新增;軟移除零刪除+restore)——77 站。
+v0140→v0141(批95):+第 78 站母系統向下接手十二檢(TOOL-097 六路:
+PS 治理考古/雙世代引擎舉證核准閘/SSOT 矛盾+regex 提醒/加速器稽核/
+支援模組 SUP 自動註冊/外呼網路稽核)——78 站。
+v0141→v0142(批97 焦點四柱):+第 85 站三子系統管理十檢(TOOL-099
+憲章對讀/四類盤點/AST 健康 RYG/VSM 遞迴迷你報/缺根缺憲章誠實)
+——85 站。
 操作員令(2026-08-12):全面測試修正 till all work perfectly。
 原則:
   ① 全站安全模式 — 只跑唯讀/dry-run/selftest/文件模式;零 --commit 零網路
@@ -126,6 +141,12 @@ def battery(fast: bool):
         B.append({"name": name, "path": path, "args": args, "expect": expect, "timeout": timeout})
 
     add("sysman 三輪協議", newest("CGC_MDL069_SystemManager_v0*.py", HERE), ["--no-open"], "rc0", 900, heavy=True)
+    add("衝突哨兵十檢", newest("via_conflict_guard_v0*.py", HERE), ["--selftest"], "rc0", 300)
+    add("美國細目擷取八檢", newest("VDF_ENG047_USMacroDetailFetcher*.py", VIA / "functional modules" / "VDF" / "engine"), ["--selftest"], "rc0", 300)
+    add("TA 工廠十檢", newest("VDF_ENG048_TAFactory*.py", VIA / "functional modules" / "VDF" / "engine"), ["--selftest"], "rc0", 300)
+    add("五日擷取八檢", newest("VDF_ENG049_FiveDayFetch*.py", VIA / "functional modules" / "VDF" / "engine"), ["--selftest"], "rc0", 300)
+    add("擷取單引擎八檢", newest("VDF_ENG050_OrderFetch*.py", VIA / "functional modules" / "VDF" / "engine"), ["--selftest"], "rc0", 300)
+    add("ETF 持股引擎自測", newest("VDF_ENG051_ActiveTWETF_Holdings*.py", VIA / "functional modules" / "VDF" / "engine"), ["--self-test"], "rc0", 300)
     add("panorama six 六車道", newest("CGC_MDL061_PanoramaSix_v0*.py", HERE), ["--no-open"], "rc0", 300)
     add("xcheck SSOT 對齊", newest("panorama_xcheck_v*.py", VRN), ["--no-pause"], "rc0", 180)
     add("supaudit 導入稽核", newest("CGC_MDL068_SupportImportAudit_v0*.py", HERE), [], "env", 300)
@@ -184,7 +205,26 @@ def battery(fast: bool):
     add("TW01 代碼橋自測", newest("VRN_TW01_TickerBridge_v0*.py", VRN), [], "rc0", 120)
     add("TW02 報告解析自測", newest("VRN_TW02_ReportParser_v0*.py", VRN), [], "rc0", 120)
     add("財務驗算稽核十檢", newest("vrn_finaudit_v0*.py", VRN), ["--selftest"], "rc0", 180)
-    add("統包網路工具十檢", newest("via_net_unified_v0*.py", HERE.parent / "network"), ["--selftest"], "rc0", 120)
+    add("年度擷取器十檢", newest("vrn_fin_extract_v0*.py", VRN), ["--selftest"], "rc0", 180)
+    add("統包網路工具十四檢(SUP_MDL740)", newest("via_net_unified_v0*.py", HERE.parent / "network"), ["--selftest"], "rc0", 120)
+    add("統一加速器六檢(SUP_MDL737)", newest("SUP_MDL737_SuperAccelModule_v*.py", HERE.parent), ["--selftest"], "rc0", 120)
+    add("子系統治理器V2八檢(批126)", newest("CGC_MDL081_SubsystemManagerV2_v*.py", HERE), ["--selftest"], "rc0", 300)
+    add("雙橋清掃器八檢(批127)", newest("via_bridge_sweeper_v*.py", HERE), ["--selftest"], "rc0", 300)
+    add("自動總跑器六檢(批127)", newest("CGC_MDL082_MasterAutorun_v*.py", HERE), ["--selftest"], "rc0", 600)
+    add("VAP 圖規鎖八檢", newest("vap_spec_guard_v0*.py", VIA / "functional modules/VAP"), ["--selftest"], "rc0", 120)
+    add("VAP TA工廠十二檢(批123)", newest("VAP_ENG004_TAFactory_v*.py", VIA / "functional modules/VAP/engine"), ["--selftest"], "rc0", 300)
+    add("VAP 模板跑器十檢(批123)", newest("VAP_ENG005_TemplateRunner_v*.py", VIA / "functional modules/VAP/engine"), ["--selftest"], "rc0", 600)
+    add("VAP 驗收稽核八檢(批124)", newest("VAP_ENG006_AcceptanceAudit_v*.py", VIA / "functional modules/VAP/engine"), ["--selftest"], "rc0", 600)
+    add("統一U/I套件六檢", newest("via_ui_kit_v0*.py", HERE), ["--selftest"], "rc0", 120)
+    add("舊根對帳八檢", newest("via_oldroot_scan_v0*.py", HERE), ["--selftest"], "rc0", 120)
+    add("介面自湊十四檢", newest("via_iface_autosync_v0*.py", HERE), ["--selftest"], "rc0", 120)
+    add("py 加速啟動器四檢", newest("via_py_celeritas_launcher_v0*.py", HERE), ["--selftest"], "rc0", 120)
+    add("VDF 輸入矩陣十三檢", newest("vdf_input_matrix_v0*.py", VIA / "functional modules/VDF"), ["--selftest"], "rc0", 120)
+    add("母系統接手十二檢", newest("via_mother_takeover_v0*.py", HERE), ["--selftest"], "rc0", 300)
+    add("子系統管理十檢", newest("via_subsys_manager_v0*.py", HERE), ["--selftest"], "rc0", 180)
+    add("四點文件摘要引擎自測", VRN / "VIA_Financial_Document_Summarizer_Engine_1.py", ["--self-test"], "rc0", 180)
+    add("治理型摘要引擎自測", VRN / "VIA_SummarizerEngine_2.py", ["self-test"], "rc0", 300, heavy=True)
+    add("族群流模擬30測試", VIA / "functional modules/GroupIndex/flow_simulation_v0400/run_tests.py", [], "rc0", 300, heavy=True)
     add("VRN 方法核十二檢", newest("vrn_method_kernel_v0*.py", VRN), ["--selftest"], "rc0", 120)
     add("財務字庫十四檢", newest("vrn_finlex_v0*.py", VRN), ["--selftest"], "rc0", 180)
     add("註冊台維運八檢", VIA / "supportive modules/VIA_FlowSystem/FlowSystem_v2/engines/FLOW_ENG024_FlowRegistryOps.py", ["--selftest"], "rc0", 120)
@@ -244,7 +284,7 @@ def main() -> int:
     fast = "--fast" in sys.argv
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     B = battery(fast)
-    print(f"=== 全面自測矩陣 v0132 · {len(B)} 站 · {'FAST' if fast else 'FULL'} · 全安全模式(零 commit 零網路)===")
+    print(f"=== 全面自測矩陣 v0137 · {len(B)} 站 · {'FAST' if fast else 'FULL'} · 全安全模式(零 commit 零網路)===")
     results = []
     for b in B:
         r = run_one(b)
