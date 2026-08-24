@@ -351,6 +351,176 @@
     }
    },
    "runs": []
+  },
+  {
+   "order_id": "003",
+   "ts": "2026-08-24",
+   "source": "批128 操作員總擷取令",
+   "window": "2024-01-02 → 最新交易日(日更增量)",
+   "status": "PENDING",
+   "storage_decision": {
+    "format": "parquet(分 lane 分區)+DuckDB 正典庫",
+    "databases": "自行決定=兩庫:vdf_tw_market.duckdb(台股清單/每日全欄/籌碼/主動 ETF 持股;官方源+T+1 紀律)+ vdf_global_market.duckdb(國際指數×ETF 對/商品/利率;yfinance/FRED 源)",
+    "rationale": "源不同(官方 vs yf)、更新節奏不同(台股 T+1 籌碼 vs 國際即時)、隔離可各自重建"
+   },
+   "lanes": {
+    "tw_listings": {
+     "desc": "①台股全清單(雙交易所)",
+     "targets": [
+      {
+       "key": "TWSE_LISTINGS",
+       "endpoint": "https://openapi.twse.com.tw/v1/opendata/t187ap03_L"
+      },
+      {
+       "key": "TPEX_LISTINGS",
+       "endpoint": "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap03_O"
+      }
+     ]
+    },
+    "active_etf_list": {
+     "desc": "②主動式台股 ETF 全清單(冊 37 檔=SSOT;TWSE OpenAPI 實連校驗)",
+     "registry": "TW_Active_ETF_Registry_v*(glob 最新)",
+     "verify_endpoint": "https://openapi.twse.com.tw/v1/opendata/t187ap47_L_AD(候實連探定)"
+    },
+    "tw_daily": {
+     "desc": "③全台股個股每日交易 2024-01-02→最新:調整後價格(主欄)+量值+籌碼",
+     "price_official": {
+      "twse": "https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?date={YYYYMMDD}&type=ALLBUT0999&response=json",
+      "tpex": "https://www.tpex.org.tw/www/zh-tw/afterTrading/otc?date={ROC_DATE}&type=AL(候實連探定)"
+     },
+     "price_adjusted": "yfinance 批次 {ticker}.TW/.TWO auto_adjust=False → Adj Close 為主欄;官方 close 並存對照(官方無調整價=誠實雙欄)",
+     "chip": {
+      "T86 三大法人": "https://www.twse.com.tw/rwd/zh/fund/T86?date={YYYYMMDD}&selectType=ALL&response=json",
+      "MI_MARGN 融資融券": "https://www.twse.com.tw/rwd/zh/marginTrading/MI_MARGN?date={YYYYMMDD}&selectType=ALL&response=json",
+      "TWTB4U 當沖": "https://www.twse.com.tw/rwd/zh/afterTrading/TWTB4U?date={YYYYMMDD}&response=json"
+     },
+     "derived_formulas": {
+      "券資比%": "融券餘額/融資餘額×100(餘額任一為 0=NULL 誠實)[CONFIRMED]",
+      "當沖比%": "當沖成交金額/總成交值×100 [CONFIRMED]",
+      "當沖交易金額": "TWTB4U 直取 [CONFIRMED]",
+      "融資維持率%": "(收盤×融資餘額股數)/融資金額×100;官方無逐股融資金額→融資金額以近60日均價×餘額估 [ESTIMATE 誠實旗標]",
+      "融券維持率%": "(融券保證金+擔保價款)/(收盤×融券餘額股數)×100;保證金成數 90% 制度值估 [ESTIMATE 誠實旗標]"
+     }
+    },
+    "etf_holdings_daily": {
+     "desc": "④主動 ETF 每日持股(各檔成立日以來);視圖=加總/分開/領先",
+     "engine": "VDF_ENG051(via-etfhold)委派;since_inception=true",
+     "views": [
+      "aggregate(37 檔持股加總變化)",
+      "per_fund(單檔)",
+      "leaders(期間增減與績效排行=誰領先)"
+     ]
+    },
+    "global_yf": {
+     "desc": "⑤-⑨ 國際線(yfinance auto_adjust=False;2024-01-02→最新)",
+     "pairs_index_etf": [
+      {
+       "idx": "^GSPC",
+       "etf": "SPY",
+       "zh": "標普500"
+      },
+      {
+       "idx": "^DJI",
+       "etf": "DIA",
+       "zh": "道瓊"
+      },
+      {
+       "idx": "^IXIC",
+       "etf": "ONEQ",
+       "zh": "納斯達克綜合"
+      },
+      {
+       "idx": "^NDX",
+       "etf": "QQQ",
+       "zh": "納指100"
+      },
+      {
+       "idx": "^RUT",
+       "etf": "IWM",
+       "zh": "羅素2000"
+      },
+      {
+       "idx": "^N225",
+       "etf": "EWJ",
+       "zh": "日經225"
+      },
+      {
+       "idx": "^KS11",
+       "etf": "EWY",
+       "zh": "KOSPI"
+      },
+      {
+       "idx": "^TWII",
+       "etf": "EWT",
+       "zh": "台股加權(EWT+0050.TW 對照)"
+      },
+      {
+       "idx": "^STOXX50E",
+       "etf": "FEZ",
+       "zh": "歐 STOXX50"
+      },
+      {
+       "idx": "^GDAXI",
+       "etf": "EWG",
+       "zh": "德 DAX"
+      },
+      {
+       "idx": "^FTSE",
+       "etf": "EWU",
+       "zh": "英 FTSE100"
+      },
+      {
+       "idx": "^FCHI",
+       "etf": "EWQ",
+       "zh": "法 CAC40"
+      }
+     ],
+     "singles": [
+      {
+       "yf": "NVDA",
+       "zh": "輝達"
+      },
+      {
+       "yf": "0050.TW",
+       "zh": "台股 ETF 對照"
+      },
+      {
+       "yf": "^VIX",
+       "zh": "VIX(現貨指數;VIXY=期貨 ETN 代理誠實註)"
+      },
+      {
+       "yf": "BZ=F",
+       "zh": "布蘭特原油期貨"
+      },
+      {
+       "yf": "CL=F",
+       "zh": "WTI 原油期貨"
+      },
+      {
+       "yf": "GC=F",
+       "zh": "黃金期貨"
+      },
+      {
+       "yf": "^TNX",
+       "zh": "美債 10Y 殖利率"
+      },
+      {
+       "yf": "^TYX",
+       "zh": "美債 30Y 殖利率"
+      },
+      {
+       "yf": "TLT",
+       "zh": "20Y+ 公債 ETF(20Y 殖利率對照)"
+      }
+     ],
+     "rates_20y": {
+      "fred": "DGS20",
+      "confidence": "NEEDS_FRED_KEY",
+      "note": "20Y 殖利率正源=FRED;TLT 為 ETF 對照道"
+     }
+    }
+   },
+   "runs": []
   }
  ]
 }
