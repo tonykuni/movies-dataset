@@ -1,0 +1,50 @@
+{
+ "schema": "vdf-fetch-orders-v1",
+ "source": "批114 操作員擷取單制(2026-08-24);append-only,單號遞增",
+ "policy": "每單=標的×源×窗口×欄位;引擎 ENG050 接單;同意閘+預檢+誠實三態;空白取前一交易日;台灣 T+1 紀律",
+ "orders": [
+  {
+   "order_id": "001",
+   "ts": "2026-08-24",
+   "window": "最新交易日往前 5 個交易日",
+   "status": "PENDING",
+   "lanes": {
+    "twse_official": {
+     "desc": "台股官方線(TWSE/TPEX;逐交易日回溯 5 日)",
+     "targets": [
+      {"key": "TAIEX", "zh": "加權指數", "endpoint": "https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?date={YYYYMMDD}&type=IND&response=json"},
+      {"key": "OTC_INDEX", "zh": "櫃買指數", "endpoint": "https://www.tpex.org.tw/openapi/v1/tpex_mainboard_highlight"},
+      {"key": "TWSE_ALL_DAILY", "zh": "上市全部清單每日交易(~980 檔 OHLCV)", "endpoint": "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL", "note": "OpenAPI 僅當日;5 日窗用 rwd MI_INDEX/STOCK_DAY 逐日"},
+      {"key": "TPEX_ALL_DAILY", "zh": "上櫃全部清單每日交易(~838 檔)", "endpoint": "https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes"},
+      {"key": "T86_INST", "zh": "三大法人買賣超(逐檔)", "endpoint": "https://www.twse.com.tw/rwd/zh/fund/T86?date={YYYYMMDD}&selectType=ALL&response=json", "asof": "T+1(FQ-01)"},
+      {"key": "MI_MARGN", "zh": "融資融券餘額(逐檔)", "endpoint": "https://www.twse.com.tw/rwd/zh/marginTrading/MI_MARGN?date={YYYYMMDD}&selectType=ALL&response=json", "asof": "T+1(FQ-02)"},
+      {"key": "DAY_TRADE", "zh": "當沖交易統計", "endpoint": "https://www.twse.com.tw/rwd/zh/afterTrading/TWTB4U?date={YYYYMMDD}&response=json", "asof": "FQ-04"}
+     ]
+    },
+    "yfinance": {
+     "desc": "國際線(yf.download 批次 5d,auto_adjust=False 保 Adj)",
+     "targets": [
+      {"yf": "NVDA", "zh": "輝達每日交易"},
+      {"yf": "BZ=F", "zh": "布蘭特原油期貨"},
+      {"yf": "CL=F", "zh": "WTI 原油期貨"},
+      {"yf": "GC=F", "zh": "黃金期貨"},
+      {"yf": "^VIX", "zh": "VIX"},
+      {"yf": "DX-Y.NYB", "zh": "美元指數"},
+      {"yf": "TWD=X", "zh": "新台幣匯率"},
+      {"yf": "JPY=X", "zh": "日圓匯率"},
+      {"yf": "EURUSD=X", "zh": "歐元匯率"},
+      {"yf": "^GSPC", "zh": "標普500"},
+      {"yf": "^DJI", "zh": "道瓊工業指數"},
+      {"yf": "^IXIC", "zh": "納斯達克指數"},
+      {"yf": "^SOX", "zh": "費城半導體指數"},
+      {"yf": "^KS11", "zh": "KOSPI"},
+      {"yf": "^TWII", "zh": "台股加權(yf 對照)"},
+      {"yf": "^TWOII", "zh": "櫃買(yf 對照)"},
+      {"yf": "1306.T", "zh": "TOPIX(ETF 代理;^TPX yf 不穩,VERIFY)", "confidence": "VERIFY_PENDING"}
+     ]
+    }
+   },
+   "runs": []
+  }
+ ]
+}
