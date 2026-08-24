@@ -1,0 +1,63 @@
+{
+ "schema": "vdf-ta-engine-spec-v1",
+ "source": "批110 操作員令(2026-08-24):美元指數/新台幣/日圓/歐元匯率、30Y/20Y/10Y+更短期公債殖利率全要、VIX、黃金現貨+期貨、比特幣現貨、加密貨幣 ETF;TA-Lib 用調整後價格,無 Adj 用一般 OHLC;多數據比較遇空白取前一交易日;台灣被美國影響晚一天;TA-Lib 所有完整指標都要入引擎;除 RSI 類特殊參數外,週期一律 5/10/20/60/120/240;risk-free rate 用美 10Y 或台 10Y 可換;Benchmark 用台股或標普500 依情況可換",
+ "engine": "VDF_ENG048_TAFactory.py(via-ta)",
+ "universe": [
+  {"key": "DXY", "zh": "美元指數", "rawwide_col": "DXY", "yf": "DX-Y.NYB", "status": "DATA_READY"},
+  {"key": "USDTWD", "zh": "新台幣匯率", "rawwide_col": null, "yf": "TWD=X", "status": "PENDING_FETCH"},
+  {"key": "USDJPY", "zh": "日圓匯率", "rawwide_col": null, "yf": "JPY=X", "status": "PENDING_FETCH"},
+  {"key": "EURUSD", "zh": "歐元匯率", "rawwide_col": null, "yf": "EURUSD=X", "status": "PENDING_FETCH"},
+  {"key": "UST30Y", "zh": "30 年期公債殖利率", "rawwide_col": null, "yf": "^TYX", "fred": "DGS30", "status": "PENDING_FETCH", "note": "MDL003 已有 DGS30 序列定義"},
+  {"key": "UST20Y", "zh": "20 年期公債殖利率", "rawwide_col": null, "fred": "DGS20", "status": "PENDING_FETCH"},
+  {"key": "UST10Y", "zh": "10 年期公債殖利率", "rawwide_col": "DGS10", "yf": "^TNX", "status": "DATA_READY"},
+  {"key": "UST2Y", "zh": "2 年期公債殖利率", "rawwide_col": "DGS2", "status": "DATA_READY"},
+  {"key": "UST3M", "zh": "3 月期公債殖利率", "rawwide_col": "DGS3MO", "status": "DATA_READY"},
+  {"key": "UST_SHORT_MORE", "zh": "更短天期(1M/6M/1Y)", "fred": "DGS1MO/DGS6MO/DGS1", "status": "PENDING_FETCH"},
+  {"key": "VIX", "zh": "VIX 恐慌指數", "rawwide_col": "VIX", "yf": "^VIX", "status": "DATA_READY"},
+  {"key": "GOLD_SPOT", "zh": "黃金現貨", "rawwide_col": "GOLD", "yf": "XAUUSD=X", "status": "DATA_READY"},
+  {"key": "GOLD_FUT", "zh": "黃金期貨", "rawwide_col": null, "yf": "GC=F", "status": "PENDING_FETCH"},
+  {"key": "BTC_SPOT", "zh": "比特幣現貨", "rawwide_col": null, "yf": "BTC-USD", "status": "PENDING_FETCH"},
+  {"key": "CRYPTO_ETF", "zh": "加密貨幣 ETF", "rawwide_col": null, "yf": "IBIT/FBTC/ETHA(CY-03/04 清冊 20 檔)", "status": "PENDING_FETCH"},
+  {"key": "GSPC", "zh": "標普500(基準候選)", "rawwide_col": "GSPC", "status": "DATA_READY"},
+  {"key": "TWII", "zh": "台股加權(基準候選)", "rawwide_col": "TWII", "status": "DATA_READY"}
+ ],
+ "price_rules": {
+  "adj_priority": "TA-Lib 一律用調整後價格(adj_close);無 Adj 者退用一般 open/high/low/close(操作員令;與 VDF-390 Adj 優先序一致)",
+  "gap_fill": "多數據比較遇空白=取前一交易日值(forward-fill);成交量不補",
+  "tw_lag": "台灣被美國影響晚一天:美系序列對台股比較時 shift +1 交易日(T+1 對齊;FQ-09 ASOF 紀律)",
+  "single_price_note": "RawWide 單價欄(指數/殖利率/匯率)視同 adj 等價;OHLC 級指標需 K 線源(PX-01/03)"
+ },
+ "talib_policy": {
+  "coverage": "TA-Lib 全指標一律入引擎:runtime 以 talib.get_functions() 動態列舉全數(158+),逐一掛載",
+  "runtime_fallback": "talib C 庫缺席=誠實 NOT_INSTALLED:核心後備組(SMA/EMA/WMA/RSI/MACD/BBANDS/MOM/ROC/STDDEV/ZSCORE/MAX/MIN)以 pandas 純算頂上,其餘標 RUNTIME_PENDING 不假算",
+  "periods": [5, 10, 20, 60, 120, 240],
+  "periods_rule": "凡帶 timeperiod 參數之指標,一律以六週期各算一輪(操作員令)",
+  "special_params": {
+   "RSI": [14],
+   "MACD": {"fast": 12, "slow": 26, "signal": 9},
+   "STOCH": {"fastk": 14, "slowk": 3, "slowd": 3},
+   "BBANDS": {"timeperiod": 20, "nbdevup": 2, "nbdevdn": 2},
+   "note": "特殊慣例參數指標依業界預設(操作員:除特殊如 RSI 日期參數外)"
+  },
+  "ohlc_required": "需 high/low/open 之指標(ATR/STOCH/CCI/SAR/ADX/K線型態 61 式等)於單價序列標 REQUIRES_OHLC 誠實跳過;K 線源接上即自動生效"
+ },
+ "risk_free_rate": {
+  "default": "US10Y(RawWide DGS10 實資料)",
+  "switch": ["US10Y", "TW10Y"],
+  "tw10y_source": "台灣 10 年期公債殖利率(候接:櫃買/央行官方源;PENDING_FETCH)",
+  "usage": "夏普/索提諾/超額報酬等風險指標之 rf 輸入;--rfr 參數切換"
+ },
+ "benchmark": {
+  "default_by_market": {"TW": "TWII", "US": "GSPC", "GLOBAL": "GSPC"},
+  "switch": ["TWII", "GSPC"],
+  "usage": "相對強弱/beta/alpha/追蹤誤差之基準;--benchmark 參數切換(操作員:依不同情況可換)"
+ },
+ "output": {
+  "dir": "functional modules/VDF/output_hub/ta_factory/",
+  "formats": ["parquet", "csv(utf-8-sig)", "json"],
+  "long_schema": ["date", "instrument", "indicator", "period", "value"]
+ },
+ "changelog": [
+  {"ts": "2026-08-24", "op": "INIT", "note": "批110 規格落冊:宇宙 17 件(DATA_READY 8/PENDING_FETCH 9)+六週期+特殊參數+rf/基準雙切換"}
+ ]
+}

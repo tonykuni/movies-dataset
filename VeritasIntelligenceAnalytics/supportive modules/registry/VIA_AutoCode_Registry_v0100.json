@@ -3821,6 +3821,13 @@
    "ts": "2026-08-24 06:20",
    "name": "批109 美國細目擷取:43 項細目冊(就業 23+通膨 15+PMI 5)+ENG047 擷取引擎(法遵雙閘)+via-usmacro+grid v0144=81 站",
    "note": "令「通膨就業細目含 PMI;各業失業/勞參率/職缺率都要抓」。①VDF_USMacro_Detail_Fetch_Roster_v0100(增量冊,零重複 MDL003 46 序列):就業=U4/U5/U6 廣義失業三階+EMRATIO+主力齡勞參 LNS11300060+續領 CCSA+失業持續五項+JOLTS 職缺率/僱用/離職率四率+各業失業四業(候定 id)+時薪工時;通膨=CPI 八大類四項 CONFIRMED(能源/食物/醫療/服裝)+住房/OER/二手車/機票細項+黏性 CPI(Atlanta)+中位數 CPI(Cleveland)+Trimmed PCE(Dallas)+PPI 三階+進出口物價;PMI=ISM 製造/非製造+S&P Global(FRED NAPM 停供=PROXY_SOURCE 誠實標)+中國 PMI 交叉參照既有+台灣 CIER TODO。confidence 三態:CONFIRMED 21 直抓/VERIFY_PENDING 17 首抓驗 id(404=BAD_ID 誠實不假抓)/候定 id 由 via-net FRED search 補。②ENG047(八檢 8/8):法遵雙閘 VIA_NET_CONSENT=YES+FRED_API_KEY 缺一即 FAIL-CLOSED rc2 零外呼;缺值 '.'→None;輸出 csv(utf-8-sig)+json+parquet(pandas 缺=誠實跳);節流 0.1s;BAD_ID 不寫回冊(冊更正走版本前進)。③bin/via-usmacro(雙 glob+Celeritas 鏈)+grid v0144 站=81 站全綠 OK 74·FAIL 0。實抓候工作站設 FRED_API_KEY+同意閘。"
+  },
+  {
+   "code": "TOOL-111",
+   "kind": "工具+冊",
+   "ts": "2026-08-24 06:25",
+   "name": "批110 TA 全指標工廠:規格冊(宇宙 17 件+三鐵則+六週期+rf/基準雙切換)+ENG048(十檢綠,實資料 228 值)+via-ta+grid v0145=82 站",
+   "note": "令:DXY/台日歐匯率/30Y·20Y·10Y+更短公債殖利率/VIX/黃金現貨期貨/BTC 現貨/加密 ETF;TA-Lib 用 Adj 無則 OHLC;空白取前一交易日;台灣晚美國一天;TA-Lib 全指標入引擎;除 RSI 類特殊參數外週期一律 5/10/20/60/120/240;rf=美 10Y 可換台 10Y;基準=台股或標普500 可換。①VDF_TA_Engine_Spec_v0100:宇宙 17 件=DATA_READY 8(DXY/VIX/GOLD/DGS10/DGS2/DGS3MO/GSPC/TWII 即 RawWide 實資料)+PENDING_FETCH 9(台日歐匯率/20Y·30Y/金期/BTC/加密 ETF 20 檔,yf ticker 全配);三鐵則+特殊參數冊(RSI14/MACD 12-26-9/STOCH 14-3-3/BB 20-2)。②ENG048(十檢 10/10):pick_price Adj 優先鏈/ffill_align 價補量不補/tw_lag_shift(1);talib 可用=get_functions() 全數動態掛載(timeperiod 類×六週期輪;OHLC 需件於單價序列誠實跳);容器 talib C 庫缺=NOT_INSTALLED 誠實,後備核心 12 式 pandas 純算頂上(SMA/EMA/WMA/RSI/MACD/BB%B/MOM/ROC/STDDEV/ZSCORE/MAX/MIN);SMA 數值驗算過;實資料煙測 DXY/VIX/GOLD/UST10Y=228 指標值落 output_hub/ta_factory(json+csv+parquet)。③via-ta 動詞+grid v0145 站=82 站全綠 OK 75·FAIL 0。工作站裝 talib C 庫後同引擎自動升 TALIB_FULL 全指標模式,零改碼。"
   }
  ]
 }
