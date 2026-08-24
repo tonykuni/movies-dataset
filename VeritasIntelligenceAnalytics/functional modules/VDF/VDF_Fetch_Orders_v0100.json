@@ -12,35 +12,341 @@
     "twse_official": {
      "desc": "台股官方線(TWSE/TPEX;逐交易日回溯 5 日)",
      "targets": [
-      {"key": "TAIEX", "zh": "加權指數", "endpoint": "https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?date={YYYYMMDD}&type=IND&response=json"},
-      {"key": "OTC_INDEX", "zh": "櫃買指數", "endpoint": "https://www.tpex.org.tw/openapi/v1/tpex_mainboard_highlight"},
-      {"key": "TWSE_ALL_DAILY", "zh": "上市全部清單每日交易(~980 檔 OHLCV)", "endpoint": "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL", "note": "OpenAPI 僅當日;5 日窗用 rwd MI_INDEX/STOCK_DAY 逐日"},
-      {"key": "TPEX_ALL_DAILY", "zh": "上櫃全部清單每日交易(~838 檔)", "endpoint": "https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes"},
-      {"key": "T86_INST", "zh": "三大法人買賣超(逐檔)", "endpoint": "https://www.twse.com.tw/rwd/zh/fund/T86?date={YYYYMMDD}&selectType=ALL&response=json", "asof": "T+1(FQ-01)"},
-      {"key": "MI_MARGN", "zh": "融資融券餘額(逐檔)", "endpoint": "https://www.twse.com.tw/rwd/zh/marginTrading/MI_MARGN?date={YYYYMMDD}&selectType=ALL&response=json", "asof": "T+1(FQ-02)"},
-      {"key": "DAY_TRADE", "zh": "當沖交易統計", "endpoint": "https://www.twse.com.tw/rwd/zh/afterTrading/TWTB4U?date={YYYYMMDD}&response=json", "asof": "FQ-04"}
+      {
+       "key": "TAIEX",
+       "zh": "加權指數",
+       "endpoint": "https://www.twse.com.tw/rwd/zh/afterTrading/MI_INDEX?date={YYYYMMDD}&type=IND&response=json"
+      },
+      {
+       "key": "OTC_INDEX",
+       "zh": "櫃買指數",
+       "endpoint": "https://www.tpex.org.tw/openapi/v1/tpex_mainboard_highlight"
+      },
+      {
+       "key": "TWSE_ALL_DAILY",
+       "zh": "上市全部清單每日交易(~980 檔 OHLCV)",
+       "endpoint": "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL",
+       "note": "OpenAPI 僅當日;5 日窗用 rwd MI_INDEX/STOCK_DAY 逐日"
+      },
+      {
+       "key": "TPEX_ALL_DAILY",
+       "zh": "上櫃全部清單每日交易(~838 檔)",
+       "endpoint": "https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes"
+      },
+      {
+       "key": "T86_INST",
+       "zh": "三大法人買賣超(逐檔)",
+       "endpoint": "https://www.twse.com.tw/rwd/zh/fund/T86?date={YYYYMMDD}&selectType=ALL&response=json",
+       "asof": "T+1(FQ-01)"
+      },
+      {
+       "key": "MI_MARGN",
+       "zh": "融資融券餘額(逐檔)",
+       "endpoint": "https://www.twse.com.tw/rwd/zh/marginTrading/MI_MARGN?date={YYYYMMDD}&selectType=ALL&response=json",
+       "asof": "T+1(FQ-02)"
+      },
+      {
+       "key": "DAY_TRADE",
+       "zh": "當沖交易統計",
+       "endpoint": "https://www.twse.com.tw/rwd/zh/afterTrading/TWTB4U?date={YYYYMMDD}&response=json",
+       "asof": "FQ-04"
+      }
      ]
     },
     "yfinance": {
      "desc": "國際線(yf.download 批次 5d,auto_adjust=False 保 Adj)",
      "targets": [
-      {"yf": "NVDA", "zh": "輝達每日交易"},
-      {"yf": "BZ=F", "zh": "布蘭特原油期貨"},
-      {"yf": "CL=F", "zh": "WTI 原油期貨"},
-      {"yf": "GC=F", "zh": "黃金期貨"},
-      {"yf": "^VIX", "zh": "VIX"},
-      {"yf": "DX-Y.NYB", "zh": "美元指數"},
-      {"yf": "TWD=X", "zh": "新台幣匯率"},
-      {"yf": "JPY=X", "zh": "日圓匯率"},
-      {"yf": "EURUSD=X", "zh": "歐元匯率"},
-      {"yf": "^GSPC", "zh": "標普500"},
-      {"yf": "^DJI", "zh": "道瓊工業指數"},
-      {"yf": "^IXIC", "zh": "納斯達克指數"},
-      {"yf": "^SOX", "zh": "費城半導體指數"},
-      {"yf": "^KS11", "zh": "KOSPI"},
-      {"yf": "^TWII", "zh": "台股加權(yf 對照)"},
-      {"yf": "^TWOII", "zh": "櫃買(yf 對照)"},
-      {"yf": "1306.T", "zh": "TOPIX(ETF 代理;^TPX yf 不穩,VERIFY)", "confidence": "VERIFY_PENDING"}
+      {
+       "yf": "NVDA",
+       "zh": "輝達每日交易"
+      },
+      {
+       "yf": "BZ=F",
+       "zh": "布蘭特原油期貨"
+      },
+      {
+       "yf": "CL=F",
+       "zh": "WTI 原油期貨"
+      },
+      {
+       "yf": "GC=F",
+       "zh": "黃金期貨"
+      },
+      {
+       "yf": "^VIX",
+       "zh": "VIX"
+      },
+      {
+       "yf": "DX-Y.NYB",
+       "zh": "美元指數"
+      },
+      {
+       "yf": "TWD=X",
+       "zh": "新台幣匯率"
+      },
+      {
+       "yf": "JPY=X",
+       "zh": "日圓匯率"
+      },
+      {
+       "yf": "EURUSD=X",
+       "zh": "歐元匯率"
+      },
+      {
+       "yf": "^GSPC",
+       "zh": "標普500"
+      },
+      {
+       "yf": "^DJI",
+       "zh": "道瓊工業指數"
+      },
+      {
+       "yf": "^IXIC",
+       "zh": "納斯達克指數"
+      },
+      {
+       "yf": "^SOX",
+       "zh": "費城半導體指數"
+      },
+      {
+       "yf": "^KS11",
+       "zh": "KOSPI"
+      },
+      {
+       "yf": "^TWII",
+       "zh": "台股加權(yf 對照)"
+      },
+      {
+       "yf": "^TWOII",
+       "zh": "櫃買(yf 對照)"
+      },
+      {
+       "yf": "1306.T",
+       "zh": "TOPIX(ETF 代理;^TPX yf 不穩,VERIFY)",
+       "confidence": "VERIFY_PENDING"
+      }
+     ]
+    }
+   },
+   "runs": []
+  },
+  {
+   "order_id": "002",
+   "ts": "2026-08-24",
+   "window": "清單=全量;行情=最新 5 交易日;財報=指定期別",
+   "status": "PENDING",
+   "source": "批119 操作員十域總測令",
+   "lanes": {
+    "twse_official": {
+     "desc": "①台股全清單 ②主動 ETF ③每日交易+三大法人+融資券+當沖(承單 001 端點)",
+     "targets": [
+      {
+       "key": "TWSE_LISTINGS",
+       "zh": "上市全清單基本資料",
+       "endpoint": "https://openapi.twse.com.tw/v1/opendata/t187ap03_L"
+      },
+      {
+       "key": "TPEX_LISTINGS",
+       "zh": "上櫃全清單基本資料",
+       "endpoint": "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap03_O"
+      },
+      {
+       "key": "TWSE_ALL_DAILY",
+       "zh": "上市每日交易全量",
+       "endpoint": "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL"
+      },
+      {
+       "key": "TPEX_ALL_DAILY",
+       "zh": "上櫃每日交易全量",
+       "endpoint": "https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes"
+      },
+      {
+       "key": "T86_INST",
+       "zh": "三大法人買賣超",
+       "endpoint": "https://www.twse.com.tw/rwd/zh/fund/T86?date={YYYYMMDD}&selectType=ALL&response=json"
+      },
+      {
+       "key": "MI_MARGN",
+       "zh": "融資融券",
+       "endpoint": "https://www.twse.com.tw/rwd/zh/marginTrading/MI_MARGN?date={YYYYMMDD}&selectType=ALL&response=json"
+      },
+      {
+       "key": "DAY_TRADE",
+       "zh": "當沖統計",
+       "endpoint": "https://www.twse.com.tw/rwd/zh/afterTrading/TWTB4U?date={YYYYMMDD}&response=json"
+      }
+     ]
+    },
+    "etf_holdings": {
+     "desc": "主動 ETF 37 檔(冊)+A 碼 30 檔每日持股",
+     "engine": "VDF_ENG051(via-etfhold)"
+    },
+    "cnyes_consensus": {
+     "desc": "④鉅亨網 FactSet 共識(MX-E1 道)",
+     "targets": [
+      {
+       "key": "CNYES_2330",
+       "zh": "台積電 2330 共識(目標價/評等/EPS)",
+       "endpoint": "https://ws.api.cnyes.com/ws/api/v1/quote/quotes/TWS:2330:STOCK",
+       "confidence": "VERIFY_PENDING",
+       "note": "完整共識 API 路徑候實連探定"
+      },
+      {
+       "key": "CNYES_3324",
+       "zh": "雙鴻 3324 共識",
+       "endpoint": "https://ws.api.cnyes.com/ws/api/v1/quote/quotes/TWS:3324:STOCK",
+       "confidence": "VERIFY_PENDING"
+      }
+     ]
+    },
+    "yf_consensus": {
+     "desc": "④yfinance 共識(analyst_price_targets/earnings_estimate)",
+     "targets": [
+      {
+       "yf": "2330.TW"
+      },
+      {
+       "yf": "3324.TW"
+      },
+      {
+       "yf": "NVDA"
+      }
+     ]
+    },
+    "financials": {
+     "desc": "⑤三大報表:2330/3324=MOPS(2Q25 累積/3Q25 單季/2024 年度);NVDA=yfinance(季/年;會計年度對映誠實標)",
+     "mops_targets": [
+      {
+       "ticker": "2330",
+       "periods": [
+        "2025Q2_CUM",
+        "2025Q3_SINGLE",
+        "2024_FY"
+       ],
+       "statements": [
+        "BS",
+        "IS",
+        "CF"
+       ],
+       "endpoint": "https://mops.twse.com.tw/mops/web/ajax_t164sb0{3,4,5}",
+       "confidence": "VERIFY_PENDING",
+       "note": "t164sb03 資產負債/04 損益/05 現流;POST 參數 co_id+year+season"
+      },
+      {
+       "ticker": "3324",
+       "periods": [
+        "2025Q2_CUM",
+        "2025Q3_SINGLE",
+        "2024_FY"
+       ],
+       "statements": [
+        "BS",
+        "IS",
+        "CF"
+       ],
+       "confidence": "VERIFY_PENDING"
+      }
+     ],
+     "yf_targets": [
+      {
+       "yf": "NVDA",
+       "note": "NVDA 會計年度領先曆年(FY2026Q2≈曆年 2025Q2);取 quarterly_/annual_ balance_sheet+financials+cashflow,期別對映誠實標"
+      }
+     ]
+    },
+    "yf_market": {
+     "desc": "⑥⑦⑧⑩ 指數/商品/利率/匯率",
+     "targets": [
+      {
+       "yf": "^GSPC",
+       "zh": "標普500"
+      },
+      {
+       "yf": "^DJI",
+       "zh": "道瓊"
+      },
+      {
+       "yf": "^IXIC",
+       "zh": "納斯達克"
+      },
+      {
+       "yf": "^NDX",
+       "zh": "納指100"
+      },
+      {
+       "yf": "^RUT",
+       "zh": "羅素2000"
+      },
+      {
+       "yf": "^SOX",
+       "zh": "費半(補充)"
+      },
+      {
+       "yf": "DX-Y.NYB",
+       "zh": "美元指數"
+      },
+      {
+       "yf": "GC=F",
+       "zh": "黃金期貨"
+      },
+      {
+       "yf": "BZ=F",
+       "zh": "布蘭特原油期貨"
+      },
+      {
+       "yf": "CL=F",
+       "zh": "西德州 WTI 原油期貨"
+      },
+      {
+       "yf": "^TNX",
+       "zh": "10Y 殖利率"
+      },
+      {
+       "yf": "^TYX",
+       "zh": "30Y 殖利率"
+      },
+      {
+       "fred": "DGS20",
+       "zh": "20Y 殖利率(FRED;yf 無 20Y 專碼)",
+       "confidence": "NEEDS_FRED_KEY"
+      },
+      {
+       "yf": "TWD=X",
+       "zh": "新台幣"
+      },
+      {
+       "yf": "JPY=X",
+       "zh": "日圓"
+      },
+      {
+       "yf": "EURUSD=X",
+       "zh": "歐元"
+      },
+      {
+       "yf": "CNY=X",
+       "zh": "人民幣"
+      }
+     ]
+    },
+    "akshare": {
+     "desc": "⑨波羅的海 BDI(AkShare bdi 道;CM-07)",
+     "targets": [
+      {
+       "key": "BDI",
+       "confidence": "VERIFY_PENDING",
+       "note": "akshare 套件候裝;CN 源同受網路政策"
+      }
+     ]
+    },
+    "rates_jp": {
+     "desc": "⑩日本利率",
+     "targets": [
+      {
+       "fred": "IRSTCI01JPM156N",
+       "zh": "日本隔夜利率(OECD via FRED)",
+       "confidence": "VERIFY_PENDING",
+       "note": "BOJ 政策利率官方源候接;GL-02 FRED 代理道"
+      }
      ]
     }
    },

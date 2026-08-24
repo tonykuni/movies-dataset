@@ -3877,6 +3877,13 @@
    "ts": "2026-08-24 15:55",
    "name": "批118:三代號正則正名 TWEquityTicker 家族入 SSOT+ActiveTWETFTicker 升格 LOCKED+主動 ETF 每日持股引擎收容整合(ENG051,自測全綠)+grid v0148=85 站",
    "note": "①正名(操作員裁:YF 碼含全球商品,台股個股式須命名分層):regex 治理中心新增四 LOCKED 式=TWEquityTicker(官方四碼,alias TW_TICKER_LOCKED)/TWEquityYFTicker(^([1-9]\\\\d{3})\\\\.(TW|TWO)$)/TWEquityBBGTicker(^([1-9]\\\\d{3})\\\\s+TT$)/ActiveTWETFTicker(^00\\\\d{2,3}[AD]$,自 ENG046 升格鎖管);VDF/VAP canonical 各 +2 新名鍵(舊鍵標 renamed_to,只增不減零刪除)。②持股引擎:原件 VIA_ActiveTWETF_DailyHoldings_Engine_v0101_DuckDB.py 原樣收容 new modules engines/;整合版 VDF_ENG051(v1.0.2-via):雙橋(SuperAccel+統包網路)+R2 修(原件 Downloads 寫死根=黑名單→VIA 根動態)+宇宙鏈三段(ActiveTWETF_Latest.csv→TW_Active_ETF_Registry 37 冊取 A 碼→bootstrap 22 檔)+代碼式對齊 ActiveTWETFTicker。功能:投信官方 adapter(群益 00992A 已實作)→MoneyDJ 後備、品質閘七檢(權重總和/重複/日期)、DuckDB 冪等(delete+insert 天然鍵)+Parquet 分區(DuckDB 直寫零 pyarrow)+持股增減偵測(ADDED/REMOVED/INCREASED/DECREASED)。實測:--self-test all_pass(duckdb 1.5.5 裝機)+宇宙鏈驗證 37 冊→A 碼 30 檔(D 債券 7 正確排除)。③via-etfhold 動詞+grid v0148=85 站全綠 OK 78·FAIL 0。實抓候網路(MoneyDJ/投信官網同受容器政策擋);工作站 via-etfhold 即跑每日持股。"
+  },
+  {
+   "code": "TOOL-119",
+   "kind": "擷取單+測試",
+   "ts": "2026-08-24 16:15",
+   "name": "批119 十域總測:擷取單 002 入冊(8 車道 33+ 標的)+ENG050 v0101 車道分派器(十檢綠)+實測=管線全通/網路門三端點 403 存證",
+   "note": "十域令→單 002:①②③台股全清單/主動 ETF/每日交易+三大法人+融資券+當沖(官方線 7 端點+ENG051 委外)④鉅亨 FactSet 共識 2330/3324(Cnyes API,VERIFY_PENDING)+yf 共識 2330/3324/NVDA ⑤三大報表 2330/3324(MOPS t164sb03/04/05:2Q25 累積/3Q25 單季/2024 年度,端點候實連探定不盲打)+NVDA(yf 報表框;會計年度領先曆年誠實標)⑥美五大指數 ^GSPC/^DJI/^IXIC/^NDX/^RUT(+費半補充)⑦DXY/金期 GC=F/布蘭特 BZ=F/WTI CL=F ⑧10Y ^TNX/30Y ^TYX/20Y=FRED DGS20(NEEDS_FRED_KEY)⑨BDI(AkShare 候裝)⑩台日歐人民幣匯率+日本利率(FRED 代理 VERIFY)。ENG050 v0101(十檢 10/10):通用車道分派器 8 道(twse/yf_market/yf_consensus/cnyes/financials/etf_holdings 委外/akshare/rates_jp 候件);修 3 蟲(selftest 鍵名/csv 通用尋列/非 yf 標的過濾)。實測:替身管線八道全通+真實啟動三端點(Yahoo/MOPS/Cnyes)CONNECT 403 存證=網路門未開,零假抓。grid 85 站 OK 78·FAIL 0。工作站 via-order --order 002 即十域實抓。"
   }
  ]
 }
