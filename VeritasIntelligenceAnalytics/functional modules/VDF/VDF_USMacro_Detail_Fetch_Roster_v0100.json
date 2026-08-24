@@ -1,0 +1,61 @@
+{
+ "schema": "vdf-usmacro-detail-fetch-roster-v1",
+ "source": "批109 操作員令(2026-08-24):「通膨就業都有很詳細的細目,包括 PMI 在內;就業還有各業失業的狀況、勞參率以及職缺率等等都要抓」",
+ "policy": "增量冊:不重複 MDL003 既有 46 序列;confidence=CONFIRMED 直抓 / VERIFY_PENDING 首抓時以 FRED API 驗 id,404 即誠實標 BAD_ID 不假抓;全部候 FRED_API_KEY+VIA_NET_CONSENT=YES 法遵雙閘",
+ "engine": "VDF_ENG047_USMacroDetailFetcher.py(via-usmacro)",
+ "sections": {
+  "employment_labor": [
+   {"key": "US.Employ.U6", "fred_id": "U6RATE", "zh": "廣義失業率 U6", "confidence": "CONFIRMED", "maps_to": "US-C04"},
+   {"key": "US.Employ.U4", "fred_id": "U4RATE", "zh": "U4(含灰心勞工)", "confidence": "CONFIRMED", "maps_to": "US-C04"},
+   {"key": "US.Employ.U5", "fred_id": "U5RATE", "zh": "U5(含邊際附著)", "confidence": "CONFIRMED", "maps_to": "US-C04"},
+   {"key": "US.Employ.EmpPopRatio", "fred_id": "EMRATIO", "zh": "就業人口比", "confidence": "CONFIRMED", "maps_to": "US-C04"},
+   {"key": "US.Employ.LFPR.PrimeAge", "fred_id": "LNS11300060", "zh": "勞參率 25-54 主力齡", "confidence": "CONFIRMED", "maps_to": "US-C04"},
+   {"key": "US.Employ.Claims.Continuing", "fred_id": "CCSA", "zh": "續領失業金", "confidence": "CONFIRMED", "maps_to": "US-L05"},
+   {"key": "US.Employ.Duration.LT5", "fred_id": "UEMPLT5", "zh": "失業 <5 週", "confidence": "CONFIRMED", "maps_to": "US-C05"},
+   {"key": "US.Employ.Duration.5to14", "fred_id": "UEMP5TO14", "zh": "失業 5-14 週", "confidence": "CONFIRMED", "maps_to": "US-C05"},
+   {"key": "US.Employ.Duration.15to26", "fred_id": "UEMP15T26", "zh": "失業 15-26 週", "confidence": "CONFIRMED", "maps_to": "US-C05"},
+   {"key": "US.Employ.Duration.27plus", "fred_id": "UEMP27OV", "zh": "失業 27 週以上", "confidence": "CONFIRMED", "maps_to": "US-C05"},
+   {"key": "US.Employ.Duration.MeanWeeks", "fred_id": "UEMPMEAN", "zh": "平均失業週數", "confidence": "CONFIRMED", "maps_to": "US-C05"},
+   {"key": "US.Employ.JOLTS.OpeningsRate", "fred_id": "JTSJOR", "zh": "職缺率(開缺率)", "confidence": "CONFIRMED", "maps_to": "US-C07"},
+   {"key": "US.Employ.JOLTS.HiresLevel", "fred_id": "JTSHIL", "zh": "僱用數", "confidence": "CONFIRMED", "maps_to": "US-C07"},
+   {"key": "US.Employ.JOLTS.HiresRate", "fred_id": "JTSHIR", "zh": "僱用率", "confidence": "CONFIRMED", "maps_to": "US-C07"},
+   {"key": "US.Employ.JOLTS.QuitsRate", "fred_id": "JTSQUR", "zh": "離職率(自願)", "confidence": "CONFIRMED", "maps_to": "US-C07"},
+   {"key": "US.Employ.JOLTS.QuitsLevel", "fred_id": "JTSQUL", "zh": "離職數", "confidence": "VERIFY_PENDING", "maps_to": "US-C07"},
+   {"key": "US.Employ.JOLTS.LayoffsRate", "fred_id": "JTSLDR", "zh": "裁員率", "confidence": "VERIFY_PENDING", "maps_to": "US-C07"},
+   {"key": "US.Employ.ByIndustry.Construction", "fred_id": null, "zh": "營建業失業率(各業失業)", "confidence": "VERIFY_PENDING", "maps_to": "US-C19", "note": "FRED LNU043 家族;首抓時 via-net FRED search 定 id"},
+   {"key": "US.Employ.ByIndustry.Manufacturing", "fred_id": null, "zh": "製造業失業率", "confidence": "VERIFY_PENDING", "maps_to": "US-C19"},
+   {"key": "US.Employ.ByIndustry.Retail", "fred_id": null, "zh": "零售業失業率", "confidence": "VERIFY_PENDING", "maps_to": "US-C19"},
+   {"key": "US.Employ.ByIndustry.Leisure", "fred_id": null, "zh": "休閒餐旅失業率", "confidence": "VERIFY_PENDING", "maps_to": "US-C19"},
+   {"key": "US.Employ.Wage.ProductionAHE", "fred_id": "AHETPI", "zh": "生產與非管理職時薪", "confidence": "VERIFY_PENDING", "maps_to": "US-C08"},
+   {"key": "US.Employ.Hours.WeeklyAll", "fred_id": null, "zh": "全體週工時", "confidence": "VERIFY_PENDING", "maps_to": "US-C08"}
+  ],
+  "inflation_detail": [
+   {"key": "US.Prices.CPI.Energy", "fred_id": "CPIENGSL", "zh": "CPI 能源", "confidence": "CONFIRMED", "maps_to": "US-G07"},
+   {"key": "US.Prices.CPI.Food", "fred_id": "CPIUFDSL", "zh": "CPI 食物", "confidence": "CONFIRMED", "maps_to": "US-G07"},
+   {"key": "US.Prices.CPI.Medical", "fred_id": "CPIMEDSL", "zh": "CPI 醫療", "confidence": "CONFIRMED", "maps_to": "US-G07"},
+   {"key": "US.Prices.CPI.Apparel", "fred_id": "CPIAPPSL", "zh": "CPI 服裝", "confidence": "CONFIRMED", "maps_to": "US-G07"},
+   {"key": "US.Prices.CPI.Transport", "fred_id": "CPITRNSL", "zh": "CPI 交通", "confidence": "VERIFY_PENDING", "maps_to": "US-G07"},
+   {"key": "US.Prices.CPI.Shelter", "fred_id": "CUSR0000SAH1", "zh": "CPI 住房(shelter)", "confidence": "VERIFY_PENDING", "maps_to": "US-G08"},
+   {"key": "US.Prices.CPI.OER", "fred_id": null, "zh": "業主約當租金 OER", "confidence": "VERIFY_PENDING", "maps_to": "US-G08"},
+   {"key": "US.Prices.CPI.UsedCars", "fred_id": "CUSR0000SETA02", "zh": "CPI 二手車", "confidence": "VERIFY_PENDING", "maps_to": "US-G08"},
+   {"key": "US.Prices.CPI.Airfare", "fred_id": null, "zh": "CPI 機票", "confidence": "VERIFY_PENDING", "maps_to": "US-G08"},
+   {"key": "US.Prices.CPI.Sticky", "fred_id": "CORESTICKM159SFRBATL", "zh": "黏性核心 CPI(Atlanta Fed)", "confidence": "CONFIRMED", "maps_to": "US-G10"},
+   {"key": "US.Prices.CPI.Median", "fred_id": "MEDCPIM158SFRBCLE", "zh": "中位數 CPI(Cleveland Fed)", "confidence": "CONFIRMED", "maps_to": "US-G14"},
+   {"key": "US.Prices.PCE.TrimmedMean", "fred_id": "PCETRIM12M159SFRBDAL", "zh": "Trimmed Mean PCE(Dallas Fed)", "confidence": "VERIFY_PENDING", "maps_to": "US-G14"},
+   {"key": "US.Prices.PPI.FinalDemand", "fred_id": null, "zh": "PPI 最終需求", "confidence": "VERIFY_PENDING", "maps_to": "US-G11"},
+   {"key": "US.Prices.ImportPrice", "fred_id": null, "zh": "進口物價指數", "confidence": "VERIFY_PENDING", "maps_to": "US-G15"},
+   {"key": "US.Prices.ExportPrice", "fred_id": null, "zh": "出口物價指數", "confidence": "VERIFY_PENDING", "maps_to": "US-G15"}
+  ],
+  "pmi": [
+   {"key": "US.PMI.ISM.Mfg", "fred_id": null, "zh": "ISM 製造業 PMI(含分項)", "confidence": "PROXY_SOURCE", "maps_to": "US-L01/L11", "note": "FRED NAPM 已停供;源=ISM 官網/S&P Global(授權層);候 via-net 合規接"},
+   {"key": "US.PMI.ISM.Services", "fred_id": null, "zh": "ISM 非製造業 PMI(含分項)", "confidence": "PROXY_SOURCE", "maps_to": "US-L02/L12"},
+   {"key": "US.PMI.SPGlobal", "fred_id": null, "zh": "S&P Global 美國 PMI", "confidence": "PROXY_SOURCE", "maps_to": "US-L03"},
+   {"key": "CN.PMI.Official", "fred_id": "CHNMFGPMI", "zh": "中國官方製造業 PMI", "confidence": "COVERED_ELSEWHERE", "maps_to": "GL-14", "note": "MDL003 既有+AKShare GL-14/15 DONE"},
+   {"key": "TW.PMI.CIER", "fred_id": null, "zh": "台灣 CIER PMI/NMI", "confidence": "TODO", "maps_to": "GL-17"}
+  ]
+ },
+ "dedupe_note": "MDL003 既有 46 序列(UNRATE/CIVPART/JTSJOL/ICSA/CPIAUCSL/CPILFESL/PCEPI/PCEPILFE/PPIACO/CES0500000003 等)不入本冊=只增不減零重複",
+ "changelog": [
+  {"ts": "2026-08-24", "op": "INIT", "note": "批109:就業 23 項+通膨 15 項+PMI 5 項=43 細目"}
+ ]
+}
