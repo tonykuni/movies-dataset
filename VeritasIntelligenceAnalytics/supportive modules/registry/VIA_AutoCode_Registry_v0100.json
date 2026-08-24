@@ -3870,6 +3870,13 @@
    "ts": "2026-08-24 13:40",
    "name": "批117:PDF 全樹鑑識(容器零券商個股報告=誠實)+VRN digest 管線真 PDF 啟動測試(分類器閘 SKIP 正確)+主動 ETF 37 檔功能答覆",
    "note": "①PDF 鑑識:全樹 20 件 PDF+zip 逐件首頁特徵掃(PyMuPDF;券商名/評等/目標價/分析師特徵字);判定=零券商個股報告(最接近者 FactSet EarningsInsight=市場週報;p766=IEEE 論文;其餘為規格/筆記);VRN input/incoming=空(.gitkeep),64 筆報告 PDF 原件在工作站 OneDrive 側未入 git。三券商測試冊三槽維持 PENDING_UPLOAD。②啟動測試:digest v0109 二十一檢 21/21 綠+真 PDF 實跑(EarningsInsight 入 --dir)→分類器閘誠實 SKIP『非個股報告(無有效代碼)』,報告 1/OK 0/FAIL 0/SKIP 1=管線端到端可運作且不假抓(存證 DIGEST_20260824_133803+U/I)。③主動 ETF 答覆:37 檔(股票 24+海外 6+債券 7);自動功能=ENG046 --sync-etf 冊同步(離線,已實測冪等)+EF-43 新掛牌追蹤(矩陣宣告)+TWSE 實連自動驗證(引擎就緒,候網路;34 檔 PENDING_VERIFY+3 名碼衝突候定奪)。"
+  },
+  {
+   "code": "TOOL-118",
+   "kind": "收容+正名",
+   "ts": "2026-08-24 15:55",
+   "name": "批118:三代號正則正名 TWEquityTicker 家族入 SSOT+ActiveTWETFTicker 升格 LOCKED+主動 ETF 每日持股引擎收容整合(ENG051,自測全綠)+grid v0148=85 站",
+   "note": "①正名(操作員裁:YF 碼含全球商品,台股個股式須命名分層):regex 治理中心新增四 LOCKED 式=TWEquityTicker(官方四碼,alias TW_TICKER_LOCKED)/TWEquityYFTicker(^([1-9]\\\\d{3})\\\\.(TW|TWO)$)/TWEquityBBGTicker(^([1-9]\\\\d{3})\\\\s+TT$)/ActiveTWETFTicker(^00\\\\d{2,3}[AD]$,自 ENG046 升格鎖管);VDF/VAP canonical 各 +2 新名鍵(舊鍵標 renamed_to,只增不減零刪除)。②持股引擎:原件 VIA_ActiveTWETF_DailyHoldings_Engine_v0101_DuckDB.py 原樣收容 new modules engines/;整合版 VDF_ENG051(v1.0.2-via):雙橋(SuperAccel+統包網路)+R2 修(原件 Downloads 寫死根=黑名單→VIA 根動態)+宇宙鏈三段(ActiveTWETF_Latest.csv→TW_Active_ETF_Registry 37 冊取 A 碼→bootstrap 22 檔)+代碼式對齊 ActiveTWETFTicker。功能:投信官方 adapter(群益 00992A 已實作)→MoneyDJ 後備、品質閘七檢(權重總和/重複/日期)、DuckDB 冪等(delete+insert 天然鍵)+Parquet 分區(DuckDB 直寫零 pyarrow)+持股增減偵測(ADDED/REMOVED/INCREASED/DECREASED)。實測:--self-test all_pass(duckdb 1.5.5 裝機)+宇宙鏈驗證 37 冊→A 碼 30 檔(D 債券 7 正確排除)。③via-etfhold 動詞+grid v0148=85 站全綠 OK 78·FAIL 0。實抓候網路(MoneyDJ/投信官網同受容器政策擋);工作站 via-etfhold 即跑每日持股。"
   }
  ]
 }
