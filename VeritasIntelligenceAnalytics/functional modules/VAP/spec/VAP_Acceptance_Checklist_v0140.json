@@ -1,0 +1,55 @@
+{
+ "system": "VIA VeritasAutoPlot (VAP)",
+ "title": "VIA VAP 量化視覺分析台 驗收清單 (AutoPlot Acceptance Checklist)",
+ "version": "v0140+",
+ "audited": "2026-08-24 19:18",
+ "auditor": "VAP_ENG006_AcceptanceAudit_v0100(批124;機器稽核零 Pending)",
+ "checks": [
+  {
+   "id": "VAP-MGR-01",
+   "status": "OK",
+   "evidence": "Invoke-VAP.ps1=在位;絕對路徑跨存 VDF=0 件(相對合約路徑不計)"
+  },
+  {
+   "id": "VAP-MGR-02",
+   "status": "OK",
+   "evidence": "chartspec_registry=在位含 chartspec 鍵;14 枝族群機讀冊=VIA_Market_Intelligence_Registry_Summary_v0400.json:categories×14(A-N 14 枝含台股族群/量價資金品質指標)"
+  },
+  {
+   "id": "VAP-VIS-01",
+   "status": "OK",
+   "evidence": "chartlib SSOT 28 型(要求 28);渲染=ENG001 SVG 靜態理印,零前端互動特效"
+  },
+  {
+   "id": "VAP-VIS-02",
+   "status": "OK_EQUIV",
+   "evidence": "Router 缺;等效模組 vap_spec_guard(TOOL-083 圖規鎖)selftest rc=0(criteria『等模組』條款)"
+  },
+  {
+   "id": "VAP-ISO-01",
+   "status": "OK",
+   "evidence": "VAP 根層零 VDF_*.py/.ps1(單向依賴 VAP→VDF 保持)"
+  },
+  {
+   "id": "VAP-ISO-02",
+   "status": "OK",
+   "evidence": "活動樹零 Runtime_Bridge 匯入(SCOPE_COPY 惰性存檔不計);Py↔前端=JSON 檔案交換(chartlib/模板冊/run.json)"
+  },
+  {
+   "id": "VAP-DB-01",
+   "status": "OK",
+   "evidence": "vap_intelligence.duckdb 表=['ta_runs', 'tpl_runs'];列數={'ta_runs': 362, 'tpl_runs': 6}"
+  },
+  {
+   "id": "VAP-UI-01",
+   "status": "OK",
+   "evidence": "藍圖區塊:{'圖型冊': True, '工作台': True, 'SSOT': True, '面板組合': True}"
+  }
+ ],
+ "summary": {
+  "OK": 7,
+  "OK_EQUIV": 1,
+  "PARTIAL": 0,
+  "FAIL": 0
+ }
+}
