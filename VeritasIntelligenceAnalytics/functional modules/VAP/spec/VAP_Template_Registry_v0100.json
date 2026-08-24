@@ -1,0 +1,82 @@
+{
+ "schema": "vap-template-registry-v1",
+ "source": "批123 操作員令(2026-08-24):各類軸/雙軸/地圖上的資料/熱力圖/各類圖形的組合及規格的事先設定及隨時可更改的彈性/堆疊圖;參考 MacroMicro/TradingView/seaborn/plotly;模板保存;資料庫資料自動更新",
+ "policy": "append-only 只增不減;渲染即重讀資料來源=自動更新(auto_update=on_render);params=事先設定,--set k=v 隨時覆寫(不回寫冊);--save-as 另存新模板;圖規鎖(TOOL-083)palette=snsDeep·相關熱圖 diverging·zmid=0 遵守",
+ "engines": {
+  "dual|series|stack|panels": "VAP_ENG001_AutoplotEngineChartlib_v* 最新版(動態 glob;SVG 理印)",
+  "corrheat": "ENG005 內建 seaborn heatmap(diverging·center 0·[-1,1])",
+  "ta_overlay": "VAP_ENG004_TAFactory_v* 最新版(動態 glob)+matplotlib",
+  "map": "leaflet 自足 HTML(SSOT adv/map 型;工作站瀏覽器開啟)"
+ },
+ "templates": [
+  {
+   "name": "twii_gspc_dual",
+   "zh": "台股加權 × 標普500 雙軸",
+   "kind": "dual",
+   "chart_ref": "dual/dline",
+   "data": {"source": "rawwide", "path": "VDF_MacroRawWide.json", "table": "VDF_MacroRawWide", "x": "date"},
+   "params": {"left": "TWII", "right": "GSPC", "left_form": "area", "right_form": "line"},
+   "auto_update": "on_render"
+  },
+  {
+   "name": "unemp_duration_stack",
+   "zh": "美國失業持續期組成 堆疊面積",
+   "kind": "stack",
+   "chart_ref": "stack/sarea",
+   "data": {"source": "rawwide", "path": "VDF_MacroRawWide.json", "table": "VDF_MacroRawWide", "x": "date"},
+   "params": {"series": "U_LT5,U_5_14,U_15_26,U_27", "mode": "sarea"},
+   "auto_update": "on_render"
+  },
+  {
+   "name": "rates_panels",
+   "zh": "美債 2Y/10Y × 10Y-2Y 利差 同軸多面板",
+   "kind": "panels",
+   "chart_ref": "single/line(VAP-CH-09 變體)",
+   "data": {"source": "rawwide", "path": "VDF_MacroRawWide.json", "table": "VDF_MacroRawWide", "x": "date"},
+   "params": {"panels": "DGS2,DGS10;T10Y2Y:bar"},
+   "auto_update": "on_render"
+  },
+  {
+   "name": "macro_corrheat",
+   "zh": "跨資產報酬相關熱力圖",
+   "kind": "corrheat",
+   "chart_ref": "adv/corrheat",
+   "data": {"source": "rawwide", "path": "VDF_MacroRawWide.json", "table": "VDF_MacroRawWide", "x": "date"},
+   "params": {"columns": ["TWII", "GSPC", "SOX", "DXY", "VIX", "GOLD", "DGS10", "hy_oas"],
+              "on": "returns", "lookback": 240},
+   "auto_update": "on_render"
+  },
+  {
+   "name": "twii_ta_overlay",
+   "zh": "台股加權 × SMA 週期輪疊圖(TradingView 式)",
+   "kind": "ta_overlay",
+   "chart_ref": "ta/candle(收盤+SMA 變體)",
+   "data": {"source": "rawwide", "path": "VDF_MacroRawWide.json", "table": "VDF_MacroRawWide", "x": "date"},
+   "params": {"instrument": "TWII", "periods": [20, 60, 240], "lookback": 720},
+   "auto_update": "on_render"
+  },
+  {
+   "name": "world_indices_map",
+   "zh": "全球主要指數 地圖 × 數據",
+   "kind": "map",
+   "chart_ref": "adv/map(leaflet)",
+   "data": {"source": "rawwide", "path": "VDF_MacroRawWide.json", "table": "VDF_MacroRawWide", "x": "date"},
+   "params": {"delta_days": 5,
+              "markers": [
+               {"col": "TWII", "label": "台股加權 TAIEX", "lat": 25.033, "lon": 121.565},
+               {"col": "GSPC", "label": "S&P 500", "lat": 40.707, "lon": -74.011},
+               {"col": "IXIC", "label": "NASDAQ", "lat": 40.756, "lon": -73.986},
+               {"col": "N225", "label": "Nikkei 225", "lat": 35.676, "lon": 139.65},
+               {"col": "KOSPI", "label": "KOSPI", "lat": 37.566, "lon": 126.978},
+               {"col": "HSI", "label": "恒生指數", "lat": 22.319, "lon": 114.169},
+               {"col": "STOXX", "label": "STOXX 600", "lat": 50.11, "lon": 8.682},
+               {"col": "SSEC", "label": "上證綜指", "lat": 31.23, "lon": 121.474}
+              ]},
+   "auto_update": "on_render",
+   "note": "leaflet tiles 由工作站瀏覽器連線載入;容器離線=HTML 照產(誠實)"
+  }
+ ],
+ "changelog": [
+  {"ts": "2026-08-24", "op": "INIT", "note": "批123 建冊;六種子模板(雙軸/堆疊/多面板/熱力/TA疊圖/地圖)"}
+ ]
+}
