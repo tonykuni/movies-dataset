@@ -4164,6 +4164,13 @@
    "ts": "2026-08-25 19:20",
    "name": "批157「將所有 NLP 工具整合支援 VRN Summarizer」:VRN_ENG066 NLPSupportHub 統一門面(ENG064 正主堆疊+finlex 字庫+jieba 分詞→ENG062 摘要核心唯讀掛接)+摘要誠實閘",
    "note": "【去重紀律】引擎不重造、正本零觸碰:底層全複用 glob 尾版——正規化/實體/三元組=ENG064 v0101(批152 正主 npl_preprocessor+批141 三引擎)、分詞=LocalKnowledgePipeline jieba 道、財務詞彙=vrn_finlex v0104、摘要核心=VRN_ENG062 SummarizerV1(ExtractiveSummarizer 唯讀消費;digest v0113 掛接不動)。【三 API】enrich_for_summary=前處理包(正規化文+實體+三元組+關鍵詞[INDICATOR∪字庫命中]+錨定選句[實體×三元組密度排序]+數字清單);verify_summary=摘要誠實閘(摘要中數字/百分比/INDICATOR/ORG 實體逐一回源驗證,ungrounded 非空即攔=「AI 只整理不發明」的 NLP 化;自測⑦實證發明數字 9.99% 必攔);support_summarizer=端到端(enrich→ENG062 五點→verify→增強摘要包:bullets+實體錨+三元組要點+關鍵詞+驗證,ENG062 缺席=錨定選句誠實後備)。九檢一次全綠。grid v0173=112 站;名冊 VRN_ENG=66。後續掛接面:digest/MailIntel/報告批跑可逐步改經 hub 消費(現行為零觸碰,消費端自選)。」"
+  },
+  {
+   "code": "TOOL-160",
+   "kind": "批158 三語知識體",
+   "ts": "2026-08-25 19:50",
+   "name": "批158「三語文章→關鍵字 SSOT→分類→漸進知識體 Mind map」:VRN_ENG067 MindMapSSOT(ENG066 樞紐×ENG063 K 樹×庫內冊分類)",
+   "note": "【去重】引擎不重造:三語讀入=ENG066(OpenCC 簡→繁+實體+關鍵詞)、英文=大寫頭 token+ENG063 雙語冊收斂至繁體正字(Target Price→目標價別名)、K 枝=ENG063 SEED_TREE 掛載(TOOL-059 續體)。【SSOT】dict/VRN_KeywordSSOT_v0100.json append-only:KW-#### 編號/canonical 繁體正字/zh-CN·en 別名/freq/sources/同句共現累積——每 ingest 增量合併=逐漸形成。【分類】庫內冊命中制零發明:INDICATOR·POLICY_ORG·CONCEPT(ENG064 實體)/TICKER(tw_listings 1,979)/INDUSTRY(VIA-IND 35 碼)/GROUP(v0202 39 族群)/RATING(K1.1 詞面)/GENERAL。【map】放射樹 HTML(分類八枝+freq 節點+跨枝同句共現虛線 Top20+K 枝尾碼;淺色主控台風+viewport 自適應),每次攝入由 SSOT 全量重生。【QA 二實錘】①OpenCC 正字漂移:norm「臺積電」對冊名「台積電」失配→冊名+正規化變體雙鍵掃描視圖(修檢不改正字);②EN regex 小寫頭吞大寫詞:「the Target Price」整串被棄→大寫頭才允許多詞延伸+尾標點剝除。九檢綠;三語樣文實跑 3 攝入→SSOT 21 字七分類、map 交付操作員。grid v0174=113 站;名冊 VRN_ENG=67。」"
   }
  ]
 }
