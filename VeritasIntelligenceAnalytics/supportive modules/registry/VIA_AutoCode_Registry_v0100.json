@@ -4024,6 +4024,13 @@
    "ts": "2026-08-25 13:25",
    "name": "批138 FRED 鑰到位:L8 美宏觀 16 series 1,254 筆+ENG055 v0101 L9 跨區宏觀(FRED 活序列 9 條實測入冊)6,010 筆落庫;台灣三項+日 CPI+歐日中 PPI=FRED 缺/停更誠實候源;DGS20 補位(批128 懸案結)",
    "note": "操作員交付 FRED API key(僅存 output_hub/mega/.fred_api_key gitignore 區 chmod 600,絕不入 git)。【L8】美宏觀 16 series 全通 1,254 筆(CPI 總/核心、PCE 總/核心、PPIFIS、失業率、非農、初領、時薪、個人所得、實質可支配、PCE 支出、零售、密大信心、開工、DGS20=批128 美債 20Y 懸案結)。【L9】ENG055 v0100→v0101:CROSS_SERIES 冊=逐序列 API 實測活性後取 9 條(US/EA/CN CPI;US PPI;US/EA/JP/CN 央行利率;US10Y)6,010 筆入 cross_macro(region×metric 表);實測揭示 FRED 停更/缺口:JPNCPIALLMINMEI 止於 2022-04、EA/JP/CN PPI 停更、台灣 CPI/PPI/利率/10Y 全缺=候 dgbas.gov.tw/cbc.gov.tw/stats.gov.cn 白名單(單 004 誠實列冊);_fred_key() 鑰匙檔後備(env 優先)。八檢綠;grid 站 glob 自動接 v0101。【回補】台股日線背景段跑(10 分鐘沙盒上限截斷=checkpoint 保全生效零浪費,分段 750 檔續跑中;405/1979 已庫 259,098 列)。"
+  },
+  {
+   "code": "TOOL-140",
+   "kind": "三域續抓波",
+   "ts": "2026-08-25 13:55",
+   "name": "批139 三域白名單續抓:CBC 臺銀利率史 307 月落庫(L10;curl 子程序道破 TLS 指紋重置)+NBS WAF/nstatdb TLS/DGBAS 檔徑三缺口誠實列冊+回補雙工人互踩債修(DB 真值重建 checkpoint;冪等 upsert 保資料零損)",
+   "note": "操作員加白 dgbas/cbc/stats.gov.cn 後續抓。【實測】www.dgbas 200·nstatdb 404 可達但 TLS SYSCALL 異常·www.cbc 302·data.stats.gov.cn 302 可達但 easyquery API 遭 WAF UrlACL 拒雲端 IP(伺服器端封鎖=白名單也無解)·DGBAS 舊檔徑 cpispl/ppispl 403·CBC/DGBAS 現代頁=JS 殼無靜態連結(時間盒紀律停盲獵)。【落地】CBC a13rate.xls 臺銀存放款利率史 307 月(2001-01→2026-07)→ENG055 v0102 L10 車道(curl 子程序道:CBC 對 urllib/requests TLS 指紋重置,curl 可通;ROC 年月轉西元;誠實旗標=臺銀掛牌利率非央行政策利率)入 tw_rates_cbc;八檢綠。【缺口冊】TW CPI/PPI=DGBAS 檔徑候查(建議補白 index.dgbas.gov.tw+data.gov.tw);TW 政策利率(重貼現率)檔徑候查;CN CPI/PPI=NBS WAF 拒雲端 IP 誠實無解(FRED CHNCPI 至 2025-04 為現況最佳)。【債修】台股回補發現雙工人並行(12:12 原跑未如預期被時限回收+12:54 分段)互踩 checkpoint:資料庫 anti-join 冪等=資料零損,僅 checkpoint 低報;處置=全停→由 DB distinct ticker 真值重建 checkpoint(485 標的 310,281 列)→單工人分段續跑(650/段防沙盒 10 分時限)。」"
   }
  ]
 }
