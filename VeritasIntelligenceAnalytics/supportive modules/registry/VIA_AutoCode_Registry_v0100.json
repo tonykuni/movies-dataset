@@ -4115,6 +4115,13 @@
    "ts": "2026-08-25 15:20",
    "name": "批151 Go on:資料庫總對帳快照(三庫 24 表交付)+QA-20260825C 日期混制債修(L2/L3/L4 TWSE Date ROC 7 碼/緊湊 8 碼→_iso_date 統一 ISO;既存列 SQL 遷移驗證過)",
    "note": "【快照】三庫 24 表:tw 庫 13 表(價格 1,065,556 列 2024→2026-08-25/法人 755,635/資券 731,667/衍生 521,339…)+global 庫 7 表(global_daily 51,221/cross_macro 6,112/us_macro 1,254/sentiment 252/factset 3…)+ETF 持股庫 4 表(holdings 1,182);批128/137 覆蓋對照+候源誠實清單隨附交付。【QA-20260825C】快照揪出 tw_trading_daily/tw_valuation_daily/tw_market_agg 日期存 ROC 7 碼(1150824)與全庫 ISO 不一致=ENG055 L2/L3/L4 直存 TWSE Date 原文;修=v0106→v0107 _iso_date 正規化(ROC+1911/8 碼補槓/ISO 直通)+既存列 duckdb regexp UPDATE 遷移;三表覆核 MIN/MAX 全 ISO。教訓:官方多制日期一律入庫前正規化。八檢綠;開機更新自動接 v0107。」"
+  },
+  {
+   "code": "TOOL-153",
+   "kind": "批152 收容整合",
+   "ts": "2026-08-25 15:45",
+   "name": "批152「Integrete and optimize」四件處置:雙讓位(VeritasAutoPlot_v4.2 tar 核心 33/33 byte 全同批125+架構 HTML 全同內含件)+雙新件收容整合(VIA_TW_Grouping_LatestCommand_v0202 統一輪動引擎→GRP_ENG040 實庫轉接實跑 gate=PASS;local_nlp_stack_upgrade npl_preprocessor 正主→VRN_ENG064 v0101 正主優先)",
+   "note": "【讓位】d6678cc6 tar.gz sha256=58c789ea…(核心 33 檔 byte 全同批125 收容版,僅多 13 個 output/ 再生件=批125 政策本就排除);01baf2c1 架構 HTML sha256=bb12c102…(byte 全同批125 內含件;已閱=生態五子系統/AST 編號/SSOT schema 參考規格)。【收容①】91f13f55 zip(13.7MB)→GroupIndex/VIA_TW_Grouping_LatestCommand_v0202/(89 件 byte-exact;核心 GroupingIndexRotationUnifiedEngine v0201 2,544 行+238 檔 39 族群名冊+包內 pytest 20 綠 Linux 實證)。GRP_ENG040 轉接器(017 撞號勘誤→040;名冊 counter 40):實庫 parquet 匯出(adj_close 正項+tw_trading_daily.trade_value→Turnover 真值;籌碼股數不冒充金額欄=誠實留缺)+v0202 日期紀律(--start=暖機 2025-01-02/--normalized=基準 2026-01-02/end=庫內最新);實跑 190/238 檔 121,600 列→gate=PASS(族群指數 10,238+輪動 15,522+熱力圖;output_hub gitignored)。六檢綠;grid v0169=106 站。【收容②】8855a9e0 zip→new modules engines/VIA_NLPStackUpgrade_Batch152/(12 件;三引擎檔與批141 全同=讓位,真價值=npl_preprocessor 正主 550 行+雙測試檔 12 passed/4 skipped)。VRN_ENG064 v0101:正主檔案級載入優先(dataclass 需先掛 sys.modules=QA 實錘)、spaCy 缺=混血(正主 Normalizer+補殼規則 NLP,裝模型即全正主)、敗回滾退補殼;九檢綠;ENG065 glob 自動吃版八檢綠。」"
   }
  ]
 }
