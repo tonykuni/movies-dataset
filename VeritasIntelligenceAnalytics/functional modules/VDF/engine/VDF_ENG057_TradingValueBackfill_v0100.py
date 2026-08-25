@@ -85,12 +85,13 @@ def curl_json(url: str) -> dict | None:
     if _NET and hasattr(_NET, "curl_json"):
         r = _NET.curl_json(url)
         return r.get("data") if r.get("state") == "OK" else None
+    # bytes 整體 decode(text=True 串流於中文多位元組邊界斷裂=UnicodeDecodeError)
     r = subprocess.run(["curl", "-sS", "--max-time", "40", "-A", UA, url],
-                       capture_output=True, text=True)
+                       capture_output=True, text=False)
     if r.returncode != 0:
         return None
     try:
-        return json.loads(r.stdout)
+        return json.loads((r.stdout or b"").decode("utf-8", "replace"))
     except Exception:
         return None
 
@@ -166,15 +167,18 @@ _TPEX_URL: str | None = None
 
 
 def _tpex_probe(sample_slash: str) -> str | None:
-    """啟動時變體探測(同 ENG056 當沖手法);全敗=誠實 TPEX_PENDING"""
+    """啟動時變體探測(同 ENG056 當沖手法);每變體重試 3 次退避
+    (單發瞬斷不得棄整車道=批156 韌性精神);全敗=誠實 TPEX_PENDING"""
     global _TPEX_URL
     if _TPEX_URL is not None:
         return _TPEX_URL or None
     for tpl in TPEX_VARIANTS:
-        js = curl_json(tpl.format(slash=sample_slash))
-        if js and parse_tpex(js, "probe"):
-            _TPEX_URL = tpl
-            return tpl
+        for attempt in range(3):
+            js = curl_json(tpl.format(slash=sample_slash))
+            if js and parse_tpex(js, "probe"):
+                _TPEX_URL = tpl
+                return tpl
+            time.sleep(1.5 * (attempt + 1))  # 退避重試
     _TPEX_URL = ""
     return None
 
