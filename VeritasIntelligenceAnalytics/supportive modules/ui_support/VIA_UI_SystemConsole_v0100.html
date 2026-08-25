@@ -1,0 +1,72 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA System Console</title>
+<style>
+:root{--bg:#f6f7f9;--card:#ffffff;--ink:#1f2937;--sub:#6b7280;--line:#e5e7eb;
+--ok:#059669;--warn:#d97706;--bad:#dc2626;--accent:#2563eb;
+--fs-xs:clamp(10px,.65vw,12px);--fs-s:clamp(11px,.75vw,13px);
+--fs-m:clamp(12px,.9vw,15px);--fs-l:clamp(15px,1.2vw,19px)}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font:400 var(--fs-m)/1.55
+-apple-system,"Segoe UI","Noto Sans TC",Roboto,sans-serif;padding:18px}
+header{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;margin-bottom:14px}
+h1{font-size:var(--fs-l);font-weight:600;letter-spacing:.2px}
+.sub{color:var(--sub);font-size:var(--fs-xs)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;
+padding:12px 14px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+.card h2{font-size:var(--fs-s);font-weight:600;color:var(--sub);
+text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.kpis{display:flex;gap:14px;flex-wrap:wrap}
+.kpi b{font-size:var(--fs-l);font-weight:600}
+.kpi span{display:block;color:var(--sub);font-size:var(--fs-xs)}
+.chip{display:inline-block;padding:1px 8px;border-radius:99px;
+font-size:var(--fs-xs);font-weight:600}
+.G{background:#ecfdf5;color:var(--ok)}.Y{background:#fffbeb;color:var(--warn)}
+.R{background:#fef2f2;color:var(--bad)}
+table{width:100%;border-collapse:collapse;font-size:var(--fs-s)}
+td,th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;
+white-space:nowrap}
+th{color:var(--sub);font-weight:500;font-size:var(--fs-xs)}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto}
+footer{margin-top:14px;color:var(--sub);font-size:var(--fs-xs)}
+</style></head><body>
+<header><h1>VIA System Console</h1>
+<span class="sub">三級測試金字塔 · 母系統×子系統×支援鏈 · 淺色主控台</span>
+<span class="chip" id="verdict"></span>
+<span class="sub" id="gen"></span></header>
+<div class="grid" id="root"></div>
+<footer>PC 橫向自動調節:CSS grid auto-fit + clamp() 字階;資料=最新 PYRAMID 存證(唯讀)。</footer>
+<script id="data" type="application/json">{"report": {}, "db": [{"db": "tw_market", "table": "etf_book", "rows": 268}, {"db": "tw_market", "table": "tw_chip_inst", "rows": 121833}, {"db": "tw_market", "table": "tw_chip_margin", "rows": 124372}, {"db": "tw_market", "table": "tw_daily_prices", "rows": 462542}, {"db": "tw_market", "table": "tw_listings", "rows": 1979}, {"db": "tw_market", "table": "tw_listings_industry", "rows": 1979}, {"db": "tw_market", "table": "tw_market_agg", "rows": 16}, {"db": "tw_market", "table": "tw_rates_cbc", "rows": 307}, {"db": "tw_market", "table": "tw_trading_daily", "rows": 2265}, {"db": "tw_market", "table": "tw_valuation_daily", "rows": 1969}, {"db": "global_market", "table": "cross_macro", "rows": 6010}, {"db": "global_market", "table": "etf_stats_daily", "rows": 58}, {"db": "global_market", "table": "global_daily", "rows": 51221}, {"db": "global_market", "table": "index_valuation_proxy", "rows": 26}, {"db": "global_market", "table": "sentiment_daily", "rows": 252}, {"db": "global_market", "table": "us_macro", "rows": 1254}], "generated": "2026-08-25 13:29"}</script>
+<script>
+const D=JSON.parse(document.getElementById('data').textContent);
+const R=D.report||{};const cls=v=>v==='GREEN'?'G':(v==='RED'?'R':'Y');
+document.getElementById('verdict').textContent=R.verdict||'N/A';
+document.getElementById('verdict').className='chip '+cls(R.verdict);
+document.getElementById('gen').textContent='產出 '+D.generated;
+const root=document.getElementById('root');
+function card(title,inner){const c=document.createElement('div');
+c.className='card';c.innerHTML='<h2>'+title+'</h2>'+inner;root.appendChild(c)}
+const u=R.T1_unit||{};
+card('T1 單元測試(grid 全矩陣)',
+ '<div class="kpis"><div class="kpi"><b style="color:var(--ok)">'+(u.ok??'–')+
+ '</b><span>OK</span></div><div class="kpi"><b style="color:var(--bad)">'+(u.fail??'–')+
+ '</b><span>FAIL</span></div><div class="kpi"><b style="color:var(--warn)">'+(u.skip??'–')+
+ '</b><span>SKIP(環境缺件誠實)</span></div></div><div class="sub" style="margin-top:6px">'+
+ (u.grid||'')+'</div>');
+card('T2 整合測試(跨件互接)','<table>'+((R.T2_integration||[]).map(r=>
+ '<tr><td><span class="chip '+(r.state==='OK'?'G':'R')+'">'+r.state+'</span></td><td>'+
+ r.key+'</td><td class="sub">'+r.note+'</td></tr>').join(''))+'</table>');
+const s=R.T3_system||{};
+card('T3 系統測試(autorun 六站)','<table>'+((s.stations||[]).map(x=>{
+ const st=x.match(/GREEN|YELLOW|RED/);const c=st?st[0][0]:'Y';
+ return '<tr><td><span class="chip '+c+'">'+(st?st[0]:'?')+'</span></td><td class="sub">'+
+ x.replace(/\[.*?\]/,'').trim()+'</td></tr>'}).join(''))+
+ '</table><div class="sub" style="margin-top:6px">'+(s.summary||'')+'</div>');
+const by={};(D.db||[]).forEach(r=>{(by[r.db]=by[r.db]||[]).push(r)});
+Object.entries(by).forEach(([db,rows])=>card('資料庫 · '+db,
+ '<div class="scroll"><table><tr><th>表</th><th style="text-align:right">列數</th></tr>'+
+ rows.map(r=>'<tr><td>'+r.table+'</td><td class="num">'+r.rows.toLocaleString()+
+ '</td></tr>').join('')+'</table></div>'));
+</script></body></html>
