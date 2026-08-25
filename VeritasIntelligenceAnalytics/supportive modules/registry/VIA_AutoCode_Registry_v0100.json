@@ -4038,6 +4038,13 @@
    "ts": "2026-08-25 14:30",
    "name": "批140 Go on:VDF_ENG056 籌碼回補引擎(雙所法人+資券逐日)+QA-20260825A 錯位債實錘修復(duckdb 位置插入→按欄名)+真值核對過(0050 買27/賣19/前468/今476)+全量常駐跑;grid v0163=100 站",
    "note": "批128 籌碼面補完啟動。【引擎】VDF_ENG056_ChipBackfill_v0100(名冊 56;via-chip;六檢綠):四車道×交易日=twse_t86(三大法人逐股;外資=外陸+外資自營合成)/twse_margin(MI_MARGN 融資融券彙總逐股)/tpex_inst(櫃買法人;net 欄按「買賣超」字樣自動定位抗欄序漂移)/tpex_margin(櫃買資券);交易日曆=已庫 tw_daily_prices 實際日期零猜測;傳輸=curl 子程序道(rwd/www 對 requests TLS 指紋重置);節流 1.2s(TWSE 限流紀律);checkpoint=日×車道粒度,傳輸敗不記 done 保重試權(初版空即記 done=喪失重試,已修);80 呼一批 parquet+duckdb 冪等。當沖 TWTB4U=安全頁攔,DAYTRADE_PENDING 誠實候探。【QA-20260825A】duckdb INSERT SELECT * 按位置對欄:雙所 dict 鍵序異→TWSE 融資列錯位入 TPEX 欄序(買進值進前日餘額欄)實錘;修=按欄名插入(缺欄 ALTER ADD)+污染列清除重抓+真值核對 0050 20240102(買27/賣19/前468/今476)四欄全中。教訓:混源同表必按欄名插入。【衍生】--derive=券資比(短/資餘額,0=NULL 誠實)+法人淨合流 tw_chip_derived。【運行】價格回補(ENG054)與籌碼回補(ENG056)雙常駐監看並行;Yahoo 端當日重度限流=價格側減速(AegisNexus 退避),TWSE/TPEX 側正常。grid v0163=第 100 站里程碑。"
+  },
+  {
+   "code": "TOOL-142",
+   "kind": "候件收編+情緒源",
+   "ts": "2026-08-25 15:40",
+   "name": "批141 五件收容整合:知識堆疊(補殼轉接八檢綠)+mail tracker v2 收編(pytest 2 綠+P2382 真值)+L11 市場情緒(CNN F&G 破 418 實抓 252 筆先保留;AAII 訂閱牆/akshare 已移除介面誠實候源);grid v0164=101 站",
+   "note": "操作員令:akshare 可查 aaii/cnn f&g 先保留擷取資料;系統完善化整合最強化測試無誤後收編。【收容】new modules engines/VIA_KnowledgeStack_Batch141/ 五件 byte-exact(sha16:4bc381ae/95a44302/3110fa8b/9190c953/fd504ac3)+zip 樹展開。【知識堆疊】送達件 import npl_preprocessor 未隨包=缺依賴實錘→VRN_ENG064_KnowledgeStack_v0100(名冊 64;via-know)記憶體級補殼(sys.modules 預掛零污染收容夾;NFKC 全形轉半形+OpenCC s2twp 簡繁+分句+規則實體 INDICATOR/POLICY_ORG/PERCENT/DATE/CONCEPT;spaCy 缺=規則道誠實後備,裝模型即自動升級)。環境補裝 jieba+opencc 純 Python 版(akshare 依賴 jsonpath 建輪敗→--no-deps+手補依賴)。八檢綠:demo 三型齊(metric/causation/policy)+真值三檢(NPL Ratio→1.85%/房地產市場波動因果/金管會政策)+圖載荷+jieba 分詞+②修檢(OpenCC 正字賬/帳=送達件 alias 表下游收斂,修檢非修殼)。【mail tracker v2】純標準庫八模組管線(identity/parser/semantic/project/dept/sla/lifeline/workflow;PEP621/735 包裝);收編測=pytest 2/2 綠+P2382 樣例 API 真值(guide PDF 對勘)。【L11 情緒】ENG055 v0102→v0103:CNN Fear&Greed 官方 dataviz API(418 茶壺擋=補 Referer 破)252 筆(歷史+今值 54.6 neutral)入 sentiment_daily+原始 JSON 先保留(操作員令);AAII sentiment.xls=站方訂閱牆 403 誠實候源;akshare 1.18.94 已移除 aaii/fear_greed 介面(changelog 佐證)=akshare 道不可行誠實列冊。grid v0164=101 站。」"
   }
  ]
 }
