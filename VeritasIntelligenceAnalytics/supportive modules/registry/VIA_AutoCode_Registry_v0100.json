@@ -4150,6 +4150,13 @@
    "ts": "2026-08-25 17:20",
    "name": "批156「被限流/黑名單時解除限制」:SUP_MDL741 網路韌性診斷層(對症解限流/TLS指紋/瞬斷;無爬蟲解誠實 PENDING)+curl bytes 解碼修(TPEX 大缺真兇)+ENG057 探測退避重試",
    "note": "【立場紅線】對象=官方公開資料(TWSE/TPEX openapi 等我方有權取);解法=禮貌化(自適應節流)+韌性(退避重試/端點鏡像/斷點續跑)+對症診斷;不做規避軍備(不繞 IP 封鎖/不解 CAPTCHA/不偽裝指紋擊破偵測);雲端 IP WAF 拒(NBS)+訂閱付費牆(AAII/S&P PMI)=NO_WORKAROUND→誠實 PENDING 絕不假綠。【SUP_MDL741】classify_failure 分類器(RATE_LIMIT/TLS_FINGERPRINT/REFERER_GATE/TRANSIENT/WAF_IP_BAN/PAYWALL/NOT_FOUND;十例真值綠)→每類對應 remedy;AdaptiveThrottle(限流訊號倍增封頂 30s+連五成功溫和降回下限);HOST_POLICY 主機政策冊(TWSE/TPEX/Yahoo/鉅亨/FRED/NBS 節流下限+偏好車道+已知限制);resilient_fetch 對症韌性抓取(政策選車道→退避重試→限流自適應→無解立即誠實收,attempts 可審計);diagnose 尊重政策冊已證無解主機不重探。七檢綠。【實測揪真兇】TPEX 成交值大缺(僅 3/640 日)診斷=非黑名單非限流,而是 subprocess text=True 串流在多位元組中文字元邊界斷裂 UnicodeDecodeError 0xe8(前見 curl:(23) 同源)→SUP_MDL740 v0108+ENG057 curl 車道改 capture bytes 後整體 decode(errors=replace);TPEX 3→21 日即證修復。【韌性補】NBS 診斷實測初判 UNKNOWN(HTML 殼未帶 WAF 字樣)→分類器補「JSON 端點回 HTML 殼=軟封鎖 WAF_IP_BAN」+diagnose 尊重政策冊 lane=None 已知無解;ENG057 _tpex_probe 單發改 3 次退避重試(單瞬斷不棄整車道)。grid v0172=111 站;名冊 SUP_MDL=741。」"
+  },
+  {
+   "code": "TOOL-158",
+   "kind": "批154 收口·真值升階",
+   "ts": "2026-08-25 18:55",
+   "name": "成交值歷史回補 100% 完成(1282/1282 日×車道;1,215,692 列真值)→方法論觸發①達成→S2 真值升階重測→v0104;VDF 全資料三包交付操作員(2024→最新)",
+   "note": "【回補終報】TWSE 640+TPEX 640 覆蓋日全清;批156 bytes 解碼修+探測退避為關鍵解(TPEX 3 日→640 日)。【升階對照】val 階梯 PROXY 111,509→907/TRUE_VALUE 13,291→123,893(99.3%);分級延續率 0.9874→0.9871、Spearman 0.9323→0.9328=真值與 PROXY 結論一致(差<0.001)→金流佔比指標對資料層不敏感=穩健成立裁定入 v0104。【交付】操作員令 share all VDF data→2024-01-01 起裁定→duckdb 77MB 超 30MB 傳限→zstd parquet 三包(19/25/28MB 各獨立可用+README):pack1 價量+全球+ETF+估值 band/pack2 成交值+法人/pack3 資券+衍生;打包時暫停工人保庫檔一致、畢即重掛(checkpoint 零損)。【方法論冊鏈】v0100→v0101→v0102→v0103(紅線自足修訂)→v0104(升階收口);餘觸發②-⑤候累積。金字塔複跑 T1 111 站 105 OK/0 FAIL/6 SKIP+T2 六 OK(T3 進行,判詞另錄)。」"
   }
  ]
 }
