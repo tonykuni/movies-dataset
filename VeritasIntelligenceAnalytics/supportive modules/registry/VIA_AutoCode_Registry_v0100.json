@@ -4017,6 +4017,13 @@
    "ts": "2026-08-25 13:10",
    "name": "批137 大擷取令:單 004 落冊(十車道規格+可行性三態)+SUP_MDL740 v0105 quoteSummary 握手道(SPY AUM $795.3B 實證)+VDF_ENG055 OmniFetch 八車道 7 落地 1 候鑰;grid v0162=99 站",
    "note": "操作員令十面:清單附產業/成交值市值/主動 ETF 可更新+AUM 流量/美亞歐南亞指數+匯率+ETF AUM/forward PE·earnings·PB/FactSet 倒推/美宏觀細項/五區 PMI·CPI·PPI·利率/輸出四格式+斷點保全。【單 004】append-only 落冊:十車道+可行性三態(READY 實抓/NEEDS_KEY=FRED 16 series 候鑰/NEEDS_WHITELIST=FactSet·BLS·BEA·ISM·S&P Global·Eurostat·NBS·主計總處候白名單)+公式冊(AUM=totalAssets;flow_est=AUM_t−AUM_{t-1}×(nav_t/nav_{t-1}) ESTIMATE;市值=close×股數;fwd_pe=price/fwd_eps)。【統包】SUP_MDL740 v0105:yahoo_quote_summary 車道(fc.yahoo 種 cookie+getcrumb 標準握手;AUM/nav/股數/PE/PB/marketCap;同意閘先行節流列敗;十六檢綠)。【引擎】VDF_ENG055_OmniFetch_v0100(名冊 55;八檢綠;via-omni):L1 清單附產業(TWSE 產業別冊 37 碼內建對映;1,979 檔;未冊碼 4 誠實)/L2 成交值逐股 2,265+FMTQIK 市場總計/L3 估值 1,969(PE/PB/殖利率)/L4 ETF 冊 268 檔可更新+主動式 32 檔旗標/L5 ETF AUM 快照 58(26 全球+32 台主動;flow_est 候第 2 快照=累計維護)/L6 全球擴編 75 標的 45,265 列(亞洲 11+歐 8+南亞 6/10:^CNX500·巴基斯坦 ^KSE·斯里蘭卡 ^CSE·孟加拉 ^DSEX Yahoo 缺載誠實列敗+匯率 15 對+區域 ETF 26)/L7 指數估值=區域 ETF 代理 [PROXY] 26 筆(FactSet 倒推候白名單)/L8 FRED 候鑰誠實 SKIP。--export parquet|csv|sqlite|gsheet(utf-8-sig)。【韌性】checkpoint+批次即落盤+anti-join 冪等=中斷零浪費(操作員問「突然中斷不浪費之前所抓」之答)。global_daily 現 51,221 列 80 標的;tw_daily_prices 回補中 405/1979(背景續跑)。grid v0162=99 站。」"
+  },
+  {
+   "code": "TOOL-139",
+   "kind": "宏觀鑰匙波",
+   "ts": "2026-08-25 13:25",
+   "name": "批138 FRED 鑰到位:L8 美宏觀 16 series 1,254 筆+ENG055 v0101 L9 跨區宏觀(FRED 活序列 9 條實測入冊)6,010 筆落庫;台灣三項+日 CPI+歐日中 PPI=FRED 缺/停更誠實候源;DGS20 補位(批128 懸案結)",
+   "note": "操作員交付 FRED API key(僅存 output_hub/mega/.fred_api_key gitignore 區 chmod 600,絕不入 git)。【L8】美宏觀 16 series 全通 1,254 筆(CPI 總/核心、PCE 總/核心、PPIFIS、失業率、非農、初領、時薪、個人所得、實質可支配、PCE 支出、零售、密大信心、開工、DGS20=批128 美債 20Y 懸案結)。【L9】ENG055 v0100→v0101:CROSS_SERIES 冊=逐序列 API 實測活性後取 9 條(US/EA/CN CPI;US PPI;US/EA/JP/CN 央行利率;US10Y)6,010 筆入 cross_macro(region×metric 表);實測揭示 FRED 停更/缺口:JPNCPIALLMINMEI 止於 2022-04、EA/JP/CN PPI 停更、台灣 CPI/PPI/利率/10Y 全缺=候 dgbas.gov.tw/cbc.gov.tw/stats.gov.cn 白名單(單 004 誠實列冊);_fred_key() 鑰匙檔後備(env 優先)。八檢綠;grid 站 glob 自動接 v0101。【回補】台股日線背景段跑(10 分鐘沙盒上限截斷=checkpoint 保全生效零浪費,分段 750 檔續跑中;405/1979 已庫 259,098 列)。"
   }
  ]
 }
