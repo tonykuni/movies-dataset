@@ -357,7 +357,7 @@
    "ts": "2026-08-24",
    "source": "批128 操作員總擷取令",
    "window": "2024-01-02 → 最新交易日(日更增量)",
-   "status": "PENDING",
+   "status": "PARTIAL(listings+global_yf 落庫;tw_daily/etf_holdings 委派中)",
    "storage_decision": {
     "format": "parquet(分 lane 分區)+DuckDB 正典庫",
     "databases": "自行決定=兩庫:vdf_tw_market.duckdb(台股清單/每日全欄/籌碼/主動 ETF 持股;官方源+T+1 紀律)+ vdf_global_market.duckdb(國際指數×ETF 對/商品/利率;yfinance/FRED 源)",
@@ -520,7 +520,41 @@
      }
     }
    },
-   "runs": []
+   "runs": [
+    {
+     "run_id": "RUN_20260825_120257",
+     "ts": "2026-08-25",
+     "source": "批136 操作員再擷取令(fetch vdf data again)",
+     "env": "遠端受管容器(TLS 再終結代理;TWSE/TPEX/FRED 直達;Yahoo 經 SUP_MDL740 v0104 無擬真 session 自適應道)",
+     "gates": "VIA_NET_CONSENT=YES+VIA_SCRAPE_CONSENT(操作員令開閘;預檢 TWSE reachable=OK)",
+     "engine": "VDF_ENG052_MegaFetch_v0101 十檢 10/10 綠後實跑",
+     "results": {
+      "tw_listings": {
+       "state": "OK",
+       "TWSE_LISTINGS": 1095,
+       "TPEX_LISTINGS": 890
+      },
+      "global_yf": {
+       "state": "OK",
+       "rows": 21836,
+       "tickers": 33,
+       "window": "2024-01-02→2026-08-25",
+       "parquet": "global_yf_20260825_120256.parquet",
+       "db": "vdf_global_market.duckdb·global_daily 21,836 列(冪等 upsert)"
+      },
+      "tw_daily": {
+       "state": "DELEGATED/PENDING",
+       "note": "逐日回補委派 ENG051/工作站長跑(引擎既定)"
+      },
+      "etf_holdings_daily": {
+       "state": "DELEGATED/PENDING",
+       "note": "同上"
+      }
+     },
+     "evidence": "output_hub/mega/RUN_20260825_120257.json(產物圈依 .gitignore 本地不入版控);首次實抓=單 003 PENDING→PARTIAL(listings+global 落庫)",
+     "sibling": "宏觀清單同日再擷取=_vdf_system/macro_manifest_fetch_runs/RUN_20260825_120500_VDF_MACRO_MANIFEST_REFETCH(53 序列至 2026-08-25)"
+    }
+   ]
   }
  ]
 }
