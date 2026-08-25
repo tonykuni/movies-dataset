@@ -4101,6 +4101,13 @@
    "ts": "2026-08-25 16:10",
    "name": "批149 Go on:--export 四格式首度全量實跑(20 表×parquet/csv/sqlite=416MB;gsheet 相容=utf-8-sig csv;批137 輸出條目結案)+grid v0168=+第 105 站 ENG051 self-test=105 站",
    "note": "批137 輸出面實跑:ENG055 --export 對雙庫 20 表全量匯出 output_hub/mega/export/(gitignored;供工作站取用)——parquet(壓縮主格式)+csv(utf-8-sig=Excel/Google Sheet 直開零亂碼)+sqlite(單檔庫)。gsheet 雲端道=候 OAuth 憑證(相容 csv 已備)。grid v0168:ENG051(批131 收容件)self-test 掛站=收容件測試覆蓋補完。回補:價格 1,603/1979(2 檔 Yahoo 無載)·籌碼 426/640 續跑。」"
+  },
+  {
+   "code": "TOOL-151",
+   "kind": "開機自動更新",
+   "ts": "2026-08-25 16:30",
+   "name": "批150 操作員令「不用固定時間 開啟系統及更新」:固定 16:30 Routine 刪除→SessionStart hook 開機更新制(via_boot_update.sh 五步日更;每日首開實跑+marker 防重複;背景 nohup 零阻塞開機)",
+   "note": "排程哲學切換:cron 定時→事件驅動(開啟系統即更新)。【刪】trig_01AgXHXzTacMjoASEHEAD9rb(每交易日 16:30)依令刪除。【建】via_boot_update.sh(registry;chmod+x):①marker=.last_boot_update 當日已更=SKIP(rc0;防同日多開重跑)②先佔位防並發③五步=OmniFetch 全車道→價格增量→籌碼增量+derive→ENG051 持股→--status 對帳;log 落 VIA_Reports/boot_update_logs/;同意閘=批123/137/150 常令授權腳本內設。【hook】.claude/settings.json(專案級,入 git=團隊共用)SessionStart:async+nohup+disown 背景喚起零阻塞;$CLAUDE_PROJECT_DIR 動態根(工作站/容器通用);statusMessage 註明批150。驗證:管測 skip 路 rc0+jq schema 過+hook 命令實射(當日 marker=SKIP 如設計)。效果:任何裝置開啟本 repo 的 Claude Code session,當日首開即自動背景補到最新;不開=不跑(合操作員「開啟系統及更新」語意)。」"
   }
  ]
 }
