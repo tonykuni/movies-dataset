@@ -4059,6 +4059,13 @@
    "ts": "2026-08-25 13:55",
    "name": "批143:VRN_ENG065 MailIntel(NLP×mail tracker×報告摘要三合流)八檢綠——逐信情報卡(追蹤欄+實體+三元組)+批次彙總(分類×風險×部門×SLA 矩陣+TF-IDF 榜+高優先清單)MD/JSON 落 mailintel_runs;grid v0166=103 站",
    "note": "操作員令:NLP support mailing tracking and report summarized。【引擎】VRN_ENG065_MailIntel_v0100(名冊 65;via-mail):①收容 tracker 包動態載入(UID/語意/專案/部門/SLA/生命線/工單;巢狀欄展平 project/dept 取核心值)②VRN_ENG064 堆疊 glob 最新(subject+body 合文→正規化+實體+三元組)③彙總器=四矩陣 tally(_label 正規化抗 dict 鍵)+risk_level 數值化(≥7 或 P0/P1=高優先)+rank_keywords TF-IDF 榜+MD(分佈矩陣/高優先/關鍵詞/逐信情報卡含 ◇ 三元組行)+JSON 存證。demo 六信集(中文金融×英文專案×風險×一般):信 6·三元組 6·高優先 3(P2382×2+NPL 月報);中文金融信三型齊(metric/causation/policy)。test-debug 二輪:tracker 巢狀 dict 不可雜湊→_label 展平;chr() 補丁→明碼清理。輸入面:--inbox <json> 通用信箱檔;Gmail 實箱接入=候操作員令(MCP 在session 側非引擎依賴,引擎維持檔案介面零綁定)。grid v0166=103 站。」"
+  },
+  {
+   "code": "TOOL-145",
+   "kind": "當沖面+日更自動化",
+   "ts": "2026-08-25 14:45",
+   "name": "批144 Go on:L12 當沖車道(TPEX 市場級 17 日+TWSE 標的冊 1,234;逐股=WAF 死鎖誠實候源)+日更 Routine(每交易日 16:30 台北自喚醒累計維護)+籌碼衍生 tw_chip_derived 52.1 萬列",
+   "note": "【當沖攻堅】雙所 swagger 全掃:TWSE openapi TWTB4U=僅當沖標的冊(1,234 檔,無統計欄實測);rwd TWTB4U 逐股統計=WAF 安全頁死鎖(Referer/XHR/compressed 全試;官頁 JS 殼無路徑可掘)=誠實候源;TPEX openapi tpex_intraday_trading_statistics=市場級當沖量值%月窗 17 日實抓。ENG055 v0103→v0104 L12 車道(ROC 年轉換;tw_daytrade_market+tw_daytrade_eligible 兩表);八檢綠。批128 當沖面=可得極大化落地(市場級+標的冊),逐股候源。【日更自動化】create_trigger trig_01AgXHXzTacMjoASEHEAD9rb:cron 30 8 * * 1-5(=台北 16:30 每交易日)自綁本 session;prompt=五步日更(ENG055 全車道→ENG054 價格增量→ENG056 籌碼增量+derive→status 對帳→flow_est 出值檢);同意閘依批123/137 自動更新常令;非交易日誠實 SKIP;明日 2026-08-26 首跑=累計維護自動化結案(批123「資料庫自動更新功能」+批137「累計維護」)。【衍生】tw_chip_derived 521,339 列(券資比+法人淨合流;餘額 0=NULL 誠實);籌碼庫現況 inst 543,019/margin 521,339(2024-01-02→2025-05-02,回補續跑中 318/640 日)。」"
   }
  ]
 }
