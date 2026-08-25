@@ -4108,6 +4108,13 @@
    "ts": "2026-08-25 16:30",
    "name": "批150 操作員令「不用固定時間 開啟系統及更新」:固定 16:30 Routine 刪除→SessionStart hook 開機更新制(via_boot_update.sh 五步日更;每日首開實跑+marker 防重複;背景 nohup 零阻塞開機)",
    "note": "排程哲學切換:cron 定時→事件驅動(開啟系統即更新)。【刪】trig_01AgXHXzTacMjoASEHEAD9rb(每交易日 16:30)依令刪除。【建】via_boot_update.sh(registry;chmod+x):①marker=.last_boot_update 當日已更=SKIP(rc0;防同日多開重跑)②先佔位防並發③五步=OmniFetch 全車道→價格增量→籌碼增量+derive→ENG051 持股→--status 對帳;log 落 VIA_Reports/boot_update_logs/;同意閘=批123/137/150 常令授權腳本內設。【hook】.claude/settings.json(專案級,入 git=團隊共用)SessionStart:async+nohup+disown 背景喚起零阻塞;$CLAUDE_PROJECT_DIR 動態根(工作站/容器通用);statusMessage 註明批150。驗證:管測 skip 路 rc0+jq schema 過+hook 命令實射(當日 marker=SKIP 如設計)。效果:任何裝置開啟本 repo 的 Claude Code session,當日首開即自動背景補到最新;不開=不跑(合操作員「開啟系統及更新」語意)。」"
+  },
+  {
+   "code": "TOOL-152",
+   "kind": "總對帳+日期正規化",
+   "ts": "2026-08-25 15:20",
+   "name": "批151 Go on:資料庫總對帳快照(三庫 24 表交付)+QA-20260825C 日期混制債修(L2/L3/L4 TWSE Date ROC 7 碼/緊湊 8 碼→_iso_date 統一 ISO;既存列 SQL 遷移驗證過)",
+   "note": "【快照】三庫 24 表:tw 庫 13 表(價格 1,065,556 列 2024→2026-08-25/法人 755,635/資券 731,667/衍生 521,339…)+global 庫 7 表(global_daily 51,221/cross_macro 6,112/us_macro 1,254/sentiment 252/factset 3…)+ETF 持股庫 4 表(holdings 1,182);批128/137 覆蓋對照+候源誠實清單隨附交付。【QA-20260825C】快照揪出 tw_trading_daily/tw_valuation_daily/tw_market_agg 日期存 ROC 7 碼(1150824)與全庫 ISO 不一致=ENG055 L2/L3/L4 直存 TWSE Date 原文;修=v0106→v0107 _iso_date 正規化(ROC+1911/8 碼補槓/ISO 直通)+既存列 duckdb regexp UPDATE 遷移;三表覆核 MIN/MAX 全 ISO。教訓:官方多制日期一律入庫前正規化。八檢綠;開機更新自動接 v0107。」"
   }
  ]
 }
