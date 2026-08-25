@@ -1,0 +1,169 @@
+{
+  "schema_version": "1.0.0",
+  "system": "VeritasIntelligenceAnalytics",
+  "generated_at": "2026-08-25T00:00:00+08:00",
+  "status_legend": {
+    "foundation_exists": "已有對應元件，但仍需母系統級契約與整合驗證",
+    "partial": "部分能力存在，尚未形成完整閉環",
+    "planned": "已規劃但尚未建構"
+  },
+  "capabilities": [
+    {
+      "id": "VIA-CAP-001",
+      "name": "統一身份",
+      "component": "SmartAsset AST + Anchor",
+      "status": "foundation_exists",
+      "priority": "P0",
+      "depends_on": [],
+      "acceptance": ["全域 ID 無重複", "無孤兒資產", "所有 Anchor 可定位", "資產版本與血緣可查詢"]
+    },
+    {
+      "id": "VIA-CAP-002",
+      "name": "單一真實來源",
+      "component": "SSOT Engine",
+      "status": "foundation_exists",
+      "priority": "P0",
+      "depends_on": ["VIA-CAP-001"],
+      "acceptance": ["所有生產狀態經受控介面寫入", "Schema 版本化", "可還原至指定版本", "Legacy JSON 為唯讀投影"]
+    },
+    {
+      "id": "VIA-CAP-003",
+      "name": "品質保證",
+      "component": "VPN Pipeline M01-M07",
+      "status": "foundation_exists",
+      "priority": "P2",
+      "depends_on": ["VIA-CAP-001", "VIA-CAP-002", "VIA-CAP-012", "VIA-CAP-013"],
+      "acceptance": ["檔案、AST、依賴、資料與 HTML 檢查可重現", "Critical 問題阻擋發布", "品質結果寫回 SSOT", "每項問題附驗證證據"]
+    },
+    {
+      "id": "VIA-CAP-004",
+      "name": "自動決策",
+      "component": "Decision Engine + Failure Engine",
+      "status": "foundation_exists",
+      "priority": "P2",
+      "depends_on": ["VIA-CAP-002", "VIA-CAP-003", "VIA-CAP-013"],
+      "acceptance": ["政策與規則版本化", "決策可解釋且可重現", "高風險動作要求人工核准", "完整保存決策鏈"]
+    },
+    {
+      "id": "VIA-CAP-005",
+      "name": "流程編排",
+      "component": "Orchestrator",
+      "status": "foundation_exists",
+      "priority": "P1",
+      "depends_on": ["VIA-CAP-001", "VIA-CAP-002", "VIA-CAP-006", "VIA-CAP-013", "VIA-CAP-014"],
+      "acceptance": ["支援 DAG 串並行", "任務冪等", "支援續跑、取消與補償", "執行狀態可追蹤"]
+    },
+    {
+      "id": "VIA-CAP-006",
+      "name": "統一模板",
+      "component": "UltimateTemplate v3",
+      "status": "foundation_exists",
+      "priority": "P0",
+      "depends_on": ["VIA-CAP-001"],
+      "acceptance": ["新模組具標準身份、Anchor、入口與錯誤結構", "可被 VPN 自動掃描", "模板版本可查詢", "具有自我測試與 Dry-run"]
+    },
+    {
+      "id": "VIA-CAP-007",
+      "name": "功能模組化",
+      "component": "ModPack A-F",
+      "status": "foundation_exists",
+      "priority": "P1",
+      "depends_on": ["VIA-CAP-006", "VIA-CAP-014"],
+      "acceptance": ["API 邊界穩定", "依賴矩陣完整", "各 ModPack 有獨立測試", "具能力偵測與降級模式"]
+    },
+    {
+      "id": "VIA-CAP-008",
+      "name": "視覺一致性",
+      "component": "FusionDashboard Design System",
+      "status": "foundation_exists",
+      "priority": "P3",
+      "depends_on": ["VIA-CAP-006", "VIA-CAP-011"],
+      "acceptance": ["Design Tokens 集中管理", "Light/Dark 使用同一語意令牌", "無未註冊品牌色", "關鍵頁面通過可讀性與響應式驗證"]
+    },
+    {
+      "id": "VIA-CAP-009",
+      "name": "資料連結",
+      "component": "VDFConnector + Future VRN Connector",
+      "status": "partial",
+      "priority": "P1",
+      "depends_on": ["VIA-CAP-001", "VIA-CAP-002", "VIA-CAP-012", "VIA-CAP-014"],
+      "acceptance": ["Parquet、CSV、DuckDB、Google Sheet 使用一致 Manifest", "Schema 與品質驗證先於發布", "VAP 輸出可追溯資料版本", "重跑結果具確定性"]
+    },
+    {
+      "id": "VIA-CAP-010",
+      "name": "統一啟動",
+      "component": "SUPREME LAUNCHER v2",
+      "status": "partial",
+      "priority": "P1",
+      "depends_on": ["VIA-CAP-002", "VIA-CAP-005", "VIA-CAP-013", "VIA-CAP-014"],
+      "acceptance": ["Preflight、Profile、單例鎖與健康驗證完整", "支援 Dry-run", "部分失敗可回滾", "重複點擊不重複啟動"]
+    },
+    {
+      "id": "VIA-CAP-011",
+      "name": "統一控制面板",
+      "component": "VIA Master Control Panel",
+      "status": "planned",
+      "priority": "P3",
+      "depends_on": ["VIA-CAP-002", "VIA-CAP-003", "VIA-CAP-005", "VIA-CAP-008", "VIA-CAP-012", "VIA-CAP-013"],
+      "acceptance": ["狀態均可追溯權威來源", "預設唯讀", "控制命令可稽核", "提供系統、管線、資料、資產、品質與修復視圖"]
+    },
+    {
+      "id": "VIA-CAP-012",
+      "name": "統一註冊表",
+      "component": "Unified Registry",
+      "status": "partial",
+      "priority": "P0",
+      "depends_on": ["VIA-CAP-001", "VIA-CAP-002", "VIA-CAP-006"],
+      "acceptance": ["Module、Asset、Dataset、Tool、Anchor、Service 共用主鍵", "Schema 版本化", "無失效路徑與孤兒引用", "支援全局血緣查詢"]
+    },
+    {
+      "id": "VIA-CAP-013",
+      "name": "統一日誌",
+      "component": "_logs + ModPack E",
+      "status": "foundation_exists",
+      "priority": "P0",
+      "depends_on": ["VIA-CAP-001", "VIA-CAP-006"],
+      "acceptance": ["統一結構化事件 Schema", "全流程使用 Correlation ID", "秘密與敏感內容遮罩", "支援輪替、保留與完整性檢查"]
+    },
+    {
+      "id": "VIA-CAP-014",
+      "name": "環境治理",
+      "component": "CoreEnvGovernance",
+      "status": "foundation_exists",
+      "priority": "P0",
+      "depends_on": [],
+      "acceptance": ["Runtime 與套件版本鎖定", "環境快照可比較", "乾淨環境可重現", "組態與秘密分離"]
+    },
+    {
+      "id": "VIA-CAP-015",
+      "name": "自動修復",
+      "component": "EnvFix + Repair Commander",
+      "status": "partial",
+      "priority": "P2",
+      "depends_on": ["VIA-CAP-001", "VIA-CAP-003", "VIA-CAP-004", "VIA-CAP-005", "VIA-CAP-012", "VIA-CAP-013", "VIA-CAP-014"],
+      "acceptance": ["修復前自動快照", "支援 Dry-run 與人工核准", "保存 Patch 與前後雜湊", "驗證失敗時可回滾且修復具冪等性"]
+    }
+  ],
+  "milestones": [
+    {
+      "id": "M1",
+      "name": "VIA Governance Contract v1",
+      "capabilities": ["VIA-CAP-001", "VIA-CAP-002", "VIA-CAP-006", "VIA-CAP-012", "VIA-CAP-013", "VIA-CAP-014"]
+    },
+    {
+      "id": "M2",
+      "name": "SUPREME LAUNCHER v2 + Orchestrator Runtime",
+      "capabilities": ["VIA-CAP-005", "VIA-CAP-007", "VIA-CAP-009", "VIA-CAP-010"]
+    },
+    {
+      "id": "M3",
+      "name": "Quality, Decision and Repair Closed Loop",
+      "capabilities": ["VIA-CAP-003", "VIA-CAP-004", "VIA-CAP-015"]
+    },
+    {
+      "id": "M4",
+      "name": "Trusted Master Control Plane",
+      "capabilities": ["VIA-CAP-008", "VIA-CAP-011"]
+    }
+  ]
+}
