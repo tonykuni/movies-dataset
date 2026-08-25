@@ -4031,6 +4031,13 @@
    "ts": "2026-08-25 13:55",
    "name": "批139 三域白名單續抓:CBC 臺銀利率史 307 月落庫(L10;curl 子程序道破 TLS 指紋重置)+NBS WAF/nstatdb TLS/DGBAS 檔徑三缺口誠實列冊+回補雙工人互踩債修(DB 真值重建 checkpoint;冪等 upsert 保資料零損)",
    "note": "操作員加白 dgbas/cbc/stats.gov.cn 後續抓。【實測】www.dgbas 200·nstatdb 404 可達但 TLS SYSCALL 異常·www.cbc 302·data.stats.gov.cn 302 可達但 easyquery API 遭 WAF UrlACL 拒雲端 IP(伺服器端封鎖=白名單也無解)·DGBAS 舊檔徑 cpispl/ppispl 403·CBC/DGBAS 現代頁=JS 殼無靜態連結(時間盒紀律停盲獵)。【落地】CBC a13rate.xls 臺銀存放款利率史 307 月(2001-01→2026-07)→ENG055 v0102 L10 車道(curl 子程序道:CBC 對 urllib/requests TLS 指紋重置,curl 可通;ROC 年月轉西元;誠實旗標=臺銀掛牌利率非央行政策利率)入 tw_rates_cbc;八檢綠。【缺口冊】TW CPI/PPI=DGBAS 檔徑候查(建議補白 index.dgbas.gov.tw+data.gov.tw);TW 政策利率(重貼現率)檔徑候查;CN CPI/PPI=NBS WAF 拒雲端 IP 誠實無解(FRED CHNCPI 至 2025-04 為現況最佳)。【債修】台股回補發現雙工人並行(12:12 原跑未如預期被時限回收+12:54 分段)互踩 checkpoint:資料庫 anti-join 冪等=資料零損,僅 checkpoint 低報;處置=全停→由 DB distinct ticker 真值重建 checkpoint(485 標的 310,281 列)→單工人分段續跑(650/段防沙盒 10 分時限)。」"
+  },
+  {
+   "code": "TOOL-141",
+   "kind": "籌碼回補",
+   "ts": "2026-08-25 14:30",
+   "name": "批140 Go on:VDF_ENG056 籌碼回補引擎(雙所法人+資券逐日)+QA-20260825A 錯位債實錘修復(duckdb 位置插入→按欄名)+真值核對過(0050 買27/賣19/前468/今476)+全量常駐跑;grid v0163=100 站",
+   "note": "批128 籌碼面補完啟動。【引擎】VDF_ENG056_ChipBackfill_v0100(名冊 56;via-chip;六檢綠):四車道×交易日=twse_t86(三大法人逐股;外資=外陸+外資自營合成)/twse_margin(MI_MARGN 融資融券彙總逐股)/tpex_inst(櫃買法人;net 欄按「買賣超」字樣自動定位抗欄序漂移)/tpex_margin(櫃買資券);交易日曆=已庫 tw_daily_prices 實際日期零猜測;傳輸=curl 子程序道(rwd/www 對 requests TLS 指紋重置);節流 1.2s(TWSE 限流紀律);checkpoint=日×車道粒度,傳輸敗不記 done 保重試權(初版空即記 done=喪失重試,已修);80 呼一批 parquet+duckdb 冪等。當沖 TWTB4U=安全頁攔,DAYTRADE_PENDING 誠實候探。【QA-20260825A】duckdb INSERT SELECT * 按位置對欄:雙所 dict 鍵序異→TWSE 融資列錯位入 TPEX 欄序(買進值進前日餘額欄)實錘;修=按欄名插入(缺欄 ALTER ADD)+污染列清除重抓+真值核對 0050 20240102(買27/賣19/前468/今476)四欄全中。教訓:混源同表必按欄名插入。【衍生】--derive=券資比(短/資餘額,0=NULL 誠實)+法人淨合流 tw_chip_derived。【運行】價格回補(ENG054)與籌碼回補(ENG056)雙常駐監看並行;Yahoo 端當日重度限流=價格側減速(AegisNexus 退避),TWSE/TPEX 側正常。grid v0163=第 100 站里程碑。"
   }
  ]
 }
