@@ -4010,6 +4010,13 @@
    "ts": "2026-08-25 12:20",
    "name": "批136 白名單生效實抓:九域全通→雙所清單 1,979 檔+國際線 33 標的 21,836 列落庫;curl_cffi TLS 不合實錘→SUP_MDL740 v0104 yahoo_chart 直連車道+ENG052 v0102 後備;ENG054 全市場日線回補工人(檢查點續跑)背景長跑中",
    "note": "操作員手機側設定 Network access=All networks 後九域實測:openapi.twse/mops/cnyes 200·tpex 302·yahoo 429/404(可達)·fred 301=全通。【落地】①tw_listings:TWSE t187ap03_L 1,095+TPEX mopsfin_t187ap03_O 890 實抓;ENG054 統一清單 1,979 檔(四碼普通股;特別股/權證誠實排除)入 vdf_tw_market.duckdb::tw_listings+parquet。②global_yf:33 標的(12 指數×ETF 對+單標 9 含 NVDA/VIX/油金期貨/美債殖利率)21,836 列 2024-01-02→2026-08-25 adj 主欄入 vdf_global_market.duckdb::global_daily+parquet。【債修】容器 yfinance(curl_cffi)與代理 TLS 不合=curl 35 reset 存證→SUP_MDL740 v0103→v0104 新增 yahoo_chart 車道(query1 chart API 直連;http_json 既有後端=AegisNexus 優先+同意閘先行;逐標的節流誠實列敗;十六檢綠);ENG052 v0101→v0102 global 車道 yfinance 失敗時 chart 後備(十檢綠)。【新工人】VDF_ENG054_TWDailyBackfill_v0100(名冊 54;六檢綠):雙所清單落庫+全市場日線回補(.TW/.TWO;批次 80 節流 0.35s;批次 parquet+duckdb anti-join 冪等 upsert;checkpoint JSON 中斷續跑零重抓);煙測 5 檔 3,200 列綠→全市場 1,974 檔背景長跑中。【誠實分工】籌碼衍生欄(三大法人/融資融券/當沖)=官方逐日端點另波;FRED DGS20 候 API key;主動 ETF 持股=ENG051 另波。grid v0161=+第 98 站=98 站。」"
+  },
+  {
+   "code": "TOOL-138",
+   "kind": "大擷取令落地",
+   "ts": "2026-08-25 13:10",
+   "name": "批137 大擷取令:單 004 落冊(十車道規格+可行性三態)+SUP_MDL740 v0105 quoteSummary 握手道(SPY AUM $795.3B 實證)+VDF_ENG055 OmniFetch 八車道 7 落地 1 候鑰;grid v0162=99 站",
+   "note": "操作員令十面:清單附產業/成交值市值/主動 ETF 可更新+AUM 流量/美亞歐南亞指數+匯率+ETF AUM/forward PE·earnings·PB/FactSet 倒推/美宏觀細項/五區 PMI·CPI·PPI·利率/輸出四格式+斷點保全。【單 004】append-only 落冊:十車道+可行性三態(READY 實抓/NEEDS_KEY=FRED 16 series 候鑰/NEEDS_WHITELIST=FactSet·BLS·BEA·ISM·S&P Global·Eurostat·NBS·主計總處候白名單)+公式冊(AUM=totalAssets;flow_est=AUM_t−AUM_{t-1}×(nav_t/nav_{t-1}) ESTIMATE;市值=close×股數;fwd_pe=price/fwd_eps)。【統包】SUP_MDL740 v0105:yahoo_quote_summary 車道(fc.yahoo 種 cookie+getcrumb 標準握手;AUM/nav/股數/PE/PB/marketCap;同意閘先行節流列敗;十六檢綠)。【引擎】VDF_ENG055_OmniFetch_v0100(名冊 55;八檢綠;via-omni):L1 清單附產業(TWSE 產業別冊 37 碼內建對映;1,979 檔;未冊碼 4 誠實)/L2 成交值逐股 2,265+FMTQIK 市場總計/L3 估值 1,969(PE/PB/殖利率)/L4 ETF 冊 268 檔可更新+主動式 32 檔旗標/L5 ETF AUM 快照 58(26 全球+32 台主動;flow_est 候第 2 快照=累計維護)/L6 全球擴編 75 標的 45,265 列(亞洲 11+歐 8+南亞 6/10:^CNX500·巴基斯坦 ^KSE·斯里蘭卡 ^CSE·孟加拉 ^DSEX Yahoo 缺載誠實列敗+匯率 15 對+區域 ETF 26)/L7 指數估值=區域 ETF 代理 [PROXY] 26 筆(FactSet 倒推候白名單)/L8 FRED 候鑰誠實 SKIP。--export parquet|csv|sqlite|gsheet(utf-8-sig)。【韌性】checkpoint+批次即落盤+anti-join 冪等=中斷零浪費(操作員問「突然中斷不浪費之前所抓」之答)。global_daily 現 51,221 列 80 標的;tw_daily_prices 回補中 405/1979(背景續跑)。grid v0162=99 站。」"
   }
  ]
 }

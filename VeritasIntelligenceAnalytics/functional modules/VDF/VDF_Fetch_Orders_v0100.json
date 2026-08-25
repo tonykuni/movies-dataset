@@ -521,6 +521,125 @@
     }
    },
    "runs": []
+  },
+  {
+   "order_id": "004",
+   "ts": "2026-08-25 12:55",
+   "source": "操作員批137 大擷取令(手機語音)",
+   "status": "OPEN",
+   "window": "2024-01-02 → 最新(日更增量;累計維護)",
+   "resilience": "批次即落盤(batch parquet)+checkpoint JSON 續跑+duckdb anti-join 冪等 upsert=中斷零浪費;編碼一律 utf-8-sig",
+   "outputs": [
+    "parquet",
+    "csv",
+    "duckdb",
+    "sqlite",
+    "gsheet 相容 csv(雲端道候 OAuth)"
+   ],
+   "lanes": {
+    "tw_listings_industry": {
+     "desc": "雙所總清單附產業(代碼+名稱)",
+     "state": "READY",
+     "src": [
+      "TWSE t187ap03_L(產業別)",
+      "TPEX mopsfin_t187ap03_O(SecuritiesIndustryCode)"
+     ]
+    },
+    "tw_trading_daily": {
+     "desc": "每日交易:成交值/量/筆數(逐股)+市場總計",
+     "state": "READY",
+     "src": [
+      "TWSE STOCK_DAY_ALL(TradeValue)",
+      "TPEX mainboard_daily_close_quotes(TransactionAmount)",
+      "TWSE FMTQIK(市場成交值)"
+     ]
+    },
+    "tw_valuation_daily": {
+     "desc": "每日估值:PE/PB/殖利率(逐股);市值=收盤×發行股數",
+     "state": "READY",
+     "src": [
+      "TWSE BWIBBU_ALL",
+      "TPEX mainboard_peratio_analysis"
+     ],
+     "formulas": {
+      "market_cap": "close×shares_outstanding;股數源候補=quoteSummary/實收資本額÷10 [ESTIMATE 旗標]"
+     }
+    },
+    "etf_book_refresh": {
+     "desc": "ETF 冊可更新(268 檔;主動式=基金類型旗標)",
+     "state": "READY",
+     "src": [
+      "TWSE t187ap47_L"
+     ]
+    },
+    "etf_stats_aum_flows": {
+     "desc": "ETF AUM/申贖流量(台+全球)",
+     "state": "READY",
+     "src": [
+      "Yahoo quoteSummary(cookie+crumb 握手;totalAssets=AUM/navPrice/PE/PB)"
+     ],
+     "formulas": {
+      "aum": "totalAssets 直取",
+      "inflow_outflow_est": "ΔAUM−報酬效果=AUM_t−AUM_{t-1}×(nav_t/nav_{t-1}) [ESTIMATE;需≥2 快照=累計維護]"
+     }
+    },
+    "global_indices_fx_etf": {
+     "desc": "美五大+亞洲主要+歐洲主要+南亞前十指數;區域匯率;區域 ETF(AUM 同上)",
+     "state": "READY",
+     "src": [
+      "Yahoo chart(價量)",
+      "Yahoo quoteSummary(AUM/估值)"
+     ],
+     "note": "指數本身無市值/AUM=以區域 ETF 為代理 [PROXY 旗標];南亞以 Yahoo 可得為準誠實列缺"
+    },
+    "index_valuation": {
+     "desc": "指數 forward PE/earnings/P/B",
+     "state": "PARTIAL",
+     "src": [
+      "Yahoo quoteSummary 指數 ETF 代理(forwardPE/trailingPE/priceToBook)[PROXY]",
+      "FactSet 月度新聞稿(forward EPS→倒推 fwd PE=price/fwd_eps)"
+     ],
+     "blockers": [
+      "factset.com 未入白名單=NEEDS_WHITELIST"
+     ]
+    },
+    "us_macro": {
+     "desc": "美國通膨/就業/收入/消費細項(官方+民間)",
+     "state": "NEEDS_KEY",
+     "src": [
+      "FRED API(api.stlouisfed.org 已通;候 FRED_API_KEY)"
+     ],
+     "series": [
+      "CPIAUCSL",
+      "CPILFESL",
+      "PCEPI",
+      "PCEPILFE",
+      "PPIFIS",
+      "UNRATE",
+      "PAYEMS",
+      "ICSA",
+      "CES0500000003",
+      "PI",
+      "DSPIC96",
+      "PCE",
+      "RSAFS",
+      "UMCSENT",
+      "HOUST"
+     ],
+     "blockers": [
+      "BLS/BEA/ISM/S&P Global 域未入白名單=民間細項候 NEEDS_WHITELIST"
+     ]
+    },
+    "cross_region_macro": {
+     "desc": "美/歐盟/日/中/台:製造+服務 PMI、CPI、PPI、央行利率跨區比較",
+     "state": "NEEDS_KEY+WHITELIST",
+     "src": [
+      "FRED(多國 CPI/利率;候 key)",
+      "ISM/S&P Global/Caixin/NBS/Eurostat/日銀/主計總處/台央行=候白名單"
+     ],
+     "note": "PMI 兩種=製造業+服務業(採購經理人指數)"
+    }
+   }
   }
  ]
 }
