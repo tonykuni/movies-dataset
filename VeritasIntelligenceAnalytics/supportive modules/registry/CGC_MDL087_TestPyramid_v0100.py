@@ -259,7 +259,8 @@ h1{font-size:var(--fs-l);font-weight:600;letter-spacing:.2px}
 .sub{color:var(--sub);font-size:var(--fs-xs)}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;
-padding:12px 14px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+padding:12px 14px;box-shadow:0 1px 2px rgba(16,24,40,.04);
+overflow-wrap:anywhere;min-width:0}
 .card h2{font-size:var(--fs-s);font-weight:600;color:var(--sub);
 text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
 .kpis{display:flex;gap:14px;flex-wrap:wrap}
@@ -271,7 +272,9 @@ font-size:var(--fs-xs);font-weight:600}
 .R{background:#fef2f2;color:var(--bad)}
 table{width:100%;border-collapse:collapse;font-size:var(--fs-s)}
 td,th{padding:4px 6px;border-bottom:1px solid var(--line);text-align:left;
-white-space:nowrap}
+word-break:break-word;overflow-wrap:anywhere}
+td.num,th.num{white-space:nowrap}
+.chip{white-space:nowrap}
 th{color:var(--sub);font-weight:500;font-size:var(--fs-xs)}
 td.num{text-align:right;font-variant-numeric:tabular-nums}
 .scroll{overflow-x:auto}
