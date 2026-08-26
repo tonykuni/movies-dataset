@@ -764,7 +764,9 @@ class HttpConfig:
     timeout:      float = 30.0
     min_interval: float = 0.25
     max_retries:  int   = 5
-    verify_ssl:   bool  = False
+    # 批177 交接報告 P0 修復:TLS 驗證預設強制開(fail-secure);
+    # 僅 VIA_SSL_NOVERIFY=1 明示才關(留痕紀律)
+    verify_ssl:   bool  = (__import__('os').environ.get('VIA_SSL_NOVERIFY') != '1')
 
 # [ANC:class ResilientHTTPClient]
 class ResilientHTTPClient:
@@ -2245,7 +2247,7 @@ class AsyncHTTPClient:
     """httpx AsyncClient wrapper with UA rotation + retry."""
 
     def __init__(self, timeout: float = 30.0, max_retries: int = 3,
-                 verify_ssl: bool = False):
+                 verify_ssl: bool = True):  # 批177 P0:預設強制驗證
         self._timeout     = timeout
         self._max_retries = max_retries
         self._verify      = verify_ssl
