@@ -1,0 +1,72 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA 系統樞紐 v0100</title><style>
+:root{--fs:clamp(11px,2.6vw,12.5px);--ok:#15803d;--fail:#b91c1c;--skip:#a16207;
+--untested:#64748b}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;color:#1f2937;
+font:var(--fs)/1.5 'Segoe UI','Noto Sans TC',sans-serif}
+.wrap{max-width:1200px;margin:0 auto;padding:clamp(8px,1.5vw,16px)}
+h1{font-size:clamp(.95rem,2vw,1.2rem);margin:.3em 0 .1em}
+h2{font-size:clamp(.85rem,1.7vw,1.05rem);margin:.2em 0 .3em}
+.mut{color:#94a3b8}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:.5em 0}
+.tab{font:inherit;border:1px solid #e5e7eb;background:#ffffff;
+border-radius:7px;padding:4px 10px;cursor:pointer;
+min-height:40px}
+.tab b{margin-left:5px;color:#94a3b8;font-weight:600}
+.tab.on{background:#111827;color:#ffffff}
+.tab.on b{color:#e5e7eb}
+.page{display:none;background:#ffffff;border:1px solid #e5e7eb;
+border-radius:10px;padding:10px 12px;overflow-wrap:anywhere}
+.page.on{display:block}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+.dot.big{width:11px;height:11px}
+.env{color:#475569;font-size:.9em;border-bottom:1px solid #f1f5f9;
+padding-bottom:5px}
+.kpi{display:flex;gap:16px;margin:.4em 0;font-weight:600}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.93em}
+th,td{text-align:left;padding:3px 6px;border-bottom:1px solid #f1f5f9;
+vertical-align:top}
+th{color:#475569}
+.num{text-align:right;color:#94a3b8}
+.engs{margin-top:.5em;font-size:.88em}
+.warn{background:#fef9c3;border:1px solid #fde047;
+border-radius:8px;padding:6px 10px;margin:.4em 0}
+.foot{color:#94a3b8;font-size:.88em;margin-top:.6em;border-top:1px solid
+#f1f5f9;padding-top:5px}
+.slotmap td:first-child{white-space:nowrap;color:#475569}
+@media (max-width:640px){
+  .kpi{gap:10px;flex-wrap:wrap}
+  table.cards,table.cards tbody{display:block}
+  table.cards tr{display:block;border:1px solid #f1f5f9;
+  border-radius:8px;margin:.35em 0;padding:2px 6px}
+  table.cards td{display:block;border:none;padding:1px 2px}
+  table.cards th{display:none}
+  table.cards td.num{text-align:left}
+}
+.hubgrid{display:grid;grid-template-columns:1fr;gap:10px}
+ul{margin:.2em 0 .4em 1.2em;padding:0}
+</style></head><body><div class="wrap">
+<h1><span class="dot big" style="background:#a16207"></span>VIA 系統樞紐(同步連動)</h1>
+<div class="mut">2026-08-26 14:58 · 開機⑨步自動重生=同步 · 全面板=存證/冊/庫唯讀 join
+零重測零發明 · 視覺單源 token 冊</div>
+<div class="hubgrid">
+<section class="page on"><h2>① 測試面(grid×金字塔)</h2>
+<div class="kpi"><span style="color:#15803d">●綠 115</span><span style="color:#a16207">●黃 3</span><span style="color:#b91c1c">●紅 0</span><span class="mut">118 站 · GRID_20260826_144929.json</span></div><div class="mut">黃(SKIP 誠實):</div><ul class="mut"><li>supaudit 導入稽核</li><li>reconcile 對帳</li><li>selftest grid(自指:文件)</li></ul><div class="env">金字塔:PYRAMID_20260826_104716.json · 判定 <b>GREEN</b></div></section>
+<section class="page on"><h2>② 資料面(DuckDB 實測列數)</h2>
+<div class="tablewrap"><table><tr><th>庫</th><th>總列</th><th>前六表</th></tr>
+<tr><td>台股庫</td><td class='num'>5,852,456</td><td class='mut'>tw_daily_prices 1,248,516 · tw_trading_daily 1,215,976 · tw_chip_inst 1,138,679 · tw_chip_derived 1,119,368 · tw_chip_margin 1,119,368 · tw_valuation_daily 3,051</td></tr><tr><td>全球庫</td><td class='num'>59,012</td><td class='mut'>global_daily 51,221 · cross_macro 6,113 · us_macro 1,255 · sentiment_daily 252 · etf_stats_daily 116 · index_valuation_proxy 52</td></tr></table></div></section>
+<section class="page on"><h2>③ 治理面(VSM 六燈+問題台帳 12 案)</h2>
+<div class="kpi"><span><span class="dot" style="background:#15803d"></span>S1</span> <span><span class="dot" style="background:#15803d"></span>S2</span> <span><span class="dot" style="background:#15803d"></span>S3</span> <span><span class="dot" style="background:#15803d"></span>S3star</span> <span><span class="dot" style="background:#15803d"></span>S4</span> <span><span class="dot" style="background:#15803d"></span>S5</span></div>
+<div class="tablewrap"><table class="cards"><tr><th>處置</th><th>問題</th><th>明細</th></tr>
+<tr><td><span class="dot" style="background:#15803d"></span>已修復</td><td>P01 S1 常駐 RED:六件語法敗檔</td><td class="mut">VRN_TW01/TW02(docstring 含 Windows 路徑 \U 逸出)→ raw docstring;WebScraping_Compliance+GRP 驗證管線 v0200(f-string 表達式含反斜線,py3.11 禁)→ 摘出變數;四件行為零變更 parse 全過。餘二件=收容原件(references/intake、bundle)→ P02。</td></tr><tr><td><span class="dot" style="background:#15803d"></span>已修復</td><td>P02 收容原件語法態計入現役燈</td><td class="mut">CGC_MDL075 v0105(version-forward):+ARCHIVE_FRAGS 收容原件區判準(references/intake//bundle//rollback/檢疫)——誠實列示不計燈(零觸碰紀律不修原件)。VSM 六燈全綠首達。</td></tr><tr><td><span class="dot" style="background:#a16207"></span>候操作員</td><td>P03 reconcile 對帳缺口:華南投顧-2762-世界健身-KY-Memo</td><td class="mut">docx 原件在操作員工作站(C:\Users\tonyk\...),雲端誠實不可補。候操作員提供原件即收容補帳。站=grid SKIP 黃(誠實)。</td></tr><tr><td><span class="dot" style="background:#a16207"></span>持續追蹤</td><td>P04 supaudit:214 引擎 NONE=候接橋</td><td class="mut">架構盤點誠實口徑(BRIDGE 20/DIRECT 6/DYNAMIC 25/SSOT-DATA 6/NONE 214)。長期治理面逐批接橋;不假綠。站=grid SKIP 黃。</td></tr><tr><td><span class="dot" style="background:#15803d"></span>裁定結案</td><td>P05 grid 自指佔位站</td><td class="mut">selftest grid 不自測自身(自指悖論)=文件佔位 SKIP,誠實設計。</td></tr><tr><td><span class="dot" style="background:#15803d"></span>裁定結案</td><td>P06 pkuseg 缺件(C 編譯輪無 py3.11 wheel)</td><td class="mut">誠實留缺;jieba 後備全鏈可用;boot ⓪步不嘗試編譯(拒絕無盡 C 輪)。</td></tr><tr><td><span class="dot" style="background:#a16207"></span>誠實無解</td><td>P07 CNYES FactSet 端點 WAF 軟封鎖</td><td class="mut">JSON 端點回 HTML 殼=WAF。紅線:不繞封鎖/不解 CAPTCHA/不偽裝指紋。估值雙源設計以 Yahoo 車道先行,CNYES_FACTSET_PENDING 誠實標記,端點解鎖即自動雙源。</td></tr><tr><td><span class="dot" style="background:#a16207"></span>候操作員</td><td>P08 e-stat appId 未供(日本 CPI/PPI 車道)</td><td class="mut">候操作員註冊 e-stat 取 appId;車道代碼已備,鑰匙到即通。</td></tr><tr><td><span class="dot" style="background:#a16207"></span>候操作員</td><td>P09 批133 治理議題 REVIEW 20 組候裁決</td><td class="mut">議題仲裁器已分圈列示(零自動套用紀律);候操作員逐組裁決。</td></tr><tr><td><span class="dot" style="background:#15803d"></span>裁定結案</td><td>P10 全球輪動冊 V13 名稱樂透</td><td class="mut">受控合成世界名稱迭代=種子賭博非誠實工程→停止;VIA_GlobalFlowRotation_Membership_v0104=正典;global profile verdict=REVIEW 非 PASS(誠實)。</td></tr><tr><td><span class="dot" style="background:#a16207"></span>持續追蹤</td><td>P11 介面合約 drift 64 模組(VIA-IFACE-1602 等)</td><td class="mut">介面合約 dry 掃描:1827 件中 drift 64/new 461=介面演化追蹤面(非錯誤);合約引擎逐批收斂;站綠。</td></tr><tr><td><span class="dot" style="background:#15803d"></span>裁定結案</td><td>P12 輪動證偽 pipeline=NOT VALIDATED</td><td class="mut">驗收閘誠實輸出:未過驗收勿 promote=方法論紀律(v0104 冊載累積觸發條件:ETF 快照≥5 日/S7 N≥30/背離 N>1000);資料累積達標自動出值,不假 VALIDATED。</td></tr></table></div></section>
+<section class="page on"><h2>④ 資產面(台帳 537 筆 · 名冊 counters)</h2>
+<div class="env">CGC_MDL 90 · CHW_ENG 26 · FLOW_ENG 23 · FLOW_MDL 3 · GRP_ENG 41 · PLG_ENG 18 · SUP_MDL 741 · VAP_ENG 9 · VDF_ENG 59 · VIA_ENG 169 · VRN_ENG 67</div>
+<div class="tablewrap"><table><tr><th>UI 頁(ui_support)</th><th>更新</th></tr>
+<tr><td>VIA_UI_Dashboard_v0100.html</td><td class='num'>08-26 14:58</td></tr><tr><td>VIA_UI_SystemHub_v0100.html</td><td class='num'>08-26 14:58</td></tr><tr><td>VIA_UI_SystemTestPages_v0100.html</td><td class='num'>08-26 14:58</td></tr><tr><td>VIA_UI_BaseTemplate_v0100.html</td><td class='num'>08-26 14:58</td></tr><tr><td>VIA_UI_SystemConsole_v0100.html</td><td class='num'>08-26 14:55</td></tr><tr><td>VIA_UI_VAPConsole_v0100.html</td><td class='num'>08-26 09:40</td></tr><tr><td>VIA_UI_Template_SysMan_v0100.html</td><td class='num'>08-12 08:06</td></tr><tr><td>VIA_UI_Hub_v0108.html</td><td class='num'>08-07 14:44</td></tr><tr><td>VIA_UI_Hub_v0107.html</td><td class='num'>08-07 14:18</td></tr><tr><td>VIA_UI_Hub_v0106.html</td><td class='num'>08-07 13:44</td></tr><tr><td>VIA_UI_Hub_v0105.html</td><td class='num'>08-07 08:47</td></tr><tr><td>VIA_UI_Hub_v0104.html</td><td class='num'>08-06 23:06</td></tr></table></div></section>
+</div>
+<div class="foot">同步機制:via_boot_update.sh ⑨步每日開機自動重生本頁+五系統分頁;
+批次收官亦重生。誠實三態:黃=SKIP/候件/無解(不假綠)· 問題台帳 append-only</div>
+</div></body></html>

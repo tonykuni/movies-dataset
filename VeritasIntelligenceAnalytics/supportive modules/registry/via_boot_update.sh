@@ -61,6 +61,11 @@ PYENV
   echo "--- ⑦ 分析師估值快照(批155)";  python3 "$(newest 'VDF_ENG059_EstimateBands_v*.py')" run
   echo "--- ⑧ 台股輪動日快照(批153)";  python3 "$(ls "$VIA/functional modules/GroupIndex/engine"/GRP_ENG040_GroupingRotationRunner_v*.py | sort | tail -1)" run tw
   echo "--- ⑤ 對帳";                    python3 "$(newest 'VDF_ENG055_OmniFetch_v*.py')" --status
+  # 批168:⑨ 同步 UI 重生(樞紐+五系統分頁=存證/庫/冊 join,與系統連動)
+  echo "--- ⑨ 同步 UI 重生(批168)"
+  REG="$VIA/supportive modules/registry"
+  python3 "$(ls "$REG"/CGC_MDL088_SystemTestPages_v*.py | sort | tail -1)" run
+  python3 "$(ls "$REG"/CGC_MDL090_SystemHub_v*.py | sort | tail -1)" run
   echo "=== 畢(誠實三態見上)==="
 } >> "$LOG" 2>&1
 exit 0

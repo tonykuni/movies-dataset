@@ -62,7 +62,8 @@ def def_redact_pii(text: str, mode: str = "partial", ssot: dict[str, Any] | None
         return "[REDACTED_MOBILE]" if mode == "full" else f"{clean[:4]}***{clean[-3:]}"
     apply("tw_mobile", mobile)
     apply("tw_id_candidate", lambda value: ("[REDACTED_TW_ID]" if mode == "full" else f"{value[:2]}******{value[-2:]}") if def_tw_id_valid(value) else value)
-    apply("credit_card_candidate", lambda value: ("[REDACTED_CARD]" if mode == "full" else f"****-****-****-{re.sub(r'\D','',value)[-4:]}") if def_luhn_valid(value) else value)
+    def_card_last4 = lambda value: re.sub(r"\D", "", value)[-4:]  # 語法救援:f-string 表達式禁反斜線(py3.12 前)→ 摘出
+    apply("credit_card_candidate", lambda value: ("[REDACTED_CARD]" if mode == "full" else f"****-****-****-{def_card_last4(value)}") if def_luhn_valid(value) else value)
     return text, counts
 
 def def_scan_terms_text(text: str, ssot: dict[str, Any] | None = None) -> dict[str, Any]:
