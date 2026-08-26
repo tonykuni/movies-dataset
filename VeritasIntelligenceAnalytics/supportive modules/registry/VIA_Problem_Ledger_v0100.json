@@ -3,45 +3,121 @@
  "version": "v0100",
  "append_only": true,
  "policy": "問題台帳(批168):全系統懸案單一冊。誠實分類六態:FIXED=本批修復/ADJUDICATED=裁定結案(誠實發現類)/BY_DESIGN=設計即誠實閘/PENDING_OPERATOR=候操作員供件/NO_WORKAROUND=外部封鎖誠實無解(紅線:不繞)/TRACKED=長期治理面持續追蹤。狀態變更只增不減:新事實=append 新條目引用舊 id。",
- "vsm_snapshot": {"ts": "2026-08-26", "S1": "GREEN", "S2": "GREEN", "S3": "GREEN",
-                  "S3star": "GREEN", "S4": "GREEN", "S5": "GREEN",
-                  "source": "CGC_MDL075_CentralGov_v0105 實跑(批168)"},
+ "vsm_snapshot": {
+  "ts": "2026-08-26",
+  "S1": "GREEN",
+  "S2": "GREEN",
+  "S3": "GREEN",
+  "S3star": "GREEN",
+  "S4": "GREEN",
+  "S5": "GREEN",
+  "source": "CGC_MDL075_CentralGov_v0105 實跑(批168)"
+ },
  "problems": [
-  {"id": "P01", "title": "S1 常駐 RED:六件語法敗檔", "class": "SYNTAX",
-   "status": "FIXED", "batch": 168,
-   "detail": "VRN_TW01/TW02(docstring 含 Windows 路徑 \\U 逸出)→ raw docstring;WebScraping_Compliance+GRP 驗證管線 v0200(f-string 表達式含反斜線,py3.11 禁)→ 摘出變數;四件行為零變更 parse 全過。餘二件=收容原件(references/intake、bundle)→ P02。"},
-  {"id": "P02", "title": "收容原件語法態計入現役燈", "class": "GOVERNANCE",
-   "status": "FIXED", "batch": 168,
-   "detail": "CGC_MDL075 v0105(version-forward):+ARCHIVE_FRAGS 收容原件區判準(references/intake//bundle//rollback/檢疫)——誠實列示不計燈(零觸碰紀律不修原件)。VSM 六燈全綠首達。"},
-  {"id": "P03", "title": "reconcile 對帳缺口:華南投顧-2762-世界健身-KY-Memo", "class": "DATA_GAP",
-   "status": "PENDING_OPERATOR", "batch": 164,
-   "detail": "docx 原件在操作員工作站(C:\\Users\\tonyk\\...),雲端誠實不可補。候操作員提供原件即收容補帳。站=grid SKIP 黃(誠實)。"},
-  {"id": "P04", "title": "supaudit:214 引擎 NONE=候接橋", "class": "ARCH_BACKLOG",
-   "status": "TRACKED", "batch": 164,
-   "detail": "架構盤點誠實口徑(BRIDGE 20/DIRECT 6/DYNAMIC 25/SSOT-DATA 6/NONE 214)。長期治理面逐批接橋;不假綠。站=grid SKIP 黃。"},
-  {"id": "P05", "title": "grid 自指佔位站", "class": "BY_DESIGN",
-   "status": "ADJUDICATED", "batch": 142,
-   "detail": "selftest grid 不自測自身(自指悖論)=文件佔位 SKIP,誠實設計。"},
-  {"id": "P06", "title": "pkuseg 缺件(C 編譯輪無 py3.11 wheel)", "class": "ENV_MISSING",
-   "status": "ADJUDICATED", "batch": 164,
-   "detail": "誠實留缺;jieba 後備全鏈可用;boot ⓪步不嘗試編譯(拒絕無盡 C 輪)。"},
-  {"id": "P07", "title": "CNYES FactSet 端點 WAF 軟封鎖", "class": "EXTERNAL_BLOCK",
-   "status": "NO_WORKAROUND", "batch": 156,
-   "detail": "JSON 端點回 HTML 殼=WAF。紅線:不繞封鎖/不解 CAPTCHA/不偽裝指紋。估值雙源設計以 Yahoo 車道先行,CNYES_FACTSET_PENDING 誠實標記,端點解鎖即自動雙源。"},
-  {"id": "P08", "title": "e-stat appId 未供(日本 CPI/PPI 車道)", "class": "AWAITING_KEY",
-   "status": "PENDING_OPERATOR", "batch": 148,
-   "detail": "候操作員註冊 e-stat 取 appId;車道代碼已備,鑰匙到即通。"},
-  {"id": "P09", "title": "批133 治理議題 REVIEW 20 組候裁決", "class": "GOVERNANCE",
-   "status": "PENDING_OPERATOR", "batch": 133,
-   "detail": "議題仲裁器已分圈列示(零自動套用紀律);候操作員逐組裁決。"},
-  {"id": "P10", "title": "全球輪動冊 V13 名稱樂透", "class": "METHODOLOGY",
-   "status": "ADJUDICATED", "batch": 153,
-   "detail": "受控合成世界名稱迭代=種子賭博非誠實工程→停止;VIA_GlobalFlowRotation_Membership_v0104=正典;global profile verdict=REVIEW 非 PASS(誠實)。"},
-  {"id": "P11", "title": "介面合約 drift 64 模組(VIA-IFACE-1602 等)", "class": "IFACE_DRIFT",
-   "status": "TRACKED", "batch": 168,
-   "detail": "介面合約 dry 掃描:1827 件中 drift 64/new 461=介面演化追蹤面(非錯誤);合約引擎逐批收斂;站綠。"},
-  {"id": "P12", "title": "輪動證偽 pipeline=NOT VALIDATED", "class": "BY_DESIGN",
-   "status": "ADJUDICATED", "batch": 154,
-   "detail": "驗收閘誠實輸出:未過驗收勿 promote=方法論紀律(v0104 冊載累積觸發條件:ETF 快照≥5 日/S7 N≥30/背離 N>1000);資料累積達標自動出值,不假 VALIDATED。"}
+  {
+   "id": "P01",
+   "title": "S1 常駐 RED:六件語法敗檔",
+   "class": "SYNTAX",
+   "status": "FIXED",
+   "batch": 168,
+   "detail": "VRN_TW01/TW02(docstring 含 Windows 路徑 \\U 逸出)→ raw docstring;WebScraping_Compliance+GRP 驗證管線 v0200(f-string 表達式含反斜線,py3.11 禁)→ 摘出變數;四件行為零變更 parse 全過。餘二件=收容原件(references/intake、bundle)→ P02。"
+  },
+  {
+   "id": "P02",
+   "title": "收容原件語法態計入現役燈",
+   "class": "GOVERNANCE",
+   "status": "FIXED",
+   "batch": 168,
+   "detail": "CGC_MDL075 v0105(version-forward):+ARCHIVE_FRAGS 收容原件區判準(references/intake//bundle//rollback/檢疫)——誠實列示不計燈(零觸碰紀律不修原件)。VSM 六燈全綠首達。"
+  },
+  {
+   "id": "P03",
+   "title": "reconcile 對帳缺口:華南投顧-2762-世界健身-KY-Memo",
+   "class": "DATA_GAP",
+   "status": "PENDING_OPERATOR",
+   "batch": 164,
+   "detail": "docx 原件在操作員工作站(C:\\Users\\tonyk\\...),雲端誠實不可補。候操作員提供原件即收容補帳。站=grid SKIP 黃(誠實)。"
+  },
+  {
+   "id": "P04",
+   "title": "supaudit:214 引擎 NONE=候接橋",
+   "class": "ARCH_BACKLOG",
+   "status": "TRACKED",
+   "batch": 164,
+   "detail": "架構盤點誠實口徑(BRIDGE 20/DIRECT 6/DYNAMIC 25/SSOT-DATA 6/NONE 214)。長期治理面逐批接橋;不假綠。站=grid SKIP 黃。"
+  },
+  {
+   "id": "P05",
+   "title": "grid 自指佔位站",
+   "class": "BY_DESIGN",
+   "status": "ADJUDICATED",
+   "batch": 142,
+   "detail": "selftest grid 不自測自身(自指悖論)=文件佔位 SKIP,誠實設計。"
+  },
+  {
+   "id": "P06",
+   "title": "pkuseg 缺件(C 編譯輪無 py3.11 wheel)",
+   "class": "ENV_MISSING",
+   "status": "ADJUDICATED",
+   "batch": 164,
+   "detail": "誠實留缺;jieba 後備全鏈可用;boot ⓪步不嘗試編譯(拒絕無盡 C 輪)。"
+  },
+  {
+   "id": "P07",
+   "title": "CNYES FactSet 端點 WAF 軟封鎖",
+   "class": "EXTERNAL_BLOCK",
+   "status": "NO_WORKAROUND",
+   "batch": 156,
+   "detail": "JSON 端點回 HTML 殼=WAF。紅線:不繞封鎖/不解 CAPTCHA/不偽裝指紋。估值雙源設計以 Yahoo 車道先行,CNYES_FACTSET_PENDING 誠實標記,端點解鎖即自動雙源。"
+  },
+  {
+   "id": "P08",
+   "title": "e-stat appId 未供(日本 CPI/PPI 車道)",
+   "class": "AWAITING_KEY",
+   "status": "PENDING_OPERATOR",
+   "batch": 148,
+   "detail": "候操作員註冊 e-stat 取 appId;車道代碼已備,鑰匙到即通。"
+  },
+  {
+   "id": "P09",
+   "title": "批133 治理議題 REVIEW 20 組候裁決",
+   "class": "GOVERNANCE",
+   "status": "PENDING_OPERATOR",
+   "batch": 133,
+   "detail": "議題仲裁器已分圈列示(零自動套用紀律);候操作員逐組裁決。"
+  },
+  {
+   "id": "P10",
+   "title": "全球輪動冊 V13 名稱樂透",
+   "class": "METHODOLOGY",
+   "status": "ADJUDICATED",
+   "batch": 153,
+   "detail": "受控合成世界名稱迭代=種子賭博非誠實工程→停止;VIA_GlobalFlowRotation_Membership_v0104=正典;global profile verdict=REVIEW 非 PASS(誠實)。"
+  },
+  {
+   "id": "P11",
+   "title": "介面合約 drift 64 模組(VIA-IFACE-1602 等)",
+   "class": "IFACE_DRIFT",
+   "status": "TRACKED",
+   "batch": 168,
+   "detail": "介面合約 dry 掃描:1827 件中 drift 64/new 461=介面演化追蹤面(非錯誤);合約引擎逐批收斂;站綠。"
+  },
+  {
+   "id": "P12",
+   "title": "輪動證偽 pipeline=NOT VALIDATED",
+   "class": "BY_DESIGN",
+   "status": "ADJUDICATED",
+   "batch": 154,
+   "detail": "驗收閘誠實輸出:未過驗收勿 promote=方法論紀律(v0104 冊載累積觸發條件:ETF 快照≥5 日/S7 N≥30/背離 N>1000);資料累積達標自動出值,不假 VALIDATED。"
+  },
+  {
+   "id": "P13",
+   "title": "P04 結案:候接橋 214 為粗口徑假債,真網路債=0",
+   "class": "GOVERNANCE",
+   "status": "FIXED",
+   "batch": 170,
+   "supersedes": "P04",
+   "detail": "CGC_MDL068 v0101 精煉三判準:①FROZEN 95=非家族尾版/_sha 鏡像(凍結零觸碰永不接橋)②NO_NEED 98=在役純本地計算(誠實無需橋)③網路痕跡 24 件抽驗全部已含統包橋記號(SUP_MDL740/741/VIA_NetSupport/via_net;批65-66 統包改造真跡)=NET_OK。真債 NET_DEBT=0→判定 CLEAN_FACE,站 SKIP→OK。往後新增引擎若直連網路未走統包=NET_GAPS 紅,守門自動化。"
+  }
  ]
 }
