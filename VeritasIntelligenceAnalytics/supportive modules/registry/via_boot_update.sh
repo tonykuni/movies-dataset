@@ -67,6 +67,7 @@ PYENV
   python3 "$(ls "$REG"/CGC_MDL088_SystemTestPages_v*.py | sort | tail -1)" run
   python3 "$(ls "$REG"/CGC_MDL090_SystemHub_v*.py | sort | tail -1)" run
   python3 "$(ls "$VIA/functional modules/VAP/engine"/VAP_ENG009_DashboardUI_v*.py | sort | tail -1)" run
+  python3 "$(ls "$VIA/functional modules/VRN"/VRN_ENG068_DailyBrief_v*.py | sort | tail -1)" run
   echo "=== 畢(誠實三態見上)==="
 } >> "$LOG" 2>&1
 exit 0
