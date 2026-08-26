@@ -4311,6 +4311,13 @@
    "ts": "2026-08-26 19:05",
    "name": "批178 操作員令「adj close/close→OHLC 全轉調整價=一切輸入」:VDF_ENG060 調整層+正典視圖+下游切源",
    "note": "【調整層】factor=adj_close/close 逐列同乘 open/high/low(close<=0/缺=誠實跳過:台股 1 列);tw_prices_adj 1,248,515 列+gl_prices_adj 51,221 列;data_class=DERIVED_ADJ_FACTOR(交接報告 05.4:不混用+Derived 標記)。【正典視圖】prices_canonical=下游一切輸入取數點;正本 tw_daily_prices 零觸碰僅供 factor 重算與稽核。【下游切源】儀表板 v0104+共識庫 v0101 version-forward 切 prices_canonical;輪動 GRP_ENG040 原已用 adj_close ✓。【不變量】同列同乘保序:調整不引入新異常,原生競價 timing 異常 1,599 守恆由 dq_ohlc_flags 續標(QA:初版誤稱歸零→實測守恆誠實修正)。2330 有調整日數學實證 adj_open=open×factor 至 1e-9。八檢 8/8+消費層 8/8+11/11;boot ②b 日更;grid v0183=122 站;名冊 VDF_ENG=60。」"
+  },
+  {
+   "code": "TOOL-181",
+   "kind": "批179 引擎簡化工程啟動",
+   "ts": "2026-08-26 19:40",
+   "name": "批179 操作員 Roadmap(五階段)收容+引擎簡化稽核 CGC_MDL092——未使用 297 件候裁+Phase 1 落地",
+   "note": "【Roadmap 入冊】docs/VIA_EngineSimplification_Roadmap(原文照錄;guardrails=不 big bang/回退直通/分層不混寫/邊界測試回放)。【盤點】battery 站冊×合約冊 imports 交叉:functional modules 現役面未使用 297 件(排除凍結/_sha/SCOPE_COPY/收容原件/vendor);八功能群分群(FETCH_NET/OCR_DOC/PLOT_UI/FLOW_REGIME/FINANCE_CALC/NLP_TEXT/STORE_DB/GOV_TEST+OTHER)→VIA_Engine_Consolidation_Register 全 PENDING_OPERATOR 候裁=AUDIT-ONLY 零改動(整併裁決權=操作員;不傷能力+回退保留原則冊載)。【凍結名單】SUP_MDL740/741/VIA_NetSupport(操作員明令網路工具不可動)+v0201 輪動正典=連候審不列。【Phase 1 落地】A=VIA_Schema_Registry(雙庫全表欄位型別快照 24 表=schema drift 守門基線)B=VIA_Engine_Contract(load/transform/evaluate/emit 四介面+Pydantic EngineEnvelope 15 欄封包=交接報告 08.2 對齊;實跑驗證過)。八檢 8/8;grid v0184=123 站;名冊 CGC_MDL=92。」"
   }
  ]
 }

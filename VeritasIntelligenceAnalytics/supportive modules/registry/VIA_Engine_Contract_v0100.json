@@ -1,0 +1,45 @@
+{
+ "schema": "VIA_ENGINE_CONTRACT_V1",
+ "version": "v0100",
+ "append_only": true,
+ "ts": "2026-08-26 18:19",
+ "interface": {
+  "load": "載入輸入(唯讀;宣告 sources+grain)",
+  "transform": "轉換(純函數;不觸網不寫正本)",
+  "evaluate": "驗證(schema check+quality_status 判定)",
+  "emit": "產出(封包化;data_class 繼承上游)"
+ },
+ "io_envelope": {
+  "note": "對齊交接報告 08.2 統一資料封包;所有新引擎 I/O 必經此封包+Pydantic 驗證",
+  "fields": [
+   "run_id",
+   "artifact_id",
+   "subsystem",
+   "schema_version",
+   "source_name",
+   "source_type",
+   "as_of_date",
+   "grain",
+   "row_count",
+   "content_sha256",
+   "quality_status",
+   "data_class",
+   "evidence_path",
+   "warnings",
+   "errors"
+  ],
+  "quality_status": [
+   "PASS",
+   "WARN",
+   "HOLD",
+   "FAIL"
+  ],
+  "data_class": [
+   "ACTUAL",
+   "DERIVED",
+   "PROXY",
+   "ESTIMATED"
+  ]
+ },
+ "pydantic_model": "from pydantic import BaseModel\nclass EngineEnvelope(BaseModel):\n    run_id: str; artifact_id: str; subsystem: str\n    schema_version: str; source_name: str; source_type: str\n    as_of_date: str; grain: list[str]; row_count: int\n    content_sha256: str; quality_status: str; data_class: str\n    evidence_path: str; warnings: list[str] = []\n    errors: list[str] = []"
+}
