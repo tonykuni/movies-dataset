@@ -59,6 +59,7 @@ PYENV
   # 批161 update:日更管線收編批154-155 引擎(checkpoint 增量制=每日只補新)
   echo "--- ⑥ 逐股成交值增量(批154)";  python3 "$(newest 'VDF_ENG057_TradingValueBackfill_v*.py')" run
   echo "--- ⑦ 分析師估值快照(批155)";  python3 "$(newest 'VDF_ENG059_EstimateBands_v*.py')" run
+  echo "--- ⑦b 驗證共識庫(批176)";     python3 "$(ls "$VIA/functional modules/VRN"/VRN_ENG069_ConsensusDB_v*.py | sort | tail -1)" build
   echo "--- ⑧ 台股輪動日快照(批153)";  python3 "$(ls "$VIA/functional modules/GroupIndex/engine"/GRP_ENG040_GroupingRotationRunner_v*.py | sort | tail -1)" run tw
   echo "--- ⑤ 對帳";                    python3 "$(newest 'VDF_ENG055_OmniFetch_v*.py')" --status
   # 批168:⑨ 同步 UI 重生(樞紐+五系統分頁=存證/庫/冊 join,與系統連動)
