@@ -1,0 +1,38 @@
+{
+ "schema": "VIA_UI_TEMPLATE_SSOT_V1",
+ "version": "v0100",
+ "append_only": true,
+ "policy": "原始 UI 模板 SSOT(批165):全系統頁面之單一樣式正主。版面規劃未定案=極簡不雕視覺;定案後改冊不改引擎(版本前進制,凍結版零觸碰)。色/字/距/斷點/槽位全由本冊供給,引擎內禁寫死。",
+ "palette": {
+  "bg": "#f6f7f9", "surface": "#ffffff", "border": "#e5e7eb",
+  "line": "#f1f5f9", "text": "#1f2937", "mut": "#94a3b8",
+  "sub": "#475569", "accent": "#111827", "accent_text": "#ffffff",
+  "warn_bg": "#fef9c3", "warn_border": "#fde047"
+ },
+ "status": {
+  "OK": "#15803d", "FAIL": "#b91c1c", "SKIP": "#a16207", "UNTESTED": "#64748b"
+ },
+ "font": {
+  "family": "'Segoe UI','Noto Sans TC',sans-serif",
+  "fs": "clamp(11px,2.6vw,12.5px)",
+  "h1": "clamp(.95rem,2vw,1.2rem)",
+  "h2": "clamp(.85rem,1.7vw,1.05rem)",
+  "line_height": 1.5
+ },
+ "space": {"pad_page": "clamp(8px,1.5vw,16px)", "pad_card": "10px 12px", "gap": "6px"},
+ "radius": {"card": "10px", "tab": "7px", "warn": "8px"},
+ "layout": {"max_width": "1200px", "mobile_breakpoint_px": 640, "tap_min_px": 40},
+ "slots": [
+  {"id": "header_lamp", "zh": "標頭三色總燈", "required": true},
+  {"id": "env_row", "zh": "環境列(Python/平台/關鍵庫版本)", "required": true},
+  {"id": "kpi", "zh": "紅黃綠 KPI 帶", "required": true},
+  {"id": "station_table", "zh": "逐站多指標表(狀態/站名/引擎/秒/摘要,上→下)", "required": true},
+  {"id": "engine_list", "zh": "引擎/庫清單", "required": false},
+  {"id": "footer", "zh": "頁尾(存證連動+誠實三態說明)", "required": true}
+ ],
+ "honesty": {
+  "yellow": "SKIP=環境缺件/誠實發現類,不假綠",
+  "grey": "UNTESTED=無存證,不假測",
+  "evidence": "頁面數據=最新 GRID 存證 join,零重測零發明"
+ }
+}
