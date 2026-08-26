@@ -28,6 +28,10 @@ newest() { ls "$ENG"/$1 2>/dev/null | sort | tail -1; }
   echo "--- ③ 籌碼增量+衍生";           python3 "$(newest 'VDF_ENG056_ChipBackfill_v*.py')" run
   python3 "$(newest 'VDF_ENG056_ChipBackfill_v*.py')" --derive
   echo "--- ④ 主動 ETF 持股(PARTIAL 屬常態)"; python3 "$ENG/VDF_ENG051_ActiveTWETF_Holdings.py"
+  # 批161 update:日更管線收編批154-155 引擎(checkpoint 增量制=每日只補新)
+  echo "--- ⑥ 逐股成交值增量(批154)";  python3 "$(newest 'VDF_ENG057_TradingValueBackfill_v*.py')" run
+  echo "--- ⑦ 分析師估值快照(批155)";  python3 "$(newest 'VDF_ENG059_EstimateBands_v*.py')" run
+  echo "--- ⑧ 台股輪動日快照(批153)";  python3 "$(ls "$VIA/functional modules/GroupIndex/engine"/GRP_ENG040_GroupingRotationRunner_v*.py | sort | tail -1)" run tw
   echo "--- ⑤ 對帳";                    python3 "$(newest 'VDF_ENG055_OmniFetch_v*.py')" --status
   echo "=== 畢(誠實三態見上)==="
 } >> "$LOG" 2>&1
