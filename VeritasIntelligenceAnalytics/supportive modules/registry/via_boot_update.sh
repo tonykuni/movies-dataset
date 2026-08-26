@@ -22,6 +22,34 @@ export VIA_NET_CONSENT=YES VIA_SCRAPE_CONSENT=YES
 newest() { ls "$ENG"/$1 2>/dev/null | sort | tail -1; }
 {
   echo "=== VIA 開機更新 $TODAY(批150)==="
+  # ⓪ 批164 環境自補(容器非持久=每日檢缺才裝;等效根+套件冊)
+  echo "--- ⓪ 環境自補(批164)"
+  mkdir -p /root/Downloads "/root/OneDrive/VeritasIntelligenceAnalytics/module"
+  python3 - <<'PYENV'
+import importlib.util, subprocess, sys
+from pathlib import Path
+need = [("networkx","networkx"),("dateparser","dateparser"),("spacy","spacy"),
+        ("sumy","sumy"),("yake","yake"),("quantulum3","quantulum3")]
+missing = [pip for mod,pip in need if importlib.util.find_spec(mod) is None]
+req = Path(__file__).resolve()  # placeholder
+if missing:
+    subprocess.run([sys.executable,"-m","pip","install","--quiet","docopt-ng"],check=False)
+    subprocess.run([sys.executable,"-m","pip","install","--quiet","--no-deps",*missing],check=False)
+    subprocess.run([sys.executable,"-m","pip","install","--quiet","segtok","jellyfish","regex","tzlocal"],check=False)
+if importlib.util.find_spec("spacy") is not None:
+    try:
+        import spacy; spacy.load("zh_core_web_sm")
+    except Exception:
+        subprocess.run([sys.executable,"-m","pip","install","--quiet",
+          "https://github.com/explosion/spacy-models/releases/download/zh_core_web_sm-3.8.0/zh_core_web_sm-3.8.0-py3-none-any.whl"],check=False)
+try:
+    import duckdb
+    p="/root/OneDrive/VeritasIntelligenceAnalytics/module/via.duckdb"
+    if not Path(p).exists():
+        duckdb.connect(p).close()
+except Exception: pass
+print("[env] 檢缺自補畢(pkuseg=C 輪誠實除外)")
+PYENV
   cd "$ENG" || exit 1
   echo "--- ① OmniFetch 全車道";        python3 "$(newest 'VDF_ENG055_OmniFetch_v*.py')" run
   echo "--- ② 價格增量";                python3 "$(newest 'VDF_ENG054_TWDailyBackfill_v*.py')" run
