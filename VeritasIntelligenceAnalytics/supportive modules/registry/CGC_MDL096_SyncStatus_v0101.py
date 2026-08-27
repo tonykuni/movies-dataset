@@ -436,7 +436,8 @@ def regen_all() -> int:
     jobs = [("supportive modules/registry", "CGC_MDL090_SystemHub_v*.py", []),
             ("supportive modules/registry", "CGC_MDL093_GovernanceMatrix_v*.py", []),
             ("supportive modules/registry", "CGC_MDL088_SystemTestPages_v*.py", []),
-            ("supportive modules/registry", "CGC_MDL094_CommandDeck_v*.py", [])]
+            ("supportive modules/registry", "CGC_MDL094_CommandDeck_v*.py", []),
+            ("supportive modules/registry", "CGC_MDL097_PortalUI_v*.py", [])]
     bad = 0
     for d, pat, extra in jobs:
         cand = sorted((VIA / d).glob(pat))

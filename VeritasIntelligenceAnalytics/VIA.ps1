@@ -48,14 +48,14 @@ function Newest([string]$dir, [string]$pat) {
 
 function Open-UIs {
     Start-Sleep -Seconds 2
-    Start-Process "http://127.0.0.1:8765/"   # 指揮台=橋接版(按下直跑)
-    foreach ($f in @("VIA_UI_SystemHub_v0100.html",
-                     "VIA_UI_GovernanceMatrix_v0100.html",
-                     "VIA_UI_SyncStatus_v0100.html")) {
-        $p = Join-Path $VIA "supportive modules\ui_support\$f"
-        if (Test-Path $p) { Start-Process $p }
-    }
-    Write-Host "  [UI] 樞紐+指揮台+治理矩陣+同步狀態台 已開" -ForegroundColor Green
+    # 批222:總入口 Portal 單頁=一鍵到全介面(先重生=尾版清單最新)
+    $pg = Newest (Join-Path $VIA "supportive modules\registry") "CGC_MDL097_PortalUI_v*.py"
+    if ($pg) { python "$pg" | Out-Null }
+    $portal = Join-Path $VIA "supportive modules\ui_support\VIA_UI_Portal_v0100.html"
+    if (Test-Path $portal) { Start-Process $portal
+        Write-Host "  [UI] 總入口 Portal 已開(內含全介面連結;橋接=指揮台直跑)" -ForegroundColor Green }
+    else { Start-Process "http://127.0.0.1:8765/"
+        Write-Host "  [UI] Portal 缺=後備開指揮台(誠實)" -ForegroundColor Yellow }
 }
 
 function Sync-Repo {
@@ -100,7 +100,7 @@ if ($Menu) {
     while ($true) {
         Write-Host "`n=== VIA 選單(輸入數字按 Enter)===" -ForegroundColor Cyan
         Write-Host " 1) 全自動(日更+回補+UI)  2) 只跑日更全鏈"
-        Write-Host " 3) 只跑歷史回補 2022~      4) 只開 UI 四頁"
+        Write-Host " 3) 只跑歷史回補 2022~      4) 只開總入口 Portal"
         Write-Host " 5) 建桌面捷徑              0) 離開"
         switch (Read-Host "選") {
             "1" { Invoke-All }
