@@ -113,6 +113,14 @@ function Invoke-All {
     if ($bf) { Start-Background "歷史回補 2022~(增量續跑;2020/21 終止批212)" $bf @("run") }
     Open-UIs
     Write-Host "[VIA] 完成派工。進度:VIA_Reports\boot_update_logs\ 最新 log;UI 稍後重新整理即最新。" -ForegroundColor Yellow
+    # 批225:剩餘進程誠實清單(一鍵之後,還在跑什麼/還候什麼)
+    Write-Host ""
+    Write-Host "=== 剩餘進程(全自動,無需操作)===" -ForegroundColor Cyan
+    Write-Host "  1) 日更全鏈 boot ①-⑨(含月營收⑦d+鉅亨共識⑦e+四頁 UI⑨)→背景跑中"
+    Write-Host "  2) 歷史回補 2022 段剩餘檔→背景續跑(斷了再雙擊 VIA 即續;2020/21=批212 終止)"
+    Write-Host "  3) 短指令註冊(regen-all / via / via-status)→新 PS 視窗生效"
+    Write-Host "=== 候操作員(系統無法代決;詳見狀態台⑥矩陣)===" -ForegroundColor Yellow
+    Write-Host "  P03 對帳 docx 原件 · P08 e-stat appId · P09 REVIEW 20 組 · P18 模板候令(未經允許不碰)"
 }
 
 if ($Install) { New-DesktopShortcut; Read-Host "按 Enter 關閉"; exit 0 }
