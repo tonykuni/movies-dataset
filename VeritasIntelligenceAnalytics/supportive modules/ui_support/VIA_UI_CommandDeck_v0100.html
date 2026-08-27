@@ -67,14 +67,19 @@ padding:10px 16px;cursor:pointer;min-height:44px}
 background:#333;color:#fff;padding:10px 18px;border-radius:20px;display:none}
 </style></head><body><div class="wrap">
 <h1>🎛️ VIA 指揮台(零打字操作)</h1>
-<div class="mut">2026-08-27 13:42 · 點卡/下拉/勾選/拖曳 → 指令自動入剪貼簿 → 貼到
+<div class="mut">2026-08-27 13:58 · 點卡/下拉/勾選/拖曳 → 指令自動入剪貼簿 → 貼到
 PowerShell 按 Enter · 誠實界線:瀏覽器不能直接執行本機程式,本台=
 三動作極簡(複製→貼上→Enter);真零操作=每日開機自動鏈+桌面
 VIA-Start.bat 雙擊</div>
 <section class="page on"><h2>⚙️ Root(批196 裁定 Active Root;可改)</h2>
 <input type="text" id="root" value="C:\Users\tonyk\movies-dataset\VeritasIntelligenceAnalytics" style="width:100%"></section>
-<section class="page on"><h2>① 一鍵任務卡(點=複製指令)</h2>
-<div class="deck"><button class="card" data-cmd="powershell -ExecutionPolicy Bypass -File &quot;{R}\launch.ps1&quot;"><div class="ci">🔄</div><div class="ct">全自動日更(建議每日一次)</div><div class="mut">背景跑全鏈+自動開 UI;終端不卡</div></button><button class="card" data-cmd="$env:VIA_NET_CONSENT=&quot;YES&quot;; $env:VIA_SCRAPE_CONSENT=&quot;YES&quot;; python &quot;{R}\functional modules\VDF\engine\VDF_ENG064_HistoryBackfill_v0100.py&quot; run"><div class="ci">📥</div><div class="ct">歷史回補 2020~(可中斷續跑)</div><div class="mut">由新到舊;斷了再點一次=接著跑</div></button><button class="card" data-cmd="$env:VIA_NET_CONSENT=&quot;YES&quot;; $env:VIA_SCRAPE_CONSENT=&quot;YES&quot;; python &quot;{R}\functional modules\VRN\VRN_ENG071_CnyesFusion_v0100.py&quot; run {CODES}"><div class="ci">🎯</div><div class="ct">三源共識更新(鉅亨 FactSet)</div><div class="mut">預設 2330 2317 2454;可在組合器改碼</div></button><button class="card" data-cmd="$env:VIA_NET_CONSENT=&quot;YES&quot;; $env:VIA_SCRAPE_CONSENT=&quot;YES&quot;; python &quot;{R}\functional modules\VDF\engine\VDF_ENG063_MonthlyRevenue_v0102.py&quot; run"><div class="ci">🏢</div><div class="ct">月營收全市場(MOPS 官方)</div><div class="mut">上市+上櫃+證券商 1,377 檔一次入庫</div></button><button class="card" data-cmd="python &quot;{R}\supportive modules\registry\CGC_MDL090_SystemHub_v0101.py&quot; run; python &quot;{R}\supportive modules\registry\CGC_MDL093_GovernanceMatrix_v0100.py&quot; run; start &quot;{R}\supportive modules\ui_support\VIA_UI_SystemHub_v0100.html&quot;"><div class="ci">🖥️</div><div class="ct">重生全部 UI 頁</div><div class="mut">重生+自動開樞紐母頁</div></button></div></section>
+<section class="page on"><h2>① 一鍵任務卡 <span id="bridgestate" class="mut">(偵測橋接中…)</span></h2>
+<div class="deck"><button class="card" data-id="boot" data-cmd="powershell -ExecutionPolicy Bypass -File &quot;{R}\launch.ps1&quot;"><div class="ci">🔄</div><div class="ct">全自動日更(建議每日一次)</div><div class="mut">背景跑全鏈+自動開 UI;終端不卡</div></button><button class="card" data-id="backfill" data-cmd="$env:VIA_NET_CONSENT=&quot;YES&quot;; $env:VIA_SCRAPE_CONSENT=&quot;YES&quot;; python &quot;{R}\functional modules\VDF\engine\VDF_ENG064_HistoryBackfill_v0100.py&quot; run"><div class="ci">📥</div><div class="ct">歷史回補 2020~(可中斷續跑)</div><div class="mut">由新到舊;斷了再點一次=接著跑</div></button><button class="card" data-id="consensus" data-cmd="$env:VIA_NET_CONSENT=&quot;YES&quot;; $env:VIA_SCRAPE_CONSENT=&quot;YES&quot;; python &quot;{R}\functional modules\VRN\VRN_ENG071_CnyesFusion_v0100.py&quot; run {CODES}"><div class="ci">🎯</div><div class="ct">三源共識更新(鉅亨 FactSet)</div><div class="mut">預設 2330 2317 2454;可在組合器改碼</div></button><button class="card" data-id="revenue" data-cmd="$env:VIA_NET_CONSENT=&quot;YES&quot;; $env:VIA_SCRAPE_CONSENT=&quot;YES&quot;; python &quot;{R}\functional modules\VDF\engine\VDF_ENG063_MonthlyRevenue_v0102.py&quot; run"><div class="ci">🏢</div><div class="ct">月營收全市場(MOPS 官方)</div><div class="mut">上市+上櫃+證券商 1,377 檔一次入庫</div></button><button class="card" data-id="ui" data-cmd="python &quot;{R}\supportive modules\registry\CGC_MDL090_SystemHub_v0101.py&quot; run; python &quot;{R}\supportive modules\registry\CGC_MDL093_GovernanceMatrix_v0100.py&quot; run; start &quot;{R}\supportive modules\ui_support\VIA_UI_SystemHub_v0100.html&quot;"><div class="ci">🖥️</div><div class="ct">重生全部 UI 頁</div><div class="mut">重生+自動開樞紐母頁</div></button></div></section>
+<section class="page on"><h2>🚦 執行狀況矩陣(RYG;橋接模式即時)</h2>
+<div class="tablewrap"><table id="runmatrix"><tr><th>任務</th><th>燈</th>
+<th>狀況(log 尾)</th><th>解決方案</th></tr>
+<tr><td colspan=4 class="mut">橋接未啟動時本矩陣停用——雙擊 VIA
+(或跑 launch.ps1)自動帶起橋接,按卡即直接執行</td></tr></table></div></section>
 <section class="page on"><h2>② 組合器(下拉×勾選×代碼)</h2>
 <div class="row">
 <select id="eng"><option value="0">月營收分析</option><option value="1">鉅亨共識</option><option value="2">Yahoo 共識</option><option value="3">歷史回補</option><option value="4">因子庫</option></select>
@@ -107,7 +112,36 @@ function copyCmd() {
   document.body.removeChild(ta); toast();
 }
 $("copy").onclick = copyCmd;
+/* 批208 橋接模式:按下=直接執行(127.0.0.1 白名單橋);無橋=剪貼簿 */
+let BRIDGE = false;
+const LAMP = {idle: "#bbb", running: "#f0b429", ok: "#15803d", fail: "#dc2626"};
+fetch("/ping").then(r => r.json()).then(j => {
+  if (j && j.via === "deck-bridge") { BRIDGE = true;
+    $("bridgestate").textContent = "(🟢 橋接中=按下直接執行)";
+    setInterval(pollStatus, 2500); pollStatus(); }
+}).catch(() => { $("bridgestate").textContent = "(⚪ 無橋=複製模式;雙擊 VIA 啟橋)"; });
+function pollStatus() {
+  fetch("/status").then(r => r.json()).then(st => {
+    const rows = Object.entries(st).map(([id, s]) =>
+      `<tr><td>${s.zh}</td>` +
+      `<td><span class="dot" style="background:${LAMP[s.state] || "#bbb"}"></span>` +
+      `${s.state}${s.rc != null ? " rc=" + s.rc : ""}</td>` +
+      `<td class="mut" style="white-space:pre-wrap">${(s.tail || "").slice(-260)}</td>` +
+      `<td>${s.fix || ""}</td></tr>`).join("");
+    $("runmatrix").innerHTML =
+      "<tr><th>任務</th><th>燈</th><th>狀況(log 尾)</th><th>解決方案</th></tr>" + rows;
+  }).catch(() => {});
+}
 document.querySelectorAll(".card").forEach(b => b.onclick = () => {
+  if (BRIDGE && b.dataset.id) {
+    fetch(`/run?task=${b.dataset.id}&codes=${encodeURIComponent($("codes").value.trim())}`)
+      .then(r => r.json()).then(j => {
+        const t = $("toast");
+        t.textContent = j.ok ? "已啟動執行!看下方矩陣燈號" : ("未啟動:" + j.err);
+        t.style.display = "block"; setTimeout(() => t.style.display = "none", 2500);
+        pollStatus(); });
+    return;
+  }
   setCmd(b.dataset.cmd.replaceAll("{R}", R())
         .replaceAll("{CODES}", $("codes").value.trim())); copyCmd(); });
 function renderVerbs() {

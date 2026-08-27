@@ -46,8 +46,9 @@ function Newest([string]$dir, [string]$pat) {
 }
 
 function Open-UIs {
+    Start-Sleep -Seconds 2
+    Start-Process "http://127.0.0.1:8765/"   # 指揮台=橋接版(按下直跑)
     foreach ($f in @("VIA_UI_SystemHub_v0100.html",
-                     "VIA_UI_CommandDeck_v0100.html",
                      "VIA_UI_GovernanceMatrix_v0100.html")) {
         $p = Join-Path $VIA "supportive modules\ui_support\$f"
         if (Test-Path $p) { Start-Process $p }
@@ -59,6 +60,10 @@ function Invoke-All {
     $env:VIA_NET_CONSENT = "YES"; $env:VIA_SCRAPE_CONSENT = "YES"
     Write-Host "[VIA] 全自動模式:日更全鏈+歷史回補續跑+開 UI(全背景不卡)" -ForegroundColor Yellow
     Start-Background "日更全鏈(boot ①-⑨)" (Join-Path $VIA "supportive modules\registry\via_boot_update.ps1") @()
+    # 批208:指揮台執行橋(按下=直接執行;127.0.0.1 白名單)
+    $ds = Get-ChildItem (Join-Path $VIA "supportive modules\registry") -Filter "CGC_MDL095_DeckServer_v*.py" | Sort-Object Name | Select-Object -Last 1
+    if ($ds) { Start-Process python -ArgumentList @("`"$($ds.FullName)`"", "serve") -WindowStyle Minimized | Out-Null
+               Write-Host "  [背景] 指揮台橋接 http://127.0.0.1:8765/ 已啟動" -ForegroundColor Cyan }
     $bf = Newest (Join-Path $VIA "functional modules\VDF\engine") "VDF_ENG064_HistoryBackfill_v*.py"
     if ($bf) { Start-Background "歷史回補 2020~(增量續跑)" $bf @("run") }
     Open-UIs

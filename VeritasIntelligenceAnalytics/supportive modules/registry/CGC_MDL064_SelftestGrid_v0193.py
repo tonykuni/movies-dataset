@@ -123,6 +123,8 @@ v0166→v0167(批145):+第 104 站寬表刷新器六檢(VAP_ENG007:
 實抓雙庫→MacroRawWide 合併延伸;既有值零觸碰+備份側件)——104 站。
 v0167→v0168(批149):+第 105 站主動 ETF 持股引擎 self-test
 (ENG051 批131 收容件;25/30 檔實抓已證)——105 站。
+v0193 追記(批208):+第 135 站執行橋八檢(CGC_MDL095:127.0.0.1
+白名單任務橋=按下直跑+RYG 狀態矩陣+解方冊;任意指令拒絕)——135 站。
 v0193 追記(批204):+第 134 站指揮台九檢(CGC_MDL094:一鍵卡×
 組合器×拖曳收件零打字;VIA-Start.bat 雙擊入口)——134 站。
 v0192→v0193(批203):+第 133 站歷史回補八檢(VDF_ENG064:2020~
@@ -406,6 +408,7 @@ def battery(fast: bool):
     add("治理台 UI Matrix 八檢(批201)", newest("CGC_MDL093_GovernanceMatrix_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("歷史回補八檢(批203)", newest("VDF_ENG064_HistoryBackfill_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300)
     add("指揮台九檢(批204)", newest("CGC_MDL094_CommandDeck_v*.py", HERE), ["--selftest"], "rc0", 300)
+    add("執行橋八檢(批208)", newest("CGC_MDL095_DeckServer_v*.py", HERE), ["--selftest"], "rc0", 300)
     B.append({"name": "ChipWar 引擎編譯檢(零執行)", "path": "PYCODE", "args": [], "expect": "rc0",
               "timeout": 180, "pycode": (
                   "import py_compile,sys\n"

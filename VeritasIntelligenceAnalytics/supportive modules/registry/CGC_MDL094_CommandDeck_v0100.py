@@ -100,7 +100,8 @@ def render() -> str:
     st = tk["status"]
     ts = datetime.now().strftime("%Y-%m-%d %H:%M")
     cards = "".join(
-        f'<button class="card" data-cmd="{t["cmd"].replace(chr(34), "&quot;")}">'
+        f'<button class="card" data-id="{t["id"]}" '
+        f'data-cmd="{t["cmd"].replace(chr(34), "&quot;")}">'
         f'<div class="ci">{t["icon"]}</div><div class="ct">{t["zh"]}</div>'
         f'<div class="mut">{t["note"]}</div></button>'
         for t in TASKS)
@@ -136,8 +137,13 @@ PowerShell 按 Enter · 誠實界線:瀏覽器不能直接執行本機程式,本
 VIA-Start.bat 雙擊</div>
 <section class="page on"><h2>⚙️ Root(批196 裁定 Active Root;可改)</h2>
 <input type="text" id="root" value="{DEFAULT_ROOT}" style="width:100%"></section>
-<section class="page on"><h2>① 一鍵任務卡(點=複製指令)</h2>
+<section class="page on"><h2>① 一鍵任務卡 <span id="bridgestate" class="mut">(偵測橋接中…)</span></h2>
 <div class="deck">{cards}</div></section>
+<section class="page on"><h2>🚦 執行狀況矩陣(RYG;橋接模式即時)</h2>
+<div class="tablewrap"><table id="runmatrix"><tr><th>任務</th><th>燈</th>
+<th>狀況(log 尾)</th><th>解決方案</th></tr>
+<tr><td colspan=4 class="mut">橋接未啟動時本矩陣停用——雙擊 VIA
+(或跑 launch.ps1)自動帶起橋接,按卡即直接執行</td></tr></table></div></section>
 <section class="page on"><h2>② 組合器(下拉×勾選×代碼)</h2>
 <div class="row">
 <select id="eng">{eng_opts}</select>
@@ -170,7 +176,36 @@ function copyCmd() {{
   document.body.removeChild(ta); toast();
 }}
 $("copy").onclick = copyCmd;
+/* 批208 橋接模式:按下=直接執行(127.0.0.1 白名單橋);無橋=剪貼簿 */
+let BRIDGE = false;
+const LAMP = {{idle: "#bbb", running: "#f0b429", ok: "#15803d", fail: "#dc2626"}};
+fetch("/ping").then(r => r.json()).then(j => {{
+  if (j && j.via === "deck-bridge") {{ BRIDGE = true;
+    $("bridgestate").textContent = "(🟢 橋接中=按下直接執行)";
+    setInterval(pollStatus, 2500); pollStatus(); }}
+}}).catch(() => {{ $("bridgestate").textContent = "(⚪ 無橋=複製模式;雙擊 VIA 啟橋)"; }});
+function pollStatus() {{
+  fetch("/status").then(r => r.json()).then(st => {{
+    const rows = Object.entries(st).map(([id, s]) =>
+      `<tr><td>${{s.zh}}</td>` +
+      `<td><span class="dot" style="background:${{LAMP[s.state] || "#bbb"}}"></span>` +
+      `${{s.state}}${{s.rc != null ? " rc=" + s.rc : ""}}</td>` +
+      `<td class="mut" style="white-space:pre-wrap">${{(s.tail || "").slice(-260)}}</td>` +
+      `<td>${{s.fix || ""}}</td></tr>`).join("");
+    $("runmatrix").innerHTML =
+      "<tr><th>任務</th><th>燈</th><th>狀況(log 尾)</th><th>解決方案</th></tr>" + rows;
+  }}).catch(() => {{}});
+}}
 document.querySelectorAll(".card").forEach(b => b.onclick = () => {{
+  if (BRIDGE && b.dataset.id) {{
+    fetch(`/run?task=${{b.dataset.id}}&codes=${{encodeURIComponent($("codes").value.trim())}}`)
+      .then(r => r.json()).then(j => {{
+        const t = $("toast");
+        t.textContent = j.ok ? "已啟動執行!看下方矩陣燈號" : ("未啟動:" + j.err);
+        t.style.display = "block"; setTimeout(() => t.style.display = "none", 2500);
+        pollStatus(); }});
+    return;
+  }}
   setCmd(b.dataset.cmd.replaceAll("{{R}}", R())
         .replaceAll("{{CODES}}", $("codes").value.trim())); copyCmd(); }});
 function renderVerbs() {{
