@@ -4591,6 +4591,13 @@
    "ts": "2026-08-27 17:26",
    "name": "批213 操作員令「用一個 POWERSHELL 去完成上述指令」:VIA.ps1 開機自同步步(Sync-Repo)",
    "note": "【Sync-Repo】VIA.ps1 Invoke-All 首步新增:①git -C $VIA pull --ff-only(取尾版;離線/本地改動=誠實提示續用現版 try/catch)②ENG064 尾版 --rebuild-ckpt(批212 真斷點債修;冪等秒過零網路)。效果=雙擊 VIA 捷徑即自動完成「pull 取 v0101 終止令+斷點修復+日更+回補續跑+開 UI」全鏈,批212 工作站待辦(pull+rebuild-ckpt)收束為零打字。首次一次性貼入指令(尚未 pull 前的雞蛋問題)=cd repo; git pull; VIA.ps1。【QA】pwsh 雲端缺席=括號平衡輕檢代替({32/32}(48/48))+Sync-Repo 定義/呼叫雙在位;PS 實跑驗證候工作站(誠實界線)。"
+  },
+  {
+   "code": "TOOL-214",
+   "kind": "批214 同步衝突根治",
+   "ts": "2026-08-27 17:31",
+   "name": "批214 工作站實錄:pull 被再生頁擋+舊 v0100 回補誤啟——Sync-Repo 雙修",
+   "note": "【病因】①樞紐/治理矩陣 html=引擎每跑必重生之衍生物,工作站本地副本永遠異於雲端版→git pull 結構性 Aborting②pull 失敗→舊 VIA.ps1 續派 ENG064 v0100 回補(跑完 2022 將誤入已終止之 2021/2020)。【修】Sync-Repo v2:①pull 前 git checkout -- supportive modules/ui_support 還原再生頁(衍生物非源;pull 後引擎重生最新=零損失)②Get-CimInstance 比對 CommandLine 含 VDF_ENG064_HistoryBackfill 之 python 進程先收束(中斷安全=checkpoint 零損失;隨後尾版 v0101 重啟)→再 pull --ff-only→再 --rebuild-ckpt。【一次性救援貼令】舊 VIA.ps1 未含此修=雞蛋問題→操作員貼一段:收束舊回補+還原再生頁+pull+啟新 VIA.ps1。【識】127.0.0.1 InsecureRequestWarning=本機自簽代理已知無害(批196 裁定;P17 凍結候解凍)。【QA】括號平衡({36/36}(50/50));PS 實跑候工作站(誠實界線)。"
   }
  ]
 }

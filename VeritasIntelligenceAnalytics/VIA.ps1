@@ -58,7 +58,16 @@ function Open-UIs {
 }
 
 function Sync-Repo {
-    # 批213:啟動先同步——git pull 取尾版+ENG064 斷點自庫修復(冪等秒過)
+    # 批213:啟動先同步;批214:工作站實錄雙修——
+    # ①再生頁=衍生物(引擎每跑必重生)→pull 前還原本地副本,消結構性衝突
+    # ②舊版回補進程先收束(中斷安全=checkpoint 零損失),隨後由尾版重啟
+    try {
+        Get-CimInstance Win32_Process -Filter "Name like 'python%'" -ErrorAction Stop |
+          Where-Object { $_.CommandLine -match "VDF_ENG064_HistoryBackfill" } |
+          ForEach-Object { Stop-Process -Id $_.ProcessId -Force
+                           Write-Host "  [同步] 收束舊回補進程 PID $($_.ProcessId)(斷點在=零損失)" -ForegroundColor Yellow }
+    } catch { }
+    git -C $VIA checkout -- "supportive modules/ui_support" 2>$null   # 再生頁還原(pull 後引擎重生最新)
     try {
         $out = git -C $VIA pull --ff-only 2>&1
         Write-Host "  [同步] git pull:$($out | Select-Object -Last 1)" -ForegroundColor Cyan
