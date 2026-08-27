@@ -93,7 +93,7 @@ def task_registry() -> dict:
         "ui": {"zh": "重生全部 UI",
                "argv": [sys.executable,
                         _eng("supportive modules/registry",
-                             "CGC_MDL090_SystemHub_v*.py"), "run"],
+                             "CGC_MDL096_SyncStatus_v*.py"), "--regen-all"],
                "net": False},
     }
     return T
@@ -234,6 +234,9 @@ class H(BaseHTTPRequestHandler):
         self.send_response(code)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(b)))
+        # 批219:本機頁(file:// 開啟之 RAW HTML UI)可呼叫橋——僅綁
+        # 127.0.0.1+白名單任務,放寬來源無擴權
+        self.send_header("Access-Control-Allow-Origin", "*")
         self.end_headers()
         self.wfile.write(b)
 

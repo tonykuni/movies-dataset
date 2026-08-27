@@ -50,11 +50,12 @@ function Open-UIs {
     Start-Sleep -Seconds 2
     Start-Process "http://127.0.0.1:8765/"   # 指揮台=橋接版(按下直跑)
     foreach ($f in @("VIA_UI_SystemHub_v0100.html",
-                     "VIA_UI_GovernanceMatrix_v0100.html")) {
+                     "VIA_UI_GovernanceMatrix_v0100.html",
+                     "VIA_UI_SyncStatus_v0100.html")) {
         $p = Join-Path $VIA "supportive modules\ui_support\$f"
         if (Test-Path $p) { Start-Process $p }
     }
-    Write-Host "  [UI] 樞紐+指揮台+治理矩陣 已開" -ForegroundColor Green
+    Write-Host "  [UI] 樞紐+指揮台+治理矩陣+同步狀態台 已開" -ForegroundColor Green
 }
 
 function Sync-Repo {
@@ -99,7 +100,7 @@ if ($Menu) {
     while ($true) {
         Write-Host "`n=== VIA 選單(輸入數字按 Enter)===" -ForegroundColor Cyan
         Write-Host " 1) 全自動(日更+回補+UI)  2) 只跑日更全鏈"
-        Write-Host " 3) 只跑歷史回補 2022~      4) 只開 UI 三頁"
+        Write-Host " 3) 只跑歷史回補 2022~      4) 只開 UI 四頁"
         Write-Host " 5) 建桌面捷徑              0) 離開"
         switch (Read-Host "選") {
             "1" { Invoke-All }
