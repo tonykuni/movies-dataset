@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>VIA v0140B · Windows Handle Acquisition Matrix</title>
+  <style>
+    :root{--bg:#06101c;--panel:#0c1929;--ink:#e8f0f7;--muted:#91a5ba;--line:#243a52;--cyan:#43d6df;--amber:#f2bb50;--red:#ff6d7a}
+    *{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#050e18,#091625 55%,#0d1928);color:var(--ink);font:12px/1.5 Inter,"Noto Sans TC","Segoe UI",sans-serif}main{max-width:1500px;margin:auto;padding:24px}header,.panel{background:rgba(12,25,41,.94);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:14px}h1{font-size:20px;letter-spacing:.08em;margin:4px 0}h2{font-size:14px;color:var(--cyan);letter-spacing:.08em;margin:0 0 12px}.muted{color:var(--muted)}.gate{margin-top:12px;background:#102136;border-left:3px solid var(--amber);padding:10px;font:600 10px/1.5 ui-monospace,Consolas;overflow-wrap:anywhere}.flow{display:grid;grid-template-columns:1.1fr 2fr;gap:12px}.guard{border:1px solid var(--cyan);border-radius:12px;padding:14px}.stop{border:1px solid var(--red);border-radius:12px;padding:14px;color:#ffd9dd}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:10px}table{width:100%;border-collapse:collapse;background:rgba(12,25,41,.78)}th,td{padding:9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:#14263c;color:#a5dce3;font-size:10px}td{font-size:11px}.zero{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.zero div{border:1px solid var(--line);border-radius:10px;padding:10px}.zero b{display:block;font-size:18px;color:var(--cyan)}@media(max-width:850px){main{padding:12px}.flow{grid-template-columns:1fr}.zero{grid-template-columns:repeat(2,1fr)}}
+  </style>
+</head>
+<body><main>
+  <header>
+    <div class="muted">DISCIPLINA • PRUDENTIA • INTEGRITAS</div>
+    <h1>WINDOWS FILE HANDLE ACQUISITION</h1>
+    <div class="muted">Sequential Process Isolation · OneDrive Hydration Guard · Read Only · v0140B-WH1</div>
+    <div class="gate">Proposal package only — no candidate patch, no canonical runtime, no source mutation.</div>
+  </header>
+  <section class="panel flow">
+    <div class="guard"><h2>H01 · PRE-CONTENT GUARD</h2>讀取 metadata 與 attributes；必須確認來源為 file，且沒有 OFFLINE、RECALL_ON_OPEN、RECALL_ON_DATA_ACCESS。</div>
+    <div><h2>DETERMINISTIC BRANCH</h2><div class="stop">Risk / insufficient metadata → H02–H06 attempt=0, success=0, bytes=0 → HOLD</div><div class="guard" style="margin-top:8px">Safe → H02 → H03 → H04 → H05 → H06；前一程序 terminal 後才啟動下一程序。</div></div>
+  </section>
+  <section class="panel"><h2>SIX-ENGINE HANDLE MATRIX</h2><div class="table-wrap"><table>
+    <thead><tr><th>#</th><th>Engine</th><th>Runtime / API</th><th>Path form</th><th>Max attempt</th><th>Bounded bytes</th><th>Static subsystem applicability</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>H01</td><td>Python metadata / Win32 attributes</td><td>Exact</td><td>0</td><td>0</td><td>VRN · VDF · VAP</td></tr>
+      <tr><td>2</td><td>H02</td><td>Python pathlib binary open</td><td>Exact</td><td>1</td><td>65,536</td><td>VRN · VDF · VAP</td></tr>
+      <tr><td>3</td><td>H03</td><td>Python os.open/read</td><td>Exact</td><td>1</td><td>65,536</td><td>VRN · VDF · VAP</td></tr>
+      <tr><td>4</td><td>H04</td><td>ctypes CreateFileW/ReadFile</td><td>Exact</td><td>1</td><td>65,536</td><td>VRN · VDF · VAP</td></tr>
+      <tr><td>5</td><td>H05</td><td>ctypes CreateFileW/ReadFile</td><td>Extended-length</td><td>1</td><td>65,536</td><td>VRN · VDF · VAP</td></tr>
+      <tr><td>6</td><td>H06</td><td>PowerShell .NET FileStream</td><td>Exact</td><td>1</td><td>65,536</td><td>VRN · VDF · VAP</td></tr>
+    </tbody>
+  </table></div></section>
+  <section class="panel"><h2>MEASUREMENT CONTRACT</h2><div class="table-wrap"><table><thead><tr><th>Metric</th><th>Meaning</th><th>PASS condition</th></tr></thead><tbody>
+    <tr><td>source_open_attempts</td><td>真正呼叫 content-open API 的次數；unavailable 或 guard skip 不計</td><td>每內容引擎 ≤1；合計 ≤5</td></tr>
+    <tr><td>source_open_successes</td><td>成功取得來源 handle / stream 的次數</td><td>合計 ≥1</td></tr>
+    <tr><td>source_bytes_read</td><td>實際進入記憶體 bounded buffer 的位元組</td><td>合計 ≥1</td></tr>
+  </tbody></table></div></section>
+  <section class="panel"><h2>ZERO-EFFECT BOUNDARY</h2><div class="zero"><div><b>0</b>source hash</div><div><b>0</b>write / copy</div><div><b>0</b>content artifact</div><div><b>0</b>network / registry</div><div><b>0</b>patch / promotion</div></div></section>
+</main></body></html>

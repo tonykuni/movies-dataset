@@ -12,6 +12,20 @@ r"""
   Supportive 4 · Control UI 4)註冊中樞 + 在庫健康檢查。輸出 → 0-0-MasterRegistry。
 ================================================================================
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(全引擎導入令 2026-08-18;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # accel_map/fetch/pip_install/run_fast
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 import sys
 from pathlib import Path
 
@@ -29,12 +43,12 @@ BASE_DIR = str(Path(__file__).parent / "db")
 MODULES = (
     [("VDF-MDL001-VRF", "TW Universe Verifier", "VDF Active", "VDF_MDL001_TWUniverseVerify.py"),
      ("VDF-MDL003", "Sentiment + Macro Engine", "VDF Active", "VDF_MDL003_SentimentMacroEngine.py"),
-     ("VDF-MDL004", "TW Full Market Engine", "VDF Active", "VDF_MDL004_TWFullMarketEngine.py"),
+     ("VDF-MDL004", "TW Full Market Engine", "VDF Active", "VDF_ENG006_MDL004TWFullMarketEngine.py"),
      ("VDF-MDL005", "TW Stock Filter + Consensus", "VDF Active", "VDF_MDL005_TWStockFilter.py"),
      ("VDF-MDL006", "Financial Model + PE/PB Band", "VDF Active", "VDF_MDL006_FinancialModel.py"),
      ("VDF-MASTER-REG", "Master Registry", "VDF Active", "VDF_MDL103_MasterRegistry.py"),
      ("VDF-OM-CORE", "OutputManager (shared lib)", "VDF Active", "VDF_MDL101_OutputManager.py"),
-     ("VDF-UPGRADER", "Format Retrofit Upgrader", "VDF Active", "VDF_MDL102_FormatUpgrader.py")]
+     ("VDF-UPGRADER", "Format Retrofit Upgrader", "VDF Active", "VDF_ENG011_MDL102FormatUpgrader.py")]
     + [("VDF-LEG-%02d" % i, n, "VDF Legacy", "") for i, n in enumerate(
         ["D2-FRED", "D2-YF", "D2-Data", "D2-Global", "D2-Integrated",
          "E0-Bootstrap", "E1-Fetch", "E2-Normalize", "E3-Validate", "E4-Publish",

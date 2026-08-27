@@ -8,7 +8,7 @@
    最新 win64 ZIP + sha256 驗證),winget 降為替代方案。analytics 執行期自動接上
    可攜式 dot,免動系統 PATH、免重開終端。
  v0102(操作員指示:用 VIA_EnvManager.py 來試試能否成功安裝):
-   安裝不再由本檔直呼 pip,而是經 workops_envmanager_bridge.py 送入平台中央
+   安裝不再由本檔直呼 pip,而是經 VIA_ENG069_WorkopsEnvmanagerBridge.py 送入平台中央
    環境治理核心 VIA_EnvManager 的 gatekeeper:plan-install 決策(風險分級/目標環境
    /封鎖理由)→ 以其產生之命令執行(pip install + pip check)→ 決策與逐命令結果
    落 WorkOps\out\envmanager\ JSON。EnvManager 正本零改動(橋於執行期覆蓋治理範圍
@@ -24,7 +24,7 @@ $ErrorActionPreference = "Continue"
 $Here   = $PSScriptRoot
 $Venv   = Join-Path $Here ".venv_pm"
 $VPy    = Join-Path $Venv "Scripts\python.exe"
-$Bridge = Join-Path $Here "workops_envmanager_bridge.py"
+$Bridge = Join-Path $Here "VIA_ENG069_WorkopsEnvmanagerBridge.py"
 
 Write-Host "==========================================================" -ForegroundColor DarkCyan
 Write-Host "  WorkOps PmSetup v0103  |  VIA_EnvManager 中央治理安裝" -ForegroundColor Cyan
@@ -95,3 +95,11 @@ if ($dotPortable) {
 
 Write-Host ("[總結] 成功 {0} / 失敗 {1} · 決策紀錄 out\envmanager\ · 基底零觸碰 · analytics/deep 自動優先此 venv" -f $ok.Count, $fail.Count) -ForegroundColor Green
 if ($fail.Count) { Write-Host ("[誠實清單] 未成:{0}" -f ($fail -join ", ")) -ForegroundColor Yellow }
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

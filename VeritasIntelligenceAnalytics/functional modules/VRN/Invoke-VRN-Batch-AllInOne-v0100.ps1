@@ -34,7 +34,7 @@ try {
 # A03 - patch the candidate ONCE into a run-local copy (canonical untouched)
 $code = Get-Content -LiteralPath $cand -Raw -Encoding UTF8
 $code = $code -replace '\$BrokerHelper\s*=\s*".*?"',
-    ('$BrokerHelper = "' + (Join-Path $rules "VIS_VRN_BrokerAlias_FullList_v0100.py") + '"')
+    ('$BrokerHelper = "' + (Join-Path $rules "SUP_MDL015_VISVRNBrokerAliasFullList_v0100.py") + '"')
 $code = $code -replace '\$FallbackHelper\s*=\s*".*?"',
     ('$FallbackHelper = "' + (Join-Path $rules "VIS_VRN_PDFTextLayerFallbackPlan_v0222.py") + '"')
 $patched = Join-Path $runDir "candidate_patched.RUNLOCAL.ps1"
@@ -63,7 +63,7 @@ try {
           Where-Object { ($_ -eq "py") -or (Test-Path $_) } | Select-Object -First 1
     $names = Join-Path $runDir "names.txt"
     $pdfs.Name | Out-File $names -Encoding utf8
-    $tk = Join-Path $rules "VIS_VRN_TickerFilenameSSOT_v0100.py"
+    $tk = Join-Path $rules "SUP_MDL030_VISVRNTickerFilenameSSOT_v0100.py"
     $pyc = "import sys,importlib.util;spec=importlib.util.spec_from_file_location('t',sys.argv[1]);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);" +
            "[print(l.rstrip()+'`t'+','.join(m.extract_filename_ticker_candidates(l.rstrip())[0])) for l in open(sys.argv[2],encoding='utf-8') if l.strip()]"
     foreach ($line in (& $py -c $pyc $tk $names 2>$null)) {
@@ -141,3 +141,11 @@ finally {
     Write-Host "[TOTAL]   $([int]$sw.Elapsed.TotalSeconds)s" -ForegroundColor Cyan
     Write-Host "PowerShell session remains open." -ForegroundColor Cyan
 }
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

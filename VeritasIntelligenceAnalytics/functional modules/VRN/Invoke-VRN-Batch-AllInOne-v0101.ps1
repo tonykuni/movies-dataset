@@ -49,8 +49,8 @@ foreach ($d in @($stageRt,$t005,$t004,$tdocx,$repDir)) { New-Item -ItemType Dire
 $py = @("$env:USERPROFILE\envs\via_core_312\Scripts\python.exe","py","python","python3") |
       Where-Object { ($_ -notmatch '\\') -and (Get-Command $_ -ErrorAction SilentlyContinue) -or (($_ -match '\\') -and (Test-Path $_)) } |
       Select-Object -First 1
-$eng005 = Join-Path $vrn "VRN_MDL005_OCRFetchingPDFText.py"
-$eng004 = Join-Path $vrn "VRN_MDL004_OCR_FetchingPDFTable.py"
+$eng005 = Join-Path $vrn "VRN_ENG018_MDL005OCRFetchingPDFText.py"
+$eng004 = Join-Path $vrn "VRN_ENG017_MDL004OCRFetchingPDFTable.py"
 
 $pdfs = @(Get-ChildItem -LiteralPath $inbox -Filter *.pdf  -File -ErrorAction SilentlyContinue)
 $docx = @(Get-ChildItem -LiteralPath $inbox -Filter *.doc* -File -ErrorAction SilentlyContinue)
@@ -190,3 +190,11 @@ Write-Host "  報告:$rep" -ForegroundColor Cyan
 Write-Host "  存證:$evi" -ForegroundColor Cyan
 if (-not $NoOpen) { Start-Process $rep }
 exit $(if ($failN -eq 0 -and $toN -eq 0) { 0 } else { 1 })
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

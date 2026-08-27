@@ -1,0 +1,5866 @@
+{
+ "schema": "VIA.VRN.FinDataSynonym.v1",
+ "generated": "2026-08-19 00:04:01",
+ "policy": "中英文同義字庫;多源並列 sources 標註不仲裁;收割自倉內正本",
+ "count": 195,
+ "multi_source": 105,
+ "folded": 4,
+ "metrics": {
+  "cash": {
+   "zh": "現金及約當現金",
+   "en": "Cash and Cash Equivalents",
+   "synonyms_zh": [
+    "現金(?:$|[^\\u4e00-\\u9fff])",
+    "現金及現金等價物",
+    "現金及約當現金",
+    "現金與約當現金",
+    "現金",
+    "貨幣資金",
+    "本期現金及約當現金",
+    "現金餘額",
+    "期末現金",
+    "銀行存款",
+    "現金約當現金"
+   ],
+   "synonyms_en": [
+    "cash\\s*(?:and|&)?\\s*cash\\s*equivalents?",
+    "Cash",
+    "Cash Equivalents",
+    "Cash & Cash Equivalents",
+    "Cash And Cash Equivalents",
+    "cash",
+    "cash and cash equivalents"
+   ],
+   "patterns": [
+    "現金及約當現金",
+    "現金與約當現金",
+    "現金及現金等價物",
+    "cash\\s*(?:and|&)?\\s*cash\\s*equivalents?",
+    "現金(?:$|[^\\u4e00-\\u9fff])"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "CURRENT_ASSET",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VRN_MDL007_APIDataFetcher.py",
+    "financial_classification_rules.py",
+    "financial_data_standardization.py(AST)",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py"
+   ],
+   "mops_official": [
+    "現金及約當現金"
+   ],
+   "field_map": {
+    "twse_tpex": "現金及約當現金",
+    "twstock": "cash",
+    "yfinance": "cashAndCashEquivalents"
+   },
+   "validation_rules": [
+    "must_be_positive",
+    "currency_format"
+   ],
+   "vrn_uid": "VRN_FIN_0010"
+  },
+  "short_term_investment": {
+   "zh": "短期投資",
+   "en": "Short-term Investments",
+   "synonyms_zh": [
+    "(?:透過損益|透過其他綜合損益)按公允價值衡量之金融資產[－—-]?流動",
+    "按攤銷後成本衡量之金融資產[－—-]?流動",
+    "流動金融資產",
+    "短期投資"
+   ],
+   "synonyms_en": [
+    "marketable\\s*securities",
+    "short[- ]?term\\s*investments?"
+   ],
+   "patterns": [
+    "(?:透過損益|透過其他綜合損益)按公允價值衡量之金融資產[－—-]?流動",
+    "按攤銷後成本衡量之金融資產[－—-]?流動",
+    "短期投資",
+    "流動金融資產",
+    "short[- ]?term\\s*investments?",
+    "marketable\\s*securities"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "CURRENT_ASSET",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "accounts_receivable": {
+   "zh": "應收帳款",
+   "en": "Accounts Receivable",
+   "synonyms_zh": [
+    "應收帳款",
+    "應收帳款[－—-]?淨額",
+    "應收帳款淨額",
+    "應收款項",
+    "貿易應收款",
+    "客戶應收款",
+    "應收帳款及票據",
+    "應收帳款與票據"
+   ],
+   "synonyms_en": [
+    "A/R",
+    "accounts?\\s*receivable",
+    "trade\\s*receivables?",
+    "Accounts Receivable",
+    "ar",
+    "accounts receivable"
+   ],
+   "patterns": [
+    "應收帳款淨額",
+    "應收帳款[－—-]?淨額",
+    "應收帳款",
+    "accounts?\\s*receivable",
+    "trade\\s*receivables?",
+    "A/R"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "CURRENT_ASSET",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_classification_rules.py",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py"
+   ],
+   "field_map": {
+    "twse_tpex": "應收帳款",
+    "twstock": "accounts_receivable",
+    "yfinance": "accountsReceivable"
+   },
+   "vrn_uid": "VRN_FIN_0011"
+  },
+  "notes_receivable": {
+   "zh": "應收票據",
+   "en": "Notes Receivable",
+   "synonyms_zh": [
+    "應收票據",
+    "應收票據淨額"
+   ],
+   "synonyms_en": [
+    "notes?\\s*receivable"
+   ],
+   "patterns": [
+    "應收票據淨額",
+    "應收票據",
+    "notes?\\s*receivable"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "CURRENT_ASSET",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "other_receivables": {
+   "zh": "其他應收款",
+   "en": "Other Receivables",
+   "synonyms_zh": [
+    "其他應收款",
+    "其他應收款項"
+   ],
+   "synonyms_en": [
+    "other\\s*receivables?"
+   ],
+   "patterns": [
+    "其他應收款",
+    "其他應收款項",
+    "other\\s*receivables?"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "CURRENT_ASSET",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "inventory": {
+   "zh": "存貨",
+   "en": "Inventory",
+   "synonyms_zh": [
+    "原物料",
+    "在製品",
+    "存貨",
+    "存貨淨額",
+    "製成品",
+    "庫存",
+    "商品存貨"
+   ],
+   "synonyms_en": [
+    "inventor(?:y|ies)",
+    "merchandise",
+    "Inventory",
+    "inventory",
+    "inventories"
+   ],
+   "patterns": [
+    "存貨淨額",
+    "存貨",
+    "inventor(?:y|ies)",
+    "merchandise",
+    "原物料",
+    "在製品",
+    "製成品"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "CURRENT_ASSET",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_classification_rules.py",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py"
+   ],
+   "field_map": {
+    "twse_tpex": "存貨",
+    "twstock": "inventory",
+    "yfinance": "inventory"
+   },
+   "vrn_uid": "VRN_FIN_0012"
+  },
+  "prepaid_expenses": {
+   "zh": "預付款項",
+   "en": "Prepaid Expenses",
+   "synonyms_zh": [
+    "預付款項",
+    "預付貨款",
+    "預付費用"
+   ],
+   "synonyms_en": [
+    "prepaid\\s*(?:expenses?|items?)"
+   ],
+   "patterns": [
+    "預付款項",
+    "預付費用",
+    "預付貨款",
+    "prepaid\\s*(?:expenses?|items?)"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "CURRENT_ASSET",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "contract_assets": {
+   "zh": "合約資產",
+   "en": "Contract Assets",
+   "synonyms_zh": [
+    "合約資產"
+   ],
+   "synonyms_en": [
+    "contract\\s*assets?"
+   ],
+   "patterns": [
+    "合約資產",
+    "contract\\s*assets?"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "CURRENT_ASSET",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "other_current_assets": {
+   "zh": "其他流動資產",
+   "en": "Other Current Assets",
+   "synonyms_zh": [
+    "其他流動資產",
+    "其它流動資產"
+   ],
+   "synonyms_en": [
+    "other\\s*current\\s*assets?",
+    "Other Current Assets",
+    "other current assets"
+   ],
+   "patterns": [
+    "其他流動資產",
+    "other\\s*current\\s*assets?"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "CURRENT_ASSET",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VIS_VRN_FinancialSSOT_v0608.py"
+   ],
+   "vrn_uid": "VRN_FIN_0014"
+  },
+  "total_current_assets": {
+   "zh": "流動資產合計",
+   "en": "Total Current Assets",
+   "synonyms_zh": [
+    "流動資產[合總]計",
+    "流動資產小計"
+   ],
+   "synonyms_en": [
+    "total\\s*current\\s*assets?"
+   ],
+   "patterns": [
+    "流動資產[合總]計",
+    "流動資產小計",
+    "total\\s*current\\s*assets?"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "CURRENT_ASSET",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "long_term_investment": {
+   "zh": "長期投資",
+   "en": "Long-term Investments",
+   "synonyms_zh": [
+    "(?:透過損益|透過其他綜合損益)按公允價值衡量之金融資產[－—-]?非流動",
+    "採用權益法之投資",
+    "長期投資",
+    "長期股權投資"
+   ],
+   "synonyms_en": [
+    "equity\\s*method\\s*investments?",
+    "long[- ]?term\\s*investments?"
+   ],
+   "patterns": [
+    "採用權益法之投資",
+    "長期股權投資",
+    "長期投資",
+    "(?:透過損益|透過其他綜合損益)按公允價值衡量之金融資產[－—-]?非流動",
+    "long[- ]?term\\s*investments?",
+    "equity\\s*method\\s*investments?"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "NON_CURRENT_ASSET",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "property_plant_equipment": {
+   "zh": "不動產廠房及設備",
+   "en": "Property, Plant and Equipment",
+   "synonyms_zh": [
+    "不動產[、,]?廠房及設備",
+    "不動產[、,]?廠房及設備淨額",
+    "固定資產",
+    "固定資產淨額"
+   ],
+   "synonyms_en": [
+    "PP&?E",
+    "PPE",
+    "property[,\\s]*plant\\s*(?:and|&)\\s*equipment"
+   ],
+   "patterns": [
+    "不動產[、,]?廠房及設備淨額",
+    "不動產[、,]?廠房及設備",
+    "固定資產淨額",
+    "固定資產",
+    "property[,\\s]*plant\\s*(?:and|&)\\s*equipment",
+    "PP&?E",
+    "PPE"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "NON_CURRENT_ASSET",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "right_of_use_assets": {
+   "zh": "使用權資產",
+   "en": "Right-of-use Assets",
+   "synonyms_zh": [
+    "使用權資產"
+   ],
+   "synonyms_en": [
+    "ROU\\s*assets?",
+    "right[- ]?of[- ]?use\\s*assets?"
+   ],
+   "patterns": [
+    "使用權資產",
+    "right[- ]?of[- ]?use\\s*assets?",
+    "ROU\\s*assets?"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "NON_CURRENT_ASSET",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "investment_property": {
+   "zh": "投資性不動產",
+   "en": "Investment Property",
+   "synonyms_zh": [
+    "投資性不動產"
+   ],
+   "synonyms_en": [
+    "investment\\s*property"
+   ],
+   "patterns": [
+    "投資性不動產",
+    "investment\\s*property"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "NON_CURRENT_ASSET",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "other_noncurrent_assets": {
+   "zh": "其他非流動資產",
+   "en": "Other Non-current Assets",
+   "synonyms_zh": [
+    "其他非流動資產"
+   ],
+   "synonyms_en": [
+    "other\\s*non[- ]?current\\s*assets?"
+   ],
+   "patterns": [
+    "其他非流動資產",
+    "other\\s*non[- ]?current\\s*assets?"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "NON_CURRENT_ASSET",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "intangible_assets": {
+   "zh": "無形資產",
+   "en": "Intangible Assets",
+   "synonyms_zh": [
+    "商標權",
+    "商譽",
+    "專利權",
+    "無形資產"
+   ],
+   "synonyms_en": [
+    "goodwill",
+    "intangible\\s*assets?",
+    "patents?"
+   ],
+   "patterns": [
+    "無形資產",
+    "商譽",
+    "專利權",
+    "商標權",
+    "intangible\\s*assets?",
+    "goodwill",
+    "patents?"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "NON_CURRENT_ASSET",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "deferred_tax_assets": {
+   "zh": "遞延所得稅資產",
+   "en": "Deferred Tax Assets",
+   "synonyms_zh": [
+    "遞延所得稅資產",
+    "遞延稅項資產"
+   ],
+   "synonyms_en": [
+    "deferred\\s*(?:income\\s*)?tax\\s*assets?"
+   ],
+   "patterns": [
+    "遞延所得稅資產",
+    "遞延稅項資產",
+    "deferred\\s*(?:income\\s*)?tax\\s*assets?"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "NON_CURRENT_ASSET",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "total_non_current_assets": {
+   "zh": "非流動資產合計",
+   "en": "Total Non-current Assets",
+   "synonyms_zh": [
+    "非流動資產[合總]計",
+    "非流動資產小計"
+   ],
+   "synonyms_en": [
+    "total\\s*non[- ]?current\\s*assets?"
+   ],
+   "patterns": [
+    "非流動資產[合總]計",
+    "非流動資產小計",
+    "total\\s*non[- ]?current\\s*assets?"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "NON_CURRENT_ASSET",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "total_assets": {
+   "zh": "資產總計",
+   "en": "Total Assets",
+   "synonyms_zh": [
+    "資產[合總]計",
+    "資產總[計額]",
+    "資產總計",
+    "資產總額",
+    "總資產",
+    "資產合計",
+    "全部資產"
+   ],
+   "synonyms_en": [
+    "total\\s*assets?",
+    "Total Assets",
+    "total assets"
+   ],
+   "patterns": [
+    "資產總[計額]",
+    "資產[合總]計",
+    "total\\s*assets?"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "NON_CURRENT_ASSET",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VRN_MDL007_APIDataFetcher.py",
+    "financial_classification_rules.py",
+    "financial_data_standardization.py(AST)",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py"
+   ],
+   "mops_official": [
+    "資產總計"
+   ],
+   "field_map": {
+    "twse_tpex": "資產總額",
+    "twstock": "total_assets",
+    "yfinance": "totalAssets"
+   },
+   "validation_rules": [
+    "must_be_positive",
+    "currency_format",
+    "equals_current_plus_noncurrent_assets"
+   ],
+   "vrn_uid": "VRN_FIN_0018"
+  },
+  "short_term_borrowings": {
+   "zh": "短期借款",
+   "en": "Short-term Borrowings",
+   "synonyms_zh": [
+    "短期借款",
+    "短期銀行借款"
+   ],
+   "synonyms_en": [
+    "bank\\s*(?:borrowings?|loans?)",
+    "short[- ]?term\\s*(?:borrowings?|loans?|debt)"
+   ],
+   "patterns": [
+    "短期借款",
+    "短期銀行借款",
+    "short[- ]?term\\s*(?:borrowings?|loans?|debt)",
+    "bank\\s*(?:borrowings?|loans?)"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "CURRENT_LIABILITY",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "accounts_payable": {
+   "zh": "應付帳款",
+   "en": "Accounts Payable",
+   "synonyms_zh": [
+    "應付帳款",
+    "應付款項",
+    "貿易應付款",
+    "供應商應付款",
+    "應付帳款及票據"
+   ],
+   "synonyms_en": [
+    "A/P",
+    "accounts?\\s*payable",
+    "trade\\s*payables?",
+    "Accounts Payable",
+    "ap",
+    "accounts payable"
+   ],
+   "patterns": [
+    "應付帳款",
+    "accounts?\\s*payable",
+    "trade\\s*payables?",
+    "A/P"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "CURRENT_LIABILITY",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py"
+   ],
+   "field_map": {
+    "twse_tpex": "應付帳款",
+    "twstock": "accounts_payable",
+    "yfinance": "accountsPayable"
+   },
+   "vrn_uid": "VRN_FIN_0019"
+  },
+  "notes_payable": {
+   "zh": "應付票據",
+   "en": "Notes Payable",
+   "synonyms_zh": [
+    "應付票據"
+   ],
+   "synonyms_en": [
+    "notes?\\s*payable"
+   ],
+   "patterns": [
+    "應付票據",
+    "notes?\\s*payable"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "CURRENT_LIABILITY",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "other_payables": {
+   "zh": "其他應付款",
+   "en": "Other Payables",
+   "synonyms_zh": [
+    "其他應付款",
+    "應付費用"
+   ],
+   "synonyms_en": [
+    "accrued\\s*expenses?",
+    "other\\s*payables?"
+   ],
+   "patterns": [
+    "其他應付款",
+    "應付費用",
+    "other\\s*payables?",
+    "accrued\\s*expenses?"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "CURRENT_LIABILITY",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "contract_liabilities": {
+   "zh": "合約負債",
+   "en": "Contract Liabilities",
+   "synonyms_zh": [
+    "合約負債"
+   ],
+   "synonyms_en": [
+    "contract\\s*liabilit(?:y|ies)"
+   ],
+   "patterns": [
+    "合約負債",
+    "contract\\s*liabilit(?:y|ies)"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "CURRENT_LIABILITY",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "other_current_liabilities": {
+   "zh": "其他流動負債",
+   "en": "Other Current Liabilities",
+   "synonyms_zh": [
+    "其他流動負債"
+   ],
+   "synonyms_en": [
+    "other\\s*current\\s*liabilit(?:y|ies)",
+    "Other Current Liabilities",
+    "other current liabilities"
+   ],
+   "patterns": [
+    "其他流動負債",
+    "other\\s*current\\s*liabilit(?:y|ies)"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "CURRENT_LIABILITY",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VIS_VRN_FinancialSSOT_v0608.py"
+   ],
+   "vrn_uid": "VRN_FIN_0022"
+  },
+  "current_portion_long_term_debt": {
+   "zh": "一年內到期長期負債",
+   "en": "Current Portion of Long-term Debt",
+   "synonyms_zh": [
+    "一年(?:內|以內)到期(?:之)?長期借款",
+    "一年內到期長期[負負]債"
+   ],
+   "synonyms_en": [
+    "current\\s*portion\\s*(?:of\\s*)?long[- ]?term\\s*debt"
+   ],
+   "patterns": [
+    "一年內到期長期[負負]債",
+    "一年(?:內|以內)到期(?:之)?長期借款",
+    "current\\s*portion\\s*(?:of\\s*)?long[- ]?term\\s*debt"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "CURRENT_LIABILITY",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "lease_liabilities_current": {
+   "zh": "租賃負債-流動",
+   "en": "Lease Liabilities - Current",
+   "synonyms_zh": [
+    "租賃負債[－—-]?流動"
+   ],
+   "synonyms_en": [
+    "lease\\s*liabilit(?:y|ies)[- ]?current"
+   ],
+   "patterns": [
+    "租賃負債[－—-]?流動",
+    "lease\\s*liabilit(?:y|ies)[- ]?current"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "CURRENT_LIABILITY",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "lease_liabilities_noncurrent": {
+   "zh": "租賃負債-非流動",
+   "en": "Lease Liabilities - Non-current",
+   "synonyms_zh": [
+    "租賃負債[－—-]?非流動"
+   ],
+   "synonyms_en": [
+    "lease\\s*liabilit(?:y|ies)[- ]?non[- ]?current"
+   ],
+   "patterns": [
+    "租賃負債[－—-]?非流動",
+    "lease\\s*liabilit(?:y|ies)[- ]?non[- ]?current"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "NON_CURRENT_LIABILITY",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "total_current_liabilities": {
+   "zh": "流動負債合計",
+   "en": "Total Current Liabilities",
+   "synonyms_zh": [
+    "流動負債[合總]計",
+    "流動負債小計"
+   ],
+   "synonyms_en": [
+    "total\\s*current\\s*liabilit(?:y|ies)"
+   ],
+   "patterns": [
+    "流動負債[合總]計",
+    "流動負債小計",
+    "total\\s*current\\s*liabilit(?:y|ies)"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "CURRENT_LIABILITY",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "long_term_borrowings": {
+   "zh": "長期借款",
+   "en": "Long-term Borrowings",
+   "synonyms_zh": [
+    "長期借款",
+    "長期銀行借款"
+   ],
+   "synonyms_en": [
+    "long[- ]?term\\s*(?:borrowings?|loans?|debt)"
+   ],
+   "patterns": [
+    "長期借款",
+    "長期銀行借款",
+    "long[- ]?term\\s*(?:borrowings?|loans?|debt)"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "NON_CURRENT_LIABILITY",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "bonds_payable": {
+   "zh": "應付公司債",
+   "en": "Bonds Payable",
+   "synonyms_zh": [
+    "公司債",
+    "應付公司債"
+   ],
+   "synonyms_en": [
+    "bonds?\\s*payable",
+    "corporate\\s*bonds?"
+   ],
+   "patterns": [
+    "應付公司債",
+    "公司債",
+    "bonds?\\s*payable",
+    "corporate\\s*bonds?"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "NON_CURRENT_LIABILITY",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "other_noncurrent_liabilities": {
+   "zh": "其他非流動負債",
+   "en": "Other Non-current Liabilities",
+   "synonyms_zh": [
+    "其他非流動負債"
+   ],
+   "synonyms_en": [
+    "other\\s*non[- ]?current\\s*liabilit(?:y|ies)"
+   ],
+   "patterns": [
+    "其他非流動負債",
+    "other\\s*non[- ]?current\\s*liabilit(?:y|ies)"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "NON_CURRENT_LIABILITY",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "deferred_tax_liabilities": {
+   "zh": "遞延所得稅負債",
+   "en": "Deferred Tax Liabilities",
+   "synonyms_zh": [
+    "遞延所得稅負債",
+    "遞延稅項負債"
+   ],
+   "synonyms_en": [
+    "deferred\\s*(?:income\\s*)?tax\\s*liabilit(?:y|ies)"
+   ],
+   "patterns": [
+    "遞延所得稅負債",
+    "遞延稅項負債",
+    "deferred\\s*(?:income\\s*)?tax\\s*liabilit(?:y|ies)"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "NON_CURRENT_LIABILITY",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "total_non_current_liabilities": {
+   "zh": "非流動負債合計",
+   "en": "Total Non-current Liabilities",
+   "synonyms_zh": [
+    "非流動負債[合總]計",
+    "非流動負債小計"
+   ],
+   "synonyms_en": [
+    "total\\s*non[- ]?current\\s*liabilit(?:y|ies)"
+   ],
+   "patterns": [
+    "非流動負債[合總]計",
+    "非流動負債小計",
+    "total\\s*non[- ]?current\\s*liabilit(?:y|ies)"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "NON_CURRENT_LIABILITY",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "total_liabilities": {
+   "zh": "負債總計",
+   "en": "Total Liabilities",
+   "synonyms_zh": [
+    "負債[合總]計",
+    "負債總[計額]",
+    "負債總計",
+    "負債總額",
+    "總負債",
+    "負債合計",
+    "全部負債"
+   ],
+   "synonyms_en": [
+    "total\\s*liabilit(?:y|ies)",
+    "Total Liabilities",
+    "total liabilities"
+   ],
+   "patterns": [
+    "負債總[計額]",
+    "負債[合總]計",
+    "total\\s*liabilit(?:y|ies)"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "NON_CURRENT_LIABILITY",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VRN_MDL007_APIDataFetcher.py",
+    "financial_classification_rules.py",
+    "financial_data_standardization.py(AST)",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py"
+   ],
+   "mops_official": [
+    "負債總計"
+   ],
+   "field_map": {
+    "twse_tpex": "負債總額",
+    "twstock": "total_liabilities",
+    "yfinance": "totalLiabilities"
+   },
+   "validation_rules": [
+    "must_be_positive",
+    "currency_format",
+    "equals_current_plus_noncurrent_liabilities"
+   ],
+   "vrn_uid": "VRN_FIN_0024"
+  },
+  "common_stock": {
+   "zh": "普通股股本",
+   "en": "Common Stock",
+   "synonyms_zh": [
+    "實收資本",
+    "普通股股本",
+    "股本"
+   ],
+   "synonyms_en": [
+    "capital\\s*stock",
+    "common\\s*stock",
+    "paid[- ]?in\\s*capital",
+    "share\\s*capital",
+    "Common Stock",
+    "common stock",
+    "capital stock"
+   ],
+   "patterns": [
+    "普通股股本",
+    "股本",
+    "實收資本",
+    "common\\s*stock",
+    "capital\\s*stock",
+    "share\\s*capital",
+    "paid[- ]?in\\s*capital"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "EQUITY",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VIS_VRN_FinancialSSOT_v0608.py"
+   ],
+   "vrn_uid": "VRN_FIN_0025"
+  },
+  "preferred_stock": {
+   "zh": "特別股股本",
+   "en": "Preferred Stock",
+   "synonyms_zh": [
+    "特別股",
+    "特別股股本"
+   ],
+   "synonyms_en": [
+    "preferred\\s*stock"
+   ],
+   "patterns": [
+    "特別股股本",
+    "特別股",
+    "preferred\\s*stock"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "EQUITY",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "capital_surplus": {
+   "zh": "資本公積",
+   "en": "Capital Surplus",
+   "synonyms_zh": [
+    "股本溢價",
+    "資本公積"
+   ],
+   "synonyms_en": [
+    "additional\\s*paid[- ]?in\\s*capital",
+    "capital\\s*surplus",
+    "share\\s*premium"
+   ],
+   "patterns": [
+    "資本公積",
+    "股本溢價",
+    "capital\\s*surplus",
+    "additional\\s*paid[- ]?in\\s*capital",
+    "share\\s*premium"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "EQUITY",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "retained_earnings": {
+   "zh": "保留盈餘",
+   "en": "Retained Earnings",
+   "synonyms_zh": [
+    "保留盈餘",
+    "未分配盈餘",
+    "法定盈餘公積",
+    "特別盈餘公積",
+    "累積盈餘",
+    "累計盈餘",
+    "累積未分配盈餘"
+   ],
+   "synonyms_en": [
+    "accumulated\\s*(?:profits?|earnings?)",
+    "retained\\s*earnings?",
+    "Retained Earnings",
+    "retained earnings"
+   ],
+   "patterns": [
+    "保留盈餘",
+    "累積盈餘",
+    "未分配盈餘",
+    "法定盈餘公積",
+    "特別盈餘公積",
+    "retained\\s*earnings?",
+    "accumulated\\s*(?:profits?|earnings?)"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "EQUITY",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_classification_rules.py",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py"
+   ],
+   "field_map": {
+    "twse_tpex": "保留盈餘",
+    "twstock": "retained_earnings",
+    "yfinance": "retainedEarnings"
+   },
+   "vrn_uid": "VRN_FIN_0026"
+  },
+  "other_equity": {
+   "zh": "其他權益",
+   "en": "Other Equity",
+   "synonyms_zh": [
+    "其他權益",
+    "其他綜合損益",
+    "累計其他綜合損益"
+   ],
+   "synonyms_en": [
+    "AOCI",
+    "accumulated\\s*other\\s*comprehensive\\s*(?:income|loss)",
+    "other\\s*(?:comprehensive\\s*)?(?:income|equity)"
+   ],
+   "patterns": [
+    "其他權益",
+    "其他綜合損益",
+    "累計其他綜合損益",
+    "other\\s*(?:comprehensive\\s*)?(?:income|equity)",
+    "accumulated\\s*other\\s*comprehensive\\s*(?:income|loss)",
+    "AOCI"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "EQUITY",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "treasury_stock": {
+   "zh": "庫藏股票",
+   "en": "Treasury Stock",
+   "synonyms_zh": [
+    "庫藏股[票]?"
+   ],
+   "synonyms_en": [
+    "treasury\\s*shares?",
+    "treasury\\s*stock"
+   ],
+   "patterns": [
+    "庫藏股[票]?",
+    "treasury\\s*stock",
+    "treasury\\s*shares?"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "EQUITY",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "non_controlling_interest": {
+   "zh": "非控制權益",
+   "en": "Non-controlling Interest",
+   "synonyms_zh": [
+    "少數股權",
+    "非控制權益"
+   ],
+   "synonyms_en": [
+    "minority\\s*interest",
+    "non[- ]?controlling\\s*interest"
+   ],
+   "patterns": [
+    "非控制權益",
+    "少數股權",
+    "minority\\s*interest",
+    "non[- ]?controlling\\s*interest"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "EQUITY",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "total_equity": {
+   "zh": "權益總計",
+   "en": "Total Equity",
+   "synonyms_zh": [
+    "權益[合總]計",
+    "權益總[計額]",
+    "股東權益[合總]計",
+    "股東權益總計",
+    "股東權益",
+    "權益總額",
+    "淨資產",
+    "股東權益總額",
+    "權益合計",
+    "淨值",
+    "總權益",
+    "權益總計"
+   ],
+   "synonyms_en": [
+    "total\\s*(?:shareholders?['\\s]?)?equity",
+    "total\\s*stockholders?['\\s]?\\s*equity",
+    "shareholders_equity",
+    "book_value_total",
+    "net_worth",
+    "Total Equity",
+    "Shareholders' Equity",
+    "stockholders_equity",
+    "total equity",
+    "shareholders equity"
+   ],
+   "patterns": [
+    "權益總[計額]",
+    "權益[合總]計",
+    "股東權益[合總]計",
+    "total\\s*(?:shareholders?['\\s]?)?equity",
+    "total\\s*stockholders?['\\s]?\\s*equity"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "EQUITY",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VRN_MDL007_APIDataFetcher.py",
+    "VRN_MDL008_CrossValidator.py",
+    "financial_classification_rules.py",
+    "financial_data_standardization.py(AST)",
+    "VIS_VRN_FinancialSSOT_v0608.py"
+   ],
+   "mops_official": [
+    "股東權益總計"
+   ],
+   "mdl008_aliases": [
+    "shareholders_equity",
+    "book_value_total",
+    "net_worth"
+   ],
+   "field_map": {
+    "twse_tpex": "權益總額",
+    "twstock": "total_equity",
+    "yfinance": "totalStockholderEquity"
+   },
+   "validation_rules": [
+    "currency_format",
+    "equals_assets_minus_liabilities"
+   ],
+   "vrn_uid": "VRN_FIN_0028"
+  },
+  "total_liabilities_equity": {
+   "zh": "負債及權益總計",
+   "en": "Total Liabilities and Equity",
+   "synonyms_zh": [
+    "負債[及與和]權益[合總]計",
+    "負債及權益總[計額]"
+   ],
+   "synonyms_en": [
+    "total\\s*liabilit(?:y|ies)\\s*(?:and|&)\\s*(?:shareholders?['\\s]?)?equity"
+   ],
+   "patterns": [
+    "負債及權益總[計額]",
+    "負債[及與和]權益[合總]計",
+    "total\\s*liabilit(?:y|ies)\\s*(?:and|&)\\s*(?:shareholders?['\\s]?)?equity"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "EQUITY",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "revenue": {
+   "zh": "營業收入",
+   "en": "Revenue",
+   "synonyms_zh": [
+    "營收",
+    "營業收入(?:淨額)?",
+    "營業收入[合總]計",
+    "銷貨收入",
+    "營業收入合計",
+    "營業收入淨額",
+    "銷貨收入淨額",
+    "營業收入",
+    "銷售收入",
+    "主營業務收入",
+    "總收入",
+    "收入"
+   ],
+   "synonyms_en": [
+    "(?:net\\s*)?(?:sales|revenue)",
+    "total\\s*(?:net\\s*)?(?:sales|revenue)",
+    "gross_revenue",
+    "net_sales",
+    "sales",
+    "top_line",
+    "Revenue",
+    "Sales",
+    "Net Revenue",
+    "Net Sales",
+    "Total Revenue",
+    "revenue",
+    "Top Line",
+    "net sales",
+    "operating revenue",
+    "turnover",
+    "total revenue"
+   ],
+   "patterns": [
+    "營業收入(?:淨額)?",
+    "營業收入[合總]計",
+    "銷貨收入",
+    "營收",
+    "(?:net\\s*)?(?:sales|revenue)",
+    "total\\s*(?:net\\s*)?(?:sales|revenue)"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "REVENUE",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VRN_MDL007_APIDataFetcher.py",
+    "VRN_MDL008_CrossValidator.py",
+    "VRN_Method_SSOT_v0100.json",
+    "financial_classification_rules.py",
+    "financial_data_standardization.py(AST)",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Financial_Synonyms_SSOT.py"
+   ],
+   "mops_official": [
+    "營業收入合計",
+    "營業收入淨額",
+    "銷貨收入淨額"
+   ],
+   "mdl008_aliases": [
+    "gross_revenue",
+    "net_sales",
+    "sales",
+    "top_line"
+   ],
+   "field_map": {
+    "twse_tpex": "營業收入",
+    "twstock": "revenue",
+    "yfinance": "totalRevenue"
+   },
+   "validation_rules": [
+    "must_be_positive",
+    "currency_format"
+   ],
+   "vrn_uid": "VRN_FIN_0001"
+  },
+  "sales_revenue": {
+   "zh": "銷貨收入",
+   "en": "Sales Revenue",
+   "synonyms_zh": [
+    "商品銷售收入",
+    "產品銷售收入",
+    "銷貨收入"
+   ],
+   "synonyms_en": [
+    "sales\\s*revenue"
+   ],
+   "patterns": [
+    "銷貨收入",
+    "商品銷售收入",
+    "產品銷售收入",
+    "sales\\s*revenue"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "REVENUE",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "service_revenue": {
+   "zh": "勞務收入",
+   "en": "Service Revenue",
+   "synonyms_zh": [
+    "勞務收入",
+    "服務收入"
+   ],
+   "synonyms_en": [
+    "service\\s*revenue"
+   ],
+   "patterns": [
+    "勞務收入",
+    "服務收入",
+    "service\\s*revenue"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "REVENUE",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "cost_of_sales": {
+   "zh": "營業成本",
+   "en": "Cost of Sales",
+   "synonyms_zh": [
+    "服務成本",
+    "營業成本",
+    "銷貨成本",
+    "營運成本"
+   ],
+   "synonyms_en": [
+    "COGS",
+    "cost\\s*of\\s*(?:goods\\s*)?(?:sold|sales|revenue)",
+    "cost_of_sales"
+   ],
+   "patterns": [
+    "營業成本",
+    "銷貨成本",
+    "服務成本",
+    "cost\\s*of\\s*(?:goods\\s*)?(?:sold|sales|revenue)",
+    "COGS"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "COST",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_data_standardization.py(AST)"
+   ],
+   "validation_rules": [
+    "must_be_positive",
+    "currency_format",
+    "less_than_revenue"
+   ]
+  },
+  "gross_profit": {
+   "zh": "營業毛利",
+   "en": "Gross Profit",
+   "synonyms_zh": [
+    "毛利(?:\\(損\\))?",
+    "營業毛利(?:\\(損\\))?",
+    "銷貨毛利",
+    "營業毛利（毛損）淨額",
+    "營業毛利淨額",
+    "毛利",
+    "營業毛利",
+    "毛利額",
+    "毛益",
+    "銷售毛利",
+    "毛利潤",
+    "總毛利"
+   ],
+   "synonyms_en": [
+    "gross\\s*(?:profit|margin)",
+    "gross_income",
+    "gross",
+    "Gross Profit",
+    "GP",
+    "Gross Income",
+    "gross_margin",
+    "Gross Margin Value",
+    "gross profit"
+   ],
+   "patterns": [
+    "營業毛利(?:\\(損\\))?",
+    "毛利(?:\\(損\\))?",
+    "銷貨毛利",
+    "gross\\s*(?:profit|margin)"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "GROSS_PROFIT",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VRN_MDL007_APIDataFetcher.py",
+    "VRN_MDL008_CrossValidator.py",
+    "VRN_Method_SSOT_v0100.json",
+    "financial_classification_rules.py",
+    "financial_data_standardization.py(AST)",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Financial_Synonyms_SSOT.py"
+   ],
+   "mops_official": [
+    "營業毛利（毛損）淨額",
+    "營業毛利淨額"
+   ],
+   "mdl008_aliases": [
+    "gross_income",
+    "gross"
+   ],
+   "field_map": {
+    "twse_tpex": "營業毛利（毛損）",
+    "twstock": "gross_profit",
+    "yfinance": "grossProfit"
+   },
+   "validation_rules": [
+    "currency_format",
+    "equals_revenue_minus_cogs"
+   ],
+   "vrn_uid": "VRN_FIN_0002"
+  },
+  "selling_expenses": {
+   "zh": "推銷費用",
+   "en": "Selling Expenses",
+   "synonyms_zh": [
+    "推銷費用",
+    "行銷費用",
+    "銷售費用"
+   ],
+   "synonyms_en": [
+    "S&M\\s*expenses?",
+    "selling\\s*(?:and\\s*marketing\\s*)?expenses?"
+   ],
+   "patterns": [
+    "推銷費用",
+    "銷售費用",
+    "行銷費用",
+    "selling\\s*(?:and\\s*marketing\\s*)?expenses?",
+    "S&M\\s*expenses?"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "OPERATING_EXPENSE",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "admin_expenses": {
+   "zh": "管理費用",
+   "en": "Administrative Expenses",
+   "synonyms_zh": [
+    "一般及管理費用",
+    "管理費用"
+   ],
+   "synonyms_en": [
+    "(?:general\\s*(?:and|&)\\s*)?admin(?:istrative)?\\s*expenses?",
+    "G&?A\\s*expenses?"
+   ],
+   "patterns": [
+    "管理費用",
+    "一般及管理費用",
+    "(?:general\\s*(?:and|&)\\s*)?admin(?:istrative)?\\s*expenses?",
+    "G&?A\\s*expenses?"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "OPERATING_EXPENSE",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "rd_expenses": {
+   "zh": "研究發展費用",
+   "en": "R&D Expenses",
+   "synonyms_zh": [
+    "研發費用",
+    "研究發展費用",
+    "研發支出",
+    "技術開發費用",
+    "研究費",
+    "研究開發費"
+   ],
+   "synonyms_en": [
+    "R&?D\\s*expenses?",
+    "research\\s*(?:and|&)\\s*development\\s*expenses?",
+    "R&D Expenses",
+    "R&D"
+   ],
+   "patterns": [
+    "研究發展費用",
+    "研發費用",
+    "research\\s*(?:and|&)\\s*development\\s*expenses?",
+    "R&?D\\s*expenses?"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "OPERATING_EXPENSE",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_classification_rules.py",
+    "financial_metrics_mapping.md"
+   ],
+   "field_map": {
+    "twse_tpex": "研究發展費用",
+    "twstock": "rd_expenses",
+    "yfinance": "researchAndDevelopment"
+   }
+  },
+  "total_operating_expenses": {
+   "zh": "營業費用合計",
+   "en": "Total Operating Expenses",
+   "synonyms_zh": [
+    "營業費用[合總]計"
+   ],
+   "synonyms_en": [
+    "total\\s*operating\\s*expenses?"
+   ],
+   "patterns": [
+    "營業費用[合總]計",
+    "total\\s*operating\\s*expenses?"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "OPERATING_EXPENSE",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "operating_income": {
+   "zh": "營業利益",
+   "en": "Operating Income",
+   "synonyms_zh": [
+    "營業利益(?:\\(損失\\))?",
+    "營業損益",
+    "營業淨利",
+    "營業利益（損失）",
+    "營業淨利（淨損）",
+    "營業利益",
+    "營業利潤",
+    "營業獲利",
+    "營運利益",
+    "經營利益",
+    "營業收入淨額"
+   ],
+   "synonyms_en": [
+    "EBIT(?!DA)",
+    "operating\\s*(?:income|profit|loss)",
+    "ebit",
+    "operating_profit",
+    "op_income",
+    "OP",
+    "Operating Profit",
+    "Operating Income",
+    "EBIT",
+    "Operating Earnings",
+    "Op. Profit",
+    "operating income",
+    "operating profit"
+   ],
+   "patterns": [
+    "營業利益(?:\\(損失\\))?",
+    "營業淨利",
+    "營業損益",
+    "operating\\s*(?:income|profit|loss)",
+    "EBIT(?!DA)"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "OPERATING_INCOME",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VRN_MDL007_APIDataFetcher.py",
+    "VRN_MDL008_CrossValidator.py",
+    "VRN_Method_SSOT_v0100.json",
+    "financial_classification_rules.py",
+    "financial_data_standardization.py(AST)",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py"
+   ],
+   "mops_official": [
+    "營業利益（損失）",
+    "營業淨利（淨損）"
+   ],
+   "mdl008_aliases": [
+    "ebit",
+    "operating_profit",
+    "op_income"
+   ],
+   "field_map": {
+    "twse_tpex": "營業利益（損失）",
+    "twstock": "operating_income",
+    "yfinance": "operatingIncome"
+   },
+   "validation_rules": [
+    "currency_format"
+   ],
+   "vrn_uid": "VRN_FIN_0003"
+  },
+  "ebitda": {
+   "zh": "稅息折舊攤銷前盈餘",
+   "en": "EBITDA",
+   "synonyms_zh": [
+    "稅息折舊攤銷前(?:盈餘|利潤|損益)",
+    "息前稅前折舊攤銷前利益",
+    "稅息折舊攤銷前盈餘",
+    "息稅折舊攤銷前利潤",
+    "息稅折舊攤銷前盈餘"
+   ],
+   "synonyms_en": [
+    "EBITDA",
+    "earnings?\\s*before\\s*interest\\s*tax\\s*depreciation\\s*amortization",
+    "ebitda"
+   ],
+   "patterns": [
+    "稅息折舊攤銷前(?:盈餘|利潤|損益)",
+    "EBITDA",
+    "earnings?\\s*before\\s*interest\\s*tax\\s*depreciation\\s*amortization"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "OPERATING_INCOME",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_classification_rules.py",
+    "financial_data_standardization.py(AST)",
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Financial_Synonyms_SSOT.py"
+   ],
+   "field_map": {
+    "yfinance": "ebitda"
+   },
+   "validation_rules": [
+    "currency_format"
+   ],
+   "vrn_uid": "VRN_FIN_0008"
+  },
+  "interest_income": {
+   "zh": "利息收入",
+   "en": "Interest Income",
+   "synonyms_zh": [
+    "利息收入"
+   ],
+   "synonyms_en": [
+    "interest\\s*income"
+   ],
+   "patterns": [
+    "利息收入",
+    "interest\\s*income"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "NON_OPERATING",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "interest_expense": {
+   "zh": "利息費用",
+   "en": "Interest Expense",
+   "synonyms_zh": [
+    "利息支出",
+    "利息費用"
+   ],
+   "synonyms_en": [
+    "interest\\s*expense"
+   ],
+   "patterns": [
+    "利息費用",
+    "利息支出",
+    "interest\\s*expense"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "NON_OPERATING",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "other_income": {
+   "zh": "其他收入",
+   "en": "Other Income",
+   "synonyms_zh": [
+    "其他收入",
+    "其他收益"
+   ],
+   "synonyms_en": [
+    "other\\s*income"
+   ],
+   "patterns": [
+    "其他收入",
+    "其他收益",
+    "other\\s*income"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "NON_OPERATING",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "other_expenses": {
+   "zh": "其他支出",
+   "en": "Other Expenses",
+   "synonyms_zh": [
+    "其他損失",
+    "其他支出",
+    "其他費用"
+   ],
+   "synonyms_en": [
+    "other\\s*expenses?"
+   ],
+   "patterns": [
+    "其他支出",
+    "其他費用",
+    "其他損失",
+    "other\\s*expenses?"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "NON_OPERATING",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "non_operating_income": {
+   "zh": "營業外收入及支出",
+   "en": "Non-operating Income and Expenses",
+   "synonyms_zh": [
+    "營業外損益",
+    "營業外收入及支出(?:淨額)?",
+    "非營業損益",
+    "營業外收入",
+    "業外收入",
+    "投資收益",
+    "業外收益",
+    "營業外收支",
+    "非營業收支",
+    "其他收支",
+    "業外收支",
+    "處分利益"
+   ],
+   "synonyms_en": [
+    "non[- ]?operating\\s*(?:income|expenses?)",
+    "Non-operating Income",
+    "Other Income"
+   ],
+   "patterns": [
+    "營業外收入及支出(?:淨額)?",
+    "營業外損益",
+    "非營業損益",
+    "non[- ]?operating\\s*(?:income|expenses?)"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "NON_OPERATING",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_classification_rules.py",
+    "financial_data_standardization.py(AST)",
+    "financial_metrics_mapping.md"
+   ],
+   "field_map": {
+    "twse_tpex": "營業外收入及支出",
+    "twstock": "non_operating_income",
+    "yfinance": "otherIncomeExpense"
+   },
+   "validation_rules": [
+    "currency_format"
+   ]
+  },
+  "income_before_tax": {
+   "zh": "稅前淨利",
+   "en": "Income Before Tax",
+   "synonyms_zh": [
+    "稅前利益",
+    "稅前淨利(?:\\(損\\))?",
+    "繼續營業單位稅前淨利",
+    "稅前淨利",
+    "稅前利潤",
+    "稅前收益"
+   ],
+   "synonyms_en": [
+    "(?:income|profit|earnings?)\\s*before\\s*(?:income\\s*)?tax",
+    "EBT",
+    "pre[- ]?tax\\s*(?:income|profit)",
+    "pretax_income"
+   ],
+   "patterns": [
+    "稅前淨利(?:\\(損\\))?",
+    "稅前利益",
+    "繼續營業單位稅前淨利",
+    "(?:income|profit|earnings?)\\s*before\\s*(?:income\\s*)?tax",
+    "pre[- ]?tax\\s*(?:income|profit)",
+    "EBT"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "NET_INCOME",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_data_standardization.py(AST)"
+   ],
+   "validation_rules": [
+    "currency_format"
+   ]
+  },
+  "income_tax": {
+   "zh": "所得稅費用",
+   "en": "Income Tax Expense",
+   "synonyms_zh": [
+    "所得稅(?:費用|利益)",
+    "所得稅費用",
+    "稅務費用",
+    "所得稅",
+    "稅費"
+   ],
+   "synonyms_en": [
+    "income\\s*tax\\s*(?:expense|benefit)",
+    "tax_expense"
+   ],
+   "patterns": [
+    "所得稅(?:費用|利益)",
+    "income\\s*tax\\s*(?:expense|benefit)"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "NET_INCOME",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_data_standardization.py(AST)"
+   ],
+   "validation_rules": [
+    "currency_format"
+   ]
+  },
+  "net_income": {
+   "zh": "本期淨利",
+   "en": "Net Income",
+   "synonyms_zh": [
+    "本期淨利(?:\\(損\\))?",
+    "淨利(?:\\(損\\))?",
+    "稅後淨利",
+    "繼續營業單位本期淨利",
+    "本期淨利（淨損）",
+    "本期淨利",
+    "淨利",
+    "稅後純益",
+    "歸屬母公司淨利",
+    "淨利潤",
+    "淨收益",
+    "本期淨收益",
+    "純益",
+    "本期純益",
+    "稅後盈餘"
+   ],
+   "synonyms_en": [
+    "(?:income|profit|earnings?)\\s*after\\s*tax",
+    "net\\s*(?:income|profit|loss)",
+    "profit_after_tax",
+    "pat",
+    "bottom_line",
+    "net_profit",
+    "Net Income",
+    "Net Profit",
+    "Profit After Tax",
+    "Net Earnings",
+    "net income",
+    "profit after tax",
+    "net profit"
+   ],
+   "patterns": [
+    "本期淨利(?:\\(損\\))?",
+    "稅後淨利",
+    "淨利(?:\\(損\\))?",
+    "繼續營業單位本期淨利",
+    "net\\s*(?:income|profit|loss)",
+    "(?:income|profit|earnings?)\\s*after\\s*tax"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "NET_INCOME",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VRN_MDL007_APIDataFetcher.py",
+    "VRN_MDL008_CrossValidator.py",
+    "VRN_Method_SSOT_v0100.json",
+    "financial_classification_rules.py",
+    "financial_data_standardization.py(AST)",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Financial_Synonyms_SSOT.py"
+   ],
+   "mops_official": [
+    "本期淨利（淨損）",
+    "繼續營業單位本期淨利"
+   ],
+   "mdl008_aliases": [
+    "profit_after_tax",
+    "pat",
+    "bottom_line",
+    "net_profit"
+   ],
+   "field_map": {
+    "twse_tpex": "本期淨利（淨損）",
+    "twstock": "net_income",
+    "yfinance": "netIncome"
+   },
+   "validation_rules": [
+    "currency_format"
+   ],
+   "vrn_uid": "VRN_FIN_0006"
+  },
+  "net_income_parent": {
+   "zh": "歸屬母公司淨利",
+   "en": "Net Income Attributable to Parent",
+   "synonyms_zh": [
+    "歸屬於?母公司(?:業主)?(?:之)?(?:本期)?淨利",
+    "母公司淨利",
+    "歸母淨利",
+    "母公司業主淨利"
+   ],
+   "synonyms_en": [
+    "net\\s*(?:income|profit)\\s*attributable\\s*to\\s*(?:parent|owners?\\s*of\\s*(?:the\\s*)?parent)"
+   ],
+   "patterns": [
+    "歸屬於?母公司(?:業主)?(?:之)?(?:本期)?淨利",
+    "母公司淨利",
+    "net\\s*(?:income|profit)\\s*attributable\\s*to\\s*(?:parent|owners?\\s*of\\s*(?:the\\s*)?parent)"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "NET_INCOME",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VRN_Method_SSOT_v0100.json"
+   ]
+  },
+  "other_comprehensive_income": {
+   "zh": "其他綜合損益",
+   "en": "Other Comprehensive Income",
+   "synonyms_zh": [
+    "其他綜合損益"
+   ],
+   "synonyms_en": [
+    "OCI",
+    "other\\s*comprehensive\\s*(?:income|loss)"
+   ],
+   "patterns": [
+    "其他綜合損益",
+    "other\\s*comprehensive\\s*(?:income|loss)",
+    "OCI"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "NET_INCOME",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "total_comprehensive_income": {
+   "zh": "本期綜合損益總額",
+   "en": "Total Comprehensive Income",
+   "synonyms_zh": [
+    "本期綜合損益總額",
+    "綜合損益總額"
+   ],
+   "synonyms_en": [
+    "total\\s*comprehensive\\s*(?:income|loss)"
+   ],
+   "patterns": [
+    "本期綜合損益總額",
+    "綜合損益總額",
+    "total\\s*comprehensive\\s*(?:income|loss)"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "NET_INCOME",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "discontinued_operations": {
+   "zh": "停業單位損益",
+   "en": "Discontinued Operations",
+   "synonyms_zh": [
+    "停業單位(?:損益|淨利)"
+   ],
+   "synonyms_en": [
+    "discontinued\\s*operations"
+   ],
+   "patterns": [
+    "停業單位(?:損益|淨利)",
+    "discontinued\\s*operations"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "NET_INCOME",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "net_income_cf": {
+   "zh": "本期淨利(現金流)",
+   "en": "Net Income (CF)",
+   "synonyms_zh": [
+    "本期稅前淨利",
+    "稅前淨利(?:\\(損失\\))?"
+   ],
+   "synonyms_en": [
+    "net\\s*(?:income|profit)\\s*before\\s*tax"
+   ],
+   "patterns": [
+    "稅前淨利(?:\\(損失\\))?",
+    "本期稅前淨利",
+    "net\\s*(?:income|profit)\\s*before\\s*tax"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "OPERATING_CF",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "depreciation": {
+   "zh": "折舊費用",
+   "en": "Depreciation",
+   "synonyms_zh": [
+    "折舊",
+    "折舊費用",
+    "折舊與攤提",
+    "固定資產折舊"
+   ],
+   "synonyms_en": [
+    "depreciation\\s*(?:expense)?",
+    "Depreciation",
+    "D&A"
+   ],
+   "patterns": [
+    "折舊費用",
+    "折舊",
+    "depreciation\\s*(?:expense)?"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "OPERATING_CF",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_metrics_mapping.md"
+   ],
+   "field_map": {
+    "twse_tpex": "折舊費用",
+    "twstock": "depreciation",
+    "yfinance": "depreciation"
+   }
+  },
+  "amortization": {
+   "zh": "攤銷費用",
+   "en": "Amortization",
+   "synonyms_zh": [
+    "攤銷",
+    "攤銷費用",
+    "攤提費用",
+    "無形資產攤提"
+   ],
+   "synonyms_en": [
+    "amortization\\s*(?:expense)?",
+    "Amortization"
+   ],
+   "patterns": [
+    "攤銷費用",
+    "攤銷",
+    "amortization\\s*(?:expense)?"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "OPERATING_CF",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_metrics_mapping.md"
+   ],
+   "field_map": {
+    "twse_tpex": "攤提費用",
+    "twstock": "amortization",
+    "yfinance": "amortization"
+   }
+  },
+  "depreciation_amortization": {
+   "zh": "折舊及攤銷",
+   "en": "Depreciation and Amortization",
+   "synonyms_zh": [
+    "折舊[及與和]攤銷"
+   ],
+   "synonyms_en": [
+    "D&?A",
+    "depreciation\\s*(?:and|&)\\s*amortization"
+   ],
+   "patterns": [
+    "折舊[及與和]攤銷",
+    "D&?A",
+    "depreciation\\s*(?:and|&)\\s*amortization"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "OPERATING_CF",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "change_in_receivables": {
+   "zh": "應收帳款變動",
+   "en": "Change in Accounts Receivable",
+   "synonyms_zh": [
+    "應收帳款(?:之)?(?:增減|變動)",
+    "應收帳款[（\\(]?增[加]?[）\\)]?減[少]?"
+   ],
+   "synonyms_en": [
+    "(?:increase|decrease)\\s*in\\s*(?:accounts?\\s*)?receivables?"
+   ],
+   "patterns": [
+    "應收帳款[（\\(]?增[加]?[）\\)]?減[少]?",
+    "應收帳款(?:之)?(?:增減|變動)",
+    "(?:increase|decrease)\\s*in\\s*(?:accounts?\\s*)?receivables?"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "OPERATING_CF",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "change_in_inventory": {
+   "zh": "存貨變動",
+   "en": "Change in Inventory",
+   "synonyms_zh": [
+    "存貨(?:之)?(?:增減|變動)",
+    "存貨[（\\(]?增[加]?[）\\)]?減[少]?"
+   ],
+   "synonyms_en": [
+    "(?:increase|decrease)\\s*in\\s*inventor(?:y|ies)"
+   ],
+   "patterns": [
+    "存貨[（\\(]?增[加]?[）\\)]?減[少]?",
+    "存貨(?:之)?(?:增減|變動)",
+    "(?:increase|decrease)\\s*in\\s*inventor(?:y|ies)"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "OPERATING_CF",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "change_in_payables": {
+   "zh": "應付帳款變動",
+   "en": "Change in Accounts Payable",
+   "synonyms_zh": [
+    "應付帳款(?:之)?(?:增減|變動)",
+    "應付帳款[（\\(]?增[加]?[）\\)]?減[少]?"
+   ],
+   "synonyms_en": [
+    "(?:increase|decrease)\\s*in\\s*(?:accounts?\\s*)?payables?"
+   ],
+   "patterns": [
+    "應付帳款[（\\(]?增[加]?[）\\)]?減[少]?",
+    "應付帳款(?:之)?(?:增減|變動)",
+    "(?:increase|decrease)\\s*in\\s*(?:accounts?\\s*)?payables?"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "OPERATING_CF",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "operating_cash_flow": {
+   "zh": "營業活動淨現金流入(出)",
+   "en": "Net Cash from Operating Activities",
+   "synonyms_zh": [
+    "營業活動[之的]?(?:淨)?現金流[入出量]?(?:[合總]計)?",
+    "營運活動現金流量"
+   ],
+   "synonyms_en": [
+    "(?:net\\s*)?cash\\s*(?:flows?\\s*)?(?:from|provided\\s*by|used\\s*in)\\s*operating\\s*activities",
+    "CFO"
+   ],
+   "patterns": [
+    "營業活動[之的]?(?:淨)?現金流[入出量]?(?:[合總]計)?",
+    "營運活動現金流量",
+    "(?:net\\s*)?cash\\s*(?:flows?\\s*)?(?:from|provided\\s*by|used\\s*in)\\s*operating\\s*activities",
+    "CFO"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "OPERATING_CF",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "capex": {
+   "zh": "購置不動產廠房設備",
+   "en": "Capital Expenditure",
+   "synonyms_zh": [
+    "取得不動產[、,]?廠房及設備",
+    "資本支出",
+    "購置不動產[、,]?廠房及設備",
+    "購買固定資產",
+    "購置不動產、廠房及設備",
+    "資本性支出",
+    "設備投資",
+    "固定資產投資"
+   ],
+   "synonyms_en": [
+    "(?:purchase|acquisition)\\s*of\\s*(?:property[,\\s]*plant\\s*(?:and|&)\\s*equipment|PP&?E|fixed\\s*assets?)",
+    "CAPEX",
+    "capital\\s*expenditure",
+    "CapEx",
+    "Capital Expenditures"
+   ],
+   "patterns": [
+    "取得不動產[、,]?廠房及設備",
+    "購置不動產[、,]?廠房及設備",
+    "購買固定資產",
+    "資本支出",
+    "(?:purchase|acquisition)\\s*of\\s*(?:property[,\\s]*plant\\s*(?:and|&)\\s*equipment|PP&?E|fixed\\s*assets?)",
+    "capital\\s*expenditure",
+    "CAPEX"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "INVESTING_CF",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VRN_MDL007_APIDataFetcher.py",
+    "financial_classification_rules.py",
+    "financial_metrics_mapping.md"
+   ],
+   "mops_official": [
+    "購置不動產、廠房及設備"
+   ],
+   "field_map": {
+    "twse_tpex": "資本支出",
+    "twstock": "capex",
+    "yfinance": "capitalExpenditures"
+   }
+  },
+  "sale_of_ppe": {
+   "zh": "處分不動產廠房設備",
+   "en": "Sale of Property, Plant and Equipment",
+   "synonyms_zh": [
+    "出售固定資產",
+    "處分不動產[、,]?廠房及設備"
+   ],
+   "synonyms_en": [
+    "(?:sale|disposal)\\s*of\\s*(?:property[,\\s]*plant\\s*(?:and|&)\\s*equipment|PP&?E|fixed\\s*assets?)"
+   ],
+   "patterns": [
+    "處分不動產[、,]?廠房及設備",
+    "出售固定資產",
+    "(?:sale|disposal)\\s*of\\s*(?:property[,\\s]*plant\\s*(?:and|&)\\s*equipment|PP&?E|fixed\\s*assets?)"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "INVESTING_CF",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "acquisition_of_investments": {
+   "zh": "取得投資",
+   "en": "Acquisition of Investments",
+   "synonyms_zh": [
+    "取得(?:金融資產|投資)",
+    "購買投資"
+   ],
+   "synonyms_en": [
+    "(?:purchase|acquisition)\\s*of\\s*investments?"
+   ],
+   "patterns": [
+    "取得(?:金融資產|投資)",
+    "購買投資",
+    "(?:purchase|acquisition)\\s*of\\s*investments?"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "INVESTING_CF",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "investing_cash_flow": {
+   "zh": "投資活動淨現金流入(出)",
+   "en": "Net Cash from Investing Activities",
+   "synonyms_zh": [
+    "投資活動[之的]?(?:淨)?現金流[入出量]?(?:[合總]計)?"
+   ],
+   "synonyms_en": [
+    "(?:net\\s*)?cash\\s*(?:flows?\\s*)?(?:from|provided\\s*by|used\\s*in)\\s*investing\\s*activities",
+    "CFI"
+   ],
+   "patterns": [
+    "投資活動[之的]?(?:淨)?現金流[入出量]?(?:[合總]計)?",
+    "(?:net\\s*)?cash\\s*(?:flows?\\s*)?(?:from|provided\\s*by|used\\s*in)\\s*investing\\s*activities",
+    "CFI"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "INVESTING_CF",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "short_term_borrowings_change": {
+   "zh": "短期借款變動",
+   "en": "Change in Short-term Borrowings",
+   "synonyms_zh": [
+    "(?:增加|減少)短期借款",
+    "短期借款(?:之)?(?:增減|變動)"
+   ],
+   "synonyms_en": [
+    "(?:increase|decrease)\\s*in\\s*short[- ]?term\\s*(?:borrowings?|loans?)"
+   ],
+   "patterns": [
+    "短期借款(?:之)?(?:增減|變動)",
+    "(?:增加|減少)短期借款",
+    "(?:increase|decrease)\\s*in\\s*short[- ]?term\\s*(?:borrowings?|loans?)"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "FINANCING_CF",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "long_term_borrowings_proceeds": {
+   "zh": "舉借長期借款",
+   "en": "Proceeds from Long-term Borrowings",
+   "synonyms_zh": [
+    "舉借長期借款",
+    "長期借款增加"
+   ],
+   "synonyms_en": [
+    "proceeds\\s*from\\s*long[- ]?term\\s*(?:borrowings?|loans?|debt)"
+   ],
+   "patterns": [
+    "舉借長期借款",
+    "長期借款增加",
+    "proceeds\\s*from\\s*long[- ]?term\\s*(?:borrowings?|loans?|debt)"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "FINANCING_CF",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "repayment_of_debt": {
+   "zh": "償還借款",
+   "en": "Repayment of Debt",
+   "synonyms_zh": [
+    "償還(?:長期)?借款"
+   ],
+   "synonyms_en": [
+    "repayment\\s*of\\s*(?:long[- ]?term\\s*)?(?:borrowings?|loans?|debt)"
+   ],
+   "patterns": [
+    "償還(?:長期)?借款",
+    "repayment\\s*of\\s*(?:long[- ]?term\\s*)?(?:borrowings?|loans?|debt)"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "FINANCING_CF",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "dividends_paid": {
+   "zh": "發放現金股利",
+   "en": "Dividends Paid",
+   "synonyms_zh": [
+    "支付股利",
+    "現金股利(?:支付|發放)",
+    "發放現金股利",
+    "現金股利發放",
+    "股息支付",
+    "股利發放",
+    "現金股利支付",
+    "股息發放",
+    "股利分配"
+   ],
+   "synonyms_en": [
+    "(?:cash\\s*)?dividends?\\s*paid",
+    "Dividends Paid",
+    "Total Dividend Payout"
+   ],
+   "patterns": [
+    "發放現金股利",
+    "支付股利",
+    "現金股利(?:支付|發放)",
+    "(?:cash\\s*)?dividends?\\s*paid"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "FINANCING_CF",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_classification_rules.py",
+    "financial_metrics_mapping.md"
+   ],
+   "field_map": {
+    "twse_tpex": "發放現金股利",
+    "twstock": "dividends_paid",
+    "yfinance": "dividendsPaid"
+   }
+  },
+  "interest_paid": {
+   "zh": "支付利息",
+   "en": "Interest Paid",
+   "synonyms_zh": [
+    "利息支付",
+    "支付利息"
+   ],
+   "synonyms_en": [
+    "interest\\s*paid"
+   ],
+   "patterns": [
+    "支付利息",
+    "利息支付",
+    "interest\\s*paid"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "FINANCING_CF",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "income_tax_paid": {
+   "zh": "支付所得稅",
+   "en": "Income Tax Paid",
+   "synonyms_zh": [
+    "所得稅支付",
+    "支付所得稅"
+   ],
+   "synonyms_en": [
+    "income\\s*tax\\s*paid"
+   ],
+   "patterns": [
+    "支付所得稅",
+    "所得稅支付",
+    "income\\s*tax\\s*paid"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "OPERATING_CF",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "stock_issuance": {
+   "zh": "現金增資",
+   "en": "Stock Issuance",
+   "synonyms_zh": [
+    "現金增資",
+    "發行新股"
+   ],
+   "synonyms_en": [
+    "(?:issuance|issue)\\s*of\\s*(?:common\\s*)?(?:stock|shares?)"
+   ],
+   "patterns": [
+    "現金增資",
+    "發行新股",
+    "(?:issuance|issue)\\s*of\\s*(?:common\\s*)?(?:stock|shares?)"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "FINANCING_CF",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "treasury_stock_purchase": {
+   "zh": "購買庫藏股",
+   "en": "Treasury Stock Purchase",
+   "synonyms_zh": [
+    "買回庫藏股",
+    "購買庫藏股"
+   ],
+   "synonyms_en": [
+    "(?:purchase|repurchase)\\s*of\\s*treasury\\s*(?:stock|shares?)",
+    "stock\\s*buyback"
+   ],
+   "patterns": [
+    "購買庫藏股",
+    "買回庫藏股",
+    "(?:purchase|repurchase)\\s*of\\s*treasury\\s*(?:stock|shares?)",
+    "stock\\s*buyback"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "FINANCING_CF",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "financing_cash_flow": {
+   "zh": "籌資活動淨現金流入(出)",
+   "en": "Net Cash from Financing Activities",
+   "synonyms_zh": [
+    "籌資活動[之的]?(?:淨)?現金流[入出量]?(?:[合總]計)?",
+    "融資活動現金流量"
+   ],
+   "synonyms_en": [
+    "(?:net\\s*)?cash\\s*(?:flows?\\s*)?(?:from|provided\\s*by|used\\s*in)\\s*financing\\s*activities",
+    "CFF"
+   ],
+   "patterns": [
+    "籌資活動[之的]?(?:淨)?現金流[入出量]?(?:[合總]計)?",
+    "融資活動現金流量",
+    "(?:net\\s*)?cash\\s*(?:flows?\\s*)?(?:from|provided\\s*by|used\\s*in)\\s*financing\\s*activities",
+    "CFF"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "FINANCING_CF",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "net_change_in_cash": {
+   "zh": "現金及約當現金淨增減",
+   "en": "Net Change in Cash",
+   "synonyms_zh": [
+    "現金及約當現金(?:之)?(?:淨增減|淨變動|增減數)",
+    "淨現金流量",
+    "現金淨增加"
+   ],
+   "synonyms_en": [
+    "(?:net\\s*)?(?:increase|decrease|change)\\s*in\\s*cash",
+    "Net Change In Cash",
+    "net change in cash"
+   ],
+   "patterns": [
+    "現金及約當現金(?:之)?(?:淨增減|淨變動|增減數)",
+    "(?:net\\s*)?(?:increase|decrease|change)\\s*in\\s*cash"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "OPERATING_CF",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VIS_VRN_FinancialSSOT_v0608.py"
+   ],
+   "vrn_uid": "VRN_FIN_0035"
+  },
+  "beginning_cash": {
+   "zh": "期初現金",
+   "en": "Beginning Cash",
+   "synonyms_zh": [
+    "期初現金及約當現金",
+    "期初現金餘額",
+    "期初現金"
+   ],
+   "synonyms_en": [
+    "(?:beginning|opening)\\s*cash\\s*(?:balance)?",
+    "Beginning Cash",
+    "beginning cash"
+   ],
+   "patterns": [
+    "期初現金及約當現金",
+    "期初現金餘額",
+    "(?:beginning|opening)\\s*cash\\s*(?:balance)?"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "OPERATING_CF",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VIS_VRN_FinancialSSOT_v0608.py"
+   ],
+   "vrn_uid": "VRN_FIN_0036"
+  },
+  "ending_cash": {
+   "zh": "期末現金",
+   "en": "Ending Cash",
+   "synonyms_zh": [
+    "期末現金及約當現金",
+    "期末現金餘額",
+    "期末現金"
+   ],
+   "synonyms_en": [
+    "(?:ending|closing)\\s*cash\\s*(?:balance)?",
+    "Ending Cash",
+    "ending cash"
+   ],
+   "patterns": [
+    "期末現金及約當現金",
+    "期末現金餘額",
+    "(?:ending|closing)\\s*cash\\s*(?:balance)?"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "OPERATING_CF",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VIS_VRN_FinancialSSOT_v0608.py"
+   ],
+   "vrn_uid": "VRN_FIN_0037"
+  },
+  "free_cash_flow": {
+   "zh": "自由現金流量",
+   "en": "Free Cash Flow",
+   "synonyms_zh": [
+    "自由現金流量?",
+    "自由現金流"
+   ],
+   "synonyms_en": [
+    "FCF",
+    "free\\s*cash\\s*flow",
+    "Free Cash Flow",
+    "fcf",
+    "free cash flow"
+   ],
+   "patterns": [
+    "自由現金流量?",
+    "free\\s*cash\\s*flow",
+    "FCF"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "OPERATING_CF",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VIS_VRN_FinancialSSOT_v0608.py"
+   ],
+   "vrn_uid": "VRN_FIN_0034"
+  },
+  "equity_beginning_balance": {
+   "zh": "本期期初餘額",
+   "en": "Beginning Balance",
+   "synonyms_zh": [
+    "期初權益餘額",
+    "本期期初餘額"
+   ],
+   "synonyms_en": [
+    "beginning\\s*balance"
+   ],
+   "patterns": [
+    "本期期初餘額",
+    "期初權益餘額",
+    "beginning\\s*balance"
+   ],
+   "statement": "EQUITY_CHANGE",
+   "category": "EQUITY",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "equity_increase": {
+   "zh": "本期權益增加",
+   "en": "Increase in Equity",
+   "synonyms_zh": [
+    "本期權益增加",
+    "權益增加"
+   ],
+   "synonyms_en": [
+    "increase\\s*in\\s*equity"
+   ],
+   "patterns": [
+    "本期權益增加",
+    "權益增加",
+    "increase\\s*in\\s*equity"
+   ],
+   "statement": "EQUITY_CHANGE",
+   "category": "EQUITY",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "equity_decrease": {
+   "zh": "本期權益減少",
+   "en": "Decrease in Equity",
+   "synonyms_zh": [
+    "本期權益減少",
+    "權益減少"
+   ],
+   "synonyms_en": [
+    "decrease\\s*in\\s*equity"
+   ],
+   "patterns": [
+    "本期權益減少",
+    "權益減少",
+    "decrease\\s*in\\s*equity"
+   ],
+   "statement": "EQUITY_CHANGE",
+   "category": "EQUITY",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "equity_ending_balance": {
+   "zh": "本期期末餘額",
+   "en": "Ending Balance",
+   "synonyms_zh": [
+    "期末權益餘額",
+    "本期期末餘額"
+   ],
+   "synonyms_en": [
+    "ending\\s*balance"
+   ],
+   "patterns": [
+    "本期期末餘額",
+    "期末權益餘額",
+    "ending\\s*balance"
+   ],
+   "statement": "EQUITY_CHANGE",
+   "category": "EQUITY",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "appropriation_legal_reserve": {
+   "zh": "提列法定盈餘公積",
+   "en": "Appropriation of Legal Reserve",
+   "synonyms_zh": [
+    "提列法定盈餘公積",
+    "法定盈餘公積"
+   ],
+   "synonyms_en": [
+    "legal\\s*reserve\\s*appropriation"
+   ],
+   "patterns": [
+    "提列法定盈餘公積",
+    "法定盈餘公積",
+    "legal\\s*reserve\\s*appropriation"
+   ],
+   "statement": "EQUITY_CHANGE",
+   "category": "EQUITY",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "dividend_distribution": {
+   "zh": "盈餘分配",
+   "en": "Dividend Distribution",
+   "synonyms_zh": [
+    "盈餘分配",
+    "股利分配"
+   ],
+   "synonyms_en": [
+    "dividend\\s*distribution"
+   ],
+   "patterns": [
+    "盈餘分配",
+    "股利分配",
+    "dividend\\s*distribution"
+   ],
+   "statement": "EQUITY_CHANGE",
+   "category": "EQUITY",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "current_ratio": {
+   "zh": "流動比率",
+   "en": "Current Ratio",
+   "synonyms_zh": [
+    "流動比率",
+    "短期償債能力",
+    "流動性比率",
+    "流動比",
+    "短期償債能力比率"
+   ],
+   "synonyms_en": [
+    "current\\s*ratio",
+    "Current Ratio",
+    "current ratio"
+   ],
+   "patterns": [
+    "流動比率",
+    "current\\s*ratio"
+   ],
+   "statement": "RATIO",
+   "category": "RATIO",
+   "unit": "%",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_classification_rules.py",
+    "financial_data_standardization.py(AST)",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py"
+   ],
+   "field_map": {
+    "twse_tpex": "流動比率",
+    "twstock": "current_ratio",
+    "yfinance": "currentRatio"
+   },
+   "validation_rules": [
+    "ratio_format",
+    "reasonable_current_ratio_range"
+   ],
+   "vrn_uid": "VRN_FIN_0048"
+  },
+  "quick_ratio": {
+   "zh": "速動比率",
+   "en": "Quick Ratio",
+   "synonyms_zh": [
+    "速動比率",
+    "酸性測試比率",
+    "酸性測驗比率",
+    "速動比"
+   ],
+   "synonyms_en": [
+    "acid[- ]?test\\s*ratio",
+    "quick\\s*ratio",
+    "Quick Ratio",
+    "Acid Test Ratio"
+   ],
+   "patterns": [
+    "速動比率",
+    "酸性測試比率",
+    "quick\\s*ratio",
+    "acid[- ]?test\\s*ratio"
+   ],
+   "statement": "RATIO",
+   "category": "RATIO",
+   "unit": "%",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_classification_rules.py",
+    "financial_metrics_mapping.md"
+   ],
+   "field_map": {
+    "twse_tpex": "速動比率",
+    "twstock": "quick_ratio",
+    "yfinance": "quickRatio"
+   }
+  },
+  "cash_ratio": {
+   "zh": "現金比率",
+   "en": "Cash Ratio",
+   "synonyms_zh": [
+    "現金比率"
+   ],
+   "synonyms_en": [
+    "cash\\s*ratio"
+   ],
+   "patterns": [
+    "現金比率",
+    "cash\\s*ratio"
+   ],
+   "statement": "RATIO",
+   "category": "RATIO",
+   "unit": "%",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "debt_ratio": {
+   "zh": "負債比率",
+   "en": "Debt Ratio",
+   "synonyms_zh": [
+    "負債佔資產比率",
+    "負債比率",
+    "負債率",
+    "總負債比率",
+    "債務比率",
+    "資產負債率",
+    "負債比"
+   ],
+   "synonyms_en": [
+    "debt\\s*ratio",
+    "debt\\s*to\\s*assets?\\s*ratio",
+    "Debt Ratio",
+    "debt ratio"
+   ],
+   "patterns": [
+    "負債比率",
+    "負債佔資產比率",
+    "debt\\s*ratio",
+    "debt\\s*to\\s*assets?\\s*ratio"
+   ],
+   "statement": "RATIO",
+   "category": "RATIO",
+   "unit": "%",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_classification_rules.py",
+    "financial_data_standardization.py(AST)",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py"
+   ],
+   "field_map": {
+    "twse_tpex": "負債比率",
+    "twstock": "debt_ratio",
+    "yfinance": "debtToTotalAssets"
+   },
+   "validation_rules": [
+    "percentage_format",
+    "reasonable_debt_ratio_range"
+   ],
+   "vrn_uid": "VRN_FIN_0049"
+  },
+  "debt_equity_ratio": {
+   "zh": "負債權益比率",
+   "en": "Debt to Equity Ratio",
+   "synonyms_zh": [
+    "債務權益比",
+    "負債[對占佔]?權益比率",
+    "負債權益比"
+   ],
+   "synonyms_en": [
+    "D/E\\s*ratio",
+    "debt\\s*(?:to\\s*)?equity\\s*ratio"
+   ],
+   "patterns": [
+    "負債[對占佔]?權益比率",
+    "負債權益比",
+    "債務權益比",
+    "debt\\s*(?:to\\s*)?equity\\s*ratio",
+    "D/E\\s*ratio"
+   ],
+   "statement": "RATIO",
+   "category": "RATIO",
+   "unit": "%",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "interest_coverage": {
+   "zh": "利息保障倍數",
+   "en": "Interest Coverage Ratio",
+   "synonyms_zh": [
+    "利息保障倍數"
+   ],
+   "synonyms_en": [
+    "TIE",
+    "interest\\s*coverage\\s*ratio",
+    "times\\s*interest\\s*earned"
+   ],
+   "patterns": [
+    "利息保障倍數",
+    "interest\\s*coverage\\s*ratio",
+    "times\\s*interest\\s*earned",
+    "TIE"
+   ],
+   "statement": "RATIO",
+   "category": "RATIO",
+   "unit": "倍",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "long_term_debt_ratio": {
+   "zh": "長期資金占固定資產比率",
+   "en": "Long-term Fund to Fixed Asset Ratio",
+   "synonyms_zh": [
+    "長期資金[占佔]固定資產比率"
+   ],
+   "synonyms_en": [
+    "long[- ]?term\\s*fund\\s*to\\s*fixed\\s*asset\\s*ratio"
+   ],
+   "patterns": [
+    "長期資金[占佔]固定資產比率",
+    "long[- ]?term\\s*fund\\s*to\\s*fixed\\s*asset\\s*ratio"
+   ],
+   "statement": "RATIO",
+   "category": "RATIO",
+   "unit": "%",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "gross_margin": {
+   "zh": "毛利率",
+   "en": "Gross Margin",
+   "synonyms_zh": [
+    "毛利率",
+    "營業毛利率",
+    "毛利潤率"
+   ],
+   "synonyms_en": [
+    "gross\\s*(?:profit\\s*)?margin",
+    "Gross Margin",
+    "Gross Profit Margin",
+    "gm",
+    "gross margin"
+   ],
+   "patterns": [
+    "毛利率",
+    "營業毛利率",
+    "gross\\s*(?:profit\\s*)?margin"
+   ],
+   "statement": "RATIO",
+   "category": "RATIO",
+   "unit": "%",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_classification_rules.py",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Financial_Synonyms_SSOT.py"
+   ],
+   "field_map": {
+    "twse_tpex": "毛利率",
+    "twstock": "gross_margin",
+    "yfinance": "grossMargins"
+   },
+   "vrn_uid": "VRN_FIN_0043"
+  },
+  "operating_margin": {
+   "zh": "營業利益率",
+   "en": "Operating Margin",
+   "synonyms_zh": [
+    "營業利益率",
+    "營業淨利率",
+    "營運利益率",
+    "營益率"
+   ],
+   "synonyms_en": [
+    "operating\\s*(?:profit\\s*)?margin",
+    "Operating Margin",
+    "EBIT Margin",
+    "opm",
+    "operating margin"
+   ],
+   "patterns": [
+    "營業利益率",
+    "營業淨利率",
+    "operating\\s*(?:profit\\s*)?margin"
+   ],
+   "statement": "RATIO",
+   "category": "RATIO",
+   "unit": "%",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_classification_rules.py",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py"
+   ],
+   "field_map": {
+    "twse_tpex": "營業利益率",
+    "twstock": "operating_margin",
+    "yfinance": "operatingMargins"
+   },
+   "vrn_uid": "VRN_FIN_0044"
+  },
+  "net_profit_margin": {
+   "zh": "淨利率",
+   "en": "Net Profit Margin",
+   "synonyms_zh": [
+    "淨利率",
+    "稅後淨利率",
+    "純益率"
+   ],
+   "synonyms_en": [
+    "net\\s*(?:profit\\s*)?margin"
+   ],
+   "patterns": [
+    "淨利率",
+    "稅後淨利率",
+    "純益率",
+    "net\\s*(?:profit\\s*)?margin"
+   ],
+   "statement": "RATIO",
+   "category": "RATIO",
+   "unit": "%",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "roe": {
+   "zh": "股東權益報酬率",
+   "en": "Return on Equity",
+   "synonyms_zh": [
+    "權益報酬率",
+    "股東權益報酬率",
+    "淨值報酬率",
+    "股東權益收益率",
+    "股東權益回報率"
+   ],
+   "synonyms_en": [
+    "ROE",
+    "return\\s*on\\s*equity",
+    "Return on Equity",
+    "ROAE",
+    "Return on Equity (ROE)",
+    "roe",
+    "return on equity"
+   ],
+   "patterns": [
+    "股東權益報酬率",
+    "權益報酬率",
+    "return\\s*on\\s*equity",
+    "ROE"
+   ],
+   "statement": "RATIO",
+   "category": "RATIO",
+   "unit": "%",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_classification_rules.py",
+    "financial_data_standardization.py(AST)",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Financial_Synonyms_SSOT.py"
+   ],
+   "field_map": {
+    "twse_tpex": "股東權益報酬率",
+    "twstock": "roe",
+    "yfinance": "returnOnEquity"
+   },
+   "validation_rules": [
+    "percentage_format",
+    "reasonable_roe_range"
+   ],
+   "vrn_uid": "VRN_FIN_0046"
+  },
+  "roa": {
+   "zh": "資產報酬率",
+   "en": "Return on Assets",
+   "synonyms_zh": [
+    "總資產報酬率",
+    "資產報酬率",
+    "資產收益率"
+   ],
+   "synonyms_en": [
+    "ROA",
+    "return\\s*on\\s*assets?",
+    "Return on Assets",
+    "ROAA",
+    "Return on Assets (ROA)",
+    "roa",
+    "return on assets"
+   ],
+   "patterns": [
+    "資產報酬率",
+    "總資產報酬率",
+    "return\\s*on\\s*assets?",
+    "ROA"
+   ],
+   "statement": "RATIO",
+   "category": "RATIO",
+   "unit": "%",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_classification_rules.py",
+    "financial_data_standardization.py(AST)",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Financial_Synonyms_SSOT.py"
+   ],
+   "field_map": {
+    "twse_tpex": "資產報酬率",
+    "twstock": "roa",
+    "yfinance": "returnOnAssets"
+   },
+   "validation_rules": [
+    "percentage_format",
+    "reasonable_roa_range"
+   ],
+   "vrn_uid": "VRN_FIN_0047"
+  },
+  "roic": {
+   "zh": "投入資本報酬率",
+   "en": "Return on Invested Capital",
+   "synonyms_zh": [
+    "投入資本報酬率",
+    "投資資本報酬率"
+   ],
+   "synonyms_en": [
+    "ROIC",
+    "return\\s*on\\s*invested\\s*capital"
+   ],
+   "patterns": [
+    "投入資本報酬率",
+    "投資資本報酬率",
+    "return\\s*on\\s*invested\\s*capital",
+    "ROIC"
+   ],
+   "statement": "RATIO",
+   "category": "RATIO",
+   "unit": "%",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "asset_turnover": {
+   "zh": "資產週轉率",
+   "en": "Asset Turnover",
+   "synonyms_zh": [
+    "(?:總)?資產週轉率",
+    "資產週轉率"
+   ],
+   "synonyms_en": [
+    "asset\\s*turnover",
+    "Asset Turnover",
+    "asset turnover"
+   ],
+   "patterns": [
+    "(?:總)?資產週轉率",
+    "asset\\s*turnover"
+   ],
+   "statement": "RATIO",
+   "category": "RATIO",
+   "unit": "次",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VIS_VRN_FinancialSSOT_v0608.py"
+   ],
+   "vrn_uid": "VRN_FIN_0052"
+  },
+  "inventory_turnover": {
+   "zh": "存貨週轉率",
+   "en": "Inventory Turnover",
+   "synonyms_zh": [
+    "存貨周轉率",
+    "存貨週轉率"
+   ],
+   "synonyms_en": [
+    "inventory\\s*turnover",
+    "Inventory Turnover",
+    "inventory turnover"
+   ],
+   "patterns": [
+    "存貨週轉率",
+    "存貨周轉率",
+    "inventory\\s*turnover"
+   ],
+   "statement": "RATIO",
+   "category": "RATIO",
+   "unit": "次",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VIS_VRN_FinancialSSOT_v0608.py"
+   ],
+   "vrn_uid": "VRN_FIN_0050"
+  },
+  "inventory_days": {
+   "zh": "平均售貨天數",
+   "en": "Days Inventory Outstanding",
+   "synonyms_zh": [
+    "存貨週轉天數",
+    "平均售貨天數"
+   ],
+   "synonyms_en": [
+    "DIO",
+    "days\\s*inventor(?:y|ies)\\s*(?:outstanding)?"
+   ],
+   "patterns": [
+    "平均售貨天數",
+    "存貨週轉天數",
+    "days\\s*inventor(?:y|ies)\\s*(?:outstanding)?",
+    "DIO"
+   ],
+   "statement": "RATIO",
+   "category": "RATIO",
+   "unit": "天",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "receivable_turnover": {
+   "zh": "應收帳款週轉率",
+   "en": "Receivables Turnover",
+   "synonyms_zh": [
+    "應收(?:帳|款項?)款?週轉率",
+    "應收帳款週轉率"
+   ],
+   "synonyms_en": [
+    "receivables?\\s*turnover",
+    "Receivable Turnover",
+    "receivable turnover"
+   ],
+   "patterns": [
+    "應收(?:帳|款項?)款?週轉率",
+    "receivables?\\s*turnover"
+   ],
+   "statement": "RATIO",
+   "category": "RATIO",
+   "unit": "次",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VIS_VRN_FinancialSSOT_v0608.py"
+   ],
+   "vrn_uid": "VRN_FIN_0051"
+  },
+  "receivable_days": {
+   "zh": "平均收現天數",
+   "en": "Days Sales Outstanding",
+   "synonyms_zh": [
+    "平均收現天數",
+    "應收帳款週轉天數"
+   ],
+   "synonyms_en": [
+    "DSO",
+    "days\\s*sales\\s*outstanding"
+   ],
+   "patterns": [
+    "平均收現天數",
+    "應收帳款週轉天數",
+    "days\\s*sales\\s*outstanding",
+    "DSO"
+   ],
+   "statement": "RATIO",
+   "category": "RATIO",
+   "unit": "天",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "payable_turnover": {
+   "zh": "應付帳款週轉率",
+   "en": "Payables Turnover",
+   "synonyms_zh": [
+    "應付(?:帳|款項?)款?週轉率"
+   ],
+   "synonyms_en": [
+    "payables?\\s*turnover"
+   ],
+   "patterns": [
+    "應付(?:帳|款項?)款?週轉率",
+    "payables?\\s*turnover"
+   ],
+   "statement": "RATIO",
+   "category": "RATIO",
+   "unit": "次",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "payable_days": {
+   "zh": "平均付款天數",
+   "en": "Days Payable Outstanding",
+   "synonyms_zh": [
+    "平均付款天數",
+    "應付帳款週轉天數"
+   ],
+   "synonyms_en": [
+    "DPO",
+    "days\\s*payable\\s*outstanding"
+   ],
+   "patterns": [
+    "平均付款天數",
+    "應付帳款週轉天數",
+    "days\\s*payable\\s*outstanding",
+    "DPO"
+   ],
+   "statement": "RATIO",
+   "category": "RATIO",
+   "unit": "天",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "cash_conversion_cycle": {
+   "zh": "現金轉換週期",
+   "en": "Cash Conversion Cycle",
+   "synonyms_zh": [
+    "現金(?:轉換|循環)週期"
+   ],
+   "synonyms_en": [
+    "CCC",
+    "cash\\s*conversion\\s*cycle"
+   ],
+   "patterns": [
+    "現金(?:轉換|循環)週期",
+    "cash\\s*conversion\\s*cycle",
+    "CCC"
+   ],
+   "statement": "RATIO",
+   "category": "RATIO",
+   "unit": "天",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "fixed_asset_turnover": {
+   "zh": "固定資產週轉率",
+   "en": "Fixed Asset Turnover",
+   "synonyms_zh": [
+    "不動產[、,]?廠房及設備週轉率",
+    "固定資產週轉率"
+   ],
+   "synonyms_en": [
+    "fixed\\s*asset\\s*turnover"
+   ],
+   "patterns": [
+    "固定資產週轉率",
+    "不動產[、,]?廠房及設備週轉率",
+    "fixed\\s*asset\\s*turnover"
+   ],
+   "statement": "RATIO",
+   "category": "RATIO",
+   "unit": "次",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "book_value_per_share": {
+   "zh": "每股淨值",
+   "en": "Book Value Per Share",
+   "synonyms_zh": [
+    "每股帳面價值",
+    "每股淨值",
+    "每股股東權益"
+   ],
+   "synonyms_en": [
+    "BVPS",
+    "NAV\\s*per\\s*share",
+    "book\\s*value\\s*per\\s*share",
+    "Book Value Per Share",
+    "NAV per share",
+    "Per share BV"
+   ],
+   "patterns": [
+    "每股淨值",
+    "每股帳面價值",
+    "book\\s*value\\s*per\\s*share",
+    "BVPS",
+    "NAV\\s*per\\s*share"
+   ],
+   "statement": "PER_SHARE",
+   "category": "PER_SHARE",
+   "unit": "元",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_metrics_mapping.md"
+   ],
+   "field_map": {
+    "twse_tpex": "每股淨值",
+    "twstock": "book_value_per_share",
+    "yfinance": "bookValue"
+   }
+  },
+  "cash_per_share": {
+   "zh": "每股現金",
+   "en": "Cash Per Share",
+   "synonyms_zh": [
+    "每股現金(?:及約當現金)?"
+   ],
+   "synonyms_en": [
+    "cash\\s*per\\s*share"
+   ],
+   "patterns": [
+    "每股現金(?:及約當現金)?",
+    "cash\\s*per\\s*share"
+   ],
+   "statement": "PER_SHARE",
+   "category": "PER_SHARE",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "operating_cf_per_share": {
+   "zh": "每股營業現金流",
+   "en": "Operating Cash Flow Per Share",
+   "synonyms_zh": [
+    "每股營業?活動?現金流(?:量)?",
+    "每股營運現金流"
+   ],
+   "synonyms_en": [
+    "CFO\\s*per\\s*share",
+    "operating\\s*cash\\s*flow\\s*per\\s*share"
+   ],
+   "patterns": [
+    "每股營業?活動?現金流(?:量)?",
+    "每股營運現金流",
+    "operating\\s*cash\\s*flow\\s*per\\s*share",
+    "CFO\\s*per\\s*share"
+   ],
+   "statement": "PER_SHARE",
+   "category": "PER_SHARE",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "free_cf_per_share": {
+   "zh": "每股自由現金流",
+   "en": "Free Cash Flow Per Share",
+   "synonyms_zh": [
+    "每股自由現金流(?:量)?"
+   ],
+   "synonyms_en": [
+    "FCF\\s*per\\s*share",
+    "free\\s*cash\\s*flow\\s*per\\s*share"
+   ],
+   "patterns": [
+    "每股自由現金流(?:量)?",
+    "free\\s*cash\\s*flow\\s*per\\s*share",
+    "FCF\\s*per\\s*share"
+   ],
+   "statement": "PER_SHARE",
+   "category": "PER_SHARE",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "dividend_per_share": {
+   "zh": "每股股利",
+   "en": "Dividend Per Share",
+   "synonyms_zh": [
+    "每股(?:現金)?股息",
+    "每股股利",
+    "每股現金股利",
+    "每股配息",
+    "現金股息",
+    "股利"
+   ],
+   "synonyms_en": [
+    "DPS",
+    "dividend\\s*per\\s*share",
+    "Dividend Per Share",
+    "Total DPS"
+   ],
+   "patterns": [
+    "每股股利",
+    "每股(?:現金)?股息",
+    "dividend\\s*per\\s*share",
+    "DPS"
+   ],
+   "statement": "PER_SHARE",
+   "category": "PER_SHARE",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_metrics_mapping.md"
+   ],
+   "field_map": {
+    "twse_tpex": "現金股利發放",
+    "twstock": "dividend_per_share",
+    "yfinance": "dividends"
+   }
+  },
+  "cash_dividend_per_share": {
+   "zh": "每股現金股利",
+   "en": "Cash Dividend Per Share",
+   "synonyms_zh": [
+    "每股現金股利",
+    "現金股利每股"
+   ],
+   "synonyms_en": [
+    "cash\\s*dividend\\s*per\\s*share"
+   ],
+   "patterns": [
+    "每股現金股利",
+    "現金股利每股",
+    "cash\\s*dividend\\s*per\\s*share"
+   ],
+   "statement": "PER_SHARE",
+   "category": "PER_SHARE",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "stock_dividend_per_share": {
+   "zh": "每股股票股利",
+   "en": "Stock Dividend Per Share",
+   "synonyms_zh": [
+    "每股股票股利",
+    "股票股利每股"
+   ],
+   "synonyms_en": [
+    "stock\\s*dividend\\s*per\\s*share"
+   ],
+   "patterns": [
+    "每股股票股利",
+    "股票股利每股",
+    "stock\\s*dividend\\s*per\\s*share"
+   ],
+   "statement": "PER_SHARE",
+   "category": "PER_SHARE",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "revenue_per_share": {
+   "zh": "每股營收",
+   "en": "Revenue Per Share",
+   "synonyms_zh": [
+    "每股營(?:業)?收(?:入)?"
+   ],
+   "synonyms_en": [
+    "revenue\\s*per\\s*share",
+    "sales\\s*per\\s*share"
+   ],
+   "patterns": [
+    "每股營(?:業)?收(?:入)?",
+    "revenue\\s*per\\s*share",
+    "sales\\s*per\\s*share"
+   ],
+   "statement": "PER_SHARE",
+   "category": "PER_SHARE",
+   "unit": "元",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "pe_ratio": {
+   "zh": "本益比",
+   "en": "P/E Ratio",
+   "synonyms_zh": [
+    "市盈率",
+    "本益比",
+    "股價盈餘比"
+   ],
+   "synonyms_en": [
+    "P/?E\\s*ratio",
+    "price[- ]?(?:to[- ]?)?earnings?\\s*ratio",
+    "Price-to-Earnings (P/E)",
+    "P/E Ratio",
+    "PER",
+    "P/E",
+    "p/e",
+    "per",
+    "pe ratio",
+    "pe",
+    "price to earnings",
+    "PE Ratio"
+   ],
+   "patterns": [
+    "本益比",
+    "市盈率",
+    "P/?E\\s*ratio",
+    "price[- ]?(?:to[- ]?)?earnings?\\s*ratio",
+    "(本益比|P/E|PE\\s+Ratio|PER|市盈率|trailingPE|forwardPE|股價盈餘比)"
+   ],
+   "statement": "PER_SHARE",
+   "category": "PER_SHARE",
+   "unit": "倍",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Financial_Synonyms_SSOT.py",
+    "financial_classification_rules.py"
+   ],
+   "field_map": {
+    "twstock": "pe_ratio",
+    "yfinance": "trailingPE",
+    "twse_tpex": "本益比"
+   },
+   "vrn_uid": "VRN_FIN_0053",
+   "merged_from": [
+    "pe"
+   ]
+  },
+  "pb_ratio": {
+   "zh": "股價淨值比",
+   "en": "P/B Ratio",
+   "synonyms_zh": [
+    "市淨率",
+    "股價淨值比",
+    "市價淨值比"
+   ],
+   "synonyms_en": [
+    "P/?B\\s*ratio",
+    "price[- ]?(?:to[- ]?)?book\\s*ratio",
+    "Price-to-Book (P/B)",
+    "P/B Ratio",
+    "PBR",
+    "P/B",
+    "p/b",
+    "pbr",
+    "pb ratio",
+    "pb",
+    "price to book",
+    "PB Ratio"
+   ],
+   "patterns": [
+    "股價淨值比",
+    "市淨率",
+    "P/?B\\s*ratio",
+    "price[- ]?(?:to[- ]?)?book\\s*ratio",
+    "(股價淨值比|P/B|PB\\s+Ratio|PBR|市淨率|priceToBook|市價淨值比)"
+   ],
+   "statement": "PER_SHARE",
+   "category": "PER_SHARE",
+   "unit": "倍",
+   "validation_level": "CRITICAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Financial_Synonyms_SSOT.py",
+    "financial_classification_rules.py"
+   ],
+   "field_map": {
+    "twstock": "pb_ratio",
+    "yfinance": "priceToBook",
+    "twse_tpex": "股價淨值比"
+   },
+   "vrn_uid": "VRN_FIN_0054",
+   "merged_from": [
+    "pb"
+   ]
+  },
+  "ps_ratio": {
+   "zh": "股價營收比",
+   "en": "P/S Ratio",
+   "synonyms_zh": [
+    "市銷率",
+    "股價營收比",
+    "市價營收比"
+   ],
+   "synonyms_en": [
+    "P/?S\\s*ratio",
+    "price[- ]?(?:to[- ]?)?sales\\s*ratio",
+    "Price-to-Sales (P/S)",
+    "P/S Ratio",
+    "PSR"
+   ],
+   "patterns": [
+    "股價營收比",
+    "市銷率",
+    "P/?S\\s*ratio",
+    "price[- ]?(?:to[- ]?)?sales\\s*ratio"
+   ],
+   "statement": "PER_SHARE",
+   "category": "PER_SHARE",
+   "unit": "倍",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_metrics_mapping.md"
+   ],
+   "field_map": {
+    "twstock": "ps_ratio",
+    "yfinance": "priceToSales"
+   }
+  },
+  "pcf_ratio": {
+   "zh": "股價現金流量比",
+   "en": "P/CF Ratio",
+   "synonyms_zh": [
+    "股價現金流(?:量)?比"
+   ],
+   "synonyms_en": [
+    "P/?CF\\s*ratio",
+    "price[- ]?(?:to[- ]?)?cash\\s*flow\\s*ratio"
+   ],
+   "patterns": [
+    "股價現金流(?:量)?比",
+    "P/?CF\\s*ratio",
+    "price[- ]?(?:to[- ]?)?cash\\s*flow\\s*ratio"
+   ],
+   "statement": "PER_SHARE",
+   "category": "PER_SHARE",
+   "unit": "倍",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "ev_ebitda": {
+   "zh": "企業價值倍數",
+   "en": "EV/EBITDA",
+   "synonyms_zh": [
+    "企業價值倍數"
+   ],
+   "synonyms_en": [
+    "EV/?EBITDA",
+    "enterprise\\s*value\\s*(?:to\\s*)?EBITDA"
+   ],
+   "patterns": [
+    "企業價值倍數",
+    "EV/?EBITDA",
+    "enterprise\\s*value\\s*(?:to\\s*)?EBITDA"
+   ],
+   "statement": "PER_SHARE",
+   "category": "PER_SHARE",
+   "unit": "倍",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "dividend_yield": {
+   "zh": "殖利率",
+   "en": "Dividend Yield",
+   "synonyms_zh": [
+    "(?:現金)?股利?殖利率",
+    "股息(?:收益)?率",
+    "股利殖利率",
+    "殖利率",
+    "現金殖利率",
+    "股息收益率"
+   ],
+   "synonyms_en": [
+    "dividend\\s*yield",
+    "Dividend Yield",
+    "Yield"
+   ],
+   "patterns": [
+    "(?:現金)?股利?殖利率",
+    "股息(?:收益)?率",
+    "dividend\\s*yield"
+   ],
+   "statement": "PER_SHARE",
+   "category": "PER_SHARE",
+   "unit": "%",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_classification_rules.py",
+    "financial_metrics_mapping.md"
+   ],
+   "field_map": {
+    "twse_tpex": "現金殖利率",
+    "twstock": "dividend_yield",
+    "yfinance": "dividendYield"
+   }
+  },
+  "payout_ratio": {
+   "zh": "配息率",
+   "en": "Payout Ratio",
+   "synonyms_zh": [
+    "股利發放率",
+    "配息率",
+    "配息比例",
+    "股利支付率"
+   ],
+   "synonyms_en": [
+    "dividend\\s*payout\\s*ratio",
+    "payout\\s*ratio",
+    "Payout Ratio"
+   ],
+   "patterns": [
+    "配息率",
+    "股利發放率",
+    "dividend\\s*payout\\s*ratio",
+    "payout\\s*ratio"
+   ],
+   "statement": "PER_SHARE",
+   "category": "PER_SHARE",
+   "unit": "%",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_metrics_mapping.md"
+   ],
+   "field_map": {
+    "twstock": "payout_ratio",
+    "yfinance": "payoutRatio"
+   }
+  },
+  "target_price": {
+   "zh": "目標價",
+   "en": "Target Price",
+   "synonyms_zh": [
+    "目標價(?:格)?",
+    "目標價",
+    "目標股價"
+   ],
+   "synonyms_en": [
+    "TP\\s*[：:]?\\s*\\d+",
+    "target\\s*price",
+    "target price",
+    "tp",
+    "price target"
+   ],
+   "patterns": [
+    "目標價(?:格)?",
+    "target\\s*price",
+    "TP\\s*[：:]?\\s*\\d+"
+   ],
+   "statement": "PER_SHARE",
+   "category": "PER_SHARE",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VRN_Financial_Synonyms_SSOT.py"
+   ]
+  },
+  "investment_rating": {
+   "zh": "投資評等",
+   "en": "Investment Rating",
+   "synonyms_zh": [
+    "(?:買進|持有|賣出|加碼|減碼|中立|Buy|Hold|Sell|Overweight|Underweight)",
+    "投資評等",
+    "評等[：:]?\\s*(?:買進|持有|賣出|加碼|減碼|中立|優於大盤|劣於大盤)"
+   ],
+   "synonyms_en": [
+    "investment\\s*rating",
+    "recommendation"
+   ],
+   "patterns": [
+    "投資評等",
+    "評等[：:]?\\s*(?:買進|持有|賣出|加碼|減碼|中立|優於大盤|劣於大盤)",
+    "investment\\s*rating",
+    "recommendation",
+    "(?:買進|持有|賣出|加碼|減碼|中立|Buy|Hold|Sell|Overweight|Underweight)"
+   ],
+   "statement": "PER_SHARE",
+   "category": "RATIO",
+   "unit": "元",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py"
+   ]
+  },
+  "revenue_growth": {
+   "zh": "營收成長率",
+   "en": "Revenue Growth Rate",
+   "synonyms_zh": [
+    "營收(?:YoY|YOY|年增|年減|成長)",
+    "營收成長率",
+    "營收年增率",
+    "銷售成長率"
+   ],
+   "synonyms_en": [
+    "YoY\\s*[：:]?\\s*[-+]?\\d",
+    "revenue\\s*growth",
+    "sales\\s*growth",
+    "Revenue Growth"
+   ],
+   "patterns": [
+    "營收成長率",
+    "營收(?:YoY|YOY|年增|年減|成長)",
+    "revenue\\s*growth",
+    "sales\\s*growth",
+    "YoY\\s*[：:]?\\s*[-+]?\\d"
+   ],
+   "statement": "PER_SHARE",
+   "category": "RATIO",
+   "unit": "%",
+   "validation_level": "IMPORTANT",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_classification_rules.py"
+   ],
+   "field_map": {
+    "twse_tpex": "營收成長率",
+    "twstock": "revenue_growth",
+    "yfinance": "revenueGrowth"
+   }
+  },
+  "eps_growth": {
+   "zh": "每股盈餘成長率",
+   "en": "EPS Growth Rate",
+   "synonyms_zh": [
+    "EPS(?:成長|YoY|年增)",
+    "每股盈餘成長率",
+    "EPS成長率",
+    "EPS年增率"
+   ],
+   "synonyms_en": [
+    "EPS\\s*growth",
+    "EPS Growth",
+    "EPS Growth Rate",
+    "EPS YoY"
+   ],
+   "patterns": [
+    "每股盈餘成長率",
+    "EPS(?:成長|YoY|年增)",
+    "EPS\\s*growth"
+   ],
+   "statement": "PER_SHARE",
+   "category": "RATIO",
+   "unit": "%",
+   "validation_level": "OPTIONAL",
+   "sources": [
+    "InvestmentRegexPattern_VALIDATED.py",
+    "financial_classification_rules.py",
+    "financial_metrics_mapping.md"
+   ],
+   "field_map": {
+    "twse_tpex": "EPS成長率",
+    "twstock": "eps_growth",
+    "yfinance": "earningsGrowth"
+   }
+  },
+  "cogs": {
+   "zh": "營業成本",
+   "en": "Cost of Revenue",
+   "synonyms_zh": [
+    "營業成本合計",
+    "銷貨成本",
+    "營業成本",
+    "直接成本",
+    "製造成本"
+   ],
+   "synonyms_en": [
+    "Cost of Revenue",
+    "COGS",
+    "Cost of Goods Sold"
+   ],
+   "patterns": [
+    "(營業成本|Cost\\s+of\\s+Revenue|COGS|Cost\\s+of\\s+Goods\\s+Sold|銷貨成本|costOfRevenue|costOfGoodsSold|直接成本|製造成本)"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "",
+   "unit": "",
+   "validation_level": "",
+   "sources": [
+    "VRN_MDL007_APIDataFetcher.py",
+    "financial_classification_rules.py",
+    "financial_metrics_mapping.md",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "mops_official": [
+    "營業成本合計",
+    "銷貨成本"
+   ],
+   "field_map": {
+    "twse_tpex": "營業成本",
+    "twstock": "cost",
+    "yfinance": "costOfRevenue"
+   },
+   "operator_filled": true
+  },
+  "opex": {
+   "zh": "營業費用合計",
+   "en": "Operating Expenses Total (Opex)",
+   "synonyms_zh": [
+    "營業費用合計"
+   ],
+   "synonyms_en": [],
+   "patterns": [],
+   "statement": "INCOME_STATEMENT",
+   "category": "",
+   "unit": "",
+   "validation_level": "",
+   "sources": [
+    "VRN_MDL007_APIDataFetcher.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "mops_official": [
+    "營業費用合計"
+   ],
+   "operator_filled": true
+  },
+  "pretax_income": {
+   "zh": "稅前純益",
+   "en": "Pre-tax Income",
+   "synonyms_zh": [
+    "稅前淨利（淨損）",
+    "稅前淨利",
+    "稅前純益",
+    "稅前盈餘",
+    "稅前利益",
+    "稅前獲利"
+   ],
+   "synonyms_en": [
+    "PBT",
+    "Pre-tax Income",
+    "EBT",
+    "Earnings Before Tax",
+    "Pretax Income",
+    "pretax income",
+    "income before tax"
+   ],
+   "patterns": [
+    "(稅前純益|Pre-tax\\s+Income|EBT|Earnings\\s+Before\\s+Tax|稅前盈餘|pretaxIncome|incomeBeforeTax|稅前利益)"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "",
+   "unit": "mn TWD",
+   "validation_level": "",
+   "sources": [
+    "VRN_MDL007_APIDataFetcher.py",
+    "VRN_Method_SSOT_v0100.json",
+    "financial_classification_rules.py",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "mops_official": [
+    "稅前淨利（淨損）"
+   ],
+   "field_map": {
+    "twse_tpex": "稅前淨利（淨損）",
+    "twstock": "pretax_income",
+    "yfinance": "incomeBeforeTax"
+   },
+   "vrn_uid": "VRN_FIN_0005",
+   "operator_filled": true
+  },
+  "eps": {
+   "zh": "基本每股盈餘",
+   "en": "Basic EPS",
+   "synonyms_zh": [
+    "基本每股盈餘",
+    "每股盈餘",
+    "每股純益"
+   ],
+   "synonyms_en": [
+    "basic_eps",
+    "diluted_eps",
+    "earnings_per_share",
+    "EPS",
+    "eps",
+    "earnings per share"
+   ],
+   "patterns": [],
+   "statement": "PER_SHARE",
+   "category": "",
+   "unit": "TWD",
+   "validation_level": "",
+   "sources": [
+    "VRN_MDL007_APIDataFetcher.py",
+    "VRN_MDL008_CrossValidator.py",
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Financial_Synonyms_SSOT.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "mops_official": [
+    "基本每股盈餘"
+   ],
+   "mdl008_aliases": [
+    "basic_eps",
+    "diluted_eps",
+    "earnings_per_share"
+   ],
+   "vrn_uid": "VRN_FIN_0055",
+   "operator_filled": true
+  },
+  "diluted_eps": {
+   "zh": "稀釋每股盈餘",
+   "en": "Diluted EPS",
+   "synonyms_zh": [
+    "稀釋每股盈餘",
+    "完全稀釋EPS",
+    "稀釋後每股盈餘",
+    "調整後EPS",
+    "每股盈餘[（\\(]稀釋[）\\)]",
+    "稀釋每股(?:淨)?(?:利|損)",
+    "稀釋eps"
+   ],
+   "synonyms_en": [
+    "Diluted EPS",
+    "FD EPS",
+    "EPSd",
+    "diluted\\s*(?:earnings?\\s*per\\s*share|EPS)",
+    "diluted eps"
+   ],
+   "patterns": [
+    "(稀釋每股盈餘|Diluted\\s+EPS|完全稀釋EPS|EPSd|dilutedEPS|dilutedEps|FD\\s*EPS|稀釋後每股盈餘)",
+    "稀釋每股盈餘",
+    "稀釋每股(?:淨)?(?:利|損)",
+    "每股盈餘[（\\(]稀釋[）\\)]",
+    "diluted\\s*(?:earnings?\\s*per\\s*share|EPS)"
+   ],
+   "statement": "PER_SHARE",
+   "category": "PER_SHARE",
+   "unit": "元",
+   "validation_level": "",
+   "sources": [
+    "VRN_MDL007_APIDataFetcher.py",
+    "financial_classification_rules.py",
+    "financial_metrics_mapping.md",
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VRN_Financial_Synonyms_SSOT.py"
+   ],
+   "mops_official": [
+    "稀釋每股盈餘"
+   ],
+   "field_map": {
+    "twse_tpex": "稀釋每股盈餘",
+    "twstock": "diluted_eps",
+    "yfinance": "dilutedEps"
+   },
+   "merged_from": [
+    "eps_diluted"
+   ]
+  },
+  "current_assets": {
+   "zh": "流動資產",
+   "en": "Current Assets",
+   "synonyms_zh": [
+    "流動資產合計",
+    "流動資產",
+    "短期資產",
+    "流動資產總額",
+    "流動性資產",
+    "一年內資產"
+   ],
+   "synonyms_en": [
+    "Current Assets",
+    "current assets",
+    "total current assets"
+   ],
+   "patterns": [
+    "(流動資產|Current\\s+Assets|短期資產|currentAssets|流動資產總額|流動資產合計)"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "",
+   "unit": "mn TWD",
+   "validation_level": "",
+   "sources": [
+    "VRN_MDL007_APIDataFetcher.py",
+    "financial_classification_rules.py",
+    "financial_data_standardization.py(AST)",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "mops_official": [
+    "流動資產合計"
+   ],
+   "field_map": {
+    "twse_tpex": "流動資產",
+    "twstock": "current_assets",
+    "yfinance": "currentAssets"
+   },
+   "validation_rules": [
+    "must_be_positive",
+    "currency_format"
+   ],
+   "vrn_uid": "VRN_FIN_0013",
+   "operator_filled": true
+  },
+  "current_liabilities": {
+   "zh": "流動負債",
+   "en": "Current Liabilities",
+   "synonyms_zh": [
+    "流動負債合計",
+    "流動負債",
+    "短期負債",
+    "流動性負債",
+    "流動負債總額",
+    "一年內負債"
+   ],
+   "synonyms_en": [
+    "Current Liabilities",
+    "current liabilities",
+    "total current liabilities"
+   ],
+   "patterns": [
+    "(流動負債|Current\\s+Liabilities|短期負債|currentLiabilities|流動負債總額)"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "",
+   "unit": "mn TWD",
+   "validation_level": "",
+   "sources": [
+    "VRN_MDL007_APIDataFetcher.py",
+    "financial_classification_rules.py",
+    "financial_data_standardization.py(AST)",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "mops_official": [
+    "流動負債合計"
+   ],
+   "field_map": {
+    "twse_tpex": "流動負債",
+    "twstock": "current_liabilities",
+    "yfinance": "currentLiabilities"
+   },
+   "validation_rules": [
+    "must_be_positive",
+    "currency_format"
+   ],
+   "vrn_uid": "VRN_FIN_0021",
+   "operator_filled": true
+  },
+  "operating_cf": {
+   "zh": "營業活動現金流",
+   "en": "Operating Cash Flow",
+   "synonyms_zh": [
+    "營業活動之淨現金流入（出）",
+    "營業活動現金流",
+    "營運現金流",
+    "營業活動現金流量",
+    "經營現金流",
+    "經營活動現金流",
+    "營業活動現金"
+   ],
+   "synonyms_en": [
+    "Operating Cash Flow",
+    "CFO",
+    "OCF",
+    "cfo",
+    "operating cash flow",
+    "cash flow from operations"
+   ],
+   "patterns": [
+    "(營業活動現金流|Operating\\s+Cash\\s+Flow|CFO|OCF|operatingCashflow|營運現金流|營業現金流量)"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "",
+   "unit": "mn TWD",
+   "validation_level": "",
+   "sources": [
+    "VRN_MDL007_APIDataFetcher.py",
+    "financial_classification_rules.py",
+    "financial_data_standardization.py(AST)",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "mops_official": [
+    "營業活動之淨現金流入（出）"
+   ],
+   "field_map": {
+    "twse_tpex": "營業活動之淨現金流入（流出）",
+    "twstock": "operating_cashflow",
+    "yfinance": "operatingCashflow"
+   },
+   "validation_rules": [
+    "currency_format"
+   ],
+   "vrn_uid": "VRN_FIN_0030",
+   "operator_filled": true
+  },
+  "investing_cf": {
+   "zh": "投資活動現金流",
+   "en": "Investing Cash Flow",
+   "synonyms_zh": [
+    "投資活動之淨現金流入（出）",
+    "投資活動現金流",
+    "投資現金流",
+    "投資活動現金流量",
+    "投資活動現金"
+   ],
+   "synonyms_en": [
+    "Investing Cash Flow",
+    "CFI",
+    "ICF",
+    "cfi",
+    "investing cash flow",
+    "cash flow from investing"
+   ],
+   "patterns": [
+    "(投資活動現金流|Investing\\s+Cash\\s+Flow|CFI|investingCashflow|投資現金流)"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "",
+   "unit": "mn TWD",
+   "validation_level": "",
+   "sources": [
+    "VRN_MDL007_APIDataFetcher.py",
+    "financial_classification_rules.py",
+    "financial_data_standardization.py(AST)",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "mops_official": [
+    "投資活動之淨現金流入（出）"
+   ],
+   "field_map": {
+    "twse_tpex": "投資活動之淨現金流入（流出）",
+    "twstock": "investing_cashflow",
+    "yfinance": "investingCashflow"
+   },
+   "validation_rules": [
+    "currency_format"
+   ],
+   "vrn_uid": "VRN_FIN_0031",
+   "operator_filled": true
+  },
+  "financing_cf": {
+   "zh": "籌資活動現金流",
+   "en": "Financing Cash Flow",
+   "synonyms_zh": [
+    "籌資活動之淨現金流入（出）",
+    "籌資活動現金流",
+    "融資現金流",
+    "籌資活動現金流量",
+    "籌資現金流",
+    "融資活動現金流",
+    "資金活動現金流",
+    "籌資活動現金"
+   ],
+   "synonyms_en": [
+    "Financing Cash Flow",
+    "CFF",
+    "FCF",
+    "cff",
+    "financing cash flow",
+    "cash flow from financing"
+   ],
+   "patterns": [
+    "(籌資活動現金流|Financing\\s+Cash\\s+Flow|CFF|financingCashflow|融資現金流|理財活動現金流)"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "",
+   "unit": "mn TWD",
+   "validation_level": "",
+   "sources": [
+    "VRN_MDL007_APIDataFetcher.py",
+    "financial_classification_rules.py",
+    "financial_data_standardization.py(AST)",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "mops_official": [
+    "籌資活動之淨現金流入（出）"
+   ],
+   "field_map": {
+    "twse_tpex": "籌資活動之淨現金流入（流出）",
+    "twstock": "financing_cashflow",
+    "yfinance": "financingCashflow"
+   },
+   "validation_rules": [
+    "currency_format"
+   ],
+   "vrn_uid": "VRN_FIN_0032",
+   "operator_filled": true
+  },
+  "operating_cost": {
+   "zh": "銷貨成本",
+   "en": "Cost of Goods Sold (COGS)",
+   "synonyms_zh": [
+    "銷貨成本",
+    "營業成本"
+   ],
+   "synonyms_en": [
+    "COGS"
+   ],
+   "patterns": [],
+   "statement": "INCOME_STATEMENT",
+   "category": "",
+   "unit": "",
+   "validation_level": "",
+   "sources": [
+    "VRN_Method_SSOT_v0100.json",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "operator_filled": true
+  },
+  "basic_eps": {
+   "zh": "基本每股盈餘",
+   "en": "Basic EPS",
+   "synonyms_zh": [
+    "每股盈餘",
+    "基本每股盈餘",
+    "每股稅後盈餘",
+    "每股淨利",
+    "每股純益",
+    "基本每股(?:淨)?(?:利|損)",
+    "每股盈餘[（\\(]基本[）\\)]"
+   ],
+   "synonyms_en": [
+    "EPS",
+    "Basic EPS",
+    "Adj. EPS",
+    "ModelWare EPS",
+    "basic\\s*(?:earnings?\\s*per\\s*share|EPS)",
+    "basic eps"
+   ],
+   "patterns": [
+    "(每股盈餘|Basic\\s+EPS|EPS|基本每股盈餘|EPSb|basicEPS|basicEps|basicEarningsPerShare|每股稅後盈餘|每股淨利)",
+    "基本每股盈餘",
+    "基本每股(?:淨)?(?:利|損)",
+    "每股盈餘[（\\(]基本[）\\)]",
+    "basic\\s*(?:earnings?\\s*per\\s*share|EPS)"
+   ],
+   "statement": "PER_SHARE",
+   "category": "PER_SHARE",
+   "unit": "元",
+   "validation_level": "",
+   "sources": [
+    "VRN_Method_SSOT_v0100.json",
+    "financial_classification_rules.py",
+    "financial_metrics_mapping.md",
+    "InvestmentRegexPattern_VALIDATED.py",
+    "VRN_Financial_Synonyms_SSOT.py"
+   ],
+   "field_map": {
+    "twse_tpex": "基本每股盈餘",
+    "twstock": "eps",
+    "yfinance": "basicEps"
+   },
+   "merged_from": [
+    "eps_basic"
+   ]
+  },
+  "operating_expenses": {
+   "zh": "營業費用",
+   "en": "Operating Expenses",
+   "synonyms_zh": [
+    "營業費用",
+    "營運費用",
+    "管銷費用",
+    "銷售及管理費用",
+    "經營費用",
+    "運營開支",
+    "營業費用合計"
+   ],
+   "synonyms_en": [
+    "Operating Expenses",
+    "OpEx",
+    "SG&A",
+    "opex"
+   ],
+   "patterns": [
+    "(營業費用|Operating\\s+Expenses|OpEx|SG&A|營業費用合計|operatingExpenses|totalOperatingExpenses|營運費用|管銷費用)"
+   ],
+   "statement": "INCOME_STATEMENT",
+   "category": "",
+   "unit": "",
+   "validation_level": "",
+   "sources": [
+    "financial_classification_rules.py",
+    "financial_data_standardization.py(AST)",
+    "financial_metrics_mapping.md",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "field_map": {
+    "twse_tpex": "營業費用",
+    "twstock": "operating_expenses",
+    "yfinance": "operatingExpenses"
+   },
+   "validation_rules": [
+    "must_be_positive",
+    "currency_format"
+   ],
+   "operator_filled": true
+  },
+  "dps": {
+   "zh": "每股現金股利",
+   "en": "DPS (Dividend Per Share)",
+   "synonyms_zh": [
+    "每股現金股利",
+    "股息",
+    "現金股利",
+    "每股派息",
+    "每股股利",
+    "每股股息",
+    "每股現金股息"
+   ],
+   "synonyms_en": [
+    "DPS",
+    "Dividend per share",
+    "dps",
+    "dividend per share",
+    "dividend"
+   ],
+   "patterns": [
+    "(每股現金股利|DPS|Dividend\\s+per\\s+share|股息|現金股利|dividendRate|每股派息|CashDividendPerShare)"
+   ],
+   "statement": "PER_SHARE",
+   "category": "",
+   "unit": "TWD",
+   "validation_level": "",
+   "sources": [
+    "financial_classification_rules.py",
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Financial_Synonyms_SSOT.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "field_map": {
+    "twse_tpex": "每股現金股利",
+    "twstock": "dividend",
+    "yfinance": "dividendRate"
+   },
+   "vrn_uid": "VRN_FIN_0058",
+   "operator_filled": true
+  },
+  "ppe": {
+   "zh": "不動產廠房設備",
+   "en": "Property, Plant & Equipment",
+   "synonyms_zh": [
+    "不動產廠房設備",
+    "固定資產",
+    "廠房設備",
+    "不動產、廠房設備",
+    "不動產廠房及設備",
+    "不動產、廠房及設備"
+   ],
+   "synonyms_en": [
+    "PPE",
+    "Property Plant Equipment",
+    "Property, Plant & Equipment",
+    "Fixed Assets",
+    "Property Plant And Equipment",
+    "ppe",
+    "fixed assets",
+    "property plant and equipment"
+   ],
+   "patterns": [
+    "(不動產廠房設備|PPE|Property\\s+Plant\\s+Equipment|固定資產|propertyPlantEquipment|廠房設備)"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "",
+   "unit": "mn TWD",
+   "validation_level": "",
+   "sources": [
+    "financial_classification_rules.py",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "field_map": {
+    "twse_tpex": "不動產、廠房及設備",
+    "twstock": "ppe",
+    "yfinance": "propertyPlantEquipment"
+   },
+   "vrn_uid": "VRN_FIN_0015",
+   "operator_filled": true
+  },
+  "total_debt": {
+   "zh": "總負債",
+   "en": "Total Debt",
+   "synonyms_zh": [
+    "總負債",
+    "借款總額"
+   ],
+   "synonyms_en": [
+    "Total Debt",
+    "Debt"
+   ],
+   "patterns": [
+    "(總負債|Total\\s+Debt|Debt|借款總額|totalDebt|長短期借款合計)"
+   ],
+   "statement": "",
+   "category": "",
+   "unit": "",
+   "validation_level": "",
+   "sources": [
+    "financial_classification_rules.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "field_map": {
+    "twse_tpex": "借款",
+    "twstock": "total_debt",
+    "yfinance": "totalDebt"
+   },
+   "operator_filled": true
+  },
+  "short_term_debt": {
+   "zh": "短期借款",
+   "en": "Short-term Debt",
+   "synonyms_zh": [
+    "短期借款",
+    "短期負債",
+    "流動借款",
+    "一年內到期負債"
+   ],
+   "synonyms_en": [
+    "Short Term Debt",
+    "Short-term Debt",
+    "short term debt",
+    "short-term debt"
+   ],
+   "patterns": [
+    "(短期借款|Short\\s+Term\\s+Debt|shortTermDebt|短期負債)"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "",
+   "unit": "mn TWD",
+   "validation_level": "",
+   "sources": [
+    "financial_classification_rules.py",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "field_map": {
+    "twse_tpex": "短期借款",
+    "twstock": "short_term_debt",
+    "yfinance": "shortTermDebt"
+   },
+   "vrn_uid": "VRN_FIN_0020",
+   "operator_filled": true
+  },
+  "long_term_debt": {
+   "zh": "長期借款",
+   "en": "Long-term Debt",
+   "synonyms_zh": [
+    "長期借款",
+    "長期負債",
+    "非流動借款",
+    "長期融資"
+   ],
+   "synonyms_en": [
+    "Long Term Debt",
+    "Long-term Debt"
+   ],
+   "patterns": [
+    "(長期借款|Long\\s+Term\\s+Debt|longTermDebt|長期負債)"
+   ],
+   "statement": "BALANCE_SHEET",
+   "category": "",
+   "unit": "",
+   "validation_level": "",
+   "sources": [
+    "financial_classification_rules.py",
+    "financial_metrics_mapping.md",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "field_map": {
+    "twse_tpex": "長期借款",
+    "twstock": "long_term_debt",
+    "yfinance": "longTermDebt"
+   },
+   "operator_filled": true
+  },
+  "bvps": {
+   "zh": "每股淨值",
+   "en": "BVPS (Book Value Per Share)",
+   "synonyms_zh": [
+    "每股淨值",
+    "每股帳面價值",
+    "每股淨資產"
+   ],
+   "synonyms_en": [
+    "BVPS",
+    "Book Value Per Share",
+    "NAV Per Share",
+    "bvps",
+    "book value per share"
+   ],
+   "patterns": [
+    "(每股淨值|BVPS|Book\\s+Value\\s+Per\\s+Share|每股帳面價值|bookValuePerShare|NAV\\s+per\\s+share|股東權益每股淨值)"
+   ],
+   "statement": "PER_SHARE",
+   "category": "",
+   "unit": "TWD",
+   "validation_level": "",
+   "sources": [
+    "financial_classification_rules.py",
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "field_map": {
+    "twse_tpex": "每股淨值",
+    "twstock": "bvps",
+    "yfinance": "bookValue"
+   },
+   "vrn_uid": "VRN_FIN_0056",
+   "operator_filled": true
+  },
+  "shares_outstanding": {
+   "zh": "普通股流通股數",
+   "en": "Shares Outstanding",
+   "synonyms_zh": [
+    "流通在外股數",
+    "發行股數",
+    "普通股股數",
+    "普通股流通股數",
+    "市場流通股"
+   ],
+   "synonyms_en": [
+    "Shares Outstanding",
+    "Average Shares Outstanding"
+   ],
+   "patterns": [
+    "(流通在外股數|Shares\\s+Outstanding|發行股數|sharesOutstanding|普通股股數|市場流通股)"
+   ],
+   "statement": "",
+   "category": "",
+   "unit": "",
+   "validation_level": "",
+   "sources": [
+    "financial_classification_rules.py",
+    "financial_metrics_mapping.md"
+   ],
+   "field_map": {
+    "twse_tpex": "普通股股數",
+    "twstock": "shares_outstanding",
+    "yfinance": "sharesOutstanding"
+   }
+  },
+  "weighted_avg_shares": {
+   "zh": "加權平均股數",
+   "en": "Weighted Average Shares",
+   "synonyms_zh": [
+    "加權平均普通股數",
+    "加權平均股數",
+    "加權平均流通股數",
+    "基本股數"
+   ],
+   "synonyms_en": [
+    "Weighted Avg Shares",
+    "Weighted Average Shares"
+   ],
+   "patterns": [
+    "(加權平均普通股數|Weighted\\s+Avg\\s+Shares|加權平均股數|Average\\s+Shares|基本股數)"
+   ],
+   "statement": "",
+   "category": "",
+   "unit": "",
+   "validation_level": "",
+   "sources": [
+    "financial_classification_rules.py",
+    "financial_metrics_mapping.md"
+   ],
+   "field_map": {
+    "twse_tpex": "加權平均普通股數",
+    "twstock": "weighted_avg_shares",
+    "yfinance": "weightedAverageShares"
+   }
+  },
+  "fcf": {
+   "zh": "自由現金流",
+   "en": "Free Cash Flow (FCF)",
+   "synonyms_zh": [
+    "自由現金流",
+    "自由現金流量"
+   ],
+   "synonyms_en": [
+    "FCF",
+    "Free Cash Flow",
+    "free cash flow",
+    "fcf"
+   ],
+   "patterns": [
+    "(自由現金流|FCF|Free\\s+Cash\\s+Flow|freeCashflow|自由現金流量)"
+   ],
+   "statement": "CASH_FLOW",
+   "category": "",
+   "unit": "",
+   "validation_level": "",
+   "sources": [
+    "financial_classification_rules.py",
+    "financial_data_standardization.py(AST)",
+    "VRN_Financial_Synonyms_SSOT.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "field_map": {
+    "twstock": "fcf",
+    "yfinance": "freeCashflow"
+   },
+   "validation_rules": [
+    "currency_format",
+    "calculated_from_operating_minus_capex"
+   ],
+   "operator_filled": true
+  },
+  "net_margin": {
+   "zh": "淨利率",
+   "en": "Net Margin",
+   "synonyms_zh": [
+    "淨利率",
+    "純益率",
+    "稅後淨利率"
+   ],
+   "synonyms_en": [
+    "Net Margin",
+    "Net Profit Margin",
+    "NPM",
+    "net margin"
+   ],
+   "patterns": [
+    "(淨利率|Net\\s+Margin|Net\\s+Profit\\s+Margin|NPM|profitMargin|純益率|稅後淨利率)"
+   ],
+   "statement": "RATIO",
+   "category": "",
+   "unit": "%",
+   "validation_level": "",
+   "sources": [
+    "financial_classification_rules.py",
+    "financial_metrics_mapping.md",
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "field_map": {
+    "twse_tpex": "淨利率",
+    "twstock": "net_margin",
+    "yfinance": "profitMargins"
+   },
+   "vrn_uid": "VRN_FIN_0045",
+   "operator_filled": true
+  },
+  "yoy": {
+   "zh": "年增率",
+   "en": "Year over Year (YoY)",
+   "synonyms_zh": [
+    "年增率",
+    "同比增長",
+    "年對年成長率"
+   ],
+   "synonyms_en": [
+    "YoY",
+    "Year over Year"
+   ],
+   "patterns": [
+    "(年增率|YoY|Year\\s+over\\s+Year|同比增長|yoyGrowth|年對年成長率|同期比較)"
+   ],
+   "statement": "",
+   "category": "",
+   "unit": "",
+   "validation_level": "",
+   "sources": [
+    "financial_classification_rules.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "field_map": {
+    "twse_tpex": "年增率",
+    "twstock": "yoy"
+   },
+   "operator_filled": true
+  },
+  "qoq": {
+   "zh": "季增率",
+   "en": "Quarter over Quarter (QoQ)",
+   "synonyms_zh": [
+    "季增率",
+    "環比增長"
+   ],
+   "synonyms_en": [
+    "QoQ",
+    "Quarter over Quarter"
+   ],
+   "patterns": [
+    "(季增率|QoQ|Quarter\\s+over\\s+Quarter|環比增長|qoqGrowth|季對季成長率)"
+   ],
+   "statement": "",
+   "category": "",
+   "unit": "",
+   "validation_level": "",
+   "sources": [
+    "financial_classification_rules.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "field_map": {
+    "twse_tpex": "季增率",
+    "twstock": "qoq"
+   },
+   "operator_filled": true
+  },
+  "ps": {
+   "zh": "股價營收比",
+   "en": "Price to Sales (P/S)",
+   "synonyms_zh": [
+    "股價營收比",
+    "市銷率"
+   ],
+   "synonyms_en": [
+    "P/S",
+    "PS Ratio",
+    "PSR"
+   ],
+   "patterns": [
+    "(股價營收比|P/S|PS\\s+Ratio|PSR|市銷率|priceToSales)"
+   ],
+   "statement": "PER_SHARE",
+   "category": "",
+   "unit": "",
+   "validation_level": "",
+   "sources": [
+    "financial_classification_rules.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "field_map": {
+    "twse_tpex": "股價營收比",
+    "twstock": "ps_ratio",
+    "yfinance": "priceToSales"
+   },
+   "operator_filled": true
+  },
+  "debt_to_equity": {
+   "zh": "負債權益比",
+   "en": "Debt-to-Equity",
+   "synonyms_zh": [
+    "負債權益比",
+    "槓桿比率",
+    "負債對權益比率"
+   ],
+   "synonyms_en": [
+    "Debt to Equity",
+    "D/E Ratio",
+    "Debt-to-Equity"
+   ],
+   "patterns": [
+    "(負債權益比|Debt\\s+to\\s+Equity|D/E\\s+Ratio|debtToEquity|負債對權益比率|槓桿比率)"
+   ],
+   "statement": "RATIO",
+   "category": "",
+   "unit": "",
+   "validation_level": "",
+   "sources": [
+    "financial_classification_rules.py",
+    "financial_metrics_mapping.md",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "field_map": {
+    "twse_tpex": "負債權益比",
+    "twstock": "debt_to_equity",
+    "yfinance": "debtToEquity"
+   },
+   "operator_filled": true
+  },
+  "tax_expense": {
+   "zh": "所得稅費用",
+   "en": "Income Tax",
+   "synonyms_zh": [
+    "所得稅費用",
+    "稅費",
+    "稅負",
+    "所得稅"
+   ],
+   "synonyms_en": [
+    "Income Tax",
+    "Tax Expense"
+   ],
+   "patterns": [],
+   "statement": "INCOME_STATEMENT",
+   "category": "",
+   "unit": "",
+   "validation_level": "",
+   "sources": [
+    "financial_metrics_mapping.md",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "field_map": {
+    "twse_tpex": "所得稅費用（利益）",
+    "twstock": "tax_expense",
+    "yfinance": "incomeTaxExpense"
+   },
+   "operator_filled": true
+  },
+  "share_capital": {
+   "zh": "股本",
+   "en": "Share Capital",
+   "synonyms_zh": [
+    "股本",
+    "實收資本",
+    "普通股股本",
+    "股份資本",
+    "實收資本額"
+   ],
+   "synonyms_en": [
+    "Share Capital"
+   ],
+   "patterns": [],
+   "statement": "BALANCE_SHEET",
+   "category": "",
+   "unit": "",
+   "validation_level": "",
+   "sources": [
+    "financial_metrics_mapping.md",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "field_map": {
+    "twse_tpex": "股本",
+    "twstock": "share_capital",
+    "yfinance": "commonStock"
+   },
+   "operator_filled": true
+  },
+  "shareholders_equity": {
+   "zh": "股東權益",
+   "en": "Shareholders' Equity",
+   "synonyms_zh": [
+    "股東權益",
+    "權益合計",
+    "股東權益總額",
+    "淨值"
+   ],
+   "synonyms_en": [
+    "Shareholders' Equity",
+    "Total Equity",
+    "Book Value"
+   ],
+   "patterns": [],
+   "statement": "BALANCE_SHEET",
+   "category": "",
+   "unit": "",
+   "validation_level": "",
+   "sources": [
+    "financial_metrics_mapping.md",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "field_map": {
+    "twse_tpex": "權益總計",
+    "twstock": "shareholders_equity",
+    "yfinance": "totalEquity"
+   },
+   "operator_filled": true
+  },
+  "free_cashflow": {
+   "zh": "自由現金流",
+   "en": "Free Cash Flow",
+   "synonyms_zh": [
+    "自由現金流",
+    "自由現金流量"
+   ],
+   "synonyms_en": [
+    "Free Cash Flow",
+    "FCF"
+   ],
+   "patterns": [],
+   "statement": "CASH_FLOW",
+   "category": "",
+   "unit": "",
+   "validation_level": "",
+   "sources": [
+    "financial_metrics_mapping.md",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "field_map": {
+    "twstock": "free_cashflow",
+    "yfinance": "freeCashflow"
+   },
+   "operator_filled": true
+  },
+  "cashflow_per_share": {
+   "zh": "每股現金流",
+   "en": "Cash Flow Per Share",
+   "synonyms_zh": [
+    "每股現金流",
+    "每股營業現金流"
+   ],
+   "synonyms_en": [
+    "Cash Flow Per Share",
+    "CFPS"
+   ],
+   "patterns": [],
+   "statement": "PER_SHARE",
+   "category": "",
+   "unit": "",
+   "validation_level": "",
+   "sources": [
+    "financial_metrics_mapping.md",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "field_map": {
+    "twstock": "cashflow_per_share"
+   },
+   "operator_filled": true
+  },
+  "sales_per_share": {
+   "zh": "每股營收",
+   "en": "Sales Per Share",
+   "synonyms_zh": [
+    "每股營收"
+   ],
+   "synonyms_en": [
+    "Sales Per Share",
+    "SPS",
+    "Revenue Per Share"
+   ],
+   "patterns": [],
+   "statement": "PER_SHARE",
+   "category": "",
+   "unit": "",
+   "validation_level": "",
+   "sources": [
+    "financial_metrics_mapping.md",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "field_map": {
+    "twstock": "sales_per_share"
+   },
+   "operator_filled": true
+  },
+  "diluted_shares": {
+   "zh": "完全稀釋後股數",
+   "en": "Fully Diluted Shares",
+   "synonyms_zh": [
+    "完全稀釋後股數",
+    "稀釋後流通股數",
+    "完全稀釋股本"
+   ],
+   "synonyms_en": [
+    "Fully Diluted Shares",
+    "FD shares",
+    "Total diluted shares"
+   ],
+   "patterns": [],
+   "statement": "PER_SHARE",
+   "category": "",
+   "unit": "",
+   "validation_level": "",
+   "sources": [
+    "financial_metrics_mapping.md",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "field_map": {
+    "twse_tpex": "稀釋後股數",
+    "twstock": "diluted_shares",
+    "yfinance": "dilutedAverageShares"
+   },
+   "operator_filled": true
+  },
+  "period": {
+   "zh": "年份/期間",
+   "en": "Period/Year",
+   "synonyms_zh": [
+    "年份/期間",
+    "年度",
+    "會計年度",
+    "季度",
+    "半年度"
+   ],
+   "synonyms_en": [
+    "Period/Year",
+    "FY",
+    "Quarter",
+    "Annual"
+   ],
+   "patterns": [],
+   "statement": "",
+   "category": "",
+   "unit": "",
+   "validation_level": "",
+   "sources": [
+    "financial_metrics_mapping.md"
+   ],
+   "field_map": {
+    "twstock": "period",
+    "yfinance": "fiscalYear"
+   }
+  },
+  "operating_expense": {
+   "zh": "營業費用",
+   "en": "Operating Expense",
+   "synonyms_zh": [
+    "營業費用"
+   ],
+   "synonyms_en": [
+    "Operating Expense",
+    "opex",
+    "sg&a",
+    "operating expense",
+    "selling general administrative"
+   ],
+   "patterns": [],
+   "statement": "INCOME_STATEMENT",
+   "category": "",
+   "unit": "mn TWD",
+   "validation_level": "",
+   "sources": [
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "vrn_uid": "VRN_FIN_0004",
+   "operator_filled": true
+  },
+  "depreciation_and_amortization": {
+   "zh": "折舊及攤銷",
+   "en": "Depreciation and Amortization",
+   "synonyms_zh": [
+    "折舊及攤銷"
+   ],
+   "synonyms_en": [
+    "Depreciation And Amortization",
+    "d&a",
+    "depreciation and amortization"
+   ],
+   "patterns": [],
+   "statement": "CASH_FLOW",
+   "category": "",
+   "unit": "mn TWD",
+   "validation_level": "",
+   "sources": [
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "vrn_uid": "VRN_FIN_0009",
+   "operator_filled": true
+  },
+  "long_term_investments": {
+   "zh": "長期投資",
+   "en": "Long Term Investments",
+   "synonyms_zh": [
+    "長期投資",
+    "長期投資合計"
+   ],
+   "synonyms_en": [
+    "Long Term Investments",
+    "long term investments",
+    "long-term investments"
+   ],
+   "patterns": [],
+   "statement": "BALANCE_SHEET",
+   "category": "",
+   "unit": "mn TWD",
+   "validation_level": "",
+   "sources": [
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "vrn_uid": "VRN_FIN_0016",
+   "operator_filled": true
+  },
+  "other_non_current_assets": {
+   "zh": "其他非流動資產",
+   "en": "Other Non-current Assets",
+   "synonyms_zh": [
+    "其他非流動資產",
+    "其它非流動資產"
+   ],
+   "synonyms_en": [
+    "Other Non Current Assets",
+    "other non current assets"
+   ],
+   "patterns": [],
+   "statement": "BALANCE_SHEET",
+   "category": "",
+   "unit": "mn TWD",
+   "validation_level": "",
+   "sources": [
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "vrn_uid": "VRN_FIN_0017",
+   "operator_filled": true
+  },
+  "non_current_liabilities": {
+   "zh": "非流動負債",
+   "en": "Non Current Liabilities",
+   "synonyms_zh": [
+    "非流動負債",
+    "其他非流動負債"
+   ],
+   "synonyms_en": [
+    "Non Current Liabilities",
+    "long term liabilities",
+    "non current liabilities"
+   ],
+   "patterns": [],
+   "statement": "BALANCE_SHEET",
+   "category": "",
+   "unit": "mn TWD",
+   "validation_level": "",
+   "sources": [
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "vrn_uid": "VRN_FIN_0023",
+   "operator_filled": true
+  },
+  "parent_equity": {
+   "zh": "母公司業主權益",
+   "en": "Parent Equity",
+   "synonyms_zh": [
+    "母公司業主權益",
+    "歸屬母公司業主權益"
+   ],
+   "synonyms_en": [
+    "Parent Equity",
+    "parent equity",
+    "equity attributable to owners of parent"
+   ],
+   "patterns": [],
+   "statement": "BALANCE_SHEET",
+   "category": "",
+   "unit": "mn TWD",
+   "validation_level": "",
+   "sources": [
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "vrn_uid": "VRN_FIN_0027",
+   "operator_filled": true
+  },
+  "total_liabilities_and_equity": {
+   "zh": "負債及權益總計",
+   "en": "Total Liabilities and Equity",
+   "synonyms_zh": [
+    "負債及權益總計",
+    "負債和權益總計"
+   ],
+   "synonyms_en": [
+    "Total Liabilities And Equity",
+    "total liabilities and equity"
+   ],
+   "patterns": [],
+   "statement": "BALANCE_SHEET",
+   "category": "",
+   "unit": "mn TWD",
+   "validation_level": "",
+   "sources": [
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "vrn_uid": "VRN_FIN_0029",
+   "operator_filled": true
+  },
+  "capital_expenditure": {
+   "zh": "資本支出",
+   "en": "Capital Expenditure",
+   "synonyms_zh": [
+    "資本支出",
+    "資本支出淨額"
+   ],
+   "synonyms_en": [
+    "Capital Expenditure",
+    "capex",
+    "capital expenditure"
+   ],
+   "patterns": [],
+   "statement": "CASH_FLOW",
+   "category": "",
+   "unit": "mn TWD",
+   "validation_level": "",
+   "sources": [
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "vrn_uid": "VRN_FIN_0033",
+   "operator_filled": true
+  },
+  "working_capital_change": {
+   "zh": "營運資金變動",
+   "en": "Working Capital Change",
+   "synonyms_zh": [
+    "營運資金變動"
+   ],
+   "synonyms_en": [
+    "Working Capital Change",
+    "working capital change",
+    "change in working capital"
+   ],
+   "patterns": [],
+   "statement": "CASH_FLOW",
+   "category": "",
+   "unit": "mn TWD",
+   "validation_level": "",
+   "sources": [
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "vrn_uid": "VRN_FIN_0038",
+   "operator_filled": true
+  },
+  "long_term_investment_change": {
+   "zh": "長期投資變動",
+   "en": "Long Term Investment Change",
+   "synonyms_zh": [
+    "長期投資變動"
+   ],
+   "synonyms_en": [
+    "Long Term Investment Change",
+    "long term investment change",
+    "change in long term investment"
+   ],
+   "patterns": [],
+   "statement": "CASH_FLOW",
+   "category": "",
+   "unit": "mn TWD",
+   "validation_level": "",
+   "sources": [
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "vrn_uid": "VRN_FIN_0039",
+   "operator_filled": true
+  },
+  "debt_change": {
+   "zh": "長借公司債變動",
+   "en": "Debt Change",
+   "synonyms_zh": [
+    "長借公司債變動",
+    "長借/公司債變動"
+   ],
+   "synonyms_en": [
+    "Debt Change",
+    "debt change"
+   ],
+   "patterns": [],
+   "statement": "CASH_FLOW",
+   "category": "",
+   "unit": "mn TWD",
+   "validation_level": "",
+   "sources": [
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "vrn_uid": "VRN_FIN_0040",
+   "operator_filled": true
+  },
+  "cash_dividend_paid": {
+   "zh": "發放現金股利",
+   "en": "Cash Dividend Paid",
+   "synonyms_zh": [
+    "發放現金股利"
+   ],
+   "synonyms_en": [
+    "Cash Dividend Paid",
+    "dividend paid",
+    "cash dividend paid"
+   ],
+   "patterns": [],
+   "statement": "CASH_FLOW",
+   "category": "",
+   "unit": "mn TWD",
+   "validation_level": "",
+   "sources": [
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "vrn_uid": "VRN_FIN_0041",
+   "operator_filled": true
+  },
+  "cash_capital_increase": {
+   "zh": "現金增資",
+   "en": "Cash Capital Increase",
+   "synonyms_zh": [
+    "現金增資"
+   ],
+   "synonyms_en": [
+    "Cash Capital Increase",
+    "cash capital increase"
+   ],
+   "patterns": [],
+   "statement": "EQUITY_CHANGE",
+   "category": "",
+   "unit": "mn TWD",
+   "validation_level": "",
+   "sources": [
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "vrn_uid": "VRN_FIN_0042",
+   "operator_filled": true
+  },
+  "cfps": {
+   "zh": "每股現金流",
+   "en": "CFPS (Cash Flow Per Share)",
+   "synonyms_zh": [
+    "每股現金流"
+   ],
+   "synonyms_en": [
+    "CFPS",
+    "cfps",
+    "cash flow per share"
+   ],
+   "patterns": [],
+   "statement": "PER_SHARE",
+   "category": "",
+   "unit": "TWD",
+   "validation_level": "",
+   "sources": [
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "vrn_uid": "VRN_FIN_0057",
+   "operator_filled": true
+  },
+  "sales_yoy": {
+   "zh": "營收年增率",
+   "en": "Sales Year over Year",
+   "synonyms_zh": [
+    "營收年增率"
+   ],
+   "synonyms_en": [
+    "Sales YoY",
+    "sales yoy",
+    "revenue yoy"
+   ],
+   "patterns": [],
+   "statement": "",
+   "category": "",
+   "unit": "%",
+   "validation_level": "",
+   "sources": [
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "vrn_uid": "VRN_FIN_0059",
+   "operator_filled": true
+  },
+  "eps_yoy": {
+   "zh": "eps年增率",
+   "en": "EPS YoY",
+   "synonyms_zh": [
+    "eps年增率"
+   ],
+   "synonyms_en": [
+    "EPS YoY",
+    "eps yoy"
+   ],
+   "patterns": [],
+   "statement": "PER_SHARE",
+   "category": "",
+   "unit": "%",
+   "validation_level": "",
+   "sources": [
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "vrn_uid": "VRN_FIN_0060",
+   "operator_filled": true
+  },
+  "sales_qoq": {
+   "zh": "營收季增率",
+   "en": "Sales Quarter over Quarter",
+   "synonyms_zh": [
+    "營收季增率"
+   ],
+   "synonyms_en": [
+    "Sales QoQ",
+    "sales qoq",
+    "revenue qoq"
+   ],
+   "patterns": [],
+   "statement": "",
+   "category": "",
+   "unit": "%",
+   "validation_level": "",
+   "sources": [
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "vrn_uid": "VRN_FIN_0061",
+   "operator_filled": true
+  },
+  "eps_qoq": {
+   "zh": "eps季增率",
+   "en": "EPS QoQ",
+   "synonyms_zh": [
+    "eps季增率"
+   ],
+   "synonyms_en": [
+    "EPS QoQ",
+    "eps qoq"
+   ],
+   "patterns": [],
+   "statement": "PER_SHARE",
+   "category": "",
+   "unit": "%",
+   "validation_level": "",
+   "sources": [
+    "VIS_VRN_FinancialSSOT_v0608.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "vrn_uid": "VRN_FIN_0062",
+   "operator_filled": true
+  },
+  "op_profit": {
+   "zh": "營業利益",
+   "en": "Operating Profit",
+   "synonyms_zh": [
+    "營業利益",
+    "營業獲利"
+   ],
+   "synonyms_en": [
+    "operating profit",
+    "operating income"
+   ],
+   "patterns": [],
+   "statement": "INCOME_STATEMENT",
+   "category": "",
+   "unit": "",
+   "validation_level": "",
+   "sources": [
+    "VRN_Financial_Synonyms_SSOT.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "operator_filled": true
+  },
+  "ebit": {
+   "zh": "",
+   "en": "EBIT",
+   "synonyms_zh": [],
+   "synonyms_en": [
+    "ebit"
+   ],
+   "patterns": [],
+   "statement": "INCOME_STATEMENT",
+   "category": "",
+   "unit": "",
+   "validation_level": "",
+   "sources": [
+    "VRN_Financial_Synonyms_SSOT.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "operator_filled": true
+  },
+  "ocf": {
+   "zh": "營業現金流",
+   "en": "Operating Cash Flow (OCF)",
+   "synonyms_zh": [
+    "營業現金流"
+   ],
+   "synonyms_en": [
+    "operating cash flow"
+   ],
+   "patterns": [],
+   "statement": "CASH_FLOW",
+   "category": "",
+   "unit": "",
+   "validation_level": "",
+   "sources": [
+    "VRN_Financial_Synonyms_SSOT.py",
+    "VRN_Canonical_Trilingual_Fill_v0100.json"
+   ],
+   "operator_filled": true
+  }
+ }
+}

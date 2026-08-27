@@ -180,7 +180,7 @@ function def_Main {
     }
 
     $config = def_ResolveFileBeside $ConfigPath $scriptDir "via_if_config.json"
-    $engine = def_ResolveFileBeside $EnginePath $scriptDir "via_if_engine.py"
+    $engine = def_ResolveFileBeside $EnginePath $scriptDir "SUP_MDL144_IfEngine.py"
     $cfg = Get-Content -LiteralPath $config -Raw -Encoding UTF8 | ConvertFrom-Json
 
     $roots = def_Prop $cfg "roots" $null
@@ -200,7 +200,7 @@ function def_Main {
     def_Progress 2 6 "Scaffold ready"
 
     $py = def_ResolvePython $PythonExe
-    $deployedEngine = def_DeployAsset $engine (Join-Path $sysDir "01_engines") "via_if_engine.py"
+    $deployedEngine = def_DeployAsset $engine (Join-Path $sysDir "01_engines") "SUP_MDL144_IfEngine.py"
     $null = def_DeployAsset $config (Join-Path $sysDir "00_config") "via_if_config.json"
     def_Progress 3 6 "Assets deployed (append-only)"
 
@@ -269,3 +269,11 @@ function def_Main {
 }
 
 def_Main
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

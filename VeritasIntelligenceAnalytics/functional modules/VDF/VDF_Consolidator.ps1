@@ -40,18 +40,18 @@ function Invoke-VDFConsolidator {
         'VDF_MDL001_TWUniverseVerify.py',
         'VDF_MDL002_YFinanceFetchingEngine.py',
         'VDF_MDL003_SentimentMacroEngine.py',
-        'VDF_MDL004_TWFullMarketEngine.py',
+        'VDF_ENG006_MDL004TWFullMarketEngine.py',
         'VDF_MDL005_TWStockFilter.py',
         'VDF_MDL006_FinancialModel.py',
         'VDF_MDL007_SSOTResolver.py',
         'VDF_MDL101_OutputManager.py',
-        'VDF_MDL102_FormatUpgrader.py',
+        'VDF_ENG011_MDL102FormatUpgrader.py',
         'VDF_MDL103_MasterRegistry.py',
         'VDF_MDL104_RegistryLoader.py',
         'VDF_MDL105_CrossValidator.py',
         'VDF_MDL201_GenerateFullRegistry.py',
         'VDF_MDL301_SystemTest.py',
-        'VDF_MDL302_FinalActivation.py',
+        'VDF_ENG017_MDL302FinalActivation.py',
         'VDF_MDL303_RegistryActivation.py',
         'VDF_MDL401_RegistrySchema.json',
         'VDF_MDL402_RegistrySample.json',
@@ -63,13 +63,13 @@ function Invoke-VDFConsolidator {
     # ─── Legacy 舊命名 → 編號版對應 ────────────────────────────────────────
     $LegacyMap = @{
         'VDF_OutputManager.py'                  = 'VDF_MDL101_OutputManager.py'
-        'VDF_FormatUpgrader.py'                 = 'VDF_MDL102_FormatUpgrader.py'
+        'VDF_FormatUpgrader.py'                 = 'VDF_ENG011_MDL102FormatUpgrader.py'
         'VDF_MasterRegistry.py'                 = 'VDF_MDL103_MasterRegistry.py'
         'VDF_RegistryLoader.py'                 = 'VDF_MDL104_RegistryLoader.py'
         'VDF_CrossValidator.py'                 = 'VDF_MDL105_CrossValidator.py'
         'generate_full_registry.py'             = 'VDF_MDL201_GenerateFullRegistry.py'
         'VDF_SystemTestSuite.py'                = 'VDF_MDL301_SystemTest.py'
-        'VDF_FinalActivationTest.py'            = 'VDF_MDL302_FinalActivation.py'
+        'VDF_FinalActivationTest.py'            = 'VDF_ENG017_MDL302FinalActivation.py'
         'VDF_RegistryActivationTest.py'         = 'VDF_MDL303_RegistryActivation.py'
         'vdf_registry_schema.json'              = 'VDF_MDL401_RegistrySchema.json'
         'vdf_extraction_registry.sample.json'   = 'VDF_MDL402_RegistrySample.json'
@@ -77,7 +77,7 @@ function Invoke-VDFConsolidator {
         'vdf_registry_coverage_report.json'     = 'VDF_MDL404_CoverageReport.json'
         'VIA_DataModule_Controller_v2.html'     = 'VDF_MDL501_DataModuleController.html'
         'VIA_DataModule_Controller.html'        = 'VDF_MDL501_DataModuleController.html'
-        'VDF_MDL001_TWUniverse_Verify.py'       = 'VDF_MDL001_TWUniverseVerify.py'
+        'VDF_ENG031_MDL001TWUniverseVerify.py'       = 'VDF_MDL001_TWUniverseVerify.py'
     }
 
     # ─── Helper Functions ──────────────────────────────────────────────────
@@ -312,3 +312,11 @@ function Invoke-VDFConsolidator {
 # Auto-run on paste/execute
 # ═══════════════════════════════════════════════════════════════════════════
 Invoke-VDFConsolidator
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

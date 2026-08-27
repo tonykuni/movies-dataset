@@ -37,9 +37,9 @@ $script:PYTHON_CANDIDATES = @(
 if (-not $PatchFile) {
     # Auto-locate patch file in common spots
     $candidates = @(
-        "C:\Users\tonyk\OneDrive\Desktop\VIA_SSOT_Unified_v22_synonyms_patch.py",
-        "C:\Users\tonyk\Downloads\VIA_SSOT_Unified_v22_synonyms_patch.py",
-        ".\VIA_SSOT_Unified_v22_synonyms_patch.py"
+        "C:\Users\tonyk\OneDrive\Desktop\SUP_MDL655_SSOTUnifiedV22SynonymsPatch.py",
+        "C:\Users\tonyk\Downloads\SUP_MDL655_SSOTUnifiedV22SynonymsPatch.py",
+        ".\SUP_MDL655_SSOTUnifiedV22SynonymsPatch.py"
     )
     foreach ($p in $candidates) {
         if (Test-Path -LiteralPath $p) { $PatchFile = $p; break }
@@ -216,3 +216,11 @@ try {
     }
     Write-Host "PowerShell session remains open." -ForegroundColor Yellow
 }
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

@@ -1,0 +1,23 @@
+﻿CheckId,Check,Status,Severity,FindingCount,Detail
+SSOT001,Expected group count,PASS,HARD,0,actual=31; expected=31; mode=DEMO_FIXTURE
+SSOT002,Taiwan ticker syntax review,PASS,REVIEW,0,Special tickers are retained for review and are never auto-deleted.
+SSOT003,Candidate market suffix evidence,REVIEW,REVIEW,104,Unknown TWSE/TPEX suffixes remain REVIEW; fixture-only .TW fallback is never treated as verified.
+DATA001,Adjusted Close limited forward-fill,PASS,INFO,0,limit=3; Volume and turnover were not filled.
+DATA002,Volume forward-fill prohibition,PASS,HARD,0,Engine does not invoke fill operations on Volume or TurnoverValue.
+GATE001,Real-data activation boundary,PASS,HARD,0,data_mode=DEMO_FIXTURE; controlled output cannot be activated as real data.
+INDEX001,Base-100 normalized index,PASS,HARD,0,method=LAGGED_CLOSE_VOLUME_WEIGHT; normalized_date=2026-01-02; lagged adjusted close x trailing 6D median volume
+INDEX002,Index weight lookahead prohibition,PASS,HARD,0,Close and volume weights are shifted by one trading day; missing weights fall back to equal weight.
+FLOW001,Missing daily flow retained,PASS,HARD,0,"Missing institution, margin, short and ETF flow values are not forward-filled."
+FLOW002,Rolling and cumulative windows,PASS,INFO,0,"windows=[1, 5, 20, 60, 120, 240]; plus YTD and SinceNormalized"
+FLOW003,Dynamic real-volume and chip metrics,PASS,INFO,0,dynamic_medium=20; dynamic_long=59; RVS excludes day-trade turnover; VMOM/thrust/health enabled
+ROLE001,Leader is evidence-based and never forced,PASS,REVIEW,7,Groups without stable lead evidence emit NO_CONFIRMED_LEADER.
+ROLE002,Classification role and next-rebalance policy,PASS,HARD,0,A/B/C role codes are evidence-based; C is dormant and excluded from the next rebalance.
+CLASS001,Dynamic size and capital-control classification,PASS,REVIEW,59,size uses lagged market cap q33/q67; style gap threshold=0.224350; no dealer-to-main-force proxy
+CLASS002,Human X review is proposal-only,PASS,HARD,0,C rows are review-eligible; canonical membership is never deleted or mutated by the engine/UI.
+SIM001,Flow Simulation OOS validation,PASS,REVIEW,20,calibrated_groups=11/31; thresholds are sample-size-derived.
+BT001,Walk-forward signal/return alignment,PASS,HARD,0,signal=t; realized return=t+1; rebalance=20D; cost=12.0bps; no in-sample accuracy claim
+ROTATION-01,2026-07-18 five-state snapshot count contract,PASS,HARD,0,"tracked=18; states={'IGNITE': 4, 'DIFFUSE': 2, 'OVERHEAT': 4, 'EBB': 5, 'DORMANT': 3}"
+ROTATION-02,Historical-to-candidate taxonomy mapping,REVIEW,REVIEW,1,unmapped=石英/頻率元件
+ROTATION-03,Evidence boundary and M3 truth gate,PASS,HARD,0,all rows remain SOURCE_REPORTED_T2_T3_UNVERIFIED; index use prohibited
+VDF-CONTRACT-01,VDF control-panel contract extraction,PASS,HARD,0,TWSE=1200; TPEX=647; execution=0
+MI-REGISTRY-01,Market intelligence registry aggregate contract,PASS,HARD,0,categories=14; items=77

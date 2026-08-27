@@ -1,0 +1,124 @@
+{
+  "version": "v0100",
+  "policy_id": "VIA-ACCURACY-001",
+  "purpose": "Common accuracy gate for classification, status, progress, commitments, closure and project health.",
+  "principles": [
+    "Evidence beats inference",
+    "Confirmed user decisions beat model similarity",
+    "Conflicting facts lower confidence",
+    "Old evidence lowers confidence",
+    "No high-impact auto promotion below gate",
+    "Confidence must explain why"
+  ],
+  "confidence_bands": [
+    {
+      "min": 0.9,
+      "max": 1.0,
+      "code": "A",
+      "label": {
+        "zh-TW": "高可信",
+        "zh-CN": "高可信",
+        "en": "High confidence"
+      }
+    },
+    {
+      "min": 0.75,
+      "max": 0.8999,
+      "code": "B",
+      "label": {
+        "zh-TW": "可信",
+        "zh-CN": "可信",
+        "en": "Reliable"
+      }
+    },
+    {
+      "min": 0.6,
+      "max": 0.7499,
+      "code": "C",
+      "label": {
+        "zh-TW": "需覆核",
+        "zh-CN": "需复核",
+        "en": "Review"
+      }
+    },
+    {
+      "min": 0.4,
+      "max": 0.5999,
+      "code": "D",
+      "label": {
+        "zh-TW": "低可信",
+        "zh-CN": "低可信",
+        "en": "Low confidence"
+      }
+    },
+    {
+      "min": 0.0,
+      "max": 0.3999,
+      "code": "E",
+      "label": {
+        "zh-TW": "不可自動採用",
+        "zh-CN": "不可自动采用",
+        "en": "Do not auto-use"
+      }
+    }
+  ],
+  "evidence_weights": {
+    "human_confirmed": 1.0,
+    "structured_control_sheet": 0.95,
+    "outlook_native_id": 0.95,
+    "explicit_product_code": 0.9,
+    "direct_email_statement": 0.85,
+    "outlook_folder": 0.7,
+    "stakeholder_pattern": 0.55,
+    "subject_similarity": 0.5,
+    "body_semantic_similarity": 0.35,
+    "keyword_only": 0.3,
+    "derived_inference": 0.2
+  },
+  "freshness_days": {
+    "0_2": 1.0,
+    "3_7": 0.95,
+    "8_30": 0.85,
+    "31_90": 0.7,
+    "91_plus": 0.5
+  },
+  "gates": {
+    "project_classification": {
+      "auto_accept": false,
+      "strong_suggestion_min": 0.85,
+      "review_min": 0.6
+    },
+    "progress": {
+      "publish_min": 0.7,
+      "manual_review_below": 0.7
+    },
+    "health": {
+      "publish_min": 0.65
+    },
+    "closure": {
+      "human_confirm": true,
+      "evidence_required": true,
+      "contradiction_count_max": 0
+    },
+    "commitment": {
+      "human_confirm_register": true,
+      "evidence_required_fulfill": true
+    },
+    "critical_risk": {
+      "human_confirm": true
+    }
+  },
+  "penalties": {
+    "single_signal": 0.15,
+    "contradiction_each": 0.2,
+    "missing_critical_field_each": 0.1,
+    "stale_evidence": 0.1,
+    "no_evidence": 0.3,
+    "low_margin_candidate": 0.12
+  },
+  "reward": {
+    "three_or_more_independent_signals": 0.08,
+    "human_confirmation": 0.15,
+    "structured_and_email_agree": 0.1
+  }
+}

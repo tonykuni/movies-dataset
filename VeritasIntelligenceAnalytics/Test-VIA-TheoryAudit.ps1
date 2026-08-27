@@ -47,11 +47,11 @@ if ($PyExe -eq '') { Write-Host '誠實 FAIL:找不到 Python 3'; exit 1 }
 
 $Root = $PSScriptRoot
 $WF   = Join-Path $Root 'VIA_WorkflowEngine.py'
-$VAP  = Join-Path $Root 'functional modules\VAP\engine\via_autoplot_seaborn_plotly_v0100.py'
+$VAP  = Join-Path $Root 'functional modules\VAP\engine\VAP_ENG003_AutoplotSeabornPlotly_v0100.py'
 $SPEC = Join-Path $Root 'functional modules\VAP\spec\ssot\vap_spec.json'
 $CW   = Join-Path $Root 'functional modules\ChipWar'
 $MF   = Join-Path $Root 'functional modules\MultiFactor'
-$TA   = Join-Path $Root 'functional modules\TALib\VIA_TALibEngine.py'
+$TA   = Join-Path $Root 'functional modules\TALib\VIA_ENG003_TALibEngine.py'
 $Tmp  = Join-Path ([System.IO.Path]::GetTempPath()) ("via_theory_" + (Get-Date -Format 'HHmmss'))
 New-Item -ItemType Directory -Path $Tmp -Force | Out-Null
 
@@ -310,3 +310,11 @@ if ($fails -eq 0) {
 }
 Remove-Item -Recurse -Force $Tmp -ErrorAction SilentlyContinue
 exit $(if ($fails -eq 0) { 0 } else { 1 })
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

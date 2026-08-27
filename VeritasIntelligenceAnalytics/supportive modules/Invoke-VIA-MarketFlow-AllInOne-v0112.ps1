@@ -70,8 +70,8 @@ $AUTHORITY_ACCEPTED = [ordered]@{
     "Invoke-VIA-ActivationGateway-Stable.ps1" = "supportive modules/audit_tools/Invoke-VIA-ActivationGateway-Stable.ps1"
     "Invoke-VIA-ALL.ps1" = "supportive modules/60_PowerShell_Entry_Internal/Invoke-VIA-ALL.ps1"
     "Invoke-VIA-UnifiedInputGateway.ps1" = "supportive modules/ssot/Invoke-VIA-UnifiedInputGateway.ps1"
-    "vap_panorama_maturity_optimizer.py" = "supportive modules/audit_tools/vap_panorama_maturity_optimizer.py"
-    "vap_warehouse_v5_next3_builder.py" = "supportive modules/ui_support/vap_warehouse_v5_next3_builder.py"
+    "SUP_MDL557_PanoramaMaturityOptimizer.py" = "supportive modules/audit_tools/SUP_MDL557_PanoramaMaturityOptimizer.py"
+    "SUP_MDL730_WarehouseV5Next3Builder.py" = "supportive modules/ui_support/SUP_MDL730_WarehouseV5Next3Builder.py"
     "VIA_ActivationGateway_Manifest.json" = "supportive modules/registry/VIA_ActivationGateway_Manifest.json"
 }
 $AUTHORITY_EXCLUDED = [ordered]@{
@@ -976,7 +976,7 @@ function def_InvokeVdfVrnStartup {
     def_WriteJson -Data $StageRows -Path (Join-Path $EvidenceDir "05_runtime_core_stage.json") -Depth 20
     $StageRed = @($StageRows | Where-Object { $_.Status -like "RED*" }).Count
 
-    $VdfPath = Join-Path $CoreStageDir "VDF_DataHub_Orchestrator.py"
+    $VdfPath = Join-Path $CoreStageDir "VDF_ENG001_DataHubOrchestrator.py"
     $VrnProbePath = Join-Path $CoreStageDir "VRN_Runtime_Orchestrator.py"
     def_WriteUtf8NoBom -Path $VdfPath -Content (def_GetVdfOrchestratorPython)
     def_WriteUtf8NoBom -Path $VrnProbePath -Content (def_GetVrnRuntimeProbePython)
@@ -2799,3 +2799,11 @@ catch {
     Write-Host ""
     Write-Host "PowerShell remains open. No canonical mutation or canonical Runtime Bridge activation was attempted." -ForegroundColor Yellow
 }
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

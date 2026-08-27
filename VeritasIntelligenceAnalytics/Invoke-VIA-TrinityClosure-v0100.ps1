@@ -114,8 +114,8 @@ if ($vmOk) {
 }
 Check "VAP" "子系統 manifest JSON" $vmOk
 Check "VAP" "manifest artifacts 在位" $artOk $artDetail
-$e1 = Join-Path $vap "engine\via_autoplot_engine_v001.py"
-$e2 = Join-Path $vap "engine\via_autoplot_engine_chartlib_v002.py"
+$e1 = Join-Path $vap "engine\VAP_ENG002_AutoplotEngine_v001.py"
+$e2 = Join-Path $vap "engine\VAP_ENG001_AutoplotEngineChartlib_v002.py"
 Check "VAP" "繪圖引擎編譯" ((Test-PyCompile $e1) -and (Test-PyCompile $e2)) "v001 + chartlib v002"
 Check "VAP" "spec SSOT JSON" ((Test-Json (Join-Path $vap "spec\ssot\vap_spec.json")) -and (Test-Json (Join-Path $vap "spec\ssot\vap_chartlib.json"))) "vap_spec + vap_chartlib"
 $promOk = $false
@@ -184,3 +184,11 @@ Write-Host ("[報告] " + $htmlP)
 Write-Host ("[結案] FinalGate = " + $final + "(VDF " + $gates["VDF"] + " · VRN " + $gates["VRN"] + " · VAP " + $gates["VAP"] + " · 紅線 " + $gates["共通"] + ")") -ForegroundColor $(if ($final -eq "PASS") { "Green" } else { "Red" })
 if (-not $NoOpen) { try { Start-Process $htmlP | Out-Null } catch { } }
 if ($final -eq "PASS") { exit 0 } else { exit 1 }
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

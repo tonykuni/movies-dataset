@@ -31,16 +31,16 @@ $scan = Join-Path $Here "Invoke-VIA-Outlook-TimeRange-ReadOnly.ps1"
         -OutputRoot (Join-Path $Deep "scanrange") -IncludeBodySnippet $true -BodySnippetLength $BodyChars
 
 Write-Host "[2/4] 語料橋(schema 統一)..." -ForegroundColor Yellow
-& py (Join-Path $Here "workops_corpus_bridge.py") --inputs (Join-Path $Deep "scanrange") (Join-Path $WorkOps "out") --outdir (Join-Path $Deep "corpus")
+& py (Join-Path $Here "VIA_ENG066_WorkopsCorpusBridge.py") --inputs (Join-Path $Deep "scanrange") (Join-Path $WorkOps "out") --outdir (Join-Path $Deep "corpus")
 
 Write-Host "[3/4] 郵件智能超級引擎..." -ForegroundColor Yellow
-& py (Join-Path $Here "email_super_engine.py") --input (Join-Path $Deep "corpus") --outdir (Join-Path $Deep "engine_out")
+& py (Join-Path $Here "VIA_ENG056_EmailSuperEngine.py") --input (Join-Path $Deep "corpus") --outdir (Join-Path $Deep "engine_out")
 
 Write-Host "[4/4] NLP/DM/PM 分析層..." -ForegroundColor Yellow
 $VPy = Join-Path $Here ".venv_pm\Scripts\python.exe"
 $PyCmd = if (Test-Path -LiteralPath $VPy) { $VPy } else { "py" }
 Push-Location $Deep
-try { & $PyCmd (Join-Path $Here "engine_analytics.py") --outdir (Join-Path $Deep "engine_out") } finally { Pop-Location }
+try { & $PyCmd (Join-Path $Here "VIA_ENG057_EngineAnalytics.py") --outdir (Join-Path $Deep "engine_out") } finally { Pop-Location }
 
 $report = Join-Path $Deep "engine_out\engine_report.html"
 $aReport = Join-Path $Deep "engine_out\analytics_report.html"
@@ -49,3 +49,11 @@ if (-not $NoOpen) {
     if (Test-Path -LiteralPath $aReport) { Start-Process $aReport | Out-Null }
 }
 Write-Host ("[總結] 深度鏈完成 · 產物:{0}(Outlook 唯讀,原件零觸碰)" -f $Deep) -ForegroundColor Green
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

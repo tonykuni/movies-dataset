@@ -6,8 +6,8 @@
 .DESCRIPTION
   在 VRN 生產資料夾單擊執行：
     1. HardGate 7-tool BOOT_PRECHECK
-    2. VRN_HealthCheck.py — 25 檔完整性 + 跨模組規則一致性
-    3. ACTIVATE_AND_CROSS_VALIDATE.py — 雙組獨立資料集交叉驗證
+    2. VRN_ENG008_HealthCheck.py — 25 檔完整性 + 跨模組規則一致性
+    3. VRN_ENG001_ACTIVATEANDCROSSVALIDATE.py — 雙組獨立資料集交叉驗證
     4. 自動開啟 HTML 報告
 
 .PARAMETER VrnDir
@@ -139,8 +139,8 @@ Write-VIAStatus "OK" "Python: $pyCheck"
 
 # Check core scripts present
 $REQUIRED_SCRIPTS = @(
-    "VRN_HealthCheck.py",
-    "ACTIVATE_AND_CROSS_VALIDATE.py",
+    "VRN_ENG008_HealthCheck.py",
+    "VRN_ENG001_ACTIVATEANDCROSSVALIDATE.py",
     "VIA_HardGate_BootPrecheck.py"
 )
 $missingScripts = @()
@@ -160,9 +160,9 @@ Write-VIAStatus "OK" "All $($REQUIRED_SCRIPTS.Count) required scripts present"
 
 $healthCheckOK = $true
 if (-not $SkipHealthCheck) {
-    Write-VIASection "Phase 1: VRN_HealthCheck.py"
+    Write-VIASection "Phase 1: VRN_ENG008_HealthCheck.py"
 
-    $hcScript = Join-Path $VrnDir "VRN_HealthCheck.py"
+    $hcScript = Join-Path $VrnDir "VRN_ENG008_HealthCheck.py"
     $t0 = Get-Date
     & $Python $PythonArgs $hcScript --vrn-dir $VrnDir
     $t1 = Get-Date
@@ -197,9 +197,9 @@ if (-not $SkipHealthCheck) {
 
 $activateOK = $true
 if (-not $SkipActivate) {
-    Write-VIASection "Phase 2: ACTIVATE_AND_CROSS_VALIDATE.py"
+    Write-VIASection "Phase 2: VRN_ENG001_ACTIVATEANDCROSSVALIDATE.py"
 
-    $cvScript = Join-Path $VrnDir "ACTIVATE_AND_CROSS_VALIDATE.py"
+    $cvScript = Join-Path $VrnDir "VRN_ENG001_ACTIVATEANDCROSSVALIDATE.py"
     $t0 = Get-Date
     Push-Location $VrnDir
     try {
@@ -284,3 +284,11 @@ Write-Host "$($p.Mono)    VRN_Production_Manifest.json$($p.Reset)"
 Write-Host ""
 
 exit $(if ($overallOK) { 0 } else { 1 })
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

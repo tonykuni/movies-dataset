@@ -575,7 +575,7 @@ def def_load_route_table() -> List[Dict[str, Any]]:
             return payload
     return [
         {"pattern": "VIA_IntegrationSystem.py", "alias": "via_core", "reason": "core integration entry"},
-        {"pattern": "VDF_DataHub_Orchestrator.py", "alias": "via_vdf", "reason": "VDF orchestration"},
+        {"pattern": "VDF_ENG001_DataHubOrchestrator.py", "alias": "via_vdf", "reason": "VDF orchestration"},
         {"pattern": "vrn_mdl_003_table_extraction_engine_v_1.py", "alias": "camelot_311", "reason": "table extraction"},
         {"pattern": "vrn_mdl_004_layout_semantic_engine_v_1.py", "alias": "paddle_311", "reason": "layout semantic"},
         {"pattern": "vrn_mdl_005_ocrtext_fusion_engine_v_1.py", "alias": "paddle_311", "reason": "ocr fusion"},

@@ -14,9 +14,9 @@ $ErrorActionPreference = "Stop"
 
 # Reviewed, approved edits (exact substring before -> after). Nothing else is touched.
 $script:Patches = @(
-    @{ File = "engines\flow_autotest.py"; Before = 'ROOT / "_test_sim.html"'; After = '_sandbox_tmp("_test_sim.html")' },
-    @{ File = "engines\flow_autotest.py"; Before = 'ROOT / "_test_perf.html"'; After = '_sandbox_tmp("_test_perf.html")' },
-    @{ File = "engines\flow_autotest.py"; Before = 'ROOT / "_test_mon.html"'; After = '_sandbox_tmp("_test_mon.html")' },
+    @{ File = "engines\FLOW_ENG001_FlowAutotest.py"; Before = 'ROOT / "_test_sim.html"'; After = '_sandbox_tmp("_test_sim.html")' },
+    @{ File = "engines\FLOW_ENG001_FlowAutotest.py"; Before = 'ROOT / "_test_perf.html"'; After = '_sandbox_tmp("_test_perf.html")' },
+    @{ File = "engines\FLOW_ENG001_FlowAutotest.py"; Before = 'ROOT / "_test_mon.html"'; After = '_sandbox_tmp("_test_mon.html")' },
     @{ File = "engines\flow_bridge.py"; Before = 'Path("_v4_sample.csv")'; After = '_sandbox_tmp("_v4_sample.csv")' },
     @{ File = "engines\flow_perf.py"; Before = 'Path(out_path).with_suffix(".tmp.html")'; After = '_sandbox_tmp(Path(out_path).stem + ".tmp.html")' }
 )
@@ -197,3 +197,11 @@ catch {
     Write-Host ""
     Write-Host "def PowerShell remains open. No activation." -ForegroundColor Yellow
 }
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

@@ -1,0 +1,362 @@
+{
+ "schema": "VIA_SCHEMA_REGISTRY_V1",
+ "version": "v0100",
+ "append_only": true,
+ "ts": "2026-08-27 03:14",
+ "policy": "Phase 1 schema drift 守門基線:新引擎改表須先過本冊比對;漂移=新版 append 舊版留存。",
+ "databases": {
+  "vdf_tw_market": {
+   "analyst_estimates": {
+    "date": "VARCHAR",
+    "code": "VARCHAR",
+    "yf_ticker": "VARCHAR",
+    "source": "VARCHAR",
+    "target_high": "DOUBLE",
+    "target_low": "DOUBLE",
+    "target_mean": "DOUBLE",
+    "target_median": "DOUBLE",
+    "n_analysts": "DOUBLE",
+    "trailing_eps": "DOUBLE",
+    "bps": "DOUBLE",
+    "eps0y_avg": "DOUBLE",
+    "eps0y_low": "DOUBLE",
+    "eps0y_high": "DOUBLE",
+    "eps0y_n": "DOUBLE",
+    "eps1y_avg": "DOUBLE",
+    "eps1y_low": "DOUBLE",
+    "eps1y_high": "DOUBLE",
+    "eps1y_n": "DOUBLE",
+    "adopted_eps": "DOUBLE"
+   },
+   "consensus_daily": {
+    "date": "DATE",
+    "code": "VARCHAR",
+    "source": "VARCHAR",
+    "target_high": "DOUBLE",
+    "target_low": "DOUBLE",
+    "target_mean": "DOUBLE",
+    "target_median": "DOUBLE",
+    "n_analysts": "INTEGER",
+    "eps_fy0": "DOUBLE",
+    "eps_fy1": "DOUBLE",
+    "adopted_eps": "DOUBLE",
+    "close": "DOUBLE",
+    "upside_pct": "DOUBLE",
+    "validated": "VARCHAR"
+   },
+   "consensus_latest": {
+    "date": "DATE",
+    "code": "VARCHAR",
+    "source": "VARCHAR",
+    "target_high": "DOUBLE",
+    "target_low": "DOUBLE",
+    "target_mean": "DOUBLE",
+    "target_median": "DOUBLE",
+    "n_analysts": "INTEGER",
+    "eps_fy0": "DOUBLE",
+    "eps_fy1": "DOUBLE",
+    "adopted_eps": "DOUBLE",
+    "close": "DOUBLE",
+    "upside_pct": "DOUBLE",
+    "validated": "VARCHAR",
+    "rn": "BIGINT"
+   },
+   "dq_ohlc_flags": {
+    "date": "VARCHAR",
+    "ticker": "VARCHAR",
+    "flag_class": "VARCHAR",
+    "open": "DOUBLE",
+    "high": "DOUBLE",
+    "low": "DOUBLE",
+    "close": "DOUBLE",
+    "adj_close": "DOUBLE"
+   },
+   "etf_book": {
+    "fund_code": "VARCHAR",
+    "fund_name": "VARCHAR",
+    "fund_type": "VARCHAR",
+    "is_active": "BOOLEAN",
+    "tracking_index": "VARCHAR",
+    "as_of": "VARCHAR"
+   },
+   "features_daily": {
+    "date": "VARCHAR",
+    "ticker": "VARCHAR",
+    "ret_1d": "DOUBLE",
+    "ret_5d": "DOUBLE",
+    "ret_20d": "DOUBLE",
+    "ret_60d": "DOUBLE",
+    "vol_20d_ann": "DOUBLE",
+    "ma20_ratio": "DOUBLE",
+    "ma60_ratio": "DOUBLE",
+    "hi252_dist": "DOUBLE",
+    "lo252_dist": "DOUBLE",
+    "volu_z20": "DOUBLE",
+    "rng_1d": "DOUBLE",
+    "data_class": "VARCHAR"
+   },
+   "group_features_daily": {
+    "gid": "VARCHAR",
+    "date": "VARCHAR",
+    "n_members": "BIGINT",
+    "n_ma20": "BIGINT",
+    "above_ma20": "BIGINT",
+    "avg_ret_20d": "DOUBLE",
+    "med_ret_60d": "DOUBLE",
+    "win60": "BIGINT",
+    "lose60": "BIGINT",
+    "avg_volu_z20": "DOUBLE",
+    "data_class": "VARCHAR"
+   },
+   "monthly_revenue_analysis": {
+    "code": "VARCHAR",
+    "ym": "VARCHAR",
+    "revenue": "DOUBLE",
+    "mom_pct": "DOUBLE",
+    "yoy_pct": "DOUBLE",
+    "cum_12m": "DOUBLE",
+    "high_60m": "INTEGER",
+    "yoy_streak": "BIGINT"
+   },
+   "prices_canonical": {
+    "date": "VARCHAR",
+    "ticker": "VARCHAR",
+    "open": "DOUBLE",
+    "high": "DOUBLE",
+    "low": "DOUBLE",
+    "close": "DOUBLE",
+    "volume": "BIGINT",
+    "factor": "DOUBLE",
+    "data_class": "VARCHAR"
+   },
+   "tw_chip_derived": {
+    "date": "VARCHAR",
+    "code": "VARCHAR",
+    "market": "VARCHAR",
+    "short_margin_ratio_pct": "DOUBLE",
+    "foreign_net": "DOUBLE",
+    "trust_net": "DOUBLE",
+    "dealer_net": "DOUBLE",
+    "total_net": "DOUBLE"
+   },
+   "tw_chip_inst": {
+    "date": "VARCHAR",
+    "code": "VARCHAR",
+    "market": "VARCHAR",
+    "foreign_net": "DOUBLE",
+    "trust_net": "DOUBLE",
+    "dealer_net": "DOUBLE",
+    "total_net": "DOUBLE"
+   },
+   "tw_chip_margin": {
+    "date": "VARCHAR",
+    "code": "VARCHAR",
+    "market": "VARCHAR",
+    "margin_bal_prev": "DOUBLE",
+    "margin_buy": "DOUBLE",
+    "margin_sell": "DOUBLE",
+    "margin_redeem": "DOUBLE",
+    "margin_bal": "DOUBLE",
+    "short_bal_prev": "DOUBLE",
+    "short_sell": "DOUBLE",
+    "short_buy": "DOUBLE",
+    "short_redeem": "DOUBLE",
+    "short_bal": "DOUBLE"
+   },
+   "tw_daily_prices": {
+    "date": "VARCHAR",
+    "ticker": "VARCHAR",
+    "open": "DOUBLE",
+    "high": "DOUBLE",
+    "low": "DOUBLE",
+    "close": "DOUBLE",
+    "adj_close": "DOUBLE",
+    "volume": "BIGINT"
+   },
+   "tw_daytrade_eligible": {
+    "date": "VARCHAR",
+    "code": "VARCHAR",
+    "suspension": "VARCHAR"
+   },
+   "tw_daytrade_market": {
+    "date": "VARCHAR",
+    "market": "VARCHAR",
+    "dt_volume": "DOUBLE",
+    "dt_volume_pct": "DOUBLE",
+    "dt_buy_value": "DOUBLE",
+    "dt_sell_value": "DOUBLE"
+   },
+   "tw_listings": {
+    "code": "VARCHAR",
+    "name": "VARCHAR",
+    "market": "VARCHAR",
+    "yf_ticker": "VARCHAR",
+    "industry": "VARCHAR",
+    "isin": "VARCHAR"
+   },
+   "tw_listings_industry": {
+    "code": "VARCHAR",
+    "name": "VARCHAR",
+    "market": "VARCHAR",
+    "industry_code": "VARCHAR",
+    "industry_name": "VARCHAR",
+    "yf_ticker": "VARCHAR"
+   },
+   "tw_market_agg": {
+    "date": "VARCHAR",
+    "trade_value": "DOUBLE",
+    "volume": "DOUBLE",
+    "taiex": "DOUBLE"
+   },
+   "tw_monthly_revenue": {
+    "code": "VARCHAR",
+    "ym": "VARCHAR",
+    "revenue": "DOUBLE",
+    "source": "VARCHAR",
+    "fetched_at": "VARCHAR"
+   },
+   "tw_prices_adj": {
+    "date": "VARCHAR",
+    "ticker": "VARCHAR",
+    "factor": "DOUBLE",
+    "adj_open": "DOUBLE",
+    "adj_high": "DOUBLE",
+    "adj_low": "DOUBLE",
+    "adj_close": "DOUBLE",
+    "volume": "BIGINT",
+    "data_class": "VARCHAR"
+   },
+   "tw_rates_cbc": {
+    "date": "VARCHAR",
+    "source": "VARCHAR",
+    "demand_deposit_float": "DOUBLE",
+    "savings_float": "DOUBLE",
+    "fixed_1m": "DOUBLE",
+    "honesty_flag": "VARCHAR"
+   },
+   "tw_trading_daily": {
+    "date": "VARCHAR",
+    "code": "VARCHAR",
+    "market": "VARCHAR",
+    "volume": "DOUBLE",
+    "trade_value": "DOUBLE",
+    "transactions": "DOUBLE",
+    "close": "DOUBLE"
+   },
+   "tw_valuation_daily": {
+    "date": "VARCHAR",
+    "code": "VARCHAR",
+    "market": "VARCHAR",
+    "pe": "DOUBLE",
+    "pb": "DOUBLE",
+    "dividend_yield": "DOUBLE",
+    "dps": "DOUBLE"
+   }
+  },
+  "vdf_global_market": {
+   "cross_macro": {
+    "date": "VARCHAR",
+    "region": "VARCHAR",
+    "metric": "VARCHAR",
+    "series": "VARCHAR",
+    "value": "DOUBLE"
+   },
+   "etf_stats_daily": {
+    "date": "VARCHAR",
+    "symbol": "VARCHAR",
+    "aum": "BIGINT",
+    "nav": "DOUBLE",
+    "price": "DOUBLE",
+    "market_cap": "INTEGER",
+    "shares_outstanding": "INTEGER",
+    "trailing_pe": "DOUBLE",
+    "forward_pe": "INTEGER",
+    "price_to_book": "INTEGER",
+    "yield_": "DOUBLE",
+    "currency": "VARCHAR"
+   },
+   "factset_earnings": {
+    "published": "VARCHAR",
+    "metric": "VARCHAR",
+    "period": "VARCHAR",
+    "value": "DOUBLE",
+    "source": "VARCHAR",
+    "flag": "VARCHAR"
+   },
+   "features_daily": {
+    "date": "VARCHAR",
+    "ticker": "VARCHAR",
+    "ret_1d": "DOUBLE",
+    "ret_5d": "DOUBLE",
+    "ret_20d": "DOUBLE",
+    "ret_60d": "DOUBLE",
+    "vol_20d_ann": "DOUBLE",
+    "ma20_ratio": "DOUBLE",
+    "ma60_ratio": "DOUBLE",
+    "hi252_dist": "DOUBLE",
+    "lo252_dist": "DOUBLE",
+    "volu_z20": "DOUBLE",
+    "rng_1d": "DOUBLE",
+    "data_class": "VARCHAR"
+   },
+   "gl_prices_adj": {
+    "date": "VARCHAR",
+    "ticker": "VARCHAR",
+    "factor": "DOUBLE",
+    "adj_open": "DOUBLE",
+    "adj_high": "DOUBLE",
+    "adj_low": "DOUBLE",
+    "adj_close": "DOUBLE",
+    "volume": "BIGINT",
+    "data_class": "VARCHAR"
+   },
+   "global_daily": {
+    "date": "VARCHAR",
+    "ticker": "VARCHAR",
+    "open": "DOUBLE",
+    "high": "DOUBLE",
+    "low": "DOUBLE",
+    "close": "DOUBLE",
+    "adj_close": "DOUBLE",
+    "volume": "BIGINT"
+   },
+   "index_valuation_proxy": {
+    "date": "VARCHAR",
+    "proxy_flag": "VARCHAR",
+    "symbol": "VARCHAR",
+    "aum": "BIGINT",
+    "nav": "DOUBLE",
+    "price": "DOUBLE",
+    "market_cap": "INTEGER",
+    "shares_outstanding": "INTEGER",
+    "trailing_pe": "DOUBLE",
+    "forward_pe": "INTEGER",
+    "price_to_book": "INTEGER",
+    "yield_": "DOUBLE",
+    "currency": "VARCHAR"
+   },
+   "prices_canonical": {
+    "date": "VARCHAR",
+    "ticker": "VARCHAR",
+    "open": "DOUBLE",
+    "high": "DOUBLE",
+    "low": "DOUBLE",
+    "close": "DOUBLE",
+    "volume": "BIGINT",
+    "factor": "DOUBLE",
+    "data_class": "VARCHAR"
+   },
+   "sentiment_daily": {
+    "date": "VARCHAR",
+    "index": "VARCHAR",
+    "score": "DOUBLE",
+    "rating": "VARCHAR"
+   },
+   "us_macro": {
+    "date": "VARCHAR",
+    "series": "VARCHAR",
+    "value": "DOUBLE"
+   }
+  }
+ }
+}

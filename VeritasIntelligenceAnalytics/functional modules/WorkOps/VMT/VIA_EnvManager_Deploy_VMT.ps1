@@ -277,7 +277,7 @@ $pkgList = @()
 if ($fr.code -eq 0) { $pkgList = @($fr.out -split "`n" | Where-Object { $_.Trim().Length -gt 0 }) }
 
 if (-not $EnginePath -or -not (Test-Path $EnginePath)) {
-    $guess = Join-Path (Split-Path -Parent $PSCommandPath) 'vmt_process_mining.py'
+    $guess = Join-Path (Split-Path -Parent $PSCommandPath) 'VIA_ENG024_VmtProcessMining.py'
     if (Test-Path $guess) { $EnginePath = $guess }
 }
 $runnerPath = Join-Path $EnvRoot ('Run-VMT-ProcessMining.ps1')
@@ -384,3 +384,11 @@ Write-Host ('  執行探勘:  powershell -File "{0}"' -f $runnerPath) -Foregroun
 Write-Host ('  報告:      {0}' -f $reportPath) -ForegroundColor Yellow
 Write-Host ''
 if (-not $NoOpen) { Start-Process $reportPath }
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

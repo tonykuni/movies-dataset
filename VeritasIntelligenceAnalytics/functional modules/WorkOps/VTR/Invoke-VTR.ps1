@@ -234,8 +234,8 @@ function Invoke-Doctor {
     $required = @(
         'engine/vtr_py/__init__.py',
         'engine/tests/test_engine.py',
-        'lexicon/tools/validate_lexicon.py',
-        'tools/build_manifest.py',
+        'lexicon/tools/VIA_ENG047_ValidateLexicon.py',
+        'tools/VIA_ENG048_BuildManifest.py',
         'contracts/vtr-document.schema.json',
         'config/vtr.json'
     )
@@ -257,7 +257,7 @@ function Invoke-Doctor {
 
 function Invoke-Lexicon {
     Write-Head 'SSOT Lexicon 驗證'
-    $args1 = @('lexicon/tools/validate_lexicon.py')
+    $args1 = @('lexicon/tools/VIA_ENG047_ValidateLexicon.py')
     if ($UpdateIndex) { $args1 += '--write-index' }
     $code = Invoke-Py -Arguments $args1
     if ($code -eq 0) { Write-Ok '詞庫通過' }
@@ -287,16 +287,16 @@ function Invoke-ManifestCheck {
         return 5
     }
 
-    # 稽核交給 build_manifest.py（單一權威）。它以「正規化行尾後的內容」計算
+    # 稽核交給 VIA_ENG048_BuildManifest.py（單一權威）。它以「正規化行尾後的內容」計算
     # SHA-256，因此在 Windows(CRLF) 與 Linux(LF) 上結果一致。
     #
     # 這裡刻意**不**用純 PowerShell 的 Get-FileHash 逐檔比對：Get-FileHash 雜湊
     # 原始位元組，會把 Git for Windows 在 checkout 時產生的 CRLF 當成不同內容，
     # 在 Windows 上對每一個文字檔誤報「內容已變更」。維護兩套必須逐位元組相符
     # 的雜湊實作本身也是缺陷來源，故收斂為一套。
-    # NEW / CHANGED / REMOVED 明細由 build_manifest.py 印到 stderr。
-    $manifestArgs = @('tools/build_manifest.py', '--quiet')
-    if ($Update) { $manifestArgs = @('tools/build_manifest.py', '--write') }
+    # NEW / CHANGED / REMOVED 明細由 VIA_ENG048_BuildManifest.py 印到 stderr。
+    $manifestArgs = @('tools/VIA_ENG048_BuildManifest.py', '--quiet')
+    if ($Update) { $manifestArgs = @('tools/VIA_ENG048_BuildManifest.py', '--write') }
 
     $code = Invoke-Py -Arguments $manifestArgs
 
@@ -499,3 +499,11 @@ if ($script:ExitCode -eq 0) {
 Write-Line ''
 
 exit $script:ExitCode
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

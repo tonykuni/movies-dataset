@@ -1,0 +1,88 @@
+{
+ "schema": "VIA_HANDOVER_GAP_REGISTER_V1",
+ "version": "v0100",
+ "append_only": true,
+ "source": "操作員批177 交接報告(證據基準 2026-08-13~18 工作站側)",
+ "policy": "逐項以雲端當下實測對照;六態:FIXED_NOW=本批實修/ALREADY_RESOLVED=雲端批次已解/VERIFIED_BETTER=實測優於報告基準+誠實標記/NOT_PRESENT_CLOUD=雲端現役面不存在(工作站側候操作員)/TRACKED/PENDING_OPERATOR。Ready≠Activated 狀態機全程遵守:本冊不宣告任何正式啟用。",
+ "activation_status": "NOT_ACTIVATED(遵報告狀態機;雲端線=日更運轉+測試綠,正式啟用權=操作員 T0-T9+Token)",
+ "items": [
+  {
+   "id": "P0-1",
+   "risk": "Canonical Root 未仲裁",
+   "status": "SPLIT",
+   "detail": "雲端側:git repo 單一根=/home/user/movies-dataset/VeritasIntelligenceAnalytics(Git HEAD+manifest 齊)=仲裁完成。工作站側(Downloads 雙根+OneDrive):候操作員按 T0 仲裁。"
+  },
+  {
+   "id": "P0-2",
+   "risk": "Runtime Bridge 硬編碼 OneDrive",
+   "status": "NOT_PRESENT_CLOUD",
+   "detail": "實測:VIA_Runtime_Bridge_All_in_One.py 僅存於 VAP/ASSETS/SCOPE_COPY 收容區(零觸碰非現役);discovery.py 之 OneDrive 字樣=硬編碼偵測守門標記非違規。雲端現役面無此件;工作站側候操作員改治理注入。"
+  },
+  {
+   "id": "P0-3",
+   "risk": "VDF OHLC 205/1,871(11%)不一致",
+   "status": "VERIFIED_BETTER",
+   "detail": "現庫實測:1,599/1,248,515=0.128%。抽樣分類:SOURCE_TIMING_CLOSE_AUCTION 768(收盤競價價微逾日內高低,yfinance 已知)+ADJUSTMENT_FACTOR 831(除權息 close≠adj_close timing)。處置=dq_ohlc_flags 標記表入庫(正本零觸碰,下游可濾),非資料損壞不改值。"
+  },
+  {
+   "id": "P0-4",
+   "risk": "Ready/Staging/Contract 誤當 Activated",
+   "status": "ALREADY_RESOLVED",
+   "detail": "誠實三態紀律全鏈實施(OK/FAIL/SKIP;COMPILE_ONLY 不假測/UNTESTED 不假綠/NOT VALIDATED 勿 promote);本冊 activation_status 明記 NOT_ACTIVATED。"
+  },
+  {
+   "id": "P0-5",
+   "risk": "Functional/Supportive 重複模組(Hydra)",
+   "status": "TRACKED",
+   "detail": "批160 HYDRA 裁定冊(授權樣式赦免+direct_import 永不赦)+批171 合約基線 1828 件;_sha 鏡像/SCOPE_COPY=收容區判準不計現役。殘餘雙 Owner 逐批收斂。"
+  },
+  {
+   "id": "P0-6",
+   "risk": "Aegis verify_ssl=False 預設",
+   "status": "FIXED_NOW",
+   "detail": "via_aegis_netcore_v0100 兩處預設改 fail-secure(True;僅 VIA_SSL_NOVERIFY=1 明示才關,留痕)。註:現役網路正主=SUP_MDL740 統包(curl 走 proxy CA bundle,恆驗證);Aegis 為後備層一併鎖死。"
+  },
+  {
+   "id": "P1-1",
+   "risk": "Celeritas import-time 初始化",
+   "status": "TRACKED",
+   "detail": "ACCEL-BRIDGE 全樹掛橋為 graceful try/except 惰性型;Celeritas 本體 warm pool 行為候 Gate 化(工作站啟用前處理)。"
+  },
+  {
+   "id": "P1-2",
+   "risk": "Panorama AST 非 Python 只 Index",
+   "status": "ALREADY_RESOLVED",
+   "detail": "雲端 grid=各語言原生道(py ast+bash -n+JSON loads);不以單工具宣稱 Polyglot PASS。"
+  },
+  {
+   "id": "P1-3",
+   "risk": "VRN M01-08 vs MDL001-008 雙命名鏈",
+   "status": "FIXED_NOW",
+   "detail": "VIA_VRN_StageAlias_Map_v0100.json 建立階段↔資產 Alias(單一 Active Owner=現役正名鏈;M 名=階段語意名)。"
+  },
+  {
+   "id": "P1-4",
+   "risk": "VAP SCOPE_COPY 含 VDF/VRN 副本",
+   "status": "TRACKED",
+   "detail": "SCOPE_COPY=收容原件區(批168 ARCHIVE 判準不計燈);VAP 現役引擎只讀契約/庫不引用副本;副本清理候操作員裁決(零刪除紀律)。"
+  },
+  {
+   "id": "P1-5",
+   "risk": "VAP Dashboard PLAN_ONLY_WAITING_LIVE_DATA",
+   "status": "PARTIAL_RESOLVED",
+   "detail": "雲端儀表板三層=實料已綁(價量籌碼/輪動/全球+因子);Global ETF Flow 細版等仍候快照累積(方法論 v0104 觸發條件),誠實 Plan-only 不 Promote。"
+  },
+  {
+   "id": "P2-1",
+   "risk": "高風險套件分散多環境",
+   "status": "TRACKED",
+   "detail": "雲端單環境+boot ⓪檢缺自補+拒裝名單;paddle/torch 未混入。工作站多 venv 路由候 EnvManager 依報告 04.4 治理。"
+  },
+  {
+   "id": "H-CHECKLIST",
+   "risk": "H01-H14 交接檢查表",
+   "status": "MAPPED",
+   "detail": "雲端證據可覆蓋:H02(SSOT 快照)/H03(名冊)/H05(五核心自測)/H06(VRN 管線矩陣)/H07(VDF 資料集矩陣=22 表)/H08(VAP 圖規冊 40)/H12(checkpoint 紀律)。候工作站/操作員:H01(Root)/H04(多環境矩陣)/H09-H11(端到端+故障注入+使用者測試)/H13(Token)/H14(啟用後三週期)。"
+  }
+ ]
+}

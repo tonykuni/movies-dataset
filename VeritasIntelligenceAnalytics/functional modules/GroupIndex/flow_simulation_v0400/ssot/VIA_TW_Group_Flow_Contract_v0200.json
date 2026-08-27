@@ -1,0 +1,74 @@
+{
+  "contract_id": "VIA_TW_GROUP_FLOW_CONTRACT_V0200",
+  "contract_version": "0.2.0",
+  "governance": {
+    "candidate_classification": "ATTACHED_CORE_31_GROUP_149_ROWS",
+    "expected_group_count": 31,
+    "expected_membership_rows": 149,
+    "mutation_policy": "APPEND_ONLY_ERRATA_AND_REVIEW_DECISIONS",
+    "human_x_policy": "EXCLUDE_PROPOSED_OR_KEEP_NEVER_DELETE",
+    "activation_policy": "READY_FOR_MANUAL_ACTIVATION_REVIEW",
+    "runtime_policy": "FAIL_CLOSED_ON_REAL_DATA_GAP",
+    "lookahead_policy": "EOD_DATA_AVAILABLE_NEXT_TRADING_DAY",
+    "order_execution": false,
+    "network_execution": false
+  },
+  "ticker_contract": {
+    "twse_regex": "^[1-9][0-9]{3}\\.TW$",
+    "tpex_regex": "^[1-9][0-9]{3}\\.TWO$",
+    "unverified_market_policy": "REVIEW_NOT_AUTO_INFER",
+    "multi_group_policy": "ALLOWED_WITH_PRIMARY_ECONOMIC_IDENTITY"
+  },
+  "tables": {
+    "membership": {
+      "grain": ["GroupId", "Ticker"],
+      "required": ["GroupId", "GroupName", "Ticker", "IndexEligible"],
+      "review_fields": ["CandidateRole", "MarketVerified", "MarketSource"]
+    },
+    "price": {
+      "grain": ["Date", "Ticker"],
+      "required": ["Date", "Ticker", "Adj_Close"],
+      "weight_fields": ["Volume", "MarketCap"],
+      "missing_policy": {
+        "Adj_Close": "FORWARD_FILL_WITHIN_TICKER_LIMITED",
+        "Volume": "NEVER_FORWARD_FILL",
+        "TurnoverValue": "NEVER_FORWARD_FILL"
+      }
+    },
+    "institutional": {
+      "grain": ["Date", "Ticker"],
+      "required": ["ForeignNetAmount", "InvestmentTrustNetAmount", "DealerNetAmount"],
+      "missing_policy": "RETAIN_MISSING"
+    },
+    "main_force": {
+      "grain": ["Date", "Ticker"],
+      "required": ["MainForceNetAmount", "BranchConcentration"],
+      "proxy_policy": "DEALER_PROXY_PROHIBITED",
+      "missing_policy": "UNRESOLVED"
+    }
+  },
+  "index": {
+    "base": 100,
+    "default_weight": "LAGGED_CLOSE_X_LAGGED_ROLLING_MEDIAN_VOLUME",
+    "fallback": "EQUAL_WEIGHT",
+    "effective_cycle": "NEXT_REBALANCE"
+  },
+  "dynamic_classification": {
+    "size": "LAGGED_MARKET_CAP_CROSS_SECTION_Q33_Q67",
+    "capital_control_styles": ["FOREIGN", "DOMESTIC_INSTITUTION", "MAIN_FORCE", "MIXED_OR_UNRESOLVED"],
+    "purity": "PCA_ABSORPTION_ABSOLUTE_LOADING_AND_AVERAGE_CORRELATION",
+    "thresholds": "ROLLING_OR_CROSS_SECTIONAL_NO_FIXED_ACCURACY_CLAIM"
+  },
+  "flow": {
+    "metrics": ["RVS", "VMOM", "INSTITUTIONAL_NET_THRUST", "CHIP_ACCUMULATION_HEALTH"],
+    "day_trade_policy": "EXCLUDE_FROM_REAL_VOLUME_SHARE",
+    "windows": [1, 5, 20, 60, 120, 240, "YTD", "SINCE_NORMALIZED_DATE"]
+  },
+  "backtest": {
+    "signal_date": "T",
+    "realized_return_date": "T_PLUS_1",
+    "transaction_cost_required": true,
+    "metrics": ["CAGR", "ANNUAL_VOLATILITY", "SHARPE", "MAX_DRAWDOWN", "HIT_RATE", "TURNOVER", "OOS_RANK_IC"],
+    "fixture_interpretation": "PIPELINE_TEST_ONLY_NOT_INVESTMENT_PERFORMANCE"
+  }
+}

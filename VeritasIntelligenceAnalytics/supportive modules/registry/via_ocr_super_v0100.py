@@ -63,7 +63,7 @@ def _load_by_path(mod_name: str, path: Path):
         return None
 
 
-_reb_path = _newest("via_env_rebuild_v0*.py", HERE)
+_reb_path = _newest("CGC_MDL050_EnvRebuild_v0*.py", HERE) or _newest("via_env_rebuild_v0*.py", HERE)
 REB = _load_by_path("via_env_rebuild_latest", _reb_path) if _reb_path else None
 
 # ── 車道編成(輕→重階梯;每車道隔離環境)───────────────────────────

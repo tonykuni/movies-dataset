@@ -711,3 +711,11 @@ Write-Host ("   週報:{0}(via-workops report 可直接開)" -f $reportFile) -Fo
 Write-Host "[5/5] 開啟(非阻塞)..." -ForegroundColor Yellow
 if (-not $NoOpen) { Start-Process $outFile | Out-Null }
 Write-Host ("[總結] 專案 {0} 案 · 未回追蹤 {1} 件 · 草稿佇列 {2} 件(絕不代寄)· 關係人 {3} 人" -f @($rec).Count, @($pendSorted).Count, @($queue).Count, @($stak).Count) -ForegroundColor Green
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

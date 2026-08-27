@@ -267,16 +267,16 @@ try {
     def_AddCheck "L02" "Python compileall" "PASS" "All engines compiled."
 
     def_Progress 40 "Lane 03 · Local RC acceptance"
-    $local = def-RunPython $Vpy $AppRoot @("tests\rc_acceptance.py")
+    $local = def-RunPython $Vpy $AppRoot @("tests\VIA_ENG144_RcAcceptance.py")
     if ($local.ExitCode -ne 0) {
         def_AddCheck "L03" "Local RC acceptance" "FAIL" $local.Output
         throw "Local RC acceptance failed."
     }
     $localJson = def-ParseJsonOutput $local.Output
-    def_AddCheck "L03" "Local RC acceptance" "PASS" ($localJson | ConvertTo-Json -Compress -Depth 20) "tests\rc_acceptance.py"
+    def_AddCheck "L03" "Local RC acceptance" "PASS" ($localJson | ConvertTo-Json -Compress -Depth 20) "tests\VIA_ENG144_RcAcceptance.py"
 
     def_Progress 48 "Lane 03 · Native SSOT"
-    $ssot = def-RunPython $Vpy $AppRoot @("engines\workops_ssot_store.py","snapshot")
+    $ssot = def-RunPython $Vpy $AppRoot @("engines\VIA_ENG136_WorkopsSsotStore.py","snapshot")
     $ssotJson = def-ParseJsonOutput $ssot.Output
     if ($ssot.ExitCode -ne 0 -or -not $ssotJson) {
         def_AddCheck "L03" "SSOT snapshot" "FAIL" $ssot.Output
@@ -298,7 +298,7 @@ try {
     def_AddCheck "L04" "LEGO module health" "PASS" "$($mhJson.count) registered modules" "out\module_registry_snapshot.json"
 
     def_Progress 62 "Lane 04 · Diagnostics"
-    $diag = def-RunPython $Vpy $AppRoot @("engines\workops_diagnostics.py","build")
+    $diag = def-RunPython $Vpy $AppRoot @("engines\VIA_ENG113_WorkopsDiagnostics.py","build")
     $diagJson = def-ParseJsonOutput $diag.Output
     if ($diag.ExitCode -ne 0 -or -not $diagJson) {
         def_AddCheck "L04" "Diagnostics" "FAIL" $diag.Output
@@ -319,7 +319,7 @@ try {
         def_AddCheck "L04" "Local FastAPI" "PASS" "Existing WorkOps API responded." $apiUrl
     }
     catch {
-        $server = Start-Process -FilePath $Vpy -ArgumentList @("engines\workops_api_server.py") -WorkingDirectory $AppRoot -PassThru -WindowStyle Hidden
+        $server = Start-Process -FilePath $Vpy -ArgumentList @("engines\VIA_ENG105_WorkopsApiServer.py") -WorkingDirectory $AppRoot -PassThru -WindowStyle Hidden
         Start-Sleep -Seconds 2
         try {
             $status = Invoke-RestMethod -Uri $apiUrl -TimeoutSec 5
@@ -370,7 +370,7 @@ try {
         }
         def_AddCheck "L05" "Live Microsoft Graph read" "PASS" "Folders=$($graphJson.folders); messages=$($graphJson.messages); changed=$($graphJson.changed)" "out\graph_sync_report.json"
 
-        $refresh = def-RunPython $Vpy $AppRoot @("engines\workops_orchestrator.py","refresh")
+        $refresh = def-RunPython $Vpy $AppRoot @("engines\VIA_ENG126_WorkopsOrchestrator.py","refresh")
         if ($refresh.ExitCode -eq 0) {
             def_AddCheck "L05" "Post-sync WorkOps refresh" "PASS" "Mailbox events propagated into WorkOps."
         } else {
@@ -480,3 +480,11 @@ catch {
 finally {
     try { Stop-Transcript | Out-Null } catch {}
 }
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

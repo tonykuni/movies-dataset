@@ -55,14 +55,14 @@ Write-Host "=== VIA AllGreen 一鍵統包 v0100 · $TS · 唯讀/dry-run · 建�
 
 # ① TEST — 全面自測矩陣(18 站)
 Write-Host "── ① TEST(自測矩陣)──"
-$grid = def_Newest "via_selftest_grid_v0*.py" $REG
+$grid = def_Newest "CGC_MDL064_SelftestGrid_v0*.py" $REG
 def_Stage "selftest_grid" @($grid, $(if ($SkipHeavy) { "--fast" }))
 # ② DEBUG
 def_Debug "①後"
 
 # ③ OPTIMIZE — 同步巡航(五站併發=牆鐘最佳化)
 Write-Host "── ③ OPTIMIZE(同步巡航)──"
-$auto = def_Newest "via_auto_pilot_v0*.py" $REG
+$auto = def_Newest "CGC_MDL042_AutoPilot_v0*.py" $REG
 def_Stage "auto_pilot_parallel" @($auto)
 # ④⑤ TEST+DEBUG
 def_Debug "③後"
@@ -94,7 +94,7 @@ def_Debug "⑥後"
 
 # ⑨ GENERATE U/I — Console 七頁重生
 Write-Host "── ⑨ GENERATE U/I(Console)──"
-$hub = def_Newest "via_master_hub_v0*.py" $REG
+$hub = def_Newest "CGC_MDL059_MasterHub_v0*.py" $REG
 def_Stage "console_7pages" @($hub, "--no-open")
 
 # ⑩ USER-TEST — 開 Console(使用者旅程入口);NoOpen 則印路徑
@@ -122,3 +122,11 @@ def_Debug "終局"
 Write-Host ("=== 終局 Gate:{0} · 站 OK {1} / FAIL {2} · 存證 {3} ===" -f $gate, $nOk, $nFail, (Split-Path $evPath -Leaf)) -ForegroundColor $(if ($nFail -gt 0) { "Red" } else { "Green" })
 Write-Host "    正式晉升/部署:NOT_PERFORMED_REQUIRES_APPROVAL(落地變更走各動詞 --commit)"
 exit $(if ($nFail -gt 0) { 1 } else { 0 })
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

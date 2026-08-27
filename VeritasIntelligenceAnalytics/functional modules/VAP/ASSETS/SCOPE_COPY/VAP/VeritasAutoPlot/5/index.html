@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Space Race — 1957–1975</title>
+  <meta name="description" content="An interactive timeline of the Space Race between the United States and the Soviet Union, from Sputnik to Apollo-Soyuz.">
+
+  <!-- Preconnect for Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./base.css">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <!-- Skip Link -->
+  <a href="#timeline" class="skip-link">Skip to timeline</a>
+
+  <!-- Star Field Canvas -->
+  <canvas id="star-canvas" aria-hidden="true"></canvas>
+
+  <!-- CRT Grid -->
+  <div class="crt-grid" aria-hidden="true"></div>
+
+  <!-- Scanline Overlay -->
+  <div class="scanline-overlay" aria-hidden="true"></div>
+
+  <!-- Header -->
+  <header class="site-header" role="banner">
+    <h1 class="site-title">
+      <span class="dot" aria-hidden="true"></span>
+      The Space Race
+      <span style="color: var(--color-text-faint); font-weight: 400;">1957–1975</span>
+    </h1>
+
+    <div class="header-controls">
+      <!-- Stats Counter -->
+      <div class="stats-counter" aria-live="polite">
+        <span><span class="stat-value" id="stat-missions">0</span> <span id="stat-missions-label">missions</span></span>
+        <span><span class="stat-value" id="stat-failures">0</span> <span id="stat-failures-label">failures</span></span>
+        <span><span class="stat-value" id="stat-firsts">0</span> <span id="stat-firsts-label">firsts</span></span>
+      </div>
+
+      <!-- What If Toggle -->
+      <button class="whatif-toggle" id="whatif-toggle" aria-pressed="false" aria-label="Toggle cancelled 'What If' missions">
+        <span class="toggle-label">What If?</span>
+        <span class="toggle-indicator" aria-hidden="true"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Timeline -->
+  <main id="timeline" class="timeline-viewport" role="region" aria-label="Space Race Timeline">
+    <div class="timeline-container" id="timeline-container">
+      <!-- US Track (top) -->
+      <div class="track-us" id="track-us" aria-label="United States missions"></div>
+
+      <!-- Central Ruler -->
+      <div class="timeline-ruler" id="timeline-ruler" role="presentation">
+        <div class="ruler-line"></div>
+      </div>
+
+      <!-- USSR Track (bottom) -->
+      <div class="track-ussr" id="track-ussr" aria-label="Soviet Union missions"></div>
+    </div>
+  </main>
+
+  <!-- Minimap -->
+  <nav class="minimap" id="minimap" aria-label="Timeline navigation">
+    <div class="minimap-track" id="minimap-track">
+      <div class="minimap-viewport" id="minimap-viewport"></div>
+    </div>
+  </nav>
+
+  <!-- Expanded Card Overlay -->
+  <div class="card-overlay" id="card-overlay" role="dialog" aria-modal="true" aria-label="Mission details" aria-hidden="true">
+    <div class="expanded-card" id="expanded-card">
+      <button class="close-btn" aria-label="Close mission details">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+      <div id="expanded-content"></div>
+    </div>
+  </div>
+
+  <script src="./app.js" defer></script>
+</body>
+</html>

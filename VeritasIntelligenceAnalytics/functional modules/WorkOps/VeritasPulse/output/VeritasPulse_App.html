@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VeritasPulse · VPL</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#5e7032">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f4f0;--panel:#fbfaf7;--panel-alt:#f0eee8;--ink:#1a1916;--ink-soft:#56524a;--ink-faint:#8f897c;
+  --line:#e2dfd6;--line-strong:#cfcabd;--accent:#5e7032;--accent-soft:#e2e6d0;--olive:#7e9150;--amber:#9a6b2f;--amber-soft:#efe2cd;
+  --rust:#8a3b2e;--rust-soft:#efd9d2;--blue:#35506b;--blue-soft:#d9e1e9;--plum:#5d4566;--teal:#2f6b6b;
+  --green:#3a7d44;--red:#c0392b;--yellow:#c99a23;--radius:10px;--radius-sm:6px;
+  --shadow:0 1px 2px rgba(26,25,22,.04),0 4px 16px rgba(26,25,22,.05);
+  --shadow-lift:0 2px 6px rgba(26,25,22,.06),0 12px 32px rgba(26,25,22,.08);
+  --fd:'Syne',sans-serif;--fb:'DM Sans',sans-serif;--fm:'DM Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--fb);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(circle at 12% 8%,rgba(58,90,64,.025),transparent 38%),radial-gradient(circle at 88% 92%,rgba(53,80,107,.022),transparent 42%)}
+.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+.sidebar{background:var(--panel);border-right:1px solid var(--line);padding:22px 16px;display:flex;flex-direction:column;gap:20px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand .mark{font-family:var(--fd);font-weight:800;font-size:20px;letter-spacing:-.02em;display:flex;align-items:center;gap:9px}
+.brand .mark .dot{width:9px;height:9px;border-radius:2px;background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.brand .sub{font-family:var(--fm);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);padding-left:18px;margin-top:3px}
+.nav-group{display:flex;flex-direction:column;gap:2px}
+.nav-label{font-family:var(--fm);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);padding:0 10px 6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--radius-sm);color:var(--ink-soft);cursor:pointer;font-weight:500;transition:.15s;position:relative}
+.nav-item svg{width:15px;height:15px;flex:none;stroke-width:1.7}
+.nav-item:hover{background:var(--panel-alt);color:var(--ink)}
+.nav-item.active{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.nav-item.active::before{content:"";position:absolute;left:-16px;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--accent);border-radius:0 2px 2px 0}
+.nav-item .badge{margin-left:auto;font-family:var(--fm);font-size:10px;background:var(--panel-alt);color:var(--ink-faint);padding:1px 6px;border-radius:20px}
+.nav-item.active .badge{background:#fff;color:var(--accent)}
+.main{display:flex;flex-direction:column;min-width:0}
+.topbar{display:flex;align-items:center;gap:12px;padding:15px 26px;border-bottom:1px solid var(--line);background:rgba(251,250,247,.7);backdrop-filter:blur(8px);position:sticky;top:0;z-index:30}
+.topbar h1{font-family:var(--fd);font-weight:700;font-size:18px}
+.topbar .date{font-family:var(--fm);font-size:11px;color:var(--ink-faint)}
+.topbar .spacer{flex:1}
+.btn{font-family:var(--fb);font-weight:600;font-size:12px;border:1px solid var(--line-strong);background:var(--panel);color:var(--ink);padding:8px 13px;border-radius:var(--radius-sm);cursor:pointer;display:flex;align-items:center;gap:7px;transition:.15s}
+.btn svg{width:14px;height:14px;stroke-width:1.8}
+.btn:hover{background:var(--panel-alt)}
+.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn.sm{padding:5px 9px;font-size:11px}
+.dd{position:relative}
+.dd-menu{position:absolute;top:calc(100% + 6px);right:0;background:var(--panel);border:1px solid var(--line-strong);border-radius:var(--radius-sm);box-shadow:var(--shadow-lift);min-width:150px;padding:5px;z-index:40;display:none}
+.dd-menu.open{display:block}
+.dd-opt{padding:7px 10px;border-radius:var(--radius-sm);cursor:pointer;font-size:12px}
+.dd-opt:hover{background:var(--panel-alt)}
+.dd-opt.sel{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.canvas{padding:22px 26px 40px}
+.grid{display:grid;grid-template-columns:1.5fr 1fr;gap:20px;align-items:start}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}
+.panel-h{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.panel-h h2{font-family:var(--fd);font-weight:700;font-size:14px}
+.panel-h .tag{font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);border:1px solid var(--line);padding:2px 7px;border-radius:20px}
+.panel-h .spacer{flex:1}
+.panel-b{padding:16px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:15px 16px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.kpi .strip{position:absolute;left:0;top:0;bottom:0;width:3px}
+.kpi .lbl{font-family:var(--fm);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint)}
+.kpi .val{font-family:var(--fd);font-weight:700;font-size:26px;margin-top:6px}
+.kpi .val small{font-size:13px;color:var(--ink-faint);font-weight:600}
+.kpi .delta{font-family:var(--fm);font-size:10px;margin-top:4px}
+/* sequence lights */
+.seq-row{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.seq-row:last-child{border-bottom:none}
+.lamp{width:11px;height:11px;border-radius:50%;background:var(--line-strong)}
+.lamp.done{background:var(--green);box-shadow:0 0 0 3px rgba(58,125,68,.15)}
+.lamp.active{background:var(--yellow);box-shadow:0 0 0 3px rgba(201,154,35,.15);animation:blink 1.4s infinite}
+.lamp.blocked{background:var(--red);box-shadow:0 0 0 3px rgba(192,57,43,.15)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.seq-t{font-weight:600;font-size:12.5px}.seq-m{font-family:var(--fm);font-size:9.5px;color:var(--ink-faint);margin-top:2px}
+.pill{font-family:var(--fm);font-size:9px;letter-spacing:.06em;text-transform:uppercase;padding:3px 9px;border-radius:20px}
+.pill.done{background:rgba(58,125,68,.12);color:var(--green)}.pill.active{background:rgba(201,154,35,.14);color:#8a6a16}
+.pill.blocked{background:rgba(192,57,43,.12);color:var(--red)}.pill.waiting{background:var(--panel-alt);color:var(--ink-faint)}
+.bar-wrap{height:7px;background:var(--panel-alt);border-radius:20px;overflow:hidden}
+.bar-wrap > div{height:100%;border-radius:20px}
+/* checklist */
+.chk{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.chk:last-child{border-bottom:none}
+.box{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--line-strong);cursor:pointer;flex:none;display:grid;place-items:center;transition:.12s}
+.box.on{background:var(--accent);border-color:var(--accent)}
+.box.on svg{width:11px;height:11px;color:#fff;stroke-width:3}
+.chk .t{font-weight:500;font-size:13px}.chk.done .t{text-decoration:line-through;color:var(--ink-faint)}
+.chk .due{margin-left:auto;font-family:var(--fm);font-size:10px;color:var(--ink-faint)}
+.prio{font-family:var(--fm);font-size:9px;padding:2px 7px;border-radius:20px}
+.prio.high{background:var(--rust-soft);color:var(--rust)}.prio.med{background:var(--amber-soft);color:#7a531f}.prio.low{background:var(--panel-alt);color:var(--ink-faint)}
+/* calendar */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden}
+.cal-hd{background:var(--panel-alt);padding:8px;text-align:center;font-family:var(--fm);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
+.cal-cell{background:var(--panel);min-height:78px;padding:6px 7px;display:flex;flex-direction:column;gap:3px}
+.cal-cell.dim{background:var(--bg);color:var(--ink-faint)}
+.cal-cell.today{box-shadow:inset 0 0 0 2px var(--accent)}
+.cal-num{font-family:var(--fm);font-size:11px}
+.cal-ev{font-size:9.5px;padding:2px 5px;border-radius:4px;border-left:2px solid;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ev-focus{background:var(--amber-soft);border-color:var(--amber);color:#7a531f}.ev-meeting{background:var(--blue-soft);border-color:var(--blue);color:var(--blue)}
+.ev-task{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+/* kanban */
+.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.col-h{display:flex;align-items:center;gap:7px;margin-bottom:10px;font-family:var(--fm);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+.col-h .pip{width:8px;height:8px;border-radius:2px}.col-h .cnt{margin-left:auto;color:var(--ink-faint)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-sm);padding:10px;margin-bottom:9px;box-shadow:var(--shadow)}
+.card .ct{font-weight:600;font-size:12px;margin-bottom:6px;line-height:1.35}
+.chip{font-family:var(--fm);font-size:9px;padding:2px 7px;border-radius:20px;background:var(--accent-soft);color:var(--accent)}
+.card .est{font-family:var(--fm);font-size:9.5px;color:var(--ink-faint);float:right}
+/* gantt */
+.gantt-row{display:grid;grid-template-columns:180px 1fr;align-items:center;height:34px}
+.gantt-name{font-size:12px;font-weight:500;padding-right:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px}
+.gantt-track{position:relative;height:100%;display:flex;align-items:center}
+.gbar{position:absolute;height:17px;border-radius:5px;cursor:pointer;overflow:hidden;transition:.15s}
+.gbar:hover{filter:brightness(1.1)}
+.gbar .pg{position:absolute;left:0;top:0;bottom:0;background:rgba(255,255,255,.28)}
+/* flow */
+.flow-wrap{position:relative;height:420px;background:var(--panel);border-radius:var(--radius-sm);overflow:hidden;background-image:radial-gradient(var(--line) 1px,transparent 1px);background-size:20px 20px}
+.flow-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.fnode{position:absolute;background:var(--panel);border:1.5px solid var(--line-strong);border-radius:8px;padding:10px 13px;min-width:120px;box-shadow:var(--shadow);cursor:grab;user-select:none;z-index:2}
+.fnode.start{border-color:var(--green);background:rgba(58,125,68,.06)}.fnode.end{border-color:var(--rust);background:var(--rust-soft)}
+.fnode .ft{font-weight:600;font-size:12px}.fnode .fm{font-family:var(--fm);font-size:9px;color:var(--ink-faint);margin-top:2px}
+.fdel{position:absolute;top:-7px;right:-7px;width:18px;height:18px;border-radius:50%;background:var(--rust);color:#fff;display:none;place-items:center;font-size:12px;line-height:1;cursor:pointer;z-index:3}
+.flow-wrap.editing .fnode .fdel{display:grid}
+.fnode.connect-src{box-shadow:0 0 0 3px var(--accent)}
+.flow-wrap.connecting .fnode{cursor:crosshair}
+.flow-tools{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.edge-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.edge-chip{font-family:var(--fm);font-size:10px;background:var(--panel-alt);border:1px solid var(--line);border-radius:20px;padding:3px 6px 3px 10px;display:flex;align-items:center;gap:6px}
+.edge-chip .x{cursor:pointer;color:var(--rust);font-size:13px;line-height:1}
+/* ledger */
+.ltbl{width:100%;border-collapse:collapse;font-size:12px}
+.ltbl th{text-align:left;font-family:var(--fm);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);padding:8px 6px;border-bottom:1px solid var(--line)}
+.ltbl td{padding:8px 6px;border-bottom:1px solid var(--line)}
+.ltbl td.amt{font-family:var(--fm);text-align:right}
+.neg{color:var(--rust)}.pos{color:var(--accent)}
+/* generic note rows */
+.note-row{display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-bottom:1px solid var(--line)}
+.note-row:last-child{border-bottom:none}
+.note-row .d{width:8px;height:8px;border-radius:50%;margin-top:5px;flex:none}
+.note-row .nt{font-weight:600;font-size:12.5px}.note-row .nm{font-family:var(--fm);font-size:10px;color:var(--ink-faint);margin-top:1px}
+.legend{display:flex;gap:14px;margin-top:13px;padding-top:12px;border-top:1px solid var(--line)}
+.legend span{display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--ink-soft);font-family:var(--fm)}
+.legend i{width:9px;height:9px;border-radius:2px}
+/* modal + toast */
+.scrim{position:fixed;inset:0;background:rgba(26,25,22,.32);backdrop-filter:blur(2px);z-index:100;display:none;align-items:flex-start;justify-content:center;padding-top:90px}
+.scrim.open{display:flex}
+.modal{background:var(--panel);border:1px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow-lift);width:460px;overflow:hidden}
+.modal-h{display:flex;align-items:center;padding:15px 18px;border-bottom:1px solid var(--line)}
+.modal-h h3{font-family:var(--fd);font-weight:700;font-size:15px}.modal-h .x{margin-left:auto;cursor:pointer;color:var(--ink-faint)}
+.modal-b{padding:18px;display:flex;flex-direction:column;gap:13px}
+.field label{font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);display:block;margin-bottom:5px}
+.field input,.field select{width:100%;border:1px solid var(--line-strong);background:var(--panel-alt);border-radius:var(--radius-sm);padding:9px 11px;font-family:var(--fb);font-size:13px;color:var(--ink);outline:none}
+.preset-row{display:flex;gap:7px;flex-wrap:wrap}
+.preset{font-family:var(--fm);font-size:10px;padding:5px 10px;border:1px solid var(--line-strong);border-radius:20px;cursor:pointer}
+.preset:hover{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.modal-f{display:flex;gap:10px;justify-content:flex-end;padding:14px 18px;border-top:1px solid var(--line);background:var(--panel-alt)}
+.toast-zone{position:fixed;right:24px;bottom:24px;display:flex;flex-direction:column;gap:10px;z-index:120}
+.toast{background:var(--panel);border:1px solid var(--line-strong);border-left:4px solid var(--amber);border-radius:var(--radius);box-shadow:var(--shadow-lift);padding:13px 15px;width:300px;display:flex;gap:11px;animation:slidein .3s cubic-bezier(.2,.9,.3,1)}
+@keyframes slidein{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+.toast .ic{width:30px;height:30px;border-radius:8px;background:var(--amber-soft);display:grid;place-items:center;flex:none}
+.toast .ic svg{width:16px;height:16px;color:var(--amber);stroke-width:1.9}
+.toast .tt{font-weight:600;font-size:12.5px}.toast .tm{font-size:11px;color:var(--ink-soft);margin-top:2px}.toast .tx{margin-left:auto;cursor:pointer;color:var(--ink-faint);font-size:16px;line-height:1}
+.footer{display:flex;align-items:center;gap:14px;padding:13px 26px;border-top:1px solid var(--line);font-family:var(--fm);font-size:9.5px;letter-spacing:.06em;color:var(--ink-faint)}
+.footer .spacer{flex:1}.footer b{color:var(--ink-soft);font-weight:500}
+/* ===== flexible dashboard widget grid (irregular) ===== */
+.wgrid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;grid-auto-flow:dense}
+.w{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}
+.w-h{display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--line)}
+.w-h .t{font-family:var(--fd);font-weight:700;font-size:13px}
+.w-h .tag{margin-left:auto;font-family:var(--fm);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);border:1px solid var(--line);padding:2px 7px;border-radius:20px}
+.w-b{padding:14px;flex:1}
+.span3{grid-column:span 3}.span4{grid-column:span 4}.span5{grid-column:span 5}.span6{grid-column:span 6}.span7{grid-column:span 7}.span8{grid-column:span 8}.span12{grid-column:span 12}
+/* live clock */
+.clock-main{font-family:var(--fd);font-weight:800;font-size:clamp(26px,3vw,40px);letter-spacing:-.03em;line-height:1;white-space:nowrap;font-variant-numeric:tabular-nums}
+.clock-sub{font-family:var(--fm);font-size:11px;color:var(--ink-faint);margin-top:6px}
+.clock-tz{font-family:var(--fm);font-size:10px;color:var(--accent);margin-top:2px}
+.wclock{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid var(--line)}
+.wclock:last-child{border-bottom:none}
+.wclock .city{font-size:12px;font-weight:500}.wclock .zone{font-family:var(--fm);font-size:9px;color:var(--ink-faint);margin-left:6px}
+.wclock .wt{font-family:var(--fm);font-size:15px;font-weight:500}
+.wclock .wt small{font-size:9px;color:var(--ink-faint)}
+/* news ticker */
+.news-item{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);text-decoration:none;color:inherit;animation:slidein .4s ease}
+.news-item:last-child{border-bottom:none}
+.news-item:hover .hl{color:var(--accent)}
+.news-time{font-family:var(--fm);font-size:10px;color:var(--ink-faint);white-space:nowrap;padding-top:1px;width:42px;flex:none}
+.news-src{font-family:var(--fm);font-size:9px;padding:1px 6px;border-radius:20px;background:var(--panel-alt);color:var(--ink-soft);white-space:nowrap;height:fit-content}
+.news-item.important .news-src{background:var(--rust-soft);color:var(--rust)}
+.hl{font-size:12.5px;font-weight:500;line-height:1.35}
+.news-item.important .hl::before{content:"●";color:var(--rust);font-size:8px;vertical-align:middle;margin-right:5px}
+.news-marq{height:152px;overflow:hidden;position:relative}
+.news-run{animation:newsrun 16s linear infinite}
+.news-marq:hover .news-run{animation-play-state:paused}
+@keyframes newsrun{from{transform:translateY(0)}to{transform:translateY(-50%)}}
+.set-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.set-field{margin-bottom:13px}
+.set-field label{font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);display:block;margin-bottom:5px}
+.set-field input,.set-field select{width:100%;border:1px solid var(--line-strong);background:var(--panel-alt);border-radius:6px;padding:8px 10px;font-family:var(--fb);font-size:12.5px;color:var(--ink);outline:none}
+.set-field input[type=color]{height:38px;padding:3px;cursor:pointer}
+.set-toggles{display:flex;flex-wrap:wrap;gap:7px}
+.set-tog{font-family:var(--fb);font-size:11px;padding:5px 10px;border:1px solid var(--line-strong);border-radius:20px;cursor:pointer}
+.set-tog.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+/* ===== modern micro-interactions (有感動畫) ===== */
+.w,.panel,.card,.kpi,.conn,.meet-row,.att-card,.contact-row{transition:transform .16s cubic-bezier(.2,.9,.3,1),box-shadow .16s ease,background .15s ease}
+.w:hover,.panel:hover{transform:translateY(-2px);box-shadow:var(--shadow-lift)}
+.card:hover,.conn:hover{transform:translateY(-2px);box-shadow:var(--shadow-lift)}
+.btn,.tap,.selchip,.nav-item,.prov,.seg button{transition:transform .12s ease,background .15s ease,color .15s ease,border-color .15s ease,box-shadow .15s ease}
+.btn:active,.tap:active,.selchip:active,.preset:active{transform:translateY(1px) scale(.98)}
+.nav-item:active{transform:translateX(1px)}
+.gbar,.gs-bar,.bar-wrap>div,.wk-seg{transition:filter .15s ease}
+@keyframes viewIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.canvas .wgrid>*,.canvas>.panel,.canvas .grid>*,.canvas .notes-wrap>*,.canvas .kanban>*{animation:viewIn .34s cubic-bezier(.2,.9,.3,1) both}
+.canvas .wgrid>*:nth-child(1),.canvas .grid>*:nth-child(1){animation-delay:0s}
+.canvas .wgrid>*:nth-child(2),.canvas .grid>*:nth-child(2){animation-delay:.04s}
+.canvas .wgrid>*:nth-child(3){animation-delay:.08s}.canvas .wgrid>*:nth-child(4){animation-delay:.11s}
+.canvas .wgrid>*:nth-child(5){animation-delay:.14s}.canvas .wgrid>*:nth-child(6){animation-delay:.17s}
+.canvas .wgrid>*:nth-child(7){animation-delay:.2s}.canvas .wgrid>*:nth-child(8){animation-delay:.22s}
+.canvas .wgrid>*:nth-child(n+9){animation-delay:.24s}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* attention smart panel */
+.att{display:flex;flex-direction:column;gap:8px}
+.att-card{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--line);background:var(--panel-alt);position:relative}
+.att-card.urgent{background:var(--rust-soft);border-color:#e0bdb4}
+.att-card.behind{background:var(--amber-soft);border-color:#e3c7a0}
+.att-ic{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;flex:none;background:#fff}
+.att-ic svg{width:15px;height:15px;stroke-width:1.9}
+.att-t{font-weight:600;font-size:12.5px}.att-m{font-family:var(--fm);font-size:9.5px;color:var(--ink-soft);margin-top:1px}
+.att-badge{margin-left:auto;font-family:var(--fm);font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:20px;font-weight:600}
+.b-urgent{background:var(--rust);color:#fff}.b-behind{background:var(--amber);color:#fff}.b-new{background:var(--accent);color:#fff}
+.chg-dot{position:absolute;top:8px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--accent);animation:blink 1.4s infinite}
+.mini-kpi{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.mk{padding:10px;border-radius:var(--radius-sm);background:var(--panel-alt)}
+.mk .v{font-family:var(--fd);font-weight:700;font-size:22px}.mk .l{font-family:var(--fm);font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-faint)}
+/* help overlay */
+.help{position:fixed;inset:0;background:rgba(26,25,22,.4);backdrop-filter:blur(3px);z-index:200;display:none;align-items:center;justify-content:center;padding:30px}
+.help.open{display:flex}
+.help-card{background:var(--panel);border:1px solid var(--line-strong);border-radius:14px;box-shadow:var(--shadow-lift);max-width:560px;width:100%;max-height:84vh;overflow:auto;padding:26px 28px}
+.help-card h3{font-family:var(--fd);font-weight:800;font-size:22px;display:flex;align-items:center;gap:10px}
+.help-step{display:flex;gap:13px;padding:13px 0;border-bottom:1px solid var(--line)}
+.help-step:last-child{border-bottom:none}
+.help-n{width:26px;height:26px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-family:var(--fm);font-weight:500;font-size:12px;flex:none}
+.help-step .ht{font-weight:600;font-size:13px}.help-step .hd{font-size:12px;color:var(--ink-soft);margin-top:2px}
+/* contacts */
+.contact-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.contact-row:last-child{border-bottom:none}
+.avatar{width:34px;height:34px;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-family:var(--fd);font-weight:700;font-size:14px;flex:none}
+.contact-row .cn{font-weight:600;font-size:13px}.contact-row .cr{font-family:var(--fm);font-size:10px;color:var(--ink-faint)}
+.contact-row .ch{margin-left:auto;font-family:var(--fm);font-size:10px;color:var(--accent);background:var(--accent-soft);padding:4px 9px;border-radius:6px;text-decoration:none}
+/* segmented toggle (reduce typing) */
+.seg{display:flex;background:var(--panel-alt);border-radius:8px;padding:3px;gap:3px}
+.seg button{flex:1;border:none;background:none;padding:7px;border-radius:6px;font-family:var(--fb);font-size:12px;font-weight:600;color:var(--ink-soft);cursor:pointer}
+.seg button.on{background:var(--panel);color:var(--accent);box-shadow:var(--shadow)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.selchip{font-family:var(--fb);font-size:11.5px;padding:6px 11px;border:1px solid var(--line-strong);border-radius:20px;cursor:pointer;transition:.12s}
+.selchip:hover{background:var(--panel-alt)}
+.selchip.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+/* ===== responsive / auto layout optimization ===== */
+.brand .mark{font-size:clamp(15px,1.4vw,18px);letter-spacing:-.03em;white-space:nowrap}
+.w-h .t{font-size:clamp(12px,1.1vw,13px)}
+.w-ic{width:24px;height:24px;border-radius:6px;background:var(--accent-soft);display:grid;place-items:center;flex:none}
+.w-ic svg{width:14px;height:14px;stroke-width:1.8;color:var(--accent)}
+/* weather */
+.wx{display:flex;align-items:center;gap:14px}
+.wx-temp{font-family:var(--fd);font-weight:800;font-size:clamp(28px,3vw,40px);line-height:1}
+.wx-ico{font-size:34px;line-height:1}
+.wx-desc{font-family:var(--fm);font-size:11px;color:var(--ink-soft);margin-top:3px}
+.wx-loc{font-family:var(--fm);font-size:9.5px;color:var(--ink-faint);margin-top:2px}
+.wx-row{display:flex;gap:14px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.wx-row div{font-family:var(--fm);font-size:10px;color:var(--ink-faint)}
+.wx-row b{display:block;font-family:var(--fd);font-size:14px;color:var(--ink);font-weight:700}
+/* weekly stacked bars */
+.wk{display:flex;align-items:flex-end;gap:9px;height:130px;padding-top:6px}
+.wk-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%}
+.wk-stack{flex:1;width:100%;display:flex;flex-direction:column;justify-content:flex-end;gap:2px}
+.wk-seg{border-radius:3px 3px 0 0;width:100%}
+.wk-lbl{font-family:var(--fm);font-size:9px;color:var(--ink-faint)}
+/* sidebar collapse */
+.app.collapsed{grid-template-columns:64px 1fr}
+.app.collapsed .sidebar .brand .sub,.app.collapsed .nav-label,.app.collapsed .nav-item span:not(.badge):not(.sync-dot),.app.collapsed .sidebar > div:last-child .svc,.app.collapsed .sidebar > div:last-child .ts{display:none}
+.app.collapsed .nav-item{justify-content:center}
+.app.collapsed .brand .mark{font-size:0}
+.app.collapsed .brand .mark .dot{margin:0 auto}
+.collapse-btn{position:absolute;top:14px;right:-11px;width:22px;height:22px;border-radius:50%;background:var(--panel);border:1px solid var(--line-strong);display:grid;place-items:center;cursor:pointer;z-index:5;box-shadow:var(--shadow)}
+.collapse-btn svg{width:13px;height:13px;stroke-width:2;color:var(--ink-soft)}
+.sidebar{position:relative}
+/* ===== notes (Notion/AppFlowy style) ===== */
+.notes-wrap{display:grid;grid-template-columns:230px 1fr;gap:16px;align-items:start}
+.notes-tree{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:10px}
+.nt-node{user-select:none}
+.nt-row{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:6px;cursor:pointer;font-size:12.5px}
+.nt-row:hover{background:var(--panel-alt)}
+.nt-row.sel{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.nt-tw{width:14px;height:14px;display:grid;place-items:center;transition:transform .15s;color:var(--ink-faint)}
+.nt-tw.open{transform:rotate(90deg)}
+.nt-children{margin-left:14px;border-left:1px solid var(--line);padding-left:4px;overflow:hidden}
+.nt-children.closed{display:none}
+.note-doc{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 26px;min-height:320px}
+.md h1{font-family:var(--fd);font-size:24px;font-weight:800;margin:0 0 12px}
+.md h2{font-family:var(--fd);font-size:18px;font-weight:700;margin:18px 0 9px}
+.md h3{font-family:var(--fd);font-size:15px;font-weight:700;margin:14px 0 7px}
+.md p{margin:8px 0;font-size:13.5px;line-height:1.6}
+.md ul{margin:8px 0 8px 4px;padding-left:18px}.md li{margin:4px 0;font-size:13.5px}
+.md code{font-family:var(--fm);font-size:12px;background:var(--panel-alt);padding:1px 5px;border-radius:4px}
+.md a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent-soft)}
+.md .chk{padding:3px 0;border:none}
+.note-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.note-ta{width:100%;min-height:320px;border:1px solid var(--line-strong);background:var(--panel-alt);border-radius:8px;padding:14px;font-family:var(--fm);font-size:12.5px;line-height:1.65;color:var(--ink);outline:none;resize:vertical;margin-top:10px}
+.note-ta:focus{border-color:var(--accent);background:var(--panel)}
+.blk-dd{position:relative}
+.blk-menu{position:absolute;top:calc(100% + 5px);left:0;background:var(--panel);border:1px solid var(--line-strong);border-radius:8px;box-shadow:var(--shadow-lift);min-width:190px;padding:5px;z-index:50;display:none}
+.blk-menu.open{display:block;animation:viewIn .16s ease both}
+.blk-opt{display:flex;gap:9px;align-items:center;padding:7px 10px;border-radius:6px;cursor:pointer;font-size:12.5px}
+.blk-opt:hover{background:var(--accent-soft);color:var(--accent)}
+.blk-opt .k{font-family:var(--fm);font-size:9px;color:var(--ink-faint);margin-left:auto}
+/* ===== unified timeline (時間相連) ===== */
+.tl{position:relative;padding-left:20px}
+.tl::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.tl-date{font-family:var(--fm);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin:16px 0 6px}
+.tl-item{position:relative;display:flex;align-items:flex-start;gap:11px;padding:8px 0;border-bottom:1px solid var(--line)}
+.tl-item:last-child{border-bottom:none}
+.tl-dot{position:absolute;left:-19px;top:12px;width:10px;height:10px;border-radius:50%;border:2px solid var(--bg)}
+.tl-time{font-family:var(--fm);font-size:10px;color:var(--ink-faint);width:44px;flex:none;padding-top:1px}
+.tl-type{font-family:var(--fm);font-size:8px;padding:1px 7px;border-radius:10px;height:fit-content;white-space:nowrap;margin-top:1px}
+.tl-title{font-size:12.5px;font-weight:500}
+.tl-item.clk{cursor:pointer}.tl-item.clk:hover .tl-title{color:var(--accent)}
+/* notebook */
+.nb-msgs{display:flex;flex-direction:column;gap:11px;max-height:340px;overflow:auto;padding:4px}
+.nb-msg{padding:11px 13px;border-radius:10px;font-size:13px;line-height:1.5;max-width:88%}
+.nb-msg.u{background:var(--accent-soft);align-self:flex-end}
+.nb-msg.a{background:var(--panel-alt);align-self:flex-start}
+.nb-msg .who{font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:4px}
+.nb-input{display:flex;gap:9px;margin-top:12px}
+.nb-input input{flex:1;border:1px solid var(--line-strong);background:var(--panel-alt);border-radius:8px;padding:10px 12px;font-family:var(--fb);font-size:13px;outline:none}
+/* matrix */
+.mtx{width:100%;border-collapse:separate;border-spacing:4px}
+.mtx th{font-family:var(--fm);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);padding:6px;text-align:center;font-weight:500}
+.mtx td.name{text-align:left;font-weight:600;font-size:12.5px;white-space:nowrap;padding-right:10px}
+.mtx .cell{border-radius:6px;height:40px;position:relative;display:grid;place-items:center;font-family:var(--fm);font-size:11px;font-weight:500;color:var(--ink)}
+.kind-tag{font-family:var(--fm);font-size:8px;padding:1px 6px;border-radius:20px;margin-left:7px;vertical-align:middle}
+.kind-project{background:var(--accent-soft);color:var(--accent)}.kind-personal{background:var(--blue-soft);color:var(--blue)}
+/* connections */
+.conn{display:flex;align-items:center;gap:13px;padding:13px;border:1px solid var(--line);border-radius:var(--radius);margin-bottom:11px;background:var(--panel)}
+.conn .logo{width:38px;height:38px;border-radius:9px;display:grid;place-items:center;font-family:var(--fd);font-weight:800;font-size:15px;color:#fff;flex:none}
+.conn .cn{font-weight:600;font-size:13.5px}.conn .cs{font-family:var(--fm);font-size:10px;color:var(--ink-faint);margin-top:2px}
+.conn .act{margin-left:auto}
+.dotk{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
+/* ===== meetings + fast review ===== */
+.meet-row{display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.meet-row:last-child{border-bottom:none}
+.meet-row:hover{background:var(--panel-alt)}
+.meet-ic{width:38px;height:38px;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;flex:none}
+.meet-ic svg{width:18px;height:18px;stroke-width:1.8}
+.meet-t{font-weight:600;font-size:13.5px}.meet-m{font-family:var(--fm);font-size:10px;color:var(--ink-faint);margin-top:2px}
+.rev{max-width:620px;margin:0 auto}
+.rev-prog{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.rev-prog .n{font-family:var(--fm);font-size:11px;color:var(--ink-faint)}
+.rev-card{background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--line-strong);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px}
+.rev-card.Decision{border-left-color:var(--blue)}.rev-card.Discussion{border-left-color:var(--ink-faint)}
+.rev-card.Action{border-left-color:var(--rust)}.rev-card.Risk{border-left-color:var(--amber)}
+.rev-time{font-family:var(--fm);font-size:11px;color:var(--ink-faint)}
+.rev-text{font-size:16px;line-height:1.5;margin:8px 0 16px;font-weight:500}
+.rev-lbl{font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin:12px 0 6px}
+.tapgrid{display:flex;flex-wrap:wrap;gap:7px}
+.tap{font-family:var(--fb);font-size:13px;font-weight:600;padding:9px 14px;border:1px solid var(--line-strong);border-radius:9px;cursor:pointer;background:var(--panel);transition:.12s}
+.tap:hover{background:var(--panel-alt)}
+.tap.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tap.cat-Decision.on{background:var(--blue);border-color:var(--blue)}.tap.cat-Action.on{background:var(--rust);border-color:var(--rust)}
+.tap.cat-Risk.on{background:var(--amber);border-color:var(--amber)}.tap.cat-Discussion.on{background:var(--ink-faint);border-color:var(--ink-faint)}
+.rev-nav{display:flex;justify-content:space-between;margin-top:18px}
+.min-sec{margin-bottom:18px}
+.min-sec h3{font-family:var(--fd);font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.min-item{display:flex;gap:9px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px}
+.min-item:last-child{border-bottom:none}
+.min-item .own{margin-left:auto;font-family:var(--fm);font-size:10px;color:var(--ink-faint);white-space:nowrap}
+.min-item .mk-task{font-family:var(--fm);font-size:10px;color:var(--accent);cursor:pointer;white-space:nowrap;border:1px solid var(--accent-soft);padding:2px 7px;border-radius:5px;margin-left:8px}
+/* ===== standardized brand icon system ===== */
+.brand-tile{width:40px;height:40px;border-radius:11px;background:#fff;border:1px solid var(--line);box-shadow:0 1px 2px rgba(26,25,22,.05),0 2px 6px rgba(26,25,22,.05);display:grid;place-items:center;flex:none}
+.brand-tile svg{width:24px;height:24px;display:block}
+.brand-tile.sm{width:28px;height:28px;border-radius:8px}.brand-tile.sm svg{width:17px;height:17px}
+.brand-tile.dark{background:#1a1916;border-color:#1a1916}
+/* LLM provider toggles */
+.prov-bar{display:flex;flex-wrap:wrap;gap:8px;padding:10px 0 14px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.prov{display:flex;align-items:center;gap:8px;padding:6px 10px 6px 6px;border:1px solid var(--line-strong);border-radius:30px;cursor:pointer;background:var(--panel);transition:.15s}
+.prov.on{border-color:var(--accent);background:var(--accent-soft)}
+.prov.active{box-shadow:0 0 0 2px var(--accent)}
+.prov .pn{font-size:12px;font-weight:600}
+.prov .sw{width:30px;height:17px;border-radius:20px;background:var(--line-strong);position:relative;transition:.15s;flex:none}
+.prov.on .sw{background:var(--accent)}
+.prov .sw::after{content:"";position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#fff;transition:.15s}
+.prov.on .sw::after{left:15px}
+/* ===== merged status strip (time + weather + world) — consolidated, secondary ===== */
+.cstrip{background:var(--panel)}
+.cstrip .w-b{padding:11px 16px}
+.cstrip-in{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.cstrip-clock{display:flex;align-items:baseline;gap:10px}
+.cstrip-time{font-family:var(--fd);font-weight:800;font-size:clamp(20px,2.2vw,28px);font-variant-numeric:tabular-nums;letter-spacing:-.02em;white-space:nowrap}
+.cstrip-date{font-family:var(--fm);font-size:10px;color:var(--ink-faint)}
+.cstrip-tz{font-family:var(--fm);font-size:9px;color:var(--accent)}
+.cstrip-wx .wx{gap:9px}.cstrip-wx .wx-ico{font-size:22px}.cstrip-wx .wx-temp{font-size:21px}
+.cstrip-wx .wx-desc{font-size:10px}.cstrip-wx .wx-loc{font-size:9px}.cstrip-wx .wx-row{display:none}
+.cstrip-div{width:1px;align-self:stretch;background:var(--line)}
+.cstrip-world{margin-left:auto;display:flex;gap:18px;flex-wrap:wrap}
+.cstrip-wc{font-family:var(--fm);font-size:9.5px;color:var(--ink-faint);text-align:right}
+.cstrip-wc b{display:block;font-size:13px;color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+/* ===== project overview hero (PM emphasis) ===== */
+.ov{display:flex;gap:18px;align-items:center}
+.ov-ring{width:96px;height:96px;flex:none}
+.ov-stats{display:grid;grid-template-columns:1fr 1fr;gap:9px;flex:1}
+.ov-st{background:var(--panel-alt);border-radius:8px;padding:8px 10px}
+.ov-st .v{font-family:var(--fd);font-weight:700;font-size:18px}
+.ov-st .l{font-family:var(--fm);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
+.ov-ms{margin-top:12px;padding-top:11px;border-top:1px solid var(--line);display:flex;align-items:center;gap:9px;font-size:12px}
+.ov-ms .lab{font-family:var(--fm);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
+.ov-ms .due{margin-left:auto;font-family:var(--fm);font-size:11px;color:var(--amber)}
+.ms-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.ms-row:last-child{border-bottom:none}
+.ms-dot{width:9px;height:9px;border-radius:50%;flex:none}
+.ms-row .mn{font-weight:600;font-size:12.5px}.ms-row .md{font-family:var(--fm);font-size:10px;color:var(--ink-faint)}
+.ms-row .mdue{margin-left:auto;font-family:var(--fm);font-size:10.5px}
+.gs-row{display:grid;grid-template-columns:130px 1fr;align-items:center;height:26px}
+.gs-name{font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:8px;display:flex;align-items:center;gap:6px}
+.gs-track{position:relative;height:100%;display:flex;align-items:center}
+.gs-bar{position:absolute;height:13px;border-radius:4px;overflow:hidden}
+.gs-bar .pg{position:absolute;left:0;top:0;bottom:0;background:rgba(255,255,255,.3)}
+.topbar h1{font-size:clamp(15px,1.8vw,18px)}
+@media (max-width:1100px){
+  .wgrid{grid-template-columns:repeat(6,1fr)}
+  .span3,.span4,.span5{grid-column:span 3}
+  .span6,.span7,.span8{grid-column:span 6}
+  .grid{grid-template-columns:1fr}
+  .kanban{grid-template-columns:repeat(2,1fr)!important}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:760px){
+  .app{grid-template-columns:1fr}
+  .sidebar{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;gap:10px;padding:12px 14px}
+  .sidebar .nav-group{flex-direction:row;flex-wrap:wrap;gap:4px}
+  .nav-label{display:none}.nav-item.active::before{display:none}
+  .sidebar > div:last-child{display:none}
+  .wgrid{grid-template-columns:1fr;gap:12px}
+  .span3,.span4,.span5,.span6,.span7,.span8,.span12{grid-column:span 1}
+  .kanban{grid-template-columns:1fr!important}.kpis{grid-template-columns:1fr}
+  .canvas{padding:16px 14px 30px}.topbar{padding:12px 14px}
+  .gantt-row{grid-template-columns:120px 1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="collapse-btn" id="collapseBtn" title="收合側欄"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 6l-6 6 6 6"/></svg></div>
+    <div class="brand"><div class="mark"><span class="dot"></span>VeritasPulse</div><div class="sub" id="brandSub">VPL · Veritas v1</div></div>
+    <div id="nav"></div>
+    <div id="syncCard" style="margin-top:auto;background:var(--panel-alt);border:1px solid var(--line);border-radius:var(--radius);padding:10px"></div>
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <div><h1 id="viewTitle">Dashboard</h1><div class="date" id="topDate"></div></div>
+      <div class="spacer"></div>
+      <div class="dd">
+        <button class="btn" id="ddBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/></svg><span id="ddLabel">30 天</span></button>
+        <div class="dd-menu" id="ddMenu"><div class="dd-opt" data-d="7">7 天</div><div class="dd-opt" data-d="14">14 天</div><div class="dd-opt sel" data-d="30">30 天</div><div class="dd-opt" data-d="90">90 天</div></div>
+      </div>
+      <button class="btn sm" id="exportBtn" title="匯出資料"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg></button>
+      <button class="btn sm" id="importBtn" title="匯入資料"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 15V3M7 8l5-5 5 5M5 21h14"/></svg></button>
+      <input type="file" id="importFile" accept="application/json" style="display:none">
+      <button class="btn" id="helpBtn" title="操作引導"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.8.4-1 .9-1 1.7M12 17h.01"/></svg></button>
+      <button class="btn primary" id="qcBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg>建立</button>
+    </header>
+    <div class="canvas" id="canvas"></div>
+    <footer class="footer"><b>VeritasPulse v1.0</b><span id="footProj"></span><div class="spacer"></div><span>VIA Visual Lock v1</span><span>Syne · DM Sans · DM Mono</span></footer>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"><div class="modal">
+  <div class="modal-h"><h3>建立</h3><svg class="x" id="qcClose" viewBox="0 0 24 24" fill="none" stroke="currentColor" width="18" height="18"><path d="M18 6L6 18M6 6l12 12"/></svg></div>
+  <div class="modal-b">
+    <div class="field"><label>類型(專案 / 單一事件)</label>
+      <div class="seg" id="qcMode"><button class="on" data-m="event">單一事件</button><button data-m="project">專案</button></div></div>
+    <div class="field"><label>分類 — 點選即可,免打字</label><div class="chips" id="qcCat">
+      <span class="selchip on" data-c="Focus">⏱ Focus</span><span class="selchip" data-c="Task">✓ Task</span>
+      <span class="selchip" data-c="Meeting">👥 Meeting</span><span class="selchip" data-c="Milestone">◆ Milestone</span>
+      <span class="selchip" data-c="Risk">⚠ Risk</span><span class="selchip" data-c="Budget">$ Budget</span></div></div>
+    <div class="field"><label>範本(自動帶標題)</label><div class="preset-row">
+      <span class="preset" data-f="Focus block · 90m">Focus 90m</span><span class="preset" data-f="Pomodoro · 25m">Pomodoro</span>
+      <span class="preset" data-f="VIA review">VIA review</span><span class="preset" data-f="LL handbook entry">LL entry</span>
+      <span class="preset" data-f="Daily shutdown">Shutdown</span></div></div>
+    <div class="field"><label>標題(可留範本帶入)</label><input id="qcTitle" placeholder="點上面範本,或自行輸入…"></div>
+    <div class="field-row" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="field"><label>優先 / 狀態</label><select id="qcPrio"><option>常態 Normal</option><option>緊急 Urgent</option><option>落後 Behind</option></select></div>
+      <div class="field"><label>提醒</label><select id="qcRemind"><option>準時</option><option>提前 10 分</option><option>提前 30 分</option><option>提前 1 天</option></select></div>
+    </div>
+  </div>
+  <div class="modal-f"><button class="btn" id="qcCancel">取消</button><button class="btn primary" id="qcSave">建立並排程</button></div>
+</div></div>
+
+<div class="help" id="help"><div class="help-card">
+  <h3><span class="dot" style="width:11px;height:11px;border-radius:3px;background:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)"></span>操作引導</h3>
+  <p style="color:var(--ink-soft);font-size:12.5px;margin:6px 0 12px">VeritasPulse 盡量用點選、下拉、勾選完成所有動作,降低打字。</p>
+  <div class="help-step"><span class="help-n">1</span><div><div class="ht">首頁 Dashboard</div><div class="hd">即時時鐘、世界時間、新聞跑馬燈、智慧 Attention 面板(自動抓緊急/過期/落後並高亮變動)。彈性 widget grid。</div></div></div>
+  <div class="help-step"><span class="help-n">2</span><div><div class="ht">建立(右上 + 鈕)</div><div class="hd">選「單一事件」或「專案」→ 點分類 → 點範本帶標題 → 下拉設提醒。幾乎不用打字。</div></div></div>
+  <div class="help-step"><span class="help-n">3</span><div><div class="ht">左側導覽(樹枝狀)</div><div class="hd">按群組分類:執行 / 規劃 / 財務 / 人 / 風險。點群組標題可收合。</div></div></div>
+  <div class="help-step"><span class="help-n">4</span><div><div class="ht">圖像化操作</div><div class="hd">甘特點 bar 看細節、流程拖節點箭頭跟隨、清單勾選即完成。新聞點標題開連結。</div></div></div>
+  <div class="help-step"><span class="help-n">5</span><div><div class="ht">隨時叫出</div><div class="hd">右上 ? 鈕任何時候打開本引導。</div></div></div>
+  <div class="modal-f" style="margin:16px -28px -26px"><button class="btn primary" id="helpClose">開始使用</button></div>
+</div></div>
+<div class="toast-zone" id="toastZone"></div>
+
+<script>
+const VPL_DATA = {"project": {"id": 1, "code": "VPL-DEMO-01", "name": "VIA Visual Lock v1 — Closeout", "owner": "Tony", "start": "2026-05-01", "finish": "2026-06-20", "status": "active", "summary": "Formalise the VIA design-DNA spec and close the VDF/VRN PanoramaFix 278-issue backlog across a 5-wave, risk-tiered plan.", "tasks": [{"id": 1, "project_id": 1, "name": "VRN Fetch v4 — BRIDGE integration", "start": "2026-05-01", "finish": "2026-05-12", "progress": 1.0, "status": "done", "lane": "VRN"}, {"id": 2, "project_id": 1, "name": "M01 TIFF → PDF migration", "start": "2026-05-03", "finish": "2026-05-10", "progress": 1.0, "status": "done", "lane": "VRN"}, {"id": 3, "project_id": 1, "name": "Celeritas v1.1 lazy modules", "start": "2026-05-06", "finish": "2026-05-14", "progress": 1.0, "status": "done", "lane": "VIA"}, {"id": 4, "project_id": 1, "name": "Visual Lock — forbidden list", "start": "2026-05-12", "finish": "2026-05-31", "progress": 0.82, "status": "active", "lane": "VIA"}, {"id": 5, "project_id": 1, "name": "PanoramaFix — wave 1-2", "start": "2026-05-13", "finish": "2026-05-22", "progress": 1.0, "status": "done", "lane": "VIA"}, {"id": 6, "project_id": 1, "name": "PanoramaFix — wave 3 verify", "start": "2026-05-22", "finish": "2026-06-04", "progress": 0.65, "status": "active", "lane": "VIA"}, {"id": 7, "project_id": 1, "name": "Module Standard v1.0 S0-S7", "start": "2026-06-04", "finish": "2026-06-16", "progress": 0.0, "status": "blocked", "lane": "VIA"}, {"id": 8, "project_id": 1, "name": "ConformanceAudit tooling", "start": "2026-06-10", "finish": "2026-06-20", "progress": 0.0, "status": "waiting", "lane": "VIA"}], "milestones": [{"id": 1, "project_id": 1, "name": "Visual Lock spec frozen", "due": "2026-05-31", "hit": 0}, {"id": 2, "project_id": 1, "name": "PanoramaFix closeout (applied>0)", "due": "2026-06-04", "hit": 0}, {"id": 3, "project_id": 1, "name": "Module Standard GA", "due": "2026-06-20", "hit": 0}], "budget": [{"id": 1, "project_id": 1, "category": "Engineering hours", "planned": 120000.0, "actual": 98500.0}, {"id": 2, "project_id": 1, "category": "Compute / infra", "planned": 18000.0, "actual": 14200.0}, {"id": 3, "project_id": 1, "category": "Tooling / licences", "planned": 9000.0, "actual": 9000.0}, {"id": 4, "project_id": 1, "category": "Contingency", "planned": 15000.0, "actual": 3000.0}], "risks": [{"id": 1, "project_id": 1, "name": "wave-3 patch fails applied>0 gate", "probability": 3, "impact": 5, "owner": "Tony", "status": "active"}, {"id": 2, "project_id": 1, "name": "numpy 2.0 leak into vpl_core", "probability": 2, "impact": 4, "owner": "Tony", "status": "active"}, {"id": 3, "project_id": 1, "name": "Seaborn/matplotlib pin drift", "probability": 2, "impact": 3, "owner": "Tony", "status": "watch"}, {"id": 4, "project_id": 1, "name": "Google API quota on sync", "probability": 2, "impact": 2, "owner": "Tony", "status": "watch"}, {"id": 5, "project_id": 1, "name": "Font fallback breaks brand render", "probability": 4, "impact": 2, "owner": "Tony", "status": "active"}], "stakeholders": [{"id": 1, "project_id": 1, "name": "Tony (Owner/Architect)", "power": 5, "interest": 5, "role": "Decision", "category": "Manage Closely"}, {"id": 2, "project_id": 1, "name": "VIA downstream consumers", "power": 2, "interest": 5, "role": "Affected", "category": "Keep Informed"}, {"id": 3, "project_id": 1, "name": "Future maintainers", "power": 3, "interest": 4, "role": "Affected", "category": "Keep Informed"}, {"id": 4, "project_id": 1, "name": "Anthropic tooling", "power": 2, "interest": 2, "role": "Support", "category": "Monitor"}], "resources": [{"id": 1, "project_id": 1, "name": "Tony", "load": 0.92, "capacity": 1.0, "url": "", "kind": "human"}, {"id": 2, "project_id": 1, "name": "vpl_core CI", "load": 0.4, "capacity": 1.0, "url": "https://ci.local/vpl", "kind": "api"}, {"id": 3, "project_id": 1, "name": "via_plot_basic", "load": 0.3, "capacity": 1.0, "url": "", "kind": "env"}, {"id": 4, "project_id": 1, "name": "VRN Fetch API", "load": 0.5, "capacity": 1.0, "url": "https://vrn.local/api/fetch", "kind": "api"}], "flow_nodes": [{"id": 1, "project_id": 1, "node_key": "n1", "label": "Scan VDF/VRN", "meta": "START", "kind": "start", "x": 40, "y": 170}, {"id": 2, "project_id": 1, "node_key": "n2", "label": "AST 分析", "meta": "VPN M02", "kind": "step", "x": 250, "y": 90}, {"id": 3, "project_id": 1, "node_key": "n3", "label": "Risk 分級", "meta": "7 layers", "kind": "step", "x": 250, "y": 250}, {"id": 4, "project_id": 1, "node_key": "n4", "label": "SafePatch", "meta": "applied>0?", "kind": "decision", "x": 470, "y": 170}, {"id": 5, "project_id": 1, "node_key": "n5", "label": "Closeout", "meta": "END", "kind": "end", "x": 680, "y": 170}], "flow_edges": [{"id": 1, "project_id": 1, "src": "n1", "dst": "n2"}, {"id": 2, "project_id": 1, "src": "n1", "dst": "n3"}, {"id": 3, "project_id": 1, "src": "n2", "dst": "n4"}, {"id": 4, "project_id": 1, "src": "n3", "dst": "n4"}, {"id": 5, "project_id": 1, "src": "n4", "dst": "n5"}], "ledger": [{"id": 1, "project_id": 1, "day": "2026-05-04", "item": "GPU compute hrs", "category": "Compute / infra", "amount": -1800.0}, {"id": 2, "project_id": 1, "day": "2026-05-09", "item": "python-pptx licence", "category": "Tooling / licences", "amount": 0.0}, {"id": 3, "project_id": 1, "day": "2026-05-13", "item": "Contractor — wave1", "category": "Engineering hours", "amount": -6200.0}, {"id": 4, "project_id": 1, "day": "2026-05-20", "item": "Storage tier", "category": "Compute / infra", "amount": -640.0}, {"id": 5, "project_id": 1, "day": "2026-05-27", "item": "Contractor — wave2", "category": "Engineering hours", "amount": -7100.0}], "checklist": [{"id": 1, "project_id": 1, "item": "Confirm PanoramaFix wave-3 applied>0", "done": 0, "priority": "high", "due": "2026-05-31"}, {"id": 2, "project_id": 1, "item": "Freeze Visual Lock forbidden list", "done": 0, "priority": "high", "due": "2026-05-31"}, {"id": 3, "project_id": 1, "item": "Review Aegis import-time round 2", "done": 0, "priority": "med", "due": "2026-05-31"}, {"id": 4, "project_id": 1, "item": "Daily shutdown review", "done": 1, "priority": "low", "due": "2026-05-31"}, {"id": 5, "project_id": 1, "item": "Tag VRN Fetch v4 release", "done": 1, "priority": "med", "due": "2026-05-30"}], "events": [{"id": 1, "project_id": 1, "title": "Visual Lock — forbidden list closeout", "day": "2026-05-31", "at_time": "09:30", "kind": "focus", "remind_min": 10, "source": "vtn"}, {"id": 2, "project_id": 1, "title": "Sync — VRN Fetch v4 review", "day": "2026-05-31", "at_time": "11:00", "kind": "meeting", "remind_min": 15, "source": "gcal"}, {"id": 3, "project_id": 1, "title": "PanoramaFix wave-3 verify", "day": "2026-05-31", "at_time": "14:00", "kind": "focus", "remind_min": 30, "source": "vtn"}, {"id": 4, "project_id": 1, "title": "LL handbook — document LL#34", "day": "2026-05-31", "at_time": "16:30", "kind": "task", "remind_min": 10, "source": "vtn"}], "contacts": [{"id": 1, "project_id": 1, "name": "Tony", "role": "Owner / Architect", "org": "VIA", "channel": "email", "handle": "tony@via", "tags": "decision,core"}, {"id": 2, "project_id": 1, "name": "VRN Maintainer", "role": "Maintainer", "org": "VIA/VRN", "channel": "slack", "handle": "#vrn-fetch", "tags": "affected"}, {"id": 3, "project_id": 1, "name": "Infra On-call", "role": "Compute", "org": "VIA", "channel": "slack", "handle": "#infra", "tags": "support"}, {"id": 4, "project_id": 1, "name": "Anthropic Tooling", "role": "Support", "org": "Anthropic", "channel": "email", "handle": "support@", "tags": "support"}], "news": [{"id": 1, "day": "2026-05-31", "at_time": "08:55", "source": "鉅亨網", "headline": "台股開盤走勢與權值股動向", "url": "https://www.cnyes.com/", "urgency": "important", "kind": "market"}, {"id": 2, "day": "2026-05-31", "at_time": "08:40", "source": "Yahoo奇摩股市", "headline": "美股收盤與台積電 ADR 變化", "url": "https://tw.stock.yahoo.com/", "urgency": "normal", "kind": "market"}, {"id": 3, "day": "2026-05-31", "at_time": "08:10", "source": "CNBC", "headline": "Fed commentary and rate outlook", "url": "https://www.cnbc.com/", "urgency": "important", "kind": "macro"}, {"id": 4, "day": "2026-05-31", "at_time": "07:30", "source": "鉅亨網", "headline": "外資買賣超與期貨未平倉", "url": "https://www.cnyes.com/", "urgency": "normal", "kind": "market"}, {"id": 5, "day": "2026-05-30", "at_time": "21:15", "source": "CNBC", "headline": "Tech earnings recap", "url": "https://www.cnbc.com/", "urgency": "normal", "kind": "tech"}], "news_sources": [{"id": 1, "name": "CNBC", "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html", "enabled": 1}, {"id": 2, "name": "Yahoo奇摩股市", "url": "https://tw.stock.yahoo.com/rss", "enabled": 1}, {"id": 3, "name": "鉅亨網", "url": "https://www.cnyes.com/rss", "enabled": 1}], "team": [{"id": 1, "project_id": 1, "name": "Tony", "role": "Architect / Lead", "allocation": 0.92, "current": "Visual Lock closeout", "status": "active"}, {"id": 2, "project_id": 1, "name": "VRN Maintainer", "role": "Engineer", "allocation": 0.55, "current": "VRN Fetch v4", "status": "active"}, {"id": 3, "project_id": 1, "name": "Infra On-call", "role": "DevOps", "allocation": 0.3, "current": "Compute monitoring", "status": "active"}, {"id": 4, "project_id": 1, "name": "Reviewer", "role": "QA / Review", "allocation": 0.2, "current": "PanoramaFix verify", "status": "waiting"}], "weeklog": [{"id": 1, "project_id": 1, "dow": "Mon", "focus": 1.5, "deep": 3.2, "meeting": 0.9}, {"id": 2, "project_id": 1, "dow": "Tue", "focus": 2.0, "deep": 2.7, "meeting": 0.6}, {"id": 3, "project_id": 1, "dow": "Wed", "focus": 1.2, "deep": 3.6, "meeting": 1.2}, {"id": 4, "project_id": 1, "dow": "Thu", "focus": 2.3, "deep": 2.8, "meeting": 0.5}, {"id": 5, "project_id": 1, "dow": "Fri", "focus": 1.8, "deep": 3.3, "meeting": 0.8}, {"id": 6, "project_id": 1, "dow": "Sat", "focus": 2.6, "deep": 2.0, "meeting": 0.3}, {"id": 7, "project_id": 1, "dow": "Sun", "focus": 0.7, "deep": 0.9, "meeting": 0.0}], "notes": [{"id": 1, "parent_id": 0, "title": "VIA 知識庫", "body": "# VIA 知識庫\n\nVeritas Intelligence Analytics 的中央筆記。\n\n- 子頁可**樹枝狀展開**\n- 支援 *Markdown*\n- 連結 [docs](https://example)", "kind": "page", "ord": 1}, {"id": 4, "parent_id": 0, "title": "個人規劃", "body": "# 個人規劃\n\n非專案的個人計畫與筆記。", "kind": "page", "ord": 2}, {"id": 2, "parent_id": 1, "title": "Visual Lock v1", "body": "## Visual Lock v1\n\n設計 DNA 規範。\n\n**配色**\n- 暖白 `#f5f4f0`\n- 橄欖綠 `#5e7032`\n\n**字體**: Syne / DM Sans / DM Mono\n\n**Forbidden**\n- 無紫色漸層\n- 無標題底線", "kind": "page", "ord": 1}, {"id": 3, "parent_id": 1, "title": "LL Handbook", "body": "## Lesson Learned\n\n- LL#10: 區塊註解內不可有 `<#`\n- LL#16: numba/ortools 需 Py<=3.12\n- LL#21: 永久隔離 venv\n- LL#25: Celeritas lazy import 13x", "kind": "page", "ord": 2}, {"id": 5, "parent_id": 4, "title": "本週重點", "body": "## 本週重點\n\n1. 關閉 PanoramaFix wave-3\n2. 凍結 Visual Lock\n3. VeritasPulse S1", "kind": "page", "ord": 1}, {"id": 6, "parent_id": 4, "title": "閱讀清單", "body": "## 閱讀清單\n\n- [ ] Notion API docs\n- [ ] AppFlowy 架構\n- [x] Open-Meteo API", "kind": "page", "ord": 2}], "plans": [{"id": 1, "name": "VIA Visual Lock", "kind": "project", "phases": [["Spec", 100], ["Forbidden", 82], ["Apply", 40], ["Audit", 0]]}, {"id": 2, "name": "PanoramaFix", "kind": "project", "phases": [["Wave1", 100], ["Wave2", 100], ["Wave3", 65], ["Closeout", 0]]}, {"id": 3, "name": "VRN Fetch v4", "kind": "project", "phases": [["Design", 100], ["Build", 100], ["BRIDGE", 100], ["Ship", 90]]}, {"id": 4, "name": "VeritasPulse 學習", "kind": "personal", "phases": [["Plan", 100], ["Build", 70], ["Test", 50], ["Ship", 10]]}, {"id": 5, "name": "健康 / 作息", "kind": "personal", "phases": [["規劃", 100], ["執行", 60], ["回顧", 30], ["優化", 0]]}], "meetings": [{"id": 1, "project_id": 1, "title": "VRN Fetch v4 — 設計審查會議", "day": "2026-05-31", "attendees": "Tony, VRN Maintainer, Reviewer", "status": "review"}], "segments": [{"id": 1, "meeting_id": 1, "ord": 1, "at_time": "00:00", "text": "今天審查 VRN Fetch v4 的 BRIDGE 整合與 ControlCenter UI。", "category": "Discussion", "speaker": "Tony", "action": 0, "keypt": 0, "confirmed": 1}, {"id": 2, "meeting_id": 1, "ord": 2, "at_time": "00:42", "text": "MDL010 到 MDL014 已全部接上 BRIDGE,測試 21/21 PASS。", "category": "Decision", "speaker": "VRN Maintainer", "action": 0, "keypt": 1, "confirmed": 1}, {"id": 3, "meeting_id": 1, "ord": 3, "at_time": "01:30", "text": "我們決定 M01 維持 PDF 流程,TIFF 不再保留 fallback。", "category": "Decision", "speaker": "Tony", "action": 0, "keypt": 1, "confirmed": 1}, {"id": 4, "meeting_id": 1, "ord": 4, "at_time": "02:15", "text": "ControlCenter 的即時狀態燈號需要補上 error 重試計數。", "category": "Action", "speaker": "Reviewer", "action": 1, "keypt": 0, "confirmed": 0}, {"id": 5, "meeting_id": 1, "ord": 5, "at_time": "03:05", "text": "風險:numpy 2.0 若洩漏進 vpl_core 會破壞相依。", "category": "Risk", "speaker": "Tony", "action": 0, "keypt": 1, "confirmed": 1}, {"id": 6, "meeting_id": 1, "ord": 6, "at_time": "03:48", "text": "下週前要完成 ControlCenter 重試計數並補單元測試。", "category": "Action", "speaker": "VRN Maintainer", "action": 1, "keypt": 0, "confirmed": 0}, {"id": 7, "meeting_id": 1, "ord": 7, "at_time": "04:30", "text": "討論是否把 Fetch 重試上限做成可設定參數。", "category": "Discussion", "speaker": "Reviewer", "action": 0, "keypt": 0, "confirmed": 1}, {"id": 8, "meeting_id": 1, "ord": 8, "at_time": "05:12", "text": "決議:重試上限預設 3,可由設定檔覆寫。", "category": "Decision", "speaker": "Tony", "action": 0, "keypt": 1, "confirmed": 1}, {"id": 9, "meeting_id": 1, "ord": 9, "at_time": "05:55", "text": "Action:Reviewer 補寫 ControlCenter 的 e2e 測試腳本。", "category": "Action", "speaker": "Reviewer", "action": 1, "keypt": 0, "confirmed": 0}, {"id": 10, "meeting_id": 1, "ord": 10, "at_time": "06:40", "text": "風險:Google API 配額在大量同步時可能受限。", "category": "Risk", "speaker": "VRN Maintainer", "action": 0, "keypt": 0, "confirmed": 0}], "minutes": [{"id": 1, "meeting_id": 1, "summary": "本次會議共 10 段,含 3 項決議、3 項行動、2 項風險。", "actions": "[{\"text\": \"ControlCenter 的即時狀態燈號需要補上 error 重試計數。\", \"owner\": \"Reviewer\"}, {\"text\": \"下週前要完成 ControlCenter 重試計數並補單元測試。\", \"owner\": \"VRN Maintainer\"}, {\"text\": \"Action:Reviewer 補寫 ControlCenter 的 e2e 測試腳本。\", \"owner\": \"Reviewer\"}]", "decisions": "[\"MDL010 到 MDL014 已全部接上 BRIDGE,測試 21/21 PASS。\", \"我們決定 M01 維持 PDF 流程,TIFF 不再保留 fallback。\", \"決議:重試上限預設 3,可由設定檔覆寫。\"]", "discussion": "[\"今天審查 VRN Fetch v4 的 BRIDGE 整合與 ControlCenter UI。\", \"討論是否把 Fetch 重試上限做成可設定參數。\"]"}]}, "modules": [{"id": "dash", "group": "INTEL", "label": "Dashboard", "icon": "grid", "enabled": true}, {"id": "today", "group": "EXEC", "label": "每日清單", "icon": "check", "enabled": true}, {"id": "cal", "group": "EXEC", "label": "月曆 Calendar", "icon": "cal", "enabled": true}, {"id": "timeline", "group": "EXEC", "label": "時間軸 Timeline", "icon": "dots", "enabled": true}, {"id": "board", "group": "EXEC", "label": "看板 Board", "icon": "rows", "enabled": true}, {"id": "gantt", "group": "PLAN", "label": "甘特 Gantt", "icon": "rows", "enabled": true}, {"id": "flow", "group": "PLAN", "label": "流程 Flow", "icon": "flow", "enabled": true}, {"id": "seq", "group": "EXEC", "label": "燈號 Sequence", "icon": "dots", "enabled": true}, {"id": "budget", "group": "FIN", "label": "預算 Budget", "icon": "chart", "enabled": true}, {"id": "ledger", "group": "FIN", "label": "記帳 Ledger", "icon": "coins", "enabled": true}, {"id": "people", "group": "PEOPLE", "label": "利害關係人", "icon": "users", "enabled": true}, {"id": "contacts", "group": "PEOPLE", "label": "聯絡人 Contacts", "icon": "users", "enabled": true}, {"id": "team", "group": "PEOPLE", "label": "團隊 Team", "icon": "users", "enabled": true}, {"id": "notes", "group": "NOTES", "label": "筆記 Notes", "icon": "book", "enabled": true}, {"id": "notebook", "group": "NOTES", "label": "LLM Notebook", "icon": "ai", "enabled": true}, {"id": "matrix", "group": "INTEL", "label": "進度矩陣 Matrix", "icon": "grid", "enabled": true}, {"id": "connect", "group": "EXEC", "label": "連線 Connections", "icon": "flow", "enabled": true}, {"id": "meetings", "group": "MEETINGS", "label": "會議 Meetings", "icon": "users", "enabled": true}, {"id": "review", "group": "MEETINGS", "label": "逐字稿審閱", "icon": "check", "enabled": true}, {"id": "minutes", "group": "MEETINGS", "label": "會議紀錄 Minutes", "icon": "book", "enabled": true}, {"id": "settings", "group": "SYS", "label": "BASE 設定", "icon": "gauge", "enabled": true}, {"id": "res", "group": "PEOPLE", "label": "資源 Resources", "icon": "gauge", "enabled": true}, {"id": "risk", "group": "RISK", "label": "風險 Risk", "icon": "alert", "enabled": true}], "groups": {"INTEL": "Intelligence", "EXEC": "執行", "PLAN": "規劃", "FIN": "財務", "PEOPLE": "人與關係", "RISK": "風險", "NOTES": "筆記與計畫", "MEETINGS": "會議", "SYS": "系統"}, "config": {"brand": "VeritasPulse", "brand_sub": "VPL · Veritas v1", "accent": "#5e7032", "default_minutes_mode": "comprehensive", "modules": {}, "llm_providers": [{"k": "openai", "name": "ChatGPT", "on": true, "endpoint": ""}, {"k": "claude", "name": "Claude", "on": true, "endpoint": ""}, {"k": "gemini", "name": "Gemini", "on": false, "endpoint": ""}, {"k": "copilot", "name": "Copilot", "on": false, "endpoint": ""}, {"k": "notion", "name": "Notion", "on": false, "endpoint": ""}], "news_sources": [{"name": "CNBC", "url": "https://www.cnbc.com/", "enabled": true}, {"name": "Yahoo奇摩股市", "url": "https://tw.stock.yahoo.com/", "enabled": true}, {"name": "鉅亨網", "url": "https://www.cnyes.com/", "enabled": true}], "world_clocks": ["Asia/Taipei", "America/New_York", "Europe/London", "Asia/Tokyo"], "weather_default": {"lat": 25.04, "lon": 121.56, "name": "Taipei"}, "pwa": true}};
+const P = VPL_DATA.project, MODS = VPL_DATA.modules, GROUPS = VPL_DATA.groups;
+const CFG = VPL_DATA.config || {};
+const ICONS = {
+  grid:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>',
+  check:'<path d="M20 6L9 17l-5-5"/>', cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  rows:'<path d="M3 5h18M3 12h18M3 19h18"/>', flow:'<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/><path d="M10 7h4a2 2 0 0 1 2 2v5"/>',
+  dots:'<circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/><path d="M12 7v3M12 14v3"/>',
+  chart:'<path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/>', coins:'<circle cx="8" cy="8" r="5"/><path d="M18.1 6.3a5 5 0 0 1 0 9.4M14.5 21a5 5 0 0 0 0-9.4"/>',
+  users:'<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0M16 6a3 3 0 0 1 0 6"/>', gauge:'<path d="M12 14l4-4M5 18a9 9 0 1 1 14 0"/>',
+  alert:'<path d="M12 2L2 20h20L12 2zM12 9v5M12 17v.5"/>',
+  book:'<path d="M4 4v16a1 1 0 0 0 1 1h14V3H7a3 3 0 0 0-3 3z"/><path d="M7 3v18"/>',
+  ai:'<path d="M12 3l1.8 4.2L18 9l-4.2 1.8L12 15l-1.8-4.2L6 9l4.2-1.8z"/><path d="M19 14l.9 2.1L22 17l-2.1.9L19 20l-.9-2.1L16 17l2.1-.9z"/>'
+};
+const STATUS_COL = {done:'var(--accent)',active:'var(--amber)',blocked:'var(--rust)',waiting:'var(--ink-faint)'};
+// standardized brand icons (self-drawn SVG, brand colours, uniform tile)
+const BRAND = {
+  gdrive:'<svg viewBox="0 0 24 24"><path d="M9 3l-6.5 11h6.7L15.6 3z" fill="#FFCF48"/><path d="M2.5 14L5.8 20h11.9l-3.3-6z" fill="#1DA462"/><path d="M21.5 14L15 3H9.1l6.6 11z" fill="#4688F4"/></svg>',
+  gcal:'<svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2.5" fill="#fff" stroke="#E1E3E6"/><path d="M4 9.5h16V7.5A2.5 2.5 0 0 0 17.5 5h-11A2.5 2.5 0 0 0 4 7.5z" fill="#4688F4"/><text x="12" y="17.5" font-size="8.5" font-weight="700" text-anchor="middle" fill="#4688F4" font-family="Arial">31</text></svg>',
+  gcontacts:'<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3.5" fill="#fff" stroke="#E1E3E6"/><circle cx="12" cy="10" r="2.7" fill="#4688F4"/><path d="M6.7 17.5a5.3 5.3 0 0 1 10.6 0z" fill="#4688F4"/></svg>',
+  gmail:'<svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2" fill="#fff" stroke="#E1E3E6"/><path d="M3.5 7l8.5 6 8.5-6" fill="none" stroke="#EA4335" stroke-width="2.2"/></svg>',
+  dropbox:'<svg viewBox="0 0 24 24"><g fill="#0061FF"><path d="M7 3.5L2 7l5 3.5L12 7z"/><path d="M17 3.5L12 7l5 3.5L22 7z"/><path d="M2 14l5 3.5L12 14 7 10.5z"/><path d="M17 10.5L12 14l5 3.5L22 14z"/><path d="M7 18.7l5-3.3 5 3.3-5 3.3z" opacity=".85"/></g></svg>',
+  onedrive:'<svg viewBox="0 0 24 24"><path d="M9 18a4 4 0 0 1-.6-7.96A5.2 5.2 0 0 1 18 11a3.5 3.5 0 0 1-.5 7z" fill="#0F78D4"/><path d="M9 18h8.5a3.5 3.5 0 0 0 .5-6.98A5 5 0 0 0 9.2 10z" fill="#28A8EA"/></svg>',
+  notion:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3.5" fill="#fff" stroke="#1a1916" stroke-width="1.4"/><path d="M8 16V8.3l8 7.4V8" stroke="#1a1916" stroke-width="1.7" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>',
+  focalboard:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2.5" fill="#fff" stroke="#E1E3E6"/><rect x="5.5" y="6.5" width="3.4" height="9" rx="1" fill="#1DA462"/><rect x="10.3" y="6.5" width="3.4" height="6" rx="1" fill="#4688F4"/><rect x="15.1" y="6.5" width="3.4" height="11" rx="1" fill="#9A6B2F"/></svg>',
+  slack:'<svg viewBox="0 0 24 24"><g><rect x="10.5" y="3" width="3" height="9" rx="1.5" fill="#36C5F0"/><rect x="3" y="10.5" width="9" height="3" rx="1.5" fill="#2EB67D"/><rect x="12" y="10.5" width="9" height="3" rx="1.5" fill="#ECB22E"/><rect x="10.5" y="12" width="3" height="9" rx="1.5" fill="#E01E5A"/></g></svg>',
+  openai:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5" fill="#10A37F"/><path d="M12 6.5l4.5 2.6v5.2L12 17l-4.5-2.7V9.1z" fill="none" stroke="#fff" stroke-width="1.4"/><path d="M12 6.5v5.5l4.5 2.6M12 12l-4.5 2.6" stroke="#fff" stroke-width="1.4" fill="none"/></svg>',
+  claude:'<svg viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#D97757"/><g stroke="#fff" stroke-width="1.5" stroke-linecap="round"><path d="M12 5v14M5 12h14M7 7l10 10M17 7L7 17"/></g></svg>',
+  gemini:'<svg viewBox="0 0 24 24"><path d="M12 2c.4 4.8 5.2 9.6 10 10-4.8.4-9.6 5.2-10 10-.4-4.8-5.2-9.6-10-10 4.8-.4 9.6-5.2 10-10z" fill="#4688F4"/><path d="M12 7c.2 2.6 2.4 4.8 5 5-2.6.2-4.8 2.4-5 5-.2-2.6-2.4-4.8-5-5 2.6-.2 4.8-2.4 5-5z" fill="#9168E0"/></svg>',
+  copilot:'<svg viewBox="0 0 24 24"><path d="M5 13a4 4 0 0 1 4-4h2a4 4 0 0 1 4 4 3 3 0 0 1-3 3H8a3 3 0 0 1-3-3z" fill="#0A7ABF"/><path d="M14 11a4 4 0 0 1 4-4 3 3 0 0 1 3 3 4 4 0 0 1-4 4 3 3 0 0 1-3-3z" fill="#1FB6A8"/></svg>',
+  notion_ai:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3.5" fill="#fff" stroke="#1a1916" stroke-width="1.4"/><path d="M8 16V8.3l8 7.4V8" stroke="#1a1916" stroke-width="1.7" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>',
+  outlook:'<svg viewBox="0 0 24 24"><rect x="10" y="5" width="11" height="14" rx="1.5" fill="#fff" stroke="#0F6CBD" stroke-width="1.2"/><path d="M10 8l5.5 3.5L21 8" fill="none" stroke="#0F6CBD" stroke-width="1.4"/><rect x="2" y="6" width="11" height="12" rx="2.5" fill="#0F6CBD"/><text x="7.5" y="15" font-size="8.5" font-weight="700" text-anchor="middle" fill="#fff" font-family="Arial">O</text></svg>',
+};
+function brand(key,cls=""){const dark=key==="notion"?"":"";return `<span class="brand-tile ${cls}">${BRAND[key]||ICONS.grid}</span>`}
+const LANE_COL = {VIA:'var(--accent)',VRN:'var(--blue)',VGF:'var(--amber)'};
+const esc = s => String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const $ = (s,r=document)=>r.querySelector(s);
+
+// ---------- nav (from registry) ----------
+function buildNav(){
+  const byG = {}; MODS.forEach(m=>{(byG[m.group]=byG[m.group]||[]).push(m)});
+  let h='';
+  Object.keys(byG).forEach(g=>{
+    h+=`<div class="nav-group"><div class="nav-label">${esc(GROUPS[g]||g)}</div>`;
+    byG[g].forEach(m=>{
+      const badge = m.id==='board'?`<span class="badge">${P.tasks.length}</span>`:m.id==='today'?`<span class="badge">${P.checklist.filter(c=>!c.done).length}</span>`:'';
+      h+=`<div class="nav-item" data-view="${m.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS[m.icon]||ICONS.grid}</svg>${esc(m.label)}${badge}</div>`;
+    });
+    h+='</div>';
+  });
+  $('#nav').innerHTML=h;
+  document.querySelectorAll('.nav-item').forEach(it=>it.addEventListener('click',()=>show(it.dataset.view)));
+}
+function show(id){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active',n.dataset.view===id));
+  const m = MODS.find(x=>x.id===id)||MODS[0];
+  $('#viewTitle').textContent = m.label;
+  $('#canvas').innerHTML='';
+  (RENDER[id]||(()=>{}))($('#canvas'));
+  if(id==='flow') drawFlow();
+}
+
+// ---------- helpers ----------
+function panel(title,tag,bodyHtml){return `<div class="panel"><div class="panel-h"><h2>${esc(title)}</h2>${tag?`<span class="tag">${esc(tag)}</span>`:''}</div><div class="panel-b">${bodyHtml}</div></div>`}
+function money(v){return (v<0?'-$':'$')+Math.abs(v/1000).toFixed(1)+'k'}
+const sumBudget = k => P.budget.reduce((a,b)=>a+b[k],0);
+
+// ---------- renderers ----------
+const RENDER = {};
+const REF_DATE = "2026-05-31";
+const WORLD = [["Taipei","Asia/Taipei"],["New York","America/New_York"],["London","Europe/London"],["Tokyo","Asia/Tokyo"]];
+function localTZ(){try{return Intl.DateTimeFormat().resolvedOptions().timeZone}catch(e){return "UTC"}}
+function tzTime(tz){try{return new Intl.DateTimeFormat("en-GB",{timeZone:tz,hour:"2-digit",minute:"2-digit"}).format(new Date())}catch(e){return "--:--"}}
+function attention(){
+  const out=[];
+  P.tasks.forEach(t=>{
+    if(t.status==="blocked") out.push({k:"urgent",t:t.name,m:"blocked · 受阻",chg:true});
+    else if(t.status==="active" && t.finish<REF_DATE) out.push({k:"urgent",t:t.name,m:"overdue · 過期 ("+t.finish+")",chg:true});
+    else if(t.status==="active" && t.progress<0.5) out.push({k:"behind",t:t.name,m:Math.round(t.progress*100)+"% · 落後",chg:false});
+  });
+  P.checklist.filter(c=>!c.done && c.priority==="high").forEach(c=>out.push({k:"urgent",t:c.item,m:"high priority · 未完成",chg:true}));
+  return out.slice(0,5);
+}
+function newsRecent(){
+  const cut=new Date(REF_DATE); cut.setDate(cut.getDate()-2);
+  return P.news.filter(n=>new Date(n.day)>=cut);  // 2-day window, older auto-dropped
+}
+RENDER.dash = el=>{
+  const tasks=P.tasks, done=tasks.filter(t=>t.status==="done").length;
+  const pct=Math.round(tasks.reduce((a,t)=>a+t.progress,0)/tasks.length*100);
+  const used=Math.round(sumBudget("actual")/sumBudget("planned")*100);
+  const openRisk=P.risks.filter(r=>r.status==="active").length;
+  const blocked=tasks.filter(t=>t.status==="blocked").length;
+  const att=attention();
+  const ic=k=>`<span class="w-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS[k]||ICONS.grid}</svg></span>`;
+  const wh=(icon,t,tag)=>`<div class="w-h">${ic(icon)}<span class="t">${t}</span>${tag?`<span class="tag">${tag}</span>`:''}</div>`;
+
+  // ---- A · merged status strip (time + weather + world) — consolidated, light ----
+  const wc=WORLD.map(c=>`<span class="cstrip-wc"><b class="wt" data-tz="${c[1]}">--:--</b>${c[0]}</span>`).join("");
+  const strip=`<div class="w span12 cstrip"><div class="w-b"><div class="cstrip-in">
+    <div class="cstrip-clock"><span class="cstrip-time" id="liveClock">--:--:--</span><div><div class="cstrip-date" id="liveDate"></div><div class="cstrip-tz" id="liveTZ"></div></div></div>
+    <div class="cstrip-div"></div>
+    <div class="cstrip-wx" id="wxBody"><span class="wx-desc">天氣載入中…</span></div>
+    <div class="cstrip-world">${wc}</div>
+  </div></div></div>`;
+
+  // ---- B · PROJECT MANAGEMENT (primary emphasis) ----
+  const ms=(P.milestones||[]); const nextMs=ms.find(m=>m.status!=="done")||ms[0]||{};
+  const onTrack = blocked===0 && !att.some(a=>a.k==="urgent");
+  const C=2*Math.PI*34, off=C*(1-pct/100);
+  const ring=`<svg class="ov-ring" viewBox="0 0 80 80"><circle cx="40" cy="40" r="34" fill="none" stroke="var(--panel-alt)" stroke-width="8"/><circle cx="40" cy="40" r="34" fill="none" stroke="var(--accent)" stroke-width="8" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${off}" transform="rotate(-90 40 40)"/><text x="40" y="45" text-anchor="middle" font-family="var(--fd)" font-size="18" font-weight="800" fill="var(--ink)">${pct}%</text></svg>`;
+  const ovStats=[["Tasks",done+"/"+tasks.length],["Milestones",ms.filter(m=>m.status==="done").length+"/"+ms.length],["Budget",used+"%"],["Open Risks",openRisk]]
+    .map(s=>`<div class="ov-st"><div class="v">${s[1]}</div><div class="l">${s[0]}</div></div>`).join("");
+  const overview=`<div class="w span5">${wh('grid','專案總覽 Project',onTrack?'on track':'at risk')}<div class="w-b"><div class="ov">${ring}<div class="ov-stats">${ovStats}</div></div><div class="ov-ms"><span class="lab">下個里程碑</span><span style="font-weight:600">${esc(nextMs.name||'—')}</span><span class="due">${esc(nextMs.due||'')}</span></div></div></div>`;
+
+  const attRows=att.length?att.map(a=>`<div class="att-card ${a.k}">${a.chg?'<span class="chg-dot"></span>':''}<div class="att-ic"><svg viewBox="0 0 24 24" fill="none" stroke="${a.k==='urgent'?'var(--rust)':'var(--amber)'}"><path d="M12 2L2 20h20L12 2zM12 9v5M12 17v.5"/></svg></div><div><div class="att-t">${esc(a.t)}</div><div class="att-m">${esc(a.m)}</div></div><span class="att-badge ${a.k==='urgent'?'b-urgent':'b-behind'}">${a.k==='urgent'?'緊急':'落後'}</span></div>`).join(""):'<div style="color:var(--ink-faint);font-size:12px;text-align:center;padding:18px">沒有緊急項目 ✓</div>';
+  const attW=`<div class="w span7">${wh('alert','Attention · 需處理',att.length+' 項')}<div class="w-b"><div class="att">${attRows}</div></div></div>`;
+
+  // ---- C · Gantt snapshot + KPI ----
+  const ts=tasks.map(t=>({...t,s:+new Date(t.start),f:+new Date(t.finish)}));
+  const mn=Math.min(...ts.map(t=>t.s)),mx=Math.max(...ts.map(t=>t.f)),sp=mx-mn||1;
+  const gs=ts.map(t=>`<div class="gs-row"><div class="gs-name"><span class="lamp ${t.status}" style="width:7px;height:7px"></span>${esc(t.name)}</div><div class="gs-track"><div class="gs-bar" style="left:${(t.s-mn)/sp*100}%;width:${(t.f-t.s)/sp*100}%;background:${STATUS_COL[t.status]}"><div class="pg" style="width:${t.progress*100}%"></div></div></div></div>`).join("");
+  const gsW=`<div class="w span8">${wh('rows','時程快照 Timeline')}<div class="w-b">${gs}</div></div>`;
+  const mk=[["Completion",pct+"%"],["Done",done+"/"+tasks.length],["Budget",used+"%"],["Risks",openRisk]];
+  const kpiW=`<div class="w span4">${wh('chart','KPI')}<div class="w-b"><div class="mini-kpi">`+mk.map(k=>`<div class="mk"><div class="v">${k[1]}</div><div class="l">${k[0]}</div></div>`).join("")+`</div></div></div>`;
+
+  // ---- D · Sequence + Milestones ----
+  const seq=tasks.map(t=>`<div class="seq-row"><span class="lamp ${t.status}"></span><div><div class="seq-t">${esc(t.name)}</div><div class="seq-m">${t.lane} · ${Math.round(t.progress*100)}%</div></div><span class="pill ${t.status}">${t.status}</span></div>`).join("");
+  const seqW=`<div class="w span6">${wh('dots','事件順序 · 燈號')}<div class="w-b">${seq}</div></div>`;
+  const msRows=ms.map(m=>{const c=m.status==="done"?"var(--green)":m.status==="active"?"var(--amber)":"var(--line-strong)";return `<div class="ms-row"><span class="ms-dot" style="background:${c}"></span><div><div class="mn">${esc(m.name)}</div><div class="md">${m.status}</div></div><span class="mdue" style="color:${c}">${esc(m.due)}</span></div>`}).join("")||'<div style="color:var(--ink-faint);font-size:12px">—</div>';
+  const msW=`<div class="w span6">${wh('cal','里程碑 Milestones')}<div class="w-b">${msRows}</div></div>`;
+
+  // ---- E · secondary: weekly + allocation + news ----
+  const wl=P.weeklog||[],maxH=Math.max(...wl.map(w=>w.focus+w.deep+w.meeting),1);
+  const bars=wl.map(w=>`<div class="wk-col"><div class="wk-stack"><div class="wk-seg" style="height:${w.focus/maxH*100}%;background:var(--amber)"></div><div class="wk-seg" style="height:${w.deep/maxH*100}%;background:var(--accent)"></div><div class="wk-seg" style="height:${w.meeting/maxH*100}%;background:var(--blue)"></div></div><span class="wk-lbl">${w.dow}</span></div>`).join("");
+  const weeklyW=`<div class="w span4">${wh('chart','本週時間')}<div class="w-b"><div class="wk">${bars}</div></div></div>`;
+  const lanes={}; tasks.forEach(t=>lanes[t.lane]=(lanes[t.lane]||0)+1);
+  const alloc=Object.entries(lanes).map(([l,n])=>`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px"><span style="font-weight:600">${l}</span><span style="font-family:var(--fm);color:var(--ink-faint)">${n}</span></div><div class="bar-wrap"><div style="width:${n/tasks.length*100}%;background:${LANE_COL[l]||'var(--ink-faint)'}"></div></div></div>`).join("");
+  const allocW=`<div class="w span4">${wh('rows','專案分配')}<div class="w-b">${alloc}</div></div>`;
+  const news=newsRecent().slice(0,4).map(n=>`<a class="news-item ${n.urgency}" href="${esc(n.url)}" target="_blank" rel="noopener"><span class="news-time">${n.at_time}</span><span class="news-src">${esc(n.source)}</span><span class="hl">${esc(n.headline)}</span></a>`).join("");
+  const newsW=`<div class="w span4">${wh('alert','重要新聞 · 跑動')}<div class="w-b"><div class="news-marq"><div class="news-run">${news}${news}</div></div></div></div>`;
+
+  el.innerHTML=`<div class="wgrid">${strip}${overview}${attW}${gsW}${kpiW}${seqW}${msW}${weeklyW}${allocW}${newsW}</div>`;
+  tickClocks(); initWeather();
+};
+RENDER.contacts = el=>{
+  const rows=P.contacts.map(c=>`<div class="contact-row"><span class="avatar">${esc(c.name[0])}</span><div><div class="cn">${esc(c.name)}</div><div class="cr">${esc(c.role)} · ${esc(c.org)}</div></div><a class="ch" href="#">${c.channel}: ${esc(c.handle)}</a></div>`).join("");
+  el.innerHTML=panel("聯絡人 Contacts","tap to connect",rows);
+};
+RENDER.team = el=>{
+  const t=P.team||[];
+  const rows=t.map(m=>{const pc=Math.round(m.allocation*100),col=pc>85?'var(--rust)':pc>60?'var(--amber)':'var(--accent)';
+    return `<div style="padding:12px 0;border-bottom:1px solid var(--line)"><div style="display:flex;align-items:center;gap:11px;margin-bottom:7px"><span class="avatar">${esc(m.name[0])}</span><div><div class="cn">${esc(m.name)}</div><div class="cr">${esc(m.role)} · ${esc(m.current)}</div></div><span class="pill ${m.status}" style="margin-left:auto">${m.status}</span></div><div style="display:flex;align-items:center;gap:9px"><div class="bar-wrap" style="flex:1"><div style="width:${pc}%;background:${col}"></div></div><span style="font-family:var(--fm);font-size:10px;color:${col};width:34px;text-align:right">${pc}%</span></div></div>`}).join("");
+  const avg=Math.round(t.reduce((a,m)=>a+m.allocation,0)/t.length*100);
+  const head=`<div class="mini-kpi" style="margin-bottom:14px"><div class="mk"><div class="v">${t.length}</div><div class="l">Members</div></div><div class="mk"><div class="v">${avg}%</div><div class="l">Avg load</div></div></div>`;
+  el.innerHTML=panel("團隊管理 Team","allocation / workload",head+rows);
+};
+// ---------- markdown engine ----------
+function md(src){
+  const lines=String(src).split("\n"); let html="",inList=false;
+  const inline=s=>esc(s)
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>')
+    .replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>").replace(/\*([^*]+)\*/g,"<i>$1</i>")
+    .replace(/`([^`]+)`/g,"<code>$1</code>");
+  const closeUl=()=>{if(inList){html+="</ul>";inList=false}};
+  lines.forEach(l=>{
+    if(/^### /.test(l)){closeUl();html+="<h3>"+inline(l.slice(4))+"</h3>"}
+    else if(/^## /.test(l)){closeUl();html+="<h2>"+inline(l.slice(3))+"</h2>"}
+    else if(/^# /.test(l)){closeUl();html+="<h1>"+inline(l.slice(2))+"</h1>"}
+    else if(/^- \[[ x]\] /.test(l)){closeUl();const dn=/\[x\]/.test(l);html+='<div class="chk '+(dn?"done":"")+'"><span class="box '+(dn?"on":"")+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6L9 17l-5-5"/></svg></span><span class="t">'+inline(l.replace(/^- \[[ x]\] /,""))+"</span></div>"}
+    else if(/^[-*] /.test(l)){if(!inList){html+="<ul>";inList=true}html+="<li>"+inline(l.slice(2))+"</li>"}
+    else if(/^\d+\. /.test(l)){if(!inList){html+="<ul>";inList=true}html+="<li>"+inline(l.replace(/^\d+\. /,""))+"</li>"}
+    else if(l.trim()===""){closeUl()}
+    else {closeUl();html+="<p>"+inline(l)+"</p>"}
+  });
+  closeUl(); return '<div class="md">'+html+"</div>";
+}
+// ---------- notes (Notion/AppFlowy · tree + markdown) ----------
+const NT_OPEN=new Set([1,4]); let NT_SEL=1, NT_EDIT=false;
+const BLOCKS=[["標題 H2","## "],["子標題 H3","### "],["項目清單","- "],["待辦","- [ ] "],["引言","> "],["分隔線","\n---\n"],["程式碼","```\n\n```\n"],["表格","| 欄1 | 欄2 |\n| --- | --- |\n| a | b |\n"]];
+function noteKids(pid){return (P.notes||[]).filter(n=>n.parent_id===pid).sort((a,b)=>a.ord-b.ord)}
+function noteTree(pid){
+  const kids=noteKids(pid); if(!kids.length)return "";
+  return kids.map(n=>{const has=noteKids(n.id).length>0,open=NT_OPEN.has(n.id);
+    return `<div class="nt-node"><div class="nt-row ${NT_SEL===n.id?'sel':''}" data-id="${n.id}"><span class="nt-tw ${open?'open':''}" data-tw="${n.id}">${has?'<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor"><path d="M9 6l6 6-6 6"/></svg>':''}</span>${esc(n.title)}</div><div class="nt-children ${open?'':'closed'}">${noteTree(n.id)}</div></div>`}).join("");
+}
+RENDER.notes = el=>{
+  const note=(P.notes||[]).find(n=>n.id===NT_SEL)||(P.notes||[{body:"# Notes"}])[0];
+  const blkMenu=BLOCKS.map((b,i)=>`<div class="blk-opt" data-blk="${i}">${b[0]}<span class="k">${esc(b[1].trim().slice(0,5)||'---')}</span></div>`).join("");
+  const right = NT_EDIT
+    ? `<div class="note-toolbar"><div class="blk-dd"><button class="btn sm" id="blkBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg>插入區塊 ▾</button><div class="blk-menu" id="blkMenu">${blkMenu}</div></div><div style="flex:1"></div><button class="btn sm" id="ntPreview">預覽</button><button class="btn sm primary" id="ntSave">儲存</button></div><textarea class="note-ta" id="ntTa">${esc(note.body)}</textarea>`
+    : `<div class="note-toolbar" style="margin-bottom:12px"><div style="flex:1"></div><button class="btn sm" id="ntEdit"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>編輯</button></div>${md(note.body)}`;
+  el.innerHTML=`<div class="notes-wrap"><div class="notes-tree">${noteTree(0)}</div><div class="note-doc">${right}</div></div>`;
+  el.querySelectorAll(".nt-row").forEach(r=>r.addEventListener("click",e=>{const tw=e.target.closest(".nt-tw");if(tw&&tw.dataset.tw){const id=+tw.dataset.tw;NT_OPEN.has(id)?NT_OPEN.delete(id):NT_OPEN.add(id);RENDER.notes(el);return}NT_SEL=+r.dataset.id;NT_EDIT=false;RENDER.notes(el)}));
+  if(NT_EDIT){
+    const ta=$("#ntTa");
+    $("#blkBtn").addEventListener("click",e=>{e.stopPropagation();$("#blkMenu").classList.toggle("open")});
+    el.querySelectorAll(".blk-opt").forEach(o=>o.addEventListener("click",()=>{const b=BLOCKS[+o.dataset.blk];const pos=ta.selectionStart!=null?ta.selectionStart:ta.value.length;const pre=(pos>0&&ta.value[pos-1]!=="\n")?"\n":"";ta.value=ta.value.slice(0,pos)+pre+b[1]+ta.value.slice(pos);$("#blkMenu").classList.remove("open");ta.focus();ta.selectionStart=ta.selectionEnd=pos+pre.length+b[1].length}));
+    $("#ntPreview").addEventListener("click",()=>{note.body=ta.value;NT_EDIT=false;RENDER.notes(el)});
+    $("#ntSave").addEventListener("click",()=>{note.body=ta.value;NT_EDIT=false;RENDER.notes(el);toast("已儲存","筆記已更新(可由匯出資料永久保存)")});
+  } else if($("#ntEdit")) $("#ntEdit").addEventListener("click",()=>{NT_EDIT=true;RENDER.notes(el)});
+};
+// ---------- LLM notebook (multi-provider · toggle mechanism) ----------
+let LLM_PROV = (CFG.llm_providers && CFG.llm_providers.length)
+  ? CFG.llm_providers.map(p=>({k:p.k,name:p.name,on:!!p.on,endpoint:p.endpoint||""}))
+  : [{k:"openai",name:"ChatGPT",on:true},{k:"claude",name:"Claude",on:true},
+     {k:"gemini",name:"Gemini",on:false},{k:"copilot",name:"Copilot",on:false},
+     {k:"notion",name:"Notion",on:false}];
+let LLM_ACTIVE = (LLM_PROV.find(p=>p.on)||LLM_PROV[0]).k;
+const NB=[{who:"a",text:"我是 VeritasPulse Notebook。可問專案狀態、整理筆記、產生待辦、讀 Notion。上方可切換 / 開關 AI 供應商。"}];
+async function vplLLM(prompt){
+  const prov = LLM_PROV.find(p=>p.k===LLM_ACTIVE && p.on) || LLM_PROV.find(p=>p.on);
+  const eps = window.VPL_LLM_ENDPOINTS||{}; const ep = (prov&&prov.endpoint) || eps[prov&&prov.k] || window.VPL_LLM_ENDPOINT;
+  const tag = prov?`[${prov.name}] `:"";
+  if(ep){try{const r=await fetch(ep,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({prompt})});const d=await r.json();return tag+(d.text||d.completion||JSON.stringify(d))}catch(e){return tag+"連線失敗:"+e.message}}
+  if(/狀態|status|進度|progress/i.test(prompt))return tag+"目前 "+P.tasks.filter(t=>t.status==="done").length+"/"+P.tasks.length+" 任務完成,"+P.risks.filter(r=>r.status==="active").length+" 個活躍風險。設定 window.VPL_LLM_ENDPOINTS['"+(prov&&prov.k)+"'] 接此供應商。";
+  return tag+"(離線)將 window.VPL_LLM_ENDPOINTS['"+(prov&&prov.k)+"'] 指向該供應商即可即時回應。我可:整理筆記、產生待辦、摘要專案、讀 Notion。";
+}
+RENDER.notebook = el=>{
+  const provBar=LLM_PROV.map(p=>`<div class="prov ${p.on?'on':''} ${p.k===LLM_ACTIVE&&p.on?'active':''}" data-prov="${p.k}">${brand(p.k==='notion'?'notion':p.k,"sm")}<span class="pn">${p.name}</span><span class="sw" data-sw="${p.k}"></span></div>`).join("");
+  const msgs=NB.map(m=>`<div class="nb-msg ${m.who}"><div class="who">${m.who==="u"?"You":"VeritasPulse AI"}</div>${esc(m.text)}</div>`).join("");
+  el.innerHTML=panel("LLM Notebook","多供應商 · 開關 / 切換",`<div class="prov-bar">${provBar}</div><div class="nb-msgs" id="nbMsgs">${msgs}</div><div class="nb-input"><input id="nbIn" placeholder="問問題或記筆記… (Enter)"><button class="btn primary" id="nbSend">送出</button></div>`);
+  const send=async()=>{const v=$("#nbIn").value.trim();if(!v)return;NB.push({who:"u",text:v});$("#nbIn").value="";RENDER.notebook(el);const rep=await vplLLM(v);NB.push({who:"a",text:rep});RENDER.notebook(el)};
+  el.querySelectorAll(".prov .sw").forEach(s=>s.addEventListener("click",e=>{e.stopPropagation();const p=LLM_PROV.find(x=>x.k===s.dataset.sw);p.on=!p.on;if(!p.on&&LLM_ACTIVE===p.k){const f=LLM_PROV.find(x=>x.on);LLM_ACTIVE=f?f.k:null}RENDER.notebook(el)}));
+  el.querySelectorAll(".prov").forEach(c=>c.addEventListener("click",()=>{const p=LLM_PROV.find(x=>x.k===c.dataset.prov);if(p.on){LLM_ACTIVE=p.k;RENDER.notebook(el)}else toast("已關閉",p.name+" 目前為關閉,請先開啟開關")}));
+  $("#nbSend").addEventListener("click",send);
+  $("#nbIn").addEventListener("keydown",e=>{if(e.key==="Enter")send()});
+  const m=$("#nbMsgs");if(m)m.scrollTop=m.scrollHeight;
+};
+// ---------- progress matrix (roadmap · project + personal) ----------
+RENDER.matrix = el=>{
+  const plans=P.plans||[], maxP=Math.max(...plans.map(p=>p.phases.length),1);
+  const lerp=(a,b,t)=>Math.round(a+(b-a)*t);
+  const col=v=>{const t=v/100;return `rgb(${lerp(235,94,t)},${lerp(237,112,t)},${lerp(222,50,t)})`};
+  let head="<tr><th></th>"; for(let i=0;i<maxP;i++)head+=`<th>Phase ${i+1}</th>`; head+="</tr>";
+  const rows=plans.map(p=>{let cells=p.phases.map(ph=>`<td><div class="cell" style="background:${col(ph[1])};color:${ph[1]>55?'#fff':'var(--ink)'}">${esc(ph[0])}<br>${ph[1]}%</div></td>`).join("");
+    for(let i=p.phases.length;i<maxP;i++)cells+="<td></td>";
+    return `<tr><td class="name">${esc(p.name)}<span class="kind-tag kind-${p.kind}">${p.kind==="project"?"專案":"個人"}</span></td>${cells}</tr>`}).join("");
+  el.innerHTML=panel("進度矩陣 Matrix","專案 / 個人計畫 · roadmap",`<table class="mtx">${head}${rows}</table>`);
+};
+// ---------- connections (Google auto-sync · Notion · tools) ----------
+RENDER.connect = el=>{
+  const conns=[
+    ["gcal","Google Calendar","已連線 · 2 分鐘前同步","on"],
+    ["gcontacts","Google 聯絡人","已連線 · 自動同步","on"],
+    ["gdrive","Google Drive","已連線 · 2 分鐘前","on"],
+    ["gmail","Gmail","已連線","on"],
+    ["outlook","Outlook · 行事曆/郵件","已連線 · 提醒依時間同步","on"],
+    ["onedrive","OneDrive","可連線","off"],
+    ["dropbox","Dropbox","可連線","off"],
+    ["notion","Notion","可讀取 · Import 頁面為筆記(自動完成)","off"],
+    ["focalboard","Focalboard","本地看板 · 可連結","off"],
+  ];
+  const rows=conns.map(c=>`<div class="conn">${brand(c[0])}<div><div class="cn">${c[1]}</div><div class="cs"><span class="dotk" style="background:${c[3]==="on"?"var(--green)":"var(--ink-faint)"}"></span>${c[2]}</div></div><div class="act"><button class="btn sm" data-conn="${c[1]}">${c[3]==="on"?"立即同步":"連線"}</button></div></div>`).join("");
+  el.innerHTML=panel("連線 Connections","Google · Notion · OneDrive · Dropbox 自動同步",rows+'<div style="font-family:var(--fm);font-size:10px;color:var(--ink-faint);margin-top:8px">OAuth 與即時抓取由後端 SyncBridge 處理,並遵循 Aegis 網路治理。</div>');
+  el.querySelectorAll("[data-conn]").forEach(b=>b.addEventListener("click",()=>toast("同步",b.dataset.conn+" — 已排入後端 SyncBridge 佇列")));
+};
+// ---------- meetings + fast review + minutes ----------
+let MEET_ID=null, REV_I=0;
+function meetSegs(){const mid=MEET_ID||((P.meetings||[])[0]||{}).id;return (P.segments||[]).filter(s=>s.meeting_id===mid).sort((a,b)=>a.ord-b.ord)}
+RENDER.meetings = el=>{
+  const rows=(P.meetings||[]).map(m=>{const segs=(P.segments||[]).filter(s=>s.meeting_id===m.id),conf=segs.filter(s=>s.confirmed).length;
+    return `<div class="meet-row" data-mid="${m.id}"><span class="meet-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.users}</svg></span><div><div class="meet-t">${esc(m.title)}</div><div class="meet-m">${m.day} · ${esc(m.attendees)}</div></div><span class="pill ${conf===segs.length?'done':'active'}" style="margin-left:auto">${conf}/${segs.length} 審閱</span></div>`}).join("");
+  el.innerHTML=panel("會議 Meetings","逐字稿 → 審閱 → 紀錄",rows+'<div style="font-family:var(--fm);font-size:10px;color:var(--ink-faint);margin-top:10px">逐字稿(Teams/SharePoint)由後端 AI 解析為分類段落,再用「逐字稿審閱」快速確認。</div>');
+  el.querySelectorAll(".meet-row").forEach(r=>r.addEventListener("click",()=>{MEET_ID=+r.dataset.mid;REV_I=0;show("review")}));
+};
+RENDER.review = el=>{
+  const segs=meetSegs(); if(!segs.length){el.innerHTML=panel("逐字稿審閱","","沒有逐字稿段落");return}
+  REV_I=Math.max(0,Math.min(REV_I,segs.length-1)); const s=segs[REV_I];
+  const att=((P.meetings||[]).find(m=>m.id===s.meeting_id)||{attendees:""}).attendees.split(",").map(x=>x.trim()).filter(Boolean).concat(["不確定"]);
+  const cats=["Decision","Discussion","Action","Risk"];
+  const spk=att.map(a=>`<button class="tap ${s.speaker===a?'on':''}" data-spk="${esc(a)}">${esc(a)}</button>`).join("");
+  const cat=cats.map(c=>`<button class="tap cat-${c} ${s.category===c?'on':''}" data-cat="${c}">${c}</button>`).join("");
+  const conf=segs.filter(x=>x.confirmed).length;
+  el.innerHTML=panel("逐字稿審閱 · 快速確認","tap → 自動跳下一筆",`<div class="rev">
+    <div class="rev-prog"><span class="n">段落 ${REV_I+1} / ${segs.length}</span><span class="n">已確認 ${conf}/${segs.length}</span></div>
+    <div class="bar-wrap" style="margin-bottom:14px"><div style="width:${conf/segs.length*100}%;background:var(--accent)"></div></div>
+    <div class="rev-card ${s.category}"><div class="rev-time">🕒 ${s.at_time}</div><div class="rev-text">${esc(s.text)}</div>
+      <div class="rev-lbl">發話人</div><div class="tapgrid" id="spk">${spk}</div>
+      <div class="rev-lbl">分類(點選自動跳下一筆)</div><div class="tapgrid" id="cat">${cat}</div>
+      <div class="rev-lbl">標記</div><div class="tapgrid"><button class="tap ${s.action?'on':''}" id="actBtn">✔ Action</button><button class="tap ${s.keypt?'on':''}" id="keyBtn">⭐ 重點</button></div>
+      <div class="rev-nav"><button class="btn" id="prevBtn">⬅ 上一筆</button><button class="btn primary" id="nextBtn">下一筆 ➡</button></div>
+    </div></div>`);
+  const adv=()=>{s.confirmed=1; if(REV_I<segs.length-1)REV_I++; RENDER.review(el)};
+  el.querySelectorAll("#spk .tap").forEach(b=>b.addEventListener("click",()=>{s.speaker=b.dataset.spk;RENDER.review(el)}));
+  el.querySelectorAll("#cat .tap").forEach(b=>b.addEventListener("click",()=>{s.category=b.dataset.cat;if(b.dataset.cat==="Action")s.action=1;adv()}));
+  $("#actBtn").addEventListener("click",()=>{s.action=s.action?0:1;RENDER.review(el)});
+  $("#keyBtn").addEventListener("click",()=>{s.keypt=s.keypt?0:1;RENDER.review(el)});
+  $("#prevBtn").addEventListener("click",()=>{if(REV_I>0)REV_I--;RENDER.review(el)});
+  $("#nextBtn").addEventListener("click",adv);
+};
+let MIN_MODE=CFG.default_minutes_mode||"comprehensive";
+function buildMinutesDoc(){
+  const segs=meetSegs(), m=(P.meetings||[]).find(x=>x.id===(segs[0]||{}).meeting_id)||{title:"Meeting",day:"",attendees:""};
+  const dec=segs.filter(s=>s.category==="Decision"),act=segs.filter(s=>s.action),dis=segs.filter(s=>s.category==="Discussion"),rsk=segs.filter(s=>s.category==="Risk");
+  const sum=`本次會議共 ${segs.length} 段,含 ${dec.length} 項決議、${act.length} 項行動、${rsk.length} 項風險。`;
+  const ctc={Decision:"決議",Action:"行動",Risk:"風險",Discussion:"討論"};
+  const actR=act.map((s,i)=>`<tr><td class="n">${i+1}</td><td>${esc(s.text)}</td><td class="ow">${esc(s.speaker)}</td><td class="ow">+7d</td></tr>`).join("")||'<tr><td colspan="4">—</td></tr>';
+  const ol=a=>a.map(s=>`<li>${esc(s.text)}</li>`).join("")||"<li>—</li>";
+  let extra=MIN_MODE==="comprehensive"?`<h2><span class="b">4</span>Discussion 討論</h2><ol>${ol(dis)}</ol><h2><span class="b">5</span>Risks 風險</h2><ol>${ol(rsk)}</ol><h2><span class="b">6</span>完整逐字稿</h2><div>`+segs.map(s=>`<div class="sg"><span class="t">${esc(s.at_time)}</span><span class="sp">${esc(s.speaker||"—")}</span><span class="ct">${ctc[s.category]||""}</span><span>${esc(s.text)}</span></div>`).join("")+`</div>`:"";
+  const css="@page{size:A4;margin:18mm 16mm}*{box-sizing:border-box}body{font-family:'DM Sans','Noto Sans CJK TC',sans-serif;color:#1a1916;background:#f5f4f0;font-size:11pt;line-height:1.6;max-width:820px;margin:auto;padding:30px}.eb{font-family:'DM Mono';font-size:9pt;letter-spacing:.2em;text-transform:uppercase;color:#5e7032}h1{font-family:'Syne','Noto Sans CJK TC';font-weight:800;font-size:25pt;margin:6px 0 10px}.hd{border-left:5px solid #5e7032;padding-left:16px}.meta{font-family:'DM Mono';font-size:9pt;color:#56524a}.sm{background:#fbfaf7;border:1px solid #e2dfd6;border-left:4px solid #5e7032;border-radius:8px;padding:13px 16px;margin:14px 0 20px}h2{font-family:'Syne','Noto Sans CJK TC';font-size:14pt;margin:20px 0 8px;display:flex;align-items:center;gap:9px}h2 .b{width:22px;height:22px;border-radius:6px;background:#5e7032;color:#fff;font-family:'DM Mono';font-size:11pt;display:inline-grid;place-items:center}table{width:100%;border-collapse:collapse;font-size:10pt}th{background:#f0eee8;text-align:left;font-family:'DM Mono';font-size:8pt;letter-spacing:.08em;text-transform:uppercase;color:#8f897c;padding:7px 9px}td{padding:8px 9px;border-bottom:1px solid #e2dfd6;vertical-align:top}td.n{font-family:'DM Mono';color:#8f897c;width:26px}td.ow{font-family:'DM Mono';color:#5e7032;white-space:nowrap}ol{padding-left:22px}li{margin:6px 0}.sg{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid #efeee9;font-size:9.5pt}.sg .t{font-family:'DM Mono';color:#8f897c;width:42px;flex:none}.sg .sp{font-weight:600;width:90px;flex:none}.sg .ct{font-family:'DM Mono';font-size:7.5pt;color:#56524a}.ft{margin-top:24px;padding-top:10px;border-top:1px solid #e2dfd6;font-family:'DM Mono';font-size:8pt;color:#8f897c}";
+  return `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><title>Minutes · ${esc(m.title)}</title><link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&family=DM+Mono&display=swap" rel="stylesheet"><style>${css}</style></head><body><div class="hd"><div class="eb">Meeting Minutes · 會議紀錄</div><h1>${esc(m.title)}</h1><div class="meta"><b>日期</b> ${esc(m.day)} · <b>出席</b> ${esc(m.attendees)} · ${MIN_MODE==="comprehensive"?"全面":"精簡"}</div></div><div class="sm">${esc(sum)}</div><h2><span class="b">1</span>Action Items 行動項目</h2><table><tr><th>#</th><th>行動</th><th>負責人</th><th>期限</th></tr>${actR}</table><h2><span class="b">2</span>Decision Log 決議</h2><ol>${ol(dec)}</ol>${extra}<div class="ft">VIA Visual Lock v1 · VeritasPulse · 發言人對齊 · 機密 Confidential</div></body></html>`;
+}
+RENDER.minutes = el=>{
+  const segs=meetSegs();
+  const dec=segs.filter(s=>s.category==="Decision"), act=segs.filter(s=>s.action),
+        dis=segs.filter(s=>s.category==="Discussion"), rsk=segs.filter(s=>s.category==="Risk");
+  const sum=`本次會議共 ${segs.length} 段,含 ${dec.length} 項決議、${act.length} 項行動、${rsk.length} 項風險。`;
+  const sec=(icon,title,items)=>`<div class="min-sec"><h3><span class="w-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS[icon]}</svg></span>${title}</h3>${items}</div>`;
+  const li=(arr,pre)=>arr.map(s=>`<div class="min-item">${pre} ${esc(s.text)}</div>`).join("")||'<div class="min-item">—</div>';
+  const actH=act.map(s=>`<div class="min-item">✔ ${esc(s.text)}<span class="own">${esc(s.speaker)}</span><span class="mk-task" data-act="${esc(s.text)}">→ 建立任務</span></div>`).join("")||'<div class="min-item">—</div>';
+  const tools=`<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px">
+    <div class="seg" style="width:auto"><button class="${MIN_MODE==='concise'?'on':''}" data-mm="concise">精簡</button><button class="${MIN_MODE==='comprehensive'?'on':''}" data-mm="comprehensive">全面</button></div>
+    <div style="flex:1"></div>
+    <button class="btn sm" id="minHtml"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>專業 HTML</button>
+    <button class="btn sm" id="minPdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 13h8M8 17h5"/></svg>列印 / PDF</button>
+    <button class="btn sm" id="minXls"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 8l8 8M16 8l-8 8"/></svg>匯出 Excel</button></div>`;
+  el.innerHTML=panel("會議紀錄 Minutes","自動生成 · DuckDB 彙整 · 視覺鎖定",tools+
+    `<div style="background:var(--accent-soft);border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:13px">${esc(sum)}</div>`+
+    sec("alert","Action Items",actH)+sec("check","Decision Log",li(dec,"◆"))+
+    (MIN_MODE==="comprehensive"?sec("dots","Discussion",li(dis,"·"))+sec("alert","Risks",li(rsk,"⚠")):""));
+  el.querySelectorAll("[data-mm]").forEach(b=>b.addEventListener("click",()=>{MIN_MODE=b.dataset.mm;RENDER.minutes(el)}));
+  el.querySelectorAll(".mk-task").forEach(b=>b.addEventListener("click",()=>toast("任務已建立","["+b.dataset.act.slice(0,22)+"…] 已加入看板 · due +7d")));
+  $("#minHtml").addEventListener("click",()=>{const blob=new Blob([buildMinutesDoc()],{type:"text/html"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="Meeting_Minutes.html";a.click();URL.revokeObjectURL(a.href);toast("已生成","專業會議紀錄 HTML 已下載("+(MIN_MODE==="comprehensive"?"全面":"精簡")+")")});
+  $("#minPdf").addEventListener("click",()=>{const w2=window.open("","_blank");if(w2){w2.document.write(buildMinutesDoc());w2.document.close();setTimeout(()=>w2.print(),400);toast("列印","已開啟列印 → 另存 PDF")}else toast("提示","請允許彈出視窗以列印 PDF")});
+  $("#minXls").addEventListener("click",()=>toast("匯出 Excel","Transcript_Review 模板由後端產生(VRN_Meeting_Transcript.xlsx)"));
+};
+RENDER.today = el=>{
+  const c=P.checklist, done=c.filter(x=>x.done).length;
+  const rows=c.map((x,i)=>`<div class="chk ${x.done?'done':''}" data-i="${i}"><span class="box ${x.done?'on':''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 6L9 17l-5-5"/></svg></span><span class="t">${esc(x.item)}</span><span class="prio ${x.priority}">${x.priority}</span><span class="due">due ${x.due}</span></div>`).join('');
+  el.innerHTML=panel(`每日清單 · ${done}/${c.length}`,'checklist',rows);
+  el.querySelectorAll('.chk').forEach(row=>row.querySelector('.box').addEventListener('click',()=>{
+    const i=+row.dataset.i; P.checklist[i].done=P.checklist[i].done?0:1; show('today');
+  }));
+};
+RENDER.cal = el=>{
+  const evByDay={}; P.events.forEach(e=>{(evByDay[e.day]=evByDay[e.day]||[]).push(e)});
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  let cells=days.map(d=>`<div class="cal-hd">${d}</div>`).join('');
+  // simple May-2026 style grid, 1..31 starting Fri (offset 3)
+  for(let i=0;i<3;i++) cells+=`<div class="cal-cell dim"></div>`;
+  for(let d=1;d<=31;d++){
+    const key='2026-05-'+String(d).padStart(2,'0');
+    const evs=(evByDay[key]||[]).map(e=>`<div class="cal-ev ev-${e.kind}">${esc(e.title)}</div>`).join('');
+    cells+=`<div class="cal-cell ${d===31?'today':''}"><span class="cal-num">${d}</span>${evs}</div>`;
+  }
+  el.innerHTML=panel('月曆 · May 2026','calendar-synced',`<div class="cal-grid">${cells}</div>`);
+};
+RENDER.board = el=>{
+  const cols=[['backlog','Backlog','var(--ink-faint)',t=>t.status==='waiting'||t.status==='blocked'],['active','In Progress','var(--amber)',t=>t.status==='active'],['done','Done','var(--accent)',t=>t.status==='done']];
+  const k=cols.map(c=>{
+    const items=P.tasks.filter(c[3]);
+    return `<div><div class="col-h"><span class="pip" style="background:${c[2]}"></span>${c[1]}<span class="cnt">${items.length}</span></div>`+
+      items.map(t=>`<div class="card"><div class="ct">${esc(t.name)}</div><span class="chip" style="background:${(LANE_COL[t.lane]||'var(--ink-faint)')}22;color:${LANE_COL[t.lane]||'var(--ink-faint)'}">${t.lane}</span><span class="est">${Math.round(t.progress*100)}%</span></div>`).join('')+`</div>`;
+  }).join('');
+  el.innerHTML=panel('看板 Board','by status',`<div class="kanban" style="grid-template-columns:repeat(3,1fr)">${k}</div>`);
+};
+RENDER.gantt = el=>{
+  const ts=P.tasks.map(t=>({...t,s:+new Date(t.start),f:+new Date(t.finish)}));
+  const min=Math.min(...ts.map(t=>t.s)), max=Math.max(...ts.map(t=>t.f)), span=max-min;
+  const rows=ts.map(t=>{
+    const left=(t.s-min)/span*100, w=(t.f-t.s)/span*100;
+    return `<div class="gantt-row"><div class="gantt-name"><span class="lamp ${t.status}" style="width:8px;height:8px"></span>${esc(t.name)}</div><div class="gantt-track"><div class="gbar" data-d="${esc(t.name)} · ${Math.round(t.progress*100)}% · ${t.status}" style="left:${left}%;width:${w}%;background:${STATUS_COL[t.status]}"><div class="pg" style="width:${t.progress*100}%"></div></div></div></div>`;
+  }).join('');
+  const leg=`<div class="legend">`+Object.entries(STATUS_COL).map(([k,v])=>`<span><i style="background:${v}"></i>${k}</span>`).join('')+`</div>`;
+  el.innerHTML=panel('甘特 Gantt','點 bar 看 detail',rows+leg);
+  el.querySelectorAll('.gbar').forEach(b=>b.addEventListener('click',()=>toast('Gantt',b.dataset.d)));
+};
+let FLOW_CONNECT=false, FLOW_SRC=null;
+RENDER.flow = el=>{
+  const nodes=P.flow_nodes.map(n=>`<div class="fnode ${n.kind} ${FLOW_SRC===n.node_key?'connect-src':''}" data-id="${n.node_key}" style="left:${n.x}px;top:${n.y}px"><span class="fdel" data-del="${n.node_key}">×</span><div class="ft">${esc(n.label)}</div><div class="fm">${esc(n.meta)}</div></div>`).join('');
+  const edges=P.flow_edges.map((e,i)=>`<span class="edge-chip">${esc(e.src)} → ${esc(e.dst)}<span class="x" data-edge="${i}">×</span></span>`).join('')||'<span style="font-family:var(--fm);font-size:10px;color:var(--ink-faint)">無連線</span>';
+  const tools=`<div class="flow-tools"><button class="btn sm" id="fAdd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg>新增節點</button><button class="btn sm ${FLOW_CONNECT?'primary':''}" id="fConnect"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/><path d="M10 7h4a2 2 0 0 1 2 2v5"/></svg>${FLOW_CONNECT?'連線中…點兩節點':'連線模式'}</button><span style="font-family:var(--fm);font-size:10px;color:var(--ink-faint)">拖移節點 · 滑過節點按 × 刪除 · 下方 × 刪線</span></div>`;
+  el.innerHTML=panel('流程 Flow','可增減節點 · 手動拉/刪線',tools+`<div class="flow-wrap editing ${FLOW_CONNECT?'connecting':''}" id="flowWrap"><svg class="flow-svg" id="flowSvg"><defs><marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#8f897c"/></marker></defs></svg>${nodes}</div><div class="edge-list">${edges}</div>`);
+  $("#fAdd").addEventListener("click",()=>{const max=P.flow_nodes.reduce((m,n)=>Math.max(m,+(n.node_key.replace(/\D/g,''))||0),0);P.flow_nodes.push({node_key:"n"+(max+1),label:"新節點",meta:"",kind:"step",x:60+Math.random()*120,y:60+Math.random()*120});RENDER.flow(el);drawFlow()});
+  $("#fConnect").addEventListener("click",()=>{FLOW_CONNECT=!FLOW_CONNECT;FLOW_SRC=null;RENDER.flow(el);drawFlow()});
+  el.querySelectorAll(".fdel").forEach(d=>{d.addEventListener("mousedown",e=>e.stopPropagation());d.addEventListener("click",e=>{e.stopPropagation();const k=d.dataset.del;P.flow_nodes=P.flow_nodes.filter(n=>n.node_key!==k);P.flow_edges=P.flow_edges.filter(g=>g.src!==k&&g.dst!==k);RENDER.flow(el);drawFlow()})});
+  el.querySelectorAll(".edge-chip .x").forEach(x=>x.addEventListener("click",()=>{P.flow_edges.splice(+x.dataset.edge,1);RENDER.flow(el);drawFlow()}));
+  if(FLOW_CONNECT) el.querySelectorAll(".fnode").forEach(n=>n.addEventListener("click",()=>{
+    const k=n.dataset.id;
+    if(!FLOW_SRC){FLOW_SRC=k;RENDER.flow(el);drawFlow();}
+    else if(FLOW_SRC!==k){if(!P.flow_edges.some(g=>g.src===FLOW_SRC&&g.dst===k))P.flow_edges.push({src:FLOW_SRC,dst:k});FLOW_SRC=null;FLOW_CONNECT=false;RENDER.flow(el);drawFlow();toast("已連線","新增流程線")}
+    else{FLOW_SRC=null;RENDER.flow(el);drawFlow()}
+  }));
+};
+RENDER.seq = el=>{
+  const ts=P.tasks, done=ts.filter(t=>t.status==='done').length;
+  const nextIdx=ts.findIndex(t=>t.status!=='done');
+  const head=`<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:6px"><span style="font-weight:600">流程進度 · 不遺漏</span><span style="font-family:var(--fm);color:var(--ink-faint)">${done}/${ts.length} 完成</span></div><div class="bar-wrap"><div style="width:${done/ts.length*100}%;background:var(--accent)"></div></div></div>`;
+  const rows=ts.map((t,i)=>{
+    const cur=i===nextIdx;
+    return `<div class="seq-row" style="${cur?'background:var(--accent-soft);border-radius:8px;padding:11px 12px;margin:0 -12px':''}"><span class="lamp ${t.status}"></span><div><div class="seq-t">${i+1}. ${esc(t.name)}${cur?' <span style="font-family:var(--fm);font-size:9px;color:var(--accent);font-weight:700">← 現在這步</span>':''}</div><div class="seq-m">${t.start} → ${t.finish} · ${t.lane}</div></div><span class="pill ${t.status}">${t.status}</span></div>`;
+  }).join('');
+  el.innerHTML=panel('事件順序 · 流程燈號','follow the flow',head+rows);
+};
+RENDER.budget = el=>{
+  const max=Math.max(...P.budget.map(b=>b.planned));
+  const bars=P.budget.map(b=>`<div style="margin-bottom:13px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="font-weight:600">${esc(b.category)}</span><span style="font-family:var(--fm);color:var(--ink-faint)">${money(b.actual)} / ${money(b.planned)}</span></div><div style="position:relative;height:14px;background:var(--panel-alt);border-radius:5px"><div style="position:absolute;height:100%;width:${b.planned/max*100}%;background:var(--ink-faint);opacity:.35;border-radius:5px"></div><div style="position:absolute;height:100%;width:${b.actual/max*100}%;background:var(--accent);border-radius:5px"></div></div></div>`).join('');
+  const v=sumBudget('planned')-sumBudget('actual');
+  const callout=`<div style="text-align:center"><div style="font-family:var(--fm);font-size:10px;letter-spacing:.1em;color:var(--ink-faint)">VARIANCE</div><div style="font-family:var(--fd);font-weight:800;font-size:38px;color:${v>=0?'var(--accent)':'var(--rust)'}">${money(v)}</div><div style="font-size:13px;color:var(--ink-soft)">${v>=0?'Under':'Over'} budget</div></div>`;
+  el.innerHTML=`<div class="grid">${panel('預算 Budget','planned vs actual',bars)}${panel('差異','variance',callout)}</div>`;
+};
+RENDER.ledger = el=>{
+  let run=0; const rows=P.ledger.map(l=>{run+=l.amount;return `<tr><td style="font-family:var(--fm);color:var(--ink-faint)">${l.day}</td><td>${esc(l.item)}</td><td style="color:var(--ink-faint)">${esc(l.category)}</td><td class="amt ${l.amount<0?'neg':'pos'}">${money(l.amount)}</td><td class="amt">${money(run)}</td></tr>`}).join('');
+  el.innerHTML=panel('流程記帳 Ledger','running balance',`<table class="ltbl"><tr><th>Date</th><th>Item</th><th>Category</th><th>Amount</th><th>Balance</th></tr>${rows}</table>`);
+};
+RENDER.people = el=>{
+  const PMBOK={"Manage Closely":"var(--rust)","Keep Satisfied":"var(--amber)","Keep Informed":"var(--blue)","Monitor":"var(--ink-faint)"};
+  const w=460,h=320,pad=40;
+  const pts=P.stakeholders.map(s=>{const x=pad+(s.interest-0.5)/5*(w-2*pad),y=h-pad-(s.power-0.5)/5*(h-2*pad);const c=PMBOK[s.category]||"var(--blue)";return `<circle cx="${x}" cy="${y}" r="13" fill="${c}" opacity="0.85" stroke="#fff" stroke-width="1.5"/><text x="${x}" y="${y+26}" font-size="9" text-anchor="middle" fill="var(--ink-soft)" font-family="var(--fm)">${esc(s.name.split(" ")[0])}</text>`}).join('');
+  const svg=`<svg viewBox="0 0 ${w} ${h}" style="width:100%;max-width:480px"><line x1="${w/2}" y1="${pad}" x2="${w/2}" y2="${h-pad}" stroke="var(--line)"/><line x1="${pad}" y1="${h/2}" x2="${w-pad}" y2="${h/2}" stroke="var(--line)"/><text x="${w-pad}" y="${pad-6}" font-size="9" text-anchor="end" fill="var(--ink-faint)" font-style="italic">高權力·高關注</text><text x="${pad}" y="${pad-6}" font-size="9" fill="var(--ink-faint)" font-style="italic">高權力·低關注</text>${pts}</svg>`;
+  const leg=`<div class="legend" style="flex-wrap:wrap">`+Object.entries(PMBOK).map(([k,v])=>`<span><i style="background:${v}"></i>${k}</span>`).join('')+`</div>`;
+  const list=P.stakeholders.map(s=>`<div class="note-row"><span class="d" style="background:${PMBOK[s.category]||'var(--blue)'}"></span><div><div class="nt">${esc(s.name)}</div><div class="nm">${esc(s.role)} · P${s.power}/I${s.interest}</div></div><span class="pill" style="margin-left:auto;background:${(PMBOK[s.category]||'var(--blue)')}1f;color:${PMBOK[s.category]||'var(--blue)'}">${esc(s.category||'—')}</span></div>`).join('');
+  el.innerHTML=`<div class="grid">${panel('利害關係人 · PMBOK 權力/關注','power / interest',svg+leg)}${panel('engagement 分類','PMBOK',list)}</div>`;
+};
+RENDER.res = el=>{
+  const bars=P.resources.map(r=>{const pc=Math.round(r.load/r.capacity*100),col=pc>85?'var(--rust)':pc>60?'var(--amber)':'var(--accent)';
+    const link=r.url?`<a href="${esc(r.url)}" target="_blank" rel="noopener" style="font-family:var(--fm);font-size:10px;color:var(--accent);text-decoration:none">🔗 ${esc(r.url)}</a>`:`<span style="font-family:var(--fm);font-size:10px;color:var(--ink-faint)">${esc(r.kind||'')}</span>`;
+    return `<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;align-items:baseline;font-size:12px;margin-bottom:4px"><span style="font-weight:600">${esc(r.name)} <span class="pill waiting" style="font-size:8px">${esc(r.kind||'')}</span></span><span style="font-family:var(--fm);color:${col}">${pc}%</span></div><div class="bar-wrap"><div style="width:${pc}%;background:${col}"></div></div><div style="margin-top:4px">${link}</div></div>`}).join('');
+  el.innerHTML=panel('資源 Resources','load · URL / API 連結',bars+'<div style="font-family:var(--fm);font-size:10px;color:var(--ink-faint);margin-top:8px">資源可掛 URL / API 端點(於 BASE 設定新增)。</div>');
+};
+RENDER.risk = el=>{
+  const g=5,cell=58,pad=30,w=g*cell+pad*2,h=g*cell+pad*2;
+  let grid='';
+  for(let imp=5;imp>=1;imp--)for(let pr=1;pr<=5;pr++){const score=pr*imp,t=score/25;const col=`rgba(${Math.round(240-t*48)},${Math.round(238-t*195)},${Math.round(232-t*186)},1)`;grid+=`<rect x="${pad+(pr-1)*cell}" y="${pad+(5-imp)*cell}" width="${cell-2}" height="${cell-2}" fill="${col}"/>`}
+  const dots=P.risks.map(r=>{const x=pad+(r.probability-0.5)*cell,y=pad+(5-r.impact+0.5)*cell;return `<circle cx="${x}" cy="${y}" r="6" fill="var(--ink)"/>`}).join('');
+  const svg=`<svg viewBox="0 0 ${w} ${h}" style="width:100%;max-width:360px">${grid}${dots}<text x="${w/2}" y="${h-6}" font-size="9" text-anchor="middle" fill="var(--ink-faint)">Probability →</text></svg>`;
+  const top=[...P.risks].sort((a,b)=>b.probability*b.impact-a.probability*a.impact).map(r=>`<div class="note-row"><span class="d" style="background:${r.probability*r.impact>=12?'var(--rust)':r.probability*r.impact>=6?'var(--amber)':'var(--accent)'}"></span><div><div class="nt">${esc(r.name)}</div><div class="nm">P${r.probability}×I${r.impact} = ${r.probability*r.impact} · ${r.status}</div></div></div>`).join('');
+  el.innerHTML=`<div class="grid">${panel('風險矩陣','probability × impact',svg)}${panel('風險登錄 · 危機','register',top)}</div>`;
+};
+
+// ---------- unified timeline (meetings + events + milestones + deadlines) ----------
+const TL_COL={event:"var(--blue)",meeting:"var(--accent)",milestone:"var(--amber)",task:"var(--ink-faint)"};
+const TL_TC={event:"事件",meeting:"會議",milestone:"里程碑",task:"截止"};
+RENDER.timeline = el=>{
+  let items=[];
+  (P.events||[]).forEach(e=>items.push({date:e.day,time:e.at_time||"",type:"event",title:e.title,src:e.source}));
+  (P.meetings||[]).forEach(m=>items.push({date:m.day,time:"",type:"meeting",title:m.title,link:"review"}));
+  (P.milestones||[]).forEach(m=>items.push({date:m.due,time:"",type:"milestone",title:m.name,status:m.status}));
+  (P.tasks||[]).forEach(t=>items.push({date:t.finish,time:"",type:"task",title:t.name+" 截止",status:t.status}));
+  items=items.filter(i=>i.date).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  const byDate={}; items.forEach(i=>{(byDate[i.date]=byDate[i.date]||[]).push(i)});
+  let h='<div class="tl">';
+  Object.keys(byDate).sort().forEach(date=>{
+    h+=`<div class="tl-date">${date}</div>`;
+    byDate[date].forEach(i=>{const c=TL_COL[i.type];
+      h+=`<div class="tl-item ${i.link?'clk':''}" ${i.link?`data-link="${i.link}"`:''}><span class="tl-dot" style="background:${c}"></span><span class="tl-time">${i.time||'·'}</span><span class="tl-type" style="background:${c}1f;color:${c}">${TL_TC[i.type]}</span><span class="tl-title">${esc(i.title)}</span></div>`;
+    });
+  });
+  h+='</div>';
+  el.innerHTML=panel("時間軸 Timeline","會議 · 事件 · 里程碑 · 截止 唯一時間相連",h);
+  el.querySelectorAll(".tl-item.clk").forEach(it=>it.addEventListener("click",()=>show(it.dataset.link)));
+};
+// ---------- CSV export (UTF-8 BOM → Excel 不亂碼) ----------
+function toCSV(rows,cols){const q=v=>{v=v==null?"":String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};return cols.join(",")+"\n"+rows.map(r=>cols.map(c=>q(r[c])).join(",")).join("\n")}
+function dl(name,text,type){const blob=new Blob([text],{type:type});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href)}
+function exportCSV(){dl("transcript.csv","\uFEFF"+toCSV(P.segments,["ord","at_time","speaker","category","text","action","keypt","confirmed"]),"text/csv;charset=utf-8");toast("已匯出 CSV","UTF-8 (BOM) · Excel 不亂碼")}
+// ---------- BASE settings ----------
+RENDER.settings = el=>{
+  const provs=LLM_PROV.map(p=>`<div class="set-field"><label>${esc(p.name)} endpoint</label><input data-ep="${p.k}" value="${esc(p.endpoint||'')}" placeholder="https://… (OpenAI 相容)"></div>`).join("");
+  const news=(CFG.news_sources||[]).map((n,i)=>`<div class="set-field"><label>${esc(n.name)} URL</label><input data-news="${i}" value="${esc(n.url||'')}"></div>`).join("");
+  const togs=MODS.map(m=>`<span class="set-tog on" data-mod="${m.id}">${esc(m.label)}</span>`).join("");
+  el.innerHTML=panel("BASE 設定 · Settings","彈性設定 · 即時套用 / 匯出 config.json",`
+    <div class="set-grid"><div>
+      <div class="set-field"><label>品牌名稱 Brand</label><input id="setBrand" value="${esc(CFG.brand||'VeritasPulse')}"></div>
+      <div class="set-field"><label>主色 Accent</label><input type="color" id="setAccent" value="${esc(CFG.accent||'#5e7032')}"></div>
+      <div class="set-field"><label>會議紀錄預設模式</label><select id="setMode"><option value="comprehensive">全面 Comprehensive</option><option value="concise">精簡 Concise</option></select></div>
+      <div class="set-field"><label>輸出資料夾(PS launcher 自動開啟)</label><input id="setOut" value="output/" readonly></div>
+    </div><div>${provs}</div></div>
+    <h3 style="font-family:var(--fd);font-size:13px;margin:8px 0 8px">新聞 / API 來源 URL</h3>${news}
+    <h3 style="font-family:var(--fd);font-size:13px;margin:14px 0 8px">模組開關(匯出 config.json 後重建生效)</h3><div class="set-toggles">${togs}</div>
+    <div style="display:flex;gap:9px;margin-top:18px;flex-wrap:wrap"><button class="btn primary" id="setApply">套用(本次)</button><button class="btn" id="setExport">匯出 config.json</button><button class="btn" id="setCsv">匯出 CSV</button></div>
+    <div style="font-family:var(--fm);font-size:10px;color:var(--ink-faint);margin-top:8px">「套用」即時改主色/品牌/模式;「匯出 config.json」放到 output/ 重建即永久生效。CSV 為 UTF-8(含 BOM)。</div>`);
+  $("#setMode").value=MIN_MODE;
+  $("#setApply").addEventListener("click",()=>{
+    const b=$("#setBrand").value,a=$("#setAccent").value;
+    if(a){document.documentElement.style.setProperty('--accent',a);CFG.accent=a}
+    if(b){CFG.brand=b;const mk=document.querySelector('.brand .mark');if(mk)mk.innerHTML='<span class="dot"></span>'+esc(b)}
+    MIN_MODE=$("#setMode").value;CFG.default_minutes_mode=MIN_MODE;
+    el.querySelectorAll("[data-ep]").forEach(i=>{const p=LLM_PROV.find(x=>x.k===i.dataset.ep);if(p)p.endpoint=i.value});
+    toast("已套用","主色 / 品牌 / 模式已即時更新")});
+  $("#setExport").addEventListener("click",()=>{
+    const mods={}; el.querySelectorAll(".set-tog").forEach(t=>mods[t.dataset.mod]=t.classList.contains("on"));
+    const cfg={brand:$("#setBrand").value,accent:$("#setAccent").value,default_minutes_mode:$("#setMode").value,modules:mods,
+      llm_providers:LLM_PROV.map(p=>({k:p.k,name:p.name,on:p.on,endpoint:(el.querySelector('[data-ep="'+p.k+'"]')||{}).value||p.endpoint||""})),
+      news_sources:(CFG.news_sources||[]).map((n,i)=>({name:n.name,url:(el.querySelector('[data-news="'+i+'"]')||{}).value||n.url,enabled:n.enabled!==false}))};
+    dl("config.json",JSON.stringify(cfg,null,2),"application/json");
+    toast("已匯出","config.json 已下載 → 放到 output/ 重建即生效")});
+  $("#setCsv").addEventListener("click",exportCSV);
+  el.querySelectorAll(".set-tog").forEach(t=>t.addEventListener("click",()=>t.classList.toggle("on")));
+};
+// ---------- flow drag + arrows ----------
+let drag=null,off={x:0,y:0};
+function fcenter(n){const r=n.getBoundingClientRect(),w=$('#flowWrap').getBoundingClientRect();return{x:r.left-w.left+r.width/2,y:r.top-w.top+r.height/2,r:r.width/2}}
+function drawFlow(){
+  const svg=$('#flowSvg'); if(!svg)return;
+  svg.querySelectorAll('path.edge').forEach(p=>p.remove());
+  P.flow_edges.forEach(e=>{
+    const a=$(`.fnode[data-id="${e.src}"]`),b=$(`.fnode[data-id="${e.dst}"]`); if(!a||!b)return;
+    const ca=fcenter(a),cb=fcenter(b),mx=(ca.x+cb.x)/2;
+    const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d',`M ${ca.x+ca.r} ${ca.y} C ${mx} ${ca.y}, ${mx} ${cb.y}, ${cb.x-cb.r-6} ${cb.y}`);
+    p.setAttribute('stroke','#8f897c');p.setAttribute('stroke-width','1.8');p.setAttribute('fill','none');p.setAttribute('marker-end','url(#arr)');p.setAttribute('class','edge');
+    svg.appendChild(p);
+  });
+}
+document.addEventListener('mousedown',e=>{if(FLOW_CONNECT||e.target.closest('.fdel'))return;const n=e.target.closest('.fnode');if(!n)return;drag=n;const r=n.getBoundingClientRect();off.x=e.clientX-r.left;off.y=e.clientY-r.top;e.preventDefault()});
+document.addEventListener('mousemove',e=>{if(!drag)return;const w=$('#flowWrap').getBoundingClientRect();drag.style.left=(e.clientX-w.left-off.x)+'px';drag.style.top=(e.clientY-w.top-off.y)+'px';drawFlow()});
+document.addEventListener('mouseup',()=>drag=null);
+
+// ---------- live clocks ----------
+function tickClocks(){
+  const c=$('#liveClock'); if(c){
+    const d=new Date();
+    c.textContent=d.toLocaleTimeString('en-GB');
+    $('#liveDate').textContent=d.toLocaleDateString(undefined,{weekday:'long',year:'numeric',month:'short',day:'numeric'});
+    $('#liveTZ').textContent='⟟ '+localTZ()+' · 自動定位';
+  }
+  document.querySelectorAll('.wt[data-tz]').forEach(w=>w.textContent=tzTime(w.dataset.tz));
+}
+setInterval(tickClocks,1000);
+// ---------- weather (Open-Meteo · keyless · graceful) ----------
+function wxDesc(c){
+  if(c===0)return["☀️","晴 Clear"];if(c<=3)return["⛅","多雲 Partly cloudy"];
+  if(c===45||c===48)return["🌫️","霧 Fog"];if(c>=51&&c<=67)return["🌧️","雨 Rain"];
+  if(c>=71&&c<=77)return["🌨️","雪 Snow"];if(c>=80&&c<=82)return["🌦️","陣雨 Showers"];
+  if(c>=95)return["⛈️","雷雨 Thunder"];return["🌡️","—"];
+}
+async function loadWeather(lat,lon,name){
+  const b=document.getElementById('wxBody'); if(!b)return;
+  try{
+    const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code`);
+    const cur=(await r.json()).current; const [ico,desc]=wxDesc(cur.weather_code);
+    b.innerHTML=`<div class="wx"><div class="wx-ico">${ico}</div><div><div class="wx-temp">${Math.round(cur.temperature_2m)}°</div><div class="wx-desc">${desc}</div><div class="wx-loc">⟟ ${name}</div></div></div><div class="wx-row"><div>濕度<b>${cur.relative_humidity_2m}%</b></div><div>風速<b>${Math.round(cur.wind_speed_10m)} km/h</b></div></div>`;
+  }catch(e){ b.innerHTML='<div class="wx-desc">天氣暫時無法載入(離線或網路治理限制)</div>'; }
+}
+function initWeather(){
+  loadWeather(25.04,121.56,'Taipei'); // default
+  try{ if(navigator.geolocation) navigator.geolocation.getCurrentPosition(p=>loadWeather(p.coords.latitude,p.coords.longitude,'目前位置'),()=>{},{timeout:4000}); }catch(e){}
+}
+// ---------- sidebar collapse (holds compact panel) ----------
+$('#collapseBtn').addEventListener('click',()=>{
+  const a=document.querySelector('.app'); a.classList.toggle('collapsed');
+  $('#collapseBtn').querySelector('path').setAttribute('d', a.classList.contains('collapsed')?'M9 6l6 6-6 6':'M15 6l-6 6 6 6');
+});
+// ---------- help overlay ----------
+$('#helpBtn').addEventListener('click',()=>$('#help').classList.add('open'));
+$('#helpClose').addEventListener('click',()=>$('#help').classList.remove('open'));
+$('#help').addEventListener('click',e=>{if(e.target===$('#help'))$('#help').classList.remove('open')});
+
+// ---------- toasts ----------
+function toast(t,m){const z=$('#toastZone'),el=document.createElement('div');el.className='toast';
+  el.innerHTML=`<div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div><div><div class="tt">${esc(t)}</div><div class="tm">${esc(m)}</div></div><span class="tx">&times;</span>`;
+  el.querySelector('.tx').addEventListener('click',()=>el.remove());z.appendChild(el);setTimeout(()=>el.remove(),6000);}
+
+// ---------- chrome wiring ----------
+$('#ddBtn').addEventListener('click',e=>{e.stopPropagation();$('#ddMenu').classList.toggle('open')});
+document.addEventListener('click',()=>{$('#ddMenu').classList.remove('open');const bm=$('#blkMenu');if(bm)bm.classList.remove('open')});
+$('#ddMenu').querySelectorAll('.dd-opt').forEach(o=>o.addEventListener('click',()=>{$('#ddMenu').querySelectorAll('.dd-opt').forEach(x=>x.classList.remove('sel'));o.classList.add('sel');$('#ddLabel').textContent=o.dataset.d+' 天'}));
+$('#qcBtn').addEventListener('click',()=>$('#scrim').classList.add('open'));
+$('#qcClose').addEventListener('click',()=>$('#scrim').classList.remove('open'));
+$('#qcCancel').addEventListener('click',()=>$('#scrim').classList.remove('open'));
+$('#scrim').addEventListener('click',e=>{if(e.target===$('#scrim'))$('#scrim').classList.remove('open')});
+$('#qcMode').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{$('#qcMode').querySelectorAll('button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}));
+$('#qcCat').querySelectorAll('.selchip').forEach(c=>c.addEventListener('click',()=>{$('#qcCat').querySelectorAll('.selchip').forEach(x=>x.classList.remove('on'));c.classList.add('on')}));
+document.querySelectorAll('.preset').forEach(p=>p.addEventListener('click',()=>$('#qcTitle').value=p.dataset.f));
+$('#qcSave').addEventListener('click',()=>{
+  const mode=$('#qcMode .on').dataset.m, cat=($('#qcCat .on')||{dataset:{c:'Task'}}).dataset.c;
+  const t=$('#qcTitle').value||(cat+' 項目');
+  $('#scrim').classList.remove('open');
+  toast('已建立 · '+(mode==='project'?'專案':'事件'),'['+cat+'] '+t+' · 已同步 Google Calendar');
+});
+
+// ---------- data interchange (export / import) ----------
+$('#exportBtn').addEventListener('click',()=>{
+  const blob=new Blob([JSON.stringify(VPL_DATA,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='veritaspulse_'+P.code+'.json';a.click();URL.revokeObjectURL(a.href);
+  toast('已匯出','資料已下載為 JSON');
+});
+$('#importBtn').addEventListener('click',()=>$('#importFile').click());
+$('#importFile').addEventListener('change',e=>{
+  const f=e.target.files[0]; if(!f)return; const r=new FileReader();
+  r.onload=()=>{try{const d=JSON.parse(r.result);if(d.project)Object.assign(P,d.project);
+    show(($('.nav-item.active')||{dataset:{view:MODS[0].id}}).dataset.view);
+    toast('已匯入','資料已載入並重新渲染');}catch(err){toast('匯入失敗',String(err.message||err))}};
+  r.readAsText(f);
+});
+
+// ---------- init ----------
+$('#brandSub').textContent='VPL · '+P.code;
+$('#topDate').textContent=P.name+' · auto-synced';
+$('#footProj').textContent=P.code+' · '+P.owner;
+buildNav(); show(MODS[0].id);
+// apply flexible config (accent / brand) + PWA
+if(CFG.accent){document.documentElement.style.setProperty('--accent',CFG.accent)}
+if(CFG.brand){const mk=document.querySelector('.brand .mark');if(mk)mk.innerHTML='<span class="dot"></span>'+esc(CFG.brand)}
+if(CFG.brand_sub){const bs=$('#brandSub');if(bs)bs.textContent=CFG.brand_sub}
+if(CFG.pwa && 'serviceWorker' in navigator){try{navigator.serviceWorker.register('service-worker.js').catch(()=>{})}catch(e){}}
+// sidebar sync card — standardized brand tiles
+$('#syncCard').innerHTML=[["gcal","Calendar"],["gdrive","Drive"],["gcontacts","Contacts"]].map(c=>
+  `<div style="display:flex;align-items:center;gap:9px;padding:5px 2px">${brand(c[0],"sm")}<span class="svc" style="font-size:11.5px;font-weight:500">${c[1]}</span><span class="ts" style="font-family:var(--fm);font-size:9px;color:var(--green);margin-left:auto"><span class="dotk" style="background:var(--green)"></span>2m</span></div>`).join("");
+// auto reminders from events
+P.events.filter(e=>e.remind_min).slice(0,2).forEach((e,i)=>setTimeout(()=>toast('即將開始 · '+e.remind_min+' 分後',e.title+' · '+e.at_time),2200+i*5500));
+window.addEventListener('resize',()=>{if($('#flowWrap'))drawFlow()});
+</script>
+</body>
+</html>

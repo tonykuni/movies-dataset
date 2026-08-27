@@ -131,7 +131,7 @@ if ($Pwsh) {
 # ---- [6/8] graphviz 可攜版(dotsetup 引擎;sha256 驗證)-----------------
 $ok6 = $false
 if ($Py) {
-    & $Py (Join-Path $Engines "workops_graphviz_setup.py") install
+    & $Py (Join-Path $Engines "VIA_ENG070_WorkopsGraphvizSetup.py") install
     $ok6 = ($LASTEXITCODE -eq 0)
 }
 Step "6/8 graphviz 可攜版" $ok6 "dotsetup(免 winget/管理員)"
@@ -161,7 +161,7 @@ if ($NoSchedule) {
 if ($SkipSelftest) {
     Step "8/8 全鏈自測" $true "略過(-SkipSelftest)"
 } elseif ($Py) {
-    & $Py (Join-Path $Engines "workops_selftest.py")
+    & $Py (Join-Path $Engines "VIA_ENG081_WorkopsSelftest.py")
     Step "8/8 全鏈自測" ($LASTEXITCODE -eq 0) "FinalGate(詳 out\selftest_report.json)"
 } else {
     Step "8/8 全鏈自測" $false "無 Python 可執行(承上段)"
@@ -179,3 +179,11 @@ Write-Host "-------------------------------------------------------------"
 Write-Host ("[總結] 部署 FinalGate = {0}({1}/{2} 步過)→ out\bootstrap_report.json" -f $final, ($Report.Count - $nF), $Report.Count) -ForegroundColor $(if ($nF -eq 0) { "Green" } else { "Red" })
 Write-Host "下一步:重開一個新視窗(讓 PATH 生效)→ via-workops all"
 if ($final -eq "PASS") { exit 0 } else { exit 1 }
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

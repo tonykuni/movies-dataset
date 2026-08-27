@@ -6,6 +6,20 @@
 治理:只增不減(不改既有列)· 全自動編號(VIA-XXX-0001)· T-1 紀律(T06 需 asof_release)
      · 證據 tier 白名單 · 財報優先法說次之(data_priority 枚舉)· retired 用狀態欄不刪列。
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 import json, csv, sys, os, re
 
 BASE=os.path.dirname(os.path.abspath(__file__))

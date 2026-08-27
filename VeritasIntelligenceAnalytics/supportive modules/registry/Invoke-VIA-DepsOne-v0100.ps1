@@ -54,8 +54,8 @@ if ($null -eq $Py) {
   Write-Host "  ✗ Python 解譯器缺(py/python/python3 皆未尋獲)——誠實停" -ForegroundColor Red
   exit 2
 }
-$DepEng = Get-NewestEngine "via_dep_super_v0*.py"
-$RebEng = Get-NewestEngine "via_env_rebuild_v0*.py"
+$DepEng = Get-NewestEngine "CGC_MDL046_DepSuper_v0*.py"
+$RebEng = Get-NewestEngine "CGC_MDL050_EnvRebuild_v0*.py"
 if ((-not $DepEng) -or (-not $RebEng)) {
   Write-Host "  ✗ 引擎缺(via_dep_super/via_env_rebuild 未尋獲)——誠實停" -ForegroundColor Red
   exit 2
@@ -163,3 +163,11 @@ Write-Host "  存證:VIA_Reports\depsuper_runs + VIA_Reports\rebuild_runs(JSON+�
 Write-Host "  候裁事項(切換/移除/YELLOW·RED 段)見 ③ 輸出——操作員裁後另跑;安裝亦可走 via-plan→via-install"
 Write-Host ("  出口碼:" + $Final)
 exit $Final
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

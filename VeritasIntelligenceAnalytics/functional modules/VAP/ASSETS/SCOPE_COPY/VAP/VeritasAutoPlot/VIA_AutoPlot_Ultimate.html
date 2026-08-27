@@ -1,0 +1,1859 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIA AutoPlot Ultimate - Professional Charting</title>
+    
+    <!-- Plotly.js for charting -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <!-- Papa Parse for CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <!-- SheetJS for Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+/* ═══════════════════════════════════════════════════════════════════════════════
+   VIA AUTOPLOT ULTIMATE - TRADINGVIEW-STYLE PROFESSIONAL CHARTING
+   Coverage Target: Chart Types, Interaction, Indicators, Drawing Tools
+═══════════════════════════════════════════════════════════════════════════════ */
+
+:root {
+    /* Dark Theme (TradingView Style) */
+    --bg-0: #131722;
+    --bg-1: #1e222d;
+    --bg-2: #2a2e39;
+    --bg-3: #363a45;
+    --bg-hover: rgba(255,255,255,0.05);
+    --bg-active: rgba(255,255,255,0.1);
+    
+    --text-0: #d1d4dc;
+    --text-1: #b2b5be;
+    --text-2: #787b86;
+    --text-3: #5d606b;
+    
+    --border: #363a45;
+    --border-light: #434651;
+    
+    /* Colors */
+    --accent: #2962ff;
+    --accent-light: #5b8def;
+    --success: #26a69a;
+    --danger: #ef5350;
+    --warning: #ff9800;
+    --up: #26a69a;
+    --down: #ef5350;
+    
+    /* Chart Colors */
+    --chart-1: #2962ff;
+    --chart-2: #26a69a;
+    --chart-3: #ff9800;
+    --chart-4: #ab47bc;
+    --chart-5: #42a5f5;
+    --chart-6: #ec407a;
+    
+    /* Sizing */
+    --header-h: 48px;
+    --toolbar-h: 40px;
+    --sidebar-w: 280px;
+    --panel-h: 200px;
+    
+    --radius: 4px;
+}
+
+/* Light Theme */
+[data-theme="light"] {
+    --bg-0: #ffffff;
+    --bg-1: #f8f9fa;
+    --bg-2: #f0f3fa;
+    --bg-3: #e0e3eb;
+    --bg-hover: rgba(0,0,0,0.04);
+    --bg-active: rgba(0,0,0,0.08);
+    
+    --text-0: #131722;
+    --text-1: #2a2e39;
+    --text-2: #787b86;
+    --text-3: #9598a1;
+    
+    --border: #e0e3eb;
+    --border-light: #d1d4dc;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+    height: 100%;
+    font-family: 'Inter', 'Noto Sans TC', -apple-system, sans-serif;
+    font-size: 13px;
+    background: var(--bg-0);
+    color: var(--text-0);
+    overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Header */
+.header {
+    height: var(--header-h);
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 12px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text-0);
+}
+
+.logo-icon {
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(135deg, var(--accent), #7b1fa2);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 11px;
+}
+
+.header-sep {
+    width: 1px;
+    height: 24px;
+    background: var(--border);
+}
+
+/* Symbol Selector */
+.symbol-selector {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+}
+
+.symbol-selector:hover {
+    border-color: var(--accent);
+}
+
+.symbol-name {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.symbol-price {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+}
+
+.symbol-change {
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+.symbol-change.up { background: rgba(38,166,154,0.2); color: var(--up); }
+.symbol-change.down { background: rgba(239,83,80,0.2); color: var(--down); }
+
+/* Timeframe Selector */
+.timeframe-group {
+    display: flex;
+    gap: 2px;
+    background: var(--bg-2);
+    padding: 2px;
+    border-radius: var(--radius);
+}
+
+.tf-btn {
+    padding: 6px 10px;
+    background: transparent;
+    border: none;
+    color: var(--text-2);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: 3px;
+    transition: all 0.15s;
+}
+
+.tf-btn:hover { color: var(--text-0); background: var(--bg-hover); }
+.tf-btn.active { background: var(--accent); color: white; }
+
+/* Chart Type Selector */
+.chart-type-group {
+    display: flex;
+    gap: 4px;
+}
+
+.ct-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-2);
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: var(--radius);
+    transition: all 0.15s;
+}
+
+.ct-btn:hover { color: var(--text-0); background: var(--bg-hover); }
+.ct-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(41,98,255,0.1); }
+
+/* Header Actions */
+.header-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header-btn {
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-1);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s;
+}
+
+.header-btn:hover { border-color: var(--text-2); color: var(--text-0); }
+.header-btn.primary { background: var(--accent); border-color: var(--accent); color: white; }
+.header-btn.primary:hover { background: var(--accent-light); }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   MAIN AREA
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+/* Drawing Toolbar (Left) */
+.draw-toolbar {
+    width: 48px;
+    background: var(--bg-1);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 8px 0;
+    gap: 2px;
+}
+
+.draw-btn {
+    width: 100%;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--text-2);
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.15s;
+    position: relative;
+}
+
+.draw-btn:hover { color: var(--text-0); background: var(--bg-hover); }
+.draw-btn.active { color: var(--accent); background: rgba(41,98,255,0.1); }
+
+.draw-btn::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 4px 8px;
+    background: var(--bg-3);
+    color: var(--text-0);
+    font-size: 11px;
+    white-space: nowrap;
+    border-radius: var(--radius);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.15s;
+    margin-left: 8px;
+    z-index: 100;
+}
+
+.draw-btn:hover::after { opacity: 1; visibility: visible; }
+
+.draw-sep {
+    height: 1px;
+    background: var(--border);
+    margin: 8px 8px;
+}
+
+/* Chart Container */
+.chart-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-0);
+    min-width: 0;
+}
+
+/* Chart Toolbar */
+.chart-toolbar {
+    height: var(--toolbar-h);
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 8px;
+}
+
+.indicator-chips {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+    overflow-x: auto;
+}
+
+.indicator-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 11px;
+    color: var(--text-1);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.indicator-chip:hover { border-color: var(--text-2); }
+.indicator-chip .close { color: var(--text-3); }
+.indicator-chip .close:hover { color: var(--danger); }
+
+.toolbar-btn {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--text-2);
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: var(--radius);
+}
+
+.toolbar-btn:hover { color: var(--text-0); background: var(--bg-hover); }
+
+/* Main Chart */
+.chart-main {
+    flex: 1;
+    position: relative;
+    min-height: 300px;
+}
+
+.chart-main .js-plotly-plot {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Chart Overlay Info */
+.chart-overlay {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.ohlc-display {
+    display: flex;
+    gap: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+}
+
+.ohlc-item {
+    display: flex;
+    gap: 4px;
+}
+
+.ohlc-label { color: var(--text-3); }
+.ohlc-value { color: var(--text-0); font-weight: 500; }
+.ohlc-value.up { color: var(--up); }
+.ohlc-value.down { color: var(--down); }
+
+/* Indicator Panel */
+.indicator-panel {
+    height: var(--panel-h);
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-header {
+    height: 28px;
+    background: var(--bg-1);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 8px;
+}
+
+.panel-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-2);
+    text-transform: uppercase;
+}
+
+.panel-chart {
+    flex: 1;
+    min-height: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   RIGHT SIDEBAR
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.sidebar {
+    width: var(--sidebar-w);
+    background: var(--bg-1);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+}
+
+.sidebar-tab {
+    flex: 1;
+    padding: 10px;
+    background: transparent;
+    border: none;
+    color: var(--text-2);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s;
+}
+
+.sidebar-tab:hover { color: var(--text-0); }
+.sidebar-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+}
+
+.sidebar-section {
+    margin-bottom: 16px;
+}
+
+.section-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+/* Indicator List */
+.indicator-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.indicator-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.indicator-item:hover { border-color: var(--accent); }
+.indicator-item.added { border-color: var(--success); background: rgba(38,166,154,0.1); }
+
+.indicator-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-3);
+    border-radius: var(--radius);
+    font-size: 12px;
+}
+
+.indicator-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.indicator-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-0);
+}
+
+.indicator-desc {
+    font-size: 10px;
+    color: var(--text-3);
+}
+
+/* Settings Panel */
+.setting-group {
+    margin-bottom: 12px;
+}
+
+.setting-label {
+    font-size: 11px;
+    color: var(--text-2);
+    margin-bottom: 4px;
+}
+
+.setting-input {
+    width: 100%;
+    padding: 8px 10px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-0);
+    font-size: 12px;
+    outline: none;
+}
+
+.setting-input:focus { border-color: var(--accent); }
+
+.setting-select {
+    width: 100%;
+    padding: 8px 10px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-0);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.setting-row {
+    display: flex;
+    gap: 8px;
+}
+
+.setting-row > * { flex: 1; }
+
+/* Toggle */
+.toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+}
+
+.toggle-label {
+    font-size: 12px;
+    color: var(--text-1);
+}
+
+.toggle {
+    width: 36px;
+    height: 20px;
+    background: var(--bg-3);
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.toggle.active { background: var(--accent); }
+
+.toggle::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: all 0.2s;
+}
+
+.toggle.active::after { left: 18px; }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   MODALS
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s;
+}
+
+.modal-overlay.active { opacity: 1; visibility: visible; }
+
+.modal {
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow: hidden;
+    transform: translateY(20px);
+    transition: all 0.2s;
+}
+
+.modal-overlay.active .modal { transform: translateY(0); }
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.modal-title {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.modal-close {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--text-2);
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: var(--radius);
+}
+
+.modal-close:hover { background: var(--bg-hover); color: var(--text-0); }
+
+.modal-body {
+    padding: 16px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 16px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-2);
+}
+
+/* Drop Zone */
+.drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--accent);
+    background: rgba(41,98,255,0.05);
+}
+
+.drop-zone-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
+.drop-zone-title { font-size: 14px; font-weight: 500; color: var(--text-0); margin-bottom: 4px; }
+.drop-zone-subtitle { font-size: 12px; color: var(--text-2); }
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   CROSSHAIR & TOOLTIPS
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.crosshair-h, .crosshair-v {
+    position: absolute;
+    background: var(--text-3);
+    pointer-events: none;
+    z-index: 50;
+    display: none;
+}
+
+.crosshair-h { height: 1px; left: 0; right: 0; }
+.crosshair-v { width: 1px; top: 0; bottom: 0; }
+
+.price-tag {
+    position: absolute;
+    right: 0;
+    background: var(--accent);
+    color: white;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    transform: translateY(-50%);
+    z-index: 51;
+    display: none;
+}
+
+.time-tag {
+    position: absolute;
+    bottom: 0;
+    background: var(--accent);
+    color: white;
+    padding: 2px 8px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    transform: translateX(-50%);
+    z-index: 51;
+    display: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   STATUS BAR
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.statusbar {
+    height: 24px;
+    background: var(--bg-1);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 16px;
+    font-size: 11px;
+    color: var(--text-2);
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--success);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════════════════════════════════════════ */
+
+.hidden { display: none !important; }
+.flex-1 { flex: 1; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-light); }
+
+/* Toast */
+.toast-container {
+    position: fixed;
+    bottom: 40px;
+    right: 16px;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.toast {
+    padding: 12px 16px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 12px;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(100%); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.toast.success { border-left: 3px solid var(--success); }
+.toast.error { border-left: 3px solid var(--danger); }
+    </style>
+</head>
+<body>
+
+<div class="app">
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">VIA</div>
+            <span>AutoPlot Ultimate</span>
+        </div>
+        
+        <div class="header-sep"></div>
+        
+        <!-- Symbol -->
+        <div class="symbol-selector" onclick="showSymbolModal()">
+            <span class="symbol-name" id="symbolName">DEMO/USD</span>
+            <span class="symbol-price" id="symbolPrice">--</span>
+            <span class="symbol-change up" id="symbolChange">+0.00%</span>
+        </div>
+        
+        <div class="header-sep"></div>
+        
+        <!-- Timeframes -->
+        <div class="timeframe-group">
+            <button class="tf-btn" data-tf="1m">1m</button>
+            <button class="tf-btn" data-tf="5m">5m</button>
+            <button class="tf-btn" data-tf="15m">15m</button>
+            <button class="tf-btn" data-tf="1H">1H</button>
+            <button class="tf-btn" data-tf="4H">4H</button>
+            <button class="tf-btn active" data-tf="1D">1D</button>
+            <button class="tf-btn" data-tf="1W">1W</button>
+            <button class="tf-btn" data-tf="1M">1M</button>
+        </div>
+        
+        <div class="header-sep"></div>
+        
+        <!-- Chart Types -->
+        <div class="chart-type-group">
+            <button class="ct-btn" data-type="candlestick" title="K線圖">📊</button>
+            <button class="ct-btn active" data-type="line" title="折線圖">📈</button>
+            <button class="ct-btn" data-type="area" title="面積圖">📉</button>
+            <button class="ct-btn" data-type="bar" title="柱狀圖">📶</button>
+            <button class="ct-btn" data-type="ohlc" title="OHLC">🔲</button>
+        </div>
+        
+        <!-- Actions -->
+        <div class="header-actions">
+            <button class="header-btn" onclick="showIndicatorModal()">📐 指標</button>
+            <button class="header-btn" onclick="showUploadModal()">📂 匯入</button>
+            <button class="header-btn" onclick="exportChart()">📥 匯出</button>
+            <button class="header-btn" onclick="toggleTheme()">🌙</button>
+            <button class="header-btn primary" onclick="loadDemoData()">📊 載入範例</button>
+        </div>
+    </header>
+    
+    <!-- Main -->
+    <div class="main">
+        <!-- Drawing Toolbar -->
+        <div class="draw-toolbar">
+            <button class="draw-btn active" data-tool="cursor" data-tooltip="游標">🖱️</button>
+            <button class="draw-btn" data-tool="crosshair" data-tooltip="十字準線">➕</button>
+            <div class="draw-sep"></div>
+            <button class="draw-btn" data-tool="trendline" data-tooltip="趨勢線">📏</button>
+            <button class="draw-btn" data-tool="horizontal" data-tooltip="水平線">➖</button>
+            <button class="draw-btn" data-tool="vertical" data-tooltip="垂直線">|</button>
+            <button class="draw-btn" data-tool="ray" data-tooltip="射線">↗️</button>
+            <div class="draw-sep"></div>
+            <button class="draw-btn" data-tool="fibonacci" data-tooltip="費波那契">🔢</button>
+            <button class="draw-btn" data-tool="rectangle" data-tooltip="矩形">⬜</button>
+            <button class="draw-btn" data-tool="channel" data-tooltip="通道">⊏</button>
+            <div class="draw-sep"></div>
+            <button class="draw-btn" data-tool="text" data-tooltip="文字">A</button>
+            <button class="draw-btn" data-tool="arrow" data-tooltip="箭頭">➡️</button>
+            <div class="draw-sep"></div>
+            <button class="draw-btn" data-tool="measure" data-tooltip="測量">📐</button>
+            <button class="draw-btn" data-tool="zoom" data-tooltip="縮放">🔍</button>
+            <div class="draw-sep"></div>
+            <button class="draw-btn" data-tool="delete" data-tooltip="刪除繪圖">🗑️</button>
+        </div>
+        
+        <!-- Chart Area -->
+        <div class="chart-container">
+            <!-- Chart Toolbar -->
+            <div class="chart-toolbar">
+                <div class="indicator-chips" id="indicatorChips">
+                    <!-- Dynamic indicator chips -->
+                </div>
+                <button class="toolbar-btn" onclick="toggleGrid()" title="網格">⊞</button>
+                <button class="toolbar-btn" onclick="resetZoom()" title="重置">↺</button>
+                <button class="toolbar-btn" onclick="toggleLog()" title="對數">㏒</button>
+                <button class="toolbar-btn" onclick="toggleAutoScale()" title="自動縮放">⇕</button>
+            </div>
+            
+            <!-- Main Chart -->
+            <div class="chart-main" id="mainChart">
+                <!-- Crosshair -->
+                <div class="crosshair-h" id="crosshairH"></div>
+                <div class="crosshair-v" id="crosshairV"></div>
+                <div class="price-tag" id="priceTag"></div>
+                <div class="time-tag" id="timeTag"></div>
+                
+                <!-- OHLC Display -->
+                <div class="chart-overlay">
+                    <div class="ohlc-display" id="ohlcDisplay">
+                        <div class="ohlc-item"><span class="ohlc-label">O</span><span class="ohlc-value" id="ohlcO">--</span></div>
+                        <div class="ohlc-item"><span class="ohlc-label">H</span><span class="ohlc-value" id="ohlcH">--</span></div>
+                        <div class="ohlc-item"><span class="ohlc-label">L</span><span class="ohlc-value" id="ohlcL">--</span></div>
+                        <div class="ohlc-item"><span class="ohlc-label">C</span><span class="ohlc-value" id="ohlcC">--</span></div>
+                        <div class="ohlc-item"><span class="ohlc-label">Vol</span><span class="ohlc-value" id="ohlcV">--</span></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Volume Panel -->
+            <div class="indicator-panel" id="volumePanel">
+                <div class="panel-header">
+                    <span class="panel-title">Volume</span>
+                </div>
+                <div class="panel-chart" id="volumeChart"></div>
+            </div>
+            
+            <!-- RSI Panel (hidden by default) -->
+            <div class="indicator-panel hidden" id="rsiPanel">
+                <div class="panel-header">
+                    <span class="panel-title">RSI (14)</span>
+                </div>
+                <div class="panel-chart" id="rsiChart"></div>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-tabs">
+                <button class="sidebar-tab active" data-tab="indicators">指標</button>
+                <button class="sidebar-tab" data-tab="drawings">繪圖</button>
+                <button class="sidebar-tab" data-tab="settings">設定</button>
+            </div>
+            
+            <div class="sidebar-content">
+                <!-- Indicators Tab -->
+                <div class="sidebar-panel" id="panel-indicators">
+                    <div class="sidebar-section">
+                        <div class="section-title">趨勢指標</div>
+                        <div class="indicator-list">
+                            <div class="indicator-item" data-indicator="sma" onclick="toggleIndicator('sma')">
+                                <div class="indicator-icon">〰️</div>
+                                <div class="indicator-info">
+                                    <div class="indicator-name">SMA</div>
+                                    <div class="indicator-desc">簡單移動平均</div>
+                                </div>
+                            </div>
+                            <div class="indicator-item" data-indicator="ema" onclick="toggleIndicator('ema')">
+                                <div class="indicator-icon">📈</div>
+                                <div class="indicator-info">
+                                    <div class="indicator-name">EMA</div>
+                                    <div class="indicator-desc">指數移動平均</div>
+                                </div>
+                            </div>
+                            <div class="indicator-item" data-indicator="bollinger" onclick="toggleIndicator('bollinger')">
+                                <div class="indicator-icon">📊</div>
+                                <div class="indicator-info">
+                                    <div class="indicator-name">Bollinger Bands</div>
+                                    <div class="indicator-desc">布林通道</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sidebar-section">
+                        <div class="section-title">動量指標</div>
+                        <div class="indicator-list">
+                            <div class="indicator-item" data-indicator="rsi" onclick="toggleIndicator('rsi')">
+                                <div class="indicator-icon">📉</div>
+                                <div class="indicator-info">
+                                    <div class="indicator-name">RSI</div>
+                                    <div class="indicator-desc">相對強弱指標</div>
+                                </div>
+                            </div>
+                            <div class="indicator-item" data-indicator="macd" onclick="toggleIndicator('macd')">
+                                <div class="indicator-icon">📶</div>
+                                <div class="indicator-info">
+                                    <div class="indicator-name">MACD</div>
+                                    <div class="indicator-desc">指數平滑異同移動平均</div>
+                                </div>
+                            </div>
+                            <div class="indicator-item" data-indicator="stochastic" onclick="toggleIndicator('stochastic')">
+                                <div class="indicator-icon">⚡</div>
+                                <div class="indicator-info">
+                                    <div class="indicator-name">Stochastic</div>
+                                    <div class="indicator-desc">隨機指標</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sidebar-section">
+                        <div class="section-title">成交量指標</div>
+                        <div class="indicator-list">
+                            <div class="indicator-item added" data-indicator="volume">
+                                <div class="indicator-icon">📊</div>
+                                <div class="indicator-info">
+                                    <div class="indicator-name">Volume</div>
+                                    <div class="indicator-desc">成交量</div>
+                                </div>
+                            </div>
+                            <div class="indicator-item" data-indicator="vwap" onclick="toggleIndicator('vwap')">
+                                <div class="indicator-icon">💰</div>
+                                <div class="indicator-info">
+                                    <div class="indicator-name">VWAP</div>
+                                    <div class="indicator-desc">成交量加權平均價</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Drawings Tab -->
+                <div class="sidebar-panel hidden" id="panel-drawings">
+                    <div class="sidebar-section">
+                        <div class="section-title">已繪製物件</div>
+                        <div id="drawingsList" style="color:var(--text-2);font-size:12px;padding:8px;">
+                            尚無繪圖物件
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Settings Tab -->
+                <div class="sidebar-panel hidden" id="panel-settings">
+                    <div class="sidebar-section">
+                        <div class="section-title">圖表設定</div>
+                        
+                        <div class="setting-group">
+                            <div class="setting-label">主題</div>
+                            <select class="setting-select" id="themeSelect" onchange="setTheme(this.value)">
+                                <option value="dark">深色主題</option>
+                                <option value="light">淺色主題</option>
+                            </select>
+                        </div>
+                        
+                        <div class="toggle-row">
+                            <span class="toggle-label">顯示網格</span>
+                            <div class="toggle active" id="toggleGrid" onclick="toggleGrid()"></div>
+                        </div>
+                        
+                        <div class="toggle-row">
+                            <span class="toggle-label">自動縮放</span>
+                            <div class="toggle active" id="toggleAutoScale" onclick="toggleAutoScale()"></div>
+                        </div>
+                        
+                        <div class="toggle-row">
+                            <span class="toggle-label">對數刻度</span>
+                            <div class="toggle" id="toggleLogScale" onclick="toggleLog()"></div>
+                        </div>
+                        
+                        <div class="toggle-row">
+                            <span class="toggle-label">十字準線</span>
+                            <div class="toggle active" id="toggleCrosshair" onclick="toggleCrosshair()"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="sidebar-section">
+                        <div class="section-title">K線顏色</div>
+                        <div class="setting-row">
+                            <div class="setting-group">
+                                <div class="setting-label">上漲</div>
+                                <input type="color" class="setting-input" value="#26a69a" id="colorUp" onchange="updateColors()">
+                            </div>
+                            <div class="setting-group">
+                                <div class="setting-label">下跌</div>
+                                <input type="color" class="setting-input" value="#ef5350" id="colorDown" onchange="updateColors()">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sidebar-section">
+                        <div class="section-title">移動平均線</div>
+                        <div class="setting-row">
+                            <div class="setting-group">
+                                <div class="setting-label">MA 期數</div>
+                                <input type="number" class="setting-input" value="20" id="maPeriod" min="1" max="200">
+                            </div>
+                            <div class="setting-group">
+                                <div class="setting-label">類型</div>
+                                <select class="setting-select" id="maType">
+                                    <option value="sma">SMA</option>
+                                    <option value="ema">EMA</option>
+                                    <option value="wma">WMA</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Status Bar -->
+    <div class="statusbar">
+        <div class="status-item">
+            <span class="status-dot"></span>
+            <span>Ready</span>
+        </div>
+        <div class="status-item" id="statusData">資料點: 0</div>
+        <div class="status-item" id="statusZoom">縮放: 100%</div>
+        <div class="status-item" style="margin-left:auto;">VIA AutoPlot Ultimate v3.0</div>
+    </div>
+</div>
+
+<!-- Upload Modal -->
+<div class="modal-overlay" id="uploadModal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title">📂 匯入資料</div>
+            <button class="modal-close" onclick="closeModal('uploadModal')">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="drop-zone" id="dropZone">
+                <div class="drop-zone-icon">📁</div>
+                <div class="drop-zone-title">拖放檔案至此</div>
+                <div class="drop-zone-subtitle">支援 CSV, Excel, JSON</div>
+            </div>
+            <input type="file" id="fileInput" accept=".csv,.xlsx,.xls,.json" style="display:none">
+            
+            <div class="setting-group" style="margin-top:16px;">
+                <div class="setting-label">或貼上 CSV 資料</div>
+                <textarea class="setting-input" id="pasteData" rows="5" placeholder="Date,Open,High,Low,Close,Volume&#10;2024-01-01,100,105,99,103,10000"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="header-btn" onclick="closeModal('uploadModal')">取消</button>
+            <button class="header-btn primary" onclick="importPastedData()">匯入</button>
+        </div>
+    </div>
+</div>
+
+<!-- Indicator Modal -->
+<div class="modal-overlay" id="indicatorModal">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title">📐 新增指標</div>
+            <button class="modal-close" onclick="closeModal('indicatorModal')">×</button>
+        </div>
+        <div class="modal-body">
+            <input type="text" class="setting-input" placeholder="搜尋指標..." id="indicatorSearch" oninput="filterIndicators()">
+            <div id="indicatorList" style="margin-top:12px;">
+                <!-- Dynamic list -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════════════
+// VIA AUTOPLOT ULTIMATE - PROFESSIONAL CHARTING ENGINE
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const APP = {
+    data: null,
+    chartType: 'line',
+    timeframe: '1D',
+    theme: 'dark',
+    indicators: new Set(['volume']),
+    drawings: [],
+    settings: {
+        showGrid: true,
+        autoScale: true,
+        logScale: false,
+        crosshair: true,
+        colorUp: '#26a69a',
+        colorDown: '#ef5350'
+    }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INITIALIZATION
+// ═══════════════════════════════════════════════════════════════════════════════
+
+document.addEventListener('DOMContentLoaded', () => {
+    initEventListeners();
+    initDropZone();
+    loadDemoData();
+});
+
+function initEventListeners() {
+    // Timeframe buttons
+    document.querySelectorAll('.tf-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            APP.timeframe = btn.dataset.tf;
+            showToast('info', `時間週期: ${APP.timeframe}`);
+        });
+    });
+    
+    // Chart type buttons
+    document.querySelectorAll('.ct-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.ct-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            APP.chartType = btn.dataset.type;
+            renderChart();
+        });
+    });
+    
+    // Drawing tools
+    document.querySelectorAll('.draw-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.draw-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const tool = btn.dataset.tool;
+            if (tool === 'delete') {
+                clearDrawings();
+            } else {
+                showToast('info', `工具: ${btn.dataset.tooltip}`);
+            }
+        });
+    });
+    
+    // Sidebar tabs
+    document.querySelectorAll('.sidebar-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            document.querySelectorAll('.sidebar-panel').forEach(p => p.classList.add('hidden'));
+            document.getElementById(`panel-${tab.dataset.tab}`).classList.remove('hidden');
+        });
+    });
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') closeAllModals();
+        if (e.ctrlKey && e.key === 's') { e.preventDefault(); exportChart(); }
+    });
+}
+
+function initDropZone() {
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    
+    ['dragenter', 'dragover'].forEach(event => {
+        dropZone.addEventListener(event, e => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+    });
+    
+    ['dragleave', 'drop'].forEach(event => {
+        dropZone.addEventListener(event, e => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+        });
+    });
+    
+    dropZone.addEventListener('drop', e => {
+        const files = e.dataTransfer.files;
+        if (files.length > 0) handleFile(files[0]);
+    });
+    
+    dropZone.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', e => {
+        if (e.target.files.length > 0) handleFile(e.target.files[0]);
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// DATA HANDLING
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function loadDemoData() {
+    const days = 120;
+    const data = { date: [], open: [], high: [], low: [], close: [], volume: [] };
+    
+    let price = 100;
+    const now = new Date();
+    
+    for (let i = days; i >= 0; i--) {
+        const d = new Date(now);
+        d.setDate(d.getDate() - i);
+        
+        const change = (Math.random() - 0.48) * 4;
+        const volatility = Math.random() * 3;
+        
+        const open = price;
+        const close = price + change;
+        const high = Math.max(open, close) + Math.random() * volatility;
+        const low = Math.min(open, close) - Math.random() * volatility;
+        const volume = Math.floor(Math.random() * 1000000) + 500000;
+        
+        data.date.push(d.toISOString().split('T')[0]);
+        data.open.push(+open.toFixed(2));
+        data.high.push(+high.toFixed(2));
+        data.low.push(+low.toFixed(2));
+        data.close.push(+close.toFixed(2));
+        data.volume.push(volume);
+        
+        price = close;
+    }
+    
+    APP.data = data;
+    updateSymbolInfo();
+    renderChart();
+    closeModal('uploadModal');
+    showToast('success', '已載入範例資料');
+}
+
+function handleFile(file) {
+    const ext = file.name.split('.').pop().toLowerCase();
+    
+    if (ext === 'csv') {
+        Papa.parse(file, {
+            header: true,
+            dynamicTyping: true,
+            complete: result => parseData(result.data)
+        });
+    } else if (['xlsx', 'xls'].includes(ext)) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const workbook = XLSX.read(e.target.result, { type: 'binary' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const data = XLSX.utils.sheet_to_json(sheet);
+            parseData(data);
+        };
+        reader.readAsBinaryString(file);
+    }
+}
+
+function parseData(rows) {
+    const data = { date: [], open: [], high: [], low: [], close: [], volume: [] };
+    
+    const colMap = {};
+    const firstRow = rows[0] || {};
+    Object.keys(firstRow).forEach(k => {
+        const kl = k.toLowerCase();
+        if (kl.includes('date') || kl.includes('time')) colMap.date = k;
+        if (kl.includes('open')) colMap.open = k;
+        if (kl.includes('high')) colMap.high = k;
+        if (kl.includes('low')) colMap.low = k;
+        if (kl.includes('close') || kl.includes('price')) colMap.close = k;
+        if (kl.includes('vol')) colMap.volume = k;
+    });
+    
+    rows.forEach(row => {
+        if (!row[colMap.date]) return;
+        data.date.push(row[colMap.date]);
+        data.open.push(parseFloat(row[colMap.open]) || 0);
+        data.high.push(parseFloat(row[colMap.high]) || 0);
+        data.low.push(parseFloat(row[colMap.low]) || 0);
+        data.close.push(parseFloat(row[colMap.close] || row[colMap.open]) || 0);
+        data.volume.push(parseFloat(row[colMap.volume]) || 0);
+    });
+    
+    if (data.date.length > 0) {
+        APP.data = data;
+        updateSymbolInfo();
+        renderChart();
+        closeModal('uploadModal');
+        showToast('success', `已載入 ${data.date.length} 筆資料`);
+    } else {
+        showToast('error', '無法解析資料');
+    }
+}
+
+function importPastedData() {
+    const text = document.getElementById('pasteData').value.trim();
+    if (!text) return;
+    
+    Papa.parse(text, {
+        header: true,
+        dynamicTyping: true,
+        complete: result => parseData(result.data)
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CHART RENDERING
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function renderChart() {
+    if (!APP.data) return;
+    
+    const traces = [];
+    const { date, open, high, low, close, volume } = APP.data;
+    
+    // Main chart trace based on type
+    if (APP.chartType === 'candlestick') {
+        traces.push({
+            type: 'candlestick',
+            x: date,
+            open: open,
+            high: high,
+            low: low,
+            close: close,
+            increasing: { line: { color: APP.settings.colorUp }, fillcolor: APP.settings.colorUp },
+            decreasing: { line: { color: APP.settings.colorDown }, fillcolor: APP.settings.colorDown },
+            name: 'OHLC'
+        });
+    } else if (APP.chartType === 'ohlc') {
+        traces.push({
+            type: 'ohlc',
+            x: date,
+            open: open,
+            high: high,
+            low: low,
+            close: close,
+            increasing: { line: { color: APP.settings.colorUp } },
+            decreasing: { line: { color: APP.settings.colorDown } },
+            name: 'OHLC'
+        });
+    } else if (APP.chartType === 'area') {
+        traces.push({
+            type: 'scatter',
+            mode: 'lines',
+            x: date,
+            y: close,
+            fill: 'tozeroy',
+            fillcolor: 'rgba(41,98,255,0.2)',
+            line: { color: 'var(--accent)', width: 2 },
+            name: 'Close'
+        });
+    } else if (APP.chartType === 'bar') {
+        const colors = close.map((c, i) => c >= (open[i] || c) ? APP.settings.colorUp : APP.settings.colorDown);
+        traces.push({
+            type: 'bar',
+            x: date,
+            y: close,
+            marker: { color: colors },
+            name: 'Close'
+        });
+    } else {
+        // Line chart
+        traces.push({
+            type: 'scatter',
+            mode: 'lines',
+            x: date,
+            y: close,
+            line: { color: 'var(--accent)', width: 2 },
+            name: 'Close'
+        });
+    }
+    
+    // Add indicators
+    if (APP.indicators.has('sma')) {
+        const period = parseInt(document.getElementById('maPeriod')?.value) || 20;
+        traces.push({
+            type: 'scatter',
+            mode: 'lines',
+            x: date,
+            y: calcSMA(close, period),
+            line: { color: '#ff9800', width: 1.5, dash: 'dot' },
+            name: `SMA(${period})`
+        });
+    }
+    
+    if (APP.indicators.has('ema')) {
+        const period = parseInt(document.getElementById('maPeriod')?.value) || 20;
+        traces.push({
+            type: 'scatter',
+            mode: 'lines',
+            x: date,
+            y: calcEMA(close, period),
+            line: { color: '#ab47bc', width: 1.5 },
+            name: `EMA(${period})`
+        });
+    }
+    
+    if (APP.indicators.has('bollinger')) {
+        const { upper, middle, lower } = calcBollinger(close, 20, 2);
+        traces.push(
+            { type: 'scatter', mode: 'lines', x: date, y: upper, line: { color: '#42a5f5', width: 1, dash: 'dot' }, name: 'BB Upper' },
+            { type: 'scatter', mode: 'lines', x: date, y: middle, line: { color: '#42a5f5', width: 1 }, name: 'BB Middle' },
+            { type: 'scatter', mode: 'lines', x: date, y: lower, line: { color: '#42a5f5', width: 1, dash: 'dot' }, name: 'BB Lower', fill: 'tonexty', fillcolor: 'rgba(66,165,245,0.1)' }
+        );
+    }
+    
+    const layout = {
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        margin: { t: 20, r: 60, b: 40, l: 60 },
+        font: { family: 'Inter, sans-serif', size: 11, color: getComputedStyle(document.documentElement).getPropertyValue('--text-2') },
+        xaxis: {
+            type: 'date',
+            gridcolor: APP.settings.showGrid ? getComputedStyle(document.documentElement).getPropertyValue('--border') : 'transparent',
+            linecolor: getComputedStyle(document.documentElement).getPropertyValue('--border'),
+            rangeslider: { visible: false },
+            showspikes: APP.settings.crosshair,
+            spikemode: 'across',
+            spikesnap: 'cursor',
+            spikecolor: getComputedStyle(document.documentElement).getPropertyValue('--text-3'),
+            spikethickness: 1
+        },
+        yaxis: {
+            type: APP.settings.logScale ? 'log' : 'linear',
+            gridcolor: APP.settings.showGrid ? getComputedStyle(document.documentElement).getPropertyValue('--border') : 'transparent',
+            linecolor: getComputedStyle(document.documentElement).getPropertyValue('--border'),
+            side: 'right',
+            showspikes: APP.settings.crosshair,
+            spikemode: 'across',
+            spikesnap: 'cursor',
+            spikecolor: getComputedStyle(document.documentElement).getPropertyValue('--text-3'),
+            spikethickness: 1,
+            autorange: APP.settings.autoScale
+        },
+        showlegend: true,
+        legend: { orientation: 'h', y: 1.02, x: 0, font: { size: 10 } },
+        hovermode: 'x unified',
+        dragmode: 'zoom'
+    };
+    
+    const config = {
+        responsive: true,
+        displayModeBar: true,
+        modeBarButtonsToRemove: ['lasso2d', 'select2d'],
+        displaylogo: false
+    };
+    
+    Plotly.newPlot('mainChart', traces, layout, config);
+    
+    // Render volume
+    renderVolume();
+    
+    // Render RSI if enabled
+    if (APP.indicators.has('rsi')) {
+        document.getElementById('rsiPanel').classList.remove('hidden');
+        renderRSI();
+    } else {
+        document.getElementById('rsiPanel').classList.add('hidden');
+    }
+    
+    // Update status
+    document.getElementById('statusData').textContent = `資料點: ${date.length}`;
+    
+    // Update indicator chips
+    updateIndicatorChips();
+    
+    // Hover event for OHLC display
+    document.getElementById('mainChart').on('plotly_hover', function(data) {
+        if (data.points && data.points.length > 0) {
+            const idx = data.points[0].pointIndex;
+            updateOHLCDisplay(idx);
+        }
+    });
+}
+
+function renderVolume() {
+    if (!APP.data) return;
+    
+    const { date, open, close, volume } = APP.data;
+    const colors = close.map((c, i) => c >= (open[i] || c) ? APP.settings.colorUp : APP.settings.colorDown);
+    
+    const trace = {
+        type: 'bar',
+        x: date,
+        y: volume,
+        marker: { color: colors, opacity: 0.7 },
+        name: 'Volume'
+    };
+    
+    const layout = {
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        margin: { t: 10, r: 60, b: 30, l: 60 },
+        font: { family: 'Inter, sans-serif', size: 10, color: getComputedStyle(document.documentElement).getPropertyValue('--text-2') },
+        xaxis: { visible: false },
+        yaxis: {
+            gridcolor: getComputedStyle(document.documentElement).getPropertyValue('--border'),
+            side: 'right',
+            tickformat: '.2s'
+        },
+        showlegend: false
+    };
+    
+    Plotly.newPlot('volumeChart', [trace], layout, { responsive: true, displayModeBar: false });
+}
+
+function renderRSI() {
+    if (!APP.data) return;
+    
+    const { date, close } = APP.data;
+    const rsi = calcRSI(close, 14);
+    
+    const traces = [
+        { type: 'scatter', mode: 'lines', x: date, y: rsi, line: { color: '#ab47bc', width: 1.5 }, name: 'RSI' },
+        { type: 'scatter', mode: 'lines', x: date, y: Array(date.length).fill(70), line: { color: 'rgba(239,83,80,0.5)', width: 1, dash: 'dot' }, name: '超買' },
+        { type: 'scatter', mode: 'lines', x: date, y: Array(date.length).fill(30), line: { color: 'rgba(38,166,154,0.5)', width: 1, dash: 'dot' }, name: '超賣' }
+    ];
+    
+    const layout = {
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        margin: { t: 10, r: 60, b: 30, l: 60 },
+        font: { size: 10 },
+        xaxis: { visible: false },
+        yaxis: { range: [0, 100], side: 'right', gridcolor: getComputedStyle(document.documentElement).getPropertyValue('--border') },
+        showlegend: false
+    };
+    
+    Plotly.newPlot('rsiChart', traces, layout, { responsive: true, displayModeBar: false });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// TECHNICAL INDICATORS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function calcSMA(data, period) {
+    const result = [];
+    for (let i = 0; i < data.length; i++) {
+        if (i < period - 1) {
+            result.push(null);
+        } else {
+            const sum = data.slice(i - period + 1, i + 1).reduce((a, b) => a + b, 0);
+            result.push(sum / period);
+        }
+    }
+    return result;
+}
+
+function calcEMA(data, period) {
+    const k = 2 / (period + 1);
+    const result = [data[0]];
+    for (let i = 1; i < data.length; i++) {
+        result.push(data[i] * k + result[i - 1] * (1 - k));
+    }
+    return result;
+}
+
+function calcBollinger(data, period = 20, stdDev = 2) {
+    const middle = calcSMA(data, period);
+    const upper = [];
+    const lower = [];
+    
+    for (let i = 0; i < data.length; i++) {
+        if (i < period - 1) {
+            upper.push(null);
+            lower.push(null);
+        } else {
+            const slice = data.slice(i - period + 1, i + 1);
+            const mean = slice.reduce((a, b) => a + b, 0) / slice.length;
+            const std = Math.sqrt(slice.reduce((s, v) => s + Math.pow(v - mean, 2), 0) / slice.length);
+            upper.push(mean + stdDev * std);
+            lower.push(mean - stdDev * std);
+        }
+    }
+    
+    return { upper, middle, lower };
+}
+
+function calcRSI(data, period = 14) {
+    const changes = [];
+    for (let i = 1; i < data.length; i++) {
+        changes.push(data[i] - data[i - 1]);
+    }
+    
+    const gains = changes.map(c => c > 0 ? c : 0);
+    const losses = changes.map(c => c < 0 ? Math.abs(c) : 0);
+    
+    const rsi = [null];
+    let avgGain = gains.slice(0, period).reduce((a, b) => a + b, 0) / period;
+    let avgLoss = losses.slice(0, period).reduce((a, b) => a + b, 0) / period;
+    
+    for (let i = 0; i < period; i++) rsi.push(null);
+    
+    for (let i = period; i < data.length; i++) {
+        avgGain = (avgGain * (period - 1) + gains[i - 1]) / period;
+        avgLoss = (avgLoss * (period - 1) + losses[i - 1]) / period;
+        const rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
+        rsi.push(100 - (100 / (1 + rs)));
+    }
+    
+    return rsi;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// UI FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+function updateSymbolInfo() {
+    if (!APP.data) return;
+    
+    const close = APP.data.close;
+    const lastPrice = close[close.length - 1];
+    const prevPrice = close[close.length - 2] || lastPrice;
+    const change = ((lastPrice - prevPrice) / prevPrice * 100);
+    
+    document.getElementById('symbolPrice').textContent = lastPrice.toFixed(2);
+    const changeEl = document.getElementById('symbolChange');
+    changeEl.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`;
+    changeEl.className = `symbol-change ${change >= 0 ? 'up' : 'down'}`;
+}
+
+function updateOHLCDisplay(idx) {
+    if (!APP.data || idx === undefined) return;
+    
+    const { open, high, low, close, volume } = APP.data;
+    const c = close[idx];
+    const o = open[idx];
+    const isUp = c >= o;
+    
+    document.getElementById('ohlcO').textContent = o?.toFixed(2) || '--';
+    document.getElementById('ohlcH').textContent = high[idx]?.toFixed(2) || '--';
+    document.getElementById('ohlcL').textContent = low[idx]?.toFixed(2) || '--';
+    document.getElementById('ohlcC').textContent = c?.toFixed(2) || '--';
+    document.getElementById('ohlcV').textContent = volume[idx]?.toLocaleString() || '--';
+    
+    document.getElementById('ohlcC').className = `ohlc-value ${isUp ? 'up' : 'down'}`;
+}
+
+function updateIndicatorChips() {
+    const container = document.getElementById('indicatorChips');
+    container.innerHTML = '';
+    
+    APP.indicators.forEach(ind => {
+        if (ind === 'volume') return;
+        const chip = document.createElement('div');
+        chip.className = 'indicator-chip';
+        chip.innerHTML = `<span>${ind.toUpperCase()}</span><span class="close" onclick="removeIndicator('${ind}')">×</span>`;
+        container.appendChild(chip);
+    });
+    
+    // Update sidebar items
+    document.querySelectorAll('.indicator-item').forEach(item => {
+        const ind = item.dataset.indicator;
+        item.classList.toggle('added', APP.indicators.has(ind));
+    });
+}
+
+function toggleIndicator(name) {
+    if (APP.indicators.has(name)) {
+        APP.indicators.delete(name);
+    } else {
+        APP.indicators.add(name);
+    }
+    renderChart();
+}
+
+function removeIndicator(name) {
+    APP.indicators.delete(name);
+    renderChart();
+}
+
+function toggleGrid() {
+    APP.settings.showGrid = !APP.settings.showGrid;
+    document.getElementById('toggleGrid').classList.toggle('active', APP.settings.showGrid);
+    renderChart();
+}
+
+function toggleLog() {
+    APP.settings.logScale = !APP.settings.logScale;
+    document.getElementById('toggleLogScale').classList.toggle('active', APP.settings.logScale);
+    renderChart();
+}
+
+function toggleAutoScale() {
+    APP.settings.autoScale = !APP.settings.autoScale;
+    document.getElementById('toggleAutoScale').classList.toggle('active', APP.settings.autoScale);
+    renderChart();
+}
+
+function toggleCrosshair() {
+    APP.settings.crosshair = !APP.settings.crosshair;
+    document.getElementById('toggleCrosshair').classList.toggle('active', APP.settings.crosshair);
+    renderChart();
+}
+
+function resetZoom() {
+    Plotly.relayout('mainChart', { 'xaxis.autorange': true, 'yaxis.autorange': true });
+    showToast('info', '已重置縮放');
+}
+
+function updateColors() {
+    APP.settings.colorUp = document.getElementById('colorUp').value;
+    APP.settings.colorDown = document.getElementById('colorDown').value;
+    renderChart();
+}
+
+function clearDrawings() {
+    APP.drawings = [];
+    document.getElementById('drawingsList').innerHTML = '尚無繪圖物件';
+    showToast('info', '已清除所有繪圖');
+}
+
+// Theme
+function toggleTheme() {
+    setTheme(APP.theme === 'dark' ? 'light' : 'dark');
+}
+
+function setTheme(theme) {
+    APP.theme = theme;
+    document.documentElement.setAttribute('data-theme', theme);
+    document.getElementById('themeSelect').value = theme;
+    renderChart();
+}
+
+// Export
+function exportChart() {
+    Plotly.downloadImage('mainChart', { format: 'png', width: 1920, height: 1080, filename: 'VIA_Chart' });
+    showToast('success', '圖表已匯出');
+}
+
+// Modals
+function showUploadModal() { document.getElementById('uploadModal').classList.add('active'); }
+function showIndicatorModal() { document.getElementById('indicatorModal').classList.add('active'); }
+function showSymbolModal() { showToast('info', '符號選擇器（開發中）'); }
+
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+function closeAllModals() { document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active')); }
+
+// Toast
+function showToast(type, message) {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+
+</script>
+</body>
+</html>

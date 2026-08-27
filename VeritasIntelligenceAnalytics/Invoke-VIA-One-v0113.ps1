@@ -39,18 +39,18 @@ Write-Host ("[加速器] " + ($Accelerators -join " · ")) -ForegroundColor Dark
 $Stages = @(
     @{ Key = "deps"; Name = "DEPS 依賴預檢(五件套)";      Kind = "deps" },
     @{ Key = "sync"; Name = "SYNC 同步 repo";                Kind = "ps";  Target = (Join-Path $Bin "via-sync.ps1") },
-    @{ Key = "mega"; Ui = "VIA_Reports\VIA_MegaMatrix.html"; Name = "MEGA 三輪全景(動態最新版)"; Kind = "py";  Target = ((Get-ChildItem (Join-Path $Root "supportive modules\VIA_Governance_Runtime") -Filter "via_mega_engine_v*.py" | Sort-Object Name | Select-Object -Last 1).FullName) },
-    @{ Key = "vmt"; Ui = (Join-Path ($env:VMT_ROOT ?? "C:\VIA\VeritasMailTracker") "reports\MasterRun.html"); Name = "VMT 總指揮(動態最新版)"; Kind = "py";  Target = ((Get-ChildItem (Join-Path $Root "functional modules\WorkOps\VMT") -Filter "via_master_engine_v0*.py" | Sort-Object Name | Select-Object -Last 1).FullName); Args = @("--no-open") },
-    @{ Key = "cge"; Ui = (Join-Path ($env:VMT_ROOT ?? "C:\VIA\VeritasMailTracker") "VIA_CentralGovernance.html"); Name = "CGE 中央治理 dry-run"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_Central_Governance\VIA_CentralGovernanceEngine_v0401.py"); Args = @("--workdir", ($env:VMT_ROOT ?? "C:\VIA\VeritasMailTracker")) },
-    @{ Key = "probe"; Name = "VRN 內容探測(唯讀 GO gate)"; Kind = "py";  Target = (Join-Path $Root "functional modules\VRN\vrn_content_probe_v0100.py"); Args = @("--no-open") },
-    @{ Key = "extract"; Name = "VRN 內容擷取 dry-run(v0101)"; Kind = "py";  Target = (Join-Path $Root "functional modules\VRN\vrn_content_extract_v0101.py") },
+    @{ Key = "mega"; Ui = "VIA_Reports\VIA_MegaMatrix.html"; Name = "MEGA 三輪全景(動態最新版)"; Kind = "py";  Target = ((Get-ChildItem (Join-Path $Root "supportive modules\VIA_Governance_Runtime") -Filter "SUP_MDL142_MegaEngine_v*.py" | Sort-Object Name | Select-Object -Last 1).FullName) },
+    @{ Key = "vmt"; Ui = (Join-Path ($env:VMT_ROOT ?? "C:\VIA\VeritasMailTracker") "reports\MasterRun.html"); Name = "VMT 總指揮(動態最新版)"; Kind = "py";  Target = ((Get-ChildItem (Join-Path $Root "functional modules\WorkOps\VMT") -Filter "VIA_ENG021_MasterEngine_v0*.py" | Sort-Object Name | Select-Object -Last 1).FullName); Args = @("--no-open") },
+    @{ Key = "cge"; Ui = (Join-Path ($env:VMT_ROOT ?? "C:\VIA\VeritasMailTracker") "VIA_CentralGovernance.html"); Name = "CGE 中央治理 dry-run"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_Central_Governance\CGC_MDL001_CentralGovernanceEngine_v0401.py"); Args = @("--workdir", ($env:VMT_ROOT ?? "C:\VIA\VeritasMailTracker")) },
+    @{ Key = "probe"; Name = "VRN 內容探測(唯讀 GO gate)"; Kind = "py";  Target = (Join-Path $Root "functional modules\VRN\VRN_ENG048_ContentProbe_v0100.py"); Args = @("--no-open") },
+    @{ Key = "extract"; Name = "VRN 內容擷取 dry-run(v0101)"; Kind = "py";  Target = (Join-Path $Root "functional modules\VRN\VRN_ENG047_ContentExtract_v0101.py") },
     @{ Key = "flow"; Ui = "VIA_Reports\flow_run\VIA_FlowSystem_UI.html"; Name = "FLOW 系統 OneShot(自產 UI)"; Kind = "py";  Target = ((Get-ChildItem (Join-Path $Root "supportive modules\VIA_FlowSystem") -Filter "VIA_FlowSystem_OneShot*.py" | Sort-Object Name | Select-Object -Last 1).FullName); Cwd = (Join-Path $Reports "flow_run") },
-    @{ Key = "if"; Name = "IF 產業預測 selftest"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_IF_Engine\via_if_engine.py"); Args = @("--selftest") },
-    @{ Key = "fis"; Ui = "VIA_Reports\fis_run"; Name = "FIS 驗證 harness(需 scipy)"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_FlowSystem\VIA_FIS_Validation_v3.py"); Cwd = (Join-Path $Reports "fis_run"); Optional = $true },
+    @{ Key = "if"; Name = "IF 產業預測 selftest"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_IF_Engine\SUP_MDL144_IfEngine.py"); Args = @("--selftest") },
+    @{ Key = "fis"; Ui = "VIA_Reports\fis_run"; Name = "FIS 驗證 harness(需 scipy)"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_FlowSystem\FLOW_MDL002_FISValidationV3.py"); Cwd = (Join-Path $Reports "fis_run"); Optional = $true },
     @{ Key = "workops"; Name = "WORKOPS 指揮板(專案指揮+追蹤哨,一支到底)"; Kind = "ps"; Target = ((Get-ChildItem (Join-Path $Root "functional modules\WorkOps") -Filter "Invoke-VIA-WorkOps-CommandBoard-v0*.ps1" | Sort-Object Name | Select-Object -Last 1).FullName) },
     @{ Key = "forge"; Name = "FORGE 工作台(45/45 驗收家族)"; Kind = "open"; Target = (Join-Path $Root "supportive modules\VIA_Forge\ui\index.html") },
-    @{ Key = "bridge"; Name = "BRIDGE 前後端狀態矩陣(動態最新版)"; Kind = "py"; Target = ((Get-ChildItem (Join-Path $Root "supportive modules\VIA_Governance_Runtime") -Filter "via_bridge_engine_v0*.py" | Sort-Object Name | Select-Object -Last 1).FullName) },
-    @{ Key = "hub"; Name = "UI HUB 活化樞紐(動態最新版引擎)"; Kind = "py"; Target = ((Get-ChildItem (Join-Path $Root "supportive modules\VIA_Governance_Runtime") -Filter "via_hub_engine_v0*.py" | Sort-Object Name | Select-Object -Last 1).FullName) }
+    @{ Key = "bridge"; Name = "BRIDGE 前後端狀態矩陣(動態最新版)"; Kind = "py"; Target = ((Get-ChildItem (Join-Path $Root "supportive modules\VIA_Governance_Runtime") -Filter "SUP_MDL140_BridgeEngine_v0*.py" | Sort-Object Name | Select-Object -Last 1).FullName) },
+    @{ Key = "hub"; Name = "UI HUB 活化樞紐(動態最新版引擎)"; Kind = "py"; Target = ((Get-ChildItem (Join-Path $Root "supportive modules\VIA_Governance_Runtime") -Filter "SUP_MDL141_HubEngine_v0*.py" | Sort-Object Name | Select-Object -Last 1).FullName) }
 )
 
 if ($Only) {
@@ -102,3 +102,11 @@ $okN = ($Results | Where-Object 結果 -eq "OK").Count
 Write-Host ("[總結] {0}/{1} 階段 OK · FlowSystem UI + Mega Matrix + Command Bridge + UI Hub 已非阻塞開啟 · PowerShell 保持開啟" -f $okN, $total) -ForegroundColor Green
 Write-Host "[提示] 選配依賴一鍵補齊:py -m pip install duckdb rich scipy numpy pandas" -ForegroundColor DarkGray
 Write-Host "[提示] via-pipe(輪動引擎)待同伴檔 rotation_engine.py 補齊後可用" -ForegroundColor DarkGray
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

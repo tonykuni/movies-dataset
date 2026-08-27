@@ -239,6 +239,7 @@ VeritasIntelligenceAnalytics/functional modules/VDF/VDF_MDL403_RegistryFull.json
 VeritasIntelligenceAnalytics/functional modules/VDF/registry_output/
 !VeritasIntelligenceAnalytics/VIA_Reports/VDF_Database_Status_Matrix_v0100.html
 !VeritasIntelligenceAnalytics/VIA_Reports/VIA_Grand_Summary_Matrix_v0100.html
+!VeritasIntelligenceAnalytics/VIA_Reports/VIA_SectorFlow_AllInOne_Dashboard_v0100.html
 _via_envmanager_output/
 # VRN OCR 批次車道產物(重擷取 staging;可再生)
 VeritasIntelligenceAnalytics/functional modules/VRN/staging/ocr_out/
@@ -247,3 +248,50 @@ VeritasIntelligenceAnalytics/functional modules/VAP/tools/RUN_*/
 VeritasIntelligenceAnalytics/VIA_Deploy_Config.json
 VeritasIntelligenceAnalytics/supportive modules/registry/VIA_MasterGovernance_SSOT_v0100.local.json
 VeritasIntelligenceAnalytics/supportive modules/registry/VIA_Lib_Registry_v0100.json
+
+# GroupIndex M10 煙霧測試本機工具(OneClick [S3] 產生,可再生)
+VeritasIntelligenceAnalytics/functional modules/GroupIndex/smoke_tooling/
+
+# 月營收引擎生成物(demo/live 皆可再生)
+VeritasIntelligenceAnalytics/functional modules/GroupIndex/engine/taiwan_revenue_engine/data/
+VeritasIntelligenceAnalytics/functional modules/GroupIndex/engine/taiwan_revenue_engine/output/
+VeritasIntelligenceAnalytics/functional modules/GroupIndex/engine/taiwan_revenue_engine/**/__pycache__/
+
+# VIA_GlobalETF_RiskModel run outputs (append-only, local)
+VIA_GlobalETF_RiskModel/output/
+
+# VMT 工作區 (帳本 / 報告 / 信稿 一律不進版控)
+VeritasMailTracker/
+vmt_workspace/
+**/data/*.jsonl
+**/reports/VMT_*.html
+
+# 稽核運行殘檔(勘誤 94c1396 制度化:runtime 存證只留本機,永不入庫)
+VeritasIntelligenceAnalytics/supportive modules/audit_tools/VIA_Panorama_Six_*.html
+VeritasIntelligenceAnalytics/supportive modules/audit_tools/VIA_Panorama_Six_*.json
+VeritasIntelligenceAnalytics/supportive modules/audit_tools/VIA_SupportImport_Audit_*.json
+
+# VDF 輸出樞紐執行期產物(via-vdfout 每跑重生;樣本源檔已入 package_samples)
+VeritasIntelligenceAnalytics/functional modules/VDF/output_hub/
+
+# 批68:族群流模擬系統 v0400 產物圈(28MB dashboard html+13MB csv 可再生,不入版控)
+VeritasIntelligenceAnalytics/functional modules/GroupIndex/flow_simulation_v0400/data/output/
+
+# 批88:母根對帳回滾快照=產物存證,留本地不入 git(GH001 100MB 上限實證)
+VeritasIntelligenceAnalytics/_via_mother_root_reconciliation_runs/
+
+# 批123:VAP TA 工廠 run 資料產物(本地存證,不入版控)
+VeritasIntelligenceAnalytics/functional modules/VAP/DATABASE/ta_runs/
+
+# 批124:VAP 正典 duckdb(二進位本機追溯庫,不入版控)
+VeritasIntelligenceAnalytics/functional modules/VAP/DATABASE/*.duckdb
+
+# 批128:總擷取 mega 產物圈(parquet/duckdb/run 存證,本地不入版控)
+VeritasIntelligenceAnalytics/functional modules/VDF/output_hub/mega/
+
+# 批152:族群輪動實跑產物圈(GRP_ENG040 每跑重生;heatmap/csv/html,不入版控)
+VeritasIntelligenceAnalytics/functional modules/GroupIndex/output_hub/
+
+# 批152:v0202 收容包內送達方樣跑產物 40MB(再生件;循批125 排除政策——
+# 本地保留存證,hash 由包內 PACKAGE_SHA256_MANIFEST_v0202.json 錄冊)
+VeritasIntelligenceAnalytics/functional modules/GroupIndex/VIA_TW_Grouping_LatestCommand_v0202/RUN_FINAL_V0201/

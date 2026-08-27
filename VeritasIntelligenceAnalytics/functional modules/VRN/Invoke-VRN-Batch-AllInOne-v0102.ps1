@@ -53,8 +53,8 @@ $matched | ForEach-Object { Copy-Item -LiteralPath $_.FullName -Destination $sol
 $py = @("$env:USERPROFILE\envs\via_core_312\Scripts\python.exe", "py", "python", "python3") |
       Where-Object { (($_ -match '\\') -and (Test-Path $_)) -or (($_ -notmatch '\\') -and (Get-Command $_ -ErrorAction SilentlyContinue)) } |
       Select-Object -First 1
-$eng005 = Join-Path $vrn "VRN_MDL005_OCRFetchingPDFText.py"
-$eng004 = Join-Path $vrn "VRN_MDL004_OCR_FetchingPDFTable.py"
+$eng005 = Join-Path $vrn "VRN_ENG018_MDL005OCRFetchingPDFText.py"
+$eng004 = Join-Path $vrn "VRN_ENG017_MDL004OCRFetchingPDFTable.py"
 
 function Run-Solo([string]$Name, [string]$Eng, [string[]]$EngArgs) {
     $log = Join-Path $repDir "solo_$($Name)_$ts.log"
@@ -120,3 +120,11 @@ foreach ($pair in @(
 }
 Write-Host "`n=== 單檔補擷完成 · 建議續跑:via-reconcile(驗 64/64)===" -ForegroundColor Cyan
 exit $(if ($ok5 -and $ok4) { 0 } else { 1 })
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

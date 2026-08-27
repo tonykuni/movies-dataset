@@ -473,7 +473,7 @@ $PathsB64 = @(
 'Tl8yMDI2MDcxMV8xMjE5MDJfQ09OVFJPTExFRF9CT09UU1RSQVBfUEhBU0VfVFJBQ0VfdjAxNUJcanNvblxwaGFzZV9QMDZfYm9vdHN0cmFwX3Nzb3QuanNvbgpDOlxVc2Vyc1x0b255a1xEb3dubG9hZHNcVmVyaXRhc0ludGVsbGlnZW5jZUFuYWx5dGljc1xfdmlhX3J1bm91dHB1dF9kcmFpbmVyX3J1bnNcUlVOXzIwMjYwNzIxXzEyMzIzN19WSUFfUlVOT1VUUFVUX0RSQUlORVJfdjAwOVxfcXVh'
 'cmFudGluZV9ydW5vdXRwdXRfcHJlc2VydmVfb3JpZ2luYWxfcGF0aHNcX3ZpYV9zeXN0ZW1fbWFuYWdlcl9ydW5zXFJVTl8yMDI2MDcwOV8xNTE3MjRfVklBX1NZU1RFTV9NQU5BR0VSX0RFQ0lTSU9OX1NUVURJT192MDA4X0RSWVJVTlxWSUFfdjAwOF9zc290X2NvbXBhcmlzb24uY3N2Cg=='
 ) -join ''
-$EnginePath = Join-Path $Gov 'VIA_CentralGovernanceEngine_v0400.py'
+$EnginePath = Join-Path $Gov 'CGC_MDL001_CentralGovernanceEngine_v0400.py'
 $PathsFile  = Join-Path $Cge 'ssot_paths.txt'
 [System.IO.File]::WriteAllBytes($EnginePath, [System.Convert]::FromBase64String($EngineB64))
 [System.IO.File]::WriteAllBytes($PathsFile,  [System.Convert]::FromBase64String($PathsB64))
@@ -522,3 +522,11 @@ if (Test-Path -LiteralPath $Dash) { Start-Process $Dash }
 Write-Output '=============================================================='
 Write-Output ('完成。之後日常只要打:  via-gov --commit --fetch-tw   (dry-run 則省略 --commit)')
 Write-Output ('治理 SSOT 位置: ' + $Cge)
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

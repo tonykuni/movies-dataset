@@ -1,0 +1,74 @@
+{
+  "system_id": "VIA_TW_GROUP_FLOW_SIMULATION_SYSTEM",
+  "version": "0.4.0",
+  "data_mode": "DEMO_FIXTURE",
+  "expected_group_count": 31,
+  "enforce_group_count": true,
+  "normalized_date": "2026-01-02",
+  "index_base_value": 100.0,
+  "index_weight_method": "LAGGED_CLOSE_VOLUME_WEIGHT",
+  "rolling_windows": [1, 5, 20, 60, 120, 240],
+  "role_windows": [20, 60],
+  "price_forward_fill_limit": 3,
+  "flow_scale": 100000000,
+  "simulation_min_observations": 80,
+  "simulation_train_fraction": 0.75,
+  "simulation_ridge_alpha": 1.0,
+  "simulation_horizon_days": 20,
+  "ui_max_dates": 180,
+  "ui_card_dense_threshold_quantile": 0.75,
+  "candidate_source_file": "references/intake/3d616edd-3f96-44cf-9e5d-c885bf414120.html",
+  "rotation_snapshot_source_file": "ssot/VIA_Rotation_Snapshot_20260718_v0400.json",
+  "vdf_contract_source_file": "references/intake/32f56779-e9a8-45d5-8498-7517053f95a2.html",
+  "market_intelligence_registry_file": "ssot/VIA_Market_Intelligence_Registry_Summary_v0400.json",
+  "method_thresholds_file": "ssot/VIA_FLOWROT_Method_Thresholds_v0300.json",
+  "input_files": {
+    "membership": "data/input/membership.csv",
+    "price": "data/input/price.csv",
+    "institutional": "data/input/institutional.csv",
+    "margin_short": "data/input/margin_short.csv",
+    "active_etf_pcf": "data/input/active_etf_pcf.csv",
+    "main_force": "data/input/main_force.csv"
+  },
+  "output_files": {
+    "group_index": "data/output/group_index_daily",
+    "group_flow": "data/output/group_flow_daily",
+    "member_roles": "data/output/member_roles_latest",
+    "simulation": "data/output/flow_simulation_summary",
+    "group_validation": "data/output/group_validation_latest",
+    "backtest_daily": "data/output/rotation_backtest_daily",
+    "backtest_summary": "data/output/rotation_backtest_summary",
+    "candidate_groups": "data/output/candidate_group_validation_v21",
+    "candidate_membership": "data/output/candidate_membership_v21",
+    "version_chain": "data/output/pipeline_version_chain_v0400",
+    "rotation_snapshots": "data/output/rotation_snapshots_v0400",
+    "dashboard": "data/output/VIA_TW_Group_Flow_Simulation_System_v0400.html",
+    "run_summary": "evidence/run_summary.json",
+    "validation_ledger": "evidence/validation_ledger.csv"
+  },
+  "scenarios": [
+    {
+      "scenario_id": "BASELINE",
+      "label": "Baseline",
+      "standardized_feature_shocks": {}
+    },
+    {
+      "scenario_id": "FLOW_ACCELERATION",
+      "label": "Flow Acceleration",
+      "standardized_feature_shocks": {
+        "InstitutionalFlowIntensity": 1.0,
+        "ActiveETFFlowIntensity": 0.75,
+        "InstitutionalSyncRate": 0.5
+      }
+    },
+    {
+      "scenario_id": "FLOW_REVERSAL",
+      "label": "Flow Reversal",
+      "standardized_feature_shocks": {
+        "InstitutionalFlowIntensity": -1.0,
+        "ActiveETFFlowIntensity": -0.75,
+        "CreditDeviation": -0.5
+      }
+    }
+  ]
+}

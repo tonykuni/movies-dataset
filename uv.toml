@@ -1,0 +1,23 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# uv 鏡像策略(監測環境衝突工具鏈共用)
+# 順序:清華 TUNA → 阿里雲 → 官方 PyPI(default = 兜底)
+# uv 依「first-index」策略逐一查詢,前面的鏡像查無套件才往下走,
+# 官方 PyPI 標記 default = true,永遠排最後 = 官方兜底導入。
+#
+# 鏡像失聯 / 海外 CI / 沙箱環境:
+#   UV_NO_CONFIG=1 UV_DEFAULT_INDEX=https://pypi.org/simple uv ...
+# 或直接跑 scripts/envcheck.sh(會自動探測鏡像、失敗切官方)。
+# ═══════════════════════════════════════════════════════════════════════════
+
+[[index]]
+name = "tsinghua"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+
+[[index]]
+name = "aliyun"
+url = "https://mirrors.aliyun.com/pypi/simple/"
+
+[[index]]
+name = "pypi-official"
+url = "https://pypi.org/simple"
+default = true

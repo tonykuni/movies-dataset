@@ -20,10 +20,10 @@ Write-Host ''
 if (-not (Test-Path -LiteralPath $OutDir)) {
     New-Item -ItemType Directory -Path $OutDir -Force | Out-Null
 }
-$script:DriverPath = Join-Path $PkgParent 'via_launch_driver.py'
+$script:DriverPath = Join-Path $PkgParent 'SUP_MDL112_LaunchDriver.py'
 if (-not (Test-Path -LiteralPath $script:DriverPath)) {
     Write-Host "找不到驅動器: ${script:DriverPath}" -ForegroundColor Red
-    Write-Host '請確認 PkgParent 指向含 via_launch_driver.py 與 pmis_lite 的資料夾。' -ForegroundColor Yellow
+    Write-Host '請確認 PkgParent 指向含 SUP_MDL112_LaunchDriver.py 與 pmis_lite 的資料夾。' -ForegroundColor Yellow
     return
 }
 
@@ -129,3 +129,11 @@ Write-Progress -Id 1 -Activity 'VIS Launch-All' -Completed
 Write-Host ("模組 {0} 個 . 測試 {1}/{2} PASS . 完整性保證 {3}" -f $mods.count, $tst.passed, $tst.total, $guarantee) -ForegroundColor Green
 Write-Host ("報告: {0}" -f $script:HtmlPath) -ForegroundColor Green
 Start-Process $script:HtmlPath
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

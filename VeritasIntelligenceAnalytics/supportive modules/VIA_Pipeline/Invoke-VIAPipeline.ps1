@@ -36,7 +36,7 @@ $OutputEncoding = [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 $ErrorActionPreference = "Stop"
 Set-Location $WorkDir
 
-$PyFiles = @("via_io.py","twse_chip_scraper.py","rotation_engine.py","devils_advocate.py","via_pipeline.py")
+$PyFiles = @("via_io.py","SUP_MDL603_TwseChipScraper.py","rotation_engine.py","devils_advocate.py","SUP_MDL152_Pipeline.py")
 $Results = [System.Collections.Generic.List[object]]::new()
 
 function Step([string]$Name, [scriptblock]$Action) {
@@ -67,7 +67,7 @@ try {
 
   # ③ 真實籌碼(可略)
   if (-not $SkipScraper) {
-    Step "twse_chip_scraper" { & $Python twse_chip_scraper.py $Stock $Days | Out-Host }
+    Step "twse_chip_scraper" { & $Python SUP_MDL603_TwseChipScraper.py $Stock $Days | Out-Host }
   } else { Write-Host "`n[skip] twse_chip_scraper(-SkipScraper)" -ForegroundColor Yellow }
 
   # ④ 輪動引擎
@@ -85,7 +85,7 @@ try {
 
   # ⑥ 統一 pipeline(回測+自演化+自我除錯+裁決+多格式輸出)
   Step "via_pipeline" {
-    $pyargs = @("via_pipeline.py","--out",$Out,"--export",$Export)
+    $pyargs = @("SUP_MDL152_Pipeline.py","--out",$Out,"--export",$Export)
     if ($Demo -or -not $Prices) { $pyargs += "--demo" } else { $pyargs += @("--prices",$Prices); if ($Themes){$pyargs+=@("--themes",$Themes)} }
     & $Python @args | Out-Host
   }
@@ -120,3 +120,11 @@ catch {
   $Results | Format-Table -AutoSize | Out-Host
   exit 3
 }
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

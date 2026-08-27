@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VeritasAutoPlot™ T02 — Dual Axis</title>
+<script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+<style>
+:root{
+  --sb-blue:#4C72B0;--sb-orange:#DD8452;--sb-green:#55A868;--sb-red:#C44E52;
+  --sb-purple:#8172B3;--sb-brown:#937860;--sb-pink:#DA8BC3;--sb-gray:#8C8C8C;
+  --sb-yellow:#CCB974;--sb-cyan:#64B5CD;
+  --bg:#FFFFFF;--bg2:#F7F6F3;--bg3:#EFEEE9;--hover:rgba(55,53,47,.04);
+  --tx1:#37352F;--tx2:#6B6B6B;--tx3:#9B9A97;--bd:#E8E7E4;
+  --font:'Inter','Noto Sans TC',-apple-system,sans-serif;
+  --mono:'JetBrains Mono',Consolas,monospace;
+  --radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg2);color:var(--tx1);min-height:100vh;padding:24px}
+.header{text-align:center;margin-bottom:20px}
+.header h1{font-size:clamp(16px,2.5vw,22px);font-weight:600;letter-spacing:-.3px}
+.header .sub{font-size:13px;color:var(--tx3);margin-top:4px}
+.card{background:var(--bg);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--bd);padding:20px;margin-bottom:16px}
+.ctrl-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.ctrl-group{display:flex;align-items:center;gap:5px}
+.ctrl-group label{font-size:12px;color:var(--tx2);white-space:nowrap}
+select,input[type=color],input[type=number]{font-family:var(--font);font-size:12px;border:1px solid var(--bd);border-radius:4px;padding:4px 8px;background:var(--bg);color:var(--tx1);outline:none}
+select:focus,input:focus{border-color:var(--sb-blue)}
+input[type=color]{width:28px;height:28px;padding:2px;cursor:pointer}
+input[type=number]{width:56px}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;cursor:pointer;border:1px solid var(--bd);background:var(--bg);transition:.15s;user-select:none}
+.chip.active{background:var(--sb-blue);color:#fff;border-color:var(--sb-blue)}
+.chip:hover{background:var(--bg3)}.chip.active:hover{background:#3a5f96}
+.sep{width:1px;height:22px;background:var(--bd);flex-shrink:0}
+#chart{width:100%;height:clamp(420px,58vh,720px)}
+.footer{text-align:center;font-size:11px;color:var(--tx3);margin-top:12px}
+@media(max-width:768px){body{padding:12px}.ctrl-row{gap:6px}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>VeritasAutoPlot™ T02 — Dual Axis Chart</h1>
+  <div class="sub">左軸：指數收盤價 · 右軸：情緒/VIX/成交量 · 危機期間陰影 + 事件垂直線 + High/Low 標註</div>
+</div>
+
+<div class="card">
+  <div class="ctrl-row">
+    <div class="ctrl-group"><label>Left</label>
+      <select id="selL" onchange="render()"><option value="price">Price</option><option value="norm">Normalized</option></select>
+    </div>
+    <div class="ctrl-group"><label>Right</label>
+      <select id="selR" onchange="render()"><option value="sentiment">Bearish%</option><option value="vix">VIX</option><option value="volume">Volume</option></select>
+    </div>
+    <div class="ctrl-group"><label>L色</label><input type="color" id="clrL" value="#4C72B0" onchange="render()"></div>
+    <div class="ctrl-group"><label>R色</label><input type="color" id="clrR" value="#DD8452" onchange="render()"></div>
+    <div class="sep"></div>
+    <span class="chip active" id="cCrisis" onclick="toggle(this);render()">Crisis</span>
+    <span class="chip active" id="cEvent" onclick="toggle(this);render()">Events</span>
+    <span class="chip active" id="cHL" onclick="toggle(this);render()">H/L</span>
+    <span class="chip" id="cLog" onclick="toggle(this);render()">Log</span>
+    <span class="chip active" id="cGrid" onclick="toggle(this);render()">Grid</span>
+  </div>
+  <div id="chart"></div>
+</div>
+
+<div class="footer">VeritasAutoPlot™ · Template T02 Dual Axis · Crisis shading + Event lines + Auto H/L annotation</div>
+
+<script>
+/* ═══ Demo Data ═══ */
+function genDual(n=750){
+  const dates=[],price=[],bear=[],vix=[],vol=[];
+  let p=1400,d=new Date('2020-01-02');
+  for(let i=0;i<n;i++){
+    dates.push(d.toISOString().slice(0,10));
+    const shock=i>50&&i<90?-.015:i>300&&i<340?.012:0;
+    p+=p*(Math.random()-.485+shock)*0.015;
+    price.push(+p.toFixed(2));
+    bear.push(+(20+Math.random()*40+(i>50&&i<90?20:0)).toFixed(1));
+    vix.push(+(15+Math.random()*25+(i>50&&i<90?35:0)).toFixed(1));
+    vol.push(Math.round(5e6+Math.random()*1e7+(i>50&&i<90?2e7:0)));
+    d=new Date(d.getTime()+864e5);
+    if(d.getDay()===0)d=new Date(d.getTime()+864e5);
+    if(d.getDay()===6)d=new Date(d.getTime()+2*864e5);
+  }
+  return{dates,price,bear,vix,vol};
+}
+const D=genDual();
+
+/* Crisis & Events */
+const CRISES=[
+  {name:'COVID-19 Crash',s:'2020-02-20',e:'2020-04-10',color:'#7f7f7f'},
+  {name:'2022 Bear Market',s:'2022-01-03',e:'2022-10-31',color:'#587cd9'},
+];
+const EVENTS=[
+  {date:'2020-03-11',label:'WHO Pandemic'},
+  {date:'2020-03-23',label:'Fed QE∞'},
+  {date:'2022-03-16',label:'First Rate Hike'},
+];
+
+function gc(id){return document.getElementById(id).classList.contains('active')}
+function toggle(el){el.classList.toggle('active')}
+
+function baseLayout(title){
+  return{
+    title:{text:title,font:{family:'Inter,Noto Sans TC',size:15,color:'#37352F'},x:0.01,xanchor:'left'},
+    paper_bgcolor:'#FFF',plot_bgcolor:'#FFF',
+    margin:{t:55,r:70,b:50,l:65},
+    xaxis:{showgrid:false,linecolor:'#E8E7E4',tickfont:{size:11,color:'#6B6B6B'},dtick:'M6',tickformat:'%Y-%m'},
+    yaxis:{showgrid:true,gridcolor:'#F0EFEC',linecolor:'#E8E7E4',tickfont:{size:11,color:'#6B6B6B'},separatethousands:true,title:{text:'',font:{size:12}}},
+    yaxis2:{overlaying:'y',side:'right',showgrid:false,linecolor:'#E8E7E4',tickfont:{size:11,color:'#DD8452'},title:{text:'',font:{size:12,color:'#DD8452'}}},
+    hovermode:'x unified',hoverlabel:{bgcolor:'rgba(255,255,255,.95)',bordercolor:'#E8E7E4',font:{size:12,family:'Inter'}},
+    legend:{orientation:'h',y:1.10,x:0,font:{size:11}},
+    shapes:[],annotations:[]
+  };
+}
+const CFG={responsive:true,displayModeBar:false};
+
+function render(){
+  const clrL=document.getElementById('clrL').value;
+  const clrR=document.getElementById('clrR').value;
+  const rightType=document.getElementById('selR').value;
+  const norm=document.getElementById('selL').value==='norm';
+  const showCrisis=gc('cCrisis'),showEvent=gc('cEvent'),showHL=gc('cHL'),logY=gc('cLog'),showGrid=gc('cGrid');
+
+  /* Left axis data */
+  let leftY=D.price.slice();
+  let leftLabel='Closing Price';
+  if(norm){const base=leftY[0];leftY=leftY.map(v=>+(v/base*100).toFixed(2));leftLabel='Normalized (base=100)';}
+
+  /* Right axis data */
+  let rightY,rightLabel;
+  if(rightType==='sentiment'){rightY=D.bear;rightLabel='AAII Bearish %';}
+  else if(rightType==='vix'){rightY=D.vix;rightLabel='VIX';}
+  else{rightY=D.vol;rightLabel='Volume';}
+
+  const trL={x:D.dates,y:leftY,type:'scatter',mode:'lines',name:leftLabel,
+    line:{color:clrL,width:2,shape:'spline'},yaxis:'y'};
+
+  const isBar=rightType==='volume';
+  const trR={x:D.dates,y:rightY,type:isBar?'bar':'scatter',mode:isBar?undefined:'lines',name:rightLabel,
+    line:isBar?undefined:{color:clrR,width:1.2},
+    marker:isBar?{color:clrR+'66'}:undefined,
+    opacity:isBar?0.5:0.6,yaxis:'y2'};
+
+  const layout=baseLayout('Index vs '+rightLabel+' — Dual Axis');
+  layout.yaxis.title.text=leftLabel;
+  layout.yaxis.title.font={size:12,color:clrL};
+  layout.yaxis.tickfont.color=clrL;
+  layout.yaxis2.title.text=rightLabel;
+  layout.yaxis2.title.font={size:12,color:clrR};
+  layout.yaxis2.tickfont.color=clrR;
+  layout.yaxis.showgrid=showGrid;
+  if(logY)layout.yaxis.type='log';
+
+  /* Crisis shading */
+  if(showCrisis){
+    CRISES.forEach(cr=>{
+      layout.shapes.push({type:'rect',xref:'x',yref:'paper',x0:cr.s,x1:cr.e,y0:0,y1:1,
+        fillcolor:cr.color,opacity:0.15,line:{width:0}});
+      layout.annotations.push({x:cr.s,y:1.02,xref:'x',yref:'paper',text:cr.name,
+        showarrow:false,font:{size:10,color:cr.color},xanchor:'left'});
+    });
+  }
+
+  /* Event vertical lines */
+  if(showEvent){
+    EVENTS.forEach(ev=>{
+      layout.shapes.push({type:'line',xref:'x',yref:'paper',x0:ev.date,x1:ev.date,y0:0,y1:1,
+        line:{color:'#C44E52',width:1,dash:'dash'}});
+      layout.annotations.push({x:ev.date,y:0.98,xref:'x',yref:'paper',text:ev.label,
+        showarrow:false,font:{size:9,color:'#C44E52'},textangle:-90,xanchor:'right'});
+    });
+  }
+
+  /* High / Low */
+  if(showHL){
+    const mx=leftY.indexOf(Math.max(...leftY));
+    const mn=leftY.indexOf(Math.min(...leftY));
+    layout.annotations.push(
+      {x:D.dates[mx],y:leftY[mx],text:'▲ '+leftY[mx].toLocaleString(),showarrow:true,arrowhead:0,ax:0,ay:-30,
+       font:{size:10,color:'#55A868',weight:700},bgcolor:'rgba(255,255,255,.9)',bordercolor:'#55A868',borderwidth:1,borderpad:3},
+      {x:D.dates[mn],y:leftY[mn],text:'▼ '+leftY[mn].toLocaleString(),showarrow:true,arrowhead:0,ax:0,ay:30,
+       font:{size:10,color:'#C44E52',weight:700},bgcolor:'rgba(255,255,255,.9)',bordercolor:'#C44E52',borderwidth:1,borderpad:3}
+    );
+  }
+
+  Plotly.react('chart',[trL,trR],layout,CFG);
+}
+
+render();
+</script>
+</body>
+</html>

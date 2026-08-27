@@ -5,7 +5,7 @@ param(
     [string]$VrnBootstrap = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\VIA_AutoSandbox20_Runtime\v0133\Start-VIA-VRN-With-Supportive-v0133.ps1",
     [string]$VdfBootstrap = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\VIA_AutoSandbox20_Runtime\v0133\Start-VIA-VDF-With-Supportive-v0133.ps1",
     [string]$PythonPath = "C:\Python313\python.exe",
-    [string]$EnginePath = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\VIA_AutoSandbox20_Runtime\v0133\VIA_UnifiedPythonEngine_v0133.py",
+    [string]$EnginePath = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\VIA_AutoSandbox20_Runtime\v0133\SUP_MDL114_UnifiedPythonEngine_v0133.py",
     [string]$HtmlReportPath = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\VIA_AutoSandbox20_Runtime\v0133\VIA_LiveBlocker_Adjudication_Activation_Matrix_v0133.html",
     [string]$LauncherLogDir = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_via_live_blocker_adjudication_runs\RUN_20260725_211909_VIA_LIVE_BLOCKER_ADJUDICATE_ACTIVATE_v0133\logs",
     [int]$UiPort = 8765
@@ -38,3 +38,11 @@ Write-Host "def VRN               : STARTED AFTER SUPPORTIVE IMPORT" -Foreground
 Write-Host "def VDF               : STARTED AFTER SUPPORTIVE IMPORT" -ForegroundColor Green
 Write-Host "def HTML UI           : STARTED NON-BLOCKING" -ForegroundColor Green
 Write-Host "def Launcher remains open; child systems continue independently." -ForegroundColor Cyan
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====

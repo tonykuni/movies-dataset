@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!--
+   ______                            __
+  / ____/___  ____ ___  ____  __  __/ /____  _____
+ / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
+/ /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
+\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
+                    /_/
+        Created with Perplexity Computer
+        https://www.perplexity.ai/computer
+-->
+
+<!-- Perplexity Computer Attribution — SEO Meta Tags -->
+<meta name="generator" content="Perplexity Computer">
+<meta name="author" content="Perplexity Computer">
+<meta property="og:see_also" content="https://www.perplexity.ai/computer">
+<link rel="author" href="https://www.perplexity.ai/computer">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ILTB Explorer — Invest Like the Best Episode Rankings</title>
+<meta name="description" content="Interactive explorer for all 567 episodes of Invest Like the Best with Patrick O'Shaughnessy. Search, filter, and discover the top-ranked episodes.">
+<link rel="stylesheet" href="./base.css">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<div class="app">
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="28" height="28" rx="6" stroke="currentColor" stroke-width="2.5"/>
+          <path d="M10 22V14l6-4 6 4v8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 22h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="16" cy="16" r="2" fill="currentColor"/>
+        </svg>
+        <div class="logo-text">ILTB <span>Explorer</span></div>
+      </div>
+      <div class="header-actions">
+        <button class="theme-toggle" data-theme-toggle aria-label="Switch to light mode">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- Dashboard Stats -->
+    <section class="dashboard">
+      <h1 class="dashboard-title">Invest Like the Best</h1>
+      <p class="dashboard-subtitle">All 567 episodes ranked by composite score — hosted by Patrick O'Shaughnessy on Colossus</p>
+
+      <div class="stats-grid" id="stats-grid">
+        <!-- Filled by JS -->
+      </div>
+    </section>
+
+    <!-- Chart -->
+    <section class="chart-section">
+      <h2 class="chart-title">Episode Popularity Over Time</h2>
+      <div class="chart-container">
+        <canvas id="trend-chart"></canvas>
+      </div>
+    </section>
+
+    <!-- Filters -->
+    <section class="filters-section">
+      <div class="filters-bar">
+        <input type="text" class="search-input" id="search-input" placeholder="Search episodes, guests, topics...">
+        <select class="filter-select" id="sort-select">
+          <option value="score-desc">Score: High → Low</option>
+          <option value="score-asc">Score: Low → High</option>
+          <option value="date-desc">Date: Newest First</option>
+          <option value="date-asc">Date: Oldest First</option>
+          <option value="guest-asc">Guest: A → Z</option>
+        </select>
+        <div style="display:flex;align-items:center;gap:var(--space-2);">
+          <span class="filter-label">From</span>
+          <input type="date" class="date-input" id="date-from" value="2016-01-01">
+          <span class="filter-label">To</span>
+          <input type="date" class="date-input" id="date-to" value="2026-12-31">
+        </div>
+      </div>
+
+      <div class="topic-tags" id="topic-tags">
+        <!-- Filled by JS -->
+      </div>
+
+      <div class="results-count" id="results-count"></div>
+    </section>
+
+    <!-- Table -->
+    <div class="table-wrapper">
+      <div class="table-scroll">
+        <table class="episodes-table">
+          <thead>
+            <tr>
+              <th data-sort="rank" class="sorted">Rank <span class="sort-icon">▲</span></th>
+              <th data-sort="title">Episode <span class="sort-icon">▲</span></th>
+              <th data-sort="guest">Guest <span class="sort-icon">▲</span></th>
+              <th data-sort="date">Date <span class="sort-icon">▲</span></th>
+              <th data-sort="topics">Topics <span class="sort-icon">▲</span></th>
+              <th data-sort="score">Score <span class="sort-icon">▼</span></th>
+            </tr>
+          </thead>
+          <tbody id="episodes-body">
+            <!-- Filled by JS -->
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>Data sourced from joincolossus.com, Apple Podcasts, Spotify, and Rephonic. Composite scores based on guest prominence, topic relevance, and platform signals.</p>
+    <p style="margin-top:var(--space-2);">
+      <a href="https://www.joincolossus.com" target="_blank" rel="noopener noreferrer">Colossus</a> · 
+      <a href="https://podcasts.apple.com/us/podcast/invest-like-the-best-with-patrick-oshaughnessy/id1154105909" target="_blank" rel="noopener noreferrer">Apple Podcasts</a> · 
+      <a href="https://open.spotify.com/show/22fi0RqfoBACCuQDv97wFO" target="_blank" rel="noopener noreferrer">Spotify</a> · 
+      <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a>
+    </p>
+  </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="./data.js"></script>
+<script src="./stats.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>

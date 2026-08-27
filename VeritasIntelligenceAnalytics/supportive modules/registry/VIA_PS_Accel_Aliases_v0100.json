@@ -1,0 +1,44 @@
+{
+ "schema": "via-ps-accel-aliases-v1",
+ "source": "操作員批87核定文(2026-08-20):Top 25 PowerShell 精簡加速指令與捷徑(五大應用場景)+再加速技巧",
+ "policy": "互動終端加速冊——腳本(.ps1)內依 Console 治理閘 LL_NO_ALIAS 續用全名 cmdlet(StrictMode 慣例);別名供操作員手打提速。irm/winget 屬網路動詞,受 via-net 法遵雙閘與同意閘制約。",
+ "sections": {
+  "一_系統與檔案": [
+   {"a": "ls / dir", "full": "Get-ChildItem", "role": "列目錄"},
+   {"a": "cd", "full": "Set-Location", "role": "切路徑"},
+   {"a": "pwd", "full": "Get-Location", "role": "現在路徑"},
+   {"a": "mkdir / md", "full": "New-Item -ItemType Directory", "role": "建夾"},
+   {"a": "rm / del", "full": "Remove-Item", "role": "刪除(零刪除鐵律:VIA 樹內禁用,僅一般日常)"},
+   {"a": "cp / copy", "full": "Copy-Item", "role": "複製"},
+   {"a": "mv / move", "full": "Move-Item", "role": "移動/改名"}
+  ],
+  "二_監控與行程": [
+   {"a": "gps", "full": "Get-Process", "role": "看行程"},
+   {"a": "sps", "full": "Stop-Process", "role": "結束行程"},
+   {"a": "gsv", "full": "Get-Service", "role": "看服務"},
+   {"a": "sasv", "full": "Start-Service", "role": "啟服務"},
+   {"a": "spsv", "full": "Stop-Service", "role": "停服務"}
+  ],
+  "三_搜尋與內容": [
+   {"a": "gci -Recurse", "full": "Get-ChildItem -Recurse", "role": "遞迴搜尋"},
+   {"a": "sls", "full": "Select-String", "role": "內文 grep(rg 在位更快,批81 已偵測)"},
+   {"a": "gc / cat", "full": "Get-Content", "role": "看內容"},
+   {"a": "sc / echo", "full": "Set-Content", "role": "寫入覆蓋(注意 sc 亦為服務控制,腳本用全名)"},
+   {"a": "ac", "full": "Add-Content", "role": "尾端追加"}
+  ],
+  "四_管道處理": [
+   {"a": "select", "full": "Select-Object", "role": "挑欄位"},
+   {"a": "where / ?", "full": "Where-Object", "role": "條件過濾"},
+   {"a": "sort", "full": "Sort-Object", "role": "排序"},
+   {"a": "measure", "full": "Measure-Object", "role": "計數/平均/極值"},
+   {"a": "oh -Paging", "full": "Out-Host -Paging", "role": "分頁看長輸出"}
+  ],
+  "五_進階與遠端": [
+   {"a": "gcim", "full": "Get-CimInstance", "role": "硬體/OS 查詢(取代 WMI)"},
+   {"a": "irm", "full": "Invoke-RestMethod", "role": "API 請求(VIA 內=經 via-net 同意閘)"},
+   {"a": "winget upgrade --all", "full": "winget", "role": "全機軟體更新(網路動詞,操作員手動道)"}
+  ]
+ },
+ "extra": ["Tab 自動補全", "F7 / history 歷史清單", "Get-Alias <縮寫> 查全名"],
+ "governance_note": "與 fd/rg(Rust 檔名/內文極速)+VIA_OLDSCAN_WORKERS/VIA_GOVCON_WORKERS 併為工作站加速三件套;PS 生成物一律照旗艦 Mega-Prompt:動態進度條+動態敘事+非阻塞+看門狗。"
+}

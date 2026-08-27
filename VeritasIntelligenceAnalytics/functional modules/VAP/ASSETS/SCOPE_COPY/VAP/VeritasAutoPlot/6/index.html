@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!--
+   ______                            __
+  / ____/___  ____ ___  ____  __  __/ /____  _____
+ / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
+/ /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
+\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
+                    /_/
+        Created with Perplexity Computer
+        https://www.perplexity.ai/computer
+-->
+<meta name="generator" content="Perplexity Computer">
+<meta name="author" content="Perplexity Computer">
+<meta property="og:see_also" content="https://www.perplexity.ai/computer">
+<link rel="author" href="https://www.perplexity.ai/computer">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Big Mac Index — Currency Valuation Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-content">
+      <div class="header-left">
+        <svg class="logo" width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="Big Mac Index logo">
+          <rect x="4" y="12" width="24" height="3" rx="1.5" fill="var(--color-gold)"/>
+          <rect x="6" y="16" width="20" height="2" rx="1" fill="var(--color-success)"/>
+          <rect x="4" y="19" width="24" height="3" rx="1.5" fill="var(--color-gold)"/>
+          <path d="M6 12C6 8 10 5 16 5C22 5 26 8 26 12H6Z" fill="var(--color-orange)" opacity="0.9"/>
+          <ellipse cx="12" cy="9" rx="1" ry="0.7" fill="var(--color-gold)" opacity="0.5"/>
+          <ellipse cx="19" cy="8" rx="0.8" ry="0.6" fill="var(--color-gold)" opacity="0.5"/>
+          <path d="M4 22C4 22 4 25 16 25C28 25 28 22 28 22H4Z" fill="var(--color-orange)" opacity="0.8"/>
+        </svg>
+        <div class="header-titles">
+          <h1>Big Mac Index</h1>
+          <p class="subtitle">Currency valuation vs. the US dollar</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <button data-theme-toggle aria-label="Switch to light mode" class="theme-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-layout">
+    <section class="map-section">
+      <div class="slider-row">
+        <label class="slider-label" for="year-slider">
+          <span class="year-display" id="year-display">2025</span>
+        </label>
+        <input type="range" id="year-slider" min="0" max="41" value="41" step="1">
+        <button class="play-btn" id="play-btn" aria-label="Play animation">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+        </button>
+      </div>
+      <div class="map-container" id="map-container">
+        <div id="map-svg-wrap"></div>
+      </div>
+      <div class="legend-bar" id="legend-bar"></div>
+      <div class="tooltip" id="tooltip"></div>
+    </section>
+
+    <aside class="side-panel">
+      <div class="panel-tabs">
+        <button class="tab-btn active" data-tab="table">Rankings</button>
+        <button class="tab-btn" data-tab="chart">Trend</button>
+      </div>
+
+      <div class="panel-content" id="panel-table" style="display:block;">
+        <div class="table-header-row">
+          <span class="th-country sortable active" data-sort="name">Country</span>
+          <span class="th-val sortable" data-sort="valuation">% vs USD</span>
+          <span class="th-price sortable" data-sort="dollar_price">USD Price</span>
+        </div>
+        <div class="table-body" id="table-body"></div>
+      </div>
+
+      <div class="panel-content" id="panel-chart" style="display:none;">
+        <div class="chart-country-label" id="chart-country-label">Select a country</div>
+        <div class="chart-wrap">
+          <canvas id="trend-chart"></canvas>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="app-footer">
+    <p>Data: <a href="https://github.com/TheEconomist/big-mac-data" target="_blank" rel="noopener noreferrer">The Economist Big Mac Index</a></p>
+    <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>

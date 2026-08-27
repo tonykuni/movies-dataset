@@ -81,14 +81,14 @@ Invoke-Stage "0b graphviz 可攜版(DFG 圖)" {
     if ($dotP -or (Get-Command dot -ErrorAction SilentlyContinue)) {
         Write-Host "  dot 已就位 — 免下載" -ForegroundColor Green
     } else {
-        & py (Join-Path $Engines "workops_graphviz_setup.py") install
+        & py (Join-Path $Engines "VIA_ENG070_WorkopsGraphvizSetup.py") install
     }
 }
 Invoke-Stage "0c EnvManager 健檢(落 out\envmanager\)" {
-    & py (Join-Path $Engines "workops_envmanager_bridge.py") health
+    & py (Join-Path $Engines "VIA_ENG069_WorkopsEnvmanagerBridge.py") health
 }
 Invoke-Stage "0d OCR 十段探測快照(ENG-026)" {
-    $router = Join-Path (Split-Path (Split-Path $WorkOps -Parent) -Parent) "supportive modules\VIA_OCR_Router\via_ocr_router.py"
+    $router = Join-Path (Split-Path (Split-Path $WorkOps -Parent) -Parent) "supportive modules\VIA_OCR_Router\SUP_MDL146_OcrRouter.py"
     $probeOut = Join-Path $WorkOps "out\ocr_probe.json"
     & py $router probe | Tee-Object -Variable probeLines | Select-Object -Last 1 | Write-Host
     ($probeLines | Select-Object -SkipLast 1) -join "`n" | Set-Content -LiteralPath $probeOut -Encoding UTF8
@@ -125,10 +125,10 @@ Invoke-Stage "2b 回覆解析(投票/token/關鍵詞三層;未中誠實)" {
 # ---------- [2c] WOP 專案歸戶(ENG-028)----------
 Invoke-Stage "2c WOP 專案歸戶(確認檔自動吸收→融合→賦號)" {
     if (Test-Path -LiteralPath (Join-Path $WorkOps "out\wop_confirm.csv")) {
-        & py (Join-Path $Engines "workops_wop_identifier.py") apply
+        & py (Join-Path $Engines "VIA_ENG087_WorkopsWopIdentifier.py") apply
     }
     if (Test-Path -LiteralPath (Join-Path $WorkOps "out\mails.csv")) {
-        & py (Join-Path $Engines "workops_wop_identifier.py") propose
+        & py (Join-Path $Engines "VIA_ENG087_WorkopsWopIdentifier.py") propose
     } else {
         Write-Host "  掃描語料尚缺(out\mails.csv)— 板段成功後下次跑即歸戶" -ForegroundColor DarkYellow
     }
@@ -137,8 +137,8 @@ Invoke-Stage "2c WOP 專案歸戶(確認檔自動吸收→融合→賦號)" {
 # ---------- [2d] 決策 KPI ----------
 Invoke-Stage "2d 決策 KPI 快照(ENG-027)" {
     if (Test-Path -LiteralPath (Join-Path $WorkOps "out\decision_log.db")) {
-        & py (Join-Path $Engines "workops_decision_log.py") report
-        & py (Join-Path $Engines "workops_decision_log.py") export
+        & py (Join-Path $Engines "VIA_ENG068_WorkopsDecisionLog.py") report
+        & py (Join-Path $Engines "VIA_ENG068_WorkopsDecisionLog.py") export
     } else {
         Write-Host "  決策帳本尚空 — via-workops decisions add 開始記錄(會議範本:docs\Meeting_Minutes_Template.md)" -ForegroundColor DarkYellow
     }
@@ -169,3 +169,11 @@ if (-not $NoOpen) {
 $bad = @($Stages | Where-Object { $_.結果 -eq "FAIL" })
 if ($bad.Count) { Write-Host ("[誠實清單] 未成段:{0}" -f (($bad | ForEach-Object { $_.段 }) -join "、")) -ForegroundColor Yellow }
 Write-Host "[總結] WorkOps ALL 完成(Outlook 唯讀 · 原件零觸碰 · 絕不代寄 · 基底零觸碰)" -ForegroundColor Green
+
+# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
+# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
+# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
+# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
+# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
+# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
+# ===== [VIA:PS-ACCEL:END] =====
