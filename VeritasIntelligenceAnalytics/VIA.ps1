@@ -58,6 +58,26 @@ function Open-UIs {
         Write-Host "  [UI] Portal 缺=後備開指揮台(誠實)" -ForegroundColor Yellow }
 }
 
+function Register-Profile {
+    # 批224:操作員屢打 regen-all 為指令→註冊 PS profile 短指令(冪等;
+    # 標記防重)。以後任何新 PowerShell 視窗:regen-all=重生全部 UI、
+    # via=一鍵啟動、via-status=開狀態台。(-- 開頭在 PS 是運算子,不可作指令名)
+    try {
+        $mark = "# [VIA:PROFILE:v0100]"
+        if (!(Test-Path $PROFILE)) { New-Item -ItemType File -Force $PROFILE | Out-Null }
+        if (-not (Select-String -Path $PROFILE -Pattern "VIA:PROFILE:v0100" -Quiet -ErrorAction SilentlyContinue)) {
+            @"
+
+$mark VIA 短指令(自動註冊;刪除本段即解除)
+function regen-all { python (Get-ChildItem "$VIA\supportive modules\registry\CGC_MDL096_SyncStatus_v*.py" | Sort-Object Name | Select-Object -Last 1).FullName --regen-all }
+function via { powershell -NoProfile -ExecutionPolicy Bypass -File "$VIA\VIA.ps1" }
+function via-status { python (Get-ChildItem "$VIA\supportive modules\registry\CGC_MDL096_SyncStatus_v*.py" | Sort-Object Name | Select-Object -Last 1).FullName --open }
+"@ | Add-Content -Path $PROFILE -Encoding UTF8
+            Write-Host "  [註冊] PS 短指令已入 profile:regen-all / via / via-status(新視窗生效)" -ForegroundColor Green
+        }
+    } catch { }
+}
+
 function Sync-Repo {
     # 批213:啟動先同步;批214:工作站實錄雙修——
     # ①再生頁=衍生物(引擎每跑必重生)→pull 前還原本地副本,消結構性衝突
@@ -77,6 +97,7 @@ function Sync-Repo {
     }
     $bf = Newest (Join-Path $VIA "functional modules\VDF\engine") "VDF_ENG064_HistoryBackfill_v*.py"
     if ($bf) { python "$bf" --rebuild-ckpt }   # 真斷點重建(批212 債修;零網路)
+    Register-Profile   # 批224:短指令註冊(冪等)
 }
 
 function Invoke-All {
