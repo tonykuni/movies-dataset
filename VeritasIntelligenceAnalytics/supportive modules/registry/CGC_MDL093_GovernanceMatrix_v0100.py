@@ -205,9 +205,13 @@ def selftest() -> int:
         h["grid"]["n"] >= 125 and "name" in h["iface"]
         and h["census"]["unused"] > 0 and h["counters"].get("CGC_MDL", 0) >= 92
         and h["ladder"]["kinds"] == 9)
-    chk("② 沙盒綠燈率實值(OK≥125∧FAIL=0)",
-        h["grid"]["ok"] >= 125 and h["grid"]["fail"] == 0,
-        f"({h['grid']['ok']}/{h['grid']['n']})")
+    # QA(批211):矩陣=顯示器非裁判(裁判=grid 自身);FAIL==0 斷言
+    # 會自指鎖死(本站讀上一輪存證,修復輪永遠落後一輪)→改綠燈率
+    # 質檢 ≥95%+FAIL 誠實列示於頁不假綠
+    chk("② 沙盒綠燈率實值(OK≥125∧綠燈率≥95%;FAIL 誠實列示)",
+        h["grid"]["ok"] >= 125
+        and h["grid"]["ok"] / max(h["grid"]["n"], 1) >= 0.95,
+        f"({h['grid']['ok']}/{h['grid']['n']}·FAIL {h['grid']['fail']} 列示)")
     p = build()
     html = p.read_text(encoding="utf-8")
     chk("③ 四大分區在頁(MODULE/ENGINE/FUNCTION-LIB/OTHERS)",

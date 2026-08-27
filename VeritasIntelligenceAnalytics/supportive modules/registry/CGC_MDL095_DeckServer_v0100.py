@@ -31,6 +31,8 @@ except Exception:
     VIA_ACCEL = None  # graceful:加速器缺席零影響
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
+# ===== [VIA:NET-BRIDGE:NOTE] 本引擎 urllib.parse 僅作 URL 剖析(零網路);
+# 127.0.0.1 本機服務零外呼;任務之網路=各引擎自帶 SUP_MDL740 統包正主道。=====
 import json
 import os
 import re
