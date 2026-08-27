@@ -52,25 +52,25 @@ TASKS = [
   "cmd": '$env:VIA_NET_CONSENT="YES"; $env:VIA_SCRAPE_CONSENT="YES"; python (Get-ChildItem "{R}\\functional modules\\VDF\\engine\\VDF_ENG064_HistoryBackfill_v*.py" | Sort-Object Name | Select-Object -Last 1).FullName run',
   "note": "由新到舊;斷了再點一次=接著跑;2020/2021 年段=操作員終止(批212)誠實 SKIP"},
  {"id": "consensus", "zh": "三源共識更新(鉅亨 FactSet)", "icon": "🎯",
-  "cmd": '$env:VIA_NET_CONSENT="YES"; $env:VIA_SCRAPE_CONSENT="YES"; python "{R}\\functional modules\\VRN\\VRN_ENG071_CnyesFusion_v0100.py" run {CODES}',
+  "cmd": '$env:VIA_NET_CONSENT="YES"; $env:VIA_SCRAPE_CONSENT="YES"; python (Get-ChildItem "{R}\\functional modules\\VRN\\VRN_ENG071_CnyesFusion_v*.py" | Sort-Object Name | Select-Object -Last 1).FullName run {CODES}',
   "note": "預設 2330 2317 2454;可在組合器改碼"},
  {"id": "revenue", "zh": "月營收全市場(MOPS 官方)", "icon": "🏢",
-  "cmd": '$env:VIA_NET_CONSENT="YES"; $env:VIA_SCRAPE_CONSENT="YES"; python "{R}\\functional modules\\VDF\\engine\\VDF_ENG063_MonthlyRevenue_v0102.py" run',
+  "cmd": '$env:VIA_NET_CONSENT="YES"; $env:VIA_SCRAPE_CONSENT="YES"; python (Get-ChildItem "{R}\\functional modules\\VDF\\engine\\VDF_ENG063_MonthlyRevenue_v*.py" | Sort-Object Name | Select-Object -Last 1).FullName run',
   "note": "上市+上櫃+證券商 1,377 檔一次入庫"},
  {"id": "ui", "zh": "重生全部 UI 頁", "icon": "🖥️",
-  "cmd": 'python "{R}\\supportive modules\\registry\\CGC_MDL090_SystemHub_v0101.py" run; python "{R}\\supportive modules\\registry\\CGC_MDL093_GovernanceMatrix_v0100.py" run; start "{R}\\supportive modules\\ui_support\\VIA_UI_SystemHub_v0100.html"',
-  "note": "重生+自動開樞紐母頁"},
+  "cmd": 'python (Get-ChildItem "{R}\\supportive modules\\registry\\CGC_MDL096_SyncStatus_v*.py" | Sort-Object Name | Select-Object -Last 1).FullName --regen-all; Start-Process "{R}\\supportive modules\\ui_support\\VIA_UI_Portal_v0100.html"',
+  "note": "統一重生道(含 Portal)+自動開總入口"},
 ]
 ENGINES = [
- {"zh": "月營收分析", "path": "functional modules\\VDF\\engine\\VDF_ENG063_MonthlyRevenue_v0102.py",
+ {"zh": "月營收分析", "path": "functional modules\\VDF\\engine\\VDF_ENG063_MonthlyRevenue_v*.py",
   "verbs": ["run", "--analyze", "--status"], "codes": True},
- {"zh": "鉅亨共識", "path": "functional modules\\VRN\\VRN_ENG071_CnyesFusion_v0100.py",
+ {"zh": "鉅亨共識", "path": "functional modules\\VRN\\VRN_ENG071_CnyesFusion_v*.py",
   "verbs": ["run", "--status"], "codes": True},
- {"zh": "Yahoo 共識", "path": "functional modules\\VRN\\VRN_ENG070_YahooConsensus_v0101.py",
+ {"zh": "Yahoo 共識", "path": "functional modules\\VRN\\VRN_ENG070_YahooConsensus_v*.py",
   "verbs": ["run", "--status"], "codes": True},
- {"zh": "歷史回補", "path": "functional modules\\VDF\\engine\\VDF_ENG064_HistoryBackfill_v0101.py",
+ {"zh": "歷史回補", "path": "functional modules\\VDF\\engine\\VDF_ENG064_HistoryBackfill_v*.py",
   "verbs": ["run", "--status", "--rebuild-ckpt"], "codes": False},
- {"zh": "因子庫", "path": "functional modules\\VDF\\engine\\VDF_ENG061_FeatureStore_v0100.py",
+ {"zh": "因子庫", "path": "functional modules\\VDF\\engine\\VDF_ENG061_FeatureStore_v*.py",
   "verbs": ["build", "--status"], "codes": False},
 ]
 # 拖曳收件對映(副檔名→處置)
@@ -234,7 +234,9 @@ function combo() {{
   let c = "";
   if ($("consent").checked)
     c += '$env:VIA_NET_CONSENT="YES"; $env:VIA_SCRAPE_CONSENT="YES"; ';
-  c += `python "${{R()}}\\\\${{e.path}}" ${{verb}}`;
+  /* 批223:glob 憲章——組合器輸出=PS 尾版動態解析,嚴禁寫死版號 */
+  c += `python (Get-ChildItem "${{R()}}\\\\${{e.path}}" | Sort-Object Name | ` +
+       `Select-Object -Last 1).FullName ${{verb}}`;
   if (e.codes && (verb === "run" || verb === "--analyze"))
     c += " " + $("codes").value.trim();
   setCmd(c.trim());

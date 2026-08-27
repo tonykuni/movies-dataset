@@ -67,14 +67,14 @@ padding:10px 16px;cursor:pointer;min-height:44px}
 background:#333;color:#fff;padding:10px 18px;border-radius:20px;display:none}
 </style></head><body><div class="wrap">
 <h1>🎛️ VIA 指揮台(零打字操作)</h1>
-<div class="mut">2026-08-27 18:54 · 點卡/下拉/勾選/拖曳 → 指令自動入剪貼簿 → 貼到
+<div class="mut">2026-08-27 19:08 · 點卡/下拉/勾選/拖曳 → 指令自動入剪貼簿 → 貼到
 PowerShell 按 Enter · 誠實界線:瀏覽器不能直接執行本機程式,本台=
 三動作極簡(複製→貼上→Enter);真零操作=每日開機自動鏈+桌面
 VIA-Start.bat 雙擊</div>
 <section class="page on"><h2>⚙️ Root(批196 裁定 Active Root;可改)</h2>
 <input type="text" id="root" value="C:\Users\tonyk\movies-dataset\VeritasIntelligenceAnalytics" style="width:100%"></section>
 <section class="page on"><h2>① 一鍵任務卡 <span id="bridgestate" class="mut">(偵測橋接中…)</span></h2>
-<div class="deck"><button class="card" data-id="boot" data-cmd="powershell -ExecutionPolicy Bypass -File &quot;{R}\launch.ps1&quot;"><div class="ci">🔄</div><div class="ct">全自動日更(建議每日一次)</div><div class="mut">背景跑全鏈+自動開 UI;終端不卡</div></button><button class="card" data-id="backfill" data-cmd="$env:VIA_NET_CONSENT=&quot;YES&quot;; $env:VIA_SCRAPE_CONSENT=&quot;YES&quot;; python (Get-ChildItem &quot;{R}\functional modules\VDF\engine\VDF_ENG064_HistoryBackfill_v*.py&quot; | Sort-Object Name | Select-Object -Last 1).FullName run"><div class="ci">📥</div><div class="ct">歷史回補 2022~(可中斷續跑)</div><div class="mut">由新到舊;斷了再點一次=接著跑;2020/2021 年段=操作員終止(批212)誠實 SKIP</div></button><button class="card" data-id="consensus" data-cmd="$env:VIA_NET_CONSENT=&quot;YES&quot;; $env:VIA_SCRAPE_CONSENT=&quot;YES&quot;; python &quot;{R}\functional modules\VRN\VRN_ENG071_CnyesFusion_v0100.py&quot; run {CODES}"><div class="ci">🎯</div><div class="ct">三源共識更新(鉅亨 FactSet)</div><div class="mut">預設 2330 2317 2454;可在組合器改碼</div></button><button class="card" data-id="revenue" data-cmd="$env:VIA_NET_CONSENT=&quot;YES&quot;; $env:VIA_SCRAPE_CONSENT=&quot;YES&quot;; python &quot;{R}\functional modules\VDF\engine\VDF_ENG063_MonthlyRevenue_v0102.py&quot; run"><div class="ci">🏢</div><div class="ct">月營收全市場(MOPS 官方)</div><div class="mut">上市+上櫃+證券商 1,377 檔一次入庫</div></button><button class="card" data-id="ui" data-cmd="python &quot;{R}\supportive modules\registry\CGC_MDL090_SystemHub_v0101.py&quot; run; python &quot;{R}\supportive modules\registry\CGC_MDL093_GovernanceMatrix_v0100.py&quot; run; start &quot;{R}\supportive modules\ui_support\VIA_UI_SystemHub_v0100.html&quot;"><div class="ci">🖥️</div><div class="ct">重生全部 UI 頁</div><div class="mut">重生+自動開樞紐母頁</div></button></div></section>
+<div class="deck"><button class="card" data-id="boot" data-cmd="powershell -ExecutionPolicy Bypass -File &quot;{R}\launch.ps1&quot;"><div class="ci">🔄</div><div class="ct">全自動日更(建議每日一次)</div><div class="mut">背景跑全鏈+自動開 UI;終端不卡</div></button><button class="card" data-id="backfill" data-cmd="$env:VIA_NET_CONSENT=&quot;YES&quot;; $env:VIA_SCRAPE_CONSENT=&quot;YES&quot;; python (Get-ChildItem &quot;{R}\functional modules\VDF\engine\VDF_ENG064_HistoryBackfill_v*.py&quot; | Sort-Object Name | Select-Object -Last 1).FullName run"><div class="ci">📥</div><div class="ct">歷史回補 2022~(可中斷續跑)</div><div class="mut">由新到舊;斷了再點一次=接著跑;2020/2021 年段=操作員終止(批212)誠實 SKIP</div></button><button class="card" data-id="consensus" data-cmd="$env:VIA_NET_CONSENT=&quot;YES&quot;; $env:VIA_SCRAPE_CONSENT=&quot;YES&quot;; python (Get-ChildItem &quot;{R}\functional modules\VRN\VRN_ENG071_CnyesFusion_v*.py&quot; | Sort-Object Name | Select-Object -Last 1).FullName run {CODES}"><div class="ci">🎯</div><div class="ct">三源共識更新(鉅亨 FactSet)</div><div class="mut">預設 2330 2317 2454;可在組合器改碼</div></button><button class="card" data-id="revenue" data-cmd="$env:VIA_NET_CONSENT=&quot;YES&quot;; $env:VIA_SCRAPE_CONSENT=&quot;YES&quot;; python (Get-ChildItem &quot;{R}\functional modules\VDF\engine\VDF_ENG063_MonthlyRevenue_v*.py&quot; | Sort-Object Name | Select-Object -Last 1).FullName run"><div class="ci">🏢</div><div class="ct">月營收全市場(MOPS 官方)</div><div class="mut">上市+上櫃+證券商 1,377 檔一次入庫</div></button><button class="card" data-id="ui" data-cmd="python (Get-ChildItem &quot;{R}\supportive modules\registry\CGC_MDL096_SyncStatus_v*.py&quot; | Sort-Object Name | Select-Object -Last 1).FullName --regen-all; Start-Process &quot;{R}\supportive modules\ui_support\VIA_UI_Portal_v0100.html&quot;"><div class="ci">🖥️</div><div class="ct">重生全部 UI 頁</div><div class="mut">統一重生道(含 Portal)+自動開總入口</div></button></div></section>
 <section class="page on"><h2>🚦 執行狀況矩陣(RYG;橋接模式即時)</h2>
 <div class="tablewrap"><table id="runmatrix"><tr><th>任務</th><th>燈</th>
 <th>狀況(log 尾)</th><th>解決方案</th></tr>
@@ -99,7 +99,7 @@ VIA-Start.bat 雙擊</div>
 <span class="mut">→ 開 PowerShell 貼上按 Enter 即執行</span></div></section>
 <div id="toast">已複製!到 PowerShell 貼上按 Enter</div>
 </div><script>
-const ENGINES = [{"zh": "月營收分析", "path": "functional modules\\VDF\\engine\\VDF_ENG063_MonthlyRevenue_v0102.py", "verbs": ["run", "--analyze", "--status"], "codes": true}, {"zh": "鉅亨共識", "path": "functional modules\\VRN\\VRN_ENG071_CnyesFusion_v0100.py", "verbs": ["run", "--status"], "codes": true}, {"zh": "Yahoo 共識", "path": "functional modules\\VRN\\VRN_ENG070_YahooConsensus_v0101.py", "verbs": ["run", "--status"], "codes": true}, {"zh": "歷史回補", "path": "functional modules\\VDF\\engine\\VDF_ENG064_HistoryBackfill_v0101.py", "verbs": ["run", "--status", "--rebuild-ckpt"], "codes": false}, {"zh": "因子庫", "path": "functional modules\\VDF\\engine\\VDF_ENG061_FeatureStore_v0100.py", "verbs": ["build", "--status"], "codes": false}];
+const ENGINES = [{"zh": "月營收分析", "path": "functional modules\\VDF\\engine\\VDF_ENG063_MonthlyRevenue_v*.py", "verbs": ["run", "--analyze", "--status"], "codes": true}, {"zh": "鉅亨共識", "path": "functional modules\\VRN\\VRN_ENG071_CnyesFusion_v*.py", "verbs": ["run", "--status"], "codes": true}, {"zh": "Yahoo 共識", "path": "functional modules\\VRN\\VRN_ENG070_YahooConsensus_v*.py", "verbs": ["run", "--status"], "codes": true}, {"zh": "歷史回補", "path": "functional modules\\VDF\\engine\\VDF_ENG064_HistoryBackfill_v*.py", "verbs": ["run", "--status", "--rebuild-ckpt"], "codes": false}, {"zh": "因子庫", "path": "functional modules\\VDF\\engine\\VDF_ENG061_FeatureStore_v*.py", "verbs": ["build", "--status"], "codes": false}];
 const DROPMAP = {"pdf": {"zh": "券商報告 PDF", "dest": "functional modules\\VRN\\input_reports", "after": "python \"{R}\\functional modules\\VRN\\vrn_report_digest_v0107.py\""}, "docx": {"zh": "Word 報告", "dest": "functional modules\\VRN\\input_reports", "after": "python \"{R}\\functional modules\\VRN\\vrn_report_digest_v0107.py\""}, "py": {"zh": "Python 引擎(候收容)", "dest": "supportive modules\\_inbox_to_classify", "after": "rem 收容後由治理批次分類"}, "csv": {"zh": "資料表", "dest": "functional modules\\VDF\\input_inbox", "after": "rem 入庫由 VDF 攝入引擎處理"}};
 const $ = id => document.getElementById(id);
 const R = () => $("root").value.trim().replace(/\\+$/, "");
@@ -170,7 +170,9 @@ function combo() {
   let c = "";
   if ($("consent").checked)
     c += '$env:VIA_NET_CONSENT="YES"; $env:VIA_SCRAPE_CONSENT="YES"; ';
-  c += `python "${R()}\\${e.path}" ${verb}`;
+  /* 批223:glob 憲章——組合器輸出=PS 尾版動態解析,嚴禁寫死版號 */
+  c += `python (Get-ChildItem "${R()}\\${e.path}" | Sort-Object Name | ` +
+       `Select-Object -Last 1).FullName ${verb}`;
   if (e.codes && (verb === "run" || verb === "--analyze"))
     c += " " + $("codes").value.trim();
   setCmd(c.trim());

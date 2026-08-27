@@ -3,7 +3,7 @@
 #   首次安裝(貼一次,桌面出現「VIA」捷徑,以後雙擊即一切):
 #     powershell -ExecutionPolicy Bypass -File "<此檔完整路徑>" -Install
 #   直接跑(=捷徑雙擊同效):全自動模式——先 git 同步+斷點修復(批213),
-#   再日更全鏈+回補續跑+開三頁 UI
+#   再日更全鏈+回補續跑+開總入口 Portal(全介面連結)
 #   選單模式:加 -Menu
 # 背景作業=獨立進程(Start-Process):關掉本視窗不中斷(不卡斷紀律)
 param([switch]$Install, [switch]$Menu)
