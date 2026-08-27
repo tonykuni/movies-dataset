@@ -64,6 +64,7 @@ PYENV
   echo "--- ⑦b 驗證共識庫(批176)";     python3 "$(ls "$VIA/functional modules/VRN"/VRN_ENG069_ConsensusDB_v*.py | sort | tail -1)" build
   echo "--- ⑦c Yahoo 共識(批194)";     python3 "$(ls "$VIA/functional modules/VRN"/VRN_ENG070_YahooConsensus_v*.py | sort | tail -1)" run
   echo "--- ⑦d 月營收(批194)";         python3 "$(newest 'VDF_ENG063_MonthlyRevenue_v*.py')" run
+  echo "--- ⑦e 鉅亨 FactSet 共識(批199)"; python3 "$(ls "$VIA/functional modules/VRN"/VRN_ENG071_CnyesFusion_v*.py | sort | tail -1)" run
   echo "--- ⑧ 台股輪動日快照(批153)";  python3 "$(ls "$VIA/functional modules/GroupIndex/engine"/GRP_ENG040_GroupingRotationRunner_v*.py | sort | tail -1)" run tw
   echo "--- ⑧b 族群因子層(批193;於輪動快照後=成員冊當日鮮)"; python3 "$(newest 'VDF_ENG062_GroupFeatureLayer_v*.py')" build
   echo "--- ⑤ 對帳";                    python3 "$(newest 'VDF_ENG055_OmniFetch_v*.py')" --status

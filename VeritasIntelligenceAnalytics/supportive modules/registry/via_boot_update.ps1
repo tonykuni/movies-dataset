@@ -4,6 +4,10 @@
 # marker 防重複:每日首跑才實跑;log 落 VIA_Reports/boot_update_logs/
 $ErrorActionPreference = "Continue"
 $VIA  = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+# ===== [VIA:PS-ACCEL:v0100] PS 加速模組掛載(批199 操作員令:PS 指令一定要加加速器;graceful 缺席零影響) =====
+$PSAccel = Join-Path $VIA "supportive modules\VIA_PS_Accel_Module.ps1"
+if (Test-Path $PSAccel) { try { . $PSAccel } catch { } }
+# ===== [VIA:PS-ACCEL:END] =====
 $ENG  = Join-Path $VIA "functional modules\VDF\engine"
 $VRN  = Join-Path $VIA "functional modules\VRN"
 $REG  = Join-Path $VIA "supportive modules\registry"
@@ -45,6 +49,7 @@ Step "⑦ 分析師估值快照(批155)"   (Newest $ENG "VDF_ENG059_EstimateBand
 Step "⑦b 驗證共識庫(批176)"      (Newest $VRN "VRN_ENG069_ConsensusDB_v*.py") @("build")
 Step "⑦c Yahoo 共識(批194)"      (Newest $VRN "VRN_ENG070_YahooConsensus_v*.py") @("run")
 Step "⑦d 月營收(批194)"          (Newest $ENG "VDF_ENG063_MonthlyRevenue_v*.py") @("run")
+Step "⑦e 鉅亨 FactSet 共識(批199)" (Newest $VRN "VRN_ENG071_CnyesFusion_v*.py") @("run")
 Step "⑧ 台股輪動日快照(批153)"   (Newest $GRP "GRP_ENG040_GroupingRotationRunner_v*.py") @("run", "tw")
 Step "⑧b 族群因子層(批193)"      (Newest $ENG "VDF_ENG062_GroupFeatureLayer_v*.py") @("build")
 Step "⑤ 對帳"                      (Newest $ENG "VDF_ENG055_OmniFetch_v*.py") @("--status")
