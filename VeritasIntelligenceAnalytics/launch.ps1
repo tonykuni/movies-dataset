@@ -15,6 +15,8 @@ $job = Start-Job -Name "VIA_Boot" -ScriptBlock {
 Write-Host ("[launch] 背景 Job Id={0}(查進度:Receive-Job {0} -Keep;log 於 VIA_Reports\boot_update_logs\)" -f $job.Id)
 $hub = Join-Path $VIA "supportive modules\ui_support\VIA_UI_SystemHub_v0100.html"
 $mtx = Join-Path $VIA "supportive modules\ui_support\VIA_UI_GovernanceMatrix_v0100.html"
+$dck = Join-Path $VIA "supportive modules\ui_support\VIA_UI_CommandDeck_v0100.html"
 if (Test-Path $hub) { Start-Process $hub }
 if (Test-Path $mtx) { Start-Process $mtx }
+if (Test-Path $dck) { Start-Process $dck }
 Write-Host "[launch] UI 已開(樞紐+治理矩陣);終端可繼續操作=非阻塞" -ForegroundColor Green

@@ -1,0 +1,157 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA 指揮台 v0100</title><style>
+:root{--fs:clamp(11px,2.6vw,12.5px);--ok:#15803d;--fail:#b91c1c;--skip:#a16207;
+--untested:#64748b}
+*{box-sizing:border-box}
+body{margin:0;background:#f6f7f9;color:#1f2937;
+font:var(--fs)/1.5 'Segoe UI','Noto Sans TC',sans-serif}
+.wrap{max-width:1200px;margin:0 auto;padding:clamp(8px,1.5vw,16px)}
+h1{font-size:clamp(.95rem,2vw,1.2rem);margin:.3em 0 .1em}
+h2{font-size:clamp(.85rem,1.7vw,1.05rem);margin:.2em 0 .3em}
+.mut{color:#94a3b8}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:.5em 0}
+.tab{font:inherit;border:1px solid #e5e7eb;background:#ffffff;
+border-radius:7px;padding:4px 10px;cursor:pointer;
+min-height:40px}
+.tab b{margin-left:5px;color:#94a3b8;font-weight:600}
+.tab.on{background:#111827;color:#ffffff}
+.tab.on b{color:#e5e7eb}
+.page{display:none;background:#ffffff;border:1px solid #e5e7eb;
+border-radius:10px;padding:10px 12px;overflow-wrap:anywhere}
+.page.on{display:block}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+.dot.big{width:11px;height:11px}
+.env{color:#475569;font-size:.9em;border-bottom:1px solid #f1f5f9;
+padding-bottom:5px}
+.kpi{display:flex;gap:16px;margin:.4em 0;font-weight:600}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.93em}
+th,td{text-align:left;padding:3px 6px;border-bottom:1px solid #f1f5f9;
+vertical-align:top}
+th{color:#475569}
+.num{text-align:right;color:#94a3b8}
+.engs{margin-top:.5em;font-size:.88em}
+.warn{background:#fef9c3;border:1px solid #fde047;
+border-radius:8px;padding:6px 10px;margin:.4em 0}
+.foot{color:#94a3b8;font-size:.88em;margin-top:.6em;border-top:1px solid
+#f1f5f9;padding-top:5px}
+.slotmap td:first-child{white-space:nowrap;color:#475569}
+@media (max-width:640px){
+  .kpi{gap:10px;flex-wrap:wrap}
+  table.cards,table.cards tbody{display:block}
+  table.cards tr{display:block;border:1px solid #f1f5f9;
+  border-radius:8px;margin:.35em 0;padding:2px 6px}
+  table.cards td{display:block;border:none;padding:1px 2px}
+  table.cards th{display:none}
+  table.cards td.num{text-align:left}
+}
+.deck{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.card{text-align:left;padding:12px;border:1px solid #e0e0e0;border-radius:8px;
+background:#fff;cursor:pointer;min-height:44px}
+.card:hover{border-color:#15803d;box-shadow:0 1px 6px rgba(0,0,0,.12)}
+.ci{font-size:22px}.ct{font-weight:bold;margin:4px 0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0}
+select,input[type=text]{padding:8px;border:1px solid #ccc;border-radius:6px;
+min-height:40px;font-size:13px}
+label.ck{display:inline-flex;align-items:center;gap:4px;padding:6px 8px;
+border:1px solid #e0e0e0;border-radius:6px;cursor:pointer}
+#drop{border:2px dashed #bbb;border-radius:10px;padding:26px;text-align:center;
+color:#888;transition:.15s}
+#drop.on{border-color:#15803d;background:#f0fff4;color:#333}
+#cmdout{width:100%;font-family:monospace;font-size:11px;padding:8px;
+border:1px solid #ccc;border-radius:6px;min-height:56px;word-break:break-all}
+.copybtn{background:#15803d;color:#fff;border:0;border-radius:6px;
+padding:10px 16px;cursor:pointer;min-height:44px}
+#toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);
+background:#333;color:#fff;padding:10px 18px;border-radius:20px;display:none}
+</style></head><body><div class="wrap">
+<h1>🎛️ VIA 指揮台(零打字操作)</h1>
+<div class="mut">2026-08-27 12:12 · 點卡/下拉/勾選/拖曳 → 指令自動入剪貼簿 → 貼到
+PowerShell 按 Enter · 誠實界線:瀏覽器不能直接執行本機程式,本台=
+三動作極簡(複製→貼上→Enter);真零操作=每日開機自動鏈+桌面
+VIA-Start.bat 雙擊</div>
+<section class="page on"><h2>⚙️ Root(批196 裁定 Active Root;可改)</h2>
+<input type="text" id="root" value="C:\Users\tonyk\movies-dataset\VeritasIntelligenceAnalytics" style="width:100%"></section>
+<section class="page on"><h2>① 一鍵任務卡(點=複製指令)</h2>
+<div class="deck"><button class="card" data-cmd="powershell -ExecutionPolicy Bypass -File &quot;{R}\launch.ps1&quot;"><div class="ci">🔄</div><div class="ct">全自動日更(建議每日一次)</div><div class="mut">背景跑全鏈+自動開 UI;終端不卡</div></button><button class="card" data-cmd="$env:VIA_NET_CONSENT=&quot;YES&quot;; $env:VIA_SCRAPE_CONSENT=&quot;YES&quot;; python &quot;{R}\functional modules\VDF\engine\VDF_ENG064_HistoryBackfill_v0100.py&quot; run"><div class="ci">📥</div><div class="ct">歷史回補 2020~(可中斷續跑)</div><div class="mut">由新到舊;斷了再點一次=接著跑</div></button><button class="card" data-cmd="$env:VIA_NET_CONSENT=&quot;YES&quot;; $env:VIA_SCRAPE_CONSENT=&quot;YES&quot;; python &quot;{R}\functional modules\VRN\VRN_ENG071_CnyesFusion_v0100.py&quot; run {CODES}"><div class="ci">🎯</div><div class="ct">三源共識更新(鉅亨 FactSet)</div><div class="mut">預設 2330 2317 2454;可在組合器改碼</div></button><button class="card" data-cmd="$env:VIA_NET_CONSENT=&quot;YES&quot;; $env:VIA_SCRAPE_CONSENT=&quot;YES&quot;; python &quot;{R}\functional modules\VDF\engine\VDF_ENG063_MonthlyRevenue_v0102.py&quot; run"><div class="ci">🏢</div><div class="ct">月營收全市場(MOPS 官方)</div><div class="mut">上市+上櫃+證券商 1,377 檔一次入庫</div></button><button class="card" data-cmd="python &quot;{R}\supportive modules\registry\CGC_MDL090_SystemHub_v0101.py&quot; run; python &quot;{R}\supportive modules\registry\CGC_MDL093_GovernanceMatrix_v0100.py&quot; run; start &quot;&quot; &quot;{R}\supportive modules\ui_support\VIA_UI_SystemHub_v0100.html&quot;"><div class="ci">🖥️</div><div class="ct">重生全部 UI 頁</div><div class="mut">重生+自動開樞紐母頁</div></button></div></section>
+<section class="page on"><h2>② 組合器(下拉×勾選×代碼)</h2>
+<div class="row">
+<select id="eng"><option value="0">月營收分析</option><option value="1">鉅亨共識</option><option value="2">Yahoo 共識</option><option value="3">歷史回補</option><option value="4">因子庫</option></select>
+<span id="verbs"></span>
+<input type="text" id="codes" placeholder="股票碼(空白分隔,如 2330 2317)" value="2330 2317 2454">
+<label class="ck"><input type="checkbox" id="consent" checked>同意閘(網路任務必勾)</label>
+</div></section>
+<section class="page on"><h2>③ 拖曳收件(把檔案拖進來)</h2>
+<div id="drop">把 PDF/Word/Python/CSV 檔拖到這裡 → 自動生成收容指令</div></section>
+<section class="page on"><h2>📋 指令輸出</h2>
+<div id="cmdout">(點任務卡或調整組合器)</div>
+<div class="row"><button class="copybtn" id="copy">複製指令</button>
+<span class="mut">→ 開 PowerShell 貼上按 Enter 即執行</span></div></section>
+<div id="toast">已複製!到 PowerShell 貼上按 Enter</div>
+</div><script>
+const ENGINES = [{"zh": "月營收分析", "path": "functional modules\\VDF\\engine\\VDF_ENG063_MonthlyRevenue_v0102.py", "verbs": ["run", "--analyze", "--status"], "codes": true}, {"zh": "鉅亨共識", "path": "functional modules\\VRN\\VRN_ENG071_CnyesFusion_v0100.py", "verbs": ["run", "--status"], "codes": true}, {"zh": "Yahoo 共識", "path": "functional modules\\VRN\\VRN_ENG070_YahooConsensus_v0101.py", "verbs": ["run", "--status"], "codes": true}, {"zh": "歷史回補", "path": "functional modules\\VDF\\engine\\VDF_ENG064_HistoryBackfill_v0100.py", "verbs": ["run", "--status"], "codes": false}, {"zh": "因子庫", "path": "functional modules\\VDF\\engine\\VDF_ENG061_FeatureStore_v0100.py", "verbs": ["build", "--status"], "codes": false}];
+const DROPMAP = {"pdf": {"zh": "券商報告 PDF", "dest": "functional modules\\VRN\\input_reports", "after": "python \"{R}\\functional modules\\VRN\\vrn_report_digest_v0107.py\""}, "docx": {"zh": "Word 報告", "dest": "functional modules\\VRN\\input_reports", "after": "python \"{R}\\functional modules\\VRN\\vrn_report_digest_v0107.py\""}, "py": {"zh": "Python 引擎(候收容)", "dest": "supportive modules\\_inbox_to_classify", "after": "rem 收容後由治理批次分類"}, "csv": {"zh": "資料表", "dest": "functional modules\\VDF\\input_inbox", "after": "rem 入庫由 VDF 攝入引擎處理"}};
+const $ = id => document.getElementById(id);
+const R = () => $("root").value.trim().replace(/\\+$/, "");
+let current = "";
+function setCmd(c) { current = c; $("cmdout").textContent = c; }
+function toast() { const t = $("toast"); t.style.display = "block";
+  setTimeout(() => t.style.display = "none", 1800); }
+function copyCmd() {
+  if (!current) return;
+  const ta = document.createElement("textarea");
+  ta.value = current; document.body.appendChild(ta); ta.select();
+  try { navigator.clipboard ? navigator.clipboard.writeText(current) :
+        document.execCommand("copy"); } catch (e) { document.execCommand("copy"); }
+  document.body.removeChild(ta); toast();
+}
+$("copy").onclick = copyCmd;
+document.querySelectorAll(".card").forEach(b => b.onclick = () => {
+  setCmd(b.dataset.cmd.replaceAll("{R}", R())
+        .replaceAll("{CODES}", $("codes").value.trim())); copyCmd(); });
+function renderVerbs() {
+  const e = ENGINES[$("eng").value];
+  $("verbs").innerHTML = e.verbs.map((v, i) =>
+    `<label class="ck"><input type="radio" name="vb" value="${v}"
+     ${i === 0 ? "checked" : ""}>${v}</label>`).join("");
+  document.querySelectorAll('input[name=vb]').forEach(r => r.onchange = combo);
+  combo();
+}
+function combo() {
+  const e = ENGINES[$("eng").value];
+  const vb = document.querySelector('input[name=vb]:checked');
+  const verb = vb ? vb.value : e.verbs[0];
+  let c = "";
+  if ($("consent").checked)
+    c += '$env:VIA_NET_CONSENT="YES"; $env:VIA_SCRAPE_CONSENT="YES"; ';
+  c += `python "${R()}\\${e.path}" ${verb}`;
+  if (e.codes && (verb === "run" || verb === "--analyze"))
+    c += " " + $("codes").value.trim();
+  setCmd(c.trim());
+}
+$("eng").onchange = renderVerbs;
+$("codes").oninput = combo; $("consent").onchange = combo;
+$("root").oninput = combo;
+renderVerbs();
+const dz = $("drop");
+["dragover", "dragenter"].forEach(ev => dz.addEventListener(ev, e => {
+  e.preventDefault(); dz.classList.add("on"); }));
+["dragleave", "drop"].forEach(ev => dz.addEventListener(ev, e => {
+  e.preventDefault(); dz.classList.remove("on"); }));
+dz.addEventListener("drop", e => {
+  const fs = [...e.dataTransfer.files];
+  if (!fs.length) return;
+  const lines = [];
+  fs.forEach(f => {
+    const ext = f.name.split(".").pop().toLowerCase();
+    const m = DROPMAP[ext];
+    if (!m) { lines.push(`rem ${f.name}:未支援副檔名(誠實跳過)`); return; }
+    lines.push(`Copy-Item "<拖入檔原始路徑>\\${f.name}" "${R()}\\${m.dest}\\" # ${m.zh}`);
+    lines.push(m.after.replaceAll("{R}", R()));
+  });
+  lines.unshift("rem 瀏覽器安全沙盒不給完整路徑=請把 <拖入檔原始路徑> 改成檔案所在資料夾(誠實界線)");
+  setCmd(lines.join("\n")); copyCmd();
+  dz.textContent = fs.map(f => "📄 " + f.name).join("  ") + " → 指令已複製";
+});
+</script></body></html>
