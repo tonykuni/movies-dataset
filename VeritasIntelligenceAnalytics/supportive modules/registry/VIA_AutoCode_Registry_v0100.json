@@ -4598,6 +4598,13 @@
    "ts": "2026-08-27 17:31",
    "name": "批214 工作站實錄:pull 被再生頁擋+舊 v0100 回補誤啟——Sync-Repo 雙修",
    "note": "【病因】①樞紐/治理矩陣 html=引擎每跑必重生之衍生物,工作站本地副本永遠異於雲端版→git pull 結構性 Aborting②pull 失敗→舊 VIA.ps1 續派 ENG064 v0100 回補(跑完 2022 將誤入已終止之 2021/2020)。【修】Sync-Repo v2:①pull 前 git checkout -- supportive modules/ui_support 還原再生頁(衍生物非源;pull 後引擎重生最新=零損失)②Get-CimInstance 比對 CommandLine 含 VDF_ENG064_HistoryBackfill 之 python 進程先收束(中斷安全=checkpoint 零損失;隨後尾版 v0101 重啟)→再 pull --ff-only→再 --rebuild-ckpt。【一次性救援貼令】舊 VIA.ps1 未含此修=雞蛋問題→操作員貼一段:收束舊回補+還原再生頁+pull+啟新 VIA.ps1。【識】127.0.0.1 InsecureRequestWarning=本機自簽代理已知無害(批196 裁定;P17 凍結候解凍)。【QA】括號平衡({36/36}(50/50));PS 實跑候工作站(誠實界線)。"
+  },
+  {
+   "code": "TOOL-215",
+   "kind": "批215 工作站實證",
+   "ts": "2026-08-27 17:35",
+   "name": "批215 工作站實錄:批213/214 修全鏈實證成功(pull FF 121abee9+Sync-Repo 全自動)",
+   "note": "【實證】救援貼令→git pull Fast-forward 226e136b..121abee9(再生頁衝突根治生效);新 VIA.ps1 實跑:Sync-Repo(pull=Already up to date)→--rebuild-ckpt 落盤→背景派工(boot 全鏈/橋 8765/回補 v0101 標籤「2022~;2020/21 終止批212」)→三頁 UI 開啟。治理矩陣頁全綠:135 站 OK 133/FAIL 0/SKIP 2·綠燈率 98.5%·VSM 六燈 GREEN。【判讀】工作站 rebuild done=0 檔=誠實非異常:雲端 +64 萬列在雲端 DuckDB(output_hub gitignored 不隨 git 走),工作站庫 2022/2023 尚空→其 v0101 回補自主由新到舊抓 2023→2022,終止段自動 SKIP;中斷安全,再雙擊即續。【識】InsecureRequestWarning(127.0.0.1)=本機自簽代理已知無害(批196 裁定;P17 凍結)。"
   }
  ]
 }
