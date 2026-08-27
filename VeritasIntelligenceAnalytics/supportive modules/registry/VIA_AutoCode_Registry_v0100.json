@@ -4584,6 +4584,13 @@
    "ts": "2026-08-27 17:11",
    "name": "批212 操作員令「這個步驟終止:2020/2021 年段續補」:ENG064 v0101 終止令入典+斷點修復",
    "note": "【終止令】VDF_ENG064_HistoryBackfill v0101(version-forward;正本 v0100 零觸碰):TERMINATED_SEGMENTS={2021:批212, 2020:批212};run 遇終止段=誠實 SKIP(終止非完成;零觸網零記 done 不假齊);活段 2023/2022 增量續跑不變;解除=僅憑操作員明令出新版。檢② 改「年段倒序+批212 終止令實構」。【債修】v0100 selftest 檢⑦ 以 fixture 覆寫+unlink 真 checkpoint(每輪 grid 誤毀實體斷點)→v0101 改備份→測→還原;新增 --rebuild-ckpt 自庫重建道(段內有列判準;已探零列檔誠實留待再探)→雲端斷點已重建落盤(台股 2023=1,896/2022=797;全球各 5)。【呼叫端】全 glob 尾版自動升 v0101(VIA.ps1/MDL095/grid);MDL094 backfill 卡寫死 v0100 債→改 PS Get-ChildItem 尾版動態解析+卡文案「2022~;2020/2021 操作員終止」;MDL095 任務冊標籤同步。【QA】ENG064 v0101 八檢綠+MDL094 九檢綠+MDL095 八檢綠;指揮台頁重生;終輪 grid v0193 存證。"
+  },
+  {
+   "code": "TOOL-213",
+   "kind": "批213 單鍵同步",
+   "ts": "2026-08-27 17:26",
+   "name": "批213 操作員令「用一個 POWERSHELL 去完成上述指令」:VIA.ps1 開機自同步步(Sync-Repo)",
+   "note": "【Sync-Repo】VIA.ps1 Invoke-All 首步新增:①git -C $VIA pull --ff-only(取尾版;離線/本地改動=誠實提示續用現版 try/catch)②ENG064 尾版 --rebuild-ckpt(批212 真斷點債修;冪等秒過零網路)。效果=雙擊 VIA 捷徑即自動完成「pull 取 v0101 終止令+斷點修復+日更+回補續跑+開 UI」全鏈,批212 工作站待辦(pull+rebuild-ckpt)收束為零打字。首次一次性貼入指令(尚未 pull 前的雞蛋問題)=cd repo; git pull; VIA.ps1。【QA】pwsh 雲端缺席=括號平衡輕檢代替({32/32}(48/48))+Sync-Repo 定義/呼叫雙在位;PS 實跑驗證候工作站(誠實界線)。"
   }
  ]
 }

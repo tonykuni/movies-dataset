@@ -2,7 +2,8 @@
 # 用法:
 #   首次安裝(貼一次,桌面出現「VIA」捷徑,以後雙擊即一切):
 #     powershell -ExecutionPolicy Bypass -File "<此檔完整路徑>" -Install
-#   直接跑(=捷徑雙擊同效):全自動模式——日更全鏈+回補續跑+開三頁 UI
+#   直接跑(=捷徑雙擊同效):全自動模式——先 git 同步+斷點修復(批213),
+#   再日更全鏈+回補續跑+開三頁 UI
 #   選單模式:加 -Menu
 # 背景作業=獨立進程(Start-Process):關掉本視窗不中斷(不卡斷紀律)
 param([switch]$Install, [switch]$Menu)
@@ -56,9 +57,22 @@ function Open-UIs {
     Write-Host "  [UI] 樞紐+指揮台+治理矩陣 已開" -ForegroundColor Green
 }
 
+function Sync-Repo {
+    # 批213:啟動先同步——git pull 取尾版+ENG064 斷點自庫修復(冪等秒過)
+    try {
+        $out = git -C $VIA pull --ff-only 2>&1
+        Write-Host "  [同步] git pull:$($out | Select-Object -Last 1)" -ForegroundColor Cyan
+    } catch {
+        Write-Host "  [同步] pull 失敗(離線/本地改動)=誠實續用現版" -ForegroundColor Yellow
+    }
+    $bf = Newest (Join-Path $VIA "functional modules\VDF\engine") "VDF_ENG064_HistoryBackfill_v*.py"
+    if ($bf) { python "$bf" --rebuild-ckpt }   # 真斷點重建(批212 債修;零網路)
+}
+
 function Invoke-All {
     $env:VIA_NET_CONSENT = "YES"; $env:VIA_SCRAPE_CONSENT = "YES"
-    Write-Host "[VIA] 全自動模式:日更全鏈+歷史回補續跑+開 UI(全背景不卡)" -ForegroundColor Yellow
+    Write-Host "[VIA] 全自動模式:同步+日更全鏈+回補續跑+開 UI(全背景不卡)" -ForegroundColor Yellow
+    Sync-Repo
     Start-Background "日更全鏈(boot ①-⑨)" (Join-Path $VIA "supportive modules\registry\via_boot_update.ps1") @()
     # 批208:指揮台執行橋(按下=直接執行;127.0.0.1 白名單)
     $ds = Get-ChildItem (Join-Path $VIA "supportive modules\registry") -Filter "CGC_MDL095_DeckServer_v*.py" | Sort-Object Name | Select-Object -Last 1
