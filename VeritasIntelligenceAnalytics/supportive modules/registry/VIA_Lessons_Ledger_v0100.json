@@ -468,6 +468,36 @@
    "src": "REBUILD_20260812_162359.json",
    "note": "多環境多工具全綠一次達陣——改進起點",
    "ts": "20260812_165538"
+  },
+  {
+   "kind": "ROOT_CAUSE",
+   "id": "RC-16",
+   "match": null,
+   "source": "workstation-20260813",
+   "ts": "20260813",
+   "sig": "numpy==1.26.4 解析失敗(hint: See above)於 Python 3.13 代測",
+   "cause": "numpy 1.26 無 cp313 輪;支架未指 Python 版時以 base 3.13 解析必敗",
+   "fix": "np1 支架錨 Py3.12(via_np1_py312);分靶實測各帶 --python-version(已修 v0104)"
+  },
+  {
+   "kind": "ROOT_CAUSE",
+   "id": "RC-17",
+   "match": null,
+   "source": "workstation-20260813",
+   "ts": "20260813",
+   "sig": "旁建境 Python 版漂移:via_core_312 之 __rb 境被建成 3.13",
+   "cause": "執行檔用 py -m venv=BASE 直譯器,未鎖原境 Python 大版",
+   "fix": "uv venv --python <原境版> 版本保真,uv 自動供應該版(已修 v0104)"
+  },
+  {
+   "kind": "ROOT_CAUSE",
+   "id": "RC-18",
+   "match": null,
+   "source": "workstation-20260813",
+   "ts": "20260813",
+   "sig": "混居境重建後仍紅:59 件 fresh-resolve 自帶 cv2 三變體",
+   "cause": "paddlex→contrib/rapidocr→opencv-python/marker→headless 各拉各的——混居是根因,重建不解",
+   "fix": "拆分才根治:OCR 家族按 via-ocrsuper 車道各出專屬境(paddle_312/via_rapidocr/via_surya)"
   }
  ]
 }

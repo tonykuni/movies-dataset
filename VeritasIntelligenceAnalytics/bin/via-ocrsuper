@@ -1,0 +1,6 @@
+#!/bin/sh
+# OCR 超引擎(輕先重後階梯;隔離境;零安裝)— 動態解析最新版(鐵律)
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
+OS="$(ls "$DIR/supportive modules/registry"/via_ocr_super_v0*.py 2>/dev/null | sort | tail -n 1)"
+[ -z "$OS" ] && { echo "  ✗ 引擎缺:via_ocr_super_v0*.py(誠實)" >&2; exit 2; }
+exec python3 "$OS" "$@"
