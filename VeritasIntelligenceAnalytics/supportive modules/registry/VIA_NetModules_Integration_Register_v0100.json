@@ -4,10 +4,10 @@
  "source": "批125 操作員令:所有網路模組整合為一",
  "policy": "單一引擎=SUP_MDL740_NetUnified 最新版(四車道 http_json/http_text/probe/yf_download+v0102 增 gsheet_csv/akshare_call;法遵雙閘 fail-closed);橋容=via_net_unified_v* shim(NET-BRIDGE glob 零斷鏈);legacy 收容件只增不減在位、能力由統包涵蓋、嚴禁繞閘直用",
  "counts": {
-  "total": 92,
+  "total": 94,
   "CANONICAL": 1,
   "SHIM_OR_PRIOR": 2,
-  "BRIDGED": 26,
+  "BRIDGED": 2,
   "LEGACY_INERT": 18,
   "SELF_NET": 45
  },
@@ -685,6 +685,22 @@
     "yfinance"
    ],
    "class": "SELF_NET(候橋/清點)"
+  },
+  {
+   "file": "functional modules/VDF/engine/VDF_ENG063_MonthlyRevenue_v0100.py",
+   "net_imports": [
+    "SUP_MDL740_NetUnified(統包正主)"
+   ],
+   "class": "BRIDGED",
+   "note": "批195:月營收分析(統包 http_json 道消費者;候選端點冊誠實探測;P16 候源)"
+  },
+  {
+   "file": "functional modules/VRN/VRN_ENG070_YahooConsensus_v0100.py",
+   "net_imports": [
+    "SUP_MDL740_NetUnified(統包正主)"
+   ],
+   "class": "BRIDGED",
+   "note": "批195:Yahoo 共識(統包 yahoo_quote_summary_raw 道消費者;consensus_daily 多源)"
   }
  ],
  "backend": {
