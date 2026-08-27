@@ -42,6 +42,7 @@ except Exception:
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
 import json
+import os
 import subprocess
 import sys
 from datetime import datetime
@@ -72,6 +73,20 @@ def gather_git(fetch: bool = True) -> dict:
             g["fetched"] = True
         except Exception:
             pass  # 離線=誠實降級(頁面標示「本地快照」)
+    if fetch and os.name == "nt":
+        # 批221:工作站自癒同步——再生頁=衍生物,本地副本永遠擋 pull
+        # (批214 同型;VIA.ps1 Sync-Repo 有此保護,手動指令道也要有)
+        # →還原 ui_support 後 pull --ff-only;雲端(非 nt)零影響
+        try:
+            subprocess.run(["git", "-C", str(VIA), "checkout", "--",
+                            "supportive modules/ui_support"],
+                           capture_output=True, timeout=30)
+            r = subprocess.run(["git", "-C", str(VIA), "pull", "--ff-only"],
+                               capture_output=True, text=True, timeout=90)
+            tail = (r.stdout or r.stderr).strip().splitlines()
+            print(f"  [同步] 再生頁還原+pull:{tail[-1] if tail else 'ok'}")
+        except Exception:
+            print("  [同步] pull 未達(離線/本地改動)=誠實續用現版")
     g["head"] = _git("rev-parse", "--short", "HEAD")
     g["branch"] = _git("rev-parse", "--abbrev-ref", "HEAD")
     for label, ref in (("main", "origin/main"), ("followup", "origin/" + BRANCH)):
