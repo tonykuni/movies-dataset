@@ -54,6 +54,7 @@ PYENV
   echo "--- ① OmniFetch 全車道";        python3 "$(newest 'VDF_ENG055_OmniFetch_v*.py')" run
   echo "--- ② 價格增量";                python3 "$(newest 'VDF_ENG054_TWDailyBackfill_v*.py')" run
   echo "--- ②b 調整後價格層(批178)";   python3 "$(newest 'VDF_ENG060_AdjPriceLayer_v*.py')" build
+  echo "--- ②c 因子庫(批188)";         python3 "$(newest 'VDF_ENG061_FeatureStore_v*.py')" build
   echo "--- ③ 籌碼增量+衍生";           python3 "$(newest 'VDF_ENG056_ChipBackfill_v*.py')" run
   python3 "$(newest 'VDF_ENG056_ChipBackfill_v*.py')" --derive
   echo "--- ④ 主動 ETF 持股(PARTIAL 屬常態)"; python3 "$ENG/VDF_ENG051_ActiveTWETF_Holdings.py"
