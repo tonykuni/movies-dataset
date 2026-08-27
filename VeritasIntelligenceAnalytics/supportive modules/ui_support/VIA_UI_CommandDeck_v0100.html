@@ -67,7 +67,7 @@ padding:10px 16px;cursor:pointer;min-height:44px}
 background:#333;color:#fff;padding:10px 18px;border-radius:20px;display:none}
 </style></head><body><div class="wrap">
 <h1>🎛️ VIA 指揮台(零打字操作)</h1>
-<div class="mut">2026-08-27 13:58 · 點卡/下拉/勾選/拖曳 → 指令自動入剪貼簿 → 貼到
+<div class="mut">2026-08-27 14:02 · 點卡/下拉/勾選/拖曳 → 指令自動入剪貼簿 → 貼到
 PowerShell 按 Enter · 誠實界線:瀏覽器不能直接執行本機程式,本台=
 三動作極簡(複製→貼上→Enter);真零操作=每日開機自動鏈+桌面
 VIA-Start.bat 雙擊</div>
@@ -87,6 +87,10 @@ VIA-Start.bat 雙擊</div>
 <input type="text" id="codes" placeholder="股票碼(空白分隔,如 2330 2317)" value="2330 2317 2454">
 <label class="ck"><input type="checkbox" id="consent" checked>同意閘(網路任務必勾)</label>
 </div></section>
+<section class="page on"><h2>🔍 個股全景(批209:輸入代號=唯一動作,其餘全自動)</h2>
+<div class="row"><input type="text" id="scode" placeholder="輸入代號後按 Enter(如 2330)"
+ style="font-size:16px;min-width:200px"><span id="sstate" class="mut"></span></div>
+<div id="spanel"></div></section>
 <section class="page on"><h2>③ 拖曳收件(把檔案拖進來)</h2>
 <div id="drop">把 PDF/Word/Python/CSV 檔拖到這裡 → 自動生成收容指令</div></section>
 <section class="page on"><h2>📋 指令輸出</h2>
@@ -168,6 +172,54 @@ $("eng").onchange = renderVerbs;
 $("codes").oninput = combo; $("consent").onchange = combo;
 $("root").oninput = combo;
 renderVerbs();
+/* 批209 個股全景:代號→①觸發共識擷取②等任務完③聚合④渲染=全自動 */
+const pc2 = (x, d = 1) => x == null ? "—" : (x * 100).toFixed(d) + "%";
+function svgLine(px) {
+  if (!px || px.length < 2) return '<div class="mut">價格序列不足(誠實)</div>';
+  const vs = px.map(p => p[1]), mn = Math.min(...vs), mx = Math.max(...vs);
+  const W = 640, Hh = 140, pad = 4;
+  const pts = px.map((p, i) => `${(i / (px.length - 1) * (W - 2 * pad) + pad).toFixed(1)},` +
+    `${(Hh - pad - (p[1] - mn) / (mx - mn || 1) * (Hh - 2 * pad)).toFixed(1)}`).join(" ");
+  return `<svg viewBox="0 0 ${W} ${Hh}" style="width:100%;max-height:160px;background:#fafafa;border:1px solid #eee;border-radius:6px"><polyline points="${pts}" fill="none" stroke="#15803d" stroke-width="1.6"/></svg>` +
+    `<div class="mut">${px[0][0]} → ${px[px.length - 1][0]} · 收盤 ${vs[vs.length - 1]}(prices_canonical 調整後)</div>`;
+}
+function renderStock(d) {
+  if (d.err) { $("spanel").innerHTML = `<div class="mut">⚠️ ${d.err}</div>`; return; }
+  if (d.busy) { $("spanel").innerHTML = `<div class="mut">🟡 ${d.note}</div>`;
+    setTimeout(() => autoStock(d.code || $("scode").value.trim(), true), 5000); return; }
+  let h = `<h3>${d.code} ${d.name || ""}</h3>` + svgLine(d.px);
+  if (d.factors) {
+    const [fd, r1, r20, r60, vol, m20, m60, hi, vz] = d.factors;
+    h += `<div class="env">因子 ${fd}:日 ${pc2(r1)} · 20日 ${pc2(r20)} · 60日 ${pc2(r60)}
+      · 波動 ${pc2(vol)} · MA20乖離 ${pc2(m20)} · MA60乖離 ${pc2(m60)}
+      · 52週高點 ${pc2(hi)} · 量能Z ${vz == null ? "—" : vz.toFixed(2)}</div>`;
+  }
+  if (d.consensus && d.consensus.length)
+    h += '<div class="tablewrap"><table><tr><th>共識源</th><th>日期</th><th>高</th><th>低</th><th>中位</th><th>分析師</th><th>FY1 EPS</th><th>upside</th></tr>' +
+      d.consensus.map(c => `<tr><td>${c[0]}</td><td>${c[1]}</td><td>${c[2] ?? "—"}</td><td>${c[3] ?? "—"}</td><td><b>${c[4] ?? "—"}</b></td><td>${c[5] ?? "—"}</td><td>${c[6] ?? "—"}</td><td>${pc2(c[8])}</td></tr>`).join("") + "</table></div>";
+  else h += '<div class="mut">共識:尚無(擷取任務可能仍在跑,矩陣看燈)</div>';
+  if (d.revenue && d.revenue.length)
+    h += '<div class="tablewrap"><table><tr><th>月營收</th><th>金額(千元)</th><th>月增</th><th>年增</th><th>60月高</th></tr>' +
+      d.revenue.map(r => `<tr><td>${r[0]}</td><td class="num">${Number(r[1]).toLocaleString()}</td><td>${pc2(r[2])}</td><td>${pc2(r[3])}</td><td>${r[4] ? "⭐" : ""}</td></tr>`).join("") + "</table></div>";
+  if (d.group) h += `<div class="env">族群「${d.group[0]}」最新:MA20 上方 ${d.group[1]}/${d.group[2]} · 60日勝 ${d.group[3]}/負 ${d.group[4]}(group_features_daily)</div>`;
+  $("spanel").innerHTML = h;
+}
+function autoStock(code, skipFetch) {
+  if (!BRIDGE) { $("sstate").textContent = "需橋接(雙擊 VIA 啟動)"; return; }
+  $("sstate").textContent = "⏳ 全自動:擷取共識→等完成→聚合…";
+  const after = () => fetch(`/stock_data?code=${code}`).then(r => r.json())
+    .then(d => { $("sstate").textContent = ""; renderStock(d); });
+  if (skipFetch) return after();
+  fetch(`/stock_fetch?code=${code}`).then(r => r.json()).then(() => {
+    const wait = () => fetch("/status").then(r => r.json()).then(st => {
+      if (st.consensus && st.consensus.state === "running") setTimeout(wait, 1500);
+      else after(); });
+    setTimeout(wait, 1200); });
+}
+$("scode").addEventListener("keydown", e => {
+  if (e.key === "Enter") { const c = $("scode").value.trim();
+    if (/^\d{4,6}$/.test(c)) autoStock(c); else $("sstate").textContent = "代號格式:4-6 位數字"; }
+});
 const dz = $("drop");
 ["dragover", "dragenter"].forEach(ev => dz.addEventListener(ev, e => {
   e.preventDefault(); dz.classList.add("on"); }));

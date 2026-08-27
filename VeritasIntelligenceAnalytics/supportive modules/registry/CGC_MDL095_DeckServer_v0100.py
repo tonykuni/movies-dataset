@@ -170,6 +170,59 @@ def status_all() -> dict:
     return out
 
 
+def stock_data(code: str) -> dict:
+    """個股全景聚合(批209:唯讀;庫鎖=busy 誠實;零發明=庫值直出)"""
+    if not re.fullmatch(r"\d{4,6}[A-Z]?", code or ""):
+        return {"err": "代號格式不符(4-6 位數字)"}
+    import duckdb
+    db = VIA / "functional modules" / "VDF" / "output_hub" / "mega" / "vdf_tw_market.duckdb"
+    try:
+        con = duckdb.connect(str(db), read_only=True)
+    except Exception as e:
+        if "lock" in str(e).lower():
+            return {"busy": True, "note": "資料庫使用中(回補/日更)=稍後自動重試"}
+        return {"err": str(e)[:120]}
+    out = {"code": code}
+
+    def q(sql, args=()):
+        try:
+            return con.execute(sql, list(args)).fetchall()
+        except Exception:
+            return []
+
+    out["name"] = (q("SELECT name FROM tw_listings WHERE code=?", [code])
+                   or [[code]])[0][0]
+    out["px"] = [[str(d), c] for d, c in q(
+        "SELECT date, close FROM prices_canonical WHERE ticker=? "
+        "ORDER BY date DESC LIMIT 120", [f"{code}.TW"])][::-1]
+    f = q("SELECT date, ret_1d, ret_20d, ret_60d, vol_20d_ann, ma20_ratio, "
+          "ma60_ratio, hi252_dist, volu_z20 FROM features_daily "
+          "WHERE ticker=? ORDER BY date DESC LIMIT 1", [f"{code}.TW"])
+    out["factors"] = ([str(f[0][0])] + [f[0][i] for i in range(1, 9)]) if f else None
+    out["consensus"] = [[s, str(d), th, tl, tm, na, e1, cl, up] for
+                        d, s, th, tl, tm, na, e1, cl, up in q(
+        "SELECT date, source, target_high, target_low, target_median, "
+        "n_analysts, eps_fy1, close, upside_pct FROM consensus_daily "
+        "WHERE code=? QUALIFY row_number() OVER (PARTITION BY source "
+        "ORDER BY date DESC)=1", [code])]
+    out["revenue"] = [[ym, rev, mom, yoy, hi] for ym, rev, mom, yoy, hi in q(
+        "SELECT ym, revenue, mom_pct, yoy_pct, high_60m "
+        "FROM monthly_revenue_analysis WHERE code=? ORDER BY ym DESC LIMIT 12",
+        [code])]
+    g = q("SELECT gid, above_ma20, n_ma20, win60, lose60 FROM ("
+          "SELECT g.*, row_number() OVER (PARTITION BY gid ORDER BY date DESC) rn "
+          "FROM group_features_daily g) WHERE rn=1 AND gid IN ("
+          "SELECT GroupId FROM read_csv_auto(?) WHERE "
+          "regexp_replace(Ticker, '\\.(TW|TWO)$', '')=?)",
+          [str(sorted((VIA / "functional modules/GroupIndex/output_hub/rotation_runs"
+                       ).glob("ROTATION_TW_*/csv/latest_classification.csv"))[-1]),
+           code]) if list((VIA / "functional modules/GroupIndex/output_hub/rotation_runs"
+                           ).glob("ROTATION_TW_*/csv/latest_classification.csv")) else []
+    out["group"] = g[0] if g else None
+    con.close()
+    return out
+
+
 class H(BaseHTTPRequestHandler):
     def log_message(self, *a):  # 靜音存取日誌
         pass
@@ -191,6 +244,10 @@ class H(BaseHTTPRequestHandler):
             return self._json(start_task(q.get("task", ""), q.get("codes", "")))
         if u.path == "/status":
             return self._json(status_all())
+        if u.path == "/stock_fetch":   # 批209:代號→自動觸發共識擷取
+            return self._json(start_task("consensus", q.get("code", "")))
+        if u.path == "/stock_data":    # 批209:代號→全景聚合 JSON
+            return self._json(stock_data(q.get("code", "")))
         if u.path == "/":
             try:
                 b = UI.read_bytes()
