@@ -58,7 +58,7 @@ TASKS = [
   "cmd": '$env:VIA_NET_CONSENT="YES"; $env:VIA_SCRAPE_CONSENT="YES"; python "{R}\\functional modules\\VDF\\engine\\VDF_ENG063_MonthlyRevenue_v0102.py" run',
   "note": "上市+上櫃+證券商 1,377 檔一次入庫"},
  {"id": "ui", "zh": "重生全部 UI 頁", "icon": "🖥️",
-  "cmd": 'python "{R}\\supportive modules\\registry\\CGC_MDL090_SystemHub_v0101.py" run; python "{R}\\supportive modules\\registry\\CGC_MDL093_GovernanceMatrix_v0100.py" run; start "" "{R}\\supportive modules\\ui_support\\VIA_UI_SystemHub_v0100.html"',
+  "cmd": 'python "{R}\\supportive modules\\registry\\CGC_MDL090_SystemHub_v0101.py" run; python "{R}\\supportive modules\\registry\\CGC_MDL093_GovernanceMatrix_v0100.py" run; start "{R}\\supportive modules\\ui_support\\VIA_UI_SystemHub_v0100.html"',
   "note": "重生+自動開樞紐母頁"},
 ]
 ENGINES = [
