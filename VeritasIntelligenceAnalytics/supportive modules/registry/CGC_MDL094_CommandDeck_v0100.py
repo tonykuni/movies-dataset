@@ -186,7 +186,14 @@ const LAMP = {{idle: "#bbb", running: "#f0b429", ok: "#15803d", fail: "#dc2626"}
 fetch("/ping").then(r => r.json()).then(j => {{
   if (j && j.via === "deck-bridge") {{ BRIDGE = true;
     $("bridgestate").textContent = "(🟢 橋接中=按下直接執行)";
-    setInterval(pollStatus, 2500); pollStatus(); }}
+    setInterval(pollStatus, 2500); pollStatus();
+    /* 批210 自動駕駛列:橋啟動時已自動派工,這裡只是顯示 */
+    fetch("/auto").then(r => r.json()).then(a => {{
+      if (a.log && a.log.length)
+        $("bridgestate").innerHTML = "(🟢 橋接+🤖 自動駕駛:" +
+          a.log.map(x => `${{x.task}} ${{x.skipped ? "已更跳過" : (x.ok ? "已自動啟動" : x.note)}}`)
+               .join(" · ") + ")";
+    }}).catch(() => {{}}); }}
 }}).catch(() => {{ $("bridgestate").textContent = "(⚪ 無橋=複製模式;雙擊 VIA 啟橋)"; }});
 function pollStatus() {{
   fetch("/status").then(r => r.json()).then(st => {{

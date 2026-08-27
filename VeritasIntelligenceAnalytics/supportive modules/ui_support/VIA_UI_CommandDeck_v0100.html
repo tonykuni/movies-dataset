@@ -67,7 +67,7 @@ padding:10px 16px;cursor:pointer;min-height:44px}
 background:#333;color:#fff;padding:10px 18px;border-radius:20px;display:none}
 </style></head><body><div class="wrap">
 <h1>🎛️ VIA 指揮台(零打字操作)</h1>
-<div class="mut">2026-08-27 14:02 · 點卡/下拉/勾選/拖曳 → 指令自動入剪貼簿 → 貼到
+<div class="mut">2026-08-27 14:07 · 點卡/下拉/勾選/拖曳 → 指令自動入剪貼簿 → 貼到
 PowerShell 按 Enter · 誠實界線:瀏覽器不能直接執行本機程式,本台=
 三動作極簡(複製→貼上→Enter);真零操作=每日開機自動鏈+桌面
 VIA-Start.bat 雙擊</div>
@@ -122,7 +122,14 @@ const LAMP = {idle: "#bbb", running: "#f0b429", ok: "#15803d", fail: "#dc2626"};
 fetch("/ping").then(r => r.json()).then(j => {
   if (j && j.via === "deck-bridge") { BRIDGE = true;
     $("bridgestate").textContent = "(🟢 橋接中=按下直接執行)";
-    setInterval(pollStatus, 2500); pollStatus(); }
+    setInterval(pollStatus, 2500); pollStatus();
+    /* 批210 自動駕駛列:橋啟動時已自動派工,這裡只是顯示 */
+    fetch("/auto").then(r => r.json()).then(a => {
+      if (a.log && a.log.length)
+        $("bridgestate").innerHTML = "(🟢 橋接+🤖 自動駕駛:" +
+          a.log.map(x => `${x.task} ${x.skipped ? "已更跳過" : (x.ok ? "已自動啟動" : x.note)}`)
+               .join(" · ") + ")";
+    }).catch(() => {}); }
 }).catch(() => { $("bridgestate").textContent = "(⚪ 無橋=複製模式;雙擊 VIA 啟橋)"; });
 function pollStatus() {
   fetch("/status").then(r => r.json()).then(st => {

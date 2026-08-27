@@ -244,6 +244,8 @@ class H(BaseHTTPRequestHandler):
             return self._json(start_task(q.get("task", ""), q.get("codes", "")))
         if u.path == "/status":
             return self._json(status_all())
+        if u.path == "/auto":          # 批210:自動駕駛派工記錄
+            return self._json({"log": _auto_log})
         if u.path == "/stock_fetch":   # 批209:代號→自動觸發共識擷取
             return self._json(start_task("consensus", q.get("code", "")))
         if u.path == "/stock_data":    # 批209:代號→全景聚合 JSON
@@ -262,10 +264,44 @@ class H(BaseHTTPRequestHandler):
         self._json({"err": "not found"}, 404)
 
 
+_auto_log: list = []
+
+
+def auto_pilot():
+    """批210:自動駕駛——橋啟動即派工(該自動跑的自動跑)。
+    規則冊(誠實留痕 _auto_log):
+      ① 今日未日更(marker≠今日)→自動啟 boot 全鏈
+      ② 歷史回補 checkpoint 未齊→自動續跑(冪等;已齊=秒退)
+    防重三閘:boot marker/任務單例/回補 (段,檔) checkpoint。"""
+    ts = datetime.now().strftime("%H:%M:%S")
+    mark = (VIA / "functional modules" / "VDF" / "output_hub" / "mega" /
+            ".last_boot_update")
+    today = datetime.now().strftime("%Y-%m-%d")
+    try:
+        done_today = mark.exists() and mark.read_text(
+            encoding="utf-8").strip() == today
+    except Exception:
+        done_today = False
+    if not done_today:
+        r = start_task("boot")
+        _auto_log.append({"ts": ts, "task": "boot",
+                          "why": "今日未日更(marker)",
+                          "ok": r.get("ok", False), "note": r.get("err", "")})
+    else:
+        _auto_log.append({"ts": ts, "task": "boot",
+                          "why": "今日已更=跳過(marker)", "ok": True,
+                          "skipped": True})
+    r2 = start_task("backfill")
+    _auto_log.append({"ts": ts, "task": "backfill",
+                      "why": "歷史回補續跑(冪等;已齊=秒退)",
+                      "ok": r2.get("ok", False), "note": r2.get("err", "")})
+
+
 def serve() -> int:
     srv = ThreadingHTTPServer(("127.0.0.1", PORT), H)
-    print(f"[deck-bridge] http://127.0.0.1:{PORT}/ 啟動(僅本機;白名單任務制)"
-          f"·Ctrl+C 停橋不斷任務")
+    threading.Thread(target=auto_pilot, daemon=True).start()
+    print(f"[deck-bridge] http://127.0.0.1:{PORT}/ 啟動(僅本機;白名單任務制;"
+          f"自動駕駛=日更+回補自動派工)·Ctrl+C 停橋不斷任務")
     try:
         srv.serve_forever()
     except KeyboardInterrupt:
