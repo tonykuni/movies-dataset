@@ -65,7 +65,7 @@ function Invoke-All {
     if ($ds) { Start-Process python -ArgumentList @("`"$($ds.FullName)`"", "serve") -WindowStyle Minimized | Out-Null
                Write-Host "  [背景] 指揮台橋接 http://127.0.0.1:8765/ 已啟動" -ForegroundColor Cyan }
     $bf = Newest (Join-Path $VIA "functional modules\VDF\engine") "VDF_ENG064_HistoryBackfill_v*.py"
-    if ($bf) { Start-Background "歷史回補 2020~(增量續跑)" $bf @("run") }
+    if ($bf) { Start-Background "歷史回補 2022~(增量續跑;2020/21 終止批212)" $bf @("run") }
     Open-UIs
     Write-Host "[VIA] 完成派工。進度:VIA_Reports\boot_update_logs\ 最新 log;UI 稍後重新整理即最新。" -ForegroundColor Yellow
 }
@@ -76,7 +76,7 @@ if ($Menu) {
     while ($true) {
         Write-Host "`n=== VIA 選單(輸入數字按 Enter)===" -ForegroundColor Cyan
         Write-Host " 1) 全自動(日更+回補+UI)  2) 只跑日更全鏈"
-        Write-Host " 3) 只跑歷史回補 2020~      4) 只開 UI 三頁"
+        Write-Host " 3) 只跑歷史回補 2022~      4) 只開 UI 三頁"
         Write-Host " 5) 建桌面捷徑              0) 離開"
         switch (Read-Host "選") {
             "1" { Invoke-All }

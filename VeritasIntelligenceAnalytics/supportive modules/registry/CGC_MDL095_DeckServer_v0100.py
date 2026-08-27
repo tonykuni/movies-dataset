@@ -70,7 +70,7 @@ def task_registry() -> dict:
                  "argv": (["powershell", "-NoProfile", "-ExecutionPolicy",
                            "Bypass", "-File", str(boot)] if is_nt
                           else ["bash", str(boot)]), "net": True},
-        "backfill": {"zh": "歷史回補 2020~(續跑)",
+        "backfill": {"zh": "歷史回補 2022~(續跑;2020/21 終止批212)",
                      "argv": [sys.executable,
                               _eng("functional modules/VDF/engine",
                                    "VDF_ENG064_HistoryBackfill_v*.py"), "run"],
