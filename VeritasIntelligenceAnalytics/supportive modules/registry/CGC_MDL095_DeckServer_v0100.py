@@ -105,6 +105,11 @@ def task_registry() -> dict:
                               _eng("functional modules/VRN",
                                    "VRN_ENG073_ReportStructuredDB_v*.py"), "run"],
                      "net": False},
+        "finpages": {"zh": "財報頁表格擷取(批241)",
+                     "argv": [sys.executable,
+                              _eng("functional modules/VRN",
+                                   "VRN_ENG074_FinancialPages_v*.py"), "run"],
+                     "net": False},
         "ui": {"zh": "重生全部 UI",
                "argv": [sys.executable,
                         _eng("supportive modules/registry",
@@ -353,8 +358,8 @@ def selftest() -> int:
     T = task_registry()
     py_ok = all(Path(t["argv"][1]).exists()
                 for t in T.values() if t["argv"][0] == sys.executable)
-    chk("① 白名單任務冊(9 任務含 structdb;py 引擎尾版 glob 全在位)",
-        len(T) == 9 and py_ok)
+    chk("① 白名單任務冊(10 任務含 finpages;py 引擎尾版 glob 全在位)",
+        len(T) == 10 and py_ok)
     chk("② 任意指令拒絕(不在白名單=err;安全鐵則)",
         start_task("rm -rf /")["ok"] is False
         and "白名單" in start_task("evil")["err"])

@@ -57,6 +57,7 @@ ANALYSIS = [
     ("📉 VAP 圖表主控", "VIA_UI_VAPConsole_v0100.html"),
     ("🗄️ 資料庫目錄+擷取細則", "VIA_UI_DataCatalog_v0100.html"),
     ("🌍 全球市場觀測(11 類)", "VIA_UI_GlobalMarkets_v0100.html"),
+    ("📑 券商報告卡(結構化庫)", "VIA_UI_ReportCards_v0100.html"),
 ]
 
 

@@ -4766,6 +4766,13 @@
    "ts": "2026-08-28 16:46",
    "name": "批240 操作員裁示「報告升幅=TP÷前一日 CLOSE(非 ADJ)」:ENG073 v0103 資料庫補值/對質道",
    "note": "【裁示實證】雲端庫查 JP 台積電報告日 2025-07-18 前一交易日 close=1130.0=頁面 P 全吻合=裁示成立。【v0103】_prior_close(ticker,rdate)=tw_daily_prices 前一交易日原始 close(.TW/.TWO 雙試;CLOSE 正主非 adj_close=檢⑳ 宣告);新欄 price_db/upside_db/price_state(ALTER 容錯):①頁 P 缺=P_FROM_DB 補值→升幅 DB_DERIVED 可判(凱基/MS/儒鴻系 MISSING 大量解鎖)②頁 P 在=對質:差<1%=P_CONFIRMED_DB/差大=P_DB_CONFLICT(KEEP_BOTH)③報告升幅在=對庫算 EXACT/ROUNDING/FORMULA_MISMATCH_DB 三態。第三輪實錄收斂統計:EXACT/ROUNDING 7+JP 台積電 1275/1130=12.8 正解+MS TP 五件全救回+東陽 100/78.9 正解;二十檢綠(修:INSERT 佔位 15→18/夾具名冊補 1476)。」"
+  },
+  {
+   "code": "TOOL-239",
+   "kind": "批241 雙波(卡頁+財報頁)",
+   "ts": "2026-08-28 17:19",
+   "name": "批241 操作員選 1+2:MDL100 券商報告卡頁+ENG074 財報頁表格擷取(SynonymEngine 對齊)",
+   "note": "【波1 MDL100_ReportCards】vrn_report_basic/metrics/financial 上 UI:每報告一卡=ticker/官方名/券商/日期/評等/TP/頁P/庫P(price_state)/升幅三軌(報告/頁算/庫算)/驗證態 RYG 邊色/KEEP_BOTH 衝突列示/摘要頭/財務 chips;唯讀鎖容錯;八檢綠。【波2 ENG074_FinancialPages】報告頁 2..N:財務頁判準(核心科目≥2+期間≥2)→期間表頭定位(年/季/民國/E·F 狀態拆離)→壓平列首數字切分(Gemini 防呆)→VRN_Financial_Synonyms_SSOT.normalize_metric 對齊(未命中=UNKNOWN 誠實候 register;SSOT 回原字串語義=命中判定包裝+去尾綴重試)→負數雙格式→zip 時間軸→vrn_report_financial(派生層重算)。十檢綠(修:fixture 預設字型無 CJK→china-t;端到端 2025F revenue=12108 ESTIMATE 實證)。【接線】橋 +finpages(10 任務)+Portal 第八卡+regen-all+grid v0200(+站144/145=145 站)OK 143/FAIL 0/SKIP 2。」"
   }
  ]
 }
