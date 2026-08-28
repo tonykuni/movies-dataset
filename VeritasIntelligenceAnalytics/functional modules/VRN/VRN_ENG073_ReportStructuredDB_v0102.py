@@ -77,7 +77,7 @@ RATING_RX = re.compile(
 TP_RX = re.compile(r"(?:Target\s*price|Price\s*Target|目標價|\bPT\b)"
                    r"[^\d]{0,20}(?:NT\$|新台幣)?\s*"
                    r"([\d,]+(?:\.\d+)?)", re.I)
-PX_RX = re.compile(r"(?<![Tt]arget )(?<![Tt]ARGET )(?:\b[Pp]rice\b(?![ \t]*"
+PX_RX = re.compile(r"(?<![Tt]arget )(?<![Tt]arget\n)(?<![Tt]ARGET )(?:\b[Pp]rice\b(?![ \t]*"
                    r"[Tt]arget)|現價|收盤價)\s*(?:\([^)]*\))?[^\d]{0,20}"
                    r"(?:NT\$)?\s*([\d,]+(?:\.\d+)?)", re.M)
 UPS_RX = re.compile(r"(?:Expected\s*total\s*return|上漲空間|Upside|漲跌空間)"
@@ -134,6 +134,10 @@ def extract_one(stem: str, zones: dict, names: dict) -> tuple[dict, list]:
     text_all = _nfkc("\n".join(str(zones.get(k, ""))
                                for k in ("header", "right", "body")))
     right = _nfkc(str(zones.get("right", "")))
+    # 批239b(操作員令「文字修復後可抓目標價」):斷行修復版=標籤與
+    # 數值被換行切開(Target↵price↵NT$165)之救回文本;raw 優先、修復版後備
+    right_rep = re.sub(r"\s*\n\s*", " ", right)
+    text_rep = re.sub(r"\s*\n\s*", " ", text_all)
     # 批238②:候選逐驗官方名冊;全不在=誠實空(研討會/晨報非個股)
     ticker = ""
     for cand in TICK_RX.finditer(stem):
@@ -152,8 +156,10 @@ def extract_one(stem: str, zones: dict, names: dict) -> tuple[dict, list]:
     if name_official and name_official not in text_all:
         conflicts.append("NAME_NOT_IN_PAGE(KEEP_BOTH)")
     rat = RATING_RX.search(right) or RATING_RX.search(text_all)
-    tp = TP_RX.search(right) or TP_RX.search(text_all)
-    ups = UPS_RX.search(right) or UPS_RX.search(text_all)
+    tp = (TP_RX.search(right) or TP_RX.search(right_rep)
+          or TP_RX.search(text_all) or TP_RX.search(text_rep))
+    ups = (UPS_RX.search(right) or UPS_RX.search(right_rep)
+           or UPS_RX.search(text_all) or UPS_RX.search(text_rep))
     # 批239:候選集+合理性配對(右區優先;比例 [0.30,3.2] 取首對;
     # 無合理對=僅留可信單值,不可信=None 寧缺勿假)
     def _cands(rx, *texts):
@@ -164,8 +170,8 @@ def extract_one(stem: str, zones: dict, names: dict) -> tuple[dict, list]:
                 if v and v > 0 and v not in out:
                     out.append(v)
         return out
-    tp_c = _cands(TP_RX, right, text_all)
-    px_c = _cands(PX_RX, right, text_all)
+    tp_c = _cands(TP_RX, right, right_rep, text_all, text_rep)
+    px_c = _cands(PX_RX, right, right_rep, text_all, text_rep)
     tpv = pxv = None
     for a in tp_c:
         for b in px_c:
@@ -225,7 +231,7 @@ def extract_one(stem: str, zones: dict, names: dict) -> tuple[dict, list]:
         mets.append({"report_file": stem, "metric": "target_price",
                      "period": basic["report_date"][:4], "status": "ESTIMATE",
                      "value": tpv, "raw_text": tp.group(0)[:80]})
-    y = YLD_RX.search(text_all)
+    y = YLD_RX.search(text_all) or YLD_RX.search(text_rep)
     if y:
         mets.append({"report_file": stem, "metric": "dividend_yield_pct",
                      "period": basic["report_date"][:4], "status": "ESTIMATE",
@@ -397,18 +403,24 @@ def selftest() -> int:
     b8, _ = extract_one("Citi-3231 20250604", zones, {"3231": "緯創"})
     chk("⑯ 正常對照不退化(Citi TP=165/P=114 配對成立)",
         b8["target_price"] == 165.0 and b8["price"] == 114.0)
+    b9, _ = extract_one("GS-2317 20251205",
+                        {"header": "", "right": "Target\nprice\nNT$250.00\n"
+                                                "Price\nNT$205.00",
+                         "body": "", "footer": ""}, {"2317": "鴻海"})
+    chk("⑰ 斷行修復救回(批239b:Target↵price 切開仍抓 TP=250/P=205)",
+        b9["target_price"] == 250.0 and b9["price"] == 205.0)
     chk("⑨ 雙 SSOT 紀律(KEEP_BOTH 衝突列示;REPORT_ESTIMATE 隔離宣告)",
         "KEEP_BOTH" in src and "ESTIMATE" in src and "不覆寫" in src)
     chk("⑩ NLP 掛載 graceful+加速橋",
         "TextProcessor" in src and "ACCEL-BRIDGE" in src)
-    print(f"  [計] 十六檢 OK {16 - len(fails)} · FAIL {len(fails)}")
+    print(f"  [計] 十七檢 OK {17 - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 
 
 def main() -> int:
     args = sys.argv[1:]
     if "--selftest" in args:
-        print("=== 報告結構化入庫引擎(VRN_ENG073 v0102)· 十六檢自測(零網路)===")
+        print("=== 報告結構化入庫引擎(VRN_ENG073 v0102)· 十七檢自測(零網路)===")
         return selftest()
     if "--status" in args:
         return status()
