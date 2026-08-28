@@ -55,6 +55,7 @@ ANALYSIS = [
     ("🧪 系統五分頁", "VIA_UI_SystemTestPages_v0100.html"),
     ("🖥️ 系統主控台", "VIA_UI_SystemConsole_v0100.html"),
     ("📉 VAP 圖表主控", "VIA_UI_VAPConsole_v0100.html"),
+    ("🗄️ 資料庫目錄+擷取細則", "VIA_UI_DataCatalog_v0100.html"),
 ]
 
 

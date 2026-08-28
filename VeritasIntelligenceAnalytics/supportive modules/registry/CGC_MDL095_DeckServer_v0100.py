@@ -74,7 +74,7 @@ def task_registry() -> dict:
                      "argv": [sys.executable,
                               _eng("functional modules/VDF/engine",
                                    "VDF_ENG064_HistoryBackfill_v*.py"), "run"],
-                     "net": True},
+                     "net": True, "range": True},
         "consensus": {"zh": "鉅亨 FactSet 共識",
                       "argv": [sys.executable,
                                _eng("functional modules/VRN",
@@ -90,6 +90,11 @@ def task_registry() -> dict:
                                     _eng("functional modules/VDF/engine",
                                          "VDF_ENG063_MonthlyRevenue_v*.py"),
                                     "--groups"], "net": False},
+        "global": {"zh": "全球宇宙擷取(11 類;批226)",
+                   "argv": [sys.executable,
+                            _eng("functional modules/VDF/engine",
+                                 "VDF_ENG066_GlobalUniverse_v*.py"), "run"],
+                   "net": True, "range": True, "cats": True},
         "ui": {"zh": "重生全部 UI",
                "argv": [sys.executable,
                         _eng("supportive modules/registry",
@@ -121,7 +126,12 @@ def _suggest(tail: str) -> str:
     return ""
 
 
-def start_task(tid: str, codes: str = "") -> dict:
+DATE_RX_Q = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+CATS_RX_Q = re.compile(r"^[a-z_,]{1,80}$")
+
+
+def start_task(tid: str, codes: str = "", start: str = "", end: str = "",
+               cats: str = "") -> dict:
     T = task_registry()
     if tid not in T:
         return {"ok": False, "err": "任務不在白名單(安全鐵則:不接受任意指令)"}
@@ -133,8 +143,14 @@ def start_task(tid: str, codes: str = "") -> dict:
         argv = list(t["argv"])
         if not argv or not argv[-1] and len(argv) > 1:
             return {"ok": False, "err": "引擎檔缺(先 git pull)"}
-        if t.get("codes") and codes:
+        if t.get("codes") and codes and tid != "global":
             argv += [c for c in re.findall(r"\d{4,6}", codes)][:50]
+        # 批226:日期範圍/分類參數(僅 range/cats 任務;嚴格驗格式=安全鐵則)
+        if t.get("range") and start and end \
+                and DATE_RX_Q.match(start) and DATE_RX_Q.match(end):
+            argv += ["--start", start, "--end", end]
+        if t.get("cats") and cats and CATS_RX_Q.match(cats):
+            argv += ["--cats", cats]
         env = dict(os.environ)
         if t.get("net"):
             env["VIA_NET_CONSENT"] = "YES"
@@ -246,7 +262,9 @@ class H(BaseHTTPRequestHandler):
         if u.path == "/ping":
             return self._json({"ok": True, "via": "deck-bridge"})
         if u.path == "/run":
-            return self._json(start_task(q.get("task", ""), q.get("codes", "")))
+            return self._json(start_task(q.get("task", ""), q.get("codes", ""),
+                                         q.get("start", ""), q.get("end", ""),
+                                         q.get("cats", "")))
         if u.path == "/status":
             return self._json(status_all())
         if u.path == "/auto":          # 批210:自動駕駛派工記錄
@@ -325,8 +343,8 @@ def selftest() -> int:
     T = task_registry()
     py_ok = all(Path(t["argv"][1]).exists()
                 for t in T.values() if t["argv"][0] == sys.executable)
-    chk("① 白名單任務冊(6 任務;py 引擎尾版 glob 全在位)",
-        len(T) == 6 and py_ok)
+    chk("① 白名單任務冊(7 任務含 global;py 引擎尾版 glob 全在位)",
+        len(T) == 7 and py_ok)
     chk("② 任意指令拒絕(不在白名單=err;安全鐵則)",
         start_task("rm -rf /")["ok"] is False
         and "白名單" in start_task("evil")["err"])

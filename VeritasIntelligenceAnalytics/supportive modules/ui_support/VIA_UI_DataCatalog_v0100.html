@@ -1,0 +1,107 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA DataCatalog · 資料庫目錄+擷取細則</title>
+<style>
+:root{--bg:#0b1220;--card:#111a2e;--line:#1e2a44;--tx:#c7d3e8;--dim:#7e8db0;
+--ac:#4f8ef7}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--tx);font:10.5px/1.5 "Segoe UI",
+"Noto Sans TC",sans-serif;padding:14px;max-width:1280px;margin:0 auto}
+h1{font-size:14px;color:#e8eefb}
+.sub{color:var(--dim);font-size:10px;margin:2px 0 10px}
+h2{font-size:11.5px;color:var(--ac);margin:14px 0 6px}
+section{background:var(--card);border:1px solid var(--line);border-radius:8px;
+padding:10px;margin-bottom:10px;overflow:auto}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;color:var(--dim);font-size:9.5px;
+border-bottom:1px solid var(--line);padding:2px 6px 3px 0}
+td{padding:3px 6px 3px 0;border-bottom:1px dashed var(--line);
+vertical-align:top;overflow-wrap:anywhere}
+.hdr{color:var(--dim);font-size:9px}
+.mut{color:var(--dim);font-size:9px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0}
+label.ck{display:inline-flex;gap:4px;align-items:center;border:1px solid
+var(--line);border-radius:6px;padding:4px 8px;cursor:pointer}
+input[type=date]{background:#16233d;color:var(--tx);border:1px solid #2a3c61;
+border-radius:6px;padding:4px 6px;font-size:10.5px}
+input[type=date]:disabled{opacity:.35}
+.act{background:#16233d;color:#c7d3e8;border:1px solid #2a3c61;
+border-radius:6px;padding:6px 12px;font-size:10.5px;cursor:pointer}
+.act:hover{border-color:var(--ac);color:#fff}
+#amx{margin-top:4px}
+</style></head><body>
+<h1>VIA 資料庫目錄+擷取細則台</h1>
+<div class="sub">2026-08-28 00:21 · 完整 header(欄:型別)+來源引擎細則+日期範圍
+· 唯讀聚合(庫忙=誠實 busy)· <span id="bstate">⏳ 橋偵測中…</span></div>
+
+<section><h2>③ 擷取控制(勾選=開始日~最新;取消勾選=可輸日期,起始可改)</h2>
+<div class="row">
+<label class="ck"><input type="checkbox" id="latest" checked>
+開始日~最新(預設)</label>
+起始 <input type="date" id="d0" value="2022-01-01" disabled>
+結束 <input type="date" id="d1" disabled>
+</div>
+<div class="row"><label class='ck'><input type='checkbox' class='cat' value='idx' checked>國際股票指數(16檔)</label><label class='ck'><input type='checkbox' class='cat' value='etf' checked>國際股票 ETF(14檔)</label><label class='ck'><input type='checkbox' class='cat' value='us_jp' checked>國際個股(美/日)(17檔)</label><label class='ck'><input type='checkbox' class='cat' value='fin_reports' disabled>國際個股財報(0檔;候源)</label><label class='ck'><input type='checkbox' class='cat' value='oil' checked>原油期貨(4檔)</label><label class='ck'><input type='checkbox' class='cat' value='fx' checked>美元指數及重要匯率(11檔)</label><label class='ck'><input type='checkbox' class='cat' value='cmdty' checked>商品(8檔)</label><label class='ck'><input type='checkbox' class='cat' value='crypto' checked>加密貨幣(4檔)</label><label class='ck'><input type='checkbox' class='cat' value='us_macro' disabled>美國總經(FRED)(0檔;候源)</label><label class='ck'><input type='checkbox' class='cat' value='fed' checked>聯準會(4檔)</label><label class='ck'><input type='checkbox' class='cat' value='us_fiscal_rates' checked>美國財政及利率(4檔)</label></div>
+<div class="row">
+<button class="act" data-task="backfill">📥 台股回補(範圍)</button>
+<button class="act" data-task="global">🌍 全球宇宙擷取(勾選類)</button>
+<button class="act" data-task="revenue">🏢 月營收</button>
+<button class="act" data-task="boot">🔄 日更全鏈</button>
+</div>
+<div class="mut">台股自訂範圍下限=2022-01-01(2020/21=批212 操作員終止;
+解除僅憑明令);全球域無終止令,預設 2020-01-01~最新</div>
+<div id="amx" class="mut"></div></section>
+
+<section><h2>① 台股庫 vdf_tw_market.duckdb(24 表)</h2>
+<table><thead><tr><th>表(來源細則)</th><th>列數</th><th>日期範圍</th><th>完整 header(欄:型別)</th></tr></thead><tbody><tr><td><b>analyst_estimates</b><div class='mut'>券商報告 digest(EXTERNAL_ANALYST)</div></td><td>585</td><td>2026-08-25~2026-08-27</td><td class='hdr'>date:VARCHAR · code:VARCHAR · yf_ticker:VARCHAR · source:VARCHAR · target_high:DOUBLE · target_low:DOUBLE · target_mean:DOUBLE · target_median:DOUBLE · n_analysts:DOUBLE · trailing_eps:DOUBLE · bps:DOUBLE · eps0y_avg:DOUBLE · eps0y_low:DOUBLE · eps0y_high:DOUBLE · eps0y_n:DOUBLE · eps1y_avg:DOUBLE · eps1y_low:DOUBLE · eps1y_high:DOUBLE · eps1y_n:DOUBLE · adopted_eps:DOUBLE</td></tr><tr><td><b>consensus_daily</b><div class='mut'>三源共識(分析師+Yahoo QS+鉅亨 FactSet ⑦b/c/e)</div></td><td>588</td><td>2026-08-25~2026-08-27</td><td class='hdr'>date:DATE · code:VARCHAR · source:VARCHAR · target_high:DOUBLE · target_low:DOUBLE · target_mean:DOUBLE · target_median:DOUBLE · n_analysts:INTEGER · eps_fy0:DOUBLE · eps_fy1:DOUBLE · adopted_eps:DOUBLE · close:DOUBLE · upside_pct:DOUBLE · validated:VARCHAR</td></tr><tr><td><b>consensus_latest</b><div class='mut'>共識尾版視圖(重建)</div></td><td>198</td><td>2026-08-27~2026-08-27</td><td class='hdr'>date:DATE · code:VARCHAR · source:VARCHAR · target_high:DOUBLE · target_low:DOUBLE · target_mean:DOUBLE · target_median:DOUBLE · n_analysts:INTEGER · eps_fy0:DOUBLE · eps_fy1:DOUBLE · adopted_eps:DOUBLE · close:DOUBLE · upside_pct:DOUBLE · validated:VARCHAR · rn:BIGINT</td></tr><tr><td><b>dq_ohlc_flags</b><div class='mut'>ENG060 品質旗標(保序判準)</div></td><td>3,258</td><td>2022-01-03~2026-08-25</td><td class='hdr'>date:VARCHAR · ticker:VARCHAR · flag_class:VARCHAR · open:DOUBLE · high:DOUBLE · low:DOUBLE · close:DOUBLE · adj_close:DOUBLE</td></tr><tr><td><b>etf_book</b><div class='mut'>ETF 持股冊(ENG051 ④)</div></td><td>804</td><td></td><td class='hdr'>fund_code:VARCHAR · fund_name:VARCHAR · fund_type:VARCHAR · is_active:BOOLEAN · tracking_index:VARCHAR · as_of:VARCHAR</td></tr><tr><td><b>features_daily</b><div class='mut'>ENG061 因子庫(boot ②c 重建;11 因子)</div></td><td>1,892,416</td><td>2020-01-02~2026-08-25</td><td class='hdr'>date:VARCHAR · ticker:VARCHAR · ret_1d:DOUBLE · ret_5d:DOUBLE · ret_20d:DOUBLE · ret_60d:DOUBLE · vol_20d_ann:DOUBLE · ma20_ratio:DOUBLE · ma60_ratio:DOUBLE · hi252_dist:DOUBLE · lo252_dist:DOUBLE · volu_z20:DOUBLE · rng_1d:DOUBLE · data_class:VARCHAR</td></tr><tr><td><b>group_features_daily</b><div class='mut'>ENG062 族群聚合層(boot ⑧b)</div></td><td>42,355</td><td>2020-01-02~2026-08-25</td><td class='hdr'>gid:VARCHAR · date:VARCHAR · n_members:BIGINT · n_ma20:BIGINT · above_ma20:BIGINT · avg_ret_20d:DOUBLE · med_ret_60d:DOUBLE · win60:BIGINT · lose60:BIGINT · avg_volu_z20:DOUBLE · data_class:VARCHAR</td></tr><tr><td><b>monthly_revenue_analysis</b><div class='mut'>ENG063 月索引 RANGE 視圖(重建)</div></td><td>4,103</td><td>202507~202607</td><td class='hdr'>code:VARCHAR · ym:VARCHAR · revenue:DOUBLE · mom_pct:DOUBLE · yoy_pct:DOUBLE · cum_12m:DOUBLE · high_60m:INTEGER · yoy_streak:BIGINT</td></tr><tr><td><b>prices_canonical</b><div class='mut'>ENG060 正典鏡像(重建)</div></td><td>1,892,416</td><td>2020-01-02~2026-08-25</td><td class='hdr'>date:VARCHAR · ticker:VARCHAR · open:DOUBLE · high:DOUBLE · low:DOUBLE · close:DOUBLE · volume:BIGINT · factor:DOUBLE · data_class:VARCHAR</td></tr><tr><td><b>revenue_group_analysis</b><div class='mut'>ENG063 族群月營收榜(重建)</div></td><td>108</td><td>202507~202607</td><td class='hdr'>gid:VARCHAR · ym:VARCHAR · n_members:BIGINT · revenue_sum:DOUBLE · yoy_median:DOUBLE · n_yoy_pos:BIGINT · n_yoy:BIGINT · n_high60:BIGINT</td></tr><tr><td><b>tw_chip_derived</b><div class='mut'>籌碼衍生(重建)</div></td><td>1,119,368</td><td>2024-01-02~2026-08-25</td><td class='hdr'>date:VARCHAR · code:VARCHAR · market:VARCHAR · short_margin_ratio_pct:DOUBLE · foreign_net:DOUBLE · trust_net:DOUBLE · dealer_net:DOUBLE · total_net:DOUBLE</td></tr><tr><td><b>tw_chip_inst</b><div class='mut'>TWSE/TPEX 官方三大法人(boot ③)</div></td><td>1,139,727</td><td>2024-01-02~2026-08-25</td><td class='hdr'>date:VARCHAR · code:VARCHAR · market:VARCHAR · foreign_net:DOUBLE · trust_net:DOUBLE · dealer_net:DOUBLE · total_net:DOUBLE</td></tr><tr><td><b>tw_chip_margin</b><div class='mut'>TWSE/TPEX 官方融資券(boot ③)</div></td><td>1,119,368</td><td>2024-01-02~2026-08-25</td><td class='hdr'>date:VARCHAR · code:VARCHAR · market:VARCHAR · margin_bal_prev:DOUBLE · margin_buy:DOUBLE · margin_sell:DOUBLE · margin_redeem:DOUBLE · margin_bal:DOUBLE · short_bal_prev:DOUBLE · short_sell:DOUBLE · short_buy:DOUBLE · short_redeem:DOUBLE · short_bal:DOUBLE</td></tr><tr><td><b>tw_daily_prices</b><div class='mut'>yahoo_chart 統包(boot ②+回補 ENG064)</div></td><td>1,892,417</td><td>1900-01-01~2026-08-25</td><td class='hdr'>date:VARCHAR · ticker:VARCHAR · open:DOUBLE · high:DOUBLE · low:DOUBLE · close:DOUBLE · adj_close:DOUBLE · volume:BIGINT</td></tr><tr><td><b>tw_daytrade_eligible</b><div class='mut'>現沖標的冊(官方)</div></td><td>3,701</td><td>2026-08-25~2026-08-27</td><td class='hdr'>date:VARCHAR · code:VARCHAR · suspension:VARCHAR</td></tr><tr><td><b>tw_daytrade_market</b><div class='mut'>現沖市場統計(官方)</div></td><td>18</td><td>2026-08-03~2026-08-26</td><td class='hdr'>date:VARCHAR · market:VARCHAR · dt_volume:DOUBLE · dt_volume_pct:DOUBLE · dt_buy_value:DOUBLE · dt_sell_value:DOUBLE</td></tr><tr><td><b>tw_listings</b><div class='mut'>TWSE/TPEX 上市櫃名冊(boot ①)</div></td><td>1,979</td><td></td><td class='hdr'>code:VARCHAR · name:VARCHAR · market:VARCHAR · yf_ticker:VARCHAR · industry:VARCHAR · isin:VARCHAR</td></tr><tr><td><b>tw_listings_industry</b><div class='mut'>官方產業分類(boot ①)</div></td><td>1,979</td><td></td><td class='hdr'>code:VARCHAR · name:VARCHAR · market:VARCHAR · industry_code:VARCHAR · industry_name:VARCHAR · yf_ticker:VARCHAR</td></tr><tr><td><b>tw_market_agg</b><div class='mut'>市場聚合(重建)</div></td><td>18</td><td>2026-08-03~2026-08-26</td><td class='hdr'>date:VARCHAR · trade_value:DOUBLE · volume:DOUBLE · taiex:DOUBLE</td></tr><tr><td><b>tw_monthly_revenue</b><div class='mut'>MOPS 官方月營收 L/P/O 三版(ENG063 ⑦d)</div></td><td>4,103</td><td>202507~202607</td><td class='hdr'>code:VARCHAR · ym:VARCHAR · revenue:DOUBLE · source:VARCHAR · fetched_at:VARCHAR</td></tr><tr><td><b>tw_prices_adj</b><div class='mut'>ENG060 調整層(boot ②b 重建)</div></td><td>1,892,416</td><td>2020-01-02~2026-08-25</td><td class='hdr'>date:VARCHAR · ticker:VARCHAR · factor:DOUBLE · adj_open:DOUBLE · adj_high:DOUBLE · adj_low:DOUBLE · adj_close:DOUBLE · volume:BIGINT · data_class:VARCHAR</td></tr><tr><td><b>tw_rates_cbc</b><div class='mut'>央行 A13 利率(cbc xls)</div></td><td>307</td><td>2001-01-01~2026-07-01</td><td class='hdr'>date:VARCHAR · source:VARCHAR · demand_deposit_float:DOUBLE · savings_float:DOUBLE · fixed_1m:DOUBLE · honesty_flag:VARCHAR</td></tr><tr><td><b>tw_trading_daily</b><div class='mut'>TWSE/TPEX 官方成交值(boot ⑥)</div></td><td>1,218,241</td><td>2024-01-02~2026-08-26</td><td class='hdr'>date:VARCHAR · code:VARCHAR · market:VARCHAR · volume:DOUBLE · trade_value:DOUBLE · transactions:DOUBLE · close:DOUBLE</td></tr><tr><td><b>tw_valuation_daily</b><div class='mut'>TWSE/TPEX 官方本益比/殖利率/淨值比(boot ⑦)</div></td><td>5,020</td><td>2026-08-24~2026-08-26</td><td class='hdr'>date:VARCHAR · code:VARCHAR · market:VARCHAR · pe:DOUBLE · pb:DOUBLE · dividend_yield:DOUBLE · dps:DOUBLE</td></tr></tbody></table></section>
+<section><h2>② 全球庫 vdf_global_market.duckdb(10 表)</h2>
+<table><thead><tr><th>表(來源細則)</th><th>列數</th><th>日期範圍</th><th>完整 header(欄:型別)</th></tr></thead><tbody><tr><td><b>cross_macro</b><div class='mut'>(重建/衍生)</div></td><td>6,115</td><td>2018-01-01~2026-08-26</td><td class='hdr'>date:VARCHAR · region:VARCHAR · metric:VARCHAR · series:VARCHAR · value:DOUBLE</td></tr><tr><td><b>etf_stats_daily</b><div class='mut'>(重建/衍生)</div></td><td>174</td><td>2026-08-25~2026-08-27</td><td class='hdr'>date:VARCHAR · symbol:VARCHAR · aum:BIGINT · nav:DOUBLE · price:DOUBLE · market_cap:INTEGER · shares_outstanding:INTEGER · trailing_pe:DOUBLE · forward_pe:INTEGER · price_to_book:INTEGER · yield_:DOUBLE · currency:VARCHAR</td></tr><tr><td><b>factset_earnings</b><div class='mut'>(重建/衍生)</div></td><td>3</td><td></td><td class='hdr'>published:VARCHAR · metric:VARCHAR · period:VARCHAR · value:DOUBLE · source:VARCHAR · flag:VARCHAR</td></tr><tr><td><b>features_daily</b><div class='mut'>ENG061 因子庫(boot ②c 重建;11 因子)</div></td><td>161,560</td><td>2020-01-01~2026-08-28</td><td class='hdr'>date:VARCHAR · ticker:VARCHAR · ret_1d:DOUBLE · ret_5d:DOUBLE · ret_20d:DOUBLE · ret_60d:DOUBLE · vol_20d_ann:DOUBLE · ma20_ratio:DOUBLE · ma60_ratio:DOUBLE · hi252_dist:DOUBLE · lo252_dist:DOUBLE · volu_z20:DOUBLE · rng_1d:DOUBLE · data_class:VARCHAR</td></tr><tr><td><b>gl_prices_adj</b><div class='mut'>(重建/衍生)</div></td><td>161,560</td><td>2020-01-01~2026-08-28</td><td class='hdr'>date:VARCHAR · ticker:VARCHAR · factor:DOUBLE · adj_open:DOUBLE · adj_high:DOUBLE · adj_low:DOUBLE · adj_close:DOUBLE · volume:BIGINT · data_class:VARCHAR</td></tr><tr><td><b>global_daily</b><div class='mut'>yahoo_chart 統包(OmniFetch+ENG066 宇宙冊 11 類)</div></td><td>161,568</td><td>2020-01-01~2026-08-28</td><td class='hdr'>date:VARCHAR · ticker:VARCHAR · open:DOUBLE · high:DOUBLE · low:DOUBLE · close:DOUBLE · adj_close:DOUBLE · volume:BIGINT</td></tr><tr><td><b>index_valuation_proxy</b><div class='mut'>(重建/衍生)</div></td><td>78</td><td>2026-08-25~2026-08-27</td><td class='hdr'>date:VARCHAR · proxy_flag:VARCHAR · symbol:VARCHAR · aum:BIGINT · nav:DOUBLE · price:DOUBLE · market_cap:INTEGER · shares_outstanding:INTEGER · trailing_pe:DOUBLE · forward_pe:INTEGER · price_to_book:INTEGER · yield_:DOUBLE · currency:VARCHAR</td></tr><tr><td><b>prices_canonical</b><div class='mut'>ENG060 正典鏡像(重建)</div></td><td>161,560</td><td>2020-01-01~2026-08-28</td><td class='hdr'>date:VARCHAR · ticker:VARCHAR · open:DOUBLE · high:DOUBLE · low:DOUBLE · close:DOUBLE · volume:BIGINT · factor:DOUBLE · data_class:VARCHAR</td></tr><tr><td><b>sentiment_daily</b><div class='mut'>(重建/衍生)</div></td><td>255</td><td>2025-08-25~2026-08-26</td><td class='hdr'>date:VARCHAR · index:VARCHAR · score:DOUBLE · rating:VARCHAR</td></tr><tr><td><b>us_macro</b><div class='mut'>FRED 官方(16 序列;key 本機 gitignored)</div></td><td>1,261</td><td>2024-01-01~2026-08-25</td><td class='hdr'>date:VARCHAR · series:VARCHAR · value:DOUBLE</td></tr></tbody></table></section>
+<section><h2>④ 全球 11 類覆蓋矩陣(宇宙冊 SSOT;候源=誠實不假抓)</h2>
+<table><thead><tr><th>分類</th><th>代碼</th><th>狀態</th><th>檔數</th>
+<th>symbols / 候源說明</th></tr></thead><tbody><tr><td>國際股票指數</td><td>idx</td><td>IN_DB+EXPAND</td><td>16</td><td class='hdr'>^GSPC ^NDX ^IXIC ^DJI ^RUT ^VIX ^N225 ^GDAXI ^FTSE ^FCHI ^STOXX50E ^HSI ^TWII ^KS11 ^BSESN ^SOX</td></tr><tr><td>國際股票 ETF</td><td>etf</td><td>IN_DB+EXPAND</td><td>14</td><td class='hdr'>SPY QQQ DIA IWM TLT VT EFA EEM IEF VGK EWJ EWT FXI SOXX</td></tr><tr><td>國際個股(美/日)</td><td>us_jp</td><td>EXPAND</td><td>17</td><td class='hdr'>AAPL MSFT NVDA GOOGL AMZN META TSLA AVGO TSM 7203.T 6758.T 8035.T 6501.T 9984.T 7974.T 6861.T 8306.T</td></tr><tr><td>國際個股財報</td><td>fin_reports</td><td>PENDING_SOURCE</td><td>0</td><td class='hdr'>候源:quoteSummary earnings/incomeStatement 統包道擴充=候操作員令(P 案候立)</td></tr><tr><td>原油期貨</td><td>oil</td><td>IN_DB+EXPAND</td><td>4</td><td class='hdr'>CL=F BZ=F RB=F HO=F</td></tr><tr><td>美元指數及重要匯率</td><td>fx</td><td>IN_DB+EXPAND</td><td>11</td><td class='hdr'>DX-Y.NYB JPY=X EURUSD=X GBPUSD=X TWD=X CNY=X KRW=X CHF=X AUDUSD=X HKD=X SGD=X</td></tr><tr><td>商品</td><td>cmdty</td><td>IN_DB+EXPAND</td><td>8</td><td class='hdr'>GC=F SI=F HG=F PL=F NG=F ZC=F ZW=F ZS=F</td></tr><tr><td>加密貨幣</td><td>crypto</td><td>EXPAND</td><td>4</td><td class='hdr'>BTC-USD ETH-USD SOL-USD BNB-USD</td></tr><tr><td>美國總經(FRED)</td><td>us_macro</td><td>IN_DB</td><td>0</td><td class='hdr'>us_macro 表 16 序列(CPI/PCE/UNRATE/PAYEMS/HOUST/ICSA/RSAFS/UMCSENT/PPI/DGS20 等;boot ①自動)</td></tr><tr><td>聯準會</td><td>fed</td><td>PARTIAL</td><td>4</td><td class='hdr'>^IRX ^FVX ^TNX ^TYX</td></tr><tr><td>美國財政及利率</td><td>us_fiscal_rates</td><td>PARTIAL</td><td>4</td><td class='hdr'>^TNX ^TYX TLT IEF</td></tr></tbody></table></section>
+
+<script>
+const BASE = location.origin.startsWith("http") ? "" : "http://127.0.0.1:8765";
+let BRIDGE = false;
+const LAMP = {idle: "#bbb", running: "#f0b429", ok: "#15803d", fail: "#dc2626"};
+const $ = id => document.getElementById(id);
+$("latest").onchange = () => {
+  const off = !$("latest").checked;      // 把勾打掉=日期輸入啟用
+  $("d0").disabled = !off; $("d1").disabled = !off;
+};
+fetch(BASE + "/ping").then(r => r.json()).then(j => {
+  if (j && j.via === "deck-bridge") {
+    BRIDGE = true;
+    $("bstate").textContent = "🟢 橋接中=按下直接執行";
+    setInterval(pollA, 2500); pollA();
+  }
+}).catch(() => { $("bstate").textContent =
+  "⚪ 無橋=先雙擊 VIA 啟橋(誠實提示)"; });
+function pollA() {
+  fetch(BASE + "/status").then(r => r.json()).then(st => {
+    $("amx").innerHTML = Object.entries(st).map(([id, s]) =>
+      `<span style="margin-right:10px"><span style="display:inline-block;` +
+      `width:8px;height:8px;border-radius:50%;background:` +
+      `${LAMP[s.state] || "#bbb"};margin-right:3px"></span>${s.zh}` +
+      `${s.fix ? "·" + s.fix : ""}</span>`).join("");
+  }).catch(() => {});
+}
+document.querySelectorAll(".act").forEach(b => b.onclick = () => {
+  if (!BRIDGE) { alert("無橋:請先雙擊桌面 VIA(啟動指揮台橋)"); return; }
+  let q = "task=" + b.dataset.task;
+  if (!$("latest").checked && $("d0").value) {
+    const end = $("d1").value ||
+      new Date().toISOString().slice(0, 10);   // 結束留空=最新(誠實補今日)
+    q += `&start=${$("d0").value}&end=${end}`;
+  }
+  if (b.dataset.task === "global") {
+    const cs = [...document.querySelectorAll(".cat:checked")]
+      .map(x => x.value).join(",");
+    if (cs) q += "&cats=" + cs;
+  }
+  fetch(BASE + "/run?" + q).then(r => r.json()).then(j => {
+    b.textContent = (j.ok ? "🟡 " : "⛔ ") + b.textContent.replace(/^[🟡⛔] /, "");
+    pollA(); }).catch(() => {});
+});
+</script>
+</body></html>
