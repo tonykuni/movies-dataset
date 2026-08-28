@@ -89,6 +89,13 @@ function Sync-Repo {
                            Write-Host "  [同步] 收束舊回補進程 PID $($_.ProcessId)(斷點在=零損失)" -ForegroundColor Yellow }
     } catch { }
     git -C $VIA checkout -- "supportive modules/ui_support" 2>$null   # 再生頁還原(pull 後引擎重生最新)
+    # 批231:運行時登記冊留痕(升階梯/整併冊等)擋 pull→stash 保存後拉
+    # (不丟留痕;stash list 可查;誠實列印)
+    $dirty = git -C $VIA status --porcelain 2>$null | Where-Object { $_ -match "^ M" }
+    if ($dirty) {
+        git -C $VIA stash push -m "VIA-local-traces-$(Get-Date -Format yyyyMMdd_HHmmss)" | Out-Null
+        Write-Host "  [同步] 本地運行留痕 $($dirty.Count) 件已 stash 保存(git stash list 可查)" -ForegroundColor Yellow
+    }
     try {
         $out = git -C $VIA pull --ff-only 2>&1
         Write-Host "  [同步] git pull:$($out | Select-Object -Last 1)" -ForegroundColor Cyan
