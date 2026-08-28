@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="主動式台股 ETF 持股聚合、FactSet／YFinance Target、Consensus EPS 與 Forward P/E 工作台。">
+  <title>VIA Taiwan Active ETF Consensus Console</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <div class="top-stripe" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+    <header class="brand-header">
+      <div class="brand-lockup">
+        <div class="seal" aria-hidden="true">理</div>
+        <div>
+          <p class="eyebrow">VERITAS INTELLIGENCE ANALYTICS</p>
+          <h1>主動式台股 ETF <span>Consensus 戰情台</span></h1>
+          <p class="subtitle">Global Market · Industry · Equity · AI Research Intelligence Platform</p>
+          <p class="motto">判天地之美，析萬物之理。</p>
+        </div>
+      </div>
+      <div class="header-status"><b>✓ SCHEMA VERIFIED</b><span>AS OF 2026/06/22</span><span>🔒 CANDIDATE LOCKED</span></div>
+    </header>
+
+    <section class="request-strip">
+      <strong>✦ VDF · VETF CONSENSUS ENRICHMENT</strong>
+      <div class="source-pills"><span>TWSE→rest</span><span>MOPS→parse</span><span>YFinance→pyproc</span><span>FactSet→keyed</span></div>
+      <small>Holdings → Identity → As-of Join → Forward P/E → Audit</small>
+    </section>
+
+    <section class="control-bar">
+      <div><b id="dataLabel">DEMO SNAPSHOT</b><span id="loadMessage">可載入 Adapter JSON 取代示範資料</span></div>
+      <div class="actions">
+        <input id="fileInput" type="file" accept="application/json,.json" hidden>
+        <button id="loadButton" type="button">↥ 載入 Adapter JSON</button>
+        <button id="resetButton" type="button">↻ 示範資料</button>
+        <button id="csvButton" type="button">⇩ CSV</button>
+        <button id="jsonButton" type="button">{} JSON</button>
+      </div>
+    </section>
+
+    <section id="metrics" class="metric-grid" aria-label="摘要指標"></section>
+
+    <nav class="tab-list" role="tablist" aria-label="主功能">
+      <button role="tab" aria-selected="false" data-tab="performance">▥ 績效矩陣</button>
+      <button role="tab" aria-selected="false" data-tab="etfs">▤ ETF 清單</button>
+      <button role="tab" aria-selected="true" data-tab="holdings">⌘ 持股 × Consensus</button>
+      <button role="tab" aria-selected="false" data-tab="actions">◎ 動作分類</button>
+      <button role="tab" aria-selected="false" data-tab="request">▣ 資料請求</button>
+    </nav>
+
+    <section class="tab-panel" data-panel="performance" hidden>
+      <div class="section-title"><div><small>PERFORMANCE MATRIX</small><h2>績效排行矩陣</h2></div><span>定期報酬 · 紅漲綠跌 · YTD 高至低</span></div>
+      <div class="table-shell"><table id="performanceTable"></table></div>
+    </section>
+
+    <section class="tab-panel" data-panel="etfs" hidden>
+      <div class="section-title"><div><small>ACTIVE ETF UNIVERSE</small><h2>主動式 ETF 清單</h2></div><div><button id="selectAllButton">全選</button><button id="clearAllButton">清除</button></div></div>
+      <div class="table-shell"><table id="etfTable"></table></div>
+    </section>
+
+    <section class="tab-panel" data-panel="holdings">
+      <div class="section-title"><div><small>HOLDINGS × CONSENSUS</small><h2>總持股聚合與 Forward Valuation</h2></div><span>AUM 加權 · As-of Join · P/E = 1 ÷ Σ(w × EPS/P)</span></div>
+      <div class="holdings-layout">
+        <aside class="fund-panel">
+          <header><strong>基金勾選</strong><small id="selectedCount"></small><div><button id="fundAll">全</button><button id="fundClear">清</button></div></header>
+          <div id="fundList" class="fund-list"></div>
+          <footer><span>雙來源涵蓋</span><strong id="coverageSide">—</strong><i><b id="coverageBar"></b></i></footer>
+        </aside>
+        <div class="holdings-main">
+          <div class="filter-bar">
+            <label class="search"><span>⌕</span><input id="searchInput" type="search" placeholder="搜尋代碼、公司或族群"></label>
+            <select id="sectorSelect" aria-label="族群"><option value="all">全部族群</option></select>
+            <select id="qualitySelect" aria-label="品質"><option value="all">全部品質</option><option>PASS</option><option>REVIEW</option><option>FAIL</option></select>
+            <div class="provider-toggle" aria-label="資料來源"><button data-provider="both" class="active">雙源</button><button data-provider="fs">FactSet</button><button data-provider="yf">YF</button></div>
+            <span id="resultCount" class="result-count"></span>
+          </div>
+          <div class="table-shell holdings-table"><table id="holdingsTable"></table><div id="emptyState" class="empty" hidden>沒有符合條件的持股</div></div>
+          <div class="legend"><span><i class="fs"></i>FactSet</span><span><i class="yf"></i>YFinance</span><span><i class="eps"></i>EPS／Forward P/E</span><span>負／零 EPS 與幣別錯配一律不計算</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-panel" data-panel="actions" hidden>
+      <div class="section-title"><div><small>MANAGER ACTION LIFECYCLE</small><h2>經理人動作五態機</h2></div><span>扣除申贖、價格與公司行動後的主動交易殘差</span></div>
+      <div class="lifecycle-grid">
+        <article data-tone="blue"><header><small>一</small><h3>破冰進場</h3><span>從無到有</span></header><div><b>首度布局</b><p>第一次買進這家公司，建立持股。</p><b>分批建倉</b><p>連續增加持股，避免把成本推高。</p></div></article>
+        <article data-tone="coral"><header><small>二</small><h3>乘勝追擊</h3><span>由小變大</span></header><div><b>順勢加碼</b><p>股價上漲且主動買進仍為正。</p><b>強勢重壓</b><p>持股跨越高分位，形成核心部位。</p><b>逢低承接</b><p>價格修正時持股數量增加。</p></div></article>
+        <article data-tone="teal"><header><small>三</small><h3>動態平衡</h3><span>持股比重</span></header><div><b>超額配置</b><p>相對基準維持較高配置。</p><b>基準配置</b><p>主動交易量位於容忍帶。</p><b>欠額配置</b><p>相對基準較低但仍持有。</p></div></article>
+        <article data-tone="gold"><header><small>四</small><h3>高檔防禦</h3><span>由大變小</span></header><div><b>逢高減碼</b><p>價格快速上升後主動賣出。</p><b>獲利調節</b><p>現價高於成本且持股下降。</p><b>降險減持</b><p>風險超標後降低部位。</p></div></article>
+        <article data-tone="green"><header><small>五</small><h3>決絕離場</h3><span>從有到無</span></header><div><b>獲利清倉</b><p>持股歸零且現價高於成本。</p><b>停損砍倉</b><p>持股歸零且現價低於成本。</p></div></article>
+      </div>
+      <div class="logic-banner"><strong>ΔQ Active = ΔQ Actual − ΔQ Flow − ΔQ Corporate Action</strong><span>五態可在加碼、平衡、減碼之間反覆轉換。</span></div>
+    </section>
+
+    <section class="tab-panel" data-panel="request" hidden>
+      <div class="section-title"><div><small>DATA REQUEST & LINEAGE</small><h2>資料請求、來源與驗證</h2></div><span>Candidate Sandbox · Append-Only · No Look-Ahead</span></div>
+      <div class="source-grid">
+        <article data-tone="green"><b>TWSE / TPEX</b><span>READY</span><p>Adj OHLCV · 商品身分</p></article>
+        <article data-tone="gold"><b>SITCA</b><span>REVIEW</span><p>ETF 規模 · 費率 · 單位</p></article>
+        <article data-tone="green"><b>MOPS / 投信</b><span>READY</span><p>每日持股 · 公開說明書</p></article>
+        <article data-tone="green"><b>YFinance</b><span>READY</span><p>Adj Close · Target</p></article>
+        <article data-tone="coral"><b>FactSet</b><span>KEYED</span><p>Target · EPS N～N+2</p></article>
+        <article data-tone="blue"><b>VDF Database</b><span>CANDIDATE</span><p>Parquet · DuckDB</p></article>
+      </div>
+      <div class="request-grid">
+        <article class="contract"><h3>欄位與驗證契約</h3><ul><li><span>雙重身分</span><b>ticker + ISIN／名稱</b></li><li><span>價格對齊</span><b>price_date ≤ analysis_date</b></li><li><span>Consensus</span><b>snapshot_date ≤ analysis_date</b></li><li><span>來源規則</span><b>FactSet／YF 不平均</b></li><li><span>Forward P/E</span><b>Adj Close ÷ Positive EPS</b></li><li><span>寫入</span><b>P0/P1 前僅 Candidate</b></li></ul></article>
+        <article class="json-card"><h3>request.json</h3><pre id="requestJson"></pre></article>
+      </div>
+    </section>
+
+    <footer class="page-footer"><div><b>VERITAS INTELLIGENCE ANALYTICS</b><span>Observa · Intellege · Praevide</span></div><p>VETF Consensus Console · Visual Lock SSOT · Candidate Data Only</p></footer>
+  </main>
+  <script src="app.js" defer></script>
+</body>
+</html>
