@@ -66,9 +66,9 @@ function Register-Profile {
     # 批247:+via-intake 尾版。批249:+via-help(指令冊)/via-md(文件
     # →Markdown 引擎);標記升 v0104(後定義勝)。
     try {
-        $mark = "# [VIA:PROFILE:v0105]"
+        $mark = "# [VIA:PROFILE:v0106]"
         if (!(Test-Path $PROFILE)) { New-Item -ItemType File -Force $PROFILE | Out-Null }
-        if (-not (Select-String -Path $PROFILE -Pattern "VIA:PROFILE:v0105" -Quiet -ErrorAction SilentlyContinue)) {
+        if (-not (Select-String -Path $PROFILE -Pattern "VIA:PROFILE:v0106" -Quiet -ErrorAction SilentlyContinue)) {
             @"
 
 $mark VIA 短指令(自動註冊;刪除本段即解除)
@@ -81,8 +81,9 @@ function via-intake { pwsh -NoProfile -ExecutionPolicy Bypass -File (Get-ChildIt
 function via-help { python (Get-ChildItem "$VIA\supportive modules\registry\CGC_MDL102_CommandRoster_v*.py" | Sort-Object Name | Select-Object -Last 1).FullName --print }
 function via-md { python (Get-ChildItem "$VIA\functional modules\VRN\VRN_ENG075_DocToMarkdown_v*.py" | Sort-Object Name | Select-Object -Last 1).FullName run @args }
 function via-tpn { python (Get-ChildItem "$VIA\functional modules\VAP\engine\VAP_ENG011_TemplateRegistry_v*.py" | Sort-Object Name | Select-Object -Last 1).FullName @args }
+function via-psrepair { pwsh -NoProfile -ExecutionPolicy Bypass -File (Get-ChildItem "$VIA\Invoke-VIA-PSRepair-v*.ps1" | Sort-Object Name | Select-Object -Last 1).FullName @args }
 "@ | Add-Content -Path $PROFILE -Encoding UTF8
-            Write-Host "  [註冊] PS 短指令已入 profile:regen-all / via / via-status / selftest / via-intake / via-help / via-md / via-tpn(新視窗生效)" -ForegroundColor Green
+            Write-Host "  [註冊] PS 短指令已入 profile:regen-all / via / via-status / selftest / via-intake / via-help / via-md / via-tpn / via-psrepair(新視窗生效)" -ForegroundColor Green
         }
     } catch { }
 }
