@@ -1,0 +1,71 @@
+{
+  "contract": "veritas.vofie-failure-catalog/1.1",
+  "policy": "TOP_20_PER_STAGE_MULTIPLE_SAFE_RECOVERIES_NO_SOURCE_MUTATION",
+  "st": "ST-GATE",
+  "stages": [
+    {
+      "stage_id": "INTAKE",
+      "name": "Window I/O and input intake",
+      "handlers": ["validate_input", "normalize_path", "deduplicate_selection", "limit_selection", "emit_diagnostic"],
+      "failures": [
+        "no input selected", "more than five inputs", "duplicate input selected", "missing input path", "directory selected as file", "unsupported extension", "zero-byte input", "input exceeds size budget", "relative path ambiguity", "environment variable path unresolved", "permission denied", "locked input file", "network path unavailable", "path contains invalid characters", "path length exceeds platform limit", "file changes during selection", "drag-drop payload malformed", "mixed URI and local path", "symlink target missing", "output path equals input path"
+      ]
+    },
+    {
+      "stage_id": "READER",
+      "name": "Format detection and read adapters",
+      "handlers": ["encoding_fallback", "stdlib_reader", "isolate_file", "chunk_content", "retain_original", "emit_diagnostic"],
+      "failures": [
+        "encoding detection failure", "binary content misdetected as text", "truncated file", "invalid OOXML package", "missing OOXML member", "malformed HTML", "malformed JSON", "malformed JSONL record", "CSV delimiter detection failure", "CSV row width mismatch", "PDF reader unavailable", "PDF text extraction empty", "spreadsheet shared strings corrupt", "spreadsheet formula cell malformed", "presentation slide order malformed", "document heading style unknown", "reader dependency missing", "reader raises memory error", "reader timeout", "source mutates while being read"
+      ]
+    },
+    {
+      "stage_id": "SEMANTIC",
+      "name": "Normalization, topic segmentation and NLP",
+      "handlers": ["normalize_fence", "chunk_content", "deterministic_nlp", "retain_original", "rebuild_index", "emit_diagnostic"],
+      "failures": [
+        "unclosed code fence", "unknown code fence language", "heading hierarchy gap", "no heading anchors", "topic exceeds size budget", "topic becomes empty", "taxonomy score tie", "language detection uncertain", "mixed language tokenization", "NLP returns no segments", "NLP changes technical meaning", "NLP invents facts", "NLP response schema mismatch", "tag explosion", "duplicate topic identity", "line mapping drift", "boilerplate false positive", "quarantine loses traceability", "source-to-topic hash mismatch", "semantic quality gate fails"
+      ]
+    },
+    {
+      "stage_id": "CONSOLIDATION",
+      "name": "Text and code merge, restructure, deduplicate and optimize",
+      "handlers": ["retain_original", "mark_duplicate", "rebuild_index", "candidate_only", "disable_optional", "emit_diagnostic"],
+      "failures": [
+        "merge order unstable", "unrelated topics merged", "related topics not merged", "canonical duplicate chosen incorrectly", "duplicate content deleted", "code language collision", "symbol name collision", "API signature changed", "code candidate syntax fails", "code candidate behavior differs", "text meaning changes", "source attribution lost", "line provenance lost", "optimization removes required detail", "restructure creates circular references", "component graph has orphan node", "consolidated category empty", "operation dependency missing", "operation order conflict", "candidate accidentally overwrites source"
+      ]
+    },
+    {
+      "stage_id": "VSIS_NLP",
+      "name": "VSIS 1.2 and NLP bridge",
+      "handlers": ["relocate_vsis", "deterministic_nlp", "disable_optional", "retain_original", "emit_diagnostic"],
+      "failures": [
+        "VSIS root not found", "VSIS import failure", "VSIS schema version mismatch", "normalize action unavailable", "segment action unavailable", "categorize action unavailable", "semantic check unavailable", "VSIS returns HOLD", "VSIS returns FAIL", "VSIS returns empty actions", "VSIS payload too large", "VSIS timeout", "VSIS memory pressure", "VSIS response malformed", "VSIS changes source content", "VSIS creates duplicate IDs", "VSIS category outside taxonomy", "VSIS exception leaks path", "VSIS leaves sys.path modified", "VSIS optional failure blocks core"
+      ]
+    },
+    {
+      "stage_id": "EXPORT",
+      "name": "Markdown, HTML, JSON, Word and CSV output",
+      "handlers": ["new_output_dir", "atomic_retry", "sanitize_filename", "inline_assets", "validate_output", "emit_diagnostic"],
+      "failures": [
+        "output directory not writable", "output directory already populated", "filename invalid", "disk space insufficient", "atomic replace fails", "Markdown write incomplete", "HTML contains remote dependency", "HTML contains executable source script", "inline JavaScript syntax fails", "component JSON schema invalid", "component JSON contains nonserializable value", "DOCX dependency missing", "DOCX package invalid", "DOCX table geometry invalid", "DOCX missing CJK font declaration", "CSV BOM missing", "CSV quoting invalid", "CSV row width mismatch", "output hash mismatch", "fewer than five primary outputs"
+      ]
+    },
+    {
+      "stage_id": "WINDOW_UI",
+      "name": "Desktop GUI and user interaction",
+      "handlers": ["ui_file_dialog", "ui_disable_dnd", "ui_preserve_state", "limit_selection", "emit_diagnostic"],
+      "failures": [
+        "Tkinter unavailable", "Tk root creation fails", "drag-drop library unavailable", "drop event not parsed", "more than five files dropped", "duplicate files dropped", "removed selection still submitted", "output picker cancelled", "role selection invalid", "no operation selected", "run button double activated", "GUI freezes during conversion", "progress queue stalls", "worker exception hidden", "Unicode filename display fails", "high DPI layout clips", "keyboard navigation fails", "screen reader label missing", "window closes during run", "result folder cannot be opened"
+      ]
+    },
+    {
+      "stage_id": "GOVERNANCE",
+      "name": "System role, tests, audit and activation",
+      "handlers": ["retain_original", "rebuild_index", "validate_output", "emit_diagnostic", "hold_activation"],
+      "failures": [
+        "registry overlay missing", "registry policy not add-only", "unknown adapter registered", "disabled tool invoked", "source hash changes", "audit chain broken", "manifest hash mismatch", "self-test fails", "user-test fails", "activation test fails", "failure catalog missing stage", "failure catalog has fewer than twenty", "recovery handler not implemented", "system sidecar written in engine role", "system role missing sidecar", "AI direct apply enabled", "telemetry enabled without opt-in", "external process starts unexpectedly", "legacy convert command regresses", "activation occurs despite HOLD"
+      ]
+    }
+  ]
+}
