@@ -1,0 +1,123 @@
+{
+ "functions": [
+  {
+   "code": "WF-01",
+   "id": "refreshRequest",
+   "label": "連線與更新",
+   "desc": "A read-only refresh request ID is appended to the ledger.",
+   "truth_boundary": "REQUESTED_RUNTIME is not CONNECTED or UPDATED.",
+   "engine_link": "CGC_MDL095 DeckServer 橋+VDF OmniFetch(唯讀請求台帳)",
+   "state": "LINKED"
+  },
+  {
+   "code": "WF-02",
+   "id": "addChart",
+   "label": "新增圖",
+   "desc": "A loaded Catalog table and numeric fields are selected.",
+   "truth_boundary": "",
+   "engine_link": "VAP_ENG001 Chartlib(CH-01..24)+ENG010 runtime SSOT",
+   "state": "LINKED"
+  },
+  {
+   "code": "WF-03",
+   "id": "renderChart",
+   "label": "繪好圖",
+   "desc": "A single-axis or dual-axis governed SVG is rendered with semantic metadata.",
+   "truth_boundary": "",
+   "engine_link": "VAP_ENG003 Seaborn/Plotly 渲染道",
+   "state": "LINKED"
+  },
+  {
+   "code": "WF-04",
+   "id": "saveGovernedImage",
+   "label": "儲存圖像",
+   "desc": "SVG, chart contract and SHA-256 are stored in IndexedDB; LocalStorage stores metadata only.",
+   "truth_boundary": "",
+   "engine_link": null,
+   "state": "GAP(斷點候補)"
+  },
+  {
+   "code": "WF-05",
+   "id": "selectSpecificSavedImage",
+   "label": "擷取特定圖",
+   "desc": "Search, filtered select-all, exact single extraction and SHA verification are available.",
+   "truth_boundary": "",
+   "engine_link": "Workbench savedImageSelection(收容 v023)",
+   "state": "LINKED"
+  },
+  {
+   "code": "WF-06",
+   "id": "composeSharedTimeStack",
+   "label": "堆圖編排",
+   "desc": "Selected images are deduplicated, ordered, height-scaled from 0.5x to 4x and aligned to a strict shared timeline.",
+   "truth_boundary": "",
+   "engine_link": "VAP v007 --panels 同時間軸堆疊(CH-09)+本冊 TPN-C",
+   "state": "LINKED"
+  },
+  {
+   "code": "WF-07",
+   "id": "explicitUserExport",
+   "label": "預覽與匯出",
+   "desc": "The stack is previewed; HTML, PNG, PDF or JSON export starts only after an explicit user action.",
+   "truth_boundary": "",
+   "engine_link": "Workbench 匯出契約(收容 v023)",
+   "state": "LINKED"
+  }
+ ],
+ "templates": [
+  {
+   "tpn": "TPN-001",
+   "kind": "dual_axis",
+   "form": "line",
+   "axes": [
+    {
+     "axis_id": "TPN-001.AX1",
+     "side": "L",
+     "series": [
+      "cpi"
+     ]
+    },
+    {
+     "axis_id": "TPN-001.AX2",
+     "side": "R",
+     "series": [
+      "ust10"
+     ]
+    }
+   ],
+   "data_link": {
+    "sources": [
+     "TWSE 台灣證交所",
+     "TPEX 櫃買中心",
+     "SITCA 投信投顧公會",
+     "MOPS 公開資訊觀測站",
+     "yfinance",
+     "FactSet (keyed)",
+     "FRED",
+     "EPFR",
+     "HKEX 港交所"
+    ],
+    "adapter": "json"
+   },
+   "hash": "7e9a2a93",
+   "created": "2026-08-30 20:56",
+   "note": "單圖=分析視覺資產;資料連結綁模板"
+  }
+ ],
+ "composites": [
+  {
+   "tpn": "TPN-C001",
+   "members_series": [
+    "ismm",
+    "isms",
+    "unrate"
+   ],
+   "base_tpn": "TPN-001",
+   "time_sync": true,
+   "order": "top_to_last",
+   "hash": "680a78e1",
+   "note": "同時間軸上下同步;存引用非複本=成員模板更新→本複合圖同時更新"
+  }
+ ],
+ "note": "append-only;hash 定生死;複合存 TPN 引用非複本=更新模板=引用圖全同步"
+}
