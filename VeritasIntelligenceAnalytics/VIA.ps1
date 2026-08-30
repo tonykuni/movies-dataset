@@ -62,12 +62,12 @@ function Register-Profile {
     # 批224:操作員屢打 regen-all 為指令→註冊 PS profile 短指令(冪等;
     # 標記防重)。以後任何新 PowerShell 視窗:regen-all=重生全部 UI、
     # via=一鍵啟動、via-status=開狀態台。(-- 開頭在 PS 是運算子,不可作指令名)
-    # 批244:操作員實錄裸打 selftest 不識→加 selftest/via-selftest=
-    # 全面自測矩陣(grid 尾版);標記升 v0101(舊 v0100 段自動補刷)。
+    # 批244:+selftest/via-selftest(grid 尾版)。批245:+via-intake=
+    # Downloads 八件名冊收容器;標記升 v0102(舊段自動補刷,後定義勝)。
     try {
-        $mark = "# [VIA:PROFILE:v0101]"
+        $mark = "# [VIA:PROFILE:v0102]"
         if (!(Test-Path $PROFILE)) { New-Item -ItemType File -Force $PROFILE | Out-Null }
-        if (-not (Select-String -Path $PROFILE -Pattern "VIA:PROFILE:v0101" -Quiet -ErrorAction SilentlyContinue)) {
+        if (-not (Select-String -Path $PROFILE -Pattern "VIA:PROFILE:v0102" -Quiet -ErrorAction SilentlyContinue)) {
             @"
 
 $mark VIA 短指令(自動註冊;刪除本段即解除)
@@ -76,8 +76,9 @@ function via { powershell -NoProfile -ExecutionPolicy Bypass -File "$VIA\VIA.ps1
 function via-status { python (Get-ChildItem "$VIA\supportive modules\registry\CGC_MDL096_SyncStatus_v*.py" | Sort-Object Name | Select-Object -Last 1).FullName --open }
 function via-selftest { python (Get-ChildItem "$VIA\supportive modules\registry\CGC_MDL064_SelftestGrid_v*.py" | Sort-Object Name | Select-Object -Last 1).FullName @args }
 function selftest { via-selftest @args }
+function via-intake { pwsh -NoProfile -ExecutionPolicy Bypass -File "$VIA\Collect-VIA-Intake-v0100.ps1" @args }
 "@ | Add-Content -Path $PROFILE -Encoding UTF8
-            Write-Host "  [註冊] PS 短指令已入 profile:regen-all / via / via-status / selftest(新視窗生效)" -ForegroundColor Green
+            Write-Host "  [註冊] PS 短指令已入 profile:regen-all / via / via-status / selftest / via-intake(新視窗生效)" -ForegroundColor Green
         }
     } catch { }
 }
