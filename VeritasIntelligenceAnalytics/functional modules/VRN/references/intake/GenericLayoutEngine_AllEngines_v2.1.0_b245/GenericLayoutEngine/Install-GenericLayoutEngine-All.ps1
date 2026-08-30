@@ -64,7 +64,7 @@ function Invoke-Python {
     & $PythonCommand @Arguments | Out-Host
     $ExitCode = $LASTEXITCODE
     if ($ExitCode -ne 0 -and -not $AllowFailure) {
-        throw "Python command failed with exit code $ExitCode: $($Arguments -join ' ')"
+        throw "Python command failed with exit code ${ExitCode}: $($Arguments -join ' ')"
     }
     return $ExitCode
 }
