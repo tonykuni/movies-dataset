@@ -1,9 +1,15 @@
 # launch.ps1 — VIA 非阻塞啟動器(批201;Mega-Prompt 令)
 # 「不關閉、不阻塞、不卡斷」:boot 全鏈丟背景 Job,終端立即返還;
 # UI Matrix+樞紐頁開瀏覽器;進度=背景 log 即時可查。
-# ===== [VIA:PS-ACCEL:v0100] PS 加速模組掛載(graceful 缺席零影響) =====
-$PSAccel = Join-Path $PSScriptRoot "supportive modules\VIA_PS_Accel_Module.ps1"
-if (Test-Path $PSAccel) { try { . $PSAccel } catch { } }
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
 # ===== [VIA:PS-ACCEL:END] =====
 $VIA = $PSScriptRoot
 $env:VIA_NET_CONSENT = "YES"; $env:VIA_SCRAPE_CONSENT = "YES"

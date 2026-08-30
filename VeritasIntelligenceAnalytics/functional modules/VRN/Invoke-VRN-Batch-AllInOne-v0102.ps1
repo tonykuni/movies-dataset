@@ -1,14 +1,4 @@
 #requires -Version 7.0
-# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
-try {
-    $VIAPSAccelProbe = $PSScriptRoot
-    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
-        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
-        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
-        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
-    }
-} catch { }
-# ===== [VIA:PS-ACCEL:END] =====
 <# =====================================================================
  VRN Batch AllInOne v0102 — v0101 全功能保留 + -Only 單檔補擷車道(只增不減)
  ---------------------------------------------------------------------
@@ -31,6 +21,16 @@ param(
     [int]$Workers = 0,
     [switch]$Fresh
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 Set-StrictMode -Off
 $ErrorActionPreference = "Continue"
 $vrn = $PSScriptRoot
@@ -131,10 +131,3 @@ foreach ($pair in @(
 Write-Host "`n=== 單檔補擷完成 · 建議續跑:via-reconcile(驗 64/64)===" -ForegroundColor Cyan
 exit $(if ($ok5 -and $ok4) { 0 } else { 1 })
 
-# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
-# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
-# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
-# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
-# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
-# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
-# ===== [VIA:PS-ACCEL:END] =====

@@ -1,4 +1,9 @@
 #requires -Version 7.0
+[CmdletBinding()]
+param(
+  [string]$WorkOpsRoot = "$env:USERPROFILE\Downloads\VeritasIntelligenceAnalytics\functional modules\WorkOps",
+  [switch]$StageToOut
+)
 # ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
 try {
     $VIAPSAccelProbe = $PSScriptRoot
@@ -9,11 +14,6 @@ try {
     }
 } catch { }
 # ===== [VIA:PS-ACCEL:END] =====
-[CmdletBinding()]
-param(
-  [string]$WorkOpsRoot = "$env:USERPROFILE\Downloads\VeritasIntelligenceAnalytics\functional modules\WorkOps",
-  [switch]$StageToOut
-)
 $ErrorActionPreference="Stop"
 Set-StrictMode -Version Latest
 $Here=Split-Path -Parent $MyInvocation.MyCommand.Path

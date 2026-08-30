@@ -130,9 +130,21 @@ def _inject_ps(p: Path) -> str:
     raw = p.read_text(encoding="utf-8-sig", errors="replace")
     lines = raw.splitlines(keepends=True)
     idx = 0
-    while idx < len(lines) and (lines[idx].lstrip().startswith("#")
-                                or not lines[idx].strip()):
-        idx += 1
+    # 批255c:檔頭=註解/空行/#requires/[屬性] 行(如 [CmdletBinding()])
+    # ——屬性必須緊貼 param,塊不得插入其間(首輪 482 注中此類破 param
+    # 律=本修根因)
+    while idx < len(lines):
+        ln = lines[idx].lstrip()
+        if ln.startswith("<#"):              # 批255d:塊註解(說明助文)
+            while idx < len(lines) and "#>" not in lines[idx]:
+                idx += 1
+            idx += 1
+            continue
+        if ln.startswith("#") or not ln.strip() \
+                or re.match(r"\[[A-Za-z].*\]\s*$", ln):
+            idx += 1
+            continue
+        break
     if idx < len(lines) and re.match(r"\s*param\s*\(", lines[idx],
                                      re.I):
         depth = 0
@@ -158,6 +170,35 @@ def _inject_ps(p: Path) -> str:
         return "SKIP_UNSAFE(括號平衡異=候真 AST)"
     p.write_text(new, encoding="utf-8")
     return "INJECTED"
+
+
+def _strip_ps(raw: str) -> str:
+    """去既有 PS-ACCEL 塊(重置重注道)"""
+    return re.sub(r"# ===== \[VIA:PS-ACCEL:v0100\].*?"
+                  r"# ===== \[VIA:PS-ACCEL:END\] =====\r?\n",
+                  "", raw, flags=re.S)
+
+
+def fixps(root: Path | None = None) -> int:
+    """批255c 自修復:全 ps 檔既有塊剝離→修正邏輯重注(錯位歸位)"""
+    root = root or VIA
+    moved = same = skip = 0
+    for p in list(_walk(root, ".ps1")) + list(_walk(root, ".psm1")):
+        raw = p.read_text(encoding="utf-8-sig", errors="replace")
+        if "PS-ACCEL" not in raw:
+            continue
+        stripped = _strip_ps(raw)
+        p.write_text(stripped, encoding="utf-8")
+        r = _inject_ps(p)
+        cur = p.read_text(encoding="utf-8", errors="replace")
+        if r != "INJECTED":
+            skip += 1
+        elif cur == raw:
+            same += 1
+        else:
+            moved += 1
+    print(f"[fixps] 歸位 {moved} · 原位不動 {same} · SKIP {skip}(誠實)")
+    return 0
 
 
 def inject(root: Path | None = None) -> int:
@@ -296,6 +337,8 @@ def main() -> int:
         print(f"[scan] py {s['py_total']}(缺 {len(s['py_miss'])})· "
               f"ps {s['ps_total']}(缺 {len(s['ps_miss'])})")
         return 0
+    if args and args[0] == "fixps":
+        return fixps()
     if args and args[0] == "inject":
         return inject()
     if args and args[0] == "dupes":

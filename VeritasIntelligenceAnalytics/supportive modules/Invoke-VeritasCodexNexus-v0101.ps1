@@ -1,13 +1,3 @@
-# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
-try {
-    $VIAPSAccelProbe = $PSScriptRoot
-    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
-        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
-        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
-        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
-    }
-} catch { }
-# ===== [VIA:PS-ACCEL:END] =====
 <#
 .SYNOPSIS
   Invoke-VeritasCodexNexus-v0101.ps1 - Codex Nexus 主指令(批105:py 一律經 Celeritas 加速器鏈)
@@ -42,6 +32,16 @@ param(
     [int]$TimeoutSec = 0,
     [switch]$NoCeleritas   # 明示跳過加速器鏈(除錯用;預設一律走鏈)
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 
 $ErrorActionPreference = 'Stop'
 $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -301,8 +301,3 @@ Write-Step ('RunLog -> {0}' -f $runlogPath) 'DarkGray'
 
 if ($Serve) { Start-CodexServer -ServeDir $Out -P $Port }
 
-# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;v0101 已實體 dot-source)=====
-# 本檔已實際 dot-source VIA_PS_Accel_Module.ps1(20 加速器冊+Invoke-VIAGuarded/
-# Write-VIAProgress/Invoke-VIAParallel);缺席 graceful。失敗模式 20 冊:
-# registry\VIA_CodexNexus_FailureModes_v0100.json(儲存維護並遵守)。
-# ===== [VIA:PS-ACCEL:END] =====

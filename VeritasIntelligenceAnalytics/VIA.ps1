@@ -7,12 +7,18 @@
 #   選單模式:加 -Menu
 # 背景作業=獨立進程(Start-Process):關掉本視窗不中斷(不卡斷紀律)
 param([switch]$Install, [switch]$Menu)
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Continue"
 $VIA = $PSScriptRoot
-# ===== [VIA:PS-ACCEL:v0100] PS 加速模組掛載(graceful 缺席零影響) =====
-$PSAccel = Join-Path $VIA "supportive modules\VIA_PS_Accel_Module.ps1"
-if (Test-Path $PSAccel) { try { . $PSAccel } catch { } }
-# ===== [VIA:PS-ACCEL:END] =====
 
 function New-DesktopShortcut {
     $desk = [Environment]::GetFolderPath("Desktop")

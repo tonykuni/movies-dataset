@@ -2,12 +2,18 @@
 # 工作站無 WSL/bash 之對應面:與 via_boot_update.sh 同鏈 ⓪-⑨(單一
 # 邏輯雙載體;.sh 為正主,本檔跟隨其節序;引擎呼叫全 python 直譯)。
 # marker 防重複:每日首跑才實跑;log 落 VIA_Reports/boot_update_logs/
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Continue"
 $VIA  = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-# ===== [VIA:PS-ACCEL:v0100] PS 加速模組掛載(批199 操作員令:PS 指令一定要加加速器;graceful 缺席零影響) =====
-$PSAccel = Join-Path $VIA "supportive modules\VIA_PS_Accel_Module.ps1"
-if (Test-Path $PSAccel) { try { . $PSAccel } catch { } }
-# ===== [VIA:PS-ACCEL:END] =====
 $ENG  = Join-Path $VIA "functional modules\VDF\engine"
 $VRN  = Join-Path $VIA "functional modules\VRN"
 $REG  = Join-Path $VIA "supportive modules\registry"

@@ -1,4 +1,13 @@
 #requires -Version 7.0
+<#
+.SYNOPSIS
+  VIA Supportive / Functional Module Registry + Safe Placement + HTML UI
+.DESCRIPTION
+  Scans C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics, classifies supportive / functional / parameter assets,
+  creates append-only SSOT registries, safely copies not-yet-placed files to canonical folders, and opens an HTML UI report.
+  No delete. No source overwrite. Existing source files are preserved.
+#>
+
 # ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
 try {
     $VIAPSAccelProbe = $PSScriptRoot
@@ -9,15 +18,6 @@ try {
     }
 } catch { }
 # ===== [VIA:PS-ACCEL:END] =====
-<#
-.SYNOPSIS
-  VIA Supportive / Functional Module Registry + Safe Placement + HTML UI
-.DESCRIPTION
-  Scans C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics, classifies supportive / functional / parameter assets,
-  creates append-only SSOT registries, safely copies not-yet-placed files to canonical folders, and opens an HTML UI report.
-  No delete. No source overwrite. Existing source files are preserved.
-#>
-
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
@@ -1365,10 +1365,3 @@ try {
   }
 }
 
-# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
-# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
-# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
-# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
-# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
-# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
-# ===== [VIA:PS-ACCEL:END] =====

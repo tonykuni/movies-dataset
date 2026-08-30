@@ -1,4 +1,11 @@
 #requires -Version 7.0
+<# =====================================================================
+ TickerRegex P1 Closeout - verify SSOT v0100 on this machine and ship
+ Operator directive 2026-08-04: VDF/VRN/VAP ticker regex = four digits,
+ first digit non-zero. Scope frozen. Old year-exclusion regex retired
+ from SSOT (v029SSOT1B archived in place).
+ Read-only verification + push. No canonical mutation.
+===================================================================== #>
 # ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
 try {
     $VIAPSAccelProbe = $PSScriptRoot
@@ -9,13 +16,6 @@ try {
     }
 } catch { }
 # ===== [VIA:PS-ACCEL:END] =====
-<# =====================================================================
- TickerRegex P1 Closeout - verify SSOT v0100 on this machine and ship
- Operator directive 2026-08-04: VDF/VRN/VAP ticker regex = four digits,
- first digit non-zero. Scope frozen. Old year-exclusion regex retired
- from SSOT (v029SSOT1B archived in place).
- Read-only verification + push. No canonical mutation.
-===================================================================== #>
 Set-StrictMode -Off
 $ErrorActionPreference = "Continue"
 $repo = Split-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) -Parent
@@ -90,10 +90,3 @@ finally {
     Write-Host "PowerShell session remains open." -ForegroundColor Cyan
 }
 
-# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
-# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
-# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
-# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
-# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
-# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
-# ===== [VIA:PS-ACCEL:END] =====
