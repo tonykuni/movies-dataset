@@ -59,32 +59,14 @@ function Open-UIs {
 }
 
 function Register-Profile {
-    # 批224:操作員屢打 regen-all 為指令→註冊 PS profile 短指令(冪等;
-    # 標記防重)。以後任何新 PowerShell 視窗:regen-all=重生全部 UI、
-    # via=一鍵啟動、via-status=開狀態台。(-- 開頭在 PS 是運算子,不可作指令名)
-    # 批244:+selftest/via-selftest(grid 尾版)。批245:+via-intake=
-    # 批247:+via-intake 尾版。批249:+via-help(指令冊)/via-md(文件
-    # →Markdown 引擎);標記升 v0104(後定義勝)。
+    # 批254 點源架構:指令定義唯一處=Register-VIA-Commands-v*.ps1(尾版);
+    # 本函式=當場點源(本進程即生效)+委派其自註冊($PROFILE 一行點源,
+    # pull 即自動最新;舊 v010x 全文段無害=點源在後後定義勝)
     try {
-        $mark = "# [VIA:PROFILE:v0106]"
-        if (!(Test-Path $PROFILE)) { New-Item -ItemType File -Force $PROFILE | Out-Null }
-        if (-not (Select-String -Path $PROFILE -Pattern "VIA:PROFILE:v0106" -Quiet -ErrorAction SilentlyContinue)) {
-            @"
-
-$mark VIA 短指令(自動註冊;刪除本段即解除)
-function regen-all { python (Get-ChildItem "$VIA\supportive modules\registry\CGC_MDL096_SyncStatus_v*.py" | Sort-Object Name | Select-Object -Last 1).FullName --regen-all }
-function via { powershell -NoProfile -ExecutionPolicy Bypass -File "$VIA\VIA.ps1" }
-function via-status { python (Get-ChildItem "$VIA\supportive modules\registry\CGC_MDL096_SyncStatus_v*.py" | Sort-Object Name | Select-Object -Last 1).FullName --open }
-function via-selftest { python (Get-ChildItem "$VIA\supportive modules\registry\CGC_MDL064_SelftestGrid_v*.py" | Sort-Object Name | Select-Object -Last 1).FullName @args }
-function selftest { via-selftest @args }
-function via-intake { pwsh -NoProfile -ExecutionPolicy Bypass -File (Get-ChildItem "$VIA\Collect-VIA-Intake-v*.ps1" | Sort-Object Name | Select-Object -Last 1).FullName @args }
-function via-help { python (Get-ChildItem "$VIA\supportive modules\registry\CGC_MDL102_CommandRoster_v*.py" | Sort-Object Name | Select-Object -Last 1).FullName --print }
-function via-md { python (Get-ChildItem "$VIA\functional modules\VRN\VRN_ENG075_DocToMarkdown_v*.py" | Sort-Object Name | Select-Object -Last 1).FullName run @args }
-function via-tpn { python (Get-ChildItem "$VIA\functional modules\VAP\engine\VAP_ENG011_TemplateRegistry_v*.py" | Sort-Object Name | Select-Object -Last 1).FullName @args }
-function via-psrepair { pwsh -NoProfile -ExecutionPolicy Bypass -File (Get-ChildItem "$VIA\Invoke-VIA-PSRepair-v*.ps1" | Sort-Object Name | Select-Object -Last 1).FullName @args }
-"@ | Add-Content -Path $PROFILE -Encoding UTF8
-            Write-Host "  [註冊] PS 短指令已入 profile:regen-all / via / via-status / selftest / via-intake / via-help / via-md / via-tpn / via-psrepair(新視窗生效)" -ForegroundColor Green
-        }
+        $reg = (Get-ChildItem "$VIA\Register-VIA-Commands-v*.ps1" |
+                Sort-Object Name | Select-Object -Last 1).FullName
+        if ($reg) { . $reg }
+        else { Write-Host "  [註冊] 指令定義檔缺(誠實;pull 後重試)" -ForegroundColor Yellow }
     } catch { }
 }
 
