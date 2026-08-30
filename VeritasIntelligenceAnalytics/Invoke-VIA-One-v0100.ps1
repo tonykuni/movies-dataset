@@ -1,4 +1,14 @@
 #requires -Version 7.0
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 <#
 Invoke-VIA-One v0100 — 最終整合版總啟動器(依 VIA_MegaPrompt_OfficialMode_v0100)
 一支 PowerShell 處理全部:同步 → Mega 三輪全景(v0103 分區 Matrix 自動跳出)→ VMT 總指揮

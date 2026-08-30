@@ -5,6 +5,16 @@
 #   input_reports(.gitignore 紅線:原件永不入 git;僅本機)
 # 誠實三態:FOUND(複製)/ALREADY(已在)/MISSING(誠實列缺)
 param([string]$SearchRoot = "$env:USERPROFILE\Downloads")
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $dest = Join-Path $PSScriptRoot "functional modules\VRN\input_reports"
 New-Item -ItemType Directory -Force $dest | Out-Null
 $GAPS = @(

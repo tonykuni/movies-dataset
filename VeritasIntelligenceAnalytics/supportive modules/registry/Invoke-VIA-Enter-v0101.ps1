@@ -15,6 +15,16 @@
 # 用法:& "$env:USERPROFILE\movies-dataset\VeritasIntelligenceAnalytics\supportive modules\registry\Invoke-VIA-Enter-v0101.ps1"
 # =============================================================================
 param([switch]$NoPull, [switch]$Deep)
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Continue"
 $TS = Get-Date -Format "yyyyMMdd_HHmmss"
 $UserRoot = if ($env:USERPROFILE) { $env:USERPROFILE } else { $HOME }

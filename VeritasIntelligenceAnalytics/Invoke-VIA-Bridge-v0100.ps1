@@ -1,4 +1,14 @@
 #requires -Version 7.0
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 <#
 Invoke-VIA-Bridge v0100 — 一支 PowerShell:前後端對接 + test/debug 迴圈 + 啟用 UI
 流程:[1] sync(容錯)→ [2] 後端探測引擎(B1-B5)→ [3] TEST:state JSON 可解析 +

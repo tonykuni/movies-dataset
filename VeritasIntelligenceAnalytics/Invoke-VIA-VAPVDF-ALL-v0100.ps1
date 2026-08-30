@@ -5,6 +5,16 @@
 # 站表:V1 VDF 契約盤點 · V2 VDF 302 全系統驗證 · V3 VDF 303 Registry 活化
 #       A1 VAP 引擎探測 · A2 VAP chartlib 零依賴出圖 · A3 VAP seaborn/plotly selftest
 param([switch]$Quick, [switch]$SkipVDF, [switch]$SkipVAP)
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Continue"
 $Root = Split-Path -Parent $PSCommandPath
 $VDF = Join-Path $Root "functional modules\VDF"

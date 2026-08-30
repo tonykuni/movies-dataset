@@ -1,4 +1,14 @@
 #requires -Version 7.0
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 <#
 Invoke-VIA-One v0107 — 全系統總啟動器(v0106 版本前送:HUB 改活化引擎 — 開啟即探測+即時徽章)
 新增:[0] DEPS 依賴預檢(五件套 import 探測,缺件標示不卡斷)

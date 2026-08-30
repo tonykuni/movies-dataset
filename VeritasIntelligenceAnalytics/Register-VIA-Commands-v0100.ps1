@@ -8,6 +8,16 @@
 #     在後=後定義勝)
 #   ③當場生效:. "<本檔路徑>"(不用新視窗不用 via)
 # =====================================================================
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $VIA = Split-Path -Parent $MyInvocation.MyCommand.Path
 
 function global:Get-VIANewest([string]$Dir, [string]$Pat) {
