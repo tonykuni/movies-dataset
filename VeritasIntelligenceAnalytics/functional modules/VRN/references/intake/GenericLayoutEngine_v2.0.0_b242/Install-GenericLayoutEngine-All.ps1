@@ -64,7 +64,8 @@ function Invoke-Python {
     & $PythonCommand @Arguments | Out-Host
     $ExitCode = $LASTEXITCODE
     if ($ExitCode -ne 0 -and -not $AllowFailure) {
-        throw "Python command failed with exit code $ExitCode: $($Arguments -join ' ')"
+        # 批243 一字修:$ExitCode: 在雙引號被 PS 解析為 scope 限定符=語法錯→${ExitCode}:
+        throw "Python command failed with exit code ${ExitCode}: $($Arguments -join ' ')"
     }
     return $ExitCode
 }
