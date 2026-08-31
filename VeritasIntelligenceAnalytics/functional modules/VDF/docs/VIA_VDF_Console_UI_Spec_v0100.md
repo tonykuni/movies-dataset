@@ -44,3 +44,16 @@ GroupIndex 儀表板三大法人扣當沖堆疊資金流、月營收儀表板族
 - **主動式台股 ETF 分析**:已部署(VIA_ActiveStockETF,19/19+59/59,宇宙自動發現/NEW 標記/AUM/申贖流)。
 - **月營收分析**:已部署(twrevenue:三層動能,**族群 31 群** group_analysis + **整體市場** analysis,
   週期股分流不進排名;selftest 8/8 + demo 端到端)。
+
+## def v0100 增補(2026-08-31 行動端追問:Microsoft MarkItDown / FactSet / yfinance consensus)
+
+三者皆可、皆納入,且前兩者工具已在庫:
+
+| 車道 | 工具(在庫位置) | 角色 | 證據標籤 |
+| --- | --- | --- | --- |
+| VRN 還原車道 2 | **Microsoft MarkItDown**(supportive modules/VIA_Toolchain_Bundle_20260830/Invoke-VIA-MarkItDown-v0101.ps1) | PDF/DOCX → Markdown 結構化,與 layout+OCR 車道**互為交叉檢核**;兩車道同欄位吻合才升級入庫 | Der(規則轉換) |
+| 前瞻評價共識 | **FactSet 公開新聞稿**(VDF/engine/forward_valuation_vintage_v2.py 已內建 insight.factset.com 發現/確定性抽取/content-hash 去重/cutoff 升級閘) | 指數級 forward EPS/PE 錨,point-in-time vintage | V(官方發布) |
+| 個股共識 | **yfinance analyst consensus**(目標價/EPS 預估/評等;yfinance 源已 186 項在冊) | 個股層共識,與 VRN 還原財報、FactSet 錨三方交叉 | Est/M(聚合非官方,永不冒充 V) |
+
+交叉檢核鏈:VRN(layout+OCR)× MarkItDown × VDF 歷史 × yfinance consensus × FactSet 錨
+—— 任兩路不吻合即 fail-closed 留審;證據階梯 V > Der > Est/M,低階不得覆寫高階。
