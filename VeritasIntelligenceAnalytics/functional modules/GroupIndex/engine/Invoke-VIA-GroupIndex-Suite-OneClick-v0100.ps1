@@ -13,6 +13,7 @@
                          安裝至 GroupIndex\smoke_tooling(僅此目錄,不污染全域)
       [0] ENV-PREFLIGHT  via_ 環境治理前哨(自動解析 via_core python + EnvManager 契約檢核)
       [1] COMPILE-GATE   Python 引擎 py_compile
+      [1b] ACCEL20       中央治理主控台:20 加速器 × 全部 PY 引擎(AST/Hydra/SSOT/矩陣)
       [2] UNIT-TEST      pytest 六套件
       [3] SECTORFLOW     族群指數/資金流引擎(TEST→DEBUG→OPTIMIZE→BACK-TEST→CONSOLIDATE 收斂迴圈)
       [4] TRADE-BACKTEST 訊號交易層回測(T+1/成本/置換 null)
@@ -38,6 +39,10 @@
 
 .EXAMPLE
     pwsh -ExecutionPolicy Bypass -File .\Invoke-VIA-GroupIndex-Suite-OneClick-v0100.ps1 -OpenHtml 1
+
+.NOTES
+    非阻塞模式(不關閉、不阻塞、不卡斷):改用同目錄 launch.ps1 背景派工,
+    立即返回 PID 與 log 路徑,隨時 Get-Content -Wait 追蹤。
 #>
 [CmdletBinding()]
 param(
@@ -79,7 +84,8 @@ $Engines = @(
     "VIA_SectorWhaleEngine_v020.py",
     "..\..\ChipWar\engines\VIA_GovFundEngine_v040.py",   # canonical 於 ChipWar 子系統(去重後不留副本)
     "VIA_ChipWar_Console_v010.py",
-    "VIA_ChipWar_Revenue_Evidence_v0100.py"
+    "VIA_ChipWar_Revenue_Evidence_v0100.py",
+    "VIA_GroupIndex_Accel20_Console_v0100.py"
 )
 $TestFiles = @(
     "test_VIA_GroupIndex_EnvPreflight_v0100.py",
@@ -89,7 +95,8 @@ $TestFiles = @(
     "test_VIA_LiveWire_ContractAdapter_v0100.py",
     "test_VIA_VAP_AxisLock_v0100.py",
     "test_VIA_ETF_Consoles_v0100.py",
-    "test_VIA_ChipWar_Revenue_v0100.py"
+    "test_VIA_ChipWar_Revenue_v0100.py",
+    "test_VIA_GroupIndex_Accel20_v0100.py"
 )
 
 function def_ResolveViaPython {
@@ -245,6 +252,9 @@ function def_Main {
         }
         def_InvokePython -Label "COMPILE-GATE (py_compile x$($Engines.Count))" -Percent 6 -Arguments (@("-m", "py_compile") + $Engines)
 
+        # [1b] ACCEL20 — 20 加速器全引擎治理掃描(分析-建議,零改寫)
+        def_InvokePython -Label "ACCEL20 governance console (20 accelerators x all py engines)" -Percent 10 -Arguments @("VIA_GroupIndex_Accel20_Console_v0100.py")
+
         # [2] UNIT-TEST
         def_InvokePython -Label "UNIT-TEST (pytest x$($TestFiles.Count))" -Percent 15 -Arguments (@("-m", "pytest", "-q", "-W", "error::RuntimeWarning") + $TestFiles)
 
@@ -277,6 +287,7 @@ function def_Main {
             @{ Name = "LiveWire";    Json = Join-Path $EvidenceDir "RUN_LIVEWIRE_ADAPTER_V0100\adapter_run_summary.json";  Field = "Status";     Expect = "ADAPTER_VERIFIED_FAIL_CLOSED" },
             @{ Name = "ETFConsoles"; Json = Join-Path $EvidenceDir "RUN_ETF_CONSOLES_V0100\etf_consoles_summary.json";     Field = "Status";     Expect = "ETF_CONSOLES_PASS" },
             @{ Name = "ChipWarRev";  Json = Join-Path $EvidenceDir "RUN_CHIPWAR_REVENUE_V0100\chipwar_revenue_summary.json"; Field = "Status";     Expect = "CHIPWAR_REVENUE_PASS" },
+            @{ Name = "Accel20";     Json = Join-Path $EvidenceDir "RUN_ACCEL20_V0100\accel20_summary.json";               Field = "Status";     Expect = "ACCEL20_GOVERNANCE_PASS" },
             @{ Name = "MasterSuite"; Json = Join-Path $EvidenceDir "RUN_MASTER_VALIDATION_V0100\master_run_summary.json";  Field = "Status";     Expect = "CONTROLLED_SUITE_ACTIVATION_PASS" }
         )
         $blocked = @()

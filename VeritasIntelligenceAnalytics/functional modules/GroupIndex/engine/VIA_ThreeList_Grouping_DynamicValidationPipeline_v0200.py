@@ -1375,7 +1375,9 @@ def def_build_test_ledger(
     def_add_test(rows, "T01", "三個 HTML 來源可讀", "PASS" if files_readable else "FAIL", "HARD", str(files_readable))
     def_add_test(rows, "T02", "List A row-level extraction", "PASS" if len(source_a) > 0 else "FAIL", "HARD", f"rows={len(source_a)} groups={source_a.Group.nunique()} tickers={source_a.Ticker.nunique()}")
     valid_ticker = source_a["Ticker"].astype(str).str.fullmatch(r"\d{4}").all()
-    def_add_test(rows, "T03", "List A 四碼 ticker contract", "PASS" if valid_ticker else "FAIL", "HARD", f"invalid={int((~source_a['Ticker'].astype(str).str.fullmatch(r'\d{4}')).sum())}")
+    # f-string 運算式含反斜線在 Python 3.12 才合法;先算後嵌,維持 3.9+ 相容
+    invalid_ticker_count = int((~source_a["Ticker"].astype(str).str.fullmatch(r"\d{4}")).sum())
+    def_add_test(rows, "T03", "List A 四碼 ticker contract", "PASS" if valid_ticker else "FAIL", "HARD", f"invalid={invalid_ticker_count}")
     duplicates = int(source_a.duplicated("MembershipKey").sum())
     def_add_test(rows, "T04", "List A membership 唯一鍵", "PASS" if duplicates == 0 else "FAIL", "HARD", f"duplicates={duplicates}")
     identity_conflicts = source_a.groupby("Ticker").agg(Names=("Name", "nunique"), Markets=("Market", "nunique")).query("Names>1 or Markets>1")

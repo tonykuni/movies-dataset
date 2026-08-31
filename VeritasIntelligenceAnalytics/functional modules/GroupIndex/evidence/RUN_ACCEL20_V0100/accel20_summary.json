@@ -1,0 +1,1775 @@
+{
+  "Harness": "VIA_GroupIndex_Accel20_Console",
+  "Version": "0.1.00",
+  "GeneratedAt": "2026-08-31T14:40:22",
+  "KeyPrompt": "supportive modules/VIA_Central_Governance/VIA_CentralGovernanceConsole_MegaPrompt_KEY.md",
+  "Status": "ACCEL20_GOVERNANCE_PASS",
+  "HardFailures": 0,
+  "Rounds": 2,
+  "TargetsScanned": 50,
+  "Accelerators": {
+    "A01_AST": {
+      "parsedOK": 50,
+      "total": 50
+    },
+    "A02_Semantic": {
+      "withDocstring": 38,
+      "todoMarkers": 3
+    },
+    "A03_Hydra": {
+      "topFanIn": [
+        [
+          "__future__",
+          42
+        ],
+        [
+          "json",
+          35
+        ],
+        [
+          "pathlib",
+          34
+        ],
+        [
+          "sys",
+          32
+        ],
+        [
+          "pandas",
+          29
+        ],
+        [
+          "datetime",
+          26
+        ],
+        [
+          "re",
+          22
+        ],
+        [
+          "numpy",
+          22
+        ],
+        [
+          "importlib",
+          18
+        ],
+        [
+          "typing",
+          18
+        ],
+        [
+          "hashlib",
+          17
+        ],
+        [
+          "os",
+          15
+        ]
+      ]
+    },
+    "A04_Topology": {
+      "intraEdges": 15,
+      "note": "套件內相依邊 15 條(引擎刻意鬆耦合,subprocess/檔案契約為主)"
+    },
+    "A05_SandboxIsolation": [
+      {
+        "runner": "VIA_ETF_Consoles_Evidence_v0100.py",
+        "tempDir": false
+      },
+      {
+        "runner": "VIA_ChipWar_Revenue_Evidence_v0100.py",
+        "tempDir": true
+      }
+    ],
+    "A06_AutoFix": {
+      "fixableFindings": 1311
+    },
+    "A07_Panoramic": {
+      "rounds": 2,
+      "converged": true
+    },
+    "A08_SSOT": {
+      "canonical": "GroupIndex SSOT L1",
+      "rosterRows": 379,
+      "tickerRegex": "[1-9]\\d{3}(非 00 開頭)",
+      "alignment": "SectorWhale registry / twrevenue groups.csv 角色學(L/P/M/G)同構,名冊以 GroupIndex 為 canonical"
+    },
+    "A09_MatrixViz": "accel20_matrix.html",
+    "A10_ErrorClusters": {
+      "UP006": 619,
+      "BLE001": 284,
+      "UP031": 218,
+      "F401": 132,
+      "S110": 101,
+      "UP045": 96,
+      "I001": 64,
+      "UP035": 49,
+      "RUF013": 35,
+      "UP009": 34,
+      "DTZ005": 28,
+      "F811": 23,
+      "RUF046": 22,
+      "G010": 20,
+      "F841": 19
+    },
+    "A11_Complexity": {
+      "maxFuncLines": 380,
+      "maxDepth": 4
+    },
+    "A12_SubsystemSync": {
+      "GroupIndex": true,
+      "ChipWar": true,
+      "VAP": true,
+      "VRN": true,
+      "VDF": true,
+      "MultiFactor": true
+    },
+    "A13_Rollback": {
+      "gitHead": "c6184d1",
+      "策略": "git 版本化 + append-only evidence 即回滾點"
+    },
+    "A14_Coverage": {
+      "gates": {
+        "RUN_SECTORFLOW_V0100": "CONTROLLED_ACTIVATION_PASS_REVIEW_WARNINGS_RETAINED",
+        "RUN_SECTORFLOW_TRADE_V0100": "TRADE_BACKTEST_PASS",
+        "RUN_LIVEWIRE_ADAPTER_V0100": "ADAPTER_VERIFIED_FAIL_CLOSED",
+        "RUN_ETF_CONSOLES_V0100": "ETF_CONSOLES_PASS",
+        "RUN_CHIPWAR_REVENUE_V0100": "CHIPWAR_REVENUE_PASS",
+        "RUN_MASTER_VALIDATION_V0100": "CONTROLLED_SUITE_ACTIVATION_PASS"
+      },
+      "testFiles": 12
+    },
+    "A15_FixOrder": {
+      "parallel": 1933,
+      "sequenceDependent": 0,
+      "note": "本輪 lint 發現均為單檔可並行修"
+    },
+    "A16_ProgressBar": "HTML 動態進度條已渲染",
+    "A17_Narration": [
+      "A07 全景式分析啟動:掃描 50 份 Python 引擎/模組檔",
+      "A07 三輪全景:第 2 輪即收斂(診斷結果穩定)",
+      "A03 Hydra 扇入最高:__future__×42",
+      "A10 分類:HARD 0 / REVIEW 1933(可自動修 1311)",
+      "A14 六道閘:6/6 綠"
+    ],
+    "A18_NonBlockingPS": {
+      "launchPs1": true,
+      "nonBlocking": true
+    },
+    "A19_MultiEngine": {
+      "py": 50,
+      "ps1": 3,
+      "html": 1,
+      "gateRows": 7
+    },
+    "A20_AutoDeployInit": {
+      "envPreflight": true,
+      "oneclickSegments": 11
+    }
+  },
+  "HardFindings": [],
+  "ReviewFindings": [
+    {
+      "file": "VIA_GovFundEngine_v040.py",
+      "code": "UP009",
+      "line": 1,
+      "msg": "UTF-8 encoding declaration is unnecessary",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_GovFundEngine_v040.py",
+      "code": "I001",
+      "line": 22,
+      "msg": "Import block is un-sorted or un-formatted",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_GovFundEngine_v040.py",
+      "code": "C408",
+      "line": 67,
+      "msg": "Unnecessary `dict()` call (rewrite as a literal)",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_GovFundEngine_v040.py",
+      "code": "C408",
+      "line": 189,
+      "msg": "Unnecessary `dict()` call (rewrite as a literal)",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_FinMind_TW_Flow_Engine.py",
+      "code": "EXE001",
+      "line": 1,
+      "msg": "Shebang is present but file is not executable",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_FinMind_TW_Flow_Engine.py",
+      "code": "UP009",
+      "line": 2,
+      "msg": "UTF-8 encoding declaration is unnecessary",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_FinMind_TW_Flow_Engine.py",
+      "code": "I001",
+      "line": 14,
+      "msg": "Import block is un-sorted or un-formatted",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_FinMind_TW_Flow_Engine.py",
+      "code": "I001",
+      "line": 328,
+      "msg": "Import block is un-sorted or un-formatted",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_FinMind_TW_Flow_Engine.py",
+      "code": "UP035",
+      "line": 341,
+      "msg": "Import from `collections.abc` instead: `Iterable`, `Iterator`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_FinMind_TW_Flow_Engine.py",
+      "code": "DTZ007",
+      "line": 362,
+      "msg": "Naive datetime constructed using `datetime.datetime.strptime()` without %z",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_FinMind_TW_Flow_Engine.py",
+      "code": "DTZ011",
+      "line": 371,
+      "msg": "`datetime.date.today()` used",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_FinMind_TW_Flow_Engine.py",
+      "code": "TRY004",
+      "line": 607,
+      "msg": "Prefer `TypeError` exception for invalid type",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_FinMind_TW_Flow_Engine.py",
+      "code": "TRY004",
+      "line": 650,
+      "msg": "Prefer `TypeError` exception for invalid type",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_FinMind_TW_Flow_Engine.py",
+      "code": "PLC0206",
+      "line": 1714,
+      "msg": "Extracting value from dictionary without calling `.items()`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_FinMind_TW_Flow_Engine.py",
+      "code": "DTZ005",
+      "line": 1846,
+      "msg": "`datetime.datetime.now()` called without a `tz` argument",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_FinMind_TW_Flow_Engine.py",
+      "code": "BLE001",
+      "line": 1946,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_TW_Branch_Capital_Circle_Engine.py",
+      "code": "EXE001",
+      "line": 1,
+      "msg": "Shebang is present but file is not executable",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_TW_Branch_Capital_Circle_Engine.py",
+      "code": "UP009",
+      "line": 2,
+      "msg": "UTF-8 encoding declaration is unnecessary",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_TW_Branch_Capital_Circle_Engine.py",
+      "code": "I001",
+      "line": 11,
+      "msg": "Import block is un-sorted or un-formatted",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_TW_Branch_Capital_Circle_Engine.py",
+      "code": "UP035",
+      "line": 138,
+      "msg": "Import from `collections.abc` instead: `Iterable`, `Iterator`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_TW_Branch_Capital_Circle_Engine.py",
+      "code": "F401",
+      "line": 138,
+      "msg": "`typing.Iterator` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_TW_Branch_Capital_Circle_Engine.py",
+      "code": "RUF046",
+      "line": 180,
+      "msg": "Value being cast to `int` is already an integer",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_TW_Branch_Capital_Circle_Engine.py",
+      "code": "F841",
+      "line": 1200,
+      "msg": "Local variable `sell_breadth` is assigned to but never used",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_TW_Branch_Capital_Circle_Engine.py",
+      "code": "DTZ005",
+      "line": 1522,
+      "msg": "`datetime.datetime.now()` called without a `tz` argument",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_TW_Branch_Capital_Circle_Engine.py",
+      "code": "BLE001",
+      "line": 1585,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_TW_Official_Data_Adapter.py",
+      "code": "EXE001",
+      "line": 1,
+      "msg": "Shebang is present but file is not executable",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_TW_Official_Data_Adapter.py",
+      "code": "UP009",
+      "line": 2,
+      "msg": "UTF-8 encoding declaration is unnecessary",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_TW_Official_Data_Adapter.py",
+      "code": "I001",
+      "line": 9,
+      "msg": "Import block is un-sorted or un-formatted",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_TW_Official_Data_Adapter.py",
+      "code": "F401",
+      "line": 59,
+      "msg": "`json` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_TW_Official_Data_Adapter.py",
+      "code": "UP035",
+      "line": 62,
+      "msg": "Import from `collections.abc` instead: `Iterable`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_TW_Official_Data_Adapter.py",
+      "code": "BLE001",
+      "line": 461,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "I001",
+      "line": 16,
+      "msg": "Import block is un-sorted or un-formatted",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "I001",
+      "line": 25,
+      "msg": "Import block is un-sorted or un-formatted",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F401",
+      "line": 26,
+      "msg": "`accelerator.VDF_MDL000_Accelerator_Core_v4.fetch` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F401",
+      "line": 27,
+      "msg": "`accelerator.VDF_MDL000_Accelerator_Core_v4.fetch_json` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F401",
+      "line": 28,
+      "msg": "`accelerator.VDF_MDL000_Accelerator_Core_v4.fetch_many` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F401",
+      "line": 29,
+      "msg": "`accelerator.VDF_MDL000_Accelerator_Core_v4.accelerated` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F401",
+      "line": 30,
+      "msg": "`accelerator.VDF_MDL000_Accelerator_Core_v4.stats` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 33,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "I001",
+      "line": 36,
+      "msg": "Import block is un-sorted or un-formatted",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "RUF012",
+      "line": 40,
+      "msg": "Mutable default value for class attribute",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "I001",
+      "line": 67,
+      "msg": "Import block is un-sorted or un-formatted",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 73,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "ASYNC251",
+      "line": 74,
+      "msg": "Async functions should not call `time.sleep`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "S110",
+      "line": 81,
+      "msg": "`try`-`except`-`pass` detected, consider logging the exception",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 81,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "I001",
+      "line": 94,
+      "msg": "Import block is un-sorted or un-formatted",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "S110",
+      "line": 107,
+      "msg": "`try`-`except`-`pass` detected, consider logging the exception",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 107,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "PLC0414",
+      "line": 113,
+      "msg": "Import alias does not rename original package",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 114,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "S110",
+      "line": 140,
+      "msg": "`try`-`except`-`pass` detected, consider logging the exception",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 140,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "EXE001",
+      "line": 147,
+      "msg": "Shebang is present but file is not executable",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "EXE005",
+      "line": 147,
+      "msg": "Shebang should be at the beginning of the file",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 160,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "I001",
+      "line": 164,
+      "msg": "Import block is un-sorted or un-formatted",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F401",
+      "line": 164,
+      "msg": "`VIA_SafeFix_PathRegistry.load_group` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "S110",
+      "line": 166,
+      "msg": "`try`-`except`-`pass` detected, consider logging the exception",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 166,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 171,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 176,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 185,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "I001",
+      "line": 224,
+      "msg": "Import block is un-sorted or un-formatted",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F401",
+      "line": 225,
+      "msg": "`base64` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F401",
+      "line": 226,
+      "msg": "`functools` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F401",
+      "line": 227,
+      "msg": "`gc` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F401",
+      "line": 228,
+      "msg": "`hashlib` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F401",
+      "line": 229,
+      "msg": "`hmac` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F401",
+      "line": 231,
+      "msg": "`logging` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F401",
+      "line": 232,
+      "msg": "`os` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F401",
+      "line": 235,
+      "msg": "`secrets` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F811",
+      "line": 237,
+      "msg": "Redefinition of unused `sys` from line 94: `sys` redefined here",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F401",
+      "line": 240,
+      "msg": "`traceback` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F401",
+      "line": 243,
+      "msg": "`uuid` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F401",
+      "line": 245,
+      "msg": "`dataclasses.field` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F401",
+      "line": 246,
+      "msg": "`enum.Enum` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F401",
+      "line": 247,
+      "msg": "`functools.wraps` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F811",
+      "line": 248,
+      "msg": "Redefinition of unused `Path` from line 95: `Path` redefined here",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP035",
+      "line": 249,
+      "msg": "Import from `collections.abc` instead: `Callable`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP035",
+      "line": 249,
+      "msg": "`typing.Dict` is deprecated, use `dict` instead",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP035",
+      "line": 249,
+      "msg": "`typing.List` is deprecated, use `list` instead",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP035",
+      "line": 249,
+      "msg": "`typing.Tuple` is deprecated, use `tuple` instead",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F401",
+      "line": 249,
+      "msg": "`typing.Union` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 266,
+      "msg": "Use `dict` instead of `Dict` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 273,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "RUF023",
+      "line": 280,
+      "msg": "`_AegisLazyModule.__slots__` is not sorted",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "S110",
+      "line": 298,
+      "msg": "`try`-`except`-`pass` detected, consider logging the exception",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 298,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 352,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "S110",
+      "line": 430,
+      "msg": "`try`-`except`-`pass` detected, consider logging the exception",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 430,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "S110",
+      "line": 436,
+      "msg": "`try`-`except`-`pass` detected, consider logging the exception",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 436,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 457,
+      "msg": "Use `dict` instead of `Dict` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 457,
+      "msg": "Use `list` instead of `List` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "RUF012",
+      "line": 457,
+      "msg": "Mutable default value for class attribute",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 504,
+      "msg": "Use `dict` instead of `Dict` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 505,
+      "msg": "Use `dict` instead of `Dict` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "PERF102",
+      "line": 506,
+      "msg": "When using only the values of a dict use the `values()` method",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 512,
+      "msg": "Use `dict` instead of `Dict` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 524,
+      "msg": "Use `list` instead of `List` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "S110",
+      "line": 559,
+      "msg": "`try`-`except`-`pass` detected, consider logging the exception",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 559,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 578,
+      "msg": "Use `dict` instead of `Dict` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 599,
+      "msg": "Use `dict` instead of `Dict` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 606,
+      "msg": "Use `dict` instead of `Dict` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 617,
+      "msg": "Use `dict` instead of `Dict` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 629,
+      "msg": "Use `dict` instead of `Dict` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 639,
+      "msg": "Use `dict` instead of `Dict` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 666,
+      "msg": "Use `dict` instead of `Dict` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 675,
+      "msg": "Use `list` instead of `List` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP045",
+      "line": 693,
+      "msg": "Use `X | None` for type annotations",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP045",
+      "line": 702,
+      "msg": "Use `X | None` for type annotations",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F841",
+      "line": 779,
+      "msg": "Local variable `exc` is assigned to but never used",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP045",
+      "line": 808,
+      "msg": "Use `X | None` for type annotations",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 833,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP045",
+      "line": 849,
+      "msg": "Use `X | None` for type annotations",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F841",
+      "line": 879,
+      "msg": "Local variable `exc` is assigned to but never used",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 900,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 936,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "S110",
+      "line": 943,
+      "msg": "`try`-`except`-`pass` detected, consider logging the exception",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 943,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 959,
+      "msg": "Use `tuple` instead of `Tuple` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 966,
+      "msg": "Use `dict` instead of `Dict` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 966,
+      "msg": "Use `tuple` instead of `Tuple` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP045",
+      "line": 970,
+      "msg": "Use `X | None` for type annotations",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP045",
+      "line": 987,
+      "msg": "Use `X | None` for type annotations",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1013,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F841",
+      "line": 1013,
+      "msg": "Local variable `e` is assigned to but never used",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "S110",
+      "line": 1038,
+      "msg": "`try`-`except`-`pass` detected, consider logging the exception",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1038,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "S110",
+      "line": 1044,
+      "msg": "`try`-`except`-`pass` detected, consider logging the exception",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1044,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP045",
+      "line": 1047,
+      "msg": "Use `X | None` for type annotations",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "S110",
+      "line": 1053,
+      "msg": "`try`-`except`-`pass` detected, consider logging the exception",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1053,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "S110",
+      "line": 1059,
+      "msg": "`try`-`except`-`pass` detected, consider logging the exception",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1059,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1066,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP045",
+      "line": 1080,
+      "msg": "Use `X | None` for type annotations",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1091,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP045",
+      "line": 1095,
+      "msg": "Use `X | None` for type annotations",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1100,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP045",
+      "line": 1104,
+      "msg": "Use `X | None` for type annotations",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1116,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP045",
+      "line": 1125,
+      "msg": "Use `X | None` for type annotations",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "RUF013",
+      "line": 1179,
+      "msg": "PEP 484 prohibits implicit `Optional`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "RUF013",
+      "line": 1180,
+      "msg": "PEP 484 prohibits implicit `Optional`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "S110",
+      "line": 1191,
+      "msg": "`try`-`except`-`pass` detected, consider logging the exception",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1191,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 1207,
+      "msg": "Use `dict` instead of `Dict` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1235,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 1247,
+      "msg": "Use `list` instead of `List` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "RUF013",
+      "line": 1251,
+      "msg": "PEP 484 prohibits implicit `Optional`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 1252,
+      "msg": "Use `list` instead of `List` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 1252,
+      "msg": "Use `dict` instead of `Dict` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 1254,
+      "msg": "Use `list` instead of `List` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1266,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 1271,
+      "msg": "Use `dict` instead of `Dict` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 1309,
+      "msg": "Use `dict` instead of `Dict` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 1315,
+      "msg": "Use `dict` instead of `Dict` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1325,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 1328,
+      "msg": "Use `dict` instead of `Dict` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1336,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 1339,
+      "msg": "Use `dict` instead of `Dict` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "DTZ011",
+      "line": 1343,
+      "msg": "`datetime.date.today()` used",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 1358,
+      "msg": "Use `dict` instead of `Dict` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "S110",
+      "line": 1366,
+      "msg": "`try`-`except`-`pass` detected, consider logging the exception",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1366,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "S110",
+      "line": 1379,
+      "msg": "`try`-`except`-`pass` detected, consider logging the exception",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1379,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 1384,
+      "msg": "Use `list` instead of `List` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 1384,
+      "msg": "Use `list` instead of `List` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 1384,
+      "msg": "Use `dict` instead of `Dict` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 1385,
+      "msg": "Use `list` instead of `List` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1392,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "S110",
+      "line": 1423,
+      "msg": "`try`-`except`-`pass` detected, consider logging the exception",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1423,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "S110",
+      "line": 1432,
+      "msg": "`try`-`except`-`pass` detected, consider logging the exception",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1432,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP045",
+      "line": 1435,
+      "msg": "Use `X | None` for type annotations",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP045",
+      "line": 1440,
+      "msg": "Use `X | None` for type annotations",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "S110",
+      "line": 1448,
+      "msg": "`try`-`except`-`pass` detected, consider logging the exception",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1448,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP045",
+      "line": 1477,
+      "msg": "Use `X | None` for type annotations",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1485,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1500,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1521,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "F841",
+      "line": 1521,
+      "msg": "Local variable `e` is assigned to but never used",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "S110",
+      "line": 1530,
+      "msg": "`try`-`except`-`pass` detected, consider logging the exception",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1530,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 1546,
+      "msg": "Use `list` instead of `List` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP045",
+      "line": 1547,
+      "msg": "Use `X | None` for type annotations",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 1547,
+      "msg": "Use `dict` instead of `Dict` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 1551,
+      "msg": "Use `list` instead of `List` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP045",
+      "line": 1551,
+      "msg": "Use `X | None` for type annotations",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1563,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "BLE001",
+      "line": 1582,
+      "msg": "Do not catch blind exception: `Exception`",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VeritasAegisNexus.py",
+      "code": "UP006",
+      "line": 1593,
+      "msg": "Use `list` instead of `List` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    }
+  ],
+  "Policy": "analyze-classify-recommend only / zero engine mutation / zero network / append-only"
+}

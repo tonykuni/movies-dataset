@@ -112,6 +112,26 @@ def _via_bootstrap_support_paths() -> None:
 
 _via_bootstrap_support_paths()
 
+# 錨點區原引用 _LazyModule/_spec_exists 而未定義(僅靠 except 吞 NameError 存活,F821)。
+# 補上最小實作:spec 探測 + 惰性載入,行為只增不減。
+import importlib as _importlib
+import importlib.util as _importlib_util
+
+def _spec_exists(_name: str) -> bool:
+    try:
+        return _importlib_util.find_spec(_name) is not None
+    except Exception:
+        return False
+
+class _LazyModule:
+    def __init__(self, _name: str) -> None:
+        self._name = _name
+        self._mod = None
+    def __getattr__(self, _attr: str):
+        if self._mod is None:
+            self._mod = _importlib.import_module(self._name)
+        return getattr(self._mod, _attr)
+
 try:
     VIA_SSOT_Unified = _LazyModule("VIA_SSOT_Unified") if _spec_exists("VIA_SSOT_Unified") else None
 except Exception:
