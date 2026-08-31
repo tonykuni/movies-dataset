@@ -1,0 +1,603 @@
+{
+  "activation_allowed": true,
+  "contract": "veritas.vofie-hydra-risk-audit/1.0",
+  "engine_version": "1.4.0",
+  "external_process_started": false,
+  "findings": [],
+  "gate": "PASS",
+  "mode": "REVIEW_ONLY_DRY_RUN",
+  "network_accessed": false,
+  "policy": {
+    "activation_requires": [
+      "hydra_gate",
+      "post_scan",
+      "self_test",
+      "user_test",
+      "rollback_ready"
+    ],
+    "canonical_source": "READ_ONLY",
+    "change_mode": "APPEND_ONLY_PROPOSAL_FIRST",
+    "child_process_default": "BLOCKED",
+    "global_concurrency_cap": 4,
+    "high_hydra_action": "HOLD",
+    "max_parallel_fixers": 2,
+    "max_rounds": 3,
+    "network_default": "BLOCKED",
+    "real_write_token": "YES_FOR_ANY_REAL_WRITE",
+    "runtime_copy": "WRITABLE_ONLY_AFTER_EXPLICIT_APPROVAL",
+    "unknown_risk_action": "FAIL_CLOSED"
+  },
+  "real_write_performed": false,
+  "round_plan": [
+    {
+      "action": "inventory + classify",
+      "finding_events": 0,
+      "mode": "PANORAMA_READ_ONLY",
+      "post_scan_complete": true,
+      "real_write": false,
+      "round": 1,
+      "source_integrity": "PASS",
+      "targets_scanned": 0,
+      "unique_findings_to_date": 0
+    },
+    {
+      "action": "proposal evidence only; no fixer execution",
+      "finding_events": 0,
+      "mode": "PARALLEL_SAFE_PROPOSAL",
+      "post_scan_complete": true,
+      "real_write": false,
+      "round": 2,
+      "source_integrity": "PASS",
+      "targets_scanned": 0,
+      "unique_findings_to_date": 0
+    },
+    {
+      "action": "post-scan + remaining risk HOLD/manual review",
+      "finding_events": 0,
+      "mode": "SEQUENTIAL_DEPENDENCY_REVIEW",
+      "post_scan_complete": true,
+      "real_write": false,
+      "round": 3,
+      "source_integrity": "PASS",
+      "targets_scanned": 0,
+      "unique_findings_to_date": 0
+    }
+  ],
+  "source_mutated": false,
+  "source_policy": "READ_ONLY_NO_DELETE_NO_MOVE_NO_CANONICAL_MUTATION",
+  "st": "ST-HYDRA",
+  "summary": {
+    "detector_coverage": 20,
+    "findings": 0,
+    "max_rounds": 3,
+    "parallel_safe": 6,
+    "post_scans": 3,
+    "sequential_only": 14,
+    "solutions": 60,
+    "targets_scanned": 0,
+    "top_risks": 20
+  },
+  "targets": [],
+  "top20": [
+    {
+      "breakers": [
+        "single-writer lease",
+        "canonical write deny",
+        "conflicting lane quarantine"
+      ],
+      "cause": "兩個以上引擎、修復器或排程共寫同一 SSOT／來源檔。",
+      "default_action": "HOLD",
+      "detectors": [
+        "writer ownership map",
+        "path lock inventory",
+        "canonical hash comparison"
+      ],
+      "name": "多個寫入者同時修改 canonical",
+      "never_again_control": "每個 writable path 必須有唯一 owner_id。",
+      "rank": 1,
+      "repair_lane": "SEQUENTIAL_ONLY",
+      "risk_id": "HYDRA-F01",
+      "severity": "CRITICAL",
+      "solutions": [
+        "指定唯一 MotherRoot owner",
+        "所有變更先寫 Runtime Copy proposal",
+        "依賴順序完成後人工核准單一 commit"
+      ],
+      "sop": "停寫→鎖定 canonical→建立 ownership map→比較 hash→只保留單一提案。"
+    },
+    {
+      "breakers": [
+        "authority uniqueness gate",
+        "alias-only duplicate",
+        "pointer freeze"
+      ],
+      "cause": "同一 namespace 出現兩份 canonical authority 或互相宣稱主檔。",
+      "default_action": "HOLD",
+      "detectors": [
+        "namespace uniqueness",
+        "authority graph",
+        "registry duplicate scan"
+      ],
+      "name": "SSOT／Registry authority 重複",
+      "never_again_control": "namespace + authority_role 必須唯一。",
+      "rank": 2,
+      "repair_lane": "SEQUENTIAL_ONLY",
+      "risk_id": "HYDRA-F02",
+      "severity": "CRITICAL",
+      "solutions": [
+        "選定唯一 canonical owner",
+        "其餘改為 alias／overlay 而不刪除",
+        "以 hash chain 記錄 authority 決策"
+      ],
+      "sop": "凍結 pointer→列出 authority→標 canonical／alias→重跑 Registry Gate。"
+    },
+    {
+      "breakers": [
+        "cycle breaker",
+        "maximum call depth",
+        "one-way adapter boundary"
+      ],
+      "cause": "引擎 A 調用 B、B 又直接或間接調用 A，形成不可終止鏈。",
+      "default_action": "HOLD",
+      "detectors": [
+        "dependency DAG cycle scan",
+        "call-chain depth",
+        "registry edge audit"
+      ],
+      "name": "循環相依與互相回呼",
+      "never_again_control": "Activation 前 dependency graph 必須為 DAG。",
+      "rank": 3,
+      "repair_lane": "SEQUENTIAL_ONLY",
+      "risk_id": "HYDRA-F03",
+      "severity": "HIGH",
+      "solutions": [
+        "將共用契約提升為獨立 interface",
+        "切斷反向直接 import",
+        "以事件或 result adapter 回傳"
+      ],
+      "sop": "停止 runner→輸出 dependency graph→找 strongly connected component→逐邊拆解。"
+    },
+    {
+      "breakers": [
+        "re-entry token",
+        "maximum process depth",
+        "child process deny"
+      ],
+      "cause": "Launcher 啟動自身、父程序或同一 orchestration entrypoint。",
+      "default_action": "HOLD",
+      "detectors": [
+        "parent-child identity",
+        "run_id recursion",
+        "entrypoint call scan"
+      ],
+      "name": "Launcher／Runner 遞迴自啟",
+      "never_again_control": "相同 run_id 不可再次啟動 controller。",
+      "rank": 4,
+      "repair_lane": "SEQUENTIAL_ONLY",
+      "risk_id": "HYDRA-F04",
+      "severity": "CRITICAL",
+      "solutions": [
+        "加入不可重入 run token",
+        "分離 controller 與 worker entrypoint",
+        "預設禁止 child process，僅核准後解鎖"
+      ],
+      "sop": "終止新 spawn→保存 process tree→比對 entrypoint→修正為單向 worker。"
+    },
+    {
+      "breakers": [
+        "global concurrency cap",
+        "max parallel fixers",
+        "bounded queue"
+      ],
+      "cause": "依 CPU 數或輸入數無上限建立 thread、process、runspace 或 fixer。",
+      "default_action": "HOLD",
+      "detectors": [
+        "worker count bound",
+        "queue depth",
+        "resource watermark"
+      ],
+      "name": "執行緒／工作器爆量",
+      "never_again_control": "所有 executor 必須明示 bounded workers。",
+      "rank": 5,
+      "repair_lane": "PARALLEL_SAFE_PROPOSAL",
+      "risk_id": "HYDRA-F05",
+      "severity": "CRITICAL",
+      "solutions": [
+        "全域 concurrency cap=4",
+        "修復器最多同時 2 個",
+        "超額工作轉為順序佇列並保留 checkpoint"
+      ],
+      "sop": "停止擴張→凍結 queue→降至上限→逐批重播。"
+    },
+    {
+      "breakers": [
+        "lane-local staging",
+        "write-set mutex",
+        "base no-pollution"
+      ],
+      "cause": "via-ui、via-ps、base 或其他 lane 對同一輸出／cache 共寫。",
+      "default_action": "HOLD",
+      "detectors": [
+        "lane-path matrix",
+        "write-set intersection",
+        "environment route audit"
+      ],
+      "name": "不同 Lane 共寫相同路徑",
+      "never_again_control": "Lane 之間只傳 contract payload，不共享 writable path。",
+      "rank": 6,
+      "repair_lane": "SEQUENTIAL_ONLY",
+      "risk_id": "HYDRA-F06",
+      "severity": "CRITICAL",
+      "solutions": [
+        "每個 lane 使用獨立 staging",
+        "只由整合層讀取提案",
+        "發現交集時改為順序合併"
+      ],
+      "sop": "建立 write-set→找交集→隔離 lane→由單一整合器輸出。"
+    },
+    {
+      "breakers": [
+        "pointer freeze",
+        "hash pin",
+        "last-known-good fallback"
+      ],
+      "cause": "Registry 指向舊版本、缺檔或與實際 hash 不一致。",
+      "default_action": "HOLD",
+      "detectors": [
+        "pointer target exists",
+        "registered hash match",
+        "version monotonicity"
+      ],
+      "name": "Registry／Pointer 過期或漂移",
+      "never_again_control": "Pointer 更新與 target seal 必須是同一核准交易。",
+      "rank": 7,
+      "repair_lane": "SEQUENTIAL_ONLY",
+      "risk_id": "HYDRA-F07",
+      "severity": "HIGH",
+      "solutions": [
+        "先凍結 pointer 再驗證 target",
+        "以 BLAKE2 hash pin 版本",
+        "失敗回到 last-known-good 而不覆寫"
+      ],
+      "sop": "停止 pointer update→驗 target/hash→產生差異報告→人工核准。"
+    },
+    {
+      "breakers": [
+        "environment isolation",
+        "contract negotiation",
+        "compatibility fallback"
+      ],
+      "cause": "base、via_core、via-ui、via-ps 使用互不相容的 runtime／schema／library。",
+      "default_action": "HOLD",
+      "detectors": [
+        "environment fingerprint",
+        "contract version matrix",
+        "dependency compatibility"
+      ],
+      "name": "跨環境版本與契約漂移",
+      "never_again_control": "每次 run 綁定 runtime 與 contract fingerprint。",
+      "rank": 8,
+      "repair_lane": "PARALLEL_SAFE_PROPOSAL",
+      "risk_id": "HYDRA-F08",
+      "severity": "HIGH",
+      "solutions": [
+        "保存每個 lane 的 environment fingerprint",
+        "以 Adapter 協商版本而不改 base",
+        "不相容能力降級為 NOT_INSTALLED／HOLD"
+      ],
+      "sop": "讀取環境→建立差異矩陣→選兼容 Adapter→重跑 contract test。"
+    },
+    {
+      "breakers": [
+        "atomic write",
+        "new run directory",
+        "manifest commit last"
+      ],
+      "cause": "多檔輸出中途失敗，舊檔與新檔混合成不可判定狀態。",
+      "default_action": "HOLD",
+      "detectors": [
+        "temporary file residue",
+        "manifest completeness",
+        "output hash set"
+      ],
+      "name": "部分寫入造成半成品",
+      "never_again_control": "未有完整 manifest 的 run 不可被 Registry 啟用。",
+      "rank": 9,
+      "repair_lane": "SEQUENTIAL_ONLY",
+      "risk_id": "HYDRA-F09",
+      "severity": "CRITICAL",
+      "solutions": [
+        "所有檔案先寫 temporary 再 replace",
+        "每次建立全新 run 目錄",
+        "最後才寫完整 manifest seal"
+      ],
+      "sop": "標記 run incomplete→隔離半成品→從 checkpoint 重建→驗五檔後 seal。"
+    },
+    {
+      "breakers": [
+        "bounded retry",
+        "exponential backoff",
+        "circuit breaker"
+      ],
+      "cause": "多個 worker 對同一失敗同步無限重試，放大 API、CPU 與寫入壓力。",
+      "default_action": "HOLD",
+      "detectors": [
+        "retry budget",
+        "same-error frequency",
+        "backoff presence"
+      ],
+      "name": "無限重試與 Retry Storm",
+      "never_again_control": "任何 retry loop 必須有次數、退避與 breaker。",
+      "rank": 10,
+      "repair_lane": "PARALLEL_SAFE_PROPOSAL",
+      "risk_id": "HYDRA-F10",
+      "severity": "CRITICAL",
+      "solutions": [
+        "設定每 stage retry budget",
+        "加入 jitter exponential backoff",
+        "同錯誤達門檻開啟 circuit breaker"
+      ],
+      "sop": "開 breaker→停止 retry→彙整 root cause→人工決定是否重放。"
+    },
+    {
+      "breakers": [
+        "stage circuit breaker",
+        "bulkhead isolation",
+        "fallback router"
+      ],
+      "cause": "單一 Adapter 或服務失敗仍讓下游持續呼叫，形成連鎖故障。",
+      "default_action": "HOLD",
+      "detectors": [
+        "breaker registration",
+        "failure propagation map",
+        "downstream suppression"
+      ],
+      "name": "缺少 Circuit Breaker／故障擴散",
+      "never_again_control": "未登記 breaker 的外部 capability 不得啟用。",
+      "rank": 11,
+      "repair_lane": "SEQUENTIAL_ONLY",
+      "risk_id": "HYDRA-F11",
+      "severity": "CRITICAL",
+      "solutions": [
+        "每個外部 Adapter 登記 breaker",
+        "以 bulkhead 隔離失敗 lane",
+        "轉 deterministic fallback 或 HOLD"
+      ],
+      "sop": "隔離故障 stage→停止下游→啟用 fallback→post-scan。"
+    },
+    {
+      "breakers": [
+        "size gate",
+        "bounded queue",
+        "chunked processing"
+      ],
+      "cause": "讀入超大檔、無界 queue 或一次 materialize 全部資料造成 OOM／卡死。",
+      "default_action": "HOLD",
+      "detectors": [
+        "input byte cap",
+        "queue capacity",
+        "memory watermark"
+      ],
+      "name": "輸入、佇列或記憶體無上限",
+      "never_again_control": "所有 input、queue、batch 必須有硬上限。",
+      "rank": 12,
+      "repair_lane": "PARALLEL_SAFE_PROPOSAL",
+      "risk_id": "HYDRA-F12",
+      "severity": "HIGH",
+      "solutions": [
+        "輸入先過 byte-size Gate",
+        "改用固定容量 queue",
+        "分塊處理並寫 checkpoint"
+      ],
+      "sop": "停止 intake→保留 checkpoint→縮小 chunk→按順序恢復。"
+    },
+    {
+      "breakers": [
+        "detect-only policy",
+        "lane environment",
+        "no PATH mutation"
+      ],
+      "cause": "工具自動 pip/npm/PowerShell install 至 base，導致既有引擎相依衝突。",
+      "default_action": "HOLD",
+      "detectors": [
+        "install command scan",
+        "base environment fingerprint",
+        "PATH mutation"
+      ],
+      "name": "依賴安裝污染 Base",
+      "never_again_control": "Base installation policy 固定為 DENIED。",
+      "rank": 13,
+      "repair_lane": "PARALLEL_SAFE_PROPOSAL",
+      "risk_id": "HYDRA-F13",
+      "severity": "HIGH",
+      "solutions": [
+        "工具只偵測不自動安裝",
+        "JavaScript／PowerShell 使用專屬 lane",
+        "缺少時使用 fallback 並標 NOT_INSTALLED"
+      ],
+      "sop": "阻擋 install→比較 base fingerprint→隔離提案→重新測試。"
+    },
+    {
+      "breakers": [
+        "AST-only inspection",
+        "no-import rule",
+        "main guard requirement"
+      ],
+      "cause": "掃描模組時 import 即啟動網路、程序、寫檔、排程或 DB。",
+      "default_action": "HOLD",
+      "detectors": [
+        "AST no-import scan",
+        "top-level side-effect scan",
+        "entrypoint guard"
+      ],
+      "name": "Import／載入時產生副作用",
+      "never_again_control": "治理掃描不得 import 被掃模組。",
+      "rank": 14,
+      "repair_lane": "SEQUENTIAL_ONLY",
+      "risk_id": "HYDRA-F14",
+      "severity": "CRITICAL",
+      "solutions": [
+        "盤點只用 AST／文字解析",
+        "副作用移入具名函式",
+        "entrypoint 必須受 main guard 與核准 token 控制"
+      ],
+      "sop": "禁止 import→AST 定位 top-level call→產生候選修正→隔離測試。"
+    },
+    {
+      "breakers": [
+        "network default blocked",
+        "request coalescing",
+        "rate limiter"
+      ],
+      "cause": "每筆資料或每個 worker 各自發送請求，造成限流、成本與重複資料。",
+      "default_action": "HOLD",
+      "detectors": [
+        "network call count",
+        "request dedup key",
+        "rate-limit policy"
+      ],
+      "name": "外部 API／網路 Fan-out",
+      "never_again_control": "未有 rate limit／dedup／cache 的 API capability 不得啟用。",
+      "rank": 15,
+      "repair_lane": "PARALLEL_SAFE_PROPOSAL",
+      "risk_id": "HYDRA-F15",
+      "severity": "HIGH",
+      "solutions": [
+        "預設封鎖網路並用 fixture",
+        "依 request key 去重合併",
+        "使用 bounded rate limiter 與 checkpoint"
+      ],
+      "sop": "關閉 network lane→彙整 request keys→去重→核准後小批重放。"
+    },
+    {
+      "breakers": [
+        "DB write locked",
+        "transaction rollback",
+        "upsert grain gate"
+      ],
+      "cause": "重跑造成重複列、半交易或跨表不一致。",
+      "default_action": "HOLD",
+      "detectors": [
+        "transaction boundary",
+        "idempotency key",
+        "grain uniqueness"
+      ],
+      "name": "DB 寫入缺少交易與冪等",
+      "never_again_control": "沒有 transaction 與 idempotency key 不得寫 DB。",
+      "rank": 16,
+      "repair_lane": "SEQUENTIAL_ONLY",
+      "risk_id": "HYDRA-F16",
+      "severity": "CRITICAL",
+      "solutions": [
+        "預設鎖定 DB write",
+        "每批使用 transaction 與 rollback",
+        "以 run_id + grain 建立 idempotency key"
+      ],
+      "sop": "停止 DB writer→驗 grain／duplicate→rollback incomplete batch→dry-run replay。"
+    },
+    {
+      "breakers": [
+        "source integrity gate",
+        "append-only audit",
+        "runtime copy only"
+      ],
+      "cause": "來源在測試、轉換或修復前後 hash 不一致，或稽核鏈中斷。",
+      "default_action": "HOLD",
+      "detectors": [
+        "before-after hash",
+        "audit chain verification",
+        "unexpected mtime"
+      ],
+      "name": "Canonical Hash／Audit Chain 破裂",
+      "never_again_control": "每次 stage 前後都必須驗證 canonical hash。",
+      "rank": 17,
+      "repair_lane": "SEQUENTIAL_ONLY",
+      "risk_id": "HYDRA-F17",
+      "severity": "CRITICAL",
+      "solutions": [
+        "立即 HOLD 並禁止啟用",
+        "保存差異與最後有效 hash",
+        "只從已驗證 canonical 重建 Runtime Copy"
+      ],
+      "sop": "凍結來源→驗 hash chain→找第一個斷點→人工復原。"
+    },
+    {
+      "breakers": [
+        "candidate-only",
+        "human approval",
+        "equivalence gate"
+      ],
+      "cause": "AI 或自動修復器未經等價測試便覆寫 canonical。",
+      "default_action": "HOLD",
+      "detectors": [
+        "candidate provenance",
+        "direct-apply flag",
+        "equivalence evidence"
+      ],
+      "name": "AI／Auto-fix 直接套用來源",
+      "never_again_control": "AI direct_apply 永遠為 DENIED。",
+      "rank": 18,
+      "repair_lane": "SEQUENTIAL_ONLY",
+      "risk_id": "HYDRA-F18",
+      "severity": "CRITICAL",
+      "solutions": [
+        "所有結果只輸出 proposal",
+        "比較 API／fixture／hash 等價性",
+        "核准後仍只提交單一可回復變更"
+      ],
+      "sop": "撤銷 direct apply→保存 candidate→跑等價測試→人工 review。"
+    },
+    {
+      "breakers": [
+        "rollback-ready gate",
+        "pre-change snapshot",
+        "restore verification"
+      ],
+      "cause": "修復前沒有快照、manifest、備份或回復驗證。",
+      "default_action": "HOLD",
+      "detectors": [
+        "rollback artifact exists",
+        "last-known-good hash",
+        "restore dry-run"
+      ],
+      "name": "無可用 Rollback／Last-known-good",
+      "never_again_control": "rollback_ready=false 時禁止任何真實寫入。",
+      "rank": 19,
+      "repair_lane": "SEQUENTIAL_ONLY",
+      "risk_id": "HYDRA-F19",
+      "severity": "CRITICAL",
+      "solutions": [
+        "變更前建立 Runtime Copy snapshot",
+        "保存 last-known-good manifest",
+        "先做 restore dry-run 才允許提案進下一 Gate"
+      ],
+      "sop": "停止變更→建立現況 evidence→尋找最後有效 seal→只在 sandbox 驗回復。"
+    },
+    {
+      "breakers": [
+        "activation hard gate",
+        "three-round maximum",
+        "review-only default"
+      ],
+      "cause": "只看單元測試或修復成功訊息，未跑 post-scan、user-test、Hydra Gate 即啟用。",
+      "default_action": "HOLD",
+      "detectors": [
+        "activation evidence set",
+        "post-scan timestamp",
+        "gate dependency"
+      ],
+      "name": "未完成 Post-test 就 Activation",
+      "never_again_control": "缺少任一必需 Gate 時 activation_state 必須為 HOLD。",
+      "rank": 20,
+      "repair_lane": "SEQUENTIAL_ONLY",
+      "risk_id": "HYDRA-F20",
+      "severity": "CRITICAL",
+      "solutions": [
+        "Activation 必須依賴 Hydra/self/user/recovery 全部 PASS",
+        "每輪修復後重新全景掃描",
+        "最多三輪；剩餘高風險改 HOLD／人工處理"
+      ],
+      "sop": "撤回 activation→補齊證據→依序跑 post-scan/user-test/Hydra Gate→再裁決。"
+    }
+  ]
+}

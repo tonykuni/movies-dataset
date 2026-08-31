@@ -25,6 +25,16 @@ param(
     [switch]$NoPromote,
     [switch]$NoPush
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Continue"
 $WorkOps = Join-Path $RepoRoot "functional modules\WorkOps"
 $Engines = Join-Path $WorkOps "engines"
@@ -191,10 +201,3 @@ $Steps | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $stage "s
 Write-Host ("[總結] GapFill Stage-2 {0}(報告:{1})" -f $(if ($bad -eq 0) { "PASS" } else { "FAIL($bad)" }), (Join-Path $stage "stage2_report.json")) -ForegroundColor $(if ($bad -eq 0) { "Green" } else { "Red" })
 if ($bad -eq 0) { exit 0 } else { exit 1 }
 
-# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
-# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
-# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
-# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
-# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
-# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
-# ===== [VIA:PS-ACCEL:END] =====

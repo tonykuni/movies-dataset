@@ -6,6 +6,16 @@ Invoke-VIA-One v0100 — 最終整合版總啟動器(依 VIA_MegaPrompt_Official
 不關閉、不阻塞、不卡斷:無 Read-Host、無 exit;UI 以 Start-Process 非阻塞開啟;
 每階段動態進度條(Write-Progress)+ 動態說明;單一階段失敗誠實記錄後續行。
 #>
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Continue"
 $Root = $PSScriptRoot
 $Bin = Join-Path $Root "bin"
@@ -60,10 +70,3 @@ $Results | Format-Table -AutoSize
 $okN = ($Results | Where-Object 結果 -eq "OK").Count
 Write-Host ("[總結] {0}/{1} 階段 OK · Matrix/儀表板/UI Hub 已非阻塞開啟 · PowerShell 保持開啟" -f $okN, $total) -ForegroundColor Green
 
-# ===== [VIA:PS-ACCEL:v0100] 20 加速器導入註記(批102 令;零執行純註解) =====
-# 本檔已登記導入 VIA 20 加速器冊(01 AST/02 語意/03 Hydra/04 拓撲/05 沙盒/
-# 06 修正建議/07 全景/08 SSOT/09 矩陣/10 分群/11 性能/12 同步/13 回滾/
-# 14 覆蓋率/15 排程/16 進度條/17 說明/18 非阻塞/19 多引擎/20 部署)。
-# 實體模組:supportive modules\VIA_PS_Accel_Module.ps1(dot-source 取用
-# Invoke-VIAGuarded/Write-VIAProgress/Invoke-VIAParallel/$VIA_ACCEL20)。
-# ===== [VIA:PS-ACCEL:END] =====

@@ -4,6 +4,16 @@
 # 實體承接:VIA_PS_Accel_Module.ps1($VIA_ACCEL20+三原語)。
 # =====================================================================
 
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $Accelerators = @(
     # --- 原生 15 個分析、修正與治理加速器 ---
     "01. AST 精準解析加速器 (AST Precision Parser Accelerator)",
