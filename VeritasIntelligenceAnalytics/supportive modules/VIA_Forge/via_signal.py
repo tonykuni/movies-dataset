@@ -12,6 +12,20 @@ VIA Signal  ——  via_signal.py   (\u865f \u00b7 \u4fe1\u4ef6\u72c0\u614b\u71c
 \u5370\u5ea6\u4e8b\u52d9\u4e00\u51fa\u73fe\u7acb\u5373\u7d05\u71c8\u6700\u9ad8\u7d1a\u3002
 ================================================================================
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 import os, sys, re, hashlib
 from datetime import datetime, timezone
 

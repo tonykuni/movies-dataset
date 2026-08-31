@@ -54,6 +54,16 @@ param(
 
     [int]$Days = 14
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 
 $Script:APP_VERSION = "v001"
 if ([string]::IsNullOrWhiteSpace($Root)) { $Root = (Get-Location).Path }
@@ -755,3 +765,4 @@ if ($MyInvocation.InvocationName -ne '.') {
         Write-Host (">> 發生未預期錯誤:{0}" -f $_.Exception.Message) -ForegroundColor Red
     }
 }
+

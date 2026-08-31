@@ -9,6 +9,16 @@ Invoke-VIA-EnvFix v0100 — EnvManager 決策式無衝突安裝(Mega parquet/ric
 安裝目標=py 基底(bin\*.cmd 的實際執行器);受保護 venv(via_core 等)一律不碰。
 #>
 param([string[]]$Packages = @("duckdb", "rich", "scipy", "numpy", "pandas"))
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Continue"
 $VIA = $PSScriptRoot
 $RunDir = Join-Path $VIA "VIA_Reports\envmgr_run"
@@ -63,3 +73,4 @@ $Results | Format-Table -AutoSize
 $okN = ($Results | Where-Object { $_.結果 -like "OK*" -or $_.結果 -like "APPROVED*" }).Count
 Write-Host ("[總結] {0}/{1} 項通過 · 決策/輸出留痕 VIA_Reports\envmgr_run(run-local 不入庫)" -f $okN, $Results.Count) -ForegroundColor Green
 Write-Host "[後續] via-mega(parquet+rich 滿配)· via-fis(scipy 就緒)" -ForegroundColor DarkGray
+

@@ -1,0 +1,83 @@
+schema: VIA_ACCELERATED_INTEGRATION_CONFIG_V1
+engine_id: VIA_ACCELERATED_INTEGRATION_ENGINE_V0139A
+version: v0139A
+policy:
+  mother_root_scope: TOP_LEVEL_INVENTORY_ONLY
+  canonical_policy: APPEND_ONLY_NO_OVERWRITE
+  activation_scope: LAUNCHER_ONLY_NO_CANONICAL_RUNTIME
+  default_network: DENY
+  base_registry_writes: 0
+  maximum_analysis_rounds: 3
+  high_hydra_action: FAIL_CLOSED
+  existing_v0138d_owner_mutation: 0
+components:
+  - component_id: VIA_VAP_Integration_Update_Engine_v0139A
+    canonical_source: engine/via_vap_update_engine_v0139a.py
+    subsystem: VAP
+    order: 5
+  - component_id: VIA_Flow_Simulation_Engine_v0139A
+    canonical_source: engine/via_flow_simulation_engine_v0139a.py
+    subsystem: VDF_VAP
+    order: 4
+  - component_id: VIA_TW_Stock_Group_Classification_Engine_v0139A
+    canonical_source: engine/via_stock_group_classification_engine_v0139a.py
+    subsystem: VDF
+    order: 1
+  - component_id: VIA_TW_Group_Index_Engine_v0139A
+    canonical_source: engine/via_group_index_engine_v0139a.py
+    subsystem: VDF_VAP
+    order: 2
+  - component_id: VIA_TW_Monthly_Revenue_Analysis_Engine_v0139A
+    canonical_source: engine/via_monthly_revenue_analysis_engine_v0139a.py
+    subsystem: VDF_VAP
+    order: 3
+data_contract:
+  price_basis: Adj Close
+  group_index_base: 100
+  group_index_weighting: equal
+  price_blank_policy: PREVIOUS_TRADING_DAY
+  volume_blank_policy: ZERO_WITH_MISSING_FLAG_NO_FORWARD_FILL
+  output_date_format: YYYY/MM/DD
+  chart_date_format: YYYY-MM-DD
+  csv_encoding: UTF-8-SIG
+  parquet_required_for_activation: true
+  duplicate_key_policy: LAST_OBSERVATION_WITH_EVIDENCE
+  taxonomy_hydra_policy: MULTIPLE_SEMANTIC_OWNER_FAIL_CLOSED
+vap_visual_lock:
+  header_line_1: VERITAS INTELLIGENCE ANALYTICS
+  header_line_2: DISCIPLINA • PRUDENTIA • INTEGRITAS
+  header_line_3: AI-Powered Research & Decision Intelligence Platform
+  red_seal: 理
+  font_stack: Inter / Noto Sans TC / DM Mono
+  palettes: Navy / Teal / Gold / Red
+  prohibited_palettes: Rainbow / Jet
+  small_font: true
+  auto_wrap: true
+  responsive_table: true
+outputs:
+  csv: true
+  parquet: true
+  json_evidence: true
+  html_matrix: true
+  sha256_manifest: true
+accelerators:
+  A01: AST Precision Analysis
+  A02: Multilingual Semantic Model
+  A03: Hydra Risk Prediction
+  A04: Dependency Topology
+  A05: Sandbox Isolation
+  A06: Auto-Fix Suggestion
+  A07: Three-Round Analysis
+  A08: SSOT Alignment
+  A09: Matrix Visualization
+  A10: Error Classification
+  A11: Performance And Complexity
+  A12: Multi-Subsystem Synchronization
+  A13: Version Diff And Rollback
+  A14: Coverage And Regression
+  A15: Fix-Order Optimization
+  A16: Dynamic Progress Bar
+  A17: Dynamic Status Narration
+  A18: Non-Blocking PowerShell
+  A19: Python PowerShell HTML Integration
+  A20: Auto-Deploy And Initialization

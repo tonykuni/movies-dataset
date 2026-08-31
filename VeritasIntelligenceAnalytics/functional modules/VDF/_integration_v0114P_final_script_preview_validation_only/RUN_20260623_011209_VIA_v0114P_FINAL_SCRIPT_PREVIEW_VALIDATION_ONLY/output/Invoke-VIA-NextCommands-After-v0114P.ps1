@@ -1,0 +1,12 @@
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
+Start-Process "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0114P_final_script_preview_validation_only\RUN_20260623_011209_VIA_v0114P_FINAL_SCRIPT_PREVIEW_VALIDATION_ONLY\report\VIA_v0114P_FinalScriptPreviewValidationOnly_Report.html" Start-Process "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0114P_final_script_preview_validation_only\RUN_20260623_011209_VIA_v0114P_FINAL_SCRIPT_PREVIEW_VALIDATION_ONLY\output" Start-Process "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0114P_final_script_preview_validation_only\RUN_20260623_011209_VIA_v0114P_FINAL_SCRIPT_PREVIEW_VALIDATION_ONLY\_final_script_preview_validation_only" Import-Csv "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0114P_final_script_preview_validation_only\RUN_20260623_011209_VIA_v0114P_FINAL_SCRIPT_PREVIEW_VALIDATION_ONLY\output\VIA_v0114P_ReadinessGate.csv" | Format-Table -AutoSize Import-Csv "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0114P_final_script_preview_validation_only\RUN_20260623_011209_VIA_v0114P_FINAL_SCRIPT_PREVIEW_VALIDATION_ONLY\output\VIA_v0114P_ValidationMatrix.csv" | Format-Table -AutoSize Import-Csv "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0114P_final_script_preview_validation_only\RUN_20260623_011209_VIA_v0114P_FINAL_SCRIPT_PREVIEW_VALIDATION_ONLY\_final_script_preview_validation_only\VIA_v0114P_PreviewValidationRows.csv" | Format-Table -AutoSize pwsh -NoProfile -NoExit -ExecutionPolicy Bypass -File "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_integration_v0114P_final_script_preview_validation_only\RUN_20260623_011209_VIA_v0114P_FINAL_SCRIPT_PREVIEW_VALIDATION_ONLY\output\Invoke-VIA-v0114Q-Precheck-After-v0114P.ps1" # Next: v0114Q final script seal only. # v0114P did not execute apply.
+

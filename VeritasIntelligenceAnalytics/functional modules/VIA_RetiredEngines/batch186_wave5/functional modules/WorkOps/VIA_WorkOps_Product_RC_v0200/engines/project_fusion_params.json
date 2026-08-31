@@ -1,0 +1,78 @@
+{
+  "version": "v0100",
+  "engine_id": "ENG-032",
+  "purpose": "Project Fusion Classifier: candidates only; every classification requires user confirmation.",
+  "weights": {
+    "confirmed_memory": 1.0,
+    "control_sheet": 0.95,
+    "product_code": 0.95,
+    "outlook_folder": 0.8,
+    "subject": 0.75,
+    "stakeholder": 0.55,
+    "attachment": 0.5,
+    "body": 0.4
+  },
+  "thresholds": {
+    "strong_candidate": 0.8,
+    "review_candidate": 0.45,
+    "quarantine_below": 0.25,
+    "top_n": 4
+  },
+  "product_code_patterns": [
+    "\\b[A-Z]{2,5}[-_ ]?\\d{3,10}\\b",
+    "\\b\\d{4,10}[-_][A-Z0-9]{2,10}\\b"
+  ],
+  "field_aliases": {
+    "subject": [
+      "Subject",
+      "subject"
+    ],
+    "body": [
+      "Body",
+      "BODY_SNIPPET",
+      "body",
+      "Snippet"
+    ],
+    "folder": [
+      "Folder",
+      "FolderPath",
+      "folder",
+      "folder_path"
+    ],
+    "sender": [
+      "SenderEmail",
+      "sender",
+      "From"
+    ],
+    "to": [
+      "To",
+      "to",
+      "ToList"
+    ],
+    "cc": [
+      "CC",
+      "Cc",
+      "cc"
+    ],
+    "conversation": [
+      "ConversationID",
+      "conversation_id",
+      "conv"
+    ],
+    "date": [
+      "EventDate",
+      "ReceivedTime",
+      "date"
+    ]
+  },
+  "files": {
+    "memory": "classification_memory.jsonl",
+    "project_registry": "project_registry.jsonl",
+    "candidate_output": "project_candidates.json"
+  },
+  "governance": {
+    "user_confirmation_required": true,
+    "auto_assign": false,
+    "immutable_existing_ids": true
+  }
+}

@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA MACRO DATA MAP / 分類</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f4f0;--bg1:#edecea;--bg2:#e5e3df;--sf:#fff;--sf2:#fafaf8;
+  --bd:#dbd9d3;--bd2:#ccc9c1;
+  --bl:#4c78a8;--bl-l:#d0e1f0;--bl-d:#3a5f8a;--tl:#439a9a;--tl-l:#c8e6e6;
+  --gn:#5a9e6f;--gn-l:#cde8d5;--am:#c4943a;--am-l:#f5e2b8;--co:#c96b5a;--co-l:#f5d0c8;
+  --vi:#7a6daa;--vi-l:#dcd8f0;--ro:#b05580;
+  --i0:#1e1d1a;--i1:#3d3c38;--i2:#6b6860;--i3:#9c9890;--i4:#c4c0b8;
+  --mo:'DM Mono',monospace;--sa:'DM Sans',system-ui,sans-serif;--display:var(--sa);
+  --r:5px;--r2:8px;--r3:12px;--sh:0 1px 3px rgba(0,0,0,.06);--sh2:0 4px 16px rgba(0,0,0,.10);
+  --ease:cubic-bezier(.22,.68,0,1.2);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--sa);background:var(--bg);color:var(--i0);font-size:11.5px;line-height:1.55;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
+.w{max-width:1280px;margin:0 auto;padding:10px 16px}
+.hdr{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r3);padding:12px 16px;margin-bottom:8px;position:relative;overflow:hidden;display:flex;align-items:center;gap:14px;box-shadow:var(--sh2)}
+.hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--bl),var(--tl),var(--vi),var(--am),var(--co),var(--gn));animation:hs 8s linear infinite;background-size:200% 100%}
+@keyframes hs{0%{background-position:0%}100%{background-position:200%}}
+.logo-wrap{width:42px;height:42px;flex-shrink:0;background:linear-gradient(135deg,#1e3a5f,var(--vi));border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(76,120,168,.35);color:#fff;font-family:var(--mo);font-weight:500;font-size:13px}
+.hdr-titles{flex:1}
+.hdr-title{font-family:var(--display);font-size:17px;font-weight:700;letter-spacing:-.5px}
+.hdr-title span{color:var(--bl)}
+.hdr-sub{font-size:9.5px;color:var(--i3);font-family:var(--mo);margin-top:2px}
+.legend{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-family:var(--mo);font-size:9px;color:var(--i2)}
+.pt{display:flex;gap:2px;padding:0 2px;overflow-x:auto}
+.pt::-webkit-scrollbar{height:0}
+.pt button{padding:8px 16px;border:1px solid var(--bd);border-radius:var(--r2) var(--r2) 0 0;border-bottom:2px solid transparent;background:var(--bg1);color:var(--i2);font:600 10.5px var(--sa);cursor:pointer;transition:.15s;white-space:nowrap}
+.pt button.on{background:var(--sf);color:var(--bl);border-bottom-color:var(--bl);box-shadow:0 -2px 8px rgba(76,120,168,.08)}
+.pt button:hover:not(.on){background:var(--bg2);color:var(--i1)}
+.pt button .key{font-family:var(--mo);font-size:8px;color:var(--i3);margin-right:5px}
+.pt button.on .key{color:var(--bl)}
+.pg{display:none;background:var(--sf);border:1px solid var(--bd);border-radius:0 var(--r2) var(--r2) var(--r2);padding:14px 16px;animation:pgin .18s var(--ease)}
+.pg.on{display:block}
+@keyframes pgin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.lei{background:linear-gradient(135deg,var(--bl-l),var(--sf2));border:1px solid var(--bd);border-left:3px solid var(--bl);border-radius:var(--r2);padding:10px 14px;margin-bottom:12px}
+.lei-t{font-family:var(--mo);font-size:9px;color:var(--bl);font-weight:500;letter-spacing:.04em;margin-bottom:3px}
+.lei-b{font-size:11px;color:var(--i1);line-height:1.6}
+.lei-note{font-size:9.5px;color:var(--co);margin-top:5px;font-family:var(--mo)}
+.timing-sec{margin-bottom:14px}
+.ts-h{font-family:var(--display);font-weight:700;font-size:12px;margin:0 0 6px;display:flex;align-items:center;gap:7px;padding-bottom:4px;border-bottom:1px solid var(--bd)}
+.cd{background:var(--sf);border:1px solid var(--bd);border-radius:var(--r2);margin-bottom:8px;overflow:hidden;transition:.15s}
+.cd:hover{box-shadow:var(--sh)}
+.cd-h{display:flex;align-items:center;gap:8px;padding:7px 12px;border-bottom:1px solid var(--bd);background:var(--sf2)}
+.cd-t{font-weight:600;font-size:11px;flex:1}
+.mx{width:100%;border-collapse:collapse;font-size:10px}
+.mx th{background:var(--bg1);padding:4px 8px;text-align:left;font-weight:600;color:var(--i2);border-bottom:2px solid var(--bd);white-space:nowrap}
+.mx td{padding:4px 8px;border-bottom:1px solid var(--bd);vertical-align:top}
+.mx tr:hover td{background:rgba(76,120,168,.04)}
+.mono{font-family:var(--mo);font-size:9.5px;color:var(--i1)}
+.note{color:var(--i3);font-size:9.5px}
+.bd{display:inline-block;padding:1px 7px;border-radius:10px;font-family:var(--mo);font-size:8.5px;font-weight:500;white-space:nowrap}
+.bd.L{background:var(--bl-l);color:var(--bl)}
+.bd.C{background:var(--tl-l);color:var(--tl)}
+.bd.G{background:var(--am-l);color:var(--am)}
+.bd.P{background:var(--vi-l);color:var(--vi)}
+.ft{text-align:center;font-family:var(--mo);font-size:8.5px;color:var(--i3);padding:14px 0 8px;border-top:1px solid var(--bd);margin-top:10px}
+</style>
+</head>
+<body>
+<div class="w">
+  <div class="hdr">
+    <div class="logo-wrap">M</div>
+    <div class="hdr-titles">
+      <div class="hdr-title">VIA <span>MACRO DATA MAP / 分類</span> <span style="color:var(--i3);font-size:11px;font-weight:400">v1</span></div>
+      <div class="hdr-sub" id="sub"></div>
+    </div>
+    <div class="legend" id="legend"></div>
+  </div>
+  <div class="pt" id="tabs"></div>
+  <div id="pages"></div>
+  <div class="ft" id="ft"></div>
+</div>
+<script>
+const REG = {
+  "registry": "VIA_Macro_Indicator_Registry",
+  "version": "v1",
+  "anchor": "AST-PS-MOD-VIA-MACRO-REG-001",
+  "philosophy": "append-only · immutable · 先領先後歷史 (leading-first, lagging-verifies)",
+  "timing": {
+    "L": { "zh": "領先", "en": "Leading",    "role": "主訊號" },
+    "C": { "zh": "同步", "en": "Coincident", "role": "現況" },
+    "G": { "zh": "落後", "en": "Lagging",    "role": "驗證" },
+    "P": { "zh": "政策", "en": "Policy",     "role": "央行/財政決策" }
+  },
+  "freq": { "D": "日", "W": "週", "M": "月", "Q": "季", "A": "年" },
+  "code_rule": "US=FRED series ID(已確認);非美區欄位標來源機構,精確代碼待接資料源時確認;不臆造代碼。",
+  "regions": [
+    {
+      "code": "US", "name": "美國 United States", "src": "FRED (St. Louis Fed)",
+      "lei": "Conference Board LEI / CEI / LAG（10 成分）· OECD CLI = USALOLITONOSTSAM · Chicago Fed CFNAI · StL Fed Financial Stress = STLFSI4",
+      "blocks": [
+        { "cat": "PMI 商業景氣", "t": "L", "items": [
+          { "n": "ISM Manufacturing PMI", "code": "ISM(專屬)", "t": "L", "f": "M", "note": "50=榮枯線;新訂單分項最領先" },
+          { "n": "ISM Services PMI", "code": "ISM(專屬)", "t": "L", "f": "M", "note": "" },
+          { "n": "S&P Global US Mfg/Svc/Comp PMI", "code": "S&P Global", "t": "L", "f": "M", "note": "" },
+          { "n": "Regional Fed Surveys（Philly/Empire/Dallas/KC）", "code": "GACDISA066MSFRBPHI 等", "t": "L", "f": "M", "note": "FRED 可得之 PMI 替代" }
+        ]},
+        { "cat": "股票指數 Equities", "t": "L", "items": [
+          { "n": "S&P 500", "code": "SP500", "t": "L", "f": "D", "note": "Conference Board LEI 成分" },
+          { "n": "NASDAQ Composite", "code": "NASDAQCOM", "t": "L", "f": "D", "note": "" },
+          { "n": "Dow Jones Industrial", "code": "DJIA", "t": "L", "f": "D", "note": "" },
+          { "n": "Wilshire 5000", "code": "WILL5000IND", "t": "L", "f": "D", "note": "全市場" },
+          { "n": "VIX", "code": "VIXCLS", "t": "L", "f": "D", "note": "波動/風險" }
+        ]},
+        { "cat": "房地產景氣 Housing", "t": "L", "items": [
+          { "n": "Building Permits", "code": "PERMIT", "t": "L", "f": "M", "note": "LEI 成分,最領先" },
+          { "n": "Housing Starts", "code": "HOUST", "t": "L", "f": "M", "note": "" },
+          { "n": "NAHB Housing Market Index", "code": "NAHB", "t": "L", "f": "M", "note": "建商信心" },
+          { "n": "New Home Sales", "code": "HSN1F", "t": "L", "f": "M", "note": "" },
+          { "n": "Existing Home Sales", "code": "EXHOSLUSM495S", "t": "C", "f": "M", "note": "" },
+          { "n": "Case-Shiller Home Price", "code": "CSUSHPINSA", "t": "G", "f": "M", "note": "價格落後" },
+          { "n": "30Y Mortgage Rate", "code": "MORTGAGE30US", "t": "L", "f": "W", "note": "需求前瞻" }
+        ]},
+        { "cat": "耐久財/資本財 Durable & Capex", "t": "L", "items": [
+          { "n": "Durable Goods New Orders", "code": "DGORDER", "t": "L", "f": "M", "note": "" },
+          { "n": "Core Capex（非國防資本財 ex-air）", "code": "NEWORDER", "t": "L", "f": "M", "note": "企業投資前瞻" },
+          { "n": "Mfrs New Orders（LEI 成分）", "code": "AMTMNO", "t": "L", "f": "M", "note": "" },
+          { "n": "Avg Weekly Hours Mfg", "code": "AWHMAN", "t": "L", "f": "M", "note": "LEI 成分" }
+        ]},
+        { "cat": "就業 Employment", "t": "C", "items": [
+          { "n": "Nonfarm Payrolls", "code": "PAYEMS", "t": "C", "f": "M", "note": "同步主指標" },
+          { "n": "Employment-Population Ratio", "code": "EMRATIO", "t": "C", "f": "M", "note": "" },
+          { "n": "Labor Force Participation", "code": "CIVPART", "t": "C", "f": "M", "note": "" },
+          { "n": "JOLTS Job Openings", "code": "JTSJOL", "t": "L", "f": "M", "note": "偏領先" },
+          { "n": "ADP Private Payrolls", "code": "ADPMNUSNERSA", "t": "C", "f": "M", "note": "" }
+        ]},
+        { "cat": "投資/工業 Investment & Industry", "t": "C", "items": [
+          { "n": "Industrial Production", "code": "INDPRO", "t": "C", "f": "M", "note": "CEI 同步成分" },
+          { "n": "Capacity Utilization", "code": "TCU", "t": "C", "f": "M", "note": "" },
+          { "n": "Gross Private Domestic Investment", "code": "GPDI", "t": "C", "f": "Q", "note": "" },
+          { "n": "Real GDP", "code": "GDPC1", "t": "C", "f": "Q", "note": "" },
+          { "n": "Real Personal Income ex-Transfer", "code": "W875RX1", "t": "C", "f": "M", "note": "CEI 成分" }
+        ]},
+        { "cat": "進出口 Trade", "t": "C", "items": [
+          { "n": "Trade Balance（goods & svc）", "code": "BOPGSTB", "t": "C", "f": "M", "note": "" },
+          { "n": "Exports", "code": "EXPGS", "t": "C", "f": "Q", "note": "" },
+          { "n": "Imports", "code": "IMPGS", "t": "C", "f": "Q", "note": "" },
+          { "n": "Advance Intl Trade in Goods", "code": "BOPGTB", "t": "C", "f": "M", "note": "搶先發布" }
+        ]},
+        { "cat": "政府支出 Gov Spending", "t": "C", "items": [
+          { "n": "Gov Consumption & Investment", "code": "GCE", "t": "C", "f": "Q", "note": "" },
+          { "n": "Federal Current Expenditures", "code": "FGEXPND", "t": "C", "f": "Q", "note": "" },
+          { "n": "State & Local Expenditures", "code": "SLEXPND", "t": "C", "f": "Q", "note": "" }
+        ]},
+        { "cat": "通膨 Inflation", "t": "G", "items": [
+          { "n": "CPI Headline", "code": "CPIAUCSL", "t": "G", "f": "M", "note": "" },
+          { "n": "Core CPI", "code": "CPILFESL", "t": "G", "f": "M", "note": "" },
+          { "n": "PCE Price Index", "code": "PCEPI", "t": "G", "f": "M", "note": "" },
+          { "n": "Core PCE（Fed 目標）", "code": "PCEPILFE", "t": "G", "f": "M", "note": "Fed 2% 錨" },
+          { "n": "PPI", "code": "PPIFIS", "t": "G", "f": "M", "note": "" },
+          { "n": "5Y/10Y Breakeven", "code": "T5YIE / T10YIE", "t": "L", "f": "D", "note": "市場通膨預期" },
+          { "n": "5y5y Forward Inflation", "code": "T5YIFR", "t": "L", "f": "D", "note": "" },
+          { "n": "UMich Inflation Expectations", "code": "MICH", "t": "L", "f": "M", "note": "" }
+        ]},
+        { "cat": "失業 Unemployment", "t": "G", "items": [
+          { "n": "Unemployment Rate", "code": "UNRATE", "t": "G", "f": "M", "note": "" },
+          { "n": "U-6 Underemployment", "code": "U6RATE", "t": "G", "f": "M", "note": "" },
+          { "n": "Initial Jobless Claims", "code": "ICSA", "t": "L", "f": "W", "note": "LEI 成分,最領先" },
+          { "n": "Continued Claims", "code": "CCSA", "t": "L", "f": "W", "note": "" },
+          { "n": "Avg Duration Unemployment", "code": "UEMPMEAN", "t": "G", "f": "M", "note": "LAG 成分" }
+        ]},
+        { "cat": "財政 Fiscal Balance", "t": "G", "items": [
+          { "n": "Federal Surplus/Deficit（月）", "code": "MTSDS133FMS", "t": "G", "f": "M", "note": "" },
+          { "n": "Federal Surplus/Deficit（年）", "code": "FYFSD", "t": "G", "f": "A", "note": "" },
+          { "n": "Federal Debt Total", "code": "GFDEBTN", "t": "G", "f": "Q", "note": "" },
+          { "n": "Debt/GDP", "code": "GFDEGDQ188S", "t": "G", "f": "Q", "note": "" }
+        ]},
+        { "cat": "央行策略 Fed Policy", "t": "P", "items": [
+          { "n": "Fed Funds Target Upper/Lower", "code": "DFEDTARU / DFEDTARL", "t": "P", "f": "D", "note": "" },
+          { "n": "Effective Fed Funds", "code": "FEDFUNDS / DFF", "t": "P", "f": "M/D", "note": "" },
+          { "n": "SOFR", "code": "SOFR", "t": "P", "f": "D", "note": "" },
+          { "n": "Fed Balance Sheet（total assets）", "code": "WALCL", "t": "P", "f": "W", "note": "QE/QT" },
+          { "n": "Reserve Balances", "code": "WRESBAL", "t": "P", "f": "W", "note": "" },
+          { "n": "Yield Curve 10Y-2Y / 10Y-3M", "code": "T10Y2Y / T10Y3M", "t": "L", "f": "D", "note": "衰退訊號" },
+          { "n": "SEP Dot Plot", "code": "Fed SEP", "t": "P", "f": "Q", "note": "質化前瞻" }
+        ]},
+        { "cat": "財政收支 Fiscal Rev/Exp", "t": "G", "items": [
+          { "n": "Federal Receipts", "code": "FGRECPT", "t": "G", "f": "Q", "note": "" },
+          { "n": "Federal Outlays", "code": "FGEXPND", "t": "G", "f": "Q", "note": "" },
+          { "n": "Monthly Treasury Statement", "code": "Treasury MTS", "t": "G", "f": "M", "note": "" },
+          { "n": "Net Interest Outlays", "code": "A091RC1Q027SBEA", "t": "G", "f": "Q", "note": "利息支出" }
+        ]}
+      ]
+    },
+
+    {
+      "code": "EU", "name": "歐盟/歐元區 EU / Eurozone", "src": "Eurostat · ECB SDW · EU Commission",
+      "lei": "EU-Commission Economic Sentiment Indicator (ESI) · OECD CLI(EA)· ZEW / ifo(德國,最領先)· Sentix",
+      "blocks": [
+        { "cat": "PMI 商業景氣", "t": "L", "items": [
+          { "n": "HCOB/S&P Global Eurozone Mfg/Svc/Comp PMI", "code": "S&P Global", "t": "L", "f": "M", "note": "" },
+          { "n": "ifo Business Climate（德）", "code": "ifo", "t": "L", "f": "M", "note": "歐元區領頭" },
+          { "n": "ZEW Expectations（德）", "code": "ZEW", "t": "L", "f": "M", "note": "最領先情緒" }
+        ]},
+        { "cat": "股票指數 Equities", "t": "L", "items": [
+          { "n": "Euro Stoxx 50 / STOXX 600", "code": "STOXX", "t": "L", "f": "D", "note": "" },
+          { "n": "DAX / CAC 40 / FTSE MIB", "code": "交易所", "t": "L", "f": "D", "note": "成員國" }
+        ]},
+        { "cat": "房地產景氣 Housing", "t": "L", "items": [
+          { "n": "House Price Index", "code": "Eurostat", "t": "G", "f": "Q", "note": "價格落後" },
+          { "n": "Construction Output / Permits", "code": "Eurostat", "t": "L", "f": "M", "note": "" },
+          { "n": "ECB Bank Lending Survey", "code": "ECB", "t": "L", "f": "Q", "note": "信用前瞻" }
+        ]},
+        { "cat": "耐久財/工業 Industry & Orders", "t": "L", "items": [
+          { "n": "Industrial New Orders", "code": "Eurostat", "t": "L", "f": "M", "note": "" },
+          { "n": "Industrial Production", "code": "Eurostat", "t": "C", "f": "M", "note": "" }
+        ]},
+        { "cat": "就業 Employment", "t": "C", "items": [
+          { "n": "Employment（QNA）", "code": "Eurostat", "t": "C", "f": "Q", "note": "" }
+        ]},
+        { "cat": "投資 Investment", "t": "C", "items": [
+          { "n": "GFCF（固定資本形成）", "code": "Eurostat", "t": "C", "f": "Q", "note": "" },
+          { "n": "Real GDP", "code": "Eurostat", "t": "C", "f": "Q", "note": "" }
+        ]},
+        { "cat": "進出口 Trade", "t": "C", "items": [
+          { "n": "Trade Balance / Exports / Imports", "code": "Eurostat", "t": "C", "f": "M", "note": "" }
+        ]},
+        { "cat": "政府支出 Gov Spending", "t": "C", "items": [
+          { "n": "Gov Final Consumption", "code": "Eurostat", "t": "C", "f": "Q", "note": "" }
+        ]},
+        { "cat": "通膨 Inflation", "t": "G", "items": [
+          { "n": "HICP Headline", "code": "Eurostat HICP", "t": "G", "f": "M", "note": "ECB 目標基準" },
+          { "n": "Core HICP", "code": "Eurostat", "t": "G", "f": "M", "note": "" },
+          { "n": "PPI", "code": "Eurostat", "t": "G", "f": "M", "note": "" },
+          { "n": "5y5y Inflation Swap", "code": "市場", "t": "L", "f": "D", "note": "ECB 緊盯預期" }
+        ]},
+        { "cat": "失業 Unemployment", "t": "G", "items": [
+          { "n": "Unemployment Rate", "code": "Eurostat", "t": "G", "f": "M", "note": "" }
+        ]},
+        { "cat": "財政 Fiscal Balance", "t": "G", "items": [
+          { "n": "Deficit/GDP（Maastricht）", "code": "Eurostat", "t": "G", "f": "Q/A", "note": "3% 上限" },
+          { "n": "Debt/GDP", "code": "Eurostat", "t": "G", "f": "Q", "note": "60% 參考" }
+        ]},
+        { "cat": "央行策略 ECB Policy", "t": "P", "items": [
+          { "n": "Deposit Facility Rate（2024 後主操作利率）", "code": "ECB", "t": "P", "f": "事件", "note": "主導利率" },
+          { "n": "MRO / Marginal Lending Rate", "code": "ECB", "t": "P", "f": "事件", "note": "2024 框架價差收斂 15bp" },
+          { "n": "APP / PEPP 餘額 · TLTRO", "code": "ECB", "t": "P", "f": "M", "note": "QE/QT" }
+        ]},
+        { "cat": "財政收支 Fiscal Rev/Exp", "t": "G", "items": [
+          { "n": "Gov Revenue / Expenditure", "code": "Eurostat", "t": "G", "f": "Q/A", "note": "Stability & Growth Pact" }
+        ]}
+      ]
+    },
+
+    {
+      "code": "JP", "name": "日本 Japan", "src": "Cabinet Office · BOJ · MIC · MOF · METI",
+      "lei": "★ Cabinet Office 景気動向指数(Leading/Coincident/Lagging CI+DI,官方現成三分類)· BOJ 短観 Tankan · OECD CLI",
+      "blocks": [
+        { "cat": "PMI/景氣 Sentiment", "t": "L", "items": [
+          { "n": "BOJ 短観 Tankan（大型製造業 DI）", "code": "BOJ", "t": "L", "f": "Q", "note": "核心領先情緒" },
+          { "n": "au Jibun Bank Japan PMI", "code": "S&P Global", "t": "L", "f": "M", "note": "" },
+          { "n": "景気動向指数 Leading CI", "code": "Cabinet Office", "t": "L", "f": "M", "note": "官方領先複合" }
+        ]},
+        { "cat": "股票指數 Equities", "t": "L", "items": [
+          { "n": "Nikkei 225 / TOPIX", "code": "JPX", "t": "L", "f": "D", "note": "" }
+        ]},
+        { "cat": "耐久財/資本財 Orders", "t": "L", "items": [
+          { "n": "機械受注 Machinery Orders（民需 ex-volatile）", "code": "Cabinet Office", "t": "L", "f": "M", "note": "企業投資領先" }
+        ]},
+        { "cat": "房地產景氣 Housing", "t": "L", "items": [
+          { "n": "新設住宅着工戸数 Housing Starts", "code": "MLIT", "t": "L", "f": "M", "note": "" },
+          { "n": "地価 Land Prices", "code": "MLIT", "t": "G", "f": "A", "note": "" }
+        ]},
+        { "cat": "就業 Employment", "t": "C", "items": [
+          { "n": "有効求人倍率 Jobs-to-Applicants", "code": "MHLW", "t": "L", "f": "M", "note": "勞動領先" },
+          { "n": "就業者数 Employment", "code": "MIC", "t": "C", "f": "M", "note": "" }
+        ]},
+        { "cat": "投資/工業 Industry", "t": "C", "items": [
+          { "n": "鉱工業生産 Industrial Production", "code": "METI", "t": "C", "f": "M", "note": "" },
+          { "n": "Real GDP", "code": "Cabinet Office", "t": "C", "f": "Q", "note": "" }
+        ]},
+        { "cat": "進出口 Trade", "t": "C", "items": [
+          { "n": "貿易収支 Trade Balance / Exports / Imports", "code": "MOF", "t": "C", "f": "M", "note": "" }
+        ]},
+        { "cat": "政府支出 Gov Spending", "t": "C", "items": [
+          { "n": "Gov Final Consumption", "code": "Cabinet Office", "t": "C", "f": "Q", "note": "" }
+        ]},
+        { "cat": "通膨 Inflation", "t": "G", "items": [
+          { "n": "全国 CPI / コアコア Core-core CPI", "code": "MIC", "t": "G", "f": "M", "note": "" },
+          { "n": "東京都区部 CPI", "code": "MIC", "t": "L", "f": "M", "note": "早一個月,領先全國" }
+        ]},
+        { "cat": "失業 Unemployment", "t": "G", "items": [
+          { "n": "完全失業率 Unemployment Rate", "code": "MIC", "t": "G", "f": "M", "note": "" }
+        ]},
+        { "cat": "財政 Fiscal Balance", "t": "G", "items": [
+          { "n": "Debt/GDP", "code": "MOF", "t": "G", "f": "A", "note": "DM 最高" },
+          { "n": "Primary Balance", "code": "MOF", "t": "G", "f": "A", "note": "" }
+        ]},
+        { "cat": "央行策略 BOJ Policy", "t": "P", "items": [
+          { "n": "無擔保コールO/N Policy Rate", "code": "BOJ", "t": "P", "f": "事件", "note": "2024/03 退出負利率,結束 YCC" },
+          { "n": "JGB 購入 / ETF 持有", "code": "BOJ", "t": "P", "f": "M", "note": "ETF 購入已停" }
+        ]},
+        { "cat": "財政收支 Fiscal Rev/Exp", "t": "G", "items": [
+          { "n": "歳入/歳出 Revenue/Expenditure", "code": "MOF", "t": "G", "f": "A", "note": "" }
+        ]}
+      ]
+    },
+
+    {
+      "code": "CN", "name": "中國 China", "src": "NBS · PBOC · 海关总署 · MOF",
+      "lei": "NBS 官方 PMI + Caixin PMatch(中小企偏重)· OECD CLI · 克強指數代理(電力/鐵路貨運/銀行貸款)",
+      "note": "官方數據透明度有限,建議交叉驗證(Caixin、海關、實物量)。",
+      "blocks": [
+        { "cat": "PMI 商業景氣", "t": "L", "items": [
+          { "n": "NBS Manufacturing / Non-Mfg PMI", "code": "NBS", "t": "L", "f": "M", "note": "大型國企偏重" },
+          { "n": "Caixin Mfg / Services PMI", "code": "S&P Global", "t": "L", "f": "M", "note": "中小/出口偏重" }
+        ]},
+        { "cat": "股票指數 Equities", "t": "L", "items": [
+          { "n": "CSI 300 / 上证综指 SHCOMP / 恒生 HSI", "code": "交易所", "t": "L", "f": "D", "note": "" }
+        ]},
+        { "cat": "房地產景氣 Housing", "t": "L", "items": [
+          { "n": "70城新建商品住宅价格", "code": "NBS", "t": "G", "f": "M", "note": "價格落後" },
+          { "n": "房地产开发投资 / 销售面积 / 新开工", "code": "NBS", "t": "L", "f": "M", "note": "投資/銷售前瞻" },
+          { "n": "土地出让 Land Sales", "code": "MOF/地方", "t": "L", "f": "M", "note": "地方財政連動" }
+        ]},
+        { "cat": "投資/工業 Industry", "t": "C", "items": [
+          { "n": "固定资产投资 FAI", "code": "NBS", "t": "C", "f": "M", "note": "" },
+          { "n": "规模以上工业增加值 IP", "code": "NBS", "t": "C", "f": "M", "note": "" },
+          { "n": "社会消费品零售总额 Retail Sales", "code": "NBS", "t": "C", "f": "M", "note": "消費同步" }
+        ]},
+        { "cat": "進出口 Trade", "t": "C", "items": [
+          { "n": "出口/进口/贸易差额（USD & CNY）", "code": "海关总署", "t": "C", "f": "M", "note": "全球需求晴雨表" }
+        ]},
+        { "cat": "就業 Employment", "t": "C", "items": [
+          { "n": "城镇调查失业率 Surveyed Urban Unemployment", "code": "NBS", "t": "G", "f": "M", "note": "可信度有限" },
+          { "n": "青年失业率 Youth Unemployment", "code": "NBS", "t": "G", "f": "M", "note": "2023 曾暫停/改版" }
+        ]},
+        { "cat": "通膨 Inflation", "t": "G", "items": [
+          { "n": "CPI", "code": "NBS", "t": "G", "f": "M", "note": "" },
+          { "n": "PPI", "code": "NBS", "t": "G", "f": "M", "note": "全球工業通膨領先訊號" }
+        ]},
+        { "cat": "財政 Fiscal Balance", "t": "G", "items": [
+          { "n": "一般公共预算 收/支", "code": "MOF", "t": "G", "f": "M", "note": "" },
+          { "n": "政府性基金预算（含土地）", "code": "MOF", "t": "G", "f": "M", "note": "地方財政關鍵" },
+          { "n": "地方/LGFV 债务", "code": "MOF", "t": "G", "f": "Q", "note": "隱性債務風險" }
+        ]},
+        { "cat": "央行策略 PBOC Policy", "t": "P", "items": [
+          { "n": "LPR 1Y / 5Y", "code": "PBOC", "t": "P", "f": "M", "note": "5Y 連動房貸" },
+          { "n": "7天逆回购利率（2024 後主政策利率）", "code": "PBOC", "t": "P", "f": "事件", "note": "" },
+          { "n": "MLF / 存款准备金率 RRR", "code": "PBOC", "t": "P", "f": "事件", "note": "" },
+          { "n": "社会融资规模 TSF / M2", "code": "PBOC", "t": "L", "f": "M", "note": "信用脈衝領先" }
+        ]}
+      ]
+    },
+
+    {
+      "code": "TW", "name": "台灣 Taiwan", "src": "國發會 NDC · 主計總處 DGBAS · 央行 CBC · 財政部 MOF · 經濟部 MOEA · 中經院 CIER",
+      "lei": "★ 國發會 景氣領先/同時/落後指標 + 景氣對策信號(燈號,5 色,官方現成三分類)",
+      "blocks": [
+        { "cat": "PMI/景氣 Sentiment", "t": "L", "items": [
+          { "n": "中經院 製造業 PMI / 非製造業 NMI", "code": "CIER", "t": "L", "f": "M", "note": "" },
+          { "n": "景氣對策信號(燈號)", "code": "國發會 NDC", "t": "L", "f": "M", "note": "綜合分數→藍/黃藍/綠/黃紅/紅" },
+          { "n": "景氣領先指標", "code": "國發會 NDC", "t": "L", "f": "M", "note": "官方領先複合" }
+        ]},
+        { "cat": "出口訂單 Export Orders", "t": "L", "items": [
+          { "n": "外銷訂單 Export Orders", "code": "經濟部 MOEA", "t": "L", "f": "M", "note": "★ 台灣科技循環核心領先" }
+        ]},
+        { "cat": "股票指數 Equities", "t": "L", "items": [
+          { "n": "加權指數 TAIEX / 電子類指數", "code": "TWSE", "t": "L", "f": "D", "note": "" }
+        ]},
+        { "cat": "房地產景氣 Housing", "t": "L", "items": [
+          { "n": "信義/國泰 房價指數", "code": "民間", "t": "G", "f": "Q", "note": "價格落後" },
+          { "n": "建照/使照 · 房貸餘額", "code": "內政部/央行", "t": "L", "f": "M", "note": "" }
+        ]},
+        { "cat": "投資/工業 Industry", "t": "C", "items": [
+          { "n": "工業生產指數 IP", "code": "MOEA", "t": "C", "f": "M", "note": "半導體權重高" },
+          { "n": "Real GDP / GFCF", "code": "DGBAS", "t": "C", "f": "Q", "note": "" }
+        ]},
+        { "cat": "進出口 Trade", "t": "C", "items": [
+          { "n": "出口/進口/出超 Trade", "code": "財政部 MOF（海關）", "t": "C", "f": "M", "note": "" }
+        ]},
+        { "cat": "就業 Employment", "t": "C", "items": [
+          { "n": "就業人數 Employment", "code": "DGBAS", "t": "C", "f": "M", "note": "" }
+        ]},
+        { "cat": "通膨 Inflation", "t": "G", "items": [
+          { "n": "CPI / 核心 CPI", "code": "DGBAS", "t": "G", "f": "M", "note": "央行盯 2%" },
+          { "n": "躉售/生產者物價 WPI/PPI", "code": "DGBAS", "t": "G", "f": "M", "note": "" }
+        ]},
+        { "cat": "失業 Unemployment", "t": "G", "items": [
+          { "n": "失業率 Unemployment Rate", "code": "DGBAS", "t": "G", "f": "M", "note": "" }
+        ]},
+        { "cat": "財政 Fiscal Balance", "t": "G", "items": [
+          { "n": "中央政府債務未償餘額", "code": "MOF", "t": "G", "f": "M", "note": "" }
+        ]},
+        { "cat": "央行策略 CBC Policy", "t": "P", "items": [
+          { "n": "重貼現率 Discount Rate", "code": "央行 CBC", "t": "P", "f": "季理監事會", "note": "政策利率" },
+          { "n": "存款準備率 RRR", "code": "央行 CBC", "t": "P", "f": "事件", "note": "" },
+          { "n": "M1B vs M2", "code": "央行 CBC", "t": "L", "f": "M", "note": "★ 黃金交叉=台股資金領先" },
+          { "n": "外匯存底 FX Reserves", "code": "央行 CBC", "t": "C", "f": "M", "note": "" }
+        ]},
+        { "cat": "財政收支 Fiscal Rev/Exp", "t": "G", "items": [
+          { "n": "賦稅收入 / 歲入歲出", "code": "MOF", "t": "G", "f": "M", "note": "" }
+        ]}
+      ]
+    },
+
+    {
+      "code": "ASEAN", "name": "東協 ASEAN", "src": "各國統計局/央行 · S&P Global · OECD CLI",
+      "lei": "S&P Global ASEAN Manufacturing PMI(整體)· 各國 OECD CLI · 逐國 PMI",
+      "note": "★ 異質性高,需逐國處理。新加坡 MAS 採匯率(NEER)而非利率為政策工具,與其他國不同。",
+      "blocks": [
+        { "cat": "PMI 商業景氣", "t": "L", "items": [
+          { "n": "S&P Global ASEAN Mfg PMI（整體）", "code": "S&P Global", "t": "L", "f": "M", "note": "" },
+          { "n": "逐國 PMI（ID/TH/MY/SG/PH/VN）", "code": "S&P Global", "t": "L", "f": "M", "note": "" }
+        ]},
+        { "cat": "印尼 Indonesia", "t": "C", "items": [
+          { "n": "CPI / Trade / GDP", "code": "BPS", "t": "C", "f": "M/Q", "note": "" },
+          { "n": "BI-Rate（7天逆回購）", "code": "Bank Indonesia", "t": "P", "f": "事件", "note": "政策利率" }
+        ]},
+        { "cat": "泰國 Thailand", "t": "C", "items": [
+          { "n": "GDP / 景氣領先指數", "code": "NESDC", "t": "L", "f": "Q/M", "note": "" },
+          { "n": "CPI / Trade", "code": "MOC", "t": "C", "f": "M", "note": "" },
+          { "n": "Policy Rate", "code": "Bank of Thailand", "t": "P", "f": "事件", "note": "" }
+        ]},
+        { "cat": "馬來西亞 Malaysia", "t": "C", "items": [
+          { "n": "CPI / GDP / IPI / Trade", "code": "DOSM", "t": "C", "f": "M/Q", "note": "" },
+          { "n": "OPR Overnight Policy Rate", "code": "BNM", "t": "P", "f": "事件", "note": "" }
+        ]},
+        { "cat": "新加坡 Singapore", "t": "C", "items": [
+          { "n": "NODX 非石油本地出口", "code": "EnterpriseSG", "t": "L", "f": "M", "note": "★ 貿易領先" },
+          { "n": "CPI / GDP", "code": "SingStat", "t": "C", "f": "M/Q", "note": "" },
+          { "n": "MAS 匯率政策(S$NEER 區間)", "code": "MAS", "t": "P", "f": "半年", "note": "★ 非利率工具" }
+        ]},
+        { "cat": "菲律賓 Philippines", "t": "C", "items": [
+          { "n": "CPI / GDP / Trade", "code": "PSA", "t": "C", "f": "M/Q", "note": "" },
+          { "n": "Policy Rate", "code": "BSP", "t": "P", "f": "事件", "note": "" }
+        ]},
+        { "cat": "越南 Vietnam", "t": "C", "items": [
+          { "n": "CPI / GDP / IIP / Trade", "code": "GSO", "t": "C", "f": "M/Q", "note": "" },
+          { "n": "Policy Rates", "code": "SBV", "t": "P", "f": "事件", "note": "" }
+        ]}
+      ]
+    }
+  ]
+}
+;
+const TC={L:'var(--bl)',C:'var(--tl)',G:'var(--am)',P:'var(--vi)'};
+document.getElementById('sub').textContent = REG.registry+' · '+REG.anchor+' · '+REG.philosophy;
+document.getElementById('ft').textContent = REG.code_rule;
+// legend
+document.getElementById('legend').innerHTML = Object.entries(REG.timing).map(([k,v])=>
+  `<span class="bd ${k}">${k}</span>${v.zh}/${v.en}`).join(' · ');
+// tabs + pages
+const tabs=document.getElementById('tabs'), pages=document.getElementById('pages');
+REG.regions.forEach((r,i)=>{
+  const b=document.createElement('button'); if(i===0)b.className='on';
+  b.innerHTML=`<span class="key">${i+1}</span>${r.code} ${r.name.split(' ')[0]}`;
+  b.onclick=()=>sw(b,'pg'+i); tabs.appendChild(b);
+  const pg=document.createElement('div'); pg.className='pg'+(i===0?' on':''); pg.id='pg'+i;
+  pg.innerHTML=renderRegion(r); pages.appendChild(pg);
+});
+function sw(btn,id){
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on'); document.getElementById(id).classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function renderRegion(r){
+  let h=`<div class="lei"><div class="lei-t">領先複合指標 · COMPOSITE LEADING（先看這個）</div>`+
+        `<div class="lei-b">${r.lei}</div>`+
+        (r.note?`<div class="lei-note">⚠ ${r.note}</div>`:'')+
+        `<div class="lei-note" style="color:var(--i3)">來源:${r.src}</div></div>`;
+  // group blocks by dominant timing, preserve leading-first order
+  const order=['L','C','G','P'], labels={L:'領先 LEADING — 主訊號',C:'同步 COINCIDENT — 現況',G:'落後 LAGGING — 驗證',P:'政策 POLICY — 央行/財政'};
+  order.forEach(t=>{
+    const blks=r.blocks.filter(b=>b.t===t); if(!blks.length)return;
+    h+=`<div class="timing-sec"><div class="ts-h"><span class="bd ${t}">${t}</span>${labels[t]}</div>`;
+    blks.forEach(b=>{ h+=renderBlock(b); });
+    h+=`</div>`;
+  });
+  return h;
+}
+function renderBlock(b){
+  let rows=b.items.map(it=>`<tr>
+    <td>${it.n}</td>
+    <td><span class="mono">${it.code}</span></td>
+    <td><span class="bd ${it.t}">${it.t}</span></td>
+    <td class="mono">${it.f}</td>
+    <td class="note">${it.note||''}</td></tr>`).join('');
+  return `<div class="cd"><div class="cd-h"><div class="cd-t">${b.cat}</div><span class="bd ${b.t}">${b.t}</span></div>
+    <table class="mx"><thead><tr><th>指標 Indicator</th><th>代碼/來源</th><th>時序</th><th>頻率</th><th>備註</th></tr></thead>
+    <tbody>${rows}</tbody></table></div>`;
+}
+document.addEventListener('keydown',e=>{
+  const btns=[...document.querySelectorAll('#tabs button')];
+  if(e.key>='1'&&e.key<=String(btns.length)) btns[+e.key-1]?.click();
+});
+</script>
+</body>
+</html>

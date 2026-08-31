@@ -53,6 +53,11 @@ symlink 循環/逃逸圍堵、非法閾值伺服器端拒絕、單元素 JSON �
 300 檔案規模化精確重複比對、404 / shutdown 契約)。缺少對應直譯器的套件
 標示 SKIP,不會靜默跳過。
 
+> ✅ **驗證紀錄(2026-08-17,Linux 容器實測)** — Ubuntu 24.04 + PowerShell 7.6.5
+> + Python 3.11 + Node.js v22 全鏈實跑:靜態分析 0 錯誤 0 警告、`-SelfTest` 35/35、
+> `--self-test` 17/17、`e2e_apitest.js` 51/51、`e2e_ps_usertest.js` 真實 pwsh 後端
+> 72/72;`-TestAll` 5 階段全綠、0 FAIL、0 SKIP(首次於 Linux 完整跑通含 pwsh 之全部套件)。
+
 安全強化(第二輪 DEBUG 循環修正):
 
 - **Symlink 圍堵** — 目錄遍歷一律不跟隨 symlink / junction(ReparsePoint),

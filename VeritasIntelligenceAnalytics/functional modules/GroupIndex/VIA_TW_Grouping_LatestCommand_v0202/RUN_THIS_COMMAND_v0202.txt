@@ -1,0 +1,16 @@
+# 解壓 ZIP 後，在 PowerShell 7 執行：
+
+pwsh -NoExit -ExecutionPolicy Bypass -File ".\Invoke-VIA-TW-Grouping-Latest-v0202.ps1" `
+  -Mode Real `
+  -PricePath "$env:USERPROFILE\OneDrive\桌面\tw_stock\StockData.parquet" `
+  -FactorPath "C:\VIA_LOCAL_CACHE\tw_stock\TW_Market_Factors.parquet" `
+  -WarmupStartDate "2025-01-02" `
+  -EvaluationStartDate "2026-01-02" `
+  -EndDate "" `
+  -RunPytest $true `
+  -OpenHtml $true `
+  -NonBlocking $true `
+  -KeepPowerShellOpen $true
+
+# EndDate 留空代表使用本地價格資料中的最新可用日期。
+# 若尚未建立 TW_Market_Factors.parquet，可先移除 -FactorPath；但正式剔除結論應保持 REVIEW/HOLD。

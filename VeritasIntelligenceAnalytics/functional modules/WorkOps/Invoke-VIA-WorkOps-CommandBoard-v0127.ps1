@@ -171,6 +171,16 @@ param(
     [string]$DraftsFor = "",
     [string]$DraftsTemplate = ""
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 if ($Silent) { $NoOpen = $true }
 $ErrorActionPreference = "Continue"
 $Here    = $PSScriptRoot
@@ -517,7 +527,7 @@ if (Test-Path -LiteralPath $nmPath2) {
 $pyCmd = Get-Command py -ErrorAction SilentlyContinue
 if (-not $pyCmd) { $pyCmd = Get-Command python3 -ErrorAction SilentlyContinue }
 if ($pyCmd) {
-    foreach ($gEng in @("workops_daily_todo.py", "workops_onboarding.py")) {
+    foreach ($gEng in @("VIA_ENG067_WorkopsDailyTodo.py", "workops_onboarding.py")) {
         $gp = Join-Path $Here ("engines\" + $gEng)
         if (Test-Path -LiteralPath $gp) { try { & $pyCmd.Source $gp *> $null } catch { } }
     }
@@ -1761,3 +1771,4 @@ Add-Content -LiteralPath $kpi -Value ("{0},{1},{2},{3},{4},{5}" -f (Get-Date -Fo
 Write-WopsLog ("完成:專案 {0} · 需注意 {1} · 未回 {2} · 佇列 {3}" -f @($rec).Count, $att, @($pendSorted).Count, @($queue).Count)
 Send-WopsToast "VIA WorkOps 指揮板" ("專案 {0} 案 · 需注意 {1} · 未回 {2} 件 · 草稿佇列 {3} 件" -f @($rec).Count, $att, @($pendSorted).Count, @($queue).Count)
 Write-Host ("[總結] 專案 {0} 案 · 需注意 {1} · 未回追蹤 {2} 件 · 草稿佇列 {3} 件(絕不代寄)· 關係人 {4} 人 · log/kpi 已落 out\" -f @($rec).Count, $att, @($pendSorted).Count, @($queue).Count, @($stak).Count) -ForegroundColor Green
+

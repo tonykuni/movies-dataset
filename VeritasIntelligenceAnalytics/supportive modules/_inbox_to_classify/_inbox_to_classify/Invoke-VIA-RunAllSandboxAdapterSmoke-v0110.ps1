@@ -1,3 +1,13 @@
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Stop"
 Write-Host ""
 Write-Host "================================================================================" -ForegroundColor DarkCyan
@@ -32,3 +42,4 @@ try {
 $out = Join-Path (Split-Path -Parent $PSCommandPath) "VIA_RunAllSandboxSmoke_Result_v0110.csv"
 $rows | Export-Csv -LiteralPath $out -NoTypeInformation -Encoding UTF8
 Write-Host "[OK] Result: $out" -ForegroundColor Green
+

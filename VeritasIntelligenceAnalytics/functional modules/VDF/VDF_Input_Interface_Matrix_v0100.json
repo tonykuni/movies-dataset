@@ -1,0 +1,119 @@
+{
+ "schema": "vdf-input-interface-matrix-v1",
+ "source": "操作員批88核定(2026-08-21):「VDF 整合後的輸入介面清單矩陣並測試;之前給的清單基本上都包含了,只有國際股市在每日交易資訊/財報需要增減項目、增減個股;台股單獨擷取的只有財報資訊(單季/累計/年度/起始日期/整合輸入);VRN 只有文件路徑跟新增輸入式重點 SUMMARY MATRIX/BASIC INFO/FINANCIAL DATA;VIA 單雙軸繪圖功能新增到堆圖」",
+ "policy": "活冊(引擎就地維護);零刪除語意=remove 一律軟移除入 removed_*;changelog append-only;種子承接 VDF_Unified_Params_v0100(之前的清單)",
+ "sections": {
+  "INTL_DAILY": {
+   "desc": "國際股市 · 每日交易資訊(可增減項目/個股)",
+   "editable": [
+    "items",
+    "tickers"
+   ],
+   "items": [
+    "open",
+    "high",
+    "low",
+    "close",
+    "adj_close",
+    "volume"
+   ],
+   "removed_items": [],
+   "tickers": [
+    "^GSPC",
+    "^DJI",
+    "^IXIC",
+    "^VIX",
+    "^HSI",
+    "^N225",
+    "EURUSD=X",
+    "JPYUSD=X",
+    "^NDX",
+    "^RUT"
+   ],
+   "removed_tickers": []
+  },
+  "INTL_FIN": {
+   "desc": "國際股市 · 財報(可增減項目/個股)",
+   "editable": [
+    "items",
+    "tickers"
+   ],
+   "items": [
+    "revenue",
+    "gross_profit",
+    "operating_income",
+    "net_income",
+    "eps",
+    "total_assets",
+    "total_liabilities",
+    "equity",
+    "cfo",
+    "cfi",
+    "cff"
+   ],
+   "removed_items": [],
+   "tickers": [],
+   "removed_tickers": [],
+   "note": "個股清單候操作員增列(誠實:不代填)"
+  },
+  "TW_FIN": {
+   "desc": "台股 · 單獨擷取=僅財報資訊",
+   "editable": [
+    "period_mode",
+    "start_date",
+    "tickers"
+   ],
+   "period_modes": [
+    "單季",
+    "累計",
+    "年度"
+   ],
+   "period_mode": "年度",
+   "start_date": "2018-01-01",
+   "integrated_input": true,
+   "tickers": [],
+   "removed_tickers": [],
+   "note": "個股由官方冊 TW_Equity_Registry 選錄;integrated_input=與 INTL 同一輸入面板整合"
+  },
+  "VRN": {
+   "desc": "VRN · 只有文件路徑+輸入式重點",
+   "editable": [
+    "doc_path",
+    "input_focus"
+   ],
+   "doc_path": "",
+   "input_focus": [
+    "SUMMARY_MATRIX",
+    "BASIC_INFO",
+    "FINANCIAL_DATA"
+   ],
+   "removed_focus": []
+  },
+  "PLOT": {
+   "desc": "VIA 繪圖 · 單/雙軸+堆圖(新增)",
+   "editable": [
+    "modes"
+   ],
+   "modes": [
+    "single_axis",
+    "dual_axis",
+    "stacked"
+   ],
+   "removed_modes": [],
+   "stacked_new": true,
+   "mapping": "stacked 由 VAP 既有 --panels 共時間軸疊圖(CH-09 家族)承接;單/雙軸=既有 VAP 主道"
+  }
+ },
+ "changelog": [
+  {
+   "ts": "2026-08-21",
+   "op": "INIT",
+   "note": "批88 初版;種子承接 VDF_Unified_Params_v0100 markets/time"
+  },
+  {
+   "ts": "2026-08-23 19:23",
+   "op": "批99R1",
+   "note": "US_INDICES 聯集:+^NDX/^RUT(操作員裁:US index 體系+只增不減)"
+  }
+ ]
+}

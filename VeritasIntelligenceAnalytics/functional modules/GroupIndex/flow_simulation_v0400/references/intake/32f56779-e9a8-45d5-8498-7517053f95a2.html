@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VDS M01 — GlobalDataFetcher Control Panel v3</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&family=IBM+Plex+Mono:wght@300;400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f5f2;--bg-w:#f2efe9;--surface:#fff;--s2:#faf8f5;
+  --border:#e5e0d8;--bh:#d1cbbf;
+  --text:#2c2825;--t2:#6b6560;--t3:#9e9690;--t4:#c4bdb5;
+  --blue:#4c72b0;--blue-l:#6895d2;
+  --green:#55a868;--amber:#ccb974;--orange:#c44e52;
+  --purple:#8172b3;--teal:#64b5a7;
+  --fd:'EB Garamond',Georgia,serif;
+  --fb:'DM Sans',sans-serif;
+  --fm:'IBM Plex Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:13px}
+body{font-family:var(--fb);background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+
+/* HEADER */
+.hdr{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;background:rgba(247,245,242,.97);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px}
+.brand-name{font-family:var(--fd);font-size:16px;font-weight:600}
+.brand-sub{font-family:var(--fm);font-size:7px;letter-spacing:2.5px;color:var(--t3);text-transform:uppercase;margin-top:1px}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border:1px solid var(--border);border-radius:20px;font-family:var(--fm);font-size:7.5px;color:var(--t2)}
+.dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dot.ok{background:var(--green);box-shadow:0 0 4px rgba(85,168,104,.5)}
+.dot.warn{background:var(--amber);animation:pw .9s ease infinite}
+.dot.err{background:var(--orange);animation:pe .65s ease infinite}
+.dot.na{background:var(--t4)}
+@keyframes pw{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(204,185,116,.6)}50%{opacity:.5;box-shadow:0 0 0 4px rgba(204,185,116,0)}}
+@keyframes pe{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(196,78,82,.7)}50%{opacity:.3;box-shadow:0 0 0 5px rgba(196,78,82,0)}}
+.clock{font-family:var(--fm);font-size:8px;color:var(--t3)}
+
+/* TABS */
+.tabs{position:fixed;top:64px;left:0;right:0;z-index:200;height:36px;background:var(--bg-w);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 22px;gap:0;overflow-x:auto}
+.tab{padding:8px 14px;font-family:var(--fm);font-size:8px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;white-space:nowrap}
+.tab:hover{color:var(--t2)}
+.tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+
+/* MAIN */
+.main{margin-top:100px;padding:18px 22px 60px;max-width:1500px;margin-left:auto;margin-right:auto}
+.page{display:none}.page.active{display:block}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:14px;margin-bottom:12px}
+.ct{font-family:var(--fm);font-size:7.5px;font-weight:500;letter-spacing:2.5px;text-transform:uppercase;color:var(--t3);margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+
+/* METRIC */
+.metric{background:var(--s2);border:1px solid var(--border);border-radius:2px;padding:10px 12px;text-align:center}
+.mv{font-family:var(--fm);font-size:19px;font-weight:500;color:var(--text);margin-bottom:1px}
+.ml{font-family:var(--fm);font-size:6.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3)}
+
+/* BADGES / TAGS */
+.badge{display:inline-flex;align-items:center;font-family:var(--fm);font-size:7px;padding:2px 7px;border-radius:2px;font-weight:500;gap:3px}
+.badge.blue{background:rgba(76,114,176,.09);color:var(--blue);border:1px solid rgba(76,114,176,.2)}
+.badge.green{background:rgba(85,168,104,.09);color:var(--green);border:1px solid rgba(85,168,104,.2)}
+.badge.amber{background:rgba(204,185,116,.12);color:#7a6200;border:1px solid rgba(204,185,116,.28)}
+.badge.gray{background:var(--s2);color:var(--t3);border:1px solid var(--border)}
+.badge.red{background:rgba(196,78,82,.09);color:var(--orange);border:1px solid rgba(196,78,82,.2)}
+.badge.purple{background:rgba(129,114,179,.09);color:var(--purple);border:1px solid rgba(129,114,179,.22)}
+
+.src-tag{display:inline-flex;align-items:center;font-family:var(--fm);font-size:7px;padding:2px 6px;border-radius:2px;font-weight:500}
+.src-yf{background:rgba(76,114,176,.07);color:var(--blue);border:1px solid rgba(76,114,176,.18)}
+.src-twse{background:rgba(85,168,104,.07);color:#3a8a52;border:1px solid rgba(85,168,104,.22)}
+.src-tpex{background:rgba(100,181,167,.07);color:#2e7268;border:1px solid rgba(100,181,167,.22)}
+.src-mops{background:rgba(129,114,179,.07);color:var(--purple);border:1px solid rgba(129,114,179,.22)}
+.src-fred{background:rgba(196,78,82,.07);color:var(--orange);border:1px solid rgba(196,78,82,.18)}
+.src-ak{background:rgba(204,185,116,.1);color:#7a6200;border:1px solid rgba(204,185,116,.28)}
+.src-cnn{background:rgba(196,78,82,.06);color:#9a3030;border:1px solid rgba(196,78,82,.14)}
+.src-calc{background:rgba(129,114,179,.06);color:#6a5a9a;border:1px solid rgba(129,114,179,.18)}
+.src-sys{background:var(--s2);color:var(--t3);border:1px solid var(--border)}
+
+.status-badge{font-family:var(--fm);font-size:7px;padding:2px 7px;border-radius:2px;font-weight:500}
+.sb-ok{background:rgba(85,168,104,.09);color:var(--green);border:1px solid rgba(85,168,104,.22)}
+.sb-warn{background:rgba(204,185,116,.1);color:#7a6200;border:1px solid rgba(204,185,116,.25)}
+.sb-err{background:rgba(196,78,82,.09);color:var(--orange);border:1px solid rgba(196,78,82,.2)}
+.sb-na{background:var(--s2);color:var(--t3);border:1px solid var(--border)}
+
+/* ════════════════════════════
+   TW STOCK MASTER TABLE
+   ════════════════════════════ */
+.tw-master{border:2px solid rgba(85,168,104,.25);border-radius:4px;overflow:hidden;margin-bottom:14px}
+.tw-master-head{background:rgba(85,168,104,.07);padding:11px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid rgba(85,168,104,.18)}
+.tw-master-title{font-family:var(--fd);font-size:15px;font-weight:600;color:var(--text)}
+.tw-master-sub{font-family:var(--fm);font-size:8px;color:var(--t2)}
+.tw-count-big{font-family:var(--fm);font-size:22px;font-weight:600;color:var(--green);background:rgba(85,168,104,.09);border:1px solid rgba(85,168,104,.22);border-radius:3px;padding:4px 12px;margin-left:auto}
+
+/* columns inside master */
+.tw-cols-header{display:grid;grid-template-columns:32px 1fr repeat(6,90px) 80px;gap:0;background:var(--s2);border-bottom:1px solid var(--border)}
+.tw-cols-header span{font-family:var(--fm);font-size:7px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t3);padding:6px 8px;border-right:1px solid var(--border)}
+.tw-cols-header span:last-child{border-right:none}
+
+/* sub-table row inside master */
+.sub-row{display:grid;grid-template-columns:32px 1fr repeat(6,90px) 80px;gap:0;border-bottom:1px solid var(--border);align-items:center;transition:background .12s}
+.sub-row:last-child{border-bottom:none}
+.sub-row:hover{background:rgba(85,168,104,.04)}
+.sub-cell{padding:7px 8px;font-family:var(--fm);font-size:8.5px;border-right:1px solid var(--border);display:flex;align-items:center;min-height:36px}
+.sub-cell:last-child{border-right:none}
+.sub-cell.name{flex-direction:column;align-items:flex-start;gap:2px}
+.sub-cell.center{justify-content:center;text-align:center}
+.sub-cell.right{justify-content:flex-end;text-align:right}
+
+/* LED */
+.led{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.led-ok{background:var(--green);box-shadow:0 0 4px rgba(85,168,104,.5)}
+.led-warn{background:var(--amber);animation:pw .85s ease infinite}
+.led-err{background:var(--orange);animation:pe .6s ease infinite}
+.led-na{background:var(--t4)}
+
+/* count consistency */
+.cnt-ok{color:var(--green);font-weight:600;font-size:11px}
+.cnt-same{color:var(--green);font-weight:600}
+.cnt-diff{color:var(--amber);font-weight:600}
+.cnt-na{color:var(--t4)}
+
+/* ════════════════════════════
+   OTHER ASSETS TABLE
+   ════════════════════════════ */
+.asset-group{border:1px solid var(--border);border-radius:3px;margin-bottom:10px;overflow:hidden}
+.asset-group-head{display:grid;grid-template-columns:28px 1fr auto auto auto;gap:0;background:var(--s2);border-bottom:1px solid var(--border);cursor:pointer;user-select:none}
+.asset-group-head:hover{background:var(--bg-w)}
+.ag-cell{padding:8px 10px;font-family:var(--fm);font-size:8px;display:flex;align-items:center;border-right:1px solid var(--border)}
+.ag-cell:last-child{border-right:none}
+.ag-name{font-weight:500;letter-spacing:.5px}
+.ag-src-group{display:flex;gap:3px;flex-wrap:wrap;padding:6px 10px}
+.ag-tickers-area{padding:10px 12px;background:var(--surface);border-top:1px solid var(--border)}
+.ticker-wrap{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.tk{display:inline-flex;align-items:center;gap:3px;font-family:var(--fm);font-size:8px;padding:3px 7px;border-radius:2px;cursor:default}
+.tk.tw{border:1px solid rgba(85,168,104,.3);background:rgba(85,168,104,.06);color:#3a8a52}
+.tk.us{border:1px solid rgba(76,114,176,.25);background:rgba(76,114,176,.06);color:var(--blue)}
+.tk.idx{border:1px solid rgba(129,114,179,.25);background:rgba(129,114,179,.06);color:var(--purple)}
+.tk.comm{border:1px solid rgba(204,185,116,.35);background:rgba(204,185,116,.07);color:#7a6200}
+.tk.crypto{border:1px solid rgba(196,78,82,.25);background:rgba(196,78,82,.06);color:var(--orange)}
+.tk.forex{border:1px solid rgba(100,181,167,.3);background:rgba(100,181,167,.07);color:#2e7268}
+.tk.mac{border:1px solid var(--border);background:var(--s2);color:var(--t2)}
+.tk .del{background:none;border:none;cursor:pointer;color:inherit;opacity:.4;font-size:9px;padding:0;line-height:1;margin-left:1px}
+.tk .del:hover{opacity:1}
+.add-row{display:flex;gap:6px;margin-top:6px}
+.add-inp{font-family:var(--fm);font-size:8.5px;flex:1;background:var(--s2);border:1px solid var(--border);border-radius:2px;padding:4px 8px;outline:none;color:var(--text)}
+.add-inp:focus{border-color:var(--blue-l)}
+.add-btn{font-family:var(--fm);font-size:7.5px;padding:4px 10px;background:var(--blue);color:#fff;border:1px solid var(--blue);border-radius:2px;cursor:pointer;letter-spacing:.5px;white-space:nowrap}
+.add-btn:hover{background:var(--blue-l)}
+.del-btn{font-family:var(--fm);font-size:7.5px;padding:4px 8px;background:none;color:var(--orange);border:1px solid rgba(196,78,82,.25);border-radius:2px;cursor:pointer}
+.del-btn:hover{background:rgba(196,78,82,.07)}
+.ag-expand{font-family:var(--fm);font-size:9px;color:var(--t3);transition:transform .2s;display:flex;align-items:center;padding:8px 10px}
+.ag-expand.open{transform:rotate(90deg)}
+
+/* PARAMS */
+.pr{display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border)}
+.pr:last-child{border-bottom:none}
+.pk{font-family:var(--fm);font-size:8.5px;color:var(--blue);min-width:160px}
+.pv{font-family:var(--fm);font-size:8.5px}
+.pi{font-family:var(--fm);font-size:8.5px;background:var(--s2);border:1px solid var(--border);border-radius:2px;padding:3px 7px;outline:none;color:var(--text);transition:border-color .15s}
+.pi:focus{border-color:var(--blue-l)}
+.tog{appearance:none;width:30px;height:16px;background:var(--border);border-radius:8px;cursor:pointer;position:relative;transition:background .2s}
+.tog:checked{background:var(--green)}
+.tog::after{content:'';position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:#fff;transition:left .2s}
+.tog:checked::after{left:16px}
+.sh{font-family:var(--fm);font-size:7.5px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin:14px 0 6px;display:flex;align-items:center;gap:7px}
+.sh::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* DIFF TABLE */
+.diff-table{width:100%;border-collapse:collapse;font-size:8px}
+.diff-table th{font-family:var(--fm);font-size:7px;letter-spacing:1.2px;text-transform:uppercase;color:var(--t3);padding:5px 9px;border-bottom:2px solid var(--border);text-align:left;background:var(--s2)}
+.diff-table td{padding:6px 9px;border-bottom:1px solid var(--border);font-family:var(--fm);vertical-align:top}
+.diff-table tr:hover td{background:var(--s2)}
+
+/* CONSOLE */
+.console{background:#18191c;border:1px solid #262830;border-radius:2px;padding:10px;font-family:var(--fm);font-size:8.5px;line-height:1.7;color:#8da0b5;max-height:150px;overflow-y:auto}
+.log-ok{color:#55a868}.log-info{color:#7a90a8}.log-warn{color:#ccb974}.log-err{color:#c44e52}.log-ts{color:#3d4a5c}
+
+/* BTN */
+.btn{font-family:var(--fm);font-size:8px;font-weight:500;letter-spacing:1px;text-transform:uppercase;border:1px solid var(--border);border-radius:2px;padding:7px 14px;cursor:pointer;background:var(--surface);color:var(--t2);transition:all .15s}
+.btn:hover{border-color:var(--bh);color:var(--text)}
+.btn.pri{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn.pri:hover{background:var(--blue-l)}
+.btn.suc{background:var(--green);color:#fff;border-color:var(--green)}
+.run-bar{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+
+/* FRED KEY */
+.fred-alert{border-radius:2px;padding:8px 12px;font-family:var(--fm);font-size:8px;margin-top:8px;line-height:1.6}
+.fred-alert.warn{background:rgba(204,185,116,.08);border:1px solid rgba(204,185,116,.25);color:#7a6200}
+.fred-alert.ok{background:rgba(85,168,104,.07);border:1px solid rgba(85,168,104,.2);color:#3a8a52}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--bh);border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div style="flex:1">
+    <div class="brand-name">VDS_M01_GlobalDataFetcher</div>
+    <div class="brand-sub">Veritas Data Suite · v3.7 · 6-Layer Accel · V12 MEGA · 25 DB Tables</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div class="pill"><span class="dot ok"></span>DuckDB OK</div>
+    <div class="pill" id="pill-twse"><span class="dot ok"></span>TWSE/TPEX</div>
+    <div class="pill" id="pill-fred"><span class="dot warn"></span>FRED (需 Key)</div>
+    <div class="pill" id="pill-ak"><span class="dot ok"></span>AKShare</div>
+    <div class="clock" id="clock">--:--:--</div>
+  </div>
+</header>
+
+<!-- TABS -->
+<nav class="tabs">
+  <button class="tab active" onclick="showPage('matrix',this)">◉ DB Matrix</button>
+  <button class="tab" onclick="showPage('instruments',this)">◈ 商品管理</button>
+  <button class="tab" onclick="showPage('fredak',this)">⟳ FRED · AKShare</button>
+  <button class="tab" onclick="showPage('params',this)">⚙ Parameters</button>
+</nav>
+
+<main class="main">
+
+<!-- ═══════════════════════════════════════
+     PAGE: DB MATRIX
+     ═══════════════════════════════════════ -->
+<div id="page-matrix" class="page active">
+
+  <!-- KPIs -->
+  <div class="g5" style="margin-bottom:12px">
+    <div class="metric"><div class="mv" id="kpi-tw-total" style="color:var(--green)">1,847</div><div class="ml">台股個股總數</div></div>
+    <div class="metric"><div class="mv" id="kpi-tw-twse">—</div><div class="ml">上市 (TWSE)</div></div>
+    <div class="metric"><div class="mv" id="kpi-tw-tpex">—</div><div class="ml">上櫃 (TPEX)</div></div>
+    <div class="metric"><div class="mv" id="kpi-tables">25</div><div class="ml">DuckDB Tables</div></div>
+    <div class="metric"><div class="mv" id="kpi-total-rows" style="color:var(--blue)">—</div><div class="ml">Total Rows</div></div>
+  </div>
+
+  <!-- ── 台股個股 MASTER BLOCK ── -->
+  <div class="tw-master">
+    <div class="tw-master-head">
+      <div>
+        <div class="tw-master-title">台股個股 — 統一 DataFrame</div>
+        <div class="tw-master-sub" style="margin-top:2px">
+          tw_stock_daily · institutional · margin · margin_calc · holding_ratio · daytrade
+          合併為同一組個股，以 <code style="background:rgba(85,168,104,.1);padding:1px 5px;border-radius:2px;font-size:7.5px">ticker + date</code> 為 Primary Key
+        </div>
+      </div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+        <span class="badge green">✅ 6 資料來源合併</span>
+        <span class="badge blue">商品數一致 = <span id="tw-count-badge" style="margin-left:3px;color:var(--green);font-weight:700">1,847</span></span>
+      </div>
+    </div>
+
+    <!-- column header -->
+    <div class="tw-cols-header">
+      <span></span>
+      <span>Sub-Table / 資料面向</span>
+      <span style="text-align:center">個股數</span>
+      <span>Sources</span>
+      <span style="text-align:center">Freq</span>
+      <span style="text-align:right">Rows</span>
+      <span style="text-align:center">Dedup PK</span>
+      <span style="text-align:center">說明</span>
+      <span style="text-align:center">Status</span>
+    </div>
+
+    <!-- rows built by JS -->
+    <div id="tw-sub-rows"></div>
+
+    <!-- merged schema hint -->
+    <div style="padding:9px 14px;background:rgba(85,168,104,.04);border-top:1px solid rgba(85,168,104,.15);font-family:var(--fm);font-size:7.5px;color:var(--t2);display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span>💡 merged_df = pd.merge(daily, institutional, on=['ticker','date']) + margin + margin_calc + holding_ratio + daytrade</span>
+      <span class="badge green" style="margin-left:auto">全部 JOIN 後商品數不變 = <span id="merged-cnt" style="font-weight:700;color:var(--green)">1,847</span></span>
+    </div>
+  </div>
+
+  <!-- ── 台股其他 & 非台股表 ── -->
+  <div id="other-tables-block"></div>
+
+  <!-- Run Bar -->
+  <div class="run-bar">
+    <button class="btn pri" onclick="runPipeline('ALL')">▶ Run ALL</button>
+    <button class="btn suc" onclick="runPipeline('STOCK')">▶ TW Stock</button>
+    <button class="btn" onclick="runPipeline('MACRO')">▶ MACRO</button>
+    <button class="btn" onclick="runPipeline('SENTIMENT')">▶ Sentiment</button>
+    <button class="btn" onclick="refreshAll()">↺ Refresh</button>
+    <button class="btn" onclick="clearLog()">✕ Log</button>
+  </div>
+  <div class="sh" style="margin-top:12px">Console</div>
+  <div class="console" id="console">
+    <span class="log-ts">[init]</span> <span class="log-info">VDS_M01 v3.7 — 25 tables · 6-Layer Accel · V12 MEGA ready</span><br>
+    <span class="log-ts">[init]</span> <span class="log-warn">[WARN] FRED_API_KEY not set — 48 FRED series will be skipped</span><br>
+    <span class="log-ts">[init]</span> <span class="log-ok">[OK] AKShare 215 functions × 12 regions integrated</span><br>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE: INSTRUMENTS
+     ═══════════════════════════════════════ -->
+<div id="page-instruments" class="page">
+
+  <!-- TW Stock List readonly info -->
+  <div class="card" style="border-color:rgba(85,168,104,.3)">
+    <div class="ct" style="color:var(--green)">台股個股清單 — tw_stock_list (MASTER)
+      <span class="badge green" id="tw-list-total-badge">Total: 1,847</span>
+      <span class="badge amber">TWSE ~1,200 · TPEX ~647</span>
+      <span class="badge gray">全股清單每日從 TWSE/TPEX 官方 API 更新</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+      <div class="pr"><span class="pk" style="font-size:8px">台股個股數 (基準)</span><span class="pv" style="color:var(--green);font-weight:600;font-family:var(--fm)" id="tw-list-count">1,847</span></div>
+      <div class="pr"><span class="pk" style="font-size:8px">格式 TWSE</span><span class="pv" style="font-family:var(--fm);font-size:8px">XXXX.TW (4碼)</span></div>
+      <div class="pr"><span class="pk" style="font-size:8px">格式 TPEX</span><span class="pv" style="font-family:var(--fm);font-size:8px">XXXX.TWO (4碼)</span></div>
+    </div>
+    <div style="margin-top:6px;padding:7px 10px;background:rgba(85,168,104,.06);border:1px solid rgba(85,168,104,.18);border-radius:2px;font-family:var(--fm);font-size:7.5px;color:#3a8a52">
+      ✅ tw_stock_daily · institutional · margin · margin_calc · holding_ratio · daytrade 六張表的個股數 = 本清單總數，任何差異代表當日抓取未完成（黃燈提示）
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ct">◈ 其他商品 — 新增 / 刪除 (13 Categories)
+      <span class="badge blue" id="all-total-badge">Total: — tickers</span>
+      <button class="btn" style="margin-left:auto;padding:4px 10px;font-size:7px" onclick="resetAll()">↺ Reset Default</button>
+    </div>
+    <div id="cat-manager-v3" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:9px"></div>
+  </div>
+
+  <div class="card" style="border-color:rgba(196,78,82,.2)">
+    <div class="ct" style="color:var(--orange)">🔒 TW Ticker REGEX — LOCKED (LL07)</div>
+    <div class="pr"><span class="pk">TW_TICKER_REGEX</span><span class="pv" style="font-family:var(--fm);font-size:8px;color:var(--orange)">(?!202[1-9])(?!2030)([1-9]\d{3}) — 排除年份誤判</span></div>
+    <div class="pr"><span class="pk">TW_BLOOMBERG_RE</span><span class="pv" style="font-family:var(--fm);font-size:8px;color:var(--orange)">\b{REGEX}\s+TT\b</span></div>
+    <div class="pr"><span class="pk">TW_YFINANCE_RE</span><span class="pv" style="font-family:var(--fm);font-size:8px;color:var(--orange)">\b{REGEX}\.(TW|TWO)\b</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE: FRED + AKShare
+     ═══════════════════════════════════════ -->
+<div id="page-fredak" class="page">
+  <div class="g2">
+    <!-- FRED -->
+    <div class="card">
+      <div class="ct">FRED (Federal Reserve Economic Data)
+        <span class="badge red" id="fred-badge">需 API Key</span>
+        <a href="https://fred.stlouisfed.org/docs/api/api_key.html" target="_blank" style="font-family:var(--fm);font-size:7.5px;color:var(--blue);margin-left:auto">申請 ↗</a>
+      </div>
+      <div class="pr">
+        <span class="pk">FRED_API_KEY</span>
+        <input class="pi" id="fred-key" placeholder="輸入 API Key (免費申請)" style="min-width:220px" oninput="updateFredStatus()">
+      </div>
+      <div id="fred-alert" class="fred-alert warn">⚠ API Key 未設定 — 以下 48 個 FRED series 將被跳過 (bond_daily / volatility_daily / macro 補充均受影響)</div>
+
+      <div class="sh">FRED Series (48)</div>
+      <div id="fred-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:3px;max-height:400px;overflow-y:auto"></div>
+    </div>
+
+    <!-- AKShare -->
+    <div class="card">
+      <div class="ct">AKShare 整合狀態 <span class="badge green">215 Functions</span><span class="badge amber">22 Broken/Skip</span></div>
+      <div class="pr"><span class="pk">AKShare 版本</span><span class="pv">akshare ≥ 1.8.0</span></div>
+      <div class="pr"><span class="pk">Region 數</span><span class="pv">12</span></div>
+      <div class="pr"><span class="pk">可用 Functions</span><span class="pv" style="color:var(--green)">~193</span></div>
+      <div class="pr"><span class="pk">BROKEN (skip)</span><span class="pv" style="color:var(--orange)">22</span></div>
+
+      <div class="sh">Region 分佈</div>
+      <div id="ak-regions" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;margin-bottom:10px"></div>
+
+      <div class="sh">Broken / Skipped (22)</div>
+      <div id="broken-list" style="display:grid;grid-template-columns:1fr 1fr;gap:3px;max-height:200px;overflow-y:auto"></div>
+
+      <div class="fred-alert ok" style="margin-top:10px">
+        ✅ AKShare 完整整合進 M02Fetcher.run() → 自動 skip broken endpoints → upsert DuckDB macro tables<br>
+        ✅ macro_indicators 表 = AKShare ~193 fn + FRED (若有 key) 合併 upsert
+      </div>
+    </div>
+  </div>
+
+  <!-- Mapping -->
+  <div class="card">
+    <div class="ct">FRED + AKShare → DuckDB Table 對應</div>
+    <table class="diff-table">
+      <thead><tr><th>DuckDB Table</th><th>Sources</th><th>說明</th><th>FRED 需要?</th><th>Status</th></tr></thead>
+      <tbody id="fredak-mapping"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PAGE: PARAMS
+     ═══════════════════════════════════════ -->
+<div id="page-params" class="page">
+  <div class="g2">
+    <div class="card">
+      <div class="ct">⚙ BatchConfig</div>
+      <div class="sh">Paths</div>
+      <div class="pr"><span class="pk">BASE_DIR</span><input class="pi" value="C:\VeritasIntelligenceAnalytics\VDS_M01" style="min-width:250px"></div>
+      <div class="pr"><span class="pk">DUCKDB_PATH</span><input class="pi" value="batch_download.duckdb"></div>
+      <div class="sh">Date Range</div>
+      <div class="pr"><span class="pk">START_DATE</span><input class="pi" type="date" value="2024-01-01"></div>
+      <div class="pr"><span class="pk">END_DATE</span><input class="pi" placeholder="'' = today"></div>
+      <div class="sh">6-Layer Accel</div>
+      <div class="pr"><span class="pk">MAX_WORKERS (L1)</span><input class="pi" type="number" value="8" min="1" max="64" style="min-width:80px"></div>
+      <div class="pr"><span class="pk">BATCH_SIZE (L2)</span><input class="pi" type="number" value="30"></div>
+      <div class="pr"><span class="pk">MAX_CONCURRENT</span><input class="pi" type="number" value="3"></div>
+      <div class="pr"><span class="pk">SLEEP_BETWEEN</span><input class="pi" type="number" value="0.8" step="0.1"></div>
+      <div class="sh">Rate Limiter</div>
+      <div class="pr"><span class="pk">RATE_PER_SECOND</span><input class="pi" type="number" value="2"></div>
+      <div class="pr"><span class="pk">RATE_PER_MINUTE</span><input class="pi" type="number" value="80"></div>
+      <div class="pr"><span class="pk">MAX_RETRIES</span><input class="pi" type="number" value="5"></div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="ct">Category Enable/Disable</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px">
+          <div class="pr"><span class="pk" style="font-size:8px">TW_STOCKS</span><input class="tog" type="checkbox" checked></div>
+          <div class="pr"><span class="pk" style="font-size:8px">TW_INDICES</span><input class="tog" type="checkbox" checked></div>
+          <div class="pr"><span class="pk" style="font-size:8px">TW_ETFS</span><input class="tog" type="checkbox" checked></div>
+          <div class="pr"><span class="pk" style="font-size:8px">US_STOCKS</span><input class="tog" type="checkbox" checked></div>
+          <div class="pr"><span class="pk" style="font-size:8px">US_INDICES</span><input class="tog" type="checkbox" checked></div>
+          <div class="pr"><span class="pk" style="font-size:8px">US_ETFS</span><input class="tog" type="checkbox" checked></div>
+          <div class="pr"><span class="pk" style="font-size:8px">FOREX</span><input class="tog" type="checkbox" checked></div>
+          <div class="pr"><span class="pk" style="font-size:8px">CRYPTO</span><input class="tog" type="checkbox" checked></div>
+          <div class="pr"><span class="pk" style="font-size:8px">COMMODITIES</span><input class="tog" type="checkbox" checked></div>
+          <div class="pr"><span class="pk" style="font-size:8px">BONDS</span><input class="tog" type="checkbox" checked></div>
+          <div class="pr"><span class="pk" style="font-size:8px">VOLATILITY</span><input class="tog" type="checkbox" checked></div>
+          <div class="pr"><span class="pk" style="font-size:8px">FUTURES</span><input class="tog" type="checkbox" checked></div>
+          <div class="pr"><span class="pk" style="font-size:8px">REITS</span><input class="tog" type="checkbox" checked></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ct">Output Settings</div>
+        <div class="pr"><span class="pk">OUTPUT_DUCKDB</span><input class="tog" type="checkbox" checked></div>
+        <div class="pr"><span class="pk">OUTPUT_CSV</span><input class="tog" type="checkbox" checked></div>
+        <div class="pr"><span class="pk">OUTPUT_PARQUET</span><input class="tog" type="checkbox" checked></div>
+        <div class="pr"><span class="pk">OUTPUT_JSON</span><input class="tog" type="checkbox"></div>
+        <div class="pr"><span class="pk">PARQUET_COMPRESS</span>
+          <select class="pi"><option>snappy</option><option>lz4</option><option>zstd</option><option>gzip</option></select>
+        </div>
+        <div class="pr"><span class="pk">CSV_ENCODING</span>
+          <select class="pi"><option selected>utf-8-sig</option><option>utf-8</option><option>big5</option></select>
+        </div>
+        <div class="pr"><span class="pk">ENABLE_CACHE</span><input class="tog" type="checkbox" checked></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+// ─── Clock ───
+function tick(){const n=new Date();document.getElementById('clock').textContent=n.toLocaleDateString('zh-TW')+' '+n.toTimeString().slice(0,8)+' CST';}
+tick();setInterval(tick,1000);
+function showPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ─── TW Stock count (base) ───
+// In reality fetched from tw_stock_list table.  Simulated here.
+const TW_TWSE = 1200;
+const TW_TPEX = 647;
+function twTotal(){return TW_TWSE+TW_TPEX;}
+
+// ─── TW sub-table definitions ───
+const TW_SUBTABLES = [
+  {name:'tw_stock_daily',      label:'每日量價 OHLCV',    src:[['src-yf','yfinance'],['src-twse','TWSE'],['src-tpex','TPEX']],   freq:'daily',    pk:'ticker+date',    rows_per_ticker:365, note:'yfinance批量下載，TWSE/TPEX提供清單'},
+  {name:'tw_stock_institutional',label:'三大法人買賣超',  src:[['src-twse','TWSE'],['src-tpex','TPEX']],                          freq:'daily',    pk:'ticker+date',    rows_per_ticker:252, note:'政府開放API'},
+  {name:'tw_stock_margin',     label:'融資融券餘額',      src:[['src-twse','TWSE'],['src-tpex','TPEX']],                          freq:'daily',    pk:'ticker+date',    rows_per_ticker:252, note:'政府開放API'},
+  {name:'tw_stock_margin_calc',label:'融資維持率+券資比 (calc)', src:[['src-twse','TWSE'],['src-tpex','TPEX'],['src-calc','calc']],freq:'daily',    pk:'ticker+date',    rows_per_ticker:252, note:'由 margin 計算，數量完全相同'},
+  {name:'tw_stock_holding_ratio',label:'三大法人持股率 (calc)',  src:[['src-twse','TWSE'],['src-tpex','TPEX'],['src-calc','calc']],freq:'daily',    pk:'ticker+date',    rows_per_ticker:252, note:'由 institutional 計算'},
+  {name:'tw_stock_daytrade',   label:'當沖交易統計',      src:[['src-twse','TWSE'],['src-tpex','TPEX']],                          freq:'daily',    pk:'ticker+date',    rows_per_ticker:252, note:'TWSE/TPEX 當沖 API'},
+];
+
+// tw_stock_list & profile are "reference" tables
+const TW_REF_TABLES = [
+  {name:'tw_stock_list',       label:'全股清單+三碼對照', src:[['src-twse','TWSE'],['src-tpex','TPEX']],          freq:'daily',    pk:'ticker',         rows_fixed:null, note:'每日更新，為所有台股表的 MASTER 清單'},
+  {name:'tw_stock_profile',    label:'基本資料+公司簡介', src:[['src-twse','TWSE'],['src-tpex','TPEX'],['src-mops','MOPS'],['src-yf','yfinance']], freq:'daily', pk:'ticker', rows_fixed:null, note:'多源整合，MOPS財報+yfinance.info'},
+  {name:'tw_stock_financials', label:'財報 (季報×4)',     src:[['src-mops','MOPS'],['src-yf','yfinance']],         freq:'quarterly',pk:'ticker+period',  rows_fixed:null, note:'季度資料，row數 = 個股數×季數'},
+];
+
+// Status simulation
+const TABLE_STATUS = {};
+function getStatus(name){return TABLE_STATUS[name]||'ok';}
+
+function calcRows(def){
+  if(def.rows_fixed!==undefined&&def.rows_fixed!==null) return def.rows_fixed;
+  if(def.rows_per_ticker) return twTotal()*def.rows_per_ticker + Math.floor(Math.random()*200);
+  return null;
+}
+const ROW_CACHE = {};
+
+function buildTWSubRows(){
+  let html='';
+  const total = twTotal();
+
+  TW_SUBTABLES.forEach(def=>{
+    const st = getStatus(def.name);
+    const ledCls = st==='ok'?'led-ok':st==='warn'?'led-warn':'led-err';
+    const sbCls = st==='ok'?'sb-ok':st==='warn'?'sb-warn':'sb-err';
+    const sbTxt = st==='ok'?'OK':st==='warn'?'⚠ WARN':'✕ ERR';
+    if(!ROW_CACHE[def.name]) ROW_CACHE[def.name]=calcRows(def);
+    const rows = ROW_CACHE[def.name];
+    const srcHtml = def.src.map(([k,l])=>`<span class="src-tag ${k}">${l}</span>`).join(' ');
+    // count color — all should equal twTotal()
+    const cntClass = 'cnt-ok';
+
+    html+=`<div class="sub-row">
+      <div class="sub-cell center"><span class="led ${ledCls}"></span></div>
+      <div class="sub-cell name">
+        <span style="font-family:var(--fm);font-size:8.5px;font-weight:500">${def.name}</span>
+        <span style="font-size:8px;color:var(--t2)">${def.label}</span>
+      </div>
+      <div class="sub-cell center"><span class="${cntClass}">${total.toLocaleString()}</span></div>
+      <div class="sub-cell">${srcHtml}</div>
+      <div class="sub-cell center" style="color:var(--t3);font-size:8px">${def.freq}</div>
+      <div class="sub-cell right" style="font-family:var(--fm);font-size:9px">${rows?rows.toLocaleString():'—'}</div>
+      <div class="sub-cell center"><span style="font-family:var(--fm);font-size:7.5px;color:var(--t3)">${def.pk}</span></div>
+      <div class="sub-cell" style="font-size:7.5px;color:var(--t2)">${def.note}</div>
+      <div class="sub-cell center"><span class="status-badge ${sbCls}">${sbTxt}</span></div>
+    </div>`;
+  });
+
+  // Separator: reference tables
+  html+=`<div style="padding:5px 12px;background:rgba(76,114,176,.04);border-top:1px solid var(--border);font-family:var(--fm);font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--t3)">Reference / Metadata Tables</div>`;
+
+  TW_REF_TABLES.forEach(def=>{
+    const st = getStatus(def.name);
+    const ledCls = st==='ok'?'led-ok':st==='warn'?'led-warn':'led-err';
+    const sbCls = st==='ok'?'sb-ok':'sb-warn';
+    const sbTxt = st==='ok'?'OK':'⚠ WARN';
+    if(!ROW_CACHE[def.name]) ROW_CACHE[def.name]= def.name==='tw_stock_financials'? total*4 : total;
+    const rows = ROW_CACHE[def.name];
+    const srcHtml = def.src.map(([k,l])=>`<span class="src-tag ${k}">${l}</span>`).join(' ');
+    const cntStr = def.name==='tw_stock_financials'? total+'×Q' : total.toLocaleString();
+
+    html+=`<div class="sub-row" style="background:rgba(76,114,176,.02)">
+      <div class="sub-cell center"><span class="led ${ledCls}"></span></div>
+      <div class="sub-cell name">
+        <span style="font-family:var(--fm);font-size:8.5px;font-weight:500">${def.name}</span>
+        <span style="font-size:8px;color:var(--t2)">${def.label}</span>
+      </div>
+      <div class="sub-cell center"><span style="font-family:var(--fm);font-size:9px;color:var(--blue);font-weight:600">${cntStr}</span></div>
+      <div class="sub-cell">${srcHtml}</div>
+      <div class="sub-cell center" style="color:var(--t3);font-size:8px">${def.freq}</div>
+      <div class="sub-cell right" style="font-family:var(--fm);font-size:9px">${rows?rows.toLocaleString():'—'}</div>
+      <div class="sub-cell center"><span style="font-family:var(--fm);font-size:7.5px;color:var(--t3)">${def.pk}</span></div>
+      <div class="sub-cell" style="font-size:7.5px;color:var(--t2)">${def.note}</div>
+      <div class="sub-cell center"><span class="status-badge ${sbCls}">${sbTxt}</span></div>
+    </div>`;
+  });
+
+  document.getElementById('tw-sub-rows').innerHTML = html;
+  // Update KPIs
+  document.getElementById('kpi-tw-total').textContent = total.toLocaleString();
+  document.getElementById('kpi-tw-twse').textContent = TW_TWSE.toLocaleString();
+  document.getElementById('kpi-tw-tpex').textContent = TW_TPEX.toLocaleString();
+  document.getElementById('tw-count-badge').textContent = total.toLocaleString();
+  document.getElementById('merged-cnt').textContent = total.toLocaleString();
+  document.getElementById('tw-list-count').textContent = total.toLocaleString();
+  document.getElementById('tw-list-total-badge').textContent = 'Total: '+total.toLocaleString();
+}
+
+// ─── Other Tables (non-TW-stock) ───
+const OTHER_TABLE_GROUPS = [
+  {cat:'台股指數', color:'idx', tables:[
+    {name:'tw_index_daily',         label:'台股指數量價',          src:[['src-twse','TWSE'],['src-yf','yfinance']], freq:'daily', pk:'index_code+date', rows:2450, cat_key:'TW_INDICES'},
+    {name:'tw_index_institutional', label:'指數三大法人',           src:[['src-twse','TWSE']],                       freq:'daily', pk:'index_code+date', rows:2450, cat_key:'TW_INDICES'},
+  ]},
+  {cat:'台股ETF', color:'tw', tables:[
+    {name:'tw_etf_daily',           label:'台股ETF量價',            src:[['src-yf','yfinance'],['src-twse','TWSE']], freq:'daily', pk:'ticker+date', rows:2100, cat_key:'TW_ETFS'},
+  ]},
+  {cat:'國際個股', color:'us', tables:[
+    {name:'intl_stock_daily',       label:'國際個股量價',           src:[['src-yf','yfinance']],                     freq:'daily', pk:'ticker+date', rows:25800, cat_key:'US_STOCKS'},
+  ]},
+  {cat:'國際指數', color:'idx', tables:[
+    {name:'intl_index_daily',       label:'國際指數量價',           src:[['src-yf','yfinance']],                     freq:'daily', pk:'index_code+date', rows:18400, cat_key:'US_INDICES'},
+  ]},
+  {cat:'國際ETF', color:'us', tables:[
+    {name:'intl_etf_daily',         label:'國際ETF量價',            src:[['src-yf','yfinance']],                     freq:'daily', pk:'ticker+date', rows:4200, cat_key:'US_ETFS'},
+  ]},
+  {cat:'外匯', color:'forex', tables:[
+    {name:'forex_daily',            label:'外匯匯率',               src:[['src-yf','yfinance']],                     freq:'daily', pk:'pair+date', rows:1820, cat_key:'FOREX'},
+  ]},
+  {cat:'加密貨幣', color:'crypto', tables:[
+    {name:'crypto_daily',           label:'加密貨幣量價',           src:[['src-yf','yfinance']],                     freq:'daily', pk:'ticker+date', rows:2100, cat_key:'CRYPTO'},
+  ]},
+  {cat:'商品', color:'comm', tables:[
+    {name:'commodity_daily',        label:'大宗商品期貨',           src:[['src-yf','yfinance']],                     freq:'daily', pk:'ticker+date', rows:1830, cat_key:'COMMODITIES'},
+  ]},
+  {cat:'債券', color:'idx', tables:[
+    {name:'bond_daily',             label:'債券殖利率',             src:[['src-yf','yfinance'],['src-fred','FRED']], freq:'daily', pk:'ticker+date', rows:2450, cat_key:'BONDS', fred_dep:true},
+  ]},
+  {cat:'波動率', color:'idx', tables:[
+    {name:'volatility_daily',       label:'波動率指數',             src:[['src-yf','yfinance'],['src-fred','FRED']], freq:'daily', pk:'ticker+date', rows:1820, cat_key:'VOLATILITY', fred_dep:true},
+  ]},
+  {cat:'期貨', color:'us', tables:[
+    {name:'futures_daily',          label:'期貨合約',               src:[['src-yf','yfinance']],                     freq:'daily', pk:'ticker+date', rows:820, cat_key:'FUTURES'},
+  ]},
+  {cat:'REITs', color:'us', tables:[
+    {name:'reit_daily',             label:'REITs',                  src:[['src-yf','yfinance']],                     freq:'daily', pk:'ticker+date', rows:1248, cat_key:'REITS'},
+  ]},
+  {cat:'總經', color:'mac', tables:[
+    {name:'macro_indicators',       label:'總經指標 (AKShare+FRED)',src:[['src-ak','AKShare'],['src-fred','FRED']],  freq:'varies', pk:'indicator+region+date', rows:38400, cat_key:'MACRO', fred_dep:true},
+  ]},
+  {cat:'情緒', color:'mac', tables:[
+    {name:'sentiment_daily',        label:'市場情緒',               src:[['src-cnn','CNN'],['src-ak','AAII']],       freq:'daily', pk:'indicator+date', rows:1248, cat_key:'SENTIMENT'},
+  ]},
+  {cat:'系統', color:'mac', tables:[
+    {name:'meta_fetch_log',         label:'抓取紀錄',               src:[['src-sys','System']],                      freq:'per-fetch', pk:'table+fetch_time', rows:2100, cat_key:'SYS'},
+  ]},
+];
+
+// ─── Ticker State ───
+const DEFAULT_TICKERS = {
+  TW_INDICES:  {cls:'idx',  src:'yfinance',          tickers:['^TWII','^TWOII']},
+  TW_ETFS:     {cls:'tw',   src:'TWSE/TPEX',         tickers:['0050.TW','0056.TW','00878.TW','00713.TW','006208.TW']},
+  US_STOCKS:   {cls:'us',   src:'yfinance',          tickers:['NVDA','AMD','TSM','AAPL','MSFT','GOOGL','AMZN','META']},
+  US_INDICES:  {cls:'idx',  src:'yfinance',          tickers:['^GSPC','^DJI','^IXIC','^SOX','^RUT']},
+  US_ETFS:     {cls:'us',   src:'yfinance',          tickers:['SPY','QQQ','IWM','DIA','SOXX','VTI','VOO']},
+  FOREX:       {cls:'forex',src:'yfinance',          tickers:['USDTWD=X','EURUSD=X','USDJPY=X','GBPUSD=X','USDCNH=X']},
+  CRYPTO:      {cls:'crypto',src:'yfinance',         tickers:['BTC-USD','ETH-USD','SOL-USD']},
+  COMMODITIES: {cls:'comm', src:'yfinance',          tickers:['GC=F','CL=F','SI=F','NG=F','HG=F']},
+  BONDS:       {cls:'idx',  src:'yfinance+FRED',     tickers:['^TNX','^TYX','^IRX','^FVX']},
+  VOLATILITY:  {cls:'idx',  src:'yfinance+FRED',     tickers:['^VIX']},
+  FUTURES:     {cls:'us',   src:'yfinance',          tickers:['ES=F','NQ=F','YM=F']},
+  REITS:       {cls:'us',   src:'yfinance',          tickers:['VNQ','IYR']},
+  MACRO:       {cls:'mac',  src:'AKShare+FRED',      tickers:['AKShare×193','FRED×48']},
+  SENTIMENT:   {cls:'mac',  src:'CNN+AAII',          tickers:['CNN_FEAR_GREED','AAII_BULL','AAII_BEAR']},
+};
+let TICKER_STATE = JSON.parse(JSON.stringify(DEFAULT_TICKERS));
+
+function getCount(key){
+  return TICKER_STATE[key]?TICKER_STATE[key].tickers.length:0;
+}
+
+// Build other tables block
+function buildOtherTables(){
+  let html='';
+  let totalRows=0;
+  const twRows = [...TW_SUBTABLES,...TW_REF_TABLES].reduce((s,d)=>{
+    return s+(ROW_CACHE[d.name]||0);
+  },0);
+
+  OTHER_TABLE_GROUPS.forEach(g=>{
+    const fredDep = g.tables.some(t=>t.fred_dep);
+    const st = fredDep&&!document.getElementById('fred-key').value.trim()?'warn':'ok';
+    let groupHtml='';
+    g.tables.forEach(def=>{
+      const cnt = getCount(def.cat_key);
+      const srcHtml = def.src.map(([k,l])=>`<span class="src-tag ${k}">${l}</span>`).join(' ');
+      const sbCls = st==='ok'?'sb-ok':'sb-warn';
+      const sbTxt = st==='ok'?'OK':'⚠ No Key';
+      totalRows += def.rows;
+      groupHtml+=`<div class="sub-row">
+        <div class="sub-cell center"><span class="led ${st==='ok'?'led-ok':'led-warn'}"></span></div>
+        <div class="sub-cell name">
+          <span style="font-family:var(--fm);font-size:8.5px;font-weight:500">${def.name}</span>
+          <span style="font-size:8px;color:var(--t2)">${def.label}</span>
+        </div>
+        <div class="sub-cell center">
+          ${cnt>0?`<span style="font-family:var(--fm);font-size:9px;color:var(--blue);font-weight:600">${cnt}</span>`:'<span style="color:var(--t4);font-size:8px">—</span>'}
+        </div>
+        <div class="sub-cell">${srcHtml}</div>
+        <div class="sub-cell center" style="color:var(--t3);font-size:8px">${def.freq}</div>
+        <div class="sub-cell right" style="font-family:var(--fm);font-size:9px">${def.rows.toLocaleString()}</div>
+        <div class="sub-cell center"><span style="font-family:var(--fm);font-size:7.5px;color:var(--t3)">${def.pk}</span></div>
+        <div class="sub-cell" style="font-size:7.5px;color:var(--t2)">${fredDep?'⚠ 需 FRED key 補充':'yfinance 直接抓取'}</div>
+        <div class="sub-cell center"><span class="status-badge ${sbCls}">${sbTxt}</span></div>
+      </div>`;
+    });
+    html+=`<div style="margin-bottom:6px">
+      <div style="font-family:var(--fm);font-size:7px;letter-spacing:2px;text-transform:uppercase;color:var(--t4);padding:5px 2px;display:flex;align-items:center;gap:6px">
+        ${g.cat}
+        ${fredDep?'<span class="badge amber" style="font-size:6.5px">FRED dep.</span>':''}
+        <span style="flex:1;height:1px;background:var(--border);display:block"></span>
+      </div>
+      <div style="border:1px solid var(--border);border-radius:2px;overflow:hidden">${groupHtml}</div>
+    </div>`;
+  });
+
+  const allRows = twRows + totalRows;
+  document.getElementById('kpi-total-rows').textContent = allRows.toLocaleString();
+  document.getElementById('other-tables-block').innerHTML = `
+    <div style="margin-bottom:8px">
+      <div class="tw-cols-header" style="border-radius:2px 2px 0 0">
+        <span></span><span>Table / 說明</span><span style="text-align:center">商品數</span>
+        <span>Sources</span><span style="text-align:center">Freq</span>
+        <span style="text-align:right">Rows</span><span style="text-align:center">PK</span>
+        <span>備註</span><span style="text-align:center">Status</span>
+      </div>
+      ${html}
+    </div>`;
+}
+
+// Build instrument manager
+function buildCatManager(){
+  const cats = Object.entries(TICKER_STATE).filter(([k])=>!['MACRO','SENTIMENT'].includes(k));
+  const macCats = Object.entries(TICKER_STATE).filter(([k])=>['MACRO','SENTIMENT'].includes(k));
+
+  let html = cats.map(([cat,d])=>buildCatCard(cat,d)).join('');
+  // Macro readonly cards
+  html += macCats.map(([cat,d])=>`
+    <div style="background:var(--s2);border:1px solid var(--border);border-radius:2px;padding:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <span style="font-family:var(--fm);font-size:8px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--t2)">${cat}</span>
+        <span class="badge gray">${d.src}</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px">
+        ${d.tickers.map(t=>`<span class="tk mac">${t}</span>`).join('')}
+      </div>
+      <div style="margin-top:5px;font-family:var(--fm);font-size:7px;color:var(--t3)">透過 ${d.src} 抓取，非 yfinance ticker</div>
+    </div>`).join('');
+
+  document.getElementById('cat-manager-v3').innerHTML = html;
+  updateTotalBadge();
+}
+
+function buildCatCard(cat,d){
+  return `<div style="background:var(--s2);border:1px solid var(--border);border-radius:2px;padding:10px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:4px">
+      <span style="font-family:var(--fm);font-size:8px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:var(--t2)">${cat}</span>
+      <div style="display:flex;align-items:center;gap:4px">
+        <span class="badge blue" id="cnt-badge-${cat}">${d.tickers.length}</span>
+        <span class="badge gray" style="font-size:6.5px">${d.src}</span>
+      </div>
+    </div>
+    <div class="ticker-wrap" id="tags-${cat}">
+      ${d.tickers.map(t=>`<span class="tk ${d.cls}">${t}<button class="del" onclick="delTicker('${cat}','${t}')">✕</button></span>`).join('')}
+    </div>
+    <div class="add-row">
+      <input class="add-inp" id="inp-${cat}" placeholder="輸入代碼" onkeydown="if(event.key==='Enter')addTicker('${cat}')">
+      <button class="add-btn" onclick="addTicker('${cat}')">+ Add</button>
+    </div>
+  </div>`;
+}
+
+function addTicker(cat){
+  const inp=document.getElementById('inp-'+cat);
+  const val=inp.value.trim().toUpperCase();
+  if(!val) return;
+  if(TICKER_STATE[cat].tickers.includes(val)){addLog('warn',`${val} already in ${cat}`);inp.value='';return;}
+  TICKER_STATE[cat].tickers.push(val);
+  inp.value='';
+  refreshCatCard(cat);
+  buildOtherTables();
+  updateTotalBadge();
+  addLog('ok',`+ Added ${val} to ${cat} (${TICKER_STATE[cat].tickers.length} total)`);
+}
+
+function delTicker(cat,ticker){
+  TICKER_STATE[cat].tickers=TICKER_STATE[cat].tickers.filter(t=>t!==ticker);
+  refreshCatCard(cat);
+  buildOtherTables();
+  updateTotalBadge();
+  addLog('warn',`- Removed ${ticker} from ${cat} (${TICKER_STATE[cat].tickers.length} total)`);
+}
+
+function refreshCatCard(cat){
+  const d=TICKER_STATE[cat];
+  const tags=document.getElementById('tags-'+cat);
+  const cnt=document.getElementById('cnt-badge-'+cat);
+  if(tags) tags.innerHTML=d.tickers.map(t=>`<span class="tk ${d.cls}">${t}<button class="del" onclick="delTicker('${cat}','${t}')">✕</button></span>`).join('');
+  if(cnt) cnt.textContent=d.tickers.length;
+}
+
+function updateTotalBadge(){
+  const total=Object.values(TICKER_STATE).reduce((s,c)=>s+c.tickers.length,0);
+  const b=document.getElementById('all-total-badge');
+  if(b) b.textContent=`Total: ${total} tickers`;
+}
+
+function resetAll(){
+  TICKER_STATE=JSON.parse(JSON.stringify(DEFAULT_TICKERS));
+  buildCatManager();
+  buildOtherTables();
+  addLog('ok','[Instruments] Reset to defaults');
+}
+
+// ─── FRED / AK ───
+const FRED_SERIES=[
+  ['US','CPIAUCSL','CPI'],['US','PPIACO','PPI'],['US','GDP','GDP'],['US','UNRATE','失業率'],
+  ['US','FEDFUNDS','Fed Funds Rate'],['US','RSAFS','零售銷售'],['US','INDPRO','工業生產'],
+  ['US','BOPGSTB','貿易差額'],['US','PCEPILFE','核心PCE'],['US','PERMIT','建築許可'],
+  ['US','ICSA','初請失業金'],['US','UMCSENT','密歇根消費'],
+  ['EU','CP0000EZ19M086NEST','EU CPI'],['EU','CLVMNACSCAB1GQEA19','EU GDP'],
+  ['EU','LRHUTTTTEZM156S','EU 失業率'],['EU','ECBDFR','ECB 利率'],
+  ['CN','CHNCPIALLMINMEI','CN CPI'],['CN','MKTGDPCNA646NWDB','CN GDP'],
+  ['CN','CHNPIEATI01GYM','CN 工業'],['CN','MYAGM2CNM189N','CN M2'],
+  ['JP','JPNCPIALLMINMEI','JP CPI'],['JP','JPNRGDPEXP','JP GDP'],
+  ['JP','LRHUTTTTJPM156S','JP 失業率'],['JP','JPNPROINDMISMEI','JP 工業'],
+  ['TW','TWNCPIALLMINMEI','TW CPI'],['TW','MKTGDPTWN646NWDB','TW GDP'],
+  ['TW','TWNPROINDMISMEI','TW 工業'],['TW','LRHUTTTTTWM156S','TW 失業率'],
+  ['TW','INTDSRTWM193N','TW 利率'],['TW','MYAGM2TWM189N','TW M2'],
+  ['TW','XTEXVA01TWM667S','TW 出口'],['TW','XTIMVA01TWM667S','TW 進口'],
+  ['PMI','MPMICTOT','US Mfg PMI'],['PMI','NMFCI','US Svc PMI'],
+  ['PMI','EUEPHM','EU PMI'],['PMI','JPAPHM','JP PMI'],
+  ['PMI','CHNPHM','CN PMI'],['PMI','GBRAPHM','UK PMI'],['PMI','WDAPHM','Global PMI'],
+  ['SENT','VIXCLS','VIX'],['SENT','T10Y2Y','10Y-2Y 殖利率'],['SENT','TEDRATE','TED Spread'],
+  ['SENT','SP500','S&P 500'],['SENT','NASDAQCOM','NASDAQ'],['SENT','DGS10','US 10Y'],
+  ['SENT','DGS2','US 2Y'],['SENT','T5YIE','5Y Breakeven'],
+];
+function buildFredGrid(){
+  document.getElementById('fred-grid').innerHTML=FRED_SERIES.map(([r,id,n])=>`
+    <div style="display:flex;align-items:center;gap:4px;padding:3px 6px;background:var(--surface);border:1px solid var(--border);border-radius:2px">
+      <span class="src-tag src-fred" style="min-width:26px;justify-content:center;font-size:6px">${r}</span>
+      <span style="font-family:var(--fm);font-size:7.5px;flex:1;color:var(--t2)">${n}</span>
+      <span style="font-family:var(--fm);font-size:6.5px;color:var(--t4)">${id}</span>
+    </div>`).join('');
+}
+
+function updateFredStatus(){
+  const key=document.getElementById('fred-key').value.trim();
+  const el=document.getElementById('fred-alert');
+  const badge=document.getElementById('fred-badge');
+  const pill=document.getElementById('pill-fred');
+  if(key.length>10){
+    el.className='fred-alert ok';
+    el.innerHTML='✅ API Key 已設定 — 48 個 FRED series 可正常抓取 (bond_daily / volatility_daily / macro 補充均啟用)';
+    badge.className='badge green'; badge.textContent='Key OK';
+    pill.querySelector('.dot').className='dot ok';
+    pill.innerHTML='<span class="dot ok"></span>FRED (active)';
+    TABLE_STATUS['bond_daily']='ok'; TABLE_STATUS['volatility_daily']='ok';
+  } else {
+    el.className='fred-alert warn';
+    el.innerHTML='⚠ API Key 未設定 — 以下 48 個 FRED series 將被跳過 (bond_daily / volatility_daily / macro 補充均受影響)';
+    badge.className='badge red'; badge.textContent='需 API Key';
+    pill.innerHTML='<span class="dot warn"></span>FRED (需 Key)';
+    TABLE_STATUS['bond_daily']='warn'; TABLE_STATUS['volatility_daily']='warn';
+  }
+  buildOtherTables(); buildTWSubRows();
+}
+
+const AK_REGIONS={China:80,HongKong:9,USA:44,Euro:14,Germany:8,Switzerland:6,Japan:5,UK:15,Australia:7,Canada:10,Global:12,Shipping:4};
+const BROKEN=['macro_china_shrzgm','macro_china_swap_rate','macro_china_insurance','macro_china_central_bank_balance','macro_china_supply_of_money','macro_china_retail_price_index','macro_china_postal','macro_china_society_traffic','macro_china_foreign_exchange_gold','macro_china_rmb','macro_china_nbs_nation','macro_china_nbs_region','macro_china_insurance_income','macro_china_mobile_number','macro_china_vegetable_basket','macro_china_agricultural_product','macro_china_energy_index','macro_china_commodity_price','macro_china_lpi','macro_china_bdti','macro_china_bsi','macro_shipping_bcti'];
+
+function buildAK(){
+  document.getElementById('ak-regions').innerHTML=Object.entries(AK_REGIONS).map(([r,n])=>`
+    <div style="display:flex;justify-content:space-between;padding:4px 7px;background:var(--surface);border:1px solid var(--border);border-radius:2px">
+      <span style="font-family:var(--fm);font-size:8px;color:var(--t2)">${r}</span>
+      <span style="font-family:var(--fm);font-size:9px;font-weight:600;color:var(--blue)">${n}</span>
+    </div>`).join('');
+  document.getElementById('broken-list').innerHTML=BROKEN.map(f=>`
+    <div style="font-family:var(--fm);font-size:7.5px;padding:3px 6px;background:rgba(196,78,82,.05);border:1px solid rgba(196,78,82,.14);border-radius:2px;color:var(--orange);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${f}">✕ ${f.replace('macro_china_','').replace('macro_','')}</div>`).join('');
+}
+
+const FREDAK_MAP = [
+  {t:'bond_daily',    src:'yf+FRED',  note:'殖利率/債券',  fred:'✅ 補充',  st:'warn'},
+  {t:'volatility_daily',src:'yf+FRED',note:'波動率/VIX',   fred:'✅ 補充',  st:'warn'},
+  {t:'macro_indicators',src:'AK+FRED',note:'總經整合表',    fred:'✅ 主力',  st:'ok'},
+  {t:'us_macro',      src:'AKShare',  note:'US AK宏觀',    fred:'—',        st:'ok'},
+  {t:'eu_macro',      src:'AKShare',  note:'EU AK宏觀',    fred:'—',        st:'ok'},
+  {t:'cn_macro',      src:'AKShare',  note:'CN AK宏觀',    fred:'—',        st:'ok'},
+  {t:'sentiment_daily',src:'CNN+AAII',note:'市場情緒',      fred:'— (VIX補充)',st:'ok'},
+];
+function buildFredAKMapping(){
+  document.getElementById('fredak-mapping').innerHTML=FREDAK_MAP.map(r=>`<tr>
+    <td><span style="font-family:var(--fm);font-size:8.5px;font-weight:500">${r.t}</span></td>
+    <td>${r.src.split('+').map(s=>`<span class="src-tag ${s==='AKShare'?'src-ak':s==='FRED'?'src-fred':s==='CNN'||s==='AAII'?'src-cnn':s==='AK'?'src-ak':'src-yf'}">${s}</span>`).join(' ')}</td>
+    <td style="font-size:8px;color:var(--t2)">${r.note}</td>
+    <td style="font-family:var(--fm);font-size:8px">${r.fred}</td>
+    <td><span class="status-badge ${r.t.includes('bond')||r.t.includes('vol')?'sb-warn':'sb-ok'}">${r.t.includes('bond')||r.t.includes('vol')?'⚠ 需 Key':'OK'}</span></td>
+  </tr>`).join('');
+}
+
+// ─── Console ───
+function addLog(type,msg){
+  const c=document.getElementById('console');if(!c)return;
+  const ts=new Date().toTimeString().slice(0,8);
+  const cls=type==='ok'?'log-ok':type==='warn'?'log-warn':type==='err'?'log-err':'log-info';
+  c.innerHTML+=`<span class="log-ts">[${ts}]</span> <span class="${cls}">${msg}</span><br>`;
+  c.scrollTop=c.scrollHeight;
+}
+function clearLog(){const c=document.getElementById('console');if(c)c.innerHTML='';}
+
+function refreshAll(){
+  // Increment rows
+  [...TW_SUBTABLES,...TW_REF_TABLES].forEach(d=>{
+    ROW_CACHE[d.name]=(ROW_CACHE[d.name]||0)+Math.floor(Math.random()*120+20);
+  });
+  buildTWSubRows();
+  buildOtherTables();
+  addLog('ok','[DB] Matrix refreshed');
+}
+
+function runPipeline(mode){
+  addLog('info',`[Pipeline] mode=${mode} starting...`);
+  setTimeout(()=>{
+    if(mode==='STOCK'||mode==='ALL'){
+      const total=twTotal();
+      addLog('ok',`[M01] ${total} TW tickers → batch download (yfinance)`);
+      addLog('ok',`[TWSE] institutional/margin/daytrade fetched → ${total} instruments`);
+      addLog('ok',`[calc] margin_calc + holding_ratio computed → ${total} instruments`);
+      addLog('ok',`[DuckDB] 6 sub-tables upserted — all at ${total} instruments ✓`);
+    }
+    if(mode==='MACRO'||mode==='ALL'){
+      addLog('info','[AKShare] 215 tasks → skip 22 broken → ~193 fetched');
+      if(!document.getElementById('fred-key').value.trim())
+        addLog('warn','[FRED] Skipped — no API key');
+      else
+        addLog('ok','[FRED] 48 series fetched OK');
+      addLog('ok','[DuckDB] macro_indicators upserted');
+    }
+    if(mode==='SENTIMENT'||mode==='ALL'){
+      addLog('ok','[CNN] Fear&Greed fetched');
+      addLog('ok','[AAII] Bullish/Bearish fetched');
+    }
+    addLog('ok',`[Pipeline] ${mode} DONE ✓`);
+  },700);
+}
+
+// ─── INIT ───
+(function init(){
+  buildTWSubRows();
+  buildCatManager();
+  buildOtherTables();
+  buildFredGrid();
+  buildAK();
+  buildFredAKMapping();
+})();
+</script>
+</body>
+</html>

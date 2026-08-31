@@ -14,6 +14,16 @@
 ==========================================================================================
 #>
 param([switch]$SkipHeavy)
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Continue"
 $Root = $PSScriptRoot
 $WorkOps = Join-Path $Root "functional modules\WorkOps"
@@ -74,7 +84,7 @@ Step "U04" "解析口徑版本(≥v0106 應答域正本)" {
     @{ r = "OK"; note = "reply_status $v(口徑=應答域)" }
 }
 Step "U05" "VAP 資料發現(--list)" {
-    $eng = Get-ChildItem -Path (Join-Path $Root "functional modules\VAP\engine") -Filter "via_autoplot_engine_chartlib_v0*.py" | Sort-Object Name | Select-Object -Last 1
+    $eng = Get-ChildItem -Path (Join-Path $Root "functional modules\VAP\engine") -Filter "VAP_ENG001_AutoplotEngineChartlib_v0*.py" | Sort-Object Name | Select-Object -Last 1
     if (-not $eng) { return @{ r = "FAIL"; note = "chartlib 不在位" } }
     $r2 = RunPy $eng.FullName @("--base", $Root, "--list") $Root
     if ($r2.code -ne 0 -and $r2.out -notmatch "table") { return @{ r = "SKIP"; note = "VDF db 無資料(--demo 可補)" } }
@@ -82,14 +92,14 @@ Step "U05" "VAP 資料發現(--list)" {
     @{ r = "OK"; note = ("{0} · 發現 {1} 表" -f $eng.Name, $n) }
 }
 Step "U06" "VAP 配對圖實渲染(沙箱)" {
-    $eng = Get-ChildItem -Path (Join-Path $Root "functional modules\VAP\engine") -Filter "via_autoplot_engine_chartlib_v0*.py" | Sort-Object Name | Select-Object -Last 1
+    $eng = Get-ChildItem -Path (Join-Path $Root "functional modules\VAP\engine") -Filter "VAP_ENG001_AutoplotEngineChartlib_v0*.py" | Sort-Object Name | Select-Object -Last 1
     $tmp = Join-Path ([IO.Path]::GetTempPath()) "via_usertest_vap"
     $r2 = RunPy $eng.FullName @("--base", $Root, "--demo", "--table", "demo_tw_stock_monthly", "--x", "date", "--left", "close", "--right", "volume", "--out", $tmp) $Root
     if ($r2.out -match "CHART ") { return @{ r = "OK"; note = "bar+line 配對圖渲染成功(沙箱)" } }
     @{ r = "FAIL"; note = ($r2.out -split "`n" | Select-Object -Last 2) -join " " }
 }
 Step "U07" "VAP 多面板實渲染(--panels)" {
-    $eng = Get-ChildItem -Path (Join-Path $Root "functional modules\VAP\engine") -Filter "via_autoplot_engine_chartlib_v0*.py" | Sort-Object Name | Select-Object -Last 1
+    $eng = Get-ChildItem -Path (Join-Path $Root "functional modules\VAP\engine") -Filter "VAP_ENG001_AutoplotEngineChartlib_v0*.py" | Sort-Object Name | Select-Object -Last 1
     $tmp = Join-Path ([IO.Path]::GetTempPath()) "via_usertest_vap"
     $r2 = RunPy $eng.FullName @("--base", $Root, "--table", "demo_tw_stock_monthly", "--panels", "close;close@yoy;volume:bar", "--out", $tmp) $Root
     if ($r2.out -match "panels") { return @{ r = "OK"; note = "3 面板同時間軸渲染成功(沙箱)" } }
@@ -103,13 +113,13 @@ Step "U08" "WorkflowEngine 自測(ENG-056)" {
 }
 Step "U09" "TALib 自測(ENG-058)" {
     if ($SkipHeavy) { return @{ r = "SKIP"; note = "-SkipHeavy" } }
-    $r2 = RunPy (Join-Path $Root "functional modules\TALib\VIA_TALibEngine.py") @("selftest") (Join-Path $Root "functional modules\TALib")
+    $r2 = RunPy (Join-Path $Root "functional modules\TALib\VIA_ENG003_TALibEngine.py") @("selftest") (Join-Path $Root "functional modules\TALib")
     if ($r2.out -match "0 FAIL") { return @{ r = "OK"; note = (($r2.out -split "`n" | Where-Object { $_ -match "合計" }) -join "").Trim() } }
     @{ r = "FAIL"; note = "selftest 未全過" }
 }
 Step "U10" "ChipWar 方法論驗收(ENG-060)" {
     if ($SkipHeavy) { return @{ r = "SKIP"; note = "-SkipHeavy" } }
-    $r2 = RunPy (Join-Path $Root "functional modules\ChipWar\engines\via_test_harness.py") @() (Join-Path $Root "functional modules\ChipWar\engines")
+    $r2 = RunPy (Join-Path $Root "functional modules\ChipWar\engines\CHW_ENG023_TestHarness.py") @() (Join-Path $Root "functional modules\ChipWar\engines")
     if ($r2.out -match "L2") { return @{ r = "OK"; note = (($r2.out -split "`n" | Where-Object { $_ -match "最終驗收" }) -join "").Trim() } }
     @{ r = "FAIL"; note = "harness 未過" }
 }
@@ -139,3 +149,4 @@ $nF = @($Steps | Where-Object { $_.結果 -eq "FAIL" }).Count
 $nS = @($Steps | Where-Object { $_.結果 -eq "SKIP" }).Count
 Write-Host ("[總結] UserTest {0} 步:OK {1} · SKIP {2}(誠實列缺) · FAIL {3} → out\usertest_report.json" -f $Steps.Count, ($Steps.Count - $nF - $nS), $nS, $nF) -ForegroundColor $(if ($nF) { "Yellow" } else { "Green" })
 exit $(if ($nF) { 1 } else { 0 })
+

@@ -8,6 +8,16 @@
 #   4) Export JSON / CSV / Parquet + HTML Matrix report.
 # =============================================================================
 
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 $ProgressPreference = "Continue"
@@ -65,18 +75,18 @@ $def_PARAM_REQUIRED_VDF_ITEMS = @(
     "VDF_MDL001_TWUniverseVerify.py",
     "VDF_MDL002_YFinanceFetchingEngine.py",
     "VDF_MDL003_SentimentMacroEngine.py",
-    "VDF_MDL004_TWFullMarketEngine.py",
+    "VDF_ENG006_MDL004TWFullMarketEngine.py",
     "VDF_MDL005_TWStockFilter.py",
     "VDF_MDL006_FinancialModel.py",
     "VDF_MDL007_SSOTResolver.py",
     "VDF_MDL101_OutputManager.py",
-    "VDF_MDL102_FormatUpgrader.py",
+    "VDF_ENG011_MDL102FormatUpgrader.py",
     "VDF_MDL103_MasterRegistry.py",
     "VDF_MDL104_RegistryLoader.py",
     "VDF_MDL105_CrossValidator.py",
     "VDF_MDL201_GenerateFullRegistry.py",
     "VDF_MDL301_SystemTest.py",
-    "VDF_MDL302_FinalActivation.py",
+    "VDF_ENG017_MDL302FinalActivation.py",
     "VDF_MDL303_RegistryActivation.py",
     "VDF_MDL401_RegistrySchema.json",
     "VDF_MDL402_RegistrySample.json",
@@ -421,16 +431,16 @@ function def_CreateNexusBridge {
         activated_adapters = @(
             "VDF_MDL002_YFinanceFetchingEngine.py",
             "VDF_MDL003_SentimentMacroEngine.py",
-            "VDF_MDL004_TWFullMarketEngine.py",
+            "VDF_ENG006_MDL004TWFullMarketEngine.py",
             "VDF_MDL006_FinancialModel.py",
             "VDF_MDL007_SSOTResolver.py",
-            "VDF_MDL102_FormatUpgrader.py",
+            "VDF_ENG011_MDL102FormatUpgrader.py",
             "VDF_MDL103_MasterRegistry.py",
             "VDF_MDL104_RegistryLoader.py",
             "VDF_MDL105_CrossValidator.py",
             "VDF_MDL201_GenerateFullRegistry.py",
             "VDF_MDL301_SystemTest.py",
-            "VDF_MDL302_FinalActivation.py",
+            "VDF_ENG017_MDL302FinalActivation.py",
             "VDF_MDL303_RegistryActivation.py",
             "VDF_MDL101_OutputManager.py"
         )
@@ -1042,7 +1052,7 @@ if __name__ == "__main__":
 '@
 
     Set-Content -LiteralPath $FetcherPath -Value $py -Encoding UTF8
-    def_AddMatrixRow "Round1" "PYTHON" "VDF_ManifestFetchAdapter.py" "OK_WRITTEN" "LOW" "PARALLEL_SAFE" "P0" "file" "ready" "Generated local Python fetch adapter." $FetcherPath
+    def_AddMatrixRow "Round1" "PYTHON" "CGC_MDL028_ManifestFetchAdapter.py" "OK_WRITTEN" "LOW" "PARALLEL_SAFE" "P0" "file" "ready" "Generated local Python fetch adapter." $FetcherPath
 }
 
 function def_EnsurePythonPackages {
@@ -1450,7 +1460,7 @@ function def_Main {
 
     $pythonExe = def_ResolvePython
 
-    $fetcherPath = Join-Path $script:def_RUN_DIR "VDF_ManifestFetchAdapter.py"
+    $fetcherPath = Join-Path $script:def_RUN_DIR "CGC_MDL028_ManifestFetchAdapter.py"
     def_WritePythonFetcher -FetcherPath $fetcherPath
     def_AddMatrixRow "Round1" "REPAIR" "GenerateFetchAdapter" "OK_REPAIR_APPLIED" "LOW" "PARALLEL_SAFE" "P0" "repair" "GENERATE_FETCH_ADAPTER" "Adapter generated under run directory only." $fetcherPath
 
@@ -1529,3 +1539,4 @@ finally {
         Write-Host "PowerShell session remains open." -ForegroundColor Cyan
     }
 }
+

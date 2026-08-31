@@ -25,6 +25,16 @@ param(
     [switch]$Offline,
     [switch]$NoOpen
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 
 $ErrorActionPreference = 'Stop'
 $script:T0 = Get-Date
@@ -277,7 +287,7 @@ $pkgList = @()
 if ($fr.code -eq 0) { $pkgList = @($fr.out -split "`n" | Where-Object { $_.Trim().Length -gt 0 }) }
 
 if (-not $EnginePath -or -not (Test-Path $EnginePath)) {
-    $guess = Join-Path (Split-Path -Parent $PSCommandPath) 'vmt_process_mining.py'
+    $guess = Join-Path (Split-Path -Parent $PSCommandPath) 'VIA_ENG024_VmtProcessMining.py'
     if (Test-Path $guess) { $EnginePath = $guess }
 }
 $runnerPath = Join-Path $EnvRoot ('Run-VMT-ProcessMining.ps1')
@@ -384,3 +394,4 @@ Write-Host ('  執行探勘:  powershell -File "{0}"' -f $runnerPath) -Foregroun
 Write-Host ('  報告:      {0}' -f $reportPath) -ForegroundColor Yellow
 Write-Host ''
 if (-not $NoOpen) { Start-Process $reportPath }
+

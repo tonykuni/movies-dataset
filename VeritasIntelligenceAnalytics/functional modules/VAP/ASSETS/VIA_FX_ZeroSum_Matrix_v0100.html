@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA · FX & Domestic Zero-Sum Game Matrix</title>
+<style>
+  :root {
+    --bg: #fdfdfc; --ink: #111; --sub: #555; --border: #e0e0e0;
+    --up: #b3261e; --dn: #166534; --highlight: #d97706;
+  }
+  body { 
+    background: var(--bg); color: var(--ink); margin: 0; padding: 40px; 
+    font-family: -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif; 
+    font-size: 13px; line-height: 1.6;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  
+  /* Classic Typography Header with Transparent Seal */
+  .header-container { display: flex; align-items: flex-start; margin-bottom: 30px; border-bottom: 1px solid var(--ink); padding-bottom: 15px; }
+  .seal-li {
+    font-family: "PMingLiU", "MingLiU", serif; font-size: 38px; color: #8b0000;
+    width: 50px; height: 50px; line-height: 50px; text-align: center;
+    border: 2px solid #8b0000; border-radius: 4px; margin-right: 20px;
+    background: transparent; flex-shrink: 0; user-select: none;
+  }
+  .header-text { display: flex; flex-direction: column; font-family: "Georgia", "Times New Roman", serif; }
+  .header-line-1 { font-size: 12px; letter-spacing: 2px; color: var(--sub); text-transform: uppercase; margin-bottom: 4px; }
+  .header-line-2 { font-size: 24px; font-weight: normal; color: var(--ink); margin: 0 0 4px 0; letter-spacing: 0.5px; }
+  .header-line-3 { font-size: 13px; font-style: italic; color: var(--sub); }
+
+  /* Input Controls */
+  .control-panel { background: #fff; border: 1px solid var(--border); padding: 15px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+  .input-group { display: flex; flex-direction: column; }
+  .input-group label { font-family: "Georgia", serif; font-size: 11px; text-transform: uppercase; color: var(--sub); margin-bottom: 4px; }
+  .input-group input { padding: 4px 8px; font-family: "Consolas", monospace; font-size: 14px; border: 1px solid var(--border); border-radius: 0; outline: none; }
+  .input-group input:focus { border-color: var(--ink); }
+
+  /* Data Table */
+  table { width: 100%; border-collapse: collapse; margin-bottom: 20px; background: #fff; }
+  th, td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; }
+  th { font-family: "Georgia", serif; font-size: 11px; text-transform: uppercase; background: #f5f5f5; font-weight: normal; color: var(--sub); }
+  td { font-family: "Consolas", monospace; font-size: 14px; }
+  .row-label { font-family: -apple-system, "Noto Sans TC", sans-serif; font-size: 13px; font-weight: 600; }
+  
+  .val-up { color: var(--up); }
+  .val-dn { color: var(--dn); }
+  
+  /* Diagnostic Section */
+  .diagnostic-box { border-left: 4px solid var(--ink); padding: 15px 20px; background: #fafafa; font-family: "Georgia", serif; }
+  .diag-title { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; color: var(--sub); }
+  .diag-content { font-size: 16px; color: var(--ink); }
+  .diag-tc { font-family: -apple-system, "Noto Sans TC", sans-serif; font-size: 14px; margin-top: 8px; color: #333; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <!-- Header exactly per instruction -->
+  <div class="header-container">
+    <div class="seal-li">理</div>
+    <div class="header-text">
+      <div class="header-line-1">VERITAS INTELLIGENCE ANALYTICS</div>
+      <h1 class="header-line-2">FX Border & Domestic Zero-Sum Matrix</h1>
+      <div class="header-line-3">Real-dollar computation of foreign capital constraints and invisible domestic flow.</div>
+    </div>
+  </div>
+
+  <!-- Exact Numbers Input -->
+  <div class="control-panel">
+    <div class="input-group">
+      <label>DXY Change (%)</label>
+      <input type="number" id="inpDxy" value="0.45" step="0.05">
+    </div>
+    <div class="input-group">
+      <label>USD/TWD Change (bps)</label>
+      <input type="number" id="inpTwd" value="8.5" step="0.5" title="Positive means TWD depreciates">
+    </div>
+    <div class="input-group">
+      <label>Foreign Net (Billion TWD)</label>
+      <input type="number" id="inpForeign" value="-215.5" step="1.0">
+    </div>
+    <div class="input-group">
+      <label>Margin $\Delta$ Cash (Billion)</label>
+      <input type="number" id="inpMargin" value="-12.3" step="0.5">
+    </div>
+    <div class="input-group">
+      <label>ITC Net (投信) (Billion)</label>
+      <input type="number" id="inpItc" value="45.2" step="0.5">
+    </div>
+    <div class="input-group">
+      <label>State Brokers (八大) (Billion)</label>
+      <input type="number" id="inpState" value="68.4" step="0.5">
+    </div>
+  </div>
+
+  <!-- Zero-Sum Matrix Output -->
+  <table>
+    <thead>
+      <tr>
+        <th>Participant / Indicator</th>
+        <th>Actual Net Flow (Billion TWD)</th>
+        <th>Physical Meaning</th>
+      </tr>
+    </thead>
+    <tbody id="matrixBody">
+      <!-- Injected via JS -->
+    </tbody>
+  </table>
+
+  <!-- Diagnostic Output -->
+  <div class="diagnostic-box">
+    <div class="diag-title">Engine Diagnostic Output</div>
+    <div id="diagEn" class="diag-content"></div>
+    <div id="diagTc" class="diag-tc"></div>
+  </div>
+</div>
+
+<script>
+  function formatNum(num) {
+    const sign = num > 0 ? '+' : '';
+    const color = num > 0 ? 'val-up' : (num < 0 ? 'val-dn' : '');
+    return `<span class="${color}">${sign}${num.toFixed(1)}</span>`;
+  }
+
+  function calculateZeroSum() {
+    const dxy = parseFloat(document.getElementById('inpDxy').value);
+    const twd = parseFloat(document.getElementById('inpTwd').value);
+    const foreign = parseFloat(document.getElementById('inpForeign').value);
+    const margin = parseFloat(document.getElementById('inpMargin').value);
+    const itc = parseFloat(document.getElementById('inpItc').value);
+    const state = parseFloat(document.getElementById('inpState').value);
+
+    // 1. Foreign FX Verification
+    let fxDiagnosis = "";
+    if (foreign < -50 && dxy > 0 && twd > 0) {
+      fxDiagnosis = "True Capital Flight (真匯出提款)";
+    } else if (foreign < -50 && twd <= 0) {
+      fxDiagnosis = "Parked Liquidity (假提款 / 資金停泊帳戶)";
+    } else if (foreign > 50 && twd < 0) {
+      fxDiagnosis = "True Capital Inflow (真實熱錢匯入)";
+    } else if (foreign > 50 && twd > 0) {
+      fxDiagnosis = "Offshore Domestic Capital (內資繞道假外資)";
+    } else {
+      fxDiagnosis = "Neutral FX Flow (匯率中性)";
+    }
+
+    // 2. Domestic Zero-Sum Calculation
+    // Foreign + ITC + State + Invisible = 0  => Invisible = -(Foreign + ITC + State)
+    const invisibleNet = -(foreign + itc + state);
+    
+    // Invisible = Smart Money + Margin(Retail) => Smart Money = Invisible - Margin
+    const smartMoney = invisibleNet - margin;
+
+    // Render Table
+    const tbody = document.getElementById('matrixBody');
+    tbody.innerHTML = `
+      <tr>
+        <td class="row-label">Foreign Institutional (外資)</td>
+        <td>${formatNum(foreign)}</td>
+        <td>${fxDiagnosis}</td>
+      </tr>
+      <tr>
+        <td class="row-label">Investment Trust (投信)</td>
+        <td>${formatNum(itc)}</td>
+        <td>Passive ETF + Gov Mandate (被動與代操)</td>
+      </tr>
+      <tr>
+        <td class="row-label">State Brokers (八大行庫)</td>
+        <td>${formatNum(state)}</td>
+        <td>Sovereign Stabilization (國家隊護盤)</td>
+      </tr>
+      <tr style="background:#fcfcfc;">
+        <td class="row-label">Invisible Domestic (全體隱形內資)</td>
+        <td>${formatNum(invisibleNet)}</td>
+        <td>Zero-sum mathematical residual (零和剩餘)</td>
+      </tr>
+      <tr>
+        <td class="row-label">Retail Margin (散戶融資)</td>
+        <td>${formatNum(margin)}</td>
+        <td>Dumb Money Leverage (散戶真金白銀槓桿)</td>
+      </tr>
+      <tr style="border-top: 2px solid #111;">
+        <td class="row-label" style="font-weight:bold; color:#d97706;">Smart Money (主力大戶實質動向)</td>
+        <td style="font-weight:bold;">${formatNum(smartMoney)}</td>
+        <td style="color:#d97706;">Absolute physical direction of large domestic players</td>
+      </tr>
+    `;
+
+    // Render Diagnostic
+    const diagEn = document.getElementById('diagEn');
+    const diagTc = document.getElementById('diagTc');
+
+    if (smartMoney > 50) {
+      diagEn.innerHTML = "System detects massive domestic accumulation offsetting foreign distribution.";
+      diagTc.innerHTML = `大戶實質淨買入高達 <strong>${smartMoney.toFixed(1)} 億</strong>。市場由內資主力強勢接盤，無懼外資匯出，屬「左側強勢築底」格局。`;
+    } else if (smartMoney < -50 && margin > 20) {
+      diagEn.innerHTML = "Lethal Divergence: Smart money distributing into retail margin expansion.";
+      diagTc.innerHTML = `致命背離：大戶實質撤資 <strong>${smartMoney.toFixed(1)} 億</strong>，但散戶融資卻逆勢擴張。聰明錢正利用外資與散戶的買盤出貨，極易引發多殺多踩踏。`;
+    } else if (margin < -30 && smartMoney > 0) {
+      diagEn.innerHTML = "Retail capitulation absorbed by smart money.";
+      diagTc.innerHTML = `散戶絕望斷頭 (融資大減 <strong>${margin.toFixed(1)} 億</strong>)，而大戶資金趁機吸籌。籌碼已進行深度換手，底部浮現。`;
+    } else {
+      diagEn.innerHTML = "Market flow is within normal statistical equilibrium.";
+      diagTc.innerHTML = "大戶與散戶資金流向未見極端背離，處於常態零和震盪區間。";
+    }
+  }
+
+  // Listeners
+  document.querySelectorAll('input').forEach(input => {
+    input.addEventListener('input', calculateZeroSum);
+  });
+
+  // Init
+  calculateZeroSum();
+</script>
+</body>
+</html>

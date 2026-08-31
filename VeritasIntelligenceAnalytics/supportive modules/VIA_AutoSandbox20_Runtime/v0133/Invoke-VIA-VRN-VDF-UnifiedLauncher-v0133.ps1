@@ -5,11 +5,21 @@ param(
     [string]$VrnBootstrap = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\VIA_AutoSandbox20_Runtime\v0133\Start-VIA-VRN-With-Supportive-v0133.ps1",
     [string]$VdfBootstrap = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\VIA_AutoSandbox20_Runtime\v0133\Start-VIA-VDF-With-Supportive-v0133.ps1",
     [string]$PythonPath = "C:\Python313\python.exe",
-    [string]$EnginePath = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\VIA_AutoSandbox20_Runtime\v0133\VIA_UnifiedPythonEngine_v0133.py",
+    [string]$EnginePath = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\VIA_AutoSandbox20_Runtime\v0133\SUP_MDL114_UnifiedPythonEngine_v0133.py",
     [string]$HtmlReportPath = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\VIA_AutoSandbox20_Runtime\v0133\VIA_LiveBlocker_Adjudication_Activation_Matrix_v0133.html",
     [string]$LauncherLogDir = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\_via_live_blocker_adjudication_runs\RUN_20260725_211909_VIA_LIVE_BLOCKER_ADJUDICATE_ACTIVATE_v0133\logs",
     [int]$UiPort = 8765
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 function EnsureDir([string]$Value) { if (-not (Test-Path -LiteralPath $Value)) { New-Item -ItemType Directory -Path $Value -Force | Out-Null } }
@@ -38,3 +48,4 @@ Write-Host "def VRN               : STARTED AFTER SUPPORTIVE IMPORT" -Foreground
 Write-Host "def VDF               : STARTED AFTER SUPPORTIVE IMPORT" -ForegroundColor Green
 Write-Host "def HTML UI           : STARTED NON-BLOCKING" -ForegroundColor Green
 Write-Host "def Launcher remains open; child systems continue independently." -ForegroundColor Cyan
+

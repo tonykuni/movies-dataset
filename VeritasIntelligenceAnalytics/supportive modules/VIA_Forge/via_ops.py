@@ -12,6 +12,20 @@ VIA Ops  ——  via_ops.py   (\u4f5c \u00b7 \u65e5\u5e38\u4f5c\u696d\u5c08\u684
 \u5efa\u5728 mailforge case_intelligence \u4e4b\u4e0a\uff1b\u53bb\u91cd\u4fdd\u7559\u4e0d\u79fb\u9664\uff1b\u4e0d\u9023\u5916\u3001\u4e0d\u9700 IT \u958b\u901a\u3002
 ================================================================================
 """
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
 import os, sys, hashlib
 from datetime import datetime, timezone
 

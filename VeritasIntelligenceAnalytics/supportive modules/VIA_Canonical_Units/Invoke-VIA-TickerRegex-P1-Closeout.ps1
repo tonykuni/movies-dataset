@@ -6,6 +6,16 @@
  from SSOT (v029SSOT1B archived in place).
  Read-only verification + push. No canonical mutation.
 ===================================================================== #>
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 Set-StrictMode -Off
 $ErrorActionPreference = "Continue"
 $repo = Split-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) -Parent
@@ -17,7 +27,7 @@ try {
 
 # G1 SSOT artifacts present and parseable
 $ssot = Join-Path $via "supportive modules\ssot\VRN_TickerRegexSSOT_v0100.json"
-$mod  = Join-Path $via "supportive modules\70_VRN_Rules\VIS_VRN_TickerFilenameSSOT_v0100.py"
+$mod  = Join-Path $via "supportive modules\70_VRN_Rules\SUP_MDL030_VISVRNTickerFilenameSSOT_v0100.py"
 $cen  = Join-Path $via "supportive modules\audit_tools\TickerRegex_LegacyDebt_Census_v0100.json"
 $j = Get-Content -LiteralPath $ssot -Raw -Encoding UTF8 | ConvertFrom-Json
 $c = Get-Content -LiteralPath $cen  -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -79,3 +89,4 @@ finally {
     Pop-Location
     Write-Host "PowerShell session remains open." -ForegroundColor Cyan
 }
+

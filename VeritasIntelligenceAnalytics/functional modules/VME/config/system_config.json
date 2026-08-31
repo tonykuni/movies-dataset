@@ -1,0 +1,35 @@
+{
+ "schema": "VIA.VME.SystemConfig.v1",
+ "version": "0.1.0",
+ "modes": [
+  "InspectOnly",
+  "SandboxDryRun",
+  "RuntimeAppendOnly"
+ ],
+ "policy": {
+  "fail_closed_unknown_mode": true,
+  "runtime_append_requires_approval": true,
+  "single_writer": true,
+  "idempotency_required": true,
+  "storage_rule": "immutable multi-part dataset + manifest;絕不整檔重寫"
+ },
+ "paths": {
+  "data_lake": "data_lake",
+  "runtime": "runtime/json",
+  "manifest": "data_lake/run_manifest"
+ },
+ "entities": [
+  "lesson_record",
+  "hypothesis_record",
+  "evidence_record",
+  "error_event",
+  "test_run",
+  "weakness_matrix",
+  "debug_action",
+  "alpha_lifecycle",
+  "prompt_break_record",
+  "state_transition",
+  "engine_run",
+  "run_manifest"
+ ]
+}

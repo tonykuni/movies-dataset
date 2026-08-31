@@ -1,0 +1,2020 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VeritasAutoPlot™ TA3 | 三圖技術分析</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.26.0/plotly.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+/* ================================================================
+   VeritasAutoPlot™ TA3 — CSS
+   Notion × MUJI Design System
+   ================================================================ */
+
+/* ===== CSS01: VARIABLES ===== */
+:root {
+  /* Notion/MUJI Palette */
+  --bg:         #F7F6F3;
+  --surface:    #FFFFFF;
+  --surface2:   #FAFAF9;
+  --surface3:   #F0EEE9;
+  --border:     #E8E5DF;
+  --border2:    #D3CFC6;
+  --txt:        #1A1A18;
+  --txt2:       #6B6860;
+  --txt3:       #9B9890;
+  --accent:     #4C72B0;
+  --accent2:    #3A5A96;
+  --shadow:     0 1px 4px rgba(0,0,0,0.07);
+  --shadow2:    0 4px 16px rgba(0,0,0,0.09);
+  --r4:         4px;
+  --r8:         8px;
+  --r12:        12px;
+
+  /* Seaborn Deep 10色 */
+  --sb0: #4C72B0;  /* blue      - SMA5   */
+  --sb1: #DD8452;  /* orange    - SMA10  */
+  --sb2: #55A868;  /* green     - SMA20  */
+  --sb3: #C44E52;  /* red       - SMA60  */
+  --sb4: #8172B2;  /* purple    - SMA120 */
+  --sb5: #937860;  /* brown     - SMA240 */
+  --sb6: #DA8BC3;  /* pink               */
+  --sb7: #8C8C8C;  /* gray               */
+  --sb8: #CCB974;  /* olive              */
+  --sb9: #64B5CD;  /* cyan               */
+
+  /* K-Line colors (亞洲: 紅漲綠跌) */
+  --up:   #E53E3E;
+  --down: #38A169;
+  --up-a: rgba(229,62,62,0.85);
+  --dn-a: rgba(56,161,105,0.85);
+
+  /* Layout */
+  --topbar-h: 50px;
+  --panel-w:  264px;
+  --stat-h:   112px;
+  --status-h: 26px;
+}
+
+/* ===== CSS02: RESET ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--txt);
+  font-size: 12.5px;
+  line-height: 1.5;
+  overflow: hidden;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* ===== CSS03: TOPBAR ===== */
+#topbar {
+  height: var(--topbar-h);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  gap: 10px;
+  flex-shrink: 0;
+  box-shadow: var(--shadow);
+  z-index: 100;
+}
+.brand {
+  display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+.brand-mark {
+  width: 26px; height: 26px;
+  background: linear-gradient(135deg, var(--accent) 0%, #7B9ED9 100%);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Serif Display'; font-size: 13px; font-weight: 700;
+  color: #fff; letter-spacing: -0.5px;
+}
+.brand-text {
+  font-family: 'DM Serif Display'; font-size: 14px;
+  color: var(--txt); letter-spacing: -0.3px;
+}
+.brand-tag {
+  font-family: 'JetBrains Mono'; font-size: 9px;
+  background: var(--surface3); color: var(--txt3);
+  padding: 1px 5px; border-radius: 3px;
+  border: 1px solid var(--border);
+}
+.sep { width: 1px; height: 22px; background: var(--border); flex-shrink: 0; }
+
+.ticker-wrap {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  border-radius: var(--r4);
+  padding: 4px 8px;
+  transition: border-color 0.15s;
+}
+.ticker-wrap:focus-within { border-color: var(--accent); background: var(--surface); }
+.ticker-label { font-size: 10px; color: var(--txt3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; }
+#ticker-in {
+  font-family: 'JetBrains Mono'; font-size: 13px; font-weight: 700;
+  border: none; background: transparent; outline: none; width: 100px;
+  color: var(--txt); text-transform: uppercase;
+}
+
+.period-group { display: flex; gap: 2px; }
+.pchip {
+  font-family: 'JetBrains Mono'; font-size: 10px; font-weight: 600;
+  padding: 3px 9px; border-radius: 3px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--txt2); transition: all 0.12s; user-select: none;
+}
+.pchip:hover { border-color: var(--accent); color: var(--accent); }
+.pchip.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+.tbtn {
+  font-family: 'DM Sans'; font-size: 11.5px; font-weight: 500;
+  padding: 4px 12px; border-radius: var(--r4); cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--txt); display: flex; align-items: center; gap: 5px;
+  transition: all 0.12s; white-space: nowrap; flex-shrink: 0;
+}
+.tbtn:hover { background: var(--surface3); }
+.tbtn.pri { background: var(--accent); color: #fff; border-color: var(--accent); }
+.tbtn.pri:hover { background: var(--accent2); }
+
+#topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+/* Live quote strip */
+#quote-strip {
+  display: flex; align-items: center; gap: 14px;
+  font-family: 'JetBrains Mono'; font-size: 11px;
+  padding: 0 10px;
+}
+.q-ticker { font-weight: 700; color: var(--txt); }
+.q-price  { color: var(--txt); }
+.q-chg.up   { color: var(--up); }
+.q-chg.down { color: var(--down); }
+
+/* ===== CSS04: BODY LAYOUT ===== */
+#body {
+  flex: 1; display: flex; overflow: hidden;
+}
+
+/* ===== CSS05: LEFT PANEL ===== */
+#lpanel {
+  width: var(--panel-w);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  overflow: hidden; flex-shrink: 0;
+  transition: width 0.22s ease;
+}
+#lpanel.collapsed { width: 0; }
+#ltoggle {
+  position: absolute; left: var(--panel-w); top: 50%;
+  transform: translateY(-50%);
+  width: 14px; height: 44px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer; z-index: 50;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; color: var(--txt3);
+  transition: left 0.22s;
+}
+#ltoggle.c { left: 0; }
+
+.psec { border-bottom: 1px solid var(--border); }
+.phead {
+  padding: 8px 13px;
+  font-size: 9.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.9px; color: var(--txt3);
+  cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+  background: var(--surface2); user-select: none;
+}
+.phead:hover { color: var(--txt2); }
+.phead .chev { transition: transform 0.18s; font-size: 10px; }
+.psec.coll .chev { transform: rotate(-90deg); }
+.psec.coll .pbody { display: none; }
+.pbody { padding: 10px 13px; }
+.pscroll { flex: 1; overflow-y: auto; }
+
+/* Form Elements */
+.fl { font-size: 10.5px; font-weight: 500; color: var(--txt2); margin-bottom: 3px; display: block; }
+.fsel, .fin {
+  width: 100%; font-family: 'DM Sans'; font-size: 11.5px;
+  padding: 4px 7px; border: 1px solid var(--border);
+  border-radius: var(--r4); background: var(--surface);
+  color: var(--txt); outline: none; cursor: pointer;
+  margin-bottom: 8px;
+}
+.fsel:focus, .fin:focus { border-color: var(--accent); }
+.fg { margin-bottom: 0; }
+
+/* Toggle */
+.trow { display: flex; align-items: center; justify-content: space-between; padding: 3px 0; }
+.tlbl { font-size: 11.5px; }
+.tsw { position: relative; width: 30px; height: 16px; cursor: pointer; }
+.tsw input { opacity: 0; width:0; height:0; }
+.tsl { position: absolute; inset:0; background: var(--border2); border-radius: 8px; transition: 0.18s; }
+.tsl::before { content:''; position:absolute; width:10px; height:10px; left:3px; top:3px; background:#fff; border-radius:50%; transition:0.18s; }
+.tsw input:checked + .tsl { background: var(--accent); }
+.tsw input:checked + .tsl::before { transform: translateX(14px); }
+
+/* Slider */
+.srow { display: flex; align-items: center; gap: 7px; }
+.sval { font-family:'JetBrains Mono'; font-size:10px; width:32px; text-align:right; color:var(--txt2); }
+input[type=range] { flex:1; height:3px; cursor:pointer; accent-color:var(--accent); }
+
+/* MA rows */
+.ma-row { display: flex; align-items: center; gap: 5px; padding: 2px 0; }
+.ma-cb { width:12px; height:12px; cursor:pointer; accent-color:var(--accent); flex-shrink:0; }
+.ma-nm { font-family:'JetBrains Mono'; font-size:10px; width:54px; color:var(--txt); }
+.ma-sw { width:18px; height:3px; border-radius:2px; flex-shrink:0; }
+.ma-lw { font-size:9px; color:var(--txt3); width:24px; text-align:center; }
+.ma-col { width:18px; height:14px; border-radius:2px; cursor:pointer; border:none; padding:0; flex-shrink:0; }
+
+/* ===== CSS06: CHART AREA ===== */
+#carea {
+  flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0;
+  position: relative;
+}
+#ctoolbar {
+  height: 36px; background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 12px; gap: 8px;
+  flex-shrink: 0;
+}
+.ct-info { display:flex; align-items:baseline; gap:7px; }
+.ct-sym { font-family:'JetBrains Mono'; font-size:14px; font-weight:700; }
+.ct-px  { font-family:'JetBrains Mono'; font-size:12px; }
+.ct-chg { font-family:'JetBrains Mono'; font-size:11px; }
+.ct-chg.up{color:var(--up)}.ct-chg.down{color:var(--down)}
+.nbadge { font-family:'JetBrains Mono'; font-size:9px; font-weight:700; padding:1px 5px; border-radius:3px; background:rgba(76,114,176,0.1); border:1px solid rgba(76,114,176,0.3); color:var(--accent); }
+#ctoolbar-r { margin-left:auto; display:flex; align-items:center; gap:5px; }
+.fc {
+  font-family:'JetBrains Mono'; font-size:9.5px; font-weight:700;
+  padding:2px 7px; border-radius:3px; cursor:pointer;
+  border:1px solid var(--border); background:var(--surface);
+  color:var(--txt2); transition:all 0.12s; user-select:none;
+}
+.fc:hover { border-color:var(--accent); color:var(--accent); }
+.fc.on { background:rgba(76,114,176,0.1); border-color:var(--accent); color:var(--accent); }
+
+#cbox { flex:1; overflow:hidden; position:relative; }
+#chart { width:100%; height:100%; }
+
+/* Loading */
+#loading {
+  position:absolute; inset:0;
+  background:rgba(247,246,243,0.9);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:10px;
+  z-index:200; backdrop-filter:blur(2px);
+}
+.spin {
+  width:28px; height:28px;
+  border:3px solid var(--border); border-top-color:var(--accent);
+  border-radius:50%; animation:spin 0.7s linear infinite;
+}
+@keyframes spin{ to{transform:rotate(360deg)} }
+.load-txt { font-family:'JetBrains Mono'; font-size:11px; color:var(--txt2); }
+
+/* ===== CSS07: STAT PANEL ===== */
+#stat-panel {
+  height: var(--stat-h);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 0;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.scard {
+  padding: 8px 10px;
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; justify-content: center;
+}
+.scard:last-child { border-right: none; }
+.sc-lbl {
+  font-size: 8.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.9px; color: var(--txt3); margin-bottom: 3px;
+}
+.sc-val {
+  font-family: 'JetBrains Mono'; font-size: 16px; font-weight: 700;
+  color: var(--txt); line-height: 1.1;
+}
+.sc-sub {
+  font-family: 'JetBrains Mono'; font-size: 9px; color: var(--txt3);
+  margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sc-val.up{color:var(--up)} .sc-val.down{color:var(--down)}
+.sc-val.neutral{color:var(--accent)}
+.sc-divider {
+  width:1px; background: var(--border); align-self:stretch; margin: 8px 0;
+}
+
+/* ===== CSS08: RIGHT PANEL ===== */
+#rpanel {
+  width: var(--panel-w);
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  overflow: hidden; flex-shrink: 0;
+  transition: width 0.22s ease;
+}
+#rpanel.collapsed { width: 0; }
+#rtoggle {
+  position: absolute; right: var(--panel-w); top: 50%;
+  transform: translateY(-50%);
+  width: 14px; height: 44px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-right: none;
+  border-radius: 4px 0 0 4px;
+  cursor: pointer; z-index: 50;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; color: var(--txt3);
+  transition: right 0.22s;
+}
+#rtoggle.c { right: 0; }
+
+/* ===== CSS09: STATUS BAR ===== */
+#statusbar {
+  height: var(--status-h); background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 13px; gap: 14px;
+  flex-shrink: 0;
+  font-family: 'JetBrains Mono'; font-size: 9.5px; color: var(--txt3);
+}
+.sdot { width:5px; height:5px; border-radius:50%; background:#55A868; flex-shrink:0; }
+.sdot.ld{background:var(--sb8)} .sdot.er{background:var(--up)}
+#sb-r { margin-left:auto; display:flex; align-items:center; gap:14px; }
+
+/* ===== CSS10: PARAM MATRIX MODAL ===== */
+.modal-bg {
+  position:fixed; inset:0; background:rgba(0,0,0,0.28);
+  z-index:1000; display:none; align-items:center; justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.modal-bg.open { display:flex; }
+.modal {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--r12); padding:22px 26px;
+  width:680px; max-width:94vw; max-height:88vh;
+  overflow-y:auto; box-shadow:var(--shadow2);
+}
+.modal-h {
+  font-family:'DM Serif Display'; font-size:17px; margin-bottom:16px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.modal-close { cursor:pointer; color:var(--txt3); font-size:18px; }
+.matrix-table {
+  width:100%; border-collapse:collapse; font-size:11.5px;
+  font-family:'JetBrains Mono';
+}
+.matrix-table th {
+  background:var(--surface3); padding:6px 8px;
+  text-align:left; border:1px solid var(--border);
+  font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px;
+  color:var(--txt2);
+}
+.matrix-table td {
+  padding:5px 8px; border:1px solid var(--border); vertical-align:middle;
+}
+.matrix-table td:first-child { color:var(--txt2); font-size:10.5px; }
+.matrix-table input[type=number], .matrix-table input[type=text] {
+  width:70px; font-family:'JetBrains Mono'; font-size:11px;
+  border:1px solid var(--border); border-radius:3px;
+  padding:2px 5px; text-align:center; background:var(--surface2); outline:none;
+}
+.matrix-table input:focus { border-color:var(--accent); }
+.matrix-table .row-label { color:var(--txt3); font-size:9.5px; }
+.mtag {
+  display:inline-block; font-size:9px; padding:1px 5px; border-radius:3px;
+  font-weight:700; margin-right:3px;
+}
+.mtag.t { background:#E8F0FE; color:#3A5A96; }
+.mtag.m { background:#FEF3E8; color:#C44E52; }
+.mtag.v { background:#E8F8EF; color:#1E7B46; }
+.mtag.s { background:#F3F0FA; color:#5A3E9E; }
+.modal-footer { display:flex; justify-content:flex-end; gap:8px; margin-top:16px; }
+
+/* ===== CSS11: MISC ===== */
+.intvl-badge {
+  font-family:'JetBrains Mono'; font-size:8.5px; color:var(--txt3);
+  padding:2px 6px; background:var(--surface3); border-radius:3px; white-space:nowrap;
+}
+.sec-chip {
+  font-family:'JetBrains Mono'; font-size:9.5px; font-weight:700;
+  padding:2px 7px; border-radius:3px; cursor:pointer;
+  border:1px solid var(--border); background:var(--surface);
+  color:var(--txt2); transition:all 0.12s; user-select:none;
+  display:inline-block; margin-right:3px; margin-bottom:3px;
+}
+.sec-chip.on { background:var(--surface3); border-color:var(--border2); color:var(--txt); }
+</style>
+</head>
+<body>
+
+<!-- ===============================================================
+     TOPBAR
+     =============================================================== -->
+<div id="topbar">
+  <div class="brand">
+    <div class="brand-mark">V</div>
+    <span class="brand-text">VeritasAutoPlot™</span>
+    <span class="brand-tag">TA3 v4.1</span>
+  </div>
+  <div class="sep"></div>
+
+  <!-- Ticker -->
+  <div class="ticker-wrap">
+    <span class="ticker-label">Ticker</span>
+    <input id="ticker-in" type="text" value="^GSPC" placeholder="^GSPC / 2330.TW">
+  </div>
+
+  <!-- Period -->
+  <div class="period-group" id="period-group">
+    <div class="pchip" data-p="3mo">3M</div>
+    <div class="pchip" data-p="6mo">6M</div>
+    <div class="pchip on" data-p="1y">1Y</div>
+    <div class="pchip" data-p="2y">2Y</div>
+    <div class="pchip" data-p="3y">3Y</div>
+    <div class="pchip" data-p="5y">5Y</div>
+    <div class="pchip" data-p="10y">10Y</div>
+    <div class="pchip" data-p="max">ALL</div>
+  </div>
+
+  <div class="sep"></div>
+
+  <!-- Quote strip -->
+  <div id="quote-strip">
+    <span class="q-ticker" id="q-sym">^GSPC</span>
+    <span class="q-price" id="q-px">—</span>
+    <span class="q-chg" id="q-chg"></span>
+  </div>
+
+  <div id="topbar-right">
+    <button class="tbtn" onclick="openMatrix()">⚙ 參數矩陣</button>
+    <button class="tbtn" onclick="exportHtml()">💾 HTML</button>
+    <button class="tbtn" onclick="exportPng()">🖼 PNG</button>
+    <button class="tbtn pri" onclick="loadAndDraw()">📊 繪圖</button>
+  </div>
+</div>
+
+<!-- ===============================================================
+     BODY
+     =============================================================== -->
+<div id="body">
+
+  <!-- LEFT PANEL TOGGLE -->
+  <div id="ltoggle" onclick="toggleL()">‹</div>
+
+  <!-- ===========================
+       LEFT PANEL
+       =========================== -->
+  <div id="lpanel">
+    <div class="pscroll">
+
+      <!-- SMA Config -->
+      <div class="psec" id="ps-sma">
+        <div class="phead" onclick="toggleSec('ps-sma')">
+          <span>均線 SMA / EMA</span><span class="chev">▾</span>
+        </div>
+        <div class="pbody">
+          <div class="trow" style="margin-bottom:7px;">
+            <span class="tlbl">類型</span>
+            <div style="display:flex;gap:3px;">
+              <div class="sec-chip on" id="ma-sma" onclick="setMaType('SMA')">SMA</div>
+              <div class="sec-chip"   id="ma-ema" onclick="setMaType('EMA')">EMA</div>
+            </div>
+          </div>
+          <div id="ma-rows-container"></div>
+        </div>
+      </div>
+
+      <!-- BB -->
+      <div class="psec" id="ps-bb">
+        <div class="phead" onclick="toggleSec('ps-bb')">
+          <span>布林通道 BBand</span><span class="chev">▾</span>
+        </div>
+        <div class="pbody">
+          <div class="trow">
+            <span class="tlbl">顯示</span>
+            <label class="tsw"><input type="checkbox" id="bb-on" checked onchange="redraw()"><span class="tsl"></span></label>
+          </div>
+          <div class="trow">
+            <span class="tlbl">填充區域</span>
+            <label class="tsw"><input type="checkbox" id="bb-fill" checked onchange="redraw()"><span class="tsl"></span></label>
+          </div>
+          <div style="height:6px;"></div>
+          <label class="fl">Period <span id="bbp-v" style="font-family:'JetBrains Mono';font-size:10px;">20</span></label>
+          <div class="srow"><input type="range" id="bb-p" min="5" max="60" value="20" step="1" oninput="S.bb.period=+this.value;document.getElementById('bbp-v').textContent=this.value;redraw()"></div>
+          <div style="height:5px;"></div>
+          <label class="fl">Std Dev <span id="bbs-v" style="font-family:'JetBrains Mono';font-size:10px;">2.0</span></label>
+          <div class="srow"><input type="range" id="bb-s" min="0.5" max="4.0" value="2.0" step="0.1" oninput="S.bb.std=+this.value;document.getElementById('bbs-v').textContent=(+this.value).toFixed(1);redraw()"></div>
+        </div>
+      </div>
+
+      <!-- KDJ Config -->
+      <div class="psec" id="ps-kdj">
+        <div class="phead" onclick="toggleSec('ps-kdj')">
+          <span>KDJ 設定</span><span class="chev">▾</span>
+        </div>
+        <div class="pbody">
+          <label class="fl">RSV Period <span id="kdj-rp-v" style="font-family:'JetBrains Mono';font-size:10px;">9</span></label>
+          <div class="srow"><input type="range" id="kdj-rp" min="3" max="30" value="9" step="1" oninput="S.kdj.rsvPeriod=+this.value;document.getElementById('kdj-rp-v').textContent=this.value;redraw()"></div>
+          <div style="height:5px;"></div>
+          <label class="fl">K Smooth <span id="kdj-ks-v" style="font-family:'JetBrains Mono';font-size:10px;">3</span></label>
+          <div class="srow"><input type="range" id="kdj-ks" min="2" max="10" value="3" step="1" oninput="S.kdj.kSmooth=+this.value;document.getElementById('kdj-ks-v').textContent=this.value;redraw()"></div>
+          <div style="height:5px;"></div>
+          <label class="fl">D Smooth <span id="kdj-ds-v" style="font-family:'JetBrains Mono';font-size:10px;">3</span></label>
+          <div class="srow"><input type="range" id="kdj-ds" min="2" max="10" value="3" step="1" oninput="S.kdj.dSmooth=+this.value;document.getElementById('kdj-ds-v').textContent=this.value;redraw()"></div>
+          <div style="height:6px;"></div>
+          <div class="trow">
+            <span class="tlbl">顯示 %J 線</span>
+            <label class="tsw"><input type="checkbox" id="kdj-j" checked onchange="redraw()"><span class="tsl"></span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- MACD Config -->
+      <div class="psec" id="ps-macd">
+        <div class="phead" onclick="toggleSec('ps-macd')">
+          <span>MACD 設定</span><span class="chev">▾</span>
+        </div>
+        <div class="pbody">
+          <label class="fl">Fast / Slow / Signal</label>
+          <div style="display:flex;gap:4px;">
+            <input class="fin" id="macd-f" type="number" value="12" min="2" max="50" style="text-align:center;font-family:'JetBrains Mono';font-size:11px;" onchange="S.macd.fast=+this.value;redraw()">
+            <input class="fin" id="macd-s" type="number" value="26" min="5" max="100" style="text-align:center;font-family:'JetBrains Mono';font-size:11px;" onchange="S.macd.slow=+this.value;redraw()">
+            <input class="fin" id="macd-g" type="number" value="9" min="2" max="30" style="text-align:center;font-family:'JetBrains Mono';font-size:11px;" onchange="S.macd.signal=+this.value;redraw()">
+          </div>
+        </div>
+      </div>
+
+      <!-- RSI Config -->
+      <div class="psec" id="ps-rsi">
+        <div class="phead" onclick="toggleSec('ps-rsi')">
+          <span>RSI 設定</span><span class="chev">▾</span>
+        </div>
+        <div class="pbody">
+          <label class="fl">Period <span id="rsi-p-v" style="font-family:'JetBrains Mono';font-size:10px;">14</span></label>
+          <div class="srow"><input type="range" id="rsi-p" min="2" max="50" value="14" step="1" oninput="S.rsi.period=+this.value;document.getElementById('rsi-p-v').textContent=this.value;redraw()"></div>
+          <div style="height:5px;"></div>
+          <label class="fl">超買 OB <span id="rsi-ob-v" style="font-family:'JetBrains Mono';font-size:10px;">70</span></label>
+          <div class="srow"><input type="range" id="rsi-ob" min="55" max="90" value="70" step="1" oninput="S.rsi.ob=+this.value;document.getElementById('rsi-ob-v').textContent=this.value;redraw()"></div>
+          <div style="height:5px;"></div>
+          <label class="fl">超賣 OS <span id="rsi-os-v" style="font-family:'JetBrains Mono';font-size:10px;">30</span></label>
+          <div class="srow"><input type="range" id="rsi-os" min="10" max="45" value="30" step="1" oninput="S.rsi.os=+this.value;document.getElementById('rsi-os-v').textContent=this.value;redraw()"></div>
+        </div>
+      </div>
+
+      <!-- Visual -->
+      <div class="psec" id="ps-vis">
+        <div class="phead" onclick="toggleSec('ps-vis')">
+          <span>視覺 / 顏色</span><span class="chev">▾</span>
+        </div>
+        <div class="pbody">
+          <div class="trow">
+            <span class="tlbl">Log Scale</span>
+            <label class="tsw"><input type="checkbox" id="log-s" onchange="redraw()"><span class="tsl"></span></label>
+          </div>
+          <div class="trow">
+            <span class="tlbl">Grid</span>
+            <label class="tsw"><input type="checkbox" id="grid-on" checked onchange="redraw()"><span class="tsl"></span></label>
+          </div>
+          <div class="trow">
+            <span class="tlbl">Range Slider</span>
+            <label class="tsw"><input type="checkbox" id="rs-on" onchange="redraw()"><span class="tsl"></span></label>
+          </div>
+          <div class="trow">
+            <span class="tlbl">危機陰影</span>
+            <label class="tsw"><input type="checkbox" id="crisis-on" checked onchange="redraw()"><span class="tsl"></span></label>
+          </div>
+          <div class="trow">
+            <span class="tlbl">H/L 標註</span>
+            <label class="tsw"><input type="checkbox" id="hl-on" checked onchange="redraw()"><span class="tsl"></span></label>
+          </div>
+          <div style="height:7px;"></div>
+          <div class="trow">
+            <span class="tlbl">上漲色 (紅)</span>
+            <input type="color" id="col-up" value="#E53E3E" onchange="redraw()">
+          </div>
+          <div class="trow">
+            <span class="tlbl">下跌色 (綠)</span>
+            <input type="color" id="col-dn" value="#38A169" onchange="redraw()">
+          </div>
+          <div style="height:4px;"></div>
+          <button class="tbtn" style="width:100%;justify-content:center;font-size:11px;" onclick="swapColors()">⇄ 互換顏色</button>
+        </div>
+      </div>
+
+    </div><!-- /pscroll -->
+  </div><!-- /lpanel -->
+
+  <!-- ===========================
+       CHART AREA
+       =========================== -->
+  <div id="carea">
+
+    <div id="ctoolbar">
+      <div class="ct-info">
+        <span class="ct-sym" id="ct-sym">^GSPC</span>
+        <span class="ct-px"  id="ct-px">—</span>
+        <span class="ct-chg" id="ct-chg"></span>
+      </div>
+      <div id="ctoolbar-r">
+        <div class="fc on"  id="fc-kline"   onclick="toggleFC('kline')">K線</div>
+        <div class="fc on"  id="fc-sma"     onclick="toggleFC('sma')">SMA</div>
+        <div class="fc on"  id="fc-bb"      onclick="toggleFC('bb')">BB</div>
+        <div class="fc on"  id="fc-vol"     onclick="toggleFC('vol')">VOL</div>
+        <div class="fc on"  id="fc-kdj"     onclick="toggleFC('kdj')">KDJ</div>
+        <div class="fc on"  id="fc-macd"    onclick="toggleFC('macd')">MACD</div>
+        <div class="fc on"  id="fc-rsi"     onclick="toggleFC('rsi')">RSI</div>
+        <div class="fc"     id="fc-sar"     onclick="toggleFC('sar')">SAR</div>
+        <div class="fc"     id="fc-crisis"  onclick="toggleFC('crisis')">危機</div>
+        <span class="intvl-badge">Δ 5·10·20·25·50·100·200·250·500·1k·2k·2.5k·5k</span>
+      </div>
+    </div>
+
+    <div id="cbox">
+      <div id="chart"></div>
+      <div id="loading">
+        <div class="spin"></div>
+        <div class="load-txt" id="load-msg">載入資料中...</div>
+      </div>
+    </div>
+
+    <!-- STAT PANEL -->
+    <div id="stat-panel">
+      <div class="scard">
+        <div class="sc-lbl">Total Return</div>
+        <div class="sc-val" id="sp-ret">—</div>
+        <div class="sc-sub" id="sp-ret-sub">期間報酬率</div>
+      </div>
+      <div class="scard">
+        <div class="sc-lbl">Sharpe Ratio</div>
+        <div class="sc-val neutral" id="sp-sharpe">—</div>
+        <div class="sc-sub" id="sp-sharpe-sub">Rf=NTX·年化</div>
+      </div>
+      <div class="scard">
+        <div class="sc-lbl">vs S&amp;P 500</div>
+        <div class="sc-val" id="sp-alpha">—</div>
+        <div class="sc-sub" id="sp-alpha-sub">超額報酬</div>
+      </div>
+      <div class="scard">
+        <div class="sc-lbl">Beta (SP500)</div>
+        <div class="sc-val neutral" id="sp-beta">—</div>
+        <div class="sc-sub" id="sp-beta-sub">系統性風險</div>
+      </div>
+      <div class="scard">
+        <div class="sc-lbl">Ann. Vol</div>
+        <div class="sc-val" id="sp-vol">—</div>
+        <div class="sc-sub" id="sp-vol-sub">年化波動度</div>
+      </div>
+      <div class="scard">
+        <div class="sc-lbl">Max Drawdown</div>
+        <div class="sc-val down" id="sp-dd">—</div>
+        <div class="sc-sub" id="sp-dd-sub">最大回落</div>
+      </div>
+      <div class="scard">
+        <div class="sc-lbl">Calmar Ratio</div>
+        <div class="sc-val neutral" id="sp-calmar">—</div>
+        <div class="sc-sub">Return / MDD</div>
+      </div>
+      <div class="scard">
+        <div class="sc-lbl">Win Rate</div>
+        <div class="sc-val" id="sp-wr">—</div>
+        <div class="sc-sub" id="sp-wr-sub">日勝率</div>
+      </div>
+    </div>
+
+  </div><!-- /carea -->
+
+  <!-- RIGHT PANEL TOGGLE -->
+  <div id="rtoggle" onclick="toggleR()">›</div>
+
+  <!-- ===========================
+       RIGHT PANEL
+       =========================== -->
+  <div id="rpanel">
+    <div class="pscroll">
+
+      <!-- Data Source -->
+      <div class="psec" id="ps-src">
+        <div class="phead" onclick="toggleSec('ps-src')">
+          <span>資料來源</span><span class="chev">▾</span>
+        </div>
+        <div class="pbody">
+          <label class="fl">來源</label>
+          <select class="fsel" id="src-sel">
+            <option value="yf">yfinance (即時)</option>
+            <option value="duckdb">DuckDB (VDF 快取)</option>
+          </select>
+          <label class="fl">頻率</label>
+          <select class="fsel" id="intvl-sel">
+            <option value="1d" selected>日線 1D</option>
+            <option value="1wk">週線 1W</option>
+            <option value="1mo">月線 1M</option>
+          </select>
+          <div class="trow">
+            <span class="tlbl">ADJ Close 優先</span>
+            <label class="tsw"><input type="checkbox" id="adj-on" checked><span class="tsl"></span></label>
+          </div>
+          <div style="margin-top:7px;font-family:'JetBrains Mono';font-size:9.5px;color:var(--txt3);padding:4px 6px;background:var(--surface3);border-radius:3px;" id="src-status">⬤ 就緒</div>
+        </div>
+      </div>
+
+      <!-- Benchmark & Sharpe -->
+      <div class="psec" id="ps-perf">
+        <div class="phead" onclick="toggleSec('ps-perf')">
+          <span>績效 / Sharpe</span><span class="chev">▾</span>
+        </div>
+        <div class="pbody">
+          <label class="fl">Risk-Free Rate (年化 %)</label>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+            <input class="fin" id="rf-rate" type="number" value="1.75" step="0.05" min="0" max="20" style="flex:1;text-align:center;font-family:'JetBrains Mono';" onchange="recalcPerf()">
+            <span style="font-size:10px;color:var(--txt3)">% (NTX≈1.75%)</span>
+          </div>
+          <label class="fl">Benchmark Ticker</label>
+          <input class="fin" id="bench-ticker" type="text" value="^GSPC" style="font-family:'JetBrains Mono';" placeholder="^GSPC / ^TWII">
+          <div class="trow">
+            <span class="tlbl">顯示 Benchmark 曲線</span>
+            <label class="tsw"><input type="checkbox" id="bench-show" onchange="redraw()"><span class="tsl"></span></label>
+          </div>
+          <div style="height:5px;"></div>
+          <label class="fl">Sharpe 天數 N</label>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+            <input class="fin" id="sharpe-n" type="number" value="252" step="1" min="30" max="2520" style="flex:1;text-align:center;font-family:'JetBrains Mono';" onchange="recalcPerf()">
+            <span style="font-size:10px;color:var(--txt3)">交易日/年</span>
+          </div>
+          <button class="tbtn" style="width:100%;justify-content:center;font-size:11px;margin-top:4px;" onclick="recalcPerf()">🔄 重算績效</button>
+        </div>
+      </div>
+
+      <!-- Y-Axis Intervals -->
+      <div class="psec" id="ps-yax">
+        <div class="phead" onclick="toggleSec('ps-yax')">
+          <span>Y 軸間隔</span><span class="chev">▾</span>
+        </div>
+        <div class="pbody">
+          <div class="trow">
+            <span class="tlbl">自動選擇</span>
+            <label class="tsw"><input type="checkbox" id="yauto" checked onchange="redraw()"><span class="tsl"></span></label>
+          </div>
+          <div class="trow">
+            <span class="tlbl">左右等框對稱</span>
+            <label class="tsw"><input type="checkbox" id="ysym" checked onchange="redraw()"><span class="tsl"></span></label>
+          </div>
+          <div style="height:5px;"></div>
+          <label class="fl">邊框格數 <span id="ymarg-v" style="font-family:'JetBrains Mono';font-size:10px;">2</span></label>
+          <div class="srow"><input type="range" id="ymarg" min="1" max="8" value="2" step="1" oninput="document.getElementById('ymarg-v').textContent=this.value;redraw()"></div>
+          <div style="height:5px;"></div>
+          <label class="fl">手動 dtick 覆寫</label>
+          <input class="fin" id="ydtick" type="number" placeholder="留空=自動" style="font-family:'JetBrains Mono';" onchange="redraw()">
+        </div>
+      </div>
+
+      <!-- Export -->
+      <div class="psec" id="ps-exp">
+        <div class="phead" onclick="toggleSec('ps-exp')">
+          <span>匯出</span><span class="chev">▾</span>
+        </div>
+        <div class="pbody">
+          <label class="fl">DPI (PNG)</label>
+          <select class="fsel" id="exp-dpi">
+            <option value="1">72 DPI (螢幕)</option>
+            <option value="2">150 DPI</option>
+            <option value="3" selected>300 DPI (印刷)</option>
+          </select>
+          <button class="tbtn" style="width:100%;justify-content:center;margin-bottom:5px;" onclick="exportHtml()">💾 HTML (互動)</button>
+          <button class="tbtn" style="width:100%;justify-content:center;" onclick="exportPng()">🖼 PNG (靜態)</button>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /rpanel -->
+
+</div><!-- /body -->
+
+<!-- STATUS BAR -->
+<div id="statusbar">
+  <div class="sdot" id="sd"></div>
+  <span id="sb-txt">就緒</span>
+  <div id="sb-r">
+    <span id="sb-range"></span>
+    <span id="sb-pts"></span>
+    <span id="sb-clock"></span>
+    <span style="color:var(--txt3)">VIA Ecosystem © 2026</span>
+  </div>
+</div>
+
+<!-- ===============================================================
+     PARAMETER MATRIX MODAL
+     =============================================================== -->
+<div class="modal-bg" id="matrix-modal">
+  <div class="modal">
+    <div class="modal-h">
+      <span>⚙ 參數矩陣 — VeritasAutoPlot TA3</span>
+      <span class="modal-close" onclick="closeMatrix()">✕</span>
+    </div>
+    <p style="font-size:11px;color:var(--txt2);margin-bottom:14px;">
+      在此統一修改所有技術指標參數。修改後點「套用」立即重繪。
+    </p>
+
+    <table class="matrix-table">
+      <tr>
+        <th>類別</th><th>指標</th><th>參數 1</th><th>說明</th><th>參數 2</th><th>說明</th><th>參數 3</th><th>說明</th>
+      </tr>
+      <!-- SMA -->
+      <tr>
+        <td><span class="mtag t">TREND</span></td>
+        <td>SMA / EMA</td>
+        <td><input type="number" id="mx-ma1" value="5"></td><td class="row-label">SMA1</td>
+        <td><input type="number" id="mx-ma2" value="10"></td><td class="row-label">SMA2</td>
+        <td><input type="number" id="mx-ma3" value="20"></td><td class="row-label">SMA3</td>
+      </tr>
+      <tr>
+        <td></td><td></td>
+        <td><input type="number" id="mx-ma4" value="60"></td><td class="row-label">SMA4</td>
+        <td><input type="number" id="mx-ma5" value="120"></td><td class="row-label">SMA5</td>
+        <td><input type="number" id="mx-ma6" value="240"></td><td class="row-label">SMA6</td>
+      </tr>
+      <!-- BBand -->
+      <tr>
+        <td><span class="mtag t">TREND</span></td>
+        <td>BBand</td>
+        <td><input type="number" id="mx-bbp" value="20"></td><td class="row-label">Period</td>
+        <td><input type="number" id="mx-bbs" value="2.0" step="0.1"></td><td class="row-label">Std Dev</td>
+        <td>—</td><td></td>
+      </tr>
+      <!-- SAR -->
+      <tr>
+        <td><span class="mtag t">TREND</span></td>
+        <td>Parabolic SAR</td>
+        <td><input type="number" id="mx-sar-acc" value="0.02" step="0.01"></td><td class="row-label">Acc. Init</td>
+        <td><input type="number" id="mx-sar-max" value="0.20" step="0.01"></td><td class="row-label">Acc. Max</td>
+        <td>—</td><td></td>
+      </tr>
+      <!-- KDJ -->
+      <tr>
+        <td><span class="mtag m">MOM</span></td>
+        <td>KDJ</td>
+        <td><input type="number" id="mx-kdj-r" value="9"></td><td class="row-label">RSV Period</td>
+        <td><input type="number" id="mx-kdj-k" value="3"></td><td class="row-label">K Smooth</td>
+        <td><input type="number" id="mx-kdj-d" value="3"></td><td class="row-label">D Smooth</td>
+      </tr>
+      <!-- MACD -->
+      <tr>
+        <td><span class="mtag m">MOM</span></td>
+        <td>MACD</td>
+        <td><input type="number" id="mx-mf" value="12"></td><td class="row-label">Fast EMA</td>
+        <td><input type="number" id="mx-ms" value="26"></td><td class="row-label">Slow EMA</td>
+        <td><input type="number" id="mx-mg" value="9"></td><td class="row-label">Signal</td>
+      </tr>
+      <!-- RSI -->
+      <tr>
+        <td><span class="mtag m">MOM</span></td>
+        <td>RSI</td>
+        <td><input type="number" id="mx-rsi-p" value="14"></td><td class="row-label">Period</td>
+        <td><input type="number" id="mx-rsi-ob" value="70"></td><td class="row-label">OB Line</td>
+        <td><input type="number" id="mx-rsi-os" value="30"></td><td class="row-label">OS Line</td>
+      </tr>
+      <!-- ATR -->
+      <tr>
+        <td><span class="mtag s">VOL</span></td>
+        <td>ATR</td>
+        <td><input type="number" id="mx-atr-p" value="14"></td><td class="row-label">Period</td>
+        <td>—</td><td></td><td>—</td><td></td>
+      </tr>
+      <!-- Perf -->
+      <tr>
+        <td><span class="mtag v">PERF</span></td>
+        <td>Sharpe / Risk</td>
+        <td><input type="number" id="mx-rf" value="1.75" step="0.05"></td><td class="row-label">Rf Rate %</td>
+        <td><input type="number" id="mx-td" value="252"></td><td class="row-label">交易日/年</td>
+        <td><input type="text" id="mx-bench" value="^GSPC" style="width:80px;"></td><td class="row-label">Benchmark</td>
+      </tr>
+      <!-- Y-Axis -->
+      <tr>
+        <td><span class="mtag v">YAXIS</span></td>
+        <td>間隔邊框</td>
+        <td><input type="number" id="mx-ymarg" value="2"></td><td class="row-label">邊框格數</td>
+        <td>—</td><td></td><td>—</td><td></td>
+      </tr>
+    </table>
+
+    <p style="font-size:10px;color:var(--txt3);margin-top:10px;">
+      可用間隔倍數 Δ：5·10·20·25·50·100·200·250·500·1000·2000·2500·5000 (自動選最適)
+    </p>
+
+    <div class="modal-footer">
+      <button class="tbtn" onclick="closeMatrix()">取消</button>
+      <button class="tbtn" onclick="resetMatrix()">↺ 重置預設</button>
+      <button class="tbtn pri" onclick="applyMatrix()">✓ 套用並重繪</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ===============================================================
+     JAVASCRIPT CORE
+     =============================================================== -->
+<script>
+/* ================================================================
+   VeritasAutoPlot™ TA3 — JavaScript
+   LEGO M-C-F Architecture (Module-Class-Function)
+   ================================================================
+
+   MODULE MAP:
+   M01  Global State & Config Matrix
+   M02  TA-Lib Implementations (JS)
+   M03  Y-Axis Auto-Interval Engine
+   M04  Data Generation (yfinance simulation)
+   M05  Chart Drawing Engine (3-panel)
+   M06  Performance / Sharpe Calculator
+   M07  UI Controllers
+   M08  Export Functions
+   M09  Init & Event Binding
+*/
+
+/* ================================================================
+   M01: GLOBAL STATE & CONFIG MATRIX
+   ================================================================ */
+
+// ── C01: Master Parameter Matrix ─────────────────────────────────
+// 所有技術指標參數集中於此，方便矩陣式調整
+const PARAMS = {
+  // ── Trend ──
+  ma: {
+    periods: [5, 10, 20, 60, 120, 240],   // SMA/EMA periods
+    colors:  ['#4C72B0','#DD8452','#55A868','#C44E52','#8172B2','#937860'],
+    widths:  [1.0, 1.0, 1.2, 1.5, 1.5, 2.0],   // 240日最粗
+    enabled: [true, true, true, true, true, true],
+    type: 'SMA',   // 'SMA' | 'EMA'
+  },
+  bb: {
+    period: 20,
+    std: 2.0,
+    color: '#8172B2',
+  },
+  sar: {
+    accInit: 0.02,
+    accMax:  0.20,
+    color:   '#CCB974',
+  },
+  // ── Momentum ──
+  kdj: {
+    rsvPeriod: 9,    // Fast K period (RSV window)
+    kSmooth:   3,    // K smoothing (1/3 EMA)
+    dSmooth:   3,    // D smoothing (1/3 EMA of K)
+    kColor:    '#4C72B0',
+    dColor:    '#DD8452',
+    jColor:    '#55A868',
+  },
+  macd: {
+    fast:   12,
+    slow:   26,
+    signal: 9,
+    barUp:  '#E53E3E',
+    barDn:  '#38A169',
+    lineColor:   '#4C72B0',
+    signalColor: '#DD8452',
+  },
+  rsi: {
+    period: 14,
+    ob: 70,   // 超買
+    os: 30,   // 超賣
+    color: '#C44E52',
+  },
+  atr: {
+    period: 14,
+  },
+  // ── Volume ──
+  vol: {
+    upColor:   '#E53E3E99',
+    downColor: '#38A16999',
+  },
+  // ── Performance ──
+  perf: {
+    rfRate:    1.75,   // Risk-free rate % (NTX = 台灣無風險利率 ≈ 1.75%)
+    tradeDays: 252,    // 年化交易日數
+    benchmark: '^GSPC',
+  },
+  // ── Y-axis ──
+  yaxis: {
+    steps: [5, 10, 20, 25, 50, 100, 200, 250, 500, 1000, 2000, 2500, 5000],
+    marginBars: 2,     // 上下各幾格邊距
+  },
+};
+
+// ── C02: App State ────────────────────────────────────────────────
+const S = {
+  ticker: '^GSPC',
+  period: '1y',
+  data:   null,    // main OHLCV
+  benchData: null, // benchmark OHLCV
+  features: {
+    kline: true, sma: true, bb: true, vol: true,
+    kdj: true, macd: true, rsi: true, sar: false, crisis: false,
+  },
+  // Mirror from PARAMS for reactive controls
+  bb:   { period: 20, std: 2.0 },
+  kdj:  { rsvPeriod: 9, kSmooth: 3, dSmooth: 3 },
+  macd: { fast: 12, slow: 26, signal: 9 },
+  rsi:  { period: 14, ob: 70, os: 30 },
+};
+
+// ── C03: Crisis Periods ───────────────────────────────────────────
+const CRISES = [
+  { s:'2000-03-01', e:'2002-10-09', lbl:'Dot-com',     col:'rgba(127,127,127,0.10)' },
+  { s:'2007-10-09', e:'2009-03-09', lbl:'GFC金融海嘯', col:'rgba(88,124,217,0.11)'  },
+  { s:'2011-07-22', e:'2011-10-03', lbl:'EU債務危機',  col:'rgba(127,127,127,0.09)' },
+  { s:'2015-08-18', e:'2015-09-29', lbl:'中國股災',    col:'rgba(127,127,127,0.09)' },
+  { s:'2018-10-01', e:'2018-12-24', lbl:'Fed緊縮',     col:'rgba(127,127,127,0.09)' },
+  { s:'2020-02-19', e:'2020-03-23', lbl:'COVID崩盤',   col:'rgba(229,62,62,0.12)'   },
+  { s:'2022-01-03', e:'2022-10-13', lbl:'升息熊市',    col:'rgba(88,124,217,0.10)'  },
+];
+
+/* ================================================================
+   M02: TA-LIB IMPLEMENTATIONS (JS)
+   All formulas self-contained — no external TA library required
+   ================================================================ */
+
+// ── F02-01: SMA ───────────────────────────────────────────────────
+function calcSMA(arr, n) {
+  return arr.map((_, i) => {
+    if (i < n-1) return null;
+    return arr.slice(i-n+1, i+1).reduce((a,b)=>a+b,0) / n;
+  });
+}
+
+// ── F02-02: EMA ───────────────────────────────────────────────────
+function calcEMA(arr, n) {
+  const k = 2 / (n+1);
+  const out = [];
+  let ema = null;
+  arr.forEach((v, i) => {
+    if (i < n-1) { out.push(null); return; }
+    if (i === n-1) {
+      ema = arr.slice(0,n).reduce((a,b)=>a+b,0)/n;
+      out.push(ema); return;
+    }
+    ema = v*k + ema*(1-k);
+    out.push(ema);
+  });
+  return out;
+}
+
+// ── F02-03: Bollinger Bands ───────────────────────────────────────
+function calcBB(arr, n, sd) {
+  const sma = calcSMA(arr, n);
+  const upper = [], lower = [];
+  arr.forEach((_, i) => {
+    if (i < n-1) { upper.push(null); lower.push(null); return; }
+    const sl = arr.slice(i-n+1, i+1);
+    const mean = sma[i];
+    const variance = sl.reduce((a,b) => a+(b-mean)**2, 0) / n;
+    const s = Math.sqrt(variance);
+    upper.push(mean + sd*s);
+    lower.push(mean - sd*s);
+  });
+  return { upper, lower, middle: sma };
+}
+
+// ── F02-04: KDJ (Taiwan-style 九轉KDJ) ───────────────────────────
+// RSV = (Close - LowestLow(n)) / (HighestHigh(n) - LowestLow(n)) * 100
+// K = prev_K * (1 - 1/kSmooth) + RSV * (1/kSmooth)
+// D = prev_D * (1 - 1/dSmooth) + K  * (1/dSmooth)
+// J = 3*K - 2*D
+function calcKDJ(high, low, close, rsvP, kS, dS) {
+  const n = close.length;
+  const rsv = [], K = [], D = [], J = [];
+  let kPrev = 50, dPrev = 50;
+  for (let i = 0; i < n; i++) {
+    if (i < rsvP-1) { rsv.push(null); K.push(null); D.push(null); J.push(null); continue; }
+    const hSlice = high.slice(i-rsvP+1, i+1);
+    const lSlice = low.slice(i-rsvP+1, i+1);
+    const hh = Math.max(...hSlice);
+    const ll = Math.min(...lSlice);
+    const r = hh===ll ? 50 : (close[i]-ll)/(hh-ll)*100;
+    rsv.push(r);
+    const k = kPrev * (1 - 1/kS) + r * (1/kS);
+    const d = dPrev * (1 - 1/dS) + k * (1/dS);
+    const j = 3*k - 2*d;
+    K.push(k); D.push(d); J.push(j);
+    kPrev = k; dPrev = d;
+  }
+  return { K, D, J };
+}
+
+// ── F02-05: MACD ──────────────────────────────────────────────────
+function calcMACD(close, fast, slow, sig) {
+  const eFast = calcEMA(close, fast);
+  const eSlow = calcEMA(close, slow);
+  const dif = close.map((_,i) => eFast[i]!==null && eSlow[i]!==null ? eFast[i]-eSlow[i] : null);
+  // signal EMA of dif (fill nulls with 0 for EMA init, then mask)
+  const difFill = dif.map(v=>v===null?0:v);
+  const deaRaw = calcEMA(difFill, sig);
+  const dea = dif.map((v,i) => v===null?null:deaRaw[i]);
+  const hist = dif.map((v,i) => v!==null&&dea[i]!==null ? v-dea[i] : null);
+  return { dif, dea, hist };
+}
+
+// ── F02-06: RSI ───────────────────────────────────────────────────
+function calcRSI(close, n) {
+  const out = [];
+  for (let i = 0; i < close.length; i++) {
+    if (i < n) { out.push(null); continue; }
+    let gains=0, losses=0;
+    for (let j=i-n+1; j<=i; j++) {
+      const d = close[j]-close[j-1];
+      if (d>0) gains+=d; else losses+=Math.abs(d);
+    }
+    losses === 0 ? out.push(100) : out.push(100 - 100/(1+gains/losses));
+  }
+  return out;
+}
+
+// ── F02-07: Parabolic SAR ─────────────────────────────────────────
+function calcSAR(high, low, accInit, accMax) {
+  const n = high.length;
+  const sar = new Array(n).fill(null);
+  if (n < 2) return sar;
+  let bull = true;       // current trend
+  let acc  = accInit;    // acceleration factor
+  let ep   = high[0];    // extreme point
+  let sarV = low[0];     // initial SAR
+
+  for (let i = 1; i < n; i++) {
+    let newSar = sarV + acc * (ep - sarV);
+    if (bull) {
+      newSar = Math.min(newSar, low[i-1], i>1?low[i-2]:low[i-1]);
+      if (low[i] < newSar) {
+        // flip to bear
+        bull = false; acc = accInit; sarV = ep; ep = low[i]; newSar = ep;
+      } else {
+        if (high[i] > ep) { ep = high[i]; acc = Math.min(acc+accInit, accMax); }
+        sarV = newSar;
+      }
+    } else {
+      newSar = Math.max(newSar, high[i-1], i>1?high[i-2]:high[i-1]);
+      if (high[i] > newSar) {
+        bull = true; acc = accInit; sarV = ep; ep = high[i]; newSar = ep;
+      } else {
+        if (low[i] < ep) { ep = low[i]; acc = Math.min(acc+accInit, accMax); }
+        sarV = newSar;
+      }
+    }
+    sar[i] = sarV;
+  }
+  return sar;
+}
+
+// ── F02-08: ATR ───────────────────────────────────────────────────
+function calcATR(high, low, close, n) {
+  const tr = high.map((h,i) => {
+    if (i===0) return h-low[i];
+    return Math.max(h-low[i], Math.abs(h-close[i-1]), Math.abs(low[i]-close[i-1]));
+  });
+  return calcSMA(tr, n);
+}
+
+// ── F02-09: OBV ───────────────────────────────────────────────────
+function calcOBV(close, vol) {
+  const out = [0];
+  for (let i=1; i<close.length; i++) {
+    if (close[i]>close[i-1])      out.push(out[i-1]+vol[i]);
+    else if (close[i]<close[i-1]) out.push(out[i-1]-vol[i]);
+    else                          out.push(out[i-1]);
+  }
+  return out;
+}
+
+/* ================================================================
+   M03: Y-AXIS AUTO-INTERVAL ENGINE
+   Allowed steps: 5,10,20,25,50,100,200,250,500,1k,2k,2.5k,5k
+   Symmetric left/right margin of N bars
+   ================================================================ */
+
+// ── F03-01: Pick best dtick ───────────────────────────────────────
+function bestDtick(range, targetBars) {
+  const idealStep = range / targetBars;
+  const steps = PARAMS.yaxis.steps;
+  let best = steps[0], bestErr = Infinity;
+  for (const s of steps) {
+    const err = Math.abs(Math.log10(s) - Math.log10(idealStep));
+    if (err < bestErr) { bestErr = err; best = s; }
+  }
+  return best;
+}
+
+// ── F03-02: Symmetric axis range ─────────────────────────────────
+function symRange(vals, dtick, marginBars) {
+  const v = vals.filter(x=>x!==null&&!isNaN(x));
+  if (!v.length) return [0, 100];
+  const mn = Math.min(...v), mx = Math.max(...v);
+  const lo = Math.floor(mn/dtick)*dtick - marginBars*dtick;
+  const hi = Math.ceil(mx/dtick)*dtick  + marginBars*dtick;
+  return [lo, hi];
+}
+
+// ── F03-03: Full Y-range computation ─────────────────────────────
+function yRange(vals, panel) {
+  const auto = document.getElementById('yauto')?.checked ?? true;
+  const marg = parseInt(document.getElementById('ymarg')?.value ?? 2);
+  const manualDtick = parseFloat(document.getElementById('ydtick')?.value || '');
+  const upCol = document.getElementById('col-up')?.value ?? '#E53E3E';
+  const dnCol = document.getElementById('col-dn')?.value ?? '#38A169';
+
+  const v = (vals||[]).flat().filter(x=>x!==null&&!isNaN(x));
+  if (!v.length) return { range:[0,100], dtick:10 };
+
+  let dtick;
+  if (!auto && !isNaN(manualDtick) && manualDtick>0) {
+    dtick = manualDtick;
+  } else {
+    const span = Math.max(...v)-Math.min(...v);
+    dtick = bestDtick(span, 7);
+  }
+  const range = symRange(v, dtick, marg);
+  return { range, dtick };
+}
+
+/* ================================================================
+   M04: DATA GENERATION (yfinance simulation)
+   In production: replace with actual API fetch
+   ================================================================ */
+
+// ── F04-01: Synthetic OHLCV ───────────────────────────────────────
+function genData(ticker, period) {
+  const daysMap = { '3mo':66,'6mo':132,'1y':252,'2y':504,'3y':756,'5y':1260,'10y':2520,'max':5040 };
+  const n = daysMap[period] || 252;
+
+  const startMap = { '^GSPC':4200,'^DJI':34000,'^IXIC':13000,'AAPL':145,'MSFT':270,'NVDA':220,
+                     'SPY':420,'QQQ':300,'2330.TW':520,'0050.TW':115,'^TWII':17000,'^VIX':18,
+                     'GLD':180,'TLT':90 };
+  let px = startMap[ticker] || 100;
+  const vol = ticker==='^VIX'?0.04:(ticker.endsWith('.TW')?0.014:0.011);
+
+  const today = new Date();
+  const dates=[],O=[],H=[],L=[],C=[],V=[];
+  let trend = 0.0003;
+
+  for (let i=n; i>=0; i--) {
+    const d = new Date(today); d.setDate(d.getDate()-i);
+    if (d.getDay()===0||d.getDay()===6) continue;
+    dates.push(d.toISOString().slice(0,10));
+    const ret  = trend + (Math.random()-0.48)*vol*2;
+    const open = px;
+    px = px*(1+ret);
+    const intra = Math.abs(ret)+vol*0.5*Math.random();
+    H.push(+Math.max(open,px)*(1+intra*0.3).toFixed(4));
+    L.push(+Math.min(open,px)*(1-intra*0.3).toFixed(4));
+    O.push(+open.toFixed(4));
+    C.push(+px.toFixed(4));
+    V.push(Math.round((2e6+Math.random()*3e6)*(1+Math.abs(ret)*8)));
+    if (Math.random()<0.003) trend=-trend;
+    if (Math.random()<0.002) trend+=(Math.random()-0.5)*0.0004;
+  }
+  // AdjClose = Close (simulation; in prod: use yfinance adj_close)
+  return { dates, O, H, L, C, V, adj: C };
+}
+
+// ── F04-02: Load Data ─────────────────────────────────────────────
+async function loadAndDraw() {
+  const ticker = document.getElementById('ticker-in').value.trim().toUpperCase()||'^GSPC';
+  S.ticker = ticker;
+  S.period = document.querySelector('.pchip.on')?.dataset.p || '1y';
+
+  setStatus('ld','載入資料...');
+  document.getElementById('loading').style.display='flex';
+  document.getElementById('load-msg').textContent=`載入 ${ticker} ${S.period}...`;
+
+  await sleep(350+Math.random()*250);
+
+  S.data = genData(ticker, S.period);
+
+  // Benchmark
+  const benchTicker = document.getElementById('bench-ticker')?.value.trim().toUpperCase()||'^GSPC';
+  S.benchData = (benchTicker !== ticker) ? genData(benchTicker, S.period) : S.data;
+
+  updateQuoteStrip();
+  document.getElementById('loading').style.display='none';
+  setStatus('ok', `${ticker} · ${S.data.dates.length} 筆`);
+  document.getElementById('src-status').textContent='⬤ yfinance 模擬資料 (demo)';
+  document.getElementById('src-status').style.color='#55A868';
+
+  redraw();
+  recalcPerf();
+}
+
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+// ── F04-03: Update quote strip ────────────────────────────────────
+function updateQuoteStrip() {
+  const d = S.data;
+  if (!d) return;
+  const last = d.C[d.C.length-1], prev = d.C[d.C.length-2]||last;
+  const chg = last-prev, pct = (chg/prev)*100;
+  document.getElementById('ct-sym').textContent  = S.ticker;
+  document.getElementById('q-sym').textContent   = S.ticker;
+  document.getElementById('ct-px').textContent   = last.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('q-px').textContent    = last.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const sign = chg>=0?'+':'';
+  const txt  = `${sign}${chg.toFixed(2)} (${sign}${pct.toFixed(2)}%)`;
+  const cls  = chg>=0?'up':'down';
+  document.getElementById('ct-chg').textContent = txt; document.getElementById('ct-chg').className='ct-chg '+cls;
+  document.getElementById('q-chg').textContent  = txt; document.getElementById('q-chg').className='q-chg '+cls;
+
+  document.getElementById('sb-range').textContent = `${d.dates[0]} ~ ${d.dates[d.dates.length-1]}`;
+  document.getElementById('sb-pts').textContent   = `${d.dates.length} bars`;
+}
+
+/* ================================================================
+   M05: CHART DRAWING ENGINE — 三圖堆疊
+   圖1: K線 + SMA/EMA + BBand     (左軸 y)
+   圖2: Volume (左軸 y2) + KDJ    (右軸 y3)
+   圖3: MACD (左軸 y4)            + RSI (右軸 y5)
+   X軸: 共用 x，完全對齊
+   ================================================================ */
+
+function redraw() {
+  if (!S.data) return;
+  draw3Panel(S.data);
+}
+
+// ── F05-01: Main draw function ────────────────────────────────────
+function draw3Panel(d) {
+  const upCol = document.getElementById('col-up').value;
+  const dnCol = document.getElementById('col-dn').value;
+  const showGrid = document.getElementById('grid-on').checked;
+  const logScale = document.getElementById('log-s').checked;
+  const showRS   = document.getElementById('rs-on').checked;
+  const crisisOn = document.getElementById('crisis-on').checked;
+  const hlOn     = document.getElementById('hl-on').checked;
+
+  const p = PARAMS;
+  const sk = S.kdj, sm = S.macd, sr = S.rsi, sb = S.bb;
+
+  // ── Compute all indicators ──
+  const close = d.adj;  // use adj close
+  const smaLines = p.ma.periods.map((n, i) =>
+    p.ma.type==='EMA' ? calcEMA(close,n) : calcSMA(close,n)
+  );
+  const bb  = calcBB(close, sb.period, sb.std);
+  const kdj = calcKDJ(d.H, d.L, close, sk.rsvPeriod, sk.kSmooth, sk.dSmooth);
+  const mac = calcMACD(close, sm.fast, sm.slow, sm.signal);
+  const rsi = calcRSI(close, sr.period);
+  const sar = calcSAR(d.H, d.L, p.sar.accInit, p.sar.accMax);
+
+  // ── Panel height ratios ── (total = 1.0)
+  // P1 (K線): 0.52, P2 (Vol+KDJ): 0.24, P3 (MACD+RSI): 0.24
+  const gap = 0.018;
+  const d1 = [0.48, 1.00];   // P1 domain (top)
+  const d2 = [0.24, 0.46];   // P2 domain
+  const d3 = [0.00, 0.22];   // P3 domain (bottom)
+
+  const dates = d.dates;
+  const traces = [];
+  const shapes = [];
+  const annotations = [];
+
+  // ── Crisis shading ──
+  if (crisisOn || S.features.crisis) {
+    const s0 = dates[0], sN = dates[dates.length-1];
+    CRISES.forEach(cr => {
+      if (cr.e < s0 || cr.s > sN) return;
+      shapes.push({ type:'rect', xref:'x', yref:'paper',
+        x0:Math.max(cr.s,s0), x1:Math.min(cr.e,sN), y0:0, y1:1,
+        fillcolor:cr.col, line:{width:0}, layer:'below' });
+    });
+  }
+
+  // ── H/L annotations on P1 ──
+  if (hlOn) {
+    const mx = Math.max(...close), mn = Math.min(...close);
+    const mxI = close.indexOf(mx), mnI = close.indexOf(mn);
+    annotations.push(
+      { x:dates[mxI], y:mx, xref:'x', yref:'y',
+        text:`▲ ${mx.toLocaleString(undefined,{maximumFractionDigits:2})}`,
+        showarrow:true, arrowhead:2, ax:0, ay:-28,
+        font:{family:"'JetBrains Mono',monospace",size:9.5,color:upCol},
+        bgcolor:'rgba(255,255,255,0.88)', bordercolor:upCol, borderwidth:1, borderpad:3 },
+      { x:dates[mnI], y:mn, xref:'x', yref:'y',
+        text:`▼ ${mn.toLocaleString(undefined,{maximumFractionDigits:2})}`,
+        showarrow:true, arrowhead:2, ax:0, ay:28,
+        font:{family:"'JetBrains Mono',monospace",size:9.5,color:dnCol},
+        bgcolor:'rgba(255,255,255,0.88)', bordercolor:dnCol, borderwidth:1, borderpad:3 }
+    );
+  }
+
+  // ── Panel separator lines ──
+  [d2[1]+gap/2, d3[1]+gap/2].forEach(y => {
+    shapes.push({ type:'line', xref:'paper', yref:'paper', x0:0, x1:1, y0:y, y1:y,
+      line:{ color:'#E8E5DF', width:1 } });
+  });
+
+  // ────────────────────────────────────────────────
+  // PANEL 1: K線 + SMA/EMA + BBand (yaxis = y)
+  // ────────────────────────────────────────────────
+  if (S.features.kline) {
+    traces.push({
+      type:'candlestick', x:dates, name:S.ticker,
+      open:d.O, high:d.H, low:d.L, close:d.adj,
+      increasing:{ line:{color:upCol,width:0.8}, fillcolor:upCol+'CC' },
+      decreasing:{ line:{color:dnCol,width:0.8}, fillcolor:dnCol+'CC' },
+      yaxis:'y', xaxis:'x', showlegend:false,
+      hoverinfo:'x+y',
+    });
+  }
+
+  if (S.features.sma) {
+    p.ma.periods.forEach((n, i) => {
+      if (!p.ma.enabled[i]) return;
+      traces.push({
+        type:'scatter', mode:'lines', x:dates, y:smaLines[i],
+        name:`${p.ma.type}${n}`,
+        line:{ color:p.ma.colors[i], width:p.ma.widths[i] },
+        yaxis:'y', xaxis:'x', hoverinfo:'x+y',
+      });
+    });
+  }
+
+  if (S.features.bb && document.getElementById('bb-on').checked) {
+    const fill = document.getElementById('bb-fill').checked;
+    traces.push({
+      type:'scatter', mode:'lines', x:dates, y:bb.upper, name:`BB Upper`,
+      line:{ color:p.bb.color+'BB', width:1, dash:'dot' },
+      yaxis:'y', xaxis:'x', showlegend:false, hoverinfo:'skip',
+    });
+    traces.push({
+      type:'scatter', mode:'lines', x:dates, y:bb.lower, name:`BB Lower`,
+      line:{ color:p.bb.color+'BB', width:1, dash:'dot' },
+      fill: fill ? 'tonexty' : 'none',
+      fillcolor: fill ? p.bb.color+'0D' : 'transparent',
+      yaxis:'y', xaxis:'x', showlegend:false, hoverinfo:'skip',
+    });
+    traces.push({
+      type:'scatter', mode:'lines', x:dates, y:bb.middle, name:`BB Mid`,
+      line:{ color:p.bb.color+'77', width:0.8, dash:'dot' },
+      yaxis:'y', xaxis:'x', showlegend:false, hoverinfo:'skip',
+    });
+  }
+
+  if (S.features.sar) {
+    traces.push({
+      type:'scatter', mode:'markers', x:dates, y:sar, name:'SAR',
+      marker:{ size:3, color:p.sar.color, symbol:'circle' },
+      yaxis:'y', xaxis:'x', hoverinfo:'x+y',
+    });
+  }
+
+  // Y1 range
+  const p1Vals = [
+    d.H, d.L,
+    ...(S.features.sma ? smaLines.filter((_,i)=>p.ma.enabled[i]) : []),
+    ...(S.features.bb ? [bb.upper, bb.lower] : []),
+  ].flat();
+  const yr1 = yRange(p1Vals, 'P1');
+
+  // ────────────────────────────────────────────────
+  // PANEL 2: Volume (y2, LEFT) + KDJ (y3, RIGHT)
+  // ────────────────────────────────────────────────
+  if (S.features.vol) {
+    const barCols = close.map((c,i)=>i===0||c>=d.O[i]?upCol+'99':dnCol+'99');
+    traces.push({
+      type:'bar', x:dates, y:d.V, name:'Volume',
+      marker:{ color:barCols, line:{width:0} },
+      yaxis:'y2', xaxis:'x', showlegend:false, hoverinfo:'x+y',
+      opacity:0.8,
+    });
+  }
+
+  if (S.features.kdj) {
+    traces.push({ type:'scatter', mode:'lines', x:dates, y:kdj.K, name:'%K',
+      line:{color:p.kdj.kColor, width:1.2}, yaxis:'y3', xaxis:'x', hoverinfo:'x+y' });
+    traces.push({ type:'scatter', mode:'lines', x:dates, y:kdj.D, name:'%D',
+      line:{color:p.kdj.dColor, width:1.2, dash:'dot'}, yaxis:'y3', xaxis:'x', hoverinfo:'x+y' });
+    if (document.getElementById('kdj-j').checked) {
+      traces.push({ type:'scatter', mode:'lines', x:dates, y:kdj.J, name:'%J',
+        line:{color:p.kdj.jColor, width:1.0}, yaxis:'y3', xaxis:'x', hoverinfo:'x+y' });
+    }
+  }
+
+  // KDJ ref lines
+  [80, 50, 20].forEach(v => {
+    shapes.push({ type:'line', xref:'paper', yref:'y3', x0:0, x1:1, y0:v, y1:v,
+      line:{ color: v===50?'#8C8C8C44':'#E53E3E44', width:1, dash:'dash' }, layer:'below' });
+  });
+
+  // Y2 range (volume)
+  const volMax = Math.max(...d.V);
+  const yr2 = { range:[0, volMax*4], dtick: bestDtick(volMax*4, 4) };
+
+  // Y3 range (KDJ: 0–100, but J can exceed)
+  const jVals = kdj.J.filter(v=>v!==null);
+  const jMin = jVals.length ? Math.min(...jVals, 0) : 0;
+  const jMax = jVals.length ? Math.max(...jVals, 100) : 100;
+  const yr3 = { range:[Math.min(jMin-5,0), Math.max(jMax+5,105)], dtick:25 };
+
+  // ────────────────────────────────────────────────
+  // PANEL 3: MACD (y4, LEFT) + RSI (y5, RIGHT)
+  // ────────────────────────────────────────────────
+  if (S.features.macd) {
+    const histCols = mac.hist.map(v=> v===null?'#ccc':(v>=0?upCol+'BB':dnCol+'BB'));
+    traces.push({ type:'bar', x:dates, y:mac.hist, name:'MACD Hist',
+      marker:{color:histCols,line:{width:0}}, yaxis:'y4', xaxis:'x', showlegend:false, hoverinfo:'x+y' });
+    traces.push({ type:'scatter', mode:'lines', x:dates, y:mac.dif, name:'DIF',
+      line:{color:p.macd.lineColor, width:1.3}, yaxis:'y4', xaxis:'x', hoverinfo:'x+y' });
+    traces.push({ type:'scatter', mode:'lines', x:dates, y:mac.dea, name:'DEA',
+      line:{color:p.macd.signalColor, width:1.0, dash:'dot'}, yaxis:'y4', xaxis:'x', hoverinfo:'x+y' });
+  }
+  // MACD zero line
+  shapes.push({ type:'line', xref:'paper', yref:'y4', x0:0, x1:1, y0:0, y1:0,
+    line:{ color:'#8C8C8C55', width:1, dash:'dash' }, layer:'below' });
+
+  if (S.features.rsi) {
+    traces.push({ type:'scatter', mode:'lines', x:dates, y:rsi, name:'RSI',
+      line:{color:p.rsi.color, width:1.3}, yaxis:'y5', xaxis:'x', hoverinfo:'x+y' });
+    // RSI reference lines
+    [sr.ob, 50, sr.os].forEach(v => {
+      shapes.push({ type:'line', xref:'paper', yref:'y5', x0:0, x1:1, y0:v, y1:v,
+        line:{ color:v===50?'#8C8C8C44':(v>50?upCol+'44':dnCol+'44'), width:1, dash:'dash' }, layer:'below' });
+    });
+    // OB/OS fill bands
+    shapes.push({ type:'rect', xref:'paper', yref:'y5', x0:0, x1:1, y0:sr.ob, y1:100,
+      fillcolor:upCol+'0C', line:{width:0}, layer:'below' });
+    shapes.push({ type:'rect', xref:'paper', yref:'y5', x0:0, x1:1, y0:0, y1:sr.os,
+      fillcolor:dnCol+'0C', line:{width:0}, layer:'below' });
+  }
+
+  // Y4 range (MACD)
+  const macdVals = [...(mac.dif||[]), ...(mac.dea||[]), ...(mac.hist||[])];
+  const yr4 = yRange(macdVals, 'MACD');
+
+  // Y5 range (RSI: fixed 0–100 with small margin)
+  const yr5 = { range:[-5, 105], dtick:25 };
+
+  // ── Panel Labels ──
+  const panelLabels = [
+    { txt:'P1 · K線 + MA + BB',  dom: d1, yref:'paper' },
+    { txt:'P2 · Vol (左) + KDJ (右)', dom: d2, yref:'paper' },
+    { txt:'P3 · MACD (左) + RSI (右)', dom: d3, yref:'paper' },
+  ];
+  panelLabels.forEach(pl => {
+    annotations.push({
+      x:0.003, y: pl.dom[0]+0.01, xref:'paper', yref:pl.yref,
+      text: pl.txt, showarrow:false,
+      font:{ family:"'DM Sans',sans-serif", size:9, color:'#9B9890' },
+      xanchor:'left', yanchor:'bottom',
+      bgcolor:'rgba(247,246,243,0.7)',
+    });
+  });
+
+  // ────────────────────────────────────────────────
+  // LAYOUT CONSTRUCTION
+  // ────────────────────────────────────────────────
+  const gridColor = showGrid ? '#EBEBEB' : 'transparent';
+  const logType   = logScale ? 'log' : 'linear';
+
+  const tickFont = { family:"'JetBrains Mono',monospace", size:9.5 };
+  const yAxisBase = { showgrid:showGrid, gridcolor:gridColor, zeroline:false,
+    showline:false, tickfont, fixedrange:false };
+
+  const layout = {
+    paper_bgcolor: '#F7F6F3',
+    plot_bgcolor:  '#FFFFFF',
+    font: { family:"'JetBrains Mono',monospace", size:10, color:'#6B6860' },
+    margin: { l:10, r:68, t:10, b:36, pad:0 },
+    shapes, annotations,
+    hovermode: 'x unified',
+    hoverlabel: { bgcolor:'#1A1A18', bordercolor:'#1A1A18',
+      font:{ family:"'JetBrains Mono',monospace", size:10, color:'#fff' } },
+    showlegend: true,
+    legend: { orientation:'h', x:0, y:1.01, xanchor:'left', yanchor:'bottom',
+      font:{ size:9.5 }, bgcolor:'rgba(255,255,255,0.85)',
+      traceorder:'normal' },
+    dragmode: 'zoom',
+
+    // ── X axis (shared, bottom panel only shows ticks) ──
+    xaxis: {
+      showgrid: showGrid, gridcolor: gridColor,
+      type:'date', zeroline:false,
+      showline:true, linecolor:'#E8E5DF',
+      tickfont, rangeslider:{ visible:showRS },
+      domain:[0.0, 1.0],
+      anchor:'y4',   // anchored to bottom panel
+    },
+
+    // ── Y1: P1 Price (RIGHT) ──
+    yaxis: {
+      ...yAxisBase,
+      side:'right', domain:d1, anchor:'x',
+      type:logType,
+      range: yr1.range, dtick: yr1.dtick,
+      tickformat:',',
+    },
+
+    // ── Y2: P2 Volume (LEFT) ──
+    yaxis2: {
+      ...yAxisBase,
+      side:'left', domain:d2, anchor:'x',
+      range: yr2.range, dtick: yr2.dtick,
+      tickformat:'.2s',
+      showticklabels:true,
+    },
+
+    // ── Y3: P2 KDJ (RIGHT) ──
+    yaxis3: {
+      ...yAxisBase,
+      side:'right', domain:d2, anchor:'x',
+      overlaying:'y2',
+      range: yr3.range, dtick: yr3.dtick,
+      showgrid:false,  // only left axis shows grid in P2
+    },
+
+    // ── Y4: P3 MACD (LEFT) ──
+    yaxis4: {
+      ...yAxisBase,
+      side:'left', domain:d3, anchor:'x',
+      range: yr4.range, dtick: yr4.dtick,
+    },
+
+    // ── Y5: P3 RSI (RIGHT) ──
+    yaxis5: {
+      ...yAxisBase,
+      side:'right', domain:d3, anchor:'x',
+      overlaying:'y4',
+      range: yr5.range, dtick: yr5.dtick,
+      showgrid:false,
+    },
+  };
+
+  Plotly.react('chart', traces, layout, {
+    responsive: true,
+    displaylogo: false,
+    scrollZoom: true,
+    displayModeBar: true,
+    modeBarButtonsToRemove:['toImage','sendDataToCloud','lasso2d','select2d'],
+  });
+}
+
+/* ================================================================
+   M06: PERFORMANCE & SHARPE CALCULATOR
+   Rf = NTX (台灣無風險利率), Benchmark = S&P500 (^GSPC)
+   ================================================================ */
+
+function recalcPerf() {
+  const d = S.data;
+  if (!d) return;
+
+  // Pull params
+  const rfAnnual = parseFloat(document.getElementById('rf-rate')?.value ?? PARAMS.perf.rfRate) / 100;
+  const tradeDays = parseInt(document.getElementById('sharpe-n')?.value ?? PARAMS.perf.tradeDays);
+  const close = d.adj;
+  const n = close.length;
+
+  // Daily returns
+  const ret = close.map((c,i) => i===0 ? null : (c-close[i-1])/close[i-1]);
+  const retV = ret.filter(v=>v!==null);
+
+  // ── Annualized return ──
+  const totalRet = (close[n-1]-close[0])/close[0];
+  const years    = n / tradeDays;
+  const annRet   = years>0 ? Math.pow(1+totalRet, 1/years)-1 : totalRet;
+
+  // ── Annualized volatility ──
+  const meanRet = retV.reduce((a,b)=>a+b,0)/retV.length;
+  const variance = retV.reduce((a,b)=>a+(b-meanRet)**2,0)/(retV.length-1);
+  const dailyVol = Math.sqrt(variance);
+  const annVol   = dailyVol * Math.sqrt(tradeDays);
+
+  // ── Daily Rf ──
+  const rfDaily  = rfAnnual / tradeDays;
+
+  // ── Sharpe Ratio ──
+  // Sharpe = (MeanDailyReturn - rfDaily) / DailyStdDev * sqrt(tradeDays)
+  const excessMean = meanRet - rfDaily;
+  const sharpe = dailyVol>0 ? excessMean / dailyVol * Math.sqrt(tradeDays) : 0;
+
+  // ── Max Drawdown ──
+  let peak = close[0], mdd = 0;
+  close.forEach(c => {
+    if (c > peak) peak = c;
+    const dd = (peak-c)/peak;
+    if (dd > mdd) mdd = dd;
+  });
+
+  // ── Calmar Ratio = AnnReturn / MDD ──
+  const calmar = mdd>0 ? annRet/mdd : 0;
+
+  // ── Beta vs Benchmark ──
+  let beta = null, alpha = null;
+  if (S.benchData && S.benchData !== S.data) {
+    const bc = S.benchData.adj;
+    const bRet = bc.map((c,i) => i===0 ? null : (c-bc[i-1])/bc[i-1]);
+    const minLen = Math.min(retV.length, bRet.filter(v=>v!==null).length);
+    const rv = retV.slice(-minLen);
+    const bv = bRet.filter(v=>v!==null).slice(-minLen);
+    const rm = rv.reduce((a,b)=>a+b,0)/rv.length;
+    const bm = bv.reduce((a,b)=>a+b,0)/bv.length;
+    const cov = rv.reduce((s,v,i)=>s+(v-rm)*(bv[i]-bm),0)/rv.length;
+    const bVar = bv.reduce((s,v)=>s+(v-bm)**2,0)/bv.length;
+    beta  = bVar>0 ? cov/bVar : null;
+    const benchTotal = (bc[bc.length-1]-bc[0])/bc[0];
+    alpha = totalRet - benchTotal;
+  } else {
+    beta = 1.0;
+    alpha = 0;
+  }
+
+  // ── Win Rate ──
+  const wins = retV.filter(v=>v>0).length;
+  const wr   = wins / retV.length;
+
+  // ── Update UI ──
+  const fmt2 = v => v===null?'—':(v>=0?'+':'')+v.toFixed(2);
+  const fmtPct = v => v===null?'—':(v>=0?'+':'')+`${(v*100).toFixed(2)}%`;
+  const fmtN   = v => v===null?'—':v.toFixed(3);
+
+  const setCard = (id, val, sub, cls) => {
+    const el = document.getElementById(id);
+    if (el) { el.textContent=val; if(cls) el.className=`sc-val ${cls}`; }
+    const sl = document.getElementById(id+'-sub');
+    if (sl && sub) sl.textContent=sub;
+  };
+
+  setCard('sp-ret',    fmtPct(totalRet), `年化 ${fmtPct(annRet)}`, totalRet>=0?'up':'down');
+  setCard('sp-sharpe', fmtN(sharpe),    `Rf=${(rfAnnual*100).toFixed(2)}% · ${tradeDays}日`, sharpe>=1?'up':sharpe<0?'down':'neutral');
+  setCard('sp-alpha',  fmtPct(alpha),   `vs ${document.getElementById('bench-ticker')?.value||'^GSPC'}`, alpha>=0?'up':'down');
+  setCard('sp-beta',   beta!==null?fmtN(beta):'—', '系統性風險', beta!==null&&beta>1?'down':beta!==null&&beta<0.5?'up':'neutral');
+  setCard('sp-vol',    `${(annVol*100).toFixed(1)}%`, `日波動 ${(dailyVol*100).toFixed(2)}%`, annVol>0.25?'down':annVol<0.12?'up':'neutral');
+  setCard('sp-dd',     `-${(mdd*100).toFixed(1)}%`, `最大回落`, 'down');
+  setCard('sp-calmar', fmtN(calmar), `年報酬/MDD`, calmar>=1?'up':calmar<0?'down':'neutral');
+  setCard('sp-wr',     `${(wr*100).toFixed(1)}%`, `${wins}/${retV.length} 日`, wr>0.52?'up':wr<0.45?'down':'neutral');
+}
+
+/* ================================================================
+   M07: UI CONTROLLERS
+   ================================================================ */
+
+// ── F07-01: Panel toggles ─────────────────────────────────────────
+function toggleL() {
+  const p = document.getElementById('lpanel');
+  const t = document.getElementById('ltoggle');
+  p.classList.toggle('collapsed');
+  t.classList.toggle('c');
+  t.textContent = p.classList.contains('collapsed') ? '›' : '‹';
+  t.style.left = p.classList.contains('collapsed') ? '0' : 'var(--panel-w)';
+  setTimeout(()=>Plotly.relayout('chart',{autosize:true}),240);
+}
+function toggleR() {
+  const p = document.getElementById('rpanel');
+  const t = document.getElementById('rtoggle');
+  p.classList.toggle('collapsed');
+  t.classList.toggle('c');
+  t.textContent = p.classList.contains('collapsed') ? '‹' : '›';
+  t.style.right = p.classList.contains('collapsed') ? '0' : 'var(--panel-w)';
+  setTimeout(()=>Plotly.relayout('chart',{autosize:true}),240);
+}
+
+// ── F07-02: Section collapse ──────────────────────────────────────
+function toggleSec(id) {
+  const sec = document.getElementById(id);
+  sec.classList.toggle('coll');
+}
+
+// ── F07-03: Feature chip toggle ───────────────────────────────────
+function toggleFC(feat) {
+  S.features[feat] = !S.features[feat];
+  document.getElementById('fc-'+feat).classList.toggle('on', S.features[feat]);
+  redraw();
+}
+
+// ── F07-04: MA type ───────────────────────────────────────────────
+function setMaType(type) {
+  PARAMS.ma.type = type;
+  document.getElementById('ma-sma').classList.toggle('on', type==='SMA');
+  document.getElementById('ma-ema').classList.toggle('on', type==='EMA');
+  redraw();
+}
+
+// ── F07-05: Swap colors ───────────────────────────────────────────
+function swapColors() {
+  const u = document.getElementById('col-up').value;
+  const dn= document.getElementById('col-dn').value;
+  document.getElementById('col-up').value = dn;
+  document.getElementById('col-dn').value = u;
+  redraw();
+}
+
+// ── F07-06: Build MA rows in left panel ──────────────────────────
+function buildMARows() {
+  const c = document.getElementById('ma-rows-container');
+  c.innerHTML = '';
+  PARAMS.ma.periods.forEach((n, i) => {
+    const row = document.createElement('div');
+    row.className = 'ma-row';
+    row.innerHTML = `
+      <input type="checkbox" class="ma-cb" ${PARAMS.ma.enabled[i]?'checked':''}
+        onchange="PARAMS.ma.enabled[${i}]=this.checked;redraw()">
+      <span class="ma-nm">${PARAMS.ma.type}${n}</span>
+      <div class="ma-sw" style="background:${PARAMS.ma.colors[i]}"></div>
+      <span class="ma-lw" title="Width">${PARAMS.ma.widths[i]}px</span>
+      <input type="color" class="ma-col" value="${PARAMS.ma.colors[i]}"
+        onchange="PARAMS.ma.colors[${i}]=this.value;redraw()">
+    `;
+    c.appendChild(row);
+  });
+}
+
+// ── F07-07: Period chips ──────────────────────────────────────────
+function bindPeriodChips() {
+  document.querySelectorAll('.pchip[data-p]').forEach(c => {
+    c.addEventListener('click', () => {
+      document.querySelectorAll('.pchip').forEach(x=>x.classList.remove('on'));
+      c.classList.add('on');
+      S.period = c.dataset.p;
+      loadAndDraw();
+    });
+  });
+}
+
+// ── F07-08: Status ────────────────────────────────────────────────
+function setStatus(type, txt) {
+  const dot = document.getElementById('sd');
+  dot.className = 'sdot' + (type==='ld'?' ld':type==='er'?' er':'');
+  document.getElementById('sb-txt').textContent = txt;
+}
+
+// ── F07-09: Clock ─────────────────────────────────────────────────
+function clock() {
+  const now = new Date();
+  document.getElementById('sb-clock').textContent =
+    now.toLocaleString('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+
+/* ================================================================
+   M08: PARAMETER MATRIX MODAL
+   ================================================================ */
+
+function openMatrix() {
+  // Sync current PARAMS to matrix inputs
+  const p = PARAMS;
+  p.ma.periods.forEach((v,i) => { const el=document.getElementById(`mx-ma${i+1}`); if(el) el.value=v; });
+  document.getElementById('mx-bbp').value  = p.bb.period;
+  document.getElementById('mx-bbs').value  = p.bb.std;
+  document.getElementById('mx-sar-acc').value = p.sar.accInit;
+  document.getElementById('mx-sar-max').value = p.sar.accMax;
+  document.getElementById('mx-kdj-r').value = p.kdj.rsvPeriod;
+  document.getElementById('mx-kdj-k').value = p.kdj.kSmooth;
+  document.getElementById('mx-kdj-d').value = p.kdj.dSmooth;
+  document.getElementById('mx-mf').value = p.macd.fast;
+  document.getElementById('mx-ms').value = p.macd.slow;
+  document.getElementById('mx-mg').value = p.macd.signal;
+  document.getElementById('mx-rsi-p').value  = p.rsi.period;
+  document.getElementById('mx-rsi-ob').value = p.rsi.ob;
+  document.getElementById('mx-rsi-os').value = p.rsi.os;
+  document.getElementById('mx-atr-p').value  = p.atr.period;
+  document.getElementById('mx-rf').value = p.perf.rfRate;
+  document.getElementById('mx-td').value = p.perf.tradeDays;
+  document.getElementById('mx-bench').value = p.perf.benchmark;
+  document.getElementById('mx-ymarg').value = p.yaxis.marginBars;
+  document.getElementById('matrix-modal').classList.add('open');
+}
+
+function closeMatrix() {
+  document.getElementById('matrix-modal').classList.remove('open');
+}
+
+function applyMatrix() {
+  const p = PARAMS;
+  // MA periods
+  p.ma.periods = [1,2,3,4,5,6].map(i => {
+    const v=parseInt(document.getElementById(`mx-ma${i}`)?.value||p.ma.periods[i-1]);
+    return v>0?v:p.ma.periods[i-1];
+  });
+  // BB
+  p.bb.period = parseInt(document.getElementById('mx-bbp').value)||20;
+  p.bb.std    = parseFloat(document.getElementById('mx-bbs').value)||2.0;
+  // SAR
+  p.sar.accInit = parseFloat(document.getElementById('mx-sar-acc').value)||0.02;
+  p.sar.accMax  = parseFloat(document.getElementById('mx-sar-max').value)||0.20;
+  // KDJ
+  p.kdj.rsvPeriod = parseInt(document.getElementById('mx-kdj-r').value)||9;
+  p.kdj.kSmooth   = parseInt(document.getElementById('mx-kdj-k').value)||3;
+  p.kdj.dSmooth   = parseInt(document.getElementById('mx-kdj-d').value)||3;
+  // MACD
+  p.macd.fast   = parseInt(document.getElementById('mx-mf').value)||12;
+  p.macd.slow   = parseInt(document.getElementById('mx-ms').value)||26;
+  p.macd.signal = parseInt(document.getElementById('mx-mg').value)||9;
+  // RSI
+  p.rsi.period = parseInt(document.getElementById('mx-rsi-p').value)||14;
+  p.rsi.ob     = parseInt(document.getElementById('mx-rsi-ob').value)||70;
+  p.rsi.os     = parseInt(document.getElementById('mx-rsi-os').value)||30;
+  // Perf
+  p.perf.rfRate    = parseFloat(document.getElementById('mx-rf').value)||1.75;
+  p.perf.tradeDays = parseInt(document.getElementById('mx-td').value)||252;
+  p.perf.benchmark = document.getElementById('mx-bench').value||'^GSPC';
+  // Yaxis
+  p.yaxis.marginBars = parseInt(document.getElementById('mx-ymarg').value)||2;
+
+  // Sync S (reactive state)
+  S.bb.period=p.bb.period; S.bb.std=p.bb.std;
+  S.kdj.rsvPeriod=p.kdj.rsvPeriod; S.kdj.kSmooth=p.kdj.kSmooth; S.kdj.dSmooth=p.kdj.dSmooth;
+  S.macd.fast=p.macd.fast; S.macd.slow=p.macd.slow; S.macd.signal=p.macd.signal;
+  S.rsi.period=p.rsi.period; S.rsi.ob=p.rsi.ob; S.rsi.os=p.rsi.os;
+
+  // Sync panel sliders
+  document.getElementById('bb-p').value=p.bb.period; document.getElementById('bbp-v').textContent=p.bb.period;
+  document.getElementById('bb-s').value=p.bb.std;    document.getElementById('bbs-v').textContent=p.bb.std.toFixed(1);
+  document.getElementById('kdj-rp').value=p.kdj.rsvPeriod; document.getElementById('kdj-rp-v').textContent=p.kdj.rsvPeriod;
+  document.getElementById('kdj-ks').value=p.kdj.kSmooth;   document.getElementById('kdj-ks-v').textContent=p.kdj.kSmooth;
+  document.getElementById('kdj-ds').value=p.kdj.dSmooth;   document.getElementById('kdj-ds-v').textContent=p.kdj.dSmooth;
+  document.getElementById('macd-f').value=p.macd.fast;
+  document.getElementById('macd-s').value=p.macd.slow;
+  document.getElementById('macd-g').value=p.macd.signal;
+  document.getElementById('rsi-p').value=p.rsi.period; document.getElementById('rsi-p-v').textContent=p.rsi.period;
+  document.getElementById('rsi-ob').value=p.rsi.ob;    document.getElementById('rsi-ob-v').textContent=p.rsi.ob;
+  document.getElementById('rsi-os').value=p.rsi.os;    document.getElementById('rsi-os-v').textContent=p.rsi.os;
+  document.getElementById('rf-rate').value=p.perf.rfRate;
+  document.getElementById('sharpe-n').value=p.perf.tradeDays;
+  document.getElementById('bench-ticker').value=p.perf.benchmark;
+
+  buildMARows();
+  closeMatrix();
+  redraw();
+  recalcPerf();
+}
+
+const DEFAULTS = JSON.parse(JSON.stringify(PARAMS));
+function resetMatrix() {
+  Object.assign(PARAMS, JSON.parse(JSON.stringify(DEFAULTS)));
+  openMatrix(); // re-sync
+}
+
+/* ================================================================
+   M09: EXPORT
+   ================================================================ */
+
+function exportHtml() {
+  const div = document.getElementById('chart');
+  const ticker = S.ticker.replace(/[^a-zA-Z0-9._^]/g,'_');
+  const date = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  Plotly.toImage(div, {format:'svg', width:1600, height:900}).then(()=>{
+    const content = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>VAP-TA3 ${ticker} ${date}</title></head><body style="margin:0;background:#F7F6F3;">${div.innerHTML}</body></html>`;
+    const blob = new Blob([content], {type:'text/html'});
+    const a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+    a.download=`VAP_TA3_${ticker}_${date}.html`; a.click();
+  });
+}
+function exportPng() {
+  const scale = parseInt(document.getElementById('exp-dpi')?.value||3);
+  const ticker = S.ticker.replace(/[^a-zA-Z0-9._^]/g,'_');
+  const date = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  Plotly.downloadImage('chart', { format:'png', filename:`VAP_TA3_${ticker}_${date}`, width:1600, height:900, scale });
+}
+
+/* ================================================================
+   M09: INIT
+   ================================================================ */
+
+function init() {
+  buildMARows();
+  bindPeriodChips();
+  clock(); setInterval(clock,1000);
+
+  // Keyboard shortcuts
+  document.getElementById('ticker-in').addEventListener('keydown', e => {
+    if (e.key==='Enter') loadAndDraw();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key==='Escape') closeMatrix();
+  });
+
+  // Resize observer
+  new ResizeObserver(()=>{ if(S.data) Plotly.relayout('chart',{autosize:true}); })
+    .observe(document.getElementById('cbox'));
+
+  // Click outside modal to close
+  document.getElementById('matrix-modal').addEventListener('click', e=>{
+    if (e.target.id==='matrix-modal') closeMatrix();
+  });
+
+  // Initial load
+  loadAndDraw();
+}
+
+init();
+</script>
+</body>
+</html>

@@ -13,6 +13,16 @@ param(
     [switch]$Force,
     [switch]$VerifyOnly
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -54,10 +64,10 @@ function Get-Python {
 function Find-PatchFile {
     if ($PatchFile -and (Test-Path -LiteralPath $PatchFile)) { return $PatchFile }
     $candidates = @(
-        "$env:USERPROFILE\Downloads\VIA_SSOT_Unified_v22_synonyms_patch.py",
-        "$env:USERPROFILE\OneDrive\Desktop\VIA_SSOT_Unified_v22_synonyms_patch.py",
-        "$env:USERPROFILE\Desktop\VIA_SSOT_Unified_v22_synonyms_patch.py",
-        ".\VIA_SSOT_Unified_v22_synonyms_patch.py"
+        "$env:USERPROFILE\Downloads\SUP_MDL655_SSOTUnifiedV22SynonymsPatch.py",
+        "$env:USERPROFILE\OneDrive\Desktop\SUP_MDL655_SSOTUnifiedV22SynonymsPatch.py",
+        "$env:USERPROFILE\Desktop\SUP_MDL655_SSOTUnifiedV22SynonymsPatch.py",
+        ".\SUP_MDL655_SSOTUnifiedV22SynonymsPatch.py"
     )
     foreach ($p in $candidates) {
         if (Test-Path -LiteralPath $p) { return $p }
@@ -249,3 +259,4 @@ try {
     }
     Write-Host "PowerShell session remains open." -ForegroundColor Yellow
 }
+

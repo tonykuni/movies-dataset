@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/schemas/omniformat-invocation-1.1.json",
+  "title": "Veritas OmniFormat Invocation",
+  "type": "object",
+  "required": ["contract", "inputs", "outputs"],
+  "properties": {
+    "contract": {"enum": ["veritas.omniformat-invocation/1.0", "veritas.omniformat-invocation/1.1"]},
+    "inputs": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "outputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"enum": ["md", "json", "component_json", "docx", "pptx", "xlsx", "csv", "html", "css", "js"]}
+    },
+    "title": {"type": "string"},
+    "target_language": {"enum": ["zh-Hant", "zh-Hans", "en", "auto"]},
+    "profile": {"enum": ["full", "simple-five"]},
+    "role": {"enum": ["ENGINE", "SYSTEM"]},
+    "operations": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"enum": ["text_merge", "code_merge", "restructure", "deduplicate", "optimize"]}
+    },
+    "use_vsis": {"type": "boolean"},
+    "ai_mode": {"const": "OFF"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"profile": {"const": "simple-five"}}, "required": ["profile"]},
+      "then": {
+        "properties": {
+          "inputs": {"maxItems": 5},
+          "outputs": {
+            "const": ["md", "html", "component_json", "docx", "csv"]
+          }
+        },
+        "required": ["role", "operations"]
+      }
+    }
+  ]
+}

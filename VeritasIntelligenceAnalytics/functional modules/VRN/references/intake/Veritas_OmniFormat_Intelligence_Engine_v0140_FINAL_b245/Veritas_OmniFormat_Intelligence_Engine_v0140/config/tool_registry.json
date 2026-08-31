@@ -1,0 +1,39 @@
+{
+  "contract": "veritas.omniformat-tool-registry/1.0",
+  "registry_id": "VOFIE-SSOT-TOOLS-001",
+  "version": "1.4.0",
+  "change_policy": "APPEND_ONLY_DISABLE_INSTEAD_OF_DELETE",
+  "instructions": [
+    "新增副檔名只加入 input_overlays；不得移除內建格式。",
+    "替換工具時保留舊 tool_id，將 enabled 設為 false，再新增新版本。",
+    "ST-FROZEN、Universal Content IR 與 source hash gate 不可被 overlay 覆寫。",
+    "JavaScript 工具只路由到 via-ui；PowerShell 工具只路由到 via-ps；不得污染 base。",
+    "外部工具只偵測；未安裝標記 NOT_INSTALLED，不得在 VOFIE 執行時自動安裝。",
+    "九頭龍高風險一律 HOLD；最多三輪；只可 proposal-first，不得自動改 canonical。"
+  ],
+  "input_overlays": {
+    "text": {"extensions": [".rst"]},
+    "structured": {"extensions": [".ndjson"]}
+  },
+  "code_language_overlays": {
+    ".dart": "dart",
+    ".ex": "elixir"
+  },
+  "tools": [
+    {"tool_id": "TOOL-VOFIE-STDLIB-001", "name": "Python Standard Library", "lane": "core-readers", "enabled": true, "st": "ST-CORE", "note": "文字、HTML、CSV、ZIP/OOXML、XML、JSON。"},
+    {"tool_id": "TOOL-VOFIE-VSIS-001", "name": "VIA Semantic Intelligence Subsystem 1.2", "lane": "nlp-overlay", "enabled": true, "st": "ST-OPTIONAL", "note": "normalize、segment、categorize、semantic_check；缺少時本地降級。"},
+    {"tool_id": "TOOL-VOFIE-DOCX-001", "name": "python-docx", "lane": "word-output", "enabled": true, "st": "ST-ADAPTER", "note": "Word 參考指南；可替換但契約不變。"},
+    {"tool_id": "TOOL-VOFIE-ARTIFACT-001", "name": "@oai/artifact-tool", "lane": "pptx-xlsx-output", "enabled": true, "st": "ST-ADAPTER", "note": "PowerPoint / Excel 可編輯輸出。"},
+    {"tool_id": "TOOL-VOFIE-PYPDF-001", "name": "pypdf", "lane": "pdf-input", "enabled": true, "st": "ST-OPTIONAL", "note": "PDF 文字抽取；未安裝時明確 HOLD。"},
+    {"tool_id": "TOOL-VOFIE-AI-001", "name": "AI Equivalent Rewrite Adapter", "lane": "candidate-rewrite", "enabled": false, "st": "ST-GATE", "note": "預設關閉；只能產生候選，需等價測試後另存。"},
+    {"tool_id": "TOOL-VOFIE-TK-001", "name": "Python Tkinter", "lane": "window-io", "enabled": true, "st": "ST-ADAPTER", "note": "Windows-friendly 選檔視窗；只透過主引擎呼叫。"},
+    {"tool_id": "TOOL-VOFIE-DND-001", "name": "tkinterdnd2", "lane": "window-drag-drop", "enabled": true, "st": "ST-OPTIONAL", "note": "拖放 Adapter；缺少時自動降級為原生多檔選取。"},
+    {"tool_id": "TOOL-VOFIE-RECOVERY-001", "name": "Failure Recovery Handler Registry", "lane": "resilience", "enabled": true, "st": "ST-GATE", "note": "八環節各 Top 20 failure，共用多個安全復原處理器。"},
+    {"tool_id": "TOOL-VOFIE-SIMPLE5-001", "name": "Five Primary Output Profile", "lane": "user-output", "enabled": true, "st": "ST-CORE", "note": "MD、單檔 HTML、Component Specs JSON、Word、CSV。"},
+    {"tool_id": "TOOL-VOFIE-POLYGLOT-CATALOG-001", "name": "JavaScript and PowerShell Top-20 Catalog", "lane": "polyglot-governance", "enabled": true, "st": "ST-GATE", "note": "各 20 個免費 CPU 工具、30 列能力矩陣、偵測與降級 SSOT。"},
+    {"tool_id": "TOOL-VOFIE-JS-BRIDGE-001", "name": "VOFIE JavaScript CPU Tool Bridge", "lane": "via-ui", "enabled": true, "st": "ST-ADAPTER", "note": "Node stdlib 唯讀偵測、結構與 syntax smoke；外部工具需明確 opt-in。"},
+    {"tool_id": "TOOL-VOFIE-PS-BRIDGE-001", "name": "VOFIE PowerShell CPU Tool Bridge", "lane": "via-ps", "enabled": true, "st": "ST-ADAPTER", "note": "PS7 AST、模組 inventory、Pester bridge；無 pwsh 時使用 Python 結構降級。"},
+    {"tool_id": "TOOL-VOFIE-HYDRA-GATE-001", "name": "VOFIE NoHydra Top-20 Risk Gate", "lane": "hydra-governance", "enabled": true, "st": "ST-HYDRA", "note": "三輪上限、parallel-safe/sequential-only 分流、breaker、rollback、post-scan 與 Activation HOLD。"},
+    {"tool_id": "TOOL-VOFIE-RUNTIME-COPY-001", "name": "VOFIE Versioned Runtime Copy and Hash State Machine", "lane": "runtime-sandbox", "enabled": true, "st": "ST-HYDRA", "note": "核准 token、四態冪等、atomic copy、manifest seal、rollback dry-run；不提供 canonical promotion。"}
+  ]
+}

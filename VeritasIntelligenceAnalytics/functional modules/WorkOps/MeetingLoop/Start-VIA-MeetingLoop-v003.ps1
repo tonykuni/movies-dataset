@@ -1,4 +1,4 @@
-﻿#requires -Version 7.0
+#requires -Version 7.0
 param(
     [ValidateSet("Doctor","SelfTest","Process","OpenLatest","ImportReview","Consolidate")]
     [string]$Mode = "Doctor",
@@ -8,6 +8,16 @@ param(
     [string]$MeetingId = "MTG-BUX-20260801-001",
     [switch]$OpenWorkbench
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -17,7 +27,7 @@ $ErrorActionPreference = "Stop"
 # =============================================================================
 
 $BaseDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$Engine = Join-Path $BaseDir "via_meetingloop_engine.py"
+$Engine = Join-Path $BaseDir "VIA_ENG019_MeetingloopEngine.py"
 $RunsDir = Join-Path $BaseDir "runs"
 $PythonCandidates = @(
     "C:\Python313\python.exe",
@@ -131,3 +141,4 @@ catch {
     Write-Host "def PowerShell remains open. No canonical source was modified." -ForegroundColor Yellow
     exit 1
 }
+

@@ -1,0 +1,322 @@
+{
+  "schema": "VIA_CONTRACT_ENVELOPE/1.0",
+  "authority": "VIA Central Government",
+  "registry_id": "PENDING_CENTRAL_REGISTRY_ASSIGNMENT",
+  "module_key": "VCG_ADAPTIVE_DOWNSTREAM",
+  "source_asset_id": "VCG-ASSET-13AF909E60",
+  "source_relative_path": "VIA_SSOT_Unified.py",
+  "source_contract_hash": "06521a13bdc3ee62213e0e22cc3055c0091cc33908d081d300f887861112d144",
+  "import_mode": "REGISTER_ONLY_NO_IMPORT",
+  "activation": "PROHIBITED_AUTOMATICALLY",
+  "canonical_mutation": false,
+  "contract": {
+    "asset_id": "VCG-ASSET-13AF909E60",
+    "relative_path": "VIA_SSOT_Unified.py",
+    "language": "PYTHON",
+    "subsystem": "VCG",
+    "module_name": "VIA_SSOT_Unified",
+    "version": "",
+    "owner": "",
+    "entrypoints": [],
+    "exports": [
+      {
+        "kind": "class",
+        "name": "SSOT",
+        "methods": [
+          "normalize",
+          "normalize_batch",
+          "canonical",
+          "all_canonicals",
+          "match",
+          "extract",
+          "extract_all",
+          "test_regex",
+          "regex_rule",
+          "regex_names",
+          "contains",
+          "items",
+          "list_rule",
+          "list_names",
+          "filter_noise",
+          "is_risk_command",
+          "is_valid_tw_ticker",
+          "is_veritas_file",
+          "detect_cloudflare",
+          "detect_anti_bot",
+          "scan_ll_violations",
+          "scan_is_violations",
+          "extract_anchors",
+          "extract_asset_ids",
+          "strip_html",
+          "find_slots",
+          "info"
+        ],
+        "line": 2135
+      },
+      {
+        "kind": "function",
+        "name": "get_ssot",
+        "async": false,
+        "positional": [],
+        "keyword_only": [],
+        "vararg": "",
+        "kwarg": "",
+        "required_count": 0,
+        "returns": "SSOT",
+        "line": 2299
+      },
+      {
+        "kind": "function",
+        "name": "normalize",
+        "async": false,
+        "positional": [
+          "raw"
+        ],
+        "keyword_only": [],
+        "vararg": "",
+        "kwarg": "",
+        "required_count": 1,
+        "returns": "str",
+        "line": 2307
+      },
+      {
+        "kind": "function",
+        "name": "extract",
+        "async": false,
+        "positional": [
+          "rule",
+          "text"
+        ],
+        "keyword_only": [],
+        "vararg": "",
+        "kwarg": "",
+        "required_count": 2,
+        "returns": "str | None",
+        "line": 2310
+      },
+      {
+        "kind": "function",
+        "name": "extract_all",
+        "async": false,
+        "positional": [
+          "rule",
+          "text"
+        ],
+        "keyword_only": [],
+        "vararg": "",
+        "kwarg": "",
+        "required_count": 2,
+        "returns": "list[str]",
+        "line": 2313
+      },
+      {
+        "kind": "function",
+        "name": "contains",
+        "async": false,
+        "positional": [
+          "lst",
+          "val"
+        ],
+        "keyword_only": [],
+        "vararg": "",
+        "kwarg": "",
+        "required_count": 2,
+        "returns": "bool",
+        "line": 2316
+      },
+      {
+        "kind": "function",
+        "name": "filter_noise",
+        "async": false,
+        "positional": [
+          "rows",
+          "list_name"
+        ],
+        "keyword_only": [],
+        "vararg": "",
+        "kwarg": "",
+        "required_count": 1,
+        "returns": "list[str]",
+        "line": 2319
+      },
+      {
+        "kind": "function",
+        "name": "asset_dump",
+        "async": false,
+        "positional": [
+          "source",
+          "asset_id",
+          "slot_name",
+          "lang",
+          "version",
+          "status",
+          "anchor",
+          "purpose",
+          "depends",
+          "frozen"
+        ],
+        "keyword_only": [],
+        "vararg": "",
+        "kwarg": "",
+        "required_count": 3,
+        "returns": "str",
+        "line": 2346
+      },
+      {
+        "kind": "function",
+        "name": "asset_load",
+        "async": false,
+        "positional": [
+          "json_str"
+        ],
+        "keyword_only": [],
+        "vararg": "",
+        "kwarg": "",
+        "required_count": 1,
+        "returns": "str",
+        "line": 2399
+      },
+      {
+        "kind": "function",
+        "name": "asset_patch",
+        "async": false,
+        "positional": [
+          "target_code",
+          "json_str",
+          "slot_name",
+          "indent"
+        ],
+        "keyword_only": [],
+        "vararg": "",
+        "kwarg": "",
+        "required_count": 2,
+        "returns": "str",
+        "line": 2429
+      },
+      {
+        "kind": "function",
+        "name": "asset_verify",
+        "async": false,
+        "positional": [
+          "target_code",
+          "json_str"
+        ],
+        "keyword_only": [],
+        "vararg": "",
+        "kwarg": "",
+        "required_count": 2,
+        "returns": "bool",
+        "line": 2529
+      },
+      {
+        "kind": "function",
+        "name": "self_test",
+        "async": false,
+        "positional": [
+          "verbose"
+        ],
+        "keyword_only": [],
+        "vararg": "",
+        "kwarg": "",
+        "required_count": 0,
+        "returns": "bool",
+        "line": 2556
+      }
+    ],
+    "dependencies": [
+      "VIA_SSOT_Unified",
+      "VeritasAegisNexus",
+      "VeritasCeleritas",
+      "__future__",
+      "base64",
+      "hashlib",
+      "json",
+      "logging",
+      "os",
+      "pandas",
+      "pathlib",
+      "polars",
+      "re",
+      "sys",
+      "textwrap",
+      "threading",
+      "typing"
+    ],
+    "inputs": [
+      "anchor",
+      "asset_id",
+      "depends",
+      "frozen",
+      "indent",
+      "json_str",
+      "lang",
+      "list_name",
+      "lst",
+      "purpose",
+      "raw",
+      "rows",
+      "rule",
+      "slot_name",
+      "source",
+      "status",
+      "target_code",
+      "text",
+      "val",
+      "verbose",
+      "version"
+    ],
+    "outputs": [
+      "SSOT",
+      "bool",
+      "list[str]",
+      "str",
+      "str | None"
+    ],
+    "side_effects": [],
+    "supports_setup_execute_teardown": false,
+    "contract_hash": "06521a13bdc3ee62213e0e22cc3055c0091cc33908d081d300f887861112d144",
+    "source": "STATIC_INFERENCE"
+  },
+  "universal_interface_envelope": {
+    "accepted_input_forms": [
+      "POSITIONAL",
+      "KEYWORD",
+      "DICT_PAYLOAD",
+      "JSON_SERIALIZABLE_CONTEXT"
+    ],
+    "output_forms": [
+      "DICT",
+      "LIST",
+      "SCALAR",
+      "JSON_SERIALIZABLE_RESULT"
+    ],
+    "context_fields": [
+      "ssot",
+      "registry",
+      "env_manager",
+      "aegis",
+      "celeritas",
+      "state",
+      "errors"
+    ],
+    "unknown_field_policy": "PRESERVE_IN_EXTENSIONS",
+    "missing_optional_policy": "DEFAULT_OR_DEGRADED",
+    "missing_required_policy": "FAIL_CLOSED",
+    "schema_evolution": "BACKWARD_COMPATIBLE_ADAPTER_REQUIRED"
+  },
+  "governance": {
+    "highest_severity": "HIGH",
+    "issue_ids": [
+      "DEPENDENCY_CYCLE",
+      "DOWNSTREAM_INHERITED_HOLD",
+      "PY_BROAD_EXCEPT_PASS",
+      "PY_IMPORT_TIME_SIDE_EFFECT",
+      "PY_SELF_IMPORT",
+      "SSOT_REGEX_FAIL_EXAMPLE_MATCHED",
+      "SSOT_REGEX_PASS_EXAMPLE_MISSED"
+    ],
+    "hydra_risk": true,
+    "manual_activation_gate": "REQUIRED",
+    "test_gate": "STATIC_AND_SANDBOX_REQUIRED"
+  }
+}

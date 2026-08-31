@@ -1,0 +1,554 @@
+{
+ "schema": "VIA_TOOL_ESCALATION_LADDER_V1",
+ "version": "v0100",
+ "append_only": true,
+ "batch": 181,
+ "policy": "操作員令:工具不衝突、只增不減;各工序輕型優先——輕階能解決就不動重型武器;升階必附輕階實敗證據(escalation evidence 留痕);每工序單一正主鏈(衝突防制);重件僅經 via-install 同意閘備裝不預載。網路工序=凍結現制(SUP_MDL740 統包唯一,不入本冊階梯)。所有引擎掛加速器(批181 全覆蓋 100%)。",
+ "ladders": {
+  "OCR_PDF_TEXT": {
+   "zh": "PDF 文字擷取(有文字層先直取)",
+   "rungs": [
+    {
+     "lv": 1,
+     "tool": "pypdf/pdfplumber 文字層直取",
+     "probe": "pdfplumber",
+     "weight": "輕"
+    },
+    {
+     "lv": 2,
+     "tool": "markitdown 結構化轉換",
+     "probe": "markitdown",
+     "weight": "輕中"
+    },
+    {
+     "lv": 3,
+     "tool": "tesseract OCR(掃描件)",
+     "probe": "pytesseract",
+     "weight": "中重"
+    },
+    {
+     "lv": 4,
+     "tool": "paddleocr(重型;僅低品質掃描殘件)",
+     "probe": "paddleocr",
+     "weight": "重"
+    }
+   ]
+  },
+  "OCR_PDF_TABLE": {
+   "zh": "PDF 表格擷取",
+   "rungs": [
+    {
+     "lv": 1,
+     "tool": "pdfplumber tables",
+     "probe": "pdfplumber",
+     "weight": "輕"
+    },
+    {
+     "lv": 2,
+     "tool": "camelot(格線表)",
+     "probe": "camelot",
+     "weight": "中"
+    },
+    {
+     "lv": 3,
+     "tool": "img2table(影像表)",
+     "probe": "img2table",
+     "weight": "中重"
+    },
+    {
+     "lv": 4,
+     "tool": "tabula(JVM;末位)",
+     "probe": "tabula",
+     "weight": "重"
+    }
+   ]
+  },
+  "DOC_TEXT": {
+   "zh": "Word/文字件擷取",
+   "rungs": [
+    {
+     "lv": 1,
+     "tool": "直讀 txt/md",
+     "probe": null,
+     "weight": "輕"
+    },
+    {
+     "lv": 2,
+     "tool": "python-docx",
+     "probe": "docx",
+     "weight": "輕"
+    },
+    {
+     "lv": 3,
+     "tool": "docx2python(深層)",
+     "probe": "docx2python",
+     "weight": "中"
+    }
+   ]
+  },
+  "ZH_SEGMENT": {
+   "zh": "中文分詞",
+   "rungs": [
+    {
+     "lv": 1,
+     "tool": "jieba",
+     "probe": "jieba",
+     "weight": "輕"
+    },
+    {
+     "lv": 2,
+     "tool": "spacy zh_core_web_sm(實體需求時)",
+     "probe": "spacy",
+     "weight": "中"
+    },
+    {
+     "lv": 3,
+     "tool": "pkuseg(缺=誠實;C 輪無 wheel)",
+     "probe": "pkuseg",
+     "weight": "重"
+    }
+   ]
+  },
+  "SUMMARIZE": {
+   "zh": "摘要",
+   "rungs": [
+    {
+     "lv": 1,
+     "tool": "ENG062 extractive(錨定選句)",
+     "probe": null,
+     "weight": "輕"
+    },
+    {
+     "lv": 2,
+     "tool": "sumy/yake 輔助關鍵詞",
+     "probe": "sumy",
+     "weight": "中"
+    },
+    {
+     "lv": 3,
+     "tool": "LLM 摘要(候;經誠實閘 verify_summary)",
+     "probe": null,
+     "weight": "重"
+    }
+   ]
+  },
+  "DATAFRAME": {
+   "zh": "資料表運算",
+   "rungs": [
+    {
+     "lv": 1,
+     "tool": "DuckDB SQL(庫內原地)",
+     "probe": "duckdb",
+     "weight": "輕快"
+    },
+    {
+     "lv": 2,
+     "tool": "pandas",
+     "probe": "pandas",
+     "weight": "中"
+    },
+    {
+     "lv": 3,
+     "tool": "polars(大件候裝)",
+     "probe": "polars",
+     "weight": "中(高效)"
+    }
+   ]
+  },
+  "TA_INDICATOR": {
+   "zh": "技術指標",
+   "rungs": [
+    {
+     "lv": 1,
+     "tool": "VAP_ENG004 TAFactory 自建 11 指標",
+     "probe": null,
+     "weight": "輕"
+    },
+    {
+     "lv": 2,
+     "tool": "talib C 庫(候裝;via-install 閘)",
+     "probe": "talib",
+     "weight": "重"
+    }
+   ]
+  },
+  "PLOT": {
+   "zh": "繪圖",
+   "rungs": [
+    {
+     "lv": 1,
+     "tool": "內建 SVG(零依賴;儀表板車道)",
+     "probe": null,
+     "weight": "輕"
+    },
+    {
+     "lv": 2,
+     "tool": "matplotlib/seaborn",
+     "probe": "matplotlib",
+     "weight": "中"
+    },
+    {
+     "lv": 3,
+     "tool": "plotly(互動;bundled 零 CDN)",
+     "probe": "plotly",
+     "weight": "中重"
+    }
+   ]
+  },
+  "NETWORK": {
+   "zh": "網路擷取(凍結:不入階梯)",
+   "frozen": true,
+   "rungs": [
+    {
+     "lv": 1,
+     "tool": "SUP_MDL740 統包唯一正主(curl+雙同意閘)+SUP_MDL741 韌性層",
+     "probe": null,
+     "weight": "唯一"
+    }
+   ],
+   "consumers": [
+    "VDF_ENG063_MonthlyRevenue(批195 登錄)",
+    "VRN_ENG070_YahooConsensus(批195 登錄)"
+   ]
+  }
+ },
+ "escalation_rule": "升階條件=下階實敗證據(exception/空產出/品質檢敗)留痕於 escalation_log;跳階=違規(哨兵可稽)。",
+ "escalation_log": [
+  {
+   "ts": "2026-08-26 18:56:33",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-26 18:56:47",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-26 19:07:16",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-26 19:29:58",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-26 19:58:48",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-26 21:37:38",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-26 22:03:33",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-26 22:14:35",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-27 00:08:13",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-27 00:57:27",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-27 01:12:33",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-27 01:47:46",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-27 02:03:47",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-27 02:16:42",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-27 02:40:24",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-27 03:06:53",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-27 03:08:46",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-27 03:14:57",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-27 09:10:54",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-27 10:50:14",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-27 11:10:23",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-27 11:30:51",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-27 16:33:58",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-27 16:45:58",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-27 16:59:31",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-27 17:20:39",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-27 18:12:14",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-27 18:27:26",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-27 18:53:48",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-27 19:07:36",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-28 00:20:58",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-28 00:46:09",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-28 01:05:50",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-28 13:00:06",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-28 14:34:28",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-28 16:16:47",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-28 16:56:37",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-28 17:18:52",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": null,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-30 17:59:55",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": 1,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-30 18:45:45",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": 1,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-30 19:05:26",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": 1,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-30 19:18:46",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": 1,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-30 21:04:52",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": 1,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-30 21:15:36",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": 1,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-30 22:07:24",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": 1,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-30 22:19:37",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": 1,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-31 08:54:28",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": 1,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  },
+  {
+   "ts": "2026-08-31 10:10:07",
+   "kind": "OCR_PDF_TEXT",
+   "from_lv": 1,
+   "to_lv": 3,
+   "evidence": "selftest 演練證據:L1 pdfplumber 對掃描件回空文字(無文字層)"
+  }
+ ]
+}

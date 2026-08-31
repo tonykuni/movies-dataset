@@ -9,6 +9,16 @@ param(
     [switch]$NoSchedule,
     [switch]$SkipSelftest
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Continue"
 try { [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12 } catch { }
 $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -131,7 +141,7 @@ if ($Pwsh) {
 # ---- [6/8] graphviz 可攜版(dotsetup 引擎;sha256 驗證)-----------------
 $ok6 = $false
 if ($Py) {
-    & $Py (Join-Path $Engines "workops_graphviz_setup.py") install
+    & $Py (Join-Path $Engines "VIA_ENG070_WorkopsGraphvizSetup.py") install
     $ok6 = ($LASTEXITCODE -eq 0)
 }
 Step "6/8 graphviz 可攜版" $ok6 "dotsetup(免 winget/管理員)"
@@ -161,7 +171,7 @@ if ($NoSchedule) {
 if ($SkipSelftest) {
     Step "8/8 全鏈自測" $true "略過(-SkipSelftest)"
 } elseif ($Py) {
-    & $Py (Join-Path $Engines "workops_selftest.py")
+    & $Py (Join-Path $Engines "VIA_ENG081_WorkopsSelftest.py")
     Step "8/8 全鏈自測" ($LASTEXITCODE -eq 0) "FinalGate(詳 out\selftest_report.json)"
 } else {
     Step "8/8 全鏈自測" $false "無 Python 可執行(承上段)"
@@ -179,3 +189,4 @@ Write-Host "-------------------------------------------------------------"
 Write-Host ("[總結] 部署 FinalGate = {0}({1}/{2} 步過)→ out\bootstrap_report.json" -f $final, ($Report.Count - $nF), $Report.Count) -ForegroundColor $(if ($nF -eq 0) { "Green" } else { "Red" })
 Write-Host "下一步:重開一個新視窗(讓 PATH 生效)→ via-workops all"
 if ($final -eq "PASS") { exit 0 } else { exit 1 }
+

@@ -7,6 +7,16 @@ param(
     [switch]$Frozen,                      # 凍結:只用已落地的 Parquet,不對外抓
     [switch]$WhatIfOnly                   # 只印路由計畫,不抓
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 
 # ============================================================================
 #  VDF Bridge · request.json  →  (engine routing)  →  etf_matrix.json
@@ -146,3 +156,4 @@ $payload | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $outFile -Encoding
 Write-Progress -Id 1 -Activity 'VDF 擷取' -Completed
 Write-Host ("[VDF] 完成 → {0}（{1} 檔）" -f $outFile, $rows.Count) -ForegroundColor Green
 Write-Host "      將此檔放到 DC 同目錄,改 DC 由 fetch('etf_matrix.json') 載入即可。" -ForegroundColor DarkGray
+

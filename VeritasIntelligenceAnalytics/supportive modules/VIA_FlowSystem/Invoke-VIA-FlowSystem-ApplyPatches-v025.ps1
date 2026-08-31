@@ -9,14 +9,24 @@ param(
     [string]$HelperName = "_sandbox_tmp",
     [switch]$Apply
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 
 $ErrorActionPreference = "Stop"
 
 # Reviewed, approved edits (exact substring before -> after). Nothing else is touched.
 $script:Patches = @(
-    @{ File = "engines\flow_autotest.py"; Before = 'ROOT / "_test_sim.html"'; After = '_sandbox_tmp("_test_sim.html")' },
-    @{ File = "engines\flow_autotest.py"; Before = 'ROOT / "_test_perf.html"'; After = '_sandbox_tmp("_test_perf.html")' },
-    @{ File = "engines\flow_autotest.py"; Before = 'ROOT / "_test_mon.html"'; After = '_sandbox_tmp("_test_mon.html")' },
+    @{ File = "engines\FLOW_ENG001_FlowAutotest.py"; Before = 'ROOT / "_test_sim.html"'; After = '_sandbox_tmp("_test_sim.html")' },
+    @{ File = "engines\FLOW_ENG001_FlowAutotest.py"; Before = 'ROOT / "_test_perf.html"'; After = '_sandbox_tmp("_test_perf.html")' },
+    @{ File = "engines\FLOW_ENG001_FlowAutotest.py"; Before = 'ROOT / "_test_mon.html"'; After = '_sandbox_tmp("_test_mon.html")' },
     @{ File = "engines\flow_bridge.py"; Before = 'Path("_v4_sample.csv")'; After = '_sandbox_tmp("_v4_sample.csv")' },
     @{ File = "engines\flow_perf.py"; Before = 'Path(out_path).with_suffix(".tmp.html")'; After = '_sandbox_tmp(Path(out_path).stem + ".tmp.html")' }
 )
@@ -197,3 +207,4 @@ catch {
     Write-Host ""
     Write-Host "def PowerShell remains open. No activation." -ForegroundColor Yellow
 }
+

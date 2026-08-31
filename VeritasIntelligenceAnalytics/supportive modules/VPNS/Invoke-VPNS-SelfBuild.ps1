@@ -26,6 +26,16 @@ param(
   [switch]$OpenReport,
   [switch]$ScanAllProjects           # 掃整個 functional modules(VAP/VRN/VDF/VPNS 四專案),預設僅 VPNS
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 
 Set-StrictMode -Version 3.0
 $ErrorActionPreference = 'Stop'
@@ -467,3 +477,4 @@ Write-Host ("missing   : {0}" -f ((@($missing) | Select-Object -First 40) -join 
 $rl = @($roundLog | ForEach-Object { "r{0}:{1}" -f $_.round, $_.total }) -join ' '
 Write-Host ("rounds    : {0}" -f $rl)
 Write-Host "===== S0 SUMMARY END ====="
+

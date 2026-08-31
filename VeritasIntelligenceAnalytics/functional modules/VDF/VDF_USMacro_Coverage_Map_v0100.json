@@ -1,0 +1,281 @@
+{
+ "schema": "vdf-usmacro-coverage-map-v1",
+ "ts": "2026-08-24",
+ "source": "批108 操作員令:之前上傳的美國經濟數據(就業/通膨/民間官方/聯準會/主權/各期利率/政府收支)對讀 VDF-390",
+ "policy": "五態:COVERED_DATA=母樹有實資料|PARTIAL=部分實資料|ENGINE_ONLY=引擎序列已定義候實抓|DECLARED=矩陣宣告候實連驗證|GAP=無資料無引擎;宣告不冒充實資料",
+ "assets_measured": {
+  "A1_RawWide": {
+   "file": "functional modules/VAP/VDF_MacroRawWide.json",
+   "kind": "實資料(日頻寬表)",
+   "columns": 53,
+   "rows": 7064,
+   "span": "2004-01-01→2026-06-16",
+   "column_list": [
+    "GSPC",
+    "TWII",
+    "KOSPI",
+    "DJI",
+    "IXIC",
+    "SOX",
+    "N225",
+    "SSEC",
+    "HSI",
+    "STOXX",
+    "XLK",
+    "XLF",
+    "XLV",
+    "XLY",
+    "XLP",
+    "XLE",
+    "XLI",
+    "XLB",
+    "XLU",
+    "XLRE",
+    "XLC",
+    "BRENT",
+    "WTI",
+    "GOLD",
+    "DXY",
+    "VIX",
+    "TNX",
+    "SHY",
+    "IEI",
+    "IEF",
+    "TLT",
+    "T10Y2Y",
+    "T10Y3M",
+    "DGS10",
+    "DGS2",
+    "DGS3MO",
+    "CPI",
+    "PPI",
+    "RETAIL",
+    "NFP",
+    "UNRATE",
+    "ICSA",
+    "U_LT5",
+    "U_5_14",
+    "U_15_26",
+    "U_27",
+    "UMCSENT",
+    "OECDCC",
+    "yield_curve_10y3m",
+    "hy_oas",
+    "sahm",
+    "leverage_margin",
+    "sovereign_debt"
+   ]
+  },
+  "A2_GlobalMacro": {
+   "file": "functional modules/VAP/VDF_Global_Macro.json",
+   "kind": "實資料(FRED 序列)",
+   "series": [
+    "CPIAUCSL",
+    "DGS10",
+    "FEDFUNDS",
+    "GDP",
+    "UNRATE",
+    "^TNX"
+   ],
+   "records": 1453
+  },
+  "A3_TransformedLong": {
+   "file": "functional modules/VAP/VDF_MacroTransformedLong.json",
+   "kind": "實資料(轉換長表)",
+   "rows": 348997
+  },
+  "A4_MDL003": {
+   "file": "functional modules/VDF/engine/VDF_MDL003_SentimentMacroEngine.py",
+   "kind": "引擎(FRED 47 序列九主題+AAII+CNN F&G+AKShare 13 碼)"
+  },
+  "A5_Legacy": {
+   "file": "MDL103 MasterRegistry 登錄(VDF_E4_MacroFetcher/VDF_D2 FRED 300+ 冊)",
+   "kind": "舊代宣告(實體檔不在母樹=誠實 DECLARED,候工作站舊樹確認)"
+  },
+  "A6_FlowMacro": {
+   "file": "supportive modules/VIA_FlowSystem/FlowSystem_v2/config/macro.json",
+   "kind": "配置(區域政策利率快照+宏觀對照層)"
+  }
+ },
+ "coverage": {
+  "就業(民間+官方)": {
+   "US-C03 非農就業": {
+    "state": "COVERED_DATA",
+    "assets": [
+     "A1_RawWide"
+    ],
+    "note": "NFP 欄實資料;修正值候引擎"
+   },
+   "US-C04 失業率/勞參": {
+    "state": "COVERED_DATA",
+    "assets": [
+     "A1_RawWide",
+     "A2_GlobalMacro"
+    ],
+    "note": "UNRATE 雙源實資料(A1 欄+A2 FRED 59 筆)"
+   },
+   "US-C05 失業持續期分布": {
+    "state": "COVERED_DATA",
+    "assets": [
+     "A1_RawWide"
+    ],
+    "note": "U_LT5/U_5_14/U_15_26/U_27 四桶全在+sahm 規則欄"
+   },
+   "US-L05 初領/續領失業金": {
+    "state": "COVERED_DATA",
+    "assets": [
+     "A1_RawWide"
+    ],
+    "note": "ICSA 欄實資料;續領候引擎"
+   },
+   "US-C06 ADP 民間就業": {
+    "state": "ENGINE_ONLY",
+    "assets": [
+     "A4_MDL003"
+    ],
+    "note": "民間源 PROXY;資料檔無 ADP 欄=對照缺一半"
+   },
+   "US-C20 民間vs官方對照": {
+    "state": "PARTIAL",
+    "assets": [
+     "A1_RawWide",
+     "A4_MDL003"
+    ],
+    "note": "官方側資料在;ADP/家戶側候接=對照表候補"
+   },
+   "US-C07/C08/C19 JOLTS/時薪/12產業": {
+    "state": "ENGINE_ONLY",
+    "assets": [
+     "A4_MDL003"
+    ],
+    "note": "FRED 序列已定義(PAYEMS/JTSJOL/CES...);候 FRED key 實抓"
+   }
+  },
+  "通膨": {
+   "US-G01 CPI+核心": {
+    "state": "COVERED_DATA",
+    "assets": [
+     "A1_RawWide",
+     "A2_GlobalMacro"
+    ],
+    "note": "CPI 欄+CPIAUCSL 58 筆實資料;八大類分項=引擎序列已定義"
+   },
+   "US-G02 PPI": {
+    "state": "COVERED_DATA",
+    "assets": [
+     "A1_RawWide",
+     "A4_MDL003"
+    ],
+    "note": "PPI 欄實資料;三階分項候引擎"
+   },
+   "US-G03 PCE/核心 PCE": {
+    "state": "ENGINE_ONLY",
+    "assets": [
+     "A4_MDL003"
+    ],
+    "note": "PCEPI/PCEPILFE 已定義;資料檔無 PCE 欄"
+   },
+   "US-G07~G15 分項細項": {
+    "state": "ENGINE_ONLY",
+    "assets": [
+     "A4_MDL003"
+    ],
+    "note": "黏性/彈性、Trimmed Mean、進出口物價等序列冊在;候 FRED key"
+   },
+   "US-G18 通膨預期": {
+    "state": "PARTIAL",
+    "assets": [
+     "A1_RawWide",
+     "A4_MDL003"
+    ],
+    "note": "UMCSENT 在;T10YIE/5y5y/MICH 引擎已定義"
+   }
+  },
+  "聯準會政策": {
+   "FD-06 資產負債表/準備金": {
+    "state": "ENGINE_ONLY",
+    "assets": [
+     "A4_MDL003"
+    ],
+    "note": "WALCL/WRESBAL 序列已定義"
+   },
+   "FED 利率實據": {
+    "state": "COVERED_DATA",
+    "assets": [
+     "A2_GlobalMacro",
+     "A6_FlowMacro"
+    ],
+    "note": "FEDFUNDS 60 筆實資料+FlowSystem 政策利率快照 4.25"
+   },
+   "FD-01~05 FOMC/SEP/語調/點陣": {
+    "state": "DECLARED",
+    "assets": [],
+    "note": "矩陣宣告 DONE(vdf_fetchers_fed);母樹無實資料檔=候實連波"
+   }
+  },
+  "美國主權+各期利率": {
+   "FX-03 殖利率曲線": {
+    "state": "PARTIAL",
+    "assets": [
+     "A1_RawWide"
+    ],
+    "note": "實資料 DGS10/DGS2/DGS3MO/TNX+債 ETF 四期(SHY/IEI/IEF/TLT);1M-30Y 全期=引擎已定義候實抓"
+   },
+   "FX-04 利差": {
+    "state": "COVERED_DATA",
+    "assets": [
+     "A1_RawWide"
+    ],
+    "note": "T10Y2Y/T10Y3M/yield_curve_10y3m 三欄實資料"
+   },
+   "FX-06 信用利差": {
+    "state": "COVERED_DATA",
+    "assets": [
+     "A1_RawWide"
+    ],
+    "note": "hy_oas 欄實資料"
+   },
+   "FI-04 聯邦債務": {
+    "state": "PARTIAL",
+    "assets": [
+     "A1_RawWide"
+    ],
+    "note": "sovereign_debt 欄實資料;債限/持有結構候 Treasury 實連"
+   },
+   "FI-06 主權評等": {
+    "state": "GAP",
+    "assets": [],
+    "note": "矩陣即標 TODO;無資料無引擎(誠實)"
+   }
+  },
+  "美國政府收支": {
+   "FI-01 DTS 日收支": {
+    "state": "DECLARED",
+    "assets": [],
+    "note": "矩陣宣告 DONE(vdf_fetchers_fiscal);母樹無 DTS 實資料檔=候實連波"
+   },
+   "FI-02 MTS 月收支": {
+    "state": "DECLARED",
+    "assets": [],
+    "note": "同上"
+   },
+   "FI-03 盈餘/赤字推導": {
+    "state": "DECLARED",
+    "assets": [],
+    "note": "推導式在冊;上游 MTS 資料候實連"
+   },
+   "FI-05 標售/持有人": {
+    "state": "DECLARED",
+    "assets": [],
+    "note": "同上"
+   }
+  }
+ },
+ "counts": {
+  "COVERED_DATA": 9,
+  "ENGINE_ONLY": 5,
+  "PARTIAL": 4,
+  "DECLARED": 5,
+  "GAP": 1
+ }
+}

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>VDF Statistics Engine Import</title>
+<style>
+:root{ --blue:#4c78a8; --grey:#9c9890; --teal:#439a9a; --up:#c96b5a; --down:#5a9e6f; }
+body{ margin:32px; background:#fbfcfd; color:#1f2a30;
+  font-family:"DM Sans","Noto Sans TC",Arial,sans-serif; }
+h1{ font-family:"Syne","DM Sans",sans-serif; color:var(--blue); font-weight:700; }
+h2{ font-family:"Syne","DM Sans",sans-serif; color:var(--teal); font-weight:600; }
+.card{ background:#fff; border:1px solid #e3e8ec; border-radius:16px;
+  padding:18px 22px; margin:18px 0; box-shadow:0 10px 26px rgba(31,42,48,.05); }
+.kpi{ display:grid; grid-template-columns:repeat(4,minmax(170px,1fr)); gap:14px; }
+.kpi div{ background:#fff; border-top:4px solid var(--blue); border-radius:14px; padding:16px; }
+.kpi.teal div{ border-top-color:var(--teal); }
+.big{ font-size:26px; color:var(--grey); font-family:"DM Mono",monospace; }
+.mono{ font-family:"DM Mono",monospace; }
+table{ width:100%; border-collapse:collapse; background:#fff; }
+th,td{ border-bottom:1px solid #eef2f4; padding:9px 10px; text-align:left;
+  vertical-align:top; font-size:13px; }
+th{ color:var(--blue); background:#f4f7f9; font-family:"DM Mono",monospace; }
+td{ font-family:"DM Mono",monospace; }
+pre{ white-space:pre-wrap; background:#f5f8f9; padding:14px; border-radius:12px;
+  font-family:"DM Mono",monospace; font-size:12px; }
+.tag{ display:inline-block; padding:2px 10px; border-radius:999px; font-size:12px;
+  background:#eef4f3; color:var(--teal); margin-right:6px; }
+</style>
+</head>
+<body>
+<h1>VDF · Statistics Engine Import</h1>
+<div class="kpi">
+<div><b>Status</b><br><span class="big">READY</span></div>
+<div><b>Run ID</b><br><span class="mono">RUN_20260619_141318_VDF_ENGINE_IMPORT_v0100</span></div>
+<div><b>Components</b><br><span class="big">3</span></div>
+<div><b>Policy</b><br><span>Append-only / No-delete</span></div>
+</div>
+
+<div class="card">
+<h2>Engine Configuration</h2>
+<p><span class="tag">Price</span> ADJ_CLOSE → CLOSE</p>
+<p><span class="tag">Statistics</span> FORMULA · STDEV / VAR / BETA / CORREL / SHARPE / SORTINO · windows 20/60/120</p>
+<p><span class="tag">Risk-free</span> TW10Y &#183; US10Y</p>
+<p><span class="tag">Benchmark</span> ^TWII &#183; ^GSPC &#183; NVDA</p>
+</div>
+
+<div class="card">
+<h2>Component Registry</h2>
+<table>
+<thead><tr><th>#</th><th>Component</th><th>Role</th><th>Exists</th><th>SHA12</th><th>Parse</th><th>Path</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>VRN_TAEngine_v01.py</td><td>statistics_engine</td><td>False</td><td></td><td>ENGINE_MISSING</td><td></td></tr>
+<tr><td>2</td><td>vdf_price_fetch.py</td><td>price_layer_adj_first</td><td>True</td><td>0467da7b06d3</td><td>OK</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_vdf_engine_integration\vdf_price_fetch.py</td></tr>
+<tr><td>3</td><td>VDF_Engine_Config.json</td><td>engine_config</td><td>True</td><td>d18dad2dbc90</td><td>config</td><td>C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_vdf_engine_integration\VDF_Engine_Config.json</td></tr>
+
+</tbody>
+</table>
+</div>
+
+<div class="card">
+<h2>Engine Selftest</h2>
+<pre>{
+  &quot;label&quot;: &quot;helper_selftest&quot;,
+  &quot;status&quot;: &quot;OK&quot;,
+  &quot;exit_code&quot;: 0,
+  &quot;pid&quot;: 37948,
+  &quot;stdout&quot;: &quot;  PASS  ADJ-first selects Adj Close\r\n  PASS  PRICE equals Adj Close\r\n  PASS  RAW_CLOSE keeps Close\r\n  PASS  fallback to Close\r\n  PASS  PRICE equals Close\r\n  PASS  no price -&gt; None\r\nSELFTEST 6/6 PASS\r\nSELFTEST_JSON {\&quot;passed\&quot;: 6, \&quot;total\&quot;: 6, \&quot;ok\&quot;: true}\r\n&quot;,
+  &quot;stderr&quot;: &quot;&quot;
+}</pre>
+</div>
+
+<div class="card">
+<h2>Output Paths</h2>
+<pre>
+Engine Config : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_vdf_engine_integration\VDF_Engine_Config.json
+Price Helper  : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_vdf_engine_integration\vdf_price_fetch.py
+Registry JSON : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_vdf_registry\VDF_Engine_Registry.json
+Registry CSV  : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_vdf_registry\VDF_Engine_Registry.csv
+Pointer JSON  : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_vdf_engine_integration\VDF_Engine_Import_ActivePointer.json
+Summary JSON  : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_vdf_logs\RUN_20260619_141318_VDF_ENGINE_IMPORT_v0100\VDF_Engine_Import_Summary.json
+Report HTML   : C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\functional modules\VDF\_vdf_reports\engine_import\VDF_Engine_Import_Report.html
+</pre>
+</div>
+</body>
+</html>

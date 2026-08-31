@@ -4,6 +4,16 @@ param(
     [string]$PythonExe = "",
     [switch]$NoOpen
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 
 # VDF-FLOW-LAUNCHER-16  Activate-VIAFlowSystem.ps1
 # One launcher: activates env, runs PY back-end (synth->calibrate->run->ui),
@@ -19,7 +29,7 @@ $ErrorActionPreference = "Stop"
 if (-not $Cmd) { $Cmd = "all" }
 
 $script:Root    = $PSScriptRoot
-$script:Manager = Join-Path $script:Root "engines/flow_manager.py"
+$script:Manager = Join-Path $script:Root "engines/FLOW_ENG009_FlowManager.py"
 $script:Report  = Join-Path $script:Root "index.html"
 $script:WorldMap = Join-Path $script:Root "world_flow.html"
 $script:TierMap  = Join-Path $script:Root "tier_flow.html"
@@ -134,3 +144,4 @@ if ((Test-Path $script:Hub) -and (-not $NoOpen)) {
 }
 
 Write-Host "=== done ===" -ForegroundColor Cyan
+

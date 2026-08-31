@@ -1,4 +1,4 @@
-﻿<#
+<#
 VIA_WorkflowEngine.ps1 — Windows 一鍵啟動器（ONE POWERSHELL TO HANDLE ALL）
 ===========================================================================
 包辦 Windows 上執行 VIA_WorkflowEngine.py 的全部前置：
@@ -41,6 +41,16 @@ USAGE
   被 ExecutionPolicy 擋時：
   powershell -ExecutionPolicy Bypass -File .\VIA_WorkflowEngine.ps1 all
 #>
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = 'Stop'
 $BranchHint = 'claude/workflow-engine-libs-integration-pxsyv3'
 
@@ -163,19 +173,19 @@ function Invoke-EngineHost {
 
 # ── VAP seaborn+plotly 繪圖引擎（新平行引擎線;動態解析鐵律:取最新版,嚴禁寫死版號）──
 $VapEngineDir = Join-Path $PSScriptRoot 'functional modules\VAP\engine'
-$VapEngine = Get-ChildItem -LiteralPath $VapEngineDir -Filter 'via_autoplot_seaborn_plotly_v0*.py' -ErrorAction SilentlyContinue |
+$VapEngine = Get-ChildItem -LiteralPath $VapEngineDir -Filter 'VAP_ENG003_AutoplotSeabornPlotly_v0*.py' -ErrorAction SilentlyContinue |
     Sort-Object Name | Select-Object -Last 1 -ExpandProperty FullName
-if (-not $VapEngine) { $VapEngine = Join-Path $VapEngineDir 'via_autoplot_seaborn_plotly_v0100.py' }
+if (-not $VapEngine) { $VapEngine = Join-Path $VapEngineDir 'VAP_ENG003_AutoplotSeabornPlotly_v0100.py' }
 
 # ── 本 session 各模組定位 ──────────────────────────────────────────────────
 $ChipWarParams = Join-Path $PSScriptRoot 'functional modules\ChipWar\chipwar_params.json'
-$ChipWarDash   = Join-Path $PSScriptRoot 'functional modules\ChipWar\engines\via_chipwar_vap_dashboard.py'
+$ChipWarDash   = Join-Path $PSScriptRoot 'functional modules\ChipWar\engines\CHW_ENG016_ChipwarVapDashboard.py'
 $ChipWarIndex  = Join-Path $PSScriptRoot 'functional modules\ChipWar\_generated\reports\vap_dashboard\index.html'
 $MFParams      = Join-Path $PSScriptRoot 'functional modules\MultiFactor\mf_params.json'
 $MFManifest    = Join-Path $PSScriptRoot 'functional modules\MultiFactor\engines\VIA_MF_ENGINE_SHA256_MANIFEST_v0100.json'
 $FlowV2Dir     = Join-Path $PSScriptRoot 'supportive modules\VIA_FlowSystem\FlowSystem_v2'
 $FlowV2Launch  = Join-Path $FlowV2Dir 'Activate-VIAFlowSystem.ps1'
-$TALibEngine   = Join-Path $PSScriptRoot 'functional modules\TALib\VIA_TALibEngine.py'
+$TALibEngine   = Join-Path $PSScriptRoot 'functional modules\TALib\VIA_ENG003_TALibEngine.py'
 $TheoryAudit   = Join-Path $PSScriptRoot 'Test-VIA-TheoryAudit.ps1'
 
 function Invoke-VapHost {
@@ -497,3 +507,4 @@ if ($Verb -eq '') {
 $Full = @($PyPre) + @($EnginePath) + @($EngineArgs)
 & $PyExe $Full
 exit $LASTEXITCODE
+

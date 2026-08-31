@@ -1,0 +1,110 @@
+{
+  "meta": {
+    "name": "vap_chart_library",
+    "system": "VeritasAutoPlot",
+    "via_code": "VIA-M-VAPLIB",
+    "ssot_rules": {
+      "palette": "^(via|deep|set2|tab10|paired|muted|pastel|cb)$",
+      "lineWidth": "^(0\\.5|[1-5](\\.5)?|6)$",
+      "lineOpacity": "^(0(\\.\\d{1,2})?|1(\\.0{1,2})?)$",
+      "fillOpacity": "^(0(\\.\\d{1,2})?|1(\\.0{1,2})?)$",
+      "frame": "^(true|false)$",
+      "grid": "^(true|false)$",
+      "zoom": "^(true|false)$",
+      "evtLw": "^\\d(\\.\\d+)?$",
+      "evtV": "^(red-grey|grey-red)$",
+      "evtH": "^(red-grey|grey-red)$",
+      "dateMode": "^(normalized|start|end|now)$",
+      "smallMultiples": "^[1-4]x[1-6]$"
+    },
+    "sap_msp_align_locked": [
+      {
+        "ext": "Plotly graph_objects",
+        "tcode": "go.* / make_subplots",
+        "lock": true,
+        "via": "VAP-CH-01..24",
+        "note": "生產渲染引擎 · 對齊不改寫"
+      },
+      {
+        "ext": "SAP GRAPH_MATRIX",
+        "tcode": "SE38/GRAL",
+        "lock": true,
+        "via": "VAP-CH-01..16",
+        "note": "圖型庫對齊 · VIA 別名"
+      },
+      {
+        "ext": "SAP LIST_VIEWER (ALV)",
+        "tcode": "SALV",
+        "lock": true,
+        "via": "VAP-CH-03/04/07",
+        "note": "條狀/堆疊對齊"
+      },
+      {
+        "ext": "MSP Gantt/Timeline",
+        "tcode": "MSP-VIEW-01",
+        "lock": true,
+        "via": "VAP-CH-09",
+        "note": "個別小圖對齊"
+      }
+    ],
+    "saved_at": "2026-08-30T15:21:04.312Z"
+  },
+  "defaults": {
+    "palette": "via",
+    "lineWidth": 1,
+    "lineOpacity": 0.9,
+    "fillOpacity": 0.4,
+    "frame": true,
+    "grid": true,
+    "zoom": true,
+    "evtLw": 0.8,
+    "evtV": "red-grey",
+    "evtH": "grey-red",
+    "dateMode": "normalized",
+    "smallMultiples": "2x2"
+  },
+  "overrides": {},
+  "selected": [],
+  "lock": {
+    "visual": true,
+    "charts": []
+  },
+  "layout": {
+    "preset": "standard",
+    "cols": "auto",
+    "height": 150
+  },
+  "db": [
+    "TWSE 台灣證交所",
+    "TPEX 櫃買中心",
+    "SITCA 投信投顧公會",
+    "MOPS 公開資訊觀測站",
+    "yfinance",
+    "FactSet (keyed)",
+    "FRED",
+    "EPFR",
+    "HKEX 港交所"
+  ],
+  "compose": {
+    "mode": "single",
+    "form": "line",
+    "L": [
+      "cpi"
+    ],
+    "Rr": [
+      "ust10"
+    ],
+    "stack": [
+      "ismm",
+      "isms",
+      "unrate"
+    ],
+    "saved": []
+  },
+  "connect": {
+    "adapter": "json",
+    "endpoint": "",
+    "tests": [],
+    "lastRun": null
+  }
+}

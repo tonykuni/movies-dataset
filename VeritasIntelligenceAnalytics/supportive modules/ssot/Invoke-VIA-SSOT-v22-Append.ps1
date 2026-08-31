@@ -14,6 +14,16 @@ param(
     [switch]$VerifyOnly,
     [switch]$NoOpenHtml
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -37,9 +47,9 @@ $script:PYTHON_CANDIDATES = @(
 if (-not $PatchFile) {
     # Auto-locate patch file in common spots
     $candidates = @(
-        "C:\Users\tonyk\OneDrive\Desktop\VIA_SSOT_Unified_v22_synonyms_patch.py",
-        "C:\Users\tonyk\Downloads\VIA_SSOT_Unified_v22_synonyms_patch.py",
-        ".\VIA_SSOT_Unified_v22_synonyms_patch.py"
+        "C:\Users\tonyk\OneDrive\Desktop\SUP_MDL655_SSOTUnifiedV22SynonymsPatch.py",
+        "C:\Users\tonyk\Downloads\SUP_MDL655_SSOTUnifiedV22SynonymsPatch.py",
+        ".\SUP_MDL655_SSOTUnifiedV22SynonymsPatch.py"
     )
     foreach ($p in $candidates) {
         if (Test-Path -LiteralPath $p) { $PatchFile = $p; break }
@@ -216,3 +226,4 @@ try {
     }
     Write-Host "PowerShell session remains open." -ForegroundColor Yellow
 }
+

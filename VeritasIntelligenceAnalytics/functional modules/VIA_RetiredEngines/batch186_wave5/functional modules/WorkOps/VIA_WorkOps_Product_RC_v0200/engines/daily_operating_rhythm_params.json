@@ -1,0 +1,82 @@
+{
+  "version": "v0100",
+  "engine_id": "ENG-041",
+  "purpose": "Translate Today/Watchlist/Commitment facts into a simple time-of-day operating rhythm.",
+  "timezone": "Asia/Taipei",
+  "dayparts": {
+    "morning": {
+      "start": "07:00",
+      "end": "10:30",
+      "label": {
+        "zh-TW": "早上先控風險",
+        "zh-CN": "早上先控风险",
+        "en": "Morning Risk Control"
+      }
+    },
+    "pre_noon": {
+      "start": "10:30",
+      "end": "13:00",
+      "label": {
+        "zh-TW": "中午前收斂關鍵回覆",
+        "zh-CN": "中午前收敛关键回复",
+        "en": "Close Key Gaps Before Noon"
+      }
+    },
+    "afternoon": {
+      "start": "13:00",
+      "end": "16:30",
+      "label": {
+        "zh-TW": "下午推進與排障",
+        "zh-CN": "下午推进与排障",
+        "en": "Afternoon Execution"
+      }
+    },
+    "eod": {
+      "start": "16:30",
+      "end": "20:00",
+      "label": {
+        "zh-TW": "下班前一次準備追蹤",
+        "zh-CN": "下班前一次准备跟踪",
+        "en": "End-of-Day Follow-up Preparation"
+      }
+    }
+  },
+  "rules": {
+    "morning": [
+      "LEVEL_5_FIRST",
+      "LEVEL_4_NEXT",
+      "OVERDUE",
+      "BLOCKED",
+      "DUE_TODAY"
+    ],
+    "pre_noon": [
+      "WAITING_REPLY",
+      "DUE_BEFORE_NOON",
+      "MISSING_CONTROL",
+      "COMMITMENT_DUE"
+    ],
+    "afternoon": [
+      "RECOVERY_PLAN",
+      "PLAN_B",
+      "OWNER_CONFIRMATION",
+      "DEPENDENCY_CLEARING"
+    ],
+    "eod": [
+      "BUILD_FOLLOWUP_PACK",
+      "PREPARE_TOMORROW",
+      "CLOSE_READY_ITEMS",
+      "REVIEW_BROKEN_COMMITMENTS"
+    ]
+  },
+  "limits": {
+    "phase_items": 8,
+    "tomorrow_preview": 8
+  },
+  "governance": {
+    "advisory_only": true,
+    "auto_send": false,
+    "auto_escalate": false,
+    "auto_close": false,
+    "human_confirmation_for_external_actions": true
+  }
+}

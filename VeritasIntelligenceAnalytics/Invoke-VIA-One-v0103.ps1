@@ -12,6 +12,16 @@ Invoke-VIA-One v0103 — 全系統總啟動器(v0102 版本前送:子系統選�
 回退:bin\via-one.cmd 改指 Invoke-VIA-One-v0102.ps1
 #>
 param([string]$Only = "")
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Continue"
 $Root = $PSScriptRoot
 $Bin = Join-Path $Root "bin"
@@ -31,14 +41,14 @@ Write-Host ("[加速器] " + ($Accelerators -join " · ")) -ForegroundColor Dark
 
 $Stages = @(
     @{ Key = "sync"; Name = "SYNC 同步 repo";                Kind = "ps";  Target = (Join-Path $Bin "via-sync.ps1") },
-    @{ Key = "mega"; Ui = "VIA_Reports\VIA_MegaMatrix.html"; Name = "MEGA 三輪全景 v0106(Porcelain)"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_Governance_Runtime\via_mega_engine_v0106.py") },
-    @{ Key = "vmt"; Ui = (Join-Path ($env:VMT_ROOT ?? "C:\VIA\VeritasMailTracker") "reports\MasterRun.html"); Name = "VMT 總指揮 9 階段"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VMT_SuperBOM\via_master_engine_v0102.py"); Args = @("--no-open") },
-    @{ Key = "cge"; Ui = (Join-Path ($env:VMT_ROOT ?? "C:\VIA\VeritasMailTracker") "VIA_CentralGovernance.html"); Name = "CGE 中央治理 dry-run"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_Central_Governance\VIA_CentralGovernanceEngine_v0401.py"); Args = @("--workdir", ($env:VMT_ROOT ?? "C:\VIA\VeritasMailTracker")) },
-    @{ Key = "probe"; Name = "VRN 內容探測(唯讀 GO gate)"; Kind = "py";  Target = (Join-Path $Root "functional modules\VRN\vrn_content_probe_v0100.py"); Args = @("--no-open") },
-    @{ Key = "extract"; Name = "VRN 內容擷取 dry-run(v0101)"; Kind = "py";  Target = (Join-Path $Root "functional modules\VRN\vrn_content_extract_v0101.py") },
-    @{ Key = "flow"; Ui = "VIA_Reports\flow_run\VIA_FlowSystem_UI.html"; Name = "FLOW 系統 OneShot(自產 UI)"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_FlowSystem\VIA_FlowSystem_OneShot.py"); Cwd = (Join-Path $Reports "flow_run") },
-    @{ Key = "if"; Name = "IF 產業預測 selftest"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_IF_Engine\via_if_engine.py"); Args = @("--selftest") },
-    @{ Key = "fis"; Ui = "VIA_Reports\fis_run"; Name = "FIS 驗證 harness(需 scipy)"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_FlowSystem\VIA_FIS_Validation_v3.py"); Cwd = (Join-Path $Reports "fis_run"); Optional = $true },
+    @{ Key = "mega"; Ui = "VIA_Reports\VIA_MegaMatrix.html"; Name = "MEGA 三輪全景 v0106(Porcelain)"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_Governance_Runtime\SUP_MDL142_MegaEngine_v0106.py") },
+    @{ Key = "vmt"; Ui = (Join-Path ($env:VMT_ROOT ?? "C:\VIA\VeritasMailTracker") "reports\MasterRun.html"); Name = "VMT 總指揮 9 階段"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VMT_SuperBOM\VIA_ENG021_MasterEngine_v0102.py"); Args = @("--no-open") },
+    @{ Key = "cge"; Ui = (Join-Path ($env:VMT_ROOT ?? "C:\VIA\VeritasMailTracker") "VIA_CentralGovernance.html"); Name = "CGE 中央治理 dry-run"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_Central_Governance\CGC_MDL001_CentralGovernanceEngine_v0401.py"); Args = @("--workdir", ($env:VMT_ROOT ?? "C:\VIA\VeritasMailTracker")) },
+    @{ Key = "probe"; Name = "VRN 內容探測(唯讀 GO gate)"; Kind = "py";  Target = (Join-Path $Root "functional modules\VRN\VRN_ENG048_ContentProbe_v0100.py"); Args = @("--no-open") },
+    @{ Key = "extract"; Name = "VRN 內容擷取 dry-run(v0101)"; Kind = "py";  Target = (Join-Path $Root "functional modules\VRN\VRN_ENG047_ContentExtract_v0101.py") },
+    @{ Key = "flow"; Ui = "VIA_Reports\flow_run\VIA_FlowSystem_UI.html"; Name = "FLOW 系統 OneShot(自產 UI)"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_FlowSystem\FLOW_MDL003_FlowSystemOneShot.py"); Cwd = (Join-Path $Reports "flow_run") },
+    @{ Key = "if"; Name = "IF 產業預測 selftest"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_IF_Engine\SUP_MDL144_IfEngine.py"); Args = @("--selftest") },
+    @{ Key = "fis"; Ui = "VIA_Reports\fis_run"; Name = "FIS 驗證 harness(需 scipy)"; Kind = "py";  Target = (Join-Path $Root "supportive modules\VIA_FlowSystem\FLOW_MDL002_FISValidationV3.py"); Cwd = (Join-Path $Reports "fis_run"); Optional = $true },
     @{ Key = "hub"; Name = "UI HUB 樞紐(動態最新版)"; Kind = "open"; Target = ((Get-ChildItem (Join-Path $Root "supportive modules\ui_support") -Filter "VIA_UI_Hub_v*.html" | Sort-Object Name | Select-Object -Last 1).FullName) }
 )
 
@@ -85,3 +95,4 @@ $okN = ($Results | Where-Object 結果 -eq "OK").Count
 Write-Host ("[總結] {0}/{1} 階段 OK · FlowSystem UI + Mega Matrix + UI Hub 已非阻塞開啟 · PowerShell 保持開啟" -f $okN, $total) -ForegroundColor Green
 Write-Host "[提示] 選配依賴一鍵補齊:py -m pip install duckdb rich scipy numpy pandas" -ForegroundColor DarkGray
 Write-Host "[提示] via-pipe(輪動引擎)待同伴檔 rotation_engine.py 補齊後可用" -ForegroundColor DarkGray
+

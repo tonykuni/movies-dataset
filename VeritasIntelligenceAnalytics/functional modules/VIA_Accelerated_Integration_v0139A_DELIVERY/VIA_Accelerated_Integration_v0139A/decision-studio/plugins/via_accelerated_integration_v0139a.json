@@ -1,0 +1,31 @@
+{
+  "plugin_id": "via_accelerated_integration_v0139a",
+  "version": "1.0.0",
+  "type": "governed-integration-engine",
+  "description": "VAP, Flow Simulation, Taiwan Stock Group Classification, Group Index And Monthly Revenue Analysis.",
+  "entrypoint": {
+    "python_engine": "engine/via_domain_engine_v0139a.py",
+    "powershell_launcher": "Invoke-VIA-Accelerated-Integration-v0139A.ps1"
+  },
+  "components": [
+    "VIA_VAP_Integration_Update_Engine_v0139A",
+    "VIA_Flow_Simulation_Engine_v0139A",
+    "VIA_TW_Stock_Group_Classification_Engine_v0139A",
+    "VIA_TW_Group_Index_Engine_v0139A",
+    "VIA_TW_Monthly_Revenue_Analysis_Engine_v0139A"
+  ],
+  "governance": {
+    "maximum_rounds": 3,
+    "append_only": true,
+    "overwrite_existing": false,
+    "default_network": "DENY",
+    "activation": "LAUNCHER_ONLY_NO_CANONICAL_RUNTIME",
+    "hydra": "FAIL_CLOSED",
+    "mother_root_inventory": "TOP_LEVEL_ONLY"
+  },
+  "ui": {
+    "small_font": true,
+    "auto_wrap": true,
+    "sections": ["MODULE", "ENGINE", "FUNCTION LIB", "OTHERS"]
+  }
+}

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+   ______                            __
+  / ____/___  ____ ___  ____  __  __/ /____  _____
+ / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
+/ /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
+\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
+                    /_/
+        Created with Perplexity Computer
+        https://www.perplexity.ai/computer
+-->
+
+<!-- Perplexity Computer Attribution — SEO Meta Tags -->
+<meta name="generator" content="Perplexity Computer">
+<meta name="author" content="Perplexity Computer">
+<meta property="og:see_also" content="https://www.perplexity.ai/computer">
+<link rel="author" href="https://www.perplexity.ai/computer">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YC Catalog — Every Y Combinator Company</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./base.css">
+<link rel="stylesheet" href="./style.css">
+<link rel='stylesheet' href='../VAP_THEME.css'><link rel='stylesheet' href='../VAP_RESPONSIVE.css'></head>
+<body>
+  <div class="app-shell">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <svg class="logo-icon" width="28" height="28" viewBox="0 0 28 28" fill="none" aria-label="YC Catalog Logo">
+          <rect width="28" height="28" rx="6" fill="var(--color-orange)"/>
+          <path d="M8 8L14 17V21H14V17L20 8" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h1 class="logo-text">YC Catalog</h1>
+        <span class="company-count" id="companyCount">0 companies</span>
+      </div>
+      <div class="header-right">
+        <div class="view-toggle" role="tablist">
+          <button class="view-btn active" data-view="companies" role="tab" aria-selected="true">Companies</button>
+          <button class="view-btn" data-view="batches" role="tab" aria-selected="false">Batch Performance</button>
+        </div>
+        <button data-theme-toggle aria-label="Switch to dark mode" class="theme-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="app-main">
+      <!-- Companies View -->
+      <div id="companiesView" class="view-panel active">
+        <!-- Search & Filters Bar -->
+        <div class="filter-bar">
+          <div class="search-wrap">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" id="searchInput" placeholder="Search companies..." class="search-input" autocomplete="off">
+          </div>
+          <div class="filter-group">
+            <select id="filterBatch" class="filter-select">
+              <option value="">All Batches</option>
+            </select>
+            <select id="filterStatus" class="filter-select">
+              <option value="">All Statuses</option>
+              <option value="Active">Active</option>
+              <option value="Public">Public</option>
+              <option value="Acquired">Acquired</option>
+              <option value="Dead">Dead</option>
+            </select>
+            <select id="filterIndustry" class="filter-select">
+              <option value="">All Industries</option>
+            </select>
+            <select id="filterTeamSize" class="filter-select">
+              <option value="">Any Team Size</option>
+              <option value="1-10">1-10</option>
+              <option value="11-50">11-50</option>
+              <option value="51-200">51-200</option>
+              <option value="201-1000">201-1,000</option>
+              <option value="1001+">1,000+</option>
+            </select>
+          </div>
+          <button id="clearFilters" class="clear-btn" style="display:none">Clear filters</button>
+        </div>
+
+        <!-- Results info -->
+        <div class="results-info" id="resultsInfo">Loading...</div>
+
+        <!-- Table -->
+        <div class="table-container">
+          <table class="data-table" id="companyTable">
+            <thead>
+              <tr>
+                <th class="col-batch sortable" data-sort="batch">Batch</th>
+                <th class="col-name sortable" data-sort="name">Company</th>
+                <th class="col-desc">Description</th>
+                <th class="col-status sortable" data-sort="status">Status</th>
+                <th class="col-industry sortable" data-sort="industry">Industry</th>
+                <th class="col-team sortable" data-sort="team">Team</th>
+                <th class="col-funding sortable" data-sort="funding">Funding</th>
+                <th class="col-valuation sortable" data-sort="valuation">Valuation</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination"></div>
+      </div>
+
+      <!-- Batch Performance View -->
+      <div id="batchesView" class="view-panel">
+        <div class="batch-header">
+          <h2 class="section-title">Batch Performance Overview</h2>
+          <p class="section-subtitle">Aggregate statistics for every YC batch</p>
+        </div>
+        <div class="batch-kpis" id="batchKpis"></div>
+        <div class="batch-chart-area">
+          <canvas id="batchChart" height="300"></canvas>
+        </div>
+        <div class="batch-table-container">
+          <table class="data-table" id="batchTable">
+            <thead>
+              <tr>
+                <th class="sortable" data-sort="batch">Batch</th>
+                <th class="sortable" data-sort="total">Companies</th>
+                <th class="sortable" data-sort="active">Active</th>
+                <th class="sortable" data-sort="public">Public</th>
+                <th class="sortable" data-sort="acquired">Acquired</th>
+                <th class="sortable" data-sort="dead">Dead</th>
+                <th class="sortable" data-sort="survival">Survival Rate</th>
+                <th class="sortable" data-sort="topcos">Top Companies</th>
+                <th class="sortable" data-sort="avgteam">Avg Team Size</th>
+              </tr>
+            </thead>
+            <tbody id="batchTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <footer class="app-footer">
+      <span>Data from <a href="https://github.com/yc-oss/api" target="_blank" rel="noopener noreferrer">yc-oss/api</a> &middot; Updated Sep 2025</span>
+      <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="./app.js" defer></script>
+</body>
+</html>
+

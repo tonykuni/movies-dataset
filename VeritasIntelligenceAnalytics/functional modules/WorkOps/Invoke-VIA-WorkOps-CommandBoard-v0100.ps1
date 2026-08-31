@@ -19,6 +19,16 @@ param(
     [switch]$NoScan,
     [switch]$NoOpen
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Continue"
 $Here    = $PSScriptRoot
 $ViaRoot = Split-Path (Split-Path $Here -Parent) -Parent
@@ -224,3 +234,4 @@ Write-Host ("   指揮板:{0}" -f $outFile) -ForegroundColor Green
 Write-Host "[4/4] 開啟(非阻塞)..." -ForegroundColor Yellow
 if (-not $NoOpen) { Start-Process $outFile | Out-Null }
 Write-Host ("[總結] 專案 {0} 案 · 未回追蹤 {1} 件 · 收件佐證 {2} 筆 · PowerShell 保持開啟" -f @($rec).Count, @($pendSorted).Count, @($mails).Count) -ForegroundColor Green
+

@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=3,user-scalable=yes">
+<title>VIA · Unified Workbench</title>
+<HTA:APPLICATION
+    ID="VIA_UNIFIED"
+    APPLICATIONNAME="VIA Unified Workbench v0163A"
+    BORDER="thin"
+    CAPTION="yes"
+    MAXIMIZEBUTTON="yes"
+    MINIMIZEBUTTON="yes"
+    SCROLL="yes"
+    SINGLEINSTANCE="yes"
+    SYSMENU="yes"
+    WINDOWSTATE="normal"
+/>
+<style>
+:root{
+ --bg:#f5f4f0;--paper:#fff;--ink:#1e1d1a;--ink2:#33403f;--mut:#6b6860;--mut2:#9c9890;
+ --line:#dbd9d3;--soft:#ecebe6;--up:#c96b5a;--down:#5a9e6f;--blue:#4c78a8;--teal:#439a9a;
+ --am:#c4943a;--vi:#7a6daa;--sidebar:#f8f7f3;
+ --reson:linear-gradient(90deg,#c96b5a 0 14.2%,#c4943a 0 28.5%,#5a9e6f 0 42.8%,#439a9a 0 57.1%,#4c78a8 0 71.4%,#7a6daa 0 85.7%,#1e1d1a 0 100%)
+}
+*{box-sizing:border-box;margin:0;padding:0}html,body{min-height:100%}
+body{background:#f5f4f0;color:#33403f;font:10px/1.45 "Microsoft JhengHei","Segoe UI",Arial,sans-serif}
+.topbar{position:fixed;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#4c78a8,#439a9a,#7fae6f,#c9b05a,#c96b5a,#a05a86);z-index:100}
+.sidebar{position:fixed;top:4px;left:0;bottom:0;width:244px;background:#f8f7f3;border-right:1px solid #dbd9d3;padding:17px 13px;overflow:auto;z-index:60}
+.brand{padding:3px 6px 14px;border-bottom:2px solid #1e1d1a}
+.brand .k{font:700 7.5px Consolas,monospace;letter-spacing:1.4px;color:#6b6860;text-transform:uppercase}
+.brand h2{margin-top:7px;font-size:17px;line-height:1.15;color:#1e1d1a}.brand h2 span{color:#439a9a}
+.brand p{margin-top:5px;font-size:9px;color:#6b6860}
+.group{margin-top:16px}.groupTitle{margin:0 6px 5px;font:700 7px Consolas,monospace;color:#9c9890;letter-spacing:1.1px;text-transform:uppercase}
+.nav button{display:block;width:100%;text-align:left;margin-bottom:3px;border:1px solid transparent;border-radius:4px;background:transparent;color:#33403f;padding:7px 8px;font:700 8px Consolas,monospace;cursor:pointer}
+.nav button:hover{background:#fff;border-color:#dbd9d3}.nav button.active{background:#1e1d1a;color:#fff;border-color:#1e1d1a}
+.nav .n{display:inline-block;min-width:23px;color:#9c9890}.nav button.active .n{color:#fff}
+.sideMetrics{margin-top:15px;border-top:1px solid #dbd9d3;padding-top:10px}.sm{display:flex;justify-content:space-between;gap:7px;padding:4px 3px;border-bottom:1px solid #ecebe6}
+.sm .k{font:700 7px Consolas,monospace;color:#6b6860}.sm .v{max-width:125px;text-align:right;overflow-wrap:anywhere;font:700 7.5px Consolas,monospace;color:#1e1d1a}
+.workspace{margin-left:244px;min-height:100vh}.inner{max-width:1380px;margin:0 auto;padding:0 20px 52px}
+header{padding:20px 0 8px;margin-bottom:10px;border-bottom:2px solid #1e1d1a}
+.kicker{font:700 9px Consolas,monospace;letter-spacing:2px;color:#6b6860;text-transform:uppercase;margin-bottom:6px}
+h1{font-size:19px;line-height:1.2;color:#1e1d1a}h1 span{color:#439a9a}.sub{margin-top:5px;color:#6b6860;font-size:9.5px}
+.page{display:none}.page.active{display:block}
+.hero{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 3px}.card{background:#fff;border:1px solid #dbd9d3;border-radius:5px;padding:9px 13px;min-width:115px}
+.card .v{font-size:17px;font-weight:800;color:#1e1d1a;line-height:1;overflow-wrap:anywhere}.card .l{font:600 7px Consolas,monospace;color:#6b6860;text-transform:uppercase;margin-top:4px}
+h2{font-size:12.5px;color:#1e1d1a;margin:22px 0 7px;padding-bottom:5px;border-bottom:1px solid #dbd9d3}
+h2 .en{font:600 7.5px Consolas,monospace;color:#9c9890;letter-spacing:.8px;margin-left:7px;text-transform:uppercase}
+.panel{background:#fff;border:1px solid #dbd9d3;border-radius:6px;padding:12px 14px;margin-top:9px}
+.homePanel{border-left:3px solid #439a9a}.vrnPanel{border-left:3px solid #c96b5a}.vdfPanel{border-left:3px solid #4c78a8}
+.matrixPanel{border-left:3px solid #7a6daa}.riskPanel{border-left:3px solid #c4943a}.registryPanel{border-left:3px solid #5a9e6f}.logPanel{border-left:3px solid #1e1d1a}
+.columns{display:flex;gap:11px;align-items:flex-start}.mainColumn{flex:1;min-width:0}.asideColumn{width:360px;min-width:320px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.full{grid-column:1/3}.field{border-bottom:1px solid #ecebe6;padding:7px 0}
+label{display:block;font:700 7.5px Consolas,monospace;color:#6b6860;text-transform:uppercase;margin-bottom:4px}
+.row{display:flex;align-items:center;gap:5px}input[type=text],input[type=number],select{width:100%;border:1px solid #dbd9d3;border-radius:4px;padding:6px 8px;background:#fafaf8;color:#33403f;font:500 9px Consolas,monospace}
+input:focus,select:focus{outline:1px solid #439a9a;border-color:#439a9a}.check{display:flex;align-items:center;gap:6px;min-height:27px}
+button{border:1px solid #dbd9d3;border-radius:4px;padding:6px 9px;background:#fff;color:#33403f;font:700 7.5px Consolas,monospace;cursor:pointer}
+button:hover{background:#fafaf8}button.primary{color:#fff;background:#439a9a;border-color:#439a9a}button.vrn{color:#fff;background:#c96b5a;border-color:#c96b5a}
+button.vdf{color:#fff;background:#4c78a8;border-color:#4c78a8}button.all{color:#fff;background:#1e1d1a;border-color:#1e1d1a}button:disabled{opacity:.45}
+.actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}.hint{color:#6b6860;font-size:8.5px;margin-top:4px}
+.drop{border:1px dashed #9c9890;border-radius:5px;background:#fafaf8;padding:15px;text-align:center;color:#6b6860}
+.drop.active{border-color:#439a9a;background:#eef7f5}.drop b{display:block;color:#1e1d1a;font-size:10.5px}.drop span{display:block;margin-top:3px;font-size:8.5px}
+.queue{margin-top:9px;border:1px solid #dbd9d3;border-radius:4px;max-height:330px;overflow:auto}.queueItem{display:flex;justify-content:space-between;gap:8px;padding:6px 8px;border-bottom:1px solid #ecebe6;font:500 8px Consolas,monospace}
+.progressOuter{height:9px;background:#ecebe6;border-radius:3px;overflow:hidden;margin-top:11px}.progressInner{height:100%;width:0%;background:linear-gradient(90deg,#4c78a8,#439a9a,#7fae6f,#c9b05a,#c96b5a,#a05a86)}
+.status{display:grid;grid-template-columns:118px 1fr;gap:4px 9px;margin-top:10px}.k{font:700 7.5px Consolas,monospace;color:#6b6860;text-transform:uppercase}.code{font-family:Consolas,monospace;overflow-wrap:anywhere}
+.pill{display:inline-block;font:700 7px Consolas,monospace;color:#fff;border-radius:3px;padding:2px 6px}.ok{background:#5a9e6f}.warn{background:#c4943a}.bad{background:#c96b5a}.mut{background:#9c9890}
+.frameWrap{margin-top:9px;border:1px solid #dbd9d3;background:#fafaf8;min-height:650px}.frameWrap iframe{display:block;width:100%;height:650px;border:0;background:#fff}
+.empty{padding:80px 20px;text-align:center;color:#6b6860}.empty b{display:block;color:#1e1d1a;font-size:13px;margin-bottom:5px}
+.viewerTop{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap}.viewerPath{color:#6b6860;font:500 8px Consolas,monospace;overflow-wrap:anywhere;margin-top:5px}
+.registryGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.registryCard{border:1px solid #dbd9d3;border-radius:5px;background:#fafaf8;padding:10px;min-height:78px}
+.registryCard .l{font:700 7px Consolas,monospace;color:#6b6860;text-transform:uppercase}.registryCard .v{margin-top:6px;color:#1e1d1a;font:700 9px/1.4 Consolas,monospace;overflow-wrap:anywhere}
+.log{background:#f8f8f5;color:#33403f;border:1px solid #dbd9d3;border-radius:4px;padding:9px;min-height:520px;max-height:700px;overflow:auto;white-space:pre-wrap;font:500 8px/1.5 Consolas,monospace}
+.accelGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.accel{border:1px solid #dbd9d3;border-radius:4px;padding:8px;background:#fafaf8}.accel b{display:block;color:#1e1d1a;font:700 8px Consolas,monospace}.accel span{display:block;color:#6b6860;font-size:8px;margin-top:3px}
+.footer{margin-top:13px;color:#9c9890;font:500 7.5px Consolas,monospace}
+@media(max-width:1050px){.sidebar{width:205px}.workspace{margin-left:205px}.columns{display:block}.asideColumn{width:auto;min-width:0}.grid{grid-template-columns:1fr}.full{grid-column:auto}.registryGrid,.accelGrid{grid-template-columns:1fr 1fr}}
+
+/* VIA v0163A · proportional bilingual responsive lock */
+html{-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
+body{
+ font-family:"Microsoft JhengHei","Segoe UI",Arial,sans-serif!important;
+ font-size:clamp(10px,.78vw,12px)!important;
+ line-height:1.62!important;
+ letter-spacing:.006em
+}
+.sidebar{width:clamp(220px,17vw,248px)!important;padding:17px 13px!important}
+.workspace{margin-left:clamp(220px,17vw,248px)!important}
+.inner{max-width:1380px!important;padding:0 clamp(14px,2vw,24px) 48px!important}
+.brand h2{font-size:clamp(17px,1.45vw,21px)!important;font-weight:800!important}
+.brand p{font-size:clamp(8px,.65vw,10px)!important;font-weight:500!important}
+.kicker{font-size:clamp(8px,.62vw,10px)!important;font-weight:600!important}
+h1{font-size:clamp(18px,2vw,24px)!important;font-weight:800!important;line-height:1.2!important}
+.sub{font-size:clamp(9px,.72vw,11px)!important;font-weight:500!important}
+h2{font-size:clamp(13px,1.15vw,16px)!important;font-weight:800!important}
+h2 .en{font-size:clamp(8px,.62vw,10px)!important;font-weight:500!important}
+.hero{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:9px!important}
+.card{min-width:0!important;padding:12px 14px!important}
+.card .v{font-size:clamp(16px,1.5vw,20px)!important;font-weight:700!important}
+.card .l{font-size:clamp(7px,.58vw,9px)!important;font-weight:600!important}
+.nav button{font-size:clamp(8px,.65vw,10px)!important;min-height:31px!important;font-weight:600!important}
+.nav button.active{font-weight:800!important}
+.panel{padding:clamp(14px,1.5vw,18px)!important}
+label{font-size:clamp(8px,.65vw,10px)!important;font-weight:700!important}
+input[type=text],input[type=number],select{font-size:clamp(10px,.75vw,12px)!important;min-height:32px!important}
+button{font-size:clamp(9px,.7vw,11px)!important;min-height:32px!important;font-weight:700!important}
+.hint,.queueItem,.viewerPath,.registryCard .v{font-size:clamp(8px,.65vw,10px)!important;line-height:1.5!important}
+.k,.registryCard .l{font-size:clamp(7px,.55vw,9px)!important;font-weight:700!important}
+.code,.log{font-size:clamp(8px,.65vw,10px)!important;line-height:1.5!important}
+.registryGrid{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+.registryCard{min-width:0!important}.registryCard .v{overflow-wrap:anywhere!important;word-break:break-word!important}
+.page.active{min-height:0!important}
+@keyframes viaFadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+@keyframes viaShimmer{from{left:-45%}to{left:110%}}
+@keyframes viaPulse{0%,100%{box-shadow:0 0 0 0 rgba(196,148,58,.10)}50%{box-shadow:0 0 0 6px rgba(196,148,58,.08)}}
+.page.active{animation:viaFadeUp .26s ease-out both}
+.panel,.card,.registryCard,.accel,.nav button,button,input,select{transition:transform .16s ease,box-shadow .18s ease,border-color .18s ease,background-color .18s ease}
+.panel:hover,.card:hover,.registryCard:hover,.accel:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(30,29,26,.08)}
+button:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(30,29,26,.11)}
+button:active{transform:scale(.985)}
+.progressInner{position:relative!important;overflow:hidden!important;transition:width .45s cubic-bezier(.2,.8,.2,1)!important}
+.progressInner:after{content:"";position:absolute;top:0;bottom:0;width:38%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.62),transparent);animation:viaShimmer 1.25s linear infinite}
+.pill.warn{animation:viaPulse 1.8s ease-in-out infinite}
+@media(max-width:1050px){
+ .hero{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+ .registryGrid,.accelGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:760px){
+ body{font-size:12px!important;line-height:1.5!important}
+ .sidebar{position:relative!important;top:auto!important;bottom:auto!important;width:100%!important;max-height:none!important;border-right:0!important;border-bottom:1px solid #dbd9d3!important}
+ .workspace{margin-left:0!important}.inner{padding:0 12px 36px!important}
+ .nav{display:grid!important;grid-template-columns:1fr 1fr!important;gap:7px!important}
+ .nav button{font-size:11px!important;min-height:36px!important;margin:0!important}
+ .sideMetrics{display:grid!important;grid-template-columns:1fr 1fr!important}
+ .hero{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .columns{display:block!important}.asideColumn{width:auto!important;min-width:0!important}.grid{grid-template-columns:1fr!important}
+ .actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:9px!important}
+ .actions button{font-size:11px!important;min-height:36px!important;width:100%!important}
+ input[type=text],input[type=number],select{font-size:12px!important;min-height:36px!important}
+ .registryGrid,.accelGrid{grid-template-columns:1fr!important}
+ .panel:hover,.card:hover,.registryCard:hover,.accel:hover{transform:none;box-shadow:none}
+}
+@media(max-width:430px){.nav,.hero,.actions,.sideMetrics{grid-template-columns:1fr!important}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+</style>
+<script language="javascript">
+/* HTA/JScript compatibility: legacy mshta may not provide JSON. */
+if (typeof JSON === "undefined") {
+ var JSON = {};
+}
+if (typeof JSON.stringify !== "function") {
+ JSON.stringify = function(value) {
+  function quoteString(text) {
+   var map = {
+    "\b":"\\b",
+    "\t":"\\t",
+    "\n":"\\n",
+    "\f":"\\f",
+    "\r":"\\r",
+    '"':'\\"',
+    "\\":"\\\\"
+   };
+   return '"' + String(text).replace(
+    /[\\"\u0000-\u001f\u007f-\u009f]/g,
+    function(character) {
+     var escaped = map[character];
+     if (escaped) {
+      return escaped;
+     }
+     var code = character.charCodeAt(0).toString(16);
+     return "\\u" + ("0000" + code).slice(-4);
+    }
+   ) + '"';
+  }
+  function serialize(item) {
+   var type = typeof item;
+   var result = [];
+   var key;
+   var index;
+   if (item === null) {
+    return "null";
+   }
+   if (type === "string") {
+    return quoteString(item);
+   }
+   if (type === "number") {
+    return isFinite(item) ? String(item) : "null";
+   }
+   if (type === "boolean") {
+    return item ? "true" : "false";
+   }
+   if (type === "undefined" || type === "function") {
+    return undefined;
+   }
+   if (Object.prototype.toString.call(item) === "[object Array]") {
+    for (index = 0; index < item.length; index++) {
+     var arrayValue = serialize(item[index]);
+     result.push(arrayValue === undefined ? "null" : arrayValue);
+    }
+    return "[" + result.join(",") + "]";
+   }
+   for (key in item) {
+    if (Object.prototype.hasOwnProperty.call(item, key)) {
+     var objectValue = serialize(item[key]);
+     if (objectValue !== undefined) {
+      result.push(quoteString(key) + ":" + objectValue);
+     }
+    }
+   }
+   return "{" + result.join(",") + "}";
+  }
+  return serialize(value);
+ };
+}
+if (typeof JSON.parse !== "function") {
+ JSON.parse = function(text) {
+  var source = String(text);
+  var safe = /^[\],:{}\s]*$/.test(
+   source
+    .replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, "@")
+    .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, "]")
+    .replace(/(?:^|:|,)(?:\s*\[)+/g, "")
+  );
+  if (!safe) {
+   throw new SyntaxError("Invalid JSON text");
+  }
+  return eval("(" + source + ")");
+ };
+}
+var shell=new ActiveXObject("WScript.Shell");
+var fso=new ActiveXObject("Scripting.FileSystemObject");
+var context=null;
+var masterStatusPath="";
+var vrnSources=[];
+var vdfSources=[];
+var timerId=0;
+var running=false;
+var viewPaths={basic:"",financial:"",matrix:"",risk:""};
+
+function byId(id){return document.getElementById(id);}
+function quote(value){return '"' + String(value).replace(/"/g,'""') + '"';}
+function setText(id,value){var n=byId(id);if(n){n.innerText=value===undefined||value===null?"":String(value);}}
+function setHtml(id,value){var n=byId(id);if(n){n.innerHTML=value;}}
+function selfPath(){
+ var p=decodeURI(location.pathname).replace(/\//g,"\\");
+ if(p.length>2&&p.charAt(0)==="\\"&&p.charAt(2)===":"){p=p.substring(1);}
+ return p;
+}
+function jsonRead(path){
+ if(!path||!fso.FileExists(path)){return null;}
+ var s=new ActiveXObject("ADODB.Stream");s.Type=2;s.Charset="utf-8";s.Open();s.LoadFromFile(path);
+ var t=s.ReadText();s.Close();t=String(t).replace(/^\uFEFF/,"");return JSON.parse(t);
+}
+function jsonWrite(path,obj){
+ var s=new ActiveXObject("ADODB.Stream");s.Type=2;s.Charset="utf-8";s.Open();s.WriteText(JSON.stringify(obj));s.SaveToFile(path,2);s.Close();
+}
+function log(text){
+ var box=byId("log");box.innerText+="\r\n"+new Date().toLocaleTimeString()+"  "+text;box.scrollTop=box.scrollHeight;
+}
+function switchPage(name){
+ var names=["home","vrn","vdf","basic","financial","matrix","risk","registry","deploy","logs"];
+ var labels={
+  home:["統一首頁 · 啟動與摘要","Unified launch, progress and 20 accelerators"],
+  vrn:["VRN · Research Intake","Broker reports, manifest and report queue"],
+  vdf:["VDF · Data Forge","Data sources, dates, universe and update mode"],
+  basic:["Basic Info","Latest VDF Basic Info output"],
+  financial:["Financial Data","Latest VDF Financial Data output"],
+  matrix:["三輪 HTML Matrix","Errors, optimization, Hydra, dependencies and repair order"],
+  risk:["Hydra / SSOT","Risk and alignment evidence"],
+  registry:["MODULE / ENGINE / FUNCTION-LIB / OTHERS","Libraries, functions and code registry"],
+  deploy:["Deployment","Runtime deployment and sandbox candidates"],
+  logs:["Execution Logs","Dynamic narration and worker evidence"]
+ };
+ for(var i=0;i<names.length;i++){
+  var page=names[i];byId("page-"+page).className="page"+(page===name?" active":"");byId("nav-"+page).className=page===name?"active":"";
+ }
+ setText("pageTitle",labels[name][0]);setText("pageSubtitle",labels[name][1]);
+ if(name==="basic"||name==="financial"||name==="matrix"||name==="risk"){loadView(name);}
+}
+function toFileUrl(path){if(!path){return "";}return "file:///"+encodeURI(String(path).replace(/\\/g,"/").replace(/^\/+/,""));}
+function setView(name,path){viewPaths[name]=path||"";setText(name+"Path",viewPaths[name]||"尚未找到對應輸出");}
+
+function applyFrameScale(frame){
+ try{
+  var d=frame.contentWindow.document;
+  var h=d.getElementsByTagName("head")[0];
+  if(!h){return;}
+  var s=d.createElement("style");s.type="text/css";
+  var css=
+   "html,body{font-size:clamp(9px,.72vw,11px)!important;line-height:1.45!important;}"+
+   "h1{font-size:clamp(17px,1.8vw,22px)!important;font-weight:800!important;}"+
+   "h2{font-size:clamp(12px,1.1vw,15px)!important;font-weight:800!important;}"+
+   "table,th,td{font-size:clamp(8px,.68vw,10px)!important;line-height:1.42!important;white-space:normal!important;overflow-wrap:anywhere!important;word-wrap:break-word!important;word-break:break-word!important;}"+
+   "input,select,button{font-size:10px!important;min-height:32px!important;}"+
+   "@media(max-width:760px){html,body{font-size:12px!important;}table,th,td{font-size:10px!important;}input,select,button{font-size:12px!important;min-height:36px!important;}}";
+  if(s.styleSheet){s.styleSheet.cssText=css;}else{s.appendChild(d.createTextNode(css));}
+  h.appendChild(s);
+ }catch(e){log("Frame proportional scale skipped: "+e.message);}
+}
+
+function loadView(name){
+ var path=viewPaths[name],frame=byId(name+"Frame"),empty=byId(name+"Empty");
+ if(path&&fso.FileExists(path)){frame.style.display="block";empty.style.display="none";frame.onload=function(){applyFrameScale(frame);};frame.src=toFileUrl(path)+(name==="risk"?"#hydra":"");}
+ else{frame.style.display="none";frame.src="about:blank";empty.style.display="block";}
+}
+function openView(name){var p=viewPaths[name];if(p&&fso.FileExists(p)){shell.Run(quote(p),1,false);}else{log("Output not found: "+name);}}
+function runDialog(mode,current){
+ var result=context.session_root+"\\dialog_"+mode+"_"+new Date().getTime()+".json";
+ var cmd=quote(context.pwsh_path)+" -NoLogo -NoProfile -Sta -ExecutionPolicy Bypass -File "+quote(context.dialog_helper)+" -Mode "+quote(mode)+" -Output "+quote(result)+" -Current "+quote(current||"");
+ shell.Run(cmd,0,true);var value=jsonRead(result);if(!value){return [];}if(value instanceof Array){return value;}return [value];
+}
+function browseFolder(id){var v=runDialog("Folder",byId(id).value);if(v.length){byId(id).value=v[0];}}
+function browseFile(id){var v=runDialog("File",byId(id).value);if(v.length){byId(id).value=v[0];}}
+function addSources(kind){
+ var current=kind==="vrn"?byId("vrnInput").value:byId("vdfInput").value;
+ var values=runDialog(kind==="vrn"?"Reports":"DataFiles",current);
+ var target=kind==="vrn"?vrnSources:vdfSources;
+ for(var i=0;i<values.length;i++){target.push({kind:"file",path:values[i]});}
+ renderQueues();
+}
+function addFolder(kind){
+ var current=kind==="vrn"?byId("vrnInput").value:byId("vdfInput").value;
+ var values=runDialog("Folder",current);if(values.length){(kind==="vrn"?vrnSources:vdfSources).push({kind:"folder",path:values[0]});renderQueues();}
+}
+function renderQueue(id,values){
+ var box=byId(id);box.innerHTML="";
+ if(!values.length){box.innerHTML='<div class="queueItem">尚未增加額外輸入。</div>';return;}
+ for(var i=0;i<values.length;i++){
+  var row=document.createElement("div");row.className="queueItem";
+  var text=document.createElement("span");text.innerText=values[i].path;
+  var remove=document.createElement("button");remove.innerText="移除";remove.setAttribute("data-index",i);remove.setAttribute("data-kind",id);
+  remove.onclick=function(){var index=parseInt(this.getAttribute("data-index"),10);if(this.getAttribute("data-kind")==="vrnQueue"){vrnSources.splice(index,1);}else{vdfSources.splice(index,1);}renderQueues();};
+  row.appendChild(text);row.appendChild(remove);box.appendChild(row);
+ }
+}
+function renderQueues(){renderQueue("vrnQueue",vrnSources);renderQueue("vdfQueue",vdfSources);setText("sideVrn",vrnSources.length);setText("sideVdf",vdfSources.length);setText("vrnCount",vrnSources.length);setText("vdfCount",vdfSources.length);}
+function bindDrop(id,kind){
+ var node=byId(id);node.ondragenter=function(){this.className="drop active";return false;};node.ondragover=function(){return false;};node.ondragleave=function(){this.className="drop";return false;};
+ node.ondrop=function(event){
+  event.returnValue=false;var target=kind==="vrn"?vrnSources:vdfSources;
+  try{var files=event.dataTransfer.files;for(var i=0;i<files.length;i++){var p=files[i].path||files[i].value||files[i].name;if(p&&fso.FileExists(p)){target.push({kind:"drag",path:p});}else{log("Explorer did not provide a full Windows path.");}}}
+  catch(e){log("Drop: "+e.message);}this.className="drop";renderQueues();return false;
+ };
+}
+function collectConfig(action){
+ var runDir=byId("base").value+"\\_via_unified_workbench_runs\\RUN_"+new Date().getTime()+"_VIA_UNIFIED_v0163A";
+ return {
+  version:"v0163A",action:action,base:byId("base").value,run_dir:runDir,status_path:masterStatusPath,
+  auto_fix:byId("autoFix").checked,open_html:byId("openHtml").checked,
+  vrn:{input:byId("vrnInput").value,manifest:byId("vrnManifest").value,python:byId("python").value,timeout:parseInt(byId("timeout").value,10),recursive:true,openHtml:false,sources:vrnSources},
+  vdf:{input:byId("vdfInput").value,startDate:byId("startDate").value,endDate:byId("endDate").value,universe:byId("universe").value,updateMode:byId("updateMode").value,openHtml:false,recursive:true,timeoutSeconds:parseInt(byId("timeout").value,10),sources:vdfSources}
+ };
+}
+function startAction(action){
+ if(running){return;}var cfg=collectConfig(action);jsonWrite(context.worker_config,cfg);
+ if(fso.FileExists(masterStatusPath)){try{fso.DeleteFile(masterStatusPath,true);}catch(e){}}
+ var cmd=quote(context.pwsh_path)+" -NoLogo -NoProfile -ExecutionPolicy Bypass -File "+quote(context.master_script)+" -Worker -WorkerConfig "+quote(context.worker_config);
+ running=true;setButtons(true);setHtml("state",'<span class="pill warn">STARTING</span>');setText("narration","Launching "+action+" workers.");log("Action started: "+action);shell.Run(cmd,0,false);timerId=window.setInterval(pollStatus,650);
+}
+function setButtons(disabled){var ids=["runAll","runAnalysis","runVrn","runVdf"];for(var i=0;i<ids.length;i++){byId(ids[i]).disabled=disabled;}}
+function pollStatus(){
+ var s=null;try{s=jsonRead(masterStatusPath);}catch(e){return;}if(!s){return;}
+ var p=parseInt(s.percent||0,10);byId("bar").style.width=p+"%";
+ var cls=s.state==="COMPLETED"?"pill ok":s.state==="FAILED"?"pill bad":"pill warn";
+ setHtml("state",'<span class="'+cls+'">'+s.state+'</span>');setText("sideState",s.state);setText("sideProgress",p+"%");setText("summaryProgress",p+"%");
+ setText("narration",s.narration||s.message||"");setText("sideGate",s.gate||"—");setText("summaryGate",s.gate||"—");
+ if(s.current_round!==undefined){setText("summaryRound",s.current_round+"/3");}
+ if(s.matrix_report){setView("matrix",s.matrix_report);setView("risk",s.matrix_report);}
+ if(s.basic_info_page){setView("basic",s.basic_info_page);}
+ if(s.financial_data_page){setView("financial",s.financial_data_page);}
+ if(s.summary){setText("files",s.summary.files);setText("files2",s.summary.files);setText("red",s.summary.red);setText("yellow",s.summary.yellow);setText("green",s.summary.green);}
+ if(s.hydra_count!==undefined){setText("hydra",s.hydra_count);setText("hydra2",s.hydra_count);}
+ if(s.ssot_group_count!==undefined){setText("ssot",s.ssot_group_count);}
+ if(s.repair_candidate_count!==undefined){setText("repairs",s.repair_candidate_count);setText("repairs2",s.repair_candidate_count);}
+ if(s.library_registry){
+  setText("libraryRegistry","Python "+(s.python_package_count||0)+" · PowerShell "+(s.powershell_module_count||0)+"\n"+s.library_registry);
+ }
+ if(s.function_registry){
+  setText("functionRegistry",(s.function_count||0)+" symbols\n"+s.function_registry);
+ }
+ if(s.supportive_registry){
+  setText("supportiveRegistry",(s.supportive_module_count||0)+" files\n"+s.supportive_registry);
+ }
+ if(s.ssot_registry){
+  setText("ssotRegistry",(s.ssot_record_count||0)+" records\n"+s.ssot_registry);
+ }
+ if(s.deployment_manifest){setText("deploymentManifest",s.deployment_manifest);}
+ if(s.run_dir){setText("runDirPath",s.run_dir);byId("openRun").disabled=false;byId("openRun").setAttribute("data-path",s.run_dir);}
+ if(s.vrn_report){setText("vrnReport",s.vrn_report);}
+ if(s.vdf_gate){setText("vdfGate",s.vdf_gate);}
+ if(s.vrn_gate){setText("vrnGate",s.vrn_gate);}
+ if(s.terminal){
+  window.clearInterval(timerId);running=false;setButtons(false);log(s.state+": "+(s.narration||s.message||""));if(s.error_message){log("Error: "+s.error_message);}
+  if(s.state==="COMPLETED"&&byId("openHtml").checked&&s.matrix_report){shell.Run(quote(s.matrix_report),1,false);}
+ }
+}
+function openPath(button){var p=button.getAttribute("data-path");if(p){shell.Run(quote(p),1,false);}}
+function init(){
+ var dir=fso.GetParentFolderName(selfPath());context=jsonRead(dir+"\\ui_context.json");masterStatusPath=context.status_path;
+ byId("base").value=context.base;byId("python").value=context.python;byId("timeout").value="2400";
+ byId("vrnInput").value=context.defaults.vrn_input;byId("vrnManifest").value=context.defaults.vrn_manifest;
+ byId("vdfInput").value=context.defaults.vdf_input;byId("startDate").value=context.defaults.start_date;byId("endDate").value="";
+ byId("universe").value="DEFAULT";byId("updateMode").value="Incremental";byId("autoFix").checked=true;byId("openHtml").checked=true;
+ renderQueues();bindDrop("vrnDrop","vrn");bindDrop("vdfDrop","vdf");switchPage("home");var sw=screen.availWidth||1366;var sh=screen.availHeight||768;var ww=Math.floor(sw*.96);var wh=Math.floor(sh*.92);if(ww<980){ww=980;}if(wh<680){wh=680;}window.resizeTo(ww,wh);window.moveTo(Math.max(0,Math.floor((sw-ww)/2)),Math.max(0,Math.floor((sh-wh)/2)));if(context.auto_launch_all){ setText("narration","AUTO · 自動部署完成，準備執行 LAUNCH ALL。"); window.setTimeout(function(){startAction("ALL");},900);}
+}
+window.onload=init;
+</script>
+</head>
+<body>
+<div class="topbar"></div>
+<aside class="sidebar">
+<div class="brand"><div class="k">VERITAS INTELLIGENCE ANALYTICS</div><h2>Unified <span>Workbench</span></h2><p>VRN · VDF · VAP · Others · v0163A</p></div>
+<div class="group"><div class="groupTitle">Operations</div><div class="nav">
+<button id="nav-home" onclick="switchPage('home')"><span class="n">01</span>HOME · LAUNCH</button>
+<button id="nav-vrn" onclick="switchPage('vrn')"><span class="n">02</span>VRN INPUT</button>
+<button id="nav-vdf" onclick="switchPage('vdf')"><span class="n">03</span>VDF INPUT</button>
+<button id="nav-basic" onclick="switchPage('basic')"><span class="n">04</span>BASIC INFO</button>
+<button id="nav-financial" onclick="switchPage('financial')"><span class="n">05</span>FINANCIAL DATA</button>
+</div></div>
+<div class="group"><div class="groupTitle">Governance Matrix</div><div class="nav">
+<button id="nav-matrix" onclick="switchPage('matrix')"><span class="n">06</span>3-ROUND MATRIX</button>
+<button id="nav-risk" onclick="switchPage('risk')"><span class="n">07</span>HYDRA / SSOT</button>
+<button id="nav-registry" onclick="switchPage('registry')"><span class="n">08</span>REGISTRY</button>
+<button id="nav-deploy" onclick="switchPage('deploy')"><span class="n">09</span>DEPLOYMENT</button>
+<button id="nav-logs" onclick="switchPage('logs')"><span class="n">10</span>EXECUTION LOGS</button>
+</div></div>
+<div class="sideMetrics">
+<div class="sm"><div class="k">STATE</div><div id="sideState" class="v">READY</div></div>
+<div class="sm"><div class="k">PROGRESS</div><div id="sideProgress" class="v">0%</div></div>
+<div class="sm"><div class="k">VRN FILES</div><div id="sideVrn" class="v">0</div></div>
+<div class="sm"><div class="k">VDF FILES</div><div id="sideVdf" class="v">0</div></div>
+<div class="sm"><div class="k">GATE</div><div id="sideGate" class="v">—</div></div>
+</div>
+<div style="margin-top:13px"><button style="width:100%" onclick="window.close()">CLOSE WORKBENCH</button></div>
+</aside>
+<div class="workspace"><div class="inner">
+<header><div class="kicker">AUTOMATIC SANDBOX TEST & REPAIR · 20 ACCELERATORS · THREE ROUNDS</div><h1 id="pageTitle">統一首頁 · 啟動與摘要</h1><p id="pageSubtitle" class="sub">Unified launch, progress and 20 accelerators</p></header>
+
+<section id="page-home" class="page active">
+<div class="hero">
+<div class="card"><div id="summaryProgress" class="v">0%</div><div class="l">PROGRESS</div></div>
+<div class="card"><div id="summaryRound" class="v">0/3</div><div class="l">ROUND</div></div>
+<div class="card"><div id="files" class="v">—</div><div class="l">FILES</div></div>
+<div class="card"><div id="green" class="v" style="color:#5a9e6f">—</div><div class="l">GREEN</div></div>
+<div class="card"><div id="yellow" class="v" style="color:#c4943a">—</div><div class="l">YELLOW</div></div>
+<div class="card"><div id="red" class="v" style="color:#c96b5a">—</div><div class="l">RED</div></div>
+<div class="card"><div id="hydra" class="v">—</div><div class="l">HYDRA</div></div>
+<div class="card"><div id="repairs" class="v">—</div><div class="l">SANDBOX CANDIDATES</div></div>
+<div class="card" style="min-width:285px"><div id="summaryGate" class="v" style="font:700 8px/1.3 Consolas,monospace">—</div><div class="l">LATEST GATE</div></div>
+</div>
+<div class="columns">
+<div class="mainColumn">
+<h2>Unified Runtime <span class="en">one PowerShell · one HTML UI</span></h2>
+<div class="panel homePanel"><div class="grid">
+<div class="field full"><label>Base · VIA 母系統</label><div class="row"><input id="base" type="text"><button onclick="browseFolder('base')">WINDOWS SEARCH</button></div></div>
+<div class="field full"><label>Python Engine</label><div class="row"><input id="python" type="text"><button onclick="browseFile('python')">SEARCH</button></div></div>
+<div class="field"><label>Timeout Seconds</label><input id="timeout" type="number" min="60" max="86400" step="60"></div>
+<div class="field"><label>Sandbox Auto-Fix</label><div class="check"><input id="autoFix" type="checkbox"><span>只修 sandbox copy</span></div></div>
+<div class="field"><label>Open Matrix HTML</label><div class="check"><input id="openHtml" type="checkbox"><span>完成後開啟報告</span></div></div>
+<div class="field"><label>Canonical Mutation</label><div class="check"><span class="pill bad">BLOCKED</span><span>需另行 hash-locked promotion</span></div></div>
+</div></div>
+<h2>20 Accelerators <span class="en">all enabled with explicit implementation mode</span></h2>
+<div class="accelGrid">
+<div class="accel"><b>A01–A05</b><span>AST · semantic tags · Hydra · topology · sandbox</span></div>
+<div class="accel"><b>A06–A10</b><span>repair suggestions · 3 rounds · SSOT · matrix · clustering</span></div>
+<div class="accel"><b>A11–A15</b><span>complexity · multi-system · rollback · regression · repair order</span></div>
+<div class="accel"><b>A16–A20</b><span>progress · narration · non-blocking · engines · runtime deploy</span></div>
+</div>
+</div>
+<div class="asideColumn">
+<h2>One-Click Actions <span class="en">non-blocking workers</span></h2>
+<div class="panel homePanel">
+<div class="actions">
+<button id="runAll" class="all" onclick="startAction('ALL')">LAUNCH ALL</button>
+<button id="runAnalysis" class="primary" onclick="startAction('UNIFIED')">3-ROUND ANALYSIS</button>
+<button id="runVrn" class="vrn" onclick="startAction('VRN')">RUN VRN</button>
+<button id="runVdf" class="vdf" onclick="startAction('VDF')">RUN VDF</button>
+<button id="openRun" disabled onclick="openPath(this)">OPEN RUNDIR</button>
+</div>
+<div class="progressOuter"><div id="bar" class="progressInner"></div></div>
+<div class="hint" style="margin:0 0 10px"><b>AUTO MODE · 自動模式：</b>本啟動器預設在 UI 載入後自動執行 LAUNCH ALL；使用 <span class="code">-UiOnly</span> 可只開啟介面。</div>
+<div class="status">
+<div class="k">STATE</div><div id="state"><span class="pill mut">READY</span></div>
+<div class="k">NARRATION</div><div id="narration">等待操作。</div>
+<div class="k">VRN GATE</div><div id="vrnGate" class="code">—</div>
+<div class="k">VDF GATE</div><div id="vdfGate" class="code">—</div>
+<div class="k">RUNDIR</div><div id="runDirPath" class="code">—</div>
+</div>
+</div>
+</div></div>
+</section>
+
+<section id="page-vrn" class="page"><h2>VRN Research Intake <span class="en">reports + manifest + disabled drafts</span></h2>
+<div class="panel vrnPanel"><div class="grid">
+<div class="field full"><label>VRN Input</label><div class="row"><input id="vrnInput" type="text"><button onclick="browseFolder('vrnInput')">SEARCH</button></div></div>
+<div class="field full"><label>VRN Manifest</label><div class="row"><input id="vrnManifest" type="text"><button onclick="browseFile('vrnManifest')">SEARCH</button></div></div>
+</div>
+<div id="vrnDrop" class="drop"><b>拖曳投資研究報告</b><span>PDF / Word / Excel / HTML / JSON / TXT</span></div>
+<div class="actions"><button onclick="addSources('vrn')">SELECT REPORTS</button><button onclick="addFolder('vrn')">SELECT FOLDER</button><button onclick="vrnSources=[];renderQueues()">CLEAR</button><span id="vrnCount" class="pill mut">0</span></div>
+<div id="vrnQueue" class="queue"></div><div class="hint">VRN 延續 v0159/v0156 治理：新增資料只產生 enabled=false draft，不自動 promotion。</div></div></section>
+
+<section id="page-vdf" class="page"><h2>VDF Data Forge <span class="en">data sources + market facts</span></h2>
+<div class="panel vdfPanel"><div class="grid">
+<div class="field full"><label>VDF Input</label><div class="row"><input id="vdfInput" type="text"><button onclick="browseFolder('vdfInput')">SEARCH</button></div></div>
+<div class="field"><label>Start Date</label><input id="startDate" type="text" placeholder="yyyy-mm-dd"></div>
+<div class="field"><label>End Date</label><input id="endDate" type="text" placeholder="blank = open"></div>
+<div class="field full"><label>Universe / Tickers</label><input id="universe" type="text" value="DEFAULT"></div>
+<div class="field"><label>Update Mode</label><select id="updateMode"><option>Incremental</option><option>Refresh</option><option>ValidateOnly</option><option>DryRun</option></select></div>
+</div>
+<div id="vdfDrop" class="drop"><b>拖曳 VDF 資料來源</b><span>CSV / Excel / JSON / Parquet / DuckDB / SQLite</span></div>
+<div class="actions"><button onclick="addSources('vdf')">SELECT DATA FILES</button><button onclick="addFolder('vdf')">SELECT FOLDER</button><button onclick="vdfSources=[];renderQueues()">CLEAR</button><span id="vdfCount" class="pill mut">0</span></div>
+<div id="vdfQueue" class="queue"></div></div></section>
+
+<section id="page-basic" class="page"><h2>Basic Info <span class="en">VDF primary output</span></h2><div class="panel vdfPanel"><div class="viewerTop"><div><span class="pill" style="background:#4c78a8">BASIC INFO</span><div id="basicPath" class="viewerPath"></div></div><div class="actions"><button onclick="loadView('basic')">RELOAD</button><button onclick="openView('basic')">OPEN EXTERNAL</button></div></div><div class="frameWrap"><div id="basicEmpty" class="empty"><b>尚未找到 Basic Info HTML</b>執行 VDF 或 Launch All 後自動更新。</div><iframe id="basicFrame" style="display:none"></iframe></div></div></section>
+<section id="page-financial" class="page"><h2>Financial Data <span class="en">VDF primary output</span></h2><div class="panel matrixPanel"><div class="viewerTop"><div><span class="pill" style="background:#7a6daa">FINANCIAL DATA</span><div id="financialPath" class="viewerPath"></div></div><div class="actions"><button onclick="loadView('financial')">RELOAD</button><button onclick="openView('financial')">OPEN EXTERNAL</button></div></div><div class="frameWrap"><div id="financialEmpty" class="empty"><b>尚未找到 Financial Data HTML</b>執行 VDF 或 Launch All 後自動更新。</div><iframe id="financialFrame" style="display:none"></iframe></div></div></section>
+
+<section id="page-matrix" class="page"><h2>Three-Round HTML Matrix <span class="en">small font · auto layout · wrap</span></h2><div class="panel matrixPanel"><div class="viewerTop"><div><span class="pill" style="background:#7a6daa">MATRIX</span><div id="matrixPath" class="viewerPath"></div></div><div class="actions"><button onclick="loadView('matrix')">RELOAD</button><button onclick="openView('matrix')">OPEN EXTERNAL</button></div></div><div class="frameWrap"><div id="matrixEmpty" class="empty"><b>尚未執行三輪分析</b>按首頁 3-ROUND ANALYSIS 或 LAUNCH ALL。</div><iframe id="matrixFrame" style="display:none"></iframe></div></div></section>
+<section id="page-risk" class="page"><h2>Hydra / SSOT Matrix <span class="en">risk and authority alignment</span></h2><div class="panel riskPanel"><div class="hero"><div class="card"><div id="ssot" class="v">—</div><div class="l">SSOT GROUPS</div></div><div class="card"><div id="hydra2" class="v">see report</div><div class="l">HYDRA DETAILS</div></div></div><div class="viewerTop"><div><div id="riskPath" class="viewerPath"></div></div><div class="actions"><button onclick="loadView('risk')">RELOAD</button><button onclick="openView('risk')">OPEN EXTERNAL</button></div></div><div class="frameWrap"><div id="riskEmpty" class="empty"><b>Hydra / SSOT 尚未產生</b>三輪分析完成後顯示。</div><iframe id="riskFrame" style="display:none"></iframe></div></div></section>
+
+<section id="page-registry" class="page"><h2>Registry <span class="en">MODULE / ENGINE / FUNCTION-LIB / OTHERS</span></h2><div class="panel registryPanel">
+<div class="registryGrid">
+<div class="registryCard"><div class="l">LIBRARIES · 函式庫</div><div id="libraryRegistry" class="v">—</div></div>
+<div class="registryCard"><div class="l">FUNCTIONS · 函式／類別</div><div id="functionRegistry" class="v">—</div></div>
+<div class="registryCard"><div class="l">SUPPORTIVE MODULES · 支援模組</div><div id="supportiveRegistry" class="v">—</div></div>
+<div class="registryCard"><div class="l">SSOT · 單一事實來源</div><div id="ssotRegistry" class="v">—</div></div>
+<div class="registryCard"><div class="l">VRN REPORT</div><div id="vrnReport" class="v">—</div></div>
+<div class="registryCard"><div class="l">FILES</div><div id="files2" class="v">See matrix</div></div>
+<div class="registryCard"><div class="l">IMPORT POLICY</div><div class="v">REGISTER ALL / IMPORT APPROVED</div></div>
+</div><div class="hint">所有函式庫皆建立 inventory；不盲目 import 或執行未知模組。功能擴充以 sandbox candidate 與 extension matrix 呈現。</div></div></section>
+
+<section id="page-deploy" class="page"><h2>Deployment <span class="en">runtime automatic · canonical review-only</span></h2><div class="panel registryPanel">
+<div class="registryGrid">
+<div class="registryCard"><div class="l">RUNTIME DEPLOYMENT</div><div class="v">AUTOMATIC</div></div>
+<div class="registryCard"><div class="l">CANONICAL MUTATION</div><div class="v" style="color:#c96b5a">BLOCKED</div></div>
+<div class="registryCard"><div class="l">REPAIR CANDIDATES</div><div id="repairs2" class="v">See summary</div></div>
+<div class="registryCard"><div class="l">DEPLOYMENT MANIFEST</div><div id="deploymentManifest" class="v">—</div></div>
+</div><div class="hint">沙盒修正通過回歸後只列為 deployment candidate；真正寫回 VRN/VDF/VAP canonical 必須另開單程序、exact-hash、backup、hash-chain transaction。</div></div></section>
+
+<section id="page-logs" class="page"><h2>Execution Logs <span class="en">dynamic status narration</span></h2><div class="panel logPanel"><div class="actions"><button onclick="byId('log').innerText='VIA Unified Workbench ready.'">CLEAR DISPLAY</button></div><div id="log" class="log">VIA Unified Workbench ready.</div></div></section>
+<div class="footer">VIA Unified Workbench v0163A · one PowerShell · one HTML U/I · exactly three rounds · sandbox repair only · runtime auto-deploy · 理</div>
+</div></div>
+</body></html>

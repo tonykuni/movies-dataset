@@ -1,8 +1,18 @@
-﻿#requires -Version 7.0
+#requires -Version 7.0
 param(
     [switch]$OpenWorkbench,
     [switch]$OpenReport
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
@@ -13,8 +23,8 @@ $ErrorActionPreference = "Stop"
 
 $BaseDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $EnvPython = Join-Path $env:USERPROFILE "envs\via_meeting_data_312\Scripts\python.exe"
-$Engine = Join-Path $BaseDir "via_meetingloop_engine.py"
-$Acceptance = Join-Path $BaseDir "via_duck_parquet_acceptance.py"
+$Engine = Join-Path $BaseDir "VIA_ENG019_MeetingloopEngine.py"
+$Acceptance = Join-Path $BaseDir "VIA_ENG018_DuckParquetAcceptance.py"
 $DataReport = Join-Path $BaseDir "DATA_ENV_ACCEPTANCE_REPORT.json"
 $UxPayload = Join-Path $BaseDir "UX_DUCKDB_PAYLOAD.json"
 $FinalReport = Join-Path $BaseDir "FULL_UX_DATA_ACCEPTANCE_REPORT.json"
@@ -91,3 +101,4 @@ catch {
     Write-Host "def Gate : FULL_UX_DATA_REJECTED" -ForegroundColor Red
     exit 1
 }
+

@@ -24,6 +24,16 @@ param(
   [string]$Roots = "",
   [int]$Rounds = 0
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Continue"
 try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch {}
 $env:PYTHONIOENCODING = "utf-8"
@@ -54,8 +64,8 @@ if ($null -eq $Py) {
   Write-Host "  ✗ Python 解譯器缺(py/python/python3 皆未尋獲)——誠實停" -ForegroundColor Red
   exit 2
 }
-$DepEng = Get-NewestEngine "via_dep_super_v0*.py"
-$RebEng = Get-NewestEngine "via_env_rebuild_v0*.py"
+$DepEng = Get-NewestEngine "CGC_MDL046_DepSuper_v0*.py"
+$RebEng = Get-NewestEngine "CGC_MDL050_EnvRebuild_v0*.py"
 if ((-not $DepEng) -or (-not $RebEng)) {
   Write-Host "  ✗ 引擎缺(via_dep_super/via_env_rebuild 未尋獲)——誠實停" -ForegroundColor Red
   exit 2
@@ -163,3 +173,4 @@ Write-Host "  存證:VIA_Reports\depsuper_runs + VIA_Reports\rebuild_runs(JSON+�
 Write-Host "  候裁事項(切換/移除/YELLOW·RED 段)見 ③ 輸出——操作員裁後另跑;安裝亦可走 via-plan→via-install"
 Write-Host ("  出口碼:" + $Final)
 exit $Final
+

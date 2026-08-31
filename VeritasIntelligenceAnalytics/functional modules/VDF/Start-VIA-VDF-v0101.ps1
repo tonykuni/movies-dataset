@@ -5,6 +5,16 @@ Start-VIA-VDF-v0101 · repo-rooted successor of the recovered Downloads-era Star
 Same fail-closed gate: SHA256 + AST validation of the canonical v0160A launcher, then hand-off.
 Paths are self-locating so the gate holds wherever the repo is cloned.
 #>
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Stop"
 
 $Base = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
@@ -38,3 +48,4 @@ if (@($Errors).Count -gt 0) {
 }
 
 & $Launcher -Base $Base @args
+

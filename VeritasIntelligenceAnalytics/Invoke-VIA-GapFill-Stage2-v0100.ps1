@@ -25,6 +25,16 @@ param(
     [switch]$NoPromote,
     [switch]$NoPush
 )
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Continue"
 $WorkOps = Join-Path $RepoRoot "functional modules\WorkOps"
 $Engines = Join-Path $WorkOps "engines"
@@ -190,3 +200,4 @@ $bad = @($Steps | Where-Object { $_.結果 -eq "FAIL" }).Count
 $Steps | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $stage "stage2_report.json") -Encoding UTF8
 Write-Host ("[總結] GapFill Stage-2 {0}(報告:{1})" -f $(if ($bad -eq 0) { "PASS" } else { "FAIL($bad)" }), (Join-Path $stage "stage2_report.json")) -ForegroundColor $(if ($bad -eq 0) { "Green" } else { "Red" })
 if ($bad -eq 0) { exit 0 } else { exit 1 }
+

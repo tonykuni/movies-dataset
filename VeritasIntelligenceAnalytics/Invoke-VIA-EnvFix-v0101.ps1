@@ -12,6 +12,16 @@ v0101 修正(依操作員機實跑證據):
 慣例:無 Read-Host、無 exit;失敗誠實 FAIL 續行;輸出 run-local。回退=改跑 v0100。
 #>
 param([string[]]$Packages = @("duckdb", "rich", "scipy", "numpy", "pandas"))
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Continue"
 $VIA = $PSScriptRoot
 $RunDir = Join-Path $VIA "VIA_Reports\envmgr_run"
@@ -76,3 +86,4 @@ Write-Host ""
 $Results | Format-Table -AutoSize
 $bad = ($Results | Where-Object { $_.結果 -like "FAIL*" }).Count
 Write-Host ($bad -eq 0 ? "[總結] 依賴層綠燈 — via-mega / via-fis / via-bridge 滿配可跑" : "[總結] 有 FAIL,見上表逐列") -ForegroundColor ($bad -eq 0 ? "Green" : "Red")
+

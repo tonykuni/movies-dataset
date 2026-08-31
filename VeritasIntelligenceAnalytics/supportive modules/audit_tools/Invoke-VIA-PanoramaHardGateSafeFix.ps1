@@ -1,4 +1,14 @@
 # def PARAMETERS
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $def_ROOT = "C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics\module"
 $def_SUPPORTIVE_ROOT = Join-Path $def_ROOT "supportive_module"
 $def_HARDGATE_RUNNER = Join-Path $def_SUPPORTIVE_ROOT "Invoke-VIA-SupportiveHardGate.ps1"
@@ -190,3 +200,4 @@ Write-Host "[HardGate] $def_HardGatePass" -ForegroundColor Green
 Write-Host "[JSON] $def_JSON" -ForegroundColor Green
 Write-Host "[HTML] $def_HTML" -ForegroundColor Green
 Write-Host "[Policy] 不直接修正；先產生定位點、風險、修正許可矩陣。" -ForegroundColor Yellow
+

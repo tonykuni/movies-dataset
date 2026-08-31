@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VeritasAutoPlot™ T04 — Heatmap</title>
+<script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+<style>
+:root{
+  --sb-blue:#4C72B0;--sb-orange:#DD8452;--sb-green:#55A868;--sb-red:#C44E52;
+  --sb-purple:#8172B3;--sb-gray:#8C8C8C;--sb-cyan:#64B5CD;
+  --bg:#FFFFFF;--bg2:#F7F6F3;--bg3:#EFEEE9;
+  --tx1:#37352F;--tx2:#6B6B6B;--tx3:#9B9A97;--bd:#E8E7E4;
+  --font:'Inter','Noto Sans TC',-apple-system,sans-serif;
+  --radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg2);color:var(--tx1);padding:24px}
+.header{text-align:center;margin-bottom:18px}
+.header h1{font-size:clamp(16px,2.5vw,22px);font-weight:600;letter-spacing:-.3px}
+.header .sub{font-size:13px;color:var(--tx3);margin-top:4px}
+.card{background:var(--bg);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--bd);padding:20px;margin-bottom:14px}
+.ctrl-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.ctrl-group{display:flex;align-items:center;gap:5px}
+.ctrl-group label{font-size:12px;color:var(--tx2);white-space:nowrap}
+select{font-family:var(--font);font-size:12px;border:1px solid var(--bd);border-radius:4px;padding:4px 8px;background:var(--bg);color:var(--tx1);outline:none}
+.chip{display:inline-flex;align-items:center;padding:3px 10px;border-radius:18px;font-size:11px;cursor:pointer;border:1px solid var(--bd);background:var(--bg);transition:.15s;user-select:none}
+.chip.active{background:var(--sb-blue);color:#fff;border-color:var(--sb-blue)}
+.chip:hover{background:var(--bg3)}.chip.active:hover{background:#3a5f96}
+.sep{width:1px;height:22px;background:var(--bd);flex-shrink:0}
+#chart{width:100%;height:clamp(480px,62vh,750px)}
+.footer{text-align:center;font-size:11px;color:var(--tx3);margin-top:12px}
+@media(max-width:768px){body{padding:10px}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>VeritasAutoPlot™ T04 — Heatmap</h1>
+  <div class="sub">Correlation Matrix · Calendar Returns · Sector Performance · Seaborn 高對比度色譜</div>
+</div>
+
+<div class="card">
+  <div class="ctrl-row">
+    <div class="ctrl-group"><label>Type</label>
+      <select id="selType" onchange="render()">
+        <option value="correlation">Correlation Matrix</option>
+        <option value="calendar">Calendar Returns</option>
+        <option value="sector">Sector Performance</option>
+      </select>
+    </div>
+    <div class="ctrl-group"><label>Palette</label>
+      <select id="selPalette" onchange="render()">
+        <option value="rdbu">RdBu (Seaborn)</option>
+        <option value="coolwarm">Coolwarm</option>
+        <option value="viridis">Viridis</option>
+        <option value="greens">Greens</option>
+      </select>
+    </div>
+    <div class="sep"></div>
+    <span class="chip active" id="cAnnot" onclick="toggle(this);render()">Annotations</span>
+    <span class="chip active" id="cBorder" onclick="toggle(this);render()">Cell Border</span>
+  </div>
+  <div id="chart"></div>
+</div>
+
+<div class="footer">VeritasAutoPlot™ · T04 Heatmap · Correlation / Calendar / Sector · Seaborn Diverging Palette</div>
+
+<script>
+function gc(id){return document.getElementById(id).classList.contains('active')}
+function toggle(el){el.classList.toggle('active')}
+const CFG={responsive:true,displayModeBar:false};
+
+/* ═══ Color Scales ═══ */
+const PALETTES={
+  rdbu:[[0,'#4C72B0'],[0.5,'#FFFFFF'],[1,'#C44E52']],
+  coolwarm:[[0,'#3B4CC0'],[0.25,'#8ABBFF'],[0.5,'#F7F7F7'],[0.75,'#F2886D'],[1,'#B40426']],
+  viridis:'Viridis',
+  greens:[[0,'#F7FCF5'],[0.5,'#74C476'],[1,'#00441B']],
+};
+
+/* ═══ Demo Data Generators ═══ */
+function corrData(){
+  const labels=['S&P 500 (^GSPC)','Dow Jones (^DJI)','NASDAQ (^IXIC)','SOX (^SOX)','TWII (^TWII)','USD Index','Gold','Crude Oil'];
+  const n=labels.length;
+  const z=[];
+  /* Realistic-ish correlation matrix */
+  const base=[
+    [1,.97,.95,.85,.72,.15,-.12,.45],
+    [.97,1,.92,.80,.70,.18,-.10,.42],
+    [.95,.92,1,.90,.75,.10,-.15,.40],
+    [.85,.80,.90,1,.78,.05,-.18,.35],
+    [.72,.70,.75,.78,1,-.05,-.08,.30],
+    [.15,.18,.10,.05,-.05,1,-.55,.20],
+    [-.12,-.10,-.15,-.18,-.08,-.55,1,-.10],
+    [.45,.42,.40,.35,.30,.20,-.10,1],
+  ];
+  for(let i=0;i<n;i++){z.push(base[i].slice());}
+  return{labels,z,zmin:-1,zmax:1};
+}
+
+function calendarData(){
+  const years=['2019','2020','2021','2022','2023','2024'];
+  const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const z=years.map(()=>months.map(()=>+(Math.random()*20-8).toFixed(1)));
+  /* inject some realism */
+  z[1][1]=-8.4;z[1][2]=-12.5;z[1][3]=12.7; // COVID
+  z[3][0]=-5.3;z[3][5]=-8.4;z[3][8]=-9.3; // 2022
+  return{x:months,y:years,z,zmin:-15,zmax:15};
+}
+
+function sectorData(){
+  const sectors=['半導體','AI','消費電子','網通','記憶體','車用','PCB','面板'];
+  const periods=['Q1','Q2','Q3','Q4','YTD'];
+  const z=sectors.map(()=>periods.map(()=>+(Math.random()*50-15).toFixed(1)));
+  return{x:periods,y:sectors,z,zmin:-20,zmax:40};
+}
+
+/* ═══ Render ═══ */
+function render(){
+  const type=document.getElementById('selType').value;
+  const palKey=document.getElementById('selPalette').value;
+  const showAnnot=gc('cAnnot');
+  const showBorder=gc('cBorder');
+
+  let data,title;
+  if(type==='correlation'){data=corrData();title='Price Correlation Matrix (Daily Returns)';}
+  else if(type==='calendar'){data=calendarData();title='Monthly Returns Calendar (%)';}
+  else{data=sectorData();title='Sector Performance Heatmap (%)';}
+
+  const cmap=PALETTES[palKey];
+  const isSector=type==='sector';
+  const isCorr=type==='correlation';
+
+  /* Build annotations */
+  const annots=[];
+  if(showAnnot){
+    for(let yi=0;yi<data.z.length;yi++){
+      for(let xi=0;xi<data.z[yi].length;xi++){
+        const v=data.z[yi][xi];
+        const formatted=isCorr?v.toFixed(2):v.toFixed(1)+'%';
+        annots.push({
+          x:isCorr?xi:(data.x?data.x[xi]:xi),
+          y:isCorr?yi:(data.y?data.y[yi]:yi),
+          text:formatted,
+          showarrow:false,
+          font:{size:isCorr?11:10,color:Math.abs(v)>(isCorr?0.6:10)?'#FFF':'#37352F'}
+        });
+      }
+    }
+  }
+
+  const trace={
+    type:'heatmap',
+    z:data.z,
+    colorscale:cmap,
+    zmin:data.zmin,zmax:data.zmax,
+    showscale:true,
+    colorbar:{thickness:15,len:0.6,tickfont:{size:10},title:{text:isCorr?'r':'%',font:{size:11}}},
+    hovertemplate:isCorr?'%{x} ↔ %{y}: %{z:.2f}<extra></extra>':'%{y} · %{x}: %{z:.1f}%<extra></extra>',
+  };
+
+  if(isCorr){
+    trace.x=data.labels;trace.y=data.labels;
+  }else{
+    trace.x=data.x;trace.y=data.y;
+  }
+
+  if(showBorder){trace.xgap=2;trace.ygap=2;}
+
+  const layout={
+    title:{text:title,font:{family:'Inter,Noto Sans TC',size:15,color:'#37352F'},x:0.01,xanchor:'left'},
+    paper_bgcolor:'#FFF',plot_bgcolor:'#FFF',
+    margin:{t:55,r:80,b:isCorr?90:60,l:isCorr?120:90},
+    annotations:annots,
+    xaxis:{tickfont:{size:11,color:'#6B6B6B'},tickangle:isCorr?-45:0,side:'bottom'},
+    yaxis:{tickfont:{size:11,color:'#6B6B6B'},autorange:isCorr?'reversed':true},
+  };
+
+  Plotly.react('chart',[trace],layout,CFG);
+}
+
+render();
+</script>
+</body>
+</html>

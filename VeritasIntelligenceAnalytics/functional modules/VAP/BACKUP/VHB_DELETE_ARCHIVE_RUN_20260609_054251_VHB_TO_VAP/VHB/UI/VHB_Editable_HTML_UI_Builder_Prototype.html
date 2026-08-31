@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VHB · Editable HTML UI Builder Prototype</title>
+<style>
+:root{--bg:#f5f4f0;--sf:#fff;--sf2:#fafaf8;--bd:#dbd9d3;--bd2:#ccc9c1;--bl:#4c78a8;--tl:#439a9a;--gn:#5a9e6f;--am:#c4943a;--co:#c96b5a;--vi:#7a6daa;--i0:#1e1d1a;--i2:#6b6860;--i3:#9c9890;--mono:Consolas,monospace;--sans:"Segoe UI","Microsoft JhengHei",system-ui,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:var(--sans);color:var(--i0);font-size:12px;overflow:hidden}
+.app{height:100vh;display:grid;grid-template-rows:auto auto 1fr auto}.hdr{background:var(--sf);border-bottom:1px solid var(--bd);padding:10px 14px;display:flex;align-items:center;gap:12px;position:relative}
+.hdr:before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--bl),var(--tl),var(--vi),var(--am),var(--co),var(--gn))}
+.logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--bl),var(--vi));color:#fff;display:grid;place-items:center;font-weight:900}.t1{font-weight:800;font-size:18px}.t2{font-family:var(--mono);font-size:10px;color:var(--i3)}
+.toolbar{background:var(--sf2);border-bottom:1px solid var(--bd);padding:8px 12px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}.btn{border:1px solid var(--bd);background:var(--sf);border-radius:8px;padding:7px 10px;font-weight:700;cursor:pointer;color:#333}.btn:hover{border-color:var(--bl);color:var(--bl)}.btn.on{background:var(--bl);border-color:var(--bl);color:#fff}
+.main{display:grid;grid-template-columns:260px 1fr 300px;min-height:0}.side,.prop{background:var(--sf2);border-right:1px solid var(--bd);overflow:auto;padding:10px}.prop{border-right:0;border-left:1px solid var(--bd)}
+.stage-wrap{overflow:auto;padding:14px}.stage{position:relative;min-height:820px;background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:14px;display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:70px;gap:10px}
+.comp{position:relative;background:var(--sf2);border:1px solid var(--bd);border-radius:10px;padding:10px;overflow:hidden;cursor:grab;transition:box-shadow .15s,border-color .15s}.comp:hover{border-color:var(--tl);box-shadow:0 4px 16px rgba(0,0,0,.08)}.comp.selected{outline:2px solid var(--bl);outline-offset:2px}
+.comp .h{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px}.ttl{font-weight:800;font-size:12px}.unit{font-family:var(--mono);font-size:9px;color:var(--i3);background:#eee;border-radius:999px;padding:2px 6px}.mini{position:absolute;top:8px;right:8px;display:flex;gap:4px}
+.ico{width:24px;height:24px;border:1px solid var(--bd);border-radius:7px;background:var(--sf);display:grid;place-items:center;font-size:12px;cursor:pointer}.chart{height:calc(100% - 26px);border-radius:8px;background:linear-gradient(180deg,#fff,#f5f4f0);position:relative;overflow:hidden}.spark{position:absolute;left:8px;right:8px;bottom:10px;height:42px}.spark svg{width:100%;height:100%}.axis-l,.axis-r{position:absolute;top:10px;bottom:10px;width:1px;background:var(--bd2)}.axis-l{left:10px}.axis-r{right:10px}
+.badge{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:999px;background:#d0e1f0;color:#315f8d}.lib{border:1px solid var(--bd);border-radius:8px;background:var(--sf);padding:8px;margin-bottom:6px;cursor:pointer}.lib:hover{border-color:var(--bl)}
+label{font-family:var(--mono);font-size:10px;color:var(--i3);display:block;margin:8px 0 3px}input,select{width:100%;border:1px solid var(--bd);border-radius:7px;padding:7px;background:var(--sf)}.ft{font-family:var(--mono);font-size:10px;color:var(--i3);padding:8px 12px;border-top:1px solid var(--bd);background:var(--sf2)}
+@media(max-width:1000px){.main{grid-template-columns:1fr}.side,.prop{display:none}.stage{grid-template-columns:repeat(6,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="hdr"><div class="logo">VHB</div><div><div class="t1">Veritas HTML Builder</div><div class="t2">Editable Chart UI · Single / Dual Axis · Drag Move · Auto Optimize · Non-overlap</div></div></header>
+<div class="toolbar"><button class="btn on" onclick="addComp('chart1')">▣ 單圖</button><button class="btn" onclick="addComp('spark')">▤ 小圖</button><button class="btn" onclick="toggleDualAxis()">⇄ 單軸/雙軸</button><button class="btn" onclick="autoOptimize()">⛶ 自動最佳化</button><button class="btn" onclick="lockLayout()">🔒 鎖定</button><button class="btn" onclick="exportSpec()">⬇ 匯出 Spec</button><span class="badge" id="status">READY</span></div>
+<main class="main">
+<aside class="side"><h3>圖像化功能鍵</h3><div class="lib" onclick="addComp('chart1')">📈 單軸圖表</div><div class="lib" onclick="addComp('dual')">📊 雙軸圖表</div><div class="lib" onclick="addComp('spark')">▁▃▆ 小圖</div><div class="lib" onclick="addComp('kpi')">◉ KPI 卡</div><div class="lib" onclick="autoOptimize()">⛶ 自動排列</div><div class="lib" onclick="toggleSettingsInside()">⚙ 小設定移入圖中</div></aside>
+<section class="stage-wrap"><div class="stage" id="stage"></div></section>
+<aside class="prop"><h3>元件設定</h3><label>Title</label><input id="pTitle" oninput="updateSelected()" placeholder="圖表標題"><label>Unit Left</label><input id="pUnitL" oninput="updateSelected()" placeholder="例如：%"><label>Unit Right</label><input id="pUnitR" oninput="updateSelected()" placeholder="例如：NTD"><label>Axis</label><select id="pAxis" onchange="updateSelected()"><option value="single">Single Axis</option><option value="dual">Dual Axis</option></select><label>Size</label><select id="pSize" onchange="updateSelected()"><option value="small">Small</option><option value="medium" selected>Medium</option><option value="large">Large</option><option value="wide">Wide</option></select><label>Spec JSON</label><textarea id="spec" style="width:100%;height:260px;border:1px solid var(--bd);border-radius:8px;padding:8px;font-family:var(--mono);font-size:10px"></textarea></aside>
+</main>
+<footer class="ft">VHB Prototype · All components use physical grid zones to prevent overlap · Settings can move inside chart · Drag supported by pointer events.</footer>
+</div>
+<script>
+let seq=0,selected=null,locked=false,settingsInside=true;const stage=document.getElementById('stage');
+function makeSpark(){return '<svg viewBox="0 0 220 60"><polyline points="0,45 20,38 40,42 60,24 80,28 100,16 120,22 140,11 160,18 180,8 220,14" fill="none" stroke="#4c78a8" stroke-width="3"/><line x1="0" y1="50" x2="220" y2="50" stroke="#dbd9d3"/></svg>'}
+function addComp(type){seq++;const c=document.createElement('div');c.className='comp';c.dataset.id='C'+seq;c.dataset.axis=(type==='dual')?'dual':'single';c.dataset.title=(type==='kpi')?'KPI Card':(type==='spark')?'Mini Trend':'Editable Chart';c.dataset.unitl=(type==='kpi')?'Score':'%';c.dataset.unitr=(type==='dual')?'NTD':'';c.dataset.size=(type==='spark')?'small':(type==='dual')?'wide':'medium';c.innerHTML=renderComp(c.dataset);applySize(c);c.addEventListener('pointerdown',startDrag);c.addEventListener('click',e=>{selectComp(c);e.stopPropagation()});stage.appendChild(c);selectComp(c);autoOptimize()}
+function renderComp(d){const right=d.axis==='dual'?'<span class="unit">'+d.unitr+'</span>':'';const axisR=d.axis==='dual'?'<div class="axis-r"></div>':'';const mini=settingsInside?'<div class="mini"><div class="ico">⚙</div><div class="ico">⇄</div><div class="ico">⛶</div></div>':'';return '<div class="h"><div class="ttl">'+d.title+'</div><div><span class="unit">'+d.unitl+'</span>'+right+'</div></div>'+mini+'<div class="chart"><div class="axis-l"></div>'+axisR+'<div class="spark">'+makeSpark()+'</div></div>'}
+function applySize(c){const s=c.dataset.size;if(s==='small'){c.style.gridColumn='span 3';c.style.gridRow='span 2'}if(s==='medium'){c.style.gridColumn='span 4';c.style.gridRow='span 3'}if(s==='large'){c.style.gridColumn='span 6';c.style.gridRow='span 4'}if(s==='wide'){c.style.gridColumn='span 8';c.style.gridRow='span 4'}}
+function selectComp(c){document.querySelectorAll('.comp').forEach(x=>x.classList.remove('selected'));selected=c;c.classList.add('selected');pTitle.value=c.dataset.title;pUnitL.value=c.dataset.unitl;pUnitR.value=c.dataset.unitr;pAxis.value=c.dataset.axis;pSize.value=c.dataset.size;exportSpec()}
+function updateSelected(){if(!selected)return;selected.dataset.title=pTitle.value;selected.dataset.unitl=pUnitL.value;selected.dataset.unitr=pUnitR.value;selected.dataset.axis=pAxis.value;selected.dataset.size=pSize.value;selected.innerHTML=renderComp(selected.dataset);applySize(selected);exportSpec()}
+function toggleDualAxis(){if(!selected)return;selected.dataset.axis=selected.dataset.axis==='dual'?'single':'dual';selected.innerHTML=renderComp(selected.dataset);selectComp(selected)}
+function toggleSettingsInside(){settingsInside=!settingsInside;document.querySelectorAll('.comp').forEach(c=>c.innerHTML=renderComp(c.dataset));status.innerText=settingsInside?'SETTINGS INSIDE':'SETTINGS OUTSIDE'}
+function autoOptimize(){document.querySelectorAll('.comp').forEach(c=>applySize(c));status.innerText='AUTO OPTIMIZED · NON OVERLAP';exportSpec()}
+function lockLayout(){locked=!locked;status.innerText=locked?'LOCKED':'UNLOCKED'}
+function exportSpec(){const comps=[...document.querySelectorAll('.comp')].map(c=>({id:c.dataset.id,title:c.dataset.title,axis:c.dataset.axis,unitL:c.dataset.unitl,unitR:c.dataset.unitr,size:c.dataset.size}));spec.value=JSON.stringify({system:'VHB',version:'prototype',components:comps},null,2)}
+let drag=null;function startDrag(e){if(locked)return;const c=e.currentTarget;selectComp(c);drag={c,sx:e.clientX,sy:e.clientY};c.setPointerCapture(e.pointerId);c.style.opacity=.72;c.addEventListener('pointermove',moveDrag);c.addEventListener('pointerup',endDrag)}
+function moveDrag(e){if(!drag)return;const dx=e.clientX-drag.sx,dy=e.clientY-drag.sy;drag.c.style.transform='translate('+dx+'px,'+dy+'px)'}
+function endDrag(e){if(!drag)return;const c=drag.c;c.style.opacity=1;c.style.transform='';c.removeEventListener('pointermove',moveDrag);c.removeEventListener('pointerup',endDrag);drag=null;autoOptimize()}
+stage.addEventListener('click',()=>{selected=null;document.querySelectorAll('.comp').forEach(x=>x.classList.remove('selected'))});addComp('dual');addComp('chart1');addComp('spark');addComp('kpi');
+</script>
+</body>
+</html>

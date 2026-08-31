@@ -1,0 +1,125 @@
+{
+ "schema": "via-central-synonym-regex-v1",
+ "policy": "append-only;LOCKED 不改;衝突=RED 燈;新規先入此冊再落引擎",
+ "regex": {
+  "TW_TICKER_LOCKED": {
+   "pattern": "^(?:[1-9]\\d{3})$|^(?!202[1-9]|2030)\\d{4}$",
+   "owner": "VRN_Summarizer_v1",
+   "locked": true,
+   "note": "台股代碼;年區 2021-2030 排除"
+  },
+  "YEAR_SUSPECT": {
+   "pattern": "^(?:202[1-9]|2030)$",
+   "owner": "vrn_lexicon_v0101",
+   "locked": true,
+   "note": "年份疑碼——收割不自動抓"
+  },
+  "TW_YFINANCE": {
+   "pattern": "^[1-9]\\d{3}\\.(TW|TWO)$",
+   "owner": "VRN_Summarizer_v1",
+   "locked": true
+  },
+  "TW_BLOOMBERG": {
+   "pattern": "^[1-9]\\d{3}\\s*TT$",
+   "owner": "VRN_Summarizer_v1",
+   "locked": true
+  },
+  "VERSION_SUFFIX": {
+   "pattern": "[_-]v?\\d{2,4}[a-z]?$",
+   "owner": "via_namereg(TOOL-047)",
+   "locked": true,
+   "note": "家族鍵版尾剝離"
+  },
+  "PRODUCT_CODE": {
+   "pattern": "^VIA-[A-Z0-9]{4}-[A-Z0-9]{4}$",
+   "owner": "via_product_ui(TOOL-048)",
+   "locked": true,
+   "note": "商品號綁一機"
+  },
+  "TW_ACTIVE_ETF": {
+   "pattern": "^\\d{5}A$",
+   "owner": "flow_tw_active_etf(TOOL-060)",
+   "locked": false,
+   "note": "主動式台股 ETF 代號尾 A+名稱含「主動」"
+  },
+  "TWEquityTicker": {
+   "pattern": "^(?:[1-9]\\d{3})$|^(?!202[1-9]|2030)\\d{4}$",
+   "locked": true,
+   "owner": "VIA 三代號政策(批118 正名)",
+   "alias_of": "TW_TICKER_LOCKED",
+   "note": "台股官方代碼(四碼;年區 2021-2030 排除);批118 正名=台股個股專用,與全球碼區隔"
+  },
+  "TWEquityYFTicker": {
+   "pattern": "^([1-9]\\d{3})\\.(TW|TWO)$",
+   "locked": true,
+   "owner": "VIA 三代號政策(批118 正名)",
+   "alias_of": "TW_YFINANCE_REGEX(canonical 冊)",
+   "note": "台股個股 yfinance 碼(上市 .TW/上櫃 .TWO);YF 全域碼含全球商品,本式僅驗台股個股=命名分層目的"
+  },
+  "TWEquityBBGTicker": {
+   "pattern": "^([1-9]\\d{3})\\s+TT$",
+   "locked": true,
+   "owner": "VIA 三代號政策(批118 正名)",
+   "alias_of": "TW_BLOOMBERG_REGEX(canonical 冊)",
+   "note": "台股個股 Bloomberg 碼(四碼+空格+TT)"
+  },
+  "ActiveTWETFTicker": {
+   "pattern": "^00\\d{2,3}[AD]$",
+   "locked": true,
+   "owner": "VIA 主動式台股 ETF 政策(批118 升格 LOCKED)",
+   "note": "主動式台股 ETF 代碼:00+2~3 位數+尾碼 A(股票/海外)或 D(債券);ENG046/ENG051 共用"
+  }
+ },
+ "synonyms": {
+  "RATING_BUY": [
+   "買進",
+   "Buy",
+   "加碼",
+   "Overweight",
+   "強烈買進",
+   "優於大盤",
+   "Outperform"
+  ],
+  "RATING_SELL": [
+   "賣出",
+   "Sell",
+   "減碼",
+   "Underweight",
+   "落後大盤",
+   "Underperform"
+  ],
+  "RATING_HOLD": [
+   "持有",
+   "Hold",
+   "中立",
+   "Neutral",
+   "維持"
+  ],
+  "FLOW_IN": [
+   "流入",
+   "淨申購",
+   "吸金",
+   "inflow"
+  ],
+  "FLOW_OUT": [
+   "流出",
+   "淨贖回",
+   "失血",
+   "outflow"
+  ],
+  "EPS": [
+   "每股盈餘",
+   "EPS",
+   "basic_eps",
+   "diluted_eps",
+   "earnings_per_share"
+  ],
+  "TARGET_PRICE": [
+   "目標價",
+   "Target Price",
+   "target_price",
+   "TP",
+   "合理價"
+  ]
+ }
+}

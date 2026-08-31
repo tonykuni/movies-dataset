@@ -1,4 +1,4 @@
-﻿
+
 # =============================================================================
 # def HOTFIX v0203
 # =============================================================================
@@ -47,6 +47,16 @@ def - Child job timeout only prevents this wrapper from hanging.
 # def 00 · PARAMETERS AT TOP
 # =============================================================================
 
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $def_PARAM_VERSION = "v0203_MANIFEST_AUTOFIX"
 $def_PARAM_TARGET_DATA_ASOF = "2026-06-19"
 
@@ -1894,3 +1904,4 @@ try {
     Write-Host ""
     Write-Host "PowerShell remains open. No destructive action was executed." -ForegroundColor Yellow
 }
+

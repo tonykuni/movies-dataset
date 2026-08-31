@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/schemas/universal-content-ir-1.0.json",
+  "title": "Veritas Universal Content IR",
+  "type": "object",
+  "required": [
+    "contract", "engine_id", "engine_version", "run_id", "source_records",
+    "topics", "quarantine", "ui_spec", "quality", "capability_profiles"
+  ],
+  "properties": {
+    "contract": {"const": "veritas.universal-content-ir/1.0"},
+    "engine_id": {"const": "ENG-VOFIE-001"},
+    "engine_version": {"type": "string"},
+    "run_id": {"type": "string", "pattern": "^RUN-"},
+    "source_records": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["source_id", "path", "source_hash", "extracted_text", "raw_preserved"],
+        "properties": {
+          "source_id": {"type": "string", "pattern": "^SRC-"},
+          "path": {"type": "string"},
+          "source_hash": {"type": "string", "minLength": 64, "maxLength": 64},
+          "extracted_text": {"type": "string"},
+          "raw_preserved": {"const": true}
+        }
+      }
+    },
+    "topics": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["topic_id", "source_id", "heading", "content", "content_hash", "st_position"],
+        "properties": {
+          "topic_id": {"type": "string", "pattern": "^TOP-"},
+          "source_id": {"type": "string", "pattern": "^SRC-"},
+          "heading": {"type": "string"},
+          "content": {"type": "string"},
+          "content_hash": {"type": "string"},
+          "duplicate_of": {"type": ["string", "null"]},
+          "st_position": {"enum": ["ST-CORE", "ST-FROZEN", "ST-GATE", "ST-ADAPTER", "ST-OPTIONAL"]}
+        }
+      }
+    },
+    "quarantine": {"type": "array"},
+    "ui_spec": {"type": "object"},
+    "quality": {"type": "object"},
+    "capability_profiles": {"type": "array"},
+    "output_files": {"type": "object"}
+  }
+}
+

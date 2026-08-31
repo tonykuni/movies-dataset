@@ -1,0 +1,42 @@
+{
+  "contract_id": "VIA_TW_GROUP_FLOW_CONTRACT_V0300",
+  "contract_version": "0.3.0",
+  "pipeline": ["FETCH", "CLASSIFY", "VALIDATE", "INDEX", "OBSERVE", "FLOW"],
+  "governance": {
+    "canonical_baseline": "31_GROUP_149_MEMBERSHIP_IMMUTABLE_REGRESSION_FIXTURE",
+    "candidate_expansion": "49_GROUP_252_MEMBERSHIP_REVIEW_QUEUE",
+    "candidate_distinct_tickers": 241,
+    "candidate_id_policy": "NONCANONICAL_CANDIDATE_ID",
+    "mutation_policy": "APPEND_ONLY_ERRATA_AND_REVIEW_DECISIONS",
+    "human_x_policy": "EXCLUDE_PROPOSED_OR_KEEP_NEVER_DELETE",
+    "real_activation_policy": "FAIL_CLOSED_UNTIL_MEASURED_BOTH_MARKETS_AND_VALIDATION_PASS",
+    "github_publish_policy": "REGISTER_ONLY_UNTIL_OWNER_REPO_AND_AUTHORITY_RESOLVED",
+    "order_execution": false
+  },
+  "evidence": {
+    "tiers_strong_to_weak": ["MEASURED", "DERIVED", "PROXY", "ESTIMATED", "SOURCE_REPORTED_SOURCED_UNVERIFIED", "CONTROLLED_FIXTURE", "UNAVAILABLE"],
+    "inheritance": "DOWNSTREAM_INHERITS_WEAKEST_UPSTREAM_TIER",
+    "promotion": "PROHIBITED_WITHOUT_NEW_CANONICAL_EVIDENCE"
+  },
+  "attention_share": {
+    "method_id": "M-1A",
+    "formula": "Val(stock_non_day_trade) / [Val(TWSE)+Val(TPEX)-Val(day_trade)-Val(2330_non_day_trade)]",
+    "required_markets": ["TWSE", "TPEX"],
+    "day_trade_policy": "REQUIRED_NO_GROSS_TURNOVER_PROXY",
+    "tsmc_policy": "REPORT_SEPARATELY_AS_SHARE_OF_BOTH_MARKETS",
+    "excluded_asset_types": ["ETF", "WARRANT"]
+  },
+  "index": {
+    "generation_gate": "VALIDATE_PASS_ONLY",
+    "adjusted_close_required": true,
+    "max_single_name_weight_recommended": 0.25,
+    "candidate_49_current_eligible": 0
+  },
+  "size_buckets": {
+    "large": "ROLLING_MARKET_CAP_P90_PLUS",
+    "mid": "ROLLING_MARKET_CAP_P60_TO_P90",
+    "small": "ROLLING_MARKET_CAP_BELOW_P60",
+    "rebucket": "QUARTERLY_APPEND_ONLY_HISTORY",
+    "missing_market_cap": "NEEDS_FETCH_NO_INFERENCE"
+  }
+}

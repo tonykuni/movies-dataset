@@ -1,0 +1,201 @@
+{
+  "report_id": "VCG-RPT-ADAPTIVE-DOWNSTREAM-0100",
+  "generated_at_utc": "2026-08-25T04:19:18.674754+00:00",
+  "scope": "8 uploaded/current VIA core assets copied to an isolated sample root; not the full Windows Mother Root",
+  "engine": {
+    "path": "/mnt/data/VIA_CentralGovernment_AdaptiveDownstream_v0100.py",
+    "version": "1.0.0"
+  },
+  "validation": {
+    "python_self_tests": "8/8 PASS",
+    "python_compile": "engine plus 7 Python core files PASS",
+    "policy_json": "PASS",
+    "powershell_static": {
+      "native_powershell_parser_available_in_validation_environment": false,
+      "launcher_contains_native_ast_self_check": true,
+      "delimiter_balance_pass": true,
+      "line_count": 380,
+      "exit_statement_found": false,
+      "remove_item_found": false,
+      "invoke_expression_found": false,
+      "network_command_found": false,
+      "policy": "Current Linux validation used static scan; launcher performs native PowerShell AST ParseFile before any governance run on Windows PowerShell 7."
+    },
+    "three_rounds": true,
+    "canonical_hash_unchanged": true,
+    "network_used": false,
+    "target_imported": false,
+    "canonical_mutation": false
+  },
+  "result": {
+    "gate": "HOLD_REMEDIATION_REQUIRED",
+    "activation": "NOT_ACTIVATED",
+    "assets": 8,
+    "issues_open": 55,
+    "issues_resolved_in_overlay": 2,
+    "unresolved_high": 22,
+    "patches": 2,
+    "contract_sidecars": 8,
+    "dependency_cycles": 1,
+    "interface_references_checked": 21,
+    "adaptive_deep_assets": 7,
+    "failure_circuit_open_first_run": 0
+  },
+  "safe_overlay_patches": [
+    {
+      "patch_id": "PATCH-R1-0088B2C7C0A4",
+      "asset_id": "VCG-ASSET-D511F97336",
+      "relative_path": "VIA_Panorama_AST_RuntimeInjector.py",
+      "round_no": 1,
+      "fix_ids": [
+        "FMT_MIXED_NEWLINES"
+      ],
+      "original_hash": "676e1f76037bccd8ce5bbcd8428667324128ae4260aa58375fc1df21d50e5b98",
+      "proposed_hash": "30b7081ad5218734f31d9e6f1bf01088a195ef8e0e35aea6324172855a5f8c09",
+      "overlay_path": "/mnt/data/VIA_CG_Adaptive_Validation_Run/RUN_20260825_041917_675277_VIA_CentralGovernment_AdaptiveDownstream_v0100/overlay/round_1/VIA_Panorama_AST_RuntimeInjector.py",
+      "status": "STAGED",
+      "validation": "PASS_PY_COMPILE",
+      "note": "Canonical unchanged; copy-on-write sandbox overlay only."
+    },
+    {
+      "patch_id": "PATCH-R1-8E1336981569",
+      "asset_id": "VCG-ASSET-A344BDB247",
+      "relative_path": "VPN_v35_Dashboard (3).html",
+      "round_no": 1,
+      "fix_ids": [
+        "FMT_FINAL_NEWLINE"
+      ],
+      "original_hash": "94d747643e71f904be14628b1babc6df70105720211940ef564e82f9ba01ba81",
+      "proposed_hash": "4c0c5175693c5a9b8bcd9599eae148af80e6d29ff41c7cb427d480081795d98a",
+      "overlay_path": "/mnt/data/VIA_CG_Adaptive_Validation_Run/RUN_20260825_041917_675277_VIA_CentralGovernment_AdaptiveDownstream_v0100/overlay/round_1/VPN_v35_Dashboard (3).html",
+      "status": "STAGED",
+      "validation": "PASS_TEXT_ROUNDTRIP",
+      "note": "Canonical unchanged; copy-on-write sandbox overlay only."
+    }
+  ],
+  "findings": [
+    {
+      "finding_id": "VCG-F001",
+      "priority": "P1",
+      "title": "Aegis ↔ SSOT 循環相依與 self-import",
+      "files": [
+        "VeritasAegisNexus.py",
+        "VIA_SSOT_Unified.py"
+      ],
+      "evidence": [
+        "VeritasAegisNexus.py:140 from VeritasAegisNexus import *",
+        "VIA_SSOT_Unified.py:116 import VIA_SSOT_Unified",
+        "dependency cycle Aegis → SSOT → Aegis"
+      ],
+      "recommended_action": "先移除 self-import，再以 Runtime Context/Registry 注入對端能力；兩檔不得互相在 module scope eager import。",
+      "automatic_canonical_fix": false
+    },
+    {
+      "finding_id": "VCG-F002",
+      "priority": "P1",
+      "title": "Celeritas 頂層使用尚未定義的 Lazy Loader",
+      "files": [
+        "VeritasCeleritas.py"
+      ],
+      "evidence": [
+        "_LazyModule/_spec_exists used at lines 86/91/96; definitions near lines 384/373"
+      ],
+      "recommended_action": "把 lazy-loader 定義移到 support bootstrap 前，或將 peer module 綁定延後至 def_bootstrap_runtime；禁止以 broad except 靜默吞掉。",
+      "automatic_canonical_fix": false
+    },
+    {
+      "finding_id": "VCG-F003",
+      "priority": "P1",
+      "title": "Runtime Bridge 呼叫不存在的 xbatch 契約",
+      "files": [
+        "VIA_Runtime_Bridge_All_in_One.py",
+        "VeritasCeleritas.py"
+      ],
+      "evidence": [
+        "ctx.celeritas.xbatch referenced at lines 271–272",
+        "VeritasCeleritas exports do not include xbatch"
+      ],
+      "recommended_action": "由 SSOT 契約決定 canonical API：新增相容 xbatch adapter，或將 Bridge 改綁現有 batch API；先做 consumer/producer contract test。",
+      "automatic_canonical_fix": false
+    },
+    {
+      "finding_id": "VCG-F004",
+      "priority": "P1",
+      "title": "Mother Root 與 runtime path 仍綁定 OneDrive／/mnt/data／版本檔名",
+      "files": [
+        "VIA_Runtime_Bridge_All_in_One.py",
+        "VIA_EnvManager.py",
+        "VIA_RegistryCore_v1.py",
+        "VeritasAegisNexus.py"
+      ],
+      "evidence": [
+        "13 PATH_HARDCODED_EXTERNAL_ROOT findings"
+      ],
+      "recommended_action": "改由 Central Root Resolver + Registry ID + Env alias 動態解析；保留舊路徑只作 migration candidate，不得作 active authority。",
+      "automatic_canonical_fix": false
+    },
+    {
+      "finding_id": "VCG-F005",
+      "priority": "P1",
+      "title": "SSOT Regex 規則與自帶 examples 不一致",
+      "files": [
+        "VIA_SSOT_Unified.py"
+      ],
+      "evidence": [
+        "TW_STOCK_CODE_4DIGIT misses pass 0050",
+        "TW_STOCK_CODE_4DIGIT matches fail 12345",
+        "TABLE_HEADER_BALANCE_SHEET misses Equity",
+        "HTML_ANTI_BOT_SIGNAL misses verify you are human"
+      ],
+      "recommended_action": "先由 SSOT owner 決定 0050 是否屬股票/ETF共同代碼契約，再修 pattern 與 examples；加入 corpus unit test 作 Gate。",
+      "automatic_canonical_fix": false
+    },
+    {
+      "finding_id": "VCG-F006",
+      "priority": "P1",
+      "title": "Dashboard 真實 DOM ID 重複",
+      "files": [
+        "VPN_v35_Dashboard (3).html"
+      ],
+      "evidence": [
+        "cmdBody duplicated",
+        "legoBody duplicated"
+      ],
+      "recommended_action": "依頁面/模組命名空間改為唯一 ID，更新所有 querySelector/getElementById 引用後跑 UI wiring test。",
+      "automatic_canonical_fix": false
+    },
+    {
+      "finding_id": "VCG-F007",
+      "priority": "P1",
+      "title": "Aegis 缺少兩個本地依賴",
+      "files": [
+        "VeritasAegisNexus.py"
+      ],
+      "evidence": [
+        "VIA_SafeFix_PathRegistry not found",
+        "VIA_SuperAccel_Module not found"
+      ],
+      "recommended_action": "不得猜測同名版本；由 Registry 查唯一 canonical owner，若無 owner 則標記 optional capability 並提供明確 fallback contract。",
+      "automatic_canonical_fix": false
+    },
+    {
+      "finding_id": "VCG-F008",
+      "priority": "P2",
+      "title": "Broad except/pass 與 import-time side effects 降低可觀測性",
+      "files": [
+        "VeritasAegisNexus.py",
+        "VeritasCeleritas.py",
+        "VIA_SSOT_Unified.py"
+      ],
+      "evidence": [
+        "6 PY_BROAD_EXCEPT_PASS findings",
+        "3 PY_IMPORT_TIME_SIDE_EFFECT findings"
+      ],
+      "recommended_action": "將 bootstrap 轉成顯式 setup(ctx)；except 必須寫 evidence/error_code，禁止無聲降級。",
+      "automatic_canonical_fix": false
+    }
+  ],
+  "final_html": "/mnt/data/VIA_CentralGovernment_AdaptiveDownstream_v0100_Validation.html",
+  "final_json": "/mnt/data/VIA_CentralGovernment_AdaptiveDownstream_v0100_Validation.json",
+  "full_run_dir": "/mnt/data/VIA_CG_Adaptive_Validation_Run/RUN_20260825_041917_675277_VIA_CentralGovernment_AdaptiveDownstream_v0100"
+}

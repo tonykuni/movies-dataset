@@ -1,4 +1,4 @@
-﻿<#
+<#
 Test-VIA-TheoryAudit.ps1 — 今日五引擎「理論正確性」獨立稽核(ONE PS CODE)
 ===========================================================================
 與各引擎 selftest 的差異:selftest 是引擎自證;本稽核是 PowerShell 端的
@@ -17,6 +17,16 @@ Test-VIA-TheoryAudit.ps1 — 今日五引擎「理論正確性」獨立稽核(ON
 
 用法:  .\Test-VIA-TheoryAudit.ps1        (或經啟動器:.\VIA_WorkflowEngine.ps1 theory)
 #>
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = 'Stop'
 try {
     [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
@@ -47,11 +57,11 @@ if ($PyExe -eq '') { Write-Host '誠實 FAIL:找不到 Python 3'; exit 1 }
 
 $Root = $PSScriptRoot
 $WF   = Join-Path $Root 'VIA_WorkflowEngine.py'
-$VAP  = Join-Path $Root 'functional modules\VAP\engine\via_autoplot_seaborn_plotly_v0100.py'
+$VAP  = Join-Path $Root 'functional modules\VAP\engine\VAP_ENG003_AutoplotSeabornPlotly_v0100.py'
 $SPEC = Join-Path $Root 'functional modules\VAP\spec\ssot\vap_spec.json'
 $CW   = Join-Path $Root 'functional modules\ChipWar'
 $MF   = Join-Path $Root 'functional modules\MultiFactor'
-$TA   = Join-Path $Root 'functional modules\TALib\VIA_TALibEngine.py'
+$TA   = Join-Path $Root 'functional modules\TALib\VIA_ENG003_TALibEngine.py'
 $Tmp  = Join-Path ([System.IO.Path]::GetTempPath()) ("via_theory_" + (Get-Date -Format 'HHmmss'))
 New-Item -ItemType Directory -Path $Tmp -Force | Out-Null
 
@@ -310,3 +320,4 @@ if ($fails -eq 0) {
 }
 Remove-Item -Recurse -Force $Tmp -ErrorAction SilentlyContinue
 exit $(if ($fails -eq 0) { 0 } else { 1 })
+

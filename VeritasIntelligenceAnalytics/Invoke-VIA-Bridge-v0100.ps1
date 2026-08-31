@@ -8,9 +8,19 @@ Invoke-VIA-Bridge v0100 — 一支 PowerShell:前後端對接 + test/debug 迴�
 回退:直接改跑 via-mega/via-ui(Bridge 為附加對接層,不影響既有接線)。
 #>
 param([int]$MaxRounds = 3)
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Continue"
 $VIA = $PSScriptRoot
-$Engine = Join-Path $VIA "supportive modules\VIA_Governance_Runtime\via_bridge_engine_v0100.py"
+$Engine = Join-Path $VIA "supportive modules\VIA_Governance_Runtime\SUP_MDL140_BridgeEngine_v0100.py"
 $StateJson = Join-Path $VIA "VIA_Reports\bridge_state.json"
 $FrontEnd = Join-Path $VIA "VIA_Reports\VIA_CommandBridge.html"
 $Results = @()
@@ -68,3 +78,4 @@ Write-Host ""
 $Results | Format-Table -AutoSize
 $okN = ($Results | Where-Object 結果 -eq "OK").Count
 Write-Host ("[總結] {0}/{1} 階段 OK · 前端={2}(run-local,每跑必重生=永遠當下真相)" -f $okN, $Results.Count, $FrontEnd) -ForegroundColor Green
+

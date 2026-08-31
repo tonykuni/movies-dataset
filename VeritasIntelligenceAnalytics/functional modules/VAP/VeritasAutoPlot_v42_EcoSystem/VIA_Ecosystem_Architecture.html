@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIA Ecosystem Architecture — Shared Layer & Integration Matrix</title>
+<style>
+:root {
+    --bg-primary: #0d1117;
+    --bg-secondary: #161b22;
+    --bg-tertiary: #1c2333;
+    --bg-card: #21262d;
+    --border: #30363d;
+    --text-primary: #e6edf3;
+    --text-secondary: #8b949e;
+    --text-muted: #6e7681;
+    --accent-cyan: #00d4ff;
+    --accent-blue: #58a6ff;
+    --accent-green: #3fb950;
+    --accent-orange: #ff6b35;
+    --accent-purple: #bc8cff;
+    --accent-red: #f85149;
+    --accent-yellow: #d29922;
+    --accent-pink: #f778ba;
+    --gradient-main: linear-gradient(135deg, #00d4ff 0%, #58a6ff 50%, #bc8cff 100%);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+.container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+/* Header */
+.header {
+    text-align: center;
+    padding: 48px 24px 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+}
+.header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    background: var(--gradient-main);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+}
+.header .subtitle {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+.header .badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin: 8px 4px 0;
+}
+.badge-vrn { background: rgba(0,212,255,0.15); color: var(--accent-cyan); border: 1px solid rgba(0,212,255,0.3); }
+.badge-vdf { background: rgba(63,185,80,0.15); color: var(--accent-green); border: 1px solid rgba(63,185,80,0.3); }
+.badge-vap { background: rgba(188,140,255,0.15); color: var(--accent-purple); border: 1px solid rgba(188,140,255,0.3); }
+.badge-vpn { background: rgba(255,107,53,0.15); color: var(--accent-orange); border: 1px solid rgba(255,107,53,0.3); }
+.badge-ssot { background: rgba(210,153,34,0.15); color: var(--accent-yellow); border: 1px solid rgba(210,153,34,0.3); }
+
+/* Tabs */
+.tabs {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+    overflow-x: auto;
+}
+.tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.tab:hover { color: var(--text-primary); }
+.tab.active {
+    color: var(--accent-cyan);
+    border-bottom-color: var(--accent-cyan);
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Cards */
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 20px;
+}
+.card h2 {
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+    color: var(--accent-cyan);
+}
+.card h3 {
+    font-size: 1.05rem;
+    margin: 16px 0 8px;
+    color: var(--accent-blue);
+}
+.card p {
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+/* Tables */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 0.85rem;
+}
+th, td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+th {
+    background: var(--bg-tertiary);
+    color: var(--accent-cyan);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+td { color: var(--text-secondary); }
+tr:hover td { background: rgba(0,212,255,0.03); }
+td code {
+    background: var(--bg-tertiary);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: var(--accent-blue);
+}
+
+/* Flow diagram */
+.flow-diagram {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 32px;
+    margin: 20px 0;
+    overflow-x: auto;
+}
+.flow-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin: 12px 0;
+    flex-wrap: wrap;
+}
+.flow-box {
+    padding: 14px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-align: center;
+    min-width: 160px;
+    border: 2px solid;
+}
+.flow-vrn { background: rgba(0,212,255,0.1); border-color: var(--accent-cyan); color: var(--accent-cyan); }
+.flow-vdf { background: rgba(63,185,80,0.1); border-color: var(--accent-green); color: var(--accent-green); }
+.flow-vap { background: rgba(188,140,255,0.1); border-color: var(--accent-purple); color: var(--accent-purple); }
+.flow-vpn { background: rgba(255,107,53,0.1); border-color: var(--accent-orange); color: var(--accent-orange); }
+.flow-ssot { background: rgba(210,153,34,0.1); border-color: var(--accent-yellow); color: var(--accent-yellow); }
+.flow-shared { background: rgba(88,166,255,0.1); border-color: var(--accent-blue); color: var(--accent-blue); }
+.flow-arrow {
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+.flow-arrow-down {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 4px 0;
+}
+
+/* Grid */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+@media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+/* Status */
+.status { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; }
+.status-active { background: rgba(63,185,80,0.15); color: var(--accent-green); }
+.status-shared { background: rgba(88,166,255,0.15); color: var(--accent-blue); }
+.status-planned { background: rgba(210,153,34,0.15); color: var(--accent-yellow); }
+
+/* Matrix cell */
+.matrix-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.dot-green { background: var(--accent-green); }
+.dot-cyan { background: var(--accent-cyan); }
+.dot-purple { background: var(--accent-purple); }
+.dot-orange { background: var(--accent-orange); }
+.dot-yellow { background: var(--accent-yellow); }
+.dot-gray { background: var(--text-muted); }
+
+/* KPI */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 20px 0; }
+.kpi-box {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+}
+.kpi-value { font-size: 2rem; font-weight: 700; }
+.kpi-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+.kpi-cyan .kpi-value { color: var(--accent-cyan); }
+.kpi-green .kpi-value { color: var(--accent-green); }
+.kpi-purple .kpi-value { color: var(--accent-purple); }
+.kpi-orange .kpi-value { color: var(--accent-orange); }
+.kpi-yellow .kpi-value { color: var(--accent-yellow); }
+.kpi-blue .kpi-value { color: var(--accent-blue); }
+
+/* Code block */
+.code-block {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    overflow-x: auto;
+    white-space: pre;
+    line-height: 1.5;
+    margin: 12px 0;
+}
+
+.footer {
+    text-align: center;
+    padding: 32px;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--border);
+    margin-top: 32px;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Veritas Intelligence Analytics</h1>
+    <div class="subtitle">Ecosystem Architecture — Shared Layer & Integration Matrix</div>
+    <div style="margin-top: 12px;">
+        <span class="badge badge-vrn">VRN ReportNova</span>
+        <span class="badge badge-vdf">VDF DataForge</span>
+        <span class="badge badge-vap">VAP AutoPlot</span>
+        <span class="badge badge-vpn">VPN PanoramaNexus</span>
+        <span class="badge badge-ssot">SSOT Engine</span>
+    </div>
+</div>
+
+<div class="container">
+
+<!-- Tabs -->
+<div class="tabs">
+    <button class="tab active" onclick="showTab('overview')">System Overview</button>
+    <button class="tab" onclick="showTab('shared')">Shared Layer</button>
+    <button class="tab" onclick="showTab('dataflow')">Data Flow</button>
+    <button class="tab" onclick="showTab('integration')">Integration Matrix</button>
+    <button class="tab" onclick="showTab('assets')">Asset Registry</button>
+    <button class="tab" onclick="showTab('paths')">Path & Config</button>
+</div>
+
+<!-- TAB 1: Overview -->
+<div id="tab-overview" class="tab-content active">
+
+<div class="kpi-grid">
+    <div class="kpi-box kpi-cyan">
+        <div class="kpi-value">5</div>
+        <div class="kpi-label">Core Subsystems</div>
+    </div>
+    <div class="kpi-box kpi-green">
+        <div class="kpi-value">50+</div>
+        <div class="kpi-label">Smart Assets</div>
+    </div>
+    <div class="kpi-box kpi-purple">
+        <div class="kpi-value">10</div>
+        <div class="kpi-label">Shared Components</div>
+    </div>
+    <div class="kpi-box kpi-orange">
+        <div class="kpi-value">14</div>
+        <div class="kpi-label">VAP Engine Modules</div>
+    </div>
+    <div class="kpi-box kpi-yellow">
+        <div class="kpi-value">8</div>
+        <div class="kpi-label">VDF Schema Tables</div>
+    </div>
+    <div class="kpi-box kpi-blue">
+        <div class="kpi-value">7</div>
+        <div class="kpi-label">VRN Pipeline Stages</div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Why One Ecosystem?</h2>
+    <p>VRN、VDF、VAP 三大子系統之所以在 VIA 母架構下建立，核心原因是<strong>大量工具與定義共用</strong>。以下是共用的關鍵理由：</p>
+    <table>
+        <tr>
+            <th>共用元件</th>
+            <th>說明</th>
+            <th>使用者</th>
+        </tr>
+        <tr>
+            <td><code>SmartAsset AST</code></td>
+            <td>統一的智慧資產編號體系，所有模組的 Class/Function/Library 都使用 <code>{DOMAIN}-{KIND}{SEQ}</code> 格式</td>
+            <td><span class="dot dot-cyan"></span> VRN <span class="dot dot-green"></span> VDF <span class="dot dot-purple"></span> VAP</td>
+        </tr>
+        <tr>
+            <td><code>SSOT Engine</code></td>
+            <td>Single Source of Truth — 所有子系統透過此層讀寫，確保資料一致性</td>
+            <td><span class="dot dot-cyan"></span> VRN <span class="dot dot-green"></span> VDF <span class="dot dot-purple"></span> VAP <span class="dot dot-orange"></span> VPN</td>
+        </tr>
+        <tr>
+            <td><code>Anchor 錨點</code></td>
+            <td>模組化定位修正系統，支援 Patcher 精準定位與自動修復</td>
+            <td><span class="dot dot-cyan"></span> VRN <span class="dot dot-green"></span> VDF <span class="dot dot-purple"></span> VAP <span class="dot dot-orange"></span> VPN</td>
+        </tr>
+        <tr>
+            <td><code>UltimateTemplate v3</code></td>
+            <td>Python 模組標準模板，定義 9 個標準錨點與共用函式</td>
+            <td><span class="dot dot-cyan"></span> VRN <span class="dot dot-green"></span> VDF <span class="dot dot-purple"></span> VAP</td>
+        </tr>
+        <tr>
+            <td><code>ModPack A~F</code></td>
+            <td>6 個功能模組包：CPU加速/快取/序列化/網路/觀測/金融</td>
+            <td><span class="dot dot-cyan"></span> VRN <span class="dot dot-green"></span> VDF <span class="dot dot-purple"></span> VAP</td>
+        </tr>
+        <tr>
+            <td><code>VPN Pipeline</code></td>
+            <td>全景掃描管線 M01~M07，用於掃描所有子系統的健康狀態</td>
+            <td><span class="dot dot-cyan"></span> VRN <span class="dot dot-green"></span> VDF <span class="dot dot-purple"></span> VAP</td>
+        </tr>
+        <tr>
+            <td><code>Design Language</code></td>
+            <td>Notion × MUJI × Seaborn 視覺風格 + VIA FusionDashboard 暗色主題</td>
+            <td><span class="dot dot-cyan"></span> VRN <span class="dot dot-green"></span> VDF <span class="dot dot-purple"></span> VAP</td>
+        </tr>
+        <tr>
+            <td><code>Decision Engine</code></td>
+            <td>自動化決策引擎，處理模組間的邏輯判斷與流程控制</td>
+            <td><span class="dot dot-cyan"></span> VRN <span class="dot dot-green"></span> VDF <span class="dot dot-purple"></span> VAP</td>
+        </tr>
+        <tr>
+            <td><code>Failure Engine</code></td>
+            <td>失敗處理引擎，記錄與分析所有失敗事件</td>
+            <td><span class="dot dot-cyan"></span> VRN <span class="dot dot-green"></span> VDF <span class="dot dot-purple"></span> VAP</td>
+        </tr>
+        <tr>
+            <td><code>CPU Accelerator</code></td>
+            <td>安全極限加速系統，自適應 CPU/記憶體壓力管理</td>
+            <td><span class="dot dot-cyan"></span> VRN <span class="dot dot-green"></span> VDF <span class="dot dot-purple"></span> VAP</td>
+        </tr>
+    </table>
+</div>
+
+<div class="grid-3">
+    <div class="card">
+        <h2 style="color: var(--accent-cyan);">VRN ReportNova</h2>
+        <p>台灣股票個股報告的 WORD/PDF/IMAGE 資料庫化建構系統</p>
+        <table>
+            <tr><td><code>M01</code></td><td>StockExtractor — 股票資料擷取</td></tr>
+            <tr><td><code>M02</code></td><td>Restructurer — 資料重組</td></tr>
+            <tr><td><code>M03</code></td><td>PDF Layout — PDF 版面分析</td></tr>
+            <tr><td><code>M04</code></td><td>TableOCR — 表格 OCR</td></tr>
+            <tr><td><code>M05</code></td><td>OCR Text — 文字 OCR</td></tr>
+            <tr><td><code>M06</code></td><td>CrossReference — 交叉比對</td></tr>
+            <tr><td><code>M07</code></td><td>Summarizer — NLP 摘要</td></tr>
+        </table>
+    </div>
+    <div class="card">
+        <h2 style="color: var(--accent-green);">VDF DataForge</h2>
+        <p>金融數據擷取維護系統，產出 Parquet/CSV/DuckDB</p>
+        <table>
+            <tr><td><code>M01</code></td><td>BatchDownloader TURBO v4</td></tr>
+            <tr><td><code>M02</code></td><td>AKShare/FRED Sentiment v5</td></tr>
+            <tr><td><code>Hub</code></td><td>CentralHub LEGO v6 (8 表)</td></tr>
+            <tr><td><code>API</code></td><td>VDF API Server</td></tr>
+            <tr><td><code>DB</code></td><td>DuckDB (intl_v6/batch/macro)</td></tr>
+            <tr><td><code>GS</code></td><td>Google Sheet 輸出</td></tr>
+        </table>
+    </div>
+    <div class="card">
+        <h2 style="color: var(--accent-purple);">VAP AutoPlot</h2>
+        <p>自動化視覺化引擎，VDF 資料 → HTML 儀表板</p>
+        <table>
+            <tr><td><code>Core</code></td><td>AutoPlot 主管線 (8 run 方法)</td></tr>
+            <tr><td><code>VDF</code></td><td>VDFConnector 資料連結引擎</td></tr>
+            <tr><td><code>TA</code></td><td>技術指標引擎 (6 指標)</td></tr>
+            <tr><td><code>Chart</code></td><td>Plotly 圖表生成器 (14 類)</td></tr>
+            <tr><td><code>HTML</code></td><td>FusionDashboard 渲染器</td></tr>
+            <tr><td><code>VIA</code></td><td>VIA 生態系統整合模組</td></tr>
+        </table>
+    </div>
+</div>
+</div>
+
+<!-- TAB 2: Shared Layer -->
+<div id="tab-shared" class="tab-content">
+
+<div class="card">
+    <h2>SmartAsset AST 編號體系</h2>
+    <p>VIA 統一的智慧資產編號系統，所有子系統的 Class、Function、Library 都使用相同的編號格式，確保跨系統的資產追蹤與定位。</p>
+    
+    <h3>編號格式</h3>
+    <div class="code-block">{DOMAIN}-{KIND}{SEQ:03d}
+
+DOMAIN (功能域)    KIND (資產種類)    SEQ (三位流水，跨區塊累計不重設)
+─────────────      ───────────────    ──────────────────────────────
+NET   網路工具     C  Class           001 → ∞  永不歸零
+ACC   加速器       F  Function
+CORE  核心邏輯     L  Library (第三方封裝)
+IO    輸入輸出
+UTIL  共用工具
+COM   商方整合
+DATA  資料模型
+CFG   設定/Schema
+
+範例:
+  NET-C001  → 網路工具 Class 001
+  ACC-F003  → 加速器 Function 003
+  COM-L001  → 商方整合 Library 001</div>
+
+    <h3>SHA1 資產 ID</h3>
+    <p>每個檔案級資產使用 SHA1 前 10 碼作為唯一 ID：<code>AST-{SHA1_10}</code>，由相對路徑計算而得。</p>
+
+    <h3>錨點插入格式</h3>
+    <div class="code-block"># ▸▸▸ INSERT:{ANC-X}:{DOMAIN}-{KIND}{SEQ} ◄◄◄</div>
+</div>
+
+<div class="card">
+    <h2>Anchor 錨點系統</h2>
+    <p>VIA 的模組化定位修正系統，每個子系統使用不同的錨點命名空間，但共享相同的定位機制。</p>
+    <table>
+        <tr>
+            <th>子系統</th>
+            <th>錨點格式</th>
+            <th>範例</th>
+            <th>用途</th>
+        </tr>
+        <tr>
+            <td><span class="badge badge-vap">VAP</span></td>
+            <td><code>ANCHOR:VAP_{NAME}</code></td>
+            <td><code>ANCHOR:VAP_DESIGN_SYSTEM</code></td>
+            <td>AutoPlot 13 個引擎錨點</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-vrn">VRN</span></td>
+            <td><code>ANCHOR:VRN_{NAME}</code></td>
+            <td><code>ANCHOR:VRN_M01_ENTRY</code></td>
+            <td>ReportNova M01~M07 模組錨點</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-vdf">VDF</span></td>
+            <td><code>&lt;FAMILY&gt;:&lt;CAT&gt;:&lt;STEM&gt;</code></td>
+            <td><code>VDF:python-module:CentralHub</code></td>
+            <td>DataForge 資產分類錨點</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-vpn">VPN</span></td>
+            <td><code>ANCHOR:VPN_PL_{PHASE}</code></td>
+            <td><code>ANCHOR:VPN_PL_PHASE1</code></td>
+            <td>Pipeline M01~M07 階段錨點</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-ssot">VIA Template</span></td>
+            <td><code>ANCHOR[VIA:ANCHOR:{TYPE}-{SEQ}]</code></td>
+            <td><code>ANCHOR[VIA:ANCHOR:DAT-001]</code></td>
+            <td>UltimateTemplate 9 標準錨點</td>
+        </tr>
+    </table>
+</div>
+
+<div class="card">
+    <h2>SSOT Engine (Single Source of Truth)</h2>
+    <p>所有子系統透過 SSOT 層進行資料讀寫，確保整個生態系統的資料一致性。SSOT 位於 <code>C:\VeritasIntelligenceAnalytics\_SSOT\SSOT.json</code>。</p>
+    <table>
+        <tr>
+            <th>Schema 欄位</th>
+            <th>類型</th>
+            <th>說明</th>
+        </tr>
+        <tr><td><code>meta</code></td><td>dict</td><td>run_id, system, version, timestamp</td></tr>
+        <tr><td><code>status</code></td><td>dict</td><td>state, progress, message</td></tr>
+        <tr><td><code>files</code></td><td>list</td><td>FID_xxxxxx 檔案資產</td></tr>
+        <tr><td><code>ast</code></td><td>list</td><td>AST 節點 (per file)</td></tr>
+        <tr><td><code>assets</code></td><td>list</td><td>SmartAsset 記錄</td></tr>
+        <tr><td><code>bricks</code></td><td>list</td><td>Brick / 可重用單元</td></tr>
+        <tr><td><code>dependencies</code></td><td>list</td><td>DEP_xxxxxx 依賴邊</td></tr>
+        <tr><td><code>issues</code></td><td>list</td><td>ISSUE_xxx 問題</td></tr>
+        <tr><td><code>violations</code></td><td>list</td><td>標準化違規</td></tr>
+        <tr><td><code>intelligence</code></td><td>list</td><td>M07 / AIO 智慧摘要</td></tr>
+        <tr><td><code>decisions</code></td><td>list</td><td>DEC_xxxxxx 決策引擎輸出</td></tr>
+        <tr><td><code>actions</code></td><td>list</td><td>ACT_xxxxxx 行動引擎輸出</td></tr>
+        <tr><td><code>failures</code></td><td>list</td><td>FAIL_xxxxxx 失敗記錄</td></tr>
+        <tr><td><code>execution_log</code></td><td>list</td><td>管線狀態轉換</td></tr>
+        <tr><td><code>registry</code></td><td>dict</td><td>modules / tools / versions / anchors</td></tr>
+    </table>
+</div>
+
+<div class="card">
+    <h2>ModPack A~F 功能模組包</h2>
+    <div class="grid-3">
+        <div style="background: var(--bg-tertiary); padding: 16px; border-radius: 8px;">
+            <h3 style="color: var(--accent-cyan);">A: CpuAccel</h3>
+            <p>CPU 加速引擎<br>OMP/BLAS/MKL 線程控制<br>自適應壓力管理</p>
+        </div>
+        <div style="background: var(--bg-tertiary); padding: 16px; border-radius: 8px;">
+            <h3 style="color: var(--accent-green);">B: CacheMemory</h3>
+            <p>快取記憶體管理<br>LRU/Disk/Bloom Filter<br>TTL 自動過期</p>
+        </div>
+        <div style="background: var(--bg-tertiary); padding: 16px; border-radius: 8px;">
+            <h3 style="color: var(--accent-purple);">C: DataSerial</h3>
+            <p>資料序列化<br>Parquet/JSON/msgpack<br>壓縮/解壓縮</p>
+        </div>
+        <div style="background: var(--bg-tertiary); padding: 16px; border-radius: 8px;">
+            <h3 style="color: var(--accent-orange);">D: HttpNetwork</h3>
+            <p>HTTP 網路工具<br>httpx/aiohttp/retry<br>Rate limiting</p>
+        </div>
+        <div style="background: var(--bg-tertiary); padding: 16px; border-radius: 8px;">
+            <h3 style="color: var(--accent-yellow);">E: Observability</h3>
+            <p>觀測性引擎<br>Logging/Metrics/Tracing<br>Health check</p>
+        </div>
+        <div style="background: var(--bg-tertiary); padding: 16px; border-radius: 8px;">
+            <h3 style="color: var(--accent-pink);">F: FinanceDomain</h3>
+            <p>金融領域工具<br>TWSE/TPEX/YFinance<br>技術指標計算</p>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- TAB 3: Data Flow -->
+<div id="tab-dataflow" class="tab-content">
+
+<div class="card">
+    <h2>VIA 生態系統資料流向</h2>
+    <p>三大子系統之間的資料流向與共用層的關係。VDF 產出的 Parquet/CSV/DuckDB 直接作為 VAP 的資料來源；VRN 產出的結構化報告資料可供 VAP 視覺化；所有輸出都註冊到 SSOT。</p>
+
+    <div class="flow-diagram">
+        <!-- Row 1: Data Sources -->
+        <div class="flow-row">
+            <div class="flow-box flow-vrn">
+                VRN ReportNova<br>
+                <small>WORD/PDF/IMAGE → 結構化 JSON</small>
+            </div>
+            <div class="flow-box flow-vdf">
+                VDF DataForge<br>
+                <small>yfinance/TWSE/AKShare → Parquet/DuckDB</small>
+            </div>
+        </div>
+
+        <div class="flow-arrow-down">▼ ─────────────── 資料產出 ─────────────── ▼</div>
+
+        <!-- Row 2: Data Outputs -->
+        <div class="flow-row">
+            <div class="flow-box flow-vrn" style="min-width: 130px;">
+                <small>台灣股票<br>個股報告 DB</small>
+            </div>
+            <div class="flow-box flow-vdf" style="min-width: 130px;">
+                <small>Parquet<br>ohlcv_{ts}</small>
+            </div>
+            <div class="flow-box flow-vdf" style="min-width: 130px;">
+                <small>DuckDB<br>intl_v6.duckdb</small>
+            </div>
+            <div class="flow-box flow-vdf" style="min-width: 130px;">
+                <small>CSV<br>utf-8-sig</small>
+            </div>
+            <div class="flow-box flow-vdf" style="min-width: 130px;">
+                <small>Google Sheet<br>CentralHub 設定</small>
+            </div>
+        </div>
+
+        <div class="flow-arrow-down">▼ ──────── VDFConnector 自動掃描 ──────── ▼</div>
+
+        <!-- Row 3: VAP -->
+        <div class="flow-row">
+            <div class="flow-box flow-vap" style="min-width: 400px;">
+                VAP AutoPlot Engine<br>
+                <small>run_vdf() | run_vdf_file() | run_gsheet() | run_vdf_compare() | run_macro() | run_etf_flow() | run_df() | run()</small>
+            </div>
+        </div>
+
+        <div class="flow-arrow-down">▼ ──────── HTML 儀表板輸出 ──────── ▼</div>
+
+        <!-- Row 4: Output -->
+        <div class="flow-row">
+            <div class="flow-box flow-vap" style="min-width: 300px;">
+                HTML Dashboard<br>
+                <small>VIA FusionDashboard 視覺風格 | 14 種圖表 | TA 指標</small>
+            </div>
+        </div>
+
+        <div class="flow-arrow-down">▼ ──────── 資產註冊 ──────── ▼</div>
+
+        <!-- Row 5: SSOT -->
+        <div class="flow-row">
+            <div class="flow-box flow-ssot" style="min-width: 400px;">
+                SSOT Engine (Single Source of Truth)<br>
+                <small>統一管理所有子系統的資產、狀態、問題、決策</small>
+            </div>
+        </div>
+
+        <div class="flow-arrow-down">▲ ──────── 全景掃描 ──────── ▲</div>
+
+        <!-- Row 6: VPN -->
+        <div class="flow-row">
+            <div class="flow-box flow-vpn" style="min-width: 400px;">
+                VPN PanoramaNexus Pipeline<br>
+                <small>M01 FileScanner → M02 ASTParser → M03 DepGraph → M04 SmartID → M05 BrickDB → M06 HTMLSync → M07 Intelligence</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>VDF → VAP 資料連結詳細規格</h2>
+    <table>
+        <tr>
+            <th>VDF 來源</th>
+            <th>輸出格式</th>
+            <th>命名規則</th>
+            <th>VAP 載入方法</th>
+        </tr>
+        <tr>
+            <td>M01 BatchDownloader</td>
+            <td>Parquet / CSV</td>
+            <td><code>ohlcv_{ts}.parquet</code></td>
+            <td><code>run_vdf()</code> / <code>run_vdf_file()</code></td>
+        </tr>
+        <tr>
+            <td>CentralHub LEGO v6</td>
+            <td>Parquet / CSV</td>
+            <td><code>{table}__{CAT}__{start}__{end}__{ts}.parquet</code></td>
+            <td><code>run_vdf()</code> / <code>run_vdf_file()</code></td>
+        </tr>
+        <tr>
+            <td>CentralHub LEGO v6</td>
+            <td>DuckDB</td>
+            <td><code>intl_v6.duckdb</code></td>
+            <td><code>VDFConnector.load_duckdb()</code></td>
+        </tr>
+        <tr>
+            <td>M02 AKShare/FRED</td>
+            <td>Parquet / CSV</td>
+            <td><code>akshare_fred_{region}_{ts}.csv</code></td>
+            <td><code>run_macro()</code></td>
+        </tr>
+        <tr>
+            <td>CentralHub (Google Sheet)</td>
+            <td>Google Sheet URL</td>
+            <td>docs.google.com/spreadsheets/d/{id}</td>
+            <td><code>run_gsheet()</code></td>
+        </tr>
+        <tr>
+            <td>ETF Flow Daily</td>
+            <td>Parquet / CSV</td>
+            <td><code>etf_flow_daily__{CAT}__{s}__{e}__{ts}</code></td>
+            <td><code>run_etf_flow()</code></td>
+        </tr>
+    </table>
+</div>
+
+<div class="card">
+    <h2>VRN → VAP 資料連結（未來擴展）</h2>
+    <p>VRN 產出的台灣股票個股報告結構化資料，可作為 VAP 的輸入來源，實現報告中的財務數據視覺化。</p>
+    <table>
+        <tr>
+            <th>VRN 來源</th>
+            <th>資料類型</th>
+            <th>VAP 用途</th>
+            <th>狀態</th>
+        </tr>
+        <tr>
+            <td>M01+M02 輸出</td>
+            <td>結構化 JSON (財報數據)</td>
+            <td>EPS/ROE/Revenue 趨勢圖</td>
+            <td><span class="status status-planned">Planned</span></td>
+        </tr>
+        <tr>
+            <td>M04 TableOCR</td>
+            <td>表格 DataFrame</td>
+            <td>財務比率比較圖</td>
+            <td><span class="status status-planned">Planned</span></td>
+        </tr>
+        <tr>
+            <td>M07 Summarizer</td>
+            <td>NLP 摘要 JSON</td>
+            <td>報告摘要卡片</td>
+            <td><span class="status status-planned">Planned</span></td>
+        </tr>
+    </table>
+</div>
+</div>
+
+<!-- TAB 4: Integration Matrix -->
+<div id="tab-integration" class="tab-content">
+
+<div class="card">
+    <h2>Cross-System Integration Matrix</h2>
+    <p>每個共用元件在各子系統中的使用狀態與整合深度。</p>
+    <table>
+        <tr>
+            <th>Shared Component</th>
+            <th>VRN</th>
+            <th>VDF</th>
+            <th>VAP</th>
+            <th>VPN</th>
+            <th>SSOT</th>
+        </tr>
+        <tr>
+            <td>SmartAsset AST ID</td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Active</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Active</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Active</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Active</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Core</span></td>
+        </tr>
+        <tr>
+            <td>Anchor System</td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> 7 Anchors</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Family:Cat</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> 13 Anchors</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> 7 Phases</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-cyan"></span> Registry</span></td>
+        </tr>
+        <tr>
+            <td>SSOT Read/Write</td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> R/W</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> R/W</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> R/W</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> R/W</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Core</span></td>
+        </tr>
+        <tr>
+            <td>UltimateTemplate v3</td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Base</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Base</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Base</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-gray"></span> PS1</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-gray"></span> N/A</span></td>
+        </tr>
+        <tr>
+            <td>ModPack A: CpuAccel</td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Heavy</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-cyan"></span> Medium</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-cyan"></span> Light</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-cyan"></span> Medium</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-gray"></span> N/A</span></td>
+        </tr>
+        <tr>
+            <td>ModPack B: Cache</td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Active</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Active</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-cyan"></span> Light</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-cyan"></span> Light</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-gray"></span> N/A</span></td>
+        </tr>
+        <tr>
+            <td>ModPack C: DataSerial</td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Active</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Core</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Active</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-cyan"></span> Light</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-gray"></span> N/A</span></td>
+        </tr>
+        <tr>
+            <td>ModPack D: HttpNetwork</td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Active</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Core</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-gray"></span> N/A</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-gray"></span> N/A</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-gray"></span> N/A</span></td>
+        </tr>
+        <tr>
+            <td>ModPack E: Observability</td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Active</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Active</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Active</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Active</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Core</span></td>
+        </tr>
+        <tr>
+            <td>ModPack F: Finance</td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> TWSE/TPEX</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Core</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> TA Engine</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-gray"></span> N/A</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-gray"></span> N/A</span></td>
+        </tr>
+        <tr>
+            <td>Decision Engine</td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Active</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Active</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Active</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Active</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Core</span></td>
+        </tr>
+        <tr>
+            <td>Failure Engine</td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Active</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Active</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Active</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Active</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Core</span></td>
+        </tr>
+        <tr>
+            <td>FusionDashboard Style</td>
+            <td><span class="matrix-cell"><span class="dot dot-cyan"></span> Reports</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-cyan"></span> Console</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Core</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-cyan"></span> Dashboard</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-gray"></span> N/A</span></td>
+        </tr>
+        <tr>
+            <td>VPN Scan Coverage</td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Scanned</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Scanned</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Scanned</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Self</span></td>
+            <td><span class="matrix-cell"><span class="dot dot-green"></span> Target</span></td>
+        </tr>
+    </table>
+</div>
+
+<div class="card">
+    <h2>VDF Schema v6 — 8 表 Integration Map</h2>
+    <table>
+        <tr>
+            <th>Table</th>
+            <th>Ticker Column</th>
+            <th>VDF Source</th>
+            <th>VAP Chart Types</th>
+            <th>VRN Overlap</th>
+        </tr>
+        <tr>
+            <td><code>index_intl</code></td>
+            <td><code>ticker</code></td>
+            <td>M01 + LEGO v6</td>
+            <td>Line / Area / Event Overlay</td>
+            <td>—</td>
+        </tr>
+        <tr>
+            <td><code>stock_intl</code></td>
+            <td><code>ticker</code></td>
+            <td>M01 + LEGO v6</td>
+            <td>OHLCV / TA / Bubble / Valuation</td>
+            <td>台股個股報告</td>
+        </tr>
+        <tr>
+            <td><code>etf_daily</code></td>
+            <td><code>ticker</code></td>
+            <td>M01 + LEGO v6</td>
+            <td>Line / Compare / Correlation</td>
+            <td>—</td>
+        </tr>
+        <tr>
+            <td><code>etf_flow_daily</code></td>
+            <td><code>ticker</code></td>
+            <td>LEGO v6</td>
+            <td>Flow Matrix / dvol_ratio / RS</td>
+            <td>—</td>
+        </tr>
+        <tr>
+            <td><code>fx_daily</code></td>
+            <td><code>pair</code></td>
+            <td>M01 + LEGO v6</td>
+            <td>Line / Multi-pair Compare</td>
+            <td>—</td>
+        </tr>
+        <tr>
+            <td><code>commodity_daily</code></td>
+            <td><code>ticker</code></td>
+            <td>M01 + LEGO v6</td>
+            <td>Line / Area / Event Overlay</td>
+            <td>—</td>
+        </tr>
+        <tr>
+            <td><code>rate_daily</code></td>
+            <td><code>ticker</code></td>
+            <td>M02 + LEGO v6</td>
+            <td>Multi-axis Line / Yield Curve</td>
+            <td>—</td>
+        </tr>
+        <tr>
+            <td><code>crypto_daily</code></td>
+            <td><code>symbol</code></td>
+            <td>M01 + LEGO v6</td>
+            <td>Line / Volatility / Bubble</td>
+            <td>—</td>
+        </tr>
+    </table>
+</div>
+</div>
+
+<!-- TAB 5: Asset Registry -->
+<div id="tab-assets" class="tab-content">
+
+<div class="card">
+    <h2>VDF Asset Registry (39 Assets)</h2>
+    <table>
+        <tr>
+            <th>AST ID</th>
+            <th>Family</th>
+            <th>Type</th>
+            <th>Path</th>
+        </tr>
+        <tr><td><code>AST-F761494815</code></td><td><span class="badge badge-vdf">VDF</span></td><td>python-module</td><td>module/VDF_CentralHub_LEGO_v6.py</td></tr>
+        <tr><td><code>AST-5C6BC9DDDA</code></td><td><span class="badge badge-vdf">VDF</span></td><td>pipeline-module</td><td>module/VDF_M01_BatchDownloader_TURBO_v4.py</td></tr>
+        <tr><td><code>AST-EBD1D3FCD2</code></td><td><span class="badge badge-vdf">VDF</span></td><td>pipeline-module</td><td>module/VDF_M02_AKShareFREDSentimentDB_v5.py</td></tr>
+        <tr><td><code>AST-56633BD6F1</code></td><td><span class="badge badge-vdf">VDF</span></td><td>registry-config</td><td>module/VDF_CentralHub_LEGO_v6_schema.json</td></tr>
+        <tr><td><code>AST-CB0EBA19A5</code></td><td><span class="badge badge-vdf">VDF</span></td><td>python-module</td><td>VDF_API_Server.py</td></tr>
+        <tr><td><code>AST-F4E02B28F6</code></td><td><span class="badge badge-vdf">VDF</span></td><td>registry-config</td><td>VDF_ASSET_REGISTRY.json</td></tr>
+        <tr><td><code>AST-F68B5FE3A6</code></td><td><span class="badge badge-vdf">VDF</span></td><td>python-module</td><td>VDF_AST_Analyzer.py</td></tr>
+    </table>
+</div>
+
+<div class="card">
+    <h2>VRN Asset Registry (10 Assets)</h2>
+    <table>
+        <tr>
+            <th>AST ID</th>
+            <th>Family</th>
+            <th>Type</th>
+            <th>Path</th>
+        </tr>
+        <tr><td><code>AST-C65847CB26</code></td><td><span class="badge badge-vrn">VRN</span></td><td>registry-config</td><td>VRN_Anchor_AST_Registry.json</td></tr>
+        <tr><td><code>AST-CFC51DE199</code></td><td><span class="badge badge-vrn">VRN</span></td><td>python-module</td><td>VRN_Integration_Loader.py</td></tr>
+        <tr><td><code>AST-DB2DD02231</code></td><td><span class="badge badge-vrn">VRN</span></td><td>powershell-launcher</td><td>VRN_Launch_Accelerated.ps1</td></tr>
+        <tr><td><code>AST-003BD7E9EE</code></td><td><span class="badge badge-vrn">VRN</span></td><td>pipeline-module</td><td>VRN_M07_Summarizer.py</td></tr>
+        <tr><td><code>AST-A089ABF774</code></td><td><span class="badge badge-vrn">VRN</span></td><td>python-module</td><td>VRN_SuperEmbedded_Accelerator_Internet_Module.py</td></tr>
+        <tr><td><code>AST-C4BEE10CBB</code></td><td><span class="badge badge-vrn">VRN</span></td><td>html-ui</td><td>VRN_SYSTEM_Launcher.html</td></tr>
+        <tr><td><code>AST-8D6C90E7E6</code></td><td><span class="badge badge-vrn">VRN</span></td><td>orchestrator</td><td>VRN_TwoGroup_Accelerated_Orchestrator.py</td></tr>
+        <tr><td><code>AST-FB928C804B</code></td><td><span class="badge badge-vrn">VRN</span></td><td>python-module</td><td>VRN_VDF_Modular_Anchor_AST_Exporter.py</td></tr>
+    </table>
+</div>
+
+<div class="card">
+    <h2>VRN Tools Registry (8 Categories)</h2>
+    <table>
+        <tr>
+            <th>Category</th>
+            <th>Role</th>
+            <th>Tools Count</th>
+            <th>High-Confidence Verify</th>
+        </tr>
+        <tr><td>synonym_engine</td><td>verify</td><td>3</td><td>1st</td></tr>
+        <tr><td>m02_restructurer</td><td>core</td><td>11</td><td>—</td></tr>
+        <tr><td>pipeline_orchestrator</td><td>orchestrate</td><td>14</td><td>—</td></tr>
+        <tr><td>diagnostic_test</td><td>verify</td><td>5</td><td>2nd</td></tr>
+        <tr><td>accelerator_turbo</td><td>accelerate</td><td>9</td><td>—</td></tr>
+        <tr><td>panoramic_scanner</td><td>verify</td><td>9</td><td>3rd</td></tr>
+        <tr><td>enterprise_production</td><td>orchestrate</td><td>5</td><td>—</td></tr>
+        <tr><td>repair_commander</td><td>verify</td><td>7</td><td>4th</td></tr>
+        <tr><td>supporting</td><td>support</td><td>8</td><td>—</td></tr>
+    </table>
+</div>
+</div>
+
+<!-- TAB 6: Paths & Config -->
+<div id="tab-paths" class="tab-content">
+
+<div class="card">
+    <h2>VIA 統一路徑常數</h2>
+    <table>
+        <tr>
+            <th>常數名</th>
+            <th>路徑</th>
+            <th>用途</th>
+        </tr>
+        <tr><td><code>VIA_ROOT</code></td><td><code>C:\VeritasIntelligenceAnalytics</code></td><td>母系統根目錄</td></tr>
+        <tr><td><code>VPN_ROOT</code></td><td><code>C:\VeritasIntelligenceAnalytics\VeritasPanoramaNexus</code></td><td>全景掃描系統</td></tr>
+        <tr><td><code>VPN_SUPREME</code></td><td><code>C:\VeritasIntelligenceAnalytics\VeritasPanoramaNexus_SUPREME</code></td><td>全景掃描進階版</td></tr>
+        <tr><td><code>VIAS_ROOT</code></td><td><code>C:\VeritasIntelligenceAnalytics\VeritasIntelligenceAssetSystem</code></td><td>智慧資產系統</td></tr>
+        <tr><td><code>VDF_ROOT</code></td><td><code>C:\VeritasIntelligenceAnalytics\VeritasDataForge</code></td><td>資料鍛造系統</td></tr>
+        <tr><td><code>VAP_ROOT</code></td><td><code>C:\VeritasIntelligenceAnalytics\VeritasAutoPlot</code></td><td>自動視覺化引擎</td></tr>
+        <tr><td><code>SSOT_DIR</code></td><td><code>C:\VeritasIntelligenceAnalytics\_SSOT</code></td><td>SSOT 資料目錄</td></tr>
+        <tr><td><code>OUTPUT_DIR</code></td><td><code>C:\VeritasIntelligenceAnalytics\output</code></td><td>統一輸出目錄</td></tr>
+        <tr><td><code>LOG_DIR</code></td><td><code>C:\VeritasIntelligenceAnalytics\logs</code></td><td>統一日誌目錄</td></tr>
+        <tr><td><code>CACHE_DIR</code></td><td><code>C:\VeritasIntelligenceAnalytics\.cache</code></td><td>統一快取目錄</td></tr>
+    </table>
+</div>
+
+<div class="card">
+    <h2>VDF 輸出目錄結構</h2>
+    <div class="code-block">C:\VeritasIntelligenceAnalytics\VeritasDataForge\
+├── output\
+│   ├── parquet\                              ← M01 Parquet 輸出
+│   │   └── ohlcv_{ts}.parquet
+│   ├── csv\                                  ← M01 CSV 輸出
+│   │   └── ohlcv_{ts}.csv
+│   ├── VDF_CentralHub_LEGO_v6\               ← LEGO v6 輸出
+│   │   ├── index_intl__DEFAULT__{s}__{e}__{ts}.parquet
+│   │   ├── stock_intl__DEFAULT__{s}__{e}__{ts}.parquet
+│   │   ├── etf_daily__DEFAULT__{s}__{e}__{ts}.parquet
+│   │   ├── etf_flow_daily__DEFAULT__{s}__{e}__{ts}.parquet
+│   │   ├── fx_daily__DEFAULT__{s}__{e}__{ts}.parquet
+│   │   ├── commodity_daily__DEFAULT__{s}__{e}__{ts}.parquet
+│   │   ├── rate_daily__DEFAULT__{s}__{e}__{ts}.parquet
+│   │   └── crypto_daily__DEFAULT__{s}__{e}__{ts}.parquet
+│   └── duckdb\
+│       └── intl_v6.duckdb                    ← LEGO v6 DuckDB
+├── VDF_M02\
+│   ├── csv\
+│   │   └── akshare_fred_{region}_{ts}.csv    ← M02 宏觀資料
+│   └── duckdb\
+│       └── akshare_fred_macro.duckdb
+└── module\
+    ├── VDF_CentralHub_LEGO_v6.py
+    ├── VDF_M01_BatchDownloader_TURBO_v4.py
+    └── VDF_M02_AKShareFREDSentimentDB_v5.py</div>
+</div>
+
+<div class="card">
+    <h2>VAP 引擎目錄結構</h2>
+    <div class="code-block">C:\VeritasIntelligenceAnalytics\VeritasAutoPlot\
+├── engine\
+│   ├── __init__.py              (27 lines)   ← 模組匯出
+│   ├── autoplot.py            (1,131 lines)   ← 主控管線 (8 run 方法)
+│   ├── vdf_connector.py       (1,042 lines)   ← VDF 資料連結引擎
+│   ├── vdf_bridge.py            (503 lines)   ← VDF Schema 橋接
+│   ├── chart_engine.py          (502 lines)   ← Plotly 圖表生成器
+│   ├── via_integration.py       (458 lines)   ← VIA 生態系統整合
+│   ├── html_renderer.py         (451 lines)   ← HTML 儀表板渲染器
+│   ├── design_system.py         (259 lines)   ← 視覺設計常數
+│   ├── chart_flow.py            (258 lines)   ← ETF 資金流圖表
+│   ├── event_matrix.py          (207 lines)   ← 歷史事件庫
+│   ├── data_loader.py           (205 lines)   ← Universal Data Loader
+│   ├── ta_engine.py             (182 lines)   ← 技術指標引擎
+│   └── bubble_valuation.py       (92 lines)   ← 泡沫偵測引擎
+├── output\                                    ← HTML 儀表板輸出
+└── temp\                                      ← 暫存目錄</div>
+</div>
+
+<div class="card">
+    <h2>環境變數</h2>
+    <table>
+        <tr>
+            <th>變數名</th>
+            <th>預設值</th>
+            <th>用途</th>
+        </tr>
+        <tr><td><code>VRN_MODIFIED_CMD_ROOT</code></td><td>修改後指令 路徑</td><td>VRN 指令根目錄</td></tr>
+        <tr><td><code>VRN_ROOT</code></td><td>VRN 子目錄</td><td>VRN 腳本目錄</td></tr>
+        <tr><td><code>VRN_OUTPUT_SAVE_DIR</code></td><td>VRN_Output</td><td>VRN 輸出儲存</td></tr>
+        <tr><td><code>VRN_ACCEL_MAX</code></td><td>1</td><td>啟用最大加速</td></tr>
+        <tr><td><code>VRN_CROSS_ACCEL</code></td><td>1</td><td>啟用交叉加速</td></tr>
+        <tr><td><code>VIS_ACCEL_MASTER_ENABLE_ALL_CPU</code></td><td>1</td><td>啟用全 CPU 加速</td></tr>
+        <tr><td><code>VRN_MAX_WORKERS</code></td><td>CPU*2</td><td>最大工作線程</td></tr>
+        <tr><td><code>VRN_SAFE_CPU_TARGET_RATIO</code></td><td>0.90</td><td>CPU 安全目標比</td></tr>
+        <tr><td><code>VRN_SAFE_MEM_TARGET_RATIO</code></td><td>0.85</td><td>記憶體安全目標比</td></tr>
+    </table>
+</div>
+</div>
+
+</div>
+
+<div class="footer">
+    Veritas Intelligence Analytics — Ecosystem Architecture v1.0<br>
+    Generated: 2026-03-20 | System: VeritasAutoPlot™ v4.1
+</div>
+
+<script>
+function showTab(name) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    event.target.classList.add('active');
+}
+</script>
+</body>
+</html>

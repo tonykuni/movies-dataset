@@ -1,8 +1,18 @@
-﻿# =============================================================================
+# =============================================================================
 #  VIA-CGE-OneShot-v0400.ps1 — 中央治理引擎一鍵安裝+執行(自解壓,零外部相依)
 #  貼上即跑:自動裝進 VIA_Governance_Runtime、註冊 via-gov 指令、跑完整 pipeline
 #  LL 慣例:無別名 / 無 Read-Host / 不刪檔;預設即 --commit 全流程
 # =============================================================================
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = 'Stop'
 
 # ---- 1) 定位 repo(優先 movies-dataset,退而求其次:目前目錄往下找)---------
@@ -473,7 +483,7 @@ $PathsB64 = @(
 'Tl8yMDI2MDcxMV8xMjE5MDJfQ09OVFJPTExFRF9CT09UU1RSQVBfUEhBU0VfVFJBQ0VfdjAxNUJcanNvblxwaGFzZV9QMDZfYm9vdHN0cmFwX3Nzb3QuanNvbgpDOlxVc2Vyc1x0b255a1xEb3dubG9hZHNcVmVyaXRhc0ludGVsbGlnZW5jZUFuYWx5dGljc1xfdmlhX3J1bm91dHB1dF9kcmFpbmVyX3J1bnNcUlVOXzIwMjYwNzIxXzEyMzIzN19WSUFfUlVOT1VUUFVUX0RSQUlORVJfdjAwOVxfcXVh'
 'cmFudGluZV9ydW5vdXRwdXRfcHJlc2VydmVfb3JpZ2luYWxfcGF0aHNcX3ZpYV9zeXN0ZW1fbWFuYWdlcl9ydW5zXFJVTl8yMDI2MDcwOV8xNTE3MjRfVklBX1NZU1RFTV9NQU5BR0VSX0RFQ0lTSU9OX1NUVURJT192MDA4X0RSWVJVTlxWSUFfdjAwOF9zc290X2NvbXBhcmlzb24uY3N2Cg=='
 ) -join ''
-$EnginePath = Join-Path $Gov 'VIA_CentralGovernanceEngine_v0400.py'
+$EnginePath = Join-Path $Gov 'CGC_MDL001_CentralGovernanceEngine_v0400.py'
 $PathsFile  = Join-Path $Cge 'ssot_paths.txt'
 [System.IO.File]::WriteAllBytes($EnginePath, [System.Convert]::FromBase64String($EngineB64))
 [System.IO.File]::WriteAllBytes($PathsFile,  [System.Convert]::FromBase64String($PathsB64))
@@ -522,3 +532,4 @@ if (Test-Path -LiteralPath $Dash) { Start-Process $Dash }
 Write-Output '=============================================================='
 Write-Output ('完成。之後日常只要打:  via-gov --commit --fetch-tw   (dry-run 則省略 --commit)')
 Write-Output ('治理 SSOT 位置: ' + $Cge)
+

@@ -1,3 +1,13 @@
+# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+try {
+    $VIAPSAccelProbe = $PSScriptRoot
+    while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
+        $VIAPSAccelMod = Join-Path $VIAPSAccelProbe "supportive modules\VIA_PS_Accel_Module.ps1"
+        if (Test-Path $VIAPSAccelMod) { . $VIAPSAccelMod; break }
+        $VIAPSAccelProbe = Split-Path $VIAPSAccelProbe -Parent
+    }
+} catch { }
+# ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Stop"
 [Environment]::SetEnvironmentVariable("PYTHONINSPECT", $null, "Process")
 [Environment]::SetEnvironmentVariable("PYTHONSTARTUP", $null, "Process")
@@ -34,3 +44,4 @@ $Report = Join-Path $RunDir "report\VIA_v0116_DashboardBindingDryRunPlan_OnePage
 if (Test-Path -LiteralPath $Report) { Start-Process -FilePath $Report }
 Write-Host "[OK] DASHBOARD_BINDING_DRYRUN_PLAN_READY_REVIEW_ONLY" -ForegroundColor Green
 Write-Host "PowerShell remains open." -ForegroundColor Cyan
+

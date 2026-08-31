@@ -1,0 +1,371 @@
+{
+  "def_system": "VIA_Global_ETF_Risk_Synchronization_Model",
+  "def_engine_id": "VIA-MDL009-ETFRISK",
+  "def_sibling_engine": "VIA-MDL008-ETFFLOW (VIA_GlobalETFFlow.py, T1 真流引擎)",
+  "def_version": "v20260816_001",
+  "def_module_family": "GLOBAL_MARKET_RADAR",
+  "def_base_currency": "USD",
+  "def_policy": {
+    "encoding": "UTF-8 (No BOM)",
+    "write_mode": "append_only_run_dirs",
+    "source_mutation": false,
+    "canonical_writeback": false,
+    "delete_action": false,
+    "truth_ladder": {
+      "T1": "真流 PRIMARY（ΔShares×NAV，由 MDL008 提供，本引擎不產生）",
+      "T3": "估算 ESTIMATE（價量推導：分數/輪動/同步/隱含EPS，本引擎主產出）",
+      "T4": "模擬 SIM（synthetic demo 資料，僅供管線驗證，輸出必須掛 SYNTHETIC 標記）"
+    },
+    "evidence_tags": { "V": "官方確認", "Der": "規則推導", "Est": "價量估算", "P": "待補" }
+  },
+  "def_visual_lock": {
+    "bg": "#f5f4f0", "paper": "#ffffff", "ink": "#1e1d1a", "sub": "#6b6a66", "bd": "#dbd9d3",
+    "up": "#c96b5a", "down": "#5a9e6f", "blue": "#4c78a8", "teal": "#439a9a", "am": "#c4943a",
+    "seal": "#b5291a",
+    "note": "紅漲綠跌（VIA Visual Lock，與 MDL008/RotationEngine 對齊）；色彩永不單獨承載意義，數值一律同列印出"
+  },
+  "def_flow_overlay": {
+    "status": "optional_input",
+    "expects": "VIA_GlobalETFFlow etf_matrix.json（T1 flow_usd / FIS_pv）",
+    "behavior": "存在時在 dashboard 疊加每檔 ETF 的 FIS 與真流金額；缺檔時本引擎獨立運作"
+  },
+  "def_timeframes_days": { "1d": 1, "5d": 5, "20d": 20, "60d": 60, "120d": 120, "252d": 252 },
+  "def_benchmark": "ACWI",
+  "def_macro_series": ["DGS2", "DGS10", "DFII10", "T10YIE"],
+
+  "def_etf_universe": {
+    "global_equity": [
+      { "ticker": "VT",   "name": "全球股市",         "region": "Global", "haven_level": 4 },
+      { "ticker": "ACWI", "name": "全球股市基準",     "region": "Global", "haven_level": 4 },
+      { "ticker": "ACWX", "name": "全球除美",         "region": "Global", "haven_level": 4 }
+    ],
+    "us_equity": [
+      { "ticker": "SPY", "name": "美國大型股",       "region": "US", "haven_level": 4 },
+      { "ticker": "QQQ", "name": "美國科技成長",     "region": "US", "haven_level": 4 },
+      { "ticker": "IWM", "name": "美國小型股",       "region": "US", "haven_level": 4 },
+      { "ticker": "RSP", "name": "標普等權重",       "region": "US", "haven_level": 4 },
+      { "ticker": "SMH", "name": "半導體",           "region": "US", "haven_level": 4 }
+    ],
+    "developed_ex_us": [
+      { "ticker": "EFA", "name": "已開發非美",       "region": "DM_exUS", "haven_level": 4 },
+      { "ticker": "VEA", "name": "已開發非美(V)",    "region": "DM_exUS", "haven_level": 4 },
+      { "ticker": "VGK", "name": "歐洲",             "region": "Europe",  "haven_level": 4 },
+      { "ticker": "EZU", "name": "歐元區",           "region": "Europe",  "haven_level": 4 },
+      { "ticker": "EWJ", "name": "日本",             "region": "Japan",   "haven_level": 4 },
+      { "ticker": "EWU", "name": "英國",             "region": "Europe",  "haven_level": 4 },
+      { "ticker": "EWG", "name": "德國",             "region": "Europe",  "haven_level": 4 },
+      { "ticker": "EWQ", "name": "法國",             "region": "Europe",  "haven_level": 4 }
+    ],
+    "emerging_markets": [
+      { "ticker": "EEM",  "name": "新興市場",        "region": "EM",        "haven_level": 4 },
+      { "ticker": "VWO",  "name": "新興市場(V)",     "region": "EM",        "haven_level": 4 },
+      { "ticker": "MCHI", "name": "中國",            "region": "China",     "haven_level": 4 },
+      { "ticker": "FXI",  "name": "中國大型股",      "region": "China",     "haven_level": 4 },
+      { "ticker": "ASHR", "name": "中國A股",         "region": "China",     "haven_level": 4 },
+      { "ticker": "INDA", "name": "印度",            "region": "India",     "haven_level": 4 },
+      { "ticker": "EWT",  "name": "台灣",            "region": "Taiwan",    "haven_level": 4 },
+      { "ticker": "EWY",  "name": "韓國",            "region": "Korea",     "haven_level": 4 },
+      { "ticker": "EWZ",  "name": "巴西",            "region": "LatAm",     "haven_level": 4 },
+      { "ticker": "EWW",  "name": "墨西哥",          "region": "LatAm",     "haven_level": 4 },
+      { "ticker": "EWS",  "name": "新加坡",          "region": "ASEAN",     "haven_level": 4 },
+      { "ticker": "EIDO", "name": "印尼",            "region": "ASEAN",     "haven_level": 4 }
+    ],
+    "us_rates": [
+      { "ticker": "BIL",  "name": "美債0-3月",       "region": "US", "haven_level": 1 },
+      { "ticker": "SGOV", "name": "美債0-3月(i)",    "region": "US", "haven_level": 1 },
+      { "ticker": "SHY",  "name": "美債1-3年",       "region": "US", "haven_level": 2 },
+      { "ticker": "IEI",  "name": "美債3-7年",       "region": "US", "haven_level": 2 },
+      { "ticker": "IEF",  "name": "美債7-10年",      "region": "US", "haven_level": 2 },
+      { "ticker": "TLT",  "name": "美債20年+",       "region": "US", "haven_level": 2 },
+      { "ticker": "TIP",  "name": "抗通膨債",        "region": "US", "haven_level": 2 }
+    ],
+    "credit": [
+      { "ticker": "LQD",  "name": "投資級債",        "region": "US", "haven_level": 3 },
+      { "ticker": "HYG",  "name": "高收益債",        "region": "US", "haven_level": 4 },
+      { "ticker": "JNK",  "name": "高收益債(J)",     "region": "US", "haven_level": 4 },
+      { "ticker": "EMB",  "name": "新興美元債",      "region": "EM", "haven_level": 4 },
+      { "ticker": "EMLC", "name": "新興本幣債",      "region": "EM", "haven_level": 4 }
+    ],
+    "commodities": [
+      { "ticker": "GLD",  "name": "黃金",            "region": "Global", "haven_level": 1 },
+      { "ticker": "SLV",  "name": "白銀",            "region": "Global", "haven_level": 3 },
+      { "ticker": "USO",  "name": "原油WTI",         "region": "Global", "haven_level": 3 },
+      { "ticker": "BNO",  "name": "原油Brent",       "region": "Global", "haven_level": 3 },
+      { "ticker": "CPER", "name": "銅",              "region": "Global", "haven_level": 3 },
+      { "ticker": "DBC",  "name": "廣泛商品",        "region": "Global", "haven_level": 3 },
+      { "ticker": "DBA",  "name": "農產品",          "region": "Global", "haven_level": 3 }
+    ],
+    "currency": [
+      { "ticker": "UUP", "name": "美元",             "region": "US",     "haven_level": 1 },
+      { "ticker": "FXE", "name": "歐元",             "region": "Europe", "haven_level": 2 },
+      { "ticker": "FXY", "name": "日圓",             "region": "Japan",  "haven_level": 2 },
+      { "ticker": "FXB", "name": "英鎊",             "region": "Europe", "haven_level": 3 }
+    ],
+    "real_assets": [
+      { "ticker": "VNQ", "name": "美國REITs",        "region": "US", "haven_level": 3 }
+    ],
+    "digital_assets": [
+      { "ticker": "IBIT", "name": "比特幣現貨ETF",   "region": "Global", "haven_level": 4 }
+    ]
+  },
+
+  "def_score_scaling": {
+    "z_method": "robust_mad",
+    "z_note": "robust_z = (x - median) / (1.4826 * MAD)，與 MDL008 FIS 同式",
+    "z_lookback_days": 252,
+    "z_clip": 3.0,
+    "fis_formula": "fis = 100 * tanh(mean(component_z * weight) / 2)  → ±100",
+    "risk_formula": "risk_0_100 = 50 + fis / 2",
+    "bands": [
+      { "id": "low",     "max": 30,  "label": "Low",     "label_zh": "低",   "status": "good" },
+      { "id": "medium",  "max": 60,  "label": "Medium",  "label_zh": "中",   "status": "warning" },
+      { "id": "high",    "max": 80,  "label": "High",    "label_zh": "高",   "status": "serious" },
+      { "id": "extreme", "max": 100, "label": "Extreme", "label_zh": "極端", "status": "critical" }
+    ]
+  },
+
+  "def_scores": {
+    "usd_stress": {
+      "name_zh": "美元壓力",
+      "mcfl": "MCFL-M20-C21-F201",
+      "components": [
+        { "id": "ret_20_UUP",        "weight": 1.0, "desc": "美元20日動能" },
+        { "id": "chg_20_DFII10",     "weight": 1.0, "desc": "10Y實質利率20日變動" },
+        { "id": "rel_20_IEF_HYG",    "weight": 1.0, "desc": "HYG落後美債(信用壓力外溢)" },
+        { "id": "rel_20_IEF_EMB",    "weight": 1.0, "desc": "EMB落後美債(EM美元壓力)" },
+        { "id": "neg_ret_20_EMLC",   "weight": 0.5, "desc": "EM本幣債弱勢(EM FX壓力)" }
+      ]
+    },
+    "rate_shock": {
+      "name_zh": "利率衝擊",
+      "mcfl": "MCFL-M20-C21-F202",
+      "components": [
+        { "id": "chg_20_DGS2",       "weight": 1.0, "desc": "2Y殖利率20日變動" },
+        { "id": "chg_20_DGS10",      "weight": 1.0, "desc": "10Y殖利率20日變動" },
+        { "id": "chg_20_DFII10",     "weight": 1.0, "desc": "實質利率20日變動" },
+        { "id": "neg_ret_20_TLT",    "weight": 1.0, "desc": "長債下跌幅度" }
+      ]
+    },
+    "credit_stress": {
+      "name_zh": "信用壓力",
+      "mcfl": "MCFL-M20-C21-F203",
+      "components": [
+        { "id": "dd_60_HYG_IEF",     "weight": 1.0, "desc": "HYG/IEF比值60日回撤" },
+        { "id": "dd_60_LQD_IEF",     "weight": 1.0, "desc": "LQD/IEF比值60日回撤" },
+        { "id": "dd_60_EMB",         "weight": 1.0, "desc": "EMB 60日回撤" }
+      ]
+    },
+    "commodity_inflation": {
+      "name_zh": "商品通膨",
+      "mcfl": "MCFL-M20-C21-F204",
+      "components": [
+        { "id": "ret_60_USO",        "weight": 1.0, "desc": "原油60日動能" },
+        { "id": "ret_60_CPER",       "weight": 1.0, "desc": "銅60日動能" },
+        { "id": "ret_60_DBC",        "weight": 1.0, "desc": "廣泛商品60日動能" }
+      ]
+    }
+  },
+
+  "def_cross_asset_pulse": {
+    "name_zh": "跨資產 Risk Pulse",
+    "mcfl": "MCFL-M20-C28-F250",
+    "risk_leg":    [ ["SPY", 1.0], ["IBIT", 1.5] ],
+    "defense_leg": [ ["IEF", 1.0], ["VNQ", 0.8] ],
+    "smooth_days": 5,
+    "z_window": 60
+  },
+
+  "def_rotation": {
+    "mcfl": "MCFL-M22-C22-F220",
+    "benchmark": "ACWI",
+    "rs_window": 60,
+    "velocity_window": 10,
+    "accel_lag": 5,
+    "tickers": [
+      "SPY", "QQQ", "IWM", "RSP", "SMH",
+      "VGK", "EZU", "EWJ", "EWU", "EWG", "EWQ", "EFA",
+      "EEM", "MCHI", "FXI", "INDA", "EWT", "EWY", "EWZ", "EWW", "EWS", "EIDO"
+    ],
+    "quadrants": {
+      "Q1": { "id": "leading",   "label_zh": "領先 LEADING",     "rule": "rs>0 and velocity>0",  "action": "主升段·續抱" },
+      "Q2": { "id": "improving", "label_zh": "改善 IMPROVING ★", "rule": "rs<=0 and velocity>0", "action": "早期機會·布局" },
+      "Q3": { "id": "lagging",   "label_zh": "落後 LAGGING",     "rule": "rs<=0 and velocity<=0","action": "雙弱·迴避" },
+      "Q4": { "id": "weakening", "label_zh": "轉弱 WEAKENING ⚠", "rule": "rs>0 and velocity<=0", "action": "出貨風險·減碼" }
+    },
+    "note": "與 VIA_RotationEngine RRG 同語彙；本引擎軸為 X=RS水位z、Y=RS動能(ROC)，順時針 Q3→Q2→Q1→Q4"
+  },
+
+  "def_sync": {
+    "mcfl": "MCFL-M25-C25-F251",
+    "corr_windows": [20, 60, 120],
+    "matrix_tickers": [
+      "SPY", "QQQ", "IWM", "VGK", "EWJ", "EEM", "FXI", "INDA", "EWT", "EWY", "EWZ",
+      "TLT", "IEF", "HYG", "EMB", "GLD", "USO", "CPER", "VNQ", "IBIT"
+    ],
+    "factor_proxies": {
+      "usd":           { "kind": "etf_return",   "id": "UUP",  "name_zh": "美元" },
+      "rates":         { "kind": "macro_diff",   "id": "DGS10", "name_zh": "10Y利率" },
+      "credit":        { "kind": "ratio_return", "id": "HYG/IEF", "name_zh": "信用" },
+      "commodity":     { "kind": "etf_return",   "id": "DBC",  "name_zh": "商品" },
+      "global_equity": { "kind": "etf_return",   "id": "ACWI", "name_zh": "全球股" }
+    },
+    "lead_lag": {
+      "lags": [1, 5, 10, 20],
+      "window": 120,
+      "pairs": [
+        ["UUP", "EEM"], ["UUP", "EMB"], ["USO", "INDA"],
+        ["DGS10", "QQQ"], ["CPER", "EWZ"], ["ACWI", "EWT"], ["FXI", "CPER"]
+      ]
+    },
+    "drawdown_sync": { "lookback_high": 60, "trigger_drawdown": 0.05 },
+    "dispersion_window": 20,
+    "pc1_tickers": [
+      "SPY", "QQQ", "IWM", "RSP", "SMH", "VGK", "EZU", "EWJ", "EWU", "EWG", "EWQ",
+      "EFA", "EEM", "MCHI", "FXI", "ASHR", "INDA", "EWT", "EWY", "EWZ", "EWW", "EWS", "EIDO"
+    ],
+    "pc1_window": 60
+  },
+
+  "def_regional_potential": {
+    "mcfl": "MCFL-M20-C26-F230",
+    "note": "利差×匯率動能勢能：potential = (local_10y - US10Y) * ret20(fx_etf)。demo 用靜態 local_10y，正式版應改接每日殖利率序列。",
+    "pairs": [
+      { "region": "Japan",  "fx_etf": "FXY", "country": "Japan" },
+      { "region": "Europe", "fx_etf": "FXE", "country": "Germany" },
+      { "region": "UK",     "fx_etf": "FXB", "country": "UK" }
+    ]
+  },
+
+  "def_regime_smoothing_days": 5,
+  "def_regimes": [
+    {
+      "id": "risk_on_global_reflation", "name_zh": "全球再通膨 Risk-On",
+      "signals": [
+        { "id": "ret_20_ACWI", "op": ">", "value": 0.01,  "weight": 2.0 },
+        { "id": "ret_20_CPER", "op": ">", "value": 0.01,  "weight": 1.0 },
+        { "id": "ret_20_USO",  "op": ">", "value": 0.01,  "weight": 1.0 },
+        { "id": "ret_20_UUP",  "op": "<", "value": 0.0,   "weight": 1.0 },
+        { "id": "ret_20_TLT",  "op": "<", "value": 0.0,   "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "usd_squeeze", "name_zh": "美元擠壓",
+      "signals": [
+        { "id": "score_usd_stress", "op": ">", "value": 60,     "weight": 2.0 },
+        { "id": "ret_20_UUP",       "op": ">", "value": 0.005,  "weight": 1.0 },
+        { "id": "rs_20_EEM",        "op": "<", "value": -0.005, "weight": 1.0 },
+        { "id": "rel_20_EMB_IEF",   "op": "<", "value": -0.003, "weight": 1.0 },
+        { "id": "ret_20_EMLC",      "op": "<", "value": -0.005, "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "rate_shock", "name_zh": "利率衝擊",
+      "signals": [
+        { "id": "score_rate_shock", "op": ">", "value": 60,    "weight": 2.0 },
+        { "id": "chg_20_DGS10",     "op": ">", "value": 0.15,  "weight": 1.0 },
+        { "id": "chg_20_DGS2",      "op": ">", "value": 0.10,  "weight": 1.0 },
+        { "id": "ret_20_TLT",       "op": "<", "value": -0.02, "weight": 1.0 },
+        { "id": "rs_20_QQQ",        "op": "<", "value": 0.0,   "weight": 0.5 }
+      ]
+    },
+    {
+      "id": "growth_scare", "name_zh": "景氣驚嚇",
+      "signals": [
+        { "id": "ret_20_ACWI",    "op": "<", "value": -0.01,  "weight": 1.5 },
+        { "id": "ret_20_TLT",     "op": ">", "value": 0.015,  "weight": 1.5 },
+        { "id": "ret_20_USO",     "op": "<", "value": -0.01,  "weight": 1.0 },
+        { "id": "ret_20_CPER",    "op": "<", "value": -0.01,  "weight": 1.0 },
+        { "id": "rel_20_HYG_IEF", "op": "<", "value": -0.003, "weight": 1.0 },
+        { "id": "chg_20_DGS10",   "op": "<", "value": -0.10,  "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "stagflation", "name_zh": "停滯性通膨",
+      "signals": [
+        { "id": "ret_20_DBC", "op": ">", "value": 0.015, "weight": 1.5 },
+        { "id": "ret_20_TLT", "op": "<", "value": -0.01, "weight": 1.5 },
+        { "id": "ret_20_SPY", "op": "<", "value": -0.01, "weight": 1.5 },
+        { "id": "ret_20_GLD", "op": ">", "value": 0.01,  "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "credit_stress", "name_zh": "信用壓力",
+      "signals": [
+        { "id": "score_credit_stress", "op": ">", "value": 60,     "weight": 2.0 },
+        { "id": "rel_20_HYG_IEF",      "op": "<", "value": -0.008, "weight": 1.5 },
+        { "id": "rs_20_IWM",           "op": "<", "value": -0.01,  "weight": 1.0 },
+        { "id": "rel_20_LQD_IEF",      "op": "<", "value": -0.004, "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "fiscal_dominance", "name_zh": "財政主導",
+      "signals": [
+        { "id": "chg_20_DGS10", "op": ">", "value": 0.10,   "weight": 1.5 },
+        { "id": "ret_20_TLT",   "op": "<", "value": -0.015, "weight": 1.5 },
+        { "id": "ret_20_GLD",   "op": ">", "value": 0.015,  "weight": 1.5 },
+        { "id": "ret_20_UUP",   "op": "<", "value": 0.002,  "weight": 1.0 },
+        { "id": "curvechg_20",  "op": ">", "value": 0.05,   "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "china_demand_shock", "name_zh": "中國需求衝擊",
+      "signals": [
+        { "id": "ret_20_FXI",  "op": "<", "value": -0.02,  "weight": 1.5 },
+        { "id": "ret_20_MCHI", "op": "<", "value": -0.02,  "weight": 1.5 },
+        { "id": "ret_20_CPER", "op": "<", "value": -0.015, "weight": 1.5 },
+        { "id": "ret_20_EWZ",  "op": "<", "value": -0.01,  "weight": 1.0 },
+        { "id": "rs_20_EWY",   "op": "<", "value": -0.005, "weight": 1.0 }
+      ]
+    },
+    {
+      "id": "ai_concentration_boom", "name_zh": "AI 集中化榮景",
+      "signals": [
+        { "id": "rs_20_QQQ",      "op": ">", "value": 0.005,  "weight": 1.5 },
+        { "id": "rs_20_SMH",      "op": ">", "value": 0.01,   "weight": 1.5 },
+        { "id": "rs_20_EWT",      "op": ">", "value": 0.005,  "weight": 1.0 },
+        { "id": "rel_20_RSP_SPY", "op": "<", "value": -0.003, "weight": 1.5 },
+        { "id": "rs_20_IWM",      "op": "<", "value": -0.003, "weight": 1.0 }
+      ]
+    }
+  ],
+
+  "def_earnings": {
+    "mcfl": "MCFL-M35-C35-F350",
+    "sources_file": "data/demo_forward_pe.json",
+    "carry_forward_days": { "fresh": 7, "usable": 21, "stale_warning": 45, "needs_refresh": 90 },
+    "index_proxy_map": {
+      "S&P 500": "SPY", "MSCI Taiwan": "EWT", "MSCI Korea": "EWY",
+      "MSCI Japan": "EWJ", "MSCI China": "MCHI", "MSCI EMU": "EZU"
+    },
+    "index_country_map": {
+      "S&P 500": "US", "MSCI Taiwan": "Taiwan", "MSCI Korea": "Korea",
+      "MSCI Japan": "Japan", "MSCI China": "China", "MSCI EMU": "Germany"
+    },
+    "usd_funding_stress_pp_at_100": 1.0,
+    "rounding_mismatch_tolerance": 0.0005
+  },
+
+  "def_fragility": {
+    "mcfl": "MCFL-M20-C21-F206",
+    "fundamentals_file": "data/demo_macro_fundamentals.json",
+    "higher_is_riskier": ["debt_gdp", "interest_expense_revenue", "external_debt_gni", "cpi"],
+    "lower_is_riskier":  ["fiscal_balance_gdp", "current_account_gdp", "fx_reserve_import_months", "gdp_growth"],
+    "market_overlay": { "etf_ret_window": 20 },
+    "bands": [
+      { "id": "resilient", "max": 30,  "label_zh": "穩健", "status": "good" },
+      { "id": "watch",     "max": 55,  "label_zh": "觀察", "status": "warning" },
+      { "id": "fragile",   "max": 75,  "label_zh": "脆弱", "status": "serious" },
+      { "id": "critical",  "max": 100, "label_zh": "危險", "status": "critical" }
+    ]
+  },
+
+  "def_output": {
+    "run_prefix": "RUN",
+    "run_suffix": "VIA_GLOBAL_ETF_RISK",
+    "files": [
+      "scores.json", "regime.json", "rotation.json", "sync.json",
+      "fragility.json", "forward_earnings_ledger.json", "dashboard.html", "run_summary.json"
+    ],
+    "ledger": "run_ledger.jsonl"
+  }
+}
