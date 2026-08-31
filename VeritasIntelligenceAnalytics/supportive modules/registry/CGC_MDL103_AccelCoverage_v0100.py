@@ -240,19 +240,22 @@ def dupes(root: Path | None = None, register: bool = False) -> int:
     (零物理合併=不失功能;重新註冊=登記候裁示)"""
     root = root or VIA
     fam: dict = defaultdict(set)
-    for p in _walk(root / "functional modules", ".py"):
+    fm = root / "functional modules"
+    for p in _walk(fm, ".py"):
         stem = re.sub(r"_v\d+.*$", "", p.stem)
         core = re.sub(r"^(VDF|VAP|VRN|CGC|VIA|SUP|PLG)_(ENG|MDL)\d+_?", "",
                       stem, flags=re.I) or stem
         if len(core) >= 5:
-            fam[core.lower()].add(p.parts[1])
+            # 批256 修蟲:v0100 誤取絕對路徑 parts[1]=恆同值→0 組假淨;
+            # 正解=相對 functional modules 首段=子系統名
+            fam[core.lower()].add(p.relative_to(fm).parts[0])
     cands = {k: sorted(v) for k, v in fam.items() if len(v) > 1}
     print(f"[dupes] 跨子系統同功能家族 {len(cands)} 組:")
     for k, subs in sorted(cands.items())[:20]:
         print(f"  {k} ×{len(subs)}{subs}")
     if register and CONSOL.exists():
         reg = json.loads(CONSOL.read_text(encoding="utf-8"))
-        lst = reg.setdefault("candidate_merges_b255", [])
+        lst = reg.setdefault("candidate_merges_b256", [])
         seen = {e["family"] for e in lst}
         n = 0
         for k, subs in sorted(cands.items()):
