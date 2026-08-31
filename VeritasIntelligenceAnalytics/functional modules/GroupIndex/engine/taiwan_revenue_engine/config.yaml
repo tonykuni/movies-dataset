@@ -1,0 +1,73 @@
+# ==========================================================================
+#  台股月營收動能引擎  設定檔
+# ==========================================================================
+
+fetch:
+  # 每個月要抓的市場別: sii=上市(TWSE), otc=上櫃(TPEX)
+  markets: [sii, otc]
+  # 每個市場的公司註冊別: 0=國內公司, 1=國外KY公司
+  registrations: [0, 1]
+  # 抓取近幾個月 (你的框架建議 36)
+  months_back: 36
+  # 請求間隔秒數 (MOPS 有速率限制, 建議 >= 3)
+  request_delay_sec: 5
+  # 逾時/重試
+  timeout_sec: 30
+  retries: 3
+  # 主域名; 若 mops.twse.com.tw 連不到, 自動改試備援域名
+  base_hosts:
+    - https://mops.twse.com.tw
+    - https://mopsov.twse.com.tw
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+  cache_dir: data/raw_cache        # 已抓過的月份會快取, 不重複下載
+  raw_out: data/monthly_revenue.csv
+  # 股票代號規則: 四碼數字, 第一碼不可為零 (排除 00xx ETF/TDR/權證, 只留有月營收的營運公司)
+  stock_id_regex: "^[1-9][0-9]{3}$"
+
+# ---- 累計增量資料庫 ----
+# parquet 為 SSOT (歷史只增不減, 主鍵 stock_id+year+month 去重);
+# duckdb 為 SQL 查詢層, 每次更新後自 parquet 重建。設空字串可停用 duckdb。
+storage:
+  parquet_path: data/revenue.parquet
+  duckdb_path: data/revenue.duckdb
+
+analyze:
+  # ---- Layer 1: 累計 YoY (主判準) ----
+  cum_yoy_strong: 10.0             # 累計YoY >= 此值 => 優選候選
+  cum_yoy_decline_months: 3        # 累計YoY 連續下滑幾個月 => 警戒
+
+  # ---- Layer 2: 多月 YoY 趨勢 (第二判準) ----
+  trend_window: 6                  # 觀察最近幾個月的 YoY 趨勢
+  min_positive_months: 3           # 連續 YoY 為正的最少月數
+  mean_yoy_strong: 15.0            # 近期平均 YoY >= 此值 => 品質佳
+  yoy_std_high: 40.0               # YoY 標準差 >= 此值 => 高波動 (訂單能見度差)
+
+  # ---- Layer 3: MoM vs 季節性 (第三判準) ----
+  seasonality_min_years: 2         # 建季節性基準所需的最少年數
+
+  # ---- 基期修正 ----
+  cagr_years: 2                    # 2年 CAGR 修正基期扭曲
+
+# ---- 原物料 / 週期股分流 ----
+# 這些產業「不看月營收」, 引擎會標記並排除於月營收動能排名之外,
+# 改提示應看: 價格YoY / 庫存YoY / 產能利用率 / 毛利率YoY。
+cyclical_industries:
+  - 水泥工業
+  - 塑膠工業
+  - 橡膠工業
+  - 鋼鐵工業
+  - 造紙工業
+  - 玻璃陶瓷
+  - 油電燃氣業
+  - 航運業
+  - 化學工業
+  # 半導體/電子零組件雖具週期性, 但月營收仍具參考性, 故不完全排除。
+
+# demo 模式的模擬全市場規模 (真實 fetch 時全市場自動來自 MOPS)
+demo:
+  universe_size: 1750
+
+report:
+  out_html: output/monthly_revenue_dashboard.html
+  top_n: 25                        # 儀表板每個名單顯示前幾名
+  title: 台股月營收動能總表

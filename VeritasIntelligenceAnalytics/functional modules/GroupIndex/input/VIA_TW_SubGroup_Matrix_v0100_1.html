@@ -1,0 +1,543 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA 台股次族群矩陣 v0100</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f4f0;--paper:#fff;--ink:#1e1d1a;--line:#dbd9d3;--blue:#4c78a8;--teal:#439a9a;--red:#c96b5a;--green:#5a9e6f;--dim:#77746c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"DM Sans",-apple-system,"Segoe UI","Microsoft JhengHei",sans-serif;font-size:12px;line-height:1.5}
+.wrap{max-width:1440px;margin:0 auto;padding:22px 20px 60px}
+header{display:flex;align-items:flex-start;gap:16px;border-bottom:2px solid var(--ink);padding-bottom:12px}
+.seal{width:44px;height:44px;flex:0 0 44px;background:var(--red);color:#fff;border-radius:3px;display:flex;align-items:center;justify-content:center;font-family:"Syne",serif;font-size:22px;font-weight:800}
+h1{font-family:"Syne",sans-serif;font-size:20px;font-weight:800;margin:0;letter-spacing:.02em}
+.sub{font-family:"DM Mono",monospace;font-size:10.5px;color:var(--dim);margin-top:3px}
+.stats{margin-left:auto;display:flex;gap:0;border:1px solid var(--line);background:var(--paper)}
+.stats div{padding:6px 12px;border-left:1px solid var(--line);text-align:right}
+.stats div:first-child{border-left:0}
+.stats b{display:block;font-family:"Syne",sans-serif;font-size:17px;line-height:1.1}
+.stats s{text-decoration:none;font-family:"DM Mono",monospace;font-size:9.5px;color:var(--dim)}
+.grad{height:3px;margin:0 0 14px;background:linear-gradient(90deg,#c96b5a,#d99b5a,#c9b45a,#5a9e6f,#439a9a,#4c78a8,#7a5aa8)}
+nav{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px}
+nav a{font-family:"DM Mono",monospace;font-size:10px;color:var(--ink);text-decoration:none;border:1px solid var(--line);background:var(--paper);padding:3px 7px;border-radius:2px}
+nav a:hover{border-color:var(--ink)}
+.note{background:var(--paper);border:1px solid var(--line);border-left:3px solid var(--blue);padding:8px 11px;font-size:11px;margin-bottom:16px}
+.note b{font-family:"DM Mono",monospace;font-size:10px;letter-spacing:.04em}
+.block{background:var(--paper);border:1px solid var(--line);border-radius:3px;margin-bottom:14px;overflow:hidden}
+h2{font-family:"Syne",sans-serif;font-size:14px;margin:0;padding:8px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px;background:#faf9f6}
+h2 .k{background:var(--ink);color:#fff;font-family:"DM Mono",monospace;font-size:11px;padding:2px 7px;border-radius:2px}
+h2 em{margin-left:auto;font-style:normal;font-family:"DM Mono",monospace;font-size:10px;color:var(--dim)}
+table{width:100%;border-collapse:collapse}
+.mtx th{width:210px;text-align:left;vertical-align:top;padding:7px 10px;border-top:1px solid var(--line);border-right:1px solid var(--line);font-weight:500;background:#fcfbf9}
+.mtx td{padding:6px 10px;border-top:1px solid var(--line);vertical-align:top}
+.mtx tr:first-child th,.mtx tr:first-child td{border-top:0}
+.l2code{font-family:"DM Mono",monospace;font-size:10px;color:var(--blue);margin-right:5px}
+.l2name{font-size:12px;font-weight:700}
+.l3{display:block;font-size:10px;color:var(--dim);margin-top:2px;line-height:1.35}
+.cnt{width:34px;text-align:right;font-family:"DM Mono",monospace;font-size:10.5px;color:var(--dim)}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{display:inline-flex;align-items:baseline;gap:4px;border:1px solid var(--line);border-radius:2px;padding:2px 6px;font-size:11px;background:#fff;cursor:default}
+.chip b{font-family:"DM Mono",monospace;font-size:10px;color:var(--dim);font-weight:500}
+.chip i{font-style:normal;font-family:"DM Mono",monospace;font-size:9px;color:var(--red)}
+.chip.core{border-color:#c9c6be;background:#fbf7f4;font-weight:700}
+.chip.sat{color:#4a4842}
+.chip.watch{border-style:dashed;color:var(--dim)}
+.chip.sec{opacity:.62}
+.chip:hover{border-color:var(--ink)}
+.peers{margin-top:5px;font-size:10px;color:var(--dim);border-top:1px dotted var(--line);padding-top:4px}
+.peers s{text-decoration:none;font-family:"DM Mono",monospace;font-size:9px;color:var(--teal);margin-right:6px}
+.peers u{text-decoration:none;font-family:"DM Mono",monospace;color:#a3a09a;margin-left:2px}
+.tbl th{text-align:left;font-family:"DM Mono",monospace;font-size:9.5px;color:var(--dim);border-bottom:1px solid var(--ink);padding:5px 8px;font-weight:400;letter-spacing:.05em}
+.tbl td{padding:5px 8px;border-bottom:1px solid var(--line);vertical-align:top;font-size:11px}
+.tbl tr:hover td{background:#faf9f6}
+.mono{font-family:"DM Mono",monospace;font-size:10.5px}
+.dim{color:var(--dim)}
+.warn{color:var(--red);font-weight:700}
+.tag{font-family:"DM Mono",monospace;font-size:9.5px;padding:1px 5px;border-radius:2px;border:1px solid}
+.tag.r{color:var(--red);border-color:var(--red);background:#fdf4f2}
+.tag.y{color:#a8802f;border-color:#d9c08a;background:#fdfaf2}
+.tag.b{color:var(--blue);border-color:#b4c6da;background:#f3f7fb}
+footer{margin-top:22px;font-family:"DM Mono",monospace;font-size:9.5px;color:var(--dim);border-top:1px solid var(--line);padding-top:9px}
+@media(max-width:820px){.mtx th{width:130px}.stats{display:none}}
+</style></head><body><div class="wrap">
+<header>
+  <div class="seal">綱</div>
+  <div><h1>台股次族群分類矩陣　L1 / L2 / L3 功能格</h1>
+  <div class="sub">VIA_TW_SubGroup_SSOT v0100 · 來源 S1 stock_group + S2 YTD輪動 + S3 對話產業研究 · 只增不減 · 2026-08-17 05:07</div></div>
+  <div class="stats">
+    <div><b>14</b><s>L1 大類</s></div>
+    <div><b>77</b><s>L2 次族群</s></div>
+    <div><b>301</b><s>個股(去重)</s></div>
+    <div><b>378</b><s>歸屬筆數</s></div>
+    <div><b>207</b><s>CORE</s></div>
+    <div><b>60</b><s>跨族群</s></div>
+  </div>
+</header>
+<div class="grad"></div>
+<nav><a href="#L1A">A 上游材料</a><a href="#L1B">B 載板與 PCB</a><a href="#L1C">C 半導體製造與封裝</a><a href="#L1D">D 記憶體</a><a href="#L1E">E IC 設計與 IP</a><a href="#L1F">F AI 伺服器系統</a><a href="#L1G">G AI 散熱</a><a href="#L1H">H AI 電力與機房</a><a href="#L1I">I 光通訊與矽光子</a><a href="#L1J">J 被動元件</a><a href="#L1K">K AI PC 與消費電子</a><a href="#L1L">L 其他科技族群</a><a href="#L1M">M 傳產輪動</a><a href="#L1Z">Z 待歸類</a></nav>
+<div class="note"><b>讀法</b>　粗體＝CORE 純度高／一般＝SAT 部分營收／虛線＝WATCH 待驗證；半透明＝SECONDARY（次歸屬，不計入族群指數以免重複計數）。
+右上角小字為來源檔的 Method A 角色（L 領先／P 同步／G 落後），僅供參考，非本表結論。
+市場別僅 185 筆為 LOCKED（來自原檔 .TW/.TWO），其餘為推定值 PENDING，需以 CGE <span class="mono">--fetch-tw</span> 對 TWSE／TPEX 正名。
+族群內的漲跌、市占、營收數字全部來自第三方對話彙整，證據等級一律 P，未經 VDF 驗算前不得進入結論層。</div>
+<section class="block" id="L1A">
+      <h2><span class="k">A</span>上游材料
+      <em>5 次族群 · 30 檔</em></h2>
+      <table class="mtx"><tr><th><span class="l2code">A1</span><span class="l2name">玻纖布 / 玻纖紗</span>
+          <span class="l3">AI 高階 Low-Dk / Low-CTE / T-Glass 骨架材料</span></th>
+          <td><div class="chips"><span class="chip core" title="1802.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">台玻<b>1802</b></span><span class="chip core" title="1815.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">富喬<b>1815</b></span><span class="chip core" title="5340.TWO · 上櫃 · CORE · PRIMARY · 來源 S3對話研究">建榮<b>5340</b></span><span class="chip core" title="5475.TWO · 上櫃 · CORE · PRIMARY · 來源 S3對話研究">德宏<b>5475</b></span><span class="chip sat" title="1303.TW · 上市 · SAT · PRIMARY · 來源 S2">南亞<b>1303</b><i>L</i></span><span class="chip sat" title="1446.TW · 上市 · SAT · PRIMARY · 來源 S3對話研究">宏和<b>1446</b></span></div><div class="peers"><s>國際同業</s>日東紡 Nittobo<u>3110.T</u> · AGC<u>5201.T</u> · 中國巨石<u>600176.SS</u> · Owens Corning<u>OC (NYSE)</u> · CPIC 重慶國際複材<u>未上市</u></div></td>
+          <td class="cnt">6</td></tr><tr><th><span class="l2code">A2</span><span class="l2name">銅箔基板 CCL</span>
+          <span class="l3">Ultra / Super Low Loss 銅箔基板與膠片</span></th>
+          <td><div class="chips"><span class="chip core" title="2383.TW · 上市 · CORE · PRIMARY · 來源 S2">台光電<b>2383</b><i>L</i></span><span class="chip core" title="6274.TW · 上市 · CORE · PRIMARY · 來源 S2">台燿<b>6274</b><i>L</i></span><span class="chip core" title="6288.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">聯茂<b>6288</b></span><span class="chip sat sec" title="1303.TW · 上市 · SAT · SECONDARY · 來源 S2">南亞<b>1303</b><i>L</i></span><span class="chip sat" title="3585.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">聯致<b>3585</b></span><span class="chip sat" title="6672.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">騰輝電子-KY<b>6672</b></span></div><div class="peers"><s>國際同業</s>Panasonic<u>6752.T</u> · Doosan Electro<u>000150.KS</u> · 生益科技<u>600183.SS</u> · Isola Group<u>未上市</u></div></td>
+          <td class="cnt">6</td></tr><tr><th><span class="l2code">A3</span><span class="l2name">銅箔 / 樹脂 / 化工基材</span>
+          <span class="l3">CCL 上游銅箔與環氧樹脂</span></th>
+          <td><div class="chips"><span class="chip core" title="1717.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">長興<b>1717</b></span><span class="chip core" title="8358.TWO · 上櫃 · CORE · PRIMARY · 來源 S3對話研究">金居<b>8358</b></span><span class="chip sat sec" title="1303.TW · 上市 · SAT · SECONDARY · 來源 S2">南亞<b>1303</b><i>L</i></span><span class="chip sat" title="1711.TW · 上市 · SAT · PRIMARY · 來源 S2">永光<b>1711</b><i>L</i></span><span class="chip sat" title="8039.TWO · 上櫃 · SAT · PRIMARY · 來源 S2">台虹<b>8039</b><i>L</i></span></div></td>
+          <td class="cnt">5</td></tr><tr><th><span class="l2code">A4</span><span class="l2name">半導體化學品 / 光阻 / 耗材</span>
+          <span class="l3">先進製程與先進封裝濕製程耗材、通路</span></th>
+          <td><div class="chips"><span class="chip core" title="1773.TW · 上市 · CORE · PRIMARY · 來源 S2">勝一<b>1773</b><i>L</i></span><span class="chip core" title="3010.TW · 上市 · CORE · PRIMARY · 來源 S2">華立<b>3010</b><i>P</i></span><span class="chip core" title="4755.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">三福化<b>4755</b></span><span class="chip core" title="5434.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">崇越<b>5434</b></span><span class="chip sat sec" title="1717.TW · 上市 · SAT · SECONDARY · 來源 S3對話研究">長興<b>1717</b></span><span class="chip sat" title="4721.TWO · 上櫃 · SAT · PRIMARY · 來源 S2">美琪瑪<b>4721</b><i>L</i></span><span class="chip sat" title="4739.TWO · 上櫃 · SAT · PRIMARY · 來源 S2">康普<b>4739</b><i>L</i></span><span class="chip sat sec" title="6667.TWO · 上櫃 · SAT · SECONDARY · 來源 S1+S2">信紘科<b>6667</b><i>P</i></span></div><div class="peers"><s>國際同業</s>信越化學<u>4106.T</u> · 東京應化 TOK<u>4186.T</u> · Entegris<u>ENTG (Nasdaq)</u> · Merck KGaA<u>MRK.DE</u> · JSR<u>未上市(JIC收購)</u></div></td>
+          <td class="cnt">8</td></tr><tr><th><span class="l2code">A5</span><span class="l2name">矽晶圓 / 靶材 / 研磨材</span>
+          <span class="l3">晶圓、再生晶圓、CMP 與靶材</span></th>
+          <td><div class="chips"><span class="chip core" title="1560.TW · 上市 · CORE · PRIMARY · 來源 S2">中砂<b>1560</b><i>P</i></span><span class="chip core" title="6182.TWO · 上櫃 · CORE · PRIMARY · 來源 S2">合晶<b>6182</b><i>P</i></span><span class="chip core" title="6488.TWO · 上櫃 · CORE · PRIMARY · 來源 S1+S2">環球晶<b>6488</b><i>P</i></span><span class="chip sat" title="1785.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">光洋科<b>1785</b></span><span class="chip sat sec" title="3583.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">辛耘<b>3583</b><i>P</i></span></div><div class="peers"><s>國際同業</s>信越化學<u>4106.T</u> · SUMCO<u>3436.T</u></div></td>
+          <td class="cnt">5</td></tr></table></section><section class="block" id="L1B">
+      <h2><span class="k">B</span>載板與 PCB
+      <em>5 次族群 · 28 檔</em></h2>
+      <table class="mtx"><tr><th><span class="l2code">B1</span><span class="l2name">ABF / FC-BGA 載板</span>
+          <span class="l3">高階 IC 載板（AI GPU / ASIC 專用）</span></th>
+          <td><div class="chips"><span class="chip core" title="3037.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">欣興<b>3037</b><i>L</i></span><span class="chip core" title="3189.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">景碩<b>3189</b><i>P</i></span><span class="chip core" title="8046.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">南電<b>8046</b><i>P</i></span><span class="chip sat sec" title="4958.TW · 上市 · SAT · SECONDARY · 來源 S2">臻鼎-KY<b>4958</b><i>L</i></span></div><div class="peers"><s>國際同業</s>Ibiden 揖斐電<u>4062.T</u> · Shinko 新光電氣<u>6967.T</u> · 三星電機 SEMCO<u>009150.KS</u> · AT&amp;S<u>ATS.VI</u> · 大德電子<u>008060.KS</u> · 深南電路<u>002916.SZ</u></div></td>
+          <td class="cnt">4</td></tr><tr><th><span class="l2code">B2</span><span class="l2name">BT 載板 / 記憶體載板</span>
+          <span class="l3">BT 樹脂載板、記憶體與射頻模組載板</span></th>
+          <td><div class="chips"><span class="chip sat" title="2313.TW · 上市 · SAT · PRIMARY · 來源 S2">華通<b>2313</b><i>L</i></span><span class="chip sat sec" title="3037.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">欣興<b>3037</b><i>L</i></span><span class="chip sat sec" title="3189.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">景碩<b>3189</b><i>P</i></span><span class="chip sat sec" title="8046.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">南電<b>8046</b><i>P</i></span></div></td>
+          <td class="cnt">4</td></tr><tr><th><span class="l2code">B3</span><span class="l2name">AI 高速板 / HDI / 主板 PCB</span>
+          <span class="l3">AI 伺服器 UBB / OAM / Switch 主板</span></th>
+          <td><div class="chips"><span class="chip core" title="2368.TW · 上市 · CORE · PRIMARY · 來源 S2">金像電<b>2368</b><i>L</i></span><span class="chip core" title="3044.TW · 上市 · CORE · PRIMARY · 來源 S2">健鼎<b>3044</b><i>L</i></span><span class="chip core" title="4958.TW · 上市 · CORE · PRIMARY · 來源 S2">臻鼎-KY<b>4958</b><i>L</i></span><span class="chip sat sec" title="2313.TW · 上市 · SAT · SECONDARY · 來源 S2">華通<b>2313</b><i>L</i></span><span class="chip sat" title="2355.TW · 上市 · SAT · PRIMARY · 來源 S3對話研究">敬鵬<b>2355</b></span><span class="chip sat" title="2367.TW · 上市 · SAT · PRIMARY · 來源 S2">燿華<b>2367</b><i>L</i></span><span class="chip sat" title="3715.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">定穎投控<b>3715</b></span><span class="chip sat" title="5469.TW · 上市 · SAT · PRIMARY · 來源 S2">瀚宇博<b>5469</b><i>P</i></span></div><div class="peers"><s>國際同業</s>TTM Technologies<u>TTMI (Nasdaq)</u> · Ibiden<u>4062.T</u> · 深南電路<u>002916.SZ</u></div></td>
+          <td class="cnt">8</td></tr><tr><th><span class="l2code">B4</span><span class="l2name">軟板 FPC</span>
+          <span class="l3">軟性印刷電路板與軟硬結合板</span></th>
+          <td><div class="chips"><span class="chip core" title="6153.TWO · 上櫃 · CORE · PRIMARY · 來源 S2">嘉聯益<b>6153</b><i>L</i></span><span class="chip core" title="6269.TW · 上市 · CORE · PRIMARY · 來源 S2">台郡<b>6269</b><i>L</i></span><span class="chip sat" title="2402.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">毅嘉<b>2402</b></span><span class="chip sat" title="3390.TWO · 上櫃 · SAT · PRIMARY · 來源 S2">旭軟<b>3390</b><i>L</i></span><span class="chip sat sec" title="4958.TW · 上市 · SAT · SECONDARY · 來源 S2">臻鼎-KY<b>4958</b><i>L</i></span></div></td>
+          <td class="cnt">5</td></tr><tr><th><span class="l2code">B5</span><span class="l2name">PCB 設備 / 鑽針 / 檢測</span>
+          <span class="l3">PCB 與載板製程設備、AOI、雷射鑽孔</span></th>
+          <td><div class="chips"><span class="chip core" title="2467.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">志聖<b>2467</b><i>L</i></span><span class="chip core" title="3455.TWO · 上櫃 · CORE · PRIMARY · 來源 S3對話研究">由田<b>3455</b></span><span class="chip core" title="3563.TWO · 上櫃 · CORE · PRIMARY · 來源 S3對話研究">牧德<b>3563</b></span><span class="chip core" title="6207.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">雷科<b>6207</b></span><span class="chip sat" title="3167.TWO · 上櫃 · SAT · PRIMARY · 來源 S1+S2">大量<b>3167</b><i>L</i></span><span class="chip sat" title="8021.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">尖點<b>8021</b></span><span class="chip watch" title="6432.TW · 上市 · WATCH · PRIMARY · 來源 S3對話研究">興普<b>6432</b></span></div></td>
+          <td class="cnt">7</td></tr></table></section><section class="block" id="L1C">
+      <h2><span class="k">C</span>半導體製造與封裝
+      <em>6 次族群 · 39 檔</em></h2>
+      <table class="mtx"><tr><th><span class="l2code">C1</span><span class="l2name">晶圓代工</span>
+          <span class="l3">邏輯與特殊製程晶圓代工</span></th>
+          <td><div class="chips"><span class="chip core" title="2303.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">聯電<b>2303</b><i>P</i></span><span class="chip core" title="2330.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">台積電<b>2330</b><i>L</i></span><span class="chip core" title="5347.TWO · 上櫃 · CORE · PRIMARY · 來源 S1+S2">世界先進<b>5347</b><i>L</i></span><span class="chip core" title="6770.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">力積電<b>6770</b><i>L</i></span></div><div class="peers"><s>國際同業</s>Samsung Foundry<u>005930.KS</u> · Intel<u>INTC (Nasdaq)</u> · GlobalFoundries<u>GFS (Nasdaq)</u> · 中芯國際<u>0981.HK</u></div></td>
+          <td class="cnt">4</td></tr><tr><th><span class="l2code">C2</span><span class="l2name">先進封裝設備 (CoWoS / SoIC)</span>
+          <span class="l3">濕製程、點膠、挑晶、壓膜、測試整合設備</span></th>
+          <td><div class="chips"><span class="chip core sec" title="2467.TW · 上市 · CORE · SECONDARY · 來源 S1+S2">志聖<b>2467</b><i>L</i></span><span class="chip core" title="3131.TWO · 上櫃 · CORE · PRIMARY · 來源 S1+S2">弘塑<b>3131</b><i>L</i></span><span class="chip core" title="3413.TWO · 上櫃 · CORE · PRIMARY · 來源 S1+S2">京鼎<b>3413</b><i>P</i></span><span class="chip core" title="3583.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">辛耘<b>3583</b><i>P</i></span><span class="chip core" title="3680.TWO · 上櫃 · CORE · PRIMARY · 來源 S1+S2">家登<b>3680</b><i>L</i></span><span class="chip core" title="6187.TWO · 上櫃 · CORE · PRIMARY · 來源 S1+S2">萬潤<b>6187</b><i>P</i></span><span class="chip core" title="6640.TWO · 上櫃 · CORE · PRIMARY · 來源 S3對話研究">均華<b>6640</b></span><span class="chip sat" title="2360.TW · 上市 · SAT · PRIMARY · 來源 S1+S2">致茂<b>2360</b><i>L</i></span><span class="chip sat" title="2464.TW · 上市 · SAT · PRIMARY · 來源 S1+S2">盟立<b>2464</b><i>P</i></span><span class="chip sat" title="6279.TWO · 上櫃 · SAT · PRIMARY · 來源 S2">漢民<b>6279</b><i>P</i></span></div><div class="peers"><s>國際同業</s>ASML<u>ASML (Nasdaq)</u> · Applied Materials<u>AMAT (Nasdaq)</u> · Lam Research<u>LRCX (Nasdaq)</u> · Tokyo Electron<u>8035.T</u> · DISCO<u>6146.T</u> · KLA<u>KLAC (Nasdaq)</u></div></td>
+          <td class="cnt">10</td></tr><tr><th><span class="l2code">C3</span><span class="l2name">廠務 / 無塵室 / 機電工程</span>
+          <span class="l3">晶圓廠與資料中心建置工程</span></th>
+          <td><div class="chips"><span class="chip core" title="2404.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">漢唐<b>2404</b><i>L</i></span><span class="chip core" title="5536.TWO · 上櫃 · CORE · PRIMARY · 來源 S3對話研究">聖暉<b>5536</b></span><span class="chip core" title="6139.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">亞翔<b>6139</b><i>P</i></span><span class="chip core" title="6196.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">帆宣<b>6196</b><i>L</i></span><span class="chip core" title="6667.TWO · 上櫃 · CORE · PRIMARY · 來源 S1+S2">信紘科<b>6667</b><i>P</i></span><span class="chip sat" title="6125.TW · 上市 · SAT · PRIMARY · 來源 S1+S2">廣運<b>6125</b><i>L</i></span><span class="chip sat" title="8383.TW · 上市 · SAT · PRIMARY · 來源 S1+S2">千附<b>8383</b><i>L</i></span></div></td>
+          <td class="cnt">7</td></tr><tr><th><span class="l2code">C4</span><span class="l2name">封測 OSAT</span>
+          <span class="l3">封裝與測試代工</span></th>
+          <td><div class="chips"><span class="chip core" title="2449.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">京元電<b>2449</b></span><span class="chip core" title="3711.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">日月光投控<b>3711</b><i>L</i></span><span class="chip core" title="6147.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">頎邦<b>6147</b></span><span class="chip core" title="6239.TW · 上市 · CORE · PRIMARY · 來源 S2">力成<b>6239</b><i>L</i></span><span class="chip sat" title="2325.TW · 上市 · SAT · PRIMARY · 來源 S2">矽品<b>2325</b><i>P</i></span><span class="chip sat" title="2329.TW · 上市 · SAT · PRIMARY · 來源 S2">華泰<b>2329</b><i>L</i></span><span class="chip sat" title="3264.TWO · 上櫃 · SAT · PRIMARY · 來源 S2">欣銓<b>3264</b><i>L</i></span><span class="chip sat" title="3374.TWO · 上櫃 · SAT · PRIMARY · 來源 S2">精材<b>3374</b><i>P</i></span><span class="chip sat" title="6548.TWO · 上櫃 · SAT · PRIMARY · 來源 S2">長華科<b>6548</b><i>L</i></span><span class="chip sat" title="8150.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">南茂<b>8150</b></span></div><div class="peers"><s>國際同業</s>Amkor<u>AMKR (Nasdaq)</u> · 長電科技<u>600584.SS</u> · 通富微電<u>002156.SZ</u></div></td>
+          <td class="cnt">10</td></tr><tr><th><span class="l2code">C5</span><span class="l2name">測試介面 / 探針卡 / 測試座</span>
+          <span class="l3">HBM 與 AI 晶片高頻測試界面</span></th>
+          <td><div class="chips"><span class="chip core" title="6223.TWO · 上櫃 · CORE · PRIMARY · 來源 S3對話研究">旺矽<b>6223</b></span><span class="chip core" title="6510.TWO · 上櫃 · CORE · PRIMARY · 來源 S3對話研究">精測<b>6510</b></span><span class="chip core" title="6515.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">穎崴<b>6515</b></span><span class="chip sat" title="6217.TW · 上市 · SAT · PRIMARY · 來源 S2">中探針<b>6217</b><i>P</i></span><span class="chip sat" title="6820.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">雍智科技<b>6820</b></span></div></td>
+          <td class="cnt">5</td></tr><tr><th><span class="l2code">C6</span><span class="l2name">材料分析 / 驗證檢測</span>
+          <span class="l3">MA / FA 微結構分析與可靠度驗證</span></th>
+          <td><div class="chips"><span class="chip core" title="3289.TWO · 上櫃 · CORE · PRIMARY · 來源 S3對話研究">宜特<b>3289</b></span><span class="chip core" title="3587.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">閎康<b>3587</b></span><span class="chip core" title="6830.TWO · 上櫃 · CORE · PRIMARY · 來源 S3對話研究">汎銓<b>6830</b></span></div></td>
+          <td class="cnt">3</td></tr></table></section><section class="block" id="L1D">
+      <h2><span class="k">D</span>記憶體
+      <em>3 次族群 · 12 檔</em></h2>
+      <table class="mtx"><tr><th><span class="l2code">D1</span><span class="l2name">HBM / 高頻寬記憶體</span>
+          <span class="l3">台廠僅為介面 IP / 封測外溢受惠</span></th>
+          <td><div class="chips"><span class="chip sat sec" title="2449.TW · 上市 · SAT · SECONDARY · 來源 S3對話研究">京元電<b>2449</b></span><span class="chip sat sec" title="3443.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">創意<b>3443</b><i>L</i></span><span class="chip sat sec" title="3661.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">世芯-KY<b>3661</b><i>L</i></span></div><div class="peers"><s>國際同業</s>SK Hynix<u>000660.KS</u> · Micron<u>MU (Nasdaq)</u> · Samsung Electronics<u>005930.KS</u></div></td>
+          <td class="cnt">3</td></tr><tr><th><span class="l2code">D2</span><span class="l2name">DRAM / NOR / 利基記憶體</span>
+          <span class="l3">傳統 DRAM 與利基記憶體受排擠效應</span></th>
+          <td><div class="chips"><span class="chip core" title="2337.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">旺宏<b>2337</b><i>P</i></span><span class="chip core" title="2344.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">華邦電<b>2344</b><i>P</i></span><span class="chip core" title="2408.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">南亞科<b>2408</b><i>L</i></span><span class="chip sat sec" title="6770.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">力積電<b>6770</b><i>L</i></span></div><div class="peers"><s>國際同業</s>Micron<u>MU (Nasdaq)</u> · SK Hynix<u>000660.KS</u> · Winbond/Nanya 對標: 兆易創新<u>603986.SS</u></div></td>
+          <td class="cnt">4</td></tr><tr><th><span class="l2code">D3</span><span class="l2name">記憶體模組 / 控制 IC</span>
+          <span class="l3">模組廠與 NAND 控制晶片</span></th>
+          <td><div class="chips"><span class="chip core" title="3260.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">威剛<b>3260</b><i>P</i></span><span class="chip core" title="4967.TWO · 上櫃 · CORE · PRIMARY · 來源 S3對話研究">十銓<b>4967</b></span><span class="chip core" title="5289.TWO · 上櫃 · CORE · PRIMARY · 來源 S3對話研究">宜鼎<b>5289</b></span><span class="chip core" title="8299.TWO · 上櫃 · CORE · PRIMARY · 來源 S1+S2">群聯<b>8299</b><i>L</i></span><span class="chip sat" title="2451.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">創見<b>2451</b></span></div></td>
+          <td class="cnt">5</td></tr></table></section><section class="block" id="L1E">
+      <h2><span class="k">E</span>IC 設計與 IP
+      <em>5 次族群 · 24 檔</em></h2>
+      <table class="mtx"><tr><th><span class="l2code">E1</span><span class="l2name">AI ASIC 設計服務</span>
+          <span class="l3">CSP 自研晶片 NRE + Turnkey</span></th>
+          <td><div class="chips"><span class="chip core" title="3035.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">智原<b>3035</b><i>P</i></span><span class="chip core" title="3443.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">創意<b>3443</b><i>L</i></span><span class="chip core" title="3661.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">世芯-KY<b>3661</b><i>L</i></span><span class="chip sat sec" title="2454.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">聯發科<b>2454</b><i>P</i></span><span class="chip sat" title="2569.TW · 上市 · SAT · PRIMARY · 來源 S1+S2">揚智<b>2569</b><i>L</i></span></div><div class="peers"><s>國際同業</s>Broadcom<u>AVGO (Nasdaq)</u> · Marvell<u>MRVL (Nasdaq)</u> · Google TPU 部門<u>未上市(GOOGL內部)</u> · Meta MTIA 部門<u>未上市(META內部)</u> · Microsoft Maia 部門<u>未上市(MSFT內部)</u> · AWS Trainium 部門<u>未上市(AMZN內部)</u></div></td>
+          <td class="cnt">5</td></tr><tr><th><span class="l2code">E2</span><span class="l2name">矽智財 IP</span>
+          <span class="l3">介面 IP、CPU 核心、eNVM</span></th>
+          <td><div class="chips"><span class="chip core" title="3529.TWO · 上櫃 · CORE · PRIMARY · 來源 S1+S2">力旺<b>3529</b><i>L</i></span><span class="chip core" title="6533.TWO · 上櫃 · CORE · PRIMARY · 來源 S1+S2">晶心科<b>6533</b><i>P</i></span><span class="chip core" title="6643.TWO · 上櫃 · CORE · PRIMARY · 來源 S1+S2">M31<b>6643</b><i>P</i></span><span class="chip sat sec" title="3443.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">創意<b>3443</b><i>L</i></span><span class="chip sat" title="6531.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">愛普<b>6531</b></span></div><div class="peers"><s>國際同業</s>ARM<u>ARM (Nasdaq)</u> · Synopsys<u>SNPS (Nasdaq)</u> · Cadence<u>CDNS (Nasdaq)</u> · Siemens EDA<u>SIE.DE</u></div></td>
+          <td class="cnt">5</td></tr><tr><th><span class="l2code">E3</span><span class="l2name">高速傳輸 / 介面 IC</span>
+          <span class="l3">USB4 / PCIe / Retimer / BMC</span></th>
+          <td><div class="chips"><span class="chip core" title="4966.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">譜瑞-KY<b>4966</b></span><span class="chip core" title="5269.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">祥碩<b>5269</b></span><span class="chip core" title="5274.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">信驊<b>5274</b></span><span class="chip sat sec" title="8299.TWO · 上櫃 · SAT · SECONDARY · 來源 S1+S2">群聯<b>8299</b><i>L</i></span></div></td>
+          <td class="cnt">4</td></tr><tr><th><span class="l2code">E4</span><span class="l2name">電源管理 IC (PMIC)</span>
+          <span class="l3">DDR5 / NPU / GPU 供電晶片</span></th>
+          <td><div class="chips"><span class="chip core" title="6138.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">茂達<b>6138</b></span><span class="chip core" title="6415.TW · 上市 · CORE · PRIMARY · 來源 S2">矽力-KY<b>6415</b><i>L</i></span><span class="chip core" title="8081.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">致新<b>8081</b></span><span class="chip sat" title="3588.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">通嘉<b>3588</b></span></div></td>
+          <td class="cnt">4</td></tr><tr><th><span class="l2code">E5</span><span class="l2name">消費 / 網通 IC 設計</span>
+          <span class="l3">SoC、驅動 IC、乙太網路 IC</span></th>
+          <td><div class="chips"><span class="chip core" title="2379.TW · 上市 · CORE · PRIMARY · 來源 S2">瑞昱<b>2379</b><i>P</i></span><span class="chip core" title="2454.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">聯發科<b>2454</b><i>P</i></span><span class="chip core" title="3034.TW · 上市 · CORE · PRIMARY · 來源 S2">聯詠<b>3034</b><i>L</i></span><span class="chip sat" title="3545.TW · 上市 · SAT · PRIMARY · 來源 S2">敦泰<b>3545</b><i>L</i></span><span class="chip sat" title="4968.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">立積<b>4968</b></span><span class="chip sat" title="6526.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">達發<b>6526</b></span></div><div class="peers"><s>國際同業</s>NVIDIA<u>NVDA (Nasdaq)</u> · Qualcomm<u>QCOM (Nasdaq)</u> · AMD<u>AMD (Nasdaq)</u> · Broadcom<u>AVGO (Nasdaq)</u></div></td>
+          <td class="cnt">6</td></tr></table></section><section class="block" id="L1F">
+      <h2><span class="k">F</span>AI 伺服器系統
+      <em>5 次族群 · 25 檔</em></h2>
+      <table class="mtx"><tr><th><span class="l2code">F1</span><span class="l2name">AI OEM / ODM 整機櫃 (L10/L11)</span>
+          <span class="l3">整櫃系統整合與液冷測試</span></th>
+          <td><div class="chips"><span class="chip core" title="2317.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">鴻海<b>2317</b><i>L</i></span><span class="chip core" title="2376.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">技嘉<b>2376</b><i>L</i></span><span class="chip core" title="2382.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">廣達<b>2382</b><i>P</i></span><span class="chip core" title="3231.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">緯創<b>3231</b><i>P</i></span><span class="chip core" title="6669.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">緯穎<b>6669</b><i>L</i></span><span class="chip sat sec" title="2356.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">英業達<b>2356</b><i>P</i></span><span class="chip sat sec" title="2357.TW · 上市 · SAT · SECONDARY · 來源 S3對話研究">華碩<b>2357</b></span></div><div class="peers"><s>國際同業</s>Supermicro<u>SMCI (Nasdaq)</u> · Dell<u>DELL (NYSE)</u> · HPE<u>HPE (NYSE)</u> · 浪潮信息<u>000977.SZ</u> · Wiwynn Thailand 產線<u>未上市(緯穎子公司)</u></div></td>
+          <td class="cnt">7</td></tr><tr><th><span class="l2code">F2</span><span class="l2name">主機板 / GPU 基板 (L6)</span>
+          <span class="l3">板級代工，毛利率高於整機</span></th>
+          <td><div class="chips"><span class="chip core" title="2356.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">英業達<b>2356</b><i>P</i></span><span class="chip core sec" title="2376.TW · 上市 · CORE · SECONDARY · 來源 S1+S2">技嘉<b>2376</b><i>L</i></span><span class="chip core sec" title="3231.TW · 上市 · CORE · SECONDARY · 來源 S1+S2">緯創<b>3231</b><i>P</i></span><span class="chip sat sec" title="2317.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">鴻海<b>2317</b><i>L</i></span><span class="chip sat" title="2377.TW · 上市 · SAT · PRIMARY · 來源 S3對話研究">微星<b>2377</b></span></div></td>
+          <td class="cnt">5</td></tr><tr><th><span class="l2code">F3</span><span class="l2name">機殼 / 機櫃 / 結構件</span>
+          <span class="l3">液冷機櫃鈑金、壓鑄與 5U 機殼</span></th>
+          <td><div class="chips"><span class="chip core" title="3013.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">晟銘電<b>3013</b></span><span class="chip core" title="6117.TWO · 上櫃 · CORE · PRIMARY · 來源 S2">迎廣<b>6117</b><i>L</i></span><span class="chip core" title="8210.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">勤誠<b>8210</b><i>P</i></span><span class="chip sat" title="3693.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">營邦<b>3693</b></span><span class="chip sat" title="6235.TWO · 上櫃 · SAT · PRIMARY · 來源 S2">華孚<b>6235</b><i>L</i></span><span class="chip watch" title="3052.TWO · 上櫃 · WATCH · PRIMARY · 來源 S2">喬鼎<b>3052</b><i>L</i></span></div></td>
+          <td class="cnt">6</td></tr><tr><th><span class="l2code">F4</span><span class="l2name">滑軌 / 導軌 / 精密機構</span>
+          <span class="l3">重載液冷機櫃盲插滑軌</span></th>
+          <td><div class="chips"><span class="chip core" title="2059.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">川湖<b>2059</b></span><span class="chip watch" title="5325.TWO · 上櫃 · WATCH · PRIMARY · 來源 S3對話研究">尚新<b>5325</b></span></div></td>
+          <td class="cnt">2</td></tr><tr><th><span class="l2code">F5</span><span class="l2name">連接器 / 高速線材 / 端子</span>
+          <span class="l3">NVLink、224G 高速連接與 DAC/AEC 線材</span></th>
+          <td><div class="chips"><span class="chip core" title="3023.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">信邦<b>3023</b></span><span class="chip core" title="3533.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">嘉澤<b>3533</b></span><span class="chip core" title="3665.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">貿聯-KY<b>3665</b><i>L</i></span><span class="chip sat" title="3526.TW · 上市 · SAT · PRIMARY · 來源 S2">凡甲<b>3526</b><i>P</i></span><span class="chip watch" title="3322.TWO · 上櫃 · WATCH · PRIMARY · 來源 S2">建舜電<b>3322</b><i>L</i></span></div></td>
+          <td class="cnt">5</td></tr></table></section><section class="block" id="L1G">
+      <h2><span class="k">G</span>AI 散熱
+      <em>6 次族群 · 24 檔</em></h2>
+      <table class="mtx"><tr><th><span class="l2code">G1</span><span class="l2name">水冷板 / CDU / 液冷系統</span>
+          <span class="l3">Cold Plate 與冷卻液分配裝置</span></th>
+          <td><div class="chips"><span class="chip core" title="3017.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">奇鋐<b>3017</b><i>L</i></span><span class="chip core" title="3324.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">雙鴻<b>3324</b><i>L</i></span><span class="chip core" title="3483.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">力致<b>3483</b><i>P</i></span><span class="chip sat sec" title="2308.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">台達電<b>2308</b><i>L</i></span><span class="chip watch" title="6230.TW · 上市 · WATCH · PRIMARY · 來源 S3對話研究">尼得科超眾(已併)<b>6230</b></span></div><div class="peers"><s>國際同業</s>Vertiv<u>VRT (NYSE)</u> · Boyd Corporation<u>未上市</u> · CoolIT Systems<u>未上市</u> · Motivair (Schneider)<u>SU.PA</u></div></td>
+          <td class="cnt">5</td></tr><tr><th><span class="l2code">G2</span><span class="l2name">均熱片 / VC / 熱管</span>
+          <span class="l3">晶片第一層導熱介面</span></th>
+          <td><div class="chips"><span class="chip core" title="3338.TWO · 上櫃 · CORE · PRIMARY · 來源 S1+S2">泰碩<b>3338</b><i>L</i></span><span class="chip core" title="3653.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">健策<b>3653</b></span><span class="chip core" title="6591.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">動力-KY<b>6591</b><i>P</i></span><span class="chip sat" title="2486.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">一詮<b>2486</b></span><span class="chip sat" title="6831.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">邁科<b>6831</b></span></div></td>
+          <td class="cnt">5</td></tr><tr><th><span class="l2code">G3</span><span class="l2name">快接頭 QD / 閥件 / 泵浦</span>
+          <span class="l3">零漏水關鍵件，認證門檻最高</span></th>
+          <td><div class="chips"><span class="chip core" title="6275.TWO · 上櫃 · CORE · PRIMARY · 來源 S1+S2">元山<b>6275</b><i>P</i></span><span class="chip core" title="6421.TWO · 上櫃 · CORE · PRIMARY · 來源 S3對話研究">君帆<b>6421</b></span><span class="chip core" title="6805.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">富世達<b>6805</b></span></div><div class="peers"><s>國際同業</s>Parker Hannifin<u>PH (NYSE)</u> · Eaton<u>ETN (NYSE)</u> · CEJN<u>未上市</u> · Staubli<u>未上市</u></div></td>
+          <td class="cnt">3</td></tr><tr><th><span class="l2code">G4</span><span class="l2name">風扇 / 馬達</span>
+          <span class="l3">高風壓高轉速風扇與 BLDC 馬達</span></th>
+          <td><div class="chips"><span class="chip core" title="2421.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">建準<b>2421</b><i>P</i></span><span class="chip sat" title="3018.TW · 上市 · SAT · PRIMARY · 來源 S2">東林<b>3018</b><i>L</i></span><span class="chip sat sec" title="6275.TWO · 上櫃 · SAT · SECONDARY · 來源 S1+S2">元山<b>6275</b><i>P</i></span><span class="chip watch" title="8028.TW · 上市 · WATCH · PRIMARY · 來源 S2">升陽<b>8028</b><i>L</i></span></div></td>
+          <td class="cnt">4</td></tr><tr><th><span class="l2code">G5</span><span class="l2name">熱交換器 / 漏液感測</span>
+          <span class="l3">CDU 內板式熱交換與防漏偵測</span></th>
+          <td><div class="chips"><span class="chip core" title="8996.TWO · 上櫃 · CORE · PRIMARY · 來源 S3對話研究">高力<b>8996</b></span><span class="chip sat sec" title="2308.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">台達電<b>2308</b><i>L</i></span><span class="chip sat sec" title="3338.TWO · 上櫃 · SAT · SECONDARY · 來源 S1+S2">泰碩<b>3338</b><i>L</i></span></div></td>
+          <td class="cnt">3</td></tr><tr><th><span class="l2code">G6</span><span class="l2name">浸沒式 / 兩相散熱</span>
+          <span class="l3">單相 / 兩相浸沒式機櫃與介質</span></th>
+          <td><div class="chips"><span class="chip core sec" title="3483.TW · 上市 · CORE · SECONDARY · 來源 S1+S2">力致<b>3483</b><i>P</i></span><span class="chip sat sec" title="2376.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">技嘉<b>2376</b><i>L</i></span><span class="chip sat sec" title="2377.TW · 上市 · SAT · SECONDARY · 來源 S3對話研究">微星<b>2377</b></span><span class="chip sat sec" title="2486.TWO · 上櫃 · SAT · SECONDARY · 來源 S3對話研究">一詮<b>2486</b></span></div></td>
+          <td class="cnt">4</td></tr></table></section><section class="block" id="L1H">
+      <h2><span class="k">H</span>AI 電力與機房
+      <em>5 次族群 · 26 檔</em></h2>
+      <table class="mtx"><tr><th><span class="l2code">H1</span><span class="l2name">伺服器電源 PSU / 電源模組</span>
+          <span class="l3">3kW–8kW 高瓦數電源</span></th>
+          <td><div class="chips"><span class="chip core" title="2301.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">光寶科<b>2301</b><i>P</i></span><span class="chip core" title="2308.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">台達電<b>2308</b><i>L</i></span><span class="chip core" title="3015.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">全漢<b>3015</b><i>P</i></span><span class="chip sat" title="5263.TWO · 上櫃 · SAT · PRIMARY · 來源 S1+S2">僑威<b>5263</b><i>L</i></span><span class="chip sat" title="6282.TW · 上市 · SAT · PRIMARY · 來源 S3對話研究">康舒<b>6282</b></span><span class="chip sat sec" title="6409.TWO · 上櫃 · SAT · SECONDARY · 來源 S2">旭隼<b>6409</b><i>L</i></span></div><div class="peers"><s>國際同業</s>Vicor<u>VICR (Nasdaq)</u> · Infineon<u>IFX.DE</u> · Monolithic Power<u>MPWR (Nasdaq)</u></div></td>
+          <td class="cnt">6</td></tr><tr><th><span class="l2code">H2</span><span class="l2name">BBU 備援電池模組</span>
+          <span class="l3">機櫃斷電保護電池包</span></th>
+          <td><div class="chips"><span class="chip core" title="3211.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">順達<b>3211</b><i>L</i></span><span class="chip core" title="3323.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">加百裕<b>3323</b><i>P</i></span><span class="chip core" title="4931.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">新盛力<b>4931</b><i>L</i></span><span class="chip core" title="6781.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">AES-KY<b>6781</b><i>P</i></span><span class="chip sat sec" title="6121.TW · 上市 · SAT · SECONDARY · 來源 S3對話研究">新普<b>6121</b></span><span class="chip watch" title="5227.TWO · 上櫃 · WATCH · PRIMARY · 來源 S2">立凱電<b>5227</b><i>L</i></span></div></td>
+          <td class="cnt">6</td></tr><tr><th><span class="l2code">H3</span><span class="l2name">重電 / 變壓器 / 開關設備</span>
+          <span class="l3">資料中心與電網供電設備</span></th>
+          <td><div class="chips"><span class="chip core" title="1503.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">士電<b>1503</b><i>P</i></span><span class="chip core" title="1513.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">中興電<b>1513</b><i>P</i></span><span class="chip core" title="1514.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">亞力<b>1514</b><i>L</i></span><span class="chip core" title="1519.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">華城<b>1519</b><i>L</i></span><span class="chip sat" title="1504.TW · 上市 · SAT · PRIMARY · 來源 S1+S2">東元<b>1504</b><i>P</i></span><span class="chip sat" title="2371.TW · 上市 · SAT · PRIMARY · 來源 S1+S2">大同<b>2371</b><i>P</i></span><span class="chip watch" title="1604.TW · 上市 · WATCH · PRIMARY · 來源 S2">聲寶<b>1604</b><i>L</i></span></div><div class="peers"><s>國際同業</s>Schneider Electric<u>SU.PA</u> · Eaton<u>ETN (NYSE)</u> · Hitachi Energy<u>6501.T</u> · GE Vernova<u>GEV (NYSE)</u></div></td>
+          <td class="cnt">7</td></tr><tr><th><span class="l2code">H4</span><span class="l2name">UPS / 機房基礎設施</span>
+          <span class="l3">不斷電系統與機房監控</span></th>
+          <td><div class="chips"><span class="chip core" title="6409.TWO · 上櫃 · CORE · PRIMARY · 來源 S2">旭隼<b>6409</b><i>L</i></span><span class="chip sat sec" title="2301.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">光寶科<b>2301</b><i>P</i></span><span class="chip sat sec" title="2308.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">台達電<b>2308</b><i>L</i></span><span class="chip sat" title="2457.TW · 上市 · SAT · PRIMARY · 來源 S3對話研究">飛宏<b>2457</b></span></div></td>
+          <td class="cnt">4</td></tr><tr><th><span class="l2code">H5</span><span class="l2name">電線電纜 / 匯流排</span>
+          <span class="l3">高壓電纜與 Busbar</span></th>
+          <td><div class="chips"><span class="chip core" title="1605.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">華新<b>1605</b></span><span class="chip core" title="1609.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">大亞<b>1609</b></span><span class="chip sat" title="1612.TW · 上市 · SAT · PRIMARY · 來源 S3對話研究">宏泰<b>1612</b></span></div></td>
+          <td class="cnt">3</td></tr></table></section><section class="block" id="L1I">
+      <h2><span class="k">I</span>光通訊與矽光子
+      <em>5 次族群 · 21 檔</em></h2>
+      <table class="mtx"><tr><th><span class="l2code">I1</span><span class="l2name">CPO 共封裝光學 / 光引擎</span>
+          <span class="l3">COUPE 平台與 51.2T 以上共封裝</span></th>
+          <td><div class="chips"><span class="chip core" title="6451.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">訊芯-KY<b>6451</b></span><span class="chip sat sec" title="2330.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">台積電<b>2330</b><i>L</i></span><span class="chip sat sec" title="3711.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">日月光投控<b>3711</b><i>L</i></span></div><div class="peers"><s>國際同業</s>Broadcom<u>AVGO (Nasdaq)</u> · Marvell<u>MRVL (Nasdaq)</u> · NVIDIA<u>NVDA (Nasdaq)</u></div></td>
+          <td class="cnt">3</td></tr><tr><th><span class="l2code">I2</span><span class="l2name">FAU 光纖陣列 / 精密光學耦合</span>
+          <span class="l3">微米級光纖對準貼合</span></th>
+          <td><div class="chips"><span class="chip core" title="3363.TW · 上市 · CORE · PRIMARY · 來源 S2">上詮<b>3363</b><i>L</i></span><span class="chip sat sec" title="3008.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">大立光<b>3008</b><i>L</i></span><span class="chip sat" title="3450.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">聯鈞<b>3450</b></span></div></td>
+          <td class="cnt">3</td></tr><tr><th><span class="l2code">I3</span><span class="l2name">雷射源 / 三五族磊晶</span>
+          <span class="l3">InP / GaAs 外部雷射光源</span></th>
+          <td><div class="chips"><span class="chip core" title="2455.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">全新<b>2455</b></span><span class="chip core" title="3081.TW · 上市 · CORE · PRIMARY · 來源 S2">聯亞<b>3081</b><i>L</i></span><span class="chip sat sec" title="3450.TWO · 上櫃 · SAT · SECONDARY · 來源 S3對話研究">聯鈞<b>3450</b></span></div><div class="peers"><s>國際同業</s>Lumentum<u>LITE (Nasdaq)</u> · Coherent<u>COHR (NYSE)</u> · 住友電工<u>5802.T</u></div></td>
+          <td class="cnt">3</td></tr><tr><th><span class="l2code">I4</span><span class="l2name">光收發模組 / 光被動元件</span>
+          <span class="l3">800G / 1.6T 可插拔光模組</span></th>
+          <td><div class="chips"><span class="chip core" title="3163.TWO · 上櫃 · CORE · PRIMARY · 來源 S2">波若威<b>3163</b><i>L</i></span><span class="chip core" title="4979.TWO · 上櫃 · CORE · PRIMARY · 來源 S2">華星光<b>4979</b><i>P</i></span><span class="chip core" title="6442.TWO · 上櫃 · CORE · PRIMARY · 來源 S2">光聖<b>6442</b><i>L</i></span><span class="chip sat sec" title="3081.TW · 上市 · SAT · SECONDARY · 來源 S2">聯亞<b>3081</b><i>L</i></span><span class="chip sat" title="4908.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">前鼎<b>4908</b></span><span class="chip sat" title="4977.TWO · 上櫃 · SAT · PRIMARY · 來源 S2">眾達-KY<b>4977</b><i>P</i></span></div><div class="peers"><s>國際同業</s>Coherent<u>COHR (NYSE)</u> · Lumentum<u>LITE (Nasdaq)</u> · 中際旭創<u>300308.SZ</u> · 新易盛<u>300502.SZ</u></div></td>
+          <td class="cnt">6</td></tr><tr><th><span class="l2code">I5</span><span class="l2name">交換器 / 白牌網通設備</span>
+          <span class="l3">800G Switch 與資料中心網通</span></th>
+          <td><div class="chips"><span class="chip core" title="2345.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">智邦<b>2345</b><i>L</i></span><span class="chip sat" title="3380.TW · 上市 · SAT · PRIMARY · 來源 S1+S2">明泰<b>3380</b><i>L</i></span><span class="chip sat" title="3596.TW · 上市 · SAT · PRIMARY · 來源 S1+S2">智易<b>3596</b><i>P</i></span><span class="chip sat" title="5388.TW · 上市 · SAT · PRIMARY · 來源 S1+S2">中磊<b>5388</b><i>P</i></span><span class="chip sat sec" title="6285.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">啟碁<b>6285</b><i>P</i></span><span class="chip watch" title="3025.TWO · 上櫃 · WATCH · PRIMARY · 來源 S3對話研究">星通<b>3025</b></span></div><div class="peers"><s>國際同業</s>Arista<u>ANET (NYSE)</u> · Cisco<u>CSCO (Nasdaq)</u> · Celestica<u>CLS (NYSE)</u></div></td>
+          <td class="cnt">6</td></tr></table></section><section class="block" id="L1J">
+      <h2><span class="k">J</span>被動元件
+      <em>9 次族群 · 36 檔</em></h2>
+      <table class="mtx"><tr><th><span class="l2code">J1</span><span class="l2name">MLCC 積層陶瓷電容</span>
+          <span class="l3">高容值、車用與 AI 高階 MLCC</span></th>
+          <td><div class="chips"><span class="chip core" title="2327.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">國巨<b>2327</b><i>L</i></span><span class="chip core" title="2492.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">華新科<b>2492</b><i>P</i></span><span class="chip core" title="3026.TWO · 上櫃 · CORE · PRIMARY · 來源 S1+S2">禾伸堂<b>3026</b><i>L</i></span><span class="chip core" title="6173.TWO · 上櫃 · CORE · PRIMARY · 來源 S1+S2">信昌電<b>6173</b><i>P</i></span><span class="chip watch" title="8043.TW · 上市 · WATCH · PRIMARY · 來源 S3對話研究">蜜望實<b>8043</b></span></div><div class="peers"><s>國際同業</s>Murata 村田<u>6981.T</u> · TDK<u>6762.T</u> · Taiyo Yuden 太陽誘電<u>6976.T</u> · 三星電機 SEMCO<u>009150.KS</u></div></td>
+          <td class="cnt">5</td></tr><tr><th><span class="l2code">J2</span><span class="l2name">晶片電阻 Chip Resistor</span>
+          <span class="l3">厚膜 / 薄膜精密電阻</span></th>
+          <td><div class="chips"><span class="chip core sec" title="2327.TW · 上市 · CORE · SECONDARY · 來源 S1+S2">國巨<b>2327</b><i>L</i></span><span class="chip core sec" title="2492.TW · 上市 · CORE · SECONDARY · 來源 S1+S2">華新科<b>2492</b><i>P</i></span><span class="chip core" title="3624.TWO · 上櫃 · CORE · PRIMARY · 來源 S2">光頡<b>3624</b><i>P</i></span><span class="chip sat" title="2478.TW · 上市 · SAT · PRIMARY · 來源 S2">大毅<b>2478</b><i>L</i></span></div></td>
+          <td class="cnt">4</td></tr><tr><th><span class="l2code">J3</span><span class="l2name">電感 / TLVR / 磁性元件</span>
+          <span class="l3">AI 供電架構 TLVR 與一體成型電感</span></th>
+          <td><div class="chips"><span class="chip core" title="3357.TW · 上市 · CORE · PRIMARY · 來源 S2">臺慶科<b>3357</b><i>L</i></span><span class="chip core" title="4767.TW · 上市 · CORE · PRIMARY · 來源 S2">乾坤<b>4767</b><i>P</i></span><span class="chip core" title="6771.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">三集瑞-KY<b>6771</b></span><span class="chip sat" title="2456.TW · 上市 · SAT · PRIMARY · 來源 S2">奇力新(已併國巨)<b>2456</b><i>L</i></span><span class="chip sat" title="3236.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">千如<b>3236</b></span><span class="chip sat" title="6155.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">鈞寶<b>6155</b></span><span class="chip watch" title="5328.TWO · 上櫃 · WATCH · PRIMARY · 來源 S2">華容<b>5328</b><i>L</i></span></div><div class="peers"><s>國際同業</s>TDK<u>6762.T</u> · Murata<u>6981.T</u> · Vishay<u>VSH (NYSE)</u></div></td>
+          <td class="cnt">7</td></tr><tr><th><span class="l2code">J4</span><span class="l2name">鋁電解 / 固態電容</span>
+          <span class="l3">AI 伺服器與 AI PC 電源端儲能</span></th>
+          <td><div class="chips"><span class="chip core" title="2375.TW · 上市 · CORE · PRIMARY · 來源 S2">凱美<b>2375</b><i>L</i></span><span class="chip core" title="2472.TW · 上市 · CORE · PRIMARY · 來源 S2">立隆電<b>2472</b><i>L</i></span><span class="chip core" title="6449.TWO · 上櫃 · CORE · PRIMARY · 來源 S3對話研究">鈺邦<b>6449</b></span><span class="chip watch" title="8042.TWO · 上櫃 · WATCH · PRIMARY · 來源 S3對話研究">金山電<b>8042</b></span></div><div class="peers"><s>國際同業</s>Nichicon<u>6996.T</u> · Rubycon<u>未上市</u> · Panasonic<u>6752.T</u></div></td>
+          <td class="cnt">4</td></tr><tr><th><span class="l2code">J5</span><span class="l2name">保護元件</span>
+          <span class="l3">熱敏 / 壓敏 / 過電流保護</span></th>
+          <td><div class="chips"><span class="chip core" title="2428.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">興勤<b>2428</b></span><span class="chip core" title="6224.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">聚鼎<b>6224</b></span><span class="chip core" title="6284.TW · 上市 · CORE · PRIMARY · 來源 S2">佳邦<b>6284</b><i>P</i></span></div></td>
+          <td class="cnt">3</td></tr><tr><th><span class="l2code">J6</span><span class="l2name">石英 / 頻率元件</span>
+          <span class="l3">TCXO / OCXO 與石英振盪器</span></th>
+          <td><div class="chips"><span class="chip core" title="2484.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">希華<b>2484</b></span><span class="chip core" title="3042.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">晶技<b>3042</b></span><span class="chip sat" title="8182.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">加高<b>8182</b></span></div></td>
+          <td class="cnt">3</td></tr><tr><th><span class="l2code">J7</span><span class="l2name">LTCC / 高頻被動模組</span>
+          <span class="l3">低軌衛星與毫米波高頻元件</span></th>
+          <td><div class="chips"><span class="chip core" title="3152.TWO · 上櫃 · CORE · PRIMARY · 來源 S3對話研究">璟德<b>3152</b></span><span class="chip sat sec" title="2492.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">華新科<b>2492</b><i>P</i></span><span class="chip sat sec" title="6284.TW · 上市 · SAT · SECONDARY · 來源 S2">佳邦<b>6284</b><i>P</i></span></div></td>
+          <td class="cnt">3</td></tr><tr><th><span class="l2code">J8</span><span class="l2name">變壓器 / PoE 磁性元件</span>
+          <span class="l3">伺服器與網通高功率變壓器</span></th>
+          <td><div class="chips"><span class="chip core" title="3207.TWO · 上櫃 · CORE · PRIMARY · 來源 S3對話研究">耀勝<b>3207</b></span><span class="chip core" title="6821.TWO · 上櫃 · CORE · PRIMARY · 來源 S3對話研究">聯寶<b>6821</b></span><span class="chip sat sec" title="2308.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">台達電<b>2308</b><i>L</i></span></div></td>
+          <td class="cnt">3</td></tr><tr><th><span class="l2code">J9</span><span class="l2name">被動元件材料 / 設備</span>
+          <span class="l3">陶瓷粉末、陶瓷基板、調阻與包裝設備</span></th>
+          <td><div class="chips"><span class="chip core" title="6127.TWO · 上櫃 · CORE · PRIMARY · 來源 S3對話研究">九豪<b>6127</b></span><span class="chip sat sec" title="6173.TWO · 上櫃 · SAT · SECONDARY · 來源 S1+S2">信昌電<b>6173</b><i>P</i></span><span class="chip sat sec" title="6207.TW · 上市 · SAT · SECONDARY · 來源 S3對話研究">雷科<b>6207</b></span><span class="chip sat" title="6271.TW · 上市 · SAT · PRIMARY · 來源 S1+S2">同欣電<b>6271</b><i>L</i></span></div></td>
+          <td class="cnt">4</td></tr></table></section><section class="block" id="L1K">
+      <h2><span class="k">K</span>AI PC 與消費電子
+      <em>6 次族群 · 28 檔</em></h2>
+      <table class="mtx"><tr><th><span class="l2code">K1</span><span class="l2name">AI PC 品牌</span>
+          <span class="l3">Copilot+ / NPU ≥40 TOPS 品牌機</span></th>
+          <td><div class="chips"><span class="chip core" title="2353.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">宏碁<b>2353</b></span><span class="chip core" title="2357.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">華碩<b>2357</b></span><span class="chip sat sec" title="2376.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">技嘉<b>2376</b><i>L</i></span><span class="chip sat sec" title="2377.TW · 上市 · SAT · SECONDARY · 來源 S3對話研究">微星<b>2377</b></span></div><div class="peers"><s>國際同業</s>Lenovo 聯想<u>0992.HK</u> · HP<u>HPQ (NYSE)</u> · Dell<u>DELL (NYSE)</u> · Apple<u>AAPL (Nasdaq)</u></div></td>
+          <td class="cnt">4</td></tr><tr><th><span class="l2code">K2</span><span class="l2name">NB / PC 代工 ODM</span>
+          <span class="l3">美系品牌 AI PC 代工</span></th>
+          <td><div class="chips"><span class="chip core" title="2324.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">仁寶<b>2324</b></span><span class="chip core sec" title="2382.TW · 上市 · CORE · SECONDARY · 來源 S1+S2">廣達<b>2382</b><i>P</i></span><span class="chip sat sec" title="2356.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">英業達<b>2356</b><i>P</i></span><span class="chip sat sec" title="3231.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">緯創<b>3231</b><i>P</i></span><span class="chip sat" title="4938.TW · 上市 · SAT · PRIMARY · 來源 S3對話研究">和碩<b>4938</b></span></div></td>
+          <td class="cnt">5</td></tr><tr><th><span class="l2code">K3</span><span class="l2name">AI PC 零組件 · IC</span>
+          <span class="l3">USB4 / PMIC / 觸控 / Wi-Fi 7</span></th>
+          <td><div class="chips"><span class="chip core" title="2458.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">義隆<b>2458</b></span><span class="chip core sec" title="4966.TW · 上市 · CORE · SECONDARY · 來源 S3對話研究">譜瑞-KY<b>4966</b></span><span class="chip core sec" title="5269.TW · 上市 · CORE · SECONDARY · 來源 S3對話研究">祥碩<b>5269</b></span><span class="chip core sec" title="6138.TW · 上市 · CORE · SECONDARY · 來源 S3對話研究">茂達<b>6138</b></span><span class="chip core sec" title="8081.TW · 上市 · CORE · SECONDARY · 來源 S3對話研究">致新<b>8081</b></span><span class="chip sat sec" title="2379.TW · 上市 · SAT · SECONDARY · 來源 S2">瑞昱<b>2379</b><i>P</i></span><span class="chip sat sec" title="4968.TWO · 上櫃 · SAT · SECONDARY · 來源 S3對話研究">立積<b>4968</b></span></div></td>
+          <td class="cnt">7</td></tr><tr><th><span class="l2code">K4</span><span class="l2name">AI PC 零組件 · 散熱機構</span>
+          <span class="l3">超薄熱導管與高密度風扇</span></th>
+          <td><div class="chips"><span class="chip core sec" title="6591.TW · 上市 · CORE · SECONDARY · 來源 S1+S2">動力-KY<b>6591</b><i>P</i></span><span class="chip sat sec" title="2421.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">建準<b>2421</b><i>P</i></span><span class="chip sat sec" title="3017.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">奇鋐<b>3017</b><i>L</i></span><span class="chip sat sec" title="3324.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">雙鴻<b>3324</b><i>L</i></span></div></td>
+          <td class="cnt">4</td></tr><tr><th><span class="l2code">K5</span><span class="l2name">AI PC 零組件 · 電池電源</span>
+          <span class="l3">高容量鋰電池模組與快充</span></th>
+          <td><div class="chips"><span class="chip core sec" title="3211.TW · 上市 · CORE · SECONDARY · 來源 S1+S2">順達<b>3211</b><i>L</i></span><span class="chip core" title="6121.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">新普<b>6121</b></span><span class="chip sat sec" title="2301.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">光寶科<b>2301</b><i>P</i></span><span class="chip sat" title="4915.TW · 上市 · SAT · PRIMARY · 來源 S2">致伸<b>4915</b><i>L</i></span></div></td>
+          <td class="cnt">4</td></tr><tr><th><span class="l2code">K6</span><span class="l2name">AI PC 零組件 · 記憶體模組</span>
+          <span class="l3">LPDDR5X 與 SSD 模組</span></th>
+          <td><div class="chips"><span class="chip sat sec" title="3260.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">威剛<b>3260</b><i>P</i></span><span class="chip sat sec" title="4967.TWO · 上櫃 · SAT · SECONDARY · 來源 S3對話研究">十銓<b>4967</b></span><span class="chip sat sec" title="5289.TWO · 上櫃 · SAT · SECONDARY · 來源 S3對話研究">宜鼎<b>5289</b></span><span class="chip sat sec" title="8299.TWO · 上櫃 · SAT · SECONDARY · 來源 S1+S2">群聯<b>8299</b><i>L</i></span></div></td>
+          <td class="cnt">4</td></tr></table></section><section class="block" id="L1L">
+      <h2><span class="k">L</span>其他科技族群
+      <em>8 次族群 · 45 檔</em></h2>
+      <table class="mtx"><tr><th><span class="l2code">L1</span><span class="l2name">光學鏡頭 / CIS</span>
+          <span class="l3">手機、車用鏡頭與感測封裝</span></th>
+          <td><div class="chips"><span class="chip core" title="3008.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">大立光<b>3008</b><i>L</i></span><span class="chip core" title="3019.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">亞光<b>3019</b><i>L</i></span><span class="chip core" title="3406.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">玉晶光<b>3406</b><i>P</i></span><span class="chip sat" title="3362.TW · 上市 · SAT · PRIMARY · 來源 S1+S2">先進光<b>3362</b><i>P</i></span><span class="chip sat" title="4976.TW · 上市 · SAT · PRIMARY · 來源 S2">佳凌<b>4976</b><i>L</i></span><span class="chip sat sec" title="6271.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">同欣電<b>6271</b><i>L</i></span></div></td>
+          <td class="cnt">6</td></tr><tr><th><span class="l2code">L2</span><span class="l2name">低軌衛星 / 衛星通訊</span>
+          <span class="l3">地面站、天線與射頻前端</span></th>
+          <td><div class="chips"><span class="chip core" title="2314.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">台揚<b>2314</b><i>P</i></span><span class="chip core" title="3491.TWO · 上櫃 · CORE · PRIMARY · 來源 S1+S2">昇達科<b>3491</b><i>L</i></span><span class="chip core" title="6285.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">啟碁<b>6285</b><i>P</i></span><span class="chip sat" title="2312.TW · 上市 · SAT · PRIMARY · 來源 S3對話研究">金寶<b>2312</b></span><span class="chip sat" title="3178.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">公準<b>3178</b></span><span class="chip sat sec" title="6271.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">同欣電<b>6271</b><i>L</i></span></div></td>
+          <td class="cnt">6</td></tr><tr><th><span class="l2code">L3</span><span class="l2name">軍工航太</span>
+          <span class="l3">航太結構件、無人機與國防系統</span></th>
+          <td><div class="chips"><span class="chip core" title="2634.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">漢翔<b>2634</b><i>L</i></span><span class="chip core" title="8033.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">雷虎<b>8033</b><i>P</i></span><span class="chip core" title="8222.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">寶一<b>8222</b><i>P</i></span><span class="chip sat" title="2645.TW · 上市 · SAT · PRIMARY · 來源 S3對話研究">長榮航太<b>2645</b></span><span class="chip sat" title="6199.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">經緯<b>6199</b></span><span class="chip sat sec" title="8383.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">千附<b>8383</b><i>L</i></span></div></td>
+          <td class="cnt">6</td></tr><tr><th><span class="l2code">L4</span><span class="l2name">機器人 / 自動化</span>
+          <span class="l3">傳動元件、機械手臂與智慧製造</span></th>
+          <td><div class="chips"><span class="chip core" title="1590.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">亞德客-KY<b>1590</b><i>L</i></span><span class="chip core" title="1597.TWO · 上櫃 · CORE · PRIMARY · 來源 S1+S2">直得<b>1597</b><i>L</i></span><span class="chip core" title="2049.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">上銀<b>2049</b><i>L</i></span><span class="chip core" title="2359.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">所羅門<b>2359</b><i>P</i></span><span class="chip sat sec" title="2308.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">台達電<b>2308</b><i>L</i></span><span class="chip sat sec" title="2464.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">盟立<b>2464</b><i>P</i></span><span class="chip sat" title="6188.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">廣明<b>6188</b></span></div></td>
+          <td class="cnt">7</td></tr><tr><th><span class="l2code">L5</span><span class="l2name">電動車 / 車用零組件</span>
+          <span class="l3">傳動、車用連接器與功率元件</span></th>
+          <td><div class="chips"><span class="chip core" title="1536.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">和大<b>1536</b><i>P</i></span><span class="chip core" title="2231.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">為升<b>2231</b><i>P</i></span><span class="chip core" title="8255.TWO · 上櫃 · CORE · PRIMARY · 來源 S1+S2">朋程<b>8255</b><i>L</i></span><span class="chip sat sec" title="2308.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">台達電<b>2308</b><i>L</i></span><span class="chip sat sec" title="3665.TW · 上市 · SAT · SECONDARY · 來源 S1+S2">貿聯-KY<b>3665</b><i>L</i></span></div></td>
+          <td class="cnt">5</td></tr><tr><th><span class="l2code">L6</span><span class="l2name">資安 / 系統整合</span>
+          <span class="l3">SI、資安服務與雲端維運</span></th>
+          <td><div class="chips"><span class="chip core" title="2480.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">敦陽科<b>2480</b><i>P</i></span><span class="chip core" title="3029.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">零壹<b>3029</b><i>L</i></span><span class="chip core" title="6214.TWO · 上櫃 · CORE · PRIMARY · 來源 S1+S2">精誠<b>6214</b><i>P</i></span><span class="chip core" title="6690.TWO · 上櫃 · CORE · PRIMARY · 來源 S1+S2">安碁資訊<b>6690</b><i>L</i></span><span class="chip sat" title="6183.TWO · 上櫃 · SAT · PRIMARY · 來源 S3對話研究">關貿<b>6183</b></span></div></td>
+          <td class="cnt">5</td></tr><tr><th><span class="l2code">L7</span><span class="l2name">工控 / 物流 / 供應鏈周邊</span>
+          <span class="l3">工業電腦與科技物流</span></th>
+          <td><div class="chips"><span class="chip core" title="2395.TW · 上市 · CORE · PRIMARY · 來源 S2">研華<b>2395</b><i>P</i></span><span class="chip core" title="6166.TWO · 上櫃 · CORE · PRIMARY · 來源 S2">凌華<b>6166</b><i>L</i></span><span class="chip sat" title="2636.TWO · 上櫃 · SAT · PRIMARY · 來源 S2">台驊投控<b>2636</b><i>P</i></span><span class="chip sat" title="5609.TWO · 上櫃 · SAT · PRIMARY · 來源 S2">中菲行<b>5609</b><i>L</i></span><span class="chip sat" title="6160.TWO · 上櫃 · SAT · PRIMARY · 來源 S2">欣技<b>6160</b><i>L</i></span></div></td>
+          <td class="cnt">5</td></tr><tr><th><span class="l2code">L8</span><span class="l2name">生技醫療</span>
+          <span class="l3">CDMO、新藥與學名藥</span></th>
+          <td><div class="chips"><span class="chip core" title="1795.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">美時<b>1795</b><i>P</i></span><span class="chip core" title="6446.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">藥華藥<b>6446</b><i>L</i></span><span class="chip core" title="6472.TWO · 上櫃 · CORE · PRIMARY · 來源 S1+S2">保瑞<b>6472</b><i>L</i></span><span class="chip sat" title="4162.TWO · 上櫃 · SAT · PRIMARY · 來源 S1+S2">智擎<b>4162</b><i>L</i></span><span class="chip sat" title="6562.TWO · 上櫃 · SAT · PRIMARY · 來源 S1+S2">聯亞藥<b>6562</b><i>L</i></span></div><div class="peers"><s>國際同業</s>Novo Nordisk<u>NVO (NYSE)</u> · Pfizer<u>PFE (NYSE)</u> · Merck<u>MRK (NYSE)</u> · Samsung Biologics<u>207940.KS</u></div></td>
+          <td class="cnt">5</td></tr></table></section><section class="block" id="L1M">
+      <h2><span class="k">M</span>傳產輪動
+      <em>8 次族群 · 37 檔</em></h2>
+      <table class="mtx"><tr><th><span class="l2code">M1</span><span class="l2name">貨櫃航運</span>
+          <span class="l3">遠洋貨櫃三雄</span></th>
+          <td><div class="chips"><span class="chip core" title="2603.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">長榮<b>2603</b><i>L</i></span><span class="chip core" title="2609.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">陽明<b>2609</b><i>P</i></span><span class="chip core" title="2615.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">萬海<b>2615</b><i>L</i></span></div></td>
+          <td class="cnt">3</td></tr><tr><th><span class="l2code">M2</span><span class="l2name">散裝航運</span>
+          <span class="l3">海岬型 / 輕便型散裝</span></th>
+          <td><div class="chips"><span class="chip core" title="2605.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">新興<b>2605</b><i>P</i></span><span class="chip core" title="2606.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">裕民<b>2606</b><i>P</i></span><span class="chip core" title="2637.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">慧洋-KY<b>2637</b><i>L</i></span><span class="chip sat" title="2612.TW · 上市 · SAT · PRIMARY · 來源 S1+S2">中航<b>2612</b><i>P</i></span><span class="chip sat" title="2617.TW · 上市 · SAT · PRIMARY · 來源 S1+S2">台航<b>2617</b><i>P</i></span><span class="chip sat" title="2641.TW · 上市 · SAT · PRIMARY · 來源 S1+S2">正德<b>2641</b><i>L</i></span><span class="chip sat" title="5608.TW · 上市 · SAT · PRIMARY · 來源 S1+S2">四維航<b>5608</b><i>L</i></span></div></td>
+          <td class="cnt">7</td></tr><tr><th><span class="l2code">M3</span><span class="l2name">航空</span>
+          <span class="l3">客貨運航空</span></th>
+          <td><div class="chips"><span class="chip core" title="2610.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">華航<b>2610</b><i>P</i></span><span class="chip core" title="2618.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">長榮航<b>2618</b><i>L</i></span><span class="chip core" title="2646.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">星宇<b>2646</b><i>L</i></span></div></td>
+          <td class="cnt">3</td></tr><tr><th><span class="l2code">M4</span><span class="l2name">鋼鐵 · 扁鋼 / 不鏽鋼</span>
+          <span class="l3">熱軋、冷軋與不鏽鋼</span></th>
+          <td><div class="chips"><span class="chip core" title="2002.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">中鋼<b>2002</b><i>L</i></span><span class="chip core" title="2014.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">中鴻<b>2014</b><i>P</i></span><span class="chip core" title="2023.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">燁輝<b>2023</b><i>P</i></span><span class="chip sat" title="2017.TW · 上市 · SAT · PRIMARY · 來源 S1+S2">官田鋼<b>2017</b><i>L</i></span><span class="chip sat" title="2029.TW · 上市 · SAT · PRIMARY · 來源 S1+S2">盛餘<b>2029</b><i>L</i></span><span class="chip sat" title="9957.TW · 上市 · SAT · PRIMARY · 來源 S1+S2">燁聯<b>9957</b><i>P</i></span></div></td>
+          <td class="cnt">6</td></tr><tr><th><span class="l2code">M5</span><span class="l2name">鋼鐵 · 條鋼 / 型鋼</span>
+          <span class="l3">鋼筋、條鋼與型鋼</span></th>
+          <td><div class="chips"><span class="chip core" title="2006.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">東和鋼鐵<b>2006</b><i>P</i></span><span class="chip core" title="2015.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">豐興<b>2015</b><i>L</i></span><span class="chip sat" title="2012.TW · 上市 · SAT · PRIMARY · 來源 S1+S2">春雨<b>2012</b><i>L</i></span><span class="chip sat" title="2028.TW · 上市 · SAT · PRIMARY · 來源 S1+S2">威致<b>2028</b><i>P</i></span><span class="chip sat" title="2038.TW · 上市 · SAT · PRIMARY · 來源 S3對話研究">海光<b>2038</b></span></div></td>
+          <td class="cnt">5</td></tr><tr><th><span class="l2code">M6</span><span class="l2name">金融</span>
+          <span class="l3">金控與銀行</span></th>
+          <td><div class="chips"><span class="chip core" title="2881.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">富邦金<b>2881</b><i>L</i></span><span class="chip core" title="2882.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">國泰金<b>2882</b><i>P</i></span><span class="chip core" title="2884.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">玉山金<b>2884</b><i>L</i></span><span class="chip core" title="2886.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">兆豐金<b>2886</b><i>P</i></span><span class="chip core" title="2891.TW · 上市 · CORE · PRIMARY · 來源 S3對話研究">中信金<b>2891</b></span></div></td>
+          <td class="cnt">5</td></tr><tr><th><span class="l2code">M7</span><span class="l2name">觀光餐飲</span>
+          <span class="l3">餐飲連鎖、旅行社與飯店</span></th>
+          <td><div class="chips"><span class="chip core" title="2707.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">晶華<b>2707</b><i>P</i></span><span class="chip core" title="2727.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">王品<b>2727</b><i>L</i></span><span class="chip core" title="2729.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">瓦城<b>2729</b><i>P</i></span><span class="chip core" title="2731.TW · 上市 · CORE · PRIMARY · 來源 S1+S2">雄獅<b>2731</b><i>L</i></span><span class="chip sat" title="5706.TW · 上市 · SAT · PRIMARY · 來源 S1+S2">鳳凰<b>5706</b><i>L</i></span></div></td>
+          <td class="cnt">5</td></tr><tr><th><span class="l2code">M8</span><span class="l2name">傳產材料 / 其他</span>
+          <span class="l3">橡塑膠與傳產材料</span></th>
+          <td><div class="chips"><span class="chip watch" title="2107.TW · 上市 · WATCH · PRIMARY · 來源 S2">厚生<b>2107</b><i>P</i></span><span class="chip watch" title="2302.TW · 上市 · WATCH · PRIMARY · 來源 S2">麗正<b>2302</b><i>L</i></span><span class="chip watch" title="4960.TW · 上市 · WATCH · PRIMARY · 來源 S2">誠美材<b>4960</b><i>L</i></span></div></td>
+          <td class="cnt">3</td></tr></table></section><section class="block" id="L1Z">
+      <h2><span class="k">Z</span>待歸類
+      <em>1 次族群 · 3 檔</em></h2>
+      <table class="mtx"><tr><th><span class="l2code">Z1</span><span class="l2name">待歸類 / 來源殘留</span>
+          <span class="l3">來源檔案有、分類樹尚未定義功能格者</span></th>
+          <td><div class="chips"><span class="chip watch" title="3024.TW · 上市 · WATCH · PRIMARY · 來源 S2 YTD輪動｜原:PCB">欣泰<b>3024</b><i>L</i></span><span class="chip watch" title="6213.TW · 上市 · WATCH · PRIMARY · 來源 S2 YTD輪動｜原:PCB">联茂<b>6213</b><i>L</i></span><span class="chip watch" title="8038.TW · 上市 · WATCH · PRIMARY · 來源 S2 YTD輪動｜原:先進封裝 / CoWoS / SoIC">台特<b>8038</b><i>L</i></span></div></td>
+          <td class="cnt">3</td></tr></table></section>
+
+<section class="block"><h2><span class="k">X1</span>一股多族群（重複計數控管）<em>60 檔</em></h2>
+<table class="tbl"><tr><th>代碼</th><th>個股</th><th>歸屬數</th><th>PRIMARY（計入指數）</th><th>SECONDARY（不計入）</th></tr><tr><td class="mono">2308</td><td>台達電</td>
+  <td class="mono">7</td><td>H1 伺服器電源 PSU / 電源模組</td><td class="dim">G1 水冷板 / CDU / 液冷系統 / G5 熱交換器 / 漏液感測 / H4 UPS / 機房基礎設施 / J8 變壓器 / PoE 磁性元件 / L4 機器人 / 自動化 / L5 電動車 / 車用零組件</td></tr><tr><td class="mono">2376</td><td>技嘉</td>
+  <td class="mono">4</td><td>F1 AI OEM / ODM 整機櫃 (L10/L11)</td><td class="dim">F2 主機板 / GPU 基板 (L6) / G6 浸沒式 / 兩相散熱 / K1 AI PC 品牌</td></tr><tr><td class="mono">2301</td><td>光寶科</td>
+  <td class="mono">3</td><td>H1 伺服器電源 PSU / 電源模組</td><td class="dim">H4 UPS / 機房基礎設施 / K5 AI PC 零組件 · 電池電源</td></tr><tr><td class="mono">1303</td><td>南亞</td>
+  <td class="mono">3</td><td>A1 玻纖布 / 玻纖紗</td><td class="dim">A2 銅箔基板 CCL / A3 銅箔 / 樹脂 / 化工基材</td></tr><tr><td class="mono">2377</td><td>微星</td>
+  <td class="mono">3</td><td>F2 主機板 / GPU 基板 (L6)</td><td class="dim">G6 浸沒式 / 兩相散熱 / K1 AI PC 品牌</td></tr><tr><td class="mono">2356</td><td>英業達</td>
+  <td class="mono">3</td><td>F2 主機板 / GPU 基板 (L6)</td><td class="dim">F1 AI OEM / ODM 整機櫃 (L10/L11) / K2 NB / PC 代工 ODM</td></tr><tr><td class="mono">2492</td><td>華新科</td>
+  <td class="mono">3</td><td>J1 MLCC 積層陶瓷電容</td><td class="dim">J2 晶片電阻 Chip Resistor / J7 LTCC / 高頻被動模組</td></tr><tr><td class="mono">3231</td><td>緯創</td>
+  <td class="mono">3</td><td>F1 AI OEM / ODM 整機櫃 (L10/L11)</td><td class="dim">F2 主機板 / GPU 基板 (L6) / K2 NB / PC 代工 ODM</td></tr><tr><td class="mono">6271</td><td>同欣電</td>
+  <td class="mono">3</td><td>J9 被動元件材料 / 設備</td><td class="dim">L1 光學鏡頭 / CIS / L2 低軌衛星 / 衛星通訊</td></tr><tr><td class="mono">8299</td><td>群聯</td>
+  <td class="mono">3</td><td>D3 記憶體模組 / 控制 IC</td><td class="dim">E3 高速傳輸 / 介面 IC / K6 AI PC 零組件 · 記憶體模組</td></tr><tr><td class="mono">4958</td><td>臻鼎-KY</td>
+  <td class="mono">3</td><td>B3 AI 高速板 / HDI / 主板 PCB</td><td class="dim">B1 ABF / FC-BGA 載板 / B4 軟板 FPC</td></tr><tr><td class="mono">3443</td><td>創意</td>
+  <td class="mono">3</td><td>E1 AI ASIC 設計服務</td><td class="dim">D1 HBM / 高頻寬記憶體 / E2 矽智財 IP</td></tr><tr><td class="mono">2357</td><td>華碩</td>
+  <td class="mono">2</td><td>K1 AI PC 品牌</td><td class="dim">F1 AI OEM / ODM 整機櫃 (L10/L11)</td></tr><tr><td class="mono">2317</td><td>鴻海</td>
+  <td class="mono">2</td><td>F1 AI OEM / ODM 整機櫃 (L10/L11)</td><td class="dim">F2 主機板 / GPU 基板 (L6)</td></tr><tr><td class="mono">2379</td><td>瑞昱</td>
+  <td class="mono">2</td><td>E5 消費 / 網通 IC 設計</td><td class="dim">K3 AI PC 零組件 · IC</td></tr><tr><td class="mono">2382</td><td>廣達</td>
+  <td class="mono">2</td><td>F1 AI OEM / ODM 整機櫃 (L10/L11)</td><td class="dim">K2 NB / PC 代工 ODM</td></tr><tr><td class="mono">2454</td><td>聯發科</td>
+  <td class="mono">2</td><td>E5 消費 / 網通 IC 設計</td><td class="dim">E1 AI ASIC 設計服務</td></tr><tr><td class="mono">2464</td><td>盟立</td>
+  <td class="mono">2</td><td>C2 先進封裝設備 (CoWoS / SoIC)</td><td class="dim">L4 機器人 / 自動化</td></tr><tr><td class="mono">2421</td><td>建準</td>
+  <td class="mono">2</td><td>G4 風扇 / 馬達</td><td class="dim">K4 AI PC 零組件 · 散熱機構</td></tr><tr><td class="mono">2449</td><td>京元電</td>
+  <td class="mono">2</td><td>C4 封測 OSAT</td><td class="dim">D1 HBM / 高頻寬記憶體</td></tr><tr><td class="mono">2486</td><td>一詮</td>
+  <td class="mono">2</td><td>G2 均熱片 / VC / 熱管</td><td class="dim">G6 浸沒式 / 兩相散熱</td></tr><tr><td class="mono">2467</td><td>志聖</td>
+  <td class="mono">2</td><td>B5 PCB 設備 / 鑽針 / 檢測</td><td class="dim">C2 先進封裝設備 (CoWoS / SoIC)</td></tr><tr><td class="mono">3017</td><td>奇鋐</td>
+  <td class="mono">2</td><td>G1 水冷板 / CDU / 液冷系統</td><td class="dim">K4 AI PC 零組件 · 散熱機構</td></tr><tr><td class="mono">3008</td><td>大立光</td>
+  <td class="mono">2</td><td>L1 光學鏡頭 / CIS</td><td class="dim">I2 FAU 光纖陣列 / 精密光學耦合</td></tr><tr><td class="mono">2330</td><td>台積電</td>
+  <td class="mono">2</td><td>C1 晶圓代工</td><td class="dim">I1 CPO 共封裝光學 / 光引擎</td></tr><tr><td class="mono">2327</td><td>國巨</td>
+  <td class="mono">2</td><td>J1 MLCC 積層陶瓷電容</td><td class="dim">J2 晶片電阻 Chip Resistor</td></tr><tr><td class="mono">1717</td><td>長興</td>
+  <td class="mono">2</td><td>A3 銅箔 / 樹脂 / 化工基材</td><td class="dim">A4 半導體化學品 / 光阻 / 耗材</td></tr><tr><td class="mono">2313</td><td>華通</td>
+  <td class="mono">2</td><td>B2 BT 載板 / 記憶體載板</td><td class="dim">B3 AI 高速板 / HDI / 主板 PCB</td></tr><tr><td class="mono">3211</td><td>順達</td>
+  <td class="mono">2</td><td>H2 BBU 備援電池模組</td><td class="dim">K5 AI PC 零組件 · 電池電源</td></tr><tr><td class="mono">3189</td><td>景碩</td>
+  <td class="mono">2</td><td>B1 ABF / FC-BGA 載板</td><td class="dim">B2 BT 載板 / 記憶體載板</td></tr><tr><td class="mono">3081</td><td>聯亞</td>
+  <td class="mono">2</td><td>I3 雷射源 / 三五族磊晶</td><td class="dim">I4 光收發模組 / 光被動元件</td></tr><tr><td class="mono">3037</td><td>欣興</td>
+  <td class="mono">2</td><td>B1 ABF / FC-BGA 載板</td><td class="dim">B2 BT 載板 / 記憶體載板</td></tr><tr><td class="mono">3450</td><td>聯鈞</td>
+  <td class="mono">2</td><td>I2 FAU 光纖陣列 / 精密光學耦合</td><td class="dim">I3 雷射源 / 三五族磊晶</td></tr><tr><td class="mono">3483</td><td>力致</td>
+  <td class="mono">2</td><td>G1 水冷板 / CDU / 液冷系統</td><td class="dim">G6 浸沒式 / 兩相散熱</td></tr><tr><td class="mono">3324</td><td>雙鴻</td>
+  <td class="mono">2</td><td>G1 水冷板 / CDU / 液冷系統</td><td class="dim">K4 AI PC 零組件 · 散熱機構</td></tr><tr><td class="mono">3260</td><td>威剛</td>
+  <td class="mono">2</td><td>D3 記憶體模組 / 控制 IC</td><td class="dim">K6 AI PC 零組件 · 記憶體模組</td></tr><tr><td class="mono">3661</td><td>世芯-KY</td>
+  <td class="mono">2</td><td>E1 AI ASIC 設計服務</td><td class="dim">D1 HBM / 高頻寬記憶體</td></tr><tr><td class="mono">3665</td><td>貿聯-KY</td>
+  <td class="mono">2</td><td>F5 連接器 / 高速線材 / 端子</td><td class="dim">L5 電動車 / 車用零組件</td></tr><tr><td class="mono">3711</td><td>日月光投控</td>
+  <td class="mono">2</td><td>C4 封測 OSAT</td><td class="dim">I1 CPO 共封裝光學 / 光引擎</td></tr><tr><td class="mono">4966</td><td>譜瑞-KY</td>
+  <td class="mono">2</td><td>E3 高速傳輸 / 介面 IC</td><td class="dim">K3 AI PC 零組件 · IC</td></tr><tr><td class="mono">4967</td><td>十銓</td>
+  <td class="mono">2</td><td>D3 記憶體模組 / 控制 IC</td><td class="dim">K6 AI PC 零組件 · 記憶體模組</td></tr><tr><td class="mono">4968</td><td>立積</td>
+  <td class="mono">2</td><td>E5 消費 / 網通 IC 設計</td><td class="dim">K3 AI PC 零組件 · IC</td></tr><tr><td class="mono">3583</td><td>辛耘</td>
+  <td class="mono">2</td><td>C2 先進封裝設備 (CoWoS / SoIC)</td><td class="dim">A5 矽晶圓 / 靶材 / 研磨材</td></tr><tr><td class="mono">3338</td><td>泰碩</td>
+  <td class="mono">2</td><td>G2 均熱片 / VC / 熱管</td><td class="dim">G5 熱交換器 / 漏液感測</td></tr><tr><td class="mono">5289</td><td>宜鼎</td>
+  <td class="mono">2</td><td>D3 記憶體模組 / 控制 IC</td><td class="dim">K6 AI PC 零組件 · 記憶體模組</td></tr><tr><td class="mono">5269</td><td>祥碩</td>
+  <td class="mono">2</td><td>E3 高速傳輸 / 介面 IC</td><td class="dim">K3 AI PC 零組件 · IC</td></tr><tr><td class="mono">6173</td><td>信昌電</td>
+  <td class="mono">2</td><td>J1 MLCC 積層陶瓷電容</td><td class="dim">J9 被動元件材料 / 設備</td></tr><tr><td class="mono">6121</td><td>新普</td>
+  <td class="mono">2</td><td>K5 AI PC 零組件 · 電池電源</td><td class="dim">H2 BBU 備援電池模組</td></tr><tr><td class="mono">6207</td><td>雷科</td>
+  <td class="mono">2</td><td>B5 PCB 設備 / 鑽針 / 檢測</td><td class="dim">J9 被動元件材料 / 設備</td></tr><tr><td class="mono">6275</td><td>元山</td>
+  <td class="mono">2</td><td>G3 快接頭 QD / 閥件 / 泵浦</td><td class="dim">G4 風扇 / 馬達</td></tr><tr><td class="mono">6284</td><td>佳邦</td>
+  <td class="mono">2</td><td>J5 保護元件</td><td class="dim">J7 LTCC / 高頻被動模組</td></tr><tr><td class="mono">6138</td><td>茂達</td>
+  <td class="mono">2</td><td>E4 電源管理 IC (PMIC)</td><td class="dim">K3 AI PC 零組件 · IC</td></tr><tr><td class="mono">6285</td><td>啟碁</td>
+  <td class="mono">2</td><td>L2 低軌衛星 / 衛星通訊</td><td class="dim">I5 交換器 / 白牌網通設備</td></tr><tr><td class="mono">6409</td><td>旭隼</td>
+  <td class="mono">2</td><td>H4 UPS / 機房基礎設施</td><td class="dim">H1 伺服器電源 PSU / 電源模組</td></tr><tr><td class="mono">6667</td><td>信紘科</td>
+  <td class="mono">2</td><td>C3 廠務 / 無塵室 / 機電工程</td><td class="dim">A4 半導體化學品 / 光阻 / 耗材</td></tr><tr><td class="mono">6591</td><td>動力-KY</td>
+  <td class="mono">2</td><td>G2 均熱片 / VC / 熱管</td><td class="dim">K4 AI PC 零組件 · 散熱機構</td></tr><tr><td class="mono">6770</td><td>力積電</td>
+  <td class="mono">2</td><td>C1 晶圓代工</td><td class="dim">D2 DRAM / NOR / 利基記憶體</td></tr><tr><td class="mono">8046</td><td>南電</td>
+  <td class="mono">2</td><td>B1 ABF / FC-BGA 載板</td><td class="dim">B2 BT 載板 / 記憶體載板</td></tr><tr><td class="mono">8081</td><td>致新</td>
+  <td class="mono">2</td><td>E4 電源管理 IC (PMIC)</td><td class="dim">K3 AI PC 零組件 · IC</td></tr><tr><td class="mono">8383</td><td>千附</td>
+  <td class="mono">2</td><td>C3 廠務 / 無塵室 / 機電工程</td><td class="dim">L3 軍工航太</td></tr></table></section>
+
+<section class="block"><h2><span class="k">X2</span>原檔問題清單<em>19 項</em></h2>
+<table class="tbl"><tr><th>來源</th><th>類型</th><th>標的</th><th>說明</th><th>建議處置</th></tr><tr><td class="mono dim">S1 stock_group.xlsx</td>
+  <td><span class="tag r">成員缺漏</span></td><td>CPO 共封裝光學</td>
+  <td class="dim">宣告 6 檔，實際匯出 0 檔，缺 6 檔</td><td>重跑匯出或補建成員</td></tr><tr><td class="mono dim">S1 stock_group.xlsx</td>
+  <td><span class="tag r">成員缺漏</span></td><td>IC設計</td>
+  <td class="dim">宣告 4 檔，實際匯出 0 檔，缺 4 檔</td><td>重跑匯出或補建成員</td></tr><tr><td class="mono dim">S1 stock_group.xlsx</td>
+  <td><span class="tag r">成員缺漏</span></td><td>PCB</td>
+  <td class="dim">宣告 5 檔，實際匯出 0 檔，缺 5 檔</td><td>重跑匯出或補建成員</td></tr><tr><td class="mono dim">S2 YTD報告</td>
+  <td><span class="tag y">規模級距異常</span></td><td>鴻海 2317</td>
+  <td class="dim">被歸為 小型股 (Small Cap)，與實際市值排名矛盾（market_cap 欄位疑為亂序或非還原市值）</td><td>Method B 重算：free-float 市值百分位 × ADV20 百分位</td></tr><tr><td class="mono dim">S1 stock_group.xlsx</td>
+  <td><span class="tag r">錯置</span></td><td>大量 3167 @ ABF 載板</td>
+  <td class="dim">大量為 PCB／半導體設備廠，非 ABF 載板製造</td><td>移至 B5 PCB 設備</td></tr><tr><td class="mono dim">S1 stock_group.xlsx</td>
+  <td><span class="tag r">錯置</span></td><td>同欣電 6271 @ 低軌衛星</td>
+  <td class="dim">同欣電為陶瓷基板／感測封裝，衛星僅間接</td><td>主歸 J9，次歸 L2 低軌衛星</td></tr><tr><td class="mono dim">S1 stock_group.xlsx</td>
+  <td><span class="tag y">粒度過粗</span></td><td>AI 伺服器 7 檔混裝</td>
+  <td class="dim">整機櫃、L6 板級、機殼結構混在同一格</td><td>拆為 F1/F2/F3</td></tr><tr><td class="mono dim">S1 stock_group.xlsx</td>
+  <td><span class="tag y">粒度過粗</span></td><td>散熱 8 檔混裝</td>
+  <td class="dim">水冷板、均熱片、風扇、泵閥混在同一格</td><td>拆為 G1–G6</td></tr><tr><td class="mono dim">S1 stock_group.xlsx</td>
+  <td><span class="tag y">粒度過粗</span></td><td>被動元件 4 檔混裝</td>
+  <td class="dim">MLCC／電阻／電感／電容未分</td><td>拆為 J1–J9</td></tr><tr><td class="mono dim">S2 YTD報告</td>
+  <td><span class="tag r">錯置</span></td><td>南亞 1303 @ PCB</td>
+  <td class="dim">南亞為玻纖布／樹脂／CCL 上游，非 PCB 製造</td><td>移至 A1/A2/A3</td></tr><tr><td class="mono dim">S2 YTD報告</td>
+  <td><span class="tag r">錯置</span></td><td>直得 1597 @ PCB</td>
+  <td class="dim">直得為線性傳動元件（機器人）</td><td>移至 L4 機器人</td></tr><tr><td class="mono dim">S2 YTD報告</td>
+  <td><span class="tag r">錯置</span></td><td>聯詠 3034／矽力 6415 @ 先進封裝</td>
+  <td class="dim">兩者為 IC 設計，非封裝</td><td>移至 E5／E4</td></tr><tr><td class="mono dim">S2 YTD報告</td>
+  <td><span class="tag r">錯置</span></td><td>厚生 2107 @ 電阻</td>
+  <td class="dim">厚生為橡塑膠／資產股</td><td>移至 M8 傳產其他</td></tr><tr><td class="mono dim">S2 YTD報告</td>
+  <td><span class="tag r">錯置</span></td><td>麗正 2302 @ 電感</td>
+  <td class="dim">麗正為二極體／半導體元件</td><td>移至 M8 待覆核</td></tr><tr><td class="mono dim">S2 YTD報告</td>
+  <td><span class="tag r">錯置</span></td><td>台達電 2308 @ 鋁電解電容</td>
+  <td class="dim">台達電為電源／散熱／被動模組，非鋁電解電容廠</td><td>移至 H1／G1</td></tr><tr><td class="mono dim">S2 YTD報告</td>
+  <td><span class="tag r">錯置</span></td><td>奇鋐 3017／雙鴻 3324 @ AI 伺服器</td>
+  <td class="dim">兩者為散熱模組廠</td><td>移至 G1</td></tr><tr><td class="mono dim">S3 對話研究</td>
+  <td><span class="tag b">事實待驗</span></td><td>台達電列於矽光子 CPO</td>
+  <td class="dim">對話原文將台達電與台積電並列為 CPO 晶圓代工，屬歸類錯誤</td><td>台達電歸 H1/G1，CPO 僅列 I1 台廠</td></tr><tr><td class="mono dim">S3 對話研究</td>
+  <td><span class="tag b">事實待驗</span></td><td>2026 年營收／毛利率／市占數字</td>
+  <td class="dim">來源為第三方 AI 對話彙整，未經 VDF 雙重驗算</td><td>一律標 P 級證據，不得進入結論層</td></tr><tr><td class="mono dim">S3 對話研究</td>
+  <td><span class="tag b">未上市剔除</span></td><td>Boyd／CoolIT／CEJN／Isola／乾坤／Wiwynn Thailand</td>
+  <td class="dim">未上市，無法餵 yfinance</td><td>列 30_國際同業 並標未上市，不入指數</td></tr></table></section>
+
+<section class="block"><h2><span class="k">X3</span>來源覆蓋核對（0 遺漏）<em>337 筆</em></h2>
+<table class="tbl"><tr><th>來源</th><th>原族群</th><th>筆數</th><th>重新歸類</th></tr><tr><td class="mono dim">S2 YTD輪動</td><td>先進封裝 / CoWoS / SoIC</td><td class="mono">11</td>
+  <td class="mono warn">11</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>AI 伺服器</td><td class="mono">9</td>
+  <td class="mono warn">1</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>AI 半導體 / 先進製程</td><td class="mono">9</td>
+  <td class="mono warn">9</td></tr><tr><td class="mono dim">S1 stock_group</td><td>散熱</td><td class="mono">8</td>
+  <td class="mono warn">3</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>工程建置 / 廠務工程</td><td class="mono">8</td>
+  <td class="mono warn">5</td></tr><tr><td class="mono dim">S1 stock_group</td><td>AI 伺服器</td><td class="mono">7</td>
+  <td class="mono warn">1</td></tr><tr><td class="mono dim">S1 stock_group</td><td>半導體</td><td class="mono">7</td>
+  <td class="mono warn">7</td></tr><tr><td class="mono dim">S1 stock_group</td><td>散裝航運</td><td class="mono">7</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>MLCC 積層陶瓷電容</td><td class="mono">7</td>
+  <td class="mono warn">3</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>PCB</td><td class="mono">7</td>
+  <td class="mono warn">6</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>散裝航運</td><td class="mono">7</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S1 stock_group</td><td>台積電擴廠</td><td class="mono">6</td>
+  <td class="mono warn">6</td></tr><tr><td class="mono dim">S1 stock_group</td><td>機器人</td><td class="mono">6</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S1 stock_group</td><td>重電</td><td class="mono">6</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S1 stock_group</td><td>鋼鐵</td><td class="mono">6</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>衛星 / 通訊</td><td class="mono">6</td>
+  <td class="mono warn">6</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>ASIC 設計服務</td><td class="mono">6</td>
+  <td class="mono warn">2</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>鋼鐵</td><td class="mono">6</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S1 stock_group</td><td>半導體設備</td><td class="mono">5</td>
+  <td class="mono warn">5</td></tr><tr><td class="mono dim">S1 stock_group</td><td>生技醫療</td><td class="mono">5</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S1 stock_group</td><td>觀光餐飲</td><td class="mono">5</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S1 stock_group</td><td>記憶體</td><td class="mono">5</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>AI PCB / 高速板</td><td class="mono">5</td>
+  <td class="mono warn">1</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>AI 伺服器散熱</td><td class="mono">5</td>
+  <td class="mono warn">3</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>連接器 / 端子</td><td class="mono">5</td>
+  <td class="mono warn">2</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>生技醫療</td><td class="mono">5</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>觀光餐飲</td><td class="mono">5</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>記憶體</td><td class="mono">5</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S1 stock_group</td><td>ABF 載板</td><td class="mono">4</td>
+  <td class="mono warn">1</td></tr><tr><td class="mono dim">S1 stock_group</td><td>ASIC 設計服務</td><td class="mono">4</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S1 stock_group</td><td>BBU 備援電池</td><td class="mono">4</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S1 stock_group</td><td>低軌衛星</td><td class="mono">4</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S1 stock_group</td><td>光學</td><td class="mono">4</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S1 stock_group</td><td>條鋼</td><td class="mono">4</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S1 stock_group</td><td>網通設備</td><td class="mono">4</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S1 stock_group</td><td>被動元件</td><td class="mono">4</td>
+  <td class="mono warn">2</td></tr><tr><td class="mono dim">S1 stock_group</td><td>資安/系統整合</td><td class="mono">4</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S1 stock_group</td><td>軍工航太</td><td class="mono">4</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S1 stock_group</td><td>金融</td><td class="mono">4</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S1 stock_group</td><td>電動車</td><td class="mono">4</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S1 stock_group</td><td>電源管理</td><td class="mono">4</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>電阻 Chip Resistor</td><td class="mono">4</td>
+  <td class="mono warn">3</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>AI 電源 / PSU / BBU</td><td class="mono">4</td>
+  <td class="mono warn">3</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>RF / 天線 / 濾波器</td><td class="mono">4</td>
+  <td class="mono warn">4</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>供應鏈周邊 / 物流 / 工控</td><td class="mono">4</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>封測 OSAT</td><td class="mono">4</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>軟板 FPC</td><td class="mono">4</td>
+  <td class="mono warn">2</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>光學</td><td class="mono">4</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>半導體</td><td class="mono">4</td>
+  <td class="mono warn">4</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>條鋼</td><td class="mono">4</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>網通設備</td><td class="mono">4</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>資安 / 系統整合</td><td class="mono">4</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>軍工航太</td><td class="mono">4</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>金融</td><td class="mono">4</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S1 stock_group</td><td>矽智財 IP</td><td class="mono">3</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S1 stock_group</td><td>航空</td><td class="mono">3</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S1 stock_group</td><td>貨櫃航運</td><td class="mono">3</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>電感 Inductor / Coil</td><td class="mono">3</td>
+  <td class="mono warn">1</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>ABF / BT 載板</td><td class="mono">3</td>
+  <td class="mono warn">3</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>晶圓材料 / Silicon / Chemicals / Targets</td><td class="mono">3</td>
+  <td class="mono warn">1</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>機房 / 電力 / UPS</td><td class="mono">3</td>
+  <td class="mono warn">2</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>機器人</td><td class="mono">3</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>矽智財 IP</td><td class="mono">3</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>航空</td><td class="mono">3</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>貨櫃航運</td><td class="mono">3</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>電動車</td><td class="mono">3</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>未分類 / Uncategorized</td><td class="mono">2</td>
+  <td class="mono warn">2</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>鋁電解 / 鋁固態電容</td><td class="mono">2</td>
+  <td class="mono warn">2</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>風扇</td><td class="mono">2</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>AI 機房 / 機櫃整合</td><td class="mono">2</td>
+  <td class="mono warn">2</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>機殼散熱 / 結構件</td><td class="mono">2</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>半導體設備</td><td class="mono">2</td>
+  <td class="mono warn">2</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>電源管理</td><td class="mono">2</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>機房電力系統 / Data Center Power</td><td class="mono">1</td>
+  <td class="mono warn">1</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>電池材料 / Chemicals / Components</td><td class="mono">1</td>
+  <td class="mono warn">1</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>電池模組 / 工業電池</td><td class="mono">1</td>
+  <td class="mono ">0</td></tr><tr><td class="mono dim">S2 YTD輪動</td><td>重電</td><td class="mono">1</td>
+  <td class="mono ">0</td></tr></table></section>
+
+<footer>VIA Veritas Intelligence Analytics · 只增不減：本表僅新增節點，既有節點退役改標 DORMANT，不刪除 ·
+未上市國際同業（Boyd／CoolIT／CEJN／Isola／Wiwynn Thailand）列示但不入指數 · 本檔為 SSOT 視圖，數值結論以 VDF 實際抓取為準</footer>
+</div></body></html>

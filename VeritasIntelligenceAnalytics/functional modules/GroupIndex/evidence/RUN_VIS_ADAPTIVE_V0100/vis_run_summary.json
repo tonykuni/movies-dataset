@@ -1,0 +1,135 @@
+{
+  "Harness": "VIA_VIS_AdaptiveClassification",
+  "Version": "0.1.00",
+  "GeneratedAt": "2026-08-31T16:42:52",
+  "Status": "VIS_ADAPTIVE_PASS",
+  "HardFailures": 0,
+  "Iterations": 1,
+  "BaseDate": "2026-01-02",
+  "MaxAttentionWeight": 0.18,
+  "ParamFamily": {
+    "TypeF": [
+      "TSMC",
+      "BASE_DATE",
+      "UNRELATED_CORR",
+      "MAX_ATT_WEIGHT"
+    ],
+    "TypeD": [
+      "liquidity_q",
+      "corr_q",
+      "size quantiles",
+      "ewm spans(rolling)"
+    ],
+    "TypeH": [
+      "baseline(shock 旗標日加重短線 0.8;旗標=滾動95分位,零固定常數)"
+    ]
+  },
+  "Tests": [
+    {
+      "TestID": "V01",
+      "TestName": "巨錨隔離:2330 不在面板",
+      "Status": "PASS",
+      "Severity": "HARD",
+      "Evidence": ""
+    },
+    {
+      "TestID": "V02",
+      "TestName": "ETR = 成交值−當沖且非負",
+      "Status": "PASS",
+      "Severity": "HARD",
+      "Evidence": ""
+    },
+    {
+      "TestID": "V03",
+      "TestName": "AS 每日總和 = 1(淨市場定義自洽)",
+      "Status": "PASS",
+      "Severity": "HARD",
+      "Evidence": "max_dev=1.11e-16"
+    },
+    {
+      "TestID": "V04",
+      "TestName": "大中小分層單調(AS 中位 Large>Mid>Small)",
+      "Status": "PASS",
+      "Severity": "HARD",
+      "Evidence": "{'Large': 0.09998, 'Small': 0.02614, 'Mid': 0.06472}"
+    },
+    {
+      "TestID": "V05",
+      "TestName": "指數權重採 T-1(零前視)",
+      "Status": "PASS",
+      "Severity": "HARD",
+      "Evidence": ""
+    },
+    {
+      "TestID": "V06",
+      "TestName": "Attention 上限鎖 18%(cap 於正規化前施加)",
+      "Status": "PASS",
+      "Severity": "HARD",
+      "Evidence": ""
+    },
+    {
+      "TestID": "V07",
+      "TestName": "三指數於 2026-01-02 全部 = 100",
+      "Status": "PASS",
+      "Severity": "HARD",
+      "Evidence": ""
+    },
+    {
+      "TestID": "V08",
+      "TestName": "植入領頭羊(3100)被辨識為 LEADER(視窗多數日)",
+      "Status": "PASS",
+      "Severity": "HARD",
+      "Evidence": "leader_days=77.99%"
+    },
+    {
+      "TestID": "V09",
+      "TestName": "植入不相關者(2605)被標 UNRELATED",
+      "Status": "PASS",
+      "Severity": "HARD",
+      "Evidence": "66.13%"
+    },
+    {
+      "TestID": "V10",
+      "TestName": "植入背離事件(3200 價漲金流出)被 Gate4 攔截",
+      "Status": "PASS",
+      "Severity": "HARD",
+      "Evidence": "flag_days=3"
+    },
+    {
+      "TestID": "V11",
+      "TestName": "半動態敏感:Shock 旗標(滾動分位觸發)日基準線貼近短線",
+      "Status": "PASS",
+      "Severity": "HARD",
+      "Evidence": "shock_days=443"
+    },
+    {
+      "TestID": "V12",
+      "TestName": "可比性:momentum_z 與 vwsp_z 同尺度(std∈[0.5,2])",
+      "Status": "PASS",
+      "Severity": "HARD",
+      "Evidence": "mz=0.94 vz=0.94"
+    },
+    {
+      "TestID": "V13",
+      "TestName": "植入外資持續買超 → Trend_Following 佔比顯著",
+      "Status": "PASS",
+      "Severity": "HARD",
+      "Evidence": "28.64%"
+    },
+    {
+      "TestID": "V14",
+      "TestName": "籌碼時序全滾動 z(z_foreign/z_sitc/z_dealer/融資融券)",
+      "Status": "PASS",
+      "Severity": "HARD",
+      "Evidence": ""
+    },
+    {
+      "TestID": "V15",
+      "TestName": "HHI 集中度監控輸出(Attention 加權)",
+      "Status": "PASS",
+      "Severity": "HARD",
+      "Evidence": ""
+    }
+  ],
+  "Boundary": "Controlled DGP = 方法驗證,非實盤績效;Adj Close 報酬;零網路"
+}

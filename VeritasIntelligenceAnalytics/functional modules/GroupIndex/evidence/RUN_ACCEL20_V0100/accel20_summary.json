@@ -1,0 +1,1775 @@
+{
+  "Harness": "VIA_GroupIndex_Accel20_Console",
+  "Version": "0.1.00",
+  "GeneratedAt": "2026-08-31T16:43:48",
+  "KeyPrompt": "supportive modules/VIA_Central_Governance/VIA_CentralGovernanceConsole_MegaPrompt_KEY.md",
+  "Status": "ACCEL20_GOVERNANCE_PASS",
+  "HardFailures": 0,
+  "Rounds": 2,
+  "TargetsScanned": 52,
+  "Accelerators": {
+    "A01_AST": {
+      "parsedOK": 52,
+      "total": 52
+    },
+    "A02_Semantic": {
+      "withDocstring": 40,
+      "todoMarkers": 3
+    },
+    "A03_Hydra": {
+      "topFanIn": [
+        [
+          "__future__",
+          44
+        ],
+        [
+          "json",
+          37
+        ],
+        [
+          "pathlib",
+          36
+        ],
+        [
+          "sys",
+          32
+        ],
+        [
+          "pandas",
+          29
+        ],
+        [
+          "datetime",
+          28
+        ],
+        [
+          "numpy",
+          23
+        ],
+        [
+          "re",
+          22
+        ],
+        [
+          "typing",
+          19
+        ],
+        [
+          "hashlib",
+          18
+        ],
+        [
+          "importlib",
+          18
+        ],
+        [
+          "os",
+          15
+        ]
+      ]
+    },
+    "A04_Topology": {
+      "intraEdges": 16,
+      "note": "套件內相依邊 16 條(引擎刻意鬆耦合,subprocess/檔案契約為主)"
+    },
+    "A05_SandboxIsolation": [
+      {
+        "runner": "VIA_ETF_Consoles_Evidence_v0100.py",
+        "tempDir": false
+      },
+      {
+        "runner": "VIA_ChipWar_Revenue_Evidence_v0100.py",
+        "tempDir": true
+      }
+    ],
+    "A06_AutoFix": {
+      "fixableFindings": 1325
+    },
+    "A07_Panoramic": {
+      "rounds": 2,
+      "converged": true
+    },
+    "A08_SSOT": {
+      "canonical": "GroupIndex SSOT L1",
+      "rosterRows": 379,
+      "tickerRegex": "[1-9]\\d{3}(非 00 開頭)",
+      "alignment": "SectorWhale registry / twrevenue groups.csv 角色學(L/P/M/G)同構,名冊以 GroupIndex 為 canonical"
+    },
+    "A09_MatrixViz": "accel20_matrix.html",
+    "A10_ErrorClusters": {
+      "UP006": 625,
+      "BLE001": 284,
+      "UP031": 218,
+      "F401": 133,
+      "S110": 101,
+      "UP045": 96,
+      "I001": 66,
+      "UP035": 51,
+      "UP009": 36,
+      "RUF013": 35,
+      "DTZ005": 29,
+      "F811": 23,
+      "RUF046": 22,
+      "G010": 20,
+      "F841": 20
+    },
+    "A11_Complexity": {
+      "maxFuncLines": 380,
+      "maxDepth": 4
+    },
+    "A12_SubsystemSync": {
+      "GroupIndex": true,
+      "ChipWar": true,
+      "VAP": true,
+      "VRN": true,
+      "VDF": true,
+      "MultiFactor": true
+    },
+    "A13_Rollback": {
+      "gitHead": "72e1c0a",
+      "策略": "git 版本化 + append-only evidence 即回滾點"
+    },
+    "A14_Coverage": {
+      "gates": {
+        "RUN_SECTORFLOW_V0100": "CONTROLLED_ACTIVATION_PASS_REVIEW_WARNINGS_RETAINED",
+        "RUN_SECTORFLOW_TRADE_V0100": "TRADE_BACKTEST_PASS",
+        "RUN_LIVEWIRE_ADAPTER_V0100": "ADAPTER_VERIFIED_FAIL_CLOSED",
+        "RUN_ETF_CONSOLES_V0100": "ETF_CONSOLES_PASS",
+        "RUN_CHIPWAR_REVENUE_V0100": "CHIPWAR_REVENUE_PASS",
+        "RUN_MASTER_VALIDATION_V0100": "CONTROLLED_SUITE_ACTIVATION_PASS"
+      },
+      "testFiles": 13
+    },
+    "A15_FixOrder": {
+      "parallel": 1950,
+      "sequenceDependent": 0,
+      "note": "本輪 lint 發現均為單檔可並行修"
+    },
+    "A16_ProgressBar": "HTML 動態進度條已渲染",
+    "A17_Narration": [
+      "A07 全景式分析啟動:掃描 52 份 Python 引擎/模組檔",
+      "A07 三輪全景:第 2 輪即收斂(診斷結果穩定)",
+      "A03 Hydra 扇入最高:__future__×44",
+      "A10 分類:HARD 0 / REVIEW 1950(可自動修 1325)",
+      "A14 六道閘:6/6 綠"
+    ],
+    "A18_NonBlockingPS": {
+      "launchPs1": true,
+      "nonBlocking": true
+    },
+    "A19_MultiEngine": {
+      "py": 52,
+      "ps1": 3,
+      "html": 1,
+      "gateRows": 8
+    },
+    "A20_AutoDeployInit": {
+      "envPreflight": true,
+      "oneclickSegments": 12
+    }
+  },
+  "HardFindings": [],
+  "ReviewFindings": [
+    {
+      "file": "VIA_GovFundEngine_v040.py",
+      "code": "UP009",
+      "line": 1,
+      "msg": "UTF-8 encoding declaration is unnecessary",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_GovFundEngine_v040.py",
+      "code": "I001",
+      "line": 22,
+      "msg": "Import block is un-sorted or un-formatted",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_GovFundEngine_v040.py",
+      "code": "C408",
+      "line": 67,
+      "msg": "Unnecessary `dict()` call (rewrite as a literal)",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_GovFundEngine_v040.py",
+      "code": "C408",
+      "line": 189,
+      "msg": "Unnecessary `dict()` call (rewrite as a literal)",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "EXE001",
+      "line": 1,
+      "msg": "Shebang is present but file is not executable",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP009",
+      "line": 2,
+      "msg": "UTF-8 encoding declaration is unnecessary",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "RUF012",
+      "line": 160,
+      "msg": "Mutable default value for class attribute",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 175,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 188,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 190,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 191,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 266,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "G010",
+      "line": 297,
+      "msg": "Logging statement uses `warn` instead of `warning`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 297,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 299,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 335,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 342,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "RUF046",
+      "line": 365,
+      "msg": "Value being cast to `int` is already an integer",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 384,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "RUF023",
+      "line": 398,
+      "msg": "`Val.__slots__` is not sorted",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 415,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 469,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 478,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 494,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 516,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 522,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "FURB167",
+      "line": 540,
+      "msg": "Use of regular expression alias `re.S`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "FURB167",
+      "line": 540,
+      "msg": "Use of regular expression alias `re.I`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "FURB167",
+      "line": 541,
+      "msg": "Use of regular expression alias `re.S`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "FURB167",
+      "line": 541,
+      "msg": "Use of regular expression alias `re.I`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "SIM114",
+      "line": 572,
+      "msg": "Combine `if` branches using logical `or` operator",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 620,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 669,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 670,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 672,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "G010",
+      "line": 673,
+      "msg": "Logging statement uses `warn` instead of `warning`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 673,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 689,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 691,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "G010",
+      "line": 692,
+      "msg": "Logging statement uses `warn` instead of `warning`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 692,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 710,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "G010",
+      "line": 711,
+      "msg": "Logging statement uses `warn` instead of `warning`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 711,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 726,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 738,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "DTZ005",
+      "line": 766,
+      "msg": "`datetime.datetime.now()` called without a `tz` argument",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "G010",
+      "line": 774,
+      "msg": "Logging statement uses `warn` instead of `warning`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 774,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "RUF007",
+      "line": 842,
+      "msg": "Prefer `itertools.pairwise()` over `zip()` when iterating over successive pairs",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 849,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "DTZ005",
+      "line": 852,
+      "msg": "`datetime.datetime.now()` called without a `tz` argument",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP020",
+      "line": 858,
+      "msg": "Use builtin `open`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "G010",
+      "line": 881,
+      "msg": "Logging statement uses `warn` instead of `warning`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 881,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 917,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 926,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 932,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "FURB167",
+      "line": 961,
+      "msg": "Use of regular expression alias `re.I`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "G010",
+      "line": 969,
+      "msg": "Logging statement uses `warn` instead of `warning`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 969,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 973,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "FURB167",
+      "line": 995,
+      "msg": "Use of regular expression alias `re.I`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1073,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "G010",
+      "line": 1075,
+      "msg": "Logging statement uses `warn` instead of `warning`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1075,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1090,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "G010",
+      "line": 1092,
+      "msg": "Logging statement uses `warn` instead of `warning`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1092,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1100,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1102,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "G010",
+      "line": 1103,
+      "msg": "Logging statement uses `warn` instead of `warning`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1103,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1106,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1119,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "G010",
+      "line": 1181,
+      "msg": "Logging statement uses `warn` instead of `warning`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "DTZ005",
+      "line": 1187,
+      "msg": "`datetime.datetime.now()` called without a `tz` argument",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1242,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1261,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP032",
+      "line": 1268,
+      "msg": "Use f-string instead of `format` call",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "RUF046",
+      "line": 1268,
+      "msg": "Value being cast to `int` is already an integer",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1285,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1295,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1308,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1309,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP032",
+      "line": 1309,
+      "msg": "Use f-string instead of `format` call",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1310,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1313,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1314,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1319,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1341,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1344,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1347,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1363,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1369,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1399,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "ISC004",
+      "line": 1411,
+      "msg": "Unparenthesized implicit string concatenation in collection",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1431,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1438,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1464,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1466,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1474,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1478,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1484,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1490,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1499,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1505,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "RUF100",
+      "line": 1526,
+      "msg": "Unused `noqa` directive (non-enabled: `E402`)",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP020",
+      "line": 1831,
+      "msg": "Use builtin `open`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1840,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP020",
+      "line": 1841,
+      "msg": "Use builtin `open`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP020",
+      "line": 1858,
+      "msg": "Use builtin `open`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1883,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "G010",
+      "line": 1885,
+      "msg": "Logging statement uses `warn` instead of `warning`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1885,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1888,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1890,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "RUF015",
+      "line": 1968,
+      "msg": "Prefer `next(x for x in rows if x[\"code\"] == \"00981A\")` over single element slice",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1995,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 1996,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 2014,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 2116,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP020",
+      "line": 2135,
+      "msg": "Use builtin `open`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "SIM115",
+      "line": 2135,
+      "msg": "Use a context manager for opening files",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 2210,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 2213,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 2214,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 2216,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 2288,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 2289,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 2296,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 2301,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "DTZ005",
+      "line": 2303,
+      "msg": "`datetime.datetime.now()` called without a `tz` argument",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 2304,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 2319,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 2321,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 2322,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 2323,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 2330,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "RUF100",
+      "line": 2337,
+      "msg": "Unused `noqa` directive (non-enabled: `S606`)",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 2339,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "RUF100",
+      "line": 2339,
+      "msg": "Unused `noqa` directive (non-enabled: `S605`)",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 2341,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "RUF100",
+      "line": 2341,
+      "msg": "Unused `noqa` directive (non-enabled: `S605`)",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "G010",
+      "line": 2343,
+      "msg": "Logging statement uses `warn` instead of `warning`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF.py",
+      "code": "UP031",
+      "line": 2343,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "EXE001",
+      "line": 1,
+      "msg": "Shebang is present but file is not executable",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP009",
+      "line": 2,
+      "msg": "UTF-8 encoding declaration is unnecessary",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "F401",
+      "line": 33,
+      "msg": "`re` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 55,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP032",
+      "line": 128,
+      "msg": "Use f-string instead of `format` call",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 148,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP032",
+      "line": 150,
+      "msg": "Use f-string instead of `format` call",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP032",
+      "line": 151,
+      "msg": "Use f-string instead of `format` call",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 152,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 152,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 153,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 153,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 163,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP032",
+      "line": 164,
+      "msg": "Use f-string instead of `format` call",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP032",
+      "line": 164,
+      "msg": "Use f-string instead of `format` call",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 165,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 166,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 169,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 186,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 202,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "RUF100",
+      "line": 234,
+      "msg": "Unused `noqa` directive (non-enabled: `N802`)",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 290,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 302,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "FURB192",
+      "line": 320,
+      "msg": "Prefer `max` over `sorted()` to compute the maximum value in a sequence",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP020",
+      "line": 321,
+      "msg": "Use builtin `open`",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "SIM115",
+      "line": 321,
+      "msg": "Use a context manager for opening files",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 330,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "RUF015",
+      "line": 373,
+      "msg": "Prefer `next(x for x in rows if x[\"code\"] == \"00999A\")` over single element slice",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 384,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 407,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 427,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 441,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 459,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 466,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 480,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 500,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 519,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 535,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 538,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ActiveStockETF_mocktest.py",
+      "code": "UP031",
+      "line": 542,
+      "msg": "Use format specifiers instead of percent format",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ChipWar_Console_v010.py",
+      "code": "UP009",
+      "line": 1,
+      "msg": "UTF-8 encoding declaration is unnecessary",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ChipWar_Console_v010.py",
+      "code": "I001",
+      "line": 19,
+      "msg": "Import block is un-sorted or un-formatted",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ChipWar_Console_v010.py",
+      "code": "F401",
+      "line": 19,
+      "msg": "`json` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ChipWar_Console_v010.py",
+      "code": "F401",
+      "line": 19,
+      "msg": "`importlib.util` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ChipWar_Console_v010.py",
+      "code": "F401",
+      "line": 19,
+      "msg": "`io` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ChipWar_Console_v010.py",
+      "code": "F401",
+      "line": 19,
+      "msg": "`contextlib` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ChipWar_Console_v010.py",
+      "code": "F401",
+      "line": 20,
+      "msg": "`numpy` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ChipWar_Console_v010.py",
+      "code": "F401",
+      "line": 20,
+      "msg": "`pandas` imported but unused",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ChipWar_Console_v010.py",
+      "code": "PLW1510",
+      "line": 38,
+      "msg": "`subprocess.run` without explicit `check` argument",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ChipWar_Revenue_Evidence_v0100.py",
+      "code": "UP009",
+      "line": 1,
+      "msg": "UTF-8 encoding declaration is unnecessary",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ChipWar_Revenue_Evidence_v0100.py",
+      "code": "I001",
+      "line": 18,
+      "msg": "Import block is un-sorted or un-formatted",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ChipWar_Revenue_Evidence_v0100.py",
+      "code": "UP035",
+      "line": 21,
+      "msg": "`typing.Dict` is deprecated, use `dict` instead",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ChipWar_Revenue_Evidence_v0100.py",
+      "code": "UP035",
+      "line": 21,
+      "msg": "`typing.List` is deprecated, use `list` instead",
+      "fixable": false,
+      "class": "Parallel-Fixable"
+    },
+    {
+      "file": "VIA_ChipWar_Revenue_Evidence_v0100.py",
+      "code": "UP006",
+      "line": 59,
+      "msg": "Use `list` instead of `List` for type annotation",
+      "fixable": true,
+      "class": "Parallel-Fixable"
+    }
+  ],
+  "Policy": "analyze-classify-recommend only / zero engine mutation / zero network / append-only"
+}

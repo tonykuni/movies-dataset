@@ -1,0 +1,27 @@
+﻿TestID,TestName,Status,Severity,Evidence
+F01,SSOT L1 membership 契約(14 族群),PASS,HARD,groups=14 rows=378
+F02,COUNT 列數契約(298),PASS,HARD,count_rows=298
+F03,非普通股代碼全數隔離(fail-closed),PASS,HARD,"[{""Ticker"":""0050"",""Reason"":""NON_COMMON_STOCK_CODE"",""Resolution"":""EXCLUDED_FAIL_CLOSED""},{""Ticker"":""030001"",""Reason"":""NON_COMMON_STOCK_CODE"",""Resolution"":""EXCLUDED_FAIL_CLOSED""},{""Ticker"":""9999A"",""Reason"":""NON_COMMON_STOCK_CODE"",""Resolution"":""EXCLUDED_FAIL_CLOSED""}]"
+F04,台積電已自市場分母剔除,PASS,HARD,denominator_reduced=True
+F05,實質成交額 = 成交額 - 當沖(非負),PASS,HARD,monotone=True
+F06,動態 Criteria 無固定市場紅線(ledger),PASS,HARD,criteria_rows=14
+F07,Executable AST 無固定市場門檻,PASS,HARD,findings=[]
+F08,動態 Criteria 跨情境/種子變動,PASS,HARD,"{""DRAIN"":2,""MARKET_TIDE"":2,""ROTATION"":2,""STEALTH_ACCUMULATION"":2}"
+F09,鏈接指數幾何連續性(含換檔日 gap=0),PASS,HARD,"[{""Scenario"":""ROTATION"",""Seed"":17,""ContinuityPass"":true},{""Scenario"":""ROTATION"",""Seed"":20260817,""ContinuityPass"":true},{""Scenario"":""MARKET_TIDE"",""Seed"":17,""ContinuityPass"":true},{""Scenario"":""MARKET_TIDE"",""Seed"":20260817,""ContinuityPass"":true},{""Scenario"":""STEALTH_ACCUMULATION"",""Seed"":17,""ContinuityPass"":true},{""Scenario"":""STEALTH_ACCUMULATION"",""Seed"":20260817,""ContinuityPass"":true},{""Scenario"":""DRAIN"",""Seed"":17,""ContinuityPass"":true},{""Scenario"":""DRAIN"",""Seed"":20260817,""ContinuityPass"":true}]"
+F10,指數錨定 2026-01-02 = 100 且視窗自 2025-01-02 起,PASS,HARD,base_rows=13 plot_min=2025-01-02
+F11,固定基期重算法存在人工跳空(鏈接法必要性證據),PASS,HARD,"[{""Scenario"":""ROTATION"",""NaiveRebaseMaxGap"":0.0607},{""Scenario"":""ROTATION"",""NaiveRebaseMaxGap"":0.2398},{""Scenario"":""MARKET_TIDE"",""NaiveRebaseMaxGap"":0.1328},{""Scenario"":""MARKET_TIDE"",""NaiveRebaseMaxGap"":0.1245},{""Scenario"":""STEALTH_ACCUMULATION"",""NaiveRebaseMaxGap"":0.2647},{""Scenario"":""STEALTH_ACCUMULATION"",""NaiveRebaseMaxGap"":0.0637},{""Scenario"":""DRAIN"",""NaiveRebaseMaxGap"":0.1079},{""Scenario"":""DRAIN"",""NaiveRebaseMaxGap"":0.0745}]"
+F12,半年首日換檔實際發生且無斷裂,PASS,HARD,rebalance_audit_rows=39
+F13,OLS 殘差化顯著壓低對大盤相關(正交性),PASS,HARD,"[{""Scenario"":""ROTATION"",""OrthoRawAbsCorr"":0.7365,""OrthoPureAbsCorr"":0.0},{""Scenario"":""ROTATION"",""OrthoRawAbsCorr"":0.753,""OrthoPureAbsCorr"":0.0},{""Scenario"":""MARKET_TIDE"",""OrthoRawAbsCorr"":0.781,""OrthoPureAbsCorr"":0.0},{""Scenario"":""MARKET_TIDE"",""OrthoRawAbsCorr"":0.7653,""OrthoPureAbsCorr"":0.0},{""Scenario"":""STEALTH_ACCUMULATION"",""OrthoRawAbsCorr"":0.7488,""OrthoPureAbsCorr"":0.0},{""Scenario"":""STEALTH_ACCUMULATION"",""OrthoRawAbsCorr"":0.7694,""OrthoPureAbsCorr"":0.0},{""Scenario"":""DRAIN"",""OrthoRawAbsCorr"":0.7533,""OrthoPureAbsCorr"":0.0},{""Scenario"":""DRAIN"",""OrthoRawAbsCorr"":0.7453,""OrthoPureAbsCorr"":0.0}]"
+F14,Market Tide 殘差化壓低族群假相關,PASS,HARD,"[{""Seed"":17,""RawMedianWithinCorr"":0.6567,""ResidualMedianWithinCorr"":0.0927},{""Seed"":20260817,""RawMedianWithinCorr"":0.6209,""ResidualMedianWithinCorr"":0.0878}]"
+F15,結構化情境偵測率優於 Market Tide 假警報率,PASS,HARD,"tide_false_alarm=0.0064; {""DRAIN"":1.0,""ROTATION"":1.0,""STEALTH_ACCUMULATION"":1.0}"
+F16,ROTATION 吸金事件可偵測且優於雜訊,PASS,HARD,"[{""Seed"":17,""EventPrecision"":0.962,""EventRecall"":1.0},{""Seed"":20260817,""EventPrecision"":0.9101,""EventRecall"":1.0}]"
+F17,STEALTH 投信暗中鎖碼訊號可觸發,PASS,HARD,"[{""Seed"":17,""StealthSignalDays"":456},{""Seed"":20260817,""StealthSignalDays"":560}]"
+F18,DRAIN 資金失血訊號可觸發,PASS,HARD,"[{""Seed"":17,""DrainSignalDays"":206},{""Seed"":20260817,""DrainSignalDays"":402}]"
+F19,半年定審角色標定具鑑別力(Macro F1 > 0),PASS,HARD,"[{""Scenario"":""ROTATION"",""Seed"":17,""RoleMacroF1"":0.3962},{""Scenario"":""ROTATION"",""Seed"":20260817,""RoleMacroF1"":0.3627},{""Scenario"":""MARKET_TIDE"",""Seed"":17,""RoleMacroF1"":0.3044},{""Scenario"":""MARKET_TIDE"",""Seed"":20260817,""RoleMacroF1"":0.3314},{""Scenario"":""STEALTH_ACCUMULATION"",""Seed"":17,""RoleMacroF1"":0.4164},{""Scenario"":""STEALTH_ACCUMULATION"",""Seed"":20260817,""RoleMacroF1"":0.3724},{""Scenario"":""DRAIN"",""Seed"":17,""RoleMacroF1"":0.4369},{""Scenario"":""DRAIN"",""Seed"":20260817,""RoleMacroF1"":0.3439}]"
+F20,真值 LEADER 置換證據 ≥ 真值 LAGGARD(統計分離),PASS,HARD,"{""LeaderMedianEvidence"": 0.8571428571428571, ""LaggardMedianEvidence"": 0.8571428571428571}"
+F21,定審零窺探(截斷資料重演 digest 一致),PASS,HARD,lookahead_ok=True
+F22,宏觀壓力情境觸發曝險熔斷(MARKET_TIDE),PASS,HARD,tide_halt_days=44 rotation_halt_days=33
+F23,核心輸出完整,PASS,HARD,"required=['sector_membership_input.csv', 'backtest_summary.csv', 'sector_chained_index_daily.csv', 'sector_flow_daily.csv', 'review_roles.csv', 'dynamic_criteria_ledger.csv', 'continuity_audit.csv', 'quarantine_ledger.csv']"
+F24,HTML 本地資產完整,PASS,HARD,missing=[]
+F25,成分池不足觸發 Floor Fallback(保留警告),PASS,REVIEW,fallback_group_periods=0
+F26,SSOT 無 MethodA 角色之成員(保留警告),WARN,REVIEW,unranked_members=98

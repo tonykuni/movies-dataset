@@ -1,0 +1,86 @@
+{
+  "Harness": "VIA_GroupIndex_EnvPreflight",
+  "Version": "0.1.00",
+  "GeneratedAt": "2026-08-31T16:45:11",
+  "Mode": "ENFORCE",
+  "Status": "ENV_PREFLIGHT_BLOCKED",
+  "HardFailures": 1,
+  "CurrentEnv": {
+    "EnvName": "usr",
+    "SysPrefix": "/usr",
+    "PythonVersion": "3.11.15",
+    "PythonExe": "/usr/local/bin/python3",
+    "IsManagedVia": false,
+    "IsViaCore": false,
+    "IsBaseOrSystem": true,
+    "Classification": "BASE_OR_SYSTEM_POLLUTION_RISK"
+  },
+  "RequiredTools": [
+    {
+      "Import": "numpy",
+      "PipName": "numpy",
+      "Installed": true,
+      "Version": "2.4.6"
+    },
+    {
+      "Import": "pandas",
+      "PipName": "pandas",
+      "Installed": true,
+      "Version": "3.0.5"
+    },
+    {
+      "Import": "sklearn",
+      "PipName": "scikit-learn",
+      "Installed": true,
+      "Version": "1.9.0"
+    },
+    {
+      "Import": "matplotlib",
+      "PipName": "matplotlib",
+      "Installed": true,
+      "Version": "3.11.1"
+    },
+    {
+      "Import": "seaborn",
+      "PipName": "seaborn",
+      "Installed": true,
+      "Version": "0.13.2"
+    },
+    {
+      "Import": "openpyxl",
+      "PipName": "openpyxl",
+      "Installed": true,
+      "Version": "3.1.5"
+    },
+    {
+      "Import": "bs4",
+      "PipName": "beautifulsoup4",
+      "Installed": true,
+      "Version": "4.15.0"
+    },
+    {
+      "Import": "pytest",
+      "PipName": "pytest",
+      "Installed": true,
+      "Version": "9.1.1"
+    }
+  ],
+  "MissingTools": [],
+  "InstallCommand": "",
+  "DiscoveredViaEnvs": [],
+  "BaseCleanlinessAudit": {
+    "Status": "AUDIT_TARGET_NOT_PRESENT",
+    "Detail": "非 Windows envs 佈局(沙盒/CI);base 稽核於本機執行"
+  },
+  "WhitelistCrossCheck": {
+    "ViaCoreWhitelistGap": [
+      "beautifulsoup4",
+      "matplotlib",
+      "pytest",
+      "scikit-learn",
+      "seaborn"
+    ],
+    "Recommendation": "OPTION_A: EnvManager 白名單擴充 via_core += beautifulsoup4, matplotlib, pytest, scikit-learn, seaborn | OPTION_B: 專用環境 via_groupindex_312(EnvManager 決策後擇一,append-only)"
+  },
+  "Policy": "scan-classify-recommend only / zero install / zero env mutation / append-only"
+}

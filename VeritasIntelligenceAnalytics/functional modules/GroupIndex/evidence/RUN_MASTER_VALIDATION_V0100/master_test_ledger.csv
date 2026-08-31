@@ -1,0 +1,16 @@
+﻿TestID,TestName,Status,Severity,Evidence
+M01,UNIT-TEST:pytest 十套件全過,PASS,HARD,51 passed in 6.84s
+M02,DEBUG:evidence manifest 重驗(零改寫),PASS,HARD,"{""RUN_SECTORFLOW_V0100"": {""files"": 22, ""mismatch"": []}, ""RUN_SECTORFLOW_TRADE_V0100"": {""files"": 9, ""mismatch"": []}}"
+M03,OPTIMIZE:修復帳本 R01-R08 + 精度濾網參數可追溯,PASS,HARD,"repairs=8 filters={'SignalConfirmDays': 2, 'SetupConfirmDays': 4, 'ReentryCooldownDays': 3}"
+M04,INTEGRATE:指數與資金流族群集合一致,PASS,HARD,chained=13 flows=13 diff=[]
+M05,INTEGRATE:交易權益日期 ⊆ 鏈接指數日期,PASS,HARD,equity_days=422 idx_days=422
+M06,INTEGRATE:交易帳本族群/日期契約,PASS,HARD,trades=29
+M07,INTEGRATE:LiveWire 對帳 76/76 + fail-closed 狀態,PASS,HARD,"{""total"": 76, ""exact"": 76, ""fuzzy"": 0, ""unmapped"": 0}"
+M08,INTEGRATE:VAP 軸鎖合規(規格 40 圖 + 性質自檢全過),PASS,HARD,"{""five_ticks"": true, ""uniform"": true, ""legal_mantissa"": true, ""covers"": true}"
+M09,INTEGRATE:儀表板嵌入四引擎資料塊,PASS,HARD,size=453KB
+M10,SYSTEM-TEST:Chromium 八分頁零 JS 錯誤,PASS,HARD,"{""jsErrors"": 0, ""tabsVisible"": 8}"
+U01,USER:每族群指數在 2026-01-02 錨定 100,PASS,HARD,groups=13
+U02,USER:視窗自 2025-01-02 起(基期前歷史可見),PASS,HARD,2025-01-02
+U03,USER:可見每族群回測勝率(至少 5 群有交易),PASS,HARD,groups_with_trades=5
+U04,USER:三大法人扣當沖堆疊與進出場標記已嵌入儀表板,PASS,HARD,tokens found
+U05,USER:接線驗證分頁可見匯入審計與對帳明細,PASS,HARD,livewire tab tokens
