@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA Central Governance Console</title>
+<style>
+:root{
+  --bg:#f3f5f7;--panel:#ffffff;--panel2:#f8fafb;--line:#dce2e8;
+  --text:#1f2933;--muted:#6b7785;--blue:#4c78a8;--teal:#439a9a;
+  --green:#5a9e6f;--amber:#c4943a;--red:#c96b5a;--violet:#7a6daa;
+  --navw:308px;--r:10px;--shadow:0 2px 10px rgba(0,0,0,.05)
+}
+*{box-sizing:border-box} body{margin:0;font-family:Inter,"Noto Sans TC","Segoe UI",sans-serif;background:var(--bg);color:var(--text);font-size:12px}
+button,input,select{font:inherit}
+.app{display:grid;grid-template-columns:var(--navw) 1fr;min-height:100vh}
+.sidebar{background:#fff;border-right:1px solid var(--line);height:100vh;position:sticky;top:0;overflow:auto}
+.brand{padding:16px 16px 12px;border-bottom:1px solid var(--line)}
+.brand h1{font-size:15px;margin:0 0 3px}.brand small{color:var(--muted)}
+.brand .latin{font-size:10px;color:var(--blue);font-weight:700;letter-spacing:.7px}
+.sysline{display:flex;gap:6px;align-items:center;margin-top:9px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green)}
+.nav-sec{padding:10px 10px 0}
+.nav-title{font-size:9px;color:var(--muted);font-weight:800;letter-spacing:.7px;text-transform:uppercase;padding:0 7px 5px}
+.nav-btn{width:100%;text-align:left;border:1px solid transparent;background:none;border-radius:8px;padding:7px 9px;margin-bottom:2px;cursor:pointer;color:#374151}
+.nav-btn:hover{background:#f4f7fa}.nav-btn.active{background:#edf3f8;color:var(--blue);border-color:#d9e5ef;font-weight:700}
+.nav-btn .tag{float:right;font-size:8px;border-radius:999px;padding:1px 5px;background:#eef1f4;color:var(--muted)}
+.divider{height:1px;background:var(--line);margin:9px 10px}
+.gatebox,.inputbox{padding:0 10px 10px}
+.card{border:1px solid var(--line);border-radius:var(--r);background:var(--panel);box-shadow:var(--shadow)}
+.card-h{padding:8px 10px;background:var(--panel2);border-bottom:1px solid var(--line);font-weight:750}
+.card-b{padding:9px}
+.gate{display:grid;grid-template-columns:34px 1fr 16px;gap:6px;align-items:center;padding:5px 0;border-bottom:1px solid #edf0f2}
+.gate:last-child{border-bottom:0}.gate-id{font-family:Consolas,monospace;font-weight:700}.gate small{color:var(--muted)}
+.light{width:9px;height:9px;border-radius:50%;justify-self:end}.g{background:var(--green)}.y{background:var(--amber)}.r{background:var(--red)}
+.field{margin-bottom:7px}.field label{display:block;font-size:9px;color:var(--muted);font-weight:700;margin-bottom:3px}
+.field input,.field select{width:100%;border:1px solid var(--line);border-radius:7px;padding:6px 7px;background:#fff}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
+.btn{border:1px solid var(--line);background:#fff;border-radius:7px;padding:6px 8px;cursor:pointer}.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.btn.warn{background:#fff8e8;color:#8a671d;border-color:#e7d2a0}
+.main{min-width:0}
+.topbar{height:58px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 18px;position:sticky;top:0;z-index:4}
+.topbar .title{font-size:16px;font-weight:800}.topbar .sub{font-size:10px;color:var(--muted);margin-top:2px}
+.topbar .right{margin-left:auto;display:flex;gap:6px;align-items:center}
+.pill{font-size:9px;padding:4px 8px;border:1px solid var(--line);border-radius:999px;background:#fff}
+.workspace{padding:14px}
+.hero{display:grid;grid-template-columns:1.4fr .6fr;gap:10px;margin-bottom:10px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.kpi{padding:10px}.kpi .n{font-size:18px;font-weight:800}.kpi .l{font-size:9px;color:var(--muted);margin-top:2px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.table{width:100%;border-collapse:collapse}.table th,.table td{padding:7px 8px;border-bottom:1px solid #edf0f2;text-align:left}.table th{font-size:9px;color:var(--muted);background:#fafbfc}
+.badge{font-size:8px;font-weight:800;border-radius:4px;padding:2px 5px}.ok{background:#e2f0e6;color:#3c7f51}.warnb{background:#f8ebca;color:#99711f}.hold{background:#f7ddd8;color:#a75242}.info{background:#e1eaf4;color:#486f98}
+.section-title{font-size:11px;font-weight:800;margin:0 0 7px}
+.flow{display:flex;gap:5px;align-items:center;flex-wrap:wrap}.node{padding:6px 8px;border:1px solid var(--line);border-radius:7px;background:#fff}.arr{color:#9aa3ad}
+.hidden{display:none}
+.preview{height:290px;border:1px dashed #cfd6dd;border-radius:10px;background:linear-gradient(180deg,#fbfcfd,#f7f9fb);display:flex;align-items:center;justify-content:center;color:#9aa3ad;text-align:center}
+.toolbar{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+@media(max-width:1100px){:root{--navw:270px}.hero,.grid2,.grid3{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <h1>Veritas Intelligence Analytics</h1>
+      <div class="latin">OBSERVA · INTELLEGE · PRAEVIDE</div>
+      <small>Central Governance Console</small>
+      <div class="sysline"><span class="dot"></span><b>System Ready</b><span style="color:var(--muted)">· Audit Mode</span></div>
+    </div>
+
+    <div class="nav-sec">
+      <div class="nav-title">System Units</div>
+      <button class="nav-btn active" data-view="overview">◫ 系統總覽 <span class="tag">HOME</span></button>
+      <button class="nav-btn" data-view="governance">⚙ Central Governance <span class="tag">CGE</span></button>
+      <button class="nav-btn" data-view="ssot">◇ SSOT <span class="tag">SSOT</span></button>
+      <button class="nav-btn" data-view="support">▦ 支援性模組管理 <span class="tag">7</span></button>
+      <button class="nav-btn" data-view="vdf">▤ VDF · Data Forge <span class="tag">DATA</span></button>
+      <button class="nav-btn" data-view="vrn">▧ VRN · Report Nova <span class="tag">DOC</span></button>
+      <button class="nav-btn" data-view="vap">▥ VAP · AutoPlot <span class="tag">VIZ</span></button>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="gatebox">
+      <div class="card">
+        <div class="card-h">GATE · 系統閘門</div>
+        <div class="card-b">
+          <div class="gate"><span class="gate-id">G00</span><span>Root / Path</span><span class="light g"></span></div>
+          <div class="gate"><span class="gate-id">G01</span><span>AST / Syntax</span><span class="light g"></span></div>
+          <div class="gate"><span class="gate-id">G02</span><span>SSOT / Registry</span><span class="light g"></span></div>
+          <div class="gate"><span class="gate-id">G03</span><span>Environment</span><span class="light g"></span></div>
+          <div class="gate"><span class="gate-id">G04</span><span>Data Contract</span><span class="light g"></span></div>
+          <div class="gate"><span class="gate-id">G05</span><span>Integration</span><span class="light g"></span></div>
+          <div class="gate"><span class="gate-id">G06</span><span>User Test / Activate</span><span class="light r"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="inputbox">
+      <div class="card">
+        <div class="card-h">Input Interface · 執行輸入</div>
+        <div class="card-b">
+          <div class="field"><label>VIA Root</label><input value="C:\Users\tonyk\movies-dataset\VeritasIntelligenceAnalytics"></div>
+          <div class="row2">
+            <div class="field"><label>Run Mode</label><select><option>AUDIT</option><option>STAGE</option><option>PROMOTE</option></select></div>
+            <div class="field"><label>Subsystem</label><select><option>ALL</option><option>VDF</option><option>VRN</option><option>VAP</option></select></div>
+          </div>
+          <div class="row2">
+            <div class="field"><label>Start Date</label><input type="date" value="2021-01-01"></div>
+            <div class="field"><label>End Date</label><input type="text" value="Latest"></div>
+          </div>
+          <div class="row2">
+            <div class="field"><label>Update</label><select><option>Incremental</option><option>Full</option><option>Validate Only</option></select></div>
+            <div class="field"><label>Max Rounds</label><input type="number" value="3" min="1" max="3"></div>
+          </div>
+          <div class="field"><label>Target / Dataset / Document</label><input placeholder="2330.TW / dataset / PDF path"></div>
+          <div class="actions">
+            <button class="btn">Dry Run</button>
+            <button class="btn primary">Run</button>
+            <button class="btn warn">Test / Debug</button>
+            <button class="btn">Open Report</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="title" id="pageTitle">系統總覽</div>
+        <div class="sub" id="pageSub">Central Governance · SSOT · Supportive · VDF · VRN · VAP</div>
+      </div>
+      <div class="right">
+        <span class="pill">LIVE · 2026-08-31 10:03</span>
+        <span class="pill">Canonical Mutation: OFF</span>
+        <span class="pill">Hydra: REVIEW</span>
+      </div>
+    </div>
+
+    <section class="workspace" id="overview">
+      <div class="hero">
+        <div class="card">
+          <div class="card-h">VIA Control Plane</div>
+          <div class="card-b">
+            <div class="flow">
+              <span class="node">Central Governance</span><span class="arr">→</span>
+              <span class="node">SSOT / Registry</span><span class="arr">→</span>
+              <span class="node">Supportive Runtime</span><span class="arr">→</span>
+              <span class="node">VDF / VRN</span><span class="arr">→</span>
+              <span class="node">VAP</span>
+            </div>
+            <p style="color:var(--muted);margin:9px 0 0">左側負責「選擇、Gate、參數與執行」；右側僅呈現該單元的工作介面、狀態、矩陣與報告。</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h">Current State</div>
+          <div class="card-b"><b>Audit / Read-only</b><br><span style="color:var(--muted)">Activation 尚未允許；G06 為 RED。</span></div>
+        </div>
+      </div>
+      <div class="kpis">
+        <div class="card kpi"><div class="n">6</div><div class="l">Primary Units</div></div>
+        <div class="card kpi"><div class="n">7</div><div class="l">Supportive Modules</div></div>
+        <div class="card kpi"><div class="n">14</div><div class="l">指揮台任務(尾版)</div></div>
+        <div class="card kpi"><div class="n">3</div><div class="l">Max Repair Rounds</div></div>
+      </div>
+    </section>
+
+    <section class="workspace hidden" id="governance">
+      <div class="grid2">
+        <div class="card"><div class="card-h">Governance Matrix</div><div class="card-b">
+          <table class="table"><tr><th>Domain</th><th>Status</th><th>Action</th></tr>
+          <tr><td>Canonical Root</td><td><span class="badge warnb">REVIEW</span></td><td>Root Arbitration</td></tr>
+          <tr><td>AST / Syntax</td><td><span class="badge ok">PASS</span></td><td>Keep</td></tr>
+          <tr><td>Hydra Detection</td><td><span class="badge warnb">REVIEW</span></td><td>Alias / Owner</td></tr>
+          <tr><td>Activation</td><td><span class="badge hold">BLOCKED</span></td><td>Need G06</td></tr></table>
+        </div></div>
+        <div class="card"><div class="card-h">Three-Round Repair</div><div class="card-b">
+          <p><b>Round 1</b> · Parallel-safe fix</p><p><b>Round 2</b> · Dependency-order fix</p><p><b>Round 3</b> · Polish / stability</p>
+          <p style="color:var(--muted)">高風險 Hydra 節點維持 suggestions-only。</p>
+        </div></div>
+      </div>
+    </section>
+
+    <section class="workspace hidden" id="ssot">
+      <div class="grid2">
+        <div class="card"><div class="card-h">SSOT Domains</div><div class="card-b">
+          <table class="table"><tr><th>Domain</th><th>Authority</th><th>Status</th></tr>
+          <tr><td>Ticker / Alias / Regex</td><td>VIA_SSOT_Unified</td><td><span class="badge ok">ACTIVE</span></td></tr>
+          <tr><td>Date / Unit / Currency</td><td>VIA_SSOT_Unified</td><td><span class="badge ok">ACTIVE</span></td></tr>
+          <tr><td>Module Naming</td><td>Registry + SSOT</td><td><span class="badge warnb">ALIGN</span></td></tr>
+          <tr><td>Chart Contract</td><td>VAP Spec</td><td><span class="badge info">LINKED</span></td></tr></table>
+        </div></div>
+        <div class="card"><div class="card-h">SSOT Workspace</div><div class="card-b"><div class="preview"><a href="VIA_UI_CommandRoster_v0100.html" style="color:var(--blue)">指令冊</a></div></div></div>
+      </div>
+    </section>
+
+    <section class="workspace hidden" id="support">
+      <div class="card"><div class="card-h">Supportive Module Manager</div><div class="card-b">
+        <table class="table"><tr><th>Module</th><th>Role</th><th>Status</th><th>Gate</th></tr>
+        <tr><td>VIA_Runtime_Bridge_All_in_One</td><td>Shared ctx / task entry</td><td><span class="badge warnb">PATH REVIEW</span></td><td>G00</td></tr>
+        <tr><td>VIA_SSOT_Unified</td><td>Semantic authority</td><td><span class="badge ok">READY</span></td><td>G02</td></tr>
+        <tr><td>VIA_RegistryCore_v1</td><td>Append-only registry</td><td><span class="badge warnb">REFRESH</span></td><td>G02</td></tr>
+        <tr><td>VIA_EnvManager</td><td>Environment governance</td><td><span class="badge warnb">CHECK</span></td><td>G03</td></tr>
+        <tr><td>VeritasAegisNexus</td><td>Network resilience</td><td><span class="badge warnb">TLS REVIEW</span></td><td>G03</td></tr>
+        <tr><td>VeritasCeleritas</td><td>Acceleration / resources</td><td><span class="badge ok">READY</span></td><td>G03</td></tr>
+        <tr><td>Panorama AST Injector</td><td>Static analysis / patch plan</td><td><span class="badge info">ANALYZE</span></td><td>G01</td></tr></table>
+      </div></div>
+    </section>
+
+    <section class="workspace hidden" id="vdf">
+      <div class="toolbar"><button class="btn primary">Data Sources</button><button class="btn">Fetch / Update</button><button class="btn">Data Quality</button><button class="btn">Dataset Registry</button></div>
+      <div class="grid2">
+        <div class="card"><div class="card-h">VDF Input Summary</div><div class="card-b">
+          <table class="table"><tr><th>Parameter</th><th>Value</th></tr><tr><td>Range</td><td>2021-01-01 → Latest</td></tr><tr><td>Mode</td><td>Incremental</td></tr><tr><td>Output</td><td>DuckDB / Parquet / CSV</td></tr><tr><td>Grain</td><td>Date + Ticker</td></tr></table>
+        </div></div>
+        <div class="card"><div class="card-h">VDF Workspace</div><div class="card-b"><div class="preview"><a href="VIA_UI_DataCatalog_v0100.html" style="color:var(--blue)">資料庫目錄</a> · <a href="VIA_UI_GlobalMarkets_v0100.html" style="color:var(--blue)">全球市場觀測</a></div></div></div>
+      </div>
+    </section>
+
+    <section class="workspace hidden" id="vrn">
+      <div class="toolbar"><button class="btn primary">Document Intake</button><button class="btn">M01–M08 Pipeline</button><button class="btn">OCR / Table</button><button class="btn">Validation</button></div>
+      <div class="grid2">
+        <div class="card"><div class="card-h">VRN Pipeline</div><div class="card-b">
+          <div class="flow"><span class="node">M01 Convert</span><span class="arr">→</span><span class="node">M02 Layout</span><span class="arr">→</span><span class="node">M03 OCR/Table</span><span class="arr">→</span><span class="node">M08 CrossValidate</span></div>
+        </div></div>
+        <div class="card"><div class="card-h">VRN Workspace</div><div class="card-b"><div class="preview"><a href="VIA_UI_ReportCards_v0100.html" style="color:var(--blue)">券商報告卡</a></div></div></div>
+      </div>
+    </section>
+
+    <section class="workspace hidden" id="vap">
+      <div class="toolbar"><button class="btn primary">Chart Specs</button><button class="btn">Dashboard</button><button class="btn">Renderer</button><button class="btn">Export</button></div>
+      <div class="grid2">
+        <div class="card"><div class="card-h">VAP Contract</div><div class="card-b">
+          <table class="table"><tr><th>Rule</th><th>Policy</th></tr><tr><td>Axis</td><td>Single-axis preferred / Dual locked</td></tr><tr><td>TW Candlestick</td><td>Red up / Green down</td></tr><tr><td>Volume</td><td>No forward-fill</td></tr><tr><td>Output</td><td>HTML / PNG / PDF</td></tr></table>
+        </div></div>
+        <div class="card"><div class="card-h">VAP Workspace</div><div class="card-b"><div class="preview"><a href="VIA_UI_TemplateRegistry_v0100.html" style="color:var(--blue)">TPN 模板冊</a> · <a href="VIA_UI_Dashboard_v0100.html" style="color:var(--blue)">儀表板</a></div></div></div>
+      </div>
+    </section>
+  </main>
+</div>
+<script>
+const meta={
+ overview:["系統總覽","Central Governance · SSOT · Supportive · VDF · VRN · VAP"],
+ governance:["Central Governance","Gate · Repair · Hydra · Activation"],
+ ssot:["SSOT","Regex · Synonym · Alias · Contract Authority"],
+ support:["支援性模組管理","Runtime Bridge · Registry · Env · Aegis · Celeritas · AST"],
+ vdf:["VDF · VeritasDataForge","Input · Fetch · Normalize · Validate · Store"],
+ vrn:["VRN · VeritasReportNova","Document Intake · OCR · Table · Cross Validation"],
+ vap:["VAP · VeritasAutoPlot","Chart Contract · Dashboard · Renderer · Export"]
+};
+document.querySelectorAll(".nav-btn").forEach(btn=>{
+ btn.addEventListener("click",()=>{
+   document.querySelectorAll(".nav-btn").forEach(x=>x.classList.remove("active"));
+   btn.classList.add("active");
+   document.querySelectorAll(".workspace").forEach(x=>x.classList.add("hidden"));
+   const id=btn.dataset.view; document.getElementById(id).classList.remove("hidden");
+   document.getElementById("pageTitle").textContent=meta[id][0];
+   document.getElementById("pageSub").textContent=meta[id][1];
+ });
+});
+</script>
+<div style="text-align:center;color:#9aa3ad;font-size:9px;padding:8px">真值時戳 2026-08-31 10:03 · 設計稿=收容 b258 原件保真 · 七閘=既有存證導入(G06 候操作員=誠實紅)</div></body>
+</html>
