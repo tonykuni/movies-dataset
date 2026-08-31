@@ -351,7 +351,13 @@ def _selftest():
                             "及 5 種 consensus method", title="🧪 Self-Test", border_style="blue"))
 
     from VDF_MDL104_RegistryLoader import RegistryLoader
-    loader = RegistryLoader("VDF_MDL403_RegistryFull.json")
+    # registry 候選解析:cwd(本機慣用)→ canonical(supportive modules/registry),零複製
+    _reg_candidates = [
+        Path("VDF_MDL403_RegistryFull.json"),
+        Path(__file__).resolve().parent.parent.parent / "supportive modules" / "registry" / "VDF_MDL403_RegistryFull.json",
+    ]
+    _reg = next((c for c in _reg_candidates if c.exists()), _reg_candidates[0])
+    loader = RegistryLoader(str(_reg))
     print(f"   ✓ Loader loaded {len(loader.items)} items")
 
     # Build mock fetched_data

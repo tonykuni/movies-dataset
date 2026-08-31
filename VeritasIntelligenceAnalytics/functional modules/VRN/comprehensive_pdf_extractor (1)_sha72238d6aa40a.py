@@ -408,7 +408,9 @@ class JavaScriptTableExtractor:
         </html>
         """
         
-        return html_template.format(pdf_url=f"file:///{pdf_path.replace('\\', '/')}")
+        # f-string 運算式含反斜線僅 Python 3.12 合法;先算後嵌,維持 3.9+ 相容
+        pdf_url_path = pdf_path.replace("\\", "/")
+        return html_template.format(pdf_url=f"file:///{pdf_url_path}")
     
     def _run_pdf_js_extraction(self, html_content: str, pdf_path: str) -> List[Dict]:
         """運行pdf.js提取"""
