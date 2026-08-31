@@ -62,43 +62,43 @@ _HARDGATE_TOOLS: Dict[str, Dict[str, Any]] = {
     "ssot": {
         "filename":   "VIA_SSOT_Unified.py",
         "module":     "VIA_SSOT_Unified",
-        "expected":   ["SSOT", "TW_STOCK_CODE_4DIGIT"],
+        "expected":   ["SSOT", "TW_STOCK_CODE_4DIGIT|asset_verify"],
         "category":   "config",
     },
     "celeritas": {
         "filename":   "VeritasCeleritas.py",
         "module":     "VeritasCeleritas",
-        "expected":   ["_LazyModule", "celeritas_parallel_map"],
+        "expected":   ["_LazyModule", "celeritas_parallel_map|parallel_map"],
         "category":   "perf",
     },
     "aegis": {
         "filename":   "VeritasAegisNexus.py",
         "module":     "VeritasAegisNexus",
-        "expected":   ["check_robots", "run_self_test"],
+        "expected":   ["check_robots|check_url_compliance", "run_self_test"],
         "category":   "network",
     },
     "registry": {
         "filename":   "VIA_RegistryCore_v1.py",
         "module":     "VIA_RegistryCore_v1",
-        "expected":   ["RegistryCore"],
+        "expected":   ["RegistryCore|def_RegistryState"],
         "category":   "registry",
     },
     "runtime_bridge": {
         "filename":   "VIA_Runtime_Bridge_All_in_One.py",
         "module":     "VIA_Runtime_Bridge_All_in_One",
-        "expected":   ["BRIDGE"],
+        "expected":   ["BRIDGE|def_load_core_modules"],
         "category":   "bridge",
     },
     "env_manager": {
         "filename":   "VIA_EnvManager.py",
         "module":     "VIA_EnvManager",
-        "expected":   ["EnvManager"],
+        "expected":   ["EnvManager|def_EnvHealthRecord"],
         "category":   "env",
     },
     "ast_planner": {
         "filename":   "VIA_Panorama_AST_RuntimeInjector.py",
         "module":     "VIA_Panorama_AST_RuntimeInjector",
-        "expected":   ["ASTRuntimeInjector"],
+        "expected":   ["ASTRuntimeInjector|def_analyze_python_file"],
         "category":   "ast",
     },
 }
@@ -130,11 +130,16 @@ def _import_from_sys(mod_name: str) -> Any:
 
 
 def _check_capability(mod: Any, expected: list) -> bool:
-    """Verify expected attributes are on module. Returns True if all present."""
+    """Verify expected attributes on module.
+
+    每個 entry 可為 "舊名|新名" 交替集:任一命中即滿足該能力
+    (支援 supportive 工具跨代 API,新舊環境皆可過閘)。
+    """
     if mod is None:
         return False
     for attr in expected:
-        if not hasattr(mod, attr):
+        alternatives = attr.split("|")
+        if not any(hasattr(mod, alt) for alt in alternatives):
             log.debug("Missing attr %s on %s", attr, mod.__name__)
             return False
     return True
@@ -179,12 +184,26 @@ def hardgate_load_inline(ssot_dir: str = "",
     ok:      Dict[str, bool] = {}
     ssot_dir = ssot_dir or ""
 
+    # 候選目錄解析:ssot_dir 優先;其後為 repo canonical 槽位佈局
+    # (七工具現分佈於 supportive modules 各槽;新工具加入即自動被發現,零複製)
+    _here = Path(__file__).resolve().parent
+    _sup = _here.parent.parent / "supportive modules"
+    _search_dirs = [Path(ssot_dir)] if ssot_dir else []
+    _search_dirs += [
+        _sup, _sup / "10_Core_Runtime", _sup / "20_Registry_SSOT",
+        _sup / "30_HardGate_Governance", _sup / "accelerator", _sup / "network",
+        _sup / "registry", _sup / "runtime_bridge", _sup / "environment",
+        _here.parent / "VDF" / "FinMind_TW_Flow_Engine",
+    ]
+
     for key, cfg in _HARDGATE_TOOLS.items():
         mod = None
-        # Path 1: direct file import from ssot_dir
-        if ssot_dir:
-            fpath = str(Path(ssot_dir) / cfg["filename"])
+        # Path 1: direct file import from candidate dirs (first hit wins)
+        for _d in _search_dirs:
+            fpath = str(_d / cfg["filename"])
             mod = _import_from_path(fpath, cfg["module"])
+            if mod is not None:
+                break
         # Path 2: sys.path import
         if mod is None:
             mod = _import_from_sys(cfg["module"])
