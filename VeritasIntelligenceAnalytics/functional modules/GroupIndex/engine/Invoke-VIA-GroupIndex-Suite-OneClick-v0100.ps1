@@ -77,7 +77,7 @@ $Engines = @(
     "VIA_ETF_Consoles_Evidence_v0100.py",
     "VIA_FinMind_Ingest_v010.py",
     "VIA_SectorWhaleEngine_v020.py",
-    "VIA_GovFundEngine_v040.py",
+    "..\..\ChipWar\engines\VIA_GovFundEngine_v040.py",   # canonical 於 ChipWar 子系統(去重後不留副本)
     "VIA_ChipWar_Console_v010.py",
     "VIA_ChipWar_Revenue_Evidence_v0100.py"
 )

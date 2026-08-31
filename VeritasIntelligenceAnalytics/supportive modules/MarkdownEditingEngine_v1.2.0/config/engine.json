@@ -1,0 +1,56 @@
+{
+"schema_version": "1.2",
+"pipeline": {
+"formatter": "prettier",
+"timeout_seconds": 120,
+"max_workers": 4,
+"table_fixer_max_line_length": 10000,
+"add_toc": false,
+"build_book_after_all": false
+},
+"normalization": {
+"encoding": "utf-8",
+"line_endings": "lf",
+"final_newline": true
+},
+"mutators": {
+"markdown_table_fixer": false,
+"lint_md_chinese_typography": true,
+"markdownlint_fix": true
+},
+"validators": {
+"markdownlint-cli2": true,
+"remark": true,
+"rumdl": true,
+"pymarkdown": true,
+"mdformat": false,
+"cspell": true,
+"markdown-it-py": true,
+"markdown-table-fixer": false,
+"pandoc": true,
+"node_ast": true,
+"rust-mdscan": true,
+"go-mdlinkcheck": true
+},
+"safety": {
+"backup_before_replace": true,
+"atomic_replace": true,
+"semantic_guard": true,
+"fail_on_missing_selected_mutator": true,
+"quarantine_rejected_changes": true
+},
+"reconstruction": {
+"safe_structure_repair": true,
+"write_sidecar": true,
+"fail_on_fail": true,
+"fail_on_review_in_strict": true,
+"policy": "split-first-merge-never",
+"rules": "config/reconstruction_rules.json"
+},
+"reporting": {
+"json": true,
+"html": true,
+"csv": true,
+"backup_hash_chain": true
+}
+}

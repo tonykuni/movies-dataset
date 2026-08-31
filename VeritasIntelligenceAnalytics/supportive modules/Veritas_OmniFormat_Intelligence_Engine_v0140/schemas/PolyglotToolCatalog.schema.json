@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/schemas/PolyglotToolCatalog.schema.json",
+  "title": "VOFIE Polyglot Tool Catalog",
+  "type": "object",
+  "required": ["contract", "version", "policy", "capability_matrix_functions", "javascript_top20", "powershell_top20"],
+  "properties": {
+    "contract": {"const": "veritas.vofie-polyglot-tool-catalog/1.2"},
+    "version": {"const": "1.2.0"},
+    "policy": {"type": "object"},
+    "capability_matrix_functions": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "uniqueItems": true,
+      "items": {"type": "string"}
+    },
+    "javascript_top20": {
+      "type": "array",
+      "minItems": 20,
+      "maxItems": 20,
+      "items": {"$ref": "#/$defs/tool"}
+    },
+    "powershell_top20": {
+      "type": "array",
+      "minItems": 20,
+      "maxItems": 20,
+      "items": {"$ref": "#/$defs/tool"}
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "tool": {
+      "type": "object",
+      "required": [
+        "rank", "tool_id", "name", "kind", "license", "functions",
+        "machine_output", "cpu_supported", "cpu_cost", "fallback", "route"
+      ],
+      "properties": {
+        "rank": {"type": "integer", "minimum": 1, "maximum": 20},
+        "tool_id": {"type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1},
+        "kind": {"type": "string", "minLength": 1},
+        "license": {"type": "string", "minLength": 1},
+        "functions": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "machine_output": {"type": "boolean"},
+        "cpu_supported": {"const": true},
+        "cpu_cost": {"type": "string", "pattern": "^[A-Z_]+$"},
+        "fallback": {"type": "string", "minLength": 1},
+        "route": {"enum": ["via-ui", "via-ps"]}
+      },
+      "additionalProperties": true
+    }
+  }
+}

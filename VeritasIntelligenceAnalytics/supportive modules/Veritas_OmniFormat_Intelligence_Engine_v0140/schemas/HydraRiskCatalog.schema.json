@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/schemas/HydraRiskCatalog.schema.json",
+  "title": "VOFIE NoHydra Top-20 Risk Catalog",
+  "type": "object",
+  "required": ["contract", "version", "policy", "risks"],
+  "properties": {
+    "contract": {"const": "veritas.vofie-hydra-risk-catalog/1.0"},
+    "version": {"const": "1.4.0"},
+    "policy": {
+      "type": "object",
+      "required": ["canonical_source", "max_rounds", "max_parallel_fixers", "high_hydra_action"],
+      "properties": {
+        "canonical_source": {"const": "READ_ONLY"},
+        "max_rounds": {"const": 3},
+        "max_parallel_fixers": {"type": "integer", "minimum": 1, "maximum": 2},
+        "high_hydra_action": {"const": "HOLD"}
+      }
+    },
+    "risks": {
+      "type": "array",
+      "minItems": 20,
+      "maxItems": 20,
+      "items": {"$ref": "#/$defs/risk"}
+    }
+  },
+  "$defs": {
+    "risk": {
+      "type": "object",
+      "required": ["risk_id", "rank", "name", "severity", "default_action", "repair_lane", "cause", "detectors", "breakers", "solutions", "sop", "never_again_control"],
+      "properties": {
+        "risk_id": {"type": "string", "pattern": "^HYDRA-F(0[1-9]|1[0-9]|20)$"},
+        "rank": {"type": "integer", "minimum": 1, "maximum": 20},
+        "severity": {"enum": ["HIGH", "CRITICAL"]},
+        "default_action": {"const": "HOLD"},
+        "repair_lane": {"enum": ["PARALLEL_SAFE_PROPOSAL", "SEQUENTIAL_ONLY"]},
+        "detectors": {"type": "array", "minItems": 2},
+        "breakers": {"type": "array", "minItems": 2},
+        "solutions": {"type": "array", "minItems": 3},
+        "sop": {"type": "string", "minLength": 1},
+        "never_again_control": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

@@ -38,7 +38,7 @@ def test_ps1_references_all_engines_and_tests() -> None:
         "VIA_ETF_Consoles_Evidence_v0100.py",
         "VIA_FinMind_Ingest_v010.py",
         "VIA_SectorWhaleEngine_v020.py",
-        "VIA_GovFundEngine_v040.py",
+        "..\\..\\ChipWar\\engines\\VIA_GovFundEngine_v040.py",
         "VIA_ChipWar_Console_v010.py",
         "VIA_ChipWar_Revenue_Evidence_v0100.py",
         "test_VIA_VAP_AxisLock_v0100.py",
@@ -46,7 +46,7 @@ def test_ps1_references_all_engines_and_tests() -> None:
         "test_VIA_ChipWar_Revenue_v0100.py",
     ]:
         assert name in TEXT, name
-        assert PS1.with_name(name).exists(), f"referenced file missing: {name}"
+        assert (PS1.parent / name.replace("\\", "/")).exists(), f"referenced file missing: {name}"
 
 
 def test_ps1_gate_matrix_covers_four_runs() -> None:

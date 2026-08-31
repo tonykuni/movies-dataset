@@ -35,3 +35,27 @@
 
 LiveData 引擎(ETF ×2、FinMind、月營收 fetch)live 模式僅本機顯式啟用;
 套件內收證一律離線(mock=127.0.0.1 / MOCK / 合成),於暫存目錄執行,零 repo 污染。
+
+## def 第三/四波上傳分流(2026-08-31)
+
+| 上傳件 | 判定 | 處置 |
+| --- | --- | --- |
+| forward_valuation_vintage_v2_2.py | 前瞻評價 vintage 引擎;pandas 3.x merge_asof dtype bug 已修(統一鎖 datetime64[ns])→ self-test PASS | **已整合** → GroupIndex/engine |
+| VIA_Hybrid_TW_Flow_Engine_v1.5.0(zip) | 官方 TWSE/TPEX/TDCC 優先 + FinMind 缺口接手;unittest 33/33 | **已整合** → GroupIndex/engine/FinMind_TW_Flow_Engine;TW 入庫 canonical |
+| VUSIPE v0100 FINAL(zip) | 語意插件引擎;pytest 26/26 | **已整合** → supportive modules(dist/ wheel 屬同源建置產物,已刪) |
+| Veritas_OmniFormat_Intelligence_Engine_v0140(zip) | 全格式引擎;pytest 67/67+10 | **已整合** → supportive modules |
+| MarkdownEditingEngine_v1.2.0(zip) | 多語言 Markdown 工具;MANIFEST 34/34 驗證 | **已整合** → supportive modules(PS1 runtime 於本機執行) |
+| VAP_v025_Complete_System_Package(zip) | VAP 系統 v025;40 圖 canon 與 v018 同套(APPEND_ONLY_STABLE_CODE);自帶測試 17/17 | **已整合** → functional modules/VAP/VAP_v025_Complete_Package |
+| VIA_Toolchain_Bundle_20260830(zip) | 工具鏈(MotherImport/PSRepair/MarkItDown/VRN 批次);MANIFEST 11/11 驗證、名稱零重複 | **已整合** → supportive modules |
+| VUSIPE FINAL(第 4 批重傳) | 與第 3 批**位元組級同雜湊** | 多餘 → 不落地 |
+| MarkdownEditingEngine FINAL_1(重傳) | 同上 | 多餘 → 不落地 |
+| VIA_Hybrid_TW_Flow_Engine _2(重傳) | 同上 | 多餘 → 不落地 |
+
+## def 去重刪除紀錄(多餘的請刪除)
+
+| 重複 | 驗證 | 動作 |
+| --- | --- | --- |
+| VIA_GovFundEngine_v040.py ×2(ChipWar/engines 既有 vs GroupIndex/engine 新副本) | SHA-256 位元組級相同 | **刪 GroupIndex 副本**;canonical 留 ChipWar 子系統,OneClick/收證改引 canonical |
+| VUSIPE dist/*.whl | 同源建置產物 | 刪 dist/(pyproject 可重建) |
+| 第 4 批 3 份 zip 重傳 | 與第 3 批同雜湊 | 不落地 |
+| VAP v015/v017 規格 | 與 v018 40/40 逐欄一致 | 免整合(SpecLineage 存查) |

@@ -18,10 +18,12 @@ import VIA_SectorWhaleEngine_v020 as whale
 def test_chipwar_registry_free_only_and_files_exist() -> None:
     # 主控台三引擎:全 FREE_READY、零付費硬依賴、檔案齊備
     assert set(console.ENGINES) == {"E1_GovFund", "E2_SectorWhale", "E3_FinMindIngest"}
+    chipwar_canonical = ENGINE_DIR.parent.parent / "ChipWar" / "engines"
     for meta in console.ENGINES.values():
         assert meta["tier"] == "FREE_READY"
         assert meta["paid_dep"] is False
-        assert (ENGINE_DIR / meta["file"]).exists(), meta["file"]
+        # GovFund canonical 家在 ChipWar 子系統(去重後 GroupIndex 不留副本)
+        assert (ENGINE_DIR / meta["file"]).exists() or (chipwar_canonical / meta["file"]).exists(), meta["file"]
 
 
 def test_sectorwhale_ssot_tickers_are_groupindex_common_stocks() -> None:
@@ -60,5 +62,8 @@ def test_evidence_summary_gate() -> None:
     assert summary["HardFailures"] == 0
     assert {r["Check"] for r in summary["Checks"]} == {
         "FinMindIngest.mock", "SectorWhale.backtest", "GovFund.fourworld",
-        "ChipWar.console", "Revenue.selftest", "Revenue.demo_e2e"}
+        "ChipWar.console", "Revenue.selftest", "Revenue.demo_e2e",
+        "HybridTWFlow.unittest", "ForwardValuation.selftest",
+        "VUSIPE.pytest", "VOFIE.pytest"}
     assert "Dedup" in summary and "robust_z" in summary["Dedup"]
+    assert "govfund" in summary["Dedup"]          # 去重紀錄:GroupIndex 不留 GovFund 副本

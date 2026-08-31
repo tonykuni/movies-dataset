@@ -36,10 +36,14 @@ REVENUE_DIR = SCRIPT_DIR / "taiwan_revenue_engine"
 VERSION = "0.1.00"
 TIMEOUT_SECONDS = 900
 
-CHIPWAR_FILES = [
-    "VIA_FinMind_Ingest_v010.py", "VIA_SectorWhaleEngine_v020.py",
-    "VIA_GovFundEngine_v040.py", "VIA_ChipWar_Console_v010.py",
-]
+# GovFund 的 canonical 家在 ChipWar 子系統(去重:GroupIndex 不留副本,執行時取 canonical)
+GOVFUND_CANONICAL = MODULE_DIR.parent / "ChipWar" / "engines" / "VIA_GovFundEngine_v040.py"
+CHIPWAR_SOURCES = {
+    "VIA_FinMind_Ingest_v010.py": SCRIPT_DIR / "VIA_FinMind_Ingest_v010.py",
+    "VIA_SectorWhaleEngine_v020.py": SCRIPT_DIR / "VIA_SectorWhaleEngine_v020.py",
+    "VIA_GovFundEngine_v040.py": GOVFUND_CANONICAL,
+    "VIA_ChipWar_Console_v010.py": SCRIPT_DIR / "VIA_ChipWar_Console_v010.py",
+}
 PASS_TOKEN = "全數通過 EXIT=0"
 CONSOLE_TOKEN = "全循環通過 EXIT=0"
 
@@ -72,8 +76,8 @@ def def_main() -> int:
     # 籌碼戰四引擎:於暫存目錄執行(FinMind MOCK 會落 duckdb 檔,零 repo 污染)
     with tempfile.TemporaryDirectory(prefix="via_chipwar_") as td:
         tdp = Path(td)
-        for f in CHIPWAR_FILES:
-            shutil.copy2(SCRIPT_DIR / f, tdp / f)
+        for name, src in CHIPWAR_SOURCES.items():
+            shutil.copy2(src, tdp / name)
         rows.append(def_run("FinMindIngest.mock", ["VIA_FinMind_Ingest_v010.py"], tdp, PASS_TOKEN))
         rows.append(def_run("SectorWhale.backtest", ["VIA_SectorWhaleEngine_v020.py"], tdp, PASS_TOKEN))
         rows.append(def_run("GovFund.fourworld", ["VIA_GovFundEngine_v040.py"], tdp, PASS_TOKEN))
@@ -86,6 +90,22 @@ def def_main() -> int:
         rcwd = tdp / "taiwan_revenue_engine"
         rows.append(def_run("Revenue.selftest", ["-m", "twrevenue.cli", "selftest"], rcwd, "全部通過"))
         rows.append(def_run("Revenue.demo_e2e", ["-m", "twrevenue.cli", "demo"], rcwd, "儀表板已產生"))
+
+    # 第三波整合:Hybrid TW Flow(官方 TWSE/TPEX/TDCC + FinMind 混合)/ 前瞻評價 /
+    # VUSIPE 語意插件 / VOFIE 全格式引擎——各自官方測試面,暫存副本執行
+    sup = MODULE_DIR.parent.parent / "supportive modules"
+    with tempfile.TemporaryDirectory(prefix="via_wave3_") as td:
+        tdp = Path(td)
+        shutil.copytree(SCRIPT_DIR / "FinMind_TW_Flow_Engine", tdp / "hybrid")
+        rows.append(def_run("HybridTWFlow.unittest", ["-m", "unittest", "discover", "-s", "tests"],
+                            tdp / "hybrid", "OK"))
+        shutil.copy2(SCRIPT_DIR / "forward_valuation_vintage_v2.py", tdp / "forward_valuation_vintage_v2.py")
+        rows.append(def_run("ForwardValuation.selftest", ["forward_valuation_vintage_v2.py", "--self-test"],
+                            tdp, '"status": "pass"'))
+        shutil.copytree(sup / "Veritas_Universal_Semantic_Intelligence_Plugin_Engine_v0100", tdp / "vusipe")
+        rows.append(def_run("VUSIPE.pytest", ["-m", "pytest", "-q", "tests"], tdp / "vusipe", "passed"))
+        shutil.copytree(sup / "Veritas_OmniFormat_Intelligence_Engine_v0140", tdp / "vofie")
+        rows.append(def_run("VOFIE.pytest", ["-m", "pytest", "-q", "tests"], tdp / "vofie", "passed"))
 
     hard_fail = sum(1 for r in rows if r["Verdict"] != "PASS")
     status = "CHIPWAR_REVENUE_PASS" if hard_fail == 0 else "CHIPWAR_REVENUE_BLOCKED"
@@ -102,8 +122,11 @@ def def_main() -> int:
             "robust_z": "SectorWhale MAD-z 與 GroupIndex/GlobalETFFlow robust_z 同法異參——引擎各自獨立成立,方法論已同源",
             "ssot": "SectorWhale 四族群 registry 與 GroupIndex SSOT 語意重疊(被動元件/PCB/ABF)——名冊以 GroupIndex SSOT 為 canonical,SectorWhale registry 屬引擎內部監控清單",
             "vap": "VAP v015 與 v018 規格 40/40 逐欄一致(僅版本戳),舊版免整合",
+            "finmind": "Hybrid TW Flow v1.5.0(官方優先+FinMind 缺口接手)為 TW 入庫 canonical;VIA_FinMind_Ingest v0.1 保留為 ChipWar E3 MOCK 車道(Console 相依),不重複發展",
+            "vusipe_dist": "VUSIPE dist/ wheel 為同源建置產物,已刪除(留 pyproject 可重建)",
+            "govfund": "VIA_GovFundEngine_v040 canonical 家為 functional modules/ChipWar/engines;GroupIndex 原重複副本已刪除,收證改引 canonical(位元組級同雜湊驗證後去重)",
         },
-        "SourceHashes": {n: sha256(SCRIPT_DIR / n) for n in CHIPWAR_FILES},
+        "SourceHashes": {n: sha256(src) for n, src in CHIPWAR_SOURCES.items()},
     }
     (RUN_OUT / "chipwar_revenue_summary.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
