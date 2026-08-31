@@ -53,5 +53,7 @@ def test_nonblocking_launcher_contract() -> None:
     text = (ENGINE_DIR / "launch.ps1").read_text("utf-8")
     assert "Start-Process" in text and "-PassThru" in text
     assert "RedirectStandardOutput" in text
-    assert '"-KeepOpen", 0' in text                  # 背景模式不等待 Enter(不卡斷)
+    assert "-KeepOpen 0" in text                     # 背景模式不等待 Enter(不卡斷)
+    assert '-File "{0}"' in text                     # 含空白路徑必須顯式引號(Start-Process 不自動引)
+    assert "-NoProfile" in text                      # 子行程隔離使用者 profile
     assert "Get-Content" in text                     # log 追蹤指引

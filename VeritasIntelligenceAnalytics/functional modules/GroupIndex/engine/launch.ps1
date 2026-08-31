@@ -35,13 +35,12 @@ $stamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $OutLog = Join-Path $LogDir "oneclick_$stamp.out.log"
 $ErrLog = Join-Path $LogDir "oneclick_$stamp.err.log"
 
-$argList = @(
-    "-ExecutionPolicy", "Bypass", "-File", $OneClick,
-    "-EnforceEnv", $EnforceEnv, "-SyncRepo", $SyncRepo,
-    "-SkipEngines", $SkipEngines, "-OpenHtml", $OpenHtml,
-    "-KeepOpen", 0            # 背景模式:結束不等待 Enter(不卡斷)
-)
-$proc = Start-Process -FilePath "pwsh" -ArgumentList $argList `
+# Start-Process 的陣列 ArgumentList 以空白串接且不加引號,含空白路徑會被拆爛;
+# 故以單一字串傳遞並顯式引號。-NoProfile:子行程不載入使用者 profile(隔離無關報錯)。
+$argString = ('-NoProfile -ExecutionPolicy Bypass -File "{0}" ' +
+              '-EnforceEnv {1} -SyncRepo {2} -SkipEngines {3} -OpenHtml {4} -KeepOpen 0') -f
+             $OneClick, $EnforceEnv, $SyncRepo, $SkipEngines, $OpenHtml
+$proc = Start-Process -FilePath "pwsh" -ArgumentList $argString `
     -RedirectStandardOutput $OutLog -RedirectStandardError $ErrLog `
     -WindowStyle Hidden -PassThru
 
