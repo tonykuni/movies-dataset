@@ -761,6 +761,16 @@
    "match": null,
    "source": "operator",
    "ts": "20260831_120046"
+  },
+  {
+   "kind": "ROOT_CAUSE",
+   "id": "RC-22",
+   "sig": "舊會話分支併主幹卡死:git commit 拒(數十檔 U 未併);單檔 git rm 不夠——該分支整組移除 GroupIndex、主幹同族已改名退役(rename/delete 大面積衝突),另含證據檔與 .gitignore 雙改",
+   "cause": "跨會話分支壽命過長:分支上的整組移除與主幹的改名退役(git mv 入 VIA_RetiredEngines)在同族檔案上必然對撞;逐檔手解在手機/工作站不可行",
+   "fix": "主幹為準批量收斂:git diff --name-only --diff-filter=U 逐檔先試 git checkout MERGE_HEAD -- 檔(主幹有=取主幹版),失敗即 git rm -f(主幹已刪=保留刪除),畢後 git commit -m 一次收官;或不急合併時 git merge --abort 後 checkout main 續用(分支原封保留)",
+   "match": null,
+   "source": "operator",
+   "ts": "20260831_190306"
   }
  ]
 }
