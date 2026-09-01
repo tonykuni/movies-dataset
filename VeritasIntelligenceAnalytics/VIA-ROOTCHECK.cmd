@@ -12,6 +12,10 @@ echo ================= VIA 三胞胎資料夾查究(批290)=================
 call :probe "C:\Users\tonyk\movies-dataset"            "正主根(批275 裁定)"
 call :probe "C:\Users\tonyk\Downloads\movies-dataset"  "Downloads 分身"
 call :probe "C:\Users\tonyk\OneDrive\Documents\movies-dataset" "OneDrive 分身"
+echo.
+echo --- 埠 8765 佔用(指揮台塔;雙塔同埠=按鈕可能打到錯的塔)---
+netstat -ano 2>nul | findstr ":8765" | findstr "LISTENING"
+if errorlevel 1 echo 埠 8765:無人佔用(塔未開)
 echo =================================================================
 echo [裁定律] 只有「正主根」可打指令/VIA-ALL;分身若為 git 庫且有
 echo          獨有提交=先留痕再封存(把輸出貼回給 Claude 裁定)。
