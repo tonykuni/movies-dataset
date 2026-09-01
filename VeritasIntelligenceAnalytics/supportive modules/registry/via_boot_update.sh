@@ -31,7 +31,6 @@ from pathlib import Path
 need = [("networkx","networkx"),("dateparser","dateparser"),("spacy","spacy"),
         ("sumy","sumy"),("yake","yake"),("quantulum3","quantulum3")]
 missing = [pip for mod,pip in need if importlib.util.find_spec(mod) is None]
-req = Path(__file__).resolve()  # placeholder
 if missing:
     subprocess.run([sys.executable,"-m","pip","install","--quiet","docopt-ng"],check=False)
     subprocess.run([sys.executable,"-m","pip","install","--quiet","--no-deps",*missing],check=False)
@@ -83,6 +82,8 @@ PYENV
   python3 "$(ls "$REG"/CGC_MDL104_TestResultsHub_v*.py | sort | tail -1)"
   python3 "$(ls "$REG"/CGC_MDL110_TriTestMatrix_v*.py | sort | tail -1)"
   python3 "$(ls "$VIA/functional modules/VAP/engine"/VAP_ENG014_StdDashboardTemplate_v*.py | sort | tail -1)" run
+  python3 "$(ls "$REG"/CGC_MDL113_UnifiedRegistry_v*.py | sort | tail -1)"
+  python3 "$(ls "$REG"/CGC_MDL114_CommandCenterBridge_v*.py | sort | tail -1)" run
   echo "=== 畢(誠實三態見上)==="
 } >> "$LOG" 2>&1
 exit 0

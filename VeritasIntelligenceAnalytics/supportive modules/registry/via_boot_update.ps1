@@ -71,6 +71,8 @@ Step "⑩c 月營收×共識分析(批264)"   (Newest $ENG "VDF_ENG069_RevenueCo
 Step "⑩d 測試總表(批257)" (Newest $REG "CGC_MDL104_TestResultsHub_v*.py") @()
 Step "⑩e 三軌矩陣(批267)"          (Newest $REG "CGC_MDL110_TriTestMatrix_v*.py") @()
 Step "⑩f 標準儀表板模板(批279)"    (Newest (Join-Path $VIA "functional modules\VAP\engine") "VAP_ENG014_StdDashboardTemplate_v*.py") @("run")
+Step "⑩g 統一編號冊(批287)"        (Newest $REG "CGC_MDL113_UnifiedRegistry_v*.py") @()
+Step "⑩h AIO 健康圖(批288)"        (Newest $REG "CGC_MDL114_CommandCenterBridge_v*.py") @("run")
 Add-Content $LOG "=== 畢(誠實三態見上)==="
 Write-Host "[boot-ps1] 完成 · log=$LOG"
 exit 0
