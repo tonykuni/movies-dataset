@@ -1,0 +1,9 @@
+#!/bin/sh
+# UI 元件三語轉碼系統管理器(HTML→spec→py/js/ps1 驗同登冊+移植旁建)— 動態解析最新版(鐵律)
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
+UM="$(ls "$DIR/supportive modules/registry"/CGC_MDL107_UISpecManager_v0*.py 2>/dev/null | sort | tail -n 1)"
+if [ -z "$UM" ]; then
+  echo "  ✗ 引擎缺:CGC_MDL107_UISpecManager_v0*.py 未尋獲(誠實)" >&2
+  exit 2
+fi
+exec python3 "$UM" "$@"
