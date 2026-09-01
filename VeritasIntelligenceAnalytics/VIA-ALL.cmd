@@ -12,11 +12,20 @@ rem =====================================================================
 setlocal
 set "VIA=%~dp0"
 
-rem --- 批269 前置自癒:髒樹全收留痕(stash -u;乾淨=無事退出) --------
-rem 實錄根因:工作站本機分流提交+執行期再生存證檔=每次 pull 被
-rem 「local changes would be overwritten」擋死;連同步修好版都拉不到
-rem =雞生蛋死鎖。本門先 stash 再派工=任何狀態都能同步(找回:git stash pop)
+rem --- 批269/272 前置自癒:任何狀態都能同步 ---------------------------
+rem 批272 實錄終判:樹乾淨仍秒退=本機分流提交 vs 雲端=合併永衝突
+rem ->abort 死循環,HEAD 永停舊版。終極律(工作站=雲端複本):
+rem   ①stash -u 收髒(乾淨=無事)②fetch ③ff-only 對齊
+rem   ④分流=先留痕備份分支(via-local-backup-<sha>=只增不減)再
+rem     reset --hard 對齊 origin/main。本機線永不失(備份分支在)。
 git -C "%VIA%.." stash push --include-untracked -m "VIA-selfheal-preclean" >nul 2>nul
+git -C "%VIA%.." fetch origin main
+git -C "%VIA%.." merge --ff-only origin/main >nul 2>nul
+if errorlevel 1 (
+    echo [VIA-ALL] 本機分流偵測:備份分支留痕後對齊雲端 origin/main
+    for /f "delims=" %%h in ('git -C "%VIA%.." rev-parse --short HEAD') do git -C "%VIA%.." branch "via-local-backup-%%h" 2>nul
+    git -C "%VIA%.." reset --hard origin/main
+)
 
 rem --- 尾版解析 Invoke-VIA-All-v*.ps1(cmd 版尾版 glob) ---------------
 set "ALLPS="
