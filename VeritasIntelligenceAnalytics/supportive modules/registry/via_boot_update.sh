@@ -4,7 +4,7 @@
 # 同意閘:操作員批123/137/150 自動更新常令授權,本腳本屬該令執行面。
 set -u
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"   # repo 根
-VIA="$ROOT/VeritasIntelligenceAnalytics"
+VIA="$ROOT/VeritasIntelligenceAnalytics"; export VIA
 ENG="$VIA/functional modules/VDF/engine"
 MARK="$VIA/functional modules/VDF/output_hub/mega/.last_boot_update"
 LOGDIR="$VIA/VIA_Reports/boot_update_logs"
@@ -26,11 +26,19 @@ newest() { ls "$ENG"/$1 2>/dev/null | sort | tail -1; }
   echo "--- ⓪ 環境自補(批164)"
   mkdir -p /root/Downloads "/root/OneDrive/VeritasIntelligenceAnalytics/module"
   python3 - <<'PYENV'
-import importlib.util, subprocess, sys
+import importlib.util, os, subprocess, sys
 from pathlib import Path
 need = [("networkx","networkx"),("dateparser","dateparser"),("spacy","spacy"),
         ("sumy","sumy"),("yake","yake"),("quantulum3","quantulum3")]
 missing = [pip for mod,pip in need if importlib.util.find_spec(mod) is None]
+# 批300 EnvManager:核心冊自癒(容器收割機兩度吃套件實錄=每日自檢自補)
+core = ["pandas","numpy","duckdb","plotly","pyarrow","yfinance","fitz",
+        "jieba","markitdown","openpyxl","matplotlib","psutil"]
+core_missing = [m for m in core if importlib.util.find_spec(m) is None]
+if core_missing:
+    req = Path(os.environ["VIA"]) / "supportive modules/registry/VIA_Env_Requirements_v0100.txt"
+    print(f"[env] 核心缺 {len(core_missing)}:{','.join(core_missing)} → 冊補裝")
+    subprocess.run([sys.executable,"-m","pip","install","--quiet","-r",str(req)],check=False)
 if missing:
     subprocess.run([sys.executable,"-m","pip","install","--quiet","docopt-ng"],check=False)
     subprocess.run([sys.executable,"-m","pip","install","--quiet","--no-deps",*missing],check=False)
