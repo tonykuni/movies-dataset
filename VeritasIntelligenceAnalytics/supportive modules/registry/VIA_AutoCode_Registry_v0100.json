@@ -5095,6 +5095,13 @@
    "ts": "2026-09-01 03:28",
    "name": "批261 總根因破案:操作員終端 cmd/pwsh 混用=歷來「指令不識/unknown switch」唯一共因→VIA-ALL.cmd 萬用總門",
    "note": "【破案證據】工作站實錄:『Sort-Object is not recognized as an internal or external command』=cmd 專屬錯誤語式;『git pull ... unknown switch F』=cmd 中分號非分隔符→pwsh -File 整串被當 git 參數。歷來 selftest/via-psrepair 不識、貼令失效,全部同因:PS 語法貼進 cmd 殼。【解】VIA-ALL.cmd(純 cmd 語法;cmd/pwsh/雙擊三通):cmd 版尾版 glob 找 Invoke-VIA-All-v*.ps1(缺=先 git pull 自舉)→pwsh 優先 powershell 後備執行;VIA-All.ps1 自身統包 pull+點源+全背景派工=以後唯一指示永遠只有一個檔案路徑,任何殼都通。MDL101 對 .cmd 不掃(非 ps 域);cmd 檔純 batch 語法自審。"
+  },
+  {
+   "code": "TOOL-260",
+   "kind": "批262 零彈窗鐵則",
+   "ts": "2026-09-01 03:33",
+   "name": "批262 操作員令「不要跳出任何 VSCode·完全全自動」:VSCode 跳窗根因=分流 pull 合併叫編輯器→零彈窗鐵則全植",
+   "note": "【根因】工作站 main 本地分流→pull 產生合併提交→git 依本機 core.editor(=VSCode)開視窗要合併訊息=操作員無法處理的跳窗。【零彈窗鐵則】我方所有 git 呼叫一律 -c core.editor=true --no-edit(不動操作員全域設定=零足跡):①VIA-ALL.cmd 自舉 pull 零編輯器化 ②Invoke-VIA-All v0101 同步三段=ff-only 重試→no-edit 自動合併→衝突 merge --abort 誠實續用現版(絕不開編輯器不卡窗);全樹掃無其他 code/編輯器呼叫。唯一指示不變=VIA-ALL.cmd 路徑(cmd/pwsh/雙擊三通)。MDL101 綠。"
   }
  ]
 }

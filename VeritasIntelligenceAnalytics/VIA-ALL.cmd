@@ -17,7 +17,7 @@ set "ALLPS="
 for /f "delims=" %%f in ('dir /b /o:n "%VIA%Invoke-VIA-All-v*.ps1" 2^>nul') do set "ALLPS=%VIA%%%f"
 if not defined ALLPS (
     echo [VIA-ALL] Invoke-VIA-All 缺 - 先同步一次...
-    git -C "%VIA%.." pull origin main
+    git -C "%VIA%.." -c core.editor=true pull --no-edit origin main
     for /f "delims=" %%f in ('dir /b /o:n "%VIA%Invoke-VIA-All-v*.ps1" 2^>nul') do set "ALLPS=%VIA%%%f"
 )
 if not defined ALLPS (
