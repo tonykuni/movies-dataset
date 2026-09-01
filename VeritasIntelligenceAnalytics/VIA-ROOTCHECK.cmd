@@ -16,6 +16,11 @@ echo.
 echo --- 埠 8765 佔用(指揮台塔;雙塔同埠=按鈕可能打到錯的塔)---
 netstat -ano 2>nul | findstr ":8765" | findstr "LISTENING"
 if errorlevel 1 echo 埠 8765:無人佔用(塔未開)
+echo.
+echo --- $PROFILE 稽核(批295:揪自動起塔鉤子;唯讀傾印)---
+powershell -NoProfile -Command "if(Test-Path $PROFILE){Write-Host ('路徑:'+$PROFILE); $i=0; Get-Content $PROFILE | ForEach-Object { $i++; Write-Host ('{0,3}: {1}' -f $i, $_) }}else{Write-Host '無 $PROFILE 檔'}"
+echo [判讀] 正常應只有一行 VIA Register 點源;出現 Lane3/ControlTower/
+echo        Start-VRN 等他行=分身鉤子(貼回裁定,先不要自行刪)。
 echo =================================================================
 echo [裁定律] 只有「正主根」可打指令/VIA-ALL;分身若為 git 庫且有
 echo          獨有提交=先留痕再封存(把輸出貼回給 Claude 裁定)。
