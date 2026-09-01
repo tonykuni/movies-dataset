@@ -1,0 +1,130 @@
+{
+  "engine": {
+    "name": "VIA NLP One Engine",
+    "profile": "safe_cpu",
+    "offline": true,
+    "language": "auto",
+    "max_text_chars": 1000000,
+    "max_batch_items": 256,
+    "max_concurrency": 2,
+    "request_timeout_seconds": 120,
+    "data_dir": "./runtime",
+    "lexicon_path": "./data/lexicon/ssot_lexicon.json",
+    "governance_path": "./config/governance.json"
+  },
+  "resources": {
+    "poll_interval_seconds": 2.0,
+    "warning_ram_percent": 75.0,
+    "shed_ram_percent": 85.0,
+    "critical_ram_percent": 92.0,
+    "warning_cpu_percent": 90.0,
+    "critical_cpu_percent": 98.0,
+    "min_available_ram_mb": 768,
+    "model_idle_ttl_seconds": 180,
+    "model_pool_max_items": 2,
+    "model_pool_max_estimated_mb": 4096,
+    "adaptive_batch_min": 1,
+    "adaptive_batch_max": 64,
+    "gc_after_request": false
+  },
+  "routing": {
+    "allow_tiers": [1, 2, 3, 4],
+    "default_tier": 1,
+    "fallback_on_pressure": true,
+    "allow_deep_models": false,
+    "allow_llm": false,
+    "deep_min_available_ram_mb": 4096,
+    "llm_min_available_ram_mb": 6144
+  },
+  "cache": {
+    "enabled": true,
+    "max_entries": 5000,
+    "ttl_seconds": 604800,
+    "max_value_bytes": 2097152
+  },
+  "jobs": {
+    "enabled": true,
+    "worker_count": 1,
+    "poll_seconds": 1.0,
+    "stale_seconds": 600,
+    "max_retries": 3,
+    "max_pending_jobs": 10000
+  },
+  "knowledge": {
+    "max_segment_chars": 8000,
+    "topic_threshold": 0.18,
+    "topic_merge_threshold": 0.31,
+    "max_topics": 40,
+    "max_features_per_segment": 96,
+    "max_topic_keywords": 12,
+    "anchor_boost": 0.28,
+    "anchor_conflict_penalty": 0.22,
+    "max_ai_graph_edges": 4000,
+    "deep_similarity_threshold": 0.62,
+    "extract_structured_tables": true,
+    "max_table_columns": 24,
+    "max_structured_tables": 500,
+    "max_knowledge_units": 2000,
+    "max_knowledge_conflicts": 500,
+    "max_code_families": 500,
+    "threshold_calibration": {
+      "enabled": false,
+      "topic_threshold_grid": [0.14, 0.18, 0.22],
+      "topic_merge_threshold_grid": [0.31, 0.38, 0.45],
+      "auto_apply": false
+    }
+  },
+  "ml": {
+    "enabled": true,
+    "classes": ["finance", "technology", "operations", "general"],
+    "n_features": 262144,
+    "random_state": 42,
+    "candidate_min_samples": 30,
+    "validation_fraction": 0.25,
+    "min_macro_f1": 0.70,
+    "max_regression": 0.02,
+    "auto_promote": false,
+    "auto_evolve_every_feedback": 50,
+    "linear_epochs": 2,
+    "training_batch_size": 64,
+    "neural_challenger_enabled": true,
+    "neural_min_samples": 200,
+    "neural_n_features": 2048,
+    "neural_hidden_layers": [128, 32],
+    "neural_max_iter": 80,
+    "evolution_estimated_ram_mb": 512,
+    "max_duplicate_ratio": 0.35,
+    "candidate_retention": 5
+  },
+  "deep": {
+    "embedding_backend": "sentence_transformers",
+    "embedding_model": "BAAI/bge-m3",
+    "embedding_device": "cpu",
+    "local_files_only": true,
+    "ollama_url": "http://127.0.0.1:11434",
+    "ollama_model": "qwen2.5:7b-instruct-q4_K_M",
+    "ollama_keep_alive": "0",
+    "ollama_timeout_seconds": 90
+  },
+  "translation": {
+    "enabled": false,
+    "default_backend": "argos",
+    "source_language": "zh",
+    "target_language": "en",
+    "max_chunk_chars": 4500,
+    "preserve_code": true,
+    "google_cloud_location": "global",
+    "google_cloud_project_env": "GOOGLE_CLOUD_PROJECT"
+  },
+  "security": {
+    "bind_host": "127.0.0.1",
+    "bind_port": 8765,
+    "api_key_env": "VIA_NLP_API_KEY",
+    "require_api_key": false,
+    "allow_remote_bind": false,
+    "rate_limit_per_minute": 60,
+    "trusted_proxy_headers": false,
+    "redact_sensitive_logs": true,
+    "audit_hash_chain": true
+  }
+}

@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>VIA NLP One Engine</title>
+  <style>
+    :root {
+      --bg: #f5f8fb;
+      --panel: #ffffff;
+      --line: #dce5ec;
+      --text: #263746;
+      --muted: #687b8b;
+      --blue: #4c78a8;
+      --teal: #59a14f;
+      --orange: #f28e2b;
+      --red: #e15759;
+      --shadow: 0 8px 28px rgba(63, 87, 106, .10);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: Inter, "Noto Sans TC", system-ui, sans-serif; }
+    header { padding: 20px 24px 12px; display: flex; align-items: end; justify-content: space-between; gap: 16px; }
+    h1 { margin: 0; color: #345f7c; font-size: 22px; letter-spacing: .02em; }
+    header p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+    .status { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--muted); }
+    .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--orange); box-shadow: 0 0 0 4px rgba(242,142,43,.12); }
+    main { padding: 12px 24px 28px; max-width: 1500px; margin: 0 auto; }
+    .metrics { display: grid; grid-template-columns: repeat(5, minmax(120px, 1fr)); gap: 10px; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+    .metric { padding: 13px 14px; min-height: 88px; }
+    .label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+    .value { margin-top: 7px; font-size: 23px; font-weight: 680; color: #315d7a; }
+    .sub { margin-top: 4px; color: var(--muted); font-size: 11px; }
+    .workspace { display: grid; grid-template-columns: minmax(360px, .9fr) minmax(420px, 1.1fr); gap: 12px; margin-top: 12px; }
+    .pane { padding: 15px; min-height: 520px; }
+    h2 { margin: 0 0 12px; color: #436f8c; font-size: 15px; }
+    label { display: block; color: var(--muted); font-size: 11px; margin: 9px 0 5px; }
+    textarea, select, input { width: 100%; border: 1px solid #cbd9e2; border-radius: 8px; background: #fbfdff; color: var(--text); padding: 9px 10px; font: inherit; font-size: 12px; outline: none; }
+    textarea:focus, select:focus, input:focus { border-color: #76a7c8; box-shadow: 0 0 0 3px rgba(76,120,168,.10); }
+    textarea { min-height: 270px; resize: vertical; line-height: 1.55; }
+    .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .actions { display: flex; gap: 8px; margin-top: 11px; }
+    button { border: 0; border-radius: 8px; padding: 9px 14px; cursor: pointer; font-weight: 650; font-size: 12px; }
+    .primary { background: var(--blue); color: white; }
+    .secondary { background: #e9f1f6; color: #315d7a; }
+    button:disabled { cursor: wait; opacity: .55; }
+    pre { margin: 0; padding: 12px; border-radius: 9px; min-height: 438px; max-height: 650px; overflow: auto; white-space: pre-wrap; word-break: break-word; background: #f7fafc; border: 1px solid #dde7ee; color: #344c5c; font: 11px/1.55 "DM Mono", Consolas, monospace; }
+    .bar { height: 6px; margin-top: 9px; border-radius: 999px; background: #e7eef3; overflow: hidden; }
+    .bar > span { display: block; height: 100%; width: 0; border-radius: inherit; background: var(--teal); transition: width .25s ease; }
+    .foot { margin-top: 10px; color: var(--muted); font-size: 10px; line-height: 1.5; }
+    .result-summary { display: grid; grid-template-columns: repeat(5, minmax(68px, 1fr)); gap: 6px; margin-bottom: 9px; }
+    .result-chip { padding: 7px 8px; border: 1px solid var(--line); border-radius: 8px; background: #f8fbfd; }
+    .result-chip span { display: block; color: var(--muted); font-size: 9px; }
+    .result-chip strong { display: block; margin-top: 3px; color: #315d7a; font-size: 13px; }
+    @media (max-width: 900px) {
+      .metrics { grid-template-columns: repeat(2, 1fr); }
+      .workspace { grid-template-columns: 1fr; }
+      header { align-items: start; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>VIA NLP One Engine</h1>
+      <p>Any Article · CPU/RAM First · Governed Learning · Local by Default</p>
+    </div>
+    <div class="status"><span id="status-dot" class="dot"></span><span id="status-text">Connecting</span></div>
+  </header>
+  <main>
+    <section class="metrics">
+      <article class="card metric"><div class="label">RAM Used</div><div id="ram" class="value">--</div><div class="bar"><span id="ram-bar"></span></div></article>
+      <article class="card metric"><div class="label">Available RAM</div><div id="available" class="value">--</div><div class="sub">Admission safety reserve</div></article>
+      <article class="card metric"><div class="label">CPU</div><div id="cpu" class="value">--</div><div class="bar"><span id="cpu-bar"></span></div></article>
+      <article class="card metric"><div class="label">Loaded Models</div><div id="models" class="value">--</div><div class="sub">Lazy pool / TTL unload</div></article>
+      <article class="card metric"><div class="label">ML Feedback</div><div id="feedback" class="value">--</div><div id="ml-state" class="sub">Governed candidate gate</div></article>
+    </section>
+
+    <section class="workspace">
+      <article class="card pane">
+        <h2>文章處理</h2>
+        <div class="controls">
+          <div><label for="task">Task</label><select id="task"><option value="auto">Auto Analyze</option><option value="reorganize">Reorganize</option><option value="knowledge">Body of Knowledge</option><option value="govern">Central Governance</option><option value="translate">Translate (Configured)</option><option value="repair">Repair</option><option value="keywords">Keywords</option><option value="classify">Classify</option><option value="entities">Entities</option><option value="structure">Structure</option><option value="summarize">Summarize</option></select></div>
+          <div><label for="quality">Quality</label><select id="quality"><option value="balanced">Balanced</option><option value="fast">Fast</option><option value="deep">Deep (Opt-in)</option></select></div>
+        </div>
+        <div class="controls">
+          <div><label for="backend">Translation Backend</label><select id="backend"><option value="argos">Argos Offline</option><option value="ollama">Ollama Local</option><option value="google_cloud">Google Cloud API</option></select></div>
+          <div class="controls"><div><label for="source-language">From</label><input id="source-language" value="zh"></div><div><label for="target-language">To</label><input id="target-language" value="en"></div></div>
+        </div>
+        <label for="article">任何文章／中英混合文字</label>
+        <textarea id="article" placeholder="貼上新聞、研究報告、一般文章、投資討論或逐字稿…"></textarea>
+        <label for="api-key">API Key（若已啟用）</label>
+        <input id="api-key" type="password" autocomplete="off" placeholder="Local API key">
+        <div class="actions"><button id="run" class="primary">開始處理</button><button id="clear" class="secondary">清除</button></div>
+        <div class="foot">Tier 3／4 預設關閉；介面不會下載模型。深度任務若未啟用會安全失敗，不會靜默改用不等價結果。</div>
+      </article>
+      <article class="card pane">
+        <h2>結構化結果</h2>
+        <div id="knowledge-summary" class="result-summary" hidden>
+          <div class="result-chip"><span>Segments</span><strong id="result-segments">--</strong></div>
+          <div class="result-chip"><span>Topics</span><strong id="result-topics">--</strong></div>
+          <div class="result-chip"><span>Returns</span><strong id="result-returns">--</strong></div>
+          <div class="result-chip"><span>Coverage</span><strong id="result-coverage">--</strong></div>
+          <div class="result-chip"><span>Code</span><strong id="result-code">--</strong></div>
+        </div>
+        <pre id="output">等待輸入…</pre>
+      </article>
+    </section>
+  </main>
+  <script>
+    const VIA_DASHBOARD_CONFIG = Object.freeze({ healthIntervalMs: 2000, healthUrl: "/health", processUrl: "/v1/process" });
+
+    function setText(id, value) { document.getElementById(id).textContent = value; }
+    function setBar(id, value, pressure) {
+      const bar = document.getElementById(id);
+      bar.style.width = `${Math.max(0, Math.min(100, value || 0))}%`;
+      bar.style.background = pressure === "critical" ? "var(--red)" : pressure === "shed" ? "var(--orange)" : "var(--teal)";
+    }
+    function getHeaders() {
+      const key = document.getElementById("api-key").value.trim();
+      return { "Content-Type": "application/json", ...(key ? { "X-API-Key": key } : {}) };
+    }
+    function updateKnowledgeSummary(data) {
+      const output = data?.output?.knowledge || data?.output;
+      const complete = output?.completeness;
+      const body = output?.body_of_knowledge;
+      const flow = output?.dialogue_flow;
+      const visible = Boolean(complete && body);
+      document.getElementById("knowledge-summary").hidden = !visible;
+      if (!visible) return;
+      setText("result-segments", String(complete.segment_count ?? "--"));
+      setText("result-topics", String(body.topics?.length ?? "--"));
+      setText("result-returns", String(flow?.metrics?.topic_returns ?? "--"));
+      setText("result-coverage", `${((complete.organized_segment_coverage ?? complete.coverage_ratio ?? 0) * 100).toFixed(0)}%`);
+      setText("result-code", String(output.code_registry?.length ?? "--"));
+    }
+    async function refreshHealth() {
+      try {
+        const response = await fetch(VIA_DASHBOARD_CONFIG.healthUrl, { cache: "no-store" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        const snapshot = data.resources.snapshot;
+        setText("ram", `${snapshot.ram_percent.toFixed(1)}%`);
+        setText("available", `${snapshot.available_ram_mb.toFixed(0)} MB`);
+        setText("cpu", `${snapshot.cpu_percent.toFixed(1)}%`);
+        setText("models", String(data.models.length));
+        setText("feedback", String(data.machine_learning.feedback_records));
+        setText("ml-state", data.machine_learning.active_model ? "Active model verified" : "Rules until model promotion");
+        setBar("ram-bar", snapshot.ram_percent, snapshot.pressure);
+        setBar("cpu-bar", snapshot.cpu_percent, snapshot.pressure);
+        setText("status-text", `${data.status.toUpperCase()} · ${snapshot.pressure}`);
+        document.getElementById("status-dot").style.background = data.status === "ok" ? "var(--teal)" : "var(--orange)";
+      } catch (error) {
+        setText("status-text", `Offline · ${error.message}`);
+        document.getElementById("status-dot").style.background = "var(--red)";
+      }
+    }
+    async function runArticle() {
+      const button = document.getElementById("run");
+      const text = document.getElementById("article").value.trim();
+      if (!text) { setText("output", "請先輸入文章。"); return; }
+      button.disabled = true;
+      setText("output", "Processing…");
+      try {
+        const response = await fetch(VIA_DASHBOARD_CONFIG.processUrl, {
+          method: "POST", headers: getHeaders(),
+          body: JSON.stringify({
+            text,
+            task: document.getElementById("task").value,
+            quality: document.getElementById("quality").value,
+            options: {
+              backend: document.getElementById("backend").value,
+              source_language: document.getElementById("source-language").value,
+              target_language: document.getElementById("target-language").value
+            }
+          })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || `HTTP ${response.status}`);
+        updateKnowledgeSummary(data);
+        setText("output", JSON.stringify(data, null, 2));
+        await refreshHealth();
+      } catch (error) { setText("output", `Error: ${error.message}`); }
+      finally { button.disabled = false; }
+    }
+    function clearArticle() { document.getElementById("article").value = ""; document.getElementById("knowledge-summary").hidden = true; setText("output", "等待輸入…"); }
+
+    document.getElementById("run").addEventListener("click", runArticle);
+    document.getElementById("clear").addEventListener("click", clearArticle);
+    refreshHealth();
+    setInterval(refreshHealth, VIA_DASHBOARD_CONFIG.healthIntervalMs);
+  </script>
+</body>
+</html>
