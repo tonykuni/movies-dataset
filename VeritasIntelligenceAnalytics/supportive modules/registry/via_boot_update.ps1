@@ -64,6 +64,12 @@ Step "⑨a 五系統分頁"               (Newest $REG "CGC_MDL088_SystemTestPag
 Step "⑨b 系統樞紐"                 (Newest $REG "CGC_MDL090_SystemHub_v*.py") @("run")
 Step "⑨c 儀表板"                   (Newest (Join-Path $VIA "functional modules\VAP\engine") "VAP_ENG009_DashboardUI_v*.py") @("run")
 Step "⑨d 每日觀察"                 (Newest $VRN "VRN_ENG068_DailyBrief_v*.py") @("run")
+# 批270:⑩ 上線分析組——新功能掛日更(資料鮮→分析頁自動鮮;全零網路在庫 join)
+Step "⑩a ETF 持股×共識增益(批243)" (Newest $ENG "VDF_ENG067_ConsensusEnrichment_v*.py") @("run")
+Step "⑩b 主動 ETF×共識分析(批264)" (Newest $ENG "VDF_ENG068_ETFConsensusAnalysis_v*.py") @("run")
+Step "⑩c 月營收×共識分析(批264)"   (Newest $ENG "VDF_ENG069_RevenueConsensusAnalysis_v*.py") @("run")
+Step "⑩d 測試總表(批257)" (Newest $REG "CGC_MDL104_TestResultsHub_v*.py") @()
+Step "⑩e 三軌矩陣(批267)"          (Newest $REG "CGC_MDL110_TriTestMatrix_v*.py") @()
 Add-Content $LOG "=== 畢(誠實三態見上)==="
 Write-Host "[boot-ps1] 完成 · log=$LOG"
 exit 0
