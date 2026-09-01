@@ -12,6 +12,12 @@ rem =====================================================================
 setlocal
 set "VIA=%~dp0"
 
+rem --- 批269 前置自癒:髒樹全收留痕(stash -u;乾淨=無事退出) --------
+rem 實錄根因:工作站本機分流提交+執行期再生存證檔=每次 pull 被
+rem 「local changes would be overwritten」擋死;連同步修好版都拉不到
+rem =雞生蛋死鎖。本門先 stash 再派工=任何狀態都能同步(找回:git stash pop)
+git -C "%VIA%.." stash push --include-untracked -m "VIA-selfheal-preclean" >nul 2>nul
+
 rem --- 尾版解析 Invoke-VIA-All-v*.ps1(cmd 版尾版 glob) ---------------
 set "ALLPS="
 for /f "delims=" %%f in ('dir /b /o:n "%VIA%Invoke-VIA-All-v*.ps1" 2^>nul') do set "ALLPS=%VIA%%%f"
