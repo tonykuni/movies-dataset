@@ -76,7 +76,7 @@ button,input,select{font:inherit}
       <button class="nav-btn" data-view="support">▦ 支援性模組管理 <span class="tag">7</span></button>
       <button class="nav-btn" data-view="vdf">▤ VDF · Data Forge <span class="tag">DATA</span></button>
       <button class="nav-btn" data-view="vrn">▧ VRN · Report Nova <span class="tag">DOC</span></button>
-      <button class="nav-btn" data-view="vap">▥ VAP · AutoPlot <span class="tag">VIZ</span></button>
+      <button class="nav-btn" data-view="vap">▥ VAP · AutoPlot <span class="tag">VIZ</span></button><button class="nav-btn" data-view="mdconvert">▨ 文件→MD 轉換 <span class="tag">MD</span></button><button class="nav-btn" data-view="prompts">✎ Prompt 管理 <span class="tag">LIB</span></button>
     </div>
 
     <div class="divider"></div>
@@ -86,10 +86,10 @@ button,input,select{font:inherit}
         <div class="card-h">GATE · 系統閘門</div>
         <div class="card-b">
           <div class="gate"><span class="gate-id">G00</span><span>Root / Path</span><span class="light g"></span></div>
-          <div class="gate"><span class="gate-id">G01</span><span>AST / Syntax</span><span class="light r"></span></div>
+          <div class="gate"><span class="gate-id">G01</span><span>AST / Syntax</span><span class="light g"></span></div>
           <div class="gate"><span class="gate-id">G02</span><span>SSOT / Registry</span><span class="light g"></span></div>
           <div class="gate"><span class="gate-id">G03</span><span>Environment</span><span class="light g"></span></div>
-          <div class="gate"><span class="gate-id">G04</span><span>Data Contract</span><span class="light r"></span></div>
+          <div class="gate"><span class="gate-id">G04</span><span>Data Contract</span><span class="light g"></span></div>
           <div class="gate"><span class="gate-id">G05</span><span>Integration</span><span class="light g"></span></div>
           <div class="gate"><span class="gate-id">G06</span><span>User Test / Activate</span><span class="light r"></span></div>
         </div>
@@ -132,7 +132,7 @@ button,input,select{font:inherit}
         <div class="sub" id="pageSub">Central Governance · SSOT · Supportive · VDF · VRN · VAP</div>
       </div>
       <div class="right">
-        <span class="pill">LIVE · 2026-09-01 03:09</span>
+        <span class="pill">LIVE · 2026-09-01 04:27</span>
         <span class="pill">Canonical Mutation: OFF</span>
         <span class="pill">Hydra: REVIEW</span>
       </div>
@@ -161,7 +161,7 @@ button,input,select{font:inherit}
       <div class="kpis">
         <div class="card kpi"><div class="n">6</div><div class="l">Primary Units</div></div>
         <div class="card kpi"><div class="n">7</div><div class="l">Supportive Modules</div></div>
-        <div class="card kpi"><div class="n">26</div><div class="l">指揮台任務(尾版)</div></div>
+        <div class="card kpi"><div class="n">28</div><div class="l">指揮台任務(尾版)</div></div>
         <div class="card kpi"><div class="n">3</div><div class="l">Max Repair Rounds</div></div>
       </div>
     </section>
@@ -237,6 +237,42 @@ button,input,select{font:inherit}
         <div class="card"><div class="card-h">VAP Workspace</div><div class="card-b"><div class="preview"><a href="VIA_UI_TemplateRegistry_v0100.html" style="color:var(--blue)">TPN 模板冊</a> · <a href="VIA_UI_Dashboard_v0100.html" style="color:var(--blue)">儀表板</a></div></div></div>
       </div>
     </section>
+
+    <section class="workspace hidden" id="mdconvert">
+      <div class="grid2">
+        <div class="card"><div class="card-h">文件→MD 轉換(批265)</div>
+        <div class="card-b">
+          <div class="flow"><span class="node">docx/pdf/html/txt</span>
+          <span class="arr">→</span><span class="node">ENG075 十一檢</span>
+          <span class="arr">→</span><span class="node">.md + .json sidecar</span></div>
+          <p style="font-size:10px;color:var(--muted)">正主=VRN_ENG075
+          DocToMarkdown 尾版(markitdown 正道+內建後備;券商衍生物
+          不入 git 紅線;產物=VIA_Reports/md_out)</p>
+        </div></div>
+        <div class="card"><div class="card-h">執行與產物</div>
+        <div class="card-b"><div class="preview">
+          <a href="VIA_UI_CommandDeck_v0100.html" style="color:var(--blue)">指揮台跑 mdconvert 任務</a> ·
+          工作站短令 <b>via-md</b><br>產物冊:VIA_Reports/md_out/(本機)
+        </div></div></div>
+      </div>
+    </section>
+    <section class="workspace hidden" id="prompts">
+      <div class="grid2">
+        <div class="card"><div class="card-h">Prompt 儲存律(批265)</div>
+        <div class="card-b">
+          <table class="table"><tr><th>Rule</th><th>Policy</th></tr>
+          <tr><td>儲存</td><td>append-only 只增不減零刪除</td></tr>
+          <tr><td>冪等</td><td>hash 定生死(同文=SKIP)</td></tr>
+          <tr><td>版本</td><td>異文=新版;舊標 SUPERSEDED 本文保留</td></tr>
+          <tr><td>取用</td><td>UI 一鍵複製 / CLI get</td></tr></table>
+        </div></div>
+        <div class="card"><div class="card-h">Prompt Workspace</div>
+        <div class="card-b"><div class="preview">
+          <a href="VIA_UI_PromptManager_v0100.html" style="color:var(--blue)">Prompt 管理冊(現役頁)</a><br>
+          CLI:python MDL109 add --id 名 --title 題 --file 檔
+        </div></div></div>
+      </div>
+    </section>
   </main>
 </div>
 <script>
@@ -247,6 +283,8 @@ const meta={
  support:["支援性模組管理","Runtime Bridge · Registry · Env · Aegis · Celeritas · AST"],
  vdf:["VDF · VeritasDataForge","Input · Fetch · Normalize · Validate · Store"],
  vrn:["VRN · VeritasReportNova","Document Intake · OCR · Table · Cross Validation"],
+ mdconvert:["文件→MD 轉換","ENG075 · markitdown 正道 · .md+.json Sidecar"],
+ prompts:["Prompt 管理","append-only 儲存 · hash 冪等 · 版本回溯"],
  vap:["VAP · VeritasAutoPlot","Chart Contract · Dashboard · Renderer · Export"]
 };
 document.querySelectorAll(".nav-btn").forEach(btn=>{
@@ -260,5 +298,5 @@ document.querySelectorAll(".nav-btn").forEach(btn=>{
  });
 });
 </script>
-<div style="text-align:center;color:#9aa3ad;font-size:9px;padding:8px">真值時戳 2026-09-01 03:09 · 設計稿=收容 b258 原件保真 · 七閘=既有存證導入(G06 候操作員=誠實紅)</div></body>
+<div style="text-align:center;color:#9aa3ad;font-size:9px;padding:8px">真值時戳 2026-09-01 04:27 · 設計稿=收容 b258 原件保真 · 七閘=既有存證導入(G06 候操作員=誠實紅)</div></body>
 </html>
