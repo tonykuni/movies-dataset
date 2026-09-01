@@ -1,0 +1,9 @@
+#!/bin/sh
+# 對話紀錄→編排文章+程式抽取(OneEngine Tier-1 掛載;誠實雙道)— 動態解析最新版(鐵律)
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
+CD="$(ls "$DIR/supportive modules/registry"/CGC_MDL108_ChatToDoc_v0*.py 2>/dev/null | sort | tail -n 1)"
+if [ -z "$CD" ]; then
+  echo "  ✗ 引擎缺:CGC_MDL108_ChatToDoc_v0*.py 未尋獲(誠實)" >&2
+  exit 2
+fi
+exec python3 "$CD" "$@"
