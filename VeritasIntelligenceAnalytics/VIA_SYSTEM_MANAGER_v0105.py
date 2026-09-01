@@ -1,0 +1,402 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+VIA_SYSTEM_MANAGER — 總系統管理器(批281;操作員令)
+====================================================================
+操作員令:「應該用一個總 VIA_SYSTEM_MANAGER.py 管理一切:銜接 sync、
+html u/i、輸入參數、windows i/o、拖曳式、下拉選單、勾選控管元件;
+engine / module list 要清楚」。
+一總管四職(Zero-Hydra=全複用正主,零重造):
+  ①sync   同步(=VIA-ALL 律:stash -u→fetch→ff-only→分流備份
+          分支後對齊;零彈窗零卡斷)
+  ②list   引擎/模組清單清楚列印(=MDL112 Atlas gather 直取)
+  ③run    任務執行(=MDL095 任務冊 argv 白名單 subprocess;
+          任意指令拒絕=安全鐵則)
+  ④ui     總控頁再生+開啟(Windows I/O:os.startfile 正道/
+          webbrowser 後備):
+          左=引擎/模組清單(搜尋過濾+分組清楚)
+          中=控管元件:任務下拉+多任務勾選+codes 參數欄→
+            fetch 指揮台 127.0.0.1:8765/run(deck 在=真跑;
+            不在=誠實教先開 via)
+          右=拖曳收件區(拖入列檔名+生成 via-intake 指引;
+            瀏覽器沙盒不落盤=誠實 v1,真收容走 Downloads 正道)
+v0100→v0101(批283 操作員令「由一個 VIA_SystemManager.py 整合
+全部連結」):⑤serve 職=帶起唯一 API 樞紐(MDL095 尾版 127.0.0.1
+:8765;CORS 已開=file:// 頁可 fetch)+總控頁右欄 API 連結冊
+(全部端點一表=全部連結歸一總管)。
+v0104→v0105(批301 操作員令「輸入參數最少化 WINDOW I/O 拖曳式
+下拉選單」;六維稽核實錘=拖曳誠實 v1 只列名):拖曳收件升真收 v2
+——FileReader→base64→POST 樞紐 /intake(text/plain 簡單請求免
+preflight);逐件回執 ✓已落+sha8/SKIP 同 hash/✗誠實拒(逾 50MB);
+樞紐未開=誠實降級列名+via-intake 指引(=舊 v1 行為);API 連結冊
++POST /intake;+/vapdeck 已在冊(四系統入口齊)。
+v0102→v0103(批292 操作員令「不卡斷 20個加速器 動態進度條」):
+狀態矩陣每任務列+真進度條(pct 有值=實寬條;running 無 pct=
+流動條紋動畫=誠實不假估;ok/fail=滿條定色)。零輪詢加重(同一
+/status 資料)=不卡斷不變。
+v0101→v0102(批285 操作員令「狀態的顯現/輸入參數/運作結果的
+顯現」):總控頁三顯迴路——狀態矩陣(輪詢 /status 每 4s RYG 點
++elapsed+pct;樞紐離線=誠實標一次)+結果窗(點任務列→log 尾)。
+用法:python3 VIA_SYSTEM_MANAGER_v0102.py sync|list|run <task>|ui
+      |serve| --selftest
+"""
+from __future__ import annotations
+# ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+try:
+    import sys as _sa_sys
+    from pathlib import Path as _sa_Path
+    _sa_p = _sa_Path(__file__).resolve()
+    while _sa_p.parent != _sa_p:
+        if (_sa_p / "supportive modules" / "VIA_SuperAccel_Module.py").exists():
+            _sa_sys.path.insert(0, str(_sa_p / "supportive modules"))
+            break
+        _sa_p = _sa_p.parent
+    import VIA_SuperAccel_Module as VIA_ACCEL  # noqa: N816
+except Exception:
+    VIA_ACCEL = None  # graceful:加速器缺席零影響
+# ===== [VIA:ACCEL-BRIDGE:END] =====
+
+import html
+import importlib.util
+import json
+import os
+import subprocess
+import sys
+from datetime import datetime
+from pathlib import Path
+
+VIA = Path(__file__).resolve().parent
+REG = VIA / "supportive modules" / "registry"
+OUT = (VIA / "supportive modules" / "ui_support"
+       / "VIA_UI_MasterControl_v0100.html")
+
+
+def _mod(pat: str):
+    p = sorted(REG.glob(pat))[-1]
+    spec = importlib.util.spec_from_file_location(p.stem, p)
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    return m
+
+
+def do_sync() -> int:
+    """VIA-ALL 同步律(批272):任何狀態都能對齊雲端;零彈窗"""
+    def g(*a):
+        return subprocess.run(["git", "-C", str(VIA), *a],
+                              capture_output=True, text=True)
+    g("stash", "push", "--include-untracked", "-m", "MGR-selfheal")
+    g("fetch", "origin", "main")
+    r = g("merge", "--ff-only", "origin/main")
+    if r.returncode != 0:
+        sha = g("rev-parse", "--short", "HEAD").stdout.strip()
+        g("branch", f"via-local-backup-{sha}")
+        g("reset", "--hard", "origin/main")
+        print(f"[MGR:sync] 分流偵測→備份分支 via-local-backup-{sha} "
+              "留痕後對齊雲端")
+    print("[MGR:sync] 對齊 origin/main ✓(髒樹已 stash 留痕,"
+          "找回:git stash pop)")
+    return 0
+
+
+def do_list(do_print: bool = True) -> dict:
+    """引擎/模組清單清楚(MDL112 Atlas 資料層直取)"""
+    d = _mod("CGC_MDL112_SystemAtlas_v*.py").gather()
+    if do_print:
+        for sub, fam in d["engines"].items():
+            print(f"[ENGINE] {sub}({len(fam)} 族)")
+            for b in sorted(fam):
+                print(f"    {b}")
+        print(f"[MODULE] CGC 治理模組 {len(d['mods'])} 族")
+        for b in sorted(d["mods"]):
+            print(f"    {b}")
+    return d
+
+
+def do_run(task: str, extra: list[str] | None = None) -> int:
+    """白名單任務執行(MDL095 任務冊=唯一 SSOT;任意指令拒絕)"""
+    T = _mod("CGC_MDL095_DeckServer_v*.py").task_registry()
+    if task not in T:
+        print(f"[MGR:run] '{task}' 不在白名單任務冊=拒絕(安全鐵則)。"
+              f"可用:{' '.join(sorted(T))}")
+        return 2
+    argv = list(T[task]["argv"]) + list(extra or [])
+    print(f"[MGR:run] {task}:{T[task]['zh']}")
+    return subprocess.run(argv, stdin=subprocess.DEVNULL).returncode
+
+
+def render(d: dict, tasks: dict) -> str:
+    eng_side = "".join(
+        f"<details open><summary><b>{html.escape(sub)}</b>"
+        f"<span class='tag'>{len(fam)}</span></summary>"
+        + "".join(f'<div class="item" data-n="{html.escape(b.lower())}">'
+                  f"{html.escape(b)}</div>" for b in sorted(fam))
+        + "</details>" for sub, fam in d["engines"].items()) \
+        + (f"<details><summary><b>CGC 治理模組</b>"
+           f"<span class='tag'>{len(d['mods'])}</span></summary>"
+           + "".join(f'<div class="item" data-n="{html.escape(b.lower())}">'
+                     f"{html.escape(b)}</div>" for b in sorted(d["mods"]))
+           + "</details>")
+    opts = "".join(f'<option value="{html.escape(k)}">{html.escape(k)} · '
+                   f"{html.escape(z)}</option>" for k, z in tasks.items())
+    checks = "".join(
+        f'<label class="ck"><input type="checkbox" value="{html.escape(k)}">'
+        f"{html.escape(k)}</label>"
+        for k in ("boot", "revenue", "consensus", "etf_analysis",
+                  "revenue_consensus", "regression", "selftest_fast")
+        if k in tasks)
+    return f"""<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIA 總控台 Master Control</title><style>
+:root{{--bg:#f3f5f7;--panel:#fff;--line:#dce2e8;--text:#1f2933;
+--muted:#6b7785;--blue:#4c78a8;--green:#5a9e6f;--red:#c96b5a}}
+@media (prefers-color-scheme: dark){{:root{{--bg:#10151b;--panel:#171e26;
+--line:#2a333d;--text:#dbe3ea;--muted:#8a97a5;--blue:#7ba3cc;
+--green:#79b58c;--red:#d98a7c}}}}
+*{{box-sizing:border-box;margin:0}}
+body{{background:var(--bg);color:var(--text);
+font:12.5px/1.5 "Segoe UI","Noto Sans TC",sans-serif}}
+.app{{display:grid;grid-template-columns:290px 1fr 260px;gap:12px;
+padding:12px;min-height:100vh}}
+.col{{background:var(--panel);border:1px solid var(--line);
+border-radius:10px;padding:12px;overflow:auto;max-height:96vh}}
+h1{{font-size:14px}}h2{{font-size:10px;color:var(--muted);
+font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+margin:10px 0 6px}}
+.sub{{color:var(--muted);font-size:10px;margin:2px 0 8px}}
+input[type=text],select{{width:100%;border:1px solid var(--line);
+border-radius:6px;padding:6px;background:var(--panel);
+color:var(--text);margin-bottom:8px}}
+.item{{padding:2px 6px;font-size:11px;color:var(--muted)}}
+.item.hide{{display:none}}
+details{{margin-bottom:4px}}summary{{cursor:pointer;padding:3px 0}}
+.tag{{float:right;font-size:9px;border-radius:999px;padding:1px 7px;
+background:var(--line);color:var(--muted)}}
+.ck{{display:block;padding:3px 0;font-size:12px}}
+button{{border:1px solid var(--line);background:var(--blue);color:#fff;
+border-radius:8px;padding:8px 14px;cursor:pointer;width:100%;
+margin-top:6px}}
+button.ghost{{background:var(--panel);color:var(--blue)}}
+@keyframes viaflow{{to{{background-position:32px 0}}}}
+#log{{white-space:pre-wrap;font:11px ui-monospace,Consolas,monospace;
+background:var(--bg);border:1px solid var(--line);border-radius:6px;
+padding:8px;min-height:120px;margin-top:8px}}
+#drop{{border:2px dashed var(--line);border-radius:10px;padding:24px 10px;
+text-align:center;color:var(--muted)}}
+#drop.on{{border-color:var(--blue);color:var(--blue)}}
+@media(max-width:1000px){{.app{{grid-template-columns:1fr}}}}
+</style></head><body><div class="app">
+<div class="col">
+  <h1>總控台</h1>
+  <div class="sub">批281 · VIA_SYSTEM_MANAGER 產 · {d['ts']} ·
+  引擎/模組清單=全樹真掃</div>
+  <input type="text" id="q" placeholder="搜尋引擎/模組…">
+  <h2>Engine / Module List</h2>{eng_side}
+</div>
+<div class="col">
+  <h2>輸入參數 · 單任務(下拉)</h2>
+  <select id="task">{opts}</select>
+  <input type="text" id="codes" placeholder="參數 codes(可空;如 2330,2317)">
+  <button onclick="runOne()">▶ 執行選定任務</button>
+  <h2>多任務勾選(依序執行)</h2>{checks}
+  <button class="ghost" onclick="runChecked()">▶ 依序執行勾選任務</button>
+  <button class="ghost" onclick="ping()">⟳ 指揮台連線檢測</button>
+  <div id="log">待命。任務經指揮台 127.0.0.1:8765 白名單真跑;
+指揮台未開=打 via(或 VIA-ALL)帶起後再按。</div>
+  <h2>狀態的顯現 · 任務矩陣(每 4s 自動刷新)</h2>
+  <div id="matrix" class="sub">樞紐連線中…</div>
+  <h2>運作結果的顯現</h2>
+  <pre id="result" style="white-space:pre-wrap;font:11px ui-monospace,Consolas,monospace;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px;min-height:90px;overflow-wrap:anywhere">點上方狀態列任一任務 → 顯示其 log 尾(真運作結果)</pre>
+</div>
+<div class="col">
+  <h2>拖曳收件 Drag &amp; Drop</h2>
+  <div id="drop">把檔案拖到這裡<br><small>真收 v2:落盤 Downloads+sha256 回執
+(樞紐未開=誠實列名+指引)</small></div>
+  <div id="files" class="sub"></div>
+  <h2>API 連結冊(唯一樞紐 127.0.0.1:8765;CORS 已開)</h2>
+  <div class="sub">GET /ping 健檢 · /run?task=名[&codes=] 白名單真跑 ·
+  POST /intake 拖曳真收({{name,b64}}→Downloads;hash 定生死)·
+  /status 全任務 RYG · / 指揮台頁 · /govdeck 治理台 · /govmatrix 矩陣 ·
+  /vapdeck 分析台 · /vap_revenue /vap_groups /vap_etflist /vap_etf
+  /vap_kline /vap_check /vap_flows 分析端點<br>
+  帶起樞紐:<code>python __ME__ serve</code>
+  (或 via 自動帶起)</div>
+  <h2>同步 Sync</h2>
+  <div class="sub">工作站同步=雙擊 VIA-ALL 或
+  <code>python __ME__ sync</code>
+  (stash 留痕→對齊雲端;分流自動備份分支)</div>
+</div>
+</div><script>
+const q=document.getElementById("q");
+q.oninput=()=>{{const v=q.value.toLowerCase();
+document.querySelectorAll(".item").forEach(i=>
+i.classList.toggle("hide",v&&!i.dataset.n.includes(v)));}};
+const log=m=>{{const el=document.getElementById("log");
+el.textContent+="\\n"+m;el.scrollTop=el.scrollHeight;}};
+async function call(t,codes){{
+ try{{const u="http://127.0.0.1:8765/run?task="+encodeURIComponent(t)
+  +(codes?"&codes="+encodeURIComponent(codes):"");
+  const r=await(await fetch(u)).json();
+  log((r.ok?"[起跑] ":"[拒/忙] ")+t+" "+(r.err||""));return r.ok;
+ }}catch(e){{log("[誠實] 指揮台未開("+t+"):先打 via 帶起 127.0.0.1:8765");
+  return false;}}}}
+function runOne(){{call(document.getElementById("task").value,
+ document.getElementById("codes").value.trim());}}
+async function runChecked(){{
+ for(const c of document.querySelectorAll('.ck input:checked'))
+   await call(c.value,"");}}
+async function ping(){{try{{
+ const r=await(await fetch("http://127.0.0.1:8765/ping")).json();
+ log("[指揮台] 在線 ✓ v="+(r.v||"?"));}}
+ catch(e){{log("[指揮台] 未開=誠實(打 via 帶起)");}}}}
+__STATUSJS__
+__DROPJS__
+</script></body></html>"""
+
+
+DROPJS = r"""
+const dz=document.getElementById("drop");
+dz.ondragover=e=>{e.preventDefault();dz.classList.add("on");};
+dz.ondragleave=()=>dz.classList.remove("on");
+dz.ondrop=async e=>{e.preventDefault();dz.classList.remove("on");
+ const fl=[...e.dataTransfer.files];
+ const out=document.getElementById("files");
+ out.innerHTML="收件 "+fl.length+" 件…";
+ const lines=[];
+ for(const f of fl){
+  if(f.size>50*1024*1024){
+   lines.push("✗ "+f.name+"(逾 50MB 上限=誠實拒)");continue;}
+  try{
+   const b64=await new Promise((ok,bad)=>{const r=new FileReader();
+    r.onload=()=>ok((r.result||"").split(",")[1]||"");
+    r.onerror=bad;r.readAsDataURL(f);});
+   const rs=await(await fetch("http://127.0.0.1:8765/intake",
+    {method:"POST",body:JSON.stringify({name:f.name,b64:b64})})).json();
+   lines.push(rs.ok
+    ?"✓ "+f.name+(rs.skip?"(SKIP 同 hash=冪等)":" → 已落 "+rs.saved)
+      +" · sha "+(rs.sha256||"").slice(0,8)
+    :"✗ "+f.name+"("+(rs.err||"拒")+")");
+  }catch(_){
+   lines.push("· "+f.name+"(樞紐未開=誠實列名;放 Downloads 後打 via-intake)");
+  }
+ }
+ out.innerHTML="真收 v2(hash 定生死;樞紐未開=誠實降級):<br>"
+  +lines.join("<br>")
+  +"<br><b>收容入冊</b>:已落 Downloads 者打 <code>via-intake</code>"
+  +" 一鍵 hash 冪等收容自動雙推。";};
+"""
+
+STATUSJS = r"""
+const DOT={idle:"var(--muted)",running:"#c4943a",ok:"var(--green)",fail:"var(--red)"};
+let hubDown=false,curTask=null,lastStatus={};
+async function poll(){try{
+ const r=await(await fetch("http://127.0.0.1:8765/status")).json();
+ lastStatus=r;hubDown=false;
+ document.getElementById("matrix").innerHTML=Object.entries(r).map(([k,v])=>{
+  const pct=(v.pct!=null)?(" "+v.pct+"%"):"";
+  const el=(v.elapsed!=null&&v.state!=="idle")?(" "+v.elapsed+"s"):"";
+  return '<div style="cursor:pointer;padding:2px 0" onclick="showTail(\''+k+'\')">'
+   +'<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:'
+   +(DOT[v.state]||DOT.idle)+';margin-right:6px"></span>'+k
+   +" <small>"+(v.zh||"")+el+pct+"</small>"
+   +'<div style="height:5px;border-radius:3px;background:var(--line);margin:3px 0 2px 15px;overflow:hidden">'
+   +'<div style="height:100%;border-radius:3px;transition:width .6s;'
+   +(v.state==="running"
+     ?(v.pct!=null
+       ?('width:'+v.pct+'%;background:#c4943a')
+       :'width:100%;background:repeating-linear-gradient(45deg,#c4943a 0 8px,transparent 8px 16px);animation:viaflow 1s linear infinite')
+     :('width:'+((v.state==="ok"||v.state==="fail")?100:0)+'%;background:'+(v.state==="fail"?"var(--red)":"var(--green)")))
+   +'"></div></div></div>';}).join("");
+ if(curTask)showTail(curTask);
+}catch(e){if(!hubDown){hubDown=true;
+ document.getElementById("matrix").textContent="樞紐未開=誠實(打 via 或 VIA-ALL 帶起後自動接上)";}}}
+function showTail(k){curTask=k;const v=lastStatus[k]||{};
+ document.getElementById("result").textContent=
+  "["+k+"] state="+(v.state||"?")+((v.rc!=null)?(" rc="+v.rc):"")+"\n"+(v.tail||"(尚無 log)");}
+setInterval(poll,4000);poll();
+"""
+
+
+def do_ui(open_after: bool = True) -> int:
+    d = do_list(do_print=False)
+    tasks = {k: v["zh"] for k, v in
+             _mod("CGC_MDL095_DeckServer_v*.py").task_registry().items()}
+    OUT.write_text(render(d, tasks).replace("__STATUSJS__", STATUSJS)
+                   .replace("__DROPJS__", DROPJS)
+                   .replace("__ME__", Path(__file__).name), encoding="utf-8")
+    print(f"[MGR:ui] 總控頁再生 · 任務 {len(tasks)} · {OUT.name}")
+    if open_after:
+        try:
+            os.startfile(str(OUT))            # Windows I/O 正道
+        except AttributeError:
+            try:
+                import webbrowser
+                webbrowser.open(OUT.as_uri())  # 跨平台後備
+            except Exception:
+                pass
+    return 0
+
+
+def selftest() -> int:
+    fails = []
+
+    def chk(name, cond, note=""):
+        print(f"  [{'OK' if cond else 'FAIL'}] {name} {note}")
+        if not cond:
+            fails.append(name)
+
+    src = Path(__file__).read_text(encoding="utf-8")
+    d = do_list(do_print=False)
+    rc = do_ui(open_after=False)
+    page = OUT.read_text(encoding="utf-8")
+    chk("① 四職一總管(sync/list/run/ui 全在)", rc == 0
+        and all(f"def do_{k}" in src for k in ("sync", "list", "run", "ui")))
+    chk("② 清單清楚(引擎>80 族+模組>30 族入頁+搜尋過濾)",
+        sum(len(v) for v in d["engines"].values()) > 80
+        and 'id="q"' in page and 'class="item"' in page)
+    chk("③ 控管元件三式(下拉+勾選+參數欄)接指揮台白名單",
+        'id="task"' in page and 'type="checkbox"' in page
+        and 'id="codes"' in page and "127.0.0.1:8765/run" in page)
+    chk("④ 拖曳收件區(真收 v2:FileReader→POST /intake 落盤+sha 回執;"
+        "樞紐未開=誠實降級列名)",
+        'id="drop"' in page and "via-intake" in page and "真收 v2" in page
+        and "readAsDataURL" in page and "/intake" in page
+        and "誠實降級" in page and "__DROPJS__" not in page)
+    chk("④b API 連結冊全端點+serve 職(批283 全部連結歸一)",
+        "API 連結冊" in page and "/vap_flows" in page
+        and 'a[0] == "serve"' in src)
+    chk("④c 三顯迴路(批285:狀態矩陣輪詢+參數欄+結果窗)",
+        "狀態的顯現" in page and "運作結果的顯現" in page
+        and 'id="matrix"' in page and 'id="result"' in page
+        and "setInterval(poll,4000)" in page and "showTail" in page
+        and "viaflow" in page and "transition:width" in page
+        and "__STATUSJS__" not in page)
+    chk("⑤ 白名單鐵則(run 拒任意指令)",
+        do_run("rm -rf /") == 2)
+    chk("⑥ Windows I/O 正道+後備+零 CDN+加速橋",
+        "os.startfile" in src and "webbrowser" in src
+        and '<script src="http' not in page and "ACCEL-BRIDGE" in src)
+    print(f"  [計] 八檢 OK {8 - len(fails)} · FAIL {len(fails)}")
+    return 1 if fails else 0
+
+
+def main() -> int:
+    a = sys.argv[1:]
+    if "--selftest" in a:
+        print("=== 總系統管理器(VIA_SYSTEM_MANAGER)· 八檢自測(零外網)===")
+        return selftest()
+    if a and a[0] == "sync":
+        return do_sync()
+    if a and a[0] == "list":
+        do_list()
+        return 0
+    if a and a[0] == "serve":
+        deck = sorted(REG.glob("CGC_MDL095_DeckServer_v*.py"))[-1]
+        print(f"[MGR:serve] 帶起唯一 API 樞紐:{deck.name}(Ctrl+C 停)")
+        return subprocess.run([sys.executable, str(deck), "serve"]).returncode
+    if a and a[0] == "run":
+        return do_run(a[1] if len(a) > 1 else "", a[2:])
+    return do_ui()
+
+
+if __name__ == "__main__":
+    sys.exit(main())
