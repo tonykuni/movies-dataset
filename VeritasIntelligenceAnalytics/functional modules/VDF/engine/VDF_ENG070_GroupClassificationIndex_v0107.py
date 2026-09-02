@@ -688,6 +688,7 @@ def story_metrics(panel, stories: dict, flows) -> dict:
         d["dcum"] = d["dl"].cumsum() / 1e8
         nz = lambda col: [None if pd.isna(v) else round(float(v), 2) for v in d[col]]
         out[sname] = {"d": [str(x.date()) for x in d["date"]],
+                      "cov": [int(has.sum()), int(len(d))],
                       "vol": nz("vol_idx"),
                       "mom": [round(float(v), 3) for v in d["mom"].fillna(0)],
                       "inst": nz("inst"), "fcum": nz("fcum"), "tcum": nz("tcum"),
@@ -1017,12 +1018,14 @@ function draw2(){{const g=DS[ssel.value];if(!g||!window.Plotly)return;
  }}else{{
   const M=g["M"];
   if(!M){{Plotly.react("c2",[],{{height:360,title:{{text:"無指標資料(誠實)",font:{{size:11}}}}}});return;}}
+  const cg=(SEG.m==="inst"||SEG.m==="margin"||SEG.m==="cash");
+  if(cg&&M.cov)title+="(法人資料覆蓋 "+M.cov[0]+"/"+M.cov[1]+" 日;斷=缺料)";
   if(SEG.m==="inst"){{
-   tr=[{{x:M.d,y:M.fcum,name:"外資",line:{{color:"#315f7d"}}}},
-       {{x:M.d,y:M.tcum,name:"投信",line:{{color:"#2f7652"}}}},
-       {{x:M.d,y:M.dcum,name:"自營",line:{{color:"#b58a3e"}}}},
-       {{x:M.d,y:M.inst,name:"三大合計",line:{{color:"#1f2530",width:2.2}}}}];
-  }}else{{tr=[{{x:M.d,y:M[SEG.m],name:LAB[SEG.m],
+   tr=[{{x:M.d,y:M.fcum,name:"外資",connectgaps:true,line:{{color:"#315f7d"}}}},
+       {{x:M.d,y:M.tcum,name:"投信",connectgaps:true,line:{{color:"#2f7652"}}}},
+       {{x:M.d,y:M.dcum,name:"自營",connectgaps:true,line:{{color:"#b58a3e"}}}},
+       {{x:M.d,y:M.inst,name:"三大合計",connectgaps:true,line:{{color:"#1f2530",width:2.2}}}}];
+  }}else{{tr=[{{x:M.d,y:M[SEG.m],name:LAB[SEG.m],connectgaps:cg,
     line:{{color:SEG.m==="mom"?"#b58a3e":"#2f7652",width:2}}}}];}}
  }}
  Plotly.react("c2",tr,{{height:380,font:{{size:10,
