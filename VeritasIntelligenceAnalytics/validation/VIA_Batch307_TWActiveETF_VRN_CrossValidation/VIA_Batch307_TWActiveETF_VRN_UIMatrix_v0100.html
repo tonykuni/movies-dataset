@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Batch 307 · TW Active ETF + VRN Cross-Validation UI Matrix</title>
+<style>
+:root{--bg:#f4f6f8;--paper:#fff;--paper2:#f9fafb;--ink:#202833;
+--ink2:#465365;--mut:#596778;--line:#dfe4ea;--soft:#eef2f5;
+--ok:#1e7d46;--bad:#b3372c;--warn:#9a6a00;--acc:#315f7d}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%;background:var(--bg);color:var(--ink)}
+body{font:12px/1.55 "Segoe UI","Noto Sans TC",system-ui,sans-serif;padding:64px 0 46px}
+code,.mono{font-family:Consolas,"SFMono-Regular",ui-monospace,monospace}
+header{position:fixed;top:0;left:0;right:0;height:56px;z-index:9;display:flex;
+align-items:center;gap:10px;padding:0 14px;background:rgba(255,255,255,.97);
+border-bottom:1px solid var(--line)}
+header .logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px}
+header .logo .sq{width:26px;height:26px;display:grid;place-items:center;
+background:#315f7d;color:#fff;border-radius:5px;font-size:11px}
+.badges{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;min-height:23px;padding:2px 9px;
+border:1px solid var(--line);border-radius:7px;background:var(--paper2);
+font-size:9.5px;font-weight:700;letter-spacing:.02em}
+.badge.ok{color:var(--ok);border-color:#b8d7c6;background:#f1f8f4}
+.badge.bad{color:var(--bad);border-color:#e3c0bc;background:#fff5f3}
+.badge.warn{color:var(--warn);border-color:#e0d0a6;background:#fdf8ec}
+.badge.mut{color:var(--mut)}
+.badge.dot::before{content:"";width:7px;height:7px;border-radius:50%;
+margin-right:5px;background:currentColor}
+main{max-width:1180px;margin:0 auto;padding:14px}
+.statrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+gap:8px;margin:8px 0 16px}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:8px;
+padding:9px 11px}
+.stat .v{font-size:19px;font-weight:800;color:var(--acc)}
+.stat .v.okc{color:var(--ok)}.stat .v.badc{color:var(--bad)}.stat .v.warnc{color:var(--warn)}
+.stat .zh{font-size:10.5px;color:var(--ink2);margin-top:2px}
+section{margin:18px 0}
+h2{font-size:14px;display:flex;align-items:center;gap:8px;margin-bottom:2px}
+h2 .secno{width:22px;height:22px;display:grid;place-items:center;background:var(--acc);
+color:#fff;border-radius:5px;font-size:11px}
+h2 .en{color:var(--mut);font-weight:600;font-size:11px}
+h3{font-size:11.5px;color:var(--ink2);margin-bottom:6px}
+.sub{margin:0 0 8px 30px;font-size:10.5px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:8px;
+padding:10px 12px;margin-top:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:860px){.grid2{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse;background:var(--paper);
+border:1px solid var(--line);border-radius:8px;overflow:hidden;font-size:11px}
+th{background:var(--soft);color:var(--ink2);text-align:left;padding:6px 8px;
+border-bottom:1px solid var(--line);font-size:10px;letter-spacing:.03em}
+td{padding:6px 8px;border-bottom:1px solid var(--paper2);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td.det{color:var(--ink2);font-size:10.5px}
+td.mut,.mut{color:var(--mut)}
+td.strike{color:var(--mut);text-decoration:line-through}
+.defect{border:1px solid var(--line);border-left:4px solid var(--mut);
+border-radius:6px;background:var(--paper);padding:8px 10px;margin:6px 0}
+.defect.bad{border-left-color:var(--bad)}
+.defect.warn{border-left-color:var(--warn)}
+.defect.ok{border-left-color:var(--ok)}
+.defect .det{color:var(--ink2);font-size:10.5px;margin-top:2px}
+footer{position:fixed;bottom:0;left:0;right:0;height:34px;display:flex;
+align-items:center;gap:14px;padding:0 14px;background:var(--paper);
+border-top:1px solid var(--line);font-size:9.5px;color:var(--mut)}
+a{color:var(--acc);text-decoration:none}
+.toc{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0}
+.toc a{border:1px solid var(--line);border-radius:6px;padding:3px 9px;
+background:var(--paper);font-size:10.5px}
+</style></head><body>
+<header>
+ <div class="logo"><span class="sq">B7</span>Batch 307 · TW Active ETF Registry + VRN Data Cross-Validation <span class="mut">U/I Matrix</span></div>
+ <div class="badges">
+  <span class="badge ok dot">TWSE OpenAPI Live · 271 Rows</span>
+  <span class="badge ok dot">Multi-Method · 6 Lanes</span>
+  <span class="badge bad dot">Verdict · 有不合(見缺陷帳)</span>
+  <span class="badge mut">誠實三態 SKIP 不代設</span>
+ </div>
+</header>
+<main>
+ <div class="statrow">
+  <div class="stat"><div class="v">38</div><div class="zh">主動式 ETF 冊載檔數(38=37 冊+1 新收)</div></div>
+  <div class="stat"><div class="v okc">33</div><div class="zh">VERIFIED_OPENAPI(官方實連定奪)</div></div>
+  <div class="stat"><div class="v warnc">6</div><div class="zh">官方改正(種子/冊載名≠官方)</div></div>
+  <div class="stat"><div class="v">5</div><div class="zh">誠實候驗(名錄查無不定奪)</div></div>
+  <div class="stat"><div class="v okc">23</div><div class="zh">檢項 PASS</div></div>
+  <div class="stat"><div class="v warnc">4</div><div class="zh">檢項 WARN 註記</div></div>
+  <div class="stat"><div class="v badc">1</div><div class="zh">檢項 FAIL(缺陷帳)</div></div>
+ </div>
+ <div class="toc"><a href="#甲">甲 ETF 清單</a><a href="#乙">乙 Basic Info</a>
+ <a href="#丙">丙 Summary</a><a href="#丁">丁 Financial</a>
+ <a href="#缺">缺陷帳 Defect Ledger</a><a href="#法">方法冊 Method Lanes</a></div>
+ <section id="甲"><h2><span class="secno">甲</span> ETF清單 <span class="en">TW Active ETF Registry Update</span></h2><div class="mut sub">FLOW_ENG023 --refresh 實連 TWSE OpenAPI+獨立快照互證</div><table><thead><tr><th style="width:44px">檢號</th><th style="width:250px">檢項 Check</th><th style="width:120px">方法道 Lane</th><th style="width:104px">判定</th><th>證跡 Evidence</th></tr></thead><tbody><tr><td class="mono">E1</td><td>快照筆數=引擎收錄筆數</td><td class="mut">法二 獨立傳輸</td><td><span class="badge dot ok">PASS 合</span></td><td class="det">curl 快照 271 筆 = 引擎 rows_fetched 271(異傳輸同數)</td></tr><tr><td class="mono">E2</td><td>官方主動式全集=冊內 VERIFIED 全集</td><td class="mut">法一×法二 集合雙射</td><td><span class="badge dot ok">PASS 合</span></td><td class="det">兩集合相等,33 檔(不多不少)</td></tr><tr><td class="mono">E3</td><td>VERIFIED 名碼逐檔=官方簡稱</td><td class="mut">法二 逐檔核對</td><td><span class="badge dot ok">PASS 合</span></td><td class="det">33 檔逐一相符(含 3 檔種子三環錯位改正+3 檔債/多資產名改正)</td></tr><tr><td class="mono">E4</td><td>00980A/981A/982A 衝突定奪(矩陣=官方≠種子)</td><td class="mut">三源定奪</td><td><span class="badge dot ok">PASS 合</span></td><td class="det">官方證實批104矩陣對映、種子冊為三環錯位</td></tr><tr><td class="mono">E5</td><td>候驗條目皆官方名錄查無(誠實不定奪)</td><td class="mut">誠實界線</td><td><span class="badge dot ok">PASS 合</span></td><td class="det">候驗 5 檔(00998A,00980D,00981D,00985D,00986D)上市名錄皆查無;TPEx 開放集亦無主動式</td></tr><tr><td class="mono">E6</td><td>引擎快取體=獨立快照(代號全集)</td><td class="mut">法一×法二 異傳輸</td><td><span class="badge dot ok">PASS 合</span></td><td class="det">兩道各 271 筆、基金代號全集一致(SuperAccel v0103 道 vs curl 道)</td></tr><tr><td class="mono">E7</td><td>官方出表日期時效(民國紀年→西元)</td><td class="mut">法五 規則冊</td><td><span class="badge dot ok">PASS 合</span></td><td class="det">出表日期 1150901(民國 115 年=2026 西元)</td></tr></tbody></table><div class="grid2"><div class="card"><h3>官方改正 Name Corrections(官方名錄為準)</h3><table><thead><tr><th>代號</th><th>冊載(改前)</th><th>官方(改後)</th><th>定奪</th></tr></thead><tbody><tr><td class="mono">00980A</td><td class="strike">主動統一台股增長</td><td><b>主動野村臺灣優選</b></td><td>矩陣證實</td></tr><tr><td class="mono">00981A</td><td class="strike">主動群益台灣強棒</td><td><b>主動統一台股增長</b></td><td>矩陣證實</td></tr><tr><td class="mono">00982A</td><td class="strike">主動野村臺灣優選</td><td><b>主動群益台灣強棒</b></td><td>矩陣證實</td></tr><tr><td class="mono">00982D</td><td class="strike">主動群益優選非投等債</td><td><b>主動富邦動態入息</b></td><td>官方改正</td></tr><tr><td class="mono">00983D</td><td class="strike">主動中信優選投等債</td><td><b>主動富邦複合收益</b></td><td>官方改正</td></tr><tr><td class="mono">00984D</td><td class="strike">主動安聯美元債</td><td><b>主動聯博全球非投</b></td><td>官方改正</td></tr></tbody></table></div><div class="card"><h3>誠實候驗 Pending(名錄查無不定奪)</h3><table><thead><tr><th>代號</th><th>冊載名</th><th>候驗註</th></tr></thead><tbody><tr><td class="mono">00998A</td><td>主動復華金融股息</td><td class="mut">TWSE 上市名錄查無此代號(2026-09-02 04:35)——維持候驗(或屬上櫃/未上市,誠實不定奪)</td></tr><tr><td class="mono">00980D</td><td>主動野村優選非投等債</td><td class="mut">TWSE 上市名錄查無此代號(2026-09-02 04:35)——維持候驗(或屬上櫃/未上市,誠實不定奪)</td></tr><tr><td class="mono">00981D</td><td>主動統一美債</td><td class="mut">TWSE 上市名錄查無此代號(2026-09-02 04:35)——維持候驗(或屬上櫃/未上市,誠實不定奪)</td></tr><tr><td class="mono">00985D</td><td>主動野村全球債</td><td class="mut">TWSE 上市名錄查無此代號(2026-09-02 04:35)——維持候驗(或屬上櫃/未上市,誠實不定奪)</td></tr><tr><td class="mono">00986D</td><td>主動第一金優選債</td><td class="mut">TWSE 上市名錄查無此代號(2026-09-02 04:35)——維持候驗(或屬上櫃/未上市,誠實不定奪)</td></tr></tbody></table><h3 style="margin-top:10px">名錄新收 Newly Listed</h3><table><thead><tr><th>代號</th><th>官方簡稱</th><th>基金類型</th></tr></thead><tbody><tr><td class="mono">00409A</td><td>主動復華全球50</td><td class="mut">國外成分證券主動式交易所交易基金(股票)</td></tr></tbody></table></div></div></section><section id="乙"><h2><span class="secno">乙</span> BASIC INFO <span class="en">VRN Basic Info</span></h2><div class="mut sub">StockReportBasicInfo CSV↔JSON↔sha 副本+規則冊+官方在籍</div><table><thead><tr><th style="width:44px">檢號</th><th style="width:250px">檢項 Check</th><th style="width:120px">方法道 Lane</th><th style="width:104px">判定</th><th>證跡 Evidence</th></tr></thead><tbody><tr><td class="mono">B1</td><td>CSV(stdlib)=JSON 逐列逐欄</td><td class="mut">法三 CSV↔JSON</td><td><span class="badge dot ok">PASS 合</span></td><td class="det">76 列 × 13 欄全等(兩格式互證)</td></tr><tr><td class="mono">B2</td><td>自寫 RFC4180 狀態機=stdlib csv</td><td class="mut">法三 雙解析器</td><td><span class="badge dot ok">PASS 合</span></td><td class="det">76 列獨立解析全等(引號跳脫/欄內逗號含)</td></tr><tr><td class="mono">B3</td><td>sha 副本檔名內嵌雜湊+內容等價</td><td class="mut">法四 雜湊</td><td><span class="badge dot ok">PASS 合</span></td><td class="det">內容等價;檔名 sha1f5033b1 命中 副本 sha256 前 8 碼</td></tr><tr><td class="mono">B4</td><td>欄位規則逐列驗(代號/日期/雜湊/風險燈)</td><td class="mut">法五 規則冊</td><td><span class="badge dot ok">PASS 合</span></td><td class="det">76 列全過:Ticker 數碼制、ReportDate ISO、FileHash hex64、風險燈 G/Y/R</td></tr><tr><td class="mono">B5</td><td>全欄重複列=0</td><td class="mut">法五 規則冊</td><td><span class="badge dot ok">PASS 合</span></td><td class="det">76 列無全欄重複(TEMP_PREVIEW/CANDIDATE 雙相位同檔屬設計)</td></tr><tr><td class="mono">B6</td><td>Ticker 官方名錄在籍(上市+上櫃+興櫃)</td><td class="mut">法六 官方在籍</td><td><span class="badge dot warn">WARN 註記</span></td><td class="det">31/32 在籍;三名錄皆查無:[&#x27;2026&#x27;]</td></tr><tr><td class="mono">B7</td><td>年份誤植入 Ticker 欄(真缺陷,候修)</td><td class="mut">缺陷鑑別</td><td><span class="badge dot bad">FAIL 不合</span></td><td class="det">檔名年份被抓成代號:2026←3 列(如「第一場 2026年投資大趨勢 - 華南投顧 -1141201.pdf…」)——市場總覽/會議簡報應 Ticker 留空(如既有盤勢分析列)</td></tr></tbody></table></section><section id="丙"><h2><span class="secno">丙</span> SUMMARY <span class="en">VRN Summary (Research Report SSOT)</span></h2><div class="mut sub">v2 世代鏈 sha256+schema 冊+沿革</div><table><thead><tr><th style="width:44px">檢號</th><th style="width:250px">檢項 Check</th><th style="width:120px">方法道 Lane</th><th style="width:104px">判定</th><th>證跡 Evidence</th></tr></thead><tbody><tr><td class="mono">S1</td><td>世代正典檔 sha256=指標檔宣告</td><td class="mut">法四 雜湊</td><td><span class="badge dot ok">PASS 合</span></td><td class="det">VRN_ResearchReport_SSOT.v2.records64.v0155.2f771c00c6dd8d6e.jsonl:重算 2f771c00c6dd8d6e…=宣告(64 位全等)+檔名內嵌前 16 碼命中</td></tr><tr><td class="mono">S2</td><td>JSONL 逐行可解析+記錄數=宣告</td><td class="mut">法五 規則冊</td><td><span class="badge dot ok">PASS 合</span></td><td class="det">64 行全解析,=指標宣告 64</td></tr><tr><td class="mono">S3</td><td>schema 雙檔 sha256=指標宣告</td><td class="mut">法四 雜湊</td><td><span class="badge dot ok">PASS 合</span></td><td class="det">record.schema 合;schema.full 合</td></tr><tr><td class="mono">S4</td><td>必要欄全在+無冊外欄名</td><td class="mut">法五 規則冊</td><td><span class="badge dot ok">PASS 合</span></td><td class="det">64 記錄 × 必要欄 4 全在;欄名皆屬 schema 52 欄冊</td></tr><tr><td class="mono">S5</td><td>v2 工作檔=世代正典檔(byte 級)</td><td class="mut">法三 雙位置</td><td><span class="badge dot ok">PASS 合</span></td><td class="det">VRN_ResearchReport_SSOT.v2.jsonl 與 VRN_ResearchReport_SSOT.v2.records64.v0155.2f771c00c6dd8d6e.jsonl byte-exact</td></tr><tr><td class="mono">S6</td><td>60→64 增量沿革一致(舊版=pre_promote)</td><td class="mut">法五 沿革</td><td><span class="badge dot ok">PASS 合</span></td><td class="det">舊版 60 記錄=pre_promote 60;世代 64;authority=v0155_INCREMENTAL_64_RECORDS</td></tr></tbody></table></section><section id="丁"><h2><span class="secno">丁</span> FINANCIAL <span class="en">VRN Financial Data</span></h2><div class="mut sub">SSOT 契約+抽取事實列規則+雙欄互證+跨集參照</div><table><thead><tr><th style="width:44px">檢號</th><th style="width:250px">檢項 Check</th><th style="width:120px">方法道 Lane</th><th style="width:104px">判定</th><th>證跡 Evidence</th></tr></thead><tbody><tr><td class="mono">F1</td><td>SSOT 契約 18 核心欄冊完整無重</td><td class="mut">法五 契約冊</td><td><span class="badge dot ok">PASS 合</span></td><td class="det">18 欄(宣告 18):report_id,ticker,company_name,report_date,statement_type,account_raw…</td></tr><tr><td class="mono">F2</td><td>正典 parquet 工作站在位(倉內誠實不在)</td><td class="mut">誠實界線</td><td><span class="badge dot warn">WARN 註記</span></td><td class="det">契約載 3 候選路徑(C:\…工作站);倉內以 01_repair 抽取事實列驗證</td></tr><tr><td class="mono">F3</td><td>JSONL 逐行解析+欄冊固定 11 欄</td><td class="mut">法五 規則冊</td><td><span class="badge dot ok">PASS 合</span></td><td class="det">189 列全解析,欄冊恆定 11 欄(含 value/unit/start_offset)</td></tr><tr><td class="mono">F4</td><td>值域規則(信度 0&lt;c≤1/識別碼制/數值/期別語意)</td><td class="mut">法五 規則冊</td><td><span class="badge dot ok">PASS 合</span></td><td class="det">189 列全過(metric 分佈:EPS×92,GROSS_MARGIN×40,REVENUE×36,OPERATING_MARGIN×10,NET_INCOME×9)</td></tr><tr><td class="mono">F7</td><td>value 正規值=raw_value 重解析</td><td class="mut">法三 雙欄互證</td><td><span class="badge dot ok">PASS 合</span></td><td class="det">189 列正規值與原始字串重解析全等(零漂移)</td></tr><tr><td class="mono">F8</td><td>期別表面制式並存清點(候標準化)</td><td class="mut">法五 制式清點</td><td><span class="badge dot warn">WARN 註記</span></td><td class="det">5 制式並存:{&#x27;缺&#x27;: 102, &#x27;YYYY&#x27;: 52, &#x27;YYQn&#x27;: 13, &#x27;FYnn&#x27;: 1, &#x27;nQYY&#x27;: 10, &#x27;YYYYQn&#x27;: 11}——下游 financial_data_standardization 候整備</td></tr><tr><td class="mono">F5</td><td>item_id 全域唯一</td><td class="mut">法五 規則冊</td><td><span class="badge dot ok">PASS 合</span></td><td class="det">189 筆識別碼零重複</td></tr><tr><td class="mono">F6</td><td>抽取事實檔名全數見於 BASIC INFO 冊</td><td class="mut">法六 跨集參照</td><td><span class="badge dot warn">WARN 註記</span></td><td class="det">34/38 對上;冊外:[&#x27;華南投顧-2762-世界健身-KY-Memo-20251209.docx&#x27;, &#x27;華南投顧-3038-全台-Memo-20251209.docx&#x27;, &#x27;華南投顧-3675-德微-Memo-20260518.docx&#x27;]</td></tr></tbody></table></section>
+ <section id="缺"><h2><span class="secno">戊</span> 缺陷帳 <span class="en">Defect Ledger(FAIL=候修;WARN=誠實註記)</span></h2>
+  <div class="defect bad"><b>B7 年份誤植入 Ticker 欄(真缺陷,候修)</b><div class="det">檔名年份被抓成代號:2026←3 列(如「第一場 2026年投資大趨勢 - 華南投顧 -1141201.pdf…」)——市場總覽/會議簡報應 Ticker 留空(如既有盤勢分析列)</div></div><div class="defect warn"><b>B6 Ticker 官方名錄在籍(上市+上櫃+興櫃)</b><div class="det">31/32 在籍;三名錄皆查無:[&#x27;2026&#x27;]</div></div><div class="defect warn"><b>F2 正典 parquet 工作站在位(倉內誠實不在)</b><div class="det">契約載 3 候選路徑(C:\…工作站);倉內以 01_repair 抽取事實列驗證</div></div><div class="defect warn"><b>F8 期別表面制式並存清點(候標準化)</b><div class="det">5 制式並存:{&#x27;缺&#x27;: 102, &#x27;YYYY&#x27;: 52, &#x27;YYQn&#x27;: 13, &#x27;FYnn&#x27;: 1, &#x27;nQYY&#x27;: 10, &#x27;YYYYQn&#x27;: 11}——下游 financial_data_standardization 候整備</div></div><div class="defect warn"><b>F6 抽取事實檔名全數見於 BASIC INFO 冊</b><div class="det">34/38 對上;冊外:[&#x27;華南投顧-2762-世界健身-KY-Memo-20251209.docx&#x27;, &#x27;華南投顧-3038-全台-Memo-20251209.docx&#x27;, &#x27;華南投顧-3675-德微-Memo-20260518.docx&#x27;]</div></div>
+ </section>
+ <section id="法"><h2><span class="secno">己</span> 方法冊 <span class="en">Method Lanes(獨立道互證)</span></h2>
+  <table><tbody><tr><td style="white-space:nowrap"><b>法一 引擎道</b></td><td class="mut">FLOW_ENG023 --refresh 經 SUP_MDL737 v0103 fetch(同意閘+UA 修補+WAF 快取自癒)</td></tr><tr><td style="white-space:nowrap"><b>法二 獨立傳輸</b></td><td class="mut">curl 快照(異 UA/異工具/異時點)重解析互比</td></tr><tr><td style="white-space:nowrap"><b>法三 雙解析器/雙欄</b></td><td class="mut">stdlib csv/json vs 自寫 RFC4180 狀態機;value↔raw_value 互證</td></tr><tr><td style="white-space:nowrap"><b>法四 雜湊鏈</b></td><td class="mut">sha256 重算 vs SSOT 指標檔宣告+檔名內嵌雜湊</td></tr><tr><td style="white-space:nowrap"><b>法五 規則冊</b></td><td class="mut">欄位格式/值域/制式/沿革逐列驗</td></tr><tr><td style="white-space:nowrap"><b>法六 官方在籍/跨集</b></td><td class="mut">TWSE 上市+TPEx 上櫃/興櫃名錄實連;跨資料集參照完整性</td></tr></tbody></table>
+ </section>
+</main>
+<footer>
+ <span>批307 · 2026-09-02 04:46 產</span>
+ <span>核驗核心:validation/VIA_Batch307_TWActiveETF_VRN_CrossValidation/batch307_crossvalidate_core.py</span>
+ <span>真值:TW_Active_ETF_Registry_v0100.json(as_of 2026-09-02 04:35)+Batch307_CrossValidation_Results.json</span>
+ <span style="margin-left:auto">零手寫數字 · 全靜態自真值渲染</span>
+</footer>
+</body></html>

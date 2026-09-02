@@ -125,24 +125,61 @@ def cmd_refresh() -> int:
 
         for r in rows:
             code, name = _code(r), _name(r)
-            # 主動式台股 ETF:代號尾 A 且任一名稱欄含「主動」
-            if code.endswith("A") and "主動" in name and code not in known:
-                reg["etfs"].append({"ticker": code, "name": name, "issuer": "",
-                                    "status": "VERIFIED_OPENAPI"})
+            # 主動式 ETF:代號尾 A(股票)/D(債・多重資產)且任一名稱欄含「主動」
+            if code[-1:] in ("A", "D") and "主動" in name and code not in known:
+                e_new = {"ticker": code, "name": name, "issuer": "",
+                         "status": "VERIFIED_OPENAPI", "verified": True,
+                         "verify_note": f"TWSE OpenAPI 名錄新收 {NOW}"}
+                t = str(r.get("基金類型", "")).strip()
+                if t:
+                    e_new["official_type"] = t
+                reg["etfs"].append(e_new)
                 n_new += 1
-        codes_in_rows = {_code(r) for r in rows}
+        # 批307:候驗條目實連定奪——種子/批104 冊載名以官方名錄為準(誠實留痕不發明)
+        by_code = {}
+        for r in rows:
+            c = _code(r)
+            if c:
+                by_code[c] = r
+        PENDING = ("SEED_KNOWN", "PENDING_VERIFY", "CONFLICT_PENDING_VERIFY")
+        n_confirmed = n_corrected = 0
         for e in reg["etfs"]:
-            if e.get("status") == "SEED_KNOWN" and e["ticker"] in codes_in_rows:
+            if e.get("status") not in PENDING:
+                continue
+            r = by_code.get(e["ticker"])
+            if r is None:
+                e["verify_note"] = f"TWSE 上市名錄查無此代號({NOW})——維持候驗(或屬上櫃/未上市,誠實不定奪)"
+                continue
+            off_name = _name(r)
+            t = str(r.get("基金類型", "")).strip()
+            if t:
+                e["official_type"] = t
+            if off_name == e.get("name"):
                 e["status"] = "VERIFIED_OPENAPI"
+                e["verified"] = True
+                e["verify_note"] = f"TWSE OpenAPI 實連核對 {NOW}:名碼相符"
+                n_confirmed += 1
+            else:
+                e["seed_name"] = e.get("name", "")
+                e["name"] = off_name
+                e["status"] = "VERIFIED_OPENAPI_NAME_CORRECTED"
+                e["verified"] = True
+                e["verify_note"] = (f"TWSE OpenAPI 實連核對 {NOW}:官方名「{off_name}」"
+                                    f"≠冊載「{e['seed_name']}」——官方為準改正")
+                if e.get("matrix_name") == off_name:
+                    e["verify_note"] += ";批104 矩陣對映經官方證實"
+                n_corrected += 1
         reg["as_of"] = NOW
-        reg["verify_required"] = any(e.get("status") == "SEED_KNOWN" for e in reg["etfs"])
+        reg["verify_required"] = any(e.get("status") in PENDING for e in reg["etfs"])
         reg["history"].append({"op": "refresh", "ts": NOW, "new": n_new,
+                               "confirmed": n_confirmed, "corrected": n_corrected,
                                "rows_fetched": len(rows)})
         save_registry(reg)
-        n_ver = sum(1 for e in reg["etfs"] if e.get("status") == "VERIFIED_OPENAPI")
-        n_seed = sum(1 for e in reg["etfs"] if e.get("status") == "SEED_KNOWN")
-        print(f"  [更新] 名錄收 {len(rows)} 筆 · 新增 {n_new} · 總 {len(reg['etfs'])} 檔"
-              f"(VERIFIED {n_ver} · 種子候校驗 {n_seed})")
+        n_ver = sum(1 for e in reg["etfs"] if str(e.get("status", "")).startswith("VERIFIED_OPENAPI"))
+        n_seed = sum(1 for e in reg["etfs"] if e.get("status") in PENDING)
+        print(f"  [更新] 名錄收 {len(rows)} 筆 · 新增 {n_new} · 核符 {n_confirmed}"
+              f" · 官方改正 {n_corrected} · 總 {len(reg['etfs'])} 檔"
+              f"(VERIFIED {n_ver} · 候校驗 {n_seed})")
         if n_ver == 0:
             print("  [診斷] 零筆校驗成——端點資料集可能非 ETF 名錄或欄名不符;"
                   "首筆欄名:" + (",".join(list(rows[0].keys())[:6]) if rows else "空"))
