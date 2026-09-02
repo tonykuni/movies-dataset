@@ -62,6 +62,8 @@ Step "⑤ 對帳"                      (Newest $ENG "VDF_ENG055_OmniFetch_v*.py"
 Add-Content $LOG "--- ⑨ 同步 UI 重生(批168)"
 Step "⑨a 五系統分頁"               (Newest $REG "CGC_MDL088_SystemTestPages_v*.py") @("run")
 Step "⑨b 系統樞紐"                 (Newest $REG "CGC_MDL090_SystemHub_v*.py") @("run")
+Step "⑨b2 統一殼四頁(批324)"     (Newest $REG "CGC_MDL116_UnifiedShell_v*.py") @()
+Step "⑨b3 治理主控台(批324)"      (Newest $REG "CGC_MDL105_GovernanceConsole_v*.py") @()
 Step "⑨c 儀表板"                   (Newest (Join-Path $VIA "functional modules\VAP\engine") "VAP_ENG009_DashboardUI_v*.py") @("run")
 Step "⑨d 每日觀察"                 (Newest $VRN "VRN_ENG068_DailyBrief_v*.py") @("run")
 # 批270:⑩ 上線分析組——新功能掛日更(資料鮮→分析頁自動鮮;全零網路在庫 join)

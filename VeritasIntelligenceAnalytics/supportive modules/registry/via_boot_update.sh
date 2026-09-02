@@ -80,6 +80,8 @@ PYENV
   REG="$VIA/supportive modules/registry"
   python3 "$(ls "$REG"/CGC_MDL088_SystemTestPages_v*.py | sort | tail -1)" run
   python3 "$(ls "$REG"/CGC_MDL090_SystemHub_v*.py | sort | tail -1)" run
+  python3 "$(ls "$REG"/CGC_MDL116_UnifiedShell_v*.py | sort | tail -1)"   # ⑨b2 統一殼四頁(批324)
+  python3 "$(ls "$REG"/CGC_MDL105_GovernanceConsole_v*.py | sort | tail -1)"   # ⑨b3 治理主控台(批324)
   python3 "$(ls "$VIA/functional modules/VAP/engine"/VAP_ENG009_DashboardUI_v*.py | sort | tail -1)" run
   python3 "$(ls "$VIA/functional modules/VRN"/VRN_ENG068_DailyBrief_v*.py | sort | tail -1)" run
   # 批270:⑩ 上線分析組——新功能掛日更(資料鮮→分析頁自動鮮;零網路在庫 join)
