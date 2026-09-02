@@ -629,14 +629,15 @@ def load_flows():
     import duckdb
     import pandas as pd
     try:
-        c = duckdb.connect(str(DB), read_only=True)
+        c = duckdb.connect(str(DB_TW), read_only=True)
         fl = c.execute("""
             SELECT i.date, i.code AS ticker, i.foreign_net, i.trust_net,
                    i.dealer_net, m.margin_bal, m.short_bal
             FROM tw_chip_inst i
             LEFT JOIN tw_chip_margin m USING (date, code)""").df()
         c.close()
-    except Exception:
+    except Exception as exc:
+        print(f"  [金流] 誠實缺:{type(exc).__name__}: {str(exc)[:80]}")
         return pd.DataFrame()
     fl["date"] = pd.to_datetime(fl["date"])
     fl["ticker"] = fl["ticker"].astype(str)
