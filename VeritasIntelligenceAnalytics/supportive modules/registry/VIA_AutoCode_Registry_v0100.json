@@ -5522,6 +5522,27 @@
    "ts": "2026-09-02 09:16",
    "name": "實錄:v0103 工人 1 秒退碼 1=自前進路徑 -SyncNote 值「-SkipSync」被 -File 綁定器當參數名",
    "note": "v0104:派工值 Safe-Val 去首字 '-'/雙引號;派工命令列寫 log;工人 try/catch 落 log 並寫畢記;提前退出印同窗重現指令(-Foreground)。啟動器誠實偵測工人早退=功能正確(未假綠)。"
+  },
+  {
+   "code": "TOOL-320",
+   "kind": "批321 管線 v0105 庫鎖律",
+   "ts": "2026-09-02 09:47",
+   "name": "實錄根因:DuckDB 單寫者鎖(python PID 15932=VIA-ALL 背景日更鏈同時寫庫)→①b 2 批後炸,①c~①g/②b/③ 連鎖 FAIL(彙總 OK3/FAIL5/SKIP4 誠實)",
+   "note": "v0105:寫庫節前 Wait-DbFree 探針(db_probe.py 開庫試;忙=印持有者 PID+命令列;15s 輪詢至多 20 分)+每節 stderr 命中鎖樣式=等 30s 重跑至多 40 次(Step→Step-Once 外殼)+不殺他人進程律。"
+  },
+  {
+   "code": "ENG-071-v0101",
+   "kind": "批321 回測自測誠實停",
+   "ts": "2026-09-02 09:47",
+   "name": "實錄:存證缺時 selftest IndexError 裸 traceback→v0101 存證零檔=誠實停 rc2;六檢綠",
+   "note": "v0100 零觸碰"
+  },
+  {
+   "code": "ENG-054-v0102",
+   "kind": "批321 回補庫鎖律",
+   "ts": "2026-09-02 09:47",
+   "name": "connect_retry 6s×20 重試印持有者;逾額 DbBusy 誠實 rc3(checkpoint 留;重跑續補);八檢綠(-W error)",
+   "note": "v0101 零觸碰"
   }
  ]
 }
