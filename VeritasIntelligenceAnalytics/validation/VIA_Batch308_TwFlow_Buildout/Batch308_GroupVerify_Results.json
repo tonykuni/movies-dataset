@@ -1,0 +1,62 @@
+{
+ "schema": "batch308-group-verify-v1",
+ "ts": "2026-09-02 05:22:13",
+ "provenance": {
+  "TWSE": "LIVE",
+  "TPEX": "LIVE",
+  "EMG": "LIVE"
+ },
+ "counts": {
+  "PASS": 4,
+  "FAIL": 0,
+  "WARN": 3,
+  "SKIP": 0
+ },
+ "verdict": "GREEN_WITH_NOTES",
+ "n_groups": 31,
+ "n_members": 149,
+ "checks": [
+  {
+   "id": "G1",
+   "name": "149 成員代號官方在籍(上市+上櫃+興櫃聯集)",
+   "status": "WARN",
+   "detail": "147/149 在籍;查無已標旗候操作員:[('6562', '聯亞藥'), ('2569', '揚智')]"
+  },
+  {
+   "id": "G2",
+   "name": "市場歸屬 TWSE/TPEX=官方名錄",
+   "status": "PASS",
+   "detail": "上市/上櫃歸屬全對(興櫃標旗候操作員 1 檔)"
+  },
+  {
+   "id": "G3",
+   "name": "名稱=官方簡稱(全等;包含=變體;錯配標旗=WARN)",
+   "status": "WARN",
+   "detail": "全等 144;變體/已標旗 5:[('5347', '世界先進', '世界'), ('2327', '國巨', '國巨*'), ('2646', '星宇', '星宇航空')]"
+  },
+  {
+   "id": "G4",
+   "name": "yfinance 後綴制(.TW 上市/.TWO 上櫃)",
+   "status": "PASS",
+   "detail": "149 檔全符 VDF 擷取分道制"
+  },
+  {
+   "id": "G5",
+   "name": "代號制式(SSOT 抽取鎖×官方在籍雙域)",
+   "status": "WARN",
+   "detail": "抽取鎖排除 202X(防年份誤抓)與真實代號碰撞 3 檔:['2023', '2029', '2028']——官方在籍屬名錄域合法;VRN 文本抽取域對此三碼不可抓(已知代價)"
+  },
+  {
+   "id": "G6",
+   "name": "群內零重複(跨群多屬=常態)",
+   "status": "PASS",
+   "detail": "群內重複 0;跨群多屬 1 檔(供應鏈多題材常態)"
+  },
+  {
+   "id": "G7",
+   "name": "每群有領頭(role=LEADER)",
+   "status": "PASS",
+   "detail": "31 群皆有領頭(共 41)"
+  }
+ ]
+}

@@ -18,6 +18,10 @@
   --refresh             線上更新清單(同意閘;TWSE OpenAPI 名錄端點)
   --ingest <json>       餵數據(rows:date,ticker,nav,units_out,
                         foreign_net,invest_trust_net,dealer_net)
+  --ingest-openapi      批308:官方自動餵入——t187ap47_L 發行單位數
+                        +STOCK_DAY_ALL 收盤(NAV 代理,誠實標
+                        PROXY_CLOSE)→ 數據庫列+冊上 units/nav 蓋章
+                        (供 via-flowops --coverage 稽核 COMPUTABLE)
   --flows               資金流矩陣(方向+規模:%AUM+z)
   --selftest            六檢
 """
@@ -212,6 +216,75 @@ def cmd_ingest(path: str) -> int:
     return 0
 
 
+def cmd_ingest_openapi() -> int:
+    """批308:官方單位數+收盤自動餵入(同意閘)——ETF AUM/資金流可算化。
+
+    式:AUM≈單位數×收盤(NAV 代理);申贖流≈Δ單位數×NAV(既有式)。
+    誠實:收盤=NAV 代理標 PROXY_CLOSE(折溢價未拆);缺價/缺單位=誠實跳。
+    """
+    reg = load_registry()
+    if VIA_ACCEL is None:
+        print("  [SKIP] SuperAccel 未載——無網路道(誠實)")
+        return 0
+    raw = VIA_ACCEL.fetch(ENDPOINTS["twse_etf_list"], timeout=60, cache=False)
+    raw_px = VIA_ACCEL.fetch("https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL",
+                             timeout=60, cache=False)
+    if not raw or not raw_px:
+        print("  [SKIP] 官方端點未達(同意閘未開/限流;誠實缺席)")
+        return 0
+    try:
+        units_rows = json.loads(raw)
+        px_rows = json.loads(raw_px)
+    except Exception as e:
+        print(f"  [FAIL] 解析:{e}")
+        return 2
+    units = {}
+    date = ""
+    for r in units_rows:
+        c = str(r.get("基金代號", "")).strip()
+        d = str(r.get("出表日期", "")).strip()
+        try:
+            u = float(str(r.get("發行單位數/轉換數", "")).replace(",", ""))
+        except ValueError:
+            continue
+        if c and u:
+            units[c] = u
+            date = date or d
+    if len(date) == 7 and date.isdigit():  # 民國→西元
+        date = f"{int(date[:3]) + 1911}-{date[3:5]}-{date[5:7]}"
+    close = {}
+    for r in px_rows:
+        try:
+            close[str(r.get("Code", "")).strip()] = float(str(r.get("ClosingPrice", "")))
+        except ValueError:
+            continue
+    db = json.loads(DATA_PATH.read_text(encoding="utf-8")) if DATA_PATH.exists() else {"rows": []}
+    seen = {(r.get("date"), r.get("ticker")) for r in db["rows"]}
+    n_row = n_stamp = n_skip = 0
+    for e in reg["etfs"]:
+        t = e["ticker"]
+        u, px = units.get(t), close.get(t)
+        if not u or px is None:
+            n_skip += 1
+            continue
+        if (date, t) not in seen:
+            db["rows"].append({"date": date, "ticker": t, "nav": px, "units_out": u,
+                               "nav_basis": "PROXY_CLOSE"})
+            seen.add((date, t))
+            n_row += 1
+        e["units"] = u          # 冊上蓋章:via-flowops --coverage 讀此二欄
+        e["nav"] = px
+        e["units_asof"] = date
+        e["nav_basis"] = "PROXY_CLOSE(收盤代理;折溢價未拆,誠實標記)"
+        n_stamp += 1
+    CFG.mkdir(parents=True, exist_ok=True)
+    DATA_PATH.write_text(json.dumps(db, ensure_ascii=False, indent=1), encoding="utf-8")
+    save_registry(reg)
+    print(f"  [餵入] {date} · 數據列 +{n_row} · 冊上蓋章 {n_stamp} 檔 · 缺價/單位誠實跳 {n_skip} 檔")
+    print(f"  [式] AUM≈單位數×收盤(NAV 代理 PROXY_CLOSE);申贖流≈Δ單位數×NAV(逐日累積後可算)")
+    return 0
+
+
 def compute_flows(rows: list) -> list:
     """申贖流 ≈ Δunits_out × NAV;方向=正負;規模=%AUM+橫斷 z。"""
     by_t = {}
@@ -315,6 +388,8 @@ def main() -> int:
         return cmd_refresh()
     if a[0] == "--ingest" and len(a) > 1:
         return cmd_ingest(a[1])
+    if a[0] == "--ingest-openapi":
+        return cmd_ingest_openapi()
     if a[0] == "--flows":
         return cmd_flows()
     print(__doc__)
