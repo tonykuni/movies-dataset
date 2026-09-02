@@ -1,0 +1,129 @@
+index e1ce224..5127c29 100644
+--- a/VeritasIntelligenceAnalytics/functional modules/VAP/engine/VAP_ENG014_StdDashboardTemplate_v0101.py	
++++ b/VeritasIntelligenceAnalytics/functional modules/VAP/engine/VAP_ENG014_StdDashboardTemplate_v0101.py	
+@@ -36,8 +36,12 @@ except Exception:
+ # ===== [VIA:ACCEL-BRIDGE:END] =====
+ 
+ import importlib.util
++import html
+ import json
++import os
++import re
+ import sys
++import tempfile
+ from datetime import datetime
+ from pathlib import Path
+ 
+@@ -88,8 +92,15 @@ def gather() -> dict:
+ 
+ 
+ def render(d: dict, po) -> str:
+-    pj = po.get_plotlyjs()                    # 內嵌單檔自足=零 CDN
+-    data_json = json.dumps(d, ensure_ascii=False)
++    # HTML parser 會在 JavaScript 字串中的 </script> 提前結束 script；資料與
++    # 內嵌函式庫都先中和該序列，避免在庫文字變成可執行標記。
++    pj = re.sub(r"(?i)</script", r"<\\/script", po.get_plotlyjs())
++    data_json = json.dumps(d, ensure_ascii=False, separators=(",", ":"))
++    data_json = (data_json.replace("<", "\\u003c")
++                 .replace(">", "\\u003e")
++                 .replace("&", "\\u0026")
++                 .replace("\u2028", "\\u2028")
++                 .replace("\u2029", "\\u2029"))
+     return """<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1">
+ <title>VIA 標準儀表板模板</title><style>
+@@ -201,8 +212,8 @@ p1(22);p2(0);p3();
+ </script></body></html>""" \
+         .replace("__PLOTLYJS__", pj) \
+         .replace("__DATA__", data_json) \
+-        .replace("__ASOF__", str(d["p1"]["asof"])) \
+-        .replace("__YM__", str(d["p2"]["ym"]))
++        .replace("__ASOF__", html.escape(str(d["p1"]["asof"]))) \
++        .replace("__YM__", html.escape(str(d["p2"]["ym"])))
+ 
+ 
+ def run() -> int:
+@@ -216,7 +227,21 @@ def run() -> int:
+         print(f"[標準模板] 在庫資料未備=誠實停({type(exc).__name__}):"
+               "先跑 via 日更後再產")
+         return 2
+-    OUT.write_text(render(d, po), encoding="utf-8")
++    content = render(d, po)
++    OUT.parent.mkdir(parents=True, exist_ok=True)
++    tmp_name = None
++    try:
++        with tempfile.NamedTemporaryFile("w", encoding="utf-8", dir=OUT.parent,
++                                         prefix=OUT.name + ".", suffix=".tmp",
++                                         delete=False) as fh:
++            fh.write(content)
++            fh.flush()
++            os.fsync(fh.fileno())
++            tmp_name = fh.name
++        os.replace(tmp_name, OUT)
++    finally:
++        if tmp_name and Path(tmp_name).exists():
++            Path(tmp_name).unlink()
+     kb = OUT.stat().st_size // 1024
+     print(f"[標準模板] 三頁 Plotly({len(d['p1']['labels'])} ETF/"
+           f"{len(d['p2']['code'])} 檔四象限/{len(d['p3']['gid'])} 族群)"
+@@ -241,6 +266,7 @@ def _data_ready() -> bool:
+ 
+ 
+ def selftest() -> int:
++    global OUT
+     fails = []
+ 
+     def chk(name, cond, note=""):
+@@ -249,17 +275,41 @@ def selftest() -> int:
+             fails.append(name)
+ 
+     src = Path(__file__).read_text(encoding="utf-8")
++    class _ProbePlotly:
++        @staticmethod
++        def get_plotlyjs():
++            return 'window.probe="</ScRiPt><img src=x onerror=1>";'
++    attack = "</script><img src=x onerror=1>\u2028&"
++    probe_data = {
++        "ts": attack,
++        "p1": {"labels": [attack], "upside": [1], "cov": [1],
++               "asof": attack},
++        "p2": {"yoy": [], "upside": [], "code": [], "ym": attack,
++               "quad": {}},
++        "p3": {"gid": [], "yoy_median": [], "members": []},
++    }
++    probe_page = render(probe_data, _ProbePlotly)
++    injection_safe = (attack not in probe_page
++                      and "</ScRiPt><img" not in probe_page
++                      and "\\u003c/script\\u003e" in probe_page
++                      and "&lt;/script&gt;" in probe_page)
+     if not _data_ready():
+         print("  [模式] 資料缺席(庫/表不在)=誠實缺料模式:驗誠實停行為")
+         rc = run()
+         chk("①' 誠實停(rc2+指路訊息,零裸 traceback)", rc == 2)
+         chk("②' 靜態紀律(零網路+加速橋+誠實宣告)",
+-            "ACCEL-BRIDGE" in src and "誠實" in src)
++            "ACCEL-BRIDGE" in src and "誠實" in src and injection_safe)
+         print(f"  [計] 誠實缺料二檢 OK {2 - len(fails)} · FAIL {len(fails)}"
+               "(全檢=資料在位環境跑)")
+         return 1 if fails else 0
+-    rc = run()
+-    page = OUT.read_text(encoding="utf-8") if OUT.exists() else ""
++    original_out = OUT
++    with tempfile.TemporaryDirectory() as directory:
++        OUT = Path(directory) / "VIA_UI_StdDashboard_v0100.html"
++        try:
++            rc = run()
++            page = OUT.read_text(encoding="utf-8") if OUT.exists() else ""
++        finally:
++            OUT = original_out
+     chk("① 引擎產出 rc0(plotly 在位+在庫資料)", rc == 0)
+     chk("② 階層規劃三層(L0 殼 grid+L1 左面板連結/參數+L2 多頁)",
+         'class="app"' in page and 'data-page="p1"' in page
+@@ -277,6 +327,7 @@ def selftest() -> int:
+     chk("⑥ 視覺鎖定元件類(nav-btn/card/field=b258 同款)+零網路+加速橋",
+         all(k in page for k in ("nav-btn", "card-h", "field"))
+         and "ACCEL-BRIDGE" in src
++        and injection_safe
+         and all(("import " + k) not in src for k in ("requests", "httpx")))
+     print(f"  [計] 六檢 OK {6 - len(fails)} · FAIL {len(fails)}")
+     return 1 if fails else 0
