@@ -434,6 +434,34 @@ def classify_story(px, stories: dict):
                      "lead_gap": round(lead_gap, 2), "collapsed": bool(collapse),
                      "leaders": [r for r in m.loc[m["role"] == "LEADER",
                                                   "ticker"]][:6]})
+    # 父群匯總列(批309):成員全被子群取走的父群=以全冊成員算 PC1/覆蓋,
+    # 領頭=子群領頭聯集(父群保留供匯總律)
+    kids_of: dict = {}
+    for nm, mt in STORY_META.items():
+        if mt.get("level") == 2 and mt.get("parent"):
+            kids_of.setdefault(mt["parent"], []).append(nm)
+    done = {x["story"] for x in summ}
+    for pname, knames in kids_of.items():
+        if pname in done:
+            continue
+        tk = stories.get(pname, set())
+        wide = (win[win["ticker"].isin(tk)]
+                .pivot_table(index="date", columns="ticker", values="ret"))
+        wide = wide.dropna(axis=1, thresh=int(len(wide) * 0.8)) if len(wide) else wide
+        wide = wide.loc[:, wide.std() > 1e-12] if len(wide) else wide
+        n_ok = wide.shape[1] if len(wide) else 0
+        pc1 = None
+        if n_ok >= 3 and len(wide) >= 30:
+            z = ((wide - wide.mean()) / (wide.std() + 1e-12)).fillna(0.0).to_numpy()
+            sv = np.linalg.svd(z, compute_uv=False)
+            pc1 = float(sv[0] ** 2 / (sv ** 2).sum())
+        leaders = [t for x in summ if x["story"] in knames for t in x["leaders"]]
+        summ.append({"story": pname, "n": int(n_ok), "n_reg": len(tk),
+                     "level": 1, "parent": None, "aggregate": True,
+                     "pc1": None if pc1 is None else round(pc1, 3),
+                     "cohesion_ok": bool((pc1 is not None) and pc1 >= PC1_MIN),
+                     "lead_gap": None, "collapsed": False,
+                     "leaders": leaders[:6]})
     members = pd.concat(rows, ignore_index=True) if rows else pd.DataFrame()
     # 故事指數面板(建 as_smooth/size_tier 供三加權)
     panel = df.copy()
@@ -506,7 +534,8 @@ def render(idx, roles, meta, story=None) -> str:
             f"{x['story']}</td><td>{x['n']}/{x.get('n_reg', '?')}</td>"
             f"<td class='{'g' if x['cohesion_ok'] else 'r'}'>"
             f"{x['pc1'] if x['pc1'] is not None else '—'}</td>"
-            f"<td>{x['lead_gap']}{' · 歸一' if x['collapsed'] else ''}</td>"
+            f"<td>{'匯總' if x.get('aggregate') else x['lead_gap']}"
+            f"{' · 歸一' if x['collapsed'] else ''}</td>"
             f"<td>{'、'.join(x['leaders']) or '—'}</td>"
             f"<td>{mix.get(x['story'], '—')}</td></tr>"
             for x in sorted(story.get("summ", []), key=_ord))
