@@ -145,11 +145,25 @@ def export(do_print: bool = True) -> dict:
     # --- 母體(舊格式單版本相容) ---
     px["code"] = px["ticker"].str.split(".").str[0]
     px["Market"] = px["ticker"].str.endswith(".TWO").map({True: "TPEX", False: "TWSE"})
-    g = px.groupby("ticker").agg(ValidFrom=("date", "min"), last=("date", "max"), Market=("Market", "first")).reset_index()
-    uni = pd.DataFrame({"Ticker": g["ticker"], "Market": g["Market"], "AssetType": "COMMON_STOCK",
-                        "ValidFrom": g["ValidFrom"],
-                        "ValidTo": g["last"].where(g["last"] < days[-1], ""),
-                        "KnownAt": [_ts(v, "08:30:00") for v in g["ValidFrom"]]})
+    # 實錄批325:契約要求每日 roster 與觀測雙向完全一致;標的序列有洞(如 1227/2417)=以連續段拆多列
+    # (舊格式相容律:Ticker+ValidFrom 唯一、區間不重疊)→每段一列
+    didx = {d_: i for i, d_ in enumerate(days)}
+    seg_rows = []
+    for tkr, grp in px.groupby("ticker"):
+        mk = grp["Market"].iloc[0]
+        idxs = sorted(didx[d_] for d_ in grp["date"].unique())
+        start = prev = idxs[0]
+        for i in idxs[1:] + [None]:
+            if i is None or i != prev + 1:
+                seg_rows.append({"Ticker": tkr, "Market": mk, "AssetType": "COMMON_STOCK",
+                                 "ValidFrom": days[start],
+                                 "ValidTo": "" if days[prev] == days[-1] else days[prev],
+                                 "KnownAt": _ts(days[start], "08:30:00")})
+                if i is not None:
+                    start = i
+            if i is not None:
+                prev = i
+    uni = pd.DataFrame(seg_rows)
     uni.to_csv(INP / "market_universe_history.csv", index=False)
     out["files"]["universe_history"] = len(uni)
     # --- 全市場日表 ---
@@ -344,10 +358,20 @@ def run(do_print: bool = True) -> int:
             reason = _block_reason(run_out["err"] or run_out["out"])
     else:
         reason = "預檢主線輸入缺:" + ", ".join(x["InputName"] for x in pf["rows"] if x.get("BlocksCorePipeline"))
+    attribution = []
+    full = (run_out.get("err") or run_out.get("out") or "")[-6000:] + reason   # 歸因掃全尾流(原因欄僅 400 字)
+    if "'ExpectedTPEX': 0" in full:
+        attribution.append("母體無 TPEX 標的(本庫殘庫僅 TWSE;工作站全量庫應有 .TWO)=契約雙市場閘阻擋")
+    if "InvalidETRRows" in full and "'InvalidETRRows': 0" not in full:
+        attribution.append("GAP-02 個股當沖缺值→ETR 無效列(契約不截零=阻擋)")
+    if "MissingOrdinaryStocks" in full and "'MissingOrdinaryStocks': 0" not in full:
+        attribution.append("每日 roster 與觀測不一致(母體分段律已處理連續洞;殘留=資料缺日)")
+    if "KeyError" in full:
+        attribution.append("欄位契約不合(橋接映射待修)")
     runs = sorted((WORK / "data" / "output").glob("RUN_*")) if (WORK / "data" / "output").exists() else []
     stamp = time.strftime("%Y%m%d_%H%M%S")
     gap = {"ts": stamp, "engine": Path(__file__).name, "package": (pkg_root() or Path("")).name,
-           "state": state, "reason": reason, "elapsed_s": round(time.time() - t0, 1),
+           "state": state, "reason": reason, "attribution": attribution, "elapsed_s": round(time.time() - t0, 1),
            "export": ex, "preflight": pf["rows"], "run_rc": run_out.get("rc"),
            "run_tail": (run_out.get("err") or run_out.get("out") or "")[-1500:],
            "latest_run_dir": str(runs[-1]) if runs else "",
@@ -358,7 +382,9 @@ def run(do_print: bool = True) -> int:
     if do_print:
         print(f"=== 故事族群輪動橋接 · 狀態 {state} · {gap['elapsed_s']}s ===")
         if reason:
-            print(f"  [阻擋原因] {reason}")
+            print(f"  [阻擋原因] {reason[:300]}")
+        for a_ in attribution:
+            print(f"  [歸因] {a_}")
         print(f"  缺口冊 {len(GAP_BOOK)} 條(誠實;補源見頁)· 存證 GAP_{stamp}.json · 頁 {UI.name}")
     return 0 if state == "PASS" else 2
 
@@ -406,7 +432,7 @@ td{{border-bottom:1px solid #eef0ee;padding:4px 8px 4px 0;vertical-align:top}} .
 </style></head><body>
 <h1>故事族群輪動橋接 <span class="sub">STORY GROUP ROTATION BRIDGE · {html.escape(gap.get('package',''))} × VDF_ENG072</span></h1>
 <div class="sub">產於 {gap['ts']} · 狀態 <span class="state {cls}">{html.escape(gap['state'])}</span> · {gap['elapsed_s']}s · 零 CDN 零外網 · 誠實三態</div>
-{('<div class="card"><b>阻擋原因</b><pre>' + html.escape(gap.get('reason','')) + '</pre></div>') if gap.get('reason') else ''}
+{('<div class="card"><b>阻擋原因</b><pre>' + html.escape(gap.get('reason','')) + '</pre>' + ''.join('<div class="bad">▸ ' + html.escape(a_) + '</div>' for a_ in gap.get('attribution', [])) + '</div>') if gap.get('reason') else ''}
 <div class="card"><h2>輸出輸入檔 EXPORTED INPUTS</h2><div class="wrap"><table><tr><th>檔 FILE</th><th>列 ROWS</th></tr>{frows}</table></div>
 <div class="sub">標的 {st.get('tickers')} · 交易日 {st.get('days')} · 當沖覆蓋列 {st.get('daytrade_cover_rows')} · 法人覆蓋列 {st.get('inst_cover_rows')} · 融資融券覆蓋列 {st.get('margin_cover_rows')} · 市值覆蓋列 {st.get('marketcap_cover_rows')} · 候選 {html.escape(json.dumps(st.get('candidate_shape', {}), ensure_ascii=False))}</div></div>
 <div class="card"><h2>預檢 PREFLIGHT-REAL</h2><div class="wrap"><table><tr><th>輸入 INPUT</th><th>角色 ROLE</th><th>狀態 STATUS</th></tr>{rows}</table></div></div>
