@@ -1,0 +1,39 @@
+{
+  "schema": "VIA-VAP-RUNTIME-CONFIG/1.0",
+  "version": "v025",
+  "host": "127.0.0.1",
+  "port": 8765,
+  "openBrowser": true,
+  "syncConnectOnStart": true,
+  "maxRows": 5000,
+  "maxBodyBytes": 20971520,
+  "requestTimeoutSeconds": 20,
+  "allowedRoots": [
+    "{PACKAGE_ROOT}",
+    "{USER_HOME}/Downloads"
+  ],
+  "allowedHosts": [],
+  "vdfGateway": {
+    "required": true,
+    "manifest": "{PACKAGE_ROOT}/config/vdf_connection_manifest.json"
+  },
+  "imageDirectory": "output/saved_images",
+  "sources": [
+    {
+      "id": "VAP-DEMO-MARKET",
+      "vdfContractId": "VDF-DEMO-MARKET-v1",
+      "alias": "DEMO_MARKET",
+      "engine": "CSV",
+      "location": "{PACKAGE_ROOT}/data/demo_market.csv",
+      "table": "demo_market",
+      "enabled": true,
+      "maxRows": 5000
+    }
+  ],
+  "disabledSourceExamples": [
+    {"id":"PARQUET-EXAMPLE","alias":"STOCK_PARQUET","engine":"PARQUET","location":"%USERPROFILE%/Downloads/StockData.parquet","enabled":false},
+    {"id":"SQLITE-EXAMPLE","alias":"LOCAL_SQLITE","engine":"SQLITE","location":"%USERPROFILE%/Downloads/market.sqlite","enabled":false},
+    {"id":"DUCKDB-EXAMPLE","alias":"LOCAL_DUCKDB","engine":"DUCKDB","location":"%USERPROFILE%/Downloads/market.duckdb","enabled":false},
+    {"id":"JSON-ENDPOINT-EXAMPLE","alias":"APPROVED_JSON_API","engine":"JSON_ENDPOINT","location":"https://api.example.com/data.json","enabled":false}
+  ]
+}
