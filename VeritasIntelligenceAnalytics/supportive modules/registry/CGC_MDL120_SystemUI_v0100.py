@@ -239,10 +239,11 @@ var VIEWS={home:vHome,vdf:vVdf,vap:vVap,etf:vEtf,rotation:vRot,revenue:vRev};
 function render(){var main=document.getElementById('views');var subs=(D&&D.subjects)||(SNAP&&SNAP.subjects)||[];subs.forEach(function(s){var el=document.getElementById('v-'+s.id);if(!el)return;var fn=VIEWS[s.id];el.innerHTML=fn?fn(D?D[s.id]:null):'';});
 var st=document.getElementById('st');st.textContent=SRC;st.className='v '+(SRC==='LIVE'?'ok':(SRC==='SNAPSHOT'?'warn':'bad'));var st2=document.getElementById('st2');st2.textContent=SRC;st2.className='v '+st.className.replace('v ','');
 document.getElementById('ts').textContent=D?(D.ts||''):'—';document.getElementById('rows').textContent=D&&D.home&&D.home.totals?n(D.home.totals.rows):'—';
-var bn=document.getElementById('banner');if(SRC==='LIVE'){bn.className='banner';bn.textContent='';}else if(SRC==='SNAPSHOT'){bn.className='banner on warn';bn.innerHTML='⚠ 樞紐 '+esc(B)+' 未連線(誠實):顯示產頁時內嵌快照 '+esc(D.ts)+'。於倉庫根打 <b>via</b> 帶起樞紐後 <a href="#" onclick="boot();return false;">重新連線</a>。';}else{bn.className='banner on bad';bn.textContent='✖ 樞紐離線且快照缺=誠實空(先 via-system 再生本頁)。';}}
+var bn=document.getElementById('banner');if(SRC==='LIVE'){bn.className='banner';bn.textContent='';}else if(SRC==='SNAPSHOT'){bn.className='banner on warn';bn.innerHTML='⚠ 樞紐 '+esc(B)+' 未連線(誠實):顯示產頁時內嵌快照 '+esc(D.ts)+'。於倉庫根打 <b>via</b> 帶起樞紐後 <a href="'+esc(B)+'/system">由樞紐同源開啟</a>(同源安全律:file:// 頁唯讀預覽;批333)。';}else{bn.className='banner on bad';bn.textContent='✖ 樞紐離線且快照缺=誠實空(先 via-system 再生本頁)。';}}
 function show(id){CUR=id;document.querySelectorAll('.view').forEach(function(v){v.className='view'+(v.id==='v-'+id?' on':'');});document.querySelectorAll('.nav a[data-v]').forEach(function(a){a.className=a.getAttribute('data-v')===id?'active':'';});var s=((D&&D.subjects)||(SNAP&&SNAP.subjects)||[]).filter(function(x){return x.id===id;})[0];if(s){document.getElementById('hzh').textContent=s.zh;document.getElementById('hen').textContent=s.en;document.getElementById('hsub').textContent=s.sub;document.getElementById('crumbcur').textContent=s.zh;}if(location.hash!=='#'+id)history.replaceState(null,'','#'+id);window.scrollTo(0,0);}
 function refetch(id){if(SRC!=='LIVE'){boot();return;}fetch(B+'/api/'+id).then(function(r){return r.json();}).then(function(j){D[id]=j;D.ts=new Date().toISOString().slice(0,19).replace('T',' ');render();show(CUR);}).catch(function(){});}
-function boot(){var ctl=new AbortController();var t=setTimeout(function(){ctl.abort();},8000);
+function sameOriginFirst(){if(location.protocol!=='file:')return Promise.resolve(false);var c=new AbortController();var t=setTimeout(function(){c.abort();},1400);return fetch(B+'/probe',{mode:'no-cors',cache:'no-store',signal:c.signal}).then(function(){clearTimeout(t);location.replace(B+'/system'+(location.hash||'#home'));return true;}).catch(function(){clearTimeout(t);return false;});}
+function boot(){if(location.protocol==='file:'){sameOriginFirst().then(function(moved){if(!moved){if(SNAP){D=SNAP;SRC='SNAPSHOT';}else{D=null;SRC='OFFLINE';}render();show(CUR);}});return;}var ctl=new AbortController();var t=setTimeout(function(){ctl.abort();},8000);
 fetch(B+'/api/all',{signal:ctl.signal}).then(function(r){return r.json();}).then(function(j){clearTimeout(t);if(!j||!j.subjects)throw new Error('bad');D=j;SRC='LIVE';render();show(CUR);}).catch(function(){clearTimeout(t);if(SNAP){D=SNAP;SRC='SNAPSHOT';}else{D=null;SRC='OFFLINE';}render();show(CUR);});}
 document.addEventListener('DOMContentLoaded',function(){var id=(location.hash||'#home').slice(1);if(!VIEWS[id])id='home';CUR=id;if(SNAP){D=SNAP;SRC='SNAPSHOT';render();}show(id);boot();window.addEventListener('hashchange',function(){var i=(location.hash||'#home').slice(1);if(VIEWS[i])show(i);});});
 """
@@ -261,7 +262,8 @@ def build(snapshot: dict, subjects: list) -> str:
               ("VDF 現況台", "VIA_UI_Shell_VDF_v0100.html"),
               ("VRN 現況台", "VIA_UI_Shell_VRN_v0100.html"),
               ("VAP 現況台", "VIA_UI_Shell_VAP_v0100.html"),
-              ("指令甲板(樞紐 /)", BRIDGE + "/")]
+              ("總控台 MasterControl(樞紐同源 /master)", BRIDGE + "/master"),
+              ("指令甲板(樞紐 /deck)", BRIDGE + "/deck")]
     sh = "".join(f'<a href="{html.escape(h)}"><span class="no">{j:02d}</span><span class="lb">{html.escape(z)}</span></a>'
                  for j, (z, h) in enumerate(shells, 1))
     snap = json.dumps(snapshot, ensure_ascii=False, default=str).replace("</", "<\\/")
@@ -356,16 +358,18 @@ def selftest() -> int:
         f"({len(deep_pages)} 連結" + (f";缺 {missing}" if missing else "") + ")")
     chk("⑦ 零 CDN 零外網+加速橋+誠實宣告",
         'src="http' not in page and "@import" not in page and "ACCEL-BRIDGE" in src and "誠實" in page)
+    chk("⑨ 同源安全律(file:// 先探同源 /system 導向;總控台 /master 連結;批333)",
+        "sameOriginFirst" in page and "location.replace(B+'/system'" in page and BRIDGE + "/master" in page)
     chk("⑧ VAP K線快查=樞紐律量(價還原/量扣當沖;離線誠實拒)+圖形律(單色量尺/極性雙色)",
         "/vap_kline?code=" in page and "樞紐離線=無法查" in page and ".meter .bar.div i.neg" in page
         and "dmeter(" in page and "meter(" in page)
-    print(f"  [計] 八檢 OK {8 - len(fails)} · FAIL {len(fails)}")
+    print(f"  [計] 九檢 OK {9 - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 
 
 def main() -> int:
     if "--selftest" in sys.argv[1:]:
-        print("=== 標準系統 U/I 前端(CGC_MDL120 v0100)· 八檢自測(零網路)===")
+        print("=== 標準系統 U/I 前端(CGC_MDL120 v0100)· 九檢自測(零網路)===")
         return selftest()
     return run(open_after="--open" in sys.argv[1:])
 
