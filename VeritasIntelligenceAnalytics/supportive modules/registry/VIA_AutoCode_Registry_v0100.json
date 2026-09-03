@@ -5865,6 +5865,20 @@
       "ts": "2026-09-03 13:40",
       "name": "Invoke-VIA-Complete-v0101.ps1:工人印「[工人PID] python=<pid>」;啟動器遇 pwsh 包裝殼退出→查 python PID 仍活=不判 FAIL 改直讀 .py.out 續播;真死=印 log 尾 25 行+.py.err 尾 15 行;工人 trap 終止性錯誤亦寫「=== 畢」;PS-ACCEL 既掛;Register 尾版律自動取 v0101",
       "note": "根因未定(雲端無 pwsh 不可重現):候工作站 LAUNCH_20260903_212524.log 尾段+.py.err+Get-Process python 實錄;本版先保「python 活著就不斷播」。"
+    },
+    {
+      "code": "CGC-121-v0104",
+      "kind": "批344 工人 Ctrl-C 免疫(工作站 .py.err 實錄兩輪 p.wait→KeyboardInterrupt 於 539s/1501s=根因定:主控台 Ctrl-C 波及工人,非引擎故障)",
+      "ts": "2026-09-03 14:15",
+      "name": "CGC_MDL121 v0104:run() env VIA_CTRLC_IMMUNE≠0→Windows SetConsoleCtrlHandler(NULL,TRUE)+SIGINT SIG_IGN+子程序 CREATE_NEW_PROCESS_GROUP(posix start_new_session);PROGRESS.json +self_pid/immune/log;起跑印本進程 PID 與停止法;selftest 不掛免疫;九檢綠;雲端 run demo 印「Ctrl-C 免疫 ON」",
+      "note": "backfill 網路抓取實證在動(批 3/50 +9840 列·回 40/40 檔;步內條 03/50 6%);兩輪皆死於 KeyboardInterrupt=Ctrl-C。"
+    },
+    {
+      "code": "TOOL-344",
+      "kind": "批344 啟動器/短令配套",
+      "ts": "2026-09-03 14:15",
+      "name": "Invoke-VIA-Complete-v0102.ps1:工人 env VIA_CTRLC_IMMUNE=1、-Foreground=0(除錯可中止)、直播提示改「Ctrl-C 只離開觀看=工人免疫照跑;via-complete watch/stop」;Register v0123 +via-complete watch(重接最新 LAUNCH log 直播)+via-complete stop(依最新 PROGRESS.json 停 MDL121 本體+當前步子程序=免疫後唯一停止法)",
+      "note": ""
     }
   ]
 }
