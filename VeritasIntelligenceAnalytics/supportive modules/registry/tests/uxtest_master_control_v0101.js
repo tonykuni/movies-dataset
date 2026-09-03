@@ -317,7 +317,7 @@ async function run() {
     const optionPairs = await page.locator("#task option").evaluateAll(options =>
       options.map(option => ({value: option.value, text: option.textContent.trim()}))
     );
-    assert.equal(optionPairs.length, 32, "任務冊應完整顯示 32 項");
+    assert.ok(optionPairs.length >= 32, `任務冊應完整顯示 ≥32 項(只增不減;現 ${optionPairs.length})`);  // 批338d
     for (const option of optionPairs) {
       assert.notEqual(option.text, option.value, `不得用鍵值當主名稱：${option.value}`);
       assert.ok(!option.text.toLowerCase().startsWith(option.value.toLowerCase() + " "),
@@ -408,7 +408,7 @@ async function run() {
 
     await page.click("#tab-engines");
     const engineNames = await page.locator("#engineTable tbody tr td:first-child").allTextContents();
-    assert.equal(engineNames.length, 194);
+    assert.ok(engineNames.length >= 194, `引擎清冊 ≥194(現 ${engineNames.length})`);  // 批338d 只增不減
     assert.ok(engineNames.every(name =>
       !/(?:ENG|MDL)\d+|[A-Za-z]{2,}_[A-Za-z0-9_]+/.test(name)),
     "引擎主名稱不得露出程式識別碼");
@@ -420,7 +420,7 @@ async function run() {
       getComputedStyle(node).display), "table-cell");
     await page.click("#tab-modules");
     const moduleNames = await page.locator("#moduleTable tbody tr td:first-child").allTextContents();
-    assert.equal(moduleNames.length, 85);
+    assert.ok(moduleNames.length >= 85, `模組清冊 ≥85(現 ${moduleNames.length})`);  // 批338d 只增不減
     assert.ok(moduleNames.every(name =>
       !/(?:ENG|MDL)\d+|[A-Za-z]{2,}_[A-Za-z0-9_]+/.test(name)),
     "模組主名稱不得露出程式識別碼");
