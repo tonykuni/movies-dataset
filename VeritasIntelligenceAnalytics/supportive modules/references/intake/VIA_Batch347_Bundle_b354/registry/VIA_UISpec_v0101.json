@@ -1,0 +1,194 @@
+{
+  "schema": "VIA_UISpec/1.0",
+  "batch": "批346 操作員令「字級位階固定;整體偏小較專業;版面字階自動最佳化;同列卡片等高;矩陣規格自動最佳化」",
+  "rule": "模板零硬碼:任何色/字/尺寸/文字/頁籤/輸入欄/行為旗標皆由本冊供給;橋接器驗證模板每個 {{slot}} 都有值,冊內每個鍵至少被模板用一次。",
+  "theme": {
+    "bg": "#f5f5f2",
+    "paper": "#ffffff",
+    "paper2": "#fafaf8",
+    "ink": "#1f2530",
+    "ink2": "#3c4658",
+    "mut": "#6d7688",
+    "mut2": "#9aa2b1",
+    "line": "#dcdfe6",
+    "soft": "#eef0ee",
+    "acc": "#3e6b8f",
+    "ok": "#4f8f6b",
+    "warn": "#b58a3e",
+    "bad": "#b05c4d",
+    "seal_bg": "#c96b5a",
+    "seal_fg": "#ffffff",
+    "code_bg": "#1e1d1a",
+    "code_fg": "#d9d6cf",
+    "font_ui": "\"Segoe UI\",\"Microsoft JhengHei\",-apple-system,sans-serif",
+    "font_mono": "Consolas,\"DM Mono\",monospace",
+    "radius": "6px",
+    "radius_sm": "4px",
+    "strip": "linear-gradient(90deg,#4c78a8,#439a9a,#5a9e6f,#c9a95a,#c96b5a,#a86b9a,#6b7ea8)",
+    "seal_bg_soft": "#eeeeee",
+    "btn_fg": "#ffffff",
+    "row_line": "#eeece7",
+    "fs_xs": "9px",
+    "fs_s": "10.5px",
+    "fs": "11.5px",
+    "fs_m": "12.5px",
+    "fs_l": "14px",
+    "fs_xl": "16px",
+    "lh": "1.4",
+    "ls_label": ".12em",
+    "ls_title": ".02em",
+    "weight_title": "700",
+    "weight_body": "400"
+  },
+  "layout": {
+    "rail_width": "250px",
+    "header_height": "84px",
+    "footer_height": "30px",
+    "content_max": "1400px",
+    "gap": "10px",
+    "card_pad": "10px 12px",
+    "rail_collapsible": true,
+    "header_sticky": true,
+    "footer_sticky": true,
+    "scrollbar_thin": true,
+    "grid_columns": "1fr 1fr",
+    "mobile_breakpoint": "900px",
+    "pad_main": "0 18px",
+    "nav_pad": "6px 8px",
+    "equal_height_cards": true,
+    "table_layout": "fixed",
+    "col_min_pct": 6,
+    "col_max_pct": 46,
+    "numeric_align": "right"
+  },
+  "brand": {
+    "seal": "理",
+    "title": "VIA 整合總台",
+    "subtitle": "CONSOLIDATED CONSOLE · CHARTER · RACI · SIX STREAMS",
+    "build": "CONSOLIDATED v0100 · 批345"
+  },
+  "tabs": [
+    {
+      "id": "ov",
+      "zh": "總覽",
+      "en": "OVERVIEW"
+    },
+    {
+      "id": "in",
+      "zh": "輸入",
+      "en": "INPUTS"
+    },
+    {
+      "id": "en",
+      "zh": "引擎",
+      "en": "ENGINES"
+    },
+    {
+      "id": "db",
+      "zh": "資料",
+      "en": "DATA"
+    },
+    {
+      "id": "me",
+      "zh": "指標",
+      "en": "METRICS"
+    },
+    {
+      "id": "wf",
+      "zh": "工作流",
+      "en": "WORKFLOW"
+    },
+    {
+      "id": "lp",
+      "zh": "閉環",
+      "en": "LIFECYCLE"
+    }
+  ],
+  "input_widgets": {
+    "start": {
+      "type": "date",
+      "zh": "起始日",
+      "auto_hint": "DB 末日+1"
+    },
+    "end": {
+      "type": "date",
+      "zh": "結束日",
+      "auto_hint": "今日"
+    },
+    "cats": {
+      "type": "multiselect",
+      "zh": "全球類別",
+      "auto_hint": "GLOBAL_CATEGORIES 全選"
+    },
+    "files": {
+      "type": "file",
+      "zh": "券商報告",
+      "auto_hint": "券商/日期=檔名判讀",
+      "accept": ".pdf,.docx",
+      "multiple": true
+    }
+  },
+  "input_policy": {
+    "max_per_domain": 3,
+    "button_zh": "產生執行計畫(不派工)",
+    "policy_zh": "未填=自動推導;本頁不派工(批340 獨立頁律)"
+  },
+  "behavior": {
+    "no_server": true,
+    "bridge_url": "http://127.0.0.1:8765",
+    "bridge_probe": true,
+    "probe_timeout_ms": 2500,
+    "rail_storage_key": "via.rail.collapsed",
+    "auto_open": true
+  },
+  "text": {
+    "led_ok": "在位",
+    "led_warn": "部分",
+    "led_bad": "缺",
+    "led_off": "未產",
+    "empty": "誠實空",
+    "digest_title": "DIGEST · 貼這段即可",
+    "footer": "零發明:每格=樹上實存物驗證;缺=誠實標 · file:// 獨立可讀;不派工"
+  },
+  "panels": {
+    "ov": [
+      "stats",
+      "six_streams",
+      "db"
+    ],
+    "in": [
+      "inputs",
+      "auto_params"
+    ],
+    "en": [
+      "engines",
+      "rules"
+    ],
+    "db": [
+      "db",
+      "fetch_matrix"
+    ],
+    "me": [
+      "metrics",
+      "thresholds"
+    ],
+    "wf": [
+      "workflow"
+    ],
+    "lp": [
+      "digest",
+      "raci"
+    ]
+  },
+  "type_scale": {
+    "rule": "六階固定;任何元素只可取這六值之一;最大 fs_xl(統計數字/頁題);模板與橋接自測皆檢無越階",
+    "map": {
+      "labels/letterspaced": "fs_xs",
+      "table/meta/hint": "fs_s",
+      "body/inputs": "fs",
+      "card title/nav/tab": "fs_m",
+      "page title/brand": "fs_l",
+      "stat number": "fs_xl"
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "schema": "VIA_ShellValidation_Thresholds/1.0",
+  "batch": "批342 六流程·Stream2 SSOT",
+  "authority": "MDL116 v0110 讀取;缺此冊=退回內建預設並在頁面標 CONSTANT_FALLBACK(誠實)",
+  "classification_rule": "COMPUTED=由資料推得 / SOURCED=引自外部權威 / CONSTANT=人為設定(須列入此冊,不得散落程式碼)",
+  "thresholds": {
+    "ticker_coverage_pct": {
+      "green": 60,
+      "yellow": 30,
+      "class": "CONSTANT",
+      "rationale": "產業/策略報告本無單一標的,60/30 為經驗值;待 VRN 稽核冊累積後改 COMPUTED(分位數)"
+    },
+    "quality_median": {
+      "green": 90,
+      "yellow": 80,
+      "class": "CONSTANT",
+      "rationale": "repair_audit quality_after 中位數;雙欄版面偏弱時落 80-90"
+    },
+    "warn_docs_pct": {
+      "green": 10,
+      "yellow": 40,
+      "class": "CONSTANT",
+      "rationale": "含 warning 文件比率;上界 40 為 v0100 語料實測(64 件)之保守值"
+    },
+    "metric_coverage_pct": {
+      "green": 100,
+      "yellow": 33,
+      "class": "CONSTANT",
+      "rationale": "financial_data 筆數/文件數;≥100 表每件至少一筆"
+    },
+    "tp_not_exceed_rating": {
+      "green": true,
+      "yellow": null,
+      "class": "CONSTANT",
+      "rationale": "目標價數不得超過評等數;結構律非門檻"
+    }
+  },
+  "review": {
+    "next": "VRN 稽核冊達 ≥3 批次後,以歷史分位數重估 ticker/quality/warn 三項並改標 COMPUTED",
+    "owner": "operator"
+  }
+}
