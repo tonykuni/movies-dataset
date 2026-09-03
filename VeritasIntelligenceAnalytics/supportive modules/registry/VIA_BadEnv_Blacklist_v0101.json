@@ -1,0 +1,154 @@
+{
+ "schema": "via-badenv-blacklist-v1",
+ "source": "批106 操作員令(2026-08-23):「檢查衝突機制 壞環境黑名單」;儲存維護並遵守",
+ "policy": "黑名單=禁止作為執行環境/執行標的之根、區、件;零刪除——列管不刪;誠實三態:容器側測不到的項 SKIP 不假綠",
+ "blacklisted_roots": [
+  {
+   "path": "C:\\Users\\tonyk\\Downloads\\VeritasIntelligenceAnalytics",
+   "reason": "舊根封存(批94)"
+  },
+  {
+   "path": "C:\\Users\\tonyk\\Downloads\\movies-dataset",
+   "reason": "舊根封存;僅過渡容錯,母系統掛 git 後除名(MotherRoot SSOT)"
+  },
+  {
+   "path": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics",
+   "reason": "舊 OneDrive 樹(canonical R2 補裁 19 枚之路徑源;非現行母根)"
+  },
+  {
+   "path": "C:\\Users\\tonyk\\OneDrive\\Desktop\\VRN",
+   "reason": "遠古桌面樹(TW02 存證註解出土;非現行)"
+  }
+ ],
+ "forbidden_exec_fragments": [
+  {
+   "frag": "_sha",
+   "reason": "鏡像存證件(byte 級唯讀;不執行不修改)"
+  },
+  {
+   "frag": "_review_quarantine",
+   "reason": "SPEC-015 檢疫區(故意收容壞件候裁)"
+  },
+  {
+   "frag": "rename_runs",
+   "reason": "改名戰役快照區"
+  },
+  {
+   "frag": "rollback",
+   "reason": "回滾快照區"
+  },
+  {
+   "frag": "evidence",
+   "reason": "證據區(唯讀)"
+  },
+  {
+   "frag": "SCOPE_COPY",
+   "reason": "VAP 全樹快照存證區"
+  },
+  {
+   "frag": "_superseded",
+   "reason": "讓位版本區(現役=glob 最新)"
+  },
+  {
+   "frag": "_inbox_to_classify",
+   "reason": "收件未分類區(第三方件混雜)"
+  },
+  {
+   "frag": "references/intake",
+   "reason": "外部參考收容區"
+  },
+  {
+   "frag": "docs/history",
+   "reason": "歷史文件區"
+  },
+  {
+   "frag": "__pycache__",
+   "reason": "快取"
+  },
+  {
+   "frag": ".venv",
+   "reason": "虛擬環境"
+  },
+  {
+   "frag": "site-packages",
+   "reason": "第三方套件樹"
+  },
+  {
+   "frag": "_vdf_envs",
+   "reason": "VDF 環境快照"
+  },
+  {
+   "frag": "package_samples",
+   "reason": "樣本包"
+  },
+  {
+   "frag": "_via_mother_root_reconciliation_runs",
+   "reason": "對帳戰役執行區(gitignore)"
+  }
+ ],
+ "blacklisted_files": [
+  {
+   "file": "functional modules/VRN/VRN_TW01_TickerBridge.py",
+   "reason": "壞原件存證(VIA_Evidence_Originals v0101;現役 v0101 版)"
+  },
+  {
+   "file": "functional modules/VRN/VRN_TW02_ReportParser.py",
+   "reason": "壞原件存證(同上)"
+  },
+  {
+   "file": "functional modules/VRN/webscraping_dualengine_v20260819/VIA_WebScraping_Compliance.py",
+   "reason": "版本閘存證(現役 syntaxfix v0100)"
+  },
+  {
+   "file": "functional modules/GroupIndex/flow_simulation_v0400/references/intake/3a2e975b-3512-437f-9a17-f5b359958e7b.py",
+   "reason": "外部參考存證(壞件)"
+  },
+  {
+   "file": "supportive modules/accelerator/pip_subprocess_shaaf8f816b.py",
+   "reason": "標準庫遮蔽地雷已隔離(QA-20260820C);嚴禁改回 subprocess.py"
+  }
+ ],
+ "env_hazards": [
+  {
+   "id": "HZ-01",
+   "name": "OneDrive On-Demand 占位檔",
+   "detect": "0-byte .py/.cmd 於活執行區",
+   "action": "紅燈+「一律保留在此裝置」指引"
+  },
+  {
+   "id": "HZ-02",
+   "name": "PATH 指向舊克隆 bin",
+   "detect": "PATH 含 blacklisted_roots 前綴",
+   "action": "紅燈+PATH 換錨指令"
+  },
+  {
+   "id": "HZ-03",
+   "name": "accelerator/ 入 sys.path",
+   "detect": "sys.path 含 supportive modules/accelerator",
+   "action": "紅燈(FM-08 標準庫遮蔽)"
+  },
+  {
+   "id": "HZ-04",
+   "name": "舊根復活(被重新寫入)",
+   "detect": "retired root 存在且 mtime 晚於封存日",
+   "action": "黃燈提醒(封存不理會;工作站測)"
+  }
+ ],
+ "changelog": [
+  {
+   "ts": "2026-08-23",
+   "op": "INIT",
+   "note": "批106 建冊:5 根+16 區+5 件+4 險"
+  }
+ ],
+ "reinstated_roots": [
+  {
+   "path": "C:\\Users\\tonyk\\movies-dataset",
+   "reason": "舊根封存(批94 不理會;MotherRoot SSOT v0102)",
+   "reinstated": "2026-09-03",
+   "why": "批349:母根對帳後 C:\\Users\\tonyk\\movies-dataset 即現行正主根(工作站實錄 ⑨ 命中 1=冊過期,非壞環境);只增不減=移入 reinstated 冊留痕"
+  }
+ ],
+ "version": "v0101",
+ "note_v0101": "批349 現行正主根 reinstated;其餘四黑根不變(Downloads×2/OneDrive×2)"
+}
