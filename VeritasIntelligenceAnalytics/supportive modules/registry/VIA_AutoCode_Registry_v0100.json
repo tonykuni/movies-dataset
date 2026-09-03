@@ -5634,6 +5634,27 @@
    "ts": "2026-09-03 06:42",
    "name": "操作員令「K線圖要加入 bb band sma 5 10 20 60 120 240D EMA 5D 8D 12D ^TWII 右軸 粗1.4」:資料層 BB(20,2σ)+SMA×6+EMA×3+^TWII(global_daily 同日對齊,覆蓋 1128/1130);包圖組加「均線疊加」line 面板(包 candlestick 不支援疊線=實錘)Close+SMA+EMA+BB 主軸、^TWII 右軸 1.4;VIA 原生 K線 kline 模式(plotly 自包含 14 trace:蠟燭紅漲綠跌+BB 帶填色+SMA 實線+EMA 虛線+^TWII 右軸粗 1.4+量副圖;matplotlib PNG 末 250 根)=stock 模式一併產出;七檢綠;Playwright 驗零 pageerror",
    "note": "v0100 零觸碰;短令 via-vapstack stock <代碼> 同時出 stock_<代碼>.* 與 kline_<代碼>.html/png。"
+  },
+  {
+   "code": "CGC-118-v0100",
+   "kind": "批330 繪圖/TA 資料律(操作員嚴令)",
+   "ts": "2026-09-03 07:31",
+   "name": "「增加並嚴格訂定規定 TA-LIB 及所有繪圖 價格一律取調整後價格 成交量一定要採扣除當沖交易成交量」:律定義處+SSOT 冊 VIA_PlotDataLaw_v0100.json+共用原語 ohlcv/ex_daytrade/volume_series/stamp+稽核 --audit(11 件冊三態+LEGACY)。律一 價=還原(PriceSource 旗標;raw_close 只准金額換算/對照);律二 量=扣當沖三階來源(個股 tw_daytrade_stock→市場比 tw_daytrade_market→無料=NaN 缺值,禁以原始量冒充;VolumeRaw 保留;圖面必印 stamp 覆蓋)。六檢綠",
+   "note": "雲端實錄 2330:個股 0 日·市場比 0 日(TPEX 僅 22 日;2330=TWSE)·無料 1130/1130=量圖誠實空;工作站以 L15 補源後即通。短令 via-plotlaw(Register v0112)。"
+  },
+  {
+   "code": "ENG-055-v0108",
+   "kind": "批330 +L15 個股當沖車道",
+   "ts": "2026-09-03 07:31",
+   "name": "L15 daytrade_stock:TWSE rwd TWTB4U(selectType=All)+TPEX rwd dayTrade 逐股→tw_daytrade_stock(律二第一階);雲端兩源皆 302=誠實 FAIL 候工作站驗;防禦式標頭對映;八檢綠",
+   "note": "管線 v0109 ①a 車道 L12,L15。"
+  },
+  {
+   "code": "LAW-APPLY-b330",
+   "kind": "批330 律落地五件",
+   "ts": "2026-09-03 07:31",
+   "name": "VAP_ENG015 v0102(取數走律;stamp 入圖題/索引;八檢綠)·VAP_ENG004 v0101 TA-Lib 工廠(pick_price 只認還原價,裸 close 須 allow_raw 明示記警;量閘 attrs ex_daytrade;十三檢綠)·VAP_ENG013 v0103(K線庫道還原 OHLC+律量 bars[5]/原始 [7]/DTSource [8];15 項綠)·VAP_ENG009 v0106(量=律;volume_raw/dt_source 欄;⑩⑪ 兩 FAIL=v0105 基線同(雲端無輪動快照/全球層)非本改)·VapDeck v0105(預設扣當沖量;律格式優先,舊格式退 flows 扣法)",
+   "note": "稽核終態 OK 10 · FAIL 0 · LEGACY 1(VDF_ENG048 正本零觸碰,由 ENG004 承接)。"
   }
  ]
 }

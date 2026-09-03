@@ -1,0 +1,55 @@
+{
+ "law_id": "VIA_PLOTDATA_LAW",
+ "version": "v0100",
+ "batch": 330,
+ "price": {
+  "basis": "ADJUSTED",
+  "columns": [
+   "adj_open",
+   "adj_high",
+   "adj_low",
+   "adj_close"
+  ],
+  "fallback": "YF_ADJ(tw_daily_prices.adj_close;PriceSource 旗標)",
+  "raw_close_allowed_for": [
+   "金額換算(淨股數×收盤)",
+   "顯示對照"
+  ],
+  "raw_close_forbidden_for": [
+   "指標",
+   "線圖",
+   "K線",
+   "TA-Lib 輸入"
+  ]
+ },
+ "volume": {
+  "basis": "EX_DAYTRADE",
+  "sources": [
+   {
+    "rank": 1,
+    "id": "STOCK",
+    "table": "tw_daytrade_stock",
+    "note": "個股當沖量(候源)"
+   },
+   {
+    "rank": 2,
+    "id": "MARKET_RATIO",
+    "table": "tw_daytrade_market",
+    "note": "同日同市場當沖比代位 DERIVED"
+   },
+   {
+    "rank": 3,
+    "id": "NONE",
+    "table": null,
+    "note": "無料=Volume NaN;禁以原始量冒充;圖面必印 stamp"
+   }
+  ],
+  "raw_volume_column": "VolumeRaw",
+  "talib_gate": "Series.attrs['ex_daytrade']==True 才入量類指標"
+ },
+ "enforcement": {
+  "marker": "[VIA:PLOTDATA-LAW:v0100]",
+  "audit": "CGC_MDL118 --audit",
+  "honesty": "三態 OK/FAIL/NA;覆蓋日數必印"
+ }
+}
