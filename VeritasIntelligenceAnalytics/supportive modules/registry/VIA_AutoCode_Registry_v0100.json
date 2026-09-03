@@ -6033,6 +6033,41 @@
       "ts": "2026-09-03 18:50",
       "name": "references/intake/VIA_SuperHtmlParser_b352(ps1 sha 180357c4…+RUN_REPORT 實錄+manifest)→執行期正本 Invoke-VIA-SuperHtmlParser-v0100.ps1(同 hash;尾版律)+Register v0128 via-superhtml <路徑…> [-NoOpen] [-NlpSource](+.cmd)+MDL122 v0105 上船件冊(2/2 INTEGRATED;主體 vrn)",
       "note": "工具=自含安裝器+內嵌 py 引擎(HTML content/UI component/JS AST esprima/CSS AST tinycss2/backend py-json-ps1→Markdown;markitdown;NLP OneEngine v1.5.0 語意橋 review_rows);自建根 C:\\VIA\\VeritasSuperHtmlParser 沿用零重造;NLP v1.5.0 候上船(倉內 v1.4.0);Zero-Hydra 界定:與 VRN_ENG075 DocToMarkdown 職權不同不合併。"
+    },
+    {
+      "code": "BENCH-b353",
+      "kind": "批353 操作員問「有導入加速器嗎 資料樹結構有優化嗎 為何速度極慢」=實證答",
+      "ts": "2026-09-03 20:40",
+      "name": "①加速器:橋掛 py 1945/ps1 746 檔,真呼叫 py 15(0.8%)/ps1 23(3.1%)=「掛橋≠加速」(MDL117 v0101 --usage 實掃)②資料樹:DuckDB tw_daily_prices 545k 列,暖快取點查 0.031s→叢集 ORDER BY ticker,date 0.003s(10×)但絕對值皆毫秒=非瓶頸;date 欄 VARCHAR(衛生候改)③慢因:網路端 Yahoo 逐檔 chart 遇 429/404→AegisNexus 指數退避;工作站實錄 40 檔/批≈8 分=12s/檔;ENG064 批內序跑未用 accel_map;雲端到 Yahoo 全被重置(SSL/reset)無法代測④矩陣串行 516s=各站子進程重型 import(torch/cupy/paddle/jieba)+網路等待",
+      "note": "處置:grid v0224 平行(真用 accel_map)/ENG064 v0106 批內平行/MDL126 NetBench 時段基準(操作員令「先測一些時段」)。"
+    },
+    {
+      "code": "CGC-064-v0224",
+      "kind": "批353 矩陣平行=加速器真用首例",
+      "ts": "2026-09-03 20:40",
+      "name": "SelftestGrid v0224:SUP_MDL737.accel_map 工人 min(8,CPU)(env VIA_GRID_WORKERS;--serial 退原序)跑站,完成即印(序號/累計秒);第二段:平行敗站序跑複判(duckdb 單寫者鎖撞=假紅,實錄 7 站 IOException Could not set lock)終態不假紅;雲端 169 站 516s→277s(+第二段)",
+      "note": ""
+    },
+    {
+      "code": "CGC-117-v0101",
+      "kind": "批353 加速器真用面稽核",
+      "ts": "2026-09-03 20:40",
+      "name": "MDL117 v0101 --usage:掛橋 vs 真呼叫(py VIA_ACCEL./accel_map/run_fast/celeritas;ps1 Invoke-VIAParallel/Guarded/Write-VIAProgress)逐檔實掃+真用件冊;六檢綠",
+      "note": ""
+    },
+    {
+      "code": "VDF-064-v0106",
+      "kind": "批353 歷史回補批內平行(真用加速器)",
+      "ts": "2026-09-03 20:40",
+      "name": "ENG064 v0106:批 40 切子批(VIA_HIST_SUB 10)→accel_map 平行(VIA_HIST_WORKERS 4;ENG054 v0101 同律;各工節流保留;缺=序跑);落盤/checkpoint/統包唯一道不變;九檢綠;誠實:429 退避仍為上限,至多 4×",
+      "note": ""
+    },
+    {
+      "code": "CGC-126-v0100",
+      "kind": "批353 網路車道時段基準(操作員令「資料不用先補齊 先測一些時段」)",
+      "ts": "2026-09-03 20:40",
+      "name": "MDL126 NetBench:同標的×同時段三車道實測(chart 逐檔/chart×N accel_map/yf yfinance 批次)秒數·成功率·列數·s/檔·1700 檔全量估算;雙同意閘 fail-closed;零入庫;報告 VIA_Reports/netbench;Register v0129 via-netbench(+.cmd);四檢綠",
+      "note": "雲端無法測(Yahoo 連線重置);工作站 via-netbench 一句=定車道/工數/節流。"
     }
   ]
 }
