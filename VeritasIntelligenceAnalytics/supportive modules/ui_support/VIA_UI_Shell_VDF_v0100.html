@@ -1,9 +1,28 @@
 <!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VIA · 資料鍛造 VDF 現況台</title><style>
+<title>VIA · 資料鍛造 VDF 現況台</title><script>(function(){if(location.protocol!=='file:')return;var B='http://127.0.0.1:8765';var c=new AbortController();var t=setTimeout(function(){c.abort();},1500);fetch(B+'/probe',{mode:'no-cors',cache:'no-store',signal:c.signal}).then(function(){clearTimeout(t);location.replace(B+'/VIA_UI_Shell_VDF_v0100.html'+(location.hash||''));}).catch(function(){clearTimeout(t);});})();</script><style>
 :root{--bg:#f5f5f2;--paper:#ffffff;--paper2:#fafaf8;--ink:#1f2530;
 --ink2:#3c4658;--mut:#6d7688;--mut2:#9aa2b1;--line:#dcdfe6;
---soft:#eef0ee;--acc:#3e6b8f;--ok:#4f8f6b;--warn:#b58a3e;--bad:#b05c4d}
+--soft:#eef0ee;--acc:#3e6b8f;--ok:#4f8f6b;--warn:#b58a3e;--bad:#b05c4d;
+--rail-w:224px;--hd:84px;--ft:30px}
+html{scrollbar-width:thin;scrollbar-color:rgba(60,70,88,.28) transparent}
+*::-webkit-scrollbar{width:6px;height:6px}
+*::-webkit-scrollbar-thumb{background:rgba(60,70,88,.28);border-radius:3px}
+*::-webkit-scrollbar-track{background:transparent}
+.led{display:inline-block;width:8px;height:8px;border-radius:50%;
+vertical-align:middle;margin-right:5px;background:var(--mut2);
+box-shadow:0 0 0 2px rgba(0,0,0,.04)}
+.led.ok{background:var(--ok)}.led.warn{background:var(--warn)}
+.led.bad{background:var(--bad)}.led.off{background:var(--mut2);opacity:.5}
+.railtg{position:fixed;left:calc(var(--rail-w) - 12px);top:calc(var(--hd) + 8px);
+z-index:30;width:22px;height:22px;border:1px solid var(--line);
+background:var(--paper);border-radius:50%;cursor:pointer;font-size:11px;
+line-height:20px;text-align:center;color:var(--mut);box-shadow:0 1px 3px rgba(0,0,0,.08);
+transition:left .18s}
+.railtg:hover{color:var(--ink)}
+body.railc{--rail-w:0px}
+body.railc .rail{display:none}
+body.railc .railtg{left:6px}
 *{box-sizing:border-box;margin:0}
 body{background:var(--bg);color:var(--ink);
 font:12px/1.5 "Segoe UI","Noto Sans TC",system-ui,sans-serif;display:flex;
@@ -12,16 +31,73 @@ code,.mono{font-family:Consolas,"SFMono-Regular",ui-monospace,monospace}
 a{color:var(--acc);text-decoration:none}
 a:hover{text-decoration:underline}
 /* ①左欄 */
-.rail{width:224px;min-width:224px;background:var(--paper);
-border-right:1px solid var(--line);padding:14px 0 10px;display:flex;
-flex-direction:column;gap:4px}
-.brand{padding:0 16px 10px;border-bottom:1px solid var(--line)}
+/* v0106 輸入面板(VDF/VRN) */
+.rin{margin:6px 8px 3px;padding:6px 8px;border:1px solid var(--line);
+border-radius:6px;background:var(--paper2)}
+.rin .t{font-size:8.5px;letter-spacing:.2em;color:var(--mut2);font-weight:700;
+margin-bottom:5px}
+.rin .g{margin:6px 0 2px;font-size:10px;font-weight:700;color:var(--ink2)}
+.rin label{display:block;font-size:9.5px;color:var(--mut);margin:4px 0 1px}
+.rin input,.rin select,.rin textarea{width:100%;font:11px/1.4 inherit;
+padding:4px 6px;border:1px solid var(--line);border-radius:4px;
+background:var(--paper);color:var(--ink)}
+.rin textarea{min-height:44px;resize:vertical}
+.rin .chk{display:flex;flex-direction:column;gap:2px;max-height:110px;
+overflow:auto;border:1px solid var(--line);border-radius:4px;padding:4px 6px;
+background:var(--paper)}
+.rin .chk label{display:flex;gap:6px;align-items:center;margin:0;
+font-size:10px;color:var(--ink2)}
+.rin .chk input{width:auto}
+.rin .row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.rin .btn{display:block;width:100%;margin-top:8px;padding:6px 8px;
+font:11px/1 inherit;font-weight:700;letter-spacing:.06em;color:#fff;
+background:var(--acc);border:0;border-radius:4px;cursor:pointer}
+.rin .btn:hover{filter:brightness(1.08)}
+.rin .hint{font-size:9px;color:var(--mut2);margin-top:5px;line-height:1.35}
+.rin .out{display:none;margin-top:6px;font:9.5px/1.35 Consolas,monospace;
+padding:6px;background:var(--paper);border:1px dashed var(--line);
+border-radius:4px;white-space:pre-wrap;word-break:break-all;max-height:120px;
+overflow:auto}
+.rin .out.show{display:block}
+.rin .out.bad{border-color:var(--bad);color:var(--bad)}
+.rin .out.ok{border-color:var(--ok);color:var(--ok)}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.fmx{width:100%;border-collapse:collapse;font-size:10.5px;margin-top:6px}
+.fmx th,.fmx td{padding:3px 5px;border-bottom:1px solid var(--line);text-align:left;
+white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+.fmx th{font-size:9px;letter-spacing:.1em;color:var(--mut2)}
+.fmx tr.dup td{background:rgba(181,138,62,.10)}
+.fmx tr.exist td{background:rgba(176,92,77,.08)}
+.drop{margin-top:5px;border:1.5px dashed var(--line);border-radius:5px;padding:9px 6px;
+text-align:center;font-size:10px;color:var(--mut);background:var(--paper);cursor:pointer}
+.drop.over{border-color:var(--acc);background:var(--soft);color:var(--ink)}
+.fmbar{display:flex;gap:6px;align-items:center;margin-top:5px;font-size:10px}
+.fmbar button{font:10px/1 inherit;padding:3px 7px;border:1px solid var(--line);
+background:var(--paper);border-radius:3px;cursor:pointer;color:var(--ink2)}
+.vcol{white-space:normal!important;max-width:none!important}
+.panels .card{margin:0}
+.panels .card.full{grid-column:1/-1}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:11px}
+.kv .k{color:var(--mut);font-weight:700;font-size:9.5px;letter-spacing:.06em}
+.pill{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;
+border-radius:3px;border:1px solid var(--line);color:var(--mut)}
+.pill.ok{color:var(--ok);border-color:var(--ok)}
+.pill.warn{color:var(--warn);border-color:var(--warn)}
+.pill.bad{color:var(--bad);border-color:var(--bad)}
+@media(max-width:900px){.panels{grid-template-columns:1fr}}
+.rail{width:var(--rail-w);min-width:var(--rail-w);background:var(--paper);
+border-right:1px solid var(--line);padding:0 0 8px;display:flex;
+flex-direction:column;gap:3px;position:sticky;top:0;height:100vh;
+overflow-y:auto}
+.brand{height:var(--hd);display:flex;flex-direction:column;justify-content:center;
+position:sticky;top:0;background:var(--paper);z-index:5}
+.brand{padding:0 14px 0;border-bottom:1px solid var(--line)}
 .brand .latin{font-size:9.5px;letter-spacing:.22em;color:var(--mut);
 font-weight:700}
-.brand h1{font-size:17px;margin:4px 0 2px;letter-spacing:.02em}
+.brand h1{font-size:16px;margin:3px 0 1px;letter-spacing:.02em}
 .brand .en{font-size:9.5px;letter-spacing:.14em;color:var(--acc);
 font-weight:700}
-.brand .badge{display:inline-block;margin-top:7px;font-size:10px;
+.brand .badge{display:inline-block;margin-top:5px;font-size:9.5px;
 font-weight:700;padding:2px 8px;border:1px solid var(--line);
 border-radius:4px;color:var(--mut);letter-spacing:.08em}
 .seal{float:right;width:28px;height:28px;border:2px solid var(--ink2);
@@ -44,14 +120,16 @@ font-weight:700}
 .railfoot .v{font-size:11.5px;font-weight:700;
 font-variant-numeric:tabular-nums}
 /* 主區 */
-.main{flex:1;padding:16px 22px;max-width:1160px}
-.crumb{font-size:10px;color:var(--mut);letter-spacing:.04em;
-margin-bottom:7px}
+.main{flex:1;padding:0 18px 0;max-width:1240px;min-width:0}
+.hdwrap{position:sticky;top:0;z-index:6;background:var(--bg);height:var(--hd);
+display:flex;flex-direction:column;justify-content:flex-end;padding-top:6px}
+.crumb{font-size:9.5px;color:var(--mut);letter-spacing:.04em;
+margin-bottom:4px}
 .crumb b{color:var(--acc)}
 .crumb .lock{letter-spacing:.16em;font-weight:700;font-size:10px}
-.head{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap;
-border-bottom:2px solid var(--ink);padding-bottom:9px;margin-bottom:12px}
-.head h2{font-size:30px;letter-spacing:.01em}
+.head{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;
+border-bottom:2px solid var(--ink);padding-bottom:6px;margin-bottom:9px}
+.head h2{font-size:24px;letter-spacing:.01em;line-height:1.1}
 .head h2 small{font-size:10px;color:var(--mut);font-weight:400;
 margin-left:10px;letter-spacing:.1em}
 .head .sub{width:100%;font-size:11px;color:var(--mut)}
@@ -91,7 +169,9 @@ vertical-align:top}
 border-radius:3px;background:var(--soft);color:var(--ink2)}
 .tag.net{background:#f3ece1;color:var(--warn)}
 .wrap-x{overflow-x:auto}
-.foot{font-size:10.5px;color:var(--mut2);margin-top:6px}
+.foot{position:sticky;bottom:0;background:var(--bg);z-index:5;
+height:var(--ft);display:flex;align-items:center;border-top:1px solid var(--line);
+margin-top:10px;font-size:10.5px;color:var(--mut2);margin-top:6px}
 /* 響應雙態(批302 中途令):PC=水平長方形(左欄+主區);
    手機=垂直長方形(欄轉頂條+導航橫捲+單欄卡);自動最佳化=
    clamp 流體字級+auto-fit 卡格+表格自 overflow;零動畫零校正負擔 */
@@ -122,25 +202,41 @@ border-radius:3px;background:var(--soft);color:var(--ink2)}
 <div class="latin">VERITAS INTELLIGENCE ANALYTICS</div>
 <h1>資料鍛造現況台</h1>
 <div class="en">VERITAS DATA FORGE</div>
-<span class="badge">SHELL v0105 · LIVE</span></div>
+<span class="badge">SHELL v0108 · LIVE</span></div>
 <div class="navsec">系統 SYSTEMS</div><div class="nav"><a href="VIA_UI_IntakeRoster_v0100.html"><span class="no">船</span><span class="lb">上船件冊<small>INTAKE ROSTER · 批336</small></span></a><a href="VIA_UI_System_v0100.html"><span class="no">統</span><span class="lb">系統總台<small>STANDARD SYSTEM UI · 6 SUBJECTS</small></span></a><a href="http://127.0.0.1:8765/master"><span class="no">00</span><span class="lb">總控台<small>MASTER CONTROL · 樞紐同源 /master</small></span></a><a href="VIA_UI_Shell_CGC_v0100.html"><span class="no">01</span><span class="lb">中央治理 · CGC<small>CENTRAL GOVERNANCE</small></span></a><a href="VIA_UI_Shell_VDF_v0100.html" class="active"><span class="no">02</span><span class="lb">資料鍛造 · VDF<small>VERITAS DATA FORGE</small></span></a><a href="VIA_UI_Shell_VRN_v0100.html"><span class="no">03</span><span class="lb">報告新星 · VRN<small>VERITAS REPORT NOVA</small></span></a><a href="VIA_UI_Shell_VAP_v0100.html"><span class="no">04</span><span class="lb">自動繪圖 · VAP<small>VERITAS AUTO PLOT</small></span></a></div><div class="navsec">區內頁面 PAGES</div><div class="nav"><a href="VIA_UI_Shell_VDF_v0100.html"><span class="no">01</span><span class="lb">VDF 現況台(統一殼)</span></a><a href="VIA_UI_System_v0100.html#vdf"><span class="no">02</span><span class="lb">系統總台 · VDF/主動 ETF 分類/族群輪動/月營收(批332)</span></a><a href="VIA_UI_GroupBacktest_v0100.html"><span class="no">03</span><span class="lb">族群回測 Group Backtest(ENG071)</span></a><a href="VIA_UI_GroupClassIndex_v0100.html"><span class="no">04</span><span class="lb">族群分類×價格指數(批307)</span></a><a href="VIA_UI_StoryRotation_v0100.html"><span class="no">05</span><span class="lb">故事族群輪動橋接 v0.5(批325;ENG072)</span></a><a href="VIA_UI_ETFConsensusAnalysis_v0100.html"><span class="no">06</span><span class="lb">主動 ETF×共識分析</span></a><a href="VIA_UI_RevenueConsensusAnalysis_v0100.html"><span class="no">07</span><span class="lb">月營收×共識分析</span></a><a href="VIA_UI_DataCatalog_v0100.html"><span class="no">08</span><span class="lb">資料庫目錄</span></a><a href="VIA_UI_GlobalMarkets_v0100.html"><span class="no">09</span><span class="lb">全球市場觀測</span></a></div>
+<div class="rin" id="rin">
+<div class="t">INPUT RAIL · 輸入面板</div>
+<form id="vdfForm" onsubmit="return VIA_submitVDF(event)">
+<div class="g">① 新增 / 移除資料 <span class="mono" style="font-weight:400;color:var(--mut2)">CATEGORIES</span></div>
+<div class="g">財報 FINANCIAL <span class="mono" style="font-weight:400;color:var(--mut2)">1</span></div><div class="chk"><label><input type="checkbox" name="cats" value="fin_reports">財報 <span class="mono" style="color:var(--mut2)">fin_reports</span></label></div><div class="g">國際商品 GLOBAL COMMODITY <span class="mono" style="font-weight:400;color:var(--mut2)">3</span></div><div class="chk"><label><input type="checkbox" name="cats" value="oil">原油 <span class="mono" style="color:var(--mut2)">oil</span></label><label><input type="checkbox" name="cats" value="fx">匯率 <span class="mono" style="color:var(--mut2)">fx</span></label><label><input type="checkbox" name="cats" value="cmdty">商品 <span class="mono" style="color:var(--mut2)">cmdty</span></label></div><div class="g">國際股市 GLOBAL EQUITY <span class="mono" style="font-weight:400;color:var(--mut2)">3</span></div><div class="chk"><label><input type="checkbox" name="cats" value="idx">指數 <span class="mono" style="color:var(--mut2)">idx</span></label><label><input type="checkbox" name="cats" value="etf">ETF <span class="mono" style="color:var(--mut2)">etf</span></label><label><input type="checkbox" name="cats" value="us_jp">美日股 <span class="mono" style="color:var(--mut2)">us_jp</span></label></div><div class="g">總經 MACRO <span class="mono" style="font-weight:400;color:var(--mut2)">4</span></div><div class="chk"><label><input type="checkbox" name="cats" value="us_macro">美總經 <span class="mono" style="color:var(--mut2)">us_macro</span></label><label><input type="checkbox" name="cats" value="fed">聯準會 <span class="mono" style="color:var(--mut2)">fed</span></label><label><input type="checkbox" name="cats" value="us_fiscal_rates">美財政利率 <span class="mono" style="color:var(--mut2)">us_fiscal_rates</span></label><label><input type="checkbox" name="cats" value="crypto">加密 <span class="mono" style="color:var(--mut2)">crypto</span></label></div>
+<div class="hint">類別冊=DeckServer GLOBAL_CATEGORIES 真取 11 類 · 勾選=納入本次全球宇宙擷取(任務 global;只增不減)</div>
+<div class="row">
+<div><label>起始日期 START <span class="mono" style="color:var(--mut2)">auto</span></label><input type="date" name="start" value="2026-08-04" required></div>
+<div><label>結束日期 END <span class="mono" style="color:var(--mut2)">留空=今日(契約:起訖成對)</span></label><input type="date" name="end"></div>
+</div>
+<button class="btn" type="submit">送出 → 樞紐 POST /run · task=global</button>
+<div class="hint"><span class="led ok"></span>任務冊 global 在位 · 參數冊=VDF_Param_Registry_v0100.json 總 678(財報 206 · 國際 22)<br>契約=白名單 {task,codes,start,end,cats}(批304);本頁零直執行;需同源開啟(file://=只檢視)</div>
+<div class="out" id="vdfOut"></div>
+</form></div>
 <div class="railfoot">
 <div><div class="k">TASKS</div><div class="v">11</div></div>
 <div><div class="k">PAGES</div><div class="v">8</div></div>
 <div><div class="k">STATE</div><div class="v">LIVE</div></div>
-<div><div class="k">LEDGER</div><div class="v">756</div></div>
+<div><div class="k">LEDGER</div><div class="v">759</div></div>
 </div></aside>
 <main class="main">
+<div class="hdwrap">
 <div class="crumb"><b>VIA 母系統</b> → <b>VDF 擷取 · 入庫</b> → <b>資料現況</b> · <span class="lock">LAYOUT SPEC(批302)</span></div>
 <div class="head"><h2>資料鍛造 VDF<small>VERITAS DATA FORGE</small></h2>
 <div class="spec">
-<div><div class="k">BUILD</div><div class="v">SHELL v0105</div></div>
-<div><div class="k">TASKS</div><div class="v">11</div></div>
-<div><div class="k">BRIDGE</div><div class="v ok">127.0.0.1:8765</div></div>
-<div><div class="k">GATE</div><div class="v ok">HONEST 3-STATE</div></div>
+<div><div class="k">BUILD</div><div class="v">SHELL v0108</div></div>
+<div><div class="k">TASKS</div><div class="v"><span class="led ok"></span>11</div></div>
+<div><div class="k">DATA</div><div class="v"><span class="led warn"></span>DATABASE 缺</div></div>
+<div><div class="k">BRIDGE</div><div class="v"><span class="led warn" id="bled"></span><span id="btxt">127.0.0.1:8765 探測中</span></div></div>
 </div>
-<div class="sub">台股全市場+全球 11 類擷取 · 單庫 SSOT · 誠實三態不假綠</div></div>
-<div class="stats"><div class="stat"><div class="n">11</div><div class="zh">一鍵任務</div><div class="en">DECK TASKS</div></div><div class="stat"><div class="n">8</div><div class="zh">現役頁族</div><div class="en">PAGE FAMILIES</div></div><div class="stat"><div class="n">756</div><div class="zh">台帳筆數</div><div class="en">LEDGER</div></div><div class="stat"><div class="n">241</div><div class="zh">SSOT 冊</div><div class="en">REGISTRY</div></div></div>
+<div class="sub">台股全市場+全球 11 類擷取 · 單庫 SSOT · 誠實三態不假綠</div></div></div>
+<div class="stats"><div class="stat"><div class="n">11</div><div class="zh">一鍵任務</div><div class="en">DECK TASKS</div></div><div class="stat"><div class="n">8</div><div class="zh">現役頁族</div><div class="en">PAGE FAMILIES</div></div><div class="stat"><div class="n">759</div><div class="zh">台帳筆數</div><div class="en">LEDGER</div></div><div class="stat"><div class="n">243</div><div class="zh">SSOT 冊</div><div class="en">REGISTRY</div></div></div>
+<div class="panels"><div class="card full"><h3>擷取內容<small>EXTRACTED CONTENT</small></h3><div class="note"><span class="led warn"></span>操作員裁:可行擷取內容僅二桶=國際股市每日交易數據 · 台股與國際股票財報。其他資料集列於「其他」誠實不併桶。欄名=pyarrow 讀取。</div><div class="g" style="margin-top:6px;font-size:10.5px;font-weight:700">① 國際股市每日交易數據 <span class="mono" style="font-weight:400;color:var(--mut2)">GLOBAL DAILY · 0</span></div><table class="fmx"><tr><th>資料集</th><th>檔</th><th>首</th><th>末</th><th class="vcol">欄 COLUMNS</th></tr><tr><td colspan="5"><span class="led off"></span>此桶無資料集(誠實空)</td></tr></table><div class="g" style="margin-top:6px;font-size:10.5px;font-weight:700">② 台股 + 國際股票財報 <span class="mono" style="font-weight:400;color:var(--mut2)">FINANCIALS · 0</span></div><table class="fmx"><tr><th>資料集</th><th>檔</th><th>首</th><th>末</th><th class="vcol">欄 COLUMNS</th></tr><tr><td colspan="5"><span class="led off"></span>此桶無資料集(誠實空)</td></tr></table></div><div class="card full"><h3>資料現況矩陣<small>DATA STATUS MATRIX</small></h3><div class="note"><span class="pill warn">誠實空</span> DATABASE 缺或空:C:\Users\tonyk\movies-dataset\VeritasIntelligenceAnalytics\dict\VDF\DATABASE — 左欄勾選資料集+起始日期送樞紐後再生</div></div><div class="card"><h3>參數歸類<small>PARAM REGISTRY · 678</small></h3><div class="kv"><div class="k">財報 FINANCIAL</div><div>206</div><div class="k">國際商品 GLOBAL</div><div>22</div><div class="k">其他 OTHER</div><div>450</div><div class="k">採收 HARVESTED</div><div class="mono">20260823_191857</div></div><div class="wrap-x" style="margin-top:6px"><table class="tbl"><tr><th>來源引擎 SRC</th><th>參數 N</th></tr><tr><td class="mono">VDF_MDL001_TWEquityEngine.py</td><td class="mono">53</td></tr><tr><td class="mono">VDF_ENG006_MDL004TWFullMarketEngine.py</td><td class="mono">41</td></tr><tr><td class="mono">VDF_MDL004_TWFullMarketEngine.py</td><td class="mono">41</td></tr><tr><td class="mono">engine/VDF_MDL003_SentimentMacroEngine.py</td><td class="mono">39</td></tr><tr><td class="mono">VDF_MDL003_SentimentMacroEngine.py</td><td class="mono">38</td></tr><tr><td class="mono">engine/VDF_MDL006_FinancialModel.py</td><td class="mono">36</td></tr><tr><td class="mono">engine/VDF_MDL002_YFinanceFetchingEngine.py</td><td class="mono">36</td></tr><tr><td class="mono">VDF_MDL006_FinancialModel.py</td><td class="mono">35</td></tr><tr><td class="mono">VDF_MDL002_YFinanceFetchingEngine.py</td><td class="mono">35</td></tr><tr><td class="mono">engine/VDF_MDL007_SSOTResolver.py</td><td class="mono">33</td></tr><tr><td class="mono">ultra_financial_tool.py</td><td class="mono">32</td></tr><tr><td class="mono">VDF_MDL007_SSOTResolver.py</td><td class="mono">32</td></tr></table></div></div><div class="card"><h3>顯示規約<small>DISPLAY RULE</small></h3><div class="note">左欄=輸入(增減資料·起始日 auto·財報·國際商品參數);右區=顯示。<br>資料集歸類=參數冊 src 引擎名關鍵字;起始日=DATABASE 末日+1(缺=今日-30)。</div></div></div>
 <div class="card"><h3>一鍵任務冊<small>DECK TASKS</small></h3>
 <div class="note">執行入口=總控台 MasterControl(下拉/勾選;樞紐
 127.0.0.1:8765 白名單真跑)。本頁=現況展示(唯讀)。</div>
@@ -152,9 +248,94 @@ border-radius:3px;background:var(--soft);color:var(--ink2)}
 左欄「區內頁面」可直開)。</div>
 <div class="wrap-x"><table class="tbl">
 <tr><th>NO</th><th>頁族 FAMILY</th><th>KB</th><th>更新 UPDATED</th></tr>
-<tr><td class="mono">01</td><td><a href="VIA_UI_DataCatalog_v0100.html">DataCatalog</a></td><td class="mono">17.2</td><td class="mono">09-03 09:36</td></tr><tr><td class="mono">02</td><td><a href="VIA_UI_ETFConsensusAnalysis_v0100.html">ETFConsensusAnalysis</a></td><td class="mono">4208.1</td><td class="mono">09-03 09:33</td></tr><tr><td class="mono">03</td><td><a href="VIA_UI_GlobalMarkets_v0100.html">GlobalMarkets</a></td><td class="mono">36.5</td><td class="mono">09-03 09:36</td></tr><tr><td class="mono">04</td><td><a href="VIA_UI_GroupBacktest_v0100.html">GroupBacktest</a></td><td class="mono">4284.7</td><td class="mono">09-03 05:29</td></tr><tr><td class="mono">05</td><td><a href="VIA_UI_GroupClassIndex_v0100.html">GroupClassIndex</a></td><td class="mono">5027.6</td><td class="mono">09-03 08:57</td></tr><tr><td class="mono">06</td><td><a href="VIA_UI_RevenueConsensusAnalysis_v0100.html">RevenueConsensusAnalysis</a></td><td class="mono">4215.6</td><td class="mono">09-03 09:33</td></tr><tr><td class="mono">07</td><td><a href="VIA_UI_Shell_VDF_v0100.html">Shell_VDF</a></td><td class="mono">13.0</td><td class="mono">09-03 09:18</td></tr><tr><td class="mono">08</td><td><a href="VIA_UI_StoryRotation_v0100.html">StoryRotation</a></td><td class="mono">8.1</td><td class="mono">09-03 05:09</td></tr></table></div></div>
+<tr><td class="mono">01</td><td><a href="VIA_UI_DataCatalog_v0100.html">DataCatalog</a></td><td class="mono">17.3</td><td class="mono">09-03 17:45</td></tr><tr><td class="mono">02</td><td>ETFConsensusAnalysis</td><td colspan="2"><span class="tag">尚未產出(誠實)</span></td></tr><tr><td class="mono">03</td><td><a href="VIA_UI_GlobalMarkets_v0100.html">GlobalMarkets</a></td><td class="mono">36.5</td><td class="mono">09-03 17:45</td></tr><tr><td class="mono">04</td><td><a href="VIA_UI_GroupBacktest_v0100.html">GroupBacktest</a></td><td class="mono">4913.7</td><td class="mono">09-02 20:55</td></tr><tr><td class="mono">05</td><td><a href="VIA_UI_GroupClassIndex_v0100.html">GroupClassIndex</a></td><td class="mono">5553.8</td><td class="mono">09-02 20:49</td></tr><tr><td class="mono">06</td><td>RevenueConsensusAnalysis</td><td colspan="2"><span class="tag">尚未產出(誠實)</span></td></tr><tr><td class="mono">07</td><td><a href="VIA_UI_Shell_VDF_v0100.html">Shell_VDF</a></td><td class="mono">28.8</td><td class="mono">09-03 19:23</td></tr><tr><td class="mono">08</td><td><a href="VIA_UI_StoryRotation_v0100.html">StoryRotation</a></td><td class="mono">8.1</td><td class="mono">09-03 14:22</td></tr></table></div></div>
 
 <div class="foot">VIA · VERITAS DATA FORGE · 真值直取(Atlas+任務冊+歸屬冊)
-零發明 · 產於 2026-09-03 09:36 · 版型=批302 四設計正本萃取(hash 已收容)
+零發明 · 產於 2026-09-03 19:32 · 版型=批302 四設計正本萃取(hash 已收容)
 · 零 CDN 零外網</div>
-</main></body></html>
+</main>
+<script>
+(function(){var k='via.rail.collapsed';try{if(localStorage.getItem(k)==='1')document.body.classList.add('railc');}catch(e){}
+ var t=document.createElement('button');t.className='railtg';t.title='收起/展開左欄';t.textContent='‹';
+ function sync(){var c=document.body.classList.contains('railc');t.textContent=c?'›':'‹';try{localStorage.setItem(k,c?'1':'0');}catch(e){}}
+ t.onclick=function(){document.body.classList.toggle('railc');sync();};document.body.appendChild(t);sync();})();
+(function(){var B='http://127.0.0.1:8765',l=document.getElementById('bled'),t=document.getElementById('btxt');if(!l)return;
+ var c=new AbortController();var tm=setTimeout(function(){c.abort();},2500);
+ fetch(B+'/probe',{mode:'no-cors',cache:'no-store',signal:c.signal}).then(function(){clearTimeout(tm);
+   var same=(location.origin===B);l.className='led '+(same?'ok':'warn');
+   t.textContent=same?'127.0.0.1:8765 同源在線':'127.0.0.1:8765 在線 · 本頁 file:// 只檢視';
+ }).catch(function(){clearTimeout(tm);l.className='led bad';t.textContent='127.0.0.1:8765 離線(誠實)';});})();
+</script>
+
+<script>
+var B='http://127.0.0.1:8765';
+var FM=[];var INC={};
+(function(){try{var r=document.getElementById('rin');if(!r)return;var a=JSON.parse(r.getAttribute('data-incoming')||'[]');a.forEach(function(x){INC[x.n]=x.s;});}catch(e){}})();
+var BR=[['兆豐','兆豐'],['華南','華南'],['凱基','凱基'],['統一','統一'],['台新','台新'],['MS-','MS'],['GS-','GS'],['UBS','UBS'],['Daiwa','Daiwa'],['JP-','JP'],['GF-','GF'],['MQ-','MQ']];
+function VIA_guess(n){var b='';for(var i=0;i<BR.length;i++){if(n.indexOf(BR[i][0])>=0){b=BR[i][1];break;}}
+ var d='',m=n.match(/(20\d{6})/);if(m){d=m[1].slice(0,4)+'-'+m[1].slice(4,6)+'-'+m[1].slice(6,8);}
+ else{m=n.match(/(?:^|\D)(1[0-2]\d{5})(?:\D|$)/);if(m){var y=parseInt(m[1].slice(0,3),10)+1911;d=y+'-'+m[1].slice(3,5)+'-'+m[1].slice(5,7);}}
+ return {b:b,d:d};}
+function VIA_addFiles(fl){var added=0;for(var i=0;i<fl.length;i++){var f=fl[i];
+ if(FM.some(function(x){return x.n===f.name;}))continue;
+ var g=VIA_guess(f.name);FM.push({n:f.name,e:(f.name.split('.').pop()||'').toLowerCase(),s:f.size,b:g.b,d:g.d,on:true,file:f});added++;}
+ VIA_render();}
+function VIA_render(){var tb=document.getElementById('fmb'),cnt=document.getElementById('fmcount');if(!tb)return;tb.innerHTML='';
+ var sizes={};FM.forEach(function(x){sizes[x.s]=(sizes[x.s]||0)+1;});
+ FM.forEach(function(x,i){var st=[],cls='';
+  if(INC[x.n]!==undefined){st.push('已在 incoming');cls='exist';}
+  if(sizes[x.s]>1){st.push('同尺寸疑似同源');cls=cls||'dup';}
+  var led=cls==='exist'?'bad':(cls==='dup'?'warn':'ok');
+  var tr=document.createElement('tr');tr.className=cls;
+  tr.innerHTML='<td><input type="checkbox" '+(x.on?'checked':'')+' onchange="FM['+i+'].on=this.checked;VIA_count()"></td>'+
+   '<td title="'+x.n.replace(/"/g,'&quot;')+'">'+x.n+'</td><td>'+x.e+'</td><td>'+Math.round(x.s/1024)+'</td>'+
+   '<td><input type="text" value="'+x.b+'" style="width:52px" onchange="FM['+i+'].b=this.value"></td>'+
+   '<td><input type="date" value="'+x.d+'" style="width:108px" onchange="FM['+i+'].d=this.value"></td>'+
+   '<td><span class="led '+led+'"></span>'+(st.join(' / ')||'新')+'</td>';
+  tb.appendChild(tr);});
+ VIA_count();}
+function VIA_count(){var c=document.getElementById('fmcount');if(c)c.textContent=FM.filter(function(x){return x.on;}).length+' / '+FM.length+' 件';}
+function VIA_selAll(v){FM.forEach(function(x){x.on=(v===null)?!x.on:v;});VIA_render();}
+function VIA_clearFiles(){FM=[];VIA_render();}
+(function(){var z=document.getElementById('drop');if(!z)return;
+ ['dragenter','dragover'].forEach(function(e){z.addEventListener(e,function(ev){ev.preventDefault();z.classList.add('over');});});
+ ['dragleave','drop'].forEach(function(e){z.addEventListener(e,function(ev){ev.preventDefault();z.classList.remove('over');});});
+ z.addEventListener('drop',function(ev){if(ev.dataTransfer&&ev.dataTransfer.files)VIA_addFiles(ev.dataTransfer.files);});})();
+function VIA_gate(o){
+  if(location.origin!==B){o.className='out show bad';o.textContent='本頁非同源(file:// 只檢視)。樞紐在線時本頁會自動導向同源;或直接開 '+B+location.pathname.split('/').pop();return false;}
+  return true;}
+function VIA_submitVDF(ev){
+  ev.preventDefault();var f=ev.target,o=document.getElementById('vdfOut');
+  var cats=[];new FormData(f).forEach(function(v,k){if(k==='cats')cats.push(v);});
+  var end=f.end.value||new Date().toISOString().slice(0,10);
+  var p={task:'global',start:f.start.value,end:end,cats:cats.join(',')};
+  if(!cats.length){o.className='out show bad';o.textContent='未勾選任何類別(誠實)';return false;}
+  if(!VIA_gate(o)){o.textContent+='\n\n載荷 JSON:\n'+JSON.stringify(p,null,1);return false;}
+  o.className='out show';o.textContent='POST /run … '+JSON.stringify(p);
+  fetch('/run',{method:'POST',body:JSON.stringify(p)})
+   .then(function(r){return r.text().then(function(t){return {ok:r.ok,st:r.status,t:t};});})
+   .then(function(r){o.className='out show '+(r.ok?'ok':'bad');o.textContent='樞紐 '+r.st+'\n'+r.t.slice(0,800);})
+   .catch(function(e){o.className='out show bad';o.textContent='送出失敗(誠實): '+e;});
+  return false;}
+function VIA_b64(file){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(String(r.result).split(',')[1]||'');};r.onerror=rej;r.readAsDataURL(file);});}
+function VIA_submitVRN(ev){
+  ev.preventDefault();var f=ev.target,o=document.getElementById('vrnOut');
+  var sel=FM.filter(function(x){return x.on;});
+  if(!sel.length){o.className='out show bad';o.textContent='未勾選任何檔案(誠實)';return false;}
+  if(!VIA_gate(o)){o.textContent+='\n\n將送出:\n'+sel.map(function(x){return x.n+' ('+Math.round(x.s/1024)+'KB)';}).join('\n');return false;}
+  var method=f.method.value,log=[],i=0;o.className='out show';
+  function step(){if(i>=sel.length){return after();}var x=sel[i++];var file=null;
+    var fp=document.getElementById('fpick');for(var j=0;fp&&j<fp.files.length;j++){if(fp.files[j].name===x.n){file=fp.files[j];break;}}
+    if(!file&&x.file)file=x.file;
+    if(!file){log.push('SKIP '+x.n+' (無檔案物件;請重新拖入)');o.textContent=log.join('\n');return step();}
+    VIA_b64(file).then(function(b64){return fetch('/intake',{method:'POST',body:JSON.stringify({name:x.n,b64:b64,dest:'vrn_incoming'})});})
+     .then(function(r){return r.json().then(function(j){return {st:r.status,j:j};});})
+     .then(function(r){var j=r.j||{};log.push((r.st===201?'新收 ':(r.st===200?'冪等 ':'拒 '))+r.st+' '+x.n+(j.skip?' · '+j.skip:'')+(j.saved?' → '+j.saved.split(/[\\/]/).pop():'')+(j.err?' · '+j.err:''));o.textContent=log.join('\n');step();})
+     .catch(function(e){log.push('失敗 '+x.n+' '+e);o.textContent=log.join('\n');step();});}
+  function after(){if(method==='none'){o.className='out show ok';return;}
+    var tasks=method==='firstpage+structdb'?['firstpage','structdb']:['firstpage'];
+    (function run(k){if(k>=tasks.length){o.className='out show ok';return;}
+      fetch('/run',{method:'POST',body:JSON.stringify({task:tasks[k]})}).then(function(r){return r.text().then(function(t){log.push('task '+tasks[k]+' → '+r.status+' '+t.slice(0,160));o.textContent=log.join('\n');run(k+1);});})
+      .catch(function(e){log.push('task '+tasks[k]+' 失敗 '+e);o.textContent=log.join('\n');run(k+1);});})(0);}
+  step();return false;}
+</body></html>

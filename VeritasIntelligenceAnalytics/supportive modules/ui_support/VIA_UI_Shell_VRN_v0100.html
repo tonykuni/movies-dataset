@@ -1,9 +1,28 @@
 <!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>VIA · 報告新星 VRN 現況台</title><style>
+<title>VIA · 報告新星 VRN 現況台</title><script>(function(){if(location.protocol!=='file:')return;var B='http://127.0.0.1:8765';var c=new AbortController();var t=setTimeout(function(){c.abort();},1500);fetch(B+'/probe',{mode:'no-cors',cache:'no-store',signal:c.signal}).then(function(){clearTimeout(t);location.replace(B+'/VIA_UI_Shell_VRN_v0100.html'+(location.hash||''));}).catch(function(){clearTimeout(t);});})();</script><style>
 :root{--bg:#f5f5f2;--paper:#ffffff;--paper2:#fafaf8;--ink:#1f2530;
 --ink2:#3c4658;--mut:#6d7688;--mut2:#9aa2b1;--line:#dcdfe6;
---soft:#eef0ee;--acc:#3e6b8f;--ok:#4f8f6b;--warn:#b58a3e;--bad:#b05c4d}
+--soft:#eef0ee;--acc:#3e6b8f;--ok:#4f8f6b;--warn:#b58a3e;--bad:#b05c4d;
+--rail-w:224px;--hd:84px;--ft:30px}
+html{scrollbar-width:thin;scrollbar-color:rgba(60,70,88,.28) transparent}
+*::-webkit-scrollbar{width:6px;height:6px}
+*::-webkit-scrollbar-thumb{background:rgba(60,70,88,.28);border-radius:3px}
+*::-webkit-scrollbar-track{background:transparent}
+.led{display:inline-block;width:8px;height:8px;border-radius:50%;
+vertical-align:middle;margin-right:5px;background:var(--mut2);
+box-shadow:0 0 0 2px rgba(0,0,0,.04)}
+.led.ok{background:var(--ok)}.led.warn{background:var(--warn)}
+.led.bad{background:var(--bad)}.led.off{background:var(--mut2);opacity:.5}
+.railtg{position:fixed;left:calc(var(--rail-w) - 12px);top:calc(var(--hd) + 8px);
+z-index:30;width:22px;height:22px;border:1px solid var(--line);
+background:var(--paper);border-radius:50%;cursor:pointer;font-size:11px;
+line-height:20px;text-align:center;color:var(--mut);box-shadow:0 1px 3px rgba(0,0,0,.08);
+transition:left .18s}
+.railtg:hover{color:var(--ink)}
+body.railc{--rail-w:0px}
+body.railc .rail{display:none}
+body.railc .railtg{left:6px}
 *{box-sizing:border-box;margin:0}
 body{background:var(--bg);color:var(--ink);
 font:12px/1.5 "Segoe UI","Noto Sans TC",system-ui,sans-serif;display:flex;
@@ -12,16 +31,73 @@ code,.mono{font-family:Consolas,"SFMono-Regular",ui-monospace,monospace}
 a{color:var(--acc);text-decoration:none}
 a:hover{text-decoration:underline}
 /* ①左欄 */
-.rail{width:224px;min-width:224px;background:var(--paper);
-border-right:1px solid var(--line);padding:14px 0 10px;display:flex;
-flex-direction:column;gap:4px}
-.brand{padding:0 16px 10px;border-bottom:1px solid var(--line)}
+/* v0106 輸入面板(VDF/VRN) */
+.rin{margin:6px 8px 3px;padding:6px 8px;border:1px solid var(--line);
+border-radius:6px;background:var(--paper2)}
+.rin .t{font-size:8.5px;letter-spacing:.2em;color:var(--mut2);font-weight:700;
+margin-bottom:5px}
+.rin .g{margin:6px 0 2px;font-size:10px;font-weight:700;color:var(--ink2)}
+.rin label{display:block;font-size:9.5px;color:var(--mut);margin:4px 0 1px}
+.rin input,.rin select,.rin textarea{width:100%;font:11px/1.4 inherit;
+padding:4px 6px;border:1px solid var(--line);border-radius:4px;
+background:var(--paper);color:var(--ink)}
+.rin textarea{min-height:44px;resize:vertical}
+.rin .chk{display:flex;flex-direction:column;gap:2px;max-height:110px;
+overflow:auto;border:1px solid var(--line);border-radius:4px;padding:4px 6px;
+background:var(--paper)}
+.rin .chk label{display:flex;gap:6px;align-items:center;margin:0;
+font-size:10px;color:var(--ink2)}
+.rin .chk input{width:auto}
+.rin .row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.rin .btn{display:block;width:100%;margin-top:8px;padding:6px 8px;
+font:11px/1 inherit;font-weight:700;letter-spacing:.06em;color:#fff;
+background:var(--acc);border:0;border-radius:4px;cursor:pointer}
+.rin .btn:hover{filter:brightness(1.08)}
+.rin .hint{font-size:9px;color:var(--mut2);margin-top:5px;line-height:1.35}
+.rin .out{display:none;margin-top:6px;font:9.5px/1.35 Consolas,monospace;
+padding:6px;background:var(--paper);border:1px dashed var(--line);
+border-radius:4px;white-space:pre-wrap;word-break:break-all;max-height:120px;
+overflow:auto}
+.rin .out.show{display:block}
+.rin .out.bad{border-color:var(--bad);color:var(--bad)}
+.rin .out.ok{border-color:var(--ok);color:var(--ok)}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.fmx{width:100%;border-collapse:collapse;font-size:10.5px;margin-top:6px}
+.fmx th,.fmx td{padding:3px 5px;border-bottom:1px solid var(--line);text-align:left;
+white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+.fmx th{font-size:9px;letter-spacing:.1em;color:var(--mut2)}
+.fmx tr.dup td{background:rgba(181,138,62,.10)}
+.fmx tr.exist td{background:rgba(176,92,77,.08)}
+.drop{margin-top:5px;border:1.5px dashed var(--line);border-radius:5px;padding:9px 6px;
+text-align:center;font-size:10px;color:var(--mut);background:var(--paper);cursor:pointer}
+.drop.over{border-color:var(--acc);background:var(--soft);color:var(--ink)}
+.fmbar{display:flex;gap:6px;align-items:center;margin-top:5px;font-size:10px}
+.fmbar button{font:10px/1 inherit;padding:3px 7px;border:1px solid var(--line);
+background:var(--paper);border-radius:3px;cursor:pointer;color:var(--ink2)}
+.vcol{white-space:normal!important;max-width:none!important}
+.panels .card{margin:0}
+.panels .card.full{grid-column:1/-1}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:11px}
+.kv .k{color:var(--mut);font-weight:700;font-size:9.5px;letter-spacing:.06em}
+.pill{display:inline-block;font-size:9px;font-weight:700;padding:1px 6px;
+border-radius:3px;border:1px solid var(--line);color:var(--mut)}
+.pill.ok{color:var(--ok);border-color:var(--ok)}
+.pill.warn{color:var(--warn);border-color:var(--warn)}
+.pill.bad{color:var(--bad);border-color:var(--bad)}
+@media(max-width:900px){.panels{grid-template-columns:1fr}}
+.rail{width:var(--rail-w);min-width:var(--rail-w);background:var(--paper);
+border-right:1px solid var(--line);padding:0 0 8px;display:flex;
+flex-direction:column;gap:3px;position:sticky;top:0;height:100vh;
+overflow-y:auto}
+.brand{height:var(--hd);display:flex;flex-direction:column;justify-content:center;
+position:sticky;top:0;background:var(--paper);z-index:5}
+.brand{padding:0 14px 0;border-bottom:1px solid var(--line)}
 .brand .latin{font-size:9.5px;letter-spacing:.22em;color:var(--mut);
 font-weight:700}
-.brand h1{font-size:17px;margin:4px 0 2px;letter-spacing:.02em}
+.brand h1{font-size:16px;margin:3px 0 1px;letter-spacing:.02em}
 .brand .en{font-size:9.5px;letter-spacing:.14em;color:var(--acc);
 font-weight:700}
-.brand .badge{display:inline-block;margin-top:7px;font-size:10px;
+.brand .badge{display:inline-block;margin-top:5px;font-size:9.5px;
 font-weight:700;padding:2px 8px;border:1px solid var(--line);
 border-radius:4px;color:var(--mut);letter-spacing:.08em}
 .seal{float:right;width:28px;height:28px;border:2px solid var(--ink2);
@@ -44,14 +120,16 @@ font-weight:700}
 .railfoot .v{font-size:11.5px;font-weight:700;
 font-variant-numeric:tabular-nums}
 /* 主區 */
-.main{flex:1;padding:16px 22px;max-width:1160px}
-.crumb{font-size:10px;color:var(--mut);letter-spacing:.04em;
-margin-bottom:7px}
+.main{flex:1;padding:0 18px 0;max-width:1240px;min-width:0}
+.hdwrap{position:sticky;top:0;z-index:6;background:var(--bg);height:var(--hd);
+display:flex;flex-direction:column;justify-content:flex-end;padding-top:6px}
+.crumb{font-size:9.5px;color:var(--mut);letter-spacing:.04em;
+margin-bottom:4px}
 .crumb b{color:var(--acc)}
 .crumb .lock{letter-spacing:.16em;font-weight:700;font-size:10px}
-.head{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap;
-border-bottom:2px solid var(--ink);padding-bottom:9px;margin-bottom:12px}
-.head h2{font-size:30px;letter-spacing:.01em}
+.head{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;
+border-bottom:2px solid var(--ink);padding-bottom:6px;margin-bottom:9px}
+.head h2{font-size:24px;letter-spacing:.01em;line-height:1.1}
 .head h2 small{font-size:10px;color:var(--mut);font-weight:400;
 margin-left:10px;letter-spacing:.1em}
 .head .sub{width:100%;font-size:11px;color:var(--mut)}
@@ -91,7 +169,9 @@ vertical-align:top}
 border-radius:3px;background:var(--soft);color:var(--ink2)}
 .tag.net{background:#f3ece1;color:var(--warn)}
 .wrap-x{overflow-x:auto}
-.foot{font-size:10.5px;color:var(--mut2);margin-top:6px}
+.foot{position:sticky;bottom:0;background:var(--bg);z-index:5;
+height:var(--ft);display:flex;align-items:center;border-top:1px solid var(--line);
+margin-top:10px;font-size:10.5px;color:var(--mut2);margin-top:6px}
 /* 響應雙態(批302 中途令):PC=水平長方形(左欄+主區);
    手機=垂直長方形(欄轉頂條+導航橫捲+單欄卡);自動最佳化=
    clamp 流體字級+auto-fit 卡格+表格自 overflow;零動畫零校正負擔 */
@@ -122,25 +202,51 @@ border-radius:3px;background:var(--soft);color:var(--ink2)}
 <div class="latin">VERITAS INTELLIGENCE ANALYTICS</div>
 <h1>報告新星現況台</h1>
 <div class="en">VERITAS REPORT NOVA</div>
-<span class="badge">SHELL v0105 · LIVE</span></div>
+<span class="badge">SHELL v0108 · LIVE</span></div>
 <div class="navsec">系統 SYSTEMS</div><div class="nav"><a href="VIA_UI_IntakeRoster_v0100.html"><span class="no">船</span><span class="lb">上船件冊<small>INTAKE ROSTER · 批336</small></span></a><a href="VIA_UI_System_v0100.html"><span class="no">統</span><span class="lb">系統總台<small>STANDARD SYSTEM UI · 6 SUBJECTS</small></span></a><a href="http://127.0.0.1:8765/master"><span class="no">00</span><span class="lb">總控台<small>MASTER CONTROL · 樞紐同源 /master</small></span></a><a href="VIA_UI_Shell_CGC_v0100.html"><span class="no">01</span><span class="lb">中央治理 · CGC<small>CENTRAL GOVERNANCE</small></span></a><a href="VIA_UI_Shell_VDF_v0100.html"><span class="no">02</span><span class="lb">資料鍛造 · VDF<small>VERITAS DATA FORGE</small></span></a><a href="VIA_UI_Shell_VRN_v0100.html" class="active"><span class="no">03</span><span class="lb">報告新星 · VRN<small>VERITAS REPORT NOVA</small></span></a><a href="VIA_UI_Shell_VAP_v0100.html"><span class="no">04</span><span class="lb">自動繪圖 · VAP<small>VERITAS AUTO PLOT</small></span></a></div><div class="navsec">區內頁面 PAGES</div><div class="nav"><a href="VIA_UI_VRNControlTower_v0100.html"><span class="no">01</span><span class="lb">VRN 控制塔(Codex 模板版面;批306)</span></a><a href="VIA_UI_Shell_VRN_v0100.html"><span class="no">02</span><span class="lb">VRN 現況台(統一殼)</span></a><a href="VIA_UI_ReportCards_v0100.html"><span class="no">03</span><span class="lb">券商報告卡</span></a><a href="VIA_UI_DailyBrief_v0100.html"><span class="no">04</span><span class="lb">每日觀察</span></a><a href="VIA_UI_RevenueConsensusAnalysis_v0100.html"><span class="no">05</span><span class="lb">月營收×共識分析(跨區 VDF)</span></a><a href="VIA_UI_ETFConsensusAnalysis_v0100.html"><span class="no">06</span><span class="lb">主動 ETF×共識分析(跨區 VDF)</span></a></div>
+<div class="rin" id="rin" data-incoming="[{&quot;n&quot;: &quot;20250819兆豐個股報告-泓德能源(6873).pdf&quot;, &quot;s&quot;: 698089}, {&quot;n&quot;: &quot;20251128兆豐訪談速報-神達(3706).pdf&quot;, &quot;s&quot;: 397184}, {&quot;n&quot;: &quot;20251204兆豐個股報告-志強-KY(6768).pdf&quot;, &quot;s&quot;: 608844}, {&quot;n&quot;: &quot;20251205兆豐晨會報告(一)-當日新聞與重要訊息評論.pdf&quot;, &quot;s&quot;: 327072}, {&quot;n&quot;: &quot;20251205兆豐晨會報告(二)-公司訪談摘要.pdf&quot;, &quot;s&quot;: 317766}, {&quot;n&quot;: &quot;20251208_台新台股盤勢分析.pdf&quot;, &quot;s&quot;: 928509}, {&quot;n&quot;: &quot;20260519兆豐個股報告-望隼(4771).pdf&quot;, &quot;s&quot;: 818339}, {&quot;n&quot;: &quot;3014TT-20231005.pdf&quot;, &quot;s&quot;: 1129733}, {&quot;n&quot;: &quot;6933_AMAX-KY_個股介紹報告.pdf&quot;, &quot;s&quot;: 1109127}, {&quot;n&quot;: &quot;Citi-3231 20250604.pdf&quot;, &quot;s&quot;: 677991}, {&quot;n&quot;: &quot;CLST-6669 20251001.pdf&quot;, &quot;s&quot;: 530185}, {&quot;n&quot;: &quot;Daiwa-1319 20231011.pdf&quot;, &quot;s&quot;: 931065}, {&quot;n&quot;: &quot;Daiwa-3653 20251002.pdf&quot;, &quot;s&quot;: 969997}, {&quot;n&quot;: &quot;Daiwa-6278 20260521.pdf&quot;, &quot;s&quot;: 1018815}, {&quot;n&quot;: &quot;Daiwa-PCB 20251204.pdf&quot;, &quot;s&quot;: 278165}, {&quot;n&quot;: &quot;GF-Thoughts on TPU Competition with GPU 20251126.pdf&quot;, &quot;s&quot;: 226266}, {&quot;n&quot;: &quot;GS-1590 20231012.pdf&quot;, &quot;s&quot;: 1001187}, {&quot;n&quot;: &quot;GS-1590 20251203.pdf&quot;, &quot;s&quot;: 508885}, {&quot;n&quot;: &quot;GS-2317 20251205.pdf&quot;, &quot;s&quot;: 536180}, {&quot;n&quot;: &quot;GS-2382 20231012.pdf&quot;, &quot;s&quot;: 570820}, {&quot;n&quot;: &quot;GS-2383 20260519.pdf&quot;, &quot;s&quot;: 846483}, {&quot;n&quot;: &quot;GS-3706 20251130.pdf&quot;, &quot;s&quot;: 685565}, {&quot;n&quot;: &quot;GS-6415 20260517.pdf&quot;, &quot;s&quot;: 1945114}, {&quot;n&quot;: &quot;GS-AI PCB CCL 20251204.pdf&quot;, &quot;s&quot;: 698563}, {&quot;n&quot;: &quot;JP-2330 20250718.pdf&quot;, &quot;s&quot;: 1381011}, {&quot;n&quot;: &quot;JP-3653 20251003.pdf&quot;, &quot;s&quot;: 983562}, {&quot;n&quot;: &quot;MQ-1560 20260520.pdf&quot;, &quot;s&quot;: 1147112}, {&quot;n&quot;: &quot;MS-1590 20251202.pdf&quot;, &quot;s&quot;: 231874}, {&quot;n&quot;: &quot;MS-2308 20251128.pdf&quot;, &quot;s&quot;: 1077594}, {&quot;n&quot;: &quot;MS-3661 20251203.pdf&quot;, &quot;s&quot;: 1033562}, {&quot;n&quot;: &quot;MS-3665 20251202.pdf&quot;, &quot;s&quot;: 238127}, {&quot;n&quot;: &quot;MS-6669 20251007.pdf&quot;, &quot;s&quot;: 252084}, {&quot;n&quot;: &quot;MS-8210 20251007.pdf&quot;, &quot;s&quot;: 246018}, {&quot;n&quot;: &quot;MS-ABF 20260518.pdf&quot;, &quot;s&quot;: 2846718}, {&quot;n&quot;: &quot;MS-Automation 20251126.pdf&quot;, &quot;s&quot;: 257309}, {&quot;n&quot;: &quot;MS-Memory 20251204.pdf&quot;, &quot;s&quot;: 640925}, {&quot;n&quot;: &quot;MS-Thermal Solutions 20251007.pdf&quot;, &quot;s&quot;: 260109}, {&quot;n&quot;: &quot;MS-Thermal Solutions 20251208.pdf&quot;, &quot;s&quot;: 249920}, {&quot;n&quot;: &quot;【國泰證期研究部】神達(3706 TT)-初次評等買進(+30.4_)-大顯神威，營運騰達-20250822.pdf&quot;, &quot;s&quot;: 1572918}, {&quot;n&quot;: &quot;凱基投顧_1476 儒鴻_劉昃恩_20260519.pdf&quot;, &quot;s&quot;: 634863}, {&quot;n&quot;: &quot;凱基投顧_2891 中信金_施志鴻_20260519.pdf&quot;, &quot;s&quot;: 747972}, {&quot;n&quot;: &quot;凱基投顧_3665 貿聯-KY_李承泰_20260519.pdf&quot;, &quot;s&quot;: 1030556}, {&quot;n&quot;: &quot;凱基投顧_6147 頎邦_劉宇程_20260519.pdf&quot;, &quot;s&quot;: 667687}, {&quot;n&quot;: &quot;凱基投顧_鋼鐵產業_劉昃恩_20260518.pdf&quot;, &quot;s&quot;: 660344}, {&quot;n&quot;: &quot;凱基日股分析20251205-軍工股及機器人股上漲推升日股收漲.pdf&quot;, &quot;s&quot;: 1781822}, {&quot;n&quot;: &quot;凱基期貨晨間解盤20251205.pdf&quot;, &quot;s&quot;: 654622}, {&quot;n&quot;: &quot;凱基港股分析20251205-機器人概念受資金追捧，港股收漲.pdf&quot;, &quot;s&quot;: 1523333}, {&quot;n&quot;: &quot;凱基美股分析20251205-Meta大砍元宇宙預算，標普、那指續漲.pdf&quot;, &quot;s&quot;: 1643701}, {&quot;n&quot;: &quot;投資早報251209.pdf&quot;, &quot;s&quot;: 438919}, {&quot;n&quot;: &quot;晶心科(6533,N,中立)-CTBC251208.pdf&quot;, &quot;s&quot;: 1496311}, {&quot;n&quot;: &quot;瑞基(4171,NR_未評等)-CTBC251208.pdf&quot;, &quot;s&quot;: 729214}, {&quot;n&quot;: &quot;第一場 2026年投資大趨勢 - 華南投顧 -1141201.pdf&quot;, &quot;s&quot;: 3762097}, {&quot;n&quot;: &quot;第三場 AI潮流下展望2026半導體產業趨勢 - 陳子昂.pdf&quot;, &quot;s&quot;: 2637379}, {&quot;n&quot;: &quot;第二場 2026海外投資展望 - 華南永昌海外商品部.pdf&quot;, &quot;s&quot;: 3426311}, {&quot;n&quot;: &quot;統一投顧-20251209投資早報.pdf&quot;, &quot;s&quot;: 1100533}, {&quot;n&quot;: &quot;華南投顧-2606-裕民-1141202.pdf&quot;, &quot;s&quot;: 1080042}, {&quot;n&quot;: &quot;華南投顧-2637-慧洋-KY-1141202.pdf&quot;, &quot;s&quot;: 1122849}, {&quot;n&quot;: &quot;華南投顧-2762-世界健身-KY-Memo-20251209.docx&quot;, &quot;s&quot;: 179533}, {&quot;n&quot;: &quot;華南投顧-3017-奇鋐-1141202.pdf&quot;, &quot;s&quot;: 1048912}, {&quot;n&quot;: &quot;華南投顧-3038-全台-Memo-20251209.docx&quot;, &quot;s&quot;: 318494}, {&quot;n&quot;: &quot;華南投顧-3675-德微-Memo-20260518.docx&quot;, &quot;s&quot;: 197763}, {&quot;n&quot;: &quot;華南投顧-4153-鈺緯-Memo-20251208.docx&quot;, &quot;s&quot;: 318899}, {&quot;n&quot;: &quot;華南投顧-6143-振曜-1141128.pdf&quot;, &quot;s&quot;: 1032324}]">
+<div class="t">INPUT RAIL · 輸入面板</div>
+<form id="vrnForm" onsubmit="return VIA_submitVRN(event)">
+<div class="g">增加輸入 <span class="mono" style="font-weight:400;color:var(--mut2)">ADD INPUT · Windows 拖曳</span></div>
+<div class="drop" id="drop" onclick="document.getElementById('fpick').click()">拖曳 PDF / DOCX 至此<br><span style="font-size:9px">或點此選檔(可多選)</span></div>
+<input type="file" id="fpick" name="files" multiple accept=".pdf,.docx,.doc" style="display:none" onchange="VIA_addFiles(this.files)">
+<div class="fmbar"><span id="fmcount" class="mono">0 件</span>
+<button type="button" onclick="VIA_selAll(true)">全選</button>
+<button type="button" onclick="VIA_selAll(false)">全不選</button>
+<button type="button" onclick="VIA_selAll(null)">反選</button>
+<button type="button" onclick="VIA_clearFiles()">清空</button></div>
+<div class="chk" style="max-height:150px;padding:0"><table class="fmx" id="fmx"><thead><tr><th></th><th>檔名 NAME</th><th>格式</th><th>KB</th><th>券商</th><th>日期</th><th>狀態</th></tr></thead><tbody id="fmb"></tbody></table></div>
+<div class="hint"><span class="led ok"></span>incoming 現有 63 件(伺服端真掃;拖入同名=WARN 已在庫;同尺寸=WARN 疑似同源;同名重拖=跳過)</div>
+<label>路徑 PATH <span class="mono" style="color:var(--mut2)">auto</span></label><input type="text" name="path" value="C:\Users\tonyk\movies-dataset\VeritasIntelligenceAnalytics\functional modules\VRN\input\incoming">
+<label>收件後續 AFTER INTAKE</label><select name="method">
+<option value="none">只收件 INTAKE ONLY</option>
+<option value="firstpage">ENG072 首頁擷取(task firstpage)</option>
+<option value="firstpage+structdb">首頁擷取 → 結構化入庫(firstpage→structdb)</option>
+<option value="four_engine" disabled>四引擎套件 · 任務冊無此鍵(誠實)</option>
+</select>
+<button class="btn" type="submit">送出勾選檔 → 樞紐 POST /intake · dest=vrn_incoming</button>
+<div class="hint">每檔 base64 逐送;伺服端 hash 去重(同名同 hash=冪等 200;同名異 hash=_sha8 讓位 201;零覆寫)。券商/日期=檔名判讀(民國7碼→西元)。需同源開啟(file://=只檢視)</div>
+<div class="out" id="vrnOut"></div>
+</form></div>
 <div class="railfoot">
 <div><div class="k">TASKS</div><div class="v">8</div></div>
 <div><div class="k">PAGES</div><div class="v">4</div></div>
 <div><div class="k">STATE</div><div class="v">LIVE</div></div>
-<div><div class="k">LEDGER</div><div class="v">756</div></div>
+<div><div class="k">LEDGER</div><div class="v">759</div></div>
 </div></aside>
 <main class="main">
+<div class="hdwrap">
 <div class="crumb"><b>VIA 母系統</b> → <b>VRN 報告 · 共識</b> → <b>報告現況</b> · <span class="lock">LAYOUT SPEC(批302)</span></div>
 <div class="head"><h2>報告新星 VRN<small>VERITAS REPORT NOVA</small></h2>
 <div class="spec">
-<div><div class="k">BUILD</div><div class="v">SHELL v0105</div></div>
-<div><div class="k">TASKS</div><div class="v">8</div></div>
-<div><div class="k">BRIDGE</div><div class="v ok">127.0.0.1:8765</div></div>
-<div><div class="k">GATE</div><div class="v ok">HONEST 3-STATE</div></div>
+<div><div class="k">BUILD</div><div class="v">SHELL v0108</div></div>
+<div><div class="k">TASKS</div><div class="v"><span class="led ok"></span>8</div></div>
+<div><div class="k">DATA</div><div class="v"><span class="led ok"></span>64 件 / 189 筆</div></div>
+<div><div class="k">BRIDGE</div><div class="v"><span class="led warn" id="bled"></span><span id="btxt">127.0.0.1:8765 探測中</span></div></div>
 </div>
-<div class="sub">券商報告五法擷取 · 結構化入庫 · 目標價迴歸 TP 100%</div></div>
-<div class="stats"><div class="stat"><div class="n">8</div><div class="zh">一鍵任務</div><div class="en">DECK TASKS</div></div><div class="stat"><div class="n">4</div><div class="zh">現役頁族</div><div class="en">PAGE FAMILIES</div></div><div class="stat"><div class="n">756</div><div class="zh">台帳筆數</div><div class="en">LEDGER</div></div><div class="stat"><div class="n">241</div><div class="zh">SSOT 冊</div><div class="en">REGISTRY</div></div></div>
+<div class="sub">券商報告五法擷取 · 結構化入庫 · 目標價迴歸 TP 100%</div></div></div>
+<div class="stats"><div class="stat"><div class="n">8</div><div class="zh">一鍵任務</div><div class="en">DECK TASKS</div></div><div class="stat"><div class="n">4</div><div class="zh">現役頁族</div><div class="en">PAGE FAMILIES</div></div><div class="stat"><div class="n">759</div><div class="zh">台帳筆數</div><div class="en">LEDGER</div></div><div class="stat"><div class="n">243</div><div class="zh">SSOT 冊</div><div class="en">REGISTRY</div></div></div>
+<div class="panels"><div class="card full"><h3>SUMMARY MATRIX<small>摘要矩陣</small></h3><div class="wrap-x"><table class="tbl"><tr><th>擷取法 METHOD</th><th>件 N</th></tr><tr><td class="mono">DUAL_ZONES</td><td class="mono">59</td></tr><tr><td class="mono">DOCX_HEAD</td><td class="mono">4</td></tr><tr><td class="mono">NEEDS_OCR</td><td class="mono">1</td></tr></table></div><div class="wrap-x" style="margin-top:6px"><table class="tbl"><tr><th>狀態 STATUS</th><th>件 N</th></tr><tr><td class="mono">PASS</td><td class="mono">63</td></tr><tr><td class="mono">NEEDS_OCR</td><td class="mono">1</td></tr></table></div></div><div class="card"><h3>BASIC INFO<small>基本資訊</small></h3><table class="fmx"><tr><th>項 FIELD</th><th>值 VALUE</th><th class="vcol">驗證 VALIDATION</th></tr><tr><td>來源冊 SRC</td><td class="mono">functional modules\VRN\references\intake\AttachmentFixedOutput_v1.0.0_b245\AttachmentFixedOutput_v1.0.0\01_repair\repair_audit.csv</td><td class="vcol"><span class="led ok"></span>稽核冊在位</td></tr><tr><td>文件 DOCS</td><td>64</td><td class="vcol"><span class="led ok"></span>非空</td></tr><tr><td>券商 SOURCES</td><td>0</td><td class="vcol"><span class="led bad"></span>無來源欄</td></tr><tr><td>有代碼 TICKER</td><td>47 (73%)</td><td class="vcol"><span class="led ok"></span>覆蓋合理</td></tr><tr><td>有評等 RATING</td><td>20</td><td class="vcol"><span class="led ok"></span>有評等</td></tr><tr><td>有目標價 TP</td><td>17</td><td class="vcol"><span class="led ok"></span>TP≤評等數 合理</td></tr></table><div class="note">驗證規則:代碼覆蓋≥60% 綠/≥30% 黃;TP 數不得超過評等數;來源>1 才可交叉核對。零發明。</div></div><div class="card"><h3>SUMMARY<small>摘要</small></h3><table class="fmx"><tr><th>項 FIELD</th><th>值 VALUE</th><th class="vcol">驗證 VALIDATION</th></tr><tr><td>品質 min/med/max</td><td class="mono">87.5 / 100.0 / 100.0</td><td class="vcol"><span class="led ok"></span>中位≥90</td></tr><tr><td>含警告 WARN DOCS</td><td>4 (6%)</td><td class="vcol"><span class="led ok"></span>警告率<10%</td></tr><tr><td>財務筆數 FIN ROWS</td><td>189</td><td class="vcol"><span class="led ok"></span>有擷取</td></tr><tr><td>未驗證 UNVERIFIED</td><td>0</td><td class="vcol"><span class="led warn"></span>擷取物非驗證物:進 SSOT 前回 TWSE/TDCC/原報告核對</td></tr></table><div class="note">驗證規則:品質中位數 ≥90 綠 / ≥80 黃;警告率 <10% 綠 / <40% 黃。零發明。</div></div><div class="card"><h3>FINANCIAL DATA<small>財務數據</small></h3><table class="fmx"><tr><th>指標 METRIC</th><th>筆 N</th><th class="vcol">驗證 VALIDATION</th></tr><tr><td class="mono">EPS</td><td class="mono">92</td><td class="vcol"><span class="led ok"></span>每件≥1 筆</td></tr><tr><td class="mono">GROSS_MARGIN</td><td class="mono">40</td><td class="vcol"><span class="led warn"></span>覆蓋 62%</td></tr><tr><td class="mono">REVENUE</td><td class="mono">36</td><td class="vcol"><span class="led warn"></span>覆蓋 56%</td></tr><tr><td class="mono">OPERATING_MARGIN</td><td class="mono">10</td><td class="vcol"><span class="led off"></span>稀疏 15%</td></tr><tr><td class="mono">NET_INCOME</td><td class="mono">9</td><td class="vcol"><span class="led off"></span>稀疏 14%</td></tr><tr><td class="mono">ROE</td><td class="mono">2</td><td class="vcol"><span class="led off"></span>稀疏 3%</td></tr></table><div class="note">驗證規則=覆蓋率(筆數/文件數):≥100% 綠 / ≥33% 黃 / 其餘灰。數值本身=擷取物;進 SSOT 前須回源核對。</div></div><div class="card"><h3>VALIDATE MATRIX<small>驗證矩陣</small></h3><div class="kv"><div class="k">四引擎 layout bbox</div><div><span class="pill warn">WARN · 純文字語料無座標</span></div><div class="k">text 後端重跑</div><div><span class="pill warn">WARN · 輸入已為文字</span></div><div class="k">table 擷取</div><div><span class="pill warn">WARN · 0 表</span></div><div class="k">NEEDS_OCR</div><div><span class="pill warn">1 件</span></div><div class="k">雙路徑對帳</div><div><span class="pill warn">未執行 · 原始 PDF 重跑後才有</span></div></div><div class="note">三結構性 WARN=輸入型態所致(pre-fetched text),非引擎缺陷;以原始 PDF 重跑可關閉。</div></div></div>
 <div class="card"><h3>一鍵任務冊<small>DECK TASKS</small></h3>
 <div class="note">執行入口=總控台 MasterControl(下拉/勾選;樞紐
 127.0.0.1:8765 白名單真跑)。本頁=現況展示(唯讀)。</div>
@@ -152,9 +258,94 @@ border-radius:3px;background:var(--soft);color:var(--ink2)}
 左欄「區內頁面」可直開)。</div>
 <div class="wrap-x"><table class="tbl">
 <tr><th>NO</th><th>頁族 FAMILY</th><th>KB</th><th>更新 UPDATED</th></tr>
-<tr><td class="mono">01</td><td><a href="VIA_UI_DailyBrief_v0100.html">DailyBrief</a></td><td class="mono">5.3</td><td class="mono">09-03 09:33</td></tr><tr><td class="mono">02</td><td><a href="VIA_UI_ReportCards_v0100.html">ReportCards</a></td><td class="mono">1.8</td><td class="mono">09-03 09:36</td></tr><tr><td class="mono">03</td><td><a href="VIA_UI_Shell_VRN_v0100.html">Shell_VRN</a></td><td class="mono">11.5</td><td class="mono">09-03 09:18</td></tr><tr><td class="mono">04</td><td><a href="VIA_UI_VRNControlTower_v0100.html">VRNControlTower</a></td><td class="mono">4233.0</td><td class="mono">09-02 02:28</td></tr></table></div></div>
+<tr><td class="mono">01</td><td><a href="VIA_UI_DailyBrief_v0100.html">DailyBrief</a></td><td class="mono">5.4</td><td class="mono">09-03 17:45</td></tr><tr><td class="mono">02</td><td><a href="VIA_UI_ReportCards_v0100.html">ReportCards</a></td><td class="mono">1.8</td><td class="mono">09-03 17:45</td></tr><tr><td class="mono">03</td><td><a href="VIA_UI_Shell_VRN_v0100.html">Shell_VRN</a></td><td class="mono">33.6</td><td class="mono">09-03 19:23</td></tr><tr><td class="mono">04</td><td>VRNControlTower</td><td colspan="2"><span class="tag">尚未產出(誠實)</span></td></tr></table></div></div>
 
 <div class="foot">VIA · VERITAS REPORT NOVA · 真值直取(Atlas+任務冊+歸屬冊)
-零發明 · 產於 2026-09-03 09:36 · 版型=批302 四設計正本萃取(hash 已收容)
+零發明 · 產於 2026-09-03 19:32 · 版型=批302 四設計正本萃取(hash 已收容)
 · 零 CDN 零外網</div>
-</main></body></html>
+</main>
+<script>
+(function(){var k='via.rail.collapsed';try{if(localStorage.getItem(k)==='1')document.body.classList.add('railc');}catch(e){}
+ var t=document.createElement('button');t.className='railtg';t.title='收起/展開左欄';t.textContent='‹';
+ function sync(){var c=document.body.classList.contains('railc');t.textContent=c?'›':'‹';try{localStorage.setItem(k,c?'1':'0');}catch(e){}}
+ t.onclick=function(){document.body.classList.toggle('railc');sync();};document.body.appendChild(t);sync();})();
+(function(){var B='http://127.0.0.1:8765',l=document.getElementById('bled'),t=document.getElementById('btxt');if(!l)return;
+ var c=new AbortController();var tm=setTimeout(function(){c.abort();},2500);
+ fetch(B+'/probe',{mode:'no-cors',cache:'no-store',signal:c.signal}).then(function(){clearTimeout(tm);
+   var same=(location.origin===B);l.className='led '+(same?'ok':'warn');
+   t.textContent=same?'127.0.0.1:8765 同源在線':'127.0.0.1:8765 在線 · 本頁 file:// 只檢視';
+ }).catch(function(){clearTimeout(tm);l.className='led bad';t.textContent='127.0.0.1:8765 離線(誠實)';});})();
+</script>
+
+<script>
+var B='http://127.0.0.1:8765';
+var FM=[];var INC={};
+(function(){try{var r=document.getElementById('rin');if(!r)return;var a=JSON.parse(r.getAttribute('data-incoming')||'[]');a.forEach(function(x){INC[x.n]=x.s;});}catch(e){}})();
+var BR=[['兆豐','兆豐'],['華南','華南'],['凱基','凱基'],['統一','統一'],['台新','台新'],['MS-','MS'],['GS-','GS'],['UBS','UBS'],['Daiwa','Daiwa'],['JP-','JP'],['GF-','GF'],['MQ-','MQ']];
+function VIA_guess(n){var b='';for(var i=0;i<BR.length;i++){if(n.indexOf(BR[i][0])>=0){b=BR[i][1];break;}}
+ var d='',m=n.match(/(20\d{6})/);if(m){d=m[1].slice(0,4)+'-'+m[1].slice(4,6)+'-'+m[1].slice(6,8);}
+ else{m=n.match(/(?:^|\D)(1[0-2]\d{5})(?:\D|$)/);if(m){var y=parseInt(m[1].slice(0,3),10)+1911;d=y+'-'+m[1].slice(3,5)+'-'+m[1].slice(5,7);}}
+ return {b:b,d:d};}
+function VIA_addFiles(fl){var added=0;for(var i=0;i<fl.length;i++){var f=fl[i];
+ if(FM.some(function(x){return x.n===f.name;}))continue;
+ var g=VIA_guess(f.name);FM.push({n:f.name,e:(f.name.split('.').pop()||'').toLowerCase(),s:f.size,b:g.b,d:g.d,on:true,file:f});added++;}
+ VIA_render();}
+function VIA_render(){var tb=document.getElementById('fmb'),cnt=document.getElementById('fmcount');if(!tb)return;tb.innerHTML='';
+ var sizes={};FM.forEach(function(x){sizes[x.s]=(sizes[x.s]||0)+1;});
+ FM.forEach(function(x,i){var st=[],cls='';
+  if(INC[x.n]!==undefined){st.push('已在 incoming');cls='exist';}
+  if(sizes[x.s]>1){st.push('同尺寸疑似同源');cls=cls||'dup';}
+  var led=cls==='exist'?'bad':(cls==='dup'?'warn':'ok');
+  var tr=document.createElement('tr');tr.className=cls;
+  tr.innerHTML='<td><input type="checkbox" '+(x.on?'checked':'')+' onchange="FM['+i+'].on=this.checked;VIA_count()"></td>'+
+   '<td title="'+x.n.replace(/"/g,'&quot;')+'">'+x.n+'</td><td>'+x.e+'</td><td>'+Math.round(x.s/1024)+'</td>'+
+   '<td><input type="text" value="'+x.b+'" style="width:52px" onchange="FM['+i+'].b=this.value"></td>'+
+   '<td><input type="date" value="'+x.d+'" style="width:108px" onchange="FM['+i+'].d=this.value"></td>'+
+   '<td><span class="led '+led+'"></span>'+(st.join(' / ')||'新')+'</td>';
+  tb.appendChild(tr);});
+ VIA_count();}
+function VIA_count(){var c=document.getElementById('fmcount');if(c)c.textContent=FM.filter(function(x){return x.on;}).length+' / '+FM.length+' 件';}
+function VIA_selAll(v){FM.forEach(function(x){x.on=(v===null)?!x.on:v;});VIA_render();}
+function VIA_clearFiles(){FM=[];VIA_render();}
+(function(){var z=document.getElementById('drop');if(!z)return;
+ ['dragenter','dragover'].forEach(function(e){z.addEventListener(e,function(ev){ev.preventDefault();z.classList.add('over');});});
+ ['dragleave','drop'].forEach(function(e){z.addEventListener(e,function(ev){ev.preventDefault();z.classList.remove('over');});});
+ z.addEventListener('drop',function(ev){if(ev.dataTransfer&&ev.dataTransfer.files)VIA_addFiles(ev.dataTransfer.files);});})();
+function VIA_gate(o){
+  if(location.origin!==B){o.className='out show bad';o.textContent='本頁非同源(file:// 只檢視)。樞紐在線時本頁會自動導向同源;或直接開 '+B+location.pathname.split('/').pop();return false;}
+  return true;}
+function VIA_submitVDF(ev){
+  ev.preventDefault();var f=ev.target,o=document.getElementById('vdfOut');
+  var cats=[];new FormData(f).forEach(function(v,k){if(k==='cats')cats.push(v);});
+  var end=f.end.value||new Date().toISOString().slice(0,10);
+  var p={task:'global',start:f.start.value,end:end,cats:cats.join(',')};
+  if(!cats.length){o.className='out show bad';o.textContent='未勾選任何類別(誠實)';return false;}
+  if(!VIA_gate(o)){o.textContent+='\n\n載荷 JSON:\n'+JSON.stringify(p,null,1);return false;}
+  o.className='out show';o.textContent='POST /run … '+JSON.stringify(p);
+  fetch('/run',{method:'POST',body:JSON.stringify(p)})
+   .then(function(r){return r.text().then(function(t){return {ok:r.ok,st:r.status,t:t};});})
+   .then(function(r){o.className='out show '+(r.ok?'ok':'bad');o.textContent='樞紐 '+r.st+'\n'+r.t.slice(0,800);})
+   .catch(function(e){o.className='out show bad';o.textContent='送出失敗(誠實): '+e;});
+  return false;}
+function VIA_b64(file){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(String(r.result).split(',')[1]||'');};r.onerror=rej;r.readAsDataURL(file);});}
+function VIA_submitVRN(ev){
+  ev.preventDefault();var f=ev.target,o=document.getElementById('vrnOut');
+  var sel=FM.filter(function(x){return x.on;});
+  if(!sel.length){o.className='out show bad';o.textContent='未勾選任何檔案(誠實)';return false;}
+  if(!VIA_gate(o)){o.textContent+='\n\n將送出:\n'+sel.map(function(x){return x.n+' ('+Math.round(x.s/1024)+'KB)';}).join('\n');return false;}
+  var method=f.method.value,log=[],i=0;o.className='out show';
+  function step(){if(i>=sel.length){return after();}var x=sel[i++];var file=null;
+    var fp=document.getElementById('fpick');for(var j=0;fp&&j<fp.files.length;j++){if(fp.files[j].name===x.n){file=fp.files[j];break;}}
+    if(!file&&x.file)file=x.file;
+    if(!file){log.push('SKIP '+x.n+' (無檔案物件;請重新拖入)');o.textContent=log.join('\n');return step();}
+    VIA_b64(file).then(function(b64){return fetch('/intake',{method:'POST',body:JSON.stringify({name:x.n,b64:b64,dest:'vrn_incoming'})});})
+     .then(function(r){return r.json().then(function(j){return {st:r.status,j:j};});})
+     .then(function(r){var j=r.j||{};log.push((r.st===201?'新收 ':(r.st===200?'冪等 ':'拒 '))+r.st+' '+x.n+(j.skip?' · '+j.skip:'')+(j.saved?' → '+j.saved.split(/[\\/]/).pop():'')+(j.err?' · '+j.err:''));o.textContent=log.join('\n');step();})
+     .catch(function(e){log.push('失敗 '+x.n+' '+e);o.textContent=log.join('\n');step();});}
+  function after(){if(method==='none'){o.className='out show ok';return;}
+    var tasks=method==='firstpage+structdb'?['firstpage','structdb']:['firstpage'];
+    (function run(k){if(k>=tasks.length){o.className='out show ok';return;}
+      fetch('/run',{method:'POST',body:JSON.stringify({task:tasks[k]})}).then(function(r){return r.text().then(function(t){log.push('task '+tasks[k]+' → '+r.status+' '+t.slice(0,160));o.textContent=log.join('\n');run(k+1);});})
+      .catch(function(e){log.push('task '+tasks[k]+' 失敗 '+e);o.textContent=log.join('\n');run(k+1);});})(0);}
+  step();return false;}
+</body></html>
