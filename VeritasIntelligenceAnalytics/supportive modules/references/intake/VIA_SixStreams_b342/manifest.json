@@ -1,0 +1,23 @@
+{
+ "intake_id": "VIA_SixStreams_b342",
+ "ts": "2026-09-03",
+ "batch": 342,
+ "origin": "操作員上傳平行沙盒線七件(MDL116 v0109/v0110、DeckServer v0119、MDL122 v0102、門檻冊 JSON、Invoke-VIA-SixStreams-v0100.ps1、Six Streams 矩陣預覽頁)+令「NEXT 六個同步流程同步進行 以不產生九頭龍風險 不傷害系統為前提」",
+ "files": {
+  "CGC_MDL116_UnifiedShell_v0110.py": "42111d6987a1ee9ea75e577290cfbf8356a9c04357e550aff02c6987ae2e8a22",
+  "CGC_MDL116_UnifiedShell_v0109.py": "a2f1f148be3e5606fbd35da6e16270e68cb41de1c521838cb096bf77f2232abd",
+  "CGC_MDL122_IntakeRoster_v0102.py": "42a156557e46688f4f96f2ee1fb794d388680b6b45a533b8f4c2f13801357e84",
+  "PREVIEW_SixStreams_matrix.html": "04765723109223ba01fa816af80816401648d648ead70f55f91cecb11f9a85bc",
+  "VIA_ShellValidation_Thresholds_v0100.json": "7edac82e749e9c3c99200ef6a9f717479cd44fa649a3d724f72e49e04c45d5a8",
+  "CGC_MDL095_DeckServer_v0119.py": "918a45edeaa44794fe739cb1bc3bf3100dc30e53dfc3a16fa8fef2b1817f1701",
+  "Invoke-VIA-SixStreams-v0100.ps1": "725c89b4d9bc4860fb9211d007386d40de5b9bb8f4035339448312f55185cba6"
+ },
+ "verdicts": [
+  "Zero-Hydra 合流律:上傳四 py 原件 byte-identical 落 registry 同名(工作站本地 commit 同 hash=rebase 零衝突);修正一律版前進(v0119→v0120、v0110→v0111、v0102→v0103、ps1 v0100→v0101)",
+  "DeckServer v0119=基於雲端 v0118 內容(diff 60 行:+dest 收件目的地冊/+ConnectionAbortedError 三處/+㉑㉒)但 ⑳ 主體數回退 ==6(雲端 v0118 批337 已改 ≥6;MDL119 七主體)=S1b FAIL 1 根因→v0120 回復 ≥6",
+  "MDL116 v0110=v0105 功能全含(系統總台/上船件冊導航/probe)+批342 門檻冊 SSOT(_thresholds;缺冊=CONSTANT_FALLBACK 誠實);但 978 行 f-string 表達式含反斜線=Python 3.11 SyntaxError(雲端 grid 3.11;工作站 3.13 無感)→v0111 改單引號",
+  "MDL122 v0102=基於 v0100(非 v0101):失 b245 工具鏈/b305 三測試件整合點+__pycache__ 排除;②檢寫死今日 4 包=工作站 7 包 FAIL(S3 FAIL 1 根因)→v0103=v0101+三新收容冊(NLP v1.4.0/VAP v025/TW10Y v0200)+SixStreams_b342 冊+②改 ≥4",
+  "Invoke-VIA-SixStreams-v0100=九流分離子進程/獨立 log/硬逾時/tally 逐字取自各工具 [計] 行(Zero-Hydra 律正確);缺 PS-ACCEL、Unified-Accel20/DefTestAudit/venv 路徑寫死 Downloads+C:\\VIA→v0101 補 PS-ACCEL、路徑動態解析(倉>Downloads;缺=誠實 SKIP 灰)、文字進度條心跳、-Root 預設本檔所在",
+  "PREVIEW_SixStreams_matrix.html=沙盒 DRY-RUN 實錄(overall YELLOW 9 流:5 綠 4 黃;S1b/S3 紅因見上;S1/S5b 黃=Unified Scan 1198 findings 0 edited 候 -GoToken GO_v1;S5 VAP v025 passed 0 需查)=純收容不上線"
+ ]
+}
