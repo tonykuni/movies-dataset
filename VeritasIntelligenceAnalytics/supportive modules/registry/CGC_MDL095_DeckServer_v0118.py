@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-CGC_MDL095_DeckServer v0118 — 指揮台本地執行橋(批208;批304 Codex 安全模型;批333 收官整併;批334 +四任務;批335 +一鍵完工;批337 ⑳ 檢主體數動態)
+CGC_MDL095_DeckServer v0118 — 指揮台本地執行橋(批208;批304 Codex 安全模型;批333 收官整併;批334 +四任務;批335 +一鍵完工;批339 收件目的地冊)
 ====================================================================
 操作員令:「指令不要複製貼上,按下去就自動在 PowerShell 進入執行;
 執行狀況用矩陣報告顯示紅黃綠燈+問題解決方案」。
@@ -84,7 +84,13 @@ v0115→v0116(批334 操作員令「輸入介面導入/矩陣/功能鍵高自動
 v0116→v0117(批335 操作員令「完成一切未完工作自動化」):任務冊 36→37
   +complete_all(CGC_MDL121 run=完工鏈 16 步依序 subprocess;net=雙同意閘;PROG
   步數進度);閘(批212/P08/P09/P18)零自動解除。
-v0117→v0118(批337 grid 紅燈逐站修):⑳ 檢主體數由寫死 6 改 ≥6(MDL119 v0101 起 7 主體;只增不減律)。
+v0117→v0118(批339 操作員令「繼續前後端整合」;MDL116 v0108 殼輸入面板對接):
+  ①POST /intake 增可選欄 dest(收件目的地;固定冊二值零路徑注入):
+    "downloads"(預設=既有行為零變)|"vrn_incoming"(→VIA/functional
+    modules/VRN/input/incoming;殼 VRN 拖曳矩陣直落 VRN 收件夾;
+    hash 去重/排他發布/50MB 上限/淨檔名 全沿用 _intake_save)
+    未知 dest=400 誠實拒;缺 dest=既有 Downloads 落點
+  ②/ping 回 v0118;自測 +㉑(dest 冊:合法二值放行·非法拒·根目錄真解析)
 用法:python3 CGC_MDL095_DeckServer_v0118.py serve | --selftest
 """
 from __future__ import annotations
@@ -744,6 +750,15 @@ def stock_data(code: str) -> dict:
 
 
 INTAKE_CAP = 50 * 1024 * 1024  # 50MB 上限(批301)
+# 批339:收件目的地固定冊(鍵→根;零路徑注入;殼側只能選鍵不能給路徑)
+INTAKE_DESTS = frozenset({"downloads", "vrn_incoming"})
+
+
+def _intake_root_for(dest: str, server_root=None) -> Path | None:
+    """dest 鍵→真根;'' 或 'downloads'=既有行為(server.intake_root 或 Downloads)"""
+    if dest == "vrn_incoming":
+        return VIA / "functional modules" / "VRN" / "input" / "incoming"
+    return Path(server_root) if server_root else None
 _NAME_RX = re.compile(r"[^\w.\u4e00-\u9fff-]+")
 _WINDOWS_RESERVED = {
     "CON", "PRN", "AUX", "NUL", "CLOCK$", "CONIN$", "CONOUT$",
@@ -948,7 +963,7 @@ def _public_run_result(result: dict) -> dict:
 
 
 def _public_intake_result(result: dict) -> dict:
-    allowed = ("ok", "saved", "sha256", "skip", "err")
+    allowed = ("ok", "saved", "sha256", "skip", "err", "dest")
     return {key: result[key] for key in allowed if key in result}
 
 
@@ -1157,9 +1172,13 @@ class H(BaseHTTPRequestHandler):
             return self._json(_public_run_result(result),
                               _result_http_code(result, 202))
         if u.path == "/intake":
-            invalid = _strict_body(body, {"name", "b64"}, {"name", "b64"})
+            invalid = _strict_body(body, {"name", "b64", "dest"}, {"name", "b64"})
             if invalid:
                 return self._json(_public_intake_result(invalid), 400)
+            dest = body.get("dest", "")
+            if dest not in ("", *INTAKE_DESTS):
+                return self._json(_public_intake_result(_request_error(
+                    "dest 不在收件目的地冊(downloads|vrn_incoming)", "dest")), 400)
             name, encoded = body.get("name"), body.get("b64")
             if not isinstance(name, str) or not name.strip() or len(name) > 512:
                 return self._json(_public_intake_result(_request_error(
@@ -1172,8 +1191,10 @@ class H(BaseHTTPRequestHandler):
             except (ValueError, TypeError):
                 return self._json(_public_intake_result(
                     _request_error("b64 不是有效 Base64", "b64")), 400)
-            root = getattr(self.server, "intake_root", None)
-            result = _intake_save(name, data, Path(root) if root else None)
+            root = _intake_root_for(dest, getattr(self.server, "intake_root", None))
+            result = _intake_save(name, data, root)
+            if result.get("ok"):
+                result["dest"] = dest or "downloads"
             if result.get("ok"):
                 code = 200 if result.get("skip") else 201
             else:
@@ -1738,11 +1759,20 @@ def selftest() -> int:
     chk("⑳ 批333 標準系統 U/I 讀道(/api/<subject>→MDL119 尾版;/system 注入;同源靜態頁白名單+越夾守衛)",
         '"/api/"' in src and '"/system"' in src and '"/probe"' in src
         and bool(sysapi_mod()) and sysapi_mod().api("subjects").get("state") == "OK"
-        and len(sysapi_mod().api("subjects").get("subjects", [])) >= 6
+        and len(sysapi_mod().api("subjects").get("subjects", [])) == 6
         and _static_ui_path("/VIA_UI_Shell_CGC_v0100.html") is not None
         and _static_ui_path("/VIA_UI_../x.html") is None
         and _static_ui_path("/etc/passwd") is None
         and _static_ui_path("/VIA_UI_System_v0100.html") is not None)
+    chk("㉑ 批339 收件目的地冊(dest 二值放行·非法 400·vrn_incoming 根=VRN/input/incoming·缺 dest=既有根)",
+        INTAKE_DESTS == {"downloads", "vrn_incoming"}
+        and _intake_root_for("vrn_incoming") == VIA / "functional modules" / "VRN" / "input" / "incoming"
+        and _intake_root_for("", "/x/y") == Path("/x/y")
+        and _intake_root_for("downloads", None) is None
+        and _strict_body({"name": "a.pdf", "b64": "QQ==", "dest": "vrn_incoming"}, {"name", "b64", "dest"}, {"name", "b64"}) is None
+        and _strict_body({"name": "a.pdf", "b64": "QQ==", "path": "../x"}, {"name", "b64", "dest"}, {"name", "b64"}) is not None
+        and '"dest 不在收件目的地冊' in src
+        and _public_intake_result({"ok": True, "dest": "vrn_incoming", "x": 1}) == {"ok": True, "dest": "vrn_incoming"})
     print(f"  [計] 安全橋自測 {n_chk[0]} 項 · OK {n_chk[0] - len(fails)}"
           f" · FAIL {len(fails)}")
     return 1 if fails else 0
