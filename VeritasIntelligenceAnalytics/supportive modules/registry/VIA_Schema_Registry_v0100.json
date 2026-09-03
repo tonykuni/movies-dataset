@@ -2,7 +2,7 @@
  "schema": "VIA_SCHEMA_REGISTRY_V1",
  "version": "v0100",
  "append_only": true,
- "ts": "2026-09-01 23:13",
+ "ts": "2026-09-03 09:18",
  "policy": "Phase 1 schema drift 守門基線:新引擎改表須先過本冊比對;漂移=新版 append 舊版留存。",
  "databases": {
   "vdf_tw_market": {
@@ -39,6 +39,14 @@
     "validated": "VARCHAR",
     "rn": "BIGINT"
    },
+   "etf_book": {
+    "fund_code": "VARCHAR",
+    "fund_name": "VARCHAR",
+    "fund_type": "VARCHAR",
+    "is_active": "BOOLEAN",
+    "tracking_index": "VARCHAR",
+    "as_of": "VARCHAR"
+   },
    "features_daily": {
     "date": "VARCHAR",
     "ticker": "VARCHAR",
@@ -53,6 +61,19 @@
     "lo252_dist": "DOUBLE",
     "volu_z20": "DOUBLE",
     "rng_1d": "DOUBLE",
+    "data_class": "VARCHAR"
+   },
+   "group_features_daily": {
+    "gid": "VARCHAR",
+    "date": "VARCHAR",
+    "n_members": "BIGINT",
+    "n_ma20": "BIGINT",
+    "above_ma20": "BIGINT",
+    "avg_ret_20d": "DOUBLE",
+    "med_ret_60d": "DOUBLE",
+    "win60": "BIGINT",
+    "lose60": "BIGINT",
+    "avg_volu_z20": "DOUBLE",
     "data_class": "VARCHAR"
    },
    "monthly_revenue_analysis": {
@@ -75,6 +96,16 @@
     "volume": "BIGINT",
     "factor": "DOUBLE",
     "data_class": "VARCHAR"
+   },
+   "revenue_group_analysis": {
+    "gid": "VARCHAR",
+    "ym": "VARCHAR",
+    "n_members": "BIGINT",
+    "revenue_sum": "DOUBLE",
+    "yoy_median": "DOUBLE",
+    "n_yoy_pos": "BIGINT",
+    "n_yoy": "BIGINT",
+    "n_high60": "BIGINT"
    },
    "tw_chip_inst": {
     "date": "VARCHAR",
@@ -110,6 +141,11 @@
     "adj_close": "DOUBLE",
     "volume": "BIGINT"
    },
+   "tw_daytrade_eligible": {
+    "date": "VARCHAR",
+    "code": "VARCHAR",
+    "suspension": "VARCHAR"
+   },
    "tw_daytrade_market": {
     "date": "VARCHAR",
     "market": "VARCHAR",
@@ -125,6 +161,20 @@
     "yf_ticker": "VARCHAR",
     "industry": "VARCHAR",
     "isin": "VARCHAR"
+   },
+   "tw_listings_industry": {
+    "code": "VARCHAR",
+    "name": "VARCHAR",
+    "market": "VARCHAR",
+    "industry_code": "VARCHAR",
+    "industry_name": "VARCHAR",
+    "yf_ticker": "VARCHAR"
+   },
+   "tw_market_agg": {
+    "date": "VARCHAR",
+    "trade_value": "DOUBLE",
+    "volume": "DOUBLE",
+    "taiex": "DOUBLE"
    },
    "tw_monthly_revenue": {
     "code": "VARCHAR",
@@ -143,6 +193,24 @@
     "adj_close": "DOUBLE",
     "volume": "BIGINT",
     "data_class": "VARCHAR"
+   },
+   "tw_trading_daily": {
+    "date": "VARCHAR",
+    "code": "VARCHAR",
+    "market": "VARCHAR",
+    "volume": "DOUBLE",
+    "trade_value": "DOUBLE",
+    "transactions": "DOUBLE",
+    "close": "DOUBLE"
+   },
+   "tw_valuation_daily": {
+    "date": "VARCHAR",
+    "code": "VARCHAR",
+    "market": "VARCHAR",
+    "pe": "DOUBLE",
+    "pb": "DOUBLE",
+    "dividend_yield": "DOUBLE",
+    "dps": "DOUBLE"
    }
   },
   "vdf_global_market": {
@@ -152,6 +220,20 @@
     "metric": "VARCHAR",
     "series": "VARCHAR",
     "value": "DOUBLE"
+   },
+   "etf_stats_daily": {
+    "date": "VARCHAR",
+    "symbol": "VARCHAR",
+    "aum": "BIGINT",
+    "nav": "DOUBLE",
+    "price": "DOUBLE",
+    "market_cap": "INTEGER",
+    "shares_outstanding": "INTEGER",
+    "trailing_pe": "DOUBLE",
+    "forward_pe": "INTEGER",
+    "price_to_book": "INTEGER",
+    "yield_": "DOUBLE",
+    "currency": "VARCHAR"
    },
    "factset_earnings": {
     "published": "VARCHAR",
