@@ -70,6 +70,11 @@ class ContractParser(HTMLParser):
 
 def normalized_generated_page(page: str) -> str:
     """排除唯一非決定性欄位，讓 committed artifact 可做 freshness 比對。"""
+    # 批338b(CI 實錄):Plotly 就緒分頁依 VIA_UI_StdDashboard(日更再生類,不入 git)在位與否分支,
+    # 追蹤頁與 runner 產出必然不同→比對前中性化該分頁(其餘全文嚴格比對)
+    import re as _re
+    page = _re.sub(r'(<section class="tab-panel" id="panel-plotly"[^>]*>).*?(</section>)',
+                   r"\1[PLOTLY-PANEL-NEUTRALIZED]\2", page, flags=_re.S)
     page = re.sub(
         r'(<div class="snapshot"><span>畫面產生時間</span><b>).*?(</b></div>)',
         r"\1__GENERATED_AT__\2", page, flags=re.S)
