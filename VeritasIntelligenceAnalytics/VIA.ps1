@@ -86,19 +86,27 @@ function Sync-Repo {
           ForEach-Object { Stop-Process -Id $_.ProcessId -Force
                            Write-Host "  [同步] 收束舊回補進程 PID $($_.ProcessId)(斷點在=零損失)" -ForegroundColor Yellow }
     } catch { }
-    git -C $VIA checkout -- "supportive modules/ui_support" 2>$null   # 再生頁還原(pull 後引擎重生最新)
+    # 批338:再生頁還原=僅生成器產出頁;可編輯模板(*EditableTemplate*=操作員手改件)排除=永不丟棄(b305 契約測試 test_13 精神)
+    $gen = @(git -C $VIA status --porcelain -- "supportive modules/ui_support" 2>$null |
+             ForEach-Object { $_.Substring(3).Trim('"') } | Where-Object { $_ -notmatch "EditableTemplate" })
+    if ($gen.Count -gt 0) { git -C $VIA checkout -q -- $gen 2>$null
+        Write-Host "  [同步] 再生頁本地差異 $($gen.Count) 件已還原(可編輯模板不動)" -ForegroundColor DarkYellow }
     # 批231:運行時登記冊留痕(升階梯/整併冊等)擋 pull→stash 保存後拉
     # (不丟留痕;stash list 可查;誠實列印)
-    $dirty = git -C $VIA status --porcelain 2>$null | Where-Object { $_ -match "^ M" }
+    $dirty = git -C $VIA status --porcelain 2>$null | Where-Object { $_ -match "^(?: M|\?\?|A |M )" }
+    $stashHash = $null
     if ($dirty) {
-        git -C $VIA stash push -m "VIA-local-traces-$(Get-Date -Format yyyyMMdd_HHmmss)" | Out-Null
-        Write-Host "  [同步] 本地運行留痕 $($dirty.Count) 件已 stash 保存(git stash list 可查)" -ForegroundColor Yellow
+        git -C $VIA stash push --include-untracked -m "VIA-local-traces-$(Get-Date -Format yyyyMMdd_HHmmss)" | Out-Null   # 批338:含未追蹤件=零丟棄(b305 契約)
+        $stashHash = (git -C $VIA rev-parse "stash@{0}" 2>$null)
+        Write-Host "  [同步] 本地變更 $($dirty.Count) 件已 stash 保存(唯一 hash $($stashHash.Substring(0,8));pull 後自動套回)" -ForegroundColor Yellow
     }
-    try {
-        $out = git -C $VIA pull --ff-only 2>&1
-        Write-Host "  [同步] git pull:$($out | Select-Object -Last 1)" -ForegroundColor Cyan
-    } catch {
-        Write-Host "  [同步] pull 失敗(離線/本地改動)=誠實續用現版" -ForegroundColor Yellow
+    $out = git -C $VIA pull --ff-only 2>&1
+    if ($LASTEXITCODE -eq 0) { Write-Host "  [同步] git pull:$($out | Select-Object -Last 1)" -ForegroundColor Cyan }
+    else { Write-Host "  [同步] pull 失敗(離線/非 ff)=誠實續用現版;不 reset 不 checkout 不 clean:$($out | Select-Object -Last 1)" -ForegroundColor Yellow }
+    if ($stashHash) {
+        git -C $VIA stash apply --index $stashHash 2>$null   # 批338:套回本地變更(b305 契約:同步不丟工作樹)
+        if ($LASTEXITCODE -eq 0) { git -C $VIA stash drop "stash@{0}" 2>$null | Out-Null; Write-Host "  [同步] 本地變更已套回工作樹" -ForegroundColor Cyan }
+        else { Write-Host "  [同步] 套回衝突=stash 保留為備份 $($stashHash.Substring(0,8))(git stash list;手動 apply)" -ForegroundColor Yellow }
     }
     $bf = Newest (Join-Path $VIA "functional modules\VDF\engine") "VDF_ENG064_HistoryBackfill_v*.py"
     if ($bf) { python "$bf" --rebuild-ckpt }   # 真斷點重建(批212 債修;零網路)
