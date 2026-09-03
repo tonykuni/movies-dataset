@@ -1,0 +1,232 @@
+{
+  "system_id": "VIA_TW_STORY_GROUP_ROTATION_ENGINE",
+  "version": "0.5.0",
+  "research_start_date": "2024-01-01",
+  "warmup_start_date": "2023-01-01",
+  "evaluation_start_dates": ["2024-01-01", "2025-01-01", "2026-01-01"],
+  "end_date": null,
+  "rolling_windows": [60, 120, 240],
+  "residual_factor_lanes": ["LaggedCap", "LaggedETR"],
+  "formal_model_grid": {
+    "factor_lanes": ["LaggedCap", "LaggedETR"],
+    "windows": [60, 120, 240],
+    "expected_model_count": 6,
+    "cardinality_policy": "EXACT_CARTESIAN_PRODUCT_MISSING_EXTRA_OR_DUPLICATE_BLOCKS_FORMAL_RUN"
+  },
+  "validation_consensus": "EXACT_AGREEMENT_ACROSS_RESIDUAL_LANES_PER_WINDOW",
+  "validation_null_repeats_override": null,
+  "forward_horizons": [1, 3, 5, 20],
+  "normalized_base_value": 100.0,
+  "tsmc_ticker": "2330.TW",
+  "required_markets": ["TWSE", "TPEX"],
+  "ordinary_equity_only": true,
+  "candidate_story_membership": "../flow_simulation_v0400/data/input/candidate_membership_v21.csv",
+  "candidate_shape": {
+    "groups": 49,
+    "membership_rows": 252,
+    "distinct_tickers": 241,
+    "meaning": "VALIDATION_COHORT_NOT_APPROVED_INDEX_MEMBERSHIP"
+  },
+  "local_inputs": {
+    "full_market_daily": "data/input/full_market_daily.parquet",
+    "universe_history": "data/input/market_universe_history.csv",
+    "trading_calendar": "data/input/trading_calendar.csv",
+    "membership_events": "data/input/membership_events.csv",
+    "macro_vintages": "data/input/macro_vintages.csv",
+    "active_etf_registry": "data/input/active_etf_registry_events.csv",
+    "active_etf_holdings": "data/input/active_etf_holding_snapshots.csv",
+    "monthly_revenue": "data/input/monthly_revenue_vintages.csv"
+  },
+  "input_policy": {
+    "core_required": [
+      "full_market_daily",
+      "universe_history",
+      "trading_calendar",
+      "membership_events",
+      "macro_vintages",
+      "active_etf_holdings"
+    ],
+    "candidate_validation": ["candidate_story_membership"],
+    "optional_reference_only": ["monthly_revenue"],
+    "optional_audit_only": ["active_etf_registry"],
+    "optional_missing_blocks_core_pipeline": false
+  },
+  "decision_contract": {
+    "composite_score": "PROHIBITED",
+    "market_value_thresholds": "ROLLING_QUANTILES_OR_MATCHED_NULLS",
+    "fixed_parameters": "STATISTICAL_ERROR_CONTROL_FINITE_SAMPLE_AND_GOVERNANCE_ONLY",
+    "role_labels": ["LEAD", "PEER", "LAG", "UNRELATED"],
+    "insufficient_data": "SEPARATE_HOLD_STATUS_NOT_A_FIFTH_ROLE",
+    "residual_consensus": "BOTH_FACTOR_LANES_MUST_AGREE_WITHIN_EACH_WINDOW",
+    "residual_provenance": "DURABLE_ROW_LEVEL_LINEAGE_FAILS_CLOSED_UNLESS_SOURCE_IS_FULL_TWSE_TPEX_ORDINARY_EQUITY_WITH_2330_ANCHOR_OUTPUT_IS_EX_2330_AND_FACTOR_WINDOW_SOURCE_IDENTITIES_MATCH",
+    "residual_lineage_serializability": "ROW_COLUMNS_ARE_AUTHORITATIVE_ACROSS_CSV_PARQUET_DATAFRAME_ATTRS_ARE_OPTIONAL_CONTRADICTION_CHECKS_ONLY",
+    "residual_daily_coverage": "EXPECTED_UNIQUE_TOTAL_TWSE_AND_TPEX_COUNTS_MUST_MATCH_EACH_EX_2330_DATE",
+    "residual_roster_integrity": "SHA256_OF_SORTED_MARKET_AND_TICKER_PER_DATE_FORMAT_AND_RECOMPUTATION_REQUIRED_NOT_A_SIGNATURE",
+    "market_session_coverage": "ALL_FORMAL_TRADING_SESSIONS_IN_THE_OBSERVED_RANGE_REQUIRED",
+    "market_data_availability": "NONMISSING_AND_SAME_ASIA_TAIPEI_SESSION",
+    "universe_history_mode": "VERSIONED_APPEND_ONLY_UNIVERSE_RECORD_ID_PLUS_REVISION_ID_OR_IMMUTABLE_LEGACY_SINGLE_VERSION",
+    "universe_version_policy": "LATEST_RECORDED_REVISION_KNOWN_BY_SESSION_MARKET_DATA_CUTOFF",
+    "universe_roster_match": "OBSERVED_AND_PIT_EXPECTED_ORDINARY_EQUITY_TICKERS_MUST_MATCH_BIDIRECTIONALLY",
+    "residual_as_of_validation_order": "CAP_DATED_ROWS_AT_AS_OF_BEFORE_LINEAGE_AND_COVERAGE_VALIDATION",
+    "validation_descriptor_alignment": "MATCHED_NULL_USES_THE_SAME_60_120_OR_240_DAY_PIT_SIZE_AND_LIQUIDITY_WINDOW_AS_THE_MODEL",
+    "signal_execution": "NEXT_TRADABLE_SESSION_AFTER_LATEST_AVAILABLE_AT",
+    "index_weight_timing": "T_MINUS_1",
+    "index_membership_timing": "ACTIVE_ON_APPLIED_DATE_WHILE_PRICE_CAP_AND_ETR_WEIGHT_INPUTS_REMAIN_T_MINUS_1",
+    "automatic_membership_mutation": false,
+    "monthly_revenue": "OPTIONAL_REFERENCE_ONLY_AFTER_STRICT_TRANSITION_STAGE_3_OR_4_NEVER_A_DECISION_INPUT"
+  },
+  "size_classification": {
+    "scope": "FULL_TWSE_TPEX_COMMON_EQUITY_EX_2330",
+    "independent_of_story_groups": true,
+    "rebalance": "QUARTERLY_POINT_IN_TIME",
+    "windows": [60, 120, 240],
+    "market_cap_tiers": {
+      "LARGE": "P90_AND_ABOVE",
+      "MID": "P60_TO_P90",
+      "SMALL": "BELOW_P60"
+    },
+    "liquidity_tiers": "SEPARATE_ETR_P60_P90_CLASSIFICATION",
+    "validation_descriptor_window": "EXACTLY_MATCH_MODEL_WINDOW"
+  },
+  "index_methods": ["GI_EW", "GI_HIER", "GI_ETR"],
+  "capital_views": [
+    "ALL_INSTITUTIONAL",
+    "FOREIGN",
+    "DOMESTIC_EX_FOREIGN",
+    "ACTIVE_ETF_SUBSET"
+  ],
+  "group_flow_states": {
+    "grain": "DATE_GROUP_DIRECTIONAL_LANE_LONG",
+    "directional_lanes": ["FOREIGN", "DOMESTIC_EX_FOREIGN", "ACTIVE_ETF"],
+    "coverage_policy": "EACH_LANE_FAILS_CLOSED_INDEPENDENTLY",
+    "aggregation_policy": "NO_CROSS_LANE_ANY_VOTE_WEIGHT_OR_COMPOSITE",
+    "formal_trading_calendar_required_for_actionable_state": true
+  },
+  "rotation_association": {
+    "view": "CAPITAL_CONSERVED",
+    "etr_coverage": "COMPLETE_MARKET_AND_GROUP_ETR_REQUIRED",
+    "partial_coverage": "HOLD_ATTENTION_SHARE_AND_BUILD_NO_EDGE",
+    "directional_lane_coverage": "ALL_COMPARISON_GROUPS_MUST_PASS_THE_SAME_DATE_AND_LANE_OTHERWISE_BUILD_NO_DIRECTIONAL_EDGE",
+    "not_supplied_directional_lane": "AUDIT_NOT_SUPPLIED_AND_BUILD_NO_EDGE_NO_CROSS_LANE_SUBSTITUTION",
+    "coverage_gap": "DO_NOT_COMPARE_ACROSS_GAP",
+    "causal_claim": "PROHIBITED"
+  },
+  "stock_positioning": {
+    "scope": "FULL_TWSE_TPEX_COMMON_EQUITY_EX_2330",
+    "windows": [60, 120, 240],
+    "directional_lanes": ["FOREIGN", "DOMESTIC_EX_FOREIGN", "ACTIVE_ETF"],
+    "threshold_policy": "T_MINUS_1_ROLLING_AND_SAME_DAY_LEAVE_ONE_OUT_PEER_MEDIANS",
+    "formal_residual_missing_policy": "HOLD_NO_RAW_RETURN_FALLBACK",
+    "formal_residual_provenance_policy": "BLOCK_RUN_ON_MISSING_OR_MISMATCHED_DURABLE_ROW_LINEAGE_WITH_2330_SOURCE_ANCHOR_EX_2330_OUTPUT_DAILY_DUAL_MARKET_COVERAGE_FACTOR_WINDOW_OR_SOURCE_IDENTITY",
+    "ordered_sequence": [
+      "DIRECTIONAL_CAPITAL_SETTLEMENT_OBSERVED",
+      "PRICE_PULLBACK_OR_SIDEWAYS_WITH_SETTLED_CAPITAL_OBSERVED",
+      "STABLE_POSITIONING_DURING_PRICE_PULLBACK_OR_SIDEWAYS_OBSERVED",
+      "PRICE_RESTART_AFTER_STABLE_POSITIONING_OBSERVED"
+    ],
+    "early_exit": [
+      "EARLY_DISTRIBUTION_WHILE_PRICE_HOLDS_OBSERVED",
+      "EXIT_WITH_PRICE_BREAKDOWN_OBSERVED"
+    ],
+    "residual_model_consensus": "EXACT_CATEGORY_AND_SEQUENCE_AGREEMENT_PER_WINDOW_AND_DIRECTIONAL_LANE",
+    "directional_lane_aggregation": "PROHIBITED",
+    "daily_phase_policy": "SAME_SESSION_SNAPSHOT_NOT_ORDERED_SEQUENCE_COMPLETION",
+    "transition_policy": {
+      "input": "EXACT_CONSENSUS_AVAILABLE_AND_EFFECTIVE_BY_EVIDENCE_CUTOFF_ONLY",
+      "ordering": "STRICT_STAGE_1_TO_4_NO_SKIPS_NO_REGRESSION",
+      "incomplete_expiry": "OWN_EVIDENCE_WINDOW_DAYS_TRADING_SESSIONS",
+      "reset": "DISTRIBUTION_OR_PRICE_BREAKDOWN",
+      "integrity": "PER_STREAM_SHA256_HASH_CHAIN",
+      "latest_materialization": "CLOCK_DRIVEN_EXPIRY_AT_AS_OF_EVEN_WITHOUT_NEW_OBSERVATION",
+      "causal_claim": "PROHIBITED"
+    },
+    "composite_score": "PROHIBITED"
+  },
+  "membership_allocation": {
+    "lookup_timing": "SIGNAL_EFFECTIVE_DATE_ELSE_EVIDENCE_DATE",
+    "event_known_at": "MAX_OF_ALL_POPULATED_APPROVED_AT_RECORDED_AT_KNOWN_AT_AVAILABLE_AT_INGESTED_AT",
+    "knowledge_replay": "ONLY_EVENT_KNOWN_AT_NOT_AFTER_CUTOFF",
+    "applied_date_semantics": "MEMBERSHIP_ACTIVE_ON_APPLIED_DATE_ALLOCATION_INPUTS_REMAIN_T_MINUS_1",
+    "duplicate_guard": "OVERLAPPING_ACTIVE_GROUP_TICKER_INTERVAL_OR_MULTIPLIED_MAPPING_BLOCKS",
+    "conserved_weight_sum": 1.0,
+    "conservation_failure": "BLOCK_NO_SILENT_DUPLICATION"
+  },
+  "point_in_time": {
+    "snapshot": "REQUESTED_DATE_MAPS_TO_LATEST_FORMAL_SESSION_NOT_AFTER_IT;MISSING_TARGET_SESSION_BLOCKS;UNSPECIFIED_USES_LATEST_COMPLETE_SESSION",
+    "stale_market_fallback": "PROHIBITED",
+    "dated_factor_tables": "CAP_ALL_TO_SINGLE_SNAPSHOT",
+    "evidence_cutoff_lower_bound": "LATEST_MARKET_AVAILABLE_AT_ON_SNAPSHOT",
+    "evidence_cutoff_local_date": "MUST_NOT_EXCEED_SNAPSHOT",
+    "next_day_evidence": "PROHIBITED",
+    "dated_contract_validation_order": "AS_OF_CAP_BEFORE_ROW_LINEAGE_AND_DAILY_COVERAGE_CHECKS"
+  },
+  "active_etf": {
+    "formal_table_cutoff": "EVERY_PUBLISHED_TABLE_DERIVES_ONLY_FROM_ROWS_WITH_AVAILABLE_AT_NOT_AFTER_EVIDENCE_CUTOFF",
+    "future_vintage_in_prepared_or_audit_tables": "PROHIBITED",
+    "full_fund_audit": "MAY_RETAIN_2330",
+    "story_comparison": "EXCLUDE_2330_FROM_EVENTS_EXPOSURES_AND_GROUP_CONSENSUS",
+    "tsmc_reporting": "SEPARATE_ACTIVE_ETF_TSMC_ANCHOR_TABLES_ONLY"
+  },
+  "risk_free": {
+    "instrument": "TAIWAN_10Y_GOVERNMENT_BOND_YIELD",
+    "instrument_id": "TAIWAN_10Y_GOVERNMENT_BOND_YIELD",
+    "yield_unit": "PERCENT",
+    "source_authority": "TAIPEI_EXCHANGE_TPEX",
+    "source_url_policy": "HTTPS_HOST_TPEX_OR_SUBDOMAIN_OF_TPEX_ORG_TW",
+    "source_payload_hash": "REQUIRED_64_HEX_SHA256_DIGEST",
+    "source_payload_hash_semantics": "PAYLOAD_INTEGRITY_FIELD_NOT_SOURCE_SIGNATURE",
+    "point_in_time_required": true,
+    "official_source_verified_required": true,
+    "available_at_required": true,
+    "fixed_rate_fallback": "PROHIBITED"
+  },
+  "output": {
+    "root": "data/output",
+    "mode": "APPEND_ONLY_RUN_DIRECTORY",
+    "formats": ["CSV", "PARQUET"],
+    "csv_date_format": "YYYY/MM/DD",
+    "chart_date_format": "YYYY-MM-DD",
+    "missing_parquet_engine": "BLOCK_WHOLE_RUN",
+    "stock_positioning_tables": [
+      "stock_positioning_market_gate_daily",
+      "stock_positioning_daily_base",
+      "stock_positioning_window_features",
+      "stock_positioning_lane_evidence",
+      "stock_positioning_grid_audit",
+      "stock_positioning_raw_story_allocation",
+      "stock_positioning_conserved_story_allocation",
+      "stock_positioning_raw_story_evidence",
+      "stock_positioning_conserved_story_evidence",
+      "stock_positioning_model_consensus",
+      "stock_positioning_raw_consensus_story_evidence",
+      "stock_positioning_conserved_consensus_story_evidence",
+      "stock_positioning_group_phase_daily",
+      "stock_positioning_transition_ledger",
+      "stock_positioning_transition_latest",
+      "stock_positioning_raw_transition_story_evidence",
+      "stock_positioning_conserved_transition_story_evidence"
+    ],
+    "active_etf_tsmc_anchor_tables": [
+      "active_etf_tsmc_anchor_holding_events",
+      "active_etf_tsmc_anchor_latest_holdings",
+      "active_etf_tsmc_anchor_security_consensus",
+      "active_etf_tsmc_anchor_story_event_audit",
+      "active_etf_tsmc_anchor_story_holding_audit"
+    ],
+    "monthly_revenue_tables": [
+      "reference_company_revenue_latest",
+      "reference_group_revenue_latest",
+      "reference_revenue_audit"
+    ],
+    "monthly_revenue_usage": "REFERENCE_ONLY_AFTER_CORE_OPPORTUNITY_NO_FEEDBACK",
+    "monthly_revenue_load_policy": "DERIVE_STAGE_3_OR_4_OPPORTUNITY_TICKERS_BEFORE_LAZY_LOADING",
+    "monthly_revenue_row_filter": "FILTER_TO_OPPORTUNITY_TICKERS_BEFORE_NORMALIZATION_AND_METRIC_COMPUTATION",
+    "monthly_revenue_group_scope": "ONLY_GROUPS_REACHED_BY_OPPORTUNITY_TICKERS_THROUGH_SNAPSHOT_PIT_MEMBERSHIP",
+    "monthly_revenue_opportunity_phases": [
+      "STABLE_POSITIONING_DURING_PRICE_PULLBACK_OR_SIDEWAYS_OBSERVED",
+      "PRICE_RESTART_AFTER_STABLE_POSITIONING_OBSERVED"
+    ],
+    "monthly_revenue_no_opportunity": "DO_NOT_OPEN_OR_PARSE_OPTIONAL_REFERENCE_WAITING_FOR_CORE_OPPORTUNITY",
+    "monthly_revenue_invalid": "OPTIONAL_REFERENCE_INVALID_CORE_UNAFFECTED"
+  }
+}

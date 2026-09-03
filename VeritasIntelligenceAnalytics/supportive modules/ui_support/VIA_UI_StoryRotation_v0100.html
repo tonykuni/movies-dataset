@@ -1,0 +1,40 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>VIA · 故事族群輪動橋接</title>
+<style>
+:root{--bg:#f5f5f2;--paper:#fff;--ink:#1f2530;--mut:#6d7688;--line:#dcdfe6;--ok:#4f8f6b;--bad:#b05c4d;--acc:#3e6b8f}
+body{margin:0;background:var(--bg);color:var(--ink);font:12px/1.5 "Segoe UI","Noto Sans TC",system-ui,sans-serif;padding:16px 22px}
+h1{font-size:20px;margin:0 0 4px} h2{font-size:13px;margin:16px 0 6px;letter-spacing:.04em}
+.sub{color:var(--mut);font-size:11px} .card{background:var(--paper);border:1px solid var(--line);border-radius:7px;padding:12px 14px;margin:10px 0}
+table{border-collapse:collapse;width:100%;font-size:11.5px} th{text-align:left;font-size:10px;letter-spacing:.14em;color:var(--mut);border-bottom:1px solid var(--line);padding:4px 8px 4px 0}
+td{border-bottom:1px solid #eef0ee;padding:4px 8px 4px 0;vertical-align:top} .ok{color:var(--ok);font-weight:700} .bad{color:var(--bad);font-weight:700}
+.mono{font-family:Consolas,ui-monospace,monospace} .wrap{overflow-x:auto} pre{font-size:10.5px;white-space:pre-wrap;color:var(--mut)}
+.state{display:inline-block;padding:2px 10px;border-radius:4px;border:1px solid var(--line);font-weight:700}
+</style></head><body>
+<h1>故事族群輪動橋接 <span class="sub">STORY GROUP ROTATION BRIDGE · VIA_TW_Story_Group_Rotation_v0500 × VDF_ENG072</span></h1>
+<div class="sub">產於 20260903_050445 · 狀態 <span class="state bad">BLOCKED_RUN_REAL</span> · 28.6s · 零 CDN 零外網 · 誠實三態</div>
+<div class="card"><b>阻擋原因</b><pre>KeyError: &#x27;Market&#x27;</pre></div>
+<div class="card"><h2>輸出輸入檔 EXPORTED INPUTS</h2><div class="wrap"><table><tr><th>檔 FILE</th><th>列 ROWS</th></tr><tr><td>trading_calendar</td><td class='mono'>1131</td></tr><tr><td>universe_history</td><td class='mono'>396</td></tr><tr><td>full_market_daily</td><td class='mono'>444591</td></tr><tr><td>membership_events</td><td class='mono'>194</td></tr><tr><td>candidate</td><td class='mono'>194</td></tr><tr><td>macro_vintages</td><td class='mono'>1212</td></tr><tr><td>active_etf_holdings</td><td class='mono'>1234</td></tr><tr><td>monthly_revenue</td><td class='mono'>3240</td></tr></table></div>
+<div class="sub">標的 396 · 交易日 1130 · 當沖覆蓋列 0 · 法人覆蓋列 97841 · 融資融券覆蓋列 101150 · 市值覆蓋列 0 · 候選 {&quot;groups&quot;: 33, &quot;membership_rows&quot;: 194, &quot;distinct_tickers&quot;: 163}</div></div>
+<div class="card"><h2>預檢 PREFLIGHT-REAL</h2><div class="wrap"><table><tr><th>輸入 INPUT</th><th>角色 ROLE</th><th>狀態 STATUS</th></tr><tr><td>full_market_daily</td><td>CORE_REQUIRED</td><td class='ok'>PASS</td></tr><tr><td>universe_history</td><td>CORE_REQUIRED</td><td class='ok'>PASS</td></tr><tr><td>trading_calendar</td><td>CORE_REQUIRED</td><td class='ok'>PASS</td></tr><tr><td>membership_events</td><td>CORE_REQUIRED</td><td class='ok'>PASS</td></tr><tr><td>macro_vintages</td><td>CORE_REQUIRED</td><td class='ok'>PASS</td></tr><tr><td>active_etf_holdings</td><td>CORE_REQUIRED</td><td class='ok'>PASS</td></tr><tr><td>monthly_revenue</td><td>OPTIONAL_POST_SIGNAL_REFERENCE</td><td class='ok'>PASS</td></tr><tr><td>candidate_story_membership</td><td>CORE_REQUIRED_VALIDATION_COHORT</td><td class='ok'>PASS</td></tr></table></div></div>
+<div class="card"><h2>缺口冊 GAP BOOK(誠實;補源後重跑即通)</h2><div class="wrap"><table><tr><th>ID</th><th>欄位 FIELD</th><th>缺口 GAP</th><th>補源 FIX</th></tr><tr><td>GAP-01</td><td>MarketCap</td><td>庫無流通股數/市值;LaggedCap 因子 lane 無法成立</td><td>補源:TWSE t187ap03_L「已發行普通股數」+TPEX 對應欄→shares 表(快照非 PIT=標 DERIVED_CURRENT_SHARES)×收盤</td></tr><tr><td>GAP-02</td><td>DayTradeTurnover</td><td>個股當沖僅市場級比例代位(TPEX 22 日;TWSE 無)=多數日期缺值→契約阻擋</td><td>補源:TWSE 當沖逐股(WAF 候源 L12)+TPEX 逐股;缺值日引擎 fail-closed=誠實</td></tr><tr><td>GAP-03</td><td>IsLimitUpLocked/IsLimitDownLocked</td><td>未知=缺值(契約:不得當 False);注意力 lane 鎖定修正不啟用</td><td>補源:漲跌停旗標(TWSE MI_INDEX 或由 prev_close×1.1 推導=DERIVED 需明令)</td></tr><tr><td>GAP-04</td><td>DXY</td><td>全球庫無 DXY 序列(僅 TWD=X)</td><td>補源:OmniFetch 加 DX-Y.NYB 車道</td></tr><tr><td>GAP-05</td><td>Taiwan10YYield</td><td>無 TPEX 官方 URL+64hex payload 雜湊之 PIT 序列;Sharpe/Sortino 保持 HOLD(契約禁固定利率)</td><td>補源:ENG071 同意閘 TW10Y intake 正本→附 SourceURL/PayloadHash</td></tr><tr><td>GAP-06</td><td>KnownAt/AvailableAt</td><td>庫無擷取時戳;以公告慣例時刻衍生(DERIVED)非真知悉時</td><td>補源:入庫層記 ingested_at(ENG054/056 增欄)</td></tr><tr><td>GAP-07</td><td>membership ApprovedAt</td><td>故事冊=操作員上傳(批308);事件以 PENDING 入 ledger=先統計驗證後人工核准(包治理律);歷史 PIT 成分無</td><td>人工核准後追加 APPROVED 事件(append-only)</td></tr></table></div></div>
+<div class="card"><h2>執行尾流 RUN TAIL</h2><pre>s = def_run_pipeline_frames(
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File &quot;/home/user/movies-dataset/VeritasIntelligenceAnalytics/supportive modules/references/intake/VIA_StoryGroupRotation_b325/VIA_TW_Story_Group_Rotation_v0500/engine/via_system_orchestrator.py&quot;, line 1600, in def_run_pipeline_frames
+    factor_output = def_run_full_market_factor_pipeline(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File &quot;/home/user/movies-dataset/VeritasIntelligenceAnalytics/supportive modules/references/intake/VIA_StoryGroupRotation_b325/VIA_TW_Story_Group_Rotation_v0500/engine/via_full_market_factor_engine.py&quot;, line 1019, in def_run_full_market_factor_pipeline
+    validated, gate_daily, gate_summary = def_validate_full_market_gate(
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File &quot;/home/user/movies-dataset/VeritasIntelligenceAnalytics/supportive modules/references/intake/VIA_StoryGroupRotation_b325/VIA_TW_Story_Group_Rotation_v0500/engine/via_full_market_factor_engine.py&quot;, line 651, in def_validate_full_market_gate
+    counts_observed = selected[MARKET_COLUMN].value_counts()
+                      ~~~~~~~~^^^^^^^^^^^^^^^
+  File &quot;/usr/local/lib/python3.11/dist-packages/pandas/core/frame.py&quot;, line 4378, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File &quot;/usr/local/lib/python3.11/dist-packages/pandas/core/indexes/base.py&quot;, line 3648, in get_loc
+    raise KeyError(key) from err
+KeyError: &#x27;Market&#x27;
+</pre>
+<div class="sub">最新 run 目錄:(無)</div></div>
+<div class="sub">VIA · VERITAS DATA FORGE · 包原件收容 intake/VIA_StoryGroupRotation_b325(零改動)· 每欄衍生律見引擎頭註</div>
+</body></html>

@@ -1,0 +1,338 @@
+{
+  "contract_id": "VIA_TW_STORY_GROUP_ROTATION_CONTRACT_V0500",
+  "contract_version": "0.5.0",
+  "purpose": "POINT_IN_TIME_STORY_GROUP_VALIDATION_ROTATION_AND_EARLY_POSITIONING_RESEARCH",
+  "pipeline": [
+    "REAL_INPUT_PREFLIGHT",
+    "PIT_MEMBERSHIP_MATERIALIZATION",
+    "FULL_TWSE_TPEX_GATE",
+    "EX_2330_DUAL_RESIDUAL_FACTORS",
+    "GLOBAL_SIZE_AND_LIQUIDITY_HISTORY",
+    "STORY_GROUP_VALIDATION",
+    "FOUR_ROLE_CLASSIFICATION",
+    "EXACT_RESIDUAL_LANE_CONSENSUS",
+    "PARALLEL_PRICE_INDICES",
+    "PIT_CAPITAL_EVIDENCE",
+    "ALL_STOCK_POSITIONING_SEQUENCE_EVIDENCE",
+    "EXACT_POSITIONING_RESIDUAL_MODEL_CONSENSUS",
+    "STRICT_POSITIONING_TRANSITION_LEDGER",
+    "OPTIONAL_STAGE_3_OR_4_REVENUE_REFERENCE",
+    "ROTATION_ASSOCIATION",
+    "MULTI_PERIOD_PIT_BACKTEST",
+    "APPEND_ONLY_PUBLICATION"
+  ],
+  "formal_model_grid": {
+    "factor_lanes": ["LAGGED_MARKET_CAP", "LAGGED_ETR"],
+    "windows": [60, 120, 240],
+    "expected_model_count": 6,
+    "cardinality": "EXACT_TWO_BY_THREE_CARTESIAN_PRODUCT",
+    "violation": "BLOCK_FORMAL_RUN_ON_MISSING_EXTRA_OR_DUPLICATE_COMBINATION"
+  },
+  "taxonomy": {
+    "type": "OVERLAPPING_STORY_GROUPS_NOT_INDUSTRY_CLASSIFICATION",
+    "examples": ["CPO", "BBU", "HIGH_SPEED_TRANSMISSION", "AI_COOLING"],
+    "primary_validation_level": "STORY_GROUP",
+    "optional_index_hierarchy": "L3_STORY_BRANCH_TO_GLOBAL_SIZE_TIER_TO_STOCK",
+    "multi_group_membership": true,
+    "market_breadth_dedupes_ticker": true,
+    "candidate_membership_is_validation_cohort": true
+  },
+  "market": {
+    "required": ["TWSE", "TPEX"],
+    "assets": "ORDINARY_EQUITY_ONLY",
+    "tsmc": "SEPARATE_ANCHOR_EXCLUDED_FROM_COMPARISON_SIZE_THRESHOLDS_AND_PRIMARY_INDICES",
+    "etr_formula": "TURNOVER_VALUE_MINUS_DAY_TRADE_TURNOVER",
+    "etr_interpretation": "NON_DIRECTIONAL_ATTENTION_NOT_NET_INFLOW",
+    "locked_limit_up_attention": "MAX_CURRENT_OR_PRIOR_SESSION_ETR_WHEN_LOCK_STATUS_IS_KNOWN",
+    "attention_share_coverage": "COMPLETE_EX_2330_MARKET_DENOMINATOR_AND_COMPLETE_GROUP_NUMERATOR_REQUIRED",
+    "partial_etr_coverage": "HOLD_ATTENTION_SHARE_NO_RENORMALIZATION_AND_NO_ROTATION_EDGE",
+    "missing_or_invalid_market_data": "FAIL_CLOSED"
+  },
+  "tsmc_anchor": {
+    "ticker": "2330.TW",
+    "policy": "SEPARATE_OBSERVATION_ANCHOR_ONLY",
+    "excluded_from": [
+      "MARKET_COMPARISON_FACTORS",
+      "GLOBAL_SIZE_AND_LIQUIDITY_THRESHOLDS",
+      "STOCK_PEER_THRESHOLDS",
+      "FOUR_ROLE_CLASSIFICATION",
+      "PRIMARY_GROUP_INDICES",
+      "STORY_FLOW_COMPARISON_TOTALS"
+    ],
+    "outputs": [
+      "tsmc_anchor_daily",
+      "tsmc_anchor_membership",
+      "active_etf_tsmc_anchor_holding_events",
+      "active_etf_tsmc_anchor_latest_holdings",
+      "active_etf_tsmc_anchor_security_consensus",
+      "active_etf_tsmc_anchor_story_event_audit",
+      "active_etf_tsmc_anchor_story_holding_audit"
+    ]
+  },
+  "size_classification": {
+    "scope": "GLOBAL_TWSE_TPEX_COMMON_EQUITY_EX_2330_NOT_STORY_GROUP_SPECIFIC",
+    "windows": [60, 120, 240],
+    "rebalance": "QUARTERLY_POINT_IN_TIME_NEXT_SESSION_EFFECTIVE",
+    "market_cap_breaks": [0.6, 0.9],
+    "labels": ["SMALL", "MID", "LARGE"],
+    "etr_liquidity_tier": "INDEPENDENT_PARALLEL_CLASSIFICATION",
+    "history": "APPEND_ONLY"
+  },
+  "classification": {
+    "windows": [60, 120, 240],
+    "roles": ["LEAD", "PEER", "LAG", "UNRELATED"],
+    "data_insufficient": "SEPARATE_HOLD_STATUS_NOT_A_FIFTH_ROLE",
+    "market_removal": {
+      "universe": "FULL_TWSE_TPEX_COMMON_EQUITY_EX_2330",
+      "source_universe": "TWSE_TPEX_COMMON_EQUITY_WITH_2330_ANCHOR",
+      "residual_universe": "TWSE_TPEX_COMMON_EQUITY_EX_2330",
+      "factor_lanes": ["LAGGED_MARKET_CAP", "LAGGED_ETR"],
+      "rolling_beta_timing": "OBSERVATIONS_THROUGH_T_MINUS_1_ONLY",
+      "residual_lineage": {
+        "schema": "VIA_FULL_MARKET_RESIDUAL_LINEAGE_V2",
+        "storage": "DURABLE_ROW_COLUMNS_SURVIVE_CSV_AND_PARQUET_ROUNDTRIP",
+        "dataframe_attrs": "OPTIONAL_CONTRADICTION_CHECKS_ONLY_NOT_AUTHORITY",
+        "integrity": "SHA256_LINEAGE_ID_OVER_EXPLICIT_FIELDS",
+        "universe_version_policy": "LATEST_RECORDED_REVISION_KNOWN_BY_SESSION_MARKET_DATA_CUTOFF",
+        "universe_knowledge_cutoff_policy": "UNIVERSE_EVENT_KNOWN_AT_NOT_AFTER_SESSION_MARKET_DATA_AVAILABLE_AT",
+        "daily_coverage": "EXPECTED_UNIQUE_TOTAL_TWSE_AND_TPEX_COUNTS_MUST_MATCH_EACH_EX_2330_DATE",
+        "as_of_order": "CAP_DATED_ROWS_BEFORE_LINEAGE_COVERAGE_AND_MODEL_STATUS_VALIDATION"
+      }
+    },
+    "self_inclusion": "LEAVE_ONE_OUT_MEMBER_VS_PEER_FACTOR",
+    "group_axes": [
+      "RESIDUAL_MEDIAN_CORRELATION",
+      "RESIDUAL_POSITIVE_PAIR_RATIO",
+      "PCA_ABSORPTION"
+    ],
+    "lead_lag": "DYNAMIC_LAG_RADIUS_AND_MAX_OVER_LAGS_NULL",
+    "nulls": ["DESCRIPTOR_MATCHED", "UNRESTRICTED_RANDOM", "CIRCULAR_BLOCK_SHIFT"],
+    "descriptor_matching": "EACH_60_120_OR_240_DAY_MODEL_USES_ONLY_THE_SAME_WINDOW_PIT_SIZE_AND_LIQUIDITY_DESCRIPTORS",
+    "multiple_testing": "BENJAMINI_HOCHBERG_FDR",
+    "market_value_cutoffs": "NO_FIXED_CORRELATION_PCA_OR_LEAD_LAG_THRESHOLDS",
+    "fixed_parameters": "ERROR_CONTROL_FINITE_SAMPLE_AND_GOVERNANCE_ONLY",
+    "composite_score": false
+  },
+  "validation_consensus": {
+    "per_window": "EXACT_DECISION_AND_ROLE_AGREEMENT_ACROSS_BOTH_RESIDUAL_FACTOR_LANES",
+    "numeric_averaging": false,
+    "voting": false,
+    "all_windows_required_for_membership_review": [60, 120, 240],
+    "automatic_canonical_mutation": false,
+    "approval_effect": "NEXT_TRADING_SESSION_AFTER_EXPLICIT_APPROVAL"
+  },
+  "indices": {
+    "methods": ["GI_EW", "GI_HIER", "GI_ETR"],
+    "meanings": {
+      "GI_EW": "EQUAL_WEIGHT_AUDIT_AND_BREADTH_BENCHMARK",
+      "GI_HIER": "EQUAL_L3_BRANCH_THEN_EQUAL_GLOBAL_SIZE_TIER_THEN_DYNAMICALLY_TRUNCATED_CAP_WEIGHT",
+      "GI_ETR": "DYNAMICALLY_TRUNCATED_NON_DAY_TRADE_ATTENTION_WEIGHT"
+    },
+    "weight_timing": "PRICE_MARKET_CAP_AND_ETR_INPUTS_FROM_T_MINUS_1",
+    "membership_timing": "ACTIVE_ON_APPLIED_DATE_T",
+    "chain_linked": true,
+    "base_level": 100.0,
+    "role_weighting": false,
+    "missing_member_data": "BLOCK_AFFECTED_METHOD_NO_SILENT_RENORMALIZATION"
+  },
+  "capital": {
+    "directional_lanes": [
+      "FOREIGN",
+      "INVESTMENT_TRUST",
+      "DEALER",
+      "DOMESTIC_EX_FOREIGN",
+      "ALL_INSTITUTIONAL",
+      "MARGIN_CHANGE",
+      "SHORT_CHANGE",
+      "ACTIVE_ETF_SUBSET"
+    ],
+    "attention_lane": "ETR_ATTENTION_SHARE_NON_DIRECTIONAL",
+    "views": ["STORY_FULL", "CAPITAL_CONSERVED"],
+    "multi_label_conserved_weight": "AUDITED_EXPOSURE_SHARE_WHEN_AVAILABLE_ELSE_EQUAL_SPLIT_WITH_UNALLOCATED_RESIDUAL_TO_UNMAPPED",
+    "active_etf_is_investment_trust_subset": true,
+    "active_etf_double_counting": "PROHIBITED",
+    "foreign_context": ["USDTWD", "DXY"],
+    "direct_transfer_claim": false,
+    "approved_name": "ROTATION_ASSOCIATION"
+  },
+  "active_etf": {
+    "availability_cutoff": "ALL_FORMAL_TABLES_DERIVE_ONLY_FROM_SNAPSHOTS_WITH_AVAILABLE_AT_NOT_AFTER_EVIDENCE_CUTOFF",
+    "future_vintage_in_prepared_or_audit_tables": "PROHIBITED",
+    "full_fund_audit": "MAY_RETAIN_2330_FOR_CONSERVATION",
+    "story_comparison": "EXCLUDE_2330_FROM_STORY_EVENTS_EXPOSURES_AND_GROUP_CONSENSUS",
+    "tsmc_reporting": "SEPARATE_ACTIVE_ETF_TSMC_ANCHOR_TABLES_ONLY"
+  },
+  "group_flow_states": {
+    "grain": "DATE_GROUP_ID_DIRECTIONAL_LANE_LONG",
+    "directional_lanes": ["FOREIGN", "DOMESTIC_EX_FOREIGN", "ACTIVE_ETF"],
+    "lane_coverage": "EACH_LANE_FAILS_CLOSED_INDEPENDENTLY",
+    "cross_lane_aggregation": "PROHIBITED_NO_ANY_VOTE_WEIGHT_OR_COMPOSITE",
+    "formal_calendar": "REQUIRED_FOR_ACTIONABLE_NEXT_SESSION_EFFECTIVE_DATE"
+  },
+  "rotation_association": {
+    "input_view": "CAPITAL_CONSERVED",
+    "complete_etr_coverage_required": true,
+    "partial_coverage_edge": "PROHIBITED",
+    "directional_lane_coverage": "EVERY_COMPARISON_GROUP_MUST_PASS_THE_SAME_DATE_AND_LANE_OR_NO_DIRECTIONAL_EDGE",
+    "not_supplied_lane": "AUDIT_NOT_SUPPLIED_NO_EDGE_AND_NO_CROSS_LANE_SUBSTITUTION",
+    "compare_across_coverage_gap": false,
+    "causal_claim": false
+  },
+  "stock_positioning": {
+    "scope": "FULL_TWSE_TPEX_COMMON_EQUITY_EX_2330_WITH_2330_REPORTED_AS_SEPARATE_ANCHOR",
+    "windows": [60, 120, 240],
+    "price_evidence": "EX_2330_RESIDUAL_RETURN_WITH_T_MINUS_1_PARAMETERS",
+    "formal_missing_residual": "HOLD_NEVER_FALL_BACK_TO_RAW_STOCK_RETURN",
+    "formal_residual_provenance": "FAIL_CLOSED_UNLESS_DURABLE_ROW_LINEAGE_PROVES_WITH_2330_SOURCE_ANCHOR_EX_2330_OUTPUT_DAILY_DUAL_MARKET_COVERAGE_AND_FACTOR_BETA_WINDOW_SOURCE_IDENTITIES_MATCH",
+    "attention_evidence": "ETR_AND_LIMIT_LOCK_ADJUSTED_ATTENTION_ETR_NON_DIRECTIONAL",
+    "directional_lanes": ["FOREIGN", "DOMESTIC_EX_FOREIGN", "ACTIVE_ETF"],
+    "dynamic_thresholds": "STRICT_T_MINUS_1_ROLLING_MEDIAN_AND_SAME_DAY_LEAVE_ONE_OUT_PEER_MEDIAN",
+    "ordered_phases": [
+      "DIRECTIONAL_CAPITAL_SETTLEMENT_OBSERVED",
+      "PRICE_PULLBACK_OR_SIDEWAYS_WITH_SETTLED_CAPITAL_OBSERVED",
+      "STABLE_POSITIONING_DURING_PRICE_PULLBACK_OR_SIDEWAYS_OBSERVED",
+      "PRICE_RESTART_AFTER_STABLE_POSITIONING_OBSERVED"
+    ],
+    "early_exit_phases": [
+      "EARLY_DISTRIBUTION_WHILE_PRICE_HOLDS_OBSERVED",
+      "EXIT_WITH_PRICE_BREAKDOWN_OBSERVED"
+    ],
+    "residual_model_consensus": "EXACT_CATEGORY_AND_SEQUENCE_AGREEMENT_NO_AVERAGING_NO_VOTING",
+    "execution": "NEXT_TRADABLE_SESSION_AFTER_LATEST_REQUIRED_AVAILABLE_AT",
+    "group_mapping": ["STORY_FULL", "CAPITAL_CONSERVED"],
+    "physical_output_tables": [
+      "stock_positioning_market_gate_daily",
+      "stock_positioning_daily_base",
+      "stock_positioning_window_features",
+      "stock_positioning_lane_evidence",
+      "stock_positioning_grid_audit",
+      "stock_positioning_raw_story_allocation",
+      "stock_positioning_conserved_story_allocation",
+      "stock_positioning_raw_story_evidence",
+      "stock_positioning_conserved_story_evidence",
+      "stock_positioning_model_consensus",
+      "stock_positioning_raw_consensus_story_evidence",
+      "stock_positioning_conserved_consensus_story_evidence",
+      "stock_positioning_group_phase_daily",
+      "stock_positioning_transition_ledger",
+      "stock_positioning_transition_latest",
+      "stock_positioning_raw_transition_story_evidence",
+      "stock_positioning_conserved_transition_story_evidence"
+    ],
+    "group_phase_daily": "SAME_SESSION_CONSENSUS_PHASE_COUNTS_AND_BREADTH_ONLY_NOT_ORDERED_SEQUENCE_COMPLETION",
+    "transition_ledger": {
+      "grain": "TICKER_EVIDENCE_WINDOW_DIRECTIONAL_LANE",
+      "input": "EXACT_FACTOR_MODEL_CONSENSUS_AVAILABLE_AND_EFFECTIVE_BY_EVIDENCE_CUTOFF_ONLY",
+      "ordering": "STRICT_FOUR_PHASE_ORDER_NO_SKIPS_NO_REGRESSION",
+      "incomplete_expiry": "OWN_EVIDENCE_WINDOW_DAYS_TRADING_SESSIONS",
+      "reset": "IMMEDIATE_ON_DISTRIBUTION_OR_PRICE_BREAKDOWN",
+      "integrity": "PER_STREAM_SHA256_PREVIOUS_TRANSITION_HASH_CHAIN",
+      "immutable_ledger": "ACTUAL_EFFECTIVE_OBSERVATIONS_ONLY",
+      "latest_output": "AS_OF_MATERIALIZED_VIEW_WITH_CLOCK_DRIVEN_EXPIRY_EVEN_WITHOUT_NEW_OBSERVATION",
+      "interpretation": "OBSERVED_POINT_IN_TIME_ORDER_ONLY_NOT_CAUSAL_NOT_TRADE_INSTRUCTION"
+    },
+    "causal_claim": false,
+    "composite_score": false
+  },
+  "membership_allocation": {
+    "field": "ExposureShare",
+    "optional": true,
+    "range": [0.0, 1.0],
+    "provenance": "AUDITED_APPEND_ONLY_EVENT_HASH_CHAIN_AND_PIT_MATERIALIZED_HISTORY",
+    "keep_event_may_update": true,
+    "missing_value_policy": "EQUAL_SPLIT_UNKNOWN_ASSIGNMENTS_WITH_ANY_UNALLOCATED_RESIDUAL_TO_UNMAPPED",
+    "lookup_timing": "SIGNAL_EFFECTIVE_DATE_ELSE_EVIDENCE_DATE",
+    "event_known_at": "MAX_OF_ALL_POPULATED_APPROVED_AT_RECORDED_AT_KNOWN_AT_AVAILABLE_AT_INGESTED_AT",
+    "knowledge_replay": "ONLY_EVENTS_WITH_EVENT_KNOWN_AT_NOT_AFTER_CUTOFF",
+    "applied_date_semantics": "MEMBERSHIP_ACTIVE_ON_APPLIED_DATE_WHILE_ALLOCATION_INPUTS_REMAIN_T_MINUS_1",
+    "duplicate_guard": "OVERLAPPING_ACTIVE_GROUP_TICKER_INTERVAL_OR_MULTIPLIED_EVIDENCE_MAPPING_BLOCKS",
+    "conservation": "EACH_TICKER_EVIDENCE_ALLOCATION_SUM_EXACTLY_ONE_OR_BLOCK"
+  },
+  "monthly_revenue": {
+    "policy": "OPTIONAL_REFERENCE_ONLY",
+    "core_pipeline_dependency": false,
+    "missing_input": "DOES_NOT_BLOCK_CORE_PREFLIGHT_PIPELINE_OR_BACKTEST",
+    "invalid_input": "EMPTY_REFERENCE_TABLES_AND_AUDIT_STATUS_OPTIONAL_REFERENCE_INVALID_CORE_UNAFFECTED",
+    "permitted_stage": "STRICT_TRANSITION_LATEST_STAGE_3_OR_STAGE_4_ONLY_FOR_EX_POST_FUNDAMENTAL_VALIDATION",
+    "opportunity_source": "stock_positioning_transition_latest.VerifiedPhase",
+    "opportunity_phases": [
+      "STABLE_POSITIONING_DURING_PRICE_PULLBACK_OR_SIDEWAYS_OBSERVED",
+      "PRICE_RESTART_AFTER_STABLE_POSITIONING_OBSERVED"
+    ],
+    "load_policy": "DERIVE_STRICT_STAGE_3_OR_4_OPPORTUNITY_TICKERS_BEFORE_LAZY_LOADING",
+    "row_filter": "OPPORTUNITY_TICKERS_ONLY_BEFORE_NORMALIZATION_AND_METRIC_COMPUTATION",
+    "group_output_scope": "ONLY_GROUPS_REACHED_BY_OPPORTUNITY_TICKERS_THROUGH_SNAPSHOT_PIT_MEMBERSHIP",
+    "no_core_opportunity": "DO_NOT_OPEN_OR_PARSE_REVENUE_AND_AUDIT_OPTIONAL_REFERENCE_WAITING_FOR_CORE_OPPORTUNITY",
+    "prohibited_uses": [
+      "GROUP_CLASSIFICATION",
+      "MEMBER_ROLE_CLASSIFICATION",
+      "INDEX_CONSTRUCTION",
+      "INDEX_WEIGHTING",
+      "EARLY_POSITIONING_SIGNAL",
+      "EARLY_EXIT_SIGNAL",
+      "SECURITY_SELECTION",
+      "MEMBERSHIP_MUTATION"
+    ],
+    "grain": "TICKER_REPORT_MONTH_AVAILABLE_AT_VINTAGE",
+    "outputs": [
+      "YOY",
+      "CUMULATIVE_YOY",
+      "SEASONAL_DEVIATION",
+      "POSITIVE_BREADTH",
+      "ACCELERATING_BREADTH"
+    ],
+    "physical_output_tables": [
+      "reference_company_revenue_latest",
+      "reference_group_revenue_latest",
+      "reference_revenue_audit"
+    ],
+    "multi_month_reporting": "HOLD_NOT_DIRECTLY_COMPARABLE",
+    "role": "POST_OPPORTUNITY_REFERENCE_NO_FEEDBACK_TO_CORE_DECISIONS",
+    "composite_score": false
+  },
+  "point_in_time": {
+    "availability_column": "AvailableAt",
+    "publication_snapshot": "REQUESTED_DATE_MAPS_TO_LATEST_FORMAL_SESSION_NOT_AFTER_IT_SHARED_BY_ALL_MODULES",
+    "missing_requested_target_session": "BLOCK_NO_STALE_MARKET_FALLBACK",
+    "unspecified_as_of": "LATEST_COMPLETE_MARKET_SESSION",
+    "dated_factor_output_cap": "DATE_NOT_AFTER_PUBLICATION_SNAPSHOT",
+    "dated_contract_validation_order": "AS_OF_CAP_BEFORE_ROW_LINEAGE_AND_DAILY_COVERAGE_VALIDATION",
+    "evidence_cutoff_lower_bound": "LATEST_MARKET_AVAILABLE_AT_ON_SNAPSHOT",
+    "evidence_cutoff_local_date": "NOT_AFTER_PUBLICATION_SNAPSHOT",
+    "signal_time": "LATEST_REQUIRED_EVIDENCE_TIMESTAMP",
+    "execution": "NEXT_TRADABLE_SESSION",
+    "future_vintage": "PROHIBITED",
+    "forward_fill_raw_evidence": false
+  },
+  "risk_free": {
+    "instrument_id": "TAIWAN_10Y_GOVERNMENT_BOND_YIELD",
+    "unit": "PERCENT",
+    "source": "OFFICIAL_SOURCE_WITH_VERIFIED_PROVENANCE",
+    "source_authority": "TAIPEI_EXCHANGE_TPEX",
+    "source_url": "HTTPS_TPEX_OR_SUBDOMAIN_WITHOUT_USERINFO",
+    "source_payload_hash": "SHA256_64_HEX_PAYLOAD_INTEGRITY_DIGEST_NOT_SOURCE_SIGNATURE",
+    "status_validation": "RECOMPUTE_FROM_ROW_PROVENANCE_DO_NOT_TRUST_CALLER_STATUS",
+    "join": "POINT_IN_TIME_BACKWARD_ASOF",
+    "fixed_rate_fallback": false,
+    "incomplete_coverage": "HOLD_SHARPE_AND_SORTINO"
+  },
+  "backtest": {
+    "research_start": "2024-01-01",
+    "warmup_start": "2023-01-01",
+    "evaluation_starts": ["2024-01-01", "2025-01-01", "2026-01-01"],
+    "horizons": [1, 3, 5, 20],
+    "execution": "NEXT_TRADABLE_SESSION",
+    "held_or_blocked_index_path": "EXCLUDED_FROM_MATURE_EVENT",
+    "retrospective_taxonomy": "RESEARCH_ONLY_NOT_TRADABLE_PERFORMANCE"
+  },
+  "governance": {
+    "append_only": true,
+    "membership_hash_chain": "SHA256",
+    "canonical_delete": false,
+    "missing_data": "BLOCKED_OR_HOLD_NO_FABRICATION",
+    "formal_output": "CSV_AND_PARQUET_ATOMIC_RUN_DIRECTORY",
+    "parquet_missing": "BLOCK_WHOLE_RUN",
+    "order_execution": false,
+    "real_data_results_in_repository": false
+  }
+}
