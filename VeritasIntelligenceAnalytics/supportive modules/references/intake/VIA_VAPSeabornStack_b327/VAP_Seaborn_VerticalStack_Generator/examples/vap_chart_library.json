@@ -1,0 +1,106 @@
+{
+  "schema": "VIA-VAP-CHART-LIBRARY/1.0",
+  "version": "2.3.0",
+  "metadata": {
+    "created_at": "2026-09-02T00:00:00+00:00",
+    "updated_at": "2026-09-02T00:00:00+00:00",
+    "item_count": 3
+  },
+  "items": [
+    {
+      "id": "adjusted_candlestick_volume",
+      "name": "Adjusted K 線＋成交量",
+      "description": "紅漲綠跌；價格 75% 與成交量 25% 兩列單軸。",
+      "tags": ["股票", "OHLCV", "VAP"],
+      "chart_type": "candlestick",
+      "chart": {
+        "id": "adjusted_candlestick_volume",
+        "type": "candlestick",
+        "title": "Adjusted Candlestick + Volume",
+        "x": "Date",
+        "y": [],
+        "secondary_y": [],
+        "axis_mode": "single",
+        "open": "AdjOpen",
+        "high": "AdjHigh",
+        "low": "AdjLow",
+        "close": "AdjClose",
+        "volume": "Volume",
+        "unit": "Adjusted Price",
+        "secondary_unit": "Volume",
+        "height_ratio": 1.5,
+        "price_height_fraction": 0.75,
+        "volume_height_fraction": 0.25,
+        "missing": "ffill",
+        "tick_policy": "vap_locked",
+        "tick_count": 5,
+        "bar_alpha": 0.75,
+        "candle_width_ratio": 0.88,
+        "bar_width_ratio": 0.92,
+        "up_color": "#D62728",
+        "down_color": "#2CA02C"
+      },
+      "metadata": {
+        "created_at": "2026-09-02T00:00:00+00:00",
+        "updated_at": "2026-09-02T00:00:00+00:00"
+      }
+    },
+    {
+      "id": "adjusted_price_trend",
+      "name": "價格與均線",
+      "description": "Adjusted Close 與 MA20 單軸趨勢。",
+      "tags": ["股票", "價格", "均線"],
+      "chart_type": "line",
+      "chart": {
+        "id": "adjusted_price_trend",
+        "type": "line",
+        "title": "Adjusted Close and MA20",
+        "x": "Date",
+        "y": ["AdjClose", "MA20"],
+        "secondary_y": [],
+        "axis_mode": "single",
+        "unit": "Price",
+        "height_ratio": 1.25,
+        "missing": "ffill",
+        "palette": "deep",
+        "line_width": 1.65,
+        "alpha": 0.82,
+        "tick_policy": "vap_locked",
+        "tick_count": 5
+      },
+      "metadata": {
+        "created_at": "2026-09-02T00:00:00+00:00",
+        "updated_at": "2026-09-02T00:00:00+00:00"
+      }
+    },
+    {
+      "id": "institutional_flow_stack",
+      "name": "法人買賣超堆疊",
+      "description": "外資、投信與自營商的正負堆疊柱圖。",
+      "tags": ["股票", "籌碼", "堆疊"],
+      "chart_type": "stacked_bar",
+      "chart": {
+        "id": "institutional_flow_stack",
+        "type": "stacked_bar",
+        "title": "Institutional Net Flow",
+        "x": "Date",
+        "y": ["Foreign", "Trust", "Dealer"],
+        "secondary_y": [],
+        "axis_mode": "single",
+        "unit": "TWD",
+        "height_ratio": 1.0,
+        "missing": "none",
+        "palette": "Set2",
+        "bar_alpha": 0.75,
+        "bar_width_ratio": 0.92,
+        "show_zero_line": true,
+        "tick_policy": "vap_locked",
+        "tick_count": 5
+      },
+      "metadata": {
+        "created_at": "2026-09-02T00:00:00+00:00",
+        "updated_at": "2026-09-02T00:00:00+00:00"
+      }
+    }
+  ]
+}
