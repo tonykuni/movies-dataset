@@ -1,0 +1,444 @@
+{
+ "ssot_id": "VIA_FLOWROT_METHOD_THRESHOLDS_V0400",
+ "version": "0.4.0",
+ "asof": "2026-09-03",
+ "supersedes": "VIA_FLOWROT_METHOD_THRESHOLDS_V0300",
+ "evidence_tier": "SOURCE_REPORTED_SOURCED_UNVERIFIED",
+ "rolling_policy": "APPEND_ONLY_CALIBRATION_HISTORY",
+ "family_doctrine": {
+  "F": "固定憲法——方法論底線/統計顯著性,任何動態結果違憲直接否決",
+  "D": "強制滾動——每次校準更新(分位/中位/IC 定),零固定閾值",
+  "H": "混合——平常滾動,觸發結構異常鎖定(鎖值=觸發前 20 日中位數),鎖期短(C-20)後恢復",
+  "resolve_order": "F 憲法優先 → D 滾動 → H 條件鎖;每次校準記錄動態/鎖定/原因/時間(族譜)"
+ },
+ "lock_triggers": [
+  {
+   "id": "L1",
+   "name": "市場廣度崩落",
+   "rule": "breadth_change<-0.30"
+  },
+  {
+   "id": "L2",
+   "name": "淨大盤乖離過大",
+   "rule": "abs(clean_mkt_z)>3.0"
+  },
+  {
+   "id": "L3",
+   "name": "族群 AS 中位數異常",
+   "rule": "abs(group_as_median_z)>2.5"
+  },
+  {
+   "id": "L4",
+   "name": "有效成員腰斬",
+   "rule": "member_ratio<0.5"
+  },
+  {
+   "id": "L5",
+   "name": "Risk-Off regime",
+   "rule": "regime==RISK_OFF"
+  }
+ ],
+ "sensitivity_doctrine": "半動態不失敏:Shock(|z|>2.3)時視窗減半(下限 C-22);核心敏感量(AS/短線動能/外資短流)不重度平滑",
+ "controls": [
+  {
+   "id": "C-01",
+   "name": "PCA 吸收率下限",
+   "value": 0.4,
+   "unit": "ratio",
+   "affects": [
+    "VALIDATE",
+    "INDEX"
+   ],
+   "param_type": "D",
+   "rolling": {
+    "stat": "quantile",
+    "q": 0.5,
+    "window": 60,
+    "floor": 0.3
+   },
+   "note": "探索用 PCA 吸收率——滾動中位數;下限 0.30 防失焦"
+  },
+  {
+   "id": "C-02",
+   "name": "置換檢定 p 上限",
+   "value": 0.05,
+   "unit": "p_value",
+   "affects": [
+    "VALIDATE"
+   ],
+   "param_type": "F",
+   "note": "統計顯著性憲法;不隨行情搖擺"
+  },
+  {
+   "id": "C-03",
+   "name": "族群資金聚焦度門檻",
+   "value": 0.8,
+   "unit": "percentile_score",
+   "affects": [
+    "CLASSIFY",
+    "INDEX"
+   ],
+   "param_type": "D",
+   "rolling": {
+    "stat": "quantile",
+    "q": 0.8,
+    "window": 60
+   },
+   "note": "族群資金聚焦度門檻——族群 AS 分位滾動"
+  },
+  {
+   "id": "C-04",
+   "name": "族群領先性門檻",
+   "value": 0.75,
+   "unit": "score",
+   "affects": [
+    "CLASSIFY",
+    "INDEX"
+   ],
+   "param_type": "D",
+   "rolling": {
+    "stat": "quantile",
+    "q": 0.75,
+    "window": 60
+   },
+   "note": "族群領先性門檻——滾動"
+  },
+  {
+   "id": "C-05",
+   "name": "LEADER 複合分下限",
+   "value": 0.75,
+   "unit": "score",
+   "affects": [
+    "CLASSIFY"
+   ],
+   "param_type": "H",
+   "rolling": {
+    "stat": "quantile",
+    "q": 0.8,
+    "window": 60
+   },
+   "lock": {
+    "trigger": "group_as_median_abs_z>2.5",
+    "hold_days": 4,
+    "lock_value": "pre_trigger_median_20d"
+   },
+   "note": "LEADER 複合分下限——平常滾動,族群 AS 中位異常時鎖定"
+  },
+  {
+   "id": "C-06",
+   "name": "PEER 複合分下限",
+   "value": 0.4,
+   "unit": "score",
+   "affects": [
+    "CLASSIFY"
+   ],
+   "param_type": "H",
+   "rolling": {
+    "stat": "quantile",
+    "q": 0.5,
+    "window": 60
+   },
+   "lock": {
+    "trigger": "group_as_median_abs_z>2.5",
+    "hold_days": 4,
+    "lock_value": "pre_trigger_median_20d"
+   },
+   "note": "PEER 複合分下限——同 C-05"
+  },
+  {
+   "id": "C-07",
+   "name": "熱度閘量能倍數",
+   "value": 1.25,
+   "unit": "multiple",
+   "affects": [
+    "VALIDATE",
+    "BACKTEST"
+   ],
+   "param_type": "D",
+   "rolling": {
+    "stat": "quantile",
+    "q": 0.75,
+    "window": 60
+   },
+   "note": "熱度閘量能倍數——滾動"
+  },
+  {
+   "id": "C-08",
+   "name": "CCF 掃描範圍",
+   "value": 5,
+   "unit": "plus_minus_days",
+   "affects": [
+    "VALIDATE"
+   ],
+   "param_type": "H",
+   "lock": {
+    "trigger": "n_obs<2*L+8",
+    "hold_days": 0,
+    "lock_value": 3
+   },
+   "note": "CCF 掃描 ±L 固定 ±5;樣本不足暫縮 ±3"
+  },
+  {
+   "id": "C-09",
+   "name": "置換重排次數",
+   "value": 200,
+   "unit": "iterations",
+   "affects": [
+    "VALIDATE"
+   ],
+   "param_type": "F",
+   "note": "置換次數憲法;最終進指數族群另跑 B=500 嚴格版(C-09b)"
+  },
+  {
+   "id": "C-10",
+   "name": "VPVI 過熱界",
+   "value": 65,
+   "unit": "score",
+   "affects": [
+    "OBSERVE"
+   ],
+   "param_type": "D",
+   "rolling": {
+    "stat": "quantile",
+    "q": 0.8,
+    "window": 60
+   },
+   "note": "VPVI 過熱界——滾動"
+  },
+  {
+   "id": "C-11",
+   "name": "VPVI 冷卻界",
+   "value": 35,
+   "unit": "score",
+   "affects": [
+    "OBSERVE"
+   ],
+   "param_type": "D",
+   "rolling": {
+    "stat": "quantile",
+    "q": 0.2,
+    "window": 60
+   },
+   "note": "VPVI 冷卻界——滾動"
+  },
+  {
+   "id": "C-12",
+   "name": "VPVI 量能衝擊權重",
+   "value": 0.4,
+   "unit": "weight",
+   "affects": [
+    "OBSERVE"
+   ],
+   "param_type": "D",
+   "rolling": {
+    "stat": "ic_weight",
+    "window": 60
+   },
+   "note": "VPVI 量能衝擊權重——滾動 IC 定"
+  },
+  {
+   "id": "C-13",
+   "name": "分階中領先性權重",
+   "value": 0.45,
+   "unit": "weight",
+   "affects": [
+    "CLASSIFY"
+   ],
+   "param_type": "H",
+   "rolling": {
+    "stat": "rank_ic_weight",
+    "window": 60,
+    "bounds": [
+     0.3,
+     0.6
+    ]
+   },
+   "lock": {
+    "trigger": "regime==RISK_OFF",
+    "hold_days": 4,
+    "lock_value": 0.35
+   },
+   "note": "分階中領先性權重——平常依 Rank IC 滾動;Risk-Off 強制提高資金權重(領先性降至 0.35)"
+  },
+  {
+   "id": "C-14",
+   "name": "台灣 10Y 無風險利率",
+   "value": 0.0215,
+   "unit": "annual_rate",
+   "affects": [
+    "BACKTEST"
+   ],
+   "runtime_policy": "FETCH_OFFICIAL_BEFORE_REAL_ACTIVATION",
+   "param_type": "F",
+   "note": "無風險利率『來源與算法』固定:台灣 10Y 公債官方抓取(值動、法固定)"
+  },
+  {
+   "id": "C-01b",
+   "name": "指數用 PCA 吸收率下限",
+   "value": 0.55,
+   "unit": "ratio",
+   "affects": [
+    "INDEX"
+   ],
+   "param_type": "F",
+   "note": "憲法:探索(C-01)與指數用分開;低於 0.55 不得進指數(學術/實務 PC1≥50–60% 慣例)"
+  },
+  {
+   "id": "C-09b",
+   "name": "指數族群嚴格置換次數",
+   "value": 500,
+   "unit": "iterations",
+   "affects": [
+    "VALIDATE"
+   ],
+   "param_type": "F",
+   "note": "最終進指數族群再做嚴格置換(B=500);多重比較以 FDR 控制(C-02b)"
+  },
+  {
+   "id": "C-02b",
+   "name": "多重比較 FDR 上限",
+   "value": 0.1,
+   "unit": "q_value",
+   "affects": [
+    "VALIDATE"
+   ],
+   "param_type": "F",
+   "note": "Benjamini–Hochberg q;對多族群反覆置換之膨脹控制"
+  },
+  {
+   "id": "C-15",
+   "name": "LEADER 降級條件",
+   "value": 5,
+   "unit": "consecutive_days",
+   "affects": [
+    "CLASSIFY"
+   ],
+   "param_type": "D",
+   "rolling": {
+    "stat": "in_group_rank_pct",
+    "threshold": 0.3
+   },
+   "note": "連續 N 日 AS 掉出族群前 30% 或 consistency 轉負 ⇒ 降為 PEER"
+  },
+  {
+   "id": "C-16",
+   "name": "指數剔除條件",
+   "value": 0.35,
+   "unit": "ratio",
+   "affects": [
+    "INDEX"
+   ],
+   "param_type": "F",
+   "extra": {
+    "min_effective_members": 5
+   },
+   "note": "PC1 吸收率跌破 0.35 或有效成員數 <5 ⇒ 剔出指數"
+  },
+  {
+   "id": "C-17",
+   "name": "單一標的聚焦權重上限",
+   "value": 0.18,
+   "unit": "weight",
+   "affects": [
+    "INDEX"
+   ],
+   "param_type": "F",
+   "note": "防單一巨獸綁架族群指數;保留聚焦敏感度"
+  },
+  {
+   "id": "C-18",
+   "name": "不相關絕對底線(相關係數)",
+   "value": 0.25,
+   "unit": "corr",
+   "affects": [
+    "CLASSIFY"
+   ],
+   "param_type": "F",
+   "note": "價與量同動皆低於此 ⇒ UNRELATED(孤狼剔除)"
+  },
+  {
+   "id": "C-19",
+   "name": "遲滯平滑(EWM span / 雙閾值入出)",
+   "value": 3,
+   "unit": "span",
+   "affects": [
+    "CLASSIFY",
+    "INDEX"
+   ],
+   "param_type": "F",
+   "extra": {
+    "enter_prob": 0.7,
+    "exit_prob": 0.3
+   },
+   "note": "布林狀態 EWM3 後雙閾值:≥0.7 入選、≤0.3 剔除、中間維持原態(冷氣機律);帶寬須含 1/0 交替穩態 [.333,.667] 方不擺盪——批309 自檢定"
+  },
+  {
+   "id": "C-20",
+   "name": "Type-H 鎖定最長天數",
+   "value": 4,
+   "unit": "days",
+   "affects": [
+    "ALL"
+   ],
+   "param_type": "F",
+   "note": "鎖定只在結構異常時觸發且時間短——保敏感度"
+  },
+  {
+   "id": "C-21",
+   "name": "分母異常過濾(clean_mkt 偏離 σ)",
+   "value": 2.5,
+   "unit": "sigma",
+   "affects": [
+    "CLASSIFY"
+   ],
+   "param_type": "F",
+   "note": "當日 clean_market_etr 偏離 20 日中位數 >2.5σ ⇒ AS 標低可信度"
+  },
+  {
+   "id": "C-22",
+   "name": "加速視窗最短 span",
+   "value": 15,
+   "unit": "span",
+   "affects": [
+    "ALL"
+   ],
+   "param_type": "F",
+   "note": "Shock 時視窗減半但不低於 15——動態不失敏"
+  }
+ ],
+ "calibration_history": [
+  {
+   "ts": "2026-09-03",
+   "op": "批309 參數分家 v0400",
+   "added": [
+    "C-01b",
+    "C-09b",
+    "C-02b",
+    "C-15",
+    "C-16",
+    "C-17",
+    "C-18",
+    "C-19",
+    "C-20",
+    "C-21",
+    "C-22"
+   ],
+   "typed": {
+    "C-01": "D",
+    "C-02": "F",
+    "C-03": "D",
+    "C-04": "D",
+    "C-05": "H",
+    "C-06": "H",
+    "C-07": "D",
+    "C-08": "H",
+    "C-09": "F",
+    "C-10": "D",
+    "C-11": "D",
+    "C-12": "D",
+    "C-13": "H",
+    "C-14": "F"
+   }
+  }
+ ]
+}
