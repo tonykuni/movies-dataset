@@ -81,6 +81,7 @@ PYENV
   python3 "$(ls "$REG"/CGC_MDL088_SystemTestPages_v*.py | sort | tail -1)" run
   python3 "$(ls "$REG"/CGC_MDL090_SystemHub_v*.py | sort | tail -1)" run
   python3 "$(ls "$REG"/CGC_MDL116_UnifiedShell_v*.py | sort | tail -1)"   # ⑨b2 統一殼四頁(批324)
+  python3 "$(ls "$REG"/CGC_MDL120_SystemUI_v*.py | sort | tail -1)"   # ⑨b4 系統總台六主體(批332;內嵌快照)
   python3 "$(ls "$REG"/CGC_MDL105_GovernanceConsole_v*.py | sort | tail -1)"   # ⑨b3 治理主控台(批324)
   python3 "$(ls "$VIA/functional modules/VAP/engine"/VAP_ENG009_DashboardUI_v*.py | sort | tail -1)" run
   python3 "$(ls "$VIA/functional modules/VRN"/VRN_ENG068_DailyBrief_v*.py | sort | tail -1)" run
