@@ -661,92 +661,12 @@
       "note": "v0200 RC 驗收 L06 安全車道補強落地:側車正本+參數 20 項備份(zip+sha256+內嵌 manifest)→ verify(zip 雜湊+逐檔)→ restore 只到暫存(STAGED_REVIEW_REQUIRED·canonical_mutation=false,正本零觸碰);篡改偵測實證;via-workops backup"
     },
     {
-      "ts": "2026-08-09T23:30:00",
-      "op": "RENAME",
-      "category": "專案子系統",
-      "component": "VIA_WorkOps子系統",
-      "code": "SUB-006",
-      "note": "操作員選定商業化名稱:Veritas WorkOps(候選十名之首)。品牌層改名 — 板 v0118 三語標題/banner、子系統 manifest 已改;component 鍵/編號/檔名/啟動器動詞一律不動(編號永不變+只增不減)。"
-    },
-    {
       "ts": "2026-08-10T00:40:00",
       "op": "ASSIGN",
       "category": "引擎",
       "component": "workops_selftest_v0100",
       "code": "ENG-032",
       "note": "產品化令(整合/系統測試後才串聯):全鏈自測器 — temp 沙箱複製六引擎+參數詞庫,合成六串 fixtures(L1 代號/L2 確認/命名/S4 資料夾/⚡風險/⏸OOO),subprocess 實跑 命名→歸戶八層→回覆解析→Gold Set 準確度→備份還原 五段逐一斷言;FinalGate=PASS 才可宣稱鏈路無誤;報告落 out/selftest_report.json;正本零觸碰、不卡斷;via-workops selftest。容器實測 5/5 PASS。"
-    },
-    {
-      "ts": "2026-08-10T01:20:00",
-      "op": "UPDATE",
-      "category": "引擎",
-      "component": "workops_selftest_v0101",
-      "code": "ENG-032",
-      "note": "操作員檢查令:會議記錄引擎整合 — ①ENG-027 決策追蹤(會議碼)補為自測第 5 段(add→report→export 斷言 DEC-0001/MTG-001),全鏈自測升六段,容器實測 6/6 PASS;②VTR 會議紀錄修復引擎補 bin/via-vtr.cmd 轉發器+via-workops vtr 動詞(先前僅子系統內 Run-VTR.cmd 可達,PATH 不可達=整合缺口,已補);詞庫共用線(48 詞入 S9)先前已通。編號/檔名不變。"
-    },
-    {
-      "ts": "2026-08-10T02:10:00",
-      "op": "UPDATE",
-      "category": "引擎",
-      "component": "Invoke-VIA-WorkOps-CommandBoard_v0119",
-      "code": "ENG-018",
-      "note": "操作員 NEXT 令:UI 重規劃 Phase A 開工 — VisualLock v0159 風格固定左側欄 232px(DM Mono kicker 00-09+側欄即時指標 WOP/未回/決策/引擎)+新「00 今日」合成面為預設頁(節奏帶 16:00/12:00 讀 watchtower daily_rhythm+六格晨報:T 段佇列/⚡風險/⏸OOO/待核名/未結決策/隱性阻塞,點格直跳)+既有七頁平移 01-03/06-09;04 確認中心/05 準確度=Phase B/C 灰佔位候令。版本前送 v0118→v0119(正本不動);啟動器動態解析自動吃新版。QA:pwsh AST CLEAN、node --check、DOM shim 11 斷言全過、紅線 lint 零 .Send。"
-    },
-    {
-      "ts": "2026-08-10T03:05:00",
-      "op": "UPDATE",
-      "category": "引擎",
-      "component": "Invoke-VIA-WorkOps-CommandBoard_v0120",
-      "code": "ENG-018",
-      "note": "操作員 PHASE B 令:04 確認中心啟用 — 三佇列一頁:歸戶 ASK(identifier v0108 新落 wop_ask.json 唯讀彙總;互動正本仍=WopConfirmQueue.html→wop apply)+命名待核(naming_top 未核列)+未解析回信(parser v0102 unparsed 樣本入 reply_status.json);各佇列直開連結+複製套用指令;三空=綠燈。QA:AST CLEAN/node check/shim 13 斷言/選測 6-6/紅線零。"
-    },
-    {
-      "ts": "2026-08-10T03:05:00",
-      "op": "UPDATE",
-      "category": "引擎",
-      "component": "workops_wop_identifier_v0108",
-      "code": "ENG-028",
-      "note": "propose 加落 out/wop_ask.json(ASK 候選 top3+分數+留置清單,≤60/40 筆)供板 04 面;歸戶邏輯零改動。"
-    },
-    {
-      "ts": "2026-08-10T03:05:00",
-      "op": "UPDATE",
-      "category": "引擎",
-      "component": "workops_reply_parser_v0102",
-      "code": "ENG-029",
-      "note": "未解析樣本(THR/主旨/寄件者,≤40 筆)入 reply_status.json unparsed 欄 — 誠實不猜原則不變,只把已印計數落成可視資料。"
-    },
-    {
-      "ts": "2026-08-10T03:40:00",
-      "op": "UPDATE",
-      "category": "引擎",
-      "component": "Invoke-VIA-WorkOps-CommandBoard_v0121",
-      "code": "ENG-018",
-      "note": "操作員令(報告整合進 U/I 不另跳窗):01 面三正本報告(掃描/超級引擎/進階分析)改板內嵌 iframe 檢視器 — 點名稱內嵌開啟+↗另開+✕收合;同機相對路徑零伺服器;缺席灰字誠實。QA:AST CLEAN/node/shim 16 斷言。另:操作員貼 SmartWorkflow v0106 套件路徑(21 引擎+ENG-031..050 manifests+Module Registry)— 僅路徑非檔案,待拖拽上傳;預裁定:對方 ENG 編號與本冊 ENG-031/032 衝突 → 依 v0200 RC 前例共存命名空間對照,本冊編號永不變。"
-    },
-    {
-      "ts": "2026-08-10T04:10:00",
-      "op": "UPDATE",
-      "category": "引擎",
-      "component": "Invoke-VIA-WorkOps-CommandBoard_v0122",
-      "code": "ENG-018",
-      "note": "操作員「準確度功能沒加入」令 = Phase C 完結:05 準確度面啟用 — 路由分佈即況(逐層命中+佔比條)+L8 佔比趨勢(wop_route_history.jsonl,identifier v0109 每輪 append;萎縮=在學)+Gold Set 實測(歸戶/狀態準確率+逐層校準+錯判前 8=校正候選+honest_note);未實測=三步引導附複製指令。十面全啟,UI 重規劃 Phase A/B/C 全完結。QA:AST/node/shim 22 斷言/自測 6-6/紅線零。"
-    },
-    {
-      "ts": "2026-08-10T04:10:00",
-      "op": "UPDATE",
-      "category": "引擎",
-      "component": "workops_wop_identifier_v0109",
-      "code": "ENG-028",
-      "note": "propose 加 append out/wop_route_history.jsonl(每輪 total/L8/佔比,append-only)— 板 05 趨勢資料源;歸戶邏輯零改動。"
-    },
-    {
-      "ts": "2026-08-10T04:40:00",
-      "op": "UPDATE",
-      "category": "引擎",
-      "component": "Invoke-VIA-WorkOps-All_v0105",
-      "code": "ENG-024",
-      "note": "操作員 ONE POWERSHELL 三令(handle all above & following automatically):ALL v0104→v0105 — 新 0e 全鏈自測(先測後串,-SkipSelftest 可略)、2e Gold Set 準確度(每輪刷樣板;gold_set.csv 在位即自動計分 — 同 wop_confirm 閉環模式)、2f 側車備份+驗證(每輪 zip+sha256)、2g 板末刷(本輪歸戶/解析/準確度吸收後重生十面板);產物清單增列 gold_set_template/accuracy_report/selftest_report/最新備份 zip。動態解析自動吃新版;分段動詞照常單獨可跑。AST CLEAN;紅線零。"
     },
     {
       "ts": "2026-08-10T05:20:00",
@@ -781,46 +701,6 @@
       "note": "操作員結案令(ONE POWERSHELL):VDF·VRN·VAP 結案器 — 14 項檢核一支跑完(VDF:manifest/取數契約 14 域 277 項盤點/MDL 4 支編譯/啟動器動態解析;VRN:manifest/Guarded-Entry AST/6 副 freeze.lock 對象逐一在位/VisualLock v0159 sha 封存;VAP:manifest 8 artifacts 在位/雙引擎編譯/spec SSOT/v002 升級鏈追源;共通:.Send 紅線三樹全掃)。全程唯讀;快照 append-only 時戳檔+HTML 報告落 VIA_Reports/closure/;可重跑=重落基線。容器實跑 14/14 PASS。via-closure。"
     },
     {
-      "ts": "2026-08-10T06:45:00",
-      "op": "CLOSE",
-      "category": "專案子系統",
-      "component": "VDF子系統",
-      "code": "SPJ-VDF",
-      "note": "結案基線落印(Trinity Closure v0100 FinalGate PASS,快照 20260809_155013):結案=盤點+封存,非停用 — 子系統照常可用;後續變更一律版本前送並重跑結案器落新基線;編號永不變。"
-    },
-    {
-      "ts": "2026-08-10T06:45:00",
-      "op": "CLOSE",
-      "category": "專案子系統",
-      "component": "VRN子系統",
-      "code": "SPJ-VRN",
-      "note": "結案基線落印(Trinity Closure v0100 FinalGate PASS,快照 20260809_155013):結案=盤點+封存,非停用 — 子系統照常可用;後續變更一律版本前送並重跑結案器落新基線;編號永不變。"
-    },
-    {
-      "ts": "2026-08-10T06:45:00",
-      "op": "CLOSE",
-      "category": "專案子系統",
-      "component": "VAP子系統",
-      "code": "SPJ-VAP",
-      "note": "結案基線落印(Trinity Closure v0100 FinalGate PASS,快照 20260809_155013):結案=盤點+封存,非停用 — 子系統照常可用;後續變更一律版本前送並重跑結案器落新基線;編號永不變。"
-    },
-    {
-      "ts": "2026-08-10T07:00:00",
-      "op": "HOME",
-      "category": "SSOT",
-      "component": "VIA_VAP_Chart_Library_Builder.html",
-      "code": "SPJ-VAP",
-      "note": "結案後補件到貨 2 件:①Chart_Library_Builder(sha cc255176…,真新件)→ VAP/spec/ 歸位+manifest artifacts 增列(9 件);②VIA_VAP_System.html 與倉內 ui/VAP_System.html 僅 <title> 一行差=等值變體,不重複入庫。結案基線不受影響(結案器 artifacts 檢核以 manifest 為準,下次重跑 via-closure 即含新件落新基線)。仍缺 1 件:UNIT03-GuardedDynamicSandbox-v0109.ps1。"
-    },
-    {
-      "ts": "2026-08-10T07:30:00",
-      "op": "UPDATE",
-      "category": "引擎",
-      "component": "Invoke-VIA-TrinityClosure_v0100",
-      "code": "ENG-034",
-      "note": "操作員實機首跑 13/14(唯 VisualLock sha FAIL)— 根因:Windows git autocrlf 簽出把 LF 轉 CRLF,位元組級 sha 自然不合(檔案內容完好)。修正:Get-Sha16 改行尾正規化(CRLF→LF)後計算,跨平台恆定;容器實證 LF/CRLF 兩版同 sha 23000e2958e9aaf9,結案器重跑 14/14 PASS。封存語意不變 — 內容等值即同基線。"
-    },
-    {
       "ts": "2026-08-10T08:10:00",
       "op": "ASSIGN",
       "category": "引擎",
@@ -843,22 +723,6 @@
       "component": "workops_summary_matrix_v0100",
       "code": "ENG-037",
       "note": "操作員令(DETAILED SUMMARY MATRIX TO DISPLAY THE RESULT AND DB):三區總結矩陣 — A 成果 9 項(板/週報/簡報/佇列/雙報告/結案/稽核包/掃描,在位·大小·時間)、B 側車 12 項(歸戶/命名/互鏈/回覆/事實流/決策/路由/趨勢/GoldSet/自測/餘量,筆數+關鍵指標)、C 資料庫 5 項(sqlite 唯讀逐表列數+VDF/VAP db 目錄檔型統計);主控台+HTML 雙輸出;缺席誠實列示。有料態 sqlite 沙箱斷言 PASS。via-workops matrix。"
-    },
-    {
-      "ts": "2026-08-10T08:50:00",
-      "op": "QUARANTINE",
-      "category": "工具",
-      "component": "VIA_BatchMailer_v001",
-      "code": "SPJ-VMT",
-      "note": "紅線違規隔離:VMT/quarantine/VIA_BatchMailer_v001.ps1.SEND_QUARANTINED — 真實 Send 呼叫(COM+SMTP)牴觸永久鐵律「系統不可代為發送」;內容一位元組未動(只增不減可回溯),非 .ps1 副檔名=不可執行實質阻斷;README_QUARANTINE.md 說明;若需群發功能待操作員明令建 v002 草稿版。"
-    },
-    {
-      "ts": "2026-08-10T09:30:00",
-      "op": "HOME",
-      "category": "治理文件",
-      "component": "Panoramic_GapFill_v0200 審查包",
-      "code": "SUB-006",
-      "note": "外部全景審查包 5 件歸位 docs/gapfill_v0200/(指南/QA/審查器/能力矩陣/audit md;sha 已錄)+ 本席裁定書 GAPFILL_ADJUDICATION_v0100:結論與本冊高度吻合(READY 13 全確認;audit bundle 已由 ENG-036 先補,來件時擇優去重;TrinityClosure=子系統層與其案件級結案不同層不重複);採納 Stage-2 四原則+加三條款(編號主權=本冊 ASSIGN、Retention apply 特別門、晉升必納 selftest)。阻塞:7 顆候選引擎本體+common+config 未上傳(僅 QA 轉述,不採信),待 GapFill zip(sha a04085567d71…)到貨後晉升。"
     },
     {
       "ts": "2026-08-10T10:20:00",
@@ -925,28 +789,12 @@
       "note": "GapFill 路 B 操作員令(外部套件不可得→本席自建;外部 QA 序列動詞相容):保留政策(序 G;apply 特別門):預設 PLAN 零刪除;apply 三重門(--confirm+備份在位+verify PASS)、白名單鎖死僅 out/ 可再生產物、側車帳本永不在範圍、逐刪 append retention_log。via-workops retention。"
     },
     {
-      "ts": "2026-08-10T11:30:00",
-      "op": "UPDATE",
-      "category": "引擎",
-      "component": "workops_selftest_v0102",
-      "code": "ENG-032",
-      "note": "GapFill 鏈納入自測第 6 段(create→complete→closure confirm→lesson confirm→search 斷言 MLS/CLS/LLN 首號)— 七段 FinalGate;容器 7/7 PASS。"
-    },
-    {
       "ts": "2026-08-10T12:20:00",
       "op": "ASSIGN",
       "category": "引擎",
       "component": "workops_daily_todo_v0100",
       "code": "ENG-046",
       "note": "操作員每日 TO-DO 令:同類工作一口氣批次+三時間錨(前日 16:00 寄出批/今日 11:00 收件判讀批/16:00 前急件批 — watchtower daily_rhythm v0102 新 reply_check_time+urgent_chase_before,可改)+可新增項掃描(確認/結案/決策/里程碑批)+AI 代筆(ai_prompt_templates.json 四範本:followup_write/urgent_write/reply_digest/todo_digest,填真實案件資料 → 貼任何 AI 產信文 → 人按寄出,絕不代寄);批次互斥(急件只進急件批)、OOO 凍結排除、已回自動出列;out/daily_todo.json+daily_prompts.txt。沙箱實測:互斥/OOO/佔位全填斷言 PASS。via-workops todo。"
-    },
-    {
-      "ts": "2026-08-10T13:10:00",
-      "op": "UPDATE",
-      "category": "引擎",
-      "component": "Invoke-VIA-WorkOps-CommandBoard_v0123",
-      "code": "ENG-018",
-      "note": "操作員收尾令(GapFill/TO-DO 生成 HTML U/I):00 今日面升級「今日作戰面」— 導入進度條(onboarding 八步+缺步引導)、六批次卡(三時間錨;急件錨紅框;via- 指令一鍵複製)、AI 代筆包一鍵入剪貼簿(daily_prompts.txt 全文)、里程碑/結案/教訓計數線;板產生前自動靜跑 todo+onboarding 引擎(開板即最新;無 py 誠實略過)。QA:AST CLEAN/node/shim 28 斷言(22 回歸+6 新)。"
     },
     {
       "ts": "2026-08-10T13:40:00",
@@ -979,14 +827,6 @@
       "component": "VIA_Note_Pro_Standalone.html",
       "code": "FNT-001",
       "note": "操作員上傳 VIA_Note_Pro_Standalone.html(73009 bytes)整合去重:sha256 5c08b9bcf3641140 與庫內正本 functional modules/VAP/spec/UIUX_Design_Source/VIA_Note_Pro_Standalone.html byte-identical — 已在籍,不重複落籍。同族對照:VIA_Note_Pro.dc.html(DC 框架原版,spec 同目錄)、ui_support/VIA_Notes_Pro.html、Dashboard_Format_Standardization/VIA Note Pro.dc.html(皆不同 sha=不同版本,只增不減全保留)。"
-    },
-    {
-      "ts": "2026-08-10T16:41:00",
-      "op": "ASSIGN",
-      "category": "功能性工具",
-      "component": "via_note_pro_standalone",
-      "code": "FNT-001",
-      "note": "操作員「加入功能」令:VIA Note Pro 單機筆記正式入系統功能面(功能性工具類首發)。三路接線:①bin/via-note.cmd 啟動器(動態解析最新版 VIA_Note_Pro_Standalone*.html,嚴禁寫死版號)②via-workops note 動詞+help ③指揮板 v0124 頂列 📝 入口(PS 產板時動態解析,缺席誠實隱藏)。本體:零網路零安裝零伺服器,file:// 雙擊即用,全資料在瀏覽器 localStorage(不外傳);contenteditable 塊編輯+表格+多頁+A4 列印。正本留 VAP spec UIUX_Design_Source 不搬不改(正本不就地修改);位階=位階 1 母系統轄下功能性工具,WorkOps 板僅掛入口不收編。紅線掃:無 .Send、無網路呼叫。"
     },
     {
       "ts": "2026-08-10T17:05:00",
@@ -1077,30 +917,6 @@
       "note": "操作員「整合優化」令:整合去重鐵律產品化 — 40+ 檔手工判定收斂為一支引擎(位階 1 registry 工具)。三動詞:build=全庫 sha256 索引(5720 檔,可再生側車不入 git,gitignore VIA_Reports/dedup/);check 路徑=本機逐檔判定 IDENTICAL(已在籍免上傳)/VERSION_DIFFERS(同名異雜湊需人工裁定;上傳檔名 8hex- 前綴與 _n/(n) 尾綴自動正規化)/NOT_IN_REPO(候歸戶),隔離件命中額外紅線標示永不回歸;report=戰役總表 HTML(合併三份稽核紀錄 45 筆判定:38 已在籍/4 新歸戶/3 劣本留痕)。全唯讀零觸碰正本;stdlib 零依賴。沙箱實測三判定全對(含 BatchMailer 隔離命中、pipeline 舊版同名異版)。bin/via-dedup。"
     },
     {
-      "ts": "2026-08-10T20:45:00",
-      "op": "UPDATE",
-      "category": "引擎",
-      "component": "via_dedup_index_v0101",
-      "code": "ENG-049",
-      "note": "操作員實機首戰誠實 FAIL(Downloads 掃描 Ctrl+C):GB 級安裝包/壓縮包逐位元組雜湊無上限又零輸出,看似當機。v0101 修:①check 大檔預設略過 >200MB → SKIP_LARGE 判定入報告(需查加 --all 解除)②進度心跳每 200 檔一行 ③異常清單主控台限 60 筆餘見報告 JSON。實機驗證另件:build 6610 檔 PASS;FIS v3 harness 實機 9/9 GATES LOGIC PROVEN 同步入帳。沙箱重測四判定全對(IDENTICAL+隔離紅線/VERSION_DIFFERS/NOT_IN_REPO/SKIP_LARGE)。"
-    },
-    {
-      "ts": "2026-08-10T21:10:00",
-      "op": "UPDATE",
-      "category": "引擎",
-      "component": "via_dedup_index_v0102",
-      "code": "ENG-049",
-      "note": "操作員「上船的資料去重留有用的」令:新 internal 動詞 — 庫內重複盤點(暫存區=uploads/_inbox_to_classify)。實測 5722 檔:380 重複叢集;暫存冗餘 38 叢集 39 檔(正本已在正式區=已歸戶,冗餘對照留否由人決);暫存唯一正本 696 檔=有用留用(_inbox_to_classify 611/Dashboard 65/VAP 20,候升籍);暫存互重 1 叢集(智能分析平台 v0162C 雙複本,正本區另有正本);正本區互重 341 叢集(刻意譜系/雙籍,只增不減不動)。零刪除紅線 — 只出裁定表;完整清單入 VIA_Onboard_Dedup_KeepUseful_Record_v0100。"
-    },
-    {
-      "ts": "2026-08-10T21:40:00",
-      "op": "UPDATE",
-      "category": "引擎",
-      "component": "via_dedup_index_v0103",
-      "code": "ENG-049",
-      "note": "操作員 Downloads 全掃(87k+ 檔)揪出兩真 bug,v0103 修:①假紅線 — 隔離判定原為路徑含 quarantine 字串,誤中 network/pycompile_…_quarantine_gate_….py_stderr.txt(檔名帶字串且為 0-byte 空檔,Downloads 所有空檔同 sha 全誤命中、紅線無上限洗版);改目錄名=quarantine 或尾碼 .SEND_QUARANTINED 才算,紅線訊息按隔離正本去重只印一次帶命中數。②空檔 — 0-byte 獨立判定 EMPTY 不查索引。沙箱重測五判定全對+隔離偵測三斷言 PASS(真隔離中/目錄中/檔名字串不中)。internal 動詞實機 6611 檔正常(暫存冗餘 39/有用留用 696 與容器一致)。"
-    },
-    {
       "ts": "2026-08-10T22:10:00",
       "op": "UPDATE",
       "category": "治理",
@@ -1123,14 +939,6 @@
       "component": "冗餘工具引擎出列(4 支)",
       "code": "VIA-DEDUP-ARCHIVE-01",
       "note": "操作員「移除多餘的工具引擎 小心檢查 重建系統」令。三段小心檢查:①候選 42 件全數 sha 驗證 byte-identical 正本另在位 ②基名引用 41 件逐一覆核=全屬清冊/展示頁歷史紀錄 ③路徑限定引用比對=零功能依賴(B_ 檔在 Master/Release registry 僅舊沙箱 run 檔案清冊列)。依令聚焦工具引擎,出列 4 支複本 → supportive modules/_superseded_redundant/20260810/(git mv 保歷史+MANIFEST 記 sha 與倖存正本;移除=拔複本非拔內容,零資訊流失):VRN_Finalize_AIO_v2 (1).ps1、Invoke-VIA-SSOT-Manager-v0100 (1).ps1、Run_VIS_HyperBOM_All_In_One (7).ps1、B_Invoke-VIA-NexusToolBridge-AIO-v010.ps1。其餘 37 件冗餘=資料/文件件且受設計源清冊路徑引用 — 非本令範圍,原地保留。重建驗證:索引重建 5720 檔、四倖存正本 AST 0 錯、全鏈自測 7/7 PASS、internal 復盤冗餘 38→35 叢集/留用 696 不變。"
-    },
-    {
-      "ts": "2026-08-10T23:21:00",
-      "op": "UPDATE",
-      "category": "引擎",
-      "component": "via_dedup_index_v0104",
-      "code": "ENG-049",
-      "note": "出列區 _superseded_redundant 加入索引排除清單 — 已出列複本不再參與判定(避免 DUAL_CANON 假膨脹);出列後 internal 數字乾淨:378 叢集/冗餘 35/留用 696。"
     },
     {
       "ts": "2026-08-10T23:50:00",
@@ -1221,14 +1029,6 @@
       "note": "操作員「大幅提高正確率各類方法」令:受控正確率 harness — FIS 受控 DGP 精神移植郵件解析:25 合成真值案例 + 4 旗標案例丟進真生產 parse_one/detect_flags(吃合併後 reply_parser_params.json),四閘 G1 逐層命中/G2 誠實閘零亂判(噪音+訊號衝突必回未解析)/G3 OOO·風險旗標/G4 可判全覆蓋 — 首跑 ALL PASS;報告落 out/accuracy_harness_report.json;與 ENG-030 Gold Set 分工:benchmark=真實信件人工核對,harness=合成語料零人工邏輯零迴歸。verb:via-workops accuracy harness。"
     },
     {
-      "ts": "2026-08-11T06:20:00",
-      "op": "UPDATE",
-      "category": "引擎",
-      "component": "workops_reply_parser v0103(A/Q/E 三新層)",
-      "code": "ENG-029",
-      "note": "同令:實機 194/195 未解析=最大正確率槓桿 → V/T/K 之後加三誠實層:A ACK 短覆(正規化 ≤12 字命中確認詞→已回覆確認,脫離未回佇列不冒充完成)/Q 問句(含問號且 ≤60 字→對方提問,球在我方)/E 弱訊號集成(三類弱詞計分,最高 ≥2 且嚴格領先次高才判 — FIS 同號過濾精神:衝突=誠實未解析)。詞庫全入 reply_parser_params.json v0102(ack_terms/weak_signals/ensemble_min);正則字元類 ~~ FutureWarning 排雷(\\~);ENG-050 harness 25+4 案例 ALL PASS + selftest 7/7 迴歸綠。"
-    },
-    {
       "ts": "2026-08-11T07:00:00",
       "op": "UPDATE",
       "category": "引擎",
@@ -1285,14 +1085,6 @@
       "note": "APPLY ALL 令收尾:①ALL v0106 新 2e2 治理鏈段(候選→登記簿→守衛→健康分;守衛 FAIL=示警不改資料)AST 0 錯;②板 v0127 依 BOARD 提案:今日面四 KPI 磚(開放/逾期承諾、跨帳矛盾 E·W、警戒專案)+治理鏈即況表(每 WOP 進度/健康/首要扣分),覆蓋≠準確分離註記,視覺鎖定 v2 零觸動 — shim 44 斷言+側車缺席路徑全過;③selftest v0104 第 8 段照外部提案八點:候選不自動成 CMT/顯式 accept 發 CMT-0001/無證據 fulfill 必敗/登記簿四帳/守衛偵測既閉 WOP 未結 DEC(第 6 段天然矛盾)/健康分可解釋 — 8/8 綠;④cmd 四動詞接線全形括號 0 隱患;⑤全 py 編譯過+harness ALL PASS 迴歸綠。"
     },
     {
-      "ts": "2026-08-11T09:40:00",
-      "op": "UPDATE",
-      "category": "引擎",
-      "component": "板 v0127 橫幅版號熱修",
-      "code": "SUB-006",
-      "note": "操作員實機 ALL v0106 全 14 段綠(2e2 治理鏈 0.6s 過;治理四產物全在位;ENG-051 首候選 MLS:MLS-0001 正確不自動納管;health 88 案全算)— 唯一瑕疵為我方版本前進時漏改執行期橫幅字串,板端誤印 v0126。熱修橫幅為 v0127 治理鏈入板;AST 0 錯。功能無恙,純顯示誠實性修正。"
-    },
-    {
       "ts": "2026-08-11T10:30:00",
       "op": "ASSIGN",
       "category": "引擎",
@@ -1307,22 +1099,6 @@
       "component": "公司面辭庫 v0100(domain_dict 46→139 詞)",
       "code": "VIA-LEX-20260811",
       "note": "操作員上傳流程探勘/PLM/BOM/AI-SSOT 參考文件(docx 1910 段,IBM 來源整理;歸戶 docs/reference/ sha16 c5b0489981c5c486)令「相關公司面辭庫從裡面建立」:雙路開採 — 中英對照術語 138 對 + 高頻商業詞 60 候選 → 人工整編 93 詞五類(流程探勘 23/PLM_BOM 16/AI_資料工程 25/SSOT_治理 22/專案時程 7)append 進 engines/domain_dict.txt(jieba userdict,analytics 每輪自動載入,防術語被切碎)。詞面逐字出自文件(AI 只整理不發明);來源與分類全錄 docs/reference/company_domain_lexicon_v0100.json;只增不減,既有 46 詞零觸動。"
-    },
-    {
-      "ts": "2026-08-11T12:40:00",
-      "op": "UPDATE",
-      "category": "治理",
-      "component": "Σ 總覽頁(板 v0128 + ALL v0107)",
-      "code": "SUB-006",
-      "note": "操作員總覽升級令(步驟性/順序性/自動化/一頁所有成果/多矩陣堆疊/專案 cards 點卡鑽取):①ALL v0107 逐段結果落 out/all_run_summary.json;②板 v0128 新 Σ 總覽頁三段式 — 自動化流程帶(逐段 OK/FAIL/秒,FAIL 誠實紅顯)、六矩陣依管線順序堆疊(計數/路由/解析六層/決策/治理/準確度,Gold Set 未實測誠實顯示)、專案 cards 最差先排(健康等級色/進度條/開放件數/⚠矛盾徽章),點卡展開詳情(串·決議·里程碑·承諾·矛盾·扣分逐項);$data 增 all_run+wop_detail(每項上限防爆量)+health.pen。QA:雙檔 AST 0 錯;shim128 27 斷言全過(含點卡開合、最差先排序、null 進度—顯示)+ 側車全缺席誠實路徑 3 斷言;視覺鎖定 v2 零觸動。版本前進正本不就地改。"
-    },
-    {
-      "ts": "2026-08-11T13:30:00",
-      "op": "UPDATE",
-      "category": "治理",
-      "component": "板 v0129:等格流程帶+在地化宣告+排程白話化",
-      "code": "SUB-006",
-      "note": "操作員三令:①流程帶 .fnode 統一 172×54 等寬等高格;②在地化不上雲端 — 雲端 Graph 線節點/矩陣列改「在地化 · 不上雲端/全系統本地執行」綠顯,雲端線正式不採用(docs 申請範本留檔備查,只增不減;Graph 休眠紅線升級為在地化鐵律);③④頁 CPM 排程白話化 — 表頭改人話(要幾天/可緩衝天/牽全案/來得及),CP→「是」、LATE→「排不進」紅字,日期一律 yyyy-MM-dd 正規化(斜線與單位數月日自動轉),無起日誠實標「2026-01-01(預設)」=操作員定義之系統時間起點,圖例白話說明關鍵鏈與排不進的處置(減量/加手/延期)。QA:AST 0 錯;shim129 12 斷言全過(日期正規化/預設起點標示/術語清除/在地化雙位置/總覽與視覺鎖迴歸)。版本前進 v0128 零觸碰。"
     },
     {
       "ts": "2026-08-11T14:50:00",
@@ -1341,14 +1117,6 @@
       "note": "5/5 全新品:八層路由準確度報告歸戶 docs/reference(=ENG-028 L0-L8 已實作架構之設計文獻,P0-P2 優先序即用);accuracy_center UI/測試/policy 四件入 candidates(依賴三支未到件引擎+PRJ- 編號族不採+project_health schema 與 ENG-053 撞名不相容 — 升籍需合流裁定)。accuracy_policy 證據權重/時效衰減/閘門六原則與本方誠實閘同哲學,列優質候令底稿。零啟用零接線。"
     },
     {
-      "ts": "2026-08-11T16:30:00",
-      "op": "UPDATE",
-      "category": "治理",
-      "component": "ALL v0108:回件收割段+ML 迴圈段(one powershell to handle all)",
-      "code": "ENG-022",
-      "note": "操作員「一個 powershell code to handle all」令(實機 wop apply 連續 FAIL=確認檔滯留 Downloads 之斷點驅動):①[0f] 回件收割 — Downloads/repo 根自動撿最新 wop_confirm*/gold_set*/lexicon_review*/control_sheet*.csv 歸位,瀏覽器序號名自動正規化,既有檔 .bak,sha 帳 harvest_ledger 防重吸,原檔零觸碰;-HarvestOnly 開關=via-workops harvest 新動詞;②[2e3] ML 迴圈 — sklearn 缺席誠實略過,lexicon_review 在位即 adopt(冪等)→train→suggest,絕不自動 cluster(防覆蓋操作員填寫中核對表)。人工閉環全數收斂為:佇列頁下載/Excel 另存 → via-workops all 一句到底。QA:AST 0 錯;沙箱雙跑實測(3 件歸位+冪等全略);cmd 掃描 0 隱患。版本前進 v0107 零觸碰。"
-    },
-    {
       "ts": "2026-08-11T17:40:00",
       "op": "UPDATE",
       "category": "引擎",
@@ -1357,52 +1125,12 @@
       "note": "操作員授權令「自動補強安裝導入工囊直到子系統非常完善」首輪:①ENG-029 v0105 三方法 — 分母淨化(未解析只計應答域:RE 前綴/已映射 THR/我方已發追蹤;bulk+域外通知另計 out_of_scope 誠實列示,域外有訊號仍照收事件)/body 後備鏈(scanrange conv 沒配到退 corpus.csv 主旨正規化對映取最長 body — 可判母體 226/424)/主旨短覆(body 空取主旨尾段 ≤12 字命中確認詞→A 層);reply_status v0105 增 out_of_scope;ml_lab 同步吃 body 後備鏈;harness 增 A05 主旨短覆案例 26+4 ALL PASS;selftest 8/8 迴歸綠。②bin/via-vap.cmd 新啟動器 — 動態解析最新 chartlib 引擎(嚴禁寫死版號)+ 預設 --base,長路徑指令收斂為 via-vap 一字。③上傳 via_autoplot_engine_v001(sha 2AE164B5)判定=chartlib_v002 升級前候選原件(填色 0.4 修復前),劣本留痕不歸戶 — 其 sha 已錄 v002 標頭。"
     },
     {
-      "ts": "2026-08-11T18:20:00",
-      "op": "UPDATE",
-      "category": "治理",
-      "component": "ALL v0109:Git 同步段入鏈(ONE POWERSHELL TO HANDLE ALL ABOVE)",
-      "code": "ENG-022",
-      "note": "操作員令:同步也收進總指揮 — [0s] 段最先跑 git pull --ff-only origin main(安全快轉;離線/分岔誠實 WARN 不中斷續跑現版;偵測 ALL 自身新版入庫時提示本輪現版跑完下輪自動採新 — 動態解析鐵律使然)。從此日常唯一指令=via-workops all(同步→收割→自測→…→板末刷 15 段)。實機根因收案:操作員 worktree 落後 3 commits 致 v003/收割段不可見 — git pull 快轉後全數到位,[0s] 段永久預防同類。QA:AST 0 錯;clone 沙箱實測同步+收割雙段綠。版本前進 v0108 零觸碰。"
-    },
-    {
-      "ts": "2026-08-11T19:00:00",
-      "op": "UPDATE",
-      "category": "治理",
-      "component": "板 v0130:出信掛號稽核+追蹤共錨(哨×VMT 整合裁定)",
-      "code": "SUB-006",
-      "note": "操作員追蹤整合令裁定:哨(執行層 T1/T2/T3)×VMT(規劃層收斂/CPM)×控管表以 THR 編號共錨整合、不搬家,板=統一呈現層;實體合併與 VTR/MeetingLoop 併案候令。缺口落地:①outbound_audit — OUTBOUND 主旨含 THR-/WOP-/專案代號=已掛號,掛號率成 KPI+未掛號清單(稽核不攔截,Outlook 唯讀鐵律;操作員要求「信件出去一定要專案分類好+信件編號」→ 現在每輪可視化追到 100%);②Σ 專案卡詳情追蹤串附已發段(哨狀態入中樞視圖)。既有已閉環對照:控管表對帳每輪跑/追蹤必達範本=VMT-CONFIRM token+投票鈕 T 層識別/文字拆解=六層+ML/草稿主旨自動嵌 THR。QA:AST 0 錯;shim130 6 斷言+迴歸全過。」"
-    },
-    {
-      "ts": "2026-08-11T20:00:00",
-      "op": "UPDATE",
-      "category": "引擎",
-      "component": "VAP chartlib v004:tick 位數一致性(操作員口述軸規格)",
-      "code": "VAP/SUB",
-      "note": "口述規格逐條對帳:五刻度左右吻合/間距 2·2.5·5·10 倍數/左右各自規格/單軸選料選形 — 皆已在;唯一缺口=位數一致性(0.1 未補零)→ v004 版本前進:tick_decimals 依 step 定位數,multi/stack/pair/workbench 四處同套,雙軸左右各自算位,≥10K 維持 K/M/B;--series 允許單欄。實測:0.05..0.25 全兩位、雙軸左 1 位右整數各自齊一;py_compile PASS。圖庫 SSOT 1.1.1 changelog 存證。同輪實機里程碑存錄:分母淨化生效 未解析 198→119 應答域+79 域外;ALL v0109 17 段雙跑全綠(0s 同步/0f 收割/2e3 ML 首次實機入鏈)。附註:ml suggest 分母(198)未套應答域過濾,與 parser KPI(119)口徑不同 — 列下輪補強。"
-    },
-    {
       "ts": "2026-08-11T21:00:00",
       "op": "RECORD",
       "category": "治理",
       "component": "整合去重參考五件判定(VAP 圖表規格族)",
       "code": "VIA-DEDUP-20260811B",
       "note": "操作員令「整合去重參考」:4/5 已在籍免上傳(Capability Matrix→VAP uploads;dashboard_chart_spec_v4/SSOT_VisualMaintainer/AutoPlot_Console→ui_support)。1 件新歸戶:VeritasAutoPlot_VisualLock_Studio_AllInOne.html→VAP/spec/UIUX_Design_Source/uploads(圖表工作台原型:DuckDB/Parquet 掛載+圖塊設定器+單/雙/堆疊/K-Line 預覽;引 Plotly CDN 違在地化 — 歸戶為設計參考不升 UI)。參考規格採集入候令簿:dashboard_chart_spec_v4 之①軸上方自動留一格(headroom 防圖示壓線 — v004 未做)②直條樣式系統(無空隙 1.0/極小 0.92/低間隙 0.82 + 邊框 0.8 實線+填 0.8)③交易日序軸(去日曆空隙)④千分位號(已有 ≥100);studio 之 DuckDB/Parquet 掛載+同時間軸堆疊模式=VAP 未來能力線。零升級零接線,判定留檔。"
-    },
-    {
-      "ts": "2026-08-11T21:40:00",
-      "op": "UPDATE",
-      "category": "引擎",
-      "component": "VAP chartlib v005:headroom+直條樣式系統(參考規格落地第一輪)",
-      "code": "VAP/SUB",
-      "note": "操作員「下一步」令,按授權簿 1→3→2 執行:①軸頂 headroom(域頂+25% 再取 nice ticks;四處同套 multi/stack/pair/workbench;sbar100 鎖軸除外);②--bar-style seamless/tiny/low 選配(spec v4 寬度因子與邊框/填色;預設=Chart ONE 原樣不破鎖);③交易日序軸=序數軸天然滿足,裁定免改。QA:py_compile PASS;實測 headroom 頂格 30>22.5、tiny 寬因子 0.92/填 0.8/邊框 0.8 全中;Playwright 截圖目檢過。候令簿餘:DuckDB/Parquet 掛載+同時間軸堆疊多面板(第 4 項,工程量大單獨一輪)。"
-    },
-    {
-      "ts": "2026-08-11T22:10:00",
-      "op": "UPDATE",
-      "category": "引擎",
-      "component": "VAP chartlib v006:雙軸預設低間隙長條(操作員樣張裁定)",
-      "code": "VAP/SUB",
-      "note": "操作員看 v005 tiny 樣張後裁定「一個折線圖一個低縫隙長條圖即可」→ v006:配對圖 --bar-style 未指定預設 low(0.82/邊框 0.8/填 0.8),workbench JS 同步;顯式參數仍可換。實測因子 0.82 全中+截圖目檢;SSOT 1.1.3 存證。"
     },
     {
       "ts": "2026-08-11T23:00:00",
@@ -1789,14 +1517,6 @@
       "note": "自動編號引擎核發:TOOL 族第 3 號(掃描既用 2 個;append-only 永不回收)。"
     },
     {
-      "ts": "2026-08-13T11:50:00",
-      "op": "BUILD",
-      "category": "VAP+VDF",
-      "code": "TOOL-003",
-      "component": "一支 PowerShell 統包 VAP & VDF 全流程(操作員令)+ 64 檔 intake 全綠收帳",
-      "note": "①操作員端 via-vrn-intake 重跑 64 檔 OK 64/FAIL 0(REPORT_PDF 60 候 OCR+REPORT_DOC 4 候解析)= v0102 二進位修正實戰確認,VRN 進件矩陣正式運轉。②TOOL-003 Invoke-VIA-VAPVDF-ALL-v0100.ps1 + via-vapvdf 動詞:六站順跑(V1 契約盤點/V2 MDL302 全驗/V3 MDL303 活化/A1 引擎探測/A2 chartlib 零依賴出圖/A3 seaborn·plotly selftest),誠實逐站 OK/FAIL 不卡斷,-Quick/-SkipVDF/-SkipVAP 開關,動態解析最新版引擎與統包器自身(dir 排序),末尾總結矩陣+存證 JSON 落 VIA_Reports/vapvdf_runs/。容器實測 FULL 六站 6/6 OK(0.9/36.2/2/12.9/0.3/8.7s;selftest 65 PASS/1 SKIP/0 FAIL);AST OK。"
-    },
-    {
       "ts": "2026-08-13T12:20:00",
       "op": "BUILD",
       "category": "三子系統",
@@ -1819,14 +1539,6 @@
       "component": "工具|via_governance_console Console輔助工具",
       "code": "TOOL-004",
       "note": "自動編號引擎核發:TOOL 族第 4 號(掃描既用 3 個;append-only 永不回收)。"
-    },
-    {
-      "ts": "2026-08-13T13:40:00",
-      "op": "BUILD",
-      "category": "治理",
-      "code": "TOOL-004",
-      "component": "中央治理台 Console 功能 JSON 正典+母版導入+輔助工具(操作員令)",
-      "note": "①VIA_CentralGovernance_Console_v0100.json(VIA-GOV-CONSOLE/1.0):六節 13 功能 GOV-01..13(登錄簿治理/自演化 SSOT/編碼引擎/中央參數註冊處/品質閘門/母版管理),每功能載動詞+engine_glob 動態解析+資料面+說明;紅線 10 條在冊;設計基準=Header.dc 1a。②TOOL-004 via_governance_console_v0100.py + via-console 動詞(via-gov 已被 CGE 佔用避讓):載 JSON 逐功能驗引擎/動詞/資料在位,誠實矩陣+--json;活測 13 功能引擎缺 0、動詞全 OK。③母版 v0105:home 新增「⑧ 中央治理台 Console」卡 — 資料驅動自 JSON(增功能改 JSON 即自動上頁,非寫死);墨底節帶+13 列功能表。QA:mother 17/17+ext 13/13+uiopt 7/7 維持全綠;治理卡 FOUND、GOV 列注入確認。"
     },
     {
       "ts": "2026-08-13T14:20:00",
@@ -1883,14 +1595,6 @@
       "code": "RPT-GRAND-SUMMARY/v0100",
       "component": "五合一總結矩陣 VIA_Grand_Summary_Matrix_v0100.html(治理台+VDF+VRN+VAP+DB)",
       "note": "依令產出 SUMMARY MATRIX:①治理台 15 功能/紅線 10(GOV-01..15 live 狀態)②VDF V1-V3 全綠(390 項 296/75/19;302 ALL PERFECT 68/68;303 238 項 4/4)+P4 setx 成功候新視窗生效 ③VRN 13/13 含 OCR 依賴全綠(torch 2.13.0 重裝除役數週紅燈)/XCheck WARN v1=60 v2=0/進件 64/64 ④VAP 65 PASS/1 SKIP(seaborn 地圖設計即然)/0 FAIL ⑤DB:via.duckdb 22 表 2 實裝 20 候填+沙箱 68 檔 ⑥判定:治理台✅ VAP✅ VRN🟡主鏈全綠 VDF🟡接近全綠 DB🟡骨架全綠。全數採操作員機 2026-08-12 00:05:35 實測值(誠實口徑);視覺鎖皮膚小號專業字級 clamp(9.5-11px);Playwright 渲染驗證 8 KPI/6 卡/38 列/0 JS 錯;gitignore 例外追蹤入庫。另錄工作站誠實警訊:torch 重裝後 torchvision/opencv-headless/onnxruntime 缺件(paddleocr 主鏈不受影響)。"
-    },
-    {
-      "ts": "2026-08-13T20:00:00",
-      "op": "BUILD",
-      "category": "工具",
-      "code": "TOOL-006",
-      "component": "VRN OCR 批次車道 Invoke-VRN-Batch-AllInOne-v0101.ps1(64 檔重擷取接線)",
-      "note": "版本前進(v0100 正本零觸碰):無 -OCR 完整委派 v0100 No-OCR 車道;-OCR 走重擷取三段 O1 MDL005 文字(雙引擎共識 T01-T20)/O2 MDL004 表格(雙引擎投票 F01-F20)/O3 DOCX 解析鏈(docx2txt→python-docx 梯次,末梯規格存證+補件指引不空手)。硬逾時 5400s/段 kill、誠實 OK/FAIL/TIMEOUT 不卡斷、視覺鎖 SUMMARY MATRIX 彈窗+JSON 存證於 VIA_Reports\\vrn_ocr_runs。via-batch.cmd 根治寫死版號違規→dir /b /o:n 動態解析。python 動態解析 via_core_312→py→python→python3。容器煙測:AST PARSE OK;實跑抓到 -WindowStyle 非 Windows 不支援→條件參數修復;種子 docx 全鏈驗證 O1 OK 20.4s/O2 OK 2.5s/O3 誠實 spec-only(容器缺 docx2txt,工作站候 via-envmgr plan-install docx2txt)。另錄:VDF_DataHub_Orchestrator.py 僅存工作站 OneDrive(30,179B 2026-04-16),倉庫無本體,TIMEOUT 修復候原件上傳。"
     },
     {
       "ts": "2026-08-13T20:40:00",
@@ -2101,20 +1805,6 @@
       "note": "治理五鐵則:①dry-run 預設(--commit 才寫)②只增不減=只建 4 新表 vrn_report_content_canon/text_blocks/table_cells/store_log,22 現表零觸碰 ③寫前整檔備份 via.duckdb.pre_<ts>.bak ④upsert 冪等(同 source_document/pdf_name 剔舊插新)⑤vrn_store_log append-only 稽核。canon 64 筆(broker/report_date/type/tickers/target_prices/evidence_state/review_required/sha/provenance);text_blocks+table_cells 以 duckdb read_parquet 直入(工作站實量 4,934+168,927 列)。歷史值蓋過預估值界權註記:本層為報告內容正典,financialdata actual-vs-estimate 裁決屬 vrn_financial_actual_canonical 既有機制不越權。db 路徑:--db 覆寫+四候選探索(VRN/db、VDF/db、OneDrive dict)誠實列缺。容器全鏈測試:dry-run 零寫/commit 四表+備份/冪等重跑 64·2·1 零疊加(log 2 如設計)/既有表零觸碰 True/canon 樣本 MQ-1560→MACQUARIE·2026-05-20 真資料流通。"
     },
     {
-      "code": "TOOL-017",
-      "name": "vrn_content_store_v0101",
-      "kind": "工具",
-      "note": "候選路徑勘誤:正典 primary_duckdb 出自 MDL025 vrn_production_home(OneDrive module/VeritasDataForge/data/via.duckdb);次候選 D:/VIA;v0100 四舊候選保留;驗證段只數實建表(來源缺誠實跳過)。落庫邏輯零變更;容器全路徑重測綠。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-017",
-      "name": "vrn_content_store_v0102",
-      "kind": "工具",
-      "note": "--init 建新庫:操作員全碟掃描(C: D:)證實 via.duckdb 本機零存在(MDL025 正典路徑之 22 表歷史庫實體已不在);--init 於正典路徑建全新庫並誠實記 FRESH_INIT;新建無前檔跳過備份;無 --init 行為與 v0101 全同。容器四路測綠。",
-      "ts": "2026-08-12"
-    },
-    {
       "code": "TOOL-018",
       "name": "via_system_manager_v0100",
       "kind": "工具",
@@ -2122,45 +1812,10 @@
       "ts": "2026-08-12"
     },
     {
-      "code": "TOOL-017",
-      "name": "registry_components_勘誤",
-      "kind": "勘誤",
-      "note": "components 重複映射勘誤:20260812 誤增鍵「工具|內容落庫引擎」與既有「工具|vrn_content_store_v0100」同指 TOOL-017,致 via-six L4 元件碼唯一檢 YELLOW(Hydra 2)。移除誤增鍵,正鍵先發先得保留;台帳歷史 append-only 未動。",
-      "ts": "2026-08-12"
-    },
-    {
       "code": "TOOL-019",
       "name": "VIA_NetSupport_v0100",
       "kind": "支援",
       "note": "網路支援模組(操作員令:功能工具統一導入網路工具):代理感知 Session/重試退避/fetch_json·fetch_text 誠實 None;紅線內建 不爬站/零 CDN/金鑰只走環境變數/graceful 全退化。容器實測 net_ok=True proxy=在。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-010",
-      "name": "via_support_bridge_inject_v0101",
-      "kind": "工具",
-      "note": "v2 錨塊:_via_load 統一導入閘(導入一律 bridge-first 過橋,橋缺退直導再缺落 None);新增四導入 SuperAccel(候上傳)/NetSupport/RegistryCore_v1+自動編號嘗試(auto_register/ensure_code/register_module 任一,全護欄);升級模式=標記間整段替換,v2 冪等 SKIP。12 引擎 v1→v2 全升(VDF MDL003-007 + OCR LEGO 家族 7),全編譯過,錨塊獨立執行實測 5/7 件接上、2 件誠實 graceful。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-018",
-      "name": "via_system_manager_v0101",
-      "kind": "工具",
-      "note": "工作站 938.8s 首跑實錄三修:①VENDOR_SKIP 廠商/venv 樹誠實跳過計數 ②單輪零修正時 R2/R3 沿用 R1 之 C1/C4/C5 快照(誠實敘明;--deep 強制重掃)③SyntaxWarning 靜音+語法錯檔路徑與結尾發現摘要直印 console。容器 30.8s→20.6s。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-018",
-      "name": "via_system_manager_v0102",
-      "kind": "工具",
-      "note": "工作站 567.1s 實錄根因雙修:⑤C3 逾時根因=xcheck 尾段 input() 停等(工作站 tty 子行程停等 180s 被殺×3 輪=540s)→傳 --no-pause + stdin=DEVNULL 雙保險;⑥C4 假環肅清=import 環只計模組層(函式內 lazy 載入無環;Aegis↔SSOT 實鑑雙向 lazy=假環肅清,mailhub↔rebuild 雙向模組層=真環保留建議)。容器 28.9s·發現 3→1。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-018",
-      "name": "forge_import_cycle_拆解",
-      "kind": "修正",
-      "note": "sysman 唯一存留發現處置:via_mailhub↔via_rebuild 頂層互引真環——mailhub 側 import 移入 work_rebuild()(用點本就延遲初始化,行為零改變;rebuild 側零觸碰)。沙盒雙向載入序實測 OK;sysman 覆核 系統 GREEN·發現 0·16.9s。三輪協議首次全綠收官。",
       "ts": "2026-08-12"
     },
     {
@@ -2178,73 +1833,10 @@
       "ts": "2026-08-12"
     },
     {
-      "code": "TOOL-021",
-      "name": "uploads_dedup_20260812_六件",
-      "kind": "整合去重",
-      "note": "六件裁決:VAP_ONE__Standalone(5651eb8b)/preview_16=VRN Sidebar v0159(23000e29)/CG v0400 三件套(b48422af·92c29453·9a399946)五件與庫內正本 hash 全同→讓位零動作;VDF_Fetch_ONE__Standalone_1(091b91b2)與正本(7ec66eeb)內容不同→鏡像收容 VIA_VDF_Fetch_ONE__Standalone_sha091b91b258a8.html(byte-exact 唯讀;正本先發先得仍任入口)。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-021",
-      "name": "via_master_hub_v0101",
-      "kind": "工具",
-      "note": "三台實裝 UI 接線:VRN=VisualLock Sidebar v0159 · VDF=Fetch ONE · VAP=VAP ONE;生成時 byte-exact 複製至 VIA_Reports/VIA_UI_<K>_Standalone.html,母版卡+藍圖頁雙連結(實裝⇱+藍圖→);正本零觸碰。SSOT entry 增 sub_ui_standalone。容器 7 頁生成綠。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-021",
-      "name": "uploads_dedup_20260812_五件_二批",
-      "kind": "整合去重",
-      "note": "五件裁決:VAP_Spec_SSOT__Standalone(23a8a4d9)/Financial_Statements_1(b5e1161c)/Capability_Matrix_1(0c8d3e99)三件與庫內正本 hash 全同→讓位零動作;二新件收容:Veritas_Subsystem_Integration_Audit_v003_dashboard.html(d039f7e8→audit_tools,補齊 v003 家族 py/ps1/md 之缺席儀表)、preview_15=台股族群/全資料源登錄檢查(ec631d7b→VAP UIUX uploads 與 preview(16) 同家族)。byte-exact 唯讀收容。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-021",
-      "name": "uploads_dedup_20260812_五件_三批",
-      "kind": "整合去重",
-      "note": "五件裁決:VRN 報告資料 SSOT 四件套(OUTPUTS 19c26070/BASIC 6b4382a8/FINANCIAL 847d8fbd/INDEX 2eab5e24)全數與 VRN/registry 正本 hash 全同→讓位;且 INDEX def_artifact_manifest 全 sha256 完整性閘實測通過(basic·financial 與 manifest 記載一致)。一新件收容:VIA_族群分類完善化_v1.1.pdf(f665f0d4,9 頁,31 群/149 檔/41 龍頭,v1.0 LOCKED→v1.1;上傳檔名中文遭底線化,依 PDF 內文標題還原命名)→ specs/。byte-exact 唯讀。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-021",
-      "name": "uploads_dedup_20260812_七件_四批",
-      "kind": "整合去重",
-      "note": "七件裁決:①AIO Registry v0104_1(df975e68)=Governance_Runtime 正本→讓位(庫另有 v0105 進化版)②族群分類 PDF(f665f0d4)=前批已收容→讓位 ③via_io(70f83bd3)=VIA_Pipeline 正本→讓位 ④devils_advocate_1(829df543)=修正前舊版(正本 00d6de68 含 regime_split 索引對齊修正)→讓位 ⑤via_pipeline_1(5a882c43)=修正前舊版(正本 c8eb0c0f 含權重跨期復活缺陷修復)→讓位 ⑥VIA_FlowSystem_1.zip(6ed157c8,v1 平鋪原始包 44 項,與現役 FlowSystem_v2 全檔有差)→整包封存 _archive_uploads/(v2 零觸碰)⑦consensus_eps_fetcher(136c91e4)=network/ 正本→讓位。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-010",
-      "name": "pipeline_family_串聯優化",
-      "kind": "整合",
-      "note": "VIA_Pipeline 四引擎(via_pipeline/via_io/devils_advocate/rotation_engine)v2 錨全注;via-pipe.cmd 過時註記修正(rotation_engine 已在庫非待補);容器全鏈實測:via_io --selftest 四格式繁中無亂碼全 PASS;via_pipeline --demo 完整協議(自演化 24 試→自我測試→七項證偽→驗收)跑通,合成資料誠實裁決 NOT VALIDATED(Deflated SR 攔截,證偽閘實證有效)。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-021",
-      "name": "via_master_hub_v0102",
-      "kind": "工具",
-      "note": "pull 卡檔根因修復:v0101 每跑改寫追蹤正本 SSOT(updated_at/動詞重掃)→工作站工作區髒→git pull Aborting(實錄)。v0102 運行態改寫 .local.json(gitignore 單機檔),追蹤正本唯 --sync 才更新。容器驗證:跑後正本零髒。",
-      "ts": "2026-08-12"
-    },
-    {
       "code": "SPEC-012",
       "name": "VIA_UI_Template_SysMan_v0100",
       "kind": "規格",
       "note": "UI 範本模板(操作員令:以 SysMan 三輪矩陣報告為基礎優化 html/css/js/grids/matrix/紅黃綠燈/彈性 layout):CSS Grid KPI auto-fit 彈性欄、details 原生折疊、表格橫滾容器+黏性表頭+自動換行、燈號點+標籤雙態、動態進度條、JS 即時過濾、響應式斷點、列印友善。元件冊存 ui_support/,全系 UI 沿用基準。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-018",
-      "name": "via_system_manager_v0103",
-      "kind": "工具",
-      "note": "報告層改用 UI 範本 v0100(分析邏輯零變更);容器實測 GREEN·22.7s。工作站 v0102 實錄收官:GREEN·發現 0·26.0s(938.8→567.1→18.2→26 全程三代根因修復)。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-021",
-      "name": "uploads_dedup_20260812_四件_五批",
-      "kind": "整合去重",
-      "note": "四件裁決:VeritasCeleritas(ef2398ce)/VeritasAegisNexus(25973bfd)/VIA_EngineForge_Config.template v0.6.0(b14ba666)/VIA_EnvManager(11d33140)全數與 supportive modules 正本 hash 全同→讓位零動作。儲存規定引用之八支輔助件盤點:全在庫(SSOT_Unified/Panorama_AST_RuntimeInjector/RegistryCore_v1/Runtime_Bridge_AIO/SafePolyglot README+StaticValidation/EngineForge/EnvManager)。",
       "ts": "2026-08-12"
     },
     {
@@ -2255,52 +1847,10 @@
       "ts": "2026-08-12"
     },
     {
-      "code": "TOOL-019",
-      "name": "VIA_NetSupport_同意閘",
-      "kind": "修正",
-      "note": "儲存規定令:網路工具開啟使用前先問操作員同意——get_session 前置 net_consent() 閘(VIA_NET_CONSENT=YES/1/TRUE 才發包;未同意一律 None+誠實告示 setx 指引)。方向更保守(預設關);容器雙態實測:未同意=閘住、YES=放行。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-021",
-      "name": "via_master_hub_v0103",
-      "kind": "工具",
-      "note": "儲存規定條文入 SSOT:紅線 11「網路工具啟用前先經操作員同意(VIA_NET_CONSENT)」;鐵則 7「安裝一律 via-install 過 EngineForge+EnvManager 閘,註冊 VIA_Lib_Registry 並導入輔助模組」。",
-      "ts": "2026-08-12"
-    },
-    {
       "code": "TOOL-023",
       "name": "via_downloads_organizer_v0100",
       "kind": "工具",
       "note": "Downloads 整理歸納去重引擎(操作員令:近期非常雜亂):十類分揀(瀏覽器複本全同/變體·已在庫·gemini 暫存·安裝程式·壓縮包·個人件·候上傳價值清單·數據檔·其他);對倉正本 hash 去重;dry-run 預設零搬動;--commit 搬移歸位 _VIA_Tidy\\(零刪除);manifest from→to 全記錄 --undo 整批還原;系統資料夾白名單零觸碰;資料夾第一輪不搬誠實列示。容器合成樹全循環測綠(dry→commit 11 搬→undo 11 還原)。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-017",
-      "name": "vrn_content_store_v0103",
-      "kind": "工具",
-      "note": "去 OneDrive 令:正典遷本機 repo 樹 VDF/db/via.duckdb(gitignore 護欄已在);--init 改建本機;OneDrive 退位偵測末位(命中誠實告示候遷移);--migrate=OneDrive 舊庫→本機「複製」搬遷(零刪除,OneDrive 原件原地凍結為備份;靶已在不覆蓋誠實停)。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-020",
-      "name": "via_provision_v0101",
-      "kind": "工具",
-      "note": "去 OneDrive 令:體檢之 via.duckdb 正典檢改本機優先;OneDrive 命中標舊制+補裝令直給 via-store --migrate --commit。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-021",
-      "name": "via_master_hub_v0104",
-      "kind": "工具",
-      "note": "儲存鐵則入 SSOT:不落 OneDrive——資料庫/新產物一律本機正典(repo VDF\\db);OneDrive 舊件唯讀凍結參照,候 --migrate 遷回。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-017",
-      "name": "vrn_content_store_v0104",
-      "kind": "工具",
-      "note": "OneDrive 備份清除令(操作員明令刪除):--purge-onedrive——刪前強制完整性閘(本機正典 vs OneDrive 舊庫表列+逐表行數全同才放行;本機缺=不刪);範圍嚴限 VeritasDataForge\\data 之 via.duckdb 家族(本體+*.bak);dry-run 先列清單,--commit 才刪。容器三態模擬:全同放行刪淨、行數異誠實攔停、來源已無=無事可刪。工作站遷移實錄:7,090,176B 已入本機正典 4 表全在。",
       "ts": "2026-08-12"
     },
     {
@@ -2311,59 +1861,10 @@
       "ts": "2026-08-12"
     },
     {
-      "code": "TOOL-018",
-      "name": "via_system_manager_v0104",
-      "kind": "工具",
-      "note": "v01.00 對齊第一波(可實作全上、未及誠實 NOT_RUN):⑧Run 證據束 sysman_runs/RUN_<ts>/(manifest/events.jsonl/heartbeat 原子更新/final_summary/SHA256SUMS)⑨數量對帳不等=RED 禁 GREEN ⑩多語言盤點+JS 語法道 node --check(缺=NOT_RUN)、PS AST 道 NOT_RUN 候 ⑪Gate 四值(§S05)⑫HydraScore LITE 映射(環=65 HIGH review-only)。Top25 規則庫 VIA_Top25_Rules_v0100.json 落檔(25 條狀態誠實分級:IMPLEMENTED 2/PARTIAL 9/NOT_RUN 14)。容器實錄:Gate GREEN_SANDBOX_STABLE_PROMOTION_REVIEW_REQUIRED·對帳一致·20.4s。候下一波:PS Parser 道/六因子完整評分/工具矩陣 30 列實測/patch-rollback 束。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-018",
-      "name": "via_system_manager_v0105",
-      "kind": "工具",
-      "note": "v01.00 對齊第二波之①PS AST 道 RUN:System.Management.Automation.Language.Parser 官方解析器 pwsh 單行程批次(600s 逾時護);372 檔首掃即獲 4 支真語法錯——鑑定皆歷史批次收容原件(Stage-2/Batch G·I/WorkOps 置檔,零動詞引用)→建 VIA_PS_Archive_Register_v0100.json 封存唯讀登錄冊(紅線原件唯讀;要修復自冊移除點名),掃描改記「封存唯讀跳過」具名列示不隱藏。容器實錄:掃 372·壞 0·封存 4·Gate GREEN·16.6s。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-017",
-      "name": "vrn_content_store_v0105",
-      "kind": "工具",
-      "note": "docstring raw 化除每跑必印之 SyntaxWarning 噪音(工作站實錄);行為零變更。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-018",
-      "name": "via_system_manager_v0106",
-      "kind": "工具",
-      "note": "工作站 WinError 32 根因修:mkstemp fd 未關→Windows 鎖檔→unlink PermissionError 炸毀主流程於 lang_inventory 清理段(Linux 不鎖未現形)。修 os.close(fd)+unlink try/except 護欄。容器覆核:PS 掃 372·壞 0·封存 4·Gate GREEN。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-018",
-      "name": "via_system_manager_v0107",
-      "kind": "工具",
-      "note": "六獨立步驟同步波(工作站 RED 實錄+令):⑮分隔符根因修——登錄冊 posix vs Windows relative_to 反斜線比對落空致封存跳過 0/RED 復發(第三個 Windows 才現形教材:tty 停等→鎖檔→分隔符),雙側 as_posix 歸一 ⑯Hydra 六因子評分(LITE 估分,證據不足因子取中值誠實標示)⑰工具偵測登錄 which+版本實測 NOT_INSTALLED 誠實不自動裝 ⑱證據束擴編 dependency_graph/hydra_risk_register/promotion_proposal(§12)。容器:封存 4 回歸列管·工具 8/14·Gate GREEN·19.0s。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-021",
-      "name": "via_master_hub_v0105",
-      "kind": "工具",
-      "note": "系統完成版(操作員令:Central Governance Console+VDF+VRN+VAP 整個系統架構及 UI 及系統完成):母版升格 VIA Central Governance Console;四頁全面改用 UI 範本 v0100(SPEC-012);系統架構圖四層(治理→子系統→資料→商品,純 CSS 零 CDN);活數接真資料 graceful(SSOT v2 64/本機庫表數/圖型冊 候/台帳/動詞 64);動詞總表 JS 即時過濾。容器 7 頁生成綠。",
-      "ts": "2026-08-12"
-    },
-    {
       "code": "TOOL-024",
       "name": "via_auto_pilot_v0100",
       "kind": "工具",
       "note": "全面自動化巡航(操作員令:不影響正常運作全面自動化):五站鏈 A sysman/B provision --check/C master Console 刷新/D tidy dry-run/E store dry-run——全程唯讀+dry-run 零 --commit 零網路;各站獨立子行程+逾時,誠實 OK/FAIL 不卡斷;存證 autopilot_runs/AUTO_<ts>.json;--register 一鍵註冊 Windows 每日 08:00 排程(schtasks,非 Windows 印令);要落地變更仍走各動詞 --commit 人工確認。容器 3/5 綠(D/E 敗=容器無 Downloads/本機庫,誠實;工作站預期 5/5)。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-024",
-      "name": "via_auto_pilot_v0101",
-      "kind": "工具",
-      "note": "同步波(操作員令:互不影響+零九頭龍能同步就同步不然順序):五站寫入集互斥實核過 PARALLEL 五要件(A sysman/B provision/C master/D tidy/E store 各寫獨占目錄,E 零寫入)→ ThreadPool 五站併發,輸出完成後按站序整列不交錯;--serial 退回順序;牆鐘=最慢站(容器 1.2x;工作站 sysman 38.6s 主導預期 ~1.5x)。工作站 v0100 實錄:5/5 全綠+VIA_AutoPilot 每日 08:00 排程註冊 SUCCESS;D 站揭露 Downloads 候上傳 1666 件。",
       "ts": "2026-08-12"
     },
     {
@@ -2381,24 +1882,10 @@
       "ts": "2026-08-12"
     },
     {
-      "code": "TOOL-025",
-      "name": "via_selftest_grid_v0101",
-      "kind": "工具",
-      "note": "自測矩陣擴至 18 站:+SuperDocExtractor selftest(15 檢 rc0 基準)。",
-      "ts": "2026-08-12"
-    },
-    {
       "code": "TOOL-027",
       "name": "Invoke-VIA-AllGreen-v0100",
       "kind": "工具",
       "note": "一支 PowerShell 統包全流程(操作員令):test(自測 18 站)→debug(零 FAIL=誠實無事可修;FAIL=建議制列示)→optimize(同步巡航五站併發)→consolidate(GRID/AUTO/SysMan 三源總彙存證 allgreen_runs/)→generate U/I(Console 七頁)→user-test(開 Console 非阻塞)→activate(schtasks 常駐確認,缺印令不代註冊)→終局 Gate 四值。v01.00 PS 契約:參數頂部/def_ 函式/無 Read-Host/不關視窗/誠實 NOT_RUN/唯讀 dry-run 建議制。動詞 via-go(pwsh 動態解析)。容器 pwsh AST parse OK+全程實跑(巡航站容器環境誠實敗 3/5→Gate RED 如實;工作站 5/5 預期 GREEN)。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-021",
-      "name": "via_master_hub_v0106",
-      "kind": "工具",
-      "note": "補齊令①:VAP 圖型冊活數「候」根因=路徑錯(正本在 spec/ssot/vap_chartlib.json,via-six L3 同源)——多候選 glob 修,28 型點亮。",
       "ts": "2026-08-12"
     },
     {
@@ -2409,13 +1896,6 @@
       "ts": "2026-08-12"
     },
     {
-      "code": "TOOL-017",
-      "name": "vrn_content_store_v0106",
-      "kind": "工具",
-      "note": "工作站 --commit FAIL WinError 32 根因修(第四個 Windows 才現形缺陷):v0105 先開 duckdb 寫入連線後才 shutil.copy2 備份——DuckDB 寫入連線於 Windows 持排他鎖,自己鎖死自己的備份複製(容器 Linux 不排他故未現形;首次非新建 commit 才走到此路)。修=寫前整檔備份移至 duckdb.connect 之前(fresh 新建誠實跳過)。容器三態綠:dry-run 計畫/commit 備份先行+64 正典+稽核 1/冪等重跑。誠實回滾機制上輪已正確運作(備份未動、庫未損)。",
-      "ts": "2026-08-12"
-    },
-    {
       "code": "TOOL-029",
       "name": "vrn_table_omni_v0100",
       "kind": "工具",
@@ -2423,80 +1903,10 @@
       "ts": "2026-08-12"
     },
     {
-      "code": "TOOL-025",
-      "name": "via_selftest_grid_v0102",
-      "kind": "工具",
-      "note": "自測矩陣 v0101→v0102:新增第 19 站「表格統包車道矩陣」(TOOL-029 唯讀可用性探測 rc0)。容器 --fast:OK 12 · FAIL 0 · SKIP 5(環境缺件誠實)。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-029",
-      "name": "vrn_table_omni_v0101",
-      "kind": "工具",
-      "note": "工作站首戰 MQ-1560 回饋修(三缺陷+兩強化):①ppstructure API 斷點——paddleocr 3.x 移除 PPStructure 改 PPStructureV3;雙軌支援 2.x/3.x(V3 pipeline 直餵 PDF+HTML 產物遞迴收割解析)。②視覺車道模型下載鎖同意閘——ppstructure/docling 首跑需下載模型權重屬網路行為(紅線):模型未快取+VIA_NET_CONSENT 未同意=誠實 SKIP_同意閘不發包。③缺件提示——ximgproc→opencv-contrib-python、pi_heif→pi-heif(FAIL 附修復令)。④掃描件前診——fitz 逐頁探文字層;MQ-1560 確診圖片件,文字車道 0 屬預期,交叉共識分軌(掃描件以視覺軌裁決)不誤判。⑤--selftest 三檢(HTML 解析/數位原生擷取/掃描件前診;合成件零網路)。容器 3/3 全綠。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-029",
-      "name": "vrn_table_omni_v0102",
-      "kind": "工具",
-      "note": "工作站 ppstructure 卡站回饋+操作員令(導入加速器+動態進度條):①卡站根因=PPStructureV3 預設管線載 15 模型含 PP-Chart2Table(VLM 大模型)+公式/印章/方向/展平,CPU 載入如當機——瘦身管線只留表格鏈(參數依版本簽名自適應過濾)。②重車道(docling/unstructured/ppstructure)子行程隔離:逾時斷路(預設 900s,--timeout 覆寫)誠實 TIMEOUT 不卡斷、輸出即時串流、30s 靜默心跳印餘時。③輕車道 ThreadPool 並行(牆鐘=最慢者)+錨點導入 VeritasCeleritas(三件加速器皆已在倉內 supportive modules)。④逐頁進度即時列印。⑤缺件提示增補(unstructured_inference;ximgproc=cv2 多發行版互撞明示修法)。--selftest 擴四檢(+worker 協議往返);容器 4/4 綠。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-022",
-      "name": "via_install_gate_v0101",
-      "kind": "工具",
-      "note": "操作員令(透過支援模組安裝+保有導入加速器+不卡斷)落地:新增醫生層 --doctor——多層 site 同名發行版互撞掃描(使用者層 vs 系統層遮蔽關係)+cv2 家族專診+全庫影蔽清單+cv2 活體子行程探測(不卡斷)。工作站根因確診:系統層 C:\\Python313 opencv-python 4.13(pip 使用者權限拒刪 WinError 5)+使用者層 contrib 4.10 互撞=img2table ximgproc 壞源。修法免管理員:使用者層優先遮蔽系統層——只清使用者層重複發行版再裝統包 opencv-contrib-python-headless,毋須提權。三值裁決 GREEN/YELLOW_ABSENT(未裝非互撞,誠實分流)/RED_COLLISION·RED_IMPORT。容器測:doctor YELLOW_ABSENT 誠實+check-only 四層照舊。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-029",
-      "name": "vrn_table_omni_v0103",
-      "kind": "工具",
-      "note": "全車道總攻回饋修:①img2table「表 1 值 0」根因=無 OCR 後端只出結構——接 OCR 鏈 EasyOCR(繁中+英;快取/同意閘)→Tesseract→無(誠實告示),並移入重車道享子行程逾時+心跳。②ppstructure PaddleX pipeline creation 依賴錯→修復令 via-install \"paddleocr[doc-parser]\";worker 錯誤全文放寬 400 字;OMP_NUM_THREADS=1 注入子行程。③unstructured 缺 unstructured_pytesseract 提示。④tables>0 且 cells=0 誠實標注「結構有、值空」。容器自測 4/4 綠。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-022",
-      "name": "via_install_gate_v0102",
-      "kind": "工具",
-      "note": "醫生裁決分層修:互撞只算「同層多件」——工作站使用者層已清至統包單件(opencv-contrib-python-headless 5.0.0.93)+系統層 opencv-python 4.13 被遮蔽+活體 niBlackThreshold True,舊 v0101 仍判 RED 屬誤判;新增 GREEN_SHADOWED(遮蔽即勝,非病;根除擇需提權)。容器 YELLOW_ABSENT 誠實照舊。",
-      "ts": "2026-08-12"
-    },
-    {
       "code": "TOOL-030",
       "name": "via_env_plan_v0100",
       "kind": "工具",
       "note": "操作員令(先寫計畫、先測可行、零風險才安裝)落地:三段零風險——①環境快照唯讀全景(層/衝突/cv2 家族/關鍵庫/java·tesseract/模型快取/磁碟);②分段安裝計畫(現階段 4 段:paddleocr[doc-parser]/unstructured.pytesseract/docling 擇需/pypdf 選邊候裁,各附理由+風險預判);③pip install --dry-run 只解析不落地逐段實測——核心庫變版=YELLOW、cv2 家族再進入=RED 互撞回歸、已滿足=NOOP GREEN、失敗誠實 FAIL;GREEN 段才印 via-install 執行令,YELLOW/RED 候裁不代決。dry-run 連 PyPI=網路行為過同意閘(未同意 NOT_RUN 誠實)。動詞 via-plan(--offline/--stage N)。容器測:offline 誠實跳測+同意後段2 實測 GREEN 給令。自測矩陣 v0103 加第 20 站(offline 零網路)。另:上傳 VIA_EnvManager.py 裁決=與正本正規化後逐行全同(僅 3 CRLF 換行符差)→讓位零動作。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-025",
-      "name": "via_selftest_grid_v0103",
-      "kind": "工具",
-      "note": "自測矩陣 v0102→v0103:新增第 20 站 via_env_plan --offline(快照+計畫,零網路 rc0)。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-022",
-      "name": "via_install_gate_v0103",
-      "kind": "工具",
-      "note": "cv2 統包版改錨 opencv-contrib-python(full):via-plan 快照抓到回歸——paddleocr[doc-parser] 相依鏈自動回拉 opencv-contrib-python(閘「解除:img2table requires opencv-contrib-python」為證),paddlex/img2table 錨定 contrib 非 headless;舊裁 headless 逆鏈=pip 反覆回拉即永久互撞源。醫生修法/未裝提示全改順鏈定錨;系統層 opencv-python 4.13 照遮蔽。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-030",
-      "name": "via_env_plan_v0101",
-      "kind": "工具",
-      "note": "KEEP_CV2 改錨 opencv-contrib-python(headless 進場改判 RED 回歸)。工作站首跑 via-plan 實績:四段全實測——段1 NOOP(doc-parser 已裝妥)/段2 會裝 1 件/段3 docling 會裝 18 件無核心變版/段4 NOOP(pypdf 5.9.0 已<6,camelot 邊已然選定);零安裝零落地。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-029",
-      "name": "vrn_table_omni_v0104",
-      "kind": "工具",
-      "note": "ximgproc 缺件修復提示同步改錨 contrib(full)。容器自測 4/4 綠。",
       "ts": "2026-08-12"
     },
     {
@@ -2511,13 +1921,6 @@
       "name": "via_env_rebuild_v0100",
       "kind": "工具",
       "note": "多環境隔離重建計畫引擎(via-rebuild):與 VIA_EnvManager 政策母版(環境根/HIGH·MEDIUM 風險表/via_core 白名單/BASE 封鎖)+EngineForge 紅線(sandbox_first/destructive_delete=false/max_rounds)+via-deps 判定器三方搭配。七段:via_*/base/paddle/camelot+BASE 盤點→子行程探針逐環境衝突掃描→風險因子(互撞/cv2 偏錨/BASE 污染/白名單違規/跨境 numpy 分歧/混居)→旁建零破壞重建計畫(依既有件單改善:潔淨頂層鎖版·衝突邊放開·cv2 換錨·via_core 白名單外改道隔離·numpy 多大版×多 Python 支架·BASE 瘦身)→三鏡像全測取最快→pip --dry-run×max_rounds 輪分靶反覆實測(末兩輪一致才綠)→GREEN 段限定出 .ps1/.sh 執行檔(操作員自跑),破壞性動作一律候裁。容器實測:仿真 via_* 環境群(互撞/偏錨/分歧全埋)偵測滿分,4 段全 GREEN 出檔,真 rc 誠實;--selftest 13 檢全綠;自測矩陣 v0105 加第 22 站。",
-      "ts": "2026-08-12"
-    },
-    {
-      "code": "TOOL-032",
-      "name": "via_env_rebuild_v0101",
-      "kind": "工具",
-      "note": "候裁切換執行令+空境視角實測修。①GREEN 旁建段附具體切換指令:A 別名法推薦(EnvManager 別名冊改指新境,零檔案移動可即回退)/B 改名法附警語(venv 改名斷 console 捷徑內嵌路徑),切換屬破壞性永不入執行檔,另入存證 swaps;②dry-run 加 --ignore-installed:旁建目標即空境,本機已裝件不得遮蔽解析清單(修 NOOP 誤報)。容器端到端實證閉環:via_light(缺件3+互撞1)→計畫→2 輪一致會裝 5 件 GREEN→操作員執行 .sh→旁建境 7 件 pip check 淨→回掃原境仍紅(零破壞)新境 OK。13 檢全綠。",
       "ts": "2026-08-12"
     },
     {
@@ -2563,34 +1966,6 @@
       "ts": "2026-08-17"
     },
     {
-      "code": "TOOL-018",
-      "name": "via_system_manager_v0108",
-      "kind": "工具",
-      "note": "全鏈令 DEBUG 波:巡航 A_sysman rc=1 根因=合併進之三清單引擎 v0200 用 f-string 反斜線(PEP 701;py3.12+ 合法/3.11- SyntaxError)——工作站 3.13 綠、容器 3.11 紅=版本閘非壞件,且 v0201 相容修已為現役。新增⑮語法版本閘冊 VIA_Syntax_Gate_Register_v0100.json(比照 PS 封存冊;as_posix 兩側):冊內檔於當前版本低於 python_min 時改記「版本閘列管」具名列示不列 RED,對帳計數不變。容器複測:Gate GREEN·發現 0·對帳 1128 一致。",
-      "ts": "2026-08-17"
-    },
-    {
-      "code": "TOOL-024",
-      "name": "via_auto_pilot_v0102",
-      "kind": "工具",
-      "note": "高自動化令:巡航五站→七站——+F 收編計畫(via-intake dry)+G 環境計畫快照(via-plan --offline 零網路);寫入集互斥照舊零九頭龍。容器:A/B/C/G 綠,D/E/F=容器無 Downloads/正典庫誠實 FAIL(工作站應全綠)。",
-      "ts": "2026-08-17"
-    },
-    {
-      "code": "TOOL-025",
-      "name": "via_selftest_grid_v0105",
-      "kind": "工具",
-      "note": "撞版勘誤+雙會話合流:本會話曾誤覆寫依賴治理會話之 v0104(+依賴統包站)——已 git checkout 回復他方正本,雙方站點合流 v0105(23 站=21 站+表格統包四檢+收編管線 dry env)。容器 --fast:OK 15·FAIL 0·SKIP 6(全環境缺件誠實)。教訓:合併他會話後造版前先查同名版號(先發先得適用於版號)。",
-      "ts": "2026-08-17"
-    },
-    {
-      "code": "TOOL-034",
-      "name": "Invoke-VIA-Central-Governance-OneClick-v0104",
-      "kind": "工具",
-      "note": "工作站實戰修:40,180 件全晉升 holds=0 後,Round 2 JSON 驗證道 throw——ConvertFrom-Json 遇『空字串屬性名』(合法 JSON,PS 需 -AsHashTable)即拋,並觸發整批回滾(該腳本 catch=rollback+rethrow)。該道為純可解析性檢查(結果 Out-Null 丟棄),補 -AsHashTable 零行為改變、真壞 JSON 照 catch;違反其自身『單檔錯誤轉 HOLD 不中斷』哲學之處以最小補丁矯正。內嵌 gzip+Base64 載荷已重封裝、SHA-256 常數同步重算(3ACC…→1528…),解包自證通過+外殼 AST 0 錯。倉內 JSON 掃無空鍵——禍首在舊樹側,屬合法內容不改資料。via-govroot 動態最新自動解析 v0104。",
-      "ts": "2026-08-17"
-    },
-    {
       "code": "TOOL-037",
       "name": "VIA_ContractEngine_v0200(跨會話導入)",
       "kind": "工具",
@@ -2626,24 +2001,10 @@
       "ts": "2026-08-17"
     },
     {
-      "code": "TOOL-035",
-      "name": "Invoke-VIA-Enter-v0101",
-      "kind": "工具",
-      "note": "ONE POWERSHELL TO HANDLE ALL 令:進場器+Git 自癒鏈統包——⑦未完成合併自動處置(唯帳本檔衝突=聯集助手+commit --no-edit 續完;其他=merge --abort 回合併前態零損;分支非 main 自動切回,擋路 AUTOSTASH 具名可還原;pull 後新衝突同規則);⑧Transcript 全程留痕(常備令①);⑨階段加權進度條 0-100%+零 Read-Host 永不 exit(常備令②)。rebase/cherry-pick 罕見態誠實 HOLD 不自動動。AST 0 錯+容器煙測綠。",
-      "ts": "2026-08-17"
-    },
-    {
       "code": "TOOL-040",
       "name": "VIA_Toolkit",
       "kind": "輔助",
       "note": "Top-10 本機免費工具統一導入層(操作員令 2026-08-17):libcst/networkx/ruff/bandit(靜態治理)+pydantic/pytest/hypothesis(契約測試)+duckdb/polars(真實資料)+psutil(Runtime 監控)——get() graceful 快取取件(缺席 None 零硬依賴)/availability() 零 import 探測/report() 四批次矩陣+經閘裝令。引擎錨點可載;安裝一律 via-install 閘;動詞 via-toolkit。",
-      "ts": "2026-08-17"
-    },
-    {
-      "code": "TOOL-030",
-      "name": "via_env_plan_v0102",
-      "kind": "工具",
-      "note": "Top-10 強化令入計畫:+段 5~8 四批次(依建議導入順序),快照關鍵庫擴列十件。容器 dry-run 實測:段5 GREEN 會裝 5 件(libcst/networkx/ruff/bandit+stevedore 相依)、段7 GREEN 只裝 polars——duckdb 已在且 dry-run 證不變版(核心庫防變版守則正確作動);零安裝零落地。",
       "ts": "2026-08-17"
     },
     {
@@ -2661,38 +2022,10 @@
       "ts": "2026-08-18"
     },
     {
-      "code": "SPEC-014",
-      "name": "VIA_ZeroHydra_RepairProtocol_v0101",
-      "kind": "規範",
-      "note": "協議增補:E01-E15 錯誤分類法(同步/順序分流預設)+Parallel-Fixable 十條件(WriteSet+Dependency+SSOT Owner+Hydra 四項共判,非『不同子系統』即同步)+AST 四級定位 A1-A4(非唯一命中不得自動套)+編號規約(RUN-/VIA-ERR-/VIA-FIX-/VIA-TST-/VIA-PL-/VIA-ART-/VIA-GATE-/VIA-HOLD-)+三輪流程摘錄(三輪未過=HOLD 不假 PASS)。落地對照誠實:T0=IMPLEMENTED;智慧化介面引擎=ContractEngine v0200 已在(操作員貼文所述 Pydantic 契約+inspect DI+Twin 即此物,不重複發明);E 分類引擎候。",
-      "ts": "2026-08-18"
-    },
-    {
-      "code": "TOOL-030",
-      "name": "via_env_plan_v0103",
-      "kind": "工具",
-      "note": "四層測試工具鏈令:+段9 第一批必裝(pytest-cov/mock/timeout/freezegun/pyfakefs/jsonschema/ruamel.yaml/deepdiff/filelock)+段10 第二批整合擇需(asyncio/tox/httpserver/robotframework/playwright/watchdog/rapidfuzz/regex;playwright 瀏覽器下載過同意閘)。Pester=PowerShell 模組非 pip 候裁另軌誠實排除。容器段9 dry-run GREEN 會裝 11 件零核心變版。",
-      "ts": "2026-08-18"
-    },
-    {
-      "code": "TOOL-021",
-      "name": "via_master_hub_v0107",
-      "kind": "工具",
-      "note": "完成五系統令(CGC+VDF+VRN+VAP+FlowSystem):中央台新增「五系統完成度總覽」板——全活數:介面合約冊(TOOL-041)子系統歸屬模組數/深水線實數(SSOT v2 64·db 表·圖型冊 28)/FlowSystem 16 flow 引擎(rglob 深掃修)+2 FIS 驗證/最新自測 GRID·sysman Gate·T0 verdict 證據;每系統 RYG 燈以真證據裁(缺件誠實 候)。容器渲染驗證:五卡全亮、flow 16/FIS 2 正確。",
-      "ts": "2026-08-18"
-    },
-    {
       "code": "TOOL-043",
       "name": "ChipWar 籌碼戰家族收編(兩批十件)",
       "kind": "工具",
       "note": "整合去重裁決:①Console 三份——裸名件=舊版(3 引擎)、(2) 副本=最新版(6 引擎+UT5-8)!檔名不能定生死再實證;6 引擎版收正典 VIA_ChipWar_Console_v010.py、舊變體 _shafdd14aeb 鏡像存譜系、(1)=(2) 全同讓位。②GovFundEngine_v040_1=與倉內正典全同讓位。③新件六收:RotationEngine v010(RRG 象限輪動+20 誤判因素冊+9/9 證偽閘)/Rotation_Dashboard(RRG SVG 視覺鎖;注:Google Fonts CDN 連結違零 CDN 紅線——原件不動,候 v0101 本地字體修)/ForeignGameEngine(宏觀→外資→內資三層級聯博弈,7 PASS+1 PROVISIONAL)/FinMind_Ingest v010/SectorWhaleEngine v020/三分類計畫 md。容器全測:Rotation 9/9·FGE 8 閘·Whale·FinMind 全 EXIT=0;Console 端到端=E1-E4 GREEN、E5 MarginFOMO/E6 Strategy 缺件 MISSING→EXIT=1 誠實未閉合(候上傳)。動詞 via-chipwar。FinMind LIVE 模式需 TOKEN(環境變數)+網路=同意閘轄。",
-      "ts": "2026-08-18"
-    },
-    {
-      "code": "TOOL-043",
-      "name": "ChipWar 輪動測試家族第三/四批收編",
-      "kind": "工具",
-      "note": "十件續裁:①綠件五收 engines/——ssot_matching_testing(pydantic+rapidfuzz+deepdiff 單元全過)/via_rotation_plug_in(龍頭鎖單跟風訊號)/veritas_via_engine_verification_suite(6/6)/purified_sector_rotation_accuracy_v2(兩份全同收一)/veritas_via_exact_dataset_test(綠)。②散文污染件修:integration_test_suite 原件 L69 起為聊天說明貼入(``` 圍欄+對接散文)致 SyntaxError——原件 byte-exact 列管 _review_quarantine/,v0101 截斷純碼版 AST OK(runtime 候 tw_stock_data_router 上傳)。③壞件二列管 _review_quarantine/:code_artifact(參數括號語法)/stock_sector_analysis(invalid syntax)——不收編不丟棄候裁。④capital_flow_2 與正典互異(正典=8/10 路徑補丁版;上傳多力致/動力-KY 兩 PEER)→_sha1f8b… 鏡像候裁零覆寫。容器測綠件全 EXIT=0。仍候上傳:E5 MarginFOMO/E6 Strategy/tw_stock_data_router。",
       "ts": "2026-08-18"
     },
     {
@@ -2717,53 +2050,11 @@
       "ts": "2026-08-18"
     },
     {
-      "code": "TOOL-018",
-      "name": "via_system_manager_v0109",
-      "kind": "工具",
-      "note": "併入 5h274b 後 RED 根因=_review_quarantine/ 檢疫區(SPEC-015 故意收容之壞件)被當一般件掃出 3 語法錯。v0109 加⑯檢疫區列管:計入 archive 道跳過不列 RED,對帳式不變(1205=1182+22+0+1 一致)。複測 YELLOW 唯一發現=via-chipwar.cmd 寫死檔名(我違動態解析鐵律)——動詞改 dir /b 最新+排 _sha 後 Gate GREEN。",
-      "ts": "2026-08-18"
-    },
-    {
-      "code": "TOOL-044",
-      "name": "vrn_office_merge_v0101",
-      "kind": "工具",
-      "note": "操作員令(仍有未擷取到資料):收 .docx 表格道限定——SuperDocExtractor 表格擷取(vMerge/gridSpan 合併格還原)重驗四支 Memo;docx 只併 MDL004、文字道跳過防與 docxmerge 冪等互撞。容器以 SDX 自家 contract 夾具測:4 表 24 格綠、文字道誠實跳過。",
-      "ts": "2026-08-18"
-    },
-    {
       "code": "MERGE-20260818",
       "name": "併入 5h274b 續作(12 提交/89 檔)",
       "kind": "整合",
       "note": "另會話續作零衝突快併:ChipWar quad(GroupIndex 側)+月營收證據引擎+VAP v018 軸鎖 40 圖 SSOT+LiveWire 接線層+鏈接指數分頁(三大法人扣當沖堆疊)+精度 OPT-4/5+套件主驗證 harness 七階段+OneClick 統包+儀表 roster 分頁。sysman 全景複掃對帳一致。",
       "ts": "2026-08-18"
-    },
-    {
-      "code": "TOOL-031",
-      "name": "via_dep_super_v0101",
-      "kind": "工具",
-      "note": "多層同名顯示帶可辨識路徑段(尾二段)。工作站首戰實績:672 件 base 掃出互撞 16+缺件 11+多層 34,與 pip check 27vs27 完全互證;原顯示 site-packages/site-packages 分不出使用者層 vs 系統層之修。",
-      "ts": "2026-08-13"
-    },
-    {
-      "code": "TOOL-032",
-      "name": "via_env_rebuild_v0102",
-      "kind": "工具",
-      "note": "母版導入根因修:_load_by_path 於 exec_module 前先掛 sys.modules(EnvManager 用 dataclass+future annotations,未掛載時 dataclass 回查 sys.modules 得 None 而炸,遭 graceful 吞成誤報「母版:缺」)。修後工作站真吃母版政策(HIGH/MED 表/白名單/含 VHB_System 等全部環境根);t12 增母版真導入斷言(VIS-ENV 機碼)。工作站首戰實績:14 境盤點 11 綠 3 紅(BASE/via_core_312/via_extract_312),cv2 三變體齊撞確診,numpy 1/2 跨境分歧確診,4 段計畫全出。13 檢全綠。",
-      "ts": "2026-08-13"
-    },
-    {
-      "code": "TOOL-034",
-      "name": "via_lessons_v0100",
-      "kind": "工具",
-      "note": "教訓帳本引擎(via-lessons;LESSON-LEARNED):純收割零耦合——掃 depsuper/rebuild 存證蒸餾入帳(冪等零重複);DETAILED RESULT MATRIX+ROOT CAUSES & SOLUTIONS 印示並落 .log;OK 單境指紋+全艦隊無衝突自動記 GOLDEN 基線(改進起點,基線差異=回歸獵源);預載 15 條實戰規則(cv2 崩潰/WinError5 系統層/enum34 陷阱/UI 舊釘/死釘/多層遮蔽/BASE 污染/混居/PATH 先佔/sys.modules/…)+證據命中標記;--record 操作員手記;SKIP 拒裝名單 4 條(操作員裁:enum34+opencv-python+headless 全域拒;contrib 錨拒入 base)。容器實收割 21 筆+艦隊基線觸發+冪等 0 筆重收;10 檢全綠;矩陣 v0106 站 23。",
-      "ts": "2026-08-13"
-    },
-    {
-      "code": "TOOL-032",
-      "name": "via_env_rebuild_v0103",
-      "kind": "工具",
-      "note": "拒裝名單接軌:讀教訓帳本 SKIP 條目,重建配方/隔離目標自動剔 scope=everywhere 件並誠實列示「拒:」;scope=base(cv2 錨)僅拒入 base,OCR 專屬環境驗綠仍可進——落實操作員令「屢衝突工具不再裝」。14 檢全綠(增拒裝剔除站)。",
-      "ts": "2026-08-13"
     },
     {
       "code": "SPEC-016",
@@ -4439,52 +3730,10 @@
       "note": "交接報告 T0/H01 Root 仲裁工作站側結案:Active Root=C:\\Users\\tonyk\\movies-dataset(git clone,git pull origin main 同步);C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset=鏡像禁作 Active(P0 規範:OneDrive 同步鎖檔會咬 DuckDB)。Gap Register P0-1 SPLIT→RESOLVED_OPERATOR_RULING。啟動程序=①git pull ②$env:VIA_NET_CONSENT/SCRAPE_CONSENT=YES ③引擎 run 或 boot 全鏈。"
     },
     {
-      "code": "TOOL-031",
-      "name": "CGC_MDL046_DepSuper_v0100",
-      "kind": "工具",
-      "note": "依賴衝突統包引擎(via-deps 歸巢名):十械三防線+三鏡像;內建 importlib.metadata 圖譜+PEP440 三層判定,零安裝可診;--why/--tree/--preset/--matrix;15 檢。原名 via_dep_super,整併波改編 CGC_MDL046。",
-      "ts": "2026-08-13"
-    },
-    {
-      "code": "TOOL-032",
-      "name": "CGC_MDL050_EnvRebuild_v0105",
-      "kind": "工具",
-      "note": "承 v0104(=via_env_rebuild_v0103 歸巢副本)實質升級:①uv pip compile 極速實測車道(4 段×3 輪 17 秒,失敗退 pip 重車道);②真機 22 境三修——venv 鎖 Python 版(uv venv --python,修 312 境被 3.13 建置漂移)/__rb 候換境不滾動再重建/因子降噪對齊母版(cv2 多變體才紅、高風險 ≥3 才混居);③numpy 支架具體化 np1 錨 py312(1.26 無 cp313 輪,修段4 RED)。教訓 RC-16~18 同波入帳。17 檢全綠。",
-      "ts": "2026-08-13"
-    },
-    {
-      "code": "TOOL-034",
-      "name": "CGC_MDL058_Lessons_v0100",
-      "kind": "工具",
-      "note": "教訓帳本引擎(via-lessons 歸巢名):收割存證→RESULT MATRIX+ROOT CAUSES 落 log→GOLDEN 基線;18 條實戰規則+SKIP 拒裝名單;10 檢。原名 via_lessons,整併波改編 CGC_MDL058。",
-      "ts": "2026-08-13"
-    },
-    {
-      "code": "TOOL-035",
-      "name": "via_ocr_super_v0100",
-      "kind": "工具",
-      "note": "OCR 超引擎(via-ocrsuper):四層編成——加速層 ONNX/RapidOCR 輕量首選→Tesseract→PaddleOCR→Surya 輕先重後階梯(成功即停失敗升級);逐車道隔離境四態探測;認知層內建 Regex 抽取;--plan 出隔離安裝執行令(uv venv --python+實測最快鏡像);零安裝紅線。12 檢全綠。",
-      "ts": "2026-08-13"
-    },
-    {
       "code": "SPT-064",
       "name": "CGC_MDL064_SelftestGrid_v0190",
       "kind": "工具",
       "note": "+OCR 超引擎站(TOOL-035 via-ocrsuper 12 檢;9hh5to 會話移植)——130 站。",
-      "ts": "2026-08-27"
-    },
-    {
-      "code": "TOOL-032",
-      "name": "CGC_MDL050_EnvRebuild_v0106",
-      "kind": "工具",
-      "note": "執行檔驗證步改 uv pip check --python——沙盒全流程代跑實證:uv venv 建境不帶 pip,原 python -m pip check 必炸 rc1(RC-19 入帳)。修後閉環 EXEC rc0『All installed packages are compatible』。同輪沙盒實證:版本保真(uv venv --python 3.11 隨原境)、__rb 待切換不滾動、退役切換後全綠、OCR 超引擎真裝 RapidOCR 隔離境真圖辨識信心 0.9777+認知層四欄全抽。17 檢全綠。",
-      "ts": "2026-08-27"
-    },
-    {
-      "code": "TOOL-032",
-      "name": "CGC_MDL050_EnvRebuild_v0107",
-      "kind": "工具",
-      "note": "拆分波 --split <境>(混居根治模式):高/中風險件按用途路由各出隔離境(pins 家族主件,相依解析器境內自取),殘部成 slim 核心境(高中風險+cv2 全出);沿用分靶實測/GREEN 執行檔/切換退役候裁全機制。沙盒閉環實證:via_mix(selenium+duckdb+lightgbm+cv2 雙變體混居)→3 家族路由+slim 全 GREEN→執行 4 境 compatible→切換後全綠單族隔離。18 檢全綠。",
       "ts": "2026-08-27"
     },
     {
@@ -4898,13 +4147,6 @@
       "name": "VIA_UI_UserTestDebug_v0100",
       "kind": "工具",
       "note": "用戶測試除錯台(U/I 格式 token 冊制/零 CDN/實料嵌入):左側六閘門面板可收放(整體 260→44px+各閘 details);閘門開關即時組貼跑指令+複製;四分頁=指令台/測試全景/UI 驗證/問題台帳。Playwright 雙視口用戶測試 17/17 綠+零頁面錯誤;唯讀展示紅線。",
-      "ts": "2026-08-27"
-    },
-    {
-      "code": "TOOL-034",
-      "name": "CGC_MDL058_Lessons_v0101",
-      "kind": "工具",
-      "note": "手記編號根因修:改「最大號+1」(原筆數+1 於帳本分叉時撞號——工作站實案連按兩次入 RC-16/17 與種子規則重號)+同象因解重複拒收(append-only 誠實拒);自測不重號限縮種子規則(手記歷史重號屬帳實不誣)。容器實測:正確鑄 RC-21+二次拒收。10/10 綠。",
       "ts": "2026-08-27"
     },
     {
@@ -5622,13 +4864,6 @@
       "note": "十七檢同 v0109。"
     },
     {
-      "code": "TOOL-322",
-      "kind": "批328 via-reload",
-      "ts": "2026-09-03 06:23",
-      "name": "實錄三度:拉齊後既開 PowerShell 視窗仍載舊短令冊(profile 點源只在開窗時)→新令不識;Register v0111 +via-reload(本窗重點源尾版冊)",
-      "note": "首次仍需手動點源一次(舊冊無 via-reload);之後每次 VIA-ALL 後打 via-reload 即可。"
-    },
-    {
       "code": "VAP-015-v0101",
       "kind": "批329 K線疊加(BB/SMA/EMA/^TWII 右軸)",
       "ts": "2026-09-03 06:42",
@@ -5704,6 +4939,20 @@
       "ts": "2026-09-03 08:26",
       "name": "MDL105 v0120(overview 首連結 總控台 /master;十檢綠)·MDL116 v0104(四殼導航 00 總控台→/master;CGC 殼 file:// 探 /probe 導同源;十一檢綠)·MDL120(System file:// 探 /probe 導同源;殼列 +/master;九檢綠)·MDL096 v0104 regen-all +VIA_SYSTEM_MANAGER ui --no-open(十二站)·Register v0115 +via-master(+.cmd)",
       "note": "工作站:via-reload→via(帶起樞紐 v0115)→via-master。file:// 開任何頁,樞紐在線即自動跳同源;離線=唯讀預覽/快照(誠實)。"
+    },
+    {
+      "code": "CGC-095-v0116",
+      "kind": "批334 任務冊 32→36",
+      "ts": "2026-09-03 08:43",
+      "name": "CGC_MDL095_DeckServer v0116:+system_ui(MDL120 再生)/group_class(ENG070 run)/group_backtest(ENG071 run)/story_rotation(ENG072 run)=系統總台功能鍵/自動鏈白名單靶;零網路;二十檢綠。VIA_SYSTEM_MANAGER v0110 正式名稱冊 +4、②檢任務數 ≥32;十檢綠",
+      "note": "only-add"
+    },
+    {
+      "code": "CGC-120-v0101",
+      "kind": "批334 輸入介面/運轉矩陣/功能鍵高自動化",
+      "ts": "2026-09-03 08:43",
+      "name": "CGC_MDL120_SystemUI v0101:①左欄執行輸入(36 工作四系統分組+契約參數 codes/range/cats 動態+▶執行/檢測+操作紀錄;同源 CSRF POST;file:// 停用誠實)②運轉矩陣視圖 06(四系統 × 36:狀態燈/run_id/開始/耗時/進度/尾行+解方/▶;/status 4s 輪詢)③六主體功能鍵卡(單鍵+自動鏈:依序、任一失敗即停、完成自動重取六主體)④任務冊由樞紐尾版 task_registry 產頁嵌入;十二檢綠;Chromium 實錄:單發 revenue_groups ok、自動鏈 revenue_groups→system_ui 兩段皆 ok 並重取、矩陣即時更新、手機 390 寬通",
+      "note": "自動鏈靶:VDF 日更→回補→再生;ETF 抓取→增益→分析→再生;輪動 分類→回測→橋接→再生;月營收 營收→榜→共識→再生;VAP 儀表板→再生。"
     }
   ]
 }
