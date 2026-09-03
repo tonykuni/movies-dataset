@@ -93,7 +93,9 @@ class MockDeck {
     const headers = await this.requestHeaders(request);
     const valid = request.method() === "POST" &&
       headers.origin === APP_ORIGIN &&
-      headers.fetchSite === "same-origin" &&
+      // 批338e 實錄:Playwright route 攔截下 Sec-Fetch-Site 不可見(空字串;雲端 Chromium 1194/CI 1187 同)
+      // →mock 接受 ""(真樞紐仍嚴格要求 same-origin;此處只驗 Origin+CSRF+JSON)
+      (headers.fetchSite === "same-origin" || headers.fetchSite === "") &&
       headers.csrf === CSRF_TOKEN &&
       headers.contentType.toLowerCase().startsWith("application/json");
     if (!valid) this.rejectedMutations.push({url: request.url(), ...headers});
@@ -580,7 +582,9 @@ async function run() {
       "boot", {codes: "", start: "", end: "", cats: ""}));
     assert.equal(offlineCall.policy, true,
       "file:// 即使被程式直接呼叫執行函式，也必須由預覽政策拒絕");
-    await offlinePage.locator("#drop").click({force: true});
+    // 批338e 實錄:file:// 頁 #drop 在摺疊 details 內=視窗外→先展開+捲入再 force 點(意圖不變:預覽不得送 mutation)
+    // (Playwright 對 aria-disabled 摺疊區元素 force click 仍報 outside viewport→改派發 click 事件,語意同)
+    await offlinePage.locator("#drop").dispatchEvent("click");
     assert.match(await offlinePage.locator("body").textContent(), /預覽|離線/);
     assert.deepEqual(offlineMutations, [], "file:// 預覽不得送出 mutation request");
     assert.deepEqual(offlineErrors, [], `file:// 不得有未捕捉錯誤：${offlineErrors.join(" | ")}`);
