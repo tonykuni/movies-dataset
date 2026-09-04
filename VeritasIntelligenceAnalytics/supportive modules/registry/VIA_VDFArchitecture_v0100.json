@@ -1,0 +1,7289 @@
+{
+ "engine": "VDF_ENG073_DataArchitecture_v0100",
+ "stamp": "2026-09-04 09:50",
+ "ssot": {
+  "dir": "VIA_VDF_SSOT_b360",
+  "categories": [
+   {
+    "id": "tw_stock",
+    "zh": "台灣股票每日交易及籌碼資訊",
+    "name": "Taiwan Stocks - Daily Price + Chip",
+    "schema_group": "prices_with_chip",
+    "pk": [
+     "Date",
+     "Ticker"
+    ],
+    "freq": "daily_after_close",
+    "sources": [
+     "YFINANCE",
+     "TWSE",
+     "TPEX"
+    ],
+    "n_targets": 0,
+    "output_file": "VDF_TWStock_Unified.parquet"
+   },
+   {
+    "id": "tw_index",
+    "zh": "台灣股票指數每日交易及籌碼資訊",
+    "name": "Taiwan Indices - TAIEX + TPEX",
+    "schema_group": "prices_with_chip",
+    "pk": [
+     "Date",
+     "Ticker"
+    ],
+    "freq": "daily_after_close",
+    "sources": [
+     "TWSE",
+     "TPEX"
+    ],
+    "n_targets": 2,
+    "output_file": "VDF_TWIndex_Unified.parquet"
+   },
+   {
+    "id": "tw_etf_passive",
+    "zh": "台灣 ETF - 被動式 (追蹤指數)",
+    "name": "Taiwan ETFs - Passive (Index-Tracking)",
+    "schema_group": "prices_core",
+    "pk": [
+     "Date",
+     "Ticker"
+    ],
+    "freq": "daily_after_close",
+    "sources": [
+     "YFINANCE"
+    ],
+    "n_targets": 12,
+    "output_file": "VDF_TWETF_Passive.parquet"
+   },
+   {
+    "id": "tw_etf_active",
+    "zh": "台灣 ETF - 主動式 (經理人選股)",
+    "name": "Taiwan ETFs - Active (Manager-Driven)",
+    "schema_group": "prices_core",
+    "pk": [
+     "Date",
+     "Ticker"
+    ],
+    "freq": "daily_after_close",
+    "sources": [
+     "YFINANCE"
+    ],
+    "n_targets": 18,
+    "output_file": "VDF_TWETF_Active.parquet"
+   },
+   {
+    "id": "intl_stock",
+    "zh": "國際股票每日交易資訊",
+    "name": "International Stocks - Daily Price",
+    "schema_group": "prices_core",
+    "pk": [
+     "Date",
+     "Ticker"
+    ],
+    "freq": "daily_after_close",
+    "sources": [
+     "YFINANCE"
+    ],
+    "n_targets": 20,
+    "output_file": "VDF_Intl_Stock.parquet"
+   },
+   {
+    "id": "intl_index",
+    "zh": "國際股票指數交易資訊",
+    "name": "International Indices - Daily",
+    "schema_group": "prices_core",
+    "pk": [
+     "Date",
+     "Ticker"
+    ],
+    "freq": "daily_after_close",
+    "sources": [
+     "YFINANCE"
+    ],
+    "n_targets": 15,
+    "output_file": "VDF_Intl_Index.parquet"
+   },
+   {
+    "id": "tw_financials",
+    "zh": "台灣及國際股票財報資訊",
+    "name": "TW & International Stock Financials",
+    "schema_group": "tw_financial",
+    "pk": [
+     "Date",
+     "Ticker",
+     "Period"
+    ],
+    "freq": "quarterly",
+    "sources": [
+     "MOPS",
+     "YFINANCE"
+    ],
+    "n_targets": 6,
+    "output_file": "VDF_Stock_Financials.parquet"
+   },
+   {
+    "id": "commodity",
+    "zh": "大宗商品 - 期貨 + 現貨",
+    "name": "Commodities - Futures + Spot",
+    "schema_group": "prices_core",
+    "pk": [
+     "Date",
+     "Ticker"
+    ],
+    "freq": "daily_after_close",
+    "sources": [
+     "YFINANCE",
+     "AKSHARE"
+    ],
+    "n_targets": 15,
+    "output_file": "VDF_Commodity.parquet"
+   },
+   {
+    "id": "fx",
+    "zh": "外匯",
+    "name": "Foreign Exchange",
+    "schema_group": "prices_core",
+    "pk": [
+     "Date",
+     "Ticker"
+    ],
+    "freq": "daily_after_close",
+    "sources": [
+     "YFINANCE"
+    ],
+    "n_targets": 10,
+    "output_file": "VDF_FX.parquet"
+   },
+   {
+    "id": "macro",
+    "zh": "總體經濟指標",
+    "name": "Macroeconomic Indicators - FRED",
+    "schema_group": "macro",
+    "pk": [
+     "Date",
+     "Series_Id"
+    ],
+    "freq": "varies",
+    "sources": [
+     "AAII",
+     "CNN",
+     "FRED",
+     "Fed",
+     "Treasury_FD",
+     "YFINANCE"
+    ],
+    "n_targets": [
+     {
+      "via_code": "US.Prices.CPI.Headline",
+      "series_id": "CPIAUCSL",
+      "name": "CPI Headline",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Index 1982-84=100",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.CPI.Headline.YoY",
+      "series_id": "CPIAUCSL",
+      "name": "CPI YoY",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": "yoy"
+     },
+     {
+      "via_code": "US.Prices.CPI.Core",
+      "series_id": "CPILFESL",
+      "name": "Core CPI (ex Food & Energy)",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "Core CPI",
+      "freq": "Monthly",
+      "unit": "Index 1982-84=100",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.CPI.Core.YoY",
+      "series_id": "CPILFESL",
+      "name": "Core CPI YoY",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "Core CPI",
+      "freq": "Monthly",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": "yoy"
+     },
+     {
+      "via_code": "US.Prices.CPI.Food",
+      "series_id": "CPIUFDSL",
+      "name": "Food",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.CPI.FoodAtHome",
+      "series_id": "CUSR0000SAF11",
+      "name": "Food at Home",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.CPI.FoodAwayFromHome",
+      "series_id": "CUSR0000SEFV",
+      "name": "Food Away from Home",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.CPI.Energy",
+      "series_id": "CPIENGSL",
+      "name": "Energy",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.CPI.Gasoline",
+      "series_id": "CUUR0000SETB01",
+      "name": "Gasoline",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.CPI.FuelOil",
+      "series_id": "CUSR0000SEHE",
+      "name": "Fuel Oil",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.CPI.Electricity",
+      "series_id": "CUUR0000SEHF01",
+      "name": "Electricity",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.CPI.UtilityGas",
+      "series_id": "CUUR0000SEHF02",
+      "name": "Utility Gas",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.CPI.Shelter",
+      "series_id": "CUSR0000SAH1",
+      "name": "Shelter",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.CPI.Rent",
+      "series_id": "CUSR0000SEHA",
+      "name": "Rent of Primary Residence",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.CPI.OER",
+      "series_id": "CUSR0000SEHC",
+      "name": "Owners' Equivalent Rent",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.CPI.LodgingAwayFromHome",
+      "series_id": "CUSR0000SEHB",
+      "name": "Lodging Away From Home",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.CPI.NewVehicles",
+      "series_id": "CUUR0000SETA01",
+      "name": "New Vehicles",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.CPI.UsedCars",
+      "series_id": "CUSR0000SETA02",
+      "name": "Used Cars & Trucks",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.CPI.MotorInsurance",
+      "series_id": "CUUR0000SETA05",
+      "name": "Motor Vehicle Insurance",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.CPI.Apparel",
+      "series_id": "CPIAPPSL",
+      "name": "Apparel",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.CPI.Transportation",
+      "series_id": "CUUR0000SAT",
+      "name": "Transportation Services",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.CPI.MedicalCare",
+      "series_id": "CPIMEDSL",
+      "name": "Medical Care",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.CPI.MedicalServices",
+      "series_id": "CUSR0000SAM2",
+      "name": "Medical Services",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.CPI.MedicalCommodities",
+      "series_id": "CUSR0000SAM1",
+      "name": "Medical Commodities",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.CPI.Services",
+      "series_id": "CUSR0000SAS",
+      "name": "Services",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.CPI.RentOfShelter",
+      "series_id": "CUSR0000SAS2RS",
+      "name": "Rent of Shelter",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.CPI.ServicesLessRentOfShelter",
+      "series_id": "CUSR0000SASL2RS",
+      "name": "Services Less Rent of Shelter (supercore proxy)",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "CPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.PCE.Headline",
+      "series_id": "PCEPI",
+      "name": "PCE Headline",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "PCE",
+      "freq": "Monthly",
+      "unit": "Index 2017=100",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.PCE.Headline.YoY",
+      "series_id": "PCEPI",
+      "name": "PCE YoY",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "PCE",
+      "freq": "Monthly",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": "yoy"
+     },
+     {
+      "via_code": "US.Prices.PCE.Core",
+      "series_id": "PCEPILFE",
+      "name": "Core PCE",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "Core PCE",
+      "freq": "Monthly",
+      "unit": "Index 2017=100",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.PCE.Core.YoY",
+      "series_id": "PCEPILFE",
+      "name": "Core PCE YoY",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "Core PCE",
+      "freq": "Monthly",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": "yoy"
+     },
+     {
+      "via_code": "US.Prices.PCE.Goods",
+      "series_id": "DGDSRG3M086SBEA",
+      "name": "PCE Goods Prices",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "PCE",
+      "freq": "Monthly",
+      "unit": "Index 2017=100",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.PCE.Services",
+      "series_id": "DSERRG3M086SBEA",
+      "name": "PCE Services Prices",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "PCE",
+      "freq": "Monthly",
+      "unit": "Index 2017=100",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.PPI.FinalDemand",
+      "series_id": "PPIFID",
+      "name": "PPI Final Demand",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "PPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.PPI.AllCommodities",
+      "series_id": "PPIACO",
+      "name": "PPI All Commodities",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "PPI",
+      "freq": "Monthly",
+      "unit": "Index 1982=100",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.PPI.ExFoodEnergy",
+      "series_id": "PPICOR",
+      "name": "PPI Ex Food & Energy (Core)",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "PPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.PPI.FinalDemand.Goods",
+      "series_id": "WPSFD49207",
+      "name": "PPI Final Demand Goods",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "PPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.PPI.FinalDemand.Services",
+      "series_id": "WPSFD4131",
+      "name": "PPI Final Demand Services",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "PPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.PPI.IntermediateDemand",
+      "series_id": "WPSID61",
+      "name": "PPI Intermediate Demand Processed",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "PPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.PPI.Unprocessed",
+      "series_id": "WPSID62",
+      "name": "PPI Intermediate Demand Unprocessed",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "PPI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.Import",
+      "series_id": "IR",
+      "name": "Import Price Index",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "Trade",
+      "freq": "Monthly",
+      "unit": "Index 2000=100",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Prices.Export",
+      "series_id": "IQ",
+      "name": "Export Price Index",
+      "region": "US",
+      "category": "prices",
+      "sub_theme": "Trade",
+      "freq": "Monthly",
+      "unit": "Index 2000=100",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Labor.UnempRate.U3",
+      "series_id": "UNRATE",
+      "name": "Unemployment Rate U3",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "Unemployment",
+      "freq": "Monthly",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Labor.UnempRate.U6",
+      "series_id": "U6RATE",
+      "name": "U6 Underemployment Rate",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "Unemployment",
+      "freq": "Monthly",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Labor.ParticipationRate",
+      "series_id": "CIVPART",
+      "name": "Labor Force Participation Rate",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "Unemployment",
+      "freq": "Monthly",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Labor.EmpPopRatio",
+      "series_id": "EMRATIO",
+      "name": "Employment-Population Ratio",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "Unemployment",
+      "freq": "Monthly",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Labor.NFP",
+      "series_id": "PAYEMS",
+      "name": "Nonfarm Payrolls",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "Payrolls",
+      "freq": "Monthly",
+      "unit": "Thousands",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Labor.NFP.MoM",
+      "series_id": "PAYEMS",
+      "name": "NFP MoM Change",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "Payrolls",
+      "freq": "Monthly",
+      "unit": "Thousands",
+      "source": "FRED",
+      "transform": "diff"
+     },
+     {
+      "via_code": "US.Labor.PrivatePayrolls",
+      "series_id": "USPRIV",
+      "name": "Private Payrolls",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "Payrolls",
+      "freq": "Monthly",
+      "unit": "Thousands",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Labor.GovtPayrolls",
+      "series_id": "USGOVT",
+      "name": "Government Payrolls",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "Payrolls",
+      "freq": "Monthly",
+      "unit": "Thousands",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Labor.MfgPayrolls",
+      "series_id": "MANEMP",
+      "name": "Manufacturing Payrolls",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "Payrolls",
+      "freq": "Monthly",
+      "unit": "Thousands",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Labor.ConstructionPayrolls",
+      "series_id": "USCONS",
+      "name": "Construction Payrolls",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "Payrolls",
+      "freq": "Monthly",
+      "unit": "Thousands",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Labor.AvgHourlyEarnings",
+      "series_id": "CES0500000003",
+      "name": "Avg Hourly Earnings",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "Wages",
+      "freq": "Monthly",
+      "unit": "Dollars",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Labor.AvgHourlyEarnings.YoY",
+      "series_id": "CES0500000003",
+      "name": "AHE YoY",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "Wages",
+      "freq": "Monthly",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": "yoy"
+     },
+     {
+      "via_code": "US.Labor.AvgWeeklyHours",
+      "series_id": "AWHAETP",
+      "name": "Avg Weekly Hours",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "Wages",
+      "freq": "Monthly",
+      "unit": "Hours",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Labor.ECI",
+      "series_id": "ECIALLCIV",
+      "name": "Employment Cost Index",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "Wages",
+      "freq": "Quarterly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Labor.ECI.Wages",
+      "series_id": "ECIWAG",
+      "name": "ECI Wages",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "Wages",
+      "freq": "Quarterly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Labor.ECI.Benefits",
+      "series_id": "ECIBEN",
+      "name": "ECI Benefits",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "Wages",
+      "freq": "Quarterly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Labor.JOLTS.JobOpenings",
+      "series_id": "JTSJOL",
+      "name": "Job Openings",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "JOLTS",
+      "freq": "Monthly",
+      "unit": "Thousands",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Labor.JOLTS.Hires",
+      "series_id": "JTSHIL",
+      "name": "Hires",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "JOLTS",
+      "freq": "Monthly",
+      "unit": "Thousands",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Labor.JOLTS.Quits",
+      "series_id": "JTSQUL",
+      "name": "Quits",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "JOLTS",
+      "freq": "Monthly",
+      "unit": "Thousands",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Labor.JOLTS.Layoffs",
+      "series_id": "JTSLDL",
+      "name": "Layoffs & Discharges",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "JOLTS",
+      "freq": "Monthly",
+      "unit": "Thousands",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Labor.JOLTS.Separations",
+      "series_id": "JTSTSL",
+      "name": "Total Separations",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "JOLTS",
+      "freq": "Monthly",
+      "unit": "Thousands",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Labor.InitialClaims",
+      "series_id": "ICSA",
+      "name": "Initial Jobless Claims",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "Claims",
+      "freq": "Weekly",
+      "unit": "Number",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Labor.ContinuingClaims",
+      "series_id": "CCSA",
+      "name": "Continuing Claims",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "Claims",
+      "freq": "Weekly",
+      "unit": "Number",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Labor.InsuredUnempRate",
+      "series_id": "IURSA",
+      "name": "Insured Unemployment Rate",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "Claims",
+      "freq": "Weekly",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Labor.Productivity",
+      "series_id": "OPHNFB",
+      "name": "Output Per Hour Nonfarm Business",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "Productivity",
+      "freq": "Quarterly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Labor.UnitLaborCosts",
+      "series_id": "ULCNFB",
+      "name": "Unit Labor Costs Nonfarm",
+      "region": "US",
+      "category": "labor",
+      "sub_theme": "Productivity",
+      "freq": "Quarterly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Business.ISM.Mfg.PMI",
+      "series_id": "NAPM",
+      "name": "ISM Mfg PMI Headline",
+      "region": "US",
+      "category": "business",
+      "sub_theme": "ISM Mfg",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Business.ISM.Mfg.NewOrders",
+      "series_id": "NAPMNOI",
+      "name": "ISM Mfg New Orders",
+      "region": "US",
+      "category": "business",
+      "sub_theme": "ISM Mfg",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Business.ISM.Mfg.Production",
+      "series_id": "NAPMPI",
+      "name": "ISM Mfg Production",
+      "region": "US",
+      "category": "business",
+      "sub_theme": "ISM Mfg",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Business.ISM.Mfg.Employment",
+      "series_id": "NAPMEI",
+      "name": "ISM Mfg Employment",
+      "region": "US",
+      "category": "business",
+      "sub_theme": "ISM Mfg",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Business.ISM.Mfg.Prices",
+      "series_id": "NAPMPRI",
+      "name": "ISM Mfg Prices Paid",
+      "region": "US",
+      "category": "business",
+      "sub_theme": "ISM Mfg",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Business.ISM.Mfg.SupplierDeliveries",
+      "series_id": "NAPMSDI",
+      "name": "ISM Mfg Supplier Deliveries",
+      "region": "US",
+      "category": "business",
+      "sub_theme": "ISM Mfg",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Business.ISM.Mfg.Inventories",
+      "series_id": "NAPMII",
+      "name": "ISM Mfg Inventories",
+      "region": "US",
+      "category": "business",
+      "sub_theme": "ISM Mfg",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Business.ISM.Svc.PMI",
+      "series_id": "NMFCI",
+      "name": "ISM Services PMI",
+      "region": "US",
+      "category": "business",
+      "sub_theme": "ISM Svc",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Business.ISM.Svc.BusinessActivity",
+      "series_id": "NMFBAI",
+      "name": "ISM Svc Business Activity",
+      "region": "US",
+      "category": "business",
+      "sub_theme": "ISM Svc",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Business.ISM.Svc.NewOrders",
+      "series_id": "NMFNOI",
+      "name": "ISM Svc New Orders",
+      "region": "US",
+      "category": "business",
+      "sub_theme": "ISM Svc",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Business.ISM.Svc.Employment",
+      "series_id": "NMFEI",
+      "name": "ISM Svc Employment",
+      "region": "US",
+      "category": "business",
+      "sub_theme": "ISM Svc",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Business.ISM.Svc.Prices",
+      "series_id": "NMFPI",
+      "name": "ISM Svc Prices Paid",
+      "region": "US",
+      "category": "business",
+      "sub_theme": "ISM Svc",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Business.SPG.PMI.Mfg",
+      "series_id": "USMFGPMI",
+      "name": "S&P Global Mfg PMI",
+      "region": "US",
+      "category": "business",
+      "sub_theme": "S&P Global",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Business.RegionalFed.EmpireState",
+      "series_id": "GACDFSA066MSFRBNY",
+      "name": "Empire State Mfg Survey",
+      "region": "US",
+      "category": "business",
+      "sub_theme": "Regional Fed",
+      "freq": "Monthly",
+      "unit": "Diffusion Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Business.RegionalFed.PhillyFed",
+      "series_id": "GACDISA066MSFRBPHI",
+      "name": "Philly Fed Business Survey",
+      "region": "US",
+      "category": "business",
+      "sub_theme": "Regional Fed",
+      "freq": "Monthly",
+      "unit": "Diffusion Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Business.RegionalFed.DallasFed",
+      "series_id": "BACTSAMFRBDAL",
+      "name": "Dallas Fed Mfg Outlook",
+      "region": "US",
+      "category": "business",
+      "sub_theme": "Regional Fed",
+      "freq": "Monthly",
+      "unit": "Diffusion Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Business.ConsumerConfidence",
+      "series_id": "CSCICP03USM665S",
+      "name": "Conference Board Consumer Confidence",
+      "region": "US",
+      "category": "business",
+      "sub_theme": "Sentiment",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Business.UMichSentiment",
+      "series_id": "UMCSENT",
+      "name": "U Mich Consumer Sentiment",
+      "region": "US",
+      "category": "business",
+      "sub_theme": "Sentiment",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Business.UMichExpectations",
+      "series_id": "MICH",
+      "name": "U Mich Inflation Expectations",
+      "region": "US",
+      "category": "business",
+      "sub_theme": "Sentiment",
+      "freq": "Monthly",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Business.NFIB",
+      "series_id": "NFIB",
+      "name": "NFIB Small Business Optimism",
+      "region": "US",
+      "category": "business",
+      "sub_theme": "Sentiment",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Business.LEI",
+      "series_id": "USSLIND",
+      "name": "Conference Board LEI",
+      "region": "US",
+      "category": "business",
+      "sub_theme": "Leading",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Growth.GDP.Real",
+      "series_id": "GDPC1",
+      "name": "Real GDP",
+      "region": "US",
+      "category": "growth",
+      "sub_theme": "GDP",
+      "freq": "Quarterly",
+      "unit": "Billions 2017 USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Growth.GDP.Nominal",
+      "series_id": "GDP",
+      "name": "Nominal GDP",
+      "region": "US",
+      "category": "growth",
+      "sub_theme": "GDP",
+      "freq": "Quarterly",
+      "unit": "Billions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Growth.GDP.QoQ.Annualized",
+      "series_id": "A191RL1Q225SBEA",
+      "name": "Real GDP QoQ Annualized",
+      "region": "US",
+      "category": "growth",
+      "sub_theme": "GDP",
+      "freq": "Quarterly",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Growth.GDP.Deflator",
+      "series_id": "GDPDEF",
+      "name": "GDP Deflator",
+      "region": "US",
+      "category": "growth",
+      "sub_theme": "GDP",
+      "freq": "Quarterly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Growth.GDP.PCE",
+      "series_id": "PCEC96",
+      "name": "PCE Real",
+      "region": "US",
+      "category": "growth",
+      "sub_theme": "GDP Components",
+      "freq": "Quarterly",
+      "unit": "Billions 2017 USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Growth.GDP.GPDI",
+      "series_id": "GPDI",
+      "name": "Gross Private Investment",
+      "region": "US",
+      "category": "growth",
+      "sub_theme": "GDP Components",
+      "freq": "Quarterly",
+      "unit": "Billions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Growth.GDP.GCE",
+      "series_id": "GCE",
+      "name": "Govt Consumption & Investment",
+      "region": "US",
+      "category": "growth",
+      "sub_theme": "GDP Components",
+      "freq": "Quarterly",
+      "unit": "Billions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Growth.GDP.NetExports",
+      "series_id": "NETEXP",
+      "name": "Net Exports",
+      "region": "US",
+      "category": "growth",
+      "sub_theme": "GDP Components",
+      "freq": "Quarterly",
+      "unit": "Billions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Growth.GDPNow",
+      "series_id": "GDPNOW",
+      "name": "Atlanta Fed GDPNow",
+      "region": "US",
+      "category": "growth",
+      "sub_theme": "Nowcast",
+      "freq": "Weekly",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Growth.IndProd.Total",
+      "series_id": "INDPRO",
+      "name": "Industrial Production Total",
+      "region": "US",
+      "category": "growth",
+      "sub_theme": "Industrial",
+      "freq": "Monthly",
+      "unit": "Index 2017=100",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Growth.IndProd.Mfg",
+      "series_id": "IPMAN",
+      "name": "Industrial Production Mfg",
+      "region": "US",
+      "category": "growth",
+      "sub_theme": "Industrial",
+      "freq": "Monthly",
+      "unit": "Index 2017=100",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Growth.CapUtil",
+      "series_id": "TCU",
+      "name": "Capacity Utilization",
+      "region": "US",
+      "category": "growth",
+      "sub_theme": "Industrial",
+      "freq": "Monthly",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Growth.DurableGoods.Total",
+      "series_id": "DGORDER",
+      "name": "Durable Goods Total Orders",
+      "region": "US",
+      "category": "growth",
+      "sub_theme": "DurableGoods",
+      "freq": "Monthly",
+      "unit": "Millions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Growth.DurableGoods.Core",
+      "series_id": "NEWORDER",
+      "name": "Core Cap Goods Orders ex Defense ex Aircraft",
+      "region": "US",
+      "category": "growth",
+      "sub_theme": "DurableGoods",
+      "freq": "Monthly",
+      "unit": "Millions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Consumer.RetailSales",
+      "series_id": "RSAFS",
+      "name": "Retail Sales Total",
+      "region": "US",
+      "category": "consumer",
+      "sub_theme": "Retail",
+      "freq": "Monthly",
+      "unit": "Millions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Consumer.RetailSales.ExAuto",
+      "series_id": "RSFSXMV",
+      "name": "Retail Sales Ex Auto",
+      "region": "US",
+      "category": "consumer",
+      "sub_theme": "Retail",
+      "freq": "Monthly",
+      "unit": "Millions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Consumer.RetailSales.Control",
+      "series_id": "RSSTHD",
+      "name": "Retail Sales Control Group",
+      "region": "US",
+      "category": "consumer",
+      "sub_theme": "Retail",
+      "freq": "Monthly",
+      "unit": "Millions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Consumer.PersonalIncome",
+      "series_id": "PI",
+      "name": "Personal Income",
+      "region": "US",
+      "category": "consumer",
+      "sub_theme": "Income",
+      "freq": "Monthly",
+      "unit": "Billions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Consumer.PersonalSpending",
+      "series_id": "PCE",
+      "name": "Personal Consumption Expenditure",
+      "region": "US",
+      "category": "consumer",
+      "sub_theme": "Spending",
+      "freq": "Monthly",
+      "unit": "Billions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Consumer.DPI",
+      "series_id": "DSPI",
+      "name": "Disposable Personal Income",
+      "region": "US",
+      "category": "consumer",
+      "sub_theme": "Income",
+      "freq": "Monthly",
+      "unit": "Billions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Consumer.SavingsRate",
+      "series_id": "PSAVERT",
+      "name": "Personal Savings Rate",
+      "region": "US",
+      "category": "consumer",
+      "sub_theme": "Savings",
+      "freq": "Monthly",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Consumer.Credit.CardDelinquency",
+      "series_id": "DRCCLACBS",
+      "name": "Credit Card Delinquency Rate",
+      "region": "US",
+      "category": "consumer",
+      "sub_theme": "Credit",
+      "freq": "Quarterly",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Housing.Starts.Total",
+      "series_id": "HOUST",
+      "name": "Housing Starts Total",
+      "region": "US",
+      "category": "housing",
+      "sub_theme": "Construction",
+      "freq": "Monthly",
+      "unit": "Thousands SAAR",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Housing.Starts.SingleFamily",
+      "series_id": "HOUST1F",
+      "name": "Housing Starts Single Family",
+      "region": "US",
+      "category": "housing",
+      "sub_theme": "Construction",
+      "freq": "Monthly",
+      "unit": "Thousands SAAR",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Housing.Starts.MultiFamily",
+      "series_id": "HOUST5F",
+      "name": "Housing Starts 5+ Multi-Family",
+      "region": "US",
+      "category": "housing",
+      "sub_theme": "Construction",
+      "freq": "Monthly",
+      "unit": "Thousands SAAR",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Housing.BuildingPermits.Total",
+      "series_id": "PERMIT",
+      "name": "Building Permits Total",
+      "region": "US",
+      "category": "housing",
+      "sub_theme": "Construction",
+      "freq": "Monthly",
+      "unit": "Thousands SAAR",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Housing.BuildingPermits.SingleFamily",
+      "series_id": "PERMIT1",
+      "name": "Building Permits Single Family",
+      "region": "US",
+      "category": "housing",
+      "sub_theme": "Construction",
+      "freq": "Monthly",
+      "unit": "Thousands SAAR",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Housing.NewHomeSales",
+      "series_id": "HSN1F",
+      "name": "New Home Sales",
+      "region": "US",
+      "category": "housing",
+      "sub_theme": "Sales",
+      "freq": "Monthly",
+      "unit": "Thousands SAAR",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Housing.ExistingHomeSales",
+      "series_id": "EXHOSLUSM495S",
+      "name": "Existing Home Sales",
+      "region": "US",
+      "category": "housing",
+      "sub_theme": "Sales",
+      "freq": "Monthly",
+      "unit": "Millions SAAR",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Housing.PendingHomeSales",
+      "series_id": "HSN1FNSA",
+      "name": "Pending Home Sales Index",
+      "region": "US",
+      "category": "housing",
+      "sub_theme": "Sales",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Housing.Prices.CaseShiller20",
+      "series_id": "SPCS20RSA",
+      "name": "Case-Shiller 20-City",
+      "region": "US",
+      "category": "housing",
+      "sub_theme": "Prices",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Housing.Prices.CaseShiller10",
+      "series_id": "SPCS10RSA",
+      "name": "Case-Shiller 10-City",
+      "region": "US",
+      "category": "housing",
+      "sub_theme": "Prices",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Housing.Prices.FHFA",
+      "series_id": "USSTHPI",
+      "name": "FHFA House Price Index",
+      "region": "US",
+      "category": "housing",
+      "sub_theme": "Prices",
+      "freq": "Quarterly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Housing.NAHB.Index",
+      "series_id": "NAHBMMI",
+      "name": "NAHB Housing Market Index",
+      "region": "US",
+      "category": "housing",
+      "sub_theme": "Sentiment",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Housing.Mortgage.30Y",
+      "series_id": "MORTGAGE30US",
+      "name": "30-Year Fixed Mortgage Rate",
+      "region": "US",
+      "category": "housing",
+      "sub_theme": "Mortgage",
+      "freq": "Weekly",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Housing.Mortgage.15Y",
+      "series_id": "MORTGAGE15US",
+      "name": "15-Year Fixed Mortgage Rate",
+      "region": "US",
+      "category": "housing",
+      "sub_theme": "Mortgage",
+      "freq": "Weekly",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fiscal.MTS.GrossReceipts",
+      "series_id": "v1/accounting/mts/mts_table_1",
+      "name": "MTS Current Month Gross Receipts",
+      "region": "US",
+      "category": "fiscal",
+      "sub_theme": "MTS",
+      "freq": "Monthly",
+      "unit": "Millions USD",
+      "source": "Treasury_FD",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fiscal.MTS.GrossOutlays",
+      "series_id": "v1/accounting/mts/mts_table_1",
+      "name": "MTS Current Month Gross Outlays",
+      "region": "US",
+      "category": "fiscal",
+      "sub_theme": "MTS",
+      "freq": "Monthly",
+      "unit": "Millions USD",
+      "source": "Treasury_FD",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fiscal.MTS.DeficitSurplus",
+      "series_id": "v1/accounting/mts/mts_table_1",
+      "name": "MTS Current Month Deficit/Surplus",
+      "region": "US",
+      "category": "fiscal",
+      "sub_theme": "MTS",
+      "freq": "Monthly",
+      "unit": "Millions USD",
+      "source": "Treasury_FD",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fiscal.MTS.YTD.Receipts",
+      "series_id": "v1/accounting/mts/mts_table_1",
+      "name": "MTS YTD Receipts",
+      "region": "US",
+      "category": "fiscal",
+      "sub_theme": "MTS",
+      "freq": "Monthly",
+      "unit": "Millions USD",
+      "source": "Treasury_FD",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fiscal.MTS.YTD.Outlays",
+      "series_id": "v1/accounting/mts/mts_table_1",
+      "name": "MTS YTD Outlays",
+      "region": "US",
+      "category": "fiscal",
+      "sub_theme": "MTS",
+      "freq": "Monthly",
+      "unit": "Millions USD",
+      "source": "Treasury_FD",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fiscal.MTS.YTD.DeficitSurplus",
+      "series_id": "v1/accounting/mts/mts_table_1",
+      "name": "MTS YTD Deficit/Surplus",
+      "region": "US",
+      "category": "fiscal",
+      "sub_theme": "MTS",
+      "freq": "Monthly",
+      "unit": "Millions USD",
+      "source": "Treasury_FD",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fiscal.MTS.ReceiptsBySource",
+      "series_id": "v1/accounting/mts/mts_table_4",
+      "name": "Receipts by Source (Indiv/Corp/Excise/Customs/etc)",
+      "region": "US",
+      "category": "fiscal",
+      "sub_theme": "MTS",
+      "freq": "Monthly",
+      "unit": "Millions USD",
+      "source": "Treasury_FD",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fiscal.MTS.OutlaysByFunction",
+      "series_id": "v1/accounting/mts/mts_table_5",
+      "name": "Outlays by Function (Defense/SocSec/Medicare/etc)",
+      "region": "US",
+      "category": "fiscal",
+      "sub_theme": "MTS",
+      "freq": "Monthly",
+      "unit": "Millions USD",
+      "source": "Treasury_FD",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fiscal.DTS.TotalReceipts",
+      "series_id": "v1/accounting/dts/deposits_withdrawals_operating_cash",
+      "name": "DTS Daily Total Deposits (Receipts)",
+      "region": "US",
+      "category": "fiscal",
+      "sub_theme": "DTS",
+      "freq": "Daily",
+      "unit": "Millions USD",
+      "source": "Treasury_FD",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fiscal.DTS.TotalOutlays",
+      "series_id": "v1/accounting/dts/deposits_withdrawals_operating_cash",
+      "name": "DTS Daily Total Withdrawals (Outlays)",
+      "region": "US",
+      "category": "fiscal",
+      "sub_theme": "DTS",
+      "freq": "Daily",
+      "unit": "Millions USD",
+      "source": "Treasury_FD",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fiscal.DTS.OperatingCashBalance",
+      "series_id": "v1/accounting/dts/operating_cash_balance",
+      "name": "DTS Operating Cash Balance (TGA)",
+      "region": "US",
+      "category": "fiscal",
+      "sub_theme": "DTS",
+      "freq": "Daily",
+      "unit": "Millions USD",
+      "source": "Treasury_FD",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fiscal.DTS.PublicDebtIssues",
+      "series_id": "v1/accounting/dts/public_debt_transactions",
+      "name": "DTS Public Debt Cash Issues",
+      "region": "US",
+      "category": "fiscal",
+      "sub_theme": "DTS",
+      "freq": "Daily",
+      "unit": "Millions USD",
+      "source": "Treasury_FD",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fiscal.DTS.PublicDebtRedemptions",
+      "series_id": "v1/accounting/dts/public_debt_transactions",
+      "name": "DTS Public Debt Cash Redemptions",
+      "region": "US",
+      "category": "fiscal",
+      "sub_theme": "DTS",
+      "freq": "Daily",
+      "unit": "Millions USD",
+      "source": "Treasury_FD",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fiscal.DTS.NetFlow",
+      "series_id": "_derived",
+      "name": "DTS Net Flow (Receipts - Outlays)",
+      "region": "US",
+      "category": "fiscal",
+      "sub_theme": "DTS",
+      "freq": "Daily",
+      "unit": "Millions USD",
+      "source": "Treasury_FD",
+      "transform": "subtract:US.Fiscal.DTS.TotalReceipts,US.Fiscal.DTS.TotalOutlays"
+     },
+     {
+      "via_code": "US.Fiscal.Debt.TotalPublic",
+      "series_id": "GFDEBTN",
+      "name": "Total Public Debt Outstanding",
+      "region": "US",
+      "category": "fiscal",
+      "sub_theme": "Debt",
+      "freq": "Quarterly",
+      "unit": "Millions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fiscal.Debt.HeldByPublic",
+      "series_id": "FYGFDPUN",
+      "name": "Federal Debt Held by Public",
+      "region": "US",
+      "category": "fiscal",
+      "sub_theme": "Debt",
+      "freq": "Annual",
+      "unit": "Millions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fiscal.Debt.ToGDP",
+      "series_id": "GFDEGDQ188S",
+      "name": "Federal Debt to GDP",
+      "region": "US",
+      "category": "fiscal",
+      "sub_theme": "Debt",
+      "freq": "Quarterly",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fiscal.Debt.NetInterest",
+      "series_id": "FYOINT",
+      "name": "Federal Net Interest Outlays",
+      "region": "US",
+      "category": "fiscal",
+      "sub_theme": "Debt",
+      "freq": "Annual",
+      "unit": "Millions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fed.Rates.FedFundsEffective",
+      "series_id": "DFF",
+      "name": "Effective Fed Funds Rate",
+      "region": "US",
+      "category": "fed",
+      "sub_theme": "Rates",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fed.Rates.FedFundsTarget.Upper",
+      "series_id": "DFEDTARU",
+      "name": "Fed Funds Target Upper Bound",
+      "region": "US",
+      "category": "fed",
+      "sub_theme": "Rates",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fed.Rates.FedFundsTarget.Lower",
+      "series_id": "DFEDTARL",
+      "name": "Fed Funds Target Lower Bound",
+      "region": "US",
+      "category": "fed",
+      "sub_theme": "Rates",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fed.Rates.IORB",
+      "series_id": "IORB",
+      "name": "Interest on Reserve Balances",
+      "region": "US",
+      "category": "fed",
+      "sub_theme": "Rates",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fed.Rates.DiscountRate",
+      "series_id": "INTDSRUSM193N",
+      "name": "Discount Rate (Primary Credit)",
+      "region": "US",
+      "category": "fed",
+      "sub_theme": "Rates",
+      "freq": "Monthly",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fed.Rates.SOFR",
+      "series_id": "SOFR",
+      "name": "Secured Overnight Financing Rate",
+      "region": "US",
+      "category": "fed",
+      "sub_theme": "Rates",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fed.Rates.EFFR",
+      "series_id": "EFFR",
+      "name": "Effective Federal Funds Rate (daily)",
+      "region": "US",
+      "category": "fed",
+      "sub_theme": "Rates",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fed.BalanceSheet.Total",
+      "series_id": "WALCL",
+      "name": "Fed Total Assets (WALCL)",
+      "region": "US",
+      "category": "fed",
+      "sub_theme": "BalanceSheet",
+      "freq": "Weekly",
+      "unit": "Millions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fed.BalanceSheet.Treasuries",
+      "series_id": "TREAST",
+      "name": "Fed Holdings of US Treasuries",
+      "region": "US",
+      "category": "fed",
+      "sub_theme": "BalanceSheet",
+      "freq": "Weekly",
+      "unit": "Millions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fed.BalanceSheet.MBS",
+      "series_id": "WSHOMCB",
+      "name": "Fed Holdings of MBS",
+      "region": "US",
+      "category": "fed",
+      "sub_theme": "BalanceSheet",
+      "freq": "Weekly",
+      "unit": "Millions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fed.BalanceSheet.ReverseRepo",
+      "series_id": "RRPONTSYD",
+      "name": "Overnight Reverse Repo (RRP)",
+      "region": "US",
+      "category": "fed",
+      "sub_theme": "BalanceSheet",
+      "freq": "Daily",
+      "unit": "Billions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fed.BalanceSheet.TGA",
+      "series_id": "WTREGEN",
+      "name": "Treasury General Account (TGA)",
+      "region": "US",
+      "category": "fed",
+      "sub_theme": "BalanceSheet",
+      "freq": "Weekly",
+      "unit": "Millions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fed.BalanceSheet.BankReserves",
+      "series_id": "WRESBAL",
+      "name": "Total Bank Reserves",
+      "region": "US",
+      "category": "fed",
+      "sub_theme": "BalanceSheet",
+      "freq": "Weekly",
+      "unit": "Billions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fed.MoneySupply.M1",
+      "series_id": "M1SL",
+      "name": "M1 Money Supply",
+      "region": "US",
+      "category": "fed",
+      "sub_theme": "MoneySupply",
+      "freq": "Monthly",
+      "unit": "Billions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fed.MoneySupply.M2",
+      "series_id": "M2SL",
+      "name": "M2 Money Supply",
+      "region": "US",
+      "category": "fed",
+      "sub_theme": "MoneySupply",
+      "freq": "Monthly",
+      "unit": "Billions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fed.MoneySupply.M2.YoY",
+      "series_id": "M2SL",
+      "name": "M2 YoY",
+      "region": "US",
+      "category": "fed",
+      "sub_theme": "MoneySupply",
+      "freq": "Monthly",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": "yoy"
+     },
+     {
+      "via_code": "US.Fed.ForwardGuidance.FOMC.Statements",
+      "series_id": "US.Fed.ForwardGuidance.FOMC.Statements",
+      "name": "FOMC Statement Text",
+      "region": "US",
+      "category": "fed",
+      "sub_theme": "ForwardGuidance",
+      "freq": "PerMeeting",
+      "unit": "text",
+      "source": "Fed",
+      "transform": null
+     },
+     {
+      "via_code": "US.Fed.ForwardGuidance.DotPlot",
+      "series_id": "US.Fed.ForwardGuidance.DotPlot",
+      "name": "FOMC Dot Plot Projections",
+      "region": "US",
+      "category": "fed",
+      "sub_theme": "ForwardGuidance",
+      "freq": "Quarterly",
+      "unit": "Percent",
+      "source": "Fed",
+      "transform": null
+     },
+     {
+      "via_code": "US.Rates.Treasury.1M",
+      "series_id": "DGS1MO",
+      "name": "1-Month Treasury",
+      "region": "US",
+      "category": "rates",
+      "sub_theme": "Treasury",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Rates.Treasury.3M",
+      "series_id": "DTB3",
+      "name": "3-Month T-Bill",
+      "region": "US",
+      "category": "rates",
+      "sub_theme": "Treasury",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Rates.Treasury.6M",
+      "series_id": "DTB6",
+      "name": "6-Month T-Bill",
+      "region": "US",
+      "category": "rates",
+      "sub_theme": "Treasury",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Rates.Treasury.1Y",
+      "series_id": "DGS1",
+      "name": "1-Year Treasury",
+      "region": "US",
+      "category": "rates",
+      "sub_theme": "Treasury",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Rates.Treasury.2Y",
+      "series_id": "DGS2",
+      "name": "2-Year Treasury",
+      "region": "US",
+      "category": "rates",
+      "sub_theme": "Treasury",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Rates.Treasury.3Y",
+      "series_id": "DGS3",
+      "name": "3-Year Treasury",
+      "region": "US",
+      "category": "rates",
+      "sub_theme": "Treasury",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Rates.Treasury.5Y",
+      "series_id": "DGS5",
+      "name": "5-Year Treasury",
+      "region": "US",
+      "category": "rates",
+      "sub_theme": "Treasury",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Rates.Treasury.7Y",
+      "series_id": "DGS7",
+      "name": "7-Year Treasury",
+      "region": "US",
+      "category": "rates",
+      "sub_theme": "Treasury",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Rates.Treasury.10Y",
+      "series_id": "DGS10",
+      "name": "10-Year Treasury",
+      "region": "US",
+      "category": "rates",
+      "sub_theme": "Treasury",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Rates.Treasury.20Y",
+      "series_id": "DGS20",
+      "name": "20-Year Treasury",
+      "region": "US",
+      "category": "rates",
+      "sub_theme": "Treasury",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Rates.Treasury.30Y",
+      "series_id": "DGS30",
+      "name": "30-Year Treasury",
+      "region": "US",
+      "category": "rates",
+      "sub_theme": "Treasury",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Rates.TIPS.5Y",
+      "series_id": "DFII5",
+      "name": "5Y TIPS Real Yield",
+      "region": "US",
+      "category": "rates",
+      "sub_theme": "TIPS",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Rates.TIPS.10Y",
+      "series_id": "DFII10",
+      "name": "10Y TIPS Real Yield",
+      "region": "US",
+      "category": "rates",
+      "sub_theme": "TIPS",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Rates.TIPS.20Y",
+      "series_id": "DFII20",
+      "name": "20Y TIPS Real Yield",
+      "region": "US",
+      "category": "rates",
+      "sub_theme": "TIPS",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Rates.TIPS.30Y",
+      "series_id": "DFII30",
+      "name": "30Y TIPS Real Yield",
+      "region": "US",
+      "category": "rates",
+      "sub_theme": "TIPS",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Rates.Spread.2s10s",
+      "series_id": "T10Y2Y",
+      "name": "10Y-2Y Spread",
+      "region": "US",
+      "category": "rates",
+      "sub_theme": "Spread",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Rates.Spread.3m10y",
+      "series_id": "T10Y3M",
+      "name": "10Y-3M Spread (NY Fed Recession Model)",
+      "region": "US",
+      "category": "rates",
+      "sub_theme": "Spread",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Rates.BreakEven.5Y",
+      "series_id": "T5YIE",
+      "name": "5Y Breakeven Inflation",
+      "region": "US",
+      "category": "rates",
+      "sub_theme": "Breakeven",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Rates.BreakEven.10Y",
+      "series_id": "T10YIE",
+      "name": "10Y Breakeven Inflation",
+      "region": "US",
+      "category": "rates",
+      "sub_theme": "Breakeven",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Rates.BreakEven.5Y5Y",
+      "series_id": "T5YIFR",
+      "name": "5Y5Y Forward Inflation",
+      "region": "US",
+      "category": "rates",
+      "sub_theme": "Breakeven",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Rates.Credit.HY_OAS",
+      "series_id": "BAMLH0A0HYM2",
+      "name": "ICE BofA HY OAS Spread",
+      "region": "US",
+      "category": "rates",
+      "sub_theme": "Credit",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Rates.Credit.IG_OAS",
+      "series_id": "BAMLC0A0CM",
+      "name": "ICE BofA IG OAS Spread",
+      "region": "US",
+      "category": "rates",
+      "sub_theme": "Credit",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Rates.Credit.CCC_OAS",
+      "series_id": "BAMLH0A3HYC",
+      "name": "ICE BofA CCC OAS Spread",
+      "region": "US",
+      "category": "rates",
+      "sub_theme": "Credit",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Trade.Goods.Balance",
+      "series_id": "BOPGSTB",
+      "name": "Trade Balance Goods",
+      "region": "US",
+      "category": "trade",
+      "sub_theme": "Goods",
+      "freq": "Monthly",
+      "unit": "Millions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Trade.Goods.Exports",
+      "series_id": "BOPGEXP",
+      "name": "Goods Exports",
+      "region": "US",
+      "category": "trade",
+      "sub_theme": "Goods",
+      "freq": "Monthly",
+      "unit": "Millions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Trade.Goods.Imports",
+      "series_id": "BOPGIMP",
+      "name": "Goods Imports",
+      "region": "US",
+      "category": "trade",
+      "sub_theme": "Goods",
+      "freq": "Monthly",
+      "unit": "Millions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Trade.Services.Balance",
+      "series_id": "IEABCS",
+      "name": "Trade Balance Services",
+      "region": "US",
+      "category": "trade",
+      "sub_theme": "Services",
+      "freq": "Monthly",
+      "unit": "Millions USD",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Trade.DXY.Broad",
+      "series_id": "DTWEXBGS",
+      "name": "USD Broad Trade-Weighted Index",
+      "region": "US",
+      "category": "trade",
+      "sub_theme": "FX",
+      "freq": "Daily",
+      "unit": "Index Jan 2006=100",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.FinCond.NFCI",
+      "series_id": "NFCI",
+      "name": "Chicago Fed NFCI",
+      "region": "US",
+      "category": "fincond",
+      "sub_theme": "FCI",
+      "freq": "Weekly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.FinCond.ANFCI",
+      "series_id": "ANFCI",
+      "name": "Adjusted NFCI",
+      "region": "US",
+      "category": "fincond",
+      "sub_theme": "FCI",
+      "freq": "Weekly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.FinCond.SLO.C&I",
+      "series_id": "DRTSCIS",
+      "name": "Senior Loan Officer C&I Tightening",
+      "region": "US",
+      "category": "fincond",
+      "sub_theme": "SLOOS",
+      "freq": "Quarterly",
+      "unit": "Net Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.FinCond.SLO.CommercialRE",
+      "series_id": "DRTSCILM",
+      "name": "Senior Loan Officer CRE Tightening",
+      "region": "US",
+      "category": "fincond",
+      "sub_theme": "SLOOS",
+      "freq": "Quarterly",
+      "unit": "Net Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "US.Sentiment.AAII.Bullish",
+      "series_id": "https://www.aaii.com/files/surveys/sentiment.xls",
+      "name": "AAII Bullish %",
+      "region": "US",
+      "category": "sentiment",
+      "sub_theme": "AAII",
+      "freq": "Weekly",
+      "unit": "Percent",
+      "source": "AAII",
+      "transform": null
+     },
+     {
+      "via_code": "US.Sentiment.AAII.Bearish",
+      "series_id": "https://www.aaii.com/files/surveys/sentiment.xls",
+      "name": "AAII Bearish %",
+      "region": "US",
+      "category": "sentiment",
+      "sub_theme": "AAII",
+      "freq": "Weekly",
+      "unit": "Percent",
+      "source": "AAII",
+      "transform": null
+     },
+     {
+      "via_code": "US.Sentiment.AAII.Neutral",
+      "series_id": "https://www.aaii.com/files/surveys/sentiment.xls",
+      "name": "AAII Neutral %",
+      "region": "US",
+      "category": "sentiment",
+      "sub_theme": "AAII",
+      "freq": "Weekly",
+      "unit": "Percent",
+      "source": "AAII",
+      "transform": null
+     },
+     {
+      "via_code": "US.Sentiment.AAII.BullBearSpread",
+      "series_id": "_derived",
+      "name": "AAII Bull-Bear Spread",
+      "region": "US",
+      "category": "sentiment",
+      "sub_theme": "AAII",
+      "freq": "Weekly",
+      "unit": "Percent",
+      "source": "AAII",
+      "transform": "subtract:US.Sentiment.AAII.Bullish,US.Sentiment.AAII.Bearish"
+     },
+     {
+      "via_code": "US.Sentiment.CNN.FearGreed",
+      "series_id": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
+      "name": "CNN Fear & Greed Composite",
+      "region": "US",
+      "category": "sentiment",
+      "sub_theme": "CNN F&G",
+      "freq": "Daily",
+      "unit": "Index 0-100",
+      "source": "CNN",
+      "transform": null
+     },
+     {
+      "via_code": "US.Sentiment.CNN.FG.PutCall",
+      "series_id": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
+      "name": "CNN F&G Put/Call Component",
+      "region": "US",
+      "category": "sentiment",
+      "sub_theme": "CNN F&G",
+      "freq": "Daily",
+      "unit": "Index 0-100",
+      "source": "CNN",
+      "transform": null
+     },
+     {
+      "via_code": "US.Sentiment.CNN.FG.Momentum",
+      "series_id": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
+      "name": "CNN F&G Momentum Component",
+      "region": "US",
+      "category": "sentiment",
+      "sub_theme": "CNN F&G",
+      "freq": "Daily",
+      "unit": "Index 0-100",
+      "source": "CNN",
+      "transform": null
+     },
+     {
+      "via_code": "US.Sentiment.CNN.FG.SafeHaven",
+      "series_id": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
+      "name": "CNN F&G Safe Haven Demand",
+      "region": "US",
+      "category": "sentiment",
+      "sub_theme": "CNN F&G",
+      "freq": "Daily",
+      "unit": "Index 0-100",
+      "source": "CNN",
+      "transform": null
+     },
+     {
+      "via_code": "US.Sentiment.CNN.FG.Breadth",
+      "series_id": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
+      "name": "CNN F&G Breadth Component",
+      "region": "US",
+      "category": "sentiment",
+      "sub_theme": "CNN F&G",
+      "freq": "Daily",
+      "unit": "Index 0-100",
+      "source": "CNN",
+      "transform": null
+     },
+     {
+      "via_code": "US.Sentiment.VIX",
+      "series_id": "^VIX",
+      "name": "CBOE VIX",
+      "region": "US",
+      "category": "sentiment",
+      "sub_theme": "Volatility",
+      "freq": "Daily",
+      "unit": "Index",
+      "source": "YFINANCE",
+      "transform": null
+     },
+     {
+      "via_code": "US.Sentiment.VVIX",
+      "series_id": "^VVIX",
+      "name": "CBOE VVIX (Vol of Vol)",
+      "region": "US",
+      "category": "sentiment",
+      "sub_theme": "Volatility",
+      "freq": "Daily",
+      "unit": "Index",
+      "source": "YFINANCE",
+      "transform": null
+     },
+     {
+      "via_code": "US.Sentiment.MOVE",
+      "series_id": "^MOVE",
+      "name": "ICE BofA MOVE (Bond Vol)",
+      "region": "US",
+      "category": "sentiment",
+      "sub_theme": "Volatility",
+      "freq": "Daily",
+      "unit": "Index",
+      "source": "YFINANCE",
+      "transform": null
+     },
+     {
+      "via_code": "US.Sentiment.SKEW",
+      "series_id": "^SKEW",
+      "name": "CBOE SKEW Tail-Risk",
+      "region": "US",
+      "category": "sentiment",
+      "sub_theme": "Volatility",
+      "freq": "Daily",
+      "unit": "Index",
+      "source": "YFINANCE",
+      "transform": null
+     },
+     {
+      "via_code": "EU.Prices.HICP.Headline",
+      "series_id": "CP0000EZ19M086NEST",
+      "name": "EU HICP All Items",
+      "region": "EU",
+      "category": "prices",
+      "sub_theme": "HICP",
+      "freq": "Monthly",
+      "unit": "Index 2015=100",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "EU.Prices.HICP.Core",
+      "series_id": "CPHPLA01EZM659N",
+      "name": "EU HICP Core YoY",
+      "region": "EU",
+      "category": "prices",
+      "sub_theme": "HICP",
+      "freq": "Monthly",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "EU.ECB.DepositFacilityRate",
+      "series_id": "ECBDFR",
+      "name": "ECB Deposit Facility Rate",
+      "region": "EU",
+      "category": "ecb",
+      "sub_theme": "Rates",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "EU.ECB.MainRefiRate",
+      "series_id": "ECBMRRFR",
+      "name": "ECB Main Refinancing Rate",
+      "region": "EU",
+      "category": "ecb",
+      "sub_theme": "Rates",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "EU.Business.PMI.Mfg",
+      "series_id": "EUGLORPMI",
+      "name": "EU Mfg PMI",
+      "region": "EU",
+      "category": "business",
+      "sub_theme": "EU PMI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "EU.Business.PMI.Svc",
+      "series_id": "EUSVPMI",
+      "name": "EU Svc PMI",
+      "region": "EU",
+      "category": "business",
+      "sub_theme": "EU PMI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "CN.Business.PMI.Mfg.NBS",
+      "series_id": "CHNMFGPMI",
+      "name": "China NBS Mfg PMI",
+      "region": "CN",
+      "category": "business",
+      "sub_theme": "CN PMI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "CN.Business.PMI.NonMfg.NBS",
+      "series_id": "CHNNMFPMI",
+      "name": "China NBS NonMfg PMI",
+      "region": "CN",
+      "category": "business",
+      "sub_theme": "CN PMI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "JP.Business.PMI.Mfg",
+      "series_id": "JPNMFGPMI",
+      "name": "Japan Mfg PMI",
+      "region": "JP",
+      "category": "business",
+      "sub_theme": "JP PMI",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "JP.BOJ.PolicyRate",
+      "series_id": "IRSTCB01JPM156N",
+      "name": "BOJ Policy Rate",
+      "region": "JP",
+      "category": "boj",
+      "sub_theme": "Rates",
+      "freq": "Monthly",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "UK.BOE.BankRate",
+      "series_id": "IUDSOIA",
+      "name": "BOE Bank Rate (SONIA proxy)",
+      "region": "UK",
+      "category": "boe",
+      "sub_theme": "Rates",
+      "freq": "Daily",
+      "unit": "Percent",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "Global.OECD.CLI.G7",
+      "series_id": "G7LOLITONOSTSAM",
+      "name": "OECD CLI G7",
+      "region": "Global",
+      "category": "oecd",
+      "sub_theme": "Leading",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     },
+     {
+      "via_code": "Global.OECD.CLI.G20",
+      "series_id": "G20LOLITONOSTSAM",
+      "name": "OECD CLI G20",
+      "region": "Global",
+      "category": "oecd",
+      "sub_theme": "Leading",
+      "freq": "Monthly",
+      "unit": "Index",
+      "source": "FRED",
+      "transform": null
+     }
+    ],
+    "output_file": "VDF_Macro_FRED.parquet"
+   },
+   {
+    "id": "sentiment",
+    "zh": "市場情緒指標",
+    "name": "Market Sentiment Indicators",
+    "schema_group": "sentiment",
+    "pk": [
+     "Date",
+     "Indicator"
+    ],
+    "freq": "daily",
+    "sources": [
+     "YFINANCE",
+     "FRED"
+    ],
+    "n_targets": [
+     {
+      "indicator": "VIX",
+      "source": "yfinance",
+      "ticker": "^VIX",
+      "category": "vol"
+     },
+     {
+      "indicator": "MOVE",
+      "source": "yfinance",
+      "ticker": "^MOVE",
+      "category": "vol_bond"
+     },
+     {
+      "indicator": "SKEW",
+      "source": "yfinance",
+      "ticker": "^SKEW",
+      "category": "tail_risk"
+     },
+     {
+      "indicator": "VVIX",
+      "source": "yfinance",
+      "ticker": "^VVIX",
+      "category": "vol_of_vol"
+     },
+     {
+      "indicator": "VIX9D",
+      "source": "yfinance",
+      "ticker": "^VIX9D",
+      "category": "vol_short"
+     },
+     {
+      "indicator": "VIX3M",
+      "source": "yfinance",
+      "ticker": "^VIX3M",
+      "category": "vol_3m"
+     },
+     {
+      "indicator": "STLFSI4",
+      "source": "fred",
+      "series_id": "STLFSI4",
+      "category": "stress"
+     },
+     {
+      "indicator": "NFCI",
+      "source": "fred",
+      "series_id": "NFCI",
+      "category": "stress"
+     }
+    ],
+    "output_file": "VDF_Sentiment.parquet"
+   },
+   {
+    "id": "shipping",
+    "zh": "航運指數",
+    "name": "Shipping Indices",
+    "schema_group": "macro",
+    "pk": [
+     "Date",
+     "Series_Id"
+    ],
+    "freq": "weekly_daily",
+    "sources": [
+     "AKSHARE"
+    ],
+    "n_targets": [
+     {
+      "indicator": "BDI",
+      "function": "drewry_wci_index",
+      "category": "shipping"
+     },
+     {
+      "indicator": "SCFI",
+      "function": "drewry_wci_index",
+      "category": "shipping"
+     },
+     {
+      "indicator": "CCFI",
+      "function": "drewry_wci_index",
+      "category": "shipping"
+     }
+    ],
+    "output_file": "VDF_Shipping.parquet"
+   }
+  ],
+  "headers": {
+   "prices_core": [
+    "Date",
+    "Ticker",
+    "YFinance_Ticker",
+    "Bloomberg_Ticker",
+    "Name",
+    "Open",
+    "Low",
+    "High",
+    "Close",
+    "Adj_Open",
+    "Adj_Low",
+    "Adj_High",
+    "Adj_Close",
+    "Volume",
+    "Turnover",
+    "Market_Cap"
+   ],
+   "tw_chip_extension": [
+    "FI_Buy",
+    "FI_Sell",
+    "FI_Net",
+    "IT_Buy",
+    "IT_Sell",
+    "IT_Net",
+    "Dealer_Buy",
+    "Dealer_Sell",
+    "Dealer_Net",
+    "Total_Net",
+    "FI_Hold_Pct",
+    "IT_Hold_Pct",
+    "Dealer_Hold_Pct",
+    "Margin_Buy",
+    "Margin_Sell",
+    "Margin_Balance",
+    "Margin_Offset",
+    "Short_Buy",
+    "Short_Sell",
+    "Short_Balance",
+    "Margin_Maintenance_Pct",
+    "Short_Margin_Ratio_Pct",
+    "DayTrade_Buy_Vol",
+    "DayTrade_Sell_Vol",
+    "DayTrade_Volume",
+    "DayTrade_Amount",
+    "DayTrade_Ratio_Pct"
+   ],
+   "tw_financial": [
+    "Date",
+    "Ticker",
+    "Period",
+    "Period_Type",
+    "Revenue",
+    "Gross_Profit",
+    "Operating_Income",
+    "Net_Income",
+    "EPS",
+    "Total_Assets",
+    "Total_Liabilities",
+    "Equity",
+    "Operating_CF",
+    "Investing_CF",
+    "Financing_CF",
+    "Free_CF",
+    "ROE",
+    "ROA",
+    "Gross_Margin",
+    "Operating_Margin",
+    "Net_Margin",
+    "Debt_To_Equity",
+    "Source"
+   ],
+   "macro": [
+    "Date",
+    "Series_Id",
+    "Series_Name",
+    "Value",
+    "Unit",
+    "Source",
+    "Region",
+    "Category"
+   ],
+   "sentiment": [
+    "Date",
+    "Indicator",
+    "Value",
+    "Source",
+    "Category"
+   ]
+  },
+  "macro_n": 219,
+  "macro_fred": 190,
+  "consensus_cols": 18
+ },
+ "data_home": {
+  "home": "C:\\Users\\tonyk\\Github\\movies-dataset\\data",
+  "src": "data/WHERE_IS_DATA.md",
+  "linked": false
+ },
+ "inventory": {
+  "tw": {
+   "db": "vdf_tw_market.duckdb",
+   "exists": true,
+   "tables": {
+    "consensus_daily": {
+     "rows": 245,
+     "cols": 14,
+     "date_col": "date",
+     "date_type": "DATE",
+     "min": "2026-09-01",
+     "max": "2026-09-01",
+     "lag_days": 3
+    },
+    "consensus_latest": {
+     "rows": 245,
+     "cols": 15,
+     "date_col": "date",
+     "date_type": "DATE",
+     "min": "2026-09-01",
+     "max": "2026-09-01",
+     "lag_days": 3
+    },
+    "etf_book": {
+     "rows": 542,
+     "cols": 6,
+     "date_col": "as_of",
+     "date_type": "VARCHAR",
+     "min": "1150901",
+     "max": "1150903",
+     "lag_days": null
+    },
+    "features_daily": {
+     "rows": 545364,
+     "cols": 14,
+     "date_col": "date",
+     "date_type": "VARCHAR",
+     "min": "2022-01-03",
+     "max": "2026-09-03",
+     "lag_days": 1
+    },
+    "group_features_daily": {
+     "rows": 26318,
+     "cols": 11,
+     "date_col": "date",
+     "date_type": "VARCHAR",
+     "min": "2022-01-03",
+     "max": "2026-09-03",
+     "lag_days": 1
+    },
+    "monthly_revenue_analysis": {
+     "rows": 3240,
+     "cols": 8,
+     "date_col": "",
+     "date_type": "",
+     "min": "",
+     "max": "",
+     "lag_days": null
+    },
+    "prices_canonical": {
+     "rows": 545364,
+     "cols": 9,
+     "date_col": "date",
+     "date_type": "VARCHAR",
+     "min": "2022-01-03",
+     "max": "2026-09-03",
+     "lag_days": 1
+    },
+    "revenue_group_analysis": {
+     "rows": 72,
+     "cols": 8,
+     "date_col": "",
+     "date_type": "",
+     "min": "",
+     "max": "",
+     "lag_days": null
+    },
+    "tw_chip_derived": {
+     "rows": 588310,
+     "cols": 8,
+     "date_col": "date",
+     "date_type": "VARCHAR",
+     "min": "2024-01-02",
+     "max": "2025-11-26",
+     "lag_days": 282
+    },
+    "tw_chip_inst": {
+     "rows": 595059,
+     "cols": 7,
+     "date_col": "date",
+     "date_type": "VARCHAR",
+     "min": "2024-01-02",
+     "max": "2025-11-26",
+     "lag_days": 282
+    },
+    "tw_chip_margin": {
+     "rows": 588310,
+     "cols": 13,
+     "date_col": "date",
+     "date_type": "VARCHAR",
+     "min": "2024-01-02",
+     "max": "2025-11-26",
+     "lag_days": 282
+    },
+    "tw_daily_prices": {
+     "rows": 545364,
+     "cols": 8,
+     "date_col": "date",
+     "date_type": "VARCHAR",
+     "min": "2022-01-03",
+     "max": "2026-09-03",
+     "lag_days": 1
+    },
+    "tw_daytrade_eligible": {
+     "rows": 3694,
+     "cols": 3,
+     "date_col": "date",
+     "date_type": "VARCHAR",
+     "min": "2026-09-02",
+     "max": "2026-09-04",
+     "lag_days": 0
+    },
+    "tw_daytrade_market": {
+     "rows": 24,
+     "cols": 6,
+     "date_col": "date",
+     "date_type": "VARCHAR",
+     "min": "2026-08-03",
+     "max": "2026-09-03",
+     "lag_days": 1
+    },
+    "tw_listings": {
+     "rows": 1980,
+     "cols": 6,
+     "date_col": "",
+     "date_type": "",
+     "min": "",
+     "max": "",
+     "lag_days": null
+    },
+    "tw_listings_industry": {
+     "rows": 1979,
+     "cols": 6,
+     "date_col": "",
+     "date_type": "",
+     "min": "",
+     "max": "",
+     "lag_days": null
+    },
+    "tw_market_agg": {
+     "rows": 1,
+     "cols": 4,
+     "date_col": "date",
+     "date_type": "VARCHAR",
+     "min": "2026-09-01",
+     "max": "2026-09-01",
+     "lag_days": 3
+    },
+    "tw_monthly_revenue": {
+     "rows": 3240,
+     "cols": 5,
+     "date_col": "",
+     "date_type": "",
+     "min": "",
+     "max": "",
+     "lag_days": null
+    },
+    "tw_prices_adj": {
+     "rows": 545364,
+     "cols": 9,
+     "date_col": "date",
+     "date_type": "VARCHAR",
+     "min": "2022-01-03",
+     "max": "2026-09-03",
+     "lag_days": 1
+    },
+    "tw_rates_cbc": {
+     "rows": 308,
+     "cols": 6,
+     "date_col": "date",
+     "date_type": "VARCHAR",
+     "min": "2001-01-01",
+     "max": "2026-08-01",
+     "lag_days": 34
+    },
+    "tw_trading_daily": {
+     "rows": 5422,
+     "cols": 7,
+     "date_col": "date",
+     "date_type": "VARCHAR",
+     "min": "2026-09-01",
+     "max": "2026-09-03",
+     "lag_days": 1
+    },
+    "tw_valuation_daily": {
+     "rows": 5904,
+     "cols": 7,
+     "date_col": "date",
+     "date_type": "VARCHAR",
+     "min": "2026-09-01",
+     "max": "2026-09-03",
+     "lag_days": 1
+    }
+   }
+  },
+  "gl": {
+   "db": "vdf_global_market.duckdb",
+   "exists": true,
+   "tables": {
+    "cross_macro": {
+     "rows": 103,
+     "cols": 5,
+     "date_col": "date",
+     "date_type": "VARCHAR",
+     "min": "2018-01-01",
+     "max": "2026-07-01",
+     "lag_days": 65
+    },
+    "etf_stats_daily": {
+     "rows": 144,
+     "cols": 12,
+     "date_col": "date",
+     "date_type": "VARCHAR",
+     "min": "2026-09-02",
+     "max": "2026-09-04",
+     "lag_days": 0
+    },
+    "factset_earnings": {
+     "rows": 3,
+     "cols": 6,
+     "date_col": "published",
+     "date_type": "VARCHAR",
+     "min": "2026-08-05",
+     "max": "2026-08-31",
+     "lag_days": 4
+    },
+    "features_daily": {
+     "rows": 82400,
+     "cols": 14,
+     "date_col": "date",
+     "date_type": "VARCHAR",
+     "min": "2022-01-03",
+     "max": "2026-09-01",
+     "lag_days": 3
+    },
+    "gl_prices_adj": {
+     "rows": 82400,
+     "cols": 9,
+     "date_col": "date",
+     "date_type": "VARCHAR",
+     "min": "2022-01-03",
+     "max": "2026-09-01",
+     "lag_days": 3
+    },
+    "global_daily": {
+     "rows": 82400,
+     "cols": 8,
+     "date_col": "date",
+     "date_type": "VARCHAR",
+     "min": "2022-01-03",
+     "max": "2026-09-01",
+     "lag_days": 3
+    },
+    "index_valuation_proxy": {
+     "rows": 104,
+     "cols": 13,
+     "date_col": "date",
+     "date_type": "VARCHAR",
+     "min": "2026-09-01",
+     "max": "2026-09-04",
+     "lag_days": 0
+    },
+    "prices_canonical": {
+     "rows": 82400,
+     "cols": 9,
+     "date_col": "date",
+     "date_type": "VARCHAR",
+     "min": "2022-01-03",
+     "max": "2026-09-01",
+     "lag_days": 3
+    },
+    "sentiment_daily": {
+     "rows": 259,
+     "cols": 4,
+     "date_col": "date",
+     "date_type": "VARCHAR",
+     "min": "2025-09-02",
+     "max": "2026-09-04",
+     "lag_days": 0
+    }
+   }
+  },
+  "etf": {
+   "db": "ActiveTWETF.duckdb",
+   "exists": true,
+   "tables": {
+    "active_tw_etf_universe": {
+     "rows": 60,
+     "cols": 5,
+     "date_col": "",
+     "date_type": "",
+     "min": "",
+     "max": "",
+     "lag_days": null
+    },
+    "fetch_status": {
+     "rows": 60,
+     "cols": 7,
+     "date_col": "",
+     "date_type": "",
+     "min": "",
+     "max": "",
+     "lag_days": null
+    },
+    "holdings_changes": {
+     "rows": 1234,
+     "cols": 12,
+     "date_col": "",
+     "date_type": "",
+     "min": "",
+     "max": "",
+     "lag_days": null
+    },
+    "holdings_daily": {
+     "rows": 1234,
+     "cols": 13,
+     "date_col": "",
+     "date_type": "",
+     "min": "",
+     "max": "",
+     "lag_days": null
+    }
+   }
+  }
+ },
+ "categories": [
+  {
+   "id": "tw_stock",
+   "zh": "台灣股票每日交易及籌碼資訊",
+   "state": "PARTIAL",
+   "n_targets": 0,
+   "schema_group": "prices_with_chip",
+   "pk": [
+    "Date",
+    "Ticker"
+   ],
+   "freq": "daily_after_close",
+   "sources": [
+    "YFINANCE",
+    "TWSE",
+    "TPEX"
+   ],
+   "tables": [
+    {
+     "table": "tw_daily_prices",
+     "db": "tw",
+     "exists": true,
+     "rows": 545364,
+     "max": "2026-09-03",
+     "lag": 1,
+     "date_type": "VARCHAR"
+    },
+    {
+     "table": "tw_prices_adj",
+     "db": "tw",
+     "exists": true,
+     "rows": 545364,
+     "max": "2026-09-03",
+     "lag": 1,
+     "date_type": "VARCHAR"
+    },
+    {
+     "table": "prices_canonical",
+     "db": "tw",
+     "exists": true,
+     "rows": 545364,
+     "max": "2026-09-03",
+     "lag": 1,
+     "date_type": "VARCHAR"
+    },
+    {
+     "table": "features_daily",
+     "db": "tw",
+     "exists": true,
+     "rows": 545364,
+     "max": "2026-09-03",
+     "lag": 1,
+     "date_type": "VARCHAR"
+    },
+    {
+     "table": "tw_chip_inst",
+     "db": "tw",
+     "exists": true,
+     "rows": 595059,
+     "max": "2025-11-26",
+     "lag": 282,
+     "date_type": "VARCHAR"
+    },
+    {
+     "table": "tw_chip_margin",
+     "db": "tw",
+     "exists": true,
+     "rows": 588310,
+     "max": "2025-11-26",
+     "lag": 282,
+     "date_type": "VARCHAR"
+    },
+    {
+     "table": "tw_chip_derived",
+     "db": "tw",
+     "exists": true,
+     "rows": 588310,
+     "max": "2025-11-26",
+     "lag": 282,
+     "date_type": "VARCHAR"
+    },
+    {
+     "table": "tw_daytrade_stock",
+     "db": "tw",
+     "exists": false,
+     "rows": 0,
+     "max": "",
+     "lag": null,
+     "date_type": ""
+    },
+    {
+     "table": "tw_trading_daily",
+     "db": "tw",
+     "exists": true,
+     "rows": 5422,
+     "max": "2026-09-03",
+     "lag": 1,
+     "date_type": "VARCHAR"
+    },
+    {
+     "table": "tw_valuation_daily",
+     "db": "tw",
+     "exists": true,
+     "rows": 5904,
+     "max": "2026-09-03",
+     "lag": 1,
+     "date_type": "VARCHAR"
+    }
+   ],
+   "engines": [
+    {
+     "pat": "VDF_ENG064_HistoryBackfill_v*.py",
+     "file": "VDF_ENG064_HistoryBackfill_v0107.py",
+     "ok": true
+    },
+    {
+     "pat": "VDF_ENG054_TWDailyBackfill_v*.py",
+     "file": "VDF_ENG054_TWDailyBackfill_v0103.py",
+     "ok": true
+    },
+    {
+     "pat": "VDF_ENG060_AdjPriceLayer_v*.py",
+     "file": "VDF_ENG060_AdjPriceLayer_v0102.py",
+     "ok": true
+    },
+    {
+     "pat": "VDF_ENG056_ChipBackfill_v*.py",
+     "file": "VDF_ENG056_ChipBackfill_v0101.py",
+     "ok": true
+    },
+    {
+     "pat": "VDF_ENG061_FeatureStore_v*.py",
+     "file": "VDF_ENG061_FeatureStore_v0100.py",
+     "ok": true
+    },
+    {
+     "pat": "VDF_ENG055_OmniFetch_v*.py",
+     "file": "VDF_ENG055_OmniFetch_v0108.py",
+     "ok": true
+    }
+   ],
+   "lanes": [
+    {
+     "lane": "yf_history",
+     "ok": true
+    },
+    {
+     "lane": "yahoo_chart",
+     "ok": true
+    },
+    {
+     "lane": "http_json(TWSE/TPEX rwd)",
+     "ok": true
+    }
+   ],
+   "headers": [
+    "prices_core",
+    "tw_chip_extension"
+   ],
+   "gap": "chip 籌碼 2025-11-26 後待 ENG056 續跑;Turnover/Market_Cap 欄候 L2/L3 併表"
+  },
+  {
+   "id": "tw_index",
+   "zh": "台灣股票指數每日交易及籌碼資訊",
+   "state": "PARTIAL",
+   "n_targets": 2,
+   "schema_group": "prices_with_chip",
+   "pk": [
+    "Date",
+    "Ticker"
+   ],
+   "freq": "daily_after_close",
+   "sources": [
+    "TWSE",
+    "TPEX"
+   ],
+   "tables": [
+    {
+     "table": "global_daily",
+     "db": "gl",
+     "exists": true,
+     "rows": 82400,
+     "max": "2026-09-01",
+     "lag": 3,
+     "date_type": "VARCHAR"
+    }
+   ],
+   "engines": [
+    {
+     "pat": "VDF_ENG066_GlobalUniverse_v*.py",
+     "file": "VDF_ENG066_GlobalUniverse_v0101.py",
+     "ok": true
+    },
+    {
+     "pat": "VDF_ENG055_OmniFetch_v*.py",
+     "file": "VDF_ENG055_OmniFetch_v0108.py",
+     "ok": true
+    }
+   ],
+   "lanes": [
+    {
+     "lane": "yahoo_chart(^TWII)",
+     "ok": true
+    },
+    {
+     "lane": "http_json(TWSE 指數)",
+     "ok": true
+    }
+   ],
+   "headers": [
+    "prices_core"
+   ],
+   "gap": "^TWII/^TWOII 在 L6 global_daily;指數籌碼欄群=候源(TWSE 三大法人買賣金額 t86 已於 chip)"
+  },
+  {
+   "id": "tw_etf_passive",
+   "zh": "台灣 ETF - 被動式 (追蹤指數)",
+   "state": "PARTIAL",
+   "n_targets": 12,
+   "schema_group": "prices_core",
+   "pk": [
+    "Date",
+    "Ticker"
+   ],
+   "freq": "daily_after_close",
+   "sources": [
+    "YFINANCE"
+   ],
+   "tables": [
+    {
+     "table": "etf_book",
+     "db": "tw",
+     "exists": true,
+     "rows": 542,
+     "max": "1150903",
+     "lag": null,
+     "date_type": "VARCHAR"
+    },
+    {
+     "table": "etf_stats_daily",
+     "db": "gl",
+     "exists": true,
+     "rows": 144,
+     "max": "2026-09-04",
+     "lag": 0,
+     "date_type": "VARCHAR"
+    },
+    {
+     "table": "tw_daily_prices",
+     "db": "tw",
+     "exists": true,
+     "rows": 545364,
+     "max": "2026-09-03",
+     "lag": 1,
+     "date_type": "VARCHAR"
+    }
+   ],
+   "engines": [
+    {
+     "pat": "VDF_ENG055_OmniFetch_v*.py",
+     "file": "VDF_ENG055_OmniFetch_v0108.py",
+     "ok": true
+    }
+   ],
+   "lanes": [
+    {
+     "lane": "http_json(t187ap47_L)",
+     "ok": true
+    },
+    {
+     "lane": "yahoo_quote_summary",
+     "ok": true
+    }
+   ],
+   "headers": [
+    "prices_core"
+   ],
+   "gap": "被動 ETF 日價=tw_daily_prices 含(代碼在 listings);AUM/流量估算 L5"
+  },
+  {
+   "id": "tw_etf_active",
+   "zh": "台灣 ETF - 主動式 (經理人選股)",
+   "state": "PARTIAL",
+   "n_targets": 18,
+   "schema_group": "prices_core",
+   "pk": [
+    "Date",
+    "Ticker"
+   ],
+   "freq": "daily_after_close",
+   "sources": [
+    "YFINANCE"
+   ],
+   "tables": [
+    {
+     "table": "active_tw_etf_universe",
+     "db": "etf",
+     "exists": true,
+     "rows": 60,
+     "max": "",
+     "lag": null,
+     "date_type": ""
+    },
+    {
+     "table": "holdings_daily",
+     "db": "etf",
+     "exists": true,
+     "rows": 1234,
+     "max": "",
+     "lag": null,
+     "date_type": ""
+    },
+    {
+     "table": "holdings_changes",
+     "db": "etf",
+     "exists": true,
+     "rows": 1234,
+     "max": "",
+     "lag": null,
+     "date_type": ""
+    },
+    {
+     "table": "etf_book",
+     "db": "tw",
+     "exists": true,
+     "rows": 542,
+     "max": "1150903",
+     "lag": null,
+     "date_type": "VARCHAR"
+    }
+   ],
+   "engines": [
+    {
+     "pat": "VDF_ENG051_ActiveTWETF_Holdings*.py",
+     "file": "VDF_ENG051_ActiveTWETF_Holdings.py",
+     "ok": true
+    },
+    {
+     "pat": "VDF_ENG068_ETFConsensusAnalysis_v*.py",
+     "file": "VDF_ENG068_ETFConsensusAnalysis_v0104.py",
+     "ok": true
+    }
+   ],
+   "lanes": [
+    {
+     "lane": "http_text(投信 PCF)",
+     "ok": true
+    },
+    {
+     "lane": "gsheet_csv",
+     "ok": true
+    }
+   ],
+   "headers": [
+    "prices_core",
+    "D.canonical_schema"
+   ],
+   "gap": "ETF 庫 60 列/GroupIndex 0 檔候 etf_fetch(工作站)"
+  },
+  {
+   "id": "intl_stock",
+   "zh": "國際股票每日交易資訊",
+   "state": "PARTIAL",
+   "n_targets": 20,
+   "schema_group": "prices_core",
+   "pk": [
+    "Date",
+    "Ticker"
+   ],
+   "freq": "daily_after_close",
+   "sources": [
+    "YFINANCE"
+   ],
+   "tables": [
+    {
+     "table": "global_daily",
+     "db": "gl",
+     "exists": true,
+     "rows": 82400,
+     "max": "2026-09-01",
+     "lag": 3,
+     "date_type": "VARCHAR"
+    },
+    {
+     "table": "gl_prices_adj",
+     "db": "gl",
+     "exists": true,
+     "rows": 82400,
+     "max": "2026-09-01",
+     "lag": 3,
+     "date_type": "VARCHAR"
+    },
+    {
+     "table": "prices_canonical",
+     "db": "gl",
+     "exists": true,
+     "rows": 82400,
+     "max": "2026-09-01",
+     "lag": 3,
+     "date_type": "VARCHAR"
+    }
+   ],
+   "engines": [
+    {
+     "pat": "VDF_ENG066_GlobalUniverse_v*.py",
+     "file": "VDF_ENG066_GlobalUniverse_v0101.py",
+     "ok": true
+    }
+   ],
+   "lanes": [
+    {
+     "lane": "yahoo_chart",
+     "ok": true
+    },
+    {
+     "lane": "yf_history",
+     "ok": true
+    }
+   ],
+   "headers": [
+    "prices_core"
+   ],
+   "gap": "SSOT 20 檔國際個股候併 ENG066 宇宙冊"
+  },
+  {
+   "id": "intl_index",
+   "zh": "國際股票指數交易資訊",
+   "state": "POPULATED",
+   "n_targets": 15,
+   "schema_group": "prices_core",
+   "pk": [
+    "Date",
+    "Ticker"
+   ],
+   "freq": "daily_after_close",
+   "sources": [
+    "YFINANCE"
+   ],
+   "tables": [
+    {
+     "table": "global_daily",
+     "db": "gl",
+     "exists": true,
+     "rows": 82400,
+     "max": "2026-09-01",
+     "lag": 3,
+     "date_type": "VARCHAR"
+    },
+    {
+     "table": "index_valuation_proxy",
+     "db": "gl",
+     "exists": true,
+     "rows": 104,
+     "max": "2026-09-04",
+     "lag": 0,
+     "date_type": "VARCHAR"
+    }
+   ],
+   "engines": [
+    {
+     "pat": "VDF_ENG066_GlobalUniverse_v*.py",
+     "file": "VDF_ENG066_GlobalUniverse_v0101.py",
+     "ok": true
+    },
+    {
+     "pat": "VDF_ENG055_OmniFetch_v*.py",
+     "file": "VDF_ENG055_OmniFetch_v0108.py",
+     "ok": true
+    }
+   ],
+   "lanes": [
+    {
+     "lane": "yahoo_chart",
+     "ok": true
+    },
+    {
+     "lane": "yahoo_quote_summary",
+     "ok": true
+    }
+   ],
+   "headers": [
+    "prices_core"
+   ],
+   "gap": ""
+  },
+  {
+   "id": "tw_financials",
+   "zh": "台灣及國際股票財報資訊",
+   "state": "PARTIAL",
+   "n_targets": 6,
+   "schema_group": "tw_financial",
+   "pk": [
+    "Date",
+    "Ticker",
+    "Period"
+   ],
+   "freq": "quarterly",
+   "sources": [
+    "MOPS",
+    "YFINANCE"
+   ],
+   "tables": [
+    {
+     "table": "tw_monthly_revenue",
+     "db": "tw",
+     "exists": true,
+     "rows": 3240,
+     "max": "",
+     "lag": null,
+     "date_type": ""
+    },
+    {
+     "table": "monthly_revenue_analysis",
+     "db": "tw",
+     "exists": true,
+     "rows": 3240,
+     "max": "",
+     "lag": null,
+     "date_type": ""
+    }
+   ],
+   "engines": [
+    {
+     "pat": "VDF_ENG063_MonthlyRevenue_v*.py",
+     "file": "VDF_ENG063_MonthlyRevenue_v0104.py",
+     "ok": true
+    }
+   ],
+   "lanes": [
+    {
+     "lane": "http_json(MOPS)",
+     "ok": true
+    }
+   ],
+   "headers": [
+    "tw_financial"
+   ],
+   "gap": "季報 23 欄(tw_financial 群)=PLANNED:MOPS t164sb04 候源;上船 vdf_fetchers_financials 設計參考"
+  },
+  {
+   "id": "commodity",
+   "zh": "大宗商品 - 期貨 + 現貨",
+   "state": "PARTIAL",
+   "n_targets": 15,
+   "schema_group": "prices_core",
+   "pk": [
+    "Date",
+    "Ticker"
+   ],
+   "freq": "daily_after_close",
+   "sources": [
+    "YFINANCE",
+    "AKSHARE"
+   ],
+   "tables": [
+    {
+     "table": "global_daily",
+     "db": "gl",
+     "exists": true,
+     "rows": 82400,
+     "max": "2026-09-01",
+     "lag": 3,
+     "date_type": "VARCHAR"
+    }
+   ],
+   "engines": [
+    {
+     "pat": "VDF_ENG066_GlobalUniverse_v*.py",
+     "file": "VDF_ENG066_GlobalUniverse_v0101.py",
+     "ok": true
+    }
+   ],
+   "lanes": [
+    {
+     "lane": "yahoo_chart",
+     "ok": true
+    },
+    {
+     "lane": "akshare_call",
+     "ok": true
+    }
+   ],
+   "headers": [
+    "prices_core"
+   ],
+   "gap": "SSOT 15 檔(期貨+現貨)候併 ENG066 宇宙冊;akshare 現貨=候白名單"
+  },
+  {
+   "id": "fx",
+   "zh": "外匯",
+   "state": "PARTIAL",
+   "n_targets": 10,
+   "schema_group": "prices_core",
+   "pk": [
+    "Date",
+    "Ticker"
+   ],
+   "freq": "daily_after_close",
+   "sources": [
+    "YFINANCE"
+   ],
+   "tables": [
+    {
+     "table": "global_daily",
+     "db": "gl",
+     "exists": true,
+     "rows": 82400,
+     "max": "2026-09-01",
+     "lag": 3,
+     "date_type": "VARCHAR"
+    }
+   ],
+   "engines": [
+    {
+     "pat": "VDF_ENG066_GlobalUniverse_v*.py",
+     "file": "VDF_ENG066_GlobalUniverse_v0101.py",
+     "ok": true
+    },
+    {
+     "pat": "VDF_ENG055_OmniFetch_v*.py",
+     "file": "VDF_ENG055_OmniFetch_v0108.py",
+     "ok": true
+    }
+   ],
+   "lanes": [
+    {
+     "lane": "yahoo_chart(=X)",
+     "ok": true
+    }
+   ],
+   "headers": [
+    "prices_core"
+   ],
+   "gap": "L6 FX 15 對已含;P18 USD FX 模板 PENDING_OPERATOR"
+  },
+  {
+   "id": "macro",
+   "zh": "總體經濟指標",
+   "state": "PENDING_KEY",
+   "n_targets": [
+    {
+     "via_code": "US.Prices.CPI.Headline",
+     "series_id": "CPIAUCSL",
+     "name": "CPI Headline",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Index 1982-84=100",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.CPI.Headline.YoY",
+     "series_id": "CPIAUCSL",
+     "name": "CPI YoY",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": "yoy"
+    },
+    {
+     "via_code": "US.Prices.CPI.Core",
+     "series_id": "CPILFESL",
+     "name": "Core CPI (ex Food & Energy)",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "Core CPI",
+     "freq": "Monthly",
+     "unit": "Index 1982-84=100",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.CPI.Core.YoY",
+     "series_id": "CPILFESL",
+     "name": "Core CPI YoY",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "Core CPI",
+     "freq": "Monthly",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": "yoy"
+    },
+    {
+     "via_code": "US.Prices.CPI.Food",
+     "series_id": "CPIUFDSL",
+     "name": "Food",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.CPI.FoodAtHome",
+     "series_id": "CUSR0000SAF11",
+     "name": "Food at Home",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.CPI.FoodAwayFromHome",
+     "series_id": "CUSR0000SEFV",
+     "name": "Food Away from Home",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.CPI.Energy",
+     "series_id": "CPIENGSL",
+     "name": "Energy",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.CPI.Gasoline",
+     "series_id": "CUUR0000SETB01",
+     "name": "Gasoline",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.CPI.FuelOil",
+     "series_id": "CUSR0000SEHE",
+     "name": "Fuel Oil",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.CPI.Electricity",
+     "series_id": "CUUR0000SEHF01",
+     "name": "Electricity",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.CPI.UtilityGas",
+     "series_id": "CUUR0000SEHF02",
+     "name": "Utility Gas",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.CPI.Shelter",
+     "series_id": "CUSR0000SAH1",
+     "name": "Shelter",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.CPI.Rent",
+     "series_id": "CUSR0000SEHA",
+     "name": "Rent of Primary Residence",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.CPI.OER",
+     "series_id": "CUSR0000SEHC",
+     "name": "Owners' Equivalent Rent",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.CPI.LodgingAwayFromHome",
+     "series_id": "CUSR0000SEHB",
+     "name": "Lodging Away From Home",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.CPI.NewVehicles",
+     "series_id": "CUUR0000SETA01",
+     "name": "New Vehicles",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.CPI.UsedCars",
+     "series_id": "CUSR0000SETA02",
+     "name": "Used Cars & Trucks",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.CPI.MotorInsurance",
+     "series_id": "CUUR0000SETA05",
+     "name": "Motor Vehicle Insurance",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.CPI.Apparel",
+     "series_id": "CPIAPPSL",
+     "name": "Apparel",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.CPI.Transportation",
+     "series_id": "CUUR0000SAT",
+     "name": "Transportation Services",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.CPI.MedicalCare",
+     "series_id": "CPIMEDSL",
+     "name": "Medical Care",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.CPI.MedicalServices",
+     "series_id": "CUSR0000SAM2",
+     "name": "Medical Services",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.CPI.MedicalCommodities",
+     "series_id": "CUSR0000SAM1",
+     "name": "Medical Commodities",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.CPI.Services",
+     "series_id": "CUSR0000SAS",
+     "name": "Services",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.CPI.RentOfShelter",
+     "series_id": "CUSR0000SAS2RS",
+     "name": "Rent of Shelter",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.CPI.ServicesLessRentOfShelter",
+     "series_id": "CUSR0000SASL2RS",
+     "name": "Services Less Rent of Shelter (supercore proxy)",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "CPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.PCE.Headline",
+     "series_id": "PCEPI",
+     "name": "PCE Headline",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "PCE",
+     "freq": "Monthly",
+     "unit": "Index 2017=100",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.PCE.Headline.YoY",
+     "series_id": "PCEPI",
+     "name": "PCE YoY",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "PCE",
+     "freq": "Monthly",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": "yoy"
+    },
+    {
+     "via_code": "US.Prices.PCE.Core",
+     "series_id": "PCEPILFE",
+     "name": "Core PCE",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "Core PCE",
+     "freq": "Monthly",
+     "unit": "Index 2017=100",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.PCE.Core.YoY",
+     "series_id": "PCEPILFE",
+     "name": "Core PCE YoY",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "Core PCE",
+     "freq": "Monthly",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": "yoy"
+    },
+    {
+     "via_code": "US.Prices.PCE.Goods",
+     "series_id": "DGDSRG3M086SBEA",
+     "name": "PCE Goods Prices",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "PCE",
+     "freq": "Monthly",
+     "unit": "Index 2017=100",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.PCE.Services",
+     "series_id": "DSERRG3M086SBEA",
+     "name": "PCE Services Prices",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "PCE",
+     "freq": "Monthly",
+     "unit": "Index 2017=100",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.PPI.FinalDemand",
+     "series_id": "PPIFID",
+     "name": "PPI Final Demand",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "PPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.PPI.AllCommodities",
+     "series_id": "PPIACO",
+     "name": "PPI All Commodities",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "PPI",
+     "freq": "Monthly",
+     "unit": "Index 1982=100",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.PPI.ExFoodEnergy",
+     "series_id": "PPICOR",
+     "name": "PPI Ex Food & Energy (Core)",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "PPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.PPI.FinalDemand.Goods",
+     "series_id": "WPSFD49207",
+     "name": "PPI Final Demand Goods",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "PPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.PPI.FinalDemand.Services",
+     "series_id": "WPSFD4131",
+     "name": "PPI Final Demand Services",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "PPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.PPI.IntermediateDemand",
+     "series_id": "WPSID61",
+     "name": "PPI Intermediate Demand Processed",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "PPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.PPI.Unprocessed",
+     "series_id": "WPSID62",
+     "name": "PPI Intermediate Demand Unprocessed",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "PPI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.Import",
+     "series_id": "IR",
+     "name": "Import Price Index",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "Trade",
+     "freq": "Monthly",
+     "unit": "Index 2000=100",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Prices.Export",
+     "series_id": "IQ",
+     "name": "Export Price Index",
+     "region": "US",
+     "category": "prices",
+     "sub_theme": "Trade",
+     "freq": "Monthly",
+     "unit": "Index 2000=100",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Labor.UnempRate.U3",
+     "series_id": "UNRATE",
+     "name": "Unemployment Rate U3",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "Unemployment",
+     "freq": "Monthly",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Labor.UnempRate.U6",
+     "series_id": "U6RATE",
+     "name": "U6 Underemployment Rate",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "Unemployment",
+     "freq": "Monthly",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Labor.ParticipationRate",
+     "series_id": "CIVPART",
+     "name": "Labor Force Participation Rate",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "Unemployment",
+     "freq": "Monthly",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Labor.EmpPopRatio",
+     "series_id": "EMRATIO",
+     "name": "Employment-Population Ratio",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "Unemployment",
+     "freq": "Monthly",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Labor.NFP",
+     "series_id": "PAYEMS",
+     "name": "Nonfarm Payrolls",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "Payrolls",
+     "freq": "Monthly",
+     "unit": "Thousands",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Labor.NFP.MoM",
+     "series_id": "PAYEMS",
+     "name": "NFP MoM Change",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "Payrolls",
+     "freq": "Monthly",
+     "unit": "Thousands",
+     "source": "FRED",
+     "transform": "diff"
+    },
+    {
+     "via_code": "US.Labor.PrivatePayrolls",
+     "series_id": "USPRIV",
+     "name": "Private Payrolls",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "Payrolls",
+     "freq": "Monthly",
+     "unit": "Thousands",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Labor.GovtPayrolls",
+     "series_id": "USGOVT",
+     "name": "Government Payrolls",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "Payrolls",
+     "freq": "Monthly",
+     "unit": "Thousands",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Labor.MfgPayrolls",
+     "series_id": "MANEMP",
+     "name": "Manufacturing Payrolls",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "Payrolls",
+     "freq": "Monthly",
+     "unit": "Thousands",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Labor.ConstructionPayrolls",
+     "series_id": "USCONS",
+     "name": "Construction Payrolls",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "Payrolls",
+     "freq": "Monthly",
+     "unit": "Thousands",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Labor.AvgHourlyEarnings",
+     "series_id": "CES0500000003",
+     "name": "Avg Hourly Earnings",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "Wages",
+     "freq": "Monthly",
+     "unit": "Dollars",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Labor.AvgHourlyEarnings.YoY",
+     "series_id": "CES0500000003",
+     "name": "AHE YoY",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "Wages",
+     "freq": "Monthly",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": "yoy"
+    },
+    {
+     "via_code": "US.Labor.AvgWeeklyHours",
+     "series_id": "AWHAETP",
+     "name": "Avg Weekly Hours",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "Wages",
+     "freq": "Monthly",
+     "unit": "Hours",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Labor.ECI",
+     "series_id": "ECIALLCIV",
+     "name": "Employment Cost Index",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "Wages",
+     "freq": "Quarterly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Labor.ECI.Wages",
+     "series_id": "ECIWAG",
+     "name": "ECI Wages",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "Wages",
+     "freq": "Quarterly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Labor.ECI.Benefits",
+     "series_id": "ECIBEN",
+     "name": "ECI Benefits",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "Wages",
+     "freq": "Quarterly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Labor.JOLTS.JobOpenings",
+     "series_id": "JTSJOL",
+     "name": "Job Openings",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "JOLTS",
+     "freq": "Monthly",
+     "unit": "Thousands",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Labor.JOLTS.Hires",
+     "series_id": "JTSHIL",
+     "name": "Hires",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "JOLTS",
+     "freq": "Monthly",
+     "unit": "Thousands",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Labor.JOLTS.Quits",
+     "series_id": "JTSQUL",
+     "name": "Quits",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "JOLTS",
+     "freq": "Monthly",
+     "unit": "Thousands",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Labor.JOLTS.Layoffs",
+     "series_id": "JTSLDL",
+     "name": "Layoffs & Discharges",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "JOLTS",
+     "freq": "Monthly",
+     "unit": "Thousands",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Labor.JOLTS.Separations",
+     "series_id": "JTSTSL",
+     "name": "Total Separations",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "JOLTS",
+     "freq": "Monthly",
+     "unit": "Thousands",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Labor.InitialClaims",
+     "series_id": "ICSA",
+     "name": "Initial Jobless Claims",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "Claims",
+     "freq": "Weekly",
+     "unit": "Number",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Labor.ContinuingClaims",
+     "series_id": "CCSA",
+     "name": "Continuing Claims",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "Claims",
+     "freq": "Weekly",
+     "unit": "Number",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Labor.InsuredUnempRate",
+     "series_id": "IURSA",
+     "name": "Insured Unemployment Rate",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "Claims",
+     "freq": "Weekly",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Labor.Productivity",
+     "series_id": "OPHNFB",
+     "name": "Output Per Hour Nonfarm Business",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "Productivity",
+     "freq": "Quarterly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Labor.UnitLaborCosts",
+     "series_id": "ULCNFB",
+     "name": "Unit Labor Costs Nonfarm",
+     "region": "US",
+     "category": "labor",
+     "sub_theme": "Productivity",
+     "freq": "Quarterly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Business.ISM.Mfg.PMI",
+     "series_id": "NAPM",
+     "name": "ISM Mfg PMI Headline",
+     "region": "US",
+     "category": "business",
+     "sub_theme": "ISM Mfg",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Business.ISM.Mfg.NewOrders",
+     "series_id": "NAPMNOI",
+     "name": "ISM Mfg New Orders",
+     "region": "US",
+     "category": "business",
+     "sub_theme": "ISM Mfg",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Business.ISM.Mfg.Production",
+     "series_id": "NAPMPI",
+     "name": "ISM Mfg Production",
+     "region": "US",
+     "category": "business",
+     "sub_theme": "ISM Mfg",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Business.ISM.Mfg.Employment",
+     "series_id": "NAPMEI",
+     "name": "ISM Mfg Employment",
+     "region": "US",
+     "category": "business",
+     "sub_theme": "ISM Mfg",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Business.ISM.Mfg.Prices",
+     "series_id": "NAPMPRI",
+     "name": "ISM Mfg Prices Paid",
+     "region": "US",
+     "category": "business",
+     "sub_theme": "ISM Mfg",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Business.ISM.Mfg.SupplierDeliveries",
+     "series_id": "NAPMSDI",
+     "name": "ISM Mfg Supplier Deliveries",
+     "region": "US",
+     "category": "business",
+     "sub_theme": "ISM Mfg",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Business.ISM.Mfg.Inventories",
+     "series_id": "NAPMII",
+     "name": "ISM Mfg Inventories",
+     "region": "US",
+     "category": "business",
+     "sub_theme": "ISM Mfg",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Business.ISM.Svc.PMI",
+     "series_id": "NMFCI",
+     "name": "ISM Services PMI",
+     "region": "US",
+     "category": "business",
+     "sub_theme": "ISM Svc",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Business.ISM.Svc.BusinessActivity",
+     "series_id": "NMFBAI",
+     "name": "ISM Svc Business Activity",
+     "region": "US",
+     "category": "business",
+     "sub_theme": "ISM Svc",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Business.ISM.Svc.NewOrders",
+     "series_id": "NMFNOI",
+     "name": "ISM Svc New Orders",
+     "region": "US",
+     "category": "business",
+     "sub_theme": "ISM Svc",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Business.ISM.Svc.Employment",
+     "series_id": "NMFEI",
+     "name": "ISM Svc Employment",
+     "region": "US",
+     "category": "business",
+     "sub_theme": "ISM Svc",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Business.ISM.Svc.Prices",
+     "series_id": "NMFPI",
+     "name": "ISM Svc Prices Paid",
+     "region": "US",
+     "category": "business",
+     "sub_theme": "ISM Svc",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Business.SPG.PMI.Mfg",
+     "series_id": "USMFGPMI",
+     "name": "S&P Global Mfg PMI",
+     "region": "US",
+     "category": "business",
+     "sub_theme": "S&P Global",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Business.RegionalFed.EmpireState",
+     "series_id": "GACDFSA066MSFRBNY",
+     "name": "Empire State Mfg Survey",
+     "region": "US",
+     "category": "business",
+     "sub_theme": "Regional Fed",
+     "freq": "Monthly",
+     "unit": "Diffusion Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Business.RegionalFed.PhillyFed",
+     "series_id": "GACDISA066MSFRBPHI",
+     "name": "Philly Fed Business Survey",
+     "region": "US",
+     "category": "business",
+     "sub_theme": "Regional Fed",
+     "freq": "Monthly",
+     "unit": "Diffusion Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Business.RegionalFed.DallasFed",
+     "series_id": "BACTSAMFRBDAL",
+     "name": "Dallas Fed Mfg Outlook",
+     "region": "US",
+     "category": "business",
+     "sub_theme": "Regional Fed",
+     "freq": "Monthly",
+     "unit": "Diffusion Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Business.ConsumerConfidence",
+     "series_id": "CSCICP03USM665S",
+     "name": "Conference Board Consumer Confidence",
+     "region": "US",
+     "category": "business",
+     "sub_theme": "Sentiment",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Business.UMichSentiment",
+     "series_id": "UMCSENT",
+     "name": "U Mich Consumer Sentiment",
+     "region": "US",
+     "category": "business",
+     "sub_theme": "Sentiment",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Business.UMichExpectations",
+     "series_id": "MICH",
+     "name": "U Mich Inflation Expectations",
+     "region": "US",
+     "category": "business",
+     "sub_theme": "Sentiment",
+     "freq": "Monthly",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Business.NFIB",
+     "series_id": "NFIB",
+     "name": "NFIB Small Business Optimism",
+     "region": "US",
+     "category": "business",
+     "sub_theme": "Sentiment",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Business.LEI",
+     "series_id": "USSLIND",
+     "name": "Conference Board LEI",
+     "region": "US",
+     "category": "business",
+     "sub_theme": "Leading",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Growth.GDP.Real",
+     "series_id": "GDPC1",
+     "name": "Real GDP",
+     "region": "US",
+     "category": "growth",
+     "sub_theme": "GDP",
+     "freq": "Quarterly",
+     "unit": "Billions 2017 USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Growth.GDP.Nominal",
+     "series_id": "GDP",
+     "name": "Nominal GDP",
+     "region": "US",
+     "category": "growth",
+     "sub_theme": "GDP",
+     "freq": "Quarterly",
+     "unit": "Billions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Growth.GDP.QoQ.Annualized",
+     "series_id": "A191RL1Q225SBEA",
+     "name": "Real GDP QoQ Annualized",
+     "region": "US",
+     "category": "growth",
+     "sub_theme": "GDP",
+     "freq": "Quarterly",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Growth.GDP.Deflator",
+     "series_id": "GDPDEF",
+     "name": "GDP Deflator",
+     "region": "US",
+     "category": "growth",
+     "sub_theme": "GDP",
+     "freq": "Quarterly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Growth.GDP.PCE",
+     "series_id": "PCEC96",
+     "name": "PCE Real",
+     "region": "US",
+     "category": "growth",
+     "sub_theme": "GDP Components",
+     "freq": "Quarterly",
+     "unit": "Billions 2017 USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Growth.GDP.GPDI",
+     "series_id": "GPDI",
+     "name": "Gross Private Investment",
+     "region": "US",
+     "category": "growth",
+     "sub_theme": "GDP Components",
+     "freq": "Quarterly",
+     "unit": "Billions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Growth.GDP.GCE",
+     "series_id": "GCE",
+     "name": "Govt Consumption & Investment",
+     "region": "US",
+     "category": "growth",
+     "sub_theme": "GDP Components",
+     "freq": "Quarterly",
+     "unit": "Billions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Growth.GDP.NetExports",
+     "series_id": "NETEXP",
+     "name": "Net Exports",
+     "region": "US",
+     "category": "growth",
+     "sub_theme": "GDP Components",
+     "freq": "Quarterly",
+     "unit": "Billions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Growth.GDPNow",
+     "series_id": "GDPNOW",
+     "name": "Atlanta Fed GDPNow",
+     "region": "US",
+     "category": "growth",
+     "sub_theme": "Nowcast",
+     "freq": "Weekly",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Growth.IndProd.Total",
+     "series_id": "INDPRO",
+     "name": "Industrial Production Total",
+     "region": "US",
+     "category": "growth",
+     "sub_theme": "Industrial",
+     "freq": "Monthly",
+     "unit": "Index 2017=100",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Growth.IndProd.Mfg",
+     "series_id": "IPMAN",
+     "name": "Industrial Production Mfg",
+     "region": "US",
+     "category": "growth",
+     "sub_theme": "Industrial",
+     "freq": "Monthly",
+     "unit": "Index 2017=100",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Growth.CapUtil",
+     "series_id": "TCU",
+     "name": "Capacity Utilization",
+     "region": "US",
+     "category": "growth",
+     "sub_theme": "Industrial",
+     "freq": "Monthly",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Growth.DurableGoods.Total",
+     "series_id": "DGORDER",
+     "name": "Durable Goods Total Orders",
+     "region": "US",
+     "category": "growth",
+     "sub_theme": "DurableGoods",
+     "freq": "Monthly",
+     "unit": "Millions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Growth.DurableGoods.Core",
+     "series_id": "NEWORDER",
+     "name": "Core Cap Goods Orders ex Defense ex Aircraft",
+     "region": "US",
+     "category": "growth",
+     "sub_theme": "DurableGoods",
+     "freq": "Monthly",
+     "unit": "Millions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Consumer.RetailSales",
+     "series_id": "RSAFS",
+     "name": "Retail Sales Total",
+     "region": "US",
+     "category": "consumer",
+     "sub_theme": "Retail",
+     "freq": "Monthly",
+     "unit": "Millions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Consumer.RetailSales.ExAuto",
+     "series_id": "RSFSXMV",
+     "name": "Retail Sales Ex Auto",
+     "region": "US",
+     "category": "consumer",
+     "sub_theme": "Retail",
+     "freq": "Monthly",
+     "unit": "Millions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Consumer.RetailSales.Control",
+     "series_id": "RSSTHD",
+     "name": "Retail Sales Control Group",
+     "region": "US",
+     "category": "consumer",
+     "sub_theme": "Retail",
+     "freq": "Monthly",
+     "unit": "Millions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Consumer.PersonalIncome",
+     "series_id": "PI",
+     "name": "Personal Income",
+     "region": "US",
+     "category": "consumer",
+     "sub_theme": "Income",
+     "freq": "Monthly",
+     "unit": "Billions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Consumer.PersonalSpending",
+     "series_id": "PCE",
+     "name": "Personal Consumption Expenditure",
+     "region": "US",
+     "category": "consumer",
+     "sub_theme": "Spending",
+     "freq": "Monthly",
+     "unit": "Billions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Consumer.DPI",
+     "series_id": "DSPI",
+     "name": "Disposable Personal Income",
+     "region": "US",
+     "category": "consumer",
+     "sub_theme": "Income",
+     "freq": "Monthly",
+     "unit": "Billions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Consumer.SavingsRate",
+     "series_id": "PSAVERT",
+     "name": "Personal Savings Rate",
+     "region": "US",
+     "category": "consumer",
+     "sub_theme": "Savings",
+     "freq": "Monthly",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Consumer.Credit.CardDelinquency",
+     "series_id": "DRCCLACBS",
+     "name": "Credit Card Delinquency Rate",
+     "region": "US",
+     "category": "consumer",
+     "sub_theme": "Credit",
+     "freq": "Quarterly",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Housing.Starts.Total",
+     "series_id": "HOUST",
+     "name": "Housing Starts Total",
+     "region": "US",
+     "category": "housing",
+     "sub_theme": "Construction",
+     "freq": "Monthly",
+     "unit": "Thousands SAAR",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Housing.Starts.SingleFamily",
+     "series_id": "HOUST1F",
+     "name": "Housing Starts Single Family",
+     "region": "US",
+     "category": "housing",
+     "sub_theme": "Construction",
+     "freq": "Monthly",
+     "unit": "Thousands SAAR",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Housing.Starts.MultiFamily",
+     "series_id": "HOUST5F",
+     "name": "Housing Starts 5+ Multi-Family",
+     "region": "US",
+     "category": "housing",
+     "sub_theme": "Construction",
+     "freq": "Monthly",
+     "unit": "Thousands SAAR",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Housing.BuildingPermits.Total",
+     "series_id": "PERMIT",
+     "name": "Building Permits Total",
+     "region": "US",
+     "category": "housing",
+     "sub_theme": "Construction",
+     "freq": "Monthly",
+     "unit": "Thousands SAAR",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Housing.BuildingPermits.SingleFamily",
+     "series_id": "PERMIT1",
+     "name": "Building Permits Single Family",
+     "region": "US",
+     "category": "housing",
+     "sub_theme": "Construction",
+     "freq": "Monthly",
+     "unit": "Thousands SAAR",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Housing.NewHomeSales",
+     "series_id": "HSN1F",
+     "name": "New Home Sales",
+     "region": "US",
+     "category": "housing",
+     "sub_theme": "Sales",
+     "freq": "Monthly",
+     "unit": "Thousands SAAR",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Housing.ExistingHomeSales",
+     "series_id": "EXHOSLUSM495S",
+     "name": "Existing Home Sales",
+     "region": "US",
+     "category": "housing",
+     "sub_theme": "Sales",
+     "freq": "Monthly",
+     "unit": "Millions SAAR",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Housing.PendingHomeSales",
+     "series_id": "HSN1FNSA",
+     "name": "Pending Home Sales Index",
+     "region": "US",
+     "category": "housing",
+     "sub_theme": "Sales",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Housing.Prices.CaseShiller20",
+     "series_id": "SPCS20RSA",
+     "name": "Case-Shiller 20-City",
+     "region": "US",
+     "category": "housing",
+     "sub_theme": "Prices",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Housing.Prices.CaseShiller10",
+     "series_id": "SPCS10RSA",
+     "name": "Case-Shiller 10-City",
+     "region": "US",
+     "category": "housing",
+     "sub_theme": "Prices",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Housing.Prices.FHFA",
+     "series_id": "USSTHPI",
+     "name": "FHFA House Price Index",
+     "region": "US",
+     "category": "housing",
+     "sub_theme": "Prices",
+     "freq": "Quarterly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Housing.NAHB.Index",
+     "series_id": "NAHBMMI",
+     "name": "NAHB Housing Market Index",
+     "region": "US",
+     "category": "housing",
+     "sub_theme": "Sentiment",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Housing.Mortgage.30Y",
+     "series_id": "MORTGAGE30US",
+     "name": "30-Year Fixed Mortgage Rate",
+     "region": "US",
+     "category": "housing",
+     "sub_theme": "Mortgage",
+     "freq": "Weekly",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Housing.Mortgage.15Y",
+     "series_id": "MORTGAGE15US",
+     "name": "15-Year Fixed Mortgage Rate",
+     "region": "US",
+     "category": "housing",
+     "sub_theme": "Mortgage",
+     "freq": "Weekly",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fiscal.MTS.GrossReceipts",
+     "series_id": "v1/accounting/mts/mts_table_1",
+     "name": "MTS Current Month Gross Receipts",
+     "region": "US",
+     "category": "fiscal",
+     "sub_theme": "MTS",
+     "freq": "Monthly",
+     "unit": "Millions USD",
+     "source": "Treasury_FD",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fiscal.MTS.GrossOutlays",
+     "series_id": "v1/accounting/mts/mts_table_1",
+     "name": "MTS Current Month Gross Outlays",
+     "region": "US",
+     "category": "fiscal",
+     "sub_theme": "MTS",
+     "freq": "Monthly",
+     "unit": "Millions USD",
+     "source": "Treasury_FD",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fiscal.MTS.DeficitSurplus",
+     "series_id": "v1/accounting/mts/mts_table_1",
+     "name": "MTS Current Month Deficit/Surplus",
+     "region": "US",
+     "category": "fiscal",
+     "sub_theme": "MTS",
+     "freq": "Monthly",
+     "unit": "Millions USD",
+     "source": "Treasury_FD",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fiscal.MTS.YTD.Receipts",
+     "series_id": "v1/accounting/mts/mts_table_1",
+     "name": "MTS YTD Receipts",
+     "region": "US",
+     "category": "fiscal",
+     "sub_theme": "MTS",
+     "freq": "Monthly",
+     "unit": "Millions USD",
+     "source": "Treasury_FD",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fiscal.MTS.YTD.Outlays",
+     "series_id": "v1/accounting/mts/mts_table_1",
+     "name": "MTS YTD Outlays",
+     "region": "US",
+     "category": "fiscal",
+     "sub_theme": "MTS",
+     "freq": "Monthly",
+     "unit": "Millions USD",
+     "source": "Treasury_FD",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fiscal.MTS.YTD.DeficitSurplus",
+     "series_id": "v1/accounting/mts/mts_table_1",
+     "name": "MTS YTD Deficit/Surplus",
+     "region": "US",
+     "category": "fiscal",
+     "sub_theme": "MTS",
+     "freq": "Monthly",
+     "unit": "Millions USD",
+     "source": "Treasury_FD",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fiscal.MTS.ReceiptsBySource",
+     "series_id": "v1/accounting/mts/mts_table_4",
+     "name": "Receipts by Source (Indiv/Corp/Excise/Customs/etc)",
+     "region": "US",
+     "category": "fiscal",
+     "sub_theme": "MTS",
+     "freq": "Monthly",
+     "unit": "Millions USD",
+     "source": "Treasury_FD",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fiscal.MTS.OutlaysByFunction",
+     "series_id": "v1/accounting/mts/mts_table_5",
+     "name": "Outlays by Function (Defense/SocSec/Medicare/etc)",
+     "region": "US",
+     "category": "fiscal",
+     "sub_theme": "MTS",
+     "freq": "Monthly",
+     "unit": "Millions USD",
+     "source": "Treasury_FD",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fiscal.DTS.TotalReceipts",
+     "series_id": "v1/accounting/dts/deposits_withdrawals_operating_cash",
+     "name": "DTS Daily Total Deposits (Receipts)",
+     "region": "US",
+     "category": "fiscal",
+     "sub_theme": "DTS",
+     "freq": "Daily",
+     "unit": "Millions USD",
+     "source": "Treasury_FD",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fiscal.DTS.TotalOutlays",
+     "series_id": "v1/accounting/dts/deposits_withdrawals_operating_cash",
+     "name": "DTS Daily Total Withdrawals (Outlays)",
+     "region": "US",
+     "category": "fiscal",
+     "sub_theme": "DTS",
+     "freq": "Daily",
+     "unit": "Millions USD",
+     "source": "Treasury_FD",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fiscal.DTS.OperatingCashBalance",
+     "series_id": "v1/accounting/dts/operating_cash_balance",
+     "name": "DTS Operating Cash Balance (TGA)",
+     "region": "US",
+     "category": "fiscal",
+     "sub_theme": "DTS",
+     "freq": "Daily",
+     "unit": "Millions USD",
+     "source": "Treasury_FD",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fiscal.DTS.PublicDebtIssues",
+     "series_id": "v1/accounting/dts/public_debt_transactions",
+     "name": "DTS Public Debt Cash Issues",
+     "region": "US",
+     "category": "fiscal",
+     "sub_theme": "DTS",
+     "freq": "Daily",
+     "unit": "Millions USD",
+     "source": "Treasury_FD",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fiscal.DTS.PublicDebtRedemptions",
+     "series_id": "v1/accounting/dts/public_debt_transactions",
+     "name": "DTS Public Debt Cash Redemptions",
+     "region": "US",
+     "category": "fiscal",
+     "sub_theme": "DTS",
+     "freq": "Daily",
+     "unit": "Millions USD",
+     "source": "Treasury_FD",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fiscal.DTS.NetFlow",
+     "series_id": "_derived",
+     "name": "DTS Net Flow (Receipts - Outlays)",
+     "region": "US",
+     "category": "fiscal",
+     "sub_theme": "DTS",
+     "freq": "Daily",
+     "unit": "Millions USD",
+     "source": "Treasury_FD",
+     "transform": "subtract:US.Fiscal.DTS.TotalReceipts,US.Fiscal.DTS.TotalOutlays"
+    },
+    {
+     "via_code": "US.Fiscal.Debt.TotalPublic",
+     "series_id": "GFDEBTN",
+     "name": "Total Public Debt Outstanding",
+     "region": "US",
+     "category": "fiscal",
+     "sub_theme": "Debt",
+     "freq": "Quarterly",
+     "unit": "Millions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fiscal.Debt.HeldByPublic",
+     "series_id": "FYGFDPUN",
+     "name": "Federal Debt Held by Public",
+     "region": "US",
+     "category": "fiscal",
+     "sub_theme": "Debt",
+     "freq": "Annual",
+     "unit": "Millions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fiscal.Debt.ToGDP",
+     "series_id": "GFDEGDQ188S",
+     "name": "Federal Debt to GDP",
+     "region": "US",
+     "category": "fiscal",
+     "sub_theme": "Debt",
+     "freq": "Quarterly",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fiscal.Debt.NetInterest",
+     "series_id": "FYOINT",
+     "name": "Federal Net Interest Outlays",
+     "region": "US",
+     "category": "fiscal",
+     "sub_theme": "Debt",
+     "freq": "Annual",
+     "unit": "Millions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fed.Rates.FedFundsEffective",
+     "series_id": "DFF",
+     "name": "Effective Fed Funds Rate",
+     "region": "US",
+     "category": "fed",
+     "sub_theme": "Rates",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fed.Rates.FedFundsTarget.Upper",
+     "series_id": "DFEDTARU",
+     "name": "Fed Funds Target Upper Bound",
+     "region": "US",
+     "category": "fed",
+     "sub_theme": "Rates",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fed.Rates.FedFundsTarget.Lower",
+     "series_id": "DFEDTARL",
+     "name": "Fed Funds Target Lower Bound",
+     "region": "US",
+     "category": "fed",
+     "sub_theme": "Rates",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fed.Rates.IORB",
+     "series_id": "IORB",
+     "name": "Interest on Reserve Balances",
+     "region": "US",
+     "category": "fed",
+     "sub_theme": "Rates",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fed.Rates.DiscountRate",
+     "series_id": "INTDSRUSM193N",
+     "name": "Discount Rate (Primary Credit)",
+     "region": "US",
+     "category": "fed",
+     "sub_theme": "Rates",
+     "freq": "Monthly",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fed.Rates.SOFR",
+     "series_id": "SOFR",
+     "name": "Secured Overnight Financing Rate",
+     "region": "US",
+     "category": "fed",
+     "sub_theme": "Rates",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fed.Rates.EFFR",
+     "series_id": "EFFR",
+     "name": "Effective Federal Funds Rate (daily)",
+     "region": "US",
+     "category": "fed",
+     "sub_theme": "Rates",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fed.BalanceSheet.Total",
+     "series_id": "WALCL",
+     "name": "Fed Total Assets (WALCL)",
+     "region": "US",
+     "category": "fed",
+     "sub_theme": "BalanceSheet",
+     "freq": "Weekly",
+     "unit": "Millions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fed.BalanceSheet.Treasuries",
+     "series_id": "TREAST",
+     "name": "Fed Holdings of US Treasuries",
+     "region": "US",
+     "category": "fed",
+     "sub_theme": "BalanceSheet",
+     "freq": "Weekly",
+     "unit": "Millions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fed.BalanceSheet.MBS",
+     "series_id": "WSHOMCB",
+     "name": "Fed Holdings of MBS",
+     "region": "US",
+     "category": "fed",
+     "sub_theme": "BalanceSheet",
+     "freq": "Weekly",
+     "unit": "Millions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fed.BalanceSheet.ReverseRepo",
+     "series_id": "RRPONTSYD",
+     "name": "Overnight Reverse Repo (RRP)",
+     "region": "US",
+     "category": "fed",
+     "sub_theme": "BalanceSheet",
+     "freq": "Daily",
+     "unit": "Billions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fed.BalanceSheet.TGA",
+     "series_id": "WTREGEN",
+     "name": "Treasury General Account (TGA)",
+     "region": "US",
+     "category": "fed",
+     "sub_theme": "BalanceSheet",
+     "freq": "Weekly",
+     "unit": "Millions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fed.BalanceSheet.BankReserves",
+     "series_id": "WRESBAL",
+     "name": "Total Bank Reserves",
+     "region": "US",
+     "category": "fed",
+     "sub_theme": "BalanceSheet",
+     "freq": "Weekly",
+     "unit": "Billions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fed.MoneySupply.M1",
+     "series_id": "M1SL",
+     "name": "M1 Money Supply",
+     "region": "US",
+     "category": "fed",
+     "sub_theme": "MoneySupply",
+     "freq": "Monthly",
+     "unit": "Billions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fed.MoneySupply.M2",
+     "series_id": "M2SL",
+     "name": "M2 Money Supply",
+     "region": "US",
+     "category": "fed",
+     "sub_theme": "MoneySupply",
+     "freq": "Monthly",
+     "unit": "Billions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fed.MoneySupply.M2.YoY",
+     "series_id": "M2SL",
+     "name": "M2 YoY",
+     "region": "US",
+     "category": "fed",
+     "sub_theme": "MoneySupply",
+     "freq": "Monthly",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": "yoy"
+    },
+    {
+     "via_code": "US.Fed.ForwardGuidance.FOMC.Statements",
+     "series_id": "US.Fed.ForwardGuidance.FOMC.Statements",
+     "name": "FOMC Statement Text",
+     "region": "US",
+     "category": "fed",
+     "sub_theme": "ForwardGuidance",
+     "freq": "PerMeeting",
+     "unit": "text",
+     "source": "Fed",
+     "transform": null
+    },
+    {
+     "via_code": "US.Fed.ForwardGuidance.DotPlot",
+     "series_id": "US.Fed.ForwardGuidance.DotPlot",
+     "name": "FOMC Dot Plot Projections",
+     "region": "US",
+     "category": "fed",
+     "sub_theme": "ForwardGuidance",
+     "freq": "Quarterly",
+     "unit": "Percent",
+     "source": "Fed",
+     "transform": null
+    },
+    {
+     "via_code": "US.Rates.Treasury.1M",
+     "series_id": "DGS1MO",
+     "name": "1-Month Treasury",
+     "region": "US",
+     "category": "rates",
+     "sub_theme": "Treasury",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Rates.Treasury.3M",
+     "series_id": "DTB3",
+     "name": "3-Month T-Bill",
+     "region": "US",
+     "category": "rates",
+     "sub_theme": "Treasury",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Rates.Treasury.6M",
+     "series_id": "DTB6",
+     "name": "6-Month T-Bill",
+     "region": "US",
+     "category": "rates",
+     "sub_theme": "Treasury",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Rates.Treasury.1Y",
+     "series_id": "DGS1",
+     "name": "1-Year Treasury",
+     "region": "US",
+     "category": "rates",
+     "sub_theme": "Treasury",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Rates.Treasury.2Y",
+     "series_id": "DGS2",
+     "name": "2-Year Treasury",
+     "region": "US",
+     "category": "rates",
+     "sub_theme": "Treasury",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Rates.Treasury.3Y",
+     "series_id": "DGS3",
+     "name": "3-Year Treasury",
+     "region": "US",
+     "category": "rates",
+     "sub_theme": "Treasury",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Rates.Treasury.5Y",
+     "series_id": "DGS5",
+     "name": "5-Year Treasury",
+     "region": "US",
+     "category": "rates",
+     "sub_theme": "Treasury",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Rates.Treasury.7Y",
+     "series_id": "DGS7",
+     "name": "7-Year Treasury",
+     "region": "US",
+     "category": "rates",
+     "sub_theme": "Treasury",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Rates.Treasury.10Y",
+     "series_id": "DGS10",
+     "name": "10-Year Treasury",
+     "region": "US",
+     "category": "rates",
+     "sub_theme": "Treasury",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Rates.Treasury.20Y",
+     "series_id": "DGS20",
+     "name": "20-Year Treasury",
+     "region": "US",
+     "category": "rates",
+     "sub_theme": "Treasury",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Rates.Treasury.30Y",
+     "series_id": "DGS30",
+     "name": "30-Year Treasury",
+     "region": "US",
+     "category": "rates",
+     "sub_theme": "Treasury",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Rates.TIPS.5Y",
+     "series_id": "DFII5",
+     "name": "5Y TIPS Real Yield",
+     "region": "US",
+     "category": "rates",
+     "sub_theme": "TIPS",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Rates.TIPS.10Y",
+     "series_id": "DFII10",
+     "name": "10Y TIPS Real Yield",
+     "region": "US",
+     "category": "rates",
+     "sub_theme": "TIPS",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Rates.TIPS.20Y",
+     "series_id": "DFII20",
+     "name": "20Y TIPS Real Yield",
+     "region": "US",
+     "category": "rates",
+     "sub_theme": "TIPS",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Rates.TIPS.30Y",
+     "series_id": "DFII30",
+     "name": "30Y TIPS Real Yield",
+     "region": "US",
+     "category": "rates",
+     "sub_theme": "TIPS",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Rates.Spread.2s10s",
+     "series_id": "T10Y2Y",
+     "name": "10Y-2Y Spread",
+     "region": "US",
+     "category": "rates",
+     "sub_theme": "Spread",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Rates.Spread.3m10y",
+     "series_id": "T10Y3M",
+     "name": "10Y-3M Spread (NY Fed Recession Model)",
+     "region": "US",
+     "category": "rates",
+     "sub_theme": "Spread",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Rates.BreakEven.5Y",
+     "series_id": "T5YIE",
+     "name": "5Y Breakeven Inflation",
+     "region": "US",
+     "category": "rates",
+     "sub_theme": "Breakeven",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Rates.BreakEven.10Y",
+     "series_id": "T10YIE",
+     "name": "10Y Breakeven Inflation",
+     "region": "US",
+     "category": "rates",
+     "sub_theme": "Breakeven",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Rates.BreakEven.5Y5Y",
+     "series_id": "T5YIFR",
+     "name": "5Y5Y Forward Inflation",
+     "region": "US",
+     "category": "rates",
+     "sub_theme": "Breakeven",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Rates.Credit.HY_OAS",
+     "series_id": "BAMLH0A0HYM2",
+     "name": "ICE BofA HY OAS Spread",
+     "region": "US",
+     "category": "rates",
+     "sub_theme": "Credit",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Rates.Credit.IG_OAS",
+     "series_id": "BAMLC0A0CM",
+     "name": "ICE BofA IG OAS Spread",
+     "region": "US",
+     "category": "rates",
+     "sub_theme": "Credit",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Rates.Credit.CCC_OAS",
+     "series_id": "BAMLH0A3HYC",
+     "name": "ICE BofA CCC OAS Spread",
+     "region": "US",
+     "category": "rates",
+     "sub_theme": "Credit",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Trade.Goods.Balance",
+     "series_id": "BOPGSTB",
+     "name": "Trade Balance Goods",
+     "region": "US",
+     "category": "trade",
+     "sub_theme": "Goods",
+     "freq": "Monthly",
+     "unit": "Millions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Trade.Goods.Exports",
+     "series_id": "BOPGEXP",
+     "name": "Goods Exports",
+     "region": "US",
+     "category": "trade",
+     "sub_theme": "Goods",
+     "freq": "Monthly",
+     "unit": "Millions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Trade.Goods.Imports",
+     "series_id": "BOPGIMP",
+     "name": "Goods Imports",
+     "region": "US",
+     "category": "trade",
+     "sub_theme": "Goods",
+     "freq": "Monthly",
+     "unit": "Millions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Trade.Services.Balance",
+     "series_id": "IEABCS",
+     "name": "Trade Balance Services",
+     "region": "US",
+     "category": "trade",
+     "sub_theme": "Services",
+     "freq": "Monthly",
+     "unit": "Millions USD",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Trade.DXY.Broad",
+     "series_id": "DTWEXBGS",
+     "name": "USD Broad Trade-Weighted Index",
+     "region": "US",
+     "category": "trade",
+     "sub_theme": "FX",
+     "freq": "Daily",
+     "unit": "Index Jan 2006=100",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.FinCond.NFCI",
+     "series_id": "NFCI",
+     "name": "Chicago Fed NFCI",
+     "region": "US",
+     "category": "fincond",
+     "sub_theme": "FCI",
+     "freq": "Weekly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.FinCond.ANFCI",
+     "series_id": "ANFCI",
+     "name": "Adjusted NFCI",
+     "region": "US",
+     "category": "fincond",
+     "sub_theme": "FCI",
+     "freq": "Weekly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.FinCond.SLO.C&I",
+     "series_id": "DRTSCIS",
+     "name": "Senior Loan Officer C&I Tightening",
+     "region": "US",
+     "category": "fincond",
+     "sub_theme": "SLOOS",
+     "freq": "Quarterly",
+     "unit": "Net Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.FinCond.SLO.CommercialRE",
+     "series_id": "DRTSCILM",
+     "name": "Senior Loan Officer CRE Tightening",
+     "region": "US",
+     "category": "fincond",
+     "sub_theme": "SLOOS",
+     "freq": "Quarterly",
+     "unit": "Net Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "US.Sentiment.AAII.Bullish",
+     "series_id": "https://www.aaii.com/files/surveys/sentiment.xls",
+     "name": "AAII Bullish %",
+     "region": "US",
+     "category": "sentiment",
+     "sub_theme": "AAII",
+     "freq": "Weekly",
+     "unit": "Percent",
+     "source": "AAII",
+     "transform": null
+    },
+    {
+     "via_code": "US.Sentiment.AAII.Bearish",
+     "series_id": "https://www.aaii.com/files/surveys/sentiment.xls",
+     "name": "AAII Bearish %",
+     "region": "US",
+     "category": "sentiment",
+     "sub_theme": "AAII",
+     "freq": "Weekly",
+     "unit": "Percent",
+     "source": "AAII",
+     "transform": null
+    },
+    {
+     "via_code": "US.Sentiment.AAII.Neutral",
+     "series_id": "https://www.aaii.com/files/surveys/sentiment.xls",
+     "name": "AAII Neutral %",
+     "region": "US",
+     "category": "sentiment",
+     "sub_theme": "AAII",
+     "freq": "Weekly",
+     "unit": "Percent",
+     "source": "AAII",
+     "transform": null
+    },
+    {
+     "via_code": "US.Sentiment.AAII.BullBearSpread",
+     "series_id": "_derived",
+     "name": "AAII Bull-Bear Spread",
+     "region": "US",
+     "category": "sentiment",
+     "sub_theme": "AAII",
+     "freq": "Weekly",
+     "unit": "Percent",
+     "source": "AAII",
+     "transform": "subtract:US.Sentiment.AAII.Bullish,US.Sentiment.AAII.Bearish"
+    },
+    {
+     "via_code": "US.Sentiment.CNN.FearGreed",
+     "series_id": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
+     "name": "CNN Fear & Greed Composite",
+     "region": "US",
+     "category": "sentiment",
+     "sub_theme": "CNN F&G",
+     "freq": "Daily",
+     "unit": "Index 0-100",
+     "source": "CNN",
+     "transform": null
+    },
+    {
+     "via_code": "US.Sentiment.CNN.FG.PutCall",
+     "series_id": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
+     "name": "CNN F&G Put/Call Component",
+     "region": "US",
+     "category": "sentiment",
+     "sub_theme": "CNN F&G",
+     "freq": "Daily",
+     "unit": "Index 0-100",
+     "source": "CNN",
+     "transform": null
+    },
+    {
+     "via_code": "US.Sentiment.CNN.FG.Momentum",
+     "series_id": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
+     "name": "CNN F&G Momentum Component",
+     "region": "US",
+     "category": "sentiment",
+     "sub_theme": "CNN F&G",
+     "freq": "Daily",
+     "unit": "Index 0-100",
+     "source": "CNN",
+     "transform": null
+    },
+    {
+     "via_code": "US.Sentiment.CNN.FG.SafeHaven",
+     "series_id": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
+     "name": "CNN F&G Safe Haven Demand",
+     "region": "US",
+     "category": "sentiment",
+     "sub_theme": "CNN F&G",
+     "freq": "Daily",
+     "unit": "Index 0-100",
+     "source": "CNN",
+     "transform": null
+    },
+    {
+     "via_code": "US.Sentiment.CNN.FG.Breadth",
+     "series_id": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
+     "name": "CNN F&G Breadth Component",
+     "region": "US",
+     "category": "sentiment",
+     "sub_theme": "CNN F&G",
+     "freq": "Daily",
+     "unit": "Index 0-100",
+     "source": "CNN",
+     "transform": null
+    },
+    {
+     "via_code": "US.Sentiment.VIX",
+     "series_id": "^VIX",
+     "name": "CBOE VIX",
+     "region": "US",
+     "category": "sentiment",
+     "sub_theme": "Volatility",
+     "freq": "Daily",
+     "unit": "Index",
+     "source": "YFINANCE",
+     "transform": null
+    },
+    {
+     "via_code": "US.Sentiment.VVIX",
+     "series_id": "^VVIX",
+     "name": "CBOE VVIX (Vol of Vol)",
+     "region": "US",
+     "category": "sentiment",
+     "sub_theme": "Volatility",
+     "freq": "Daily",
+     "unit": "Index",
+     "source": "YFINANCE",
+     "transform": null
+    },
+    {
+     "via_code": "US.Sentiment.MOVE",
+     "series_id": "^MOVE",
+     "name": "ICE BofA MOVE (Bond Vol)",
+     "region": "US",
+     "category": "sentiment",
+     "sub_theme": "Volatility",
+     "freq": "Daily",
+     "unit": "Index",
+     "source": "YFINANCE",
+     "transform": null
+    },
+    {
+     "via_code": "US.Sentiment.SKEW",
+     "series_id": "^SKEW",
+     "name": "CBOE SKEW Tail-Risk",
+     "region": "US",
+     "category": "sentiment",
+     "sub_theme": "Volatility",
+     "freq": "Daily",
+     "unit": "Index",
+     "source": "YFINANCE",
+     "transform": null
+    },
+    {
+     "via_code": "EU.Prices.HICP.Headline",
+     "series_id": "CP0000EZ19M086NEST",
+     "name": "EU HICP All Items",
+     "region": "EU",
+     "category": "prices",
+     "sub_theme": "HICP",
+     "freq": "Monthly",
+     "unit": "Index 2015=100",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "EU.Prices.HICP.Core",
+     "series_id": "CPHPLA01EZM659N",
+     "name": "EU HICP Core YoY",
+     "region": "EU",
+     "category": "prices",
+     "sub_theme": "HICP",
+     "freq": "Monthly",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "EU.ECB.DepositFacilityRate",
+     "series_id": "ECBDFR",
+     "name": "ECB Deposit Facility Rate",
+     "region": "EU",
+     "category": "ecb",
+     "sub_theme": "Rates",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "EU.ECB.MainRefiRate",
+     "series_id": "ECBMRRFR",
+     "name": "ECB Main Refinancing Rate",
+     "region": "EU",
+     "category": "ecb",
+     "sub_theme": "Rates",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "EU.Business.PMI.Mfg",
+     "series_id": "EUGLORPMI",
+     "name": "EU Mfg PMI",
+     "region": "EU",
+     "category": "business",
+     "sub_theme": "EU PMI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "EU.Business.PMI.Svc",
+     "series_id": "EUSVPMI",
+     "name": "EU Svc PMI",
+     "region": "EU",
+     "category": "business",
+     "sub_theme": "EU PMI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "CN.Business.PMI.Mfg.NBS",
+     "series_id": "CHNMFGPMI",
+     "name": "China NBS Mfg PMI",
+     "region": "CN",
+     "category": "business",
+     "sub_theme": "CN PMI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "CN.Business.PMI.NonMfg.NBS",
+     "series_id": "CHNNMFPMI",
+     "name": "China NBS NonMfg PMI",
+     "region": "CN",
+     "category": "business",
+     "sub_theme": "CN PMI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "JP.Business.PMI.Mfg",
+     "series_id": "JPNMFGPMI",
+     "name": "Japan Mfg PMI",
+     "region": "JP",
+     "category": "business",
+     "sub_theme": "JP PMI",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "JP.BOJ.PolicyRate",
+     "series_id": "IRSTCB01JPM156N",
+     "name": "BOJ Policy Rate",
+     "region": "JP",
+     "category": "boj",
+     "sub_theme": "Rates",
+     "freq": "Monthly",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "UK.BOE.BankRate",
+     "series_id": "IUDSOIA",
+     "name": "BOE Bank Rate (SONIA proxy)",
+     "region": "UK",
+     "category": "boe",
+     "sub_theme": "Rates",
+     "freq": "Daily",
+     "unit": "Percent",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "Global.OECD.CLI.G7",
+     "series_id": "G7LOLITONOSTSAM",
+     "name": "OECD CLI G7",
+     "region": "Global",
+     "category": "oecd",
+     "sub_theme": "Leading",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    },
+    {
+     "via_code": "Global.OECD.CLI.G20",
+     "series_id": "G20LOLITONOSTSAM",
+     "name": "OECD CLI G20",
+     "region": "Global",
+     "category": "oecd",
+     "sub_theme": "Leading",
+     "freq": "Monthly",
+     "unit": "Index",
+     "source": "FRED",
+     "transform": null
+    }
+   ],
+   "schema_group": "macro",
+   "pk": [
+    "Date",
+    "Series_Id"
+   ],
+   "freq": "varies",
+   "sources": [
+    "AAII",
+    "CNN",
+    "FRED",
+    "Fed",
+    "Treasury_FD",
+    "YFINANCE"
+   ],
+   "tables": [
+    {
+     "table": "us_macro",
+     "db": "gl",
+     "exists": false,
+     "rows": 0,
+     "max": "",
+     "lag": null,
+     "date_type": ""
+    },
+    {
+     "table": "macro_series_registry",
+     "db": "gl",
+     "exists": false,
+     "rows": 0,
+     "max": "",
+     "lag": null,
+     "date_type": ""
+    },
+    {
+     "table": "cross_macro",
+     "db": "gl",
+     "exists": true,
+     "rows": 103,
+     "max": "2026-07-01",
+     "lag": 65,
+     "date_type": "VARCHAR"
+    },
+    {
+     "table": "tw_rates_cbc",
+     "db": "tw",
+     "exists": true,
+     "rows": 308,
+     "max": "2026-08-01",
+     "lag": 34,
+     "date_type": "VARCHAR"
+    }
+   ],
+   "engines": [
+    {
+     "pat": "VDF_ENG074_FredMacroSSOT_v*.py",
+     "file": "VDF_ENG074_FredMacroSSOT_v0100.py",
+     "ok": true
+    },
+    {
+     "pat": "VDF_ENG055_OmniFetch_v*.py",
+     "file": "VDF_ENG055_OmniFetch_v0108.py",
+     "ok": true
+    }
+   ],
+   "lanes": [
+    {
+     "lane": "http_json(FRED api;鑰)",
+     "ok": true
+    },
+    {
+     "lane": "http_json(Eurostat)",
+     "ok": true
+    },
+    {
+     "lane": "curl_json(CBC)",
+     "ok": true
+    }
+   ],
+   "headers": [
+    "macro"
+   ],
+   "gap": "FRED 190 series=ENG074 從新往舊(候鑰);Treasury_FD 14/Fed scrape 2/ISM 12=PLANNED 候源"
+  },
+  {
+   "id": "sentiment",
+   "zh": "市場情緒指標",
+   "state": "PARTIAL",
+   "n_targets": [
+    {
+     "indicator": "VIX",
+     "source": "yfinance",
+     "ticker": "^VIX",
+     "category": "vol"
+    },
+    {
+     "indicator": "MOVE",
+     "source": "yfinance",
+     "ticker": "^MOVE",
+     "category": "vol_bond"
+    },
+    {
+     "indicator": "SKEW",
+     "source": "yfinance",
+     "ticker": "^SKEW",
+     "category": "tail_risk"
+    },
+    {
+     "indicator": "VVIX",
+     "source": "yfinance",
+     "ticker": "^VVIX",
+     "category": "vol_of_vol"
+    },
+    {
+     "indicator": "VIX9D",
+     "source": "yfinance",
+     "ticker": "^VIX9D",
+     "category": "vol_short"
+    },
+    {
+     "indicator": "VIX3M",
+     "source": "yfinance",
+     "ticker": "^VIX3M",
+     "category": "vol_3m"
+    },
+    {
+     "indicator": "STLFSI4",
+     "source": "fred",
+     "series_id": "STLFSI4",
+     "category": "stress"
+    },
+    {
+     "indicator": "NFCI",
+     "source": "fred",
+     "series_id": "NFCI",
+     "category": "stress"
+    }
+   ],
+   "schema_group": "sentiment",
+   "pk": [
+    "Date",
+    "Indicator"
+   ],
+   "freq": "daily",
+   "sources": [
+    "YFINANCE",
+    "FRED"
+   ],
+   "tables": [
+    {
+     "table": "sentiment_daily",
+     "db": "gl",
+     "exists": true,
+     "rows": 259,
+     "max": "2026-09-04",
+     "lag": 0,
+     "date_type": "VARCHAR"
+    },
+    {
+     "table": "factset_earnings",
+     "db": "gl",
+     "exists": true,
+     "rows": 3,
+     "max": "2026-08-31",
+     "lag": 4,
+     "date_type": "VARCHAR"
+    }
+   ],
+   "engines": [
+    {
+     "pat": "VDF_ENG055_OmniFetch_v*.py",
+     "file": "VDF_ENG055_OmniFetch_v0108.py",
+     "ok": true
+    }
+   ],
+   "lanes": [
+    {
+     "lane": "http_json(CNN F&G)",
+     "ok": true
+    },
+    {
+     "lane": "http_text(FactSet)",
+     "ok": true
+    }
+   ],
+   "headers": [
+    "sentiment"
+   ],
+   "gap": "AAII 4 序列=訂閱牆 PENDING_AUTH;CNN 5 序列 L11 已抓 score"
+  },
+  {
+   "id": "shipping",
+   "zh": "航運指數",
+   "state": "PLANNED",
+   "n_targets": [
+    {
+     "indicator": "BDI",
+     "function": "drewry_wci_index",
+     "category": "shipping"
+    },
+    {
+     "indicator": "SCFI",
+     "function": "drewry_wci_index",
+     "category": "shipping"
+    },
+    {
+     "indicator": "CCFI",
+     "function": "drewry_wci_index",
+     "category": "shipping"
+    }
+   ],
+   "schema_group": "macro",
+   "pk": [
+    "Date",
+    "Series_Id"
+   ],
+   "freq": "weekly_daily",
+   "sources": [
+    "AKSHARE"
+   ],
+   "tables": [],
+   "engines": [],
+   "lanes": [
+    {
+     "lane": "http_json(候源)",
+     "ok": true
+    }
+   ],
+   "headers": [
+    "macro"
+   ],
+   "gap": "BDI/SCFI/CCFI 3 序列=PLANNED(候源:Baltic 付費/上海航交所 WAF)"
+  }
+ ],
+ "tally": {
+  "POPULATED": 1,
+  "PARTIAL": 9,
+  "SCHEMA-ONLY": 0,
+  "PLANNED": 1,
+  "PENDING_KEY": 1,
+  "PENDING_AUTH": 0
+ },
+ "kpi": {
+  "tables": 35,
+  "rows": 4339150,
+  "varchar_date_tables": 24,
+  "ssot_categories": 12,
+  "macro_series": 219,
+  "macro_fred": 190,
+  "parquet_files": 82
+ },
+ "optimize_plan": [
+  {
+   "db": "tw",
+   "table": "etf_book",
+   "action": "TYPED_MIRROR",
+   "rows": 542,
+   "sql": "CREATE TABLE IF NOT EXISTS \"etf_book_typed\" AS SELECT * REPLACE (TRY_CAST(\"as_of\" AS DATE) AS \"as_of\") FROM \"etf_book\" ORDER BY \"as_of\"",
+   "why": "as_of VARCHAR→DATE(zone-map 掃描/區間查詢加速);原表零觸碰"
+  },
+  {
+   "db": "tw",
+   "table": "features_daily",
+   "action": "TYPED_MIRROR",
+   "rows": 545364,
+   "sql": "CREATE TABLE IF NOT EXISTS \"features_daily_typed\" AS SELECT * REPLACE (TRY_CAST(\"date\" AS DATE) AS \"date\") FROM \"features_daily\" ORDER BY \"date\"",
+   "why": "date VARCHAR→DATE(zone-map 掃描/區間查詢加速);原表零觸碰"
+  },
+  {
+   "db": "tw",
+   "table": "features_daily",
+   "action": "CLUSTER_PARQUET",
+   "rows": 545364,
+   "sql": "COPY (SELECT * FROM \"features_daily\" ORDER BY ticker, \"date\") TO '<mega>/arch/features_daily.parquet' (FORMAT PARQUET, COMPRESSION ZSTD)",
+   "why": "大表 zstd 叢集 parquet 鏡(polars/duckdb 零複製掃;跨機共享)"
+  },
+  {
+   "db": "tw",
+   "table": "group_features_daily",
+   "action": "TYPED_MIRROR",
+   "rows": 26318,
+   "sql": "CREATE TABLE IF NOT EXISTS \"group_features_daily_typed\" AS SELECT * REPLACE (TRY_CAST(\"date\" AS DATE) AS \"date\") FROM \"group_features_daily\" ORDER BY \"date\"",
+   "why": "date VARCHAR→DATE(zone-map 掃描/區間查詢加速);原表零觸碰"
+  },
+  {
+   "db": "tw",
+   "table": "prices_canonical",
+   "action": "TYPED_MIRROR",
+   "rows": 545364,
+   "sql": "CREATE TABLE IF NOT EXISTS \"prices_canonical_typed\" AS SELECT * REPLACE (TRY_CAST(\"date\" AS DATE) AS \"date\") FROM \"prices_canonical\" ORDER BY \"date\"",
+   "why": "date VARCHAR→DATE(zone-map 掃描/區間查詢加速);原表零觸碰"
+  },
+  {
+   "db": "tw",
+   "table": "prices_canonical",
+   "action": "CLUSTER_PARQUET",
+   "rows": 545364,
+   "sql": "COPY (SELECT * FROM \"prices_canonical\" ORDER BY ticker, \"date\") TO '<mega>/arch/prices_canonical.parquet' (FORMAT PARQUET, COMPRESSION ZSTD)",
+   "why": "大表 zstd 叢集 parquet 鏡(polars/duckdb 零複製掃;跨機共享)"
+  },
+  {
+   "db": "tw",
+   "table": "tw_chip_derived",
+   "action": "TYPED_MIRROR",
+   "rows": 588310,
+   "sql": "CREATE TABLE IF NOT EXISTS \"tw_chip_derived_typed\" AS SELECT * REPLACE (TRY_CAST(\"date\" AS DATE) AS \"date\") FROM \"tw_chip_derived\" ORDER BY \"date\"",
+   "why": "date VARCHAR→DATE(zone-map 掃描/區間查詢加速);原表零觸碰"
+  },
+  {
+   "db": "tw",
+   "table": "tw_chip_derived",
+   "action": "CLUSTER_PARQUET",
+   "rows": 588310,
+   "sql": "COPY (SELECT * FROM \"tw_chip_derived\" ORDER BY ticker, \"date\") TO '<mega>/arch/tw_chip_derived.parquet' (FORMAT PARQUET, COMPRESSION ZSTD)",
+   "why": "大表 zstd 叢集 parquet 鏡(polars/duckdb 零複製掃;跨機共享)"
+  },
+  {
+   "db": "tw",
+   "table": "tw_chip_inst",
+   "action": "TYPED_MIRROR",
+   "rows": 595059,
+   "sql": "CREATE TABLE IF NOT EXISTS \"tw_chip_inst_typed\" AS SELECT * REPLACE (TRY_CAST(\"date\" AS DATE) AS \"date\") FROM \"tw_chip_inst\" ORDER BY \"date\"",
+   "why": "date VARCHAR→DATE(zone-map 掃描/區間查詢加速);原表零觸碰"
+  },
+  {
+   "db": "tw",
+   "table": "tw_chip_inst",
+   "action": "CLUSTER_PARQUET",
+   "rows": 595059,
+   "sql": "COPY (SELECT * FROM \"tw_chip_inst\" ORDER BY ticker, \"date\") TO '<mega>/arch/tw_chip_inst.parquet' (FORMAT PARQUET, COMPRESSION ZSTD)",
+   "why": "大表 zstd 叢集 parquet 鏡(polars/duckdb 零複製掃;跨機共享)"
+  },
+  {
+   "db": "tw",
+   "table": "tw_chip_margin",
+   "action": "TYPED_MIRROR",
+   "rows": 588310,
+   "sql": "CREATE TABLE IF NOT EXISTS \"tw_chip_margin_typed\" AS SELECT * REPLACE (TRY_CAST(\"date\" AS DATE) AS \"date\") FROM \"tw_chip_margin\" ORDER BY \"date\"",
+   "why": "date VARCHAR→DATE(zone-map 掃描/區間查詢加速);原表零觸碰"
+  },
+  {
+   "db": "tw",
+   "table": "tw_chip_margin",
+   "action": "CLUSTER_PARQUET",
+   "rows": 588310,
+   "sql": "COPY (SELECT * FROM \"tw_chip_margin\" ORDER BY ticker, \"date\") TO '<mega>/arch/tw_chip_margin.parquet' (FORMAT PARQUET, COMPRESSION ZSTD)",
+   "why": "大表 zstd 叢集 parquet 鏡(polars/duckdb 零複製掃;跨機共享)"
+  },
+  {
+   "db": "tw",
+   "table": "tw_daily_prices",
+   "action": "TYPED_MIRROR",
+   "rows": 545364,
+   "sql": "CREATE TABLE IF NOT EXISTS \"tw_daily_prices_typed\" AS SELECT * REPLACE (TRY_CAST(\"date\" AS DATE) AS \"date\") FROM \"tw_daily_prices\" ORDER BY \"date\"",
+   "why": "date VARCHAR→DATE(zone-map 掃描/區間查詢加速);原表零觸碰"
+  },
+  {
+   "db": "tw",
+   "table": "tw_daily_prices",
+   "action": "CLUSTER_PARQUET",
+   "rows": 545364,
+   "sql": "COPY (SELECT * FROM \"tw_daily_prices\" ORDER BY ticker, \"date\") TO '<mega>/arch/tw_daily_prices.parquet' (FORMAT PARQUET, COMPRESSION ZSTD)",
+   "why": "大表 zstd 叢集 parquet 鏡(polars/duckdb 零複製掃;跨機共享)"
+  },
+  {
+   "db": "tw",
+   "table": "tw_daytrade_eligible",
+   "action": "TYPED_MIRROR",
+   "rows": 3694,
+   "sql": "CREATE TABLE IF NOT EXISTS \"tw_daytrade_eligible_typed\" AS SELECT * REPLACE (TRY_CAST(\"date\" AS DATE) AS \"date\") FROM \"tw_daytrade_eligible\" ORDER BY \"date\"",
+   "why": "date VARCHAR→DATE(zone-map 掃描/區間查詢加速);原表零觸碰"
+  },
+  {
+   "db": "tw",
+   "table": "tw_daytrade_market",
+   "action": "TYPED_MIRROR",
+   "rows": 24,
+   "sql": "CREATE TABLE IF NOT EXISTS \"tw_daytrade_market_typed\" AS SELECT * REPLACE (TRY_CAST(\"date\" AS DATE) AS \"date\") FROM \"tw_daytrade_market\" ORDER BY \"date\"",
+   "why": "date VARCHAR→DATE(zone-map 掃描/區間查詢加速);原表零觸碰"
+  },
+  {
+   "db": "tw",
+   "table": "tw_market_agg",
+   "action": "TYPED_MIRROR",
+   "rows": 1,
+   "sql": "CREATE TABLE IF NOT EXISTS \"tw_market_agg_typed\" AS SELECT * REPLACE (TRY_CAST(\"date\" AS DATE) AS \"date\") FROM \"tw_market_agg\" ORDER BY \"date\"",
+   "why": "date VARCHAR→DATE(zone-map 掃描/區間查詢加速);原表零觸碰"
+  },
+  {
+   "db": "tw",
+   "table": "tw_prices_adj",
+   "action": "TYPED_MIRROR",
+   "rows": 545364,
+   "sql": "CREATE TABLE IF NOT EXISTS \"tw_prices_adj_typed\" AS SELECT * REPLACE (TRY_CAST(\"date\" AS DATE) AS \"date\") FROM \"tw_prices_adj\" ORDER BY \"date\"",
+   "why": "date VARCHAR→DATE(zone-map 掃描/區間查詢加速);原表零觸碰"
+  },
+  {
+   "db": "tw",
+   "table": "tw_prices_adj",
+   "action": "CLUSTER_PARQUET",
+   "rows": 545364,
+   "sql": "COPY (SELECT * FROM \"tw_prices_adj\" ORDER BY ticker, \"date\") TO '<mega>/arch/tw_prices_adj.parquet' (FORMAT PARQUET, COMPRESSION ZSTD)",
+   "why": "大表 zstd 叢集 parquet 鏡(polars/duckdb 零複製掃;跨機共享)"
+  },
+  {
+   "db": "tw",
+   "table": "tw_rates_cbc",
+   "action": "TYPED_MIRROR",
+   "rows": 308,
+   "sql": "CREATE TABLE IF NOT EXISTS \"tw_rates_cbc_typed\" AS SELECT * REPLACE (TRY_CAST(\"date\" AS DATE) AS \"date\") FROM \"tw_rates_cbc\" ORDER BY \"date\"",
+   "why": "date VARCHAR→DATE(zone-map 掃描/區間查詢加速);原表零觸碰"
+  },
+  {
+   "db": "tw",
+   "table": "tw_trading_daily",
+   "action": "TYPED_MIRROR",
+   "rows": 5422,
+   "sql": "CREATE TABLE IF NOT EXISTS \"tw_trading_daily_typed\" AS SELECT * REPLACE (TRY_CAST(\"date\" AS DATE) AS \"date\") FROM \"tw_trading_daily\" ORDER BY \"date\"",
+   "why": "date VARCHAR→DATE(zone-map 掃描/區間查詢加速);原表零觸碰"
+  },
+  {
+   "db": "tw",
+   "table": "tw_valuation_daily",
+   "action": "TYPED_MIRROR",
+   "rows": 5904,
+   "sql": "CREATE TABLE IF NOT EXISTS \"tw_valuation_daily_typed\" AS SELECT * REPLACE (TRY_CAST(\"date\" AS DATE) AS \"date\") FROM \"tw_valuation_daily\" ORDER BY \"date\"",
+   "why": "date VARCHAR→DATE(zone-map 掃描/區間查詢加速);原表零觸碰"
+  },
+  {
+   "db": "gl",
+   "table": "cross_macro",
+   "action": "TYPED_MIRROR",
+   "rows": 103,
+   "sql": "CREATE TABLE IF NOT EXISTS \"cross_macro_typed\" AS SELECT * REPLACE (TRY_CAST(\"date\" AS DATE) AS \"date\") FROM \"cross_macro\" ORDER BY \"date\"",
+   "why": "date VARCHAR→DATE(zone-map 掃描/區間查詢加速);原表零觸碰"
+  },
+  {
+   "db": "gl",
+   "table": "etf_stats_daily",
+   "action": "TYPED_MIRROR",
+   "rows": 144,
+   "sql": "CREATE TABLE IF NOT EXISTS \"etf_stats_daily_typed\" AS SELECT * REPLACE (TRY_CAST(\"date\" AS DATE) AS \"date\") FROM \"etf_stats_daily\" ORDER BY \"date\"",
+   "why": "date VARCHAR→DATE(zone-map 掃描/區間查詢加速);原表零觸碰"
+  },
+  {
+   "db": "gl",
+   "table": "factset_earnings",
+   "action": "TYPED_MIRROR",
+   "rows": 3,
+   "sql": "CREATE TABLE IF NOT EXISTS \"factset_earnings_typed\" AS SELECT * REPLACE (TRY_CAST(\"published\" AS DATE) AS \"published\") FROM \"factset_earnings\" ORDER BY \"published\"",
+   "why": "published VARCHAR→DATE(zone-map 掃描/區間查詢加速);原表零觸碰"
+  },
+  {
+   "db": "gl",
+   "table": "features_daily",
+   "action": "TYPED_MIRROR",
+   "rows": 82400,
+   "sql": "CREATE TABLE IF NOT EXISTS \"features_daily_typed\" AS SELECT * REPLACE (TRY_CAST(\"date\" AS DATE) AS \"date\") FROM \"features_daily\" ORDER BY \"date\"",
+   "why": "date VARCHAR→DATE(zone-map 掃描/區間查詢加速);原表零觸碰"
+  },
+  {
+   "db": "gl",
+   "table": "gl_prices_adj",
+   "action": "TYPED_MIRROR",
+   "rows": 82400,
+   "sql": "CREATE TABLE IF NOT EXISTS \"gl_prices_adj_typed\" AS SELECT * REPLACE (TRY_CAST(\"date\" AS DATE) AS \"date\") FROM \"gl_prices_adj\" ORDER BY \"date\"",
+   "why": "date VARCHAR→DATE(zone-map 掃描/區間查詢加速);原表零觸碰"
+  },
+  {
+   "db": "gl",
+   "table": "global_daily",
+   "action": "TYPED_MIRROR",
+   "rows": 82400,
+   "sql": "CREATE TABLE IF NOT EXISTS \"global_daily_typed\" AS SELECT * REPLACE (TRY_CAST(\"date\" AS DATE) AS \"date\") FROM \"global_daily\" ORDER BY \"date\"",
+   "why": "date VARCHAR→DATE(zone-map 掃描/區間查詢加速);原表零觸碰"
+  },
+  {
+   "db": "gl",
+   "table": "index_valuation_proxy",
+   "action": "TYPED_MIRROR",
+   "rows": 104,
+   "sql": "CREATE TABLE IF NOT EXISTS \"index_valuation_proxy_typed\" AS SELECT * REPLACE (TRY_CAST(\"date\" AS DATE) AS \"date\") FROM \"index_valuation_proxy\" ORDER BY \"date\"",
+   "why": "date VARCHAR→DATE(zone-map 掃描/區間查詢加速);原表零觸碰"
+  },
+  {
+   "db": "gl",
+   "table": "prices_canonical",
+   "action": "TYPED_MIRROR",
+   "rows": 82400,
+   "sql": "CREATE TABLE IF NOT EXISTS \"prices_canonical_typed\" AS SELECT * REPLACE (TRY_CAST(\"date\" AS DATE) AS \"date\") FROM \"prices_canonical\" ORDER BY \"date\"",
+   "why": "date VARCHAR→DATE(zone-map 掃描/區間查詢加速);原表零觸碰"
+  },
+  {
+   "db": "gl",
+   "table": "sentiment_daily",
+   "action": "TYPED_MIRROR",
+   "rows": 259,
+   "sql": "CREATE TABLE IF NOT EXISTS \"sentiment_daily_typed\" AS SELECT * REPLACE (TRY_CAST(\"date\" AS DATE) AS \"date\") FROM \"sentiment_daily\" ORDER BY \"date\"",
+   "why": "date VARCHAR→DATE(zone-map 掃描/區間查詢加速);原表零觸碰"
+  }
+ ],
+ "fetch_accel": [
+  {
+   "id": "F01",
+   "name": "SSOT 動態母冊",
+   "mech": "macro_ssot.json 尾版 glob(190 FRED series);缺=內建 16 FALLBACK",
+   "a": "A08",
+   "state": "ACTIVE"
+  },
+  {
+   "id": "F02",
+   "name": "平行工人",
+   "mech": "VIA_ACCEL.accel_map(ThreadPool;預設 4;例外隔離保序)",
+   "a": "A19",
+   "state": "ACTIVE"
+  },
+  {
+   "id": "F03",
+   "name": "令牌桶節流",
+   "mech": "FRED 120 req/min 官方上限→預設 100/min;跨工人共享鎖",
+   "a": "A11",
+   "state": "ACTIVE"
+  },
+  {
+   "id": "F04",
+   "name": "從新往舊視窗",
+   "mech": "observation_end 游標倒序+sort_order=desc;視窗長依頻率",
+   "a": "A15",
+   "state": "ACTIVE"
+  },
+  {
+   "id": "F05",
+   "name": "checkpoint 續跑",
+   "mech": "每視窗落盤即記 oldest 游標;中斷零浪費;DONE 不重抓",
+   "a": "A13",
+   "state": "ACTIVE"
+  },
+  {
+   "id": "F06",
+   "name": "anti-join 冪等",
+   "mech": "DuckDB INSERT … WHERE NOT EXISTS(date,series);重跑不重複",
+   "a": "A03",
+   "state": "ACTIVE"
+  },
+  {
+   "id": "F07",
+   "name": "typed schema",
+   "mech": "date DATE/value DOUBLE/fetched_at TIMESTAMP;既存 VARCHAR 表=顯式 CAST 相容",
+   "a": "A08",
+   "state": "ACTIVE"
+  },
+  {
+   "id": "F08",
+   "name": "parquet 每序列",
+   "mech": "macro/fred/<id>.parquet zstd;讀寫局部化(單序列更新不重寫全量)",
+   "a": "A11",
+   "state": "ACTIVE"
+  },
+  {
+   "id": "F09",
+   "name": "polars 鏡",
+   "mech": "us_macro_all.parquet 以 polars 合併排序;缺=pyarrow 後備(誠實)",
+   "a": "A19",
+   "state": "FALLBACK"
+  },
+  {
+   "id": "F10",
+   "name": "韌性 HTTP",
+   "mech": "SUP_MDL740.http_json→Aegis ResilientHTTPClient(retry/backoff/TLS)",
+   "a": "A18",
+   "state": "ACTIVE"
+  },
+  {
+   "id": "F11",
+   "name": "同意閘先行",
+   "mech": "VIA_NET_CONSENT/VIA_SCRAPE_CONSENT fail-closed",
+   "a": "A05",
+   "state": "ACTIVE"
+  },
+  {
+   "id": "F12",
+   "name": "動態進度條",
+   "mech": "序列級 [■■□] n/N %·已耗·預估;每序列 flush 即時",
+   "a": "A16",
+   "state": "ACTIVE"
+  },
+  {
+   "id": "F13",
+   "name": "非阻塞輸出",
+   "mech": "逐行 flush;可由啟動器/工人分離尾讀(Invoke-VIA-Complete)",
+   "a": "A18",
+   "state": "ACTIVE"
+  },
+  {
+   "id": "F14",
+   "name": "視窗即落盤",
+   "mech": "每視窗 rows→parquet+duckdb;不等全序列",
+   "a": "A14",
+   "state": "ACTIVE"
+  },
+  {
+   "id": "F15",
+   "name": "最新 vintage",
+   "mech": "realtime_start/end 預設今日(最新修訂值)",
+   "a": "A02",
+   "state": "ACTIVE"
+  },
+  {
+   "id": "F16",
+   "name": "缺值過濾",
+   "mech": "FRED '.' 缺值不入庫;value 轉 float 失敗即棄",
+   "a": "A10",
+   "state": "ACTIVE"
+  },
+  {
+   "id": "F17",
+   "name": "增量刷新",
+   "mech": "DONE 序列只抓 max_date−45d 修訂窗(快)",
+   "a": "A15",
+   "state": "ACTIVE"
+  },
+  {
+   "id": "F18",
+   "name": "叢集排序",
+   "mech": "parquet 寫入前 ORDER BY series,date;DuckDB 掃描 zone-map 有效",
+   "a": "A11",
+   "state": "ACTIVE"
+  },
+  {
+   "id": "F19",
+   "name": "誠實三態+序列冊",
+   "mech": "OK/FAIL/SKIP/EMPTY;macro_series_registry 記 min/max/n/state",
+   "a": "A17",
+   "state": "ACTIVE"
+  },
+  {
+   "id": "F20",
+   "name": "資料家接點",
+   "mech": "output_hub=MDL123 Junction→本機資料家;印實體路徑",
+   "a": "A20",
+   "state": "ACTIVE"
+  }
+ ],
+ "bridge": {
+  "files": 128,
+  "accel": 128,
+  "net": 128
+ },
+ "lanes_available": [
+  "akshare_call",
+  "check_url",
+  "cmd_modules",
+  "cnyes_quote",
+  "curl_json",
+  "fetch",
+  "gate_state",
+  "gsheet_csv",
+  "gsheet_csv_url",
+  "http_json",
+  "http_text",
+  "inventory",
+  "load_classifier",
+  "load_compliance",
+  "load_net_register",
+  "main",
+  "probe",
+  "selftest",
+  "yahoo_chart",
+  "yahoo_quote_summary",
+  "yahoo_quote_summary_raw",
+  "yf_download",
+  "yf_history"
+ ],
+ "elapsed_s": 0.55,
+ "rules": [
+  "只增不減:對映冊不合併不取代現役;最佳化=並存 *_typed/parquet 鏡;原表零 DROP",
+  "誠實三態:POPULATED/PARTIAL/SCHEMA-ONLY/PLANNED/PENDING_KEY/PENDING_AUTH 依實表列數與缺口判",
+  "鑰匙紅線:FRED 鑰僅 env 或 output_hub/mega/.fred_api_key(gitignored);SSOT 收容件明文鑰已遮罩",
+  "Zero-Hydra:上船 vdf_api(8765=DeckServer 樞紐 port 撞)不啟用;vdf_supportive_bridge 不重掛(在庫橋已承接)"
+ ]
+}

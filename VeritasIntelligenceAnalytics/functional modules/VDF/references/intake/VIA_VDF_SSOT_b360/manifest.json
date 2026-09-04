@@ -1,0 +1,182 @@
+{
+ "intake_id": "VIA_VDF_SSOT_b360",
+ "ts": "2026-09-04",
+ "batch": 360,
+ "origin": "操作員上傳 VDF v3 SSOT 五件(master/macro/tw_consensus/fetch_matrix csv+json)+14 件 vdf_*.py(2026-05-26 VDF v3 設計)+兩工具;令「優化vdf資料架構 加入上船的加速器跟網路工具」「只增不減 最優最快的資料結構搭配加速器及網路工具」;批361 續令「優化整個vdf擷取引擎 會要我輸入fed 快 準 從新往舊抓 存在 data parquet duckdb polars 20個強化加速器」",
+ "redaction": {
+  "pattern": "FRED API key(32 hex)明文預設值",
+  "mask": "<REDACTED:VDF_FRED_API_KEY>",
+  "files_masked": [
+   {
+    "file": "macro_ssot.json",
+    "hits": 1
+   },
+   {
+    "file": "vdf_core.py",
+    "hits": 1
+   },
+   {
+    "file": "vdf_fetch_matrix.json",
+    "hits": 1
+   },
+   {
+    "file": "vdf_fetchers_macro.py",
+    "hits": 2
+   },
+   {
+    "file": "via_master_ssot.json",
+    "hits": 2
+   }
+  ],
+  "rule": "紅線:任何 API 鑰永不入 git;原件 sha256_original 保留可驗(操作員本機原件);庫內 stored 為遮罩後 sha;執行期鑰匙只讀 env FRED_API_KEY 或 output_hub/mega/.fred_api_key(gitignored)"
+ },
+ "files": {
+  "macro_ssot.json": {
+   "sha256_original": "b592082379868be8d0c2aa8e72076379ec831ff34dbaf154ae79788738e28a6d",
+   "sha256_stored": "0fe180c4a23f09045f6ebc2dba6c12e4c45fccf773bfbab6c6f7a5229d5da68e",
+   "bytes": 69993,
+   "key_hits_masked": 1
+  },
+  "tw_consensus_ssot.json": {
+   "sha256_original": "1c19034cd01c01912a76b54fa62404b40e1f8e7f7c0bfeb4f0ebd1150dc28093",
+   "sha256_stored": "1c19034cd01c01912a76b54fa62404b40e1f8e7f7c0bfeb4f0ebd1150dc28093",
+   "bytes": 12628,
+   "key_hits_masked": 0
+  },
+  "vdf_api.py": {
+   "sha256_original": "6c964669385a585cca5680f67a4ec2d8edd2b9e34ec5887ba9961799832e104b",
+   "sha256_stored": "6c964669385a585cca5680f67a4ec2d8edd2b9e34ec5887ba9961799832e104b",
+   "bytes": 18273,
+   "key_hits_masked": 0
+  },
+  "vdf_bridge.py": {
+   "sha256_original": "1565fd50bf3390420307e90ea63e911312c317fb50869568932f46a56eb9315f",
+   "sha256_stored": "1565fd50bf3390420307e90ea63e911312c317fb50869568932f46a56eb9315f",
+   "bytes": 19499,
+   "key_hits_masked": 0
+  },
+  "vdf_core.py": {
+   "sha256_original": "32833c6a2419528d1e839535e2fb476f11e01d13c3828d9c6ede4eee7979c73d",
+   "sha256_stored": "23bfb953b1e18bac5177cf68b13080cd8b995935fd6bdfafaa6cdef10ba8f42b",
+   "bytes": 28207,
+   "key_hits_masked": 1
+  },
+  "vdf_fetch_matrix.csv": {
+   "sha256_original": "52f2ae7de3f658563d7be5fa832228ea2d0e31e709bfd3b9aa2c70ac1040473a",
+   "sha256_stored": "52f2ae7de3f658563d7be5fa832228ea2d0e31e709bfd3b9aa2c70ac1040473a",
+   "bytes": 26287,
+   "key_hits_masked": 0
+  },
+  "vdf_fetch_matrix.json": {
+   "sha256_original": "54c00e452ff081e329243841ea424a46e0f1e1b341b58e79516bd6dd3ad0516b",
+   "sha256_stored": "57c828c2cd3e69ab3859b9d76593a67bff7bb492ffb140194a72b7659f9aed71",
+   "bytes": 106164,
+   "key_hits_masked": 1
+  },
+  "vdf_fetchers_consensus.py": {
+   "sha256_original": "d4b532163dc33976d56315905029b6f188265b6ed21afc0b6c714440eb1fe2ab",
+   "sha256_stored": "d4b532163dc33976d56315905029b6f188265b6ed21afc0b6c714440eb1fe2ab",
+   "bytes": 12876,
+   "key_hits_masked": 0
+  },
+  "vdf_fetchers_derived.py": {
+   "sha256_original": "463c1b4169b816c48a1a3653912ac475696273f9216c63ee9c4821e31def1417",
+   "sha256_stored": "463c1b4169b816c48a1a3653912ac475696273f9216c63ee9c4821e31def1417",
+   "bytes": 12497,
+   "key_hits_masked": 0
+  },
+  "vdf_fetchers_etf_holdings.py": {
+   "sha256_original": "621de9191625333233525d7b2884e677fd6277d3553bc7657929c42c3139e0eb",
+   "sha256_stored": "621de9191625333233525d7b2884e677fd6277d3553bc7657929c42c3139e0eb",
+   "bytes": 20306,
+   "key_hits_masked": 0
+  },
+  "vdf_fetchers_fed.py": {
+   "sha256_original": "683f9f2277e7a65dde1969ddd44efc408d69c204342e6f1db2ae5f12ff94e8db",
+   "sha256_stored": "683f9f2277e7a65dde1969ddd44efc408d69c204342e6f1db2ae5f12ff94e8db",
+   "bytes": 10453,
+   "key_hits_masked": 0
+  },
+  "vdf_fetchers_financials.py": {
+   "sha256_original": "eef127506ca903303fad04311a61516d32585b3e31b2425696f39eddba12a071",
+   "sha256_stored": "eef127506ca903303fad04311a61516d32585b3e31b2425696f39eddba12a071",
+   "bytes": 12686,
+   "key_hits_masked": 0
+  },
+  "vdf_fetchers_fiscal.py": {
+   "sha256_original": "9f20f8324c0d5573e6653a07b4edace3dbfb58f40b10043653733f07c04c23de",
+   "sha256_stored": "9f20f8324c0d5573e6653a07b4edace3dbfb58f40b10043653733f07c04c23de",
+   "bytes": 11454,
+   "key_hits_masked": 0
+  },
+  "vdf_fetchers_macro.py": {
+   "sha256_original": "7a31dafe0fc8d89780461b637300817d4660a81abed32944d18abf1234cd5f22",
+   "sha256_stored": "1497a485d64476a64f6676d12b800471a570a4d9009016510ee96f9d755d8c81",
+   "bytes": 10901,
+   "key_hits_masked": 2
+  },
+  "vdf_fetchers_market.py": {
+   "sha256_original": "4acc6f34743bd6738d1e7de9f926946d42623fd3259c5fbc174a916bbc157aca",
+   "sha256_stored": "4acc6f34743bd6738d1e7de9f926946d42623fd3259c5fbc174a916bbc157aca",
+   "bytes": 51505,
+   "key_hits_masked": 0
+  },
+  "vdf_fetchers_sentiment.py": {
+   "sha256_original": "11b9a1f534d430fc49703c33c08d95b30593619e54be2b405f88c6a10cd5b116",
+   "sha256_stored": "11b9a1f534d430fc49703c33c08d95b30593619e54be2b405f88c6a10cd5b116",
+   "bytes": 8474,
+   "key_hits_masked": 0
+  },
+  "vdf_fetchers_tdcc.py": {
+   "sha256_original": "2b43d2af980012191097bd18f8ceac637df43cc4e07019ffeacf5a6104bf3623",
+   "sha256_stored": "2b43d2af980012191097bd18f8ceac637df43cc4e07019ffeacf5a6104bf3623",
+   "bytes": 9916,
+   "key_hits_masked": 0
+  },
+  "vdf_supportive_bridge.py": {
+   "sha256_original": "0a7c2caf87a6e4b1c60f1681c8a82cf34b30172c3e403166313932dd3b5b053b",
+   "sha256_stored": "0a7c2caf87a6e4b1c60f1681c8a82cf34b30172c3e403166313932dd3b5b053b",
+   "bytes": 15651,
+   "key_hits_masked": 0
+  },
+  "via_master_ssot.json": {
+   "sha256_original": "7f57f92687f8abfc6fd6523a5d3f2cc34898621036b6b76720af2f16f3530654",
+   "sha256_stored": "99e35067b4712a01506975cf85fdabeb33c49f9e86570c4ec338f8b138eb1332",
+   "bytes": 152169,
+   "key_hits_masked": 2
+  }
+ },
+ "tools_crosscheck": {
+  "VeritasCeleritas.py": {
+   "uploaded_sha256": [
+    "ecb06be4badb7ce648e275a4c35a1ac44759f155ab39a137f9fbbbb7a536a1d0"
+   ],
+   "b345_sha256": "ecb06be4badb7ce648e275a4c35a1ac44759f155ab39a137f9fbbbb7a536a1d0",
+   "verdict": "SKIP_IDENTICAL(與 b345 收容件 byte-exact 同 sha;不重複收容=Zero-Hydra)"
+  },
+  "VeritasAegisNexus.py": {
+   "uploaded_sha256": [
+    "4a9443686a8f5de076a9f69d4cd00fab9576180d17f9fe03f9ff59a526be4d7d"
+   ],
+   "b345_sha256": "4a9443686a8f5de076a9f69d4cd00fab9576180d17f9fe03f9ff59a526be4d7d",
+   "verdict": "SKIP_IDENTICAL(與 b345 收容件 byte-exact 同 sha;不重複收容=Zero-Hydra)"
+  }
+ },
+ "integration": {
+  "replaces_nothing": "上船件不合併不取代現役(ENG055/064/054/066/051/069);職權界定=設計參考+對映冊",
+  "consumed_by": [
+   "VDF_ENG073_DataArchitecture(SSOT 12 類/unified_headers→現役表對映;optimize 計畫)",
+   "VDF_ENG074_FredMacroSSOT(macro_ssot series_registry 190 FRED series 真抓;從新往舊;parquet+duckdb+polars)"
+  ],
+  "not_enabled": [
+   "vdf_api.py(8765 port 與 CGC_MDL095 DeckServer 樞紐同 port=撞;不啟用)",
+   "vdf_supportive_bridge.py(Aegis/Celeritas 直掛=在庫已由 ACCEL-BRIDGE/NET-BRIDGE 承接;不重掛)",
+   "vdf_fetchers_*(sentiment AAII/CNN·tdcc·fiscal·fed·etf_holdings·financials·consensus·derived 9 模型=候源設計;現役對應:L11 sentiment/ENG056 chip/ENG051 holdings/ENG063 revenue/ENG069 consensus;fiscal(Treasury FD 14)/tdcc/fed(scrape)=缺口誠實列 PLANNED)"
+  ]
+ },
+ "verdicts": [
+  "19 件 byte-level 收容;5 件含明文鑰共 7 處遮罩;工具兩件 sha 同 b345=SKIP_IDENTICAL",
+  "Zero-Hydra:上船 vdf_core ParquetStore/DuckDB mirror 設計與在庫 ENG055 upsert(anti-join)同構;不並存兩套寫入器,以 ENG073 對映冊界定",
+  "fetch_matrix 12 類=對映現役:tw_stock→ENG064/054;tw_index/intl_*/commodity/fx→ENG066/L6;tw_etf_active→ENG051;macro→ENG074(新)/L8;sentiment→L11;tw_financials→ENG063(月營收)+候源(季報)"
+ ]
+}

@@ -1,0 +1,5151 @@
+{
+  "schema_version": "1.0.0",
+  "build_date": "2026-05-26",
+  "title": "VIA Master Data SSOT",
+  "description": "Single source of truth — every data acquisition target across VeritasDataForge: market prices, chip data, financials, US macro full detail, fiscal, Fed policy, global ETF universe with fund-flow methodology, TW active ETF daily holdings, and sentiment indices.",
+  "naming_convention": "{Region}.{Macro_Theme}.{Sub_Theme}.{Indicator}",
+  "owner": "Tony / VIA Intelligence Analytics",
+  "sources_legend": {
+    "TWSE": {
+      "used_for": "台灣上市股票 OHLCV + 籌碼 (T86/MI_MARGN/TWTB4U/MI_INDEX3/FMTQIK)",
+      "key_required": false,
+      "endpoint_base": "https://www.twse.com.tw/",
+      "fetcher": "vdf_fetchers_market::fetch_tw_stock_unified + fetch_tw_index_official"
+    },
+    "TPEX": {
+      "used_for": "台灣上櫃股票 OHLCV + 籌碼 + 櫃買指數",
+      "key_required": false,
+      "endpoint_base": "https://www.tpex.org.tw/",
+      "fetcher": "vdf_fetchers_market"
+    },
+    "MOPS": {
+      "used_for": "台灣公司財報 (損益表/資產負債表/現金流量表)",
+      "key_required": false,
+      "endpoint_base": "https://mops.twse.com.tw/",
+      "fetcher": "vdf_fetchers_financials"
+    },
+    "TDCC": {
+      "used_for": "台灣集保結算所 — ETF 受益人數 / 持股分布",
+      "key_required": false,
+      "endpoint_base": "https://www.tdcc.com.tw/",
+      "fetcher": "vdf_fetchers_tdcc (要新寫)"
+    },
+    "投信網站": {
+      "used_for": "台股主動式 ETF 每日實際持股 (10家投信各自)",
+      "key_required": false,
+      "endpoint_base": "ezmoney/nomurafunds/capitalfund/...",
+      "fetcher": "vdf_fetchers_etf_holdings (要新寫)"
+    },
+    "YFINANCE": {
+      "used_for": "全球股票/ETF/指數/期貨/外匯 OHLCV + Adj Close",
+      "key_required": false,
+      "endpoint_base": "yfinance Python lib",
+      "fetcher": "vdf_fetchers_market::fetch_yfinance_prices"
+    },
+    "FRED": {
+      "used_for": "美國總經 CPI/PCE/PPI/GDP/Labor/Rates 等 ~150 series",
+      "key_required": true,
+      "env": "VDF_FRED_API_KEY",
+      "default_key": "<REDACTED:VDF_FRED_API_KEY>",
+      "endpoint_base": "https://api.stlouisfed.org/fred/",
+      "fetcher": "vdf_fetchers_macro::fetch_macro_fred"
+    },
+    "Treasury_FD": {
+      "used_for": "美國財政 DTS 日度 + MTS 月度 (Receipts/Outlays/TGA/Debt)",
+      "key_required": false,
+      "endpoint_base": "https://api.fiscaldata.treasury.gov/services/api/fiscal_service/",
+      "fetcher": "vdf_fetchers_fiscal (要新寫)"
+    },
+    "Fed": {
+      "used_for": "FOMC 聲明 / Dot Plot / Press Conference (scrape)",
+      "key_required": false,
+      "endpoint_base": "https://www.federalreserve.gov/",
+      "fetcher": "vdf_fetchers_fed_guidance (要新寫)"
+    },
+    "FRBNY": {
+      "used_for": "SOFR / EFFR / RRP / NY Fed nowcast",
+      "key_required": false,
+      "endpoint_base": "https://www.newyorkfed.org/",
+      "fetcher": "FRED 代理可取"
+    },
+    "BEA": {
+      "used_for": "GDP 細項 / PCE / Personal Income (FRED 已代理多數)",
+      "key_required": true,
+      "env": "VDF_BEA_API_KEY",
+      "endpoint_base": "https://apps.bea.gov/api/",
+      "fetcher": "FRED 代理 OR vdf_fetchers_bea (optional)"
+    },
+    "BLS": {
+      "used_for": "CPI/PPI/Employment/JOLTS 原始檔 (FRED 已代理多數)",
+      "key_required": false,
+      "endpoint_base": "https://api.bls.gov/publicAPI/v2/",
+      "fetcher": "FRED 代理 OR vdf_fetchers_bls (optional)"
+    },
+    "AKSHARE": {
+      "used_for": "中國商品期貨 / BDI / SCFI / CCFI / 中國 PMI",
+      "key_required": false,
+      "endpoint_base": "akshare Python lib",
+      "fetcher": "vdf_fetchers_macro::fetch_shipping"
+    },
+    "AAII": {
+      "used_for": "美國個人投資人協會 散戶情緒調查 (Bull/Bear/Neutral)",
+      "key_required": false,
+      "endpoint_base": "https://www.aaii.com/sentimentsurvey/sent_results",
+      "fetcher": "vdf_fetchers_sentiment::fetch_aaii (要新寫)"
+    },
+    "CNN": {
+      "used_for": "CNN Fear & Greed Index (composite + 7 components)",
+      "key_required": false,
+      "endpoint_base": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
+      "fetcher": "vdf_fetchers_sentiment::fetch_cnn_fear_greed (要新寫)"
+    },
+    "Yahoo": {
+      "used_for": "VIX/VVIX/MOVE/SKEW (透過 yfinance)",
+      "key_required": false,
+      "endpoint_base": "yfinance",
+      "fetcher": "vdf_fetchers_market"
+    },
+    "ISM": {
+      "used_for": "ISM 製造業/服務業 PMI (FRED 代理)",
+      "key_required": false,
+      "endpoint_base": "https://www.ismworld.org/",
+      "fetcher": "FRED 代理"
+    },
+    "ConfBoard": {
+      "used_for": "Conference Board Consumer Confidence + LEI (FRED 代理)",
+      "key_required": false,
+      "endpoint_base": "https://www.conference-board.org/",
+      "fetcher": "FRED 代理"
+    },
+    "UMich": {
+      "used_for": "U Mich Consumer Sentiment + Inflation Expectations (FRED 代理)",
+      "key_required": false,
+      "endpoint_base": "http://www.sca.isr.umich.edu/",
+      "fetcher": "FRED 代理"
+    },
+    "ECB": {
+      "used_for": "歐元區政策利率 / HICP / M3",
+      "key_required": false,
+      "endpoint_base": "https://sdw-wsrest.ecb.europa.eu/service/",
+      "fetcher": "FRED 代理 OR vdf_fetchers_ecb (optional)"
+    },
+    "BOJ": {
+      "used_for": "日本央行政策利率 / Tankan",
+      "key_required": false,
+      "endpoint_base": "https://www.stat-search.boj.or.jp/ssi/cgi-bin/famecgi2",
+      "fetcher": "FRED 代理"
+    },
+    "BOE": {
+      "used_for": "英國央行政策利率",
+      "key_required": false,
+      "endpoint_base": "https://www.bankofengland.co.uk/boeapps/database/",
+      "fetcher": "FRED 代理"
+    },
+    "OECD": {
+      "used_for": "OECD CLI G7/G20 領先指標",
+      "key_required": false,
+      "endpoint_base": "https://stats.oecd.org/SDMX-JSON/",
+      "fetcher": "FRED 代理"
+    },
+    "Cnyes": {
+      "name": "鉅亨網 (Anue Cnyes)",
+      "used_for": "FactSet 機構共識預期資料 (target valuation / rating / EPS forecast) — Playwright scrape",
+      "key_required": false,
+      "endpoint_base": "https://www.cnyes.com/twstock/{ticker}/summary/overview",
+      "method": "Playwright headless Chromium scrape (requires playwright + chromium install)",
+      "fetcher": "vdf_fetchers_consensus (要新寫)",
+      "underlying_source": "FactSet (Cnyes 為 FactSet 在台代理)",
+      "throttle_advice": "建議 0.5-1s per ticker, 全台股約 1800 檔 → 30-60 分鐘一輪"
+    }
+  },
+  "credentials": {
+    "FRED": {
+      "env": "VDF_FRED_API_KEY",
+      "default_key": "<REDACTED:VDF_FRED_API_KEY>",
+      "priority": [
+        "request body / CLI flag",
+        "env var",
+        "matrix default"
+      ]
+    },
+    "BEA": {
+      "env": "VDF_BEA_API_KEY",
+      "default_key": null,
+      "note": "optional — FRED covers most BEA series"
+    }
+  },
+  "section_A_market_matrix": {
+    "description": "Daily price + chip + financials. Drives the cockpit MATRIX tab.",
+    "categories": [
+      {
+        "id": "tw_stock",
+        "name": "Taiwan Stocks - Daily Price + Chip",
+        "name_zh": "台灣股票每日交易及籌碼資訊",
+        "description": "上市櫃個股 OHLCV + 三大法人 + 融資融券 + 當沖, yfinance prices + TWSE/TPEX chips",
+        "output_file": "VDF_TWStock_Unified.parquet",
+        "schema_group": "prices_with_chip",
+        "primary_key": [
+          "Date",
+          "Ticker"
+        ],
+        "update_frequency": "daily_after_close",
+        "universe_source": "tw_universe.json",
+        "data_sources": [
+          "YFINANCE",
+          "TWSE",
+          "TPEX"
+        ],
+        "source_pipeline": [
+          {
+            "step": "prices",
+            "primary": "yfinance",
+            "fallback": [],
+            "required": true,
+            "endpoint": "yf.download([ticker.TW/.TWO], batch=50, auto_adjust=False)",
+            "fields": "Open, Low, High, Close, Adj_Close, Volume"
+          },
+          {
+            "step": "chip_inst",
+            "primary": "twse",
+            "fallback": [
+              "tpex"
+            ],
+            "required": false,
+            "endpoint": "TWSE T86?selectType=ALLBUT0999 / TPEX openapi/v1/tpex_3insti_daily_rpt",
+            "fields": "FI_Buy/Sell/Net, IT_Buy/Sell/Net, Dealer_Buy/Sell/Net, Total_Net"
+          },
+          {
+            "step": "chip_margin",
+            "primary": "twse",
+            "fallback": [
+              "tpex"
+            ],
+            "required": false,
+            "endpoint": "TWSE MI_MARGN?selectType=STOCK / TPEX openapi/v1/tpex_margin_trading_balance",
+            "fields": "Margin_Buy/Sell/Balance/Offset, Short_Buy/Sell/Balance"
+          },
+          {
+            "step": "chip_daytrade",
+            "primary": "twse",
+            "fallback": [
+              "tpex"
+            ],
+            "required": false,
+            "endpoint": "TWSE TWTB4U?selectType=0 / TPEX openapi/v1/tpex_dtsold_result_dl",
+            "fields": "DayTrade_Buy_Vol, DayTrade_Sell_Vol, DayTrade_Volume, DayTrade_Amount, DayTrade_Ratio_Pct"
+          }
+        ],
+        "tickers": []
+      },
+      {
+        "id": "tw_index",
+        "name": "Taiwan Indices - TAIEX + TPEX",
+        "name_zh": "台灣股票指數每日交易及籌碼資訊",
+        "description": "^TWII (TAIEX) + ^TWOII (TPEX) OHLCV + 整體三大法人 + 整體融資融券 + 整體當沖",
+        "output_file": "VDF_TWIndex_Unified.parquet",
+        "schema_group": "prices_with_chip",
+        "primary_key": [
+          "Date",
+          "Ticker"
+        ],
+        "update_frequency": "daily_after_close",
+        "data_sources": [
+          "TWSE",
+          "TPEX"
+        ],
+        "source_pipeline": [
+          {
+            "step": "index_price",
+            "primary": "twse_tpex_native",
+            "fallback": [
+              "yfinance"
+            ],
+            "required": true,
+            "endpoint": "TWSE FMTQIK?date=YYYYMM01 (TAIEX monthly) / TPEX stockidx_result.php?d=YYYMMDD (TPEX daily)"
+          },
+          {
+            "step": "index_chip",
+            "primary": "twse",
+            "fallback": [],
+            "required": false,
+            "endpoint": "TWSE fund/MI_INDEX3?response=json&date=YYYYMMDD",
+            "note": "BUG-2 fixed: gc 索引修正 fi=1 it=2 dt=5 total=6"
+          },
+          {
+            "step": "index_margin",
+            "primary": "twse",
+            "fallback": [],
+            "required": false,
+            "endpoint": "TWSE marginTrading/MI_MARGN?selectType=MS"
+          },
+          {
+            "step": "index_daytrade",
+            "primary": "twse",
+            "fallback": [],
+            "required": false,
+            "endpoint": "TWSE afterTrading/TWTB4U?selectType=MS",
+            "note": "BUG-3 fixed: key 由 daytrade 改為 dt"
+          }
+        ],
+        "tickers": [
+          {
+            "ticker": "^TWII",
+            "yf_ticker": "^TWII",
+            "bbg_ticker": "TWSE Index",
+            "name": "TAIEX",
+            "market": "TWSE"
+          },
+          {
+            "ticker": "^TWOII",
+            "yf_ticker": "^TWOII",
+            "bbg_ticker": "TPEX Index",
+            "name": "TPEX Index",
+            "market": "TPEX"
+          }
+        ]
+      },
+      {
+        "id": "tw_etf_passive",
+        "name": "Taiwan ETFs - Passive (Index-Tracking)",
+        "name_zh": "台灣 ETF - 被動式 (追蹤指數)",
+        "description": "被動式 ETF (元大台灣50/高股息等), yfinance prices, auto_adjust=False",
+        "output_file": "VDF_TWETF_Passive.parquet",
+        "schema_group": "prices_core",
+        "primary_key": [
+          "Date",
+          "Ticker"
+        ],
+        "update_frequency": "daily_after_close",
+        "data_sources": [
+          "YFINANCE"
+        ],
+        "source_pipeline": [
+          {
+            "step": "prices",
+            "primary": "yfinance",
+            "fallback": [],
+            "required": true,
+            "endpoint": "yf.download([ticker.TW], auto_adjust=False)"
+          }
+        ],
+        "tickers": [
+          {
+            "ticker": "0050.TW",
+            "name": "元大台灣50",
+            "category": "market_cap"
+          },
+          {
+            "ticker": "0056.TW",
+            "name": "元大高股息",
+            "category": "high_dividend"
+          },
+          {
+            "ticker": "006208.TW",
+            "name": "富邦台50",
+            "category": "market_cap"
+          },
+          {
+            "ticker": "00878.TW",
+            "name": "國泰永續高股息",
+            "category": "esg_dividend"
+          },
+          {
+            "ticker": "00919.TW",
+            "name": "群益台灣精選高息",
+            "category": "high_dividend"
+          },
+          {
+            "ticker": "00929.TW",
+            "name": "復華台灣科技優息",
+            "category": "tech_dividend"
+          },
+          {
+            "ticker": "00940.TW",
+            "name": "元大台灣價值高息",
+            "category": "value_dividend"
+          },
+          {
+            "ticker": "00713.TW",
+            "name": "元大台灣高息低波",
+            "category": "low_vol"
+          },
+          {
+            "ticker": "00923.TW",
+            "name": "群益台ESG低碳50",
+            "category": "esg"
+          },
+          {
+            "ticker": "00646.TW",
+            "name": "元大S&P500",
+            "category": "intl_index"
+          },
+          {
+            "ticker": "00631L.TW",
+            "name": "元大台灣50正2",
+            "category": "leveraged"
+          },
+          {
+            "ticker": "00632R.TW",
+            "name": "元大台灣50反1",
+            "category": "inverse"
+          }
+        ]
+      },
+      {
+        "id": "tw_etf_active",
+        "name": "Taiwan ETFs - Active (Manager-Driven)",
+        "name_zh": "台灣 ETF - 主動式 (經理人選股)",
+        "description": "2025-05 起新類別主動式 ETF, 28 檔截至 2026-04, yfinance prices",
+        "output_file": "VDF_TWETF_Active.parquet",
+        "schema_group": "prices_core",
+        "primary_key": [
+          "Date",
+          "Ticker"
+        ],
+        "update_frequency": "daily_after_close",
+        "data_sources": [
+          "YFINANCE"
+        ],
+        "source_pipeline": [
+          {
+            "step": "prices",
+            "primary": "yfinance",
+            "fallback": [],
+            "required": true,
+            "endpoint": "yf.download([ticker.TW], auto_adjust=False)"
+          }
+        ],
+        "tickers": [
+          {
+            "ticker": "00980A.TW",
+            "name": "主動野村臺灣優選",
+            "issuer": "野村",
+            "focus": "台股大型權值"
+          },
+          {
+            "ticker": "00981A.TW",
+            "name": "主動統一台股增長",
+            "issuer": "統一",
+            "focus": "台股成長"
+          },
+          {
+            "ticker": "00982A.TW",
+            "name": "主動群益台灣強棒",
+            "issuer": "群益",
+            "focus": "台股趨勢"
+          },
+          {
+            "ticker": "00983A.TW",
+            "name": "主動中信ARK創新",
+            "issuer": "中信",
+            "focus": "美股創新主題"
+          },
+          {
+            "ticker": "00984A.TW",
+            "name": "主動安聯台灣高息",
+            "issuer": "安聯",
+            "focus": "台股高息"
+          },
+          {
+            "ticker": "00985A.TW",
+            "name": "主動野村台灣50",
+            "issuer": "野村",
+            "focus": "台股大型權值"
+          },
+          {
+            "ticker": "00987A.TW",
+            "name": "主動台新優勢成長",
+            "issuer": "台新",
+            "focus": "台股成長"
+          },
+          {
+            "ticker": "00988A.TW",
+            "name": "主動統一全球創新",
+            "issuer": "統一",
+            "focus": "全球創新"
+          },
+          {
+            "ticker": "00989A.TW",
+            "name": "主動摩根美國科技",
+            "issuer": "摩根",
+            "focus": "美股科技"
+          },
+          {
+            "ticker": "00990A.TW",
+            "name": "主動元大AI新經濟",
+            "issuer": "元大",
+            "focus": "AI主題"
+          },
+          {
+            "ticker": "00991A.TW",
+            "name": "主動復華未來50",
+            "issuer": "復華",
+            "focus": "台股未來50"
+          },
+          {
+            "ticker": "00992A.TW",
+            "name": "主動群益科技創新",
+            "issuer": "群益",
+            "focus": "台股科技"
+          },
+          {
+            "ticker": "00994A.TW",
+            "name": "主動第一金台股優選",
+            "issuer": "第一金",
+            "focus": "台股優選"
+          },
+          {
+            "ticker": "00995A.TW",
+            "name": "主動中信台灣卓越",
+            "issuer": "中信",
+            "focus": "台股卓越"
+          },
+          {
+            "ticker": "00997A.TW",
+            "name": "主動群益美國增長",
+            "issuer": "群益",
+            "focus": "美股成長"
+          },
+          {
+            "ticker": "00999A.TW",
+            "name": "主動安聯台股趨勢",
+            "issuer": "安聯",
+            "focus": "台股趨勢"
+          },
+          {
+            "ticker": "00402A.TW",
+            "name": "主動安聯美國科技領航",
+            "issuer": "安聯",
+            "focus": "美股科技"
+          },
+          {
+            "ticker": "00403A.TW",
+            "name": "主動統一升級版0050",
+            "issuer": "統一",
+            "focus": "台股大型權值"
+          }
+        ]
+      },
+      {
+        "id": "intl_stock",
+        "name": "International Stocks - Daily Price",
+        "name_zh": "國際股票每日交易資訊",
+        "description": "美股 + 國際大型股 OHLCV + Adj OLH + Market Cap, yfinance only",
+        "output_file": "VDF_Intl_Stock.parquet",
+        "schema_group": "prices_core",
+        "primary_key": [
+          "Date",
+          "Ticker"
+        ],
+        "update_frequency": "daily_after_close",
+        "data_sources": [
+          "YFINANCE"
+        ],
+        "source_pipeline": [
+          {
+            "step": "prices",
+            "primary": "yfinance",
+            "fallback": [],
+            "required": true,
+            "endpoint": "yf.download([ticker], auto_adjust=False)"
+          }
+        ],
+        "tickers": [
+          {
+            "ticker": "AAPL",
+            "name": "Apple",
+            "exchange": "NASDAQ"
+          },
+          {
+            "ticker": "MSFT",
+            "name": "Microsoft",
+            "exchange": "NASDAQ"
+          },
+          {
+            "ticker": "NVDA",
+            "name": "NVIDIA",
+            "exchange": "NASDAQ"
+          },
+          {
+            "ticker": "GOOGL",
+            "name": "Alphabet A",
+            "exchange": "NASDAQ"
+          },
+          {
+            "ticker": "AMZN",
+            "name": "Amazon",
+            "exchange": "NASDAQ"
+          },
+          {
+            "ticker": "META",
+            "name": "Meta",
+            "exchange": "NASDAQ"
+          },
+          {
+            "ticker": "TSLA",
+            "name": "Tesla",
+            "exchange": "NASDAQ"
+          },
+          {
+            "ticker": "BRK-B",
+            "name": "Berkshire B",
+            "exchange": "NYSE"
+          },
+          {
+            "ticker": "AVGO",
+            "name": "Broadcom",
+            "exchange": "NASDAQ"
+          },
+          {
+            "ticker": "ASML",
+            "name": "ASML",
+            "exchange": "NASDAQ"
+          },
+          {
+            "ticker": "TSM",
+            "name": "TSMC ADR",
+            "exchange": "NYSE"
+          },
+          {
+            "ticker": "JPM",
+            "name": "JPMorgan",
+            "exchange": "NYSE"
+          },
+          {
+            "ticker": "V",
+            "name": "Visa",
+            "exchange": "NYSE"
+          },
+          {
+            "ticker": "MA",
+            "name": "Mastercard",
+            "exchange": "NYSE"
+          },
+          {
+            "ticker": "JNJ",
+            "name": "J&J",
+            "exchange": "NYSE"
+          },
+          {
+            "ticker": "UNH",
+            "name": "UnitedHealth",
+            "exchange": "NYSE"
+          },
+          {
+            "ticker": "WMT",
+            "name": "Walmart",
+            "exchange": "NYSE"
+          },
+          {
+            "ticker": "XOM",
+            "name": "ExxonMobil",
+            "exchange": "NYSE"
+          },
+          {
+            "ticker": "CVX",
+            "name": "Chevron",
+            "exchange": "NYSE"
+          },
+          {
+            "ticker": "HD",
+            "name": "Home Depot",
+            "exchange": "NYSE"
+          }
+        ]
+      },
+      {
+        "id": "intl_index",
+        "name": "International Indices - Daily",
+        "name_zh": "國際股票指數交易資訊",
+        "description": "S&P500 / NASDAQ / Dow / DAX / Nikkei / FTSE / HSI / Russell etc., yfinance",
+        "output_file": "VDF_Intl_Index.parquet",
+        "schema_group": "prices_core",
+        "primary_key": [
+          "Date",
+          "Ticker"
+        ],
+        "update_frequency": "daily_after_close",
+        "data_sources": [
+          "YFINANCE"
+        ],
+        "source_pipeline": [
+          {
+            "step": "prices",
+            "primary": "yfinance",
+            "fallback": [],
+            "required": true,
+            "endpoint": "yf.download([^TICKER], auto_adjust=False)"
+          }
+        ],
+        "tickers": [
+          {
+            "ticker": "^GSPC",
+            "name": "S&P 500",
+            "region": "US"
+          },
+          {
+            "ticker": "^IXIC",
+            "name": "NASDAQ Comp",
+            "region": "US"
+          },
+          {
+            "ticker": "^NDX",
+            "name": "NASDAQ 100",
+            "region": "US"
+          },
+          {
+            "ticker": "^DJI",
+            "name": "Dow Jones",
+            "region": "US"
+          },
+          {
+            "ticker": "^RUT",
+            "name": "Russell 2000",
+            "region": "US"
+          },
+          {
+            "ticker": "^SOX",
+            "name": "Phlx Semi",
+            "region": "US"
+          },
+          {
+            "ticker": "^VIX",
+            "name": "CBOE VIX",
+            "region": "US"
+          },
+          {
+            "ticker": "^N225",
+            "name": "Nikkei 225",
+            "region": "JP"
+          },
+          {
+            "ticker": "^HSI",
+            "name": "Hang Seng",
+            "region": "HK"
+          },
+          {
+            "ticker": "^GDAXI",
+            "name": "DAX",
+            "region": "EU"
+          },
+          {
+            "ticker": "^FTSE",
+            "name": "FTSE 100",
+            "region": "UK"
+          },
+          {
+            "ticker": "^STOXX50E",
+            "name": "Euro Stoxx 50",
+            "region": "EU"
+          },
+          {
+            "ticker": "000001.SS",
+            "name": "Shanghai Comp",
+            "region": "CN"
+          },
+          {
+            "ticker": "399001.SZ",
+            "name": "Shenzhen Comp",
+            "region": "CN"
+          },
+          {
+            "ticker": "^KS11",
+            "name": "KOSPI",
+            "region": "KR"
+          }
+        ]
+      },
+      {
+        "id": "tw_financials",
+        "name": "TW & International Stock Financials",
+        "name_zh": "台灣及國際股票財報資訊",
+        "description": "季報/年報財務數據, TW=MOPS官方, 國際=yfinance financials",
+        "output_file": "VDF_Stock_Financials.parquet",
+        "schema_group": "tw_financial",
+        "primary_key": [
+          "Date",
+          "Ticker",
+          "Period"
+        ],
+        "update_frequency": "quarterly",
+        "data_sources": [
+          "MOPS",
+          "YFINANCE"
+        ],
+        "source_pipeline": [
+          {
+            "step": "tw_financials",
+            "primary": "mops",
+            "fallback": [],
+            "required": false,
+            "endpoint": "mops.twse.com.tw/server-java/t164sb01 + sii (financial reports)"
+          },
+          {
+            "step": "intl_financials",
+            "primary": "yfinance",
+            "fallback": [],
+            "required": false,
+            "endpoint": "yf.Ticker(t).financials / balance_sheet / cashflow"
+          }
+        ],
+        "tickers": [
+          {
+            "ticker": "2330.TW",
+            "source": "mops",
+            "name": "台積電"
+          },
+          {
+            "ticker": "2317.TW",
+            "source": "mops",
+            "name": "鴻海"
+          },
+          {
+            "ticker": "2454.TW",
+            "source": "mops",
+            "name": "聯發科"
+          },
+          {
+            "ticker": "AAPL",
+            "source": "yfinance",
+            "name": "Apple"
+          },
+          {
+            "ticker": "MSFT",
+            "source": "yfinance",
+            "name": "Microsoft"
+          },
+          {
+            "ticker": "NVDA",
+            "source": "yfinance",
+            "name": "NVIDIA"
+          }
+        ]
+      },
+      {
+        "id": "commodity",
+        "name": "Commodities - Futures + Spot",
+        "name_zh": "大宗商品 - 期貨 + 現貨",
+        "description": "能源/貴金屬/工業金屬/農產品, yfinance =F suffix + akshare 替代",
+        "output_file": "VDF_Commodity.parquet",
+        "schema_group": "prices_core",
+        "primary_key": [
+          "Date",
+          "Ticker"
+        ],
+        "update_frequency": "daily_after_close",
+        "data_sources": [
+          "YFINANCE",
+          "AKSHARE"
+        ],
+        "source_pipeline": [
+          {
+            "step": "prices",
+            "primary": "yfinance",
+            "fallback": [
+              "akshare"
+            ],
+            "required": true,
+            "endpoint": "yf.download([ticker=F]) or ak.futures_main_sina"
+          }
+        ],
+        "tickers": [
+          {
+            "ticker": "CL=F",
+            "name": "WTI Crude Oil",
+            "category": "energy"
+          },
+          {
+            "ticker": "BZ=F",
+            "name": "Brent Crude",
+            "category": "energy"
+          },
+          {
+            "ticker": "NG=F",
+            "name": "Natural Gas",
+            "category": "energy"
+          },
+          {
+            "ticker": "GC=F",
+            "name": "Gold",
+            "category": "metals_precious"
+          },
+          {
+            "ticker": "SI=F",
+            "name": "Silver",
+            "category": "metals_precious"
+          },
+          {
+            "ticker": "PL=F",
+            "name": "Platinum",
+            "category": "metals_precious"
+          },
+          {
+            "ticker": "PA=F",
+            "name": "Palladium",
+            "category": "metals_precious"
+          },
+          {
+            "ticker": "HG=F",
+            "name": "Copper",
+            "category": "metals_base"
+          },
+          {
+            "ticker": "ALI=F",
+            "name": "Aluminum",
+            "category": "metals_base"
+          },
+          {
+            "ticker": "ZS=F",
+            "name": "Soybeans",
+            "category": "agri"
+          },
+          {
+            "ticker": "ZC=F",
+            "name": "Corn",
+            "category": "agri"
+          },
+          {
+            "ticker": "ZW=F",
+            "name": "Wheat",
+            "category": "agri"
+          },
+          {
+            "ticker": "KC=F",
+            "name": "Coffee",
+            "category": "agri"
+          },
+          {
+            "ticker": "RB=F",
+            "name": "RBOB Gasoline",
+            "category": "energy"
+          },
+          {
+            "ticker": "HO=F",
+            "name": "Heating Oil",
+            "category": "energy"
+          }
+        ]
+      },
+      {
+        "id": "fx",
+        "name": "Foreign Exchange",
+        "name_zh": "外匯",
+        "description": "主要貨幣對美元, yfinance =X suffix",
+        "output_file": "VDF_FX.parquet",
+        "schema_group": "prices_core",
+        "primary_key": [
+          "Date",
+          "Ticker"
+        ],
+        "update_frequency": "daily_after_close",
+        "data_sources": [
+          "YFINANCE"
+        ],
+        "source_pipeline": [
+          {
+            "step": "prices",
+            "primary": "yfinance",
+            "fallback": [],
+            "required": true,
+            "endpoint": "yf.download([ticker=X])"
+          }
+        ],
+        "tickers": [
+          {
+            "ticker": "TWD=X",
+            "name": "USD/TWD",
+            "category": "asia"
+          },
+          {
+            "ticker": "EURUSD=X",
+            "name": "EUR/USD",
+            "category": "major"
+          },
+          {
+            "ticker": "JPY=X",
+            "name": "USD/JPY",
+            "category": "major"
+          },
+          {
+            "ticker": "GBPUSD=X",
+            "name": "GBP/USD",
+            "category": "major"
+          },
+          {
+            "ticker": "CNY=X",
+            "name": "USD/CNY",
+            "category": "asia"
+          },
+          {
+            "ticker": "KRW=X",
+            "name": "USD/KRW",
+            "category": "asia"
+          },
+          {
+            "ticker": "AUDUSD=X",
+            "name": "AUD/USD",
+            "category": "major"
+          },
+          {
+            "ticker": "DX-Y.NYB",
+            "name": "DXY",
+            "category": "index"
+          },
+          {
+            "ticker": "HKD=X",
+            "name": "USD/HKD",
+            "category": "asia"
+          },
+          {
+            "ticker": "SGD=X",
+            "name": "USD/SGD",
+            "category": "asia"
+          }
+        ]
+      },
+      {
+        "id": "macro",
+        "name": "Macroeconomic Indicators - FRED",
+        "name_zh": "總體經濟指標",
+        "description": "29 FRED series 涵蓋 US/EU/CN/JP/TW, fredapi + HTTP fallback",
+        "output_file": "VDF_Macro_FRED.parquet",
+        "schema_group": "macro",
+        "primary_key": [
+          "Date",
+          "Series_Id"
+        ],
+        "update_frequency": "varies",
+        "data_sources": [
+          "FRED"
+        ],
+        "source_pipeline": [
+          {
+            "step": "fred_series",
+            "primary": "fredapi",
+            "fallback": [
+              "fred_http"
+            ],
+            "required": true,
+            "endpoint": "fred.stlouisfed.org/api with VDF_FRED_API_KEY"
+          }
+        ],
+        "indicators": [
+          {
+            "series_id": "CPIAUCSL",
+            "name": "US CPI All Urban Consumers",
+            "region": "US",
+            "category": "inflation"
+          },
+          {
+            "series_id": "CPILFESL",
+            "name": "US Core CPI",
+            "region": "US",
+            "category": "inflation"
+          },
+          {
+            "series_id": "PCEPI",
+            "name": "US PCE Price Index",
+            "region": "US",
+            "category": "inflation"
+          },
+          {
+            "series_id": "PCEPILFE",
+            "name": "US Core PCE",
+            "region": "US",
+            "category": "inflation"
+          },
+          {
+            "series_id": "UNRATE",
+            "name": "US Unemployment Rate",
+            "region": "US",
+            "category": "employment"
+          },
+          {
+            "series_id": "PAYEMS",
+            "name": "US Nonfarm Payrolls",
+            "region": "US",
+            "category": "employment"
+          },
+          {
+            "series_id": "ICSA",
+            "name": "US Initial Jobless Claims",
+            "region": "US",
+            "category": "employment"
+          },
+          {
+            "series_id": "FEDFUNDS",
+            "name": "US Federal Funds Rate",
+            "region": "US",
+            "category": "rates"
+          },
+          {
+            "series_id": "DGS2",
+            "name": "US 2Y Treasury Yield",
+            "region": "US",
+            "category": "rates"
+          },
+          {
+            "series_id": "DGS10",
+            "name": "US 10Y Treasury Yield",
+            "region": "US",
+            "category": "rates"
+          },
+          {
+            "series_id": "DGS30",
+            "name": "US 30Y Treasury Yield",
+            "region": "US",
+            "category": "rates"
+          },
+          {
+            "series_id": "T10Y2Y",
+            "name": "US 10Y-2Y Spread",
+            "region": "US",
+            "category": "rates"
+          },
+          {
+            "series_id": "T10Y3M",
+            "name": "US 10Y-3M Spread",
+            "region": "US",
+            "category": "rates"
+          },
+          {
+            "series_id": "BAMLH0A0HYM2",
+            "name": "ICE BofA US HY Spread",
+            "region": "US",
+            "category": "credit"
+          },
+          {
+            "series_id": "GDP",
+            "name": "US GDP",
+            "region": "US",
+            "category": "growth"
+          },
+          {
+            "series_id": "GDPC1",
+            "name": "US Real GDP",
+            "region": "US",
+            "category": "growth"
+          },
+          {
+            "series_id": "INDPRO",
+            "name": "US Industrial Production",
+            "region": "US",
+            "category": "growth"
+          },
+          {
+            "series_id": "RSXFS",
+            "name": "US Retail Sales",
+            "region": "US",
+            "category": "consumer"
+          },
+          {
+            "series_id": "UMCSENT",
+            "name": "U Michigan Consumer Sentiment",
+            "region": "US",
+            "category": "consumer"
+          },
+          {
+            "series_id": "HOUST",
+            "name": "US Housing Starts",
+            "region": "US",
+            "category": "housing"
+          },
+          {
+            "series_id": "M2SL",
+            "name": "US M2 Money Supply",
+            "region": "US",
+            "category": "monetary"
+          },
+          {
+            "series_id": "DEXTAUS",
+            "name": "USD/TWD Exchange Rate",
+            "region": "TW",
+            "category": "fx"
+          },
+          {
+            "series_id": "CSCICP02EZM460S",
+            "name": "Euro Area Consumer Confidence",
+            "region": "EU",
+            "category": "consumer"
+          },
+          {
+            "series_id": "ECBDFR",
+            "name": "ECB Deposit Facility Rate",
+            "region": "EU",
+            "category": "rates"
+          },
+          {
+            "series_id": "IRSTCI01CNM156N",
+            "name": "China Interbank Overnight Rate",
+            "region": "CN",
+            "category": "rates"
+          },
+          {
+            "series_id": "CHNCPIALLMINMEI",
+            "name": "China CPI",
+            "region": "CN",
+            "category": "inflation"
+          },
+          {
+            "series_id": "JPNCPIALLMINMEI",
+            "name": "Japan CPI",
+            "region": "JP",
+            "category": "inflation"
+          },
+          {
+            "series_id": "INTDSRJPM193N",
+            "name": "Japan Discount Rate",
+            "region": "JP",
+            "category": "rates"
+          },
+          {
+            "series_id": "TWNCPIALLMINMEI",
+            "name": "Taiwan CPI",
+            "region": "TW",
+            "category": "inflation"
+          }
+        ]
+      },
+      {
+        "id": "sentiment",
+        "name": "Market Sentiment Indicators",
+        "name_zh": "市場情緒指標",
+        "description": "VIX, MOVE, SKEW, VVIX, NFCI etc. - mixed sources",
+        "output_file": "VDF_Sentiment.parquet",
+        "schema_group": "sentiment",
+        "primary_key": [
+          "Date",
+          "Indicator"
+        ],
+        "update_frequency": "daily",
+        "data_sources": [
+          "YFINANCE",
+          "FRED"
+        ],
+        "source_pipeline": [
+          {
+            "step": "sentiment_series",
+            "primary": "mixed",
+            "fallback": [],
+            "required": false,
+            "endpoint": "per-indicator source switch"
+          }
+        ],
+        "indicators": [
+          {
+            "indicator": "VIX",
+            "source": "yfinance",
+            "ticker": "^VIX",
+            "category": "vol"
+          },
+          {
+            "indicator": "MOVE",
+            "source": "yfinance",
+            "ticker": "^MOVE",
+            "category": "vol_bond"
+          },
+          {
+            "indicator": "SKEW",
+            "source": "yfinance",
+            "ticker": "^SKEW",
+            "category": "tail_risk"
+          },
+          {
+            "indicator": "VVIX",
+            "source": "yfinance",
+            "ticker": "^VVIX",
+            "category": "vol_of_vol"
+          },
+          {
+            "indicator": "VIX9D",
+            "source": "yfinance",
+            "ticker": "^VIX9D",
+            "category": "vol_short"
+          },
+          {
+            "indicator": "VIX3M",
+            "source": "yfinance",
+            "ticker": "^VIX3M",
+            "category": "vol_3m"
+          },
+          {
+            "indicator": "STLFSI4",
+            "source": "fred",
+            "series_id": "STLFSI4",
+            "category": "stress"
+          },
+          {
+            "indicator": "NFCI",
+            "source": "fred",
+            "series_id": "NFCI",
+            "category": "stress"
+          }
+        ]
+      },
+      {
+        "id": "shipping",
+        "name": "Shipping Indices",
+        "name_zh": "航運指數",
+        "description": "BDI / SCFI / CCFI - akshare only",
+        "output_file": "VDF_Shipping.parquet",
+        "schema_group": "macro",
+        "primary_key": [
+          "Date",
+          "Series_Id"
+        ],
+        "update_frequency": "weekly_daily",
+        "data_sources": [
+          "AKSHARE"
+        ],
+        "source_pipeline": [
+          {
+            "step": "shipping_series",
+            "primary": "akshare",
+            "fallback": [],
+            "required": false,
+            "endpoint": "ak.shipping_bdi / sse.net.cn SCFI / sse CCFI"
+          }
+        ],
+        "indicators": [
+          {
+            "indicator": "BDI",
+            "function": "drewry_wci_index",
+            "category": "shipping"
+          },
+          {
+            "indicator": "SCFI",
+            "function": "drewry_wci_index",
+            "category": "shipping"
+          },
+          {
+            "indicator": "CCFI",
+            "function": "drewry_wci_index",
+            "category": "shipping"
+          }
+        ]
+      }
+    ],
+    "unified_headers": {
+      "prices_core": [
+        "Date",
+        "Ticker",
+        "YFinance_Ticker",
+        "Bloomberg_Ticker",
+        "Name",
+        "Open",
+        "Low",
+        "High",
+        "Close",
+        "Adj_Open",
+        "Adj_Low",
+        "Adj_High",
+        "Adj_Close",
+        "Volume",
+        "Turnover",
+        "Market_Cap"
+      ],
+      "tw_chip_extension": [
+        "FI_Buy",
+        "FI_Sell",
+        "FI_Net",
+        "IT_Buy",
+        "IT_Sell",
+        "IT_Net",
+        "Dealer_Buy",
+        "Dealer_Sell",
+        "Dealer_Net",
+        "Total_Net",
+        "FI_Hold_Pct",
+        "IT_Hold_Pct",
+        "Dealer_Hold_Pct",
+        "Margin_Buy",
+        "Margin_Sell",
+        "Margin_Balance",
+        "Margin_Offset",
+        "Short_Buy",
+        "Short_Sell",
+        "Short_Balance",
+        "Margin_Maintenance_Pct",
+        "Short_Margin_Ratio_Pct",
+        "DayTrade_Buy_Vol",
+        "DayTrade_Sell_Vol",
+        "DayTrade_Volume",
+        "DayTrade_Amount",
+        "DayTrade_Ratio_Pct"
+      ],
+      "tw_financial": [
+        "Date",
+        "Ticker",
+        "Period",
+        "Period_Type",
+        "Revenue",
+        "Gross_Profit",
+        "Operating_Income",
+        "Net_Income",
+        "EPS",
+        "Total_Assets",
+        "Total_Liabilities",
+        "Equity",
+        "Operating_CF",
+        "Investing_CF",
+        "Financing_CF",
+        "Free_CF",
+        "ROE",
+        "ROA",
+        "Gross_Margin",
+        "Operating_Margin",
+        "Net_Margin",
+        "Debt_To_Equity",
+        "Source"
+      ],
+      "macro": [
+        "Date",
+        "Series_Id",
+        "Series_Name",
+        "Value",
+        "Unit",
+        "Source",
+        "Region",
+        "Category"
+      ],
+      "sentiment": [
+        "Date",
+        "Indicator",
+        "Value",
+        "Source",
+        "Category"
+      ]
+    }
+  },
+  "section_B_us_macro": {
+    "description": "Full-detail US macro per Tony's docx tree + Treasury FiscalData + Fed Policy + USD Index Model.",
+    "macro_tree": {
+      "US": {
+        "Prices": {
+          "CPI": [
+            "Headline",
+            "Core",
+            "Food",
+            "FoodAtHome",
+            "FoodAwayFromHome",
+            "Energy",
+            "Gasoline",
+            "FuelOil",
+            "Electricity",
+            "UtilityGas",
+            "Shelter",
+            "Rent",
+            "OER",
+            "LodgingAwayFromHome",
+            "Transportation",
+            "NewVehicles",
+            "UsedCars",
+            "MotorInsurance",
+            "MedicalCare",
+            "MedicalServices",
+            "MedicalCommodities",
+            "EducationCommunication",
+            "OtherGoodsServices",
+            "Apparel",
+            "RecreationServices"
+          ],
+          "PCE": [
+            "Headline",
+            "Core",
+            "Goods",
+            "Services",
+            "Durable",
+            "Nondurable"
+          ],
+          "PPI": [
+            "Final",
+            "FinalDemand",
+            "ExFoodEnergy",
+            "Goods",
+            "Services",
+            "IntermediateDemand",
+            "Processed",
+            "Unprocessed"
+          ],
+          "Trade": [
+            "ImportPrice",
+            "ExportPrice"
+          ]
+        },
+        "Labor": {
+          "Employment": [
+            "NFP",
+            "PrivatePayrolls",
+            "GovtPayrolls",
+            "ManufacturingPayrolls",
+            "ConstructionPayrolls"
+          ],
+          "Unemployment": [
+            "U3",
+            "U6",
+            "ParticipationRate",
+            "EmpPopRatio"
+          ],
+          "Wages": [
+            "AvgHourlyEarnings",
+            "AvgWeeklyHours",
+            "ECI",
+            "ECIWages",
+            "ECIBenefits"
+          ],
+          "JOLTS": [
+            "JobOpenings",
+            "Hires",
+            "Quits",
+            "Layoffs",
+            "Separations"
+          ],
+          "Claims": [
+            "Initial",
+            "Continuing",
+            "InsuredUnempRate"
+          ],
+          "Productivity": [
+            "OutputPerHour",
+            "UnitLaborCosts"
+          ]
+        },
+        "Business": {
+          "ISM_Manufacturing": [
+            "PMI",
+            "NewOrders",
+            "Production",
+            "Employment",
+            "Prices",
+            "SupplierDeliveries",
+            "Inventories"
+          ],
+          "ISM_Services": [
+            "PMI",
+            "BusinessActivity",
+            "NewOrders",
+            "Employment",
+            "Prices"
+          ],
+          "SP_Global_PMI": [
+            "Manufacturing",
+            "Services",
+            "Composite"
+          ],
+          "RegionalFed": [
+            "EmpireState",
+            "PhillyFed",
+            "DallasFed",
+            "RichmondFed",
+            "KansasCityFed"
+          ],
+          "Sentiment": [
+            "ConfBoardConsumer",
+            "ConfBoardExpectations",
+            "UMichSentiment",
+            "UMichExpectations",
+            "UMichCurrentConditions",
+            "NFIB_SmallBusiness"
+          ],
+          "Leading": [
+            "ConfBoardLEI",
+            "OECD_CLI_US"
+          ]
+        },
+        "Growth": {
+          "GDP": [
+            "Real",
+            "Nominal",
+            "Deflator",
+            "QoQ_Annualized",
+            "YoY"
+          ],
+          "GDP_Components": [
+            "PCE_Real",
+            "GPDI",
+            "GCE",
+            "NetExports"
+          ],
+          "Nowcast": [
+            "AtlantaFed_GDPNow",
+            "NY_Fed_Nowcast"
+          ],
+          "Industrial": [
+            "IndProd_Total",
+            "IndProd_Mfg",
+            "IndProd_Mining",
+            "IndProd_Utilities",
+            "CapUtil"
+          ],
+          "DurableGoods": [
+            "TotalOrders",
+            "CoreOrders",
+            "Shipments",
+            "Inventories"
+          ]
+        },
+        "Consumer": {
+          "RetailSales": [
+            "Total",
+            "ExAuto",
+            "Control"
+          ],
+          "Personal": [
+            "Income",
+            "Spending",
+            "SavingsRate",
+            "DPI"
+          ],
+          "Credit": [
+            "TotalConsumer",
+            "CreditCardDelinquency",
+            "AutoDelinquency"
+          ]
+        },
+        "Housing": {
+          "Construction": [
+            "HousingStarts_Total",
+            "HousingStarts_SingleFamily",
+            "HousingStarts_MultiFamily",
+            "BuildingPermits_Total",
+            "BuildingPermits_SingleFamily"
+          ],
+          "Sales": [
+            "NewHomeSales",
+            "ExistingHomeSales",
+            "PendingHomeSales"
+          ],
+          "Prices": [
+            "CaseShiller20",
+            "CaseShiller10",
+            "FHFA_HPI"
+          ],
+          "Sentiment": [
+            "NAHB_HousingMarket"
+          ],
+          "Mortgage": [
+            "Mortgage30Y",
+            "Mortgage15Y",
+            "MBA_Applications"
+          ]
+        },
+        "Fiscal": {
+          "MTS_Monthly": [
+            "GrossReceipts",
+            "GrossOutlays",
+            "DeficitSurplus",
+            "YTD_Receipts",
+            "YTD_Outlays",
+            "YTD_Deficit",
+            "ReceiptsBySource",
+            "OutlaysByFunction"
+          ],
+          "DTS_Daily": [
+            "TotalReceipts",
+            "TotalOutlays",
+            "NetFlow",
+            "OperatingCashBalance",
+            "Withdrawals",
+            "Deposits",
+            "PublicDebtCashIssues",
+            "PublicDebtCashRedemptions"
+          ],
+          "Debt": [
+            "TotalPublicDebt",
+            "PublicDebt_HeldByPublic",
+            "DebtToGDP",
+            "NetInterestPayments"
+          ]
+        },
+        "Fed": {
+          "Rates": [
+            "FedFundsEffective",
+            "FedFundsTarget_Upper",
+            "FedFundsTarget_Lower",
+            "IORB",
+            "DiscountRate",
+            "SOFR",
+            "EFFR"
+          ],
+          "BalanceSheet": [
+            "Total_WALCL",
+            "Treasuries",
+            "MBS",
+            "ReverseRepo_RRP",
+            "TGA_TreasuryGeneralAccount",
+            "BankReserves_WRESBAL"
+          ],
+          "ForwardGuidance": [
+            "FOMC_Statements",
+            "DotPlot",
+            "MeetingMinutes",
+            "PressConference_Sentiment"
+          ],
+          "QT_Pace": [
+            "MonthlyRollOff_Treasuries",
+            "MonthlyRollOff_MBS"
+          ]
+        },
+        "Rates": {
+          "Treasury": [
+            "1M",
+            "3M",
+            "6M",
+            "1Y",
+            "2Y",
+            "3Y",
+            "5Y",
+            "7Y",
+            "10Y",
+            "20Y",
+            "30Y"
+          ],
+          "TIPS": [
+            "5Y",
+            "10Y",
+            "20Y",
+            "30Y"
+          ],
+          "Spreads": [
+            "2s10s",
+            "3m10y",
+            "5s30s"
+          ],
+          "Breakeven": [
+            "5Y",
+            "10Y",
+            "5Y5Y_Forward"
+          ],
+          "Credit": [
+            "HY_OAS",
+            "IG_OAS",
+            "CCC_OAS"
+          ]
+        },
+        "Trade": {
+          "Goods": [
+            "Exports",
+            "Imports",
+            "Balance"
+          ],
+          "Services": [
+            "Exports",
+            "Imports",
+            "Balance"
+          ],
+          "CurrentAccount": [
+            "Total"
+          ],
+          "FX": [
+            "DXY_Broad",
+            "DXY_Major",
+            "DXY_NYBoT"
+          ]
+        },
+        "FinCond": {
+          "ChicagoFed_NFCI": [
+            "Overall",
+            "Adjusted_ANFCI"
+          ],
+          "GS_FCI": [
+            "Overall"
+          ],
+          "SLO": [
+            "C_and_I",
+            "CommercialRE",
+            "Consumer"
+          ]
+        },
+        "Sentiment": {
+          "Market": [
+            "AAII_Bullish",
+            "AAII_Bearish",
+            "AAII_Neutral",
+            "AAII_BullBear_Spread"
+          ],
+          "Composite": [
+            "CNN_FearGreed",
+            "CNN_FearGreed_PutCall",
+            "CNN_FearGreed_Momentum",
+            "CNN_FearGreed_SafeHaven",
+            "CNN_FearGreed_Breadth"
+          ],
+          "Volatility": [
+            "VIX",
+            "VVIX",
+            "MOVE",
+            "SKEW",
+            "VIX9D",
+            "VIX3M"
+          ]
+        }
+      },
+      "EU": {
+        "Prices": [
+          "HICP_Headline",
+          "HICP_Core",
+          "PPI"
+        ],
+        "Labor": [
+          "UnempRate",
+          "Wages"
+        ],
+        "Business": [
+          "HCOB_PMI_Mfg",
+          "HCOB_PMI_Svc",
+          "EC_ESI",
+          "ZEW",
+          "IFO"
+        ],
+        "Growth": [
+          "GDP_QoQ",
+          "GDP_YoY"
+        ],
+        "ECB": [
+          "DepositFacilityRate",
+          "MainRefinancingRate",
+          "MarginalLendingRate",
+          "M1",
+          "M2",
+          "M3"
+        ]
+      },
+      "CN": {
+        "Prices": [
+          "CPI",
+          "PPI"
+        ],
+        "Business": [
+          "NBS_PMI_Mfg",
+          "NBS_PMI_NonMfg",
+          "Caixin_PMI"
+        ],
+        "Growth": [
+          "GDP_YoY",
+          "IndProd",
+          "RetailSales"
+        ]
+      },
+      "JP": {
+        "Prices": [
+          "CPI",
+          "PPI"
+        ],
+        "BOJ": [
+          "PolicyRate"
+        ],
+        "Business": [
+          "Tankan_LargeMfg",
+          "Tankan_LargeNonMfg",
+          "Jibun_PMI_Mfg"
+        ]
+      },
+      "UK": {
+        "Prices": [
+          "CPI",
+          "PPI"
+        ],
+        "BOE": [
+          "BankRate"
+        ],
+        "Business": [
+          "SP_Global_PMI_Mfg",
+          "SP_Global_PMI_Svc"
+        ]
+      },
+      "Global": {
+        "OECD": [
+          "CLI_G7",
+          "CLI_G20",
+          "CLI_OECD_Total"
+        ]
+      }
+    },
+    "series_registry": {
+      "_comment_prices_cpi": "──────── CPI 全細項 (24 series) ────────",
+      "US.Prices.CPI.Headline": {
+        "fred_id": "CPIAUCSL",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index 1982-84=100",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "CPI Headline"
+      },
+      "US.Prices.CPI.Headline.YoY": {
+        "fred_id": "CPIAUCSL",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Percent",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "CPI YoY",
+        "transform": "yoy"
+      },
+      "US.Prices.CPI.Core": {
+        "fred_id": "CPILFESL",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index 1982-84=100",
+        "macro_theme": "Prices",
+        "sub_theme": "Core CPI",
+        "indicator": "Core CPI (ex Food & Energy)"
+      },
+      "US.Prices.CPI.Core.YoY": {
+        "fred_id": "CPILFESL",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Percent",
+        "macro_theme": "Prices",
+        "sub_theme": "Core CPI",
+        "indicator": "Core CPI YoY",
+        "transform": "yoy"
+      },
+      "US.Prices.CPI.Food": {
+        "fred_id": "CPIUFDSL",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "Food"
+      },
+      "US.Prices.CPI.FoodAtHome": {
+        "fred_id": "CUSR0000SAF11",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "Food at Home"
+      },
+      "US.Prices.CPI.FoodAwayFromHome": {
+        "fred_id": "CUSR0000SEFV",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "Food Away from Home"
+      },
+      "US.Prices.CPI.Energy": {
+        "fred_id": "CPIENGSL",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "Energy"
+      },
+      "US.Prices.CPI.Gasoline": {
+        "fred_id": "CUUR0000SETB01",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "Gasoline"
+      },
+      "US.Prices.CPI.FuelOil": {
+        "fred_id": "CUSR0000SEHE",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "Fuel Oil"
+      },
+      "US.Prices.CPI.Electricity": {
+        "fred_id": "CUUR0000SEHF01",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "Electricity"
+      },
+      "US.Prices.CPI.UtilityGas": {
+        "fred_id": "CUUR0000SEHF02",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "Utility Gas"
+      },
+      "US.Prices.CPI.Shelter": {
+        "fred_id": "CUSR0000SAH1",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "Shelter"
+      },
+      "US.Prices.CPI.Rent": {
+        "fred_id": "CUSR0000SEHA",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "Rent of Primary Residence"
+      },
+      "US.Prices.CPI.OER": {
+        "fred_id": "CUSR0000SEHC",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "Owners' Equivalent Rent"
+      },
+      "US.Prices.CPI.LodgingAwayFromHome": {
+        "fred_id": "CUSR0000SEHB",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "Lodging Away From Home"
+      },
+      "US.Prices.CPI.NewVehicles": {
+        "fred_id": "CUUR0000SETA01",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "New Vehicles"
+      },
+      "US.Prices.CPI.UsedCars": {
+        "fred_id": "CUSR0000SETA02",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "Used Cars & Trucks"
+      },
+      "US.Prices.CPI.MotorInsurance": {
+        "fred_id": "CUUR0000SETA05",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "Motor Vehicle Insurance"
+      },
+      "US.Prices.CPI.Apparel": {
+        "fred_id": "CPIAPPSL",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "Apparel"
+      },
+      "US.Prices.CPI.Transportation": {
+        "fred_id": "CUUR0000SAT",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "Transportation Services"
+      },
+      "US.Prices.CPI.MedicalCare": {
+        "fred_id": "CPIMEDSL",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "Medical Care"
+      },
+      "US.Prices.CPI.MedicalServices": {
+        "fred_id": "CUSR0000SAM2",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "Medical Services"
+      },
+      "US.Prices.CPI.MedicalCommodities": {
+        "fred_id": "CUSR0000SAM1",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "Medical Commodities"
+      },
+      "US.Prices.CPI.Services": {
+        "fred_id": "CUSR0000SAS",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "Services"
+      },
+      "US.Prices.CPI.RentOfShelter": {
+        "fred_id": "CUSR0000SAS2RS",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "Rent of Shelter"
+      },
+      "US.Prices.CPI.ServicesLessRentOfShelter": {
+        "fred_id": "CUSR0000SASL2RS",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "CPI",
+        "indicator": "Services Less Rent of Shelter (supercore proxy)"
+      },
+      "_comment_prices_pce": "──────── PCE 全細項 (6 series) ────────",
+      "US.Prices.PCE.Headline": {
+        "fred_id": "PCEPI",
+        "source": "BEA",
+        "freq": "Monthly",
+        "unit": "Index 2017=100",
+        "macro_theme": "Prices",
+        "sub_theme": "PCE",
+        "indicator": "PCE Headline"
+      },
+      "US.Prices.PCE.Headline.YoY": {
+        "fred_id": "PCEPI",
+        "source": "BEA",
+        "freq": "Monthly",
+        "unit": "Percent",
+        "macro_theme": "Prices",
+        "sub_theme": "PCE",
+        "indicator": "PCE YoY",
+        "transform": "yoy"
+      },
+      "US.Prices.PCE.Core": {
+        "fred_id": "PCEPILFE",
+        "source": "BEA",
+        "freq": "Monthly",
+        "unit": "Index 2017=100",
+        "macro_theme": "Prices",
+        "sub_theme": "Core PCE",
+        "indicator": "Core PCE"
+      },
+      "US.Prices.PCE.Core.YoY": {
+        "fred_id": "PCEPILFE",
+        "source": "BEA",
+        "freq": "Monthly",
+        "unit": "Percent",
+        "macro_theme": "Prices",
+        "sub_theme": "Core PCE",
+        "indicator": "Core PCE YoY",
+        "transform": "yoy"
+      },
+      "US.Prices.PCE.Goods": {
+        "fred_id": "DGDSRG3M086SBEA",
+        "source": "BEA",
+        "freq": "Monthly",
+        "unit": "Index 2017=100",
+        "macro_theme": "Prices",
+        "sub_theme": "PCE",
+        "indicator": "PCE Goods Prices"
+      },
+      "US.Prices.PCE.Services": {
+        "fred_id": "DSERRG3M086SBEA",
+        "source": "BEA",
+        "freq": "Monthly",
+        "unit": "Index 2017=100",
+        "macro_theme": "Prices",
+        "sub_theme": "PCE",
+        "indicator": "PCE Services Prices"
+      },
+      "_comment_prices_ppi": "──────── PPI 全細項 (8 series) ────────",
+      "US.Prices.PPI.FinalDemand": {
+        "fred_id": "PPIFID",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "PPI",
+        "indicator": "PPI Final Demand"
+      },
+      "US.Prices.PPI.AllCommodities": {
+        "fred_id": "PPIACO",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index 1982=100",
+        "macro_theme": "Prices",
+        "sub_theme": "PPI",
+        "indicator": "PPI All Commodities"
+      },
+      "US.Prices.PPI.ExFoodEnergy": {
+        "fred_id": "PPICOR",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "PPI",
+        "indicator": "PPI Ex Food & Energy (Core)"
+      },
+      "US.Prices.PPI.FinalDemand.Goods": {
+        "fred_id": "WPSFD49207",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "PPI",
+        "indicator": "PPI Final Demand Goods"
+      },
+      "US.Prices.PPI.FinalDemand.Services": {
+        "fred_id": "WPSFD4131",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "PPI",
+        "indicator": "PPI Final Demand Services"
+      },
+      "US.Prices.PPI.IntermediateDemand": {
+        "fred_id": "WPSID61",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "PPI",
+        "indicator": "PPI Intermediate Demand Processed"
+      },
+      "US.Prices.PPI.Unprocessed": {
+        "fred_id": "WPSID62",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Prices",
+        "sub_theme": "PPI",
+        "indicator": "PPI Intermediate Demand Unprocessed"
+      },
+      "_comment_prices_trade": "──────── Import/Export Prices (2) ────────",
+      "US.Prices.Import": {
+        "fred_id": "IR",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index 2000=100",
+        "macro_theme": "Prices",
+        "sub_theme": "Trade",
+        "indicator": "Import Price Index"
+      },
+      "US.Prices.Export": {
+        "fred_id": "IQ",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Index 2000=100",
+        "macro_theme": "Prices",
+        "sub_theme": "Trade",
+        "indicator": "Export Price Index"
+      },
+      "_comment_labor": "──────── Labor Market 全細項 (22 series) ────────",
+      "US.Labor.UnempRate.U3": {
+        "fred_id": "UNRATE",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Percent",
+        "macro_theme": "Labor",
+        "sub_theme": "Unemployment",
+        "indicator": "Unemployment Rate U3"
+      },
+      "US.Labor.UnempRate.U6": {
+        "fred_id": "U6RATE",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Percent",
+        "macro_theme": "Labor",
+        "sub_theme": "Unemployment",
+        "indicator": "U6 Underemployment Rate"
+      },
+      "US.Labor.ParticipationRate": {
+        "fred_id": "CIVPART",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Percent",
+        "macro_theme": "Labor",
+        "sub_theme": "Unemployment",
+        "indicator": "Labor Force Participation Rate"
+      },
+      "US.Labor.EmpPopRatio": {
+        "fred_id": "EMRATIO",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Percent",
+        "macro_theme": "Labor",
+        "sub_theme": "Unemployment",
+        "indicator": "Employment-Population Ratio"
+      },
+      "US.Labor.NFP": {
+        "fred_id": "PAYEMS",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Thousands",
+        "macro_theme": "Labor",
+        "sub_theme": "Payrolls",
+        "indicator": "Nonfarm Payrolls"
+      },
+      "US.Labor.NFP.MoM": {
+        "fred_id": "PAYEMS",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Thousands",
+        "macro_theme": "Labor",
+        "sub_theme": "Payrolls",
+        "indicator": "NFP MoM Change",
+        "transform": "diff"
+      },
+      "US.Labor.PrivatePayrolls": {
+        "fred_id": "USPRIV",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Thousands",
+        "macro_theme": "Labor",
+        "sub_theme": "Payrolls",
+        "indicator": "Private Payrolls"
+      },
+      "US.Labor.GovtPayrolls": {
+        "fred_id": "USGOVT",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Thousands",
+        "macro_theme": "Labor",
+        "sub_theme": "Payrolls",
+        "indicator": "Government Payrolls"
+      },
+      "US.Labor.MfgPayrolls": {
+        "fred_id": "MANEMP",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Thousands",
+        "macro_theme": "Labor",
+        "sub_theme": "Payrolls",
+        "indicator": "Manufacturing Payrolls"
+      },
+      "US.Labor.ConstructionPayrolls": {
+        "fred_id": "USCONS",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Thousands",
+        "macro_theme": "Labor",
+        "sub_theme": "Payrolls",
+        "indicator": "Construction Payrolls"
+      },
+      "US.Labor.AvgHourlyEarnings": {
+        "fred_id": "CES0500000003",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Dollars",
+        "macro_theme": "Labor",
+        "sub_theme": "Wages",
+        "indicator": "Avg Hourly Earnings"
+      },
+      "US.Labor.AvgHourlyEarnings.YoY": {
+        "fred_id": "CES0500000003",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Percent",
+        "macro_theme": "Labor",
+        "sub_theme": "Wages",
+        "indicator": "AHE YoY",
+        "transform": "yoy"
+      },
+      "US.Labor.AvgWeeklyHours": {
+        "fred_id": "AWHAETP",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Hours",
+        "macro_theme": "Labor",
+        "sub_theme": "Wages",
+        "indicator": "Avg Weekly Hours"
+      },
+      "US.Labor.ECI": {
+        "fred_id": "ECIALLCIV",
+        "source": "BLS",
+        "freq": "Quarterly",
+        "unit": "Index",
+        "macro_theme": "Labor",
+        "sub_theme": "Wages",
+        "indicator": "Employment Cost Index"
+      },
+      "US.Labor.ECI.Wages": {
+        "fred_id": "ECIWAG",
+        "source": "BLS",
+        "freq": "Quarterly",
+        "unit": "Index",
+        "macro_theme": "Labor",
+        "sub_theme": "Wages",
+        "indicator": "ECI Wages"
+      },
+      "US.Labor.ECI.Benefits": {
+        "fred_id": "ECIBEN",
+        "source": "BLS",
+        "freq": "Quarterly",
+        "unit": "Index",
+        "macro_theme": "Labor",
+        "sub_theme": "Wages",
+        "indicator": "ECI Benefits"
+      },
+      "US.Labor.JOLTS.JobOpenings": {
+        "fred_id": "JTSJOL",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Thousands",
+        "macro_theme": "Labor",
+        "sub_theme": "JOLTS",
+        "indicator": "Job Openings"
+      },
+      "US.Labor.JOLTS.Hires": {
+        "fred_id": "JTSHIL",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Thousands",
+        "macro_theme": "Labor",
+        "sub_theme": "JOLTS",
+        "indicator": "Hires"
+      },
+      "US.Labor.JOLTS.Quits": {
+        "fred_id": "JTSQUL",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Thousands",
+        "macro_theme": "Labor",
+        "sub_theme": "JOLTS",
+        "indicator": "Quits"
+      },
+      "US.Labor.JOLTS.Layoffs": {
+        "fred_id": "JTSLDL",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Thousands",
+        "macro_theme": "Labor",
+        "sub_theme": "JOLTS",
+        "indicator": "Layoffs & Discharges"
+      },
+      "US.Labor.JOLTS.Separations": {
+        "fred_id": "JTSTSL",
+        "source": "BLS",
+        "freq": "Monthly",
+        "unit": "Thousands",
+        "macro_theme": "Labor",
+        "sub_theme": "JOLTS",
+        "indicator": "Total Separations"
+      },
+      "US.Labor.InitialClaims": {
+        "fred_id": "ICSA",
+        "source": "DOL",
+        "freq": "Weekly",
+        "unit": "Number",
+        "macro_theme": "Labor",
+        "sub_theme": "Claims",
+        "indicator": "Initial Jobless Claims"
+      },
+      "US.Labor.ContinuingClaims": {
+        "fred_id": "CCSA",
+        "source": "DOL",
+        "freq": "Weekly",
+        "unit": "Number",
+        "macro_theme": "Labor",
+        "sub_theme": "Claims",
+        "indicator": "Continuing Claims"
+      },
+      "US.Labor.InsuredUnempRate": {
+        "fred_id": "IURSA",
+        "source": "DOL",
+        "freq": "Weekly",
+        "unit": "Percent",
+        "macro_theme": "Labor",
+        "sub_theme": "Claims",
+        "indicator": "Insured Unemployment Rate"
+      },
+      "US.Labor.Productivity": {
+        "fred_id": "OPHNFB",
+        "source": "BLS",
+        "freq": "Quarterly",
+        "unit": "Index",
+        "macro_theme": "Labor",
+        "sub_theme": "Productivity",
+        "indicator": "Output Per Hour Nonfarm Business"
+      },
+      "US.Labor.UnitLaborCosts": {
+        "fred_id": "ULCNFB",
+        "source": "BLS",
+        "freq": "Quarterly",
+        "unit": "Index",
+        "macro_theme": "Labor",
+        "sub_theme": "Productivity",
+        "indicator": "Unit Labor Costs Nonfarm"
+      },
+      "_comment_business": "──────── Business / PMI / Sentiment (20 series) ────────",
+      "US.Business.ISM.Mfg.PMI": {
+        "fred_id": "NAPM",
+        "source": "ISM",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Business",
+        "sub_theme": "ISM Mfg",
+        "indicator": "ISM Mfg PMI Headline"
+      },
+      "US.Business.ISM.Mfg.NewOrders": {
+        "fred_id": "NAPMNOI",
+        "source": "ISM",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Business",
+        "sub_theme": "ISM Mfg",
+        "indicator": "ISM Mfg New Orders"
+      },
+      "US.Business.ISM.Mfg.Production": {
+        "fred_id": "NAPMPI",
+        "source": "ISM",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Business",
+        "sub_theme": "ISM Mfg",
+        "indicator": "ISM Mfg Production"
+      },
+      "US.Business.ISM.Mfg.Employment": {
+        "fred_id": "NAPMEI",
+        "source": "ISM",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Business",
+        "sub_theme": "ISM Mfg",
+        "indicator": "ISM Mfg Employment"
+      },
+      "US.Business.ISM.Mfg.Prices": {
+        "fred_id": "NAPMPRI",
+        "source": "ISM",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Business",
+        "sub_theme": "ISM Mfg",
+        "indicator": "ISM Mfg Prices Paid"
+      },
+      "US.Business.ISM.Mfg.SupplierDeliveries": {
+        "fred_id": "NAPMSDI",
+        "source": "ISM",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Business",
+        "sub_theme": "ISM Mfg",
+        "indicator": "ISM Mfg Supplier Deliveries"
+      },
+      "US.Business.ISM.Mfg.Inventories": {
+        "fred_id": "NAPMII",
+        "source": "ISM",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Business",
+        "sub_theme": "ISM Mfg",
+        "indicator": "ISM Mfg Inventories"
+      },
+      "US.Business.ISM.Svc.PMI": {
+        "fred_id": "NMFCI",
+        "source": "ISM",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Business",
+        "sub_theme": "ISM Svc",
+        "indicator": "ISM Services PMI"
+      },
+      "US.Business.ISM.Svc.BusinessActivity": {
+        "fred_id": "NMFBAI",
+        "source": "ISM",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Business",
+        "sub_theme": "ISM Svc",
+        "indicator": "ISM Svc Business Activity"
+      },
+      "US.Business.ISM.Svc.NewOrders": {
+        "fred_id": "NMFNOI",
+        "source": "ISM",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Business",
+        "sub_theme": "ISM Svc",
+        "indicator": "ISM Svc New Orders"
+      },
+      "US.Business.ISM.Svc.Employment": {
+        "fred_id": "NMFEI",
+        "source": "ISM",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Business",
+        "sub_theme": "ISM Svc",
+        "indicator": "ISM Svc Employment"
+      },
+      "US.Business.ISM.Svc.Prices": {
+        "fred_id": "NMFPI",
+        "source": "ISM",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Business",
+        "sub_theme": "ISM Svc",
+        "indicator": "ISM Svc Prices Paid"
+      },
+      "US.Business.SPG.PMI.Mfg": {
+        "fred_id": "USMFGPMI",
+        "source": "S&P Global",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Business",
+        "sub_theme": "S&P Global",
+        "indicator": "S&P Global Mfg PMI"
+      },
+      "US.Business.RegionalFed.EmpireState": {
+        "fred_id": "GACDFSA066MSFRBNY",
+        "source": "FRBNY",
+        "freq": "Monthly",
+        "unit": "Diffusion Index",
+        "macro_theme": "Business",
+        "sub_theme": "Regional Fed",
+        "indicator": "Empire State Mfg Survey"
+      },
+      "US.Business.RegionalFed.PhillyFed": {
+        "fred_id": "GACDISA066MSFRBPHI",
+        "source": "FRBPhilly",
+        "freq": "Monthly",
+        "unit": "Diffusion Index",
+        "macro_theme": "Business",
+        "sub_theme": "Regional Fed",
+        "indicator": "Philly Fed Business Survey"
+      },
+      "US.Business.RegionalFed.DallasFed": {
+        "fred_id": "BACTSAMFRBDAL",
+        "source": "FRBDallas",
+        "freq": "Monthly",
+        "unit": "Diffusion Index",
+        "macro_theme": "Business",
+        "sub_theme": "Regional Fed",
+        "indicator": "Dallas Fed Mfg Outlook"
+      },
+      "US.Business.ConsumerConfidence": {
+        "fred_id": "CSCICP03USM665S",
+        "source": "ConfBoard",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Business",
+        "sub_theme": "Sentiment",
+        "indicator": "Conference Board Consumer Confidence"
+      },
+      "US.Business.UMichSentiment": {
+        "fred_id": "UMCSENT",
+        "source": "UMich",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Business",
+        "sub_theme": "Sentiment",
+        "indicator": "U Mich Consumer Sentiment"
+      },
+      "US.Business.UMichExpectations": {
+        "fred_id": "MICH",
+        "source": "UMich",
+        "freq": "Monthly",
+        "unit": "Percent",
+        "macro_theme": "Business",
+        "sub_theme": "Sentiment",
+        "indicator": "U Mich Inflation Expectations"
+      },
+      "US.Business.NFIB": {
+        "fred_id": "NFIB",
+        "source": "NFIB",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Business",
+        "sub_theme": "Sentiment",
+        "indicator": "NFIB Small Business Optimism"
+      },
+      "US.Business.LEI": {
+        "fred_id": "USSLIND",
+        "source": "ConfBoard",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Business",
+        "sub_theme": "Leading",
+        "indicator": "Conference Board LEI"
+      },
+      "_comment_growth": "──────── GDP / Growth / Industrial (12) ────────",
+      "US.Growth.GDP.Real": {
+        "fred_id": "GDPC1",
+        "source": "BEA",
+        "freq": "Quarterly",
+        "unit": "Billions 2017 USD",
+        "macro_theme": "Growth",
+        "sub_theme": "GDP",
+        "indicator": "Real GDP"
+      },
+      "US.Growth.GDP.Nominal": {
+        "fred_id": "GDP",
+        "source": "BEA",
+        "freq": "Quarterly",
+        "unit": "Billions USD",
+        "macro_theme": "Growth",
+        "sub_theme": "GDP",
+        "indicator": "Nominal GDP"
+      },
+      "US.Growth.GDP.QoQ.Annualized": {
+        "fred_id": "A191RL1Q225SBEA",
+        "source": "BEA",
+        "freq": "Quarterly",
+        "unit": "Percent",
+        "macro_theme": "Growth",
+        "sub_theme": "GDP",
+        "indicator": "Real GDP QoQ Annualized"
+      },
+      "US.Growth.GDP.Deflator": {
+        "fred_id": "GDPDEF",
+        "source": "BEA",
+        "freq": "Quarterly",
+        "unit": "Index",
+        "macro_theme": "Growth",
+        "sub_theme": "GDP",
+        "indicator": "GDP Deflator"
+      },
+      "US.Growth.GDP.PCE": {
+        "fred_id": "PCEC96",
+        "source": "BEA",
+        "freq": "Quarterly",
+        "unit": "Billions 2017 USD",
+        "macro_theme": "Growth",
+        "sub_theme": "GDP Components",
+        "indicator": "PCE Real"
+      },
+      "US.Growth.GDP.GPDI": {
+        "fred_id": "GPDI",
+        "source": "BEA",
+        "freq": "Quarterly",
+        "unit": "Billions USD",
+        "macro_theme": "Growth",
+        "sub_theme": "GDP Components",
+        "indicator": "Gross Private Investment"
+      },
+      "US.Growth.GDP.GCE": {
+        "fred_id": "GCE",
+        "source": "BEA",
+        "freq": "Quarterly",
+        "unit": "Billions USD",
+        "macro_theme": "Growth",
+        "sub_theme": "GDP Components",
+        "indicator": "Govt Consumption & Investment"
+      },
+      "US.Growth.GDP.NetExports": {
+        "fred_id": "NETEXP",
+        "source": "BEA",
+        "freq": "Quarterly",
+        "unit": "Billions USD",
+        "macro_theme": "Growth",
+        "sub_theme": "GDP Components",
+        "indicator": "Net Exports"
+      },
+      "US.Growth.GDPNow": {
+        "fred_id": "GDPNOW",
+        "source": "Atlanta Fed",
+        "freq": "Weekly",
+        "unit": "Percent",
+        "macro_theme": "Growth",
+        "sub_theme": "Nowcast",
+        "indicator": "Atlanta Fed GDPNow"
+      },
+      "US.Growth.IndProd.Total": {
+        "fred_id": "INDPRO",
+        "source": "Fed",
+        "freq": "Monthly",
+        "unit": "Index 2017=100",
+        "macro_theme": "Growth",
+        "sub_theme": "Industrial",
+        "indicator": "Industrial Production Total"
+      },
+      "US.Growth.IndProd.Mfg": {
+        "fred_id": "IPMAN",
+        "source": "Fed",
+        "freq": "Monthly",
+        "unit": "Index 2017=100",
+        "macro_theme": "Growth",
+        "sub_theme": "Industrial",
+        "indicator": "Industrial Production Mfg"
+      },
+      "US.Growth.CapUtil": {
+        "fred_id": "TCU",
+        "source": "Fed",
+        "freq": "Monthly",
+        "unit": "Percent",
+        "macro_theme": "Growth",
+        "sub_theme": "Industrial",
+        "indicator": "Capacity Utilization"
+      },
+      "US.Growth.DurableGoods.Total": {
+        "fred_id": "DGORDER",
+        "source": "Census",
+        "freq": "Monthly",
+        "unit": "Millions USD",
+        "macro_theme": "Growth",
+        "sub_theme": "DurableGoods",
+        "indicator": "Durable Goods Total Orders"
+      },
+      "US.Growth.DurableGoods.Core": {
+        "fred_id": "NEWORDER",
+        "source": "Census",
+        "freq": "Monthly",
+        "unit": "Millions USD",
+        "macro_theme": "Growth",
+        "sub_theme": "DurableGoods",
+        "indicator": "Core Cap Goods Orders ex Defense ex Aircraft"
+      },
+      "_comment_consumer": "──────── Consumer / Retail (8) ────────",
+      "US.Consumer.RetailSales": {
+        "fred_id": "RSAFS",
+        "source": "Census",
+        "freq": "Monthly",
+        "unit": "Millions USD",
+        "macro_theme": "Consumer",
+        "sub_theme": "Retail",
+        "indicator": "Retail Sales Total"
+      },
+      "US.Consumer.RetailSales.ExAuto": {
+        "fred_id": "RSFSXMV",
+        "source": "Census",
+        "freq": "Monthly",
+        "unit": "Millions USD",
+        "macro_theme": "Consumer",
+        "sub_theme": "Retail",
+        "indicator": "Retail Sales Ex Auto"
+      },
+      "US.Consumer.RetailSales.Control": {
+        "fred_id": "RSSTHD",
+        "source": "Census",
+        "freq": "Monthly",
+        "unit": "Millions USD",
+        "macro_theme": "Consumer",
+        "sub_theme": "Retail",
+        "indicator": "Retail Sales Control Group"
+      },
+      "US.Consumer.PersonalIncome": {
+        "fred_id": "PI",
+        "source": "BEA",
+        "freq": "Monthly",
+        "unit": "Billions USD",
+        "macro_theme": "Consumer",
+        "sub_theme": "Income",
+        "indicator": "Personal Income"
+      },
+      "US.Consumer.PersonalSpending": {
+        "fred_id": "PCE",
+        "source": "BEA",
+        "freq": "Monthly",
+        "unit": "Billions USD",
+        "macro_theme": "Consumer",
+        "sub_theme": "Spending",
+        "indicator": "Personal Consumption Expenditure"
+      },
+      "US.Consumer.DPI": {
+        "fred_id": "DSPI",
+        "source": "BEA",
+        "freq": "Monthly",
+        "unit": "Billions USD",
+        "macro_theme": "Consumer",
+        "sub_theme": "Income",
+        "indicator": "Disposable Personal Income"
+      },
+      "US.Consumer.SavingsRate": {
+        "fred_id": "PSAVERT",
+        "source": "BEA",
+        "freq": "Monthly",
+        "unit": "Percent",
+        "macro_theme": "Consumer",
+        "sub_theme": "Savings",
+        "indicator": "Personal Savings Rate"
+      },
+      "US.Consumer.Credit.CardDelinquency": {
+        "fred_id": "DRCCLACBS",
+        "source": "Fed",
+        "freq": "Quarterly",
+        "unit": "Percent",
+        "macro_theme": "Consumer",
+        "sub_theme": "Credit",
+        "indicator": "Credit Card Delinquency Rate"
+      },
+      "_comment_housing": "──────── Housing 全細項 (12) ────────",
+      "US.Housing.Starts.Total": {
+        "fred_id": "HOUST",
+        "source": "Census",
+        "freq": "Monthly",
+        "unit": "Thousands SAAR",
+        "macro_theme": "Housing",
+        "sub_theme": "Construction",
+        "indicator": "Housing Starts Total"
+      },
+      "US.Housing.Starts.SingleFamily": {
+        "fred_id": "HOUST1F",
+        "source": "Census",
+        "freq": "Monthly",
+        "unit": "Thousands SAAR",
+        "macro_theme": "Housing",
+        "sub_theme": "Construction",
+        "indicator": "Housing Starts Single Family"
+      },
+      "US.Housing.Starts.MultiFamily": {
+        "fred_id": "HOUST5F",
+        "source": "Census",
+        "freq": "Monthly",
+        "unit": "Thousands SAAR",
+        "macro_theme": "Housing",
+        "sub_theme": "Construction",
+        "indicator": "Housing Starts 5+ Multi-Family"
+      },
+      "US.Housing.BuildingPermits.Total": {
+        "fred_id": "PERMIT",
+        "source": "Census",
+        "freq": "Monthly",
+        "unit": "Thousands SAAR",
+        "macro_theme": "Housing",
+        "sub_theme": "Construction",
+        "indicator": "Building Permits Total"
+      },
+      "US.Housing.BuildingPermits.SingleFamily": {
+        "fred_id": "PERMIT1",
+        "source": "Census",
+        "freq": "Monthly",
+        "unit": "Thousands SAAR",
+        "macro_theme": "Housing",
+        "sub_theme": "Construction",
+        "indicator": "Building Permits Single Family"
+      },
+      "US.Housing.NewHomeSales": {
+        "fred_id": "HSN1F",
+        "source": "Census",
+        "freq": "Monthly",
+        "unit": "Thousands SAAR",
+        "macro_theme": "Housing",
+        "sub_theme": "Sales",
+        "indicator": "New Home Sales"
+      },
+      "US.Housing.ExistingHomeSales": {
+        "fred_id": "EXHOSLUSM495S",
+        "source": "NAR",
+        "freq": "Monthly",
+        "unit": "Millions SAAR",
+        "macro_theme": "Housing",
+        "sub_theme": "Sales",
+        "indicator": "Existing Home Sales"
+      },
+      "US.Housing.PendingHomeSales": {
+        "fred_id": "HSN1FNSA",
+        "source": "NAR",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Housing",
+        "sub_theme": "Sales",
+        "indicator": "Pending Home Sales Index"
+      },
+      "US.Housing.Prices.CaseShiller20": {
+        "fred_id": "SPCS20RSA",
+        "source": "S&P",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Housing",
+        "sub_theme": "Prices",
+        "indicator": "Case-Shiller 20-City"
+      },
+      "US.Housing.Prices.CaseShiller10": {
+        "fred_id": "SPCS10RSA",
+        "source": "S&P",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Housing",
+        "sub_theme": "Prices",
+        "indicator": "Case-Shiller 10-City"
+      },
+      "US.Housing.Prices.FHFA": {
+        "fred_id": "USSTHPI",
+        "source": "FHFA",
+        "freq": "Quarterly",
+        "unit": "Index",
+        "macro_theme": "Housing",
+        "sub_theme": "Prices",
+        "indicator": "FHFA House Price Index"
+      },
+      "US.Housing.NAHB.Index": {
+        "fred_id": "NAHBMMI",
+        "source": "NAHB",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Housing",
+        "sub_theme": "Sentiment",
+        "indicator": "NAHB Housing Market Index"
+      },
+      "US.Housing.Mortgage.30Y": {
+        "fred_id": "MORTGAGE30US",
+        "source": "Freddie Mac",
+        "freq": "Weekly",
+        "unit": "Percent",
+        "macro_theme": "Housing",
+        "sub_theme": "Mortgage",
+        "indicator": "30-Year Fixed Mortgage Rate"
+      },
+      "US.Housing.Mortgage.15Y": {
+        "fred_id": "MORTGAGE15US",
+        "source": "Freddie Mac",
+        "freq": "Weekly",
+        "unit": "Percent",
+        "macro_theme": "Housing",
+        "sub_theme": "Mortgage",
+        "indicator": "15-Year Fixed Mortgage Rate"
+      },
+      "_comment_fiscal_mts": "──────── 🟧 Fiscal: MTS Monthly (Treasury FiscalData) ────────",
+      "US.Fiscal.MTS.GrossReceipts": {
+        "source": "Treasury_FD",
+        "endpoint": "v1/accounting/mts/mts_table_1",
+        "field": "current_month_gross_receipts_amt",
+        "freq": "Monthly",
+        "unit": "Millions USD",
+        "macro_theme": "Fiscal",
+        "sub_theme": "MTS",
+        "indicator": "MTS Current Month Gross Receipts"
+      },
+      "US.Fiscal.MTS.GrossOutlays": {
+        "source": "Treasury_FD",
+        "endpoint": "v1/accounting/mts/mts_table_1",
+        "field": "current_month_gross_outlays_amt",
+        "freq": "Monthly",
+        "unit": "Millions USD",
+        "macro_theme": "Fiscal",
+        "sub_theme": "MTS",
+        "indicator": "MTS Current Month Gross Outlays"
+      },
+      "US.Fiscal.MTS.DeficitSurplus": {
+        "source": "Treasury_FD",
+        "endpoint": "v1/accounting/mts/mts_table_1",
+        "field": "current_month_dfct_sur_amt",
+        "freq": "Monthly",
+        "unit": "Millions USD",
+        "macro_theme": "Fiscal",
+        "sub_theme": "MTS",
+        "indicator": "MTS Current Month Deficit/Surplus"
+      },
+      "US.Fiscal.MTS.YTD.Receipts": {
+        "source": "Treasury_FD",
+        "endpoint": "v1/accounting/mts/mts_table_1",
+        "field": "ytd_gross_receipts_amt",
+        "freq": "Monthly",
+        "unit": "Millions USD",
+        "macro_theme": "Fiscal",
+        "sub_theme": "MTS",
+        "indicator": "MTS YTD Receipts"
+      },
+      "US.Fiscal.MTS.YTD.Outlays": {
+        "source": "Treasury_FD",
+        "endpoint": "v1/accounting/mts/mts_table_1",
+        "field": "ytd_gross_outlays_amt",
+        "freq": "Monthly",
+        "unit": "Millions USD",
+        "macro_theme": "Fiscal",
+        "sub_theme": "MTS",
+        "indicator": "MTS YTD Outlays"
+      },
+      "US.Fiscal.MTS.YTD.DeficitSurplus": {
+        "source": "Treasury_FD",
+        "endpoint": "v1/accounting/mts/mts_table_1",
+        "field": "ytd_dfct_sur_amt",
+        "freq": "Monthly",
+        "unit": "Millions USD",
+        "macro_theme": "Fiscal",
+        "sub_theme": "MTS",
+        "indicator": "MTS YTD Deficit/Surplus"
+      },
+      "US.Fiscal.MTS.ReceiptsBySource": {
+        "source": "Treasury_FD",
+        "endpoint": "v1/accounting/mts/mts_table_4",
+        "field": "*",
+        "freq": "Monthly",
+        "unit": "Millions USD",
+        "macro_theme": "Fiscal",
+        "sub_theme": "MTS",
+        "indicator": "Receipts by Source (Indiv/Corp/Excise/Customs/etc)"
+      },
+      "US.Fiscal.MTS.OutlaysByFunction": {
+        "source": "Treasury_FD",
+        "endpoint": "v1/accounting/mts/mts_table_5",
+        "field": "*",
+        "freq": "Monthly",
+        "unit": "Millions USD",
+        "macro_theme": "Fiscal",
+        "sub_theme": "MTS",
+        "indicator": "Outlays by Function (Defense/SocSec/Medicare/etc)"
+      },
+      "_comment_fiscal_dts": "──────── 🟦 Fiscal: DTS Daily (Treasury FiscalData) ────────",
+      "US.Fiscal.DTS.TotalReceipts": {
+        "source": "Treasury_FD",
+        "endpoint": "v1/accounting/dts/deposits_withdrawals_operating_cash",
+        "field": "deposits_today_amt",
+        "freq": "Daily",
+        "unit": "Millions USD",
+        "macro_theme": "Fiscal",
+        "sub_theme": "DTS",
+        "indicator": "DTS Daily Total Deposits (Receipts)"
+      },
+      "US.Fiscal.DTS.TotalOutlays": {
+        "source": "Treasury_FD",
+        "endpoint": "v1/accounting/dts/deposits_withdrawals_operating_cash",
+        "field": "withdrawals_today_amt",
+        "freq": "Daily",
+        "unit": "Millions USD",
+        "macro_theme": "Fiscal",
+        "sub_theme": "DTS",
+        "indicator": "DTS Daily Total Withdrawals (Outlays)"
+      },
+      "US.Fiscal.DTS.OperatingCashBalance": {
+        "source": "Treasury_FD",
+        "endpoint": "v1/accounting/dts/operating_cash_balance",
+        "field": "close_today_bal",
+        "freq": "Daily",
+        "unit": "Millions USD",
+        "macro_theme": "Fiscal",
+        "sub_theme": "DTS",
+        "indicator": "DTS Operating Cash Balance (TGA)"
+      },
+      "US.Fiscal.DTS.PublicDebtIssues": {
+        "source": "Treasury_FD",
+        "endpoint": "v1/accounting/dts/public_debt_transactions",
+        "field": "issues_today_amt",
+        "freq": "Daily",
+        "unit": "Millions USD",
+        "macro_theme": "Fiscal",
+        "sub_theme": "DTS",
+        "indicator": "DTS Public Debt Cash Issues"
+      },
+      "US.Fiscal.DTS.PublicDebtRedemptions": {
+        "source": "Treasury_FD",
+        "endpoint": "v1/accounting/dts/public_debt_transactions",
+        "field": "redemptions_today_amt",
+        "freq": "Daily",
+        "unit": "Millions USD",
+        "macro_theme": "Fiscal",
+        "sub_theme": "DTS",
+        "indicator": "DTS Public Debt Cash Redemptions"
+      },
+      "US.Fiscal.DTS.NetFlow": {
+        "source": "Treasury_FD",
+        "endpoint": "_derived",
+        "field": "_computed",
+        "freq": "Daily",
+        "unit": "Millions USD",
+        "macro_theme": "Fiscal",
+        "sub_theme": "DTS",
+        "indicator": "DTS Net Flow (Receipts - Outlays)",
+        "transform": "subtract:US.Fiscal.DTS.TotalReceipts,US.Fiscal.DTS.TotalOutlays"
+      },
+      "_comment_fiscal_debt": "──────── 🟪 Fiscal: Debt (FRED) ────────",
+      "US.Fiscal.Debt.TotalPublic": {
+        "fred_id": "GFDEBTN",
+        "source": "Treasury",
+        "freq": "Quarterly",
+        "unit": "Millions USD",
+        "macro_theme": "Fiscal",
+        "sub_theme": "Debt",
+        "indicator": "Total Public Debt Outstanding"
+      },
+      "US.Fiscal.Debt.HeldByPublic": {
+        "fred_id": "FYGFDPUN",
+        "source": "Treasury",
+        "freq": "Annual",
+        "unit": "Millions USD",
+        "macro_theme": "Fiscal",
+        "sub_theme": "Debt",
+        "indicator": "Federal Debt Held by Public"
+      },
+      "US.Fiscal.Debt.ToGDP": {
+        "fred_id": "GFDEGDQ188S",
+        "source": "Treasury",
+        "freq": "Quarterly",
+        "unit": "Percent",
+        "macro_theme": "Fiscal",
+        "sub_theme": "Debt",
+        "indicator": "Federal Debt to GDP"
+      },
+      "US.Fiscal.Debt.NetInterest": {
+        "fred_id": "FYOINT",
+        "source": "OMB",
+        "freq": "Annual",
+        "unit": "Millions USD",
+        "macro_theme": "Fiscal",
+        "sub_theme": "Debt",
+        "indicator": "Federal Net Interest Outlays"
+      },
+      "_comment_fed_rates": "──────── 🟥 Fed Policy: Rates ────────",
+      "US.Fed.Rates.FedFundsEffective": {
+        "fred_id": "DFF",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Fed",
+        "sub_theme": "Rates",
+        "indicator": "Effective Fed Funds Rate"
+      },
+      "US.Fed.Rates.FedFundsTarget.Upper": {
+        "fred_id": "DFEDTARU",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Fed",
+        "sub_theme": "Rates",
+        "indicator": "Fed Funds Target Upper Bound"
+      },
+      "US.Fed.Rates.FedFundsTarget.Lower": {
+        "fred_id": "DFEDTARL",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Fed",
+        "sub_theme": "Rates",
+        "indicator": "Fed Funds Target Lower Bound"
+      },
+      "US.Fed.Rates.IORB": {
+        "fred_id": "IORB",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Fed",
+        "sub_theme": "Rates",
+        "indicator": "Interest on Reserve Balances"
+      },
+      "US.Fed.Rates.DiscountRate": {
+        "fred_id": "INTDSRUSM193N",
+        "source": "Fed",
+        "freq": "Monthly",
+        "unit": "Percent",
+        "macro_theme": "Fed",
+        "sub_theme": "Rates",
+        "indicator": "Discount Rate (Primary Credit)"
+      },
+      "US.Fed.Rates.SOFR": {
+        "fred_id": "SOFR",
+        "source": "FRBNY",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Fed",
+        "sub_theme": "Rates",
+        "indicator": "Secured Overnight Financing Rate"
+      },
+      "US.Fed.Rates.EFFR": {
+        "fred_id": "EFFR",
+        "source": "FRBNY",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Fed",
+        "sub_theme": "Rates",
+        "indicator": "Effective Federal Funds Rate (daily)"
+      },
+      "_comment_fed_balance": "──────── 🟥 Fed Policy: Balance Sheet ────────",
+      "US.Fed.BalanceSheet.Total": {
+        "fred_id": "WALCL",
+        "source": "Fed",
+        "freq": "Weekly",
+        "unit": "Millions USD",
+        "macro_theme": "Fed",
+        "sub_theme": "BalanceSheet",
+        "indicator": "Fed Total Assets (WALCL)"
+      },
+      "US.Fed.BalanceSheet.Treasuries": {
+        "fred_id": "TREAST",
+        "source": "Fed",
+        "freq": "Weekly",
+        "unit": "Millions USD",
+        "macro_theme": "Fed",
+        "sub_theme": "BalanceSheet",
+        "indicator": "Fed Holdings of US Treasuries"
+      },
+      "US.Fed.BalanceSheet.MBS": {
+        "fred_id": "WSHOMCB",
+        "source": "Fed",
+        "freq": "Weekly",
+        "unit": "Millions USD",
+        "macro_theme": "Fed",
+        "sub_theme": "BalanceSheet",
+        "indicator": "Fed Holdings of MBS"
+      },
+      "US.Fed.BalanceSheet.ReverseRepo": {
+        "fred_id": "RRPONTSYD",
+        "source": "FRBNY",
+        "freq": "Daily",
+        "unit": "Billions USD",
+        "macro_theme": "Fed",
+        "sub_theme": "BalanceSheet",
+        "indicator": "Overnight Reverse Repo (RRP)"
+      },
+      "US.Fed.BalanceSheet.TGA": {
+        "fred_id": "WTREGEN",
+        "source": "Treasury",
+        "freq": "Weekly",
+        "unit": "Millions USD",
+        "macro_theme": "Fed",
+        "sub_theme": "BalanceSheet",
+        "indicator": "Treasury General Account (TGA)"
+      },
+      "US.Fed.BalanceSheet.BankReserves": {
+        "fred_id": "WRESBAL",
+        "source": "Fed",
+        "freq": "Weekly",
+        "unit": "Billions USD",
+        "macro_theme": "Fed",
+        "sub_theme": "BalanceSheet",
+        "indicator": "Total Bank Reserves"
+      },
+      "US.Fed.MoneySupply.M1": {
+        "fred_id": "M1SL",
+        "source": "Fed",
+        "freq": "Monthly",
+        "unit": "Billions USD",
+        "macro_theme": "Fed",
+        "sub_theme": "MoneySupply",
+        "indicator": "M1 Money Supply"
+      },
+      "US.Fed.MoneySupply.M2": {
+        "fred_id": "M2SL",
+        "source": "Fed",
+        "freq": "Monthly",
+        "unit": "Billions USD",
+        "macro_theme": "Fed",
+        "sub_theme": "MoneySupply",
+        "indicator": "M2 Money Supply"
+      },
+      "US.Fed.MoneySupply.M2.YoY": {
+        "fred_id": "M2SL",
+        "source": "Fed",
+        "freq": "Monthly",
+        "unit": "Percent",
+        "macro_theme": "Fed",
+        "sub_theme": "MoneySupply",
+        "indicator": "M2 YoY",
+        "transform": "yoy"
+      },
+      "_comment_fed_guidance": "──────── 🟥 Fed Policy: Forward Guidance (scrape) ────────",
+      "US.Fed.ForwardGuidance.FOMC.Statements": {
+        "source": "Fed",
+        "endpoint": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm",
+        "method": "scrape",
+        "freq": "PerMeeting",
+        "unit": "text",
+        "macro_theme": "Fed",
+        "sub_theme": "ForwardGuidance",
+        "indicator": "FOMC Statement Text"
+      },
+      "US.Fed.ForwardGuidance.DotPlot": {
+        "source": "Fed",
+        "endpoint": "https://www.federalreserve.gov/monetarypolicy/fomcprojtabl.htm",
+        "method": "scrape",
+        "freq": "Quarterly",
+        "unit": "Percent",
+        "macro_theme": "Fed",
+        "sub_theme": "ForwardGuidance",
+        "indicator": "FOMC Dot Plot Projections"
+      },
+      "_comment_rates_treasury": "──────── 🟪 US Treasury Yield Curve (Full) ────────",
+      "US.Rates.Treasury.1M": {
+        "fred_id": "DGS1MO",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Rates",
+        "sub_theme": "Treasury",
+        "indicator": "1-Month Treasury"
+      },
+      "US.Rates.Treasury.3M": {
+        "fred_id": "DTB3",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Rates",
+        "sub_theme": "Treasury",
+        "indicator": "3-Month T-Bill"
+      },
+      "US.Rates.Treasury.6M": {
+        "fred_id": "DTB6",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Rates",
+        "sub_theme": "Treasury",
+        "indicator": "6-Month T-Bill"
+      },
+      "US.Rates.Treasury.1Y": {
+        "fred_id": "DGS1",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Rates",
+        "sub_theme": "Treasury",
+        "indicator": "1-Year Treasury"
+      },
+      "US.Rates.Treasury.2Y": {
+        "fred_id": "DGS2",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Rates",
+        "sub_theme": "Treasury",
+        "indicator": "2-Year Treasury"
+      },
+      "US.Rates.Treasury.3Y": {
+        "fred_id": "DGS3",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Rates",
+        "sub_theme": "Treasury",
+        "indicator": "3-Year Treasury"
+      },
+      "US.Rates.Treasury.5Y": {
+        "fred_id": "DGS5",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Rates",
+        "sub_theme": "Treasury",
+        "indicator": "5-Year Treasury"
+      },
+      "US.Rates.Treasury.7Y": {
+        "fred_id": "DGS7",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Rates",
+        "sub_theme": "Treasury",
+        "indicator": "7-Year Treasury"
+      },
+      "US.Rates.Treasury.10Y": {
+        "fred_id": "DGS10",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Rates",
+        "sub_theme": "Treasury",
+        "indicator": "10-Year Treasury"
+      },
+      "US.Rates.Treasury.20Y": {
+        "fred_id": "DGS20",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Rates",
+        "sub_theme": "Treasury",
+        "indicator": "20-Year Treasury"
+      },
+      "US.Rates.Treasury.30Y": {
+        "fred_id": "DGS30",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Rates",
+        "sub_theme": "Treasury",
+        "indicator": "30-Year Treasury"
+      },
+      "_comment_rates_tips": "──────── 🟪 TIPS Curve (Real Yields) ────────",
+      "US.Rates.TIPS.5Y": {
+        "fred_id": "DFII5",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Rates",
+        "sub_theme": "TIPS",
+        "indicator": "5Y TIPS Real Yield"
+      },
+      "US.Rates.TIPS.10Y": {
+        "fred_id": "DFII10",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Rates",
+        "sub_theme": "TIPS",
+        "indicator": "10Y TIPS Real Yield"
+      },
+      "US.Rates.TIPS.20Y": {
+        "fred_id": "DFII20",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Rates",
+        "sub_theme": "TIPS",
+        "indicator": "20Y TIPS Real Yield"
+      },
+      "US.Rates.TIPS.30Y": {
+        "fred_id": "DFII30",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Rates",
+        "sub_theme": "TIPS",
+        "indicator": "30Y TIPS Real Yield"
+      },
+      "_comment_rates_spreads": "──────── 🟪 Spreads & Breakeven ────────",
+      "US.Rates.Spread.2s10s": {
+        "fred_id": "T10Y2Y",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Rates",
+        "sub_theme": "Spread",
+        "indicator": "10Y-2Y Spread"
+      },
+      "US.Rates.Spread.3m10y": {
+        "fred_id": "T10Y3M",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Rates",
+        "sub_theme": "Spread",
+        "indicator": "10Y-3M Spread (NY Fed Recession Model)"
+      },
+      "US.Rates.BreakEven.5Y": {
+        "fred_id": "T5YIE",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Rates",
+        "sub_theme": "Breakeven",
+        "indicator": "5Y Breakeven Inflation"
+      },
+      "US.Rates.BreakEven.10Y": {
+        "fred_id": "T10YIE",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Rates",
+        "sub_theme": "Breakeven",
+        "indicator": "10Y Breakeven Inflation"
+      },
+      "US.Rates.BreakEven.5Y5Y": {
+        "fred_id": "T5YIFR",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Rates",
+        "sub_theme": "Breakeven",
+        "indicator": "5Y5Y Forward Inflation"
+      },
+      "US.Rates.Credit.HY_OAS": {
+        "fred_id": "BAMLH0A0HYM2",
+        "source": "ICE/Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Rates",
+        "sub_theme": "Credit",
+        "indicator": "ICE BofA HY OAS Spread"
+      },
+      "US.Rates.Credit.IG_OAS": {
+        "fred_id": "BAMLC0A0CM",
+        "source": "ICE/Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Rates",
+        "sub_theme": "Credit",
+        "indicator": "ICE BofA IG OAS Spread"
+      },
+      "US.Rates.Credit.CCC_OAS": {
+        "fred_id": "BAMLH0A3HYC",
+        "source": "ICE/Fed",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "Rates",
+        "sub_theme": "Credit",
+        "indicator": "ICE BofA CCC OAS Spread"
+      },
+      "_comment_trade": "──────── Trade & External (5) ────────",
+      "US.Trade.Goods.Balance": {
+        "fred_id": "BOPGSTB",
+        "source": "Census/BEA",
+        "freq": "Monthly",
+        "unit": "Millions USD",
+        "macro_theme": "Trade",
+        "sub_theme": "Goods",
+        "indicator": "Trade Balance Goods"
+      },
+      "US.Trade.Goods.Exports": {
+        "fred_id": "BOPGEXP",
+        "source": "Census/BEA",
+        "freq": "Monthly",
+        "unit": "Millions USD",
+        "macro_theme": "Trade",
+        "sub_theme": "Goods",
+        "indicator": "Goods Exports"
+      },
+      "US.Trade.Goods.Imports": {
+        "fred_id": "BOPGIMP",
+        "source": "Census/BEA",
+        "freq": "Monthly",
+        "unit": "Millions USD",
+        "macro_theme": "Trade",
+        "sub_theme": "Goods",
+        "indicator": "Goods Imports"
+      },
+      "US.Trade.Services.Balance": {
+        "fred_id": "IEABCS",
+        "source": "BEA",
+        "freq": "Monthly",
+        "unit": "Millions USD",
+        "macro_theme": "Trade",
+        "sub_theme": "Services",
+        "indicator": "Trade Balance Services"
+      },
+      "US.Trade.DXY.Broad": {
+        "fred_id": "DTWEXBGS",
+        "source": "Fed",
+        "freq": "Daily",
+        "unit": "Index Jan 2006=100",
+        "macro_theme": "Trade",
+        "sub_theme": "FX",
+        "indicator": "USD Broad Trade-Weighted Index"
+      },
+      "_comment_fincond": "──────── Financial Conditions (4) ────────",
+      "US.FinCond.NFCI": {
+        "fred_id": "NFCI",
+        "source": "Chicago Fed",
+        "freq": "Weekly",
+        "unit": "Index",
+        "macro_theme": "FinCond",
+        "sub_theme": "FCI",
+        "indicator": "Chicago Fed NFCI"
+      },
+      "US.FinCond.ANFCI": {
+        "fred_id": "ANFCI",
+        "source": "Chicago Fed",
+        "freq": "Weekly",
+        "unit": "Index",
+        "macro_theme": "FinCond",
+        "sub_theme": "FCI",
+        "indicator": "Adjusted NFCI"
+      },
+      "US.FinCond.SLO.C&I": {
+        "fred_id": "DRTSCIS",
+        "source": "Fed",
+        "freq": "Quarterly",
+        "unit": "Net Percent",
+        "macro_theme": "FinCond",
+        "sub_theme": "SLOOS",
+        "indicator": "Senior Loan Officer C&I Tightening"
+      },
+      "US.FinCond.SLO.CommercialRE": {
+        "fred_id": "DRTSCILM",
+        "source": "Fed",
+        "freq": "Quarterly",
+        "unit": "Net Percent",
+        "macro_theme": "FinCond",
+        "sub_theme": "SLOOS",
+        "indicator": "Senior Loan Officer CRE Tightening"
+      },
+      "_comment_sentiment": "──────── Market Sentiment (non-FRED scrape) ────────",
+      "US.Sentiment.AAII.Bullish": {
+        "source": "AAII",
+        "endpoint": "https://www.aaii.com/files/surveys/sentiment.xls",
+        "field": "bullish",
+        "freq": "Weekly",
+        "unit": "Percent",
+        "macro_theme": "Sentiment",
+        "sub_theme": "AAII",
+        "indicator": "AAII Bullish %"
+      },
+      "US.Sentiment.AAII.Bearish": {
+        "source": "AAII",
+        "endpoint": "https://www.aaii.com/files/surveys/sentiment.xls",
+        "field": "bearish",
+        "freq": "Weekly",
+        "unit": "Percent",
+        "macro_theme": "Sentiment",
+        "sub_theme": "AAII",
+        "indicator": "AAII Bearish %"
+      },
+      "US.Sentiment.AAII.Neutral": {
+        "source": "AAII",
+        "endpoint": "https://www.aaii.com/files/surveys/sentiment.xls",
+        "field": "neutral",
+        "freq": "Weekly",
+        "unit": "Percent",
+        "macro_theme": "Sentiment",
+        "sub_theme": "AAII",
+        "indicator": "AAII Neutral %"
+      },
+      "US.Sentiment.AAII.BullBearSpread": {
+        "source": "AAII",
+        "endpoint": "_derived",
+        "field": "_computed",
+        "freq": "Weekly",
+        "unit": "Percent",
+        "macro_theme": "Sentiment",
+        "sub_theme": "AAII",
+        "indicator": "AAII Bull-Bear Spread",
+        "transform": "subtract:US.Sentiment.AAII.Bullish,US.Sentiment.AAII.Bearish"
+      },
+      "US.Sentiment.CNN.FearGreed": {
+        "source": "CNN",
+        "endpoint": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
+        "field": "score",
+        "freq": "Daily",
+        "unit": "Index 0-100",
+        "macro_theme": "Sentiment",
+        "sub_theme": "CNN F&G",
+        "indicator": "CNN Fear & Greed Composite"
+      },
+      "US.Sentiment.CNN.FG.PutCall": {
+        "source": "CNN",
+        "endpoint": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
+        "field": "put_call_options.score",
+        "freq": "Daily",
+        "unit": "Index 0-100",
+        "macro_theme": "Sentiment",
+        "sub_theme": "CNN F&G",
+        "indicator": "CNN F&G Put/Call Component"
+      },
+      "US.Sentiment.CNN.FG.Momentum": {
+        "source": "CNN",
+        "endpoint": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
+        "field": "market_momentum_sp500.score",
+        "freq": "Daily",
+        "unit": "Index 0-100",
+        "macro_theme": "Sentiment",
+        "sub_theme": "CNN F&G",
+        "indicator": "CNN F&G Momentum Component"
+      },
+      "US.Sentiment.CNN.FG.SafeHaven": {
+        "source": "CNN",
+        "endpoint": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
+        "field": "safe_haven_demand.score",
+        "freq": "Daily",
+        "unit": "Index 0-100",
+        "macro_theme": "Sentiment",
+        "sub_theme": "CNN F&G",
+        "indicator": "CNN F&G Safe Haven Demand"
+      },
+      "US.Sentiment.CNN.FG.Breadth": {
+        "source": "CNN",
+        "endpoint": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata",
+        "field": "market_volatility_vix.score",
+        "freq": "Daily",
+        "unit": "Index 0-100",
+        "macro_theme": "Sentiment",
+        "sub_theme": "CNN F&G",
+        "indicator": "CNN F&G Breadth Component"
+      },
+      "US.Sentiment.VIX": {
+        "source": "Yahoo",
+        "ticker": "^VIX",
+        "freq": "Daily",
+        "unit": "Index",
+        "macro_theme": "Sentiment",
+        "sub_theme": "Volatility",
+        "indicator": "CBOE VIX"
+      },
+      "US.Sentiment.VVIX": {
+        "source": "Yahoo",
+        "ticker": "^VVIX",
+        "freq": "Daily",
+        "unit": "Index",
+        "macro_theme": "Sentiment",
+        "sub_theme": "Volatility",
+        "indicator": "CBOE VVIX (Vol of Vol)"
+      },
+      "US.Sentiment.MOVE": {
+        "source": "Yahoo",
+        "ticker": "^MOVE",
+        "freq": "Daily",
+        "unit": "Index",
+        "macro_theme": "Sentiment",
+        "sub_theme": "Volatility",
+        "indicator": "ICE BofA MOVE (Bond Vol)"
+      },
+      "US.Sentiment.SKEW": {
+        "source": "Yahoo",
+        "ticker": "^SKEW",
+        "freq": "Daily",
+        "unit": "Index",
+        "macro_theme": "Sentiment",
+        "sub_theme": "Volatility",
+        "indicator": "CBOE SKEW Tail-Risk"
+      },
+      "_comment_eu_cn_jp": "──────── Global: EU / CN / JP / UK / OECD ────────",
+      "EU.Prices.HICP.Headline": {
+        "fred_id": "CP0000EZ19M086NEST",
+        "source": "Eurostat",
+        "freq": "Monthly",
+        "unit": "Index 2015=100",
+        "macro_theme": "Prices",
+        "sub_theme": "HICP",
+        "indicator": "EU HICP All Items"
+      },
+      "EU.Prices.HICP.Core": {
+        "fred_id": "CPHPLA01EZM659N",
+        "source": "Eurostat",
+        "freq": "Monthly",
+        "unit": "Percent",
+        "macro_theme": "Prices",
+        "sub_theme": "HICP",
+        "indicator": "EU HICP Core YoY"
+      },
+      "EU.ECB.DepositFacilityRate": {
+        "fred_id": "ECBDFR",
+        "source": "ECB",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "ECB",
+        "sub_theme": "Rates",
+        "indicator": "ECB Deposit Facility Rate"
+      },
+      "EU.ECB.MainRefiRate": {
+        "fred_id": "ECBMRRFR",
+        "source": "ECB",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "ECB",
+        "sub_theme": "Rates",
+        "indicator": "ECB Main Refinancing Rate"
+      },
+      "EU.Business.PMI.Mfg": {
+        "fred_id": "EUGLORPMI",
+        "source": "S&P Global",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Business",
+        "sub_theme": "EU PMI",
+        "indicator": "EU Mfg PMI"
+      },
+      "EU.Business.PMI.Svc": {
+        "fred_id": "EUSVPMI",
+        "source": "S&P Global",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Business",
+        "sub_theme": "EU PMI",
+        "indicator": "EU Svc PMI"
+      },
+      "CN.Business.PMI.Mfg.NBS": {
+        "fred_id": "CHNMFGPMI",
+        "source": "NBS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Business",
+        "sub_theme": "CN PMI",
+        "indicator": "China NBS Mfg PMI"
+      },
+      "CN.Business.PMI.NonMfg.NBS": {
+        "fred_id": "CHNNMFPMI",
+        "source": "NBS",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Business",
+        "sub_theme": "CN PMI",
+        "indicator": "China NBS NonMfg PMI"
+      },
+      "JP.Business.PMI.Mfg": {
+        "fred_id": "JPNMFGPMI",
+        "source": "Jibun Bank",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "Business",
+        "sub_theme": "JP PMI",
+        "indicator": "Japan Mfg PMI"
+      },
+      "JP.BOJ.PolicyRate": {
+        "fred_id": "IRSTCB01JPM156N",
+        "source": "BOJ",
+        "freq": "Monthly",
+        "unit": "Percent",
+        "macro_theme": "BOJ",
+        "sub_theme": "Rates",
+        "indicator": "BOJ Policy Rate"
+      },
+      "UK.BOE.BankRate": {
+        "fred_id": "IUDSOIA",
+        "source": "BOE",
+        "freq": "Daily",
+        "unit": "Percent",
+        "macro_theme": "BOE",
+        "sub_theme": "Rates",
+        "indicator": "BOE Bank Rate (SONIA proxy)"
+      },
+      "Global.OECD.CLI.G7": {
+        "fred_id": "G7LOLITONOSTSAM",
+        "source": "OECD",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "OECD",
+        "sub_theme": "Leading",
+        "indicator": "OECD CLI G7"
+      },
+      "Global.OECD.CLI.G20": {
+        "fred_id": "G20LOLITONOSTSAM",
+        "source": "OECD",
+        "freq": "Monthly",
+        "unit": "Index",
+        "macro_theme": "OECD",
+        "sub_theme": "Leading",
+        "indicator": "OECD CLI G20"
+      }
+    },
+    "derived_models": {
+      "US.Model.FedPolicy.Stance": {
+        "description": "Aggregate Fed policy stance: Tightening / Restrictive Hold / Neutral / Easing / Emergency Easing",
+        "inputs": [
+          "US.Fed.Rates.FedFundsTarget.Upper",
+          "US.Fed.Rates.FedFundsTarget.Lower",
+          "US.Fed.BalanceSheet.Total",
+          "US.Prices.PCE.Core.YoY",
+          "US.Labor.UnempRate.U3"
+        ],
+        "formula": "f(FFR - r_neutral, inflation_gap, unemployment_gap)",
+        "r_neutral": 0.75,
+        "output_categories": [
+          "Tightening",
+          "RestrictiveHold",
+          "Neutral",
+          "Easing",
+          "EmergencyEasing"
+        ],
+        "fetcher": "Derived"
+      },
+      "US.Model.FedPolicy.LiquidityImpulse": {
+        "description": "Change in net liquidity = Δ(Reserves + RRP_inverse + TGA_inverse). Drives risk assets.",
+        "inputs": [
+          "US.Fed.BalanceSheet.BankReserves",
+          "US.Fed.BalanceSheet.ReverseRepo",
+          "US.Fed.BalanceSheet.TGA"
+        ],
+        "formula": "Δ(Reserves - RRP - TGA)",
+        "interpretation": {
+          "positive": "Net liquidity injection → risk-on, equities up",
+          "negative": "Net liquidity drain → risk-off, USD up"
+        },
+        "fetcher": "Derived"
+      },
+      "US.Model.USDIndex.PolicyDiff": {
+        "description": "USD policy premium = Fed rate minus DXY-weighted G6 policy rates",
+        "inputs": [
+          "US.Fed.Rates.FedFundsTarget.Upper",
+          "EU.ECB.DepositFacilityRate",
+          "JP.BOJ.PolicyRate",
+          "UK.BOE.BankRate"
+        ],
+        "formula": "FFR - (ECB*0.576 + BOJ*0.136 + BOE*0.119 + BOC*0.091 + SNB*0.036)",
+        "dxy_weights": {
+          "EUR": 0.576,
+          "JPY": 0.136,
+          "GBP": 0.119,
+          "CAD": 0.091,
+          "SEK": 0.042,
+          "CHF": 0.036
+        },
+        "fetcher": "Derived"
+      },
+      "US.Model.USDIndex.YieldDiff2Y": {
+        "description": "Short-end yield differential vs G10 weighted average",
+        "inputs": [
+          "US.Rates.Treasury.2Y"
+        ],
+        "formula": "US2Y - weighted_G10_2Y",
+        "fetcher": "Derived"
+      },
+      "US.Model.USDIndex.RiskFactor": {
+        "description": "USD as safe-haven proxy = VIX + MOVE + NFCI tightening",
+        "inputs": [
+          "US.Sentiment.VIX",
+          "US.Sentiment.MOVE",
+          "US.FinCond.NFCI"
+        ],
+        "formula": "normalize(VIX) + normalize(MOVE) + normalize(NFCI)",
+        "fetcher": "Derived"
+      },
+      "US.Model.USDIndex.Composite": {
+        "description": "DXY Engine — 4-layer composite (policy / yield / liquidity / risk)",
+        "inputs": [
+          "US.Model.USDIndex.PolicyDiff",
+          "US.Model.USDIndex.YieldDiff2Y",
+          "US.Rates.Spread.2s10s",
+          "US.Model.FedPolicy.LiquidityImpulse",
+          "US.Model.USDIndex.RiskFactor"
+        ],
+        "formula": "0.35*PolicyDiff + 0.30*YieldDiff2Y + 0.10*YieldDiff10Y + 0.15*LiquidityImpulse + 0.10*RiskFactor",
+        "weights": {
+          "policy": 0.35,
+          "yield_2y": 0.3,
+          "yield_10y": 0.1,
+          "liquidity": 0.15,
+          "risk": 0.1
+        },
+        "fetcher": "Derived"
+      },
+      "US.Model.YieldCurve.Inversion": {
+        "description": "Recession signal: percent of yield curve points inverted",
+        "inputs": [
+          "US.Rates.Spread.2s10s",
+          "US.Rates.Spread.3m10y"
+        ],
+        "formula": "count(spread<0) / total_spreads",
+        "fetcher": "Derived"
+      },
+      "US.Model.Fiscal.MonthlyImpulse": {
+        "description": "Monthly fiscal impulse = (Outlays - Receipts) / GDP",
+        "inputs": [
+          "US.Fiscal.MTS.GrossOutlays",
+          "US.Fiscal.MTS.GrossReceipts",
+          "US.Growth.GDP.Nominal"
+        ],
+        "formula": "(MTS_Outlays - MTS_Receipts) / GDP_nominal_monthly",
+        "fetcher": "Derived"
+      },
+      "US.Model.Sentiment.RiskOnOff": {
+        "description": "Composite risk-on/off signal: AAII + CNN F&G + VIX inverse",
+        "inputs": [
+          "US.Sentiment.AAII.BullBearSpread",
+          "US.Sentiment.CNN.FearGreed",
+          "US.Sentiment.VIX"
+        ],
+        "formula": "normalize(AAII_Spread) + normalize(CNN_FG) - normalize(VIX)",
+        "fetcher": "Derived"
+      }
+    }
+  },
+  "section_C_etf_universe": {
+    "description": "Global ETF universe for capital flow tracking (region/sector/bond/theme/commodity/AI) + 4 fund-flow methods.",
+    "C1_regional_equity_index_etfs": {
+      "name": "全球/區域股票指數 ETF",
+      "purpose": "判斷大資金進出哪個地區",
+      "tickers": [
+        {
+          "ticker": "SPY",
+          "name": "S&P 500",
+          "aum_bn_usd": 500,
+          "region": "US"
+        },
+        {
+          "ticker": "QQQ",
+          "name": "Nasdaq 100",
+          "aum_bn_usd": 250,
+          "region": "US"
+        },
+        {
+          "ticker": "IWM",
+          "name": "Russell 2000",
+          "aum_bn_usd": 60,
+          "region": "US"
+        },
+        {
+          "ticker": "DIA",
+          "name": "Dow Jones",
+          "aum_bn_usd": 35,
+          "region": "US"
+        },
+        {
+          "ticker": "EFA",
+          "name": "MSCI EAFE (developed ex-US)",
+          "aum_bn_usd": 50,
+          "region": "DM"
+        },
+        {
+          "ticker": "EEM",
+          "name": "MSCI Emerging Markets",
+          "aum_bn_usd": 18,
+          "region": "EM"
+        },
+        {
+          "ticker": "VWO",
+          "name": "Vanguard Emerging Markets",
+          "aum_bn_usd": 75,
+          "region": "EM"
+        },
+        {
+          "ticker": "FXI",
+          "name": "iShares China Large-Cap",
+          "aum_bn_usd": 5,
+          "region": "CN"
+        },
+        {
+          "ticker": "MCHI",
+          "name": "MSCI China",
+          "aum_bn_usd": 4,
+          "region": "CN"
+        },
+        {
+          "ticker": "EWJ",
+          "name": "Japan",
+          "aum_bn_usd": 10,
+          "region": "JP"
+        },
+        {
+          "ticker": "EWY",
+          "name": "South Korea",
+          "aum_bn_usd": 4,
+          "region": "KR"
+        },
+        {
+          "ticker": "EWT",
+          "name": "Taiwan",
+          "aum_bn_usd": 3,
+          "region": "TW",
+          "note": "外資台股代理"
+        },
+        {
+          "ticker": "EWZ",
+          "name": "Brazil",
+          "aum_bn_usd": 5,
+          "region": "BR"
+        },
+        {
+          "ticker": "INDA",
+          "name": "India",
+          "aum_bn_usd": 6,
+          "region": "IN"
+        },
+        {
+          "ticker": "EWG",
+          "name": "Germany",
+          "aum_bn_usd": 2,
+          "region": "DE"
+        },
+        {
+          "ticker": "EZU",
+          "name": "Eurozone",
+          "aum_bn_usd": 6,
+          "region": "EU"
+        }
+      ]
+    },
+    "C2_sector_etfs": {
+      "name": "產業/板塊 ETF (SPDR Select Sectors + 細分產業)",
+      "purpose": "判斷資金在哪個產業集中 / 板塊輪動",
+      "tickers": [
+        {
+          "ticker": "XLK",
+          "name": "Technology",
+          "category": "sector_select"
+        },
+        {
+          "ticker": "XLF",
+          "name": "Financials",
+          "category": "sector_select"
+        },
+        {
+          "ticker": "XLV",
+          "name": "Healthcare",
+          "category": "sector_select"
+        },
+        {
+          "ticker": "XLE",
+          "name": "Energy",
+          "category": "sector_select"
+        },
+        {
+          "ticker": "XLI",
+          "name": "Industrials",
+          "category": "sector_select"
+        },
+        {
+          "ticker": "XLY",
+          "name": "Consumer Discretionary",
+          "category": "sector_select"
+        },
+        {
+          "ticker": "XLP",
+          "name": "Consumer Staples",
+          "category": "sector_select"
+        },
+        {
+          "ticker": "XLU",
+          "name": "Utilities",
+          "category": "sector_select"
+        },
+        {
+          "ticker": "XLRE",
+          "name": "Real Estate",
+          "category": "sector_select"
+        },
+        {
+          "ticker": "XLB",
+          "name": "Materials",
+          "category": "sector_select"
+        },
+        {
+          "ticker": "XLC",
+          "name": "Communication Services",
+          "category": "sector_select"
+        },
+        {
+          "ticker": "SOXX",
+          "name": "Semiconductors (iShares)",
+          "category": "subsector",
+          "note": "台股最相關"
+        },
+        {
+          "ticker": "SMH",
+          "name": "Semiconductors (VanEck)",
+          "category": "subsector",
+          "note": "NVDA/TSM 權重高"
+        },
+        {
+          "ticker": "IBB",
+          "name": "Biotech",
+          "category": "subsector"
+        },
+        {
+          "ticker": "KRE",
+          "name": "Regional Banks",
+          "category": "subsector"
+        },
+        {
+          "ticker": "ARKK",
+          "name": "ARK Innovation (主動 AI)",
+          "category": "ai_innovation",
+          "note": "高風險偏好溫度計"
+        },
+        {
+          "ticker": "AIQ",
+          "name": "Global X AI & Tech",
+          "category": "ai_innovation"
+        },
+        {
+          "ticker": "BOTZ",
+          "name": "Global X Robotics & AI",
+          "category": "ai_innovation"
+        },
+        {
+          "ticker": "ROBO",
+          "name": "Robotics & AI Index",
+          "category": "ai_innovation"
+        }
+      ]
+    },
+    "C3_bond_etfs": {
+      "name": "債券 ETF (期限 × 信評)",
+      "purpose": "判斷資金在股債之間流動",
+      "tickers": [
+        {
+          "ticker": "SHY",
+          "name": "1-3Y Treasury",
+          "duration": "short",
+          "category": "treasury"
+        },
+        {
+          "ticker": "IEI",
+          "name": "3-7Y Treasury",
+          "duration": "med_short",
+          "category": "treasury"
+        },
+        {
+          "ticker": "IEF",
+          "name": "7-10Y Treasury",
+          "duration": "med",
+          "category": "treasury"
+        },
+        {
+          "ticker": "TLT",
+          "name": "20+Y Treasury",
+          "duration": "long",
+          "category": "treasury",
+          "note": "股債翹翹板核心"
+        },
+        {
+          "ticker": "LQD",
+          "name": "Investment Grade Corp",
+          "credit": "IG",
+          "category": "credit"
+        },
+        {
+          "ticker": "HYG",
+          "name": "High Yield (iShares)",
+          "credit": "HY",
+          "category": "credit",
+          "note": "風險偏好 HY 利差"
+        },
+        {
+          "ticker": "JNK",
+          "name": "High Yield (SPDR)",
+          "credit": "HY",
+          "category": "credit"
+        },
+        {
+          "ticker": "TIP",
+          "name": "TIPS Inflation Protected",
+          "category": "tips",
+          "note": "Break-even 通膨率"
+        },
+        {
+          "ticker": "BND",
+          "name": "Total Bond Market",
+          "category": "aggregate"
+        },
+        {
+          "ticker": "AGG",
+          "name": "iShares Core US Aggregate",
+          "category": "aggregate"
+        },
+        {
+          "ticker": "EMB",
+          "name": "EM Sovereign USD",
+          "category": "em_bond"
+        },
+        {
+          "ticker": "MUB",
+          "name": "Municipal Bonds",
+          "category": "muni"
+        }
+      ]
+    },
+    "C4_commodity_etfs": {
+      "name": "商品 ETF (貴金屬 / 一般金屬 / 大宗物資 / 原油)",
+      "purpose": "通膨/實質利率反向 + 工業需求溫度",
+      "tickers": [
+        {
+          "ticker": "GLD",
+          "name": "Gold",
+          "category": "precious"
+        },
+        {
+          "ticker": "IAU",
+          "name": "Gold (iShares cheap)",
+          "category": "precious"
+        },
+        {
+          "ticker": "SLV",
+          "name": "Silver",
+          "category": "precious",
+          "note": "工業+避險雙重屬性"
+        },
+        {
+          "ticker": "PPLT",
+          "name": "Platinum",
+          "category": "precious"
+        },
+        {
+          "ticker": "PALL",
+          "name": "Palladium",
+          "category": "precious"
+        },
+        {
+          "ticker": "COPX",
+          "name": "Copper Miners",
+          "category": "base_metals"
+        },
+        {
+          "ticker": "PICK",
+          "name": "Metals & Mining",
+          "category": "base_metals"
+        },
+        {
+          "ticker": "USO",
+          "name": "WTI Crude Oil",
+          "category": "energy",
+          "note": "通膨/地緣衝突代理"
+        },
+        {
+          "ticker": "BNO",
+          "name": "Brent Oil",
+          "category": "energy"
+        },
+        {
+          "ticker": "UNG",
+          "name": "Natural Gas",
+          "category": "energy"
+        },
+        {
+          "ticker": "XOP",
+          "name": "Oil & Gas Exploration",
+          "category": "energy_eq"
+        },
+        {
+          "ticker": "DJP",
+          "name": "Bloomberg Commodity",
+          "category": "broad",
+          "note": "大宗商品整體輪動"
+        },
+        {
+          "ticker": "DBC",
+          "name": "Invesco DB Commodity",
+          "category": "broad"
+        },
+        {
+          "ticker": "DBA",
+          "name": "Agriculture",
+          "category": "agri"
+        }
+      ]
+    },
+    "C5_factor_style_etfs": {
+      "name": "因子 / 風格 ETF + 槓桿/反向",
+      "purpose": "判斷成長 vs 價值 + 極端情緒偵測",
+      "tickers": [
+        {
+          "ticker": "VTV",
+          "name": "Value",
+          "factor": "value"
+        },
+        {
+          "ticker": "VUG",
+          "name": "Growth",
+          "factor": "growth"
+        },
+        {
+          "ticker": "QUAL",
+          "name": "Quality",
+          "factor": "quality"
+        },
+        {
+          "ticker": "MTUM",
+          "name": "Momentum",
+          "factor": "momentum"
+        },
+        {
+          "ticker": "USMV",
+          "name": "Min Volatility",
+          "factor": "low_vol"
+        },
+        {
+          "ticker": "SQQQ",
+          "name": "Nasdaq 3X Inverse",
+          "factor": "inverse_lev",
+          "note": "量能驟增=恐慌"
+        },
+        {
+          "ticker": "TQQQ",
+          "name": "Nasdaq 3X Long",
+          "factor": "long_lev",
+          "note": "量能驟增=貪婪"
+        },
+        {
+          "ticker": "SH",
+          "name": "S&P 500 -1X Inverse",
+          "factor": "inverse",
+          "note": "避險資金計量"
+        },
+        {
+          "ticker": "SPXL",
+          "name": "S&P 500 3X Long",
+          "factor": "long_lev"
+        }
+      ]
+    },
+    "C6_auxiliary_etfs": {
+      "name": "輔助指標 ETF / 指數 (流動性 × 波動率 × 美元)",
+      "purpose": "市場環境 context",
+      "tickers": [
+        {
+          "ticker": "UUP",
+          "name": "Bullish USD",
+          "category": "fx"
+        },
+        {
+          "ticker": "UDN",
+          "name": "Bearish USD",
+          "category": "fx"
+        },
+        {
+          "ticker": "^VIX",
+          "name": "CBOE VIX (Index)",
+          "category": "vol",
+          "note": "市場情緒溫度計"
+        },
+        {
+          "ticker": "VIXY",
+          "name": "VIX Futures (long)",
+          "category": "vol"
+        },
+        {
+          "ticker": "VXX",
+          "name": "VIX Short-Term Futures",
+          "category": "vol"
+        },
+        {
+          "ticker": "BIL",
+          "name": "T-Bill 短債",
+          "category": "cash",
+          "note": "現金等價物流量"
+        },
+        {
+          "ticker": "SGOV",
+          "name": "0-3M T-Bill 公債",
+          "category": "cash",
+          "note": "資金停泊規模"
+        }
+      ]
+    },
+    "C_fund_flow_methodology": {
+      "description": "ETF 資金流計算方法論 — 5 個 TIER",
+      "tier_1_direct_yfinance": {
+        "description": "yfinance 直接擷取欄位 (每日 auto_adjust=False)",
+        "fields": [
+          "open",
+          "high",
+          "low",
+          "close",
+          "adj_close",
+          "volume",
+          "dollar_volume = close * volume"
+        ]
+      },
+      "tier_2_proxy_calculations": {
+        "description": "ETF 資金流代理計算 (僅靠 yfinance)",
+        "methods": {
+          "M1_dollar_volume_flow": {
+            "name": "成交金額法",
+            "formula": [
+              "dollar_vol = close * volume",
+              "dvol_ma5 = dollar_vol.rolling(5).mean()",
+              "dvol_ma20 = dollar_vol.rolling(20).mean()",
+              "dvol_ratio = dollar_vol / dvol_ma20"
+            ],
+            "signal": ">2x 均量 = 顯著流入信號"
+          },
+          "M2_price_volume_divergence": {
+            "name": "價量背離法",
+            "formula": [
+              "ret_1d = adj_close.pct_change()",
+              "vol_chg = volume.pct_change()",
+              "INFLOW if ret>0 AND vol_chg>0.2",
+              "OUTFLOW if ret<0 AND vol_chg>0.2"
+            ],
+            "signal": "漲+放量=流入 / 跌+放量=流出"
+          },
+          "M3_relative_strength_flow": {
+            "name": "相對強度 RS Flow (跨 ETF 資金輪動)",
+            "formula": [
+              "rs_vs_spy = etf_ret / spy_ret",
+              "rs_ma10 = rs_vs_spy.rolling(10).mean()",
+              "rs_trend = rs_ma10 - rs_ma10.shift(5)"
+            ],
+            "signal": "rs_trend ↑ = 資金正從大盤流入該板塊"
+          }
+        }
+      },
+      "tier_3_precise_external": {
+        "description": "精確 ETF 資金流 (需外部資料)",
+        "sources": {
+          "ETF.com": {
+            "provides": "精確每日 Flows + AUM",
+            "fee": "free / API"
+          },
+          "Morningstar Direct": {
+            "provides": "機構級精確 Flow",
+            "fee": "paid"
+          },
+          "Bloomberg ETF Mon": {
+            "provides": "AUM + Flow + 持倉",
+            "fee": "paid"
+          },
+          "iShares.com": {
+            "provides": "iShares 官方 AUM/Flow",
+            "fee": "free / scrape"
+          },
+          "State Street SSGA": {
+            "provides": "SPDR 官方持倉 xlsx",
+            "fee": "free / scrape"
+          },
+          "SEC EDGAR N-PORT": {
+            "provides": "月度 ETF 持倉揭露",
+            "fee": "free / EDGAR fulltext API"
+          }
+        }
+      },
+      "tier_4_aum_back_calc": {
+        "description": "M4 — AUM 反推資金淨流量 (若可取得 shares_outstanding)",
+        "formula": [
+          "aum_t = shares_outstanding * nav_per_share",
+          "flow_t = aum_t - aum_t_minus_1 - (aum_t_minus_1 * ret_t)"
+        ],
+        "note": "扣除漲跌後的淨流入 = 最精確方法，直接反映申購/贖回金額 (Creation/Redemption 機制). yfinance.Ticker(t).get_shares_full() 可取部分 shares 歷史"
+      },
+      "tier_5_composite_signals": {
+        "description": "複合資金流信號矩陣 (Signal Composite)",
+        "signals": [
+          {
+            "name": "Risk-On/Off",
+            "formula": "SPY_ret - TLT_ret (rolling 5d)",
+            "meaning": ">0=資金偏股 / <0=逃往債券"
+          },
+          {
+            "name": "HY 利差代理",
+            "formula": "HYG_ret - IEF_ret (daily)",
+            "meaning": "收斂=信用修復 / 擴大=風險升溫"
+          },
+          {
+            "name": "成長 vs 價值",
+            "formula": "VUG_ret - VTV_ret (rolling 20d)",
+            "meaning": ">0=成長風格受青睞"
+          },
+          {
+            "name": "EM 資金輪動",
+            "formula": "EEM_flow / SPY_flow (比值)",
+            "meaning": ">1=資金往新興 / <1=回流美國"
+          },
+          {
+            "name": "台股外資代理",
+            "formula": "EWT_flow 與 TWSE 外資買超對照",
+            "meaning": "兩者背離 → 外資隱性操作"
+          },
+          {
+            "name": "半導體動能",
+            "formula": "SMH_rs = SMH_ret / QQQ_ret",
+            "meaning": "台股半導體板塊前瞻"
+          },
+          {
+            "name": "現金堆積",
+            "formula": "BIL+SGOV dollar_vol 趨勢",
+            "meaning": "急增=大資金避險停泊"
+          },
+          {
+            "name": "恐慌對沖",
+            "formula": "SQQQ+SH+VIXY 合計量能",
+            "meaning": "異常放量=機構積極避險"
+          }
+        ]
+      }
+    }
+  },
+  "section_D_tw_active_etf_holdings": {
+    "description": "台股主動式 ETF 每日完整持股 — 法規要求每日揭露 (代號末碼 A)。每家投信獨立揭露頁面。",
+    "regulation": "金管會明文：主動式 ETF 須每日向市場揭露實際投資組合 (全透明)",
+    "disclosure_time": "T 日 08:00 PCF 申報 + 盤後淨值結算後投信網站揭露完整持股",
+    "canonical_schema": {
+      "primary_key": [
+        "Date",
+        "ETF_Ticker",
+        "Holding_Ticker"
+      ],
+      "fields": [
+        "Date",
+        "ETF_Ticker",
+        "ETF_Name",
+        "Holding_Ticker",
+        "Holding_Name",
+        "Shares",
+        "Market_Value",
+        "Weight_Pct",
+        "Sector",
+        "Asset_Type",
+        "Source"
+      ]
+    },
+    "issuers": {
+      "統一投信 (UNI)": {
+        "etfs": [
+          "00981A 主動統一台股增長",
+          "00988A 主動統一全球創新",
+          "00403A 主動統一升級版0050"
+        ],
+        "endpoint_base": "https://www.ezmoney.com.tw",
+        "holding_url_pattern": "/ETF/Fund/Info?fundCode={UNI_internal_code}",
+        "pcf_url": "https://www.ezmoney.com.tw/ETF/Transaction/PCF",
+        "method": "scrape_html"
+      },
+      "野村投信 (NOM)": {
+        "etfs": [
+          "00980A 主動野村臺灣優選",
+          "00985A 主動野村台灣50"
+        ],
+        "endpoint_base": "https://www.nomurafunds.com.tw",
+        "holding_url_pattern": "/ETFWEB/product-description?fundNo={ETF_CODE}",
+        "method": "scrape_html"
+      },
+      "群益投信 (CAP)": {
+        "etfs": [
+          "00982A 主動群益台灣強棒",
+          "00992A 主動群益科技創新",
+          "00997A 主動群益美國增長"
+        ],
+        "endpoint_base": "https://www.capitalfund.com.tw",
+        "method": "scrape_html"
+      },
+      "中信投信 (CTBC)": {
+        "etfs": [
+          "00983A 主動中信ARK創新",
+          "00995A 主動中信台灣卓越"
+        ],
+        "endpoint_base": "https://www.ctbcinvestments.com",
+        "method": "scrape_html"
+      },
+      "安聯投信 (AGI)": {
+        "etfs": [
+          "00984A 主動安聯台灣高息",
+          "00999A 主動安聯台股趨勢",
+          "00402A 主動安聯美國科技領航"
+        ],
+        "endpoint_base": "https://tw.allianzgi.com",
+        "method": "scrape_html"
+      },
+      "元大投信 (YT)": {
+        "etfs": [
+          "00990A 主動元大AI新經濟"
+        ],
+        "endpoint_base": "https://www.yuantaetfs.com",
+        "method": "scrape_html"
+      },
+      "第一金投信 (FIRST)": {
+        "etfs": [
+          "00994A 主動第一金台股優選"
+        ],
+        "endpoint_base": "https://www.firstrust.com.tw",
+        "method": "scrape_html"
+      },
+      "復華投信 (FHTR)": {
+        "etfs": [
+          "00991A 主動復華未來50"
+        ],
+        "endpoint_base": "https://www.fhtrust.com.tw",
+        "method": "scrape_html"
+      },
+      "台新投信 (TS)": {
+        "etfs": [
+          "00987A 主動台新優勢成長"
+        ],
+        "endpoint_base": "https://tsit.tsit.com.tw",
+        "method": "scrape_html"
+      },
+      "摩根投信 (JPM)": {
+        "etfs": [
+          "00989A 主動摩根美國科技"
+        ],
+        "endpoint_base": "https://www.jpmorgan.com.tw",
+        "method": "scrape_html"
+      }
+    },
+    "aggregator_fallbacks": {
+      "TWSE_eTienFu": {
+        "url_pattern": "https://www.twse.com.tw/zh/ETFortune/etfInfo/{ETF_CODE}",
+        "note": "TWSE 官方聚合頁，但持股細節需從投信端取得"
+      },
+      "PocketSec": {
+        "url_pattern": "https://www.pocket.tw/etf/tw/{ETF_CODE}/fundholding",
+        "note": "口袋證券 — 第三方但整理完整，可作備援"
+      },
+      "CMoney": {
+        "url_pattern": "https://www.cmoney.tw/etf/tw/{ETF_CODE}",
+        "note": "CMoney 第三方備援"
+      },
+      "MoneyDJ": {
+        "url_pattern": "https://www.moneydj.com/ETF/X/Basic/Basic0007.xdjhtm?etfid={code}.tw",
+        "note": "MoneyDJ 第三方備援"
+      }
+    },
+    "fund_flow_calc_for_active_etfs": {
+      "description": "主動式 ETF 因每日揭露持股，可精確算出資金流",
+      "method_AUM_diff": {
+        "formula": [
+          "aum_t = total_market_value_t (from holdings)",
+          "ret_t = (nav_per_share_t - nav_per_share_t_minus_1) / nav_per_share_t_minus_1",
+          "flow_t = aum_t - aum_t_minus_1 - (aum_t_minus_1 * ret_t)"
+        ],
+        "note": "比 yfinance 代理法精確 100 倍"
+      },
+      "method_holdings_diff": {
+        "description": "持股股數變化 → 看經理人加減碼方向",
+        "formula": "shares_today - shares_yesterday for each holding",
+        "signal": "經理人對個股的主動操作意圖"
+      }
+    }
+  },
+  "summary": {
+    "section_A_market_categories": 12,
+    "section_A_total_tickers": 138,
+    "section_B_macro_series": 219,
+    "section_B_derived_models": 9,
+    "section_C_etf_universe_count": 77,
+    "section_C_fund_flow_methods": 5,
+    "section_D_active_etf_count": 18,
+    "section_D_issuers": 10,
+    "total_data_sources": 24,
+    "grand_total_acquisition_targets": "≈ 138 (A) + 219 (B) + 77 (C) + 18*N持股 (D) = ~450+ daily endpoints",
+    "section_E_consensus_columns_per_row": 41,
+    "section_E_universe_size": "全台股 ~1800-2000 檔"
+  },
+  "section_E_tw_stock_consensus": {
+    "description": "台股個股 YFinance + FactSet 分析師預期共識資料 — 包含目標價、評級分布、未來 5 年 EPS 預估。每天執行一次。",
+    "fetcher": "vdf_fetchers_consensus (要新寫，移植自 VERITAS_Consensus_Database_OneShot.ps1)",
+    "coverage": "全台上市櫃股票 (~1800-2000 檔)",
+    "refresh_frequency": "Daily (post-market, after 16:00 TWT)",
+    "duckdb_table": "tw_consensus_daily",
+    "primary_key": [
+      "Date",
+      "tw_ticker"
+    ],
+    "sources_used": [
+      "YFINANCE",
+      "FactSet (via Cnyes 鉅亨網 scrape)"
+    ],
+    "universe_source": {
+      "description": "全台股清單 — 3 個本地檔案 fallback chain",
+      "candidates": [
+        "C:\\Users\\tonyk\\OneDrive\\桌面\\tw_stock\\dict\\TickerList\\StockTickerListDatabase.csv",
+        "C:\\Users\\tonyk\\OneDrive\\桌面\\tw_stock\\dict\\TickerList\\AllStockYfinanceTickerList.txt",
+        "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VeritasDataForge\\data\\tw_stock_list.csv"
+      ],
+      "validation_regex": {
+        "tw_ticker": "^(?!202[1-9])(?!2030)[1-9]\\d{3}$",
+        "tw_yfinance_ticker": "^[1-9]\\d{3}\\.(TW|TWO)$"
+      },
+      "fields": [
+        "tw_ticker",
+        "tw_yfinance_ticker",
+        "name",
+        "display_name"
+      ]
+    },
+    "E1_yfinance_quote_api": {
+      "description": "YFinance Quote API v7 — 目標價共識 + 分析師評級 + 市值",
+      "endpoint": "https://query1.finance.yahoo.com/v7/finance/quote?symbols={ticker}",
+      "method": "GET (requests + User-Agent header)",
+      "fallback_order": [
+        "yf_ticker if exists",
+        "{tw_ticker}.TW",
+        "{tw_ticker}.TWO"
+      ],
+      "fields": {
+        "yf_market_cap": {
+          "unit": "USD/TWD",
+          "desc": "市值"
+        },
+        "yf_target_mean_price": {
+          "unit": "Price",
+          "desc": "分析師平均目標價"
+        },
+        "yf_target_high_price": {
+          "unit": "Price",
+          "desc": "分析師最高目標價"
+        },
+        "yf_target_low_price": {
+          "unit": "Price",
+          "desc": "分析師最低目標價"
+        },
+        "yf_recommendation_mean": {
+          "unit": "Score 1-5",
+          "desc": "綜合評級分數 (1=Strong Buy, 5=Sell)"
+        },
+        "yf_recommendation_key": {
+          "unit": "String",
+          "desc": "評級分類 (buy/hold/sell/etc)"
+        },
+        "yf_number_of_analyst_opinions": {
+          "unit": "Count",
+          "desc": "分析師人數"
+        },
+        "yf_currency": {
+          "unit": "ISO",
+          "desc": "報價幣別"
+        }
+      }
+    },
+    "E2_yfinance_chart_api": {
+      "description": "YFinance Chart API v8 — 最新 Adj Close + Volume",
+      "endpoint": "https://query1.finance.yahoo.com/v8/finance/chart/{ticker}?range=5d&interval=1d",
+      "method": "GET",
+      "fields": {
+        "yf_adj_close": {
+          "unit": "Price",
+          "desc": "最新除權息還原收盤價"
+        },
+        "yf_volume": {
+          "unit": "Shares",
+          "desc": "最新成交量"
+        }
+      }
+    },
+    "E3_factset_consensus_via_cnyes": {
+      "description": "FactSet 機構共識預期 — 透過鉅亨網 scrape (Playwright headless Chromium)",
+      "endpoint": "https://www.cnyes.com/twstock/{ticker}/summary/overview",
+      "method": "Playwright headless scrape",
+      "user_agent": "Chrome/124 Windows",
+      "scraping_logic": [
+        "1. goto URL, wait domcontentloaded + 3500ms",
+        "2. Click '預估' button (with 6 retries + scroll fallback)",
+        "3. JS evaluate finds smallest visible block containing required keywords",
+        "4. Regex parse 3 blocks: Target / Rating / EPS"
+      ],
+      "block_keywords": {
+        "target": [
+          "目標估值",
+          "最高估值",
+          "最低估值",
+          "中位數"
+        ],
+        "rating": [
+          "綜合評級",
+          "積極樂觀",
+          "保持中立"
+        ],
+        "eps": [
+          "預估EPS",
+          "中位數",
+          "最高價",
+          "最低價"
+        ]
+      },
+      "block_1_target_valuation": {
+        "title": "目標估值區塊",
+        "fields": {
+          "factset_updated_at": {
+            "format": "YYYY-MM-DD",
+            "regex": "(\\d{4}/\\d{2}/\\d{2})\\s*更新",
+            "desc": "FactSet 資料更新日"
+          },
+          "factset_target_analyst_count": {
+            "format": "int",
+            "regex": "目前有\\s*(\\d+)\\s*位分析師",
+            "desc": "出具目標價的分析師人數"
+          },
+          "factset_target_current_price": {
+            "format": "float",
+            "regex": "目前\\s*([0-9.]+)",
+            "desc": "目前股價"
+          },
+          "factset_target_low": {
+            "format": "float",
+            "regex": "最低估值\\s*([0-9.]+)",
+            "desc": "最低目標估值"
+          },
+          "factset_target_median": {
+            "format": "float",
+            "regex": "中位數\\s*([0-9.]+)",
+            "desc": "中位數目標估值"
+          },
+          "factset_target_high": {
+            "format": "float",
+            "regex": "最高估值\\s*([0-9.]+)",
+            "desc": "最高目標估值"
+          }
+        }
+      },
+      "block_2_rating_distribution": {
+        "title": "綜合評級區塊",
+        "fields": {
+          "factset_rating_updated_at": {
+            "format": "YYYY-MM-DD"
+          },
+          "factset_rating_analyst_count": {
+            "format": "int",
+            "regex": "有\\s*(\\d+)\\s*位分析師",
+            "desc": "提供評級的分析師人數"
+          },
+          "factset_rating_optimistic_count": {
+            "format": "int",
+            "regex": "積極樂觀\\s*(\\d+)\\s*位",
+            "desc": "積極樂觀(Buy) 人數"
+          },
+          "factset_rating_neutral_count": {
+            "format": "int",
+            "regex": "保持中立\\s*(\\d+)\\s*位",
+            "desc": "保持中立(Hold) 人數"
+          },
+          "factset_rating_pessimistic_count": {
+            "format": "int",
+            "regex": "保守悲觀\\s*(\\d+)\\s*位",
+            "desc": "保守悲觀(Sell) 人數"
+          }
+        }
+      },
+      "block_3_eps_estimates": {
+        "title": "預估 EPS 區塊 (5 年 × 3 種估值)",
+        "years_covered": [
+          2024,
+          2025,
+          2026,
+          2027,
+          2028
+        ],
+        "actuals": [
+          2024,
+          2025
+        ],
+        "estimates": [
+          2026,
+          2027,
+          2028
+        ],
+        "estimate_types": [
+          "median",
+          "high",
+          "low"
+        ],
+        "field_pattern": "factset_diluted_eps_{type}_{year}",
+        "total_fields": 16,
+        "fields": {
+          "factset_eps_updated_at": {
+            "format": "YYYY-MM-DD"
+          },
+          "factset_diluted_eps_median_2024": {
+            "format": "float",
+            "type": "actual",
+            "year": 2024
+          },
+          "factset_diluted_eps_high_2024": {
+            "format": "float",
+            "type": "actual",
+            "year": 2024
+          },
+          "factset_diluted_eps_low_2024": {
+            "format": "float",
+            "type": "actual",
+            "year": 2024
+          },
+          "factset_diluted_eps_median_2025": {
+            "format": "float",
+            "type": "actual",
+            "year": 2025
+          },
+          "factset_diluted_eps_high_2025": {
+            "format": "float",
+            "type": "actual",
+            "year": 2025
+          },
+          "factset_diluted_eps_low_2025": {
+            "format": "float",
+            "type": "actual",
+            "year": 2025
+          },
+          "factset_diluted_eps_median_2026": {
+            "format": "float",
+            "type": "estimate",
+            "year": 2026
+          },
+          "factset_diluted_eps_high_2026": {
+            "format": "float",
+            "type": "estimate",
+            "year": 2026
+          },
+          "factset_diluted_eps_low_2026": {
+            "format": "float",
+            "type": "estimate",
+            "year": 2026
+          },
+          "factset_diluted_eps_median_2027": {
+            "format": "float",
+            "type": "estimate",
+            "year": 2027
+          },
+          "factset_diluted_eps_high_2027": {
+            "format": "float",
+            "type": "estimate",
+            "year": 2027
+          },
+          "factset_diluted_eps_low_2027": {
+            "format": "float",
+            "type": "estimate",
+            "year": 2027
+          },
+          "factset_diluted_eps_median_2028": {
+            "format": "float",
+            "type": "estimate",
+            "year": 2028
+          },
+          "factset_diluted_eps_high_2028": {
+            "format": "float",
+            "type": "estimate",
+            "year": 2028
+          },
+          "factset_diluted_eps_low_2028": {
+            "format": "float",
+            "type": "estimate",
+            "year": 2028
+          }
+        }
+      }
+    },
+    "derived_signals": {
+      "description": "可從 Section E 衍生的訊號 (建議放 derived_models)",
+      "signals": [
+        {
+          "name": "target_upside_pct",
+          "formula": "(factset_target_median - factset_target_current_price) / factset_target_current_price * 100",
+          "meaning": "中位數目標價隱含漲幅 %"
+        },
+        {
+          "name": "target_dispersion",
+          "formula": "(factset_target_high - factset_target_low) / factset_target_median",
+          "meaning": "分析師分歧度 — 高=共識弱"
+        },
+        {
+          "name": "rating_bull_bear_ratio",
+          "formula": "factset_rating_optimistic_count / max(factset_rating_pessimistic_count, 1)",
+          "meaning": "Buy/Sell 比，>3 強烈看好"
+        },
+        {
+          "name": "eps_growth_2yr",
+          "formula": "(factset_diluted_eps_median_2027 - factset_diluted_eps_median_2025) / factset_diluted_eps_median_2025",
+          "meaning": "2 年期 EPS 成長預期"
+        },
+        {
+          "name": "eps_estimate_dispersion",
+          "formula": "(factset_diluted_eps_high_{year} - factset_diluted_eps_low_{year}) / factset_diluted_eps_median_{year}",
+          "meaning": "EPS 預估分歧度 — 高=高度不確定"
+        },
+        {
+          "name": "implied_forward_pe",
+          "formula": "factset_target_current_price / factset_diluted_eps_median_2026",
+          "meaning": "隱含 forward PE"
+        },
+        {
+          "name": "yf_vs_factset_target_gap",
+          "formula": "(yf_target_mean_price - factset_target_median) / factset_target_median",
+          "meaning": "外資 (YF) vs 在地 (FactSet) 共識差異"
+        }
+      ]
+    },
+    "output_formats": [
+      {
+        "format": "CSV",
+        "encoding": "utf-8-sig",
+        "filename": "Consensus.csv"
+      },
+      {
+        "format": "Parquet",
+        "engine": "pyarrow",
+        "filename": "Consensus.parquet"
+      },
+      {
+        "format": "DuckDB",
+        "table": "consensus",
+        "filename": "Consensus.duckdb"
+      },
+      {
+        "format": "Excel",
+        "engine": "openpyxl",
+        "filename": "Consensus.xlsx"
+      },
+      {
+        "format": "HTML",
+        "encoding": "utf-8-sig",
+        "filename": "Consensus_Report.html"
+      }
+    ],
+    "execution_config": {
+      "headless": true,
+      "timeout_ms": 30000,
+      "init_wait_ms": 3500,
+      "click_wait_ms": 1200,
+      "scroll_wait_ms": 1200,
+      "request_timeout_s": 20,
+      "max_tickers": "None (production) | 20 (test)",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124"
+    },
+    "integration_notes": {
+      "supportive_modules_loaded": [
+        "VIA_SSOT_Unified.py",
+        "VeritasAegisNexus.py",
+        "VeritasCeleritas.py",
+        "VIA_EnvManager.py",
+        "VIA_Panorama_AST_RuntimeInjector.py",
+        "VIA_RegistryCore_v1.py",
+        "VIA_Runtime_Bridge_All_in_One.py"
+      ],
+      "output_root_default": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\_veritas_consensus_database",
+      "python_env_default": "C:\\Users\\tonyk\\envs\\via_core_312\\Scripts\\python.exe",
+      "google_sheet_upload": {
+        "enabled_default": false,
+        "spreadsheet_name": "VERITAS Consensus Database"
+      }
+    }
+  }
+}

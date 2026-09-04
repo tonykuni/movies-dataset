@@ -1,0 +1,595 @@
+{
+  "schema_version": "1.0.0",
+  "build_date": "2026-05-26",
+  "description": "VIA Macro SSOT - unified registry of every macro series, fiscal flow, Fed policy channel, and derived model used by VeritasDataForge & downstream analytics.",
+  "naming_convention": "{Region}.{Macro_Theme}.{Sub_Theme}.{Indicator}",
+  "regions": ["US", "EU", "CN", "JP", "UK", "Global"],
+
+  "sources_legend": {
+    "FRED":            { "name": "Federal Reserve Economic Data",     "key_required": true,  "env": "VDF_FRED_API_KEY", "default_key": "<REDACTED:VDF_FRED_API_KEY>" },
+    "Treasury_FD":     { "name": "Treasury FiscalData API",            "key_required": false, "base": "https://api.fiscaldata.treasury.gov/services/api/fiscal_service" },
+    "BEA":             { "name": "Bureau of Economic Analysis",        "key_required": true,  "env": "VDF_BEA_API_KEY" },
+    "BLS":             { "name": "Bureau of Labor Statistics",         "key_required": false },
+    "Fed":             { "name": "Federal Reserve Board",              "key_required": false },
+    "FRBNY":           { "name": "Federal Reserve Bank of New York",   "key_required": false },
+    "Treasury":        { "name": "U.S. Department of the Treasury",    "key_required": false },
+    "ISM":             { "name": "Institute for Supply Management",    "key_required": false, "note": "FRED proxies preferred" },
+    "ConfBoard":       { "name": "The Conference Board",               "key_required": false },
+    "UMich":           { "name": "University of Michigan Survey",      "key_required": false },
+    "AAII":            { "name": "American Association of Indiv Investors", "key_required": false, "endpoint": "https://www.aaii.com/sentimentsurvey/sent_results" },
+    "CNN":             { "name": "CNN Business Fear & Greed Index",    "key_required": false, "endpoint": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata" },
+    "ECB":             { "name": "European Central Bank Statistical Data Warehouse", "key_required": false },
+    "BOJ":             { "name": "Bank of Japan Statistics",           "key_required": false },
+    "BOE":             { "name": "Bank of England Statistical Database", "key_required": false }
+  },
+
+  "fetcher_routing": {
+    "FRED":         "vdf_fetchers_macro::fetch_macro_fred",
+    "Treasury_FD":  "vdf_fetchers_fiscal::fetch_treasury_dts_mts",
+    "AAII":         "vdf_fetchers_sentiment::fetch_aaii",
+    "CNN":          "vdf_fetchers_sentiment::fetch_cnn_fear_greed",
+    "Derived":      "vdf_fetchers_derived::compute_models"
+  },
+
+  "macro_tree": {
+    "US": {
+      "Prices": {
+        "CPI": ["Headline", "Core", "Food", "FoodAtHome", "FoodAwayFromHome",
+                "Energy", "Gasoline", "FuelOil", "Electricity", "UtilityGas",
+                "Shelter", "Rent", "OER", "LodgingAwayFromHome",
+                "Transportation", "NewVehicles", "UsedCars", "MotorInsurance",
+                "MedicalCare", "MedicalServices", "MedicalCommodities",
+                "EducationCommunication", "OtherGoodsServices",
+                "Apparel", "RecreationServices"],
+        "PCE": ["Headline", "Core", "Goods", "Services", "Durable", "Nondurable"],
+        "PPI": ["Final", "FinalDemand", "ExFoodEnergy", "Goods", "Services",
+                "IntermediateDemand", "Processed", "Unprocessed"],
+        "Trade": ["ImportPrice", "ExportPrice"]
+      },
+      "Labor": {
+        "Employment": ["NFP", "PrivatePayrolls", "GovtPayrolls", "ManufacturingPayrolls", "ConstructionPayrolls"],
+        "Unemployment": ["U3", "U6", "ParticipationRate", "EmpPopRatio"],
+        "Wages": ["AvgHourlyEarnings", "AvgWeeklyHours", "ECI", "ECIWages", "ECIBenefits"],
+        "JOLTS": ["JobOpenings", "Hires", "Quits", "Layoffs", "Separations"],
+        "Claims": ["Initial", "Continuing", "InsuredUnempRate"],
+        "Productivity": ["OutputPerHour", "UnitLaborCosts"]
+      },
+      "Business": {
+        "ISM_Manufacturing": ["PMI", "NewOrders", "Production", "Employment", "Prices", "SupplierDeliveries", "Inventories"],
+        "ISM_Services":      ["PMI", "BusinessActivity", "NewOrders", "Employment", "Prices"],
+        "SP_Global_PMI":     ["Manufacturing", "Services", "Composite"],
+        "RegionalFed":       ["EmpireState", "PhillyFed", "DallasFed", "RichmondFed", "KansasCityFed"],
+        "Sentiment":         ["ConfBoardConsumer", "ConfBoardExpectations",
+                              "UMichSentiment", "UMichExpectations", "UMichCurrentConditions",
+                              "NFIB_SmallBusiness"],
+        "Leading":           ["ConfBoardLEI", "OECD_CLI_US"]
+      },
+      "Growth": {
+        "GDP": ["Real", "Nominal", "Deflator", "QoQ_Annualized", "YoY"],
+        "GDP_Components": ["PCE_Real", "GPDI", "GCE", "NetExports"],
+        "Nowcast": ["AtlantaFed_GDPNow", "NY_Fed_Nowcast"],
+        "Industrial": ["IndProd_Total", "IndProd_Mfg", "IndProd_Mining", "IndProd_Utilities", "CapUtil"],
+        "DurableGoods": ["TotalOrders", "CoreOrders", "Shipments", "Inventories"]
+      },
+      "Consumer": {
+        "RetailSales": ["Total", "ExAuto", "Control"],
+        "Personal":    ["Income", "Spending", "SavingsRate", "DPI"],
+        "Credit":      ["TotalConsumer", "CreditCardDelinquency", "AutoDelinquency"]
+      },
+      "Housing": {
+        "Construction": ["HousingStarts_Total", "HousingStarts_SingleFamily", "HousingStarts_MultiFamily",
+                         "BuildingPermits_Total", "BuildingPermits_SingleFamily"],
+        "Sales":        ["NewHomeSales", "ExistingHomeSales", "PendingHomeSales"],
+        "Prices":       ["CaseShiller20", "CaseShiller10", "FHFA_HPI"],
+        "Sentiment":    ["NAHB_HousingMarket"],
+        "Mortgage":     ["Mortgage30Y", "Mortgage15Y", "MBA_Applications"]
+      },
+      "Fiscal": {
+        "MTS_Monthly":    ["GrossReceipts", "GrossOutlays", "DeficitSurplus",
+                           "YTD_Receipts", "YTD_Outlays", "YTD_Deficit",
+                           "ReceiptsBySource", "OutlaysByFunction"],
+        "DTS_Daily":      ["TotalReceipts", "TotalOutlays", "NetFlow",
+                           "OperatingCashBalance", "Withdrawals", "Deposits",
+                           "PublicDebtCashIssues", "PublicDebtCashRedemptions"],
+        "Debt":           ["TotalPublicDebt", "PublicDebt_HeldByPublic", "DebtToGDP",
+                           "NetInterestPayments"]
+      },
+      "Fed": {
+        "Rates":          ["FedFundsEffective", "FedFundsTarget_Upper", "FedFundsTarget_Lower",
+                           "IORB", "DiscountRate", "SOFR", "EFFR"],
+        "BalanceSheet":   ["Total_WALCL", "Treasuries", "MBS",
+                           "ReverseRepo_RRP", "TGA_TreasuryGeneralAccount",
+                           "BankReserves_WRESBAL"],
+        "ForwardGuidance":["FOMC_Statements", "DotPlot", "MeetingMinutes", "PressConference_Sentiment"],
+        "QT_Pace":        ["MonthlyRollOff_Treasuries", "MonthlyRollOff_MBS"]
+      },
+      "Rates": {
+        "Treasury": ["1M", "3M", "6M", "1Y", "2Y", "3Y", "5Y", "7Y", "10Y", "20Y", "30Y"],
+        "TIPS":     ["5Y", "10Y", "20Y", "30Y"],
+        "Spreads":  ["2s10s", "3m10y", "5s30s"],
+        "Breakeven":["5Y", "10Y", "5Y5Y_Forward"],
+        "Credit":   ["HY_OAS", "IG_OAS", "CCC_OAS"]
+      },
+      "Trade": {
+        "Goods":       ["Exports", "Imports", "Balance"],
+        "Services":    ["Exports", "Imports", "Balance"],
+        "CurrentAccount": ["Total"],
+        "FX":          ["DXY_Broad", "DXY_Major", "DXY_NYBoT"]
+      },
+      "FinCond": {
+        "ChicagoFed_NFCI": ["Overall", "Adjusted_ANFCI"],
+        "GS_FCI":          ["Overall"],
+        "SLO":             ["C_and_I", "CommercialRE", "Consumer"]
+      },
+      "Sentiment": {
+        "Market":     ["AAII_Bullish", "AAII_Bearish", "AAII_Neutral", "AAII_BullBear_Spread"],
+        "Composite":  ["CNN_FearGreed", "CNN_FearGreed_PutCall", "CNN_FearGreed_Momentum",
+                       "CNN_FearGreed_SafeHaven", "CNN_FearGreed_Breadth"],
+        "Volatility": ["VIX", "VVIX", "MOVE", "SKEW", "VIX9D", "VIX3M"]
+      }
+    },
+
+    "EU": {
+      "Prices":   ["HICP_Headline", "HICP_Core", "PPI"],
+      "Labor":    ["UnempRate", "Wages"],
+      "Business": ["HCOB_PMI_Mfg", "HCOB_PMI_Svc", "EC_ESI", "ZEW", "IFO"],
+      "Growth":   ["GDP_QoQ", "GDP_YoY"],
+      "ECB":      ["DepositFacilityRate", "MainRefinancingRate", "MarginalLendingRate",
+                   "M1", "M2", "M3"]
+    },
+    "CN": {
+      "Prices":   ["CPI", "PPI"],
+      "Business": ["NBS_PMI_Mfg", "NBS_PMI_NonMfg", "Caixin_PMI"],
+      "Growth":   ["GDP_YoY", "IndProd", "RetailSales"]
+    },
+    "JP": {
+      "Prices":   ["CPI", "PPI"],
+      "BOJ":      ["PolicyRate"],
+      "Business": ["Tankan_LargeMfg", "Tankan_LargeNonMfg", "Jibun_PMI_Mfg"]
+    },
+    "UK": {
+      "Prices":   ["CPI", "PPI"],
+      "BOE":      ["BankRate"],
+      "Business": ["SP_Global_PMI_Mfg", "SP_Global_PMI_Svc"]
+    },
+    "Global": {
+      "OECD": ["CLI_G7", "CLI_G20", "CLI_OECD_Total"]
+    }
+  },
+
+  "series_registry": {
+
+    "_comment_prices_cpi": "──────── CPI 全細項 (24 series) ────────",
+    "US.Prices.CPI.Headline":              { "fred_id": "CPIAUCSL",      "source": "BLS",      "freq": "Monthly", "unit": "Index 1982-84=100", "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "CPI Headline" },
+    "US.Prices.CPI.Headline.YoY":          { "fred_id": "CPIAUCSL",      "source": "BLS",      "freq": "Monthly", "unit": "Percent",            "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "CPI YoY", "transform": "yoy" },
+    "US.Prices.CPI.Core":                  { "fred_id": "CPILFESL",      "source": "BLS",      "freq": "Monthly", "unit": "Index 1982-84=100", "macro_theme": "Prices", "sub_theme": "Core CPI","indicator": "Core CPI (ex Food & Energy)" },
+    "US.Prices.CPI.Core.YoY":              { "fred_id": "CPILFESL",      "source": "BLS",      "freq": "Monthly", "unit": "Percent",            "macro_theme": "Prices", "sub_theme": "Core CPI","indicator": "Core CPI YoY", "transform": "yoy" },
+    "US.Prices.CPI.Food":                  { "fred_id": "CPIUFDSL",      "source": "BLS",      "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "Food" },
+    "US.Prices.CPI.FoodAtHome":            { "fred_id": "CUSR0000SAF11", "source": "BLS",      "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "Food at Home" },
+    "US.Prices.CPI.FoodAwayFromHome":      { "fred_id": "CUSR0000SEFV",  "source": "BLS",      "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "Food Away from Home" },
+    "US.Prices.CPI.Energy":                { "fred_id": "CPIENGSL",      "source": "BLS",      "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "Energy" },
+    "US.Prices.CPI.Gasoline":              { "fred_id": "CUUR0000SETB01","source": "BLS",      "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "Gasoline" },
+    "US.Prices.CPI.FuelOil":               { "fred_id": "CUSR0000SEHE",  "source": "BLS",      "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "Fuel Oil" },
+    "US.Prices.CPI.Electricity":           { "fred_id": "CUUR0000SEHF01","source": "BLS",      "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "Electricity" },
+    "US.Prices.CPI.UtilityGas":            { "fred_id": "CUUR0000SEHF02","source": "BLS",      "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "Utility Gas" },
+    "US.Prices.CPI.Shelter":               { "fred_id": "CUSR0000SAH1",  "source": "BLS",      "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "Shelter" },
+    "US.Prices.CPI.Rent":                  { "fred_id": "CUSR0000SEHA",  "source": "BLS",      "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "Rent of Primary Residence" },
+    "US.Prices.CPI.OER":                   { "fred_id": "CUSR0000SEHC",  "source": "BLS",      "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "Owners' Equivalent Rent" },
+    "US.Prices.CPI.LodgingAwayFromHome":   { "fred_id": "CUSR0000SEHB",  "source": "BLS",      "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "Lodging Away From Home" },
+    "US.Prices.CPI.NewVehicles":           { "fred_id": "CUUR0000SETA01","source": "BLS",      "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "New Vehicles" },
+    "US.Prices.CPI.UsedCars":              { "fred_id": "CUSR0000SETA02","source": "BLS",      "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "Used Cars & Trucks" },
+    "US.Prices.CPI.MotorInsurance":        { "fred_id": "CUUR0000SETA05","source": "BLS",      "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "Motor Vehicle Insurance" },
+    "US.Prices.CPI.Apparel":               { "fred_id": "CPIAPPSL",      "source": "BLS",      "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "Apparel" },
+    "US.Prices.CPI.Transportation":        { "fred_id": "CUUR0000SAT",   "source": "BLS",      "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "Transportation Services" },
+    "US.Prices.CPI.MedicalCare":           { "fred_id": "CPIMEDSL",      "source": "BLS",      "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "Medical Care" },
+    "US.Prices.CPI.MedicalServices":       { "fred_id": "CUSR0000SAM2",  "source": "BLS",      "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "Medical Services" },
+    "US.Prices.CPI.MedicalCommodities":    { "fred_id": "CUSR0000SAM1",  "source": "BLS",      "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "Medical Commodities" },
+    "US.Prices.CPI.Services":              { "fred_id": "CUSR0000SAS",   "source": "BLS",      "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "Services" },
+    "US.Prices.CPI.RentOfShelter":         { "fred_id": "CUSR0000SAS2RS","source": "BLS",      "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "Rent of Shelter" },
+    "US.Prices.CPI.ServicesLessRentOfShelter": { "fred_id": "CUSR0000SASL2RS", "source": "BLS","freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "CPI",     "indicator": "Services Less Rent of Shelter (supercore proxy)" },
+
+    "_comment_prices_pce": "──────── PCE 全細項 (6 series) ────────",
+    "US.Prices.PCE.Headline":              { "fred_id": "PCEPI",          "source": "BEA",     "freq": "Monthly", "unit": "Index 2017=100",     "macro_theme": "Prices", "sub_theme": "PCE",     "indicator": "PCE Headline" },
+    "US.Prices.PCE.Headline.YoY":          { "fred_id": "PCEPI",          "source": "BEA",     "freq": "Monthly", "unit": "Percent",             "macro_theme": "Prices", "sub_theme": "PCE",     "indicator": "PCE YoY", "transform": "yoy" },
+    "US.Prices.PCE.Core":                  { "fred_id": "PCEPILFE",       "source": "BEA",     "freq": "Monthly", "unit": "Index 2017=100",     "macro_theme": "Prices", "sub_theme": "Core PCE","indicator": "Core PCE" },
+    "US.Prices.PCE.Core.YoY":              { "fred_id": "PCEPILFE",       "source": "BEA",     "freq": "Monthly", "unit": "Percent",             "macro_theme": "Prices", "sub_theme": "Core PCE","indicator": "Core PCE YoY", "transform": "yoy" },
+    "US.Prices.PCE.Goods":                 { "fred_id": "DGDSRG3M086SBEA","source": "BEA",     "freq": "Monthly", "unit": "Index 2017=100",     "macro_theme": "Prices", "sub_theme": "PCE",     "indicator": "PCE Goods Prices" },
+    "US.Prices.PCE.Services":              { "fred_id": "DSERRG3M086SBEA","source": "BEA",     "freq": "Monthly", "unit": "Index 2017=100",     "macro_theme": "Prices", "sub_theme": "PCE",     "indicator": "PCE Services Prices" },
+
+    "_comment_prices_ppi": "──────── PPI 全細項 (8 series) ────────",
+    "US.Prices.PPI.FinalDemand":           { "fred_id": "PPIFID",          "source": "BLS",    "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "PPI",     "indicator": "PPI Final Demand" },
+    "US.Prices.PPI.AllCommodities":        { "fred_id": "PPIACO",          "source": "BLS",    "freq": "Monthly", "unit": "Index 1982=100",     "macro_theme": "Prices", "sub_theme": "PPI",     "indicator": "PPI All Commodities" },
+    "US.Prices.PPI.ExFoodEnergy":          { "fred_id": "PPICOR",          "source": "BLS",    "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "PPI",     "indicator": "PPI Ex Food & Energy (Core)" },
+    "US.Prices.PPI.FinalDemand.Goods":     { "fred_id": "WPSFD49207",      "source": "BLS",    "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "PPI",     "indicator": "PPI Final Demand Goods" },
+    "US.Prices.PPI.FinalDemand.Services":  { "fred_id": "WPSFD4131",       "source": "BLS",    "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "PPI",     "indicator": "PPI Final Demand Services" },
+    "US.Prices.PPI.IntermediateDemand":    { "fred_id": "WPSID61",         "source": "BLS",    "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "PPI",     "indicator": "PPI Intermediate Demand Processed" },
+    "US.Prices.PPI.Unprocessed":           { "fred_id": "WPSID62",         "source": "BLS",    "freq": "Monthly", "unit": "Index",              "macro_theme": "Prices", "sub_theme": "PPI",     "indicator": "PPI Intermediate Demand Unprocessed" },
+
+    "_comment_prices_trade": "──────── Import/Export Prices (2) ────────",
+    "US.Prices.Import":                    { "fred_id": "IR",              "source": "BLS",    "freq": "Monthly", "unit": "Index 2000=100",     "macro_theme": "Prices", "sub_theme": "Trade",   "indicator": "Import Price Index" },
+    "US.Prices.Export":                    { "fred_id": "IQ",              "source": "BLS",    "freq": "Monthly", "unit": "Index 2000=100",     "macro_theme": "Prices", "sub_theme": "Trade",   "indicator": "Export Price Index" },
+
+    "_comment_labor": "──────── Labor Market 全細項 (22 series) ────────",
+    "US.Labor.UnempRate.U3":               { "fred_id": "UNRATE",          "source": "BLS",    "freq": "Monthly", "unit": "Percent",            "macro_theme": "Labor", "sub_theme": "Unemployment", "indicator": "Unemployment Rate U3" },
+    "US.Labor.UnempRate.U6":               { "fred_id": "U6RATE",          "source": "BLS",    "freq": "Monthly", "unit": "Percent",            "macro_theme": "Labor", "sub_theme": "Unemployment", "indicator": "U6 Underemployment Rate" },
+    "US.Labor.ParticipationRate":          { "fred_id": "CIVPART",         "source": "BLS",    "freq": "Monthly", "unit": "Percent",            "macro_theme": "Labor", "sub_theme": "Unemployment", "indicator": "Labor Force Participation Rate" },
+    "US.Labor.EmpPopRatio":                { "fred_id": "EMRATIO",         "source": "BLS",    "freq": "Monthly", "unit": "Percent",            "macro_theme": "Labor", "sub_theme": "Unemployment", "indicator": "Employment-Population Ratio" },
+    "US.Labor.NFP":                        { "fred_id": "PAYEMS",          "source": "BLS",    "freq": "Monthly", "unit": "Thousands",          "macro_theme": "Labor", "sub_theme": "Payrolls",     "indicator": "Nonfarm Payrolls" },
+    "US.Labor.NFP.MoM":                    { "fred_id": "PAYEMS",          "source": "BLS",    "freq": "Monthly", "unit": "Thousands",          "macro_theme": "Labor", "sub_theme": "Payrolls",     "indicator": "NFP MoM Change", "transform": "diff" },
+    "US.Labor.PrivatePayrolls":            { "fred_id": "USPRIV",          "source": "BLS",    "freq": "Monthly", "unit": "Thousands",          "macro_theme": "Labor", "sub_theme": "Payrolls",     "indicator": "Private Payrolls" },
+    "US.Labor.GovtPayrolls":               { "fred_id": "USGOVT",          "source": "BLS",    "freq": "Monthly", "unit": "Thousands",          "macro_theme": "Labor", "sub_theme": "Payrolls",     "indicator": "Government Payrolls" },
+    "US.Labor.MfgPayrolls":                { "fred_id": "MANEMP",          "source": "BLS",    "freq": "Monthly", "unit": "Thousands",          "macro_theme": "Labor", "sub_theme": "Payrolls",     "indicator": "Manufacturing Payrolls" },
+    "US.Labor.ConstructionPayrolls":       { "fred_id": "USCONS",          "source": "BLS",    "freq": "Monthly", "unit": "Thousands",          "macro_theme": "Labor", "sub_theme": "Payrolls",     "indicator": "Construction Payrolls" },
+    "US.Labor.AvgHourlyEarnings":          { "fred_id": "CES0500000003",   "source": "BLS",    "freq": "Monthly", "unit": "Dollars",            "macro_theme": "Labor", "sub_theme": "Wages",        "indicator": "Avg Hourly Earnings" },
+    "US.Labor.AvgHourlyEarnings.YoY":      { "fred_id": "CES0500000003",   "source": "BLS",    "freq": "Monthly", "unit": "Percent",            "macro_theme": "Labor", "sub_theme": "Wages",        "indicator": "AHE YoY", "transform": "yoy" },
+    "US.Labor.AvgWeeklyHours":             { "fred_id": "AWHAETP",         "source": "BLS",    "freq": "Monthly", "unit": "Hours",              "macro_theme": "Labor", "sub_theme": "Wages",        "indicator": "Avg Weekly Hours" },
+    "US.Labor.ECI":                        { "fred_id": "ECIALLCIV",       "source": "BLS",    "freq": "Quarterly","unit": "Index",              "macro_theme": "Labor", "sub_theme": "Wages",        "indicator": "Employment Cost Index" },
+    "US.Labor.ECI.Wages":                  { "fred_id": "ECIWAG",          "source": "BLS",    "freq": "Quarterly","unit": "Index",              "macro_theme": "Labor", "sub_theme": "Wages",        "indicator": "ECI Wages" },
+    "US.Labor.ECI.Benefits":               { "fred_id": "ECIBEN",          "source": "BLS",    "freq": "Quarterly","unit": "Index",              "macro_theme": "Labor", "sub_theme": "Wages",        "indicator": "ECI Benefits" },
+    "US.Labor.JOLTS.JobOpenings":          { "fred_id": "JTSJOL",          "source": "BLS",    "freq": "Monthly", "unit": "Thousands",          "macro_theme": "Labor", "sub_theme": "JOLTS",        "indicator": "Job Openings" },
+    "US.Labor.JOLTS.Hires":                { "fred_id": "JTSHIL",          "source": "BLS",    "freq": "Monthly", "unit": "Thousands",          "macro_theme": "Labor", "sub_theme": "JOLTS",        "indicator": "Hires" },
+    "US.Labor.JOLTS.Quits":                { "fred_id": "JTSQUL",          "source": "BLS",    "freq": "Monthly", "unit": "Thousands",          "macro_theme": "Labor", "sub_theme": "JOLTS",        "indicator": "Quits" },
+    "US.Labor.JOLTS.Layoffs":              { "fred_id": "JTSLDL",          "source": "BLS",    "freq": "Monthly", "unit": "Thousands",          "macro_theme": "Labor", "sub_theme": "JOLTS",        "indicator": "Layoffs & Discharges" },
+    "US.Labor.JOLTS.Separations":          { "fred_id": "JTSTSL",          "source": "BLS",    "freq": "Monthly", "unit": "Thousands",          "macro_theme": "Labor", "sub_theme": "JOLTS",        "indicator": "Total Separations" },
+    "US.Labor.InitialClaims":              { "fred_id": "ICSA",            "source": "DOL",    "freq": "Weekly",  "unit": "Number",             "macro_theme": "Labor", "sub_theme": "Claims",       "indicator": "Initial Jobless Claims" },
+    "US.Labor.ContinuingClaims":           { "fred_id": "CCSA",            "source": "DOL",    "freq": "Weekly",  "unit": "Number",             "macro_theme": "Labor", "sub_theme": "Claims",       "indicator": "Continuing Claims" },
+    "US.Labor.InsuredUnempRate":           { "fred_id": "IURSA",           "source": "DOL",    "freq": "Weekly",  "unit": "Percent",            "macro_theme": "Labor", "sub_theme": "Claims",       "indicator": "Insured Unemployment Rate" },
+    "US.Labor.Productivity":               { "fred_id": "OPHNFB",          "source": "BLS",    "freq": "Quarterly","unit": "Index",              "macro_theme": "Labor", "sub_theme": "Productivity", "indicator": "Output Per Hour Nonfarm Business" },
+    "US.Labor.UnitLaborCosts":             { "fred_id": "ULCNFB",          "source": "BLS",    "freq": "Quarterly","unit": "Index",              "macro_theme": "Labor", "sub_theme": "Productivity", "indicator": "Unit Labor Costs Nonfarm" },
+
+    "_comment_business": "──────── Business / PMI / Sentiment (20 series) ────────",
+    "US.Business.ISM.Mfg.PMI":             { "fred_id": "NAPM",            "source": "ISM",    "freq": "Monthly", "unit": "Index",              "macro_theme": "Business", "sub_theme": "ISM Mfg",   "indicator": "ISM Mfg PMI Headline" },
+    "US.Business.ISM.Mfg.NewOrders":       { "fred_id": "NAPMNOI",         "source": "ISM",    "freq": "Monthly", "unit": "Index",              "macro_theme": "Business", "sub_theme": "ISM Mfg",   "indicator": "ISM Mfg New Orders" },
+    "US.Business.ISM.Mfg.Production":      { "fred_id": "NAPMPI",          "source": "ISM",    "freq": "Monthly", "unit": "Index",              "macro_theme": "Business", "sub_theme": "ISM Mfg",   "indicator": "ISM Mfg Production" },
+    "US.Business.ISM.Mfg.Employment":      { "fred_id": "NAPMEI",          "source": "ISM",    "freq": "Monthly", "unit": "Index",              "macro_theme": "Business", "sub_theme": "ISM Mfg",   "indicator": "ISM Mfg Employment" },
+    "US.Business.ISM.Mfg.Prices":          { "fred_id": "NAPMPRI",         "source": "ISM",    "freq": "Monthly", "unit": "Index",              "macro_theme": "Business", "sub_theme": "ISM Mfg",   "indicator": "ISM Mfg Prices Paid" },
+    "US.Business.ISM.Mfg.SupplierDeliveries":{ "fred_id":"NAPMSDI",        "source": "ISM",    "freq": "Monthly", "unit": "Index",              "macro_theme": "Business", "sub_theme": "ISM Mfg",   "indicator": "ISM Mfg Supplier Deliveries" },
+    "US.Business.ISM.Mfg.Inventories":     { "fred_id": "NAPMII",          "source": "ISM",    "freq": "Monthly", "unit": "Index",              "macro_theme": "Business", "sub_theme": "ISM Mfg",   "indicator": "ISM Mfg Inventories" },
+    "US.Business.ISM.Svc.PMI":             { "fred_id": "NMFCI",           "source": "ISM",    "freq": "Monthly", "unit": "Index",              "macro_theme": "Business", "sub_theme": "ISM Svc",   "indicator": "ISM Services PMI" },
+    "US.Business.ISM.Svc.BusinessActivity":{ "fred_id": "NMFBAI",          "source": "ISM",    "freq": "Monthly", "unit": "Index",              "macro_theme": "Business", "sub_theme": "ISM Svc",   "indicator": "ISM Svc Business Activity" },
+    "US.Business.ISM.Svc.NewOrders":       { "fred_id": "NMFNOI",          "source": "ISM",    "freq": "Monthly", "unit": "Index",              "macro_theme": "Business", "sub_theme": "ISM Svc",   "indicator": "ISM Svc New Orders" },
+    "US.Business.ISM.Svc.Employment":      { "fred_id": "NMFEI",           "source": "ISM",    "freq": "Monthly", "unit": "Index",              "macro_theme": "Business", "sub_theme": "ISM Svc",   "indicator": "ISM Svc Employment" },
+    "US.Business.ISM.Svc.Prices":          { "fred_id": "NMFPI",           "source": "ISM",    "freq": "Monthly", "unit": "Index",              "macro_theme": "Business", "sub_theme": "ISM Svc",   "indicator": "ISM Svc Prices Paid" },
+    "US.Business.SPG.PMI.Mfg":             { "fred_id": "USMFGPMI",        "source": "S&P Global","freq": "Monthly", "unit": "Index",           "macro_theme": "Business", "sub_theme": "S&P Global","indicator": "S&P Global Mfg PMI" },
+    "US.Business.RegionalFed.EmpireState": { "fred_id": "GACDFSA066MSFRBNY","source": "FRBNY", "freq": "Monthly", "unit": "Diffusion Index",    "macro_theme": "Business", "sub_theme": "Regional Fed","indicator": "Empire State Mfg Survey" },
+    "US.Business.RegionalFed.PhillyFed":   { "fred_id": "GACDISA066MSFRBPHI","source":"FRBPhilly","freq":"Monthly","unit":"Diffusion Index",   "macro_theme": "Business", "sub_theme": "Regional Fed","indicator": "Philly Fed Business Survey" },
+    "US.Business.RegionalFed.DallasFed":   { "fred_id": "BACTSAMFRBDAL",   "source": "FRBDallas","freq": "Monthly","unit": "Diffusion Index",   "macro_theme": "Business", "sub_theme": "Regional Fed","indicator": "Dallas Fed Mfg Outlook" },
+    "US.Business.ConsumerConfidence":      { "fred_id": "CSCICP03USM665S", "source": "ConfBoard","freq": "Monthly","unit": "Index",             "macro_theme": "Business", "sub_theme": "Sentiment", "indicator": "Conference Board Consumer Confidence" },
+    "US.Business.UMichSentiment":          { "fred_id": "UMCSENT",         "source": "UMich",  "freq": "Monthly", "unit": "Index",              "macro_theme": "Business", "sub_theme": "Sentiment", "indicator": "U Mich Consumer Sentiment" },
+    "US.Business.UMichExpectations":       { "fred_id": "MICH",            "source": "UMich",  "freq": "Monthly", "unit": "Percent",            "macro_theme": "Business", "sub_theme": "Sentiment", "indicator": "U Mich Inflation Expectations" },
+    "US.Business.NFIB":                    { "fred_id": "NFIB",            "source": "NFIB",   "freq": "Monthly", "unit": "Index",              "macro_theme": "Business", "sub_theme": "Sentiment", "indicator": "NFIB Small Business Optimism" },
+    "US.Business.LEI":                     { "fred_id": "USSLIND",         "source": "ConfBoard","freq": "Monthly","unit": "Index",            "macro_theme": "Business", "sub_theme": "Leading",   "indicator": "Conference Board LEI" },
+
+    "_comment_growth": "──────── GDP / Growth / Industrial (12) ────────",
+    "US.Growth.GDP.Real":                  { "fred_id": "GDPC1",           "source": "BEA",    "freq": "Quarterly","unit": "Billions 2017 USD","macro_theme": "Growth", "sub_theme": "GDP",       "indicator": "Real GDP" },
+    "US.Growth.GDP.Nominal":               { "fred_id": "GDP",             "source": "BEA",    "freq": "Quarterly","unit": "Billions USD",     "macro_theme": "Growth", "sub_theme": "GDP",       "indicator": "Nominal GDP" },
+    "US.Growth.GDP.QoQ.Annualized":        { "fred_id": "A191RL1Q225SBEA", "source": "BEA",    "freq": "Quarterly","unit": "Percent",          "macro_theme": "Growth", "sub_theme": "GDP",       "indicator": "Real GDP QoQ Annualized" },
+    "US.Growth.GDP.Deflator":              { "fred_id": "GDPDEF",          "source": "BEA",    "freq": "Quarterly","unit": "Index",            "macro_theme": "Growth", "sub_theme": "GDP",       "indicator": "GDP Deflator" },
+    "US.Growth.GDP.PCE":                   { "fred_id": "PCEC96",          "source": "BEA",    "freq": "Quarterly","unit": "Billions 2017 USD","macro_theme": "Growth", "sub_theme": "GDP Components","indicator": "PCE Real" },
+    "US.Growth.GDP.GPDI":                  { "fred_id": "GPDI",            "source": "BEA",    "freq": "Quarterly","unit": "Billions USD",     "macro_theme": "Growth", "sub_theme": "GDP Components","indicator": "Gross Private Investment" },
+    "US.Growth.GDP.GCE":                   { "fred_id": "GCE",             "source": "BEA",    "freq": "Quarterly","unit": "Billions USD",     "macro_theme": "Growth", "sub_theme": "GDP Components","indicator": "Govt Consumption & Investment" },
+    "US.Growth.GDP.NetExports":            { "fred_id": "NETEXP",          "source": "BEA",    "freq": "Quarterly","unit": "Billions USD",     "macro_theme": "Growth", "sub_theme": "GDP Components","indicator": "Net Exports" },
+    "US.Growth.GDPNow":                    { "fred_id": "GDPNOW",          "source": "Atlanta Fed","freq": "Weekly","unit": "Percent",         "macro_theme": "Growth", "sub_theme": "Nowcast",   "indicator": "Atlanta Fed GDPNow" },
+    "US.Growth.IndProd.Total":             { "fred_id": "INDPRO",          "source": "Fed",    "freq": "Monthly", "unit": "Index 2017=100",    "macro_theme": "Growth", "sub_theme": "Industrial","indicator": "Industrial Production Total" },
+    "US.Growth.IndProd.Mfg":               { "fred_id": "IPMAN",           "source": "Fed",    "freq": "Monthly", "unit": "Index 2017=100",    "macro_theme": "Growth", "sub_theme": "Industrial","indicator": "Industrial Production Mfg" },
+    "US.Growth.CapUtil":                   { "fred_id": "TCU",             "source": "Fed",    "freq": "Monthly", "unit": "Percent",           "macro_theme": "Growth", "sub_theme": "Industrial","indicator": "Capacity Utilization" },
+    "US.Growth.DurableGoods.Total":        { "fred_id": "DGORDER",         "source": "Census", "freq": "Monthly", "unit": "Millions USD",      "macro_theme": "Growth", "sub_theme": "DurableGoods","indicator": "Durable Goods Total Orders" },
+    "US.Growth.DurableGoods.Core":         { "fred_id": "NEWORDER",        "source": "Census", "freq": "Monthly", "unit": "Millions USD",      "macro_theme": "Growth", "sub_theme": "DurableGoods","indicator": "Core Cap Goods Orders ex Defense ex Aircraft" },
+
+    "_comment_consumer": "──────── Consumer / Retail (8) ────────",
+    "US.Consumer.RetailSales":             { "fred_id": "RSAFS",           "source": "Census", "freq": "Monthly", "unit": "Millions USD",      "macro_theme": "Consumer","sub_theme": "Retail",    "indicator": "Retail Sales Total" },
+    "US.Consumer.RetailSales.ExAuto":      { "fred_id": "RSFSXMV",         "source": "Census", "freq": "Monthly", "unit": "Millions USD",      "macro_theme": "Consumer","sub_theme": "Retail",    "indicator": "Retail Sales Ex Auto" },
+    "US.Consumer.RetailSales.Control":     { "fred_id": "RSSTHD",          "source": "Census", "freq": "Monthly", "unit": "Millions USD",      "macro_theme": "Consumer","sub_theme": "Retail",    "indicator": "Retail Sales Control Group" },
+    "US.Consumer.PersonalIncome":          { "fred_id": "PI",              "source": "BEA",    "freq": "Monthly", "unit": "Billions USD",      "macro_theme": "Consumer","sub_theme": "Income",    "indicator": "Personal Income" },
+    "US.Consumer.PersonalSpending":        { "fred_id": "PCE",             "source": "BEA",    "freq": "Monthly", "unit": "Billions USD",      "macro_theme": "Consumer","sub_theme": "Spending",  "indicator": "Personal Consumption Expenditure" },
+    "US.Consumer.DPI":                     { "fred_id": "DSPI",            "source": "BEA",    "freq": "Monthly", "unit": "Billions USD",      "macro_theme": "Consumer","sub_theme": "Income",    "indicator": "Disposable Personal Income" },
+    "US.Consumer.SavingsRate":             { "fred_id": "PSAVERT",         "source": "BEA",    "freq": "Monthly", "unit": "Percent",           "macro_theme": "Consumer","sub_theme": "Savings",   "indicator": "Personal Savings Rate" },
+    "US.Consumer.Credit.CardDelinquency":  { "fred_id": "DRCCLACBS",       "source": "Fed",    "freq": "Quarterly","unit": "Percent",          "macro_theme": "Consumer","sub_theme": "Credit",    "indicator": "Credit Card Delinquency Rate" },
+
+    "_comment_housing": "──────── Housing 全細項 (12) ────────",
+    "US.Housing.Starts.Total":             { "fred_id": "HOUST",           "source": "Census", "freq": "Monthly", "unit": "Thousands SAAR",    "macro_theme": "Housing", "sub_theme": "Construction","indicator": "Housing Starts Total" },
+    "US.Housing.Starts.SingleFamily":      { "fred_id": "HOUST1F",         "source": "Census", "freq": "Monthly", "unit": "Thousands SAAR",    "macro_theme": "Housing", "sub_theme": "Construction","indicator": "Housing Starts Single Family" },
+    "US.Housing.Starts.MultiFamily":       { "fred_id": "HOUST5F",         "source": "Census", "freq": "Monthly", "unit": "Thousands SAAR",    "macro_theme": "Housing", "sub_theme": "Construction","indicator": "Housing Starts 5+ Multi-Family" },
+    "US.Housing.BuildingPermits.Total":    { "fred_id": "PERMIT",          "source": "Census", "freq": "Monthly", "unit": "Thousands SAAR",    "macro_theme": "Housing", "sub_theme": "Construction","indicator": "Building Permits Total" },
+    "US.Housing.BuildingPermits.SingleFamily":{ "fred_id":"PERMIT1",       "source": "Census", "freq": "Monthly", "unit": "Thousands SAAR",    "macro_theme": "Housing", "sub_theme": "Construction","indicator": "Building Permits Single Family" },
+    "US.Housing.NewHomeSales":             { "fred_id": "HSN1F",           "source": "Census", "freq": "Monthly", "unit": "Thousands SAAR",    "macro_theme": "Housing", "sub_theme": "Sales",     "indicator": "New Home Sales" },
+    "US.Housing.ExistingHomeSales":        { "fred_id": "EXHOSLUSM495S",   "source": "NAR",    "freq": "Monthly", "unit": "Millions SAAR",     "macro_theme": "Housing", "sub_theme": "Sales",     "indicator": "Existing Home Sales" },
+    "US.Housing.PendingHomeSales":         { "fred_id": "HSN1FNSA",        "source": "NAR",    "freq": "Monthly", "unit": "Index",             "macro_theme": "Housing", "sub_theme": "Sales",     "indicator": "Pending Home Sales Index" },
+    "US.Housing.Prices.CaseShiller20":     { "fred_id": "SPCS20RSA",       "source": "S&P",    "freq": "Monthly", "unit": "Index",             "macro_theme": "Housing", "sub_theme": "Prices",    "indicator": "Case-Shiller 20-City" },
+    "US.Housing.Prices.CaseShiller10":     { "fred_id": "SPCS10RSA",       "source": "S&P",    "freq": "Monthly", "unit": "Index",             "macro_theme": "Housing", "sub_theme": "Prices",    "indicator": "Case-Shiller 10-City" },
+    "US.Housing.Prices.FHFA":              { "fred_id": "USSTHPI",         "source": "FHFA",   "freq": "Quarterly","unit": "Index",            "macro_theme": "Housing", "sub_theme": "Prices",    "indicator": "FHFA House Price Index" },
+    "US.Housing.NAHB.Index":               { "fred_id": "NAHBMMI",         "source": "NAHB",   "freq": "Monthly", "unit": "Index",             "macro_theme": "Housing", "sub_theme": "Sentiment", "indicator": "NAHB Housing Market Index" },
+    "US.Housing.Mortgage.30Y":             { "fred_id": "MORTGAGE30US",    "source": "Freddie Mac","freq":"Weekly","unit":"Percent",          "macro_theme": "Housing", "sub_theme": "Mortgage",  "indicator": "30-Year Fixed Mortgage Rate" },
+    "US.Housing.Mortgage.15Y":             { "fred_id": "MORTGAGE15US",    "source": "Freddie Mac","freq":"Weekly","unit":"Percent",          "macro_theme": "Housing", "sub_theme": "Mortgage",  "indicator": "15-Year Fixed Mortgage Rate" },
+
+    "_comment_fiscal_mts": "──────── 🟧 Fiscal: MTS Monthly (Treasury FiscalData) ────────",
+    "US.Fiscal.MTS.GrossReceipts":         { "source": "Treasury_FD", "endpoint": "v1/accounting/mts/mts_table_1", "field": "current_month_gross_receipts_amt",   "freq": "Monthly", "unit": "Millions USD", "macro_theme": "Fiscal", "sub_theme": "MTS",  "indicator": "MTS Current Month Gross Receipts" },
+    "US.Fiscal.MTS.GrossOutlays":          { "source": "Treasury_FD", "endpoint": "v1/accounting/mts/mts_table_1", "field": "current_month_gross_outlays_amt",    "freq": "Monthly", "unit": "Millions USD", "macro_theme": "Fiscal", "sub_theme": "MTS",  "indicator": "MTS Current Month Gross Outlays" },
+    "US.Fiscal.MTS.DeficitSurplus":        { "source": "Treasury_FD", "endpoint": "v1/accounting/mts/mts_table_1", "field": "current_month_dfct_sur_amt",         "freq": "Monthly", "unit": "Millions USD", "macro_theme": "Fiscal", "sub_theme": "MTS",  "indicator": "MTS Current Month Deficit/Surplus" },
+    "US.Fiscal.MTS.YTD.Receipts":          { "source": "Treasury_FD", "endpoint": "v1/accounting/mts/mts_table_1", "field": "ytd_gross_receipts_amt",             "freq": "Monthly", "unit": "Millions USD", "macro_theme": "Fiscal", "sub_theme": "MTS",  "indicator": "MTS YTD Receipts" },
+    "US.Fiscal.MTS.YTD.Outlays":           { "source": "Treasury_FD", "endpoint": "v1/accounting/mts/mts_table_1", "field": "ytd_gross_outlays_amt",              "freq": "Monthly", "unit": "Millions USD", "macro_theme": "Fiscal", "sub_theme": "MTS",  "indicator": "MTS YTD Outlays" },
+    "US.Fiscal.MTS.YTD.DeficitSurplus":    { "source": "Treasury_FD", "endpoint": "v1/accounting/mts/mts_table_1", "field": "ytd_dfct_sur_amt",                   "freq": "Monthly", "unit": "Millions USD", "macro_theme": "Fiscal", "sub_theme": "MTS",  "indicator": "MTS YTD Deficit/Surplus" },
+    "US.Fiscal.MTS.ReceiptsBySource":      { "source": "Treasury_FD", "endpoint": "v1/accounting/mts/mts_table_4", "field": "*",                                  "freq": "Monthly", "unit": "Millions USD", "macro_theme": "Fiscal", "sub_theme": "MTS",  "indicator": "Receipts by Source (Indiv/Corp/Excise/Customs/etc)" },
+    "US.Fiscal.MTS.OutlaysByFunction":     { "source": "Treasury_FD", "endpoint": "v1/accounting/mts/mts_table_5", "field": "*",                                  "freq": "Monthly", "unit": "Millions USD", "macro_theme": "Fiscal", "sub_theme": "MTS",  "indicator": "Outlays by Function (Defense/SocSec/Medicare/etc)" },
+
+    "_comment_fiscal_dts": "──────── 🟦 Fiscal: DTS Daily (Treasury FiscalData) ────────",
+    "US.Fiscal.DTS.TotalReceipts":         { "source": "Treasury_FD", "endpoint": "v1/accounting/dts/deposits_withdrawals_operating_cash", "field": "deposits_today_amt", "freq": "Daily", "unit": "Millions USD", "macro_theme": "Fiscal", "sub_theme": "DTS", "indicator": "DTS Daily Total Deposits (Receipts)" },
+    "US.Fiscal.DTS.TotalOutlays":          { "source": "Treasury_FD", "endpoint": "v1/accounting/dts/deposits_withdrawals_operating_cash", "field": "withdrawals_today_amt","freq":"Daily","unit": "Millions USD", "macro_theme": "Fiscal", "sub_theme": "DTS", "indicator": "DTS Daily Total Withdrawals (Outlays)" },
+    "US.Fiscal.DTS.OperatingCashBalance":  { "source": "Treasury_FD", "endpoint": "v1/accounting/dts/operating_cash_balance",              "field": "close_today_bal",     "freq": "Daily", "unit": "Millions USD", "macro_theme": "Fiscal", "sub_theme": "DTS", "indicator": "DTS Operating Cash Balance (TGA)" },
+    "US.Fiscal.DTS.PublicDebtIssues":      { "source": "Treasury_FD", "endpoint": "v1/accounting/dts/public_debt_transactions",            "field": "issues_today_amt",   "freq": "Daily", "unit": "Millions USD", "macro_theme": "Fiscal", "sub_theme": "DTS", "indicator": "DTS Public Debt Cash Issues" },
+    "US.Fiscal.DTS.PublicDebtRedemptions": { "source": "Treasury_FD", "endpoint": "v1/accounting/dts/public_debt_transactions",            "field": "redemptions_today_amt","freq":"Daily","unit": "Millions USD", "macro_theme": "Fiscal", "sub_theme": "DTS", "indicator": "DTS Public Debt Cash Redemptions" },
+    "US.Fiscal.DTS.NetFlow":               { "source": "Treasury_FD", "endpoint": "_derived",                                              "field": "_computed",          "freq": "Daily", "unit": "Millions USD", "macro_theme": "Fiscal", "sub_theme": "DTS", "indicator": "DTS Net Flow (Receipts - Outlays)", "transform": "subtract:US.Fiscal.DTS.TotalReceipts,US.Fiscal.DTS.TotalOutlays" },
+
+    "_comment_fiscal_debt": "──────── 🟪 Fiscal: Debt (FRED) ────────",
+    "US.Fiscal.Debt.TotalPublic":          { "fred_id": "GFDEBTN",         "source": "Treasury","freq": "Quarterly","unit": "Millions USD", "macro_theme": "Fiscal", "sub_theme": "Debt", "indicator": "Total Public Debt Outstanding" },
+    "US.Fiscal.Debt.HeldByPublic":         { "fred_id": "FYGFDPUN",        "source": "Treasury","freq": "Annual",   "unit": "Millions USD", "macro_theme": "Fiscal", "sub_theme": "Debt", "indicator": "Federal Debt Held by Public" },
+    "US.Fiscal.Debt.ToGDP":                { "fred_id": "GFDEGDQ188S",     "source": "Treasury","freq": "Quarterly","unit": "Percent",      "macro_theme": "Fiscal", "sub_theme": "Debt", "indicator": "Federal Debt to GDP" },
+    "US.Fiscal.Debt.NetInterest":          { "fred_id": "FYOINT",          "source": "OMB",     "freq": "Annual",   "unit": "Millions USD", "macro_theme": "Fiscal", "sub_theme": "Debt", "indicator": "Federal Net Interest Outlays" },
+
+    "_comment_fed_rates": "──────── 🟥 Fed Policy: Rates ────────",
+    "US.Fed.Rates.FedFundsEffective":      { "fred_id": "DFF",             "source": "Fed",    "freq": "Daily",   "unit": "Percent",           "macro_theme": "Fed", "sub_theme": "Rates",        "indicator": "Effective Fed Funds Rate" },
+    "US.Fed.Rates.FedFundsTarget.Upper":   { "fred_id": "DFEDTARU",        "source": "Fed",    "freq": "Daily",   "unit": "Percent",           "macro_theme": "Fed", "sub_theme": "Rates",        "indicator": "Fed Funds Target Upper Bound" },
+    "US.Fed.Rates.FedFundsTarget.Lower":   { "fred_id": "DFEDTARL",        "source": "Fed",    "freq": "Daily",   "unit": "Percent",           "macro_theme": "Fed", "sub_theme": "Rates",        "indicator": "Fed Funds Target Lower Bound" },
+    "US.Fed.Rates.IORB":                   { "fred_id": "IORB",            "source": "Fed",    "freq": "Daily",   "unit": "Percent",           "macro_theme": "Fed", "sub_theme": "Rates",        "indicator": "Interest on Reserve Balances" },
+    "US.Fed.Rates.DiscountRate":           { "fred_id": "INTDSRUSM193N",   "source": "Fed",    "freq": "Monthly", "unit": "Percent",           "macro_theme": "Fed", "sub_theme": "Rates",        "indicator": "Discount Rate (Primary Credit)" },
+    "US.Fed.Rates.SOFR":                   { "fred_id": "SOFR",            "source": "FRBNY",  "freq": "Daily",   "unit": "Percent",           "macro_theme": "Fed", "sub_theme": "Rates",        "indicator": "Secured Overnight Financing Rate" },
+    "US.Fed.Rates.EFFR":                   { "fred_id": "EFFR",            "source": "FRBNY",  "freq": "Daily",   "unit": "Percent",           "macro_theme": "Fed", "sub_theme": "Rates",        "indicator": "Effective Federal Funds Rate (daily)" },
+
+    "_comment_fed_balance": "──────── 🟥 Fed Policy: Balance Sheet ────────",
+    "US.Fed.BalanceSheet.Total":           { "fred_id": "WALCL",           "source": "Fed",    "freq": "Weekly",  "unit": "Millions USD",      "macro_theme": "Fed", "sub_theme": "BalanceSheet", "indicator": "Fed Total Assets (WALCL)" },
+    "US.Fed.BalanceSheet.Treasuries":      { "fred_id": "TREAST",          "source": "Fed",    "freq": "Weekly",  "unit": "Millions USD",      "macro_theme": "Fed", "sub_theme": "BalanceSheet", "indicator": "Fed Holdings of US Treasuries" },
+    "US.Fed.BalanceSheet.MBS":             { "fred_id": "WSHOMCB",         "source": "Fed",    "freq": "Weekly",  "unit": "Millions USD",      "macro_theme": "Fed", "sub_theme": "BalanceSheet", "indicator": "Fed Holdings of MBS" },
+    "US.Fed.BalanceSheet.ReverseRepo":     { "fred_id": "RRPONTSYD",       "source": "FRBNY",  "freq": "Daily",   "unit": "Billions USD",      "macro_theme": "Fed", "sub_theme": "BalanceSheet", "indicator": "Overnight Reverse Repo (RRP)" },
+    "US.Fed.BalanceSheet.TGA":             { "fred_id": "WTREGEN",         "source": "Treasury","freq": "Weekly", "unit": "Millions USD",      "macro_theme": "Fed", "sub_theme": "BalanceSheet", "indicator": "Treasury General Account (TGA)" },
+    "US.Fed.BalanceSheet.BankReserves":    { "fred_id": "WRESBAL",         "source": "Fed",    "freq": "Weekly",  "unit": "Billions USD",      "macro_theme": "Fed", "sub_theme": "BalanceSheet", "indicator": "Total Bank Reserves" },
+    "US.Fed.MoneySupply.M1":               { "fred_id": "M1SL",            "source": "Fed",    "freq": "Monthly", "unit": "Billions USD",      "macro_theme": "Fed", "sub_theme": "MoneySupply",  "indicator": "M1 Money Supply" },
+    "US.Fed.MoneySupply.M2":               { "fred_id": "M2SL",            "source": "Fed",    "freq": "Monthly", "unit": "Billions USD",      "macro_theme": "Fed", "sub_theme": "MoneySupply",  "indicator": "M2 Money Supply" },
+    "US.Fed.MoneySupply.M2.YoY":           { "fred_id": "M2SL",            "source": "Fed",    "freq": "Monthly", "unit": "Percent",           "macro_theme": "Fed", "sub_theme": "MoneySupply",  "indicator": "M2 YoY", "transform": "yoy" },
+
+    "_comment_fed_guidance": "──────── 🟥 Fed Policy: Forward Guidance (scrape) ────────",
+    "US.Fed.ForwardGuidance.FOMC.Statements": { "source": "Fed", "endpoint": "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm", "method": "scrape", "freq": "PerMeeting", "unit": "text", "macro_theme": "Fed", "sub_theme": "ForwardGuidance", "indicator": "FOMC Statement Text" },
+    "US.Fed.ForwardGuidance.DotPlot":          { "source": "Fed", "endpoint": "https://www.federalreserve.gov/monetarypolicy/fomcprojtabl.htm","method": "scrape", "freq": "Quarterly",  "unit": "Percent","macro_theme": "Fed", "sub_theme": "ForwardGuidance", "indicator": "FOMC Dot Plot Projections" },
+
+    "_comment_rates_treasury": "──────── 🟪 US Treasury Yield Curve (Full) ────────",
+    "US.Rates.Treasury.1M":                { "fred_id": "DGS1MO",          "source": "Fed",    "freq": "Daily",   "unit": "Percent",           "macro_theme": "Rates", "sub_theme": "Treasury", "indicator": "1-Month Treasury" },
+    "US.Rates.Treasury.3M":                { "fred_id": "DTB3",            "source": "Fed",    "freq": "Daily",   "unit": "Percent",           "macro_theme": "Rates", "sub_theme": "Treasury", "indicator": "3-Month T-Bill" },
+    "US.Rates.Treasury.6M":                { "fred_id": "DTB6",            "source": "Fed",    "freq": "Daily",   "unit": "Percent",           "macro_theme": "Rates", "sub_theme": "Treasury", "indicator": "6-Month T-Bill" },
+    "US.Rates.Treasury.1Y":                { "fred_id": "DGS1",            "source": "Fed",    "freq": "Daily",   "unit": "Percent",           "macro_theme": "Rates", "sub_theme": "Treasury", "indicator": "1-Year Treasury" },
+    "US.Rates.Treasury.2Y":                { "fred_id": "DGS2",            "source": "Fed",    "freq": "Daily",   "unit": "Percent",           "macro_theme": "Rates", "sub_theme": "Treasury", "indicator": "2-Year Treasury" },
+    "US.Rates.Treasury.3Y":                { "fred_id": "DGS3",            "source": "Fed",    "freq": "Daily",   "unit": "Percent",           "macro_theme": "Rates", "sub_theme": "Treasury", "indicator": "3-Year Treasury" },
+    "US.Rates.Treasury.5Y":                { "fred_id": "DGS5",            "source": "Fed",    "freq": "Daily",   "unit": "Percent",           "macro_theme": "Rates", "sub_theme": "Treasury", "indicator": "5-Year Treasury" },
+    "US.Rates.Treasury.7Y":                { "fred_id": "DGS7",            "source": "Fed",    "freq": "Daily",   "unit": "Percent",           "macro_theme": "Rates", "sub_theme": "Treasury", "indicator": "7-Year Treasury" },
+    "US.Rates.Treasury.10Y":               { "fred_id": "DGS10",           "source": "Fed",    "freq": "Daily",   "unit": "Percent",           "macro_theme": "Rates", "sub_theme": "Treasury", "indicator": "10-Year Treasury" },
+    "US.Rates.Treasury.20Y":               { "fred_id": "DGS20",           "source": "Fed",    "freq": "Daily",   "unit": "Percent",           "macro_theme": "Rates", "sub_theme": "Treasury", "indicator": "20-Year Treasury" },
+    "US.Rates.Treasury.30Y":               { "fred_id": "DGS30",           "source": "Fed",    "freq": "Daily",   "unit": "Percent",           "macro_theme": "Rates", "sub_theme": "Treasury", "indicator": "30-Year Treasury" },
+
+    "_comment_rates_tips": "──────── 🟪 TIPS Curve (Real Yields) ────────",
+    "US.Rates.TIPS.5Y":                    { "fred_id": "DFII5",           "source": "Fed",    "freq": "Daily",   "unit": "Percent",           "macro_theme": "Rates", "sub_theme": "TIPS",     "indicator": "5Y TIPS Real Yield" },
+    "US.Rates.TIPS.10Y":                   { "fred_id": "DFII10",          "source": "Fed",    "freq": "Daily",   "unit": "Percent",           "macro_theme": "Rates", "sub_theme": "TIPS",     "indicator": "10Y TIPS Real Yield" },
+    "US.Rates.TIPS.20Y":                   { "fred_id": "DFII20",          "source": "Fed",    "freq": "Daily",   "unit": "Percent",           "macro_theme": "Rates", "sub_theme": "TIPS",     "indicator": "20Y TIPS Real Yield" },
+    "US.Rates.TIPS.30Y":                   { "fred_id": "DFII30",          "source": "Fed",    "freq": "Daily",   "unit": "Percent",           "macro_theme": "Rates", "sub_theme": "TIPS",     "indicator": "30Y TIPS Real Yield" },
+
+    "_comment_rates_spreads": "──────── 🟪 Spreads & Breakeven ────────",
+    "US.Rates.Spread.2s10s":               { "fred_id": "T10Y2Y",          "source": "Fed",    "freq": "Daily",   "unit": "Percent",           "macro_theme": "Rates", "sub_theme": "Spread",   "indicator": "10Y-2Y Spread" },
+    "US.Rates.Spread.3m10y":               { "fred_id": "T10Y3M",          "source": "Fed",    "freq": "Daily",   "unit": "Percent",           "macro_theme": "Rates", "sub_theme": "Spread",   "indicator": "10Y-3M Spread (NY Fed Recession Model)" },
+    "US.Rates.BreakEven.5Y":                { "fred_id": "T5YIE",          "source": "Fed",    "freq": "Daily",   "unit": "Percent",           "macro_theme": "Rates", "sub_theme": "Breakeven","indicator": "5Y Breakeven Inflation" },
+    "US.Rates.BreakEven.10Y":               { "fred_id": "T10YIE",         "source": "Fed",    "freq": "Daily",   "unit": "Percent",           "macro_theme": "Rates", "sub_theme": "Breakeven","indicator": "10Y Breakeven Inflation" },
+    "US.Rates.BreakEven.5Y5Y":              { "fred_id": "T5YIFR",         "source": "Fed",    "freq": "Daily",   "unit": "Percent",           "macro_theme": "Rates", "sub_theme": "Breakeven","indicator": "5Y5Y Forward Inflation" },
+    "US.Rates.Credit.HY_OAS":               { "fred_id": "BAMLH0A0HYM2",   "source": "ICE/Fed","freq": "Daily",   "unit": "Percent",           "macro_theme": "Rates", "sub_theme": "Credit",   "indicator": "ICE BofA HY OAS Spread" },
+    "US.Rates.Credit.IG_OAS":               { "fred_id": "BAMLC0A0CM",     "source": "ICE/Fed","freq": "Daily",   "unit": "Percent",           "macro_theme": "Rates", "sub_theme": "Credit",   "indicator": "ICE BofA IG OAS Spread" },
+    "US.Rates.Credit.CCC_OAS":              { "fred_id": "BAMLH0A3HYC",    "source": "ICE/Fed","freq": "Daily",   "unit": "Percent",           "macro_theme": "Rates", "sub_theme": "Credit",   "indicator": "ICE BofA CCC OAS Spread" },
+
+    "_comment_trade": "──────── Trade & External (5) ────────",
+    "US.Trade.Goods.Balance":              { "fred_id": "BOPGSTB",         "source": "Census/BEA","freq": "Monthly","unit": "Millions USD",    "macro_theme": "Trade", "sub_theme": "Goods",    "indicator": "Trade Balance Goods" },
+    "US.Trade.Goods.Exports":              { "fred_id": "BOPGEXP",         "source": "Census/BEA","freq": "Monthly","unit": "Millions USD",    "macro_theme": "Trade", "sub_theme": "Goods",    "indicator": "Goods Exports" },
+    "US.Trade.Goods.Imports":              { "fred_id": "BOPGIMP",         "source": "Census/BEA","freq": "Monthly","unit": "Millions USD",    "macro_theme": "Trade", "sub_theme": "Goods",    "indicator": "Goods Imports" },
+    "US.Trade.Services.Balance":           { "fred_id": "IEABCS",          "source": "BEA",    "freq": "Monthly", "unit": "Millions USD",      "macro_theme": "Trade", "sub_theme": "Services", "indicator": "Trade Balance Services" },
+    "US.Trade.DXY.Broad":                  { "fred_id": "DTWEXBGS",        "source": "Fed",    "freq": "Daily",   "unit": "Index Jan 2006=100","macro_theme": "Trade", "sub_theme": "FX",       "indicator": "USD Broad Trade-Weighted Index" },
+
+    "_comment_fincond": "──────── Financial Conditions (4) ────────",
+    "US.FinCond.NFCI":                     { "fred_id": "NFCI",            "source": "Chicago Fed","freq": "Weekly","unit": "Index",         "macro_theme": "FinCond", "sub_theme": "FCI",     "indicator": "Chicago Fed NFCI" },
+    "US.FinCond.ANFCI":                    { "fred_id": "ANFCI",           "source": "Chicago Fed","freq": "Weekly","unit": "Index",         "macro_theme": "FinCond", "sub_theme": "FCI",     "indicator": "Adjusted NFCI" },
+    "US.FinCond.SLO.C&I":                  { "fred_id": "DRTSCIS",         "source": "Fed",    "freq": "Quarterly","unit": "Net Percent",     "macro_theme": "FinCond", "sub_theme": "SLOOS",   "indicator": "Senior Loan Officer C&I Tightening" },
+    "US.FinCond.SLO.CommercialRE":         { "fred_id": "DRTSCILM",        "source": "Fed",    "freq": "Quarterly","unit": "Net Percent",     "macro_theme": "FinCond", "sub_theme": "SLOOS",   "indicator": "Senior Loan Officer CRE Tightening" },
+
+    "_comment_sentiment": "──────── Market Sentiment (non-FRED scrape) ────────",
+    "US.Sentiment.AAII.Bullish":           { "source": "AAII", "endpoint": "https://www.aaii.com/files/surveys/sentiment.xls", "field": "bullish", "freq": "Weekly", "unit": "Percent", "macro_theme": "Sentiment", "sub_theme": "AAII",      "indicator": "AAII Bullish %" },
+    "US.Sentiment.AAII.Bearish":           { "source": "AAII", "endpoint": "https://www.aaii.com/files/surveys/sentiment.xls", "field": "bearish", "freq": "Weekly", "unit": "Percent", "macro_theme": "Sentiment", "sub_theme": "AAII",      "indicator": "AAII Bearish %" },
+    "US.Sentiment.AAII.Neutral":           { "source": "AAII", "endpoint": "https://www.aaii.com/files/surveys/sentiment.xls", "field": "neutral", "freq": "Weekly", "unit": "Percent", "macro_theme": "Sentiment", "sub_theme": "AAII",      "indicator": "AAII Neutral %" },
+    "US.Sentiment.AAII.BullBearSpread":    { "source": "AAII", "endpoint": "_derived", "field": "_computed", "freq": "Weekly", "unit": "Percent", "macro_theme": "Sentiment", "sub_theme": "AAII", "indicator": "AAII Bull-Bear Spread", "transform": "subtract:US.Sentiment.AAII.Bullish,US.Sentiment.AAII.Bearish" },
+    "US.Sentiment.CNN.FearGreed":          { "source": "CNN",  "endpoint": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata", "field": "score",   "freq": "Daily",  "unit": "Index 0-100", "macro_theme": "Sentiment", "sub_theme": "CNN F&G", "indicator": "CNN Fear & Greed Composite" },
+    "US.Sentiment.CNN.FG.PutCall":         { "source": "CNN",  "endpoint": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata", "field": "put_call_options.score","freq":"Daily","unit": "Index 0-100", "macro_theme": "Sentiment", "sub_theme": "CNN F&G", "indicator": "CNN F&G Put/Call Component" },
+    "US.Sentiment.CNN.FG.Momentum":        { "source": "CNN",  "endpoint": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata", "field": "market_momentum_sp500.score", "freq":"Daily","unit":"Index 0-100","macro_theme": "Sentiment", "sub_theme": "CNN F&G", "indicator": "CNN F&G Momentum Component" },
+    "US.Sentiment.CNN.FG.SafeHaven":       { "source": "CNN",  "endpoint": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata", "field": "safe_haven_demand.score","freq":"Daily","unit":"Index 0-100","macro_theme": "Sentiment", "sub_theme": "CNN F&G", "indicator": "CNN F&G Safe Haven Demand" },
+    "US.Sentiment.CNN.FG.Breadth":         { "source": "CNN",  "endpoint": "https://production.dataviz.cnn.io/index/fearandgreed/graphdata", "field": "market_volatility_vix.score","freq":"Daily","unit":"Index 0-100","macro_theme": "Sentiment", "sub_theme": "CNN F&G", "indicator": "CNN F&G Breadth Component" },
+    "US.Sentiment.VIX":                    { "source": "Yahoo", "ticker": "^VIX",   "freq": "Daily", "unit": "Index",            "macro_theme": "Sentiment", "sub_theme": "Volatility", "indicator": "CBOE VIX" },
+    "US.Sentiment.VVIX":                   { "source": "Yahoo", "ticker": "^VVIX",  "freq": "Daily", "unit": "Index",            "macro_theme": "Sentiment", "sub_theme": "Volatility", "indicator": "CBOE VVIX (Vol of Vol)" },
+    "US.Sentiment.MOVE":                   { "source": "Yahoo", "ticker": "^MOVE",  "freq": "Daily", "unit": "Index",            "macro_theme": "Sentiment", "sub_theme": "Volatility", "indicator": "ICE BofA MOVE (Bond Vol)" },
+    "US.Sentiment.SKEW":                   { "source": "Yahoo", "ticker": "^SKEW",  "freq": "Daily", "unit": "Index",            "macro_theme": "Sentiment", "sub_theme": "Volatility", "indicator": "CBOE SKEW Tail-Risk" },
+
+    "_comment_eu_cn_jp": "──────── Global: EU / CN / JP / UK / OECD ────────",
+    "EU.Prices.HICP.Headline":             { "fred_id": "CP0000EZ19M086NEST","source":"Eurostat","freq":"Monthly","unit":"Index 2015=100","macro_theme":"Prices","sub_theme":"HICP","indicator": "EU HICP All Items" },
+    "EU.Prices.HICP.Core":                 { "fred_id": "CPHPLA01EZM659N","source": "Eurostat","freq": "Monthly","unit": "Percent",    "macro_theme":"Prices","sub_theme":"HICP","indicator": "EU HICP Core YoY" },
+    "EU.ECB.DepositFacilityRate":          { "fred_id": "ECBDFR",           "source":"ECB",    "freq": "Daily",   "unit": "Percent",     "macro_theme":"ECB","sub_theme":"Rates","indicator": "ECB Deposit Facility Rate" },
+    "EU.ECB.MainRefiRate":                 { "fred_id": "ECBMRRFR",         "source":"ECB",    "freq": "Daily",   "unit": "Percent",     "macro_theme":"ECB","sub_theme":"Rates","indicator": "ECB Main Refinancing Rate" },
+    "EU.Business.PMI.Mfg":                 { "fred_id": "EUGLORPMI",        "source":"S&P Global","freq":"Monthly","unit":"Index",       "macro_theme":"Business","sub_theme":"EU PMI","indicator": "EU Mfg PMI" },
+    "EU.Business.PMI.Svc":                 { "fred_id": "EUSVPMI",          "source":"S&P Global","freq":"Monthly","unit":"Index",       "macro_theme":"Business","sub_theme":"EU PMI","indicator": "EU Svc PMI" },
+    "CN.Business.PMI.Mfg.NBS":             { "fred_id": "CHNMFGPMI",        "source":"NBS",    "freq": "Monthly", "unit": "Index",       "macro_theme":"Business","sub_theme":"CN PMI","indicator": "China NBS Mfg PMI" },
+    "CN.Business.PMI.NonMfg.NBS":          { "fred_id": "CHNNMFPMI",        "source":"NBS",    "freq": "Monthly", "unit": "Index",       "macro_theme":"Business","sub_theme":"CN PMI","indicator": "China NBS NonMfg PMI" },
+    "JP.Business.PMI.Mfg":                 { "fred_id": "JPNMFGPMI",        "source":"Jibun Bank","freq":"Monthly","unit":"Index",       "macro_theme":"Business","sub_theme":"JP PMI","indicator": "Japan Mfg PMI" },
+    "JP.BOJ.PolicyRate":                   { "fred_id": "IRSTCB01JPM156N",  "source":"BOJ",    "freq": "Monthly", "unit": "Percent",     "macro_theme":"BOJ","sub_theme":"Rates","indicator": "BOJ Policy Rate" },
+    "UK.BOE.BankRate":                     { "fred_id": "IUDSOIA",          "source":"BOE",    "freq": "Daily",   "unit": "Percent",     "macro_theme":"BOE","sub_theme":"Rates","indicator": "BOE Bank Rate (SONIA proxy)" },
+    "Global.OECD.CLI.G7":                  { "fred_id": "G7LOLITONOSTSAM",  "source":"OECD",   "freq": "Monthly", "unit": "Index",       "macro_theme":"OECD","sub_theme":"Leading","indicator": "OECD CLI G7" },
+    "Global.OECD.CLI.G20":                 { "fred_id": "G20LOLITONOSTSAM", "source":"OECD",   "freq": "Monthly", "unit": "Index",       "macro_theme":"OECD","sub_theme":"Leading","indicator": "OECD CLI G20" }
+  },
+
+  "derived_models": {
+
+    "US.Model.FedPolicy.Stance": {
+      "description": "Aggregate Fed policy stance: Tightening / Restrictive Hold / Neutral / Easing / Emergency Easing",
+      "inputs": [
+        "US.Fed.Rates.FedFundsTarget.Upper",
+        "US.Fed.Rates.FedFundsTarget.Lower",
+        "US.Fed.BalanceSheet.Total",
+        "US.Prices.PCE.Core.YoY",
+        "US.Labor.UnempRate.U3"
+      ],
+      "formula": "f(FFR - r_neutral, inflation_gap, unemployment_gap)",
+      "r_neutral": 0.75,
+      "output_categories": ["Tightening", "RestrictiveHold", "Neutral", "Easing", "EmergencyEasing"],
+      "fetcher": "Derived"
+    },
+
+    "US.Model.FedPolicy.LiquidityImpulse": {
+      "description": "Change in net liquidity = Δ(Reserves + RRP_inverse + TGA_inverse). Drives risk assets.",
+      "inputs": [
+        "US.Fed.BalanceSheet.BankReserves",
+        "US.Fed.BalanceSheet.ReverseRepo",
+        "US.Fed.BalanceSheet.TGA"
+      ],
+      "formula": "Δ(Reserves - RRP - TGA)",
+      "interpretation": {
+        "positive": "Net liquidity injection → risk-on, equities up",
+        "negative": "Net liquidity drain → risk-off, USD up"
+      },
+      "fetcher": "Derived"
+    },
+
+    "US.Model.USDIndex.PolicyDiff": {
+      "description": "USD policy premium = Fed rate minus DXY-weighted G6 policy rates",
+      "inputs": [
+        "US.Fed.Rates.FedFundsTarget.Upper",
+        "EU.ECB.DepositFacilityRate",
+        "JP.BOJ.PolicyRate",
+        "UK.BOE.BankRate"
+      ],
+      "formula": "FFR - (ECB*0.576 + BOJ*0.136 + BOE*0.119 + BOC*0.091 + SNB*0.036)",
+      "dxy_weights": { "EUR": 0.576, "JPY": 0.136, "GBP": 0.119, "CAD": 0.091, "SEK": 0.042, "CHF": 0.036 },
+      "fetcher": "Derived"
+    },
+
+    "US.Model.USDIndex.YieldDiff2Y": {
+      "description": "Short-end yield differential vs G10 weighted average",
+      "inputs": ["US.Rates.Treasury.2Y"],
+      "formula": "US2Y - weighted_G10_2Y",
+      "fetcher": "Derived"
+    },
+
+    "US.Model.USDIndex.RiskFactor": {
+      "description": "USD as safe-haven proxy = VIX + MOVE + NFCI tightening",
+      "inputs": ["US.Sentiment.VIX", "US.Sentiment.MOVE", "US.FinCond.NFCI"],
+      "formula": "normalize(VIX) + normalize(MOVE) + normalize(NFCI)",
+      "fetcher": "Derived"
+    },
+
+    "US.Model.USDIndex.Composite": {
+      "description": "DXY Engine — 4-layer composite (policy / yield / liquidity / risk)",
+      "inputs": [
+        "US.Model.USDIndex.PolicyDiff",
+        "US.Model.USDIndex.YieldDiff2Y",
+        "US.Rates.Spread.2s10s",
+        "US.Model.FedPolicy.LiquidityImpulse",
+        "US.Model.USDIndex.RiskFactor"
+      ],
+      "formula": "0.35*PolicyDiff + 0.30*YieldDiff2Y + 0.10*YieldDiff10Y + 0.15*LiquidityImpulse + 0.10*RiskFactor",
+      "weights": { "policy": 0.35, "yield_2y": 0.30, "yield_10y": 0.10, "liquidity": 0.15, "risk": 0.10 },
+      "fetcher": "Derived"
+    },
+
+    "US.Model.YieldCurve.Inversion": {
+      "description": "Recession signal: percent of yield curve points inverted",
+      "inputs": ["US.Rates.Spread.2s10s", "US.Rates.Spread.3m10y"],
+      "formula": "count(spread<0) / total_spreads",
+      "fetcher": "Derived"
+    },
+
+    "US.Model.Fiscal.MonthlyImpulse": {
+      "description": "Monthly fiscal impulse = (Outlays - Receipts) / GDP",
+      "inputs": ["US.Fiscal.MTS.GrossOutlays", "US.Fiscal.MTS.GrossReceipts", "US.Growth.GDP.Nominal"],
+      "formula": "(MTS_Outlays - MTS_Receipts) / GDP_nominal_monthly",
+      "fetcher": "Derived"
+    },
+
+    "US.Model.Sentiment.RiskOnOff": {
+      "description": "Composite risk-on/off signal: AAII + CNN F&G + VIX inverse",
+      "inputs": ["US.Sentiment.AAII.BullBearSpread", "US.Sentiment.CNN.FearGreed", "US.Sentiment.VIX"],
+      "formula": "normalize(AAII_Spread) + normalize(CNN_FG) - normalize(VIX)",
+      "fetcher": "Derived"
+    }
+  },
+
+  "fetcher_groups": {
+    "fred_macro": {
+      "description": "All FRED-sourced series (CPI/PCE/PPI/Labor/Growth/Housing/Trade)",
+      "fetcher": "FRED",
+      "count_estimate": 150
+    },
+    "fred_rates_daily": {
+      "description": "All daily yield series + Fed rates (high update frequency)",
+      "fetcher": "FRED",
+      "freq_filter": "Daily",
+      "count_estimate": 30
+    },
+    "treasury_dts": {
+      "description": "Daily Treasury Statement — DTS",
+      "fetcher": "Treasury_FD",
+      "endpoint_root": "v1/accounting/dts/",
+      "count_estimate": 6
+    },
+    "treasury_mts": {
+      "description": "Monthly Treasury Statement — MTS",
+      "fetcher": "Treasury_FD",
+      "endpoint_root": "v1/accounting/mts/",
+      "count_estimate": 8
+    },
+    "sentiment_scrape": {
+      "description": "AAII + CNN Fear & Greed (HTTP scrape)",
+      "fetcher": "AAII|CNN",
+      "count_estimate": 13
+    },
+    "derived_models": {
+      "description": "Computed models requiring multi-series joins",
+      "fetcher": "Derived",
+      "count_estimate": 9
+    }
+  },
+
+  "summary": {
+    "total_series_in_registry": 178,
+    "total_derived_models": 9,
+    "us_series": 156,
+    "global_series": 13,
+    "by_source": {
+      "FRED":          145,
+      "Treasury_FD":    14,
+      "AAII":            4,
+      "CNN":             5,
+      "Yahoo":           4,
+      "Fed (scrape)":    2,
+      "Derived":         9
+    },
+    "by_freq": {
+      "Daily":          37,
+      "Weekly":         11,
+      "Monthly":       105,
+      "Quarterly":      11,
+      "Annual":          2,
+      "PerMeeting":      2
+    },
+    "by_theme": {
+      "Prices":         33,
+      "Labor":          26,
+      "Business":       21,
+      "Growth":         14,
+      "Consumer":        8,
+      "Housing":        14,
+      "Fiscal":         18,
+      "Fed":            18,
+      "Rates":          22,
+      "Trade":           5,
+      "FinCond":         4,
+      "Sentiment":      13,
+      "Global":         13
+    }
+  }
+}

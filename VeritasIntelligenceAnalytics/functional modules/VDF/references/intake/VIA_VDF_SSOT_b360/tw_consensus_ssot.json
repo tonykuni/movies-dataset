@@ -1,0 +1,391 @@
+{
+  "schema_version": "1.0.0",
+  "build_date": "2026-05-26",
+  "title": "TW Stock Consensus SSOT — Section E of VIA Master",
+  "section_E": {
+    "description": "台股個股 YFinance + FactSet 分析師預期共識資料 — 包含目標價、評級分布、未來 5 年 EPS 預估。每天執行一次。",
+    "fetcher": "vdf_fetchers_consensus (要新寫，移植自 VERITAS_Consensus_Database_OneShot.ps1)",
+    "coverage": "全台上市櫃股票 (~1800-2000 檔)",
+    "refresh_frequency": "Daily (post-market, after 16:00 TWT)",
+    "duckdb_table": "tw_consensus_daily",
+    "primary_key": [
+      "Date",
+      "tw_ticker"
+    ],
+    "sources_used": [
+      "YFINANCE",
+      "FactSet (via Cnyes 鉅亨網 scrape)"
+    ],
+    "universe_source": {
+      "description": "全台股清單 — 3 個本地檔案 fallback chain",
+      "candidates": [
+        "C:\\Users\\tonyk\\OneDrive\\桌面\\tw_stock\\dict\\TickerList\\StockTickerListDatabase.csv",
+        "C:\\Users\\tonyk\\OneDrive\\桌面\\tw_stock\\dict\\TickerList\\AllStockYfinanceTickerList.txt",
+        "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\VeritasDataForge\\data\\tw_stock_list.csv"
+      ],
+      "validation_regex": {
+        "tw_ticker": "^(?!202[1-9])(?!2030)[1-9]\\d{3}$",
+        "tw_yfinance_ticker": "^[1-9]\\d{3}\\.(TW|TWO)$"
+      },
+      "fields": [
+        "tw_ticker",
+        "tw_yfinance_ticker",
+        "name",
+        "display_name"
+      ]
+    },
+    "E1_yfinance_quote_api": {
+      "description": "YFinance Quote API v7 — 目標價共識 + 分析師評級 + 市值",
+      "endpoint": "https://query1.finance.yahoo.com/v7/finance/quote?symbols={ticker}",
+      "method": "GET (requests + User-Agent header)",
+      "fallback_order": [
+        "yf_ticker if exists",
+        "{tw_ticker}.TW",
+        "{tw_ticker}.TWO"
+      ],
+      "fields": {
+        "yf_market_cap": {
+          "unit": "USD/TWD",
+          "desc": "市值"
+        },
+        "yf_target_mean_price": {
+          "unit": "Price",
+          "desc": "分析師平均目標價"
+        },
+        "yf_target_high_price": {
+          "unit": "Price",
+          "desc": "分析師最高目標價"
+        },
+        "yf_target_low_price": {
+          "unit": "Price",
+          "desc": "分析師最低目標價"
+        },
+        "yf_recommendation_mean": {
+          "unit": "Score 1-5",
+          "desc": "綜合評級分數 (1=Strong Buy, 5=Sell)"
+        },
+        "yf_recommendation_key": {
+          "unit": "String",
+          "desc": "評級分類 (buy/hold/sell/etc)"
+        },
+        "yf_number_of_analyst_opinions": {
+          "unit": "Count",
+          "desc": "分析師人數"
+        },
+        "yf_currency": {
+          "unit": "ISO",
+          "desc": "報價幣別"
+        }
+      }
+    },
+    "E2_yfinance_chart_api": {
+      "description": "YFinance Chart API v8 — 最新 Adj Close + Volume",
+      "endpoint": "https://query1.finance.yahoo.com/v8/finance/chart/{ticker}?range=5d&interval=1d",
+      "method": "GET",
+      "fields": {
+        "yf_adj_close": {
+          "unit": "Price",
+          "desc": "最新除權息還原收盤價"
+        },
+        "yf_volume": {
+          "unit": "Shares",
+          "desc": "最新成交量"
+        }
+      }
+    },
+    "E3_factset_consensus_via_cnyes": {
+      "description": "FactSet 機構共識預期 — 透過鉅亨網 scrape (Playwright headless Chromium)",
+      "endpoint": "https://www.cnyes.com/twstock/{ticker}/summary/overview",
+      "method": "Playwright headless scrape",
+      "user_agent": "Chrome/124 Windows",
+      "scraping_logic": [
+        "1. goto URL, wait domcontentloaded + 3500ms",
+        "2. Click '預估' button (with 6 retries + scroll fallback)",
+        "3. JS evaluate finds smallest visible block containing required keywords",
+        "4. Regex parse 3 blocks: Target / Rating / EPS"
+      ],
+      "block_keywords": {
+        "target": [
+          "目標估值",
+          "最高估值",
+          "最低估值",
+          "中位數"
+        ],
+        "rating": [
+          "綜合評級",
+          "積極樂觀",
+          "保持中立"
+        ],
+        "eps": [
+          "預估EPS",
+          "中位數",
+          "最高價",
+          "最低價"
+        ]
+      },
+      "block_1_target_valuation": {
+        "title": "目標估值區塊",
+        "fields": {
+          "factset_updated_at": {
+            "format": "YYYY-MM-DD",
+            "regex": "(\\d{4}/\\d{2}/\\d{2})\\s*更新",
+            "desc": "FactSet 資料更新日"
+          },
+          "factset_target_analyst_count": {
+            "format": "int",
+            "regex": "目前有\\s*(\\d+)\\s*位分析師",
+            "desc": "出具目標價的分析師人數"
+          },
+          "factset_target_current_price": {
+            "format": "float",
+            "regex": "目前\\s*([0-9.]+)",
+            "desc": "目前股價"
+          },
+          "factset_target_low": {
+            "format": "float",
+            "regex": "最低估值\\s*([0-9.]+)",
+            "desc": "最低目標估值"
+          },
+          "factset_target_median": {
+            "format": "float",
+            "regex": "中位數\\s*([0-9.]+)",
+            "desc": "中位數目標估值"
+          },
+          "factset_target_high": {
+            "format": "float",
+            "regex": "最高估值\\s*([0-9.]+)",
+            "desc": "最高目標估值"
+          }
+        }
+      },
+      "block_2_rating_distribution": {
+        "title": "綜合評級區塊",
+        "fields": {
+          "factset_rating_updated_at": {
+            "format": "YYYY-MM-DD"
+          },
+          "factset_rating_analyst_count": {
+            "format": "int",
+            "regex": "有\\s*(\\d+)\\s*位分析師",
+            "desc": "提供評級的分析師人數"
+          },
+          "factset_rating_optimistic_count": {
+            "format": "int",
+            "regex": "積極樂觀\\s*(\\d+)\\s*位",
+            "desc": "積極樂觀(Buy) 人數"
+          },
+          "factset_rating_neutral_count": {
+            "format": "int",
+            "regex": "保持中立\\s*(\\d+)\\s*位",
+            "desc": "保持中立(Hold) 人數"
+          },
+          "factset_rating_pessimistic_count": {
+            "format": "int",
+            "regex": "保守悲觀\\s*(\\d+)\\s*位",
+            "desc": "保守悲觀(Sell) 人數"
+          }
+        }
+      },
+      "block_3_eps_estimates": {
+        "title": "預估 EPS 區塊 (5 年 × 3 種估值)",
+        "years_covered": [
+          2024,
+          2025,
+          2026,
+          2027,
+          2028
+        ],
+        "actuals": [
+          2024,
+          2025
+        ],
+        "estimates": [
+          2026,
+          2027,
+          2028
+        ],
+        "estimate_types": [
+          "median",
+          "high",
+          "low"
+        ],
+        "field_pattern": "factset_diluted_eps_{type}_{year}",
+        "total_fields": 16,
+        "fields": {
+          "factset_eps_updated_at": {
+            "format": "YYYY-MM-DD"
+          },
+          "factset_diluted_eps_median_2024": {
+            "format": "float",
+            "type": "actual",
+            "year": 2024
+          },
+          "factset_diluted_eps_high_2024": {
+            "format": "float",
+            "type": "actual",
+            "year": 2024
+          },
+          "factset_diluted_eps_low_2024": {
+            "format": "float",
+            "type": "actual",
+            "year": 2024
+          },
+          "factset_diluted_eps_median_2025": {
+            "format": "float",
+            "type": "actual",
+            "year": 2025
+          },
+          "factset_diluted_eps_high_2025": {
+            "format": "float",
+            "type": "actual",
+            "year": 2025
+          },
+          "factset_diluted_eps_low_2025": {
+            "format": "float",
+            "type": "actual",
+            "year": 2025
+          },
+          "factset_diluted_eps_median_2026": {
+            "format": "float",
+            "type": "estimate",
+            "year": 2026
+          },
+          "factset_diluted_eps_high_2026": {
+            "format": "float",
+            "type": "estimate",
+            "year": 2026
+          },
+          "factset_diluted_eps_low_2026": {
+            "format": "float",
+            "type": "estimate",
+            "year": 2026
+          },
+          "factset_diluted_eps_median_2027": {
+            "format": "float",
+            "type": "estimate",
+            "year": 2027
+          },
+          "factset_diluted_eps_high_2027": {
+            "format": "float",
+            "type": "estimate",
+            "year": 2027
+          },
+          "factset_diluted_eps_low_2027": {
+            "format": "float",
+            "type": "estimate",
+            "year": 2027
+          },
+          "factset_diluted_eps_median_2028": {
+            "format": "float",
+            "type": "estimate",
+            "year": 2028
+          },
+          "factset_diluted_eps_high_2028": {
+            "format": "float",
+            "type": "estimate",
+            "year": 2028
+          },
+          "factset_diluted_eps_low_2028": {
+            "format": "float",
+            "type": "estimate",
+            "year": 2028
+          }
+        }
+      }
+    },
+    "derived_signals": {
+      "description": "可從 Section E 衍生的訊號 (建議放 derived_models)",
+      "signals": [
+        {
+          "name": "target_upside_pct",
+          "formula": "(factset_target_median - factset_target_current_price) / factset_target_current_price * 100",
+          "meaning": "中位數目標價隱含漲幅 %"
+        },
+        {
+          "name": "target_dispersion",
+          "formula": "(factset_target_high - factset_target_low) / factset_target_median",
+          "meaning": "分析師分歧度 — 高=共識弱"
+        },
+        {
+          "name": "rating_bull_bear_ratio",
+          "formula": "factset_rating_optimistic_count / max(factset_rating_pessimistic_count, 1)",
+          "meaning": "Buy/Sell 比，>3 強烈看好"
+        },
+        {
+          "name": "eps_growth_2yr",
+          "formula": "(factset_diluted_eps_median_2027 - factset_diluted_eps_median_2025) / factset_diluted_eps_median_2025",
+          "meaning": "2 年期 EPS 成長預期"
+        },
+        {
+          "name": "eps_estimate_dispersion",
+          "formula": "(factset_diluted_eps_high_{year} - factset_diluted_eps_low_{year}) / factset_diluted_eps_median_{year}",
+          "meaning": "EPS 預估分歧度 — 高=高度不確定"
+        },
+        {
+          "name": "implied_forward_pe",
+          "formula": "factset_target_current_price / factset_diluted_eps_median_2026",
+          "meaning": "隱含 forward PE"
+        },
+        {
+          "name": "yf_vs_factset_target_gap",
+          "formula": "(yf_target_mean_price - factset_target_median) / factset_target_median",
+          "meaning": "外資 (YF) vs 在地 (FactSet) 共識差異"
+        }
+      ]
+    },
+    "output_formats": [
+      {
+        "format": "CSV",
+        "encoding": "utf-8-sig",
+        "filename": "Consensus.csv"
+      },
+      {
+        "format": "Parquet",
+        "engine": "pyarrow",
+        "filename": "Consensus.parquet"
+      },
+      {
+        "format": "DuckDB",
+        "table": "consensus",
+        "filename": "Consensus.duckdb"
+      },
+      {
+        "format": "Excel",
+        "engine": "openpyxl",
+        "filename": "Consensus.xlsx"
+      },
+      {
+        "format": "HTML",
+        "encoding": "utf-8-sig",
+        "filename": "Consensus_Report.html"
+      }
+    ],
+    "execution_config": {
+      "headless": true,
+      "timeout_ms": 30000,
+      "init_wait_ms": 3500,
+      "click_wait_ms": 1200,
+      "scroll_wait_ms": 1200,
+      "request_timeout_s": 20,
+      "max_tickers": "None (production) | 20 (test)",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/124"
+    },
+    "integration_notes": {
+      "supportive_modules_loaded": [
+        "VIA_SSOT_Unified.py",
+        "VeritasAegisNexus.py",
+        "VeritasCeleritas.py",
+        "VIA_EnvManager.py",
+        "VIA_Panorama_AST_RuntimeInjector.py",
+        "VIA_RegistryCore_v1.py",
+        "VIA_Runtime_Bridge_All_in_One.py"
+      ],
+      "output_root_default": "C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics\\module\\_veritas_consensus_database",
+      "python_env_default": "C:\\Users\\tonyk\\envs\\via_core_312\\Scripts\\python.exe",
+      "google_sheet_upload": {
+        "enabled_default": false,
+        "spreadsheet_name": "VERITAS Consensus Database"
+      }
+    }
+  }
+}
