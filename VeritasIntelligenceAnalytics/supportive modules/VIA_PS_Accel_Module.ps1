@@ -65,5 +65,22 @@ function Invoke-VIAParallel {
 
 function Get-VIAAccelRoster { $script:VIA_ACCEL20 }
 
+# 批366 零跳出閘(PS 側):VIA_NO_OPEN=1 時 Start-Process/Invoke-Item 之頁面目標(.html/.htm/.url/http)靜默略過;
+# 其餘目標(python 工人/exe)全參數直通=ProxyCommand 產生之代理(保留原 cmdlet 全部參數集);缺席/失敗=graceful 不裝
+function Test-VIAPageTarget { param([string]$T) if (-not $T) { return $false }; return ($T -match '^(https?:|file:)' -or $T -match '\.(html?|url|svg|pdf)$') }
+try {
+    foreach ($cmdName in @('Start-Process', 'Invoke-Item')) {
+        $orig = Get-Command -Name $cmdName -CommandType Cmdlet -ErrorAction Stop
+        $md = New-Object System.Management.Automation.CommandMetaData($orig)
+        $body = [System.Management.Automation.ProxyCommand]::Create($md)
+        $probe = if ($cmdName -eq 'Start-Process') { '$PSBoundParameters["FilePath"]' } else { '($PSBoundParameters["Path"] + $PSBoundParameters["LiteralPath"])' }
+        $guard = '$script:__viaSkip = ($env:VIA_NO_OPEN -eq "1" -and (Test-VIAPageTarget ("" + ' + $probe + '))); if ($script:__viaSkip) { Write-Host ("  [VIA_NO_OPEN] 抑制跳出 " + ' + $probe + ') -ForegroundColor DarkGray; return }'
+        $body = $body -replace 'begin\s*\{', ('begin { ' + $guard)
+        $body = $body -replace 'process\s*\{', 'process { if ($script:__viaSkip) { return }'
+        $body = $body -replace 'end\s*\{', 'end { if ($script:__viaSkip) { return }'
+        Invoke-Expression ("function global:" + $cmdName + " { " + $body + " }")
+    }
+} catch { }
+
 }
 # ===== [VIA:PS-ACCEL-MODULE:END] =====
