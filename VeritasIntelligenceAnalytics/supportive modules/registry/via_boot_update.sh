@@ -95,6 +95,8 @@ PYENV
   python3 "$(ls "$VIA/functional modules/VAP/engine"/VAP_ENG014_StdDashboardTemplate_v*.py | sort | tail -1)" run
   python3 "$(ls "$REG"/CGC_MDL113_UnifiedRegistry_v*.py | sort | tail -1)"
   python3 "$(ls "$REG"/CGC_MDL114_CommandCenterBridge_v*.py | sort | tail -1)" run
+  echo "--- ⑪ 四專案完工矩陣(批368;MDL131)"
+  VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL131_ProjectCompletion_v*.py | sort | tail -1)" build
   echo "=== 畢(誠實三態見上)==="
 } >> "$LOG" 2>&1
 exit 0
