@@ -120,3 +120,44 @@ via-envgov rename --from paddle_311 --to via_paddle_313  # 想讓尾碼對齊實
 下游同步正名:MDL050 v0109 路由出口一律 `via_` 前綴、OCR 車道 v0101 優先找 `via_paddle_*`、Provision v0102 把功能件改到 via_ 境檢查;
 `VIA_EnvManager.py` 正本零觸碰(其 purpose hints 舊鍵視為別名層)。
 
+## 九、批383:單一入口、Grok 主控台接回、VDF/VRN 實際能跑、本機三庫整併(抓過的不必再抓)
+
+操作員令:「將 river-beam-aurora-acorn 裡面的檔案接回做為整合為一入口」+「單一入口與這個(SYSTEM MANAGER MATRIX v0700)整合;vap 補充;vdf vrn 要弄到實際能跑;vdf 要將資料庫存入;之前有的資料庫能把它整理好,抓過的資料不必再抓」。
+
+### 單一入口(`via-entry`;CGC_MDL136 EntryBridge)
+
+- 母倉 `Register-VIA-Commands` 點源=唯一入口。載入即接回收容包 b383 的 `scripts/VIA-CmdMatrix.ps1`:去掉尾段自動執行(`via-enter` 進母根、`via-matrix` WPF 板,違批378 零跳出律),撞名守衛=母倉先發先得(`via-entry`/`via-env` 母倉正本;Grok 同名改 `-grok`),Grok 助手函式升 global。`$env:VIA_GROK_MATRIX="0"` 可不載。
+- `via-entry` 燈板 11 層(GitHub/Mother/Data/Env/PATH/EnvGov/VDF-DB/VAP/Matrix/Console/Grok;零網路;落 `VIA_Reports/entry/ENTRY_latest.json/.html`);`via-entry plan` 一貼即用 11 步;`via-entry roster` 短令冊;`--open` 開 `VIA_MasterControl_Matrix_v0700.html`(`via-open 矩陣`,瀏覽器道零跳出);`--console` 帶起 Grok 網頁主控台(`via-webconsole`;npm install 同意閘;8080)。
+- `via-env` = `via-envgov`(MDL135 正本);`via-grok matrix` 開 Grok WPF 右側板。
+
+### VDF/VRN 實際能跑(功能件住 via_ 境 → 啟動器指對境 python)
+
+- `Get-VIAEnvPython <family>`/`via-envpy vdf|vrn|vap|core|ocr|table`:`VIA_PY_<FAMILY>` 覆寫 > 境根(`VIA_ENV_ROOT`/`VIA_ENV_ROOTS`/`~\envs`/`C:\Users\tonyk\envs`/conda envs/`$VIA\Environments`)× Baseline 別名(`via_vdf_312`/`via_vrn_312`/`via_vap_312`/`via_paddle_311`/`via_camelot_311`…)> base 退路(誠實黃)。`via-vdfdb`/`via-vapone` 已用此律啟動。
+- base 仍缺 manifest 件(工作站實錄 duckdb/pyarrow/plotly 缺)→ `via-envgov apply --approve --only-kind REPAIR_BASE`(只跑 base 補齊段;非破壞;鏡像鏈)。功能件拉出 base 之前,先看矩陣「引擎影響」欄,以 base python 啟動之引擎須改由目標境 python(本批啟動器已備)。
+
+### VDF 資料庫存入與「抓過的不必再抓」(`via-vdfdb`;VDF_ENG079 LocalDbConsolidate)
+
+```powershell
+via-vdfdb scan                       # 唯讀:三庫盤點(parquet/csv/duckdb/sqlite)+路由計畫+anti-join 計數(不寫);缺 src 誠實 RED
+via-vdfdb run --apply                # COPY_ONLY:anti-join 只補缺鍵(ENG064 鍵 date,ticker;既有列零觸碰;冪等);檔指紋台帳 via_ingest_ledger(已入冊跳過)
+via-vdfdb ckpt                       # ENG064 --rebuild-ckpt:段內有列即 done → 歷史回補不再重抓已有年段/檔
+via-vdfdb need --start 2023-01-01    # 月粒度覆蓋缺口(只列缺的)→ NEED_latest.json;抓取只抓缺口
+via-vdfdb coverage                   # 每表 ticker×年覆蓋 → COVERAGE_latest.json
+via-vdfdb run --apply --assume-twse  # 裸碼在 tw_listings 對不到時視為 .TW(預設誠實入 local_px_daily 暫存)
+```
+
+路由律:px `date+ticker+close` → `tw_daily_prices`(裸碼經 `tw_listings` 表/`mega/tw_listings_*.csv` 對映 yahoo 風格;非台股碼 → `global_daily`);chip → `tw_chips_daily`(欄位聯集只增);rest → `tw_rest_daily`(鍵 `date,ticker,kind`;`kind` 缺以檔名補);無鍵 → `local_<part>__<stem>`(EXCEPT 集合 anti-join)。正典庫=ENG064/ENG065 同路徑 `output_hub/mega`(MDL123 接點→本機資料家)。
+
+### VAP 補充(`via-vapone`;VAP_ENG016 AutoplotOne)
+
+原件零改動直入 `functional modules/VAP/engine/`;`--selftest` 72 檢(沙盒 70/72、工作站 base 71/72;缺 plotly/duckdb/pyarrow 車道=Baseline 冊 REPAIR_BASE 補;`via-vapone` 以 `via_vap_312` 啟動=全車道)。
+
+### 一貼即用(工作站 pwsh)
+
+```powershell
+via-reload; via-entry
+via-envgov; via-envgov apply --approve --only-kind REPAIR_BASE
+via-vdfdb scan; via-vdfdb run --apply; via-vdfdb ckpt; via-vdfdb need --start 2023-01-01
+via-vapone; via-open 矩陣
+via-webconsole --install; via-webconsole --background     # 選配:Grok 網頁主控台(Node 22;觸網同意)
+```

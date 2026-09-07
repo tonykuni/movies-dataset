@@ -1,0 +1,33 @@
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import { GOV_TOOLS } from "./catalog.ts";
+import { ENV_BUILD_SLOTS, envBuildCounts, envBuildNote, envBuildQc, envSlotPinned } from "./env-build.ts";
+import { ENV_PINS, libTable, scanEnvConflicts } from "./inventory.ts";
+import { GOV_REQUIRED_LIBS } from "./gov-spec.ts";
+import { libCompleteness } from "./gov-env.ts";
+
+test("env+libs construction: 8 slots pinned, required libs, iso numpy, GOV 10", () => {
+  assert.equal(ENV_BUILD_SLOTS.length, 8);
+  assert.ok(ENV_BUILD_SLOTS.every((s) => envSlotPinned(s.id)));
+  const libs = libCompleteness(ENV_PINS);
+  assert.equal(libs.ok, true, libs.miss.join(","));
+  assert.ok(GOV_REQUIRED_LIBS.every((x) => libs.pinned.includes(x)));
+  assert.ok(libTable().some((r) => r.name === "numpy"));
+  assert.ok(libTable().some((r) => r.name === "pydantic"));
+  assert.ok(libTable().some((r) => r.name === "plotly"));
+  assert.ok(ENV_PINS.some((p) => p.env === "via_iso_numpy" && p.pkg === "numpy" && p.ver === "1.26.4"));
+  assert.ok(ENV_PINS.some((p) => p.env === "via_vdf" && p.pkg === "numpy" && p.ver === "2.1.1"));
+  const iso = scanEnvConflicts();
+  assert.ok(iso.some((c) => c.isolate === "via_iso_numpy"));
+  assert.equal(GOV_TOOLS.length, 10);
+  const qc = envBuildQc();
+  assert.equal(qc.filter((r) => r.light === "bad").length, 0);
+  assert.equal(qc.find((r) => r.id === "EB_SLOT")?.value, "8/8");
+  assert.equal(qc.find((r) => r.id === "EB_GOV")?.value, "10/10");
+  assert.equal(qc.find((r) => r.id === "EB_NLP")?.value, "8/8");
+  const c = envBuildCounts();
+  assert.equal(c.ps, 20);
+  assert.equal(c.ga, 20);
+  assert.match(envBuildNote(), /不 spawn/);
+  assert.match(envBuildNote(), /LIVE 關/);
+});

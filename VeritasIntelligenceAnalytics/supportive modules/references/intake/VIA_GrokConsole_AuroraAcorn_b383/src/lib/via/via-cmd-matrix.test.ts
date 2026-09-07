@@ -1,0 +1,51 @@
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { test } from "node:test";
+
+test("VIA-CmdMatrix.ps1 registers short cmds, right side panel, Chinese notes, COPY_ONLY", () => {
+  const t = readFileSync("scripts/VIA-CmdMatrix.ps1", "utf8");
+  assert.match(t, /function global:via-enter/);
+  assert.match(t, /function global:via-entry/);
+  assert.match(t, /function global:via-env/);
+  assert.match(t, /function global:via-path/);
+  assert.match(t, /function global:via-gh/);
+  assert.match(t, /function global:via-aea/);
+  assert.match(t, /function global:via-rev/);
+  assert.match(t, /function global:via-handle/);
+  assert.match(t, /VIA_GH_YES/);
+  assert.match(t, /VIA-ALL\.cmd/);
+  assert.match(t, /foreach \(\$p in \$add\) \{ git add -- \$p \}/);
+  assert.match(t, /禁止強制推送/);
+  assert.doesNotMatch(t, /git push --force|git push -f/);
+  assert.match(t, /function global:via-ingest/);
+  assert.match(t, /function global:via-matrix/);
+  assert.match(t, /function global:via-probe/);
+  assert.match(t, /Width="448"/);
+  assert.match(t, /Topmost="True"/);
+  assert.match(t, /右側板/);
+  assert.match(t, /DockPanel.Dock="Top"/);
+  assert.match(t, /BeginInvoke/);
+  assert.match(t, /進入母目錄並釘 via_vdf/);
+  assert.match(t, /系統狀態盤點/);
+  assert.match(t, /COPY_ONLY/);
+  assert.match(t, /VIA_db_part1_prices/);
+  assert.match(t, /akshare_call SKIP/);
+  assert.match(t, /via_vdf/);
+  assert.match(t, /year=_raw/);
+  assert.match(t, /DESCRIBE SELECT/);
+  assert.match(t, /YEAR\(TRY_CAST\(/);
+  assert.doesNotMatch(t, /TRY_CAST\(year AS INTEGER\)/);
+  assert.doesNotMatch(t, /SizeToContent="WidthAndHeight"/);
+  assert.doesNotMatch(t, /conda remove|pip uninstall|Stop-Process|Remove-Item/i);
+  assert.doesNotMatch(t, /union_by_name=true/);
+});
+
+test("Handle-All is paste-safe: scriptblock, no markdown fence, foreach add", () => {
+  const t = readFileSync("public/via/VIA-Handle-All.ps1", "utf8");
+  assert.match(t, /^& \{/m);
+  assert.doesNotMatch(t, /```/);
+  assert.doesNotMatch(t, /^#requires/m);
+  assert.match(t, /foreach \(\$p in \$add\) \{ git add -- \$p \}/);
+  assert.match(t, /via_handover\.md/);
+  assert.match(t, /ENG075/);
+});

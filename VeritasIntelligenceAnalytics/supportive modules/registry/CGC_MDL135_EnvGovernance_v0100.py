@@ -37,7 +37,7 @@ installed.」→ 既有工具(EnvFix/InstallGate doctor)未閉環;根因=OCR 家
 用法:via-envgov [run] [--offline] [--roots P1;P2] [--env-root P] [--base-python EXE]
                  [--workers 20] [--task-timeout 120] [--rounds N] [--approve]
                  [--approve-remove] [--open] [--install-plan F]
-     via-envgov panorama | plan | apply --approve [--approve-remove] [--only S02,S03]
+     via-envgov panorama | plan | apply --approve [--approve-remove] [--only S02,S03] [--only-kind REPAIR_BASE,INSTALL]   (批383:段類過濾;REPAIR_BASE=只補 base manifest 缺件)
      via-envgov lkgc [snapshot|promote|status]
      via-envgov rollback [--to LKGC_xxx.json | --baseline] [--execute --approve [--approve-remove]]
      via-envgov rename [--from 舊境 [--to 新境]] [--execute --approve [--approve-remove]]   (批382 命名律:非 via_ 境換名重建)
@@ -1306,7 +1306,7 @@ def verify_env(name: str, py: str, baseline: dict, skips: dict, timeout: int = 1
 
 
 def apply_plan(plan: dict, scans: list[dict], approve: bool, approve_remove: bool, baseline: dict | None = None, skips: dict | None = None,
-               only: set | None = None) -> dict:
+               only: set | None = None, only_kinds: set | None = None) -> dict:
     baseline = baseline or load_baseline()
     skips = skips if skips is not None else lessons_skip()
     base = next((s for s in scans if s["env"]["name"] == "BASE"), {})
@@ -1328,6 +1328,10 @@ def apply_plan(plan: dict, scans: list[dict], approve: bool, approve_remove: boo
             continue
         if only and st["id"] not in only:
             st["result"] = {"state": "SKIP", "note": "--only 未選"}
+            summary["skipped"] += 1
+            continue
+        if only_kinds and k not in only_kinds:   # 批383:--only-kind REPAIR_BASE(base 補 manifest 缺件;VERIFY 段同列才驗)
+            st["result"] = {"state": "SKIP", "note": "--only-kind 未選"}
             summary["skipped"] += 1
             continue
         if not deps_ok:
@@ -1990,7 +1994,10 @@ def do_run(args: list[str], mode: str = "run") -> int:
     if mode in ("run", "apply") and approve:
         print("--- apply(授權閉環:GREEN 非破壞段;移除須 --approve-remove)---")
         only_stages = {x.strip().upper() for x in (_arg_after(args, "--only") or "").split(",") if x.strip()} or None
-        apply_summary = apply_plan(plan, scans, approve, approve_remove, baseline, skips, only_stages)
+        only_kinds = {x.strip().upper() for x in (_arg_after(args, "--only-kind") or "").split(",") if x.strip()} or None
+        if only_kinds:
+            print(f"  [apply] --only-kind {','.join(sorted(only_kinds))}(段類過濾;其餘段 SKIP)")
+        apply_summary = apply_plan(plan, scans, approve, approve_remove, baseline, skips, only_stages, only_kinds)
         if apply_summary.get("ran"):
             print("  [再掃] 執行後全景複驗")
             envs2 = discover_envs(baseline, roots, env_root, base_python, only)
@@ -2250,6 +2257,11 @@ def selftest() -> int:
                 any(st["kind"] == "RENAME_ENV" and st["env"] == "paddle_311" and st["cls"] == "SEQUENTIAL" for st in plan2["stages"])
                 and any(st["kind"] == "REMOVE_BASE" and st.get("family") == "(共用支援件)" and st["pins"] == ["shared-util"] for st in plan2["stages"])
                 and engine_impact(["pymupdf"], {"VRN_ENG001_X": {"fitz", "json"}, "VDF_ENG002_Y": {"pandas"}})["names"] == ["VRN_ENG001_X"])
+            ap3 = apply_plan(plan2, [base_scan], approve=True, approve_remove=False, only_kinds={"NO_SUCH_KIND"})
+            chk("㉚ 批383 --only-kind 段類過濾:授權但段類皆未選=全段 SKIP 零執行(REPAIR_BASE 單跑之閘同律)",
+                ap3["ran"] == 0 and ap3["ok"] == 0 and ap3["fail"] == 0
+                and all(st["result"]["state"] == "SKIP" for st in plan2["stages"])
+                and any(st["result"]["note"] == "--only-kind 未選" for st in plan2["stages"]))
         except Exception as exc:
             checks.append(("例外", False))
             print("  [FAIL] 例外:", type(exc).__name__, exc)

@@ -104,6 +104,10 @@ PYENV
   VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL133_ProductGate_v*.py | sort | tail -1)" build
   echo "--- ⑬ 環境治理全景(批381;MDL135;唯讀 run --offline;LKGC 快照;log logs/env_governance.log)"
   VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL135_EnvGovernance_v*.py | sort | tail -1)" run --offline --quiet
+  echo "--- ⑭ 單一入口燈板(批383;MDL136;零網路;VIA_Reports/entry)"
+  VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL136_EntryBridge_v*.py | sort | tail -1)" status --quiet
+  echo "--- ⑮ 本機三庫整併盤點(批383;ENG079;scan 唯讀;雲端無本機三庫=誠實 RED 不寫)"
+  VIA_NO_OPEN=1 python3 "$(ls "$ENG"/VDF_ENG079_LocalDbConsolidate_v*.py | sort | tail -1)" scan || true
   echo "=== 畢(誠實三態見上)==="
 } >> "$LOG" 2>&1
 exit 0
