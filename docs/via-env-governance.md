@@ -263,3 +263,22 @@ via-reload; via-famui vdf,vrn --open      # 再生 VDF/VRN 頁 + 開索引
 via-open VDF; via-open VRN; via-open 四點  # 直開單頁
 via                                        # 樞紐 8765 帶起後再 via-famui 即 LIVE
 ```
+
+## 十五、批389:工作站實錄——ENG065 協定檔回歸正典表、資料家接點、VRN plotly
+
+操作員貼回 `via-famui` 產出的 VDF 資料架構頁與 VRN 控制塔頁。三件實錄:
+
+- **part3_rest 的 ENG065 協定檔落錯表**:`tw__tw_listings`、`gl__us_macro`、`tw__tw_monthly_revenue`、`gl__sentiment_daily`、`gl__cross_macro`、`tw__tw_rates_cbc`、`tw__etf_book`、`tw__tw_daytrade_market`、`gl__factset_earnings`、`tw__tw_listings_industry` 被 ENG079 路由到 `local_rest__<stem>`(無 date+ticker 鍵的保底道)。批389 起 ENG079 認 ENG065 檔名協定:`tw__<table>` → `vdf_tw_market` 同名正典表、`gl__<table>` → `vdf_global_market` 同名正典表(跨庫經臨時 parquet 搬運,零 pyarrow 依賴);零改名零轉型(同 ENG065 律)、共同欄交集不 ALTER 正典表;`date`+`ticker` 皆在=鍵 anti-join(ENG064 律),否則 EXCEPT 集合 anti-join。台帳鍵改為「指紋|單元|目標表」:同檔改路由自動重做,不需 `--force`;舊的 `local_rest__*` 表只增不減留存(可自行 DROP,引擎不動)。
+- **資料家接點 UNLINKED**:b381 worktree 的 `functional modules/VDF/output_hub` 是真目錄,正典庫困在 worktree 內,與 `C:\Users\tonyk\Github\movies-dataset\data` 資料家各一份。ENG079 加接點燈(MDL123 正本判定):正典庫在倉內 output_hub 且接點非 LINKED → YELLOW 並指路 `via-datahome link`(倉內庫併入家後接點;MDL123 合併律只增)→ 重跑 `via-vdfdb run --apply`(冪等只補缺鍵)。`via-entry` Data 燈同律,`via-entry plan` +`via-datahome link` 步(14 步)。
+- **VRN 控制塔「誠實降級:plotly 未安裝」**:`via_vrn_312` 無 plotly。RunGate vrn 必要庫 +plotly、Baseline `family_env_core.via_vrn_312` +plotly;`via-rungate --family vrn --approve-install` 以 uv 補進家族境(不動 base)。
+
+```powershell
+via-reload                                   # 拉齊本分支 + 重載短令冊
+via-datahome status; via-datahome link       # 接點:倉內 output_hub → 資料家 junction(庫併入家)
+via-vdfdb run --apply; via-vdfdb ckpt        # tw__/gl__ 協定檔自動回歸正典表(冪等);checkpoint 重建
+via-rungate --family vrn --approve-install   # via_vrn_312 補 plotly
+via-famui vdf,vrn --open                     # 再生兩族頁面:資料架構頁應見 tw_listings/us_macro 等正典表;控制塔不再降級
+```
+
+自測:ENG079 十三檢 13/13(協定回歸/跨庫/鍵律/台帳鍵/接點燈)、MDL137 十檢、MDL136 八檢、MDL135 31 檢;SelftestGrid v0232 第 189 站改十三檢(193 站不變)。
+

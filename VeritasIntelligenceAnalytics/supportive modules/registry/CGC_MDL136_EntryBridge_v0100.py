@@ -271,20 +271,29 @@ def _port_open(port: int, host: str = "127.0.0.1") -> bool:
         return False
 
 
-def _data_home() -> tuple[str, str]:
+def _data_home() -> tuple[str, str, str]:
+    """資料家(MDL123 正本 resolve_home/_is_link):回 (家, 來源, VDF output_hub 接點態 LINKED/LINKED_ELSEWHERE/REAL_DIR/REAL_EMPTY/MISSING)(批389 工作站實錄:worktree 接點 UNLINKED=正典庫困在倉內)"""
     try:
         import importlib.util
         p = newest(HERE, "CGC_MDL123_DataHome_v0*.py")
         if not p:
-            return "", "MDL123 缺"
+            return "", "MDL123 缺", "?"
         spec = importlib.util.spec_from_file_location("datahome_e136", p)
         m = importlib.util.module_from_spec(spec)
         sys.modules["datahome_e136"] = m
         spec.loader.exec_module(m)
         home, src = m.resolve_home(VIA)
-        return str(home), src
+        rel = "functional modules/VDF/output_hub"
+        rp, tgt = VIA / rel, Path(home) / VIA.name / rel
+        if m._is_link(rp):
+            link = "LINKED" if tgt.exists() else "LINKED_ELSEWHERE"
+        elif rp.is_dir():
+            link = "REAL_DIR" if any(x.is_file() for x in rp.rglob("*")) else "REAL_EMPTY"
+        else:
+            link = "MISSING"
+        return str(home), src, link
     except Exception as exc:
-        return "", f"解析失敗 {str(exc)[:60]}"
+        return "", f"解析失敗 {str(exc)[:60]}", "?"
 
 
 def status(do_print: bool = True, quiet: bool = False, environ: dict | None = None) -> dict:
@@ -307,11 +316,13 @@ def status(do_print: bool = True, quiet: bool = False, environ: dict | None = No
     miss = [k for k in keys if not (VIA / k).exists()]
     add("GREEN" if not miss and reg else "RED", "Mother", f"{VIA}  Register={reg.name if reg else '缺'}" + (f"  缺 {miss}" if miss else ""))
     # Data
-    home, src = _data_home()
+    home, src, link = _data_home()
     dbs = [(p.name, p.exists(), (p.stat().st_size // 1_048_576) if p.exists() else 0) for p in DBS]
     have = [f"{n} {mb}MB" for n, ok, mb in dbs if ok]
-    add("GREEN" if have else "YELLOW", "Data", f"資料家={home or '未解析'}({src}) · mega 庫 {'、'.join(have) if have else '缺(via-vdfdb run --apply 建;ENG065 三包匯入)'}",
-        home=home, dbs=dbs)
+    add("GREEN" if have and link == "LINKED" else "YELLOW", "Data",
+        f"資料家={home or '未解析'}({src}) · 接點 {link}{'' if link == 'LINKED' else '(正典庫困在倉內/worktree → via-datahome link 後 via-vdfdb run --apply 冪等重跑)'}"
+        f" · mega 庫 {'、'.join(have) if have else '缺(via-vdfdb run --apply 建;ENG065 三包匯入)'}",
+        home=home, dbs=dbs, link=link)
     # Env(家族境 python)
     fams = ["vdf", "vrn", "vap", "core", "ocr", "table"]
     res = {f: resolve_env_python(f, environ=environ) for f in fams}
@@ -440,7 +451,8 @@ def plan(do_print: bool = True, quiet: bool = False) -> list:
         ("via-envgov apply --approve --only-kind REPAIR_BASE", "base 補 manifest 缺件(duckdb/pyarrow/plotly…;非破壞;鏡像鏈 Tsinghua→Aliyun→PyPI)", "READY" if mm else "SKIP(manifest 齊)"),
         ("via-rungate", "能跑閘(批384):家族境 python(via_vdf_312/via_vrn_312/via_vap_312)逐庫 import + 真跑引擎自測;RED=有引擎跑不起來;YELLOW=base 退路", "READY" if "RunGate" not in L or L["RunGate"]["lamp"] == "GREY" else "DONE"),
         ("via-famui vdf,vrn --open", "家族 U/I 再生閘(批388):家族境 python 真跑 VDF/VRN 頁面產生器→頁新鮮/零 CDN→索引一鍵開(via-open VDF/VRN/四點/家族)", "READY"),
-        ("via-vdfdb scan", "本機三庫(prices/chips/rest)盤點+路由計畫(唯讀;檔冊 sha 已入冊=跳過)", "READY"),
+        ("via-datahome link", "資料家接點(批340/389):倉內 output_hub → 本機資料家 junction;非 LINKED=正典庫困在 worktree;link 後 via-vdfdb run --apply 冪等重跑(ENG065 協定檔自動回歸正典表)", "DONE" if (L.get("Data") or {}).get("link") == "LINKED" else "READY"),
+        ("via-vdfdb scan", "本機三庫(prices/chips/rest)盤點+路由計畫(唯讀;檔冊 sha 已入冊=跳過;tw__/gl__ 協定檔→同名正典表)", "READY"),
         ("via-vdfdb run --apply", "COPY_ONLY anti-join 入正典 DuckDB(只補缺鍵;原件不刪不搬)", "PENDING(先 scan)"),
         ("via-vdfdb ckpt", "ENG064 checkpoint 自庫重建=已有年段/檔永不重抓", "PENDING(先 run --apply)"),
         ("via-vdfdb need --start 2023-01-01", "覆蓋缺口清單(只列缺的;抓取引擎只抓缺口)", "PENDING"),
@@ -509,8 +521,8 @@ def selftest() -> int:
     chk("⑥ 短指令冊(母倉∪Grok;名稱唯一;撞名列 -grok)", len(rows) >= 60 and len(names) == len(set(names))
         and any(r["state"].startswith("撞名改名") for r in rows if r["owner"] == "GROK"), f"({len(rows)} 令)")
     pl = plan(do_print=False)
-    chk("⑦ 一貼即用次序(≥13 步;含 envgov/REPAIR_BASE/rungate/famui/vdfdb/ckpt/vapone/矩陣/webconsole)",
-        len(pl) >= 13 and all(any(k in r["cmd"] for r in pl) for k in ("via-envgov", "REPAIR_BASE", "via-rungate", "via-famui", "via-vdfdb", "ckpt", "via-vapone", "矩陣", "via-webconsole")))
+    chk("⑦ 一貼即用次序(≥14 步;含 envgov/REPAIR_BASE/rungate/famui/datahome/vdfdb/ckpt/vapone/矩陣/webconsole)",
+        len(pl) >= 14 and all(any(k in r["cmd"] for r in pl) for k in ("via-envgov", "REPAIR_BASE", "via-rungate", "via-famui", "via-datahome", "via-vdfdb", "ckpt", "via-vapone", "矩陣", "via-webconsole")))
     src = Path(__file__).read_text(encoding="utf-8")
     chk("⑧ 紀律宣告(只增不減/原件零觸碰/誠實三態/零 CDN/尾版律/ACCEL-BRIDGE)",
         all(k in src for k in ("只增不減", "原件零觸碰", "誠實三態", "零 CDN", "尾版律", "ACCEL-BRIDGE")))

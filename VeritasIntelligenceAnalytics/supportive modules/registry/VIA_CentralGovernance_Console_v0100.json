@@ -208,7 +208,7 @@
      "verb": "via-vdfdb",
      "engine_glob": "functional modules/VDF/engine/VDF_ENG079_LocalDbConsolidate_v*.py",
      "data": "functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb(接點→本機資料家)· via_ingest_ledger · VIA_Reports/vdf/local_db/RUN_latest.json · COVERAGE_latest.json · NEED_latest.json · logs/vdf_local_db.log",
-     "note": "批383:C:\\新增資料夾\\新增資料夾\\VIA_db_part1_prices/part2_chips/part3_rest → scan 唯讀盤點(parquet/csv/duckdb/sqlite;欄位別名偵測;路由 px→tw_daily_prices(ENG064 鍵 date,ticker;裸碼經 tw_listings 對映 yahoo;對不到→local_px_daily)/chip→tw_chips_daily/rest→tw_rest_daily)→ run --apply COPY_ONLY anti-join 只補缺鍵(既有零觸碰;冪等)+檔指紋台帳(已入冊跳過)→ ckpt=ENG064 --rebuild-ckpt(段內有列即 done)→ need 月粒度缺口只列缺的"
+     "note": "批383:C:\\新增資料夾\\新增資料夾\\VIA_db_part1_prices/part2_chips/part3_rest → scan 唯讀盤點(parquet/csv/duckdb/sqlite;欄位別名偵測;路由 px→tw_daily_prices(ENG064 鍵 date,ticker;裸碼經 tw_listings 對映 yahoo;對不到→local_px_daily)/chip→tw_chips_daily/rest→tw_rest_daily)→ run --apply COPY_ONLY anti-join 只補缺鍵(既有零觸碰;冪等)+檔指紋台帳(已入冊跳過)→ ckpt=ENG064 --rebuild-ckpt(段內有列即 done)→ need 月粒度缺口只列缺的;批389 工作站實錄:part3_rest 的 ENG065 協定檔(tw__tw_listings/gl__us_macro/tw__tw_monthly_revenue…)曾落 local_rest__<stem> → 協定路由回歸同名正典表(tw__→vdf_tw_market/gl__→vdf_global_market;零改名零轉型;date+ticker 鍵 anti-join 否則 EXCEPT;台帳鍵含目標表=重跑自動回歸不需 --force;舊 local_rest__* 只增不減留存)+資料家接點燈(接點非 LINKED=YELLOW → via-datahome link 後冪等重跑);十三檢"
     },
     {
      "id": "GOV-19",

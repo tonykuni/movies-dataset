@@ -8,7 +8,7 @@ claude/via-system-followup-tz7k9t @ c14d428 = main = 本分支基底;0 未併)�
 「能跑」的誠實定義=以家族境 python 真跑引擎自測(不是 base 有沒有裝):
   ① python_for(family):MDL136 EntryBridge resolve_env_python(VIA_PY_<FAMILY> 覆寫 > 境根×Baseline
      別名 via_vdf_312/via_vrn_312/via_vap_312 > base 退路=誠實 BASE_FALLBACK)
-  ② probe:家族境 python 逐庫 import(vdf:duckdb/pandas/numpy/pyarrow 必要;vrn:fitz/duckdb 必要;
+  ② probe:家族境 python 逐庫 import(vdf:duckdb/pandas/numpy/pyarrow 必要;vrn:fitz/duckdb/plotly 必要(批389 +plotly);
      vap:pandas/matplotlib/duckdb/plotly 必要;其餘選配)→ 缺件=誠實列 + 修法(REPAIR_BASE/ENSURE_ENV)
   ③ run:SelftestGrid 尾版 battery 中家族站(functional modules/VDF|VRN|VAP 且 --selftest)改以家族境
      python 執行(--fast 每族 3 站;預設 8 站;--all 全站)→ OK/FAIL/TIMEOUT + 尾行存證
@@ -59,7 +59,7 @@ LOG = VIA / "logs" / "rungate.log"
 FAMILY_DIRS = {"vdf": "functional modules/VDF", "vrn": "functional modules/VRN", "vap": "functional modules/VAP"}
 FAMILY_LIBS = {
     "vdf": {"required": ["duckdb", "pandas", "numpy", "pyarrow"], "optional": ["polars", "plotly", "yfinance", "openpyxl"]},
-    "vrn": {"required": ["fitz", "duckdb"], "optional": ["docx", "pdfplumber", "markitdown", "pandas", "openpyxl", "bs4", "lxml"]},
+    "vrn": {"required": ["fitz", "duckdb", "plotly"], "optional": ["docx", "pdfplumber", "markitdown", "pandas", "openpyxl", "bs4", "lxml"]},   # 批389:plotly 入必要(VRN 控制塔互動圖;工作站實錄「誠實降級:plotly 未安裝」)
     "vap": {"required": ["pandas", "matplotlib", "duckdb", "plotly"], "optional": ["seaborn", "numpy", "talib", "pyarrow"]},
 }
 FAST_N, DEFAULT_N = 3, 8

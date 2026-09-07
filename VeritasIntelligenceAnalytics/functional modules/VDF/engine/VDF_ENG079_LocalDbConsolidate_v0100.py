@@ -19,6 +19,12 @@ VIA_db_part3_rest(其餘;鍵 kind,ticker,obs_date)。
            chip date+ticker → tw_chips_daily(鍵 date,ticker[,kind];欄位聯集只增)
            rest date+ticker → tw_rest_daily(鍵 date,ticker,kind;kind 缺=以檔名 stem 補)
            其餘無鍵 → local_<part>__<stem>(EXCEPT 集合 anti-join;ENG065 律)
+           ENG065 檔名協定(批389 工作站實錄:part3_rest 的 tw__tw_listings/gl__us_macro 等曾落 local_rest__<stem>):
+                stem tw__<table> → vdf_tw_market 同名正典表;gl__<table> → vdf_global_market 同名正典表(跨庫經臨時 parquet 搬運);
+                零改名零轉型(同 ENG065 律)· 共同欄交集 · 表缺=依來源建 · date+ticker 皆在=鍵 anti-join(ENG064 律)否則 EXCEPT;
+                台帳鍵=指紋|單元|目標表 → 改路由後同檔自動重做(舊 local_rest__* 表只增不減留存;不需 --force)
+  ⑦ 資料家接點燈(批389;MDL123 正本):正典庫在倉內 output_hub 且接點非 LINKED → YELLOW「庫困在 worktree」
+           → via-datahome link 後重跑 run --apply(冪等只補缺鍵);--db 自訂路徑=不適用
   ④ ckpt   ENG064 --rebuild-ckpt(段內有列即 done)=整併後歷史回補引擎不再重抓已有年段/檔
   ⑤ need   覆蓋缺口(月粒度:(ticker,月) 有列=已抓;缺=待抓;只列缺的)→ NEED_latest.json;抓取只抓缺口
   ⑥ coverage 每表 ticker×年覆蓋摘要 → COVERAGE_latest.json
@@ -65,6 +71,8 @@ SRC_DEFAULT = r"C:\新增資料夾\新增資料夾"
 PARTS = (("px", "VIA_db_part1_prices"), ("chip", "VIA_db_part2_chips"), ("rest", "VIA_db_part3_rest"))
 LEDGER = "via_ingest_ledger"
 TARGETS = {"px": "tw_daily_prices", "chip": "tw_chips_daily", "rest": "tw_rest_daily", "px_unmapped": "local_px_daily", "gl": "global_daily"}
+PROTOCOL_RX = re.compile(r"^(tw|gl)__(.+)$")   # ENG065 檔名協定(批389):tw__<table>/gl__<table>
+OUTPUT_HUB = VIA / "functional modules" / "VDF" / "output_hub"
 PRICE_COLS = ["date", "ticker", "open", "high", "low", "close", "adj_close", "volume"]
 
 # 欄位別名表(小寫比對;零發明:ENG064 鍵 date/ticker;Grok 湖鍵 obs_date;台股常見中文欄)
@@ -246,8 +254,9 @@ def _ledger_ensure(con) -> None:
 
 
 def _ledger_done(con) -> set:
+    """已入冊鍵=指紋|單元|目標表(批389:改路由後同檔自動重做;舊路由入冊不擋新目標表)"""
     try:
-        return {r[0] for r in con.execute(f"SELECT DISTINCT fingerprint || '|' || unit FROM {LEDGER} WHERE rows_new IS NOT NULL").fetchall()}
+        return {r[0] for r in con.execute(f"SELECT DISTINCT fingerprint || '|' || unit || '|' || COALESCE(target_table, '') FROM {LEDGER} WHERE rows_new IS NOT NULL").fetchall()}
     except Exception:
         return set()
 
@@ -291,8 +300,12 @@ def target_style(con, table: str) -> str:
 
 
 # ---------------------------------------------------------------- 路由/正規化視圖
-def _norm_view(con, u: dict, det: dict, types: dict, lst: dict, assume_twse: bool, style: str) -> tuple[str, list]:
-    """建臨時正規化視圖 _src_norm(date 'YYYY-MM-DD' VARCHAR;ticker 正規;其餘欄小寫);回 (視圖名, 欄清單)"""
+def _norm_view(con, u: dict, det: dict, types: dict, lst: dict, assume_twse: bool, style: str, proto: bool = False) -> tuple[str, list]:
+    """建臨時正規化視圖 _src_norm(date 'YYYY-MM-DD' VARCHAR;ticker 正規;其餘欄小寫);回 (視圖名, 欄清單)
+    proto=True(ENG065 協定檔):零改名零轉型原樣物化(同 ENG065 律;欄名/欄型與正典表一致)"""
+    if proto:
+        con.execute(f"CREATE OR REPLACE TEMP TABLE _src_norm AS SELECT * FROM {u['src']}")
+        return "_src_norm", [r[0] for r in con.execute("DESCRIBE _src_norm").fetchall()]
     sel = []
     used = set()
     if det.get("date"):
@@ -337,8 +350,71 @@ def _norm_view(con, u: dict, det: dict, types: dict, lst: dict, assume_twse: boo
     return "_src_norm", cols
 
 
+def protocol_target(u: dict) -> tuple[str, str] | None:
+    """ENG065 檔名協定(批389):檔 stem tw__<table>/gl__<table> → (庫, 表);庫內表單元/不合協定=None"""
+    if "::" in u.get("unit", ""):
+        return None
+    m = PROTOCOL_RX.match(Path(u["unit"]).stem)
+    if not m or not m.group(2).strip():
+        return None
+    return m.group(1), m.group(2).strip()
+
+
+def protocol_keys(cols: list) -> list:
+    """協定表鍵律:date+ticker 皆在=鍵 anti-join(ENG064 律;kind 在則併入);否則 []=EXCEPT 集合 anti-join(ENG065 律)"""
+    if "date" in cols and "ticker" in cols:
+        return ["date", "ticker"] + (["kind"] if "kind" in cols else [])
+    return []
+
+
+def _xfer(con_src, con_dst, select_sql: str, name: str = "_src_norm") -> int:
+    """跨庫搬運(DuckDB 臨時表不可跨連線):來源庫 COPY → 臨時 parquet → 目標庫臨時表(任意欄型;零 pyarrow 依賴;用畢即刪)"""
+    import tempfile
+    fd, tmp = tempfile.mkstemp(prefix="via_eng079_xfer_", suffix=".parquet")
+    os.close(fd)
+    try:
+        os.unlink(tmp)
+        con_src.execute(f"COPY ({select_sql}) TO {_q(_u(tmp))} (FORMAT PARQUET)")
+        con_dst.execute(f"CREATE OR REPLACE TEMP TABLE {name} AS SELECT * FROM read_parquet({_q(_u(tmp))})")
+        return con_dst.execute(f"SELECT count(*) FROM {name}").fetchone()[0]
+    finally:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+
+
+def datahome_note(db_tw: Path) -> dict | None:
+    """資料家接點燈(批389;MDL123 正本 resolve_home/_is_link):正典庫在倉內 output_hub 且接點非 LINKED=YELLOW(庫困在 worktree);
+    LINKED=GREEN;--db 自訂路徑或 MDL123 缺=None(不適用)"""
+    try:
+        if not os.path.normcase(str(db_tw)).startswith(os.path.normcase(str(OUTPUT_HUB))):
+            return None
+        hits = sorted((VIA / "supportive modules" / "registry").glob("CGC_MDL123_DataHome_v0*.py"))
+        if not hits:
+            return None
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("datahome_e079", hits[-1])
+        m = importlib.util.module_from_spec(spec)
+        sys.modules["datahome_e079"] = m
+        spec.loader.exec_module(m)
+        home, src = m.resolve_home(VIA)
+        rel = "functional modules/VDF/output_hub"
+        rp, tgt = VIA / rel, Path(home) / VIA.name / rel
+        if m._is_link(rp):
+            state = "LINKED" if tgt.exists() else "LINKED_ELSEWHERE"
+        else:
+            state = "REAL_DIR" if rp.is_dir() else "MISSING"
+        if state == "LINKED":
+            return {"lamp": "GREEN", "part": "home", "state": state, "home": str(home), "note": f"資料家接點 LINKED → 正典庫寫入本機資料家 {home}({src})"}
+        return {"lamp": "YELLOW", "part": "home", "state": state, "home": str(home),
+                "note": f"資料家接點 {state}:正典庫落在倉內 output_hub(非資料家 {home};各 worktree 各一份)→ via-datahome status → via-datahome link(倉內庫併入家後接點)→ 重跑 via-vdfdb run --apply(冪等只補缺鍵)"}
+    except Exception:
+        return None
+
+
 def route(u: dict, det: dict) -> tuple[str, list]:
-    """(目標表, 鍵)"""
+    """(目標表, 鍵);ENG065 協定檔另走 protocol_target(批389)"""
     has_dt = bool(det.get("date") and det.get("ticker"))
     if u["part"] == "px" and has_dt and det.get("close"):
         return TARGETS["px"], ["date", "ticker"]
@@ -350,8 +426,8 @@ def route(u: dict, det: dict) -> tuple[str, list]:
     return f"local_{u['part']}__{stem}", []
 
 
-def _ensure_table(con, table: str, cols: list, keys: list, src: str = "_src_norm") -> list:
-    """表缺=依正規化視圖建(價表用 ENG064 八欄);表在=欄位聯集只增(ALTER ADD COLUMN);回可寫欄"""
+def _ensure_table(con, table: str, cols: list, keys: list, src: str = "_src_norm", union_cols: bool = True) -> list:
+    """表缺=依正規化視圖建(價表用 ENG064 八欄);表在=欄位聯集只增(ALTER ADD COLUMN;union_cols=False=只取交集,ENG065 協定律);回可寫欄"""
     have = {r[0] for r in con.execute("SHOW TABLES").fetchall()}
     if table not in have:
         if table in (TARGETS["px"], TARGETS["gl"], TARGETS["px_unmapped"]):
@@ -361,7 +437,7 @@ def _ensure_table(con, table: str, cols: list, keys: list, src: str = "_src_norm
             if "ticker_raw" in cols:
                 con.execute(f"ALTER TABLE {_qi(table)} DROP COLUMN ticker_raw")
     tcols = {r[0]: r[1] for r in con.execute(f"DESCRIBE {_qi(table)}").fetchall()}
-    if table not in (TARGETS["px"], TARGETS["gl"], TARGETS["px_unmapped"]):
+    if union_cols and table not in (TARGETS["px"], TARGETS["gl"], TARGETS["px_unmapped"]):
         for c, ty in [(r[0], r[1]) for r in con.execute(f"DESCRIBE {src}").fetchall()]:
             if c not in tcols and c != "ticker_raw":
                 con.execute(f"ALTER TABLE {_qi(table)} ADD COLUMN {_qi(c)} {ty}")
@@ -433,6 +509,10 @@ def consolidate(src_root: Path, db_tw: Path, db_gl: Path | None = None, apply: b
     rep["summary"]["files"] = len(units)
     for n in notes:
         say(f"{n['lamp']:<7} {n['part']:<5} {n['note']}")
+    dh = datahome_note(db_tw)
+    if dh:
+        rep["notes"].append(dh)
+        say(f"{dh['lamp']:<7} HOME  {dh['note']}")
     say(f"--- [{mode}] COPY_ONLY(原件不刪不搬)· anti-join 只補缺鍵 · 正典 {db_tw.name} ---")
     con = _connect(db_tw, read_only=False)
     con_gl = None
@@ -455,21 +535,38 @@ def consolidate(src_root: Path, db_tw: Path, db_gl: Path | None = None, apply: b
             try:
                 fp = fingerprint(Path(u["path"]))
                 row["fingerprint"] = fp
-                if f"{fp}|{u['unit']}" in done:
+                types = {r[0]: r[1] for r in con.execute(f"DESCRIBE SELECT * FROM {u['src']}").fetchall()}
+                det = detect(list(types))
+                proto = protocol_target(u)
+                if proto:
+                    table, keys = proto[1], []   # ENG065 協定:同名正典表;鍵於交集後定(protocol_keys)
+                    row["protocol"] = f"{proto[0]}__{proto[1]}"
+                else:
+                    table, keys = route(u, det)
+                row["target"], row["keys"], row["detect"] = table, keys, {k: v for k, v in det.items() if v}
+                if f"{fp}|{u['unit']}|{table}" in done:
                     row["state"] = "SKIP_LEDGER"
                     row["note"] = "檔指紋已入冊(整併過=不再做;--force 重做)"
                     rep["summary"]["skipped_ledger"] += 1
                     say(f"GREY    {u['part']:<5} {u['unit']}:已入冊跳過")
                     continue
-                types = {r[0]: r[1] for r in con.execute(f"DESCRIBE SELECT * FROM {u['src']}").fetchall()}
-                det = detect(list(types))
-                table, keys = route(u, det)
-                row["target"], row["keys"], row["detect"] = table, keys, {k: v for k, v in det.items() if v}
-                _norm_view(con, u, det, types, lst, assume_twse, style)
+                _norm_view(con, u, det, types, lst, assume_twse, style, proto=bool(proto))
                 cols = [r[0] for r in con.execute("DESCRIBE _src_norm").fetchall()]
                 row["n_rows"] = con.execute("SELECT count(*) FROM _src_norm").fetchone()[0]
                 targets = []  # (庫連線, 表, 鍵, where, 來源臨時表)
-                if table == TARGETS["px"]:
+                if proto:
+                    if proto[0] == "gl":
+                        if db_gl and con_gl is None:
+                            con_gl = _connect(db_gl, read_only=False)
+                        if con_gl is None:
+                            row["state"], row["note"] = "SKIP", "gl 協定檔需全球庫連線(--db-global);無=略(誠實)"
+                            say(f"GREY    {u['part']:<5} {u['unit']}:{row['note']}")
+                            continue
+                        _xfer(con, con_gl, "SELECT * FROM _src_norm")
+                        targets.append((con_gl, table, None, "", "_src_norm"))
+                    else:
+                        targets.append((con, table, None, "", "_src_norm"))
+                elif table == TARGETS["px"]:
                     unm = con.execute("SELECT count(*) FROM _src_norm WHERE ticker IS NULL").fetchone()[0]
                     gl = con.execute("SELECT count(*) FROM _src_norm WHERE ticker IS NOT NULL AND NOT regexp_matches(ticker, '^[0-9]{4}[A-Z0-9]{0,2}\\.(TW|TWO)$') AND NOT regexp_matches(ticker, '^[0-9]{4}[A-Z0-9]{0,2}$')").fetchone()[0]
                     row["unmapped"] = unm
@@ -489,17 +586,25 @@ def consolidate(src_root: Path, db_tw: Path, db_gl: Path | None = None, apply: b
                 else:
                     targets.append((con, table, keys, "", "_src_norm"))
                 planned, done_n, tnames = 0, 0, []
+                skip_note = ""
                 for c2, t2, k2, w2, s2 in targets:
-                    if c2 is not con:
-                        # 全球庫:臨時表不可跨庫→以列搬運(只 ENG064 八欄)
+                    if c2 is not con and not proto:
+                        # 全球庫(px 非台股碼):臨時表不可跨庫→臨時 parquet 搬運(只 ENG064 八欄)
                         pc = [c for c in PRICE_COLS if c in cols]
-                        rows = con.execute(f"SELECT {', '.join(_qi(c) for c in pc)} FROM _src_norm WHERE {w2}").fetchall()
-                        c2.execute(f"CREATE OR REPLACE TEMP TABLE _src_norm({', '.join(f'{_qi(c)} ' + ('VARCHAR' if c in ('date', 'ticker') else 'DOUBLE') for c in pc)})")
-                        c2.executemany(f"INSERT INTO _src_norm VALUES ({', '.join('?' * len(pc))})", rows)
+                        _xfer(con, c2, f"SELECT {', '.join(_qi(c) for c in pc)} FROM _src_norm WHERE {w2}")
                         w2, cols2 = "", pc
                     else:
-                        cols2 = [r[0] for r in con.execute(f"DESCRIBE {s2}").fetchall()]
-                    wcols = _ensure_table(c2, t2, [c for c in cols2 if c != "ticker_raw"], k2, s2)
+                        cols2 = [r[0] for r in c2.execute(f"DESCRIBE {s2}").fetchall()]
+                    if proto:
+                        # ENG065 律:共同欄交集(不 ALTER 正典表);零共同欄=誠實跳過;鍵律 protocol_keys
+                        wcols = _ensure_table(c2, t2, cols2, [], s2, union_cols=False)
+                        if not wcols:
+                            skip_note = f"與正典表 {t2} 零共同欄=誠實跳過(ENG065 律)"
+                            break
+                        k2 = protocol_keys(wcols)
+                        row["keys"] = k2
+                    else:
+                        wcols = _ensure_table(c2, t2, [c for c in cols2 if c != "ticker_raw"], k2, s2)
                     n_new = _count_new(c2, t2, wcols, k2, w2, s2)
                     planned += n_new
                     if apply and n_new:
@@ -507,7 +612,11 @@ def consolidate(src_root: Path, db_tw: Path, db_gl: Path | None = None, apply: b
                         done_n += got
                         rep["summary"]["tables"][t2] = rep["summary"]["tables"].get(t2, 0) + got
                         log_event("INSERT", f"{u['unit']} → {t2} +{got}", run_id=run_id, part=u["part"])
-                    tnames.append(f"{t2}+{n_new}")
+                    tnames.append(f"{('gl:' if c2 is not con else '') + t2}+{n_new}")
+                if skip_note:
+                    row["state"], row["note"] = "SKIP", skip_note
+                    say(f"GREY    {u['part']:<5} {u['unit']}:{skip_note}")
+                    continue
                 row["planned_new"], row["rows_new"] = planned, done_n
                 rep["summary"]["planned_new"] += planned
                 rep["summary"]["rows_new"] += done_n
@@ -517,6 +626,7 @@ def consolidate(src_root: Path, db_tw: Path, db_gl: Path | None = None, apply: b
                                 [run_id, rep["ts"], u["part"], u["unit"], u["path"], fp, table, row["n_rows"], done_n, "; ".join(tnames)])
                 lampc = "GREEN" if not row.get("unmapped") else "YELLOW"
                 say(f"{lampc:<7} {u['part']:<5} {u['unit']}:{row['n_rows']:,} 列 → {' '.join(tnames)}{'(已寫 +%d)' % done_n if apply else '(計畫;--apply 才寫)'}"
+                    + (f" · ENG065 協定 {row['protocol']}(鍵 {'+'.join(row['keys']) if row['keys'] else 'EXCEPT'})" if proto else "")
                     + (f" · 裸碼對不到 {row['unmapped']} 列→{TARGETS['px_unmapped']}" if row.get("unmapped") else ""))
             except Exception as exc:
                 row["state"], row["note"] = "FAIL", str(exc)[:200]
@@ -535,7 +645,8 @@ def consolidate(src_root: Path, db_tw: Path, db_gl: Path | None = None, apply: b
             con_gl.close()
     s = rep["summary"]
     rep["verdict"] = "RED" if s["failed"] else ("YELLOW" if (s["unmapped"] or any(n["lamp"] == "YELLOW" for n in rep["notes"])) else "GREEN")
-    rep["next"] = (["via-vdfdb run --apply(寫入;只補缺鍵)"] if not apply else []) + ["via-vdfdb ckpt(ENG064 checkpoint 重建=抓過不再抓)", "via-vdfdb need --start 2023-01-01(缺口清單)", "via-vdfdb coverage"]
+    rep["next"] = (["via-datahome link(接點後重跑 run --apply;冪等)"] if any(n.get("part") == "home" and n["lamp"] == "YELLOW" for n in rep["notes"]) else []) \
+        + (["via-vdfdb run --apply(寫入;只補缺鍵)"] if not apply else []) + ["via-vdfdb ckpt(ENG064 checkpoint 重建=抓過不再抓)", "via-vdfdb need --start 2023-01-01(缺口清單)", "via-vdfdb coverage"]
     _finish(rep, reports, do_print)
     return rep
 
@@ -719,6 +830,13 @@ def selftest() -> int:
         w.execute(f"COPY c TO {_q(_u(chip / 'chips.parquet'))} (FORMAT PARQUET)")
         w.execute("CREATE TABLE r AS SELECT * FROM (VALUES (TIMESTAMP '2023-01-05 00:00:00', '2330', 'margin', 12.5), (TIMESTAMP '2023-01-06 00:00:00', '2330', 'margin', 13.0)) t(obs_date, ticker, kind, value)")
         w.execute(f"COPY r TO {_q(_u(rest / 'rest.parquet'))} (FORMAT PARQUET)")
+        # ENG065 協定檔(批389 工作站實錄:part3_rest 的 tw__/gl__ 檔曾落 local_rest__*):tw__tw_listings(無日期鍵=EXCEPT)/gl__us_macro(全球庫)/tw__tw_chips_daily(date+ticker=鍵 anti-join)
+        w.execute("CREATE TABLE l AS SELECT * FROM (VALUES ('2330', '台積電', 'TWSE', '2330.TW'), ('6488', '環球晶', 'TPEX', '6488.TWO'), ('2454', '聯發科', 'TWSE', '2454.TW')) t(code, name, market, yf_ticker)")
+        w.execute(f"COPY l TO {_q(_u(rest / 'tw__tw_listings.parquet'))} (FORMAT PARQUET)")
+        w.execute("CREATE TABLE gm AS SELECT * FROM (VALUES (DATE '2023-01-05', 'DGS10', 3.5), (DATE '2023-01-06', 'DGS10', 3.6)) t(date, series, value)")
+        w.execute(f"COPY gm TO {_q(_u(rest / 'gl__us_macro.parquet'))} (FORMAT PARQUET)")
+        w.execute("CREATE TABLE cp AS SELECT * FROM (VALUES ('2023-01-05', '2330', 100, 5), ('2023-01-09', '2330', 20, 3)) t(date, ticker, foreign_net, trust_net)")
+        w.execute(f"COPY cp TO {_q(_u(chip / 'tw__tw_chips_daily.parquet'))} (FORMAT PARQUET)")
         w.close()
         # 內嵌 duckdb 檔(價表)
         e = duckdb.connect(str(px / "old_prices.duckdb"))
@@ -728,23 +846,30 @@ def selftest() -> int:
         c0 = duckdb.connect(str(db))
         c0.execute("CREATE TABLE tw_daily_prices(date VARCHAR, ticker VARCHAR, open DOUBLE, high DOUBLE, low DOUBLE, close DOUBLE, adj_close DOUBLE, volume DOUBLE)")
         c0.execute("INSERT INTO tw_daily_prices VALUES ('2023-01-05', '2330.TW', 1, 1, 1, 9.9, 9.9, 1)")
+        # 台帳預植舊路由(批389 前 gl__us_macro 曾入 local_rest__gl__us_macro):鍵含目標表 → 新目標 us_macro 不被舊冊擋
+        _ledger_ensure(c0)
+        c0.execute(f"INSERT INTO {LEDGER} VALUES ('seed', '2026-09-07', 'rest', 'gl__us_macro.parquet', ?, ?, 'local_rest__gl__us_macro', 2, 0, '批389 前舊路由')",
+                   [str(rest / "gl__us_macro.parquet"), fingerprint(rest / "gl__us_macro.parquet")])
         c0.close()
         chk("① 日期正規化(DATE/TIMESTAMP/VARCHAR 多格式/整數 20230105 → 'YYYY-MM-DD')",
             all(duckdb.connect().execute(f"SELECT {date_expr('x', ty)} FROM (SELECT {v} AS x)").fetchone()[0] == "2023-01-05"
                 for v, ty in (("DATE '2023-01-05'", "DATE"), ("TIMESTAMP '2023-01-05 10:00:00'", "TIMESTAMP"), ("'2023/01/05'", "VARCHAR"), ("'2023-01-05'", "VARCHAR"), ("20230105", "BIGINT"))))
         r1 = consolidate(src, db, dbg, apply=False, reports=reports, mega=mega, do_print=False)
         units = {u["unit"]: u for u in r1["units"]}
-        chk("② scan 唯讀盤點(單元 5:parquet×3/csv/duckdb 表;路由 px→tw_daily_prices chip→tw_chips_daily rest→tw_rest_daily)",
-            r1["summary"]["units"] == 5 and units["part-000.parquet"]["target"] == "tw_daily_prices" and units["chips.parquet"]["target"] == "tw_chips_daily"
+        chk("② scan 唯讀盤點(單元 8:parquet×6/csv/duckdb 表;路由 px→tw_daily_prices chip→tw_chips_daily rest→tw_rest_daily;ENG065 協定 tw__X→X gl__X→X)",
+            r1["summary"]["units"] == 8 and units["part-000.parquet"]["target"] == "tw_daily_prices" and units["chips.parquet"]["target"] == "tw_chips_daily"
             and units["rest.parquet"]["target"] == "tw_rest_daily" and units["old_prices.duckdb::px_extra"]["target"] == "tw_daily_prices"
-            and units["extra.csv"]["target"] == "tw_daily_prices", f"(單元 {r1['summary']['units']};{[u['target'] for u in r1['units']]})")
+            and units["extra.csv"]["target"] == "tw_daily_prices" and units["tw__tw_listings.parquet"]["target"] == "tw_listings"
+            and units["gl__us_macro.parquet"]["target"] == "us_macro" and units["tw__tw_chips_daily.parquet"]["target"] == "tw_chips_daily"
+            and units["gl__us_macro.parquet"]["state"] == "PLAN", f"(單元 {r1['summary']['units']};{[(u['unit'], u['target'], u['state']) for u in r1['units']]})")
         c1 = duckdb.connect(str(db), read_only=True)
         n_scan = c1.execute("SELECT count(*) FROM tw_daily_prices").fetchone()[0]
         tabs_scan = {r[0] for r in c1.execute("SHOW TABLES").fetchall()}
         c1.close()
-        chk("③ dry-run 零寫入(價表列數不變;計畫新增=裸碼對映 yahoo 後 anti-join:2330 01-06 +6488=2;既有 2330 01-05 不算;裸碼 9999 對不到→local_px_daily 1;AAPL→global_daily 1;csv 2;duckdb 表 1)",
+        chk("③ dry-run 零寫入(價表列數不變;計畫新增=裸碼對映 yahoo 後 anti-join:2330 01-06 +6488=2;既有 2330 01-05 不算;裸碼 9999 對不到→local_px_daily 1;AAPL→global_daily 1;csv 2;duckdb 表 1;協定 3+2+2)",
             n_scan == 1 and r1["summary"]["rows_new"] == 0 and units["part-000.parquet"]["planned_new"] == 4 and units["part-000.parquet"]["unmapped"] == 1
-            and units["extra.csv"]["planned_new"] == 2 and units["old_prices.duckdb::px_extra"]["planned_new"] == 1 and r1["verdict"] == "YELLOW" and r1["summary"]["planned_new"] == 11,
+            and units["extra.csv"]["planned_new"] == 2 and units["old_prices.duckdb::px_extra"]["planned_new"] == 1 and r1["verdict"] == "YELLOW" and r1["summary"]["planned_new"] == 18
+            and units["tw__tw_listings.parquet"]["planned_new"] == 3 and units["gl__us_macro.parquet"]["planned_new"] == 2 and units["tw__tw_chips_daily.parquet"]["planned_new"] == 2,
             f"(計畫 {r1['summary']['planned_new']};單元 {[(u['unit'], u['planned_new'], u.get('unmapped')) for u in r1['units']]})")
         r2 = consolidate(src, db, dbg, apply=True, reports=reports, mega=mega, do_print=False)
         c2 = duckdb.connect(str(db), read_only=True)
@@ -752,19 +877,32 @@ def selftest() -> int:
         keep = c2.execute("SELECT close FROM tw_daily_prices WHERE date='2023-01-05' AND ticker='2330.TW'").fetchone()[0]
         unm = c2.execute("SELECT ticker, close FROM local_px_daily").fetchall()
         chips = c2.execute("SELECT count(*) FROM tw_chips_daily").fetchone()[0]
+        chips_rows = c2.execute("SELECT date, ticker, foreign_net FROM tw_chips_daily ORDER BY date").fetchall()
         restn = c2.execute("SELECT count(*), min(kind) FROM tw_rest_daily").fetchone()
         led = c2.execute(f"SELECT count(*) FROM {LEDGER}").fetchone()[0]
+        lst_rows = c2.execute("SELECT code, yf_ticker FROM tw_listings ORDER BY code").fetchall()
+        lst_cols = [r[0] for r in c2.execute("DESCRIBE tw_listings").fetchall()]
+        tabs2 = {r[0] for r in c2.execute("SHOW TABLES").fetchall()}
         c2.close()
         cg = duckdb.connect(str(dbg), read_only=True)
         gl = cg.execute("SELECT ticker, close FROM global_daily").fetchall()
+        usm = cg.execute("SELECT CAST(date AS VARCHAR), series, CAST(value AS DOUBLE) FROM us_macro ORDER BY 1").fetchall()
         cg.close()
-        chk("④ --apply anti-join 只補缺鍵(既有 2330.TW 01-05 close 9.9 零觸碰;來源重複列去重;裸碼→yahoo;csv 整數/斜線日期;duckdb 內表;籌碼/其餘表建立;全球碼入 global_daily;台帳 5 筆)",
+        units2 = {u["unit"]: u for u in r2["units"]}
+        chk("④ --apply anti-join 只補缺鍵(既有 2330.TW 01-05 close 9.9 零觸碰;來源重複列去重;裸碼→yahoo;csv 整數/斜線日期;duckdb 內表;籌碼/其餘表建立;全球碼入 global_daily;台帳 8+預植 1)",
             keep == 9.9 and len(rows) == 6 and [r[1] for r in rows] == ["2330.TW", "2330.TW", "2330.TW", "2454.TW", "2454.TW", "6488.TWO"]
-            and unm == [("9999", 1.0)] and chips == 2 and restn == (2, "margin") and led == 5 and gl == [("AAPL", 130.5)] and r2["summary"]["rows_new"] == 6 + 1 + 2 + 2 + 1 - 1
+            and unm == [("9999", 1.0)] and chips == 3 and restn == (2, "margin") and led == 9 and gl == [("AAPL", 130.5)] and r2["summary"]["rows_new"] == 6 + 1 + 2 + 2 + 1 - 1 + 3 + 2 + 1
             and r2["summary"]["tables"].get("tw_daily_prices") == 5,
             f"(價表 {rows};暫存 {unm};籌碼 {chips};其餘 {restn};全球 {gl};台帳 {led};寫 {r2['summary']['rows_new']} {r2['summary']['tables']})")
+        chk("⑫ ENG065 協定回歸正典表(批389:tw__tw_listings→tw_listings 零改名 EXCEPT 3 列;gl__us_macro→全球庫 us_macro 2 列(臨時 parquet 跨庫);tw__tw_chips_daily→tw_chips_daily 鍵 date+ticker 只補 1;不落 local_rest__*;台帳鍵含目標表=舊路由預植不擋)",
+            lst_rows == [("2330", "2330.TW"), ("2454", "2454.TW"), ("6488", "6488.TWO")] and lst_cols == ["code", "name", "market", "yf_ticker"]
+            and usm == [("2023-01-05", "DGS10", 3.5), ("2023-01-06", "DGS10", 3.6)] and chips_rows[-1] == ("2023-01-09", "2330", 20)
+            and units2["tw__tw_chips_daily.parquet"]["keys"] == ["date", "ticker"] and units2["tw__tw_chips_daily.parquet"]["rows_new"] == 1
+            and units2["tw__tw_listings.parquet"]["keys"] == [] and units2["gl__us_macro.parquet"]["state"] == "OK" and units2["gl__us_macro.parquet"]["rows_new"] == 2
+            and not any(t.startswith("local_rest__") for t in tabs2) and r2["summary"]["tables"].get("us_macro") == 2,
+            f"(listings {lst_rows} {lst_cols};us_macro {usm};chips {chips_rows};單元 {[(u['unit'], u['keys'], u['state'], u['rows_new']) for u in r2['units'] if u.get('protocol')]};表 {sorted(tabs2)})")
         r3 = consolidate(src, db, dbg, apply=True, reports=reports, mega=mega, do_print=False)
-        chk("⑤ 重跑冪等(檔指紋已入冊=5 單元全跳過;0 新增)", r3["summary"]["skipped_ledger"] == 5 and r3["summary"]["rows_new"] == 0 and r3["summary"]["planned_new"] == 0)
+        chk("⑤ 重跑冪等(檔指紋已入冊=8 單元全跳過;0 新增)", r3["summary"]["skipped_ledger"] == 8 and r3["summary"]["rows_new"] == 0 and r3["summary"]["planned_new"] == 0)
         r4 = consolidate(src, db, dbg, apply=True, reports=reports, mega=mega, force=True, do_print=False)
         chk("⑥ --force 重做仍 0 新增(anti-join 律;既有列零觸碰)", r4["summary"]["skipped_ledger"] == 0 and r4["summary"]["rows_new"] == 0)
         cv = coverage(db, reports=reports, do_print=False)
@@ -783,7 +921,12 @@ def selftest() -> int:
         src_txt = Path(__file__).read_text(encoding="utf-8")
         chk("⑪ 紀律宣告(只增不減/原件零觸碰/誠實三態/零網路/尾版律/COPY_ONLY/ACCEL-BRIDGE)",
             all(k in src_txt for k in ("只增不減", "原件零觸碰", "誠實三態", "零網路", "尾版律", "COPY_ONLY", "ACCEL-BRIDGE")))
-    print(f"  [計] 十一檢 OK {11 - len(fails)} · FAIL {len(fails)}")
+        dn = datahome_note(DB_TW)
+        chk("⑬ 資料家接點燈(批389:--db 自訂路徑=不適用 None;正典庫路徑=MDL123 正本判 LINKED 綠/其餘黃並指 via-datahome link 後冪等重跑)",
+            datahome_note(db) is None and (dn is None or (dn["lamp"] in ("GREEN", "YELLOW") and dn["state"] in ("LINKED", "LINKED_ELSEWHERE", "REAL_DIR", "MISSING")
+                                                          and (dn["lamp"] == "GREEN") == (dn["state"] == "LINKED") and (dn["lamp"] == "GREEN" or "via-datahome link" in dn["note"]))),
+            f"({dn and (dn['lamp'], dn['state'])})")
+    print(f"  [計] 十三檢 OK {13 - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 
 
@@ -799,7 +942,7 @@ def _arg(a: list, flag: str, default=None):
 def main() -> int:
     a = sys.argv[1:]
     if "--selftest" in a:
-        print("=== 本機三庫整併引擎(VDF_ENG079_LocalDbConsolidate)· 十一檢自測(零網路;臨時庫)===")
+        print("=== 本機三庫整併引擎(VDF_ENG079_LocalDbConsolidate)· 十三檢自測(零網路;臨時庫)===")
         return selftest()
     verb = next((x for x in a if x in ("scan", "run", "ckpt", "need", "coverage")), "scan")   # 批387:動詞白名單(旗標值不得誤判為動詞)
     src = Path(_arg(a, "--src", os.environ.get("VIA_LOCAL_DB_ROOT", SRC_DEFAULT)))
