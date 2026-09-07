@@ -19,6 +19,9 @@ try {
 # ===== [VIA:PS-ACCEL:END] =====
 $ErrorActionPreference = "Continue"
 $VIA = $PSScriptRoot
+# 批379 操作員令「自動完成所有動作 不要打開 VS Code」:總入口亦全域零跳出(.html 預設程式=VS Code);git 永不開編輯器(GIT_EDITOR=true=接受預設訊息)
+if ($env:VIA_OPEN_PAGES -ne "1") { $env:VIA_NO_OPEN = "1" }
+$env:GIT_EDITOR = "true"; $env:GIT_MERGE_AUTOEDIT = "no"; $env:GIT_SEQUENCE_EDITOR = "true"; $env:GIT_TERMINAL_PROMPT = "0"
 
 function New-DesktopShortcut {
     $desk = [Environment]::GetFolderPath("Desktop")
@@ -58,7 +61,8 @@ function Open-UIs {
     $pg = Newest (Join-Path $VIA "supportive modules\registry") "CGC_MDL097_PortalUI_v*.py"
     if ($pg) { python "$pg" | Out-Null }
     $portal = Join-Path $VIA "supportive modules\ui_support\VIA_UI_Portal_v0100.html"
-    if (Test-Path $portal) { Start-Process $portal
+    if ($env:VIA_NO_OPEN -eq "1") { Write-Host ("  [UI] 零跳出律:Portal 已落檔未開(看頁:via-open 總控 / via-open Portal):" + $portal) -ForegroundColor DarkGray }
+    elseif (Test-Path $portal) { Start-Process $portal
         Write-Host "  [UI] 總入口 Portal 已開(內含全介面連結;橋接=指揮台直跑)" -ForegroundColor Green }
     else { Start-Process "http://127.0.0.1:8765/"
         Write-Host "  [UI] Portal 缺=後備開指揮台(誠實)" -ForegroundColor Yellow }
