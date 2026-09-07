@@ -64,6 +64,7 @@ PYENV
   echo "--- ②c 因子庫(批188)";         python3 "$(newest 'VDF_ENG061_FeatureStore_v*.py')" build
   echo "--- ③ 籌碼增量+衍生";           python3 "$(newest 'VDF_ENG056_ChipBackfill_v*.py')" run
   python3 "$(newest 'VDF_ENG056_ChipBackfill_v*.py')" --derive
+  echo "--- ④a 主動 ETF 宇宙日更(批374;A 碼律+國內成分揭露律;ENG077)"; python3 "$(newest 'VDF_ENG077_ActiveETFUniverse_v*.py')" run
   echo "--- ④ 主動 ETF 持股(PARTIAL 屬常態)"; python3 "$ENG/VDF_ENG051_ActiveTWETF_Holdings.py"
   # 批161 update:日更管線收編批154-155 引擎(checkpoint 增量制=每日只補新)
   echo "--- ⑥ 逐股成交值增量(批154)";  python3 "$(newest 'VDF_ENG057_TradingValueBackfill_v*.py')" run
