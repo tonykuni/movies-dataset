@@ -161,3 +161,42 @@ via-vdfdb scan; via-vdfdb run --apply; via-vdfdb ckpt; via-vdfdb need --start 20
 via-vapone; via-open 矩陣
 via-webconsole --install; via-webconsole --background     # 選配:Grok 網頁主控台(Node 22;觸網同意)
 ```
+
+## 十、批384:中央控管整合(session_01R2d69oa1AGvnPVwjSUdSv5)與「vdf vrn 能跑」閘
+
+操作員令:「以此為中央控管將 session_01R2d69oa1AGvnPVwjSUdSv5 整合完畢 vdf vrn 能跑」。
+
+### 整合對象與結論
+
+- 該會話「VIA系統後續工作」的分支 `claude/via-system-followup-tz7k9t` 尾端 c14d428 = `origin/main` = 本分支基底;`git log HEAD..該分支` 為 0,其全部工作已在本分支(PR #30 `claude/via-envmanager-governance-7cls8h`)。本分支即中央控管;該會話遺留的待辦「`via-reload; via-autorun`」改由 `via-entry` 一貼次序承接。
+- 其他未併分支(`claude/taiwan-etf-vrn-validation-9b39qw` 等)屬不同世系,本批不併;需要時另令。
+
+### 「能跑」的誠實定義(`via-rungate`;CGC_MDL137 RunGate)
+
+功能件住 via_ 境(Baseline 冊),所以「能跑」不是 base 有沒有裝,而是**以家族境 python 真跑引擎自測**:
+
+```powershell
+via-rungate                 # 每族 8 站(vdf/vrn/vap);家族境 python 逐庫 import + SelftestGrid 家族站真跑
+via-rungate --fast          # 每族 3 站(總控台 rungate 任務同此)
+via-rungate --all           # 全站
+via-rungate --family vdf    # 只看一族
+via-rungate status          # 看上次 RUNGATE_latest.json
+```
+
+判定:族內任一引擎 FAIL/TIMEOUT=RED;家族境未見(base 退路)或必要庫缺=YELLOW;全綠=GREEN。必要庫:vdf `duckdb/pandas/numpy/pyarrow`、vrn `fitz/duckdb`、vap `pandas/matplotlib/duckdb/plotly`。缺件時報告直接印修法(`via-envgov apply --approve` 建境/補庫、或 `--only-kind REPAIR_BASE`)。
+
+### 家族路由落到所有啟動面(一處路由,全鏈同律)
+
+- **DeckServer v0129**:任務冊 `argv[0]` 改由 `_py(family)` 解析(MDL136;`VIA_PY_<FAMILY>` 覆寫 > 境根×Baseline 別名 > base 退路)。ParallelLanes、CompletionAutomator、MasterControl 都讀這本任務冊,因此 `via-mobile --lanes`/`via-autorun`/總控頁按鈕一併改走家族境。雲端/CI 無境=退路 `sys.executable`=原行為零差異。
+- **Register v0151**:所有 VDF/VRN/VAP 引擎短令改為 `& (Get-VIAEnvPython <fam>) (Get-VIANewest …)`;新增 `via-py <fam> <script>` 通用啟動器。
+- **VIA.ps1** 開機鏈仍 `Start-Process python`(base;正本零觸碰),RunGate 鏈路燈誠實列黃。
+
+### 一貼即用
+
+```powershell
+via-reload; via-entry
+via-rungate                                   # RED:看尾行修引擎;YELLOW:境缺 → via-envgov apply --approve;必要庫缺 → 報告印的 pip 令
+via-envgov apply --approve --only-kind REPAIR_BASE
+via-vdfdb scan; via-vdfdb run --apply; via-vdfdb ckpt
+via-vapone; via-open 矩陣
+```

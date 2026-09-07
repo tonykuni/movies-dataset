@@ -10,7 +10,7 @@ CGC_MDL136_EntryBridge v0100 — 單一入口橋(批383)
   ①roster  短指令冊=母倉 Register-VIA-Commands 尾版(function global: 實掃)∪ Grok 主控台
            收容包 scripts/VIA-CmdMatrix.ps1(function global: 實掃)→ 撞名守衛:母倉先發先得,
            Grok 同名令改 -grok 尾綴(Register v0150 載入時同律;本檔=規則正本+驗證)
-  ②status  單一入口燈板(GitHub/Mother/Data/Env/PATH/EnvGov/VDF-DB/VAP/Matrix/Console/Grok;
+  ②status  單一入口燈板(GitHub/Mother/Data/Env/PATH/EnvGov/RunGate(批384)/VDF-DB/VAP/Matrix/Console/Grok;
            零網路;RYG 誠實三態;落 VIA_Reports/entry/ENTRY_latest.json + .html 零 CDN)
   ③plan    一貼即用次序(via-entry → via-envgov → REPAIR_BASE → via-vdfdb → ckpt → via-vapone
            → via-open 矩陣 → via-webconsole);每步依現況標 READY/PENDING/SKIP
@@ -62,6 +62,7 @@ UI = VIA / "supportive modules" / "ui_support"
 OUT = VIA / "VIA_Reports" / "entry"
 ENVGOV_RUN = VIA / "VIA_Reports" / "env_governance" / "RUN_latest.json"
 VDFDB_RUN = VIA / "VIA_Reports" / "vdf" / "local_db" / "RUN_latest.json"
+RUNGATE_RUN = VIA / "VIA_Reports" / "rungate" / "RUNGATE_latest.json"   # 批384 能跑閘(MDL137)
 MEGA = VIA / "functional modules" / "VDF" / "output_hub" / "mega"
 DBS = [MEGA / "vdf_tw_market.duckdb", MEGA / "vdf_global_market.duckdb"]
 CONSOLE_PORT = 8080
@@ -345,6 +346,16 @@ def status(do_print: bool = True, quiet: bool = False, environ: dict | None = No
             add("YELLOW", "VDF-DB", f"RUN_latest 讀取失敗 {str(exc)[:60]}")
     else:
         add("GREY", "VDF-DB", "未跑;via-vdfdb scan(本機三庫盤點;唯讀)→ via-vdfdb run --apply → via-vdfdb ckpt")
+    # RunGate(批384 能跑閘:家族境 python 真跑引擎自測)
+    if RUNGATE_RUN.exists():
+        try:
+            r = json.loads(_read(RUNGATE_RUN))
+            fams = " ".join(f"{k}={v['verdict']}({v['summary']['engines_ok']}/{v['summary']['engines_n']};{v['python']['state']})" for k, v in (r.get("families") or {}).items())
+            add({"GREEN": "GREEN", "YELLOW": "YELLOW"}.get(r.get("verdict"), "RED"), "RunGate", f"{r.get('verdict', '?')} · {r.get('ts', '')[:16]} · {fams} · via-rungate status")
+        except Exception as exc:
+            add("YELLOW", "RunGate", f"RUNGATE_latest 讀取失敗 {str(exc)[:60]}")
+    else:
+        add("GREY", "RunGate", "未跑;via-rungate(家族境 python 真跑 VDF/VRN/VAP 引擎自測;--fast 每族 3 站)")
     # VAP ONE
     vap = newest(VIA / "functional modules" / "VAP" / "engine", "VAP_ENG016_AutoplotOne_v*.py")
     sj = INTAKE / "VIA_VapOne_b383" / "VAP_ONE_selftest.json"
@@ -386,6 +397,7 @@ def status(do_print: bool = True, quiet: bool = False, environ: dict | None = No
     verdict = "RED" if "RED" in colors else ("YELLOW" if "YELLOW" in colors else "GREEN")
     rep = {"schema": "VIA.EntryBridge.v1", "ts": _dt.datetime.now().isoformat(timespec="seconds"), "via": str(VIA), "verdict": verdict, "lamps": lamps,
            "next": ["via-entry(本燈板)", "via-envgov(全景;唯讀)", "via-envgov apply --approve --only-kind REPAIR_BASE(base 補 manifest 缺件;非破壞)",
+                    "via-rungate(能跑閘:家族境 python 真跑 VDF/VRN/VAP 引擎自測)",
                     "via-vdfdb scan → via-vdfdb run --apply → via-vdfdb ckpt(抓過不再抓)", "via-vapone(VAP ONE 72 檢)", "via-open 矩陣", "via-webconsole --background(選配;Node 22)"]}
     try:
         OUT.mkdir(parents=True, exist_ok=True)
@@ -425,6 +437,7 @@ def plan(do_print: bool = True, quiet: bool = False) -> list:
         ("via-entry", "單一入口燈板(GitHub/Mother/Data/Env/EnvGov/VDF-DB/VAP/Matrix/Console/Grok)", "READY"),
         ("via-envgov", "環境治理全景(唯讀 run --offline;digest 25 行)", "READY" if "EnvGov" not in L or L["EnvGov"]["lamp"] == "GREY" else "DONE"),
         ("via-envgov apply --approve --only-kind REPAIR_BASE", "base 補 manifest 缺件(duckdb/pyarrow/plotly…;非破壞;鏡像鏈 Tsinghua→Aliyun→PyPI)", "READY" if mm else "SKIP(manifest 齊)"),
+        ("via-rungate", "能跑閘(批384):家族境 python(via_vdf_312/via_vrn_312/via_vap_312)逐庫 import + 真跑引擎自測;RED=有引擎跑不起來;YELLOW=base 退路", "READY" if "RunGate" not in L or L["RunGate"]["lamp"] == "GREY" else "DONE"),
         ("via-vdfdb scan", "本機三庫(prices/chips/rest)盤點+路由計畫(唯讀;檔冊 sha 已入冊=跳過)", "READY"),
         ("via-vdfdb run --apply", "COPY_ONLY anti-join 入正典 DuckDB(只補缺鍵;原件不刪不搬)", "PENDING(先 scan)"),
         ("via-vdfdb ckpt", "ENG064 checkpoint 自庫重建=已有年段/檔永不重抓", "PENDING(先 run --apply)"),
@@ -482,18 +495,18 @@ def selftest() -> int:
             and r3["python"] == sys.executable and r4["source"] == "env VIA_PY_VDF")
     rep = status(do_print=False, quiet=True, environ={})
     layers = [x["layer"] for x in rep["lamps"]]
-    chk("⑤ 燈板(零網路;≥11 層;三態+GREY;落 ENTRY_latest.json/.html 零 CDN)",
-        len(layers) >= 11 and all(x["lamp"] in ("GREEN", "YELLOW", "RED", "GREY") for x in rep["lamps"])
+    chk("⑤ 燈板(零網路;≥12 層含 RunGate;三態+GREY;落 ENTRY_latest.json/.html 零 CDN)",
+        len(layers) >= 12 and all(x["lamp"] in ("GREEN", "YELLOW", "RED", "GREY") for x in rep["lamps"])
         and (OUT / "ENTRY_latest.json").exists() and 'src="http' not in _read(OUT / "ENTRY_latest.html")
-        and all(k in layers for k in ("GitHub", "Mother", "Data", "Env", "EnvGov", "VDF-DB", "VAP", "Matrix", "Console", "Grok")),
+        and all(k in layers for k in ("GitHub", "Mother", "Data", "Env", "EnvGov", "RunGate", "VDF-DB", "VAP", "Matrix", "Console", "Grok")),
         f"({rep['verdict']};{len(layers)} 層)")
     rows = roster(do_print=False)
     names = [r["name"] for r in rows]
     chk("⑥ 短指令冊(母倉∪Grok;名稱唯一;撞名列 -grok)", len(rows) >= 60 and len(names) == len(set(names))
         and any(r["state"].startswith("撞名改名") for r in rows if r["owner"] == "GROK"), f"({len(rows)} 令)")
     pl = plan(do_print=False)
-    chk("⑦ 一貼即用次序(≥11 步;含 envgov/REPAIR_BASE/vdfdb/ckpt/vapone/矩陣/webconsole)",
-        len(pl) >= 11 and all(any(k in r["cmd"] for r in pl) for k in ("via-envgov", "REPAIR_BASE", "via-vdfdb", "ckpt", "via-vapone", "矩陣", "via-webconsole")))
+    chk("⑦ 一貼即用次序(≥12 步;含 envgov/REPAIR_BASE/rungate/vdfdb/ckpt/vapone/矩陣/webconsole)",
+        len(pl) >= 12 and all(any(k in r["cmd"] for r in pl) for k in ("via-envgov", "REPAIR_BASE", "via-rungate", "via-vdfdb", "ckpt", "via-vapone", "矩陣", "via-webconsole")))
     src = Path(__file__).read_text(encoding="utf-8")
     chk("⑧ 紀律宣告(只增不減/原件零觸碰/誠實三態/零 CDN/尾版律/ACCEL-BRIDGE)",
         all(k in src for k in ("只增不減", "原件零觸碰", "誠實三態", "零 CDN", "尾版律", "ACCEL-BRIDGE")))
