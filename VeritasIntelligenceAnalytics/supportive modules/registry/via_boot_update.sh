@@ -100,6 +100,8 @@ PYENV
   python3 "$(ls "$REG"/CGC_MDL114_CommandCenterBridge_v*.py | sort | tail -1)" run
   echo "--- ⑪ 四專案完工矩陣(批368;MDL131)"
   VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL131_ProjectCompletion_v*.py | sort | tail -1)" build
+  echo "--- ⑫ 產品資格閘(批376;MDL133;九閘;只讀存證)"
+  VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL133_ProductGate_v*.py | sort | tail -1)" build
   echo "=== 畢(誠實三態見上)==="
 } >> "$LOG" 2>&1
 exit 0

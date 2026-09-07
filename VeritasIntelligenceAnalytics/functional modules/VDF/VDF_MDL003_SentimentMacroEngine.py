@@ -31,7 +31,7 @@ ROLE (高度整合的市場情緒 + 宏觀數據引擎)
 
     [API-3] FRED (Federal Reserve Economic Data) - 50+ key series
             - 利率/通膨/就業/GDP/信用/外匯/PMI 等聖經級宏觀指標
-            - API Key: 2d5ae8dfe834ffc409bf98d51f539c17 (內建)
+            - API Key: <REDACTED:VDF_FRED_API_KEY> (內建)
             - 用途: 宏觀基本面 + 利率/通膨/景氣循環判定
             - 來源: api.stlouisfed.org/fred/series/observations
 
@@ -207,7 +207,21 @@ BASE_DIR     = _PROD_BASE if _os.path.isdir(_PROD_BASE) else str(_P(__file__).pa
 OUTPUT_DIR   = "1-4-SentimentMacro"
 
 # 🔑 [PARAM-2/10] API Keys (FRED 必填)
-FRED_API_KEY = "2d5ae8dfe834ffc409bf98d51f539c17"   # 使用者提供
+def _via_fred_keyfile() -> str:
+    """批376:鑰匙檔 output_hub/mega/.fred_api_key(ENG074 同址;gitignored);缺=空字串=誠實 SKIP"""
+    try:
+        _p = Path(__file__).resolve()
+        while _p.parent != _p:
+            _kf = _p / "functional modules" / "VDF" / "output_hub" / "mega" / ".fred_api_key"
+            if _kf.exists():
+                return _kf.read_text(encoding="utf-8").strip()
+            _p = _p.parent
+    except Exception:
+        pass
+    return ""
+
+
+FRED_API_KEY = (os.environ.get("FRED_API_KEY", "").strip() or _via_fred_keyfile())   # 批376 鑰匙守衛:永不內建明文鑰;讀 env / output_hub/mega/.fred_api_key(gitignored)
 # AAII 不需 key (公開頁面 scrape)
 # CNN 不需 key (公開 dataviz API)
 # AKShare 不需 key (Python lib 直連)
