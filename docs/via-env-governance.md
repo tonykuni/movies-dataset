@@ -376,3 +376,19 @@ via-align check
 via-align update --apply
 via-handover
 ```
+
+### 批396 工作站實錄補:`via-rebuild` 登錄、環境治理 RED 的安全路徑、coverage 哨兵
+
+- 實錄(批395 一貼全綠):`via-chip run` 自庫重建 +1760、待抓 40、四工 1.95 件/秒、落庫 33,584 列;08-25 至 09-04 全轉 PARTIAL;清單基準日前進至 2026-09-04(+1978 列);`via-vdfdb coverage` 16 表;接棒台缺件歸零,RED 燈剩 entry/env/vrn。
+- `via-envgov` 裁決 RED(BASE 317 件 136 衝突;via_iso_scrape_H/via_paddle_311/via_vrn_312 候 REBUILD;base manifest 缺 28;封鎖家族件 14),digest「下一指令」指路 `via-rebuild --env <境>`,但短令冊從未登錄(與批394 `via-chip` 同類死路)。修:Register v0161 `via-rebuild`(MDL050 多環境隔離重建;旁建零破壞;無參數=`--offline` 唯讀計畫;`--split` 為 MDL135 提案、MDL050 尾版尚無 → 改以 `--env --offline` 唯讀並印明)+ `via-rebuild.cmd`;`via-entry` 次序文字 15 步→16 步含 console/handover。
+- 安全路徑(皆非破壞;破壞段 `--approve-remove` 一律由操作員另下令):`via-envgov apply --approve --only-kind REPAIR_BASE`(base 補 manifest 缺 28)→ `via-rebuild --env via_vrn_312`(旁建驗綠;原境不動)→ 再看 digest。entry RED 隨 env RED 連動;vrn RED=尚無報告。
+- ENG079 `coverage`:哨兵列 `_NOOP_`(1900-01-01)不計入票數/年分佈(實錄 tw_daily_prices 顯示 1981 票含 1900:1票=哨兵)。十三檢不變。
+
+```powershell
+# 先按 Enter 讓提示字元回來,再整段貼(皆唯讀或非破壞;不含 --approve-remove)
+via-reload
+via-rebuild --env via_vrn_312
+via-envgov apply --approve --only-kind REPAIR_BASE
+via-envgov
+via-handover
+```

@@ -773,8 +773,9 @@ def coverage(db: Path, reports: Path = REPORTS, do_print: bool = True) -> dict:
             if "date" not in cols:
                 continue
             if "ticker" in cols:
-                r = con.execute(f"SELECT count(*), count(DISTINCT ticker), min(CAST(date AS VARCHAR)), max(CAST(date AS VARCHAR)) FROM {_qi(t)}").fetchone()
-                yrs = con.execute(f"SELECT substr(CAST(date AS VARCHAR), 1, 4) y, count(DISTINCT ticker), count(*) FROM {_qi(t)} GROUP BY 1 ORDER BY 1").fetchall()
+                # 批396:哨兵列 _NOOP_(1900-01-01;批383 建表用)不計入票數/年分佈(工作站實錄:tw_daily_prices 1981 票含 1900:1票/1=哨兵)
+                r = con.execute(f"SELECT count(*), count(DISTINCT ticker), min(CAST(date AS VARCHAR)), max(CAST(date AS VARCHAR)) FROM {_qi(t)} WHERE ticker IS NULL OR ticker <> '_NOOP_'").fetchone()
+                yrs = con.execute(f"SELECT substr(CAST(date AS VARCHAR), 1, 4) y, count(DISTINCT ticker), count(*) FROM {_qi(t)} WHERE ticker IS NULL OR ticker <> '_NOOP_' GROUP BY 1 ORDER BY 1").fetchall()
                 rep["tables"][t] = {"rows": r[0], "tickers": r[1], "min": r[2], "max": r[3], "years": {y: {"tickers": a, "rows": b} for y, a, b in yrs}}
             else:
                 r = con.execute(f"SELECT count(*), min(CAST(date AS VARCHAR)), max(CAST(date AS VARCHAR)) FROM {_qi(t)}").fetchone()
