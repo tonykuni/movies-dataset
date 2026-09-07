@@ -19,6 +19,8 @@ batch310_stress_core — APCE 壓力測試砲台(批310;魔鬼代言人波)
   T12 置換檢定+FDR:族群 att 指數 vs Δclean_mkt% CCF ±5、B=200、BH q=0.10
   T13 小公雞謬誤量化:vol_shock Top10 vs gravity Top10 之 Small 占比
   T14 參數家族實值校準(真實歷史餵 C-05/C-06;鎖觸狀態評估)
+  T15 走勢前推:擴張視窗逐月重跑(LEADER 存續/角色一致/家族模式遷移)
+  T16 月營收引擎高原(LOWBASE_PCT × Z_GATE 掃描)
 判定:PASS/WARN/FAIL/INFO/SKIP(統計結果為 INFO 誠實列數,不美化)。
 輸出:Batch310_StressTest_Results.json
 """
@@ -582,6 +584,65 @@ def t14_family(eng, fam):
           f"C-13={STATS['family']['C-13']['value']}({STATS['family']['C-13']['mode']})")
 
 
+# ─────────────────────────── T15 走勢前推(walk-forward) ───────────────────────────
+
+def t15_walkforward(apce, rows, fam):
+    """擴張視窗逐月重跑:角色持續性(LEADER 存續)+參數家族模式遷移(FALLBACK→ROLLING)。"""
+    print("\n═══ T15 走勢前推(擴張視窗)═══")
+    cuts = ["2026-05-01", "2026-06-01", "2026-07-01", "2026-08-01", "2026-09-03"]
+    leaders_by_cut, roles_by_cut, hist05 = {}, {}, []
+    for c in cuts:
+        sub = [r for r in rows if r["date"] <= c]
+        e = apce.APCE(); e.resolve_params(); res = e.run(sub, base_date="2026-01-01")
+        roles_by_cut[c] = {x["ticker"]: x["role"] for x in res["latest"]}
+        leaders_by_cut[c] = {x["ticker"] for x in res["latest"] if x["role"] == "LEADER"}
+        sc = [x["leader_score"] for x in res["latest"] if x.get("leader_score") is not None]
+        if len(sc) >= 20:
+            hist05.append(sorted(sc)[int(0.8 * (len(sc) - 1))])
+    persist = []
+    for a, b in zip(cuts, cuts[1:]):
+        A, B = leaders_by_cut[a], leaders_by_cut[b]
+        persist.append({"from": a, "to": b, "n_from": len(A), "n_to": len(B), "kept": len(A & B),
+                        "role_agree": round(agree(roles_by_cut[a], roles_by_cut[b]) or 0, 3)})
+    modes = []
+    for k in range(1, len(hist05) + 1):
+        r = fam.resolve("C-05", hist05[:k], {}, {}, fam.load_ssot())
+        modes.append({"n_hist": k, "mode": r["mode"], "value": r["value"]})
+    STATS["walkforward"] = {"leaders": {c: sorted(v) for c, v in leaders_by_cut.items()}, "persist": persist, "c05_modes": modes}
+    kept_share = statistics.mean((p["kept"] / p["n_from"]) if p["n_from"] else 0 for p in persist)
+    check("T15", "走勢前推:LEADER 月存續率+角色月一致率+C-05 家族模式遷移", "INFO",
+          f"LEADER 月存續 {kept_share:.0%}(" + "; ".join(f"{p['from'][:7]}→{p['to'][:7]} {p['kept']}/{p['n_from']} 一致 {p['role_agree']:.2f}" for p in persist)
+          + f");C-05 模式 {[m['mode'] for m in modes]}(月度歷史 {len(hist05)} 點<8 ⇒ FALLBACK 誠實;日度累積後轉 ROLLING)")
+
+
+# ─────────────────────────── T16 月營收引擎高原 ───────────────────────────
+
+def t16_revenue_plateau():
+    """ENG027 超參數高原:LOWBASE_PCT × Z_GATE 掃描,異常榜 Jaccard vs 基準。"""
+    print("\n═══ T16 月營收引擎高原(LOWBASE_PCT × Z_GATE)═══")
+    rev = load_mod("flow_rev", "FLOW_ENG027_FlowTwMonthlyRevenue.py")
+    db = rev.load_db()
+    if not db["rows"]:
+        check("T16", "月營收高原", "SKIP", "側車庫空"); return
+    groups = rev.load_groups()
+    base = rev.analyze(db["rows"], groups)
+    A0 = {r["code"] for r in base["anomalies_market"]}
+    table = []
+    for lb, zg in ((0.20, 3.0), (0.30, 3.0), (0.25, 2.5), (0.25, 3.5)):
+        rev.LOWBASE_PCT, rev.Z_GATE = lb, zg
+        r = rev.analyze(db["rows"], groups)
+        A = {x["code"] for x in r["anomalies_market"]}
+        table.append({"lowbase_pct": lb, "z_gate": zg, "theta": r["theta_low_dynamic"], "n_excluded": r["n_low_base_excluded"],
+                      "n_anom": len(A), "jaccard": round(len(A & A0) / len(A | A0), 3) if (A | A0) else 1.0,
+                      "top_group": (r["group_stats"] or [{}])[0].get("group")})
+    rev.LOWBASE_PCT, rev.Z_GATE = 0.25, 3.0
+    STATS["revenue_plateau"] = table
+    mn = min(x["jaccard"] for x in table)
+    check("T16", "月營收異常榜對超參數之穩定(Jaccard vs 基準;族群冠軍不變)", "PASS" if mn >= 0.6 and all(x["top_group"] == (base["group_stats"] or [{}])[0].get("group") for x in table) else "WARN",
+          "; ".join(f"lb={x['lowbase_pct']} z={x['z_gate']}:θ={x['theta']} 剔 {x['n_excluded']} 異常 {x['n_anom']} J={x['jaccard']}" for x in table)
+          + f";族群冠軍恆為 {(base['group_stats'] or [{}])[0].get('group')}")
+
+
 # ─────────────────────────── 主流程 ───────────────────────────
 
 def main() -> int:
@@ -621,6 +682,8 @@ def main() -> int:
     t12_permutation(eng, leadlag)
     t13_smallcap(eng)
     t14_family(eng, fam)
+    t15_walkforward(apce, rows, fam)
+    t16_revenue_plateau()
     n = {}
     for r in RESULTS:
         n[r["status"]] = n.get(r["status"], 0) + 1

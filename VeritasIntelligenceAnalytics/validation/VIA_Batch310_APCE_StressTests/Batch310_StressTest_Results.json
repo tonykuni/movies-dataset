@@ -1,10 +1,10 @@
 {
  "schema": "batch310-stress-v1",
- "ts": "2026-09-07 05:17:02",
+ "ts": "2026-09-07 05:19:27",
  "counts": {
-  "PASS": 11,
+  "PASS": 12,
   "WARN": 4,
-  "INFO": 5
+  "INFO": 6
  },
  "verdict": "GREEN_WITH_NOTES",
  "checks": [
@@ -127,6 +127,18 @@
    "name": "家族以真實歷史校準(C-05/C-06 滾動;鎖觸狀態實評)",
    "status": "PASS",
    "detail": "state={'clean_mkt_z': -0.239, 'breadth_change': 0.131, 'member_ratio': 1.0, 'group_as_median_z': 0.0, 'regime': 'RISK_ON', 'n_obs': 165};模式 {'FALLBACK': 9, 'FIXED': 13, 'ROLLING': 3};觸發 無;C-05=0.7386(ROLLING);C-13=0.45(FALLBACK)"
+  },
+  {
+   "id": "T15",
+   "name": "走勢前推:LEADER 月存續率+角色月一致率+C-05 家族模式遷移",
+   "status": "INFO",
+   "detail": "LEADER 月存續 3%(2026-05→2026-06 0/2 一致 0.78; 2026-06→2026-07 0/1 一致 0.75; 2026-07→2026-08 0/3 一致 0.74; 2026-08→2026-09 1/9 一致 0.70);C-05 模式 ['FALLBACK', 'FALLBACK', 'FALLBACK', 'FALLBACK', 'FALLBACK'](月度歷史 5 點<8 ⇒ FALLBACK 誠實;日度累積後轉 ROLLING)"
+  },
+  {
+   "id": "T16",
+   "name": "月營收異常榜對超參數之穩定(Jaccard vs 基準;族群冠軍不變)",
+   "status": "PASS",
+   "detail": "lb=0.2 z=3.0:θ=0.891 剔 311 異常 60 J=0.875; lb=0.3 z=3.0:θ=0.936 剔 469 異常 60 J=0.967; lb=0.25 z=2.5:θ=0.914 剔 391 異常 60 J=1.0; lb=0.25 z=3.5:θ=0.914 剔 391 異常 60 J=1.0;族群冠軍恆為 記憶體"
   }
  ],
  "stats": {
@@ -1376,6 +1388,137 @@
     "mode": "FALLBACK",
     "why": "IC 樣本<8 誠實退回基值"
    }
-  }
+  },
+  "walkforward": {
+   "leaders": {
+    "2026-05-01": [
+     "2454",
+     "3081"
+    ],
+    "2026-06-01": [
+     "4979"
+    ],
+    "2026-07-01": [
+     "2303",
+     "2344",
+     "2727"
+    ],
+    "2026-08-01": [
+     "1519",
+     "2002",
+     "2317",
+     "2360",
+     "2383",
+     "2404",
+     "2421",
+     "3017",
+     "3231"
+    ],
+    "2026-09-03": [
+     "2408",
+     "3231",
+     "6196"
+    ]
+   },
+   "persist": [
+    {
+     "from": "2026-05-01",
+     "to": "2026-06-01",
+     "n_from": 2,
+     "n_to": 1,
+     "kept": 0,
+     "role_agree": 0.778
+    },
+    {
+     "from": "2026-06-01",
+     "to": "2026-07-01",
+     "n_from": 1,
+     "n_to": 3,
+     "kept": 0,
+     "role_agree": 0.75
+    },
+    {
+     "from": "2026-07-01",
+     "to": "2026-08-01",
+     "n_from": 3,
+     "n_to": 9,
+     "kept": 0,
+     "role_agree": 0.736
+    },
+    {
+     "from": "2026-08-01",
+     "to": "2026-09-03",
+     "n_from": 9,
+     "n_to": 3,
+     "kept": 1,
+     "role_agree": 0.701
+    }
+   ],
+   "c05_modes": [
+    {
+     "n_hist": 1,
+     "mode": "FALLBACK",
+     "value": 0.75
+    },
+    {
+     "n_hist": 2,
+     "mode": "FALLBACK",
+     "value": 0.75
+    },
+    {
+     "n_hist": 3,
+     "mode": "FALLBACK",
+     "value": 0.75
+    },
+    {
+     "n_hist": 4,
+     "mode": "FALLBACK",
+     "value": 0.75
+    },
+    {
+     "n_hist": 5,
+     "mode": "FALLBACK",
+     "value": 0.75
+    }
+   ]
+  },
+  "revenue_plateau": [
+   {
+    "lowbase_pct": 0.2,
+    "z_gate": 3.0,
+    "theta": 0.891,
+    "n_excluded": 311,
+    "n_anom": 60,
+    "jaccard": 0.875,
+    "top_group": "記憶體"
+   },
+   {
+    "lowbase_pct": 0.3,
+    "z_gate": 3.0,
+    "theta": 0.936,
+    "n_excluded": 469,
+    "n_anom": 60,
+    "jaccard": 0.967,
+    "top_group": "記憶體"
+   },
+   {
+    "lowbase_pct": 0.25,
+    "z_gate": 2.5,
+    "theta": 0.914,
+    "n_excluded": 391,
+    "n_anom": 60,
+    "jaccard": 1.0,
+    "top_group": "記憶體"
+   },
+   {
+    "lowbase_pct": 0.25,
+    "z_gate": 3.5,
+    "theta": 0.914,
+    "n_excluded": 391,
+    "n_anom": 60,
+    "jaccard": 1.0,
+    "top_group": "記憶體"
+   }
+  ]
  }
 }
