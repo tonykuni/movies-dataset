@@ -2,21 +2,22 @@
  "schema": "VIA.EnvGovernanceBaseline.v1",
  "module_id": "VIS-ENV-GOVERNANCE-000001",
  "version": "0100",
- "batch": 381,
+ "batch": 382,
  "owner": "VIA_ENV_MANAGER",
- "updated_at_utc": "2026-09-07T12:00:00+00:00",
+ "updated_at_utc": "2026-09-07T13:00:00+00:00",
  "doc": "docs/via-env-governance.md",
  "engine": "supportive modules/registry/CGC_MDL135_EnvGovernance_v*.py",
- "operator_order": "依照已成功地建構布局向上新增;最壞還原成原本規劃;base 只放該有的工具;其他放在 via_core 及 via_ 開頭的環境",
+ "operator_order": "依照已成功地建構布局向上新增;最壞還原成原本規劃;base 只放該有的工具;其他放在 via_core 及 via_ 開頭的環境 ‖ 批382:BASE 應該放都用得到的工具;功能性的工具應該都放到 via_ 相關環境;沒有 via_ 在前面的境換名稱重建",
  "principles": {
   "append_only": true,
   "build_upward_on_lkgc": "所有變更計畫以前一次成功組合(LKGC)為基準向上新增;不從頭重來",
   "worst_case_restore": "最壞情況還原:①LKGC_latest lock 逐境重裝 ②無 LKGC → 本冊原本規劃(base manifest + env_layout)重建",
-  "base_minimal": "base 只放 manifest(工具鏈+引擎核心+LOW 白名單)及其相依閉包;MEDIUM/HIGH 家族一律不入",
+  "base_minimal": "base 只放共用工具(大家都用得到:安裝鏈+資料/繪圖/HTTP/序列化基座)及其相依閉包;功能性工具(文件/HTML/擷取/NLP/ML/OCR/UI/開發工具)一律進 via_ 家族境",
   "others_to_via": "manifest 外之件:via_core 白名單者 → via_core;家族件 → 專屬 via_*/paddle_*/camelot_*;未分類 → via_iso_quarantine 候裁",
   "zero_hydra": "共用節點(反向相依 ≥ shared_node_threshold)之異動一律 Sequence-Dependent 依拓撲序;其餘 Parallel-Fixable 一口氣並行",
   "consent_loop": "計畫先出、沙盒模擬(uv pip compile 多輪)、經使用者明確同意(--approve)方執行非破壞段;base 端移除另需 --approve-remove 且逐件印令",
-  "honest_three_state": "OK/WARN/FAIL 與 NOT_RUN 誠實,永不假綠"
+  "honest_three_state": "OK/WARN/FAIL 與 NOT_RUN 誠實,永不假綠",
+  "naming_law": "所有受管境一律 via_ 前綴;非 via_ 境=NAMING_VIOLATION → via-envgov rename 換名重建(舊境 lock 逐件 sync;驗綠後舊境 _retire_ 候裁)"
  },
  "base": {
   "python_expected": "3.13",
@@ -39,39 +40,46 @@
    "certifi"
   ],
   "engine_core": [
-   "pandas",
    "numpy",
+   "pandas",
    "pyarrow",
    "duckdb",
-   "pymupdf",
-   "requests",
-   "jsonschema",
+   "polars",
    "plotly",
    "matplotlib",
-   "openpyxl",
    "scipy",
+   "requests",
+   "httpx",
+   "jsonschema",
+   "openpyxl",
+   "xlsxwriter",
    "rich",
    "psutil",
-   "yfinance",
-   "jieba",
-   "markitdown",
-   "docx2python",
-   "python-docx",
-   "polars",
-   "xlsxwriter",
-   "pdfplumber",
-   "orjson",
    "pydantic",
    "loguru",
    "tqdm",
    "python-dateutil",
    "pytz",
    "tzlocal",
-   "beautifulsoup4",
-   "lxml",
    "pyyaml",
+   "orjson",
    "pillow",
-   "opencc-python-reimplemented"
+   "certifi",
+   "charset-normalizer",
+   "idna",
+   "urllib3",
+   "typing-extensions",
+   "six",
+   "attrs",
+   "filelock",
+   "platformdirs",
+   "cffi",
+   "pycparser",
+   "markdown-it-py",
+   "mdit-py-plugins",
+   "pygments",
+   "jinja2",
+   "markupsafe"
   ],
   "low_risk_allow": [
    "colorama",
@@ -82,23 +90,12 @@
    "inquirer",
    "typer",
    "regex",
-   "charset-normalizer",
-   "idna",
-   "urllib3",
-   "six",
-   "attrs",
-   "filelock",
-   "platformdirs",
    "tomli",
-   "typing-extensions",
    "networkx",
-   "dateparser",
-   "sumy",
-   "yake",
-   "quantulum3",
-   "segtok",
-   "jellyfish",
-   "docopt-ng"
+   "docopt-ng",
+   "wcwidth",
+   "shellingham",
+   "python-dotenv"
   ],
   "evidence": {
    "provision_req_core": [
@@ -142,7 +139,8 @@
     "psutil"
    ],
    "install_plan_lkgc": "VIA_Install_Plan_20260820_062418/230001/235933:libs·核心 9/9、DOCX 2/2、OCR(選配)2/2 在位;唯一 FAIL=pip 衝突掃描『albucore 0.0.24 requires opencv-python-headless, which is not installed.』三次體檢同狀=衝突持續未閉環",
-   "note": "OCR(選配)雖在位於 base,依本冊屬 ocr 家族=不屬 base 該有;拉出至 paddle_312(統包錨 opencv-contrib-python;Lessons SKIP:headless/opencv-python 永不再裝)"
+   "note": "OCR(選配)雖在位於 base,依本冊屬 ocr 家族=不屬 base 該有;拉出至 paddle_312(統包錨 opencv-contrib-python;Lessons SKIP:headless/opencv-python 永不再裝)",
+   "workstation_20260907": "via-envgov 首跑:24 境 19s;via_* 22 境零衝突;BASE py3.13.7 681 件 136 衝突 RED;閉包 253/閉包外 428/封鎖家族件 71;非 via_ 境 2(camelot_311、paddle_311)"
   },
   "never_in_base_families": [
    "ocr",
@@ -153,11 +151,13 @@
    "gis",
    "web_api",
    "webui",
-   "nlp_heavy",
+   "nlp",
    "process_mining",
    "compilers",
    "stealth_proxy"
-  ]
+  ],
+  "policy": "base=共用工具冊(toolchain+engine_core 共用基座+low_risk_allow)+相依閉包;閉包外一律拉出;功能件依 families 進 via_ 境(YELLOW 政策拉出);封鎖家族(never_in_base_families)RED 立拔",
+  "functional_moved_to_via": "批382:pymupdf/pdfplumber/docx2python/python-docx/markitdown → docs(via_vrn_312);beautifulsoup4/lxml → html_parse(via_html_312);yfinance/akshare → data_fetch(via_vdf_312);jieba/opencc/dateparser/sumy/yake/quantulum3/segtok/jellyfish → nlp(via_nlp)"
  },
  "families": {
   "ocr": {
@@ -191,12 +191,14 @@
     "tifffile",
     "lazy-loader"
    ],
-   "target_env": "paddle_312",
+   "target_env": "via_paddle_311",
    "alt_envs": [
     "paddle_311",
+    "via_paddle_312",
+    "paddle_312",
     "via_ocr"
    ],
-   "python": "3.12",
+   "python": "3.13",
    "anchor": {
     "cv2": "opencv-contrib-python"
    },
@@ -257,12 +259,13 @@
     "camelot-py",
     "tabula-py",
     "ghostscript",
-    "pypdf2",
     "pdfminer.six"
    ],
-   "target_env": "camelot_311",
-   "alt_envs": [],
-   "python": "3.11"
+   "target_env": "via_camelot_311",
+   "alt_envs": [
+    "camelot_311"
+   ],
+   "python": "3.13"
   },
   "ml_boost": {
    "zh": "梯度提升/資料科學重件",
@@ -276,10 +279,13 @@
     "h5py",
     "tables",
     "numba",
-    "statsmodels"
+    "statsmodels",
+    "cupy-cuda11x",
+    "cupy-cuda12x"
    ],
    "target_env": "via_mix_ds_np2_M",
    "alt_envs": [
+    "via_ml",
     "via_vdf"
    ],
    "python": "3.12"
@@ -324,34 +330,13 @@
     "streamlit",
     "gradio",
     "gradio-client",
-    "altair",
-    "pydeck",
-    "dash",
-    "panel",
-    "bokeh",
-    "nicegui"
+    "nicegui",
+    "flet"
    ],
    "target_env": "via_iso_webui_M",
-   "alt_envs": [],
-   "python": "3.12"
-  },
-  "nlp_heavy": {
-   "zh": "NLP 重件(spaCy 模型/pkuseg C 輪)",
-   "members": [
-    "spacy",
-    "spacy-pkuseg",
-    "zh-core-web-sm",
-    "thinc",
-    "blis",
-    "cymem",
-    "preshed",
-    "murmurhash",
-    "srsly",
-    "catalogue",
-    "langcodes"
+   "alt_envs": [
+    "via_vap_312"
    ],
-   "target_env": "via_iso_nlp_M",
-   "alt_envs": [],
    "python": "3.12"
   },
   "process_mining": {
@@ -367,14 +352,14 @@
    "lane": "VIA_EnvManager_Deploy_VMT.ps1"
   },
   "compilers": {
-   "zh": "編譯器族(Cython/Numba/LLVM)",
+   "zh": "編譯器族(Cython/Numba LLVM/PyO3);cffi/pycparser 屬共用基座不在此",
    "members": [
     "cython",
     "llvmlite",
     "pybind11",
-    "cffi",
     "maturin",
-    "setuptools-rust"
+    "setuptools-rust",
+    "nuitka"
    ],
    "target_env": "via_iso_compilers_H",
    "alt_envs": [],
@@ -383,7 +368,6 @@
   "stealth_proxy": {
    "zh": "反偵測/代理族(R3 腐爛率最高)",
    "members": [
-    "curl-cffi",
     "tls-client",
     "cloudscraper",
     "fake-useragent",
@@ -423,6 +407,178 @@
     "via_core"
    ],
    "python": "3.12"
+  },
+  "nlp": {
+   "zh": "NLP 族(spaCy 家族+中文分詞/文本工具;功能件→via_nlp)",
+   "members": [
+    "spacy",
+    "spacy-pkuseg",
+    "zh-core-web-sm",
+    "thinc",
+    "blis",
+    "cymem",
+    "preshed",
+    "murmurhash",
+    "srsly",
+    "catalogue",
+    "langcodes",
+    "jieba",
+    "opencc-python-reimplemented",
+    "opencc",
+    "dateparser",
+    "sumy",
+    "yake",
+    "quantulum3",
+    "segtok",
+    "jellyfish",
+    "nltk",
+    "gensim",
+    "pkuseg",
+    "ckip-transformers",
+    "wordcloud"
+   ],
+   "target_env": "via_nlp",
+   "alt_envs": [
+    "via_iso_nlp_M"
+   ],
+   "python": "3.12"
+  },
+  "docs": {
+   "zh": "文件處理族(PDF/DOCX/PPTX/Markdown 轉換;功能件→via_vrn_312)",
+   "members": [
+    "pymupdf",
+    "pdfplumber",
+    "pdf2docx",
+    "docx2python",
+    "python-docx",
+    "python-pptx",
+    "markitdown",
+    "pypdf",
+    "pypdf2",
+    "pdfminer-six",
+    "reportlab",
+    "img2pdf",
+    "pikepdf",
+    "ocrmypdf",
+    "docx2txt",
+    "mammoth",
+    "pdf2image",
+    "fonttools"
+   ],
+   "target_env": "via_vrn_312",
+   "alt_envs": [
+    "via_extract_312",
+    "via_vrn4",
+    "via_vrn"
+   ],
+   "python": "3.12"
+  },
+  "html_parse": {
+   "zh": "HTML 解析族(功能件→via_html_312)",
+   "members": [
+    "beautifulsoup4",
+    "bs4",
+    "lxml",
+    "html5lib",
+    "selectolax",
+    "trafilatura",
+    "readability-lxml",
+    "newspaper3k",
+    "extruct",
+    "feedparser",
+    "markdownify",
+    "esprima",
+    "tinycss2",
+    "cssselect",
+    "bleach",
+    "html2text"
+   ],
+   "target_env": "via_html_312",
+   "alt_envs": [],
+   "python": "3.12"
+  },
+  "data_fetch": {
+   "zh": "資料擷取族(市場/總經資料源;功能件→via_vdf_312)",
+   "members": [
+    "yfinance",
+    "akshare",
+    "tushare",
+    "fredapi",
+    "pandas-datareader",
+    "twstock",
+    "finlab",
+    "finmind",
+    "investpy",
+    "ccxt",
+    "alpha-vantage",
+    "yahooquery",
+    "requests-cache",
+    "curl-cffi"
+   ],
+   "target_env": "via_vdf_312",
+   "alt_envs": [
+    "via_vdf"
+   ],
+   "python": "3.12"
+  },
+  "dev_tools": {
+   "zh": "開發/測試/打包工具族(功能件→via_tools_312)",
+   "members": [
+    "black",
+    "flake8",
+    "flake8-polyfill",
+    "autoflake",
+    "isort",
+    "mypy",
+    "pylint",
+    "ruff",
+    "pytest",
+    "pytest-cov",
+    "hypothesis",
+    "coverage",
+    "pre-commit",
+    "tox",
+    "nox",
+    "bandit",
+    "pyinstaller",
+    "altgraph",
+    "pefile",
+    "pywin32-ctypes",
+    "pip-audit",
+    "safety",
+    "vulture",
+    "radon",
+    "pyright",
+    "jupyter",
+    "jupyterlab",
+    "notebook",
+    "ipykernel",
+    "ipython"
+   ],
+   "target_env": "via_tools_312",
+   "alt_envs": [],
+   "python": "3.12"
+  },
+  "plot_ui": {
+   "zh": "繪圖/儀表族(功能件→via_vap_312)",
+   "members": [
+    "dash",
+    "altair",
+    "bokeh",
+    "panel",
+    "seaborn",
+    "kaleido",
+    "pydeck",
+    "holoviews",
+    "hvplot",
+    "mplfinance",
+    "plotly-express"
+   ],
+   "target_env": "via_vap_312",
+   "alt_envs": [
+    "via_vap"
+   ],
+   "python": "3.12"
   }
  },
  "cv2_family": [
@@ -446,19 +602,6 @@
    "python": "3.12",
    "rule": "白名單制(VIA_EnvManager def_PARAM_VIA_CORE_WHITELIST);既有健康境不動(只增)"
   },
-  "paddle_312": {
-   "family": "ocr",
-   "aliases": [
-    "paddle_311",
-    "via_ocr"
-   ],
-   "python": "3.12",
-   "rule": "OCR 專屬境;cv2 統包錨 contrib;headless/opencv-python 永不再裝(Lessons SKIP)"
-  },
-  "camelot_311": {
-   "family": "table_extraction",
-   "python": "3.11"
-  },
   "via_vdf": {
    "purpose": "VDF 資料鍛造(numpy/pandas/pyarrow/duckdb/polars/plotly/openpyxl/xlsxwriter)",
    "python": "3.12"
@@ -478,15 +621,115 @@
   },
   "matrix_5d": "supportive modules/registry/VIA_Env_Matrix_5D_v0100.json(25 規劃境;assignments 只增)",
   "protected_envs": [
-   "via_core",
-   "via_core_312",
    "venv_core",
-   "via_ml",
    "vgf_core",
    "vgf_ml",
+   "via_core",
+   "via_core_312",
    "via_image",
+   "via_ml",
+   "via_supportive_core_313",
    "vmt_pm"
-  ]
+  ],
+  "via_paddle_311": {
+   "family": "ocr",
+   "aliases": [
+    "paddle_311",
+    "paddle_312",
+    "via_paddle_312",
+    "via_ocr"
+   ],
+   "python": "3.13",
+   "rule": "OCR 專屬境(批382 命名律:paddle_311 換名重建);cv2 統包錨 contrib;headless/opencv-python 永不再裝"
+  },
+  "via_camelot_311": {
+   "family": "table_extraction",
+   "aliases": [
+    "camelot_311"
+   ],
+   "python": "3.13",
+   "rule": "表格擷取專屬境(批382 命名律:camelot_311 換名重建)"
+  },
+  "via_vdf_312": {
+   "purpose": "via_vdf_312:VDF 資料鍛造+資料擷取族",
+   "python": "3.12",
+   "existing": "工作站 20260907 實錄在位"
+  },
+  "via_vrn_312": {
+   "purpose": "via_vrn_312:VRN 研報擷取+文件處理族",
+   "python": "3.12",
+   "existing": "工作站 20260907 實錄在位"
+  },
+  "via_vap_312": {
+   "purpose": "via_vap_312:VAP 繪圖/儀表族",
+   "python": "3.12",
+   "existing": "工作站 20260907 實錄在位"
+  },
+  "via_html_312": {
+   "purpose": "via_html_312:HTML 解析族",
+   "python": "3.12",
+   "existing": "工作站 20260907 實錄在位"
+  },
+  "via_nlp": {
+   "purpose": "via_nlp:NLP 族",
+   "python": "3.12",
+   "existing": "工作站 20260907 實錄在位"
+  },
+  "via_ml": {
+   "purpose": "via_ml:深度學習/資料科學重件",
+   "python": "3.12",
+   "existing": "工作站 20260907 實錄在位"
+  },
+  "via_tools_312": {
+   "purpose": "via_tools_312:開發/測試/打包工具族",
+   "python": "3.12",
+   "existing": "工作站 20260907 實錄在位"
+  },
+  "via_extract_312": {
+   "purpose": "via_extract_312:內容擷取(docs 備境)",
+   "python": "3.12",
+   "existing": "工作站 20260907 實錄在位"
+  },
+  "via_supportive_core_313": {
+   "purpose": "via_supportive_core_313:支援模組核心(受保護)",
+   "python": "3.12",
+   "existing": "工作站 20260907 實錄在位"
+  },
+  "via_forge": {
+   "purpose": "via_forge:EngineForge 沙箱",
+   "python": "3.12",
+   "existing": "工作站 20260907 實錄在位"
+  },
+  "via_onnxruntime": {
+   "purpose": "via_onnxruntime:ONNX Runtime 專屬",
+   "python": "3.12",
+   "existing": "工作站 20260907 實錄在位"
+  },
+  "via_lightgbm": {
+   "purpose": "via_lightgbm:LightGBM 專屬",
+   "python": "3.12",
+   "existing": "工作站 20260907 實錄在位"
+  },
+  "via_catboost": {
+   "purpose": "via_catboost:CatBoost 專屬",
+   "python": "3.12",
+   "existing": "工作站 20260907 實錄在位"
+  },
+  "via_steel_global_matrix_312": {
+   "purpose": "via_steel_global_matrix_312:鋼鐵全球矩陣專案",
+   "python": "3.12",
+   "existing": "工作站 20260907 實錄在位"
+  },
+  "via_vrn4": {
+   "purpose": "via_vrn4:VRN v4",
+   "python": "3.12",
+   "existing": "工作站 20260907 實錄在位"
+  },
+  "via_vrn_core_312": {
+   "purpose": "via_vrn_core_312:VRN 核心",
+   "python": "3.12",
+   "existing": "工作站 20260907 實錄在位"
+  }
  },
  "managed_prefixes": [
   "via_",
@@ -498,11 +741,11 @@
   "vgf_"
  ],
  "routing_order": [
-  "explicit_preferred_env",
+  "explicit_preferred_env / package_env_overrides(catboost→via_catboost 等)",
   "lessons_skip(everywhere=拒;base=拒入 base)",
   "via_core_whitelist(EnvManager 政策母版;既有健康境優先)",
-  "family(本冊 families)",
-  "envmanager_purpose_hints",
+  "family(本冊 families;target_env→alt_envs 既有境優先;非 via_ 名依 naming_law.renames 正名)",
+  "envmanager_purpose_hints(出口加 via_ 前綴)",
   "matrix_5d_lib_index",
   "via_iso_quarantine(候裁)"
  ],
@@ -526,7 +769,9 @@
    "H3 共用節點異動(反向相依≥閾)=Sequence-Dependent",
    "H4 單寫者律:同一目標境一次只由一段寫入",
    "H5 尾版律:引擎一律動態尾版",
-   "H6 拒裝名單(Lessons SKIP)永不入計畫"
+   "H6 拒裝名單(Lessons SKIP)永不入計畫",
+   "H4b 家族整包單寫者:同一件只歸一家族;多家族共用相依=共用支援件,最後候裁",
+   "H7 命名律:非 via_ 境=NAMING_VIOLATION;MDL050/OCR 車道/Provision 同步正名"
   ]
  },
  "rounds": {
@@ -624,5 +869,30 @@
    "zh": "UI Matrix 渲染與非阻塞 PowerShell 部署",
    "engine": "本引擎 matrix + Invoke-VIA-EnvGovernance-v0100.ps1"
   }
+ },
+ "naming_law": {
+  "prefix": "via_",
+  "exempt": [
+   "BASE"
+  ],
+  "rule": "受管境一律 via_ 前綴(工作站實錄:camelot_311/paddle_311 兩境違律)。rename 流程:uv venv via_<舊名> --python <舊境實際版本> → uv pip sync 舊境 lock → uv pip check(cv2 錨遮蔽殘餘=接受)→ 驗綠後舊境改名 _retire_<舊名>(候裁 --approve-remove;掃描自然除名)→ 別名冊 A 法:alias 改指新境零檔案移動",
+  "renames": {
+   "paddle_311": "via_paddle_311",
+   "camelot_311": "via_camelot_311",
+   "paddle_312": "via_paddle_312"
+  },
+  "downstream": [
+   "CGC_MDL050_EnvRebuild v0109:_route_env 出口一律 via_ 前綴",
+   "via_ocr_super v0101:paddleocr 車道優先 via_paddle_*",
+   "CGC_MDL062_Provision v0102:功能件改於 via_ 境檢",
+   "VIA_EnvManager 正本零觸碰(purpose hints 舊鍵=別名層)"
+  ]
+ },
+ "package_env_overrides": {
+  "catboost": "via_catboost",
+  "lightgbm": "via_lightgbm",
+  "onnxruntime": "via_onnxruntime",
+  "onnxruntime-gpu": "via_onnxruntime",
+  "pm4py": "vmt_pm"
  }
 }

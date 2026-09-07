@@ -14,8 +14,11 @@ Invoke-VIA-EnvGovernance v0100 — 環境治理一貼即用單一 PowerShell(批
       via-envgov-auto -Online -Approve     # 執行 GREEN 段
       via-envgov-auto -Online -Approve -ApproveRemove   # 連 base 端移除(候裁段)
       via-envgov-auto -Background;  via-envgov-auto -Watch
+      via-envgov-auto -Rename                       # 批382 命名律:非 via_ 境換名重建計畫(唯讀出令)
+      via-envgov-auto -Rename -Approve [-ApproveRemove]   # 建境+lock 同步+驗證(+退役舊境);--approve 即同意 uv 取件上網
 #>
 param(
+    [switch]$Rename,
     [switch]$Approve,
     [switch]$ApproveRemove,
     [switch]$Online,
@@ -70,14 +73,16 @@ if (-not $Engine) { Write-Host "  [FAIL] CGC_MDL135_EnvGovernance 尾版缺(誠�
 $Py = Get-Py
 $mode = "run"
 if ($Approve) { $mode = "apply" }
+if ($Rename) { $mode = "rename"; $Online = $true }   # 批382:rename 執行=uv pip sync 取件(--approve 即同意上網)
 $argsList = @($mode)
-if (-not $Online) { $argsList += "--offline" }
+if (-not $Online -and -not $Rename) { $argsList += "--offline" }
+if ($Rename -and $Approve) { $argsList += "--execute" }
 if ($Approve) { $argsList += "--approve" }
 if ($ApproveRemove) { $argsList += "--approve-remove" }
 if ($EnvRoot) { $argsList += @("--env-root", $EnvRoot) }
 if ($BasePython) { $argsList += @("--base-python", $BasePython) }
 if ($Only) { $argsList += @("--only", $Only) }
-$argsList += @("--workers", "$Workers", "--task-timeout", "$TaskTimeout")
+if (-not $Rename) { $argsList += @("--workers", "$Workers", "--task-timeout", "$TaskTimeout") }
 $ts = Get-Date -Format "yyyyMMdd_HHmmss"
 $Log = Join-Path $RunDir ("LAUNCH_" + $ts + ".log")
 

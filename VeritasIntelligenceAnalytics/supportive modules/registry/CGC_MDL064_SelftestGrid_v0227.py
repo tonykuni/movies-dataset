@@ -311,7 +311,7 @@ v0224→v0225(批376 操作員令「Final test and user test debug till them wor
 v0225→v0226(批377 操作員令「safely proceed with the 10 parallel procedures … Prevent hydra issues」):+第 185 站十道並行編排九檢(MDL134;
   FixAll 步冊→資源鏈 DAG 單寫者律;Hydra 哨兵 H1–H5)+第 186 站資料本機家九檢(MDL123 v0101 可用律;此前從未入站)——186 站。
 v0226→v0227(批381 操作員令「依照已成功地建構布局向上新增;最壞還原成原本規劃;base 只放該有的工具;其他放在 via_core 及 via_ 開頭的環境」):
-  +第 187 站環境治理統一引擎 25 檢(CGC_MDL135;全景式分析/uv 快篩行解析/base 該有冊閉包/OCR 家族整包 albucore 案/白名單優先路由/
+  +第 187 站環境治理統一引擎 29 檢(CGC_MDL135;批382 +非可選閉包/單寫者律/專屬境覆寫/命名律 rename;全景式分析/uv 快篩行解析/base 該有冊閉包/OCR 家族整包 albucore 案/白名單優先路由/
   Zero-Hydra 分流拓撲/三輪段冊/模擬判讀/未授權零動作/LKGC 晉升律/rollback 原本規劃/四分區矩陣/log JSONL;零網路零環境依賴)——187 站。
 用法:via-selftest            → 全矩陣(43 站)
       via-selftest --refail  → 只重跑上次紅站+全原因;via-selftest --only 共識,調整後
@@ -575,7 +575,7 @@ def battery(fast: bool):
     add("產品資格閘九檢(批376)", newest("CGC_MDL133_ProductGate_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("十道並行編排九檢(批377)", newest("CGC_MDL134_ParallelLanes_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("資料本機家九檢(批377)", newest("CGC_MDL123_DataHome_v0*.py", HERE), ["--selftest"], "rc0", 300)
-    add("環境治理統一引擎 25 檢(批381)", newest("CGC_MDL135_EnvGovernance_v*.py", HERE), ["--selftest"], "rc0", 300)
+    add("環境治理統一引擎 29 檢(批381/382)", newest("CGC_MDL135_EnvGovernance_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("selftest grid(自指:文件)", None, [], "doc", 10)  # 佔位:自身以 --fast 遞迴屬禁,列 SKIP
     return B
 

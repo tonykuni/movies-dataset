@@ -40,6 +40,7 @@ installed.」→ 既有工具(EnvFix/InstallGate doctor)未閉環;根因=OCR 家
      via-envgov panorama | plan | apply --approve [--approve-remove] [--only S02,S03]
      via-envgov lkgc [snapshot|promote|status]
      via-envgov rollback [--to LKGC_xxx.json | --baseline] [--execute --approve [--approve-remove]]
+     via-envgov rename [--from 舊境 [--to 新境]] [--execute --approve [--approve-remove]]   (批382 命名律:非 via_ 境換名重建)
      via-envgov matrix | digest | --selftest
 紅線:零安裝零刪除預設;破壞段永不自動;尾版律(引擎動態尾版);Zero-Hydra;誠實三態。
 """
@@ -607,8 +608,10 @@ def family_index(baseline: dict) -> dict:
     return idx
 
 
-def closure(dists: dict, roots: set, blocked: set | None = None) -> set:
-    """已裝相依閉包(含 extra 相依—已裝即支援件);封鎖家族件永不被閉包收留。"""
+def closure(dists: dict, roots: set, blocked: set | None = None, follow_optional: bool = True) -> set:
+    """已裝相依閉包;封鎖家族件永不被閉包收留。
+    follow_optional=True(base 該有冊):extra 可選相依已裝即視為支援件(保守留 base);
+    follow_optional=False(家族整包/白名單群):只走必要相依(批382 工作站實錄:extras 把 bleach/greenlet 拖進 browser 家族=誤判根因)。"""
     blocked = blocked or set()
     keep, stack = set(), [r for r in roots if r in dists]
     while stack:
@@ -617,7 +620,9 @@ def closure(dists: dict, roots: set, blocked: set | None = None) -> set:
             continue
         keep.add(n)
         for raw in dists[n].get("requires", []):
-            nm, _spec, _opt = parse_req(raw)
+            nm, _spec, opt = parse_req(raw)
+            if opt and not follow_optional:
+                continue
             if nm and nm in dists and nm not in keep and nm not in blocked:
                 stack.append(nm)
     return keep
@@ -663,6 +668,10 @@ def route_package(pkg: str, baseline: dict, present_envs: set, skips: dict) -> d
     if skips.get(p) == "everywhere":
         return {"pkg": p, "target": "", "python": "", "exists": False, "via": "lessons_skip", "note": "拒裝名單(everywhere)永不入計畫"}
     fam = family_index(baseline).get(p)
+    ov = {canon(k): v for k, v in (baseline.get("package_env_overrides") or {}).items()}
+    if p in ov:  # explicit_preferred_env:本冊專屬境覆寫(catboost→via_catboost;lightgbm→via_lightgbm;onnxruntime→via_onnxruntime)
+        pres = {e.lower(): e for e in present_envs}
+        return {"pkg": p, "target": pres.get(ov[p].lower(), ov[p]), "python": "", "exists": ov[p].lower() in pres, "via": "package_env_overrides", "family": fam or ""}
     if p in core_whitelist():  # 政策母版白名單優先(既有健康 via_core 承接;routing_order)
         pres = {e.lower(): e for e in present_envs}
         for a in ["via_core"] + list((baseline.get("env_layout") or {}).get("via_core", {}).get("aliases", [])):
@@ -686,37 +695,113 @@ def route_package(pkg: str, baseline: dict, present_envs: set, skips: dict) -> d
     return {"pkg": p, "target": pres.get(q, q), "python": "3.12", "exists": q in pres, "via": "quarantine", "family": ""}
 
 
+_IMPORT_NAME = {"pymupdf": "fitz", "python-docx": "docx", "beautifulsoup4": "bs4", "pillow": "PIL", "opencv-python": "cv2", "opencv-contrib-python": "cv2",
+                "opencv-python-headless": "cv2", "opencv-contrib-python-headless": "cv2", "scikit-learn": "sklearn", "scikit-image": "skimage", "pyyaml": "yaml",
+                "python-dateutil": "dateutil", "pdfminer-six": "pdfminer", "python-pptx": "pptx", "pypdf2": "PyPDF2", "opencc-python-reimplemented": "opencc",
+                "readability-lxml": "readability", "python-dotenv": "dotenv", "typing-extensions": "typing_extensions", "markdown-it-py": "markdown_it", "attrs": "attr",
+                "camelot-py": "camelot", "tabula-py": "tabula", "requests-html": "requests_html", "curl-cffi": "curl_cffi", "spacy-pkuseg": "spacy_pkuseg",
+                "pywin32": "win32api", "msgpack": "msgpack", "tables": "tables", "gradio-client": "gradio_client", "flake8-polyfill": "flake8_polyfill"}
+_IMPORT_RE = re.compile(r"^\s*(?:from|import)\s+([A-Za-z_][A-Za-z0-9_]*)", re.M)
+_ENGINE_INDEX: dict | None = None
+
+
+def import_name(pkg: str) -> str:
+    return _IMPORT_NAME.get(canon(pkg), canon(pkg).replace("-", "_"))
+
+
+def engine_import_index(force: bool = False) -> dict:
+    """倉庫引擎 import 索引 {檔名: {頂層模組}}(一次掃描快取;排除退役/收容/鏡像/副本)——家族拉出後之引擎影響評估(以 base python 啟動之引擎會失去該件)。"""
+    global _ENGINE_INDEX
+    if _ENGINE_INDEX is not None and not force:
+        return _ENGINE_INDEX
+    idx: dict[str, set] = {}
+    skip = ("VIA_RetiredEngines", "references", "SCOPE_COPY", "BACKUP", "__pycache__", "_superseded", "_nexuscore", "VIA_Standalone_Package", "VIA_CentralGovernance_ALL")
+    for root in (VIA / "functional modules", REG, SUP):
+        if not root.is_dir():
+            continue
+        for f in root.rglob("*.py"):
+            sp = str(f)
+            if any(k in sp for k in skip) or re.search(r"_sha[0-9a-f]{6,}", f.name):
+                continue
+            try:
+                mods = {m.lower() for m in _IMPORT_RE.findall(f.read_text(encoding="utf-8", errors="replace"))}
+            except Exception:
+                continue
+            if mods:
+                idx[f.stem] = mods
+    _ENGINE_INDEX = idx
+    return idx
+
+
+def engine_impact(pkgs, index: dict) -> dict:
+    """件群 → 倉庫中 import 該件之引擎(檔名);純函式可自測。"""
+    names = {import_name(p).lower() for p in pkgs}
+    hit = sorted(f for f, mods in index.items() if mods & names)
+    return {"n": len(hit), "names": hit}
+
+
+def naming_check(scans: list[dict], baseline: dict) -> list[dict]:
+    """H7 命名律(批382):受管境一律 via_ 前綴;非 via_ 境=NAMING_VIOLATION(BASE/_retire_ 豁免)。"""
+    law = baseline.get("naming_law") or {}
+    prefix = str(law.get("prefix", "via_")).lower()
+    renames = {k.lower(): v for k, v in (law.get("renames") or {}).items()}
+    out = []
+    for s in scans:
+        n = s["env"]["name"]
+        if n == "BASE" or n.lower().startswith(prefix) or n.startswith("_retire_"):
+            continue
+        out.append({"env": n, "suggested": renames.get(n.lower(), prefix + n), "python": s.get("python"), "path": s["env"].get("path"),
+                    "py": s["env"].get("py"), "n_dists": _ndists(s), "ok": s.get("ok"), "conflicts": len(s.get("conflicts", []))})
+    for v in out:
+        log_event("NAMING", v["env"], "", "YELLOW", f"非 via_ 境 → {v['suggested']}(via-envgov rename)")
+    return out
+
+
 def analyze_base(scan: dict, baseline: dict, present_envs: set, skips: dict) -> dict:
-    """base 該有冊比對:manifest 缺件 / 相依閉包 / 拉出候選(家族整包)/ 影響評估。"""
+    """base 該有冊比對:manifest 缺件 / 相依閉包 / 拉出候選(家族整包;單寫者律)/ 影響評估(閉包相依+引擎 import)。"""
     dists = scan.get("dists", {}) or {}
     ms = manifest_sets(baseline)
     fidx = family_index(baseline)
     never = set(baseline.get("base", {}).get("never_in_base_families", []))
+    overrides = {canon(k): v for k, v in (baseline.get("package_env_overrides") or {}).items()}
     blocked_pkgs = {p for p, f in fidx.items() if f in never}
     manifest_missing = sorted(p for p in (ms["toolchain"] | ms["engine_core"]) if p not in dists and p not in BOOT)
     keep = closure(dists, ms["all"], blocked=blocked_pkgs)
     os_managed = sorted(p for p, i in dists.items() if i.get("layer") == "os" and p not in blocked_pkgs)  # Linux 發行版 dist-packages=OS 管理,不動不列
     extras = sorted(p for p in dists if p not in keep and p not in BOOT and p not in os_managed)
-    # routing_order:via_core 白名單優先(政策母版)——白名單件+其私有相依閉包成群改道 via_core,不入家族整包
+    ov_pkgs = sorted(p for p in extras if p in overrides)  # ① 專屬境覆寫(catboost→via_catboost 等)
+    # ② routing_order:via_core 白名單優先(政策母版)——白名單件+其必要相依閉包成群改道 via_core
     wl = core_whitelist()
-    wl_roots = sorted(p for p in extras if p in wl)
-    wl_members = (closure(dists, set(wl_roots), blocked=blocked_pkgs - set(wl_roots)) - keep - BOOT) if wl_roots else set()
-    fam_pool = [p for p in extras if p not in wl_members]
-    # 家族整包(根+境內相依,不含閉包件;cv2 家族隨 OCR 家族)
-    bundles: dict[str, dict] = {}
-    assigned: set = set()
+    wl_roots = sorted(p for p in extras if p in wl and p not in overrides)
+    wl_members = (closure(dists, set(wl_roots), blocked=blocked_pkgs - set(wl_roots), follow_optional=False) - keep - BOOT - set(ov_pkgs)) if wl_roots else set()
+    fam_pool = [p for p in extras if p not in wl_members and p not in overrides]
+    # ③ 家族整包:只走必要相依;單寫者律(H4b)=件只歸一家族;多家族共用相依=共用支援件(最後候裁)
+    rev = reverse_deps(dists)
+    claims: dict[str, set] = {}
+    fam_roots: dict[str, set] = {}
+    fam_full: dict[str, set] = {}
     for fam in sorted({fidx[p] for p in fam_pool if p in fidx}):
         roots = {p for p in fam_pool if fidx.get(p) == fam}
-        full = closure(dists, roots)  # 目標境需完整閉包(含 base 留用件之副本)=自足境;LKGC 精神鎖現版
-        members = full - keep - BOOT - wl_members
-        members = {m for m in members if fidx.get(m) in (fam, None)}  # 他家族件歸他家族(各自拉出)
+        full = closure(dists, roots, follow_optional=False)
+        fam_roots[fam], fam_full[fam] = roots, full
+        for m in full - keep - BOOT - wl_members - set(ov_pkgs):
+            if fidx.get(m) in (fam, None):  # 他家族件歸他家族(各自拉出;目標境仍自足=install 含之)
+                claims.setdefault(m, set()).add(fam)
+    shared = sorted(m for m, fs in claims.items() if len(fs) > 1)
+    bundles: dict[str, dict] = {}
+    assigned: set = set(shared)
+    index = engine_import_index() if fam_roots else {}
+    for fam, roots in fam_roots.items():
+        members = sorted(m for m, fs in claims.items() if fs == {fam})
         tgt, pyv, ex = resolve_target(fam, baseline, present_envs)
-        impact = sorted({r for m in members for r in reverse_deps(dists).get(m, set()) if r in keep})
-        bundles[fam] = {"family": fam, "blocked": fam in never, "roots": sorted(roots), "members": sorted(members),
-                        "install": sorted(full - BOOT), "target": tgt, "python": pyv, "target_exists": ex, "impact_kept": impact,
+        impact = sorted({r for m in members for r in rev.get(m, set()) if r in keep})
+        eng = engine_impact(roots, index)
+        bundles[fam] = {"family": fam, "blocked": fam in never, "roots": sorted(roots), "members": members,
+                        "install": sorted(fam_full[fam] - BOOT), "target": tgt, "python": pyv, "target_exists": ex, "impact_kept": impact,
+                        "engines_n": eng["n"], "engines": eng["names"][:8],
                         "severity": "RED" if fam in never else "YELLOW"}
-        assigned |= members
-    unclassified = [p for p in extras if p not in assigned]
+        assigned |= set(members)
+    unclassified = [p for p in extras if p not in assigned and p not in overrides]
     routed_other: dict[str, list] = {}
     for p in unclassified:
         r = route_package(p, baseline, present_envs, skips)
@@ -725,10 +810,15 @@ def analyze_base(scan: dict, baseline: dict, present_envs: set, skips: dict) -> 
             r = route_package(wl_roots[0], baseline, present_envs, skips) if wl_roots else r
         routed_other.setdefault(r["target"] or "(拒裝)", []).append({"pkg": p, "ver": dists[p]["ver"], "via": via,
                                                                    "note": r.get("note", ""), "exists": r["exists"], "python": r["python"]})
+    pres = {e.lower(): e for e in present_envs}
+    for p in ov_pkgs:
+        tgt = overrides[p]
+        routed_other.setdefault(pres.get(tgt.lower(), tgt), []).append({"pkg": p, "ver": dists[p]["ver"], "via": "package_env_overrides",
+                                                                        "note": "專屬境(本冊 package_env_overrides)", "exists": tgt.lower() in pres, "python": ""})
     blocked_present = sorted(p for p in dists if p in blocked_pkgs)
     return {"n_dists": len(dists), "manifest_missing": manifest_missing, "keep_n": len(keep), "extras": extras,
             "bundles": bundles, "routed_other": routed_other, "blocked_present": blocked_present, "os_managed": os_managed,
-            "manifest_src": baseline.get("_src", "")}
+            "shared_support": shared, "overrides": ov_pkgs, "manifest_src": baseline.get("_src", "")}
 
 
 def classify_conflicts(scans: list[dict], baseline: dict, base_analysis: dict, skips: dict) -> list[dict]:
@@ -844,6 +934,11 @@ def analyze_via_envs(scans: list[dict], baseline: dict) -> list[dict]:
             row["status"] = "WARN"
         if "__rb" in name:
             row["notes"].append("旁建候換境(MDL050 via-rebuild 驗綠後切換候裁;原境不動)")
+        law = baseline.get("naming_law") or {}
+        if not name.lower().startswith(str(law.get("prefix", "via_")).lower()) and not name.startswith("_retire_"):
+            row["notes"].append(f"命名律違反(H7)→ via-envgov rename(建議 {(law.get('renames') or {}).get(name, law.get('prefix', 'via_') + name)})")
+            if row["status"] == "OK":
+                row["status"] = "WARN"
         rows.append(row)
     return rows
 
@@ -904,7 +999,7 @@ def _pins_for_bundle(bundle: dict, dists: dict, baseline: dict, skips: dict) -> 
 
 
 def build_plan(scans: list[dict], baseline: dict, base_analysis: dict, conflicts: list[dict], hydra: list[dict],
-               via_rows: list[dict], env_root: str, skips: dict) -> dict:
+               via_rows: list[dict], env_root: str, skips: dict, naming: list[dict] | None = None) -> dict:
     """段冊:ENSURE_ENV/INSTALL/VERIFY(並行)→ REMOVE_BASE(候裁序跑)→ VERIFY base → LOCK → PROMOTE。"""
     base = next((s for s in scans if s["env"]["name"] == "BASE"), {})
     dists = base.get("dists", {}) if base else {}
@@ -960,6 +1055,16 @@ def build_plan(scans: list[dict], baseline: dict, base_analysis: dict, conflicts
         v = add("VERIFY", tgt, env_path=env_path, deps=[i["id"]], goal=f"uv pip check {tgt}")
         add("REMOVE_BASE", "BASE", pins=[it["pkg"] for it in items], family="(單件)", deps=[v["id"]], cls="SEQUENTIAL", round=2, destructive=True,
             goal=f"base 端移除閉包外 {len(items)} 件(候裁;--approve-remove)", note="單件路由;移除前目標境須 VERIFY 綠")
+    # 共用支援件(多家族必要相依;單寫者律):待所有家族目標境 VERIFY 綠後最後候裁移除
+    if base_analysis.get("shared_support"):
+        fam_verifies = [s["id"] for s in stages if s["kind"] == "VERIFY" and s["env"] != "BASE"]
+        add("REMOVE_BASE", "BASE", pins=list(base_analysis["shared_support"]), family="(共用支援件)", deps=fam_verifies, cls="SEQUENTIAL", round=2, destructive=True,
+            goal=f"base 端移除共用支援件 {len(base_analysis['shared_support'])} 件(多家族相依;所有家族境 VERIFY 綠後最後候裁;--approve-remove)",
+            note="H4b 單寫者律:多家族共用相依不歸任一家族,各目標境自足後方移除")
+    # 命名律(H7):非 via_ 境 → 委派 via-envgov rename(換名重建;唯讀印令)
+    for v in (naming or []):
+        add("RENAME_ENV", v["env"], cls="SEQUENTIAL", round=2, goal=f"命名律:{v['env']} → {v['suggested']}(uv venv 同 Python {v.get('python') or '?'} + uv pip sync 舊境 lock + check;驗綠後舊境 _retire_ 候裁)",
+            argv_hint=f"via-envgov rename --from {v['env']} --execute --approve", note="via-envgov rename 唯讀出令;--execute --approve 建境+同步+驗證;--approve-remove 退役舊境")
     # base manifest 缺件補齊(非封鎖件)
     repair = [c["required"] + (c.get("spec") or "") for c in conflicts if c.get("action") == "REPAIR_BASE" and c.get("required")]
     repair += base_analysis.get("manifest_missing", [])
@@ -1160,7 +1265,7 @@ def stage_commands(st: dict, base_py: str) -> tuple[list[list[str]], list[str], 
             argvs.append([base_py, "-m", "pip", "uninstall", "-y", p])
             ps.append(f'& "{base_py}" -m pip uninstall -y {p}   # 候裁(--approve-remove)')
             sh.append(f'"{base_py}" -m pip uninstall -y {p}   # 候裁(--approve-remove)')
-    elif k in ("DELEGATE_REBUILD", "DELEGATE_SPLIT", "PRUNE"):
+    elif k in ("DELEGATE_REBUILD", "DELEGATE_SPLIT", "PRUNE", "RENAME_ENV"):
         ps.append(f"# {st.get('argv_hint', '')}   # 委派/候裁:操作員自跑")
         sh.append(f"# {st.get('argv_hint', '')}   # 委派/候裁:操作員自跑")
     return argvs, ps, sh
@@ -1217,8 +1322,8 @@ def apply_plan(plan: dict, scans: list[dict], approve: bool, approve_remove: boo
         st = by[i]
         k = st["kind"]
         deps_ok = all(by[d]["result"].get("state") in ("OK", "SKIP_EXISTS") for d in st["deps"] if d in by)
-        if k in ("LOCK", "PROMOTE_LKGC", "PRUNE", "DELEGATE_REBUILD", "DELEGATE_SPLIT"):
-            st["result"] = {"state": "SKIP", "note": "R3/委派段由 run 收尾或操作員自跑"}
+        if k in ("LOCK", "PROMOTE_LKGC", "PRUNE", "DELEGATE_REBUILD", "DELEGATE_SPLIT", "RENAME_ENV"):
+            st["result"] = {"state": "SKIP", "note": "R3/委派段由 run 收尾或操作員自跑(rename 走 via-envgov rename)"}
             summary["skipped"] += 1
             continue
         if only and st["id"] not in only:
@@ -1473,6 +1578,133 @@ def rollback_execute(rb: dict, approve: bool, approve_remove: bool) -> dict:
 
 
 # ══════════════════════════════════════════════════════════════════════════════
+# ⑨b 命名律換名重建(批382):via-envgov rename [--from X [--to Y]] [--execute --approve [--approve-remove]]
+# ══════════════════════════════════════════════════════════════════════════════
+def rename_plan(envs: list[dict], baseline: dict, env_root: str, only_from: str | None = None, to_name: str | None = None) -> list[dict]:
+    """非 via_ 境 → 換名重建計畫(純函式可自測):新境=via_<舊名>(冊 renames 優先;--to 覆寫);Python=舊境實際版本;lock=舊境現況。"""
+    law = baseline.get("naming_law") or {}
+    prefix = str(law.get("prefix", "via_"))
+    renames = {k.lower(): v for k, v in (law.get("renames") or {}).items()}
+    items = []
+    for e in envs:
+        n = e["name"]
+        if n == "BASE" or n.lower().startswith(prefix.lower()) or n.startswith("_retire_"):
+            continue
+        if only_from and n.lower() != only_from.lower():
+            continue
+        new = to_name if (only_from and to_name) else renames.get(n.lower(), prefix + n)
+        items.append({"old": n, "new": new, "old_path": e.get("path", ""), "new_path": str(Path(env_root) / new), "py": e.get("py"),
+                      "python": e.get("python", ""), "lock": "", "state": "PLAN"})
+    return items
+
+
+def rename_commands(it: dict) -> tuple[list[str], list[str]]:
+    mm = ".".join(str(it.get("python") or "").split(".")[:2]) if str(it.get("python") or "")[:1].isdigit() else ""
+    np_, op = it["new_path"], it["old_path"]
+    pyw, pyu = f"{np_}\\Scripts\\python.exe", str(PurePosixPath(np_.replace("\\", "/")) / "bin" / "python")
+    retire = str(Path(op).parent / f"_retire_{it['old']}") if op else ""
+    lock = it.get("lock") or "<lock>"
+    ps = [f"# 命名律 {it['old']} → {it['new']}(Python {mm or '同 base'};lock {lock})",
+          f'uv venv "{np_}"' + (f" --python {mm}" if mm else ""),
+          f'uv pip sync --python "{pyw}" "{lock}"',
+          f'uv pip check --python "{pyw}"',
+          f'# Rename-Item -LiteralPath "{op}" "_retire_{it["old"]}"   # 候裁(--approve-remove;驗綠後;掃描自然除名)',
+          f"# 別名冊 A 法:VIA_Env_Alias_Map {it['old']} → {it['new']}(路由/工具改指新境;零檔案移動可即回退)"]
+    sh = [f"# 命名律 {it['old']} → {it['new']}",
+          f'uv venv "{np_.replace(chr(92), "/")}"' + (f" --python {mm}" if mm else ""),
+          f'uv pip sync --python "{pyu}" "{lock.replace(chr(92), "/")}"',
+          f'uv pip check --python "{pyu}"',
+          f'# mv "{op.replace(chr(92), "/")}" "{retire.replace(chr(92), "/")}"   # 候裁(--approve-remove)']
+    return ps, sh
+
+
+def do_rename(args: list[str]) -> int:
+    baseline = load_baseline()
+    skips = lessons_skip()
+    roots = [r for r in (_arg_after(args, "--roots") or "").split(os.pathsep) if r]
+    env_root = _arg_after(args, "--env-root")
+    envs = discover_envs(baseline, roots, env_root, _arg_after(args, "--base-python"))
+    er = env_root or next((str(r) for r in discover_roots(roots, None) if r.is_dir()), str(Path.home() / "envs"))
+    items = rename_plan(envs, baseline, er, _arg_after(args, "--from"), _arg_after(args, "--to"))
+    execute, approve, approve_remove = "--execute" in args, "--approve" in args, "--approve-remove" in args
+    ts = _RUN_ID
+    print(f"=== 命名律換名重建(批382)· MDL135 v{VERSION} · {ts} · 非 via_ 境 {len(items)} · {'執行' if execute and approve else '唯讀出令'} ===")
+    if not items:
+        print("  [OK ] 受管境全數 via_ 前綴(命名律 H7 綠)")
+        log_event("RENAME", "*", "", "GREEN", "無非 via_ 境")
+        return 0
+    OUT.mkdir(parents=True, exist_ok=True)
+    LOCK_DIR.mkdir(parents=True, exist_ok=True)
+    ps_all = ['$ErrorActionPreference = "Stop"', f"# VIA 命名律換名重建 {ts}(MDL135)— 候裁段以 # 註記"]
+    sh_all = ["#!/bin/sh", "set -e", f"# VIA 命名律換名重建 {ts}"]
+    for it in items:
+        env = {"name": it["old"], "py": it["py"], "path": it["old_path"]}
+        pr = probe_env(env, timeout=120) if it["py"] else {"ok": False, "err": "python 缺"}
+        if pr.get("ok"):
+            it["python"] = pr.get("python", it.get("python", ""))
+            lock = LOCK_DIR / f"{it['old']}.lock.txt"
+            lock.write_text(f"# VIA env lock · {it['old']} · python {it['python']} · {now_iso()}\n" + "\n".join(sorted(f"{n}=={i['ver']}" for n, i in pr.get("dists", {}).items())) + "\n", encoding="utf-8")
+            it["lock"] = str(lock)
+            it["n_dists"] = len(pr.get("dists", {}))
+        else:
+            it["state"] = "SKIP"
+            it["note"] = f"舊境探針失敗:{pr.get('err')}"
+        ps, sh = rename_commands(it)
+        ps_all += ps
+        sh_all += sh
+        print(f"  [{it['state']:4s}] {it['old']} → {it['new']} · py{it.get('python') or '?'} · 件 {it.get('n_dists', '?')} · lock {Path(it['lock']).name if it.get('lock') else '—'}{(' · ' + it['note']) if it.get('note') else ''}")
+        if not (execute and approve) or it["state"] == "SKIP":
+            continue
+        newp = Path(it["new_path"])
+        mm = ".".join(str(it["python"]).split(".")[:2]) if str(it["python"])[:1].isdigit() else ""
+        ok = True
+        if not env_python(newp):
+            a = [_UV or "uv", "venv", str(newp)] + (["--python", mm] if mm else [])
+            print(f"     $ {' '.join(a)[:160]}")
+            r = run_cmd(a, timeout=900, cwd=ROOT if (ROOT / "uv.toml").exists() else None)
+            if r["rc"] != 0:
+                ok = False
+                tail = (r["err"] or r["out"]).strip().splitlines()
+                it["state"], it["note"] = "FAIL", "venv:" + (tail[-1][:120] if tail else "rc" + str(r["rc"]))
+        npy = env_python(newp) if ok else None
+        if ok and not npy:
+            ok, it["state"], it["note"] = False, "FAIL", "新境 python 缺"
+        if ok:
+            a = [_UV or "uv", "pip", "sync", "--python", str(npy), it["lock"]]
+            print(f"     $ {' '.join(a)[:160]}")
+            r = run_cmd(a, timeout=1800, cwd=ROOT if (ROOT / "uv.toml").exists() else None)
+            if r["rc"] != 0:
+                tail = (r["err"] or r["out"]).strip().splitlines()
+                ok, it["state"], it["note"] = False, "FAIL", "sync:" + (tail[-1][:120] if tail else "?")
+        if ok:
+            vr = verify_env(it["new"], str(npy), baseline, skips)
+            it["verify"] = vr["note"]
+            if not vr["ok"]:
+                ok, it["state"], it["note"] = False, "FAIL", "verify:" + vr["note"]
+        if ok:
+            it["state"] = "OK"
+            if approve_remove and it["old_path"] and Path(it["old_path"]).is_dir():
+                retire = Path(it["old_path"]).parent / f"_retire_{it['old']}"
+                try:
+                    os.rename(it["old_path"], retire)
+                    it["retired"] = str(retire)
+                except Exception as exc:
+                    it["note"] = f"退役改名失敗(舊境保留):{type(exc).__name__}"
+            else:
+                it["note"] = "新境驗綠;舊境保留(--approve-remove 才退役)"
+        log_event("RENAME_EXEC", it["old"], "", it["state"], f"→ {it['new']} {it.get('note', '')} {it.get('verify', '')}")
+        print(f"  [{it['state']:4s}] {it['old']} → {it['new']} · {it.get('verify', '')} · {it.get('note', '')}{(' · 退役 ' + it['retired']) if it.get('retired') else ''}")
+    (OUT / f"RENAME_EXEC_{ts}.ps1").write_text("\n".join(ps_all) + "\n", encoding="utf-8-sig")
+    (OUT / f"RENAME_EXEC_{ts}.sh").write_text("\n".join(sh_all) + "\n", encoding="utf-8")
+    _write_json(OUT / f"RENAME_{ts}.json", {"schema": "VIA.EnvGovernance.Rename.v1", "ts": ts, "machine": machine_hash(), "items": items, "executed": bool(execute and approve)})
+    print(f"  [檔] RENAME_EXEC_{ts}.ps1/.sh · RENAME_{ts}.json(VIA_Reports/env_governance)")
+    if not (execute and approve):
+        print("  [次步] via-envgov rename --execute --approve(建境+lock 同步+驗證;舊境不動)→ 再加 --approve-remove 退役舊境(改名 _retire_);工具改指新境:別名冊 A 法")
+    log_event("RENAME", "*", "", "PLAN" if not (execute and approve) else "EXEC", f"{len(items)} 境:" + ", ".join(f"{i['old']}→{i['new']}:{i['state']}" for i in items))
+    return 0 if all(i["state"] in ("OK", "PLAN") for i in items) else 1
+
+
+# ══════════════════════════════════════════════════════════════════════════════
 # ⑩ HTML UI Matrix(四分區;小字體;自動換行;RYG;進度條;零 CDN)
 # ══════════════════════════════════════════════════════════════════════════════
 def _esc(x) -> str:
@@ -1566,11 +1798,18 @@ def render_matrix(run: dict) -> str:
     if not conflicts:
         parts.append("<tr><td colspan=6>無衝突(或 NOT_RUN 誠實—見 MODULE 快篩欄)</td></tr>")
     parts.append("</table></div>")
-    parts.append("<div class='card'><h2>base 家族整包(拉出候選 → 目標境)</h2><table><tr><th style='width:14%'>家族</th><th style='width:8%'>級</th><th style='width:16%'>目標境</th><th>成員(根+境內相依)</th><th style='width:18%'>閉包相依受影響</th></tr>")
+    parts.append("<div class='card'><h2>base 家族整包(拉出候選 → 目標境;單寫者律)</h2><table><tr><th style='width:12%'>家族</th><th style='width:7%'>級</th><th style='width:14%'>目標境</th><th style='width:22%'>家族根件</th><th>境內必要相依(隨行移除)</th><th style='width:16%'>引擎影響(import 根件)</th></tr>")
     for fam, b in sorted(ba.get("bundles", {}).items()):
-        parts.append(f"<tr><td>{_esc(fam)}</td><td>{_lamp(b['severity'])}</td><td>{_esc(b['target'])}{'' if b['target_exists'] else '(待建)'} py{_esc(b.get('python'))}</td><td>{_esc(', '.join(b['members']))}</td><td>{_esc(', '.join(b.get('impact_kept', [])))}</td></tr>")
+        deps_only = [m for m in b['members'] if m not in set(b.get('roots', []))]
+        parts.append(f"<tr><td>{_esc(fam)}</td><td>{_lamp(b['severity'])}</td><td>{_esc(b['target'])}{'' if b['target_exists'] else '(待建)'} py{_esc(b.get('python'))}</td><td>{_esc(', '.join(b.get('roots', [])))}</td>"
+                     f"<td>{_esc(', '.join(deps_only))}<br><span class=small>閉包相依受影響:{_esc(', '.join(b.get('impact_kept', [])))}</span></td>"
+                     f"<td>{b.get('engines_n', 0)}:{_esc(', '.join(b.get('engines', [])))}</td></tr>")
+    if ba.get("shared_support"):
+        parts.append(f"<tr><td>(共用支援件)</td><td>{_lamp('YELLOW')}</td><td>—</td><td colspan=3>多家族必要相依 {len(ba['shared_support'])} 件,所有家族境 VERIFY 綠後最後候裁:{_esc(', '.join(ba['shared_support']))}</td></tr>")
+    for v in run.get("naming", []):
+        parts.append(f"<tr><td>(命名律 H7)</td><td>{_lamp('YELLOW')}</td><td>{_esc(v['suggested'])}</td><td colspan=3>非 via_ 境 {_esc(v['env'])}(py{_esc(v.get('python'))} 件 {v.get('n_dists', 0)})→ via-envgov rename --from {_esc(v['env'])}</td></tr>")
     if not ba.get("bundles"):
-        parts.append("<tr><td colspan=5>base 無封鎖家族/閉包外家族件</td></tr>")
+        parts.append("<tr><td colspan=6>base 無封鎖家族/閉包外家族件</td></tr>")
     parts.append("</table><h2 style='margin-top:8px'>閉包外單件路由</h2><table><tr><th style='width:22%'>目標境</th><th>件(路由依據)</th></tr>")
     for tgt, items in sorted(ba.get("routed_other", {}).items()):
         items_txt = ", ".join("%s==%s(%s)" % (it["pkg"], it["ver"], it["via"]) for it in items)
@@ -1664,8 +1903,14 @@ def make_digest(run: dict) -> list[str]:
     if ok_names:
         L.append(f"  [{LAMP['GREEN']} OK     ] 其餘 {len(ok_names)} 境零衝突:{', '.join(ok_names[:10])}{' …' if len(ok_names) > 10 else ''}")
     L.append(f"  base 該有冊({ba.get('manifest_src', '?')}):閉包 {ba.get('keep_n', 0)} · 閉包外 {len(ba.get('extras', []))} · manifest 缺 {len(ba.get('manifest_missing', []))} · 封鎖家族件 {len(ba.get('blocked_present', []))}" + (f" · OS 管理不動 {len(ba['os_managed'])}" if ba.get('os_managed') else ""))
-    for fam, b in sorted(ba.get("bundles", {}).items())[:6]:
-        L.append(f"    拉出 {LAMP[b['severity']]} {fam:16s} → {b['target']}{'' if b['target_exists'] else '(待建)'}:{', '.join(b['members'][:6])}{' …' if len(b['members']) > 6 else ''}")
+    for fam, b in sorted(ba.get("bundles", {}).items(), key=lambda kv: (kv[1]["severity"] != "RED", -len(kv[1]["members"])))[:7]:
+        roots = b.get("roots", [])
+        L.append(f"    拉出 {LAMP[b['severity']]} {fam:16s} → {b['target']}{'' if b['target_exists'] else '(待建)'}:{', '.join(roots[:4])}{' …' if len(roots) > 4 else ''}"
+                 f" +相依 {max(0, len(b['members']) - len(roots))} · 引擎影響 {b.get('engines_n', 0)}")
+    if ba.get("shared_support"):
+        L.append(f"    共用支援件 {len(ba['shared_support'])}(多家族相依;最後候裁):{', '.join(ba['shared_support'][:8])}{' …' if len(ba['shared_support']) > 8 else ''}")
+    for v in run.get("naming", [])[:3]:
+        L.append(f"    命名律 🟡 非 via_ 境 {v['env']} → {v['suggested']}(py{v.get('python') or '?'} 件 {v.get('n_dists', 0)};via-envgov rename --from {v['env']})")
     for tgt, items in sorted(ba.get("routed_other", {}).items())[:4]:
         L.append(f"    改道 → {tgt}:{', '.join(it['pkg'] for it in items[:8])}{' …' if len(items) > 8 else ''}")
     for c in conflicts[:6]:
@@ -1688,6 +1933,8 @@ def make_digest(run: dict) -> list[str]:
         nxt.append("via-envgov apply --approve(GREEN 非破壞段:建境/裝件/驗證)→ 目標境綠後 via-envgov apply --approve --approve-remove")
     if any(s["kind"] in ("DELEGATE_REBUILD", "DELEGATE_SPLIT") for s in plan.get("stages", [])):
         nxt.append("; ".join(sorted({s.get('argv_hint', '') for s in plan.get('stages', []) if s.get('argv_hint') and s['kind'].startswith('DELEGATE')})))
+    if run.get("naming"):
+        nxt.append("via-envgov rename(唯讀出令)→ via-envgov rename --execute --approve(建境+同步+驗證)→ --approve-remove 退役舊境")
     if run.get("mode") == "offline":
         nxt.append("$env:VIA_NET_CONSENT='YES'; via-envgov plan(上網模擬 uv pip compile 多輪)")
     if not lk.get("eligible"):
@@ -1732,8 +1979,9 @@ def do_run(args: list[str], mode: str = "run") -> int:
     conflicts = classify_conflicts(scans, baseline, ba, skips)
     hydra = hydra_risks(scans, baseline, ba)
     via_rows = analyze_via_envs(scans, baseline)
+    naming = naming_check(scans, baseline)
     ip = ingest_install_plans(baseline, [_arg_after(args, "--install-plan") or ""])
-    plan = build_plan(scans, baseline, ba, conflicts, hydra, via_rows, er, skips)
+    plan = build_plan(scans, baseline, ba, conflicts, hydra, via_rows, er, skips, naming)
     mirrors = mirror_health(baseline) if not offline else [{"label": l, "url": u, "state": "NOT_RUN", "ms": None, "note": "離線"} for l, u in zip(baseline["mirror_chain"].get("labels", []), baseline["mirror_chain"]["order"])]
     mirror_url = next((m["url"] for m in sorted([m for m in mirrors if m["state"] == "OK"], key=lambda m: m.get("ms") or 9e9)), "")
     if mode in ("run", "plan", "apply"):
@@ -1754,7 +2002,7 @@ def do_run(args: list[str], mode: str = "run") -> int:
     lk = lkgc_snapshot(scans, ba, conflicts, ts)
     promote = lkgc_promote(lk) if mode in ("run", "apply", "panorama", "plan") else {}
     hard = [c for c in conflicts if c.get("action") != "METADATA_SHADOWED"]
-    verdict = "RED" if (ba.get("blocked_present") or any(c["severity"] == "RED" for c in hard)) else ("YELLOW" if (hard or ba.get("extras") or ba.get("manifest_missing") or any(r["status"] != "OK" for r in via_rows)) else "GREEN")
+    verdict = "RED" if (ba.get("blocked_present") or any(c["severity"] == "RED" for c in hard)) else ("YELLOW" if (hard or ba.get("extras") or ba.get("manifest_missing") or naming or any(r["status"] != "OK" for r in via_rows)) else "GREEN")
     n_st = len(plan["stages"]) or 1
     r1 = [s for s in plan["stages"] if s["round"] == 1]
     r2 = [s for s in plan["stages"] if s["round"] == 2]
@@ -1767,7 +2015,7 @@ def do_run(args: list[str], mode: str = "run") -> int:
         return int(100 * done / len(lst))
     run = {"schema": "VIA.EnvGovernance.Run.v1", "run_id": ts, "ts": now_iso(), "machine": machine_hash(), "mode": ("offline" if offline else "online") + f"/{mode}",
            "base_python": base.get("python"), "verdict": verdict, "_baseline": baseline, "panorama": [{k: v for k, v in s.items()} for s in scans],
-           "base_analysis": ba, "conflicts": conflicts, "hydra": hydra, "via_rows": via_rows, "install_plans": ip, "plan": plan, "mirrors": mirrors,
+           "base_analysis": ba, "conflicts": conflicts, "hydra": hydra, "via_rows": via_rows, "naming": naming, "install_plans": ip, "plan": plan, "mirrors": mirrors,
            "apply_summary": apply_summary, "lkgc": lk, "lkgc_promote": promote, "engine_chain": engine_chain(),
            "round_progress": {"R1": {"pct": pct(r1), "note": f"全面性(並行段 {len(r1)}):{'已授權執行' if approve else '計畫唯讀'}"},
                               "R2": {"pct": pct(r2), "note": f"順序性(拓撲段 {len(r2)};破壞候裁 {sum(1 for s in r2 if s['destructive'])}):{'--approve-remove' if approve_remove else '候裁'}"},
@@ -1911,10 +2159,13 @@ def selftest() -> int:
             ba = analyze_base(base_scan, b, {"via_core_312"}, skips)
             ocr = ba["bundles"].get("ocr", {})
             chk("⑤ base 該有冊閉包(pandas→numpy/dateutil/six/pytz 留;閉包外=拉出候選)", "six" not in ba["extras"] and "numpy" not in ba["extras"] and "paddleocr" in ba["extras"])
-            chk("⑥ OCR 家族整包(paddleocr+paddlex+albumentations+albucore+contrib 同包;RED;目標 paddle_312 待建)",
-                ocr and set(ocr["members"]) >= {"paddleocr", "paddlex", "albumentations", "albucore", "opencv-contrib-python"} and ocr["severity"] == "RED" and ocr["target"] == "paddle_312" and not ocr["target_exists"])
+            chk("⑥ OCR 家族整包(paddleocr+paddlex+albumentations+albucore+contrib 同包;RED;目標 via_paddle_311 待建=命名律)",
+                ocr and set(ocr["members"]) >= {"paddleocr", "paddlex", "albumentations", "albucore", "opencv-contrib-python"} and ocr["severity"] == "RED" and ocr["target"] == "via_paddle_311" and not ocr["target_exists"]
+                and ocr["roots"] == ["albucore", "albumentations", "opencv-contrib-python", "paddleocr", "paddlex"] and "engines_n" in ocr)
             webui = ba["bundles"].get("webui", {})
-            chk("⑦ webui 家族(streamlit+altair)整包;fastapi/pydantic → via_core 白名單改道;unknownlib → 黑環境", webui and "altair" in webui["members"]
+            plotui = ba["bundles"].get("plot_ui", {})
+            chk("⑦ webui(streamlit)與 plot_ui(altair)各歸各家族(單寫者律);fastapi → via_core 白名單改道;unknownlib → 黑環境",
+                webui and webui["members"] == ["streamlit"] and plotui and plotui["members"] == ["altair"]
                 and any(it["pkg"] == "fastapi" and it["via"] == "via_core_whitelist" for it in ba["routed_other"].get("via_core_312", []))
                 and any(it["pkg"] == "unknownlib" for it in ba["routed_other"].get("via_iso_quarantine", [])))
             cc = classify_conflicts([base_scan], b, ba, skips)
@@ -1973,6 +2224,32 @@ def selftest() -> int:
             chk("㉔ 環境發現:管理前綴+pyvenv.cfg;_retire_ 與非管理名除名;BASE 首列", names[0] == "BASE" and "via_core_312" in names and "paddle_312" in names and "_retire_via_old" not in names and "notmanaged" not in names)
             argvs, ps, sh = stage_commands(next(s for s in plan["stages"] if s["kind"] == "INSTALL"), sys.executable)
             chk("㉕ 段令:INSTALL 出 uv pip install --python;ps/sh 雙令;sh 路徑 posix", argvs and argvs[0][1:3] == ["pip", "install"] and ps and sh and "\\" not in sh[0])
+            # 批382:非可選閉包+單寫者律+專屬境覆寫+命名律+引擎影響
+            d2 = {"pip": {"ver": "25", "requires": []}, "numpy": {"ver": "2.2", "requires": []},
+                  "paddleocr": {"ver": "3.1", "requires": ["numpy", "shared-util", 'optdep; extra == "full"']}, "shared-util": {"ver": "1.0", "requires": []}, "optdep": {"ver": "0.1", "requires": []},
+                  "streamlit": {"ver": "1.40", "requires": ["shared-util", "numpy"]}, "catboost": {"ver": "1.2", "requires": ["numpy"]}, "lxml": {"ver": "5.3", "requires": []},
+                  "pdf2docx": {"ver": "0.5", "requires": ["lxml", "numpy"]}}
+            sc2 = {"env": {"name": "BASE", "py": sys.executable}, "ok": True, "python": "3.13.7", "dists": d2, "dup": {}, "conflicts": [], "check_tool": "uv"}
+            ba2 = analyze_base(sc2, b, {"via_core_312", "via_catboost", "via_html_312"}, skips)
+            chk("㉖ 家族整包只走必要相依(extra 可選件 optdep 不入包);多家族共用 shared-util=共用支援件不歸任一家族;lxml 歸 html_parse 但 docs 境 install 含之(自足)",
+                "optdep" not in ba2["bundles"]["ocr"]["members"] and "optdep" not in ba2["bundles"]["ocr"]["install"]
+                and ba2["shared_support"] == ["shared-util"] and all("shared-util" not in bb["members"] for bb in ba2["bundles"].values())
+                and "lxml" in ba2["bundles"]["html_parse"]["members"] and "lxml" not in ba2["bundles"]["docs"]["members"] and "lxml" in ba2["bundles"]["docs"]["install"])
+            chk("㉗ 專屬境覆寫:catboost → via_catboost(package_env_overrides;既有境)不入 ml_boost 家族整包", "ml_boost" not in ba2["bundles"]
+                and any(it["pkg"] == "catboost" and it["via"] == "package_env_overrides" and it["exists"] for it in ba2["routed_other"].get("via_catboost", [])))
+            fake = [sc2, {"env": {"name": "paddle_311", "py": sys.executable, "path": str(tdp / "envs" / "paddle_311")}, "ok": True, "python": "3.13.7", "dists": {"six": {"ver": "1.17", "requires": []}}, "dup": {}, "conflicts": [], "check_tool": "uv"},
+                    {"env": {"name": "via_core_312", "py": sys.executable, "path": str(tdp / "envs" / "via_core_312")}, "ok": True, "python": "3.12.4", "dists": {}, "dup": {}, "conflicts": [], "check_tool": "uv"}]
+            nv = naming_check(fake, b)
+            rp = rename_plan([{"name": s["env"]["name"], "path": s["env"].get("path", ""), "py": s["env"]["py"], "python": s.get("python", "")} for s in fake], b, str(tdp / "envs"))
+            ps2, sh2 = rename_commands(rp[0]) if rp else ([], [])
+            chk("㉘ 命名律 H7:paddle_311 違律 → via_paddle_311(冊 renames);BASE/via_ 豁免;rename 計畫出 uv venv --python 3.13 + uv pip sync + check;退役段候裁註記",
+                len(nv) == 1 and nv[0]["env"] == "paddle_311" and nv[0]["suggested"] == "via_paddle_311" and len(rp) == 1 and rp[0]["new"] == "via_paddle_311"
+                and any("uv venv" in l and "--python 3.13" in l for l in ps2) and any("uv pip sync" in l for l in ps2) and any(l.startswith("# Rename-Item") for l in ps2) and any("mv " in l for l in sh2))
+            plan2 = build_plan(fake, b, ba2, [], [], analyze_via_envs(fake, b), str(tdp / "envs"), skips, nv)
+            chk("㉙ 段冊含 RENAME_ENV 委派段(序跑 R2)與共用支援件 REMOVE_BASE(待所有家族 VERIFY);引擎影響索引純函式可判",
+                any(st["kind"] == "RENAME_ENV" and st["env"] == "paddle_311" and st["cls"] == "SEQUENTIAL" for st in plan2["stages"])
+                and any(st["kind"] == "REMOVE_BASE" and st.get("family") == "(共用支援件)" and st["pins"] == ["shared-util"] for st in plan2["stages"])
+                and engine_impact(["pymupdf"], {"VRN_ENG001_X": {"fitz", "json"}, "VDF_ENG002_Y": {"pandas"}})["names"] == ["VRN_ENG001_X"])
         except Exception as exc:
             checks.append(("例外", False))
             print("  [FAIL] 例外:", type(exc).__name__, exc)
@@ -2009,6 +2286,8 @@ def main() -> int:
         return do_lkgc(rest)
     if verb == "rollback":
         return do_rollback(rest)
+    if verb == "rename":
+        return do_rename(rest)
     if verb == "matrix":
         return do_matrix()
     if verb == "digest":

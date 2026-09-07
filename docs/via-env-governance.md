@@ -87,3 +87,36 @@ panorama(平行探針硬逾時;動態進度條)→ uv pip check 毫秒快篩(退
 A03 九頭龍 · A04 拓撲 · A05 沙盒模擬 · A07 三輪 · A08 SSOT(冊+母版+5D+Lessons)· A09 矩陣 · A10 分類分群 · A11 uv 毫秒快篩/平行探針 ·
 A12 多子系統境 · A13 LKGC/rollback · A15 修正序最佳化 · A16 進度條 · A17 digest · A18 背景 Job · A19 多引擎整合 · A20 apply。
 P4「uv 依賴解析、衝突立拔與多環境隔離」=本引擎+MDL050;P6「UI Matrix 與非阻塞 PowerShell」=本引擎 matrix+Invoke-VIA-EnvGovernance。
+
+## 八、批382:base 共用冊、功能件家族與命名律
+
+操作員令:「BASE 應該放都用得到的工具;功能性的工具應該都放到 via_ 相關環境;有兩個環境沒有 via_ 在前面,換名稱重建」。
+工作站首跑實錄:24 境 19 秒全探,via_* 22 境零衝突,BASE 681 件 136 衝突;`camelot_311`、`paddle_311` 兩境違反命名律。
+
+### base 共用冊(只放大家都用得到的工具)
+
+| 層 | 內容 |
+|---|---|
+| toolchain | pip/setuptools/wheel/packaging/uv + Top 8 檢測工具 |
+| engine_core(共用基座) | numpy/pandas/pyarrow/duckdb/polars/plotly/matplotlib/scipy/requests/httpx/jsonschema/openpyxl/xlsxwriter/rich/psutil/pydantic/loguru/tqdm/dateutil/pytz/pyyaml/orjson/pillow/certifi/urllib3/cffi… |
+| 功能件 → via_ 家族境 | docs→`via_vrn_312`(pymupdf/pdfplumber/docx…)、html_parse→`via_html_312`、data_fetch→`via_vdf_312`(yfinance/akshare…)、nlp→`via_nlp`(spaCy/jieba/opencc…)、dev_tools→`via_tools_312`、plot_ui→`via_vap_312`、deep_learning→`via_ml`、ml_boost→`via_ml`;專屬境覆寫 catboost→`via_catboost`、lightgbm→`via_lightgbm`、onnxruntime→`via_onnxruntime` |
+
+家族整包只走**必要相依**(extras 可選件不入包;實錄 extras 曾把 bleach/greenlet 拖進 browser 家族),
+一件只歸一家族(單寫者律);多家族共用的相依=「共用支援件」,所有家族目標境驗綠後最後候裁移除。
+矩陣的「引擎影響」欄列出倉庫中 import 該家族根件的引擎:功能件拉出 base 後,以 base python 啟動的引擎必須改由目標境 python 啟動,
+移除前先看這一欄。
+
+### 命名律(H7)與換名重建
+
+```powershell
+via-envgov                                  # digest 出現「命名律 🟡 非 via_ 境 paddle_311 → via_paddle_311」
+via-envgov rename                           # 唯讀出令:RENAME_EXEC_<ts>.ps1/.sh + 舊境 lock 快照
+via-envgov rename --execute --approve       # uv venv via_paddle_311 --python <舊境實際版本> → uv pip sync 舊境 lock → uv pip check(cv2 錨遮蔽殘餘=接受)
+via-envgov rename --execute --approve --approve-remove   # 驗綠後舊境改名 _retire_paddle_311(掃描自然除名;可即回退)
+via-envgov rename --from paddle_311 --to via_paddle_313  # 想讓尾碼對齊實際 Python 時自訂新名
+```
+
+沙盒實證:paddle_311 → via_paddle_311 建境、同步、驗綠、退役全綠;帶有 albucore 殘缺的境則誠實 FAIL 並保留舊境。
+下游同步正名:MDL050 v0109 路由出口一律 `via_` 前綴、OCR 車道 v0101 優先找 `via_paddle_*`、Provision v0102 把功能件改到 via_ 境檢查;
+`VIA_EnvManager.py` 正本零觸碰(其 purpose hints 舊鍵視為別名層)。
+

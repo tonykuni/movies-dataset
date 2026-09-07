@@ -69,7 +69,9 @@ INTEGRATION = {
     "VIA_EnvGovernance_InstallPlans_b381": {"zh": "環境治理上船件(三份 VIA_Install_Plan 體檢證據;批381 MDL135 攝入)", "today": True,
                                             "upload": "VIA_Install_Plan_20260820_062418/230001/235933.json(同狀三次:pip 衝突掃描 FAIL albucore 0.0.24 requires opencv-python-headless;Python 3.13.7;pwsh 7.6.5)",
                                             "engines": ["supportive modules/registry/CGC_MDL135_EnvGovernance_v*.py", "supportive modules/registry/VIA_EnvGovernance_Baseline_v*.json",
-                                                        "supportive modules/registry/CGC_MDL052_EnvmgrRouter_v*.py", "Invoke-VIA-EnvGovernance-v*.ps1"],
+                                                        "supportive modules/registry/CGC_MDL052_EnvmgrRouter_v*.py", "Invoke-VIA-EnvGovernance-v*.ps1",
+                                                        "supportive modules/registry/CGC_MDL050_EnvRebuild_v0*.py", "supportive modules/registry/via_ocr_super_v0*.py",
+                                                        "supportive modules/registry/CGC_MDL062_Provision_v0*.py"],
                                             "pages": [], "cmds": ["via-envgov", "via-envgov-auto"], "tasks": ["envgov"], "subject": "home",
                                             "note": "根因=OCR 家族(paddleocr/paddlex/albumentations/albucore/cv2)住 base;處置=家族整包拉出 paddle_312(contrib 錨;--no-deps 防回拉拒裝 headless)+base 端移除候裁 --approve-remove;LKGC 晉升律;最壞還原 rollback(LKGC lock 逐境 sync;無=原本規劃重建)"},
     "VIA_StoryGroupRotation_b325": {
