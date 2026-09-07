@@ -14,7 +14,9 @@ VDF_ENG081_UniverseAlign v0100 — 台股每日交易資訊×籌碼 數量對齊
            in_prices,in_chips,aligned,updated_at);--apply 才寫:DuckDB anti-join 只增(鍵 asof_date,ticker)+ parquet 增量
            (output_hub/mega/tw_universe_<ts>.parquet 只含本次新增列;0 新增=不落檔);預設 dry-run 只印
   ③ status 上次 ALIGN_latest 摘要 + tw_universe 表現況
-紀律:只增不減;正本零觸碰(不改價表/籌碼表);誠實三態(GREEN/YELLOW/RED;庫缺/表缺不假綠);零網路;尾版律。
+紀律:只增不減;正本零觸碰(不改價表/籌碼表);誠實三態(GREEN/YELLOW/RED;庫缺/表缺不假綠);零網路;尾版律;
+      讓庫律(批391 工作站實錄:日更鏈/回補持單寫者鎖 → update --apply 曾 IOException traceback):開庫短等重試 6×3s,逾額誠實
+      [FAIL] 庫忙 rc3 印修法(等日更鏈/回補跑完再 update --apply;check 唯讀)不再 traceback。
 用法:python3 VDF_ENG081_UniverseAlign_v0100.py check [--days N] [--db PATH] [--json]
       | update [--apply] [--db PATH] [--json] | status [--db PATH] | --selftest
 """
@@ -87,6 +89,24 @@ def _duckdb():
         return None
 
 
+def _connect(db: Path, read_only: bool, retries: int = 6, wait: float = 3.0, sleep_fn=None):
+    """讓庫律(批391;ENG064/ENG079 同律):DuckDB 單寫者鎖=短等重試;逾額誠實 RuntimeError(主程式印 [FAIL] rc3,零 traceback)"""
+    import time
+    duckdb = _duckdb()
+    last = ""
+    for i in range(retries):
+        try:
+            return duckdb.connect(str(db), read_only=read_only)
+        except duckdb.IOException as exc:
+            last = str(exc)
+            low = last.lower()
+            if not any(k in low for k in ("lock", "already open", "being used", "另一個程序", "cannot open file")):
+                raise
+            print(f"  [庫忙] {i + 1}/{retries}:{last.splitlines()[0][:90]} → 等 {wait}s", flush=True)
+            (sleep_fn or time.sleep)(wait)
+    raise RuntimeError(f"庫忙逾 {retries}×{wait}s(日更鏈/歷史回補持單寫者鎖;等其跑完再 via-align {'update --apply' if not read_only else 'check'};via-status 看背景進程):{last.splitlines()[0][:120]}")
+
+
 def _q(s: str) -> str:
     return "'" + str(s).replace("'", "''") + "'"
 
@@ -151,7 +171,7 @@ def check(db: Path = DB_TW, days: int = DAYS_DEFAULT, reports: Path = REPORTS, d
         say(f"RED     {rep['note']}")
         _finish(rep, reports, "ALIGN")
         return rep
-    con = duckdb.connect(str(db), read_only=True)
+    con = _connect(db, read_only=True)
     try:
         have = _tables(con)
         if PX not in have:
@@ -252,7 +272,7 @@ def update(db: Path = DB_TW, apply: bool = False, reports: Path = REPORTS, mega:
         say(f"RED     {rep['note']}")
         _finish(rep, reports, "UNIVERSE")
         return rep
-    con = duckdb.connect(str(db), read_only=not apply)
+    con = _connect(db, read_only=not apply)
     try:
         have = _tables(con)
         if PX not in have:
@@ -340,7 +360,7 @@ def status(db: Path = DB_TW, reports: Path = REPORTS, do_print: bool = True) -> 
     duckdb = _duckdb()
     if duckdb and db.exists():
         try:
-            con = duckdb.connect(str(db), read_only=True)
+            con = _connect(db, read_only=True, retries=2, wait=1.0)
             try:
                 if UNIVERSE in _tables(con):
                     n, mx, k = con.execute(f"SELECT count(*), max(asof_date), count(DISTINCT asof_date) FROM {UNIVERSE}").fetchone()
@@ -438,7 +458,47 @@ def selftest() -> int:
     src = Path(__file__).read_text(encoding="utf-8")
     chk("⑧ 紀律宣告(只增不減/正本零觸碰/誠實三態/零網路/尾版律/Zero-Hydra/ACCEL-BRIDGE)",
         all(k in src for k in ("只增不減", "正本零觸碰", "誠實三態", "零網路", "尾版律", "Zero-Hydra", "ACCEL-BRIDGE")))
-    print(f"  [計] 八檢 OK {8 - len(fails)} · FAIL {len(fails)}")
+    # ⑨ 讓庫律(批391 工作站實錄:單寫者鎖 IOException):鎖兩次後放行=重試成功;永鎖=誠實 RuntimeError(主程式 rc3);非鎖 IOException 原樣拋
+    calls = {"n": 0}
+    real_connect = duckdb.connect
+
+    def locked_twice(path, read_only=False):
+        calls["n"] += 1
+        if calls["n"] <= 2:
+            raise duckdb.IOException('IO Error: Cannot open file "x.duckdb": 程序無法存取檔案，因為檔案正由另一個程序使用。 File is already open in python.exe (PID 1)')
+        return real_connect(path, read_only=read_only)
+
+    def locked_forever(path, read_only=False):
+        raise duckdb.IOException("IO Error: Could not set lock on file")
+
+    def other_io(path, read_only=False):
+        raise duckdb.IOException("IO Error: disk full")
+
+    with tempfile.TemporaryDirectory() as td2:
+        dbp = Path(td2) / "t.duckdb"
+        real_connect(str(dbp)).close()
+        duckdb.connect = locked_twice
+        try:
+            c_ok = _connect(dbp, read_only=True, retries=4, wait=0.0, sleep_fn=lambda s: None)
+            c_ok.close()
+            ok_retry = calls["n"] == 3
+            duckdb.connect = locked_forever
+            try:
+                _connect(dbp, read_only=False, retries=2, wait=0.0, sleep_fn=lambda s: None)
+                ok_forever = False
+            except RuntimeError as exc:
+                ok_forever = "庫忙逾" in str(exc) and "update --apply" in str(exc)
+            duckdb.connect = other_io
+            try:
+                _connect(dbp, read_only=True, retries=2, wait=0.0, sleep_fn=lambda s: None)
+                ok_other = False
+            except duckdb.IOException:
+                ok_other = True
+        finally:
+            duckdb.connect = real_connect
+    chk("⑨ 讓庫律(單寫者鎖 IOException 短等重試;鎖兩次後放行;永鎖=誠實 RuntimeError 指路等日更鏈/回補跑完;非鎖 IOException 原樣拋)", ok_retry and ok_forever and ok_other,
+        f"(retry {calls['n']};forever {ok_forever};other {ok_other})")
+    print(f"  [計] 九檢 OK {9 - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 
 
@@ -454,7 +514,7 @@ def _arg(a: list, flag: str, default=None):
 def main() -> int:
     a = sys.argv[1:]
     if "--selftest" in a:
-        print("=== 台股日交易×籌碼對齊與清單更新引擎(VDF_ENG081_UniverseAlign)· 八檢自測(零網路;臨時庫)===")
+        print("=== 台股日交易×籌碼對齊與清單更新引擎(VDF_ENG081_UniverseAlign)· 九檢自測(零網路;臨時庫)===")
         return selftest()
     verb = next((x for x in a if x in VERBS), "check")   # 動詞白名單
     db = Path(_arg(a, "--db", str(DB_TW)))
@@ -475,6 +535,10 @@ def main() -> int:
         if as_json:
             print(json.dumps(st, ensure_ascii=False, indent=1, default=str))
         return 0
+    except RuntimeError as exc:
+        print(f"[FAIL] {exc}")
+        log_event("FAIL", str(exc)[:200])
+        return 3
     except BrokenPipeError:
         return 0
 

@@ -6607,6 +6607,13 @@
    "ts": "2026-09-07 19:13",
    "name": "①VIA_InputConsole_Spec 冊(三族 37 項;每項綁母倉現役引擎+真旗標:ENG054/064/056/057/063/075/079/081/074/047/055/059/066/077/078/076/073;VRN ENG072/073/074/080/075/digest/MDL138;VAP ENG015/009/014/016;財報三大報表 PLANNED 誠實;user 段個別改動只增不減鏡寫 VDF_Input_Interface_Matrix)②CGC_MDL139 InputConsole:status(庫狀況 ENG073 快照+DuckDB 現值/對齊/台股清單 焦點冊∪操作員/宏觀 macro_ssot 13 類展開/VRN 跑況判準/VAP 頁/項目可跑態)、set、argv/run(參數白名單:range/start/since/since_ym/days/codes 三風格/only/lanes/cats/dir 必須存在/code/vapone)、build 頁(零 CDN;左 rail 三族表單 下拉/勾選/全選/全不選/逐項起始日 最新勾/拖曳區+webkitdirectory 選夾;右 main 八矩陣 篩選/點欄排序預設大到小;進度動畫 /status 輪詢;LIVE=樞紐同源 /console,file:// SNAPSHOT 印等價短令);八檢 ③VDF_ENG081 UniverseAlign:check 逐日 價票數 vs 籌碼票數(inst∪margin→yf_ticker)ALIGNED/PARTIAL/MISALIGNED+差集;update --apply → tw_universe anti-join + parquet 增量;八檢 ④DeckServer v0132:GET /console /console_status;POST /console_run(冊白名單+參數驗證→單一啟動道 _launch_locked)/console_set(鍵/值白名單);任務 50→52(console_ui/align);/status 併列 console:<item>;23/23 ⑤Register v0156 via-console/via-align+梭+via-open 別名 主控台/輸入;Manager v0119 正式名稱+總控頁再生(十檢/契約 19);MDL136 plan +console(15 步);MDL138 HUB_PAGES;SelftestGrid v0233(195 站);Console GOV-23/24;SSOT 動詞 2;docs 十六/README",
    "note": "工作站:via-reload → via-console(建頁)→ via(樞紐)→ 開 http://127.0.0.1:8765/console(LIVE 可啟動)· via-align check → via-align update --apply · 財報三大報表為 PLANNED(MOPS 引擎候上船;期別/年起迄先入冊)"
+  },
+  {
+   "code": "ENG081-v0100/REG-v0157/GRID-v0234",
+   "kind": "批391 工作站實錄(2026-09-07 b381 worktree):①start http://127.0.0.1:8765/console 被 VIA_NO_OPEN 抑制(PS 側 Start-Process 閘認 http 為頁面目標)②via-align check 真跑 MISALIGNED(籌碼最新日 2026-08-25 落後價表 2026-09-07 13 日;08-25 PARTIAL 1978 vs 1935)③via-align update --apply 撞日更鏈/回補單寫者鎖 → duckdb IOException traceback(File is already open in python.exe)",
+   "ts": "2026-09-07 19:26",
+   "name": "①Register v0157:via-open 認 http(s):// URL(只走瀏覽器 exe=閘外;別名 LIVE/主控台LIVE=樞紐 /console、總控LIVE=/master);via-console --open 先 TCP 探樞紐 8765:在線=via-open LIVE(可按啟動),離線=印修法+開快照頁 ②VDF_ENG081 讓庫律(ENG064/ENG079 同律):_connect 短等重試 6×3s;永鎖=誠實 RuntimeError → 主程式 [FAIL] 庫忙 rc3 印修法(等日更鏈/回補跑完再 update --apply;check 唯讀);非鎖 IOException 原樣拋;九檢 9/9 ③SelftestGrid v0234 第 195 站九檢;docs 十六補/README",
+   "note": "工作站:via-reload → via-console --open(樞紐在線即開 LIVE)· 籌碼落後 13 日=先 via-py vdf \"functional modules\\VDF\\engine\\VDF_ENG056_ChipBackfill_v0101.py\" run(或等日更鏈 ③ 跑完)→ via-align check → via-align update --apply(日更鏈/回補跑完後)"
   }
  ]
 }

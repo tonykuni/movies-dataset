@@ -300,3 +300,14 @@ via-align check; via-align update --apply   # 日交易×籌碼對齊 → 更新
 via-console set tw-add=6488:TPEX macro-cats=Business,Prices,Labor fin-period=累計 fin-from=2022
 ```
 
+### 批391 工作站實錄補:LIVE 開頁走 `via-open`、對齊引擎讓庫律
+
+- `start http://127.0.0.1:8765/console` 會被零跳出律(PS 側 `Start-Process` 閘)抑制。正道:`via-console --open`(先探樞紐 8765,在線即以瀏覽器 exe 開 LIVE 網址;離線開快照頁並印修法),或 `via-open LIVE`。`via-open` 自 v0157 起認 `http(s)://`(只走瀏覽器 exe,閘外)。
+- `via-align check` 真跑:籌碼最新日落後價表 13 日 → MISALIGNED 並指路 `via-chip run`(日更鏈 ③ 籌碼增量);`update --apply` 撞日更鏈/回補的單寫者鎖曾 traceback → 讓庫律:短等重試 6×3s,逾額誠實 `[FAIL] 庫忙` rc3 印修法(等背景鏈跑完再 `update --apply`;`check` 唯讀)。
+
+```powershell
+via-reload; via-console --open              # 樞紐在線=開 LIVE(可按啟動);離線=快照頁
+via-align check                             # 唯讀;籌碼落後=先跑籌碼增量(日更鏈 ③ 或 via-py vdf ENG056 run)
+via-align update --apply                    # 日更鏈/回補跑完後再寫 tw_universe(讓庫律誠實等/停)
+```
+
