@@ -581,7 +581,7 @@ def battery(fast: bool):
     add("產品資格閘九檢(批376)", newest("CGC_MDL133_ProductGate_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("十道並行編排九檢(批377)", newest("CGC_MDL134_ParallelLanes_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("資料本機家九檢(批377)", newest("CGC_MDL123_DataHome_v0*.py", HERE), ["--selftest"], "rc0", 300)
-    add("環境治理統一引擎 30 檢(批381–383)", newest("CGC_MDL135_EnvGovernance_v*.py", HERE), ["--selftest"], "rc0", 300)
+    add("環境治理統一引擎 31 檢(批381–385)", newest("CGC_MDL135_EnvGovernance_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("單一入口橋八檢(批383)", newest("CGC_MDL136_EntryBridge_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("本機三庫整併十一檢(批383)", newest("VDF_ENG079_LocalDbConsolidate_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300)
     add("VAP ONE 單檔整合引擎 72 檢(批383)", newest("VAP_ENG016_AutoplotOne_v*.py", VIA / "functional modules/VAP/engine"), ["--selftest"], "rc0", 300)

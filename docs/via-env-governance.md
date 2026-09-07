@@ -200,3 +200,21 @@ via-envgov apply --approve --only-kind REPAIR_BASE
 via-vdfdb scan; via-vdfdb run --apply; via-vdfdb ckpt
 via-vapone; via-open 矩陣
 ```
+
+## 十一、批385:工作站實錄修——via-reload 分支感知、旗標白名單、衝突明細
+
+工作站實錄(2026-09-07 22:13):b381 worktree 在 `claude/via-envmanager-governance-7cls8h` 分支,舊 `via-reload` 固定拉 `origin/main`,快轉失敗、HEAD 停在 8be0780,所以 `via-entry`/`via-vdfdb`/`via-vapone`/`via-rungate` 全部 not recognized;同時舊版 MDL135 不認識 `--only-kind`,卻在 `--approve` 下靜默跑完所有 GREEN 非破壞段(多境 INSTALL + REPAIR_BASE;無破壞段;3 境 VERIFY FAIL)。
+
+- **`via-reload` 分支感知**(Register v0152):當前分支是 `main` 才拉 `origin/main`;否則拉 `origin/<當前分支>`,並印「分支/目標/HEAD 前後」。stash 律不變。
+- **旗標白名單**(MDL135):未知 `--旗標` 一律誠實停(rc 2)並列已知旗標,版本落差不再靜默照跑。
+- **`via-envgov conflicts [--env X] [--limit N]`**:自 `RUN_latest.json` 印各境衝突明細(requirer/要求/裝的是/kind)與逐條修法(pip 令、`via-rebuild --env`);BASE 預設只印計數。
+- 命名律豁免受保護境(`env_layout.protected_envs`,如 `vmt_pm`)與冊 `naming_law.exempt`。
+
+脫困一貼(第一行用絕對路徑,之後 `via-reload` 自動拉對分支):
+
+```powershell
+git -C "C:\Users\tonyk\Downloads\movies-dataset-b381" pull --ff-only origin claude/via-envmanager-governance-7cls8h
+via-reload; via-entry
+via-envgov conflicts --env via_vrn_312; via-rungate --family vrn
+via-rungate; via-vdfdb scan; via-vdfdb run --apply; via-vdfdb ckpt; via-vapone; via-open 矩陣
+```

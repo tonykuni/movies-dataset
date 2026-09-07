@@ -39,6 +39,7 @@ installed.」→ 既有工具(EnvFix/InstallGate doctor)未閉環;根因=OCR 家
                  [--approve-remove] [--open] [--install-plan F]
      via-envgov panorama | plan | apply --approve [--approve-remove] [--only S02,S03] [--only-kind REPAIR_BASE,INSTALL]   (批383:段類過濾;REPAIR_BASE=只補 base manifest 缺件)
      via-envgov lkgc [snapshot|promote|status]
+     via-envgov conflicts [--env X] [--limit N]   (批385:自 RUN_latest 印各境衝突明細;零重掃;BASE 預設只印計數)
      via-envgov rollback [--to LKGC_xxx.json | --baseline] [--execute --approve [--approve-remove]]
      via-envgov rename [--from 舊境 [--to 新境]] [--execute --approve [--approve-remove]]   (批382 命名律:非 via_ 境換名重建)
      via-envgov matrix | digest | --selftest
@@ -741,14 +742,15 @@ def engine_impact(pkgs, index: dict) -> dict:
 
 
 def naming_check(scans: list[dict], baseline: dict) -> list[dict]:
-    """H7 命名律(批382):受管境一律 via_ 前綴;非 via_ 境=NAMING_VIOLATION(BASE/_retire_ 豁免)。"""
+    """H7 命名律(批382):受管境一律 via_ 前綴;非 via_ 境=NAMING_VIOLATION(BASE/_retire_/受保護境/冊 exempt 豁免;批385 工作站實錄 vmt_pm 受保護境被列=噪音)。"""
     law = baseline.get("naming_law") or {}
     prefix = str(law.get("prefix", "via_")).lower()
     renames = {k.lower(): v for k, v in (law.get("renames") or {}).items()}
+    exempt = {str(x).lower() for x in (law.get("exempt") or [])} | {str(x).lower() for x in ((baseline.get("env_layout") or {}).get("protected_envs") or [])}
     out = []
     for s in scans:
         n = s["env"]["name"]
-        if n == "BASE" or n.lower().startswith(prefix) or n.startswith("_retire_"):
+        if n == "BASE" or n.lower().startswith(prefix) or n.startswith("_retire_") or n.lower() in exempt:
             continue
         out.append({"env": n, "suggested": renames.get(n.lower(), prefix + n), "python": s.get("python"), "path": s["env"].get("path"),
                     "py": s["env"].get("py"), "n_dists": _ndists(s), "ok": s.get("ok"), "conflicts": len(s.get("conflicts", []))})
@@ -2262,6 +2264,12 @@ def selftest() -> int:
                 ap3["ran"] == 0 and ap3["ok"] == 0 and ap3["fail"] == 0
                 and all(st["result"]["state"] == "SKIP" for st in plan2["stages"])
                 and any(st["result"]["note"] == "--only-kind 未選" for st in plan2["stages"]))
+            b_prot = json.loads(json.dumps(b))
+            b_prot.setdefault("env_layout", {})["protected_envs"] = ["paddle_311"]
+            chk("㉛ 批385 旗標白名單(未知 --x 誠實停;已知/數值放行)+命名律豁免受保護境與冊 exempt",
+                unknown_flags(["apply", "--approve", "--only-kind", "REPAIR_BASE", "--workers", "8"]) == []
+                and unknown_flags(["apply", "--approve", "--onlykind", "--zzz"]) == ["--onlykind", "--zzz"]
+                and naming_check(fake, b_prot) == [] and len(naming_check(fake, b)) == 1)
         except Exception as exc:
             checks.append(("例外", False))
             print("  [FAIL] 例外:", type(exc).__name__, exc)
@@ -2273,6 +2281,61 @@ def selftest() -> int:
     return 0 if n_ok == len(checks) else 1
 
 
+# 批385:旗標白名單(工作站實錄:舊版 MDL135 不識 --only-kind 卻靜默照跑全段=版本落差風險)→ 未知旗標=誠實停(fail-closed)
+KNOWN_FLAGS = {"--offline", "--online", "--quiet", "--workers", "--task-timeout", "--rounds", "--roots", "--env-root", "--base-python", "--env",
+               "--approve", "--approve-remove", "--only", "--only-kind", "--open", "--no-open", "--install-plan", "--to", "--baseline", "--execute", "--from",
+               "--limit", "--json", "--selftest", "--help", "-h"}
+
+
+def unknown_flags(args: list) -> list:
+    return [a for a in args if a.startswith("-") and a not in KNOWN_FLAGS and not a.lstrip("-").replace(".", "").isdigit()]
+
+
+def do_conflicts(args: list[str]) -> int:
+    """批385:印各境衝突明細(自 RUN_latest.json;零重掃);--env X 只看一境;BASE 預設只印計數(--env BASE 全印);--limit N 每境上限"""
+    if not RUN_LATEST.exists():
+        print("[conflicts] 無 RUN_latest.json;先 via-envgov(唯讀全景)")
+        return 2
+    run = json.loads(RUN_LATEST.read_text(encoding="utf-8"))
+    only = _arg_after(args, "--env")
+    limit = int(_arg_after(args, "--limit") or 25)
+    print(f"=== 衝突明細 · {run.get('ts', '')[:19]} · 裁決 {run.get('verdict')} · 來源 {RUN_LATEST.name}(零重掃)===")
+    shown = 0
+    for sc in run.get("panorama", []):
+        name = sc["env"]["name"]
+        c = sc.get("conflicts") or []
+        if only and name.lower() != only.lower():
+            continue
+        if not c:
+            if only:
+                print(f"  [OK ] {name} 零衝突(python {sc.get('python')};{sc.get('check_tool')})")
+            continue
+        if name == "BASE" and not only:
+            print(f"  [RED] BASE 衝突 {len(c)}(base 家族拉出候裁;全印:via-envgov conflicts --env BASE)")
+            continue
+        shown += 1
+        py = sc["env"].get("py") or ""
+        print(f"  [RED] {name} 衝突 {len(c)}(python {sc.get('python')};{sc.get('check_tool')};{py})")
+        fixes = []
+        for r in c[:limit]:
+            kind, req, rv = r.get("kind", "?"), r.get("requirer", "?"), r.get("requirer_ver", "")
+            need, spec, inst = r.get("required", ""), r.get("spec", ""), r.get("installed", "")
+            if kind == "BROKEN":
+                print(f"     BROKEN    {req}{(' ' + rv) if rv else ''}:{str(r.get('detail', r.get('line', '')))[:110]}")
+                fixes.append(f'"{py}" -m pip install --force-reinstall --no-deps {req}')
+            else:
+                print(f"     {kind:<9} {req}{(' ' + rv) if rv else ''} 要求 {need}{spec}" + (f",裝的是 {inst}" if inst else ",未裝"))
+                fixes.append(f'"{py}" -m pip install "{need}{spec}"' if kind == "MISSING" else f'"{py}" -m pip install "{need}{spec}"   # MISMATCH:先看家族冊是否鎖版(via-envgov plan 段冊)')
+        if len(c) > limit:
+            print(f"     … 其餘 {len(c) - limit} 條(--limit N)")
+        for f in dict.fromkeys(fixes):
+            print(f"     修法 $ {f}")
+        print(f"     或整境重建:via-rebuild --env {name}(MDL050;LKGC lock 可 via-envgov rollback)")
+    if shown == 0 and not only:
+        print("  [OK ] via_* 境零衝突(BASE 見上計數)")
+    return 0
+
+
 def main() -> int:
     args = sys.argv[1:]
     _ARGV_ALL[:] = args
@@ -2282,8 +2345,14 @@ def main() -> int:
     if "--help" in args or "-h" in args:
         print(__doc__)
         return 0
+    bad = unknown_flags(args)
+    if bad:
+        print(f"  [誠實停] 未知旗標 {' '.join(bad)}(本版 MDL135 v{VERSION} 不識;版本落差?先 via-reload 拉齊再試;已知旗標:{' '.join(sorted(KNOWN_FLAGS))})")
+        return 2
     verb = next((a for a in args if not a.startswith("-")), "run")
     rest = [a for a in args if a != verb]
+    if verb == "conflicts":
+        return do_conflicts(rest)
     if verb == "run":
         return do_run(rest, "run")
     if verb in ("panorama", "scan"):
