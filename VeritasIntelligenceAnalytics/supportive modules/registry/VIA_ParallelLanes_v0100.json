@@ -1,0 +1,119 @@
+{
+ "engine": "CGC_MDL134_ParallelLanes v0100",
+ "chains": {
+  "datahome": [
+   "fs",
+   []
+  ],
+  "opencc": [
+   "pip",
+   [
+    "datahome"
+   ]
+  ],
+  "pkuseg": [
+   "pip",
+   [
+    "datahome"
+   ]
+  ],
+  "vap_node": [
+   "node",
+   [
+    "datahome"
+   ]
+  ],
+  "global": [
+   "gl",
+   [
+    "datahome"
+   ]
+  ],
+  "fred": [
+   "gl",
+   [
+    "datahome"
+   ]
+  ],
+  "hist_probe": [
+   "tw",
+   [
+    "datahome"
+   ]
+  ],
+  "group_class": [
+   "tw",
+   [
+    "datahome"
+   ]
+  ],
+  "revenue_backfill": [
+   "tw",
+   [
+    "datahome"
+   ]
+  ],
+  "consensus": [
+   "tw",
+   [
+    "datahome"
+   ]
+  ],
+  "revenue_consensus": [
+   "tw",
+   [
+    "datahome"
+   ]
+  ],
+  "etf_universe": [
+   "etf",
+   [
+    "datahome"
+   ]
+  ],
+  "etf_fetch": [
+   "etf",
+   [
+    "datahome"
+   ]
+  ],
+  "etf_history": [
+   "etf",
+   [
+    "datahome"
+   ]
+  ],
+  "etf_revenue": [
+   "join",
+   [
+    "revenue_consensus",
+    "etf_history"
+   ]
+  ],
+  "refail": [
+   "grid",
+   [
+    "etf_revenue",
+    "fred",
+    "pkuseg",
+    "vap_node"
+   ]
+  ],
+  "digest": [
+   "grid",
+   [
+    "refail"
+   ]
+  ]
+ },
+ "max_lanes": 10,
+ "rules": [
+  "單寫者律:同一 DuckDB/安裝器的步在同鏈序跑;鏈間才並行(十道=上限,有效並行=鏈數)",
+  "Hydra 律:H3 進程雙頭=阻擋(PID 活=BUSY;死=回收);H1/H2 同名/同版雙物具名 WARN;零 force",
+  "誠實三態 OK/FAIL/SKIP;離線=net 步 SKIP;鑰缺=SKIP 印指令;逾時 kill 不卡斷",
+  "只增不減:步冊零重複定義(直取 MDL125 plan);頁/冊 version-forward;零刪除",
+  "尾版律:引擎/冊 glob 尾版動態解析,永不寫死版號"
+ ],
+ "last": "20260907_062013",
+ "last_state": "FAIL"
+}

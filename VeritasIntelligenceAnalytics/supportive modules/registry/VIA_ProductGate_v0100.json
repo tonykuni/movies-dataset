@@ -1,8 +1,8 @@
 {
- "engine": "CGC_MDL133_ProductGate v0100",
- "stamp": "2026-09-07 05:03",
+ "engine": "CGC_MDL133_ProductGate v0101",
+ "stamp": "2026-09-07 06:25",
  "grid": {
-  "name": "GRID_20260907_045251.json + 2 REFAIL(→REFAIL_20260907_050101.json)",
+  "name": "GRID_20260907_045251.json + 8 REFAIL(→REFAIL_20260907_062319.json)",
   "ok": 177,
   "fail": 5,
   "skip": 2
@@ -12,14 +12,14 @@
    "id": "G1",
    "name": "矩陣存證",
    "state": "WARN",
-   "evidence": "grid GRID_20260907_045251.json + 2 REFAIL(→REFAIL_20260907_050101.json) · OK 177 FAIL 5 SKIP 2 · 核心站 16/16(批376 站 9/8)· 碼紅 0 料紅 5 · 料側 寬表刷新器六檢(批145)[DATA?], 族群輪動實庫轉接六檢(批152)[DATA], 儀表板原始版八檢(批167)[DATA], 每日觀察摘要八檢(批174)[DATA?], 驗證共識庫八檢(批176)[DATA]",
+   "evidence": "grid GRID_20260907_045251.json + 8 REFAIL(→REFAIL_20260907_062319.json) · OK 177 FAIL 5 SKIP 2 · 核心站 16/16(批376 站 9/8)· 碼紅 0 料紅 5 · 料側 寬表刷新器六檢(批145)[DATA?], 族群輪動實庫轉接六檢(批152)[DATA?], 儀表板原始版八檢(批167)[DATA], 每日觀察摘要八檢(批174)[DATA?], 驗證共識庫八檢(批176)[DATA]",
    "next": "via-mobile(補齊鏈)"
   },
   {
    "id": "G2",
    "name": "短令↔梭",
    "state": "OK",
-   "evidence": "函式 49 · 梭 46 · 讓位 via-all,via-rootcheck,via-tower-reset",
+   "evidence": "函式 51 · 梭 48 · 讓位 via-all,via-rootcheck,via-tower-reset",
    "next": ""
   },
   {
@@ -40,35 +40,35 @@
    "id": "G5",
    "name": "再生物讓位",
    "state": "OK",
-   "evidence": ".gitignore 規則 181 · 再生頁 5/5 已讓位",
+   "evidence": ".gitignore 規則 182 · 再生頁 6/6 已讓位",
    "next": ""
   },
   {
    "id": "G6",
    "name": "鑰匙守衛",
    "state": "OK",
-   "evidence": "掃描 /home/user/movies-dataset · 命中 0 · 36.6s",
+   "evidence": "掃描 /home/user/movies-dataset · 命中 0 · 37.2s",
    "next": ""
   },
   {
    "id": "G7",
    "name": "引擎尾版",
    "state": "OK",
-   "evidence": "尾版 18/18 可編譯 · Register Register-VIA-Commands-v0144.ps1 · CGC_MDL125_FixAll_v0109.py, CGC_MDL131_ProjectCompletion_v0105.py, CGC_MDL132_VesBridge_v0103.py, CGC_MDL133_ProductGate_v0100.py",
+   "evidence": "尾版 19/19 可編譯 · Register Register-VIA-Commands-v0146.ps1 · CGC_MDL131_ProjectCompletion_v0105.py, CGC_MDL132_VesBridge_v0103.py, CGC_MDL133_ProductGate_v0101.py, CGC_MDL134_ParallelLanes_v0100.py",
    "next": ""
   },
   {
    "id": "G8",
    "name": "短令在位",
    "state": "OK",
-   "evidence": "產品短令 14/14",
+   "evidence": "產品短令 15/15",
    "next": ""
   },
   {
    "id": "G9",
    "name": "用法文件",
    "state": "OK",
-   "evidence": "usage 6 條 · 頁 VIA_UI_ProductGate_v0100.html · 本頁零 CDN/手機單欄",
+   "evidence": "usage 7 條 · 頁 VIA_UI_ProductGate_v0100.html · 本頁零 CDN/手機單欄",
    "next": ""
   }
  ],
@@ -116,6 +116,7 @@
   "全矩陣:via-selftest;只重跑紅站:via-selftest --refail;只八站:via-selftest --only 批376",
   "資料側:via-fred(FRED 190 序列)/ via-revfill(月營收史深)/ via-etfuniv(主動 ETF 宇宙)/ via-etfhist(持股史深)/ via-etfrev(ETF×營收)",
   "標準化掃描:via-ves(唯讀;--apply 永不經短令)",
+  "並行補齊:via-lanes run(十道;Hydra 哨兵)/ via-mobile --lanes",
   "日更:boot(via_boot_update.sh)①–⑫ 含本閘"
  ],
  "rules": [
@@ -126,5 +127,5 @@
   "鑰匙守衛以 SHA-256 指紋比對;本檔永不含明文鑰"
  ],
  "verdict": "CONDITIONAL",
- "elapsed_s": 36.9
+ "elapsed_s": 37.5
 }
