@@ -392,3 +392,16 @@ via-envgov apply --approve --only-kind REPAIR_BASE
 via-envgov
 via-handover
 ```
+
+### 批397 工作站實錄補:雙副本律(`via-pin`)
+
+- 實錄:在 `PS C:\Users\tonyk>` 新視窗 `via-reload; via-famui vdf,vrn --open` → 載到 `Register-VIA-Commands-v0148.ps1 · HEAD c14d428c → c14d428c`,`via-famui` 不認。根因:`$PROFILE` 點源的是 Github 母副本(分支 `main`,c14d428c = PR #30 基底),`via-reload` 分支感知只拉 `origin/main`;PR #30 未併,母副本永遠拉不到批381–396。b381 副本(`Downloads\movies-dataset-b381`,分支 `claude/…`,e7989bc8,v0161)只在該資料夾啟動的視窗生效。另:貼入的文字含終端輸出(`remote: …`、`Fast-forward` 等),PowerShell 逐行當指令跑=一串 ParserError,無害但吵;只貼程式碼框內文字。
+- 修:Register v0162 `via-pin`——把 profile 的 VIA 點源行換成本窗副本(`--show` 只看;只改 profile 一行;兩副本檔案零觸碰);`via-reload` 印雙副本提示(profile 預設副本 ≠ 本窗副本時指路 `via-pin`)。PR #30 合併後母副本自然拉齊,`via-pin` 回指母副本即可(操作員令「合併」未下,不自行合併)。
+
+```powershell
+# 在任何新視窗(先按 Enter 讓提示字元回來;只貼本框內文字)
+. (Get-ChildItem "C:\Users\tonyk\Downloads\movies-dataset-b381\VeritasIntelligenceAnalytics\Register-VIA-Commands-v*.ps1" | Sort-Object Name | Select-Object -Last 1).FullName
+via-reload
+via-pin
+via-famui vdf,vrn --open
+```
