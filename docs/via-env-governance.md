@@ -218,3 +218,18 @@ via-reload; via-entry
 via-envgov conflicts --env via_vrn_312; via-rungate --family vrn
 via-rungate; via-vdfdb scan; via-vdfdb run --apply; via-vdfdb ckpt; via-vapone; via-open 矩陣
 ```
+
+## 十二、批386:VRN 一題四點契約接回母倉(潛在上漲空間與目標價除權息調整)
+
+操作員令(自 Grok 主控台對話帶回):「1. 潛在上漲空間(用最新 adj close 去算),目標價 xxx 元,評價方式 xxx,基於 xxx;2. n~n+3 diluted eps,yoy xxx,主要原因 xxx;3. 4. 將第一頁其餘本文部分整合成兩點不受限」,並補一律:「如果報告時間在除權息前,目標價也必須除權息調整」。
+
+- 引擎 `VRN_ENG080_FourPointDigest`(`via-vrn4`,以 `via_vrn_312` python 啟動):輸入 ENG073 的 `vrn_report_basic`/`vrn_report_metrics`、ENG072 首頁 sidecar(header/right/body)與 `tw_daily_prices`;輸出 `vrn_four_point_digest`(派生層,同 report_file 重寫)與 `VIA_Reports/vrn/four_point/DIGEST_latest.json/.html`。
+- **除權息調整律**:報告日 < 除權息日 ≤ 最新日 → `TP_adj = TP × F`,`F = (adj_close/close)@報告日 ÷ (adj_close/close)@最新日`(後向復權因子鏈;因子變動日即除權息/拆股事件,逐日列示)。母倉沒有配息事件表,因子由價表推定並誠實標 `PRICE_FACTOR_CHAIN`;最新日因子 ≠ 1 代表 adj 基準不是最新(價表混抓時點),報告會加註,建議 `via-hist` 重抓或 ENG060 重建。
+- **潛在上漲空間** `upside_now = (TP_adj − 最新 adj close) / 最新 adj close`;批240 的「報告時上漲」(目標價 ÷ 報告前日 close)另欄保留,兩者口徑不同、不互相取代。目標價缺、該檔不在價表、或價表無 adj_close 時一律「上漲空間未算」,不拿共識或 close 頂替。
+- 五槽 quote-or-abstain:標題/K1/K2/K3/K4 皆須從正文或冊抽出才算接地;K5 風險可空即通過;多值目標價只列示不平均;文摘裡出現來源沒有的數字 → QC 紅(衍生數 TP_adj/上漲%/YoY 除外)。
+- 另依操作員裁示,Baseline 冊新增 `not_accelerators`:PyPy/RPython 翻譯鏈不是加速槽,`via_iso_pypy` 不得當 GA/PS 加速器,cp311/cp312 與 pp311 ABI 不混載。
+
+```powershell
+via-reload; via-vrn4                 # 全冊;需先 ENG072 首頁抽取 + ENG073 入庫
+via-vrn4 --ticker 2330; via-vrn4 show 2330
+```

@@ -43,6 +43,7 @@ pwsh -File "VeritasIntelligenceAnalytics\Install-VIA.ps1"     # 加 -AutoStart �
 | `via-vapone` | VAP ONE 單檔整合引擎 VAP_ENG016(批383 vap 補充):圖規 SSOT 40/圖規鎖/批330 資料律/K 線 75/25/零依賴 SVG+Plotly+Matplotlib 車道;無參數=`--selftest` 72 檢;`--axis`/`--list-charts`/`--demo`/`--render`/`--lanes`;以 `via_vap_312` python 啟動=全車道 |
 | `via-rungate` | **VDF/VRN/VAP 能跑閘 MDL137(批384)**:「能跑」=家族境 python(`via_vdf_312`/`via_vrn_312`/`via_vap_312`;MDL136 解析)逐庫 import + SelftestGrid 家族站真跑(`--fast` 每族 3 站/預設 8/`--all`;`--family vdf,vrn,vap`);RED=引擎 FAIL、YELLOW=base 退路或必要庫缺;`status` 看上次;鏈路燈(DeckServer v0129 任務冊家族路由=ParallelLanes/CompletionAutomator/MasterControl 同律) |
 | `via-py` | 家族境 python 通用啟動器(批384):`via-py vdf "functional modules\VDF\engine\VDF_ENG064_HistoryBackfill_v0108.py" --status`;境缺=base 退路印黃 |
+| `via-vrn4` | **研報一題四點文摘 VRN_ENG080(批386)**:標題+K1 潛在上漲空間(目標價 報告正文>VRN_SSOT 多值不平均;最新 adj close;**報告日在除權息前=目標價後向因子鏈同口徑調整**;另存批240 報告時上漲)+K2 稀釋 EPS n～n+3 YoY 主要原因+K3/K4 首頁其餘對半+K5 風險可空;quote-or-abstain、novel numbers QC;`run [--ticker X]`/`show <ticker>`;落 `vrn_four_point_digest` 與 `VIA_Reports/vrn/four_point/DIGEST_latest.html` |
 | `via-bridge` | **Command Bridge**:一鍵前後端對接——後端 B1-B5 探測(接線/SSOT/依賴/資料庫/UI)+ test/debug 三輪 + 多 TAB 前端,首頁=總覽+全系統狀態矩陣(每跑必重生=當下真相) |
 | `via-trinity` | 功能三系整合模板:VIA 母刊頭 > 鍛 VDF/研 VRN/鑑 VAP 四 TAB(Porcelain;22 個 {{…}} 資料綁定槽) |
 | `via-workops` | **WorkOps 指揮板**:一支到底=唯讀掃描+控管表自動對帳+兩頁指揮板(①專案指揮 ②追蹤哨,≥3 天未回主動跳出);`ui` 開靜態儀表板;`Scan\|Reconcile\|Draft\|FollowUp\|Templates\|All` 走引擎非互動面 |
