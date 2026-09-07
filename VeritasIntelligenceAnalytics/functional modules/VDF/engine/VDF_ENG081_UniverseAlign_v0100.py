@@ -10,15 +10,19 @@ VDF_ENG081_UniverseAlign v0100 — 台股每日交易資訊×籌碼 數量對齊
   ① check  逐日核對(最近 N 個交易日;交易日曆=價表實際日期):價表票數 px_n vs 籌碼票數 chip_n(tw_chip_inst ∪ tw_chip_margin)
            → both/px_only/chip_only → 每日判定 ALIGNED(兩側票集合相等)/PARTIAL(交集≥90%)/MISALIGNED;最新日列不一致清單;
            籌碼最新日落後價表=誠實 MISALIGNED 並指路 via-chip run(ENG056)→ VIA_Reports/vdf/universe/ALIGN_latest.json
-  ② update 股票清單=最新日(價表∪籌碼)∩ tw_listings(缺冊=價表∪籌碼全員)→ tw_universe(asof_date,ticker,code,market,name,
+  ② update 股票清單=基準日(價表∪籌碼)∩ tw_listings(缺冊=價表∪籌碼全員)→ tw_universe(asof_date,ticker,code,market,name,
            in_prices,in_chips,aligned,updated_at);--apply 才寫:DuckDB anti-join 只增(鍵 asof_date,ticker)+ parquet 增量
            (output_hub/mega/tw_universe_<ts>.parquet 只含本次新增列;0 新增=不落檔);預設 dry-run 只印
+           基準日律(批393 工作站實錄:最新價日 2026-09-07 只 399 票、籌碼 0,曾以此建清單 399 列=殘缺):預設=最新「雙側齊日」
+           (價表票數 ≥ 窗內最大 60% 且籌碼有票且判定 ALIGNED/PARTIAL 的最新日);最新價日 價未齊/籌碼缺=誠實 YELLOW 改以雙側齊日為基準並印修法;
+           --asof YYYY-MM-DD 指定基準日;--allow-latest 強制最新價日;status 標殘缺快照(列數 < 最大快照 60%)並報現役基準日 current_asof
   ③ status 上次 ALIGN_latest 摘要 + tw_universe 表現況
 紀律:只增不減;正本零觸碰(不改價表/籌碼表);誠實三態(GREEN/YELLOW/RED;庫缺/表缺不假綠);零網路;尾版律;
       讓庫律(批391 工作站實錄:日更鏈/回補持單寫者鎖 → update --apply 曾 IOException traceback):開庫短等重試 6×3s,逾額誠實
-      [FAIL] 庫忙 rc3 印修法(等日更鏈/回補跑完再 update --apply;check 唯讀)不再 traceback。
+      [FAIL] 庫忙 rc3 印修法(等日更鏈/回補跑完再 update --apply;check 唯讀)不再 traceback;持鎖者解析(批393:IOException 內 PID n →
+      命令列 → 引擎名+動詞,印一次 [庫忙] 持鎖者;指路 via-bg 背景引擎進程唯讀一覽,絕不 Stop-Process;實錄:via-status 開的是同步頁不是進程表)。
 用法:python3 VDF_ENG081_UniverseAlign_v0100.py check [--days N] [--db PATH] [--json]
-      | update [--apply] [--db PATH] [--json] | status [--db PATH] | --selftest
+      | update [--apply] [--asof YYYY-MM-DD] [--allow-latest] [--db PATH] [--json] | status [--db PATH] | --selftest
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
@@ -39,6 +43,7 @@ except Exception:
 import datetime as _dt
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -54,6 +59,9 @@ UNIVERSE = "tw_universe"
 VERBS = ("check", "update", "status")
 DAYS_DEFAULT = 20
 PARTIAL_FLOOR = 0.90
+PX_FULL_FLOOR = 0.60   # 批393:價表票數 ≥ 窗內最大 60% 才算「價齊日」(日更未齊/來源缺=殘缺日,不作清單基準)
+_PID_RX = re.compile(r"PID\s*(\d+)")
+_ENGINE_RX = re.compile(r"((?:VDF|VRN|VAP|CGC|SUP)_(?:ENG|MDL)\d{3}_[A-Za-z0-9]+(?:_v\d{4})?\.py|via_boot_update\.(?:ps1|sh)|VIA\.ps1|VIA_SYSTEM_MANAGER_v\d{4}\.py)")
 
 
 # ---------------------------------------------------------------- 基礎
@@ -89,11 +97,48 @@ def _duckdb():
         return None
 
 
-def _connect(db: Path, read_only: bool, retries: int = 6, wait: float = 3.0, sleep_fn=None):
-    """讓庫律(批391;ENG064/ENG079 同律):DuckDB 單寫者鎖=短等重試;逾額誠實 RuntimeError(主程式印 [FAIL] rc3,零 traceback)"""
+def _proc_cmdline(pid: int) -> str:
+    """持鎖進程命令列(唯讀;Windows=Get-CimInstance Win32_Process;POSIX=ps;失敗=空字串;零第三方依賴;絕不動進程)"""
+    import subprocess
+    try:
+        if os.name == "nt":
+            cmd = ["powershell", "-NoProfile", "-Command", f"(Get-CimInstance Win32_Process -Filter 'ProcessId={int(pid)}').CommandLine"]
+        else:
+            cmd = ["ps", "-o", "args=", "-p", str(int(pid))]
+        out = subprocess.run(cmd, capture_output=True, text=True, timeout=10).stdout
+        return " ".join(out.split())[:240]
+    except Exception:
+        return ""
+
+
+def _holder_label(cmdline: str) -> str:
+    """命令列 → 引擎名(+動詞):…VDF_ENG064_HistoryBackfill_v0102.py run --resume → 'VDF_ENG064_HistoryBackfill_v0102.py run'"""
+    if not cmdline:
+        return ""
+    m = _ENGINE_RX.search(cmdline)
+    if not m:
+        return cmdline[:80]
+    tail = cmdline[m.end():].strip().strip('"').split()
+    verb = tail[0] if tail and not tail[0].startswith("-") else ""
+    return (m.group(1) + (" " + verb if verb else "")).strip()
+
+
+def _holder_of(msg: str) -> tuple:
+    """IOException 文字 → (pid, 引擎標籤);無 PID=(None, '')(批393 工作站實錄:File is already open in python.exe (PID 7396))"""
+    m = _PID_RX.search(msg or "")
+    if not m:
+        return (None, "")
+    pid = int(m.group(1))
+    return (pid, _holder_label(_proc_cmdline(pid)))
+
+
+def _connect(db: Path, read_only: bool, retries: int = 6, wait: float = 3.0, sleep_fn=None, resolver=None):
+    """讓庫律(批391;ENG064/ENG079 同律):DuckDB 單寫者鎖=短等重試;逾額誠實 RuntimeError(主程式印 [FAIL] rc3,零 traceback)
+    批393:持鎖者解析(IOException 內 PID n → 命令列 → 引擎名)印一次 [庫忙] 持鎖者;[FAIL] 句指路 via-bg(唯讀一覽;絕不 Stop-Process)"""
     import time
     duckdb = _duckdb()
     last = ""
+    holder = None
     for i in range(retries):
         try:
             return duckdb.connect(str(db), read_only=read_only)
@@ -102,9 +147,14 @@ def _connect(db: Path, read_only: bool, retries: int = 6, wait: float = 3.0, sle
             low = last.lower()
             if not any(k in low for k in ("lock", "already open", "being used", "另一個程序", "cannot open file")):
                 raise
+            if holder is None:
+                holder = (resolver or _holder_of)(last)
+                if holder[0]:
+                    print(f"  [庫忙] 持鎖者 PID {holder[0]}:{holder[1] or '(命令列不可讀)'}(等其跑完;絕不 Stop-Process;via-bg 看全部背景引擎)", flush=True)
             print(f"  [庫忙] {i + 1}/{retries}:{last.splitlines()[0][:90]} → 等 {wait}s", flush=True)
             (sleep_fn or time.sleep)(wait)
-    raise RuntimeError(f"庫忙逾 {retries}×{wait}s(日更鏈/歷史回補持單寫者鎖;等其跑完再 via-align {'update --apply' if not read_only else 'check'};via-status 看背景進程):{last.splitlines()[0][:120]}")
+    who = f"持鎖者 PID {holder[0]}:{holder[1] or '?'};" if holder and holder[0] else ""
+    raise RuntimeError(f"庫忙逾 {retries}×{wait}s({who}日更鏈/歷史回補持單寫者鎖;等其跑完再 via-align {'update --apply' if not read_only else 'check'};via-bg 看背景引擎進程):{last.splitlines()[0][:120]}")
 
 
 def _q(s: str) -> str:
@@ -151,6 +201,75 @@ def chip_ticker(code: str, market: str, lst: dict) -> str:
     return code + (".TW" if mk == "TWSE" else ".TWO" if mk in ("TPEX", "OTC") else ".TW")
 
 
+def _daily_sets(con, have: set, lst: dict, days: int) -> tuple:
+    """最近 N 個交易日(交易日曆=價表)→ (px_dates 新→舊, 日→價表票集合, 日→籌碼票集合(inst∪margin 經冊對映), 籌碼最新日)"""
+    chips = [t for t in CHIPS if t in have]
+    px_dates = [r[0] for r in con.execute(f"SELECT DISTINCT CAST(date AS VARCHAR) d FROM {PX} WHERE ticker <> '_NOOP_' ORDER BY d DESC LIMIT {int(days)}").fetchall()]
+    chip_max = None
+    chip_sets: dict = {}
+    for t in chips:
+        cols = _cols(con, t)
+        dc, cc, mc = cols.get("date"), cols.get("code"), cols.get("market")
+        if not (dc and cc):
+            continue
+        mx = con.execute(f'SELECT max(CAST("{dc}" AS VARCHAR)) FROM "{t}"').fetchone()[0]
+        if mx and (chip_max is None or str(mx) > chip_max):
+            chip_max = str(mx)[:10]
+        if px_dates:
+            rows = con.execute(f'SELECT CAST({_qi(dc)} AS VARCHAR), {_qi(cc)}, {_qi(mc)} FROM {_qi(t)} WHERE CAST({_qi(dc)} AS VARCHAR) >= {_q(min(px_dates))}').fetchall()
+            for d, code, mk in rows:
+                chip_sets.setdefault(str(d)[:10], set()).add(chip_ticker(code, mk, lst))
+    px_sets: dict = {}
+    if px_dates:
+        for d, tk in con.execute(f"SELECT CAST(date AS VARCHAR), ticker FROM {PX} WHERE ticker <> '_NOOP_' AND CAST(date AS VARCHAR) >= {_q(min(px_dates))}").fetchall():
+            px_sets.setdefault(str(d)[:10], set()).add(str(tk))
+    return px_dates, px_sets, chip_sets, chip_max
+
+
+def _verdict(p: set, c: set) -> str:
+    if not c:
+        return "MISALIGNED"
+    if p == c:
+        return "ALIGNED"
+    if len(p & c) >= PARTIAL_FLOOR * max(len(p), len(c)):
+        return "PARTIAL"
+    return "MISALIGNED"
+
+
+def _pick_asof(px_dates: list, px_sets: dict, chip_sets: dict, px_top: int, asof: str | None = None, allow_latest: bool = False) -> dict:
+    """基準日律(批393):--asof 指定 > --allow-latest 最新價日 > 最新雙側齊日(價 ≥ 窗內最大 60%、籌碼有票、ALIGNED/PARTIAL)
+    > 最新雙側有票日 > 最新價日(籌碼全缺);非雙側齊日一律 YELLOW 並印修法(誠實三態;殘缺日不假綠)"""
+    def row(d):
+        p, c = px_sets.get(d, set()), chip_sets.get(d, set())
+        return len(p), len(c), _verdict(p, c), len(p) >= PX_FULL_FLOOR * px_top
+    d_latest = px_dates[0]
+    n0, m0, v0, full0 = row(d_latest)
+    if asof:
+        if asof not in px_dates:
+            return {"asof": None, "lamp": "RED", "rule": "--asof", "why": "", "error": f"基準日 {asof} 不在價表交易日(窗內 {px_dates[-1]}…{d_latest} 共 {len(px_dates)} 日)"}
+        n, m, v, full = row(asof)
+        good = bool(m) and v != "MISALIGNED" and full
+        return {"asof": asof, "lamp": "GREEN" if good else "YELLOW", "rule": "--asof 指定",
+                "why": "" if good else f"指定基準日 {asof} 價 {n} 籌碼 {m} {v}{'' if full else '(價未齊)'}=非雙側齊日(操作員指定,照辦)"}
+    good0 = bool(m0) and v0 != "MISALIGNED" and full0
+    if allow_latest or good0:
+        return {"asof": d_latest, "lamp": "GREEN" if good0 else "YELLOW", "rule": "最新價日" if good0 else "--allow-latest 強制最新價日",
+                "why": "" if good0 else f"最新價日 {d_latest} 價 {n0} 籌碼 {m0} {v0}{'' if full0 else '(價未齊)'}=非雙側齊日(--allow-latest 強制)"}
+    flaw = ("(價未齊<窗內最大 " + str(px_top) + " 之 60%)" if not full0 else "") + ("(籌碼缺/落後)" if not m0 else "")
+    for d in px_dates:
+        n, m, v, full = row(d)
+        if m and v != "MISALIGNED" and full:
+            return {"asof": d, "lamp": "YELLOW", "rule": "最新雙側齊日",
+                    "why": f"最新價日 {d_latest} 價 {n0} 籌碼 {m0}{flaw}=殘缺日不作基準 → 基準日改最新雙側齊日 {d}(價 {n} 籌碼 {m} {v});--asof 指定;--allow-latest 強制最新價日"}
+    for d in px_dates:
+        n, m, v, full = row(d)
+        if m and n:
+            return {"asof": d, "lamp": "YELLOW", "rule": "最新雙側有票日(窗內無齊日)",
+                    "why": f"窗內無雙側齊日 → 基準日改最新雙側有票日 {d}(價 {n} 籌碼 {m} {v});先 via-chip run(ENG056)補籌碼再 update"}
+    return {"asof": d_latest, "lamp": "YELLOW", "rule": "最新價日(窗內籌碼全缺)",
+            "why": f"窗內籌碼全缺 → 清單只含價表側(asof {d_latest} 價 {n0});先 via-chip run(ENG056)補籌碼再 update"}
+
+
 # ---------------------------------------------------------------- ① check
 def check(db: Path = DB_TW, days: int = DAYS_DEFAULT, reports: Path = REPORTS, do_print: bool = True) -> dict:
     rep = {"schema": "VIA.UniverseAlign.v1", "ts": _now(), "db": str(db), "days": days, "verdict": "GREEN", "note": "", "dates": [], "mismatch": {"px_only": [], "chip_only": []},
@@ -185,43 +304,21 @@ def check(db: Path = DB_TW, days: int = DAYS_DEFAULT, reports: Path = REPORTS, d
             say(f"RED     {rep['note']}")
         lst = listings_map(con)
         rep["summary"]["listings"] = len(lst)
-        px_dates = [r[0] for r in con.execute(f"SELECT DISTINCT CAST(date AS VARCHAR) d FROM {PX} WHERE ticker <> '_NOOP_' ORDER BY d DESC LIMIT {int(days)}").fetchall()]
-        chip_max = None
-        chip_sets: dict = {}
-        for t in chips:
-            cols = _cols(con, t)
-            dc, cc, mc = cols.get("date"), cols.get("code"), cols.get("market")
-            if not (dc and cc):
-                continue
-            mx = con.execute(f'SELECT max(CAST("{dc}" AS VARCHAR)) FROM "{t}"').fetchone()[0]
-            if mx and (chip_max is None or str(mx) > chip_max):
-                chip_max = str(mx)[:10]
-            if px_dates:
-                rows = con.execute(f'SELECT CAST({_qi(dc)} AS VARCHAR), {_qi(cc)}, {_qi(mc)} FROM {_qi(t)} WHERE CAST({_qi(dc)} AS VARCHAR) >= {_q(min(px_dates))}').fetchall()
-                for d, code, mk in rows:
-                    chip_sets.setdefault(str(d)[:10], set()).add(chip_ticker(code, mk, lst))
-        px_sets: dict = {}
-        if px_dates:
-            for d, tk in con.execute(f"SELECT CAST(date AS VARCHAR), ticker FROM {PX} WHERE ticker <> '_NOOP_' AND CAST(date AS VARCHAR) >= {_q(min(px_dates))}").fetchall():
-                px_sets.setdefault(str(d)[:10], set()).add(str(tk))
+        px_dates, px_sets, chip_sets, chip_max = _daily_sets(con, have, lst, days)
         rep["summary"]["px_max"] = px_dates[0] if px_dates else None
         rep["summary"]["chip_max"] = chip_max
+        px_top = max((len(px_sets.get(d, set())) for d in px_dates), default=0)
+        rep["summary"]["px_top"] = px_top
         n_al = n_part = n_mis = 0
         for d in px_dates:
             p, c = px_sets.get(d, set()), chip_sets.get(d, set())
             both = p & c
-            if not c:
-                v = "MISALIGNED"
-            elif p == c:
-                v = "ALIGNED"
-            elif len(both) >= PARTIAL_FLOOR * max(len(p), len(c)):
-                v = "PARTIAL"
-            else:
-                v = "MISALIGNED"
+            v = _verdict(p, c)
             n_al += v == "ALIGNED"
             n_part += v == "PARTIAL"
             n_mis += v == "MISALIGNED"
-            rep["dates"].append({"date": d, "px_n": len(p), "chip_n": len(c), "both": len(both), "px_only": len(p - c), "chip_only": len(c - p), "verdict": v})
+            rep["dates"].append({"date": d, "px_n": len(p), "chip_n": len(c), "both": len(both), "px_only": len(p - c), "chip_only": len(c - p), "verdict": v,
+                                 "px_full": len(p) >= PX_FULL_FLOOR * px_top})
         if px_dates:
             d0 = px_dates[0]
             p, c = px_sets.get(d0, set()), chip_sets.get(d0, set())
@@ -244,6 +341,10 @@ def check(db: Path = DB_TW, days: int = DAYS_DEFAULT, reports: Path = REPORTS, d
             else:
                 rep["verdict"] = "ALIGNED"
                 rep["note"] = f"{len(px_dates)} 日票集合全等(最新日 {rep['latest'].get('px_n', 0)} 票)"
+            if rep["dates"] and not rep["dates"][0]["px_full"]:
+                if rep["verdict"] == "ALIGNED":
+                    rep["verdict"] = "PARTIAL"
+                rep["note"] = f"最新價日 {rep['dates'][0]['date']} 價 {rep['dates'][0]['px_n']} < 窗內最大 {px_top} 之 60%=日更未齊(ENG054 增量跑中/來源缺;清單基準日自動改雙側齊日)· " + rep["note"]
     finally:
         con.close()
     _finish(rep, reports, "ALIGN")
@@ -251,7 +352,7 @@ def check(db: Path = DB_TW, days: int = DAYS_DEFAULT, reports: Path = REPORTS, d
         lamp = {"ALIGNED": "GREEN", "PARTIAL": "YELLOW", "MISALIGNED": "YELLOW"}.get(rep["verdict"], rep["verdict"])
         say(f"[via-align check] {rep['verdict']}({lamp})· {rep['note']}")
         for d in rep["dates"][:10]:
-            say(f"  {d['date']}  價 {d['px_n']:>5}  籌碼 {d['chip_n']:>5}  皆有 {d['both']:>5}  只價 {d['px_only']:>4}  只籌 {d['chip_only']:>4}  {d['verdict']}")
+            say(f"  {d['date']}  價 {d['px_n']:>5}  籌碼 {d['chip_n']:>5}  皆有 {d['both']:>5}  只價 {d['px_only']:>4}  只籌 {d['chip_only']:>4}  {d['verdict']}{'' if d.get('px_full', True) else '  價未齊'}")
         if len(rep["dates"]) > 10:
             say(f"  … 其餘 {len(rep['dates']) - 10} 日見 ALIGN_latest.json")
         say(f"  存證 {reports / 'ALIGN_latest.json'}")
@@ -259,8 +360,8 @@ def check(db: Path = DB_TW, days: int = DAYS_DEFAULT, reports: Path = REPORTS, d
 
 
 # ---------------------------------------------------------------- ② update
-def update(db: Path = DB_TW, apply: bool = False, reports: Path = REPORTS, mega: Path | None = None, do_print: bool = True) -> dict:
-    rep = {"schema": "VIA.UniverseUpdate.v1", "ts": _now(), "db": str(db), "mode": "apply" if apply else "dry-run", "verdict": "GREEN", "note": "", "asof": None, "rows": 0, "new": 0, "parquet": "", "summary": {}}
+def update(db: Path = DB_TW, apply: bool = False, reports: Path = REPORTS, mega: Path | None = None, do_print: bool = True, asof: str | None = None, allow_latest: bool = False) -> dict:
+    rep = {"schema": "VIA.UniverseUpdate.v1", "ts": _now(), "db": str(db), "mode": "apply" if apply else "dry-run", "verdict": "GREEN", "note": "", "asof": None, "latest_px_date": None, "asof_rule": "", "rows": 0, "new": 0, "parquet": "", "summary": {}}
 
     def say(s):
         if do_print:
@@ -281,24 +382,27 @@ def update(db: Path = DB_TW, apply: bool = False, reports: Path = REPORTS, mega:
             _finish(rep, reports, "UNIVERSE")
             return rep
         lst = listings_map(con)
-        d0 = con.execute(f"SELECT max(CAST(date AS VARCHAR)) FROM {PX} WHERE ticker <> '_NOOP_'").fetchone()[0]
-        if not d0:
+        days = DAYS_DEFAULT
+        if asof:   # 指定基準日=窗擴到含該日(上限 3650 交易日)
+            k = con.execute(f"SELECT count(DISTINCT CAST(date AS VARCHAR)) FROM {PX} WHERE ticker <> '_NOOP_' AND CAST(date AS VARCHAR) >= {_q(str(asof)[:10])}").fetchone()[0]
+            days = max(DAYS_DEFAULT, min(3650, int(k or 0) + 1))
+        px_dates, px_sets, chip_sets, chip_max = _daily_sets(con, have, lst, days)
+        if not px_dates:
             rep["verdict"], rep["note"] = "RED", "價表空"
             say(f"RED     {rep['note']}")
             _finish(rep, reports, "UNIVERSE")
             return rep
-        d0 = str(d0)[:10]
-        px = {str(r[0]) for r in con.execute(f"SELECT DISTINCT ticker FROM {PX} WHERE ticker <> '_NOOP_' AND CAST(date AS VARCHAR) = {_q(d0)}").fetchall()}
-        chips = set()
-        for t in CHIPS:
-            if t not in have:
-                continue
-            cols = _cols(con, t)
-            dc, cc, mc = cols.get("date"), cols.get("code"), cols.get("market")
-            if not (dc and cc):
-                continue
-            for code, mk in con.execute(f'SELECT DISTINCT {_qi(cc)}, {_qi(mc)} FROM {_qi(t)} WHERE CAST({_qi(dc)} AS VARCHAR) = {_q(d0)}').fetchall():
-                chips.add(chip_ticker(code, mk, lst))
+        px_top = max(len(px_sets.get(d, set())) for d in px_dates)
+        pick = _pick_asof(px_dates, px_sets, chip_sets, px_top, asof=str(asof)[:10] if asof else None, allow_latest=allow_latest)
+        rep.update({"latest_px_date": px_dates[0], "asof_rule": pick["rule"], "px_top": px_top, "chip_max": chip_max})
+        if pick.get("error"):
+            rep["verdict"], rep["note"] = "RED", pick["error"]
+            say(f"RED     {rep['note']}")
+            _finish(rep, reports, "UNIVERSE")
+            return rep
+        d0 = pick["asof"]
+        px = set(px_sets.get(d0, set()))
+        chips = set(chip_sets.get(d0, set()))
         by_yf = {v[0]: (k, v[1], v[2]) for k, v in lst.items()}
         union = px | chips
         rows = []
@@ -341,6 +445,9 @@ def update(db: Path = DB_TW, apply: bool = False, reports: Path = REPORTS, mega:
             rep["note"] = f"dry-run:清單 {len(rows)} 票(asof {d0};價 {len(px)} ∪ 籌碼 {len(chips)} ∩ 冊 {len(lst) or '無冊'})· 計畫新增 {n_new}(--apply 才寫)"
         if rep["summary"]["aligned"] < rep["summary"]["listed"]:
             rep["note"] += f" · 未對齊 {rep['summary']['listed'] - rep['summary']['aligned']} 票(in_prices/in_chips 單側)"
+        if pick["lamp"] == "YELLOW":   # 批393 基準日律:非雙側齊日=誠實 YELLOW 印修法(仍可寫;只增不減)
+            rep["verdict"] = "YELLOW"
+            rep["note"] += " · " + pick["why"]
     finally:
         con.close()
     _finish(rep, reports, "UNIVERSE")
@@ -364,7 +471,10 @@ def status(db: Path = DB_TW, reports: Path = REPORTS, do_print: bool = True) -> 
             try:
                 if UNIVERSE in _tables(con):
                     n, mx, k = con.execute(f"SELECT count(*), max(asof_date), count(DISTINCT asof_date) FROM {UNIVERSE}").fetchone()
-                    out["universe"] = {"rows": n, "asof_max": mx, "snapshots": k}
+                    snaps = con.execute(f"SELECT asof_date, count(*), sum(CASE WHEN aligned THEN 1 ELSE 0 END) FROM {UNIVERSE} GROUP BY asof_date ORDER BY asof_date DESC").fetchall()
+                    top = max((int(x[1]) for x in snaps), default=0)
+                    det = [{"asof": str(x[0]), "rows": int(x[1]), "aligned": int(x[2] or 0), "state": "OK" if int(x[1]) >= PX_FULL_FLOOR * top else "PARTIAL(殘缺日快照;列數<最大快照 60%;批393)"} for x in snaps]
+                    out["universe"] = {"rows": n, "asof_max": mx, "snapshots": k, "detail": det[:12], "current_asof": next((d["asof"] for d in det if d["state"] == "OK"), None)}
             finally:
                 con.close()
         except Exception:
@@ -424,26 +534,41 @@ def selftest() -> int:
             and by["2026-09-03"]["verdict"] == "MISALIGNED" and by["2026-09-03"]["px_only"] == 1 and by["2026-09-03"]["chip_only"] == 1
             and r["mismatch"]["px_only"] == ["9999.TW"] and r["mismatch"]["chip_only"] == ["2317.TW"] and r["verdict"] == "MISALIGNED" and (reports / "ALIGN_latest.json").exists(),
             f"({r['verdict']};{[(d['date'], d['verdict'], d['px_n'], d['chip_n']) for d in r['dates']]})")
-        u0 = update(db, apply=False, reports=reports, mega=mega, do_print=False)
-        u1 = update(db, apply=True, reports=reports, mega=mega, do_print=False)
+        u0 = update(db, apply=False, reports=reports, mega=mega, do_print=False, allow_latest=True)
+        u1 = update(db, apply=True, reports=reports, mega=mega, do_print=False, allow_latest=True)
         c2 = duckdb.connect(str(db), read_only=True)
         rows = c2.execute(f"SELECT ticker, code, market, in_prices, in_chips, aligned FROM {UNIVERSE} ORDER BY ticker").fetchall()
         c2.close()
         pq = sorted(mega.glob("tw_universe_*.parquet"))
-        chk("② update 股票清單(最新日 價∪籌碼 ∩ 冊:9999 非冊不入;2317 只籌碼 in_prices=False;dry-run 零寫;--apply 建表 4 列 + parquet 增量 1 檔)",
+        chk("② update 股票清單(--allow-latest 最新日 價∪籌碼 ∩ 冊:9999 非冊不入;2317 只籌碼 in_prices=False;dry-run 零寫;--apply 建表 4 列 + parquet 增量 1 檔)",
             u0["mode"] == "dry-run" and u0["rows"] == 4 and u0["new"] == 4 and u1["new"] == 4 and len(rows) == 4
             and rows == [("2317.TW", "2317", "TWSE", False, True, False), ("2330.TW", "2330", "TWSE", True, True, True), ("2454.TW", "2454", "TWSE", True, True, True), ("6488.TWO", "6488", "TPEX", True, True, True)]
             and len(pq) == 1, f"(dry {u0['rows']}/{u0['new']};apply +{u1['new']};rows {rows};pq {len(pq)})")
-        u2 = update(db, apply=True, reports=reports, mega=mega, do_print=False)
+        u2 = update(db, apply=True, reports=reports, mega=mega, do_print=False, allow_latest=True)
         chk("③ 重跑冪等(anti-join 0 新增;不落新 parquet)", u2["new"] == 0 and len(sorted(mega.glob("tw_universe_*.parquet"))) == 1 and (reports / "UNIVERSE_latest.json").exists(), f"(+{u2['new']})")
         st = status(db, reports=reports, do_print=False)
-        chk("④ status(對齊摘要+清單現況)", st["align"]["verdict"] == "MISALIGNED" and st["universe"]["rows"] == 4 and st["universe"]["snapshots"] == 1)
+        chk("④ status(對齊摘要+清單現況+快照明細/現役基準日)", st["align"]["verdict"] == "MISALIGNED" and st["universe"]["rows"] == 4 and st["universe"]["snapshots"] == 1
+            and st["universe"]["current_asof"] == "2026-09-03" and st["universe"]["detail"][0]["state"] == "OK")
         c3 = duckdb.connect(str(db))
         c3.execute("DELETE FROM tw_chip_inst WHERE CAST(date AS VARCHAR) = '2026-09-03'")
         c3.execute("DELETE FROM tw_chip_margin WHERE CAST(date AS VARCHAR) = '2026-09-03'")
         c3.close()
         r2 = check(db, days=5, reports=reports, do_print=False)
         chk("⑤ 籌碼落後價表=誠實 MISALIGNED 指路 via-chip run(ENG056)", r2["verdict"] == "MISALIGNED" and "落後" in r2["note"] and "via-chip" in r2["note"] and r2["summary"]["chip_max"] == "2026-09-02", f"({r2['note'][:80]})")
+        u4 = update(db, apply=False, reports=reports, mega=mega, do_print=False)
+        u5 = update(db, apply=False, reports=reports, mega=mega, do_print=False, allow_latest=True)
+        u6 = update(db, apply=False, reports=reports, mega=mega, do_print=False, asof="2026-09-01")
+        u7 = update(db, apply=False, reports=reports, mega=mega, do_print=False, asof="2026-12-31")
+        c5 = duckdb.connect(str(db))
+        c5.execute("INSERT INTO tw_daily_prices VALUES ('2026-09-04', '2330.TW', 1.0)")   # 殘缺日:只 1 票(<60% 窗內最大 4)
+        c5.close()
+        r4 = check(db, days=5, reports=reports, do_print=False)
+        u8 = update(db, apply=False, reports=reports, mega=mega, do_print=False)
+        chk("⑩ 基準日律(批393 實錄:最新價日只價無籌碼/價未齊=殘缺日不作清單基準 → 最新雙側齊日 09-02 YELLOW 印修法;check 標「價未齊」;--allow-latest 強制最新價日;--asof 指定;壞基準日 RED)",
+            u4["asof"] == "2026-09-02" and u4["verdict"] == "YELLOW" and "基準日改" in u4["note"] and u4["latest_px_date"] == "2026-09-03" and u4["rows"] == 4
+            and u5["asof"] == "2026-09-03" and u5["verdict"] == "YELLOW" and u6["asof"] == "2026-09-01" and u6["rows"] == 3 and u6["verdict"] == "GREEN" and u7["verdict"] == "RED"
+            and r4["dates"][0]["date"] == "2026-09-04" and r4["dates"][0]["px_full"] is False and "日更未齊" in r4["note"] and u8["asof"] == "2026-09-02" and "價未齊" in u8["note"],
+            f"(u4 {u4['asof']} {u4['verdict']};u5 {u5['asof']};u6 {u6['asof']}/{u6['rows']};u7 {u7['verdict']};r4 {r4['dates'][0]['px_n']}/{r4['summary'].get('px_top')} {r4['verdict']};u8 {u8['asof']})")
         miss = check(root / "no.duckdb", reports=reports, do_print=False)
         chk("⑥ 庫缺誠實 RED(不假綠)", miss["verdict"] == "RED")
         c4 = duckdb.connect(str(root / "nolist.duckdb"))
@@ -479,18 +604,18 @@ def selftest() -> int:
         real_connect(str(dbp)).close()
         duckdb.connect = locked_twice
         try:
-            c_ok = _connect(dbp, read_only=True, retries=4, wait=0.0, sleep_fn=lambda s: None)
+            c_ok = _connect(dbp, read_only=True, retries=4, wait=0.0, sleep_fn=lambda s: None, resolver=lambda m: (None, ""))
             c_ok.close()
             ok_retry = calls["n"] == 3
             duckdb.connect = locked_forever
             try:
-                _connect(dbp, read_only=False, retries=2, wait=0.0, sleep_fn=lambda s: None)
+                _connect(dbp, read_only=False, retries=2, wait=0.0, sleep_fn=lambda s: None, resolver=lambda m: (None, ""))
                 ok_forever = False
             except RuntimeError as exc:
                 ok_forever = "庫忙逾" in str(exc) and "update --apply" in str(exc)
             duckdb.connect = other_io
             try:
-                _connect(dbp, read_only=True, retries=2, wait=0.0, sleep_fn=lambda s: None)
+                _connect(dbp, read_only=True, retries=2, wait=0.0, sleep_fn=lambda s: None, resolver=lambda m: (None, ""))
                 ok_other = False
             except duckdb.IOException:
                 ok_other = True
@@ -498,7 +623,31 @@ def selftest() -> int:
             duckdb.connect = real_connect
     chk("⑨ 讓庫律(單寫者鎖 IOException 短等重試;鎖兩次後放行;永鎖=誠實 RuntimeError 指路等日更鏈/回補跑完;非鎖 IOException 原樣拋)", ok_retry and ok_forever and ok_other,
         f"(retry {calls['n']};forever {ok_forever};other {ok_other})")
-    print(f"  [計] 九檢 OK {9 - len(fails)} · FAIL {len(fails)}")
+    # ⑪ 持鎖者解析(批393 工作站實錄:File is already open in C:\Python313\python.exe (PID 7396);via-status 開的是同步頁不是進程表)
+    lab = _holder_label(r'C:\Python313\python.exe "C:\Users\tonyk\Github\movies-dataset\VeritasIntelligenceAnalytics\functional modules\VDF\engine\VDF_ENG064_HistoryBackfill_v0102.py" run --resume')
+    lab2 = _holder_label("powershell -NoProfile -ExecutionPolicy Bypass -File C:\\x\\supportive modules\\registry\\via_boot_update.ps1")
+    lab3 = _holder_label("")
+    pid_none = _holder_of("IO Error: Could not set lock on file")
+    pid_hit = _PID_RX.search('IO Error: Cannot open file "x.duckdb": 程序無法存取檔案 File is already open in C:\\Python313\\python.exe (PID 7396)')
+
+    def locked_pid(path, read_only=False):
+        raise duckdb.IOException('IO Error: Cannot open file "x.duckdb": File is already open in C:\\Python313\\python.exe (PID 7396)')
+
+    msg = ""
+    with tempfile.TemporaryDirectory() as td3:
+        dbp3 = Path(td3) / "t.duckdb"
+        real_connect(str(dbp3)).close()
+        duckdb.connect = locked_pid
+        try:
+            _connect(dbp3, read_only=True, retries=1, wait=0.0, sleep_fn=lambda s: None, resolver=lambda m: (7396, "VDF_ENG064_HistoryBackfill_v0102.py run"))
+        except RuntimeError as exc:
+            msg = str(exc)
+        finally:
+            duckdb.connect = real_connect
+    chk("⑪ 持鎖者解析(IOException PID n → 命令列 → 引擎名+動詞;boot 鏈 ps1;空=空;無 PID=(None,''))+ [FAIL] 句含持鎖者 PID/引擎與 via-bg 指路(取代 via-status)",
+        lab == "VDF_ENG064_HistoryBackfill_v0102.py run" and lab2 == "via_boot_update.ps1" and lab3 == "" and pid_none == (None, "") and pid_hit and pid_hit.group(1) == "7396"
+        and "持鎖者 PID 7396" in msg and "VDF_ENG064" in msg and "via-bg" in msg and "via-status" not in msg, f"({lab};{lab2};{msg[:70]})")
+    print(f"  [計] 十一檢 OK {11 - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 
 
@@ -514,7 +663,7 @@ def _arg(a: list, flag: str, default=None):
 def main() -> int:
     a = sys.argv[1:]
     if "--selftest" in a:
-        print("=== 台股日交易×籌碼對齊與清單更新引擎(VDF_ENG081_UniverseAlign)· 九檢自測(零網路;臨時庫)===")
+        print("=== 台股日交易×籌碼對齊與清單更新引擎(VDF_ENG081_UniverseAlign)· 十一檢自測(零網路;臨時庫)===")
         return selftest()
     verb = next((x for x in a if x in VERBS), "check")   # 動詞白名單
     db = Path(_arg(a, "--db", str(DB_TW)))
@@ -527,7 +676,11 @@ def main() -> int:
                 print(json.dumps(rep, ensure_ascii=False, indent=1, default=str))
             return 0 if rep["verdict"] != "RED" else 2
         if verb == "update":
-            rep = update(db, apply="--apply" in a, do_print=not as_json)
+            asof = _arg(a, "--asof")
+            if asof and not re.match(r"^\d{4}-\d{2}-\d{2}$", str(asof)):
+                print(f"[FAIL] --asof 需 YYYY-MM-DD:{asof}")
+                return 2
+            rep = update(db, apply="--apply" in a, do_print=not as_json, asof=asof, allow_latest="--allow-latest" in a)
             if as_json:
                 print(json.dumps(rep, ensure_ascii=False, indent=1, default=str))
             return 0 if rep["verdict"] != "RED" else 2

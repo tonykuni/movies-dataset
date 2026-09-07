@@ -328,3 +328,18 @@ via-handover --open                         # 接棒狀態台:15 類堆疊矩陣
 via-console set group-start=tw_equity:2024-01-01 intl-add=INTL_DAILY:^FTSE   # 整類起始/國際資訊增減(可選)
 via-align check; via-align update --apply   # 背景日更鏈/回補跑完後(讓庫律誠實等/停)
 ```
+
+### 批393 工作站實錄補:清單基準日律、持鎖者解析、`via-bg`
+
+- 實錄 A:`via-align update --apply` 以最新價日 2026-09-07 建清單,但該日價表只有 399 票、籌碼 0(日更未齊+籌碼落後)→ `tw_universe` 首快照 399 列=殘缺(只增不減,留存;`status` 現標 PARTIAL 快照)。修:基準日律——`update` 預設取最新「雙側齊日」(價表票數 ≥ 窗內最大 60%、籌碼有票、判定 ALIGNED/PARTIAL;實錄即 2026-08-25 價 1978 籌碼 1935),最新價日殘缺=誠實 YELLOW 改基準並印修法;`--asof YYYY-MM-DD` 指定;`--allow-latest` 強制最新價日;`check` 逐日標「價未齊」;`status` 標殘缺快照並報現役 `current_asof`。
+- 實錄 B:`[FAIL] 庫忙` 指路 `via-status`,但 `via-status` 開的是同步狀態頁不是進程表。修:ENG081 自 IOException 解析持鎖者 PID → 命令列 → 引擎名+動詞,印一次 `[庫忙] 持鎖者 PID 7396:VDF_ENG064_HistoryBackfill_v0102.py run`;`[FAIL]` 句改指路 `via-bg`(Register v0159:`Get-CimInstance Win32_Process` 唯讀一覽 VIA 背景引擎 PID/已跑分鐘/引擎+動詞;絕不 `Stop-Process`)。十一檢。
+- 實錄 C:`via-handover` 不認=批392 一貼首行 `via-reload; via-console --open` 被前一段尾註 `# …` 吞成註解(上一段貼入時末行無換行,兩段接成一行)。修法:貼之前先按一次 Enter 讓提示字元回來;本文件一貼自此改「註解獨立行、指令純行」。
+
+```powershell
+# 先按 Enter 讓提示字元回來,再整段貼(批393 後一貼皆此式)
+via-reload
+via-bg
+via-align check
+via-align update --apply
+via-handover --open
+```
