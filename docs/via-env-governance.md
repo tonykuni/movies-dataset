@@ -360,3 +360,19 @@ via-align check
 via-align update --apply
 via-handover
 ```
+
+### 批395 工作站實錄補:籌碼回補「卡斷」修——自庫重建 checkpoint、20 加速器平行、動態進度條、Ctrl+C 安全
+
+- 實錄:`via-chip run` 印「交易日 649 · 待抓 1800 日×車道(節流 1.2s)」後 96 秒零輸出(v0101 每 80 件才印一行)→ 操作員 Ctrl+C → `KeyboardInterrupt` 裸 traceback,緩衝列與 checkpoint 全失。待抓 1800 的根因:本 worktree 的 `chip_checkpoint.json` 不知道 ENG079 整併/他機回補進庫的日子,只憑 checkpoint 就要重抓 450 日 × 4 車道(約 36 分鐘)。`via-price run` 已把 09-03/09-04 補齊到 1978 票(09-07 仍 400,Yahoo 尚未齊;`failed 1424` 保留重試權)。
+- 修(ENG056 v0102):① checkpoint 自庫重建——啟動時自 `tw_chip_inst`/`tw_chip_margin` 既有 (date, market) 標記該日該車道已完成並回寫 checkpoint(1800 → 只剩真缺的日×車道);② SuperAccel `accel_map` 平行(加速器 #12/#19,同 ENG054 律)`--workers N` 預設 4,每工保留 1.2s 節流,小塊提交(Ctrl+C 最多等一塊),一塊傳輸敗過半=自癒減工;③ 動態進度條+數字(加速器 #16 `Write-VIAProgress` 同款):`[####----] 37.5% 675/1800 · OK · 空 · 敗 · 至日 · 速率 · ETA`,非 TTY 每 40 件換行,`VIA_Reports/vdf/chips/PROGRESS.json` 供主控台/接棒台;④ Ctrl+C → 先落緩衝列(parquet+upsert)再存 checkpoint,印 `[中斷] … 重跑續補` rc130 零 traceback。九檢。SelftestGrid v0237 第 100 站。
+- 接棒台點名:`RED 燈 entry,env,vrn · 未跑 localdb:覆蓋`——各自來源:`via-entry`(入口燈板)、`via-envgov`(環境治理)、`via-vrn4`(一題四點;尚無報告=RED 誠實)、`via-vdfdb coverage`(覆蓋缺口);皆是「來源自己的判定」,接棒台只彙整。
+
+```powershell
+# 先按 Enter 讓提示字元回來,再整段貼(籌碼只補真缺;進度條每 0.5 秒重繪;Ctrl+C 安全)
+via-reload
+via-chip run
+via-chip --derive
+via-align check
+via-align update --apply
+via-handover
+```
