@@ -27,7 +27,9 @@
   M 信用當沖   券資比 smr、當沖比 dtr、real_ratio、smr_shock、規制標籤(欄在才算)
   B 角色       複合分=C-13 領先性權重×領先分+(1−w)×聚焦分(族群內百分位);
                LEADER=族群前 20%∧分≥C-05∧價同動過閘∧rs_mom>0(相對+絕對雙重);
-               2D 覆蓋:UNRELATED/FAKE_PULL/WASHOUT;LAGGER=分<C-06∨背離;
+               2D 覆蓋:UNRELATED(C-18 絕對底線)/FAKE_PULL(價過閘∧量同動≤池 P20)
+               /WASHOUT(量過閘∧價同動≤池 P20)——批310 改動態低分位,原稿 <0 為死條件;
+               LAGGER=分<C-06∨背離;
                樣本<5=RANK_ONLY;C-15 連 5 日掉出前 30% ⇒ 降級
   H 遲滯       valid=EWM3(閘門布林)雙閾值:≥0.7 入選/≤0.3 剔除/中間維持(C-19)
   G 族群健康   PC1 吸收率(60 日冪迭代)≥C-01 探索/≥C-01b 指數級;<C-16 剔除
@@ -107,7 +109,7 @@ CATALOG = [
     ("四 閘門與背離", "liq_floor / pass_liq", "族群池滾動 P25(etr)", "流動性閘門", "D"),
     ("四 閘門與背離", "price_corr", "EWM50-corr(ret, 群中位 ret)", "價格同動(族群共識)", "D"),
     ("四 閘門與背離", "vol_corr", "EWM50-corr(Δetr%, 群中位 Δetr%)", "量能同動(資金共識)——價到量的推進", "D"),
-    ("四 閘門與背離", "p_th / v_th", "族群池滾動 P45(corr)", "動態及格線(C-xx corr_q)", "D"),
+    ("四 閘門與背離", "p_th / v_th / p_lo / v_lo", "族群池滾動 P45(及格)/P20(低位)", "動態及格線+2D 覆蓋低分位(批310:原稿 <0 於真實資料 0% 觸發)", "D"),
     ("四 閘門與背離", "mfm / k_net_cash_flow", "((C−L)−(H−C))/(H−L);mfm×etr", "K 線重心實質淨流(剝離當沖)", "F"),
     ("四 閘門與背離", "k_net_cash_z / div_flag", "Z40(k_net);adaptive_score>1∧z<−1", "爆量留上影線出貨型背離", "D"),
     ("五 籌碼流向與風格", "cash_foreign/sitc/dealer", "淨買賣股數×VWAP", "張數→絕對金額(跨股可比)", "F"),
@@ -119,7 +121,7 @@ CATALOG = [
     ("六 信用交易與當沖", "margin_mom_z", "Z20(Δ融資餘額)", "槓桿進場力道", "D"),
     ("六 信用交易與當沖", "squeeze_regime / margin_health", "規制標籤", "Squeeze_Prime/Short_Overhang;Retail_Trapped/Margin_Washout/Healthy", "H"),
     ("七 綜合評分與角色", "leader_score", "w13×領先分+(1−w13)×聚焦分(族群內百分位)", "領先分=pct(rel20,rel60,正報酬日率,rs_mom)均;聚焦分=pct(as,adaptive,etr20med)均", "H"),
-    ("七 綜合評分與角色", "role", "雙重條件+2D 覆蓋", "LEADER/PEER/LAGGER/UNRELATED/FAKE_PULL/WASHOUT/RANK_ONLY", "H"),
+    ("七 綜合評分與角色", "role", "雙重條件+2D 覆蓋(FAKE=價≥P45∧量≤P20;WASH=量≥P45∧價≤P20)", "LEADER/PEER/LAGGER/UNRELATED/FAKE_PULL/WASHOUT/RANK_ONLY", "H"),
     ("七 綜合評分與角色", "valid_member", "EWM3(pass_liq∧pass_pcorr∧¬div) ≥0.7 入/≤0.3 出/中間維持", "雙閾值真遲滯防震盪(C-19;冷氣機律)", "F"),
     ("七 綜合評分與角色", "downgrade_c15", "AS 族群排名掉出前 30% 連 C-15 日", "LEADER 降級律", "D"),
     ("八 族群健康與指數資格", "pc1_absorption", "λ1/trace(60 日報酬共變異;冪迭代)", "同一因子驅動度", "監控"),
@@ -430,7 +432,8 @@ class APCE:
                 raw_t = {t: tw.get(S[t]["size_tier"][di[d][t]] or "Small", 0.2) for t in mem}
                 st = sum(raw_t.values())
                 w_tier = {t: v / st for t, v in raw_t.items()}
-                w_att = cap_weights({t: S[t]["as"][di[d][t]] for t in mem}, cap)
+                cap_eff = max(cap, 1.2 / len(mem)) if p.get("cap_relax") else cap  # 批310 實驗:小族群放寬律(預設關)
+                w_att = cap_weights({t: S[t]["as"][di[d][t]] for t in mem}, cap_eff)
                 weights[(sec, d)] = {t: {"eq": w_eq[t], "tier": w_tier[t], "att": w_att.get(t, 0.0)} for t in mem}
         indices = {sec: {} for sec in sectors}
         levels = {sec: {"eq": 100.0, "tier": 100.0, "att": 100.0} for sec in sectors}
@@ -541,13 +544,17 @@ class APCE:
                         pc.append(S[t]["price_corr"][i])
                         vc.append(S[t]["vol_corr"][i])
                         et.append(S[t]["etr"][i])
-                thr[(sec, d)] = (quantile(pc, p["corr_q"]), quantile(vc, p["corr_q"]), quantile(et, p["liquidity_q"]))
+                thr[(sec, d)] = (quantile(pc, p["corr_q"]), quantile(vc, p["corr_q"]), quantile(et, p["liquidity_q"]),
+                                 quantile(pc, p.get("corr_lo_q", 0.20)), quantile(vc, p.get("corr_lo_q", 0.20)))  # 批310:2D 覆蓋低分位
         for t, s in S.items():
             s["pass_liq"], s["pass_pcorr"], s["pass_vcorr"], s["div_flag"], s["p_th"], s["v_th"] = [], [], [], [], [], []
+            s["p_lo"], s["v_lo"] = [], []
             for i, d in enumerate(s["dates"]):
-                pth, vth, lf = thr.get((s["sector"], d), (None, None, None))
+                pth, vth, lf, plo, vlo = thr.get((s["sector"], d), (None, None, None, None, None))
                 s["p_th"].append(pth)
                 s["v_th"].append(vth)
+                s["p_lo"].append(plo)
+                s["v_lo"].append(vlo)
                 s["pass_liq"].append(None if (lf is None or s["etr"][i] is None) else s["etr"][i] >= lf)
                 s["pass_pcorr"].append(None if (pth is None or s["price_corr"][i] is None) else s["price_corr"][i] >= pth)
                 s["pass_vcorr"].append(None if (vth is None or s["vol_corr"][i] is None) else s["vol_corr"][i] >= vth)
@@ -617,6 +624,7 @@ class APCE:
                                    for i in range(n)]
         # B 角色(複合分族群內百分位;雙重條件;2D 覆蓋;C-15 降級;H 遲滯)
         w13 = float(p["C-13"])
+        ablate = set(p.get("ablate", []))  # 批310 閹割測試:{"vol","div","rs"};預設空=零行為變更
         for t, s in S.items():
             n = len(s["dates"])
             s["ret20"] = [None] * n
@@ -671,20 +679,24 @@ class APCE:
                     s["as_pct"][i] = as_pct.get(t)
                     pc_, vc_ = s["price_corr"][i], s["vol_corr"][i]
                     floor = float(p["C-18"])
+                    div_ = False if "div" in ablate else s["div_flag"][i]
+                    rs_ok = True if "rs" in ablate else ((s["rs_mom"][i] or 0) > 0)
                     if len(mem) < 5:
                         role = "RANK_ONLY"
                     elif pc_ is None or vc_ is None or scores.get(t) is None:
                         role = None
-                    elif pc_ < floor and vc_ < floor:
+                    elif pc_ < floor and (vc_ < floor or "vol" in ablate):
                         role = "UNRELATED"
-                    elif s["p_th"][i] is not None and pc_ >= s["p_th"][i] and vc_ < 0:
-                        role = "FAKE_PULL"
-                    elif s["v_th"][i] is not None and vc_ >= s["v_th"][i] and pc_ < 0:
-                        role = "WASHOUT"
+                    elif ("vol" not in ablate and s["p_th"][i] is not None and s["v_lo"][i] is not None
+                          and pc_ >= s["p_th"][i] and vc_ <= s["v_lo"][i]):
+                        role = "FAKE_PULL"   # 批310:量同動≤池 P20(動態)取代 <0 死條件
+                    elif ("vol" not in ablate and s["v_th"][i] is not None and s["p_lo"][i] is not None
+                          and vc_ >= s["v_th"][i] and pc_ <= s["p_lo"][i]):
+                        role = "WASHOUT"     # 批310:價同動≤池 P20(動態)取代 <0 死條件
                     elif (spct.get(t, 0) >= 0.80 and scores[t] >= float(p["C-05"]) and s["pass_pcorr"][i]
-                          and (s["rs_mom"][i] or 0) > 0):
+                          and rs_ok):
                         role = "LEADER"
-                    elif scores[t] < float(p["C-06"]) or s["div_flag"][i]:
+                    elif scores[t] < float(p["C-06"]) or div_:
                         role = "LAGGER"
                     else:
                         role = "PEER"
@@ -742,7 +754,7 @@ class APCE:
                    "etr": g("etr"), "etr_basis": g("etr_basis"), "price_rs": g("price_rs"), "rs_mom": g("rs_mom"),
                    "vol_shock": g("vol_shock"), "adaptive_score": g("adaptive_score"), "cs_z": g("cs_z"),
                    "gravity_shock": g("gravity_shock"), "price_corr": g("price_corr"), "vol_corr": g("vol_corr"),
-                   "p_th": g("p_th"), "v_th": g("v_th"), "pass_liq": g("pass_liq"), "pass_pcorr": g("pass_pcorr"),
+                   "p_th": g("p_th"), "v_th": g("v_th"), "p_lo": g("p_lo"), "v_lo": g("v_lo"), "pass_liq": g("pass_liq"), "pass_pcorr": g("pass_pcorr"),
                    "pass_vcorr": g("pass_vcorr"), "k_net_z": g("k_net_z"), "div_flag": g("div_flag"),
                    "leader_score": g("leader_score"), "score_pct": g("score_pct"), "as_pct": g("as_pct"),
                    "role": g("role"), "valid_member": g("valid_member"), "downgrade_c15": g("downgrade_c15"),
@@ -764,6 +776,9 @@ class APCE:
         roles = {}
         for r in latest:
             roles[str(r["role"])] = roles.get(str(r["role"]), 0) + 1
+        # 批310:暴露全序列供壓力測試/IC 檢定取用(不入 JSON 輸出)
+        self.S, self.dates, self.di, self.indices, self.cm_conf = S, dates, di, indices, cm_conf
+        self.weights, self.clean_mkt, self.health = weights, clean_mkt, health
         return {"schema": "VIA.APCE.v1", "ts": NOW, "asof": d_last, "n_dates": len(dates), "n_tickers": len(S),
                 "base_date": base_date, "tier_basis": tier_basis, "coverage": self.coverage,
                 "params_used": self.params_used, "params": {k: v for k, v in p.items() if k != "tier_weights"},

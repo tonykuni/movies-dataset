@@ -1,0 +1,1381 @@
+{
+ "schema": "batch310-stress-v1",
+ "ts": "2026-09-07 05:17:02",
+ "counts": {
+  "PASS": 11,
+  "WARN": 4,
+  "INFO": 5
+ },
+ "verdict": "GREEN_WITH_NOTES",
+ "checks": [
+  {
+   "id": "T1",
+   "name": "全引擎 selftest 迴歸",
+   "status": "PASS",
+   "detail": "9/9 引擎自檢全過;ENG020:[計] 6/6 檢通過; ENG023:[計] 6/6 檢通過; ENG025:[計] 6/6 檢通過; ENG026:[計] 8/8 檢通過; ENG027:[計] 8/8 檢通過; ENG028:[計] 8/8 檢通過; ENG029:[計] 10/10 檢通過; ENG030:[計] 6/6 檢通過; MDL737:[計] 7/7 檢通過"
+  },
+  {
+   "id": "T0",
+   "name": "樣本選擇偏差警示(族群冊策展日 vs 面板起日)",
+   "status": "WARN",
+   "detail": "族群冊 TW_Group_Classification_v0111.json 策展於 2026-09-02(批52 熱門族群總表),面板自 2025-12-30 起——策展前之歷史屬事後選擇(hindsight),T3/T4 之 IC 與角色前瞻報酬為樣本內數,不得解讀為樣本外效度;真效度須自 2026-09-02 起滾動累積"
+  },
+  {
+   "id": "T2a",
+   "name": "成員缺日稽核(>5% 缺列標)",
+   "status": "PASS",
+   "detail": "145 檔 × 165 日;缺日>5%:0 檔 {}"
+  },
+  {
+   "id": "T2b",
+   "name": "PROXY(量×收盤)vs 官方成交值比",
+   "status": "PASS",
+   "detail": "n=145 中位 1.0051 IQR [0.9981,1.0170] 偏離>20%:0(0.0%)——代理誤差量化"
+  },
+  {
+   "id": "T2c",
+   "name": "近 20 日還原收盤=收盤(除權息外)",
+   "status": "WARN",
+   "detail": "169/2900 列有還原差(=5.8%;除權息期屬常態)"
+  },
+  {
+   "id": "T2d",
+   "name": "單日極端報酬(|r|>50%)稽核",
+   "status": "PASS",
+   "detail": "零極端"
+  },
+  {
+   "id": "T3",
+   "name": "因子 IC(逐日 Spearman;|t|≥2 顯著)",
+   "status": "INFO",
+   "detail": "20 組;顯著 11;最強:price_corr@20d IC=+0.137 t=+12.1 勝率 91%; vol_corr@20d IC=+0.067 t=+8.0 勝率 76%; leader_score@20d IC=+0.037 t=+4.0 勝率 69%; price_corr@5d IC=+0.048 t=+3.9 勝率 66%"
+  },
+  {
+   "id": "T4",
+   "name": "角色前瞻報酬(fwd5/fwd20 均,%;重疊樣本 t 值僅供參)",
+   "status": "INFO",
+   "detail": "RANK_ONLY n=5695 f5=+1.86% f20=+6.82%; LEADER n=391 f5=+1.84% f20=+5.18%; FAKE_PULL n=310 f5=+1.55% f20=+4.66%; PEER n=3340 f5=+1.19% f20=+3.92%; LAGGER n=2177 f5=+1.42% f20=+3.32%; WASHOUT n=327 f5=+0.53% f20=+1.49%;LEADER−LAGGER 20 日價差 +1.86%"
+  },
+  {
+   "id": "T5",
+   "name": "角色日變動率+遲滯翻轉降幅",
+   "status": "PASS",
+   "detail": "角色日變動率 12.7%;valid 翻轉率 遲滯前 12.63% → 遲滯後 4.67%(降 63%)"
+  },
+  {
+   "id": "T6",
+   "name": "T0 當日權重相對 T-1 之終值偏誤",
+   "status": "PASS",
+   "detail": "8 群(n≥6)平均偏誤 +7.31%(T0 高估=前視獎勵);最大 散熱 +20.95%"
+  },
+  {
+   "id": "T7",
+   "name": "回填法相對鏈結法之終值高估(最弱成員中途退出情境)",
+   "status": "PASS",
+   "detail": "8 群 平均高估 +4.02%;最大 機器人 +10.98%——倖存者偏差=鏈結法所除"
+  },
+  {
+   "id": "T8",
+   "name": "聚焦權重封頂綁定率(可行群)+不可行族群(n×0.18<1 ⇒ 等權退場)",
+   "status": "WARN",
+   "detail": "可行 8 群綁定日占比 100.0%;不可行 23/31 群(att 指數退化=等權):['ABF 載板', 'ASIC 設計服務', 'BBU 備援電池', 'IC設計', 'PCB', '低軌衛星', '光學', '半導體設備']…"
+  },
+  {
+   "id": "T8b",
+   "name": "放寬律回復之聚焦傾斜(不可行群 att_relaxed vs eq 終值差)",
+   "status": "INFO",
+   "detail": "23 群 平均 |att_relaxed/eq−1|=4.13%;max w 放寬後 ≤0.40;憲法 C-17 不動——是否採放寬律候操作員定奪"
+  },
+  {
+   "id": "T9",
+   "name": "PC1 吸收率跨窗穩定(40 vs 90 窗 Spearman;0.55 資格翻轉)",
+   "status": "PASS",
+   "detail": "31 群 ρ(40,90)=0.715;60↔90 窗資格翻轉 0 群:[]"
+  },
+  {
+   "id": "T10",
+   "name": "參數高原(角色一致率最低值 ≥0.80=高原;<0.80=孤峰)",
+   "status": "PASS",
+   "detail": "corr_q=0.35:一致 0.97/LEADER J=0.60(n=5); corr_q=0.55:一致 0.97/LEADER J=0.67(n=2); quant_window=40:一致 0.96/LEADER J=1.00(n=3); quant_window=80:一致 0.98/LEADER J=0.75(n=4); ewm_span=30:一致 0.96/LEADER J=0.00(n=0); ewm_span=70:一致 0.97/LEADER J=0.75(n=4)"
+  },
+  {
+   "id": "T11",
+   "name": "閹割貢獻(拔閘門後角色變動率;越大=閘門越有作用)",
+   "status": "INFO",
+   "detail": "拔 vol:變動 5.6% LEADER 3 FAKE/WASH 0; 拔 div:變動 2.1% LEADER 3 FAKE/WASH 7; 拔 rs:變動 0.7% LEADER 4 FAKE/WASH 7"
+  },
+  {
+   "id": "T11b",
+   "name": "vol_corr 分佈(原稿 FAKE/WASH 以 <0 為條件之可行性診斷)",
+   "status": "WARN",
+   "detail": "vol_corr 中位 +0.603 P10 +0.390 P90 +0.815 負占比 0%;price_corr 中位 +0.788 P10 +0.594——原稿 <0 為死條件(0% 觸發);批310 改族群池 P20 動態低分位後 2D 覆蓋方可觸發"
+  },
+  {
+   "id": "T12",
+   "name": "CCF ±5 置換檢定 B=200(C-02 p≤0.05)+BH FDR q=0.1(C-02b)",
+   "status": "INFO",
+   "detail": "31 群:raw p≤0.05 12 群 → FDR 後 11 群顯著;ABF 載板 lag=+1 IC=+0.27 p=0.01; IC設計 lag=+1 IC=+0.27 p=0.01; 記憶體 lag=+1 IC=+0.29 p=0.01; PCB lag=+1 IC=+0.25 p=0.0149"
+  },
+  {
+   "id": "T13",
+   "name": "時序 Z(vol_shock)Top10 vs 重力乘數 Top10 之 Small 占比",
+   "status": "PASS",
+   "detail": "vol_shock Top10 含 Small 5 檔 → gravity Top10 含 Small 1 檔(重力乘數壓小公雞);gravity Top:['6442', '3363', '3019', '6669', '2454']"
+  },
+  {
+   "id": "T14",
+   "name": "家族以真實歷史校準(C-05/C-06 滾動;鎖觸狀態實評)",
+   "status": "PASS",
+   "detail": "state={'clean_mkt_z': -0.239, 'breadth_change': 0.131, 'member_ratio': 1.0, 'group_as_median_z': 0.0, 'regime': 'RISK_ON', 'n_obs': 165};模式 {'FALLBACK': 9, 'FIXED': 13, 'ROLLING': 3};觸發 無;C-05=0.7386(ROLLING);C-13=0.45(FALLBACK)"
+  }
+ ],
+ "stats": {
+  "regression": [
+   {
+    "engine": "FLOW_ENG020_FlowLeadlag.py",
+    "rc": 0,
+    "tally": "[計] 6/6 檢通過"
+   },
+   {
+    "engine": "FLOW_ENG023_FlowTwActiveEtf.py",
+    "rc": 0,
+    "tally": "[計] 6/6 檢通過"
+   },
+   {
+    "engine": "FLOW_ENG025_FlowUsMacroOpenData.py",
+    "rc": 0,
+    "tally": "[計] 6/6 檢通過"
+   },
+   {
+    "engine": "FLOW_ENG026_FlowTwBaseline.py",
+    "rc": 0,
+    "tally": "[計] 8/8 檢通過"
+   },
+   {
+    "engine": "FLOW_ENG027_FlowTwMonthlyRevenue.py",
+    "rc": 0,
+    "tally": "[計] 8/8 檢通過"
+   },
+   {
+    "engine": "FLOW_ENG028_FlowParamFamily.py",
+    "rc": 0,
+    "tally": "[計] 8/8 檢通過"
+   },
+   {
+    "engine": "FLOW_ENG029_FlowApce.py",
+    "rc": 0,
+    "tally": "[計] 10/10 檢通過 · 參數模式 ['FALLBACK', 'FIXED', 'ROLLING']"
+   },
+   {
+    "engine": "FLOW_ENG030_FlowTwPanel.py",
+    "rc": 0,
+    "tally": "[計] 6/6 檢通過"
+   },
+   {
+    "engine": "SUP_MDL737_SuperAccelModule_v0104.py",
+    "rc": 0,
+    "tally": "[計] 7/7 檢通過 · stats={'map_calls': 1, 'cache_hit': 1, 'cache_miss': 1, 'fetch': 3, 'pip': 1}"
+   }
+  ],
+  "proxy_ratio": {
+   "n": 145,
+   "median": 1.0051,
+   "q1": 0.9981,
+   "q3": 1.017,
+   "n_out20": 0
+  },
+  "baseline": {
+   "asof": "2026-09-03",
+   "roles": {
+    "PEER": 42,
+    "LAGGER": 25,
+    "LEADER": 3,
+    "RANK_ONLY": 67,
+    "WASHOUT": 5,
+    "FAKE_PULL": 2
+   },
+   "n": 145
+  },
+  "ic": [
+   {
+    "feature": "leader_score",
+    "horizon": "5d",
+    "n_days": 100,
+    "mean_ic": 0.0049,
+    "t": 0.52,
+    "hit": 0.56
+   },
+   {
+    "feature": "leader_score",
+    "horizon": "20d",
+    "n_days": 85,
+    "mean_ic": 0.0369,
+    "t": 4.0,
+    "hit": 0.694
+   },
+   {
+    "feature": "adaptive_score",
+    "horizon": "5d",
+    "n_days": 100,
+    "mean_ic": -0.0269,
+    "t": -2.2,
+    "hit": 0.41
+   },
+   {
+    "feature": "adaptive_score",
+    "horizon": "20d",
+    "n_days": 85,
+    "mean_ic": 0.006,
+    "t": 0.42,
+    "hit": 0.588
+   },
+   {
+    "feature": "gravity_shock",
+    "horizon": "5d",
+    "n_days": 99,
+    "mean_ic": -0.0415,
+    "t": -2.6,
+    "hit": 0.394
+   },
+   {
+    "feature": "gravity_shock",
+    "horizon": "20d",
+    "n_days": 84,
+    "mean_ic": -0.0235,
+    "t": -1.22,
+    "hit": 0.5
+   },
+   {
+    "feature": "rs_mom",
+    "horizon": "5d",
+    "n_days": 100,
+    "mean_ic": -0.0291,
+    "t": -3.49,
+    "hit": 0.39
+   },
+   {
+    "feature": "rs_mom",
+    "horizon": "20d",
+    "n_days": 85,
+    "mean_ic": -0.0247,
+    "t": -3.51,
+    "hit": 0.376
+   },
+   {
+    "feature": "cs_z",
+    "horizon": "5d",
+    "n_days": 100,
+    "mean_ic": 0.0474,
+    "t": 1.72,
+    "hit": 0.57
+   },
+   {
+    "feature": "cs_z",
+    "horizon": "20d",
+    "n_days": 85,
+    "mean_ic": 0.0966,
+    "t": 3.35,
+    "hit": 0.6
+   },
+   {
+    "feature": "price_rs",
+    "horizon": "5d",
+    "n_days": 100,
+    "mean_ic": -0.0083,
+    "t": -0.94,
+    "hit": 0.42
+   },
+   {
+    "feature": "price_rs",
+    "horizon": "20d",
+    "n_days": 85,
+    "mean_ic": -0.0176,
+    "t": -2.23,
+    "hit": 0.388
+   },
+   {
+    "feature": "vol_corr",
+    "horizon": "5d",
+    "n_days": 100,
+    "mean_ic": 0.0192,
+    "t": 1.99,
+    "hit": 0.55
+   },
+   {
+    "feature": "vol_corr",
+    "horizon": "20d",
+    "n_days": 85,
+    "mean_ic": 0.0666,
+    "t": 8.0,
+    "hit": 0.765
+   },
+   {
+    "feature": "price_corr",
+    "horizon": "5d",
+    "n_days": 100,
+    "mean_ic": 0.0475,
+    "t": 3.93,
+    "hit": 0.66
+   },
+   {
+    "feature": "price_corr",
+    "horizon": "20d",
+    "n_days": 85,
+    "mean_ic": 0.1372,
+    "t": 12.05,
+    "hit": 0.906
+   },
+   {
+    "feature": "as",
+    "horizon": "5d",
+    "n_days": 99,
+    "mean_ic": 0.0479,
+    "t": 1.72,
+    "hit": 0.576
+   },
+   {
+    "feature": "as",
+    "horizon": "20d",
+    "n_days": 84,
+    "mean_ic": 0.0977,
+    "t": 3.35,
+    "hit": 0.607
+   },
+   {
+    "feature": "vol_shock",
+    "horizon": "5d",
+    "n_days": 100,
+    "mean_ic": -0.0208,
+    "t": -1.6,
+    "hit": 0.44
+   },
+   {
+    "feature": "vol_shock",
+    "horizon": "20d",
+    "n_days": 85,
+    "mean_ic": 0.0203,
+    "t": 1.35,
+    "hit": 0.588
+   }
+  ],
+  "role_fwd": [
+   {
+    "role": "RANK_ONLY",
+    "n": 5695,
+    "fwd5_mean": 1.856,
+    "fwd20_mean": 6.815,
+    "t5": 13.58,
+    "t20": 21.27
+   },
+   {
+    "role": "LEADER",
+    "n": 391,
+    "fwd5_mean": 1.844,
+    "fwd20_mean": 5.179,
+    "t5": 3.25,
+    "t20": 4.74
+   },
+   {
+    "role": "FAKE_PULL",
+    "n": 310,
+    "fwd5_mean": 1.549,
+    "fwd20_mean": 4.655,
+    "t5": 2.79,
+    "t20": 3.93
+   },
+   {
+    "role": "PEER",
+    "n": 3340,
+    "fwd5_mean": 1.191,
+    "fwd20_mean": 3.923,
+    "t5": 7.05,
+    "t20": 12.35
+   },
+   {
+    "role": "LAGGER",
+    "n": 2177,
+    "fwd5_mean": 1.418,
+    "fwd20_mean": 3.316,
+    "t5": 6.74,
+    "t20": 8.69
+   },
+   {
+    "role": "WASHOUT",
+    "n": 327,
+    "fwd5_mean": 0.527,
+    "fwd20_mean": 1.493,
+    "t5": 1.24,
+    "t20": 2.61
+   }
+  ],
+  "turnover": {
+   "role_change_rate": 0.12706997863247863,
+   "valid_raw_flip": 0.126288305620448,
+   "valid_member_flip": 0.04665384086848976
+  },
+  "lookahead": [
+   {
+    "sector": "AI 伺服器",
+    "t1": 138.05,
+    "t0": 150.41,
+    "bias": 0.0895
+   },
+   {
+    "sector": "CPO 共封裝光學",
+    "t1": 213.21,
+    "t0": 227.73,
+    "bias": 0.0681
+   },
+   {
+    "sector": "半導體",
+    "t1": 237.43,
+    "t0": 261.99,
+    "bias": 0.1034
+   },
+   {
+    "sector": "台積電擴廠",
+    "t1": 135.87,
+    "t0": 138.23,
+    "bias": 0.0173
+   },
+   {
+    "sector": "散熱",
+    "t1": 109.72,
+    "t0": 132.7,
+    "bias": 0.2095
+   },
+   {
+    "sector": "散裝航運",
+    "t1": 123.35,
+    "t0": 127.03,
+    "bias": 0.0299
+   },
+   {
+    "sector": "機器人",
+    "t1": 196.45,
+    "t0": 202.35,
+    "bias": 0.03
+   },
+   {
+    "sector": "重電",
+    "t1": 101.47,
+    "t0": 105.23,
+    "bias": 0.037
+   }
+  ],
+  "survivorship": [
+   {
+    "sector": "AI 伺服器",
+    "removed": "8210",
+    "chain": 143.4,
+    "backfill": 139.83,
+    "bias": -0.0249
+   },
+   {
+    "sector": "CPO 共封裝光學",
+    "removed": "4977",
+    "chain": 222.44,
+    "backfill": 236.24,
+    "bias": 0.062
+   },
+   {
+    "sector": "半導體",
+    "removed": "6770",
+    "chain": 237.78,
+    "backfill": 249.74,
+    "bias": 0.0503
+   },
+   {
+    "sector": "台積電擴廠",
+    "removed": "6667",
+    "chain": 138.01,
+    "backfill": 144.54,
+    "bias": 0.0474
+   },
+   {
+    "sector": "散熱",
+    "removed": "6591",
+    "chain": 110.93,
+    "backfill": 112.42,
+    "bias": 0.0135
+   },
+   {
+    "sector": "散裝航運",
+    "removed": "2641",
+    "chain": 124.91,
+    "backfill": 127.35,
+    "bias": 0.0195
+   },
+   {
+    "sector": "機器人",
+    "removed": "2359",
+    "chain": 192.91,
+    "backfill": 214.1,
+    "bias": 0.1098
+   },
+   {
+    "sector": "重電",
+    "removed": "1504",
+    "chain": 100.34,
+    "backfill": 104.74,
+    "bias": 0.0438
+   }
+  ],
+  "cap": {
+   "bind_share": 1.0,
+   "infeasible": [
+    [
+     "ABF 載板",
+     4
+    ],
+    [
+     "ASIC 設計服務",
+     3
+    ],
+    [
+     "BBU 備援電池",
+     4
+    ],
+    [
+     "IC設計",
+     4
+    ],
+    [
+     "PCB",
+     5
+    ],
+    [
+     "低軌衛星",
+     4
+    ],
+    [
+     "光學",
+     4
+    ],
+    [
+     "半導體設備",
+     5
+    ],
+    [
+     "條鋼",
+     4
+    ],
+    [
+     "生技醫療",
+     4
+    ],
+    [
+     "矽智財 IP",
+     3
+    ],
+    [
+     "網通設備",
+     4
+    ],
+    [
+     "航空",
+     3
+    ],
+    [
+     "被動元件",
+     4
+    ],
+    [
+     "觀光餐飲",
+     5
+    ],
+    [
+     "記憶體",
+     5
+    ],
+    [
+     "貨櫃航運",
+     3
+    ],
+    [
+     "資安/系統整合",
+     4
+    ],
+    [
+     "軍工航太",
+     4
+    ],
+    [
+     "金融",
+     4
+    ],
+    [
+     "鋼鐵",
+     5
+    ],
+    [
+     "電動車",
+     4
+    ],
+    [
+     "電源管理",
+     3
+    ]
+   ],
+   "n_feasible": 8
+  },
+  "cap_relax": [
+   {
+    "sector": "ABF 載板",
+    "n": 4,
+    "eq": 453.72,
+    "att_fixed": 453.72,
+    "att_relaxed": 467.22,
+    "max_w_relaxed": 0.3
+   },
+   {
+    "sector": "ASIC 設計服務",
+    "n": 3,
+    "eq": 153.91,
+    "att_fixed": 153.91,
+    "att_relaxed": 158.61,
+    "max_w_relaxed": 0.4
+   },
+   {
+    "sector": "BBU 備援電池",
+    "n": 4,
+    "eq": 101.86,
+    "att_fixed": 101.86,
+    "att_relaxed": 108.8,
+    "max_w_relaxed": 0.3
+   },
+   {
+    "sector": "IC設計",
+    "n": 4,
+    "eq": 156.08,
+    "att_fixed": 155.37,
+    "att_relaxed": 168.37,
+    "max_w_relaxed": 0.3
+   },
+   {
+    "sector": "PCB",
+    "n": 5,
+    "eq": 230.81,
+    "att_fixed": 230.81,
+    "att_relaxed": 247.51,
+    "max_w_relaxed": 0.24
+   },
+   {
+    "sector": "低軌衛星",
+    "n": 4,
+    "eq": 154.77,
+    "att_fixed": 150.58,
+    "att_relaxed": 181.81,
+    "max_w_relaxed": 0.3
+   },
+   {
+    "sector": "光學",
+    "n": 4,
+    "eq": 204.0,
+    "att_fixed": 204.0,
+    "att_relaxed": 201.75,
+    "max_w_relaxed": 0.3
+   },
+   {
+    "sector": "半導體設備",
+    "n": 5,
+    "eq": 246.06,
+    "att_fixed": 246.06,
+    "att_relaxed": 254.8,
+    "max_w_relaxed": 0.24
+   },
+   {
+    "sector": "條鋼",
+    "n": 4,
+    "eq": 105.99,
+    "att_fixed": 105.99,
+    "att_relaxed": 107.85,
+    "max_w_relaxed": 0.3
+   },
+   {
+    "sector": "生技醫療",
+    "n": 4,
+    "eq": 113.37,
+    "att_fixed": 113.37,
+    "att_relaxed": 119.41,
+    "max_w_relaxed": 0.3
+   },
+   {
+    "sector": "矽智財 IP",
+    "n": 3,
+    "eq": 122.7,
+    "att_fixed": 122.7,
+    "att_relaxed": 122.28,
+    "max_w_relaxed": 0.4
+   },
+   {
+    "sector": "網通設備",
+    "n": 4,
+    "eq": 117.18,
+    "att_fixed": 117.18,
+    "att_relaxed": 116.75,
+    "max_w_relaxed": 0.3
+   },
+   {
+    "sector": "航空",
+    "n": 3,
+    "eq": 105.15,
+    "att_fixed": 105.15,
+    "att_relaxed": 108.77,
+    "max_w_relaxed": 0.4
+   },
+   {
+    "sector": "被動元件",
+    "n": 4,
+    "eq": 333.68,
+    "att_fixed": 333.68,
+    "att_relaxed": 306.92,
+    "max_w_relaxed": 0.3
+   },
+   {
+    "sector": "觀光餐飲",
+    "n": 5,
+    "eq": 99.4,
+    "att_fixed": 99.4,
+    "att_relaxed": 100.43,
+    "max_w_relaxed": 0.24
+   },
+   {
+    "sector": "記憶體",
+    "n": 5,
+    "eq": 200.81,
+    "att_fixed": 200.81,
+    "att_relaxed": 192.78,
+    "max_w_relaxed": 0.24
+   },
+   {
+    "sector": "貨櫃航運",
+    "n": 3,
+    "eq": 130.31,
+    "att_fixed": 130.31,
+    "att_relaxed": 129.04,
+    "max_w_relaxed": 0.341
+   },
+   {
+    "sector": "資安/系統整合",
+    "n": 4,
+    "eq": 116.18,
+    "att_fixed": 116.18,
+    "att_relaxed": 119.85,
+    "max_w_relaxed": 0.3
+   },
+   {
+    "sector": "軍工航太",
+    "n": 4,
+    "eq": 127.69,
+    "att_fixed": 127.69,
+    "att_relaxed": 130.66,
+    "max_w_relaxed": 0.3
+   },
+   {
+    "sector": "金融",
+    "n": 4,
+    "eq": 144.56,
+    "att_fixed": 144.56,
+    "att_relaxed": 147.25,
+    "max_w_relaxed": 0.3
+   },
+   {
+    "sector": "鋼鐵",
+    "n": 5,
+    "eq": 104.18,
+    "att_fixed": 104.18,
+    "att_relaxed": 103.65,
+    "max_w_relaxed": 0.24
+   },
+   {
+    "sector": "電動車",
+    "n": 4,
+    "eq": 117.88,
+    "att_fixed": 117.43,
+    "att_relaxed": 113.71,
+    "max_w_relaxed": 0.3
+   },
+   {
+    "sector": "電源管理",
+    "n": 3,
+    "eq": 122.33,
+    "att_fixed": 126.82,
+    "att_relaxed": 132.35,
+    "max_w_relaxed": 0.4
+   }
+  ],
+  "pc1": {
+   "ABF 載板": {
+    "40": 0.77,
+    "60": 0.719,
+    "90": 0.692
+   },
+   "AI 伺服器": {
+    "40": 0.642,
+    "60": 0.624,
+    "90": 0.607
+   },
+   "ASIC 設計服務": {
+    "40": 0.792,
+    "60": 0.769,
+    "90": 0.757
+   },
+   "BBU 備援電池": {
+    "40": 0.792,
+    "60": 0.76,
+    "90": 0.722
+   },
+   "CPO 共封裝光學": {
+    "40": 0.803,
+    "60": 0.77,
+    "90": 0.756
+   },
+   "IC設計": {
+    "40": 0.618,
+    "60": 0.639,
+    "90": 0.638
+   },
+   "PCB": {
+    "40": 0.696,
+    "60": 0.669,
+    "90": 0.647
+   },
+   "低軌衛星": {
+    "40": 0.674,
+    "60": 0.594,
+    "90": 0.584
+   },
+   "光學": {
+    "40": 0.699,
+    "60": 0.706,
+    "90": 0.674
+   },
+   "半導體": {
+    "40": 0.623,
+    "60": 0.569,
+    "90": 0.579
+   },
+   "半導體設備": {
+    "40": 0.713,
+    "60": 0.678,
+    "90": 0.663
+   },
+   "台積電擴廠": {
+    "40": 0.708,
+    "60": 0.664,
+    "90": 0.611
+   },
+   "散熱": {
+    "40": 0.618,
+    "60": 0.626,
+    "90": 0.599
+   },
+   "散裝航運": {
+    "40": 0.702,
+    "60": 0.688,
+    "90": 0.662
+   },
+   "條鋼": {
+    "40": 0.655,
+    "60": 0.499,
+    "90": 0.476
+   },
+   "機器人": {
+    "40": 0.553,
+    "60": 0.56,
+    "90": 0.561
+   },
+   "生技醫療": {
+    "40": 0.669,
+    "60": 0.648,
+    "90": 0.577
+   },
+   "矽智財 IP": {
+    "40": 0.595,
+    "60": 0.61,
+    "90": 0.657
+   },
+   "網通設備": {
+    "40": 0.74,
+    "60": 0.665,
+    "90": 0.594
+   },
+   "航空": {
+    "40": 0.84,
+    "60": 0.843,
+    "90": 0.841
+   },
+   "被動元件": {
+    "40": 0.819,
+    "60": 0.79,
+    "90": 0.777
+   },
+   "觀光餐飲": {
+    "40": 0.534,
+    "60": 0.389,
+    "90": 0.384
+   },
+   "記憶體": {
+    "40": 0.803,
+    "60": 0.795,
+    "90": 0.777
+   },
+   "貨櫃航運": {
+    "40": 0.877,
+    "60": 0.857,
+    "90": 0.804
+   },
+   "資安/系統整合": {
+    "40": 0.651,
+    "60": 0.615,
+    "90": 0.659
+   },
+   "軍工航太": {
+    "40": 0.721,
+    "60": 0.707,
+    "90": 0.691
+   },
+   "重電": {
+    "40": 0.798,
+    "60": 0.759,
+    "90": 0.771
+   },
+   "金融": {
+    "40": 0.649,
+    "60": 0.684,
+    "90": 0.719
+   },
+   "鋼鐵": {
+    "40": 0.518,
+    "60": 0.578,
+    "90": 0.694
+   },
+   "電動車": {
+    "40": 0.593,
+    "60": 0.485,
+    "90": 0.496
+   },
+   "電源管理": {
+    "40": 0.792,
+    "60": 0.75,
+    "90": 0.638
+   }
+  },
+  "plateau": [
+   {
+    "param": "corr_q",
+    "value": 0.35,
+    "role_agreement": 0.972,
+    "leader_jaccard": 0.6,
+    "n_leader": 5
+   },
+   {
+    "param": "corr_q",
+    "value": 0.55,
+    "role_agreement": 0.972,
+    "leader_jaccard": 0.667,
+    "n_leader": 2
+   },
+   {
+    "param": "quant_window",
+    "value": 40,
+    "role_agreement": 0.965,
+    "leader_jaccard": 1.0,
+    "n_leader": 3
+   },
+   {
+    "param": "quant_window",
+    "value": 80,
+    "role_agreement": 0.979,
+    "leader_jaccard": 0.75,
+    "n_leader": 4
+   },
+   {
+    "param": "ewm_span",
+    "value": 30,
+    "role_agreement": 0.965,
+    "leader_jaccard": 0.0,
+    "n_leader": 0
+   },
+   {
+    "param": "ewm_span",
+    "value": 70,
+    "role_agreement": 0.972,
+    "leader_jaccard": 0.75,
+    "n_leader": 4
+   }
+  ],
+  "ablation": [
+   {
+    "ablate": "vol",
+    "role_change": 0.056,
+    "n_leader": 3,
+    "n_fake_wash": 0
+   },
+   {
+    "ablate": "div",
+    "role_change": 0.021,
+    "n_leader": 3,
+    "n_fake_wash": 7
+   },
+   {
+    "ablate": "rs",
+    "role_change": 0.007,
+    "n_leader": 4,
+    "n_fake_wash": 7
+   }
+  ],
+  "volcorr": {
+   "median": 0.603,
+   "p10": 0.39,
+   "p90": 0.815,
+   "neg_share": 0.0,
+   "price_median": 0.788,
+   "price_p10": 0.594
+  },
+  "permutation": [
+   {
+    "sector": "ABF 載板",
+    "peak_lag": 1,
+    "ic": 0.2735,
+    "p": 0.01,
+    "direction": "族群領先市場",
+    "bh_crit": 0.0032,
+    "fdr_sig": true
+   },
+   {
+    "sector": "IC設計",
+    "peak_lag": 1,
+    "ic": 0.2734,
+    "p": 0.01,
+    "direction": "族群領先市場",
+    "bh_crit": 0.0065,
+    "fdr_sig": true
+   },
+   {
+    "sector": "記憶體",
+    "peak_lag": 1,
+    "ic": 0.2949,
+    "p": 0.01,
+    "direction": "族群領先市場",
+    "bh_crit": 0.0097,
+    "fdr_sig": true
+   },
+   {
+    "sector": "PCB",
+    "peak_lag": 1,
+    "ic": 0.2527,
+    "p": 0.0149,
+    "direction": "族群領先市場",
+    "bh_crit": 0.0129,
+    "fdr_sig": true
+   },
+   {
+    "sector": "被動元件",
+    "peak_lag": 1,
+    "ic": 0.2657,
+    "p": 0.0149,
+    "direction": "族群領先市場",
+    "bh_crit": 0.0161,
+    "fdr_sig": true
+   },
+   {
+    "sector": "矽智財 IP",
+    "peak_lag": 1,
+    "ic": 0.236,
+    "p": 0.0199,
+    "direction": "族群領先市場",
+    "bh_crit": 0.0194,
+    "fdr_sig": true
+   },
+   {
+    "sector": "網通設備",
+    "peak_lag": 1,
+    "ic": 0.2262,
+    "p": 0.0199,
+    "direction": "族群領先市場",
+    "bh_crit": 0.0226,
+    "fdr_sig": true
+   },
+   {
+    "sector": "電動車",
+    "peak_lag": 1,
+    "ic": 0.2393,
+    "p": 0.0199,
+    "direction": "族群領先市場",
+    "bh_crit": 0.0258,
+    "fdr_sig": true
+   },
+   {
+    "sector": "鋼鐵",
+    "peak_lag": 4,
+    "ic": 0.2322,
+    "p": 0.0299,
+    "direction": "族群領先市場",
+    "bh_crit": 0.029,
+    "fdr_sig": true
+   },
+   {
+    "sector": "半導體",
+    "peak_lag": 1,
+    "ic": 0.2509,
+    "p": 0.0348,
+    "direction": "族群領先市場",
+    "bh_crit": 0.0323,
+    "fdr_sig": true
+   },
+   {
+    "sector": "散熱",
+    "peak_lag": 1,
+    "ic": 0.2242,
+    "p": 0.0348,
+    "direction": "族群領先市場",
+    "bh_crit": 0.0355,
+    "fdr_sig": true
+   },
+   {
+    "sector": "BBU 備援電池",
+    "peak_lag": 1,
+    "ic": 0.2219,
+    "p": 0.0498,
+    "direction": "族群領先市場",
+    "bh_crit": 0.0387,
+    "fdr_sig": false
+   },
+   {
+    "sector": "低軌衛星",
+    "peak_lag": 1,
+    "ic": 0.2148,
+    "p": 0.0647,
+    "direction": "族群領先市場",
+    "bh_crit": 0.0419,
+    "fdr_sig": false
+   },
+   {
+    "sector": "半導體設備",
+    "peak_lag": 1,
+    "ic": 0.2095,
+    "p": 0.0746,
+    "direction": "族群領先市場",
+    "bh_crit": 0.0452,
+    "fdr_sig": false
+   },
+   {
+    "sector": "AI 伺服器",
+    "peak_lag": 1,
+    "ic": 0.2158,
+    "p": 0.0796,
+    "direction": "族群領先市場",
+    "bh_crit": 0.0484,
+    "fdr_sig": false
+   },
+   {
+    "sector": "機器人",
+    "peak_lag": 1,
+    "ic": 0.2096,
+    "p": 0.0796,
+    "direction": "族群領先市場",
+    "bh_crit": 0.0516,
+    "fdr_sig": false
+   },
+   {
+    "sector": "電源管理",
+    "peak_lag": 1,
+    "ic": 0.213,
+    "p": 0.0896,
+    "direction": "族群領先市場",
+    "bh_crit": 0.0548,
+    "fdr_sig": false
+   },
+   {
+    "sector": "散裝航運",
+    "peak_lag": 3,
+    "ic": -0.2026,
+    "p": 0.1045,
+    "direction": "族群領先市場",
+    "bh_crit": 0.0581,
+    "fdr_sig": false
+   },
+   {
+    "sector": "生技醫療",
+    "peak_lag": -5,
+    "ic": 0.1929,
+    "p": 0.1045,
+    "direction": "市場領先族群",
+    "bh_crit": 0.0613,
+    "fdr_sig": false
+   },
+   {
+    "sector": "條鋼",
+    "peak_lag": 4,
+    "ic": 0.2084,
+    "p": 0.1144,
+    "direction": "族群領先市場",
+    "bh_crit": 0.0645,
+    "fdr_sig": false
+   },
+   {
+    "sector": "台積電擴廠",
+    "peak_lag": 1,
+    "ic": 0.2056,
+    "p": 0.1194,
+    "direction": "族群領先市場",
+    "bh_crit": 0.0677,
+    "fdr_sig": false
+   },
+   {
+    "sector": "CPO 共封裝光學",
+    "peak_lag": 1,
+    "ic": 0.1955,
+    "p": 0.1244,
+    "direction": "族群領先市場",
+    "bh_crit": 0.071,
+    "fdr_sig": false
+   },
+   {
+    "sector": "光學",
+    "peak_lag": 1,
+    "ic": 0.1993,
+    "p": 0.1393,
+    "direction": "族群領先市場",
+    "bh_crit": 0.0742,
+    "fdr_sig": false
+   },
+   {
+    "sector": "ASIC 設計服務",
+    "peak_lag": 1,
+    "ic": 0.2028,
+    "p": 0.1791,
+    "direction": "族群領先市場",
+    "bh_crit": 0.0774,
+    "fdr_sig": false
+   },
+   {
+    "sector": "貨櫃航運",
+    "peak_lag": 3,
+    "ic": -0.1759,
+    "p": 0.3035,
+    "direction": "族群領先市場",
+    "bh_crit": 0.0806,
+    "fdr_sig": false
+   },
+   {
+    "sector": "重電",
+    "peak_lag": 2,
+    "ic": 0.1565,
+    "p": 0.3831,
+    "direction": "族群領先市場",
+    "bh_crit": 0.0839,
+    "fdr_sig": false
+   },
+   {
+    "sector": "軍工航太",
+    "peak_lag": 1,
+    "ic": 0.1667,
+    "p": 0.393,
+    "direction": "族群領先市場",
+    "bh_crit": 0.0871,
+    "fdr_sig": false
+   },
+   {
+    "sector": "航空",
+    "peak_lag": 0,
+    "ic": -0.158,
+    "p": 0.403,
+    "direction": "同期",
+    "bh_crit": 0.0903,
+    "fdr_sig": false
+   },
+   {
+    "sector": "資安/系統整合",
+    "peak_lag": -1,
+    "ic": 0.1394,
+    "p": 0.5672,
+    "direction": "市場領先族群",
+    "bh_crit": 0.0935,
+    "fdr_sig": false
+   },
+   {
+    "sector": "觀光餐飲",
+    "peak_lag": 0,
+    "ic": -0.1403,
+    "p": 0.607,
+    "direction": "同期",
+    "bh_crit": 0.0968,
+    "fdr_sig": false
+   },
+   {
+    "sector": "金融",
+    "peak_lag": -3,
+    "ic": -0.105,
+    "p": 0.9005,
+    "direction": "市場領先族群",
+    "bh_crit": 0.1,
+    "fdr_sig": false
+   }
+  ],
+  "smallcap": {
+   "vol_shock_top10_small": 5,
+   "gravity_top10_small": 1,
+   "top_vol": [
+    "3019",
+    "3363",
+    "6442",
+    "1597",
+    "3324",
+    "3380",
+    "6669",
+    "2884",
+    "2421",
+    "2617"
+   ],
+   "top_gravity": [
+    "6442",
+    "3363",
+    "3019",
+    "6669",
+    "2454",
+    "3037",
+    "2408",
+    "3189",
+    "3081",
+    "3008"
+   ]
+  },
+  "family": {
+   "state": {
+    "clean_mkt_z": -0.239,
+    "breadth_change": 0.131,
+    "member_ratio": 1.0,
+    "group_as_median_z": 0.0,
+    "regime": "RISK_ON",
+    "n_obs": 165
+   },
+   "modes": {
+    "FALLBACK": 9,
+    "FIXED": 13,
+    "ROLLING": 3
+   },
+   "fired": [],
+   "C-05": {
+    "id": "C-05",
+    "value": 0.7386,
+    "mode": "ROLLING",
+    "why": "滾動 P80(視窗 60)"
+   },
+   "C-06": {
+    "id": "C-06",
+    "value": 0.4904,
+    "mode": "ROLLING",
+    "why": "滾動 P50(視窗 60)"
+   },
+   "C-13": {
+    "id": "C-13",
+    "value": 0.45,
+    "mode": "FALLBACK",
+    "why": "IC 樣本<8 誠實退回基值"
+   }
+  }
+ }
+}
