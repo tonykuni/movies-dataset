@@ -102,6 +102,8 @@ PYENV
   VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL131_ProjectCompletion_v*.py | sort | tail -1)" build
   echo "--- ⑫ 產品資格閘(批376;MDL133;九閘;只讀存證)"
   VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL133_ProductGate_v*.py | sort | tail -1)" build
+  echo "--- ⑬ 環境治理全景(批381;MDL135;唯讀 run --offline;LKGC 快照;log logs/env_governance.log)"
+  VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL135_EnvGovernance_v*.py | sort | tail -1)" run --offline --quiet
   echo "=== 畢(誠實三態見上)==="
 } >> "$LOG" 2>&1
 exit 0

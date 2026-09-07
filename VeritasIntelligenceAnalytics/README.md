@@ -36,6 +36,7 @@ pwsh -File "VeritasIntelligenceAnalytics\Install-VIA.ps1"     # 加 -AutoStart �
 | `via-fis` | FIS 驗證 harness v3:E1/E2/E3 實驗+Matrix 報告(需 `py -m pip install scipy`) |
 | `via-pipe` | 統一輪動引擎(回測+自演化+證偽;**待同伴檔 rotation_engine.py 補齊**) |
 | `via-envfix` | EnvManager 決策式無衝突安裝:五依賴 plan-install 留痕 → NumPy 黃金律 constraints → py 基底聯合安裝 → pip check 後驗 |
+| `via-envgov` | **環境治理統一引擎 MDL135(批381)**:全景式分析 base/via_core/via_* → uv 毫秒快篩 → base 該有冊閉包(Baseline 冊)→ 衝突立拔家族路由(OCR→`paddle_312` 等)→ Zero-Hydra 分流拓撲三輪 → LKGC/rollback(最壞還原原本規劃)→ 四分區 HTML Matrix;預設唯讀 `run --offline`;`apply --approve`(base 移除另 `--approve-remove`);`via-envgov-auto` 單一 PowerShell 一貼即用(`-Online`/`-Approve`/`-Background` 不阻塞) |
 | `via-bridge` | **Command Bridge**:一鍵前後端對接——後端 B1-B5 探測(接線/SSOT/依賴/資料庫/UI)+ test/debug 三輪 + 多 TAB 前端,首頁=總覽+全系統狀態矩陣(每跑必重生=當下真相) |
 | `via-trinity` | 功能三系整合模板:VIA 母刊頭 > 鍛 VDF/研 VRN/鑑 VAP 四 TAB(Porcelain;22 個 {{…}} 資料綁定槽) |
 | `via-workops` | **WorkOps 指揮板**:一支到底=唯讀掃描+控管表自動對帳+兩頁指揮板(①專案指揮 ②追蹤哨,≥3 天未回主動跳出);`ui` 開靜態儀表板;`Scan\|Reconcile\|Draft\|FollowUp\|Templates\|All` 走引擎非互動面 |

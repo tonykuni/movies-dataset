@@ -129,3 +129,17 @@ scripts/envcheck.{sh,ps1} ───────────┤  (Top 8 快篩,�
 - 環境分配藍圖(5D 分類 × 25 個 via_ 環境)見
   [`docs/via-env-matrix-5d.md`](via-env-matrix-5d.md) 與機器可讀之
   `VeritasIntelligenceAnalytics/supportive modules/registry/VIA_Env_Matrix_5D_v0100.json`。
+
+## 六、統一治理引擎(批381;`via-envgov`)
+
+上節監測迴路只「找」衝突;批381 新增 `CGC_MDL135_EnvGovernance`(正本零觸碰)把「找 → 拉出 → 隔離 → 驗證 → 基線」閉環:
+
+```
+via-envgov            # 全景式分析(base+via_core+via_*)→ uv 快篩 → base 該有冊閉包 → 家族整包路由 → 三輪段冊 → LKGC 快照 → 四分區矩陣(唯讀)
+via-envgov-auto -Online -Approve   # 單一 PowerShell 一貼即用:鏡像健康+uv pip compile 模擬 → 執行 GREEN 段(base 移除另 -ApproveRemove)
+via-envgov rollback   # 最壞還原:LKGC lock 逐境 sync;無 LKGC → 原本規劃(Baseline 冊)重建
+```
+
+base 該有冊=`VeritasIntelligenceAnalytics/supportive modules/registry/VIA_EnvGovernance_Baseline_v0100.json`;
+存證 `VIA_Reports/env_governance/` + `logs/env_governance.log`;規範全文見 [`docs/via-env-governance.md`](via-env-governance.md)。
+
