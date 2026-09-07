@@ -277,6 +277,9 @@ def gather(via: Path = VIA, do_git: bool = True) -> dict:
     inc = via / "functional modules" / "VRN" / "input" / "incoming"
     files = sorted(inc.glob("*")) if inc.exists() else []
     add(c, "收件夾 incoming", [{"name": f.name, "kb": f.stat().st_size // 1024, "mtime": _mtime(f)} for f in files if f.is_file()][:100] or None, str(inc.relative_to(via)), note="" if files else "空(拖曳/選夾入件)")
+    co_v = _read_json(R / "closeout" / "VRN_CLOSEOUT_latest.json")   # 批398 收尾閘(via-closeout vrn)
+    add(c, "驗證收尾(五段鏈+核對態;via-closeout vrn)", [{k: r.get(k) for k in ("report_file", "ticker", "report_date", "stage_zh", "basic", "financial", "fin_vdf_over", "verdict")} for r in (co_v or {}).get("rows", [])][:150] if co_v else None,
+        "VIA_Reports/closeout/VRN_CLOSEOUT_latest.json", lamp=(co_v or {}).get("verdict", "GREY"), note=(co_v or {}).get("note", ""))
     rep["lamps"]["vrn"] = (fp or {}).get("verdict", "GREY")
     # 12 VAP
     c = cat("vap", "VAP 產出")
@@ -289,6 +292,11 @@ def gather(via: Path = VIA, do_git: bool = True) -> dict:
             add(c, "VAP ONE 台帳(近 10)", lines, "VIA_Reports/vap_one/vap_one_ledger.jsonl")
         except Exception:
             pass
+    co_a = _read_json(R / "closeout" / "VAP_CLOSEOUT_latest.json")   # 批398 收尾閘(via-closeout vap)
+    add(c, "產出收尾(逐圖驗;via-closeout vap)", [{k: r.get(k) for k in ("name", "kind", "kb", "mtime", "dims", "valid", "why")} for r in (co_a or {}).get("images", [])][:150] if co_a else None,
+        "VIA_Reports/closeout/VAP_CLOSEOUT_latest.json", lamp=(co_a or {}).get("verdict", "GREY"), note=(co_a or {}).get("note", ""))
+    co = _read_json(R / "closeout" / "CLOSEOUT_latest.json")
+    rep["lamps"]["closeout"] = (co or {}).get("verdict", "GREY")
     # 13 日更鏈
     c = cat("boot", "日更鏈(boot_update_logs)")
     bl = R / "boot_update_logs"

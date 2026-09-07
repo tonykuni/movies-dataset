@@ -116,6 +116,8 @@ echo "--- ⑱ 輸入主控台頁再生(批390;MDL139 build;零 CDN;零網路)"
   VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL139_InputConsole_v*.py | sort | tail -1)" build || true
 echo "--- ⑲ 接棒狀態台再生(批392;MDL140 build;只讀現役 *_latest.json → 15 類堆疊矩陣+Markdown;零網路)"
   VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL140_HandoverConsole_v*.py | sort | tail -1)" build || true
+echo "--- ⑳ 收尾閘(批398;MDL141 vrn,vap 只讀:VRN 逐份五段鏈+核對態、VAP 逐圖驗;無報告/無圖=誠實黃)"
+  VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL141_ClosingGate_v*.py | sort | tail -1)" all || true
   echo "=== 畢(誠實三態見上)==="
 } >> "$LOG" 2>&1
 exit 0

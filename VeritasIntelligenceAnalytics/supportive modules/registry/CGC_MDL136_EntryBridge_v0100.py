@@ -453,6 +453,7 @@ def plan(do_print: bool = True, quiet: bool = False) -> list:
         ("via-famui vdf,vrn --open", "家族 U/I 再生閘(批388):家族境 python 真跑 VDF/VRN 頁面產生器→頁新鮮/零 CDN→索引一鍵開(via-open VDF/VRN/四點/家族)", "READY"),
         ("via-console --open", "輸入主控台(批390;MDL139 左輸入/右矩陣):VDF 查詢標的分類細項/起始日/財報期別/庫狀況/日交易×籌碼對齊;VRN 資料夾拖曳與整體跑況;VAP 簡輸入;樞紐在線=LIVE 可啟動,否則 SNAPSHOT 只看", "READY"),
         ("via-handover --open", "接棒狀態台(批392;MDL140):超詳細系統狀態 15 類堆疊矩陣一頁(倉/入口/環境/能跑閘/家族 U/I/樞紐/主控台/庫/對齊/本機三庫/VRN/VAP/boot/待辦/下一步)+ Markdown 一鍵複製(VIA_Reports/handover/HANDOVER_latest.md)=次日接棒;樞紐在線=LIVE /handover", "READY"),
+        ("via-closeout", "收尾閘(批398;MDL141):VRN 驗證收尾=報告夾每一份 收件→首頁→入庫→財報頁→四點 + TAB2/TAB4 核對態 DONE|FAIL|PENDING;VAP 產出收尾=逐圖驗+零 CDN;--run 先跑鏈;CLOSEOUT_latest.md 供接棒", "READY"),
         ("via-datahome link", "資料家接點(批340/389):倉內 output_hub → 本機資料家 junction;非 LINKED=正典庫困在 worktree;link 後 via-vdfdb run --apply 冪等重跑(ENG065 協定檔自動回歸正典表)", "DONE" if (L.get("Data") or {}).get("link") == "LINKED" else "READY"),
         ("via-vdfdb scan", "本機三庫(prices/chips/rest)盤點+路由計畫(唯讀;檔冊 sha 已入冊=跳過;tw__/gl__ 協定檔→同名正典表)", "READY"),
         ("via-vdfdb run --apply", "COPY_ONLY anti-join 入正典 DuckDB(只補缺鍵;原件不刪不搬)", "PENDING(先 scan)"),
@@ -523,8 +524,8 @@ def selftest() -> int:
     chk("⑥ 短指令冊(母倉∪Grok;名稱唯一;撞名列 -grok)", len(rows) >= 60 and len(names) == len(set(names))
         and any(r["state"].startswith("撞名改名") for r in rows if r["owner"] == "GROK"), f"({len(rows)} 令)")
     pl = plan(do_print=False)
-    chk("⑦ 一貼即用次序(≥16 步;含 envgov/REPAIR_BASE/rungate/famui/console/handover/datahome/vdfdb/ckpt/vapone/矩陣/webconsole)",
-        len(pl) >= 16 and all(any(k in r["cmd"] for r in pl) for k in ("via-envgov", "REPAIR_BASE", "via-rungate", "via-famui", "via-console", "via-handover", "via-datahome", "via-vdfdb", "ckpt", "via-vapone", "矩陣", "via-webconsole")))
+    chk("⑦ 一貼即用次序(≥17 步;含 envgov/REPAIR_BASE/rungate/famui/console/handover/closeout/datahome/vdfdb/ckpt/vapone/矩陣/webconsole)",
+        len(pl) >= 17 and all(any(k in r["cmd"] for r in pl) for k in ("via-envgov", "REPAIR_BASE", "via-rungate", "via-famui", "via-console", "via-handover", "via-closeout", "via-datahome", "via-vdfdb", "ckpt", "via-vapone", "矩陣", "via-webconsole")))
     src = Path(__file__).read_text(encoding="utf-8")
     chk("⑧ 紀律宣告(只增不減/原件零觸碰/誠實三態/零 CDN/尾版律/ACCEL-BRIDGE)",
         all(k in src for k in ("只增不減", "原件零觸碰", "誠實三態", "零 CDN", "尾版律", "ACCEL-BRIDGE")))

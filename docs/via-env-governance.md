@@ -405,3 +405,22 @@ via-reload
 via-pin
 via-famui vdf,vrn --open
 ```
+
+## 十八、批398:收尾閘——VRN 驗證收尾(VAL)與 VAP 產出收尾(`via-closeout`)
+
+操作員令:「將 VRN VAL 收個尾吧」。收尾=「跑成功了嗎」的最後一道誠實閘:不另算、不另抓,只彙整母倉現役引擎的落檔與判準,逐份/逐圖給 DONE|FAIL|PENDING、總判 GREEN|YELLOW|RED|GREY、下一步短令,落 JSON+Markdown 供接棒台讀。
+
+- **引擎** `CGC_MDL141_ClosingGate_v0100.py`(`via-closeout [vrn|vap|all] [--run] [--dir 夾] [--json]`;別名 `via-vrnval`/`via-vapval`;以 `via_vrn_312` python 啟動):
+  - **VRN**:報告夾(`functional modules/VRN/input_reports` ∪ `input/incoming`)每一份 → 五段鏈 收件→首頁(ENG072 sidecar `VIA_Reports/first_page_text/<stem>.json`)→入庫(ENG073 `vrn_report_basic`)→財報頁(ENG074 `vrn_report_financial` / ENG073 metrics)→四點(ENG080 `vrn_four_point_digest`);核對態沿用 MDL139 正本 in-process(`basic_verified`/`classify_report`/`fin_final`/`vrn_tabs`:TAB2 BASIC INFO VERIFIED|FAIL|PENDING、TAB4 報告值 vs VDF 歷史值 一致|不同→VDF 為主|無對照);逐份 DONE(五段全通且 VERIFIED)|FAIL|PENDING;總判:無報告=YELLOW(候操作員丟 PDF)· 有 FAIL=RED · 有未跑完=YELLOW(最低停段)· 全 DONE=GREEN · 庫缺/duckdb 缺=GREY;次步直指該補的鏈段(`via-console run --item vrn_firstpage` …)。
+  - **VAP**:規格冊 `VIA_VAP_All_Chart_Specs`(40 條)計數 + 產出夾(`vap_one`/`vap_stack`)逐圖驗:SVG 有 `<svg>` 與繪圖元素且無外部連結、PNG 簽章與 IHDR 尺寸、HTML 有圖且零 CDN、PDF 簽章;VAP ONE 台帳末筆;逐圖 OK|FAIL;總判:夾缺=GREY · 無圖=YELLOW · 有壞圖=RED · 全好=GREEN。
+  - `--run`:先經 MDL139 `run --item` 跑鏈(vrn=冊 `chain_default` 五段,`--dir` 只給有 dir 參數的段;vap=`vap_one_render`;任一段 rc≠0 即停)再收尾。落 `VIA_Reports/closeout/CLOSEOUT_latest.json/.md`(+`VRN_`/`VAP_`)。八檢(臨時庫/臨時夾/假圖;零網路)。
+- **登錄**:Register v0163 三短令+三梭;MDL140 接棒台 vrn/vap 類 +「驗證收尾」「產出收尾」矩陣 +`closeout` 燈;MDL136 plan +`via-closeout`(17 步);SelftestGrid v0238 第 197 站;boot ⑳(只讀);Console GOV-26;SSOT 動詞;台帳 883。
+- **誠實現況**(工作站):VRN 報告夾空、庫無 `vrn_report_basic` → 收尾 YELLOW「尚無報告」,丟 PDF 進主控台或 `via-closeout vrn --run --dir <夾>` 即整條鏈;VAP 產出夾有無圖由 `via-closeout vap` 逐圖判,不假綠。
+
+```powershell
+# 先按 Enter 讓提示字元回來;只貼框內文字
+via-reload
+via-closeout                                   # 兩族只讀收尾:VRN 無報告=YELLOW 屬誠實;VAP 逐圖 OK|FAIL
+via-closeout vrn --run --dir "C:\Users\tonyk\Downloads\reports"   # 有報告夾時:先跑五段鏈再收尾(路徑換成您的夾)
+via-handover                                   # 接棒台 vrn/vap 類含收尾矩陣;closeout 燈
+```
