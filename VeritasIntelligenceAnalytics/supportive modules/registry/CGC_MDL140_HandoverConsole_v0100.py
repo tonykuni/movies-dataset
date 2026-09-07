@@ -321,7 +321,20 @@ def gather(via: Path = VIA, do_git: bool = True) -> dict:
     rep["summary"]["verdict"] = "RED" if "RED" in lamps else ("YELLOW" if "YELLOW" in lamps else ("GREEN" if lamps else "GREY"))
     rep["summary"]["matrices"] = sum(len(c["matrices"]) for c in rep["cats"])
     rep["summary"]["missing"] = sum(1 for c in rep["cats"] for m in c["matrices"] if m["lamp"] == "GREY")
+    # 批394 工作站實錄:「未跑/缺 1 · 判定 RED」看不出是哪一類 → 點名 RED 燈與缺件來源(操作員一眼知道該跑什麼)
+    rep["summary"]["red"] = [k for k, v in rep["lamps"].items() if v == "RED"]
+    rep["summary"]["missing_names"] = [f"{c['id']}:{m['title']}" for c in rep["cats"] for m in c["matrices"] if m["lamp"] == "GREY"][:12]
     return rep
+
+
+def _flags(rep: dict) -> str:
+    sm = rep.get("summary") or {}
+    out = ""
+    if sm.get("red"):
+        out += " · RED 燈 " + ",".join(sm["red"])
+    if sm.get("missing_names"):
+        out += " · 未跑 " + ",".join(sm["missing_names"][:6]) + ("…" if len(sm["missing_names"]) > 6 else "")
+    return out
 
 
 # ---------------------------------------------------------------- Markdown
@@ -412,14 +425,14 @@ def build(out: Path = OUT_PAGE, reports: Path = REPORTS, do_print: bool = True, 
     _write_text(reports / "HANDOVER_latest.json", json.dumps(rep, ensure_ascii=False, indent=1, default=str))
     log_event("BUILD", str(out), matrices=rep["summary"].get("matrices"), verdict=rep["summary"].get("verdict"))
     if do_print:
-        print(f"[via-handover build] {out}({len(page) // 1024} KB;零 CDN)· {rep['summary'].get('matrices')} 矩陣 · 未跑/缺 {rep['summary'].get('missing')} · 判定 {rep['summary'].get('verdict')} · MD {reports / 'HANDOVER_latest.md'} · LIVE {BRIDGE}/handover")
+        print(f"[via-handover build] {out}({len(page) // 1024} KB;零 CDN)· {rep['summary'].get('matrices')} 矩陣 · 未跑/缺 {rep['summary'].get('missing')} · 判定 {rep['summary'].get('verdict')}{_flags(rep)} · MD {reports / 'HANDOVER_latest.md'} · LIVE {BRIDGE}/handover")
     return out
 
 
 def status(rep: dict | None = None, do_print: bool = True) -> dict:
     rep = rep or gather()
     if do_print:
-        print(f"[via-handover status] {rep['summary'].get('verdict')} · 分支 {rep['summary'].get('branch')} HEAD {rep['summary'].get('head')} · 矩陣 {rep['summary'].get('matrices')} · 未跑/缺 {rep['summary'].get('missing')}")
+        print(f"[via-handover status] {rep['summary'].get('verdict')} · 分支 {rep['summary'].get('branch')} HEAD {rep['summary'].get('head')} · 矩陣 {rep['summary'].get('matrices')} · 未跑/缺 {rep['summary'].get('missing')}{_flags(rep)}")
         for c in rep["cats"]:
             print(f"  {c['zh']:<28} " + " · ".join(f"{m['lamp']} {m['title'][:18]}({m['n']})" for m in c["matrices"]))
     return rep
@@ -446,7 +459,9 @@ def selftest() -> int:
     ids = [c["id"] for c in rep["cats"]]
     chk("③ 來源冊彙整(15 類齊:倉/入口/環境/能跑閘/家族 U/I/樞紐/主控台/庫/對齊/本機三庫/VRN/VAP/日更鏈/候操作員/次步;缺件 GREY 不假綠;燈冊)",
         ids == ["repo", "entry", "env", "rungate", "famui", "deck", "console", "db", "align", "localdb", "vrn", "vap", "boot", "pending", "next"] and rep["summary"]["matrices"] >= 15
-        and rep["summary"]["verdict"] in ("GREEN", "YELLOW", "RED", "GREY") and all(m["lamp"] in ("GREEN", "YELLOW", "RED", "GREY") for c in rep["cats"] for m in c["matrices"]),
+        and rep["summary"]["verdict"] in ("GREEN", "YELLOW", "RED", "GREY") and all(m["lamp"] in ("GREEN", "YELLOW", "RED", "GREY") for c in rep["cats"] for m in c["matrices"])
+        and isinstance(rep["summary"].get("red"), list) and isinstance(rep["summary"].get("missing_names"), list) and len(rep["summary"]["missing_names"]) == min(12, rep["summary"]["missing"])
+        and (("RED 燈" in _flags(rep)) == bool(rep["summary"]["red"])),
         f"({rep['summary']['matrices']} 矩陣;缺 {rep['summary']['missing']};判定 {rep['summary']['verdict']};燈 {rep['lamps']})")
     with tempfile.TemporaryDirectory() as td:
         root = Path(td)

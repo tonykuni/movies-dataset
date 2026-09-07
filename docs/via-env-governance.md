@@ -343,3 +343,20 @@ via-align check
 via-align update --apply
 via-handover --open
 ```
+
+### 批394 工作站實錄補:`via-chip`/`via-price` 登錄、接棒台點名 RED 燈與缺件
+
+- 實錄 A(批393 一貼全綠):`via-bg` 無背景進程;`via-align check` 標 09-03/09-04/09-07 價未齊;`update --apply` 基準日自動改 2026-08-25、`tw_universe` +1979 列;`via-handover --open` 建頁成功(樞紐離線=快照頁)。
+- 實錄 B:ENG081/ENG056 docstring 指路的 `via-chip` 在短令冊從未登錄=死路(Zero-Hydra 違律)。籌碼止 08-25 的根因:ENG056 交易日曆=價表實際日期,日更鏈 ③ 跑時價表尚無 08-26 之後交易日(ENG064 回補在後才補齊),故那些日子從未入待抓;現在 `via-chip run` 即補 10 日 × 4 車道(約 1 分鐘)。修:Register v0160 `via-chip`(ENG056 run/--derive/--status)、`via-price`(ENG054 增量 run/--status;別名 `via-tw-backfill`)+ 三梭;`via-align check` 的修法句改指 `via-price run`。
+- 實錄 C:接棒台印「未跑/缺 1 · 判定 RED」看不出是哪一類。修:MDL140 摘要 +`red`(RED 燈名)+`missing_names`(缺件來源),build/status 行點名。
+
+```powershell
+# 先按 Enter 讓提示字元回來,再整段貼(籌碼補 10 日約 1 分鐘;價未齊日由 via-price 補)
+via-reload
+via-chip run
+via-chip --derive
+via-price run
+via-align check
+via-align update --apply
+via-handover
+```

@@ -331,7 +331,7 @@ def check(db: Path = DB_TW, days: int = DAYS_DEFAULT, reports: Path = REPORTS, d
             elif chip_max and rep["summary"]["px_max"] and chip_max < rep["summary"]["px_max"]:
                 lag = (_dt.date.fromisoformat(rep["summary"]["px_max"]) - _dt.date.fromisoformat(chip_max)).days
                 rep["verdict"] = "MISALIGNED"
-                rep["note"] = f"籌碼最新日 {chip_max} 落後價表 {rep['summary']['px_max']}({lag} 日)→ via-chip run(ENG056 籌碼增量)後重核"
+                rep["note"] = f"籌碼最新日 {chip_max} 落後價表 {rep['summary']['px_max']}({lag} 日)→ via-chip run(ENG056 籌碼增量;交易日曆=價表,回補新增日後需重跑)後重核"
             elif n_mis:
                 rep["verdict"] = "MISALIGNED"
                 rep["note"] = f"{n_mis}/{len(px_dates)} 日票集合不一致(最新日 只有價 {rep['mismatch'].get('px_only_n', 0)} · 只有籌碼 {rep['mismatch'].get('chip_only_n', 0)})→ 差集見 mismatch;更新清單 via-align update --apply"
@@ -344,7 +344,7 @@ def check(db: Path = DB_TW, days: int = DAYS_DEFAULT, reports: Path = REPORTS, d
             if rep["dates"] and not rep["dates"][0]["px_full"]:
                 if rep["verdict"] == "ALIGNED":
                     rep["verdict"] = "PARTIAL"
-                rep["note"] = f"最新價日 {rep['dates'][0]['date']} 價 {rep['dates'][0]['px_n']} < 窗內最大 {px_top} 之 60%=日更未齊(ENG054 增量跑中/來源缺;清單基準日自動改雙側齊日)· " + rep["note"]
+                rep["note"] = f"最新價日 {rep['dates'][0]['date']} 價 {rep['dates'][0]['px_n']} < 窗內最大 {px_top} 之 60%=日更未齊(via-price run=ENG054 增量補齊;清單基準日自動改雙側齊日)· " + rep["note"]
     finally:
         con.close()
     _finish(rep, reports, "ALIGN")
