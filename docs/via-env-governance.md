@@ -311,3 +311,20 @@ via-align check                             # 唯讀;籌碼落後=先跑籌碼�
 via-align update --apply                    # 日更鏈/回補跑完後再寫 tw_universe(讓庫律誠實等/停)
 ```
 
+## 十七、批392:參數最小化——啟動跑一切、統一起始 2023-01-01、VRN 三 TAB 核對(VDF 為主)、接棒狀態台(`via-handover`)
+
+操作員令:「參數最小化;VRN 只是透過 Windows I/O 或拖曳式檔案及資料夾,啟動就跑了;台股除了財報可選股票外其他都是抓全部;國際資訊現有哪些、增減那些,勾選功能可放右面板;啟動跑一切;輸入及運作結果矩陣;TAB2 BASIC INFO WITH VERIFIED STATUS;TAB3 SUMMARY MATRIX;TAB4 FINANCIAL DATA VERIFYING,如果報告歷史值跟報告值不同,VDF 抓來的資料歷史值為主;起始時間統一 2023-01-01 起到最新;單一種資料庫儲存可個別整類改起始日,齊 YYYY-MM-DD,格子中「-」不動,未輸入前顯示淺色 YYYY-MM-DD,輸入數字自行填上;VAP 規格細節跟圖片顯示;VDF VRN VAP 都跑成功了嗎;VIA Central Console 一定是超詳細的系統狀態如 handover reports,表格最佳化、分門別類堆疊矩陣一頁展示,可轉換成 MD 供下一日接棒」。
+
+- **冊 v2** `VIA_InputConsole_Spec_v0100.json`:`defaults.start=2023-01-01`(統一起始;`latest`=不帶旗標=引擎增量律);`user.group_starts` 整類起始(呼叫參數 > 單項 > 整類 > 預設);台股群除財報(`fin_statements`)/月營收(`tw_revenue_codes`)外零代碼參數=抓全部;`intl` 群(原 global)讀寫 `VDF_Input_Interface_Matrix` 的 INTL_DAILY/INTL_FIN 兩節;VRN `minimal=true`(拖曳即跑;`chain_default` 五段);VAP `specs_csv`(40 規格)+`image_dirs`。
+- **引擎 v2** `CGC_MDL139_InputConsole_v0100.py`:`effective_start`;`apply_set` +`group-start=<群>:<日|latest>`、`intl-add/intl-remove/intl-item-add/intl-item-remove`(零刪除:軟移除入 `removed_*`,可 `--restore`);`fin_final` 核對律:報告值 vs VDF 歷史值 → 一致(VDF 為主)|不同→VDF 歷史值為主(單位差 ×千/×百萬 標)|無 VDF 對照=報告值(誠實)|報告缺=VDF;`vrn_tabs`:TAB2 BASIC INFO(核對態 VERIFIED|FAIL)/TAB3 SUMMARY 矩陣/TAB4 FINANCIAL(價、上漲、營收 vs `tw_monthly_revenue`);`vap_specs`/`vap_images`;`family_success` 三族最近一次真跑落檔。十檢。
+- **頁 v2**:左 rail `▶ 啟動全部 VDF`(冊內全部可跑項依序入樞紐)、整類起始遮罩 `dmask`(`YYYY-MM-DD` 淺色提示、只收數字、「-」固定)+「最新」勾、VRN 拖曳/`webkitdirectory` 選夾上傳 → 樞紐 `/intake`(dest `vrn_incoming`)→ 自動啟動整條鏈;右 main 12 矩陣:輸入×運作結果、國際資訊勾選、TAB2/3/4、庫狀況、對齊、清單、宏觀、VAP 規格與圖(LIVE 走樞紐 `/vap_img?p=` 白名單道;SNAPSHOT 走 `file://`)、「跑成功?」、執行狀態。
+- **接棒狀態台** `CGC_MDL140_HandoverConsole_v0100.py`(`via-handover`):只讀現役 `*_latest.json`(ENTRY/ENV_GOV/RUNGATE/FAMILY_UI/CONSOLE/ALIGN/UNIVERSE/COVERAGE/LOCALDB/VRN/VAP/boot log)+ git 現況 + 缺口冊 `VIA_Handover_Gap_Register` → 15 類分門別類堆疊矩陣一頁 `VIA_UI_Handover_v0100.html`(零 CDN;頁內「複製 Markdown」)+ `VIA_Reports/handover/HANDOVER_latest.md`/`.json`;缺料誠實 UNKNOWN;八檢。DeckServer v0133 `GET /handover`(注入權杖)、`GET /vap_img`(夾內守衛+副檔名白名單;越夾=404)、任務冊 52→53(`handover`)。
+- **登錄**:Register v0158 `via-handover`(探樞紐 → `via-open 接棒LIVE` 或快照頁)+ `via-open` 別名 接棒/接棒LIVE;Manager v0120 正式名稱 53;MDL136 plan 16 步;MDL138 HUB_PAGES;SelftestGrid v0235 第 196 站;Console GOV-25;SSOT 動詞;boot ⑲;台帳 877。
+- **「VDF VRN VAP 都跑成功了嗎」誠實答**:「跑成功?」分頁與接棒頁只認最近一次真跑落檔——VRN 能跑閘 GREEN、VDF 價表已整併但籌碼落後價表(對齊 MISALIGNED 直到日更鏈 ③ 補齊)、VRN 尚無報告(丟 PDF 即跑)、VAP 頁存在但未逐圖驗證、財報三大報表 PLANNED;不假綠。
+
+```powershell
+via-reload; via-console --open              # v2 頁:樞紐在線=LIVE(▶ 啟動全部 VDF;VRN 拖曳即跑)
+via-handover --open                         # 接棒狀態台:15 類堆疊矩陣一頁;頁內複製 Markdown / via-handover md
+via-console set group-start=tw_equity:2024-01-01 intl-add=INTL_DAILY:^FTSE   # 整類起始/國際資訊增減(可選)
+via-align check; via-align update --apply   # 背景日更鏈/回補跑完後(讓庫律誠實等/停)
+```

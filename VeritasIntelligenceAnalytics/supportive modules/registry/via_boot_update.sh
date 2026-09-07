@@ -114,6 +114,8 @@ echo "--- ⑰ 台股日交易×籌碼數量對齊核對(批390;VDF_ENG081 check;
   VIA_NO_OPEN=1 python3 "$(ls "$ENG"/VDF_ENG081_UniverseAlign_v*.py | sort | tail -1)" check || true
 echo "--- ⑱ 輸入主控台頁再生(批390;MDL139 build;零 CDN;零網路)"
   VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL139_InputConsole_v*.py | sort | tail -1)" build || true
+echo "--- ⑲ 接棒狀態台再生(批392;MDL140 build;只讀現役 *_latest.json → 15 類堆疊矩陣+Markdown;零網路)"
+  VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL140_HandoverConsole_v*.py | sort | tail -1)" build || true
   echo "=== 畢(誠實三態見上)==="
 } >> "$LOG" 2>&1
 exit 0

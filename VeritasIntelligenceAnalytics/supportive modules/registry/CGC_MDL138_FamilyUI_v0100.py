@@ -81,7 +81,7 @@ STATIC = {
     "vrn": [("VRN VisualLock 側欄", "supportive modules/VIA_VisualLock/VIA_VRN_VisualLock_Sidebar_v0159.html")],
     "vap": [("VAP ONE 單檔工作台", "functional modules/VAP/VIA_VAP_ONE__Standalone.html")],
 }
-HUB_PAGES = [("總控台 MasterControl", "supportive modules/ui_support/VIA_UI_MasterControl_v0100.html"), ("總控矩陣 v0700", "supportive modules/ui_support/VIA_MasterControl_Matrix_v0700.html"), ("輸入主控台 InputConsole(批390)", "supportive modules/ui_support/VIA_UI_InputConsole_v0100.html")]
+HUB_PAGES = [("總控台 MasterControl", "supportive modules/ui_support/VIA_UI_MasterControl_v0100.html"), ("總控矩陣 v0700", "supportive modules/ui_support/VIA_MasterControl_Matrix_v0700.html"), ("輸入主控台 InputConsole(批390/392 v2)", "supportive modules/ui_support/VIA_UI_InputConsole_v0100.html"), ("接棒狀態台 Handover(批392)", "supportive modules/ui_support/VIA_UI_Handover_v0100.html")]
 
 
 def _ts() -> str:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-CGC_MDL139_InputConsole v0100 — 左輸入/右矩陣 統一輸入主控台(批390)
+CGC_MDL139_InputConsole v0100 — 左輸入/右矩陣 統一輸入主控台(批390;批392 v2)
 ====================================================================
 操作員令(批390):「左面板有輸入介面,右面板是顯示介面;VDF 可新增查詢標的:總體經濟指標可分 PMI/通膨/就業…、
 台灣股票分 TWSE/TPEX 可新增代碼;輸入介面項目類別拆細;起始日期個別可改;財報分當季/累計/年度、年起迄;
@@ -10,25 +10,30 @@ DEFAULT 都是最新;目前資料庫狀況;台股每日交易資訊及籌碼最�
 儘量用 Windows U/I 下拉/勾選/全選/全不選;VRN 輸入可有資料夾、Windows I/O 拖曳式輸入、啟動、人機互動動畫、
 高自動化;VRN 要看整體跑況 BASIC INFO / SUMMARY / FINANCIAL DATA(VERIFIED/FAIL);其他含輸入介面儘量簡單但
 維持個別改動空間;VAP 也一樣」。
+操作員令(批392):「參數最小化:VRN 只透過 Windows I/O 或拖曳(檔案及資料夾)啟動就跑;台股除財報可選股票外其他抓全部;
+國際資訊現有哪些/增減哪些=勾選放右面板;啟動跑一切+輸入及運作結果矩陣;TAB2 BASIC INFO(核對態)/TAB3 SUMMARY 矩陣/
+TAB4 FINANCIAL DATA 核對:報告歷史值≠報告值時以 VDF 抓來的歷史值為主;起始時間統一 2023-01-01 至最新;可整類改起始日
+(YYYY-MM-DD 遮罩:'-' 固定,未輸入前淺色 YYYY-MM-DD,輸入數字自行填上);VAP 規格細節與圖片顯示;VDF/VRN/VAP 跑成功了嗎」。
 機制(Zero-Hydra:一冊一頁一橋;每一項目綁定母倉現役引擎與真旗標,引擎缺=誠實 PLANNED 不假跑):
   冊  VIA_InputConsole_Spec_v0100.json:families(vdf/vrn/vap)→ groups → items{engine(dir/glob/verb), params 種類}
-      + user 段(操作員個別改動:台股代碼 TWSE/TPEX、逐項起始日、天數、宏觀類別、財報期別年起迄、VRN 報告夾、
-      VAP 代碼/格式/設定;只增不減;changelog append-only);台股代碼/財報期別/VRN 路徑鏡寫 VDF_Input_Interface_Matrix 活冊
-  頁  supportive modules/ui_support/VIA_UI_InputConsole_v0100.html(零 CDN;左 rail=輸入表單,右 main=矩陣 篩選/
-      點欄排序(預設大到小)/勾選/全選/全不選;拖曳區+資料夾選擇(webkitdirectory=Windows 原生夾對話框);
-      進度動畫=樞紐 /status 輪詢;同源樞紐 /console 在線=LIVE 可啟動,file:// 頁=SNAPSHOT 只看+印等價短令)
-  橋  DeckServer 尾版:GET /console(注入權杖)/console_status;POST /console_run{item,params}/console_set{ops};
-      啟動一律走白名單解析(resolve_argv)後 Popen;參數逐項驗證(代碼/日期/天數/車道/類別/資料夾必須存在)
-  狀況 status:庫狀況(ENG073 架構冊快照+DuckDB 現值)、對齊(ENG081 ALIGN_latest)、台股清單(焦點冊∪操作員)、
-      宏觀序列(macro_ssot 依類別)、VRN 跑況(每報告 BASIC INFO/SUMMARY/FINANCIAL DATA VERIFIED|FAIL|PENDING)、
-      VAP 產出頁、各項目可跑態(READY/PLANNED/ENGINE_MISSING/NEED_DIR)→ VIA_Reports/console/CONSOLE_latest.json
+      + defaults.start=2023-01-01(統一起始;end=最新)+ user 段(操作員個別改動:群組起始 group_starts/單項 starts、
+      台股代碼 TWSE/TPEX、宏觀類別、財報期別年起迄、VRN 報告夾、VAP;只增不減;changelog append-only);
+      台股代碼/財報期別/VRN 路徑/國際資訊增減鏡寫 VDF_Input_Interface_Matrix 活冊(零刪除語意)
+  頁  supportive modules/ui_support/VIA_UI_InputConsole_v0100.html(零 CDN;左 rail=輸入表單(整類起始遮罩/台股代碼冊/
+      宏觀類別/財報期別/VRN 選夾·選檔·拖曳·單鍵啟動/VAP 簡輸入;▶ 啟動全部),右 main=矩陣(輸入及運作結果/國際資訊勾選/
+      BASIC INFO 核對態/SUMMARY 矩陣/FINANCIAL DATA 核對(VDF 為主)/庫狀況/對齊/台股清單/宏觀序列/VAP 規格與圖/跑成功?)
+      篩選/點欄排序預設大到小/勾選/全選/全不選;進度動畫=樞紐 /status 輪詢;同源樞紐 /console=LIVE,file:// 頁=SNAPSHOT)
+  橋  DeckServer 尾版:GET /console /console_status /vap_img;POST /console_run{item,params}/console_set{ops}/intake
+  狀況 status:庫狀況(ENG073 快照+DuckDB 現值)、對齊(ENG081)、台股清單、宏觀(macro_ssot)、國際資訊冊、VRN 三 TAB
+      (BASIC INFO 核對態/SUMMARY 矩陣/FINANCIAL DATA 核對:價/上漲/營收 報告值 vs VDF 值 → VDF 為主)、VAP 規格冊
+      (40 canonical)與圖片清單、家族跑成功?(RunGate+FamilyUI 存證)、項目可跑態 → VIA_Reports/console/CONSOLE_latest.json
 紀律:只增不減;正本零觸碰;誠實三態;零 CDN;零網路(status/build 不觸網;run 只在操作員按啟動且項目 net=true 才給同意閘);
-      尾版律(引擎 glob 尾版);預設 start=latest=不帶旗標=引擎增量律。
+      尾版律(引擎 glob 尾版);預設起始=冊 defaults.start(批392 2023-01-01);latest=不帶旗標=引擎增量律。
 用法:python3 CGC_MDL139_InputConsole_v0100.py [build] [--open] | status [--json]
-      | set k=v [k=v …](tw-add=2330:TWSE tw-remove=2330 start=<item>:YYYY-MM-DD|latest days=<item>:N
-        macro-cats=Business,Prices macro-since=YYYY-MM-DD|latest fin-period=當季|累計|年度 fin-from=YYYY fin-to=YYYY
-        vrn-dir=<夾> vrn-chain=a,b vap-code=2330 vap-formats=svg,html vap-profile=vap_spec_v1 vap-out=<夾>
-        vap-data=<檔> vap-config=<檔> global-cats=a,b)
+      | set k=v [k=v …](group-start=<group>:YYYY-MM-DD|latest start=<item>:YYYY-MM-DD|latest tw-add=2330:TWSE tw-remove=2330
+        days=<item>:N macro-cats=Business,Prices macro-since=YYYY-MM-DD|latest fin-period=當季|累計|年度 fin-from=YYYY fin-to=YYYY
+        vrn-dir=<夾> vrn-chain=a,b vap-code=2330 vap-formats=svg,html vap-profile=vap_spec_v1 vap-out=<夾> vap-data=<檔>
+        vap-config=<檔> global-cats=a,b intl-add=INTL_DAILY:^GSPC intl-remove=… intl-item-add=INTL_FIN:eps intl-item-remove=…)
       | argv --item <id> [k=v …] [--json] | run --item <id> [k=v …] [--dry] | --selftest
 """
 from __future__ import annotations
@@ -47,6 +52,7 @@ except Exception:
     VIA_ACCEL = None  # graceful:加速器缺席零影響
 # ===== [VIA:ACCEL-BRIDGE:END] =====
 
+import csv
 import datetime as _dt
 import json
 import os
@@ -79,10 +85,15 @@ LANE_RX = re.compile(r"^L\d{1,2}$")
 FRED_RX = re.compile(r"^[A-Z0-9_.\-]{2,40}$")
 CAT_RX = re.compile(r"^[A-Za-z_]{1,32}$")
 ITEM_RX = re.compile(r"^[a-z0-9_]{2,48}$")
+GROUP_RX = re.compile(r"^[a-z0-9_]{2,32}$")
+INTL_SECTIONS = ("INTL_DAILY", "INTL_FIN")
+INTL_ID_RX = re.compile(r"^[\^A-Za-z0-9_.=\-]{1,24}$")
 PERIODS = ("單季", "累計", "年度", "當季")
 GLOBAL_THEMES = ("Global", "ECB", "BOJ", "BOE", "OECD")
+GLOBAL_CATS = ("idx", "etf", "us_jp", "fin_reports", "oil", "fx", "cmdty", "crypto", "us_macro", "fed", "us_fiscal_rates")
 VERIFIED_STATES = ("EXACT_MATCH", "EXACT_MATCH_DB", "ROUNDING_ONLY", "ROUNDING_ONLY_DB", "DB_DERIVED")
 FAIL_STATES = ("FORMULA_MISMATCH", "FORMULA_MISMATCH_DB", "PARSE_SUSPECT", "MISSING_SOURCE")
+REVENUE_WORDS = ("revenue", "營收", "營業收入", "sales")
 
 
 # ---------------------------------------------------------------- 基礎
@@ -111,7 +122,7 @@ def _write_text(p: Path, text: str) -> None:
 
 
 def _write_json(p: Path, obj) -> None:
-    _write_text(p, json.dumps(obj, ensure_ascii=False, indent=1))
+    _write_text(p, json.dumps(obj, ensure_ascii=False, indent=1, default=str))
 
 
 def newest(dirp: Path, pat: str) -> Path | None:
@@ -119,16 +130,29 @@ def newest(dirp: Path, pat: str) -> Path | None:
     return hits[-1] if hits else None
 
 
+def _date_ok(s: str) -> bool:
+    if not DATE_RX.fullmatch(s or ""):
+        return False
+    try:
+        _dt.date.fromisoformat(s)
+        return True
+    except ValueError:
+        return False
+
+
 def load_spec(path: Path | None = None) -> dict:
     p = path or SPEC
     d = json.loads(p.read_text(encoding="utf-8-sig"))
+    d.setdefault("defaults", {})
+    d["defaults"].setdefault("start", "2023-01-01")
     d.setdefault("user", {})
     u = d["user"]
     u.setdefault("tw_codes", {"TWSE": [], "TPEX": []})
     u.setdefault("starts", {})
+    u.setdefault("group_starts", {})
     u.setdefault("days", {})
     u.setdefault("macro_cats", [])
-    u.setdefault("macro_since", "latest")
+    u.setdefault("macro_since", "")
     u.setdefault("fin", {"period": "年度", "year_from": "", "year_to": ""})
     u.setdefault("vrn_dir", "")
     u.setdefault("vrn_chain", [])
@@ -150,6 +174,10 @@ def items_index(spec: dict) -> dict:
             for it in g.get("items", []):
                 out[it["id"]] = {"family": fam, "group": g["id"], "item": it, "fam_python": f.get("python", "base")}
     return out
+
+
+def group_index(spec: dict) -> dict:
+    return {g["id"]: {"family": fam, "group": g} for fam, f in spec.get("families", {}).items() for g in f.get("groups", [])}
 
 
 def hub_live(port: int = HUB_PORT, timeout: float = 0.3) -> str:
@@ -197,21 +225,17 @@ def family_python(fam: str, environ: dict | None = None) -> dict:
         return {"python": sys.executable, "state": "BASE_FALLBACK", "env": "", "hint": str(exc)[:80]}
 
 
-# ---------------------------------------------------------------- 宏觀序列冊 / 台股代碼冊
+# ---------------------------------------------------------------- 宏觀序列冊 / 台股代碼冊 / 國際資訊冊
 def macro_series(spec: dict) -> list:
     """macro_ssot series_registry(有 fred_id 者)→ [{key, fred_id, theme, sub, indicator, freq, cat}]"""
-    rel = spec.get("families", {}).get("vdf", {})
     src = None
-    for g in rel.get("groups", []):
+    for g in spec.get("families", {}).get("vdf", {}).get("groups", []):
         if g.get("id") == "macro":
             src = g.get("series_source")
-    if not src:
-        return []
-    p = VIA / src
-    if not p.exists():
+    if not src or not (VIA / src).exists():
         return []
     try:
-        m = json.loads(p.read_text(encoding="utf-8-sig"))
+        m = json.loads((VIA / src).read_text(encoding="utf-8-sig"))
     except Exception:
         return []
     out = []
@@ -272,20 +296,49 @@ def tw_codes(spec: dict, names: dict | None = None) -> list:
     return rows
 
 
+def intl_matrix(spec: dict, matrix_path: Path | None = None) -> list:
+    """國際資訊冊(VDF_Input_Interface_Matrix INTL_DAILY/INTL_FIN 現有/已移除 tickers 與 items)+ ENG066 11 類 + ENG055 車道 → 右面板勾選列"""
+    rows = []
+    mp = matrix_path or INPUT_MATRIX
+    try:
+        m = json.loads(mp.read_text(encoding="utf-8-sig"))
+        for sec in INTL_SECTIONS:
+            s = (m.get("sections") or {}).get(sec) or {}
+            for t in s.get("tickers", []) or []:
+                rows.append({"section": sec, "kind": "ticker", "id": str(t), "state": "現有", "zh": s.get("desc", "")})
+            for t in s.get("removed_tickers", []) or []:
+                rows.append({"section": sec, "kind": "ticker", "id": str(t), "state": "已移除", "zh": s.get("desc", "")})
+            for it in s.get("items", []) or []:
+                rows.append({"section": sec, "kind": "item", "id": str(it), "state": "現有", "zh": s.get("desc", "")})
+            for it in s.get("removed_items", []) or []:
+                rows.append({"section": sec, "kind": "item", "id": str(it), "state": "已移除", "zh": s.get("desc", "")})
+    except Exception:
+        rows.append({"section": "冊", "kind": "note", "id": "VDF_Input_Interface_Matrix 缺", "state": "缺", "zh": ""})
+    sel = set(spec.get("user", {}).get("global_cats") or [])
+    for c in GLOBAL_CATS:
+        rows.append({"section": "ENG066", "kind": "cat", "id": c, "state": "現有" if (not sel or c in sel) else "未選", "zh": "全球宇宙 11 類(--cats)"})
+    for ln, zh in (("L5", "etf_stats"), ("L6", "global"), ("L7", "idx_val")):
+        rows.append({"section": "ENG055", "kind": "lane", "id": ln, "state": "現有", "zh": zh})
+    return rows
+
+
+# ---------------------------------------------------------------- 起始日律(批392 統一 2023-01-01;整類/單項可改;latest=不帶旗標)
+def effective_start(spec: dict, item_id: str, group_id: str, given: str = "") -> str:
+    """回 'YYYY-MM-DD' 或 ''(=latest 不帶旗標);優先序:呼叫參數 > user.starts[item] > user.group_starts[group] > defaults.start;'latest' 任一層即 ''"""
+    u = spec.get("user", {})
+    for v in (str(given or "").strip(), str(u.get("starts", {}).get(item_id, "") or "").strip(), str(u.get("group_starts", {}).get(group_id, "") or "").strip(),
+              str(spec.get("defaults", {}).get("start", "") or "").strip()):
+        if v == "latest":
+            return ""
+        if v:
+            return v
+    return ""
+
+
 # ---------------------------------------------------------------- 參數解析 → argv(白名單)
 def _p(params: dict, k: str, default=""):
     v = params.get(k, default)
     return v if v is not None else default
-
-
-def _date_ok(s: str) -> bool:
-    if not DATE_RX.fullmatch(s or ""):
-        return False
-    try:
-        _dt.date.fromisoformat(s)
-        return True
-    except ValueError:
-        return False
 
 
 def resolve_argv(spec: dict, item_id: str, params: dict | None = None, environ: dict | None = None, check_files: bool = True) -> dict:
@@ -308,40 +361,32 @@ def resolve_argv(spec: dict, item_id: str, params: dict | None = None, environ: 
     py = family_python(pyfam, environ)
     argv = [py["python"], str(ef) if ef else str(eng_dir / eng["glob"]), *eng.get("verb", [])]
     notes = []
+    given_start = str(_p(params, "start") or _p(params, "since") or "").strip()
     for kind in it.get("params", []):
-        if kind == "range":
-            s, e = str(_p(params, "start")).strip(), str(_p(params, "end")).strip()
-            if s and s != "latest":
-                if not _date_ok(s):
-                    return {"ok": False, "state": "BAD_PARAM", "note": "start 需 YYYY-MM-DD", "argv": []}
-                e = e or _dt.date.today().isoformat()
-                if not _date_ok(e) or s > e:
-                    return {"ok": False, "state": "BAD_PARAM", "note": "end 需 YYYY-MM-DD 且 ≥ start", "argv": []}
-                argv += ["--start", s, "--end", e]
-            else:
+        if kind in ("range", "start", "since", "since_ym"):
+            s = effective_start(spec, item_id, ent["group"], given_start)
+            if not s:
                 notes.append("start=latest(引擎增量律)")
-        elif kind == "start":
-            s = str(_p(params, "start")).strip()
-            if s and s != "latest":
-                if not _date_ok(s):
-                    return {"ok": False, "state": "BAD_PARAM", "note": "start 需 YYYY-MM-DD", "argv": []}
-                argv += ["--start", s]
-        elif kind == "since":
-            s = str(_p(params, "since") or _p(params, "start")).strip()
-            if s and s != "latest":
-                if not _date_ok(s):
-                    return {"ok": False, "state": "BAD_PARAM", "note": "since 需 YYYY-MM-DD", "argv": []}
-                argv += ["--since", s]
-        elif kind == "since_ym":
-            s = str(_p(params, "since") or _p(params, "start")).strip()
-            if s and s != "latest":
-                if DATE_RX.fullmatch(s):
-                    s = s[:7]
-                if not YM_RX.fullmatch(s):
-                    return {"ok": False, "state": "BAD_PARAM", "note": "since 需 YYYY-MM", "argv": []}
-                argv += ["--since", s]
+                continue
+            if kind == "since_ym" and _date_ok(s):
+                s2 = s[:7]
+            elif kind == "since_ym" and YM_RX.fullmatch(s):
+                s2 = s
+            elif not _date_ok(s):
+                return {"ok": False, "state": "BAD_PARAM", "note": f"start 需 YYYY-MM-DD 有效日期({s})", "argv": []}
+            else:
+                s2 = s
+            if kind == "range":
+                e = str(_p(params, "end")).strip() or _dt.date.today().isoformat()
+                if not _date_ok(e) or s2 > e:
+                    return {"ok": False, "state": "BAD_PARAM", "note": "end 需 YYYY-MM-DD 且 ≥ start", "argv": []}
+                argv += ["--start", s2, "--end", e]
+            elif kind == "start":
+                argv += ["--start", s2]
+            else:
+                argv += ["--since", s2]
         elif kind == "days":
-            d = str(_p(params, "days")).strip()
+            d = str(_p(params, "days") or user.get("days", {}).get(item_id, "") or "").strip()
             if d:
                 if not d.isdigit() or not 1 <= int(d) <= 3650:
                     return {"ok": False, "state": "BAD_PARAM", "note": "days 需 1~3650 整數", "argv": []}
@@ -475,7 +520,7 @@ def _market_of(code: str, spec: dict) -> str:
 
 
 def apply_set(spec: dict, kv: dict, matrix_path: Path | None = None, mirror: bool = True) -> list:
-    """k=v 逐項套用到 user 段(驗證;只增不減;changelog);鏡寫 VDF_Input_Interface_Matrix(台股代碼/財報期別與起始/VRN 路徑)"""
+    """k=v 逐項套用到 user 段(驗證;只增不減;changelog);鏡寫 VDF_Input_Interface_Matrix(台股代碼/財報期別與起始/VRN 路徑/國際資訊增減)"""
     u = spec.setdefault("user", {})
     notes, mirrored = [], []
     tool = _input_tool() if mirror else None
@@ -486,9 +531,10 @@ def apply_set(spec: dict, kv: dict, matrix_path: Path | None = None, mirror: boo
             md = tool.load(mp)
         except Exception:
             md = None
+    gidx = group_index(spec)
     for k, v in kv.items():
-        v = "" if v is None else str(v).strip()
         k = str(k).split("#", 1)[0]   # 同鍵多筆:tw-add#2=…(頁面多選移除亦同)
+        v = "" if v is None else str(v).strip()
         if k == "tw-add":
             code, _, mk = v.partition(":")
             code = code.strip().upper()
@@ -526,12 +572,18 @@ def apply_set(spec: dict, kv: dict, matrix_path: Path | None = None, mirror: boo
             if not ITEM_RX.fullmatch(item) or (d != "latest" and not _date_ok(d)):
                 notes.append(f"FAIL:start 需 <item>:YYYY-MM-DD|latest({v})")
                 continue
-            if d == "latest":
-                u.setdefault("starts", {}).pop(item, None)
-            else:
-                u.setdefault("starts", {})[item] = d
+            u.setdefault("starts", {})[item] = d
             notes.append(f"OK:start[{item}]={d}")
             if item in ("tw_revenue_backfill", "fin_statements") and md is not None and d != "latest":
+                mirrored.append(tool.set_tw(md, "start", d))
+        elif k == "group-start":
+            gid, _, d = v.partition(":")
+            if gid not in gidx or (d != "latest" and not _date_ok(d)):
+                notes.append(f"FAIL:group-start 需 <group>:YYYY-MM-DD|latest({v};有效群組 {sorted(gidx)})")
+                continue
+            u.setdefault("group_starts", {})[gid] = d
+            notes.append(f"OK:group_start[{gid}]={d}")
+            if gid == "financials" and md is not None and d != "latest":
                 mirrored.append(tool.set_tw(md, "start", d))
         elif k == "days":
             item, _, n = v.partition(":")
@@ -550,11 +602,13 @@ def apply_set(spec: dict, kv: dict, matrix_path: Path | None = None, mirror: boo
             u["macro_cats"] = cats
             notes.append(f"OK:macro_cats={cats or '全冊'}")
         elif k == "macro-since":
-            if v != "latest" and not _date_ok(v):
+            if v and v != "latest" and not _date_ok(v):
                 notes.append("FAIL:macro-since 需 YYYY-MM-DD|latest")
                 continue
             u["macro_since"] = v
-            notes.append(f"OK:macro_since={v}")
+            if v:
+                u.setdefault("group_starts", {})["macro"] = v
+            notes.append(f"OK:macro_since={v or '群組/統一起始'}")
         elif k == "fin-period":
             if v not in PERIODS:
                 notes.append(f"FAIL:fin-period 僅 {'/'.join(PERIODS)}")
@@ -572,8 +626,6 @@ def apply_set(spec: dict, kv: dict, matrix_path: Path | None = None, mirror: boo
             if k == "fin-from" and v and md is not None:
                 mirrored.append(tool.set_tw(md, "start", f"{v}-01-01"))
         elif k == "vrn-dir":
-            if v and not (Path(v).is_absolute() or (VIA / v).exists()):
-                notes.append(f"NOTE:vrn-dir 相對路徑以母倉為根:{v}")
             u["vrn_dir"] = v
             notes.append(f"OK:vrn_dir={v or '預設 input_reports'}")
             if md is not None:
@@ -599,16 +651,30 @@ def apply_set(spec: dict, kv: dict, matrix_path: Path | None = None, mirror: boo
             notes.append(f"OK:vap.{key}={v}")
         elif k == "global-cats":
             cats = [x.strip() for x in v.split(",") if x.strip()]
-            if any(not CAT_RX.fullmatch(x) for x in cats):
-                notes.append("FAIL:global-cats 需英文類別名")
+            bad = [x for x in cats if x not in GLOBAL_CATS]
+            if bad:
+                notes.append(f"FAIL:global-cats 未知類 {bad}(有效 {list(GLOBAL_CATS)})")
                 continue
             u["global_cats"] = cats
             notes.append(f"OK:global_cats={cats or '全類'}")
+        elif k in ("intl-add", "intl-remove", "intl-item-add", "intl-item-remove"):
+            sec, _, ident = v.partition(":")
+            sec, ident = sec.strip().upper(), ident.strip()
+            if sec not in INTL_SECTIONS or not INTL_ID_RX.fullmatch(ident):
+                notes.append(f"FAIL:{k} 需 INTL_DAILY|INTL_FIN:<代碼或項目>({v})")
+                continue
+            if md is None:
+                notes.append(f"FAIL:{k} 需 VDF_Input_Interface_Matrix 活冊(缺或工具缺)")
+                continue
+            fn = {"intl-add": tool.add_ticker, "intl-remove": tool.rm_ticker, "intl-item-add": tool.add_item, "intl-item-remove": tool.rm_item}[k]
+            r = fn(md, sec, ident)
+            mirrored.append(r)
+            notes.append(f"{'OK' if r.startswith('OK') else 'SKIP'}:{k} {sec}:{ident} → {r}")
         else:
             notes.append(f"FAIL:未知鍵 {k}")
     if md is not None and mirrored:
         try:
-            tool.save(md, mp, op="console-set(批390)", note="; ".join(mirrored)[:300])
+            tool.save(md, mp, op="console-set(批390/392)", note="; ".join(mirrored)[:300])
             notes.append(f"MIRROR:{len(mirrored)} 筆鏡寫 {mp.name}")
         except Exception as exc:
             notes.append(f"NOTE:鏡寫失敗 {str(exc)[:60]}")
@@ -616,7 +682,7 @@ def apply_set(spec: dict, kv: dict, matrix_path: Path | None = None, mirror: boo
     return notes
 
 
-# ---------------------------------------------------------------- VRN 跑況判準
+# ---------------------------------------------------------------- VRN 跑況判準 / 三 TAB
 def classify_report(row: dict, n_metrics: int, n_fin: int, has_sidecar: bool) -> dict:
     """單報告三態:BASIC INFO / SUMMARY / FINANCIAL DATA(VERIFIED|FAIL|PENDING)"""
     basic_ok = bool(row.get("ticker")) and bool(row.get("report_date")) and (row.get("target_price") is not None or row.get("price") is not None)
@@ -635,32 +701,154 @@ def classify_report(row: dict, n_metrics: int, n_fin: int, has_sidecar: bool) ->
             "upside_state": us, "price_state": ps, "n_metrics": n_metrics, "n_financial": n_fin}
 
 
-def vrn_stage_matrix(con, zones: Path) -> list:
-    rows = []
+def basic_verified(row: dict) -> str:
+    """TAB2 BASIC INFO 核對態:VDF 價表核對成立=VERIFIED;不符=FAIL;其餘 PENDING"""
+    us, ps = str(row.get("upside_state") or ""), str(row.get("price_state") or "")
+    if ps in ("P_CONFIRMED_DB", "P_FROM_DB") or us in VERIFIED_STATES:
+        return "VERIFIED"
+    if ps in ("DB_NO_MATCH",) or us in FAIL_STATES:
+        return "FAIL"
+    return "PENDING"
+
+
+def fin_final(report_val, vdf_val, tol_pct: float = 0.5) -> dict:
+    """TAB4 核對律(批392):報告值 vs VDF 抓來的歷史值 → 不同=VDF 為主;一致=一致;無 VDF 對照=報告值(誠實標)"""
+    try:
+        r = float(report_val) if report_val is not None and str(report_val) != "" else None
+    except (TypeError, ValueError):
+        r = None
+    try:
+        v = float(vdf_val) if vdf_val is not None and str(vdf_val) != "" else None
+    except (TypeError, ValueError):
+        v = None
+    if v is None and r is None:
+        return {"final": None, "rule": "無值", "diff_pct": None}
+    if v is None:
+        return {"final": r, "rule": "無 VDF 對照=報告值", "diff_pct": None}
+    if r is None:
+        return {"final": v, "rule": "VDF 值(報告缺)", "diff_pct": None}
+    diff = (r - v) / v * 100 if v else None
+    unit = ""
+    if v and r and abs(r) > 0:
+        ratio = abs(r / v)
+        for k, lab in ((1000, "千"), (1_000_000, "百萬"), (100_000_000, "億")):
+            if 0.995 <= ratio * k <= 1.005 or 0.995 <= ratio / k <= 1.005:
+                unit = f"單位差 ×{lab}"
+    if diff is not None and abs(diff) <= tol_pct:
+        return {"final": v, "rule": "一致(VDF 為主)", "diff_pct": round(diff, 3)}
+    return {"final": v, "rule": "不同→VDF 歷史值為主" + (f"({unit})" if unit else ""), "diff_pct": round(diff, 3) if diff is not None else None}
+
+
+def _norm_ym(period: str) -> str:
+    p = str(period or "").strip()
+    m = re.match(r"^(\d{4})[-/.]?(\d{2})$", p)
+    if m and 1 <= int(m.group(2)) <= 12:
+        return f"{m.group(1)}-{m.group(2)}"
+    m = re.match(r"^(\d{4})年?(\d{1,2})月?$", p)
+    if m and 1 <= int(m.group(2)) <= 12:
+        return f"{m.group(1)}-{int(m.group(2)):02d}"
+    return ""
+
+
+def vrn_tabs(con, zones: Path) -> dict:
+    """TAB2 basic(核對態)/TAB3 summary 矩陣/TAB4 financial 核對(VDF 為主)+ 跑況 reports"""
+    out = {"reports": [], "basic": [], "summary_matrix": [], "financial": []}
     have = {r[0] for r in con.execute("SHOW TABLES").fetchall()}
     if "vrn_report_basic" not in have:
-        return rows
+        return out
     cols = [r[0] for r in con.execute('DESCRIBE "vrn_report_basic"').fetchall()]
-    met = {}
+    met_n, met_rows = {}, {}
     if "vrn_report_metrics" in have:
-        met = {r[0]: r[1] for r in con.execute("SELECT report_file, count(*) FROM vrn_report_metrics GROUP BY 1").fetchall()}
-    fin = {}
+        for rf, metric, period, status_, value, raw in con.execute("SELECT report_file, metric, period, status, value, raw_text FROM vrn_report_metrics").fetchall():
+            met_n[rf] = met_n.get(rf, 0) + 1
+            met_rows.setdefault(rf, []).append({"metric": metric, "period": period, "status": status_, "value": value, "raw": raw})
+    fin_n, fin_rows = {}, {}
     if "vrn_report_financial" in have:
-        fin = {r[0]: r[1] for r in con.execute("SELECT report_file, count(*) FROM vrn_report_financial GROUP BY 1").fetchall()}
+        for rf, page, canon, raw_label, period, status_, value, raw in con.execute("SELECT report_file, page, canonical, raw_label, period, status, value, raw_text FROM vrn_report_financial").fetchall():
+            fin_n[rf] = fin_n.get(rf, 0) + 1
+            fin_rows.setdefault(rf, []).append({"page": page, "canonical": canon, "raw_label": raw_label, "period": period, "status": status_, "value": value, "raw": raw})
     fp = {}
     if "vrn_four_point_digest" in have:
-        fp = {r[0]: r[1] for r in con.execute("SELECT report_file, qc FROM vrn_four_point_digest").fetchall()}
+        for r in con.execute("SELECT report_file, headline, k1, k2, k3, k4, k5, qc, upside_now FROM vrn_four_point_digest").fetchall():
+            fp[r[0]] = {"headline": r[1], "k1": r[2], "k2": r[3], "k3": r[4], "k4": r[5], "k5": r[6], "qc": r[7], "upside_now": r[8]}
+    rev = {}
+    if "tw_monthly_revenue" in have:
+        try:
+            for code, ym, val in con.execute("SELECT code, CAST(ym AS VARCHAR), revenue FROM tw_monthly_revenue").fetchall():
+                rev[(str(code), _norm_ym(ym) or str(ym))] = val
+        except Exception:
+            rev = {}
     for rec in con.execute('SELECT * FROM "vrn_report_basic" ORDER BY report_date DESC, report_file').fetchall():
         row = dict(zip(cols, rec))
         rf = str(row.get("report_file") or "")
+        tk = str(row.get("ticker") or "")
         side = (zones / f"{Path(rf).stem}.json").exists() if zones.exists() else False
-        c = classify_report(row, int(met.get(rf, 0)), int(fin.get(rf, 0)), side)
-        rows.append({"report_file": rf, "ticker": row.get("ticker"), "name": row.get("name_official"), "broker": row.get("broker"), "report_date": row.get("report_date"),
-                     "target_price": row.get("target_price"), "price": row.get("price"), "four_point_qc": fp.get(rf, ""), **c})
-    return rows
+        c = classify_report(row, int(met_n.get(rf, 0)), int(fin_n.get(rf, 0)), side)
+        out["reports"].append({"report_file": rf, "ticker": tk, "name": row.get("name_official"), "broker": row.get("broker"), "report_date": row.get("report_date"),
+                               "target_price": row.get("target_price"), "price": row.get("price"), "four_point_qc": (fp.get(rf) or {}).get("qc", ""), **c})
+        out["basic"].append({"report_file": rf, "ticker": tk, "name": row.get("name_official"), "broker": row.get("broker"), "report_date": row.get("report_date"), "rating": row.get("rating_raw"),
+                             "target_price": row.get("target_price"), "price_report": row.get("price"), "price_vdf": row.get("price_db"), "price_state": row.get("price_state"),
+                             "upside_report": row.get("upside_report"), "upside_calc": row.get("upside_calc"), "upside_vdf": row.get("upside_db"), "upside_state": row.get("upside_state"),
+                             "verified": basic_verified(row), "conflicts": row.get("conflicts")})
+        f4 = fp.get(rf) or {}
+        out["summary_matrix"].append({"report_file": rf, "ticker": tk, "name": row.get("name_official"), "report_date": row.get("report_date"), "title": (row.get("title_head") or "")[:200],
+                                      "summary": (row.get("summary_head") or "")[:400], "headline": f4.get("headline", ""), "k1": f4.get("k1", ""), "k2": f4.get("k2", ""), "k3": f4.get("k3", ""),
+                                      "k4": f4.get("k4", ""), "k5": f4.get("k5", ""), "qc": f4.get("qc", "")})
+        ff = fin_final(row.get("price"), row.get("price_db"))
+        out["financial"].append({"report_file": rf, "ticker": tk, "metric": "price(報告日前收)", "period": row.get("report_date"), "status": row.get("price_state") or "", "value_report": row.get("price"),
+                                 "value_vdf": row.get("price_db"), "final": ff["final"], "rule": ff["rule"], "diff_pct": ff["diff_pct"]})
+        fu = fin_final(row.get("upside_report"), row.get("upside_db"))
+        out["financial"].append({"report_file": rf, "ticker": tk, "metric": "upside_pct", "period": row.get("report_date"), "status": row.get("upside_state") or "", "value_report": row.get("upside_report"),
+                                 "value_vdf": row.get("upside_db"), "final": fu["final"], "rule": fu["rule"], "diff_pct": fu["diff_pct"]})
+        for m in met_rows.get(rf, []):
+            out["financial"].append({"report_file": rf, "ticker": tk, "metric": m["metric"], "period": m["period"], "status": m["status"], "value_report": m["value"], "value_vdf": None,
+                                     "final": m["value"], "rule": "無 VDF 對照=報告值(估計/陳述)", "diff_pct": None})
+        for m in fin_rows.get(rf, []):
+            canon = str(m.get("canonical") or "")
+            vdf_val = None
+            if any(w in canon.lower() for w in REVENUE_WORDS) and rev:
+                ym = _norm_ym(m.get("period"))
+                code = tk.split(".")[0]
+                if ym:
+                    vdf_val = rev.get((code, ym))
+                elif YEAR_RX.fullmatch(str(m.get("period") or "")):
+                    vals = [rev.get((code, f"{m['period']}-{i:02d}")) for i in range(1, 13)]
+                    vdf_val = sum(v for v in vals if v is not None) if all(v is not None for v in vals) else None
+            ff2 = fin_final(m["value"], vdf_val)
+            out["financial"].append({"report_file": rf, "ticker": tk, "metric": canon or m.get("raw_label") or "?", "period": m.get("period"), "status": m.get("status"), "value_report": m["value"],
+                                     "value_vdf": vdf_val, "final": ff2["final"], "rule": ff2["rule"] if vdf_val is not None else "無 VDF 對照=報告值(財報頁;MOPS 引擎候上船)", "diff_pct": ff2["diff_pct"]})
+    return out
 
 
-# ---------------------------------------------------------------- 狀況
+# ---------------------------------------------------------------- VAP 規格冊/圖片 · 家族跑成功?
+def vap_specs(spec: dict) -> list:
+    rel = spec.get("families", {}).get("vap", {}).get("specs_csv", "")
+    p = VIA / rel if rel else None
+    if not p or not p.exists():
+        return []
+    try:
+        with open(p, encoding="utf-8-sig", newline="") as fh:
+            return [{k: (r.get(k) or "") for k in ("code", "id", "group", "zh", "en", "axes", "axisMode", "dataShape", "fields", "rule", "renderer")} for r in csv.DictReader(fh)][:60]
+    except Exception:
+        return []
+
+
+def vap_images(spec: dict, limit: int = 60) -> list:
+    out = []
+    for rel in spec.get("families", {}).get("vap", {}).get("image_dirs", []) or []:
+        d = VIA / rel
+        if not d.is_dir():
+            continue
+        for f in d.rglob("*"):
+            if f.is_file() and f.suffix.lower() in (".svg", ".png", ".jpg", ".jpeg", ".webp"):
+                st = f.stat()
+                out.append({"rel": str(f.relative_to(VIA)).replace("\\", "/"), "abs": str(f), "name": f.name, "kb": st.st_size // 1024, "mtime": _dt.datetime.fromtimestamp(st.st_mtime).strftime("%Y-%m-%d %H:%M"), "mt": st.st_mtime})
+    out.sort(key=lambda r: -r["mt"])
+    for r in out:
+        r.pop("mt", None)
+    return out[:limit]
+
+
 def _read_json(p: Path):
     try:
         return json.loads(p.read_text(encoding="utf-8-sig"))
@@ -668,6 +856,34 @@ def _read_json(p: Path):
         return None
 
 
+def family_success() -> dict:
+    """VDF/VRN/VAP 跑成功了嗎:RunGate(引擎自測真跑)+ FamilyUI(頁面產生)存證 → 答案+證據(缺=未證實,不假綠)"""
+    rg = _read_json(VIA / "VIA_Reports" / "rungate" / "RUNGATE_latest.json") or {}
+    fu = _read_json(VIA / "VIA_Reports" / "ui" / "FAMILY_UI_latest.json") or {}
+    out = {}
+    for f in ("vdf", "vrn", "vap"):
+        r = (rg.get("families") or {}).get(f) or {}
+        u = (fu.get("families") or {}).get(f) or {}
+        rv, uv = r.get("verdict", ""), u.get("verdict", "")
+        s = r.get("summary") or {}
+        ev = []
+        if rv:
+            ev.append(f"能跑閘 {rv}(引擎 {s.get('engines_ok', '?')}/{s.get('engines_n', '?')} 必要庫 {s.get('required_ok', '?')}/{s.get('required_n', '?')};{str(rg.get('ts', ''))[:16]})")
+        if uv:
+            ev.append(f"家族 U/I {uv}({str(fu.get('ts', ''))[:16]})")
+        if rv == "RED" or uv == "RED":
+            ans = "RED:有引擎/頁面跑不起來"
+        elif rv == "GREEN" and uv in ("GREEN", "YELLOW", ""):
+            ans = "跑成功(引擎自測真跑綠)" + ("" if uv else ";頁面未驗(via-famui)")
+        elif rv or uv:
+            ans = "部分(黃):" + "; ".join(x for x in (r.get("reasons") or [])[:2])
+        else:
+            ans = "未證實(未跑 via-rungate / via-famui)"
+        out[f] = {"answer": ans, "rungate": rv or "未跑", "famui": uv or "未跑", "evidence": " · ".join(ev) or "無存證"}
+    return out
+
+
+# ---------------------------------------------------------------- 狀況
 def _list_dir(p: Path, exts: tuple, limit: int = 300) -> list:
     out = []
     if not p.is_dir():
@@ -681,13 +897,13 @@ def _list_dir(p: Path, exts: tuple, limit: int = 300) -> list:
     return out
 
 
-def status(spec: dict | None = None, do_print: bool = True, reports: Path = REPORTS, db_tw: Path = DB_TW, db_gl: Path = DB_GL, environ: dict | None = None, hub_fn=None) -> dict:
+def status(spec: dict | None = None, do_print: bool = True, reports: Path = REPORTS, db_tw: Path = DB_TW, db_gl: Path = DB_GL, environ: dict | None = None, hub_fn=None, matrix_path: Path | None = None) -> dict:
     spec = spec or load_spec()
     hub = (hub_fn or hub_live)()
     rep = {"schema": "VIA.InputConsole.status.v1", "ts": _now(), "hub": hub, "bridge": BRIDGE, "via": str(VIA), "verdict": "GREEN", "notes": [],
-           "db": {"source": "", "tables": {}}, "align": None, "coverage": None, "localdb": None, "tw_codes": [], "macro": {}, "vrn": {}, "vap": {}, "items": {}}
+           "defaults": spec.get("defaults", {}), "group_starts": spec.get("user", {}).get("group_starts", {}),
+           "db": {"source": "", "tables": {}}, "align": None, "coverage": None, "localdb": None, "tw_codes": [], "macro": {}, "intl": [], "vrn": {}, "vap": {}, "items": {}, "family_success": {}}
     duckdb = _duckdb()
-    # 庫狀況:ENG073 架構冊快照(尾版 JSON)+ DuckDB 現值(可用時覆蓋)
     arch = _read_json(HERE / "VIA_VDFArchitecture_v0100.json")
     tables = {}
     if arch and isinstance(arch.get("inventory"), dict):
@@ -697,6 +913,7 @@ def status(spec: dict | None = None, do_print: bool = True, reports: Path = REPO
         rep["db"]["source"] = f"VIA_VDFArchitecture_v0100.json({arch.get('stamp', '')})"
     names = {}
     live_tables = {}
+    rep["vrn"] = {"reports": [], "basic": [], "summary_matrix": [], "financial": []}
     if duckdb:
         for dbk, dbp in (("tw", db_tw), ("gl", db_gl)):
             if not dbp.exists():
@@ -704,7 +921,7 @@ def status(spec: dict | None = None, do_print: bool = True, reports: Path = REPO
             try:
                 con = duckdb.connect(str(dbp), read_only=True)
             except Exception as exc:
-                rep["notes"].append({"lamp": "YELLOW", "note": f"{dbp.name} 開啟失敗 {str(exc)[:60]}"})
+                rep["notes"].append({"lamp": "YELLOW", "note": f"{dbp.name} 開啟失敗(讓庫:日更鏈/回補持鎖?){str(exc)[:60]}"})
                 continue
             try:
                 for t in [r[0] for r in con.execute("SHOW TABLES").fetchall()]:
@@ -731,9 +948,8 @@ def status(spec: dict | None = None, do_print: bool = True, reports: Path = REPO
                 if dbk == "tw":
                     zones = VIA / spec["families"]["vrn"]["input"]["sidecars"]
                     try:
-                        rep["vrn"]["reports"] = vrn_stage_matrix(con, zones)
+                        rep["vrn"].update(vrn_tabs(con, zones))
                     except Exception as exc:
-                        rep["vrn"]["reports"] = []
                         rep["notes"].append({"lamp": "YELLOW", "note": f"VRN 跑況讀取失敗 {str(exc)[:60]}"})
             finally:
                 con.close()
@@ -745,7 +961,6 @@ def status(spec: dict | None = None, do_print: bool = True, reports: Path = REPO
     rep["db"]["tables"] = tables
     if not tables:
         rep["notes"].append({"lamp": "YELLOW", "note": "庫狀況空:正典庫缺或 ENG073 尚未 build(via-vdfarch build)"})
-    # 對齊/覆蓋/本機三庫
     rep["align"] = _read_json(VIA / "VIA_Reports" / "vdf" / "universe" / "ALIGN_latest.json")
     rep["coverage"] = (_read_json(VIA / "VIA_Reports" / "vdf" / "local_db" / "COVERAGE_latest.json") or {}).get("tables") or None
     ld = _read_json(VIA / "VIA_Reports" / "vdf" / "local_db" / "RUN_latest.json")
@@ -754,17 +969,16 @@ def status(spec: dict | None = None, do_print: bool = True, reports: Path = REPO
         rep["notes"].append({"lamp": "GREY", "note": "對齊未跑:via-align check(ENG081)"})
     elif rep["align"].get("verdict") == "MISALIGNED":
         rep["notes"].append({"lamp": "YELLOW", "note": f"日交易×籌碼未對齊:{rep['align'].get('note', '')[:120]}"})
-    # 台股清單 / 宏觀
     rep["tw_codes"] = tw_codes(spec, names)
     series = macro_series(spec)
     cats = macro_categories(spec)
     sel = list(spec.get("user", {}).get("macro_cats") or [])
     rep["macro"] = {"categories": [{**c, "n": sum(1 for s in series if s["cat"] == c["id"]), "selected": c["id"] in sel} for c in cats],
-                    "selected": sel, "since": spec.get("user", {}).get("macro_since", "latest"), "series": series, "n_series": len(series),
+                    "selected": sel, "since": effective_start(spec, "macro_fred", "macro", spec.get("user", {}).get("macro_since", "")), "series": series, "n_series": len(series),
                     "selected_ids": macro_ids_for(spec, sel) if sel else []}
     if not series:
         rep["notes"].append({"lamp": "YELLOW", "note": "宏觀序列冊 macro_ssot 缺(類別勾選無法展開)"})
-    # VRN 輸入
+    rep["intl"] = intl_matrix(spec, matrix_path)
     vin = spec["families"]["vrn"]["input"]
     ud = spec.get("user", {}).get("vrn_dir") or ""
     udp = (Path(ud) if Path(ud).is_absolute() else VIA / ud) if ud else VIA / vin["dir_default"]
@@ -772,33 +986,31 @@ def status(spec: dict | None = None, do_print: bool = True, reports: Path = REPO
                        "incoming": str(VIA / vin["incoming"]), "incoming_files": _list_dir(VIA / vin["incoming"], tuple(vin["extensions"])),
                        "sidecars": len(list((VIA / vin["sidecars"]).glob("*.json"))) if (VIA / vin["sidecars"]).exists() else 0,
                        "chain": spec.get("user", {}).get("vrn_chain") or spec["families"]["vrn"].get("chain_default", []),
-                       "stage_labels": vin.get("stage_labels", {})})
-    rep["vrn"].setdefault("reports", [])
+                       "stage_labels": vin.get("stage_labels", {}), "minimal": bool(spec["families"]["vrn"].get("minimal"))})
     rs = rep["vrn"]["reports"]
     rep["vrn"]["summary"] = {"reports": len(rs), "verified": sum(1 for r in rs if r["financial"] == "VERIFIED"), "fail": sum(1 for r in rs if r["financial"] == "FAIL"),
-                             "basic_ok": sum(1 for r in rs if r["basic"] == "OK"), "summary_ok": sum(1 for r in rs if r["summary"] == "OK")}
-    # VAP 產出
+                             "basic_ok": sum(1 for r in rs if r["basic"] == "OK"), "summary_ok": sum(1 for r in rs if r["summary"] == "OK"),
+                             "basic_verified": sum(1 for r in rep["vrn"]["basic"] if r["verified"] == "VERIFIED"), "fin_rows": len(rep["vrn"]["financial"]),
+                             "fin_vdf_first": sum(1 for r in rep["vrn"]["financial"] if str(r.get("rule", "")).startswith("不同"))}
     pages = {"VIA_UI_Dashboard_v0100.html": "儀表板(ENG009)", "VIA_UI_StdDashboard_v0100.html": "標準儀表板(ENG014)", "VIA_UI_VapStack_v0100.html": "圖組索引(ENG015)"}
     rep["vap"] = {"pages": [{"page": p, "zh": z, "exists": (UI_DIR / p).exists(), "mtime": _dt.datetime.fromtimestamp((UI_DIR / p).stat().st_mtime).strftime("%Y-%m-%d %H:%M") if (UI_DIR / p).exists() else ""} for p, z in pages.items()],
-                  "user": spec.get("user", {}).get("vap", {})}
+                  "user": spec.get("user", {}).get("vap", {}), "specs": vap_specs(spec), "images": vap_images(spec)}
     led = VIA / (spec.get("user", {}).get("vap", {}).get("out") or "VIA_Reports/vap_one") / "vap_one_ledger.jsonl"
     if led.exists():
         try:
             rep["vap"]["last_render"] = json.loads(led.read_text(encoding="utf-8").strip().splitlines()[-1])
         except Exception:
             pass
-    # 項目可跑態
     idx = items_index(spec)
     user = spec.get("user", {})
     for iid, ent in idx.items():
         it = ent["item"]
-        params = {"start": user.get("starts", {}).get(iid, "latest"), "days": str(user.get("days", {}).get(iid, "") or "")}
-        if "since" in it.get("params", []):
-            params["since"] = user.get("macro_since", "latest") if iid.startswith("macro") else user.get("starts", {}).get(iid, "latest")
-        r = resolve_argv(spec, iid, params, environ)
+        r = resolve_argv(spec, iid, {}, environ)
         rep["items"][iid] = {"zh": it.get("zh"), "family": ent["family"], "group": ent["group"], "state": r["state"], "note": r.get("note", ""),
-                             "python": (r.get("python") or {}).get("state", ""), "net": bool(it.get("net")), "params": it.get("params", []), "start": user.get("starts", {}).get(iid, "latest"),
-                             "days": user.get("days", {}).get(iid, ""), "argv_preview": " ".join(Path(x).name if os.sep in str(x) or "/" in str(x) else str(x) for x in r.get("argv", []))}
+                             "python": (r.get("python") or {}).get("state", ""), "net": bool(it.get("net")), "params": it.get("params", []),
+                             "start": effective_start(spec, iid, ent["group"]) or "latest", "days": user.get("days", {}).get(iid, ""),
+                             "argv_preview": " ".join(Path(x).name if os.sep in str(x) or "/" in str(x) else str(x) for x in r.get("argv", []))}
+    rep["family_success"] = family_success()
     n_planned = sum(1 for v in rep["items"].values() if v["state"] == "PLANNED")
     n_missing = sum(1 for v in rep["items"].values() if v["state"] == "ENGINE_MISSING")
     if n_missing:
@@ -813,8 +1025,11 @@ def status(spec: dict | None = None, do_print: bool = True, reports: Path = REPO
         rep["notes"].append({"lamp": "YELLOW", "note": f"存證失敗 {str(exc)[:60]}"})
     log_event("STATUS", rep["verdict"], hub=hub, tables=len(tables), reports=len(rs))
     if do_print:
-        print(f"[via-console status] {rep['verdict']} · 樞紐 {hub} · 庫表 {len(tables)}({rep['db']['source'] or '無'})· 台股清單 {len(rep['tw_codes'])} · 宏觀序列 {len(series)}"
-              f" · VRN 報告 {len(rs)}(VERIFIED {rep['vrn']['summary']['verified']}/FAIL {rep['vrn']['summary']['fail']})· 項目 {len(idx)}(PLANNED {n_planned})")
+        fs = rep["family_success"]
+        print(f"[via-console status] {rep['verdict']} · 樞紐 {hub} · 庫表 {len(tables)}({rep['db']['source'] or '無'})· 台股清單 {len(rep['tw_codes'])} · 宏觀序列 {len(series)} · 國際冊 {len(rep['intl'])}"
+              f" · VRN 報告 {len(rs)}(BASIC VERIFIED {rep['vrn']['summary']['basic_verified']}/FIN VERIFIED {rep['vrn']['summary']['verified']}/FAIL {rep['vrn']['summary']['fail']})· 項目 {len(idx)}(PLANNED {n_planned})· 統一起始 {rep['defaults'].get('start')}")
+        for f, v in fs.items():
+            print(f"  跑成功? {f:<4} {v['answer']} · {v['evidence']}")
         for n in rep["notes"]:
             print(f"  {n['lamp']:<7} {n['note']}")
         for iid, v in rep["items"].items():
@@ -826,7 +1041,7 @@ def status(spec: dict | None = None, do_print: bool = True, reports: Path = REPO
 
 # ---------------------------------------------------------------- 頁面
 CSS = r"""
-:root{--bg:#f4f6f8;--paper:#fff;--paper2:#f9fafb;--ink:#202833;--ink2:#465365;--mut:#596778;--line:#dfe4ea;--line2:#edf0f3;--soft:#eef3f6;--acc:#315f7d;--acc2:#dce9f1;--ok:#2f7652;--warn:#765418;--bad:#a64f46;--grey:#6e7581;--rail-w:372px;--radius:8px}
+:root{--bg:#f4f6f8;--paper:#fff;--paper2:#f9fafb;--ink:#202833;--ink2:#465365;--mut:#596778;--line:#dfe4ea;--line2:#edf0f3;--soft:#eef3f6;--acc:#315f7d;--acc2:#dce9f1;--ok:#2f7652;--warn:#765418;--bad:#a64f46;--grey:#6e7581;--rail-w:380px;--radius:8px}
 *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:12px/1.45 "Segoe UI","Noto Sans TC",system-ui,sans-serif}
 header.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:8px 14px;background:var(--paper);border-bottom:1px solid var(--line)}
 header.top h1{font-size:14px;margin:0}header.top .lamp{padding:2px 8px;border-radius:12px;font-weight:600;font-size:11px}
@@ -838,40 +1053,46 @@ main.work{flex:1;min-width:0;padding:12px 16px;overflow:auto}
 .tabs{display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap}.tabs button{border:1px solid var(--line);background:var(--paper2);padding:6px 10px;border-radius:6px;cursor:pointer;font-weight:600;min-height:32px}
 .tabs button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
 .pane{display:none}.pane.on{display:block}
-details.grp{border:1px solid var(--line);border-radius:var(--radius);margin:6px 0;background:var(--paper)}details.grp>summary{cursor:pointer;padding:6px 8px;font-weight:600;background:var(--soft);border-radius:var(--radius) var(--radius) 0 0}
+details.grp{border:1px solid var(--line);border-radius:var(--radius);margin:6px 0;background:var(--paper)}details.grp>summary{cursor:pointer;padding:6px 8px;font-weight:600;background:var(--soft);border-radius:var(--radius) var(--radius) 0 0;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+details.grp>summary .gs{margin-left:auto;font-weight:400;display:flex;gap:4px;align-items:center}
 .item{display:grid;grid-template-columns:1fr auto;gap:4px 6px;align-items:center;padding:6px 8px;border-top:1px solid var(--line2)}
 .item .zh{font-weight:600}.item .note{grid-column:1/-1;color:var(--mut);font-size:11px}.item .ctl{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:center}
-.item input[type=date],.item input[type=number],.item input[type=text],.item select{border:1px solid var(--line);border-radius:4px;padding:3px 5px;font:inherit;min-height:26px}
+input.dmask{width:104px;font-family:Consolas,"SFMono-Regular",monospace;letter-spacing:.5px}input.dmask::placeholder{color:#9aa5b1;opacity:.55}
+.item input,.item select,summary input,summary select{border:1px solid var(--line);border-radius:4px;padding:3px 5px;font:inherit;min-height:26px}
 .item input[type=number]{width:74px}.item input[type=text].dir{width:100%}
-.badge{padding:1px 6px;border-radius:10px;font-size:10px;font-weight:600;background:var(--soft);color:var(--ink2)}.badge.READY{background:#dff3e6;color:var(--ok)}.badge.PLANNED{background:#e6e8eb;color:var(--grey)}.badge.ENGINE_MISSING,.badge.NEED_DIR,.badge.BAD_PARAM{background:#f6dcd9;color:var(--bad)}
-button.run{border:1px solid var(--acc);background:var(--acc);color:#fff;border-radius:5px;padding:3px 9px;cursor:pointer;min-height:26px;font:inherit}button.run:disabled{opacity:.45;cursor:not-allowed}
+.badge{padding:1px 6px;border-radius:10px;font-size:10px;font-weight:600;background:var(--soft);color:var(--ink2)}.badge.READY{background:#dff3e6;color:var(--ok)}.badge.PLANNED{background:#e6e8eb;color:var(--grey)}.badge.ENGINE_MISSING,.badge.NEED_DIR,.badge.BAD_PARAM,.badge.NEED_CONFIG{background:#f6dcd9;color:var(--bad)}
+button.run{border:1px solid var(--acc);background:var(--acc);color:#fff;border-radius:5px;padding:3px 9px;cursor:pointer;min-height:26px;font:inherit}button.run:disabled{opacity:.45;cursor:not-allowed}button.run.big{padding:7px 14px;font-weight:700;min-height:34px;width:100%}
 button.sm{border:1px solid var(--line);background:var(--paper2);border-radius:5px;padding:2px 8px;cursor:pointer;min-height:24px;font:inherit}
 .codes{display:grid;grid-template-columns:1fr 1fr;gap:4px}.codes label{display:flex;gap:4px;align-items:center;white-space:nowrap;font-size:11px}
-.drop{border:1.5px dashed #b9c3cd;border-radius:var(--radius);padding:14px;text-align:center;color:var(--mut);margin:6px 0;cursor:pointer}.drop.hover{border-color:var(--acc);background:var(--acc2);color:var(--acc)}
+.drop{border:1.5px dashed #b9c3cd;border-radius:var(--radius);padding:16px;text-align:center;color:var(--mut);margin:6px 0;cursor:pointer}.drop.hover{border-color:var(--acc);background:var(--acc2);color:var(--acc)}
 .prog{margin:6px 0}.bar{height:8px;border-radius:4px;background:var(--line2);overflow:hidden;position:relative}.bar i{display:block;height:100%;width:100%;background:repeating-linear-gradient(45deg,var(--acc) 0 10px,var(--acc2) 10px 20px);animation:mv 1s linear infinite}
 .bar.ok i{background:var(--ok);animation:none}.bar.fail i{background:var(--bad);animation:none}.bar.idle i{background:var(--line);animation:none}@keyframes mv{from{background-position:0 0}to{background-position:40px 0}}
 pre.log{max-height:160px;overflow:auto;background:#1f2530;color:#d7dde6;padding:8px;border-radius:6px;font:11px/1.4 Consolas,"SFMono-Regular",monospace;white-space:pre-wrap}
 .via-matrix-bar{display:flex;gap:6px;align-items:center;margin:6px 0;flex-wrap:wrap}.via-q{border:1px solid var(--line);border-radius:4px;padding:4px 6px;min-width:220px;font:inherit}.via-cnt{color:var(--mut)}
 table.via-tbl{width:100%;border-collapse:collapse;background:var(--paper);font-size:11.5px}table.via-tbl th{position:sticky;top:0;background:var(--soft);text-align:left;padding:5px 6px;border-bottom:1px solid var(--line);cursor:pointer;user-select:none;white-space:nowrap}
-table.via-tbl th.sd::after{content:" ▼"}table.via-tbl th.sa::after{content:" ▲"}table.via-tbl td{padding:4px 6px;border-bottom:1px solid var(--line2);white-space:nowrap}table.via-tbl td.num{text-align:right;font-variant-numeric:tabular-nums}
-table.via-tbl tr.on{background:var(--acc2)}td.lamp-ok,td.lamp-verified,td.lamp-green,td.lamp-aligned,td.lamp-ready{color:var(--ok);font-weight:600}td.lamp-fail,td.lamp-red,td.lamp-misaligned{color:var(--bad);font-weight:600}td.lamp-pending,td.lamp-yellow,td.lamp-partial{color:var(--warn);font-weight:600}
+table.via-tbl th.sd::after{content:" ▼"}table.via-tbl th.sa::after{content:" ▲"}table.via-tbl td{padding:4px 6px;border-bottom:1px solid var(--line2);white-space:nowrap;max-width:460px;overflow:hidden;text-overflow:ellipsis}table.via-tbl td.num{text-align:right;font-variant-numeric:tabular-nums}
+table.via-tbl tr.on{background:var(--acc2)}td.lamp-ok,td.lamp-verified,td.lamp-green,td.lamp-aligned,td.lamp-ready,td.lamp-現有{color:var(--ok);font-weight:600}td.lamp-fail,td.lamp-red,td.lamp-misaligned,td.lamp-已移除{color:var(--bad);font-weight:600}td.lamp-pending,td.lamp-yellow,td.lamp-partial,td.lamp-planned,td.lamp-未選{color:var(--warn);font-weight:600}
 .tbox{overflow:auto;max-height:70vh;border:1px solid var(--line);border-radius:var(--radius)}.kpi{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0}.kpi div{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:6px 10px;min-width:120px}.kpi b{display:block;font-size:16px}
 .cmd{background:var(--paper2);border:1px dashed var(--line);border-radius:6px;padding:6px 8px;font:11px Consolas,monospace;white-space:pre-wrap;word-break:break-all;margin-top:6px}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}.gallery figure{margin:0;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:6px}.gallery img{width:100%;height:150px;object-fit:contain;background:#fff}.gallery figcaption{font-size:10.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.okbox{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px}.okbox div{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:8px}.okbox b{font-size:14px;display:block}
 @media (max-width:900px){.wrap{flex-direction:column}aside.rail{width:auto;min-width:0;border-right:0;border-bottom:1px solid var(--line)}}
 """
 
 JS = r"""
 var B='__BRIDGE__';var SNAP=null;try{SNAP=JSON.parse(document.getElementById('snap').textContent);}catch(e){SNAP=null;}
 var SPEC=SNAP?SNAP.spec:{},ST=SNAP?SNAP.status:{},USER=SNAP?SNAP.user:{},MODE='OFFLINE',CSRF=((document.querySelector('meta[name="via-csrf"]')||{}).content||'').trim(),SAME=location.origin===B;
-var OPS={};var CHECK={};
+var OPS={};var INTL=null;var POLL=null;
 function $(id){return document.getElementById(id);}function el(t,c,h){var e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function canRun(){return MODE==='LIVE'&&SAME&&/^[A-Za-z0-9_-]{20,200}$/.test(CSRF);}
 function postJson(path,body){return fetch(B+path,{method:'POST',headers:{'Content-Type':'application/json','X-VIA-CSRF':CSRF},body:JSON.stringify(body)}).then(function(r){return r.json().then(function(j){j._http=r.status;return j;});});}
-function setMode(m){MODE=m;var l=$('lamp');l.className='lamp '+m;l.textContent=m==='LIVE'?'LIVE 樞紐同源(可啟動)':(m==='SNAPSHOT'?'SNAPSHOT 快照(只看;啟動請 via 帶起樞紐後開 '+B+'/console)':'OFFLINE');document.querySelectorAll('button.run').forEach(function(b){b.disabled=!canRun();});}
+function setMode(m){MODE=m;var l=$('lamp');l.className='lamp '+m;l.textContent=m==='LIVE'?'LIVE 樞紐同源(可啟動)':(m==='SNAPSHOT'?'SNAPSHOT 快照(只看;啟動請 via-console --open 或 via-open LIVE)':'OFFLINE');document.querySelectorAll('button.run').forEach(function(b){b.disabled=!canRun()||b.getAttribute('data-off')==='1';});}
 function boot(){if(location.protocol==='file:'){fetch(B+'/probe',{mode:'no-cors',cache:'no-store'}).then(function(){location.replace(B+'/console'+(location.hash||''));}).catch(function(){setMode('SNAPSHOT');});return;}
  fetch(B+'/console_status',{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){if(j&&j.schema){ST=j;}setMode('LIVE');renderAll();}).catch(function(){setMode(SNAP?'SNAPSHOT':'OFFLINE');});}
+function dmask(inp){inp.setAttribute('placeholder','YYYY-MM-DD');inp.setAttribute('maxlength','10');inp.addEventListener('input',function(){var d=inp.value.replace(/\D/g,'').slice(0,8);var o=d.slice(0,4);if(d.length>4)o+='-'+d.slice(4,6);if(d.length>6)o+='-'+d.slice(6,8);inp.value=o;});}
+function dateOk(v){return /^\d{4}-\d{2}-\d{2}$/.test(v)&&!isNaN(new Date(v).getTime());}
 // ---- 右側矩陣通用件:篩選+排序(預設大到小)+勾選/全選/全不選 ----
-function viaMatrix(host,cols,rows,opts){opts=opts||{};var state={q:'',sortKey:opts.defaultSort||(cols[0]&&cols[0].key),desc:opts.desc!==false,checked:{}};
+function viaMatrix(host,cols,rows,opts){opts=opts||{};var state={q:'',sortKey:opts.defaultSort||(cols[0]&&cols[0].key),desc:opts.desc!==false,checked:{}};if(opts.preChecked)rows.forEach(function(r){if(opts.preChecked(r))state.checked[String(r[opts.idKey||cols[0].key])]=true;});
  var wrap=el('div','via-matrix'),bar=el('div','via-matrix-bar'),q=el('input','via-q');q.type='search';q.placeholder='篩選(任一欄含字)';var cnt=el('span','via-cnt');bar.appendChild(q);bar.appendChild(cnt);
  function mkBtn(t,fn){var b=el('button','sm',t);b.type='button';b.addEventListener('click',fn);return b;}
  if(opts.select){bar.appendChild(mkBtn('全選',function(){visible().forEach(function(r){state.checked[rid(r)]=true;});render();}));bar.appendChild(mkBtn('全不選',function(){state.checked={};render();}));}
@@ -883,89 +1104,107 @@ function viaMatrix(host,cols,rows,opts){opts=opts||{};var state={q:'',sortKey:op
   var c=cols.filter(function(x){return x.key===state.sortKey;})[0]||cols[0];out.sort(function(a,b){var x=a[c.key],y=b[c.key];if(c.num){x=Number(x)||0;y=Number(y)||0;return state.desc?y-x:x-y;}x=String(x==null?'':x);y=String(y==null?'':y);return state.desc?y.localeCompare(x,'zh-Hant'):x.localeCompare(y,'zh-Hant');});return out;}
  function render(){var vis=visible(),h='<thead><tr>'+(opts.select?"<th class='sel'>✓</th>":'');cols.forEach(function(c){h+="<th data-k='"+c.key+"' class='"+(c.key===state.sortKey?(state.desc?'sd':'sa'):'')+"'>"+esc(c.zh)+'</th>';});h+='</tr></thead><tbody>';
   if(!vis.length)h+="<tr><td colspan='"+(cols.length+1)+"'>(空;誠實:尚無資料)</td></tr>";
-  vis.forEach(function(r){var id=rid(r);h+="<tr data-id='"+esc(id)+"'"+(state.checked[id]?" class='on'":'')+'>'+(opts.select?"<td class='sel'><input type='checkbox'"+(state.checked[id]?' checked':'')+'></td>':'');cols.forEach(function(c){var v=r[c.key];h+="<td class='"+(c.num?'num':'')+(c.lamp?' lamp-'+String(v==null?'':v).toLowerCase():'')+"'>"+(c.num&&typeof v==='number'?v.toLocaleString('en-US'):esc(v))+'</td>';});h+='</tr>';});
+  vis.forEach(function(r){var id=rid(r);h+="<tr data-id='"+esc(id)+"'"+(state.checked[id]?" class='on'":'')+'>'+(opts.select?"<td class='sel'><input type='checkbox'"+(state.checked[id]?' checked':'')+'></td>':'');cols.forEach(function(c){var v=r[c.key];h+="<td class='"+(c.num?'num':'')+(c.lamp?' lamp-'+String(v==null?'':v).toLowerCase().slice(0,12):'')+"' title='"+esc(v)+"'>"+(c.num&&typeof v==='number'?v.toLocaleString('en-US'):esc(v))+'</td>';});h+='</tr>';});
   tbl.innerHTML=h+'</tbody>';cnt.textContent=vis.length+' / '+rows.length+(opts.select?' · 已選 '+Object.keys(state.checked).length:'');
   tbl.querySelectorAll('th[data-k]').forEach(function(th){th.addEventListener('click',function(){var k=th.getAttribute('data-k');if(state.sortKey===k)state.desc=!state.desc;else{state.sortKey=k;state.desc=true;}render();});});
   if(opts.select)tbl.querySelectorAll('tr[data-id] input').forEach(function(cb){cb.addEventListener('change',function(){var id=cb.closest('tr').getAttribute('data-id');if(cb.checked)state.checked[id]=true;else delete state.checked[id];render();});});}
  render();return {selected:function(){return Object.keys(state.checked);},setRows:function(rs){rows=rs;render();},state:state};}
 // ---- 左側輸入 ----
 function itemState(id){var it=(ST.items||{})[id]||{};return it.state||'?';}
+function findItem(id){var r=null;Object.keys(SPEC.families||{}).forEach(function(f){((SPEC.families[f]||{}).groups||[]).forEach(function(g){(g.items||[]).forEach(function(it){if(it.id===id)r=it;});});});return r;}
+function groupOf(id){var r='';Object.keys(SPEC.families||{}).forEach(function(f){((SPEC.families[f]||{}).groups||[]).forEach(function(g){(g.items||[]).forEach(function(it){if(it.id===id)r=g.id;});});});return r;}
+function groupStart(gid){var gs=$('gs_'+gid),lt=$('gl_'+gid);if(!gs)return '';if(lt&&lt.checked)return 'latest';return gs.value||'';}
 function paramWidgets(it,ctl){var ps=it.params||[],id=it.id,st=(ST.items||{})[id]||{};
- if(ps.indexOf('range')>=0||ps.indexOf('start')>=0||ps.indexOf('since')>=0||ps.indexOf('since_ym')>=0){var lab=el('label',null,'起始 ');var d=el('input');d.type=ps.indexOf('since_ym')>=0?'month':'date';d.id='p_'+id+'_start';var cur=(USER.starts||{})[id]||'';if(cur)d.value=ps.indexOf('since_ym')>=0?cur.slice(0,7):cur;lab.appendChild(d);var lt=el('label',null,' <input type="checkbox" id="p_'+id+'_latest"'+(cur?'':' checked')+'> 最新(預設)');ctl.appendChild(lab);ctl.appendChild(lt);
-  d.addEventListener('change',function(){if(d.value){$('p_'+id+'_latest').checked=false;OPS['start']=id+':'+(d.value.length===7?d.value+'-01':d.value);}});lt.querySelector('input').addEventListener('change',function(e){if(e.target.checked){d.value='';OPS['start']=id+':latest';}});
-  if(ps.indexOf('range')>=0){var e2=el('label',null,' 迄 ');var de=el('input');de.type='date';de.id='p_'+id+'_end';e2.appendChild(de);ctl.appendChild(e2);}}
+ if(ps.indexOf('range')>=0||ps.indexOf('start')>=0||ps.indexOf('since')>=0||ps.indexOf('since_ym')>=0){ctl.appendChild(el('span','note','起始=本類遮罩('+esc(st.start||'')+');單項改:'));var d=el('input','dmask');d.type='text';d.id='p_'+id+'_start';var cur=((USER.starts||{})[id]||'');d.value=cur==='latest'?'':cur;dmask(d);ctl.appendChild(d);d.addEventListener('change',function(){if(d.value&&dateOk(d.value))OPS['start']=id+':'+d.value;});
+  if(ps.indexOf('range')>=0){var de=el('input','dmask');de.type='text';de.id='p_'+id+'_end';dmask(de);de.setAttribute('placeholder','迄 YYYY-MM-DD');ctl.appendChild(de);}}
  if(ps.indexOf('days')>=0){var l2=el('label',null,'天數 ');var n=el('input');n.type='number';n.min=1;n.max=3650;n.id='p_'+id+'_days';n.value=(USER.days||{})[id]||'';n.placeholder='引擎預設';l2.appendChild(n);ctl.appendChild(l2);n.addEventListener('change',function(){if(n.value)OPS['days']=id+':'+n.value;});}
- if(ps.indexOf('codes')>=0){var l3=el('label',null,'代碼 ');var s=el('select');s.multiple=true;s.size=3;s.id='p_'+id+'_codes';(ST.tw_codes||[]).forEach(function(c){var o=el('option',null,esc(c.code+' '+(c.name||'')+' '+c.market));o.value=c.code;s.appendChild(o);});l3.appendChild(s);ctl.appendChild(l3);var b1=el('button','sm','全選'),b2=el('button','sm','全不選');b1.type=b2.type='button';b1.onclick=function(){Array.prototype.forEach.call(s.options,function(o){o.selected=true;});};b2.onclick=function(){Array.prototype.forEach.call(s.options,function(o){o.selected=false;});};ctl.appendChild(b1);ctl.appendChild(b2);}
+ if(ps.indexOf('codes')>=0){var l3=el('label',null,'股票 ');var s=el('select');s.multiple=true;s.size=3;s.id='p_'+id+'_codes';(ST.tw_codes||[]).forEach(function(c){var o=el('option',null,esc(c.code+' '+(c.name||'')+' '+c.market));o.value=c.code;s.appendChild(o);});l3.appendChild(s);ctl.appendChild(l3);var b1=el('button','sm','全選'),b2=el('button','sm','全不選');b1.type=b2.type='button';b1.onclick=function(){Array.prototype.forEach.call(s.options,function(o){o.selected=true;});};b2.onclick=function(){Array.prototype.forEach.call(s.options,function(o){o.selected=false;});};ctl.appendChild(b1);ctl.appendChild(b2);}
  if(ps.indexOf('only')>=0){ctl.appendChild(el('span','note','類別勾選見「總體經濟」區塊;無勾選=全冊'));}
  if(ps.indexOf('lanes')>=0){var l4=el('label',null,'車道 ');var t=el('input');t.type='text';t.id='p_'+id+'_lanes';t.value=it.lanes_default||'';t.size=18;l4.appendChild(t);ctl.appendChild(l4);}
- if(ps.indexOf('cats')>=0){var l5=el('label',null,'類別(逗號) ');var t2=el('input');t2.type='text';t2.id='p_'+id+'_cats';t2.value=(USER.global_cats||[]).join(',');t2.size=22;t2.placeholder='空=全類';l5.appendChild(t2);ctl.appendChild(l5);}
- if(ps.indexOf('dir')>=0){ctl.appendChild(el('span','note','報告夾=左上 VRN 輸入區(預設 input_reports)'));}
+ if(ps.indexOf('cats')>=0){ctl.appendChild(el('span','note','類別=右面板「國際資訊」勾選(空=全類)'));}
+ if(ps.indexOf('dir')>=0){ctl.appendChild(el('span','note','報告夾=VRN 輸入區'));}
  if(ps.indexOf('code')>=0){var l6=el('label',null,'代碼 ');var s2=el('select');s2.id='p_'+id+'_code';(ST.tw_codes||[]).forEach(function(c){var o=el('option',null,esc(c.code+' '+(c.name||'')));o.value=c.code;if(c.code===((USER.vap||{}).code||'2330'))o.selected=true;s2.appendChild(o);});l6.appendChild(s2);ctl.appendChild(l6);s2.addEventListener('change',function(){OPS['vap-code']=s2.value;});}
- if(ps.indexOf('vapone')>=0){ctl.appendChild(el('span','note','格式/設定/資料檔=左下 VAP 區塊(個別可改)'));}
+ if(ps.indexOf('vapone')>=0){ctl.appendChild(el('span','note','格式/設定/資料檔=VAP 區塊'));}
  if(ps.indexOf('period')>=0){ctl.appendChild(el('span','note','期別/年起迄=財報區塊(入冊;引擎候上船)'));}
- var stv=st.state||'?';var bd=el('span','badge '+stv,stv);ctl.appendChild(bd);if(st.note)ctl.appendChild(el('span','note',esc(st.note)));}
+ var stv=st.state||'?';ctl.appendChild(el('span','badge '+stv,stv));if(st.note)ctl.appendChild(el('span','note',esc(st.note)));}
 function collectParams(it){var id=it.id,p={},ps=it.params||[];var g=function(x){var e=$('p_'+id+'_'+x);return e?e.value:'';};
- if(ps.indexOf('range')>=0||ps.indexOf('start')>=0||ps.indexOf('since')>=0||ps.indexOf('since_ym')>=0){var lt=$('p_'+id+'_latest');var v=g('start');p.start=(lt&&lt.checked)||!v?'latest':(v.length===7?v+'-01':v);if(ps.indexOf('since')>=0||ps.indexOf('since_ym')>=0)p.since=p.start;if(ps.indexOf('range')>=0&&g('end'))p.end=g('end');}
+ if(ps.indexOf('range')>=0||ps.indexOf('start')>=0||ps.indexOf('since')>=0||ps.indexOf('since_ym')>=0){var v=g('start');var gs=groupStart(groupOf(id));p.start=v&&dateOk(v)?v:(gs||'');if(ps.indexOf('since')>=0||ps.indexOf('since_ym')>=0)p.since=p.start;if(ps.indexOf('range')>=0&&g('end')&&dateOk(g('end')))p.end=g('end');}
  if(ps.indexOf('days')>=0&&g('days'))p.days=g('days');
  if(ps.indexOf('codes')>=0){var s=$('p_'+id+'_codes');if(s)p.codes=Array.prototype.filter.call(s.options,function(o){return o.selected;}).map(function(o){return o.value;}).join(',');}
- if(ps.indexOf('only')>=0){p.cats=selectedMacro().join(',');p.since=$('macro_since')&&$('macro_since').value?$('macro_since').value:'latest';}
- if(ps.indexOf('lanes')>=0)p.lanes=g('lanes');if(ps.indexOf('cats')>=0)p.cats=g('cats');
+ if(ps.indexOf('only')>=0){p.cats=selectedMacro().join(',');}
+ if(ps.indexOf('lanes')>=0)p.lanes=g('lanes');if(ps.indexOf('cats')>=0)p.cats=intlCats().join(',');
  if(ps.indexOf('dir')>=0)p.dir=$('vrn_dir').value;if(ps.indexOf('code')>=0)p.code=g('code');
  if(ps.indexOf('vapone')>=0){p.out=$('vap_out').value;p.formats=Array.prototype.filter.call(document.querySelectorAll('#vap_fmt input'),function(c){return c.checked;}).map(function(c){return c.value;}).join(',');p.profile=$('vap_profile').value;p.data=$('vap_data').value;p.config=$('vap_config').value;}
  return p;}
 function selectedMacro(){return Array.prototype.filter.call(document.querySelectorAll('#macro_cats input'),function(c){return c.checked;}).map(function(c){return c.value;});}
-function runItem(it,params){if(!canRun()){showCmd(it,params);return;}var box=$('prog');box.innerHTML='<div class="prog"><div class="bar"><i></i></div><div id="prog_txt">啟動 '+esc(it.zh)+' …</div><pre class="log" id="prog_log"></pre></div>';
- postJson('/console_run',{item:it.id,params:params}).then(function(j){if(!j.ok){$('prog_txt').textContent='拒:'+(j.err||j.note||'');$('prog').querySelector('.bar').className='bar fail';return;}$('prog_txt').textContent='執行中 '+esc(it.zh)+'(run '+(j.run_id||'')+')';pollRun('console:'+it.id);}).catch(function(e){$('prog_txt').textContent='樞紐錯誤 '+e;});}
-var POLL=null;function pollRun(tid){if(POLL)clearInterval(POLL);function tick(){fetch(B+'/status',{cache:'no-store'}).then(function(r){return r.json();}).then(function(s){var e=s[tid];if(!e)return;var bar=$('prog').querySelector('.bar');$('prog_log').textContent=e.tail||'';bar.className='bar '+(e.state==='running'?'':(e.state==='ok'?'ok':'fail'));$('prog_txt').textContent=(e.zh||tid)+' · '+e.state+' · '+(e.elapsed||0)+'s'+(e.pct!=null?' · '+e.pct+'%':'');renderRuns(s);if(e.state!=='running'){clearInterval(POLL);POLL=null;refreshStatus();}}).catch(function(){});}
+function intlCats(){return Array.prototype.filter.call(document.querySelectorAll('#intl_cats input'),function(c){return c.checked;}).map(function(c){return c.value;});}
+function showProg(txt){$('prog').innerHTML='<div class="prog"><div class="bar"><i></i></div><div id="prog_txt">'+esc(txt)+'</div><pre class="log" id="prog_log"></pre></div>';}
+function runItem(it,params){if(!canRun()){showCmd(it,params);return;}showProg('啟動 '+it.zh+' …');
+ postJson('/console_run',{item:it.id,params:params}).then(function(j){if(!j.ok){$('prog_txt').textContent='拒:'+(j.err||j.note||'');$('prog').querySelector('.bar').className='bar fail';return;}$('prog_txt').textContent='執行中 '+it.zh+'(run '+(j.run_id||'')+')';pollRun('console:'+it.id,null);}).catch(function(e){$('prog_txt').textContent='樞紐錯誤 '+e;});}
+function pollRun(tid,done){if(POLL)clearInterval(POLL);function tick(){fetch(B+'/status',{cache:'no-store'}).then(function(r){return r.json();}).then(function(s){var e=s[tid];if(!e)return;var bar=$('prog').querySelector('.bar');$('prog_log').textContent=e.tail||'';bar.className='bar '+(e.state==='running'?'':(e.state==='ok'?'ok':'fail'));$('prog_txt').textContent=(e.zh||tid)+' · '+e.state+' · '+(e.elapsed||0)+'s'+(e.pct!=null?' · '+e.pct+'%':'');renderRuns(s);if(e.state!=='running'){clearInterval(POLL);POLL=null;if(done)done(e);else refreshStatus();}}).catch(function(){});}
  POLL=setInterval(tick,2000);tick();}
-function showCmd(it,params){var kv=Object.keys(params).filter(function(k){return params[k];}).map(function(k){return k+'='+params[k];}).join(' ');$('prog').innerHTML='<div class="cmd">SNAPSHOT 模式無法啟動;工作站等價短令:\nvia-console run --item '+esc(it.id)+(kv?' '+esc(kv):'')+'\n(或輸入 via 帶起樞紐後開 '+B+'/console 直接按啟動)</div>';}
-function refreshStatus(){if(MODE!=='LIVE')return;fetch(B+'/console_status',{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){if(j&&j.schema){ST=j;renderMatrices();}}).catch(function(){});}
-function saveOps(){var ops=Object.assign({},OPS);var mc=selectedMacro();ops['macro-cats']=mc.join(',');if($('macro_since').value)ops['macro-since']=$('macro_since').value;ops['fin-period']=$('fin_period').value;ops['fin-from']=$('fin_from').value;ops['fin-to']=$('fin_to').value;ops['vrn-dir']=$('vrn_dir').value;
- ops['vap-out']=$('vap_out').value;ops['vap-profile']=$('vap_profile').value;ops['vap-formats']=Array.prototype.filter.call(document.querySelectorAll('#vap_fmt input'),function(c){return c.checked;}).map(function(c){return c.value;}).join(',');if($('vap_data').value)ops['vap-data']=$('vap_data').value;if($('vap_config').value)ops['vap-config']=$('vap_config').value;
- if(!canRun()){$('save_out').innerHTML='<div class="cmd">SNAPSHOT:工作站等價短令\nvia-console set '+esc(Object.keys(ops).filter(function(k){return ops[k]!=='';}).map(function(k){return k+'='+ops[k];}).join(' '))+'</div>';return;}
- postJson('/console_set',{ops:ops}).then(function(j){$('save_out').innerHTML='<div class="cmd">'+esc((j.notes||[j.err||'?']).join('\n'))+'</div>';OPS={};refreshStatus();});}
-function addCode(){var c=$('tw_new').value.trim().toUpperCase(),m=$('tw_mkt').value;if(!/^\d{4,6}[A-Z]?$/.test(c)){$('save_out').innerHTML='<div class="cmd">代碼需 4~6 位</div>';return;}var ops={'tw-add':c+':'+m};if(!canRun()){$('save_out').innerHTML='<div class="cmd">SNAPSHOT:via-console set tw-add='+c+':'+m+'</div>';return;}postJson('/console_set',{ops:ops}).then(function(j){$('save_out').innerHTML='<div class="cmd">'+esc((j.notes||[]).join('\n'))+'</div>';refreshStatus();});}
-function renderRail(){var fams=['vdf','vrn','vap'];fams.forEach(function(f){var pane=$('pane_'+f),fam=(SPEC.families||{})[f]||{};pane.innerHTML='';
-  if(f==='vdf'){var tw=el('details','grp','<summary>台灣股票代碼冊(TWSE/TPEX;可新增)</summary>');tw.open=true;var body=el('div','item');body.innerHTML='<div class="ctl"><input type="text" id="tw_new" placeholder="代碼 如 2330" size="10"> <select id="tw_mkt"><option>TWSE</option><option>TPEX</option></select> <button class="sm" type="button" onclick="addCode()">新增</button> <span class="note">焦點冊 '+((ST.tw_codes||[]).filter(function(c){return c.source==="焦點冊";}).length)+' + 操作員 '+((ST.tw_codes||[]).filter(function(c){return c.source==="操作員";}).length)+'(右側「台股清單」可篩選/排序)</span></div>';tw.appendChild(body);pane.appendChild(tw);
-   var mc=el('details','grp','<summary>總體經濟指標類別(勾選=FRED --only 展開;全選/全不選)</summary>');mc.open=true;var mb=el('div','item');var h='<div class="ctl"><button class="sm" type="button" onclick="document.querySelectorAll(\'#macro_cats input\').forEach(function(c){c.checked=true;})">全選</button><button class="sm" type="button" onclick="document.querySelectorAll(\'#macro_cats input\').forEach(function(c){c.checked=false;})">全不選</button> 起始 <input type="date" id="macro_since" value="'+esc(((ST.macro||{}).since||'')==='latest'?'':(ST.macro||{}).since)+'"> <span class="note">空=最新(增量律)</span></div><div class="codes" id="macro_cats">';((ST.macro||{}).categories||[]).forEach(function(c){h+='<label><input type="checkbox" value="'+esc(c.id)+'"'+(c.selected?' checked':'')+'> '+esc(c.zh)+' <span class="badge">'+c.n+'</span></label>';});mb.innerHTML=h+'</div>';mc.appendChild(mb);pane.appendChild(mc);
-   var fin=el('details','grp','<summary>財報(當季/累計/年度;年起迄;DEFAULT=最新)</summary>');fin.open=true;var fb=el('div','item');var uf=USER.fin||{};fb.innerHTML='<div class="ctl">期別 <select id="fin_period">'+['當季','累計','年度'].map(function(p){return '<option'+(uf.period===p?' selected':'')+'>'+p+'</option>';}).join('')+'</select> 年起 <input type="number" id="fin_from" min="2000" max="2100" value="'+esc(uf.year_from||'')+'" placeholder="最新"> 年迄 <input type="number" id="fin_to" min="2000" max="2100" value="'+esc(uf.year_to||'')+'" placeholder="最新"> <span class="badge PLANNED">三大報表 PLANNED</span><span class="note">誠實:母倉無現役財報擷取引擎(MOPS 候源);設定先入冊;月營收(ENG075/063)可跑</span></div>';fin.appendChild(fb);pane.appendChild(fin);}
-  if(f==='vrn'){var vi=el('details','grp','<summary>VRN 輸入(資料夾/拖曳/Windows 選夾)</summary>');vi.open=true;var vb=el('div','item');var v=ST.vrn||{};vb.innerHTML='<div class="ctl"><input type="text" class="dir" id="vrn_dir" value="'+esc(USER.vrn_dir||'')+'" placeholder="報告夾路徑(空=預設 '+esc(v.dir||'input_reports')+')"></div><div class="ctl"><label class="sm">Windows 選夾 <input type="file" id="vrn_pick" webkitdirectory multiple hidden></label><label class="sm">選檔 <input type="file" id="vrn_files" multiple accept=".pdf,.docx" hidden></label><span class="note">選夾/拖曳=上傳至樞紐 incoming('+esc(v.incoming||'')+')並自動設為報告夾</span></div><div class="drop" id="drop">拖曳 PDF/DOCX 或整個資料夾到這裡<br><small>樞紐未開=只列檔名(誠實)</small></div><ul id="drop_out" class="note"></ul><div class="ctl">鏈 <input type="text" id="vrn_chain" value="'+esc((v.chain||[]).join(','))+'" size="46"> <button class="run" id="vrn_go" type="button">▶ 啟動整條鏈</button></div><div class="note">報告夾 '+(v.dir_exists?'在('+((v.dir_files||[]).length)+' 件)':'缺')+' · incoming '+((v.incoming_files||[]).length)+' 件 · 首頁 sidecar '+(v.sidecars||0)+'</div>';vi.appendChild(vb);pane.appendChild(vi);}
-  if(f==='vap'){var va=el('details','grp','<summary>VAP 簡輸入(個別可改)</summary>');va.open=true;var vab=el('div','item');var uv=USER.vap||{};vab.innerHTML='<div class="ctl">格式 <span id="vap_fmt">'+['svg','html','png','pdf','plotly'].map(function(x){return '<label><input type="checkbox" value="'+x+'"'+((uv.formats||'svg,html').split(',').indexOf(x)>=0?' checked':'')+'> '+x+'</label>';}).join(' ')+'</span> 風格 <select id="vap_profile"><option'+(uv.profile==='vap_spec_v1'?' selected':'')+'>vap_spec_v1</option><option'+(uv.profile==='seaborn_stack_v23'?' selected':'')+'>seaborn_stack_v23</option></select></div><div class="ctl">輸出夾 <input type="text" id="vap_out" value="'+esc(uv.out||'VIA_Reports/vap_one')+'" size="28"> 資料檔 <input type="text" id="vap_data" value="'+esc(uv.data||'')+'" size="22" placeholder="parquet/csv(選配)"> 設定 <input type="text" id="vap_config" value="'+esc(uv.config||'')+'" size="22" placeholder="stack config.json(--render 必要)"></div>';va.appendChild(vab);pane.appendChild(va);}
-  (fam.groups||[]).forEach(function(g){var d=el('details','grp','<summary>'+esc(g.zh)+'</summary>');d.open=(f!=='vdf'||g.id==='tw_equity'||g.id==='db');(g.items||[]).forEach(function(it){var row=el('div','item');row.appendChild(el('span','zh',esc(it.zh)));var b=el('button','run','▶ 啟動');b.type='button';b.disabled=!canRun()||itemState(it.id)!=='READY';b.addEventListener('click',function(){runItem(it,collectParams(it));});row.appendChild(b);var ctl=el('div','ctl');paramWidgets(it,ctl);row.appendChild(ctl);if(it.note)row.appendChild(el('span','note',esc(it.note)));d.appendChild(row);});pane.appendChild(d);});});
- var go=$('vrn_go');if(go){go.disabled=!canRun();go.addEventListener('click',function(){var ids=$('vrn_chain').value.split(',').map(function(x){return x.trim();}).filter(Boolean);chainRun(ids);});}
- setupDrop();var sv=$('save');sv.onclick=saveOps;}
-function chainRun(ids){if(!ids.length)return;if(!canRun()){$('prog').innerHTML='<div class="cmd">SNAPSHOT:via-console run --item '+esc(ids.join(' ; via-console run --item '))+' dir='+esc($('vrn_dir').value)+'</div>';return;}var i=0;function next(){if(i>=ids.length){$('prog_txt').textContent='整條鏈完成';refreshStatus();return;}var id=ids[i++];var it=findItem(id);if(!it){next();return;}var p=collectParams(it);p.dir=$('vrn_dir').value;$('prog').innerHTML='<div class="prog"><div class="bar"><i></i></div><div id="prog_txt">鏈 '+i+'/'+ids.length+' '+esc(it.zh)+'</div><pre class="log" id="prog_log"></pre></div>';
-  postJson('/console_run',{item:id,params:p}).then(function(j){if(!j.ok){$('prog_txt').textContent='鏈停於 '+id+':'+(j.err||j.note||'');$('prog').querySelector('.bar').className='bar fail';return;}var tid='console:'+id;var t=setInterval(function(){fetch(B+'/status',{cache:'no-store'}).then(function(r){return r.json();}).then(function(s){var e=s[tid];if(!e)return;$('prog_log').textContent=e.tail||'';$('prog_txt').textContent='鏈 '+i+'/'+ids.length+' '+esc(it.zh)+' · '+e.state+' · '+(e.elapsed||0)+'s';renderRuns(s);if(e.state!=='running'){clearInterval(t);if(e.state==='ok')next();else{$('prog').querySelector('.bar').className='bar fail';$('prog_txt').textContent+='(任一失敗即停;誠實)';refreshStatus();}}});},2000);});}
+function showCmd(it,params){var kv=Object.keys(params).filter(function(k){return params[k];}).map(function(k){return k+'='+params[k];}).join(' ');$('prog').innerHTML='<div class="cmd">SNAPSHOT 模式無法啟動;工作站等價短令:\nvia-console run --item '+esc(it.id)+(kv?' '+esc(kv):'')+'\n(或 via-console --open 開 LIVE 頁直接按啟動)</div>';}
+function chainRun(ids,label){if(!ids.length)return;if(!canRun()){$('prog').innerHTML='<div class="cmd">SNAPSHOT:'+esc(ids.map(function(i){return 'via-console run --item '+i;}).join(' ; '))+'</div>';return;}var i=0,fails=0;function next(){if(i>=ids.length){$('prog_txt').textContent=(label||'鏈')+' 完成 '+ids.length+' 步'+(fails?'(失敗 '+fails+';誠實)':'');refreshStatus();return;}var id=ids[i++];var it=findItem(id);if(!it){next();return;}var p=collectParams(it);if((it.params||[]).indexOf('dir')>=0)p.dir=$('vrn_dir').value;showProg((label||'鏈')+' '+i+'/'+ids.length+' '+it.zh);
+  postJson('/console_run',{item:id,params:p}).then(function(j){if(!j.ok){$('prog_txt').textContent=(label||'鏈')+' 停於 '+id+':'+(j.err||j.note||'');$('prog').querySelector('.bar').className='bar fail';fails++;if(label==='VRN')return;next();return;}pollRun('console:'+id,function(e){if(e.state==='ok')next();else{fails++;if(label==='VRN'){$('prog_txt').textContent+='(VRN 鏈:任一失敗即停;誠實)';refreshStatus();}else next();}});});}
  next();}
-function findItem(id){var r=null;Object.keys(SPEC.families||{}).forEach(function(f){((SPEC.families[f]||{}).groups||[]).forEach(function(g){(g.items||[]).forEach(function(it){if(it.id===id)r=it;});});});return r;}
-// ---- 拖曳/選夾 → 樞紐 /intake(dest=vrn_incoming;base64 JSON;既有道) ----
+function refreshStatus(){if(MODE!=='LIVE')return;fetch(B+'/console_status',{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){if(j&&j.schema){ST=j;renderMatrices();}}).catch(function(){});}
+function saveOps(){var ops=Object.assign({},OPS);var gi=0;document.querySelectorAll('input.gstart').forEach(function(inp){var gid=inp.getAttribute('data-g');var lt=$('gl_'+gid);var key='group-start'+(gi?'#'+gi:'');if(lt&&lt.checked){ops[key]=gid+':latest';gi++;}else if(inp.value&&dateOk(inp.value)){ops[key]=gid+':'+inp.value;gi++;}});
+ var mc=selectedMacro();ops['macro-cats']=mc.join(',');ops['fin-period']=$('fin_period').value;ops['fin-from']=$('fin_from').value;ops['fin-to']=$('fin_to').value;ops['vrn-dir']=$('vrn_dir').value;ops['global-cats']=intlCats().join(',');
+ ops['vap-out']=$('vap_out').value;ops['vap-profile']=$('vap_profile').value;ops['vap-formats']=Array.prototype.filter.call(document.querySelectorAll('#vap_fmt input'),function(c){return c.checked;}).map(function(c){return c.value;}).join(',');if($('vap_data').value)ops['vap-data']=$('vap_data').value;if($('vap_config').value)ops['vap-config']=$('vap_config').value;
+ var keys=Object.keys(ops).filter(function(k){return ops[k]!=='';});if(!canRun()){$('save_out').innerHTML='<div class="cmd">SNAPSHOT:工作站等價短令\nvia-console set '+esc(keys.map(function(k){return k+'='+ops[k];}).join(' '))+'</div>';return;}
+ var send={};keys.forEach(function(k){send[k]=ops[k];});postJson('/console_set',{ops:send}).then(function(j){$('save_out').innerHTML='<div class="cmd">'+esc((j.notes||[j.err||'?']).join('\n'))+'</div>';OPS={};refreshStatus();});}
+function addCode(){var c=$('tw_new').value.trim().toUpperCase(),m=$('tw_mkt').value;if(!/^\d{4,6}[A-Z]?$/.test(c)){$('save_out').innerHTML='<div class="cmd">代碼需 4~6 位</div>';return;}if(!canRun()){$('save_out').innerHTML='<div class="cmd">SNAPSHOT:via-console set tw-add='+c+':'+m+'</div>';return;}postJson('/console_set',{ops:{'tw-add':c+':'+m}}).then(function(j){$('save_out').innerHTML='<div class="cmd">'+esc((j.notes||[]).join('\n'))+'</div>';refreshStatus();});}
+function applyIntl(){if(!INTL)return;var sel=INTL.selected();var ops={},n=0;(ST.intl||[]).forEach(function(r){if(r.kind!=='ticker'&&r.kind!=='item')return;var id=r.section+':'+r.kind+':'+r.id;var on=sel.indexOf(id)>=0;if(on&&r.state==='已移除')ops[(r.kind==='ticker'?'intl-add':'intl-item-add')+'#'+(n++)]=r.section+':'+r.id;if(!on&&r.state==='現有')ops[(r.kind==='ticker'?'intl-remove':'intl-item-remove')+'#'+(n++)]=r.section+':'+r.id;});ops['global-cats']=intlCats().join(',');
+ var keys=Object.keys(ops);if(!canRun()){$('intl_out').innerHTML='<div class="cmd">SNAPSHOT:via-console set '+esc(keys.map(function(k){return k+'='+ops[k];}).join(' '))+'</div>';return;}postJson('/console_set',{ops:ops}).then(function(j){$('intl_out').innerHTML='<div class="cmd">'+esc((j.notes||[j.err||'?']).join('\n'))+'</div>';refreshStatus();});}
+function readyIds(fam,excl){var out=[];((SPEC.families[fam]||{}).groups||[]).forEach(function(g){if(excl&&excl.indexOf(g.id)>=0)return;(g.items||[]).forEach(function(it){if(itemState(it.id)==='READY')out.push(it.id);});});return out;}
+function renderRail(){var fams=['vdf','vrn','vap'];fams.forEach(function(f){var pane=$('pane_'+f),fam=(SPEC.families||{})[f]||{};pane.innerHTML='';
+  if(f==='vdf'){var top=el('div','item');top.innerHTML='<button class="run big" id="vdf_all" type="button">▶ 啟動全部 VDF(依序;PLANNED 跳過;起始=各類遮罩,預設 '+esc((ST.defaults||{}).start||'2023-01-01')+' → 最新)</button>';pane.appendChild(top);
+   var tw=el('details','grp','<summary>台灣股票代碼冊(只用於財報/月營收可選股票;其餘抓全部)</summary>');var body=el('div','item');body.innerHTML='<div class="ctl"><input type="text" id="tw_new" placeholder="代碼 如 2330" size="10"> <select id="tw_mkt"><option>TWSE</option><option>TPEX</option></select> <button class="sm" type="button" onclick="addCode()">新增</button> <span class="note">焦點冊 '+((ST.tw_codes||[]).filter(function(c){return c.source==="焦點冊";}).length)+' + 操作員 '+((ST.tw_codes||[]).filter(function(c){return c.source==="操作員";}).length)+'(右側「台股清單」)</span></div>';tw.appendChild(body);pane.appendChild(tw);
+   var mc=el('details','grp','<summary>總體經濟類別(勾選=FRED --only 展開;全選/全不選)</summary>');mc.open=true;var mb=el('div','item');var h='<div class="ctl"><button class="sm" type="button" onclick="document.querySelectorAll(\'#macro_cats input\').forEach(function(c){c.checked=true;})">全選</button><button class="sm" type="button" onclick="document.querySelectorAll(\'#macro_cats input\').forEach(function(c){c.checked=false;})">全不選</button> <span class="note">起始=「總體經濟」類遮罩</span></div><div class="codes" id="macro_cats">';((ST.macro||{}).categories||[]).forEach(function(c){h+='<label><input type="checkbox" value="'+esc(c.id)+'"'+(c.selected?' checked':'')+'> '+esc(c.zh)+' <span class="badge">'+c.n+'</span></label>';});mb.innerHTML=h+'</div>';mc.appendChild(mb);pane.appendChild(mc);
+   var fin=el('details','grp','<summary>財報期別(當季/累計/年度;年起迄;三大報表 PLANNED)</summary>');var fb=el('div','item');var uf=USER.fin||{};fb.innerHTML='<div class="ctl">期別 <select id="fin_period">'+['當季','累計','年度'].map(function(p){return '<option'+(uf.period===p?' selected':'')+'>'+p+'</option>';}).join('')+'</select> 年起 <input type="number" id="fin_from" min="2000" max="2100" value="'+esc(uf.year_from||'')+'" placeholder="最新"> 年迄 <input type="number" id="fin_to" min="2000" max="2100" value="'+esc(uf.year_to||'')+'" placeholder="最新"> <span class="badge PLANNED">三大報表 PLANNED</span><span class="note">誠實:母倉無現役財報擷取引擎(MOPS 候源);設定先入冊;月營收(ENG075/063)可跑</span></div>';fin.appendChild(fb);pane.appendChild(fin);}
+  if(f==='vrn'){var vi=el('details','grp','<summary>VRN 輸入(參數最小化:選夾/選檔/拖曳 → 啟動就跑)</summary>');vi.open=true;var vb=el('div','item');var v=ST.vrn||{};vb.innerHTML='<div class="ctl"><label class="sm">Windows 選夾 <input type="file" id="vrn_pick" webkitdirectory multiple hidden></label><label class="sm">選檔 <input type="file" id="vrn_files" multiple accept=".pdf,.docx" hidden></label></div><div class="drop" id="drop">拖曳 PDF/DOCX 或整個資料夾到這裡<br><small>上傳至樞紐 incoming 後自動設為報告夾並啟動整條鏈;樞紐未開=只列檔名(誠實)</small></div><ul id="drop_out" class="note"></ul><div class="ctl"><input type="text" class="dir" id="vrn_dir" value="'+esc(USER.vrn_dir||'')+'" placeholder="報告夾路徑(空=預設 '+esc(v.dir||'input_reports')+';選夾/拖曳後自動填)"></div><button class="run big" id="vrn_go" type="button">▶ 啟動(整條鏈:首頁→入庫→財報頁→四點→頁面)</button><div class="note">報告夾 '+(v.dir_exists?'在('+((v.dir_files||[]).length)+' 件)':'缺')+' · incoming '+((v.incoming_files||[]).length)+' 件 · 首頁 sidecar '+(v.sidecars||0)+' · 鏈 '+esc((v.chain||[]).join('→'))+'</div>';vi.appendChild(vb);pane.appendChild(vi);}
+  if(f==='vap'){var va=el('details','grp','<summary>VAP 簡輸入(個別可改)</summary>');va.open=true;var vab=el('div','item');var uv=USER.vap||{};vab.innerHTML='<div class="ctl">格式 <span id="vap_fmt">'+['svg','html','png','pdf','plotly'].map(function(x){return '<label><input type="checkbox" value="'+x+'"'+((uv.formats||'svg,html').split(',').indexOf(x)>=0?' checked':'')+'> '+x+'</label>';}).join(' ')+'</span> 風格 <select id="vap_profile"><option'+(uv.profile==='vap_spec_v1'?' selected':'')+'>vap_spec_v1</option><option'+(uv.profile==='seaborn_stack_v23'?' selected':'')+'>seaborn_stack_v23</option></select></div><div class="ctl">輸出夾 <input type="text" id="vap_out" value="'+esc(uv.out||'VIA_Reports/vap_one')+'" size="28"> 資料檔 <input type="text" id="vap_data" value="'+esc(uv.data||'')+'" size="22" placeholder="parquet/csv(選配)"> 設定 <input type="text" id="vap_config" value="'+esc(uv.config||'')+'" size="22" placeholder="stack config.json(--render 必要)"></div>';va.appendChild(vab);pane.appendChild(va);}
+  (fam.groups||[]).forEach(function(g){var d=el('details','grp');var sm=el('summary',null,esc(g.zh));if(f==='vdf'){var gs=el('span','gs');var cur=((ST.group_starts||{})[g.id]||'');gs.innerHTML='起始 <input type="text" class="dmask gstart" id="gs_'+esc(g.id)+'" data-g="'+esc(g.id)+'" value="'+esc(cur==='latest'?'':cur)+'"> <label><input type="checkbox" id="gl_'+esc(g.id)+'"'+(cur==='latest'?' checked':'')+'> 最新</label>';sm.appendChild(gs);}d.appendChild(sm);d.open=(f!=='vdf'||g.id==='tw_equity');
+   (g.items||[]).forEach(function(it){var row=el('div','item');row.appendChild(el('span','zh',esc(it.zh)));var b=el('button','run','▶ 啟動');b.type='button';if(itemState(it.id)!=='READY')b.setAttribute('data-off','1');b.disabled=!canRun()||itemState(it.id)!=='READY';b.addEventListener('click',function(){runItem(it,collectParams(it));});row.appendChild(b);var ctl=el('div','ctl');paramWidgets(it,ctl);row.appendChild(ctl);if(it.note)row.appendChild(el('span','note',esc(it.note)));d.appendChild(row);});
+   if(f==='vrn'&&fam.minimal){var w=el('details','grp','<summary>進階(逐段啟動;參數最小化下通常不需要)</summary>');w.appendChild(d);d.open=true;pane.appendChild(w);}else pane.appendChild(d);});});
+ document.querySelectorAll('input.gstart').forEach(function(inp){dmask(inp);var gid=inp.getAttribute('data-g');inp.addEventListener('change',function(){if(inp.value&&dateOk(inp.value)){$('gl_'+gid).checked=false;}});var lt=$('gl_'+gid);if(lt)lt.addEventListener('change',function(){if(lt.checked)inp.value='';});});
+ var go=$('vrn_go');if(go){go.disabled=!canRun();go.addEventListener('click',function(){chainRun((ST.vrn||{}).chain||[],'VRN');});}
+ var va=$('vdf_all');if(va){va.disabled=!canRun();va.addEventListener('click',function(){chainRun(readyIds('vdf',['db']),'VDF');});}
+ setupDrop();$('save').onclick=saveOps;}
+// ---- 拖曳/選夾 → 樞紐 /intake(dest=vrn_incoming;base64 JSON;既有道)→ 高自動化:上傳完自動啟動整條鏈 ----
 function setupDrop(){var z=$('drop');if(!z)return;['dragenter','dragover'].forEach(function(ev){z.addEventListener(ev,function(e){e.preventDefault();z.classList.add('hover');});});['dragleave','drop'].forEach(function(ev){z.addEventListener(ev,function(e){e.preventDefault();z.classList.remove('hover');});});
- z.addEventListener('drop',function(e){collectDropped(e.dataTransfer,function(files){uploadFiles(files);});});z.addEventListener('click',function(){$('vrn_files').click();});
- $('vrn_files').addEventListener('change',function(){uploadFiles(Array.prototype.map.call(this.files,function(f){return {file:f,rel:f.name};}));});$('vrn_pick').addEventListener('change',function(){uploadFiles(Array.prototype.map.call(this.files,function(f){return {file:f,rel:f.webkitRelativePath||f.name};}));});
+ z.addEventListener('drop',function(e){collectDropped(e.dataTransfer,function(files){uploadFiles(files,true);});});z.addEventListener('click',function(){$('vrn_files').click();});
+ $('vrn_files').addEventListener('change',function(){uploadFiles(Array.prototype.map.call(this.files,function(f){return {file:f,rel:f.name};}),true);});$('vrn_pick').addEventListener('change',function(){uploadFiles(Array.prototype.map.call(this.files,function(f){return {file:f,rel:f.webkitRelativePath||f.name};}),true);});
  $('vrn_pick').parentNode.addEventListener('click',function(){$('vrn_pick').click();});}
 function collectDropped(dt,done){var items=dt&&dt.items,files=[];function walk(entry,path,cb){if(entry.isFile)entry.file(function(f){files.push({file:f,rel:path+f.name});cb();});else if(entry.isDirectory){var rd=entry.createReader();rd.readEntries(function(ents){var n=ents.length;if(!n)return cb();ents.forEach(function(en){walk(en,path+entry.name+'/',function(){if(--n===0)cb();});});});}else cb();}
  if(items&&items[0]&&items[0].webkitGetAsEntry){var pend=items.length;Array.prototype.forEach.call(items,function(it){var en=it.webkitGetAsEntry();if(!en){if(--pend===0)done(files);return;}walk(en,'',function(){if(--pend===0)done(files);});});}else{Array.prototype.forEach.call(dt.files,function(f){files.push({file:f,rel:f.name});});done(files);}}
 function b64(file){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(String(r.result).split(',')[1]||'');};r.onerror=rej;r.readAsDataURL(file);});}
-function uploadFiles(files){var ul=$('drop_out');ul.innerHTML='';files=files.filter(function(x){return /\.(pdf|docx)$/i.test(x.rel);});if(!files.length){ul.innerHTML='<li>無 PDF/DOCX</li>';return;}
- if(!canRun()){files.forEach(function(x){ul.appendChild(el('li',null,esc(x.rel)+' · '+Math.round(x.file.size/1024)+' KB(SNAPSHOT:只列檔名;請 via 帶起樞紐)'));});return;}
- var i=0;function next(){if(i>=files.length){$('vrn_dir').value=(ST.vrn||{}).incoming||'';OPS['vrn-dir']=$('vrn_dir').value;ul.appendChild(el('li',null,'完成 '+files.length+' 件 → 報告夾已設為 incoming;按「啟動整條鏈」'));return;}var x=files[i++];if(x.file.size>50*1024*1024){ul.appendChild(el('li',null,esc(x.rel)+' 逾 50MB 拒'));next();return;}
-  b64(x.file).then(function(s){return postJson('/intake',{name:x.file.name,b64:s,dest:'vrn_incoming'});}).then(function(j){ul.appendChild(el('li',null,esc(x.rel)+' · '+(j._http===201?'新收':(j._http===200?'冪等(已在)':'拒 '+(j.err||'')))));next();}).catch(function(e){ul.appendChild(el('li',null,esc(x.rel)+' 失敗 '+e));next();});}
+function uploadFiles(files,autostart){var ul=$('drop_out');ul.innerHTML='';files=files.filter(function(x){return /\.(pdf|docx)$/i.test(x.rel);});if(!files.length){ul.innerHTML='<li>無 PDF/DOCX</li>';return;}
+ if(!canRun()){files.forEach(function(x){ul.appendChild(el('li',null,esc(x.rel)+' · '+Math.round(x.file.size/1024)+' KB(SNAPSHOT:只列檔名;請 via-console --open)'));});return;}
+ var i=0,got=0;function next(){if(i>=files.length){$('vrn_dir').value=(ST.vrn||{}).incoming||'';OPS['vrn-dir']=$('vrn_dir').value;ul.appendChild(el('li',null,'完成 '+got+'/'+files.length+' 件 → 報告夾=incoming'+(autostart&&got?';自動啟動整條鏈(高自動化)':'')));if(autostart&&got)chainRun((ST.vrn||{}).chain||[],'VRN');return;}var x=files[i++];if(x.file.size>50*1024*1024){ul.appendChild(el('li',null,esc(x.rel)+' 逾 50MB 拒'));next();return;}
+  b64(x.file).then(function(s){return postJson('/intake',{name:x.file.name,b64:s,dest:'vrn_incoming'});}).then(function(j){var ok=j._http===201||j._http===200;if(ok)got++;ul.appendChild(el('li',null,esc(x.rel)+' · '+(j._http===201?'新收':(j._http===200?'冪等(已在)':'拒 '+(j.err||'')))));next();}).catch(function(e){ul.appendChild(el('li',null,esc(x.rel)+' 失敗 '+e));next();});}
  next();}
 // ---- 右側矩陣 ----
+function imgSrc(r){return MODE==='LIVE'?(B+'/vap_img?p='+encodeURIComponent(r.rel)):('file:///'+String(r.abs||'').replace(/\\/g,'/'));}
 function renderMatrices(){var t=(ST.db||{}).tables||{};var rows=Object.keys(t).map(function(k){var v=t[k];return {table:k,db:v.db,rows:v.rows,max:v.max||'',lag:v.lag_days==null?'':v.lag_days,source:v.source||''};});
- $('kpi_db').innerHTML='<div><b>'+rows.length+'</b>庫表</div><div><b>'+esc(((ST.align||{}).verdict)||'未跑')+'</b>日交易×籌碼對齊</div><div><b>'+esc((ST.hub||''))+'</b>樞紐</div><div><b>'+esc(((ST.vrn||{}).summary||{}).reports||0)+'</b>VRN 報告</div><div><b>'+esc((ST.tw_codes||[]).length)+'</b>台股清單</div>';
+ var fs=ST.family_success||{};$('kpi_db').innerHTML='<div><b>'+rows.length+'</b>庫表</div><div><b>'+esc(((ST.align||{}).verdict)||'未跑')+'</b>日交易×籌碼對齊</div><div><b>'+esc((ST.hub||''))+'</b>樞紐</div><div><b>'+esc(((ST.vrn||{}).summary||{}).reports||0)+'</b>VRN 報告</div><div><b>'+esc((ST.defaults||{}).start||'')+'</b>統一起始</div>'+['vdf','vrn','vap'].map(function(f){var v=fs[f]||{};return '<div><b>'+esc((v.answer||'未證實').split(/[:(]/)[0])+'</b>'+f.toUpperCase()+' 跑成功?</div>';}).join('');
+ var its=ST.items||{};var runsNow=window._RUNS||{};viaMatrix($('m_io'),[{key:'id',zh:'項目'},{key:'family',zh:'族'},{key:'zh',zh:'說明'},{key:'state',zh:'可跑態',lamp:true},{key:'start',zh:'起始'},{key:'run',zh:'運作結果',lamp:true},{key:'elapsed',zh:'秒',num:true},{key:'tail',zh:'尾行'},{key:'argv_preview',zh:'argv 預覽'}],Object.keys(its).map(function(k){var e=runsNow['console:'+k]||{};return Object.assign({id:k,run:e.state||'',elapsed:e.elapsed||'',tail:(e.tail||'').slice(-100)},its[k]);}),{desc:false,defaultSort:'family'});
+ var intl=ST.intl||[];INTL=viaMatrix($('m_intl'),[{key:'uid',zh:'鍵'},{key:'section',zh:'冊/引擎'},{key:'kind',zh:'型'},{key:'id',zh:'代碼/項目'},{key:'state',zh:'狀態',lamp:true},{key:'zh',zh:'說明'}],intl.map(function(r){return Object.assign({uid:r.section+':'+r.kind+':'+r.id},r);}),{select:true,idKey:'uid',desc:false,defaultSort:'section',preChecked:function(r){return r.state==='現有';},extra:[['套用勾選(勾=納入 未勾=移除;零刪除)',applyIntl]]});
+ var cb=$('intl_cats');cb.innerHTML=intl.filter(function(r){return r.kind==='cat';}).map(function(r){return '<label><input type="checkbox" value="'+esc(r.id)+'"'+(r.state==='現有'?' checked':'')+'> '+esc(r.id)+'</label>';}).join(' ');
+ var vb=(ST.vrn||{}).basic||[];viaMatrix($('m_basic'),[{key:'report_file',zh:'報告'},{key:'ticker',zh:'代碼'},{key:'name',zh:'名稱'},{key:'broker',zh:'券商'},{key:'report_date',zh:'日期'},{key:'rating',zh:'評等'},{key:'target_price',zh:'目標價',num:true},{key:'price_report',zh:'價(報告)',num:true},{key:'price_vdf',zh:'價(VDF)',num:true},{key:'price_state',zh:'價核對'},{key:'upside_report',zh:'上漲(報告)',num:true},{key:'upside_vdf',zh:'上漲(VDF)',num:true},{key:'upside_state',zh:'上漲核對'},{key:'verified',zh:'VERIFIED',lamp:true}],vb,{defaultSort:'report_date'});
+ viaMatrix($('m_summary'),[{key:'report_file',zh:'報告'},{key:'ticker',zh:'代碼'},{key:'name',zh:'名稱'},{key:'report_date',zh:'日期'},{key:'title',zh:'標題'},{key:'summary',zh:'摘要'},{key:'headline',zh:'四點標題'},{key:'k1',zh:'K1 潛在上漲'},{key:'k2',zh:'K2 EPS'},{key:'k3',zh:'K3'},{key:'k4',zh:'K4'},{key:'k5',zh:'K5 風險'},{key:'qc',zh:'QC',lamp:true}],(ST.vrn||{}).summary_matrix||[],{defaultSort:'report_date'});
+ viaMatrix($('m_fin'),[{key:'report_file',zh:'報告'},{key:'ticker',zh:'代碼'},{key:'metric',zh:'科目'},{key:'period',zh:'期別'},{key:'status',zh:'態'},{key:'value_report',zh:'報告值',num:true},{key:'value_vdf',zh:'VDF 歷史值',num:true},{key:'final',zh:'採用(VDF 為主)',num:true},{key:'diff_pct',zh:'差 %',num:true},{key:'rule',zh:'律'}],(ST.vrn||{}).financial||[],{defaultSort:'report_file',desc:false});
+ var vs=(ST.vrn||{}).summary||{};$('vrn_kpi').innerHTML='<div><b>'+(vs.reports||0)+'</b>報告</div><div><b>'+(vs.basic_verified||0)+'</b>BASIC VERIFIED</div><div><b>'+(vs.summary_ok||0)+'</b>SUMMARY OK</div><div><b>'+(vs.verified||0)+'</b>FINANCIAL VERIFIED</div><div><b>'+(vs.fail||0)+'</b>FINANCIAL FAIL</div><div><b>'+(vs.fin_vdf_first||0)+'</b>不同→VDF 為主</div>';$('fin_kpi').innerHTML=$('vrn_kpi').innerHTML;
  viaMatrix($('m_db'),[{key:'table',zh:'表'},{key:'db',zh:'庫'},{key:'rows',zh:'列數',num:true},{key:'max',zh:'最新日'},{key:'lag',zh:'滯後(日)',num:true},{key:'source',zh:'來源'}],rows,{defaultSort:'rows'});
- var al=ST.align||{};var drows=(al.dates||[]).map(function(d){return d;});viaMatrix($('m_align'),[{key:'date',zh:'日期'},{key:'px_n',zh:'價表票數',num:true},{key:'chip_n',zh:'籌碼票數',num:true},{key:'both',zh:'皆有',num:true},{key:'px_only',zh:'只有價',num:true},{key:'chip_only',zh:'只有籌碼',num:true},{key:'verdict',zh:'判定',lamp:true}],drows,{defaultSort:'date'});
- $('align_note').textContent=al.note?al.note:'(未跑:via-align check)';var mm=(al.mismatch||{});var mrows=[].concat((mm.px_only||[]).map(function(c){return {code:c,side:'只有價'};}),(mm.chip_only||[]).map(function(c){return {code:c,side:'只有籌碼'};}));viaMatrix($('m_align2'),[{key:'code',zh:'票/代碼'},{key:'side',zh:'缺的一側'}],mrows,{desc:false});
+ var al=ST.align||{};viaMatrix($('m_align'),[{key:'date',zh:'日期'},{key:'px_n',zh:'價表票數',num:true},{key:'chip_n',zh:'籌碼票數',num:true},{key:'both',zh:'皆有',num:true},{key:'px_only',zh:'只有價',num:true},{key:'chip_only',zh:'只有籌碼',num:true},{key:'verdict',zh:'判定',lamp:true}],(al.dates||[]),{defaultSort:'date'});$('align_note').textContent=al.note?al.note:'(未跑:via-align check)';var mm=(al.mismatch||{});viaMatrix($('m_align2'),[{key:'code',zh:'票/代碼'},{key:'side',zh:'缺的一側'}],[].concat((mm.px_only||[]).map(function(c){return {code:c,side:'只有價'};}),(mm.chip_only||[]).map(function(c){return {code:c,side:'只有籌碼'};})),{desc:false});
  var cm=viaMatrix($('m_codes'),[{key:'code',zh:'代碼'},{key:'name',zh:'名稱'},{key:'market',zh:'市場'},{key:'group',zh:'族群'},{key:'source',zh:'來源'}],ST.tw_codes||[],{select:true,desc:false,extra:[['移出勾選(操作員項)',function(){var sel=cm.selected();if(!sel.length)return;var ops={};sel.forEach(function(c,i){ops['tw-remove'+(i?'#'+i:'')]=c;});if(!canRun()){$('save_out').innerHTML='<div class="cmd">SNAPSHOT:via-console set '+sel.map(function(c){return 'tw-remove='+c;}).join(' ')+'</div>';return;}postJson('/console_set',{ops:ops}).then(function(j){$('save_out').innerHTML='<div class="cmd">'+esc((j.notes||[]).join('\n'))+'</div>';refreshStatus();});}]]});
  viaMatrix($('m_macro'),[{key:'cat',zh:'類別'},{key:'sub',zh:'子題'},{key:'fred_id',zh:'FRED'},{key:'indicator',zh:'指標'},{key:'freq',zh:'頻率'}],(ST.macro||{}).series||[],{desc:false,defaultSort:'cat'});
- var vr=(ST.vrn||{}).reports||[];viaMatrix($('m_vrn'),[{key:'report_file',zh:'報告'},{key:'ticker',zh:'代碼'},{key:'name',zh:'名稱'},{key:'broker',zh:'券商'},{key:'report_date',zh:'日期'},{key:'basic',zh:'BASIC INFO',lamp:true},{key:'summary',zh:'SUMMARY',lamp:true},{key:'financial',zh:'FINANCIAL DATA',lamp:true},{key:'n_metrics',zh:'指標數',num:true},{key:'n_financial',zh:'財表列',num:true},{key:'four_point_qc',zh:'四點 QC',lamp:true},{key:'overall',zh:'總判',lamp:true}],vr,{defaultSort:'report_date'});
- var vs=(ST.vrn||{}).summary||{};$('vrn_kpi').innerHTML='<div><b>'+(vs.reports||0)+'</b>報告</div><div><b>'+(vs.basic_ok||0)+'</b>BASIC INFO OK</div><div><b>'+(vs.summary_ok||0)+'</b>SUMMARY OK</div><div><b>'+(vs.verified||0)+'</b>FINANCIAL VERIFIED</div><div><b>'+(vs.fail||0)+'</b>FINANCIAL FAIL</div>';
- var inc=((ST.vrn||{}).incoming_files||[]).map(function(f){return Object.assign({where:'incoming'},f);}).concat(((ST.vrn||{}).dir_files||[]).map(function(f){return Object.assign({where:'報告夾'},f);}));viaMatrix($('m_vrn_files'),[{key:'name',zh:'檔名'},{key:'where',zh:'位置'},{key:'kb',zh:'KB',num:true},{key:'mtime',zh:'修改時間'}],inc,{defaultSort:'mtime'});
- viaMatrix($('m_vap'),[{key:'zh',zh:'產出'},{key:'page',zh:'頁'},{key:'exists',zh:'在位'},{key:'mtime',zh:'更新'}],(ST.vap||{}).pages||[],{desc:false});
- var its=ST.items||{};viaMatrix($('m_items'),[{key:'id',zh:'項目'},{key:'family',zh:'族'},{key:'zh',zh:'說明'},{key:'state',zh:'可跑態',lamp:true},{key:'start',zh:'起始'},{key:'net',zh:'觸網'},{key:'argv_preview',zh:'argv 預覽'}],Object.keys(its).map(function(k){return Object.assign({id:k},its[k]);}),{desc:false,defaultSort:'family'});
+ var vap=ST.vap||{};viaMatrix($('m_vap_specs'),[{key:'code',zh:'代碼'},{key:'id',zh:'id'},{key:'group',zh:'群'},{key:'zh',zh:'圖名'},{key:'en',zh:'EN'},{key:'axes',zh:'軸',num:true},{key:'axisMode',zh:'軸模式'},{key:'dataShape',zh:'資料形'},{key:'fields',zh:'欄'},{key:'rule',zh:'規則'},{key:'renderer',zh:'渲染'}],vap.specs||[],{desc:false,defaultSort:'code'});
+ var g=$('m_vap_imgs');g.innerHTML='';(vap.images||[]).forEach(function(r){var f=el('figure');f.innerHTML='<img src="'+esc(imgSrc(r))+'" alt="'+esc(r.name)+'" loading="lazy"><figcaption title="'+esc(r.rel)+'">'+esc(r.name)+' · '+r.kb+' KB · '+esc(r.mtime)+'</figcaption>';g.appendChild(f);});if(!(vap.images||[]).length)g.innerHTML='<div class="note">(尚無圖片:按 VAP ONE 示範堆圖或圖組啟動後出現;LIVE 經樞紐 /vap_img 供圖,快照經 file://)</div>';
+ viaMatrix($('m_vap_pages'),[{key:'zh',zh:'產出'},{key:'page',zh:'頁'},{key:'exists',zh:'在位'},{key:'mtime',zh:'更新'}],vap.pages||[],{desc:false});
+ var ok=$('m_ok');ok.innerHTML='';['vdf','vrn','vap'].forEach(function(f){var v=fs[f]||{};ok.appendChild(el('div',null,'<b>'+f.toUpperCase()+':'+esc(v.answer||'未證實')+'</b><div>能跑閘 '+esc(v.rungate||'未跑')+' · 家族 U/I '+esc(v.famui||'未跑')+'</div><div class="note">'+esc(v.evidence||'')+'</div>'));});
  if(MODE==='LIVE')fetch(B+'/status',{cache:'no-store'}).then(function(r){return r.json();}).then(renderRuns).catch(function(){});}
-function renderRuns(s){var rows=Object.keys(s||{}).map(function(k){var e=s[k];return {task:k,zh:e.zh,state:e.state,started:e.started||'',elapsed:e.elapsed||0,pct:e.pct==null?'':e.pct,rc:e.rc==null?'':e.rc,tail:(e.tail||'').slice(-120)};}).filter(function(r){return r.state!=='idle';});viaMatrix($('m_runs'),[{key:'task',zh:'任務'},{key:'zh',zh:'說明'},{key:'state',zh:'狀態',lamp:true},{key:'started',zh:'開始'},{key:'elapsed',zh:'秒',num:true},{key:'pct',zh:'%',num:true},{key:'rc',zh:'rc'},{key:'tail',zh:'尾行'}],rows,{defaultSort:'started'});}
+function renderRuns(s){window._RUNS=s||{};var rows=Object.keys(s||{}).map(function(k){var e=s[k];return {task:k,zh:e.zh,state:e.state,started:e.started||'',elapsed:e.elapsed||0,pct:e.pct==null?'':e.pct,rc:e.rc==null?'':e.rc,tail:(e.tail||'').slice(-120)};}).filter(function(r){return r.state!=='idle';});viaMatrix($('m_runs'),[{key:'task',zh:'任務'},{key:'zh',zh:'說明'},{key:'state',zh:'狀態',lamp:true},{key:'started',zh:'開始'},{key:'elapsed',zh:'秒',num:true},{key:'pct',zh:'%',num:true},{key:'rc',zh:'rc'},{key:'tail',zh:'尾行'}],rows,{defaultSort:'started'});}
 function renderAll(){renderRail();renderMatrices();var notes=(ST.notes||[]).map(function(n){return n.lamp+' '+n.note;}).join(' · ');$('notes').textContent=notes||'GREEN';$('stamp').textContent='狀況 '+(ST.ts||'')+' · 頁 '+(SNAP?SNAP.built:'');}
 document.querySelectorAll('.tabs button').forEach(function(b){b.addEventListener('click',function(){var grp=b.parentNode;grp.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');var pfx=grp.getAttribute('data-panes');document.querySelectorAll('.pane[data-grp="'+pfx+'"]').forEach(function(p){p.classList.toggle('on',p.id===pfx+'_'+b.getAttribute('data-p'));});});});
 renderAll();boot();
@@ -973,9 +1212,9 @@ renderAll();boot();
 
 PAGE = r"""<!DOCTYPE html>
 <html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><meta name="via-csrf" content="">
-<title>VIA 輸入主控台 · 左輸入/右矩陣(批390)</title><style>__CSS__</style></head>
+<title>VIA 輸入主控台 · 左輸入/右矩陣(批390/392)</title><style>__CSS__</style></head>
 <body>
-<header class="top"><h1>VIA 輸入主控台 <small>左輸入 / 右矩陣 · 批390 · MDL139</small></h1><span id="lamp" class="lamp OFFLINE">…</span><span class="sp"></span><small id="notes"></small><small id="stamp"></small><button class="sm" id="save" type="button">儲存設定</button></header>
+<header class="top"><h1>VIA 輸入主控台 <small>左輸入 / 右矩陣 · 批390/392 · MDL139</small></h1><span id="lamp" class="lamp OFFLINE">…</span><span class="sp"></span><small id="notes"></small><small id="stamp"></small><button class="sm" id="save" type="button">儲存設定</button></header>
 <div class="wrap">
 <aside class="rail">
  <div class="tabs" data-panes="pane"><button class="on" data-p="vdf">VDF 資料</button><button data-p="vrn">VRN 報告</button><button data-p="vap">VAP 圖</button></div>
@@ -985,14 +1224,18 @@ PAGE = r"""<!DOCTYPE html>
 </aside>
 <main class="work">
  <div class="kpi" id="kpi_db"></div>
- <div class="tabs" data-panes="mx"><button class="on" data-p="db">庫狀況</button><button data-p="align">日交易×籌碼對齊</button><button data-p="codes">台股清單</button><button data-p="macro">宏觀序列</button><button data-p="vrn">VRN 跑況</button><button data-p="vap">VAP 產出</button><button data-p="items">項目冊</button><button data-p="runs">執行狀態</button></div>
- <div class="pane on" id="mx_db" data-grp="mx"><div id="m_db"></div></div>
+ <div class="tabs" data-panes="mx"><button class="on" data-p="io">輸入及運作結果</button><button data-p="intl">國際資訊(勾選增減)</button><button data-p="basic">BASIC INFO(核對態)</button><button data-p="summary">SUMMARY 矩陣</button><button data-p="fin">FINANCIAL DATA 核對</button><button data-p="db">庫狀況</button><button data-p="align">日交易×籌碼對齊</button><button data-p="codes">台股清單</button><button data-p="macro">宏觀序列</button><button data-p="vap">VAP 規格與圖</button><button data-p="ok">跑成功?</button><button data-p="runs">執行狀態</button></div>
+ <div class="pane on" id="mx_io" data-grp="mx"><div id="m_io"></div></div>
+ <div class="pane" id="mx_intl" data-grp="mx"><p class="note">現有=冊內 live;已移除=removed_*(零刪除);勾=納入、未勾=移除,按「套用勾選」入冊(鏡寫 VDF_Input_Interface_Matrix)。ENG066 11 類:<span id="intl_cats"></span></p><div id="m_intl"></div><div id="intl_out"></div></div>
+ <div class="pane" id="mx_basic" data-grp="mx"><div class="kpi" id="vrn_kpi"></div><div id="m_basic"></div></div>
+ <div class="pane" id="mx_summary" data-grp="mx"><div id="m_summary"></div></div>
+ <div class="pane" id="mx_fin" data-grp="mx"><div class="kpi" id="fin_kpi"></div><p class="note">律(批392):報告歷史值與 VDF 抓來的歷史值不同時,以 VDF 為主;無 VDF 對照=報告值(誠實標);單位差另標。</p><div id="m_fin"></div></div>
+ <div class="pane" id="mx_db" data-grp="mx"><div id="m_db"></div></div>
  <div class="pane" id="mx_align" data-grp="mx"><p class="note" id="align_note"></p><div id="m_align"></div><h3>最新日不一致清單</h3><div id="m_align2"></div></div>
  <div class="pane" id="mx_codes" data-grp="mx"><div id="m_codes"></div></div>
  <div class="pane" id="mx_macro" data-grp="mx"><div id="m_macro"></div></div>
- <div class="pane" id="mx_vrn" data-grp="mx"><div class="kpi" id="vrn_kpi"></div><div id="m_vrn"></div><h3>輸入檔</h3><div id="m_vrn_files"></div></div>
- <div class="pane" id="mx_vap" data-grp="mx"><div id="m_vap"></div></div>
- <div class="pane" id="mx_items" data-grp="mx"><div id="m_items"></div></div>
+ <div class="pane" id="mx_vap" data-grp="mx"><h3>圖規細節(40 canonical;VIA_VAP_All_Chart_Specs_v018)</h3><div id="m_vap_specs"></div><h3>圖片</h3><div class="gallery" id="m_vap_imgs"></div><h3>產出頁</h3><div id="m_vap_pages"></div></div>
+ <div class="pane" id="mx_ok" data-grp="mx"><div class="okbox" id="m_ok"></div></div>
  <div class="pane" id="mx_runs" data-grp="mx"><div id="m_runs"></div></div>
 </main>
 </div>
@@ -1006,9 +1249,9 @@ CDN_RX = re.compile(r"<(?:script|link)[^>]+(?:src|href)=[\"']https?://", re.I)
 
 def spec_lite(spec: dict) -> dict:
     """頁內嵌冊(去引擎路徑細節;保留 id/zh/params/note/lanes_default/state)"""
-    out = {"families": {}}
+    out = {"families": {}, "defaults": spec.get("defaults", {})}
     for fam, f in spec.get("families", {}).items():
-        out["families"][fam] = {"zh": f.get("zh"), "groups": [{"id": g["id"], "zh": g.get("zh"), "items": [{k: it[k] for k in ("id", "zh", "params", "note", "lanes_default", "state", "codes_style", "net") if k in it} for it in g.get("items", [])]} for g in f.get("groups", [])]}
+        out["families"][fam] = {"zh": f.get("zh"), "minimal": bool(f.get("minimal")), "groups": [{"id": g["id"], "zh": g.get("zh"), "items": [{k: it[k] for k in ("id", "zh", "params", "note", "lanes_default", "state", "codes_style", "net") if k in it} for it in g.get("items", [])]} for g in f.get("groups", [])]}
         if fam == "vrn":
             out["families"][fam]["chain_default"] = f.get("chain_default", [])
     return out
@@ -1024,7 +1267,7 @@ def build(spec: dict | None = None, out: Path = OUT_PAGE, reports: Path = REPORT
     _write_text(out, page)
     log_event("BUILD", str(out), bytes=len(page))
     if do_print:
-        print(f"[via-console build] {out}({len(page) // 1024} KB;零 CDN;樞紐 {st.get('hub')})· 看頁:via-open 主控台 · LIVE:{BRIDGE}/console")
+        print(f"[via-console build] {out}({len(page) // 1024} KB;零 CDN;樞紐 {st.get('hub')})· 看頁:via-console --open(在線=LIVE {BRIDGE}/console;否則快照)")
     return out
 
 
@@ -1063,26 +1306,31 @@ def selftest() -> int:
     spec = load_spec()
     idx = items_index(spec)
     missing = [i for i, e in idx.items() if e["item"].get("state") != "PLANNED" and not newest(VIA / e["item"]["engine"]["dir"], e["item"]["engine"]["glob"])]
-    chk("① 冊載入(三族;項目 ≥ 25;每項綁母倉現役引擎尾版;PLANNED 只財報三大報表)", len(idx) >= 25 and not missing and [i for i, e in idx.items() if e["item"].get("state") == "PLANNED"] == ["fin_statements"],
-        f"(項目 {len(idx)};引擎缺 {missing})")
-    r1 = resolve_argv(spec, "tw_history", {"start": "2024-01-01", "end": "2024-03-31"}, check_files=True)
+    gids = [g["id"] for g in spec["families"]["vdf"]["groups"]]
+    chk("① 冊載入(三族;項目 ≥ 25;每項綁母倉現役引擎尾版;PLANNED 只財報三大報表;統一起始 2023-01-01;台股除財報/月營收外無代碼參數;國際資訊群在冊)",
+        len(idx) >= 25 and not missing and [i for i, e in idx.items() if e["item"].get("state") == "PLANNED"] == ["fin_statements"] and spec["defaults"]["start"] == "2023-01-01"
+        and "intl" in gids and all("codes" not in e["item"].get("params", []) for i, e in idx.items() if e["group"] == "tw_equity") and idx["tw_revenue_codes"]["group"] == "financials",
+        f"(項目 {len(idx)};引擎缺 {missing};群 {gids})")
+    r1 = resolve_argv(spec, "tw_history", {"start": "2024-01-01", "end": "2024-03-31"})
     r2 = resolve_argv(spec, "tw_chips", {"days": "30"})
     r3 = resolve_argv(spec, "tw_revenue_codes", {"codes": "2330,2454,2330"})
-    r4 = resolve_argv(spec, "tw_need", {"codes": "2330,2454", "start": "2023-01-01"})
+    r4 = resolve_argv(spec, "tw_need", {})
     r5 = resolve_argv(spec, "vrn_fourpoint", {"codes": "2330,2454"})
     r6 = resolve_argv(spec, "tw_history", {"start": "2024-13-01"})
-    r7 = resolve_argv(spec, "tw_prices_inc", {"start": "latest"})
+    r7 = resolve_argv(spec, "tw_history", {"start": "latest"})
     r8 = resolve_argv(spec, "fin_statements", {})
     r9 = resolve_argv(spec, "vrn_firstpage", {"dir": "/nonexistent_dir_xyz"})
     r10 = resolve_argv(spec, "tw_revenue_backfill", {"since": "2023-05-15"})
     r11 = resolve_argv(spec, "macro_lanes", {})
-    chk("② 參數→argv 白名單(range 成對/days/codes 三風格 positional|--tickers|--ticker 去重/since_ym 截月/lanes 預設/latest 不帶旗標/壞日期 BAD_PARAM/PLANNED 不假跑/報告夾缺 NEED_DIR)",
+    r12 = resolve_argv(spec, "macro_fred", {})
+    chk("② 參數→argv 白名單(range 成對/days/codes 三風格去重/統一起始 2023-01-01 自動帶入 start|since/since_ym 截月/lanes 預設/latest 不帶旗標/壞日期 BAD_PARAM/PLANNED 不假跑/報告夾缺 NEED_DIR)",
         r1["ok"] and r1["argv"][-4:] == ["--start", "2024-01-01", "--end", "2024-03-31"] and r2["ok"] and r2["argv"][-2:] == ["--days", "30"]
-        and r3["ok"] and r3["argv"][-2:] == ["2330", "2454"] and r4["ok"] and r4["argv"][-4:] == ["--start", "2023-01-01", "--tickers", "2330,2454"]
+        and r3["ok"] and r3["argv"][-2:] == ["2330", "2454"] and r4["ok"] and r4["argv"][-2:] == ["--start", "2023-01-01"]
         and r5["ok"] and r5["argv"][-2:] == ["--ticker", "2330"] and "單票" in r5["note"] and not r6["ok"] and r6["state"] == "BAD_PARAM"
         and r7["ok"] and "--start" not in r7["argv"] and not r8["ok"] and r8["state"] == "PLANNED" and not r9["ok"] and r9["state"] == "NEED_DIR"
-        and r10["ok"] and r10["argv"][-2:] == ["--since", "2023-05"] and r11["ok"] and r11["argv"][-2:] == ["--lane", "L8,L9,L10,L11,L14"],
-        f"({[x['state'] for x in (r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11)]})")
+        and r10["ok"] and r10["argv"][-2:] == ["--since", "2023-05"] and r11["ok"] and r11["argv"][-2:] == ["--lane", "L8,L9,L10,L11,L14"]
+        and r12["ok"] and r12["argv"][-2:] == ["--since", "2023-01-01"] and "--only" not in r12["argv"],
+        f"({[x['state'] for x in (r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12)]})")
     series = macro_series(spec)
     ids_b = macro_ids_for(spec, ["Business"])
     ids_pl = macro_ids_for(spec, ["Prices", "Labor"])
@@ -1096,20 +1344,22 @@ def selftest() -> int:
         sp.write_text(json.dumps(spec, ensure_ascii=False), encoding="utf-8")
         s2 = load_spec(sp)
         mp = root / "matrix.json"
-        mp.write_text(INPUT_MATRIX.read_text(encoding="utf-8-sig"), encoding="utf-8") if INPUT_MATRIX.exists() else None
-        n1 = apply_set(s2, {"tw-add": "6488:TPEX", "tw-add#2": "2330", "start": "tw_history:2024-01-01", "days": "tw_chips:45", "macro-cats": "Business,Prices", "fin-period": "累計", "fin-from": "2022", "fin-to": "2026", "vrn-dir": "functional modules/VRN/input/incoming", "vap-code": "2317", "vap-formats": "svg,png"}, matrix_path=mp, mirror=INPUT_MATRIX.exists())
-        n2 = apply_set(s2, {"tw-add": "6488:TPEX", "tw-remove": "6488", "macro-cats": "Nope", "fin-period": "半年", "start": "tw_history:latest"}, matrix_path=mp, mirror=INPUT_MATRIX.exists())
+        has_mx = INPUT_MATRIX.exists()
+        if has_mx:
+            mp.write_text(INPUT_MATRIX.read_text(encoding="utf-8-sig"), encoding="utf-8")
+        n1 = apply_set(s2, {"tw-add": "6488:TPEX", "tw-add#2": "2330", "start": "tw_history:2024-01-01", "days": "tw_chips:45", "macro-cats": "Business,Prices", "fin-period": "累計", "fin-from": "2022", "fin-to": "2026", "vrn-dir": "functional modules/VRN/input/incoming", "vap-code": "2317", "vap-formats": "svg,png"}, matrix_path=mp, mirror=has_mx)
+        n2 = apply_set(s2, {"tw-add": "6488:TPEX", "tw-remove": "6488", "macro-cats": "Nope", "fin-period": "半年", "start": "tw_history:latest"}, matrix_path=mp, mirror=has_mx)
         codes = tw_codes(s2)
         u = s2["user"]
-        mir = json.loads(mp.read_text(encoding="utf-8")) if mp.exists() else None
-        chk("④ set 個別改動(TPEX 新增/焦點冊已含 2330 去重/起始日與天數逐項/宏觀類別驗證/財報期別與年起迄/VRN 夾/VAP;重複 SKIP;移除;未知類別與期別 FAIL;latest 清除;changelog 兩筆;鏡寫活冊 TW_FIN)",
-            any(n.startswith("OK:6488 入 TPEX") for n in n1) and u["tw_codes"]["TPEX"] == [] and u["starts"].get("tw_history") is None and u["days"]["tw_chips"] == 45
+        mir = json.loads(mp.read_text(encoding="utf-8")) if has_mx else None
+        chk("④ set 個別改動(TPEX 新增/焦點冊已含 2330 去重/起始日與天數逐項/宏觀類別驗證/財報期別與年起迄/VRN 夾/VAP;重複 SKIP;移除;未知類別與期別 FAIL;latest 記錄;changelog 兩筆;鏡寫活冊 TW_FIN)",
+            any(n.startswith("OK:6488 入 TPEX") for n in n1) and u["tw_codes"]["TPEX"] == [] and u["starts"].get("tw_history") == "latest" and u["days"]["tw_chips"] == 45
             and u["macro_cats"] == ["Business", "Prices"] and u["fin"] == {"period": "累計", "year_from": "2022", "year_to": "2026"} and u["vrn_dir"].endswith("incoming")
             and u["vap"]["code"] == "2317" and u["vap"]["formats"] == "svg,png" and any(n.startswith("SKIP:6488 已在") for n in n2) and any("6488 移出" in n for n in n2)
             and any(n.startswith("FAIL:未知宏觀類別") for n in n2) and any(n.startswith("FAIL:fin-period") for n in n2) and len(u["changelog"]) == 2
             and not any(c["code"] == "6488" and c["source"] == "操作員" for c in codes) and (mir is None or ("6488" in mir["sections"]["TW_FIN"].get("removed_tickers", []) or "6488" not in mir["sections"]["TW_FIN"].get("tickers", []))
                                                                                             and mir["sections"]["TW_FIN"]["period_mode"] == "累計" and mir["sections"]["TW_FIN"]["start_date"] == "2022-01-01"),
-            f"(n1 {n1[:6]};n2 {n2[:5]};user {json.dumps({k: u[k] for k in ('tw_codes', 'starts', 'days', 'fin')}, ensure_ascii=False)})")
+            f"(n1 {n1[:4]};n2 {n2[:4]})")
         c_ok = classify_report({"ticker": "2330", "report_date": "2026-09-01", "target_price": 1200.0, "price": 1000.0, "summary_head": "台積電…", "upside_state": "EXACT_MATCH_DB", "price_state": "P_CONFIRMED_DB"}, 3, 5, True)
         c_fail = classify_report({"ticker": "2330", "report_date": "2026-09-01", "target_price": 1200.0, "price": 1000.0, "summary_head": "", "upside_state": "FORMULA_MISMATCH", "price_state": "DB_NO_MATCH"}, 0, 0, False)
         c_pend = classify_report({"ticker": "2330", "report_date": "2026-09-01", "target_price": 1200.0, "price": None, "summary_head": "x", "upside_state": "SINGLE_SOURCE", "price_state": ""}, 2, 0, True)
@@ -1117,26 +1367,76 @@ def selftest() -> int:
             c_ok == {**c_ok, "basic": "OK", "summary": "OK", "financial": "VERIFIED", "overall": "GREEN"} and c_fail["financial"] == "FAIL" and c_fail["summary"] == "FAIL" and c_fail["overall"] == "RED"
             and c_pend["financial"] == "PENDING" and c_pend["overall"] == "YELLOW")
         rep_dir = root / "reports"
-        st = status(s2, do_print=False, reports=rep_dir, db_tw=root / "no.duckdb", db_gl=root / "no_gl.duckdb", hub_fn=lambda: "SNAPSHOT")
-        chk("⑥ status 結構(hub 三態/庫狀況 ENG073 快照或空誠實/台股清單 焦點冊≥100/宏觀類別 13 含計數/VRN 輸入+跑況摘要/VAP 頁/項目可跑態含 PLANNED;CONSOLE_latest.json 落檔)",
+        st = status(s2, do_print=False, reports=rep_dir, db_tw=root / "no.duckdb", db_gl=root / "no_gl.duckdb", hub_fn=lambda: "SNAPSHOT", matrix_path=mp if has_mx else None)
+        chk("⑥ status 結構(hub 三態/庫狀況 ENG073 快照或空誠實/台股清單 焦點冊≥100/宏觀類別 13 含計數/國際資訊冊列/VRN 三 TAB 容器+摘要/VAP 頁+規格 40+圖片清單/跑成功? 三族/項目可跑態含 PLANNED;CONSOLE_latest.json 落檔)",
             st["hub"] == "SNAPSHOT" and st["schema"] == "VIA.InputConsole.status.v1" and len(st["tw_codes"]) >= 100 and len(st["macro"]["categories"]) == 13
-            and all("n" in c for c in st["macro"]["categories"]) and "summary" in st["vrn"] and "reports" in st["vrn"] and len(st["vap"]["pages"]) == 3
-            and st["items"]["fin_statements"]["state"] == "PLANNED" and st["items"]["tw_history"]["state"] == "READY" and (rep_dir / "CONSOLE_latest.json").exists(),
-            f"(hub {st['hub']};表 {len(st['db']['tables'])};清單 {len(st['tw_codes'])};項目 {len(st['items'])})")
+            and all("n" in c for c in st["macro"]["categories"]) and all(k in st["vrn"] for k in ("summary", "reports", "basic", "summary_matrix", "financial")) and len(st["vap"]["pages"]) == 3
+            and len(st["vap"]["specs"]) == 40 and isinstance(st["vap"]["images"], list) and set(st["family_success"]) == {"vdf", "vrn", "vap"} and all("answer" in v for v in st["family_success"].values())
+            and st["items"]["fin_statements"]["state"] == "PLANNED" and st["items"]["tw_history"]["state"] == "READY" and st["items"]["tw_history"]["start"] == "latest" and st["items"]["tw_chips"]["start"] == "2023-01-01"
+            and len(st["intl"]) >= 14 and any(r["kind"] == "cat" for r in st["intl"]) and (rep_dir / "CONSOLE_latest.json").exists(),
+            f"(hub {st['hub']};表 {len(st['db']['tables'])};清單 {len(st['tw_codes'])};項目 {len(st['items'])};國際 {len(st['intl'])};規格 {len(st['vap']['specs'])})")
         out = root / "VIA_UI_InputConsole_v0100.html"
         build(s2, out=out, reports=rep_dir, do_print=False, st=st)
         page = out.read_text(encoding="utf-8")
         m = re.search(r'<script id="snap" type="application/json">(.*?)</script>', page, re.S)
         snap = json.loads(m.group(1).replace("<\\/", "</")) if m else None
-        chk("⑦ 頁面(零 CDN;左 rail 三族分頁+右矩陣八頁;拖曳區/選夾 webkitdirectory/全選全不選/排序篩選/進度動畫;內嵌快照 JSON 可解析;CSRF meta 契約;同源樞紐 /console 道)",
-            not CDN_RX.search(page) and 'class="rail"' in page and 'id="pane_vrn"' in page and 'id="mx_align"' in page and 'webkitdirectory' in page and 'id="drop"' in page
+        chk("⑦ 頁面(零 CDN;左 rail 三族+▶ 啟動全部 VDF/VRN 單鍵啟動;整類起始遮罩 dmask YYYY-MM-DD;右矩陣 12 頁 含國際資訊勾選/BASIC INFO/SUMMARY/FINANCIAL/VAP 規格與圖/跑成功?;拖曳區/選夾;快照 JSON;CSRF meta;樞紐道)",
+            not CDN_RX.search(page) and 'class="rail"' in page and 'id="vdf_all"' in page and 'id="vrn_go"' in page and "function dmask(" in page and "YYYY-MM-DD" in page
+            and all(f'id="mx_{k}"' in page for k in ("io", "intl", "basic", "summary", "fin", "db", "align", "codes", "macro", "vap", "ok", "runs")) and 'webkitdirectory' in page and 'id="drop"' in page
             and "全不選" in page and "viaMatrix" in page and "@keyframes mv" in page and snap is not None and snap["status"]["hub"] == "SNAPSHOT" and '<meta name="via-csrf" content="">' in page
-            and "/console_run" in page and "/console_set" in page and "/console_status" in page and "dest:'vrn_incoming'" in page and page.count("<script") == 2,
+            and "/console_run" in page and "/console_set" in page and "/console_status" in page and "/vap_img" in page and "dest:'vrn_incoming'" in page and page.count("<script") == 2,
             f"({len(page) // 1024} KB)")
+        s3 = load_spec(sp)
+        g1 = apply_set(s3, {"group-start": "tw_equity:2024-06-01", "group-start#2": "macro:latest", "group-start#3": "nope:2024-01-01", "group-start#4": "etf:2024-13-01"}, mirror=False)
+        e_tw = effective_start(s3, "tw_chips", "tw_equity")
+        e_mac = effective_start(s3, "macro_fred", "macro")
+        e_dft = effective_start(s3, "etf_universe", "etf")
+        e_item = effective_start(s3, "tw_history", "tw_equity", "2025-01-01")
+        rr = resolve_argv(s3, "tw_chips", {})
+        ni = apply_set(s3, {"intl-add": "INTL_DAILY:^FTSE", "intl-remove": "INTL_DAILY:^GSPC", "intl-item-add": "INTL_FIN:eps", "intl-add#2": "BAD:^X", "global-cats": "idx,etf", "global-cats#2": "idx,nope"}, matrix_path=mp, mirror=has_mx)
+        im = intl_matrix(s3, mp if has_mx else None)
+        chk("⑨ 統一起始/整類起始(group-start 有效群組+日期驗證;類=latest → 不帶旗標;單項/呼叫參數優先;預設 2023-01-01)+國際資訊冊增減(INTL_DAILY/INTL_FIN 零刪除鏡寫;壞冊 FAIL;ENG066 類別驗證)",
+            e_tw == "2024-06-01" and e_mac == "" and e_dft == "2023-01-01" and e_item == "2025-01-01" and rr["ok"] and "--days" not in rr["argv"]
+            and any(n.startswith("FAIL:group-start") and "nope" in n for n in g1) and any(n.startswith("FAIL:group-start") and "2024-13-01" in n for n in g1) and s3["user"]["group_starts"]["macro"] == "latest"
+            and any(n.startswith("FAIL:intl-add") and "BAD" in n for n in ni) and s3["user"]["global_cats"] == ["idx", "etf"] and any(n.startswith("FAIL:global-cats") for n in ni)
+            and (not has_mx or (any(r["id"] == "^FTSE" and r["state"] == "現有" for r in im) and any(r["id"] == "^GSPC" and r["state"] == "已移除" for r in im) and any(r["id"] == "eps" and r["kind"] == "item" and r["state"] == "現有" for r in im)))
+            and sum(1 for r in im if r["kind"] == "cat") == 11,
+            f"(tw {e_tw};macro {e_mac!r};etf {e_dft};g1 {g1[:2]};ni {ni[:3]})")
+    f1 = fin_final(1000.0, 1000.0)
+    f2 = fin_final(1000.0, 980.0)
+    f3 = fin_final(1000.0, None)
+    f4 = fin_final(None, 55.5)
+    f5 = fin_final(1234.0, 1_234_000_000.0)
+    f6 = fin_final(1234.0, 1234000.0)
+    duckdb = _duckdb()
+    tabs_ok = True
+    if duckdb:
+        c = duckdb.connect()
+        c.execute("CREATE TABLE vrn_report_basic(report_file VARCHAR, ticker VARCHAR, name_official VARCHAR, broker VARCHAR, report_date VARCHAR, rating_raw VARCHAR, target_price DOUBLE, price DOUBLE, upside_report DOUBLE, upside_calc DOUBLE, upside_state VARCHAR, title_head VARCHAR, summary_head VARCHAR, conflicts VARCHAR, extracted_at VARCHAR, price_db DOUBLE, upside_db DOUBLE, price_state VARCHAR)")
+        c.execute("INSERT INTO vrn_report_basic VALUES ('r1.pdf','2330','台積電','A','2026-09-01','BUY',1200,1000,20,20,'EXACT_MATCH_DB','標','摘要','','t',990,21.2,'P_CONFIRMED_DB'), ('r2.pdf','2454','聯發科','B','2026-08-01','HOLD',1500,1400,7,7,'FORMULA_MISMATCH','標2','','','t',NULL,NULL,'DB_NO_MATCH')")
+        c.execute("CREATE TABLE vrn_report_metrics(report_file VARCHAR, metric VARCHAR, period VARCHAR, status VARCHAR, value DOUBLE, raw_text VARCHAR)")
+        c.execute("INSERT INTO vrn_report_metrics VALUES ('r1.pdf','eps','2026','ESTIMATE',60.5,'EPS 60.5')")
+        c.execute("CREATE TABLE vrn_report_financial(report_file VARCHAR, page INTEGER, canonical VARCHAR, raw_label VARCHAR, period VARCHAR, status VARCHAR, value DOUBLE, raw_text VARCHAR)")
+        c.execute("INSERT INTO vrn_report_financial VALUES ('r1.pdf',3,'revenue','營收','2026-07','REPORT_STATED',2500,'…'), ('r1.pdf',3,'gross_margin','毛利率','2026-07','REPORT_STATED',55,'…')")
+        c.execute("CREATE TABLE tw_monthly_revenue(code VARCHAR, ym VARCHAR, revenue DOUBLE, source VARCHAR, fetched_at VARCHAR)")
+        c.execute("INSERT INTO tw_monthly_revenue VALUES ('2330','2026-07',2600,'MOPS','')")
+        tabs = vrn_tabs(c, Path("/nonexistent_zones"))
+        c.close()
+        b1 = tabs["basic"][0]
+        fin = [r for r in tabs["financial"] if r["report_file"] == "r1.pdf"]
+        price_row = [r for r in fin if r["metric"].startswith("price")][0]
+        rev_row = [r for r in fin if r["metric"] == "revenue"][0]
+        gm_row = [r for r in fin if r["metric"] == "gross_margin"][0]
+        tabs_ok = (b1["verified"] == "VERIFIED" and tabs["basic"][1]["verified"] == "FAIL" and tabs["summary_matrix"][0]["summary"] == "摘要" and price_row["final"] == 990 and price_row["rule"].startswith("不同")
+                   and rev_row["value_vdf"] == 2600 and rev_row["final"] == 2600 and rev_row["rule"].startswith("不同") and gm_row["value_vdf"] is None and gm_row["rule"].startswith("無 VDF")
+                   and tabs["reports"][0]["financial"] == "VERIFIED" and tabs["reports"][1]["financial"] == "FAIL")
+    chk("⑩ TAB 核對律(fin_final:一致/不同→VDF 歷史值為主/無 VDF 對照=報告值/報告缺=VDF/單位差 ×千/×百萬 標)+ VRN 三 TAB 建表(basic VERIFIED|FAIL;summary;financial 價/上漲/營收 vs tw_monthly_revenue;無對照誠實)",
+        f1["rule"].startswith("一致") and f1["final"] == 1000.0 and f2["final"] == 980.0 and f2["rule"].startswith("不同") and f3["final"] == 1000.0 and "無 VDF" in f3["rule"]
+        and f4["final"] == 55.5 and f5["rule"].startswith("不同") and "百萬" in f5["rule"] and "千" in f6["rule"] and tabs_ok, f"({f2};{f5['rule']};{f6['rule']};tabs {tabs_ok})")
     src = Path(__file__).read_text(encoding="utf-8")
     chk("⑧ 紀律宣告(只增不減/正本零觸碰/誠實三態/零 CDN/尾版律/Zero-Hydra/ACCEL-BRIDGE)",
         all(k in src for k in ("只增不減", "正本零觸碰", "誠實三態", "零 CDN", "尾版律", "Zero-Hydra", "ACCEL-BRIDGE")))
-    print(f"  [計] 八檢 OK {8 - len(fails)} · FAIL {len(fails)}")
+    print(f"  [計] 十檢 OK {10 - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 
 
@@ -1161,7 +1461,7 @@ def _arg(a: list, flag: str, default=None):
 def main() -> int:
     a = sys.argv[1:]
     if "--selftest" in a:
-        print("=== 輸入主控台(CGC_MDL139_InputConsole)· 八檢自測(零網路;臨時冊)===")
+        print("=== 輸入主控台(CGC_MDL139_InputConsole)· 十檢自測(零網路;臨時冊)===")
         return selftest()
     verb = next((x for x in a if x in VERBS), "build")   # 動詞白名單(旗標值不得誤判為動詞)
     as_json = "--json" in a
@@ -1189,9 +1489,9 @@ def main() -> int:
             return 0 if r["ok"] else 2
         if verb == "run":
             return run(spec, _arg(a, "--item", ""), _kv(a), dry="--dry" in a)
-        out = build(spec)
+        build(spec)
         if "--open" in a:
-            print(f"  [看頁] via-open 主控台(零跳出律;或 {BRIDGE}/console)")
+            print(f"  [看頁] via-console --open(在線=LIVE {BRIDGE}/console;否則 via-open 主控台)")
         return 0
     except FileNotFoundError as exc:
         print(f"[FAIL] 冊缺 {exc}")

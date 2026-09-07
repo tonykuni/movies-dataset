@@ -1,14 +1,15 @@
 {
  "schema": "VIA.InputConsole.v1",
  "ts": "2026-09-07",
- "policy": "批390 操作員令「左面板輸入/右面板顯示;VDF 查詢標的分類細項(總體經濟 PMI/通膨/就業…;台股 TWSE/TPEX 可新增代碼);起始日期個別可改;財報當季/累計/年度年起迄;DEFAULT 皆最新;目前資料庫狀況;日交易與籌碼數量對齊=更新股票清單並核對一致;輸出 parquet 增量+DuckDB 管理;右側矩陣篩選/大到小排列;Windows U/I 下拉/勾選/全選/全不選;VRN 資料夾拖曳輸入/啟動/互動動畫/高自動化;VRN 整體跑況 BASIC INFO/SUMMARY/FINANCIAL DATA(VERIFIED/FAIL);其他含輸入介面簡單但保留個別改動;VAP 同」。零發明:每一項目綁定母倉現役引擎與其真旗標(尾版 glob);引擎缺=誠實 PLANNED 不假跑;預設 start=latest=不帶旗標=引擎增量律;user 段=操作員個別改動(只增不減;台股代碼/財報期別鏡寫 VDF_Input_Interface_Matrix 活冊)。",
+ "policy": "批390 操作員令「左面板輸入/右面板顯示;VDF 查詢標的分類細項(總體經濟 PMI/通膨/就業…;台股 TWSE/TPEX 可新增代碼);起始日期個別可改;財報當季/累計/年度年起迄;DEFAULT 皆最新;目前資料庫狀況;日交易與籌碼數量對齊=更新股票清單並核對一致;輸出 parquet 增量+DuckDB 管理;右側矩陣篩選/大到小排列;Windows U/I 下拉/勾選/全選/全不選;VRN 資料夾拖曳輸入/啟動/互動動畫/高自動化;VRN 整體跑況 BASIC INFO/SUMMARY/FINANCIAL DATA(VERIFIED/FAIL);其他含輸入介面簡單但保留個別改動;VAP 同」。零發明:每一項目綁定母倉現役引擎與其真旗標(尾版 glob);引擎缺=誠實 PLANNED 不假跑;預設 start=latest=不帶旗標=引擎增量律;user 段=操作員個別改動(只增不減;台股代碼/財報期別鏡寫 VDF_Input_Interface_Matrix 活冊)。 批392 操作員令:「參數最小化:VRN 只透過 Windows I/O 或拖曳(檔案及資料夾)啟動就跑;台股除財報可選股票外其他抓全部;國際資訊現有哪些/增減哪些=勾選放右面板;啟動跑一切+輸入及運作結果矩陣;TAB2 BASIC INFO(核對態)/TAB3 SUMMARY 矩陣/TAB4 FINANCIAL DATA 核對(報告歷史值≠報告值時以 VDF 抓來的歷史值為主);起始時間統一 2023-01-01 至最新,可整類改起始日(YYYY-MM-DD 遮罩輸入,'-' 固定,未輸入前淺色 YYYY-MM-DD);VAP 規格細節與圖片顯示;VDF/VRN/VAP 跑成功了嗎」",
  "defaults": {
-  "start": "latest",
+  "start": "2023-01-01",
   "period": "年度",
   "days": 20,
   "vap_code": "2330",
   "vap_formats": "svg,html",
-  "vap_profile": "vap_spec_v1"
+  "vap_profile": "vap_spec_v1",
+  "start_note": "批392 統一起始 2023-01-01 → 最新;整類(群組)可改 user.group_starts[group]=YYYY-MM-DD|latest;單項 user.starts[item] 優先"
  },
  "param_kinds": {
   "range": "--start YYYY-MM-DD --end YYYY-MM-DD(成對;ENG064 律 <2022-01-01 抬升)",
@@ -31,7 +32,7 @@
    "groups": [
     {
      "id": "tw_equity",
-     "zh": "台灣股票(TWSE/TPEX;每日交易資訊+籌碼)",
+     "zh": "台灣股票(TWSE/TPEX;每日交易資訊+籌碼;全上市櫃抓全部)",
      "codes_source": {
       "listings": "tw_listings(code,name,market,yf_ticker)",
       "focus": "functional modules/VDF/VDF_TW_Focus_Universe_v0100.json",
@@ -171,27 +172,6 @@
        ]
       },
       {
-       "id": "tw_revenue_codes",
-       "zh": "月營收(指定代碼;ENG063)",
-       "engine": {
-        "dir": "functional modules/VDF/engine",
-        "glob": "VDF_ENG063_MonthlyRevenue_v*.py",
-        "verb": [
-         "run"
-        ]
-       },
-       "params": [
-        "codes"
-       ],
-       "codes_style": "positional",
-       "net": true,
-       "note": "無代碼=引擎預設 2330/2317/2454",
-       "outputs": [
-        "tw_monthly_revenue",
-        "monthly_revenue_analysis"
-       ]
-      },
-      {
        "id": "tw_need",
        "zh": "覆蓋缺口清單(ENG079 need;月粒度只列缺的)",
        "engine": {
@@ -202,14 +182,13 @@
         ]
        },
        "params": [
-        "start",
-        "codes"
+        "start"
        ],
-       "codes_style": "--tickers",
        "net": false,
        "outputs": [
         "VIA_Reports/vdf/local_db/NEED_latest.json"
-       ]
+       ],
+       "note": "全部票(批392 台股抓全部);月粒度只列缺的"
       }
      ]
     },
@@ -346,7 +325,7 @@
     },
     {
      "id": "financials",
-     "zh": "財報(當季/累計/年度;年起迄)",
+     "zh": "財報(當季/累計/年度;年起迄;唯一可選股票的台股項)",
      "items": [
       {
        "id": "fin_statements",
@@ -359,6 +338,27 @@
        "note": "誠實:母倉無現役財報擷取引擎(ENG073 冊註 tw_financial 群=PLANNED,MOPS t164sb04 候源;ENG050 financials 車道 VERIFY_PENDING);期別/年起迄先入冊(VDF_Input_Interface_Matrix TW_FIN),引擎上船即接",
        "outputs": [
         "tw_financial(PLANNED)"
+       ]
+      },
+      {
+       "id": "tw_revenue_codes",
+       "zh": "月營收(可選股票;ENG063)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG063_MonthlyRevenue_v*.py",
+        "verb": [
+         "run"
+        ]
+       },
+       "params": [
+        "codes"
+       ],
+       "codes_style": "positional",
+       "net": true,
+       "note": "無代碼=引擎預設 2330/2317/2454",
+       "outputs": [
+        "tw_monthly_revenue",
+        "monthly_revenue_analysis"
        ]
       },
       {
@@ -453,8 +453,8 @@
      ]
     },
     {
-     "id": "global",
-     "zh": "全球金融商品",
+     "id": "intl",
+     "zh": "國際資訊(現有冊=VDF_Input_Interface_Matrix INTL_DAILY/INTL_FIN;右面板「國際資訊」勾選增減;引擎 ENG066 11 類/ENG055 車道)",
      "items": [
       {
        "id": "global_universe",
@@ -496,7 +496,13 @@
         "index_valuation_proxy"
        ]
       }
-     ]
+     ],
+     "matrix_source": "functional modules/VDF/VDF_Input_Interface_Matrix_v0100.json",
+     "sections": [
+      "INTL_DAILY",
+      "INTL_FIN"
+     ],
+     "note": "冊=選錄依據(增=入 live 冊;減=軟移除入 removed_*;零刪除);ENG066 依 11 類擷取(idx/etf/us_jp/fin_reports/oil/fx/cmdty/crypto/us_macro/fed/us_fiscal_rates)"
     },
     {
      "id": "db",
@@ -597,7 +603,8 @@
      "basic": "BASIC INFO",
      "summary": "SUMMARY",
      "financial": "FINANCIAL DATA"
-    }
+    },
+    "note": "批392 參數最小化:選夾/選檔/拖曳 → 上傳 incoming → 啟動即整條鏈(首頁→入庫→財報頁→四點→頁面)"
    },
    "groups": [
     {
@@ -742,7 +749,8 @@
     "vrn_finpages",
     "vrn_fourpoint",
     "vrn_ui"
-   ]
+   ],
+   "minimal": true
   },
   "vap": {
    "zh": "VAP 視覺化",
@@ -858,6 +866,12 @@
       }
      ]
     }
+   ],
+   "specs_csv": "functional modules/GroupIndex/input/VIA_VAP_All_Chart_Specs_v018.csv",
+   "image_dirs": [
+    "VIA_Reports/vap_one",
+    "VIA_Reports/vap_stack/output",
+    "VIA_Reports/vap_stack"
    ]
   }
  },
@@ -886,6 +900,7 @@
    "config": ""
   },
   "global_cats": [],
-  "changelog": []
+  "changelog": [],
+  "group_starts": {}
  }
 }
