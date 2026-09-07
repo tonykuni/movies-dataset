@@ -110,6 +110,10 @@ PYENV
   VIA_NO_OPEN=1 python3 "$(ls "$ENG"/VDF_ENG079_LocalDbConsolidate_v*.py | sort | tail -1)" scan || true
   echo "--- ⑯ 能跑閘(批384;MDL137;家族境 python 真跑引擎自測 --fast;雲端無境=base 退路誠實黃)"
   VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL137_RunGate_v*.py | sort | tail -1)" run --fast --quiet || true
+echo "--- ⑰ 台股日交易×籌碼數量對齊核對(批390;VDF_ENG081 check;唯讀;庫缺/籌碼落後=誠實不假綠)"
+  VIA_NO_OPEN=1 python3 "$(ls "$ENG"/VDF_ENG081_UniverseAlign_v*.py | sort | tail -1)" check || true
+echo "--- ⑱ 輸入主控台頁再生(批390;MDL139 build;零 CDN;零網路)"
+  VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL139_InputConsole_v*.py | sort | tail -1)" build || true
   echo "=== 畢(誠實三態見上)==="
 } >> "$LOG" 2>&1
 exit 0

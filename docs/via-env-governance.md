@@ -282,3 +282,21 @@ via-famui vdf,vrn --open                     # 再生兩族頁面:資料架構�
 
 自測:ENG079 十三檢 13/13(協定回歸/跨庫/鍵律/台帳鍵/接點燈)、MDL137 十檢、MDL136 八檢、MDL135 31 檢;SelftestGrid v0232 第 189 站改十三檢(193 站不變)。
 
+## 十六、批390:輸入主控台——左面板輸入、右面板矩陣(`via-console`)與日交易×籌碼對齊(`via-align`)
+
+操作員令:「左面板有輸入介面,右面板是顯示介面;VDF 可新增查詢標的(總體經濟指標分 PMI/通膨/就業…;台灣股票分 TWSE/TPEX 可新增代碼);輸入項目類別拆細;起始日期個別可改;財報分當季/累計/年度、年起迄;DEFAULT 都是最新;目前資料庫狀況;台股每日交易資訊及籌碼要對齊數量,作為更新股票清單並核對一致;輸出 parquet 增量、DuckDB 管理;所有輸入介面在左側面板,右側矩陣有篩選、大到小;儘量 Windows U/I 下拉/勾選/全選/全不選;VRN 輸入可有資料夾、Windows I/O 拖曳、啟動、人機互動動畫、高自動化;VRN 要看整體跑況 BASIC INFO / SUMMARY / FINANCIAL DATA(VERIFIED/FAIL);其他含輸入介面儘量簡單但維持個別改動;VAP 也一樣」。
+
+- **冊** `VIA_InputConsole_Spec_v0100.json`:三族 37 項,每項綁母倉現役引擎與真旗標(尾版 glob):台股 ENG054 增量/ENG064 歷史(起迄)/ENG056 籌碼(天數)/ENG057/ENG081 對齊與清單/ENG063 月營收(代碼)/ENG079 need;總體經濟 ENG074 FRED(類別勾選自 `macro_ssot` 展開 `--only`,`--since`)/ENG047 細目/ENG055 車道;財報:三大報表 **PLANNED**(母倉無現役 MOPS 擷取引擎;期別/年起迄先入冊 `VDF_Input_Interface_Matrix`,引擎上船即接)、ENG075 月營收回補;ETF/全球/庫狀況(ENG073/ENG079);VRN ENG072→073→074→080→MDL138 鏈(`--dir` 報告夾);VAP ENG015/009/014/016。預設 `start=latest`=不帶旗標=引擎增量律;`user` 段=操作員個別改動(只增不減;台股代碼/期別/VRN 路徑鏡寫活冊)。
+- **引擎** `CGC_MDL139_InputConsole_v0100.py`:`status`(庫狀況=ENG073 架構冊快照+DuckDB 現值;對齊=ENG081;台股清單=焦點冊∪操作員;宏觀 13 類;VRN 跑況判準:BASIC INFO=代碼+日期+價;SUMMARY=摘要非空;FINANCIAL DATA=VERIFIED(價表核對態 EXACT/ROUNDING/DB_DERIVED 且有指標)|FAIL(公式不符/無指標)|PENDING;項目可跑態 READY/PLANNED/ENGINE_MISSING/NEED_DIR)、`set k=v`、`argv`/`run --item`(參數白名單)、`build` 頁(零 CDN)。八檢。
+- **頁** `VIA_UI_InputConsole_v0100.html`:左 rail 三族表單(下拉/勾選/全選/全不選/逐項起始日「最新」勾/拖曳區/`webkitdirectory` Windows 選夾),右 main 八矩陣(篩選、點欄排序預設大到小、勾選),進度動畫輪詢樞紐 `/status`。樞紐同源 `http://127.0.0.1:8765/console` = LIVE 可啟動;`file://` 頁 = SNAPSHOT 只看並印等價短令。
+- **橋** DeckServer v0132:`GET /console`、`/console_status`;`POST /console_run{item,params}`(冊白名單+參數逐項驗證→單一啟動道)、`/console_set{ops}`;任務冊 50→52(`console_ui`/`align`);`/status` 併列 `console:<item>`;安全模型零變(同源 CSRF POST;零 CORS)。23/23。
+- **對齊** `VDF_ENG081_UniverseAlign_v0100.py`(`via-align`):`check` 逐日核對價表票數 vs 籌碼票數(inst∪margin 經 `tw_listings.yf_ticker` 對映)→ ALIGNED/PARTIAL/MISALIGNED + 最新日差集;籌碼落後價表=誠實指路 `via-chip run`;`update --apply` → `tw_universe`(anti-join 只增)+ `mega/tw_universe_<ts>.parquet` 只含新增列。八檢。boot 鏈 +⑰ check +⑱ 建頁。
+
+```powershell
+via-reload; via-console                     # 建頁(零 CDN)
+via                                         # 帶起樞紐 8765
+start http://127.0.0.1:8765/console         # LIVE:左輸入→▶ 啟動;或 via-open 主控台(SNAPSHOT 只看)
+via-align check; via-align update --apply   # 日交易×籌碼對齊 → 更新 tw_universe
+via-console set tw-add=6488:TPEX macro-cats=Business,Prices,Labor fin-period=累計 fin-from=2022
+```
+

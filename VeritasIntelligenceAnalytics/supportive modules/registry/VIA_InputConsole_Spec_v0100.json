@@ -1,0 +1,891 @@
+{
+ "schema": "VIA.InputConsole.v1",
+ "ts": "2026-09-07",
+ "policy": "批390 操作員令「左面板輸入/右面板顯示;VDF 查詢標的分類細項(總體經濟 PMI/通膨/就業…;台股 TWSE/TPEX 可新增代碼);起始日期個別可改;財報當季/累計/年度年起迄;DEFAULT 皆最新;目前資料庫狀況;日交易與籌碼數量對齊=更新股票清單並核對一致;輸出 parquet 增量+DuckDB 管理;右側矩陣篩選/大到小排列;Windows U/I 下拉/勾選/全選/全不選;VRN 資料夾拖曳輸入/啟動/互動動畫/高自動化;VRN 整體跑況 BASIC INFO/SUMMARY/FINANCIAL DATA(VERIFIED/FAIL);其他含輸入介面簡單但保留個別改動;VAP 同」。零發明:每一項目綁定母倉現役引擎與其真旗標(尾版 glob);引擎缺=誠實 PLANNED 不假跑;預設 start=latest=不帶旗標=引擎增量律;user 段=操作員個別改動(只增不減;台股代碼/財報期別鏡寫 VDF_Input_Interface_Matrix 活冊)。",
+ "defaults": {
+  "start": "latest",
+  "period": "年度",
+  "days": 20,
+  "vap_code": "2330",
+  "vap_formats": "svg,html",
+  "vap_profile": "vap_spec_v1"
+ },
+ "param_kinds": {
+  "range": "--start YYYY-MM-DD --end YYYY-MM-DD(成對;ENG064 律 <2022-01-01 抬升)",
+  "start": "--start YYYY-MM-DD",
+  "since": "--since YYYY-MM-DD(ENG074)",
+  "since_ym": "--since YYYY-MM(ENG075)",
+  "days": "--days N(1~3650)",
+  "codes": "台股代碼冊(codes_style:positional|--tickers|--ticker)",
+  "only": "--only FRED_ID,…(由宏觀類別勾選展開;macro_ssot fred_id)",
+  "lanes": "--lane L8,L9(ENG055 車道)",
+  "cats": "--cats a,b(ENG066 全球宇宙 11 類)",
+  "dir": "--dir <資料夾>(必須存在;VRN 報告夾)",
+  "code": "stock <代碼>(ENG015 位置參數)",
+  "vapone": "--demo|--render <config> [--data <檔>] --out <夾> --formats <F> --profile <P>"
+ },
+ "families": {
+  "vdf": {
+   "zh": "VDF 資料鍛造",
+   "python": "vdf",
+   "groups": [
+    {
+     "id": "tw_equity",
+     "zh": "台灣股票(TWSE/TPEX;每日交易資訊+籌碼)",
+     "codes_source": {
+      "listings": "tw_listings(code,name,market,yf_ticker)",
+      "focus": "functional modules/VDF/VDF_TW_Focus_Universe_v0100.json",
+      "user": "user.tw_codes"
+     },
+     "items": [
+      {
+       "id": "tw_prices_inc",
+       "zh": "每日交易資訊增量(價量;全上市櫃;ENG054)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG054_TWDailyBackfill_v*.py",
+        "verb": [
+         "run"
+        ]
+       },
+       "params": [],
+       "net": true,
+       "note": "宇宙=tw_listings 全員;增量律=各票 MAX(date)-3 日重疊;無 --tickers 旗標(誠實)",
+       "outputs": [
+        "tw_daily_prices",
+        "tw_listings",
+        "mega/tw_daily_prices_<ts>.parquet"
+       ]
+      },
+      {
+       "id": "tw_history",
+       "zh": "歷史回補 2022~(ENG064;起迄可改)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG064_HistoryBackfill_v*.py",
+        "verb": [
+         "run"
+        ]
+       },
+       "params": [
+        "range"
+       ],
+       "net": true,
+       "note": "宇宙=價表既有票;checkpoint 段律;<2022-01-01 抬升(批212 終止段)",
+       "outputs": [
+        "tw_daily_prices",
+        "global_daily"
+       ]
+      },
+      {
+       "id": "tw_chips",
+       "zh": "籌碼增量(法人買賣超/融資融券;ENG056)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG056_ChipBackfill_v*.py",
+        "verb": [
+         "run"
+        ]
+       },
+       "params": [
+        "days"
+       ],
+       "net": true,
+       "note": "交易日曆=價表實際日期;day×lane checkpoint;鍵 (date,code,market)",
+       "outputs": [
+        "tw_chip_inst",
+        "tw_chip_margin",
+        "mega/tw_chip_*_<ts>.parquet"
+       ]
+      },
+      {
+       "id": "tw_chips_derive",
+       "zh": "籌碼衍生表重建(ENG056 --derive)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG056_ChipBackfill_v*.py",
+        "verb": [
+         "--derive"
+        ]
+       },
+       "params": [],
+       "net": false,
+       "outputs": [
+        "tw_chip_derived"
+       ]
+      },
+      {
+       "id": "tw_trading_value",
+       "zh": "逐股成交值增量(ENG057)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG057_TradingValueBackfill_v*.py",
+        "verb": [
+         "run"
+        ]
+       },
+       "params": [
+        "days"
+       ],
+       "net": true,
+       "outputs": [
+        "tw_trading_daily"
+       ]
+      },
+      {
+       "id": "tw_align",
+       "zh": "日交易×籌碼數量對齊核對(ENG081;唯讀)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG081_UniverseAlign_v*.py",
+        "verb": [
+         "check"
+        ]
+       },
+       "params": [
+        "days"
+       ],
+       "net": false,
+       "note": "逐日比對 tw_daily_prices 票數 vs 籌碼(inst∪margin)票數;ALIGNED/PARTIAL/MISALIGNED;ALIGN_latest.json",
+       "outputs": [
+        "VIA_Reports/vdf/universe/ALIGN_latest.json"
+       ]
+      },
+      {
+       "id": "tw_universe_update",
+       "zh": "更新股票清單(ENG081 update --apply;parquet 增量+DuckDB tw_universe)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG081_UniverseAlign_v*.py",
+        "verb": [
+         "update",
+         "--apply"
+        ]
+       },
+       "params": [],
+       "net": false,
+       "note": "最新日價表∪籌碼 ∩ tw_listings → tw_universe(asof_date,ticker,code,market,name,in_prices,in_chips,aligned);anti-join 只增",
+       "outputs": [
+        "tw_universe",
+        "mega/tw_universe_<ts>.parquet"
+       ]
+      },
+      {
+       "id": "tw_revenue_codes",
+       "zh": "月營收(指定代碼;ENG063)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG063_MonthlyRevenue_v*.py",
+        "verb": [
+         "run"
+        ]
+       },
+       "params": [
+        "codes"
+       ],
+       "codes_style": "positional",
+       "net": true,
+       "note": "無代碼=引擎預設 2330/2317/2454",
+       "outputs": [
+        "tw_monthly_revenue",
+        "monthly_revenue_analysis"
+       ]
+      },
+      {
+       "id": "tw_need",
+       "zh": "覆蓋缺口清單(ENG079 need;月粒度只列缺的)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG079_LocalDbConsolidate_v*.py",
+        "verb": [
+         "need"
+        ]
+       },
+       "params": [
+        "start",
+        "codes"
+       ],
+       "codes_style": "--tickers",
+       "net": false,
+       "outputs": [
+        "VIA_Reports/vdf/local_db/NEED_latest.json"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "macro",
+     "zh": "總體經濟指標(依類別勾選;FRED)",
+     "series_source": "functional modules/VDF/references/intake/VIA_VDF_SSOT_b360/macro_ssot.json",
+     "categories": [
+      {
+       "id": "Business",
+       "zh": "PMI/景氣(ISM 製造/服務、區域聯儲、領先指標)"
+      },
+      {
+       "id": "Prices",
+       "zh": "通膨/物價(CPI/PCE/PPI/預期)"
+      },
+      {
+       "id": "Labor",
+       "zh": "就業/勞動(非農、失業率、初領、JOLTS、工資)"
+      },
+      {
+       "id": "Growth",
+       "zh": "成長/GDP(工業生產、耐久財、Nowcast)"
+      },
+      {
+       "id": "Consumer",
+       "zh": "消費(零售、所得、儲蓄、信用)"
+      },
+      {
+       "id": "Housing",
+       "zh": "房市(新屋、成屋、房價、房貸)"
+      },
+      {
+       "id": "Fiscal",
+       "zh": "財政(赤字、債務)"
+      },
+      {
+       "id": "Fed",
+       "zh": "聯準會(政策利率、資產負債表、貨幣供給)"
+      },
+      {
+       "id": "Rates",
+       "zh": "利率/殖利率(國庫券、曲線、實質利率、利差)"
+      },
+      {
+       "id": "Trade",
+       "zh": "貿易(進出口、貿易差額)"
+      },
+      {
+       "id": "FinCond",
+       "zh": "金融條件(FCI、SLOOS)"
+      },
+      {
+       "id": "Sentiment",
+       "zh": "情緒(消費者信心、AAII、CNN)"
+      },
+      {
+       "id": "Global",
+       "zh": "全球央行/OECD(ECB/BOJ/BOE/OECD 領先)",
+       "themes": [
+        "Global",
+        "ECB",
+        "BOJ",
+        "BOE",
+        "OECD"
+       ]
+      }
+     ],
+     "items": [
+      {
+       "id": "macro_fred",
+       "zh": "FRED 宏觀序列擷取(ENG074;依勾選類別 --only;起始 --since)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG074_FredMacroSSOT_v*.py",
+        "verb": [
+         "run"
+        ]
+       },
+       "params": [
+        "only",
+        "since"
+       ],
+       "net": true,
+       "note": "需 FRED_API_KEY(env 或 mega/.fred_api_key);無勾選=全冊;增量=DONE 序列 max_date-45d 修訂窗",
+       "outputs": [
+        "us_macro",
+        "macro_series_registry",
+        "mega/macro/fred/<id>.parquet"
+       ]
+      },
+      {
+       "id": "macro_detail",
+       "zh": "美國細目冊(ENG047;就業/通膨細目/PMI;--start)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG047_USMacroDetailFetcher*.py",
+        "verb": [
+         "--fetch"
+        ]
+       },
+       "params": [
+        "start"
+       ],
+       "net": true,
+       "note": "冊 VDF_USMacro_Detail_Fetch_Roster(employment_labor 23/inflation_detail 15/pmi 5);輸出 output_hub/usmacro",
+       "outputs": [
+        "output_hub/usmacro/*.parquet"
+       ]
+      },
+      {
+       "id": "macro_lanes",
+       "zh": "跨區宏觀/情緒/台灣利率車道(ENG055 L8 us_macro/L9 cross_macro/L10 tw_rates/L11 sentiment/L14 eurostat)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG055_OmniFetch_v*.py",
+        "verb": [
+         "run"
+        ]
+       },
+       "params": [
+        "lanes"
+       ],
+       "lanes_default": "L8,L9,L10,L11,L14",
+       "net": true,
+       "outputs": [
+        "us_macro",
+        "cross_macro",
+        "tw_rates_cbc",
+        "sentiment_daily"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "financials",
+     "zh": "財報(當季/累計/年度;年起迄)",
+     "items": [
+      {
+       "id": "fin_statements",
+       "zh": "三大報表(損益/資產負債/現金流;MOPS)",
+       "state": "PLANNED",
+       "params": [
+        "period",
+        "years"
+       ],
+       "note": "誠實:母倉無現役財報擷取引擎(ENG073 冊註 tw_financial 群=PLANNED,MOPS t164sb04 候源;ENG050 financials 車道 VERIFY_PENDING);期別/年起迄先入冊(VDF_Input_Interface_Matrix TW_FIN),引擎上船即接",
+       "outputs": [
+        "tw_financial(PLANNED)"
+       ]
+      },
+      {
+       "id": "tw_revenue_backfill",
+       "zh": "月營收史深回補(ENG075;--since YYYY-MM)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG075_MonthlyRevenueBackfill_v*.py",
+        "verb": [
+         "run"
+        ]
+       },
+       "params": [
+        "since_ym"
+       ],
+       "net": true,
+       "note": "MOPS t21sc03 新→舊月游標;anti-join (code,ym)",
+       "outputs": [
+        "tw_monthly_revenue"
+       ]
+      },
+      {
+       "id": "estimate_bands",
+       "zh": "分析師估值快照(ENG059)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG059_EstimateBands_v*.py",
+        "verb": [
+         "run"
+        ]
+       },
+       "params": [],
+       "net": true,
+       "outputs": [
+        "output_hub/estimate_bands"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "etf",
+     "zh": "主動 ETF",
+     "items": [
+      {
+       "id": "etf_universe",
+       "zh": "主動 ETF 宇宙日更(ENG077)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG077_ActiveETFUniverse_v*.py",
+        "verb": [
+         "run"
+        ]
+       },
+       "params": [],
+       "net": true,
+       "outputs": [
+        "ActiveTWETF.duckdb::active_tw_etf_universe"
+       ]
+      },
+      {
+       "id": "etf_holdings_daily",
+       "zh": "持股史深日更(ENG078 daily)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG078_ActiveETFHoldingsHistory_v*.py",
+        "verb": [
+         "daily"
+        ]
+       },
+       "params": [],
+       "net": true,
+       "outputs": [
+        "ActiveTWETF.duckdb::holdings_daily"
+       ]
+      },
+      {
+       "id": "etf_revenue",
+       "zh": "ETF×月營收動能(ENG076)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG076_ETFRevenueMomentum_v*.py",
+        "verb": [
+         "run"
+        ]
+       },
+       "params": [],
+       "net": false,
+       "outputs": [
+        "etf_revenue_momentum"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "global",
+     "zh": "全球金融商品",
+     "items": [
+      {
+       "id": "global_universe",
+       "zh": "全球宇宙擷取(ENG066;11 類;起迄可改)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG066_GlobalUniverse_v*.py",
+        "verb": [
+         "run"
+        ]
+       },
+       "params": [
+        "range",
+        "cats"
+       ],
+       "net": true,
+       "outputs": [
+        "global_daily"
+       ]
+      },
+      {
+       "id": "global_lanes",
+       "zh": "全球車道(ENG055 L5 etf_stats/L6 global/L7 idx_val)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG055_OmniFetch_v*.py",
+        "verb": [
+         "run"
+        ]
+       },
+       "params": [
+        "lanes"
+       ],
+       "lanes_default": "L5,L6,L7",
+       "net": true,
+       "outputs": [
+        "etf_stats_daily",
+        "global_daily",
+        "index_valuation_proxy"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "db",
+     "zh": "目前資料庫狀況(parquet 增量 · DuckDB 管理)",
+     "status_source": {
+      "arch": "supportive modules/registry/VIA_VDFArchitecture_v0100.json",
+      "align": "VIA_Reports/vdf/universe/ALIGN_latest.json",
+      "coverage": "VIA_Reports/vdf/local_db/COVERAGE_latest.json",
+      "localdb": "VIA_Reports/vdf/local_db/RUN_latest.json"
+     },
+     "items": [
+      {
+       "id": "db_arch",
+       "zh": "資料架構矩陣重建(ENG073 build;表列數/最新日/滯後)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG073_DataArchitecture_v*.py",
+        "verb": [
+         "build"
+        ]
+       },
+       "params": [],
+       "net": false,
+       "outputs": [
+        "VIA_VDFArchitecture_v0100.json",
+        "VIA_UI_VDFArchitecture_v0100.html"
+       ]
+      },
+      {
+       "id": "db_coverage",
+       "zh": "覆蓋摘要(ENG079 coverage;票×年)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG079_LocalDbConsolidate_v*.py",
+        "verb": [
+         "coverage"
+        ]
+       },
+       "params": [],
+       "net": false,
+       "outputs": [
+        "VIA_Reports/vdf/local_db/COVERAGE_latest.json"
+       ]
+      },
+      {
+       "id": "db_localdb_scan",
+       "zh": "本機三庫盤點(ENG079 scan;唯讀)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG079_LocalDbConsolidate_v*.py",
+        "verb": [
+         "scan"
+        ]
+       },
+       "params": [],
+       "net": false,
+       "outputs": [
+        "VIA_Reports/vdf/local_db/RUN_latest.json"
+       ]
+      },
+      {
+       "id": "db_localdb_apply",
+       "zh": "本機三庫整併寫入(ENG079 run --apply;只補缺鍵)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG079_LocalDbConsolidate_v*.py",
+        "verb": [
+         "run",
+         "--apply"
+        ]
+       },
+       "params": [],
+       "net": false,
+       "outputs": [
+        "tw_daily_prices",
+        "tw_chips_daily",
+        "tw_rest_daily",
+        "正典表(協定檔)"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  "vrn": {
+   "zh": "VRN 研究報告",
+   "python": "vrn",
+   "input": {
+    "dir_default": "functional modules/VRN/input_reports",
+    "incoming": "functional modules/VRN/input/incoming",
+    "intake_dest": "vrn_incoming",
+    "extensions": [
+     ".pdf",
+     ".docx"
+    ],
+    "sidecars": "VIA_Reports/first_page_text",
+    "stage_labels": {
+     "basic": "BASIC INFO",
+     "summary": "SUMMARY",
+     "financial": "FINANCIAL DATA"
+    }
+   },
+   "groups": [
+    {
+     "id": "pipeline",
+     "zh": "管線(啟動=依序;資料夾可改)",
+     "items": [
+      {
+       "id": "vrn_firstpage",
+       "zh": "① 首頁文字擷取(ENG072;--dir)",
+       "engine": {
+        "dir": "functional modules/VRN",
+        "glob": "VRN_ENG072_FirstPageText_v*.py",
+        "verb": [
+         "run"
+        ]
+       },
+       "params": [
+        "dir"
+       ],
+       "net": false,
+       "outputs": [
+        "VIA_Reports/first_page_text/<stem>.json"
+       ]
+      },
+      {
+       "id": "vrn_structdb",
+       "zh": "② 基本資訊+摘要+指標入庫(ENG073;BASIC INFO/SUMMARY;價表核對)",
+       "engine": {
+        "dir": "functional modules/VRN",
+        "glob": "VRN_ENG073_ReportStructuredDB_v*.py",
+        "verb": [
+         "run"
+        ]
+       },
+       "params": [],
+       "net": false,
+       "outputs": [
+        "vrn_report_basic",
+        "vrn_report_metrics"
+       ]
+      },
+      {
+       "id": "vrn_finpages",
+       "zh": "③ 財報頁表格擷取(ENG074;FINANCIAL DATA;--dir)",
+       "engine": {
+        "dir": "functional modules/VRN",
+        "glob": "VRN_ENG074_FinancialPages_v*.py",
+        "verb": [
+         "run"
+        ]
+       },
+       "params": [
+        "dir"
+       ],
+       "net": false,
+       "outputs": [
+        "vrn_report_financial"
+       ]
+      },
+      {
+       "id": "vrn_fourpoint",
+       "zh": "④ 一題四點文摘+潛在上漲空間(ENG080)",
+       "engine": {
+        "dir": "functional modules/VRN",
+        "glob": "VRN_ENG080_FourPointDigest_v*.py",
+        "verb": [
+         "run"
+        ]
+       },
+       "params": [
+        "codes"
+       ],
+       "codes_style": "--ticker",
+       "net": false,
+       "outputs": [
+        "vrn_four_point_digest",
+        "VIA_Reports/vrn/four_point/DIGEST_latest.html"
+       ]
+      },
+      {
+       "id": "vrn_markdown",
+       "zh": "文件→Markdown(ENG075;--dir)",
+       "engine": {
+        "dir": "functional modules/VRN",
+        "glob": "VRN_ENG075_DocToMarkdown_v*.py",
+        "verb": [
+         "run"
+        ]
+       },
+       "params": [
+        "dir"
+       ],
+       "net": false,
+       "outputs": [
+        "VIA_Reports/md_out"
+       ]
+      },
+      {
+       "id": "vrn_digest",
+       "zh": "摘要矩陣批跑(vrn_report_digest;--dir;不開頁)",
+       "engine": {
+        "dir": "functional modules/VRN",
+        "glob": "vrn_report_digest_v*.py",
+        "verb": [
+         "--no-open"
+        ]
+       },
+       "params": [
+        "dir"
+       ],
+       "net": false,
+       "outputs": [
+        "VIA_Reports/digest_runs/DIGEST_<ts>/Digest_Matrix.json"
+       ]
+      },
+      {
+       "id": "vrn_ui",
+       "zh": "VRN 頁面再生(MDL138 控制塔/每日觀察/一題四點)",
+       "engine": {
+        "dir": "supportive modules/registry",
+        "glob": "CGC_MDL138_FamilyUI_v*.py",
+        "verb": [
+         "run",
+         "--family",
+         "vrn"
+        ],
+        "python": "base"
+       },
+       "params": [],
+       "net": false,
+       "outputs": [
+        "VIA_UI_VRNControlTower_v0100.html",
+        "VIA_UI_DailyBrief_v0100.html"
+       ]
+      }
+     ]
+    }
+   ],
+   "chain_default": [
+    "vrn_firstpage",
+    "vrn_structdb",
+    "vrn_finpages",
+    "vrn_fourpoint",
+    "vrn_ui"
+   ]
+  },
+  "vap": {
+   "zh": "VAP 視覺化",
+   "python": "vap",
+   "groups": [
+    {
+     "id": "charts",
+     "zh": "圖組/儀表板(簡輸入;保留個別改動)",
+     "items": [
+      {
+       "id": "vap_stack",
+       "zh": "Seaborn 垂直圖組(ENG015 stock <代碼>)",
+       "engine": {
+        "dir": "functional modules/VAP/engine",
+        "glob": "VAP_ENG015_SeabornStackBridge_v*.py",
+        "verb": [
+         "stock"
+        ]
+       },
+       "params": [
+        "code"
+       ],
+       "net": false,
+       "outputs": [
+        "VIA_Reports/vap_stack/output",
+        "VIA_UI_VapStack_v0100.html"
+       ]
+      },
+      {
+       "id": "vap_heatmap",
+       "zh": "族群熱力圖(ENG015 heatmap)",
+       "engine": {
+        "dir": "functional modules/VAP/engine",
+        "glob": "VAP_ENG015_SeabornStackBridge_v*.py",
+        "verb": [
+         "heatmap"
+        ]
+       },
+       "params": [],
+       "net": false,
+       "outputs": [
+        "VIA_Reports/vap_stack/output"
+       ]
+      },
+      {
+       "id": "vap_dashboard",
+       "zh": "儀表板(ENG009;2330/2317/2454 內嵌實料)",
+       "engine": {
+        "dir": "functional modules/VAP/engine",
+        "glob": "VAP_ENG009_DashboardUI_v*.py",
+        "verb": [
+         "run"
+        ]
+       },
+       "params": [],
+       "net": false,
+       "outputs": [
+        "VIA_UI_Dashboard_v0100.html"
+       ]
+      },
+      {
+       "id": "vap_std_dashboard",
+       "zh": "標準儀表板三頁(ENG014;Plotly 內嵌)",
+       "engine": {
+        "dir": "functional modules/VAP/engine",
+        "glob": "VAP_ENG014_StdDashboardTemplate_v*.py",
+        "verb": [
+         "run"
+        ]
+       },
+       "params": [],
+       "net": false,
+       "outputs": [
+        "VIA_UI_StdDashboard_v0100.html"
+       ]
+      },
+      {
+       "id": "vap_one_demo",
+       "zh": "VAP ONE 示範堆圖(ENG016 --demo;--out/--formats/--profile 可改)",
+       "engine": {
+        "dir": "functional modules/VAP/engine",
+        "glob": "VAP_ENG016_AutoplotOne_v*.py",
+        "verb": [
+         "--demo"
+        ]
+       },
+       "params": [
+        "vapone"
+       ],
+       "net": false,
+       "outputs": [
+        "<out>/RUN_<ts>/vap_one.svg|html"
+       ]
+      },
+      {
+       "id": "vap_one_render",
+       "zh": "VAP ONE 依 config 出圖(ENG016 --render;--data 可指 parquet/csv)",
+       "engine": {
+        "dir": "functional modules/VAP/engine",
+        "glob": "VAP_ENG016_AutoplotOne_v*.py",
+        "verb": [
+         "--render"
+        ]
+       },
+       "params": [
+        "vapone"
+       ],
+       "net": false,
+       "outputs": [
+        "<out>/RUN_<ts>/vap_one.*",
+        "<out>/vap_one_ledger.jsonl"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "user": {
+  "tw_codes": {
+   "TWSE": [],
+   "TPEX": []
+  },
+  "starts": {},
+  "days": {},
+  "macro_cats": [],
+  "macro_since": "latest",
+  "fin": {
+   "period": "年度",
+   "year_from": "",
+   "year_to": ""
+  },
+  "vrn_dir": "",
+  "vrn_chain": [],
+  "vap": {
+   "code": "2330",
+   "formats": "svg,html",
+   "profile": "vap_spec_v1",
+   "out": "VIA_Reports/vap_one",
+   "data": "",
+   "config": ""
+  },
+  "global_cats": [],
+  "changelog": []
+ }
+}

@@ -241,6 +241,22 @@
      "engine_glob": "supportive modules/registry/CGC_MDL138_FamilyUI_v*.py",
      "data": "VIA_Reports/ui/FAMILY_UI_latest.json · FAMILY_UI_latest.html(索引;file:// 真連結)· logs/family_ui.log",
      "note": "批388 操作員令「若能跑 vdf vrn 的 u/i」:冊=母倉現役產生器(vdf:ENG073 資料架構/MDL120 系統總台;vrn:ENG079 控制塔/ENG068 每日觀察/ENG080 一題四點;vap:ENG009/ENG014)+靜態頁(VDF Fetch ONE/MDL501/VisualLock/VAP ONE);判準=rc0+頁新鮮(mtime≥起跑)+零 CDN;資料側 rc≠0=YELLOW;FAIL=RED;樞紐 8765 LIVE/SNAPSHOT 誠實;頁面只走 via-open 瀏覽器道(via-open VDF/VRN/四點/家族)"
+    },
+    {
+     "id": "GOV-23",
+     "zh": "輸入主控台(左輸入/右矩陣;VDF 查詢標的分類細項/起始日/財報期別/庫狀況;VRN 資料夾拖曳與整體跑況;VAP 簡輸入)",
+     "verb": "via-console",
+     "engine_glob": "supportive modules/registry/CGC_MDL139_InputConsole_v*.py",
+     "data": "VIA_InputConsole_Spec_v0100.json(冊+user 個別改動)· VIA_UI_InputConsole_v0100.html(零 CDN)· VIA_Reports/console/CONSOLE_latest.json · logs/input_console.log",
+     "note": "批390 操作員令:每項目綁母倉現役引擎與真旗標(尾版 glob),引擎缺=誠實 PLANNED(財報三大報表候 MOPS);預設 start=latest=不帶旗標=引擎增量律;宏觀類別自 macro_ssot 展開 --only;台股代碼 TWSE/TPEX 可增(鏡寫 VDF_Input_Interface_Matrix);樞紐 /console LIVE 可啟動(POST /console_run 冊白名單+參數驗證;/console_set 入冊),file:// 頁 SNAPSHOT 只看並印等價短令;VRN 拖曳/選夾→/intake dest=vrn_incoming→整條鏈啟動→跑況 BASIC INFO/SUMMARY/FINANCIAL DATA(VERIFIED/FAIL/PENDING)"
+    },
+    {
+     "id": "GOV-24",
+     "zh": "台股日交易×籌碼數量對齊與股票清單更新(parquet 增量+DuckDB tw_universe)",
+     "verb": "via-align",
+     "engine_glob": "functional modules/VDF/engine/VDF_ENG081_UniverseAlign_v*.py",
+     "data": "VIA_Reports/vdf/universe/ALIGN_latest.json · UNIVERSE_latest.json · output_hub/mega/tw_universe_<ts>.parquet · DuckDB tw_universe",
+     "note": "批390:逐日核對 tw_daily_prices 票數 vs 籌碼(tw_chip_inst∪tw_chip_margin;code+market→tw_listings.yf_ticker)ALIGNED/PARTIAL/MISALIGNED;籌碼落後價表=誠實指路 via-chip run;update --apply=最新日 價∪籌碼 ∩ 冊 → tw_universe anti-join 只增 + parquet 只含新增列;正本零觸碰"
     }
    ]
   }
