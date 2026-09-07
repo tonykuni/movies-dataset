@@ -44,6 +44,7 @@ pwsh -File "VeritasIntelligenceAnalytics\Install-VIA.ps1"     # 加 -AutoStart �
 | `via-rungate` | **VDF/VRN/VAP 能跑閘 MDL137(批384)**:「能跑」=家族境 python(`via_vdf_312`/`via_vrn_312`/`via_vap_312`;MDL136 解析)逐庫 import + SelftestGrid 家族站真跑(`--fast` 每族 3 站/預設 8/`--all`;`--family vdf,vrn,vap`);RED=引擎 FAIL、YELLOW=base 退路或必要庫缺;`status` 看上次;鏈路燈(DeckServer v0129 任務冊家族路由=ParallelLanes/CompletionAutomator/MasterControl 同律) |
 | `via-py` | 家族境 python 通用啟動器(批384):`via-py vdf "functional modules\VDF\engine\VDF_ENG064_HistoryBackfill_v0108.py" --status`;境缺=base 退路印黃 |
 | `via-vrn4` | **研報一題四點文摘 VRN_ENG080(批386)**:標題+K1 潛在上漲空間(目標價 報告正文>VRN_SSOT 多值不平均;最新 adj close;**報告日在除權息前=目標價後向因子鏈同口徑調整**;另存批240 報告時上漲)+K2 稀釋 EPS n～n+3 YoY 主要原因+K3/K4 首頁其餘對半+K5 風險可空;quote-or-abstain、novel numbers QC;`run [--ticker X]`/`show <ticker>`;落 `vrn_four_point_digest` 與 `VIA_Reports/vrn/four_point/DIGEST_latest.html` |
+| `via-famui` | **家族 U/I 再生閘 MDL138(批388)**:`via-famui vdf|vrn|vap|all [--open]`,以家族境 python 真跑頁面產生器(vdf:資料架構矩陣+系統總台;vrn:控制塔+每日觀察+一題四點;vap:儀表板×2)+靜態頁,判準=rc0+頁新鮮+零 CDN;索引 `VIA_Reports/ui/FAMILY_UI_latest.html`;`via-vdfui`/`via-vrnui` 別名;`via-open VDF` / `via-open VRN` / `via-open 四點` / `via-open 家族` |
 | `via-bridge` | **Command Bridge**:一鍵前後端對接——後端 B1-B5 探測(接線/SSOT/依賴/資料庫/UI)+ test/debug 三輪 + 多 TAB 前端,首頁=總覽+全系統狀態矩陣(每跑必重生=當下真相) |
 | `via-trinity` | 功能三系整合模板:VIA 母刊頭 > 鍛 VDF/研 VRN/鑑 VAP 四 TAB(Porcelain;22 個 {{…}} 資料綁定槽) |
 | `via-workops` | **WorkOps 指揮板**:一支到底=唯讀掃描+控管表自動對帳+兩頁指揮板(①專案指揮 ②追蹤哨,≥3 天未回主動跳出);`ui` 開靜態儀表板;`Scan\|Reconcile\|Draft\|FollowUp\|Templates\|All` 走引擎非互動面 |

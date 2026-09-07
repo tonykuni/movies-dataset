@@ -249,3 +249,17 @@ via-reload
 via-rungate --family vrn --approve-install
 via-rungate --family vrn; via-vrn4; via-vrn4 show 2330
 ```
+
+## 十四、批388:VDF/VRN 的 U/I 能跑(`via-famui`)
+
+操作員令「若能跑 vdf vrn 的 u/i」。「U/I 能跑」的誠實定義:以家族境 python 真跑母倉現役的頁面產生器,產物頁在位且本次新鮮、零 CDN,再由 `via-open`(瀏覽器道,零跳出)開啟。
+
+- 冊(尾版 glob):vdf = ENG073 資料架構矩陣、MDL120 系統總台(六主體;base 先跑,缺庫才退家族境);vrn = ENG079 控制塔、ENG068 每日觀察摘要、ENG080 一題四點(資料閘:報告表缺=YELLOW);vap = ENG009/ENG014 儀表板;靜態頁 VDF Fetch ONE、MDL501 控制器、VRN VisualLock 側欄、VAP ONE。
+- 判定:產生器 rc≠0 且無頁=RED;資料側/頁未更新/靜態缺=YELLOW;全新鮮=GREEN。樞紐 127.0.0.1:8765 在聽=LIVE(系統總台可從樞紐重取),否則 SNAPSHOT(頁內嵌快照,誠實)。
+- 索引 `VIA_Reports/ui/FAMILY_UI_latest.html` 以 file:// 真連結列所有頁;`via-open 家族` 一鍵開索引,`via-open VDF` / `via-open VRN` / `via-open 四點` 直開單頁。總控台任務冊 +`ui_vdf`/`ui_vrn`,MasterControl 頁按鈕同律。
+
+```powershell
+via-reload; via-famui vdf,vrn --open      # 再生 VDF/VRN 頁 + 開索引
+via-open VDF; via-open VRN; via-open 四點  # 直開單頁
+via                                        # 樞紐 8765 帶起後再 via-famui 即 LIVE
+```

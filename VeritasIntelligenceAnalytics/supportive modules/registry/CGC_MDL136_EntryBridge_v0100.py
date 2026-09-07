@@ -439,6 +439,7 @@ def plan(do_print: bool = True, quiet: bool = False) -> list:
         ("via-envgov", "環境治理全景(唯讀 run --offline;digest 25 行)", "READY" if "EnvGov" not in L or L["EnvGov"]["lamp"] == "GREY" else "DONE"),
         ("via-envgov apply --approve --only-kind REPAIR_BASE", "base 補 manifest 缺件(duckdb/pyarrow/plotly…;非破壞;鏡像鏈 Tsinghua→Aliyun→PyPI)", "READY" if mm else "SKIP(manifest 齊)"),
         ("via-rungate", "能跑閘(批384):家族境 python(via_vdf_312/via_vrn_312/via_vap_312)逐庫 import + 真跑引擎自測;RED=有引擎跑不起來;YELLOW=base 退路", "READY" if "RunGate" not in L or L["RunGate"]["lamp"] == "GREY" else "DONE"),
+        ("via-famui vdf,vrn --open", "家族 U/I 再生閘(批388):家族境 python 真跑 VDF/VRN 頁面產生器→頁新鮮/零 CDN→索引一鍵開(via-open VDF/VRN/四點/家族)", "READY"),
         ("via-vdfdb scan", "本機三庫(prices/chips/rest)盤點+路由計畫(唯讀;檔冊 sha 已入冊=跳過)", "READY"),
         ("via-vdfdb run --apply", "COPY_ONLY anti-join 入正典 DuckDB(只補缺鍵;原件不刪不搬)", "PENDING(先 scan)"),
         ("via-vdfdb ckpt", "ENG064 checkpoint 自庫重建=已有年段/檔永不重抓", "PENDING(先 run --apply)"),
@@ -508,8 +509,8 @@ def selftest() -> int:
     chk("⑥ 短指令冊(母倉∪Grok;名稱唯一;撞名列 -grok)", len(rows) >= 60 and len(names) == len(set(names))
         and any(r["state"].startswith("撞名改名") for r in rows if r["owner"] == "GROK"), f"({len(rows)} 令)")
     pl = plan(do_print=False)
-    chk("⑦ 一貼即用次序(≥12 步;含 envgov/REPAIR_BASE/rungate/vdfdb/ckpt/vapone/矩陣/webconsole)",
-        len(pl) >= 12 and all(any(k in r["cmd"] for r in pl) for k in ("via-envgov", "REPAIR_BASE", "via-rungate", "via-vdfdb", "ckpt", "via-vapone", "矩陣", "via-webconsole")))
+    chk("⑦ 一貼即用次序(≥13 步;含 envgov/REPAIR_BASE/rungate/famui/vdfdb/ckpt/vapone/矩陣/webconsole)",
+        len(pl) >= 13 and all(any(k in r["cmd"] for r in pl) for k in ("via-envgov", "REPAIR_BASE", "via-rungate", "via-famui", "via-vdfdb", "ckpt", "via-vapone", "矩陣", "via-webconsole")))
     src = Path(__file__).read_text(encoding="utf-8")
     chk("⑧ 紀律宣告(只增不減/原件零觸碰/誠實三態/零 CDN/尾版律/ACCEL-BRIDGE)",
         all(k in src for k in ("只增不減", "原件零觸碰", "誠實三態", "零 CDN", "尾版律", "ACCEL-BRIDGE")))
