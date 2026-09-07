@@ -556,7 +556,7 @@ def panorama(envs: list[dict], workers: int = 20, task_timeout: int = 120, quiet
         spin, last = 0, 0.0
         while not stop.is_set():
             if tty:
-                sys.stdout.write("\r" + _bar_line(done_n[0], total, t0, active, spin) + "   ")
+                sys.stdout.write("\r" + _bar_line(done_n[0], total, t0, active, spin).ljust(110))
                 sys.stdout.flush()
             elif not quiet and time.time() - last > 3:
                 print(_bar_line(done_n[0], total, t0, active, spin), flush=True)
@@ -572,7 +572,7 @@ def panorama(envs: list[dict], workers: int = 20, task_timeout: int = 120, quiet
     stop.set()
     th.join(timeout=1)
     if tty:
-        sys.stdout.write("\r" + _bar_line(done_n[0], total, t0, set(), 0) + "\n")
+        sys.stdout.write("\r" + _bar_line(done_n[0], total, t0, set(), 0).ljust(110) + "\n")
     scans = []
     for env in envs:
         p = results.get(env["name"], {})
@@ -842,6 +842,8 @@ def analyze_via_envs(scans: list[dict], baseline: dict) -> list[dict]:
                 row["notes"].append(f"via_core 白名單外 {len(off)} 件 → 依家族改道:" + ", ".join(f"{p}→{fidx.get(p, '?')}" for p in off[:6]))
         if s.get("dup") and row["status"] == "OK":
             row["status"] = "WARN"
+        if "__rb" in name:
+            row["notes"].append("旁建候換境(MDL050 via-rebuild 驗綠後切換候裁;原境不動)")
         rows.append(row)
     return rows
 
@@ -1648,13 +1650,19 @@ def make_digest(run: dict) -> list[str]:
     ba = run.get("base_analysis", {})
     plan = run.get("plan", {"stages": []})
     conflicts = run.get("conflicts", [])
-    L = [f"=== VIA 環境治理 digest · MDL135 v{VERSION} · {run.get('ts')} · 裁決 {run.get('verdict')} · 模式 {run.get('mode')} ==="]
+    L = [f"=== VIA 環境治理 digest · MDL135 v{VERSION} · {run.get('ts')} · 裁決 {run.get('verdict')} · 模式 {run.get('mode')} · 境 {len(scans)} ==="]
+    ok_names = []
     for s in scans:
         n = s["env"]["name"]
         st = "BROKEN" if not s.get("ok") else ("REBUILD" if s.get("conflicts") else "OK")
         if n == "BASE":
             st = "RED" if ba.get("blocked_present") else ("YELLOW" if ba.get("extras") or ba.get("manifest_missing") else "GREEN")
+        elif st == "OK":
+            ok_names.append(n)  # 24 境實錄:OK 境收攏一行,保住拉出/段冊/LKGC/下一指令
+            continue
         L.append(f"  [{LAMP.get(st, LAMP.get('GREEN' if st == 'OK' else 'RED'))} {st:7s}] {n:22s} py{s.get('python', '?'):8s} 件 {_ndists(s):4d} · 快篩 {s.get('check_tool', '?'):7s} · 衝突 {len(s.get('conflicts', []))}")
+    if ok_names:
+        L.append(f"  [{LAMP['GREEN']} OK     ] 其餘 {len(ok_names)} 境零衝突:{', '.join(ok_names[:10])}{' …' if len(ok_names) > 10 else ''}")
     L.append(f"  base 該有冊({ba.get('manifest_src', '?')}):閉包 {ba.get('keep_n', 0)} · 閉包外 {len(ba.get('extras', []))} · manifest 缺 {len(ba.get('manifest_missing', []))} · 封鎖家族件 {len(ba.get('blocked_present', []))}" + (f" · OS 管理不動 {len(ba['os_managed'])}" if ba.get('os_managed') else ""))
     for fam, b in sorted(ba.get("bundles", {}).items())[:6]:
         L.append(f"    拉出 {LAMP[b['severity']]} {fam:16s} → {b['target']}{'' if b['target_exists'] else '(待建)'}:{', '.join(b['members'][:6])}{' …' if len(b['members']) > 6 else ''}")
@@ -1685,7 +1693,9 @@ def make_digest(run: dict) -> list[str]:
     if not lk.get("eligible"):
         nxt.append("最壞還原:via-envgov rollback(LKGC 有=lock 逐境 sync;無=原本規劃重建)")
     L.append("  下一指令:" + (" | ".join(nxt) if nxt else "無(全綠;LKGC 已晉升)"))
-    return L[:25]
+    if len(L) > 25:  # 上限 25 行:中段省略,尾三行(LKGC/存證/下一指令)必留
+        L = L[:21] + [f"  …(省略 {len(L) - 24} 行;完整見矩陣 {run.get('matrix')} 或 RUN JSON)"] + L[-3:]
+    return L
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1813,7 +1823,12 @@ def do_digest() -> int:
     if not run:
         print("  [digest] 無 RUN_latest.json(先 via-envgov run)")
         return 2
-    print("\n".join(run.get("digest", [])))
+    try:
+        print("\n".join(make_digest(run)))  # 以現行碼自 RUN 存證重生(舊存證 digest 若被截斷亦可補全)
+    except BrokenPipeError:
+        return 0
+    except Exception:
+        print("\n".join(run.get("digest", [])))
     return 0
 
 
