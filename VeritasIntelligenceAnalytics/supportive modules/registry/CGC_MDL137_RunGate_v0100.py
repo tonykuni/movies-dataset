@@ -18,8 +18,12 @@ claude/via-system-followup-tz7k9t @ c14d428 = main = 本分支基底;0 未併)�
 落 VIA_Reports/rungate/RUNGATE_latest.json + .html(零 CDN)+ logs/rungate.log(JSONL)。
 律:只增不減;正本零觸碰(引擎/SelftestGrid/EntryBridge 皆唯讀複用=Zero-Hydra);誠實三態;
     零網路(引擎自測皆零觸網站;VIA_NET_CONSENT 不設);尾版律(glob 尾版,嚴禁寫死版號)。
-用法:python3 CGC_MDL137_RunGate_v0100.py run [--fast|--all] [--family vdf,vrn,vap] [--json] [--quiet]
+  ⑥ 補庫(批387):家族境在而必要庫缺 → 印 uv pip install --python <家族境> <缺件>(import 名→pip 名對映 fitz→pymupdf 等);
+     --approve-install 才裝(觸網;只增不減;只裝進家族境,base 退路一律不裝功能件)→ 裝後重探
+用法:python3 CGC_MDL137_RunGate_v0100.py run [--fast|--all] [--family vdf,vrn,vap] [--approve-install] [--json] [--quiet]
       | probe [--family …] | status | --selftest
+批387 工作站實錄:via-rungate --family vrn 把 vrn 當動詞印用法(旗標值誤判動詞)→ 動詞白名單;via_vrn_312 無 duckdb → VRN 引擎
+ModuleNotFoundError → --approve-install 補庫道
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
@@ -59,6 +63,8 @@ FAMILY_LIBS = {
     "vap": {"required": ["pandas", "matplotlib", "duckdb", "plotly"], "optional": ["seaborn", "numpy", "talib", "pyarrow"]},
 }
 FAST_N, DEFAULT_N = 3, 8
+VERBS = ("run", "probe", "status")
+PIP_NAMES = {"fitz": "pymupdf", "docx": "python-docx", "bs4": "beautifulsoup4", "PIL": "pillow", "talib": "TA-Lib", "yaml": "pyyaml", "sklearn": "scikit-learn", "cv2": "opencv-contrib-python"}
 PROBE_SRC = ("import importlib, json, sys\n"
              "out = {}\n"
              "for n in sys.argv[1:]:\n"
@@ -163,6 +169,37 @@ def probe_libs(py: str, libs: list, timeout: int = 90) -> dict:
     except Exception:
         pass
     return {n: None for n in libs}
+
+
+def pick_verb(a: list, default: str = "run") -> str:
+    """動詞白名單(旗標值如 --family vrn 不得誤判為動詞;批387 實錄)"""
+    return next((x for x in a if x in VERBS), default)
+
+
+def install_missing(fam: str, pyinfo: dict, missing: list, approve: bool, timeout: int = 900) -> dict:
+    """家族境補庫(批387):uv pip install --python <家族境> <缺件>;無 uv 退 pip;--approve-install 才裝;base 退路不裝功能件"""
+    if not missing:
+        return {"state": "NONE"}
+    if pyinfo.get("state") != "OK":
+        return {"state": "SKIP", "note": f"{fam} 家族境未見=不往 base 裝功能件(建境:via-envgov apply --approve;或設 VIA_PY_{fam.upper()})"}
+    pkgs = [PIP_NAMES.get(n, n) for n in missing]
+    import shutil as _sh
+    uv = _sh.which("uv") or next((str(c) for c in (Path.home() / ".local" / "bin" / "uv.exe", Path.home() / ".local" / "bin" / "uv") if c.exists()), None)
+    cmd = ([uv, "pip", "install", "--python", pyinfo["python"], *pkgs] if uv else [pyinfo["python"], "-m", "pip", "install", *pkgs])
+    idx = (os.environ.get("VIA_PIP_INDEX_URL") or "").strip()
+    if idx:
+        cmd += ["--index-url", idx]
+    if not approve:
+        return {"state": "PLAN", "cmd": " ".join(cmd), "note": "via-rungate --approve-install 才裝(觸網;只增不減;只裝進家族境)"}
+    try:
+        env = dict(os.environ)
+        env["PYTHONUTF8"] = "1"
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout, stdin=subprocess.DEVNULL, env=env, encoding="utf-8", errors="replace")
+        tail = [l for l in ((r.stdout or "") + (r.stderr or "")).strip().splitlines() if l.strip()][-2:]
+        log_event("INSTALL", " ".join(cmd), rc=r.returncode, family=fam)
+        return {"state": "OK" if r.returncode == 0 else "FAIL", "cmd": " ".join(cmd), "rc": r.returncode, "tail": [t[:160] for t in tail]}
+    except Exception as exc:
+        return {"state": "FAIL", "cmd": " ".join(cmd), "note": str(exc)[:160]}
 
 
 # ---------------------------------------------------------------- ③ 站冊(SelftestGrid 尾版 battery 複用)
@@ -272,7 +309,7 @@ def render_html(rep: dict) -> str:
 
 
 def run(families: list | None = None, mode: str = "default", do_print: bool = True, quiet: bool = False, reports: Path = OUT,
-        battery: list | None = None, python_fn=None, probe_fn=None, run_fn=None, chains_fn=None) -> dict:
+        battery: list | None = None, python_fn=None, probe_fn=None, run_fn=None, chains_fn=None, approve_install: bool = False, install_fn=None) -> dict:
     q = quiet or not do_print
     families = families or list(FAMILY_DIRS)
     limit = {"fast": FAST_N, "default": DEFAULT_N, "all": None}.get(mode, DEFAULT_N)
@@ -281,6 +318,7 @@ def run(families: list | None = None, mode: str = "default", do_print: bool = Tr
     probe_fn = probe_fn or probe_libs
     run_fn = run_fn or run_station
     chains_fn = chains_fn or chain_lamps
+    install_fn = install_fn or install_missing
     rep = {"schema": "VIA.RunGate.v1", "ts": _dt.datetime.now().isoformat(timespec="seconds"), "mode": mode, "families": {}, "chains": [], "verdict": "GREEN"}
     _say(f"=== [via-rungate] 能跑閘 · 模式 {mode} · 族 {','.join(families)}(家族境 python 真跑引擎自測;零網路)===", q)
     worst = 0
@@ -289,6 +327,13 @@ def run(families: list | None = None, mode: str = "default", do_print: bool = Tr
         pyinfo = python_fn(fam)
         spec = FAMILY_LIBS.get(fam, {"required": [], "optional": []})
         libs = probe_fn(pyinfo["python"], spec["required"] + spec["optional"])
+        inst = {"state": "NONE"}
+        missing_req = [n for n in spec["required"] if libs.get(n) is None]
+        if missing_req:
+            inst = install_fn(fam, pyinfo, missing_req, approve_install)
+            _say(f"  [{inst['state']:<5}] {fam} 補庫 {','.join(PIP_NAMES.get(n, n) for n in missing_req)}:{inst.get('cmd', '')} {inst.get('note', '')} {' | '.join(inst.get('tail') or [])}"[:220], q)
+            if inst["state"] == "OK":
+                libs = probe_fn(pyinfo["python"], spec["required"] + spec["optional"])
         sts = family_stations(battery, fam, limit) if mode != "probe" else []
         results = []
         for st in sts:
@@ -299,7 +344,7 @@ def run(families: list | None = None, mode: str = "default", do_print: bool = Tr
         worst = max(worst, order[v])
         req = sum(1 for n in spec["required"] if libs.get(n))
         opt = sum(1 for n in spec["optional"] if libs.get(n))
-        rep["families"][fam] = {"verdict": v, "python": pyinfo, "libs": libs, "required": spec["required"], "optional": spec["optional"], "results": results, "reasons": reasons,
+        rep["families"][fam] = {"verdict": v, "python": pyinfo, "libs": libs, "required": spec["required"], "optional": spec["optional"], "results": results, "reasons": reasons, "install": inst,
                                 "summary": {"required_ok": req, "required_n": len(spec["required"]), "optional_ok": opt, "optional_n": len(spec["optional"]),
                                             "engines_ok": sum(1 for r in results if r["state"] == "OK"), "engines_n": len(results)}}
         s = rep["families"][fam]["summary"]
@@ -312,10 +357,10 @@ def run(families: list | None = None, mode: str = "default", do_print: bool = Tr
     rep["next"] = []
     for fam, f in rep["families"].items():
         if f["python"]["state"] != "OK":
-            rep["next"].append(f"建 {fam} 境:via-envgov apply --approve(ENSURE_ENV via_{fam}_312)或 uv venv <境根>\\via_{fam}_312 --python 3.12 → uv pip install {' '.join(f['required'])}")
+            rep["next"].append(f"建 {fam} 境:via-envgov apply --approve(ENSURE_ENV via_{fam}_312)或 uv venv <境根>\\via_{fam}_312 --python 3.12 → uv pip install {' '.join(PIP_NAMES.get(n, n) for n in f['required'])}")
         miss = [n for n in f["required"] if f["libs"].get(n) is None]
         if miss and f["python"]["state"] == "OK":
-            rep["next"].append(f"{fam} 境補庫:\"{f['python']['python']}\" -m pip install {' '.join(miss)}(或 via-envgov apply --approve)")
+            rep["next"].append(f"{fam} 境補庫:via-rungate --family {fam} --approve-install(= {f['install'].get('cmd') or 'uv pip install --python <境> ' + ' '.join(PIP_NAMES.get(n, n) for n in miss)})")
         elif miss:
             rep["next"].append(f"base 補 manifest 缺件:via-envgov apply --approve --only-kind REPAIR_BASE({','.join(miss)})")
     try:
@@ -418,7 +463,14 @@ def selftest() -> int:
     src = Path(__file__).read_text(encoding="utf-8")
     chk("⑧ 紀律宣告(只增不減/正本零觸碰/誠實三態/零網路/尾版律/Zero-Hydra/ACCEL-BRIDGE)",
         all(k in src for k in ("只增不減", "正本零觸碰", "誠實三態", "零網路", "尾版律", "Zero-Hydra", "ACCEL-BRIDGE")))
-    print(f"  [計] 八檢 OK {8 - len(fails)} · FAIL {len(fails)}")
+    chk("⑨ 動詞白名單(批387 實錄:--family vrn 不得誤判為動詞;status/probe 仍可)",
+        pick_verb(["--family", "vrn"]) == "run" and pick_verb(["status"]) == "status" and pick_verb(["probe", "--family", "vdf"]) == "probe" and pick_verb(["--fast"]) == "run")
+    okpy = {"state": "OK", "python": sys.executable, "env": "via_vrn_312"}
+    plan = install_missing("vrn", okpy, ["fitz", "duckdb"], approve=False)
+    skip = install_missing("vrn", {"state": "BASE_FALLBACK", "python": sys.executable}, ["duckdb"], approve=False)
+    chk("⑩ 補庫道(PLAN 印 uv/pip 令且 import 名→pip 名 fitz→pymupdf;base 退路 SKIP 不裝功能件;缺件空=NONE;未授權零執行)",
+        plan["state"] == "PLAN" and "pymupdf" in plan["cmd"] and "duckdb" in plan["cmd"] and skip["state"] == "SKIP" and install_missing("vrn", okpy, [], False)["state"] == "NONE")
+    print(f"  [計] 十檢 OK {10 - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 
 
@@ -433,15 +485,15 @@ def _arg(a: list, flag: str, default=None):
 def main() -> int:
     a = sys.argv[1:]
     if "--selftest" in a:
-        print("=== VDF/VRN/VAP 能跑閘(CGC_MDL137_RunGate)· 八檢自測(零網路)===")
+        print("=== VDF/VRN/VAP 能跑閘(CGC_MDL137_RunGate)· 十檢自測(零網路)===")
         return selftest()
-    verb = next((x for x in a if not x.startswith("--")), "run")
+    verb = pick_verb(a)
     fams = [x.strip() for x in (_arg(a, "--family") or "").split(",") if x.strip()] or None
     as_json, quiet = "--json" in a, "--quiet" in a
     try:
         if verb in ("run", "probe"):
             mode = "probe" if verb == "probe" else ("fast" if "--fast" in a else ("all" if "--all" in a else "default"))
-            rep = run(fams, mode, do_print=not as_json, quiet=quiet)
+            rep = run(fams, mode, do_print=not as_json, quiet=quiet, approve_install="--approve-install" in a)
             if as_json:
                 print(json.dumps(rep, ensure_ascii=False, indent=1))
             return 0 if rep["verdict"] != "RED" else 1

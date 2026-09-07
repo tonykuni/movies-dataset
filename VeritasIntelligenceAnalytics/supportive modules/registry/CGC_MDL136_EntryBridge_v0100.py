@@ -71,7 +71,8 @@ CONSOLE_PORT = 8080
 MOTHER_FIRST = ("via-entry", "via-env")
 # CmdMatrix 尾段自動執行行(載入即進母根+開 WPF 板=違批378 零跳出律)→ 去除
 # (欄 0 錨定=只去頂層尾段;函式體內縮排的 via-enter | Out-Null 保留)
-TAIL_STRIP = (re.compile(r"(?m)^via-enter \| Out-Null[ \t]*$"),
+# 批387 實錄:Windows autocrlf 工作副本為 CRLF,$ 只認 \n 前 → \r 殘留使 via-enter 行未去除而於載入時執行(cwd 跳到主 clone)→ 容 \r
+TAIL_STRIP = (re.compile(r"(?m)^via-enter \| Out-Null[ \t\r]*$"),
               re.compile(r"(?m)^try \{ via-matrix \}.*$"),
               re.compile(r"(?m)^Lamp 'GREEN' 'LOAD'.*$"))
 # Grok 非 global 助手函式(Lamp/Get-VIAZh/Get-VIAShortCommands/New-ViaDir/Find-ViaPython)於 Register 函式域內點源會隨域消失
@@ -468,9 +469,11 @@ def selftest() -> int:
               "function global:via-entry {\n    via-env\n    Lamp 'GREEN' 'ENTRY' 'x'\n}\nfunction global:via-ingest {\n    via-enter | Out-Null\n}\n"
               "Lamp 'GREEN' 'LOAD' 'x'\nvia-enter | Out-Null\ntry { via-matrix } catch { }\n")
     t, rep = clean_cmdmatrix(sample, {"via-entry", "via-env", "via-status"})
-    chk("① 去尾段自動執行(欄 0 三行:via-enter/via-matrix/LOAD)且函式體內 via-enter | Out-Null 保留;助手函式升 global",
+    t_crlf, rep_crlf = clean_cmdmatrix(sample.replace("\n", "\r\n"), {"via-entry", "via-env", "via-status"})
+    chk("① 去尾段自動執行(欄 0 三行:via-enter/via-matrix/LOAD;LF 與 CRLF 皆去=批387 Windows 實錄)且函式體內 via-enter | Out-Null 保留;助手函式升 global",
         rep["stripped"] == 3 and "try { via-matrix }" not in t and t.count("via-enter | Out-Null") == 1
-        and rep["promoted"] == 1 and "function global:Lamp(" in t)
+        and rep["promoted"] == 1 and "function global:Lamp(" in t
+        and rep_crlf["stripped"] == 3 and t_crlf.count("via-enter | Out-Null") == 1)
     chk("② 撞名守衛(母倉先發先得;Grok via-entry/via-env → -grok;內部呼叫鏈同步改指)",
         rep["renamed"] == {"via-env": "via-env-grok", "via-entry": "via-entry-grok"} and "function global:via-entry-grok {" in t
         and "\n    via-env-grok\n" in t and "via-path" in t and set(rep["verbs"]) == {"via-enter", "via-env-grok", "via-entry-grok", "via-ingest"})
@@ -521,7 +524,7 @@ def main() -> int:
         return selftest()
     quiet = "--quiet" in a
     as_json = "--json" in a
-    verb = next((x for x in a if not x.startswith("--")), "status")
+    verb = next((x for x in a if x in ("status", "roster", "plan", "envpy", "cmdmatrix-clean")), "status")   # 批387:動詞白名單
     try:
         if verb == "status":
             rep = status(do_print=not as_json, quiet=quiet)

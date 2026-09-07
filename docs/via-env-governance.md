@@ -233,3 +233,19 @@ via-rungate; via-vdfdb scan; via-vdfdb run --apply; via-vdfdb ckpt; via-vapone; 
 via-reload; via-vrn4                 # 全冊;需先 ENG072 首頁抽取 + ENG073 入庫
 via-vrn4 --ticker 2330; via-vrn4 show 2330
 ```
+
+## 十三、批387:工作站實錄修——旗標值誤判動詞、CRLF 去尾段、via_vrn_312 補庫
+
+工作站實錄三件:`via-rungate --family vrn` 印出用法(旗標值 `vrn` 被當成動詞);`via-vrn4` 在 `via_vrn_312` 下 `ModuleNotFoundError: duckdb`;`via-reload` 載入 Grok 矩陣時印出 Grok 的 ENTER/ENV 燈並把 cwd 跳到主 clone(Windows `autocrlf` 工作副本是 CRLF,`$` 只認 `\n` 前,`\r` 殘留讓 `via-enter | Out-Null` 那行沒被去掉、載入即執行)。
+
+- 動詞白名單:MDL137/MDL136/ENG079/ENG080 只把已知動詞當動詞,旗標值不再誤判。
+- 去尾段 regex 容 `\r`(Register v0154 與 MDL136 同律;MDL136 自測加 CRLF 樣本)。
+- `via-rungate --family vrn --approve-install`:必要庫缺而家族境在時,`uv pip install --python <家族境> <缺件>`(無 uv 退 pip;`VIA_PIP_INDEX_URL` 可指鏡像;import 名→pip 名 fitz→pymupdf);未授權只印 PLAN;base 退路一律不裝功能件;裝後重探。Baseline 冊新增 `family_env_core` 記三個家族境的核心基座。
+- ENG080 缺 duckdb 時誠實 FAIL 並印修法,不再 traceback。
+
+```powershell
+git -C "C:\Users\tonyk\Downloads\movies-dataset-b381" pull --ff-only origin claude/via-envmanager-governance-7cls8h
+via-reload
+via-rungate --family vrn --approve-install
+via-rungate --family vrn; via-vrn4; via-vrn4 show 2330
+```

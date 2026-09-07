@@ -596,7 +596,12 @@ def main() -> int:
     if "--selftest" in a:
         print("=== VRN 一題四點文摘(VRN_ENG080_FourPointDigest)· 十二檢自測(零網路;臨時庫)===")
         return selftest()
-    verb = next((x for x in a if not x.startswith("--")), "run")
+    verb = next((x for x in a if x in ("run", "show")), "run")   # 批387:動詞白名單(--ticker 2330 不得誤判為動詞)
+    try:
+        import duckdb  # noqa: F401
+    except Exception:
+        print(f"[FAIL] duckdb 缺於 {sys.executable}=本引擎不可跑;修法:via-rungate --family vrn --approve-install(裝進 via_vrn_312;只增不減)或 via-envgov apply --approve --only-kind REPAIR_BASE")
+        return 3
     try:
         if verb == "run":
             rep = run(_arg(a, "--db"), _arg(a, "--zones"), _arg(a, "--ticker"), int(_arg(a, "--limit") or 0) or None, do_print="--json" not in a)
@@ -604,7 +609,8 @@ def main() -> int:
                 print(json.dumps(rep, ensure_ascii=False, indent=1))
             return 0 if rep["verdict"] != "RED" else 1
         if verb == "show":
-            key = next((x for x in a[a.index("show") + 1:] if not x.startswith("--")), "")
+            rest = a[a.index("show") + 1:]
+            key = next((x for i, x in enumerate(rest) if not x.startswith("--") and not (i > 0 and rest[i - 1] in ("--db", "--zones", "--ticker", "--limit"))), "")
             return show(key, _arg(a, "--db"))
         print(__doc__)
         return 2

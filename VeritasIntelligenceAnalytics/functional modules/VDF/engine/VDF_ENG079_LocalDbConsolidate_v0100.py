@@ -801,7 +801,7 @@ def main() -> int:
     if "--selftest" in a:
         print("=== 本機三庫整併引擎(VDF_ENG079_LocalDbConsolidate)· 十一檢自測(零網路;臨時庫)===")
         return selftest()
-    verb = next((x for x in a if not x.startswith("--")), "scan")
+    verb = next((x for x in a if x in ("scan", "run", "ckpt", "need", "coverage")), "scan")   # 批387:動詞白名單(旗標值不得誤判為動詞)
     src = Path(_arg(a, "--src", os.environ.get("VIA_LOCAL_DB_ROOT", SRC_DEFAULT)))
     db = Path(_arg(a, "--db", str(DB_TW)))
     dbg = Path(_arg(a, "--db-global", str(DB_GL)))

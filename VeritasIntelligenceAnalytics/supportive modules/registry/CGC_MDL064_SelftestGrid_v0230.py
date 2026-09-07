@@ -587,7 +587,7 @@ def battery(fast: bool):
     add("單一入口橋八檢(批383)", newest("CGC_MDL136_EntryBridge_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("本機三庫整併十一檢(批383)", newest("VDF_ENG079_LocalDbConsolidate_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300)
     add("VAP ONE 單檔整合引擎 72 檢(批383)", newest("VAP_ENG016_AutoplotOne_v*.py", VIA / "functional modules/VAP/engine"), ["--selftest"], "rc0", 300)
-    add("VDF/VRN/VAP 能跑閘八檢(批384)", newest("CGC_MDL137_RunGate_v*.py", HERE), ["--selftest"], "rc0", 300)
+    add("VDF/VRN/VAP 能跑閘十檢(批384/387)", newest("CGC_MDL137_RunGate_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("研報一題四點文摘十二檢(批386)", newest("VRN_ENG080_FourPointDigest_v*.py", VRN), ["--selftest"], "rc0", 300)
     add("selftest grid(自指:文件)", None, [], "doc", 10)  # 佔位:自身以 --fast 遞迴屬禁,列 SKIP
     return B
