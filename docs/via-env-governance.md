@@ -1725,3 +1725,96 @@ ENG073 v0113 **三十二檢 32/32**、疊加層 **十檢 10/10**、SelftestGrid 
 `uv pip install --python …\via_vrn_312 pydantic` → `pydantic==2.13.5` 已裝。
 下一跑正典會在位:券商中英名、評等 `code`/`direction`、**分析師姓名擷取**三件會一起回來,
 `src` 也會從 `OVERLAY_KEY(正典缺席…)` 變回 `CANON`。
+
+## 四十九、批421:兩收容系統升格為 VRN 支援模組——順手抓到寫死的尾版律破口
+
+操作員令:「REGISTER AND IMPLEMENT THESE TWO SYSTEMS AS SUPPORTIVE MODULES TO
+SUPPORT VRN」,附 `GenericLayoutEngine_AllEngines_v2.1.0` 與
+`VIA_NLP_Application_System_v1.8.0` 兩包。
+
+### 收容前先查驗:一包是新的,一包不是
+
+| 上傳包 | 逐檔比對結果 | 處置 |
+|---|---|---|
+| GLE AllEngines v2.1.0(18 檔) | 對在庫 `..._v2.1.0_b245` **16 檔位元相同** | **不新增收容夾** |
+| ↳ `Install-GenericLayoutEngine-All.ps1` | 唯一差異:`${ExitCode}:` → `$ExitCode:` | 不採(見下) |
+| ↳ `dist/*.whl` | 原始碼的建置產物,原始碼已在庫 | 不收(不留二進位重複件) |
+| NLP Application System v1.8.0(68 檔) | 對在庫 v1.5.0 **多 5 支、13 檔改版** | **收容**,原件一位元未改 |
+
+那個 installer 差異值得記一筆:PowerShell 裡 `"$ExitCode:"` 的冒號會被當成範圍/限定
+符解析,`"${ExitCode}:"` 才是安全寫法。**在庫那份是對的,上傳那份是回歸** —— 所以不採。
+「新上傳的就比較新」不是通則,逐檔比對才是。
+
+### 真正的缺陷在鏈上,不在收容夾
+
+```
+VRN_ENG072_FirstPageText_v0106.py:123   pkg = _INTAKE / "VIA_NLP_OneEngine_v1.1.0"
+VRN_ENG073_ReportStructuredDB_v0113.py:134   pkg = HERE/".../VIA_NLP_OneEngine_v1.1.0"
+```
+
+**寫死。** 庫裡早有 v1.5.0,現在又有 v1.8.0,兩支引擎永遠掛不上。
+`ENG077`/`ENG078` 兩座舊橋雖然都做了尾版 glob,但**鏈上四支引擎沒有一支走橋**。
+
+差多少?v1.1.0 有 18 支模組,v1.8.0 有 39 支。多出來的這六支,正是研報解讀要用的:
+
+`table_ops`(表格結構化)· `layout_analysis`(版面分塊)· `content_roles` ·
+`context_reconstruction` · `summarization` · `function_classifier`
+
+### 新增兩支支援模組(`supportive modules/70_VRN_Rules/`)
+
+**`SUP_MDL743_GenericLayoutHub_v0100`** — GLE 全後端統轄橋。九檢 9/9。
+在此之前,收容件只有 ENG072 私下掛載,而且只用 `generic_layout_engine` 一支;
+`all_backend_engines`(32 支 adapter 優先序)與 `multi_engine_orchestrator`(路由/共識/快取)
+**全樹無人呼叫**——收容了但沒被採用。本橋把四支正主收成單一掛載點,
+`zone_annotate` 與 ENG072 的 `gle_annotate` 逐鍵同契約,實作只留一份。
+
+寫這支時被自己的檢咬了兩次,兩次都是真的:
+
+- 我先斷言路由表有六個模式 `auto/consensus/tables/paddle/ocr/all`。實際 `MODE_ADAPTERS`
+  **只有四個具名鍵**,`auto` 與 `all` 根本不在表內,是靠 `build_route` 的 else 落到
+  `build_all_adapters()`。改成如實回報四具名 + 落空分支,並另開 `route_fallthrough()`
+  把去向講明白。**斷言要對著真實狀態寫,不是對著我以為的樣子寫。**
+- 「本橋零安裝動作」那一檢用字串比對掃自己的原始碼,結果掃到**斷言自己寫的那些字串**
+  = 自指偽陽。改用 AST 檢查匯入面(`subprocess`/`os`/`pip` 一個都沒有)。
+
+**`SUP_MDL744_NLPApplicationHub_v0100`** — NLP 應用系統統轄橋。十一檢 11/11。
+跨 `VIA_NLP_OneEngine_v*` 與 `VIA_NLP_Application_System_v*` **兩個家族名**做語意尾版解析
+(只認一個 glob 就會漏掉尾版)。另有兩件本橋獨有的防制:
+
+- **`__main__` 排除**:它 `import` 即跑 argparse,會用 `SystemExit` 中斷宿主。
+  第一次全模組探測就是被它炸掉的。
+- **雙掛防制**:同一個行程只能有一個 `via_nlp_engine`。舊引擎若先把 v1.1.0 掛進
+  `sys.modules`,本橋**不偷換**,回 `MOUNTED_STALE` 並指出先佔者是誰。
+
+### 接鏈:兩支引擎改走橋,退路一寸不少
+
+`ENG072 v0107`(十六檢 16/16)· `ENG073 v0114`(三十三檢 33/33)
+
+三段誠實退路:**橋 → v1.1.0 直掛(原行為逐字不動)→ stdlib NFKC**。
+ENG073 的 `run` 尾段新增一行 `[NLP 掛載]`,把走了哪條、為何沒走橋當場印出來
+——批419e 的教訓:捕捉到卻不顯示,等於沒捕捉。
+
+新檢怎麼證「真的走到尾版」?**全形轉半形不能當證據**,`ＡＢＣ１２３ → ABC123`
+stdlib 也做得到,測不出差別。改用判別輸入:
+
+| 輸入 | stdlib NFKC | TextProcessor |
+|---|---|---|
+| `台積電  的的的營收`(連續空白) | `台積電  的的的營收`(不併) | `台積電 的的的營收`(併) |
+
+外加缺席對照組:把 `HUB_DIR` 指到空夾,兩支橋都得**退回直掛而不是炸掉**。
+
+### 一項自審更正
+
+上一則回覆我對操作員說「ENG074 現在只用 pdfplumber+fitz 雙法」——**這是錯的**。
+ENG074 其實只有 `fitz` 文字 + 行級 regex **一法**;docstring 第 24 行寫的是 ENG072 的法B。
+
+而本批**沒有動 ENG074**。原因是實測結果不支持我原本的假設:
+`fitz.get_text("text", sort=True)` 會把分欄版面的標籤與數字**併回同一行**,
+舊法在那種情形是 work 的,我造的合成樣本沒有重現真實故障。
+剩下的 12 筆真 FAIL 全是 GS 英文報告,不拿到真檔無從斷因 ——
+**不憑猜測去動一條已經跑綠的鏈。**
+
+### 登錄
+
+`Register v0166`(`via-gle`/`via-nlp` + 別名 `版面橋`/`語意橋` + 兩梭;
+梭機制與正典 `via-closeout.cmd` 逐行相同)· `SelftestGrid v0261`(+兩站)· 台帳 914。
