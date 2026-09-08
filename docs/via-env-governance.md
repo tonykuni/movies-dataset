@@ -551,3 +551,24 @@ via-psrepair -Selftest
 - **改動 2 檔(各 1–4 行,零刪除)**:`types.ts` 的 `Deck` +`"mother"`;`shell.tsx` 的 import／NAV(`05 母倉`)／`lights`／main 分支。既有 5 個分頁與所有既有模組零觸碰。
 - **Zero-Hydra**:`tri-xcheck` 不與既有 `vrn-xval`(報告值 vs API)重疊——那是跨來源,本模組是同一份報告內兩條擷取道;`psrepair-rounds` 沿用既有 `ast-anchor.classifyFix` 做 parallel/sequence 分類,不另造。
 - **真跑驗證**(在 clone 上實測,非宣稱):`node --experimental-strip-types --test src/lib/via/*.test.ts` → **224 pass / 0 fail**(原 222 + 本批 2);`tsc --noEmit` → 本批 7 檔**零錯誤**(僅環境級 `@types/node`/`vite/client` 缺,因未 `npm install`,與本批無關)。
+
+## 二十五、批406:主動型台股 ETF 每日持股——回補通路打通(ENG078 v0101)
+
+工作站 `via-etfuniv` 實錄:「23 檔須每日揭露 · 今日已抓 0 · COMPLETE 0 PARTIAL 23 · 回補 tried 0 filled 0 no_source 0」。操作員令回顧:「我只抓主動型台股 ETF 的資料持股」「用 TWSE 去抓」。
+
+- **根因(查車道冊查出,非猜)**:`VIA_ActiveETF_HistoryLanes_v0100.json` 的 17 條車道中,唯一 `VERIFIED` 的 MONEYDJ 是 `LATEST_ONLY`(只給今日),其餘 16 條 `ISSUER_ARCHIVE:*` 全是 `PENDING_SOURCE` 且 `url` 空;`backfill` 的 DATED 分支在 v0100 本來就只是佔位,原碼自註「DATED 車道解析器候接(v0101)」。所以 `tried 0` 不是壞掉,是**根本沒有可呼叫的歷史車道**。
+- **不猜端點**:全倉 grep 過所有 TWSE/TPEX/MOPS URL,**沒有任何一條是 ETF 持股/成分**端點;沙盒又連不到 TWSE。依批401 立下的規矩(端點要真連線查實才寫死),本批不硬寫任何持股 URL,改做**發現機制**。
+- **`discover [--apply]`**:自 TWSE **OpenAPI 規格檔**(四個候選路徑)真列舉 `paths`,以持股/成分/PCF/基金等中英關鍵字篩出候選,寫回車道冊為 `state: CANDIDATE`(**永不**未驗即標 VERIFIED;只增不減)。四路皆取不到=誠實回 `UNREACHABLE` 並列已試路徑。
+- **`parse_holdings`**:JSON(`list[dict]` 欄名對映:代號/名稱/股數/權重,欄名不合慣例時退而找任一四碼值)與 HTML 表雙道 → `(holding_ticker, name, shares, weight)`;判準=**≥5 列**且四碼台股代號與數字皆可辨,不合一律回空(誠實不硬填)。
+- **`probe [--ticker] [--date] [--apply]`**:對有 `url` 的非 VERIFIED 車道以真標的真日期取一次、跑上述解析驗證,逐條印 `PASS/FAIL` 與因由(HTTP 態/零列/取用失敗);`--apply` **只把驗證通過者**升為 VERIFIED,不刪車道、不動他條。
+- **DATED 回補接上**:`fetch_dated` + `upsert_holdings` → 落 **ENG051 正本表** `holdings_daily`。正本零觸碰:欄名依現表 `DESCRIBE` 逐欄對映、缺欄不寫、**不建表不改結構**(表未建=誠實回 0 並指路先跑 ENG051),鍵 `(portfolio_date, etf_ticker, holding_ticker)` anti-join 冪等。
+- **十三檢 13/13**(原八檢 + 本批四檢,全注入式假 net、零外呼):解析雙道、判準誠實(少於門檻/非持股/空皆回空)、發現真列舉與 UNREACHABLE、探測只升通過者、DATED 真回補(同日同列重寫 +0 零倍增、續輪往前推進、全表零重鍵)。自測過程中測出我自己的兩個錯:網路工具契約是 `{state,data}` 我誤寫成 `json/text` 鍵;以及 `max_days=2` 每輪往回推兩天是正確推進、我原本的「重跑應為 0」假設寫錯。
+- **登錄**:SelftestGrid v0242 站名;README `via-etfuniv`／`via-etfhist` 列;台帳 891。
+
+```powershell
+# 先按 Enter 讓提示字元回來;只貼框內文字
+via-reload
+via-etfhist discover --apply
+via-etfhist probe --ticker 00981A --apply
+via-etfhist backfill --max-days 5
+```

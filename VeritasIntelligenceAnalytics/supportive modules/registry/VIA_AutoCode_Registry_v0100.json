@@ -6712,6 +6712,13 @@
    "ts": "2026-09-08 17:45",
    "name": "母倉批402–404 成果接進 cherry-lagoon-honey-dove(Grok app)介面:新增 src/lib/via/tri-xcheck.ts(VRN 三方對照七態,與 ENG074 v0102 同律;triAffectsVerdict 明寫 DIVERGE 不降判定)+ psrepair-rounds.ts(六段輪次契約+工作站實跑實績+卡斷根因+洗版修)各配 node:test;新增 src/components/mother-deck.tsx「母倉」分頁(三方對照五邊/PS 三輪/橋覆蓋 521·8·788/收容差異 同36異23缺4);改 types.ts 的 Deck +mother 與 shell.tsx 四處接線(import/NAV 05 母倉/lights/main 分支),既有五分頁與所有既有模組零觸碰。真跑:node --test 全 via lib 224 pass 0 fail(原 222+本批 2);tsc --noEmit 本批 7 檔零錯誤。",
    "note": "推送權限經過:首次 add_repo(access: push) 遭 auto mode classifier 擋下,先做成上傳包依操作員指定路徑交付;操作員隨後明示「你可以進入環境整合」授權後再試即通,已直接推 tonykuni/cherry-lagoon-honey-dove 分支 claude/via-mother-deck-b405(commit 5898fa0,7 檔 +411/-2),未開 PR 未併 main(未獲該項指令);上傳包保留(README-上傳說明.md 列逐檔去處與改動摘要),母倉留可追溯副本於 references/intake/VIA_GrokConsole_CherryLagoon_b404/ui_integration_b405/。接線全照該 app 既有慣例(lib=純資料+Light 型別+每檔一測;元件用既有 Matrix/StatusLight/Badge 與 Tailwind token),Zero-Hydra:tri-xcheck 不與 vrn-xval 重疊(那是報告值 vs API 跨來源,本模組是同一報告內兩條擷取道),psrepair-rounds 沿用既有 ast-anchor.classifyFix。"
+  },
+  {
+   "code": "ENG078-v0101(批406)",
+   "kind": "批406 工作站實錄「23 檔須每日揭露 · 今日已抓 0 · 回補 tried 0 filled 0」+ 操作員令「我只抓主動型台股 ETF 的資料持股」「用 TWSE 去抓」",
+   "ts": "2026-09-08 18:10",
+   "name": "VDF_ENG078_ActiveETFHoldingsHistory v0101:根因=車道冊 17 條中唯一 VERIFIED 的 MONEYDJ 為 LATEST_ONLY,其餘 16 條 ISSUER_ARCHIVE 全 PENDING_SOURCE 且 url 空,且 v0100 的 backfill DATED 分支本就是佔位(原碼自註「候接 v0101」)→ tried 0 非壞掉而是無車道可呼。本版補齊四件:① discover [--apply] 自 TWSE OpenAPI 規格檔四候選路真列舉 paths,關鍵字篩候選寫回車道冊為 CANDIDATE(永不未驗即 VERIFIED;只增不減;四路皆不通=誠實 UNREACHABLE 列已試路徑)② parse_holdings JSON 欄名對映 + HTML 表雙道,判準 ≥5 列且四碼代號與數字可辨,不合回空 ③ probe [--ticker][--date][--apply] 真取真解析驗證,逐條 PASS/FAIL 印因由,--apply 只升通過者不動他條 ④ fetch_dated + upsert_holdings 落 ENG051 正本 holdings_daily(欄名依現表 DESCRIBE 對映、缺欄不寫、不建表不改結構、表未建誠實回 0、(portfolio_date,etf_ticker,holding_ticker) anti-join 冪等)。十三檢 13/13(全注入式假 net,零外呼)。Grid v0242 站名;README via-etfuniv/via-etfhist 列;docs 二十五。",
+   "note": "不猜端點:全倉 grep 過所有 TWSE/TPEX/MOPS URL 確認沒有任何一條是 ETF 持股/成分端點,沙盒又連不到 TWSE,故依批401 規矩(端點須真連線查實才寫死)不硬寫任何持股 URL,改做發現機制交工作站驗真。自測過程測出我自己兩個錯並修:①網路工具契約是 {state,data} 我誤寫成 json/text 鍵(照 ENG054 既有消費式核對後修正)②max_days=2 每輪往回推兩天是正確推進,我原本斷言「重跑 filled 應為 0」是假設錯,改為真 anti-join 測試(同日同列重寫 +0、續輪推進、全表零重鍵)。正本零觸碰:ENG051 擁有 holdings_daily 結構,本器只補列。"
   }
  ]
 }
