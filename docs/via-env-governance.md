@@ -572,3 +572,13 @@ via-etfhist discover --apply
 via-etfhist probe --ticker 00981A --apply
 via-etfhist backfill --max-days 5
 ```
+
+## 二十六、批406b:工作站首跑修——規格 base 漏 `/v1` 致候選全 404;並記 TWSE 目錄實況
+
+操作員問:「那麼多 404 是不是沒有掛入網路工具?」**不是。** `404 Not Found` 與 `403 Forbidden` 都是伺服器**真的回**給我們的:請求出得去、回得來,證明網路工具有掛且暢通(閘關會回 `DENY`、未掛會回 `NO_NET`、斷線會是連線例外)。`[SuperAccel] 抓取敗(HTTPError)——誠實 None` 也是加速層如實回報,不是壞掉。
+
+- **真根因(我的 bug)**:OpenAPI 規格檔裡的 `paths` 是**相對 base**,不是相對主機根。TWSE 的 base 含 `/v1`(倉內 ENG054/ENG055/ENG077 現役常數皆為 `https://openapi.twse.com.tw/v1/opendata/...`,是既驗證事實)。v0101 首版只接主機名,組出 `https://openapi.twse.com.tw/opendata/t187ap47_L` → 全 404。修:新增 `spec_base()`,序為 OpenAPI3 `servers[0].url`(絕對直用/相對接主機)→ Swagger2 `schemes`+`host`+`basePath` → 退倉內既驗證常數;`discover --apply` 併修既有 CANDIDATE 的錯 url(`VERIFIED` 不動)。十四檢 14/14。
+- **discover 本身是成功的**:它真的列舉到 TWSE 目錄並命中 13 條——`/opendata/t187ap47_L`(ETF 冊)、`t187ap46_L_18`、`t187ap02_L`、`t187ap08_L`、`t187ap10_L`、`t187ap11_L`、`t187ap11_P`、`t187ap12_L`、`t187ap13_L`、`/ETFReport/ETFRank`、`/fund/MI_QFIIS_cat`、`/fund/MI_QFIIS_sort_20`。
+- **誠實研判(重要)**:這 13 條**看不出有 ETF 每日持股/成分股**。`MI_QFIIS` 是上市公司的**外資持股比例**,不是 ETF 持股;`ETFRank` 是 ETF 排行;`t187ap47_L` 是 ETF 冊(ENG054/ENG077 已在用)。所以修好 `/v1` 之後,預期它們會**取得到(200)但解析不出持股列(FAIL:零可解析持股列)**——那正是判準該給的誠實結果,不是失敗。結論方向:**TWSE openapi 很可能沒有開放主動 ETF 每日持股**,得改走投信 PCF 頁。
+- **群益 403 另一類**:伺服器回 403=拒絕,不是找不到。多半要瀏覽器式標頭/referer;倉內有 `VIA_Unified_WebScraping_Playwright_Engine`(雙引擎爬蟲)可走,但那要另掛車道,本批不動。
+- **登錄**:SelftestGrid v0243 站名;台帳 892。

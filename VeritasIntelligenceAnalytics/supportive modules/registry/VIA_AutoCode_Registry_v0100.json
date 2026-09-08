@@ -6719,6 +6719,13 @@
    "ts": "2026-09-08 18:10",
    "name": "VDF_ENG078_ActiveETFHoldingsHistory v0101:根因=車道冊 17 條中唯一 VERIFIED 的 MONEYDJ 為 LATEST_ONLY,其餘 16 條 ISSUER_ARCHIVE 全 PENDING_SOURCE 且 url 空,且 v0100 的 backfill DATED 分支本就是佔位(原碼自註「候接 v0101」)→ tried 0 非壞掉而是無車道可呼。本版補齊四件:① discover [--apply] 自 TWSE OpenAPI 規格檔四候選路真列舉 paths,關鍵字篩候選寫回車道冊為 CANDIDATE(永不未驗即 VERIFIED;只增不減;四路皆不通=誠實 UNREACHABLE 列已試路徑)② parse_holdings JSON 欄名對映 + HTML 表雙道,判準 ≥5 列且四碼代號與數字可辨,不合回空 ③ probe [--ticker][--date][--apply] 真取真解析驗證,逐條 PASS/FAIL 印因由,--apply 只升通過者不動他條 ④ fetch_dated + upsert_holdings 落 ENG051 正本 holdings_daily(欄名依現表 DESCRIBE 對映、缺欄不寫、不建表不改結構、表未建誠實回 0、(portfolio_date,etf_ticker,holding_ticker) anti-join 冪等)。十三檢 13/13(全注入式假 net,零外呼)。Grid v0242 站名;README via-etfuniv/via-etfhist 列;docs 二十五。",
    "note": "不猜端點:全倉 grep 過所有 TWSE/TPEX/MOPS URL 確認沒有任何一條是 ETF 持股/成分端點,沙盒又連不到 TWSE,故依批401 規矩(端點須真連線查實才寫死)不硬寫任何持股 URL,改做發現機制交工作站驗真。自測過程測出我自己兩個錯並修:①網路工具契約是 {state,data} 我誤寫成 json/text 鍵(照 ENG054 既有消費式核對後修正)②max_days=2 每輪往回推兩天是正確推進,我原本斷言「重跑 filled 應為 0」是假設錯,改為真 anti-join 測試(同日同列重寫 +0、續輪推進、全表零重鍵)。正本零觸碰:ENG051 擁有 holdings_daily 結構,本器只補列。"
+  },
+  {
+   "code": "ENG078-v0101-406b(批406b)",
+   "kind": "批406b 工作站首跑實錄「13 條 candidate 全 404、群益 403」+ 操作員問「那麼多 404 是不是沒有掛入網路工具」",
+   "ts": "2026-09-08 18:20",
+   "name": "答:不是。404/403 皆為伺服器真回,證明網路工具有掛且暢通(閘關=DENY、未掛=NO_NET、斷線=連線例外);[SuperAccel] 誠實 None 亦是如實回報。真根因是我的 URL 組法錯:OpenAPI 規格的 paths 相對 base 而非相對主機根,TWSE base 含 /v1(倉內 ENG054/ENG055/ENG077 現役常數為既驗證事實),v0101 首版只接主機名致全 404。修:spec_base() 推導序=OpenAPI3 servers[0].url(絕對直用/相對接主機)→ Swagger2 schemes+host+basePath → 退倉內既驗證常數;discover --apply 併修既有 CANDIDATE 錯 url(VERIFIED 不動)。十四檢 14/14。Grid v0243 站名。",
+   "note": "discover 本身成功:真列舉到 TWSE 目錄 13 條(t187ap47_L ETF 冊/t187ap46_L_18/t187ap02_L/08_L/10_L/11_L/11_P/12_L/13_L、ETFReport/ETFRank、fund/MI_QFIIS_cat、fund/MI_QFIIS_sort_20)。誠實研判:此 13 條看不出有 ETF 每日持股/成分股——MI_QFIIS 是上市公司外資持股比例非 ETF 持股、ETFRank 是排行、t187ap47_L 是 ETF 冊(已在用),故修好 /v1 後預期為「取得到 200 但解析不出持股列」,即判準該給的誠實結果;方向結論=TWSE openapi 很可能未開放主動 ETF 每日持股,需改走投信 PCF 頁。群益 403 屬另一類(伺服器拒絕,多半需瀏覽器式標頭/referer;倉內有 Playwright 雙引擎爬蟲可走,需另掛車道,本批不動)。"
   }
  ]
 }

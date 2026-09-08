@@ -31,6 +31,13 @@ v0100→v0101(批406 工作站實錄「23 檔須每日揭露 · 今日已抓 0 �
      證通過者**升為 VERIFIED 並寫回 url(只增不減:不刪車道、不動他條)。
   ④ backfill:VERIFIED DATED 車道存在時真取真解析真落庫(anti-join);仍無=NO_SOURCE。
   沙盒無外網,②③④ 皆以注入式假 net 自測;真跑在工作站(via-etfhist 自帶雙閘 YES)。
+  v0101 首跑修(批406b 工作站實錄「13 條 candidate 全 404」):規格檔的 paths 是
+     **相對 base**(TWSE 之 base 含 /v1),v0101 首版只接主機名 → 組出
+     https://openapi.twse.com.tw/opendata/t187ap47_L 全 404(倉內既驗證之真 URL 是
+     .../v1/opendata/t187ap47_L)。新增 spec_base():OpenAPI3 servers[0].url →
+     Swagger2 schemes+host+basePath → 退倉內既驗證常數;discover --apply 併修既有
+     CANDIDATE 之錯 url(VERIFIED 不動)。**404/403 皆為伺服器真回,證明網路工具有掛
+     且暢通**(閘關會回 DENY、未掛會回 NO_NET)。
 用法:python3 VDF_ENG078_ActiveETFHoldingsHistory_v0101.py daily [--offline]
         | backfill [--max-days N] | discover [--apply] | probe [--ticker 00980A]
         [--date YYYY-MM-DD] [--apply] | status | --selftest
@@ -353,6 +360,34 @@ def parse_holdings(payload) -> list[dict]:
     return rows if len(rows) >= MIN_HOLD_ROWS else []
 
 
+# 倉內既驗證事實(ENG054/ENG055/ENG077 現役常數):TWSE openapi 之 base 含 /v1。
+TWSE_FALLBACK_BASE = "https://openapi.twse.com.tw/v1"
+
+
+def spec_base(body: dict, spec_url: str) -> str:
+    """自規格檔推導 base(路徑是相對 base,非相對主機根)。
+    ① OpenAPI3 servers[0].url(絕對直用;相對接主機)② Swagger2 schemes+host+basePath
+    ③ 皆無=退倉內既驗證之 TWSE_FALLBACK_BASE。批406b:漏 /v1 導致全 404 之修。"""
+    try:
+        srv = (body.get("servers") or [{}])[0].get("url") or ""
+    except Exception:
+        srv = ""
+    if srv:
+        if srv.startswith("http"):
+            return srv.rstrip("/")
+        m = re.match(r"(https?://[^/]+)", spec_url)
+        return ((m.group(1) if m else "") + "/" + srv.lstrip("/")).rstrip("/")
+    host = body.get("host") or ""
+    if host:
+        sch = (body.get("schemes") or ["https"])[0]
+        return (f"{sch}://{host}" + (body.get("basePath") or "")).rstrip("/")
+    bp = body.get("basePath") or ""
+    m = re.match(r"(https?://[^/]+)", spec_url)
+    if m and bp:
+        return (m.group(1) + bp).rstrip("/")
+    return TWSE_FALLBACK_BASE
+
+
 def discover_twse(net=None, apply: bool = False, do_print: bool = True) -> dict:
     """自 TWSE OpenAPI 規格真列舉資料集,關鍵字篩候選 → 車道冊 state=CANDIDATE。
     規格全取不到=UNREACHABLE 誠實列已試路徑(不臆造端點)。"""
@@ -389,21 +424,31 @@ def discover_twse(net=None, apply: bool = False, do_print: bool = True) -> dict:
         if do_print:
             print(f"[發現] TWSE OpenAPI 規格四路皆取不到=UNREACHABLE(誠實;不臆造端點)。已試:{len(tried)} 路")
         return {"state": "UNREACHABLE", "tried": tried, "candidates": []}
+    base = spec_base(body, spec_used)
     cands = [{"id": f"TWSE_OPENAPI:{h['path']}", "kind": "DATED", "state": "CANDIDATE",
-              "url": "https://openapi.twse.com.tw" + h["path"], "note": f"discover 自規格列舉:{h['summary']}"}
+              "url": base + "/" + h["path"].lstrip("/"),
+              "note": f"discover 自規格列舉(base {base}):{h['summary']}"}
              for h in hits]
     if do_print:
-        print(f"[發現] 規格 {spec_used} · 命中 {len(hits)} 條(關鍵字 {'/'.join(HOLDING_HINTS[:4])}…)")
+        print(f"[發現] 規格 {spec_used} · base {spec_base(body, spec_used)} · 命中 {len(hits)} 條(關鍵字 {'/'.join(HOLDING_HINTS[:4])}…)")
         for h in hits[:20]:
             print(f"    {h['path']}  {h['summary']}")
     if apply and cands:
         lanes = load_lanes()
-        have = {l["id"] for l in lanes.get("lanes", [])}
-        add = [c for c in cands if c["id"] not in have]      # 只增不減
+        by_id = {l["id"]: l for l in lanes.get("lanes", [])}
+        add, fixed = [], 0
+        for c in cands:
+            cur = by_id.get(c["id"])
+            if cur is None:
+                add.append(c)                                    # 只增不減
+            elif cur.get("state") != "VERIFIED" and cur.get("url") != c["url"]:
+                cur["url"] = c["url"]                            # 批406b:修既有 CANDIDATE 的錯 base
+                cur["note"] = c["note"]
+                fixed += 1
         lanes["lanes"].extend(add)
         LANES_JSON.write_text(json.dumps(lanes, ensure_ascii=False, indent=1), encoding="utf-8")
         if do_print:
-            print(f"[發現] 車道冊 +{len(add)} 條 CANDIDATE(未驗證;probe 過才升 VERIFIED)")
+            print(f"[發現] 車道冊 +{len(add)} 條 CANDIDATE · 修正既有 url {fixed} 條(VERIFIED 不動;probe 過才升)")
     return {"state": "OK", "spec": spec_used, "tried": tried, "candidates": cands}
 
 
@@ -822,14 +867,22 @@ def selftest() -> int:
             f"(首輪 filled {bf2['filled']}/列 {n_rows}/日 {n_days} · 同日重寫 +{again} · 續輪 filled {bf3['filled']}/列 {n3} · 重鍵 {dup})")
     DB_ETF, DB_TW, REP, CKPT, OUT_UI, LANES_JSON = _s
     globals().update(DB_ETF=_s[0], DB_TW=_s[1], REP=_s[2], CKPT=_s[3], OUT_UI=_s[4], LANES_JSON=_s[5])
-    print(f"  [計] 十三檢 OK {13 - len(fails)} · FAIL {len(fails)}")
+    chk("⑭ 規格 base 推導(OpenAPI3 servers / Swagger2 host+basePath / 相對 servers / 退倉內既驗證常數)"
+        "· 組出之 URL 含 /v1(批406b 全 404 之修)",
+        spec_base({"servers": [{"url": "https://openapi.twse.com.tw/v1"}]}, "https://x/s.json") == "https://openapi.twse.com.tw/v1"
+        and spec_base({"servers": [{"url": "/v1"}]}, "https://openapi.twse.com.tw/v1/swagger.json") == "https://openapi.twse.com.tw/v1"
+        and spec_base({"host": "openapi.twse.com.tw", "basePath": "/v1", "schemes": ["https"]}, "https://x/s.json") == "https://openapi.twse.com.tw/v1"
+        and spec_base({}, "https://openapi.twse.com.tw/openapi.json") == TWSE_FALLBACK_BASE
+        and (spec_base({"servers": [{"url": "https://openapi.twse.com.tw/v1"}]}, "u") + "/" + "/opendata/t187ap47_L".lstrip("/"))
+            == "https://openapi.twse.com.tw/v1/opendata/t187ap47_L")
+    print(f"  [計] 十四檢 OK {14 - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 
 
 def main() -> int:
     a = sys.argv[1:]
     if "--selftest" in a:
-        print("=== 主動 ETF 每日持股史深覆蓋(VDF_ENG078 v0101)· 十三檢自測(零外呼)===")
+        print("=== 主動 ETF 每日持股史深覆蓋(VDF_ENG078 v0101)· 十四檢自測(零外呼)===")
         return selftest()
     if a and a[0] == "status":
         return status()
