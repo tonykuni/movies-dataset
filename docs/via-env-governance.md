@@ -1912,3 +1912,87 @@ param( [int]$StageTimeoutSec = 1200 )     # ← grep 全檔:只有這一行,從�
 
 回歸:橋743 **9/9** · 橋744 **11/11** · ENG072 v0107 **16/16** · ENG073 v0114 **33/33**。
 四支 `.ps1` 全數通過 `Parser::ParseFile`(含批421 的 `v0166` —— 那批我沒驗過語法,補驗了)。
+
+## 五十一、批424:TEST→DEBUG→…→TEST 五輪實跑——修的是自測本身在污染正本
+
+操作員令:「TEST DEBUG OPTIMIZE TEST DEBUG CONSOLIDATE TEST DEBUG **TILL THEY WORKS**」。
+不是給指令,是在沙盒裡把 201 站自測矩陣**跑到修完**。
+
+| 輪 | 結果 | 這一輪做了什麼 |
+|---|---|---|
+| R1 | OK 162 · FAIL 36 · 151s | 基準。批423 的進度條與心跳全程生效,不再有畫面空白 |
+| R2 | — | 補件(pyarrow/bs4/yfinance/fastparquet/lxml) |
+| R3 | — | 補件(openpyxl/matplotlib/opencc) |
+| R4 | OK 173 · FAIL 25 | 補 pytest、jieba |
+| R5 | **OK 177 · FAIL 22** | 自指站落後一輪的驗證 |
+
+**15 站轉綠。**
+
+### 真缺陷:自測每跑一次就往正本冊塞一筆
+
+```python
+# SUP_MDL742_ToolLadder_v0100.py selftest ⑥⑦
+e2 = escalate("OCR_PDF_TEXT", 3, "selftest 演練證據:L1 pdfplumber 對掃描件回空文字")
+#    ↑ escalate() 寫的是正本 VIA_Tool_Escalation_Ladder_v0100.json
+```
+
+本 session 十餘跑,`escalation_log` **66 筆 → 78 筆**,全是「selftest 演練證據」。
+工作站每天跑一次 `via-selftest` 就多一筆,**真實升階紀錄會被演練資料淹沒**。
+這違反正本零觸碰。
+
+修法(`v0101`)刻意不走捷徑:
+
+- 自測期間把 `LADDER_P` 改指 tempdir 內的正本副本
+- **`escalate()` 一行未改、不加測試旗標、不弱化斷言** —— 走的仍是同一條真實寫入路徑
+- 新增檢⑩:`sha256` 前後比對證明正本零位元變動,**且副本確實多一筆**
+  (證明寫入真的發生了,這一檢不是空轉)
+
+驗證:連跑三次自測,正本仍 66 筆、`git diff` 無變更;十檢 **10/10**。
+
+### 結構性事實:自指站永遠慢一拍(不是回歸)
+
+格子裡有四個站讀**格子自己的存證**:
+
+| 站 | 讀什麼 |
+|---|---|
+| MDL088 五系統測試分頁 · MDL104 測試結果總表 · MDL110 三軌測試矩陣 | 最新 `GRID_*.json` |
+| MDL093 治理台 UI Matrix | 綠燈率 ≥95% |
+
+它們在格子**內**跑時,本輪存證還沒落檔,讀到的是**上一輪**的證據。
+所以修好之後的第一輪它們仍紅,第二輪才轉綠。
+
+實測對照:**R4 三站紅,但單獨跑全綠;R5 三站全綠。**
+`MDL093` 例外 —— 它斷言的是綠燈率,那是**後果不是原因**,別家紅它就跟著紅。
+
+這條已寫進 `Grid v0263` 檔頭,免得下次有人把它誤判成回歸。
+
+### 兩個 pip 教訓
+
+1. **批次安裝會互相拖累。** `jieba` 建 wheel 失敗,把同一批的 `openpyxl`/`matplotlib`/
+   `opencc` 全拖下水 —— 三支都沒裝成,而輸出看起來像成功。**分開裝才看得出誰真的失敗。**
+2. **jieba 是純 Python。** pip 建不起來時,把套件目錄直接搬進 `site-packages` 就能用
+   (分詞實測 `['台積電','第三季','毛利率','創高']` 正確)。
+
+補件的連鎖效果:`opencc` 一裝就修掉 `ENG066 ②`(9/9)與 `ENG064 ②③b`;
+`pytest` 修掉 `ENG064 ⑧`;`jieba` 補上後 `ENG064` 9/9、`SUP_MDL742 ④` 轉綠。
+
+### 剩下 22 站沒有被改成綠
+
+| 類 | 站數 | 為什麼不動 |
+|---|---|---|
+| 要操作員的 DuckDB | ~19 | `global_daily`/`tw_daily_prices`/`tw_listings`/`tw_prices_adj`/`features_daily`/ETF 共識庫。**沙盒沒有庫就是沒有**,檢誠實地紅 |
+| 後果非原因 | 1 | `MDL093` 綠燈率 |
+| 沙盒環境 | ~2 | matplotlib 缺 CJK 字型(`findfont`) |
+
+其中 `MDL105 ⑨` 值得單記:它斷言 `VIA_UI_ETFConsensusAnalysis_v0100.html` 存在,
+查出該頁**自批303 起就在 `.gitignore:311`**(產出物不入庫),
+產生器 `VDF_ENG068` 在無庫時誠實停(`[ETF共識] 在庫來源缺=誠實停`)→ 同屬資料依賴。
+
+**弱化斷言就是造假。** `SUP_MDL742 ④` 斷言 jieba 這個最輕階必須在位 ——
+我的解法是把 jieba 裝起來,不是把斷言拿掉。
+
+### 清理
+
+五輪跑下來沙盒重生了 **25 個產出檔**(19 個 `ui_support` HTML + 6 個 `registry` JSON,
+其中 `VIA_Schema_Registry` 少了 **343 行** = 沙盒無庫的塌陷),全數 `git checkout` 還原。
+**不把沙盒狀態寫進正本** —— 批416、批421 之後同一教訓的第三次。
