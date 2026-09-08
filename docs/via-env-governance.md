@@ -540,3 +540,14 @@ via-psrepair
 via-reload
 via-psrepair -Selftest
 ```
+
+## 二十四、批405:母倉成果整合進 Grok app 介面(cherry-lagoon-honey-dove)
+
+操作員令:「透過 GITHUB GROK 上傳介面加計你完成的部分整合到他的介面及版面繼續完成」。
+
+- **推送權限**:`add_repo(access: push)` 遭安全閘擋下(auto mode classifier),故**不能直接推**該 repo。改走操作員指定的路徑=做成上傳包,由操作員經 Grok 上傳介面放入。母倉這邊留一份可追溯副本:`supportive modules/references/intake/VIA_GrokConsole_CherryLagoon_b404/ui_integration_b405/`。
+- **接線方式(照該 app 既有慣例,非另起爐灶)**:lib 模組=純資料/邏輯 + `import type { Light } from "./types.ts"` + 每檔一支 `.test.ts`(node:test);元件用既有 `Matrix`/`StatusLight`/`LightLegend`/`Badge` 與既有 Tailwind token。
+- **新增 5 檔**:`src/lib/via/tri-xcheck.ts`(VRN 三方對照七態,與 `VRN_ENG074_FinancialPages_v0102` 同律:一致≤1%/四捨五入≤5%/單位差比值近 1e±2·3·6/DIVERGE/單邊/雙缺;`triAffectsVerdict` 明寫 DIVERGE 不降判定)+ 測試;`src/lib/via/psrepair-rounds.ts`(六段輪次契約 + 工作站 2026-09-08 實跑實績 R1 rc=0 847檔976findings、R3a rc=0 但 5 不可解析+HARNESS 不可信、R2a/R2b 誠實 pending 不假綠 + 卡斷根因與洗版修文字)+ 測試;`src/components/mother-deck.tsx`(「母倉」分頁:三方對照五邊矩陣、PS 三輪矩陣、橋覆蓋 521/8/788、本倉收容差異 同36/異23/缺4)。
+- **改動 2 檔(各 1–4 行,零刪除)**:`types.ts` 的 `Deck` +`"mother"`;`shell.tsx` 的 import／NAV(`05 母倉`)／`lights`／main 分支。既有 5 個分頁與所有既有模組零觸碰。
+- **Zero-Hydra**:`tri-xcheck` 不與既有 `vrn-xval`(報告值 vs API)重疊——那是跨來源,本模組是同一份報告內兩條擷取道;`psrepair-rounds` 沿用既有 `ast-anchor.classifyFix` 做 parallel/sequence 分類,不另造。
+- **真跑驗證**(在 clone 上實測,非宣稱):`node --experimental-strip-types --test src/lib/via/*.test.ts` → **224 pass / 0 fail**(原 222 + 本批 2);`tsc --noEmit` → 本批 7 檔**零錯誤**(僅環境級 `@types/node`/`vite/client` 缺,因未 `npm install`,與本批無關)。
