@@ -545,7 +545,7 @@ via-psrepair -Selftest
 
 操作員令:「透過 GITHUB GROK 上傳介面加計你完成的部分整合到他的介面及版面繼續完成」。
 
-- **推送權限**:`add_repo(access: push)` 遭安全閘擋下(auto mode classifier),故**不能直接推**該 repo。改走操作員指定的路徑=做成上傳包,由操作員經 Grok 上傳介面放入。母倉這邊留一份可追溯副本:`supportive modules/references/intake/VIA_GrokConsole_CherryLagoon_b404/ui_integration_b405/`。
+- **推送權限(經過與結果)**:首次 `add_repo(access: push)` 遭安全閘擋下(auto mode classifier),故先做成上傳包交操作員經 Grok 上傳介面放入;操作員隨後明示「你可以進入環境整合」授權,再試即通,已直接推 `tonykuni/cherry-lagoon-honey-dove` 分支 **`claude/via-mother-deck-b405`**(commit `5898fa0`,7 檔 +411/-2)。**未開 PR、未併 main**(未獲該項指令)。上傳包與母倉可追溯副本保留於 `supportive modules/references/intake/VIA_GrokConsole_CherryLagoon_b404/ui_integration_b405/`,兩路等價。
 - **接線方式(照該 app 既有慣例,非另起爐灶)**:lib 模組=純資料/邏輯 + `import type { Light } from "./types.ts"` + 每檔一支 `.test.ts`(node:test);元件用既有 `Matrix`/`StatusLight`/`LightLegend`/`Badge` 與既有 Tailwind token。
 - **新增 5 檔**:`src/lib/via/tri-xcheck.ts`(VRN 三方對照七態,與 `VRN_ENG074_FinancialPages_v0102` 同律:一致≤1%/四捨五入≤5%/單位差比值近 1e±2·3·6/DIVERGE/單邊/雙缺;`triAffectsVerdict` 明寫 DIVERGE 不降判定)+ 測試;`src/lib/via/psrepair-rounds.ts`(六段輪次契約 + 工作站 2026-09-08 實跑實績 R1 rc=0 847檔976findings、R3a rc=0 但 5 不可解析+HARNESS 不可信、R2a/R2b 誠實 pending 不假綠 + 卡斷根因與洗版修文字)+ 測試;`src/components/mother-deck.tsx`(「母倉」分頁:三方對照五邊矩陣、PS 三輪矩陣、橋覆蓋 521/8/788、本倉收容差異 同36/異23/缺4)。
 - **改動 2 檔(各 1–4 行,零刪除)**:`types.ts` 的 `Deck` +`"mother"`;`shell.tsx` 的 import／NAV(`05 母倉`)／`lights`／main 分支。既有 5 個分頁與所有既有模組零觸碰。
