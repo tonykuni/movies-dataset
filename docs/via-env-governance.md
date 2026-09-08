@@ -988,3 +988,54 @@ GF_2454_…    → (空) DENY:拒絕清單:GF(操作員裁決)
 (原 224 + 本批 3);`tsc --noEmit` 本批兩檔零錯誤。
 已推 `claude/via-mother-deck-b405`(`f2ef6ff`);**未開 PR、未併 main**(未獲該項指令)。
 母倉可追溯副本留於 `references/intake/VIA_GrokConsole_CherryLagoon_b404/ui_integration_b414/`。
+
+## 三十七、批415:`--max-days 30` 只 tried 1——不是重試律壞了,是要補的日子根本沒被算進來
+
+工作站實錄:
+
+```
+checkpoint 日格 46 · {'NO_SOURCE': 22, 'PENDING_TODAY': 23, 'FILLED': 1}
+[回補] tried 1 · filled 0 · no_source 1 · revived 1 · verified_dated_lanes 1
+```
+
+46 個日格 ÷ 23 檔 = **每檔只有 2 天**。`--max-days` 給再大也沒用,因為**覆蓋窗本身只有兩天**。
+
+### 真因在 `resolve_listing`
+
+三道解上市日:① registry 冊上市日欄——**未來欄位,現在是空的** ② `yfinance` 首根 K 線——
+主動 ETF 幾乎都是新掛牌,**常常查無**(工作站實錄 `00998A.TW → 404 possibly delisted`)
+③ 於是全部退到「首個快照=下界」,而首個快照往往**就是前天**。
+
+歷史其實一直都在:實測 `00992A × 2026-02-02` → **52 檔持股**。是我沒把它算進覆蓋窗。
+
+### 修:L1b 發行商自家上市日車道
+
+車道 schema 加 `listing_api`,排在 `yfinance` **之前**(發行商自己的資料比第三方對新掛牌檔可靠):
+
+```json
+"listing_api": {"url": ".../CFWeb/api/etf/detail/{fundid}",
+                "method": "GET", "pick": "data.listingDate",
+                "fallback_pick": "data.establishmentTime"}
+```
+
+群益實測 `detail/{fundNo}`:
+
+| fundNo | 代號 | 成立 | **上市** |
+|---|---|---|---|
+| 399 | 00982A | 2025-05-13 | **2025-05-22** |
+| 500 | 00992A | 2025-12-16 | **2025-12-30** |
+| 502 | 00997A | 2026-03-30 | **2026-04-14** |
+
+00992A 從 2025-12-30 到今天約 170 個交易日——先前只算到 2 天。
+
+### 誠實界限
+
+- 取到的日期**早於主動 ETF 元年**(`ACTIVE_ETF_ERA`)即**不採信**(那必是解析錯了)。
+- 沒有 `listing_api` 的投信**誠實回空**,不猜。
+- `listingDate` 缺欄才退 `establishmentTime`(成立日 ≠ 上市日,所以是後備不是首選)。
+
+### 驗
+
+**二十八檢 28/28**。新檢 ㉘ 以注入式假 net 實證四件:L1b 優先於 `yfinance`(假 net 的
+`yf_history` 一律回空,重現新掛牌檔實況)、缺欄退 fallback、早於元年不採信、無 `listing_api` 誠實空。
+另以**真實抓回的群益 `detail` 回應重放**驗三檔上市日全中——**全程未動任何同意閘**。
