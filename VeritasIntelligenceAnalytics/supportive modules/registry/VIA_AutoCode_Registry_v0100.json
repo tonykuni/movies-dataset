@@ -6726,6 +6726,13 @@
    "ts": "2026-09-08 18:20",
    "name": "答:不是。404/403 皆為伺服器真回,證明網路工具有掛且暢通(閘關=DENY、未掛=NO_NET、斷線=連線例外);[SuperAccel] 誠實 None 亦是如實回報。真根因是我的 URL 組法錯:OpenAPI 規格的 paths 相對 base 而非相對主機根,TWSE base 含 /v1(倉內 ENG054/ENG055/ENG077 現役常數為既驗證事實),v0101 首版只接主機名致全 404。修:spec_base() 推導序=OpenAPI3 servers[0].url(絕對直用/相對接主機)→ Swagger2 schemes+host+basePath → 退倉內既驗證常數;discover --apply 併修既有 CANDIDATE 錯 url(VERIFIED 不動)。十四檢 14/14。Grid v0243 站名。",
    "note": "discover 本身成功:真列舉到 TWSE 目錄 13 條(t187ap47_L ETF 冊/t187ap46_L_18/t187ap02_L/08_L/10_L/11_L/11_P/12_L/13_L、ETFReport/ETFRank、fund/MI_QFIIS_cat、fund/MI_QFIIS_sort_20)。誠實研判:此 13 條看不出有 ETF 每日持股/成分股——MI_QFIIS 是上市公司外資持股比例非 ETF 持股、ETFRank 是排行、t187ap47_L 是 ETF 冊(已在用),故修好 /v1 後預期為「取得到 200 但解析不出持股列」,即判準該給的誠實結果;方向結論=TWSE openapi 很可能未開放主動 ETF 每日持股,需改走投信 PCF 頁。群益 403 屬另一類(伺服器拒絕,多半需瀏覽器式標頭/referer;倉內有 Playwright 雙引擎爬蟲可走,需另掛車道,本批不動)。"
+  },
+  {
+   "code": "ENG078-v0101-406c(批406c)",
+   "kind": "批406c 工作站以修好 base 的 v0101 實跑:discover 命中 12 條(TWSE 定論)+ probe 誤放 4 條假陽性升 VERIFIED",
+   "ts": "2026-09-08 18:30",
+   "name": "定論:TWSE openapi 沒有主動 ETF 每日持股——discover 自 /v1/swagger.json 真列舉、base 正確推導,命中 12 條之中文名稱全是公司內部人/外資/大股東持股(ESG持股及控制力、基金基本資料彙總表=ETF 冊、定期定額排行、外資陸資持股比率/前20、持股逾10%大股東、董監持股不足法定成數×2、董監事持股餘額明細×2、內部人持股轉讓×2),無一條為 ETF 成分股。我的錯:probe 對 MI_QFIIS_sort_20(18 列)、t187ap08_L(12 列)、t187ap11_L(27528 列)、t187ap11_P(6508 列)回 PASS 並升 VERIFIED,因判準只看「≥5 列+四碼代號+數字」而董監事持股表全都滿足;若就此 backfill 會把董監事持股寫進 ETF 持股正本表。收緊三道:①列數 5≤n≤600 ②反指標否決(董事/監察人/內部人/大股東/外資/陸資/持股比率/轉讓/ESG/法定成數/餘額明細/insider/director/supervisor)③給 ETF 代號時原文須含該代號或含成分股正指標。撤銷道:probe --apply 重驗本器升過之 VERIFIED(以 note 內『probe 驗過』認定),不過即降回 CANDIDATE 並記『曾誤升已撤』;原生 VERIFIED(MONEYDJ)不重驗不動。十八檢 18/18;Grid v0244 站名。",
+   "note": "自測又抓到我兩個 fixture 自撞並修:①DATED 回補假 payload 未帶基金代號,收緊後被自己的新判準擋下 → 改成真實 PCF 樣態帶『基金代號』②⑰ 的 fixture 股票名稱寫成『成分N』自撞正指標 → 改為『股N』。方向已定:ETF 每日持股要走投信 PCF 頁;群益 403 是伺服器拒絕非找不到,需瀏覽器式標頭,倉內 VIA_Unified_WebScraping_Playwright_Engine 可走但要另掛爬蟲車道,候操作員指示。操作員機上那 4 條誤升車道會在下次 probe --apply 自動撤掉。"
   }
  ]
 }

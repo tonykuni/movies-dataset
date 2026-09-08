@@ -301,6 +301,15 @@ TWSE_SPEC_CANDIDATES = (
 HOLDING_HINTS = ("ETF", "成分", "持股", "投資組合", "申購買回", "PCF", "基金",
                  "holding", "constituent", "portfolio", "fund")
 MIN_HOLD_ROWS = 5                      # 少於此列數=不算持股表(誠實不硬填)
+# 批406c(工作站實錄:4 條董監事/外資持股表被誤判 PASS 並升 VERIFIED):判準補三道
+MAX_HOLD_ROWS = 600                    # 單一 ETF 單日持股上限;逾此=全市場表非單檔持股
+# 反指標:出現即否決(這些都是「公司內部人/外資/大股東」持股,不是 ETF 成分)
+NON_HOLDING_HINTS = ("董事", "監察人", "董監", "內部人", "大股東", "外資", "陸資",
+                     "持股比率", "持股轉讓", "轉讓", "ESG", "定期定額", "法定成數",
+                     "餘額明細", "insider", "director", "supervisor")
+# 正指標:ETF 成分股表該有的字樣(給了 etf_ticker 時,兩者擇一必須命中)
+HOLDING_POS_HINTS = ("成分", "持股明細", "投資組合", "基金持股", "constituent",
+                     "holding", "portfolio", "PCF", "申購買回")
 TW_CODE_RX = re.compile(r"^\d{4}[A-Z]?$")
 _NUM_RX = re.compile(r"-?[\d,]+(?:\.\d+)?")
 
@@ -314,10 +323,19 @@ def _num_or_none(v):
     return float(m.group(0)) if m else None
 
 
-def parse_holdings(payload) -> list[dict]:
+def parse_holdings(payload, etf_ticker: str = "") -> list[dict]:
     """JSON(list[dict])或 HTML 表 → [{holding_ticker,name,shares,weight}]。
-    判準:≥MIN_HOLD_ROWS 列、每列四碼台股代號可辨、股數或權重至少一個是數字。
-    不合=回 []( 誠實:寧可空,不硬填)。"""
+    判準(批406c 收緊,因工作站實錄誤放董監事/外資持股表):
+      ① ≥MIN_HOLD_ROWS 且 ≤MAX_HOLD_ROWS 列(逾上限=全市場表,非單檔 ETF 持股)
+      ② 反指標(董事/監察人/內部人/大股東/外資/陸資/轉讓/ESG…)出現即否決
+      ③ 給了 etf_ticker 時,原文須含該代號或含 ETF 成分股正指標(成分/持股明細/
+         投資組合/constituent/holding/portfolio/PCF…),否則否決
+    不合=回 []( 誠實:寧可空,不硬填——錯資料進正本表比沒資料更糟)。"""
+    blob = json.dumps(payload, ensure_ascii=False)[:20000] if not isinstance(payload, str) else payload[:20000]
+    if any(h in blob for h in NON_HOLDING_HINTS):
+        return []                       # ② 反指標
+    if etf_ticker and etf_ticker not in blob and not any(h in blob for h in HOLDING_POS_HINTS):
+        return []                       # ③ 與本檔無關且無成分股字樣
     rows: list[dict] = []
     if isinstance(payload, list):
         for it in payload:
@@ -357,7 +375,9 @@ def parse_holdings(payload) -> list[dict]:
             if nums:
                 rows.append({"holding_ticker": code, "name": nm,
                              "shares": nums[0], "weight": nums[-1] if len(nums) > 1 else None})
-    return rows if len(rows) >= MIN_HOLD_ROWS else []
+    if not (MIN_HOLD_ROWS <= len(rows) <= MAX_HOLD_ROWS):
+        return []                       # ① 列數上下界
+    return rows
 
 
 # 倉內既驗證事實(ENG054/ENG055/ENG077 現役常數):TWSE openapi 之 base 含 /v1。
@@ -464,8 +484,13 @@ def probe_lanes(ticker: str = "", day: str = "", net=None, apply: bool = False,
     tk = ticker or (us[0]["ticker"] if us else "")
     d = day or date.today().isoformat()
     out, passed = [], 0
+    PROMOTED = "probe 驗過"          # 批406c:只重驗「本器升過」的,不動人工/原生 VERIFIED
+    demoted = 0
     for l in lanes.get("lanes", []):
-        if l.get("state") == "VERIFIED" or not l.get("url"):
+        if not l.get("url"):
+            continue
+        recheck = l.get("state") == "VERIFIED" and PROMOTED in str(l.get("note", ""))
+        if l.get("state") == "VERIFIED" and not recheck:
             continue
         url = (l["url"].replace("{yf}", tk).replace("{code}", tk)
                .replace("{ymd}", d.replace("-", "")).replace("{date}", d))
@@ -479,25 +504,38 @@ def probe_lanes(ticker: str = "", day: str = "", net=None, apply: bool = False,
                 if body is None:
                     why = f"{str((r or {}).get('state', '?'))}:{str((r or {}).get('note', ''))[:50]}"
             if body is not None:
-                rows = parse_holdings(body)
+                if isinstance(body, (bytes, bytearray)):
+                    body = body.decode("utf-8", "replace")
+                rows = parse_holdings(body, tk)
                 n = len(rows)
                 if not rows:
                     why = "零可解析持股列(非持股表/需登入/該日無資料)"
         except Exception as exc:
             why = f"取用失敗 {type(exc).__name__}"
-        ok = n >= MIN_HOLD_ROWS
+        ok = MIN_HOLD_ROWS <= n <= MAX_HOLD_ROWS
         passed += 1 if ok else 0
-        out.append({"id": l["id"], "url": url, "rows": n, "pass": ok, "why": why})
+        out.append({"id": l["id"], "url": url, "rows": n, "pass": ok, "why": why,
+                    "recheck": recheck})
         if do_print:
-            print(f"  [{'PASS' if ok else 'FAIL'}] {l['id'][:44]:<44} 列 {n:>4}  {why}")
-        if ok and apply:
-            l["state"] = "VERIFIED"
-            l["note"] = (l.get("note", "") + f" · probe 驗過({tk} {d} {n} 列)").strip(" ·")
+            tag = "PASS" if ok else ("DEMOTE" if recheck else "FAIL")
+            print(f"  [{tag}] {l['id'][:44]:<44} 列 {n:>4}  {why}")
+        if apply:
+            if ok:
+                if not recheck:
+                    l["state"] = "VERIFIED"
+                    l["note"] = (l.get("note", "") + f" · {PROMOTED}({tk} {d} {n} 列)").strip(" ·")
+            elif recheck:                # 批406c:曾誤升者,重驗不過即降回候選(誠實撤銷)
+                l["state"] = "CANDIDATE"
+                l["note"] = (str(l.get("note", "")).replace(PROMOTED, "曾誤升已撤")
+                             + f" · 批406c 收緊判準後重驗不過({why or '零列'})").strip(" ·")
+                demoted += 1
     if apply:
         LANES_JSON.write_text(json.dumps(lanes, ensure_ascii=False, indent=1), encoding="utf-8")
     if do_print:
-        print(f"[探測] {len(out)} 條 · PASS {passed} · {'已寫回車道冊(只升通過者)' if apply else 'dry-run(加 --apply 才寫)'}")
-    return {"state": "OK", "ticker": tk, "date": d, "rows": out, "passed": passed}
+        print(f"[探測] {len(out)} 條 · PASS {passed} · 撤銷 {demoted} · "
+              f"{'已寫回車道冊(只升通過者;曾誤升者重驗不過即撤)' if apply else 'dry-run(加 --apply 才寫)'}")
+    return {"state": "OK", "ticker": tk, "date": d, "rows": out, "passed": passed,
+            "demoted": demoted}
 
 
 def fetch_dated(lane: dict, ticker: str, day: str, net) -> list[dict]:
@@ -514,7 +552,7 @@ def fetch_dated(lane: dict, ticker: str, day: str, net) -> list[dict]:
         return []
     if isinstance(body, (bytes, bytearray)):
         body = body.decode("utf-8", "replace")
-    return parse_holdings(body) if body is not None else []
+    return parse_holdings(body, ticker) if body is not None else []
 
 
 # ENG051 正本表:本器只補列、不改結構。欄位以現表為準(欄名對映;缺欄不寫)。
@@ -758,8 +796,9 @@ def selftest() -> int:
     chk("⑧ 紀律宣告(只增不減/誠實三態/零假造/PENDING_SOURCE/永不假填/親跑同意)", all(k in src for k in ("只增不減", "誠實三態", "零假造", "PENDING_SOURCE", "永不假填", "親跑同意")))
 
     # --- 批406 四檢:發現 / 解析 / 探測 / DATED 真回補(全注入式假 net,零外呼)---
-    js = [{"股票代號": f"23{i:02d}", "股票名稱": f"股{i}", "股數": f"{i},000", "權重(%)": i / 2}
-          for i in range(1, 9)]
+    # 真實 PCF 列會帶基金代號(批406c 正指標之一);TW_CODE_RX 不吃五碼+A 故不成列
+    js = [{"基金代號": "00981A", "股票代號": f"23{i:02d}", "股票名稱": f"股{i}",
+           "股數": f"{i},000", "權重(%)": i / 2} for i in range(1, 9)]
     htm = "<table>" + "".join(
         f"<tr><td>13{i:02d}</td><td>名{i}</td><td>{i},500</td><td>{i}.5</td></tr>"
         for i in range(1, 7)) + "</table>"
@@ -875,14 +914,58 @@ def selftest() -> int:
         and spec_base({}, "https://openapi.twse.com.tw/openapi.json") == TWSE_FALLBACK_BASE
         and (spec_base({"servers": [{"url": "https://openapi.twse.com.tw/v1"}]}, "u") + "/" + "/opendata/t187ap47_L".lstrip("/"))
             == "https://openapi.twse.com.tw/v1/opendata/t187ap47_L")
-    print(f"  [計] 十四檢 OK {14 - len(fails)} · FAIL {len(fails)}")
+    # --- 批406c:工作站實錄「4 條董監事/外資持股表誤判 PASS 並升 VERIFIED」之收緊 ---
+    insider = [{"公司代號": f"2{i:03d}", "姓名": f"某{i}", "職稱": "董事",
+                "目前持股": i * 1000} for i in range(1, 40)]
+    qfiis = [{"證券代號": f"23{i:02d}", "證券名稱": f"股{i}",
+              "外資及陸資持股比率": i / 3} for i in range(1, 25)]
+    huge = [{"股票代號": f"{1000 + i}", "股票名稱": "x", "股數": 1} for i in range(1200)]
+    good = [{"股票代號": f"23{i:02d}", "股票名稱": f"股{i}", "股數": i * 100,
+             "權重(%)": i / 4} for i in range(1, 12)]   # 刻意不含正指標字樣
+    chk("⑮ 反指標否決(董事/監察人/內部人/大股東/外資/陸資/轉讓/ESG 等表一律回空)",
+        parse_holdings(insider) == [] and parse_holdings(qfiis) == []
+        and parse_holdings(insider, "00981A") == [])
+    chk("⑯ 列數上限(單檔 ETF 單日持股 ≤ %d;全市場表逾限=回空)" % MAX_HOLD_ROWS,
+        parse_holdings(huge) == [] and len(huge) > MAX_HOLD_ROWS)
+    chk("⑰ 給了 ETF 代號時須與本檔相關(原文含代號或含成分股正指標,否則回空)",
+        parse_holdings(good, "00981A") == []                        # 兩者皆無=否決
+        and len(parse_holdings(good + [{"基金代號": "00981A"}], "00981A")) == 11
+        and len(parse_holdings(good, "")) == 11)                    # 未給代號=不套此道
+    with tempfile.TemporaryDirectory() as td4:
+        LANES_JSON = Path(td4) / "l.json"
+        globals()["LANES_JSON"] = LANES_JSON
+        LANES_JSON.write_text(json.dumps({"schema": "x", "rule": "只增不減", "lanes": [
+            {"id": "BAD_PROMOTED", "kind": "DATED", "state": "VERIFIED",
+             "url": "https://x/insider", "note": "probe 驗過(00981A 2026-09-08 27528 列)"},
+            {"id": "MONEYDJ", "kind": "LATEST_ONLY", "state": "VERIFIED",
+             "url": "https://x/moneydj?e={yf}", "note": "原生 VERIFIED,非本器所升"},
+        ]}, ensure_ascii=False), encoding="utf-8")
+
+        class _NetInsider:
+            def http_json(self, url, timeout=30):
+                return {"state": "OK", "data": insider}
+            def http_text(self, url, timeout=30):
+                return {"state": "FAIL", "note": "x"}
+        pr2 = probe_lanes(ticker="00981A", day="2026-09-08", net=_NetInsider(),
+                          apply=True, do_print=False)
+        after = {l["id"]: l for l in load_lanes()["lanes"]}
+        chk("⑱ 撤銷道:曾由本器誤升者重驗不過即降回 CANDIDATE 並記因由;"
+            "原生 VERIFIED(非本器所升)不重驗不動",
+            pr2["demoted"] == 1 and after["BAD_PROMOTED"]["state"] == "CANDIDATE"
+            and "曾誤升已撤" in after["BAD_PROMOTED"]["note"]
+            and after["MONEYDJ"]["state"] == "VERIFIED"
+            and after["MONEYDJ"]["note"] == "原生 VERIFIED,非本器所升",
+            f"(撤銷 {pr2['demoted']})")
+    DB_ETF, DB_TW, REP, CKPT, OUT_UI, LANES_JSON = _s
+    globals().update(DB_ETF=_s[0], DB_TW=_s[1], REP=_s[2], CKPT=_s[3], OUT_UI=_s[4], LANES_JSON=_s[5])
+    print(f"  [計] 十八檢 OK {18 - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 
 
 def main() -> int:
     a = sys.argv[1:]
     if "--selftest" in a:
-        print("=== 主動 ETF 每日持股史深覆蓋(VDF_ENG078 v0101)· 十四檢自測(零外呼)===")
+        print("=== 主動 ETF 每日持股史深覆蓋(VDF_ENG078 v0101)· 十八檢自測(零外呼)===")
         return selftest()
     if a and a[0] == "status":
         return status()
