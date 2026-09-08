@@ -523,3 +523,20 @@ via-reload
 via-psrepair -Selftest
 via-psrepair
 ```
+
+## 二十三、批404:PS 修復洗版修 + cherry-lagoon-honey-dove 收容與差異總冊
+
+工作站實跑證實批403 的卡斷根因修生效:`via-psrepair` 三輪全通(R1 `rc=0` 847 檔/976 findings、R3a `rc=0`、R3b `rc=0`、R3c GREEN),18 分鐘零吊死。同一跑暴露三件事:
+
+- **F1 洗版(我造成的,已修)**:`Invoke-VIA-PSRepair-v0102.ps1`。`Write-Progress` 在本場景是淨損——子引擎(Accel20/Verify)自己就印豐富進度,而看門狗每 0.8s 一次 `Write-Progress` 會令主機重繪**所有**在線進度記錄(含本檔輪次列 Id 12),終端每秒冒出數行 `VIA PS 修復三輪 [R1 …]` 把真實輸出淹掉。改法:本檔全面改純文字——不再呼叫 `Invoke-VIAGuarded`(其 0.8s 迴圈=洗版源),改本檔 `Invoke-VIAWatched`(同款 `Start-Process`+逾時 `Kill` 整樹回 124,只每 `-HeartbeatSec` 預設 60 秒印一行心跳);輪次改一行 `[輪次 n/6]`。加速器 #16/#17/#18 的語意(進度可見+逾時不卡斷)全保留,只換呈現方式。九檢(⑨ 零洗版律:不呼 `Write-Progress`/`Invoke-VIAGuarded`、心跳字串與 `HeartbeatSec` 在位;判準以拆字面量寫成,免自測句自撞)。
+- **F2 R1 RED(真實待修量,非工具壞)**:847 檔 976 findings,其中 parallel-fixable 65、sequence-dependent 911。65 件可由 `via-psrepair -Fix` 的 R2a 並行安全修處理,911 件序相依需逐檔。**尚未動**——`-Fix` 要操作員下令。
+- **F3 R3a RED 的兩個 blocker**:①**5 個不可解析腳本**——我的啟發式括號/引號掃描器在 855 個在冊 ps1 上報 118 個可疑,真 PS AST 只判 5 個,**差距太大表示我這把尺太粗**(PowerShell 的 `$()`、`@{}`、regex 字串、here-string 全會誤判),因此**不猜、不亂修**,真名單要從工作站 `verify_report.json` 取。②`HARNESS_SELFCHECK_FAILED`/`HARNESS_SUSPECT`——收容驗證器的 pytest 連一個 trivial test 都跑不起來,故其「0P/0F/0E」不可信,是**驗證器本身的問題不是程式碼的問題**(誠實記為工具面待查)。
+- **F4 cherry-lagoon-honey-dove 收容(操作員令「用他為唯一入口」)**:`add_repo` + 淺 clone(head `ad5b0a17`「Export from Grok」),逐件比對 `attachments/`+`public/via/` 共 63 件 → 同 36 · 異 23 · 缺 4;**只收「異」與「缺」共 26 件**(逐位元相同者不重複收=Zero-Hydra;母倉同名檔一律不覆寫=正本零觸碰,收容件加 `__cherrylagoon` 尾綴並存),落 `supportive modules/references/intake/VIA_GrokConsole_CherryLagoon_b404/` + `VIA_CherryLagoon_Delta_Manifest_v0100.json`(逐件 sha16/狀態/母倉對應路徑/尺寸)。4 件全新:`Invoke-VIA-Spectrum.ps1`、`VRN_PIPELINE_LAUNCHER.ps1`、`VRN_Pipeline_Runner.py`、`Spectrum_preview_dual.html`(4.3MB 產生預覽頁,只記指紋不入倉=倉庫衛生)。
+- **正典核對(重要)**:cherry-lagoon 的 `VeritasAegisNexus.py`(5172 行)/`VeritasCeleritas.py`(5694 行)**比母倉正典舊**(5186/5708 行),與 b345/b383 收容件同版。批402 選定的母倉正典因此站得住,無回退風險。
+- **TypeScript 面(未動,候裁決)**:`src/lib/via/` 89 模組 + 66 測試共 21,346 行(accel/active-etf/vrn-*/vdf-*/fred/duck-catalog…),是 Grok app 自己的 VIA 層,母倉為 Python/PowerShell 無對應實作。這是架構岔路:①只當參考不整合 ②把 app 接到母倉 DuckDB/引擎(app 前端、母倉後端)③移植成 Python 引擎(=第二套實作,違 Zero-Hydra)。本批不選,列入總冊候操作員裁決。
+
+```powershell
+# 先按 Enter 讓提示字元回來;只貼框內文字
+via-reload
+via-psrepair -Selftest
+```
