@@ -6777,6 +6777,12 @@
    "kind": "批412 操作員上傳金融機構 SSOT(py+json)並令「SSOT補充報告分析師姓名擷取 BROKER / RATING DICTS」",
    "ts": "2026-09-08 20:55",
    "name": "收容:supportive modules/ssot/VIA_Financial_Institution_SSOT_v0100.{py,json}(逐位元原樣;自測 PASS:國內 16 · 外資 12 · 評等 6 · regex 8 · 網域 16 · 24 斷言)。接線 VRN_ENG073 v0106(Zero-Hydra:只調度不改寫,本器不自建第二份券商/評等字典):① ssot_broker 檔名優先→內文後備,舊 16 鍵經 resolve_broker 轉正典鍵(MQ→MACQUARIE 等遷移生效);② ssot_rating 把英中同義歸一(Buy/Outperform/Overweight/優於大盤→BUY code2 POSITIVE;NR→NOT_RATED code0);③ ssot_analysts=**全新能力**,VRN 全鏈先前沒有任何一處在抽分析師姓名——以 SSOT 的 analyze_contact_document(email/電話錨點→鄰近行姓名候選→local part 相似度→網域反查機構)為引擎,落新表 vrn_report_analyst。只增不減:broker/rating_raw 兩欄語意與值完全不動;新事實走新欄新表;位置式 INSERT (?×18) 一併改具名欄位(加欄與位置式 INSERT 天生互斥)。誠實:matched_* 與 *_guess 分欄並記來源(EMAIL_LOCALPART_GUESS / NEARBY_MATCHED / TRANSLITERATION_GUESS),同一中文名被配給多人即標 zh_shared(鄰近視窗誤配的徵狀,不刪但要標)。修掉自己兩個問題:動態載入沒把模組放進 sys.modules,pydantic 解不了延後註解 → analyze_contact_document 丟「TextBlock is not fully defined」(直接跑 SSOT 自測不會重現);而我的 except 把它吞成「0 筆」——靜默回空看起來像「這份報告沒有分析師」,是假訊息,改為記因由並在入庫計印出。驗:二十三檢 23/23(原二十檢全過 + 批412 三檢)。**回報 SSOT 缺口(canonical 依其 alias_governance 為 READ_ONLY,我未觸碰)**:舊 BROKER_DICT 16 鍵中 JP(摩根大通;SSOT 只有 JPM/小摩/摩通)、CLST(里昂;只有 CLSA/里昂)、GF(廣發;SSOT 完全沒有這家)查不到正典鍵;舊 RATING_RX 中「增持」查不到(SSOT 的 BUY 有「加碼」沒「增持」,但「減持」有)。這四項不會遺失資料(舊欄仍存原值、新欄誠實留空),但要不要補進 SSOT 是操作員的決定。"
+  },
+  {
+   "code": "FIN_OVERLAY-v0100+ENG073-v0107(批413)",
+   "kind": "批413 操作員令「查一下GROK 在GITHUB的文件夾有無解方 昨天有過關 / 去摩通 / CLST·CLSA·里昂都可 / 大陸券商刪除 / 增持加碼」",
+   "ts": "2026-09-08 21:20",
+   "name": "先查:Grok 倉(cherry-lagoon-honey-dove)確實早有解方——src/lib/via/vrn-broker-cache.ts 開頭即寫「Broker dict 29 + extended 28(無陸券)。GS=高盛;MS/大摩;JPM/小摩;刪「摩根」。」,並有 VRN_DROP_KEYS 明列陸券(中信建投/CITIC/國泰君安/中金/海通/廣發·GF…);vrn-rating-cache.ts 有 102 條評等別名(BUY 31/HOLD 26/SELL 25/NOT_RATED 20),「增持」與「加碼」本來就同列 BUY;JPM 別名裡本來就沒有「摩通」。四項裁決與該冊完全一致。比對正典:Grok 29 家有 24 家能對上正典鍵、5 家正典沒有(日盛/合庫/大華/宏遠/德意志);102 條評等別名中有 59 條正典查不到。做法:**不改正典**(其 alias_governance 自書 canonical_write_mode=READ_ONLY),改立 VIA_FinancialInstitution_Overlay_v0100.{json,py} 疊加層,只做四件事——① 拒絕清單(20 條;陸券 + 摩根 + 摩通)**先於**正典查詢且回報因由,不是靜默查無;② 券商別名補充 23 條 / 14 家;③ 新增機構 5 家;④ 檔名鍵對映 16 條(JP→JPM、CLST→CLSA、GF→__DENY__;兩三字母 token 只在**檔名命名空間**認,內文別名絕不收裸 JP——在內文會亂咬)。評等疊加 59 條接上正典六鍵。解析次序一律 拒絕清單 → 正典 → 疊加層;正典先行,疊加層只補空缺永不覆寫。ENG073 v0107 改綁疊加層(分析師擷取引擎仍在正典那一層,轉呼)。驗:疊加層九檢 9/9、ENG073 二十三檢 23/23;四項裁決端到端實測 JP→JPM、CLST→CLSA 里昂證券、GF→依裁決拒絕並記因由、增持/加碼/超配→BUY、續抱→HOLD、低配/Short→SELL、摩通→空;舊 BROKER_DICT 16 鍵覆蓋率 13/16 → 15/16(GF 是刻意拒絕不是漏)。"
   }
  ]
 }
