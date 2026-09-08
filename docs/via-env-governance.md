@@ -504,3 +504,22 @@ via-bridge-sweep --accel --root "supportive modules"
 via-bridge-sweep --net --net-callers --root "supportive modules"
 via-psrepair
 ```
+
+## 二十二、批403:六流程並進——PS 修復卡斷修、VRN 三方對照(檔名×首頁×財報頁表格)
+
+操作員兩問:(a)「檢查所有 VRN 檔案有拆解 FILENAME、首頁、財報頁表格、讀取相互對照的引擎模組??」(b) 工作站實錄 `via-psrepair` R1/R2a `rc=1`、R2b「卡斷」,並令「20 個加速器不卡斷、六個獨立步驟、不傷害系統、不產生九頭龍」。六流程各只碰各自的檔,共用登錄由主線最後整合。
+
+- **F1 `Invoke-VIA-PSRepair-v0101.ps1`(卡斷根因修)**:v0100 用 `pwsh -File $accel -ExcludePattern $Excl`。PowerShell 的 `-File` 模式**不支援陣列引數**——`$Excl` 的 9 個樣式被攤平成散落位置引數,第 1 個綁上 `-ExcludePattern`,第 2 個起依宣告序掉進 `-Paths`(位置 1)、`-ThrottleLimit`(位置 3)…於是 `'*\_bytecode_originals\*'` 撞上 `[int]$ThrottleLimit`,報 `Cannot convert value ... to type System.Int32`,R1/R2a 全滅(非設定問題,是真 bug)。改法:子行程改走 `-Command`,於子行程內以「雜湊表字面量+splatting」呼叫(`$p=@{'ExcludePattern'=@('…','…');'ThrottleLimit'=8;…}; & '<腳本>' @p`),陣列真的是陣列、整數真的是整數;仍是獨立行程=收容腳本的 `exit` 不會殺母行程。**收容原件零觸碰**(`references/intake` 不可動律)。並修 R3a:PostRepairVerify 同為 `[string[]]$ExcludePattern` 且 `-PythonExe` 預設是他機硬寫路徑,一併走 `-Command` 道並顯式帶本機解譯器。
+- **F1 續:不卡斷(加速器 #16/#17/#18)**:每輪走 `Invoke-VIAGuarded` 看門狗——同視窗直播、逾時 `Kill` 整樹回 `rc=124` 誠實印明(不再無聲吊死);六段輪次進度條(`Write-VIAProgress` Id 12);`-TimeoutSec`(預設 1800)/`-Throttle`/`-ShowCmd` 可調;加速器缺席=graceful 退回直呼。`-Selftest` 八檢純字串驗子行程命令建構(零外呼零寫檔)。`via-psrepair` 走 `Get-VIANewest`,尾版律自動接 v0101,短令零改。
+- **F2 VRN 對照盤點(回答 (a))+ `VRN_ENG074_FinancialPages_v0102.py`**:盤點四邊——①檔名拆解=ENG073 `extract_one`(四碼 ticker 逐一對 `tw_listings` 名冊驗證、`BROKER_DICT` 券商、三格式日期含民國)**在位** ②首頁=ENG072 v0105 分區(標題帶/左本文/右資訊/頁尾)+ pdfplumber 法B 雙法逐區對照 AGREE/PARTIAL/DIVERGE **在位** ③財報頁表格=ENG074 **在位** ④檔名↔首頁對照=ENG073 交互驗證(ticker/官方名/升幅 `EXACT_MATCH`·`ROUNDING_ONLY`·`FORMULA_MISMATCH`·`PARSE_SUSPECT`;衝突 `KEEP_BOTH` 不覆寫)**在位**——**唯一缺口=財報頁表格從不與首頁/檔名對照**:v0101 只寫 `vrn_report_financial`,全樹亦只有它自己讀該表,ENG080 四點取的是 ENG073 的 `vrn_report_metrics`。v0102 補第三邊使三角閉合(不另造引擎=Zero-Hydra,對照住在表格擁有者):`crosscheck()` → `vrn_report_crosscheck`:`eps@期間` 首頁 rx 值 vs 表格值 七態(`AGREE` ≤1% / `ROUNDING` ≤5% / `UNIT_SCALE` 比值近 1e±2/3/6=單位差非錯 / `DIVERGE` / `ONLY_FIRSTPAGE` / `ONLY_TABLE` / `MISSING_BOTH`)、表格獨有正典科目列 `ONLY_TABLE`、`ticker_on_fin_page`(檔名 ticker 是否現身財報頁原文)、`report_date_vs_periods`(表格已報年 > 報告日年=`DATE_AHEAD` 誠實可疑)。派生層重算;ENG073 兩表缺=誠實略過不 crash;`run` 內建同輪跑,亦可 `--crosscheck` 單獨重算、`--no-cross` 關閉。十五檢 15/15(端到端:首頁 eps 2024=2.40 對表格 2.40=AGREE、2025 首頁 9.90 對表格 3.10=DIVERGE)。
+- **F3 `CGC_MDL141_ClosingGate_v0101.py`**:收尾閘認得第三邊——逐份併列對照欄(AGREE/DIVERGE/ROUNDING/UNIT_SCALE/ONLY_TABLE 計數 + ticker/date 兩態)、總結 `[三方對照]` 行、次步點名 DIVERGE 前五名、未對照=指路 `--crosscheck`。**DIVERGE 屬資訊級誠實旗標(待人工核,非鏈路失敗)故不降 verdict**——九檢 ⑨ 以「同一 fixture 有/無對照表 verdict 相同」對照組實證。
+- **F4 `CGC_MDL064_SelftestGrid_v0241`**:站名 財報頁擷取十檢→十五檢、收尾閘八檢→九檢(逐站 2/2 綠)。PS 入口為 ps1、沙盒與 CI 無 pwsh,不設站,改由工作站 `via-psrepair -Selftest` 八檢自驗。
+- **F5 docs 本節 + README**(`via-psrepair` 列補卡斷修與看門狗;`via-closeout` 列補三方對照)。**F6 台帳 888 + commit/push/CI/PR**。
+- **誠實邊界**:沙盒無 pwsh,F1 只能以「Python 逐字鏡像複刻字串建構器」驗出子行程命令正確(陣列/整數/布林/單引號逸出/零雙引號全過)+ 括號引號平衡檢查,**真跑要在工作站**。
+
+```powershell
+# 先按 Enter 讓提示字元回來;只貼框內文字
+via-reload
+via-psrepair -Selftest
+via-psrepair
+```
