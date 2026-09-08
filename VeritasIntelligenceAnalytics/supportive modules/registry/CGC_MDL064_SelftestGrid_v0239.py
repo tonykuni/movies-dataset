@@ -477,7 +477,7 @@ def battery(fast: bool):
     add("正典裁定器六檢(批133 收官)", newest("CGC_MDL086_CanonArbiter_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("總擷取引擎十檢(批128)", newest("VDF_ENG052_MegaFetch_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300)
     add("VDF 參數映射器十檢(批134)", newest("VDF_ENG053_ParamEngineMap_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300)
-    add("台股回補工人六檢(批136)", newest("VDF_ENG054_TWDailyBackfill_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300)
+    add("台股回補工人九檢(批136/401)", newest("VDF_ENG054_TWDailyBackfill_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300)
     add("總擷取執行器八檢(批137)", newest("VDF_ENG055_OmniFetch_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300)
     add("籌碼回補引擎九檢(批140/395)", newest("VDF_ENG056_ChipBackfill_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300)
     add("主動 ETF 持股引擎 self-test(批131)", VIA / "functional modules/VDF/engine/VDF_ENG051_ActiveTWETF_Holdings.py", ["--self-test"], "rc0", 600)

@@ -467,3 +467,20 @@ via-closeout vap --run          # 無 config 自動走 --demo:產示範圖 → �
 via-deadends                    # 短令死路實掃(唯讀;落 DEADENDS_latest.json)
 via-handover                    # 接棒台:收件夾「空」GREEN;closeout 燈
 ```
+
+## 二十、批401:VDF 完工——台股被動 ETF 價格補源(0050 等)
+
+操作員令:「先將 vdf vrn 完工」。工作站 `via-align check` 差集實錄(`ALIGN_latest.json.mismatch`)查出「只籌 8 票」恆定不變:`0050/0051/0052/0053/0055/0056/0057/0061`——全是知名 TWSE 上市被動 ETF。
+
+- **根因**(程式面,非資料面):`VDF_ENG054_TWDailyBackfill` 的 `fetch_listings()` 只從 TWSE `t187ap03_L`/TPEX `mopsfin_t187ap03_O` 兩個「上市/上櫃公司產業分類」端點抓票——ETF 是基金不是公司、天生沒有產業別,從未進過清單,`tw_daily_prices` 因而永遠零 ETF 列。籌碼面(`ENG056` 的 T86/MI_MARGN 逐日申報端點)不靠預建清單、當天有申報就有,ETF 本來就有三大法人/融資融券資料,所以差集恆定卡在這 8 檔。
+- **端點驗證**(真連線查實,非猜測硬寫):TWSE openapi 根目錄非目錄頁(734 bytes、零 ETF 字樣)死路;改用 `isin.twse.com.tw` ISIN 分類頁系統性掃過候選 `strMode` 值(1/2/4/5/6/13),以不會假陽性的「元大台灣50」全名鎖定,確認 `strMode=2` 混合上市股票與 ETF(欄位:代號+名稱、ISIN、上市日、市場別、產業別〔ETF 為空〕、CFI 碼〔ETF 為 `CE` 開頭,普通股 `ES` 開頭〕)。同時發現 `VDF_ENG077_ActiveETFUniverse`(主動式 ETF 宇宙,批374)已在用 TWSE openapi **JSON** 端點 `t187ap47_L`(ETF 冊,含被動+主動)——比 ISIN 頁的 Big5 HTML 解析乾淨、且與既有 `t187ap03_L` 同一 `net.http_json()` 車道,改採此端點。
+- **修法**(`VDF_ENG054_TWDailyBackfill_v0104.py`,`via-price`/`via-tw-backfill` 新尾版):新增 `fetch_etf_listings()` 抓 `t187ap47_L`,只收四碼數字被動碼(如 `0050`);五碼+A 主動碼(如 `00981A`)留給 `ENG077`(`via-etfuniv`)專責每日持股揭露追蹤,不重複收——Zero-Hydra 分工,兩端點分類互斥(個股產業分類 vs 基金冊),`(code, market)` 鍵結構性不會相撞。`run()` 併入 `tw_listings` 落庫,下游 Yahoo chart 抓價/checkpoint/增量律全程不用改(邏輯與券商代碼無關)。九檢(原八檢+新增 ETF 補源檢:被動收、主動排、FAIL 誠實回空不阻斷雙所清單)。
+- **不修**(機制不同,非同類問題):另一差集「只價 44 票」(幾乎全 `.TWO` 上櫃小型股,有價無籌碼)——籌碼面本來就是當天有申報才有、不靠清單,這批比較可能是真實稀疏(小型上櫃股法人/融資融券活動本就少),沒有像 ETF 那樣明確的程式面根因,記為已知邊界暫不追。
+- **登錄**:SelftestGrid 站名同步(「台股回補工人六檢」→「九檢」,批136/401);台帳 886。
+
+```powershell
+# 先按 Enter 讓提示字元回來;只貼框內文字
+via-reload
+via-price run
+via-align check
+```

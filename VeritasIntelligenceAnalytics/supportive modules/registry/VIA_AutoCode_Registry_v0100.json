@@ -6677,6 +6677,13 @@
    "ts": "2026-09-08 00:41",
    "name": "F1 MDL141:vap --run 無 config → vap_one_demo(--demo)並印明;vrn 報告夾空=一行指路不跑鏈(八檢)· F2 MDL140:收件夾三態(有件 GREEN/在位空 GREEN 空/夾缺 GREY;empty_ok)(八檢)· F3 ENG081:逐日計數 SQL 端化(_daily_counts FULL OUTER JOIN;chip 對映仍走 chip_ticker;--asof 遠日 16.6s/240MB → 0.38s/0.5MB;十二檢)· F4 MDL136:deadends 短令死路掃描器(真倉 158 令/2554 處未登錄;via-chip/via-rebuild 已不在)(九檢)· F5 VAP_ENG009 v0107:缺料前檢(缺件/缺表逐項指補料短令;rc2 誠實停舊頁在位;讓庫律 rc3;十六檢 rc0)+MDL138 data_gate · F6 Deck v0134 +closeout 任務(25/25)+Manager v0121 正式名稱 54+總控頁再生+契約 19/19 · F7 MDL139 「收尾」分頁(第 13 頁;LIVE/快照同路)(十檢)· F8 Grid v0238 FAST 全跑 191 站:OK 135/FAIL 50/SKIP 6,49 紅為沙盒缺庫缺料,1 真發現=雙橋稽核 網路缺 2(MDL135 mirror_health/MDL134 online 直用 urlopen)→ 補掛 NET-BRIDGE(+MDL134 ACCEL-BRIDGE)後 網路缺 0、加速覆蓋 99.6%、自動總跑器 S1 GREEN · Register v0164 via-entry +deadends/via-deadends+梭;Grid v0239 站名;SSOT/Console/README/docs 十九",
    "note": "不修(下一次/需操作員令):via-envgov RED 環境重建(--approve-remove);09-07 Yahoo 價未齊(資料);VRN 需報告 PDF;158 個舊令登錄工程(候);update() executemany 效能(F3 註)。工作站:via-reload → via-closeout vap --run(示範圖)→ via-deadends → via-handover"
+  },
+  {
+   "code": "ENG054-v0104(批401)",
+   "kind": "批401 操作員令「先將vdf vrn完工」——工作站 via-align 差集實錄查出台股被動 ETF 價格恆缺",
+   "ts": "2026-09-08 14:30",
+   "name": "VDF_ENG054_TWDailyBackfill v0104(via-price|via-tw-backfill):新增 fetch_etf_listings()——t187ap03_L/mopsfin_t187ap03_O(上市/上櫃公司產業分類端點)天生排除 ETF(基金非公司、無產業別),tw_daily_prices 因而恆缺 0050 等被動 ETF(工作站 via-align 差集實錄查實 8 檔:0050/51/52/53/55/56/57/61);改抓 TWSE openapi t187ap47_L(ETF 冊;ENG077 主動式 ETF 宇宙已驗證同一端點可用)只收四碼被動碼,五碼+A 主動碼留給 ENG077(via-etfuniv)專責,不重複收(Zero-Hydra 分工;二端點分類互斥、(code,market) 鍵結構性不撞);run() 併入 tw_listings 落庫,下游 Yahoo chart 抓價/checkpoint/upsert 全程無需改動(ticker 無關邏輯);九檢(原八檢+ETF 補源新檢:被動收/主動排/FAIL 誠實回空);SelftestGrid 站名同步(六檢→九檢,批136/401)。",
+   "note": "根因與正確端點皆經真實網路驗證,非猜測硬寫:TWSE openapi 目錄頁死路(734 bytes)→ isin.twse.com.tw ISIN strMode 系統性掃描(strMode=2 首次「0050」命中為假陽性,改用「元大台灣50」全名鎖定排除誤判)定位真正端點 t187ap47_L,含真實 0050/0051 列樣本核對後才動筆;沙盒本身連線遭 TWSE 安全頁擋,驗證改經操作員工作站唯讀探測完成。工作站待驗:via-price run(增量律照舊,ETF 首次入列走全抓)→ via-align check 預期只籌 8→0(尚待實跑確認)。另一差集(44 檔 .TWO 上櫃小股只價無籌碼)機制上屬 T86/MI_MARGN 逐日申報無資料、非清單漏,記為已知邊界暫不追(候操作員異議)。"
   }
  ]
 }
