@@ -727,7 +727,12 @@ def fin_final(report_val, vdf_val, tol_pct: float = 0.5) -> dict:
         return {"final": r, "rule": "無 VDF 對照=報告值", "diff_pct": None}
     if r is None:
         return {"final": v, "rule": "VDF 值(報告缺)", "diff_pct": None}
-    diff = (r - v) / v * 100 if v else None
+    if v:
+        diff = (r - v) / v * 100
+    elif r == 0:
+        diff = 0.0   # 批399 自審:報告 0 vs VDF 0=一致(非「不同」)
+    else:
+        diff = None
     unit = ""
     if v and r and abs(r) > 0:
         ratio = abs(r / v)
@@ -835,12 +840,17 @@ def vap_specs(spec: dict) -> list:
 
 def vap_images(spec: dict, limit: int = 60) -> list:
     out = []
+    seen: set = set()   # 批399 自審:image_dirs 有父子夾(vap_stack ⊃ vap_stack/output)→ 以實路徑去重
     for rel in spec.get("families", {}).get("vap", {}).get("image_dirs", []) or []:
         d = VIA / rel
         if not d.is_dir():
             continue
         for f in d.rglob("*"):
             if f.is_file() and f.suffix.lower() in (".svg", ".png", ".jpg", ".jpeg", ".webp"):
+                rp = str(f.resolve())
+                if rp in seen:
+                    continue
+                seen.add(rp)
                 st = f.stat()
                 out.append({"rel": str(f.relative_to(VIA)).replace("\\", "/"), "abs": str(f), "name": f.name, "kb": st.st_size // 1024, "mtime": _dt.datetime.fromtimestamp(st.st_mtime).strftime("%Y-%m-%d %H:%M"), "mt": st.st_mtime})
     out.sort(key=lambda r: -r["mt"])
@@ -974,7 +984,7 @@ def status(spec: dict | None = None, do_print: bool = True, reports: Path = REPO
     cats = macro_categories(spec)
     sel = list(spec.get("user", {}).get("macro_cats") or [])
     rep["macro"] = {"categories": [{**c, "n": sum(1 for s in series if s["cat"] == c["id"]), "selected": c["id"] in sel} for c in cats],
-                    "selected": sel, "since": effective_start(spec, "macro_fred", "macro", spec.get("user", {}).get("macro_since", "")), "series": series, "n_series": len(series),
+                    "selected": sel, "since": effective_start(spec, "macro_fred", "macro"),   # 批399 自審:與 resolve_argv 同律(macro-since 經 group_starts 生效) "series": series, "n_series": len(series),
                     "selected_ids": macro_ids_for(spec, sel) if sel else []}
     if not series:
         rep["notes"].append({"lamp": "YELLOW", "note": "宏觀序列冊 macro_ssot 缺(類別勾選無法展開)"})
@@ -1145,7 +1155,7 @@ function pollRun(tid,done){if(POLL)clearInterval(POLL);function tick(){fetch(B+'
  POLL=setInterval(tick,2000);tick();}
 function showCmd(it,params){var kv=Object.keys(params).filter(function(k){return params[k];}).map(function(k){return k+'='+params[k];}).join(' ');$('prog').innerHTML='<div class="cmd">SNAPSHOT 模式無法啟動;工作站等價短令:\nvia-console run --item '+esc(it.id)+(kv?' '+esc(kv):'')+'\n(或 via-console --open 開 LIVE 頁直接按啟動)</div>';}
 function chainRun(ids,label){if(!ids.length)return;if(!canRun()){$('prog').innerHTML='<div class="cmd">SNAPSHOT:'+esc(ids.map(function(i){return 'via-console run --item '+i;}).join(' ; '))+'</div>';return;}var i=0,fails=0;function next(){if(i>=ids.length){$('prog_txt').textContent=(label||'鏈')+' 完成 '+ids.length+' 步'+(fails?'(失敗 '+fails+';誠實)':'');refreshStatus();return;}var id=ids[i++];var it=findItem(id);if(!it){next();return;}var p=collectParams(it);if((it.params||[]).indexOf('dir')>=0)p.dir=$('vrn_dir').value;showProg((label||'鏈')+' '+i+'/'+ids.length+' '+it.zh);
-  postJson('/console_run',{item:id,params:p}).then(function(j){if(!j.ok){$('prog_txt').textContent=(label||'鏈')+' 停於 '+id+':'+(j.err||j.note||'');$('prog').querySelector('.bar').className='bar fail';fails++;if(label==='VRN')return;next();return;}pollRun('console:'+id,function(e){if(e.state==='ok')next();else{fails++;if(label==='VRN'){$('prog_txt').textContent+='(VRN 鏈:任一失敗即停;誠實)';refreshStatus();}else next();}});});}
+  postJson('/console_run',{item:id,params:p}).then(function(j){if(!j.ok){$('prog_txt').textContent=(label||'鏈')+' 停於 '+id+':'+(j.err||j.note||'');$('prog').querySelector('.bar').className='bar fail';fails++;if(label==='VRN')return;next();return;}pollRun('console:'+id,function(e){if(e.state==='ok')next();else{fails++;if(label==='VRN'){$('prog_txt').textContent+='(VRN 鏈:任一失敗即停;誠實)';refreshStatus();}else next();}});}).catch(function(e){$('prog_txt').textContent=(label||'鏈')+' 停於 '+id+':'+String(e);var b=$('prog').querySelector('.bar');if(b)b.className='bar fail';fails++;if(label==='VRN'){refreshStatus();return;}next();});}
  next();}
 function refreshStatus(){if(MODE!=='LIVE')return;fetch(B+'/console_status',{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){if(j&&j.schema){ST=j;renderMatrices();}}).catch(function(){});}
 function saveOps(){var ops=Object.assign({},OPS);var gi=0;document.querySelectorAll('input.gstart').forEach(function(inp){var gid=inp.getAttribute('data-g');var lt=$('gl_'+gid);var key='group-start'+(gi?'#'+gi:'');if(lt&&lt.checked){ops[key]=gid+':latest';gi++;}else if(inp.value&&dateOk(inp.value)){ops[key]=gid+':'+inp.value;gi++;}});

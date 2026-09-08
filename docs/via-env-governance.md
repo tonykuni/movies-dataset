@@ -424,3 +424,20 @@ via-closeout                                   # 兩族只讀收尾:VRN 無報�
 via-closeout vrn --run --dir "C:\Users\tonyk\Downloads\reports"   # 有報告夾時:先跑五段鏈再收尾(路徑換成您的夾)
 via-handover                                   # 接棒台 vrn/vap 類含收尾矩陣;closeout 燈
 ```
+
+### 批399 自審修(code review 十一項 → 九修)
+
+- MDL141:次步冊 off-by-one(stage 是「已完成段」,次步應指下一段);報告夾律 `_report_dirs`(`--dir` > `user.vrn_dir` > 冊 `dir_default`;相對路徑=母倉相對;incoming 一律併入)與 MDL139 `dir` 參數同律。
+- ENG056 v0102:五處開庫改走讓庫律 `_connect`(撞單寫者鎖=短等重試;永鎖=誠實 `[FAIL] 庫忙` rc3 指路 `via-bg`,不再裸 traceback)。
+- MDL139:宏觀面板 since 與 `resolve_argv` 同律(`set macro-since=` 經 `group_starts` 生效);`vap_images` 以實路徑去重;`fin_final(0,0)`=一致;頁面 `chainRun` 加 `.catch`(樞紐斷線=停於該段印明)。
+- MDL140:收件夾只算 `.pdf/.docx`(`.gitkeep` 不再誤列為報告);頁面占位純量先換再拼 Markdown/快照;`_rows_from` 死碼修。
+- 不修並註:ENG081 `--asof` 遠日窗寬效能(少用;可接受)。
+- 工作站實錄(批397/398 一貼):profile 原指第三份副本 `C:\Users\tonyk\movies-dataset`(`claude/via-system-followup-tz7k9t` c14d428c),`via-pin` 已換 b381;`via-famui` YELLOW(vrn 四點 DATA=報告表缺;vap 儀表板 rc1 舊頁在位);`via-closeout` VRN YELLOW 尚無報告、VAP GREY 產出夾皆缺;`--dir "C:\Users\tonyk\Downloads\reports"` 為示例路徑不存在=NEED_DIR 誠實停。
+
+```powershell
+# 先按 Enter 讓提示字元回來;只貼框內文字
+via-reload
+via-closeout vap --run          # VAP ONE 渲染後逐圖驗(via_vap_312)
+via-closeout vrn --run --dir "<您放研究報告 PDF 的資料夾>"   # 有報告才跑
+via-handover
+```

@@ -65,6 +65,23 @@ LANE_TABLE_MARKET = {"twse_t86": ("tw_chip_inst", "TWSE"), "tpex_inst": ("tw_chi
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
 
+def _connect(db: Path, read_only: bool, retries: int = 6, wait: float = 3.0, sleep_fn=None):
+    """讓庫律(批399 自審;ENG081/ENG064/ENG079 同律):DuckDB 單寫者鎖=短等重試;逾額誠實 RuntimeError(主程式 [FAIL] 庫忙 rc3,零裸 traceback)"""
+    import duckdb
+    last = ""
+    for i in range(retries):
+        try:
+            return duckdb.connect(str(db), read_only=read_only)
+        except duckdb.IOException as exc:
+            last = str(exc)
+            low = last.lower()
+            if not any(k in low for k in ("lock", "already open", "being used", "另一個程序", "cannot open file")):
+                raise
+            print(f"  [庫忙] {i + 1}/{retries}:{last.splitlines()[0][:90]} → 等 {wait}s", flush=True)
+            (sleep_fn or time.sleep)(wait)
+    raise RuntimeError(f"庫忙逾 {retries}×{wait}s(日更鏈/回補/via-price 持單寫者鎖;等其跑完再 via-chip;via-bg 看背景引擎進程):{last.splitlines()[0][:120]}")
+
+
 def gate_open(env=None) -> bool:
     env = env if env is not None else os.environ
     return env.get("VIA_NET_CONSENT") == "YES" and env.get("VIA_SCRAPE_CONSENT") == "YES"
@@ -118,8 +135,7 @@ def _num(v):
 
 def trading_days() -> list[str]:
     """交易日曆=已庫價格實際日期(YYYY-MM-DD)"""
-    import duckdb
-    con = duckdb.connect(str(DB_TW), read_only=True)
+    con = _connect(DB_TW, read_only=True)
     days = [r[0] for r in con.execute(
         "SELECT DISTINCT date FROM tw_daily_prices WHERE ticker LIKE '%.TW' "
         "AND date >= '2024-01-02' ORDER BY date").fetchall()]
@@ -223,7 +239,7 @@ def upsert(table: str, rows: list[dict], keys: list[str]) -> int:
     import duckdb
     import pandas as pd
     df = pd.DataFrame(rows)
-    con = duckdb.connect(str(DB_TW))
+    con = _connect(DB_TW, read_only=False)
     con.execute(f"CREATE TABLE IF NOT EXISTS {table} AS SELECT * FROM df LIMIT 0")
     # 按欄名插入(duckdb INSERT SELECT * 按位置對欄=雙所 dict 鍵序異即錯位,QA-20260825A 實錘)
     have = {c[0] for c in con.execute(f"DESCRIBE {table}").fetchall()}
@@ -261,7 +277,7 @@ def db_done_lanes(db: Path | None = None) -> set:
     out: set = set()
     if not db.exists():
         return out
-    con = duckdb.connect(str(db), read_only=True)
+    con = _connect(db, read_only=True)
     try:
         have = {r[0] for r in con.execute("SHOW TABLES").fetchall()}
         for lane, (table, market) in LANE_TABLE_MARKET.items():
@@ -492,8 +508,7 @@ def run(max_days: int | None = None, workers: int | None = None, *, lane_fn=None
 
 def derive() -> int:
     """衍生欄:券資比(短/融資餘額)…依批128 公式;NULL 誠實"""
-    import duckdb
-    con = duckdb.connect(str(DB_TW))
+    con = _connect(DB_TW, read_only=False)
     con.execute("""
         CREATE OR REPLACE TABLE tw_chip_derived AS
         SELECT m.date, m.code, m.market,
@@ -522,7 +537,7 @@ def status() -> int:
             pass
     import duckdb
     if DB_TW.exists():
-        con = duckdb.connect(str(DB_TW), read_only=True)
+        con = _connect(DB_TW, read_only=True)
         for t in ("tw_chip_inst", "tw_chip_margin", "tw_chip_derived"):
             try:
                 r = con.execute(f"SELECT COUNT(*), MIN(date), MAX(date) FROM {t}").fetchone()
@@ -579,8 +594,21 @@ def selftest() -> int:
         c.execute("INSERT INTO tw_chip_margin VALUES ('2026-09-01','2330','TWSE',1)")
         c.close()
         dbd = db_done_lanes(db)
-        chk("⑦ checkpoint 自庫重建(庫內 (date,market) → 該日該車道已完成;margin TPEX 缺=待抓;庫缺=空集合)",
-            dbd == {"2026-09-01|twse_t86", "2026-09-01|tpex_inst", "2026-09-01|twse_margin"} and db_done_lanes(root / "no.duckdb") == set(), f"({sorted(dbd)})")
+        real_connect = duckdb.connect
+
+        def locked_forever(path, read_only=False):
+            raise duckdb.IOException("IO Error: Could not set lock on file")
+        duckdb.connect = locked_forever
+        try:
+            try:
+                _connect(db, read_only=True, retries=2, wait=0.0, sleep_fn=lambda s: None)
+                lock_ok = False
+            except RuntimeError as exc:
+                lock_ok = "庫忙逾" in str(exc) and "via-bg" in str(exc)
+        finally:
+            duckdb.connect = real_connect
+        chk("⑦ checkpoint 自庫重建(庫內 (date,market) → 該日該車道已完成;margin TPEX 缺=待抓;庫缺=空集合)+ 讓庫律(永鎖=誠實 RuntimeError 指路 via-bg;批399)",
+            dbd == {"2026-09-01|twse_t86", "2026-09-01|tpex_inst", "2026-09-01|twse_margin"} and db_done_lanes(root / "no.duckdb") == set() and lock_ok, f"({sorted(dbd)};lock {lock_ok})")
         out = io.StringIO()
         p = Progress(4, stream=out, tty=False, progress_path=root / "PROGRESS.json")
         p.tick("ok", "2026-09-01"); p.tick("empty", "2026-09-01"); p.tick("fail", "2026-09-02"); p.tick("ok", "2026-09-02")
@@ -629,17 +657,21 @@ def main() -> int:
     if "--selftest" in args:
         print("=== 籌碼回補引擎(VDF_ENG056 v0102 批395)· 九檢自測(零網路)===")
         return selftest()
-    if "--status" in args:
-        return status()
-    if "--derive" in args:
-        return derive()
     md = None
     if "--days" in args:
         md = int(args[args.index("--days") + 1])
     w = None
     if "--workers" in args:
         w = int(args[args.index("--workers") + 1])
-    return run(md, w)
+    try:
+        if "--status" in args:
+            return status()
+        if "--derive" in args:
+            return derive()
+        return run(md, w)
+    except RuntimeError as exc:   # 批399 自審:讓庫律 → 誠實 [FAIL] rc3 零裸 traceback
+        print(f"[FAIL] {exc}")
+        return 3
 
 
 if __name__ == "__main__":

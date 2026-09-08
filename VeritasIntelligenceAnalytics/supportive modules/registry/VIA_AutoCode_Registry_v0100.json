@@ -6663,6 +6663,13 @@
    "ts": "2026-09-07 23:15",
    "name": "①CGC_MDL141_ClosingGate v0100(via-closeout|via-vrnval|via-vapval):VRN=報告夾每一份 收件→首頁→入庫→財報頁→四點 五段鏈 + TAB2 BASIC INFO/TAB4 FINANCIAL 核對態(MDL139 正本判準 in-process)→ DONE|FAIL|PENDING,總判 無報告 YELLOW/FAIL RED/未跑完 YELLOW/全 DONE GREEN/庫缺 GREY,次步指 chain 段;VAP=規格冊計數+產出夾逐圖驗(SVG 繪圖元素+無外鏈、PNG 簽章+IHDR、HTML 有圖+零 CDN、PDF 簽章)+VAP ONE 台帳末筆 → OK|FAIL;--run 經 MDL139 run --item 同一啟動道(rc≠0 即停);CLOSEOUT_latest.json/.md(+VRN_/VAP_);八檢 8/8 ②Register v0163 三短令+三梭(via_vrn_312 python)③MDL140 vrn/vap 類 +收尾矩陣 +closeout 燈(八檢)④MDL136 plan +via-closeout(17 步)⑤SelftestGrid v0238 第 197 站 ⑥boot ⑳ ⑦Console GOV-26;SSOT 動詞 +3;docs 十八;README",
    "note": "工作站:via-reload → via-closeout(兩族只讀收尾;無報告=YELLOW 候丟 PDF)→ via-closeout vrn --run --dir <報告夾>(先跑鏈再收尾)→ via-handover(接棒台含收尾矩陣)"
+  },
+  {
+   "code": "MDL139/MDL140/MDL141/ENG056-v0102(批399 自審修)",
+   "kind": "批399 自審(code review 5dda789e..HEAD;十一項發現 → 九修、二不修並註)",
+   "ts": "2026-09-08 00:01",
+   "name": "①MDL141:次步冊 off-by-one(stage=已完成段 → 次步=下一段:0→firstpage/1→structdb/2→finpages/3→fourpoint/4→ui);報告夾律 _report_dirs(--dir > user.vrn_dir > 冊 dir_default;相對=母倉相對;incoming 併入)同 MDL139 dir 參數 ②ENG056 v0102:_connect 讓庫律(trading_days/db_done_lanes/upsert/derive/status 五處;永鎖=誠實 [FAIL] 庫忙 rc3 指路 via-bg;九檢 ⑦ 擴)③MDL139:status 宏觀 since 改與 resolve_argv 同律(macro-since 經 group_starts 生效);vap_images 以實路徑去重(vap_stack ⊃ vap_stack/output);fin_final(0,0)=一致;頁 chainRun 加 .catch(樞紐斷線=停於該段印明,不再無聲) ④MDL140:incoming 只算 .pdf/.docx(.gitkeep 不再誤列);頁占位純量先換再拼 MD/快照;_rows_from keys 死碼修;十檢/八檢/八檢/九檢 全綠;InputConsole/Handover 頁再生",
+   "note": "不修:ENG081 --asof 窗寬效能(少用;可接受)。工作站:via-reload 即得;VAP 產出夾缺 → via-closeout vap --run(VAP ONE 渲染後逐圖驗)"
   }
  ]
 }

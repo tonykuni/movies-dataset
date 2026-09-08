@@ -242,7 +242,7 @@ def vrn_closeout(spec: dict | None = None, db: Path = DB_TW, zones: Path | None 
             rep["verdict"] = "GREEN"
             rep["note"] = f"{done}/{n} 份 收件→首頁→入庫→財報頁→四點 全通且 BASIC INFO/FINANCIAL VERIFIED"
         if pend:
-            item = {0: "vrn_firstpage", 1: "vrn_firstpage", 2: "vrn_structdb", 3: "vrn_finpages"}.get(low, "vrn_fourpoint")
+            item = {0: "vrn_firstpage", 1: "vrn_structdb", 2: "vrn_finpages", 3: "vrn_fourpoint"}.get(low, "vrn_ui")   # 批399 自審:stage=已完成段 → 次步=下一段
             nxt.append(f"via-console run --item {item}(或 via-closeout vrn --run;冊 chain_default 五段自動接續)")
     rep["next"] = nxt
     _write_family(rep, reports_dir, "VRN")
@@ -440,6 +440,22 @@ def run_chain(mod, spec: dict, family: str, report_dir: str | None = None, do_pr
     return out
 
 
+def _report_dirs(spec: dict, given: str | None) -> list:
+    """報告夾律(批399 自審;同 MDL139 dir 參數):--dir > user.vrn_dir > 冊 dir_default;相對路徑=母倉相對;incoming 一律併入"""
+    fam = spec["families"]["vrn"]
+    raw = str(given or spec.get("user", {}).get("vrn_dir") or "").strip()
+    out = []
+    if raw:
+        pth = Path(raw)
+        out.append(pth if pth.is_absolute() else VIA / pth)
+    else:
+        out.append(VIA / fam["input"]["dir_default"])
+    inc = VIA / fam["input"]["incoming"]
+    if inc not in out:
+        out.append(inc)
+    return out
+
+
 def closeout(verb: str = "all", run: bool = False, report_dir: str | None = None, reports_dir: Path = REPORTS, do_print: bool = True, mod=None, **kw) -> dict:
     mod = mod or console_mod()
     spec = mod.load_spec()
@@ -449,7 +465,7 @@ def closeout(verb: str = "all", run: bool = False, report_dir: str | None = None
         if run:
             rep["run"][f] = run_chain(mod, spec, f, report_dir, do_print)
         if f == "vrn":
-            dirs = [Path(report_dir)] if report_dir else None
+            dirs = _report_dirs(spec, report_dir)
             rep["families"]["vrn"] = vrn_closeout(spec, report_dirs=dirs, reports_dir=reports_dir, do_print=do_print, mod=mod, **{k: v for k, v in kw.items() if k in ("db", "zones")})
         else:
             rep["families"]["vap"] = vap_closeout(spec, reports_dir=reports_dir, do_print=do_print, mod=mod, **{k: v for k, v in kw.items() if k in ("image_dirs", "specs_csv", "ledger")})
@@ -578,9 +594,13 @@ def selftest() -> int:
         fm = FakeMod()
         rr = run_chain(fm, spec, "vrn", report_dir=str(rdir), do_print=False)
         rv = run_chain(fm, spec, "vap", do_print=False)
-        chk("⑥ --run 經 MDL139 run --item 同一啟動道(vrn 冊 chain_default 依序;--dir 只給有 dir 參數的段;rc≠0 即停=誠實;vap=vap_one_render)",
+        d_abs = _report_dirs(spec, str(rdir)); d_rel = _report_dirs(spec, "functional modules/VRN/x"); d_dft = _report_dirs({"families": spec["families"], "user": {}}, None)
+        d_usr = _report_dirs({"families": spec["families"], "user": {"vrn_dir": str(root / "usr")}}, None)   # 平台無關:當前 OS 的絕對路徑
+        chk("⑥ --run 經 MDL139 run --item 同一啟動道(vrn 冊 chain_default 依序;--dir 只給有 dir 參數的段;rc≠0 即停=誠實;vap=vap_one_render)+ 報告夾律(絕對/母倉相對/user.vrn_dir/冊預設;incoming 併入)",
             [x["item"] for x in rr] == ["vrn_firstpage", "vrn_structdb", "vrn_finpages"] and rr[-1]["rc"] == 3 and calls[0][1].get("dir") == str(rdir) and calls[1][1] == {}
-            and [x["item"] for x in rv] == ["vap_one_render"], f"({[x['item'] for x in rr]})")
+            and [x["item"] for x in rv] == ["vap_one_render"] and d_abs[0] == rdir and d_rel[0] == VIA / "functional modules/VRN/x" and d_dft[0] == VIA / spec["families"]["vrn"]["input"]["dir_default"]
+            and d_usr[0] == root / "usr" and all(d[-1] == VIA / spec["families"]["vrn"]["input"]["incoming"] for d in (d_abs, d_rel, d_dft, d_usr)),
+            f"({[x['item'] for x in rr]};{[str(d[0]) for d in (d_abs, d_rel, d_dft)]})")
         allrep = closeout("all", reports_dir=out, do_print=False, mod=fm, db=db, zones=zones, image_dirs=[img], specs_csv=csvp, ledger=img / "vap_one_ledger.jsonl")
         chk("⑦ 總閘 all(兩族併列;總判取最壞 RED;CLOSEOUT_latest.json/.md 落檔;log)",
             set(allrep["families"]) == {"vrn", "vap"} and allrep["verdict"] == "RED" and (out / "CLOSEOUT_latest.json").exists() and (out / "CLOSEOUT_latest.md").exists(),

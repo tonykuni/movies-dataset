@@ -127,7 +127,7 @@ def _rows_from(obj, keys: list | None = None) -> list:
     else:
         rows = [{"value": obj}]
     if keys:
-        rows = [{k: r.get(k) for k in keys if k in r or True} for r in rows]
+        rows = [{k: r.get(k) for k in keys} for r in rows]
     return rows[:MAX_ROWS]
 
 
@@ -275,8 +275,8 @@ def gather(via: Path = VIA, do_git: bool = True) -> dict:
     if cs and (cs.get("vrn") or {}).get("reports"):
         add(c, "跑況矩陣(BASIC INFO/SUMMARY/FINANCIAL DATA)", [{k: r.get(k) for k in ("report_file", "ticker", "report_date", "basic", "summary", "financial", "overall")} for r in cs["vrn"]["reports"]][:150], "CONSOLE_latest.vrn.reports")
     inc = via / "functional modules" / "VRN" / "input" / "incoming"
-    files = sorted(inc.glob("*")) if inc.exists() else []
-    add(c, "收件夾 incoming", [{"name": f.name, "kb": f.stat().st_size // 1024, "mtime": _mtime(f)} for f in files if f.is_file()][:100] or None, str(inc.relative_to(via)), note="" if files else "空(拖曳/選夾入件)")
+    files = sorted(f for f in inc.glob("*") if f.is_file() and not f.name.startswith(".") and f.suffix.lower() in (".pdf", ".docx")) if inc.exists() else []   # 批399 自審:.gitkeep 等不算報告
+    add(c, "收件夾 incoming", [{"name": f.name, "kb": f.stat().st_size // 1024, "mtime": _mtime(f)} for f in files][:100] or None, str(inc.relative_to(via)), note="" if files else "空(拖曳/選夾入件)")
     co_v = _read_json(R / "closeout" / "VRN_CLOSEOUT_latest.json")   # 批398 收尾閘(via-closeout vrn)
     add(c, "驗證收尾(五段鏈+核對態;via-closeout vrn)", [{k: r.get(k) for k in ("report_file", "ticker", "report_date", "stage_zh", "basic", "financial", "fin_vdf_over", "verdict")} for r in (co_v or {}).get("rows", [])][:150] if co_v else None,
         "VIA_Reports/closeout/VRN_CLOSEOUT_latest.json", lamp=(co_v or {}).get("verdict", "GREY"), note=(co_v or {}).get("note", ""))
@@ -425,8 +425,8 @@ def build(out: Path = OUT_PAGE, reports: Path = REPORTS, do_print: bool = True, 
     rep = rep or gather()
     md = to_markdown(rep)
     snap = json.dumps(rep, ensure_ascii=False, default=str).replace("</", "<\\/")
-    page = (PAGE.replace("__CSS__", CSS).replace("__JS__", JS).replace("__SNAP__", snap).replace("__MD__", html.escape(md))
-            .replace("__VERDICT__", str(rep["summary"].get("verdict"))).replace("__TS__", rep["ts"]))
+    page = (PAGE.replace("__VERDICT__", str(rep["summary"].get("verdict"))).replace("__TS__", rep["ts"])   # 批399 自審:純量占位先換,再拼 MD/快照(資料內同名字串不被改寫)
+            .replace("__CSS__", CSS).replace("__JS__", JS).replace("__MD__", html.escape(md)).replace("__SNAP__", snap))
     assert not CDN_RX.search(page), "零 CDN 律"
     _write_text(out, page)
     _write_text(reports / "HANDOVER_latest.md", md)
