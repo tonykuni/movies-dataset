@@ -6795,6 +6795,13 @@
    "kind": "批415 工作站實錄:`backfill --max-days 30` 只 tried 1——不是重試律壞了,是要補的日子根本沒被算進來",
    "ts": "2026-09-08 22:05",
    "name": "實錄:`status` 顯示 checkpoint 只有 46 個日格(23 檔 × 2),態 {NO_SOURCE 22, PENDING_TODAY 23, FILLED 1};`--max-days 30` 給再大也沒用,因為覆蓋窗本身只有兩天。真因在 resolve_listing:① registry 冊上市日欄是未來欄位(現在空的)② yfinance 首根 K——主動 ETF 幾乎都是新掛牌,常常查無(工作站實錄 00998A.TW → 404 possibly delisted)③ 於是全部退到「首個快照=下界」,而首個快照往往就是前天。修:新增 L1b 發行商自家上市日車道(車道 schema 加 listing_api),排在 yfinance 之前。群益實測 detail/{fundNo}:399→2025-05-22(00982A)、500→2025-12-30(00992A)、502→2026-04-14(00997A);且 00992A×2026-02-02 真的回 52 檔持股——歷史一直都在,是我沒把它算進覆蓋窗。誠實界限:取到的日期早於主動 ETF 元年(ACTIVE_ETF_ERA)即不採信;無 listing_api 的投信誠實回空;listingDate 缺欄退 establishmentTime。驗:二十八檢 28/28;新檢 ㉘ 以注入式假 net 實證四件(L1b 優先於 yf、fallback、早於元年不採信、無 car 道誠實空);另以**真實抓回的群益 detail 回應重放**驗三檔上市日全中(全程未動同意閘)。"
+  },
+  {
+   "code": "ENG078-v0107(批416)",
+   "kind": "批416 批415 推上去了卻在工作站靜默失效——`sync` 的硬寫鍵白名單",
+   "ts": "2026-09-08 20:58",
+   "name": "工作站 git pull 拿到 批415 後:`sync --apply` 回「新增 0 · 補鍵 0」且對群益說「已是 VERIFIED(設定齊全,無須併入)」;checkpoint 仍 46 日格、上市日仍 LOWER_BOUND、backfill 仍 tried 1。根因:sync_lanes 補鍵用硬寫鍵白名單 (method,body,pick,date_path,id_api,fetch,kind),批415 新加的 listing_api 沒進白名單 → 永遠併不進磁碟車道冊 → lane_listing_date 找不到 listing_api → 誠實回空 → resolve_listing 照舊退 L3「首快照即下界」。鏈上每段都按設計行事,合起來就是靜默失效;而「設定齊全」那句是沒真比對就下的斷言,訊息比缺陷更難查。修(v0107):改自種子逐鍵推導 keys = sorted(k for k in seed if k not in SYNC_RUNTIME_KEYS and not cur.get(k)),SYNC_RUNTIME_KEYS=(id,state,note,url,id_map)=執行期會被寫回的欄;以後加欄零維護。零動作訊息改成逐鍵比對後才敢說「種子鍵全在」,缺了就點名。驗:二十九檢 29/29;新檢 ㉙ fixture 照工作站那份(群益 VERIFIED、鍵齊、獨缺 listing_api)+ operator_field/id_map 驗補鍵不得動 state/url/note/id_map 且不得刪操作員自加欄、二跑零動作;對照組實證同一 fixture 在 v0106 filled=[] 從不落地、v0107 落地。順帶查實:群益 /CFWeb/api/etf/list 現有 28 檔主動型僅 00982A/00992A/00997A 三檔(現有 3 條即群益全部,非漏抓);元大 PCF 頁 tradeInfo/pcf/{code} 為 Nuxt SSR、API 形狀 POST {base}/api/trans body {APIType,CompanyName,PageName,DeviceId,FuncId},但 FuncId 與日期參數未查實故不寫車道。沙盒限制:Chromium 經中繼 proxy 連外部主機一律 ERR_CONNECTION_RESET,無法用 XHR 攔截逐家挖端點。登錄:Grid v0252、docs 三十八。"
   }
- ]
+ ],
+ "updated_at": "2026-09-08 20:58"
 }

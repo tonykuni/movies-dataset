@@ -1039,3 +1039,131 @@ checkpoint 日格 46 · {'NO_SOURCE': 22, 'PENDING_TODAY': 23, 'FILLED': 1}
 **二十八檢 28/28**。新檢 ㉘ 以注入式假 net 實證四件:L1b 優先於 `yfinance`(假 net 的
 `yf_history` 一律回空,重現新掛牌檔實況)、缺欄退 fallback、早於元年不採信、無 `listing_api` 誠實空。
 另以**真實抓回的群益 `detail` 回應重放**驗三檔上市日全中——**全程未動任何同意閘**。
+
+## 三十八、批416:批415 推上去了,卻在工作站靜默失效——`sync` 的硬寫鍵白名單
+
+### 工作站回報的事實
+
+`git pull` 拿到 批415 之後:
+
+```
+via-etfhist sync --apply
+[車道併入] 新增 0 · 補鍵 0 · 升態 0 · 已寫回
+  [不動] ISSUER_ARCHIVE:群益投信    已是 VERIFIED(設定齊全,無須併入)
+
+via-etfhist checkpoint
+  00400A 上市 2026-09-07(LOWER_BOUND(first_seen)· 快照 0/2(0.0%)
+[回補] {'tried': 1, 'filled': 0, 'revived': 1, 'verified_dated_lanes': 1}
+```
+
+日格還是 46、上市日還是 `LOWER_BOUND`、`tried` 還是 1。**批415 的程式碼是對的,但它從來沒到過磁碟。**
+
+### 根因
+
+`sync_lanes()` 補鍵時用的是一份**硬寫的鍵白名單**:
+
+```python
+keys = [k for k in ("method", "body", "pick", "date_path", "id_api", "fetch", "kind")
+        if k in seed and not cur.get(k)]
+```
+
+批415 幫車道種子加了 `listing_api`,白名單沒跟著改 → `listing_api` 永遠不會被併進磁碟車道冊
+→ `lane_listing_date()` 找不到 `listing_api` → 誠實回空 → `resolve_listing` 照舊退到 L3
+「首快照即下界」。整條鏈每一段都按設計行事,合起來就是靜默失效。
+
+而且訊息還幫倒忙:零動作時印的「已是 VERIFIED(**設定齊全**,無須併入)」是**沒有真的比對過**
+就下的斷言——缺著 `listing_api` 也照樣說齊全。訊息比缺陷本身更難查。
+
+### 修(`VDF_ENG078_ActiveETFHoldingsHistory_v0107.py`)
+
+白名單這種抽象**每加一個欄位就要記得改一次,漏一次就靜默失效**。換成自種子逐鍵推導,
+只排除執行期會被寫回的欄:
+
+```python
+SYNC_RUNTIME_KEYS = ("id", "state", "note", "url", "id_map")
+keys = sorted(k for k in seed if k not in SYNC_RUNTIME_KEYS and not cur.get(k))
+```
+
+- `id` 是鍵;`state`/`note` 由探測與升降態維護;`url` 另有汰換規則(批409);
+  `id_map` 是 `probe` 查出的代號↔基金編號對照。其餘欄一律「缺了就補」,以後加欄零維護。
+- 零動作訊息改成**逐鍵比對後**才敢講:全在才說「種子鍵全在」,缺了就點名缺哪幾個。
+
+### 驗
+
+**二十九檢 29/29**。新檢 ㉙ 的 fixture 就照工作站當時那份:群益已是 `VERIFIED`、
+該有的鍵都有、唯獨缺 `listing_api`;另加一個 `operator_field` 與 `id_map` 驗證補鍵
+不得動 `state`/`url`/`note`/`id_map`、不得刪操作員自加的欄,且第二次跑零動作。
+
+**對照組實證**(這檢不是空檢):同一份 fixture 餵給修前的 v0106 → `filled=[]`、
+`listing_api` 從不落地;餵給 v0107 → `filled=['ISSUER_ARCHIVE:群益投信:listing_api']`、落地。
+
+### 順帶查實的兩件事(逐家投信仍是逐家的工)
+
+- 群益 `/CFWeb/api/etf/list` 現有 **28 檔**,主動型就是 `00982A`/`00992A`/`00997A` **三檔**
+  ——現有 3 條車道**已是群益全部**,不是漏抓。要往上加只能加別家投信。
+- 元大:PCF 頁是 `https://www.yuantaetfs.com/tradeInfo/pcf/{code}`(Nuxt SSR),
+  API 形狀為 `POST {base}/api/trans`,body `{APIType, CompanyName:"YUANTAFUNDS", PageName,
+  DeviceId, FuncId, …}`;但 PCF 的 `FuncId` 在尚未取得的 chunk 內,**且還沒看到日期參數的證據**,
+  所以**不寫任何車道**——沒查實就不寫,是 批406c 立下的規矩。
+- 沙盒限制(誠實記下):Chromium 走中繼 proxy 連任何外部主機一律 `ERR_CONNECTION_RESET`
+  (`--disable-http2`/`--disable-quic` 都試過),所以**無法用 XHR 攔截**逐家挖端點;
+  curl 可通,但那就要逐家讀 SPA chunk。剩下 13 家需另批逐家做。
+
+## 三十九、批416 F3:六流程全景治理令——先盤點,再說「已在位」還是「要新造」
+
+操作員下了一份完整的 Mega-Prompt(20 加速器 / 三輪全景式分析 / 六獨立同步流程 /
+零九頭龍 / RYG HTML UI Matrix)。**照 Zero-Hydra 先查再做**:這份清單裡絕大多數
+不是要新造的東西,是這幾十批已經蓋好的件。硬照字面再蓋一套,就正好是它自己
+要防的九頭龍。
+
+### 20 加速器 → 現役對應件(全部實查在檔)
+
+| # | 加速器 | 現役件 |
+|---|---|---|
+| 01 | AST 精準解析 | `VIA_PS_Accel_Module.ps1` #01 + `CGC_MDL101_PSAstRepair_v0100.py` |
+| 02 | 多語言語意 | `VIA_PS_Accel_Module.ps1` #02 |
+| 03 | 九頭龍風險預測 | `CGC_MDL135_EnvGovernance` 拓撲三輪 |
+| 04 | 依賴拓撲排序 | 同上(無環最佳修正序) |
+| 05 | 沙盒隔離執行 | `via-rungate`(`CGC_MDL137_RunGate`)家族境逐庫 import |
+| 06 | 自動修正建議 | `Invoke-VIA-PSRepair-v0102.ps1` R2b |
+| 07 | 三輪全景式分析 | `via-psrepair` R1 / R2 / R3 |
+| 08 | SSOT 對齊 | `CGC_MDL096_SyncStatus_v0109` + `VIA_MasterGovernance_SSOT` |
+| 09 | 視覺化矩陣生成 | `CGC_MDL064_SelftestGrid`(RYG)+ MDL135 四分區 + MDL139 + MDL140 |
+| 10 | 錯誤分類分群 | PSRepair `parallel-fixable` / `sequence-dependent` |
+| 11 | 性能與複雜度 | `CGC_MDL133` 引擎簡化稽核 + ENG081 SQL 側計數(批400) |
+| 12 | 多子系統同步檢視 | `CGC_MDL140_HandoverConsole` 15 類堆疊矩陣 |
+| 13 | 版本差異與回滾 | MDL135 LKGC 快照/晉升/rollback;PSRepair 讓位備份 + UNDO manifest |
+| 14 | 覆蓋率與回歸 | `via-selftest`(SelftestGrid 193 站) |
+| 15 | 修正順序最佳化 | MDL135 拓撲序 |
+| 16 | 動態進度條 | `Write-VIAProgress` / ENG056 `PROGRESS.json` |
+| 17 | 動態說明 | 各引擎逐條印因由(批411 起連「不動的原因」都印) |
+| 18 | 非阻塞 PowerShell | `Invoke-VIAWatched`(批404 洗版修) |
+| 19 | 多引擎整合 | `via-entry` 唯一入口 + `CGC_MDL136_EntryBridge` |
+| 20 | 自動部署與初始化 | `via-rebuild` + `via-envgov` |
+
+### 六獨立流程 → 現役短令
+
+1. 代碼層與 AST 重構 → `via-psrepair`
+2. SSOT 資料與配置對齊 → `via-ssot` + MDL096
+3. 子系統依賴解耦(VRN/VDF/VAP)→ `via-rungate` + `via-envgov`
+4. 性能瓶頸與死碼清理 → `via-deadends` + `via-bridge-sweep --net-callers`
+5. 沙盒回歸驗證 → `via-selftest`
+6. UI Matrix 渲染與非阻塞部署 → `via-famui` / `via-console`
+
+### 本批沙盒實跑(能跑的那一半)
+
+`CGC_MDL064_SelftestGrid_v0252 --fast` 全跑:**OK 158 · FAIL 32 · SKIP 3**(存證
+`GRID_20260908_125812.json`)。前次同類全跑是 `OK 135 / FAIL 50 / SKIP 6`。
+
+**32 紅逐條看過,沒有一條是新缺陷**:多數是沙盒沒有工作站的正本庫
+(`tw_listings` / `tw_daily_prices` / `features_daily` / `global_daily` 查無此表)
+與缺 `pyarrow`,其餘是頁面站在沙盒缺再生前提。這是**誠實三態**該有的樣子——
+沙盒沒有的東西就報沒有,不假綠。
+
+### 誠實界限:另一半只能在工作站跑
+
+`via-psrepair` 的入口是 ps1,**沙盒無 pwsh**,所以 R1/R2/R3 三輪、20 個 PS 加速器、
+`-Fix` 都必須在工作站跑。`-Fix` 的可逆性已查實:Accel20 走 `.psrepair.bak` 讓位、
+MDL101 走 `VIA_Reports/ps_repair/backup_<ts>/` 整檔讓位 + manifest + UNDO,
+且 **sequence-dependent 只列不修**——所以它是保守且可回滾的,但仍是會改檔的動作,
+由操作員自己在工作站按下。
