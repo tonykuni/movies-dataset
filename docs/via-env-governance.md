@@ -950,3 +950,41 @@ GF_2454_…    → (空) DENY:拒絕清單:GF(操作員裁決)
 ```
 
 舊 `BROKER_DICT` 16 鍵覆蓋率 **13/16 → 15/16**(`GF` 是**刻意拒絕**不是漏掉)。
+
+## 三十六、批414:母倉現況導入 VIA Central Governance Console 面板
+
+操作員令「所有狀況都到導入 GROK VIA CENTRAL GOVERNANCE CONSOLE 面板顯示」。
+
+**先查再做**:那個面板本來就在——`cherry-lagoon-honey-dove` 的 `console-deck.tsx`
+標題就是「VIA Central Governance Console · 中央唯一入口」。所以不另開分頁,接進那一頁。
+
+新增 `src/lib/via/mother-status.ts`(照該 app 既有慣例:lib=純資料/邏輯 +
+`import type { Light }` + 一支 `node:test`),母倉 PR #30 批407–413 的**唯讀鏡面** 10 列:
+
+| 燈 | 批 | 項目 | 量 |
+|---|---|---|---|
+| ok | 批409 | 群益 PCF 車道驗真 | 26/26 檢 · 00992A×09-03 → 40 列 |
+| **warn** | 批409 | ETF 覆蓋誠實話 | **3 / 23 檔有源** |
+| ok | 批411 | 回補重試律 | 工作站 revived 23 · filled 1 |
+| ok | 批407 | 三道升級取用 | 22/22 |
+| ok | 批408 | 同意閘不覆蓋律 | 六令改為只在未設時補 |
+| ok | 批410 | VRN 自測污染修 | 15/15 + 10/10 |
+| ok | 批412 | 券商/評等正典化 | 舊鍵覆蓋 15/16 |
+| ok | 批412 | 分析師姓名擷取 | 落表 `vrn_report_analyst` |
+| ok | 批413 | 操作員裁決疊加層 | 拒絕 20 · 別名 +82 · 機構 +5 |
+| **pending** | 批410 | VRN 走到 GREEN 還缺什麼 | **尚無真報告** |
+
+**不跑、不抓、不連線**——數字全部來自母倉實跑與工作站實錄,在面板上只是被顯示。
+
+總燈**不取巧**:有 bad 即 bad,有 warn/pending 即 warn,全 ok 才 ok。
+現況是 **warn**(ETF 覆蓋 3/23、VRN 尚無真報告兩件未了結)。
+而且面板把**未了結的先列**——不讓好消息壓過待辦。
+
+`console-deck.tsx` 加一段(Pillar 之後、實測矩陣之前),用既有的
+`Matrix`/`StatusLight`/`Badge`/`tri`,附「母倉詳情」鍵跳既有 `05 母倉` 分頁。
+既有區段與所有既有模組零觸碰。
+
+**驗**:`node --experimental-strip-types --test src/lib/via/*.test.ts` → **227 pass / 0 fail**
+(原 224 + 本批 3);`tsc --noEmit` 本批兩檔零錯誤。
+已推 `claude/via-mother-deck-b405`(`f2ef6ff`);**未開 PR、未併 main**(未獲該項指令)。
+母倉可追溯副本留於 `references/intake/VIA_GrokConsole_CherryLagoon_b404/ui_integration_b414/`。
