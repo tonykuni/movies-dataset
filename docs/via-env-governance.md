@@ -616,3 +616,55 @@ via-etfhist backfill --max-days 5
 - **二十二檢 22/22**(+⑲ 三道升級序與瀏覽器標頭真傳入、⑳ 法遵 DENY 不啟動爬蟲、㉑ 走收容雙引擎且缺件誠實、㉒ 勝出道寫回車道冊),全注入式假 net、零外呼。
 - **工作站要跑爬蟲道需先裝**:`uv pip install --python <via_vdf_312> playwright` 後 `playwright install chromium`。缺席=誠實回因由,不假裝。
 - **登錄**:SelftestGrid v0245 站名;台帳 895。
+
+## 三十、批408:爬蟲道可達性修——短令覆寫式設閘 × 閘二值非期望 token = 批407 掛上的爬蟲道其實是死路
+
+批407 把 `scrape` 道掛上去之後,我回頭實查短令冊要寫給操作員的一貼指令,才發現這條道**根本開不了**。
+兩層根因相乘,而且各自單看都不像 bug:
+
+**① 短令是「覆寫式」設閘,不是「預設」。**
+`Register-VIA-Commands` 裡六個短令——`via-fred`(批360)、`via-revfill`(批368)、`via-etfuniv`(批374)、
+`via-etfhist`(批375)、`via-chip`/`via-price`(批394)——函式體第一句都是:
+
+```powershell
+$env:VIA_NET_CONSENT = "YES"; $env:VIA_SCRAPE_CONSENT = "YES";
+```
+
+**每次呼叫都寫死**。所以操作員就算在自己視窗裡把閘二設成正確 token,只要打 `via-etfhist`,
+第一句就把它蓋回 `"YES"`。這不是「不代設」的問題(那是另一條律),是**操作員連自己設都設不成**。
+
+**② 閘二的兩個把關者,判準寬嚴不同。**
+`SUP_MDL740.gate_state()` 的閘二只驗 `bool(g2)`(非空即算開);但 `check_url()` 會再走包內法遵
+`VIA_WebScraping_Compliance_v0101.def_validate_consent`,那支是**逐字比對** SSOT 的
+`required_consent_token`(`VIA_WebScraping_Compliance_SSOT.json` = `I_ACCEPT_RESPONSIBLE_SCRAPING`),
+`"YES"` 一律回 `CONSENT_MISSING` / `BLOCK`。
+
+於是實際跑出來的樣子是:`gate_state()` 說 `open=True`(看起來兩閘都開了),`check_url()` 卻回
+`DENY(fail-closed:法遵 finding 阻擋)`。訊息**看不出差在哪**——這是最傷的部分,操作員只會覺得「掛了但沒用」。
+
+### 修法(兩處,皆只增不減)
+
+- **`Register-VIA-Commands-v0165.ps1`**:新 `Set-VIAGateDefaults`——
+  `if (-not $env:VIA_NET_CONSENT) { … }` / `if (-not $env:VIA_SCRAPE_CONSENT) { … }`,
+  **只在該閘未設時才補預設值,已設者一律尊重**。六處覆寫改呼它;六令函式名、參數、下游啟動方式零改,
+  未設閘的情境下行為與前版**逐字相同**(=既有 `via-fred`/`via-chip`/… 不受影響)。
+  另新 `via-gates` 唯讀閘態一覽 + 同名 `.cmd` 梭:只報「是否等於期望 token」,**絕不印原值、絕不代設**,
+  並附上要自行開啟時該親打的那一行。
+- **`VDF_ENG078_ActiveETFHoldingsHistory_v0103.py`**:新 `gate2_diagnosis()` 三態
+  (未設(順帶告知期望值)/已設但非期望值(明說短令預設的 `YES` 過不了)/已是期望 token(阻擋另有其因)),
+  接進 `scrape` 道 DENY 的回傳訊息裡。同樣**不外洩原值**。
+
+### 驗
+
+- `ENG078 v0103 --selftest` **二十三檢 23/23**(全注入式假 net、零外呼)。新增檢 ㉓ 以
+  「臨時把 `VIA_SCRAPE_CONSENT` 設成 `YES` → 跑 `fetch_escalating` → 斷言訊息含『非期望值』與期望 token、
+  且不含原值;跑完還原原環境」實證三態。
+- `Register v0165` **十檢 10/10**(沙盒無 pwsh,以 Python 靜態驗)。其中兩檢刻意寫成**相對前版**:
+  大括號差與奇數引號行數都取「與 v0164 相同」為準——因為這個檔本來就有字面量內的括號與引號,
+  用絕對數當判準只會製造假紅(這是我在寫檢時先撞到、當場改掉的判準錯)。
+  另一檢 ⑩ 以集合比對證明「前版函式全數仍在,本批只新增兩支」。
+
+### 律(重申)
+
+**永不代操作員設任何同意閘。** 本批做的是**移除覆寫**、把差別講白,讓操作員自己決定要不要開;
+`Set-VIAGateDefaults` 保留六令原有的預設值只是為了不改既有行為,一旦操作員自己設了,它就不再插手。
