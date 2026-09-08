@@ -604,3 +604,15 @@ via-etfhist backfill --max-days 5
 - **修法(`CGC_MDL096_SyncStatus_v0109.py`)**:④ 改成驗**真 join**——直接讀 `VIA_AutoCode_Registry_v0100.json` 的尾筆 `code`,斷言它**逐字**出現在頁上。這才是「唯讀 join」的字面意思,且對任何前綴永久成立;台帳不可讀=誠實紅並印明。十檢 10/10(尾筆 `ENG078-v0101-406c(批406c)` 命中)。CI 以 `Tail "CGC_MDL096_SyncStatus_v*.py"` 取尾版,故 v0109 自動生效(尾版律)。
 - **順帶更正我先前的誤判**:本會話早先我在沙盒看到同一道 ④ 紅,用 `git stash` 在乾淨的 `128695c1` 上復現後,判定為「沙盒既有、CI 會過、不動」。**復現是對的,歸因是錯的**——那不是環境差異,就是這個脆弱白名單;我自己一路追加台帳,最後把 CI 也拖紅了。
 - **登錄**:台帳 894。再生頁 `VIA_UI_SyncStatus_v0100.html` 含 HEAD/dirty/列數等機器態,照往例不入 commit(CI 自己會再生)。
+
+## 二十九、批407:掛網路工具及爬蟲——三道升級取用(http → headers → scrape)
+
+操作員令「掛網路工具及爬蟲」。工作站實證:撤銷道生效(`PASS 0 · 撤銷 4`,車道冊已清乾淨),TWSE 路走完;群益投信那條是 `403 Forbidden`——伺服器拒絕、非找不到。
+
+- **Zero-Hydra:三道全走既有件,本器只調度不改寫**。① `http`=`SUP_MDL740.http_json`/`http_text`(現行)② `headers`=`SUP_MDL740.curl_json` / `http_bytes`——**這兩支本來就收 `headers` 參數**,只是沒人帶瀏覽器式標頭;多數 403(UA 擋)於此即通,不必動用瀏覽器 ③ `scrape`=收容之爬蟲雙引擎包 `PlaywrightBackend`(真瀏覽器),順帶捕 XHR `network_json`——**投信 PCF 頁多為 XHR 載入,故 JSON 優先於 HTML**。
+- **自動升級**:`probe`/`fetch_dated` 依車道 `fetch` 欄起跳、首個取到即用,並把**勝出道寫回車道冊**(下次自該道起跳,不必每次重試三道)。群益車道預設起跳道已改 `headers`(403 實證)。
+- **法遵不打折**:`scrape` 前必過 `SUP_MDL740.check_url`(雙閘 + 包內 `def_validate_consent` 審查);verdict 非 `ALLOW` 即**不啟動爬蟲**,誠實印因由並提示閘二 `VIA_SCRAPE_CONSENT` 期望 token `I_ACCEPT_RESPONSIBLE_SCRAPING`。**永不代設任何同意閘。** 註:`via-etfhist` 目前設的是 `YES`,`gate_state()` 只看非空故閘二會開,但包內 `def_validate_consent` 可能因 token 不符而出 BLOCK finding → 屆時 `check_url` 會回 DENY 並印明,由操作員決定是否改設正確 token。
+- **順修一個會擋死爬蟲道的真 bug**:爬蟲引擎 `import` 同包件(`VIA_Investment_Report_Classifier` 等),載入時**包夾必須在 `sys.path`**,否則 `ModuleNotFoundError`。沙盒自測原本回「引擎載入失敗」,修正後正確回「playwright 未安裝」(誠實區分「載不動」與「沒裝瀏覽器」)。
+- **二十二檢 22/22**(+⑲ 三道升級序與瀏覽器標頭真傳入、⑳ 法遵 DENY 不啟動爬蟲、㉑ 走收容雙引擎且缺件誠實、㉒ 勝出道寫回車道冊),全注入式假 net、零外呼。
+- **工作站要跑爬蟲道需先裝**:`uv pip install --python <via_vdf_312> playwright` 後 `playwright install chromium`。缺席=誠實回因由,不假裝。
+- **登錄**:SelftestGrid v0245 站名;台帳 895。

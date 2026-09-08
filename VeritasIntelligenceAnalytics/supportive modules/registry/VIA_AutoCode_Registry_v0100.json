@@ -6740,6 +6740,13 @@
    "ts": "2026-09-08 18:40",
    "name": "根因=④ 檢以 code 前綴白名單(TOOL|CGC|VDF|VAP|VRN|REG|INTAKE|BENCH|GRID|SHIM|MERGE|REFAIL|CI)- 猜台帳尾筆,但台帳 append-only、code 可為任何形狀;批406c 後尾 8 筆為 ENG054-/SUP_MDL740-/PSRepair-/GrokUI-/ENG078-×3 全不中,頁面其實正確 join 卻報紅(批401–406b 綠只因窗內殘留一筆舊合規 code,406c 擠出)。此為第二次:原寫死 TOOL- 已於批354 放寬成 13 前綴,放寬白名單只是延後同一個錯。修:CGC_MDL096_SyncStatus v0109 之 ④ 改驗真 join——讀 VIA_AutoCode_Registry_v0100.json 尾筆 code 並斷言逐字出現在頁上,對任何前綴永久成立;台帳不可讀=誠實紅印明。十檢 10/10。CI 以 Tail 取尾版故自動生效。",
    "note": "順帶更正我先前的誤判:本會話早先在沙盒見同一道 ④ 紅,以 git stash 於乾淨 128695c1 復現後判為『沙盒既有、CI 會過、不動』——復現對、歸因錯,那不是環境差異而是這個脆弱白名單,我自己持續追加台帳最後把 CI 也拖紅。再生頁 VIA_UI_SyncStatus_v0100.html 含 HEAD/dirty/列數等機器態,照往例不入 commit(CI 自己再生)。"
+  },
+  {
+   "code": "ENG078-v0102(批407)",
+   "kind": "批407 操作員令「掛網路工具及爬蟲」;工作站實證撤銷道生效(PASS 0 撤銷 4)、TWSE 路走完、群益 403",
+   "ts": "2026-09-08 18:55",
+   "name": "VDF_ENG078_ActiveETFHoldingsHistory v0102 三道升級取用(Zero-Hydra 全走既有件,只調度不改寫):① http=SUP_MDL740.http_json/http_text ② headers=SUP_MDL740.curl_json / http_bytes(兩支本就收 headers 參數,只是沒人帶瀏覽器式標頭)+ BROWSER_HEADERS,多數 403(UA 擋)於此即通 ③ scrape=收容爬蟲雙引擎 PlaywrightBackend 真瀏覽器,順帶捕 XHR network_json 且 JSON 優先於 HTML(投信 PCF 頁多為 XHR 載入)。probe/fetch_dated 依車道 fetch 欄起跳、首個取到即用、勝出道寫回車道冊;群益車道預設起跳道改 headers(403 實證)。法遵:scrape 前必過 check_url(雙閘+包內 def_validate_consent),非 ALLOW 即不啟動爬蟲並印明閘二期望 token I_ACCEPT_RESPONSIBLE_SCRAPING;永不代設任何同意閘。二十二檢 22/22;Grid v0245 站名。",
+   "note": "順修一個會擋死爬蟲道的真 bug:爬蟲引擎 import 同包件(VIA_Investment_Report_Classifier 等),載入時包夾必須在 sys.path,否則 ModuleNotFoundError;沙盒自測原回『引擎載入失敗』,修後正確回『playwright 未安裝』(誠實區分載不動 vs 沒裝瀏覽器)。工作站要跑爬蟲道需先 uv pip install playwright + playwright install chromium,缺席=誠實回因由不假裝。註:via-etfhist 目前設 VIA_SCRAPE_CONSENT=YES,gate_state 只看非空故閘二會開,但包內 def_validate_consent 可能因 token 不符出 BLOCK finding → check_url 回 DENY 並印明,由操作員決定是否改設正確 token(我不代設)。"
   }
  ]
 }
