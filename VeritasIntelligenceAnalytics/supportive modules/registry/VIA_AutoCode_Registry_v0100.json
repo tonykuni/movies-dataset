@@ -6837,7 +6837,13 @@
    "kind": "批419e 捕捉到卻不顯示,等於沒捕捉",
    "ts": "2026-09-08 23:10",
    "name": "成果:非個股修生效——via-closeout FAIL 34→12、另 22 份非個股已完成(DONE_NS)、報告 59 DONE 25/FAIL 12/PENDING 0、vrn_structdb rc=0,批418→419d 那條線收斂。券商正典鍵 0/59:批419c 的取樣把答案交出來——token=兆豐 → key=(空)、模組路徑正確、resolve_broker_filename 可呼叫=True;沙盒實跑對照同一條鏈是通的(兆豐→MEGA、MS→MS、JP→JPM,經 fin_ssot() 一樣通),所以不是邏輯錯是執行期查詢在炸。形狀:疊加層 overlay() 的 json.loads(OVERLAY_JSON.read_text()) 沒有 try,資料檔讀不到就丟例外不是回空;ssot_broker 的 except 把因由存進 _FIN['why'] 回空字典;而總結那行只在模組是 None 時才印 _FIN['why']。於是模組載得起來(印「SSOT 在位」)、每次查詢都拋例外、因由躺著沒人看,對外只剩沒有理由的 0/59。捕捉到卻不顯示等於沒捕捉——與批412『except 把 pydantic 錯誤吞成 0 筆』同一錯誤家族,那次修單一函式,這次修顯示規則。修 v0111:① 因由一律印(模組在位但 why 非空時補「查詢期例外:…」)② 零命中診斷加印疊加層 stats()(filename_keys 幾條、canon 在不在)與資料檔路徑及存在與否。新檢 ㉙ 以「模組在位但每次查詢都炸」的 stub 重現工作站故障形狀,斷言 rc=0、因由印得出來且是原始因由、stats() 炸掉也照實說。驗:二十九檢 29/29、Grid v0257 站綠。未解:0/59 的根因待下一跑的 stats() 與資料檔存在與否指出,不猜。登錄:Grid v0257、docs 四十五。"
+  },
+  {
+   "code": "OVERLAY-v0101(批419f)",
+   "kind": "批419f 正典缺席時疊加層自有的鍵一起陪葬",
+   "ts": "2026-09-08 23:25",
+   "name": "批419e 加的兩行下一跑就把根因交出來:查詢期例外=正典載入失敗 ModuleNotFoundError No module named 'pydantic';stats()={deny_keys 20, broker_alias_add 23, broker_add 5, rating_alias_add 59, filename_keys 16, canon 缺席};疊加層資料檔 存在=True。即疊加層資料全在、正典載不起來(vrn 境無 pydantic)。從「0 沒有告訴我們任何事」到「一行說完」,中間隔的就是批419c/e 兩次加診斷。根因:resolve_broker_filename 把 兆豐→MEGA 從 filename_key_map 查到了,再拿 MEGA 去 resolve_broker 要中英名,而 resolve_broker 次序是 拒絕→正典→疊加層別名→疊加層新增機構,MEGA 是正典機構,正典一缺席就全落空——即使對映已經知道答案。中英名確實只有正典有,但鍵是操作員裁決寫在疊加層 JSON 裡的資料,正典缺席不影響它成立;把它一起丟掉是把已知資料丟掉。修 Overlay v0101:新 overlay_keys()(filename_key_map 目標 ∪ broker_alias_add 鍵 ∪ broker_add ssot_key);resolve_broker 正典缺席且命中 overlay_keys 時鍵照回、中英名誠實留空、src=OVERLAY_KEY(正典缺席;僅鍵無中英名)不冒充 CANON;resolve_broker_filename 對映查得到卻回空時直接回該鍵。界線未放寬:查無仍查無(不存在的券商XYZ→空)、拒絕仍壓過一切(GF→DENY)、正典在位時照舊走 CANON。資料檔改尾版 glob。驗:疊加層十檢 10/10(新檢 ⑩ 強制 _CACHE['ssot'] 缺席重現 vrn 境);端到端實證同一條 ENG073.ssot_broker 鏈在正典缺席下跑 9 個真檔名命中 8(兆豐MEGA/MS/JPM/CLSA/KGI/HUANAN/CTBC/UBS;GF 正確 DENY);Grid v0258 站綠。誠實界限:券商中英名、評等 code/direction、分析師姓名擷取仍要正典即仍要 pydantic,補法 uv pip install --python C:\\Users\\tonyk\\envs\\via_vrn_312 pydantic。登錄:Grid v0258、docs 四十六。"
   }
  ],
- "updated_at": "2026-09-08 23:10"
+ "updated_at": "2026-09-08 23:25"
 }

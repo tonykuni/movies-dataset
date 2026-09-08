@@ -1543,3 +1543,68 @@ ENG073 v0111 **二十九檢 29/29**、SelftestGrid **v0257** 該站實跑綠。
 `0/59` 的**根因**還沒定案——下一跑的 `stats()` 與資料檔存在與否會直接指出來:
 若 `filename_keys=0` 或資料檔不存在,就是 `VIA_FinancialInstitution_Overlay_v0100.json`
 沒被拉到/讀不到;若 `stats()` 正常而查詢仍炸,那是別的東西。**不猜。**
+
+## 四十六、批419f:診斷把根因交出來了——正典缺席時,疊加層自有的鍵一起陪葬
+
+### 診斷奏效:一字不差的根因
+
+批419e 加的兩行,下一跑就把答案交出來:
+
+```
+[SSOT 正規化] 券商正典鍵 0/59 · … · 金融機構 SSOT 在位
+              · **查詢期例外**:正典載入失敗 ModuleNotFoundError:No module named 'pydantic'
+[SSOT 診斷] … stats()={'deny_keys': 20, 'broker_alias_add': 23, 'broker_add': 5,
+                        'rating_alias_add': 59, 'filename_keys': 16,
+                        'canon': "缺席:正典載入失敗 … No module named 'pydantic'"}
+            疊加層資料檔:…\VIA_FinancialInstitution_Overlay_v0100.json · 存在=True
+```
+
+**疊加層資料全在**(16 條檔名鍵、20 條拒絕、23+59 條別名),**正典載不起來**
+——`via_vrn_312` 沒有 `pydantic`。從「0 沒有告訴我們任何事」到「一行說完」,
+中間隔的就是批419c/e 那兩次加診斷。
+
+### 根因:把已知的資料丟掉
+
+```python
+def resolve_broker_filename(token):
+    tgt = filename_key_map.get(token)      # 兆豐 → "MEGA"  ← 查到了
+    if tgt:
+        r = resolve_broker(tgt)            # 拿 MEGA 去問正典要中英名
+        return r                           # 正典缺席 → r["key"] 是空的 → 整個丟掉
+```
+
+`resolve_broker("MEGA")` 的次序是 拒絕 → 正典 → 疊加層別名 → 疊加層新增機構。
+`MEGA` 是**正典**的機構,所以正典一缺席就全落空——即使
+`filename_key_map` **已經知道** `兆豐 → MEGA`。
+
+**中英名確實只有正典有,但「鍵」是操作員裁決寫在疊加層 JSON 裡的資料。**
+正典缺席不影響那個鍵成立。把它一起丟掉,是把已知的資料丟掉。
+
+### 修(`VIA_FinancialInstitution_Overlay_v0101.py`)
+
+- 新 `overlay_keys()`:疊加層自己知道的鍵集合(`filename_key_map` 的目標 ∪
+  `broker_alias_add` 的鍵 ∪ `broker_add` 的 `ssot_key`)。
+- `resolve_broker()`:**正典缺席時**,若 `value` 命中 `overlay_keys()`,鍵照回、
+  中英名**誠實留空**、`src="OVERLAY_KEY(正典缺席;僅鍵無中英名)"`——**不冒充 CANON**。
+- `resolve_broker_filename()`:對映查得到目標鍵卻因正典缺席回空 → 直接回那個鍵,
+  `src="FILENAME_MAP(正典缺席;僅鍵無中英名)"`。
+- **界線沒有放寬**:查無仍是查無(`不存在的券商XYZ` → 空,不硬造);
+  拒絕仍壓過一切(`GF` → DENY);正典在位時一切照舊走 CANON。
+- 資料檔改**尾版 glob**,不再把 `v0100.json` 的名字寫死在 v0101 裡。
+
+### 驗
+
+疊加層 **十檢 10/10**(新檢 ⑩ 把 `_CACHE["ssot"]` 強制設成缺席以重現 vrn 境無 pydantic);
+**端到端實證**:同一條 `ENG073.ssot_broker` 鏈在正典缺席下跑 9 個真檔名 → **命中 8**
+(`兆豐→MEGA`、`MS→MS`、`JP→JPM`、`CLST→CLSA`、`凱基→KGI`、`華南→HUANAN`、
+`CTBC→CTBC`、`UBS→UBS`;`GF` 正確 DENY)。SelftestGrid **v0258** 該站實跑綠。
+
+### 誠實界限:這不是 pydantic 的替代品
+
+券商**鍵**回來了,但這三件仍然要正典,也就仍然要 `pydantic`:
+
+- 券商中英名(`broker_name_zh` / `broker_name_en`)
+- 評等正典鍵的 `code` / `direction`
+- **分析師姓名擷取**(`analyze_contact_document` 整支都在正典那一層)
+
+補法一行:`uv pip install --python C:\Users\tonyk\envs\via_vrn_312 pydantic`
