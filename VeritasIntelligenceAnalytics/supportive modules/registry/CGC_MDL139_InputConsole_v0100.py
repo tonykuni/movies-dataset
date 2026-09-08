@@ -14,6 +14,11 @@ DEFAULT 都是最新;目前資料庫狀況;台股每日交易資訊及籌碼最�
 國際資訊現有哪些/增減哪些=勾選放右面板;啟動跑一切+輸入及運作結果矩陣;TAB2 BASIC INFO(核對態)/TAB3 SUMMARY 矩陣/
 TAB4 FINANCIAL DATA 核對:報告歷史值≠報告值時以 VDF 抓來的歷史值為主;起始時間統一 2023-01-01 至最新;可整類改起始日
 (YYYY-MM-DD 遮罩:'-' 固定,未輸入前淺色 YYYY-MM-DD,輸入數字自行填上);VAP 規格細節與圖片顯示;VDF/VRN/VAP 跑成功了嗎」。
+批400:右矩陣 +「收尾」TAB(收尾閘 MDL141 via-closeout 落檔 VIA_Reports/closeout/{CLOSEOUT,VRN_CLOSEOUT,VAP_CLOSEOUT}_latest.json 只讀;
+      Zero-Hydra:MDL141 為正本,本頁不另算不另抓;缺=誠實「未跑:via-closeout」):表頭 總判/VRN/VAP 判定+註+次步;VRN 逐份矩陣(報告/代碼/
+      日期/已完成段/BASIC INFO/FINANCIAL DATA/判定 DONE|FAIL|PENDING)+ VAP 逐圖矩陣(圖/型/KB/更新/尺寸/合格 OK|FAIL/因);篩選/排序/勾選同他頁;
+      LIVE 與 SNAPSHOT 皆讀 ST.closeout(快照嵌頁;LIVE 經既有 /console_status 輪詢);status 加 closeout{all,vrn,vap}(缺=None);
+      十檢 ⑥ 擴 closeout 三鍵、⑦ 擴 右矩陣 13 頁含「收尾」;零 CDN 零新外部資源。
 機制(Zero-Hydra:一冊一頁一橋;每一項目綁定母倉現役引擎與真旗標,引擎缺=誠實 PLANNED 不假跑):
   冊  VIA_InputConsole_Spec_v0100.json:families(vdf/vrn/vap)→ groups → items{engine(dir/glob/verb), params 種類}
       + defaults.start=2023-01-01(統一起始;end=最新)+ user 段(操作員個別改動:群組起始 group_starts/單項 starts、
@@ -21,12 +26,13 @@ TAB4 FINANCIAL DATA 核對:報告歷史值≠報告值時以 VDF 抓來的歷史
       台股代碼/財報期別/VRN 路徑/國際資訊增減鏡寫 VDF_Input_Interface_Matrix 活冊(零刪除語意)
   頁  supportive modules/ui_support/VIA_UI_InputConsole_v0100.html(零 CDN;左 rail=輸入表單(整類起始遮罩/台股代碼冊/
       宏觀類別/財報期別/VRN 選夾·選檔·拖曳·單鍵啟動/VAP 簡輸入;▶ 啟動全部),右 main=矩陣(輸入及運作結果/國際資訊勾選/
-      BASIC INFO 核對態/SUMMARY 矩陣/FINANCIAL DATA 核對(VDF 為主)/庫狀況/對齊/台股清單/宏觀序列/VAP 規格與圖/跑成功?)
+      BASIC INFO 核對態/SUMMARY 矩陣/FINANCIAL DATA 核對(VDF 為主)/庫狀況/對齊/台股清單/宏觀序列/VAP 規格與圖/跑成功?/收尾(批400))
       篩選/點欄排序預設大到小/勾選/全選/全不選;進度動畫=樞紐 /status 輪詢;同源樞紐 /console=LIVE,file:// 頁=SNAPSHOT)
   橋  DeckServer 尾版:GET /console /console_status /vap_img;POST /console_run{item,params}/console_set{ops}/intake
   狀況 status:庫狀況(ENG073 快照+DuckDB 現值)、對齊(ENG081)、台股清單、宏觀(macro_ssot)、國際資訊冊、VRN 三 TAB
       (BASIC INFO 核對態/SUMMARY 矩陣/FINANCIAL DATA 核對:價/上漲/營收 報告值 vs VDF 值 → VDF 為主)、VAP 規格冊
-      (40 canonical)與圖片清單、家族跑成功?(RunGate+FamilyUI 存證)、項目可跑態 → VIA_Reports/console/CONSOLE_latest.json
+      (40 canonical)與圖片清單、家族跑成功?(RunGate+FamilyUI 存證)、收尾(MDL141 CLOSEOUT/VRN_/VAP_CLOSEOUT_latest.json 只讀;批400)、
+      項目可跑態 → VIA_Reports/console/CONSOLE_latest.json
 紀律:只增不減;正本零觸碰;誠實三態;零 CDN;零網路(status/build 不觸網;run 只在操作員按啟動且項目 net=true 才給同意閘);
       尾版律(引擎 glob 尾版);預設起始=冊 defaults.start(批392 2023-01-01);latest=不帶旗標=引擎增量律。
 用法:python3 CGC_MDL139_InputConsole_v0100.py [build] [--open] | status [--json]
@@ -912,7 +918,8 @@ def status(spec: dict | None = None, do_print: bool = True, reports: Path = REPO
     hub = (hub_fn or hub_live)()
     rep = {"schema": "VIA.InputConsole.status.v1", "ts": _now(), "hub": hub, "bridge": BRIDGE, "via": str(VIA), "verdict": "GREEN", "notes": [],
            "defaults": spec.get("defaults", {}), "group_starts": spec.get("user", {}).get("group_starts", {}),
-           "db": {"source": "", "tables": {}}, "align": None, "coverage": None, "localdb": None, "tw_codes": [], "macro": {}, "intl": [], "vrn": {}, "vap": {}, "items": {}, "family_success": {}}
+           "db": {"source": "", "tables": {}}, "align": None, "coverage": None, "localdb": None, "tw_codes": [], "macro": {}, "intl": [], "vrn": {}, "vap": {}, "items": {}, "family_success": {},
+           "closeout": {"all": None, "vrn": None, "vap": None}}   # 批400:收尾閘(MDL141)三鍵;缺=None 誠實「未跑」
     duckdb = _duckdb()
     arch = _read_json(HERE / "VIA_VDFArchitecture_v0100.json")
     tables = {}
@@ -1021,6 +1028,9 @@ def status(spec: dict | None = None, do_print: bool = True, reports: Path = REPO
                              "start": effective_start(spec, iid, ent["group"]) or "latest", "days": user.get("days", {}).get(iid, ""),
                              "argv_preview": " ".join(Path(x).name if os.sep in str(x) or "/" in str(x) else str(x) for x in r.get("argv", []))}
     rep["family_success"] = family_success()
+    # 批400:收尾閘(MDL141 via-closeout)落檔只讀;缺=None(誠實「未跑:via-closeout」;Zero-Hydra:MDL141 為正本,不另算)
+    co_dir = VIA / "VIA_Reports" / "closeout"
+    rep["closeout"] = {"all": _read_json(co_dir / "CLOSEOUT_latest.json"), "vrn": _read_json(co_dir / "VRN_CLOSEOUT_latest.json"), "vap": _read_json(co_dir / "VAP_CLOSEOUT_latest.json")}
     n_planned = sum(1 for v in rep["items"].values() if v["state"] == "PLANNED")
     n_missing = sum(1 for v in rep["items"].values() if v["state"] == "ENGINE_MISSING")
     if n_missing:
@@ -1040,6 +1050,7 @@ def status(spec: dict | None = None, do_print: bool = True, reports: Path = REPO
               f" · VRN 報告 {len(rs)}(BASIC VERIFIED {rep['vrn']['summary']['basic_verified']}/FIN VERIFIED {rep['vrn']['summary']['verified']}/FAIL {rep['vrn']['summary']['fail']})· 項目 {len(idx)}(PLANNED {n_planned})· 統一起始 {rep['defaults'].get('start')}")
         for f, v in fs.items():
             print(f"  跑成功? {f:<4} {v['answer']} · {v['evidence']}")
+        print("  收尾閘  " + " · ".join((f"{k.upper()} {v.get('verdict', '?')}" + (f"({str(v.get('note', ''))[:60]})" if v.get("note") else "") if isinstance(v, dict) else f"{k.upper()} 未跑:via-closeout") for k, v in rep["closeout"].items()))
         for n in rep["notes"]:
             print(f"  {n['lamp']:<7} {n['note']}")
         for iid, v in rep["items"].items():
@@ -1081,11 +1092,12 @@ pre.log{max-height:160px;overflow:auto;background:#1f2530;color:#d7dde6;padding:
 .via-matrix-bar{display:flex;gap:6px;align-items:center;margin:6px 0;flex-wrap:wrap}.via-q{border:1px solid var(--line);border-radius:4px;padding:4px 6px;min-width:220px;font:inherit}.via-cnt{color:var(--mut)}
 table.via-tbl{width:100%;border-collapse:collapse;background:var(--paper);font-size:11.5px}table.via-tbl th{position:sticky;top:0;background:var(--soft);text-align:left;padding:5px 6px;border-bottom:1px solid var(--line);cursor:pointer;user-select:none;white-space:nowrap}
 table.via-tbl th.sd::after{content:" ▼"}table.via-tbl th.sa::after{content:" ▲"}table.via-tbl td{padding:4px 6px;border-bottom:1px solid var(--line2);white-space:nowrap;max-width:460px;overflow:hidden;text-overflow:ellipsis}table.via-tbl td.num{text-align:right;font-variant-numeric:tabular-nums}
-table.via-tbl tr.on{background:var(--acc2)}td.lamp-ok,td.lamp-verified,td.lamp-green,td.lamp-aligned,td.lamp-ready,td.lamp-現有{color:var(--ok);font-weight:600}td.lamp-fail,td.lamp-red,td.lamp-misaligned,td.lamp-已移除{color:var(--bad);font-weight:600}td.lamp-pending,td.lamp-yellow,td.lamp-partial,td.lamp-planned,td.lamp-未選{color:var(--warn);font-weight:600}
+table.via-tbl tr.on{background:var(--acc2)}td.lamp-ok,td.lamp-verified,td.lamp-green,td.lamp-aligned,td.lamp-ready,td.lamp-done,td.lamp-現有{color:var(--ok);font-weight:600}td.lamp-fail,td.lamp-red,td.lamp-misaligned,td.lamp-已移除{color:var(--bad);font-weight:600}td.lamp-pending,td.lamp-yellow,td.lamp-partial,td.lamp-planned,td.lamp-未選{color:var(--warn);font-weight:600}
 .tbox{overflow:auto;max-height:70vh;border:1px solid var(--line);border-radius:var(--radius)}.kpi{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0}.kpi div{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:6px 10px;min-width:120px}.kpi b{display:block;font-size:16px}
 .cmd{background:var(--paper2);border:1px dashed var(--line);border-radius:6px;padding:6px 8px;font:11px Consolas,monospace;white-space:pre-wrap;word-break:break-all;margin-top:6px}
 .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}.gallery figure{margin:0;background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:6px}.gallery img{width:100%;height:150px;object-fit:contain;background:#fff}.gallery figcaption{font-size:10.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .okbox{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px}.okbox div{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:8px}.okbox b{font-size:14px;display:block}
+.cv-GREEN{color:var(--ok)}.cv-YELLOW{color:var(--warn)}.cv-RED{color:var(--bad)}.cv-GREY,.cv-NONE{color:var(--grey)}.kpi div.co{min-width:220px;max-width:420px}.kpi div.co .note{color:var(--mut);font-size:11px;white-space:normal}
 @media (max-width:900px){.wrap{flex-direction:column}aside.rail{width:auto;min-width:0;border-right:0;border-bottom:1px solid var(--line)}}
 """
 
@@ -1198,6 +1210,7 @@ function uploadFiles(files,autostart){var ul=$('drop_out');ul.innerHTML='';files
 function imgSrc(r){return MODE==='LIVE'?(B+'/vap_img?p='+encodeURIComponent(r.rel)):('file:///'+String(r.abs||'').replace(/\\/g,'/'));}
 function renderMatrices(){var t=(ST.db||{}).tables||{};var rows=Object.keys(t).map(function(k){var v=t[k];return {table:k,db:v.db,rows:v.rows,max:v.max||'',lag:v.lag_days==null?'':v.lag_days,source:v.source||''};});
  var fs=ST.family_success||{};$('kpi_db').innerHTML='<div><b>'+rows.length+'</b>庫表</div><div><b>'+esc(((ST.align||{}).verdict)||'未跑')+'</b>日交易×籌碼對齊</div><div><b>'+esc((ST.hub||''))+'</b>樞紐</div><div><b>'+esc(((ST.vrn||{}).summary||{}).reports||0)+'</b>VRN 報告</div><div><b>'+esc((ST.defaults||{}).start||'')+'</b>統一起始</div>'+['vdf','vrn','vap'].map(function(f){var v=fs[f]||{};return '<div><b>'+esc((v.answer||'未證實').split(/[:(]/)[0])+'</b>'+f.toUpperCase()+' 跑成功?</div>';}).join('');
+ var co=ST.closeout||{};$('kpi_db').innerHTML+='<div><b class="cv-'+(co.all?esc(co.all.verdict||'GREY'):'NONE')+'">'+(co.all?esc(co.all.verdict||'?'):'未跑')+'</b>收尾閘(MDL141)</div>';
  var its=ST.items||{};var runsNow=window._RUNS||{};viaMatrix($('m_io'),[{key:'id',zh:'項目'},{key:'family',zh:'族'},{key:'zh',zh:'說明'},{key:'state',zh:'可跑態',lamp:true},{key:'start',zh:'起始'},{key:'run',zh:'運作結果',lamp:true},{key:'elapsed',zh:'秒',num:true},{key:'tail',zh:'尾行'},{key:'argv_preview',zh:'argv 預覽'}],Object.keys(its).map(function(k){var e=runsNow['console:'+k]||{};return Object.assign({id:k,run:e.state||'',elapsed:e.elapsed||'',tail:(e.tail||'').slice(-100)},its[k]);}),{desc:false,defaultSort:'family'});
  var intl=ST.intl||[];INTL=viaMatrix($('m_intl'),[{key:'uid',zh:'鍵'},{key:'section',zh:'冊/引擎'},{key:'kind',zh:'型'},{key:'id',zh:'代碼/項目'},{key:'state',zh:'狀態',lamp:true},{key:'zh',zh:'說明'}],intl.map(function(r){return Object.assign({uid:r.section+':'+r.kind+':'+r.id},r);}),{select:true,idKey:'uid',desc:false,defaultSort:'section',preChecked:function(r){return r.state==='現有';},extra:[['套用勾選(勾=納入 未勾=移除;零刪除)',applyIntl]]});
  var cb=$('intl_cats');cb.innerHTML=intl.filter(function(r){return r.kind==='cat';}).map(function(r){return '<label><input type="checkbox" value="'+esc(r.id)+'"'+(r.state==='現有'?' checked':'')+'> '+esc(r.id)+'</label>';}).join(' ');
@@ -1213,6 +1226,12 @@ function renderMatrices(){var t=(ST.db||{}).tables||{};var rows=Object.keys(t).m
  var g=$('m_vap_imgs');g.innerHTML='';(vap.images||[]).forEach(function(r){var f=el('figure');f.innerHTML='<img src="'+esc(imgSrc(r))+'" alt="'+esc(r.name)+'" loading="lazy"><figcaption title="'+esc(r.rel)+'">'+esc(r.name)+' · '+r.kb+' KB · '+esc(r.mtime)+'</figcaption>';g.appendChild(f);});if(!(vap.images||[]).length)g.innerHTML='<div class="note">(尚無圖片:按 VAP ONE 示範堆圖或圖組啟動後出現;LIVE 經樞紐 /vap_img 供圖,快照經 file://)</div>';
  viaMatrix($('m_vap_pages'),[{key:'zh',zh:'產出'},{key:'page',zh:'頁'},{key:'exists',zh:'在位'},{key:'mtime',zh:'更新'}],vap.pages||[],{desc:false});
  var ok=$('m_ok');ok.innerHTML='';['vdf','vrn','vap'].forEach(function(f){var v=fs[f]||{};ok.appendChild(el('div',null,'<b>'+f.toUpperCase()+':'+esc(v.answer||'未證實')+'</b><div>能跑閘 '+esc(v.rungate||'未跑')+' · 家族 U/I '+esc(v.famui||'未跑')+'</div><div class="note">'+esc(v.evidence||'')+'</div>'));});
+ // ---- 收尾(批400):收尾閘 MDL141 落檔只讀(ST.closeout;快照嵌頁、LIVE 經 /console_status 輪詢);缺=誠實「未跑:via-closeout」;不另算 ----
+ function coTile(tag,x){if(!x)return '<div class="co"><b class="cv-NONE">未跑</b>'+tag+'<div class="note">未跑:via-closeout</div></div>';return '<div class="co"><b class="cv-'+esc(x.verdict||'GREY')+'">'+esc(x.verdict||'?')+'</b>'+tag+' · '+esc(x.ts||'')+'<div class="note">'+esc(x.note||'')+((x.next||[]).length?'<br>次步:'+esc(x.next.join(' ; ')):'')+'</div></div>';}
+ $('closeout_kpi').innerHTML=coTile('總判(收尾閘 MDL141)',co.all)+coTile('VRN 驗證收尾(VAL)',co.vrn)+coTile('VAP 產出收尾',co.vap);
+ var cvs=(co.vrn||{}).summary||{},cas=(co.vap||{}).summary||{};$('closeout_note').textContent=(co.vrn?'VRN:報告 '+(cvs.reports||0)+' · DONE '+(cvs.done||0)+' · FAIL '+(cvs.fail||0)+' · PENDING '+(cvs.pending||0)+' · BASIC VERIFIED '+(cvs.basic_verified||0)+' · FINANCIAL VERIFIED '+(cvs.financial_verified||0)+' · 庫 '+(cvs.db_state||'?'):'VRN:未跑:via-closeout')+' ｜ '+(co.vap?'VAP:規格 '+(cas.specs||0)+' · 產出夾在位 '+(cas.dirs_exist||0)+' · 圖 '+(cas.images||0)+' · 合格 '+(cas.valid||0)+' · 不合格 '+(cas.invalid||0):'VAP:未跑:via-closeout');
+ viaMatrix($('m_closeout_vrn'),[{key:'report_file',zh:'報告'},{key:'ticker',zh:'代碼'},{key:'report_date',zh:'日期'},{key:'stage_zh',zh:'已完成段'},{key:'basic',zh:'BASIC INFO',lamp:true},{key:'financial',zh:'FINANCIAL DATA',lamp:true},{key:'verdict',zh:'判定',lamp:true}],(co.vrn||{}).rows||[],{select:true,defaultSort:'report_date'});
+ viaMatrix($('m_closeout_vap'),[{key:'name',zh:'圖'},{key:'kind',zh:'型'},{key:'kb',zh:'KB',num:true},{key:'mtime',zh:'更新'},{key:'dims',zh:'尺寸'},{key:'valid',zh:'合格',lamp:true},{key:'why',zh:'因'}],((co.vap||{}).images||[]).map(function(r){return Object.assign({},r,{valid:r.valid===true?'OK':(r.valid===false?'FAIL':'')});}),{select:true,defaultSort:'mtime'});
  if(MODE==='LIVE')fetch(B+'/status',{cache:'no-store'}).then(function(r){return r.json();}).then(renderRuns).catch(function(){});}
 function renderRuns(s){window._RUNS=s||{};var rows=Object.keys(s||{}).map(function(k){var e=s[k];return {task:k,zh:e.zh,state:e.state,started:e.started||'',elapsed:e.elapsed||0,pct:e.pct==null?'':e.pct,rc:e.rc==null?'':e.rc,tail:(e.tail||'').slice(-120)};}).filter(function(r){return r.state!=='idle';});viaMatrix($('m_runs'),[{key:'task',zh:'任務'},{key:'zh',zh:'說明'},{key:'state',zh:'狀態',lamp:true},{key:'started',zh:'開始'},{key:'elapsed',zh:'秒',num:true},{key:'pct',zh:'%',num:true},{key:'rc',zh:'rc'},{key:'tail',zh:'尾行'}],rows,{defaultSort:'started'});}
 function renderAll(){renderRail();renderMatrices();var notes=(ST.notes||[]).map(function(n){return n.lamp+' '+n.note;}).join(' · ');$('notes').textContent=notes||'GREEN';$('stamp').textContent='狀況 '+(ST.ts||'')+' · 頁 '+(SNAP?SNAP.built:'');}
@@ -1234,7 +1253,7 @@ PAGE = r"""<!DOCTYPE html>
 </aside>
 <main class="work">
  <div class="kpi" id="kpi_db"></div>
- <div class="tabs" data-panes="mx"><button class="on" data-p="io">輸入及運作結果</button><button data-p="intl">國際資訊(勾選增減)</button><button data-p="basic">BASIC INFO(核對態)</button><button data-p="summary">SUMMARY 矩陣</button><button data-p="fin">FINANCIAL DATA 核對</button><button data-p="db">庫狀況</button><button data-p="align">日交易×籌碼對齊</button><button data-p="codes">台股清單</button><button data-p="macro">宏觀序列</button><button data-p="vap">VAP 規格與圖</button><button data-p="ok">跑成功?</button><button data-p="runs">執行狀態</button></div>
+ <div class="tabs" data-panes="mx"><button class="on" data-p="io">輸入及運作結果</button><button data-p="intl">國際資訊(勾選增減)</button><button data-p="basic">BASIC INFO(核對態)</button><button data-p="summary">SUMMARY 矩陣</button><button data-p="fin">FINANCIAL DATA 核對</button><button data-p="db">庫狀況</button><button data-p="align">日交易×籌碼對齊</button><button data-p="codes">台股清單</button><button data-p="macro">宏觀序列</button><button data-p="vap">VAP 規格與圖</button><button data-p="ok">跑成功?</button><button data-p="closeout">收尾</button><button data-p="runs">執行狀態</button></div>
  <div class="pane on" id="mx_io" data-grp="mx"><div id="m_io"></div></div>
  <div class="pane" id="mx_intl" data-grp="mx"><p class="note">現有=冊內 live;已移除=removed_*(零刪除);勾=納入、未勾=移除,按「套用勾選」入冊(鏡寫 VDF_Input_Interface_Matrix)。ENG066 11 類:<span id="intl_cats"></span></p><div id="m_intl"></div><div id="intl_out"></div></div>
  <div class="pane" id="mx_basic" data-grp="mx"><div class="kpi" id="vrn_kpi"></div><div id="m_basic"></div></div>
@@ -1246,6 +1265,7 @@ PAGE = r"""<!DOCTYPE html>
  <div class="pane" id="mx_macro" data-grp="mx"><div id="m_macro"></div></div>
  <div class="pane" id="mx_vap" data-grp="mx"><h3>圖規細節(40 canonical;VIA_VAP_All_Chart_Specs_v018)</h3><div id="m_vap_specs"></div><h3>圖片</h3><div class="gallery" id="m_vap_imgs"></div><h3>產出頁</h3><div id="m_vap_pages"></div></div>
  <div class="pane" id="mx_ok" data-grp="mx"><div class="okbox" id="m_ok"></div></div>
+ <div class="pane" id="mx_closeout" data-grp="mx"><div class="kpi" id="closeout_kpi"></div><p class="note" id="closeout_note"></p><p class="note">律(批400):收尾閘 MDL141(via-closeout / via-vrnval / via-vapval)落檔只讀,本頁不另算不另抓;逐份 DONE|FAIL|PENDING、逐圖 OK|FAIL;總判 GREEN|YELLOW|RED|GREY;落檔缺=未跑(誠實)。</p><h3>VRN 驗證收尾(逐份;五段鏈 收件→首頁→入庫→財報頁→四點)</h3><div id="m_closeout_vrn"></div><h3>VAP 產出收尾(逐圖驗:SVG/PNG/HTML/PDF;零 CDN)</h3><div id="m_closeout_vap"></div></div>
  <div class="pane" id="mx_runs" data-grp="mx"><div id="m_runs"></div></div>
 </main>
 </div>
@@ -1378,24 +1398,29 @@ def selftest() -> int:
             and c_pend["financial"] == "PENDING" and c_pend["overall"] == "YELLOW")
         rep_dir = root / "reports"
         st = status(s2, do_print=False, reports=rep_dir, db_tw=root / "no.duckdb", db_gl=root / "no_gl.duckdb", hub_fn=lambda: "SNAPSHOT", matrix_path=mp if has_mx else None)
-        chk("⑥ status 結構(hub 三態/庫狀況 ENG073 快照或空誠實/台股清單 焦點冊≥100/宏觀類別 13 含計數/國際資訊冊列/VRN 三 TAB 容器+摘要/VAP 頁+規格 40+圖片清單/跑成功? 三族/項目可跑態含 PLANNED;CONSOLE_latest.json 落檔)",
+        chk("⑥ status 結構(hub 三態/庫狀況 ENG073 快照或空誠實/台股清單 焦點冊≥100/宏觀類別 13 含計數/國際資訊冊列/VRN 三 TAB 容器+摘要/VAP 頁+規格 40+圖片清單/跑成功? 三族/收尾 closeout 三鍵 all·vrn·vap(缺=None 誠實)/項目可跑態含 PLANNED;CONSOLE_latest.json 落檔)",
             st["hub"] == "SNAPSHOT" and st["schema"] == "VIA.InputConsole.status.v1" and len(st["tw_codes"]) >= 100 and len(st["macro"]["categories"]) == 13
             and all("n" in c for c in st["macro"]["categories"]) and all(k in st["vrn"] for k in ("summary", "reports", "basic", "summary_matrix", "financial")) and len(st["vap"]["pages"]) == 3
             and len(st["vap"]["specs"]) == 40 and isinstance(st["vap"]["images"], list) and set(st["family_success"]) == {"vdf", "vrn", "vap"} and all("answer" in v for v in st["family_success"].values())
             and st["items"]["fin_statements"]["state"] == "PLANNED" and st["items"]["tw_history"]["state"] == "READY" and st["items"]["tw_history"]["start"] == "latest" and st["items"]["tw_chips"]["start"] == "2023-01-01"
-            and len(st["intl"]) >= 14 and any(r["kind"] == "cat" for r in st["intl"]) and (rep_dir / "CONSOLE_latest.json").exists(),
-            f"(hub {st['hub']};表 {len(st['db']['tables'])};清單 {len(st['tw_codes'])};項目 {len(st['items'])};國際 {len(st['intl'])};規格 {len(st['vap']['specs'])})")
+            and len(st["intl"]) >= 14 and any(r["kind"] == "cat" for r in st["intl"]) and (rep_dir / "CONSOLE_latest.json").exists()
+            and set(st["closeout"]) == {"all", "vrn", "vap"} and all(v is None or (isinstance(v, dict) and "verdict" in v) for v in st["closeout"].values()),
+            f"(hub {st['hub']};表 {len(st['db']['tables'])};清單 {len(st['tw_codes'])};項目 {len(st['items'])};國際 {len(st['intl'])};規格 {len(st['vap']['specs'])};收尾 {[(k, (v or {}).get('verdict', '未跑')) for k, v in st['closeout'].items()]})")
         out = root / "VIA_UI_InputConsole_v0100.html"
         build(s2, out=out, reports=rep_dir, do_print=False, st=st)
         page = out.read_text(encoding="utf-8")
         m = re.search(r'<script id="snap" type="application/json">(.*?)</script>', page, re.S)
         snap = json.loads(m.group(1).replace("<\\/", "</")) if m else None
-        chk("⑦ 頁面(零 CDN;左 rail 三族+▶ 啟動全部 VDF/VRN 單鍵啟動;整類起始遮罩 dmask YYYY-MM-DD;右矩陣 12 頁 含國際資訊勾選/BASIC INFO/SUMMARY/FINANCIAL/VAP 規格與圖/跑成功?;拖曳區/選夾;快照 JSON;CSRF meta;樞紐道)",
+        mx_bar = re.search(r'<div class="tabs" data-panes="mx">(.*?)</div>', page, re.S)   # 批400:右矩陣頁數=分頁列按鈕數(與 pane 數同)
+        n_tabs = mx_bar.group(1).count("<button") if mx_bar else 0
+        chk("⑦ 頁面(零 CDN;左 rail 三族+▶ 啟動全部 VDF/VRN 單鍵啟動;整類起始遮罩 dmask YYYY-MM-DD;右矩陣 13 頁 含國際資訊勾選/BASIC INFO/SUMMARY/FINANCIAL/VAP 規格與圖/跑成功?/收尾(批400 MDL141 逐份+逐圖矩陣);拖曳區/選夾;快照 JSON 含 closeout;CSRF meta;樞紐道)",
             not CDN_RX.search(page) and 'class="rail"' in page and 'id="vdf_all"' in page and 'id="vrn_go"' in page and "function dmask(" in page and "YYYY-MM-DD" in page
-            and all(f'id="mx_{k}"' in page for k in ("io", "intl", "basic", "summary", "fin", "db", "align", "codes", "macro", "vap", "ok", "runs")) and 'webkitdirectory' in page and 'id="drop"' in page
+            and all(f'id="mx_{k}"' in page for k in ("io", "intl", "basic", "summary", "fin", "db", "align", "codes", "macro", "vap", "ok", "closeout", "runs")) and 'webkitdirectory' in page and 'id="drop"' in page
+            and n_tabs == 13 and page.count('data-grp="mx"') == 13 and '<button data-p="closeout">收尾</button>' in page and 'id="m_closeout_vrn"' in page and 'id="m_closeout_vap"' in page
+            and "ST.closeout" in page and "未跑:via-closeout" in page and "closeout" in snap["status"] and set(snap["status"]["closeout"]) == {"all", "vrn", "vap"}
             and "全不選" in page and "viaMatrix" in page and "@keyframes mv" in page and snap is not None and snap["status"]["hub"] == "SNAPSHOT" and '<meta name="via-csrf" content="">' in page
             and "/console_run" in page and "/console_set" in page and "/console_status" in page and "/vap_img" in page and "dest:'vrn_incoming'" in page and page.count("<script") == 2,
-            f"({len(page) // 1024} KB)")
+            f"({len(page) // 1024} KB;右矩陣 {n_tabs} 頁)")
         s3 = load_spec(sp)
         g1 = apply_set(s3, {"group-start": "tw_equity:2024-06-01", "group-start#2": "macro:latest", "group-start#3": "nope:2024-01-01", "group-start#4": "etf:2024-13-01"}, mirror=False)
         e_tw = effective_start(s3, "tw_chips", "tw_equity")

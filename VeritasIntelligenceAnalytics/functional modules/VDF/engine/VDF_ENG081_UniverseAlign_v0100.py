@@ -21,6 +21,12 @@ VDF_ENG081_UniverseAlign v0100 — 台股每日交易資訊×籌碼 數量對齊
       讓庫律(批391 工作站實錄:日更鏈/回補持單寫者鎖 → update --apply 曾 IOException traceback):開庫短等重試 6×3s,逾額誠實
       [FAIL] 庫忙 rc3 印修法(等日更鏈/回補跑完再 update --apply;check 唯讀)不再 traceback;持鎖者解析(批393:IOException 內 PID n →
       命令列 → 引擎名+動詞,印一次 [庫忙] 持鎖者;指路 via-bg 背景引擎進程唯讀一覽,絕不 Stop-Process;實錄:via-status 開的是同步頁不是進程表)。
+      批400(code review 發現):逐日計數 SQL 端化——_daily_sets() 曾把窗內每一價列/籌碼列 fetchall 進 Python 逐日集合(update --asof 舊日
+      窗擴至 3650 交易日≈54.5 萬價列+120 萬籌碼列全數實體化);改 _daily_counts():價/籌碼各去重 (日,票) 後 FULL OUTER JOIN 算交集/差集再
+      GROUP BY 日;籌碼對映律仍是 chip_ticker()(只對窗內 DISTINCT (code,market) 在 Python 算一次 → TEMP _chipmap JOIN;零 SQL 重寫=零等價風險);
+      單日票集合只由 _date_sets() 取需要的日(check 最新日差集清單/update 基準日清單列);check 表/ALIGN_latest 欄位/判定律/update 列/十一檢
+      零變更;_daily_sets 保留為 ⑫ 逐列集合參照實作(只增不減);十二檢 ⑫ 以獨立逐列 Python 集合參照證等價(現有夾具 days=5/寬窗 --asof;
+      25 日合成庫 窗 26>20 與 days=3 截窗;對映分支全覆蓋;TEMP 物件僅存本連線不落正本)。
 用法:python3 VDF_ENG081_UniverseAlign_v0100.py check [--days N] [--db PATH] [--json]
       | update [--apply] [--asof YYYY-MM-DD] [--allow-latest] [--db PATH] [--json] | status [--db PATH] | --selftest
 """
@@ -166,6 +172,11 @@ def _qi(c) -> str:
     return ('"' + str(c).replace('"', '""') + '"') if c else "NULL"
 
 
+def _lit(v) -> str:
+    """值字面量:None=NULL,其餘 _q 單引號(批400:_chipmap 單句多列 INSERT 用;CAST VARCHAR 後的值只會是 str 或 None)"""
+    return "NULL" if v is None else _q(v)
+
+
 def _tables(con) -> set:
     return {r[0] for r in con.execute("SHOW TABLES").fetchall()}
 
@@ -202,7 +213,9 @@ def chip_ticker(code: str, market: str, lst: dict) -> str:
 
 
 def _daily_sets(con, have: set, lst: dict, days: int) -> tuple:
-    """最近 N 個交易日(交易日曆=價表)→ (px_dates 新→舊, 日→價表票集合, 日→籌碼票集合(inst∪margin 經冊對映), 籌碼最新日)"""
+    """最近 N 個交易日(交易日曆=價表)→ (px_dates 新→舊, 日→價表票集合, 日→籌碼票集合(inst∪margin 經冊對映), 籌碼最新日)
+    批400:逐列 fetchall 全數實體化=寬窗(--asof 舊日 3650 交易日)記憶體/時間熱點;主路徑改 _daily_counts()+_date_sets(),
+    本函式保留為逐列 Python 集合參照實作(⑫ 等價證;只增不減),不再於 check/update 主路徑呼叫"""
     chips = [t for t in CHIPS if t in have]
     px_dates = [r[0] for r in con.execute(f"SELECT DISTINCT CAST(date AS VARCHAR) d FROM {PX} WHERE ticker <> '_NOOP_' ORDER BY d DESC LIMIT {int(days)}").fetchall()]
     chip_max = None
@@ -236,10 +249,81 @@ def _verdict(p: set, c: set) -> str:
     return "MISALIGNED"
 
 
-def _pick_asof(px_dates: list, px_sets: dict, chip_sets: dict, px_top: int, asof: str | None = None, allow_latest: bool = False) -> dict:
+def _verdict_n(px_n: int, chip_n: int, both: int) -> str:
+    """批400 計數版判定(與集合版 _verdict 等價:籌碼 0 票=MISALIGNED;兩集合相等 ⟺ 交集數=價票數=籌碼票數;交集 ≥ 90% 大方=PARTIAL)"""
+    if not chip_n:
+        return "MISALIGNED"
+    if both == px_n == chip_n:
+        return "ALIGNED"
+    if both >= PARTIAL_FLOOR * max(px_n, chip_n):
+        return "PARTIAL"
+    return "MISALIGNED"
+
+
+_ZERO = (0, 0, 0, 0, 0)   # 批400:日計數元組 (px_n, chip_n, both, px_only, chip_only);窗內缺日預設
+
+
+def _daily_counts(con, have: set, lst: dict, days: int) -> tuple:
+    """批400(code review):最近 N 個交易日(交易日曆=價表)→ (px_dates 新→舊, 日→(px_n, chip_n, both, px_only, chip_only), 籌碼最新日)
+    逐日計數全在 DuckDB 端:價/籌碼各去重 (日,票) 後 FULL OUTER JOIN 算交集/差集再 GROUP BY 日,不再把窗內每一列 fetchall 進 Python
+    (update --asof 舊日窗擴至 3650 交易日≈54.5 萬價列+120 萬籌碼列曾全數實體化為逐日集合);
+    籌碼對映律仍是 chip_ticker()(只對窗內 DISTINCT (code,market) 對子在 Python 算一次 → TEMP TABLE _chipmap → SQL JOIN,NULL 對子以
+    IS NOT DISTINCT FROM 配對=與逐列 str(None) 同律;零 SQL 重寫=零等價風險;載入用單句多列 INSERT 非 executemany);留 TEMP VIEW _align_px/_align_chip(日,票)供 _date_sets()
+    只取需要的單日集合;TEMP 物件僅存於本連線(唯讀連線可建;正本零觸碰;Zero-Hydra);鍵律與 _daily_sets 同:日鍵=CAST VARCHAR 前 10 字、
+    票=str、查鍵=原日字串;輸出與 _daily_sets 逐列集合算法逐日全等(⑫ 證)"""
+    chips = [t for t in CHIPS if t in have]
+    px_dates = [r[0] for r in con.execute(f"SELECT DISTINCT CAST(date AS VARCHAR) d FROM {PX} WHERE ticker <> '_NOOP_' ORDER BY d DESC LIMIT {int(days)}").fetchall()]
+    lo = min(px_dates) if px_dates else None
+    chip_max = None
+    parts = []
+    for t in chips:
+        cols = _cols(con, t)
+        dc, cc, mc = cols.get("date"), cols.get("code"), cols.get("market")
+        if not (dc and cc):
+            continue
+        mx = con.execute(f'SELECT max(CAST("{dc}" AS VARCHAR)) FROM "{t}"').fetchone()[0]
+        if mx and (chip_max is None or str(mx) > chip_max):
+            chip_max = str(mx)[:10]
+        if lo:
+            parts.append(f'SELECT substr(CAST({_qi(dc)} AS VARCHAR), 1, 10) AS d, CAST({_qi(cc)} AS VARCHAR) AS code, CAST({_qi(mc)} AS VARCHAR) AS market FROM {_qi(t)} WHERE CAST({_qi(dc)} AS VARCHAR) >= {_q(lo)}')
+    raw = " UNION ALL ".join(parts) if parts else "SELECT NULL::VARCHAR AS d, NULL::VARCHAR AS code, NULL::VARCHAR AS market WHERE 1=0"
+    con.execute("CREATE OR REPLACE TEMP TABLE _chipmap(code VARCHAR, market VARCHAR, ticker VARCHAR)")
+    if parts:   # 對映只算窗內 DISTINCT (code,market)(數千對子;NULL 亦為一對子);單句多列 INSERT 分批(實測 executemany 逐列≈1ms/列:1800 列 1.9s → 單句 0.03s)
+        pairs = con.execute(f"SELECT DISTINCT code, market FROM ({raw})").fetchall()
+        vals = [f"({_lit(code)}, {_lit(mk)}, {_lit(chip_ticker(code, mk, lst))})" for code, mk in pairs]
+        for i in range(0, len(vals), 1000):
+            con.execute("INSERT INTO _chipmap VALUES " + ", ".join(vals[i:i + 1000]))
+    con.execute(f"CREATE OR REPLACE TEMP VIEW _align_chip AS SELECT DISTINCT r.d, m.ticker AS tk FROM ({raw}) r JOIN _chipmap m ON r.code IS NOT DISTINCT FROM m.code AND r.market IS NOT DISTINCT FROM m.market")
+    px_where = f"ticker <> '_NOOP_' AND CAST(date AS VARCHAR) >= {_q(lo)}" if lo else "1=0"
+    con.execute(f"CREATE OR REPLACE TEMP VIEW _align_px AS SELECT DISTINCT substr(CAST(date AS VARCHAR), 1, 10) AS d, CAST(ticker AS VARCHAR) AS tk FROM {PX} WHERE {px_where}")
+    counts: dict = {}
+    if px_dates:
+        sql = ("SELECT COALESCE(p.d, c.d) AS d, count(p.tk), count(c.tk), "
+               "count(CASE WHEN p.tk IS NOT NULL AND c.tk IS NOT NULL THEN 1 END), "
+               "count(CASE WHEN p.tk IS NOT NULL AND c.tk IS NULL THEN 1 END), "
+               "count(CASE WHEN p.tk IS NULL AND c.tk IS NOT NULL THEN 1 END) "
+               "FROM _align_px p FULL OUTER JOIN _align_chip c ON p.d = c.d AND p.tk = c.tk GROUP BY 1")
+        for d, n, m, b, po, co in con.execute(sql).fetchall():
+            counts[str(d)[:10]] = (int(n), int(m), int(b), int(po), int(co))
+    return px_dates, counts, chip_max
+
+
+def _date_sets(con, d) -> tuple:
+    """批400:單日 (價表票集合, 籌碼票集合)——只實體化需要的那一日(check 最新日差集清單/update 基準日清單列);
+    須先於同一連線跑過 _daily_counts()(用其 TEMP VIEW);查鍵=原日字串(與 _daily_sets 字典查鍵同律);無列=空集合"""
+    p = {str(r[0]) for r in con.execute("SELECT tk FROM _align_px WHERE d = ?", [d]).fetchall()}
+    c = {str(r[0]) for r in con.execute("SELECT tk FROM _align_chip WHERE d = ?", [d]).fetchall()}
+    return p, c
+
+
+def _pick_asof(px_dates: list, px_sets: dict, chip_sets: dict, px_top: int, asof: str | None = None, allow_latest: bool = False, counts: dict | None = None) -> dict:
     """基準日律(批393):--asof 指定 > --allow-latest 最新價日 > 最新雙側齊日(價 ≥ 窗內最大 60%、籌碼有票、ALIGNED/PARTIAL)
-    > 最新雙側有票日 > 最新價日(籌碼全缺);非雙側齊日一律 YELLOW 並印修法(誠實三態;殘缺日不假綠)"""
+    > 最新雙側有票日 > 最新價日(籌碼全缺);非雙側齊日一律 YELLOW 並印修法(誠實三態;殘缺日不假綠)
+    批400:給 counts(日→計數元組)即走計數版 _verdict_n 不實體化集合(px_sets/chip_sets 可為 None);無 counts=集合版原律"""
     def row(d):
+        if counts is not None:
+            n, m, b = counts.get(d, _ZERO)[:3]
+            return n, m, _verdict_n(n, m, b), n >= PX_FULL_FLOOR * px_top
         p, c = px_sets.get(d, set()), chip_sets.get(d, set())
         return len(p), len(c), _verdict(p, c), len(p) >= PX_FULL_FLOOR * px_top
     d_latest = px_dates[0]
@@ -304,24 +388,23 @@ def check(db: Path = DB_TW, days: int = DAYS_DEFAULT, reports: Path = REPORTS, d
             say(f"RED     {rep['note']}")
         lst = listings_map(con)
         rep["summary"]["listings"] = len(lst)
-        px_dates, px_sets, chip_sets, chip_max = _daily_sets(con, have, lst, days)
+        px_dates, counts, chip_max = _daily_counts(con, have, lst, days)   # 批400:逐日計數 SQL 端化(不再逐列 fetchall 進 Python)
         rep["summary"]["px_max"] = px_dates[0] if px_dates else None
         rep["summary"]["chip_max"] = chip_max
-        px_top = max((len(px_sets.get(d, set())) for d in px_dates), default=0)
+        px_top = max((counts.get(d, _ZERO)[0] for d in px_dates), default=0)
         rep["summary"]["px_top"] = px_top
         n_al = n_part = n_mis = 0
         for d in px_dates:
-            p, c = px_sets.get(d, set()), chip_sets.get(d, set())
-            both = p & c
-            v = _verdict(p, c)
+            n, m, b, po, co = counts.get(d, _ZERO)
+            v = _verdict_n(n, m, b)
             n_al += v == "ALIGNED"
             n_part += v == "PARTIAL"
             n_mis += v == "MISALIGNED"
-            rep["dates"].append({"date": d, "px_n": len(p), "chip_n": len(c), "both": len(both), "px_only": len(p - c), "chip_only": len(c - p), "verdict": v,
-                                 "px_full": len(p) >= PX_FULL_FLOOR * px_top})
+            rep["dates"].append({"date": d, "px_n": n, "chip_n": m, "both": b, "px_only": po, "chip_only": co, "verdict": v,
+                                 "px_full": n >= PX_FULL_FLOOR * px_top})
         if px_dates:
             d0 = px_dates[0]
-            p, c = px_sets.get(d0, set()), chip_sets.get(d0, set())
+            p, c = _date_sets(con, d0)   # 批400:只實體化最新日(差集清單需集合)
             rep["latest"] = {"date": d0, "px_n": len(p), "chip_n": len(c), "both": len(p & c), "verdict": rep["dates"][0]["verdict"]}
             rep["mismatch"] = {"px_only": sorted(p - c)[:200], "chip_only": sorted(c - p)[:200], "px_only_n": len(p - c), "chip_only_n": len(c - p)}
         rep["summary"].update({"dates": len(px_dates), "aligned": n_al, "partial": n_part, "misaligned": n_mis})
@@ -386,14 +469,14 @@ def update(db: Path = DB_TW, apply: bool = False, reports: Path = REPORTS, mega:
         if asof:   # 指定基準日=窗擴到含該日(上限 3650 交易日)
             k = con.execute(f"SELECT count(DISTINCT CAST(date AS VARCHAR)) FROM {PX} WHERE ticker <> '_NOOP_' AND CAST(date AS VARCHAR) >= {_q(str(asof)[:10])}").fetchone()[0]
             days = max(DAYS_DEFAULT, min(3650, int(k or 0) + 1))
-        px_dates, px_sets, chip_sets, chip_max = _daily_sets(con, have, lst, days)
+        px_dates, counts, chip_max = _daily_counts(con, have, lst, days)   # 批400:寬窗(--asof 舊日)只算逐日計數,不實體化每日集合
         if not px_dates:
             rep["verdict"], rep["note"] = "RED", "價表空"
             say(f"RED     {rep['note']}")
             _finish(rep, reports, "UNIVERSE")
             return rep
-        px_top = max(len(px_sets.get(d, set())) for d in px_dates)
-        pick = _pick_asof(px_dates, px_sets, chip_sets, px_top, asof=str(asof)[:10] if asof else None, allow_latest=allow_latest)
+        px_top = max(counts.get(d, _ZERO)[0] for d in px_dates)
+        pick = _pick_asof(px_dates, None, None, px_top, asof=str(asof)[:10] if asof else None, allow_latest=allow_latest, counts=counts)
         rep.update({"latest_px_date": px_dates[0], "asof_rule": pick["rule"], "px_top": px_top, "chip_max": chip_max})
         if pick.get("error"):
             rep["verdict"], rep["note"] = "RED", pick["error"]
@@ -401,8 +484,7 @@ def update(db: Path = DB_TW, apply: bool = False, reports: Path = REPORTS, mega:
             _finish(rep, reports, "UNIVERSE")
             return rep
         d0 = pick["asof"]
-        px = set(px_sets.get(d0, set()))
-        chips = set(chip_sets.get(d0, set()))
+        px, chips = _date_sets(con, d0)   # 批400:只實體化基準日(清單列需集合)
         by_yf = {v[0]: (k, v[1], v[2]) for k, v in lst.items()}
         union = px | chips
         rows = []
@@ -569,6 +651,97 @@ def selftest() -> int:
             and u5["asof"] == "2026-09-03" and u5["verdict"] == "YELLOW" and u6["asof"] == "2026-09-01" and u6["rows"] == 3 and u6["verdict"] == "GREEN" and u7["verdict"] == "RED"
             and r4["dates"][0]["date"] == "2026-09-04" and r4["dates"][0]["px_full"] is False and "日更未齊" in r4["note"] and u8["asof"] == "2026-09-02" and "價未齊" in u8["note"],
             f"(u4 {u4['asof']} {u4['verdict']};u5 {u5['asof']};u6 {u6['asof']}/{u6['rows']};u7 {u7['verdict']};r4 {r4['dates'][0]['px_n']}/{r4['summary'].get('px_top')} {r4['verdict']};u8 {u8['asof']})")
+        # ⑫ 批400(code review):逐日計數 SQL 端化(_daily_counts=價/籌碼去重後 FULL OUTER JOIN 算交集/差集再 GROUP BY 日;籌碼對映只對 DISTINCT (code,market)
+        #    經 chip_ticker → TEMP _chipmap JOIN)與「逐列 fetchall+chip_ticker 逐列對映+Python 集合」獨立參照算法逐日 (px_n,chip_n,both,px_only,chip_only) 全等;
+        #    保留的 _daily_sets 同證;SQL 對映視圖 _align_chip(日,票)=Python 逐列對映;_date_sets 單日集合=參照;check 表列/最新日差集/判定與 update 摘要/列數=參照;
+        #    現有夾具 days=5 + 寬窗 update --asof 2026-09-01;25 日合成庫(冊 yf 空/NULL 走冊後綴推定;無冊碼 OTC/小寫 otc/NULL 市場/未知市場走 chip_ticker
+        #    後綴推定;_NOOP_ 與重複列去重;inst∪margin 去重)days=3 截窗/25 全窗/--asof 最舊日 窗 26>DAYS_DEFAULT;計數版 _verdict_n=集合版 _verdict;TEMP 物件不落正本
+        def ref_counts(dbp, days):
+            """參照:逐列 fetchall + chip_ticker 逐列對映 + Python 集合(獨立於 _daily_sets/_daily_counts)→ (px_dates, 日→五計數, 日→價集合, 日→籌碼集合, 全等, 各旗標)"""
+            cx = duckdb.connect(str(dbp), read_only=True)
+            try:
+                hv, ls = _tables(cx), listings_map(cx)
+                pd_ = [r[0] for r in cx.execute(f"SELECT DISTINCT CAST(date AS VARCHAR) d FROM {PX} WHERE ticker <> '_NOOP_' ORDER BY d DESC LIMIT {int(days)}").fetchall()]
+                ps, cs = {}, {}
+                for d, tk in cx.execute(f"SELECT CAST(date AS VARCHAR), ticker FROM {PX} WHERE ticker <> '_NOOP_' AND CAST(date AS VARCHAR) >= {_q(min(pd_))}").fetchall():
+                    ps.setdefault(str(d)[:10], set()).add(str(tk))
+                for t in [t for t in CHIPS if t in hv]:
+                    for d, code, mk in cx.execute(f'SELECT CAST(date AS VARCHAR), code, market FROM "{t}" WHERE CAST(date AS VARCHAR) >= {_q(min(pd_))}').fetchall():
+                        cs.setdefault(str(d)[:10], set()).add(chip_ticker(code, mk, ls))
+                old = _daily_sets(cx, hv, ls, days)
+                new = _daily_counts(cx, hv, ls, days)
+                view = {(str(r[0]), str(r[1])) for r in cx.execute("SELECT d, tk FROM _align_chip").fetchall()}
+                one = _date_sets(cx, pd_[0])
+            finally:
+                cx.close()
+            ref = {d: (len(ps.get(d, set())), len(cs.get(d, set())), len(ps.get(d, set()) & cs.get(d, set())), len(ps.get(d, set()) - cs.get(d, set())), len(cs.get(d, set()) - ps.get(d, set()))) for d in pd_}
+            flags = (old == (pd_, ps, cs, new[2]), new[0] == pd_ and {d: new[1].get(d, _ZERO) for d in pd_} == ref,
+                     view == {(d, tk) for d, s in cs.items() for tk in s}, one == (ps.get(pd_[0], set()), cs.get(pd_[0], set())))
+            return pd_, ref, ps, cs, all(flags), flags
+
+        def five(x):
+            return (x["px_n"], x["chip_n"], x["both"], x["px_only"], x["chip_only"])
+
+        pd5, ref5, ps5, cs5, ok5, fl5 = ref_counts(db, 5)
+        r12 = check(db, days=5, reports=reports, do_print=False)
+        got5 = {x["date"]: five(x) for x in r12["dates"]}
+        p0, c0 = ps5.get(pd5[0], set()), cs5.get(pd5[0], set())
+        ok_chk = (list(got5) == pd5 and got5 == ref5 and r12["mismatch"]["px_only"] == sorted(p0 - c0)[:200] and r12["mismatch"]["chip_only"] == sorted(c0 - p0)[:200]
+                  and r12["latest"] == {"date": pd5[0], "px_n": len(p0), "chip_n": len(c0), "both": len(p0 & c0), "verdict": _verdict(p0, c0)}
+                  and all(x["verdict"] == _verdict(ps5.get(x["date"], set()), cs5.get(x["date"], set())) for x in r12["dates"]) and r12["summary"]["px_top"] == max(v[0] for v in ref5.values()))
+        u12 = update(db, apply=False, reports=reports, mega=mega, do_print=False, asof="2026-09-01")   # 寬窗:含該日 k=4 → days=max(20,5)=20
+        pdw, refw, psw, csw, okw, flw = ref_counts(db, 20)
+        pw, cw = psw.get("2026-09-01", set()), csw.get("2026-09-01", set())
+        ok_upd = (okw and u12["asof"] == "2026-09-01" and u12["verdict"] == "GREEN" and u12["rows"] == 3 and u12["px_top"] == max(v[0] for v in refw.values())
+                  and u12["summary"]["px"] == len(pw) and u12["summary"]["chips"] == len(cw) and u12["summary"]["union"] == len(pw | cw) and u12["summary"]["aligned"] == len(pw & cw))
+        db12 = root / "wide.duckdb"
+        c12 = duckdb.connect(str(db12))
+        c12.execute("CREATE TABLE tw_listings(code VARCHAR, name VARCHAR, market VARCHAR, yf_ticker VARCHAR)")
+        c12.executemany("INSERT INTO tw_listings VALUES (?, ?, ?, ?)", [("2330", "台積電", "TWSE", "2330.TW"), ("2454", "聯發科", "TWSE", "2454.TW"), ("6488", "環球晶", "TPEX", "6488.TWO"),
+                                                                        ("2317", "鴻海", "TWSE", "2317.TW"), ("3008", "大立光", "TWSE", ""), ("5483", "中美晶", "TPEX", None)])
+        c12.execute("CREATE TABLE tw_daily_prices(date VARCHAR, ticker VARCHAR, close DOUBLE)")
+        c12.execute("CREATE TABLE tw_chip_inst(date DATE, code VARCHAR, market VARCHAR, foreign_net DOUBLE)")
+        c12.execute("CREATE TABLE tw_chip_margin(date DATE, code VARCHAR, market VARCHAR, margin_bal DOUBLE)")
+        wd, day = [], _dt.date(2026, 7, 27)
+        while len(wd) < 25:
+            if day.weekday() < 5:
+                wd.append(day.isoformat())
+            day += _dt.timedelta(days=1)
+        pxr, inr, mgr = [], [], []
+        for i, ds in enumerate(wd):
+            pxr += [(ds, "2330.TW", 1.0), (ds, "2454.TW", 1.0), (ds, "6488.TWO", 1.0), (ds, "3008.TW", 1.0), (ds, "_NOOP_", 0.0), (ds, "2330.TW", 1.0)]
+            pxr += [(ds, "2317.TW", 1.0)] if i % 3 == 0 else []
+            pxr += [(ds, "9999.TW", 1.0)] if i % 4 == 1 else []
+            pxr += [(ds, "5483.TWO", 1.0), (ds, "8888.TWO", 1.0), (ds, "7777.TW", 1.0)] if i % 7 == 6 else []
+            inr += [(ds, "2330", "TWSE", 1.0), (ds, "2454", "TWSE", 1.0), (ds, "6488", "TPEX", 1.0), (ds, "3008", "TWSE", 1.0)]
+            inr += [(ds, "2317", "TWSE", 1.0)] if i % 5 == 2 else []
+            inr += [(ds, "5483", "OTC", 1.0), (ds, "8888", "otc", 1.0), (ds, "7777", None, 1.0), (ds, "6666", "XX", 1.0)] if i % 7 == 6 else []
+            mgr += [(ds, "2330", "TWSE", 1.0), (ds, "6488", "TPEX", 1.0)] + ([(ds, "2454", "TWSE", 1.0)] if i % 6 == 5 else []) + ([(ds, "1234", "TPEX", 1.0)] if i == 24 else [])
+        c12.executemany("INSERT INTO tw_daily_prices VALUES (?, ?, ?)", pxr)
+        c12.executemany("INSERT INTO tw_chip_inst VALUES (?, ?, ?, ?)", inr)
+        c12.executemany("INSERT INTO tw_chip_margin VALUES (?, ?, ?, ?)", mgr)
+        c12.close()
+        pd3, ref3, ps3, cs3, ok3, fl3 = ref_counts(db12, 3)
+        pd25, ref25, ps25, cs25, ok25, fl25 = ref_counts(db12, 25)
+        rw3 = check(db12, days=3, reports=reports, do_print=False)
+        rw25 = check(db12, days=25, reports=reports, do_print=False)
+        uw = update(db12, apply=False, reports=reports, mega=mega, do_print=False, asof=wd[0])   # 寬窗:含最舊日 k=25 → days=26 > DAYS_DEFAULT
+        uwa = update(db12, apply=True, reports=reports, mega=mega, do_print=False, asof=wd[0])   # 讀寫連線 --apply 同路徑:TEMP 物件仍不落正本
+        cx12 = duckdb.connect(str(db12), read_only=True)
+        yfs = {v[0] for v in listings_map(cx12).values()}
+        left = _tables(cx12)
+        cx12.close()
+        po, co = ps25.get(wd[0], set()), cs25.get(wd[0], set())
+        listed = [t for t in (po | co) if t in yfs]
+        ok_wide = (ok3 and ok25 and len(pd3) == 3 and len(pd25) == 25 and pd3 == pd25[:3] and {x["date"]: five(x) for x in rw3["dates"]} == ref3 and {x["date"]: five(x) for x in rw25["dates"]} == ref25
+                   and uw["asof"] == wd[0] and uw["latest_px_date"] == wd[-1] and uw["rows"] == len(listed) == 5 and uw["summary"]["aligned"] == sum(1 for t in listed if t in po and t in co)
+                   and uw["summary"]["px"] == len(po) and uw["summary"]["chips"] == len(co) and uw["summary"]["union"] == len(po | co) and uw["px_top"] == max(v[0] for v in ref25.values())
+                   and uwa["new"] == uwa["rows"] == 5 and UNIVERSE in left and not ({"_align_px", "_align_chip", "_chipmap"} & left))
+        pool = [set(), {"a"}, {"a", "b"}, set("abcdefghij"), set("abcdefghik"), set("abcdefghijk"), set("bcdefghijkl"), set("abcdefghijklmnopqrst")]
+        ok_v = all(_verdict(p, c) == _verdict_n(len(p), len(c), len(p & c)) for p in pool for c in pool)
+        chk("⑫ 批400 逐日計數 SQL 端化(GROUP BY 日+FULL OUTER JOIN;籌碼對映只算 DISTINCT (code,market) 仍經 chip_ticker → TEMP _chipmap JOIN)= 逐列 Python 集合參照:現有夾具 days=5 check 表列/最新日差集/判定 + 寬窗 update --asof;25 日合成庫(冊 yf 空/NULL、無冊 OTC/otc/NULL/未知市場、_NOOP_/重複列/inst∪margin 去重)days=3 截窗/25 全窗/--asof 最舊日 窗 26>20;_daily_sets 參照同證;_verdict_n=_verdict;TEMP 物件唯讀/--apply 讀寫連線皆不落正本",
+            ok5 and ok_chk and ok_upd and ok_wide and ok_v,
+            f"(fixture {fl5}/{ok_chk}/{ok_upd};wide {fl3}/{fl25}/{ok_wide};verdict {ok_v};uw {uw['asof']} {uw['verdict']} rows {uw['rows']} px_top {uw.get('px_top')};rw25 {rw25['verdict']} {rw25['summary'].get('aligned')}/{rw25['summary'].get('partial')}/{rw25['summary'].get('misaligned')})")
         miss = check(root / "no.duckdb", reports=reports, do_print=False)
         chk("⑥ 庫缺誠實 RED(不假綠)", miss["verdict"] == "RED")
         c4 = duckdb.connect(str(root / "nolist.duckdb"))
@@ -647,7 +820,7 @@ def selftest() -> int:
     chk("⑪ 持鎖者解析(IOException PID n → 命令列 → 引擎名+動詞;boot 鏈 ps1;空=空;無 PID=(None,''))+ [FAIL] 句含持鎖者 PID/引擎與 via-bg 指路(取代 via-status)",
         lab == "VDF_ENG064_HistoryBackfill_v0102.py run" and lab2 == "via_boot_update.ps1" and lab3 == "" and pid_none == (None, "") and pid_hit and pid_hit.group(1) == "7396"
         and "持鎖者 PID 7396" in msg and "VDF_ENG064" in msg and "via-bg" in msg and "via-status" not in msg, f"({lab};{lab2};{msg[:70]})")
-    print(f"  [計] 十一檢 OK {11 - len(fails)} · FAIL {len(fails)}")
+    print(f"  [計] 十二檢 OK {12 - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 
 
@@ -663,7 +836,7 @@ def _arg(a: list, flag: str, default=None):
 def main() -> int:
     a = sys.argv[1:]
     if "--selftest" in a:
-        print("=== 台股日交易×籌碼對齊與清單更新引擎(VDF_ENG081_UniverseAlign)· 十一檢自測(零網路;臨時庫)===")
+        print("=== 台股日交易×籌碼對齊與清單更新引擎(VDF_ENG081_UniverseAlign)· 十二檢自測(零網路;臨時庫)===")
         return selftest()
     verb = next((x for x in a if x in VERBS), "check")   # 動詞白名單
     db = Path(_arg(a, "--db", str(DB_TW)))

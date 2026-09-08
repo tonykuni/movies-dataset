@@ -19,11 +19,19 @@ CGC_MDL136_EntryBridge v0100 — 單一入口橋(批383)
            Baseline 冊別名(via_vdf_312/via_vrn_312/via_vap_312/via_paddle_311/via_camelot_311…)
            > base 退路(誠實 BASE_FALLBACK;VDF/VRN 引擎要能跑=功能件住 via_ 境,啟動器須指對 python)
   ⑤cmdmatrix-clean  印去尾段自動執行(via-enter/via-matrix WPF)+撞名改名後的 CmdMatrix 文本
+  ⑥deadends  短令死路掃描器(批400):批394/批396 工作站實錄=引擎 docstring/治理 digest 指路的
+           via-chip / via-rebuild 在短令冊從未登錄=死路(Zero-Hydra 違律)。本動詞把「文本裡指路的
+           via-* 短令」對「真令集」(roster 母倉∪Grok + 根 *.cmd 梭名 + via)逐檔逐行實掃:
+           掃 functional modules/*/engine/*.py、VRN/*.py、registry/*.py|*.json|via_boot_update.*、
+           VIA.ps1、README.md、倉根 docs/*.md(排除 intake/references/RetiredEngines/VIA_GrokConsole/
+           node_modules/__pycache__);放行冊 DEADENDS_ALLOW(檔名/分支名/散文/DOM id/schema id;
+           只增即擴充)。判定 GREEN=0 死路 / YELLOW=有死路(誠實表:令·次數·首見 file:line);
+           落 VIA_Reports/entry/DEADENDS_latest.json;治法=Register 尾版登錄或改指既登錄令。
 律:只增不減;原件零觸碰(收容包/Grok 腳本/EnvManager 正本皆不改);誠實三態;零 CDN;
     零網路(status 只探本機 127.0.0.1:8080 是否在聽=Grok 網頁主控台 LIVE/OFF);
     尾版律(所有引擎 glob 尾版,嚴禁寫死版號)。
-用法:python3 CGC_MDL136_EntryBridge_v0100.py [status|roster|plan|envpy <family>|cmdmatrix-clean] [--json] [--quiet]
-      | --selftest
+用法:python3 CGC_MDL136_EntryBridge_v0100.py [status|roster|plan|envpy <family>|cmdmatrix-clean|deadends] [--json] [--quiet]
+      | --selftest(九檢;批400 +⑨ 死路掃描)
 """
 from __future__ import annotations
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
@@ -78,6 +86,36 @@ TAIL_STRIP = (re.compile(r"(?m)^via-enter \| Out-Null[ \t\r]*$"),
 # Grok 非 global 助手函式(Lamp/Get-VIAZh/Get-VIAShortCommands/New-ViaDir/Find-ViaPython)於 Register 函式域內點源會隨域消失
 # → 一律升 global(Grok 全域令執行期才找得到);母倉無同名助手=零撞
 HELPER_PROMOTE = re.compile(r"(?m)^function (?!global:)([\w-]+)")
+
+# ---- 批400 短令死路掃描(deadends)常數 ----
+# 令樣式:小寫 via-<字母數字…>(區分大小寫;VIA-Verb-Shim / VIA-ALL 等大寫散文天然不算)
+DEADENDS_RX = re.compile(r"\bvia-[a-z0-9][a-z0-9-]*\b")
+# 掃描面(相對 VIA 根 / 倉根):(基底鍵, glob);基底鍵 via=VIA 根、fm=functional modules、reg=registry、repo=倉根
+DEADENDS_TARGETS = (("fm", "*/engine/*.py"), ("fm", "VRN/*.py"), ("reg", "*.py"), ("reg", "*.json"),
+                    ("via", "VIA.ps1"), ("reg", "via_boot_update.*"), ("via", "README.md"), ("repo", "docs/*.md"))
+# 路徑含下列字串一律不掃(收容包/參考件/退役引擎/Grok 主控台/依賴/快取)
+DEADENDS_EXCLUDE = ("intake", "references", "RetiredEngines", "VIA_GrokConsole", "node_modules", "__pycache__")
+# 放行冊(非短令:檔名/分支名/散文/頁名);只增不減——直接加字串即擴充
+DEADENDS_ALLOW = frozenset({
+    "via-verb-shim",                       # cmd 梭註記 VIA-Verb-Shim 的小寫散文
+    "via-env-governance",                  # docs/via-env-governance.md 檔名散文
+    "via-envmanager-governance-7cls8h",    # 分支名 claude/via-envmanager-governance-7cls8h
+    "via-system-followup-tz7k9t",          # 分支名 claude/via-system-followup-tz7k9t
+    "via-master-control-ui",               # ui_support 頁名 via-master-control-ui(.html)
+    "via-csrf",                            # MDL095 DeckServer CSRF <meta name="via-csrf"> 名(regex 原文形式 name=["\']via-csrf 非 DOM 屬性樣式)
+    "via-x",                               # 佔位符(MDL133/command_center 自測夾具、本檔 grok_zh 說明 'via-x' = '說明')
+})
+# 令後緊接副檔名=檔名(via-chip.cmd / via-env-matrix-5d.md …),非指令
+DEADENDS_ALLOW_SUFFIX = (".md", ".yml", ".yaml", ".ps1", ".cmd", ".json", ".py", ".js", ".html", ".css", ".txt", ".sh", ".csv", ".log")
+# 令前一字元=選擇器/複合識別字(.via-q{ CSS、x-via-aliases 鍵、#via-x 錨、registry\via-x 路徑)
+# (「/」不列:中文散文以 / 分隔兩令(令A/令B)=真指路;分支名 claude/via-… 改由 CTX 判)
+DEADENDS_ALLOW_PREFIX = ".-_\\#"
+# 令本身樣式:schema/version id(via-mother-root-ssot-v1 …)
+DEADENDS_ALLOW_RX = (re.compile(r"-v\d+$"),)
+# 令前文(同行)樣式:HTML DOM 屬性值(<meta name="via-csrf"> / <script id="via-…">)、JSON 類名/選擇器鍵行、分支路徑 claude/via-…
+DEADENDS_ALLOW_CTX = (re.compile(r"""\b(?:id|name|class|className|for)\s*=\s*["']$"""),
+                      re.compile(r"""^\s*"(?:classes|class|ids|selectors?)"\s*:"""),
+                      re.compile(r"\bclaude/$"))
 
 # 家族 → 境名候選(Baseline 冊 env_layout/families 別名;既有境優先;尾碼=Python 版)
 FAMILY_ENVS = {
@@ -471,6 +509,107 @@ def plan(do_print: bool = True, quiet: bool = False) -> list:
     return rows
 
 
+# ---------------------------------------------------------------- ⑥ 短令死路掃描(批400)
+def _deadends_allow(tok: str, line: str, s: int, e: int, grok: set) -> str:
+    """放行判定:回放行理由(空字串=不放行=死路)。次序:放行冊 > 檔名後綴 > 前一字元 > -grok 尾綴 > 令樣式 > 前文樣式"""
+    if tok in DEADENDS_ALLOW:
+        return "allow"
+    if line[e:].startswith(DEADENDS_ALLOW_SUFFIX):
+        return "file"
+    if s > 0 and line[s - 1] in DEADENDS_ALLOW_PREFIX:
+        return "prefix"
+    if tok.endswith("-grok") and (tok in grok or tok[:-5] in grok):
+        return "grok"
+    if any(rx.search(tok) for rx in DEADENDS_ALLOW_RX):
+        return "rx"
+    before = line[:s]
+    if any(rx.search(before) for rx in DEADENDS_ALLOW_CTX):
+        return "ctx"
+    return ""
+
+
+def deadends_files(via: Path | None = None) -> list:
+    """掃描面實列(尾版律無關=全列;去重;排除冊套在相對倉根路徑上)"""
+    root = Path(via) if via else VIA
+    repo = root.parent
+    base = {"via": root, "fm": root / "functional modules", "reg": root / "supportive modules" / "registry", "repo": repo}
+    seen, files = set(), []
+    for key, pat in DEADENDS_TARGETS:
+        b = base[key]
+        for p in (sorted(b.glob(pat)) if b.exists() else []):
+            if not p.is_file():
+                continue
+            try:
+                rel = p.relative_to(repo).as_posix()
+            except ValueError:
+                rel = p.as_posix()
+            if rel in seen or any(x in rel for x in DEADENDS_EXCLUDE):
+                continue
+            seen.add(rel)
+            files.append((p, rel))
+    return files
+
+
+def deadends(do_print: bool = True, quiet: bool = False, via: Path | None = None, write: bool = True) -> dict:
+    """短令死路掃描器(批400):文本指路的 via-* 對真令集(roster 母倉∪Grok + 根 *.cmd 梭 + via)逐行實掃;
+    GREEN=0 死路 / YELLOW=有死路;落 VIA_Reports/entry/DEADENDS_latest.json(via 指到夾具根時落該根下;零網路;唯讀掃描)"""
+    q = quiet or not do_print
+    root = Path(via) if via else VIA
+    out_dir = (root / "VIA_Reports" / "entry") if via else OUT
+    rows = roster(do_print=False)                                   # Zero-Hydra:短令冊正主
+    names = {r["name"] for r in rows}
+    grok = {r["name"] for r in rows if r["owner"] == "GROK"}
+    shims = {p.stem for p in root.glob("*.cmd")}
+    real = names | shims | {"via"}
+    files = deadends_files(root)
+    dead, counts, first, allowed, allowed_why = [], {}, {}, {}, {}
+    for p, rel in files:
+        text = _read(p)
+        if "via-" not in text:
+            continue
+        for ln, line in enumerate(text.splitlines(), 1):
+            if "via-" not in line:
+                continue
+            for m in DEADENDS_RX.finditer(line):
+                tok = m.group(0)
+                if tok in real:
+                    continue
+                why = _deadends_allow(tok, line, m.start(), m.end(), grok)
+                if why:
+                    allowed[tok] = allowed.get(tok, 0) + 1
+                    allowed_why.setdefault(tok, why)
+                    continue
+                counts[tok] = counts.get(tok, 0) + 1
+                first.setdefault(tok, f"{rel}:{ln}")
+                dead.append({"token": tok, "file": rel, "line": ln, "text": line.strip()[:120]})
+    order = sorted(counts, key=lambda t: (-counts[t], t))
+    verdict = "YELLOW" if counts else "GREEN"
+    rep = {"schema": "VIA.DeadEnds.v1", "ts": _dt.datetime.now().isoformat(timespec="seconds"), "via": str(root),
+           "roster_n": len(names), "shim_n": len(shims), "real_n": len(real), "scanned_files": len(files),
+           "dead": dead, "dead_tokens": {t: counts[t] for t in order},
+           "table": [{"token": t, "count": counts[t], "first": first[t]} for t in order],
+           "allowed_tokens": dict(sorted(allowed.items())), "allowed_why": allowed_why,
+           "allow_rules": {"allow": sorted(DEADENDS_ALLOW), "suffix": list(DEADENDS_ALLOW_SUFFIX), "prefix": DEADENDS_ALLOW_PREFIX,
+                           "rx": [r.pattern for r in DEADENDS_ALLOW_RX], "ctx": [r.pattern for r in DEADENDS_ALLOW_CTX],
+                           "exclude": list(DEADENDS_EXCLUDE)},
+           "verdict": verdict,
+           "fix": "Register 尾版 +function global:<令>(+同名 .cmd 梭)或文本改指既登錄令;非令(檔名/分支/DOM id)→ 加入 DEADENDS_ALLOW"}
+    if write:
+        try:
+            _write_json(out_dir / "DEADENDS_latest.json", rep)
+        except Exception as exc:
+            lamp("YELLOW", "Report", f"DEADENDS 落檔失敗 {str(exc)[:60]}", q)
+    if not q:
+        print(f"--- 短令死路掃描(批400;真令 {len(real)}=冊 {len(names)}+梭 {len(shims)}+via · 掃 {len(files)} 檔 · 死路 {len(counts)} 令/{len(dead)} 處 · 放行 {len(allowed)} 令)---")
+        if counts:
+            print(f"  {'令':<40} {'次數':>5}  首見 file:line")
+            for t in order:
+                print(f"  {t:<40} {counts[t]:>5}  {first[t]}")
+        print(f"[via-entry deadends] {verdict} {len(counts)} 死路 · 存證 {out_dir / 'DEADENDS_latest.json'}"
+              + (f" · 治法:{rep['fix']}" if counts else ""))
+    return rep
+
+
 # ---------------------------------------------------------------- 自測
 def selftest() -> int:
     import tempfile
@@ -529,21 +668,59 @@ def selftest() -> int:
     src = Path(__file__).read_text(encoding="utf-8")
     chk("⑧ 紀律宣告(只增不減/原件零觸碰/誠實三態/零 CDN/尾版律/ACCEL-BRIDGE)",
         all(k in src for k in ("只增不減", "原件零觸碰", "誠實三態", "零 CDN", "尾版律", "ACCEL-BRIDGE")))
-    print(f"  [計] 八檢 OK {8 - len(fails)} · FAIL {len(fails)}")
+    # ⑨ 批400 短令死路掃描:(a) 夾具根=假引擎指路假令+docs 指路真令+放行樣式+排除夾 → 只標假令;(b) 真倉零例外且冊內令零誤標
+    # (夾具令一律以 V() 拼接構成=本檔原文不含該字面,免得真倉掃描把自測夾具當死路;真令/放行冊令可直寫)
+    def V(s: str) -> str:
+        return "via-" + s
+    fake, fake2, retired, br = V("nonexistent-xyz"), V("nonexistent-abc"), V("retired-zzz"), V("fixture-branch-abc123")
+    allow_expect = {V("nothere"), "via-verb-shim", "via-envmanager-governance-7cls8h", br, V("q"), "via-csrf", V("fake-ssot-v1"), V("app"), V("btn"), V("enter-grok")}
+    with tempfile.TemporaryDirectory() as td:
+        fx = Path(td) / "VIA_fixture"
+        eng = fx / "functional modules" / "FAKE" / "engine"
+        eng.mkdir(parents=True)
+        (eng / "FAKE_ENG001_v0100.py").write_text("\n".join([
+            f'"""FAKE_ENG001 — 用法:{fake} run(候 via-entry;{V("nothere")}.cmd 梭;VIA-Verb-Shim v0100;via-verb-shim;claude/via-envmanager-governance-7cls8h;分支 claude/{br})',
+            f'.{V("q")}{{color:red}} <meta name="via-csrf"> "schema": "{V("fake-ssot-v1")}"',
+            f'"classes": "{V("app")}, {V("btn")}"',
+            f'via-env-grok {V("enter-grok")};散文斜線分隔=真指路 via-entry/{fake2} 家族"""', ""]), encoding="utf-8")
+        old = fx / "functional modules" / "VIA_RetiredEngines" / "engine"
+        old.mkdir(parents=True)
+        (old / "OLD_ENG_v0100.py").write_text(f"# {retired} 退役指路(排除夾=不掃)\n", encoding="utf-8")
+        (fx.parent / "docs").mkdir()
+        (fx.parent / "docs" / "NOTE.md").write_text("via-entry 燈板 → `via-entry deadends`;via-env-matrix-5d.md\n", encoding="utf-8")
+        fr = deadends(do_print=False, quiet=True, via=fx)
+        chk("⑨a 死路掃描夾具(假引擎指路假令=死路,含散文 a/b 斜線分隔;docs 真令/檔名/分支/散文/CSS/DOM/schema/-grok 皆放行;退役夾不掃;落夾具根 DEADENDS_latest.json)",
+            fr["dead_tokens"] == {fake: 1, fake2: 1} and fr["verdict"] == "YELLOW" and fr["scanned_files"] == 2
+            and retired not in fr["dead_tokens"] and fr["dead"][0]["file"].endswith("FAKE_ENG001_v0100.py") and fr["dead"][0]["line"] == 1
+            and allow_expect <= set(fr["allowed_tokens"]) and fr["allowed_why"][br] == "ctx"
+            and (fx / "VIA_Reports" / "entry" / "DEADENDS_latest.json").exists(),
+            f"(死路 {fr['dead_tokens']};放行 {len(fr['allowed_tokens'])} 令)")
+    rd = deadends(do_print=False, quiet=True)
+    hit = set(rd["dead_tokens"]) & set(names)
+    chk("⑨b 死路掃描真倉(零例外;冊內每令零誤標;批394/批396 via-chip/via-rebuild 已登錄=不再死路;落 DEADENDS_latest.json)",
+        rd["verdict"] in ("GREEN", "YELLOW") and not hit and rd["scanned_files"] >= 100
+        and "via-chip" not in rd["dead_tokens"] and "via-rebuild" not in rd["dead_tokens"] and (OUT / "DEADENDS_latest.json").exists(),
+        f"({rd['verdict']};死路 {len(rd['dead_tokens'])} 令/{len(rd['dead'])} 處;掃 {rd['scanned_files']} 檔;誤標 {sorted(hit)})")
+    print(f"  [計] 九檢 OK {9 - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 
 
 def main() -> int:
     a = sys.argv[1:]
     if "--selftest" in a:
-        print("=== 單一入口橋(CGC_MDL136_EntryBridge)· 八檢自測(零網路)===")
+        print("=== 單一入口橋(CGC_MDL136_EntryBridge)· 九檢自測(零網路)===")
         return selftest()
     quiet = "--quiet" in a
     as_json = "--json" in a
-    verb = next((x for x in a if x in ("status", "roster", "plan", "envpy", "cmdmatrix-clean")), "status")   # 批387:動詞白名單
+    verb = next((x for x in a if x in ("status", "roster", "plan", "envpy", "cmdmatrix-clean", "deadends")), "status")   # 批387:動詞白名單;批400 +deadends
     try:
         if verb == "status":
             rep = status(do_print=not as_json, quiet=quiet)
+            if as_json:
+                print(json.dumps(rep, ensure_ascii=False, indent=1))
+            return 0
+        if verb == "deadends":                                       # 批400 短令死路掃描(報告型;回傳 0,判定看 verdict)
+            rep = deadends(do_print=not as_json, quiet=quiet)
             if as_json:
                 print(json.dumps(rep, ensure_ascii=False, indent=1))
             return 0

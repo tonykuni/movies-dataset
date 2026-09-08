@@ -71,7 +71,7 @@ ROSTER = {
     ],
     "vap": [
         {"zh": "VAP 儀表板", "dir": "functional modules/VAP/engine", "glob": "VAP_ENG009_DashboardUI_v*.py", "args": ["run"],
-         "page": "supportive modules/ui_support/VIA_UI_Dashboard_v0100.html", "timeout": 300, "python": "family"},
+         "page": "supportive modules/ui_support/VIA_UI_Dashboard_v0100.html", "timeout": 300, "python": "family", "data_gate": True},   # 批400:ENG009 v0107 缺料前檢 rc2=資料側(DATA/YELLOW),非引擎 FAIL
         {"zh": "VAP 標準 Plotly 儀表板", "dir": "functional modules/VAP/engine", "glob": "VAP_ENG014_StdDashboardTemplate_v*.py", "args": ["run"],
          "page": "supportive modules/ui_support/VIA_UI_StdDashboard_v0100.html", "timeout": 300, "python": "family"},
     ],

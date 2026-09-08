@@ -16,7 +16,12 @@ CGC_MDL141_ClosingGate v0100 — 收尾閘(批398 操作員令「將 VRN VAL 收
   ③ all  兩族併列,總判取最壞;CLOSEOUT_latest.json/.md(+VRN_/VAP_ 各自)落 VIA_Reports/closeout。
   --run   先跑鏈再收尾(Zero-Hydra:經 MDL139 run --item 逐段,同一啟動道;vrn=冊 chain_default 五段(--dir 報告夾);vap=vap_one_render);
           任一段 rc≠0 即停(誠實)。--dir 指定報告夾。--json 印 JSON。
+          批400 工作站實錄修:vrn 報告夾(--dir > user.vrn_dir > 冊 dir_default;∪ incoming)無 .pdf/.docx=不跑鏈、一行誠實指路(零 NEED_DIR 噪音;收尾照跑);
+          vap 無 config(user.vap.config 空/檔缺;判準=MDL139 resolve_argv vapone 種類 NEED_CONFIG,零重寫)=改跑 vap_one_demo(ENG016 --demo 產
+          demo_config.json+示範圖入 user.vap.out)並印明取道;有 config=vap_one_render(零 NEED_CONFIG 噪音)。
 紀律:只增不減;正本零觸碰(只讀庫/只讀夾);誠實三態;零 CDN(驗圖亦以此為律);零網路;尾版律(MDL139 尾版 glob);Zero-Hydra;ACCEL-BRIDGE。
+沿革:批398 初版(vrn/vap/all 三動詞+--run);批399 自審(次步冊 off-by-one;報告夾律 _report_dirs);批400 工作站實錄(vap --run 無 config 誤跑 render →
+      NEED_CONFIG、vrn --run 空夾 → NEED_DIR 噪音:run_chain 取道律 _vap_run_item/_report_files;八檢 ⑥ 擴)。
 用法:python3 CGC_MDL141_ClosingGate_v0100.py [vrn|vap|all] [--run] [--dir 夾] [--json] | --selftest
 """
 from __future__ import annotations
@@ -125,6 +130,22 @@ def _stage_of(side: bool, basic: bool, n_met: int, n_fin: int, four: bool) -> in
     return st
 
 
+def _report_exts(spec: dict) -> tuple:
+    """冊 families.vrn.input.extensions(小寫;冊缺=.pdf/.docx;批400 抽出供 vrn_closeout 與 run_chain 同源)"""
+    return tuple(str(x).lower() for x in spec["families"]["vrn"]["input"].get("extensions", [".pdf", ".docx"]))
+
+
+def _report_files(dirs: list, exts: tuple) -> dict:
+    """報告夾內報告檔(檔名→路徑;同名先見者為主;只計冊 extensions;夾缺=跳過;批400 抽出供 vrn_closeout 與 run_chain 空夾判定同源)"""
+    files: dict = {}
+    for d in dirs:
+        if d.exists():
+            for f in sorted(d.iterdir()):
+                if f.is_file() and f.suffix.lower() in exts:
+                    files.setdefault(f.name, f)
+    return files
+
+
 def vrn_closeout(spec: dict | None = None, db: Path = DB_TW, zones: Path | None = None, report_dirs: list | None = None,
                  reports_dir: Path = REPORTS, do_print: bool = True, mod=None) -> dict:
     mod = mod or console_mod()
@@ -132,15 +153,10 @@ def vrn_closeout(spec: dict | None = None, db: Path = DB_TW, zones: Path | None 
     fam = spec["families"]["vrn"]
     zones = zones if zones is not None else VIA / fam["input"]["sidecars"]
     dirs = report_dirs if report_dirs is not None else [VIA / fam["input"]["dir_default"], VIA / fam["input"]["incoming"]]
-    exts = tuple(str(x).lower() for x in fam["input"].get("extensions", [".pdf", ".docx"]))
+    exts = _report_exts(spec)
     rep = {"schema": "VIA.Closeout.vrn.v1", "ts": _now(), "family": "vrn", "verdict": "GREY", "note": "", "db": str(db), "dirs": [str(d) for d in dirs],
            "zones": str(zones), "rows": [], "summary": {}, "next": [], "fail": []}
-    files: dict = {}
-    for d in dirs:
-        if d.exists():
-            for f in sorted(d.iterdir()):
-                if f.is_file() and f.suffix.lower() in exts:
-                    files.setdefault(f.name, f)
+    files = _report_files(dirs, exts)   # 批400:與 run_chain 空夾判定同源(語意不變)
     tabs = {"reports": [], "basic": [], "summary_matrix": [], "financial": []}
     fp_files: set = set()
     duckdb = _duckdb()
@@ -418,12 +434,37 @@ def to_markdown(rep: dict) -> str:
     return "\n".join(L) + "\n"
 
 
+def _vap_run_item(mod, spec: dict) -> tuple:
+    """批400 vap --run 取道律(工作站實錄:無 config 誤跑 vap_one_render → NEED_CONFIG 噪音)。Zero-Hydra:判準=MDL139 resolve_argv vapone 種類
+    (check_files=False 只判參數不判引擎;config 空/相對/絕對解析零重寫):NEED_CONFIG(user.vap.config 空/檔缺)→ ('vap_one_demo', 取道說明);
+    其餘(READY/BAD_PARAM/NEED_DATA)→ ('vap_one_render', '')(引擎缺/參數不合仍由 MDL139 run 誠實印 rc=2);MDL139 無 resolve_argv=維持原道(只增不減)"""
+    fn = getattr(mod, "resolve_argv", None)
+    if fn is None:
+        return "vap_one_render", ""
+    try:
+        st = (fn(spec, "vap_one_render", {}, check_files=False) or {}).get("state", "")
+    except Exception as exc:   # 判準例外=誠實印明並維持原道,不吞錯
+        return "vap_one_render", f"vap 取道判準例外({str(exc)[:60]})→ 維持 vap_one_render"
+    if st == "NEED_CONFIG":
+        return "vap_one_demo", "vap 無 config → 以 --demo 產生 demo_config 與示範圖(vap_one_demo → user.vap.out);要用自訂 config:via-console set vap-config=<path>"
+    return "vap_one_render", ""
+
+
 def run_chain(mod, spec: dict, family: str, report_dir: str | None = None, do_print: bool = True) -> list:
-    """--run:經 MDL139 run --item(同一啟動道;家族境 python 由 MDL139 解析);任一段 rc≠0 即停(誠實)"""
+    """--run:經 MDL139 run --item(同一啟動道;家族境 python 由 MDL139 解析);任一段 rc≠0 即停(誠實)
+    批400:vrn 報告夾(_report_dirs 律)無 .pdf/.docx=不跑鏈、一行誠實指路、回 [](零 NEED_DIR 噪音;收尾照跑);vap=_vap_run_item 取道(無 config=vap_one_demo 並印明)"""
     if family == "vrn":
+        dirs = _report_dirs(spec, report_dir)
+        if not _report_files(dirs, _report_exts(spec)):
+            if do_print:
+                print(f"[via-closeout --run] 報告夾空/缺:{' ∪ '.join(str(d) for d in dirs)} → 放入 PDF 後重跑(或 via-console --open 拖曳/選夾入件)")
+            return []
         items = list(spec["families"]["vrn"].get("chain_default", []))
     else:
-        items = ["vap_one_render"]
+        item, why = _vap_run_item(mod, spec)
+        if why and do_print:
+            print(f"[via-closeout --run] {why}")
+        items = [item]
     idx = mod.items_index(spec)
     out = []
     for it in items:
@@ -484,6 +525,8 @@ def closeout(verb: str = "all", run: bool = False, report_dir: str | None = None
 
 # ---------------------------------------------------------------- 自測
 def selftest() -> int:
+    import contextlib
+    import copy
     import io
     import tempfile
     fails = []
@@ -585,6 +628,9 @@ def selftest() -> int:
             def items_index(self, s):
                 return mod.items_index(s)
 
+            def resolve_argv(self, s, item, params=None, environ=None, check_files=True):   # 批400:vap 取道判準沿用正本(NEED_CONFIG|READY)
+                return mod.resolve_argv(s, item, params, environ, check_files)
+
             def vrn_tabs(self, con, z):
                 return mod.vrn_tabs(con, z)
 
@@ -593,14 +639,24 @@ def selftest() -> int:
                 return 0 if item != "vrn_finpages" else 3
         fm = FakeMod()
         rr = run_chain(fm, spec, "vrn", report_dir=str(rdir), do_print=False)
-        rv = run_chain(fm, spec, "vap", do_print=False)
+        sp0 = copy.deepcopy(spec); sp0["user"]["vap"]["config"] = ""; sp0["families"]["vrn"]["input"]["incoming"] = str(e0)   # 批400:無 config;incoming 指空夾(工作站 incoming 有無 PDF 不影響自測)
+        cfgp = root / "demo_config.json"; cfgp.write_text("{}", encoding="utf-8")
+        sp1 = copy.deepcopy(sp0); sp1["user"]["vap"]["config"] = str(cfgp)   # 平台無關:當前 OS 的絕對路徑
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            rv0 = run_chain(fm, sp0, "vap", do_print=True)                       # 無 config → vap_one_demo 並印明取道
+            rv1 = run_chain(fm, sp1, "vap", do_print=True)                       # 有 config → vap_one_render(不印取道)
+            re0 = run_chain(fm, sp0, "vrn", report_dir=str(e0), do_print=True)   # 空夾 → [] 一行「報告夾空」不跑鏈
+        cap = buf.getvalue()
         d_abs = _report_dirs(spec, str(rdir)); d_rel = _report_dirs(spec, "functional modules/VRN/x"); d_dft = _report_dirs({"families": spec["families"], "user": {}}, None)
         d_usr = _report_dirs({"families": spec["families"], "user": {"vrn_dir": str(root / "usr")}}, None)   # 平台無關:當前 OS 的絕對路徑
-        chk("⑥ --run 經 MDL139 run --item 同一啟動道(vrn 冊 chain_default 依序;--dir 只給有 dir 參數的段;rc≠0 即停=誠實;vap=vap_one_render)+ 報告夾律(絕對/母倉相對/user.vrn_dir/冊預設;incoming 併入)",
+        chk("⑥ --run 經 MDL139 run --item 同一啟動道(vrn 冊 chain_default 依序;--dir 只給有 dir 參數的段;rc≠0 即停=誠實;vap 有 config=vap_one_render)+ 批400 取道律(vap 無 config=vap_one_demo 並印明;vrn 報告夾空=[] 一行「報告夾空」不跑鏈、零 NEED_DIR)+ 報告夾律(絕對/母倉相對/user.vrn_dir/冊預設;incoming 併入)",
             [x["item"] for x in rr] == ["vrn_firstpage", "vrn_structdb", "vrn_finpages"] and rr[-1]["rc"] == 3 and calls[0][1].get("dir") == str(rdir) and calls[1][1] == {}
-            and [x["item"] for x in rv] == ["vap_one_render"] and d_abs[0] == rdir and d_rel[0] == VIA / "functional modules/VRN/x" and d_dft[0] == VIA / spec["families"]["vrn"]["input"]["dir_default"]
+            and [x["item"] for x in rv0] == ["vap_one_demo"] and "--demo" in cap and "vap-config" in cap and [x["item"] for x in rv1] == ["vap_one_render"] and rv1[0]["rc"] == 0
+            and re0 == [] and "報告夾空" in cap and "NEED_DIR" not in cap and all(c[1].get("dir") != str(e0) for c in calls)
+            and d_abs[0] == rdir and d_rel[0] == VIA / "functional modules/VRN/x" and d_dft[0] == VIA / spec["families"]["vrn"]["input"]["dir_default"]
             and d_usr[0] == root / "usr" and all(d[-1] == VIA / spec["families"]["vrn"]["input"]["incoming"] for d in (d_abs, d_rel, d_dft, d_usr)),
-            f"({[x['item'] for x in rr]};{[str(d[0]) for d in (d_abs, d_rel, d_dft)]})")
+            f"({[x['item'] for x in rr]};vap {[x['item'] for x in rv0]}/{[x['item'] for x in rv1]};vrn 空夾 {re0};{[str(d[0]) for d in (d_abs, d_rel, d_dft)]})")
         allrep = closeout("all", reports_dir=out, do_print=False, mod=fm, db=db, zones=zones, image_dirs=[img], specs_csv=csvp, ledger=img / "vap_one_ledger.jsonl")
         chk("⑦ 總閘 all(兩族併列;總判取最壞 RED;CLOSEOUT_latest.json/.md 落檔;log)",
             set(allrep["families"]) == {"vrn", "vap"} and allrep["verdict"] == "RED" and (out / "CLOSEOUT_latest.json").exists() and (out / "CLOSEOUT_latest.md").exists(),

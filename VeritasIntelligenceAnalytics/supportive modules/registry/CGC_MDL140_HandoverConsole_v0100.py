@@ -15,7 +15,10 @@ CGC_MDL140_HandoverConsole v0100 — VIA Central Console 接棒狀態台(批392)
   ② build:VIA_UI_Handover_v0100.html(零 CDN;一頁堆疊;每矩陣篩選/點欄排序/摺疊;「複製 Markdown」鈕)
      + VIA_Reports/handover/HANDOVER_latest.md(同內容 Markdown 表;可直接貼給下一位接棒者)+ HANDOVER_latest.json
   ③ status:印各類來源在位/缺席燈;md:只印 Markdown
-紀律:只增不減;正本零觸碰(只讀);誠實三態(來源缺=GREY「未跑」;讀取失敗=YELLOW);零 CDN;零網路;尾版律。
+紀律:只增不減;正本零觸碰(只讀);誠實三態(來源缺=GREY「未跑」;讀取失敗=YELLOW;在位但空=GREEN 0 列);零 CDN;零網路;尾版律。
+改版:批394 點名 RED 燈/缺件來源 · 批398 收尾閘矩陣(via-closeout)· 批399 .gitkeep 不算報告/占位先換
+     · 批400 工作站實錄「未跑/缺 2 · 未跑 vrn:收件夾 incoming」:收件夾目錄在位但無 .pdf/.docx ≠ 未跑/缺 → GREEN 0 列「空(拖曳/選夾入件)」
+       (matrix/add 新增 empty_ok=空列合法;不計 summary.missing/missing_names);目錄缺才 GREY「未跑/缺:<路徑>」;MD/頁 0 列文案分「空」與「未跑/缺」
 用法:python3 CGC_MDL140_HandoverConsole_v0100.py [build] [--open] | status | md | --selftest
 """
 from __future__ import annotations
@@ -131,7 +134,8 @@ def _rows_from(obj, keys: list | None = None) -> list:
     return rows[:MAX_ROWS]
 
 
-def matrix(cat: str, title: str, rows: list, lamp: str = "GREEN", note: str = "", src: str = "", cols: list | None = None) -> dict:
+def matrix(cat: str, title: str, rows: list, lamp: str = "GREEN", note: str = "", src: str = "", cols: list | None = None, empty_ok: bool = False) -> dict:
+    """列→矩陣;預設 0 列且 GREEN 降 GREY(誠實:無列多半=未跑);empty_ok=True(批400)=「空列合法」(如在位但無件的收件夾)→ 0 列仍保 GREEN"""
     rows = [r for r in (rows or []) if isinstance(r, dict)]
     if cols is None:
         seen = []
@@ -140,7 +144,7 @@ def matrix(cat: str, title: str, rows: list, lamp: str = "GREEN", note: str = ""
                 if k not in seen:
                     seen.append(k)
         cols = seen[:14]
-    return {"cat": cat, "title": title, "lamp": lamp if rows or lamp != "GREEN" else "GREY", "note": note, "src": src, "cols": cols,
+    return {"cat": cat, "title": title, "lamp": lamp if rows or lamp != "GREEN" or empty_ok else "GREY", "note": note, "src": src, "cols": cols,
             "rows": [{c: _cell(r.get(c)) for c in cols} for r in rows], "n": len(rows)}
 
 
@@ -155,13 +159,13 @@ def gather(via: Path = VIA, do_git: bool = True) -> dict:
         rep["cats"].append(c)
         return c
 
-    def add(c, title, obj, src="", note="", lamp="GREEN", cols=None, rows=None):
+    def add(c, title, obj, src="", note="", lamp="GREEN", cols=None, rows=None, empty_ok=False):
         if rows is None:
             if obj is None:
                 c["matrices"].append(matrix(c["id"], title, [], "GREY", note or f"未跑/缺:{src}", src, cols or []))
                 return
             rows = _rows_from(obj)
-        c["matrices"].append(matrix(c["id"], title, rows, lamp, note, src, cols))
+        c["matrices"].append(matrix(c["id"], title, rows, lamp, note, src, cols, empty_ok=empty_ok))   # 批400:empty_ok=空列合法(rows=[] 仍 GREEN)
 
     # 1 倉
     c = cat("repo", "母倉(git)")
@@ -275,8 +279,15 @@ def gather(via: Path = VIA, do_git: bool = True) -> dict:
     if cs and (cs.get("vrn") or {}).get("reports"):
         add(c, "跑況矩陣(BASIC INFO/SUMMARY/FINANCIAL DATA)", [{k: r.get(k) for k in ("report_file", "ticker", "report_date", "basic", "summary", "financial", "overall")} for r in cs["vrn"]["reports"]][:150], "CONSOLE_latest.vrn.reports")
     inc = via / "functional modules" / "VRN" / "input" / "incoming"
-    files = sorted(f for f in inc.glob("*") if f.is_file() and not f.name.startswith(".") and f.suffix.lower() in (".pdf", ".docx")) if inc.exists() else []   # 批399 自審:.gitkeep 等不算報告
-    add(c, "收件夾 incoming", [{"name": f.name, "kb": f.stat().st_size // 1024, "mtime": _mtime(f)} for f in files][:100] or None, str(inc.relative_to(via)), note="" if files else "空(拖曳/選夾入件)")
+    inc_cols = ["name", "kb", "mtime"]
+    if inc.is_dir():
+        files = sorted(f for f in inc.glob("*") if f.is_file() and not f.name.startswith(".") and f.suffix.lower() in (".pdf", ".docx"))   # 批399 自審:.gitkeep 等不算報告
+        # 批400 工作站實錄「未跑/缺 2 · 未跑 vrn:收件夾 incoming」:收件夾在位但無 .pdf/.docx ≠ 未跑/缺,是健康的空收件夾
+        #   → rows=[] + GREEN + 註「空(拖曳/選夾入件)」(empty_ok;不計入 summary.missing/missing_names);目錄缺才走下方 GREY
+        add(c, "收件夾 incoming", None, str(inc.relative_to(via)), note="" if files else "空(拖曳/選夾入件)", cols=inc_cols, empty_ok=True,
+            rows=[{"name": f.name, "kb": f.stat().st_size // 1024, "mtime": _mtime(f)} for f in files][:100])
+    else:
+        add(c, "收件夾 incoming", None, str(inc.relative_to(via)), cols=inc_cols)   # 收件夾目錄缺 → GREY「未跑/缺:<路徑>」(誠實點名)
     co_v = _read_json(R / "closeout" / "VRN_CLOSEOUT_latest.json")   # 批398 收尾閘(via-closeout vrn)
     add(c, "驗證收尾(五段鏈+核對態;via-closeout vrn)", [{k: r.get(k) for k in ("report_file", "ticker", "report_date", "stage_zh", "basic", "financial", "fin_vdf_over", "verdict")} for r in (co_v or {}).get("rows", [])][:150] if co_v else None,
         "VIA_Reports/closeout/VRN_CLOSEOUT_latest.json", lamp=(co_v or {}).get("verdict", "GREY"), note=(co_v or {}).get("note", ""))
@@ -355,7 +366,7 @@ def to_markdown(rep: dict) -> str:
         for m in c["matrices"]:
             L.append(f"### {m['title']}({m['lamp']};{m['n']} 列;{m['src']})" + (f" — {m['note']}" if m["note"] else ""))
             if not m["rows"]:
-                L.append("(未跑/缺)")
+                L.append("(空;在位無件)" if m["lamp"] == "GREEN" else "(未跑/缺)")   # 批400:GREEN 0 列=在位但空(如收件夾),非未跑/缺
                 L.append("")
                 continue
             cols = m["cols"]
@@ -395,7 +406,7 @@ var REP=null;try{REP=JSON.parse(document.getElementById('snap').textContent);}ca
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function mx(host,m){var st={q:'',k:m.cols[0],desc:true};var bar=document.createElement('div');bar.className='bar';var q=document.createElement('input');q.type='search';q.placeholder='篩選';var cnt=document.createElement('span');bar.appendChild(q);bar.appendChild(cnt);var box=document.createElement('div');box.className='tbox';var t=document.createElement('table');box.appendChild(t);host.appendChild(bar);host.appendChild(box);
  function vis(){var rows=m.rows.filter(function(r){if(!st.q)return true;return m.cols.some(function(c){return String(r[c]||'').toLowerCase().indexOf(st.q)>=0;});});rows.sort(function(a,b){var x=a[st.k]||'',y=b[st.k]||'';var nx=parseFloat(String(x).replace(/,/g,'')),ny=parseFloat(String(y).replace(/,/g,''));if(!isNaN(nx)&&!isNaN(ny))return st.desc?ny-nx:nx-ny;return st.desc?String(y).localeCompare(String(x),'zh-Hant'):String(x).localeCompare(String(y),'zh-Hant');});return rows;}
- function render(){var rows=vis(),h='<thead><tr>';m.cols.forEach(function(c){h+='<th data-k="'+esc(c)+'" class="'+(c===st.k?(st.desc?'sd':'sa'):'')+'">'+esc(c)+'</th>';});h+='</tr></thead><tbody>';if(!rows.length)h+='<tr><td colspan="'+m.cols.length+'">(未跑/缺;誠實)</td></tr>';rows.forEach(function(r){h+='<tr>';m.cols.forEach(function(c){var v=r[c]==null?'':r[c];h+='<td class="l-'+esc(String(v).toLowerCase().slice(0,12))+'" title="'+esc(v)+'">'+esc(v)+'</td>';});h+='</tr>';});t.innerHTML=h+'</tbody>';cnt.textContent=rows.length+' / '+m.rows.length;t.querySelectorAll('th').forEach(function(th){th.onclick=function(){var k=th.getAttribute('data-k');if(st.k===k)st.desc=!st.desc;else{st.k=k;st.desc=true;}render();};});}
+ function render(){var rows=vis(),h='<thead><tr>';m.cols.forEach(function(c){h+='<th data-k="'+esc(c)+'" class="'+(c===st.k?(st.desc?'sd':'sa'):'')+'">'+esc(c)+'</th>';});h+='</tr></thead><tbody>';if(!rows.length)h+='<tr><td colspan="'+m.cols.length+'">'+(m.rows.length?'(篩選無符合)':(m.lamp==='GREEN'?'(空;在位無件)':'(未跑/缺;誠實)'))+'</td></tr>';rows.forEach(function(r){h+='<tr>';m.cols.forEach(function(c){var v=r[c]==null?'':r[c];h+='<td class="l-'+esc(String(v).toLowerCase().slice(0,12))+'" title="'+esc(v)+'">'+esc(v)+'</td>';});h+='</tr>';});t.innerHTML=h+'</tbody>';cnt.textContent=rows.length+' / '+m.rows.length;t.querySelectorAll('th').forEach(function(th){th.onclick=function(){var k=th.getAttribute('data-k');if(st.k===k)st.desc=!st.desc;else{st.k=k;st.desc=true;}render();};});}
  q.addEventListener('input',function(){st.q=q.value.trim().toLowerCase();render();});render();}
 function render(){var main=document.getElementById('main');main.innerHTML='';if(!REP){main.textContent='快照缺';return;}var k=document.getElementById('kpi');k.innerHTML='<div><b>'+esc(REP.summary.verdict)+'</b>總判</div><div><b>'+esc(REP.summary.branch||'?')+'</b>分支</div><div><b>'+esc(REP.summary.head||'?')+'</b>HEAD</div><div><b>'+REP.summary.matrices+'</b>矩陣</div><div><b>'+REP.summary.missing+'</b>未跑/缺</div>'+Object.keys(REP.lamps||{}).map(function(x){return '<div><span class="lamp '+esc(REP.lamps[x])+'">'+esc(x)+'</span></div>';}).join('');
  REP.cats.forEach(function(c){var d=document.createElement('details');d.className='cat';d.open=true;d.innerHTML='<summary>'+esc(c.zh)+' <small>('+c.matrices.length+' 矩陣)</small></summary>';c.matrices.forEach(function(m){var box=document.createElement('div');box.className='mx';box.innerHTML='<h4><span class="lamp '+esc(m.lamp)+'">'+esc(m.lamp)+'</span>'+esc(m.title)+' <span class="src">'+esc(m.src)+(m.note?' · '+esc(m.note):'')+' · '+m.n+' 列</span></h4>';mx(box,m);d.appendChild(box);});main.appendChild(d);});}
@@ -462,7 +473,9 @@ def selftest() -> int:
     chk("① 冊→列(dict of dict=鍵+子欄;list 混型;平面 dict=鍵/值;上限 400)", r1 == [{"key": "a", "x": 1, "y": 2}, {"key": "b", "x": 3}] and r2 == [{"k": 1}, {"value": 5}] and r3 == [{"key": "k", "value": "v"}, {"key": "n", "value": 2}] and len(_rows_from(list(range(1000)))) == 400)
     m = matrix("t", "T", [{"a": 1, "b": True, "c": None, "d": [1, 2], "e": 3.14159}], "GREEN", src="x")
     m0 = matrix("t", "空", [], "GREEN", src="y")
-    chk("② 矩陣格式化(int 千分位/bool ✓/None 空/list JSON 截斷/float 4 位;欄自動;空列=GREY 誠實)", m["rows"] == [{"a": "1", "b": "✓", "c": "", "d": "[1, 2]", "e": "3.142"}] and m["cols"] == ["a", "b", "c", "d", "e"] and m0["lamp"] == "GREY" and m0["n"] == 0)
+    m1 = matrix("t", "空但在位", [], "GREEN", src="y", cols=["a"], empty_ok=True)   # 批400:空列合法 → 保 GREEN(預設仍降 GREY)
+    chk("② 矩陣格式化(int 千分位/bool ✓/None 空/list JSON 截斷/float 4 位;欄自動;空列=GREY 誠實;empty_ok 空列保 GREEN)", m["rows"] == [{"a": "1", "b": "✓", "c": "", "d": "[1, 2]", "e": "3.142"}] and m["cols"] == ["a", "b", "c", "d", "e"] and m0["lamp"] == "GREY" and m0["n"] == 0
+        and m1["lamp"] == "GREEN" and m1["n"] == 0 and m1["rows"] == [] and m1["cols"] == ["a"])
     rep = gather(do_git=True)
     ids = [c["id"] for c in rep["cats"]]
     chk("③ 來源冊彙整(15 類齊:倉/入口/環境/能跑閘/家族 U/I/樞紐/主控台/庫/對齊/本機三庫/VRN/VAP/日更鏈/候操作員/次步;缺件 GREY 不假綠;燈冊)",
@@ -475,10 +488,21 @@ def selftest() -> int:
         root = Path(td)
         (root / "VIA_Reports").mkdir()
         rep2 = gather(root, do_git=False)
-        chk("④ 空母倉誠實(全來源 GREY 未跑;不例外;判定 GREY)", rep2["summary"]["verdict"] == "GREY" and rep2["summary"]["missing"] >= 12 and all(m["lamp"] == "GREY" for c in rep2["cats"] for m in c["matrices"] if c["id"] not in ("vap",)),
-            f"(缺 {rep2['summary']['missing']})")
+        inb2 = next(m for c in rep2["cats"] if c["id"] == "vrn" for m in c["matrices"] if m["title"] == "收件夾 incoming")   # 目錄缺 → GREY 點名路徑
+        # 批400:收件夾目錄在位但只有 .gitkeep(無 .pdf/.docx)→ GREEN 0 列「空(拖曳/選夾入件)」;不計 missing/missing_names;缺數恰減 1;總判不受影響
+        inc3 = root / "functional modules" / "VRN" / "input" / "incoming"
+        inc3.mkdir(parents=True)
+        (inc3 / ".gitkeep").write_text("", encoding="utf-8")
+        rep3 = gather(root, do_git=False)
+        inb3 = next(m for c in rep3["cats"] if c["id"] == "vrn" for m in c["matrices"] if m["title"] == "收件夾 incoming")
+        chk("④ 空母倉誠實(全來源 GREY 未跑;不例外;判定 GREY;收件夾目錄缺=GREY 點名路徑)· 批400 空收件夾(僅 .gitkeep)=GREEN 0 列不計未跑/缺",
+            rep2["summary"]["verdict"] == "GREY" and rep2["summary"]["missing"] >= 12 and all(m["lamp"] == "GREY" for c in rep2["cats"] for m in c["matrices"] if c["id"] not in ("vap",))
+            and inb2["lamp"] == "GREY" and inb2["n"] == 0 and inb2["note"].startswith("未跑/缺:") and "incoming" in inb2["note"]
+            and inb3["lamp"] == "GREEN" and inb3["n"] == 0 and inb3["rows"] == [] and inb3["note"] == "空(拖曳/選夾入件)" and inb3["cols"] == ["name", "kb", "mtime"]
+            and "vrn:收件夾 incoming" not in rep3["summary"]["missing_names"] and rep3["summary"]["missing"] == rep2["summary"]["missing"] - 1 and rep3["summary"]["verdict"] == "GREY",
+            f"(缺 {rep2['summary']['missing']};空收件夾後缺 {rep3['summary']['missing']};收件夾 {inb3['lamp']} {inb3['n']} 列)")
         md = to_markdown(rep)
-        chk("⑤ Markdown 匯出(標題/燈/每類 ## /每矩陣 ### 與表頭分隔線/缺=「未跑/缺」/次步清單;'|' 逃逸)", md.startswith("# VIA 接棒狀態台") and md.count("\n## ") >= 15 and "|---|" in md and "(未跑/缺)" in to_markdown(rep2) and "\\|" in to_markdown({"ts": "t", "via": "v", "summary": {}, "lamps": {}, "cats": [{"id": "x", "zh": "X", "matrices": [matrix("x", "T", [{"a": "p|q"}], src="s")]}], "next": []}))
+        chk("⑤ Markdown 匯出(標題/燈/每類 ## /每矩陣 ### 與表頭分隔線/缺=「未跑/缺」/次步清單;'|' 逃逸)", md.startswith("# VIA 接棒狀態台") and md.count("\n## ") >= 15 and "|---|" in md and "(未跑/缺)" in to_markdown(rep2) and "(空;在位無件)" in to_markdown(rep3) and "\\|" in to_markdown({"ts": "t", "via": "v", "summary": {}, "lamps": {}, "cats": [{"id": "x", "zh": "X", "matrices": [matrix("x", "T", [{"a": "p|q"}], src="s")]}], "next": []}))
         out = root / "VIA_UI_Handover_v0100.html"
         build(out=out, reports=root / "rep", do_print=False, rep=rep)
         page = out.read_text(encoding="utf-8")

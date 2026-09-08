@@ -441,3 +441,29 @@ via-closeout vap --run          # VAP ONE 渲染後逐圖驗(via_vap_312)
 via-closeout vrn --run --dir "<您放研究報告 PDF 的資料夾>"   # 有報告才跑
 via-handover
 ```
+
+## 十九、批400:八流程並進——一次修完可修的、其餘下一次、不傷系統、零九頭龍
+
+操作員令:「可同時修完的問題一次修完;不能的下一次;不傷害系統;不發生九頭龍問題;多流程 8 個平行流程向前推進」。做法:八個子流程各只碰各自的引擎檔,共用登錄檔(短令冊/台帳/SSOT/docs/README)由主線最後整合;全面自測在隔離 worktree 跑,只報紅不改碼。
+
+| 流程 | 修了什麼 | 自測 |
+|---|---|---|
+| F1 收尾閘 MDL141 | `vap --run` 無 config → 先 `--demo` 產示範圖再逐圖驗(印明);`vrn --run` 報告夾空=一行指路、不跑鏈、零 NEED_DIR | 八檢 8/8 |
+| F2 接棒台 MDL140 | 收件夾三態:有件 GREEN、在位但空 GREEN「空」、夾缺 GREY(不再誤報未跑) | 八檢 8/8 |
+| F3 對齊 ENG081 | 逐日計數 SQL 端化(`FULL OUTER JOIN` 計數;籌碼對映仍走 `chip_ticker`);`--asof` 遠日 16.6 s/240 MB → 0.38 s/0.5 MB;輸出逐位元相同 | 十二檢 12/12 |
+| F4 單一入口 MDL136 | `deadends` 短令死路掃描器(`via-deadends`):真倉 158 令/2,554 處未登錄;`via-chip`/`via-rebuild` 已不在 | 九檢 9/9 |
+| F5 儀表板 ENG009 v0107 | 缺料前檢:缺件/缺表逐項指補料短令,rc2 誠實停、舊頁在位;鎖住走讓庫律 rc3;MDL138 roster `data_gate` | 十六檢 rc0 |
+| F6 樞紐/總控 | Deck v0134 +`closeout` 任務(54);Manager v0121 正式名稱「收尾閘再生」;總控頁再生;契約測試 19/19 | 25/25、10/10、19/19 |
+| F7 主控台 MDL139 | 「收尾」分頁(第 13 頁):三族判定、VRN 逐份、VAP 逐圖;LIVE/快照同路 | 十檢 10/10 |
+| F8 全面自測 v0238 | FAST 191 站:OK 135 / FAIL 50 / SKIP 6;49 紅=沙盒缺庫缺料(pandas/fitz/pyarrow/duckdb 檔);**1 真發現**:雙橋稽核「網路缺 2」(MDL135 `mirror_health`、MDL134 `online` 直用 `urlopen`)→ 補掛 NET-BRIDGE(MDL134 併補 ACCEL-BRIDGE)後 網路缺 0、加速覆蓋 99.6%、自動總跑器 S1 GREEN | — |
+
+- **不修(下一次/需操作員令)**:`via-envgov` RED 的環境重建(`--approve-remove` 段);09-07 Yahoo 價未齊(資料面);VRN 需真實報告 PDF;158 個舊令的登錄工程;`update()` 的 `executemany` 效能(F3 註)。
+- 登錄:Register v0164(`via-entry` 白名單 +`deadends`;`via-deadends` 別名+梭);SelftestGrid v0239 站名;SSOT 動詞;Console 註;台帳 885;README(`via-deadends` 列與「本表以實掃為準」註)。
+
+```powershell
+# 先按 Enter 讓提示字元回來;只貼框內文字
+via-reload
+via-closeout vap --run          # 無 config 自動走 --demo:產示範圖 → 逐圖驗 → VAP 收尾應轉 GREEN
+via-deadends                    # 短令死路實掃(唯讀;落 DEADENDS_latest.json)
+via-handover                    # 接棒台:收件夾「空」GREEN;closeout 燈
+```
