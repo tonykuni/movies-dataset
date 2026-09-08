@@ -6753,6 +6753,12 @@
    "kind": "批408 爬蟲道可達性修:批407 掛上的 scrape 道,經短令冊實查=永遠不可達(真死路)",
    "ts": "2026-09-08 19:05",
    "name": "根因二層。① 短令覆寫式設閘:via-fred/via-revfill/via-etfhist/via-etfuniv/via-chip/via-price 自 批360/368/374/375/394 起,每次呼叫都寫死 $env:VIA_NET_CONSENT=\"YES\";$env:VIA_SCRAPE_CONSENT=\"YES\" ——是覆寫,不是預設,操作員自設的值每呼必被蓋掉。② 閘二值與期望 token 不符:包內法遵 VIA_WebScraping_Compliance_v0101.def_validate_consent 逐字比對 SSOT 的 required_consent_token=I_ACCEPT_RESPONSIBLE_SCRAPING,字串 \"YES\" 一律回 CONSENT_MISSING/BLOCK;而 SUP_MDL740.gate_state() 的閘二只驗 bool(非空),於是 open=True 但 check_url 仍 DENY,verdict 只說「法遵 finding 阻擋」。兩者相乘=爬蟲道無論如何都開不了,且訊息看不出差在哪。修:Register v0165 新 Set-VIAGateDefaults(只在該閘未設時補預設值,已設者尊重;六令既有預設行為零變更、函式名零改)取代六處覆寫;新 via-gates 唯讀閘態一覽(只報是否等於期望 token,絕不印原值、絕不代設)+ 同名 .cmd 梭。ENG078 v0103 新 gate2_diagnosis() 三態(未設/已設但非期望值/已是期望 token),DENY 訊息把差別講白且不外洩原值。驗:ENG078 二十三檢 23/23(全注入式假 net、零外呼);Register v0165 十檢 10/10(含『未引入新的大括號/引號失衡』以與前版同差為準、『只增不減 前版函式全在』)。律:永不代操作員設任何同意閘。"
+  },
+  {
+   "code": "ENG078-v0104+MDL740-v0113(批409)",
+   "kind": "批409 操作員令「你決定 請完成VRN VDF」;主動型台股 ETF 每日持股——從『沒有可呼叫的車道』變成『有一條實測驗真的 DATED 車道』",
+   "ts": "2026-09-08 19:40",
+   "name": "沙盒本批可連外(TWSE 仍被擋回 FOR SECURITY REASONS,但投信站可達),故由我親自把端點查實,不再只交工作站猜。查法:群益站是 Angular SPA→取 runtime.js 列 45 個 lazy chunk→抓到 getBuyback 呼叫點→得 body 形狀 {fundId,date}→試出 API base /CFWeb(直打 /api/... 是 404,/CFWeb/api/... 才對;POST 不帶 Content-Length 會回 411 Length Required,那個 411 正是端點存在的證據)。端點:POST https://www.capitalfund.com.tw/CFWeb/api/etf/buyback body {\"fundId\":\"<基金編號>\",\"date\":\"YYYY-MM-DD\"};基金編號≠股票代號,先 POST /CFWeb/api/etf/list 取 stockNo→fundNo 對照(00982A=399、00992A=500、00997A=502)。實測:date=null 回 39 列、date=2026-09-01 回 40 列且 pcf.date1 隨之改、date=2026-08-15(週六)回 data=null(誠實無資料)→ 這是真 DATED 車道,不是只給今日。SUP_MDL740 v0113 +post_json 車道(雙閘/法遵/契約全同),令 POST 端點仍走唯一網路收口,不讓呼端自開 urllib 繞過閘與 NET-BRIDGE 稽核。ENG078 v0104 車道 schema 加 method/body/pick/date_path/id_api,新 fetch_lane 單一入口(解編號→渲染→三道取用→pick→解析→日期硬閘),probe 與 backfill 共用同一條路;新硬閘『點名了哪一日,回來就必須是那一日』(不符即拒寫,避免今日持股冒充歷史);parse_holdings 加 by_id 相關性(以本檔代號查出的基金編號點名索取=相關性由建構保證,比字串比對強;列數上限與反指標否決不放寬)與 share 欄;probe 拿別家代號探到『該投信不發此檔』標 N/A、不算 PASS 也不撤銷(否則問錯人就把驗過的車道誤降)。新 sync_lanes(加法式併入車道冊:新增/補鍵/只升不降/未驗 url 才汰換且舊值留 note/冪等)——因為車道冊是執行期會被改寫的檔,工作站那份早與倉內分岔,新設定放程式碼裡再併入,操作員 git pull 不會撞本機修改。驗:ENG078 二十六檢 26/26、SUP_MDL740 二十一檢 21/21(皆全注入式假 net、零外呼);另以**真實抓回的群益回應重放**端到端驗證:00992A 2026-09-03 → 40 列(3017 奇鋐 1,001,000 股 7.7434%、2330 台積電…),改掉回傳日期即被硬閘擋下。覆蓋誠實話:23 檔須每日揭露中,本批只通了群益 3 檔(00982A/00992A/00997A),其餘 13 檔仍缺源。"
   }
  ]
 }

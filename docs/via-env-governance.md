@@ -668,3 +668,84 @@ $env:VIA_NET_CONSENT = "YES"; $env:VIA_SCRAPE_CONSENT = "YES";
 
 **永不代操作員設任何同意閘。** 本批做的是**移除覆寫**、把差別講白,讓操作員自己決定要不要開;
 `Set-VIAGateDefaults` 保留六令原有的預設值只是為了不改既有行為,一旦操作員自己設了,它就不再插手。
+
+## 三十一、批409:主動型台股 ETF 每日持股——從「沒有可呼叫的車道」到「一條實測驗真的 DATED 車道」
+
+操作員令「你決定 請完成VRN VDF」。VDF 這邊唯一真正的缺口就是主動 ETF 每日持股:
+批406 查出車道冊 16 條投信歷史道全空、批406b 修好 base、批406c 定論 TWSE openapi 沒有這份資料、
+批407 掛上三道取用、批408 修好爬蟲道可達性——**但一直還是沒有任何一條真的能取到持股的歷史車道**。
+
+本批把它補上了,而且不是猜的。
+
+### 為什麼這次能查實
+
+先前幾批我一直寫「沙盒連不到,交工作站驗真」。本批重測連線發現:**沙盒本批可連外**——
+TWSE 仍被擋(回「FOR SECURITY REASONS」頁),但**投信站可達**。既然可達,端點就該由我查實,
+不該再讓操作員拿猜的 URL 去試。
+
+### 查法(逐步,可複現)
+
+1. `https://www.capitalfund.com.tw/etf/product/detail/500/portfolio` 帶瀏覽器 UA → **200**
+   (工作站先前 403 是因為走的是不帶標頭的 `http` 道——這正好反證批407 `headers` 道是對的方向),
+   標題「00992A 群益台灣科技創新主動式ETF - **申購買回清單**」=PCF 就是這頁。
+2. 頁是 Angular SPA,持股走 XHR。`main.*.js` 只給得到 API 路徑清單(`/api/etf/buyback` 等),
+   給不到 body 形狀 → 取 `runtime.*.js` 列出 45 個 lazy chunk → 逐塊抓 `getBuyback` 呼叫點 →
+   兩塊命中 → 讀出 `this.condition={fundId:"",date:null}`,body 形狀到手。
+3. API base 不是站根:直打 `/api/etf/list` 是 **404**,`/CFWeb/api/etf/list` 回 **411 Length Required**
+   ——那個 411 正是「端點存在、只是我沒帶 Content-Length」的證據(curl 帶 `--data-raw` 即自動帶上),
+   補上就 200。
+
+### 端點(實測)
+
+```
+POST https://www.capitalfund.com.tw/CFWeb/api/etf/buyback
+body {"fundId": "<投信自家基金編號>", "date": "YYYY-MM-DD"}   # date=null 表示最新一日
+→ data.pcf(fundName/date1/nav/…)、data.stocks(持股)、bonds/futures/assets/rps
+```
+
+基金編號**不是**股票代號,要先查對照:
+
+```
+POST https://www.capitalfund.com.tw/CFWeb/api/etf/list  body null
+→ data.funds[].stockNo ↔ fundNo        # 00982A=399、00992A=500、00997A=502
+```
+
+實測三態:`date=null` → 39 列;`date=2026-09-01` → 40 列且 `pcf.date1` 隨之變成 2026-09-01;
+`date=2026-08-15`(週六)→ `data=null`。**所以這是真的 DATED 車道**,不是只給今日。
+
+### 做了什麼
+
+- **`SUP_MDL740_NetUnified_v0113.py`**:加 `post_json` 車道(雙閘先行 → 法遵 → curl 子程序 →
+  `{state,data}` 契約全同)。理由是 Zero-Hydra:這類端點是 POST,若讓呼端自己開 urllib,
+  就繞過了雙閘與 `[VIA:NET-BRIDGE]` 稽核——網路出口必須只有一個。二十一檢 21/21。
+- **`VDF_ENG078_ActiveETFHoldingsHistory_v0104.py`**:
+  - 車道 schema 加 `method` / `body`(含 `{fundid}`/`{date}`/`{ymd}` 模板)/ `pick`(點路徑,
+    如 `data.stocks`)/ `date_path` / `id_api`(代號→編號對照表規格)。
+  - 新 `fetch_lane` **單一入口**:解編號 → 渲染 url/body → 三道取用 → `pick` → 解析 → 日期硬閘。
+    `probe` 與 `backfill` 共用同一條路,判準不會有兩套。
+  - **日期硬閘**:點名了哪一日,回來就必須是那一日;不符即拒寫。沒有這道閘,「今日持股被寫成
+    過去某一日」會長得跟成功一模一樣——那比沒資料更糟。
+  - `parse_holdings` 加 `by_id`:以本檔代號查出的基金編號去**點名**索取的單檔端點,相關性由建構
+    方式保證(比字串比對強),故略過批406c 的第③道;**①列數上限與②反指標否決照跑,不放寬**。
+    另補 `share` 欄名(群益用單數 `share`,先前只認 `shares` 會漏掉股數)。
+  - `probe` 拿別家代號探到「該投信不發此檔」標 **N/A**——不算 PASS,也**不撤銷**。
+    (沒有這條,拿 00981A 去探群益車道一次,就會把驗過的好車道誤降。)
+  - 新動詞 **`sync [--apply]`**:把程式碼裡的車道種子**加法式**併進磁碟車道冊——新增缺的、
+    補空的鍵、只升不降、**未驗過的 url 才汰換且舊值寫進 note**、冪等。
+    為什麼要這樣:車道冊是執行期會被 `--apply` 改寫的檔,工作站那份早與倉內分岔;
+    把新車道直接寫進倉內 JSON,操作員 `git pull` 就會撞本機修改。設定放程式碼、併入用這支。
+
+### 驗
+
+- ENG078 **二十六檢 26/26**、SUP_MDL740 **二十一檢 21/21**,皆全注入式假 net、零外呼。
+- 另做**真實回應重放**端到端驗證(真取用是我自己以 curl 做的端點研究,重放證明解析鏈對真資料成立,
+  **全程未動任何同意閘**):00992A × 2026-09-03 → **40 列**
+  (3017 奇鋐 1,001,000 股 7.7434%、2059 川湖、2330 台積電 1,116,000 股 6.2205%…);
+  把回傳日期改成別日,硬閘立刻擋下並印「日期不符:要 2026-09-03 回 2026-09-08」。
+- 車道併入以**倉內真車道冊**實跑:17 條 → 17 條、舊 id 全在、群益升 VERIFIED、第二次跑零動作。
+
+### 誠實的覆蓋話
+
+23 檔須每日揭露的主動 ETF 裡,本批通的是**群益的 3 檔**(00982A / 00992A / 00997A)。
+其餘 13 家投信仍是 `PENDING_SOURCE`。查法已經定型(頁→chunk→body 形狀→API base),
+可以逐家照做;但那是逐家的工,不是一批做得完,也不該為了湊數而臆造端點。
