@@ -749,3 +749,55 @@ POST https://www.capitalfund.com.tw/CFWeb/api/etf/list  body null
 23 檔須每日揭露的主動 ETF 裡,本批通的是**群益的 3 檔**(00982A / 00992A / 00997A)。
 其餘 13 家投信仍是 `PENDING_SOURCE`。查法已經定型(頁→chunk→body 形狀→API base),
 可以逐家照做;但那是逐家的工,不是一批做得完,也不該為了湊數而臆造端點。
+
+## 三十二、批410:VRN 半邊——自測污染正式產出,收尾閘看到的是假報告
+
+操作員令「你決定 請完成VRN VDF」。VDF 那半邊是批409。VRN 這半邊,我先把鏈**真的跑一遍**再說話。
+
+### 先跑,再判
+
+拿倉內既有的 `synthetic_financial_report.pdf` 走 `via-closeout vrn --run --dir <夾>`,五段鏈
+(收件→首頁→入庫→財報頁→四點)**跑得完**——所以 VRN 不是「壞了」。但輸出裡冒出兩份我沒放進去的
+報告:`fx_report` 與 `fx_twocol`,而且被判成 FAIL。
+
+### 真因:只有一支引擎的自測會寫進正式產出夾
+
+把 `VIA_Reports` 全樹與各庫做快照,逐一跑四支 VRN 引擎自測再比對差異:
+
+| 引擎 | 自測後新建 | 改動 |
+|---|---|---|
+| `VRN_ENG072_FirstPageText_v0105` | **6** | 0 |
+| `VRN_ENG073_ReportStructuredDB_v0105` | 0 | 0 |
+| `VRN_ENG074_FinancialPages_v0102` | 0 | 0 |
+| `VRN_ENG080_FourPointDigest_v0100` | 0 | 0 |
+
+ENG072 的 selftest 把**輸入 PDF** 放進暫存夾了,但 `run()` 的**輸出**仍寫
+`OUTDIR = VIA_Reports/first_page_text/`,於是每跑一次自測就留下
+`fx_report.{txt,json}` / `fx_scan.txt` / `fx_twocol.{txt,json}` 六個 fixture 檔。
+
+後果實測:再跑一次鏈,`ENG073` 把那些 fixture 當**真報告**收進正本庫(`basic +3`、`metrics +2`),
+收尾閘於是把誠實的「尚無報告 YELLOW」變成假的「報告 3 · DONE 0 · FAIL 2 · RED」。
+工作站只要跑過 `via-rungate --family vrn`、`via-selftest` 或 SelftestGrid 就會中——
+這是 VRN 長期吵雜的一部分來源,而且是**假的紅**,比缺料更糟。
+
+### 三處修
+
+- **`VRN_ENG072_FirstPageText_v0106.py`(治本)**:自測期間把 `OUTDIR` 一併重導進暫存夾,跑完還原。
+  新檢 ⑮ 只問「**本次**跑有沒有新增」——舊機器上前版留下的殘件不是本次的錯,那是清理道的工;
+  拿舊殘件判本次紅,就是判準綁錯前提(批408 的教訓,這次先想到)。十五檢 15/15。
+- **`purge-selftest [--apply]`(清舊)**:把已外流的 fixture 自正式產出夾**搬進隔離夾**
+  (`_selftest_quarantine/`)——**不刪、可逆、資訊不丟**;並查出正本庫對應列、印出該下的 `DELETE` SQL,
+  **庫側絕不代刪**,由操作員自己決定。
+  (第一版我對著 `functional modules/VRN/**` glob 找庫,一列都查不到;VRN 的報告表其實住在 VDF 正本庫
+  `vdf_tw_market.duckdb`=`ENG073`/`MDL141` 的 `DB_TW`——查核路徑要跟真正寫入者一致。)
+- **`CGC_MDL141_ClosingGate_v0102.py`(閘上認得)**:收尾閘認出 fixture 外流件,**不進 rows 與判定**,
+  單列 `FIXTURE` 說明並指路清理。這樣即使操作員還沒清庫,判定也已經是誠實的。
+  新檢 ⑩ 以對照組實證「有無外流件,報告數與 verdict 皆相同」(乾淨 1 份 RED = 有外流 1 份 RED,外流 2)。十檢 10/10。
+  寫這檢時撞到自己一個錯:DuckDB 單寫者,乾淨組讀之前沒先關連線,讀到空 → 判準假紅;先關再讀即正確。
+
+### VRN 的誠實話
+
+鏈本身五段可跑,卡的是**沒有真報告輸入**——`via-closeout vrn` 在乾淨態說「尚無報告(報告夾與庫皆空)
+→ 拖 PDF/選夾進主控台即整條鏈」,那句話是對的。倉內的 `synthetic_financial_report.pdf` 不是台股
+投資報告(抽不出代號與目標價,`ENG080` 誠實回「`vrn_report_basic` 無有效 ticker 列」),
+所以它不能充當四點文摘的示範件。要讓 VRN 走到 GREEN,需要的是真報告,不是再寫程式。
