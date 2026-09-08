@@ -6733,6 +6733,13 @@
    "ts": "2026-09-08 18:30",
    "name": "定論:TWSE openapi 沒有主動 ETF 每日持股——discover 自 /v1/swagger.json 真列舉、base 正確推導,命中 12 條之中文名稱全是公司內部人/外資/大股東持股(ESG持股及控制力、基金基本資料彙總表=ETF 冊、定期定額排行、外資陸資持股比率/前20、持股逾10%大股東、董監持股不足法定成數×2、董監事持股餘額明細×2、內部人持股轉讓×2),無一條為 ETF 成分股。我的錯:probe 對 MI_QFIIS_sort_20(18 列)、t187ap08_L(12 列)、t187ap11_L(27528 列)、t187ap11_P(6508 列)回 PASS 並升 VERIFIED,因判準只看「≥5 列+四碼代號+數字」而董監事持股表全都滿足;若就此 backfill 會把董監事持股寫進 ETF 持股正本表。收緊三道:①列數 5≤n≤600 ②反指標否決(董事/監察人/內部人/大股東/外資/陸資/持股比率/轉讓/ESG/法定成數/餘額明細/insider/director/supervisor)③給 ETF 代號時原文須含該代號或含成分股正指標。撤銷道:probe --apply 重驗本器升過之 VERIFIED(以 note 內『probe 驗過』認定),不過即降回 CANDIDATE 並記『曾誤升已撤』;原生 VERIFIED(MONEYDJ)不重驗不動。十八檢 18/18;Grid v0244 站名。",
    "note": "自測又抓到我兩個 fixture 自撞並修:①DATED 回補假 payload 未帶基金代號,收緊後被自己的新判準擋下 → 改成真實 PCF 樣態帶『基金代號』②⑰ 的 fixture 股票名稱寫成『成分N』自撞正指標 → 改為『股N』。方向已定:ETF 每日持股要走投信 PCF 頁;群益 403 是伺服器拒絕非找不到,需瀏覽器式標頭,倉內 VIA_Unified_WebScraping_Playwright_Engine 可走但要另掛爬蟲車道,候操作員指示。操作員機上那 4 條誤升車道會在下次 probe --apply 自動撤掉。"
+  },
+  {
+   "code": "CGC_MDL096-v0109(批406d)",
+   "kind": "批406d CI 假紅修:批406c(43de99b6)Windows bundled Chromium UAT 紅於 SyncStatus 十檢之 ④",
+   "ts": "2026-09-08 18:40",
+   "name": "根因=④ 檢以 code 前綴白名單(TOOL|CGC|VDF|VAP|VRN|REG|INTAKE|BENCH|GRID|SHIM|MERGE|REFAIL|CI)- 猜台帳尾筆,但台帳 append-only、code 可為任何形狀;批406c 後尾 8 筆為 ENG054-/SUP_MDL740-/PSRepair-/GrokUI-/ENG078-×3 全不中,頁面其實正確 join 卻報紅(批401–406b 綠只因窗內殘留一筆舊合規 code,406c 擠出)。此為第二次:原寫死 TOOL- 已於批354 放寬成 13 前綴,放寬白名單只是延後同一個錯。修:CGC_MDL096_SyncStatus v0109 之 ④ 改驗真 join——讀 VIA_AutoCode_Registry_v0100.json 尾筆 code 並斷言逐字出現在頁上,對任何前綴永久成立;台帳不可讀=誠實紅印明。十檢 10/10。CI 以 Tail 取尾版故自動生效。",
+   "note": "順帶更正我先前的誤判:本會話早先在沙盒見同一道 ④ 紅,以 git stash 於乾淨 128695c1 復現後判為『沙盒既有、CI 會過、不動』——復現對、歸因錯,那不是環境差異而是這個脆弱白名單,我自己持續追加台帳最後把 CI 也拖紅。再生頁 VIA_UI_SyncStatus_v0100.html 含 HEAD/dirty/列數等機器態,照往例不入 commit(CI 自己再生)。"
   }
  ]
 }

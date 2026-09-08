@@ -594,3 +594,13 @@ via-etfhist backfill --max-days 5
 - **十八檢 18/18**(+⑮ 反指標、⑯ 列數上限、⑰ 相關性、⑱ 撤銷道)。自測又抓到我兩個 fixture 自撞:DATED 回補的假 payload 沒帶基金代號(收緊後被自己的新判準擋下,改成真實 PCF 樣態帶 `基金代號`);⑰ 的 fixture 名稱寫「成分N」自撞正指標。
 - **下一步(方向已定)**:ETF 每日持股要走**投信 PCF 頁**。群益那條回 403(伺服器拒絕,非找不到),需瀏覽器式標頭——倉內有 `VIA_Unified_WebScraping_Playwright_Engine` 可走,但要另掛爬蟲車道,候操作員指示。
 - **登錄**:SelftestGrid v0244 站名;台帳 893。
+
+## 二十八、批406d:CI 假紅修——同步狀態台 ④ 檢的「code 前綴白名單」是錯抽象
+
+批406c(`43de99b6`)CI 紅:`CGC_MDL096_SyncStatus` 十檢的 ④「台帳/問題冊唯讀 join」失敗,其餘九檢與 Manager 十檢、DeckServer 25 項全綠。
+
+- **根因**:④ 檢用**前綴白名單**去猜台帳 code——`\b(TOOL|CGC|VDF|VAP|VRN|REG|INTAKE|BENCH|GRID|SHIM|MERGE|REFAIL|CI)-`。但台帳是 append-only、code 可以是任何形狀。批406c 之後尾 8 筆是 `ENG054-`、`SUP_MDL740-`、`PSRepair-`、`GrokUI-`、`ENG078-`×3——**白名單一個都不中**,於是頁面明明正確 join 了台帳,檢查卻報紅。批401–406b 之所以還綠,只是窗內還殘著一筆舊的合規 code;406c 把它擠出去了。
+- **這不是第一次**:原本寫死 `"TOOL-"`,批354 就因為「尾筆非 TOOL 即假紅」放寬成 13 個前綴。**放寬白名單只是延後同一個錯**。
+- **修法(`CGC_MDL096_SyncStatus_v0109.py`)**:④ 改成驗**真 join**——直接讀 `VIA_AutoCode_Registry_v0100.json` 的尾筆 `code`,斷言它**逐字**出現在頁上。這才是「唯讀 join」的字面意思,且對任何前綴永久成立;台帳不可讀=誠實紅並印明。十檢 10/10(尾筆 `ENG078-v0101-406c(批406c)` 命中)。CI 以 `Tail "CGC_MDL096_SyncStatus_v*.py"` 取尾版,故 v0109 自動生效(尾版律)。
+- **順帶更正我先前的誤判**:本會話早先我在沙盒看到同一道 ④ 紅,用 `git stash` 在乾淨的 `128695c1` 上復現後,判定為「沙盒既有、CI 會過、不動」。**復現是對的,歸因是錯的**——那不是環境差異,就是這個脆弱白名單;我自己一路追加台帳,最後把 CI 也拖紅了。
+- **登錄**:台帳 894。再生頁 `VIA_UI_SyncStatus_v0100.html` 含 HEAD/dirty/列數等機器態,照往例不入 commit(CI 自己會再生)。
