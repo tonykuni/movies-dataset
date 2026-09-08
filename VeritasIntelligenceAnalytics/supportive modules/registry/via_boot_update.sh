@@ -102,6 +102,22 @@ PYENV
   VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL131_ProjectCompletion_v*.py | sort | tail -1)" build
   echo "--- ⑫ 產品資格閘(批376;MDL133;九閘;只讀存證)"
   VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL133_ProductGate_v*.py | sort | tail -1)" build
+  echo "--- ⑬ 環境治理全景(批381;MDL135;唯讀 run --offline;LKGC 快照;log logs/env_governance.log)"
+  VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL135_EnvGovernance_v*.py | sort | tail -1)" run --offline --quiet
+  echo "--- ⑭ 單一入口燈板(批383;MDL136;零網路;VIA_Reports/entry)"
+  VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL136_EntryBridge_v*.py | sort | tail -1)" status --quiet
+  echo "--- ⑮ 本機三庫整併盤點(批383;ENG079;scan 唯讀;雲端無本機三庫=誠實 RED 不寫)"
+  VIA_NO_OPEN=1 python3 "$(ls "$ENG"/VDF_ENG079_LocalDbConsolidate_v*.py | sort | tail -1)" scan || true
+  echo "--- ⑯ 能跑閘(批384;MDL137;家族境 python 真跑引擎自測 --fast;雲端無境=base 退路誠實黃)"
+  VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL137_RunGate_v*.py | sort | tail -1)" run --fast --quiet || true
+echo "--- ⑰ 台股日交易×籌碼數量對齊核對(批390;VDF_ENG081 check;唯讀;庫缺/籌碼落後=誠實不假綠)"
+  VIA_NO_OPEN=1 python3 "$(ls "$ENG"/VDF_ENG081_UniverseAlign_v*.py | sort | tail -1)" check || true
+echo "--- ⑱ 輸入主控台頁再生(批390;MDL139 build;零 CDN;零網路)"
+  VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL139_InputConsole_v*.py | sort | tail -1)" build || true
+echo "--- ⑲ 接棒狀態台再生(批392;MDL140 build;只讀現役 *_latest.json → 15 類堆疊矩陣+Markdown;零網路)"
+  VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL140_HandoverConsole_v*.py | sort | tail -1)" build || true
+echo "--- ⑳ 收尾閘(批398;MDL141 vrn,vap 只讀:VRN 逐份五段鏈+核對態、VAP 逐圖驗;無報告/無圖=誠實黃)"
+  VIA_NO_OPEN=1 python3 "$(ls "$REG"/CGC_MDL141_ClosingGate_v*.py | sort | tail -1)" all || true
   echo "=== 畢(誠實三態見上)==="
 } >> "$LOG" 2>&1
 exit 0
