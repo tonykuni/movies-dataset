@@ -801,3 +801,90 @@ ENG072 的 selftest 把**輸入 PDF** 放進暫存夾了,但 `run()` 的**輸出
 → 拖 PDF/選夾進主控台即整條鏈」,那句話是對的。倉內的 `synthetic_financial_report.pdf` 不是台股
 投資報告(抽不出代號與目標價,`ENG080` 誠實回「`vrn_report_basic` 無有效 ticker 列」),
 所以它不能充當四點文摘的示範件。要讓 VRN 走到 GREEN,需要的是真報告,不是再寫程式。
+
+## 三十三、批411:工作站實錄修——`backfill` 回 `tried 0` 不是沒事做,是我讓它做不到
+
+工作站實錄:`verified_dated_lanes: 1`(群益車道確實已驗真)、checkpoint 46 個日格,
+`backfill --max-days 10` 卻回 `tried 0 · filled 0 · no_source 0`。
+
+**真因**:`coverage()` 用 `st.setdefault(d, {"state": "MISSING"})` ——**既有日格保留舊態**;
+而 `backfill` 只走 `state == "MISSING"` 的日格。批406 那時一條車道都沒有,所有日格早就被寫成
+`NO_SOURCE` / `PENDING_TODAY`;於是批409 把車道驗真之後,**那些日格永遠不會再被看一眼**。
+
+`NO_SOURCE` 本來就該是「**當時**沒有源」的紀錄,不是終局判決。是我把它當成終局了。
+
+**重試律**(`VDF_ENG078_v0105`):
+
+| 日格態 | 重試? | 理由 |
+|---|---|---|
+| `MISSING` | 一律試 | 原本就是待補 |
+| `NO_SOURCE` | 該發行商**現在有** VERIFIED DATED 車道才試 | 沒車道時重試是做白工 |
+| `PENDING_TODAY` | 那一日**已不是今日**才試 | 當日快照歸 ENG051,過了就該補 |
+| `FILLED` | 永不重跑 | 只增不減,已落庫的不動 |
+
+回傳加 `revived` 計數,看得見復活了幾格。另外 `sync` 零動作時逐條印出「不動的原因」——
+先前只印「新增 0 · 補鍵 0 · 升態 0」,分不出「早就併好了」與「被狀態擋住」。
+
+**驗**:二十七檢 27/27。新檢 ㉗ 用對照組實證兩個方向:無 DATED 車道時 `NO_SOURCE` 不復活
+(revived 1 = 只有過期的 `PENDING_TODAY`),車道驗真後同一批日格復活並真的補起來
+(revived 6 · tried 3 · filled 3)。寫這檢時自撞一次:fixture 拿 `wd8[-1]` 當「過期的今日」,
+但平日它就等於今日=永遠不復活——判準是對的、fixture 是錯的,改以 `date.today()` 明確切開。
+
+## 三十四、批412:金融機構 SSOT 收容與接線——券商/評等正典化 + 報告分析師姓名擷取
+
+操作員上傳 `VIA_Financial_Institution_SSOT_v0100.{py,json}` 並令
+「SSOT補充報告分析師姓名擷取 BROKER / RATING DICTS」。
+
+### 先講缺口(v0105 為止的實況)
+
+- `VRN_ENG073.BROKER_DICT` 只有 **16 條寫死鍵**,而且鍵是**檔名子字串**(`MS`/`Citi`/`凱基`…),
+  不是正典鍵;國內 16 家 + 外資 12 家的中英別名、舊鍵遷移(`BOA`→`BOFA`、`MCQ`/`MQ`→`MACQUARIE`)全無。
+- `rating_raw` 只存正則抓到的**原字串**,從不正規化——`Outperform` 與 `買進` 在庫裡是兩筆不同的東西。
+- **分析師姓名完全沒有抽取**。整條 VRN 鏈(ENG072/073/074/080)沒有任何一處在做這件事。
+
+### 收容與接線
+
+- 收容:`supportive modules/ssot/VIA_Financial_Institution_SSOT_v0100.{py,json}`(逐位元原樣)。
+  其自測 PASS:國內 16 · 外資 12 · 評等 6 · regex 8 · 網域 16 · 24 斷言。
+- `VRN_ENG073_ReportStructuredDB_v0106.py` **綁**它(Zero-Hydra:只調度不改寫,
+  本器不自建第二份券商或評等字典):
+  - `ssot_broker` 檔名優先→內文後備,舊 16 鍵經 `resolve_broker` 轉正典鍵。
+  - `ssot_rating` 英中同義歸一(`Buy`/`Outperform`/`Overweight`/`優於大盤` → `BUY` code2 POSITIVE;
+    `NR` → `NOT_RATED` code0 不可行動)。
+  - `ssot_analysts` = **全新能力**,以 SSOT 的 `analyze_contact_document` 為引擎
+    (Email／電話當錨點 → 鄰近行姓名候選 → local part 相似度比對 → 網域反查機構),落新表 `vrn_report_analyst`。
+- **只增不減**:`broker` 與 `rating_raw` 兩欄的語意與值**完全不動**(下游 MDL141/ENG080 仍讀得到原樣),
+  新事實一律走新欄新表。順帶必須一起改的:原本 `INSERT ... VALUES (?×18)` 是位置式,
+  一旦 `ALTER` 加欄就整批爆掉——**加欄與位置式 INSERT 天生互斥**,改成具名欄位。
+
+### 誠實面
+
+SSOT 給的是四個**語意不同**的欄:`matched_*`(與本錨點比對到的)與 `*_guess`
+(自 email local part 還原、或英轉中音譯)。我第一版把它們併成一欄,那是把「驗到的」和「猜的」
+混為一談,已改成分欄並記來源(`EMAIL_LOCALPART_GUESS` / `NEARBY_MATCHED` / `TRANSLITERATION_GUESS`)。
+另外實測發現 SSOT 會把**同一個中文名同時配給兩位分析師**(鄰近視窗誤配的典型徵狀)——
+那是正典的判斷、正典依其 `alias_governance` 為唯讀,我不改它;但我在本器加 `zh_shared` 標記,
+讓它不會看起來像確定的事實。
+
+**修掉自己兩個問題**:① 動態載入沒把模組放進 `sys.modules`,pydantic 解不了延後註解,
+`analyze_contact_document` 丟「`TextBlock` is not fully defined」——而且**只在動態載入時發生**,
+直接 `python SSOT.py` 跑自測不會重現。② 我的 `except` 把它吞成「0 筆」——靜默回空看起來像
+「這份報告沒有分析師」,那是假訊息;改為記下因由並在 `[入庫計]` 印出來。
+
+### 回報 SSOT 缺口(canonical 唯讀,我未觸碰;要不要補是操作員的決定)
+
+| 舊鍵/詞 | 意義 | SSOT 現況 |
+|---|---|---|
+| `JP` | 摩根大通 | 只有 `JPM` / 小摩 / 摩通 / `J.P. Morgan`,沒有裸 `JP` |
+| `CLST` | 里昂 | 只有 `CLSA` / 里昂 / `CLSA Securities` |
+| `GF` | 廣發 | **SSOT 完全沒有廣發這家券商** |
+| `增持` | 買進同義 | `BUY` 的別名有「加碼」沒有「增持」(而「減持」在 `SELL` 裡有) |
+
+這四項**不會遺失資料**——舊欄 `broker`/`rating_raw` 仍存原值,新欄誠實留空。
+
+### 驗
+
+ENG073 v0106 **二十三檢 23/23**(原二十檢全過 + 批412 三檢);SelftestGrid v0249 兩站實跑綠;
+ENG078 v0105 二十七檢 27/27;CGC_MDL096 v0109 十檢 10/10。
+分析師擷取端到端實測:兩位分析師、英文名自 email local part 還原、電話正規化、
+網域反查出「摩根士丹利」與「凱基證券」並帶正典鍵 `MS`/`KGI`、`zh_shared` 正確標出中文名共用。

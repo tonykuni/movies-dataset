@@ -6765,6 +6765,18 @@
    "kind": "批410 VRN 半邊:自測污染正式產出=收尾閘一直看到假報告的真因(操作員令「你決定 請完成VRN VDF」)",
    "ts": "2026-09-08 20:10",
    "name": "查法:把 VIA_Reports 全樹與各庫做快照,逐一跑四支 VRN 引擎自測再比對差異。結果只有一支會寫活路徑——VRN_ENG072 v0105 的 selftest 輸入 PDF 走暫存夾,但 run() 的輸出仍寫 OUTDIR=VIA_Reports/first_page_text/,每跑一次就留下 fx_report/fx_scan/fx_twocol 六個 fixture 檔(ENG073/074/080 皆乾淨,新建 0 改動 0)。後果實測:再跑一次鏈,ENG073 把那些 fixture 當真報告收進正本庫(basic +3、metrics +2),收尾閘把誠實的「尚無報告 YELLOW」變成假的「報告 3 · DONE 0 · FAIL 2 · RED」。工作站只要跑過 via-rungate --family vrn / via-selftest / SelftestGrid 就會中,這也是 VRN 長期吵雜的一部分來源。修:① ENG072 v0106 自測期間把 OUTDIR 一併重導進暫存夾、跑完還原;新檢 ⑮ 只問「本次跑有沒有新增」(舊機器上的前版殘件不是本次的錯,那是清理道的工;拿舊殘件判本次紅就是判準綁錯前提=批408 教訓)。十五檢 15/15。② ENG072 新動詞 purge-selftest [--apply]:把已外流的 fixture 自正式產出夾**搬進隔離夾**(不刪、可逆),並查出正本庫對應列、印出該下的 SQL——**庫側絕不代刪**,由操作員自己決定。(第一版我對著 VRN 夾 glob 找庫,一列都查不到;VRN 的報告表其實住在 VDF 正本庫 vdf_tw_market.duckdb=ENG073/MDL141 的 DB_TW,路徑要跟真正寫入者一致。)③ MDL141 v0102 收尾閘認得 fixture 外流件:不進 rows 與判定,單列 FIXTURE 說明並指路清理。新檢 ⑩ 以對照組實證『有無外流件,報告數與 verdict 皆相同』(乾淨 1 份 RED = 有外流 1 份 RED,外流 2)。十檢 10/10。寫檢時撞到自己一個錯:DuckDB 單寫者,乾淨組讀之前沒先關連線,讀到空 → 判準假紅;先關再讀即正確。VRN 誠實話:鏈本身五段可跑(收件→首頁→入庫→財報頁→四點,實測跑得完),卡的是沒有真報告輸入;倉內 synthetic_financial_report.pdf 不是台股投資報告(抽不出代號與目標價),無法充當四點文摘的示範件。"
+  },
+  {
+   "code": "ENG078-v0105(批411)",
+   "kind": "批411 工作站實錄修:backfill 回 tried 0 / filled 0 / no_source 0——不是沒事做,是我讓它做不到",
+   "ts": "2026-09-08 20:40",
+   "name": "實錄:群益車道已 VERIFIED(verified_dated_lanes 1)、checkpoint 46 個日格全 PENDING_TODAY,但 backfill 一個都沒試。真因=coverage() 以 setdefault 保留舊態,而 backfill 只走 state=='MISSING' 的日格;批406 那時沒有任何車道,所有日格早被寫成 NO_SOURCE / PENDING_TODAY,於是批409 車道驗真之後那些日格**永遠不會被回補**。NO_SOURCE 本來就該是「當時沒有源」的紀錄,不是終局判決。修:重試律——MISSING 一律試;NO_SOURCE 在「該發行商現在有 VERIFIED DATED 車道」時復活;PENDING_TODAY 在「那一日已不是今日」時復活;FILLED 永不重跑(只增不減)。回傳加 revived 計數。另:sync 零動作時逐條印出不動的原因(先前只印『新增 0 補鍵 0 升態 0』,分不出『早就併好』與『被狀態擋住』)。驗:二十七檢 27/27;新檢 ㉗ 以對照組實證『無 DATED 車道時 NO_SOURCE 不復活(不做白工)/車道驗真後同批日格復活並真補起來』(無源 revived 1 tried 1 · 有源 revived 6 tried 3 filled 3)。寫檢時自撞一次:fixture 拿 wd8[-1] 當「過期的今日」,但平日它就等於今日=永遠不復活,判準對而 fixture 錯,改以 date.today() 明確切開。"
+  },
+  {
+   "code": "FIN_SSOT-v0100+ENG073-v0106(批412)",
+   "kind": "批412 操作員上傳金融機構 SSOT(py+json)並令「SSOT補充報告分析師姓名擷取 BROKER / RATING DICTS」",
+   "ts": "2026-09-08 20:55",
+   "name": "收容:supportive modules/ssot/VIA_Financial_Institution_SSOT_v0100.{py,json}(逐位元原樣;自測 PASS:國內 16 · 外資 12 · 評等 6 · regex 8 · 網域 16 · 24 斷言)。接線 VRN_ENG073 v0106(Zero-Hydra:只調度不改寫,本器不自建第二份券商/評等字典):① ssot_broker 檔名優先→內文後備,舊 16 鍵經 resolve_broker 轉正典鍵(MQ→MACQUARIE 等遷移生效);② ssot_rating 把英中同義歸一(Buy/Outperform/Overweight/優於大盤→BUY code2 POSITIVE;NR→NOT_RATED code0);③ ssot_analysts=**全新能力**,VRN 全鏈先前沒有任何一處在抽分析師姓名——以 SSOT 的 analyze_contact_document(email/電話錨點→鄰近行姓名候選→local part 相似度→網域反查機構)為引擎,落新表 vrn_report_analyst。只增不減:broker/rating_raw 兩欄語意與值完全不動;新事實走新欄新表;位置式 INSERT (?×18) 一併改具名欄位(加欄與位置式 INSERT 天生互斥)。誠實:matched_* 與 *_guess 分欄並記來源(EMAIL_LOCALPART_GUESS / NEARBY_MATCHED / TRANSLITERATION_GUESS),同一中文名被配給多人即標 zh_shared(鄰近視窗誤配的徵狀,不刪但要標)。修掉自己兩個問題:動態載入沒把模組放進 sys.modules,pydantic 解不了延後註解 → analyze_contact_document 丟「TextBlock is not fully defined」(直接跑 SSOT 自測不會重現);而我的 except 把它吞成「0 筆」——靜默回空看起來像「這份報告沒有分析師」,是假訊息,改為記因由並在入庫計印出。驗:二十三檢 23/23(原二十檢全過 + 批412 三檢)。**回報 SSOT 缺口(canonical 依其 alias_governance 為 READ_ONLY,我未觸碰)**:舊 BROKER_DICT 16 鍵中 JP(摩根大通;SSOT 只有 JPM/小摩/摩通)、CLST(里昂;只有 CLSA/里昂)、GF(廣發;SSOT 完全沒有這家)查不到正典鍵;舊 RATING_RX 中「增持」查不到(SSOT 的 BUY 有「加碼」沒「增持」,但「減持」有)。這四項不會遺失資料(舊欄仍存原值、新欄誠實留空),但要不要補進 SSOT 是操作員的決定。"
   }
  ]
 }
