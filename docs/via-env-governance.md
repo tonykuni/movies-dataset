@@ -1419,3 +1419,67 @@ ENG080 v0102 **十五檢 15/15**、ENG073 v0109 **二十七檢 27/27**(新檢 �
 `via-closeout vrn` 從 **65 份 / PENDING 6** 變成 **59 份 / PENDING 0**——收件與首頁兩段
 **全清空**(`段:{'收件': 0, '首頁': 0, …}`),鏈跑得完了。DONE 25 維持,
 三方對照從 61/65 升到 **59/59 全覆蓋**,DIVERGE 從 6 降到 4。
+
+## 四十四、批419d:診斷程式碼把主流程弄掛,以及守衛太寬又走回假紅
+
+操作員再跑一次,兩件事同時出現——**一件是好消息,一件是我的錯**。
+
+### 好消息:批418 的分類確實在跑
+
+```
+[報告型別] 個股 37 · 產業 9 · 大盤晨報 6 · 海外 4 · 研討會 3
+```
+
+批419c 加的直方圖第一次讓我們看見:59 份裡 **22 份是非個股**,分類完全生效。
+先前只能猜「有沒有分到」,現在是事實。**這就是加診斷的價值。**
+
+### 我的錯一:診斷程式碼把主流程弄掛
+
+```
+File …VRN_ENG073_ReportStructuredDB_v0109.py, line 716, in run
+    _con2 = duckdb.connect(str(db), read_only=True)
+_duckdb.IOException: Cannot open database "…\VeritasIntelligenceAnalytics\None"
+[via-console run] vrn_structdb rc=1
+```
+
+`run(zdir=None, db=None)` 的 `db` 是**函式參數**,解析後的路徑是區域變數 `dbp`。
+我在關庫後另開一條唯讀連線,而且傳錯變數 → `str(None)` → `"…\None"` → 整支 rc=1。
+
+**診斷程式碼把主流程弄掛,比沒有診斷更糟。**
+
+修(`v0110`):取樣改在**關庫前**用同一條連線抓好,**完全不再開第二條連線**——
+少一個地方可以傳錯路徑。新檢 ㉘ 以 stub SSOT 逼出零命中分支**真的走一遍**
+(v0109 的自測從沒進過這條分支,所以沒抓到)。
+
+### 我的錯二:守衛太寬,22 份非個股又被擋回 FAIL
+
+批418 讓非個股判 `DONE_NS`,但我加了一道「真失敗才不放過」的守衛:
+
+```python
+_fail_states = getattr(mod, "FAIL_STATES", ())     # ← 含 MISSING_SOURCE
+_real_bad = price_state == "DB_NO_MATCH" or upside_state in _fail_states
+```
+
+`MDL139.FAIL_STATES = ("FORMULA_MISMATCH", "FORMULA_MISMATCH_DB", "PARSE_SUSPECT", "MISSING_SOURCE")`
+——而 **`MISSING_SOURCE` 正是產業/晨報/研討會的正常態**(沒代號 → 沒目標價 → 沒價)。
+守衛於是把 22 份非個股**全部擋回 FAIL**,等於又走回假紅。
+
+修(`MDL141 v0104`):非個股真正該留 FAIL 的只有
+`FORMULA_MISMATCH` / `FORMULA_MISMATCH_DB` / `PARSE_SUSPECT`
+——**數字抽出來了、而且對不起來**。`MISSING_SOURCE` 與 `DB_NO_MATCH` 是預期。
+
+**這條為什麼檢沒抓到**:v0103 的 fixture `upside_state` 用**空字串**,
+而真實資料是 `MISSING_SOURCE`。**fixture 不帶真實狀態,測的就不是真的那條路。**
+v0104 的 fixture 改帶 `MISSING_SOURCE`,並多加一份「非個股但 `FORMULA_MISMATCH`」
+證明守衛沒被拆掉——那一份照樣 FAIL。
+
+### 驗
+
+ENG073 v0110 **二十八檢 28/28**、MDL141 v0104 **十一檢 11/11**、
+SelftestGrid **v0256** 兩站實跑綠。
+
+### 這一跑的其他進展
+
+`vrn_fourpoint` **rc=0**(批419b 的 derived 修生效,QC 紅 3 → **0**),
+三份 TP 疑誤照樣掛旗標但不再判死;`via-closeout` 維持 59 份 / PENDING 0 /
+三方對照 59/59 全覆蓋。

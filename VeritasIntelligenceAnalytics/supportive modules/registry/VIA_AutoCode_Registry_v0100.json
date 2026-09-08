@@ -6825,7 +6825,13 @@
    "kind": "批419b/c 閘門被自己的診斷訊息判死,以及一個看不出因由的 0",
    "ts": "2026-09-08 22:40",
    "name": "操作員拉齊後重跑。① 批419 的閘判對了(MS-2308/MS-8210/JP-3653 確實 TP 可疑),但 K1 印出的比值 0.020 與合理帶界 0.2/5.0 是閘門自己的診斷值=關於擷取的後設說明,不是報告裡的宣稱;novel numbers 拿它們查出處等於要求判準本身也要出現在正文裡,結果三份 QC 紅、vrn_fourpoint rc=1,整段鏈被自己的診斷訊息判死。修 ENG080 v0102:診斷值(比值/合理帶界/天數/STALE_DAYS)列入既有 derived 機制,不另造;新檢 ⑮ 帶對照組(不放進 derived 就會被判新數字=證明非空檢;真發明的 7777 照樣抓得到=閘門不是萬用赦免)。② [SSOT 正規化] 券商正典鍵 0/59,但這一行給得出數字給不出因由——0 可能是 SSOT 沒載/token 抽不到/抽到了而正典查無,三件事差很多,靜默的 0 跟假訊息一樣難查。修 ENG073 v0109 三件:NULL 不等於 ''(WHERE x<>'' 對 NULL 回 NULL 不是 TRUE,加欄前舊列一律不被計入;改 COALESCE 並把 NULL 列數分開報,「認不出」與「舊列沒這欄」不該長得一樣)、報告型別直方圖(分不出型別收尾閘就會把產業/晨報/研討會當失敗,批418 修的正是這個)、零命中逐項取樣(命中 0 時取三份實跑同一支函式印 token/key/src 與模組路徑與 resolve_broker_filename 是否可呼叫,不猜,下一跑直接說出哪段斷掉)。順帶修 SyntaxWarning invalid escape sequence \\m(docstring 內 Windows 路徑改 raw string)。驗:ENG080 十五檢 15/15、ENG073 二十七檢 27/27(㉗ 以 MS/''/NULL 三列實證直算少算一列而 COALESCE 不會)、Grid v0255 兩站綠。這一跑真正的好消息:via-closeout 從 65 份/PENDING 6 變成 59 份/PENDING 0,收件與首頁兩段全清空,鏈跑得完了;DONE 25 維持,三方對照 61/65 升到 59/59 全覆蓋,DIVERGE 6 降到 4。登錄:Grid v0255、docs 四十三。"
+  },
+  {
+   "code": "ENG073-v0110/MDL141-v0104(批419d)",
+   "kind": "批419d 診斷程式碼把主流程弄掛,以及守衛太寬又走回假紅",
+   "ts": "2026-09-08 22:55",
+   "name": "操作員再跑。好消息:批419c 加的直方圖第一次讓我們看見 [報告型別] 個股 37 · 產業 9 · 大盤晨報 6 · 海外 4 · 研討會 3——59 份裡 22 份非個股,批418 分類完全生效;先前只能猜有沒有分到,現在是事實,這就是加診斷的價值。我的錯一:診斷程式碼把主流程弄掛——run(zdir=None, db=None) 的 db 是函式參數,解析後路徑是區域變數 dbp;我在關庫後另開一條唯讀連線且傳錯變數 → str(None) → 「…\\None」→ IOException → vrn_structdb rc=1。診斷把主流程弄掛比沒有診斷更糟。修 v0110:取樣改在關庫前用同一條連線抓好,完全不再開第二條連線(少一個地方可以傳錯路徑);新檢 ㉘ 以 stub SSOT 逼出零命中分支真的走一遍(v0109 自測從沒進過這條分支所以沒抓到)。我的錯二:守衛太寬——批418 的 _real_bad 用 MDL139.FAIL_STATES,而該常數含 MISSING_SOURCE,那正是產業/晨報/研討會的正常態(沒代號→沒目標價→沒價),於是 22 份非個股全被擋回 FAIL=又走回假紅。修 MDL141 v0104:非個股真正該留 FAIL 的只有 FORMULA_MISMATCH/FORMULA_MISMATCH_DB/PARSE_SUSPECT(數字抽出來了而且對不起來),MISSING_SOURCE 與 DB_NO_MATCH 是預期。這條為什麼檢沒抓到:v0103 fixture 的 upside_state 用空字串而真實資料是 MISSING_SOURCE——fixture 不帶真實狀態,測的就不是真的那條路;v0104 fixture 改帶 MISSING_SOURCE,並多加一份非個股但 FORMULA_MISMATCH 證明守衛沒被拆掉(照樣 FAIL)。驗:ENG073 二十八檢 28/28、MDL141 十一檢 11/11、Grid v0256 兩站綠。其他進展:vrn_fourpoint rc=0(批419b derived 修生效,QC 紅 3→0),三份 TP 疑誤照樣掛旗標但不再判死;via-closeout 維持 59 份/PENDING 0/三方對照 59/59 全覆蓋。登錄:Grid v0256、docs 四十四。"
   }
  ],
- "updated_at": "2026-09-08 22:40"
+ "updated_at": "2026-09-08 22:55"
 }
