@@ -6843,7 +6843,13 @@
    "kind": "批419f 正典缺席時疊加層自有的鍵一起陪葬",
    "ts": "2026-09-08 23:25",
    "name": "批419e 加的兩行下一跑就把根因交出來:查詢期例外=正典載入失敗 ModuleNotFoundError No module named 'pydantic';stats()={deny_keys 20, broker_alias_add 23, broker_add 5, rating_alias_add 59, filename_keys 16, canon 缺席};疊加層資料檔 存在=True。即疊加層資料全在、正典載不起來(vrn 境無 pydantic)。從「0 沒有告訴我們任何事」到「一行說完」,中間隔的就是批419c/e 兩次加診斷。根因:resolve_broker_filename 把 兆豐→MEGA 從 filename_key_map 查到了,再拿 MEGA 去 resolve_broker 要中英名,而 resolve_broker 次序是 拒絕→正典→疊加層別名→疊加層新增機構,MEGA 是正典機構,正典一缺席就全落空——即使對映已經知道答案。中英名確實只有正典有,但鍵是操作員裁決寫在疊加層 JSON 裡的資料,正典缺席不影響它成立;把它一起丟掉是把已知資料丟掉。修 Overlay v0101:新 overlay_keys()(filename_key_map 目標 ∪ broker_alias_add 鍵 ∪ broker_add ssot_key);resolve_broker 正典缺席且命中 overlay_keys 時鍵照回、中英名誠實留空、src=OVERLAY_KEY(正典缺席;僅鍵無中英名)不冒充 CANON;resolve_broker_filename 對映查得到卻回空時直接回該鍵。界線未放寬:查無仍查無(不存在的券商XYZ→空)、拒絕仍壓過一切(GF→DENY)、正典在位時照舊走 CANON。資料檔改尾版 glob。驗:疊加層十檢 10/10(新檢 ⑩ 強制 _CACHE['ssot'] 缺席重現 vrn 境);端到端實證同一條 ENG073.ssot_broker 鏈在正典缺席下跑 9 個真檔名命中 8(兆豐MEGA/MS/JPM/CLSA/KGI/HUANAN/CTBC/UBS;GF 正確 DENY);Grid v0258 站綠。誠實界限:券商中英名、評等 code/direction、分析師姓名擷取仍要正典即仍要 pydantic,補法 uv pip install --python C:\\Users\\tonyk\\envs\\via_vrn_312 pydantic。登錄:Grid v0258、docs 四十六。"
+  },
+  {
+   "code": "ENG073-v0112/OVERLAY-JSON(批419g)",
+   "kind": "批419g 券商鍵 0→54 之後,評等仍 0——抽取器的詞表比正規化器窄",
+   "ts": "2026-09-08 23:40",
+   "name": "批419f 生效:券商正典鍵 0/59→54/59,剩 5 個是檔名本來就沒券商 token(3014TT/投資早報/6933_AMAX-KY/研討會三場),那是對的。但評等仍 0/59,是另一種病:ssot_rating 兩道都以 RATING_RX 為詞表,而它只認 8 個英文字加 7 個中文詞;批413 把 59 條別名加進疊加層(加碼/續抱/低配/未評等/超配/區間操作…),掃描器卻看不到它們——實測加碼/續抱/低配/未評等四個 RATING_RX 一個都不中。字典加了 59 條、掃描器只認 15 個詞,加了等於白加。修 ENG073 v0112:第三道改用疊加層自己的別名當掃描詞表(Zero-Hydra 不寫第二份),且只掃標題帶/右區與檔名(掃全文會把內文敘述裡的『中立』當評等),只收 ≥2 字的詞;計數加「原始評等字串 N 筆」分得出是抽取階段沒有還是正規化查不到。順帶補疊加層兩條資料:① 加碼——操作員裁決是「增持=加碼=BUY」但疊加層只帶「增持」,「加碼」一直靠正典,批413 的檢在正典在位時過所以沒發現,正典缺席時操作員親自裁決的一半就掉了 ② 未評等/NR——出自操作員真檔名 瑞基(4171,NR_未評等)-CTBC251208,疊加層原本只有「未評級」。兩條都是補完既有裁決不是新裁決,正典一個字沒動。驗:ENG073 三十檢 30/30(新檢 ㉚ 實證舊詞表漏四個、詞表 67 條、加碼→BUY、未評等→NOT_RATED、無評等→空不硬塞、Buy 原路優先)、疊加層十檢 10/10、Grid v0259 兩站綠。判準對著事實寫:第一版斷言「這五個 RATING_RX 都不中」,實測發現「增持」本來就在裡面→改成四個(批419d 教訓再一次)。登錄:Grid v0259、docs 四十七。"
   }
  ],
- "updated_at": "2026-09-08 23:25"
+ "updated_at": "2026-09-08 23:40"
 }
