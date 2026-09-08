@@ -484,3 +484,23 @@ via-reload
 via-price run
 via-align check
 ```
+
+## 二十一、批402:加速/網路雙正典令——VeritasCeleritas 加速器、VeritasAegisNexus 網路核、PS 20 加速器、AST 多輪修正引擎
+
+操作員令:「所有外部資料透過 VDF 取 · 所有 PY 檔導入 `VeritasCeleritas.py` 加速器 · 所有向外擷取資料檔全部導入 `VeritasAegisNexus.py` · PS 指令一律加入 20 個加速器不卡斷、一個指令完成一切 · 啟動 PowerShell 指令語法多輪並行安全修正引擎」;另一會話結論「VDF 加速只認 Celeritas、網路只認 AegisNexus;737/740 留作橋,不直 import;不代設 `VIA_NET_CONSENT`」。本批先查鏈再動筆(Zero-Hydra:不另造第二套實作,只校正既有委派鏈的指向與覆蓋):
+
+- **加速鏈(已通,零改)**:引擎 `[VIA:ACCEL-BRIDGE]` → `VIA_SuperAccel_Module.py`(殼)→ `SUP_MDL737_SuperAccelModule_v0104`(`celeritas()/fetch()` 即 `import VeritasCeleritas`)→ `VeritasCeleritas.py`(88 庫能力冊+執行緒預算)。737 自測 9/9、`--activate` 真載 Celeritas OK。**更正前次誤判**:`VeritasCeleritas.py` 不是死檔,是加速鏈的正典終點(先前只 grep 整合總冊與殼未見其名而誤稱 legacy)。ACCEL 覆蓋:全樹僅註冊夾 5 檔缺(MDL129/130 v0101、MDL133 v0100/v0101、DefTestAudit v0101)→ 補掛後 100%;各件自測不變(8/8、11/11、9/9、9/9;DefTestAudit 無自測,用法 rc2 前後相同)。
+- **網路鏈(一處失準,修)**:引擎 `[VIA:NET-BRIDGE]` → `via_net_unified_v*`(殼,glob 尾版)→ `SUP_MDL740_NetUnified`(四車道+雙閘)→ `_aegis()` → **原指 `via_aegis_netcore_v0100.py`(批130 送達件衍生版,4537 行)而非操作員指定正典 `VeritasAegisNexus.py`(5186 行;根層與 `supportive modules/network/` 副本逐位元相同、皆在冊)**。`SUP_MDL740_NetUnified_v0112`:`_resolve_aegis_path()` 改序——① env `VIA_AEGIS_PATH`(指向存在檔才採)② `supportive modules/network/VeritasAegisNexus.py` ③ `supportive modules/VeritasAegisNexus.py` ④ 後備 `via_aegis_netcore_v*`;740 只呼 `fetch_json/fetch_text`,兩核皆備,雙閘/法遵層/四車道零改;二十檢 20/20(新 ⑳:正典優先/env 存在採、不存在忽略/後備在/兩函式在)。殼 glob 尾版自動接 v0112;實測 `VIA_AEGIS_PATH` 已落 `VeritasAegisNexus.py`。
+- **NET-BRIDGE 覆蓋(只掛真擷取檔)**:`CGC_MDL124_BridgeSweeper_v0103` +`--net-callers`:去註解/字串字面量後仍直呼 `urlopen/requests/httpx/urllib3/yf.download/yfinance.Ticker/aiohttp` 才算「向外擷取」(本機 `socket.create_connection` 樞紐探測不計;冊內文字提及不計);工具本體(SUP_MDL737/740、via_net_unified、via_aegis_netcore、VIA_NetSupport)與 vendored 件(相對匯入、`pip._vendor`、SPDX 標頭)永不掛(自掛即循環);九檢 9/9。實掛 45 檔:supportive 18(network/ 種子擷取器群、cnn 恐貪、YFinance 引擎、VRN_MDL007 副本…)、VRN 5(MDL001/MDL007 各版、Playwright 雙引擎)、VAP 14(SCOPE_COPY 內 VDF/VRN 擷取件,循批102 全樹前例)、VDF 3(ENG076/079/081,批115 VDF 全導入令補齊);全 py_compile 通、ENG076 8/8、ENG079 13/13、ENG081 12/12 不變。掛法=只增不減:塊內只算路徑、`_via_net()` 惰性載入,原檔直呼一行未改(把直呼改寫為 VIA_NET 車道屬行為變更,須逐檔驗證,另批)。
+- **PS 20 加速器**:`VIA_PS_Accel_Module.ps1`(TOOL-101)`$VIA_ACCEL20` 01–20 與操作員名單逐一相同;`[VIA:PS-ACCEL]` 748/761 在冊 ps1(13 未掛=`VIA_Reports/env_governance/` 再生物,不掛);`Write-VIAProgress` 動態進度條(16/17)+`Invoke-VIAGuarded`(18)不卡斷。
+- **AST 多輪修正引擎(已在庫,啟動法)**:`via-psrepair`=`Invoke-VIA-PSRepair-v0100.ps1`(批253):R1 唯讀(Accel20 dry-run+PSScriptAnalyzer)→ `-Fix` R2a Accel20 GO_v1 + R2b `CGC_MDL101_PSAstRepair fix`(AST 逐檔、失敗原檔不動)→ R3 PostRepairVerify+再掃+`VIA.ps1` 沙盒解析;沙盒無 pwsh 僅 HEURISTIC_ONLY(846 檔/127 序相依),正式跑在工作站。
+- **登錄**:SelftestGrid v0240(站名「統包網路工具二十檢」;+「橋塊掃描注入器九檢」站);README(`via-bridge-sweep`/`via-psrepair` 列);台帳 887。
+- **不代設/不動**:`VIA_NET_CONSENT` 不代設(雙閘 fail-closed 照舊);737/740 留橋不直 import;`VRN_MDL009_TrustScore.py` 全倉不存在(其餘 7 件「缺檔」皆在本分支,拉取即得);via-envgov RED 重建仍候 `--approve-remove` 令。
+
+```powershell
+# 先按 Enter 讓提示字元回來;只貼框內文字
+via-reload
+via-bridge-sweep --accel --root "supportive modules"
+via-bridge-sweep --net --net-callers --root "supportive modules"
+via-psrepair
+```

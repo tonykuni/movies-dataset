@@ -61,6 +61,8 @@ pwsh -File "VeritasIntelligenceAnalytics\Install-VIA.ps1"     # 加 -AutoStart �
 | `via-forge` | **VIA_Forge 五引擎家族**(45/45 驗收):無參數開工作台 UI;`check` 跑驗收矩陣;`server` 啟本機服務(127.0.0.1) |
 | `via-storage` | **Storage Optimizer AIO**:預覽制清理(雙引擎+GUI;`-Execute` 才刪;`-TestAll` 全鏈測試;`.veritas_protect` 禁區跳過) |
 | `via-pack` | 子系統獨立打包:`via-pack <cge\|mega\|bridge\|audit\|flow\|if\|vmt\|tools>` — 產品號自動編號(PKG 序號×內容 SHA8,冪等)+ **單機綁定**(Install 綁主機指紋、Launch 驗證,不符 fail-closed)+ **每包自帶封面 U/I**(產品/綁定/manifest 矩陣/報告出口,Launch 自動開)+ 逐檔 SHA256 manifest + zip |
+| `via-bridge-sweep` | **橋塊掃描/注入器 CGC_MDL124(批345;批402 v0103 +`--net-callers`)**:`[--accel] [--net] [--ps] [--root 夾] [--apply]`;預設 dry-run 只列 PLAN,`--apply` 才寫(py_compile 雙驗,壞檔 SKIP 原檔不動);`--net --net-callers` 只把 NET-BRIDGE 掛進「真向外擷取」檔(去註解/字串後仍直呼 urlopen/requests/httpx/urllib3/yfinance/aiohttp;本機 socket 探測不計;工具本體 SUP_MDL737/740、via_net_unified、via_aegis_netcore、VIA_NetSupport 與 vendored 件(相對匯入/`pip._vendor`/SPDX 標頭)永不掛=自掛即循環);批402 實掛:ACCEL 註冊夾 5 缺→100%、NET 擷取檔 supportive 18/VRN 5/VAP 14 缺→100%、VDF 3(批115 全導入令)→100%;報告 `VIA_Reports/bridge_sweep/SWEEP_*.json`。橋本身只增不減:塊內只算路徑、`_via_net()` 惰性載入,原檔直呼一行未改。 |
+| `via-psrepair` | **PowerShell 指令語法多輪並行安全修正引擎(批253;`Invoke-VIA-PSRepair-v*.ps1` 尾版)**:無參數=R1 唯讀(Accel20 dry-run+PSScriptAnalyzer 橋,零寫);`-Fix`=R2a Accel20 GO_v1 修 + R2b `CGC_MDL101_PSAstRepair fix`(AST 逐檔、只增不減、失敗原檔不動)→ R3 PostRepairVerify+MDL101 再掃+`VIA.ps1` AST 沙盒解析;HTML 矩陣落 `VIA_Reports/`;沙盒無 pwsh 只能 HEURISTIC_ONLY,正式跑在工作站(pwsh 7)。PS 20 加速器=`VIA_PS_Accel_Module.ps1`(TOOL-101)`$VIA_ACCEL20` 01–20,`[VIA:PS-ACCEL]` 748/761 在冊 ps1(13 未掛=`VIA_Reports/env_governance/` 再生物);`Write-VIAProgress` 動態進度條+`Invoke-VIAGuarded` 不卡斷。 |
 
 ## 系統架構
 
