@@ -1996,3 +1996,76 @@ e2 = escalate("OCR_PDF_TEXT", 3, "selftest 演練證據:L1 pdfplumber 對掃描�
 五輪跑下來沙盒重生了 **25 個產出檔**(19 個 `ui_support` HTML + 6 個 `registry` JSON,
 其中 `VIA_Schema_Registry` 少了 **343 行** = 沙盒無庫的塌陷),全數 `git checkout` 還原。
 **不把沙盒狀態寫進正本** —— 批416、批421 之後同一教訓的第三次。
+
+## 五十二、批425:自己造報告把 VRN 跑到 GREEN——四例「參數在、線沒接」
+
+操作員令:「Test by yourself debug optimize test debug **till VRN works** and then **verify if VDF works**」。
+
+沙盒沒有操作員的報告,也沒有他的庫。所以自己造:五份**符合命名慣例的真 PDF**
+(中文券商個股 / GS 英文個股 / 民國日期檔名 / 晨會報告 / 產業報告)+ 一個
+`tw_daily_prices(date, ticker, close, adj_close)` 的 DuckDB,然後跑**真 `run`**,不是跑自測。
+
+### VRN 最終:GREEN
+
+```
+[via-closeout vrn] GREEN · 報告 5(DONE 3 · FAIL 0 · PENDING 0)· 三方對照 5/5
+  DONE    志強-KY(6768)   段 4/4  BASIC VERIFIED  FIN VERIFIED  四點✓
+  DONE    GS-2330        段 4/4  BASIC VERIFIED  FIN VERIFIED  四點✓
+  DONE    慧洋-KY(2637)   段 4/4  BASIC VERIFIED  FIN VERIFIED  四點✓
+  DONE_NS 晨會報告 · 產業報告
+```
+
+| 報告 | 目標價 | adj close | 算出上漲 | 對照 |
+|---|---|---|---|---|
+| 志強-KY(6768) | 145 | 118.0 | **22.9%** | 報告自稱 23.0% → `ROUNDING_ONLY` |
+| GS-2330 | 1275 | 1130.0 | **12.8%** | — |
+| 慧洋-KY(2637) | 78 | 68.9 | **13.2%** | — |
+
+### 一路上修的四件,全是同一個病
+
+**參數在、線沒接。**
+
+| # | 位置 | 病灶 | 實跑證據 |
+|---|---|---|---|
+| ① | `ENG073 v0114` | `main()` 是光禿禿的 `return run()`;`run(zdir, db)` 簽名擺著,CLI 從不解析 `--dir`/`--db`,**傳了不生效也不吭聲** | `--db` 被吞 → 讀到殘留舊庫,`庫 8 · DB_NO_MATCH` |
+| ② | `ENG074 v0102` | run 分支寫死 `run(d, None, ...)` —— db 那格是 `None`;而 `--db` 在 `--crosscheck` 分支**有**解析,所以更難察覺 | 印「對照 5 件 → 28 列」,收尾讀 X 卻是「已對照 **0/5**」 |
+| ③ | `MDL141 v0104` | `main()` 不解析 `--db`/`--zones`,但 `vrn_closeout(..., db=DB_TW)` 參數一直在、`closeout(**kw)` 一直會轉發 | ENG080 報 GREEN、上漲已算 3/3,收尾卻三份都印「**四點-**」 |
+| ④ | `AllGreen v0100`(批423 已修) | `$StageTimeoutSec` 宣告了整檔沒用過 | 任一站卡住就永遠等 |
+
+**四天內同一模式第四次。** 已寫進 `Grid v0264` 檔頭。
+三支的新檢都用**攔真實呼叫**證明旗標有傳到,不掃原始碼字串
+——那只證明字在,不證明會生效。
+
+### 自審:兩次差點把自己的錯報成引擎的錯
+
+1. 第一版 fixture 抽回來是 `NT,275`,我一度認定是「千分位逗號解析 bug」。
+   實查是 **bash heredoc 沒加引號,`$1` 被當成位置參數吃掉了** —— 引擎無辜。
+2. `ENG080` 起初報 `adj — · 上漲未算`。查出是我的價表沒有 `adj_close` 欄,
+   而引擎**誠實拒絕拿 `close` 頂替**(「Adjusted 與原始不混用」)—— 正確行為,不是 bug。
+   補欄後 3/3 全算出。
+
+**先證明是被測物的錯,再動被測物。**
+
+### VDF 驗證
+
+`via-rungate --family vdf`:**引擎 8/8 OK · 必要庫 4/4** · 選配 2/4。
+判 `YELLOW` 的唯一原因是沙盒無 `via_vdf_312` 家族境、退 base python
+(誠實標註「能跑≠本位」)—— 不是程式碼問題。
+
+自測過不等於產得出資料,所以再跑兩支唯讀動詞驗真:
+
+```
+VDF_ENG081 check → 2025-12-04 價 2 · 12-03 價 4 · 12-02 價 4 · 12-01 價 4
+                   RED 籌碼表缺 (tw_chip_inst, tw_chip_margin)
+VDF_ENG079 scan  → RED 本機三庫根缺 C:\新增資料夾(Windows 路徑,沙盒本來就沒有)
+```
+
+`ENG081` **真的讀到了我的價表**,每日檔數與插入列數完全吻合,然後誠實紅在缺料上。
+
+**離線驗不到的部分照實說**:價格 / 籌碼 / 月營收的**擷取道**要同意閘 + 網路。
+我不代設同意閘,所以那一段未驗。
+
+### 回歸
+
+`ENG072 v0107` 16/16 · `ENG073 v0115` **34/34** · `ENG074 v0103` **16/16** ·
+`ENG080 v0102` 15/15 · `MDL141 v0105` **12/12**。
