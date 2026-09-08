@@ -1818,3 +1818,97 @@ ENG074 其實只有 `fitz` 文字 + 行級 regex **一法**;docstring 第 24 行
 
 `Register v0166`(`via-gle`/`via-nlp` + 別名 `版面橋`/`語意橋` + 兩梭;
 梭機制與正典 `via-closeout.cmd` 逐行相同)· `SelftestGrid v0261`(+兩站)· 台帳 914。
+
+## 五十、批423:卡斷根治——輸出被吞、逾時沒接線,兩條都不在被懷疑的那一端
+
+操作員令:「卡斷 加入20個加速器 不卡斷 動態進度條」。
+實錄:`via-go` 印出「── ① TEST(自測矩陣)──」之後**畫面完全不動**。
+
+### 先排除被懷疑的那一端
+
+直覺會說「自測矩陣 200 站太慢」。但看格子的程式碼,它**逐站都有 `flush=True`**,
+而且早就有 SuperAccel 平行(8 工人)。格子不是啞巴。
+
+真正的兩條根因都在 `Invoke-VIA-AllGreen-v0100.ps1`:
+
+```powershell
+# 根因① — 第 45 行
+$out = & $PY @Argv 2>&1 | Out-String      # ← 緩衝到子行程結束才吐
+
+# 根因② — 第 12 行
+param( [int]$StageTimeoutSec = 1200 )     # ← grep 全檔:只有這一行,從未被使用
+```
+
+**①** `Out-String` 把 200 站的輸出全部吞進管線,跑完才一次吐出。
+格子每站都在喊,操作員一個字都看不到 —— 批419e「捕捉到卻不顯示,等於沒捕捉」的 PowerShell 版。
+
+**②** 檔頭契約寫著「非阻塞(無 Read-Host/無限等待)· 誠實 OK/FAIL/NOT_RUN 不卡斷」,
+`$StageTimeoutSec` 也宣告好了 —— **但整支檔案沒有一行用到它**。
+契約寫了,實作沒接。跟批422 的假綠(`MDL141` 不讀 `tp_state`)是同一個家族:
+**宣告了、沒接線。**
+
+### 修法
+
+**`Invoke-VIA-AllGreen-v0101.ps1`** — `①~⑭` 流程、判準、Gate 文字一字未改,只換「怎麼跑一站」:
+
+| | |
+|---|---|
+| `def_Drain` | 以 `FileShare::ReadWrite` 開重導向檔,每 0.4s 排出新行即時轉播 |
+| 逾時 | `$StageTimeoutSec` 真正接線,逾時 `Kill()` |
+| 第四態 | `TIMEOUT` —— **不冒充 FAIL 也不冒充 OK** |
+| 進度 | `Write-Progress` 進度列 + 每站耗時 |
+| 加速器 | `def_AccelLamp` 開跑先點 20 加速器名(缺席誠實說缺) |
+
+真 pwsh 7.4.6 實跑驗證:
+
+```
+=== ① 逾時真的會 Kill(上限 3s,子行程要跑 30s)===
+  [RUN    ] 慢站 · 逾時上限 3s · 子行程輸出即時轉播 ↓
+      |   慢站心跳 1/30 … 4/30
+  [TIMEOUT] 慢站 · 3.3s          ← 不是 30s
+=== ② 輸出即時轉播 ===
+      | 逐步輸出 1 … 5           ← 逐行出現,不再等到最後
+```
+
+**`CGC_MDL064_SelftestGrid_v0262.py`** — 格子端補三件:
+
+- 動態進度條:TTY 走 `\r` 就地重畫;**非 TTY 每 10 站一行**(被導向檔案時,
+  200 行進度條會把站名洗光)
+- `SELFTEST_PROGRESS.json` 心跳每站落檔 —— 外部可以證明行程還活著,
+  不必去猜「沒輸出」是卡死還是在跑
+- Ctrl+C 安全落檔:**中斷不是崩潰**。已跑完的站是真證據,寫出來;
+  沒跑到的標 `NOT_RUN`(不冒充 `SKIP`);`rc=130` 不冒充成功也不冒充失敗
+
+加速器點名實測:`Celeritas OK · lib 9/88 · 能力 7/31 · 執行緒預算 3 · maxsafe · 缺 79 支(列名不假在)`。
+
+### 自審:我差點自己製造一個新的假訊息
+
+心跳檔本來命名 `GRID_PROGRESS.json`。**我自己的測試第一次就踩到** ——
+`sorted(glob("GRID_*.json"))[-1]` 取到的是心跳不是證據(字母序 `GRID_P` > `GRID_2`)。
+
+追下去發現會被害的不只我的測試:
+
+| 消費者 | 取法 | 後果 |
+|---|---|---|
+| `VRN_ENG068_DailyBrief`(三版) | `sorted(glob("GRID_*.json"))` | 取到心跳 |
+| `CGC_MDL131_ProjectCompletion` | **按 mtime** | 心跳永遠最後寫 → **必中** |
+| `CGC_MDL095_DeckServer` | `[-1]` | 取到心跳 |
+| `Invoke-VIA-FinishLine` | `-Filter 'GRID_*.json'` | 取到心跳 |
+
+改名 `SELFTEST_PROGRESS.json`。
+**教訓:新增產出檔之前,先查誰在 glob 同一個樣式。**
+
+### 死路修:修好了但送不到,等於沒修
+
+倉庫裡**沒有任何東西呼叫 AllGreen**。`via-go` 是操作員自己放在 PATH 上的檔,
+指向寫死的 `v0100` —— 批358 已記「PATH 上已有操作員之 via-go;同名=九頭龍→讓位」,
+所以短令冊永遠不能佔 `via-go` 這個名。
+
+**只推 v0101 的話,操作員的 `via-go` 照樣跑 v0100、照樣卡。**
+
+→ `Register v0167` 新登錄 `via-allgreen`(尾版律 glob `Invoke-VIA-AllGreen-v*.ps1`;
+別名 `統包`)+ `via-allgreen.cmd` 梭(機制與正典 `via-closeout.cmd` 逐行相同)。
+新版一落地就自動生效,不必再改任何寫死路徑。
+
+回歸:橋743 **9/9** · 橋744 **11/11** · ENG072 v0107 **16/16** · ENG073 v0114 **33/33**。
+四支 `.ps1` 全數通過 `Parser::ParseFile`(含批421 的 `v0166` —— 那批我沒驗過語法,補驗了)。
