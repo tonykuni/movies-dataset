@@ -6801,7 +6801,13 @@
    "kind": "批416 批415 推上去了卻在工作站靜默失效——`sync` 的硬寫鍵白名單",
    "ts": "2026-09-08 20:58",
    "name": "工作站 git pull 拿到 批415 後:`sync --apply` 回「新增 0 · 補鍵 0」且對群益說「已是 VERIFIED(設定齊全,無須併入)」;checkpoint 仍 46 日格、上市日仍 LOWER_BOUND、backfill 仍 tried 1。根因:sync_lanes 補鍵用硬寫鍵白名單 (method,body,pick,date_path,id_api,fetch,kind),批415 新加的 listing_api 沒進白名單 → 永遠併不進磁碟車道冊 → lane_listing_date 找不到 listing_api → 誠實回空 → resolve_listing 照舊退 L3「首快照即下界」。鏈上每段都按設計行事,合起來就是靜默失效;而「設定齊全」那句是沒真比對就下的斷言,訊息比缺陷更難查。修(v0107):改自種子逐鍵推導 keys = sorted(k for k in seed if k not in SYNC_RUNTIME_KEYS and not cur.get(k)),SYNC_RUNTIME_KEYS=(id,state,note,url,id_map)=執行期會被寫回的欄;以後加欄零維護。零動作訊息改成逐鍵比對後才敢說「種子鍵全在」,缺了就點名。驗:二十九檢 29/29;新檢 ㉙ fixture 照工作站那份(群益 VERIFIED、鍵齊、獨缺 listing_api)+ operator_field/id_map 驗補鍵不得動 state/url/note/id_map 且不得刪操作員自加欄、二跑零動作;對照組實證同一 fixture 在 v0106 filled=[] 從不落地、v0107 落地。順帶查實:群益 /CFWeb/api/etf/list 現有 28 檔主動型僅 00982A/00992A/00997A 三檔(現有 3 條即群益全部,非漏抓);元大 PCF 頁 tradeInfo/pcf/{code} 為 Nuxt SSR、API 形狀 POST {base}/api/trans body {APIType,CompanyName,PageName,DeviceId,FuncId},但 FuncId 與日期參數未查實故不寫車道。沙盒限制:Chromium 經中繼 proxy 連外部主機一律 ERR_CONNECTION_RESET,無法用 XHR 攔截逐家挖端點。登錄:Grid v0252、docs 三十八。"
+  },
+  {
+   "code": "GROK-RUNDECK-b417(批417)",
+   "kind": "批417 整合台——一頁輸入、一頁結果,VDF → ETF → VRN 跑成一輪",
+   "ts": "2026-09-08 21:30",
+   "name": "操作員令「用 GROK 的介面將 VRN VDF ETF 跑成功,有整合後的輸入介面、結果介面」。缺口不是引擎是動線:三族輸入散在三處(VDF 起始年金鑰在 01、ETF 挑檔在 01 內層、VRN 拖放在 02)、結果散在各自分頁四個 tab,跑一輪要走三處。新增 run-console.ts 純邏輯 + node:test 七檢(readiness 跑前先講每族能不能跑、缺什麼;resultRows 三族數字收成同一張表;誠實三態:沒輸入=pending 絕不當 ok、跑完零列=warn、busy 一律 run 不讓上輪數字冒充本輪、總燈取最壞)+ run-deck.tsx 左輸入右結果(左:起始年/FRED KEY/網閘勾選不代開同意閘、主動 ETF 挑檔、VRN 拖放去重、整備矩陣、一鍵整合跑;右:三族整合矩陣+分燈+擷取車道+ETF 檢核+VRN 報告+跳既有分頁)。Zero-Hydra:引擎零新造,跑的仍是既有 runVdf/runIntake,既有六分頁零觸碰。真跑驗證(headless Chromium 實操):VDF 巨觀序列 98 列、擷取車道 4/14 有料、ETF 檢核 7 列、VRN 基本資料 71/73 件、四點文摘 288 列、財報頁 27 列、卡住的件 1 件=紅;總燈紅不是綠而這是對的(一件卡住就不准說成功)。驗:node --test 237 pass/0 fail(原 230+7)、tsc 零錯誤、vite dev 實跑截圖。已推 cherry-lagoon-honey-dove claude/via-mother-deck-b405(76ef17f);母倉可追溯副本 ui_integration_b417/。順帶取得母倉一直缺的主動 ETF 全名冊×發行商 29 檔(國泰1 摩根2 安聯3 統一3 聯博1 富邦1 中信3 凱基1 第一金2 永豐1 野村3 群益3 台新2 元大1 復華1 兆豐1;AETF_MISSING_CODES 00409A/00998A),與工作站 00400A–00406A 相互印證——群益 3 檔已通,剩 13 家 26 檔有了標的與優先序,但名冊不等於端點,仍要逐家查實才寫。另查實操作員上傳的 VETF_FINAL_SEAL zip 與倉內 b242 收容件逐位元相同,不重複收。登錄:docs 四十。"
   }
  ],
- "updated_at": "2026-09-08 20:58"
+ "updated_at": "2026-09-08 21:30"
 }

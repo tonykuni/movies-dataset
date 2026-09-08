@@ -1167,3 +1167,67 @@ keys = sorted(k for k in seed if k not in SYNC_RUNTIME_KEYS and not cur.get(k))
 MDL101 走 `VIA_Reports/ps_repair/backup_<ts>/` 整檔讓位 + manifest + UNDO,
 且 **sequence-dependent 只列不修**——所以它是保守且可回滾的,但仍是會改檔的動作,
 由操作員自己在工作站按下。
+
+## 四十、批417:整合台——一頁輸入、一頁結果,VDF → ETF → VRN 跑成一輪
+
+操作員令「用 GROK 的介面將 VRN VDF ETF 跑成功,有整合後的**輸入介面**、**結果介面**」。
+
+### 缺口不是引擎,是動線
+
+Grok app 六個分頁裡三族其實都跑得動,但**輸入散在三處**(VDF 的起始年與金鑰在
+`01`、ETF 的挑檔在 `01` 內層、VRN 的檔案拖放在 `02`),**結果也散在各自分頁的四個
+tab**。要「跑一輪看結果」得走三個地方——這就是「接近成功」跟「跑成功」的差距。
+
+### 做法(Zero-Hydra:引擎一支都不新造)
+
+- `src/lib/via/run-console.ts` — 純邏輯層 + `node:test` **七檢**:
+  - `readiness()` 跑之前先講清楚每族能不能跑、不能跑差什麼(**VRN 沒檔案就是不能跑**)。
+  - `resultRows()` 把三族跑完的實際數字收成同一張表。
+  - 誠實三態鐵律:沒有輸入=`pending` **絕不當 ok**;跑完零列=`warn`(「跑完了但什麼
+    都沒有」跟「成功」是兩件事);`busy` 期間一律 `run`,**不讓上一輪的數字冒充本輪**;
+    總燈取最壞 `bad > run > warn > pending > ok`。
+- `src/components/run-deck.tsx` — 左輸入 / 右結果一頁:
+  - 左:共用(起始年、FRED KEY、網閘勾選——**本頁不替任何人開同意閘**)、主動 ETF 挑檔、
+    VRN 拖放+選擇檔案+去重開關、整備矩陣、一鍵「整合跑」(VRN 無檔時按鈕自己改口說會跳過)。
+  - 右:三族整合矩陣 + 三族分燈 + 擷取車道 + 主動 ETF 檢核 + VRN 報告,附跳既有分頁的鍵。
+- `shell.tsx` 只加 NAV 一列與一個分支;`types.ts` 的 `Deck` 加 `"run"`。既有六分頁零觸碰。
+
+### 真跑驗證(headless Chromium 實際操作,不是靜態檢查)
+
+按下「整合跑」之後:
+
+| 族 | 指標 | 值 | 燈 |
+|---|---|---|---|
+| VDF | 巨觀序列 | 98 列 | 綠 |
+| VDF | 擷取車道 | 4/14 有料 | 綠 |
+| ETF | 主動 ETF 檢核列 | 7 列 | 綠 |
+| VRN | 報告基本資料 | 71/73 件 | 綠 |
+| VRN | 一題四點文摘 | 288 列 | 綠 |
+| VRN | 財報頁表格 | 27 列 | 綠 |
+| VRN | **卡住的件** | **1 件** | **紅** |
+
+**總燈是紅不是綠,而這是對的**:六項有料、一件卡住,就不准說成功;卡點在 `03 VRN`
+分頁逐件列得出來。若把它算成綠,就正好是這整套治理在防的那件事。
+
+驗:`node --test src/lib/via/*.test.ts` → **237 pass / 0 fail**(原 230 + 本批 7);
+`tsc --noEmit` 零錯誤;`vite dev` 實跑並截圖存證。已推 `claude/via-mother-deck-b405`
+(`76ef17f`);母倉可追溯副本在 `references/intake/VIA_GrokConsole_CherryLagoon_b404/ui_integration_b417/`。
+
+### 順帶取得母倉一直缺的東西:主動 ETF 全名冊 × 發行商
+
+Grok app 的 `src/lib/via/active-etf.ts` 帶有 **29 檔**主動 ETF 的 `ticker → issuer`
+對照(`AETF_UNIVERSE` + `AETF_MISSING_CODES = ["00409A","00998A"]`),與工作站
+`checkpoint` 看到的 `00400A`–`00406A` 系列相互印證:
+
+國泰 1 · 摩根 2 · 安聯 3 · 統一 3 · 聯博 1 · 富邦 1 · 中信 3 · 凱基 1 · 第一金 2 ·
+永豐 1 · 野村 3 · **群益 3** · 台新 2 · 元大 1 · 復華 1 · 兆豐 1。
+
+這正是母倉逐家補車道要的名冊——**群益那 3 檔已通**,剩下 13 家 26 檔有了明確標的與
+優先序(檔數多的先做:安聯/統一/中信/野村 各 3 檔)。**但名冊不等於端點**,
+端點仍要逐家查實才寫(批406c 的規矩不因為有了名冊而放寬)。
+
+### 順帶查實:操作員上傳的 VETF 封存包已在倉內
+
+`VETF_FINAL_SEAL_20260829_013330.zip` 的 `MANIFEST.json` / `SHA256SUMS.txt` /
+`README_FINAL_SEAL.md` 與倉內 `functional modules/VDF/references/intake/VETF_FINAL_SEAL_b242/`
+**逐位元相同**——已於 b242 收容,**不重複收**(Zero-Hydra)。
