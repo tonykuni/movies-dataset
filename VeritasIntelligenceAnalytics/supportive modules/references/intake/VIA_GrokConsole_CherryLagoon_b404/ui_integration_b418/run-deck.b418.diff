@@ -1,0 +1,54 @@
+diff --git a/src/components/run-deck.tsx b/src/components/run-deck.tsx
+index 6eab6a0..0bb89fd 100644
+--- a/src/components/run-deck.tsx
++++ b/src/components/run-deck.tsx
+@@ -14,6 +14,7 @@ import {
+   verdictText,
+   type RunCounts,
+ } from "@/lib/via/run-console";
++import { classifyKind, kindHistogram, tickerFromStem } from "@/lib/via/report-kind";
+ import { useVia } from "@/lib/via/store";
+ import type { Light } from "@/lib/via/types";
+ 
+@@ -87,6 +88,11 @@ export function RunDeck() {
+   const runIntake = useVia((s) => s.runIntake);
+   const setDeck = useVia((s) => s.setDeck);
+ 
++  // 批418:操作員 63 份真報告裡有 19 份本來就不是個股(產業/大盤晨報/海外/研討會)。
++  // 判準若一律要求代號與目標價,那 19 份會變成一整面假紅——先把型別分出來再說成敗。
++  const stems = files.map((f) => f.name.replace(/\.[^.]+$/, ""));
++  const kindHist = kindHistogram(stems);
++
+   const fileRef = useRef<HTMLInputElement>(null);
+   const [ran, setRan] = useState(false);
+ 
+@@ -335,11 +341,28 @@ export function RunDeck() {
+           </Panel>
+ 
+           <Panel icon={<Table2 className="size-4" />} title="結果 · VRN 報告" sub={`${basics.length} 件入庫`}>
++            {files.length ? (
++              <div className="mb-2 flex flex-wrap gap-1.5">
++                {(Object.entries(kindHist) as Array<[string, number]>)
++                  .filter(([, n]) => n > 0)
++                  .map(([k, n]) => (
++                    <Badge key={k} tone={k === "個股" ? "ok" : "mute"}>
++                      {k} {n}
++                    </Badge>
++                  ))}
++                <span className="text-[11px] text-subtle">
++                  非個股沒有代號與目標價是對的,不算失敗(批418)
++                </span>
++              </div>
++            ) : null}
+             <Matrix
+-              columns={["檔名", "代號", "券商", "評等", "判定"]}
++              columns={["檔名", "型別", "代號", "券商", "評等", "判定"]}
+               empty={files.length ? "尚未跑——按左邊的整合跑" : "尚無報告檔:拖 PDF 進左欄"}
+               rows={basics.slice(0, 10).map((b) => [
+                 <span key="f" className="truncate font-mono">{b.fileName}</span>,
++                <Badge key="k" tone="mute">
++                  {classifyKind(b.fileName.replace(/\.[^.]+$/, ""), b.ticker || tickerFromStem(b.fileName).ticker).kind}
++                </Badge>,
+                 <span key="t" className="font-mono">{b.ticker || "—"}</span>,
+                 <span key="b" className="text-muted">{b.broker || "—"}</span>,
+                 <span key="r" className="text-muted">{b.rating || "—"}</span>,

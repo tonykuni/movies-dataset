@@ -1039,3 +1039,1033 @@ checkpoint 日格 46 · {'NO_SOURCE': 22, 'PENDING_TODAY': 23, 'FILLED': 1}
 **二十八檢 28/28**。新檢 ㉘ 以注入式假 net 實證四件:L1b 優先於 `yfinance`(假 net 的
 `yf_history` 一律回空,重現新掛牌檔實況)、缺欄退 fallback、早於元年不採信、無 `listing_api` 誠實空。
 另以**真實抓回的群益 `detail` 回應重放**驗三檔上市日全中——**全程未動任何同意閘**。
+
+## 三十八、批416:批415 推上去了,卻在工作站靜默失效——`sync` 的硬寫鍵白名單
+
+### 工作站回報的事實
+
+`git pull` 拿到 批415 之後:
+
+```
+via-etfhist sync --apply
+[車道併入] 新增 0 · 補鍵 0 · 升態 0 · 已寫回
+  [不動] ISSUER_ARCHIVE:群益投信    已是 VERIFIED(設定齊全,無須併入)
+
+via-etfhist checkpoint
+  00400A 上市 2026-09-07(LOWER_BOUND(first_seen)· 快照 0/2(0.0%)
+[回補] {'tried': 1, 'filled': 0, 'revived': 1, 'verified_dated_lanes': 1}
+```
+
+日格還是 46、上市日還是 `LOWER_BOUND`、`tried` 還是 1。**批415 的程式碼是對的,但它從來沒到過磁碟。**
+
+### 根因
+
+`sync_lanes()` 補鍵時用的是一份**硬寫的鍵白名單**:
+
+```python
+keys = [k for k in ("method", "body", "pick", "date_path", "id_api", "fetch", "kind")
+        if k in seed and not cur.get(k)]
+```
+
+批415 幫車道種子加了 `listing_api`,白名單沒跟著改 → `listing_api` 永遠不會被併進磁碟車道冊
+→ `lane_listing_date()` 找不到 `listing_api` → 誠實回空 → `resolve_listing` 照舊退到 L3
+「首快照即下界」。整條鏈每一段都按設計行事,合起來就是靜默失效。
+
+而且訊息還幫倒忙:零動作時印的「已是 VERIFIED(**設定齊全**,無須併入)」是**沒有真的比對過**
+就下的斷言——缺著 `listing_api` 也照樣說齊全。訊息比缺陷本身更難查。
+
+### 修(`VDF_ENG078_ActiveETFHoldingsHistory_v0107.py`)
+
+白名單這種抽象**每加一個欄位就要記得改一次,漏一次就靜默失效**。換成自種子逐鍵推導,
+只排除執行期會被寫回的欄:
+
+```python
+SYNC_RUNTIME_KEYS = ("id", "state", "note", "url", "id_map")
+keys = sorted(k for k in seed if k not in SYNC_RUNTIME_KEYS and not cur.get(k))
+```
+
+- `id` 是鍵;`state`/`note` 由探測與升降態維護;`url` 另有汰換規則(批409);
+  `id_map` 是 `probe` 查出的代號↔基金編號對照。其餘欄一律「缺了就補」,以後加欄零維護。
+- 零動作訊息改成**逐鍵比對後**才敢講:全在才說「種子鍵全在」,缺了就點名缺哪幾個。
+
+### 驗
+
+**二十九檢 29/29**。新檢 ㉙ 的 fixture 就照工作站當時那份:群益已是 `VERIFIED`、
+該有的鍵都有、唯獨缺 `listing_api`;另加一個 `operator_field` 與 `id_map` 驗證補鍵
+不得動 `state`/`url`/`note`/`id_map`、不得刪操作員自加的欄,且第二次跑零動作。
+
+**對照組實證**(這檢不是空檢):同一份 fixture 餵給修前的 v0106 → `filled=[]`、
+`listing_api` 從不落地;餵給 v0107 → `filled=['ISSUER_ARCHIVE:群益投信:listing_api']`、落地。
+
+### 順帶查實的兩件事(逐家投信仍是逐家的工)
+
+- 群益 `/CFWeb/api/etf/list` 現有 **28 檔**,主動型就是 `00982A`/`00992A`/`00997A` **三檔**
+  ——現有 3 條車道**已是群益全部**,不是漏抓。要往上加只能加別家投信。
+- 元大:PCF 頁是 `https://www.yuantaetfs.com/tradeInfo/pcf/{code}`(Nuxt SSR),
+  API 形狀為 `POST {base}/api/trans`,body `{APIType, CompanyName:"YUANTAFUNDS", PageName,
+  DeviceId, FuncId, …}`;但 PCF 的 `FuncId` 在尚未取得的 chunk 內,**且還沒看到日期參數的證據**,
+  所以**不寫任何車道**——沒查實就不寫,是 批406c 立下的規矩。
+- 沙盒限制(誠實記下):Chromium 走中繼 proxy 連任何外部主機一律 `ERR_CONNECTION_RESET`
+  (`--disable-http2`/`--disable-quic` 都試過),所以**無法用 XHR 攔截**逐家挖端點;
+  curl 可通,但那就要逐家讀 SPA chunk。剩下 13 家需另批逐家做。
+
+## 三十九、批416 F3:六流程全景治理令——先盤點,再說「已在位」還是「要新造」
+
+操作員下了一份完整的 Mega-Prompt(20 加速器 / 三輪全景式分析 / 六獨立同步流程 /
+零九頭龍 / RYG HTML UI Matrix)。**照 Zero-Hydra 先查再做**:這份清單裡絕大多數
+不是要新造的東西,是這幾十批已經蓋好的件。硬照字面再蓋一套,就正好是它自己
+要防的九頭龍。
+
+### 20 加速器 → 現役對應件(全部實查在檔)
+
+| # | 加速器 | 現役件 |
+|---|---|---|
+| 01 | AST 精準解析 | `VIA_PS_Accel_Module.ps1` #01 + `CGC_MDL101_PSAstRepair_v0100.py` |
+| 02 | 多語言語意 | `VIA_PS_Accel_Module.ps1` #02 |
+| 03 | 九頭龍風險預測 | `CGC_MDL135_EnvGovernance` 拓撲三輪 |
+| 04 | 依賴拓撲排序 | 同上(無環最佳修正序) |
+| 05 | 沙盒隔離執行 | `via-rungate`(`CGC_MDL137_RunGate`)家族境逐庫 import |
+| 06 | 自動修正建議 | `Invoke-VIA-PSRepair-v0102.ps1` R2b |
+| 07 | 三輪全景式分析 | `via-psrepair` R1 / R2 / R3 |
+| 08 | SSOT 對齊 | `CGC_MDL096_SyncStatus_v0109` + `VIA_MasterGovernance_SSOT` |
+| 09 | 視覺化矩陣生成 | `CGC_MDL064_SelftestGrid`(RYG)+ MDL135 四分區 + MDL139 + MDL140 |
+| 10 | 錯誤分類分群 | PSRepair `parallel-fixable` / `sequence-dependent` |
+| 11 | 性能與複雜度 | `CGC_MDL133` 引擎簡化稽核 + ENG081 SQL 側計數(批400) |
+| 12 | 多子系統同步檢視 | `CGC_MDL140_HandoverConsole` 15 類堆疊矩陣 |
+| 13 | 版本差異與回滾 | MDL135 LKGC 快照/晉升/rollback;PSRepair 讓位備份 + UNDO manifest |
+| 14 | 覆蓋率與回歸 | `via-selftest`(SelftestGrid 193 站) |
+| 15 | 修正順序最佳化 | MDL135 拓撲序 |
+| 16 | 動態進度條 | `Write-VIAProgress` / ENG056 `PROGRESS.json` |
+| 17 | 動態說明 | 各引擎逐條印因由(批411 起連「不動的原因」都印) |
+| 18 | 非阻塞 PowerShell | `Invoke-VIAWatched`(批404 洗版修) |
+| 19 | 多引擎整合 | `via-entry` 唯一入口 + `CGC_MDL136_EntryBridge` |
+| 20 | 自動部署與初始化 | `via-rebuild` + `via-envgov` |
+
+### 六獨立流程 → 現役短令
+
+1. 代碼層與 AST 重構 → `via-psrepair`
+2. SSOT 資料與配置對齊 → `via-ssot` + MDL096
+3. 子系統依賴解耦(VRN/VDF/VAP)→ `via-rungate` + `via-envgov`
+4. 性能瓶頸與死碼清理 → `via-deadends` + `via-bridge-sweep --net-callers`
+5. 沙盒回歸驗證 → `via-selftest`
+6. UI Matrix 渲染與非阻塞部署 → `via-famui` / `via-console`
+
+### 本批沙盒實跑(能跑的那一半)
+
+`CGC_MDL064_SelftestGrid_v0252 --fast` 全跑:**OK 158 · FAIL 32 · SKIP 3**(存證
+`GRID_20260908_125812.json`)。前次同類全跑是 `OK 135 / FAIL 50 / SKIP 6`。
+
+**32 紅逐條看過,沒有一條是新缺陷**:多數是沙盒沒有工作站的正本庫
+(`tw_listings` / `tw_daily_prices` / `features_daily` / `global_daily` 查無此表)
+與缺 `pyarrow`,其餘是頁面站在沙盒缺再生前提。這是**誠實三態**該有的樣子——
+沙盒沒有的東西就報沒有,不假綠。
+
+### 誠實界限:另一半只能在工作站跑
+
+`via-psrepair` 的入口是 ps1,**沙盒無 pwsh**,所以 R1/R2/R3 三輪、20 個 PS 加速器、
+`-Fix` 都必須在工作站跑。`-Fix` 的可逆性已查實:Accel20 走 `.psrepair.bak` 讓位、
+MDL101 走 `VIA_Reports/ps_repair/backup_<ts>/` 整檔讓位 + manifest + UNDO,
+且 **sequence-dependent 只列不修**——所以它是保守且可回滾的,但仍是會改檔的動作,
+由操作員自己在工作站按下。
+
+## 四十、批417:整合台——一頁輸入、一頁結果,VDF → ETF → VRN 跑成一輪
+
+操作員令「用 GROK 的介面將 VRN VDF ETF 跑成功,有整合後的**輸入介面**、**結果介面**」。
+
+### 缺口不是引擎,是動線
+
+Grok app 六個分頁裡三族其實都跑得動,但**輸入散在三處**(VDF 的起始年與金鑰在
+`01`、ETF 的挑檔在 `01` 內層、VRN 的檔案拖放在 `02`),**結果也散在各自分頁的四個
+tab**。要「跑一輪看結果」得走三個地方——這就是「接近成功」跟「跑成功」的差距。
+
+### 做法(Zero-Hydra:引擎一支都不新造)
+
+- `src/lib/via/run-console.ts` — 純邏輯層 + `node:test` **七檢**:
+  - `readiness()` 跑之前先講清楚每族能不能跑、不能跑差什麼(**VRN 沒檔案就是不能跑**)。
+  - `resultRows()` 把三族跑完的實際數字收成同一張表。
+  - 誠實三態鐵律:沒有輸入=`pending` **絕不當 ok**;跑完零列=`warn`(「跑完了但什麼
+    都沒有」跟「成功」是兩件事);`busy` 期間一律 `run`,**不讓上一輪的數字冒充本輪**;
+    總燈取最壞 `bad > run > warn > pending > ok`。
+- `src/components/run-deck.tsx` — 左輸入 / 右結果一頁:
+  - 左:共用(起始年、FRED KEY、網閘勾選——**本頁不替任何人開同意閘**)、主動 ETF 挑檔、
+    VRN 拖放+選擇檔案+去重開關、整備矩陣、一鍵「整合跑」(VRN 無檔時按鈕自己改口說會跳過)。
+  - 右:三族整合矩陣 + 三族分燈 + 擷取車道 + 主動 ETF 檢核 + VRN 報告,附跳既有分頁的鍵。
+- `shell.tsx` 只加 NAV 一列與一個分支;`types.ts` 的 `Deck` 加 `"run"`。既有六分頁零觸碰。
+
+### 真跑驗證(headless Chromium 實際操作,不是靜態檢查)
+
+按下「整合跑」之後:
+
+| 族 | 指標 | 值 | 燈 |
+|---|---|---|---|
+| VDF | 巨觀序列 | 98 列 | 綠 |
+| VDF | 擷取車道 | 4/14 有料 | 綠 |
+| ETF | 主動 ETF 檢核列 | 7 列 | 綠 |
+| VRN | 報告基本資料 | 71/73 件 | 綠 |
+| VRN | 一題四點文摘 | 288 列 | 綠 |
+| VRN | 財報頁表格 | 27 列 | 綠 |
+| VRN | **卡住的件** | **1 件** | **紅** |
+
+**總燈是紅不是綠,而這是對的**:六項有料、一件卡住,就不准說成功;卡點在 `03 VRN`
+分頁逐件列得出來。若把它算成綠,就正好是這整套治理在防的那件事。
+
+驗:`node --test src/lib/via/*.test.ts` → **237 pass / 0 fail**(原 230 + 本批 7);
+`tsc --noEmit` 零錯誤;`vite dev` 實跑並截圖存證。已推 `claude/via-mother-deck-b405`
+(`76ef17f`);母倉可追溯副本在 `references/intake/VIA_GrokConsole_CherryLagoon_b404/ui_integration_b417/`。
+
+### 順帶取得母倉一直缺的東西:主動 ETF 全名冊 × 發行商
+
+Grok app 的 `src/lib/via/active-etf.ts` 帶有 **29 檔**主動 ETF 的 `ticker → issuer`
+對照(`AETF_UNIVERSE` + `AETF_MISSING_CODES = ["00409A","00998A"]`),與工作站
+`checkpoint` 看到的 `00400A`–`00406A` 系列相互印證:
+
+國泰 1 · 摩根 2 · 安聯 3 · 統一 3 · 聯博 1 · 富邦 1 · 中信 3 · 凱基 1 · 第一金 2 ·
+永豐 1 · 野村 3 · **群益 3** · 台新 2 · 元大 1 · 復華 1 · 兆豐 1。
+
+這正是母倉逐家補車道要的名冊——**群益那 3 檔已通**,剩下 13 家 26 檔有了明確標的與
+優先序(檔數多的先做:安聯/統一/中信/野村 各 3 檔)。**但名冊不等於端點**,
+端點仍要逐家查實才寫(批406c 的規矩不因為有了名冊而放寬)。
+
+### 順帶查實:操作員上傳的 VETF 封存包已在倉內
+
+`VETF_FINAL_SEAL_20260829_013330.zip` 的 `MANIFEST.json` / `SHA256SUMS.txt` /
+`README_FINAL_SEAL.md` 與倉內 `functional modules/VDF/references/intake/VETF_FINAL_SEAL_b242/`
+**逐位元相同**——已於 b242 收容,**不重複收**(Zero-Hydra)。
+
+## 四十一、批418:63 份真報告當 INPUT FOR TEST——查出兩個會毀掉整批的問題
+
+操作員把工作站上 63 份**真研究報告**的路徑交出來當測試輸入
+(`…\VeritasIntelligenceAnalytics - 複製\functional modules\VRN\input\incoming\`)。
+**先把 63 個檔名逐一餵給現役擷取器**再說要不要動手——查出兩件事,兩件都會在真跑時
+把整批毀掉。
+
+### 一、年份被當成股票代號(假資料入正本庫)
+
+`第三場 AI潮流下展望2026半導體產業趨勢 - 陳子昂.pdf` 被抽出代號 **2026**。
+那是**年份**。而且擋不住——`extract_one` 本來就會「逐驗官方名冊」,但
+**2026 恰好是真實上市代號(聚亨)**,名冊逐驗照樣放行。三份研討會簡報全中。
+
+把產業展望簡報歸到聚亨名下,比沒有代號更糟:**假資料比缺資料難查**。
+
+修(`VRN_ENG073_ReportStructuredDB_v0108.py` 的 `_is_year_like`),三道由結構到語意:
+
+1. 候選落在本檔名的日期字串裡 → 那是日期的一部分(結構事實,永遠對)
+2. 候選後面緊接 `年`/`年度`/`H1`/`Q3`… → 語言事實,永遠對
+3. 值在 1990–2099、檔名帶 展望/趨勢/前瞻/年度 這類詞、且候選旁沒有代號記號
+   (括號/`TT`/代號)→ 這是**判斷**不是事實,所以條件收得很緊
+
+第 ③ 道擋錯的代價是「誠實無代號」,擋不住的代價是「假代號入正本庫」——不對稱,
+所以寧可擋。被擋下的候選寫進 `conflicts` 的 `YEAR_NOT_TICKER=…`,留痕可查。
+
+### 二、19 份非個股報告會變成一整面假紅
+
+63 份裡有 **19 份本來就不是個股報告**:
+
+| 型別 | 份數 | 例 |
+|---|---|---|
+| 個股 | 41 | `凱基投顧_3665 貿聯-KY_李承泰_20260519` |
+| 產業 | 9 | `MS-Thermal Solutions` / `MS-ABF` / `Daiwa-PCB` / `凱基投顧_鋼鐵產業` |
+| 大盤晨報 | 6 | `20251205兆豐晨會報告(一)` / `投資早報251209` / `台新台股盤勢分析` |
+| 海外 | 4 | `凱基日股分析` / `凱基美股分析` / `UBS-Asia Hardware Insights` |
+| 研討會 | 3 | `第一場 2026年投資大趨勢 - 華南投顧` |
+
+它們沒有代號、沒有目標價、沒有 EPS——**這是對的**,不是缺陷。但
+`CGC_MDL139.classify_report` 在「零 metrics 且零 financial」時直接判
+`financial=FAIL`,於是這 19 份會被算成 **FAIL**:操作員一跑就看到一整面**假紅**,
+而假紅跟假綠一樣糟。
+
+修(`VRN_ENG073 v0108` + `CGC_MDL141_ClosingGate_v0103.py`):
+
+- ENG073 新增 `classify_kind()` → `report_kind` / `kind_reason` 兩個新欄(ALTER 加欄,
+  舊欄零觸碰)。**有代號一律先算個股**(代號是最硬的證據);沒代號才按關鍵詞分,
+  全不中=「其他」誠實留白,**不硬塞個股**。
+- MDL141 讀 `report_kind`:非個股型只要**首頁抽出來了、也進了庫**,對它適用的鏈就
+  走完了 → `DONE_NS`(非個股完成),自成一格統計、不混進「全通且 VERIFIED」充數。
+  **收得很緊**:真的核對不符(`DB_NO_MATCH`、上漲空間落在 FAIL 態)照舊是 FAIL,
+  不因為型別就放過。舊庫沒有這一欄=**行為逐字不變**(只增不減)。
+
+### 驗
+
+- ENG073 **二十六檢 26/26**;新檢 ㉔㉕㉖ 的 fixture **全部取自操作員這 63 份真檔名**,
+  並把 `2026:聚亨` 放進名冊以重現「名冊逐驗擋不住」的真實情況。
+- MDL141 **十一檢 11/11**;新檢 ⑪ 是**對照組**:同一份 fixture,沒有型別欄時兩份都
+  `FAIL`(證明假紅真的存在),加上型別欄後 產業→`DONE_NS`、個股→仍 `FAIL`(不受影響)。
+- 63 個真檔名的**全量重跑對照**:v0107 三份研討會被誤判代號 2026 → v0108 **0 份**;
+  型別分佈 個股 41 / 產業 9 / 大盤晨報 6 / 海外 4 / 研討會 3 = 63,每一份非個股都
+  印得出判準理由。
+- SelftestGrid **v0253** 兩站實跑綠。
+
+### 券商正典化在真檔名上的實測(批412/413 的疊加層真的有用)
+
+`JP-2330` → `JPM 摩根大通`、`CLST-6669` → `CLSA 里昂證券`、
+`GF-Thoughts on TPU…` → **`DENY:拒絕清單:GF(操作員裁決)`**、
+兆豐→`MEGA`、華南→`HUANAN`、凱基→`KGI`、國泰→`CATHAY`、台新→`TAISHIN`、
+統一→`PRESIDENT`、`CTBC`、`MQ`→`MACQUARIE`、`UBS`、`Citi`→`CITI`、`Daiwa`→`DAIWA`。
+63 份裡只有 5 份抽不出券商鍵,其中 `GF` 是**刻意拒絕**不是漏掉。
+
+## 四十二、批419:那一跑成功了——但 37 份文摘裡只有 7 份的「上漲空間」是它字面的意思
+
+操作員把工作站 2026-09-08 21:55 的真跑輸出貼回來,並令「用 GROK 的 U/I 顯示狀況,
+逐步形成微系統 U/I」。
+
+**先講成功的部分**:65 份真報告全走完五段鏈,ENG080 產出 **37 份四點文摘**,
+`via-famui` 三頁再生 **GREEN 3/3**。VRN 從「尚無真報告」變成「有真報告、也真的跑出東西」。
+
+**再講輸出裡兩件會讓人讀錯的事**——用他自己的數字證明,不是猜的。
+
+### 一、目標價只有股價的 1/50 到 1/200(抽錯的數被印成預測)
+
+| 檔 | 目標價 | 基準價 | 比值 | 印出來的「上漲空間」 |
+|---|---|---|---|---|
+| `MS-2308 20251128` | 37.8 | 1850.0 | **0.020** | −98.0% |
+| `MS-8210 20251007` | 17.81 | 937.0 | **0.019** | −98.1% |
+| `JP-3653 20251003` | 25.84 | 5655.0 | **0.005** | −99.5% |
+
+沒有分析師會發 −98% 的目標價。那三個數是抽錯的(EPS、倍數、或外幣價)。
+**印成「潛在上漲空間 −98.0%」比不印更糟**:讀的人會以為那是預測。
+
+### 二、37 份全部拿 2026-09-07 的價去比,但 18 份的報告逾 180 天
+
+最舊的 `Daiwa-1319` 是 **2023-10-11**——距基準日 **1062 天**。
+拿三年後的價算三年前報告的「潛在上漲空間」,算出來的不是上漲空間,**是事後看圖**。
+`JP-2330`(2025-07-18,416 天)印出 −48.9%,那不是分析師看空,是台積電漲了。
+
+### 修(`VRN_ENG080_FourPointDigest_v0101.py`)
+
+- **`tp_sanity()`** 合理帶 `[0.2, 5.0]`(=上漲 −80%～+400%)。帶外 → `TP_SUSPECT`,
+  K1 **不列為潛在上漲空間**,改印兩個數字與比值並註明待人工核。
+  **只 flag 不丟棄**——我們不知道哪個數字才對,丟棄等於替操作員決定;
+  標可疑,他才知道要去翻哪三份 PDF。泓德 +192%(比值 2.92)仍在帶內=**不亂殺**。
+- **`basis_state()`** 逾 `STALE_DAYS=180` → `STALE_BASIS`,K1 改把**報告時上漲**
+  (批240 既有的 `upside_at_report`)放頭,今日比值降為「僅供參考,不作潛在上漲空間」。
+- 兩態落庫(`tp_state`/`tp_ratio`/`basis_state`/`basis_days`,ALTER 加欄),
+  逐份印 `⚑TP 疑誤` / `⚑非當期`,總結加 `tp_suspect`/`stale_basis`/`upside_trusted`。
+- **順帶踩到批412 同一個坑**:加四個欄後位置式 `INSERT VALUES (?×36)` 立刻爆
+  「40 欄 36 值」。改具名欄位。**記法:加欄就改具名。**
+
+### 判讀結果(37 份)
+
+| 判讀 | 份數 | 意思 |
+|---|---|---|
+| 可信 | **7** | 當期(≤180 天)且比值在合理帶內——「潛在上漲空間」是它字面的意思 |
+| 非當期 | 18 | 今日比值僅供參考 |
+| TP 疑誤 | 3 | 待人工核 PDF |
+| 未算 | 9 | 報告沒抽到目標價 |
+
+### GROK 側:微系統 U/I 的第一塊
+
+新增 `src/lib/via/vrn-run.ts`(唯讀鏡面 + 同律判讀)+ 六檢、
+`src/components/vrn-run-deck.tsx`(NAV「04 VRN 實跑」):三張摘要卡
+(鏈跑完了/頁面再生/四點文摘判讀)+ 逐份判讀表,**排序刻意把要處理的放最上面**
+(TP 疑誤 → 非當期 → 未算 → 可信)。總燈紅——有 TP 疑誤就是紅,不取巧。
+
+驗:ENG080 v0101 **十四檢 14/14**(新檢 ⑬⑭ 的 fixture 比值與天數全部取自這 37 份真文摘);
+SelftestGrid **v0254** 該站實跑綠;Grok `node --test` **250 pass / 0 fail**、`tsc` 零錯誤、
+`vite dev` 實跑截圖。
+
+## 四十三、批419b/c:閘門被自己的診斷訊息判死,以及一個看不出因由的 0
+
+操作員拉齊後重跑,兩件事同時出現。
+
+### 一、批419 的閘生效了,但我讓它把自己判死
+
+```
+[RED] MS-2308 … ⚑TP 疑誤(比值 0.020) · 新數字 ['0.020', '0.2']
+[RED] MS-8210 … ⚑TP 疑誤(比值 0.019) · 新數字 ['0.019', '0.2', '5.0']
+[RED] JP-3653 … ⚑TP 疑誤(比值 0.005) · 新數字 ['0.005', '0.2', '5.0']
+[via-vrn4] RED · QC 紅 3 → vrn_fourpoint rc=1
+```
+
+閘門判對了(那三份的目標價確實可疑),但 K1 印出的 **比值 0.020** 與 **合理帶界 0.2 / 5.0**
+是**閘門自己的診斷值**——是「關於擷取的後設說明」,不是「報告裡的宣稱」。
+`novel numbers` 拿它們去查有沒有出處,等於要求**判準本身也要出現在報告正文裡**,無理。
+結果三份 QC 紅、`rc=1`,**整段鏈被自己的診斷訊息判死**。
+
+修(`VRN_ENG080 v0102`):把比值、合理帶界、天數、`STALE_DAYS` 一併列入 `derived`
+(既有的「衍生數不計」機制,不另造)。新檢 ⑮ 帶對照組:
+**不**把診斷值放進 `derived` 就會被判成新數字(證明這檢不是空檢),
+而真的發明的數字(`7777`)照樣抓得到——閘門不是萬用赦免。
+
+### 二、`券商正典鍵 0/59` —— 0 沒有告訴我們任何事
+
+```
+[SSOT 正規化] 券商正典鍵 0/59 · 評等正典鍵 0/59 · 分析師 +0(庫 0)· 金融機構 SSOT 在位
+```
+
+批412/413 端到端測過會通,現在全空。但**這一行給得出數字給不出因由**:0 可能是
+SSOT 沒載、可能是券商 token 抽不到、也可能是抽到了而正典查無——三件事差很多。
+**靜默的 0 跟假訊息一樣難查。**
+
+修(`VRN_ENG073 v0109`),三件:
+
+1. **`NULL` 不等於 `''`**。`WHERE broker_ssot_key <> ''` 在 SQL 裡對 NULL 回 **NULL 不是 TRUE**,
+   加欄前寫入的舊列一律不被計入。改 `COALESCE(...,'')` 並**把 NULL 列數分開報**——
+   「認不出」和「舊列沒這欄」不該長得一樣。
+2. **報告型別直方圖**:`[報告型別] 個股 41 · 產業 9 · …`。分不出型別,收尾閘就會把
+   產業/晨報/研討會當成失敗(批418 修的正是這個),所以要看得到它到底有沒有分。
+3. **零命中逐項取樣**:命中 0 時直接取三份實跑同一支函式,印出
+   `token=… → key=… src=…` 與模組路徑、`resolve_broker_filename` 是否可呼叫。
+   **不猜**——下一跑就會直接說出是哪一段斷掉。
+
+順帶修掉 `SyntaxWarning: invalid escape sequence '\m'`(docstring 內的 Windows 路徑,改 raw string)。
+
+### 驗
+
+ENG080 v0102 **十五檢 15/15**、ENG073 v0109 **二十七檢 27/27**(新檢 ㉗ 以
+`MS`/`''`/`NULL` 三列實證直算會少算一列而 `COALESCE` 不會);SelftestGrid **v0255** 兩站實跑綠。
+
+### 這一跑真正的好消息
+
+`via-closeout vrn` 從 **65 份 / PENDING 6** 變成 **59 份 / PENDING 0**——收件與首頁兩段
+**全清空**(`段:{'收件': 0, '首頁': 0, …}`),鏈跑得完了。DONE 25 維持,
+三方對照從 61/65 升到 **59/59 全覆蓋**,DIVERGE 從 6 降到 4。
+
+## 四十四、批419d:診斷程式碼把主流程弄掛,以及守衛太寬又走回假紅
+
+操作員再跑一次,兩件事同時出現——**一件是好消息,一件是我的錯**。
+
+### 好消息:批418 的分類確實在跑
+
+```
+[報告型別] 個股 37 · 產業 9 · 大盤晨報 6 · 海外 4 · 研討會 3
+```
+
+批419c 加的直方圖第一次讓我們看見:59 份裡 **22 份是非個股**,分類完全生效。
+先前只能猜「有沒有分到」,現在是事實。**這就是加診斷的價值。**
+
+### 我的錯一:診斷程式碼把主流程弄掛
+
+```
+File …VRN_ENG073_ReportStructuredDB_v0109.py, line 716, in run
+    _con2 = duckdb.connect(str(db), read_only=True)
+_duckdb.IOException: Cannot open database "…\VeritasIntelligenceAnalytics\None"
+[via-console run] vrn_structdb rc=1
+```
+
+`run(zdir=None, db=None)` 的 `db` 是**函式參數**,解析後的路徑是區域變數 `dbp`。
+我在關庫後另開一條唯讀連線,而且傳錯變數 → `str(None)` → `"…\None"` → 整支 rc=1。
+
+**診斷程式碼把主流程弄掛,比沒有診斷更糟。**
+
+修(`v0110`):取樣改在**關庫前**用同一條連線抓好,**完全不再開第二條連線**——
+少一個地方可以傳錯路徑。新檢 ㉘ 以 stub SSOT 逼出零命中分支**真的走一遍**
+(v0109 的自測從沒進過這條分支,所以沒抓到)。
+
+### 我的錯二:守衛太寬,22 份非個股又被擋回 FAIL
+
+批418 讓非個股判 `DONE_NS`,但我加了一道「真失敗才不放過」的守衛:
+
+```python
+_fail_states = getattr(mod, "FAIL_STATES", ())     # ← 含 MISSING_SOURCE
+_real_bad = price_state == "DB_NO_MATCH" or upside_state in _fail_states
+```
+
+`MDL139.FAIL_STATES = ("FORMULA_MISMATCH", "FORMULA_MISMATCH_DB", "PARSE_SUSPECT", "MISSING_SOURCE")`
+——而 **`MISSING_SOURCE` 正是產業/晨報/研討會的正常態**(沒代號 → 沒目標價 → 沒價)。
+守衛於是把 22 份非個股**全部擋回 FAIL**,等於又走回假紅。
+
+修(`MDL141 v0104`):非個股真正該留 FAIL 的只有
+`FORMULA_MISMATCH` / `FORMULA_MISMATCH_DB` / `PARSE_SUSPECT`
+——**數字抽出來了、而且對不起來**。`MISSING_SOURCE` 與 `DB_NO_MATCH` 是預期。
+
+**這條為什麼檢沒抓到**:v0103 的 fixture `upside_state` 用**空字串**,
+而真實資料是 `MISSING_SOURCE`。**fixture 不帶真實狀態,測的就不是真的那條路。**
+v0104 的 fixture 改帶 `MISSING_SOURCE`,並多加一份「非個股但 `FORMULA_MISMATCH`」
+證明守衛沒被拆掉——那一份照樣 FAIL。
+
+### 驗
+
+ENG073 v0110 **二十八檢 28/28**、MDL141 v0104 **十一檢 11/11**、
+SelftestGrid **v0256** 兩站實跑綠。
+
+### 這一跑的其他進展
+
+`vrn_fourpoint` **rc=0**(批419b 的 derived 修生效,QC 紅 3 → **0**),
+三份 TP 疑誤照樣掛旗標但不再判死;`via-closeout` 維持 59 份 / PENDING 0 /
+三方對照 59/59 全覆蓋。
+
+## 四十五、批419e:捕捉到卻不顯示,等於沒捕捉
+
+### 先講成果:非個股修真的生效了
+
+```
+[via-closeout vrn] RED · 12/59 份核對 FAIL;另 22 份非個股已完成
+  報告 59(DONE 25 · FAIL 12 · PENDING 0)
+  DONE_NS 20251205兆豐晨會報告(一) / 20251208_台新台股盤勢分析 / Daiwa-PCB /
+          GF-Thoughts on TPU / GS-AI PCB CCL …
+```
+
+**FAIL 從 34 掉到 12**,22 份產業/晨報/海外/研討會轉成「非個股已完成」。
+`vrn_structdb` 也回 **rc=0**。批418→419d 那條線收斂了。
+
+### 再講 `券商正典鍵 0/59`——診斷把答案交出來了
+
+批419c 加的取樣印出:
+
+```
+· 20250819兆豐個股報告-泓德能源(6873)  token=兆豐 → key=(空) src=(空)
+· 疊加層/正典模組:…\VIA_FinancialInstitution_Overlay_v0100.py
+· resolve_broker_filename 可呼叫=True
+```
+
+**沙盒跑同一條鏈是通的**(實跑對照:`兆豐→MEGA`、`MS→MS`、`JP→JPM`,
+`ssot_broker` 經 `fin_ssot()` 一樣通)。所以不是邏輯錯,是**執行期查詢在炸**。
+
+看程式碼就找到形狀:
+
+- 疊加層的 `overlay()` 是 `json.loads(OVERLAY_JSON.read_text(...))`,**沒有 try**
+  ——資料檔讀不到就**丟例外**,不是回空。
+- `ssot_broker` 的 `except Exception` 把因由存進 `_FIN["why"]` 然後回空字典。
+- 而總結那一行 **只在模組是 None 時才印 `_FIN["why"]`**。
+
+於是:模組載得起來(所以印「SSOT 在位」)、每次查詢都拋例外、**因由躺在
+`_FIN["why"]` 裡沒人看**,對外只剩一個沒有理由的 `0/59`。
+
+**捕捉到卻不顯示,等於沒捕捉。** 這跟批412「`except` 把 pydantic 錯誤吞成
+『0 筆』」是同一個錯誤家族——那次我修的是單一支函式,這次要修的是**顯示規則**。
+
+### 修(`VRN_ENG073 v0111`)
+
+1. **因由一律印**:模組在位但 `_FIN["why"]` 非空時,總結行補
+   「**查詢期例外**:…」。
+2. 零命中診斷加印**疊加層自己的 `stats()`**(`filename_keys` 幾條、`canon` 在不在)
+   與**資料檔路徑及是否存在**——JSON 沒載/壞掉會直接在這裡現形。
+
+新檢 ㉙ 用「**模組在位但每次查詢都炸**」的 stub 重現工作站的故障形狀,
+斷言 `rc=0`、因由印得出來、而且是**原始**因由(不是重述)、`stats()` 炸掉也照實說。
+
+### 驗
+
+ENG073 v0111 **二十九檢 29/29**、SelftestGrid **v0257** 該站實跑綠。
+
+### 還沒解的
+
+`0/59` 的**根因**還沒定案——下一跑的 `stats()` 與資料檔存在與否會直接指出來:
+若 `filename_keys=0` 或資料檔不存在,就是 `VIA_FinancialInstitution_Overlay_v0100.json`
+沒被拉到/讀不到;若 `stats()` 正常而查詢仍炸,那是別的東西。**不猜。**
+
+## 四十六、批419f:診斷把根因交出來了——正典缺席時,疊加層自有的鍵一起陪葬
+
+### 診斷奏效:一字不差的根因
+
+批419e 加的兩行,下一跑就把答案交出來:
+
+```
+[SSOT 正規化] 券商正典鍵 0/59 · … · 金融機構 SSOT 在位
+              · **查詢期例外**:正典載入失敗 ModuleNotFoundError:No module named 'pydantic'
+[SSOT 診斷] … stats()={'deny_keys': 20, 'broker_alias_add': 23, 'broker_add': 5,
+                        'rating_alias_add': 59, 'filename_keys': 16,
+                        'canon': "缺席:正典載入失敗 … No module named 'pydantic'"}
+            疊加層資料檔:…\VIA_FinancialInstitution_Overlay_v0100.json · 存在=True
+```
+
+**疊加層資料全在**(16 條檔名鍵、20 條拒絕、23+59 條別名),**正典載不起來**
+——`via_vrn_312` 沒有 `pydantic`。從「0 沒有告訴我們任何事」到「一行說完」,
+中間隔的就是批419c/e 那兩次加診斷。
+
+### 根因:把已知的資料丟掉
+
+```python
+def resolve_broker_filename(token):
+    tgt = filename_key_map.get(token)      # 兆豐 → "MEGA"  ← 查到了
+    if tgt:
+        r = resolve_broker(tgt)            # 拿 MEGA 去問正典要中英名
+        return r                           # 正典缺席 → r["key"] 是空的 → 整個丟掉
+```
+
+`resolve_broker("MEGA")` 的次序是 拒絕 → 正典 → 疊加層別名 → 疊加層新增機構。
+`MEGA` 是**正典**的機構,所以正典一缺席就全落空——即使
+`filename_key_map` **已經知道** `兆豐 → MEGA`。
+
+**中英名確實只有正典有,但「鍵」是操作員裁決寫在疊加層 JSON 裡的資料。**
+正典缺席不影響那個鍵成立。把它一起丟掉,是把已知的資料丟掉。
+
+### 修(`VIA_FinancialInstitution_Overlay_v0101.py`)
+
+- 新 `overlay_keys()`:疊加層自己知道的鍵集合(`filename_key_map` 的目標 ∪
+  `broker_alias_add` 的鍵 ∪ `broker_add` 的 `ssot_key`)。
+- `resolve_broker()`:**正典缺席時**,若 `value` 命中 `overlay_keys()`,鍵照回、
+  中英名**誠實留空**、`src="OVERLAY_KEY(正典缺席;僅鍵無中英名)"`——**不冒充 CANON**。
+- `resolve_broker_filename()`:對映查得到目標鍵卻因正典缺席回空 → 直接回那個鍵,
+  `src="FILENAME_MAP(正典缺席;僅鍵無中英名)"`。
+- **界線沒有放寬**:查無仍是查無(`不存在的券商XYZ` → 空,不硬造);
+  拒絕仍壓過一切(`GF` → DENY);正典在位時一切照舊走 CANON。
+- 資料檔改**尾版 glob**,不再把 `v0100.json` 的名字寫死在 v0101 裡。
+
+### 驗
+
+疊加層 **十檢 10/10**(新檢 ⑩ 把 `_CACHE["ssot"]` 強制設成缺席以重現 vrn 境無 pydantic);
+**端到端實證**:同一條 `ENG073.ssot_broker` 鏈在正典缺席下跑 9 個真檔名 → **命中 8**
+(`兆豐→MEGA`、`MS→MS`、`JP→JPM`、`CLST→CLSA`、`凱基→KGI`、`華南→HUANAN`、
+`CTBC→CTBC`、`UBS→UBS`;`GF` 正確 DENY)。SelftestGrid **v0258** 該站實跑綠。
+
+### 誠實界限:這不是 pydantic 的替代品
+
+券商**鍵**回來了,但這三件仍然要正典,也就仍然要 `pydantic`:
+
+- 券商中英名(`broker_name_zh` / `broker_name_en`)
+- 評等正典鍵的 `code` / `direction`
+- **分析師姓名擷取**(`analyze_contact_document` 整支都在正典那一層)
+
+補法一行:`uv pip install --python C:\Users\tonyk\envs\via_vrn_312 pydantic`
+
+## 四十七、批419g:券商鍵 0→54 之後,評等仍 0——抽取器的詞表比正規化器窄
+
+### 批419f 的修生效了
+
+```
+[SSOT 正規化] 券商正典鍵 54/59 · 評等正典鍵 0/59 · … · 查詢期例外:… No module named 'pydantic'
+```
+
+`0/59 → 54/59`。剩下 5 個是檔名本來就沒有券商 token 的
+(`3014TT-20231005`、`投資早報251209`、`6933_AMAX-KY`、研討會三場),**那是對的**。
+
+### 但評等還是 0——而且是另一種病
+
+`ssot_rating` 的次序是:`rating_raw`(`RATING_RX` 抓到的)→ 內文用 `RATING_RX` 逐詞試。
+兩道**都以 `RATING_RX` 為詞表**,而它只認:
+
+```
+Buy|Sell|Hold|Neutral|Overweight|Underweight|Outperform|Underperform
+買進|賣出|中立|增持|減持|優於大盤|強力買進
+```
+
+批413 把 **59 條別名**加進疊加層(加碼/續抱/低配/未評等/超配/區間操作…),
+但**掃描器看不到它們**。實測:`加碼`/`續抱`/`低配`/`未評等` 四個 `RATING_RX` 一個都不中。
+
+**字典加了 59 條,掃描器只認 15 個詞——加了等於白加。**
+
+### 修(`VRN_ENG073 v0112`)
+
+第三道:改用**疊加層自己的別名**當掃描詞表(Zero-Hydra,**不寫第二份詞表**),
+且**只掃標題帶/右區與檔名**——評等就寫在那裡,掃全文只會把內文敘述裡的
+「中立」當成評等。只收 ≥2 字的詞(單字「買」「空」在內文太容易亂咬)。
+
+計數同時加「**原始評等字串 N 筆**」:0/59 有兩種可能——抽取階段就沒抓到字串,
+或抓到了但正規化查不到。只印後者的分母,就跟先前那個沒有因由的 0 一樣難查。
+
+### 順帶補上兩條疊加層資料(操作員裁決掉了一半)
+
+- **`加碼`**:操作員裁決是「**增持 = 加碼** = BUY」,但疊加層只帶了「增持」,
+  「加碼」一直靠**正典**。批413 的檢是在正典在位時過的,所以沒發現——
+  **正典缺席時,操作員親自裁決的一半就掉了**。已補進疊加層自帶。
+- **`未評等` / `NR`**:出自操作員真檔名 `瑞基(4171,NR_未評等)-CTBC251208`;
+  疊加層原本只有「未評級」。
+
+兩條都是**補完既有裁決**,不是新裁決;正典仍然一個字都沒動。
+
+### 驗
+
+ENG073 v0112 **三十檢 30/30**(新檢 ㉚ 實證舊詞表漏掉四個、詞表 67 條、
+`加碼→BUY`、`未評等→NOT_RATED`、無評等→空不硬塞、`Buy` 原路照舊優先);
+疊加層 **十檢 10/10**;SelftestGrid **v0259** 兩站實跑綠。
+
+**判準對著事實寫**:第一版我斷言「這五個 `RATING_RX` 都不中」,實測發現
+「增持」本來就在裡面 → 改成四個。批419d 的教訓再一次:**斷言要對著真實狀態寫。**
+
+## 四十八、批420:操作員規格——檔名拆解律 + 評等全名冊
+
+### 診斷先分辨出是哪一段(批419g 的成果)
+
+```
+[SSOT 正規化] 券商正典鍵 54/59 · 評等正典鍵 4/59(原始評等字串 34 筆)
+```
+
+**34 筆有原始評等字串,只有 4 筆解得出鍵**——所以不是抽取問題,是**正規化查不到**。
+而且是券商那個病的翻版:`Buy`/`買進`/`中立` 這些**基本詞只在正典裡**,疊加層只帶
+別名(增持/加碼/續抱…),正典缺席就全落空。已把基本詞補進疊加層自帶
+(BUY 19→32、HOLD 14→24、SELL 14→24、NOT_RATED 16→22);正典在位時次序仍是
+**正典先行**,這些永遠不會蓋過正典。
+
+### 操作員規格,逐條實作
+
+> 「FILENAME 拆解方式就是中英文標點符號轉換處切開來,TRIM 過便成為獨立連續的
+> 英文/中文/數字的單位。四碼數字是台股的 TICKER,較長的數字為日期。
+> TICKER 去 TWSE/TPEX 找名稱。名字-KY 也是公司名稱。**3014TT 是 3014 TT**。」
+
+新增 `tokenize_filename()` —— 一支具名、可測的拆解器:
+
+1. **標點切**:ASCII 與全形一併收(`-_()【】,、。;:` 等)。
+2. **字集轉換處再切**:數字 / 英文 / 中日韓各自成段。
+   **這一條就是 `3014TT` 的解**——它沒有標點,只有數字↔英文的轉換;
+   舊的三支 regex(`TICK_RX` 掃裸四碼、`parse_date` 三種寫法、`parse_broker`
+   拿字典做子字串掃)各管一段,**誰也切不開**。
+3. **四碼數字 = 台股 TICKER**(年份守衛照舊在後面把關,批418)。
+4. **較長的數字 = 日期**:8 碼 `20251202`、7 碼民國 `1141202`、6 碼 `251209`。
+5. **市場後綴** `TT`/`TW`/`TWO`/`TPE` 單獨記,不當代號也不當日期。
+6. **名字-KY 也是公司名稱**:中文段(或英文段)後面緊跟 `-KY` 就合體收進名候選,
+   `貿聯` 與 `貿聯-KY` **兩個都留**,交給 TWSE/TPEX 名冊決定。
+   代號抽不到時改以名候選反查名冊,並在 `conflicts` 記 `TICKER_FROM_NAME=…` 留痕。
+
+`parse_date` / ticker 候選 / 名冊反查**全部改吃拆解器的結果**,不再各切各的。
+
+> 「RATING_LIST=() 所有評等中英文名稱,第一頁符合即可。」
+
+新增 `RATING_LIST`(中英文共約 100 條)併入掃描詞表(與疊加層別名聯集,共 **109 條**)。
+它是**掃描詞表不是判定表**——判定仍走正典/疊加層 `resolve_rating`,
+認不出就是認不出(Zero-Hydra:本器不自建第二份「詞→鍵」對照)。
+
+### 驗:對著操作員的 63 份真檔名跑
+
+| | 結果 |
+|---|---|
+| 有日期 | **60/63**(3 份本來就沒有:`6933_AMAX-KY_個股介紹報告` 與兩場研討會) |
+| 有四碼代號候選 | **44/63** |
+| 日期候選有但解不出 | **0** |
+| `3014TT-20231005` | 代號 `3014` · 日期 `2023-10-05` · 市場 `TT` |
+| `凱基投顧_3665 貿聯-KY_…` | 代號 `3665` · 名候選含 `貿聯-KY` |
+| `華南投顧-2637-慧洋-KY-1141202` | 代號 `2637` · 民國日期 `2025-12-02` · 名候選含 `慧洋-KY` |
+| `瑞基(4171,NR_未評等)-CTBC251208` | 代號 `4171` · 評等 `NOT_RATED` |
+| `晶心科(6533,N,中立)-CTBC251208` | 代號 `6533` · 評等 `HOLD` |
+
+ENG073 v0113 **三十二檢 32/32**、疊加層 **十檢 10/10**、SelftestGrid **v0260** 兩站實跑綠。
+
+### 操作員已補 pydantic
+
+`uv pip install --python …\via_vrn_312 pydantic` → `pydantic==2.13.5` 已裝。
+下一跑正典會在位:券商中英名、評等 `code`/`direction`、**分析師姓名擷取**三件會一起回來,
+`src` 也會從 `OVERLAY_KEY(正典缺席…)` 變回 `CANON`。
+
+## 四十九、批421:兩收容系統升格為 VRN 支援模組——順手抓到寫死的尾版律破口
+
+操作員令:「REGISTER AND IMPLEMENT THESE TWO SYSTEMS AS SUPPORTIVE MODULES TO
+SUPPORT VRN」,附 `GenericLayoutEngine_AllEngines_v2.1.0` 與
+`VIA_NLP_Application_System_v1.8.0` 兩包。
+
+### 收容前先查驗:一包是新的,一包不是
+
+| 上傳包 | 逐檔比對結果 | 處置 |
+|---|---|---|
+| GLE AllEngines v2.1.0(18 檔) | 對在庫 `..._v2.1.0_b245` **16 檔位元相同** | **不新增收容夾** |
+| ↳ `Install-GenericLayoutEngine-All.ps1` | 唯一差異:`${ExitCode}:` → `$ExitCode:` | 不採(見下) |
+| ↳ `dist/*.whl` | 原始碼的建置產物,原始碼已在庫 | 不收(不留二進位重複件) |
+| NLP Application System v1.8.0(68 檔) | 對在庫 v1.5.0 **多 5 支、13 檔改版** | **收容**,原件一位元未改 |
+
+那個 installer 差異值得記一筆:PowerShell 裡 `"$ExitCode:"` 的冒號會被當成範圍/限定
+符解析,`"${ExitCode}:"` 才是安全寫法。**在庫那份是對的,上傳那份是回歸** —— 所以不採。
+「新上傳的就比較新」不是通則,逐檔比對才是。
+
+### 真正的缺陷在鏈上,不在收容夾
+
+```
+VRN_ENG072_FirstPageText_v0106.py:123   pkg = _INTAKE / "VIA_NLP_OneEngine_v1.1.0"
+VRN_ENG073_ReportStructuredDB_v0113.py:134   pkg = HERE/".../VIA_NLP_OneEngine_v1.1.0"
+```
+
+**寫死。** 庫裡早有 v1.5.0,現在又有 v1.8.0,兩支引擎永遠掛不上。
+`ENG077`/`ENG078` 兩座舊橋雖然都做了尾版 glob,但**鏈上四支引擎沒有一支走橋**。
+
+差多少?v1.1.0 有 18 支模組,v1.8.0 有 39 支。多出來的這六支,正是研報解讀要用的:
+
+`table_ops`(表格結構化)· `layout_analysis`(版面分塊)· `content_roles` ·
+`context_reconstruction` · `summarization` · `function_classifier`
+
+### 新增兩支支援模組(`supportive modules/70_VRN_Rules/`)
+
+**`SUP_MDL743_GenericLayoutHub_v0100`** — GLE 全後端統轄橋。九檢 9/9。
+在此之前,收容件只有 ENG072 私下掛載,而且只用 `generic_layout_engine` 一支;
+`all_backend_engines`(32 支 adapter 優先序)與 `multi_engine_orchestrator`(路由/共識/快取)
+**全樹無人呼叫**——收容了但沒被採用。本橋把四支正主收成單一掛載點,
+`zone_annotate` 與 ENG072 的 `gle_annotate` 逐鍵同契約,實作只留一份。
+
+寫這支時被自己的檢咬了兩次,兩次都是真的:
+
+- 我先斷言路由表有六個模式 `auto/consensus/tables/paddle/ocr/all`。實際 `MODE_ADAPTERS`
+  **只有四個具名鍵**,`auto` 與 `all` 根本不在表內,是靠 `build_route` 的 else 落到
+  `build_all_adapters()`。改成如實回報四具名 + 落空分支,並另開 `route_fallthrough()`
+  把去向講明白。**斷言要對著真實狀態寫,不是對著我以為的樣子寫。**
+- 「本橋零安裝動作」那一檢用字串比對掃自己的原始碼,結果掃到**斷言自己寫的那些字串**
+  = 自指偽陽。改用 AST 檢查匯入面(`subprocess`/`os`/`pip` 一個都沒有)。
+
+**`SUP_MDL744_NLPApplicationHub_v0100`** — NLP 應用系統統轄橋。十一檢 11/11。
+跨 `VIA_NLP_OneEngine_v*` 與 `VIA_NLP_Application_System_v*` **兩個家族名**做語意尾版解析
+(只認一個 glob 就會漏掉尾版)。另有兩件本橋獨有的防制:
+
+- **`__main__` 排除**:它 `import` 即跑 argparse,會用 `SystemExit` 中斷宿主。
+  第一次全模組探測就是被它炸掉的。
+- **雙掛防制**:同一個行程只能有一個 `via_nlp_engine`。舊引擎若先把 v1.1.0 掛進
+  `sys.modules`,本橋**不偷換**,回 `MOUNTED_STALE` 並指出先佔者是誰。
+
+### 接鏈:兩支引擎改走橋,退路一寸不少
+
+`ENG072 v0107`(十六檢 16/16)· `ENG073 v0114`(三十三檢 33/33)
+
+三段誠實退路:**橋 → v1.1.0 直掛(原行為逐字不動)→ stdlib NFKC**。
+ENG073 的 `run` 尾段新增一行 `[NLP 掛載]`,把走了哪條、為何沒走橋當場印出來
+——批419e 的教訓:捕捉到卻不顯示,等於沒捕捉。
+
+新檢怎麼證「真的走到尾版」?**全形轉半形不能當證據**,`ＡＢＣ１２３ → ABC123`
+stdlib 也做得到,測不出差別。改用判別輸入:
+
+| 輸入 | stdlib NFKC | TextProcessor |
+|---|---|---|
+| `台積電  的的的營收`(連續空白) | `台積電  的的的營收`(不併) | `台積電 的的的營收`(併) |
+
+外加缺席對照組:把 `HUB_DIR` 指到空夾,兩支橋都得**退回直掛而不是炸掉**。
+
+### 一項自審更正
+
+上一則回覆我對操作員說「ENG074 現在只用 pdfplumber+fitz 雙法」——**這是錯的**。
+ENG074 其實只有 `fitz` 文字 + 行級 regex **一法**;docstring 第 24 行寫的是 ENG072 的法B。
+
+而本批**沒有動 ENG074**。原因是實測結果不支持我原本的假設:
+`fitz.get_text("text", sort=True)` 會把分欄版面的標籤與數字**併回同一行**,
+舊法在那種情形是 work 的,我造的合成樣本沒有重現真實故障。
+剩下的 12 筆真 FAIL 全是 GS 英文報告,不拿到真檔無從斷因 ——
+**不憑猜測去動一條已經跑綠的鏈。**
+
+### 登錄
+
+`Register v0166`(`via-gle`/`via-nlp` + 別名 `版面橋`/`語意橋` + 兩梭;
+梭機制與正典 `via-closeout.cmd` 逐行相同)· `SelftestGrid v0261`(+兩站)· 台帳 914。
+
+## 五十、批423:卡斷根治——輸出被吞、逾時沒接線,兩條都不在被懷疑的那一端
+
+操作員令:「卡斷 加入20個加速器 不卡斷 動態進度條」。
+實錄:`via-go` 印出「── ① TEST(自測矩陣)──」之後**畫面完全不動**。
+
+### 先排除被懷疑的那一端
+
+直覺會說「自測矩陣 200 站太慢」。但看格子的程式碼,它**逐站都有 `flush=True`**,
+而且早就有 SuperAccel 平行(8 工人)。格子不是啞巴。
+
+真正的兩條根因都在 `Invoke-VIA-AllGreen-v0100.ps1`:
+
+```powershell
+# 根因① — 第 45 行
+$out = & $PY @Argv 2>&1 | Out-String      # ← 緩衝到子行程結束才吐
+
+# 根因② — 第 12 行
+param( [int]$StageTimeoutSec = 1200 )     # ← grep 全檔:只有這一行,從未被使用
+```
+
+**①** `Out-String` 把 200 站的輸出全部吞進管線,跑完才一次吐出。
+格子每站都在喊,操作員一個字都看不到 —— 批419e「捕捉到卻不顯示,等於沒捕捉」的 PowerShell 版。
+
+**②** 檔頭契約寫著「非阻塞(無 Read-Host/無限等待)· 誠實 OK/FAIL/NOT_RUN 不卡斷」,
+`$StageTimeoutSec` 也宣告好了 —— **但整支檔案沒有一行用到它**。
+契約寫了,實作沒接。跟批422 的假綠(`MDL141` 不讀 `tp_state`)是同一個家族:
+**宣告了、沒接線。**
+
+### 修法
+
+**`Invoke-VIA-AllGreen-v0101.ps1`** — `①~⑭` 流程、判準、Gate 文字一字未改,只換「怎麼跑一站」:
+
+| | |
+|---|---|
+| `def_Drain` | 以 `FileShare::ReadWrite` 開重導向檔,每 0.4s 排出新行即時轉播 |
+| 逾時 | `$StageTimeoutSec` 真正接線,逾時 `Kill()` |
+| 第四態 | `TIMEOUT` —— **不冒充 FAIL 也不冒充 OK** |
+| 進度 | `Write-Progress` 進度列 + 每站耗時 |
+| 加速器 | `def_AccelLamp` 開跑先點 20 加速器名(缺席誠實說缺) |
+
+真 pwsh 7.4.6 實跑驗證:
+
+```
+=== ① 逾時真的會 Kill(上限 3s,子行程要跑 30s)===
+  [RUN    ] 慢站 · 逾時上限 3s · 子行程輸出即時轉播 ↓
+      |   慢站心跳 1/30 … 4/30
+  [TIMEOUT] 慢站 · 3.3s          ← 不是 30s
+=== ② 輸出即時轉播 ===
+      | 逐步輸出 1 … 5           ← 逐行出現,不再等到最後
+```
+
+**`CGC_MDL064_SelftestGrid_v0262.py`** — 格子端補三件:
+
+- 動態進度條:TTY 走 `\r` 就地重畫;**非 TTY 每 10 站一行**(被導向檔案時,
+  200 行進度條會把站名洗光)
+- `SELFTEST_PROGRESS.json` 心跳每站落檔 —— 外部可以證明行程還活著,
+  不必去猜「沒輸出」是卡死還是在跑
+- Ctrl+C 安全落檔:**中斷不是崩潰**。已跑完的站是真證據,寫出來;
+  沒跑到的標 `NOT_RUN`(不冒充 `SKIP`);`rc=130` 不冒充成功也不冒充失敗
+
+加速器點名實測:`Celeritas OK · lib 9/88 · 能力 7/31 · 執行緒預算 3 · maxsafe · 缺 79 支(列名不假在)`。
+
+### 自審:我差點自己製造一個新的假訊息
+
+心跳檔本來命名 `GRID_PROGRESS.json`。**我自己的測試第一次就踩到** ——
+`sorted(glob("GRID_*.json"))[-1]` 取到的是心跳不是證據(字母序 `GRID_P` > `GRID_2`)。
+
+追下去發現會被害的不只我的測試:
+
+| 消費者 | 取法 | 後果 |
+|---|---|---|
+| `VRN_ENG068_DailyBrief`(三版) | `sorted(glob("GRID_*.json"))` | 取到心跳 |
+| `CGC_MDL131_ProjectCompletion` | **按 mtime** | 心跳永遠最後寫 → **必中** |
+| `CGC_MDL095_DeckServer` | `[-1]` | 取到心跳 |
+| `Invoke-VIA-FinishLine` | `-Filter 'GRID_*.json'` | 取到心跳 |
+
+改名 `SELFTEST_PROGRESS.json`。
+**教訓:新增產出檔之前,先查誰在 glob 同一個樣式。**
+
+### 死路修:修好了但送不到,等於沒修
+
+倉庫裡**沒有任何東西呼叫 AllGreen**。`via-go` 是操作員自己放在 PATH 上的檔,
+指向寫死的 `v0100` —— 批358 已記「PATH 上已有操作員之 via-go;同名=九頭龍→讓位」,
+所以短令冊永遠不能佔 `via-go` 這個名。
+
+**只推 v0101 的話,操作員的 `via-go` 照樣跑 v0100、照樣卡。**
+
+→ `Register v0167` 新登錄 `via-allgreen`(尾版律 glob `Invoke-VIA-AllGreen-v*.ps1`;
+別名 `統包`)+ `via-allgreen.cmd` 梭(機制與正典 `via-closeout.cmd` 逐行相同)。
+新版一落地就自動生效,不必再改任何寫死路徑。
+
+回歸:橋743 **9/9** · 橋744 **11/11** · ENG072 v0107 **16/16** · ENG073 v0114 **33/33**。
+四支 `.ps1` 全數通過 `Parser::ParseFile`(含批421 的 `v0166` —— 那批我沒驗過語法,補驗了)。
+
+## 五十一、批424:TEST→DEBUG→…→TEST 五輪實跑——修的是自測本身在污染正本
+
+操作員令:「TEST DEBUG OPTIMIZE TEST DEBUG CONSOLIDATE TEST DEBUG **TILL THEY WORKS**」。
+不是給指令,是在沙盒裡把 201 站自測矩陣**跑到修完**。
+
+| 輪 | 結果 | 這一輪做了什麼 |
+|---|---|---|
+| R1 | OK 162 · FAIL 36 · 151s | 基準。批423 的進度條與心跳全程生效,不再有畫面空白 |
+| R2 | — | 補件(pyarrow/bs4/yfinance/fastparquet/lxml) |
+| R3 | — | 補件(openpyxl/matplotlib/opencc) |
+| R4 | OK 173 · FAIL 25 | 補 pytest、jieba |
+| R5 | **OK 177 · FAIL 22** | 自指站落後一輪的驗證 |
+
+**15 站轉綠。**
+
+### 真缺陷:自測每跑一次就往正本冊塞一筆
+
+```python
+# SUP_MDL742_ToolLadder_v0100.py selftest ⑥⑦
+e2 = escalate("OCR_PDF_TEXT", 3, "selftest 演練證據:L1 pdfplumber 對掃描件回空文字")
+#    ↑ escalate() 寫的是正本 VIA_Tool_Escalation_Ladder_v0100.json
+```
+
+本 session 十餘跑,`escalation_log` **66 筆 → 78 筆**,全是「selftest 演練證據」。
+工作站每天跑一次 `via-selftest` 就多一筆,**真實升階紀錄會被演練資料淹沒**。
+這違反正本零觸碰。
+
+修法(`v0101`)刻意不走捷徑:
+
+- 自測期間把 `LADDER_P` 改指 tempdir 內的正本副本
+- **`escalate()` 一行未改、不加測試旗標、不弱化斷言** —— 走的仍是同一條真實寫入路徑
+- 新增檢⑩:`sha256` 前後比對證明正本零位元變動,**且副本確實多一筆**
+  (證明寫入真的發生了,這一檢不是空轉)
+
+驗證:連跑三次自測,正本仍 66 筆、`git diff` 無變更;十檢 **10/10**。
+
+### 結構性事實:自指站永遠慢一拍(不是回歸)
+
+格子裡有四個站讀**格子自己的存證**:
+
+| 站 | 讀什麼 |
+|---|---|
+| MDL088 五系統測試分頁 · MDL104 測試結果總表 · MDL110 三軌測試矩陣 | 最新 `GRID_*.json` |
+| MDL093 治理台 UI Matrix | 綠燈率 ≥95% |
+
+它們在格子**內**跑時,本輪存證還沒落檔,讀到的是**上一輪**的證據。
+所以修好之後的第一輪它們仍紅,第二輪才轉綠。
+
+實測對照:**R4 三站紅,但單獨跑全綠;R5 三站全綠。**
+`MDL093` 例外 —— 它斷言的是綠燈率,那是**後果不是原因**,別家紅它就跟著紅。
+
+這條已寫進 `Grid v0263` 檔頭,免得下次有人把它誤判成回歸。
+
+### 兩個 pip 教訓
+
+1. **批次安裝會互相拖累。** `jieba` 建 wheel 失敗,把同一批的 `openpyxl`/`matplotlib`/
+   `opencc` 全拖下水 —— 三支都沒裝成,而輸出看起來像成功。**分開裝才看得出誰真的失敗。**
+2. **jieba 是純 Python。** pip 建不起來時,把套件目錄直接搬進 `site-packages` 就能用
+   (分詞實測 `['台積電','第三季','毛利率','創高']` 正確)。
+
+補件的連鎖效果:`opencc` 一裝就修掉 `ENG066 ②`(9/9)與 `ENG064 ②③b`;
+`pytest` 修掉 `ENG064 ⑧`;`jieba` 補上後 `ENG064` 9/9、`SUP_MDL742 ④` 轉綠。
+
+### 剩下 22 站沒有被改成綠
+
+| 類 | 站數 | 為什麼不動 |
+|---|---|---|
+| 要操作員的 DuckDB | ~19 | `global_daily`/`tw_daily_prices`/`tw_listings`/`tw_prices_adj`/`features_daily`/ETF 共識庫。**沙盒沒有庫就是沒有**,檢誠實地紅 |
+| 後果非原因 | 1 | `MDL093` 綠燈率 |
+| 沙盒環境 | ~2 | matplotlib 缺 CJK 字型(`findfont`) |
+
+其中 `MDL105 ⑨` 值得單記:它斷言 `VIA_UI_ETFConsensusAnalysis_v0100.html` 存在,
+查出該頁**自批303 起就在 `.gitignore:311`**(產出物不入庫),
+產生器 `VDF_ENG068` 在無庫時誠實停(`[ETF共識] 在庫來源缺=誠實停`)→ 同屬資料依賴。
+
+**弱化斷言就是造假。** `SUP_MDL742 ④` 斷言 jieba 這個最輕階必須在位 ——
+我的解法是把 jieba 裝起來,不是把斷言拿掉。
+
+### 清理
+
+五輪跑下來沙盒重生了 **25 個產出檔**(19 個 `ui_support` HTML + 6 個 `registry` JSON,
+其中 `VIA_Schema_Registry` 少了 **343 行** = 沙盒無庫的塌陷),全數 `git checkout` 還原。
+**不把沙盒狀態寫進正本** —— 批416、批421 之後同一教訓的第三次。
+
+## 五十二、批425:自己造報告把 VRN 跑到 GREEN——四例「參數在、線沒接」
+
+操作員令:「Test by yourself debug optimize test debug **till VRN works** and then **verify if VDF works**」。
+
+沙盒沒有操作員的報告,也沒有他的庫。所以自己造:五份**符合命名慣例的真 PDF**
+(中文券商個股 / GS 英文個股 / 民國日期檔名 / 晨會報告 / 產業報告)+ 一個
+`tw_daily_prices(date, ticker, close, adj_close)` 的 DuckDB,然後跑**真 `run`**,不是跑自測。
+
+### VRN 最終:GREEN
+
+```
+[via-closeout vrn] GREEN · 報告 5(DONE 3 · FAIL 0 · PENDING 0)· 三方對照 5/5
+  DONE    志強-KY(6768)   段 4/4  BASIC VERIFIED  FIN VERIFIED  四點✓
+  DONE    GS-2330        段 4/4  BASIC VERIFIED  FIN VERIFIED  四點✓
+  DONE    慧洋-KY(2637)   段 4/4  BASIC VERIFIED  FIN VERIFIED  四點✓
+  DONE_NS 晨會報告 · 產業報告
+```
+
+| 報告 | 目標價 | adj close | 算出上漲 | 對照 |
+|---|---|---|---|---|
+| 志強-KY(6768) | 145 | 118.0 | **22.9%** | 報告自稱 23.0% → `ROUNDING_ONLY` |
+| GS-2330 | 1275 | 1130.0 | **12.8%** | — |
+| 慧洋-KY(2637) | 78 | 68.9 | **13.2%** | — |
+
+### 一路上修的四件,全是同一個病
+
+**參數在、線沒接。**
+
+| # | 位置 | 病灶 | 實跑證據 |
+|---|---|---|---|
+| ① | `ENG073 v0114` | `main()` 是光禿禿的 `return run()`;`run(zdir, db)` 簽名擺著,CLI 從不解析 `--dir`/`--db`,**傳了不生效也不吭聲** | `--db` 被吞 → 讀到殘留舊庫,`庫 8 · DB_NO_MATCH` |
+| ② | `ENG074 v0102` | run 分支寫死 `run(d, None, ...)` —— db 那格是 `None`;而 `--db` 在 `--crosscheck` 分支**有**解析,所以更難察覺 | 印「對照 5 件 → 28 列」,收尾讀 X 卻是「已對照 **0/5**」 |
+| ③ | `MDL141 v0104` | `main()` 不解析 `--db`/`--zones`,但 `vrn_closeout(..., db=DB_TW)` 參數一直在、`closeout(**kw)` 一直會轉發 | ENG080 報 GREEN、上漲已算 3/3,收尾卻三份都印「**四點-**」 |
+| ④ | `AllGreen v0100`(批423 已修) | `$StageTimeoutSec` 宣告了整檔沒用過 | 任一站卡住就永遠等 |
+
+**四天內同一模式第四次。** 已寫進 `Grid v0264` 檔頭。
+三支的新檢都用**攔真實呼叫**證明旗標有傳到,不掃原始碼字串
+——那只證明字在,不證明會生效。
+
+### 自審:兩次差點把自己的錯報成引擎的錯
+
+1. 第一版 fixture 抽回來是 `NT,275`,我一度認定是「千分位逗號解析 bug」。
+   實查是 **bash heredoc 沒加引號,`$1` 被當成位置參數吃掉了** —— 引擎無辜。
+2. `ENG080` 起初報 `adj — · 上漲未算`。查出是我的價表沒有 `adj_close` 欄,
+   而引擎**誠實拒絕拿 `close` 頂替**(「Adjusted 與原始不混用」)—— 正確行為,不是 bug。
+   補欄後 3/3 全算出。
+
+**先證明是被測物的錯,再動被測物。**
+
+### VDF 驗證
+
+`via-rungate --family vdf`:**引擎 8/8 OK · 必要庫 4/4** · 選配 2/4。
+判 `YELLOW` 的唯一原因是沙盒無 `via_vdf_312` 家族境、退 base python
+(誠實標註「能跑≠本位」)—— 不是程式碼問題。
+
+自測過不等於產得出資料,所以再跑兩支唯讀動詞驗真:
+
+```
+VDF_ENG081 check → 2025-12-04 價 2 · 12-03 價 4 · 12-02 價 4 · 12-01 價 4
+                   RED 籌碼表缺 (tw_chip_inst, tw_chip_margin)
+VDF_ENG079 scan  → RED 本機三庫根缺 C:\新增資料夾(Windows 路徑,沙盒本來就沒有)
+```
+
+`ENG081` **真的讀到了我的價表**,每日檔數與插入列數完全吻合,然後誠實紅在缺料上。
+
+**離線驗不到的部分照實說**:價格 / 籌碼 / 月營收的**擷取道**要同意閘 + 網路。
+我不代設同意閘,所以那一段未驗。
+
+### 回歸
+
+`ENG072 v0107` 16/16 · `ENG073 v0115` **34/34** · `ENG074 v0103` **16/16** ·
+`ENG080 v0102` 15/15 · `MDL141 v0105` **12/12**。
