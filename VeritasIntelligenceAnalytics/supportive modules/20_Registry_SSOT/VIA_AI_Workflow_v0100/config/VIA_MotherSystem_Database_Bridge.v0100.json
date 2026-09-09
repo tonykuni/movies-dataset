@@ -1,0 +1,54 @@
+{
+  "bridge_id": "VIA-AI-BRIDGE-000001",
+  "version": "0100",
+  "repository": {
+    "remote": "https://github.com/tonykuni/movies-dataset",
+    "canonical_relative_root": "VeritasIntelligenceAnalytics",
+    "local_root_candidates": [
+      "C:\\Users\\tonyk\\movies-dataset\\VeritasIntelligenceAnalytics",
+      "C:\\Users\\tonyk\\Github\\movies-dataset\\VeritasIntelligenceAnalytics"
+    ],
+    "root_environment_variable": "VIA_REPO_ROOT"
+  },
+  "data_plane": {
+    "mode": "local_external",
+    "root_environment_variable": "VIA_DATA_ROOT",
+    "relative_candidates": ["data", "database", "warehouse", "functional modules/VDF/data"],
+    "catalog_patterns": ["*.duckdb", "*.db", "*.parquet", "*.csv"],
+    "preferred_query_engine": "DuckDB",
+    "preferred_storage": "Parquet",
+    "upload_to_github": false
+  },
+  "database_contract": {
+    "read_before_fetch": true,
+    "incremental_update": true,
+    "checkpoint_resume": true,
+    "deduplicate": true,
+    "primary_key_required": true,
+    "schema_fingerprint_required": true,
+    "source_lineage_required": true,
+    "adjusted_price_fields": ["Adj Open", "Adj High", "Adj Low", "Adj Close"],
+    "taiwan_volume_views": ["original", "net_of_day_trade"],
+    "display_date_format": "YYYY/MM/DD",
+    "chart_date_format": "YYYY-MM-DD"
+  },
+  "github_allowlist": [
+    "source_code",
+    "contracts",
+    "schemas",
+    "migrations",
+    "lockfiles",
+    "small_fixtures",
+    "summary_evidence",
+    "handoff_packets"
+  ],
+  "github_denylist": [
+    "duckdb_database",
+    "parquet_dataset",
+    "pdf_corpus",
+    "model_weights",
+    "secrets",
+    "full_logs",
+    "full_backtest_results"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "module_id": "VIA-AI-000001",
+  "version": "0100",
+  "layer": "PREFLIGHT",
+  "slug": "preflight",
+  "title": "VIA task preflight",
+  "status": "validated",
+  "owner": "VIA",
+  "purpose": "Freeze task scope and verify repository, branch, SSOT, ownership, security and data boundaries before work begins.",
+  "dependencies": [],
+  "inputs": [
+    {"name": "task_context_pack", "type": "json", "required": true},
+    {"name": "git_base_sha", "type": "string", "required": true}
+  ],
+  "outputs": [
+    {"name": "preflight_result", "type": "json", "required": true},
+    {"name": "owned_scope", "type": "json", "required": true}
+  ],
+  "owned_paths": [],
+  "owned_symbols": [],
+  "steps": [
+    {"step_id": "S01", "action": "Resolve VIA repository root from environment and approved candidates.", "on_failure": "stop"},
+    {"step_id": "S02", "action": "Verify branch is isolated and base SHA matches the task pack.", "on_failure": "stop"},
+    {"step_id": "S03", "action": "Resolve canonical anchors and freeze locks without modifying them.", "on_failure": "stop"},
+    {"step_id": "S04", "action": "Reject overlapping path or symbol ownership and forbidden data uploads.", "on_failure": "stop"}
+  ],
+  "gates": ["STATIC", "CONTRACT"],
+  "metadata": {"stage": 1, "fail_closed": true}
+}
+

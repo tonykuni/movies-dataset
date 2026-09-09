@@ -1,0 +1,29 @@
+{
+  "module_id": "VIA-AI-000006",
+  "version": "0100",
+  "layer": "OPS",
+  "slug": "handoff-github",
+  "title": "VIA multi-AI handoff and GitHub delivery",
+  "status": "validated",
+  "owner": "VIA",
+  "purpose": "Package minimal reproducible context, checksums and Git state so another AI can continue safely through an isolated GitHub branch.",
+  "dependencies": ["VIA-AI-000005"],
+  "inputs": [
+    {"name": "gate_matrix", "type": "json", "required": true},
+    {"name": "git_state", "type": "json", "required": true}
+  ],
+  "outputs": [
+    {"name": "handoff_packet", "type": "json", "required": true},
+    {"name": "promote_plan", "type": "markdown", "required": true}
+  ],
+  "owned_paths": [],
+  "owned_symbols": [],
+  "steps": [
+    {"step_id": "S01", "action": "Verify changed paths and symbols match ownership and ID lease.", "on_failure": "stop"},
+    {"step_id": "S02", "action": "Record base SHA, head SHA, artifact hashes, tests, unresolved risks and rollback.", "on_failure": "stop"},
+    {"step_id": "S03", "action": "Push only code-plane allowlisted artifacts to the agent branch.", "on_failure": "stop"},
+    {"step_id": "S04", "action": "Open a reviewable PR and require human approval for Promotion.", "on_failure": "review_required"}
+  ],
+  "gates": ["CONTRACT", "REGRESSION", "USER_TEST"],
+  "metadata": {"stage": 6, "direct_merge": false, "force_push": false}
+}
