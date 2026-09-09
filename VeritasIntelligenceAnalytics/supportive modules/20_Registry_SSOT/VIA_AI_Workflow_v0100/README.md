@@ -12,11 +12,11 @@
 | AST runtime | `supportive modules/VIA_Panorama_AST_RuntimeInjector.py` |
 | Runtime bridge | `supportive modules/VIA_Runtime_Bridge_All_in_One.py` |
 | Governance engine | `supportive modules/VIA_Central_Governance/CGC_MDL001_CentralGovernanceEngine_v0401.py` |
-| AI workflow bridge | `supportive modules/registry/CGC_MDL142_AIWorkflowBridge_v0100.py` |
+| AI workflow bridge proposal | `supportive modules/20_Registry_SSOT/VIA_AI_Workflow_v0100/src/via_mother_system_bridge.py` |
 
 上述既有檔案維持原狀。本套件只提供契約、索引與交接橋接，不直接 Promotion、不改名、不刪除舊版本。
 
-`CGC_MDL142_AIWorkflowBridge_v0100.py` 位於母系統既有 registry 掃描目錄，讓現行 System Manager 能盤點此能力；其 lifecycle 固定為 `REGISTRATION_PROPOSAL`，不會自行升級為 active。
+`via_mother_system_bridge.py` 保留 `CGC_MDL142` 候選身分，但放在本套件內，不進入母系統 live registry 掃描。只有完成 MasterControl 再生比對、Zero-Hydra 審查與人工核准後，才可依 Registration Proposal 移入正式 registry。
 
 ## Six-layer instruction model
 

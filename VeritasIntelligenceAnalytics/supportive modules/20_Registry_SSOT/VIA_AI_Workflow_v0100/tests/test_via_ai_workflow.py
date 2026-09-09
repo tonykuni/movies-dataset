@@ -16,7 +16,7 @@ from unittest import mock
 
 PACKAGE_ROOT = Path(__file__).resolve().parents[1]
 SOURCE_PATH = PACKAGE_ROOT / "src" / "via_ai_workflow.py"
-BRIDGE_PATH = PACKAGE_ROOT.parents[1] / "registry" / "CGC_MDL142_AIWorkflowBridge_v0100.py"
+BRIDGE_PATH = PACKAGE_ROOT / "src" / "via_mother_system_bridge.py"
 SPEC = importlib.util.spec_from_file_location("via_ai_workflow", SOURCE_PATH)
 if SPEC is None or SPEC.loader is None:
     raise RuntimeError(f"Unable to import {SOURCE_PATH}")

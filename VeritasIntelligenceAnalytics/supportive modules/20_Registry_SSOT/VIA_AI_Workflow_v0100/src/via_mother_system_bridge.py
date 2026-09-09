@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""CGC_MDL142_AIWorkflowBridge_v0100 — AI 模組指令、AST 與多代理接棒橋接治理模組。"""
+"""CGC_MDL142 proposal — AI 模組指令、AST 與多代理接棒橋接治理模組。"""
 
 from __future__ import annotations
 
@@ -18,8 +18,8 @@ from typing import Sequence
 MODULE_ID = "CGC_MDL142"
 MODULE_VERSION = "0100"
 MODULE_STATUS = "REGISTRATION_PROPOSAL"
-SUPPORTIVE_ROOT = Path(__file__).resolve().parents[1]
-AI_WORKFLOW_ROOT = SUPPORTIVE_ROOT / "20_Registry_SSOT" / "VIA_AI_Workflow_v0100"
+AI_WORKFLOW_ROOT = Path(__file__).resolve().parents[1]
+SUPPORTIVE_ROOT = AI_WORKFLOW_ROOT.parents[1]
 AI_WORKFLOW_ENTRY = AI_WORKFLOW_ROOT / "src" / "via_ai_workflow.py"
 AI_REGISTRY = AI_WORKFLOW_ROOT / "registry" / "ai_module_registry.v0100.json"
 AI_BRIDGE_CONFIG = AI_WORKFLOW_ROOT / "config" / "VIA_MotherSystem_Database_Bridge.v0100.json"
@@ -31,7 +31,7 @@ AI_BRIDGE_CONFIG = AI_WORKFLOW_ROOT / "config" / "VIA_MotherSystem_Database_Brid
 
 
 def module_contract() -> dict[str, object]:
-    """Return the stable contract consumed by registry and mother-system scans."""
+    """Return the stable contract for review before mother-system promotion."""
     return {
         "module_id": MODULE_ID,
         "version": MODULE_VERSION,
@@ -53,6 +53,7 @@ def module_contract() -> dict[str, object]:
         "promotion": {
             "automatic": False,
             "requires_human_approval": True,
+            "target_after_approval": "supportive modules/registry/CGC_MDL142_AIWorkflowBridge_v0100.py",
         },
     }
 
@@ -79,6 +80,7 @@ def selftest() -> dict[str, object]:
         "workflow_entry_exists": AI_WORKFLOW_ENTRY.is_file(),
         "ai_registry_exists": AI_REGISTRY.is_file(),
         "database_bridge_exists": AI_BRIDGE_CONFIG.is_file(),
+        "not_in_live_registry": AI_WORKFLOW_ROOT in Path(__file__).resolve().parents,
     }
     workflow_result: dict[str, object] = {"status": "FAIL", "errors": ["not run"]}
     if all(checks.values()):
@@ -98,7 +100,7 @@ def selftest() -> dict[str, object]:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    """Expose bridge metadata, self-test, or the complete workflow CLI."""
+    """Expose proposal metadata, self-test, or the complete workflow CLI."""
     arguments = list(argv if argv is not None else sys.argv[1:])
     if not arguments or arguments[0] == "contract":
         print(json.dumps(module_contract(), ensure_ascii=False, indent=2))
