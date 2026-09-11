@@ -2250,3 +2250,94 @@ NLP 路徑=HUB(VIA_NLP_Application_System_v1.8.0) · 正典 MDL008=在 / TW02=�
 `GS-2330` 檔名沒帶公司名 → `NO_HINT`。這不是錯,只是無從對,所以是 N/A 不是綠。
 
 登錄:Grid v0266(站名「首頁全能引擎十二檢」→「十四檢」)、docs 五十四、台帳 920。
+
+## 五十五、批427b:`--dir` 三病合一 —— 而且第一個病是我給錯路徑
+
+操作員貼回工作站實錄：自測十四檢 14/14 過，但
+
+```
+> python "functional modules\VRN\VIA_VRN_FirstPageEngine_v0103.py" --dir "VIA_Reports\incoming"
+[絕] 無可處理檔(VIA_Reports\incoming)
+```
+
+**檔**：`functional modules/VRN/VIA_VRN_FirstPageEngine_v0104.py`（十六檢 16/16）
+
+### P1 路徑是我憑印象給錯的
+
+正典收件夾**不是** `VIA_Reports/incoming`，是：
+
+```
+functional modules/VRN/input_reports      ← 冊 dir_default
+functional modules/VRN/input/incoming     ← 冊 incoming(一律併入)
+```
+
+冊在 `supportive modules/registry/VIA_InputConsole_Spec_v0100.json` 的 `families.vrn.input`，
+MDL139 / MDL141 全走這條。我上一則的一貼即跑沒查冊。
+
+**這是本會期第三次同型錯誤：**
+
+| 批 | 我憑印象寫的 | 冊上真正的 |
+|---|---|---|
+| 425 | 站名「財報頁**表格**十五檢」 | 「財報頁**擷取**十五檢」（replace 靜默沒生效） |
+| 426 | 去連字號期望值 `'a b c'` | `'ab c'`（接回換行斷字才對） |
+| 427b | `VIA_Reports\incoming` | `functional modules/VRN/input/incoming` |
+
+三次都是「我以為我記得」。**記得不算證據，grep 才算。**
+
+### P2 三種原因壓成一句話
+
+夾不存在 / 夾是空的 / 夾有檔但副檔名不對 —— 這三件事對操作員的下一步**完全不同**
+（換路徑 / 放檔進去 / 看副檔名），v0103 一律回「`[絕] 無可處理檔`」。
+操作員看到的是「沒檔案」，真相卻是「夾根本不存在」，下一步全走錯。
+
+> **把不同的失敗壓成同一個訊息，等於把診斷資訊丟掉。**
+> 這正是我這幾批一直在修的病（批422 假綠、批425 靜默退後備）出現在我自己的碼裡。
+
+v0104 分三態講，並列出夾內實際有哪些副檔名各幾個：
+
+```
+[絕] 找不到可處理的報告檔。以下是**每個夾各自**的真實狀況
+     (報告夾律 --dir > user.vrn_dir > 冊 dir_default,incoming 一律併入;來源=冊 VIA_InputConsole_Spec_v0100.json):
+   · 夾不存在     …\VIA_Reports\incoming
+   · 夾是空的     …\functional modules\VRN\input_reports
+   · 夾有檔但沒有報告檔 …\input\incoming   [夾內其他檔:.txt×3、.xlsx×1]
+   認的副檔名=.pdf/.docx(大小寫不拘)
+   下一步:把報告放進下面這個**正典收件夾**,或用 --dir 指到你真正放報告的夾
+     …\functional modules\VRN\input\incoming
+```
+
+### P3 副檔名
+
+`glob("*.pdf")` 漏大寫 `.PDF`；而冊上 `extensions` 明明寫 `[".pdf", ".docx"]`，v0103 連 `.docx` 看都不看。
+v0104 走 `suffix.lower()`，兩種都收。
+
+### Q. 補 P 的時候當場撞出來的假紅
+
+修完 P 拿混合夾實跑，`台新AI伺服器-2317鴻海.docx` 檔名層**全對**
+（台新=券商、2317=代號、鴻海=名稱、對帳 MATCH），卻被判 **FAIL** —— 因為 `target_price` 抽不到。
+
+但 `.docx` 本來就沒有 PDF 文字層。**讀不到 ≠ 抽錯。**
+
+> 這是假紅，和批422 的假綠是**同一枚硬幣的兩面**：
+> 證據不可得的時候，燈要給 N/A，不是給顏色。
+
+`run()` 產出 `text_state`；無文字層時文字類的閘
+（`target_price` / `tp_sanity` / `zone_presence` / `filename_vs_page` / `historical`）
+一律降成 `N/A_NO_TEXT`，而**檔名類的閘照常判** —— 代號、券商、名稱對帳正是 `.docx` 仍然有用的部分，
+名稱對不上照樣要紅（檢⑯ 有這組對照）。
+
+順帶修了檢⑩ 的斷言：`--file` 缺值原本斷言 `rc==0`。但旗標打壞卻回成功，
+對串鏈的呼叫端就是一句謊（`via-closeout --run` 靠 `rc≠0` 才會誠實停）→ 改斷言 `rc==2` 且訊息說得出原因。
+
+### 實跑（混合夾六件全 PASS）
+
+```
+[PASS] 20251204兆豐個股報告-志強-KY(6768).pdf   個股    6768 MEGA    TP=145.0  志強-KY→志強-KY[MATCH/VDF_DB]
+[PASS] 20251205兆豐晨會報告-當日新聞與重要訊息評論   大盤晨報  -    MEGA    TP=-      -→?[NO_TICKER]
+[PASS] GS-2330 20251205.PDF                  個股    2330 GOLDMAN TP=1275.0 -→台積電[NO_HINT/VDF_DB]    ← 大寫副檔名
+[PASS] GS-AI PCB CCL 20251204.pdf            產業    -    GOLDMAN TP=-      -→?[NO_TICKER]
+[PASS] 台新AI伺服器-2317鴻海.docx               個股    2317 TAISHIN TP=- 文字層=無 鴻海→鴻海[MATCH/VDF_DB]  ← .docx 走檔名層
+[PASS] 華南投顧-2637-慧洋-KY-1141202.pdf        個股    2637 HUANAN  TP=78.0   慧洋-KY→慧洋-KY[MATCH/VDF_DB]
+```
+
+登錄：Grid v0267（站名「首頁全能引擎十四檢」→「十六檢」）、docs 五十五、台帳 921。
