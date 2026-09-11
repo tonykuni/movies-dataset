@@ -4428,3 +4428,67 @@ raise RuntimeError("none of the requested Tesseract languages are installed")
 |---|---|---|
 | `VRN_ENG072_FirstPageText` | v0112 | 二十一檢 21/21 |
 | `CGC_MDL064_SelftestGrid` | v0290 | 站名改 |
+
+## 七十九、批451:診斷對了不等於看得下去;「在位」不等於「跑得動」
+
+### 批450 的逐支因由答對了
+
+```
+tesseract:FAIL/0元素 錯=RuntimeError: none of the requested Tesseract languages are installed
+paddleocr:SKIPPED_UNAVAILABLE/0元素 探針=requires paddleocr, paddlepaddle, and cached models
+paddle_ppstructure:SKIPPED_UNAVAILABLE/0元素 探針=requires … PP-Structure models
+```
+
+八份候 OCR 的因由一模一樣。**不是影像的問題。**
+
+### 而且比我預判的更硬
+
+我上一輪猜「`missing Tesseract languages: chi_tra`,改用 eng」。
+查 GLE 的 `resolved_tesseract_languages`(`all_backend_engines.py:154`)才知道
+它**還有一層退路**:
+
+```python
+if not selected and "eng" in available:
+    selected = ["eng"]
+```
+
+請求的語言全不在時,只要 `eng` 在就退 `eng`。
+會拋出那個 `RuntimeError` = **連 `eng` 都不在** —— `tesseract --list-langs`
+回空,tessdata 裡一個語言檔都沒有。
+
+**所以正解不是「補 chi_tra」,是先確認 tessdata 到底有沒有東西。**
+
+### 同一貼也照出兩個我自己造的問題
+
+**① 診斷對了,呈現把它埋掉了。**
+第三階原樣複述第二階的整包逐支因由,一行約 1,200 字 × 8 份,終端讀不下去。
+兩階因由一字不差時只寫「同第二階」;不同才印——那才是新資訊。
+
+**② 在位不等於跑得動。**
+矩陣說 tesseract「在位 1/7」,而它每一份都 FAIL。
+就緒燈只有「就緒 / 未就緒」兩態,**講不出這件事**。補第三態:
+
+```
+[OCR 在位但不可用] tesseract 在矩陣上算在位,但 --list-langs 回空(tessdata 無語言檔)
+                   ——它會逐份 FAIL,不是影像的問題
+   A. 補語言檔:chi_tra / chi_sim / eng.traineddata → <Tesseract>\tessdata\
+      或設 TESSDATA_PREFIX 指到真的有 .traineddata 的夾
+   B. 改走 PaddleOCR(中文較強,道二 PPP 也會一起活過來)
+```
+
+另加 `tess_langs()` 直接跑 `tesseract --list-langs` 把**事實**印出來:
+主程式不在就說不在;有裝但沒中文就點名「沒有中文,中文報告會抽不到字」。
+**不要用一句話含糊帶過三種不同的狀況。**
+
+### 本輪其他全綠
+
+批447 整對換全中(`MS-2308 1288/932` · `JP-3653 3650/2470` · `MS-8210 730/621` ·
+`中信金 63`);批446 夾律與替根讓 64 件全取到、ENG080 `rc=0`;
+收尾 `DONE 27 · FAIL 10 · PENDING 6`。
+
+### 落地
+
+| 件 | 版 | 檢 |
+|---|---|---|
+| `VRN_ENG072_FirstPageText` | v0113 | 二十二檢 22/22 |
+| `CGC_MDL064_SelftestGrid` | v0291 | 站名改 |
