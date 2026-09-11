@@ -3742,3 +3742,150 @@ TP 前後差:只有 JP-3653 一份(2,470 → 3,650)
 ```
 
 登錄:引擎 v0120、ENG073 v0117、ENG072 v0109、Grid v0283、docs 七十一、台帳 937。
+
+## 七十二、批444:先查再造第五次 —— 而且這一次我先講錯,再改回來
+
+操作員上傳 `VIA_PDFPlumberPlusEngine.py`(1196 行)並令「接上去」。
+
+### 先把話講回來
+
+我上一輪對操作員說過:「這包真正庫裡沒有的,是它**真的會去建構** PaddleOCR /
+PP-Structure。」**那句是錯的。**
+
+查了 `GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine/all_backend_engines.py`
+第 1334–1348 行才知道,GLE 的 `PaddleOcrEngine.extract()` 一樣真的
+`from paddleocr import PaddleOCR` 並建構,而且**連 3.x 新 API 都接**——
+`PPStructureV3` / `LayoutDetection` / `engine.predict()`;這一包只接得動 2.x
+(`PPStructure`、`use_gpu`、`show_log` 都是 2.x 才有的鍵)。論 OCR 建構,
+**庫裡那支比較新**。
+
+所以這條車道的定位不是取代,是**補位**:誰在位誰上。
+
+### 逐項對照後,真正非重疊的三件
+
+| | 這一包 | 庫裡本來有的 |
+|---|---|---|
+| OCR 建構 | paddleocr **2.x**,`_build()` 逐鍵剝除不支援 kwargs | GLE:**2.x + 3.x**,七支後端路由 |
+| 渲染 | 記憶體內 fitz→NumPy,不落暫存圖 | GLE:fitz→PNG 落地 |
+| 抽表 | **四策略**(lines / lines+text / text+lines / text)+重疊率去重+表頭回溯+填充率平方化評分 | GLE 的 pdfplumber 轉接器:**只跑 lines/lines 一種** |
+| 逐頁分流 | **字元密度閘** | 沒有。ENG072 也沒有 |
+
+四策略是真的有差。同一批真檔跑下來,勝出的策略各不相同:
+
+```
+synthetic_financial_report.pdf   S1_lines        3 列×4 欄
+EarningsInsight_062626.pdf       S4_text        20 列×10 欄   ← lines/lines 一張都找不到
+VisualLock_v0109_SLIDES.pdf      S4_text        19 列×12 欄
+TALib_參考_A_14頁.pdf            S3_text_lines  15 列×10 欄
+```
+
+### 真正的收穫是密度閘,而且一個新套件都不必裝
+
+ENG072 到 v0109 為止的判準是:
+
+```python
+txt = doc[0].get_text("text", sort=True).strip()
+if txt:
+    return txt, "FITZ_LAYOUT"
+```
+
+抽得到**一個字**就算有文字層。一頁只有浮水印文字層(「機密」「DRAFT」十來個字)
+的掃描頁會被這一問放行,首頁引擎再從那十來個字裡找目標價——**那是假綠**。
+而且是最難查的那種假綠,因為它**有值**。
+
+密度閘把「字數 ÷ 頁面點面積」一起看,浮水印那種頁 3e-05 遠低於 2e-04 就擋下來。
+
+### 但密度單獨用會誤殺 —— 批440 那一課第二次現身
+
+全庫 20 件 PDF 掃過一輪,跳出一件:
+
+```
+supportive modules/specs/Veritas Intelligence Analytics Brief.pdf
+  949 × 7448 點(14.1 倍 A4 面積)· 首頁 862 字的 8–11pt 正文
+  密度 1.22e-04 < 門檻 2e-04  → 光看密度會判它「掃描頁」
+```
+
+那是**假紅**。一份長捲頁(web 式一頁 brief)的真文字層,被面積稀釋掉了。
+
+批440 的那一課——「改嚴一道閘之前要有真檔證據,合成測資只能證明碼會動,
+證不了它不亂點燈」——在這裡第二次現身,而且這次是我自己在收容件裡撿到的
+現成參數,更容易照單全收。
+
+修法:**密度只當訊號,不當判決**。誠實三態:
+
+| 態 | 判準 | 處置 |
+|---|---|---|
+| `DIGITAL` | 密度過門檻 | 照抽 |
+| `THIN` | 密度不足**但字數 >= 300** | **照抽**,只把「稀薄」標出來 |
+| `SCANNED` | 字數 < 300 且密度不足(或幾乎無字) | 走 OCR 車道 |
+| `UNKNOWN` | 探不動(檔不在/頁數不足/橋缺席) | 走 v0109 原路,零回歸 |
+
+界線 300 是量出來的:全庫最低的真文字首頁是 442 字
+(`synthetic_financial_report.pdf`),浮水印/戳章那種頁在 100 字以下,
+300 兩邊都留得住餘裕。
+
+### 閘要擋在對的地方
+
+第一次接的位置是 `extract_pdf_page1()` 裡——**錯的**。PDF 的正路是分區道
+`extract_page1_zones()`,浮水印那十幾個字照樣會讓 `zones["header"]` 非空,
+分區道就把它當首頁文字收下了。**閘擋在後面等於沒擋。**
+
+改成分流先跑,判 `SCANNED` 就整條分區道都不走,直接交給 OCR 車道;
+OCR 也跑不動就停在 `NEEDS_OCR[…·密度閘:…]`,把密度因由寫進標記——
+不靜靜把浮水印那十幾個字當首頁文字送下去。
+
+### OCR 兩車道
+
+```
+道一 GLE(SUP_MDL743)  七支後端,含 paddleocr 3.x 新 API   ← 先走
+道二 PPP(SUP_MDL746)  只接 2.x,但記憶體內渲染不落暫存圖   ← 道一整條不在位才換
+```
+
+順序的理由是**涵蓋面**,不是偏好。兩條都不在位就誠實停在 `NEEDS_OCR`,
+兩條的因由都印出來:
+
+```
+[OCR 未就緒] 道一 GLE 路由 7 支全未裝(tesseract, paddleocr, …) · 道二 PPP 缺 paddleocr
+```
+
+### 自審三條
+
+**① 候OCR 那格一直報 0。** 批443 起 `NEEDS_OCR` 帶了因由後綴,而 v0109 的
+`key = tag if tag in stats` 對不上鍵,整批被算進 `OTHER`。改取「[」前的基名。
+
+**② ENG072 的檢數也是手寫**(`16 - len(fails)`)。這是第四支同病
+(前三支在批438/批442/批443),一併改成 `done.append(name)` 真的數。
+
+**③ fixture 太瘦。** `fx_report.pdf` 首頁只有 38 個字,密度閘**正確地**把它
+判成掃描頁——38 字的一頁和只有浮水印的掃描頁本來就分不出來。
+修法不是把閘放寬(那等於白做),是把 fixture 加厚成**像一頁真報告**(2194 字)。
+fixture 太瘦就代表不了它要代表的東西。
+
+### 紀律
+
+* **收容件原地不動**——不是宣告,是證據:全部服務道跑過一輪後
+  收容件 SHA-256 不變(`d1a4d8f037ce…`),且原始碼裡凡提到 `INTAKE` 的行
+  一行都沒有寫檔動詞。
+* 它 `_PARAMS["VIA_ROOT"]` 硬寫 `C:\Users\tonyk\OneDrive\VeritasIntelligenceAnalytics`
+  ——**操作員實機不是這條**(是 `…\OneDrive\Documents\movies-dataset\…`)。
+  橋一律用 `CFG["out_dir"]` 蓋過去,落到 `VIA_Reports/pdfplumber_plus/`(已入 .gitignore)。
+* 零網路、零彈窗(它只寫 report.html 不自己開窗;stderr 進度條在**記憶體內**關掉,
+  檔案一位元不動)。
+
+### 落地
+
+| 件 | 版 | 檢 |
+|---|---|---|
+| `SUP_MDL746_PDFPlumberPlusHub` | v0100 | 九檢 9/9 |
+| `VRN_ENG072_FirstPageText` | v0110 | 十八檢 18/18 |
+| `CGC_MDL064_SelftestGrid` | v0284 | +「PDFPlumber-Plus 統轄橋九檢」站 |
+| `Register-VIA-Commands` | v0168 | +`via-ppp`(別名 抽表橋) |
+
+短令:
+
+```powershell
+via-ppp                          # 狀態頁:掛載態/落地根/逐件在位/OCR 車道可跑否
+via-ppp --triage "C:\...\x.pdf"  # 這一頁到底有沒有文字層(DIGITAL/THIN/SCANNED)
+via-ppp --run    "C:\...\x.pdf"  # 整份跑並落地 JSON/CSV/MD/HTML + G00–G12 閘報
+via-ppp --selftest
+```
