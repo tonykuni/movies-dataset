@@ -2859,3 +2859,59 @@ JP-2330  TP=1275   乾淨抽取 → 被拉黃
 另庫加 `tpEvidenceLight()`（只有 P 拉燈），`FPE_VER v0110→v0111`；13/13 + 36/36 零回歸。
 
 登錄：Grid v0274（站名「二十五檢」→「二十六檢」，逾時 360→380）、docs 六十二、台帳 928。
+
+## 六十三、批435:多工具核對的本文 —— 但那東西早就造好了
+
+操作員令：「另外一邊有最新的 NLP 引擎／LAYOUT 引擎，將第一頁真正的內容相關本文及表格
+（不含底部小字體頁尾），多工具核對，至少兩種解取工具還原文字及表格後是一致的，先看驗證後的本文」。
+
+### 先查再造:`VRN_ENG072 v0107` 已經有了
+
+| | 方法 |
+|---|---|
+| 法A | `fitz` 分區 —— 標題帶／左本文／右資訊區／**頁尾帶（底 8% 當雜訊）** |
+| 法B | `pdfplumber` words 同判準分區 + `extract_tables` 表格還原 |
+| 法C | `GenericLayoutEngine v2.1.0` —— 九宮分區 + 字重階層 + 本文字級推定 |
+| 句級 | NLP `OneEngine TextProcessor`（帶 `ssot_lexicon`）修復後再 `split_sentences` |
+
+`compare_zones` 逐區 difflib：**≥0.90 AGREE ／ ≥0.60 PARTIAL ／ 低 DIVERGE**。
+產物就在 `VIA_Reports/first_page_text/<檔名>.json`。
+
+### 那我這支引擎在幹嘛 —— 它自己又判了一次版面
+
+本引擎從 v0101 起用自己的 `_pdf_chars` + `Layout` 判版面，**完全沒去讀 sidecar**。
+同一份 PDF 被判兩次版面，而且**下游用的是沒有經過雙法核對的那一份**。
+
+> 這是我造出來的重複，也是操作員這次問題的真正答案：
+> **不是「要做多工具核對」，是「已經做了，但我沒接」。**
+
+→ 新增 `SidecarBridge`：有 sidecar 就用驗證後的本文，沒有就退回自判並在 `text_source` 寫明走哪條。
+
+| `text_consensus` | 燈 |
+|---|---|
+| AGREE | PASS |
+| PARTIAL | WARN |
+| **DIVERGE** | **FAIL** |
+| 無 sidecar | `N/A_NO_SIDECAR` |
+
+**DIVERGE 判紅不判黃**：兩個獨立工具對同一頁讀出不同的字，那不是「有點疑慮」，
+是**下游拿到的字可能根本不是報告寫的**。
+
+`verified()` 在 DIVERGE 時仍把本文給出來供人看，但 state 已標明不可信 ——
+**不挑一份給下游當真**，回哪一份都是在猜。
+
+### 先看驗證後的本文
+
+```
+python … --dir --body 2330
+
+── GS-2330 20251205.pdf
+   核對=AGREE 相似度=1.0 工具=fitz+pdfplumber+GLE+NLP句級
+   來源=ENG072 sidecar(AGREE;fitz+pdfplumber+GLE+NLP句級)
+   ┌─ 本文(不含頁尾小字) ──────────────────────────────
+   │ Goldman Sachs Equity Research TSMC (2330 TT) Buy
+   │ 12-month target price: NT$1,275 Last close: NT$1,130.0
+   └──────────────────────────────────────────────────
+```
+
+登錄：Grid v0275（站名「二十六檢」→「二十七檢」，逾時 380→400）、docs 六十三、台帳 929。
