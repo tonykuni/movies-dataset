@@ -4492,3 +4492,76 @@ if not selected and "eng" in available:
 |---|---|---|
 | `VRN_ENG072_FirstPageText` | v0113 | 二十二檢 22/22 |
 | `CGC_MDL064_SelftestGrid` | v0291 | 站名改 |
+
+## 八十、批452:副本錯了要叫 —— 閘要叫,才叫閘
+
+工作站一貼,三件事同時出現。
+
+### ① `git pull` 被未解衝突擋住
+
+```
+error: Pulling is not possible because you have unmerged files.
+```
+
+工作副本有沒解完的 merge,得先解掉才拉得動。
+
+### ② 批451 猜對了
+
+```
+tesseract --list-langs
+List of available languages in "C:/Users/tonyk/OneDrive/Desktop/VRN/tessdata_best/" (0):
+```
+
+`TESSDATA_PREFIX` 指到的那個夾**是空的**——一個 `.traineddata` 都沒有。
+所以 GLE 的「請求的語言全不在就退 `eng`」也退不了,才拋
+`none of the requested Tesseract languages are installed`。
+
+**正解是把語言檔放進那個夾(或把 `TESSDATA_PREFIX` 指到真的有檔的夾),不是換引擎。**
+
+### ③ 最嚴重的:那一整跑,跑的是另一份副本
+
+操作員 `cd` 進 OneDrive 那份,`git pull` 也對著那份。而 `via-vrnval --run` 印出來的是:
+
+```
+報告夾空/缺:C:/Users/tonyk/Downloads/movies-dataset-b381/…/input/incoming
+存證        C:/Users/tonyk/Downloads/movies-dataset-b381/…/CLOSEOUT_latest.md
+IO Error: Cannot open file "C:/Users/tonyk/Github/movies-dataset/data/VeritasInt…
+```
+
+**同一分鐘內三個副本。** 短令是 PowerShell profile 點源的那一份定義的,
+**不隨 `cd` 走**。於是他對著 A 副本拉新碼、跑的是 B 副本的舊碼、庫又指到 C 副本
+——那一整跑的結論全部作廢。
+
+而畫面上**沒有任何一行**說「你跑的不是你以為的那一份」。
+
+> 批397 立了 `via-pin` 來**解**這件事,卻從來沒有人**警告**它正在發生。
+> **閘要叫,才叫閘。**
+
+`MDL139` v0102 加 `via_root_of()`(從任一路徑往上找出它屬於哪個副本根)
+與 `copy_check()`(比對「碼所在的副本」與「你站的位置」,不同就指路 `via-pin`);
+`MDL141` v0108 在收尾**開口第一句**印 `[副本警示]`。
+
+同批把替根候選從寫死兩條改成在 `~` / `~/Downloads` / `~/Github` /
+`~/OneDrive/Documents` 下 **glob `movies-dataset*`** —— b381 這種後綴、
+以後再多一份,都不必再改碼。(批440 律:這幾個父夾是工作站實錄**真的出現過**的,不是猜的。)
+
+### 自審兩條
+
+**① 正向分支從頭到尾沒被驗過。**
+新檢 ⑬ 第一版拿臨時假樹當「同副本」案例,而本檔住在本樹,對假樹當然 `same=False`
+——那根本不是同副本案例,而且判準沒 assert 它,純裝飾。
+改成拿本檔自己所在的樹去問,正反兩支都真的走一遍。
+
+**② 在描述這個 bug 的句子裡又犯了一次同一個 bug。**
+Grid 版史在 docstring 內,Windows 路徑的反斜線接大寫 `U` 會被當 unicode 逃逸,
+整檔 `SyntaxError`(批443 踩過一次)。而我這一批寫版史時**在說明這件事的那句話裡
+又寫了一次那個字面**,於是再炸一次。
+版史內路徑一律正斜線,**連舉例也不准寫反斜線**。
+
+### 落地
+
+| 件 | 版 | 檢 |
+|---|---|---|
+| `CGC_MDL139_InputConsole` | v0102 | 十三檢 13/13 |
+| `CGC_MDL141_ClosingGate` | v0108 | 十四檢 14/14 |
+| `CGC_MDL064_SelftestGrid` | v0292 | 站名改 |
