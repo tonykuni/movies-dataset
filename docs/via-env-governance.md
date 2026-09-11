@@ -4565,3 +4565,68 @@ Grid 版史在 docstring 內,Windows 路徑的反斜線接大寫 `U` 會被當 u
 | `CGC_MDL139_InputConsole` | v0102 | 十三檢 13/13 |
 | `CGC_MDL141_ClosingGate` | v0108 | 十四檢 14/14 |
 | `CGC_MDL064_SelftestGrid` | v0292 | 站名改 |
+
+## 八十一、批453:解藥自己有同一個病
+
+照著批452 的步驟跑 `via-pin`:
+
+```
+[via-pin] 本窗副本:C:/Users/tonyk/Downloads/movies-dataset-b381/…(Register-VIA-Commands-v0167.ps1)
+[via-pin] 新視窗預設(profile …):C:/Users/tonyk/Downloads/movies-dataset-b381/…
+[via-pin] 已是本副本;無事
+```
+
+而操作員人站在 `C:/Users/tonyk/OneDrive/Documents/movies-dataset/…`,
+`git pull` 也剛對著那份把批452 拉完。
+
+> 批452 才剛補的副本警示抓到了病,而這個「解藥」**自己也有同一個病**。
+
+### 根因
+
+```powershell
+$VIA      # ← 載入的那份腳本所在的副本(profile 點源進來的那個路徑)
+$pinned   # ← 讀 profile,指著同一份
+if ($pinned -eq $VIA) { "已是本副本;無事"; return }   # ← 恆真
+```
+
+**「本窗副本」這四個字從一開始就是假的**——它講的是「已載入的那份」,
+不是「你站的那份」。
+
+批397 造 `via-pin` 的目的就是解副本錯亂,而它偏偏**看不見使用者站在第三個地方**。
+所以它永遠解不了它被造出來要解的那件事。
+
+這比單純的 bug 更難查,因為它**回綠燈**:「已是本副本;無事」讀起來像確認,
+實際上是它根本沒去看你在哪。
+
+### 修
+
+`Get-VIACwdRoot` 從 cwd 一路往上找同時有 `supportive modules` 與
+`functional modules` 的那一層。`via-pin` 改以**你站的位置**為釘住目標,
+並把三個位置全印出來:
+
+```
+[via-pin] 你站的副本(cwd):              …
+[via-pin] 本視窗**已載入**的副本:        …
+[via-pin] 新視窗預設(profile …):        …
+[via-pin] **注意:本視窗現在跑的短令來自「已載入」那份,不是你站的這份**
+          ——換掉 profile 之後要**重開視窗**(或重新點源)才生效
+```
+
+舊版換完 profile 只印一句「已換」,**不講本視窗還是舊的**,
+於是換完立刻再跑,還是跑錯副本。
+
+不在任何副本裡就誠實叫人先 `cd`,不硬猜。
+實測三副本佈局:站在副本根、站在子夾都找得到根,站在副本外回 `null`。
+
+### 還沒解的
+
+* 操作員的 `tessdata_best` 夾仍是空的(`--list-langs` 回 0),語言檔要他自己放。
+* 他解衝突那一 commit 把一批先前未追蹤的檔(含 `.zip` 與 `_selftest.db`)
+  一起入了 git —— 二進位入庫是另一件事,先記著不動。
+
+### 落地
+
+| 件 | 版 |
+|---|---|
+| `Register-VIA-Commands` | v0169(`Get-VIACwdRoot` + via-pin 以 cwd 為準) |
+| `CGC_MDL064_SelftestGrid` | v0293 |
