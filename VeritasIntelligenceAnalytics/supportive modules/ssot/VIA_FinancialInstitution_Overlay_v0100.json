@@ -1,0 +1,291 @@
+{
+ "schema": "VIA_FINANCIAL_INSTITUTION_OVERLAY",
+ "version": "0100",
+ "base_ssot": "VIA_Financial_Institution_SSOT_v0100",
+ "rule": "正典唯讀(canonical_write_mode=READ_ONLY);本層只做「加別名／加機構／拒絕清單／檔名鍵對映」,不改正典一個字",
+ "provenance": {
+  "operator_order": "查一下GROK 在GITHUB的文件夾有無解方 昨天有過關 / 去摩通 / CLST·CLSA·里昂都可 / 大陸券商刪除 / 增持加碼",
+  "source_repo": "tonykuni/cherry-lagoon-honey-dove",
+  "source_files": [
+   "src/lib/via/vrn-broker-cache.ts",
+   "src/lib/via/vrn-rating-cache.ts"
+  ],
+  "source_head": "5898fa0(批405 分支;內容承 origin/main ad5b0a1 Export from Grok)",
+  "source_header": "Broker dict 29 + extended 28(無陸券)。GS=高盛;MS/大摩;JPM/小摩;刪「摩根」。"
+ },
+ "rulings": {
+  "JP": "檔名鍵 JP → 正典 JPM(裸 JP 只在**檔名命名空間**認,不進內文別名——兩字母 token 在內文會亂咬)",
+  "摩通": "依操作員令『去摩通』移入拒絕清單;Grok 正典的 JPM 別名本來就沒有這條,兩邊一致",
+  "CLST": "CLST / CLSA / 里昂 皆可 → 一律解到正典鍵 CLSA",
+  "GF/廣發": "大陸券商刪除 → 進拒絕清單(Grok 的 VRN_DROP_KEYS 早已列入);檔名鍵 GF 解析為拒絕並記因由",
+  "增持": "增持 = 加碼 = BUY(Grok 評等冊本來就兩條都在 BUY)。批419g:疊加層原本只寫了「增持」,「加碼」靠正典——正典缺席(vrn 境無 pydantic)時操作員親自裁決的一半就掉了,故補進疊加層自帶,不再依賴正典。",
+  "未評等": "未評等 = 未評級 = NR = NOT_RATED。出自操作員真檔名 瑞基(4171,NR_未評等)-CTBC251208;疊加層原本只有「未評級」。",
+  "評等基本詞": "批420:Buy/Hold/Sell/買進/中立/賣出 這些**基本詞**原本只在正典裡,疊加層只帶別名(增持/加碼/續抱…)。工作站實證:正典缺席時「原始評等字串 34 筆 → 正典鍵只 4 筆」,34 筆裡多數就是基本詞。與批419f 券商鍵同理——疊加層要能自足,故把基本詞一併帶上;正典在位時次序仍是正典先行,這些永遠不會蓋過正典。"
+ },
+ "deny_keys": [
+  "摩根",
+  "中信證券",
+  "中信建投",
+  "CITIC",
+  "CITIC Securities",
+  "國泰君安",
+  "國泰君安證券",
+  "Guotai Junan",
+  "中金",
+  "中金公司",
+  "CICC",
+  "海通",
+  "海通證券",
+  "Haitong",
+  "Haitong Securities",
+  "廣發",
+  "廣發證券",
+  "GF",
+  "GF Securities",
+  "摩通"
+ ],
+ "broker_alias_add": {
+  "YUANTA": [
+   "元大金控"
+  ],
+  "FUBON": [
+   "富邦金控"
+  ],
+  "CATHAY": [
+   "國泰金控"
+  ],
+  "FIRST": [
+   "第一"
+  ],
+  "CAPITAL": [
+   "群益證券"
+  ],
+  "MS": [
+   "摩根史坦利"
+  ],
+  "JPM": [
+   "JPMorgan Chase",
+   "JP摩根"
+  ],
+  "UBS": [
+   "UBS Group AG",
+   "UBS Group",
+   "瑞銀集團"
+  ],
+  "BOFA": [
+   "BAML",
+   "美國銀行美林證券",
+   "美銀美林"
+  ],
+  "CITI": [
+   "花旗銀行",
+   "花旗集團"
+  ],
+  "GS": [
+   "高盛集團"
+  ],
+  "NOMURA": [
+   "NMR",
+   "野村控股"
+  ],
+  "DAIWA": [
+   "Daiwa Securities",
+   "大和證券"
+  ],
+  "CLSA": [
+   "CLST",
+   "CLSA Securities Taiwan"
+  ]
+ },
+ "broker_add": [
+  {
+   "ssot_key": "JS",
+   "chinese_name": "日盛",
+   "english_name": "",
+   "country": "TW",
+   "aliases": [
+    "日盛",
+    "日盛"
+   ],
+   "category": "DOMESTIC_BROKER"
+  },
+  {
+   "ssot_key": "TCB",
+   "chinese_name": "合庫",
+   "english_name": "",
+   "country": "TW",
+   "aliases": [
+    "合庫",
+    "合庫"
+   ],
+   "category": "DOMESTIC_BROKER"
+  },
+  {
+   "ssot_key": "DH",
+   "chinese_name": "大華",
+   "english_name": "",
+   "country": "TW",
+   "aliases": [
+    "大華",
+    "大華"
+   ],
+   "category": "DOMESTIC_BROKER"
+  },
+  {
+   "ssot_key": "HY",
+   "chinese_name": "宏遠",
+   "english_name": "",
+   "country": "TW",
+   "aliases": [
+    "宏遠",
+    "宏遠"
+   ],
+   "category": "DOMESTIC_BROKER"
+  },
+  {
+   "ssot_key": "DB",
+   "chinese_name": "德意志",
+   "english_name": "Deutsche Bank",
+   "country": "DE",
+   "aliases": [
+    "德意志",
+    "德意志",
+    "DB",
+    "Deutsche Bank",
+    "德意志銀行",
+    "德銀"
+   ],
+   "category": "FOREIGN_BROKER"
+  }
+ ],
+ "rating_alias_add": {
+  "BUY": [
+   "增持",
+   "推薦",
+   "積極買進",
+   "強烈推薦",
+   "建議買進",
+   "值得買進",
+   "超配",
+   "強力推薦",
+   "極力推薦",
+   "買進評等",
+   "推薦買進",
+   "優先買進",
+   "Long",
+   "Recommended Buy",
+   "Strong Outperform",
+   "Aggressive Buy",
+   "Active Buy",
+   "加碼",
+   "逢低加碼",
+   "Buy",
+   "買進",
+   "Outperform",
+   "Overweight",
+   "Accumulate",
+   "Add",
+   "Strong Buy",
+   "Conviction Buy",
+   "優於大盤",
+   "強力買進",
+   "看好",
+   "Positive",
+   "Attractive"
+  ],
+  "HOLD": [
+   "平衡",
+   "續抱",
+   "維持",
+   "觀望評等",
+   "持有評等",
+   "中立評等",
+   "符合大盤",
+   "持平",
+   "標準配置",
+   "Wait and see",
+   "Maintain",
+   "Market Weight",
+   "Fair Value",
+   "Sector Weight",
+   "Hold",
+   "Neutral",
+   "中立",
+   "持有",
+   "Market Perform",
+   "Equal Weight",
+   "In Line",
+   "區間操作",
+   "觀望",
+   "Peer Perform"
+  ],
+  "SELL": [
+   "下調",
+   "避險",
+   "轉弱",
+   "建議賣出",
+   "低配",
+   "賣出評等",
+   "建議減碼",
+   "不推薦",
+   "Short",
+   "Trim",
+   "Lighten",
+   "Avoid",
+   "Below Market",
+   "Downgrade",
+   "Sell",
+   "賣出",
+   "Underperform",
+   "Underweight",
+   "Reduce",
+   "減持",
+   "減碼",
+   "劣於大盤",
+   "看壞",
+   "Negative"
+  ],
+  "NOT_RATED": [
+   "未評級",
+   "暫無評等",
+   "無覆蓋",
+   "不予評等",
+   "暫不評等",
+   "尚未評級",
+   "無研究覆蓋",
+   "N/A",
+   "No Rating",
+   "Not Covered",
+   "No Recommendation",
+   "No Opinion",
+   "Not Available",
+   "Coverage Dropped",
+   "未評等",
+   "NR",
+   "Not Rated",
+   "無評等",
+   "待覆蓋",
+   "Under Review",
+   "Restricted",
+   "Suspended"
+  ]
+ },
+ "filename_key_map": {
+  "MS": "MS",
+  "GS": "GS",
+  "JP": "JPM",
+  "Citi": "CITI",
+  "UBS": "UBS",
+  "Daiwa": "DAIWA",
+  "CLST": "CLSA",
+  "MQ": "MACQUARIE",
+  "GF": "__DENY__",
+  "凱基": "KGI",
+  "兆豐": "MEGA",
+  "華南": "HUANAN",
+  "統一": "PRESIDENT",
+  "台新": "TAISHIN",
+  "國泰": "CATHAY",
+  "CTBC": "CTBC"
+ }
+}

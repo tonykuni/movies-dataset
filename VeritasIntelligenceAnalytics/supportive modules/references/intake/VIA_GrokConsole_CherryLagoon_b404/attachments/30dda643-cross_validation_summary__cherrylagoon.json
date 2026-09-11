@@ -1,0 +1,237 @@
+{
+  "set_A": {
+    "set": "A",
+    "elapsed": 0.82,
+    "hardgate_seal": "PARTIAL",
+    "hardgate_caps": 3,
+    "mdl001_conv": 3,
+    "mdl002_tables": 0,
+    "phase1_fin": 9,
+    "phase2_fin": 8,
+    "phase_match": 8,
+    "phase_mismatch": 0,
+    "phase_p1_only": 1,
+    "phase_p2_only": 0,
+    "phase_match_rate": 1.0,
+    "phase_success": true,
+    "api_rows": 10,
+    "triangle_match": 8,
+    "triangle_mismatch": 0,
+    "triangle_total": 8,
+    "triangle_match_rate": 1.0,
+    "triangle_avg_conf": 0.95,
+    "triangle_ok": true,
+    "fcst_total": 0,
+    "fcst_fail": 0,
+    "self_verify": {
+      "mdl001": "READY",
+      "mdl002": "READY",
+      "mdl006": "READY",
+      "mdl007": "READY",
+      "mdl008": "READY"
+    },
+    "mismatch_details": []
+  },
+  "set_B": {
+    "set": "B",
+    "elapsed": 0.8,
+    "hardgate_seal": "PARTIAL",
+    "hardgate_caps": 3,
+    "mdl001_conv": 3,
+    "mdl002_tables": 0,
+    "phase1_fin": 9,
+    "phase2_fin": 6,
+    "phase_match": 6,
+    "phase_mismatch": 0,
+    "phase_p1_only": 3,
+    "phase_p2_only": 0,
+    "phase_match_rate": 1.0,
+    "phase_success": true,
+    "api_rows": 10,
+    "triangle_match": 8,
+    "triangle_mismatch": 0,
+    "triangle_total": 8,
+    "triangle_match_rate": 1.0,
+    "triangle_avg_conf": 0.95,
+    "triangle_ok": true,
+    "fcst_total": 0,
+    "fcst_fail": 0,
+    "self_verify": {
+      "mdl001": "READY",
+      "mdl002": "READY",
+      "mdl006": "READY",
+      "mdl007": "READY",
+      "mdl008": "READY"
+    },
+    "mismatch_details": []
+  },
+  "cross_validation": {
+    "checks": [
+      {
+        "name": "HardGate seal stable",
+        "ok": true,
+        "set_A": "PARTIAL",
+        "set_B": "PARTIAL"
+      },
+      {
+        "name": "HardGate capable count stable",
+        "ok": true,
+        "set_A": 3,
+        "set_B": 3
+      },
+      {
+        "name": "MDL001 conversion count stable",
+        "ok": true,
+        "set_A": 3,
+        "set_B": 3
+      },
+      {
+        "name": "MDL002 tables stable",
+        "ok": true,
+        "set_A": 0,
+        "set_B": 0
+      },
+      {
+        "name": "MDL006 phase1.fin identical (MDL003 unchanged)",
+        "ok": true,
+        "set_A": 9,
+        "set_B": 9
+      },
+      {
+        "name": "MDL006 phase2.fin: B has fewer rows due to ocr_missing",
+        "ok": true,
+        "set_A": 8,
+        "set_B": 6
+      },
+      {
+        "name": "Set A phase match_rate == 100%",
+        "ok": true,
+        "set_A": "100.00%",
+        "set_B": "100.00%"
+      },
+      {
+        "name": "Set B has FEWER matched pairs than Set A (coverage drop)",
+        "ok": true,
+        "set_A": "8 matched",
+        "set_B": "6 matched"
+      },
+      {
+        "name": "Set B has expected p1_only count from missing field",
+        "ok": true,
+        "set_A": 1,
+        "set_B": 3
+      },
+      {
+        "name": "Set B p1_only > Set A p1_only (missing field detected)",
+        "ok": true,
+        "set_A": 1,
+        "set_B": 3
+      },
+      {
+        "name": "MDL007 API rows identical (MOPS+TWSE+yfinance unchanged)",
+        "ok": true,
+        "set_A": 10,
+        "set_B": 10
+      },
+      {
+        "name": "MDL008 triangle match identical (both reports use ground truth)",
+        "ok": true,
+        "set_A": 8,
+        "set_B": 8
+      },
+      {
+        "name": "MDL008 triangle match_rate == 100% in both sets",
+        "ok": true,
+        "set_A": "100.00%",
+        "set_B": "100.00%"
+      },
+      {
+        "name": "MDL008 avg_confidence stable (both >= 0.9)",
+        "ok": true,
+        "set_A": "0.950",
+        "set_B": "0.950"
+      },
+      {
+        "name": "MDL001 self_verify=READY in both",
+        "ok": true,
+        "set_A": "READY",
+        "set_B": "READY"
+      },
+      {
+        "name": "MDL002 self_verify=READY in both",
+        "ok": true,
+        "set_A": "READY",
+        "set_B": "READY"
+      },
+      {
+        "name": "MDL006 self_verify=READY in both",
+        "ok": true,
+        "set_A": "READY",
+        "set_B": "READY"
+      },
+      {
+        "name": "MDL007 self_verify=READY in both",
+        "ok": true,
+        "set_A": "READY",
+        "set_B": "READY"
+      },
+      {
+        "name": "MDL008 self_verify=READY in both",
+        "ok": true,
+        "set_A": "READY",
+        "set_B": "READY"
+      },
+      {
+        "name": "Set A elapsed < 30s",
+        "ok": true,
+        "set_A": 0.82,
+        "set_B": ""
+      },
+      {
+        "name": "Set B elapsed < 30s",
+        "ok": true,
+        "set_A": 0.8,
+        "set_B": ""
+      },
+      {
+        "name": "Both triangle_ok=True",
+        "ok": true,
+        "set_A": true,
+        "set_B": true
+      }
+    ],
+    "n_pass": 22,
+    "n_fail": 0,
+    "n_total": 22,
+    "classification": "READY"
+  },
+  "hardgate": {
+    "policy": "BOOT_PRECHECK_ONLY_NO_NETWORK_NO_PARALLEL_NO_AUTOPATCH",
+    "py_inject": "3.12",
+    "ssot_dir": "/tmp/fake_ssot",
+    "plugins": {
+      "ssot": "<module 'VIA_SSOT_Unified' from '/tmp/fake_ssot/VIA_SSOT_Unified.py'>",
+      "celeritas": "<module 'VeritasCeleritas' from '/tmp/fake_ssot/VeritasCeleritas.py'>",
+      "aegis": "<module 'VeritasAegisNexus' from '/tmp/fake_ssot/VeritasAegisNexus.py'>",
+      "registry": null,
+      "runtime_bridge": null,
+      "env_manager": null,
+      "ast_planner": null
+    },
+    "ok": {
+      "ssot": true,
+      "celeritas": true,
+      "aegis": true,
+      "registry": false,
+      "runtime_bridge": false,
+      "env_manager": false,
+      "ast_planner": false
+    },
+    "n_loaded": 3,
+    "n_capable": 3,
+    "elapsed_ms": 0.66,
+    "seal": "PARTIAL"
+  },
+  "activation_ok": true,
+  "generated": "2026-05-06 02:38:31"
+}

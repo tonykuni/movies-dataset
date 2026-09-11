@@ -1,5 +1,5 @@
 # =====================================================================
-# Register-VIA-Commands-v0149.ps1 — VIA 短指令唯一定義處(批381 操作員令「給我一個(單一)指令進入環境去擷取 2023 年以後 vdf 的資料」→ +via-vdffetch [年份](預設 2023;單一 PowerShell 一行:20 加速器→Hydra 哨兵→十一步資料鏈十道並行→存證;零跳出零互動不卡斷);批380 操作員令「用一個 PowerShell 完成所有動作 不影響系統健康 不可造成九頭龍風險 20 的加速器 不卡斷」→ via-autorun 四閘版:①20 加速器點亮 ②Hydra 哨兵 H1–H6 先行(H3/H5 阻擋=誠實停) ③全程零跳出零 TTY 等待 ④逾時 kill 不卡斷;批379 操作員在電腦前「自動完成所有動作 不要打開 VS Code 我不知道要怎麼辦」→ +via-autorun 一鍵全自動(雙擊 via-autorun.cmd 即可;結束停窗)+git 永不開編輯器 env;批378 操作員令「不要一直開啟 VS Code,全自動完成一切」→ 載入即全域 VIA_NO_OPEN=1(所有短令零跳出;看頁只走 via-open 瀏覽器道;VIA_OPEN_PAGES=1 可解);批377 +via-lanes 十道並行安全編排(MDL134;Hydra 哨兵)+via-mobile --lanes;批376 +via-productgate 產品資格閘九閘(MDL133);via-mobile 末段 +productgate digest;批375 +via-etfhist 每日持股史深;批374 +via-etfuniv 主動 ETF 宇宙日更;批373 +via-etfrev 主動 ETF×月營收合流;批371 via-ves→MDL132 橋(尾版鏡像+安全種子+雙跑;--raw 直通原件);批370 +via-ves 唯讀 E3 標準化掃描;批368 +via-projects 四專案完工矩陣;+via-revfill 月營收史深;批367 via-reload 同名雙物大寫原件復位;批366 via-mobile 零跳出 VIA_NO_OPEN=1;批362 via-fred 無動詞=run;批360/361 +via-fred/via-vdfarch;批254 立;批260 +via-all;批316 +via-pipeline;批323 +via-accel/via-accel-check;批325 +via-rotation/via-repo-optimize;批327 +via-vapstack;批328 +via-reload;批330 +via-plotlaw;批331 via-reload 先拉齊;批332 +via-system/via-api;批333 +via-master;批335 +via-complete;批336 +via-intake-roster;批337 via-reload 拉齊誠實+產出頁自動讓位;批338 可編輯模板排除;批339 短令清單動態;批340 +via-datahome/via-complete 分離啟動器;批342 +via-six 六流程 Zero-Hydra 編排;批344 via-complete watch/stop;批345 +via-bridge-sweep)
+# Register-VIA-Commands-v0149.ps1 — VIA 短指令唯一定義處(批381 操作員令「依照已成功地建構布局向上新增;最壞還原成原本規劃;base 只放該有的工具;其他放在 via_core 及 via_ 開頭的環境」→ +via-envgov(CGC_MDL135 環境治理統一引擎:全景式分析 base/via_core/via_* → uv 毫秒快篩 → base 該有冊閉包 → 衝突立拔家族路由 → Zero-Hydra 分流拓撲三輪 → LKGC/rollback → 四分區 UI Matrix;預設 run --offline 唯讀;apply --approve 才動;base 移除另 --approve-remove)+via-envgov-auto(Invoke-VIA-EnvGovernance 單一 PowerShell 一貼即用;-Background 非阻塞);批380 操作員令「用一個 PowerShell 完成所有動作 不影響系統健康 不可造成九頭龍風險 20 的加速器 不卡斷」→ via-autorun 四閘版:①20 加速器點亮 ②Hydra 哨兵 H1–H6 先行(H3/H5 阻擋=誠實停) ③全程零跳出零 TTY 等待 ④逾時 kill 不卡斷;批379 操作員在電腦前「自動完成所有動作 不要打開 VS Code 我不知道要怎麼辦」→ +via-autorun 一鍵全自動(雙擊 via-autorun.cmd 即可;結束停窗)+git 永不開編輯器 env;批378 操作員令「不要一直開啟 VS Code,全自動完成一切」→ 載入即全域 VIA_NO_OPEN=1(所有短令零跳出;看頁只走 via-open 瀏覽器道;VIA_OPEN_PAGES=1 可解);批377 +via-lanes 十道並行安全編排(MDL134;Hydra 哨兵)+via-mobile --lanes;批376 +via-productgate 產品資格閘九閘(MDL133);via-mobile 末段 +productgate digest;批375 +via-etfhist 每日持股史深;批374 +via-etfuniv 主動 ETF 宇宙日更;批373 +via-etfrev 主動 ETF×月營收合流;批371 via-ves→MDL132 橋(尾版鏡像+安全種子+雙跑;--raw 直通原件);批370 +via-ves 唯讀 E3 標準化掃描;批368 +via-projects 四專案完工矩陣;+via-revfill 月營收史深;批367 via-reload 同名雙物大寫原件復位;批366 via-mobile 零跳出 VIA_NO_OPEN=1;批362 via-fred 無動詞=run;批360/361 +via-fred/via-vdfarch;批254 立;批260 +via-all;批316 +via-pipeline;批323 +via-accel/via-accel-check;批325 +via-rotation/via-repo-optimize;批327 +via-vapstack;批328 +via-reload;批330 +via-plotlaw;批331 via-reload 先拉齊;批332 +via-system/via-api;批333 +via-master;批335 +via-complete;批336 +via-intake-roster;批337 via-reload 拉齊誠實+產出頁自動讓位;批338 可編輯模板排除;批339 短令清單動態;批340 +via-datahome/via-complete 分離啟動器;批342 +via-six 六流程 Zero-Hydra 編排;批344 via-complete watch/stop;批345 +via-bridge-sweep)
 # =====================================================================
 # 批254 摩擦修:舊制=Register-Profile 把函式全文塞 $PROFILE(要跑 via
 # +開新視窗+每加一指令就 v010x 重貼)。新制=點源架構:
@@ -132,25 +132,6 @@ function global:via-etfhist { $env:VIA_NET_CONSENT = "YES"; $env:VIA_SCRAPE_CONS
 function global:via-etfuniv { $env:VIA_NET_CONSENT = "YES"; $env:VIA_SCRAPE_CONSENT = "YES"; python (Get-VIANewest "$VIA\functional modules\VDF\engine" "VDF_ENG077_ActiveETFUniverse_v*.py") $(if ($args) { $args } else { "run" }) }
 # 批373:主動 ETF 持股×月營收動能(ENG076;兩專案合流層;零網路;加權 yoy/重疊榜;頁 VIA_UI_ETFRevenueMomentum);via-etfrev [run|status]
 function global:via-etfrev { python (Get-VIANewest "$VIA\functional modules\VDF\engine" "VDF_ENG076_ETFRevenueMomentum_v*.py") $(if ($args) { $args } else { "run" }) }
-# 批381:via-vdffetch [年份]=單一指令抓該年以後全部 VDF 資料(預設 2023)。做四件事:
-#   ① 年份旗標:VIA_HIST_SINCE=<年>-01-01(ENG064 價格史深)+VIA_REV_SINCE=<年>-01(ENG075 月營收史深)——MDL125 步冊 hist_2023/revenue_backfill 直讀
-#   ② 20 加速器點亮(via-accel --activate);③ Hydra 哨兵 H1–H6(via-lanes plan;H3 進程雙頭/H5 尾版律 FAIL=誠實停不跑)
-#   ④ 十一步資料鏈走十道並行(同庫序跑=單寫者律;net 步雙同意閘;逾時 kill 不卡斷;零跳出;FRED 鑰缺=SKIP 印指令)→ lanes digest + projects digest
-#   用法:via-vdffetch(=2023 起)/ via-vdffetch 2020(改年份)/ via-vdffetch 2023 --dry(只印不抓)
-function global:via-vdffetch {
-    $y = if ($args.Count -gt 0 -and ("" + $args[0]) -match "^\d{4}$") { "" + $args[0] } else { "2023" }
-    $rest = @($args | Where-Object { ("" + $_) -ne $y })
-    $env:VIA_HIST_SINCE = "$y-01-01"; $env:VIA_REV_SINCE = "$y-01"
-    $env:VIA_NO_OPEN = "1"; $env:VIA_FRED_PROMPT = "0"; $env:GIT_EDITOR = "true"; $env:PYTHONUTF8 = "1"
-    $env:VIA_NET_CONSENT = "YES"; $env:VIA_SCRAPE_CONSENT = "YES"   # 操作員親打本令=同意閘開(紅線:不代設於他處)
-    Write-Host ("=== [via-vdffetch] VDF 史深全抓 " + $y + "-01-01 → 今(單一 PowerShell;零跳出;不卡斷)===") -ForegroundColor Cyan
-    Write-Host "--- ① 20 加速器點亮 ---" -ForegroundColor Cyan; try { via-accel --activate } catch { Write-Host ("  [加速器] " + $_.Exception.Message) -ForegroundColor Yellow }
-    Write-Host "--- ② 九頭龍哨兵 H1–H6(唯讀)---" -ForegroundColor Cyan; $plan = (via-lanes plan 2>&1 | Out-String); Write-Host $plan
-    if ($plan -match "H3 FAIL|H5 FAIL") { Write-Host "=== [via-vdffetch] 九頭龍風險(見上 H3/H5)=誠實停;關閉另一條在跑的鏈或修尾版後重試 ===" -ForegroundColor Red; return }
-    Write-Host ("--- ③ 資料鏈十道並行(hist_2023 " + $y + "→今 / global / fred / 月營收 / 主動 ETF / 共識 / 合流)---") -ForegroundColor Cyan
-    via-lanes run --only datahome,hist_2023,global,fred,revenue_backfill,etf_universe,etf_fetch,etf_history,consensus,revenue_consensus,etf_revenue @rest
-    Write-Host "--- ④ 存證 ---" -ForegroundColor Cyan; via-lanes digest; via-projects digest
-    Write-Host "=== [via-vdffetch] 畢;看頁:via-open 架構 / via-open 竣工 ===" -ForegroundColor Cyan }
 # 批379/380:via-autorun=一鍵全自動四閘版:①via-accel --activate(20 加速器)②via-lanes plan(Hydra 哨兵 H1–H6;H3/H5 FAIL=誠實停)③via-mobile --lanes(拉齊→六流程→十道並行→矩陣→產品閘)④lanes digest;零跳出、零 TTY 等待(VIA_FRED_PROMPT=0)、逾時 kill 不卡斷;雙擊 via-autorun.cmd 同效且結束停窗
 function global:via-autorun { $env:VIA_NO_OPEN = "1"; $env:VIA_FRED_PROMPT = "0"; $env:GIT_EDITOR = "true"; $env:PYTHONUTF8 = "1"
     Write-Host "=== [via-autorun] 一鍵全自動(單一 PowerShell;零跳出;不卡斷;約 20–60 分鐘)===" -ForegroundColor Cyan
@@ -183,6 +164,11 @@ function global:via-loop { python (Get-VIANewest "$VIA\supportive modules\regist
 function global:via-ui { python (Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL130_UIBridge_v*.py") $(if ($args) { $args } else { @("build", "--open") }) }
 # 批316:族群分類一鍵管線(補料→ENG070 自測+run→ENG071 自測+run→開頁;pwsh 缺退 powershell)
 function global:via-pipeline { $ps = if (Get-Command pwsh -ErrorAction SilentlyContinue) { "pwsh" } else { "powershell" }; & $ps -NoProfile -ExecutionPolicy Bypass -File (Get-VIANewest $VIA "Invoke-VIA-GroupPipeline-v*.ps1") @args }
+
+# 批381:環境治理統一引擎(MDL135):①全景式分析 base+via_core*+via_*/paddle*/camelot*(平行探針硬逾時不卡斷)②uv pip check 毫秒快篩(退 pip)③base 該有冊(Baseline 冊:工具鏈+引擎核心+LOW)+相依閉包=該有;閉包外=拉出候選 ④衝突要求者家族整包路由(via_core 白名單→家族 target_env(如 OCR→paddle_312 contrib 錨)→purpose hints→5D→黑環境)⑤H1–H6 九頭龍分流:Parallel-Fixable 並行/Sequence-Dependent 拓撲序 ⑥三輪 R1/R2/R3 ⑦uv pip compile 多輪沙盒模擬(同意閘)⑧apply --approve 只跑 GREEN 非破壞段;base 移除 --approve-remove 且目標境 VERIFY 綠後 ⑨LKGC 晉升律+rollback(LKGC lock 逐境 sync;無=原本規劃重建)⑩logs/env_governance.log JSONL+四分區矩陣;批382 +rename 命名律(非 via_ 境換名重建:uv venv 同 Python+lock sync+check;--approve-remove 退役舊境)+base 共用冊/功能件家族(docs/html_parse/data_fetch/nlp/dev_tools/plot_ui→既有 via_ 境)+專屬境覆寫;via-envgov [run|panorama|plan|apply|lkgc|rollback|rename|matrix|digest] [--offline] [--approve] [--approve-remove] [--only S02,S03] [--env-root P] [--base-python EXE]
+function global:via-envgov { python (Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL135_EnvGovernance_v*.py") $(if ($args) { $args } else { @("run", "--offline") }) }
+# 批381:單一 PowerShell 一貼即用(Invoke-VIA-EnvGovernance 尾版):①20 加速器點亮 ②全景+計畫(唯讀)③-Approve 執行 GREEN 段(-ApproveRemove 破壞段)④矩陣落檔零跳出;-Online 開同意閘;-Background 背景 Job 不阻塞(-Watch 直播 log);-Open 只走瀏覽器 exe
+function global:via-envgov-auto { $ps = if (Get-Command pwsh -ErrorAction SilentlyContinue) { "pwsh" } else { "powershell" }; & $ps -NoProfile -ExecutionPolicy Bypass -File (Get-VIANewest $VIA "Invoke-VIA-EnvGovernance-v*.ps1") @args }
 
 # --- 自註冊:$PROFILE 補一行點源(冪等;標記 v0200) -------------------
 try {
