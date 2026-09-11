@@ -6899,6 +6899,27 @@
    "ts": "2026-09-11 15:16",
    "name": "合併 origin/main(批382–425;697 檔)入本分支:同名雙物二件(Register-VIA-Commands-v0149.ps1、CGC_MDL064_SelftestGrid_v0227.py)皆讓位主線版(先發先得;零 force 零刪除);台帳聯集 918+1=919。前推:Register v0168=主線 v0167 尾版 +via-vdffetch(主線已自帶 via-lanes/via-open/via-autorun/via-productgate);grid v0265=主線 v0264 +紅站補齊鏈七檢(MDL125 v0110)=201 站;MDL125 v0110 與 MDL134 v0101 於合流後仍為各族尾版",
    "note": "合流後實測四站全綠(產品資格閘/十道並行/資料本機家/紅站補齊鏈);短令↔梭 G2 與引擎尾版 G7 見本批輸出"
+  },
+  {
+   "code": "VDF-TEST-b382",
+   "kind": "批382 操作員令「實測VDF」——雲端真跑十一步資料鏈(via-vdffetch 同鏈;60 檔探測上限)",
+   "ts": "2026-09-11 16:20",
+   "name": "終態 PART:OK 8 · FAIL 1 · SKIP 2 · 642.6s · 有效並行 5 道。OK:etf_universe 13.9s / etf_fetch 16.6s / hist_2023 577.5s(2023-01-01→2026-09-11;60 檔;抓 53,250 列真插 2,122 列)/ global 588.5s(219,620→219,931;→2026-09-11)/ consensus(248→251)/ revenue_consensus / etf_history 607.7s(持股 2,357→3,479 列;25 檔;→2026-09-11)/ etf_revenue(榜首 00999A 加權 yoy +153.4%)。SKIP:datahome(資料家為 Windows 路徑=零搬移)、fred(鑰缺不空轉)。FAIL:revenue_backfill 8/176 單元",
+   "note": "庫完好:tw_daily_prices 548,093 列 · 零重複 (date,ticker);checkpoint 鍵 台股:custom:2023-01-01~2026-09-11 記 60 檔=可續跑"
+  },
+  {
+   "code": "VDF-ENG064-v0109",
+   "kind": "批382 實測揭發誠實性缺陷(假數風險)",
+   "ts": "2026-09-11 16:20",
+   "name": "根因:_insert_missing 回傳抓回量卻被上層印成「+N 列」——雲端 60 檔報 +53,250 而庫只增 2,122(其餘已在庫)。修:回 (抓回量, 真插入量)=插前/插後庫差;批列印改「抓 X 列·新插 Y 列」;段/總結改「台股新插 N 列」;⑤ 檢加驗(抓 2 新插 1);九檢綠",
+   "note": "誠實數字律:抓回量永不冒充入庫量"
+  },
+  {
+   "code": "VDF-ENG075-v0102/CGC-125-v0111",
+   "kind": "批382 實測紅站與環境節流",
+   "ts": "2026-09-11 16:20",
+   "name": "ENG075 v0102:每主機 VIA_MOPS_ROUNDS 輪(預設 3)× 每輪 VIA_MOPS_RETRIES 次(預設 6)=存根/307/連線重置皆同址重試;十檢綠。MDL125 v0111:hist_2023 +env VIA_HIST_LIMIT(>0 才加 --limit)=先小量實測再全抓;七檢綠",
+   "note": "8 單元仍 FAIL:實證為雲端出口被 mopsov 節流(已成單元 202607:sii:1 重測亦連 307 六次)=環境側非碼側;Yahoo 出口同時節流(85 次代理失敗)。工作站(家用 IP)執行 via-vdffetch 會自動重試這 8 單元"
   }
  ],
  "updated_at": "2026-09-09 05:10"
