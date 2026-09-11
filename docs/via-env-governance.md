@@ -4339,3 +4339,92 @@ v0120 的 `_native_dpi` 取頁上**最大**的那張圖,不管它多小——那
 | `VRN_ENG072_FirstPageText` | v0111 | 二十檢 20/20 |
 | `VRN_MDL001_Converter` | v0121(內部 1.2.1) | 九檢 9/9 |
 | `CGC_MDL064_SelftestGrid` | v0289 | 兩站改名 |
+
+## 七十八、批450:三階梯答對了問題,同一行卻照出我自己在說謊
+
+### 先說好消息:三階梯回答了那個問題
+
+8 份候 OCR 全部是:
+
+```
+OCR_EMPTY(…跑了但零字) | HQ300_EMPTY(…) / HQ350_EMPTY(…)
+```
+
+**不是解析度的問題。** 300 和 350 都是零字。批449 的第三階把這件事釘死了。
+
+批447 的整對換也全中:`MS-2308 TP=1288 P=932` · `JP-3653 3650/2470` ·
+`MS-8210 730/621` · `中信金 63`。批446 的替根讓 ENG080 從 `rc=1` 變 `rc=0`。
+
+### 壞消息:同一行裡有一句是我編的
+
+v0111 寫的是:
+
+```python
+used = "+".join(dict.fromkeys(run.route or usable))
+#                             ^^^^^^^^^^^^^^^^^^^ route 空掉就拿「矩陣說裝了的那些」頂替
+return "", f"OCR_EMPTY({used};跑了但零字=影像可能不可辨)"
+#                              ^^^^^^^^^^ 然後宣稱它們「跑了」
+```
+
+證據就在同一行裡:它說 GLE 的 `paddleocr` 跑過,
+而緊接著的 `PPP_OCR_ABSENT(缺 paddleocr)` 說沒裝。**兩句不可能都真。**
+
+那個「跑了」從頭到尾**沒有任何人驗過**。
+
+### 而真正的因由,早就在我手上
+
+`run.adapter_results` 的每個 `AdapterResult` 帶著:
+
+```
+status · error · warnings · elements · probe.reason
+```
+
+GLE 的 tesseract 轉接器**自己就會寫**:
+
+```python
+"missing Tesseract languages: " + ", ".join(missing_languages) + f"; using {languages}"
+raise RuntimeError("none of the requested Tesseract languages are installed")
+```
+
+我把整包丟掉,只留 `canonical_elements`,再自己掰一句「影像可能不可辨」。
+
+> 批419e 那一課的最深一層。前幾批是**捕捉到卻不顯示**;
+> 這一次是**捕捉到、丟掉、然後編一個理由代替它**。
+
+### 修
+
+`used` 只認 `run.route`,不再拿 `usable` 頂替:
+
+| 情況 | 新標記 |
+|---|---|
+| 有字 | `OCR_<實際跑過的後端>` |
+| route 空 | `OCR_ROUTE_EMPTY(沒有任何後端真的跑;矩陣說在位的是…,兩者不一致要查 GLE 探針)` |
+| 跑了但零字 | `OCR_EMPTY[<route>;tesseract:SUCCESS/0元素 警=missing Tesseract languages: chi_tra…]` |
+
+那行 `missing Tesseract languages` 從此會印在標記裡——
+操作員一眼就知道**要裝 chi_tra 語言包,不是換引擎**。
+
+### 自審兩條
+
+**① 改了標記格式,卻差點讓升階靜靜失效。**
+批449 第三階的升階判準是 `"_EMPTY(" in tag`——**帶括號**。
+本批把標記改成 `OCR_EMPTY[` 之後,那個判準**永遠為假**,
+第三階會靜靜地再也不升階,而且沒有任何一行會說它不升了。
+改成具名函式 `ocr_did_run(tag)`,三態寫成檢 ㉑ 的判準:
+
+```
+跑了但零字 → 升階      路由空 → 不升(沒東西可升)      後端不在位 → 不升(白跑)
+```
+
+**② 第三次踩同一個自 match 陷阱。**
+新檢第一版又加了「原始碼裡不准再出現某串字」,
+而**檢自己的敘述文字就寫著那串字**(我在註解裡引用了舊寫法),恆為假。
+前兩次是 `SUP_MDL746` 檢②、`CGC_MDL141` 檢⑭。
+**拿原始碼當證據這件事本身就脆**;判準全部改成行為。
+
+### 落地
+
+| 件 | 版 | 檢 |
+|---|---|---|
+| `VRN_ENG072_FirstPageText` | v0112 | 二十一檢 21/21 |
+| `CGC_MDL064_SelftestGrid` | v0290 | 站名改 |
