@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VeritasAutoPlot™ — Event Timeline Matrix + Charts</title>
+<script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+<style>
+:root{
+  --sb-blue:#4C72B0;--sb-orange:#DD8452;--sb-green:#55A868;--sb-red:#C44E52;
+  --sb-purple:#8172B3;--sb-brown:#937860;--sb-pink:#DA8BC3;--sb-gray:#8C8C8C;
+  --sb-yellow:#CCB974;--sb-cyan:#64B5CD;
+  --up:#C44E52;--dn:#55A868;
+  --bg:#FFFFFF;--bg2:#F7F6F3;--bg3:#EFEEE9;--bg4:#E8E7E4;
+  --tx1:#37352F;--tx2:#6B6B6B;--tx3:#9B9A97;--bd:#E8E7E4;
+  --font:'Inter','Noto Sans TC',-apple-system,sans-serif;
+  --mono:'JetBrains Mono',Consolas,monospace;
+  --radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg2);color:var(--tx1);padding:20px;font-size:13px}
+
+/* ═══ Layout ═══ */
+.header{text-align:center;margin-bottom:16px}
+.header h1{font-size:clamp(16px,2.5vw,22px);font-weight:600;letter-spacing:-.3px}
+.header .sub{font-size:12px;color:var(--tx3);margin-top:3px}
+
+.main-grid{display:grid;grid-template-columns:340px 1fr;gap:14px}
+@media(max-width:1000px){.main-grid{grid-template-columns:1fr}}
+
+/* ═══ Sidebar: Event Matrix ═══ */
+.sidebar{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--bg);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--bd);padding:14px}
+.card h3{font-size:13px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.card h3 .badge{font-size:10px;padding:1px 6px;border-radius:10px;background:var(--bg3);color:var(--tx2)}
+
+/* Crisis tree */
+.crisis-group{margin-bottom:10px;border:1px solid var(--bd);border-radius:4px;overflow:hidden}
+.crisis-header{display:flex;align-items:center;gap:6px;padding:8px 10px;background:var(--bg3);cursor:pointer;user-select:none;font-size:12px;font-weight:600;transition:.15s}
+.crisis-header:hover{background:var(--bg4)}
+.crisis-header .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.crisis-header .toggle{font-size:10px;color:var(--tx3);margin-left:auto;transition:.2s}
+.crisis-header.collapsed .toggle{transform:rotate(-90deg)}
+.crisis-header input[type=checkbox]{margin:0;cursor:pointer}
+.crisis-body{padding:0;max-height:500px;overflow:hidden;transition:max-height .3s ease}
+.crisis-header.collapsed+.crisis-body{max-height:0}
+.sub-event{display:flex;align-items:center;gap:6px;padding:5px 10px 5px 28px;font-size:11px;border-top:1px solid var(--bg3)}
+.sub-event:hover{background:var(--bg3)}
+.sub-event input[type=checkbox]{margin:0;cursor:pointer}
+.sub-event .date{font-family:var(--mono);font-size:10px;color:var(--tx3);min-width:78px}
+.sub-event .label{flex:1;color:var(--tx2)}
+.sub-event .line-style{font-size:9px;color:var(--tx3);font-family:var(--mono)}
+
+/* Summary matrix */
+.matrix-table{width:100%;border-collapse:collapse;font-size:11px}
+.matrix-table th{background:var(--bg3);padding:5px 6px;text-align:left;font-weight:600;border-bottom:1px solid var(--bd)}
+.matrix-table td{padding:4px 6px;border-bottom:1px solid var(--bg3)}
+.matrix-table tr:hover td{background:var(--bg3)}
+.matrix-table .mono{font-family:var(--mono);font-size:10px}
+.cnt{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;border-radius:9px;background:var(--sb-blue);color:#fff;font-size:9px;font-weight:700}
+
+/* Controls */
+.ctrl-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.chip{display:inline-flex;align-items:center;padding:3px 9px;border-radius:18px;font-size:10px;cursor:pointer;border:1px solid var(--bd);background:var(--bg);transition:.15s;user-select:none}
+.chip.active{background:var(--sb-blue);color:#fff;border-color:var(--sb-blue)}
+.chip:hover{background:var(--bg3)}.chip.active:hover{background:#3a5f96}
+.sep{width:1px;height:20px;background:var(--bd);flex-shrink:0}
+select{font-family:var(--font);font-size:11px;border:1px solid var(--bd);border-radius:4px;padding:3px 6px;background:var(--bg);color:var(--tx1);outline:none}
+input[type=color]{width:24px;height:24px;padding:1px;cursor:pointer;border:1px solid var(--bd);border-radius:3px}
+
+/* Chart */
+.chart-area{display:flex;flex-direction:column;gap:12px}
+#chart{width:100%;height:clamp(500px,62vh,780px)}
+.footer{text-align:center;font-size:10px;color:var(--tx3);margin-top:10px}
+
+/* Tabs */
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--bd);margin-bottom:12px}
+.tab{padding:6px 14px;font-size:12px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;color:var(--tx2);transition:.15s;user-select:none}
+.tab:hover{color:var(--tx1)}.tab.active{color:var(--sb-blue);border-bottom-color:var(--sb-blue);font-weight:600}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>VeritasAutoPlot™ — Event Timeline Matrix</h1>
+  <div class="sub">Crisis 母事件 + Sub-Event 子事件 · 矩陣化管理 · 勾選即渲染 · 全圖型通用</div>
+</div>
+
+<div class="main-grid">
+  <!-- ═══ LEFT: Event Matrix Sidebar ═══ -->
+  <div class="sidebar">
+    <!-- Matrix Summary -->
+    <div class="card">
+      <h3>📊 Event Matrix Summary <span class="badge" id="badgeTotal">0 events</span></h3>
+      <table class="matrix-table" id="matrixSummary"></table>
+    </div>
+
+    <!-- Crisis Tree -->
+    <div class="card" style="max-height:60vh;overflow-y:auto">
+      <h3>🗂️ Crisis / Sub-Event Tree</h3>
+      <div style="margin-bottom:8px;display:flex;gap:6px">
+        <button onclick="selectAll(true)" style="font-size:10px;padding:2px 8px;border:1px solid var(--bd);border-radius:3px;background:var(--bg);cursor:pointer">全選</button>
+        <button onclick="selectAll(false)" style="font-size:10px;padding:2px 8px;border:1px solid var(--bd);border-radius:3px;background:var(--bg);cursor:pointer">全不選</button>
+        <button onclick="expandAll(true)" style="font-size:10px;padding:2px 8px;border:1px solid var(--bd);border-radius:3px;background:var(--bg);cursor:pointer">全展</button>
+        <button onclick="expandAll(false)" style="font-size:10px;padding:2px 8px;border:1px solid var(--bd);border-radius:3px;background:var(--bg);cursor:pointer">全收</button>
+      </div>
+      <div id="crisisTree"></div>
+    </div>
+  </div>
+
+  <!-- ═══ RIGHT: Chart Area ═══ -->
+  <div class="chart-area">
+    <div class="card">
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('single')">Single Axis</div>
+        <div class="tab" onclick="switchTab('dual')">Dual Axis</div>
+        <div class="tab" onclick="switchTab('candle')">K-Line</div>
+        <div class="tab" onclick="switchTab('stack')">Stack</div>
+      </div>
+      <div class="ctrl-row">
+        <span class="chip active" id="cShading" onclick="toggle(this);render()">Crisis Shading</span>
+        <span class="chip active" id="cEvents" onclick="toggle(this);render()">Sub-Events</span>
+        <span class="chip active" id="cHL" onclick="toggle(this);render()">Crisis H/L</span>
+        <span class="chip active" id="cGrid" onclick="toggle(this);render()">Grid</span>
+        <span class="chip" id="cLog" onclick="toggle(this);render()">Log</span>
+        <div class="sep"></div>
+        <select id="selIndex" onchange="render()">
+          <option value="sp500">S&P 500</option>
+          <option value="twii">TWII 加權指數</option>
+          <option value="sox">SOX 費半</option>
+        </select>
+      </div>
+      <div id="chart"></div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">VeritasAutoPlot™ · Event Timeline Matrix · Crisis (Parent) → Sub-Events (Children) · Hierarchical Management</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════════
+   EVENT TIMELINE MATRIX — 資料結構
+   每個 Crisis 是母事件，包含:
+   - 期間陰影 (shading)
+   - 子事件 (sub-events) 以垂直線標記
+   - 期間內自動偵測 High/Low
+   ══════════════════════════════════════════════════════════════════ */
+const EVENT_MATRIX = [
+  {
+    id: 'GFC',
+    name: '2007-2009 全球金融危機',
+    president: '布希 / 歐巴馬',
+    start: '2007-08-09', end: '2009-03-31',
+    color: '#7f7f7f',
+    enabled: true,
+    subEvents: [
+      { date: '2007-06-07', label: 'Bear Stearns 基金凍結',       color: '#C44E52', style: 'dash', enabled: true },
+      { date: '2007-07-31', label: 'Bear Stearns 基金破產',       color: '#C44E52', style: 'dash', enabled: true },
+      { date: '2007-08-09', label: 'BNP Paribas 停止贖回',        color: '#C44E52', style: 'dash', enabled: true },
+      { date: '2007-10-24', label: 'Merrill Lynch 80億虧損',      color: '#DD8452', style: 'dot',  enabled: true },
+      { date: '2007-11-05', label: 'Citigroup CEO辭職',           color: '#DD8452', style: 'dot',  enabled: false },
+      { date: '2008-01-22', label: 'Fed 緊急降息75bp',            color: '#4C72B0', style: 'dash', enabled: true },
+      { date: '2008-03-14', label: 'Bear Stearns 被收購',         color: '#C44E52', style: 'dash', enabled: true },
+      { date: '2008-07-11', label: 'IndyMac Bank 倒閉',           color: '#C44E52', style: 'dot',  enabled: false },
+      { date: '2008-09-07', label: 'Fannie/Freddie 被接管',       color: '#C44E52', style: 'dash', enabled: true },
+      { date: '2008-09-15', label: '⚡ 雷曼兄弟破產',              color: '#C44E52', style: 'solid',enabled: true },
+      { date: '2008-09-16', label: 'AIG 850億紓困',               color: '#DD8452', style: 'dash', enabled: true },
+      { date: '2008-09-25', label: 'WaMu 倒閉(史上最大)',          color: '#C44E52', style: 'dash', enabled: true },
+      { date: '2008-09-29', label: 'TARP 紓困案被否決→道瓊-778',  color: '#C44E52', style: 'dash', enabled: true },
+      { date: '2008-10-03', label: 'TARP 7000億通過',              color: '#55A868', style: 'dash', enabled: true },
+      { date: '2008-11-25', label: 'Fed QE1 啟動',                 color: '#4C72B0', style: 'dash', enabled: true },
+      { date: '2009-03-09', label: '⚡ S&P 500 觸底 666',          color: '#55A868', style: 'solid',enabled: true },
+    ]
+  },
+  {
+    id: 'FLASH',
+    name: '2010 股市閃崩',
+    president: '歐巴馬',
+    start: '2010-04-01', end: '2010-07-31',
+    color: '#677ea5',
+    enabled: true,
+    subEvents: [
+      { date: '2010-05-06', label: '⚡ 閃崩 道瓊-998點 (HFT)',    color: '#C44E52', style: 'solid',enabled: true },
+      { date: '2010-05-10', label: 'EU 7500億歐元紓困',            color: '#4C72B0', style: 'dash', enabled: true },
+      { date: '2010-06-21', label: '人民幣匯改 (脫鉤美元)',         color: '#DD8452', style: 'dot',  enabled: false },
+    ]
+  },
+  {
+    id: 'EURO',
+    name: '2011-2012 歐債危機',
+    president: '歐巴馬',
+    start: '2011-04-01', end: '2011-10-31',
+    color: '#6f7e99',
+    enabled: true,
+    subEvents: [
+      { date: '2011-04-27', label: 'S&P 調降美國展望→負面',        color: '#DD8452', style: 'dash', enabled: true },
+      { date: '2011-07-21', label: 'EU 第二次希臘紓困',             color: '#4C72B0', style: 'dash', enabled: true },
+      { date: '2011-08-05', label: '⚡ S&P 調降美國評級 AA+',       color: '#C44E52', style: 'solid',enabled: true },
+      { date: '2011-08-08', label: '美股暴跌 S&P -6.7%',           color: '#C44E52', style: 'dash', enabled: true },
+      { date: '2011-10-27', label: 'EFSF 擴大至1兆歐元',           color: '#55A868', style: 'dash', enabled: true },
+    ]
+  },
+  {
+    id: 'OIL',
+    name: '2015-2016 油價暴跌',
+    president: '歐巴馬',
+    start: '2015-05-01', end: '2016-02-29',
+    color: '#5f7db2',
+    enabled: false,
+    subEvents: [
+      { date: '2015-08-24', label: '中國黑色星期一 上證-8.5%',     color: '#C44E52', style: 'dash', enabled: true },
+      { date: '2016-01-20', label: 'WTI 原油跌破 $27',             color: '#C44E52', style: 'dash', enabled: true },
+      { date: '2016-02-11', label: '⚡ S&P 500 觸底 1810',          color: '#55A868', style: 'solid',enabled: true },
+    ]
+  },
+  {
+    id: 'TRADE',
+    name: '2018 美中貿易戰',
+    president: '川普',
+    start: '2018-09-01', end: '2018-12-31',
+    color: '#587cbf',
+    enabled: true,
+    subEvents: [
+      { date: '2018-10-03', label: 'Powell "距中性還很遠"',         color: '#DD8452', style: 'dash', enabled: true },
+      { date: '2018-10-10', label: 'S&P -3.3% 科技股崩',           color: '#C44E52', style: 'dash', enabled: true },
+      { date: '2018-12-03', label: 'G20 美中貿易戰暫停',            color: '#55A868', style: 'dash', enabled: true },
+      { date: '2018-12-19', label: 'Fed升息+鷹派前瞻',              color: '#C44E52', style: 'dash', enabled: true },
+      { date: '2018-12-24', label: '⚡ 聖誕崩盤 S&P 2351',          color: '#C44E52', style: 'solid',enabled: true },
+    ]
+  },
+  {
+    id: 'COVID',
+    name: '2020 新冠肺炎大流行',
+    president: '川普',
+    start: '2020-02-01', end: '2020-03-31',
+    color: '#507ccc',
+    enabled: true,
+    subEvents: [
+      { date: '2020-02-20', label: '義大利爆發 社區感染',           color: '#C44E52', style: 'dash', enabled: true },
+      { date: '2020-03-03', label: 'Fed 緊急降息50bp',              color: '#4C72B0', style: 'dash', enabled: true },
+      { date: '2020-03-09', label: '⚡ 第一次熔斷 -7%',             color: '#C44E52', style: 'solid',enabled: true },
+      { date: '2020-03-11', label: 'WHO 宣布全球大流行',             color: '#C44E52', style: 'dash', enabled: true },
+      { date: '2020-03-12', label: '第二次熔斷 -9.5%',              color: '#C44E52', style: 'dash', enabled: true },
+      { date: '2020-03-15', label: 'Fed 降至零利率 + QE∞',          color: '#4C72B0', style: 'dash', enabled: true },
+      { date: '2020-03-16', label: '第三次熔斷 -12%',               color: '#C44E52', style: 'dash', enabled: true },
+      { date: '2020-03-23', label: '⚡ S&P 觸底 2237',              color: '#55A868', style: 'solid',enabled: true },
+      { date: '2020-03-27', label: 'CARES Act 2.2兆美元',           color: '#55A868', style: 'dash', enabled: true },
+    ]
+  },
+  {
+    id: 'RATE',
+    name: '2022 通膨升息熊市',
+    president: '拜登',
+    start: '2022-01-01', end: '2022-10-31',
+    color: '#487bd9',
+    enabled: true,
+    subEvents: [
+      { date: '2022-01-05', label: 'S&P 歷史高 4818 轉跌',         color: '#DD8452', style: 'dash', enabled: true },
+      { date: '2022-02-24', label: '俄羅斯入侵烏克蘭',              color: '#C44E52', style: 'dash', enabled: true },
+      { date: '2022-03-16', label: 'Fed 首次升息 25bp',              color: '#4C72B0', style: 'dash', enabled: true },
+      { date: '2022-06-13', label: 'S&P 進入熊市 (-20%)',            color: '#C44E52', style: 'dash', enabled: true },
+      { date: '2022-06-15', label: 'Fed 升息 75bp (最大)',           color: '#4C72B0', style: 'dash', enabled: true },
+      { date: '2022-09-13', label: 'CPI 超預期 S&P -4.3%',          color: '#C44E52', style: 'dash', enabled: true },
+      { date: '2022-10-13', label: '⚡ S&P 觸底 3577',              color: '#55A868', style: 'solid',enabled: true },
+    ]
+  },
+  {
+    id: 'TRUMP2',
+    name: '2024-2025 川普第二任期',
+    president: '川普',
+    start: '2024-11-06', end: '2025-02-14',
+    color: '#937860',
+    enabled: true,
+    subEvents: [
+      { date: '2024-11-06', label: '川普當選 美股大漲',              color: '#55A868', style: 'dash', enabled: true },
+      { date: '2024-12-18', label: 'Fed 鷹派降息 道瓊-1100',        color: '#C44E52', style: 'dash', enabled: true },
+      { date: '2025-01-20', label: '川普就職',                       color: '#DD8452', style: 'dash', enabled: true },
+      { date: '2025-02-01', label: '對中加徵10%關稅',                color: '#C44E52', style: 'dash', enabled: true },
+    ]
+  },
+];
+
+/* ══════════════════════════════════════════════════════════════════
+   SIMULATED INDEX DATA
+   ══════════════════════════════════════════════════════════════════ */
+function genIndex(name,anchors){
+  const dates=[],vals=[];
+  for(let i=0;i<anchors.length-1;i++){
+    const d0=new Date(anchors[i][0]),d1=new Date(anchors[i+1][0]),v0=anchors[i][1],v1=anchors[i+1][1];
+    let d=new Date(d0);while(d<d1){if(d.getDay()!==0&&d.getDay()!==6){const t=(d-d0)/(d1-d0);dates.push(d.toISOString().slice(0,10));vals.push(+(v0+(v1-v0)*t+v0*(Math.random()-.5)*.003).toFixed(2));}d=new Date(d.getTime()+864e5);}
+  }
+  dates.push(anchors[anchors.length-1][0]);vals.push(anchors[anchors.length-1][1]);
+  return{dates,vals};
+}
+
+const INDICES={
+  sp500:genIndex('S&P500',[
+    ['2007-01-03',1416],['2007-07-19',1553],['2007-10-09',1565],['2008-01-22',1310],['2008-05-19',1426],
+    ['2008-09-12',1252],['2008-09-15',1192],['2008-09-29',1106],['2008-10-10',899],['2008-11-20',752],
+    ['2009-03-09',677],['2009-06-01',942],['2009-12-31',1115],
+    ['2010-04-23',1217],['2010-05-06',1128],['2010-07-02',1023],['2010-12-31',1258],
+    ['2011-04-29',1364],['2011-08-08',1119],['2011-10-03',1099],['2011-12-30',1258],
+    ['2015-05-21',2130],['2015-08-25',1868],['2016-02-11',1829],['2016-12-30',2239],
+    ['2018-09-21',2930],['2018-10-29',2641],['2018-12-24',2351],['2019-12-31',3231],
+    ['2020-02-19',3386],['2020-03-09',2746],['2020-03-23',2237],['2020-06-08',3232],['2020-12-31',3756],
+    ['2021-12-31',4766],['2022-01-04',4796],['2022-06-16',3666],['2022-10-13',3577],['2022-12-30',3839],
+    ['2023-10-27',4117],['2023-12-28',4783],['2024-07-16',5667],['2024-11-06',5929],['2024-12-06',6090],
+    ['2025-01-24',6101],['2025-02-14',6068],
+  ]),
+  twii:genIndex('TWII',[
+    ['2007-01-02',7823],['2007-10-30',9859],['2008-01-22',7384],['2008-09-15',6207],['2008-11-21',4110],
+    ['2009-03-02',4325],['2009-12-31',8188],['2010-05-06',7671],['2010-12-31',8973],
+    ['2011-02-08',9145],['2011-08-08',7560],['2011-12-30',7072],
+    ['2015-04-28',10014],['2015-08-24',7410],['2016-02-15',7745],['2016-12-30',9254],
+    ['2018-10-11',9806],['2018-12-26',9400],['2019-12-31',11997],
+    ['2020-01-20',12179],['2020-03-19',8523],['2020-12-31',14732],
+    ['2021-07-15',18034],['2021-12-31',18218],['2022-01-05',18526],['2022-10-25',12629],['2022-12-30',14137],
+    ['2023-12-29',17930],['2024-07-11',24390],['2024-08-05',19830],['2024-11-06',23035],['2024-12-31',22987],
+    ['2025-02-14',22700],
+  ]),
+  sox:genIndex('SOX',[
+    ['2007-01-03',475],['2007-10-31',519],['2008-09-15',320],['2008-11-21',167],['2009-03-09',185],
+    ['2009-12-31',319],['2010-05-06',345],['2010-12-31',425],['2011-08-08',350],['2011-12-30',385],
+    ['2015-06-01',743],['2015-08-25',577],['2016-02-11',582],['2016-12-30',893],
+    ['2018-10-01',1346],['2018-12-24',1069],['2019-12-31',1818],
+    ['2020-02-19',1979],['2020-03-18',1348],['2020-03-23',1422],['2020-12-31',2824],
+    ['2021-12-27',4039],['2022-01-04',3951],['2022-10-13',2162],['2022-12-30',2522],
+    ['2023-10-27',3208],['2023-12-28',4291],['2024-07-11',5805],['2024-08-05',4290],
+    ['2024-11-06',5180],['2024-12-31',4984],['2025-02-14',5100],
+  ]),
+};
+
+/* ══════════════════════════════════════════════════════════════════
+   UI ENGINE
+   ══════════════════════════════════════════════════════════════════ */
+const SB={bl:'#4C72B0',or:'#DD8452',gn:'#55A868',rd:'#C44E52',pu:'#8172B3',gy:'#8C8C8C'};
+const CFG={responsive:true,displayModeBar:false};
+let currentTab='single';
+
+function gc(id){return document.getElementById(id).classList.contains('active')}
+function toggle(el){el.classList.toggle('active')}
+
+function switchTab(t){
+  currentTab=t;
+  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
+  document.querySelector(`.tab[onclick="switchTab('${t}')"]`).classList.add('active');
+  render();
+}
+
+/* Build Crisis Tree UI */
+function buildTree(){
+  const container=document.getElementById('crisisTree');
+  container.innerHTML='';
+  EVENT_MATRIX.forEach((cr,ci)=>{
+    const group=document.createElement('div');group.className='crisis-group';
+    const enabledSubs=cr.subEvents.filter(e=>e.enabled).length;
+    group.innerHTML=`
+      <div class="crisis-header${cr.enabled?'':' collapsed'}" onclick="toggleGroup(this)" data-ci="${ci}">
+        <input type="checkbox" ${cr.enabled?'checked':''} onclick="event.stopPropagation();toggleCrisis(${ci},this.checked);render()">
+        <span class="dot" style="background:${cr.color}"></span>
+        <span style="flex:1">${cr.name}</span>
+        <span class="cnt">${enabledSubs}/${cr.subEvents.length}</span>
+        <span class="toggle">▼</span>
+      </div>
+      <div class="crisis-body">
+        ${cr.subEvents.map((ev,ei)=>`
+          <div class="sub-event">
+            <input type="checkbox" ${ev.enabled?'checked':''} onchange="toggleSubEvent(${ci},${ei},this.checked);render()">
+            <span class="date">${ev.date}</span>
+            <span class="label">${ev.label}</span>
+            <span class="line-style" style="color:${ev.color}">${ev.style==='solid'?'━':ev.style==='dash'?'┄':'·'}</span>
+          </div>
+        `).join('')}
+      </div>`;
+    container.appendChild(group);
+  });
+  updateSummary();
+}
+
+function toggleGroup(el){el.classList.toggle('collapsed')}
+function toggleCrisis(ci,v){EVENT_MATRIX[ci].enabled=v;buildTree();}
+function toggleSubEvent(ci,ei,v){EVENT_MATRIX[ci].subEvents[ei].enabled=v;updateSummary();}
+function selectAll(v){EVENT_MATRIX.forEach(cr=>{cr.enabled=v;cr.subEvents.forEach(e=>e.enabled=v);});buildTree();render();}
+function expandAll(v){document.querySelectorAll('.crisis-header').forEach(el=>{if(v)el.classList.remove('collapsed');else el.classList.add('collapsed');});}
+
+function updateSummary(){
+  let totalCrisis=0,totalEvents=0,enabledCrisis=0,enabledEvents=0;
+  const rows=EVENT_MATRIX.map(cr=>{
+    totalCrisis++;
+    const en=cr.subEvents.filter(e=>e.enabled).length;
+    totalEvents+=cr.subEvents.length;
+    if(cr.enabled){enabledCrisis++;enabledEvents+=en;}
+    return`<tr><td><span class="dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${cr.color};vertical-align:middle;margin-right:4px"></span>${cr.id}</td><td>${cr.enabled?'✓':'—'}</td><td class="mono">${cr.start.slice(0,7)}</td><td class="mono">${cr.end.slice(0,7)}</td><td>${en}/${cr.subEvents.length}</td></tr>`;
+  });
+  document.getElementById('matrixSummary').innerHTML=`<thead><tr><th>Crisis</th><th>ON</th><th>Start</th><th>End</th><th>Events</th></tr></thead><tbody>${rows.join('')}</tbody>`;
+  document.getElementById('badgeTotal').textContent=`${enabledCrisis} crisis · ${enabledEvents} events`;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   CHART RENDER
+   ══════════════════════════════════════════════════════════════════ */
+function render(){
+  const idx=document.getElementById('selIndex').value;
+  const D=INDICES[idx];
+  const showShading=gc('cShading'),showEvents=gc('cEvents'),showHL=gc('cHL'),showGrid=gc('cGrid'),logY=gc('cLog');
+  const names={sp500:'S&P 500 (^GSPC)',twii:'臺灣加權指數 (^TWII)',sox:'費城半導體 (^SOX)'};
+
+  const traces=[];
+  traces.push({x:D.dates,y:D.vals,type:'scatter',mode:'lines',name:names[idx],
+    line:{color:SB.bl,width:2,shape:'spline'},yaxis:'y'});
+
+  const layout={
+    title:{text:names[idx]+' — Event Timeline',font:{family:'Inter,Noto Sans TC',size:15,color:'#37352F'},x:0.01,xanchor:'left'},
+    paper_bgcolor:'#FFF',plot_bgcolor:'#FFF',
+    margin:{t:55,r:45,b:55,l:65},
+    xaxis:{showgrid:false,linecolor:'#E8E7E4',tickfont:{size:10,color:'#6B6B6B'},dtick:'M12',tickformat:'%Y'},
+    yaxis:{showgrid:showGrid,gridcolor:showGrid?'#F0EFEC':'transparent',linecolor:'#E8E7E4',tickfont:{size:10},separatethousands:true,type:logY?'log':'linear'},
+    hovermode:'x unified',hoverlabel:{bgcolor:'rgba(255,255,255,.95)',bordercolor:'#E8E7E4',font:{size:11}},
+    legend:{orientation:'h',y:1.10,x:0,font:{size:10}},
+    shapes:[],annotations:[]
+  };
+
+  /* Apply enabled crisis periods + sub-events */
+  EVENT_MATRIX.forEach(cr=>{
+    if(!cr.enabled)return;
+    /* Shading */
+    if(showShading){
+      if(cr.end<D.dates[0]||cr.start>D.dates[D.dates.length-1])return;
+      layout.shapes.push({type:'rect',xref:'x',yref:'paper',x0:cr.start,x1:cr.end,y0:0,y1:1,
+        fillcolor:cr.color,opacity:0.13,line:{width:0}});
+      layout.annotations.push({x:cr.start,y:1.03,xref:'x',yref:'paper',text:cr.name,
+        showarrow:false,font:{size:9,color:cr.color,weight:600},xanchor:'left'});
+    }
+
+    /* Sub-event vertical lines */
+    if(showEvents){
+      cr.subEvents.forEach(ev=>{
+        if(!ev.enabled)return;
+        if(ev.date<D.dates[0]||ev.date>D.dates[D.dates.length-1])return;
+        const dashMap={solid:'solid',dash:'dash',dot:'dot'};
+        layout.shapes.push({type:'line',xref:'x',yref:'paper',x0:ev.date,x1:ev.date,y0:0,y1:1,
+          line:{color:ev.color,width:ev.style==='solid'?1.5:1,dash:dashMap[ev.style]||'dash'}});
+        layout.annotations.push({x:ev.date,y:0.97,xref:'x',yref:'paper',text:ev.label,
+          showarrow:false,font:{size:8,color:ev.color},textangle:-90,xanchor:'right'});
+      });
+    }
+
+    /* High/Low within crisis period */
+    if(showHL){
+      const startIdx=D.dates.findIndex(d=>d>=cr.start);
+      const endIdx=D.dates.findIndex(d=>d>cr.end);
+      if(startIdx<0)return;
+      const slice=D.vals.slice(startIdx,endIdx>0?endIdx:D.vals.length);
+      const sliceDates=D.dates.slice(startIdx,endIdx>0?endIdx:D.dates.length);
+      if(slice.length===0)return;
+      const mx=slice.indexOf(Math.max(...slice)),mn=slice.indexOf(Math.min(...slice));
+      const dd=((slice[mn]-slice[mx])/slice[mx]*100).toFixed(1);
+      layout.annotations.push(
+        {x:sliceDates[mx],y:slice[mx],text:'▲'+Math.round(slice[mx]).toLocaleString(),
+         showarrow:true,arrowhead:0,ax:0,ay:-22,font:{size:8,color:SB.gn,weight:700},
+         bgcolor:'rgba(255,255,255,.9)',bordercolor:SB.gn,borderwidth:1,borderpad:2},
+        {x:sliceDates[mn],y:slice[mn],text:'▼'+Math.round(slice[mn]).toLocaleString()+' ('+dd+'%)',
+         showarrow:true,arrowhead:0,ax:0,ay:22,font:{size:8,color:SB.rd,weight:700},
+         bgcolor:'rgba(255,255,255,.9)',bordercolor:SB.rd,borderwidth:1,borderpad:2}
+      );
+    }
+  });
+
+  Plotly.react('chart',traces,layout,CFG);
+}
+
+/* Init */
+buildTree();
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+   ______                            __
+  / ____/___  ____ ___  ____  __  __/ /____  _____
+ / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
+/ /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
+\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
+                    /_/
+        Created with Perplexity Computer
+        https://www.perplexity.ai/computer
+-->
+
+<!-- Perplexity Computer Attribution — SEO Meta Tags -->
+<meta name="generator" content="Perplexity Computer">
+<meta name="author" content="Perplexity Computer">
+<meta property="og:see_also" content="https://www.perplexity.ai/computer">
+<link rel="author" href="https://www.perplexity.ai/computer">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Straight Talk Tracker — Mag 7 Earnings Call Directness</title>
+<meta name="description" content="Analyzing how directly Magnificent 7 executives answer analyst questions during earnings calls">
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700&f[]=general-sans@400,500,600,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./base.css">
+<link rel="stylesheet" href="./style.css">
+<link rel='stylesheet' href='../VAP_THEME.css'><link rel='stylesheet' href='../VAP_RESPONSIVE.css'></head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo-group">
+        <svg class="logo-icon" width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+          <rect x="2" y="2" width="24" height="24" rx="4" stroke="currentColor" stroke-width="2"/>
+          <path d="M8 18 L12 10 L16 16 L20 8" stroke="var(--color-primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="8" cy="18" r="2" fill="var(--color-primary)"/>
+          <circle cx="20" cy="8" r="2" fill="var(--color-primary)"/>
+        </svg>
+        <h1 class="site-title">Straight Talk Tracker</h1>
+      </div>
+      <nav class="header-nav">
+        <button class="nav-btn active" data-tab="leaderboard">Leaderboard</button>
+        <button class="nav-btn" data-tab="explorer">Explorer</button>
+        <button class="nav-btn" data-tab="search">Search</button>
+      </nav>
+      <button class="theme-toggle" data-theme-toggle aria-label="Switch to dark mode">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <!-- Leaderboard Tab -->
+    <section id="tab-leaderboard" class="tab-panel active">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Who gives straight answers?</h2>
+          <p class="section-subtitle">Directness scores from 329 Q&A exchanges across 28 Mag 7 earnings calls</p>
+        </div>
+        <div class="filter-group">
+          <select id="leaderboard-filter" class="filter-select">
+            <option value="all">All Executives</option>
+            <option value="ceo">CEOs Only</option>
+            <option value="cfo">CFOs Only</option>
+          </select>
+        </div>
+      </div>
+      <div id="leaderboard-container" class="leaderboard-grid"></div>
+      <div class="company-summary-section">
+        <h3 class="subsection-title">By Company</h3>
+        <div id="company-summary" class="company-grid"></div>
+      </div>
+    </section>
+
+    <!-- Explorer Tab -->
+    <section id="tab-explorer" class="tab-panel">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Explore individual answers</h2>
+          <p class="section-subtitle">Browse every Q&A exchange and see how each answer was scored</p>
+        </div>
+      </div>
+      <div class="explorer-controls">
+        <select id="filter-company" class="filter-select">
+          <option value="all">All Companies</option>
+          <option value="Apple">Apple</option>
+          <option value="Microsoft">Microsoft</option>
+          <option value="Alphabet">Alphabet</option>
+          <option value="Amazon">Amazon</option>
+          <option value="Meta">Meta</option>
+          <option value="Nvidia">Nvidia</option>
+          <option value="Tesla">Tesla</option>
+        </select>
+        <select id="filter-respondent" class="filter-select">
+          <option value="all">All Respondents</option>
+        </select>
+        <select id="filter-quarter" class="filter-select">
+          <option value="all">All Quarters</option>
+        </select>
+        <select id="sort-by" class="filter-select">
+          <option value="score-desc">Most Direct First</option>
+          <option value="score-asc">Most Avoidant First</option>
+          <option value="company">By Company</option>
+        </select>
+      </div>
+      <div class="explorer-stats" id="explorer-stats"></div>
+      <div id="explorer-list" class="qa-list"></div>
+      <div class="load-more-container">
+        <button id="load-more-btn" class="btn-secondary">Show more</button>
+      </div>
+    </section>
+
+    <!-- Search Tab -->
+    <section id="tab-search" class="tab-panel">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Search the corpus</h2>
+          <p class="section-subtitle">Search across all questions and answers from 28 earnings calls</p>
+        </div>
+      </div>
+      <div class="search-container">
+        <div class="search-input-wrap">
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" id="search-input" class="search-input" placeholder="Search questions, answers, analysts, executives...">
+          <kbd class="search-kbd">/</kbd>
+        </div>
+        <div id="search-results" class="qa-list"></div>
+        <div id="search-empty" class="search-empty">
+          <p>Type to search across 329 Q&A exchanges from Mag 7 earnings calls.</p>
+          <p class="search-hint">Try: "tariff", "AI", "margins", "capex", "guidance", "China"</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p class="footer-text">Analysis of Q&A sections from the last 4 earnings calls for each Magnificent 7 company. Directness scored on 0-1 scale.</p>
+    <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer" class="footer-link">Created with Perplexity Computer</a>
+  </footer>
+
+  <script src="./data.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
+

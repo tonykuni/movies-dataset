@@ -1,0 +1,215 @@
+{
+  "build_date": "2026-05-26 17:37:28",
+  "totals": {
+    "pass": 22,
+    "fail": 1,
+    "skip": 2
+  },
+  "by_category": {
+    "ssot": {
+      "passed": 7,
+      "total": 7
+    },
+    "fiscal": {
+      "passed": 2,
+      "total": 3
+    },
+    "sentiment": {
+      "passed": 2,
+      "total": 2
+    },
+    "etf": {
+      "passed": 2,
+      "total": 2
+    },
+    "consensus": {
+      "passed": 5,
+      "total": 5
+    },
+    "derived": {
+      "passed": 4,
+      "total": 4
+    },
+    "live": {
+      "passed": 2,
+      "total": 2
+    }
+  },
+  "tests": [
+    {
+      "name": "SSOT: master ssot loads",
+      "category": "ssot",
+      "status": "PASS",
+      "elapsed_ms": 8.8,
+      "error": ""
+    },
+    {
+      "name": "SSOT: section A has 12 categories",
+      "category": "ssot",
+      "status": "PASS",
+      "elapsed_ms": 2.9,
+      "error": ""
+    },
+    {
+      "name": "SSOT: section B has 219+ macro series",
+      "category": "ssot",
+      "status": "PASS",
+      "elapsed_ms": 1.7,
+      "error": ""
+    },
+    {
+      "name": "SSOT: section B has 9 derived models",
+      "category": "ssot",
+      "status": "PASS",
+      "elapsed_ms": 1.6,
+      "error": ""
+    },
+    {
+      "name": "SSOT: section C has 6 ETF categories + flow methodology",
+      "category": "ssot",
+      "status": "PASS",
+      "elapsed_ms": 1.6,
+      "error": ""
+    },
+    {
+      "name": "SSOT: section D has 18 active ETFs + 10 issuers",
+      "category": "ssot",
+      "status": "PASS",
+      "elapsed_ms": 1.7,
+      "error": ""
+    },
+    {
+      "name": "SSOT: section E has 41+ consensus columns spec",
+      "category": "ssot",
+      "status": "PASS",
+      "elapsed_ms": 1.8,
+      "error": ""
+    },
+    {
+      "name": "fiscal: module imports",
+      "category": "fiscal",
+      "status": "PASS",
+      "elapsed_ms": 66.8,
+      "error": ""
+    },
+    {
+      "name": "fiscal: url construction safe",
+      "category": "fiscal",
+      "status": "FAIL",
+      "elapsed_ms": 0.1,
+      "error": "TestFailure: : 'page%5Bsize%5D=50' not in 'https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/test?page[number]=1&page[size]=50&filter=x%3Aeq%3Ay&dummy=x'"
+    },
+    {
+      "name": "fiscal: standardize produces SSOT-format rows",
+      "category": "fiscal",
+      "status": "PASS",
+      "elapsed_ms": 0.0,
+      "error": ""
+    },
+    {
+      "name": "sentiment: module imports",
+      "category": "sentiment",
+      "status": "PASS",
+      "elapsed_ms": 4.9,
+      "error": ""
+    },
+    {
+      "name": "sentiment: CNN parse handles synthetic JSON",
+      "category": "sentiment",
+      "status": "PASS",
+      "elapsed_ms": 0.1,
+      "error": ""
+    },
+    {
+      "name": "etf_holdings: registry has 18 active ETFs",
+      "category": "etf",
+      "status": "PASS",
+      "elapsed_ms": 2.1,
+      "error": ""
+    },
+    {
+      "name": "etf_holdings: empty row has canonical schema",
+      "category": "etf",
+      "status": "PASS",
+      "elapsed_ms": 0.0,
+      "error": ""
+    },
+    {
+      "name": "consensus: module imports",
+      "category": "consensus",
+      "status": "PASS",
+      "elapsed_ms": 4.1,
+      "error": ""
+    },
+    {
+      "name": "consensus: ticker validation",
+      "category": "consensus",
+      "status": "PASS",
+      "elapsed_ms": 0.0,
+      "error": ""
+    },
+    {
+      "name": "consensus: parse target block",
+      "category": "consensus",
+      "status": "PASS",
+      "elapsed_ms": 0.6,
+      "error": ""
+    },
+    {
+      "name": "consensus: parse rating block",
+      "category": "consensus",
+      "status": "PASS",
+      "elapsed_ms": 0.3,
+      "error": ""
+    },
+    {
+      "name": "consensus: parse EPS block",
+      "category": "consensus",
+      "status": "PASS",
+      "elapsed_ms": 0.6,
+      "error": ""
+    },
+    {
+      "name": "derived: module imports",
+      "category": "derived",
+      "status": "PASS",
+      "elapsed_ms": 3.4,
+      "error": ""
+    },
+    {
+      "name": "derived: liquidity impulse computed correctly",
+      "category": "derived",
+      "status": "PASS",
+      "elapsed_ms": 0.0,
+      "error": ""
+    },
+    {
+      "name": "derived: yield curve inversion",
+      "category": "derived",
+      "status": "PASS",
+      "elapsed_ms": 0.0,
+      "error": ""
+    },
+    {
+      "name": "derived: all models run with sparse data",
+      "category": "derived",
+      "status": "PASS",
+      "elapsed_ms": 0.0,
+      "error": ""
+    },
+    {
+      "name": "LIVE: Treasury FiscalData reachable",
+      "category": "live",
+      "status": "SKIP",
+      "elapsed_ms": 0,
+      "error": "requires --live"
+    },
+    {
+      "name": "LIVE: CNN Fear & Greed reachable",
+      "category": "live",
+      "status": "SKIP",
+      "elapsed_ms": 0,
+      "error": "requires --live"
+    }
+  ]
+}

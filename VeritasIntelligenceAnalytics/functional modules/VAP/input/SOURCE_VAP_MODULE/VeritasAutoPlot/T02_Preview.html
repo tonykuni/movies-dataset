@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VeritasAutoPlot™ T02 — Dual Axis Preview</title>
+<script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+<style>
+:root{--sb-blue:#4C72B0;--sb-orange:#DD8452;--sb-green:#55A868;--sb-red:#C44E52;--sb-purple:#8172B3;--sb-gray:#8C8C8C;--sb-cyan:#64B5CD;--bg:#FFF;--bg2:#F7F6F3;--bg3:#EFEEE9;--tx1:#37352F;--tx2:#6B6B6B;--tx3:#9B9A97;--bd:#E8E7E4;--font:'Inter','Noto Sans TC',-apple-system,sans-serif;--radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg2);color:var(--tx1);padding:24px}
+.header{text-align:center;margin-bottom:18px}
+.header h1{font-size:clamp(16px,2.5vw,22px);font-weight:600;letter-spacing:-.3px}
+.header .sub{font-size:13px;color:var(--tx3);margin-top:4px}
+.card{background:var(--bg);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--bd);padding:20px;margin-bottom:14px}
+.ctrl-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.ctrl-group{display:flex;align-items:center;gap:5px}
+.ctrl-group label{font-size:12px;color:var(--tx2);white-space:nowrap}
+select,input[type=color]{font-family:var(--font);font-size:12px;border:1px solid var(--bd);border-radius:4px;padding:4px 8px;background:var(--bg);color:var(--tx1);outline:none}
+input[type=color]{width:28px;height:28px;padding:2px;cursor:pointer}
+.chip{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;cursor:pointer;border:1px solid var(--bd);background:var(--bg);transition:.15s;user-select:none}
+.chip.active{background:var(--sb-blue);color:#fff;border-color:var(--sb-blue)}.chip:hover{background:var(--bg3)}.chip.active:hover{background:#3a5f96}
+.sep{width:1px;height:22px;background:var(--bd);flex-shrink:0}
+#chart{width:100%;height:clamp(440px,60vh,740px)}
+.footer{text-align:center;font-size:11px;color:var(--tx3);margin-top:12px}
+@media(max-width:768px){body{padding:12px}}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>VeritasAutoPlot™ T02 — 臺灣加權指數 vs VIX / AAII Bearish%</h1>
+  <div class="sub">2019-01 ~ 2025-02 · 危機期間陰影 + 事件垂直線 + H/L 自動標註</div>
+</div>
+<div class="card">
+  <div class="ctrl-row">
+    <div class="ctrl-group"><label>Right Axis</label>
+      <select id="selR" onchange="render()"><option value="vix">VIX</option><option value="bear">AAII Bearish%</option></select>
+    </div>
+    <div class="ctrl-group"><label>L色</label><input type="color" id="clrL" value="#4C72B0" onchange="render()"></div>
+    <div class="ctrl-group"><label>R色</label><input type="color" id="clrR" value="#DD8452" onchange="render()"></div>
+    <div class="sep"></div>
+    <span class="chip active" id="cCrisis" onclick="toggle(this);render()">Crisis</span>
+    <span class="chip active" id="cEvent" onclick="toggle(this);render()">Events</span>
+    <span class="chip active" id="cHL" onclick="toggle(this);render()">H/L</span>
+    <span class="chip active" id="cGrid" onclick="toggle(this);render()">Grid</span>
+  </div>
+  <div id="chart"></div>
+</div>
+<div class="footer">VeritasAutoPlot™ · T02 Dual Axis · TWII vs VIX/Bearish% · Crisis + Events + H/L</div>
+
+<script>
+/* ═══ Realistic TWII + VIX path ═══ */
+function genData(){
+  const twiiAnchors=[
+    ['2019-01-02',9727],['2019-04-01',10641],['2019-07-01',10734],['2019-10-01',10829],['2019-12-31',11997],
+    ['2020-01-02',12118],['2020-01-20',12179],['2020-02-03',11610],['2020-03-19',8523],['2020-04-01',9663],
+    ['2020-06-01',11237],['2020-07-01',11621],['2020-09-01',12591],['2020-12-31',14732],
+    ['2021-01-04',14902],['2021-04-01',16431],['2021-07-01',17755],['2021-07-15',18034],['2021-10-01',16457],['2021-12-31',18218],
+    ['2022-01-03',18270],['2022-01-05',18526],['2022-04-01',17686],['2022-07-01',14825],['2022-10-25',12629],['2022-12-30',14137],
+    ['2023-01-03',14238],['2023-04-03',15712],['2023-07-03',17038],['2023-07-31',17391],['2023-10-02',16593],['2023-10-23',15952],['2023-12-29',17930],
+    ['2024-01-02',17817],['2024-03-01',19427],['2024-05-01',20517],['2024-07-11',24390],['2024-08-05',19830],['2024-09-02',22057],
+    ['2024-10-01',22325],['2024-10-28',22822],['2024-11-01',22687],['2024-12-31',22987],
+    ['2025-01-02',22907],['2025-01-20',23140],['2025-02-14',22700],
+  ];
+  const vixAnchors=[
+    ['2019-01-02',21],['2019-04-01',13],['2019-07-01',14],['2019-10-01',17],['2019-12-31',14],
+    ['2020-01-02',13],['2020-02-20',15],['2020-03-16',82],['2020-03-19',72],['2020-04-01',46],
+    ['2020-06-01',28],['2020-07-01',30],['2020-09-01',26],['2020-12-31',23],
+    ['2021-01-04',23],['2021-04-01',18],['2021-07-01',16],['2021-10-01',22],['2021-12-31',17],
+    ['2022-01-03',17],['2022-03-07',36],['2022-06-13',34],['2022-10-25',30],['2022-12-30',22],
+    ['2023-01-03',22],['2023-03-13',26],['2023-07-03',13],['2023-10-23',22],['2023-12-29',13],
+    ['2024-01-02',13],['2024-04-15',19],['2024-07-11',12],['2024-08-05',65],['2024-09-02',15],
+    ['2024-12-31',17],['2025-01-02',16],['2025-02-14',15],
+  ];
+  const bearAnchors=[
+    ['2019-01-02',39],['2019-06-01',30],['2019-12-31',25],
+    ['2020-01-02',24],['2020-03-19',52],['2020-06-01',42],['2020-12-31',27],
+    ['2021-06-01',22],['2021-12-31',24],
+    ['2022-01-03',27],['2022-06-01',48],['2022-09-29',61],['2022-12-30',45],
+    ['2023-03-13',48],['2023-07-03',24],['2023-10-23',51],['2023-12-29',22],
+    ['2024-04-15',30],['2024-08-05',44],['2024-12-31',28],
+    ['2025-01-02',34],['2025-02-14',42],
+  ];
+
+  function interp(anchors){
+    const dates=[],vals=[];
+    for(let ai=0;ai<anchors.length-1;ai++){
+      const d0=new Date(anchors[ai][0]),d1=new Date(anchors[ai+1][0]);
+      const v0=anchors[ai][1],v1=anchors[ai+1][1];
+      let d=new Date(d0);
+      while(d<d1){
+        if(d.getDay()!==0&&d.getDay()!==6){
+          const t=(d-d0)/(d1-d0);
+          const base=v0+(v1-v0)*t;
+          const noise=base*(Math.random()-.5)*0.005;
+          dates.push(d.toISOString().slice(0,10));
+          vals.push(+(base+noise).toFixed(2));
+        }
+        d=new Date(d.getTime()+864e5);
+      }
+    }
+    dates.push(anchors[anchors.length-1][0]);
+    vals.push(anchors[anchors.length-1][1]);
+    return{dates,vals};
+  }
+  const twii=interp(twiiAnchors),vix=interp(vixAnchors),bear=interp(bearAnchors);
+  // Align to twii dates
+  const vixMap=new Map(vix.dates.map((d,i)=>[d,vix.vals[i]]));
+  const bearMap=new Map(bear.dates.map((d,i)=>[d,bear.vals[i]]));
+  const alignedVix=[],alignedBear=[];
+  let lastV=14,lastB=30;
+  twii.dates.forEach(d=>{
+    if(vixMap.has(d)){lastV=vixMap.get(d);}alignedVix.push(lastV);
+    if(bearMap.has(d)){lastB=bearMap.get(d);}alignedBear.push(lastB);
+  });
+  return{dates:twii.dates,twii:twii.vals,vix:alignedVix,bear:alignedBear};
+}
+const D=genData();
+
+const CRISES=[
+  {name:'COVID-19 Crash',s:'2020-02-20',e:'2020-04-06',color:'#7f7f7f'},
+  {name:'2022 升息熊市',s:'2022-01-05',e:'2022-10-25',color:'#587cd9'},
+  {name:'2024 川普當選',s:'2024-11-06',e:'2025-02-14',color:'#937860'},
+];
+const EVENTS=[
+  {date:'2020-03-19',label:'TWII 低點 8,523'},
+  {date:'2022-10-25',label:'TWII 低點 12,629'},
+  {date:'2024-07-11',label:'TWII 歷史新高 24,390'},
+  {date:'2024-08-05',label:'日圓套利崩盤'},
+];
+
+function gc(id){return document.getElementById(id).classList.contains('active')}
+function toggle(el){el.classList.toggle('active')}
+const CFG={responsive:true,displayModeBar:false};
+
+function render(){
+  const clrL=document.getElementById('clrL').value;
+  const clrR=document.getElementById('clrR').value;
+  const rightType=document.getElementById('selR').value;
+  const showCrisis=gc('cCrisis'),showEvent=gc('cEvent'),showHL=gc('cHL'),showGrid=gc('cGrid');
+
+  const rightY=rightType==='vix'?D.vix:D.bear;
+  const rightLabel=rightType==='vix'?'CBOE VIX':'AAII Bearish %';
+
+  const trL={x:D.dates,y:D.twii,type:'scatter',mode:'lines',name:'臺灣加權指數 (^TWII)',
+    line:{color:clrL,width:2.2,shape:'spline'},yaxis:'y'};
+  const trR={x:D.dates,y:rightY,type:'scatter',mode:'lines',name:rightLabel,
+    line:{color:clrR,width:1.2},opacity:0.55,yaxis:'y2'};
+
+  const layout={
+    title:{text:'臺灣加權指數 vs '+rightLabel,font:{family:'Inter,Noto Sans TC',size:16,color:'#37352F'},x:0.01,xanchor:'left'},
+    paper_bgcolor:'#FFF',plot_bgcolor:'#FFF',
+    margin:{t:60,r:75,b:55,l:70},
+    xaxis:{showgrid:false,linecolor:'#E8E7E4',tickfont:{size:11,color:'#6B6B6B'},dtick:'M6',tickformat:'%Y-%m'},
+    yaxis:{showgrid:showGrid,gridcolor:'#F0EFEC',linecolor:'#E8E7E4',
+      tickfont:{size:11,color:clrL},separatethousands:true,
+      title:{text:'TWII',font:{size:12,color:clrL}}},
+    yaxis2:{overlaying:'y',side:'right',showgrid:false,linecolor:'#E8E7E4',
+      tickfont:{size:11,color:clrR},
+      title:{text:rightLabel,font:{size:12,color:clrR}}},
+    hovermode:'x unified',hoverlabel:{bgcolor:'rgba(255,255,255,.95)',bordercolor:'#E8E7E4',font:{size:12}},
+    legend:{orientation:'h',y:1.10,x:0,font:{size:11}},
+    shapes:[],annotations:[]
+  };
+
+  if(showCrisis){CRISES.forEach(cr=>{
+    layout.shapes.push({type:'rect',xref:'x',yref:'paper',x0:cr.s,x1:cr.e,y0:0,y1:1,fillcolor:cr.color,opacity:0.14,line:{width:0}});
+    layout.annotations.push({x:cr.s,y:1.03,xref:'x',yref:'paper',text:cr.name,showarrow:false,font:{size:10,color:cr.color,weight:600},xanchor:'left'});
+  });}
+
+  if(showEvent){EVENTS.forEach(ev=>{
+    layout.shapes.push({type:'line',xref:'x',yref:'paper',x0:ev.date,x1:ev.date,y0:0,y1:1,line:{color:'#C44E52',width:1,dash:'dash'}});
+    layout.annotations.push({x:ev.date,y:0.96,xref:'x',yref:'paper',text:ev.label,showarrow:false,font:{size:9,color:'#C44E52'},textangle:-90,xanchor:'right'});
+  });}
+
+  if(showHL){
+    const mx=D.twii.indexOf(Math.max(...D.twii));
+    const mn=D.twii.indexOf(Math.min(...D.twii));
+    const dd=((D.twii[mn]-D.twii[mx])/D.twii[mx]*100).toFixed(1);
+    layout.annotations.push(
+      {x:D.dates[mx],y:D.twii[mx],text:'▲ '+Math.round(D.twii[mx]).toLocaleString()+'\n'+D.dates[mx],
+       showarrow:true,arrowhead:0,ax:50,ay:-35,font:{size:10,color:'#55A868',weight:700},bgcolor:'rgba(255,255,255,.92)',bordercolor:'#55A868',borderwidth:1,borderpad:4},
+      {x:D.dates[mn],y:D.twii[mn],text:'▼ '+Math.round(D.twii[mn]).toLocaleString()+'\n'+D.dates[mn]+'\nDD: '+dd+'%',
+       showarrow:true,arrowhead:0,ax:-50,ay:40,font:{size:10,color:'#C44E52',weight:700},bgcolor:'rgba(255,255,255,.92)',bordercolor:'#C44E52',borderwidth:1,borderpad:4}
+    );
+  }
+
+  Plotly.react('chart',[trL,trR],layout,CFG);
+}
+render();
+</script>
+</body>
+</html>
