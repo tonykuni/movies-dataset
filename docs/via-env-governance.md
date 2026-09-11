@@ -3984,3 +3984,113 @@ NT$1,288.00
 
 `ENG073` / `ENG074` / `MDL141` 零改動——它們自批442/443 起就綁契約走尾版律,
 引擎一換版自動跟上。
+
+## 七十四、批446:同一份冊,四個消費者三個做對一個做錯
+
+`via-vrnval --run` 第一段就停:
+
+```
+[via-console run] NEED_DIR:報告夾缺:…\functional modules\VRN\input_reports
+[via-closeout --run] vrn_firstpage rc=2 → 停(誠實;修後重跑)
+```
+
+而**同一次跑**的收尾閘:
+
+```
+[via-closeout vrn] 報告 64(DONE 0 · FAIL 0 · PENDING 64)
+                   段:{'收件': 5, '首頁': 59}
+  PENDING MS-2308 20251128.pdf   段 1/4(首頁)  夾✓ 頁✓ 庫- 四點-
+```
+
+**64 份報告全在 `input/incoming`。收尾閘看得見,啟動器看不見。**
+
+### 報告夾律,四個消費者
+
+| 消費者 | `dir_default ∪ incoming`? | 立於 |
+|---|---|---|
+| `VRN_ENG072` v0108 | ✅ | 批438 |
+| `VRN_ENG074` v0104 | ✅ | 批442 |
+| `CGC_MDL141` v0105 | ✅ | 批400 |
+| `CGC_MDL139` `kind == "dir"` | ❌ 只認 `dir_default` | — |
+
+更難看的是 MDL141 那一份的 docstring:
+
+```python
+def _report_dirs(spec, given):
+    """報告夾律(批399 自審;同 MDL139 dir 參數):…;incoming 一律併入"""
+```
+
+「**同 MDL139 dir 參數**」——那句是假的。本檔併 `incoming`,MDL139 不併。
+**「同某某」寫在註解裡,不會讓它真的相同。**
+
+而且這件事**批421 的台帳第 915 筆就記過了**,逐字:
+
+> via-console run --item vrn_firstpage 回 NEED_DIR:預設夾 input_reports
+> 不存在,實檔在 input/incoming
+
+記了沒修,拖了 25 批。
+
+### 第二條同型:主庫替根
+
+同一次跑:
+
+```
+ENG073/ENG074 → 主路徑缺→改用替根庫(家目錄那份 clone)· 寫進 59 列 basic / 7,024 列財報值
+收尾閘        → 庫缺 …\mega\vdf_tw_market.duckdb(先 via-vdfdb run --apply / 日更鏈)· GREY
+```
+
+替根探測 `ENG073._resolve_db`(批244)、`ENG074`、首頁引擎 `_alt_root`(批443)都有,
+MDL141 寫死 `DB_TW`,不在就判 GREY。**庫就在那裡,是收尾閘沒去找。**
+批443 那一課(「資料已經在庫裡,是我找不到那個庫」)第二次現身,這次在收尾閘。
+
+### 治法:不是貼第四份第五份
+
+兩條律收在**冊的擁有者** `CGC_MDL139` v0101:
+
+| 函式 | 律 |
+|---|---|
+| `vrn_report_dirs(spec, given)` | `--dir > user.vrn_dir > 冊 dir_default`,**incoming 一律併入** |
+| `vrn_dir_with_reports(spec, given)` | 取**有報告件的**那個夾,回 `(夾, 逐夾狀況)`;全無 → `None` |
+| `mega_db(explicit, via, home)` | 主路徑 → 替根,回 `(路徑, 因由)` |
+
+`CGC_MDL141` v0107 的 `_report_dirs` / `_mega_db` 改成**轉呼叫**;
+舊版 MDL139 掛上來時退本地實作**並印因由**(零回歸)。
+
+`vrn_dir_with_reports` 取的是「**有件的**」而不是「存在的」那個夾——
+`input_reports` 可能存在但是空的,而檔全在 `incoming`;
+**指到空夾等於什麼都沒跑還報成功。**
+
+### 實測(重現工作站佈局:報告只在 incoming、input_reports 不存在)
+
+```
+MDL139 v0100 → ok=False  state=NEED_DIR
+MDL139 v0101 → ok=True   state=READY   --dir → incoming
+```
+
+### 自審三條
+
+**① 檢數又是手寫。** MDL139 的 `10 - len(fails)` ——第五支同病,改成真的數。
+
+**② 新檢 ⑫ 的判準恆為真。** 第一版寫
+
+```python
+(_db is None) == (not _why.startswith("主路徑缺→替根庫") and _db is None)
+```
+
+`_db` 不是 None 時左邊 False、右邊也 False → **恆真**。而這正是它能活到今天的原因:
+**沙盒的主路徑剛好有庫,工作站沒有**——「跑得到就算過」的檢在沙盒永遠綠,
+替根那一支**從來沒被驗過**。改成把「皆缺 / 只有替根 / 主路徑也有」三條分支的
+佈局都造出來各走一遍,並讓 `mega_db` 收 `via`/`home` 注入參數使它測得起來。
+
+**③ 新檢 ⑭ 自己 match 自己。** 第一版拿「原始碼裡還有沒有『同 MDL139 dir 參數』
+這串字」當證據——而**檢自己的敘述文字就含著那串字**,恆為假
+(與 `SUP_MDL746` 檢 ② 同一個陷阱)。改成真的把一個沒有那兩支函式的假 MDL139
+換上去,走退路一遍。
+
+### 落地
+
+| 件 | 版 | 檢 |
+|---|---|---|
+| `CGC_MDL139_InputConsole` | v0101 | 十二檢 12/12 |
+| `CGC_MDL141_ClosingGate` | v0107 | 十四檢 14/14 |
+| `CGC_MDL064_SelftestGrid` | v0286 | 兩站改名 |
