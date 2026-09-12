@@ -7137,7 +7137,21 @@
    "ts": "2026-09-13 01:40",
    "name": "建 Invoke-VIA-OneShot-v0100.ps1(九段一鍵)+ Register v0179 登錄 via-oneshot(別名 一鍵)+ .cmd 梭。九段:S1 解卡(委派 Unstick 尾版;本副本缺該件即自 origin checkout 單檔繞 bootstrap 死結)→ S2 點源尾版冊 + via-pin(新視窗亦生效)→ S3 進入 via_core 虛境(在位才進,不在位誠實 SKIP)+ via-envgov 唯讀治理計畫 + 印家族境 python → S4 via-accel-import --apply --approve(base 零觸碰)→ S5 via-rungate --fast → S6 via-price → via-chip → via-align update --apply → via-fred(鑰在位才跑;只判鑰檔在位,永不讀值永不印值)→ S7 via-psrepair-ast + via-pstest → S8 via-selftest 207 站 → S9 via-productgate + via-projects + 誠實三態總表與下一指令。每段獨立計時與三態、任一段不擋後段、逾時 kill 不卡斷、邊跑邊吐並每 15s 印心跳、段 rc 回報。旗標 -DryRun/-SkipAccel/-SkipData/-SkipMatrix。",
    "note": "本件三枚自犯錯全靠真跑現形(AST 解析一律綠,靜態看不出),已逐枚修並寫進檔內註記:①Start-Job 是新工作階段,本視窗點源的 global 短令不會帶進去 → 段內 via-* 必然 not recognized;改為每段在 job 內先點源尾版冊(路徑以 ArgumentList 傳入)。②輸出緩衝到結束才吐 → 長跑段畫面全白=批423 操作員抱怨的『看起來死機』;改邊跑邊 Receive-Job + 心跳。③早期三態判定式抓不到 python 缺檔錯誤,腳手架裡引擎不存在卻 0.7s 回 OK=假綠;改為段 rc(wrapped 末行回報 __RC__)+缺件樣式+錯誤樣式三者合判,rc≠0 必紅。另修 R2(Join-Path $env:USERPROFILE 未非空判,批389 同型)與型別錯(Object[] 無 Trim();解析綠卻執行紅)。端到端代跑 PASS:自腳手架卡住態取出 OneShot → 解卡兩輪 → 升版 v0174→v0178/v0101→v0104 → 點源新令在位 → 九段三態總表。"
+  },
+  {
+   "code": "ONESHOT-v0101",
+   "kind": "批394 續章 操作員工作站首跑實錄(OK 10 · FAIL 5 · SKIP 1 · 3296s)三修",
+   "ts": "2026-09-13 02:30",
+   "name": "OneShot v0101 三修:①四態——原只有 OK/FAIL/SKIP,把引擎的誠實中間態 YELLOW/PARTIAL/WARN 一律算成 FAIL=判定過嚴的假紅(實錄:S5 via-rungate 明印『判定 YELLOW』=家族境未建走 base 退路,卻被標 FAIL;S3b via-envgov 唯讀計畫 rc=1 亦屬有待裁段的中間態)→ 新增 WARN 態。②紅站明細自動列出——S8 實錄 OK 181 · FAIL 22 卻只給總數,操作員得另外翻存證=來回白費;v0101 於總表後自動讀最新 GRID_*.json / VIA_ProductGate / VIA_ProjectCompletion 並列出紅站、紅閘、未綠專案(最多 30 筆,餘數指向存證)。③資料段數字健檢——S6b 籌碼『落庫 0 列』而庫落後數月、S6a 價格『done 1988 · failed 1430』失敗過半,皆非引擎崩潰故原判 OK,但數字本身就是警訊 → 落庫 0 列或 failed 佔比 >30% 即標 WARN 並印建議。",
+   "note": "明細欄位以實際存證鍵名對齊(projects 用 key/zh 非 name;gates 用 id/name/evidence/next;gaps 元素是物件故改印數量)——先印出空白欄才發現,查存證後修正。"
+  },
+  {
+   "code": "CGC-146-v0104",
+   "kind": "批394 續章:F1 規則太窄的真相(我自己連犯兩次才看清)",
+   "ts": "2026-09-13 02:30",
+   "name": "PS AST 引擎 v0104 新增 F1b:上一行未以運算子/逗號/開括號結尾,而下一行以續接運算子起頭 → 運算式提前結束 → Missing closing ')'。原 F1(改稱 F1a)只認『行尾註解』那一種成因,但註解只是成因之一,真因是上一行沒以運算子結尾;故我在 Invoke-VIA-OneShot v0101 寫出無註解的跨行 Write-Host 時,detect_f1 回零命中=規則太窄漏抓。F1b 修法=運算子上提本行末。安全閘:只在該檔確有 ParseError 時啟用,且只掃 ParseError 行號附近 ±4 行,否則 -Path/-not 這類合法續行會被大量誤判(健康檔一律不碰;無錯不啟用)。第⑮檢固化:真案例修前紅→命中 1→修後綠、健康檔零誤判、無錯不啟用。十五檢全綠。",
+   "note": "實戰驗證:我在同一支啟動器上第二次犯同型錯(L375),直接呼 v0104 的 detect_f1b + fix_f1b,引擎自己命中 375、沙盒複驗綠、寫回修成——引擎修了作者的錯。這也再次印證 F1a/F1b/R4/param 位置錯同屬一族:AST 解析綠不代表能跑。"
   }
  ],
- "updated_at": "2026-09-13 01:40"
+ "updated_at": "2026-09-13 02:30"
 }
