@@ -16,7 +16,9 @@ function Head($t) {
   $global:Stations = $global:Stations + 1
   Write-Host "`n── $t ──" -ForegroundColor Cyan
 }
-function GitU { , @(git diff --name-only --diff-filter=U 2>$null | Where-Object { $_ }) }
+# 一元逗號會把陣列再包一層:`$x = GitU` 讀得到 0,`@(GitU).Count` 卻回 1。
+# 同一個 helper 兩種用法給不同答案 —— 拿掉逗號,呼叫端一律 @() 包。
+function GitU { git diff --name-only --diff-filter=U 2>$null | Where-Object { $_ } }
 
 # ① 母庫正本
 Head '① 母庫正本'
@@ -48,35 +50,47 @@ if (-not $Mother) {
   }
 }
 
-# ③ git 解卡（可逆；非阻塞）
+# ③ git 解卡（可逆；非阻塞；產物自動解,原始碼不猜）
 Head '③ git 解卡'
 $pulled = $false
+# 產物 = 引擎的輸出,下次跑就重生 → 取遠端版不損失任何東西,可以自動解。
+# .zip 不在內:批367 定過「zip 為收容原件=只增不減」,那是來源不是產物。
+function IsArtifact([string]$f) {
+  if ($f -match '\.(parquet|duckdb|pyc)$') { return $true }
+  if ($f -match '(^|/)__pycache__/') { return $true }
+  if ($f -match '(^|/)VIA_Reports/') { return $true }
+  if ($f -match '(^|/)_warehouse/') { return $true }
+  if ($f -match '(^|/)output/.*\.(db|json|html|csv)$') { return $true }
+  if ($f -match '_selftest\.db$') { return $true }
+  return $false
+}
+function ResolveArtifacts {
+  $u = @(git diff --name-only --diff-filter=U 2>$null | Where-Object { $_ })
+  $art = @($u | Where-Object { IsArtifact $_ })
+  $src = @($u | Where-Object { -not (IsArtifact $_) })
+  foreach ($f in $art) {
+    git checkout --theirs -- "$f" 2>&1 | Out-Null
+    git add -- "$f" 2>&1 | Out-Null
+  }
+  return @{ art = $art; src = $src }
+}
 if (-not $Mother) {
   Lamp 'YELLOW' 'GIT' '母庫缺席,跳過'
 } else {
   $br = (git rev-parse --abbrev-ref HEAD 2>$null)
   $gd = (git rev-parse --git-dir 2>$null)
-  $U = GitU
-  Write-Host ("  分支 $br · HEAD $(git rev-parse --short HEAD 2>$null) · 未合併檔 $($U.Count) 個")
-  foreach ($f in ($U | Select-Object -First 12)) { Write-Host ("      $f") -ForegroundColor Yellow }
-  if ($U.Count -gt 0) {
-    # 先存保命點：只是一個分支指標,不動任何檔,隨時 git checkout 回來
+  $U0 = @(GitU)
+  Write-Host ("  分支 $br · HEAD $(git rev-parse --short HEAD 2>$null) · 未合併檔 $($U0.Count) 個")
+  if ($U0.Count -gt 0) {
     $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
     git branch "via-rescue-$stamp" 2>&1 | Out-Null
-    Write-Host ("  保命點 via-rescue-$stamp(只是個分支指標,不動檔案)") -ForegroundColor DarkGray
-    if (Test-Path -LiteralPath (Join-Path $gd 'MERGE_HEAD')) {
-      git merge --abort 2>&1 | Out-Null
-      Write-Host '  merge --abort(完全可逆,還原成 pull 之前)' -ForegroundColor DarkGray
-    }
+    Write-Host ("  保命點 via-rescue-$stamp(分支指標,不動檔案;要回去 git checkout 它)") -ForegroundColor DarkGray
   }
-  $U2 = GitU
-  if ($U2.Count -gt 0) {
-    Lamp 'RED' 'GIT' "仍有 $($U2.Count) 個未合併檔,不硬拉(硬拉只會再卡一次)；把上面清單貼給我"
-  } else {
-    git fetch origin $br 2>&1 | Out-Null
+  git fetch origin $br 2>&1 | Out-Null
+  # 不在 merge 中但有分岔 → 主動起一次 merge,好讓產物律有東西可解
+  if (-not (Test-Path -LiteralPath (Join-Path $gd 'MERGE_HEAD'))) {
     git merge-base --is-ancestor HEAD FETCH_HEAD 2>$null
     $ff = ($LASTEXITCODE -eq 0)
-    $localOnly = @(git log --oneline HEAD --not FETCH_HEAD 2>$null | Where-Object { $_ })
     $remoteOnly = @(git log --oneline FETCH_HEAD --not HEAD 2>$null | Where-Object { $_ })
     if ($ff -and $remoteOnly.Count -eq 0) {
       Lamp 'GREEN' 'GIT' "已是最新 $(git rev-parse --short HEAD 2>$null)"
@@ -84,21 +98,44 @@ if (-not $Mother) {
     } elseif ($ff) {
       $before = (git rev-parse --short HEAD 2>$null)
       git pull --ff-only origin $br 2>&1 | Out-Null
-      if ($LASTEXITCODE -eq 0) {
-        Lamp 'GREEN' 'GIT' "$before → $(git rev-parse --short HEAD 2>$null)（快轉 $($remoteOnly.Count) 個 commit）"
-        $pulled = $true
-      } else { Lamp 'RED' 'GIT' '快轉失敗' }
-    } else {
-      $mt = (git merge-tree HEAD FETCH_HEAD 2>&1 | Out-String)
-      $conf = @([regex]::Matches($mt, 'CONFLICT[^\r\n]*') | ForEach-Object { $_.Value } | Select-Object -Unique)
-      if ($conf.Count -eq 0) {
-        $mb = (git merge-base HEAD FETCH_HEAD 2>$null)
-        $old = (git merge-tree $mb HEAD FETCH_HEAD 2>&1 | Out-String)
-        $conf = @([regex]::Matches($old, 'changed in both\r?\n\s+base\s+\S+\s+\S+\s+(\S.*)') | ForEach-Object { '兩邊都改過：' + $_.Groups[1].Value.Trim() } | Select-Object -Unique)
+      if ($LASTEXITCODE -eq 0) { Lamp 'GREEN' 'GIT' "$before → $(git rev-parse --short HEAD 2>$null)(快轉 $($remoteOnly.Count) 個)"; $pulled = $true } else { Lamp 'RED' 'GIT' '快轉失敗' }
+    } elseif ($U0.Count -eq 0) {
+      Write-Host '  兩邊各自往前走了 → 起一次 merge(產物自動解,原始碼不猜)' -ForegroundColor DarkGray
+      git merge FETCH_HEAD --no-edit 2>&1 | Out-Null
+    }
+  }
+  # 到這裡若還在 merge 中(本來就卡著,或剛起的)→ 套產物律
+  if (-not $pulled) {
+    if (Test-Path -LiteralPath (Join-Path $gd 'MERGE_HEAD')) {
+      $r = ResolveArtifacts
+      Write-Host ("  產物自動取遠端 $($r.art.Count) 個 · 原始碼待決 $($r.src.Count) 個") -ForegroundColor DarkGray
+      foreach ($f in ($r.art | Select-Object -First 8)) { Write-Host ("      [產物] $f") -ForegroundColor DarkGray }
+      if ($r.src.Count -eq 0) {
+        git commit --no-edit 2>&1 | Out-Null
+        if (@(GitU).Count -eq 0) {
+          Lamp 'GREEN' 'GIT' "解開了 · $(git rev-parse --short HEAD 2>$null) · 產物 $($r.art.Count) 個取遠端(下次跑重生)"
+          $pulled = $true
+        } else { Lamp 'RED' 'GIT' '產物都解了但 commit 沒成,訊息在上面' }
+      } else {
+        Lamp 'RED' 'GIT' "原始碼衝突 $($r.src.Count) 個,不猜該留哪邊 → 把下面清單貼給我"
+        foreach ($f in $r.src) { Write-Host ("      [原始碼] $f") -ForegroundColor Yellow }
       }
-      Lamp 'YELLOW' 'GIT' "分岔:你獨有 $($localOnly.Count) · 遠端獨有 $($remoteOnly.Count) · 會打架 $($conf.Count) 處 → 不猜該留哪邊,貼給我"
-      foreach ($c in ($conf | Select-Object -First 10)) { Write-Host ("      $c") -ForegroundColor Yellow }
-      foreach ($c in ($localOnly | Select-Object -First 6)) { Write-Host ("      本地 $c") -ForegroundColor DarkYellow }
+    } elseif (@(GitU).Count -gt 0) {
+      Lamp 'RED' 'GIT' "索引有殘留未合併檔但不在 merge 中,不亂動 → 貼給我"
+      foreach ($f in @(GitU)) { Write-Host ("      $f") -ForegroundColor Yellow }
+    }
+  }
+  # 保證這一站一定發燈。實測逼出來的漏洞:repo 已解完、本地領先遠端時
+  # ——不是快轉、遠端沒新東西、也不在 merge 中——上面三個分支都不成立,
+  # 結果一盞燈都沒發,又是一個靜默站。不補 elseif(下次還會漏),
+  # 改成**發完才算數**:沒發就在這裡照實況補一盞。
+  if (-not (@($L | Where-Object { $_.站 -eq 'GIT' }).Count)) {
+    $ahead = @(git log --oneline HEAD --not FETCH_HEAD 2>$null | Where-Object { $_ }).Count
+    $behind = @(git log --oneline FETCH_HEAD --not HEAD 2>$null | Where-Object { $_ }).Count
+    if ($ahead -gt 0 -and $behind -eq 0) {
+      Lamp 'GREEN' 'GIT' "沒東西要拉 · 本地領先遠端 $ahead 個 commit(要送上去就 git push)"
+    } else {
+      Lamp 'YELLOW' 'GIT' "狀態未歸類:領先 $ahead · 落後 $behind · 未合併 $(@(GitU).Count) → 貼給我"
     }
   }
 }
