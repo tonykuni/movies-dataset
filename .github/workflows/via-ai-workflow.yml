@@ -1,0 +1,39 @@
+name: VIA AI Workflow Contract
+
+on:
+  pull_request:
+    paths:
+      - "VeritasIntelligenceAnalytics/supportive modules/20_Registry_SSOT/VIA_AI_Workflow_v0100/**"
+      - ".github/workflows/via-ai-workflow.yml"
+      - ".github/workflows/via-master-control-ui.yml"
+  push:
+    branches:
+      - ChatGPT
+    paths:
+      - "VeritasIntelligenceAnalytics/supportive modules/20_Registry_SSOT/VIA_AI_Workflow_v0100/**"
+      - ".github/workflows/via-ai-workflow.yml"
+      - ".github/workflows/via-master-control-ui.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: "VeritasIntelligenceAnalytics/supportive modules/20_Registry_SSOT/VIA_AI_Workflow_v0100"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile
+        run: python -m py_compile src/via_ai_workflow.py src/via_mother_system_bridge.py tests/test_via_ai_workflow.py
+      - name: Contract validation
+        run: python src/via_ai_workflow.py validate
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+      - name: PowerShell bridge smoke test
+        shell: pwsh
+        run: ./Invoke-VIA-AIWorkflow-v0100.ps1 -Action Validate

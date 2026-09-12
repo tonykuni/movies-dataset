@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/schemas/handoff_packet.schema.json",
+  "title": "VIA Multi-AI Handoff Packet",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "handoff_id",
+    "task_id",
+    "module_ids",
+    "from_agent",
+    "to_agent",
+    "repository",
+    "branch",
+    "base_sha",
+    "head_sha",
+    "status",
+    "changed_paths",
+    "changed_symbols",
+    "gates",
+    "artifacts",
+    "unresolved",
+    "rollback",
+    "next_action"
+  ],
+  "properties": {
+    "handoff_id": {"type": "string", "pattern": "^VIA-HO-[0-9]{8}-[0-9]{4}$"},
+    "task_id": {"type": "string", "minLength": 1},
+    "module_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^VIA-AI-[0-9]{6}$"}},
+    "from_agent": {"type": "string", "minLength": 1},
+    "to_agent": {"type": "string", "minLength": 1},
+    "repository": {"const": "tonykuni/movies-dataset"},
+    "branch": {"type": "string", "minLength": 1},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{7,40}$"},
+    "head_sha": {"type": "string", "pattern": "^[0-9a-f]{7,40}$"},
+    "status": {"enum": ["in_progress", "blocked", "ready_for_review", "accepted"]},
+    "changed_paths": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "changed_symbols": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "status", "command", "evidence"],
+        "properties": {
+          "name": {"type": "string"},
+          "status": {"enum": ["PASS", "FAIL", "SKIP", "BLOCKED"]},
+          "command": {"type": "string"},
+          "evidence": {"type": "string"}
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": {"type": "string"},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "unresolved": {"type": "array", "items": {"type": "string"}},
+    "rollback": {"type": "string", "minLength": 1},
+    "next_action": {"type": "string", "minLength": 1},
+    "promote_plan": {"type": "string"}
+  }
+}
+

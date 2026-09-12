@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/schemas/context_pack.schema.json",
+  "title": "VIA Task Context Pack",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task_id", "goal", "module_ids", "repository_root", "base_sha", "path_allowlist", "symbol_allowlist", "constraints", "acceptance", "token_budget"],
+  "properties": {
+    "task_id": {"type": "string", "minLength": 1},
+    "goal": {"type": "string", "minLength": 1},
+    "module_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^VIA-AI-[0-9]{6}$"}},
+    "repository_root": {"type": "string", "minLength": 1},
+    "base_sha": {"type": "string", "pattern": "^[0-9a-f]{7,40}$"},
+    "path_allowlist": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+    "symbol_allowlist": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "constraints": {"type": "array", "items": {"type": "string"}},
+    "acceptance": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+    "token_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_input_tokens", "include_full_files"],
+      "properties": {
+        "max_input_tokens": {"type": "integer", "minimum": 1000},
+        "include_full_files": {"type": "boolean"},
+        "max_chars_per_file": {"type": "integer", "minimum": 256}
+      }
+    }
+  }
+}
+

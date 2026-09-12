@@ -1,0 +1,30 @@
+{
+  "module_id": "VIA-AI-000003",
+  "version": "0100",
+  "layer": "CORE",
+  "slug": "core-implementation",
+  "title": "VIA canonical core implementation",
+  "status": "validated",
+  "owner": "VIA",
+  "purpose": "Implement or repair one bounded canonical capability while preserving public behavior and avoiding Hydra duplication.",
+  "dependencies": ["VIA-AI-000001", "VIA-AI-000002"],
+  "inputs": [
+    {"name": "ast_index", "type": "json", "required": true},
+    {"name": "contract", "type": "json", "required": true}
+  ],
+  "outputs": [
+    {"name": "implementation_delta", "type": "source", "required": true},
+    {"name": "compatibility_report", "type": "json", "required": true}
+  ],
+  "owned_paths": [],
+  "owned_symbols": [],
+  "steps": [
+    {"step_id": "S01", "action": "Build AST symbol and dependency index for the allowed scope.", "on_failure": "stop"},
+    {"step_id": "S02", "action": "Compare existing family candidates and select one canonical target by SSOT order.", "on_failure": "review_required"},
+    {"step_id": "S03", "action": "Implement complete functions with parameters centralized at the top and stable interfaces.", "on_failure": "stop"},
+    {"step_id": "S04", "action": "Record behavior delta and backward-compatibility evidence.", "on_failure": "stop"}
+  ],
+  "gates": ["AST", "STATIC", "UNIT", "CONTRACT"],
+  "metadata": {"stage": 3, "zero_hydra": true}
+}
+

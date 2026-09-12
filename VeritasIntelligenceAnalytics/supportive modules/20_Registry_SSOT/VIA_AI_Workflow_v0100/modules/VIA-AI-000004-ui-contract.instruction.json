@@ -1,0 +1,30 @@
+{
+  "module_id": "VIA-AI-000004",
+  "version": "0100",
+  "layer": "UI",
+  "slug": "ui-contract",
+  "title": "VIA UI input-status-output contract",
+  "status": "validated",
+  "owner": "VIA",
+  "purpose": "Bind UI controls to governed parameters, status telemetry, data subjects, units and outputs without embedding business logic in the view.",
+  "dependencies": ["VIA-AI-000002", "VIA-AI-000003"],
+  "inputs": [
+    {"name": "parameter_contract", "type": "json", "required": true},
+    {"name": "visual_spec", "type": "json", "required": true}
+  ],
+  "outputs": [
+    {"name": "ui_binding", "type": "json", "required": true},
+    {"name": "status_matrix", "type": "json", "required": true}
+  ],
+  "owned_paths": [],
+  "owned_symbols": [],
+  "steps": [
+    {"step_id": "S01", "action": "Map each UI input to a typed registry parameter and default value.", "on_failure": "stop"},
+    {"step_id": "S02", "action": "Expose input, running status, validation and output as separate UI states.", "on_failure": "stop"},
+    {"step_id": "S03", "action": "Preserve VAP visual locks and responsive panel behavior.", "on_failure": "review_required"},
+    {"step_id": "S04", "action": "Verify subject, unit, data type and source are visible or machine-addressable.", "on_failure": "stop"}
+  ],
+  "gates": ["CONTRACT", "INTEGRATION", "USER_TEST"],
+  "metadata": {"stage": 4, "business_logic_in_ui": false}
+}
+
