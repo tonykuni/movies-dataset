@@ -2,8 +2,8 @@
 
 - 日期:2026-09-13
 - 倉庫:`tonykuni/movies-dataset` · 分支 `main` 與 `claude/via-system-followup-tz7k9t`(每 commit 雙推)
-- HEAD:`3e4e5cca` · 工作樹乾淨 · 台帳 956 筆(append-only)
-- 窗次:批394 與其續章(共 9 個 commit,清單見 §6)
+- HEAD:見 §6 commit 清單首筆之後(本報告由收尾 commit 一併收束;以 `git log` 為準)· 工作樹乾淨 · 台帳 958 筆(append-only)
+- 窗次:批394 與其續章(§6 列 9 筆;另有報告入庫與收尾自檢各一筆)
 
 ---
 
@@ -22,12 +22,12 @@ till they work.」
 
 | 件 | 尾版 | 作用 |
 |---|---|---|
-| `CGC_MDL146_PsAstRepair` | v0104 | PS AST 多輪並行安全修正引擎(T1 AST / T2 PSSA / T3 CommandAst;F1a/F1b 自動修;R1/R2/R4 只列) |
-| `CGC_MDL143_MergeMedic` | v0104 | 拉齊醫生(連字號版號、stash pop 不毀台帳、MERGE_HEAD 已解態) |
-| `CGC_MDL144_CopyDoctor` | v0102 | 副本醫生(+bootstrap 死結偵測與可貼指令產出) |
-| `CGC_MDL064_SelftestGrid` | v0273 | 全矩陣 207 站(+寫庫站分組=鎖撞假紅歸零) |
+| `CGC_MDL146_PsAstRepair` | v0104(十五檢) | PS AST 多輪並行安全修正引擎(T1 AST / T2 PSSA / T3 CommandAst;F1a/F1b 自動修;R1/R2/R4 只列) |
+| `CGC_MDL143_MergeMedic` | v0104(十四檢) | 拉齊醫生(連字號版號、stash pop 不毀台帳、MERGE_HEAD 已解態) |
+| `CGC_MDL144_CopyDoctor` | v0102(十一檢) | 副本醫生(+bootstrap 死結偵測與可貼指令產出) |
+| `CGC_MDL064_SelftestGrid` | v0274 | 全矩陣 207 站(+寫庫站分組=鎖撞假紅歸零;站名校正至實檢數) |
 | `CGC_MDL087_TestPyramid` | v0101 | 三級金字塔(I3 寫死版號修 + ②b 自我看守反測) |
-| `Invoke-VIA-OneShot` | v0101 | **一個指令跑完全部**(九段;四態;紅站明細;資料數字健檢) |
+| `Invoke-VIA-OneShot` | v0102 | **一個指令跑完全部**(九段;四態;紅站明細;資料數字健檢;pathspec 改 glob) |
 | `Invoke-VIA-Unstick` | v0100 | 倉庫解卡啟動器(不依賴副本醫生版本;迴圈至與 origin 齊平) |
 | `Register-VIA-Commands` | v0179 | 短令冊(+via-oneshot/一鍵、via-unstick/解卡、via-psrepair-ast/語法修) |
 | `VAP_ENG007_RawWideRefresh` | v0101 | 寬表刷新器(FRED 鑰缺 → 誠實 SKIP) |
@@ -70,7 +70,7 @@ till they work.」
 
 ---
 
-## 4 我自己犯的錯(誠實記錄,供接棒者避坑)
+## 4 我自己犯的錯(十枚;誠實記錄,供接棒者避坑)
 
 1. **F1 修法首猜錯** — 初版以為「把行尾註解搬走」就能解續行斷裂,pwsh 真測仍紅。真因是
    PowerShell 換行續接的唯一條件是「上一行以運算子結尾」。正解=運算子上提 + 註解搬續行末。
@@ -98,6 +98,11 @@ till they work.」
    輸出緩衝到結束才吐(長跑段畫面全白);判定式抓不到 python 缺檔錯誤造成 0.7s 假綠。
 
 9. **OneShot 判定過嚴造成假紅** — 把引擎的誠實中間態 YELLOW/待裁一律算 FAIL。已加 WARN 態。
+
+10. **git pathspec 也寫死了版號** — 我在 OneShot v0101 的 S1 與交接報告的指令裡都寫死
+    `Invoke-VIA-Unstick-v0100.ps1` / `Invoke-VIA-OneShot-v0100.ps1`。「glob 尾版動態解析嚴禁
+    寫死版號」律同樣適用於 git pathspec——啟動器一升版,那行就取到舊版。實測 `git checkout`
+    支援 glob pathspec,已改取整族再由 `Sort-Object | Select -Last 1` 挑尾版(OneShot v0102)。
 
 > 共通教訓:**AST 解析綠 ≠ 能跑**。`param` 位置錯、`if` 當參數運算式、型別假設錯(`Object[]`
 > 沒有 `Trim()`)三者都解析全綠而執行必炸。靜態檢與真跑必須並用。
@@ -150,6 +155,16 @@ via-oneshot -SkipAccel -SkipData -SkipMatrix     # 約 5 分;只看診斷
 2. 籌碼落庫 0 列 → 查 checkpoint 是否已全標 done / 端點節流;`via-chip` 重跑或重置該段
 3. 家族境未建 → `via-envgov apply --approve` 建 via_core/via_*,rungate 才由 YELLOW 轉綠
 4. 價格 failed 1430 → 多為端點節流或代碼已下市;重試權保留,可重跑該段
+
+### 副本若完全拿不到新檔(bootstrap 死結)
+倉庫卡未合併時新檔進不來,但 git 可跨分支取單檔(pathspec 支援 glob=零寫死版號):
+```powershell
+$r="C:\Users\tonyk\OneDrive\Documents\movies-dataset"
+git -C $r fetch origin main
+git -C $r checkout origin/main -- "VeritasIntelligenceAnalytics/Invoke-VIA-OneShot-v*.ps1"
+& (Get-ChildItem "$r\VeritasIntelligenceAnalytics\Invoke-VIA-OneShot-v*.ps1" |
+    Sort-Object Name | Select-Object -Last 1).FullName -Root $r
+```
 
 ### 倉庫若再卡住
 ```powershell

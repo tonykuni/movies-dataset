@@ -3,9 +3,9 @@
 | 層 | 值 | 燈 |
 |---|---|---|
 | GitHub | tonykuni/movies-dataset @ main + claude/via-system-followup-tz7k9t(雙推) | 綠 |
-| HEAD | 3e4e5cca · 工作樹乾淨 | 綠 |
-| 短令冊尾版 | Register-VIA-Commands-v0179.ps1(via-oneshot / via-unstick / via-psrepair-ast 已在) | 綠 |
-| 台帳 | 956 筆(append-only) | 綠 |
+| HEAD | 以 git log 為準(收尾 commit 後)· 工作樹乾淨 | 綠 |
+| 短令冊尾版 | Register-VIA-Commands-v0179.ps1(via-oneshot / via-unstick / via-psrepair-ast 各配 .cmd 梭與別名) | 綠 |
+| 台帳 | 958 筆(append-only) | 綠 |
 | 雲端全矩陣 | 207 站 · OK 205 · FAIL 0 · SKIP 2 · 286s | 綠 |
 | 雲端 PS 全樹 | 尾版 ParseError 0 · 解析綠 164 · T3 死路嫌疑 0 · Report-Only R2 十二枚 | 綠 |
 | 工作站倉庫 | 卡未合併已解 · 冊升 v0174→v0179 · 醫生升 v0101→v0104 | 綠 |
@@ -23,6 +23,16 @@
 ```powershell
 via-oneshot -SkipAccel -SkipData      # 約 45 分;跑完總表後附 22 紅站明細
 via-oneshot -SkipAccel -SkipData -SkipMatrix   # 約 5 分;只看診斷
+```
+
+副本拿不到新檔時(bootstrap 死結;git pathspec 支援 glob=零寫死版號):
+
+```powershell
+$r="C:\Users\tonyk\OneDrive\Documents\movies-dataset"
+git -C $r fetch origin main
+git -C $r checkout origin/main -- "VeritasIntelligenceAnalytics/Invoke-VIA-OneShot-v*.ps1"
+& (Get-ChildItem "$r\VeritasIntelligenceAnalytics\Invoke-VIA-OneShot-v*.ps1" |
+    Sort-Object Name | Select-Object -Last 1).FullName -Root $r
 ```
 
 ## 三件未解(需工作站)

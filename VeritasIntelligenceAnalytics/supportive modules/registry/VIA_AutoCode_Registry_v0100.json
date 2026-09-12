@@ -7158,7 +7158,14 @@
    "ts": "2026-09-13 03:10",
    "name": "入 logs/VIA_STATUS_20260913.md(現況表:雙側分列——雲端 207 站 OK 205/FAIL 0/SKIP 2 與工作站 OneShot 首跑 OK 10/FAIL 5/SKIP 1 含全矩陣 22 紅;附下一指令與三件未解)+ logs/VIA_HANDOVER_b394_20260913.md(交接全文八節:起終點、新建升版件尾版表、七枚真缺陷含實測證據、我自己犯的九枚錯與共通教訓『AST 解析綠 ≠ 能跑』、雙側實測現況、本窗九個 commit、接棒者下一步與不變常令與安全紅線、雲端自動快照說明)。依既有慣例放 logs/(該夾 md 已入 git)。",
    "note": "誠實性要點:報告明白分列雲端與工作站兩側數字並警示『勿以單側數字代表全系統』(雲端同矩陣 0 紅而工作站 22 紅,差異來自真資料與真環境);工作站兩枚 FAIL 標明實為假紅並已於 OneShot v0101 改判 WARN;資料段兩個數字警訊(籌碼落庫 0 列、價格 failed 1430/done 1988)如實列出而非以『引擎沒崩』代過。鑰匙守衛與 model ID 守衛皆零命中。"
+  },
+  {
+   "code": "AUDIT-b394-close",
+   "kind": "批394 操作員令「再檢查一次全部都更新有無遺漏」:十一項逐查,抓到兩枚我方違律",
+   "ts": "2026-09-13 03:50",
+   "name": "收尾自檢十一項:①工作樹乾淨且 HEAD=origin/main=origin/claude/via-system-followup-tz7k9t 三者同 ②本窗十五件全部入 git ③三新令(via-oneshot/via-unstick/via-psrepair-ast)各有冊內定義+同名 .cmd 梭+別名 ④格子涵蓋本窗五引擎(皆 glob 尾版)⑤台帳筆數與時戳 ⑥死路掃描:本窗與報告指路的 21 個令零死路(既有 161 種歷史缺口非本窗造成)⑦新建件 AST 綠且 Report-Only 零命中 ⑧⑨兩枚違律已修(見 note)⑩報告數字與尾版表同步 ⑪以與操作員指令同形的 glob pathspec 做端到端實跑 PASS。產出:Invoke-VIA-OneShot v0102、格子 v0274、報告二份同步。",
+   "note": "抓到的兩枚我方違律:①『glob 尾版動態解析嚴禁寫死版號』律同樣適用於 git pathspec——OneShot v0101 的 S1 與交接報告的指令都寫死 Invoke-VIA-Unstick-v0100.ps1 / Invoke-VIA-OneShot-v0100.ps1,啟動器一升版該行就取到舊版;實測 git checkout 支援 glob pathspec,改取整族再由 Sort-Object | Select -Last 1 挑尾版(v0102 + 報告二份)。②格子三站名落後實檢數(PS AST 十三檢→十五檢、拉齊醫生九檢→十四檢、副本醫生十檢→十一檢)=名實相符律偏差,v0274 校正並逐站複跑全綠。另誠實記錄:本次查死路時我第一次取錯 JSON 鍵(取 dead_tokens 而非 dead)得到『零死路』,若就此收工即為假綠;改用正確鍵後確認 2691 筆/161 種,再比對本窗令才是真零。"
   }
  ],
- "updated_at": "2026-09-13 03:10"
+ "updated_at": "2026-09-13 03:50"
 }
