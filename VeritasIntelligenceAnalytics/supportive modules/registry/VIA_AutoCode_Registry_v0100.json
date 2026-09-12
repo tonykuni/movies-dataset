@@ -6976,6 +6976,20 @@
    "ts": "2026-09-11 19:15",
    "name": "Invoke-VIA-VdfFetch v0102:+①b 倉庫自癒(-SelfHeal 預設開;-NoHeal 關):卡未合併→merge --abort(退 reset --merge)/髒樹→stash -u/落後→ff/分叉→merge --no-ff/衝突→MDL143 拉齊醫生按律解(台帳聯集·同名雙物讓位遠端·再生物取遠端)/末 stash pop 原樣還原;零 force 零 reset --hard 零刪除。一段 PS 即完成:自癒→進環境→同意閘→家族境 python→年份旗標→20 加速器→Hydra 哨兵→十一步十道並行→雙 digest",
    "note": "實錄根因:操作員副本從未拉到 via-vdffetch.cmd 與本腳本(先卡未合併、後分叉),故任何依賴檔案的指令皆不可用→自癒必須內建於單一貼入碼;雲端無 pwsh=PS 側靜態檢(括號/引號/反引號平衡),git 序列邏輯與 MDL143 已於真 git 倉九檢驗證"
+  },
+  {
+   "code": "CGC-145-v0100/REG-v0175/CGC-064-v0269",
+   "kind": "批389 操作員令「test debug by yourself till it works perfectly」",
+   "ts": "2026-09-12 09:05",
+   "name": "雲端裝入可攜 PowerShell 7.4.6(scratchpad;不入 git)→ PS 層自此可真測,建 MDL145 PowerShell 真測閘固化:P1 AST 解析閘(VIA 根全 157 件 .ps1;守尾版律=同族尾版壞才 FAIL、封存版壞=WARN 具名凍結不改;另以刻意壞檔反測防空轉)/P2 功能閘(真建裸倉+兩複本造真分叉→跑 Invoke-VIA-VdfFetch 尾版 -Dry -NoEnter→驗自癒 merge 成功、HEAD 前進、零未合併、兩邊提交皆在、零 PS 錯誤行)/P3 參數閘(點源 Register 尾版→via-vdffetch 2023 / 2020 --limit 150 / --dry 三式具名傳遞=批384 陣列潑灑 bug 回歸測);pwsh 缺=SKIP 不假綠;九檢綠。Register v0175 +via-pstest+梭;grid v0269 +站=205 站",
+   "note": "真測立即抓到三枚真錯:①VdfFetch Resolve-VIARoot 在 USERPROFILE 空時基底含空值 ②同函式硬寫 C:\\Users\\tonyk → 非 Windows 上 Join-Path 噴「Cannot find drive 'C'」(我首猜 null=猜錯,真測才給真話)③主線 Invoke-VIA-PSRepair-v0102.ps1 L179 行尾註解截斷運算式 → 該族尾版整支 ParserError → via-psrepair 載入即敗(非我方檔,已 version-forward v0103 僅移註解位置,邏輯零變更)"
+  },
+  {
+   "code": "PS-VdfFetch-v0103/PSRepair-v0103",
+   "kind": "批389 真測修正二件",
+   "ts": "2026-09-12 09:05",
+   "name": "Invoke-VIA-VdfFetch v0103:Resolve-VIARoot 跨平台硬化(基底逐項非空判;Windows 專屬基底只在 Windows 加;兩 Join-Path 包 try/catch)→ USERPROFILE 空時零錯誤行(真測證實 0)。Invoke-VIA-PSRepair v0103:修 v0102 L179 ParserError(行尾註解移至續行末;邏輯零變更;v0102 原件零觸碰)",
+   "note": "v0103 自癒路徑三條真測皆通:DIVERGED→merge --no-ff 成功(HEAD 前進、兩邊提交皆在)、卡未合併→merge --abort 後續跑、BEHIND→ff;-NoHeal 可關"
   }
  ],
  "updated_at": "2026-09-09 05:10"
