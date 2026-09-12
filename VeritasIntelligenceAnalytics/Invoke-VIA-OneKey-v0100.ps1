@@ -12,9 +12,49 @@ function Lamp($c, $k, $m) {
   Write-Host ("{0,-6} {1,-11} {2}" -f $c, $k, $m) -ForegroundColor $col
 }
 $Stations = 0
+$StationTotal = 12
 function Head($t) {
   $global:Stations = $global:Stations + 1
-  Write-Host "`n── $t ──" -ForegroundColor Cyan
+  $pct = [int](100 * ($global:Stations - 1) / $StationTotal)
+  Write-Progress -Id 1 -Activity 'VIA 一鍵' -Status $t -PercentComplete $pct
+  Write-Host ("`n── {0} ──  [{1}%]" -f $t, $pct) -ForegroundColor Cyan
+}
+
+# 不卡斷:子行程邊跑邊把新行吐出來(不是等它跑完才一次 Out-String),
+# 逾時就中止並記 TIMEOUT——**只中止本腳本自己啟動的那個子行程**,
+# 絕不碰別人的進程(NoStopProcess 講的是別人的)。
+# 批423 操作員令「卡斷 加入20個加速器 不卡斷 動態進度條」的同一條紀律。
+function RunProc([string]$exe, [string[]]$argv, [int]$TimeoutSec, [string]$Label) {
+  $o = [IO.Path]::GetTempFileName()
+  $e = [IO.Path]::GetTempFileName()
+  $to = $false
+  # 含空白的路徑一定要自己加引號:Start-Process 會把 -ArgumentList 用空白串起來,
+  # 而這個系統的路徑天天都是「functional modules\VRN」。實測不加引號 → python rc=2
+  # (開不了檔),而且是靜默的——RunProc 收到 0 行輸出,燈就報成「沒印出計數」。
+  $q = @($argv | ForEach-Object { if ($_ -match '\s') { '"' + $_ + '"' } else { $_ } })
+  $p = Start-Process -FilePath $exe -ArgumentList $q -NoNewWindow -PassThru -RedirectStandardOutput $o -RedirectStandardError $e
+  $sw = [Diagnostics.Stopwatch]::StartNew()
+  $seen = 0
+  while (-not $p.HasExited) {
+    $lines = @(Get-Content -LiteralPath $o -EA SilentlyContinue)
+    if ($lines.Count -gt $seen) {
+      foreach ($ln in $lines[$seen..($lines.Count - 1)]) { Write-Host ("    $ln") -ForegroundColor DarkGray }
+      $seen = $lines.Count
+    }
+    $el = [int]$sw.Elapsed.TotalSeconds
+    Write-Progress -Id 2 -ParentId 1 -Activity $Label -Status ("跑了 {0} 秒 / 上限 {1} 秒 · 已吐 {2} 行" -f $el, $TimeoutSec, $seen) -PercentComplete ([math]::Min(99, [int](100 * $el / [math]::Max(1, $TimeoutSec))))
+    if ($el -ge $TimeoutSec) { try { $p.Kill() } catch { }; $to = $true; break }
+    Start-Sleep -Milliseconds 400
+  }
+  Start-Sleep -Milliseconds 200
+  $all = @(Get-Content -LiteralPath $o -EA SilentlyContinue)
+  if ($all.Count -gt $seen) { foreach ($ln in $all[$seen..($all.Count - 1)]) { Write-Host ("    $ln") -ForegroundColor DarkGray } }
+  $err = (Get-Content -LiteralPath $e -Raw -EA SilentlyContinue)
+  Write-Progress -Id 2 -ParentId 1 -Activity $Label -Completed
+  $rc = 0
+  if ($to) { $rc = -1 } elseif ($null -ne $p.ExitCode) { $rc = $p.ExitCode }
+  Remove-Item -LiteralPath $o, $e -EA SilentlyContinue
+  return @{ out = ($all -join "`n"); err = $err; rc = $rc; timeout = $to; secs = [int]$sw.Elapsed.TotalSeconds }
 }
 # 一元逗號會把陣列再包一層:`$x = GitU` 讀得到 0,`@(GitU).Count` 卻回 1。
 # 同一個 helper 兩種用法給不同答案 —— 拿掉逗號,呼叫端一律 @() 包。
@@ -147,8 +187,24 @@ if (-not $py) { $py = Get-Command python3 -EA SilentlyContinue }
 if (-not $py) { $py = Get-Command py -EA SilentlyContinue }
 if ($py) { Lamp 'GREEN' 'PYTHON' $py.Source } else { Lamp 'RED' 'PYTHON' '不在 PATH 上' }
 
+# ⑤ 加速器(綁正典 SUP_MDL737 加速器橋,不另造一套)
+Head '⑤ 加速器'
+if (-not ($Mother -and $py)) {
+  Lamp 'YELLOW' 'ACCEL' '母庫或 python 缺席,跳過'
+} else {
+  $acc = Get-ChildItem -LiteralPath (Join-Path $Mother 'supportive modules') -Filter 'SUP_MDL737_SuperAccelModule_v*.py' -EA SilentlyContinue | Sort-Object Name | Select-Object -Last 1
+  if (-not $acc) {
+    Lamp 'YELLOW' 'ACCEL' '找不到 SUP_MDL737 加速器橋'
+  } else {
+    $ra = RunProc $py.Source @($acc.FullName, '--activate') 180 '加速器啟動'
+    $cap = ($ra.out -split "`n" | Where-Object { $_ -match 'lib 冊' } | Select-Object -First 1)
+    if ($cap) { $cap = $cap.Trim() } else { $cap = '' }
+    if ($ra.timeout) { Lamp 'RED' 'ACCEL' "$($acc.Name) 逾時中止(不卡斷)" } elseif ($cap) { Lamp 'GREEN' 'ACCEL' "$($acc.Name) · $cap" } else { Lamp 'YELLOW' 'ACCEL' "$($acc.Name) 跑了但沒印出 lib 冊(rc=$($ra.rc))" }
+  }
+}
+
 # ⑤ OCR 安裝器：驗能力,不只驗在位
-Head '⑤ OCR 安裝器'
+Head '⑥ OCR 安裝器'
 $EM = $null; $EMwhy = ''
 $cands = New-Object System.Collections.ArrayList
 foreach ($p in @('C:\Users\tonyk\Github\VIA-VDF-VRN', 'C:\Users\tonyk\OneDrive\Documents\VIA-VDF-VRN',
@@ -183,12 +239,12 @@ if (-not $py) {
   if ($EM) {
     Lamp 'GREEN' 'ENVMGR' "$EM"
   } else {
-    Lamp 'RED' 'ENVMGR' "找到 $($cands.Count) 支,沒有一支有 ocr 子命令$EMwhy`n      修法:origin 若是 tonykuni/VIA-VDF-VRN,到該夾 git fetch origin claude/vrn-tp-candidate-scoring 再 git checkout 它"
+    Lamp 'RED' 'ENVMGR' "找到 $($cands.Count) 支,沒有一支有 ocr 子命令$EMwhy`n      修法(2026-09-12 PR #8 已併進 main,main 現在就有 ocr 子命令):`n      上面哪個 clone 的分支是 main,到那個夾跑 `"git pull`" 就好;`n      不在 main 的(例如 grok/… 分支)先 git checkout main 再 git pull"
   }
 }
 
 # ⑥ OCR 現況
-Head '⑥ OCR 現況'
+Head '⑦ OCR 現況'
 $Prefix = $env:TESSDATA_PREFIX
 if (-not $Prefix) { $Prefix = 'C:\Users\tonyk\OneDrive\Desktop\VRN\tessdata_best' }
 $langs = @()
@@ -200,11 +256,11 @@ if (Get-Command tesseract -EA SilentlyContinue) {
 } else { Lamp 'RED' 'TESSERACT' '不在 PATH 上' }
 
 # ⑦ 補 OCR 語言檔
-Head '⑦ 補 OCR 語言檔'
+Head '⑧ 補 OCR 語言檔'
 if ($langs.Count -ge 3) {
   Lamp 'GREEN' 'OCR-FIX' '語言檔本來就齊,不動'
 } elseif (-not ($EM -and $py)) {
-  Lamp 'YELLOW' 'OCR-FIX' '沒有可用的安裝器,跳過(見 ⑤)'
+  Lamp 'YELLOW' 'OCR-FIX' '沒有可用的安裝器,跳過(見 ⑥)'
 } else {
   Write-Host '  會從 GitHub 下載 chi_tra/chi_sim/eng(約 41 MB,pinned commit)' -ForegroundColor Yellow
   & $py.Source $EM ocr --repair --tessdata-prefix $Prefix
@@ -216,7 +272,7 @@ if ($langs.Count -ge 3) {
 }
 
 # ⑧ 首頁引擎自測
-Head '⑧ 首頁引擎自測'
+Head '⑨ 首頁引擎自測'
 if (-not ($Mother -and $py)) {
   Lamp 'YELLOW' 'ENGINE' '母庫或 python 缺席,跳過'
 } else {
@@ -224,22 +280,34 @@ if (-not ($Mother -and $py)) {
   if (-not $eng) {
     Lamp 'RED' 'ENGINE' '找不到首頁引擎'
   } else {
-    $out = & $py.Source $eng.FullName --selftest 2>&1 | Out-String
-    $tally = ($out -split "`n" | Where-Object { $_ -match '\[計\]' } | Select-Object -Last 1)
-    if ($tally) { $tally = $tally.Trim() } else { $tally = '(沒印出計數)' }
-    if ($out -match 'FAIL 0') { Lamp 'GREEN' 'ENGINE' "$($eng.Name) · $tally" } else { Lamp 'RED' 'ENGINE' "$($eng.Name) · $tally" }
+    $r = RunProc $py.Source @($eng.FullName, '--selftest') 900 "引擎自測 $($eng.Name)"
+    $tally = ($r.out -split "`n" | Where-Object { $_ -match '\[計\]' } | Select-Object -Last 1)
+    if ($tally) { $tally = $tally.Trim() } else { $tally = '' }
+    # 工作站實錄 2026-09-12:舊寫法是全篇搜 'FAIL 0',而自測輸出裡有子報告
+    # 也印 'FAIL 0'(例如「[計] 1 件 · FAIL 0 · NLP 路徑=…」),於是真總計是
+    # 「三十九檢 OK 38 · FAIL 1」卻掛綠燈。**又一個假綠**。
+    # 只認**最後那一行 [計]** 裡的數字,別的地方寫什麼都不算。
+    if ($r.timeout) {
+      Lamp 'RED' 'ENGINE' "$($eng.Name) · 逾時被中止(不卡斷)"
+    } elseif (-not $tally) {
+      Lamp 'RED' 'ENGINE' "$($eng.Name) · 沒印出 [計] 計數,不當它綠"
+    } elseif ($tally -match 'FAIL\s+(\d+)') {
+      if ([int]$Matches[1] -eq 0) { Lamp 'GREEN' 'ENGINE' "$($eng.Name) · $tally" } else { Lamp 'RED' 'ENGINE' "$($eng.Name) · $tally" }
+    } else {
+      Lamp 'RED' 'ENGINE' "$($eng.Name) · [計] 讀不到 FAIL 數:$tally"
+    }
   }
 }
 
 # ⑨ VRN 收尾
-Head '⑨ VRN 收尾'
+Head '⑩ VRN 收尾'
 if (Get-Command via-vrnval -EA SilentlyContinue) {
   via-vrnval --run
   Lamp 'GREEN' 'VRNVAL' '已跑(判讀看上面 DONE/FAIL/PENDING)'
 } else { Lamp 'YELLOW' 'VRNVAL' '短令未載入,跳過' }
 
 # ⑩ 編碼暴露盤點（唯讀,只量不改）
-Head '⑩ 編碼暴露盤點'
+Head '⑪ 編碼暴露盤點'
 if (-not $Mother) {
   Lamp 'YELLOW' 'ENC' '母庫缺席,跳過'
 } else {
@@ -259,7 +327,8 @@ if (-not $Mother) {
 }
 
 # ⑪ 總表
-Head '⑪ 總表'
+Write-Progress -Id 1 -Activity 'VIA 一鍵' -Completed
+Head '⑫ 總表'
 foreach ($row in $L) { Write-Host ("  {0,-6}  {1,-11}  {2}" -f $row.燈, $row.站, ($row.說明 -split "`n")[0]) }
 $red = @($L | Where-Object { $_.燈 -eq 'RED' }).Count
 $yel = @($L | Where-Object { $_.燈 -eq 'YELLOW' }).Count
