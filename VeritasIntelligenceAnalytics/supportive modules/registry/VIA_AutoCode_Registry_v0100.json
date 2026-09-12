@@ -7018,7 +7018,14 @@
    "ts": "2026-09-12 21:20",
    "name": "拉齊醫生 v0102:同名雙物正規式 _v#### → [-_]v####。實錄:操作員 OneDrive 副本卡 Register-VIA-Commands-v0168.ps1 與 v0169.ps1 兩件未合併,v0101 因只認底線而把連字號族判成 MANUAL 停住→倉庫永遠解不開(via-pstest 等新令永不到)。本系統連字號版號族(Register-VIA-Commands-v####、Invoke-VIA-*-v####)正是最常衝突者,故此漏判影響最大。+①b 檢:以卡住的真檔名驗四式(兩 Register、一 Invoke、一底線族)",
    "note": "同時誠實記錄:我給的手動 stash 指令在未合併態下必敗(git stash push 需可寫 index → 'needs merge / could not write index'),故正確順序必為『先解未合併→提交→再 stash→merge』=v0101 sync() 既有順序;操作員那次因 classify 漏判停在第一步,無任何損害(stash 未建立、HEAD 未動)"
+  },
+  {
+   "code": "CGC-146-v0100",
+   "kind": "批394 操作員令:PowerShell 指令語法多輪並行安全修正引擎",
+   "ts": "2026-09-12 21:35",
+   "name": "MDL146 PsAstRepair v0100:全景式語法分析(T1 AST Parser 取 Extent 起訖行列/T2 PSScriptAnalyzer 缺=SKIP 不代裝/T3 Command-Param Inspector)+ AST 雙模錨點(精準 Extent + 彈性結構簽名)+ 錯誤分流(Parallel-Fixable F1 / Report-Only R1R2 / Sequence-Dependent 只列)+ 多輪沙盒驗證(寫前沙盒解析、寫後複驗,任一不過即放棄該檔)+ Zero-Hydra(version-forward,目標版號已存在即拒寫,正本零觸碰零刪除零 force)+ 四分區 HTML 矩陣(RYG/ENGINE 每輪/MODULE 逐檔/OTHERS 封存凍結紅檔;零 CDN 手機單欄)。九檢全綠;Register v0177 登錄 via-psrepair-ast(別名 語法修)+ .cmd 梭;格子 v0271 第 206 站。",
+   "note": "自測抓到我自己的錯(誠實記錄):初版 F1 修法只把行尾註解搬到續行末,pwsh 真測證明仍紅——PowerShell 運算式換行只有『上一行以運算子結尾』才續接,註解把運算子留在下一行開頭就必斷。對照主線 Invoke-VIA-PSRepair v0102→v0103 的真修法,正解是『續接運算子上提到本行末 + 註解搬到續行末』,token 零變更。真測才給真話,首猜不算。雲端全樹實測:尾版 ParseError 0 · 解析綠 158 · 封存版紅 4(全為已被 v0103 取代的 Invoke-VIA-PSRepair-v0102.ps1=封存律凍結不改)=WARN 誠實態;--apply 真跑零寫入(健康樹=零動作,永不沒事亂改)。"
   }
  ],
- "updated_at": "2026-09-09 05:10"
+ "updated_at": "2026-09-12 21:35"
 }
