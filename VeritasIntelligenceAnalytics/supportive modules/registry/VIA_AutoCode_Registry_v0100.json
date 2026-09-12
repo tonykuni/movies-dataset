@@ -7046,7 +7046,42 @@
    "ts": "2026-09-12 22:10",
    "name": "格子 v0272:MDL146 站名改十三檢;併校正標頭站數——實跑 207 站(add() 206 枚 + 直接 B.append 的 ChipWar 引擎編譯檢 1 枚),歷來註記只數 add() 故一路少算該枚(v0270 註記 205、v0271 註記 206,實跑皆多 1)。自此註記以實跑為準。",
    "note": "全矩陣實跑(207 站):OK 200 · FAIL 5 · SKIP 2 · 312s。5 紅皆既有紅站(自動總跑器批127、寬表刷新器批145、族群輪動批152、每日觀察摘要批174 市場寬度句、驗證共識庫批176),非本批造成;duckdb 單寫者鎖衝突經 grid 既有『平行敗→序跑』機制已轉綠。"
+  },
+  {
+   "code": "FIX-MDL134-bridges",
+   "kind": "批394 續章 紅站①真修:尾版缺雙橋",
+   "ts": "2026-09-12 22:45",
+   "name": "自動總跑器六檢(批127)② S1 雙橋稽核恆紅,真因=CGC_MDL134_ParallelLanes_v0100.py 有 4 個橋標記但尾版 v0101 一個都沒有(新版建立時沒帶上 ACCEL/NET 橋)→ 全樹外呼 127 件中唯一網路缺 1 件、加速殘亦含它。以既有 MDL124 BridgeSweeper v0103 --accel --net --net-callers --apply 注入(零重造),注入後 AST OK、MDL134 九檢全綠、覆蓋 100%/100%、總跑器六檢全 OK=真綠。",
+   "note": "教訓:version-forward 產新版時若不帶橋,稽核即紅而表面看不出;橋掃描器本就能修,問題只是沒人對該根目錄跑過。"
+  },
+  {
+   "code": "VAP-007-v0101",
+   "kind": "批394 續章 紅站②:FRED 鑰缺的下游假紅",
+   "ts": "2026-09-12 22:45",
+   "name": "寬表刷新器六檢 ② 要求 US10Y > 300 日;查證 US10Y 取自 cross_macro (region='US', metric='GOV10Y'),該鍵由 VDF_ENG055 以 FRED 序列 DGS10 寫入=需 FRED 鑰。雲端無鑰(鑰檔僅工作站 output_hub/mega/.fred_api_key 且 gitignored)→ cross_macro 只有 EA/PPI 103 列、US10Y 恆 0 → 此檢在雲端永遠紅=假紅。v0101 改三態:指數欄正常 × US10Y 零 × 鑰缺席 → SKIP 並印補法;鑰在位而仍 0 → 照舊 FAIL。",
+   "note": "新增 fred_key_present():只判鑰檔存在與非空,永不讀值永不印值(鑰匙守衛律)。"
+  },
+  {
+   "code": "GRP-040-v0102",
+   "kind": "批394 續章 紅站③:核心第三方需求缺席",
+   "ts": "2026-09-12 22:45",
+   "name": "族群輪動六檢 ⑧「核心 demo 端到端」原只看 rc 且不印原因。實跑捕獲:核心收容件 VIA_TW_GroupingIndexRotationUnifiedEngine_v0201.py 第 60 行頂層 from sklearn.mixture import GaussianMixture → 雲端 base 無 scikit-learn → ModuleNotFoundError rc=1。依「base 只放該有的工具」律雲端 base 本就不該裝 → 假紅。v0102:先以 AST 取核心頂層第三方 import 逐名 find_spec(只讀不執行),缺席 → SKIP 並印缺件名與補法;在位則真跑判 rc,且失敗時把 stderr 末行印出。",
+   "note": "過去畫面只有 rc=1 三個字=除錯白跑;現在一眼看到 sklearn。"
+  },
+  {
+   "code": "VRN-068-v0103",
+   "kind": "批394 續章 紅站④:判準與資料宇宙不符 + 存證結構性缺口",
+   "ts": "2026-09-12 22:45",
+   "name": "每日觀察摘要實為三紅。⑨ 市場寬度句門檻 n_ma > 1000 係按『台股全市場 1800 檔』假設寫死,實查本庫 prices_canonical 全庫最大單日僅 552 檔(此庫標的宇宙規模)→ 該檢自設立起不可能綠;v0103 改用更嚴的相對守恆(該完整日因子覆蓋須 100% 且該日規模須等於庫內最大單日,不許小日冒充完整日)=真綠 325/552=58.9%。③ 榜前五/因子四線取自 GRP_ENG040 輪動快照 group_rotation_daily.csv 與全球快照,二檔由需 sklearn 的核心產生 → 快照不存在 → SKIP(但個股三檔日變動仍照驗)。① 金字塔存證缺 → SKIP 並指路 via-pyramid run(grid 燈/VSM 六燈/問題板三項仍照驗)。",
+   "note": "① 的結構性事實:金字塔存證落在 VIA_Reports/*(.gitignore 第 205 行)故永不入 git,而日更鏈 via_boot_update.sh 的 ⑨ 會跑本引擎卻從不跑 CGC_MDL087 → 任何新環境首跑必缺存證=恆紅。金字塔 T1 是 grid 全矩陣、T3 又含 autorun 六站,塞進每日 boot 會讓日更卡十餘分鐘(違不卡斷律),故不接日更,改為缺證即 SKIP 並指路。"
+  },
+  {
+   "code": "VRN-069-v0103",
+   "kind": "批394 續章 紅站⑤:檢點與引擎自身守衛矛盾",
+   "ts": "2026-09-12 22:45",
+   "name": "驗證共識庫兩紅皆為判準綁死單一源。② 硬要求 EXTERNAL≥190,但 build() 自身已有『批300 守衛:analyst_estimates 表缺=誠實 0 筆,單源續建』=檢點與引擎守衛互相矛盾;該表由上游 VDF_ENG059 Yahoo 車道寫入,雲端擋牆未跑故表不存在 → 恆紅。v0103:表缺 → SKIP 並誠實列示在庫實源(CNYES_FACTSET 251 筆/245 檔);表在位而 <190 → 照舊 FAIL。④ 原只查 source='EXTERNAL_ANALYST' 的 2330 故恆『缺』,但庫內 CNYES_FACTSET 的 2330 三欄俱全(median 3175 / close 2410 / upside 0.317427)、公式本可實證 → 改為優先 EXTERNAL_ANALYST、缺則取任一在庫源並誠實註記所用源=真綠。公式嚴格度不變。",
+   "note": "五紅總結:2 枚真修轉綠(MDL134 雙橋、ENG068 ⑨ 判準)、1 枚判準解綁轉綠(ENG069 ④)、4 枚誠實 SKIP(FRED 鑰缺、sklearn 缺、輪動快照缺、金字塔存證缺)。無一枚以放寬判定換綠。"
   }
  ],
- "updated_at": "2026-09-12 22:10"
+ "updated_at": "2026-09-12 22:45"
 }
