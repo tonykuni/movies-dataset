@@ -7130,7 +7130,14 @@
    "ts": "2026-09-13 00:50",
    "name": "PS AST 引擎 v0103:① 新增 R4 規則——if 當『參數位置運算式』(如 Write-Step (\"a\" + (if ($x) {..} else {..})))AST 解析全綠但 pwsh 真跑必噴 The term 'if' is not recognized;我寫 Invoke-VIA-Unstick 時一次連犯 5 處,真跑才現形。合法寫法三種:$(if ...)、@(if ...)、$x = if ...。② 修設計缺口:Report-Only(R1/R2/R4)原只在「有 ParseError 的尾版檔」上跑,而這三型正是解析綠卻執行期必紅——健康檔才是主場,故規則存在卻永不掃到=名存實亡(R4 立規當輪全樹零命中就是這原因)。改為首輪全掃所有尾版檔並入頁。十四檢全綠。",
    "note": "誠實記錄 R4 的立規當輪假紅:第一版正規式把合法的 @(if ($args) {...} else {...}) 也命中,誤報 Register v0177 L158 via-medic。以 pwsh 實測分辨——@( ) 陣列子運算式內可含語句故合法,裸 ( ) 當參數運算式才炸——同輪修掉並把三種合法寫法全納入零誤判檢。全樹掃描終值:R2 十二枚(真;Join-Path 基底為 $env: 未非空判)、R4 零。"
+  },
+  {
+   "code": "ONESHOT-v0100",
+   "kind": "批394 續章 操作員令:整合成一個 PS 指令含進入環境,一個指令跑完全部,把還沒做的都整合進來",
+   "ts": "2026-09-13 01:40",
+   "name": "建 Invoke-VIA-OneShot-v0100.ps1(九段一鍵)+ Register v0179 登錄 via-oneshot(別名 一鍵)+ .cmd 梭。九段:S1 解卡(委派 Unstick 尾版;本副本缺該件即自 origin checkout 單檔繞 bootstrap 死結)→ S2 點源尾版冊 + via-pin(新視窗亦生效)→ S3 進入 via_core 虛境(在位才進,不在位誠實 SKIP)+ via-envgov 唯讀治理計畫 + 印家族境 python → S4 via-accel-import --apply --approve(base 零觸碰)→ S5 via-rungate --fast → S6 via-price → via-chip → via-align update --apply → via-fred(鑰在位才跑;只判鑰檔在位,永不讀值永不印值)→ S7 via-psrepair-ast + via-pstest → S8 via-selftest 207 站 → S9 via-productgate + via-projects + 誠實三態總表與下一指令。每段獨立計時與三態、任一段不擋後段、逾時 kill 不卡斷、邊跑邊吐並每 15s 印心跳、段 rc 回報。旗標 -DryRun/-SkipAccel/-SkipData/-SkipMatrix。",
+   "note": "本件三枚自犯錯全靠真跑現形(AST 解析一律綠,靜態看不出),已逐枚修並寫進檔內註記:①Start-Job 是新工作階段,本視窗點源的 global 短令不會帶進去 → 段內 via-* 必然 not recognized;改為每段在 job 內先點源尾版冊(路徑以 ArgumentList 傳入)。②輸出緩衝到結束才吐 → 長跑段畫面全白=批423 操作員抱怨的『看起來死機』;改邊跑邊 Receive-Job + 心跳。③早期三態判定式抓不到 python 缺檔錯誤,腳手架裡引擎不存在卻 0.7s 回 OK=假綠;改為段 rc(wrapped 末行回報 __RC__)+缺件樣式+錯誤樣式三者合判,rc≠0 必紅。另修 R2(Join-Path $env:USERPROFILE 未非空判,批389 同型)與型別錯(Object[] 無 Trim();解析綠卻執行紅)。端到端代跑 PASS:自腳手架卡住態取出 OneShot → 解卡兩輪 → 升版 v0174→v0178/v0101→v0104 → 點源新令在位 → 九段三態總表。"
   }
  ],
- "updated_at": "2026-09-13 00:50"
+ "updated_at": "2026-09-13 01:40"
 }
