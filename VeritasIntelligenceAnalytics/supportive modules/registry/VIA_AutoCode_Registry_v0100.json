@@ -7025,7 +7025,28 @@
    "ts": "2026-09-12 21:35",
    "name": "MDL146 PsAstRepair v0100:全景式語法分析(T1 AST Parser 取 Extent 起訖行列/T2 PSScriptAnalyzer 缺=SKIP 不代裝/T3 Command-Param Inspector)+ AST 雙模錨點(精準 Extent + 彈性結構簽名)+ 錯誤分流(Parallel-Fixable F1 / Report-Only R1R2 / Sequence-Dependent 只列)+ 多輪沙盒驗證(寫前沙盒解析、寫後複驗,任一不過即放棄該檔)+ Zero-Hydra(version-forward,目標版號已存在即拒寫,正本零觸碰零刪除零 force)+ 四分區 HTML 矩陣(RYG/ENGINE 每輪/MODULE 逐檔/OTHERS 封存凍結紅檔;零 CDN 手機單欄)。九檢全綠;Register v0177 登錄 via-psrepair-ast(別名 語法修)+ .cmd 梭;格子 v0271 第 206 站。",
    "note": "自測抓到我自己的錯(誠實記錄):初版 F1 修法只把行尾註解搬到續行末,pwsh 真測證明仍紅——PowerShell 運算式換行只有『上一行以運算子結尾』才續接,註解把運算子留在下一行開頭就必斷。對照主線 Invoke-VIA-PSRepair v0102→v0103 的真修法,正解是『續接運算子上提到本行末 + 註解搬到續行末』,token 零變更。真測才給真話,首猜不算。雲端全樹實測:尾版 ParseError 0 · 解析綠 158 · 封存版紅 4(全為已被 v0103 取代的 Invoke-VIA-PSRepair-v0102.ps1=封存律凍結不改)=WARN 誠實態;--apply 真跑零寫入(健康樹=零動作,永不沒事亂改)。"
+  },
+  {
+   "code": "CGC-146-v0102",
+   "kind": "批394 續章 test/debug/optimize:T3 真實作並分級,抓到一枚解析閘永遠看不見的真缺陷",
+   "ts": "2026-09-12 22:10",
+   "name": "MDL146 v0101→v0102:①T3 名實不符修正(v0100 docstring 宣稱掃未知動詞,實作只有 regex=宣稱大於實作)→ 真實作 CommandAst 指令名 × 全樹遞迴定義集 ∪ 系統可解析;②規格要求並行卻是逐檔循序 → 執行緒池並行 + 目標版號鎖內預約(reserve)使 Hydra 守衛零競態;③PSSA 每輪重掃白跑 → 快取(僅首輪與上輪有寫入時重掃);④_ps 臨時檔名改唯一(原以 hash(script) 命名,並行必撞同檔);⑤T3 五級誠實分級 PLATFORM/CROSS/GUARDED/SYNTAX/ARCHIVE 皆非死路,只有尾版檔 TRUE 級才算。十三檢全綠。",
+   "note": "T3 首跑 11 枚,逐枚查證後只有 1 枚真缺陷、9 枚假紅(分級前)——假紅率 82% 不可上產品,故加分級;分級後雲端實測 7 枚全 PLATFORM、死路嫌疑 0。"
+  },
+  {
+   "code": "FIX-InvokeVIA-param",
+   "kind": "批394 T3 抓到的真缺陷(T1 AST 解析閘與 MDL145 皆看不見)",
+   "ts": "2026-09-12 22:10",
+   "name": "InvokeVIA.ps1:param 區塊原在 L24,前面已有加速器橋 try{}、Set-StrictMode、$ErrorActionPreference 等可執行語句 → param 不在合法位置 → PowerShell 把 param(...) 當『指令呼叫』(實測 InvalidOperation: The function or command was called as if it were a method)→ -Run/-SafeProbe/-Plan 三開關永遠無法綁定 → 這支 Guarded Root Entry 的真跑路徑完全不可達(永遠只能跑 SAFE PROBE)。修法=param 區塊上移至 #Requires 之後(無版號檔可就地改;語意零變更)。",
+   "note": "為何過去所有閘都漏掉:檔案『解析仍綠』(param(...) 形式上是合法的指令呼叫運算式),所以 T1 AST 解析閘、MDL145 真測閘、PSScriptAnalyzer 全都不報。唯 T3 Command/Param Inspector 的 CommandAst 檢查抓得到——這正是 T3 存在的理由。修後真跑零 InvalidOperation、AST ParamBlock 三開關在位。"
+  },
+  {
+   "code": "CGC-064-v0272",
+   "kind": "批394 站數誠實性校正",
+   "ts": "2026-09-12 22:10",
+   "name": "格子 v0272:MDL146 站名改十三檢;併校正標頭站數——實跑 207 站(add() 206 枚 + 直接 B.append 的 ChipWar 引擎編譯檢 1 枚),歷來註記只數 add() 故一路少算該枚(v0270 註記 205、v0271 註記 206,實跑皆多 1)。自此註記以實跑為準。",
+   "note": "全矩陣實跑(207 站):OK 200 · FAIL 5 · SKIP 2 · 312s。5 紅皆既有紅站(自動總跑器批127、寬表刷新器批145、族群輪動批152、每日觀察摘要批174 市場寬度句、驗證共識庫批176),非本批造成;duckdb 單寫者鎖衝突經 grid 既有『平行敗→序跑』機制已轉綠。"
   }
  ],
- "updated_at": "2026-09-12 21:35"
+ "updated_at": "2026-09-12 22:10"
 }

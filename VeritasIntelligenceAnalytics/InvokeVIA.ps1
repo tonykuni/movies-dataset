@@ -1,4 +1,14 @@
 #Requires -Version 7.0
+# [批394 T3 真缺陷修]param 區塊原在 L24(加速器橋/Set-StrictMode 等可執行語句之後)=不在合法位置,
+# PowerShell 遂把 param(...) 當『指令呼叫』(實測 InvalidOperation: called as if it were a method),
+# 導致 -Run/-SafeProbe/-Plan 三開關永遠無法綁定 → 真跑路徑完全不可達(只能跑 SAFE PROBE)。
+# 檔案解析仍綠,故 T1 AST 解析閘與 MDL145 皆看不到;唯 T3 CommandAst 檢查抓得到。
+# 修法=param 區塊上移至 #Requires 之後(PowerShell 要求 param 為首個語句);語意零變更。
+param(
+    [switch]$Run,
+    [switch]$SafeProbe,
+    [switch]$Plan
+)
 # ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
 try {
     $VIAPSAccelProbe = $PSScriptRoot
@@ -21,11 +31,6 @@ $ErrorActionPreference = "Continue"
 # Full run requires explicit -Run.
 # =============================================================================
 
-param(
-    [switch]$Run,
-    [switch]$SafeProbe,
-    [switch]$Plan
-)
 
 $SelectedCandidate = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\supportive modules\Invoke-VIA-UltimateEngineForge-AIO-v060.ps1"
 $ExpectedEntry = "C:\Users\tonyk\Downloads\VeritasIntelligenceAnalytics\Invoke-VIA.ps1"
