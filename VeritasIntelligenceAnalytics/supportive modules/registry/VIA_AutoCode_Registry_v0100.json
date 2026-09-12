@@ -6887,6 +6887,258 @@
    "name": "操作員令「Test by yourself debug optimize test debug till VRN works and then verify if VDF works」。沙盒沒有操作員的報告也沒有他的庫,所以自己造:五份符合命名慣例的真 PDF(中文券商個股/GS 英文個股/民國日期檔名/晨會報告/產業報告)+ 一個含 tw_daily_prices(date,ticker,close,adj_close) 的 DuckDB,然後跑**真 run**,不是跑自測。【VRN 最終:GREEN】報告 5(DONE 3 · DONE_NS 2 · FAIL 0 · PENDING 0)· 三方對照 5/5。三檔個股段 4/4、BASIC/FIN 皆 VERIFIED、四點✓:志強-KY(6768)TP145÷adj118=22.9%(報告自稱 23.0%=ROUNDING_ONLY)、GS-2330 TP1275÷adj1130=12.8%、慧洋-KY(2637)TP78÷adj68.9=13.2%;晨會與產業報告判 DONE_NS(非個股本來就沒有代號與目標價)。【修:四例同一個病「參數在、線沒接」】① ENG073 v0114 main() 是光禿禿的 `return run()`——run(zdir, db) 簽名擺著,CLI 從不解析 --dir/--db,傳了不生效也不吭聲;兄弟引擎 ENG072 認 --dir、ENG074 認 --db,只有它兩個都不認。→ v0115 接線 + 檢㉞(攔真實呼叫證明,不掃原始碼字串)。三十四檢 34/34。② ENG074 v0102 的 run 分支寫死 `run(d, None, ...)`——db 那一格是 None,所以 `run --db X` 永遠寫進預設庫;而 --db 在 --crosscheck 分支**有**解析=更難察覺。實跑證據:ENG074 印「對照 5 件 → 28 列」,收尾閘讀 X 卻是「已對照 0/5」。→ v0103 接線 + 檢⑯。十六檢 16/16。③ MDL141 v0104 main() 不解析 --db/--zones,而 vrn_closeout(..., db=DB_TW) 參數一直都在、closeout(**kw) 也一直會轉發=收尾閘寫死預設庫。實跑證據:ENG080 報 GREEN、上漲已算 3/3,收尾卻三份都印「四點-」,因為兩邊讀的不是同一個庫(還讀到自測殘留的 fx_*/synthetic 件)。→ v0105 接線(無旗標時不硬塞 None 以免覆蓋函式預設)+ 檢⑫。十二檢 12/12。④(批423 已修)AllGreen 的 $StageTimeoutSec 宣告了整檔沒用過。**四天內同一模式第四次**,已寫進 Grid v0264 檔頭。【自審:兩次差點把自己的錯報成引擎的錯】① 第一版 fixture 用 china-t 字型寫拉丁字,PDF 抽回 'NT,275',我一度認定是「千分位逗號解析 bug」——實查是 **bash heredoc 沒加引號,$1 被當位置參數吃掉**。② ENG080 起初報「adj —·上漲未算」,查出是我的價表沒有 adj_close 欄,而引擎**誠實拒絕拿 close 頂替**(『Adjusted 與原始不混用』)=正確行為不是 bug。補欄後 3/3 全算出。教訓:先證明是被測物的錯,再動被測物。【VDF 驗證】via-rungate --family vdf:**引擎 8/8 OK · 必要庫 4/4** · 選配 2/4;判 YELLOW 的唯一原因是沙盒無 via_vdf_312 家族境、退 base python(誠實標『能跑≠本位』),不是程式碼問題。再跑兩支唯讀動詞驗真:VDF_ENG081 check 真的讀到我的價表並算出每日檔數(12-04 價 2 · 12-03 價 4 · 12-02 價 4 · 12-01 價 4,與插入列數完全吻合),然後誠實紅在『籌碼表缺 tw_chip_inst/tw_chip_margin』;VDF_ENG079 scan 誠實紅在『本機三庫根缺 C:\\新增資料夾』(Windows 路徑,沙盒本來就沒有)。**離線驗不到的部分照實說**:價格/籌碼/月營收的擷取道要同意閘+網路,我不代設同意閘,所以未驗。登錄:ENG073 v0115、ENG074 v0103、MDL141 v0105、Grid v0264(三站名隨檢數更新 + 四例模式入檔頭)、docs 五十二、台帳 918。"
   },
   {
+   "code": "CGC-125-v0110/CGC-134-v0101/CGC-064-v0227/REG-v0149",
+   "kind": "批381 操作員令「實測 vdf 擷取資料;給我一個(單一)指令進入環境去擷取 2023 年以後 vdf 的資料」",
+   "ts": "2026-09-11 15:12",
+   "name": "單一指令 via-vdffetch [年份](預設 2023):①年份旗標 VIA_HIST_SINCE=<年>-01-01 + VIA_REV_SINCE=<年>-01(MDL125 v0110 步冊直讀)②20 加速器點亮 ③Hydra 哨兵 H1–H6(H3/H5 FAIL=誠實停)④十一步資料鏈十道並行(hist_2023/global/fred/月營收/主動 ETF 三步/共識二步/合流;同庫序跑單寫者律;逾時 kill 不卡斷;零跳出零 TTY)→ lanes digest + projects digest。MDL125 v0110 +步 hist_2023(ENG064 run --start/--end 全市場無 limit;18 步;七檢綠);MDL134 v0101 hist_2023 入 tw 鏈(九檢綠);grid v0227 +第 187 站紅站補齊鏈七檢;梭 via-vdffetch.cmd",
+   "note": "雲端實測 ENG064 run --start 2023-01-01 --end 2023-02-28 --limit 10 → +310 列(yf 車道 SSL 斷→chart 子批後備成功;checkpoint 鍵 custom:2023-01-01~2023-02-28 中斷安全);DRY 十一步鏈序正確(有效並行 5)"
+  },
+  {
+   "code": "MERGE-b381/REG-v0168/CGC-064-v0265",
+   "kind": "批381 合流與前推(主線已至 批425;Zero-Hydra 裁決)",
+   "ts": "2026-09-11 15:16",
+   "name": "合併 origin/main(批382–425;697 檔)入本分支:同名雙物二件(Register-VIA-Commands-v0149.ps1、CGC_MDL064_SelftestGrid_v0227.py)皆讓位主線版(先發先得;零 force 零刪除);台帳聯集 918+1=919。前推:Register v0168=主線 v0167 尾版 +via-vdffetch(主線已自帶 via-lanes/via-open/via-autorun/via-productgate);grid v0265=主線 v0264 +紅站補齊鏈七檢(MDL125 v0110)=201 站;MDL125 v0110 與 MDL134 v0101 於合流後仍為各族尾版",
+   "note": "合流後實測四站全綠(產品資格閘/十道並行/資料本機家/紅站補齊鏈);短令↔梭 G2 與引擎尾版 G7 見本批輸出"
+  },
+  {
+   "code": "VDF-TEST-b382",
+   "kind": "批382 操作員令「實測VDF」——雲端真跑十一步資料鏈(via-vdffetch 同鏈;60 檔探測上限)",
+   "ts": "2026-09-11 16:20",
+   "name": "終態 PART:OK 8 · FAIL 1 · SKIP 2 · 642.6s · 有效並行 5 道。OK:etf_universe 13.9s / etf_fetch 16.6s / hist_2023 577.5s(2023-01-01→2026-09-11;60 檔;抓 53,250 列真插 2,122 列)/ global 588.5s(219,620→219,931;→2026-09-11)/ consensus(248→251)/ revenue_consensus / etf_history 607.7s(持股 2,357→3,479 列;25 檔;→2026-09-11)/ etf_revenue(榜首 00999A 加權 yoy +153.4%)。SKIP:datahome(資料家為 Windows 路徑=零搬移)、fred(鑰缺不空轉)。FAIL:revenue_backfill 8/176 單元",
+   "note": "庫完好:tw_daily_prices 548,093 列 · 零重複 (date,ticker);checkpoint 鍵 台股:custom:2023-01-01~2026-09-11 記 60 檔=可續跑"
+  },
+  {
+   "code": "VDF-ENG064-v0109",
+   "kind": "批382 實測揭發誠實性缺陷(假數風險)",
+   "ts": "2026-09-11 16:20",
+   "name": "根因:_insert_missing 回傳抓回量卻被上層印成「+N 列」——雲端 60 檔報 +53,250 而庫只增 2,122(其餘已在庫)。修:回 (抓回量, 真插入量)=插前/插後庫差;批列印改「抓 X 列·新插 Y 列」;段/總結改「台股新插 N 列」;⑤ 檢加驗(抓 2 新插 1);九檢綠",
+   "note": "誠實數字律:抓回量永不冒充入庫量"
+  },
+  {
+   "code": "VDF-ENG075-v0102/CGC-125-v0111",
+   "kind": "批382 實測紅站與環境節流",
+   "ts": "2026-09-11 16:20",
+   "name": "ENG075 v0102:每主機 VIA_MOPS_ROUNDS 輪(預設 3)× 每輪 VIA_MOPS_RETRIES 次(預設 6)=存根/307/連線重置皆同址重試;十檢綠。MDL125 v0111:hist_2023 +env VIA_HIST_LIMIT(>0 才加 --limit)=先小量實測再全抓;七檢綠",
+   "note": "8 單元仍 FAIL:實證為雲端出口被 mopsov 節流(已成單元 202607:sii:1 重測亦連 307 六次)=環境側非碼側;Yahoo 出口同時節流(85 次代理失敗)。工作站(家用 IP)執行 via-vdffetch 會自動重試這 8 單元"
+  },
+  {
+   "code": "PS-VdfFetch-v0100/REG-v0169",
+   "kind": "批383 操作員令「用一個 powershell 啟動 vdf 包含進入環境」",
+   "ts": "2026-09-11 18:12",
+   "name": "Invoke-VIA-VdfFetch-v0100.ps1(唯一正本;主線『一貼即用』型式同款):①自找 VIA 根(本檔所在→%USERPROFILE%\\movies-dataset→Github 副本;缺=誠實停 rc2)②進環境=點源 Register 尾版(via-* 於本進程生效;批378 VIA_NO_OPEN=1)③同意閘不覆蓋律(批408 Set-VIAGateDefaults 在位即用;缺席僅在未設時補)④vdf 家族境 python(批384 Get-VIAEnvPython;缺=base 誠實印)⑤年份旗標 -Year/-Limit⑥20 加速器→Hydra 哨兵 H1–H6(H3/H5 FAIL=誠實停 rc3)⑦十一步資料鏈十道並行→lanes+projects digest;點源道 exit→return(不關操作員視窗)。Register v0169:via-vdffetch 改薄包裝委派本腳本(--dry/--limit N 轉參數),並移除我方 批381 硬寫 VIA_NET_CONSENT/VIA_SCRAPE_CONSENT 之違規(批408 不覆蓋律)",
+   "note": "雲端無 pwsh=PS 側靜態檢(括號/引號平衡、param 首句、與 v0168 同差值);引擎序列以 python 真跑驗證(plan H3/H5 OK → 十一步 DRY 鏈序正確 → lanes digest → projects digest);G2 短令↔梭 85/82 讓位 3 OK、G8 產品短令 15/15 OK"
+  },
+  {
+   "code": "PS-VdfFetch-v0101",
+   "kind": "批383 工作站實錄:-File 報「路徑不存在」",
+   "ts": "2026-09-11 18:30",
+   "name": "根因:庫實住 C:\\Users\\tonyk\\OneDrive\\Documents\\movies-dataset\\VeritasIntelligenceAnalytics(OneDrive 重導向 Documents),v0100 候選清單只猜 %USERPROFILE%\\movies-dataset 與 Github 副本=皆不存在;我方指令亦寫錯路。修 v0101:候選基底改以 [Environment]::GetFolderPath('MyDocuments')(OneDrive 重導向亦認)+ $env:OneDrive/OneDriveCommercial/OneDriveConsumer\\Documents + %USERPROFILE%\\Documents + Github 副本,各基底試 movies-dataset 與 Github\\movies-dataset;找不到時列出試過的每一路(誠實)",
+   "note": "本檔所在($PSScriptRoot)仍為第一優先=以完整路徑或於庫內呼叫永遠命中;第三副本出現(OneDrive\\Documents)=雙副本律升三副本,via-pin 可指定新視窗預設"
+  },
+  {
+   "code": "CGC-142-v0100/REG-v0171/CGC-064-v0266",
+   "kind": "批384 操作員令「將所有加速器依照 via_envmanager 規定導入 via_core via_ 相關環境」",
+   "ts": "2026-09-11 18:30",
+   "name": "AccelImport v0100 加速器套件導入閘:①冊=VeritasCeleritas 尾版 _LIB_MAP 逐字 88 件(零發明)②路由=MDL135 尾版 core_whitelist/high_risk/purpose_hints 直取(缺席=保守退路誠實標);白名單件→via_core+三家族、高風險(torch/tensorflow/paddleocr/onnxruntime/cv2/jax)→只家族境永不入 base/via_core、通用算力→核心+三家族③探針=該境 python find_spec(零副作用)④誠實不空轉:GPU 無卡 cudf=NOT_APPLICABLE、平台不符 winloop/uvloop=NOT_APPLICABLE、需系統二進位 talib/snappy/pyvips/rawpy/datatable/modin/vaex=MANUAL 記原因(皆不列計畫)⑤plan 唯讀;--apply --approve 才裝(uv 優先退 pip)、同意閘未開=拒裝、base 零觸碰(除 --include-base)⑥頁 VIA_UI_AccelImport(gitignored)+冊+存證;九檢綠。Register v0171 +via-accel-import+梭;grid v0266 +站=202 站;.gitignore +頁",
+   "note": "雲端 plan 實跑:冊 88 · 可計畫 79 · 不適用 2 · 需手動 7;四境皆 SKIP 境未找到(Linux 雲端無 Windows envs)並列別名=誠實。工作站一句:via-accel-import(唯讀看缺)→ via-accel-import --apply --approve(真裝)"
+  },
+  {
+   "code": "VDF-BRIDGE-AUDIT-b384",
+   "kind": "批384 操作員令「vdf 所有引擎都要加入加速器跟網路工具」實測",
+   "ts": "2026-09-11 18:30",
+   "name": "MDL124 v0103 全掃 functional modules/VDF:掃 184 · 已掛 154 · 缺 0 · 排除 30 → ACCEL 橋 100%、NET 橋 100%(無需注入)。深測(去註解字串後計真呼叫):真呼叫加速器 15/154、真用統包網路 153/154;掛橋零呼叫 139 件;直連網路未走統包 17 件(皆 legacy/test/bundle 原件與兩不可動工具本體 VeritasCeleritas/VeritasAegisNexus)",
+   "note": "誠實:不對 139 件硬插加速器呼叫(單次查詢型引擎並行化=假加速,且改行為有回歸風險);真加速前提=套件在境內(via_vdf_312 實錄 88 件只可用 14)→ 故本批主修為 MDL142 導入閘。ENG078 backfill 迴圈目前無網路呼叫(無 VERIFIED DATED 車道)=併行亦為假加速,不接"
+  },
+  {
+   "code": "REG-v0172",
+   "kind": "批385 工作站實錄:工作副本卡未完成合併→新短令永不到",
+   "ts": "2026-09-11 19:05",
+   "name": "實錄:OneDrive\\Documents 副本 status 有 UU VIA_AutoCode_Registry_v0100.json + AA Register-VIA-Commands-v0168.ps1 + AA CGC_MDL064_SelftestGrid_v0265.py(未完成合併)→ git merge 一律拒(Merging is not possible because you have unmerged files)→ via-reload 既有 stash 道救不了(stash 也拒)→ HEAD 永停 44b0c79d → via-accel-import 等新短令 not recognized。修 Register v0172:via-reload 先偵測 UU/AA/DU/UD/AU/UA,具名列出並印二解法(merge --abort 或 --resolve-theirs);--resolve-theirs=衝突檔一律取 origin/<分支> 版(同名雙物讓位先發者;台帳聯集版已在遠端版內)+完成提交;零刪除零 force",
+   "note": "根因類別=『阻擋檔偵測只認 M/??,未認未合併態』;操作員亦有第四副本(Downloads\\movies-dataset-b381 為 profile 預設)→ via-pin 可指定本窗副本"
+  },
+  {
+   "code": "CGC-143-v0100/REG-v0173/CGC-064-v0267",
+   "kind": "批386 操作員令「請你自測自修正 test debug optimize … till it works perfectly」",
+   "ts": "2026-09-11 18:40",
+   "name": "MergeMedic v0100 拉齊醫生:三態判定(rev-list --left-right:BEHIND→ff / DIVERGED→merge --no-ff / AHEAD·UP_TO_DATE→免拉)+衝突逐檔按律自動裁決(LEDGER 台帳 append-only 聯集(遠端序在前+本地獨有附後,(code,ts,name) 去重,零丟棄)/ VERSIONED_TWIN 同名雙物=先發先得取遠端版 / REGEN 頁與再生冊與 WHERE_IS=取遠端版 / 其餘=MANUAL 不動具名列出誠實停)+零 force 零 reset --hard 零刪除+唯讀預設;九檢=真建暫時 git 倉(裸倉+兩複本)造真分叉與三類衝突真驗(含本地提交零丟失、MANUAL 誠實停)。Register v0173:via-reload 偵測分叉即委派醫生(--no-medic 可退);+via-medic 短令+梭;grid v0267 +站=203 站",
+   "note": "自測首錯實錄:裸倉預設 HEAD 為 master→第二複本 clone 出空樹→自測 FileNotFoundError;修=symbolic-ref HEAD refs/heads/main + assert 斷言。工作站現況:OneDrive 副本 merge --abort 後分叉(本地獨有提交存在)→ 需 merge --no-ff 才能前進"
+  },
+  {
+   "code": "CGC-144-v0100/REG-v0174/CGC-064-v0268",
+   "kind": "批387 工作站實錄:新視窗 via-vdffetch not recognized(載到舊副本短令冊)",
+   "ts": "2026-09-11 19:00",
+   "name": "CopyDoctor v0100 副本醫生(全唯讀):①掃同機所有副本(env VIA_COPY_ROOTS → 真 Documents/OneDrive 變數 → %USERPROFILE%{,Documents,Downloads,Github} × movies-dataset*;含 Register 冊者才算;本引擎所在副本必入)②逐副本體檢(Register 尾版版號/四動詞在位實讀/分支 HEAD/未合併件數/與 origin 分歧=MDL143 divergence 直取零重造/髒度)③判新鍵=(冊版號, HEAD 時間)④印立即可用(最新副本 Invoke-VIA-VdfFetch 尾版完整路徑)+一勞永逸(該副本 via-pin)指令;十檢綠。Register v0174 +via-copies+梭;grid v0268 +站=204 站",
+   "note": "自測抓兩錯並修:①git -c 置於子命令後→commit 靜默失敗→無衝突可測(⑥ FAIL);②雲端首跑回「副本 0 份」=漏收本引擎所在副本(非 Windows 無 USERPROFILE/OneDrive)→ +②b 檢。雲端真跑:1 份 · v0173 · UP_TO_DATE · 動詞全在"
+  },
+  {
+   "code": "PS-VdfFetch-v0102",
+   "kind": "批388 操作員令「INTEGRATE INTO ONE PS CODE」+實錄 .\\via-vdffetch.cmd not recognized",
+   "ts": "2026-09-11 19:15",
+   "name": "Invoke-VIA-VdfFetch v0102:+①b 倉庫自癒(-SelfHeal 預設開;-NoHeal 關):卡未合併→merge --abort(退 reset --merge)/髒樹→stash -u/落後→ff/分叉→merge --no-ff/衝突→MDL143 拉齊醫生按律解(台帳聯集·同名雙物讓位遠端·再生物取遠端)/末 stash pop 原樣還原;零 force 零 reset --hard 零刪除。一段 PS 即完成:自癒→進環境→同意閘→家族境 python→年份旗標→20 加速器→Hydra 哨兵→十一步十道並行→雙 digest",
+   "note": "實錄根因:操作員副本從未拉到 via-vdffetch.cmd 與本腳本(先卡未合併、後分叉),故任何依賴檔案的指令皆不可用→自癒必須內建於單一貼入碼;雲端無 pwsh=PS 側靜態檢(括號/引號/反引號平衡),git 序列邏輯與 MDL143 已於真 git 倉九檢驗證"
+  },
+  {
+   "code": "CGC-145-v0100/REG-v0175/CGC-064-v0269",
+   "kind": "批389 操作員令「test debug by yourself till it works perfectly」",
+   "ts": "2026-09-12 09:05",
+   "name": "雲端裝入可攜 PowerShell 7.4.6(scratchpad;不入 git)→ PS 層自此可真測,建 MDL145 PowerShell 真測閘固化:P1 AST 解析閘(VIA 根全 157 件 .ps1;守尾版律=同族尾版壞才 FAIL、封存版壞=WARN 具名凍結不改;另以刻意壞檔反測防空轉)/P2 功能閘(真建裸倉+兩複本造真分叉→跑 Invoke-VIA-VdfFetch 尾版 -Dry -NoEnter→驗自癒 merge 成功、HEAD 前進、零未合併、兩邊提交皆在、零 PS 錯誤行)/P3 參數閘(點源 Register 尾版→via-vdffetch 2023 / 2020 --limit 150 / --dry 三式具名傳遞=批384 陣列潑灑 bug 回歸測);pwsh 缺=SKIP 不假綠;九檢綠。Register v0175 +via-pstest+梭;grid v0269 +站=205 站",
+   "note": "真測立即抓到三枚真錯:①VdfFetch Resolve-VIARoot 在 USERPROFILE 空時基底含空值 ②同函式硬寫 C:\\Users\\tonyk → 非 Windows 上 Join-Path 噴「Cannot find drive 'C'」(我首猜 null=猜錯,真測才給真話)③主線 Invoke-VIA-PSRepair-v0102.ps1 L179 行尾註解截斷運算式 → 該族尾版整支 ParserError → via-psrepair 載入即敗(非我方檔,已 version-forward v0103 僅移註解位置,邏輯零變更)"
+  },
+  {
+   "code": "PS-VdfFetch-v0103/PSRepair-v0103",
+   "kind": "批389 真測修正二件",
+   "ts": "2026-09-12 09:05",
+   "name": "Invoke-VIA-VdfFetch v0103:Resolve-VIARoot 跨平台硬化(基底逐項非空判;Windows 專屬基底只在 Windows 加;兩 Join-Path 包 try/catch)→ USERPROFILE 空時零錯誤行(真測證實 0)。Invoke-VIA-PSRepair v0103:修 v0102 L179 ParserError(行尾註解移至續行末;邏輯零變更;v0102 原件零觸碰)",
+   "note": "v0103 自癒路徑三條真測皆通:DIVERGED→merge --no-ff 成功(HEAD 前進、兩邊提交皆在)、卡未合併→merge --abort 後續跑、BEHIND→ff;-NoHeal 可關"
+  },
+  {
+   "code": "CGC-131-v0106",
+   "kind": "批390 工作站實錄:AETF/REVENUE「YELLOW 站 0/0 碼紅 0 料紅 0」=零證據卻上色",
+   "ts": "2026-09-12 13:05",
+   "name": "誠實律補:專案站數 0(本次 GRID 存證內無該專案任何站,常見於 --only 局部跑或存證過舊)→ 新態 NO_EVIDENCE(灰),永不假黃;overall 新增 PARTIAL_EVIDENCE(部分專案零證據);digest 於零證據時附印「存證檔名+可能原因」;頁徽章 NO_EVIDENCE=灰 PARTIAL_EVIDENCE=黃;下一步改指 via-selftest(先產生存證)。八檢(+⑧ 零證據律:局部存證 fixture 真驗)",
+   "note": "雲端完整存證下實跑不受影響(AETF GREEN 9/9、REVENUE 4/4);工作站那次為局部存證故 0/0"
+  },
+  {
+   "code": "CGC-144-v0101/REG-v0176/CGC-064-v0270",
+   "kind": "批391 我方錯:指令寫死版號(給 v0175 而該副本只有 v0174)",
+   "ts": "2026-09-12 21:20",
+   "name": "操作員實跑副本醫生,真相三副本:①OneDrive\\Documents v0174 main DIVERGED 髒 35 卡未合併 2 件(=所有短令與拉齊皆被擋之真因)②%USERPROFILE%\\movies-dataset v0168 claude 分支 UP_TO_DATE 缺 via-accel-import/via-medic ③Downloads\\movies-dataset-b381 v0167 envmanager 分支 缺三令。我方先前給「點源 Register-VIA-Commands-v0175.ps1」之指令必然失敗=違反自訂『永不寫死版號』律(程式守了,指令沒守)。修 CopyDoctor v0101:cmd_heal/cmd_now/cmd_pin/cmd_all 四道指令一律以 PowerShell Get-ChildItem …-v*.ps1|Sort|Select -Last 1 尾版 glob 寫成;+--heal 明令對最新副本呼 MDL143 sync --apply(授權閉環);⑤ 檢改為反測「產出指令零寫死版號」(regex 驗 0 處);十檢綠。Register v0176 註記 --heal",
+   "note": "雲端以真 pwsh 驗證三段指令形可執行(glob 點源、python 帶 glob 參數、點源後呼 via-pin/via-pstest);工作站下一步=貼一行全包(先自癒 2 件未合併+分叉→點源尾版冊→via-pin→via-pstest)"
+  },
+  {
+   "code": "CGC-143-v0101",
+   "kind": "批392 工作站實況補測:髒樹 35 件+分叉+卡未合併 2 件三者同時",
+   "ts": "2026-09-12 21:30",
+   "name": "拉齊醫生 v0101 +髒樹律:merge 前若工作樹有未提交改動(含未追蹤)先 stash push -u,合併與衝突裁決完成後 pop 原樣還原;pop 起衝突=stash 留存並誠實印(永不丟棄操作員工作);衝突現場保留時不 pop(避免把 stash 疊到衝突上);--no-stash 可關(此時髒樹分叉=誠實停不硬合)。十檢(+⑩ 三合一真驗:stash→merge→台帳聯集 BASE/R/L→pop;髒檔與未追蹤檔皆還原;HEAD 前進)",
+   "note": "根因:v0100 只處理未合併與分叉,未處理髒樹;而工作站 OneDrive 副本正是髒 35+DIVERGED+未合併 2,直呼 sync --apply 會被 git 以未提交改動為由擋下。另:操作員副本仍為 v0100 副本醫生,故 --heal 旗標被忽略(誠實:舊版不識新旗標)"
+  },
+  {
+   "code": "CGC-143-v0102",
+   "kind": "批393 工作站實況抓真 bug:連字號版號全漏判",
+   "ts": "2026-09-12 21:20",
+   "name": "拉齊醫生 v0102:同名雙物正規式 _v#### → [-_]v####。實錄:操作員 OneDrive 副本卡 Register-VIA-Commands-v0168.ps1 與 v0169.ps1 兩件未合併,v0101 因只認底線而把連字號族判成 MANUAL 停住→倉庫永遠解不開(via-pstest 等新令永不到)。本系統連字號版號族(Register-VIA-Commands-v####、Invoke-VIA-*-v####)正是最常衝突者,故此漏判影響最大。+①b 檢:以卡住的真檔名驗四式(兩 Register、一 Invoke、一底線族)",
+   "note": "同時誠實記錄:我給的手動 stash 指令在未合併態下必敗(git stash push 需可寫 index → 'needs merge / could not write index'),故正確順序必為『先解未合併→提交→再 stash→merge』=v0101 sync() 既有順序;操作員那次因 classify 漏判停在第一步,無任何損害(stash 未建立、HEAD 未動)"
+  },
+  {
+   "code": "CGC-146-v0100",
+   "kind": "批394 操作員令:PowerShell 指令語法多輪並行安全修正引擎",
+   "ts": "2026-09-12 21:35",
+   "name": "MDL146 PsAstRepair v0100:全景式語法分析(T1 AST Parser 取 Extent 起訖行列/T2 PSScriptAnalyzer 缺=SKIP 不代裝/T3 Command-Param Inspector)+ AST 雙模錨點(精準 Extent + 彈性結構簽名)+ 錯誤分流(Parallel-Fixable F1 / Report-Only R1R2 / Sequence-Dependent 只列)+ 多輪沙盒驗證(寫前沙盒解析、寫後複驗,任一不過即放棄該檔)+ Zero-Hydra(version-forward,目標版號已存在即拒寫,正本零觸碰零刪除零 force)+ 四分區 HTML 矩陣(RYG/ENGINE 每輪/MODULE 逐檔/OTHERS 封存凍結紅檔;零 CDN 手機單欄)。九檢全綠;Register v0177 登錄 via-psrepair-ast(別名 語法修)+ .cmd 梭;格子 v0271 第 206 站。",
+   "note": "自測抓到我自己的錯(誠實記錄):初版 F1 修法只把行尾註解搬到續行末,pwsh 真測證明仍紅——PowerShell 運算式換行只有『上一行以運算子結尾』才續接,註解把運算子留在下一行開頭就必斷。對照主線 Invoke-VIA-PSRepair v0102→v0103 的真修法,正解是『續接運算子上提到本行末 + 註解搬到續行末』,token 零變更。真測才給真話,首猜不算。雲端全樹實測:尾版 ParseError 0 · 解析綠 158 · 封存版紅 4(全為已被 v0103 取代的 Invoke-VIA-PSRepair-v0102.ps1=封存律凍結不改)=WARN 誠實態;--apply 真跑零寫入(健康樹=零動作,永不沒事亂改)。"
+  },
+  {
+   "code": "CGC-146-v0102",
+   "kind": "批394 續章 test/debug/optimize:T3 真實作並分級,抓到一枚解析閘永遠看不見的真缺陷",
+   "ts": "2026-09-12 22:10",
+   "name": "MDL146 v0101→v0102:①T3 名實不符修正(v0100 docstring 宣稱掃未知動詞,實作只有 regex=宣稱大於實作)→ 真實作 CommandAst 指令名 × 全樹遞迴定義集 ∪ 系統可解析;②規格要求並行卻是逐檔循序 → 執行緒池並行 + 目標版號鎖內預約(reserve)使 Hydra 守衛零競態;③PSSA 每輪重掃白跑 → 快取(僅首輪與上輪有寫入時重掃);④_ps 臨時檔名改唯一(原以 hash(script) 命名,並行必撞同檔);⑤T3 五級誠實分級 PLATFORM/CROSS/GUARDED/SYNTAX/ARCHIVE 皆非死路,只有尾版檔 TRUE 級才算。十三檢全綠。",
+   "note": "T3 首跑 11 枚,逐枚查證後只有 1 枚真缺陷、9 枚假紅(分級前)——假紅率 82% 不可上產品,故加分級;分級後雲端實測 7 枚全 PLATFORM、死路嫌疑 0。"
+  },
+  {
+   "code": "FIX-InvokeVIA-param",
+   "kind": "批394 T3 抓到的真缺陷(T1 AST 解析閘與 MDL145 皆看不見)",
+   "ts": "2026-09-12 22:10",
+   "name": "InvokeVIA.ps1:param 區塊原在 L24,前面已有加速器橋 try{}、Set-StrictMode、$ErrorActionPreference 等可執行語句 → param 不在合法位置 → PowerShell 把 param(...) 當『指令呼叫』(實測 InvalidOperation: The function or command was called as if it were a method)→ -Run/-SafeProbe/-Plan 三開關永遠無法綁定 → 這支 Guarded Root Entry 的真跑路徑完全不可達(永遠只能跑 SAFE PROBE)。修法=param 區塊上移至 #Requires 之後(無版號檔可就地改;語意零變更)。",
+   "note": "為何過去所有閘都漏掉:檔案『解析仍綠』(param(...) 形式上是合法的指令呼叫運算式),所以 T1 AST 解析閘、MDL145 真測閘、PSScriptAnalyzer 全都不報。唯 T3 Command/Param Inspector 的 CommandAst 檢查抓得到——這正是 T3 存在的理由。修後真跑零 InvalidOperation、AST ParamBlock 三開關在位。"
+  },
+  {
+   "code": "CGC-064-v0272",
+   "kind": "批394 站數誠實性校正",
+   "ts": "2026-09-12 22:10",
+   "name": "格子 v0272:MDL146 站名改十三檢;併校正標頭站數——實跑 207 站(add() 206 枚 + 直接 B.append 的 ChipWar 引擎編譯檢 1 枚),歷來註記只數 add() 故一路少算該枚(v0270 註記 205、v0271 註記 206,實跑皆多 1)。自此註記以實跑為準。",
+   "note": "全矩陣實跑(207 站):OK 200 · FAIL 5 · SKIP 2 · 312s。5 紅皆既有紅站(自動總跑器批127、寬表刷新器批145、族群輪動批152、每日觀察摘要批174 市場寬度句、驗證共識庫批176),非本批造成;duckdb 單寫者鎖衝突經 grid 既有『平行敗→序跑』機制已轉綠。"
+  },
+  {
+   "code": "FIX-MDL134-bridges",
+   "kind": "批394 續章 紅站①真修:尾版缺雙橋",
+   "ts": "2026-09-12 22:45",
+   "name": "自動總跑器六檢(批127)② S1 雙橋稽核恆紅,真因=CGC_MDL134_ParallelLanes_v0100.py 有 4 個橋標記但尾版 v0101 一個都沒有(新版建立時沒帶上 ACCEL/NET 橋)→ 全樹外呼 127 件中唯一網路缺 1 件、加速殘亦含它。以既有 MDL124 BridgeSweeper v0103 --accel --net --net-callers --apply 注入(零重造),注入後 AST OK、MDL134 九檢全綠、覆蓋 100%/100%、總跑器六檢全 OK=真綠。",
+   "note": "教訓:version-forward 產新版時若不帶橋,稽核即紅而表面看不出;橋掃描器本就能修,問題只是沒人對該根目錄跑過。"
+  },
+  {
+   "code": "VAP-007-v0101",
+   "kind": "批394 續章 紅站②:FRED 鑰缺的下游假紅",
+   "ts": "2026-09-12 22:45",
+   "name": "寬表刷新器六檢 ② 要求 US10Y > 300 日;查證 US10Y 取自 cross_macro (region='US', metric='GOV10Y'),該鍵由 VDF_ENG055 以 FRED 序列 DGS10 寫入=需 FRED 鑰。雲端無鑰(鑰檔僅工作站 output_hub/mega/.fred_api_key 且 gitignored)→ cross_macro 只有 EA/PPI 103 列、US10Y 恆 0 → 此檢在雲端永遠紅=假紅。v0101 改三態:指數欄正常 × US10Y 零 × 鑰缺席 → SKIP 並印補法;鑰在位而仍 0 → 照舊 FAIL。",
+   "note": "新增 fred_key_present():只判鑰檔存在與非空,永不讀值永不印值(鑰匙守衛律)。"
+  },
+  {
+   "code": "GRP-040-v0102",
+   "kind": "批394 續章 紅站③:核心第三方需求缺席",
+   "ts": "2026-09-12 22:45",
+   "name": "族群輪動六檢 ⑧「核心 demo 端到端」原只看 rc 且不印原因。實跑捕獲:核心收容件 VIA_TW_GroupingIndexRotationUnifiedEngine_v0201.py 第 60 行頂層 from sklearn.mixture import GaussianMixture → 雲端 base 無 scikit-learn → ModuleNotFoundError rc=1。依「base 只放該有的工具」律雲端 base 本就不該裝 → 假紅。v0102:先以 AST 取核心頂層第三方 import 逐名 find_spec(只讀不執行),缺席 → SKIP 並印缺件名與補法;在位則真跑判 rc,且失敗時把 stderr 末行印出。",
+   "note": "過去畫面只有 rc=1 三個字=除錯白跑;現在一眼看到 sklearn。"
+  },
+  {
+   "code": "VRN-068-v0103",
+   "kind": "批394 續章 紅站④:判準與資料宇宙不符 + 存證結構性缺口",
+   "ts": "2026-09-12 22:45",
+   "name": "每日觀察摘要實為三紅。⑨ 市場寬度句門檻 n_ma > 1000 係按『台股全市場 1800 檔』假設寫死,實查本庫 prices_canonical 全庫最大單日僅 552 檔(此庫標的宇宙規模)→ 該檢自設立起不可能綠;v0103 改用更嚴的相對守恆(該完整日因子覆蓋須 100% 且該日規模須等於庫內最大單日,不許小日冒充完整日)=真綠 325/552=58.9%。③ 榜前五/因子四線取自 GRP_ENG040 輪動快照 group_rotation_daily.csv 與全球快照,二檔由需 sklearn 的核心產生 → 快照不存在 → SKIP(但個股三檔日變動仍照驗)。① 金字塔存證缺 → SKIP 並指路 via-pyramid run(grid 燈/VSM 六燈/問題板三項仍照驗)。",
+   "note": "① 的結構性事實:金字塔存證落在 VIA_Reports/*(.gitignore 第 205 行)故永不入 git,而日更鏈 via_boot_update.sh 的 ⑨ 會跑本引擎卻從不跑 CGC_MDL087 → 任何新環境首跑必缺存證=恆紅。金字塔 T1 是 grid 全矩陣、T3 又含 autorun 六站,塞進每日 boot 會讓日更卡十餘分鐘(違不卡斷律),故不接日更,改為缺證即 SKIP 並指路。"
+  },
+  {
+   "code": "VRN-069-v0103",
+   "kind": "批394 續章 紅站⑤:檢點與引擎自身守衛矛盾",
+   "ts": "2026-09-12 22:45",
+   "name": "驗證共識庫兩紅皆為判準綁死單一源。② 硬要求 EXTERNAL≥190,但 build() 自身已有『批300 守衛:analyst_estimates 表缺=誠實 0 筆,單源續建』=檢點與引擎守衛互相矛盾;該表由上游 VDF_ENG059 Yahoo 車道寫入,雲端擋牆未跑故表不存在 → 恆紅。v0103:表缺 → SKIP 並誠實列示在庫實源(CNYES_FACTSET 251 筆/245 檔);表在位而 <190 → 照舊 FAIL。④ 原只查 source='EXTERNAL_ANALYST' 的 2330 故恆『缺』,但庫內 CNYES_FACTSET 的 2330 三欄俱全(median 3175 / close 2410 / upside 0.317427)、公式本可實證 → 改為優先 EXTERNAL_ANALYST、缺則取任一在庫源並誠實註記所用源=真綠。公式嚴格度不變。",
+   "note": "五紅總結:2 枚真修轉綠(MDL134 雙橋、ENG068 ⑨ 判準)、1 枚判準解綁轉綠(ENG069 ④)、4 枚誠實 SKIP(FRED 鑰缺、sklearn 缺、輪動快照缺、金字塔存證缺)。無一枚以放寬判定換綠。"
+  },
+  {
+   "code": "CGC-087-v0101",
+   "kind": "批394 續章:金字塔 T2 唯一紅道=我方自訂律被自己違反(寫死版號)",
+   "ts": "2026-09-12 23:05",
+   "name": "測試金字塔 T2 六道中 I3「參數映射覆蓋新引擎(054/055/056 在役面)」恆 FAIL。真因:need = {\"VDF_ENG054_TWDailyBackfill_v0100.py\"} 以完整版號檔名硬比,而 ENG053 參數映射(正確地)只收同族尾版——ENG054 早已到 v0104 → 此道自 ENG054 升版那刻起永遠紅。055/056 本就用族前綴故無恙,只有 054 漏改=操作員「glob 尾版動態解析嚴禁寫死版號」律在我方程式內被違反的實例。v0101 改三族一致的族前綴判定並印各族實際尾版(v0104/v0109/v0102),T2 轉 OK 6/6;併加 ②b 反測:本檔正規式掃 \"*_v####.py\" 完整檔名硬比字面,命中即紅(自我看守,防同錯復發)。計數字串亦由「六檢」校正為「七檢」(名實相符)。",
+   "note": "發現路徑:為補 ENG068 ① 的金字塔存證而真跑 via-pyramid run,順帶看見 T2 的這枚紅。金字塔存證落 VIA_Reports(gitignored)且不在日更鏈,故此紅在任何新環境都得真跑一次才看得到。"
+  },
+  {
+   "code": "CGC-064-v0273",
+   "kind": "批394 續章 optimize:鎖撞假紅歸零 + 站名同步",
+   "ts": "2026-09-12 23:30",
+   "name": "格子 v0273:add() 增 db=True 旗,十二個會開寫 duckdb 的站事前分出平行池(平行 195 站 · 寫庫序跑 12 站),第二段複判亦只針對平行組。原先全站平行、撞鎖者才序跑複判,雲端兩輪實錄每輪固定 7–9 站先印 FAIL 再轉綠——終態誠實但操作員先看到一串紅易誤判系統壞了;分組後鎖撞歸零,總時間不變(這些站本來也得序跑一次)。併把金字塔站名「六檢」改「七檢」(MDL087 v0101 加了 ②b 反測;名實相符律)。",
+   "note": "v0272 驗收實錄:OK 205 · FAIL 0 · SKIP 2 · 277s(五紅全清)。十二站名單取自雲端兩輪鎖撞實錄:每日觀察摘要批174、驗證共識庫批176、調整後價格層批178、引擎簡化稽核批179、因子庫批188、族群聚合因子層批193、月營收分析批194、Yahoo 共識批194、鉅亨 FactSet 批199、歷史回補批203、全球宇宙擷取批226、資料庫目錄台批226。"
+  },
+  {
+   "code": "CGC-143-v0103",
+   "kind": "批394 續章:我方給操作員的解鎖步驟有多餘前置(實測更正)",
+   "ts": "2026-09-12 23:30",
+   "name": "拉齊醫生 v0103 +第⑫檢:以腳手架完整複製操作員卡住態——合併進行中(MERGE_HEAD 在)+ 兩件連字號同名雙物衝突(Register-VIA-Commands-v0168/v0169.ps1)+ 髒樹 + 未追蹤件 + 台帳衝突五者同時——實測單一指令 sync --apply 即可全解:雙物判 VERSIONED_TWIN 取遠端版(先發先得律)、台帳聯集 BASE+R+L、完成合併提交、髒檔與未追蹤件原樣還原、零未合併殘留。此檢把「零手動前置」鎖成回歸條件。",
+   "note": "誠實更正:我先前給操作員的解鎖步驟含兩行 git checkout --theirs + git add 作為前置,那是 v0101 只認底線版號、連字號族被判 MANUAL 而停的時代 workaround;v0102 修正後醫生自己就能解,該前置已多餘。操作員只需跑醫生一行。"
+  },
+  {
+   "code": "CGC-144-v0102",
+   "kind": "批394 續章:我把雲端實測結論誤套到操作員環境(自錯更正)+ bootstrap 死結治本",
+   "ts": "2026-09-13 00:10",
+   "name": "副本醫生 v0102 +第⑪檢 bootstrap 死結偵測:inspect() 新增 medic_ver(該副本拉齊醫生尾版號)、unmerged_files(衝突檔清單動態取自 git)、deadlock 診斷。判準=卡未合併 × 衝突檔含連字號版號族 × 該副本醫生 < v0102(只認底線版號)→ 標 BOOTSTRAP 並產 cmd_bootstrap(git checkout --theirs 實際衝突檔 → git add → 醫生 sync --apply → 點源尾版冊);digest 優先印該段。自測以真 git 倉造「醫生 v0101 + 連字號同名雙物衝突」fixture,驗死結被標出、指令含實際檔名、醫生路徑仍為 glob 尾版(零寫死版號)。",
+   "note": "我的錯(誠實記錄):上一窗我宣稱『操作員不需要手動 checkout --theirs 前置,單一醫生指令即可』——那是在雲端倉庫(已含 v0102/v0103 醫生)做的實測,卻把結論套到操作員副本(醫生仍 v0101)。操作員實跑結果正是 MANUAL 停住、點源仍 v0174、新短令全不在。真相是雞生蛋死結:要解倉庫才拿得到新醫生,但新醫生在倉庫裡出不來,故該副本必須手動取遠端版一次做 bootstrap。教訓:實測環境與操作員環境的版本差必須先核對,否則實測為真而結論為假。治本=副本醫生自己偵測並印出 bootstrap 指令,任何副本下次卡住皆自動指路。"
+  },
+  {
+   "code": "UNSTICK-v0100",
+   "kind": "批394 續章 操作員不在電腦前要我代跑:代跑不了他的機器,改把指令端到端驗到底",
+   "ts": "2026-09-13 00:50",
+   "name": "建 Invoke-VIA-Unstick-v0100.ps1(倉庫解卡啟動器)+ Register v0178 登錄 via-unstick(別名 解卡)+ .cmd 梭。不依賴副本醫生版本:醫生 >= v0102 即委派 sync --apply(零重造);否則走最小迴圈——台帳交該副本醫生的 ledger_union 聯集(append-only,絕不取單邊)、其餘衝突取遠端版(先發先得律,與 VERSIONED_TWIN 裁決同義)、完成合併後再 fetch/merge,迴圈至與 origin 齊平(最多 MaxRounds 輪,不卡斷);髒樹擋 merge 自動 stash 並於結束還原,pop 衝突委派醫生裁決;零 force 零刪除;-DryRun 唯讀診斷;收斂後自動點源尾版短令冊並印驗收。",
+   "note": "雲端腳手架端到端真跑 PASS(複製操作員確切時間線):卡住態=醫生 v0101 + 冊 v0174 + 合併進行中 3 件衝突 + 髒樹 + 未追蹤;結果=R1 取遠端 2 件/台帳聯集 3 筆/完成合併 → R2 再 merge 當日新 commit/台帳聯集 4 筆/收斂,未合併殘留零、落後 0、升版 v0174→v0177 與 v0101→v0104、本地件零遺失、點源後新令在位。"
+  },
+  {
+   "code": "CGC-143-v0104",
+   "kind": "批394 續章:腳手架抓到兩枚會毀台帳/白做一輪的真缺陷",
+   "ts": "2026-09-13 00:50",
+   "name": "拉齊醫生 v0104 兩修 + 十四檢:① stash pop 衝突時 git 已把衝突標記寫進工作樹——台帳若在其中就當場變成非法 JSON(append-only 生命線被毀;腳手架實錄:驗收讀取直接 JSONDecodeError)。改為 pop 起衝突後一律按律裁決:台帳聯集、同名雙物/再生物取合併後版(ours),其餘誠實留衝突並保留 stash;全解則 stash drop 不留殘渣。② 醫生原只看 unmerged() 判斷有無合併在進行,漏掉「MERGE_HEAD 在但 index 已乾淨」態(操作員或 AI 先手動 checkout --theirs + add 過)→ 會把已解的成果連同髒樹 stash 走、再 merge 一遍=白做一輪且徒增 pop 衝突風險;改為直接完成合併提交,不 stash 不重跑。新增 ⑬⑭ 兩檢固化。",
+   "note": "兩枚都是在為操作員做端到端代跑時浮出的,非靜態審閱所得。"
+  },
+  {
+   "code": "CGC-146-v0103",
+   "kind": "批394 續章:R4 新規 + 我自己犯的第二型「解析綠卻執行紅」",
+   "ts": "2026-09-13 00:50",
+   "name": "PS AST 引擎 v0103:① 新增 R4 規則——if 當『參數位置運算式』(如 Write-Step (\"a\" + (if ($x) {..} else {..})))AST 解析全綠但 pwsh 真跑必噴 The term 'if' is not recognized;我寫 Invoke-VIA-Unstick 時一次連犯 5 處,真跑才現形。合法寫法三種:$(if ...)、@(if ...)、$x = if ...。② 修設計缺口:Report-Only(R1/R2/R4)原只在「有 ParseError 的尾版檔」上跑,而這三型正是解析綠卻執行期必紅——健康檔才是主場,故規則存在卻永不掃到=名存實亡(R4 立規當輪全樹零命中就是這原因)。改為首輪全掃所有尾版檔並入頁。十四檢全綠。",
+   "note": "誠實記錄 R4 的立規當輪假紅:第一版正規式把合法的 @(if ($args) {...} else {...}) 也命中,誤報 Register v0177 L158 via-medic。以 pwsh 實測分辨——@( ) 陣列子運算式內可含語句故合法,裸 ( ) 當參數運算式才炸——同輪修掉並把三種合法寫法全納入零誤判檢。全樹掃描終值:R2 十二枚(真;Join-Path 基底為 $env: 未非空判)、R4 零。"
+  },
+  {
+   "code": "ONESHOT-v0100",
+   "kind": "批394 續章 操作員令:整合成一個 PS 指令含進入環境,一個指令跑完全部,把還沒做的都整合進來",
+   "ts": "2026-09-13 01:40",
+   "name": "建 Invoke-VIA-OneShot-v0100.ps1(九段一鍵)+ Register v0179 登錄 via-oneshot(別名 一鍵)+ .cmd 梭。九段:S1 解卡(委派 Unstick 尾版;本副本缺該件即自 origin checkout 單檔繞 bootstrap 死結)→ S2 點源尾版冊 + via-pin(新視窗亦生效)→ S3 進入 via_core 虛境(在位才進,不在位誠實 SKIP)+ via-envgov 唯讀治理計畫 + 印家族境 python → S4 via-accel-import --apply --approve(base 零觸碰)→ S5 via-rungate --fast → S6 via-price → via-chip → via-align update --apply → via-fred(鑰在位才跑;只判鑰檔在位,永不讀值永不印值)→ S7 via-psrepair-ast + via-pstest → S8 via-selftest 207 站 → S9 via-productgate + via-projects + 誠實三態總表與下一指令。每段獨立計時與三態、任一段不擋後段、逾時 kill 不卡斷、邊跑邊吐並每 15s 印心跳、段 rc 回報。旗標 -DryRun/-SkipAccel/-SkipData/-SkipMatrix。",
+   "note": "本件三枚自犯錯全靠真跑現形(AST 解析一律綠,靜態看不出),已逐枚修並寫進檔內註記:①Start-Job 是新工作階段,本視窗點源的 global 短令不會帶進去 → 段內 via-* 必然 not recognized;改為每段在 job 內先點源尾版冊(路徑以 ArgumentList 傳入)。②輸出緩衝到結束才吐 → 長跑段畫面全白=批423 操作員抱怨的『看起來死機』;改邊跑邊 Receive-Job + 心跳。③早期三態判定式抓不到 python 缺檔錯誤,腳手架裡引擎不存在卻 0.7s 回 OK=假綠;改為段 rc(wrapped 末行回報 __RC__)+缺件樣式+錯誤樣式三者合判,rc≠0 必紅。另修 R2(Join-Path $env:USERPROFILE 未非空判,批389 同型)與型別錯(Object[] 無 Trim();解析綠卻執行紅)。端到端代跑 PASS:自腳手架卡住態取出 OneShot → 解卡兩輪 → 升版 v0174→v0178/v0101→v0104 → 點源新令在位 → 九段三態總表。"
+  },
+  {
    "code": "VIA_VRN_FirstPageEngine-v0102 + Grid-v0265(批426)",
    "kind": "批426 首頁全能引擎升級 + 綁 MDL008/TW02 正典驗證法",
    "ts": "2026-09-09 07:20",
@@ -7061,5 +7313,5 @@
    "name": "工作站照著我給的步驟跑 `via-pin`,它回:「本窗副本:C:/Users/tonyk/Downloads/movies-dataset-b381/…(…Register-VIA-Commands-v0167.ps1)· 新視窗預設:同上 · **已是本副本;無事**」——而操作員人站在 `C:/Users/tonyk/OneDrive/Documents/movies-dataset/…`,`git pull` 也剛對著那份拉完批452。【批452 才剛補的副本警示抓到了病,而這個「解藥」自己也有同一個病】根因:`$VIA` 是**載入的那份腳本所在的副本**(profile 點源進來的那個路徑),不是使用者站的地方;`$pinned` 讀 profile 也指著同一份,於是 `$pinned -eq $VIA` **恆真**,永遠走「無事」那一支。**「本窗副本」這四個字從一開始就是假的**——它講的是「已載入的那份」。批397 造 via-pin 的目的就是解副本錯亂,而它偏偏看不見使用者站在第三個地方,**所以它永遠解不了它被造出來要解的那件事**。這比單純的 bug 更難查,因為它**回綠燈**:「已是本副本;無事」讀起來像確認,實際上是它根本沒去看你在哪。【修】Register v0169 加 `Get-VIACwdRoot`(從 cwd 一路往上找同時有 `supportive modules` 與 `functional modules` 的那一層);via-pin 改以**你站的位置**為釘住目標,並把三個位置全印出來:你站的(cwd)/ 本視窗已載入的 / profile 預設的。三者不一致時明說「**本視窗現在跑的短令來自已載入那份,不是你站的這份**;換掉 profile 之後要**重開視窗**才生效」——舊版換完 profile 只印一句「已換」,不講本視窗還是舊的,於是換完立刻再跑還是跑錯副本。不在任何副本裡就誠實叫人先 cd,不硬猜。實測三副本佈局:站在副本根、站在子夾都找得到根,站在副本外回 null。【還沒解的】① 操作員的 tessdata_best 夾仍是空的(`--list-langs` 回 0),語言檔要他自己放;② 他解衝突那一 commit 把一批先前未追蹤的檔(含 .zip 與 _selftest.db)一起入了 git,二進位入庫是另一件事,先記著不動。"
   }
  ],
- "updated_at": "2026-09-09 07:20"
+ "updated_at": "2026-09-13 01:40"
 }
