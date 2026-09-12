@@ -7011,6 +7011,13 @@
    "ts": "2026-09-12 21:30",
    "name": "拉齊醫生 v0101 +髒樹律:merge 前若工作樹有未提交改動(含未追蹤)先 stash push -u,合併與衝突裁決完成後 pop 原樣還原;pop 起衝突=stash 留存並誠實印(永不丟棄操作員工作);衝突現場保留時不 pop(避免把 stash 疊到衝突上);--no-stash 可關(此時髒樹分叉=誠實停不硬合)。十檢(+⑩ 三合一真驗:stash→merge→台帳聯集 BASE/R/L→pop;髒檔與未追蹤檔皆還原;HEAD 前進)",
    "note": "根因:v0100 只處理未合併與分叉,未處理髒樹;而工作站 OneDrive 副本正是髒 35+DIVERGED+未合併 2,直呼 sync --apply 會被 git 以未提交改動為由擋下。另:操作員副本仍為 v0100 副本醫生,故 --heal 旗標被忽略(誠實:舊版不識新旗標)"
+  },
+  {
+   "code": "CGC-143-v0102",
+   "kind": "批393 工作站實況抓真 bug:連字號版號全漏判",
+   "ts": "2026-09-12 21:20",
+   "name": "拉齊醫生 v0102:同名雙物正規式 _v#### → [-_]v####。實錄:操作員 OneDrive 副本卡 Register-VIA-Commands-v0168.ps1 與 v0169.ps1 兩件未合併,v0101 因只認底線而把連字號族判成 MANUAL 停住→倉庫永遠解不開(via-pstest 等新令永不到)。本系統連字號版號族(Register-VIA-Commands-v####、Invoke-VIA-*-v####)正是最常衝突者,故此漏判影響最大。+①b 檢:以卡住的真檔名驗四式(兩 Register、一 Invoke、一底線族)",
+   "note": "同時誠實記錄:我給的手動 stash 指令在未合併態下必敗(git stash push 需可寫 index → 'needs merge / could not write index'),故正確順序必為『先解未合併→提交→再 stash→merge』=v0101 sync() 既有順序;操作員那次因 classify 漏判停在第一步,無任何損害(stash 未建立、HEAD 未動)"
   }
  ],
  "updated_at": "2026-09-09 05:10"
