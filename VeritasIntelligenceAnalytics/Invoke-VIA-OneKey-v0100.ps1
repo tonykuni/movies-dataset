@@ -11,7 +11,11 @@ function Lamp($c, $k, $m) {
   if ($c -eq 'GREEN') { $col = 'Green' } elseif ($c -eq 'YELLOW') { $col = 'Yellow' } elseif ($c -eq 'RED') { $col = 'Red' }
   Write-Host ("{0,-6} {1,-11} {2}" -f $c, $k, $m) -ForegroundColor $col
 }
-function Head($t) { Write-Host "`n── $t ──" -ForegroundColor Cyan }
+$Stations = 0
+function Head($t) {
+  $global:Stations = $global:Stations + 1
+  Write-Host "`n── $t ──" -ForegroundColor Cyan
+}
 function GitU { , @(git diff --name-only --diff-filter=U 2>$null | Where-Object { $_ }) }
 
 # ① 母庫正本
@@ -222,9 +226,22 @@ Head '⑪ 總表'
 foreach ($row in $L) { Write-Host ("  {0,-6}  {1,-11}  {2}" -f $row.燈, $row.站, ($row.說明 -split "`n")[0]) }
 $red = @($L | Where-Object { $_.燈 -eq 'RED' }).Count
 $yel = @($L | Where-Object { $_.燈 -eq 'YELLOW' }).Count
-$verdict = 'GREEN'; $vcol = 'Green'
-if ($red) { $verdict = "RED($red 紅 / $yel 黃)"; $vcol = 'Red' } elseif ($yel) { $verdict = "YELLOW($yel 黃)"; $vcol = 'Yellow' }
-Write-Host "`n總判:$verdict" -ForegroundColor $vcol
+# 完整性閘：⑪ 本身不是工作站,所以應收燈數 = 站數 - 1。
+# 工作站實錄 2026-09-12:總表只印出 1 列卻報「總判:GREEN」,而同一次跑的
+# 收尾是 RED、ENC 是 YELLOW——**假綠出現在我自己的儀表上**。
+# 成因多半是分段貼上讓開頭的 $L 被重建一次,舊燈就沒了。
+# 治法不是去猜成因,是立一條規矩:**數不齊就不准給總判**。
+# 看不見全部的儀器沒有資格說「全綠」。
+$want = $global:Stations - 1
+if ($L.Count -lt $want) {
+  Write-Host ("`n總判:不給 —— 總表只收到 $($L.Count) 盞燈,應該有 $want 盞。") -ForegroundColor Red
+  Write-Host '  少掉的燈多半是分段貼上把 $L 重建了(開頭那行 $L = New-Object … 跑了第二次)。' -ForegroundColor Red
+  Write-Host '  上面逐站的即時輸出仍然可信;不可信的是這張總表。請整份一次貼,或存檔用 .\Invoke-VIA-OneKey-v0100.ps1 跑。' -ForegroundColor Red
+} else {
+  $verdict = 'GREEN'; $vcol = 'Green'
+  if ($red) { $verdict = "RED($red 紅 / $yel 黃)"; $vcol = 'Red' } elseif ($yel) { $verdict = "YELLOW($yel 黃)"; $vcol = 'Yellow' }
+  Write-Host "`n總判:$verdict（$($L.Count)/$want 盞燈齊）" -ForegroundColor $vcol
+}
 Write-Host '故意沒做:PR #8 不代你合併;VIA_SYSTEM_MANAGER 守衛不代你加;不代設任何同意閘。' -ForegroundColor DarkGray
 Write-Host '全程零破壞性指令:沒有 reset --hard / clean / checkout --force / Remove-Item。' -ForegroundColor DarkGray
 
