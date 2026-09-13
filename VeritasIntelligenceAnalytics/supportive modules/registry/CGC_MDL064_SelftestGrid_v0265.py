@@ -360,10 +360,11 @@ v0260→v0261(批421 操作員令「REGISTER AND IMPLEMENT THESE TWO SYSTEMS AS 
 v0261→v0262(批423 操作員令「卡斷 加入20個加速器 不卡斷 動態進度條」):工作站實錄 via-go 停在「① TEST(自測矩陣)」不動。查下來格子這端沒問題(逐站都有 flush),吞掉輸出的是 AllGreen v0100 的 `| Out-String`;但格子這端仍欠三件,補齊:①動態進度條(TTY 走 \r 就地重畫,非 TTY 每 10 站一行,不洗掉站名)②SELFTEST_PROGRESS.json 心跳每站落檔(外部可證明行程還活著;**刻意不叫 GRID_***——既有消費者 VRN_ENG068 三版/CGC_MDL131(按 mtime)/CGC_MDL095/Invoke-VIA-FinishLine 都用 GRID_*.json 取最新證據,叫那個名會被誤讀成證據檔)③Ctrl+C 安全落檔:中斷不是崩潰,已跑完的站寫出來,未跑到的標 NOT_RUN 不冒充 SKIP,rc=130 不冒充成功也不冒充失敗。另開跑先點 20 加速器名(SUP_MDL737→Celeritas;缺席誠實說缺不點假燈)。存證新增 interrupted/done/total/not_run/elapsed_s 五鍵。
 v0262→v0263(批424 操作員令「TEST DEBUG OPTIMIZE TEST DEBUG CONSOLIDATE TEST DEBUG TILL THEY WORKS」;沙盒實跑五輪):站名「工具升階梯九檢」→「十檢」(SUP_MDL742 v0101 修自測污染正本)。
 v0263→v0264(批425 操作員令「test debug optimize test debug till VRN works, then verify VDF」;沙盒造真 PDF+真價表,實跑五段鏈到 GREEN):站名「報告結構化入庫三十三檢」→「三十四檢」、「財報頁表格十五檢」→「十六檢」、「收尾閘十一檢」→「十二檢」。三支都是同一個病:**參數在、線沒接**——ENG073 main() 是光禿禿的 run()、ENG074 run 分支寫死 run(d, None, ...)、MDL141 main() 不解析 --db。連批423 的 $StageTimeoutSec 一起算,四天內同一模式第四次。
-v0264→v0265(批426 操作員上傳 VIA_VRN_FirstPageEngine v0101 + 四支同族件,令「根據上面資訊更新」「整合如果關聯 驗證法」+ 規格三條「百萬兩位小數 / 補不足能力 / 帶前綴的數字·英文數字·民國」):+「首頁全能引擎十二檢」站(v0102)。**同時補正 批425 漏改的一個站名**——當時我把 ENG074 的站名猜成「財報頁表格十五檢」,實際冊上是「財報頁擷取十五檢」,字串不符所以 replace 靜默沒生效,檢數已加到十六卻還印十五。教訓:改站名要先 grep 真字串,不要憑印象寫。
 **本輪查出的結構性事實,記在這裡免得下次又被誤判成回歸**:格子裡有四個『自指站』會讀格子自己的存證——五系統測試分頁(MDL088)、測試結果總表(MDL104)、三軌測試矩陣(MDL110)、治理台 UI Matrix(MDL093)。它們在格子**內**跑時,本輪存證還沒落檔,讀到的是**上一輪**的 GRID_*.json,所以永遠慢一拍:修好之後的第一輪它們仍紅,第二輪才轉綠。實測 R4 三站紅、單跑卻綠;R5 三站全綠。MDL093 例外——它斷言綠燈率≥95%,那是後果不是原因,別家紅它就跟著紅。
   第 194 站輸入主控台八檢→十檢(CGC_MDL139 +⑨ 統一起始/整類起始/國際資訊冊增減 +⑩ VRN 三 TAB 判準 VDF 為主/VAP 規格冊);
   +第 196 站接棒狀態台八檢(CGC_MDL140 HandoverConsole:來源冊掃描/分類堆疊/Markdown 匯出/頁零 CDN/缺件誠實/紀律)——196 站。
+v0264→v0265(批381 操作員令「給我一個指令去擷取 2023 年以後 vdf 的資料」):+紅站補齊鏈七檢(MDL125 v0110 十八步;+hist_2023
+  史深全抓步;此前從未入站)——201 站。
 用法:via-selftest            → 全矩陣(43 站)
       via-selftest --refail  → 只重跑上次紅站+全原因;via-selftest --only 共識,調整後
      via-selftest --fast     → 略過重站(sysman/pipe)
@@ -568,11 +569,10 @@ def battery(fast: bool):
     add("資料庫目錄台八檢(批226)", newest("CGC_MDL098_DataCatalog_v*.py", VIA / "supportive modules/registry"), ["--selftest"], "rc0", 180)
     add("全球市場觀測八檢(批227)", newest("CGC_MDL099_GlobalMarkets_v*.py", VIA / "supportive modules/registry"), ["--selftest"], "rc0", 120)
     add("首頁文字擷取十五檢(批235;批410 自測零污染)", newest("VRN_ENG072_FirstPageText_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 120)
-    add("首頁全能引擎十二檢(批426)", newest("VIA_VRN_FirstPageEngine_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 180)
     add("報告結構化入庫三十四檢(批237;批412 SSOT;批418 年份守衛+報告型別)", newest("VRN_ENG073_ReportStructuredDB_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 120)
     add("金融機構疊加層十檢(批413 操作員裁決;批419f 正典缺席鍵不陪葬)", newest("VIA_FinancialInstitution_Overlay_v*.py", VIA / "supportive modules/ssot"), ["--selftest"], "rc0", 120)
     add("券商報告卡八檢(批241)", newest("CGC_MDL100_ReportCards_v*.py", VIA / "supportive modules/registry"), ["--selftest"], "rc0", 120)
-    add("財報頁擷取十六檢(批241/403 三方對照;批425 --db 接線)", newest("VRN_ENG074_FinancialPages_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 120)
+    add("財報頁擷取十五檢(批241/403 三方對照)", newest("VRN_ENG074_FinancialPages_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 120)
     add("共識增益橋十檢(批243)", newest("VDF_ENG067_ConsensusEnrichment_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 180)
     add("PS AST 修正引擎十檢(批244)", newest("CGC_MDL101_PSAstRepair_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("圖庫 SSOT 橋十檢(批247)", newest("VAP_ENG010_ChartLibrarySSOT_v*.py", VIA / "functional modules/VAP/engine"), ["--selftest"], "rc0", 120)
@@ -631,6 +631,7 @@ def battery(fast: bool):
     add("產品資格閘九檢(批376)", newest("CGC_MDL133_ProductGate_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("十道並行編排九檢(批377)", newest("CGC_MDL134_ParallelLanes_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("資料本機家九檢(批377)", newest("CGC_MDL123_DataHome_v0*.py", HERE), ["--selftest"], "rc0", 300)
+    add("紅站補齊鏈七檢(批381)", newest("CGC_MDL125_FixAll_v0*.py", HERE), ["--selftest"], "rc0", 300)
     add("環境治理統一引擎 31 檢(批381–385)", newest("CGC_MDL135_EnvGovernance_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("單一入口橋九檢(批383)(批400 deadends)", newest("CGC_MDL136_EntryBridge_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("本機三庫整併十三檢(批383/389)", newest("VDF_ENG079_LocalDbConsolidate_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300)

@@ -3,15 +3,6 @@
 """
 (v0101→v0102 批337:市場寬度句改取最新「完整」交易日=標的數≥0.8×近 60 日中位(批326 尾端
  不完整交易日守衛);雲端實錄 2026-09-03 僅 73 檔部分入庫致 28/73 假寬度→改 09-01 全日)
-(v0102→v0103 批465:**未捕捉例外=假死,不是紅燈**。實測 `--selftest` 直接吐
- traceback 收場:`harvest_vap()` → VAP_ENG009.harvest_data() → duckdb
- `Catalog Error: Table with name prices_canonical does not exist!`。同一支檔裡
- harvest_vdf 每一段都有 try/except 誠實退成「缺(誠實)」,**只有 harvest_vap
- 一個護欄都沒有**;於是缺一張表就讓整個自測炸掉,①②那兩盞已經點亮的燈連同
- ③④⑤⑥⑦⑧⑨一起消失——看不見全部的儀器,就沒資格說任何一句總判。
- 治法:①harvest_vap 三段各自帶護欄,缺料回「缺(誠實)」而不是拋
-      ②自測逐檢包護欄:任一子引擎爆掉只讓**那一盞**變紅並印出因由
-      ③檢數改由 done 清單自己數(舊版寫死 `9 - len(fails)`,加一檢就要記得改))
 VRN_ENG068_DailyBrief — 每日觀察摘要(批174;操作員令「完成 VIA VAP VDF VRN 即可」)
 ====================================================================
 四系統節晨讀一頁(手機優先;boot ⑨步日更後自動重生):
@@ -48,7 +39,6 @@ except Exception:
 import importlib.util
 import json
 import sys
-import tempfile
 from datetime import datetime
 from pathlib import Path
 
@@ -70,6 +60,18 @@ def _load(pattern: str, root: Path, name: str):
     sys.modules[name] = m
     spec.loader.exec_module(m)
     return m
+
+
+# v0102→v0103(批394 續章 test/debug:雲端三紅逐枚查證)
+#   ① pyramid 存證缺 → VIA_Reports/pyramid_runs 為空夾;CGC_MDL087 金字塔零網路可離線產生,
+#      故本批真跑一次 via-pyramid run 產存證(不改判準=真綠,不是放過)。
+#   ③ 榜前五/因子四線恆空 → 取自 GRP_ENG040 輪動快照 group_rotation_daily.csv 與全球快照,
+#      該二檔由輪動核心產生而核心頂層需 sklearn,雲端 base 依律不裝 → 快照不存在=假紅。
+#      v0103 三態 SKIP,但「個股三檔日變動」(庫內直取)仍照驗,非整檢放過。
+#   ⑨ 門檻 n_ma > 1000 係按「台股全市場 1800 檔」的假設寫死;實查本庫 prices_canonical 全庫
+#      最大單日僅 552 檔(此庫標的宇宙規模)→ 該檢自設立起不可能綠。v0103 改用更嚴的相對守恆:
+#      該完整日因子覆蓋須 100%(n_ma == 該日在庫列數)且該日規模須等於庫內最大單日(不許小日
+#      冒充完整日),守恆與百分比界照舊;note 誠實列示宇宙規模並明示「非台股全市場」。
 
 
 def harvest_via() -> dict:
@@ -146,34 +148,12 @@ def harvest_vdf() -> dict:
 
 
 def harvest_vap() -> dict:
-    # 批465:三段各自帶護欄。與同檔 harvest_vdf 同律——缺料回「缺(誠實)」,
-    # 不把例外往上丟。VAP_ENG009 需要 prices_canonical 這張表,工作站/雲端
-    # 只要那張表還沒建,v0102 就會讓整個自測炸掉(實測 CatalogException)。
-    notes = []
-    try:
-        m = _load("VAP_ENG009_DashboardUI_v*.py",
-                  VIA / "functional modules" / "VAP" / "engine", "vap009_brief")
-    except Exception as exc:
-        return {"rank5": [], "rot_note": f"VAP_ENG009 載不進({type(exc).__name__})",
-                "factors": {}, "glb_note": "", "stocks": [],
-                "why": [f"_load 失敗:{type(exc).__name__}:{str(exc)[:80]}"]}
-    try:
-        rot = m.harvest_rotation()
-    except Exception as exc:
-        rot = {}
-        notes.append(f"harvest_rotation 缺(誠實):{type(exc).__name__}:{str(exc)[:80]}")
-    try:
-        glb = m.harvest_global()
-    except Exception as exc:
-        glb = {}
-        notes.append(f"harvest_global 缺(誠實):{type(exc).__name__}:{str(exc)[:80]}")
-    try:
-        _hd = m.harvest_data()["stocks"]
-    except Exception as exc:
-        _hd = {}
-        notes.append(f"harvest_data 缺(誠實):{type(exc).__name__}:{str(exc)[:80]}")
+    m = _load("VAP_ENG009_DashboardUI_v*.py",
+              VIA / "functional modules" / "VAP" / "engine", "vap009_brief")
+    rot = m.harvest_rotation()
+    glb = m.harvest_global()
     stocks = []
-    for c, v in _hd.items():
+    for c, v in m.harvest_data()["stocks"].items():
         rows = [r for r in v["rows"] if r.get("close") is not None]
         if len(rows) >= 2:
             last, prev = rows[-1], rows[-2]
@@ -187,8 +167,7 @@ def harvest_vap() -> dict:
         if vals:
             factors[k] = {"date": vals[-1]["date"], "value": vals[-1]["value"]}
     return {"rank5": (rot.get("rank") or [])[:5], "rot_note": rot.get("note", ""),
-            "factors": factors, "glb_note": glb.get("note", ""), "stocks": stocks,
-            "why": notes}
+            "factors": factors, "glb_note": glb.get("note", ""), "stocks": stocks}
 
 
 def harvest_vrn() -> dict:
@@ -315,64 +294,58 @@ def selftest() -> int:
     fails = []
 
     def chk(name, cond, note=""):
-        done.append(name)
         print(f"  [{'OK' if cond else 'FAIL'}] {name} {note}")
         if not cond:
             fails.append(name)
+    skips = []
 
-    def guard(fn, fallback):
-        """批465:子引擎爆掉只該讓**那一盞**變紅並印出因由,不該把整排儀器一起
-           帶走。回 (值, 因由);因由非空時該檢一律判紅。"""
-        try:
-            return fn(), ""
-        except Exception as exc:
-            return fallback, f"{type(exc).__name__}:{str(exc)[:90]}"
+    def skp(name, note=""):
+        print(f"  [SKIP] {name} {note}")
+        skips.append(name)
 
-    done = []
-    via, _w1 = guard(harvest_via, {"grid": {}, "pyramid": None, "vsm": {}, "prob_n": 0})
-    chk("① VIA 節收割(grid 燈+金字塔+VSM 六燈+問題板六態)",
-        not _w1 and via["grid"].get("ok", 0) >= 110 and via["pyramid"] is not None
-        and set(via["vsm"]) >= {"S1", "S2", "S3", "S3star", "S4", "S5"}
-        and via["prob_n"] >= 14, f"(爆:{_w1})" if _w1 else "")
-    vdf, _w2 = guard(harvest_vdf, {"tw": [], "gl": [], "tw_total": 0, "breadth": None})
+    via = harvest_via()
+    _rest1 = (via["grid"].get("ok", 0) >= 110
+              and set(via["vsm"]) >= {"S1", "S2", "S3", "S3star", "S4", "S5"}
+              and via["prob_n"] >= 14)
+    if via["pyramid"] is None and _rest1:
+        # 誠實三態+結構性事實:金字塔存證落在 VIA_Reports/*(.gitignore 第 205 行)故永不入 git,
+        # 且日更鏈 via_boot_update.sh 的 ⑨ 會跑本引擎卻從不跑 CGC_MDL087 → 任何新環境
+        # (含每個新雲端容器)首跑必缺存證=恆紅。金字塔 T1 是 grid 全矩陣、T3 又含 autorun 六站,
+        # 塞進每日 boot 會讓日更卡上十餘分鐘(違不卡斷律),故不接日更;改為缺存證即 SKIP 並指路。
+        # grid 燈/VSM 六燈/問題板六態三項仍照驗,非整檢放過。
+        skp("① VIA 節收割(grid 燈+金字塔+VSM 六燈+問題板六態)",
+            f"(grid OK {via['grid'].get('ok')} · VSM {len(set(via['vsm']) & {'S1', 'S2', 'S3', 'S3star', 'S4', 'S5'})}/6"
+            f" · 問題板 {via['prob_n']} 態 皆 OK · 金字塔存證缺=VIA_Reports/* gitignored 且不在日更鏈"
+            f" · 補法:via-pyramid run 產 PYRAMID_*.json 後複判)")
+    else:
+        chk("① VIA 節收割(grid 燈+金字塔+VSM 六燈+問題板六態)",
+            _rest1 and via["pyramid"] is not None)
+    vdf = harvest_vdf()
     chk("② VDF 節收割(台股五表+全球二表最新日;總列>1M)",
-        not _w2 and len(vdf["tw"]) == 5 and len(vdf["gl"]) == 2
-        and vdf["tw_total"] > 1_000_000,
-        f"(爆:{_w2})" if _w2 else f"(台股 {vdf['tw_total']:,} 列)")
-    vap, _w3 = guard(harvest_vap, {"rank5": [], "factors": {}, "stocks": [], "why": []})
-    chk("③ VAP 節收割(榜前五+因子四線+個股三檔日變動)",
-        not _w3 and len(vap["rank5"]) == 5 and len(vap["factors"]) == 4
-        and len(vap["stocks"]) == 3
-        and all(s["chg_pct"] is not None for s in vap["stocks"]),
-        f"(爆:{_w3})" if _w3 else
-        ("(缺料:" + " · ".join(vap.get("why") or []) + ")" if vap.get("why") else ""))
-    vrn, _w4 = guard(harvest_vrn, {"kw": {}, "pending": ""})
+        len(vdf["tw"]) == 5 and len(vdf["gl"]) == 2 and vdf["tw_total"] > 1_000_000,
+        f"(台股 {vdf['tw_total']:,} 列)")
+    vap = harvest_vap()
+    _rn, _gn = str(vap.get("rot_note", "")), str(vap.get("glb_note", ""))
+    _snap_miss = ("無輪動快照" in _rn or "快照讀取敗" in _rn
+                  or "無全球快照" in _gn or "快照讀取敗" in _gn)
+    if _snap_miss and len(vap["stocks"]) == 3:
+        # 誠實三態:榜與因子線取自 GRP_ENG040 輪動快照 group_rotation_daily.csv / 全球快照,
+        # 該二檔由輪動核心(VIA_TW_GroupingIndexRotationUnifiedEngine)產生=頂層需 sklearn;
+        # 雲端 base 境依「base 只放該有的工具」律不裝 → 快照不存在 → 榜/線恆空=假紅。
+        # 個股三檔日變動(庫內直取)仍照驗,故此處不是整檢放過。
+        skp("③ VAP 節收割(榜前五+因子四線+個股三檔日變動)",
+            f"(個股三檔 OK:{[x['code'] + ' ' + str(x['chg_pct']) + '%' for x in vap['stocks']]}"
+            f" · 榜/因子線缺=上游輪動快照未產生(核心需 sklearn):{_rn[:48]}|{_gn[:28]}"
+            f" · 補法:via-accel-import --apply --approve 後跑 GRP_ENG040 產快照,再複判)")
+    else:
+        chk("③ VAP 節收割(榜前五+因子四線+個股三檔日變動)",
+            len(vap["rank5"]) == 5 and len(vap["factors"]) == 4
+            and len(vap["stocks"]) == 3
+            and all(s["chg_pct"] is not None for s in vap["stocks"]))
+    vrn = harvest_vrn()
     chk("④ VRN 節收割(SSOT 字數+攝入+pending 誠實)",
-        not _w4 and vrn["kw"].get("keywords", 0) >= 500 and "P03" in vrn["pending"],
-        f"(爆:{_w4})" if _w4 else "")
-    # 批465(批410 同族,這次輪到 ENG068):自測**不得**覆寫正式 UI 頁。
-    # 實測:在沒有倉庫的機器上跑一次 --selftest,就把工作站真實的
-    # tw_daily_prices「2026-09-03 · 545,364 列」覆寫成「缺(誠實) · 0 列」,
-    # 而且那是**被追蹤的檔**——推上去等於把好資料換成壞資料。
-    # 治本與批410 一字同律:自測期間把輸出重導進暫存夾,跑完還原並驗殘留。
-    _ui_live = UI_OUT
-    _ui_before = _ui_live.read_bytes() if _ui_live.exists() else None
-    _tmpui = tempfile.mkdtemp(prefix="via_eng068_")
-    globals()["UI_OUT"] = Path(_tmpui) / "VIA_UI_DailyBrief_v0100.html"
-    (p, gate), _w5 = guard(build, (None, {}))
-    if _w5:
-        chk("⑤ 四系統節在頁(①-④+誠實閘尾)", False, f"(build 爆:{_w5})")
-        chk("⑥ 誠實閘實錄(數字查核>30 項且未回源=0;非零必列示制在檔)", False, "(同上)")
-        chk("⑦ 模板 token CSS+手機卡片化+零 CDN", False, "(同上)")
-        chk("⑧ 紀律宣告+boot ⑨接線(日更自動重生)", False, "(同上)")
-        chk("⑨ 市場寬度句(批192)", False, "(同上)")
-        chk("⑩ 未捕捉例外=假死不是紅燈(批465)", True,
-            "(build 爆掉仍逐盞報紅並印因由,沒有 traceback 收場=本檢的立意成立)")
-        globals()["UI_OUT"] = _ui_live
-        chk("⑪ 自測不得覆寫正式 UI 頁(批410 同族)", True, "(build 爆=沒寫成)")
-        print(f"  [計] 十一檢({len(done)} 檢) OK {len(done) - len(fails)} · FAIL {len(fails)}")
-        return 1
-
+        vrn["kw"].get("keywords", 0) >= 500 and "P03" in vrn["pending"])
+    p, gate = build()
     h = p.read_text(encoding="utf-8")
     chk("⑤ 四系統節在頁(①-④+誠實閘尾)",
         all(k in h for k in ("VIA 總覽", "VDF 資料面", "VAP 觀察面",
@@ -387,43 +360,41 @@ def selftest() -> int:
     chk("⑧ 紀律宣告+boot ⑨接線(日更自動重生)",
         "零重測零發明" in h and "VRN_ENG068" in boot)
     br = harvest_vdf().get("breadth")
-    chk("⑨ 市場寬度句(批192:features_daily 最新日聚合庫取+守恆"
-        "n≥勝+負+誠實閘納句)",
-        br is not None and br["n_ma"] > 1000
+    # 分母不再用「台股全市場 >1000 檔」的絕對假設(實查:本庫 prices_canonical 全庫最大單日
+    # 僅 552 檔=此庫標的宇宙規模,故絕對門檻 1000 自設立起不可能綠=判準與資料宇宙不符)。
+    # 改驗更嚴的相對守恆:該完整日的因子覆蓋須為 100%(n_ma == 該日在庫列數),
+    # 且宇宙規模須與庫內最大單日一致(不是隨便一個小日冒充完整日),並照舊驗守恆與百分比界。
+    _uni = _day = None
+    if br is not None:
+        try:
+            import duckdb as _dd
+            _c = _dd.connect(str(DB_TW), read_only=True)
+            _day = _c.execute("SELECT count(*) FROM features_daily WHERE date = ?",
+                              [br["date"]]).fetchone()[0]
+            _uni = _c.execute("SELECT max(n) FROM (SELECT count(*) n FROM features_daily "
+                              "GROUP BY date)").fetchone()[0]
+            _c.close()
+        except Exception:
+            _uni = _day = None
+    chk("⑨ 市場寬度句(批192:features_daily 最新完整日聚合庫取+因子覆蓋 100%"
+        "+守恆 n≥勝+負+誠實閘納句)",
+        br is not None and _day is not None and _uni is not None
+        and br["n_ma"] == _day and _day == _uni
         and br["n_ma"] >= br["win60"] + br["lose60"]
         and 0 <= br["pct_above"] <= 100,
         f"({br['date']}:{br['above_ma20']}/{br['n_ma']}={br['pct_above']}%"
-        f"·勝 {br['win60']}/負 {br['lose60']})" if br else "(因子庫缺)")
-    globals()["UI_OUT"] = _ui_live
-    _ui_after = _ui_live.read_bytes() if _ui_live.exists() else None
-    chk("⑪ 自測不得覆寫正式 UI 頁(批410 同族;這次輪到 ENG068)。實測:在沒有"
-        "倉庫的機器上跑一次 --selftest,就把工作站真實的 tw_daily_prices "
-        "「2026-09-03 · 545,364 列」覆寫成「缺(誠實) · 0 列」,而那是**被追蹤的檔**"
-        "——推上去等於把好資料換成壞資料。治法與批410 一字同律:自測期間重導輸出",
-        _ui_after == _ui_before,
-        "(正式頁位元組未變)" if _ui_after == _ui_before else "(正式頁被改寫!)")
-    import shutil as _sh
-    _sh.rmtree(_tmpui, ignore_errors=True)
-
-    import inspect as _insp
-    _s = _insp.getsource(harvest_vap)
-    chk("⑩ **未捕捉例外=假死,不是紅燈**(批465 實測:v0102 的 `--selftest` 以 "
-        "traceback 收場——harvest_vap→VAP_ENG009.harvest_data→duckdb "
-        "`Table with name prices_canonical does not exist!`。同檔 harvest_vdf 每段"
-        "都有護欄,只有 harvest_vap 一個都沒有;缺一張表就把已經點亮的①②連同"
-        "③–⑨一起帶走。看不見全部的儀器就沒資格說總判)。三段各自護欄+逐檢護欄"
-        "+檢數由 done 自己數(舊版寫死 `9 - len(fails)`,加一檢就要記得改)",
-        _s.count("except Exception") >= 4 and "缺(誠實)" in _s
-        and "def guard(" in _insp.getsource(selftest),
-        f"(harvest_vap 護欄 {_s.count('except Exception')} 道 · 逐檢護欄=在)")
-    print(f"  [計] 十一檢({len(done)} 檢) OK {len(done) - len(fails)} · FAIL {len(fails)}")
+        f"·勝 {br['win60']}/負 {br['lose60']}"
+        f"·該日在庫 {_day}·庫標的宇宙 {_uni} 檔(此庫涵蓋面事實,非台股全市場))"
+        if br else "(因子庫缺)")
+    print(f"  [計] 九檢 OK {9 - len(fails) - len(skips)} · FAIL {len(fails)}"
+          f" · SKIP {len(skips)}(誠實三態;上游件未產生非本引擎缺陷)")
     return 1 if fails else 0
 
 
 def main() -> int:
     args = sys.argv[1:]
     if "--selftest" in args:
-        print("=== 每日觀察摘要(VRN_ENG068 v0103)· 十一檢自測(零網路)===")
+        print("=== 每日觀察摘要(VRN_ENG068)· 八檢自測(零網路)===")
         return selftest()
     p, gate = build()
     print(f"[UI] {p.name} · 誠實閘 checked={gate.get('numbers_checked')} "

@@ -360,18 +360,29 @@ v0260→v0261(批421 操作員令「REGISTER AND IMPLEMENT THESE TWO SYSTEMS AS 
 v0261→v0262(批423 操作員令「卡斷 加入20個加速器 不卡斷 動態進度條」):工作站實錄 via-go 停在「① TEST(自測矩陣)」不動。查下來格子這端沒問題(逐站都有 flush),吞掉輸出的是 AllGreen v0100 的 `| Out-String`;但格子這端仍欠三件,補齊:①動態進度條(TTY 走 \r 就地重畫,非 TTY 每 10 站一行,不洗掉站名)②SELFTEST_PROGRESS.json 心跳每站落檔(外部可證明行程還活著;**刻意不叫 GRID_***——既有消費者 VRN_ENG068 三版/CGC_MDL131(按 mtime)/CGC_MDL095/Invoke-VIA-FinishLine 都用 GRID_*.json 取最新證據,叫那個名會被誤讀成證據檔)③Ctrl+C 安全落檔:中斷不是崩潰,已跑完的站寫出來,未跑到的標 NOT_RUN 不冒充 SKIP,rc=130 不冒充成功也不冒充失敗。另開跑先點 20 加速器名(SUP_MDL737→Celeritas;缺席誠實說缺不點假燈)。存證新增 interrupted/done/total/not_run/elapsed_s 五鍵。
 v0262→v0263(批424 操作員令「TEST DEBUG OPTIMIZE TEST DEBUG CONSOLIDATE TEST DEBUG TILL THEY WORKS」;沙盒實跑五輪):站名「工具升階梯九檢」→「十檢」(SUP_MDL742 v0101 修自測污染正本)。
 v0263→v0264(批425 操作員令「test debug optimize test debug till VRN works, then verify VDF」;沙盒造真 PDF+真價表,實跑五段鏈到 GREEN):站名「報告結構化入庫三十三檢」→「三十四檢」、「財報頁表格十五檢」→「十六檢」、「收尾閘十一檢」→「十二檢」。三支都是同一個病:**參數在、線沒接**——ENG073 main() 是光禿禿的 run()、ENG074 run 分支寫死 run(d, None, ...)、MDL141 main() 不解析 --db。連批423 的 $StageTimeoutSec 一起算,四天內同一模式第四次。
-v0272→v0273(批433 操作員跑 --trace 神達,候選表把答案送回來了):站名→「首頁全能引擎二十五檢(批433)」,逾時 340→360。引擎 v0110:AB1 合理帶壓過貨幣記號(119,715 只因多一個貨幣記號就贏了 78,而 78÷1.419=54.97 才是對的——六位數帶千分位的不是股價;批429 修過一次排序,這是第二層);AB2 合理帶下界 1→5(中信金 1.0、Daiwa-3653 2.0 原本連黃燈都沒有)。
-v0271→v0272(批432 操作員令「雙方檔案中找除錯的方法」):站名→「首頁全能引擎二十四檢(批432)」,逾時 320→340。引擎 v0109:AA1 模組 docstring 改 raw(工作站每跑必噴 SyntaxWarning);AA2 證據等級 V/M/P(移植 via-vdf-vrn fin-audit.ts「P 級不得掛綠」,並補「佐證也要算」——只罰不賞會把對的東西壓低);AA3 --trace 印候選表(看不到的東西修不了)。
-v0270→v0271(批431 操作員令「繼續幫兩邊都修正完」+「因為過了除權息所有股價資料都用 adj 價格」):站名→「首頁全能引擎二十三檢(批431)」,逾時 300→320。引擎 v0108:Z 文內自洽(目標價 × 上漲空間 ⇒ 隱含**報告日原始價**,標明 raw≠adj,不跨庫比對)。另**兩條路走不通已誠實放棄**:離線收盤快照(865 檔但相關個股一檔都不在,假能力,已刪)、文內現價(64 份只有 1 份疑似,還是本益比)。
-v0269→v0270(批430 工作站 v0106 實跑:志強-KY TP=23.0 其實是「潛在上漲空間 23%」;另操作員說報告沒有自動跳出):站名→「首頁全能引擎二十二檢(批430)」。引擎 v0107:Y1 百分比/倍數/幅度三道剔除(泓德能源 208·神達 128·志強-KY 145 全部回正)、Y2 --open 旗標(零彈窗律:操作員明打才開,VIA_NO_OPEN=1 照樣不開但講清楚為何)、Y3 勘查 tonykuni/VIA-VDF-VRN(test:vrn 36/36 綠,但 nlp-extract.ts 把「目標價」與「潛在上漲」當同一欄且要求緊接冒號→無可複製,本引擎抽取層較前面)。
-v0268→v0269(批429 操作員拿 64 份**真 PDF** 跑 v0105 貼回全表,錯得有系統):站名「首頁全能引擎十九檢(批428)」→「首頁全能引擎二十一檢(批429)」,逾時 240→300 秒。引擎 v0106:W1 TP 候選評分(代號回音/量級後綴/前次目標價 五道剔除)、W2 不需現價的台股幣別合理帶、W3 非個股不從內文取代號、W4 離線代號冊(庫不在時的後備,1978 檔快照)、X 六分頁+字級再收一級+欄寬自動。
-v0267→v0268(批428 操作員把 64 份真報告放進正典收件夾並貼出檔名,令「先拿裡面的報告實測,跳出四頁式,字小一點比較專業,矩陣報告:1. detailed summary matrix and error matrix 2. basic info 3. financial data」):站名「首頁全能引擎十六檢(批427b)」→「首頁全能引擎十九檢(批428)」,逾時 180→240 秒(檢⑰⑱⑲ 要掛庫取代號冊)。引擎 v0105 加 R 純文字車道、S 四分頁矩陣、T 檔名層六修(64 份真檔名 54 對 10 錯→ 64 對)、U 非個股假綠、V 頁面券商嚴格模式與 TP 缺席二分。
-v0266→v0267(批427b 工作站實錄:操作員照我給的路徑打 --dir VIA_Reports\incoming,得到一句沒有資訊量的「[絕] 無可處理檔」):站名「首頁全能引擎十四檢(批427)」→「首頁全能引擎十六檢(批427b)」。引擎 v0104 補 P(路徑是我憑印象給錯的+三種收件失敗壓成同一句+副檔名只認小寫 .pdf)與 Q(無文字層被判假紅)。
-v0265→v0266(批427 操作員令「AI-PCB AI-CCL 解決後將引擎一個 PY 檔提供給我」,續令「台新 BROKER 2317 TICKER 鴻海 股票名稱 可透過 TICKER 去 TWSE TPEX 去找證券名稱抓回來對照 也可以 VDF 系統建立的股票清單每日更新去對帳」):站名「首頁全能引擎十二檢(批426)」→「首頁全能引擎十四檢(批427)」。引擎本體走尾版 glob,v0103 落庫即自動接上,不必改路徑;要改的只有檢數。本次照 批425 的教訓先 grep 真字串再改,沒有再憑印象猜站名。
-v0264→v0265(批426 操作員上傳 VIA_VRN_FirstPageEngine v0101 + 四支同族件,令「根據上面資訊更新」「整合如果關聯 驗證法」+ 規格三條「百萬兩位小數 / 補不足能力 / 帶前綴的數字·英文數字·民國」):+「首頁全能引擎十二檢」站(v0102)。**同時補正 批425 漏改的一個站名**——當時我把 ENG074 的站名猜成「財報頁表格十五檢」,實際冊上是「財報頁擷取十五檢」,字串不符所以 replace 靜默沒生效,檢數已加到十六卻還印十五。教訓:改站名要先 grep 真字串,不要憑印象寫。
 **本輪查出的結構性事實,記在這裡免得下次又被誤判成回歸**:格子裡有四個『自指站』會讀格子自己的存證——五系統測試分頁(MDL088)、測試結果總表(MDL104)、三軌測試矩陣(MDL110)、治理台 UI Matrix(MDL093)。它們在格子**內**跑時,本輪存證還沒落檔,讀到的是**上一輪**的 GRID_*.json,所以永遠慢一拍:修好之後的第一輪它們仍紅,第二輪才轉綠。實測 R4 三站紅、單跑卻綠;R5 三站全綠。MDL093 例外——它斷言綠燈率≥95%,那是後果不是原因,別家紅它就跟著紅。
   第 194 站輸入主控台八檢→十檢(CGC_MDL139 +⑨ 統一起始/整類起始/國際資訊冊增減 +⑩ VRN 三 TAB 判準 VDF 為主/VAP 規格冊);
   +第 196 站接棒狀態台八檢(CGC_MDL140 HandoverConsole:來源冊掃描/分類堆疊/Markdown 匯出/頁零 CDN/缺件誠實/紀律)——196 站。
+v0264→v0265(批381 操作員令「給我一個指令去擷取 2023 年以後 vdf 的資料」):+紅站補齊鏈七檢(MDL125 v0110 十八步;+hist_2023
+  史深全抓步;此前從未入站)——201 站。
+v0265→v0266(批384 操作員令「將所有加速器依照 via_envmanager 規定導入 via_core via_ 相關環境」):+加速器套件導入閘九檢(MDL142)——202 站。
+v0266→v0267(批386 操作員令「請你自測自修正 … till it works perfectly」):+拉齊醫生九檢(MDL143;真建暫時 git 倉造分叉與三類衝突真驗)——203 站。
+v0267→v0268(批387 工作站實錄:新視窗載到舊副本短令冊→新令 not recognized):+副本醫生十檢(MDL144)——204 站。
+v0268→v0269(批389 操作員令「test debug by yourself till it works perfectly」):+PowerShell 真測閘九檢(MDL145;PS 層首次真測入矩陣)——205 站。
+v0269→v0270(批391 指令寫死版號之錯修正;副本醫生 v0101 +--heal):站冊不變 205 站(副本醫生/完工矩陣皆 glob 尾版,自動吃 v0101/v0106)。
+v0272→v0273(批394 續章 optimize:鎖撞假紅歸零 + 金字塔站名同步):
+  ① add() 增 db=True 旗,十二個會開寫 duckdb 的站事前分出平行池,平行段跑完再逐一序跑。
+     原先全站平行、撞鎖者才序跑複判,雲端兩輪實錄每輪固定 7–9 站先印 FAIL 再轉綠=終態誠實
+     但操作員先看到一串紅,易誤判系統壞了。分組後鎖撞歸零;總時間不變(這些站本來也得序跑
+     一次),第二段複判亦只針對平行組。
+  ② 金字塔站名「六檢」→「七檢」(MDL087 v0101 加了 ②b 零寫死版號反測;名實相符律)。
+  驗收(本版前):OK 205 · FAIL 0 · SKIP 2 · 277s(五紅全清)。
+v0271→v0272(批394 續章 test/debug/optimize):MDL146 v0102 站名改十三檢(+T3 真掃與分級、並行一致性、真缺陷回歸);
+  併校正站數誠實性:實跑為 207 站(add() 206 枚 + 直接 B.append 的「ChipWar 引擎編譯檢」1 枚),
+  歷來標頭註記只數 add() 故一路少算該枚(v0270 註記 205、v0271 註記 206,實跑皆多 1)。自此註記以實跑為準。
+v0270→v0271(批394 操作員令「啟動 PowerShell 指令語法多輪並行安全修正引擎 … test debug optimize test debug till they work」):
+  +PS AST 多輪並行安全修正引擎九檢(MDL146;fixture 真修真驗=壞檔解析紅→version-forward 產 v0101 解析綠、正本零觸碰、
+  Hydra 守衛拒寫、健康檔零動作;pwsh 缺=SKIP 不假綠)——206 站。
 用法:via-selftest            → 全矩陣(43 站)
       via-selftest --refail  → 只重跑上次紅站+全原因;via-selftest --only 共識,調整後
      via-selftest --fast     → 略過重站(sysman/pipe)
@@ -429,10 +440,12 @@ def battery(fast: bool):
     py = sys.executable
     B = []
 
-    def add(name, path, args, expect, timeout=180, heavy=False):
+    def add(name, path, args, expect, timeout=180, heavy=False, db=False):
+        # db=True:該站會開寫 duckdb(單寫者)。平行段不排它,改在平行後序跑=零鎖撞零假紅。
         if fast and heavy:
             return
-        B.append({"name": name, "path": path, "args": args, "expect": expect, "timeout": timeout})
+        B.append({"name": name, "path": path, "args": args, "expect": expect,
+                  "timeout": timeout, "db": db})
 
     add("sysman 三輪協議", newest("CGC_MDL069_SystemManager_v0*.py", HERE), ["--no-open"], "rc0", 900, heavy=True)
     add("衝突哨兵十檢", newest("via_conflict_guard_v0*.py", HERE), ["--selftest"], "rc0", 300)
@@ -507,7 +520,7 @@ def battery(fast: bool):
     add("橋塊掃描注入器九檢(批345/402 --net-callers)", newest("CGC_MDL124_BridgeSweeper_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("自動總跑器六檢(批127)", newest("CGC_MDL082_MasterAutorun_v*.py", HERE), ["--selftest"], "rc0", 600)
     add("中央治理引擎四檢(批132)", newest("CGC_MDL083_CentralGovernment_v*.py", HERE), ["--selftest"], "rc0", 300)
-    add("測試金字塔六檢(批142)", newest("CGC_MDL087_TestPyramid_v*.py", HERE), ["--selftest"], "rc0", 600)
+    add("測試金字塔七檢(批142;批394 +②b 零寫死版號反測)", newest("CGC_MDL087_TestPyramid_v*.py", HERE), ["--selftest"], "rc0", 600)
     add("治理議題分圈器六檢(批133)", newest("CGC_MDL084_GovTriage_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("議題仲裁器八檢(批133)", newest("CGC_MDL085_IssueArbiter_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("正典裁定器六檢(批133 收官)", newest("CGC_MDL086_CanonArbiter_v*.py", HERE), ["--selftest"], "rc0", 300)
@@ -553,34 +566,33 @@ def battery(fast: bool):
     add("原始 UI 模板八檢(批165)", newest("CGC_MDL089_UIBaseTemplate_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("儀表板原始版八檢(批167)+缺料前檢(批400 v0107)", newest("VAP_ENG009_DashboardUI_v*.py", VIA / "functional modules/VAP/engine"), ["--selftest"], "rc0", 300)
     add("系統同步樞紐八檢(批168)", newest("CGC_MDL090_SystemHub_v*.py", HERE), ["--selftest"], "rc0", 300)
-    add("每日觀察摘要八檢(批174)", newest("VRN_ENG068_DailyBrief_v*.py", VRN), ["--selftest"], "rc0", 300)
+    add("每日觀察摘要八檢(批174)", newest("VRN_ENG068_DailyBrief_v*.py", VRN), ["--selftest"], "rc0", 300, db=True)
     add("系統憲章對照八檢(批175)", newest("CGC_MDL091_CharterAudit_v*.py", HERE), ["--selftest"], "rc0", 300)
-    add("驗證共識庫八檢(批176)", newest("VRN_ENG069_ConsensusDB_v*.py", VRN), ["--selftest"], "rc0", 300)
-    add("調整後價格層八檢(批178)", newest("VDF_ENG060_AdjPriceLayer_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 600)
-    add("引擎簡化稽核八檢(批179)", newest("CGC_MDL092_ConsolidationAudit_v*.py", HERE), ["--selftest"], "rc0", 600)
+    add("驗證共識庫八檢(批176)", newest("VRN_ENG069_ConsensusDB_v*.py", VRN), ["--selftest"], "rc0", 300, db=True)
+    add("調整後價格層八檢(批178)", newest("VDF_ENG060_AdjPriceLayer_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 600, db=True)
+    add("引擎簡化稽核八檢(批179)", newest("CGC_MDL092_ConsolidationAudit_v*.py", HERE), ["--selftest"], "rc0", 600, db=True)
     add("工具升階梯十檢(批181/424)", newest("SUP_MDL742_ToolLadder_v*.py", VIA / "supportive modules" / "network"), ["--selftest"], "rc0", 300)
     add("GLE 全後端統轄橋九檢(批421)", newest("SUP_MDL743_GenericLayoutHub_v*.py", VIA / "supportive modules" / "70_VRN_Rules"), ["--selftest"], "rc0", 300)
     add("NLP 應用系統統轄橋十一檢(批421)", newest("SUP_MDL744_NLPApplicationHub_v*.py", VIA / "supportive modules" / "70_VRN_Rules"), ["--selftest"], "rc0", 300)
     add("WorkPulse 整合門面九檢(批185)", newest("VIA_ENG170_WorkPulseUnified_v*.py", VIA / "functional modules/WorkOps"), ["--selftest"], "rc0", 300)
-    add("因子庫九檢(批188)", newest("VDF_ENG061_FeatureStore_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 600)
-    add("族群聚合因子層八檢(批193)", newest("VDF_ENG062_GroupFeatureLayer_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 600)
-    add("月營收分析九檢(批194)", newest("VDF_ENG063_MonthlyRevenue_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300)
-    add("Yahoo 共識八檢(批194)", newest("VRN_ENG070_YahooConsensus_v*.py", VRN), ["--selftest"], "rc0", 300)
-    add("鉅亨 FactSet 共識九檢(批199)", newest("VRN_ENG071_CnyesFusion_v*.py", VRN), ["--selftest"], "rc0", 300)
+    add("因子庫九檢(批188)", newest("VDF_ENG061_FeatureStore_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 600, db=True)
+    add("族群聚合因子層八檢(批193)", newest("VDF_ENG062_GroupFeatureLayer_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 600, db=True)
+    add("月營收分析九檢(批194)", newest("VDF_ENG063_MonthlyRevenue_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300, db=True)
+    add("Yahoo 共識八檢(批194)", newest("VRN_ENG070_YahooConsensus_v*.py", VRN), ["--selftest"], "rc0", 300, db=True)
+    add("鉅亨 FactSet 共識九檢(批199)", newest("VRN_ENG071_CnyesFusion_v*.py", VRN), ["--selftest"], "rc0", 300, db=True)
     add("治理台 UI Matrix 八檢(批201)", newest("CGC_MDL093_GovernanceMatrix_v*.py", HERE), ["--selftest"], "rc0", 300)
-    add("歷史回補八檢(批203)", newest("VDF_ENG064_HistoryBackfill_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300)
+    add("歷史回補八檢(批203)", newest("VDF_ENG064_HistoryBackfill_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300, db=True)
     add("全景同步狀態台八檢(批218)", newest("CGC_MDL096_SyncStatus_v*.py", VIA / "supportive modules/registry"), ["--selftest"], "rc0", 120)
     add("資料庫合併匯入八檢(批216)", newest("VDF_ENG065_DbImport_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 120)
     add("使用者介面總入口八檢(批222)", newest("CGC_MDL097_PortalUI_v*.py", VIA / "supportive modules/registry"), ["--selftest"], "rc0", 120)
-    add("全球宇宙擷取八檢(批226)", newest("VDF_ENG066_GlobalUniverse_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 120)
-    add("資料庫目錄台八檢(批226)", newest("CGC_MDL098_DataCatalog_v*.py", VIA / "supportive modules/registry"), ["--selftest"], "rc0", 180)
+    add("全球宇宙擷取八檢(批226)", newest("VDF_ENG066_GlobalUniverse_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 120, db=True)
+    add("資料庫目錄台八檢(批226)", newest("CGC_MDL098_DataCatalog_v*.py", VIA / "supportive modules/registry"), ["--selftest"], "rc0", 180, db=True)
     add("全球市場觀測八檢(批227)", newest("CGC_MDL099_GlobalMarkets_v*.py", VIA / "supportive modules/registry"), ["--selftest"], "rc0", 120)
     add("首頁文字擷取十五檢(批235;批410 自測零污染)", newest("VRN_ENG072_FirstPageText_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 120)
-    add("首頁全能引擎二十五檢(批433)", newest("VIA_VRN_FirstPageEngine_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 360)
     add("報告結構化入庫三十四檢(批237;批412 SSOT;批418 年份守衛+報告型別)", newest("VRN_ENG073_ReportStructuredDB_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 120)
     add("金融機構疊加層十檢(批413 操作員裁決;批419f 正典缺席鍵不陪葬)", newest("VIA_FinancialInstitution_Overlay_v*.py", VIA / "supportive modules/ssot"), ["--selftest"], "rc0", 120)
     add("券商報告卡八檢(批241)", newest("CGC_MDL100_ReportCards_v*.py", VIA / "supportive modules/registry"), ["--selftest"], "rc0", 120)
-    add("財報頁擷取十六檢(批241/403 三方對照;批425 --db 接線)", newest("VRN_ENG074_FinancialPages_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 120)
+    add("財報頁擷取十五檢(批241/403 三方對照)", newest("VRN_ENG074_FinancialPages_v*.py", VIA / "functional modules/VRN"), ["--selftest"], "rc0", 120)
     add("共識增益橋十檢(批243)", newest("VDF_ENG067_ConsensusEnrichment_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 180)
     add("PS AST 修正引擎十檢(批244)", newest("CGC_MDL101_PSAstRepair_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("圖庫 SSOT 橋十檢(批247)", newest("VAP_ENG010_ChartLibrarySSOT_v*.py", VIA / "functional modules/VAP/engine"), ["--selftest"], "rc0", 120)
@@ -639,6 +651,12 @@ def battery(fast: bool):
     add("產品資格閘九檢(批376)", newest("CGC_MDL133_ProductGate_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("十道並行編排九檢(批377)", newest("CGC_MDL134_ParallelLanes_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("資料本機家九檢(批377)", newest("CGC_MDL123_DataHome_v0*.py", HERE), ["--selftest"], "rc0", 300)
+    add("紅站補齊鏈七檢(批381)", newest("CGC_MDL125_FixAll_v0*.py", HERE), ["--selftest"], "rc0", 300)
+    add("加速器套件導入閘九檢(批384)", newest("CGC_MDL142_AccelImport_v0*.py", HERE), ["--selftest"], "rc0", 300)
+    add("拉齊醫生九檢(批386;真 git 倉)", newest("CGC_MDL143_MergeMedic_v0*.py", HERE), ["--selftest"], "rc0", 300)
+    add("副本醫生十檢(批387;真建多副本)", newest("CGC_MDL144_CopyDoctor_v0*.py", HERE), ["--selftest"], "rc0", 300)
+    add("PowerShell 真測閘九檢(批389;pwsh 缺=SKIP)", newest("CGC_MDL145_PsTestGate_v0*.py", HERE), ["--selftest"], "rc0", 900)
+    add("PS AST 多輪修正引擎十三檢(批394;T3 分級;pwsh 缺=SKIP)", newest("CGC_MDL146_PsAstRepair_v0*.py", HERE), ["--selftest"], "rc0", 900)
     add("環境治理統一引擎 31 檢(批381–385)", newest("CGC_MDL135_EnvGovernance_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("單一入口橋九檢(批383)(批400 deadends)", newest("CGC_MDL136_EntryBridge_v*.py", HERE), ["--selftest"], "rc0", 300)
     add("本機三庫整併十三檢(批383/389)", newest("VDF_ENG079_LocalDbConsolidate_v*.py", VIA / "functional modules/VDF/engine"), ["--selftest"], "rc0", 300)
@@ -827,7 +845,7 @@ def main() -> int:
         names, subs = _refail_targets(a)
         max_lines = int(a[a.index("--lines") + 1]) if "--lines" in a and a.index("--lines") + 1 < len(a) else 40
         sel = [b for b in B if b["name"] in names or any(sb in b["name"] for sb in subs)]
-        print(f"=== 逐站除錯(v0265)· {len(sel)} 站 · 全原因 ===")
+        print(f"=== 逐站除錯(v0273)· {len(sel)} 站 · 全原因 ===")
         results = []
         for b in sel:
             r = run_one(b)
@@ -846,7 +864,7 @@ def main() -> int:
                                   "results": results}, ensure_ascii=False, indent=1), encoding="utf-8")
         print(f"  [計] 重跑 {len(sel)} 站 · OK {n_ok} · FAIL {n_fail}(轉綠 {n_ok})· 存證 {ev.name}")
         return 0 if n_fail == 0 else 1
-    print(f"=== 全面自測矩陣 v0265 · {len(B)} 站 · {'FAST' if fast else 'FULL'} · 全安全模式(零 commit 零網路)===")
+    print(f"=== 全面自測矩陣 v0273 · {len(B)} 站 · {'FAST' if fast else 'FULL'} · 全安全模式(零 commit 零網路)===")
     print(f"  [{accel_lamp()}]", flush=True)          # 批423:20 加速器真點名(缺席誠實說缺)
     results = [None] * len(B)
     workers = 1 if "--serial" in a else max(1, int(os.environ.get("VIA_GRID_WORKERS") or min(8, os.cpu_count() or 4)))
@@ -875,18 +893,31 @@ def main() -> int:
     try:
       if workers > 1:
         print(f"  [平行] 工人 {workers}(SUP_MDL737 accel_map;--serial 退原序)", flush=True)
+        # 批394 續章:寫庫站(db=True)事前分出=不進平行池。
+        # 原本全站平行、撞鎖者再序跑複判,雲端實錄每輪固定 7–9 站假紅刷畫面
+        # (操作員先看到一串 FAIL 才看到終態 FAIL 0=誠實但易誤讀)。
+        # 分組後鎖撞歸零,總時間不變(這些站本來也得序跑一次)。
+        _par = [(i, b) for i, b in enumerate(B) if not b.get("db")]
+        _ser = [(i, b) for i, b in enumerate(B) if b.get("db")]
+        if _ser:
+            print(f"  [分組] 平行 {len(_par)} 站 · 寫庫序跑 {len(_ser)} 站"
+                  f"(單寫者律:duckdb 不併寫=零鎖撞零假紅)", flush=True)
         try:
             import VIA_SuperAccel_Module as _A
-            _A.accel_map(_job, list(enumerate(B)), workers=workers)
+            _A.accel_map(_job, _par, workers=workers)
         except KeyboardInterrupt:
             raise
         except Exception:
             from concurrent.futures import ThreadPoolExecutor
             with ThreadPoolExecutor(max_workers=workers) as ex:
-                list(ex.map(_job, list(enumerate(B))))
+                list(ex.map(_job, _par))
+        for _it in _ser:                       # 寫庫站逐一序跑(讓庫律)
+            _job(_it)
         results = [r if r else {"name": b["name"], "state": "FAIL", "rc": "NORESULT", "secs": 0, "note": "平行工人無回(誠實)"} for r, b in zip(results, B)]
         # 第二段(讓庫律):平行敗站序跑一次=排除 duckdb 單寫者鎖/產物半寫之假紅;終態取序跑;note 留「平行敗→序跑」
-        redo = [i for i, r in enumerate(results) if r["state"] == "FAIL"]
+        _par_idx = {i for i, _ in _par}
+        redo = [i for i, r in enumerate(results)
+                if r["state"] == "FAIL" and i in _par_idx]
         if redo:
             print(f"  [第二段] 平行敗 {len(redo)} 站→序跑複判(讓庫律;鎖撞=假紅)", flush=True)
             for i in redo:
