@@ -7441,6 +7441,12 @@
    "kind": "批469 唯一變因實驗:引擎側證明是對的",
    "ts": "2026-09-13 15:55",
    "name": "操作員令「2. 請幫我完成」(tessdata 中文語言檔)。語言檔必須落在他的機器上,我放不進去;但可以把「引擎到底行不行」這個變數徹底消掉:在本容器裝上 chi_tra/chi_sim(各 13MB,tessdata_best),同一張圖、同一支引擎、同一條道再跑——「台積電」從 ARs 變成讀得出來、180→240 字、第三態警語 [無中文語言檔…] 自動消失。**引擎側到此證明是對的**。但同一跑照出新缺陷:輸出簡繁混雜(台积电/报告)——tesseract 兩本都在時逐行挑哪一本由它自己決定,下游對名冊會時中時不中,而錯得沒有規律最難查。ENG072 v0116(二十九檢 29/29):OCR 道產物過一次 **ENG066 樞紐 normalize()**(ENG067 收斂『联发科→聯發科』用的同一支,不另寫轉換表=Zero-Hydra);**只對 OCR 道**(PDF 文字層是文件自己的字不改寫);樞紐缺席原樣輸出並標 [未繁化:因由] 不假裝。自審:第一版以為 _nlp_tp().normalize() 會繁化——實測不會(台积电進去台积电出來);是 ENG066 樞紐那一支才會。**名字像不等於語意像**,同一課第二次。安裝器不另造:姊妹倉 VIA-VDF-VRN 的 public/via/VIA_EnvManager.py ocr --repair(OneKey ⑧ 呼叫的那支)。全 VRN 回歸:可測 29 支 GREEN 29 非綠 0 · 被追蹤檔零污染。"
+  },
+  {
+   "code": "批469b 操作員常規:PS 一律先進入環境 + OCR 安裝器根因定案",
+   "kind": "批469b 同一症狀隔十幾批又回來",
+   "ts": "2026-09-13 16:20",
+   "name": "①操作員令「以後不論是啥 PS 指令最上面一定是進入該環境」——立為常規並寫進交接文:每段 PS 先 Set-Location 母庫 VIA 夾 + 點源 Register 尾版(glob 取尾,不寫死版號)。理由:家目錄殼跑 via 指令會踩空,而踩空的樣子常常看起來像程式壞掉而不是走錯地方。②OCR 安裝器根因定案(量的,不是猜的):姊妹倉 tonykuni/VIA-VDF-VRN origin/main 的 public/via/VIA_EnvManager.py 是 **1163 行**且有 ocr/--repair/--tessdata-prefix;操作員 C:\\Users\\tonyk\\Github\\VIA-VDF-VRN 那份是 **328 行**只有 scan/talib。`usage: [--task {scan,talib}]` 這一行**批456 就出現過一次**,當時判對了血脈不同但**沒修掉**,於是同一症狀隔十幾批又原樣回來——判對了不等於修好了。指令本身是對的(action ∈ scan/audit/apply/ocr/selftest,從 origin/main 真檔讀出),缺的是檔。③提醒:批465–469 產物全在分支上不在 main;工作站母庫停在 main 就沒有 via-vrnin.cmd 與 ENG072 v0116。"
   }
  ],
  "updated_at": "2026-09-13 03:50"

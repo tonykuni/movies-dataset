@@ -370,3 +370,51 @@ tesseract 同時裝了 `chi_sim` 與 `chi_tra` 時,**逐行挑哪一本由它自
 要列得出 `chi_tra`,再跑一次影像件,tag 應該是 `IMAGE_OCR(...)[繁化]`
 而**不再**有 `[無中文語言檔…]`。
 
+
+---
+
+## 十一、操作員常規(批469b 立;以後每一段都照辦)
+
+### 11.1 PS 指令一律從「進入環境」開頭
+
+操作員令:「**以後不論是啥 PS 指令最上面一定是進入該環境**」。
+
+理由(實錄):`C:\Users\tonyk>` 這種家目錄殼跑任何 via 相關指令都會踩空,
+而踩空的樣子常常**看起來像程式壞掉**而不是像走錯地方。
+
+標準抬頭(每一段 PS 都先貼這兩行):
+
+```powershell
+Set-Location 'C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics'
+. (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName
+```
+
+第二行是**尾版律**:不寫死版號,glob 取尾。
+
+### 11.2 OCR 安裝器為什麼一直裝不起來 —— 量到的
+
+| | 行數 | 有 `ocr` 子命令? |
+|---|---|---|
+| 姊妹倉 `tonykuni/VIA-VDF-VRN` `origin/main` | **1163** | ✅ `ocr` · `--repair` · `--tessdata-prefix` |
+| 操作員 `C:\Users\tonyk\Github\VIA-VDF-VRN` | **328** | ❌ 只有 `scan`/`talib` |
+
+`usage: VIA_EnvManager.py [-h] [--task {scan,talib}] [--yes]` 這一行
+**批456 就出現過一次**,當時判成「他的副本是另一支血脈」——判對了,但
+**沒有把它修掉**,於是同一個症狀隔了十幾批又原樣回來。
+
+真正的 CLI(從 origin/main 的真檔讀出來,非推測):
+
+```
+action ∈ (scan, audit, apply, ocr, selftest)
+--repair            下載缺少的 OCR 語言模型
+--tessdata-prefix   明確指定 TESSDATA_PREFIX
+```
+
+**指令本身是對的,缺的是檔** —— 他那份 clone 沒拉最新。
+
+### 11.3 母庫那邊要注意
+
+批465–469 的產物全在分支 `claude/via-envmanager-governance-7cls8h`,**不在 main**。
+工作站的母庫若停在 main,就**沒有** `via-vrnin.cmd`、沒有 ENG072 v0116。
+tessdata 這件事只碰姊妹倉,可以獨立先做完;要用到新的輸入介面得先讓分支進 main。
+
