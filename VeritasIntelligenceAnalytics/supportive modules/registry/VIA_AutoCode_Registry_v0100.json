@@ -7153,6 +7153,20 @@
    "note": "實戰驗證:我在同一支啟動器上第二次犯同型錯(L375),直接呼 v0104 的 detect_f1b + fix_f1b,引擎自己命中 375、沙盒複驗綠、寫回修成——引擎修了作者的錯。這也再次印證 F1a/F1b/R4/param 位置錯同屬一族:AST 解析綠不代表能跑。"
   },
   {
+   "code": "HANDOVER-b394",
+   "kind": "批394 操作員令:上傳現況及交接報告給 GitHub",
+   "ts": "2026-09-13 03:10",
+   "name": "入 logs/VIA_STATUS_20260913.md(現況表:雙側分列——雲端 207 站 OK 205/FAIL 0/SKIP 2 與工作站 OneShot 首跑 OK 10/FAIL 5/SKIP 1 含全矩陣 22 紅;附下一指令與三件未解)+ logs/VIA_HANDOVER_b394_20260913.md(交接全文八節:起終點、新建升版件尾版表、七枚真缺陷含實測證據、我自己犯的九枚錯與共通教訓『AST 解析綠 ≠ 能跑』、雙側實測現況、本窗九個 commit、接棒者下一步與不變常令與安全紅線、雲端自動快照說明)。依既有慣例放 logs/(該夾 md 已入 git)。",
+   "note": "誠實性要點:報告明白分列雲端與工作站兩側數字並警示『勿以單側數字代表全系統』(雲端同矩陣 0 紅而工作站 22 紅,差異來自真資料與真環境);工作站兩枚 FAIL 標明實為假紅並已於 OneShot v0101 改判 WARN;資料段兩個數字警訊(籌碼落庫 0 列、價格 failed 1430/done 1988)如實列出而非以『引擎沒崩』代過。鑰匙守衛與 model ID 守衛皆零命中。"
+  },
+  {
+   "code": "AUDIT-b394-close",
+   "kind": "批394 操作員令「再檢查一次全部都更新有無遺漏」:十一項逐查,抓到兩枚我方違律",
+   "ts": "2026-09-13 03:50",
+   "name": "收尾自檢十一項:①工作樹乾淨且 HEAD=origin/main=origin/claude/via-system-followup-tz7k9t 三者同 ②本窗十五件全部入 git ③三新令(via-oneshot/via-unstick/via-psrepair-ast)各有冊內定義+同名 .cmd 梭+別名 ④格子涵蓋本窗五引擎(皆 glob 尾版)⑤台帳筆數與時戳 ⑥死路掃描:本窗與報告指路的 21 個令零死路(既有 161 種歷史缺口非本窗造成)⑦新建件 AST 綠且 Report-Only 零命中 ⑧⑨兩枚違律已修(見 note)⑩報告數字與尾版表同步 ⑪以與操作員指令同形的 glob pathspec 做端到端實跑 PASS。產出:Invoke-VIA-OneShot v0102、格子 v0274、報告二份同步。",
+   "note": "抓到的兩枚我方違律:①『glob 尾版動態解析嚴禁寫死版號』律同樣適用於 git pathspec——OneShot v0101 的 S1 與交接報告的指令都寫死 Invoke-VIA-Unstick-v0100.ps1 / Invoke-VIA-OneShot-v0100.ps1,啟動器一升版該行就取到舊版;實測 git checkout 支援 glob pathspec,改取整族再由 Sort-Object | Select -Last 1 挑尾版(v0102 + 報告二份)。②格子三站名落後實檢數(PS AST 十三檢→十五檢、拉齊醫生九檢→十四檢、副本醫生十檢→十一檢)=名實相符律偏差,v0274 校正並逐站複跑全綠。另誠實記錄:本次查死路時我第一次取錯 JSON 鍵(取 dead_tokens 而非 dead)得到『零死路』,若就此收工即為假綠;改用正確鍵後確認 2691 筆/161 種,再比對本窗令才是真零。"
+  },
+  {
    "code": "VIA_VRN_FirstPageEngine-v0102 + Grid-v0265(批426)",
    "kind": "批426 首頁全能引擎升級 + 綁 MDL008/TW02 正典驗證法",
    "ts": "2026-09-09 07:20",
@@ -7327,5 +7341,5 @@
    "name": "工作站照著我給的步驟跑 `via-pin`,它回:「本窗副本:C:/Users/tonyk/Downloads/movies-dataset-b381/…(…Register-VIA-Commands-v0167.ps1)· 新視窗預設:同上 · **已是本副本;無事**」——而操作員人站在 `C:/Users/tonyk/OneDrive/Documents/movies-dataset/…`,`git pull` 也剛對著那份拉完批452。【批452 才剛補的副本警示抓到了病,而這個「解藥」自己也有同一個病】根因:`$VIA` 是**載入的那份腳本所在的副本**(profile 點源進來的那個路徑),不是使用者站的地方;`$pinned` 讀 profile 也指著同一份,於是 `$pinned -eq $VIA` **恆真**,永遠走「無事」那一支。**「本窗副本」這四個字從一開始就是假的**——它講的是「已載入的那份」。批397 造 via-pin 的目的就是解副本錯亂,而它偏偏看不見使用者站在第三個地方,**所以它永遠解不了它被造出來要解的那件事**。這比單純的 bug 更難查,因為它**回綠燈**:「已是本副本;無事」讀起來像確認,實際上是它根本沒去看你在哪。【修】Register v0169 加 `Get-VIACwdRoot`(從 cwd 一路往上找同時有 `supportive modules` 與 `functional modules` 的那一層);via-pin 改以**你站的位置**為釘住目標,並把三個位置全印出來:你站的(cwd)/ 本視窗已載入的 / profile 預設的。三者不一致時明說「**本視窗現在跑的短令來自已載入那份,不是你站的這份**;換掉 profile 之後要**重開視窗**才生效」——舊版換完 profile 只印一句「已換」,不講本視窗還是舊的,於是換完立刻再跑還是跑錯副本。不在任何副本裡就誠實叫人先 cd,不硬猜。實測三副本佈局:站在副本根、站在子夾都找得到根,站在副本外回 null。【還沒解的】① 操作員的 tessdata_best 夾仍是空的(`--list-langs` 回 0),語言檔要他自己放;② 他解衝突那一 commit 把一批先前未追蹤的檔(含 .zip 與 _selftest.db)一起入了 git,二進位入庫是另一件事,先記著不動。"
   }
  ],
- "updated_at": "2026-09-13 02:30"
+ "updated_at": "2026-09-13 03:50"
 }
