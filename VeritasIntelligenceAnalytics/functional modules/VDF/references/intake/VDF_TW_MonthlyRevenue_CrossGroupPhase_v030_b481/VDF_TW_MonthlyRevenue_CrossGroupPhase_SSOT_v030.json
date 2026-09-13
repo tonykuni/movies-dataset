@@ -1,0 +1,181 @@
+{
+  "ssot_id": "VDF_TW_MONTHLY_REVENUE_CROSS_GROUP_PHASE_SSOT_V030",
+  "engine": "VDF_TW_MonthlyRevenue_CrossIndustry_CrossGroup_Phase_Engine",
+  "version": "v030",
+  "contract": "VDF.MONTHLY_REVENUE.COMPANY.INDUSTRY.GROUP.PHASE/3.0",
+  "build_date": "2026-08-27",
+  "governance": {
+    "write_policy": "APPEND_ONLY_UPGRADE_WITH_BACKUP_BEFORE_WRITE",
+    "canonical_key": [
+      "period",
+      "ticker",
+      "market"
+    ],
+    "company_group_key": [
+      "period",
+      "ticker",
+      "group"
+    ],
+    "dedup_policy": "source_priority_then_fetched_at_keep_latest",
+    "history_policy": "incremental_merge_no_silent_overwrite",
+    "missing_revenue_policy": "retain_and_flag_never_forward_fill",
+    "multi_group_policy": "weights_per_ticker_must_sum_to_one",
+    "group_fallback_policy": "industry_as_proxy_group_with_explicit_proxy_flag",
+    "fail_closed": [
+      "empty canonical result",
+      "invalid period",
+      "duplicate canonical key",
+      "multi-group weights not equal to one",
+      "weighted group revenue does not reconcile",
+      "required Parquet engine unavailable",
+      "required DuckDB engine unavailable"
+    ]
+  },
+  "sources": {
+    "monthly_revenue": {
+      "primary": "MOPS Open Data",
+      "twse": "https://mopsfin.twse.com.tw/opendata/t187ap05_L.csv",
+      "tpex": "https://mopsfin.twse.com.tw/opendata/t187ap05_O.csv",
+      "existing_canonical": "dict/VDF/DATABASE/VDF_TW_MonthlyRevenue.parquet",
+      "priority": [
+        "latest official MOPS snapshot",
+        "existing VDF canonical"
+      ]
+    },
+    "company_master": {
+      "primary": "StockTickerListDatabase.csv",
+      "required_fields": [
+        "ticker",
+        "name",
+        "market",
+        "industry"
+      ],
+      "optional_fields": [
+        "sector",
+        "subindustry"
+      ]
+    },
+    "group_mapping": {
+      "shape": "long or delimited multi-group",
+      "required_fields": [
+        "ticker",
+        "group"
+      ],
+      "optional_fields": [
+        "group_weight",
+        "is_primary_group",
+        "classification_version",
+        "classification_source"
+      ]
+    }
+  },
+  "company_metrics": [
+    "revenue",
+    "mom_pct",
+    "yoy_pct",
+    "cum_revenue",
+    "cum_yoy_reported_pct",
+    "revenue_ma_3",
+    "revenue_ma_6",
+    "revenue_ma_12",
+    "yoy_acceleration_1m_pp",
+    "yoy_acceleration_3m_pp",
+    "positive_yoy_streak",
+    "positive_mom_streak",
+    "accelerating_yoy_streak",
+    "new_high_12m",
+    "new_high_24m",
+    "revenue_zscore_12m",
+    "company_phase",
+    "company_phase_age_months"
+  ],
+  "dimension_metrics": [
+    "total_revenue",
+    "mom_pct",
+    "yoy_pct",
+    "yoy_acceleration_1m_pp",
+    "positive_yoy_breadth",
+    "positive_mom_breadth",
+    "accelerating_breadth",
+    "new_high_12m_breadth",
+    "market_contribution",
+    "hhi_revenue_concentration",
+    "top5_revenue_concentration",
+    "rotation_score",
+    "rotation_rank",
+    "phase",
+    "phase_age_months",
+    "phase_confidence",
+    "rotation_state"
+  ],
+  "phase_model": {
+    "method": "dynamic_cross_sectional_percentile_plus_absolute_direction",
+    "rotation_score_weights": {
+      "yoy_percentile": 0.35,
+      "mom_percentile": 0.20,
+      "acceleration_percentile": 0.25,
+      "breadth_percentile": 0.15,
+      "new_high_percentile": 0.05
+    },
+    "high_percentile": 0.70,
+    "low_percentile": 0.30,
+    "minimum_positive_breadth": 0.50,
+    "strong_breadth": 0.60,
+    "phase_values": [
+      "LEADING_ACCELERATION",
+      "EXPANDING",
+      "RECOVERING",
+      "MIXED",
+      "DECELERATING",
+      "CONTRACTING",
+      "INSUFFICIENT_HISTORY"
+    ],
+    "rotation_states": [
+      "LEADER",
+      "IMPROVING",
+      "PEER",
+      "WEAKENING",
+      "LAGGER"
+    ]
+  },
+  "cross_analysis": {
+    "pairwise_matrix": [
+      "yoy_gap_pp",
+      "mom_gap_pp",
+      "acceleration_gap_pp",
+      "breadth_gap_pp",
+      "rotation_score_gap",
+      "dominant_dimension",
+      "dominance_strength"
+    ],
+    "lead_lag": {
+      "definition": "corr(A[t], B[t+L]); L > 0 means A leads B",
+      "minimum_observations": 18,
+      "maximum_lag_months": 6
+    },
+    "industry_group_bridge": [
+      "weighted_revenue",
+      "share_of_industry",
+      "share_of_group",
+      "industry_group_yoy_pct"
+    ]
+  },
+  "outputs": {
+    "csv_encoding": "utf-8-sig",
+    "parquet_required_in_production": true,
+    "duckdb_required_in_production": true,
+    "tables": [
+      "monthly_revenue_company",
+      "monthly_revenue_company_group_phase",
+      "monthly_revenue_industry",
+      "monthly_revenue_group",
+      "monthly_revenue_industry_group_bridge",
+      "monthly_revenue_cross_industry",
+      "monthly_revenue_cross_group",
+      "monthly_revenue_lead_lag_industry",
+      "monthly_revenue_lead_lag_group",
+      "monthly_revenue_phase_transition_industry",
+      "monthly_revenue_phase_transition_group"
+    ]
+  }
+}

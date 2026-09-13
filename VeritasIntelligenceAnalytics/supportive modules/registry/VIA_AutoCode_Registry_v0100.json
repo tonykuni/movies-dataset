@@ -7527,6 +7527,12 @@
    "kind": "批480 操作員睡覺期間核准自主完成全線(接批479)",
    "ts": "2026-09-13 22:40",
    "name": "F 項:無資料環境跑 via-famui,產生器把操作員的正本 UI 頁(supportive modules/ui_support/*)改寫成一格格「缺(誠實)」;本工作階段人工 git checkout 還原 5 次。守則寫進 MDL138 run_item:只對正本頁,跑前快照;跑後若新頁占位格「缺(誠實)」數 ≥3 且比舊頁多=資料缺席的再生 → 還原舊頁,並把這件事寫進紀錄 guard 欄(不是靜靜還原),態走資料側 DATA 不假綠(rc 0 → 3)。對照組:真資料再生照常覆寫、態 OK。專測兩案皆對;八檢 8/8。同版把 MDL138 接上批476 啟動層(它是第五個啟動器:產生器子行程 PYTHONPATH 前置 bootstrap、VIA_ROOT、VIA_FAMILY 按家族)。G 項附記:VRN_MDL「300 vs 294」的差,取決於計數範圍——本批用排除 references/_superseded 的規則只數到 20 個唯一編號,與先前 294 不是同一把尺;要對,得用同一規則再量,先記不判。"
+  },
+  {
+   "code": "批481 兩專案授權使用:主動 ETF 持股引擎 v1.1.0 → ENG051 v0102 綁上;月營收跨族群相位 v030 收容+登冊+短令",
+   "kind": "批481 操作員令「看另外兩個專案裡面有沒有授權使用?授權使用」+ 四個上傳件",
+   "ts": "2026-09-13 23:40",
+   "name": "先查再造:①VIA_ActiveTWETF_DailyHoldings_Engine_v0101_DuckDB.py(v1.1.0,2026.08.27)與樹上收容件**位元相同**(references/intake + new modules engines),但活著的 ENG051 是它的舊版(ENGINE_NAME 相同;29 個 def 對 46 個,少了動態宇宙/原子寫入/parquet-by-duckdb/同日冪等等 17 個);ENG078 與它零函式重疊(各自的引擎)。→ 版本前進 VDF_ENG051_ActiveTWETF_Holdings_v0102.py = v1.1.0 + 兩處修:(a)根路徑寫死 ~/Downloads/VeritasIntelligenceAnalytics/data(批452/453 三副本病)改 VIA_ACTIVE_TW_ETF_ROOT 明設 → VIA_ROOT(啟動層必設)/functional modules/VDF/output_hub/active_tw_etf → 原退路;(b)唯一對外呼叫點 def_http_get_text 走 via_net 優先(同批479 seam)。自帶 27 檢 27/27(docstring 寫 24,實測 27);經啟動層實證 DEFAULT_ROOT 推到 output_hub/active_tw_etf。樞紐任務 glob VDF_ENG051_ActiveTWETF_Holdings*.py 尾版律自動接到 v0102。②月營收 × 產業 × 族群 相位/領先落後 v030(引擎 116KB + 8 檢 + SSOT JSON):樹上**從沒收過**(只在 b305 整理清單出現過)。跨族群相位/領先落後在樹上只有 ENG070 GroupClassificationIndex 提到,層次不同(分類索引 vs 月營收相位)=不是重複件。收容 VDF/references/intake/VDF_TW_MonthlyRevenue_CrossGroupPhase_v030_b481(3 檔位元相同);unittest 8/8;--self-test 真跑產出 DuckDB/CSV/Parquet + 品質報告 rc=0。引擎根路徑寫死 C:\\Users\\tonyk\\Downloads\\…(可由 VIA_ROOT 覆寫=啟動層已設)與桌面 StockTickerListDatabase.csv;引擎只吃 CSV/Parquet。冊 vdf_revphase(financials 組;--self-test 落 VIA_Reports/engine_bus/_cwd/revphase_selftest)匯流排真跑 GREEN 4.35s、28 檔產出。Register v0187:via-revphase(別名 營收相位;自 vdf_tw_market.duckdb 匯出 tw_monthly_revenue/tw_listings 成 CSV 再明給 --input/--company-master;-SelfTest)+ via-etfhold(別名 持股日更;-SelfTest 根=VIA_Reports/etfhold 不碰正庫;日更觸網只看同意閘不代設)。「授權使用」答案:①早在庫但**沒真正用上**(活引擎是舊版)→ 現在用上;②**沒在庫**→ 現在收容登冊。兩支引擎本體皆無授權條款檔,授權=操作員親口。"
   }
  ],
  "updated_at": "2026-09-13"
