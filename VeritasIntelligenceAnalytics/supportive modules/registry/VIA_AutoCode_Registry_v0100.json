@@ -7469,7 +7469,23 @@
    "selftest": "MDL148 十九檢 19/19 · MDL118 七檢 7/7 · ENG015 九檢 9/9 · Grid 三新站 OK 3 FAIL 0",
    "live": "37 項實跑(真跑家族 vrn,vap):GREEN 7 · NODATA 4 · ABSENT 3 · PLAN 23 · **RED 0**;產出契約 在 10 · 缺 3(皆真缺)· 判不了 5",
    "discipline": "零網路 · 預設 dry · 寫庫動詞閘(家族全掃永不代跑)· 同意閘絕不代設 · 正本零觸碰 · 零 CDN"
+  },
+  {
+   "code": "批473b 收容 PDFPlumber-Plus 啟動器 —— 寫死的根路徑一個都不留",
+   "kind": "批473 操作員令「授權你解決 收引擎即可」",
+   "ts": "2026-09-13 17:59",
+   "name": "引擎本體 VIA_PDFPlumberPlusEngine.py **早就在庫內**(functional modules/VRN/references/intake/…v1.0.0/),缺的一直是**啟動器**。操作員上傳的那一份把四個東西全寫死,照收會壞——逐條量過再改:① `$VIA_ROOT = C:\\Users\\tonyk\\OneDrive\\VeritasIntelligenceAnalytics` —— 那**不是**操作員實際在跑的副本(OneDrive\\Documents\\movies-dataset\\…)。批452/453 那一課:同一分鐘內三個副本,而畫面上沒有一行說「你跑的不是你以為的那一份」——**寫死根路徑正是那場災難的起因**。改成從腳本自己的位置往上找母倉標記。② `inbox\\pdf` —— VRN 的收件夾律在**冊**上,ENG072/074/MDL139/MDL141 四家都讀它;自己另指一個 inbox 就是批446 的翻版。改成讀冊,而且取**有報告的那個夾**(指到空夾等於什麼都沒跑還報成功)。③ `outputs\\PDFPlumberPlus` → VIA_Reports(已 gitignore);而且 **--out 一律顯式傳**,引擎自己 _PARAMS 裡那個寫死的根永不啟用。④ python 寫死 envs\\via_core → 先用 Get-VIAEnvPython 'vrn'。**真檔實測**:用 pymupdf 造一份帶線框表格的真 PDF 跑完整鏈——ok=True、1 頁、抽出 1 個 4×4 表、值全對、CSV 帶 BOM,而且**表頭回溯**抓到表格上方的標題「Quarterly Revenue Summary (unit: NTD thousand)」,策略 S1_lines 分數 20.0。**第八盞判錯的紅燈(我自己的)**:把它掛進調度冊後,匯流排報 RED,而引擎印的是「selftest 需要 reportlab」——那是缺件而且連補法都給了。最難看的是同一批我在那支PowerShell 啟動器裡**已經把這條律寫對**(`需要\\s*([A-Za-z0-9_-]+)`),卻沒帶回匯流排:**同一個判準寫兩個地方、只改一邊,另一邊靜靜走錯**——那正是 MDL148 立案要收掉的那件事,結果我自己又犯一次。MDL148 v0106 補上,判準收緊(`需要` 後面要緊跟像套件名的 ASCII 識別字,中文「需要…」不放過),並把缺件從「誠實停底下」解耦(`需要 X` 本身就是一句完整的誠實話,不會再多寫一次「誠實停」)。",
+   "files": [
+    "Invoke-VIA-PDFPlumberPlus-v0100.ps1(新;根/收件夾/產出/python 四者皆不寫死)",
+    "via-ppp.cmd(拖曳梭;夾走 -In、檔走 -Pdf)",
+    "Register-VIA-Commands-v0182.ps1(via-ppp)",
+    "supportive modules/registry/VIA_InputConsole_Spec_v0100.json(+vrn_pdfplus;動詞刻意留 --selftest,家族全掃不去掃操作員的收件夾)",
+    "supportive modules/registry/CGC_MDL148_EngineBus_v0106.py(「需要 <套件>」=缺件)"
+   ],
+   "selftest": "MDL148 二十檢 20/20 · Register v0182 pwsh 解析過且 via-ppp 載得起來",
+   "live": "真 PDF 端到端 ok=True(1 頁/1 表 4×4/值全對/表頭回溯命中)· 匯流排 38 項:GREEN 7 · NODATA 4 · ABSENT 4 · PLAN 23 · **RED 0**;vrn_pdfplus 正確讀作 ABSENT(缺件)需要 reportlab",
+   "discipline": "零寫死根 · 收件夾讀冊 · 零彈窗(報告要 -Open 才跳)· 產出落 VIA_Reports"
   }
  ],
- "updated_at": "2026-09-13 15:42"
+ "updated_at": "2026-09-13 17:59"
 }
