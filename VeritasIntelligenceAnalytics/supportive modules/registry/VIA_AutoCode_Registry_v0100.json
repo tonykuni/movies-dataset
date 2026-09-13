@@ -7131,6 +7131,12 @@
    "kind": "批465 續:主控台受理三類 + 簡稱冊併入",
    "ts": "2026-09-13 13:05",
    "name": "①CGC_MDL139_InputConsole_v0103:拖曳區 accept 與過濾式改由冊 input.intake 生成(v0102 寫死 accept=\".pdf,.docx\" 與 /\\.(pdf|docx)$/i,拖掃描圖進來只得到「無 PDF/DOCX」——影像件連被拒的資格都沒有);頁上寫明**瀏覽器拿不到真實路徑**、要零複製就地讀請走 via-vrnin。十四檢 14/14。②VRN_ENG067_MindMapSSOT_v0102:③⑤ 兩紅同一個根。我第一版判成「庫缺=冊空」**判錯了**,量完才知道庫在、891 家、冊不空——但 tw_listings 存**全名**(「茂生農經股份有限公司」),研究報告寫**簡稱**(台積電/聯發科),scan 視圖由全名組成 → 永遠對不上報告文字:classify(台積電)=GENERAL、聯發科連被抽成關鍵詞都不會。簡稱冊就在同夾 VRN_TWRoster_Offline_v0100.json(1,978 家,VDF_ENG081 每日落盤)→ 兩本都併(只增不減,庫有的鍵不覆蓋)。九檢 9/9,TICKER 類別出現。③全 VRN 回歸:可測 28 支 GREEN 24→25、非綠 4→3(餘 3 支全為本容器缺料:ENG068 無倉庫、ENG069 零外部零券商、ENG070 依賴 ENG069 的表)。自測零污染被追蹤檔。"
+  },
+  {
+   "code": "批465c CGC_MDL142_TWNameBook_v0100 + ENG067 v0103",
+   "kind": "批465 續:台股名稱正典冊(操作員追令)",
+   "ts": "2026-09-13 13:35",
+   "name": "操作員追令「VDF 有用四碼台股代碼去擷取 TWSE/TPEX/MOPS 每日更新的全台股清單,名稱統一從這裡更新」。量到的:庫裡兩張清單表名稱樣態完全不同——tw_listings 891 列存**全名**(「茂生農經股份有限公司」,industry 只有代碼 33、isin 空)、tw_listings_industry 1,978 列是四碼+**簡稱**(台積電;TWSE 1,088/TPEX 890,含產業名與 yf_ticker)。研究報告寫簡稱,拿全名冊比對報告文字一個字都不會命中。產物 ①CGC_MDL142_TWNameBook_v0100.py:唯讀、零網路、零發明的名稱正典冊,取數次序 ①正典表 →②落盤 VRN_TWRoster_Offline →③全名補位,每家標得出 src;介面 book/name_of/code_of/scan_names/provenance;台↔臺同義收斂;九檢 9/9。②VRN_ENG067_MindMapSSOT_v0103:改**委派** MDL142,撤掉 v0102 我手併的第二份實作(Zero-Hydra:同一件事 VDF/VAP/VRN 各寫各的,正典換了沒人跟得上);橋缺席退回 v0101 直掛=零回歸;九檢 9/9。③docs/VIA_VRN_Panorama_20260913.md 全景表列。**未處理待裁示**:全樹 19 支尾版仍引用 tw_listings(非 _industry),其中 VDF_ENG052/ENG081 是那張表的**寫入方**,一律改讀會弄壞它們——不代裁。"
   }
  ],
  "updated_at": "2026-09-09 07:20"
