@@ -604,7 +604,36 @@
      "summary": "SUMMARY",
      "financial": "FINANCIAL DATA"
     },
-    "note": "批392 參數最小化:選夾/選檔/拖曳 → 上傳 incoming → 啟動即整條鏈(首頁→入庫→財報頁→四點→頁面)"
+    "note": "批392 參數最小化:選夾/選檔/拖曳 → 上傳 incoming → 啟動即整條鏈(首頁→入庫→財報頁→四點→頁面)",
+    "intake": {
+     "pdf": [
+      ".pdf"
+     ],
+     "word": [
+      ".docx",
+      ".doc"
+     ],
+     "image": [
+      ".png",
+      ".jpg",
+      ".jpeg",
+      ".tif",
+      ".tiff",
+      ".bmp",
+      ".webp",
+      ".gif"
+     ]
+    },
+    "free_location": {
+     "policy": "輸入位置解放(批465 操作員令):輸入介面不再有特定系統內指定位置",
+     "accepts": [
+      "Windows 原生選檔/選夾對話框(真實路徑)",
+      "拖曳(真實路徑)",
+      "--in <檔或夾>(可重複,系統任何位置)"
+     ],
+     "legacy": "舊的 --dir > user.vrn_dir > dir_default + incoming 三層律保留不動;只有在**沒有**顯式輸入時才走,故零回歸"
+    },
+    "note_465": "舊鍵 extensions 保持 [.pdf,.docx] 不動——舊引擎依它 glob,若在這裡加影像副檔名,舊引擎會收到它抽不動的件而變紅。新引擎讀 intake;這是只增不減的做法。"
    },
    "groups": [
     {
@@ -739,6 +768,26 @@
         "VIA_UI_VRNControlTower_v0100.html",
         "VIA_UI_DailyBrief_v0100.html"
        ]
+      },
+      {
+       "id": "vrn_pdfplus",
+       "zh": "PDFPlumber-Plus 多引擎抽表(批473 收容;原生文字優先→OCR 後備;13 道閘門)",
+       "engine": {
+        "dir": "functional modules/VRN/references/intake/VIA_PDFPlumberPlusEngine_v1.0.0",
+        "glob": "VIA_PDFPlumberPlusEngine*.py",
+        "verb": [
+         "--selftest"
+        ]
+       },
+       "params": [
+        "dir"
+       ],
+       "net": false,
+       "outputs": [
+        "VIA_Reports/pdfplumber_plus/<stem>_<run_id>/report.html",
+        "VIA_Reports/pdfplumber_plus/VIA_PDFPlumberPlus_Ledger.jsonl"
+       ],
+       "note_473": "動詞留 --selftest 是**刻意**的:家族全掃時它只做自我驗證,不會去掃操作員的收件夾(掃整批要走 via-ppp / --ids 明點,帶 --scan-dir)。調度層的預設值錯一次,代價是在別人的機器上動了不該動的東西。"
       }
      ]
     }
