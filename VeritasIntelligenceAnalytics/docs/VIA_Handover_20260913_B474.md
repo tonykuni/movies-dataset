@@ -125,6 +125,35 @@ via-ryg -DryAll      # 一支都不真跑(只要那張圖)
 
 ---
 
+## 一-b · 批476 · 新令 1/2/4/5 的落地:啟動層注入(零引擎改動)
+
+**量到的**:加速器在 VDF 引擎只綁 4/109、VRN 0、VAP 0;VDF 109 支裡 52 支走正典網路件,**7 支活著的直呼網路**
+(`ENG047 / ENG049 / ENG050_v0101 / ENG051 / MDL002 / MDL003 / MDL007`)。
+
+**為什麼不逐檔加**:幾百個 .py 逐檔加一行=幾百個新版本檔(尾版律),正本零觸碰守不住,新引擎還得記得加。
+
+**做法(第 5 條「最小代價整合」)**:`supportive modules/bootstrap/sitecustomize.py`。Python 起跑會自動 import 路徑上的
+`sitecustomize`;四個啟動器把該目錄**前置**進子行程 `PYTHONPATH`,每一支 .py 起跑就綁上。
+
+| 啟動器 | 版 | 注入點 |
+|---|---|---|
+| 匯流排 MDL148 | v0109 | `child_env(family)`;新增 `boot` 動詞=每家族真起子行程印它看到的 |
+| 能跑閘 MDL137 | v0101 | `run_station` |
+| 樞紐 MDL095 | v0135 | `_launch_locked`(家族從引擎路徑推) |
+| 短令冊 | v0185 | `Set-VIABoot` 載入即前置;`via-py <family>` 設 `VIA_FAMILY`;`via-boot`(別名 `啟動層`) |
+
+bootstrap 做三件事,全包 try(**絕不能讓引擎起不來**):
+① 所有家族:`SUP_MDL737.activate()` → `VIA_ACCEL_BOOT=1:<可用>/<冊>` 或 `ABSENT:<因>`
+② 只在 `VIA_FAMILY=vdf`:`SUP_MDL740` 註冊成 `via_net`(引擎 `import via_net` 即可用 `http_json/http_bytes/yf_download`)
+③ 預設零輸出;`VIA_BOOT_VERBOSE=1` 才印一行;`VIA_BOOT=0` 整個關
+
+**不做的**:同意閘一個字不碰(fail-closed 照舊);**不 monkeypatch `requests`**——靜靜改別人行為,是這套系統最恨的病。
+
+實證(`via-boot`):vdf → 加速器 `1:11/88` · `via_net` True · 閘態「(未設)」;vrn/vap → 加速器同、不掛網路件。
+
+**排隊(下一批)**:7 支直呼網路的 VDF 引擎逐支改走 `via_net`(各一個新版本檔);Grid 站登錄(格子檔太大,省 token 先延)。
+
+
 ## 二 · C 的答案:VDF 現況(**操作員機器實測,批475 他貼回來的**)
 
 > 批474 這一節原本寫的是容器副本的數字,結論是「`tw_daily_prices` 全樹不存在」。
@@ -174,6 +203,9 @@ GREEN 6 · NODATA 1(`vrn_markdown` 無可轉檔=誠實)· ABSENT 1(`vrn_pdfplus`
 | **G** | VRN_MDL 數量 | 操作員總表寫 300,實掃 **294**。差 6 支,還沒逐支列出是哪 6 支。 |
 | **I** | VDF SSOT 化:庫冊(哪本庫/哪張表/誰寫/最少幾列/正本是哪本) | 第二節四件事是輸入。下一批。 |
 | **J** | `vrn_digest` 取價失敗未進計數行 | 待改;不是假綠但不夠誠實。 |
+| **K** | 樞紐 `_launch_locked` 對 net 項目**覆寫式**設 `VIA_NET_CONSENT/VIA_SCRAPE_CONSENT="YES"` | 批408 從六個短令拔掉的那種代設;且 "YES" 過不了閘二 token 檢查。本批只記不動,等明令。 |
+| **L** | 「VERT」是哪個子系統 | 樹上不存在(命中全是 `Converter` 子字串)。**要問操作員。** |
+| **M** | 7 支直呼網路的 VDF 引擎改走 `via_net` | 逐支新版本檔;bootstrap 已把 `via_net` 送到門口。 |
 | **H** | 11 支引擎仍綁舊 `tw_listings`(891) | 而 `tw_listings_industry` 有 1,978。**`VDF_ENG052`/`ENG081` 是寫入端,不可一律轉換。** |
 
 ---
@@ -211,4 +243,5 @@ git pull origin claude/via-envmanager-governance-7cls8h
 
 via-census                        # ② C:你那台機器的庫況真相(唯讀)
 via-ryg -Timeout 300              # ③ B:五矩陣紅黃綠燈,有心跳不白畫面,跑完自己跳出來
+via-boot                          # ④ 啟動層實證:每支引擎起跑是否綁上加速器/網路件(同意閘不碰)
 ```
