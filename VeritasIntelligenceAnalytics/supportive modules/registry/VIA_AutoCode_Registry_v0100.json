@@ -7119,6 +7119,12 @@
    "kind": "批464 台帳補登——推上去了不等於登錄了",
    "ts": "2026-09-13 01:10",
    "name": "操作員問「都更新交接進度到 github?」。查清楚後兩個答案不一樣:**推送乾淨**(母庫本地=遠端、0 未推 0 未提交;TS 庫亦乾淨),但**台帳停在批453**——批454–463 這十批沒進 `VIA_AutoCode_Registry_v0100.json`。這十批都在救火(工作站 git 卡死、OCR、一鍵腳本),每批都 commit+push 了,唯獨漏了登錄。`append_only` 為真,只補不改,本筆連同前九筆一次補齊。【留給接棒者】commit 進去了、CI 綠了、PR 併了,都不等於**登錄**做了;登錄是讓下一個人查得到的那一步,漏掉它等於這十批在台帳上不存在。"
+  },
+  {
+   "code": "批465 VRN 輸入全面 Windows I/O + 三類受理",
+   "kind": "批465 輸入位置解放(WORD/PDF/IMAGE)",
+   "ts": "2026-09-13 12:30",
+   "name": "操作員令「輸入介面不再有特定系統內指定位置,改為一律 WINDOWS I/O 或拖曳式輸入,搜尋檔案夾中的 WORD PDF IMAGE 檔案」+「實測 VRN 修正直到成功」。先量:VRN 38 個版號族 33 支有自測,全跑得 28 可測 / GREEN 24 / 非綠 4;端到端餵三件料(PDF+DOCX+PNG)只取到兩件——影像件**從頭到尾沒被當成一件**,不是抽失敗是看不見。產物:①VRN_ENG072_FirstPageText_v0114(受理三類 + --in 系統任意位置 + --no-incoming + 零相依 docx 退路 + 影像走同一條 OCR 車道 + 「抽到字≠抽到對的字」第三態;二十七檢 27/27)②VIA_WinIO_InputPicker_v0100.ps1(原生 OpenFileDialog/FolderBrowserDialog;PS7 預設 MTA → STA runspace 保險;零彈窗律;$input 預讀 stdin 卡死修;十一檢 11/11)③via-vrnin.cmd 拖曳梭(.ps1 收不到拖曳路徑,.cmd 才收得到 %*)④VIA_InputConsole_Spec_v0100.json 加 input.intake 三類(只增不減,舊鍵 extensions 一字不動,免得舊引擎收到抽不動的影像件而變紅)⑤VRN_ENG068_DailyBrief_v0103(harvest_vap 零護欄 → 自測以 traceback 收場;四道護欄 + 逐檢護欄 + 自測重導 UI 輸出,修掉「跑一次自測就把 545,364 列覆寫成缺」)"
   }
  ],
  "updated_at": "2026-09-09 07:20"
