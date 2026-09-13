@@ -23,7 +23,8 @@
   "cats": "--cats a,b(ENG066 全球宇宙 11 類)",
   "dir": "--dir <資料夾>(必須存在;VRN 報告夾)",
   "code": "stock <代碼>(ENG015 位置參數)",
-  "vapone": "--demo|--render <config> [--data <檔>] --out <夾> --formats <F> --profile <P>"
+  "vapone": "--demo|--render <config> [--data <檔>] --out <夾> --formats <F> --profile <P>",
+  "vetf": "--holdings <庫::表|csv> --prices <庫::表|csv> --output-dir <夾> [--factset <檔> --yfinance <檔> --asof YYYY-MM-DD](VETF adapter;預設 candidate 沙盒,不碰正庫)"
  },
  "families": {
   "vdf": {
@@ -395,6 +396,22 @@
        "outputs": [
         "output_hub/estimate_bands"
        ]
+      },
+      {
+       "id": "vdf_twrev",
+       "zh": "台股月營收動能引擎 v2.7 自測(三層動能/真突破/族群;免網路;讀 cwd)",
+       "engine": {
+        "dir": "functional modules/VDF/references/intake/TWREV_v2.7_FULL_b477",
+        "glob": "twrevenue/cli.py",
+        "verb": [
+         "selftest"
+        ]
+       },
+       "params": [],
+       "net": false,
+       "outputs": [],
+       "module": "twrevenue.cli",
+       "cwd": "engine"
       }
      ]
     },
@@ -448,6 +465,22 @@
        "net": false,
        "outputs": [
         "etf_revenue_momentum"
+       ]
+      },
+      {
+       "id": "vdf_vetf_consensus",
+       "zh": "VETF 持股×Consensus 擴充(Forward P/E fail-closed;候選沙盒)",
+       "engine": {
+        "dir": "functional modules/VDF/references/intake/VETF_FINAL_SEAL_b242/01_ENGINES/Consensus_Enrichment_Adapter",
+        "glob": "VETF_ConsensusEnrichment_Adapter_v*.py",
+        "verb": []
+       },
+       "params": [
+        "vetf"
+       ],
+       "net": false,
+       "outputs": [
+        "VIA_Reports/vetf_consensus/asof=*/manifest.json"
        ]
       }
      ]

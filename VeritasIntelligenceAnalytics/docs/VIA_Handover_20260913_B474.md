@@ -154,6 +154,20 @@ bootstrap 做三件事,全包 try(**絕不能讓引擎起不來**):
 **排隊(下一批)**:7 支直呼網路的 VDF 引擎逐支改走 `via_net`(各一個新版本檔);Grid 站登錄(格子檔太大,省 token 先延)。
 
 
+## 一-c · 批477 · VETF 收尾 + TWREV v2.7 + 討論重建包(操作員睡覺期間,核准自主完成)
+
+**「VERT」= VETF**(上傳的封印包名字就是答案)。四包先查再造:VETF 封印包 125/126 已在庫(b242)、NLP v1.8.0 68/68 已在庫(批421)→ **兩包不重收**;TWREV v2.7 對樹上舊版 14 檔全不同=真升版;討論重建包 0/20 在庫。
+
+| 件 | 做了什麼 | 證據 |
+|---|---|---|
+| VETF | adapter 16 檢通過卻**從沒登錄**(冊 0、短令 0)→ 登 `vdf_vetf_consensus` + `via-vetf`(別名 `共識擴充`) | 合成長表真跑:Forward P/E 2330=1100/55=**20.0** 對;EPS=0 留空=fail-closed;覆蓋 factset_eps_n1 100% |
+| TWREV v2.7 | 收容 `VDF/references/intake/TWREV_v2.7_FULL_b477`;登 `vdf_twrev` + `via-twrev`(別名 `月營收`) | selftest 全部通過;demo 真突破 27/候選 468;匯流排 GREEN 2.67s |
+| 討論重建包 | ≤1MB 治理件 13 檔入 VRN 收容夾;>1MB 衍生 JSON 7 檔(76.8MB)**只記 sha256 不進 git** | `MANIFEST_intake_b477.json` |
+| 匯流排 v0110 | **第十盞判錯的燈**:套件內模組當檔案跑的 ImportError 被判「缺件」→ 冊上 `module`(-m 啟動)+ `cwd: engine`(讀 cwd 的引擎)+ classify_stop 守衛 | 三十一檢 31/31 |
+
+**via-twrev 的工作家**:引擎全靠相對路徑(`data/ output/ logs/`),所以首跑把 `config.yaml + data/` 種進 `VIA_Reports\twrev`,碼仍從收容夾 import(一份碼);`fetch/run` 觸 MOPS **只看同意閘,不代設**。demo 曾覆寫封裝內 3 個資料檔→自 zip 還原後才入庫。
+
+
 ## 二 · C 的答案:VDF 現況(**操作員機器實測,批475 他貼回來的**)
 
 > 批474 這一節原本寫的是容器副本的數字,結論是「`tw_daily_prices` 全樹不存在」。
@@ -204,7 +218,10 @@ GREEN 6 · NODATA 1(`vrn_markdown` 無可轉檔=誠實)· ABSENT 1(`vrn_pdfplus`
 | **I** | VDF SSOT 化:庫冊(哪本庫/哪張表/誰寫/最少幾列/正本是哪本) | 第二節四件事是輸入。下一批。 |
 | **J** | `vrn_digest` 取價失敗未進計數行 | 待改;不是假綠但不夠誠實。 |
 | **K** | 樞紐 `_launch_locked` 對 net 項目**覆寫式**設 `VIA_NET_CONSENT/VIA_SCRAPE_CONSENT="YES"` | 批408 從六個短令拔掉的那種代設;且 "YES" 過不了閘二 token 檢查。本批只記不動,等明令。 |
-| **L** | 「VERT」是哪個子系統 | 樹上不存在(命中全是 `Converter` 子字串)。**要問操作員。** |
+| ~~L~~ | ~~「VERT」是哪個子系統~~ | **已解:VETF**(批477)。 |
+| **N** | TWREV `fetch` 直呼 MOPS(requests;無 VIA 同意閘) | `via-twrev` 在外層擋(閘沒開=誠實停);引擎本體改走 `via_net` 是逐支工作,併入 M 佇列。 |
+| **O** | VETF React 網站原始碼(63 tsx)未建置 | 需 node/npm;Standalone HTML 已可直接開。非本批範圍。 |
+| **P** | `vdf_tw_market_repo_a7752b3` / `vdf_global_market_repo_ae7…` 兩本 `_repo_` 副本庫與正庫並存 | 庫層級三副本病;哪本是正本要有冊講(併入 I)。 |
 | **M** | 7 支直呼網路的 VDF 引擎改走 `via_net` | 逐支新版本檔;bootstrap 已把 `via_net` 送到門口。 |
 | **H** | 11 支引擎仍綁舊 `tw_listings`(891) | 而 `tw_listings_industry` 有 1,978。**`VDF_ENG052`/`ENG081` 是寫入端,不可一律轉換。** |
 
@@ -244,4 +261,6 @@ git pull origin claude/via-envmanager-governance-7cls8h
 via-census                        # ② C:你那台機器的庫況真相(唯讀)
 via-ryg -Timeout 300              # ③ B:五矩陣紅黃綠燈,有心跳不白畫面,跑完自己跳出來
 via-boot                          # ④ 啟動層實證:每支引擎起跑是否綁上加速器/網路件(同意閘不碰)
+via-vetf                          # ⑤ VETF 持股×Consensus(candidate 沙盒;自動找你的兩本庫)
+via-twrev demo                    # ⑥ 月營收 v2.7 免網路跑通;via-twrev fetch 要你自己開閘
 ```
