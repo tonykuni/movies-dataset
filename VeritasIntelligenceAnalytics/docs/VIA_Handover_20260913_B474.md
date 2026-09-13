@@ -6,7 +6,32 @@
 
 ---
 
-## 〇 · 你現在最該先做的一件事(操作員工作副本卡住了)
+## 〇-1 · 新律(批475 起,凡事先想這條)
+
+> **凡是流程皆要想一個節省 TOKEN 的方式,想好才進行;通盤畫子系統,思考更省的方法。**
+
+具體做法(本批已照做):
+- 不重讀大檔,只 `grep -n` 要改的那一段,前後各看幾行。
+- 操作員貼回來的實測輸出**直接當量測結果**,不自己再跑一次。
+- 一個問題一個小版本檔;一版一 push;不順手擴大範圍。
+- 輸出只印判定行與 `[計]`,不印整篇。
+
+## 〇-1b · 新令六條(批475 收到,批476 起執行;原文照錄,免得卡斷丟失)
+
+1. **所有 PY 檔案都要加上加速器**
+2. **VDF 全部還要加入網路工具**
+3. **所有紀錄、工具、模組、引擎及功能註冊,除非過時,只增不減**
+4. **引擎功能化;子系統指揮化**
+5. **必要時,同功能以最小代價整合(功能工具不便時)**
+6. **VDF 若實測成功,則測試修正修 VERT**
+
+省 token 的執行方針(先想好才動):
+- 第 1、2 條**不逐檔改**(幾百個 .py 逐檔加一行=尾版律要幾百個新版本檔,且正本零觸碰)。
+  改在**啟動層**做:匯流排/家族啟動器起子行程時注入加速器(SUP_MDL737)與網路正典件(SUP_MDL740),
+  同一處維護、每一支引擎都吃得到、零檔案改動。哪一支沒吃到,census 式的量測會亮出來。
+- 第 6 條先量:VERT 在樹上是什麼,量完再說。
+
+## 〇-2 · 你現在最該先做的一件事(操作員工作副本卡住了)
 
 實錄:
 ```
@@ -100,56 +125,72 @@ via-ryg -DryAll      # 一支都不真跑(只要那張圖)
 
 ---
 
-## 二 · C 的答案:VDF 現況(**容器內副本實測,不是操作員機器**)
+## 一-b · 批476 · 新令 1/2/4/5 的落地:啟動層注入(零引擎改動)
 
-> ⚠️ **這一節的數字來自 GitHub 副本裡的 .duckdb,不是操作員工作站上的庫。**
-> 兩者可能差很多。操作員機器上的真相要打 `via-census` 才知道。
-> 這條警語是有意寫的:拿容器的數字去說操作員的機器,就是另一種判錯的紅燈。
+**量到的**:加速器在 VDF 引擎只綁 4/109、VRN 0、VAP 0;VDF 109 支裡 52 支走正典網路件,**7 支活著的直呼網路**
+(`ENG047 / ENG049 / ENG050_v0101 / ENG051 / MDL002 / MDL003 / MDL007`)。
 
-`vdf_tw_market.duckdb`(容器副本 5.5MB):
+**為什麼不逐檔加**:幾百個 .py 逐檔加一行=幾百個新版本檔(尾版律),正本零觸碰守不住,新引擎還得記得加。
 
-| 表 | 列 | 日期跨度 | 判 |
-|----|----|---------|-----|
-| `tw_listings_industry` | 1,978 | — | GREEN |
-| `tw_listings` | 891 | — | GREEN(**但只有 891,見下** ) |
-| `tw_rates_cbc` | 308 | 2001-01-01 → 2026-08-01 | GREEN |
-| `etf_book` | 271 | — | GREEN |
-| `tw_valuation_daily` | 2,656 | 2026-09-08 → 09-11(**4 天**) | AMBER |
-| `tw_trading_daily` | 1,773 | 2026-09-08 → 09-11(**4 天**) | AMBER |
-| `tw_daytrade_market` | 9 | 2026-09-01 → 09-11 | AMBER |
-| `tw_market_agg` | 6 | 2026-09-01 → 09-08 | AMBER |
-| `consensus_daily` / `consensus_latest` / `tw_monthly_revenue` / `monthly_revenue_analysis` | **0** | — | **NODATA ×4** |
+**做法(第 5 條「最小代價整合」)**:`supportive modules/bootstrap/sitecustomize.py`。Python 起跑會自動 import 路徑上的
+`sitecustomize`;四個啟動器把該目錄**前置**進子行程 `PYTHONPATH`,每一支 .py 起跑就綁上。
 
-`vdf_global_market.duckdb`(國際半邊):
+| 啟動器 | 版 | 注入點 |
+|---|---|---|
+| 匯流排 MDL148 | v0109 | `child_env(family)`;新增 `boot` 動詞=每家族真起子行程印它看到的 |
+| 能跑閘 MDL137 | v0101 | `run_station` |
+| 樞紐 MDL095 | v0135 | `_launch_locked`(家族從引擎路徑推) |
+| 短令冊 | v0185 | `Set-VIABoot` 載入即前置;`via-py <family>` 設 `VIA_FAMILY`;`via-boot`(別名 `啟動層`) |
 
-| 表 | 列 | 日期跨度 | 判 |
-|----|----|---------|-----|
-| `global_daily` | **47,973** | 2024-01-02 → 2026-09-11 | **GREEN** |
-| `sentiment_daily` | 253 | 2025-09-11 → 2026-09-11 | GREEN |
-| `cross_macro` | 103 | 2018-01-01 → 2026-07-01 | GREEN |
-| `etf_stats_daily` | 104 | 2026-09-09 → 09-13 | AMBER |
-| `index_valuation_proxy` | 78 | 2026-09-11 → 09-13 | AMBER |
+bootstrap 做三件事,全包 try(**絕不能讓引擎起不來**):
+① 所有家族:`SUP_MDL737.activate()` → `VIA_ACCEL_BOOT=1:<可用>/<冊>` 或 `ABSENT:<因>`
+② 只在 `VIA_FAMILY=vdf`:`SUP_MDL740` 註冊成 `via_net`(引擎 `import via_net` 即可用 `http_json/http_bytes/yf_download`)
+③ 預設零輸出;`VIA_BOOT_VERBOSE=1` 才印一行;`VIA_BOOT=0` 整個關
 
-### 誠實的結論
+**不做的**:同意閘一個字不碰(fail-closed 照舊);**不 monkeypatch `requests`**——靜靜改別人行為,是這套系統最恨的病。
 
-- **國際半邊 = 綠**。`global_daily` 47,973 列橫跨兩年半,那是真的在跑。
-- **台股半邊 = 黃/紅**。價格與估值只有 **4 天**;四張表 **0 列**。
-- **最大的一筆:`tw_daily_prices` 這張表,全樹沒有任何一本庫有它——
-  而 121 個檔案在 SQL 語境裡用它。** 另外 `tw_chip_inst`(33 檔)、
-  `tw_prices_adj`(30 檔)、`tw_chip_margin`(18 檔)同樣不存在。
+實證(`via-boot`):vdf → 加速器 `1:11/88` · `via_net` True · 閘態「(未設)」;vrn/vap → 加速器同、不掛網路件。
 
-  容器副本裡台股價格實際住在 **`tw_trading_daily`**。
-  所以這是**名字對不上**,不是「資料抓失敗」——
-  批471 那次 `vap_stack` 報 `Table tw_daily_prices does not exist`,
-  當時記成「VAP 側缺陷」,**現在看那個判斷是錯的**:
-  VAP 沒壞,它要的表本來就不叫那個名字。
+**排隊(下一批)**:7 支直呼網路的 VDF 引擎逐支改走 `via_net`(各一個新版本檔);Grid 站登錄(格子檔太大,省 token 先延)。
 
-  ⚠️ **但在操作員機器上可能相反**(那邊的庫大得多)。
-  所以本批**沒有**去改任何一個 `tw_daily_prices` 的引用——
-  先量再改;量的地方不對,改下去就是災難。
-  **下一步是操作員打 `via-census`,把那台機器的真相貼回來。**
 
----
+## 二 · C 的答案:VDF 現況(**操作員機器實測,批475 他貼回來的**)
+
+> 批474 這一節原本寫的是容器副本的數字,結論是「`tw_daily_prices` 全樹不存在」。
+> **對操作員的機器完全不成立。** 幸好那批一個引用都沒改。先量再改——量的地方不對就別改。
+
+`via-census` 於工作站:**132 張表在庫 · GREEN 111 · AMBER 15 · NODATA 6 · ABSENT 12**
+
+| 台股核心表 | 列 | 跨度 | 判 |
+|---|---|---|---|
+| `tw_daily_prices` | 2,128,169 | **1900-01-01** → 2026-09-11 | GREEN(但有 1900 哨兵列,見下) |
+| `tw_prices_adj` / `prices_canonical` / `features_daily` | 2,128,168 | 2020-01-02 → 2026-09-11 | GREEN |
+| `tw_trading_daily` | 1,469,025 | 2023-01-03 → 2026-09-11 | GREEN |
+| `tw_chip_inst` / `tw_chip_margin` / `tw_chip_derived` | ~1.15M 各 | 2024-01-02 → 2026-09-11 | GREEN |
+| `tw_universe` 7,930 · `tw_listings` 1,996 · `tw_listings_industry` 1,981 · `tw_monthly_revenue` 88,275 | | | GREEN |
+| `consensus_daily` 597 · `tw_valuation_daily` 13,778 · `analyst_estimates` 585 | | 2026-08-24 起(≤19 天) | AMBER=新管線,料在但薄 |
+
+| 國際 | 列 | 跨度 | 判 |
+|---|---|---|---|
+| `global_daily` / `gl_prices_adj` / `prices_canonical` | 203,9xx | 2018-01-01 → 2026-09-12 | GREEN |
+| `us_macro` | 284,805 | 1990 → 2026-09-13 | GREEN |
+| `cross_macro` 6,144 · `sentiment_daily` 264 | | | GREEN |
+
+**結論:VDF 台股半邊與國際半邊在操作員機器上都是綠的。** VDF「能不能跑」這題,答案是能。
+
+### census 照出來、留給「VDF SSOT 化」的四件事
+
+1. **哨兵/垃圾列**:`tw_daily_prices` MIN 日期 `1900-01-01`;`vdf_global_market_repo_ae7…` 的 `global_daily` 只有 1 列、日期 `1900-01-01`。
+2. **庫層級的三副本病**:`vdf_tw_market_repo_a7752b3` / `vdf_global_market_repo_ae7…` 兩本 `_repo_` 副本庫與正庫並存(資料止於 2026-08-25,較舊)。哪一本是正本要有冊講。
+3. **六張 0 列表**:`VRN_MDL004.duckdb` / `VRN_MDL005.duckdb` 各三張,全空。
+4. **ABSENT 12 張**:9 張是 `vrn_mdl00X_*` 舊制表名(疑為 legacy 死路引用);其餘 `vrn_supportbridge`(32 檔在用)、`tw_ticker_regex`(11)、`consensus_current`(3)、`vrn_header_schema_registry_v1`(3)。
+
+「SSOT 化」的第一步就是把這張表**寫成冊**(哪本庫、哪張表、誰寫、該有幾列以上、正本是哪一本),census 改成對冊比對,而不是靠 grep 猜。**冊還沒寫,這是下一批。**
+
+### 批475 · VRN 八項真跑(容器;經 v0108 匯流排)
+
+GREEN 6 · NODATA 1(`vrn_markdown` 無可轉檔=誠實)· ABSENT 1(`vrn_pdfplus` 需 reportlab;操作員機器上 via_vrn_312 已有,故那邊會綠)· **RED 0**。
+附記:`vrn_digest` 內含 yfinance 取價,容器內連線失敗仍 `[計] OK 1 · FAIL 0`——取價是選配,按 FAIL 定義不算假綠;但它沒把「取價失敗 n」印進計數行,記為待改。
 
 ## 三 · 還掛著的事(誰都別忘)
 
@@ -157,9 +198,14 @@ via-ryg -DryAll      # 一支都不真跑(只要那張圖)
 |------|----|-------|
 | **A** | 姊妹倉 `tonykuni/VIA-VDF-VRN` 同步 | **工具層權限**。操作員在聊天裡授權過三次,但 `add_repo` 被自動模式的權限分類器擋下。聊天授權 ≠ 工具授權,我繞不過去。 |
 | **D** | 批416 F2 逐家投信 PCF 端點查實 | 需網路 + 同意閘。**同意閘一律由操作員自己設,我不代設。** |
-| **E** | `tw_daily_prices` 名稱歸位(121 檔) | 等 `via-census` 在操作員機器上的實測結果。**先量再改。** |
-| **F** | 正本頁再生閘 | 在無資料環境跑 `via-famui`,會把操作員的正本 UI 頁改寫成「缺(誠實)」。本工作階段手動 `git checkout --` 復原 4 次。MDL138 應該自己擋住這件事,現在沒擋。 |
+| ~~E~~ | ~~`tw_daily_prices` 名稱歸位~~ | **撤銷**:操作員機器上該表 2,128,169 列,在。批474 從容器副本得出的結論不成立。 |
+| **F** | 正本頁再生閘 | 在無資料環境跑 `via-famui`,會把操作員的正本 UI 頁改寫成「缺(誠實)」。本工作階段手動 `git checkout --` 復原 **5** 次。MDL138 應該自己擋住這件事,現在沒擋。 |
 | **G** | VRN_MDL 數量 | 操作員總表寫 300,實掃 **294**。差 6 支,還沒逐支列出是哪 6 支。 |
+| **I** | VDF SSOT 化:庫冊(哪本庫/哪張表/誰寫/最少幾列/正本是哪本) | 第二節四件事是輸入。下一批。 |
+| **J** | `vrn_digest` 取價失敗未進計數行 | 待改;不是假綠但不夠誠實。 |
+| **K** | 樞紐 `_launch_locked` 對 net 項目**覆寫式**設 `VIA_NET_CONSENT/VIA_SCRAPE_CONSENT="YES"` | 批408 從六個短令拔掉的那種代設;且 "YES" 過不了閘二 token 檢查。本批只記不動,等明令。 |
+| **L** | 「VERT」是哪個子系統 | 樹上不存在(命中全是 `Converter` 子字串)。**要問操作員。** |
+| **M** | 7 支直呼網路的 VDF 引擎改走 `via_net` | 逐支新版本檔;bootstrap 已把 `via_net` 送到門口。 |
 | **H** | 11 支引擎仍綁舊 `tw_listings`(891) | 而 `tw_listings_industry` 有 1,978。**`VDF_ENG052`/`ENG081` 是寫入端,不可一律轉換。** |
 
 ---
@@ -196,5 +242,6 @@ git pull origin claude/via-envmanager-governance-7cls8h
 . (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName
 
 via-census                        # ② C:你那台機器的庫況真相(唯讀)
-via-ryg                           # ③ B:五矩陣紅黃綠燈,跑完自己跳出來
+via-ryg -Timeout 300              # ③ B:五矩陣紅黃綠燈,有心跳不白畫面,跑完自己跳出來
+via-boot                          # ④ 啟動層實證:每支引擎起跑是否綁上加速器/網路件(同意閘不碰)
 ```
