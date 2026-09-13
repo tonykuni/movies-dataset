@@ -7125,6 +7125,12 @@
    "kind": "批465 輸入位置解放(WORD/PDF/IMAGE)",
    "ts": "2026-09-13 12:30",
    "name": "操作員令「輸入介面不再有特定系統內指定位置,改為一律 WINDOWS I/O 或拖曳式輸入,搜尋檔案夾中的 WORD PDF IMAGE 檔案」+「實測 VRN 修正直到成功」。先量:VRN 38 個版號族 33 支有自測,全跑得 28 可測 / GREEN 24 / 非綠 4;端到端餵三件料(PDF+DOCX+PNG)只取到兩件——影像件**從頭到尾沒被當成一件**,不是抽失敗是看不見。產物:①VRN_ENG072_FirstPageText_v0114(受理三類 + --in 系統任意位置 + --no-incoming + 零相依 docx 退路 + 影像走同一條 OCR 車道 + 「抽到字≠抽到對的字」第三態;二十七檢 27/27)②VIA_WinIO_InputPicker_v0100.ps1(原生 OpenFileDialog/FolderBrowserDialog;PS7 預設 MTA → STA runspace 保險;零彈窗律;$input 預讀 stdin 卡死修;十一檢 11/11)③via-vrnin.cmd 拖曳梭(.ps1 收不到拖曳路徑,.cmd 才收得到 %*)④VIA_InputConsole_Spec_v0100.json 加 input.intake 三類(只增不減,舊鍵 extensions 一字不動,免得舊引擎收到抽不動的影像件而變紅)⑤VRN_ENG068_DailyBrief_v0103(harvest_vap 零護欄 → 自測以 traceback 收場;四道護欄 + 逐檢護欄 + 自測重導 UI 輸出,修掉「跑一次自測就把 545,364 列覆寫成缺」)"
+  },
+  {
+   "code": "批465b MDL139 v0103 + ENG067 v0102",
+   "kind": "批465 續:主控台受理三類 + 簡稱冊併入",
+   "ts": "2026-09-13 13:05",
+   "name": "①CGC_MDL139_InputConsole_v0103:拖曳區 accept 與過濾式改由冊 input.intake 生成(v0102 寫死 accept=\".pdf,.docx\" 與 /\\.(pdf|docx)$/i,拖掃描圖進來只得到「無 PDF/DOCX」——影像件連被拒的資格都沒有);頁上寫明**瀏覽器拿不到真實路徑**、要零複製就地讀請走 via-vrnin。十四檢 14/14。②VRN_ENG067_MindMapSSOT_v0102:③⑤ 兩紅同一個根。我第一版判成「庫缺=冊空」**判錯了**,量完才知道庫在、891 家、冊不空——但 tw_listings 存**全名**(「茂生農經股份有限公司」),研究報告寫**簡稱**(台積電/聯發科),scan 視圖由全名組成 → 永遠對不上報告文字:classify(台積電)=GENERAL、聯發科連被抽成關鍵詞都不會。簡稱冊就在同夾 VRN_TWRoster_Offline_v0100.json(1,978 家,VDF_ENG081 每日落盤)→ 兩本都併(只增不減,庫有的鍵不覆蓋)。九檢 9/9,TICKER 類別出現。③全 VRN 回歸:可測 28 支 GREEN 24→25、非綠 4→3(餘 3 支全為本容器缺料:ENG068 無倉庫、ENG069 零外部零券商、ENG070 依賴 ENG069 的表)。自測零污染被追蹤檔。"
   }
  ],
  "updated_at": "2026-09-09 07:20"
