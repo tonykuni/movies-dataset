@@ -7453,7 +7453,23 @@
    "kind": "批470 操作員令「全景式分析先解決所有問題」",
    "ts": "2026-09-13 17:10",
    "name": "⓪**更正我自己公布過的數字**:第五節寫「19 支尾版仍引用 tw_listings」是錯的——那個 regex 連註解都算,而我自己在 ENG073 v0120/MDL142 裡寫了大量提到表名的解說。只算真 SQL 後是 **12 支**。量錯的數字會讓人去解不存在的問題,故更正寫進文件不默默改。①**建了卻叫不到**:批465 造了 via-vrnin.cmd 與 Windows I/O 輸入器,但短令冊裡沒有它——操作員唯一入口是短令冊,冊裡沒有等於沒造。Register-VIA-Commands-v0180 補上 via-vrnin(短令清單是動態實掃 ^function global: 的,加函式即自動現身)。②**盲試票號=看不出來的錯**:ENG080 v0103 的 _tickers_for 只查 tw_listings,而那張表不含 2330/2454/3008/1101 → 權值股查不到 yf_ticker,只能盲試 .TW/.TWO;盲試不報錯,只是價表對不上,顯示成「adj —@— 上漲未算」,看起來像沒價格資料,其實票號從一開始就沒查對。v0104 綁 MDL142(十六檢 16/16),檢⑯ 註記印出「殘缺表有 2330? 0」。③**判錯的紅燈和假綠一樣傷**:煙霧閘 v0100 把 reporter/reporters/table 判 RED,查了才知是 rich 與 pip-resolvelib 的**套件內檔**放錯地方且零人 import——拿「能不能獨立載入」測套件內檔是用錯的尺,它會讓人去修沒壞的東西而真壞的淹在雜訊裡。v0101 加第四態 VENDOR(判準:相對 import + 全樹零人 import,有人用就不算;十二檢 12/12),本件不搬檔(搬進 _quarantine_pip_vendor 是操作員裁示)。另修一支真壞:financial_data_standardization.py 的 from typing import Dict 在 L113 而 -> Dict[str,bool] 在 L51 就用 → import 期 NameError;加 from __future__ import annotations 一行修好。附名單 RED 5→1(只剩 panorama_xcheck_v110 真過期)· VENDOR 3 · SMOKE 26→27。認證:全 VRN 可測 29 GREEN 29 非綠 0 · 煙霧閘主名單 9 支 RED 0。"
+  },
+  {
+   "code": "批471 引擎調度匯流排 CGC_MDL148:一條匯流排四家共用 + 六盞判錯的紅燈",
+   "kind": "批471 操作員令「功能性引擎功能性化 可讓多個子系統調度」「顯示 html 多矩陣結果摘要及資料 全部 SSOT」",
+   "ts": "2026-09-13 15:42",
+   "name": "⓪**先更正我上一輪公布過的判斷**:我拿操作員 64 份真檔名實測,報「第一場 2026年投資大趨勢」等三份研討會的 2026 被當成代號=引擎缺陷。那是**我的量法錯**——我裸建 TickerFilename() 沒給代號冊,而引擎正線是 `roster=nr.code_roster()`(實測 1,979 檔)。有冊時 2026 正確被拒,2002 中鋼/2015 豐興/2023 燁輝/2027 大成鋼/2030 彰源一支沒誤殺。更難堪的是**儀器有報、我沒看**:parse_filename 的回傳第 906 行就寫著 roster_state「冊不可得(未經庫對帳)」,我那張表沒印這一欄。64 份正線重量:分類 64/64、代號 42/42、日期 61/64(缺 3 是檔名本來就沒日期)、誤判 0。①**先查再造**:調度 SSOT 早就有(VIA_InputConsole_Spec_v0100.json,37 項),不另立第二本冊;但調度的**碼**四家各寫各的(DeckServer Popen×12 / RunGate×3 / InputConsole×1 / ClosingGate 自成一套),每家重寫尾版 glob、家族 python、逾時、結果解讀——漏改的那一份不會報錯,只會靜靜走錯。MDL148 補的就是那一格:catalog/call/matrix/render 四支統一契約。②**v0100→v0105 是同一批的五次實跑五次自我修正**,每一次都是我的尺錯不是引擎錯:v0101 VRN 報 RED 3 而那三支印「無報告件(誠實)」→ 缺料不是壞掉;想用 rc=2 當判準,量過後否決(全樹 return 2 有 163 處,只有 46 處是誠實停)。v0102 VAP 報 RED 4 而只有 1 支真壞:「誠實停」才是全樹正典句(451 處)而我的字表只認得 VRN 方言;缺件(套件/必要參數)要與缺料分開;--apply 不該是全有全無(VDF 24 項按下去會發動全史回補與兩支寫庫件)。v0103 git status 冒出從沒入過庫的 VAP/engine/vap_one_out/——**調度層讓引擎在原始碼樹裡生檔**;量過 36 支全用 __file__ 定位、讀 cwd 的 0 支,改在 VIA_Reports/engine_bus/_cwd 底下跑。v0104 讀自己產的頁:頁首在 --apply-family 下印「只解析(dry)」;矩陣四拿檔案系統判產出,而冊上 60 條宣告裡 34 條是資料庫表名 → 超過一半格子在說謊(vrn_structdb 剛入庫 71 筆卻寫成缺)。v0105 裸檔名(7 條)也被拿 VIA 根去接;判法改成照形狀分四路:萬用不判/路徑接根/裸檔名去找/表名問庫。③**兩支根修**:CGC_MDL118_PlotDataLaw v0101——ohlcv() 只擋庫檔不在、沒擋庫在但表不在,CatalogException 裸奔;修在正主一處,ENG009/013/015 三個呼叫者一起好。VAP_ENG015 v0103——缺料標成 FAIL 且因由不上 stdout;改 SKIP+逐件印因由,離開碼改動量過才改(全樹沒有任何調度者在讀它的 rc)。④**又兩個看不見的儀器**:MDL118 立了 141 批、ENG015 收容了 144 批,**兩支都沒進自測格**——難怪 MDL118 的自測在空庫機器上直接崩(連 [計] 都印不出來)這麼久沒人知道。Grid v0294 三站一起設。⑤**更正自測格一條舊記載的事實錯誤**(不改舊條目,追記):v0252→v0253(批418)寫「2026 恰好也是真實上市代號 聚亨」——實測 **聚亨=2022**(鋼鐵工業 TWSE),而 2026 在 1,978 檔名冊裡一筆都沒有。年份守衛本身是對的,理由寫錯了公司;留著錯理由,下一個人會去修一個不存在的問題。",
+   "files": [
+    "supportive modules/registry/CGC_MDL148_EngineBus_v0100.py … v0105.py(尾版載全程版沿革)",
+    "supportive modules/registry/CGC_MDL118_PlotDataLaw_v0101.py(庫在但表不在=誠實回空)",
+    "functional modules/VAP/engine/VAP_ENG015_SeabornStackBridge_v0103.py(缺料 SKIP+因由上 stdout)",
+    "supportive modules/registry/CGC_MDL064_SelftestGrid_v0294.py(+3 站 → 207 站)",
+    "Register-VIA-Commands-v0181.ps1(via-bus / via-busui)"
+   ],
+   "selftest": "MDL148 十九檢 19/19 · MDL118 七檢 7/7 · ENG015 九檢 9/9 · Grid 三新站 OK 3 FAIL 0",
+   "live": "37 項實跑(真跑家族 vrn,vap):GREEN 7 · NODATA 4 · ABSENT 3 · PLAN 23 · **RED 0**;產出契約 在 10 · 缺 3(皆真缺)· 判不了 5",
+   "discipline": "零網路 · 預設 dry · 寫庫動詞閘(家族全掃永不代跑)· 同意閘絕不代設 · 正本零觸碰 · 零 CDN"
   }
  ],
- "updated_at": "2026-09-13 03:50"
+ "updated_at": "2026-09-13 15:42"
 }
