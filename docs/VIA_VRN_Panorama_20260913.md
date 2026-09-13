@@ -418,3 +418,86 @@ action ∈ (scan, audit, apply, ocr, selftest)
 工作站的母庫若停在 main,就**沒有** `via-vrnin.cmd`、沒有 ENG072 v0116。
 tessdata 這件事只碰姊妹倉,可以獨立先做完;要用到新的輸入介面得先讓分支進 main。
 
+
+---
+
+## 十二、批470 全景式分析 —— 逐項量出並解決
+
+### 12.0 先更正我自己公布過的一個數字
+
+第五節寫「**19 支**尾版仍引用 `tw_listings`」——**那個數字是錯的**。
+那次的 regex 連**註解**都算,而 ENG073 v0120 與 MDL142 裡有大量我自己寫的
+解說文字提到那張表名。只算真 SQL(`FROM/INTO/JOIN/UPDATE/TABLE` + 表名)後:
+
+| | 粗 regex(錯) | 只算真 SQL(對) |
+|---|---|---|
+| 尾版引擎數 | 19–20 支 | **12 支** |
+
+**量錯的數字會讓人去解一個不存在的問題**,所以更正寫在這裡而不是默默改掉。
+
+### 12.1 建了卻叫不到 —— `via-vrnin` 沒進短令冊
+
+全景分析第一項照出來的:批465 造了 Windows I/O 輸入器與 `via-vrnin.cmd`,
+但**短令冊裡沒有它**。操作員的唯一入口是短令冊 —— 冊裡沒有就等於**沒造**。
+
+`Register-VIA-Commands-v0180.ps1` 補上 `via-vrnin`
+(零參數=開原生選檔;`-Pick Folder`=選夾;`-Path`=直接給;拖曳仍走同夾的 `.cmd`)。
+短令清單是**動態實掃** `^function global:` 的,加了函式就自動現身,不必改宣告字串。
+
+### 12.2 盲試票號 —— 看不出來的那種錯
+
+`VRN_ENG080_FourPointDigest_v0104`(十六檢 16/16):
+
+v0103 的 `_tickers_for()` 只查 `tw_listings` —— **那張表不含 2330/2454/3008/1101**,
+於是權值股一律查不到 `yf_ticker`,只能退到盲試 `.TW/.TWO`。
+
+盲試的成本**不是慢,是看不出來**:它不報錯,只是價表對不上,
+最後顯示成「`adj —@—` 上漲未算」——**看起來像沒有價格資料,其實是票號從一開始就沒查對**。
+
+改綁 MDL142(冊裡就有 `yf_ticker` 與 `market`);冊缺席退回原本直查=零回歸;
+盲試保留為最終退路,去重但保序。檢 ⑯ 的註記直接印出根因:`殘缺表有 2330? 0`。
+
+### 12.3 判錯的紅燈和假綠一樣傷 —— 煙霧閘加第四態
+
+v0100 把 `reporter.py` / `reporters.py` / `table.py` 判成 RED。查了才知道
+**它們不是壞掉,是放錯地方**:那是 **rich** 與 **pip-resolvelib** 的套件內檔
+(`from . import box, errors`),散落在引擎夾且**零人 import**。
+套件內檔本來就不能單獨載入 —— 拿「能不能獨立載入」去測它是**用錯的尺**。
+
+**判錯的紅燈和假綠一樣傷**:它會讓人去修一個沒有壞的東西,
+而真正壞的那支反而淹在雜訊裡。
+
+`CGC_MDL147_EngineSmokeGate_v0101`(十二檢 12/12)加第四態 **VENDOR**,
+判準兩條都要成立:①有相對 import ②全樹零人 import(有人用就不算)。
+本件**不搬檔** —— 搬進 `_quarantine_pip_vendor` 是操作員的裁示。
+
+另修一支**真的壞**的:`financial_data_standardization.py` 的
+`from typing import Dict` 在 L113,而 `-> Dict[str, bool]` 在 L51 就用了
+→ 整支檔 import 期就 `NameError`。加一行 `from __future__ import annotations`
+延後註記求值,不動任何既有 import 的位置。
+
+| | 批468 | 批470 |
+|---|---|---|
+| 附名單 RED | 5 | **1**(只剩 `panorama_xcheck_v110` 真的過期) |
+| VENDOR | — | 3(正確歸類,不計入總判) |
+| SMOKE | 26 | **27** |
+
+### 12.4 本批後的認證狀態
+
+```
+全 VRN 自測掃描   可測 29 支 · GREEN 29 · 非綠 0
+煙霧閘主名單     9 支 · SMOKE 9 · AMBER 0 · VENDOR 0 · RED 0
+煙霧閘附名單     31 支 · SMOKE 27 · VENDOR 3 · RED 1(不計入總判)
+```
+
+### 12.5 剩下的、只有操作員能決定的
+
+| # | 事 | 為什麼我不代做 |
+|---|---|---|
+| A | 分支進 main | 工作站拿不到批465–470 的任何東西(`via-vrnin`、ENG072 v0116…)。開 PR 要你明講 |
+| B | 姊妹倉 `VIA-VDF-VRN` 分岔 | 在 `grok/via-token-gov-20260910`,**領先 main 93 · 落後 54**,且落後自己的 origin 15。併法會動到 93 個提交,我不替你裁 |
+| C | 三支 VENDOR 收進隔離夾 | 搬也是搬不是刪,但那是你的決定 |
+| D | `panorama_xcheck_v110` 過期 | import 一支不存在的 `MDL001_Conv_v110`;要修就綁 `VRN_MDL001_Converter_v*.py` 尾版,但它是一次性腳本,值不值得修由你定 |
+| E | TW01 鎖定的 Desktop 路徑 | 檔上寫著 DO NOT CHANGE,是你的鎖 |
+| F | 其餘 11 支綁殘缺表 | 其中 `VDF_ENG052`/`ENG081` 是那張表的**寫入方**,一律改讀會弄壞它們 |
+

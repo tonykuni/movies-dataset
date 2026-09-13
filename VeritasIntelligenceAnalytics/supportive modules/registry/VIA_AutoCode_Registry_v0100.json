@@ -7447,6 +7447,12 @@
    "kind": "批469b 同一症狀隔十幾批又回來",
    "ts": "2026-09-13 16:20",
    "name": "①操作員令「以後不論是啥 PS 指令最上面一定是進入該環境」——立為常規並寫進交接文:每段 PS 先 Set-Location 母庫 VIA 夾 + 點源 Register 尾版(glob 取尾,不寫死版號)。理由:家目錄殼跑 via 指令會踩空,而踩空的樣子常常看起來像程式壞掉而不是走錯地方。②OCR 安裝器根因定案(量的,不是猜的):姊妹倉 tonykuni/VIA-VDF-VRN origin/main 的 public/via/VIA_EnvManager.py 是 **1163 行**且有 ocr/--repair/--tessdata-prefix;操作員 C:\\Users\\tonyk\\Github\\VIA-VDF-VRN 那份是 **328 行**只有 scan/talib。`usage: [--task {scan,talib}]` 這一行**批456 就出現過一次**,當時判對了血脈不同但**沒修掉**,於是同一症狀隔十幾批又原樣回來——判對了不等於修好了。指令本身是對的(action ∈ scan/audit/apply/ocr/selftest,從 origin/main 真檔讀出),缺的是檔。③提醒:批465–469 產物全在分支上不在 main;工作站母庫停在 main 就沒有 via-vrnin.cmd 與 ENG072 v0116。"
+  },
+  {
+   "code": "批470 全景式分析:via-vrnin 登冊 + 盲試票號修 + 煙霧閘 VENDOR 態",
+   "kind": "批470 操作員令「全景式分析先解決所有問題」",
+   "ts": "2026-09-13 17:10",
+   "name": "⓪**更正我自己公布過的數字**:第五節寫「19 支尾版仍引用 tw_listings」是錯的——那個 regex 連註解都算,而我自己在 ENG073 v0120/MDL142 裡寫了大量提到表名的解說。只算真 SQL 後是 **12 支**。量錯的數字會讓人去解不存在的問題,故更正寫進文件不默默改。①**建了卻叫不到**:批465 造了 via-vrnin.cmd 與 Windows I/O 輸入器,但短令冊裡沒有它——操作員唯一入口是短令冊,冊裡沒有等於沒造。Register-VIA-Commands-v0180 補上 via-vrnin(短令清單是動態實掃 ^function global: 的,加函式即自動現身)。②**盲試票號=看不出來的錯**:ENG080 v0103 的 _tickers_for 只查 tw_listings,而那張表不含 2330/2454/3008/1101 → 權值股查不到 yf_ticker,只能盲試 .TW/.TWO;盲試不報錯,只是價表對不上,顯示成「adj —@— 上漲未算」,看起來像沒價格資料,其實票號從一開始就沒查對。v0104 綁 MDL142(十六檢 16/16),檢⑯ 註記印出「殘缺表有 2330? 0」。③**判錯的紅燈和假綠一樣傷**:煙霧閘 v0100 把 reporter/reporters/table 判 RED,查了才知是 rich 與 pip-resolvelib 的**套件內檔**放錯地方且零人 import——拿「能不能獨立載入」測套件內檔是用錯的尺,它會讓人去修沒壞的東西而真壞的淹在雜訊裡。v0101 加第四態 VENDOR(判準:相對 import + 全樹零人 import,有人用就不算;十二檢 12/12),本件不搬檔(搬進 _quarantine_pip_vendor 是操作員裁示)。另修一支真壞:financial_data_standardization.py 的 from typing import Dict 在 L113 而 -> Dict[str,bool] 在 L51 就用 → import 期 NameError;加 from __future__ import annotations 一行修好。附名單 RED 5→1(只剩 panorama_xcheck_v110 真過期)· VENDOR 3 · SMOKE 26→27。認證:全 VRN 可測 29 GREEN 29 非綠 0 · 煙霧閘主名單 9 支 RED 0。"
   }
  ],
  "updated_at": "2026-09-13 03:50"

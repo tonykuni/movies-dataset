@@ -1,4 +1,9 @@
 # ===== [VIA:ACCEL-BRIDGE:v0100] SuperAccel 加速器橋(批102 全樹導入令;graceful 零行為變更) =====
+# 批470:`from typing import Dict` 原本在 L113,而 `-> Dict[str, bool]` 在 L51 就用了。
+# 回傳註記在 def 當下就會被求值,於是整支檔 **import 期就 NameError**
+# (煙霧閘 CGC_MDL147 照出來的:RED · NameError: name 'Dict' is not defined)。
+# 延後註記求值即可,一行修好,不動任何既有 import 的位置與內容。
+from __future__ import annotations
 try:
     import sys as _sa_sys
     from pathlib import Path as _sa_Path
