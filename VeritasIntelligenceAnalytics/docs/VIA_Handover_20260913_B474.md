@@ -168,6 +168,13 @@ bootstrap 做三件事,全包 try(**絕不能讓引擎起不來**):
 **via-twrev 的工作家**:引擎全靠相對路徑(`data/ output/ logs/`),所以首跑把 `config.yaml + data/` 種進 `VIA_Reports\twrev`,碼仍從收容夾 import(一份碼);`fetch/run` 觸 MOPS **只看同意閘,不代設**。demo 曾覆寫封裝內 3 個資料檔→自 zip 還原後才入庫。
 
 
+## 一-d · 批478 · VDF SSOT 化第一步:庫冊 + 庫況對冊比 + K 項
+
+- **庫冊** `supportive modules/registry/VIA_DB_Table_SSOT_v0100.json`:49 張表(來源=你機器的 census 實測 + 引擎碼寫入者掃描,20 張表有寫入者)。冊上明寫:列數/日期是**觀測值不是保證值**,`min_rows` 才是判準;三本正庫;`_repo_` 是副本;`tw_daily_prices` 標 1900 哨兵列;`known_legacy_absent` 12 張。
+- **匯流排 v0111**:census **冊優先**——冊上宣告而庫裡沒有 → `ABSENT(冊上宣告)` 並列寫入者(該有而沒有,最該亮的一種);冊外 SQL 語境 ≥3 檔 → `ABSENT(冊外)`;庫裡有冊上沒有 → 加註「冊外」提醒冊該補。矩陣五多一欄「冊」。三十二檢 32/32。
+- **K 項已改**(你核准全線):樞紐 v0136 同意閘由覆寫改 `setdefault`——沒設才補、設了一律尊重;既有流程零行為變更。
+
+
 ## 二 · C 的答案:VDF 現況(**操作員機器實測,批475 他貼回來的**)
 
 > 批474 這一節原本寫的是容器副本的數字,結論是「`tw_daily_prices` 全樹不存在」。
@@ -215,9 +222,9 @@ GREEN 6 · NODATA 1(`vrn_markdown` 無可轉檔=誠實)· ABSENT 1(`vrn_pdfplus`
 | ~~E~~ | ~~`tw_daily_prices` 名稱歸位~~ | **撤銷**:操作員機器上該表 2,128,169 列,在。批474 從容器副本得出的結論不成立。 |
 | **F** | 正本頁再生閘 | 在無資料環境跑 `via-famui`,會把操作員的正本 UI 頁改寫成「缺(誠實)」。本工作階段手動 `git checkout --` 復原 **5** 次。MDL138 應該自己擋住這件事,現在沒擋。 |
 | **G** | VRN_MDL 數量 | 操作員總表寫 300,實掃 **294**。差 6 支,還沒逐支列出是哪 6 支。 |
-| **I** | VDF SSOT 化:庫冊(哪本庫/哪張表/誰寫/最少幾列/正本是哪本) | 第二節四件事是輸入。下一批。 |
+| **I** | VDF SSOT 化 | **第一步已做**(批478 庫冊 v0100 + census 對冊比)。餘:1900 哨兵列清理、`_repo_` 副本裁決、六張 0 列表——要你點頭才動資料。 |
 | **J** | `vrn_digest` 取價失敗未進計數行 | 待改;不是假綠但不夠誠實。 |
-| **K** | 樞紐 `_launch_locked` 對 net 項目**覆寫式**設 `VIA_NET_CONSENT/VIA_SCRAPE_CONSENT="YES"` | 批408 從六個短令拔掉的那種代設;且 "YES" 過不了閘二 token 檢查。本批只記不動,等明令。 |
+| ~~K~~ | ~~樞紐同意閘覆寫式代設~~ | **已改**(批478,v0136 setdefault)。 |
 | ~~L~~ | ~~「VERT」是哪個子系統~~ | **已解:VETF**(批477)。 |
 | **N** | TWREV `fetch` 直呼 MOPS(requests;無 VIA 同意閘) | `via-twrev` 在外層擋(閘沒開=誠實停);引擎本體改走 `via_net` 是逐支工作,併入 M 佇列。 |
 | **O** | VETF React 網站原始碼(63 tsx)未建置 | 需 node/npm;Standalone HTML 已可直接開。非本批範圍。 |
