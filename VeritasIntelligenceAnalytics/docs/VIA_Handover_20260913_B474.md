@@ -175,6 +175,19 @@ bootstrap 做三件事,全包 try(**絕不能讓引擎起不來**):
 - **K 項已改**(你核准全線):樞紐 v0136 同意閘由覆寫改 `setdefault`——沒設才補、設了一律尊重;既有流程零行為變更。
 
 
+## 一-e · 批479 · M 項:VDF 直呼網路的引擎改走正典網路件優先
+
+**先量再改**:七支直呼網路的 VDF 引擎裡,**有人調度的只有兩支**——`ENG047`(冊 `macro_detail`)與 `ENG051`(樞紐任務)。
+`ENG049 / ENG050 / MDL002 / MDL003 / MDL007` 被 0 支引擎 import、被 0 處調度=**真孤兒**(先前「被 30 檔引用」全是提及,不是依賴)。孤兒不動刀:只增不減,動了也沒人跑。
+
+| 引擎 | 新版 | 改法 | 驗 |
+|---|---|---|---|
+| ENG047 | `_v0101` | `_http_get_json` 先走 `via_net.http_json`,不在位才退回 urllib(零回歸);DENY 照停不代設閘 | 八檢 8/8;經啟動層 `--fetch` 閘未開 → FAIL-CLOSED 零外呼 |
+| ENG051 | `_v0101` | 本檔唯一對外呼叫點 `def_http_get_text` 先走 `via_net.http_text`,非 OK 丟 `RequestException` 讓既有 except 接手 | 原本就無 selftest → py_compile + 單一 seam |
+
+冊/樞紐的 glob 都是 `*.py` 萬用,尾版律自動解析到 `_v0101`(匯流排 catalog 實證)。VDF 引擎走正典優先數:0 → 2(活著的兩支全部)。
+
+
 ## 二 · C 的答案:VDF 現況(**操作員機器實測,批475 他貼回來的**)
 
 > 批474 這一節原本寫的是容器副本的數字,結論是「`tw_daily_prices` 全樹不存在」。
@@ -229,7 +242,7 @@ GREEN 6 · NODATA 1(`vrn_markdown` 無可轉檔=誠實)· ABSENT 1(`vrn_pdfplus`
 | **N** | TWREV `fetch` 直呼 MOPS(requests;無 VIA 同意閘) | `via-twrev` 在外層擋(閘沒開=誠實停);引擎本體改走 `via_net` 是逐支工作,併入 M 佇列。 |
 | **O** | VETF React 網站原始碼(63 tsx)未建置 | 需 node/npm;Standalone HTML 已可直接開。非本批範圍。 |
 | **P** | `vdf_tw_market_repo_a7752b3` / `vdf_global_market_repo_ae7…` 兩本 `_repo_` 副本庫與正庫並存 | 庫層級三副本病;哪本是正本要有冊講(併入 I)。 |
-| **M** | 7 支直呼網路的 VDF 引擎改走 `via_net` | 逐支新版本檔;bootstrap 已把 `via_net` 送到門口。 |
+| ~~M~~ | ~~7 支直呼網路的 VDF 引擎改走 `via_net`~~ | **活著的兩支已改**(批479);其餘五支是孤兒(0 import、0 調度),只記不動。 |
 | **H** | 11 支引擎仍綁舊 `tw_listings`(891) | 而 `tw_listings_industry` 有 1,978。**`VDF_ENG052`/`ENG081` 是寫入端,不可一律轉換。** |
 
 ---
