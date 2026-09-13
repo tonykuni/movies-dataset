@@ -7485,7 +7485,13 @@
    "selftest": "MDL148 二十檢 20/20 · Register v0182 pwsh 解析過且 via-ppp 載得起來",
    "live": "真 PDF 端到端 ok=True(1 頁/1 表 4×4/值全對/表頭回溯命中)· 匯流排 38 項:GREEN 7 · NODATA 4 · ABSENT 4 · PLAN 23 · **RED 0**;vrn_pdfplus 正確讀作 ABSENT(缺件)需要 reportlab",
    "discipline": "零寫死根 · 收件夾讀冊 · 零彈窗(報告要 -Open 才跳)· 產出落 VIA_Reports"
+  },
+  {
+   "code": "批474 卡斷修 + B 一頁式紅黃綠燈 + C 庫況普查 + 交接紀錄",
+   "kind": "批474 操作員令「卡斷了 不卡斷 PS20個加速器 上傳GITHUB附上交接紀錄 B C」",
+   "ts": "2026-09-13 18:30",
+   "name": "工作站實錄三修(MDL148 v0107):① `via-bus --matrix` 什麼都沒跑就吐兩百行 docstring 再回 rc=0。動詞是 `matrix` 不是 `--matrix`——**而那是我上一則訊息叫操作員打的,錯在我**;但 `--matrix` 也是任何人都會自然打出來的形狀,所以拆成兩個獨立缺陷各修各的:`_verb()` 只脫頭部連字號再比對白名單(`matrixx` 照樣不收——猜錯的體貼比不體貼更難救);不認得的動詞回 **rc=2 不是 rc=0**(rc=0 是假綠:自動化鏈路看 rc,會把「什麼都沒跑」讀成「跑完了」),並印六行用法而不是整篇 docstring(說明書不是錯誤訊息)。② SyntaxWarning: invalid escape sequence——docstring 拿正則當範例卻不是 raw 字串;諷刺的是那段文字**正在講**「同一個判準寫兩個地方只改一邊」,結果它自己又生一個缺陷。改 r 開頭 docstring。③ **矩陣五 · 庫況**(操作員的 C「VDF 到底能不能跑」):既有的能跑閘與矩陣一～四**全都回答不了那題**——一支引擎可以完美地跑完,然後把資料寫進一張空表;只報引擎綠不綠就是一種假綠。四態:GREEN 有列且跨度≥30天 · AMBER 有列但薄 · NODATA 表在列數 0 · ABSENT 碼裡當表用但庫裡沒有。沿用既有 `db_table_index()` 那一趟掃描,**不另開第二支掃描器**。ABSENT 這裡犯過一次錯並記檔:第一版抓所有 tw_/vrn_/etf_ 識別字 → **74 筆**,一半是 python 變數名,連庫裡明明有 891 列的 `tw_listings` 都寫成缺——**判錯的紅燈,一次七十四盞**;收緊成只認 SQL 語境(FROM/JOIN/INTO/TABLE/UPDATE)且 ≥3 檔在用 → 23 筆,每筆亮得出引用數。另一枚自犯錯:`db_table_index` **成功時 why 也有值**(「問過 6 本庫 · 43 張表」),我拿它當失敗旗標 → 庫況永遠空;判準看 idx 本身不看附註。B(Register v0183):`via-ryg`(別名 紅黃綠/燈板)= 真跑 vrn+vap → 五矩陣頁 → **自動開**;-NoOpen 給自動化鏈路,-DryAll 只要圖。**零彈窗律沒被違反**:它管的是「沒人要求就別跳」,而 via-ryg 是操作員親手打的——分界線是「誰要求的」,不是「跳不跳」。C(`via-census`,別名 庫況):容器副本實測 6 本庫 35 張表 —— 國際半邊 global_daily 47,973 列橫跨 2024-01-02→2026-09-11=真綠;台股半邊 tw_trading_daily / tw_valuation_daily **只有 4 天**=AMBER,consensus_daily 等**四張表 0 列**=NODATA;最大一筆:**`tw_daily_prices` 全樹沒有任何一本庫有它,而 121 個檔在 SQL 語境裡用它**(tw_chip_inst 33 檔 / tw_prices_adj 30 檔 / tw_chip_margin 18 檔同樣不存在)。容器副本裡台股價格其實住在 `tw_trading_daily`,所以那是**名字對不上**不是抓失敗——**批471 把 vap_stack 的 `Table tw_daily_prices does not exist` 記成「VAP 側缺陷」,那個判斷現在看是錯的**:VAP 沒壞。但**本批一個引用都沒改**:容器副本 ≠ 操作員機器的庫,量的地方不對就改下去是災難——先量再改,等 via-census 在那台機器上的結果。20 加速器實測不卡斷(SUP_MDL737 --activate rc=0;88 件冊 · 可用 11 · 缺 77 走 lazy stub 誠實非真加速)。交接紀錄 docs/VIA_Handover_20260913_B474.md:操作員工作副本卡在未完成合併(台帳 JSON 衝突)=「卡斷」真身,首段即給 via-unstick 解法(台帳取聯集絕不取單邊)。驗證:MDL148 二十四檢 24/24 · 真產 32KB 五矩陣頁零外連 · pwsh 解析零錯誤 · via-ryg/via-census/紅黃綠/庫況 皆載得起來。"
   }
  ],
- "updated_at": "2026-09-13 17:59"
+ "updated_at": "2026-09-13"
 }
