@@ -393,6 +393,17 @@ via-boot           # 之後每個短令起跑都是毫秒級
 
 律冊 `VRN_ExtractionLogic_SSOT_v0100.json` 的 `order` 已改成四步;`VRN_ENG082_ExtractionLogic_v0101`(十三檢)、`VRN_ENG072_FirstPageText_v0119`(三十五檢,容器 34/35)。
 
+## 一-x · 批497 · 「中高風險拉出獨立境;numpy 這種可多境多版本多 Python;加速器與網路工具請勿遺漏」
+
+| 律 | 落在哪 | 驗 |
+|---|---|---|
+| 中高風險件拉出獨立境,相關工具一起隔離 | Baseline 家族 target_env 尾 `_H`(deep_learning/browser/gis/compilers/stealth_proxy)=HIGH、`_M`=MEDIUM;`via-envtools` 把它們排到各自的隔離境(缺境→ENSURE_ENV) | MDL135 ㉟ |
+| numpy 等樞紐件可多環境多版本多 Python | Baseline hydra +**H2b**:跨獨立境多版本=設計允許,同境內多版(H1 遮蔽)才是病;`via-envtools` 印 `[樞紐] 境×版本` 只作 INFO | MDL135 ㊱ |
+| 加速器/網路工具裡的工具請勿遺漏 | `tools` 預設**全冊聯集**:手寫冊 ∪ Celeritas `_LIB_MAP`(經 MDL142,100+ 件)∪ AegisNexus 相依;`--sheet-only` 只看手寫冊 | MDL135 三十六檢 36/36 |
+| 你的實錄:候 OCR 8 件全是舊跑的 FAIL_HIT | `via-firstpage -RetryFailed` 只重試 FAIL 件(忽略 TTL),44 件命中不重抽 | ENG072 v0120 ㊱ |
+
+`via-envtools` not recognized:那個視窗還沒 pull 到批495(畫面上匯流排 v0119、ENG072 v0117),先 `git pull` 再點源。
+
 ## 二 · C 的答案:VDF 現況(**操作員機器實測,批475 他貼回來的**)
 
 > 批474 這一節原本寫的是容器副本的數字,結論是「`tw_daily_prices` 全樹不存在」。
@@ -497,6 +508,7 @@ via-vrnlogic -SelfTest            # ②c 批493:擷取中央邏輯庫十二檢
 via-vrnlogic                      # ②d 邏輯庫現況(件數/法/後端健康)
 via-boot                          # ②e 批494:每家族應印「工具:Celeritas(lazy);AegisNexus(lazy)」
 via-envtools                      # ②f 批495:工具冊導入計畫(唯讀);貼回來
+via-firstpage -RetryFailed        # ②g 批497:只重試上次 FAIL 的件(新次序)
 # $env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve   # 你決定要裝時才跑(裝前 freeze 存證)
 via-ryg -Timeout 300              # ③ B:五矩陣紅黃綠燈,有心跳不白畫面,跑完自己跳出來
 via-boot                          # ④ 啟動層實證:每支引擎起跑是否綁上加速器/網路件(同意閘不碰)

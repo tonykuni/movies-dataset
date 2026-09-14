@@ -7623,6 +7623,12 @@
    "kind": "批496 操作員令(VRN 擷取次序修正)",
    "ts": "2026-09-14 10:40",
    "name": "先量 v0118 差三處:①密度閘判 SCANNED 就整條分區道不走=非 OCR 沒先跑;②批493 我加的「剩餘預算 ≥45s 才升第三階」把畫質提升幾乎關掉(第二階常把 150s 燒光);③DPI 帶沒釘死。改:ENG082 v0101 冊/預設 +hq_budget_s 120(第三階自有預算)+hq_dpi [300,350]+nonocr_failed()(本文 < min_chars 或兩法 DISAGREE=失敗;PARTIAL 只是標示未還原=成功不 OCR);十三檢。ENG072 v0119:分區道一律先跑(密度閘只留證據),驗證失敗印 [非OCR驗證失敗] 轉 OCR 階梯並把證據留 logic.nonocr,轉 OCR 時 skip_text_layer 不重抽非 OCR;第三階只要第二階「跑了但零字」就升,時鐘重起、預算 hq_budget_s;hq_dpi_for 把 MDL001 auto_dpi 結果夾進 300~350 帶(缺 MDL001 退 350);三十五檢 34/35(⑤ 容器夾況舊紅;㉞ 第二階預算燒光仍走第三階且第三階抽到字即回;㉟ DPI 帶+判準+skip_text_layer)。容器實錄:rep65.pdf 非 OCR 28 字=FAIL/AGREE → 轉 OCR 階梯,證明次序生效。"
+  },
+  {
+   "code": "批497 操作員律「特殊/中高風險者直接拉出獨立環境連同相關工具隔離;numpy 這種常撞的可多環境多版本搭配多 Python;加速器及網路工具中的工具很多請勿遺漏」→ MDL135 v0102 tools 全冊聯集(冊+Celeritas _LIB_MAP 經 MDL142+AegisNexus 相依)+ 風險分級/隔離境路由 + 樞紐矩陣 INFO;Baseline H2b;ENG072 v0120 --retry-failed;Register v0196",
+   "kind": "批497 操作員律(環境隔離/多版本)+ 實錄(邏輯庫命中 44/64、候 OCR 8 皆 FAIL_HIT;via-envtools not recognized=未 pull)",
+   "ts": "2026-09-14 11:20",
+   "name": "先查:Baseline 早有 18 家族→目標境(via_iso_ml_cuda_H/via_iso_scrape_H/via_iso_gis_H/via_iso_compilers_H/via_iso_stealth_H 隔離、via_mix_*_M 混合、家族境)與 hydra.watch_diverge 樞紐件名單(numpy/pandas/pyarrow/torch/paddlepaddle/pydantic/protobuf/sqlalchemy/pillow);MDL142 早會解析 Celeritas _LIB_MAP(100+ 件)。缺的是:工具冊只列手寫件(會遺漏)、H2 把跨境多版本當病、樞紐件沒有矩陣。造:①Baseline hydra +H2b(樞紐件跨獨立境多版本多 Python=設計允許;同境內多版才是 H1 病;_H/_M 家族直接拉出隔離境)+tool_roster 指標;工具冊 +sources/risk_policy。②MDL135 v0102 union_roster():冊 ∪ Celeritas _LIB_MAP(經 MDL142 roster/pip_name;零遺漏)∪ AegisNexus 相依(掃 import 剔標準庫/VIA 內部;requests/urllib3/joblib→四家族境+via_core);逐件依 Baseline families 路由(成員表比對 pip/import 名)→ target_env(尾 _H=HIGH、_M=MEDIUM、家族境=LOW、無家族→via_core),樞紐件標 SPECIAL;tools 預設走聯集(--sheet-only 只看手寫冊);計畫印 [樞紐] 境×版本矩陣只作 INFO、[風險] 分級計數;三十六檢 36/36。容器假境根實跑:聯集後隔離境(ENV_ABSENT)列 ENSURE_ENV+INSTALL,家族境逐件探針。③ENG072 v0120 --retry-failed(只重試 FAIL 件忽略 TTL,命中件不重抽;印 [RETRY_FAILED]);三十六檢 35/36(⑤ 容器舊紅);Register v0196 via-firstpage -RetryFailed。實錄讀出:命中 44 · 新記 12 · 候 OCR 8 全是批493 舊跑的 FAIL_HIT,新次序要重試那 8 件用 -RetryFailed;via-envtools not recognized 是視窗還沒 pull 到批495(畫面匯流排 v0119/ENG072 v0117)。"
   }
  ],
  "updated_at": "2026-09-14"
