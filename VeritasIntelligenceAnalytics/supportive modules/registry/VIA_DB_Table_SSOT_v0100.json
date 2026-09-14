@@ -1,7 +1,7 @@
 {
  "schema": "VIA.DBTableSSOT.v1",
  "ts": "2026-09-13",
- "batch": "批498",
+ "batch": "批499",
  "source": "操作員工作站 via-census 實測(批475 貼回)+ VDF 引擎碼 INSERT/CREATE 寫入者掃描(批478)",
  "policy": {
   "canonical": "vdf_tw_market.duckdb / vdf_global_market.duckdb / ActiveTWETF.duckdb 為正庫",
@@ -611,7 +611,7 @@
    "note": ""
   },
   {
-   "db": "vdf_tw_market.duckdb",
+   "db": "全庫(資料家每本 .duckdb;首本 vdf_tw_market.duckdb)",
    "table": "vrn_extraction_logic",
    "role": "邏輯庫·VRN 擷取台帳(逐件 方法/互核/修復/判準;批498 入庫)",
    "rows_seen": 0,
@@ -621,10 +621,10 @@
     "VRN_ENG082"
    ],
    "min_rows": 0,
-   "note": "ENG072 每次跑完自動 sync;via-vrnlogic sync-db 手動"
+   "note": "ENG072 每次跑完自動 sync;via-vrnlogic sync-db 手動;批499 起全庫同步(同一 hash)"
   },
   {
-   "db": "vdf_tw_market.duckdb",
+   "db": "全庫(資料家每本 .duckdb;首本 vdf_tw_market.duckdb)",
    "table": "via_policy_factors",
    "role": "政策庫·律冊攤平(擷取邏輯/工具冊風險/資料家版面/基線 hydra;批498 入庫)",
    "rows_seen": 0,
@@ -634,7 +634,33 @@
     "VRN_ENG082"
    ],
    "min_rows": 1,
-   "note": "source/key/value/synced_at;每次 sync 整表覆寫"
+   "note": "source/key/value/synced_at;每次 sync 整表覆寫;批499 起全庫同步(同一 hash)"
+  },
+  {
+   "db": "全庫(資料家每本 .duckdb;首本 vdf_tw_market.duckdb)",
+   "table": "via_policy_sync",
+   "role": "政策庫·同步對帳單(sync_id/ts/host/列數/policy_hash/engine;批499 全庫同步律)",
+   "rows_seen": 0,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [
+    "VRN_ENG082"
+   ],
+   "min_rows": 1,
+   "note": "每本庫一列;hash 相同=全庫同步;via-vrnlogic 印 [入庫同步]"
+  },
+  {
+   "db": "全庫(資料家每本 .duckdb;首本 vdf_tw_market.duckdb)",
+   "table": "via_handover",
+   "role": "交接庫·最新交接報告全文(file/batch/ts/sha1/chars/body;批499 三處同步律:母檔案夾/資料庫/github)",
+   "rows_seen": 0,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [
+    "VRN_ENG082"
+   ],
+   "min_rows": 1,
+   "note": "docs/VIA_Handover_*.md 尾版;資料家根另落 VIA_HANDOVER_LATEST.md;倉根副本隨 git"
   }
  ]
 }
