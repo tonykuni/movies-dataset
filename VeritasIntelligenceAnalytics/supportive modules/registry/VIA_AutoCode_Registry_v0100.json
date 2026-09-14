@@ -7545,6 +7545,24 @@
    "kind": "批483 操作員令「GO ON」(核准自主完成全線續);自審批474–482 的碼",
    "ts": "2026-09-14 03:20",
    "name": "①啟動層靠 PYTHONPATH 前置生效,所以會**遮住**發行版自帶的 sitecustomize——本容器就有 /usr/lib/python3.11/sitecustomize.py(Debian apport 崩潰掛鉤)。遮住別人的東西還不吭聲,正是這套系統最恨的靜靜走錯。改:_boot() 之後在 sys.path 找下一個同名檔(排除本目錄),找到就 runpy 執行並記 VIA_BOOT_CHAINED;找不到=正常。實證:假的被遮 sitecustomize 放在後面 → 加速器 1:11/88 照掛、被遮的也跑了、接力路徑記在環境變數。本檔無版號(名字必須是 sitecustomize 才生效),就地改,記在此。②工作站實錄 via-boot「還在跑」:boot 逐家族呼叫 python_for()(委派 MDL137→MDL136 解析 conda 境,Windows 上慢),三家族逐一、各 120s、期間零輸出——最壞白畫面六分鐘,又是批423/475 那個病。v0112:三家族各一條執行緒並行;主執行緒每 20s 印「⏳ 還在探測」;總上限 150s,逾時的家族誠實印「探測逾時」不掛著。三十三檢 33/33(㉝ 三家族都印、有總時長、慢不過單家族上限);容器實測 0.3s。其餘自審結論(不改):_run_streaming 逾時只殺自己子行程、讀取執行緒 daemon 化=孫行程持管道不會卡死主流程;MDL138 守則還原後 rc 0→3 走資料側不假綠;via-vetf 的 scriptblock 在呼叫端子作用域可見 $hub;via-revphase 的 python -c 字串 \"\" 轉義正確;Set-VIABoot 只前置不覆蓋 PYTHONPATH。"
+  },
+  {
+   "code": "批484 J 項:vrn_report_digest v0114 計數行亮「取價缺 n」;匯流排 v0113 心跳改走 stderr(call 的 JSON 契約);H 項量測結案",
+   "kind": "批484 操作員令「GO ON」(核准自主完成全線續)",
+   "ts": "2026-09-14 04:10",
+   "name": "J:vrn_report_digest 的取價失敗以前只把值轉 None(批74 nan 誠實閘),計數行看不出來——容器內 yfinance 全失敗仍印「OK 1 · FAIL 0」。按 FAIL 定義(數字抽出來了且對不起來)那不是 FAIL,但「取價缺幾份」得亮出來,不然上漲空間空著沒人知道為什麼。v0114:OK 列中 adj_close 為 None 的計 n_px_miss → matrix.price_missing + 計數行「· 取價缺 n」。三十一檢 31/31(88.7s);經匯流排真跑:GREEN · 報告 2 · OK 1 · FAIL 0 · SKIP 1 · 取價缺 1。自己踩到:call --item vrn_digest 跑超過 20 秒,v0108 的心跳印進 stdout,結果 JSON 就不是合法 JSON,調用端 json.load 直接炸——v0108 加心跳時只想著人眼,忘了 call 的契約是「stdout=統一結果字典」。v0113:人看的字走 stderr,機器讀的字走 stdout;心跳間隔改在呼叫時讀模組常數(預設參數定義時就凍住,執行期改 HEARTBEAT_SEC 沒感覺——㉞ 檢第一版就因此 0 心跳);三十四檢 34/34。H 項量測結案:tw_listings 讀 4 支(ENG070/072/081 + 1)、寫 ENG081;tw_listings_industry 讀 2 支、engine/ 內**無寫入者**(1,981 列來自別處,庫冊已標 writers=[]);操作員機器 tw_listings 1,996 ≥ industry 1,981,「綁舊表 891 列」的顧慮在他的機器上不成立——先前那個數字是容器副本的。不改碼。MDL139 輸入主控台讀冊的 groups/items/glob(6/9/3 處)→ 本工作階段登冊的 vdf_vetf_consensus/vdf_twrev/vdf_revphase/vrn_pdfplus 會在操作員重建頁時自動出現;不在容器內重建正本頁(會 churn)。"
+  },
+  {
+   "code": "批485 I 項準備:庫衛生唯讀審計(census --hygiene)+ 匯流排登進樞紐/總控(bus_ryg/bus_census)",
+   "kind": "批485 操作員令「GO ON」(核准自主完成全線續)",
+   "ts": "2026-09-14 05:00",
+   "name": "I 項(1900 哨兵列/_repo_ 副本/六張 0 列表)資料本體一筆都不動——先把該動的列**數出來、SQL 寫出來**,讓操作員拿數字決定。MDL148 v0114 census --hygiene:①哨兵列=日期欄 < 1950-01-01 的列數+樣本,印對應 DELETE 語句**不執行**;②_repo_ 副本每張表 vs 正庫同名表 MAX 日期,副本較舊=退役候選**不刪**。沒有 --apply,永遠不會有:刪資料是操作員的手。三十五檢 35/35(㉟ 合成含 1900 列的庫:數得出 1 列、DELETE 只寫不跑、審計後列數仍 3)。容器實跑:哨兵 0 張、副本 0 張(它們在操作員機器上)。Register v0188:via-census -Hygiene(別名 庫衛生)。功能註冊只增不減再補一格:匯流排(批471 立)至今**沒有樞紐任務、沒有總控正式名稱**——總控頁按不到 via-ryg/via-census。樞紐 v0137 +bus_ryg(matrix --apply-family vrn,vap --html)/+bus_census(census),net=False;白名單任務冊釘數 54→56(釘數存在就是要逼人明改,兩檢照改);25/25。總控 VIA_SYSTEM_MANAGER v0122 +兩個正式名稱;**不在雲端再生總控頁**(正本頁在操作員機器上再生,雲端再生只會 churn)。MDL069_SystemManager 不是正式名稱冊(0 命中)——找對冊花了兩次 grep,記下:總控正式名稱住 VIA 根的 VIA_SYSTEM_MANAGER_v*.py。"
+  },
+  {
+   "code": "批486 所有 py 指令統一走 Invoke-VIAPython:20 加速器點亮一次 + 動態進度條 + 邊跑邊轉播 + 逾時不卡斷;短令冊 82 處呼叫改寫;VdfFetch v0104;匯流排 v0115 沙盒排除",
+   "kind": "批486 操作員令「ps 檔案要加 20 個加速器動態進度條;所有 py 指令都要加速加速器」",
+   "ts": "2026-09-14 06:20",
+   "name": "先查再造:PS 側 20 加速器實體模組早在 supportive modules/VIA_PS_Accel_Module.ps1(TOOL-101,批102):$VIA_ACCEL20 冊 20 條 + Write-VIAProgress + Invoke-VIAGuarded;短令冊裡 95 個短令各自 `& python …` 直呼(三種形狀:& (Get-VIAEnvPython) 22 · python (Get-VIANewest 43 · & $py 17 = 82 處),逐個改是九頭龍。新立 supportive modules/VIA_PS_PyProgress_Module.ps1(不重造那 20 條,只把它們接到每一次 python 啟動):①一視窗第一次跑 python:SUP_MDL737 --activate 真點亮(缺席誠實說缺),同時走 $VIA_ACCEL20 二十格點亮條,快取 $env:VIA_ACCEL_LIT;②每次子行程:Start-Process 重導到暫存檔、邊跑邊排水——stdout 走 pipeline(上游 `| Out-String` 照舊抓得到;via-autorun 的 $plan 捕捉不斷)、stderr 灰字;Write-VIAProgress 動態條(跑了幾秒 · 引擎最後一行 · 30 秒一輪脈動);-TimeoutSec 逾時 Kill 整樹回 124;$global:LASTEXITCODE 照真回;引數含空白/引號原樣到達。自犯錯兩枚:排水 scriptblock 既 Write-Output 又回傳位置,行全被 $posO 吞掉=捕捉 0 行 → 位置走 [ref]、行走 pipeline;文字長度重算位置在 Windows \\r\\n 下會漂移 → 改位元組找最後一個 \\n 定位。實證:捕捉 4/4 行、rc=3 照回、逾時 2s 回 124、'a b'/'c\"d'/--flag=1 原樣。Register v0189:82 處呼叫規律改寫成 Invoke-VIAPython(-Family/-Python 兩形;SUP_MDL737 自身不重點);第一版把點源行插在 $VIA 賦值之前(在 try 探測迴圈裡)——我的測試預設了 $VIA 才沒炸,操作員機器上會整段被 catch 吞掉、Invoke-VIAPython 未定義、95 個短令全斷;移到 $VIA 賦值之後,不預設 $VIA 重載實證模組來源正確、via-bus catalog 捕捉 3531 字元。啟動器:OneShot 0 個直呼(委派短令=自動受惠);VdfFetch v0104 點源模組 + 5 處 & $PY 改寫(含 $plan 捕捉那處);其餘啟動器逐個接(下一批)。匯流排 v0115:跑過自測後 census 35→48 張表——沙盒產出的 .duckdb(engine_bus/_cwd、selftest_grid、selftest_out)被當正庫數;第一版整夾排除 VIA_Reports 又把 VRN 主庫 VIA_Reports/vrn/maindb 打掉(35→31),收窄成沙盒標記 _is_sandbox(三處掃描共用)→ 34 張(原 35 含一張 selftest_out 沙盒表)。三十五檢 35/35。"
   }
  ],
  "updated_at": "2026-09-14"

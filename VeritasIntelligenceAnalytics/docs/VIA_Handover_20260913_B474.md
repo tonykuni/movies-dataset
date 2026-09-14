@@ -202,7 +202,10 @@ bootstrap 做三件事,全包 try(**絕不能讓引擎起不來**):
 | 480 | `d11a0718` | 正本頁保護(F);MDL138 接啟動層 |
 | 481 | `1a502f9e` | 兩專案授權使用:ENG051 v0102(v1.1.0 綁上)+ 月營收跨族群相位 v030 收容登冊 |
 | 482 | `2525efd0` | 自測格子 v0295 +三站;格子接啟動層;新短令 0 死路 |
-| 483 | (本批) | 啟動層接力被遮的 sitecustomize;via-boot 三家族並行+心跳 |
+| 483 | `4e03010b` | 啟動層接力被遮的 sitecustomize;via-boot 三家族並行+心跳 |
+| 484 | `403ad604` | digest v0114 取價缺 n;匯流排 v0113 心跳走 stderr;H 量測結案 |
+| 485 | `06736d7a` | `via-census -Hygiene` 唯讀審計;匯流排登進樞紐 v0137/總控 v0122 |
+| 486 | (本批) | 所有 py 指令走 `Invoke-VIAPython`:20 加速器 + 動態進度條;短令冊 82 處;VdfFetch v0104 |
 
 **沒動的**:資料本體一筆都沒動(1900 哨兵列、`_repo_` 副本、六張 0 列表——要你點頭);同意閘一個字沒設;孤兒引擎沒刪。
 
@@ -229,6 +232,37 @@ bootstrap 做三件事,全包 try(**絕不能讓引擎起不來**):
 
 - **啟動層接力**:`sitecustomize` 靠 PYTHONPATH 前置生效,會遮住發行版自帶的 sitecustomize(Debian 的 apport 掛鉤就在那)。改成 `_boot()` 之後找 sys.path 上**下一個**同名檔,找到就接力執行、記 `VIA_BOOT_CHAINED`。實證:被遮的也跑了。
 - **`via-boot` 不再「還在跑」**:原本三家族逐一探測、各 120 秒、零輸出;v0112 改三家族並行 + 每 20 秒心跳 + 總上限 150 秒,逾時的家族誠實印「探測逾時」。容器 0.3 秒;三十三檢 33/33。
+
+
+## 一-k · 批484 · J 項結案 + 匯流排 JSON 契約 + H 項量測結案
+
+- **J**:`vrn_report_digest` v0114 計數行亮「**取價缺 n**」(以前取價失敗只把值轉 None,計數行看不出來)。容器真跑:`報告 2 · OK 1 · FAIL 0 · SKIP 1 · 取價缺 1`。
+- **匯流排 v0113**:自己踩到——`call` 跑超過 20 秒時心跳印進 stdout,結果 JSON 就炸。人看的字走 stderr,機器讀的字走 stdout;三十四檢 34/34。
+- **H**(量測結案,不改碼):`tw_listings` 讀 4 支、寫 ENG081;`tw_listings_industry` 讀 2 支、`engine/` 內無寫入者(1,981 列來自別處,庫冊已標)。你機器上 `tw_listings` 1,996 ≥ 1,981,「綁舊表 891 列」的顧慮不成立(那是容器副本的數字)。
+- 輸入主控台(MDL139)讀冊的 groups/items → 本工作階段登冊的四項會在你重建頁時自動出現。
+
+
+## 一-l · 批485 · I 項準備(唯讀審計)+ 匯流排登進樞紐/總控
+
+- **`via-census -Hygiene`**(別名 `庫衛生`):哨兵列(日期 < 1950)數出來 + 對應 `DELETE` **只寫不跑**;`_repo_` 副本每張表對正庫 MAX 日期,副本較舊=退役候選**不刪**。沒有 `--apply`,永遠不會有——刪資料是你的手。你機器上跑一次,把哨兵那幾行貼回來,我們就有數字可以決定。
+- **匯流排登進樞紐/總控**:批471 立的匯流排至今沒有樞紐任務、沒有總控正式名稱——總控頁按不到。樞紐 v0137 `+bus_ryg/+bus_census`(白名單釘數 54→56,兩檢照改,25/25);總控 v0122 +兩個正式名稱。**總控頁沒在雲端再生**——你那邊 `via-manager` 再生一次,按鍵才會出現。
+
+
+## 一-m · 批486 · 所有 py 指令統一走 `Invoke-VIAPython`(20 加速器 + 動態進度條)
+
+**先查再造**:PS 側 20 加速器實體模組早就在 `supportive modules/VIA_PS_Accel_Module.ps1`(批102):`$VIA_ACCEL20` 冊 + `Write-VIAProgress` + `Invoke-VIAGuarded`。不重造,只接上每一次 python 啟動。
+
+| 件 | 做法 |
+|---|---|
+| `supportive modules/VIA_PS_PyProgress_Module.ps1`(新) | `Invoke-VIAPython [-Family f] [-Python exe] [-TimeoutSec N] <script> [args]`:一視窗第一次跑 python 真點亮 20 格(SUP_MDL737 `--activate`;缺席誠實說缺);每次子行程邊跑邊轉播(stdout 走 pipeline,上游捕捉照舊)、`Write-VIAProgress` 動態條、逾時 Kill 整樹回 124、`$LASTEXITCODE` 照真回 |
+| 短令冊 v0189 | **82 處** python 呼叫規律改寫成 `Invoke-VIAPython`;模組缺=誠實退回直呼 |
+| `Invoke-VIA-VdfFetch-v0104` | 點源模組 + 5 處改寫(含 `$plan` 捕捉那處) |
+| OneShot | 0 個直呼(委派短令)=自動受惠 |
+| 匯流排 v0115 | 自測沙盒的 .duckdb 不再冒充正庫(第一版整夾排除 VIA_Reports 打掉了 VRN 主庫,收窄成沙盒標記) |
+
+自犯錯兩枚記檔:排水把行吞進位置變數(捕捉 0 行);點源行插在 `$VIA` 賦值之前(我的測試預設了 `$VIA` 才沒炸,你機器上 95 個短令會全斷)。兩枚都在推之前實證修掉。
+
+**其餘啟動器**(All/Complete/EnvGovernance/Unstick/FixAll…)還沒接進度條——下一批逐個接;PSRepair/PDFPlumberPlus/AllGreen 本來就有。
 
 
 ## 二 · C 的答案:VDF 現況(**操作員機器實測,批475 他貼回來的**)
@@ -278,15 +312,15 @@ GREEN 6 · NODATA 1(`vrn_markdown` 無可轉檔=誠實)· ABSENT 1(`vrn_pdfplus`
 | ~~E~~ | ~~`tw_daily_prices` 名稱歸位~~ | **撤銷**:操作員機器上該表 2,128,169 列,在。批474 從容器副本得出的結論不成立。 |
 | ~~F~~ | ~~正本頁再生閘~~ | **已擋**(批480 MDL138 v0101 正本頁保護)。 |
 | **G** | VRN_MDL 數量 | 300 vs 294 的差取決於計數範圍(排除 references/_superseded 只數到 20 個唯一編號)——要用同一把尺再量,先記不判。 |
-| **I** | VDF SSOT 化 | **第一步已做**(批478 庫冊 v0100 + census 對冊比)。餘:1900 哨兵列清理、`_repo_` 副本裁決、六張 0 列表——要你點頭才動資料。 |
-| **J** | `vrn_digest` 取價失敗未進計數行 | 待改;不是假綠但不夠誠實。 |
+| **I** | VDF SSOT 化 | 庫冊 v0100 + census 對冊比(批478);**唯讀審計 `via-census -Hygiene`**(批485)。餘:哨兵列/副本/六張 0 列表——貼審計結果回來、你點頭,才動資料。 |
+| ~~J~~ | ~~`vrn_digest` 取價失敗未進計數行~~ | **已改**(批484 v0114「取價缺 n」)。 |
 | ~~K~~ | ~~樞紐同意閘覆寫式代設~~ | **已改**(批478,v0136 setdefault)。 |
 | ~~L~~ | ~~「VERT」是哪個子系統~~ | **已解:VETF**(批477)。 |
 | **N** | TWREV `fetch` 直呼 MOPS(requests;無 VIA 同意閘) | `via-twrev` 在外層擋(閘沒開=誠實停);引擎本體改走 `via_net` 是逐支工作,併入 M 佇列。 |
 | **O** | VETF React 網站原始碼(63 tsx)未建置 | 需 node/npm;Standalone HTML 已可直接開。非本批範圍。 |
 | **P** | `vdf_tw_market_repo_a7752b3` / `vdf_global_market_repo_ae7…` 兩本 `_repo_` 副本庫與正庫並存 | 庫層級三副本病;哪本是正本要有冊講(併入 I)。 |
 | ~~M~~ | ~~7 支直呼網路的 VDF 引擎改走 `via_net`~~ | **活著的兩支已改**(批479);其餘五支是孤兒(0 import、0 調度),只記不動。 |
-| **H** | 11 支引擎仍綁舊 `tw_listings`(891) | 而 `tw_listings_industry` 有 1,978。**`VDF_ENG052`/`ENG081` 是寫入端,不可一律轉換。** |
+| ~~H~~ | ~~11 支引擎仍綁舊 `tw_listings`(891)~~ **量測結案(批484)**:讀 4 寫 1,你機器上 1,996 列,不成立 | 而 `tw_listings_industry` 有 1,978。**`VDF_ENG052`/`ENG081` 是寫入端,不可一律轉換。** |
 
 ---
 
@@ -329,4 +363,7 @@ via-twrev demo                    # ⑥ 月營收 v2.7 免網路跑通;via-twrev
 via-famui all                     # ⑦ 家族頁再生(現在有正本頁保護,無資料時不會再把正本改成「缺」)
 via-revphase -SelfTest            # ⑧ 月營收相位 v030 合成自測;去掉 -SelfTest 就讀你的庫真跑
 via-etfhold -SelfTest             # ⑨ 主動 ETF 持股引擎 v1.1.0 27 檢(不碰正庫)
+via-census -Hygiene               # ⑩ 庫衛生唯讀審計:哨兵列與副本庫,只數不刪;把輸出貼回來
+via-manager                       # ⑪ 總控頁再生,bus_ryg/bus_census 按鍵才會出現
+# 批486 起:任何 via-* 跑 python 時,第一次會看到 20 格點亮,之後每支引擎上方有動態進度條(跑了幾秒 · 引擎最後一行)
 ```
