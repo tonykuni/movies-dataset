@@ -303,6 +303,23 @@ via-boot           # 之後每個短令起跑都是毫秒級
 好消息:加速器真點 54/88;`via-boot` 1.0 秒;`vrn_pdfplus` 在你機器上 GREEN;64 份 digest 68 秒有進度條;頁自動開在 msedge(B 落地)。
 
 
+## 一-q · 批490 · 你說「庫在 `C:\Users\tonyk\VIA System\via_database`,parquet 存、duckdb 管」——49 張 ABSENT 是我點錯的燈
+
+批489 你貼的 `via-census` 只剩 7 本庫、冊上 49 張全 ABSENT。**不是庫沒了,是庫搬到倉外的家**,而匯流排只掃倉內(`VIA.rglob`)。
+我上一則把它歸因到 `/selftest_out/` 沙盒標記,那是判錯:ENG045 的 `vdfout_runs/selftest_out` 真是自測夾,只住 `vdf_hub.duckdb`。
+
+| 事 | 檔 | 怎麼驗的 |
+|---|----|---------|
+| 資料家冊(家在哪、長什麼樣、省 token 的規矩) | `supportive modules/registry/VIA_DataHome_SSOT_v0100.json` | MDL123 解析序:`--home` > env > VLL local_paths.json > **冊** > 舊指標 `data/WHERE_IS_DATA.md` > 預設 |
+| `via-datahome catalog`:家內清點→**一頁目錄** `VIA_Reports/datahome/DATAHOME_CATALOG_latest.json`(庫名→路徑;表/湖→列數·日期範圍);`plan`:倉內散落整併計畫**只列不動** | `CGC_MDL123_DataHome_v0102.py` | 十一檢 11/11(暫存家;真目錄零觸碰) |
+| `via-census` 家內也掃(env `VIA_DATA_HOME` > 目錄頁 > MDL123);parquet 湖入普查 `[湖]`;**預設一本庫一行**,`-Tables` 逐表;`[家]`/`[沙盒略]` 明印;沙盒標記錨定擁有者夾;「庫缺」=缺料不是壞掉 | `CGC_MDL148_EngineBus_v0118.py` | 三十九檢 39/39 |
+| 啟動層 ③ 資料家:目錄頁→ env `VIA_DATA_HOME` + `VIA_DB_<庫名大寫>`(引擎按名取路徑,不寫死;家不在=誠實不設) | `supportive modules/bootstrap/sitecustomize.py` | 實證兩變數到子行程 |
+| ENG073/ENG080 尋庫**家優先**(`VIA_DB_VDF_TW_MARKET` > 家內按名找最新 > 舊路徑鏈) | `VRN_ENG073_…_v0124.py` / `VRN_ENG080_…_v0105.py` | 三十六檢/十六檢皆綠;env 指到暫存家即解到家 |
+| `via-datahome catalog [-Tables] | plan | link [-DryRun] [--point 夾]`;`via-census -Tables/-Hygiene`;別名 資料家/庫目錄 | `Register-VIA-Commands-v0191.ps1` | pwsh 解析 0 錯 |
+
+整併律(照你一貫的規矩):搬=`link`(hash 定生死、零刪除)、**不複製**(三副本病)、刪副本/暫存=你的手。
+「parquet 本體 + duckdb VIEW 管家」的匯出是整併第二步,**等你貼 `via-datahome catalog` 回來我才知道家裡現在長怎樣**(先量再改)。
+
 ## 二 · C 的答案:VDF 現況(**操作員機器實測,批475 他貼回來的**)
 
 > 批474 這一節原本寫的是容器副本的數字,結論是「`tw_daily_prices` 全樹不存在」。
@@ -352,6 +369,7 @@ GREEN 6 · NODATA 1(`vrn_markdown` 無可轉檔=誠實)· ABSENT 1(`vrn_pdfplus`
 | **G** | VRN_MDL 數量 | 300 vs 294 的差取決於計數範圍(排除 references/_superseded 只數到 20 個唯一編號)——要用同一把尺再量,先記不判。 |
 | **I** | VDF SSOT 化 | 庫冊 v0100 + census 對冊比(批478);唯讀審計(批485)。**批489 新知:你的 `vdf_tw_market.duckdb` 不在引擎寫死的 `output_hub/mega/`——冊上該補路徑**,`via-census` 頭幾行會印出來。 |
 | **R** | ENG072 起手 140 秒靜默(GLE 探 7 個 OCR 後端) | 該像加速器一樣把探測結果快取;下一批。 |
+| **S** | 資料家整併第二步:parquet 本體 + duckdb VIEW 管家的匯出/接點(`link`) | 等操作員貼 `via-datahome catalog` 與 `plan`;搬=link、不複製、刪=他的手(批490)。 |
 | ~~J~~ | ~~`vrn_digest` 取價失敗未進計數行~~ | **已改**(批484 v0114「取價缺 n」)。 |
 | ~~K~~ | ~~樞紐同意閘覆寫式代設~~ | **已改**(批478,v0136 setdefault)。 |
 | ~~L~~ | ~~「VERT」是哪個子系統~~ | **已解:VETF**(批477)。 |
@@ -394,7 +412,9 @@ via-unstick                       # ① 先解開那個未完成合併(台帳取
 git pull origin claude/via-envmanager-governance-7cls8h
 . (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName
 
-via-census                        # ② C:你那台機器的庫況真相(唯讀)
+via-datahome catalog              # ①b 批490:家內清點(C:\Users\tonyk\VIA System\via_database)→ 一頁目錄;把輸出貼回來
+via-datahome plan                 # ①c 倉內散落整併計畫(只列不動)
+via-census                        # ② C:庫況(批490 起家內也掃;預設一本庫一行,逐表加 -Tables)
 via-ryg -Timeout 300              # ③ B:五矩陣紅黃綠燈,有心跳不白畫面,跑完自己跳出來
 via-boot                          # ④ 啟動層實證:每支引擎起跑是否綁上加速器/網路件(同意閘不碰)
 via-vetf                          # ⑤ VETF 持股×Consensus(candidate 沙盒;自動找你的兩本庫)
