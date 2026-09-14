@@ -7671,6 +7671,12 @@
    "kind": "批504 財務邏輯橋(AllInOne+FDS 只掛不搬)+ 自測零污染律 + 五件上傳量測",
    "ts": "2026-09-14 19:40",
    "name": "先查:SSOT normalize_metric 對 總資產/股東權益/營業活動現金流/營業毛利/流動比率 皆回原字(未收),AllInOne FINANCIAL_SYNONYMS 與 FDS 28 欄都有 → 二見有價值;FDS 直接 import 會 NoneType.__dict__(dataclass 找 sys.modules),登錄後可過;AllInOne parse_filename('6873_2024-05-06_元大.pdf') 回 ticker 6873/broker YUANTA。"
+  },
+  {
+   "code": "批505 操作員 via-ryg 實錄(vrn_logic 站 RED;vdf/fin_statements 缺席;VDF 26 項 PLAN;令「實測 vdf vrn vetf」)→ ①ENG082(VRN)v0107:自測整段撤 VIA_DB_*/VIA_DATA_HOME、設 VIA_SELFTEST=1、結束還原(⑲);容器帶 VIA_DB_FAKE 重現 v0106 ⑮/⑰ FAIL + 假庫被寫四表,v0107 19/19 且假庫零觸碰;復原=via-vrnlogic sync-db。②VDF_ENG082_FinStatements v0100:填主控台冊 fin_statements 缺席;收容件 vdf_fetchers_financials 只掛不搬;雙閘 fail-closed(NetUnified gate_state);yfinance 車道 AegisNexus ResilientHTTPClient session 注入(拒收退原生講明);MOPS 走 http_text 探路(解析候);tw_financial 23 欄+fetched_at 派生層冪等;parquet duckdb COPY 落 mega/fin;八檢。③登冊:主控台冊 fin_statements SHIPPED 接引擎、庫表冊 +tw_financial(54)、Register v0198 via-finstat、Deck v0140 fin_statements(釘 62)、Manager v0125、Grid v0300 +一站;交接 B498 +一-h(實測 vdf/vrn/vetf 一貼即用);倉根副本。批505 首 commit d80adde4 登冊腳本在 Deck 說明行錨點斷掉只上一半,批505b 補齊。",
+   "kind": "批505 vrn_logic 站 RED 根因修(自測隔離)+ 三大報表引擎上船(填缺席)+ 實測 vdf/vrn/vetf 指路",
+   "ts": "2026-09-14 20:30",
+   "name": "先查:matrix USAGE=--apply-family 真跑家族、--ids 才跑帶 --apply 的寫庫動詞;via-ryg 位置參數=家族;NetUnified gate_state 雙閘 open=gate1 YES 且 gate2 token 設;http_text 回 {state,data,via};AegisNexus ResilientHTTPClient._get_session();tw_listings 欄 code/name;收容件 _new_row 23 欄。"
   }
  ],
  "updated_at": "2026-09-14"

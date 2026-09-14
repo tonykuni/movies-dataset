@@ -15,6 +15,7 @@ CGC_MDL095_DeckServer v0134 — 指揮台本地執行橋(批400 +closeout 任務
   同源 Origin、Sec-Fetch-Site 與當次橋接器隨機權杖。
 啟動:VIA.ps1 自動帶起(或 python 本檔 serve);Ctrl+C 停=任務
 行程不受影響(獨立)。
+v0139→v0140(批505):+fin_statements(VDF_ENG082 三大報表 status;釘 61→62)。v0138→v0139(批504):+fin_logic(釘 60→61)。
 v0101→v0102(9hh5to 會話「create real ui」令):+依賴治理任務八條
 (deps_scan/deps_mirror/rebuild_scan/rebuild_full/lessons/ocr_probe/
 ocr_plan/selftest_fast;net 任務沿用同意環境變數機制)+GET /govdeck
@@ -441,6 +442,9 @@ def task_registry() -> dict:
         "fin_logic": {"zh": "財務邏輯統轄橋現況(批504;AllInOne 2.1.0 + 28 欄對照;第二意見/評等正典/政策因子;唯讀)",
                       "argv": [_py("vrn"), _eng("supportive modules/70_VRN_Rules", "SUP_MDL748_FinancialLogicHub_v*.py"), "status"],
                       "net": False},
+        "fin_statements": {"zh": "三大報表擷取現況(批505;VDF_ENG082;tw_financial;唯讀 status)",
+                           "argv": [_py("vdf"), _eng("functional modules/VDF/engine", "VDF_ENG082_FinStatements_v*.py"), "status"],
+                           "net": False},
         "datahome_catalog": {"zh": "資料家清點→一頁目錄(批490/491;庫/湖/壞檔;唯讀)",
                              "argv": [sys.executable, _eng("supportive modules/registry", "CGC_MDL123_DataHome_v*.py"), "catalog"],
                              "net": False},
@@ -1827,8 +1831,8 @@ def selftest() -> int:
             _VAP["m"] = FakeVap()
 
             tasks = task_registry()
-            chk("① 白名單任務冊固定 61 項(批504 +fin_logic;批498 +vrn_logic/vrn_logic_syncdb/datahome_catalog/env_tools;firstpage 早在冊;批485 +bus_ryg/bus_census;批400 +closeout;批392 +handover;批390 +console_ui/align;批388 +ui_vdf/ui_vrn;批386 +vrn4;批384 +rungate;批383 +entry/vdfdb/vapone;批381 +envgov;批334 +4;批335 +complete_all)且治理/VAP 任務齊備",
-                len(tasks) == 61  # 批504 +fin_logic;批498 +4(firstpage 早在冊);批400 +closeout;批392 +1;批390 +2;批388 +2;批386 +vrn4;批384 +rungate;批383 +3;批381 +envgov and "system_ui" in tasks and "group_class" in tasks and "complete_all" in tasks
+            chk("① 白名單任務冊固定 62 項(批505 +fin_statements;批504 +fin_logic;批498 +vrn_logic/vrn_logic_syncdb/datahome_catalog/env_tools;firstpage 早在冊;批485 +bus_ryg/bus_census;批400 +closeout;批392 +handover;批390 +console_ui/align;批388 +ui_vdf/ui_vrn;批386 +vrn4;批384 +rungate;批383 +entry/vdfdb/vapone;批381 +envgov;批334 +4;批335 +complete_all)且治理/VAP 任務齊備",
+                len(tasks) == 62  # 批505 +fin_statements;批504 +fin_logic;批498 +4(firstpage 早在冊);批400 +closeout;批392 +1;批390 +2;批388 +2;批386 +vrn4;批384 +rungate;批383 +3;批381 +envgov and "system_ui" in tasks and "group_class" in tasks and "complete_all" in tasks
                 and all(k in tasks for k in (
                     "deps_scan", "rebuild_full", "govcon", "uispec",
                     "etf_fetch", "etf_analysis", "revenue_consensus",
@@ -2228,7 +2232,7 @@ def selftest() -> int:
         len(_co_argv) == 3 and _co_argv[0] == sys.executable and _co_argv[2] == "all"
         and _co_name is not None and re.fullmatch(r"CGC_MDL141_ClosingGate_v\d{4}\.py", _co_name) is not None
         and Path(_co_argv[1]).is_file() and _co.get("net") is False
-        and "批400" in _co.get("zh", "") and "MDL141" in _co.get("zh", "") and len(task_registry()) == 61,
+        and "批400" in _co.get("zh", "") and "MDL141" in _co.get("zh", "") and len(task_registry()) == 62,
         f"({_co_name};net={_co.get('net')};argv[2]={_co_argv[2] if len(_co_argv) > 2 else None})")
     chk("㉒ 批342 寫回斷線三類全吞(BrokenPipe/ConnectionReset/ConnectionAborted=WinError 10053)",
         len(re.findall(r"^\s*except \(BrokenPipeError, ConnectionResetError, ConnectionAbortedError\):", src, re.M)) == 4   # 批392 +/vap_img 供圖道
