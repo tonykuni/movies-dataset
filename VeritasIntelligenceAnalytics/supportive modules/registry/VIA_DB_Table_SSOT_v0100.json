@@ -1,7 +1,7 @@
 {
  "schema": "VIA.DBTableSSOT.v1",
  "ts": "2026-09-13",
- "batch": "批500",
+ "batch": "批505",
  "source": "操作員工作站 via-census 實測(批475 貼回)+ VDF 引擎碼 INSERT/CREATE 寫入者掃描(批478)",
  "policy": {
   "canonical": "vdf_tw_market.duckdb / vdf_global_market.duckdb / ActiveTWETF.duckdb 為正庫",
@@ -670,6 +670,19 @@
    "note": "docs/VIA_Handover_*.md 尾版;資料家根另落 VIA_HANDOVER_LATEST.md;倉根副本隨 git",
    "db_scope": "all_home",
    "lamp": "rows"
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_financial",
+   "role": "VDF·三大報表 canonical 23 欄+fetched_at(損益/資產負債/現金流/比率;yfinance 車道;批505)",
+   "rows_seen": 0,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [
+    "VDF_ENG082"
+   ],
+   "min_rows": 0,
+   "note": "派生層:同 Ticker DELETE+INSERT;parquet 鏡 mega/fin;閘未開=空表非缺陷"
   }
  ]
 }

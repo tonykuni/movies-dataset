@@ -330,16 +330,26 @@
      "items": [
       {
        "id": "fin_statements",
-       "zh": "三大報表(損益/資產負債/現金流;MOPS)",
-       "state": "PLANNED",
+       "zh": "三大報表(損益/資產負債/現金流;ENG082 收容件 yfinance 車道走 AegisNexus session;MOPS 探路候源)",
+       "state": "SHIPPED(批505)",
        "params": [
-        "period",
-        "years"
+        "only",
+        "years",
+        "limit"
        ],
-       "note": "誠實:母倉無現役財報擷取引擎(ENG073 冊註 tw_financial 群=PLANNED,MOPS t164sb04 候源;ENG050 financials 車道 VERIFY_PENDING);期別/年起迄先入冊(VDF_Input_Interface_Matrix TW_FIN),引擎上船即接",
+       "note": "批505 上船:雙閘 fail-closed(閘你開);yfinance 缺=缺件誠實停;tw_financial 派生層冪等 + mega/fin parquet;MOPS 解析=候(VERIFY_PENDING)",
        "outputs": [
-        "tw_financial(PLANNED)"
-       ]
+        "tw_financial",
+        "mega/fin/tw_financial_<ts>.parquet"
+       ],
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG082_FinStatements_v*.py",
+        "verb": [
+         "run"
+        ]
+       },
+       "net": true
       },
       {
        "id": "tw_revenue_codes",
