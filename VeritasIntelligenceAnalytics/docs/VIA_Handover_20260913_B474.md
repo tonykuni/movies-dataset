@@ -332,6 +332,16 @@ via-boot           # 之後每個短令起跑都是毫秒級
 `tails` 還是 14:49 那次舊跑(ENG080 v0104);拉齊後 `via-ryg` 重跑才會換。
 留給你的手:`via-datahome link -Relink`;兩本 `_repo_` 副本(158.8 MB/14 表至 09-07 vs 正庫至 09-12;0.5 MB/1 列 1900-01-01);`px/year=_raw` 那筆 1900-01-01 哨兵;`fiveday` 壞檔;pyarrow 重裝。
 
+## 一-s · 批492 · 你上傳的兩件
+
+| 件 | 查到什麼 | 做了什麼 |
+|---|---|---|
+| `TWREV___________v2.7_FULL.zip` | 36 檔逐檔 md5 與 b477 收容包**全同** | 不重複收容(重收=九頭龍);`via-twrev` 照舊 |
+| `VIA_VRN_UnifiedReportEngine_v0100.py` | 2760 行;檔名×首頁×財務頁三源互證;兩本 parquet 為必選 SSOT;零寫死路徑;零主動連線(`--allow-web-official` 預設關);借用在庫 FirstPageEngine/ENG072 尾版;容器自測 **23/23** | 收容 `functional modules/VRN/references/intake/VIA_VRN_UnifiedReportEngine_v0100_b492/`;規格項 `vrn_unified`(匯流排 `call` 實證 GREEN);格子 v0296 一站;`via-vrnuni`(Register v0193;別名 統一報告) |
+
+`via-vrnuni -SelfTest` 免料;真跑 `via-vrnuni --in <報告夾> --csv --json --duckdb`(未給 `--out` 落 `VIA_Reports\vrn\unified`)。
+它的官方名冊要一份 CSV(`--official-listings`);沒給時台股 canonical ticker 依它自己的律留空,不污染。庫裡的 `tw_listings` 橋成那份 CSV 是 T 項。
+
 ## 二 · C 的答案:VDF 現況(**操作員機器實測,批475 他貼回來的**)
 
 > 批474 這一節原本寫的是容器副本的數字,結論是「`tw_daily_prices` 全樹不存在」。
@@ -382,6 +392,7 @@ GREEN 6 · NODATA 1(`vrn_markdown` 無可轉檔=誠實)· ABSENT 1(`vrn_pdfplus`
 | **I** | VDF SSOT 化 | 庫冊 v0100 + census 對冊比(批478);唯讀審計(批485)。**批489 新知:你的 `vdf_tw_market.duckdb` 不在引擎寫死的 `output_hub/mega/`——冊上該補路徑**,`via-census` 頭幾行會印出來。 |
 | **R** | ENG072 起手 140 秒靜默(GLE 探 7 個 OCR 後端) | 該像加速器一樣把探測結果快取;下一批。 |
 | **S** | 資料家整併第二步:parquet 本體 + duckdb VIEW 管家的匯出/接點(`link`) | 等操作員貼 `via-datahome catalog` 與 `plan`;搬=link、不複製、刪=他的手(批490)。 |
+| **T** | `via-vrnuni` 的官方名冊 CSV:把庫裡 `tw_listings`(MDL142 正典冊)橋成它認的欄名(code/name/yf_ticker/industry) | 小橋;做完 canonical ticker 才會填(批492)。 |
 | ~~J~~ | ~~`vrn_digest` 取價失敗未進計數行~~ | **已改**(批484 v0114「取價缺 n」)。 |
 | ~~K~~ | ~~樞紐同意閘覆寫式代設~~ | **已改**(批478,v0136 setdefault)。 |
 | ~~L~~ | ~~「VERT」是哪個子系統~~ | **已解:VETF**(批477)。 |
@@ -430,6 +441,7 @@ via-datahome link -Relink         # ①a'' 重接死接點(只換接點,資料�
 via-datahome catalog              # ①b 批490:家內清點(C:\Users\tonyk\VIA System\via_database)→ 一頁目錄;把輸出貼回來
 via-datahome plan                 # ①c 倉內散落整併計畫(只列不動)
 via-census                        # ② C:庫況(批490 起家內也掃;預設一本庫一行,逐表加 -Tables)
+via-vrnuni -SelfTest              # ②b 批492:你上傳的統一報告引擎 23 檢(免料)
 via-ryg -Timeout 300              # ③ B:五矩陣紅黃綠燈,有心跳不白畫面,跑完自己跳出來
 via-boot                          # ④ 啟動層實證:每支引擎起跑是否綁上加速器/網路件(同意閘不碰)
 via-vetf                          # ⑤ VETF 持股×Consensus(candidate 沙盒;自動找你的兩本庫)
