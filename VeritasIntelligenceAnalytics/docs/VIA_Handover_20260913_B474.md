@@ -206,7 +206,8 @@ bootstrap 做三件事,全包 try(**絕不能讓引擎起不來**):
 | 484 | `403ad604` | digest v0114 取價缺 n;匯流排 v0113 心跳走 stderr;H 量測結案 |
 | 485 | `06736d7a` | `via-census -Hygiene` 唯讀審計;匯流排登進樞紐 v0137/總控 v0122 |
 | 486 | `a6327d03` | 所有 py 指令走 `Invoke-VIAPython`:20 加速器 + 動態進度條;短令冊 82 處;VdfFetch v0104 |
-| 487 | (本批) | via-boot 卡住根因:啟動層每次載 Celeritas → 改快取優先;PS 點亮不擋 |
+| 487 | `06f8987c` | via-boot 卡住根因:啟動層每次載 Celeritas → 改快取優先;PS 點亮不擋 |
+| 488 | (本批) | via-ryg 參數三修(貼進來的註解/非數字 timeout/家族驗證)+ 兩枚 v0184 起的舊錯 |
 
 **沒動的**:資料本體一筆都沒動(1900 哨兵列、`_repo_` 副本、六張 0 列表——要你點頭);同意閘一個字沒設;孤兒引擎沒刪。
 
@@ -280,6 +281,12 @@ git pull origin claude/via-envmanager-governance-7cls8h
 via-accel          # 產快取:這一次會慢(它真的載 88 件冊)——只需一次
 via-boot           # 之後每個短令起跑都是毫秒級
 ```
+
+
+## 一-o · 批488 · `via-ryg` 參數三修(實錄:`-Timeout 300# 先 Ctrl+C…`)
+
+註解黏在數字後面,PowerShell 把 `300#` 給了 `-Timeout`、把「先」當家族名;包裝一邊丟錯一邊照跑「真跑 先」。修:參數裡出現 `#` → 截掉並提醒「實際採用:…」;`-Timeout` 非正整數誠實停;家族只認 vdf/vrn/vap,亂的只點名亂的那個。
+順帶抓到**自 v0184 起就在**的兩枚:沒給 `-Timeout` 時第一個位置參數永遠被跳過(`via-ryg vrn` 其實一直跑 vrn,vap);`vrn,vap` 被 PowerShell 當陣列傳進來變 "vrn vap"(以前傳給匯流排=沒人認得的家族=全 PLAN)。都修了。
 
 
 ## 二 · C 的答案:VDF 現況(**操作員機器實測,批475 他貼回來的**)
