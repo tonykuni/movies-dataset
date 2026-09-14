@@ -205,7 +205,8 @@ bootstrap 做三件事,全包 try(**絕不能讓引擎起不來**):
 | 483 | `4e03010b` | 啟動層接力被遮的 sitecustomize;via-boot 三家族並行+心跳 |
 | 484 | `403ad604` | digest v0114 取價缺 n;匯流排 v0113 心跳走 stderr;H 量測結案 |
 | 485 | `06736d7a` | `via-census -Hygiene` 唯讀審計;匯流排登進樞紐 v0137/總控 v0122 |
-| 486 | (本批) | 所有 py 指令走 `Invoke-VIAPython`:20 加速器 + 動態進度條;短令冊 82 處;VdfFetch v0104 |
+| 486 | `a6327d03` | 所有 py 指令走 `Invoke-VIAPython`:20 加速器 + 動態進度條;短令冊 82 處;VdfFetch v0104 |
+| 487 | (本批) | via-boot 卡住根因:啟動層每次載 Celeritas → 改快取優先;PS 點亮不擋 |
 
 **沒動的**:資料本體一筆都沒動(1900 哨兵列、`_repo_` 副本、六張 0 列表——要你點頭);同意閘一個字沒設;孤兒引擎沒刪。
 
@@ -263,6 +264,22 @@ bootstrap 做三件事,全包 try(**絕不能讓引擎起不來**):
 自犯錯兩枚記檔:排水把行吞進位置變數(捕捉 0 行);點源行插在 `$VIA` 賦值之前(我的測試預設了 `$VIA` 才沒炸,你機器上 95 個短令會全斷)。兩枚都在推之前實證修掉。
 
 **其餘啟動器**(All/Complete/EnvGovernance/Unstick/FixAll…)還沒接進度條——下一批逐個接;PSRepair/PDFPlumberPlus/AllGreen 本來就有。
+
+
+## 一-n · 批487 · 「via-boot 為何每次動不了」——根因是我的啟動層
+
+**量到的**:容器(只 11 個加速庫)有啟動層的 python 起跑 13→206 ms、拉進 95 個 numpy/pandas/duckdb/pyarrow 模組。批476 我讓每一支 python 起跑都載 Celeritas;你的機器在批384 把 88 件冊全裝進 via_core/via_vdf,所以**每支 python 指令前面都是一大段空白**;批486 的點亮又是**同步**跑完 `--activate` 才畫進度條——所以連條都看不到。兩次卡都是我的啟動層,不是引擎。
+
+**修**:啟動層改**快取優先**——加速的效果其實只是 17 個執行緒預算環境變數,`via-accel --activate` 早就存在 `VIA_Reports/accel_activation/ACCEL_ACTIVATION_*.json`;起跑只套快取(206→59 ms,重套件零載入),永不在啟動層載 Celeritas。PS 點亮:有快取直接畫 20 格零 python;沒快取才**背景**點、最多等 20 秒、逾時誠實說還在背景。
+
+**你現在要做的**(順序重要):
+```powershell
+# Ctrl+C 掉卡住的 via-boot,然後:
+git pull origin claude/via-envmanager-governance-7cls8h
+. (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName
+via-accel          # 產快取:這一次會慢(它真的載 88 件冊)——只需一次
+via-boot           # 之後每個短令起跑都是毫秒級
+```
 
 
 ## 二 · C 的答案:VDF 現況(**操作員機器實測,批475 他貼回來的**)

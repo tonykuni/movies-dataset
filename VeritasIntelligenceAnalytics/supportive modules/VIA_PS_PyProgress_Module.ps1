@@ -24,32 +24,45 @@ function Get-VIAPyProgRoot {
 }
 
 function Show-VIAAccel20 {
-    # 20 加速器點亮(一視窗一次;-Force 重點)。真點=SUP_MDL737 --activate;條=$VIA_ACCEL20 二十格。
+    # 20 加速器點亮(一視窗一次;-Force 重點)。批487 改**快取優先**(操作員實錄:via-boot 每次動不了——
+    # 第一版同步跑 SUP_MDL737 --activate,而那一跑在 88 件冊全裝的機器上會拉進幾十個重套件,進度條要等它回來才畫):
+    #   有快取(VIA_Reports\accel_activation\ACCEL_ACTIVATION_*.json)→ 直接用快取畫 20 格,零 python;
+    #   沒快取 → 背景起 --activate(不擋當前指令),最多等 $env:VIA_ACCEL_LIGHT_SEC(預設 20)秒畫格子,逾時誠實說「還在背景點,先跑」。
     param([switch]$Force)
     if ($env:VIA_ACCEL_LIT -and -not $Force) { return }
     $root = Get-VIAPyProgRoot
-    $m = Get-ChildItem -LiteralPath (Join-Path $root "supportive modules") -Filter "SUP_MDL737_SuperAccelModule_v*.py" -File -ErrorAction SilentlyContinue | Sort-Object Name | Select-Object -Last 1
-    $summary = ""
-    if ($m) {
-        try {
-            $py = if (Get-Command Get-VIAEnvPython -ErrorAction SilentlyContinue) { Get-VIAEnvPython "core" } else { "python" }
-            $o = & $py $m.FullName --activate 2>&1 | Out-String
-            $summary = (($o -split "`r?`n") | Where-Object { $_ -match "lib 冊|Celeritas" } | Select-Object -First 1)
-            if (-not $summary) { $summary = (($o -split "`r?`n") | Where-Object { $_.Trim() } | Select-Object -First 1) }
-        } catch { $summary = "點名例外:" + $_.Exception.Message }
-    } else { $summary = "SUP_MDL737 缺檔(誠實;不影響跑,只是沒加速)" }
+    $cacheDir = Join-Path $root "VIA_Reports\accel_activation"
+    $cache = Get-ChildItem -LiteralPath $cacheDir -Filter "ACCEL_ACTIVATION_*.json" -File -ErrorAction SilentlyContinue | Sort-Object Name | Select-Object -Last 1
     $names = if (Get-Variable -Name VIA_ACCEL20 -Scope Script -ErrorAction SilentlyContinue) { $script:VIA_ACCEL20 } else { $null }
+    $summary = ""; $bg = $null
+    if ($cache -and -not $Force) {
+        try { $j = Get-Content -LiteralPath $cache.FullName -Raw | ConvertFrom-Json; $summary = ("快取 {0}/{1} 庫 · 執行緒預算 {2} · {3}" -f $j.libs_available, $j.libs_total, $j.thread_budget, $cache.Name.Substring(17, 15)) } catch { $summary = "快取讀不了:" + $_.Exception.Message }
+    } else {
+        $m = Get-ChildItem -LiteralPath (Join-Path $root "supportive modules") -Filter "SUP_MDL737_SuperAccelModule_v*.py" -File -ErrorAction SilentlyContinue | Sort-Object Name | Select-Object -Last 1
+        if (-not $m) { $summary = "SUP_MDL737 缺檔(誠實;不影響跑,只是沒加速)" }
+        else {
+            $py = if (Get-Command Get-VIAEnvPython -ErrorAction SilentlyContinue) { Get-VIAEnvPython "core" } else { "python" }
+            try { $bg = Start-Process -FilePath $py -ArgumentList ('"' + $m.FullName + '" --activate') -NoNewWindow -PassThru -RedirectStandardOutput ([IO.Path]::GetTempPath() + "via_accel_bg.out") -RedirectStandardError ([IO.Path]::GetTempPath() + "via_accel_bg.err") } catch { $summary = "背景點名起不來:" + $_.Exception.Message }
+        }
+    }
+    $cap = 20; if ($env:VIA_ACCEL_LIGHT_SEC) { $cap = [int]$env:VIA_ACCEL_LIGHT_SEC }
     if ($names) {
-        $i = 0
+        $i = 0; $t0 = Get-Date
         foreach ($k in $names.Keys) {
             $i++
             Write-Progress -Id 12 -Activity "VIA 20 加速器點亮" -Status ("{0}/20 {1}" -f $k, $names[$k]) -PercentComplete ([int](100 * $i / 20))
-            Start-Sleep -Milliseconds 25
+            # 背景點名時每格最多等 cap/20 秒;快取模式每格 25ms
+            if ($bg) { $wait = [Math]::Max(50, [int](1000 * $cap / 20)); $spent = 0; while (-not $bg.HasExited -and $spent -lt $wait) { Start-Sleep -Milliseconds 50; $spent += 50 } }
+            else { Start-Sleep -Milliseconds 25 }
         }
         Write-Progress -Id 12 -Activity "VIA 20 加速器點亮" -Completed
     }
+    if ($bg) {
+        if ($bg.HasExited) { $summary = "已真點(背景 " + [int]((Get-Date) - $t0).TotalSeconds + "s);下次起跑走快取" }
+        else { $summary = ("還在背景點名(逾 {0}s 不等;不擋你;下次起跑走快取)" -f $cap) }
+    }
     $env:VIA_ACCEL_LIT = "1"
-    Write-Host ("  [加速器] 20 格點亮 · " + ("" + $summary).Trim()) -ForegroundColor DarkCyan
+    Write-Host ("  [加速器] 20 格 · " + ("" + $summary).Trim()) -ForegroundColor DarkCyan
 }
 
 function Invoke-VIAPython {

@@ -10,8 +10,8 @@ VIA 啟動層 bootstrap(批476 立;操作員令「所有 PY 檔案都要加上�
   操作員第 5 條「必要時同功能以最小代價整合」,這就是最小代價。
 
 做什麼(全部包在 try 裡;bootstrap 絕不能讓任何引擎起不來):
-  ① 加速器(所有家族):尾版 SUP_MDL737 → activate(apply_limits=True)
-     → 環境變數 VIA_ACCEL_BOOT = "1:<可用>/<冊總數>" 或 "ABSENT:<原因>"
+  ① 加速器(所有家族):批487 起**快取優先**——套用 via-accel --activate 存下的 17 個執行緒預算環境變數(微秒級),
+     不在啟動層載 Celeritas;VIA_ACCEL_BOOT = "cache:<可用>/<冊>:<n>env" | "NOCACHE:…" | (VIA_ACCEL_FULL=1 時)"1:…"
   ② 網路正典件(VIA_FAMILY=vdf 時;其餘家族不掛):尾版 SUP_MDL740 →
      註冊成 sys.modules["via_net"],引擎可 `import via_net` 用 http_json/http_bytes/yf_download
      → VIA_NET_BOOT = "1" 或 "ABSENT:<原因>"
@@ -43,6 +43,14 @@ def _newest(dirpath, prefix):
     return os.path.join(dirpath, names[-1]) if names else None
 
 
+def _newest_json(dirpath, prefix):
+    try:
+        names = sorted(n for n in os.listdir(dirpath) if n.startswith(prefix) and n.endswith(".json"))
+    except Exception:
+        return None
+    return os.path.join(dirpath, names[-1]) if names else None
+
+
 def _load(path, name):
     import importlib.util
     spec = importlib.util.spec_from_file_location(name, path)
@@ -60,17 +68,35 @@ def _boot():
     root = _via_root()
     fam = (os.environ.get("VIA_FAMILY") or "").lower()
     note = []
-    # ① 加速器
+    # ① 加速器——批487 改**快取優先**(操作員實錄:via-boot 每次動不了)。
+    #   量過:載 Celeritas 一次要拉進 numpy/pandas/duckdb/pyarrow 共 95 個模組,容器(11 個庫)+190ms,
+    #   操作員機器(88 件冊全裝)是每支 python 指令前面一大段空白。加速的**效果**其實只是那 17 個
+    #   執行緒預算環境變數(OMP_NUM_THREADS…),而 `via-accel --activate` 早就把它們存在
+    #   VIA_Reports/accel_activation/ACCEL_ACTIVATION_*.json 的 applied 裡。
+    #   起跑時只套用快取(微秒級),永不在啟動層載 Celeritas;沒快取=誠實標 NOCACHE(跑一次 via-accel 即可);
+    #   VIA_ACCEL_FULL=1 才走舊的完整 activate(給 via-accel 自己或想強制的人)。
     try:
-        p = _newest(os.path.join(root, "supportive modules"), "SUP_MDL737_SuperAccelModule_v")
-        if not p:
-            raise FileNotFoundError("SUP_MDL737_SuperAccelModule_v*.py 缺")
-        acc = _load(p, "via_accel")
-        r = acc.activate(apply_limits=True)
-        if r.get("celeritas"):
-            os.environ["VIA_ACCEL_BOOT"] = f"1:{r.get('libs_available', 0)}/{r.get('libs_total', 0)}"
+        if os.environ.get("VIA_ACCEL_FULL") == "1":
+            p = _newest(os.path.join(root, "supportive modules"), "SUP_MDL737_SuperAccelModule_v")
+            if not p:
+                raise FileNotFoundError("SUP_MDL737_SuperAccelModule_v*.py 缺")
+            acc = _load(p, "via_accel")
+            r = acc.activate(apply_limits=True)
+            os.environ["VIA_ACCEL_BOOT"] = (f"1:{r.get('libs_available', 0)}/{r.get('libs_total', 0)}"
+                                            if r.get("celeritas") else "ABSENT:" + str(r.get("err") or "Celeritas 缺")[:80])
         else:
-            os.environ["VIA_ACCEL_BOOT"] = "ABSENT:" + str(r.get("err") or "Celeritas 缺")[:80]
+            cache = _newest_json(os.path.join(root, "VIA_Reports", "accel_activation"), "ACCEL_ACTIVATION_")
+            if cache:
+                import json
+                with open(cache, "r", encoding="utf-8") as fh:
+                    r = json.load(fh)
+                n = 0
+                for k, v in (r.get("applied") or {}).items():
+                    if isinstance(k, str) and k.isupper() and v is not None and k not in os.environ:
+                        os.environ[k] = str(v); n += 1
+                os.environ["VIA_ACCEL_BOOT"] = f"cache:{r.get('libs_available', 0)}/{r.get('libs_total', 0)}:{n}env"
+            else:
+                os.environ["VIA_ACCEL_BOOT"] = "NOCACHE:跑一次 via-accel 即有快取"
         note.append("加速器 " + os.environ["VIA_ACCEL_BOOT"])
     except Exception as exc:
         os.environ["VIA_ACCEL_BOOT"] = f"ABSENT:{type(exc).__name__}:{str(exc)[:60]}"
