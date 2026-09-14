@@ -1,0 +1,21 @@
+{
+ "schema": "VIA.DataHome.SSOT.v1",
+ "declared_by": "操作員 2026-09-14「data save in parquet and managed by duckdb. this is database file: C:\\Users\\tonyk\\VIA System\\via_database — integrate and consolidate into database storage structure which saving the largest token when fetching and testing」",
+ "home_win": "C:\\Users\\tonyk\\VIA System\\via_database",
+ "home_posix": null,
+ "precedence": ["--home", "env VIA_DATA_HOME", "VLL local_paths.json data_home", "本冊 home_win", "data/WHERE_IS_DATA.md(舊指標)", "預設"],
+ "legacy_homes": ["C:\\Users\\tonyk\\Github\\movies-dataset\\data"],
+ "layout_contract": {
+  "body": "parquet = 資料本體(zstd;一表一夾或一檔;可按年分片 part-YYYY.parquet 便於增量;零複製掃描)",
+  "manager": "duckdb = 管家(表 = VIEW over read_parquet,或整本 .duckdb 原樣保留;只增不減)",
+  "catalog": "VIA_Reports/datahome/DATAHOME_CATALOG_latest.json = 一頁目錄(庫名→路徑;表/湖→列數·日期範圍·更新時);測試與抓取只讀這一頁,不掃湖",
+  "resolution": "按名找,不寫死路徑:啟動層把目錄放進 env(VIA_DATA_HOME / VIA_DB_<庫名大寫>);引擎先看 env,再看家,最後才是舊寫死路徑"
+ },
+ "token_saving_rules": [
+  "census 預設 --brief:一本庫一行(表數·總列·最新日·三態計),逐表只在 --tables 才印",
+  "抓取引擎讀目錄頁的 hi(最新日)決定增量起點,不重抓已抓過的",
+  "自測/矩陣讀目錄頁判庫況,不逐表 COUNT(*)",
+  "沙盒產出(engine_bus/_cwd、selftest_grid、vdfout_runs/selftest_out、_self_test)永不算正庫"
+ ],
+ "note": "本冊只宣告「家在哪、長什麼樣」;搬資料/接點/刪副本一律操作員的手(via-datahome link / plan 只列不動)"
+}

@@ -12,6 +12,7 @@ VIA 啟動層 bootstrap(批476 立;操作員令「所有 PY 檔案都要加上�
 做什麼(全部包在 try 裡;bootstrap 絕不能讓任何引擎起不來):
   ① 加速器(所有家族):批487 起**快取優先**——套用 via-accel --activate 存下的 17 個執行緒預算環境變數(微秒級),
      不在啟動層載 Celeritas;VIA_ACCEL_BOOT = "cache:<可用>/<冊>:<n>env" | "NOCACHE:…" | (VIA_ACCEL_FULL=1 時)"1:…"
+  ③ 資料家(批490):目錄頁/MDL123 → env VIA_DATA_HOME、VIA_DB_<庫名>(引擎按名取路徑;家不在=誠實不設)
   ② 網路正典件(VIA_FAMILY=vdf 時;其餘家族不掛):尾版 SUP_MDL740 →
      註冊成 sys.modules["via_net"],引擎可 `import via_net` 用 http_json/http_bytes/yf_download
      → VIA_NET_BOOT = "1" 或 "ABSENT:<原因>"
@@ -114,6 +115,40 @@ def _boot():
         except Exception as exc:
             os.environ["VIA_NET_BOOT"] = f"ABSENT:{type(exc).__name__}:{str(exc)[:60]}"
             note.append("網路正典件 " + os.environ["VIA_NET_BOOT"])
+    # ③ 資料家(批490 操作員宣告 C:\\Users\\tonyk\\VIA System\\via_database):把「庫在哪」放進 env,引擎按名取路徑,不寫死。
+    #   快取優先:目錄頁 VIA_Reports/datahome/DATAHOME_CATALOG_latest.json(via-datahome catalog 產)→ VIA_DATA_HOME + VIA_DB_<庫名大寫>;
+    #   沒目錄頁才載 MDL123 尾版 resolve_home()(純標準庫,毫秒級);家不在=誠實標缺,不設。已設者一律尊重。
+    try:
+        if not os.environ.get("VIA_DATA_HOME"):
+            import json
+            cat = os.path.join(root, "VIA_Reports", "datahome", "DATAHOME_CATALOG_latest.json")
+            home, how, n = None, "", 0
+            if os.path.isfile(cat):
+                with open(cat, "r", encoding="utf-8") as fh:
+                    j = json.load(fh)
+                if j.get("home") and os.path.exists(j["home"]):
+                    home, how = j["home"], "目錄頁"
+                    for name, path in (j.get("by_name") or {}).items():
+                        k = "VIA_DB_" + "".join(ch if ch.isalnum() else "_" for ch in os.path.splitext(name)[0]).upper()
+                        if os.path.exists(path) and k not in os.environ:
+                            os.environ[k] = str(path); n += 1
+            if home is None:
+                p = _newest(os.path.join(root, "supportive modules", "registry"), "CGC_MDL123_DataHome_v")
+                if p:
+                    h, src = _load(p, "via_datahome").resolve_home()
+                    if os.path.exists(str(h)):
+                        home, how = str(h), "MDL123 " + str(src)
+                    else:
+                        os.environ["VIA_DATAHOME_BOOT"] = f"ABSENT:{h}({src})"
+            if home is not None:
+                os.environ["VIA_DATA_HOME"] = home
+                os.environ["VIA_DATAHOME_BOOT"] = f"{how}:{home}:{n}庫"
+        else:
+            os.environ.setdefault("VIA_DATAHOME_BOOT", "env:" + os.environ["VIA_DATA_HOME"])
+        note.append("資料家 " + os.environ.get("VIA_DATAHOME_BOOT", "缺"))
+    except Exception as exc:
+        os.environ["VIA_DATAHOME_BOOT"] = f"ABSENT:{type(exc).__name__}:{str(exc)[:60]}"
+        note.append("資料家 " + os.environ["VIA_DATAHOME_BOOT"])
     if os.environ.get("VIA_BOOT_VERBOSE") == "1":
         sys.stderr.write("  [VIA boot] " + " · ".join(note) + "\n")
 
