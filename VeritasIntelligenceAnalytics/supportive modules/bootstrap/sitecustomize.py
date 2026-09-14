@@ -13,6 +13,7 @@ VIA 啟動層 bootstrap(批476 立;操作員令「所有 PY 檔案都要加上�
   ① 加速器(所有家族):批487 起**快取優先**——套用 via-accel --activate 存下的 17 個執行緒預算環境變數(微秒級),
      不在啟動層載 Celeritas;VIA_ACCEL_BOOT = "cache:<可用>/<冊>:<n>env" | "NOCACHE:…" | (VIA_ACCEL_FULL=1 時)"1:…"
   ③ 資料家(批490):目錄頁/MDL123 → env VIA_DATA_HOME、VIA_DB_<庫名>(引擎按名取路徑;家不在=誠實不設)
+  ④ 正典工具本名掛載(批494):VeritasCeleritas / VeritasAegisNexus 惰性代理進 sys.modules;VIA_TOOLS_MOUNT 存證
   ② 網路正典件(VIA_FAMILY=vdf 時;其餘家族不掛):尾版 SUP_MDL740 →
      註冊成 sys.modules["via_net"],引擎可 `import via_net` 用 http_json/http_bytes/yf_download
      → VIA_NET_BOOT = "1" 或 "ABSENT:<原因>"
@@ -59,6 +60,49 @@ def _load(path, name):
     sys.modules[name] = mod
     spec.loader.exec_module(mod)
     return mod
+
+
+import types as _types
+
+
+class _LazyTool(_types.ModuleType):
+    """正典工具的惰性掛載代理(批494):掛在 sys.modules 本名下,第一次取屬性才把真檔載入並換成真模組。"""
+
+    def __init__(self, name, path):
+        super().__init__(name)
+        self.__dict__["_via_path"] = path
+        self.__dict__["_via_real"] = None
+        self.__dict__["__file__"] = path
+
+    def _via_load(self):
+        real = self.__dict__["_via_real"]
+        if real is None:
+            import importlib.util
+            spec = importlib.util.spec_from_file_location(self.__name__, self.__dict__["_via_path"])
+            real = importlib.util.module_from_spec(spec)
+            sys.modules[self.__name__] = real          # dataclass 於 3.11+ 必查 sys.modules[__module__]
+            try:
+                spec.loader.exec_module(real)
+            except Exception:
+                sys.modules[self.__name__] = self      # 載入失敗=代理留著,誠實丟例外給呼叫端
+                raise
+            self.__dict__["_via_real"] = real
+        return real
+
+    #: 只有這幾個 import/反射機關會探的名字不觸發載入;__version__/__all__ 這類真屬性照常載入後回答
+    _NO_LOAD = frozenset({"__path__", "__wrapped__", "__signature__", "__func__", "__self__", "__origin__",
+                          "__args__", "__parameters__", "__mro_entries__", "__class_getitem__", "__getstate__"})
+
+    def __getattr__(self, item):
+        if item in self._NO_LOAD:
+            raise AttributeError(item)
+        return getattr(self._via_load(), item)
+
+    def __dir__(self):
+        try:
+            return dir(self._via_load())
+        except Exception:
+            return []
 
 
 def _boot():
@@ -149,6 +193,31 @@ def _boot():
     except Exception as exc:
         os.environ["VIA_DATAHOME_BOOT"] = f"ABSENT:{type(exc).__name__}:{str(exc)[:60]}"
         note.append("資料家 " + os.environ["VIA_DATAHOME_BOOT"])
+    # ④ 兩件正典工具**以本名掛載**(批494 操作員令「未經過我同意…這兩個是我指令唯一的加速器及網路工具,重新掛載」):
+    #   批487 為解 via-boot 卡住,把啟動層改成只套快取不載 Celeritas——那等於沒經同意把加速器從每個行程卸下。
+    #   現在每個行程都把 VeritasCeleritas / VeritasAegisNexus 掛進 sys.modules(惰性代理:首次取屬性才真載入,
+    #   起跑零等待;`import VeritasCeleritas` 在任何 VIA 行程都直接可用);VIA_ACCEL_FULL=1 仍是起跑就真點亮。
+    #   正典路徑同 SUP_MDL737 CEL_CANDIDATES / SUP_MDL740 AEGIS 正典序;橋(737/740)留作橋,工具只認這兩件。
+    try:
+        mounted = []
+        for name, rels in (("VeritasCeleritas", ("supportive modules/VeritasCeleritas.py",
+                                                 "supportive modules/50_Protection_Acceleration/VeritasCeleritas.py",
+                                                 "supportive modules/accelerator/VeritasCeleritas.py")),
+                           ("VeritasAegisNexus", ("supportive modules/network/VeritasAegisNexus.py",
+                                                  "supportive modules/VeritasAegisNexus.py"))):
+            real = sys.modules.get(name)
+            if real is not None and not isinstance(real, _LazyTool):
+                mounted.append(f"{name}=loaded"); continue
+            path = next((os.path.join(root, r) for r in rels if os.path.isfile(os.path.join(root, r))), None)
+            if not path:
+                mounted.append(f"{name}=ABSENT"); continue
+            if real is None:
+                sys.modules[name] = _LazyTool(name, path)
+            mounted.append(f"{name}=lazy:{path}")
+        os.environ["VIA_TOOLS_MOUNT"] = ";".join(mounted)
+        note.append("正典工具 " + " · ".join(m.split("=")[0] + "(" + m.split("=")[1].split(":")[0] + ")" for m in mounted))
+    except Exception as exc:
+        os.environ["VIA_TOOLS_MOUNT"] = f"ABSENT:{type(exc).__name__}:{str(exc)[:60]}"
     if os.environ.get("VIA_BOOT_VERBOSE") == "1":
         sys.stderr.write("  [VIA boot] " + " · ".join(note) + "\n")
 

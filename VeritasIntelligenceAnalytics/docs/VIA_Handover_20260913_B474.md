@@ -357,6 +357,53 @@ via-boot           # 之後每個短令起跑都是毫秒級
 短令:`via-vrnlogic`(status / reset-backends / -SelfTest;別名 邏輯庫)、`via-firstpage [-Force] [-OcrBudget N] [--in …]`(別名 首頁擷取)。
 仍是你的手:tesseract 的 `chi_tra` 語言包、easyocr 模型下載(要網路同意)、paddleocr 本體;`via-vrnlogic status` 會列出每支後端的 BROKEN 因由。
 
+## 一-u · 批494 · 你說「未經過我同意…這兩個是我指令唯一的加速器及網路工具,重新掛載」
+
+你上傳的 `VeritasCeleritas.py` / `VeritasAegisNexus.py` 與庫內正典逐字相同(只差 CRLF),問題不在檔案,在掛載:批487 我為了解「via-boot 每次動不了」把啟動層改成只套快取、不載 Celeritas,那等於沒經你同意把加速器從每個行程卸下。認錯。
+
+| 改 | 怎麼驗 |
+|---|---|
+| 啟動層 ④:每個 VIA 行程把 `VeritasCeleritas`、`VeritasAegisNexus` 以**本名**掛進 `sys.modules`(惰性代理:`import` 零成本,第一次用才真載入;`VIA_ACCEL_FULL=1` 仍是起跑就真點亮) | 容器實測:import 0 ms、numpy 未載;取 `__version__` 後真載入 134 ms、值 1.0.0 |
+| `via-boot` 每家族多印「工具:Celeritas(lazy);AegisNexus(lazy)」;`VIA_TOOLS_MOUNT` 記名與路徑 | 匯流排 v0120 ㊶ 檢;四十一檢 41/41 |
+
+橋(SUP_MDL737 / SUP_MDL740)留作橋;加速器與網路工具只認這兩件。
+
+## 一-v · 批495 · 「透過 envmanager 安全地導入全部工具」
+
+環境衝突的真面目(從你的實錄量出來的):
+- **半拆件**:`via_vap_312` 的 pyarrow 是命名空間包(有夾無 `__init__.py`)→ force-reinstall。
+- **境配錯**:Baseline `families.ocr` 把 OCR 生態定在 `via_paddle_311` 專屬境,而 ENG072 的 OCR 車道在 `via_vrn_312` 行程內 import,兩件同時成立=後端永遠「不在位」。
+- **外部本體**:Tesseract-OCR 本體與 `chi_tra` 語言包、easyocr 模型下載,pip 管不到。
+
+| 件 | 做什麼 | 驗 |
+|---|---|---|
+| `VIA_ToolRoster_SSOT_v0100.json` | 工具冊:四境逐件 pip/import/健康判準/外部令;不列版本鎖 | MDL135 ㉜ |
+| `CGC_MDL135_EnvGovernance_v0101` `tools` | 逐境探針(OK/ABSENT/BROKEN/CONFLICT/EXTERNAL/NEEDS_MODELS/ENV_ABSENT)→ 段 REPAIR→INSTALL→VERIFY;plan 唯讀寫 `TOOLS_PLAN_latest.json/.ps1`;`--apply --approve` 才裝;同意閘未開=零動作不代設;裝前 freeze 存證 | 三十四檢 34/34;容器假境根實跑 4 境 9 段 |
+| `SUP_MDL747_OcrLaneRunner_v0100` | 在 OCR 境跑同一條 GLE 編排器,JSON 回主行程 | 三檢 |
+| `VRN_ENG072_FirstPageText_v0118` | 本境缺這一階後端 → 派到 `via_paddle_311` 跑;境不在=誠實指路 `via-envtools` | 三十三檢 32/33(⑤ 容器夾況舊紅) |
+| Register v0195 `via-envtools [-Apply] [-Approve] [-Env 境]`(別名 工具導入);格子 v0298 | | pwsh 解析 0 錯 |
+
+## 一-w · 批496 · 你的次序修正令:非 OCR 先 → 驗證失敗才 OCR(輕→重)→ 都失敗才拉 DPI 300~350
+
+| v0118 差在哪 | v0119 改成 |
+|---|---|
+| 密度閘判 SCANNED 就整條分區道不走,非 OCR 沒先跑 | 非 OCR **一律先跑**(fitz×pdfplumber → 修復 → 驗證);本文 < 40 字或兩法 DISAGREE 才算失敗轉 OCR;PARTIAL 只是標示未還原=不 OCR |
+| 批493 我加的「剩餘預算 ≥45 秒才升第三階」把畫質提升幾乎關掉 | 第三階**自有預算**(`hq_budget_s` 120 秒),只要第二階「跑了但零字」就一定升 |
+| DPI 帶沒釘死 | MDL001 auto_dpi 結果夾進 300~350;缺 MDL001 退 350 |
+
+律冊 `VRN_ExtractionLogic_SSOT_v0100.json` 的 `order` 已改成四步;`VRN_ENG082_ExtractionLogic_v0101`(十三檢)、`VRN_ENG072_FirstPageText_v0119`(三十五檢,容器 34/35)。
+
+## 一-x · 批497 · 「中高風險拉出獨立境;numpy 這種可多境多版本多 Python;加速器與網路工具請勿遺漏」
+
+| 律 | 落在哪 | 驗 |
+|---|---|---|
+| 中高風險件拉出獨立境,相關工具一起隔離 | Baseline 家族 target_env 尾 `_H`(deep_learning/browser/gis/compilers/stealth_proxy)=HIGH、`_M`=MEDIUM;`via-envtools` 把它們排到各自的隔離境(缺境→ENSURE_ENV) | MDL135 ㉟ |
+| numpy 等樞紐件可多環境多版本多 Python | Baseline hydra +**H2b**:跨獨立境多版本=設計允許,同境內多版(H1 遮蔽)才是病;`via-envtools` 印 `[樞紐] 境×版本` 只作 INFO | MDL135 ㊱ |
+| 加速器/網路工具裡的工具請勿遺漏 | `tools` 預設**全冊聯集**:手寫冊 ∪ Celeritas `_LIB_MAP`(經 MDL142,100+ 件)∪ AegisNexus 相依;`--sheet-only` 只看手寫冊 | MDL135 三十六檢 36/36 |
+| 你的實錄:候 OCR 8 件全是舊跑的 FAIL_HIT | `via-firstpage -RetryFailed` 只重試 FAIL 件(忽略 TTL),44 件命中不重抽 | ENG072 v0120 ㊱ |
+
+`via-envtools` not recognized:那個視窗還沒 pull 到批495(畫面上匯流排 v0119、ENG072 v0117),先 `git pull` 再點源。
+
 ## 二 · C 的答案:VDF 現況(**操作員機器實測,批475 他貼回來的**)
 
 > 批474 這一節原本寫的是容器副本的數字,結論是「`tw_daily_prices` 全樹不存在」。
@@ -459,6 +506,10 @@ via-census                        # ② C:庫況(批490 起家內也掃;預設�
 via-vrnuni -SelfTest              # ②b 批492:你上傳的統一報告引擎 23 檢(免料)
 via-vrnlogic -SelfTest            # ②c 批493:擷取中央邏輯庫十二檢
 via-vrnlogic                      # ②d 邏輯庫現況(件數/法/後端健康)
+via-boot                          # ②e 批494:每家族應印「工具:Celeritas(lazy);AegisNexus(lazy)」
+via-envtools                      # ②f 批495:工具冊導入計畫(唯讀);貼回來
+via-firstpage -RetryFailed        # ②g 批497:只重試上次 FAIL 的件(新次序)
+# $env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve   # 你決定要裝時才跑(裝前 freeze 存證)
 via-ryg -Timeout 300              # ③ B:五矩陣紅黃綠燈,有心跳不白畫面,跑完自己跳出來
 via-boot                          # ④ 啟動層實證:每支引擎起跑是否綁上加速器/網路件(同意閘不碰)
 via-vetf                          # ⑤ VETF 持股×Consensus(candidate 沙盒;自動找你的兩本庫)
