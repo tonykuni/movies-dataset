@@ -154,6 +154,83 @@ bootstrap 做三件事,全包 try(**絕不能讓引擎起不來**):
 **排隊(下一批)**:7 支直呼網路的 VDF 引擎逐支改走 `via_net`(各一個新版本檔);Grid 站登錄(格子檔太大,省 token 先延)。
 
 
+## 一-c · 批477 · VETF 收尾 + TWREV v2.7 + 討論重建包(操作員睡覺期間,核准自主完成)
+
+**「VERT」= VETF**(上傳的封印包名字就是答案)。四包先查再造:VETF 封印包 125/126 已在庫(b242)、NLP v1.8.0 68/68 已在庫(批421)→ **兩包不重收**;TWREV v2.7 對樹上舊版 14 檔全不同=真升版;討論重建包 0/20 在庫。
+
+| 件 | 做了什麼 | 證據 |
+|---|---|---|
+| VETF | adapter 16 檢通過卻**從沒登錄**(冊 0、短令 0)→ 登 `vdf_vetf_consensus` + `via-vetf`(別名 `共識擴充`) | 合成長表真跑:Forward P/E 2330=1100/55=**20.0** 對;EPS=0 留空=fail-closed;覆蓋 factset_eps_n1 100% |
+| TWREV v2.7 | 收容 `VDF/references/intake/TWREV_v2.7_FULL_b477`;登 `vdf_twrev` + `via-twrev`(別名 `月營收`) | selftest 全部通過;demo 真突破 27/候選 468;匯流排 GREEN 2.67s |
+| 討論重建包 | ≤1MB 治理件 13 檔入 VRN 收容夾;>1MB 衍生 JSON 7 檔(76.8MB)**只記 sha256 不進 git** | `MANIFEST_intake_b477.json` |
+| 匯流排 v0110 | **第十盞判錯的燈**:套件內模組當檔案跑的 ImportError 被判「缺件」→ 冊上 `module`(-m 啟動)+ `cwd: engine`(讀 cwd 的引擎)+ classify_stop 守衛 | 三十一檢 31/31 |
+
+**via-twrev 的工作家**:引擎全靠相對路徑(`data/ output/ logs/`),所以首跑把 `config.yaml + data/` 種進 `VIA_Reports\twrev`,碼仍從收容夾 import(一份碼);`fetch/run` 觸 MOPS **只看同意閘,不代設**。demo 曾覆寫封裝內 3 個資料檔→自 zip 還原後才入庫。
+
+
+## 一-d · 批478 · VDF SSOT 化第一步:庫冊 + 庫況對冊比 + K 項
+
+- **庫冊** `supportive modules/registry/VIA_DB_Table_SSOT_v0100.json`:49 張表(來源=你機器的 census 實測 + 引擎碼寫入者掃描,20 張表有寫入者)。冊上明寫:列數/日期是**觀測值不是保證值**,`min_rows` 才是判準;三本正庫;`_repo_` 是副本;`tw_daily_prices` 標 1900 哨兵列;`known_legacy_absent` 12 張。
+- **匯流排 v0111**:census **冊優先**——冊上宣告而庫裡沒有 → `ABSENT(冊上宣告)` 並列寫入者(該有而沒有,最該亮的一種);冊外 SQL 語境 ≥3 檔 → `ABSENT(冊外)`;庫裡有冊上沒有 → 加註「冊外」提醒冊該補。矩陣五多一欄「冊」。三十二檢 32/32。
+- **K 項已改**(你核准全線):樞紐 v0136 同意閘由覆寫改 `setdefault`——沒設才補、設了一律尊重;既有流程零行為變更。
+
+
+## 一-e · 批479 · M 項:VDF 直呼網路的引擎改走正典網路件優先
+
+**先量再改**:七支直呼網路的 VDF 引擎裡,**有人調度的只有兩支**——`ENG047`(冊 `macro_detail`)與 `ENG051`(樞紐任務)。
+`ENG049 / ENG050 / MDL002 / MDL003 / MDL007` 被 0 支引擎 import、被 0 處調度=**真孤兒**(先前「被 30 檔引用」全是提及,不是依賴)。孤兒不動刀:只增不減,動了也沒人跑。
+
+| 引擎 | 新版 | 改法 | 驗 |
+|---|---|---|---|
+| ENG047 | `_v0101` | `_http_get_json` 先走 `via_net.http_json`,不在位才退回 urllib(零回歸);DENY 照停不代設閘 | 八檢 8/8;經啟動層 `--fetch` 閘未開 → FAIL-CLOSED 零外呼 |
+| ENG051 | `_v0101` | 本檔唯一對外呼叫點 `def_http_get_text` 先走 `via_net.http_text`,非 OK 丟 `RequestException` 讓既有 except 接手 | 原本就無 selftest → py_compile + 單一 seam |
+
+冊/樞紐的 glob 都是 `*.py` 萬用,尾版律自動解析到 `_v0101`(匯流排 catalog 實證)。VDF 引擎走正典優先數:0 → 2(活著的兩支全部)。
+
+
+## 一-f · 批480 · F 項:正本頁保護(MDL138 v0101)+ 第五個啟動器接啟動層
+
+無資料環境跑 `via-famui`,產生器會把你的正本 UI 頁改寫成一格格「缺(誠實)」——本工作階段我人工 `git checkout` 還原 **5 次**。守則寫進 `run_item`:只對正本頁,跑前快照;跑後若新頁占位格 ≥3 且比舊頁多=資料缺席的再生 → **還原舊頁,並寫進紀錄 `guard` 欄**(不是靜靜還原),態走 DATA 不假綠。真資料再生照常覆寫。專測兩案皆對;八檢 8/8。同版把 MDL138 接上啟動層(產生器子行程綁加速器)。
+
+## 一-g · 你睡覺期間推了什麼(一眼看完)
+
+| 批 | commit | 一句話 |
+|---|---|---|
+| 477 | `54ecf4a4` | VETF 登錄+真跑實證;TWREV v2.7 收容+自測綠;討論重建包收容;匯流排第十盞燈(-m 啟動 / cwd) |
+| 478 | `37b5b60b` | 庫冊 `VIA_DB_Table_SSOT_v0100`;census 對冊比;樞紐同意閘改 setdefault(K) |
+| 479 | `d286f101` | ENG047/ENG051 v0101 走正典網路件優先(M);孤兒五支只記不動 |
+| 480 | `d11a0718` | 正本頁保護(F);MDL138 接啟動層 |
+| 481 | `1a502f9e` | 兩專案授權使用:ENG051 v0102(v1.1.0 綁上)+ 月營收跨族群相位 v030 收容登冊 |
+| 482 | `2525efd0` | 自測格子 v0295 +三站;格子接啟動層;新短令 0 死路 |
+| 483 | (本批) | 啟動層接力被遮的 sitecustomize;via-boot 三家族並行+心跳 |
+
+**沒動的**:資料本體一筆都沒動(1900 哨兵列、`_repo_` 副本、六張 0 列表——要你點頭);同意閘一個字沒設;孤兒引擎沒刪。
+
+
+## 一-h · 批481 · 「另外兩個專案有沒有授權使用?授權使用」
+
+| 專案 | 先查 | 造 |
+|---|---|---|
+| 主動 ETF 每日持股引擎 v1.1.0 | 早在庫(位元相同),**但活著的 ENG051 是它的舊版**(29 個 def 對 46 個) | `ENG051_v0102` = v1.1.0 + 去硬寫根(`~/Downloads/…` → 自 `VIA_ROOT` 推到 `output_hub/active_tw_etf`)+ `via_net` 優先;27/27;樞紐 glob 尾版律自動接上 |
+| 月營收 × 產業 × 族群 相位/領先落後 v030 | **從沒收過**(只在 b305 整理清單出現過);樹上無重複件 | 收容 `…/VDF_TW_MonthlyRevenue_CrossGroupPhase_v030_b481`;8/8;`--self-test` 真跑;冊 `vdf_revphase` 匯流排 GREEN |
+
+短令:`via-revphase`(別名 `營收相位`;自你的庫匯出 CSV 再餵引擎;`-SelfTest`)、`via-etfhold`(別名 `持股日更`;`-SelfTest` 不碰正庫;日更觸網只看同意閘)。
+兩支引擎本體都沒有授權條款檔——「授權」= 你親口,已記台帳 1016。
+
+
+## 一-i · 批482 · 功能註冊只增不減:自測格子 v0295
+
+**先量再登**:這幾批新版的 MDL148/138/137/095、ENG047/051/078 在格子裡**本來就有站**,且全用 `newest()` 動態解析尾版 → 已自動跑到新版,不重登(重登=九頭龍)。真的沒站的只有三支 → 登了:VETF adapter 16 檢、月營收相位 v030 8 檢、TWREV v2.7 selftest(pycode 站,`-m` 啟動;第十盞燈那一課)。`--only` 重跑 4 站 OK 4。
+格子執行器接啟動層(第六個啟動器),且把 ENG051 自測根指到 `VIA_Reports/selftest_grid/`,不寫進原始碼樹。
+死路掃描:本工作階段新登的十個短令 **0 死路**;YELLOW 162 條是既有債(多為台帳 JSON 內提及的舊令名),沒動。
+
+
+## 一-j · 批483 · 自審兩修
+
+- **啟動層接力**:`sitecustomize` 靠 PYTHONPATH 前置生效,會遮住發行版自帶的 sitecustomize(Debian 的 apport 掛鉤就在那)。改成 `_boot()` 之後找 sys.path 上**下一個**同名檔,找到就接力執行、記 `VIA_BOOT_CHAINED`。實證:被遮的也跑了。
+- **`via-boot` 不再「還在跑」**:原本三家族逐一探測、各 120 秒、零輸出;v0112 改三家族並行 + 每 20 秒心跳 + 總上限 150 秒,逾時的家族誠實印「探測逾時」。容器 0.3 秒;三十三檢 33/33。
+
+
 ## 二 · C 的答案:VDF 現況(**操作員機器實測,批475 他貼回來的**)
 
 > 批474 這一節原本寫的是容器副本的數字,結論是「`tw_daily_prices` 全樹不存在」。
@@ -199,13 +276,16 @@ GREEN 6 · NODATA 1(`vrn_markdown` 無可轉檔=誠實)· ABSENT 1(`vrn_pdfplus`
 | **A** | 姊妹倉 `tonykuni/VIA-VDF-VRN` 同步 | **工具層權限**。操作員在聊天裡授權過三次,但 `add_repo` 被自動模式的權限分類器擋下。聊天授權 ≠ 工具授權,我繞不過去。 |
 | **D** | 批416 F2 逐家投信 PCF 端點查實 | 需網路 + 同意閘。**同意閘一律由操作員自己設,我不代設。** |
 | ~~E~~ | ~~`tw_daily_prices` 名稱歸位~~ | **撤銷**:操作員機器上該表 2,128,169 列,在。批474 從容器副本得出的結論不成立。 |
-| **F** | 正本頁再生閘 | 在無資料環境跑 `via-famui`,會把操作員的正本 UI 頁改寫成「缺(誠實)」。本工作階段手動 `git checkout --` 復原 **5** 次。MDL138 應該自己擋住這件事,現在沒擋。 |
-| **G** | VRN_MDL 數量 | 操作員總表寫 300,實掃 **294**。差 6 支,還沒逐支列出是哪 6 支。 |
-| **I** | VDF SSOT 化:庫冊(哪本庫/哪張表/誰寫/最少幾列/正本是哪本) | 第二節四件事是輸入。下一批。 |
+| ~~F~~ | ~~正本頁再生閘~~ | **已擋**(批480 MDL138 v0101 正本頁保護)。 |
+| **G** | VRN_MDL 數量 | 300 vs 294 的差取決於計數範圍(排除 references/_superseded 只數到 20 個唯一編號)——要用同一把尺再量,先記不判。 |
+| **I** | VDF SSOT 化 | **第一步已做**(批478 庫冊 v0100 + census 對冊比)。餘:1900 哨兵列清理、`_repo_` 副本裁決、六張 0 列表——要你點頭才動資料。 |
 | **J** | `vrn_digest` 取價失敗未進計數行 | 待改;不是假綠但不夠誠實。 |
-| **K** | 樞紐 `_launch_locked` 對 net 項目**覆寫式**設 `VIA_NET_CONSENT/VIA_SCRAPE_CONSENT="YES"` | 批408 從六個短令拔掉的那種代設;且 "YES" 過不了閘二 token 檢查。本批只記不動,等明令。 |
-| **L** | 「VERT」是哪個子系統 | 樹上不存在(命中全是 `Converter` 子字串)。**要問操作員。** |
-| **M** | 7 支直呼網路的 VDF 引擎改走 `via_net` | 逐支新版本檔;bootstrap 已把 `via_net` 送到門口。 |
+| ~~K~~ | ~~樞紐同意閘覆寫式代設~~ | **已改**(批478,v0136 setdefault)。 |
+| ~~L~~ | ~~「VERT」是哪個子系統~~ | **已解:VETF**(批477)。 |
+| **N** | TWREV `fetch` 直呼 MOPS(requests;無 VIA 同意閘) | `via-twrev` 在外層擋(閘沒開=誠實停);引擎本體改走 `via_net` 是逐支工作,併入 M 佇列。 |
+| **O** | VETF React 網站原始碼(63 tsx)未建置 | 需 node/npm;Standalone HTML 已可直接開。非本批範圍。 |
+| **P** | `vdf_tw_market_repo_a7752b3` / `vdf_global_market_repo_ae7…` 兩本 `_repo_` 副本庫與正庫並存 | 庫層級三副本病;哪本是正本要有冊講(併入 I)。 |
+| ~~M~~ | ~~7 支直呼網路的 VDF 引擎改走 `via_net`~~ | **活著的兩支已改**(批479);其餘五支是孤兒(0 import、0 調度),只記不動。 |
 | **H** | 11 支引擎仍綁舊 `tw_listings`(891) | 而 `tw_listings_industry` 有 1,978。**`VDF_ENG052`/`ENG081` 是寫入端,不可一律轉換。** |
 
 ---
@@ -244,4 +324,9 @@ git pull origin claude/via-envmanager-governance-7cls8h
 via-census                        # ② C:你那台機器的庫況真相(唯讀)
 via-ryg -Timeout 300              # ③ B:五矩陣紅黃綠燈,有心跳不白畫面,跑完自己跳出來
 via-boot                          # ④ 啟動層實證:每支引擎起跑是否綁上加速器/網路件(同意閘不碰)
+via-vetf                          # ⑤ VETF 持股×Consensus(candidate 沙盒;自動找你的兩本庫)
+via-twrev demo                    # ⑥ 月營收 v2.7 免網路跑通;via-twrev fetch 要你自己開閘
+via-famui all                     # ⑦ 家族頁再生(現在有正本頁保護,無資料時不會再把正本改成「缺」)
+via-revphase -SelfTest            # ⑧ 月營收相位 v030 合成自測;去掉 -SelfTest 就讀你的庫真跑
+via-etfhold -SelfTest             # ⑨ 主動 ETF 持股引擎 v1.1.0 27 檢(不碰正庫)
 ```

@@ -1,0 +1,80 @@
+# ==========================================================================
+#  台股月營收動能引擎  設定檔
+# ==========================================================================
+
+fetch:
+  markets: [sii, otc]              # sii=上市(TWSE), otc=上櫃(TPEX)
+  registrations: [0, 1]            # 0=國內公司, 1=國外KY公司
+  months_back: 36                  # 分析視窗 (歷史仍完整保留於 parquet)
+  request_delay_sec: 5             # MOPS 速率限制, 建議 >= 3
+  timeout_sec: 30
+  retries: 3
+  base_hosts:
+    - https://mops.twse.com.tw
+    - https://mopsov.twse.com.tw
+  user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+  cache_dir: data/raw_cache
+  raw_out: data/monthly_revenue.csv
+  # 股票代號規則: 四碼數字, 第一碼不可為零 (排除 00xx ETF / 6碼 TDR 權證)
+  stock_id_regex: "^[1-9][0-9]{3}$"
+
+# ---- 累計增量資料庫 ----
+# parquet 為 SSOT (歷史只增不減, 主鍵 stock_id+year+month 去重)
+# duckdb 為 SQL 查詢層, 每次更新後自 parquet 重建。duckdb_path 留空可停用。
+storage:
+  parquet_path: data/revenue.parquet
+  duckdb_path: data/revenue.duckdb
+
+analyze:
+  # ---- Layer 1: 累計 YoY (主判準) ----
+  cum_yoy_strong: 10.0
+  cum_yoy_decline_months: 3
+  # ---- Layer 2: 多月 YoY 趨勢 ----
+  trend_window: 6
+  min_positive_months: 3
+  mean_yoy_strong: 15.0
+  yoy_std_high: 40.0
+  # ---- Layer 3: MoM vs 季節性 ----
+  seasonality_min_years: 2
+  # ---- 基期修正 ----
+  cagr_years: 2
+
+# ---- 真突破偵測 (創歷史新高 + 年增強 + 非低基期) ----
+# 五道關卡全過才算真突破; 任一不過即歸類為假突破並標明原因。
+breakout:
+  min_yoy: 30.0            # 關卡3: 單月年增率門檻 (%)
+  min_base_pct: 40.0       # 關卡4a: 去年同月在歷史分布的百分位下限 (低於視為低基期)
+  min_base_ratio: 0.90     # 關卡4b: 去年同月 / 其前12月中位數 (低於視為基期塌陷)
+  min_cagr_2y: 15.0        # 關卡5: 兩年 CAGR 門檻 (%) — 完全跳過去年基期
+  require_ttm_ath: true    # 關卡2: 是否要求近12月滾動營收也創新高 (排除一次性訂單)
+  min_ttm_yoy: 10.0        # 關卡2: TTM 年增率門檻 (%) — 擋掉「單月強、整年平」
+  min_history_months: 26   # 需至少這麼多月歷史才做判定 (要能回看兩年)
+  top_n: 30                # 儀表板顯示前幾名
+
+# 原物料/週期產業 (config 相容層; 實際分流見 classify.py 六大類)
+cyclical_industries:
+  - 水泥工業
+  - 塑膠工業
+  - 橡膠工業
+  - 鋼鐵工業
+  - 造紙工業
+  - 玻璃陶瓷
+  - 油電燃氣業
+  - 航運業
+  - 化學工業
+
+# demo 模式的模擬全市場規模 (真實 fetch 時全市場自動來自 MOPS)
+demo:
+  universe_size: 1750
+
+# ---- 輸出編碼 ----
+# utf-8-sig = UTF-8 + BOM。繁中 Windows 的 Excel 沒看到 BOM 會改用 CP950 解讀,
+# 中文就變亂碼; 加了 BOM 才會正確以 UTF-8 開啟。
+# 若下游工具不吃 BOM, 改成 utf-8 即可 (讀取端兩種都相容)。
+output:
+  csv_encoding: utf-8-sig
+
+report:
+  out_html: output/monthly_revenue_dashboard.html
+  top_n: 25
+  title: 台股月營收動能總表
