@@ -1,0 +1,198 @@
+{
+ "schema": "VIA.PolicyLaws.SSOT.v1",
+ "batch": "批506",
+ "ts": "2026-09-14",
+ "purpose": "政策庫正本:操作員律 + 紀律 + lessons-learned(只增不減;ENG082 sync-db 攤平入 via_policy_factors;VCGC 唯一對接口讀此冊)",
+ "laws": [
+  {
+   "id": "L01",
+   "batch": "批475",
+   "zh": "凡是流程皆要想一個節省 TOKEN 的方式,想好才進行;先查再造,先量再改",
+   "cat": "流程"
+  },
+  {
+   "id": "L02",
+   "batch": "批475",
+   "zh": "所有紀錄/工具/模組/引擎/功能註冊,除非過時,只增不減",
+   "cat": "註冊"
+  },
+  {
+   "id": "L03",
+   "batch": "批232",
+   "zh": "正本零觸碰:references/intake 收容件永不編輯;新版=新收容夾 _bNNN + MANIFEST",
+   "cat": "正本"
+  },
+  {
+   "id": "L04",
+   "batch": "批254",
+   "zh": "尾版律:引擎改動=新版號檔;無版號檔(sitecustomize/JSON 冊)才就地改;glob 取尾版",
+   "cat": "版本"
+  },
+  {
+   "id": "L05",
+   "batch": "批403",
+   "zh": "Zero-Hydra:綁既有引擎不重造;同一判準只寫一處(寫兩處只改一邊=另一邊靜靜走錯)",
+   "cat": "架構"
+  },
+  {
+   "id": "L06",
+   "batch": "批390",
+   "zh": "零 CDN · 零彈窗:頁面自足,沒人要求不跳窗",
+   "cat": "UI"
+  },
+  {
+   "id": "L07",
+   "batch": "批478",
+   "zh": "同意閘(VIA_NET_CONSENT / VIA_SCRAPE_CONSENT / 金鑰)一律操作員自設,我不代設;setdefault 只在未設時給預設;fail-closed",
+   "cat": "法遵"
+  },
+  {
+   "id": "L08",
+   "batch": "批474",
+   "zh": "零 force push;不 Stop-Process;不 Remove-Item / conda remove / pip uninstall 環境;--approve-remove 只在明令下;裝套件=操作員的手(--approve + 閘)",
+   "cat": "安全"
+  },
+  {
+   "id": "L09",
+   "batch": "批494",
+   "zh": "加速器與網路工具只認 VeritasCeleritas / VeritasAegisNexus;SUP_MDL737/740 留作橋不直 import;網路件只收不掛線除非走 AegisNexus 車道",
+   "cat": "工具"
+  },
+  {
+   "id": "L10",
+   "batch": "批490",
+   "zh": "資料家律:parquet 存、duckdb 管;家在 C:\\Users\\tonyk\\VIA System\\via_database;鏡根 via_database\\movies-dataset\\data;搬=link(junction,hash 定生死,零刪除)不複製;刪資料=操作員的手;census --hygiene 永無 apply",
+   "cat": "資料"
+  },
+  {
+   "id": "L11",
+   "batch": "批493/496",
+   "zh": "VRN 擷取次序律:非 OCR 一律先跑(兩法互核)→ 修復 → 驗證;失敗才 OCR 階梯 輕→重(simple→dual→paddle);都失敗才畫質提升 DPI 300~350;成功=資料標示還原+文字修復;成功法入中央邏輯庫",
+   "cat": "VRN"
+  },
+  {
+   "id": "L12",
+   "batch": "批497",
+   "zh": "環境隔離律:特殊/中高風險件直接拉出獨立境連同相關工具隔離;numpy 等樞紐件可多境多版本多 Python(H2b);加速器與網路工具的工具很多請勿遺漏(全冊聯集)",
+   "cat": "環境"
+  },
+  {
+   "id": "L13",
+   "batch": "批498/500",
+   "zh": "via_core 白名單律:白名單單一來源 VIA_EnvManager def_PARAM_VIA_CORE_WHITELIST;白名單件才進 via_core(只增);非白名單缺件留置 WHITELIST_HOLD;無家族通用件列 [未路由];HIGH 家族只認同名獨立境不借 alt",
+   "cat": "環境"
+  },
+  {
+   "id": "L14",
+   "batch": "批499",
+   "zh": "全庫同步律:所有的庫政策邏輯因子庫都要同步更新——sync-db 對資料家每本 .duckdb 寫同一份(同一 hash)+ via_policy_sync 對帳單",
+   "cat": "資料"
+  },
+  {
+   "id": "L15",
+   "batch": "批499",
+   "zh": "交接三處律:交接報告在 docs(github)、倉根 VIA_HANDOVER_LATEST.md(母檔案夾)、每本庫 via_handover + 資料家根",
+   "cat": "交接"
+  },
+  {
+   "id": "L16",
+   "batch": "批474/498",
+   "zh": "誠實四態:ABSENT(缺件)/NODATA(缺料)/GATED(閘未開)/RED(壞);判錯的紅燈和假綠一樣傷;缺件≠缺料≠壞掉≠閘未開",
+   "cat": "燈"
+  },
+  {
+   "id": "L17",
+   "batch": "批410/504/505",
+   "zh": "自測零污染律:自測只寫暫存;VIA_SELFTEST=1;自測期間撤 VIA_DB_* 與 VIA_DATA_HOME;真庫永不進自測目標",
+   "cat": "測試"
+  },
+  {
+   "id": "L18",
+   "batch": "批482",
+   "zh": "功能註冊只增不減:新引擎/工具=規格項、格子站、Register 指令、Deck 任務、Manager 正式名稱、台帳、交接七處齊備;指令與參數不丟失",
+   "cat": "註冊"
+  },
+  {
+   "id": "L19",
+   "batch": "批506",
+   "zh": "安裝核可律:環境統一測式(RunGate 家族境 python × 套件探針 × 引擎自測)無誤(GREEN,24h 內)後才可核可安裝;否則 BLOCKED_UNITEST 誠實停",
+   "cat": "環境"
+  },
+  {
+   "id": "L20",
+   "batch": "批506",
+   "zh": "唯一對接口律:Veritas Central Governance Console(CGC_MDL149)為各模組引擎連接系統的唯一對接口,統管政策庫/邏輯庫/因子庫/資料庫/VIA 引擎調度/多矩陣實測結果/註冊表/環境工具/交接",
+   "cat": "架構"
+  },
+  {
+   "id": "L21",
+   "batch": "批474",
+   "zh": "所有 VDF 價格資料皆 adj(除權息調整後);報告上是報告日原始價;兩者不可直接比",
+   "cat": "資料"
+  },
+  {
+   "id": "L22",
+   "batch": "批478",
+   "zh": "SSOT 正本 VIA_Financial_Institution_SSOT_v0100.py READ_ONLY 不改;台帳 indent=1、衝突取聯集;VIA_Reports 不入 git;容器空沙盒再生的冊/頁不 commit",
+   "cat": "SSOT"
+  },
+  {
+   "id": "L23",
+   "batch": "批506",
+   "zh": "倉衛生律:只刪有證據的重複件(byte 同、BACKUP 孿生、__DUP__)與過時再生件;正本/收容件/UI 正本頁/唯一副本不刪;每次刪除附清單與 md5 證據(git 可回溯)",
+   "cat": "倉"
+  }
+ ],
+ "lessons": [
+  {
+   "id": "LL01",
+   "batch": "批489/490",
+   "zh": "49 張 ABSENT 是點錯的燈:庫在倉外的資料家;census 先找家再判缺"
+  },
+  {
+   "id": "LL02",
+   "batch": "批491",
+   "zh": "接點死了不是庫沒了:junction LINKED_ELSEWHERE → --relink,不重建庫"
+  },
+  {
+   "id": "LL03",
+   "batch": "批493",
+   "zh": "paddleocr 3.x 拒收 2.x 參數(show_log)=900 秒 TIMEOUT 根因;相容墊片剝參數重試"
+  },
+  {
+   "id": "LL04",
+   "batch": "批499",
+   "zh": "FirstPageText 卻 OCR 全卷=1138 秒;後端 PASS/0元素、SKIPPED_UNAVAILABLE 都沒記=每件重載 Paddle;只送第 1 頁 + 分境健康全記"
+  },
+  {
+   "id": "LL05",
+   "batch": "批500",
+   "zh": "冊上 db 欄寫「全庫」機器對不上=冊外;對帳單一列一天=假 AMBER;db_scope/lamp 欄補上;via_paddle_311 缺 pymupdf=整批 OCR 轉接器 off"
+  },
+  {
+   "id": "LL06",
+   "batch": "批501",
+   "zh": "階梯用轉接器名、後端矩陣回規格名,兩套名對不上=paddle 三支永遠不在位;判準照抄 adapter.probe 只寫一處;黑底白字要反白"
+  },
+  {
+   "id": "LL07",
+   "batch": "批502",
+   "zh": "本境標壞鍵剔掉車道候選=第三階誤 SKIP;本境鍵與車道鍵分開;零字再試 psm 11→6;錯誤全文 400 字"
+  },
+  {
+   "id": "LL08",
+   "batch": "批504/505",
+   "zh": "自測寫進真庫兩次:全庫同步律讓 sync_targets 掃家與 VIA_DB_*,自測只導向首選庫不夠;自測整段撤 VIA_DB_*/VIA_DATA_HOME + VIA_SELFTEST 旗,並用假 VIA_DB 鍵重現證明零觸碰"
+  },
+  {
+   "id": "LL09",
+   "batch": "批505",
+   "zh": "登冊腳本在一個錨點斷掉=只上一半還 commit 了;每檔獨立寫入、失敗要可見、commit 前對清單"
+  },
+  {
+   "id": "LL10",
+   "batch": "批506",
+   "zh": "倉 560MB pack:ICON_FORGE 1.5GB 含 __DUP__/_vN 孿生、BACKUP 939/944 與正本 byte 同、25MB 巨檔四份同本;刪只憑 md5 證據且不動被引用的檔名"
+  }
+ ]
+}
