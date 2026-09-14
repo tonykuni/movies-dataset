@@ -357,6 +357,17 @@ via-boot           # 之後每個短令起跑都是毫秒級
 短令:`via-vrnlogic`(status / reset-backends / -SelfTest;別名 邏輯庫)、`via-firstpage [-Force] [-OcrBudget N] [--in …]`(別名 首頁擷取)。
 仍是你的手:tesseract 的 `chi_tra` 語言包、easyocr 模型下載(要網路同意)、paddleocr 本體;`via-vrnlogic status` 會列出每支後端的 BROKEN 因由。
 
+## 一-u · 批494 · 你說「未經過我同意…這兩個是我指令唯一的加速器及網路工具,重新掛載」
+
+你上傳的 `VeritasCeleritas.py` / `VeritasAegisNexus.py` 與庫內正典逐字相同(只差 CRLF),問題不在檔案,在掛載:批487 我為了解「via-boot 每次動不了」把啟動層改成只套快取、不載 Celeritas,那等於沒經你同意把加速器從每個行程卸下。認錯。
+
+| 改 | 怎麼驗 |
+|---|---|
+| 啟動層 ④:每個 VIA 行程把 `VeritasCeleritas`、`VeritasAegisNexus` 以**本名**掛進 `sys.modules`(惰性代理:`import` 零成本,第一次用才真載入;`VIA_ACCEL_FULL=1` 仍是起跑就真點亮) | 容器實測:import 0 ms、numpy 未載;取 `__version__` 後真載入 134 ms、值 1.0.0 |
+| `via-boot` 每家族多印「工具:Celeritas(lazy);AegisNexus(lazy)」;`VIA_TOOLS_MOUNT` 記名與路徑 | 匯流排 v0120 ㊶ 檢;四十一檢 41/41 |
+
+橋(SUP_MDL737 / SUP_MDL740)留作橋;加速器與網路工具只認這兩件。
+
 ## 二 · C 的答案:VDF 現況(**操作員機器實測,批475 他貼回來的**)
 
 > 批474 這一節原本寫的是容器副本的數字,結論是「`tw_daily_prices` 全樹不存在」。
