@@ -383,6 +383,16 @@ via-boot           # 之後每個短令起跑都是毫秒級
 | `VRN_ENG072_FirstPageText_v0118` | 本境缺這一階後端 → 派到 `via_paddle_311` 跑;境不在=誠實指路 `via-envtools` | 三十三檢 32/33(⑤ 容器夾況舊紅) |
 | Register v0195 `via-envtools [-Apply] [-Approve] [-Env 境]`(別名 工具導入);格子 v0298 | | pwsh 解析 0 錯 |
 
+## 一-w · 批496 · 你的次序修正令:非 OCR 先 → 驗證失敗才 OCR(輕→重)→ 都失敗才拉 DPI 300~350
+
+| v0118 差在哪 | v0119 改成 |
+|---|---|
+| 密度閘判 SCANNED 就整條分區道不走,非 OCR 沒先跑 | 非 OCR **一律先跑**(fitz×pdfplumber → 修復 → 驗證);本文 < 40 字或兩法 DISAGREE 才算失敗轉 OCR;PARTIAL 只是標示未還原=不 OCR |
+| 批493 我加的「剩餘預算 ≥45 秒才升第三階」把畫質提升幾乎關掉 | 第三階**自有預算**(`hq_budget_s` 120 秒),只要第二階「跑了但零字」就一定升 |
+| DPI 帶沒釘死 | MDL001 auto_dpi 結果夾進 300~350;缺 MDL001 退 350 |
+
+律冊 `VRN_ExtractionLogic_SSOT_v0100.json` 的 `order` 已改成四步;`VRN_ENG082_ExtractionLogic_v0101`(十三檢)、`VRN_ENG072_FirstPageText_v0119`(三十五檢,容器 34/35)。
+
 ## 二 · C 的答案:VDF 現況(**操作員機器實測,批475 他貼回來的**)
 
 > 批474 這一節原本寫的是容器副本的數字,結論是「`tw_daily_prices` 全樹不存在」。

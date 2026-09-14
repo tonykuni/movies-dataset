@@ -3,21 +3,65 @@
  "declared_by": "操作員 2026-09-14「vrn 非 OCR 擷取式必要使用;若還有抓不到改用 OCR,從較簡單的工具組往雙引擎、往 Paddle 相關工具;所謂成功包含資料標示還原原樣修復、文字修復;非 OCR 有兩個相同的相互核對,再跟非 OCR 核對;邏輯方法及其他驗證擷取方法成功後存於中央邏輯庫」",
  "law": {
   "stage0_non_ocr": "必用:fitz(PyMuPDF)版面序分區 × pdfplumber 同判準分區 = 兩個非 OCR 引擎互核(xcheck);密度閘判 SCANNED 才進 OCR",
-  "ocr_ladder": "抓不到才 OCR;逐階升:simple(tesseract)→ dual(tesseract+easyocr 互核)→ paddle(paddleocr/ppstructure/pdf_pipeline);再與非 OCR 文字層核對(有真文字層時)",
+  "ocr_ladder": "驗證失敗才 OCR;逐階升:simple(tesseract)→ dual(tesseract+easyocr 互核)→ paddle(paddleocr/ppstructure/pdf_pipeline);再與非 OCR 文字層核對(有真文字層時);都失敗 → DPI 300~350 重繪再跑階梯(操作員 2026-09-14 修正令)",
   "success": "文字 ≥ min_chars 且 互核不為 DISAGREE;分區件另需 資料標示還原(標題帶/右資訊區 + 本文)成立;文字修復(零寬字元/全形英數/中文斷行)已套用並留數字",
   "central_library": "成功與失敗的方法、互核分數、修復統計、後端健康,全記 VIA_Reports/vrn/extraction_logic/(LOGIC_LEDGER.jsonl 只增 + LOGIC_latest.json 摘要);再跑同一檔(sha1 同、產物在)直接命中不重抽;失敗件 fail_ttl_h 內不重燒 OCR"
  },
  "ladder": [
-  {"stage": "simple", "adapters": ["tesseract"], "note": "最簡單的工具組先走"},
-  {"stage": "dual", "adapters": ["tesseract", "easyocr"], "note": "雙引擎互核"},
-  {"stage": "paddle", "adapters": ["paddleocr", "paddle_ppstructure", "paddle_pdf_pipeline"], "note": "Paddle 系(CJK 最佳;操作員指名)"}
+  {
+   "stage": "simple",
+   "adapters": [
+    "tesseract"
+   ],
+   "note": "最簡單的工具組先走"
+  },
+  {
+   "stage": "dual",
+   "adapters": [
+    "tesseract",
+    "easyocr"
+   ],
+   "note": "雙引擎互核"
+  },
+  {
+   "stage": "paddle",
+   "adapters": [
+    "paddleocr",
+    "paddle_ppstructure",
+    "paddle_pdf_pipeline"
+   ],
+   "note": "Paddle 系(CJK 最佳;操作員指名)"
+  }
  ],
  "budget_s": 150,
  "hq_min_remaining_s": 45,
- "xcheck": {"agree_bag": 0.85, "agree_seq": 0.6, "partial_bag": 0.5, "textlayer_min_chars": 200},
+ "xcheck": {
+  "agree_bag": 0.85,
+  "agree_seq": 0.6,
+  "partial_bag": 0.5,
+  "textlayer_min_chars": 200
+ },
  "min_chars": 40,
  "backend_ttl_h": 24,
  "fail_ttl_h": 24,
- "repair": {"zero_width": true, "fullwidth_alnum_to_ascii": true, "keep_cjk_punct": true, "join_cjk_linebreaks": true, "collapse_spaces": true},
- "note": "本冊是律的資料形;引擎 VRN_ENG082_ExtractionLogic 尾版讀它;沒有這冊時用引擎內建預設(同值)"
+ "repair": {
+  "zero_width": true,
+  "fullwidth_alnum_to_ascii": true,
+  "keep_cjk_punct": true,
+  "join_cjk_linebreaks": true,
+  "collapse_spaces": true
+ },
+ "note": "本冊是律的資料形;引擎 VRN_ENG082_ExtractionLogic 尾版讀它;沒有這冊時用引擎內建預設(同值)",
+ "hq_budget_s": 120,
+ "hq_dpi": [
+  300,
+  350
+ ],
+ "nonocr_fail_rule": "非 OCR(fitz×pdfplumber)抽完、修復、驗證後:本文 < min_chars 或 兩法 DISAGREE = 失敗 → 轉 OCR 階梯;PARTIAL(只是標示未還原)= 非 OCR 成功不 OCR",
+ "order": [
+  "① 非 OCR 擷取(fitz 分區 × pdfplumber 分區)+ 文字修復 + 驗證(互核/字數/標示)",
+  "② 驗證失敗 → OCR 階梯 輕量(tesseract)→ 雙引擎(+easyocr)→ 重型(paddle 三支);共用 budget_s",
+  "③ 都失敗 → PDF 畫質提升:DPI 拉到 hq_dpi 帶(300~350;MDL001 auto_dpi)重繪首頁,再跑同一條階梯;自有 hq_budget_s,不受 ② 用盡影響",
+  "④ 成功/失敗與方法逐件入中央邏輯庫;同檔再跑命中不重抽"
+ ]
 }
