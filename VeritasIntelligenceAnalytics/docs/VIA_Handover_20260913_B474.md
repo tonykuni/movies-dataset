@@ -368,6 +368,21 @@ via-boot           # 之後每個短令起跑都是毫秒級
 
 橋(SUP_MDL737 / SUP_MDL740)留作橋;加速器與網路工具只認這兩件。
 
+## 一-v · 批495 · 「透過 envmanager 安全地導入全部工具」
+
+環境衝突的真面目(從你的實錄量出來的):
+- **半拆件**:`via_vap_312` 的 pyarrow 是命名空間包(有夾無 `__init__.py`)→ force-reinstall。
+- **境配錯**:Baseline `families.ocr` 把 OCR 生態定在 `via_paddle_311` 專屬境,而 ENG072 的 OCR 車道在 `via_vrn_312` 行程內 import,兩件同時成立=後端永遠「不在位」。
+- **外部本體**:Tesseract-OCR 本體與 `chi_tra` 語言包、easyocr 模型下載,pip 管不到。
+
+| 件 | 做什麼 | 驗 |
+|---|---|---|
+| `VIA_ToolRoster_SSOT_v0100.json` | 工具冊:四境逐件 pip/import/健康判準/外部令;不列版本鎖 | MDL135 ㉜ |
+| `CGC_MDL135_EnvGovernance_v0101` `tools` | 逐境探針(OK/ABSENT/BROKEN/CONFLICT/EXTERNAL/NEEDS_MODELS/ENV_ABSENT)→ 段 REPAIR→INSTALL→VERIFY;plan 唯讀寫 `TOOLS_PLAN_latest.json/.ps1`;`--apply --approve` 才裝;同意閘未開=零動作不代設;裝前 freeze 存證 | 三十四檢 34/34;容器假境根實跑 4 境 9 段 |
+| `SUP_MDL747_OcrLaneRunner_v0100` | 在 OCR 境跑同一條 GLE 編排器,JSON 回主行程 | 三檢 |
+| `VRN_ENG072_FirstPageText_v0118` | 本境缺這一階後端 → 派到 `via_paddle_311` 跑;境不在=誠實指路 `via-envtools` | 三十三檢 32/33(⑤ 容器夾況舊紅) |
+| Register v0195 `via-envtools [-Apply] [-Approve] [-Env 境]`(別名 工具導入);格子 v0298 | | pwsh 解析 0 錯 |
+
 ## 二 · C 的答案:VDF 現況(**操作員機器實測,批475 他貼回來的**)
 
 > 批474 這一節原本寫的是容器副本的數字,結論是「`tw_daily_prices` 全樹不存在」。
@@ -470,6 +485,9 @@ via-census                        # ② C:庫況(批490 起家內也掃;預設�
 via-vrnuni -SelfTest              # ②b 批492:你上傳的統一報告引擎 23 檢(免料)
 via-vrnlogic -SelfTest            # ②c 批493:擷取中央邏輯庫十二檢
 via-vrnlogic                      # ②d 邏輯庫現況(件數/法/後端健康)
+via-boot                          # ②e 批494:每家族應印「工具:Celeritas(lazy);AegisNexus(lazy)」
+via-envtools                      # ②f 批495:工具冊導入計畫(唯讀);貼回來
+# $env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve   # 你決定要裝時才跑(裝前 freeze 存證)
 via-ryg -Timeout 300              # ③ B:五矩陣紅黃綠燈,有心跳不白畫面,跑完自己跳出來
 via-boot                          # ④ 啟動層實證:每支引擎起跑是否綁上加速器/網路件(同意閘不碰)
 via-vetf                          # ⑤ VETF 持股×Consensus(candidate 沙盒;自動找你的兩本庫)
