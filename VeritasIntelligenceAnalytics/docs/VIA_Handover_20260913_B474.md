@@ -207,7 +207,8 @@ bootstrap 做三件事,全包 try(**絕不能讓引擎起不來**):
 | 485 | `06736d7a` | `via-census -Hygiene` 唯讀審計;匯流排登進樞紐 v0137/總控 v0122 |
 | 486 | `a6327d03` | 所有 py 指令走 `Invoke-VIAPython`:20 加速器 + 動態進度條;短令冊 82 處;VdfFetch v0104 |
 | 487 | `06f8987c` | via-boot 卡住根因:啟動層每次載 Celeritas → 改快取優先;PS 點亮不擋 |
-| 488 | (本批) | via-ryg 參數三修(貼進來的註解/非數字 timeout/家族驗證)+ 兩枚 v0184 起的舊錯 |
+| 488 | `4270bda0` | via-ryg 參數三修(貼進來的註解/非數字 timeout/家族驗證)+ 兩枚 v0184 起的舊錯 |
+| 489 | (本批) | 實錄四修:啟動層父行程跳過、心跳錯位、+tails、ENG073 樹內尋庫 |
 
 **沒動的**:資料本體一筆都沒動(1900 哨兵列、`_repo_` 副本、六張 0 列表——要你點頭);同意閘一個字沒設;孤兒引擎沒刪。
 
@@ -289,6 +290,19 @@ via-boot           # 之後每個短令起跑都是毫秒級
 順帶抓到**自 v0184 起就在**的兩枚:沒給 `-Timeout` 時第一個位置參數永遠被跳過(`via-ryg vrn` 其實一直跑 vrn,vap);`vrn,vap` 被 PowerShell 當陣列傳進來變 "vrn vap"(以前傳給匯流排=沒人認得的家族=全 PLAN)。都修了。
 
 
+## 一-p · 批489 · 你真跑 via-ryg 的實錄,照出四件事
+
+| 實錄 | 真相 | 修 |
+|---|---|---|
+| `via-boot [vdf] 網路件(不掛)· via_net False` | 啟動層看到父行程已設 `VIA_ACCEL_BOOT` 就整段跳過,連 vdf 該掛的網路件都跳掉 | 每個行程各做各的(批489) |
+| `vrn_firstpage TIMEOUT 300s` | 你收件匣 64 份,OCR 起手就 140 秒;**我建議的 300 秒是錯的尺**,預設 900 | 不帶 `-Timeout` 或 `-Timeout 1800`;ENG072 起手靜默另記 R 項 |
+| `vap_stack` 底下「⏳ 19s · 引擎最後一行:}」 | 那是上一項 `vrn_pdfplus` 的心跳(20.1s、結尾 `}`),兩條流錯位 | 矩陣模式心跳走 stdout 並帶項目名(v0117) |
+| `vrn_structdb 庫缺…確認 clone 根` | ENG073 寫死 `output_hub/mega/` 加兩個寫死替根,你的庫不在那三處(寫死路徑病) | ENG073 v0123 最後一道在樹裡找同名庫並印出用了哪本;`via-census` 先印每本庫的路徑 |
+
+三個 RED(fourpoint／vap_stack／vap_heatmap)雲端看不到尾段 → 新增 `via-bus tails`。`vap_dashboard` ABSENT = via_vap 境沒裝 pandas(你的手:`via-rungate --family vap --approve-install`)。
+好消息:加速器真點 54/88;`via-boot` 1.0 秒;`vrn_pdfplus` 在你機器上 GREEN;64 份 digest 68 秒有進度條;頁自動開在 msedge(B 落地)。
+
+
 ## 二 · C 的答案:VDF 現況(**操作員機器實測,批475 他貼回來的**)
 
 > 批474 這一節原本寫的是容器副本的數字,結論是「`tw_daily_prices` 全樹不存在」。
@@ -336,7 +350,8 @@ GREEN 6 · NODATA 1(`vrn_markdown` 無可轉檔=誠實)· ABSENT 1(`vrn_pdfplus`
 | ~~E~~ | ~~`tw_daily_prices` 名稱歸位~~ | **撤銷**:操作員機器上該表 2,128,169 列,在。批474 從容器副本得出的結論不成立。 |
 | ~~F~~ | ~~正本頁再生閘~~ | **已擋**(批480 MDL138 v0101 正本頁保護)。 |
 | **G** | VRN_MDL 數量 | 300 vs 294 的差取決於計數範圍(排除 references/_superseded 只數到 20 個唯一編號)——要用同一把尺再量,先記不判。 |
-| **I** | VDF SSOT 化 | 庫冊 v0100 + census 對冊比(批478);**唯讀審計 `via-census -Hygiene`**(批485)。餘:哨兵列/副本/六張 0 列表——貼審計結果回來、你點頭,才動資料。 |
+| **I** | VDF SSOT 化 | 庫冊 v0100 + census 對冊比(批478);唯讀審計(批485)。**批489 新知:你的 `vdf_tw_market.duckdb` 不在引擎寫死的 `output_hub/mega/`——冊上該補路徑**,`via-census` 頭幾行會印出來。 |
+| **R** | ENG072 起手 140 秒靜默(GLE 探 7 個 OCR 後端) | 該像加速器一樣把探測結果快取;下一批。 |
 | ~~J~~ | ~~`vrn_digest` 取價失敗未進計數行~~ | **已改**(批484 v0114「取價缺 n」)。 |
 | ~~K~~ | ~~樞紐同意閘覆寫式代設~~ | **已改**(批478,v0136 setdefault)。 |
 | ~~L~~ | ~~「VERT」是哪個子系統~~ | **已解:VETF**(批477)。 |

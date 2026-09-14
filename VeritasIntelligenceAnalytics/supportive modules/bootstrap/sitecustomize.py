@@ -63,8 +63,9 @@ def _load(path, name):
 def _boot():
     if os.environ.get("VIA_BOOT", "1") == "0":
         return
-    if os.environ.get("VIA_ACCEL_BOOT"):      # 子行程再往下生子行程:不重做
-        return
+    # 批489 操作員實錄:via-boot 的 [vdf] 印「網路件(不掛)· via_net False」——因為父行程(匯流排本身也在啟動層下跑)
+    # 已設 VIA_ACCEL_BOOT,第一版在這裡整段 return,連 vdf 該掛的網路件都跳掉;子行程印的還是父行程的值。
+    # 改:每個行程都各做各的(環境變數本來就 setdefault、網路件本來就依 VIA_FAMILY),不靠「父做過就跳」。
     root = _via_root()
     fam = (os.environ.get("VIA_FAMILY") or "").lower()
     note = []
