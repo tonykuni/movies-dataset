@@ -1,0 +1,310 @@
+{
+ "schema": "VIA.ToolRoster.SSOT.v1",
+ "operator_order": "透過 envmanager 安全地導入全部工具;基於目前環境衝突問題修復後;如環境工具管理(VIA_EnvGovernance_Baseline)所定",
+ "governs": "MDL135 EnvGovernance `tools` 動詞讀本冊:逐境探針(import/健康/版本)→ 修復(半拆件 force-reinstall)→ 安裝(缺件)→ 驗證;plan 唯讀,--apply --approve 才裝,網路走同意閘 VIA_NET_CONSENT=YES(不代設);外部本體(Tesseract-OCR 等)只印令不代裝",
+ "routing_note": "OCR 生態依 Baseline families.ocr 進 via_paddle_311(OCR 專屬境),不混進 via_vrn_312(torch+paddle+numpy 混境=Hydra H5 高風險);ENG072 v0118 的 OCR 車道在本境缺後端時改派到 via_paddle_311 的 python 跑(SUP_MDL747 執行器)",
+ "envs": {
+  "via_vrn_312": {
+   "python": "3.12",
+   "aliases": [
+    "via_vrn_312",
+    "via_vrn"
+   ],
+   "purpose": "VRN 研報擷取:非 OCR 雙引擎必用 + 核心基座",
+   "tools": [
+    {
+     "pip": "pymupdf",
+     "imp": "fitz",
+     "role": "非 OCR 引擎 A(必用)"
+    },
+    {
+     "pip": "pdfplumber",
+     "imp": "pdfplumber",
+     "role": "非 OCR 引擎 B(必用;與 A 互核)"
+    },
+    {
+     "pip": "pypdf",
+     "imp": "pypdf",
+     "role": "非 OCR 後備"
+    },
+    {
+     "pip": "python-docx",
+     "imp": "docx",
+     "role": "WORD 件"
+    },
+    {
+     "pip": "duckdb",
+     "imp": "duckdb",
+     "role": "庫"
+    },
+    {
+     "pip": "pandas",
+     "imp": "pandas",
+     "role": "表"
+    },
+    {
+     "pip": "numpy",
+     "imp": "numpy",
+     "role": "數"
+    },
+    {
+     "pip": "pyarrow",
+     "imp": "pyarrow",
+     "role": "parquet",
+     "health": [
+      "attr:__version__"
+     ]
+    },
+    {
+     "pip": "plotly",
+     "imp": "plotly",
+     "role": "控制塔互動圖"
+    },
+    {
+     "pip": "opencc-python-reimplemented",
+     "imp": "opencc",
+     "role": "簡→繁(文字修復)",
+     "optional": true
+    }
+   ],
+   "python_measured": "3.13.7(EnvManager v0300 AUDIT 2026-09-14;冊原定 3.12,既有健康境不動只增)"
+  },
+  "via_paddle_311": {
+   "python": "3.12",
+   "aliases": [
+    "via_paddle_311",
+    "paddle_311",
+    "via_paddle_312",
+    "paddle_312",
+    "via_ocr"
+   ],
+   "purpose": "OCR 專屬境(Baseline families.ocr):階梯 simple→dual→paddle 的後端都住這裡",
+   "tools": [
+    {
+     "pip": "pymupdf",
+     "imp": "fitz",
+     "role": "渲染掃描頁(執行器需要)"
+    },
+    {
+     "pip": "numpy",
+     "imp": "numpy",
+     "role": "影像陣列"
+    },
+    {
+     "pip": "opencv-contrib-python",
+     "imp": "cv2",
+     "role": "cv2 家族統包錨(Baseline cv2_anchor;headless/opencv-python 永不再裝)"
+    },
+    {
+     "pip": "pytesseract",
+     "imp": "pytesseract",
+     "role": "OCR 階一 simple",
+     "health": [
+      "tesseract_langs:chi_tra"
+     ],
+     "external": {
+      "what": "Tesseract-OCR 本體 + tessdata chi_tra",
+      "win": "winget install --id UB-Mannheim.TesseractOCR -e ; 語言包 chi_tra.traineddata 放 <Tesseract-OCR>\\\\tessdata(批469 via-tessdata)"
+     }
+    },
+    {
+     "pip": "easyocr",
+     "imp": "easyocr",
+     "role": "OCR 階二 dual(與 tesseract 互核)",
+     "needs": [
+      "torch"
+     ],
+     "health": [
+      "easyocr_models"
+     ],
+     "note": "首跑要下載模型(網路同意閘)"
+    },
+    {
+     "pip": "torch",
+     "imp": "torch",
+     "role": "easyocr 相依(CPU 輪)",
+     "index_url": "https://download.pytorch.org/whl/cpu"
+    },
+    {
+     "pip": "paddlepaddle>=3.0",
+     "imp": "paddle",
+     "role": "Paddle 框架(CPU)",
+     "health": [
+      "attr:__version__"
+     ]
+    },
+    {
+     "pip": "paddleocr>=3.0",
+     "imp": "paddleocr",
+     "role": "OCR 階三 paddle(操作員指名;3.x API,2.x 鍵由 ENG082 墊片剔除)",
+     "needs": [
+      "paddlepaddle>=3.0"
+     ],
+     "health": [
+      "attr:__version__",
+      "version_min:3.0"
+     ]
+    }
+   ],
+   "python_measured": "3.13.7(EnvManager v0300 AUDIT 2026-09-14;冊原定 3.12,既有健康境不動只增)"
+  },
+  "via_vap_312": {
+   "python": "3.12",
+   "aliases": [
+    "via_vap_312",
+    "via_vap"
+   ],
+   "purpose": "VAP 繪圖/儀表",
+   "tools": [
+    {
+     "pip": "pandas",
+     "imp": "pandas",
+     "role": "表"
+    },
+    {
+     "pip": "numpy",
+     "imp": "numpy",
+     "role": "數"
+    },
+    {
+     "pip": "pyarrow",
+     "imp": "pyarrow",
+     "role": "parquet(實錄:半拆成命名空間包 → force-reinstall)",
+     "health": [
+      "attr:__version__"
+     ]
+    },
+    {
+     "pip": "matplotlib",
+     "imp": "matplotlib",
+     "role": "圖"
+    },
+    {
+     "pip": "seaborn",
+     "imp": "seaborn",
+     "role": "圖"
+    },
+    {
+     "pip": "plotly",
+     "imp": "plotly",
+     "role": "互動圖"
+    },
+    {
+     "pip": "duckdb",
+     "imp": "duckdb",
+     "role": "庫"
+    }
+   ],
+   "python_measured": "3.13.7(EnvManager v0300 AUDIT 2026-09-14;冊原定 3.12,既有健康境不動只增)"
+  },
+  "via_vdf_312": {
+   "python": "3.12",
+   "aliases": [
+    "via_vdf_312",
+    "via_vdf"
+   ],
+   "purpose": "VDF 資料鍛造",
+   "tools": [
+    {
+     "pip": "duckdb",
+     "imp": "duckdb",
+     "role": "庫"
+    },
+    {
+     "pip": "pandas",
+     "imp": "pandas",
+     "role": "表"
+    },
+    {
+     "pip": "numpy",
+     "imp": "numpy",
+     "role": "數"
+    },
+    {
+     "pip": "pyarrow",
+     "imp": "pyarrow",
+     "role": "parquet",
+     "health": [
+      "attr:__version__"
+     ]
+    },
+    {
+     "pip": "polars",
+     "imp": "polars",
+     "role": "湖零複製掃"
+    },
+    {
+     "pip": "plotly",
+     "imp": "plotly",
+     "role": "互動圖"
+    },
+    {
+     "pip": "requests",
+     "imp": "requests",
+     "role": "AegisNexus 網路核心相依"
+    }
+   ],
+   "python_measured": "3.13.7(EnvManager v0300 AUDIT 2026-09-14;冊原定 3.12,既有健康境不動只增)"
+  }
+ },
+ "health_checks": {
+  "attr:<name>": "import 得到但缺該屬性=半拆/命名空間包(BROKEN → force-reinstall)",
+  "version_min:<v>": "已裝版本低於 v=CONFLICT(升版;依 pip 規格)",
+  "tesseract_langs:<lang>": "pytesseract.get_languages() 不含 lang=外部語言包缺(EXTERNAL;只印令)",
+  "easyocr_models": "~/.EasyOCR/model 無檔=模型未下載(NEEDS_MODELS;首跑觸網要同意閘)"
+ },
+ "states": [
+  "OK",
+  "ABSENT",
+  "BROKEN",
+  "CONFLICT",
+  "EXTERNAL",
+  "NEEDS_MODELS",
+  "ENV_ABSENT"
+ ],
+ "order": [
+  "REPAIR(force-reinstall 半拆件)",
+  "INSTALL(缺件;每境一段;torch 走 CPU index)",
+  "EXTERNAL(本體/語言包/模型:只印令)",
+  "VERIFY(重探 + uv pip check)"
+ ],
+ "note": "本冊只列工具與判準;不列版本鎖(鎖由 MDL135 LKGC lock 在真裝後產生);錯的鎖比沒鎖更傷",
+ "sources": {
+  "sheet": "本冊 envs(手寫:核心/OCR/家族)",
+  "accelerator": "VeritasCeleritas _LIB_MAP(經 CGC_MDL142 roster()/pip_name;100+ 件,零遺漏)→ 依 Baseline families 路由到目標境(含 via_iso_*_H 隔離境/via_mix_*_M);無家族者→via_core",
+  "network": "VeritasAegisNexus 第三方相依(掃 import;requests/urllib3/joblib)→ 四家族境 + via_core"
+ },
+ "risk_policy": {
+  "HIGH": "Baseline 家族 target_env 尾 _H(deep_learning/browser/gis/compilers/stealth_proxy):直接拉出獨立境,相關工具一起隔離",
+  "MEDIUM": "尾 _M(ml_boost/web_api/webui/http_async):混合隔離境",
+  "LOW": "家族境(via_vdf_312/via_vrn_312/via_vap_312/via_html_312/via_nlp/via_tools_312)或 via_core",
+  "SPECIAL": "hydra.watch_diverge 樞紐件(numpy 等):多環境多版本搭配多 Python=允許;tools 動詞印樞紐矩陣(境×版本)只作 INFO,不強制對齊"
+ },
+ "never_install": {
+  "via_paddle_311": [
+   "opencv-python",
+   "opencv-python-headless"
+  ],
+  "note": "Baseline cv2_anchor=opencv-contrib-python;pdf2docx/easyocr/albucore 要的 headless 依 families.ocr.residual_accepted 接受殘餘,不裝(裝了=互斥同裝 UVT-07)"
+ },
+ "fleet_measured_2026-09-14": {
+  "source": "操作員貼回 VIA_EnvManager-v0300 AUDIT run ENV-20260914_112000",
+  "envs": 48,
+  "managed": 42,
+  "migration_required": [
+   "camelot_311",
+   "paddle_311",
+   "vif_aio",
+   "vif_core",
+   "vmt_pm"
+  ],
+  "key": {
+   "via_paddle_311": "114 件:paddleocr 3.3.1/paddlepaddle 3.2.0/easyocr 1.7.2/pytesseract/rapidocr/doctr/torch 2.13;缺 opencv-python(-headless)=接受殘餘",
+   "via_vrn_312": "229 件:paddleocr 3.7.0/paddlex/torch 2.14/tensorflow/pymupdf/pdfplumber/python-docx/reportlab/pyarrow 24;無 easyocr(→階梯 dual 派 via_paddle_311)",
+   "via_vap_312": "210 件:pandas 3.0.3/matplotlib/plotly/catboost/tensorflow;pyarrow 不在 dist 清單=半拆(force-reinstall);seaborn 缺",
+   "via_vdf_312": "171 件:duckdb/pandas 2.3.3/polars/pyarrow 24/yfinance/playwright;numpy 2.2.6",
+   "via_vdf": "38 件 登錄 profile(numpy 1.26.4 黃金釘;py 3.12)——引擎實跑的是 via_vdf_312(未登錄 advisory);誰是正典要操作員裁",
+   "via_core": "14 件白名單境(PASS);EnvManager profile 缺 ruff"
+  }
+ }
+}

@@ -1,0 +1,878 @@
+{
+  "cpu_nlp_provider_registry": {
+    "groups": [
+      {
+        "candidates": [
+          {
+            "available": false,
+            "ecosystem": "python",
+            "module": "ftfy",
+            "name": "ftfy",
+            "version": null
+          }
+        ],
+        "capabilities": [
+          "unicode_repair",
+          "mojibake_candidate"
+        ],
+        "label": "ftfy",
+        "notes": [],
+        "official_urls": [
+          "https://github.com/rspeer/python-ftfy"
+        ],
+        "provider_id": "CPU01",
+        "safety": "Repair is derivative-only and rejected when protected facts change.",
+        "scope": "text_repair_optional",
+        "status": "unavailable"
+      },
+      {
+        "candidates": [
+          {
+            "available": true,
+            "ecosystem": "python",
+            "module": "charset_normalizer",
+            "name": "charset-normalizer",
+            "version": "3.4.4"
+          }
+        ],
+        "capabilities": [
+          "encoding_detection",
+          "lossless_decode_candidate"
+        ],
+        "label": "charset-normalizer",
+        "notes": [],
+        "official_urls": [
+          "https://charset-normalizer.readthedocs.io/"
+        ],
+        "provider_id": "CPU02",
+        "safety": "Low-confidence guesses fall back to the deterministic decoder chain.",
+        "scope": "document_intake_optional",
+        "status": "available"
+      },
+      {
+        "candidates": [
+          {
+            "available": false,
+            "ecosystem": "python",
+            "module": "blingfire",
+            "name": "blingfire",
+            "version": null
+          }
+        ],
+        "capabilities": [
+          "sentence_breaking",
+          "tokenization"
+        ],
+        "label": "Microsoft BlingFire",
+        "notes": [],
+        "official_urls": [
+          "https://github.com/microsoft/BlingFire"
+        ],
+        "provider_id": "CPU03",
+        "safety": "Local CPU inference only; no model or network download is performed.",
+        "scope": "segmentation_optional",
+        "status": "unavailable"
+      },
+      {
+        "candidates": [
+          {
+            "available": false,
+            "ecosystem": "python",
+            "module": "lingua",
+            "name": "lingua-language-detector",
+            "version": null
+          }
+        ],
+        "capabilities": [
+          "language_detection",
+          "zh_en_routing"
+        ],
+        "label": "Lingua",
+        "notes": [
+          "Python 3.11 environments must keep lingua-language-detector below 2.3."
+        ],
+        "official_urls": [
+          "https://github.com/pemistahl/lingua-py"
+        ],
+        "provider_id": "CPU04",
+        "safety": "Language output is advisory and never translates or rewrites source text.",
+        "scope": "language_routing_optional",
+        "status": "unavailable"
+      },
+      {
+        "candidates": [
+          {
+            "available": false,
+            "ecosystem": "python",
+            "module": "rapidfuzz",
+            "name": "RapidFuzz",
+            "version": null
+          }
+        ],
+        "capabilities": [
+          "fuzzy_alias_candidates",
+          "string_similarity"
+        ],
+        "label": "RapidFuzz",
+        "notes": [],
+        "official_urls": [
+          "https://rapidfuzz.github.io/RapidFuzz/"
+        ],
+        "provider_id": "CPU05",
+        "safety": "Fuzzy matches remain reviewable candidates and cannot promote SSOT terms.",
+        "scope": "ssot_matching_optional",
+        "status": "unavailable"
+      },
+      {
+        "candidates": [
+          {
+            "available": false,
+            "ecosystem": "python",
+            "module": "ahocorasick",
+            "name": "pyahocorasick",
+            "version": null
+          }
+        ],
+        "capabilities": [
+          "multi_pattern_search",
+          "exact_alias_matching"
+        ],
+        "label": "pyahocorasick",
+        "notes": [],
+        "official_urls": [
+          "https://github.com/WojciechMula/pyahocorasick"
+        ],
+        "provider_id": "CPU06",
+        "safety": "Exact matching is read-only and bounded by configured result limits.",
+        "scope": "keyword_matching_optional",
+        "status": "unavailable"
+      },
+      {
+        "candidates": [
+          {
+            "available": false,
+            "ecosystem": "python",
+            "module": "datasketch",
+            "name": "datasketch",
+            "version": null
+          }
+        ],
+        "capabilities": [
+          "minhash",
+          "lsh_near_duplicate_candidates"
+        ],
+        "label": "datasketch",
+        "notes": [],
+        "official_urls": [
+          "https://ekzhu.com/datasketch/lsh.html"
+        ],
+        "provider_id": "CPU07",
+        "safety": "Approximate results never delete, merge, or hide source segments.",
+        "scope": "deduplication_optional",
+        "status": "unavailable"
+      },
+      {
+        "candidates": [
+          {
+            "available": false,
+            "ecosystem": "python",
+            "module": "networkx",
+            "name": "networkx",
+            "version": null
+          }
+        ],
+        "capabilities": [
+          "graph_validation",
+          "cycle_and_orphan_detection"
+        ],
+        "label": "NetworkX",
+        "notes": [],
+        "official_urls": [
+          "https://networkx.org/documentation/stable/reference/index.html"
+        ],
+        "provider_id": "CPU08",
+        "safety": "Validation reports issues but never mutates graph nodes or edges.",
+        "scope": "knowledge_graph_optional",
+        "status": "unavailable"
+      },
+      {
+        "candidates": [
+          {
+            "available": false,
+            "ecosystem": "python",
+            "module": "msgspec",
+            "name": "msgspec",
+            "version": null
+          }
+        ],
+        "capabilities": [
+          "json_round_trip",
+          "typed_contract_acceleration"
+        ],
+        "label": "msgspec",
+        "notes": [],
+        "official_urls": [
+          "https://github.com/jcrist/msgspec"
+        ],
+        "provider_id": "CPU09",
+        "safety": "Serialization is verified by round-trip equality before acceptance.",
+        "scope": "contract_serialization_optional",
+        "status": "unavailable"
+      },
+      {
+        "candidates": [
+          {
+            "available": false,
+            "ecosystem": "python",
+            "module": "marisa_trie",
+            "name": "marisa-trie",
+            "version": null
+          }
+        ],
+        "capabilities": [
+          "compact_trie",
+          "prefix_lookup"
+        ],
+        "label": "marisa-trie",
+        "notes": [],
+        "official_urls": [
+          "https://github.com/pytries/marisa-trie"
+        ],
+        "provider_id": "CPU10",
+        "safety": "The index is derived, immutable, and rebuildable from SSOT candidates.",
+        "scope": "lexicon_index_optional",
+        "status": "unavailable"
+      }
+    ],
+    "provider_group_count": 10,
+    "schema": "VIA_CPU_NLP_PROVIDER_REGISTRY/1.0"
+  },
+  "groups": [
+    {
+      "candidates": [
+        {
+          "available": false,
+          "ecosystem": "python",
+          "module": "markitdown",
+          "name": "markitdown",
+          "version": null
+        }
+      ],
+      "capabilities": [
+        "document_to_markdown",
+        "office_text_extraction",
+        "structure_preservation"
+      ],
+      "label": "Microsoft MarkItDown",
+      "notes": [
+        "Markdown is an analysis projection, not a pixel-perfect layout reconstruction."
+      ],
+      "official_urls": [
+        "https://github.com/microsoft/markitdown"
+      ],
+      "provider_id": "MS01",
+      "safety": "Local files only; plugins, LLM clients, remote URLs, and automatic downloads are disabled.",
+      "scope": "document_intake_optional",
+      "status": "unavailable"
+    },
+    {
+      "candidates": [
+        {
+          "available": false,
+          "ecosystem": "python",
+          "module": "libcst",
+          "name": "libcst",
+          "version": null
+        },
+        {
+          "available": false,
+          "ecosystem": "python",
+          "module": "tree_sitter",
+          "name": "tree-sitter",
+          "version": null
+        }
+      ],
+      "capabilities": [
+        "lossless_cst",
+        "incremental_ast",
+        "source_positioning"
+      ],
+      "label": "Python CST / AST",
+      "notes": [
+        "Marwood was not verified as the canonical dependency; LibCST and Tree-sitter are the supported adapters."
+      ],
+      "official_urls": [
+        "https://libcst.readthedocs.io/",
+        "https://tree-sitter.github.io/"
+      ],
+      "provider_id": "PY01",
+      "safety": "Read-only detection; explicit activation is required.",
+      "scope": "core_optional",
+      "status": "unavailable"
+    },
+    {
+      "candidates": [
+        {
+          "available": false,
+          "ecosystem": "executable",
+          "name": "ruff",
+          "path": null,
+          "version": null
+        }
+      ],
+      "capabilities": [
+        "lint",
+        "format",
+        "static_diagnostics"
+      ],
+      "label": "Ruff",
+      "notes": [],
+      "official_urls": [
+        "https://docs.astral.sh/ruff/"
+      ],
+      "provider_id": "PY02",
+      "safety": "Read-only detection; explicit activation is required.",
+      "scope": "development_optional",
+      "status": "unavailable"
+    },
+    {
+      "candidates": [
+        {
+          "available": false,
+          "ecosystem": "python",
+          "module": "icecream",
+          "name": "icecream",
+          "version": null
+        },
+        {
+          "available": false,
+          "ecosystem": "python",
+          "module": "loguru",
+          "name": "loguru",
+          "version": null
+        }
+      ],
+      "capabilities": [
+        "debug_trace",
+        "structured_logging"
+      ],
+      "label": "IceCream / Loguru",
+      "notes": [],
+      "official_urls": [
+        "https://github.com/gruns/icecream",
+        "https://github.com/Delgan/loguru"
+      ],
+      "provider_id": "PY03",
+      "safety": "Read-only detection; explicit activation is required.",
+      "scope": "development_optional",
+      "status": "unavailable"
+    },
+    {
+      "candidates": [
+        {
+          "available": false,
+          "ecosystem": "python",
+          "module": "polars",
+          "name": "polars",
+          "version": null
+        }
+      ],
+      "capabilities": [
+        "columnar_data",
+        "lazy_evaluation",
+        "streaming"
+      ],
+      "label": "Polars",
+      "notes": [],
+      "official_urls": [
+        "https://docs.pola.rs/"
+      ],
+      "provider_id": "PY04",
+      "safety": "Read-only detection; explicit activation is required.",
+      "scope": "performance_optional",
+      "status": "unavailable"
+    },
+    {
+      "candidates": [
+        {
+          "available": true,
+          "ecosystem": "executable",
+          "name": "uv",
+          "path": "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/uv",
+          "version": null
+        }
+      ],
+      "capabilities": [
+        "environment_resolution",
+        "dependency_management"
+      ],
+      "label": "uv",
+      "notes": [],
+      "official_urls": [
+        "https://docs.astral.sh/uv/"
+      ],
+      "provider_id": "PY05",
+      "safety": "Read-only detection; explicit activation is required.",
+      "scope": "environment_optional",
+      "status": "available"
+    },
+    {
+      "candidates": [
+        {
+          "available": true,
+          "ecosystem": "python",
+          "module": "pydantic",
+          "name": "pydantic",
+          "version": "2.13.4"
+        },
+        {
+          "available": false,
+          "ecosystem": "python",
+          "module": "typeguard",
+          "name": "typeguard",
+          "version": null
+        }
+      ],
+      "capabilities": [
+        "schema_validation",
+        "runtime_type_checks"
+      ],
+      "label": "Pydantic / Typeguard",
+      "notes": [],
+      "official_urls": [
+        "https://docs.pydantic.dev/",
+        "https://typeguard.readthedocs.io/"
+      ],
+      "provider_id": "PY06",
+      "safety": "Read-only detection; explicit activation is required.",
+      "scope": "contract_optional",
+      "status": "partial"
+    },
+    {
+      "candidates": [
+        {
+          "available": false,
+          "ecosystem": "python",
+          "module": "playwright",
+          "name": "playwright",
+          "version": null
+        }
+      ],
+      "capabilities": [
+        "browser_testing",
+        "authorized_dynamic_page_rendering"
+      ],
+      "label": "Playwright for Python",
+      "notes": [],
+      "official_urls": [
+        "https://playwright.dev/python/"
+      ],
+      "provider_id": "PY07",
+      "safety": "No CAPTCHA, verification, authentication, or site-control bypass.",
+      "scope": "browser_optional",
+      "status": "unavailable"
+    },
+    {
+      "candidates": [
+        {
+          "available": false,
+          "ecosystem": "python",
+          "module": "selectolax",
+          "name": "selectolax",
+          "version": null
+        }
+      ],
+      "capabilities": [
+        "html_parse",
+        "css_selection"
+      ],
+      "label": "Selectolax",
+      "notes": [],
+      "official_urls": [
+        "https://github.com/rushter/selectolax"
+      ],
+      "provider_id": "PY08",
+      "safety": "Read-only detection; explicit activation is required.",
+      "scope": "parser_optional",
+      "status": "unavailable"
+    },
+    {
+      "candidates": [
+        {
+          "available": false,
+          "ecosystem": "python",
+          "module": "plotly",
+          "name": "plotly",
+          "version": null
+        },
+        {
+          "available": false,
+          "ecosystem": "python",
+          "module": "dash",
+          "name": "dash",
+          "version": null
+        }
+      ],
+      "capabilities": [
+        "interactive_chart",
+        "local_dashboard"
+      ],
+      "label": "Plotly / Dash",
+      "notes": [],
+      "official_urls": [
+        "https://plotly.com/python/",
+        "https://dash.plotly.com/"
+      ],
+      "provider_id": "PY09",
+      "safety": "Read-only detection; explicit activation is required.",
+      "scope": "reporting_optional",
+      "status": "unavailable"
+    },
+    {
+      "candidates": [
+        {
+          "available": false,
+          "ecosystem": "python",
+          "module": "rembg",
+          "name": "rembg",
+          "version": null
+        },
+        {
+          "available": true,
+          "ecosystem": "python",
+          "module": "PIL",
+          "name": "Pillow",
+          "version": "12.3.0"
+        }
+      ],
+      "capabilities": [
+        "image_background_removal",
+        "image_processing"
+      ],
+      "label": "rembg / Pillow",
+      "notes": [],
+      "official_urls": [
+        "https://github.com/danielgatis/rembg",
+        "https://pillow.readthedocs.io/"
+      ],
+      "provider_id": "PY10",
+      "safety": "Read-only detection; explicit activation is required.",
+      "scope": "non_nlp_optional",
+      "status": "partial"
+    },
+    {
+      "candidates": [
+        {
+          "available": false,
+          "ecosystem": "node",
+          "manifest": "/workspace/scratch/5f8e190a3a94/nlp_upgrade_workspace/VIA_NLP_Application_System_v1.8.0/node_modules/tree-sitter/package.json",
+          "name": "tree-sitter",
+          "version": null
+        }
+      ],
+      "capabilities": [
+        "incremental_ast",
+        "source_positioning"
+      ],
+      "label": "Tree-sitter JS bindings",
+      "notes": [],
+      "official_urls": [
+        "https://tree-sitter.github.io/"
+      ],
+      "provider_id": "JS01",
+      "safety": "Read-only detection; explicit activation is required.",
+      "scope": "core_optional",
+      "status": "unavailable"
+    },
+    {
+      "candidates": [
+        {
+          "available": false,
+          "ecosystem": "node",
+          "manifest": "/workspace/scratch/5f8e190a3a94/nlp_upgrade_workspace/VIA_NLP_Application_System_v1.8.0/node_modules/oxlint/package.json",
+          "name": "oxlint",
+          "version": null
+        },
+        {
+          "available": false,
+          "ecosystem": "executable",
+          "name": "oxlint",
+          "path": null,
+          "version": null
+        }
+      ],
+      "capabilities": [
+        "lint",
+        "static_diagnostics"
+      ],
+      "label": "Oxlint / Oxc",
+      "notes": [],
+      "official_urls": [
+        "https://oxc.rs/docs/guide/usage/linter"
+      ],
+      "provider_id": "JS02",
+      "safety": "Read-only detection; explicit activation is required.",
+      "scope": "development_optional",
+      "status": "unavailable"
+    },
+    {
+      "candidates": [
+        {
+          "available": false,
+          "ecosystem": "node",
+          "manifest": "/workspace/scratch/5f8e190a3a94/nlp_upgrade_workspace/VIA_NLP_Application_System_v1.8.0/node_modules/zod/package.json",
+          "name": "zod",
+          "version": null
+        }
+      ],
+      "capabilities": [
+        "schema_validation",
+        "typescript_contract"
+      ],
+      "label": "Zod",
+      "notes": [],
+      "official_urls": [
+        "https://zod.dev/"
+      ],
+      "provider_id": "JS03",
+      "safety": "Read-only detection; explicit activation is required.",
+      "scope": "contract_optional",
+      "status": "unavailable"
+    },
+    {
+      "candidates": [
+        {
+          "available": false,
+          "ecosystem": "node",
+          "manifest": "/workspace/scratch/5f8e190a3a94/nlp_upgrade_workspace/VIA_NLP_Application_System_v1.8.0/node_modules/zx/package.json",
+          "name": "zx",
+          "version": null
+        },
+        {
+          "available": false,
+          "ecosystem": "executable",
+          "name": "bun",
+          "path": null,
+          "version": null
+        }
+      ],
+      "capabilities": [
+        "script_orchestration",
+        "shell_wrapper"
+      ],
+      "label": "Bun Shell / zx",
+      "notes": [],
+      "official_urls": [
+        "https://bun.com/",
+        "https://github.com/google/zx"
+      ],
+      "provider_id": "JS04",
+      "safety": "Detected only; shell commands are never executed by this registry.",
+      "scope": "environment_optional",
+      "status": "unavailable"
+    },
+    {
+      "candidates": [
+        {
+          "available": false,
+          "ecosystem": "node",
+          "manifest": "/workspace/scratch/5f8e190a3a94/nlp_upgrade_workspace/VIA_NLP_Application_System_v1.8.0/node_modules/esbuild/package.json",
+          "name": "esbuild",
+          "version": null
+        },
+        {
+          "available": false,
+          "ecosystem": "executable",
+          "name": "esbuild",
+          "path": null,
+          "version": null
+        }
+      ],
+      "capabilities": [
+        "bundle",
+        "transform"
+      ],
+      "label": "esbuild",
+      "notes": [],
+      "official_urls": [
+        "https://esbuild.github.io/"
+      ],
+      "provider_id": "JS05",
+      "safety": "Read-only detection; explicit activation is required.",
+      "scope": "development_optional",
+      "status": "unavailable"
+    },
+    {
+      "candidates": [
+        {
+          "available": false,
+          "ecosystem": "node",
+          "manifest": "/workspace/scratch/5f8e190a3a94/nlp_upgrade_workspace/VIA_NLP_Application_System_v1.8.0/node_modules/archiver/package.json",
+          "name": "archiver",
+          "version": null
+        },
+        {
+          "available": false,
+          "ecosystem": "node",
+          "manifest": "/workspace/scratch/5f8e190a3a94/nlp_upgrade_workspace/VIA_NLP_Application_System_v1.8.0/node_modules/fs-extra/package.json",
+          "name": "fs-extra",
+          "version": null
+        }
+      ],
+      "capabilities": [
+        "archive_stream",
+        "filesystem_helpers"
+      ],
+      "label": "Archiver / fs-extra",
+      "notes": [],
+      "official_urls": [
+        "https://www.archiverjs.com/",
+        "https://github.com/jprichardson/node-fs-extra"
+      ],
+      "provider_id": "JS06",
+      "safety": "Read-only detection; explicit activation is required.",
+      "scope": "io_optional",
+      "status": "unavailable"
+    },
+    {
+      "candidates": [
+        {
+          "available": false,
+          "ecosystem": "node",
+          "manifest": "/workspace/scratch/5f8e190a3a94/nlp_upgrade_workspace/VIA_NLP_Application_System_v1.8.0/node_modules/puppeteer/package.json",
+          "name": "puppeteer",
+          "version": null
+        }
+      ],
+      "capabilities": [
+        "browser_testing",
+        "authorized_dynamic_page_rendering"
+      ],
+      "label": "Puppeteer",
+      "notes": [],
+      "official_urls": [
+        "https://pptr.dev/"
+      ],
+      "provider_id": "JS07",
+      "safety": "No CAPTCHA, verification, authentication, or site-control bypass.",
+      "scope": "browser_optional",
+      "status": "unavailable"
+    },
+    {
+      "candidates": [
+        {
+          "available": false,
+          "ecosystem": "node",
+          "manifest": "/workspace/scratch/5f8e190a3a94/nlp_upgrade_workspace/VIA_NLP_Application_System_v1.8.0/node_modules/cheerio/package.json",
+          "name": "cheerio",
+          "version": null
+        }
+      ],
+      "capabilities": [
+        "html_parse",
+        "css_selection"
+      ],
+      "label": "Cheerio",
+      "notes": [],
+      "official_urls": [
+        "https://cheerio.js.org/"
+      ],
+      "provider_id": "JS08",
+      "safety": "Read-only detection; explicit activation is required.",
+      "scope": "parser_optional",
+      "status": "unavailable"
+    },
+    {
+      "candidates": [
+        {
+          "available": false,
+          "ecosystem": "node",
+          "manifest": "/workspace/scratch/5f8e190a3a94/nlp_upgrade_workspace/VIA_NLP_Application_System_v1.8.0/node_modules/ink/package.json",
+          "name": "ink",
+          "version": null
+        },
+        {
+          "available": false,
+          "ecosystem": "node",
+          "manifest": "/workspace/scratch/5f8e190a3a94/nlp_upgrade_workspace/VIA_NLP_Application_System_v1.8.0/node_modules/neo-blessed/package.json",
+          "name": "neo-blessed",
+          "version": null
+        }
+      ],
+      "capabilities": [
+        "terminal_ui",
+        "progress_matrix"
+      ],
+      "label": "Ink / neo-blessed",
+      "notes": [
+        "The original blessed package is legacy; neo-blessed is the maintained-compatible candidate."
+      ],
+      "official_urls": [
+        "https://github.com/vadimdemedes/ink",
+        "https://github.com/embarklabs/neo-blessed"
+      ],
+      "provider_id": "JS09",
+      "safety": "Read-only detection; explicit activation is required.",
+      "scope": "reporting_optional",
+      "status": "unavailable"
+    },
+    {
+      "candidates": [
+        {
+          "available": false,
+          "ecosystem": "node",
+          "manifest": "/workspace/scratch/5f8e190a3a94/nlp_upgrade_workspace/VIA_NLP_Application_System_v1.8.0/node_modules/d3/package.json",
+          "name": "d3",
+          "version": null
+        },
+        {
+          "available": false,
+          "ecosystem": "node",
+          "manifest": "/workspace/scratch/5f8e190a3a94/nlp_upgrade_workspace/VIA_NLP_Application_System_v1.8.0/node_modules/chart.js/package.json",
+          "name": "chart.js",
+          "version": null
+        }
+      ],
+      "capabilities": [
+        "data_visualization",
+        "web_chart"
+      ],
+      "label": "D3 / Chart.js",
+      "notes": [],
+      "official_urls": [
+        "https://d3js.org/",
+        "https://www.chartjs.org/docs/latest/"
+      ],
+      "provider_id": "JS10",
+      "safety": "Read-only detection; explicit activation is required.",
+      "scope": "reporting_optional",
+      "status": "unavailable"
+    }
+  ],
+  "policy": {
+    "auto_execute": false,
+    "auto_import": false,
+    "auto_install": false,
+    "browser_launch": false,
+    "browser_verification_bypass": false,
+    "canonical_source_write": false,
+    "captcha_bypass": false,
+    "core_runtime_dependencies": "none",
+    "cpu_nlp_activation": "knowledge.cpu_tools.enabled",
+    "cpu_nlp_results": "derivative_candidates_only",
+    "missing_provider_behavior": "deterministic_core_fallback",
+    "network_access": false
+  },
+  "provider_group_count": 21,
+  "schema": "VIA_LOCAL_PROVIDER_REGISTRY/1.0",
+  "statistics": {
+    "available": 1,
+    "cpu_nlp_available": 1,
+    "cpu_nlp_partial": 0,
+    "cpu_nlp_unavailable": 9,
+    "partial": 2,
+    "unavailable": 18,
+    "unverified": 0
+  },
+  "total_provider_group_count": 31
+}

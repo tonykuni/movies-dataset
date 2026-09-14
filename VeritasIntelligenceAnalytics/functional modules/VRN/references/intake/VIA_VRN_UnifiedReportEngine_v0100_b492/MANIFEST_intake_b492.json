@@ -1,0 +1,38 @@
+{
+ "schema": "VIA.Intake.Manifest.v1",
+ "batch": "批492",
+ "ts": "2026-09-14",
+ "origin": "操作員上傳 VIA_VRN_UnifiedReportEngine_v0100.py(2026-09-14;同批另上傳 TWREV v2.7 FULL zip,逐檔 md5 與 b477 收容包全同=不重複收容)",
+ "files": [
+  {
+   "name": "VIA_VRN_UnifiedReportEngine_v0100.py",
+   "md5": "8e16e55165e6f9628882c83cb5080da0",
+   "lines": 2760
+  }
+ ],
+ "measured": {
+  "selftest": "容器 23/23 PASS(PyMuPDF 1.28.2 + pdfplumber + duckdb 在位)",
+  "hardcoded_paths": "無(module 搜尋走 --module-dir/自身夾/cwd/cwd/upload;輸出預設 VRN_Unified_Output 相對 cwd)",
+  "network": "無主動連線;--allow-web-official 旗標預設關(官方名冊走 web 時才會連,同意閘不代設)",
+  "borrows": [
+   "VIA_VRN_FirstPageEngine_v*.py(在庫 v0122)",
+   "VRN_ENG072_FirstPageText_v*.py(在庫)"
+  ],
+  "ssot_outputs": [
+   "StockReportBasicInfo.parquet",
+   "StockReportFinancialData.parquet"
+  ],
+  "derived": [
+   "CSV(UTF-8 BOM)",
+   "JSON",
+   "DuckDB",
+   "HTML 零 CDN"
+  ]
+ },
+ "registered": {
+  "spec_item": "vrn_unified(VIA_InputConsole_Spec_v0100.json vrn/pipeline)",
+  "grid": "CGC_MDL064_SelftestGrid_v0296 站",
+  "command": "via-vrnuni(Register v0193;別名 統一報告)"
+ },
+ "open": "官方名冊 --official-listings 期待 CSV(code/ticker/證券代號 · name/證券名稱 · yf_ticker · industry 任一命名);庫裡 tw_listings 尚未橋成該 CSV(交接 T 項)"
+}

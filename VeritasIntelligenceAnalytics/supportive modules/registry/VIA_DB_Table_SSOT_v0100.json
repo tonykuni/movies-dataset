@@ -1,0 +1,640 @@
+{
+ "schema": "VIA.DBTableSSOT.v1",
+ "ts": "2026-09-13",
+ "batch": "批498",
+ "source": "操作員工作站 via-census 實測(批475 貼回)+ VDF 引擎碼 INSERT/CREATE 寫入者掃描(批478)",
+ "policy": {
+  "canonical": "vdf_tw_market.duckdb / vdf_global_market.duckdb / ActiveTWETF.duckdb 為正庫",
+  "replicas": "檔名含 _repo_ 的是副本(資料止於 2026-08-25);census 對副本只列不判正典",
+  "absent_rule": "冊上宣告而庫裡沒有 → ABSENT(冊上宣告)並列寫入者;冊外但碼上 SQL 語境引用 ≥3 檔 → ABSENT(冊外)",
+  "numbers": "rows_seen/date_* 是觀測值不是保證值;min_rows 才是判準(預設 1=表不得為空)"
+ },
+ "known_legacy_absent": [
+  "vrn_supportbridge",
+  "tw_ticker_regex",
+  "vrn_mdl001_convert_log",
+  "vrn_mdl002_tables",
+  "vrn_mdl002_text_blocks",
+  "vrn_mdl003_financial_rows",
+  "vrn_mdl003_text_flow",
+  "vrn_mdl003_verify_results",
+  "vrn_mdl007_api_data",
+  "consensus_current",
+  "vrn_header_schema_registry_v1",
+  "vrn_mdl001_conversions"
+ ],
+ "tables": [
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_daily_prices",
+   "role": "正庫·台股",
+   "rows_seen": 2128169,
+   "date_lo": "1900-01-01",
+   "date_hi": "2026-09-11",
+   "writers": [
+    "VDF_ENG073",
+    "VDF_ENG078"
+   ],
+   "min_rows": 1,
+   "note": "MIN 日期 1900-01-01=哨兵列污染(待清;只增不減律下先標不刪)"
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_prices_adj",
+   "role": "正庫·台股",
+   "rows_seen": 2128168,
+   "date_lo": "2020-01-02",
+   "date_hi": "2026-09-11",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "prices_canonical",
+   "role": "正庫·台股",
+   "rows_seen": 2128168,
+   "date_lo": "2020-01-02",
+   "date_hi": "2026-09-11",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "features_daily",
+   "role": "正庫·台股",
+   "rows_seen": 2128168,
+   "date_lo": "2020-01-02",
+   "date_hi": "2026-09-11",
+   "writers": [
+    "VDF_ENG061"
+   ],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_trading_daily",
+   "role": "正庫·台股",
+   "rows_seen": 1469025,
+   "date_lo": "2023-01-03",
+   "date_hi": "2026-09-11",
+   "writers": [
+    "VDF_ENG057"
+   ],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_chip_inst",
+   "role": "正庫·台股",
+   "rows_seen": 1165675,
+   "date_lo": "2024-01-02",
+   "date_hi": "2026-09-11",
+   "writers": [
+    "VDF_ENG056",
+    "VDF_ENG081"
+   ],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_chip_margin",
+   "role": "正庫·台股",
+   "rows_seen": 1145409,
+   "date_lo": "2024-01-02",
+   "date_hi": "2026-09-11",
+   "writers": [
+    "VDF_ENG056",
+    "VDF_ENG081"
+   ],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_chip_derived",
+   "role": "正庫·台股",
+   "rows_seen": 1136185,
+   "date_lo": "2024-01-02",
+   "date_hi": "2026-09-07",
+   "writers": [
+    "VDF_ENG056"
+   ],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "group_features_daily",
+   "role": "正庫·台股",
+   "rows_seen": 37308,
+   "date_lo": "2022-01-03",
+   "date_hi": "2026-09-11",
+   "writers": [
+    "VDF_ENG062"
+   ],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_monthly_revenue",
+   "role": "正庫·台股",
+   "rows_seen": 88275,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [
+    "VDF_ENG063",
+    "VDF_ENG073"
+   ],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "monthly_revenue_analysis",
+   "role": "正庫·台股",
+   "rows_seen": 88275,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [
+    "VDF_ENG076"
+   ],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_universe",
+   "role": "正庫·台股",
+   "rows_seen": 7930,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_listings",
+   "role": "正庫·台股",
+   "rows_seen": 1996,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [
+    "VDF_ENG081"
+   ],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_listings_industry",
+   "role": "正庫·台股",
+   "rows_seen": 1981,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "etf_book",
+   "role": "正庫·台股",
+   "rows_seen": 2155,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [
+    "VDF_ENG077"
+   ],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_valuation_daily",
+   "role": "正庫·台股",
+   "rows_seen": 13778,
+   "date_lo": "2026-08-24",
+   "date_hi": "2026-09-11",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "consensus_daily",
+   "role": "正庫·台股",
+   "rows_seen": 597,
+   "date_lo": "2026-08-25",
+   "date_hi": "2026-09-12",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "consensus_latest",
+   "role": "正庫·台股",
+   "rows_seen": 198,
+   "date_lo": "2026-08-27",
+   "date_hi": "2026-09-12",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "analyst_estimates",
+   "role": "正庫·台股",
+   "rows_seen": 585,
+   "date_lo": "2026-08-25",
+   "date_hi": "2026-08-27",
+   "writers": [
+    "VDF_ENG059"
+   ],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_daytrade_eligible",
+   "role": "正庫·台股",
+   "rows_seen": 6164,
+   "date_lo": "2026-08-25",
+   "date_hi": "2026-09-03",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_daytrade_market",
+   "role": "正庫·台股",
+   "rows_seen": 20,
+   "date_lo": "2026-08-03",
+   "date_hi": "2026-09-02",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_market_agg",
+   "role": "正庫·台股",
+   "rows_seen": 28,
+   "date_lo": "2026-08-03",
+   "date_hi": "2026-09-10",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "tw_rates_cbc",
+   "role": "正庫·台股",
+   "rows_seen": 308,
+   "date_lo": "2001-01-01",
+   "date_hi": "2026-08-01",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "etf_revenue_holdings",
+   "role": "正庫·台股",
+   "rows_seen": 40,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "etf_revenue_momentum",
+   "role": "正庫·台股",
+   "rows_seen": 1,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "via_ingest_ledger",
+   "role": "正庫·台股",
+   "rows_seen": 21,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "vrn_report_basic",
+   "role": "正庫·台股",
+   "rows_seen": 59,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "vrn_report_analyst",
+   "role": "正庫·台股",
+   "rows_seen": 111,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "vrn_report_crosscheck",
+   "role": "正庫·台股",
+   "rows_seen": 573,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "vrn_report_financial",
+   "role": "正庫·台股",
+   "rows_seen": 7024,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "vrn_report_metrics",
+   "role": "正庫·台股",
+   "rows_seen": 47,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "vrn_four_point_digest",
+   "role": "正庫·台股",
+   "rows_seen": 37,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_global_market.duckdb",
+   "table": "global_daily",
+   "role": "正庫·國際",
+   "rows_seen": 203924,
+   "date_lo": "2018-01-01",
+   "date_hi": "2026-09-12",
+   "writers": [
+    "VDF_ENG066"
+   ],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_global_market.duckdb",
+   "table": "gl_prices_adj",
+   "role": "正庫·國際",
+   "rows_seen": 203916,
+   "date_lo": "2018-01-01",
+   "date_hi": "2026-09-12",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_global_market.duckdb",
+   "table": "prices_canonical",
+   "role": "正庫·國際",
+   "rows_seen": 203916,
+   "date_lo": "2018-01-01",
+   "date_hi": "2026-09-12",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_global_market.duckdb",
+   "table": "features_daily",
+   "role": "正庫·國際",
+   "rows_seen": 203916,
+   "date_lo": "2018-01-01",
+   "date_hi": "2026-09-12",
+   "writers": [
+    "VDF_ENG061"
+   ],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_global_market.duckdb",
+   "table": "us_macro",
+   "role": "正庫·國際",
+   "rows_seen": 284805,
+   "date_lo": "1990-01-01",
+   "date_hi": "2026-09-13",
+   "writers": [
+    "VDF_ENG073"
+   ],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_global_market.duckdb",
+   "table": "cross_macro",
+   "role": "正庫·國際",
+   "rows_seen": 6144,
+   "date_lo": "2018-01-01",
+   "date_hi": "2026-09-11",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_global_market.duckdb",
+   "table": "sentiment_daily",
+   "role": "正庫·國際",
+   "rows_seen": 264,
+   "date_lo": "2025-08-25",
+   "date_hi": "2026-09-03",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_global_market.duckdb",
+   "table": "macro_series_registry",
+   "role": "正庫·國際",
+   "rows_seen": 183,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_global_market.duckdb",
+   "table": "factset_earnings",
+   "role": "正庫·國際",
+   "rows_seen": 4,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_global_market.duckdb",
+   "table": "etf_stats_daily",
+   "role": "正庫·國際",
+   "rows_seen": 467,
+   "date_lo": "2026-08-25",
+   "date_hi": "2026-09-12",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_global_market.duckdb",
+   "table": "index_valuation_proxy",
+   "role": "正庫·國際",
+   "rows_seen": 156,
+   "date_lo": "2026-08-25",
+   "date_hi": "2026-09-12",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "ActiveTWETF.duckdb",
+   "table": "holdings_daily",
+   "role": "正庫·主動 ETF",
+   "rows_seen": 40,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [
+    "VDF_ENG051",
+    "VDF_ENG076",
+    "VDF_ENG078"
+   ],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "ActiveTWETF.duckdb",
+   "table": "holdings_changes",
+   "role": "正庫·主動 ETF",
+   "rows_seen": 40,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [
+    "VDF_ENG051"
+   ],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "ActiveTWETF.duckdb",
+   "table": "active_tw_etf_universe",
+   "role": "正庫·主動 ETF",
+   "rows_seen": 260,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [
+    "VDF_ENG051",
+    "VDF_ENG077"
+   ],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "ActiveTWETF.duckdb",
+   "table": "active_tw_etf_registry",
+   "role": "正庫·主動 ETF",
+   "rows_seen": 31,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [
+    "VDF_ENG078"
+   ],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "ActiveTWETF.duckdb",
+   "table": "active_etf_holdings_coverage",
+   "role": "正庫·主動 ETF",
+   "rows_seen": 69,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "ActiveTWETF.duckdb",
+   "table": "fetch_status",
+   "role": "正庫·主動 ETF",
+   "rows_seen": 145,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [
+    "VDF_ENG051"
+   ],
+   "min_rows": 1,
+   "note": ""
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "vrn_extraction_logic",
+   "role": "邏輯庫·VRN 擷取台帳(逐件 方法/互核/修復/判準;批498 入庫)",
+   "rows_seen": 0,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [
+    "VRN_ENG082"
+   ],
+   "min_rows": 0,
+   "note": "ENG072 每次跑完自動 sync;via-vrnlogic sync-db 手動"
+  },
+  {
+   "db": "vdf_tw_market.duckdb",
+   "table": "via_policy_factors",
+   "role": "政策庫·律冊攤平(擷取邏輯/工具冊風險/資料家版面/基線 hydra;批498 入庫)",
+   "rows_seen": 0,
+   "date_lo": "",
+   "date_hi": "",
+   "writers": [
+    "VRN_ENG082"
+   ],
+   "min_rows": 1,
+   "note": "source/key/value/synced_at;每次 sync 整表覆寫"
+  }
+ ]
+}
