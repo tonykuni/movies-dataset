@@ -66,7 +66,8 @@
      "role": "簡→繁(文字修復)",
      "optional": true
     }
-   ]
+   ],
+   "python_measured": "3.13.7(EnvManager v0300 AUDIT 2026-09-14;冊原定 3.12,既有健康境不動只增)"
   },
   "via_paddle_311": {
    "python": "3.12",
@@ -144,7 +145,8 @@
       "version_min:3.0"
      ]
     }
-   ]
+   ],
+   "python_measured": "3.13.7(EnvManager v0300 AUDIT 2026-09-14;冊原定 3.12,既有健康境不動只增)"
   },
   "via_vap_312": {
    "python": "3.12",
@@ -192,7 +194,8 @@
      "imp": "duckdb",
      "role": "庫"
     }
-   ]
+   ],
+   "python_measured": "3.13.7(EnvManager v0300 AUDIT 2026-09-14;冊原定 3.12,既有健康境不動只增)"
   },
   "via_vdf_312": {
    "python": "3.12",
@@ -240,7 +243,8 @@
      "imp": "requests",
      "role": "AegisNexus 網路核心相依"
     }
-   ]
+   ],
+   "python_measured": "3.13.7(EnvManager v0300 AUDIT 2026-09-14;冊原定 3.12,既有健康境不動只增)"
   }
  },
  "health_checks": {
@@ -275,5 +279,32 @@
   "MEDIUM": "尾 _M(ml_boost/web_api/webui/http_async):混合隔離境",
   "LOW": "家族境(via_vdf_312/via_vrn_312/via_vap_312/via_html_312/via_nlp/via_tools_312)或 via_core",
   "SPECIAL": "hydra.watch_diverge 樞紐件(numpy 等):多環境多版本搭配多 Python=允許;tools 動詞印樞紐矩陣(境×版本)只作 INFO,不強制對齊"
+ },
+ "never_install": {
+  "via_paddle_311": [
+   "opencv-python",
+   "opencv-python-headless"
+  ],
+  "note": "Baseline cv2_anchor=opencv-contrib-python;pdf2docx/easyocr/albucore 要的 headless 依 families.ocr.residual_accepted 接受殘餘,不裝(裝了=互斥同裝 UVT-07)"
+ },
+ "fleet_measured_2026-09-14": {
+  "source": "操作員貼回 VIA_EnvManager-v0300 AUDIT run ENV-20260914_112000",
+  "envs": 48,
+  "managed": 42,
+  "migration_required": [
+   "camelot_311",
+   "paddle_311",
+   "vif_aio",
+   "vif_core",
+   "vmt_pm"
+  ],
+  "key": {
+   "via_paddle_311": "114 件:paddleocr 3.3.1/paddlepaddle 3.2.0/easyocr 1.7.2/pytesseract/rapidocr/doctr/torch 2.13;缺 opencv-python(-headless)=接受殘餘",
+   "via_vrn_312": "229 件:paddleocr 3.7.0/paddlex/torch 2.14/tensorflow/pymupdf/pdfplumber/python-docx/reportlab/pyarrow 24;無 easyocr(→階梯 dual 派 via_paddle_311)",
+   "via_vap_312": "210 件:pandas 3.0.3/matplotlib/plotly/catboost/tensorflow;pyarrow 不在 dist 清單=半拆(force-reinstall);seaborn 缺",
+   "via_vdf_312": "171 件:duckdb/pandas 2.3.3/polars/pyarrow 24/yfinance/playwright;numpy 2.2.6",
+   "via_vdf": "38 件 登錄 profile(numpy 1.26.4 黃金釘;py 3.12)——引擎實跑的是 via_vdf_312(未登錄 advisory);誰是正典要操作員裁",
+   "via_core": "14 件白名單境(PASS);EnvManager profile 缺 ruff"
+  }
  }
 }
