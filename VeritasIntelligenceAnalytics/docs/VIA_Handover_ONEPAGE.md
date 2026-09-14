@@ -1,6 +1,93 @@
-# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0100 · 批506)
+# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0101 · 批507)
 
-> 產生 2026-09-14 17:05:17 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
+> 產生 2026-09-14 17:32:53 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
+
+## 〇 · 接手提示詞(給下一個 AI;來源 VIA_AI_Handover_Prompt_v0100.md)
+
+# VIA · AI 接手提示詞與交接格式 v0100(批507;長久使用)
+
+> 這套系統是**多個 AI 工作階段接力寫成的**(每批 `批NNN` 一次 commit),操作員下令、AI 造件、操作員實測貼回、AI 讀實錄修。
+> 對話會卡斷,檔案不會。所以「接手不掉球」靠三個檔,不靠對話記憶:
+> ① 倉根 `VIA_HANDOVER_LATEST.md`(VCGC 一頁交接;八段 + 〇 接手提示 + 九 掉球清單)
+> ② `docs/VIA_Handover_2026MMDD_BNNN.md`(逐批紀錄;最新一份)
+> ③ `supportive modules/registry/VIA_Policy_Laws_SSOT_v*.json`(23 律 + lessons;違反=重犯)
+
+---
+
+## A · 給被交接者(接手 AI)——開場提示詞,整段貼進新對話即可
+
+```text
+你接手 VIA(VeritasIntelligenceAnalytics)。倉 tonykuni/movies-dataset,分支 claude/via-envmanager-governance-7cls8h,
+工作根 VeritasIntelligenceAnalytics/。操作員用中文;工作站 C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics。
+
+先做(不准跳過,任何造件之前):
+1. 讀倉根 VIA_HANDOVER_LATEST.md(一頁交接:〇 接手提示 · 一 政策庫 · 二 安裝核可/環境工具 · 三 邏輯/因子/資料庫 ·
+   四 引擎調度/多矩陣 · 五 指令與參數 · 六 註冊稽核 · 七 自動編號註冊表 · 八 交接本文 · 九 掉球清單)。
+2. 讀 docs/ 最新 VIA_Handover_*_B*.md 的「三 還掛著的事」與最後兩批段落。
+3. 讀 VIA_Policy_Laws_SSOT_v*.json 的 23 律;下面 12 條是最常犯的,背起來:
+   L01 先想省 token(不重讀大檔,grep 要改的段;操作員貼回的實錄直接當量測)
+   L02 只增不減 · L03 正本零觸碰(references/intake 不編輯)· L04 尾版律(引擎改=新版號檔;冊/無版號檔才就地改)
+   L05 Zero-Hydra(綁既有引擎;同一判準只寫一處)· L06 零 CDN 零彈窗
+   L07 同意閘(VIA_NET_CONSENT/VIA_SCRAPE_CONSENT/金鑰)操作員自設,永不代設
+   L08 零 force push;不 Stop-Process;不 Remove-Item/conda remove/pip uninstall;裝件=操作員的手(--approve + 閘)
+   L09 加速器/網路只認 VeritasCeleritas/VeritasAegisNexus · L16 誠實四態 ABSENT/NODATA/GATED/RED(判錯的燈和假綠一樣傷)
+   L17 自測零污染(VIA_SELFTEST=1;撤 VIA_DB_*/VIA_DATA_HOME;只寫暫存)· L18 功能註冊七處(規格項/格子站/Register/Deck/Manager/台帳/交接)
+   L19 環境統一測式 GREEN 24h 內才核可安裝 · L20 VCGC 為唯一對接口 · L23 只刪有 md5 證據的重複件
+4. 接手驗收(在容器裡跑,貼結果給操作員,證明你接上了):
+   python3 "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0100.py" status
+   python3 "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0100.py" --selftest
+   git log --oneline -3
+5. 讀「九 掉球清單」,把仍掛著的項目原樣列回給操作員,問他要先追哪一顆——不要自己挑。
+
+工作節奏(每一批都一樣):
+- 每批一個小主題;commit 訊息「批NNN: …」;push origin claude/via-envmanager-governance-7cls8h(失敗退避重試,不 force)。
+- commit 尾註只留 Co-Authored-By / Claude-Session 兩行;倉內任何產物不放模型識別字。
+- 造件前先 grep 現況;造完跑 --selftest;新引擎=七處登冊 + 台帳 VIA_AutoCode_Registry(indent=1)+ 交接段。
+- 回覆操作員:中文;先講結果;一個 PowerShell 一貼即用區塊,前兩行固定:
+    Set-Location 'C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics'
+    . (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName
+  然後要他貼回哪幾個指令的尾段;他貼回來的實錄直接當量測,不自己重跑。
+- 容器沒有他的資料與環境(via_database、48 個 env、Tesseract、Paddle);容器裡的 NODATA/ABSENT 不是壞,寫明「容器」。
+- 收尾:via-vcgc page --publish(一頁交接 + 倉根副本 + 頁)→ 台帳 → 交接段 → commit → push;再回覆。
+
+掉球定義:操作員說過、你沒做也沒寫進掉球清單的事。掉球清單只增不減,結案用 ~~刪除線~~ 加「已結(批NNN)」。
+```
+
+## B · 給交接者(離場 AI)——收尾清單(每一條都要有證據路徑)
+
+| # | 收尾 | 證據 |
+|---|------|------|
+| 1 | 所有改動 commit「批NNN」並 push;工作樹乾淨(`git status --short` 空) | commit hash |
+| 2 | `via-vcgc page --publish`:一頁交接 `docs/VIA_Handover_ONEPAGE.md`、倉根 `VIA_HANDOVER_LATEST.md`、頁 `ui_support/VIA_UI_CentralGovernanceConsole_v0100.html` 三處同一份 | ENG082 ⑯ 交接三處 = 同 |
+| 3 | 掉球清單 `docs/VIA_DroppedBalls_*.md` 更新(新掛的加、結案的劃線);未做的**寫進去比做一半更重要** | 檔在、ONEPAGE 九段有列 |
+| 4 | 台帳 `VIA_AutoCode_Registry_v0100.json` 追記本批(code/kind/ts/name 四欄;indent=1) | 筆數 +1 |
+| 5 | 逐批紀錄 `docs/VIA_Handover_*_B*.md` 追加本批段(做了什麼/實錄讀出/你的手/一貼即用) | 段在 |
+| 6 | 新引擎七處登冊齊(規格/格子/Register/Deck/Manager/台帳/交接);`via-vcgc audit` 未登冊數不增 | audit 數 |
+| 7 | 操作員機器要跑的復原/同步指令寫在回覆的 PS 區塊(例:`via-vrnlogic sync-db` 讓六本庫的 via_policy_factors/via_handover 跟上) | 回覆 |
+| 8 | 最後一則回覆:結果 → 你的手(操作員待辦)→ PS 區塊 → 要貼回什麼 | — |
+
+## C · 交接紀錄固定格式(長久使用;人與 AI 都讀得懂)
+
+```
+# VIA 交接紀錄 · 批NNN(YYYY-MM-DD)
+〇 接手提示詞 → 見 docs/VIA_AI_Handover_Prompt_v*.md(尾版)
+一 律(新收到的原文照錄;編號進 VIA_Policy_Laws_SSOT)
+二 現況快照(VCGC status 八行原樣貼)
+三 本批做了什麼(表:件 / 檔(版號) / 自測 n/n / 證據)
+四 實錄讀出(表:你貼的 / 讀出 / 修)
+五 掉球清單(表:代號 / 事 / 狀態 未做·候·操作員的手·容器紅 / 誰 / 下一步)——只增不減,結案劃線
+六 你的手(操作員待辦:閘/裝件/決策)
+七 一貼即用(PS 區塊;前兩行固定)
+八 接手驗收(接手者要跑的三個指令與預期輸出)
+```
+
+## D · 「多 AI 寫作」的規矩(為什麼要這樣)
+
+- 每個 AI 只活一個對話;**檔案是唯一的記憶**。所以規則、掉球、參數、指令全部要落檔,不留在對話裡。
+- 同一判準只寫一處(L05):兩個 AI 各寫一份,第三個 AI 只會改到其中一份。
+- 自測不讀自測本身的字串(LL:批504/506 兩次自我引用誤判)。
+- 登冊腳本逐檔獨立寫入、失敗要可見(LL09:批505 錨點斷掉只上一半還 commit 了)。
+- 判錯的燈和假綠一樣傷(L16):接手者第一件事不是造新件,是把上一位的燈對一遍。
 
 ## 一 · 政策庫(律 + lessons-learned)
 
@@ -43,13 +130,13 @@
 
 ## 二 · 安裝核可(L19)與環境工具
 
-- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 141.8 h → **BLOCKED_UNITEST**
+- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 142.3 h → **BLOCKED_UNITEST**
 - 工具冊導入計畫:ABSENT · - · 件態 None · 風險 None · 段 None · 未路由 None · 白名單留置 None(TOOLS_PLAN_latest.json 不在(via-envtools))
 - 裝件=操作員的手:`$env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve`(閘不代設;L19 未綠=BLOCKED_UNITEST)
 
 ## 三 · 邏輯庫 · 因子庫 · 資料庫
 
-- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 332 列 · 全庫同步 {'hash': 'ef83a0c2b212', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_20260914_B498.md', 'sha': '47e90db19762', 'root': '舊', 'home': '缺'}
+- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 332 列 · 全庫同步 {'hash': 'ef83a0c2b212', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': 'ed02df243594', 'root': '同', 'home': '缺'}
 - 因子庫 OK:130 列 · {'SUP_MDL748:allinone 2.1.0': 77, 'SUP_MDL748:financial_data_standardization': 53} · 掛載 {'allinone': 'OK VIA_VRNLogic_AllInOne_v0201.py 2.1.0', 'fds': 'OK financial_data_standardization.py · 28 欄 · 合併損傷件(__main__ 示範缺 5 法,程式庫面可用)'}
 - 庫表冊 OK:54 表(批505)· 全庫表 4 · 庫 ['ActiveTWETF.duckdb', 'vdf_global_market.duckdb', 'vdf_tw_market.duckdb']
 - 資料家 ABSENT:VIA_Reports/datahome/DATAHOME_CATALOG_latest.json 不在(via-datahome catalog) · 庫 None · 表 None · 湖 None
@@ -57,7 +144,7 @@
 ## 四 · 引擎調度 · 多矩陣實測
 
 - 五矩陣 OK:2026-09-14T11:21:39 · 真跑 ['vdf'] · 項 43 · 態 {'GATED': 12, 'NODATA': 5, 'PLAN': 18, 'ABSENT': 2, 'GREEN': 6}
-- Deck 任務 64 · 規格項 44 · 格子站 217(在位 214)· Register 指令 109 · Manager 正式名稱 任務 64 / 引擎 81
+- Deck 任務 64 · 規格項 44 · 格子站 217(在位 217)· Register 指令 109 · Manager 正式名稱 任務 64 / 引擎 81
 
 ## 五 · 指令與參數(不丟失;來源 Register-VIA-Commands-v0199.ps1)
 
@@ -217,15 +304,15 @@
 
 ## 七 · 自動編號註冊表(台帳)
 
-- 台帳 1041 筆 · 元件 147 · 更新 2026-09-14
+- 台帳 1042 筆 · 元件 147 · 更新 2026-09-14
 - 類別 current:系統 1 · 支援性工具 1 · 功能性工具 1 · 模組 1 · 引擎 19 · 函數庫 1 · 打包產品 8
 
-- 2026-09-14 17:05 批501 實錄修:深底反白 + 轉接器就緒判準(名對不上)
 - 2026-09-14 18:00 批502 實錄修:車道候選鍵分離 + 階梯派送判準 + psm 階梯 + 錯誤全文
 - 2026-09-14 18:30 批503 收尾:首頁擷取 64/64;法計數歸一
 - 2026-09-14 19:40 批504 財務邏輯橋(AllInOne+FDS 只掛不搬)+ 自測零污染律 + 五件上傳量測
 - 2026-09-14 20:30 批505 vrn_logic 站 RED 根因修(自測隔離)+ 三大報表引擎上船(填缺席)+ 實測 vdf/vrn/vetf 指路
 - 2026-09-14 22:10 批506 倉衛生 + 政策庫 + VCGC 唯一對接口 + L19 安裝核可 + 一頁交接
+- 2026-09-14 17:32 批507 AI 交接提示詞 / 固定格式 / 掉球清單 / VCGC 〇九段
 
 ## 八 · 交接本文(來源 VIA_Handover_20260914_B498.md;逐批紀錄見該檔)
 
@@ -282,4 +369,38 @@ via-ryg -Timeout 300              # ⑦ 五矩陣燈:紫=GATED(閘未開,不是�
 # 你決定要裝時才跑(裝前 freeze 存證;我不代設閘):
 # $env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve
 ```
+
+
+## 九 · 掉球清單(來源 VIA_DroppedBalls_B507.md;列 24 · 未結 23;只增不減,結案劃線)
+
+# VIA 掉球清單(漏球審計)· 批507(2026-09-14)· 涵蓋 批474–506
+
+> 律:操作員說過、沒做也沒寫進這裡=掉球。只增不減;結案用 ~~刪除線~~ 加「已結(批NNN)」。狀態:未做 / 候(等操作員裁) / 操作員的手(閘·裝件·決策) / 容器紅(容器沒料,他機器綠或未驗)。
+
+| 代號 | 事 | 狀態 | 誰 | 下一步 |
+|------|----|------|----|--------|
+| A | 姊妹倉 tonykuni/VIA-VDF-VRN 同步 | 候 | 工具層權限 | 操作員在工具層授權後再做 |
+| D | 批416 F2 逐家投信 PCF 端點查實 | 操作員的手 | 需網路+閘 | 開閘後跑 ENG078 sync |
+| G | VRN_MDL 數量 300 vs 294 | 未做 | AI | 同一把尺再量 |
+| I/P | VDF SSOT 化;`_repo_` 副本庫哪本正本 | 候 | 操作員 | 冊講明後 census 對冊 |
+| R | ENG072 起手 GLE 探 7 後端 140 秒未快取 | 未做 | AI | 探測結果落 24h 快取 |
+| S | 資料家第二步:31 處散落件 link 進鏡根 | 候 | 操作員 | `via-datahome plan` 核准後 link |
+| T | via-vrnuni 官方名冊 CSV 橋 | 未做 | AI | tw_listings → code/name/yf_ticker/industry |
+| U | VDF 正境 via_vdf(登錄 py3.12)vs via_vdf_312(3.13.7 未登錄) | 候 | 操作員 | 一句話定案後改工具冊 |
+| V | via_vap_312 pyarrow 半拆/pandas/seaborn;via_paddle_311 paddlepaddle(paddle_ppstructure 相依錯)、easyocr 模型檔;Tesseract 已有 chi_tra | 操作員的手 | 閘+Approve | `via-rungate` → `via-vcgc check` → `via-envtools -Apply -Approve` |
+| X | ENG072 ⑤ 空夾誠實 rc2 | 容器紅 | — | v0116 基線同紅;他機器未見紅 |
+| Y | 「Table … does not exist」現為 NODATA | 已改(批498) | — | 冊上有而缺料=查 census -Tables |
+| Z1 | VRN PARTIAL 16 件(互核一致但標示未全還原;操作員律第二句) | 未做 | AI | 逐件看 labels_ok=False 的 repair 紀錄;決定要不要追=操作員 |
+| Z2 | 未登冊引擎家族 40(VCGC audit) | 候 | 操作員核准 | `via-vcgc register-plan` 清單;核准後逐支登站 |
+| Z3 | 倉衛生未刪八類(ICON_FORGE 餘量 1.1GB、SCOPE_COPY、安裝器三版、ui_support 大頁、.dup.csv、跑批產出、收件夾、sha701 巨檔副本) | 候 | 操作員 | 逐類定案;刪必附證據 |
+| Z4 | MOPS 三大報表解析(收容件自述 brittle;ENG082 只探路) | 未做 | AI | 有真回應樣本後再寫解析;`tw_financial` 現靠 yfinance 車道 |
+| Z5 | fin_statements 真抓未驗(via_vdf_312 有無 yfinance?閘?) | 操作員的手 | 閘 | `via-finstat -Dry` → 開閘 `via-finstat run --only 2330,2317` 貼回 |
+| Z6 | vdf/vetf 真跑未驗(容器無料;矩陣預設只跑 vrn,vap) | 操作員的手 | 閘 | `via-ryg vdf,vrn -Timeout 600` + `via-vetf`,`via-bus tails` 貼回 |
+| Z7 | ENG074 ⑬ 三方對照夾具(NO_TICKER/NO_DATE) | 容器紅 | — | v0106 基線同紅;他機器批466 曾 18/18;若他機器也紅=AI 修 |
+| Z8 | 格子 3 站 present=False(ChipWar 編譯檢、TWREV 編譯檢=PYCODE 特殊站;selftest grid 自指) | 非掉球 | — | VCGC v0101 標「特殊」不當缺 |
+| Z9 | ENG074 公式檢(AllInOne validate_formulas)未接進 crosscheck | 未做 | AI | 加 dimension=formula 列(PASS/FAIL) |
+| Z10 | 五本真庫政策表曾被自測污染兩次(批504/505) | 已修(批506 ENG082 v0107) | 操作員復原 | `via-vrnlogic sync-db` 一次;`via-vrnlogic` 應 同步 6 |
+| Z11 | 主控台冊 GOV 類治理任務只在 Deck,不在規格冊 families | 未做 | AI | 規格冊加 gov 家族或 VCGC 頁直接列(現已列 Deck 64 任務) |
+| Z12 | MasterControl 總控頁未隨 Manager v0124–v0126 再生(容器再生會覆蓋真頁;L22) | 操作員的手 | — | 他機器 `via-manager` 再生一次 |
+| ~~W~~ | ~~8 件 FAIL_HIT 首頁件重抽~~ | 已結(批503) | — | 64/64 |
 
