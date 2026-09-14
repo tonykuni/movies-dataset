@@ -7533,7 +7533,13 @@
    "kind": "批481 操作員令「看另外兩個專案裡面有沒有授權使用?授權使用」+ 四個上傳件",
    "ts": "2026-09-13 23:40",
    "name": "先查再造:①VIA_ActiveTWETF_DailyHoldings_Engine_v0101_DuckDB.py(v1.1.0,2026.08.27)與樹上收容件**位元相同**(references/intake + new modules engines),但活著的 ENG051 是它的舊版(ENGINE_NAME 相同;29 個 def 對 46 個,少了動態宇宙/原子寫入/parquet-by-duckdb/同日冪等等 17 個);ENG078 與它零函式重疊(各自的引擎)。→ 版本前進 VDF_ENG051_ActiveTWETF_Holdings_v0102.py = v1.1.0 + 兩處修:(a)根路徑寫死 ~/Downloads/VeritasIntelligenceAnalytics/data(批452/453 三副本病)改 VIA_ACTIVE_TW_ETF_ROOT 明設 → VIA_ROOT(啟動層必設)/functional modules/VDF/output_hub/active_tw_etf → 原退路;(b)唯一對外呼叫點 def_http_get_text 走 via_net 優先(同批479 seam)。自帶 27 檢 27/27(docstring 寫 24,實測 27);經啟動層實證 DEFAULT_ROOT 推到 output_hub/active_tw_etf。樞紐任務 glob VDF_ENG051_ActiveTWETF_Holdings*.py 尾版律自動接到 v0102。②月營收 × 產業 × 族群 相位/領先落後 v030(引擎 116KB + 8 檢 + SSOT JSON):樹上**從沒收過**(只在 b305 整理清單出現過)。跨族群相位/領先落後在樹上只有 ENG070 GroupClassificationIndex 提到,層次不同(分類索引 vs 月營收相位)=不是重複件。收容 VDF/references/intake/VDF_TW_MonthlyRevenue_CrossGroupPhase_v030_b481(3 檔位元相同);unittest 8/8;--self-test 真跑產出 DuckDB/CSV/Parquet + 品質報告 rc=0。引擎根路徑寫死 C:\\Users\\tonyk\\Downloads\\…(可由 VIA_ROOT 覆寫=啟動層已設)與桌面 StockTickerListDatabase.csv;引擎只吃 CSV/Parquet。冊 vdf_revphase(financials 組;--self-test 落 VIA_Reports/engine_bus/_cwd/revphase_selftest)匯流排真跑 GREEN 4.35s、28 檔產出。Register v0187:via-revphase(別名 營收相位;自 vdf_tw_market.duckdb 匯出 tw_monthly_revenue/tw_listings 成 CSV 再明給 --input/--company-master;-SelfTest)+ via-etfhold(別名 持股日更;-SelfTest 根=VIA_Reports/etfhold 不碰正庫;日更觸網只看同意閘不代設)。「授權使用」答案:①早在庫但**沒真正用上**(活引擎是舊版)→ 現在用上;②**沒在庫**→ 現在收容登冊。兩支引擎本體皆無授權條款檔,授權=操作員親口。"
+  },
+  {
+   "code": "批482 功能註冊只增不減:自測格子 v0295 +三站(VETF/相位 v030/TWREV -m)+ 格子接啟動層(第六個啟動器);死路掃描新短令 0",
+   "kind": "批482 操作員令「GO ON」(核准自主完成全線續)",
+   "ts": "2026-09-14 02:40",
+   "name": "先量再登:這幾批新版的 MDL148/MDL138/MDL137/MDL095/ENG047/ENG051/ENG078 在格子裡**本來就有站**,且全用 newest() 動態解析尾版,已自動跑到新版——不重登(重登=九頭龍)。真的沒站的只有三支:VETF Consensus adapter(16 檢)、月營收跨族群相位 v030(8 檢)、TWREV v2.7 selftest。Grid v0295:+三站。TWREV 是套件內模組須 -m 啟動(第十盞燈那一課),格子的 add() 只會 [python 檔 argv] → 用 pycode 站型:subprocess -m twrevenue.cli selftest、cwd=收容包、PYTHONPATH=收容包(碼從收容夾 import,一份碼);收容包缺=誠實 SKIP。執行器 _grid_env():站的子行程接批476 啟動層(格子是第六個啟動器:PYTHONPATH 前置 bootstrap、VIA_ROOT),並把 VIA_ACTIVE_TW_ETF_ROOT 指到 VIA_Reports/selftest_grid/active_tw_etf——ENG051 v0102 會從 VIA_ROOT 推根到 output_hub,自測不該寫進原始碼樹。--only 重跑 4 站(三新站 + ENG051 自測)OK 4 · FAIL 0。跑後收容夾只多 __pycache__(已清),零 churn。既有站 557「主動 ETF 持股引擎 self-test(批131)」寫死舊檔 VDF_ENG051_ActiveTWETF_Holdings.py——只增不減,留著;481 站以 newest() 跑到 v0102 才是活的那站。死路掃描(MDL136 deadends):YELLOW 162 條為既有債(多為台帳 JSON 內提及的舊令名),本工作階段新登的十個短令(via-ryg/census/boot/vetf/twrev/revphase/etfhold/ppp/bus/busui)**0 死路**。"
   }
  ],
- "updated_at": "2026-09-13"
+ "updated_at": "2026-09-14"
 }
