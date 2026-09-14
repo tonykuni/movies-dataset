@@ -91,7 +91,32 @@ def _boot():
         sys.stderr.write("  [VIA boot] " + " · ".join(note) + "\n")
 
 
+def _chain_shadowed():
+    r"""批483:本檔靠 PYTHONPATH 前置生效,會**遮住**發行版自帶的 sitecustomize
+    (Debian/Ubuntu 的 /usr/lib/python3.x/sitecustomize.py 裝的是 apport 崩潰掛鉤)。
+    遮住別人的東西還不吭聲,就是這套系統最恨的那種靜靜走錯。所以接力:
+    在 sys.path 上找**下一個**同名檔(排除本目錄),找到就以 runpy 執行它。找不到=正常。
+    """
+    import runpy
+    here = os.path.dirname(os.path.abspath(__file__))
+    for d in list(sys.path):
+        if not d or os.path.abspath(d) == here:
+            continue
+        cand = os.path.join(d, "sitecustomize.py")
+        if os.path.isfile(cand):
+            try:
+                runpy.run_path(cand, run_name="sitecustomize_shadowed")
+                os.environ["VIA_BOOT_CHAINED"] = cand
+            except Exception as exc:
+                os.environ["VIA_BOOT_CHAINED"] = f"FAIL:{type(exc).__name__}"
+            break
+
+
 try:
     _boot()
+except Exception:
+    pass
+try:
+    _chain_shadowed()
 except Exception:
     pass

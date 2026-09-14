@@ -7539,6 +7539,12 @@
    "kind": "批482 操作員令「GO ON」(核准自主完成全線續)",
    "ts": "2026-09-14 02:40",
    "name": "先量再登:這幾批新版的 MDL148/MDL138/MDL137/MDL095/ENG047/ENG051/ENG078 在格子裡**本來就有站**,且全用 newest() 動態解析尾版,已自動跑到新版——不重登(重登=九頭龍)。真的沒站的只有三支:VETF Consensus adapter(16 檢)、月營收跨族群相位 v030(8 檢)、TWREV v2.7 selftest。Grid v0295:+三站。TWREV 是套件內模組須 -m 啟動(第十盞燈那一課),格子的 add() 只會 [python 檔 argv] → 用 pycode 站型:subprocess -m twrevenue.cli selftest、cwd=收容包、PYTHONPATH=收容包(碼從收容夾 import,一份碼);收容包缺=誠實 SKIP。執行器 _grid_env():站的子行程接批476 啟動層(格子是第六個啟動器:PYTHONPATH 前置 bootstrap、VIA_ROOT),並把 VIA_ACTIVE_TW_ETF_ROOT 指到 VIA_Reports/selftest_grid/active_tw_etf——ENG051 v0102 會從 VIA_ROOT 推根到 output_hub,自測不該寫進原始碼樹。--only 重跑 4 站(三新站 + ENG051 自測)OK 4 · FAIL 0。跑後收容夾只多 __pycache__(已清),零 churn。既有站 557「主動 ETF 持股引擎 self-test(批131)」寫死舊檔 VDF_ENG051_ActiveTWETF_Holdings.py——只增不減,留著;481 站以 newest() 跑到 v0102 才是活的那站。死路掃描(MDL136 deadends):YELLOW 162 條為既有債(多為台帳 JSON 內提及的舊令名),本工作階段新登的十個短令(via-ryg/census/boot/vetf/twrev/revphase/etfhold/ppp/bus/busui)**0 死路**。"
+  },
+  {
+   "code": "批483 自審兩修:啟動層 sitecustomize 接力載入被遮的發行版 sitecustomize;匯流排 v0112 boot 三家族並行+心跳",
+   "kind": "批483 操作員令「GO ON」(核准自主完成全線續);自審批474–482 的碼",
+   "ts": "2026-09-14 03:20",
+   "name": "①啟動層靠 PYTHONPATH 前置生效,所以會**遮住**發行版自帶的 sitecustomize——本容器就有 /usr/lib/python3.11/sitecustomize.py(Debian apport 崩潰掛鉤)。遮住別人的東西還不吭聲,正是這套系統最恨的靜靜走錯。改:_boot() 之後在 sys.path 找下一個同名檔(排除本目錄),找到就 runpy 執行並記 VIA_BOOT_CHAINED;找不到=正常。實證:假的被遮 sitecustomize 放在後面 → 加速器 1:11/88 照掛、被遮的也跑了、接力路徑記在環境變數。本檔無版號(名字必須是 sitecustomize 才生效),就地改,記在此。②工作站實錄 via-boot「還在跑」:boot 逐家族呼叫 python_for()(委派 MDL137→MDL136 解析 conda 境,Windows 上慢),三家族逐一、各 120s、期間零輸出——最壞白畫面六分鐘,又是批423/475 那個病。v0112:三家族各一條執行緒並行;主執行緒每 20s 印「⏳ 還在探測」;總上限 150s,逾時的家族誠實印「探測逾時」不掛著。三十三檢 33/33(㉝ 三家族都印、有總時長、慢不過單家族上限);容器實測 0.3s。其餘自審結論(不改):_run_streaming 逾時只殺自己子行程、讀取執行緒 daemon 化=孫行程持管道不會卡死主流程;MDL138 守則還原後 rc 0→3 走資料側不假綠;via-vetf 的 scriptblock 在呼叫端子作用域可見 $hub;via-revphase 的 python -c 字串 \"\" 轉義正確;Set-VIABoot 只前置不覆蓋 PYTHONPATH。"
   }
  ],
  "updated_at": "2026-09-14"
