@@ -1,0 +1,23 @@
+{
+ "schema": "VIA.VRN.ExtractionLogic.SSOT.v1",
+ "declared_by": "操作員 2026-09-14「vrn 非 OCR 擷取式必要使用;若還有抓不到改用 OCR,從較簡單的工具組往雙引擎、往 Paddle 相關工具;所謂成功包含資料標示還原原樣修復、文字修復;非 OCR 有兩個相同的相互核對,再跟非 OCR 核對;邏輯方法及其他驗證擷取方法成功後存於中央邏輯庫」",
+ "law": {
+  "stage0_non_ocr": "必用:fitz(PyMuPDF)版面序分區 × pdfplumber 同判準分區 = 兩個非 OCR 引擎互核(xcheck);密度閘判 SCANNED 才進 OCR",
+  "ocr_ladder": "抓不到才 OCR;逐階升:simple(tesseract)→ dual(tesseract+easyocr 互核)→ paddle(paddleocr/ppstructure/pdf_pipeline);再與非 OCR 文字層核對(有真文字層時)",
+  "success": "文字 ≥ min_chars 且 互核不為 DISAGREE;分區件另需 資料標示還原(標題帶/右資訊區 + 本文)成立;文字修復(零寬字元/全形英數/中文斷行)已套用並留數字",
+  "central_library": "成功與失敗的方法、互核分數、修復統計、後端健康,全記 VIA_Reports/vrn/extraction_logic/(LOGIC_LEDGER.jsonl 只增 + LOGIC_latest.json 摘要);再跑同一檔(sha1 同、產物在)直接命中不重抽;失敗件 fail_ttl_h 內不重燒 OCR"
+ },
+ "ladder": [
+  {"stage": "simple", "adapters": ["tesseract"], "note": "最簡單的工具組先走"},
+  {"stage": "dual", "adapters": ["tesseract", "easyocr"], "note": "雙引擎互核"},
+  {"stage": "paddle", "adapters": ["paddleocr", "paddle_ppstructure", "paddle_pdf_pipeline"], "note": "Paddle 系(CJK 最佳;操作員指名)"}
+ ],
+ "budget_s": 150,
+ "hq_min_remaining_s": 45,
+ "xcheck": {"agree_bag": 0.85, "agree_seq": 0.6, "partial_bag": 0.5, "textlayer_min_chars": 200},
+ "min_chars": 40,
+ "backend_ttl_h": 24,
+ "fail_ttl_h": 24,
+ "repair": {"zero_width": true, "fullwidth_alnum_to_ascii": true, "keep_cjk_punct": true, "join_cjk_linebreaks": true, "collapse_spaces": true},
+ "note": "本冊是律的資料形;引擎 VRN_ENG082_ExtractionLogic 尾版讀它;沒有這冊時用引擎內建預設(同值)"
+}

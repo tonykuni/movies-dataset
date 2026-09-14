@@ -342,6 +342,21 @@ via-boot           # 之後每個短令起跑都是毫秒級
 `via-vrnuni -SelfTest` 免料;真跑 `via-vrnuni --in <報告夾> --csv --json --duckdb`(未給 `--out` 落 `VIA_Reports\vrn\unified`)。
 它的官方名冊要一份 CSV(`--official-listings`);沒給時台股 canonical ticker 依它自己的律留空,不污染。庫裡的 `tw_listings` 橋成那份 CSV 是 T 項。
 
+## 一-t · 批493 · 你的擷取律 + `vrn_firstpage` 900 秒的根因
+
+律(你 2026-09-14 講的):非 OCR 擷取必用;抓不到才 OCR,從簡單工具組往雙引擎、往 Paddle;成功 = 資料標示還原 + 文字修復;非 OCR 兩引擎互核,再與非 OCR 核對;成功的邏輯存中央邏輯庫。
+
+| 實錄 | 真相 | 修 |
+|---|---|---|
+| `JP-3653` 一份卡 340 秒,之後多份 `NEEDS_OCR[OCR_EMPTY[五支]]` | 抓不到時整座梯子一次全燒(七支後端逐支載模型),再升高畫質整條重跑;每次 `via-ryg` 從頭燒 | **階梯**:simple(tesseract)→dual(+easyocr)→paddle(三支),每件共用 150 秒預算(`VIA_OCR_BUDGET_SEC`);超了誠實標 `OCR_BUDGET` 不升 |
+| `OCR 引擎載入失敗:Unknown argument: show_log` | PPP 收容件拿 PaddleOCR 2.x 的鍵建 3.x | 相容墊片:2.x 鍵自動剔除重試(收容件正本零觸碰);載入失敗的後端記 BROKEN,24 小時內跳過 |
+| 每次重跑 64 份都重抽 | 沒有地方記「這份上次怎麼成功的」 | **中央邏輯庫** `VRN_ENG082`:同檔(sha1)上次 SUCCESS 且產物在 = 命中不重抽;FAIL 的 24 小時內不重燒 OCR;`--force` 重抽 |
+| 兩法互核、文字修復、標示還原沒有存證 | ENG072 早有 fitz×pdfplumber 雙法,但沒判、沒記 | 每件 sidecar 加 `logic{xcheck, repair, labels_ok, verdict}`;台帳 `VIA_Reports\vrn\extraction_logic\LOGIC_LEDGER.jsonl`(只增)+ `LOGIC_latest.json` |
+
+律的資料形在 `VRN_ExtractionLogic_SSOT_v0100.json`(階梯、預算、互核門檻、TTL);執行層 `VRN_ENG082_ExtractionLogic_v0100.py`(十二檢);`VRN_ENG072_FirstPageText_v0117.py` 綁它(三十二檢;容器 30/32:⑤ 空夾 rc2 是 v0116 在此容器本就紅,是夾況不是碼)。
+短令:`via-vrnlogic`(status / reset-backends / -SelfTest;別名 邏輯庫)、`via-firstpage [-Force] [-OcrBudget N] [--in …]`(別名 首頁擷取)。
+仍是你的手:tesseract 的 `chi_tra` 語言包、easyocr 模型下載(要網路同意)、paddleocr 本體;`via-vrnlogic status` 會列出每支後端的 BROKEN 因由。
+
 ## 二 · C 的答案:VDF 現況(**操作員機器實測,批475 他貼回來的**)
 
 > 批474 這一節原本寫的是容器副本的數字,結論是「`tw_daily_prices` 全樹不存在」。
@@ -442,6 +457,8 @@ via-datahome catalog              # ①b 批490:家內清點(C:\Users\tonyk\VIA 
 via-datahome plan                 # ①c 倉內散落整併計畫(只列不動)
 via-census                        # ② C:庫況(批490 起家內也掃;預設一本庫一行,逐表加 -Tables)
 via-vrnuni -SelfTest              # ②b 批492:你上傳的統一報告引擎 23 檢(免料)
+via-vrnlogic -SelfTest            # ②c 批493:擷取中央邏輯庫十二檢
+via-vrnlogic                      # ②d 邏輯庫現況(件數/法/後端健康)
 via-ryg -Timeout 300              # ③ B:五矩陣紅黃綠燈,有心跳不白畫面,跑完自己跳出來
 via-boot                          # ④ 啟動層實證:每支引擎起跑是否綁上加速器/網路件(同意閘不碰)
 via-vetf                          # ⑤ VETF 持股×Consensus(candidate 沙盒;自動找你的兩本庫)
