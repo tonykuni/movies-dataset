@@ -7545,6 +7545,12 @@
    "kind": "批483 操作員令「GO ON」(核准自主完成全線續);自審批474–482 的碼",
    "ts": "2026-09-14 03:20",
    "name": "①啟動層靠 PYTHONPATH 前置生效,所以會**遮住**發行版自帶的 sitecustomize——本容器就有 /usr/lib/python3.11/sitecustomize.py(Debian apport 崩潰掛鉤)。遮住別人的東西還不吭聲,正是這套系統最恨的靜靜走錯。改:_boot() 之後在 sys.path 找下一個同名檔(排除本目錄),找到就 runpy 執行並記 VIA_BOOT_CHAINED;找不到=正常。實證:假的被遮 sitecustomize 放在後面 → 加速器 1:11/88 照掛、被遮的也跑了、接力路徑記在環境變數。本檔無版號(名字必須是 sitecustomize 才生效),就地改,記在此。②工作站實錄 via-boot「還在跑」:boot 逐家族呼叫 python_for()(委派 MDL137→MDL136 解析 conda 境,Windows 上慢),三家族逐一、各 120s、期間零輸出——最壞白畫面六分鐘,又是批423/475 那個病。v0112:三家族各一條執行緒並行;主執行緒每 20s 印「⏳ 還在探測」;總上限 150s,逾時的家族誠實印「探測逾時」不掛著。三十三檢 33/33(㉝ 三家族都印、有總時長、慢不過單家族上限);容器實測 0.3s。其餘自審結論(不改):_run_streaming 逾時只殺自己子行程、讀取執行緒 daemon 化=孫行程持管道不會卡死主流程;MDL138 守則還原後 rc 0→3 走資料側不假綠;via-vetf 的 scriptblock 在呼叫端子作用域可見 $hub;via-revphase 的 python -c 字串 \"\" 轉義正確;Set-VIABoot 只前置不覆蓋 PYTHONPATH。"
+  },
+  {
+   "code": "批484 J 項:vrn_report_digest v0114 計數行亮「取價缺 n」;匯流排 v0113 心跳改走 stderr(call 的 JSON 契約);H 項量測結案",
+   "kind": "批484 操作員令「GO ON」(核准自主完成全線續)",
+   "ts": "2026-09-14 04:10",
+   "name": "J:vrn_report_digest 的取價失敗以前只把值轉 None(批74 nan 誠實閘),計數行看不出來——容器內 yfinance 全失敗仍印「OK 1 · FAIL 0」。按 FAIL 定義(數字抽出來了且對不起來)那不是 FAIL,但「取價缺幾份」得亮出來,不然上漲空間空著沒人知道為什麼。v0114:OK 列中 adj_close 為 None 的計 n_px_miss → matrix.price_missing + 計數行「· 取價缺 n」。三十一檢 31/31(88.7s);經匯流排真跑:GREEN · 報告 2 · OK 1 · FAIL 0 · SKIP 1 · 取價缺 1。自己踩到:call --item vrn_digest 跑超過 20 秒,v0108 的心跳印進 stdout,結果 JSON 就不是合法 JSON,調用端 json.load 直接炸——v0108 加心跳時只想著人眼,忘了 call 的契約是「stdout=統一結果字典」。v0113:人看的字走 stderr,機器讀的字走 stdout;心跳間隔改在呼叫時讀模組常數(預設參數定義時就凍住,執行期改 HEARTBEAT_SEC 沒感覺——㉞ 檢第一版就因此 0 心跳);三十四檢 34/34。H 項量測結案:tw_listings 讀 4 支(ENG070/072/081 + 1)、寫 ENG081;tw_listings_industry 讀 2 支、engine/ 內**無寫入者**(1,981 列來自別處,庫冊已標 writers=[]);操作員機器 tw_listings 1,996 ≥ industry 1,981,「綁舊表 891 列」的顧慮在他的機器上不成立——先前那個數字是容器副本的。不改碼。MDL139 輸入主控台讀冊的 groups/items/glob(6/9/3 處)→ 本工作階段登冊的 vdf_vetf_consensus/vdf_twrev/vdf_revphase/vrn_pdfplus 會在操作員重建頁時自動出現;不在容器內重建正本頁(會 churn)。"
   }
  ],
  "updated_at": "2026-09-14"
