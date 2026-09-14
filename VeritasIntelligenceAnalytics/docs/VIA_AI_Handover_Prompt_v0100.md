@@ -28,8 +28,9 @@
    L17 自測零污染(VIA_SELFTEST=1;撤 VIA_DB_*/VIA_DATA_HOME;只寫暫存)· L18 功能註冊七處(規格項/格子站/Register/Deck/Manager/台帳/交接)
    L19 環境統一測式 GREEN 24h 內才核可安裝 · L20 VCGC 為唯一對接口 · L23 只刪有 md5 證據的重複件
 4. 接手驗收(在容器裡跑,貼結果給操作員,證明你接上了):
-   python3 "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0100.py" status
-   python3 "supportive modules/registry/CGC_MDL149_VeritasCentralGovernanceConsole_v0100.py" --selftest
+   VCGC=$(ls "supportive modules/registry"/CGC_MDL149_VeritasCentralGovernanceConsole_v*.py | sort | tail -1)   # 尾版律:永遠拿最新版號
+   python3 "$VCGC" status
+   python3 "$VCGC" --selftest
    git log --oneline -3
 5. 讀「九 掉球清單」,把仍掛著的項目原樣列回給操作員,問他要先追哪一顆——不要自己挑。
 
