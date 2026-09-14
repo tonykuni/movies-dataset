@@ -204,7 +204,8 @@ bootstrap 做三件事,全包 try(**絕不能讓引擎起不來**):
 | 482 | `2525efd0` | 自測格子 v0295 +三站;格子接啟動層;新短令 0 死路 |
 | 483 | `4e03010b` | 啟動層接力被遮的 sitecustomize;via-boot 三家族並行+心跳 |
 | 484 | `403ad604` | digest v0114 取價缺 n;匯流排 v0113 心跳走 stderr;H 量測結案 |
-| 485 | (本批) | `via-census -Hygiene` 唯讀審計;匯流排登進樞紐 v0137/總控 v0122 |
+| 485 | `06736d7a` | `via-census -Hygiene` 唯讀審計;匯流排登進樞紐 v0137/總控 v0122 |
+| 486 | (本批) | 所有 py 指令走 `Invoke-VIAPython`:20 加速器 + 動態進度條;短令冊 82 處;VdfFetch v0104 |
 
 **沒動的**:資料本體一筆都沒動(1900 哨兵列、`_repo_` 副本、六張 0 列表——要你點頭);同意閘一個字沒設;孤兒引擎沒刪。
 
@@ -245,6 +246,23 @@ bootstrap 做三件事,全包 try(**絕不能讓引擎起不來**):
 
 - **`via-census -Hygiene`**(別名 `庫衛生`):哨兵列(日期 < 1950)數出來 + 對應 `DELETE` **只寫不跑**;`_repo_` 副本每張表對正庫 MAX 日期,副本較舊=退役候選**不刪**。沒有 `--apply`,永遠不會有——刪資料是你的手。你機器上跑一次,把哨兵那幾行貼回來,我們就有數字可以決定。
 - **匯流排登進樞紐/總控**:批471 立的匯流排至今沒有樞紐任務、沒有總控正式名稱——總控頁按不到。樞紐 v0137 `+bus_ryg/+bus_census`(白名單釘數 54→56,兩檢照改,25/25);總控 v0122 +兩個正式名稱。**總控頁沒在雲端再生**——你那邊 `via-manager` 再生一次,按鍵才會出現。
+
+
+## 一-m · 批486 · 所有 py 指令統一走 `Invoke-VIAPython`(20 加速器 + 動態進度條)
+
+**先查再造**:PS 側 20 加速器實體模組早就在 `supportive modules/VIA_PS_Accel_Module.ps1`(批102):`$VIA_ACCEL20` 冊 + `Write-VIAProgress` + `Invoke-VIAGuarded`。不重造,只接上每一次 python 啟動。
+
+| 件 | 做法 |
+|---|---|
+| `supportive modules/VIA_PS_PyProgress_Module.ps1`(新) | `Invoke-VIAPython [-Family f] [-Python exe] [-TimeoutSec N] <script> [args]`:一視窗第一次跑 python 真點亮 20 格(SUP_MDL737 `--activate`;缺席誠實說缺);每次子行程邊跑邊轉播(stdout 走 pipeline,上游捕捉照舊)、`Write-VIAProgress` 動態條、逾時 Kill 整樹回 124、`$LASTEXITCODE` 照真回 |
+| 短令冊 v0189 | **82 處** python 呼叫規律改寫成 `Invoke-VIAPython`;模組缺=誠實退回直呼 |
+| `Invoke-VIA-VdfFetch-v0104` | 點源模組 + 5 處改寫(含 `$plan` 捕捉那處) |
+| OneShot | 0 個直呼(委派短令)=自動受惠 |
+| 匯流排 v0115 | 自測沙盒的 .duckdb 不再冒充正庫(第一版整夾排除 VIA_Reports 打掉了 VRN 主庫,收窄成沙盒標記) |
+
+自犯錯兩枚記檔:排水把行吞進位置變數(捕捉 0 行);點源行插在 `$VIA` 賦值之前(我的測試預設了 `$VIA` 才沒炸,你機器上 95 個短令會全斷)。兩枚都在推之前實證修掉。
+
+**其餘啟動器**(All/Complete/EnvGovernance/Unstick/FixAll…)還沒接進度條——下一批逐個接;PSRepair/PDFPlumberPlus/AllGreen 本來就有。
 
 
 ## 二 · C 的答案:VDF 現況(**操作員機器實測,批475 他貼回來的**)
@@ -347,4 +365,5 @@ via-revphase -SelfTest            # ⑧ 月營收相位 v030 合成自測;去掉
 via-etfhold -SelfTest             # ⑨ 主動 ETF 持股引擎 v1.1.0 27 檢(不碰正庫)
 via-census -Hygiene               # ⑩ 庫衛生唯讀審計:哨兵列與副本庫,只數不刪;把輸出貼回來
 via-manager                       # ⑪ 總控頁再生,bus_ryg/bus_census 按鍵才會出現
+# 批486 起:任何 via-* 跑 python 時,第一次會看到 20 格點亮,之後每支引擎上方有動態進度條(跑了幾秒 · 引擎最後一行)
 ```
