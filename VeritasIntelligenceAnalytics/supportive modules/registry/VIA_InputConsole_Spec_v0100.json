@@ -197,6 +197,24 @@
         "VIA_Reports/vdf/local_db/NEED_latest.json"
        ],
        "note": "全部票(批392 台股抓全部);月粒度只列缺的"
+      },
+      {
+       "id": "tw_daytrade_stock",
+       "zh": "個股當沖成交量值(ENG055 L15;TWSE TWTB4U + TPEX dayTrade;WAF 擋=誠實 FAIL;批520 L41 扣當沖量值之源)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG055_OmniFetch_v*.py",
+        "verb": [
+         "run",
+         "--lane",
+         "L15"
+        ]
+       },
+       "params": [],
+       "net": true,
+       "outputs": [
+        "tw_daytrade_stock"
+       ]
       }
      ]
     },
@@ -512,18 +530,19 @@
       },
       {
        "id": "vdf_vetf_consensus",
-       "zh": "VETF 持股×Consensus 擴充(Forward P/E fail-closed;候選沙盒)",
+       "zh": "VATETF 持股×Consensus 擴充(ENG085 正主橋:對接口合約自適應→收容件 adapter candidate 沙盒;Forward P/E fail-closed;批520)",
        "engine": {
-        "dir": "functional modules/VDF/references/intake/VETF_FINAL_SEAL_b242/01_ENGINES/Consensus_Enrichment_Adapter",
-        "glob": "VETF_ConsensusEnrichment_Adapter_v*.py",
-        "verb": []
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG085_VatetfBridge_v*.py",
+        "verb": [
+         "run"
+        ]
        },
-       "params": [
-        "vetf"
-       ],
+       "params": [],
        "net": false,
        "outputs": [
-        "VIA_Reports/vetf_consensus/asof=*/manifest.json"
+        "VIA_Reports/vatetf/out/asof=*/audit.json",
+        "VIA_Reports/vatetf/RUN_latest.json"
        ]
       }
      ]

@@ -1,6 +1,6 @@
 {
  "schema": "VIA.PolicyLaws.SSOT.v1",
- "batch": "批519",
+ "batch": "批520",
  "ts": "2026-09-15",
  "purpose": "政策庫正本:操作員律 + 紀律 + lessons-learned(只增不減;ENG082 sync-db 攤平入 via_policy_factors;VCGC 唯一對接口讀此冊)",
  "laws": [
@@ -252,6 +252,12 @@
    "batch": "批519",
    "cat": "調度",
    "zh": "工作流重組律(操作員令「WORKFLOW 圖可重整不同引擎形成新功能 · 對接口合約自適應式功能完善化 · 自動跳出實測真實結果」):①工作流=冊上項(VIA_InputConsole_Spec)依序重組,冊在 VIA_Workflow_SSOT_v0100.json(種子八條;頁面匯出 JSON 存回即入冊)②執行只經匯流排 call --item --apply --profile(家族境/閘/PYTHONHOME 撤除全在匯流排;不另起爐灶)③合約自適應:節點在冊?參數有預設/要操作員給/可解?觸網?→ 逐邊 OK/DEFAULT/NEED_INPUT/GATED/ABSENT,整條取最壞;RED 節點後預設 SKIP(--continue 才續)④實測面板=最新真跑(工作流/五矩陣/RunGate/VTMRA/主控台/循環判讀)自動展開,ABSENT 誠實"
+  },
+  {
+   "id": "L41",
+   "batch": "批520",
+   "cat": "指標",
+   "zh": "TA-Lib 量值政策律(操作員令「TA-LIB 只取用股票的 ADJ 價格;成交量值要有扣除當沖交易量值跟沒扣除,但計算指標一律使用扣除後」):①價=ADJUSTED_PRICE_ONLY(tw_prices_adj 的 adj_open/high/low/close;缺則由 tw_daily_prices 以 adj_close/close 因子還原;不拿 raw OHLC 算指標)②量值四欄同時保留:volume_raw/volume_ex_daytrade/turnover_raw/turnover_ex_daytrade ③指標一律以扣當沖後量值計(display_mode/indicator_volume_bases=ex_daytrade)④當日無當沖資料 → ex 欄 NULL、該日量能指標 NULL 並警告,不拿 raw 冒充 ⑤扣法:ex_volume=成交股數−當沖成交股數(TWSE 當沖股數=買賣兩腿平均);ex_turnover=成交金額−(當沖買進金額+當沖賣出金額)/2 ⑥源:價 ENG060 tw_prices_adj · 值 ENG057 tw_trading_daily · 當沖 ENG055 L15 tw_daytrade_stock(WAF 擋=誠實缺);政策 config=functional modules/TALib/VIA_TALib_OneEngine.via.config.json(收容件 config 零觸碰)"
   }
  ],
  "lessons": [
@@ -446,6 +452,16 @@
    "id": "LL36",
    "batch": "批519",
    "zh": "ENG069 自測在資料在位時把資料側門檻(市場檔數>1000/交集>0)當程式檢:工作站庫在、共識表沒交集就 rc=1,VTMRA 家族閘連帶 RED=判錯的紅燈;容器無庫走誠實缺料二檢全綠=判不到。自測要分「程式檢」(結構不變量)與「資料側」(YELLOW 註記),資料在位卻誠實停 rc2 也是資料側;例外才是程式壞(印類別+訊息貼回)"
+  },
+  {
+   "id": "LL37",
+   "batch": "批520",
+   "zh": "via-vetf 找到庫了卻 FAIL_CLOSED「Need a DataFrame with at least one column」:收容件 adapter 只認自己的欄名別名(holding_date/etf_code/ticker/holding_weight、price_date/adj_close),VDF 正本 holdings_daily 叫 portfolio_date/etf_ticker/holding_ticker/weight_pct、價表 ticker 帶 .TW 尾綴 → 每列被丟成 0 筆 → 寫候選 DuckDB 空表炸。錯的不是庫也不是 adapter,是對接口沒合約 → 正主橋 ENG085 建暫存輸入庫把欄名改成它認得的(L31 對接口合約自適應),缺哪欄講哪欄"
+  },
+  {
+   "id": "LL38",
+   "batch": "批520",
+   "zh": "ENG069 ② 每檔唯一最新月 FAIL:工作站 monthly_revenue_analysis 同 (code,ym) 多列(多來源/重跑殘留),latest 子查詢只鎖 ym 沒鎖列 → JOIN 放大;容器空庫判不到。修=QUALIFY ROW_NUMBER() 去重 + 印重複列數(庫零觸碰)+ 合成庫自測證 join 不放大(容器也能跑)。凡 JOIN 到「每檔一列」的視圖,兩側都要鎖唯一"
   }
  ]
 }

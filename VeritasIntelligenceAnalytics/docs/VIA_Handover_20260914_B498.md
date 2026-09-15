@@ -707,6 +707,42 @@ via-vetf                                                   # VATETF 應用端(v0
 
 ---
 
+## 一-w · 批520 · 你貼回批519 區塊 + 令「TA-LIB 只取用股票的 ADJ 價格;成交量值要有扣除當沖跟沒扣除;計算指標一律使用扣除後」
+
+**你貼回 → 判讀 → 做了**
+
+| 量到 | 判讀 | 做了 |
+|---|---|---|
+| `via-vtmra` eng069 **v0107 仍 FAIL**:② 每檔唯一最新月 | 工作站 `monthly_revenue_analysis` 同 (code,ym) 多列(多來源/重跑殘留),latest 子查詢只鎖 ym → JOIN 放大;容器空庫判不到(LL38) | **ENG069 v0108**:QUALIFY ROW_NUMBER 去重 + 印重複列數(庫零觸碰)+ 合成庫自測 ⑦(容器證 join 不放大) |
+| `via-taone` ABSENT,印的 pip 令 `numpy>=1.26,<2.0`(沒引號) | PowerShell 會把 `>` 當導向=貼了會炸(Z34) | **ENG083 v0101** PINS 逐項引號 |
+| `via-vetf`:資料家找到 ActiveTWETF/vdf_tw_market ✓ → adapter **FAIL_CLOSED「Need a DataFrame with at least one column」** | adapter 只認自己的欄名別名;VDF 正本 holdings_daily 叫 portfolio_date/etf_ticker/holding_ticker/weight_pct、價表 ticker 帶 .TW → 每列被丟成 0 筆 → 寫候選空表炸;**對接口沒合約**(LL37) | **VDF_ENG085 VatetfBridge**(`via-vetf` v0207 → 它):家族境建暫存輸入庫(每檔 ETF asof 前最新日持股、代碼去尾綴、欄改 adapter 別名;價 45 日;consensus_latest 依 source 分 FactSet/其他)→ adapter candidate 沙盒 → audit 摘要;`status` 印庫解析/合約缺欄/最新 audit;8/8 |
+| ui-contract 71 頁 · db-summary 9 類 · `run vrn_logic_nlp` GREEN 3/3 · `run vdf_db_governance` GREEN 4/4 · 重組台/VCGC 頁發佈 | 工作流真跑在你機器成立 | — |
+
+**令 → 律 L41(TA-Lib 量值政策)**:①價只用 adj(tw_prices_adj;缺則因子還原)②量值四欄同留(raw/ex_daytrade × volume/turnover)③指標一律以扣當沖量值算(display_mode/indicator_volume_bases=ex_daytrade)④無當沖日=NULL 不冒充 ⑤扣法 ex_volume=成交股數−當沖股數、ex_turnover=成交金額−(買+賣)/2 ⑥源:ENG060 價 · ENG057 值 · ENG055 L15 當沖(TWSE/TPEX;WAF 擋=誠實缺)。
+落實:`functional modules/TALib/VIA_TALib_OneEngine.via.config.json`(收容件 config 副本+覆寫;原檔零觸碰)+ `VIA_TALib_Policy_v0100.json`;**ENG083 v0101** `run` 改 `--query`(adj ⟕ 成交金額 ⟕ 當沖;表缺哪張就少哪欄)+ `check-data`(三表覆蓋;容器:價 575,295 列 · 值 2,660 列 · 當沖 ABSENT → YELLOW 誠實)+ `policy`;冊 +`tw_daytrade_stock`(ENG055 L15;觸網)· 工作流 `vdf_talib_features` = 當沖→架構→TA-Lib。
+登冊:Grid v0313 · Deck v0149(+vatetf_app;76)· Manager v0135 · Register v0207 · VCGC v0111(批號改讀政策庫)。
+
+### 一貼即用(批520)
+
+```powershell
+Set-Location 'C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics'
+git status --short | Select-Object -First 10; git stash push -m "b520 工作站樹快照"; git pull --ff-only origin claude/via-envmanager-governance-7cls8h; git stash list; git log --oneline -1   # 四行貼回
+. (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName   # v0207
+via-vtmra                                                  # eng069 v0108 應 OK(去重);仍 FAIL → 貼那一列
+via-vetf status                                            # ENG085:庫解析/表列數/合約缺欄/最新 audit(唯讀)
+via-vetf                                                   # = run:暫存輸入庫 → adapter candidate → audit 摘要(貼回 [對接]/[audit] 行)
+via-taone check-data                                       # 價/值/當沖三表覆蓋(當沖表在不在;L41)
+$env:VIA_NET_CONSENT='YES'; $env:VIA_SCRAPE_CONSENT='YES'; via-bus one tw_daytrade_stock   # 個股當沖(ENG055 L15;TWSE/TPEX;你開閘)→ 抓不到=誠實 FAIL 貼回
+via-taone check-data                                       # 再看覆蓋 %
+# TA-Lib 裝(你的手;vdf 境 numpy 2.x 要先降):
+& "C:\Users\tonyk\envs\via_vdf_312\Scripts\python.exe" -m pip install "numpy>=1.26,<2.0" "pandas>=2.1,<2.2" "TA-Lib>=0.4.28,<0.5"
+via-taone selftest-engine                                  # 裝後:360 筆合成 OHLCV 真跑 → OK 帶 coverage
+via-taone run --since 2026-06-01 --codes 2330,2317         # 小數量實測:adj 價 + 扣當沖量值算指標(當沖缺=量能 NULL 誠實)→ VIA_Reports\talib_one\RUN_*
+via-vcgc page --publish                                    # v0111(批號讀政策庫)
+```
+
+---
+
 ## 二 · 操作員機器實況(他貼的 EnvManager v0300 AUDIT,run ENV-20260914_112000;直接當量測)
 
 | 事實 | 影響 |

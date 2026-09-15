@@ -1,0 +1,15 @@
+{
+ "schema": "VIA.TALibPolicy.v1",
+ "batch": "批520",
+ "law": "L41",
+ "zh": "操作員令(批520):TA-Lib 只取用股票的 ADJ 價格;成交量/值要有扣除當沖與未扣除兩套;但計算指標一律使用扣除當沖後的量值",
+ "rules": {
+  "prices": "ADJUSTED_PRICE_ONLY:adj_open/adj_high/adj_low/adj_close(tw_prices_adj;缺則由 tw_daily_prices adj_close/close 因子還原);不用 raw OHLC 算指標",
+  "volume_columns": "volume_raw 與 volume_ex_daytrade、turnover_raw 與 turnover_ex_daytrade 四欄同時保留於輸出",
+  "indicator_basis": "indicator_volume_bases=['ex_daytrade'];display_mode='ex_daytrade';量能指標只用扣當沖後量值",
+  "missing_daytrade": "當日無當沖資料 → volume_ex_daytrade NULL(missing_daytrade_cell_policy=null)→ 該日量能指標 NULL 並警告;不拿 raw 冒充",
+  "deduction": "ex_volume = 成交股數 − 當沖成交股數(TWSE 當沖成交股數=買賣兩腿平均);ex_turnover = 成交金額 − (當沖買進金額+當沖賣出金額)/2",
+  "sources": "價=tw_prices_adj(ENG060) · 量=tw_prices_adj.volume · 值=tw_trading_daily.trade_value(ENG057) · 當沖=tw_daytrade_stock(ENG055 L15;TWSE TWTB4U + TPEX dayTrade;WAF 擋=誠實缺)"
+ },
+ "config": "functional modules/TALib/VIA_TALib_OneEngine.via.config.json(收容件 config 副本+VIA 覆寫;收容件原檔零觸碰)"
+}

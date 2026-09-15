@@ -1,6 +1,6 @@
-# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0110 · 批519)
+# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0111 · 批520)
 
-> 產生 2026-09-15 13:17:04 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
+> 產生 2026-09-15 13:41:24 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
 
 ## 〇 · 接手提示詞(給下一個 AI;來源 VIA_AI_Handover_Prompt_v0100.md)
 
@@ -136,6 +136,7 @@
 - **L38**(批518;治理)治理閘處置律(中央治理主控台 RED 的判讀):工具的 FAIL/WARN 先分「活樹/新模組/存檔/收容/退役」再判——①G17 循環:活樹圈才是債(懶載入/單向依賴修);退役/收容/存檔內互呼零觸碰只記錄(via-cgfamily cycles 對回檔名分區 → CYCLES_latest.json)②G03 重複家族依 L23:byte 同且檔名零引用才刪;惰性存檔(SCOPE_COPY/_output)與被冊引用的副本=留 ③G04 無法解析=退役/收容件原始語法錯與空 __init__.py,零觸碰 ④G16 外部呼叫無 URN、G18 爆炸半徑(我們從不 --commit)、G22 未探針(--probe=操作員之手)=設計上 WARN 不擋;判讀寫進 FAMILY_latest,VCGC 十一段一行講清楚,工具整體 RED 不等於活樹 RED
 - **L39**(批519;介面)U/I 對接契約律(操作員令「規劃好所有 U/I 自小一點更專業 · 中央自適應式連結對接 U/I · 介面做好與 HTML U/I 對接規格」):①每頁一產生器(L30),頁名/擁有者/家族/再生短令登在 VIA_UI_Contract_v0100.json(CGC_MDL153 ui-contract --apply 掃出來,不手填)②中央(VCGC 十二段)只連結不重造:頁在=file:// 連、不在=ABSENT 誠實、逾 7 日=YELLOW ③頁面規格:零 CDN、系統字、內嵌 JSON 快照(SNAPSHOT),樞紐 127.0.0.1:8765 在聽才 LIVE 重取、產生器不開瀏覽器(via-open 才開)、引擎→JSON→頁(頁不直讀庫)④樣式 tokens:12.5px 緊湊表格單色系,燈色只講狀態,手機單欄
 - **L40**(批519;調度)工作流重組律(操作員令「WORKFLOW 圖可重整不同引擎形成新功能 · 對接口合約自適應式功能完善化 · 自動跳出實測真實結果」):①工作流=冊上項(VIA_InputConsole_Spec)依序重組,冊在 VIA_Workflow_SSOT_v0100.json(種子八條;頁面匯出 JSON 存回即入冊)②執行只經匯流排 call --item --apply --profile(家族境/閘/PYTHONHOME 撤除全在匯流排;不另起爐灶)③合約自適應:節點在冊?參數有預設/要操作員給/可解?觸網?→ 逐邊 OK/DEFAULT/NEED_INPUT/GATED/ABSENT,整條取最壞;RED 節點後預設 SKIP(--continue 才續)④實測面板=最新真跑(工作流/五矩陣/RunGate/VTMRA/主控台/循環判讀)自動展開,ABSENT 誠實
+- **L41**(批520;指標)TA-Lib 量值政策律(操作員令「TA-LIB 只取用股票的 ADJ 價格;成交量值要有扣除當沖交易量值跟沒扣除,但計算指標一律使用扣除後」):①價=ADJUSTED_PRICE_ONLY(tw_prices_adj 的 adj_open/high/low/close;缺則由 tw_daily_prices 以 adj_close/close 因子還原;不拿 raw OHLC 算指標)②量值四欄同時保留:volume_raw/volume_ex_daytrade/turnover_raw/turnover_ex_daytrade ③指標一律以扣當沖後量值計(display_mode/indicator_volume_bases=ex_daytrade)④當日無當沖資料 → ex 欄 NULL、該日量能指標 NULL 並警告,不拿 raw 冒充 ⑤扣法:ex_volume=成交股數−當沖成交股數(TWSE 當沖股數=買賣兩腿平均);ex_turnover=成交金額−(當沖買進金額+當沖賣出金額)/2 ⑥源:價 ENG060 tw_prices_adj · 值 ENG057 tw_trading_daily · 當沖 ENG055 L15 tw_daytrade_stock(WAF 擋=誠實缺);政策 config=functional modules/TALib/VIA_TALib_OneEngine.via.config.json(收容件 config 零觸碰)
 
 **Lessons-learned**
 
@@ -175,17 +176,19 @@
 - LL34(批519)三件上傳先對 md5/SHA256SUMS 再收(LL31 的落實):VRN_BatchFourEngine_v0100.py 與 b245/b383 兩處 byte 全同=第三次上傳,不再收;VETF_FINAL_SEAL_2 的 SHA256SUMS 與 b242 逐行同=不再收;只有 VIA_TALib_OneEngine 是新件(倉內零同名同 md5)→ 收容 _b519 + 正主橋。功能需求對回正主:docx→md 橋=ENG075(markitdown)、批次=匯流排、對帳=ENG074;four_engine_orchestrator 套件不在倉=ABSENT 誠實
 - LL35(批519)via-vetf 找庫只翻 output_hub 舊主路徑,資料家那本 ActiveTWETF.duckdb/vdf_tw_market.duckdb 永遠找不到=第五次「庫就在那裡,是我找不到那個庫」(LL27/LL30 在 Register 短令層漏了)→ Register v0206 $findDb 資料家優先、output_hub 退路;之後凡短令自己找庫,一律先問 VIA_DATA_HOME
 - LL36(批519)ENG069 自測在資料在位時把資料側門檻(市場檔數>1000/交集>0)當程式檢:工作站庫在、共識表沒交集就 rc=1,VTMRA 家族閘連帶 RED=判錯的紅燈;容器無庫走誠實缺料二檢全綠=判不到。自測要分「程式檢」(結構不變量)與「資料側」(YELLOW 註記),資料在位卻誠實停 rc2 也是資料側;例外才是程式壞(印類別+訊息貼回)
+- LL37(批520)via-vetf 找到庫了卻 FAIL_CLOSED「Need a DataFrame with at least one column」:收容件 adapter 只認自己的欄名別名(holding_date/etf_code/ticker/holding_weight、price_date/adj_close),VDF 正本 holdings_daily 叫 portfolio_date/etf_ticker/holding_ticker/weight_pct、價表 ticker 帶 .TW 尾綴 → 每列被丟成 0 筆 → 寫候選 DuckDB 空表炸。錯的不是庫也不是 adapter,是對接口沒合約 → 正主橋 ENG085 建暫存輸入庫把欄名改成它認得的(L31 對接口合約自適應),缺哪欄講哪欄
+- LL38(批520)ENG069 ② 每檔唯一最新月 FAIL:工作站 monthly_revenue_analysis 同 (code,ym) 多列(多來源/重跑殘留),latest 子查詢只鎖 ym 沒鎖列 → JOIN 放大;容器空庫判不到。修=QUALIFY ROW_NUMBER() 去重 + 印重複列數(庫零觸碰)+ 合成庫自測證 join 不放大(容器也能跑)。凡 JOIN 到「每檔一列」的視圖,兩側都要鎖唯一
 
 ## 二 · 安裝核可(L19)與環境工具
 
-- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 162.0 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
+- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 162.4 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
 - 工具冊導入計畫:ABSENT · - · 件態 - · 風險 - · 段 - · 未路由 - · 白名單留置 -(TOOLS_PLAN_latest.json 不在(via-envtools))
 - 環境復原(L24):PLAN · 2026-09-15 05:30:50 · 還原 原本規劃(Baseline;無 LKGC 或 --baseline) · 段 16 · 單獨隔離境 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 借境封鎖 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 次序 RESTORE → CORE → LOW → MEDIUM → HIGH → EXTERNAL → VERIFY;安裝出問題=`via-envrecover`(①還原前次 ②順序裝 ③_M/_H 單獨隔離;-Execute -Approve 才跑,① 不受 L19,② 過 L19)
 - 裝件=操作員的手:`$env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve`(閘不代設;L19 未綠=BLOCKED_UNITEST)
 
 ## 三 · 邏輯庫 · 因子庫 · 資料庫
 
-- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 499 列 · 全庫同步 {'hash': '29c2456a130d', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': 'b7356d68a6f4', 'root': '同', 'home': '缺'}
+- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 509 列 · 全庫同步 {'hash': '043542e1ce9f', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '9f5dec3a8618', 'root': '同', 'home': '缺'}
 - 因子庫 OK:130 列 · {'SUP_MDL748:allinone 2.1.0': 77, 'SUP_MDL748:financial_data_standardization': 53} · 掛載 {'allinone': 'OK VIA_VRNLogic_AllInOne_v0201.py 2.1.0', 'fds': 'OK financial_data_standardization.py · 28 欄 · 合併損傷件(__main__ 示範缺 5 法,程式庫面可用)'}
 - 庫表冊 OK:54 表(批505)· 全庫表 4 · 庫 ['ActiveTWETF.duckdb', 'vdf_global_market.duckdb', 'vdf_tw_market.duckdb']
 - 資料家 ABSENT:VIA_Reports/datahome/DATAHOME_CATALOG_latest.json 不在(via-datahome catalog) · 庫 - · 表 - · 湖 -
@@ -194,9 +197,9 @@
 
 - 五矩陣 OK:2026-09-14T11:21:39 · profile run · 真跑 ['vdf'] · 項 43 · 態 {'GATED': 12, 'NODATA': 5, 'PLAN': 18, 'ABSENT': 2, 'GREEN': 6}
 - VTMRA 家族測試閘(批516;台股月營收分析七成員):RED · 2026-09-15T10:08:56 · 成員 {'eng063': 'OK', 'eng075': 'OK', 'eng069': 'FAIL', 'eng076': 'OK', 'twrev': 'OK', 'revphase': 'OK', 'talib': 'ABSENT'} · 成員自測非 OK:eng069(FAIL); TA-Lib 未裝(不是壞;裝=你的手 via-talib 印令)
-- Deck 任務 75 · 規格項 46 · 格子站 223(在位 223)· Register 指令 123 · Manager 正式名稱 任務 75 / 引擎 87
+- Deck 任務 76 · 規格項 47 · 格子站 224(在位 224)· Register 指令 123 · Manager 正式名稱 任務 76 / 引擎 88
 
-## 五 · 指令與參數(不丟失;來源 Register-VIA-Commands-v0206.ps1)
+## 五 · 指令與參數(不丟失;來源 Register-VIA-Commands-v0207.ps1)
 
 - `via-gates`
 - `via-envpy`
@@ -324,21 +327,21 @@
 
 ## 六 · 註冊稽核(所有引擎/模組/功能/工具/環境)
 
-- 中央自動編號冊 OK · ACTIVE 4897/4897 · **缺 0** · 類別 {'class': 91, 'engine': 78, 'environment': 43, 'function': 4075, 'feature': 78, 'module': 145, 'package': 251, 'system': 10, 'tool': 126}
-- 尾版引擎/模組家族 232 · 中央冊已登 232 · **未登 0** · 操作介面有掛載 190 · 內部件無操作介面 42(誠實分列，不拿編號片段假命中)
+- 中央自動編號冊 OK · ACTIVE 4920/4920 · **缺 0** · 類別 {'class': 91, 'engine': 79, 'environment': 43, 'function': 4096, 'feature': 79, 'module': 145, 'package': 251, 'system': 10, 'tool': 126}
+- 尾版引擎/模組家族 233 · 中央冊已登 233 · **未登 0** · 操作介面有掛載 191 · 內部件無操作介面 42(誠實分列，不拿編號片段假命中)
 
 ## 七 · 自動編號註冊表(台帳)
 
-- 全域台帳 1054 筆 · 元件 147 · 更新 2026-09-15
-- 元件冊 OK · ACTIVE 4897 · RETIRED 1 · 更新 2026-09-15T13:14:02 · {'class': 91, 'engine': 78, 'environment': 43, 'function': 4075, 'feature': 78, 'module': 145, 'package': 251, 'system': 10, 'tool': 126}
+- 全域台帳 1055 筆 · 元件 147 · 更新 2026-09-15
+- 元件冊 OK · ACTIVE 4920 · RETIRED 1 · 更新 2026-09-15T13:41:06 · {'class': 91, 'engine': 79, 'environment': 43, 'function': 4096, 'feature': 79, 'module': 145, 'package': 251, 'system': 10, 'tool': 126}
 - 類別 current:系統 1 · 支援性工具 1 · 功能性工具 1 · 模組 1 · 引擎 19 · 函數庫 1 · 打包產品 8
 
-- 2026-09-15 08:34 批514 Z15 根因=母殼 PYTHONHOME(律 L32 子行程環境衛生)+ 中央治理家族入台(CGC_MDL150 擁有者)
 - 2026-09-15 09:28 批515 L33 工序律 / L34 VATETF 應用端律 / L35 VDF 基金範圍律 + TAB3 FIXED CONTENTS + 五額外試跑 + 家族擁有者實錄修
 - 2026-09-15 10:12 批516 除錯五修 + VTMRA 家族測試閘 CGC_MDL152 + TA-Lib 閘 CGC_MDL151 + 律 L36/LL27/LL28
 - 2026-09-15 10:46 批517 律 L37 VDF 擷取範圍律 + ENG069 v0106 + VCGC v0108 + NLP 正主 SUP_MDL744 v0102 summarize + MDL
 - 2026-09-15 11:51 批518 MDL139 v0108 status 印「更新到哪一天」+ MDL150 v0103 cycles(G17 對回檔名分區)+ VCGC v0109 十一段循環判讀 + 
 - 2026-09-15 13:12 批519 CGC_MDL153 WorkflowComposer v0100(工作流重組台+U/I 對接契約+庫分類歸納+實測面板)+ VDF_ENG083 TALibOneBri
+- 2026-09-15 13:39 批520 ENG069 v0108 去重 + VDF_ENG085 VatetfBridge v0100(對接口合約自適應)+ ENG083 v0101(L41 扣當沖查詢/政策 
 
 ## 八 · 交接本文(來源 VIA_Handover_20260914_B498.md;逐批紀錄見該檔)
 
@@ -1050,6 +1053,42 @@ via-vetf                                                   # VATETF 應用端(v0
 
 ---
 
+### 一-w · 批520 · 你貼回批519 區塊 + 令「TA-LIB 只取用股票的 ADJ 價格;成交量值要有扣除當沖跟沒扣除;計算指標一律使用扣除後」
+
+**你貼回 → 判讀 → 做了**
+
+| 量到 | 判讀 | 做了 |
+|---|---|---|
+| `via-vtmra` eng069 **v0107 仍 FAIL**:② 每檔唯一最新月 | 工作站 `monthly_revenue_analysis` 同 (code,ym) 多列(多來源/重跑殘留),latest 子查詢只鎖 ym → JOIN 放大;容器空庫判不到(LL38) | **ENG069 v0108**:QUALIFY ROW_NUMBER 去重 + 印重複列數(庫零觸碰)+ 合成庫自測 ⑦(容器證 join 不放大) |
+| `via-taone` ABSENT,印的 pip 令 `numpy>=1.26,<2.0`(沒引號) | PowerShell 會把 `>` 當導向=貼了會炸(Z34) | **ENG083 v0101** PINS 逐項引號 |
+| `via-vetf`:資料家找到 ActiveTWETF/vdf_tw_market ✓ → adapter **FAIL_CLOSED「Need a DataFrame with at least one column」** | adapter 只認自己的欄名別名;VDF 正本 holdings_daily 叫 portfolio_date/etf_ticker/holding_ticker/weight_pct、價表 ticker 帶 .TW → 每列被丟成 0 筆 → 寫候選空表炸;**對接口沒合約**(LL37) | **VDF_ENG085 VatetfBridge**(`via-vetf` v0207 → 它):家族境建暫存輸入庫(每檔 ETF asof 前最新日持股、代碼去尾綴、欄改 adapter 別名;價 45 日;consensus_latest 依 source 分 FactSet/其他)→ adapter candidate 沙盒 → audit 摘要;`status` 印庫解析/合約缺欄/最新 audit;8/8 |
+| ui-contract 71 頁 · db-summary 9 類 · `run vrn_logic_nlp` GREEN 3/3 · `run vdf_db_governance` GREEN 4/4 · 重組台/VCGC 頁發佈 | 工作流真跑在你機器成立 | — |
+
+**令 → 律 L41(TA-Lib 量值政策)**:①價只用 adj(tw_prices_adj;缺則因子還原)②量值四欄同留(raw/ex_daytrade × volume/turnover)③指標一律以扣當沖量值算(display_mode/indicator_volume_bases=ex_daytrade)④無當沖日=NULL 不冒充 ⑤扣法 ex_volume=成交股數−當沖股數、ex_turnover=成交金額−(買+賣)/2 ⑥源:ENG060 價 · ENG057 值 · ENG055 L15 當沖(TWSE/TPEX;WAF 擋=誠實缺)。
+落實:`functional modules/TALib/VIA_TALib_OneEngine.via.config.json`(收容件 config 副本+覆寫;原檔零觸碰)+ `VIA_TALib_Policy_v0100.json`;**ENG083 v0101** `run` 改 `--query`(adj ⟕ 成交金額 ⟕ 當沖;表缺哪張就少哪欄)+ `check-data`(三表覆蓋;容器:價 575,295 列 · 值 2,660 列 · 當沖 ABSENT → YELLOW 誠實)+ `policy`;冊 +`tw_daytrade_stock`(ENG055 L15;觸網)· 工作流 `vdf_talib_features` = 當沖→架構→TA-Lib。
+登冊:Grid v0313 · Deck v0149(+vatetf_app;76)· Manager v0135 · Register v0207 · VCGC v0111(批號改讀政策庫)。
+
+#### 一貼即用(批520)
+
+```powershell
+Set-Location 'C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics'
+git status --short | Select-Object -First 10; git stash push -m "b520 工作站樹快照"; git pull --ff-only origin claude/via-envmanager-governance-7cls8h; git stash list; git log --oneline -1   # 四行貼回
+. (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName   # v0207
+via-vtmra                                                  # eng069 v0108 應 OK(去重);仍 FAIL → 貼那一列
+via-vetf status                                            # ENG085:庫解析/表列數/合約缺欄/最新 audit(唯讀)
+via-vetf                                                   # = run:暫存輸入庫 → adapter candidate → audit 摘要(貼回 [對接]/[audit] 行)
+via-taone check-data                                       # 價/值/當沖三表覆蓋(當沖表在不在;L41)
+$env:VIA_NET_CONSENT='YES'; $env:VIA_SCRAPE_CONSENT='YES'; via-bus one tw_daytrade_stock   # 個股當沖(ENG055 L15;TWSE/TPEX;你開閘)→ 抓不到=誠實 FAIL 貼回
+via-taone check-data                                       # 再看覆蓋 %
+# TA-Lib 裝(你的手;vdf 境 numpy 2.x 要先降):
+& "C:\Users\tonyk\envs\via_vdf_312\Scripts\python.exe" -m pip install "numpy>=1.26,<2.0" "pandas>=2.1,<2.2" "TA-Lib>=0.4.28,<0.5"
+via-taone selftest-engine                                  # 裝後:360 筆合成 OHLCV 真跑 → OK 帶 coverage
+via-taone run --since 2026-06-01 --codes 2330,2317         # 小數量實測:adj 價 + 扣當沖量值算指標(當沖缺=量能 NULL 誠實)→ VIA_Reports\talib_one\RUN_*
+via-vcgc page --publish                                    # v0111(批號讀政策庫)
+```
+
+---
+
 ### 二 · 操作員機器實況(他貼的 EnvManager v0300 AUDIT,run ENV-20260914_112000;直接當量測)
 
 | 事實 | 影響 |
@@ -1120,7 +1159,7 @@ via-ryg -Timeout 300              # ⑦ 五矩陣燈:紫=GATED(閘未開,不是�
 # $env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve
 ```
 
-## 九 · 掉球清單(來源 VIA_DroppedBalls_B507.md;列 54 · 未結 50;只增不減,結案劃線)
+## 九 · 掉球清單(來源 VIA_DroppedBalls_B507.md;列 56 · 未結 52;只增不減,結案劃線)
 
 # VIA 掉球清單(漏球審計)· 批507(2026-09-14)· 涵蓋 批474–506
 
@@ -1171,8 +1210,8 @@ via-ryg -Timeout 300              # ⑦ 五矩陣燈:紫=GATED(閘未開,不是�
 | Z30 | 「以 VIA 為中央管理 全部 SSOT 化 唯一接觸口」(L20 延伸):冊外仍有寫死路徑/自帶輸出夾的件(中央治理家族五件、VETF 封印包 adapter、ENG075 OUTDIR);逐件改成讀冊(Spec/DataHome/契約)=下一批盤點表 | 未做 | AI | 出「寫死路徑清單」再逐件改冊 |
 | Z31 | VRN_MDL001_Converter v0121 自測太重:容器 82.7s、工作站 >180s TIMEOUT(渲染 A4 200/600 DPI 點陣頁 ×9 檢)→ Grid v0310 站逾時 600 先讓閘判真;候優化:自測改小頁(A6)或只算一次 pixmap | 未做 | AI | v0122 自測瘦身,量到 <30s |
 | Z32 | ~~摘要批跑器自測出網(Summarizer 取價器沒看閘)~~ 已結(批516):Summarizer v0102 閘 + digest v0115 VIA_SELFTEST=1;容器帶 VIA_NET_CONSENT=YES 跑自測零 404 | 已結(批516) | — | 工作站 `via-rungate --family vrn` 尾行不再有 HTTP 404 即證 |
-| Z33 | ENG069 月營收×共識:工作站 via-vtmra 仍 **eng069 FAIL rc=1**(v0106;庫在=走全檢,資料側門檻當程式檢;LL36)→ **v0107** 資料側 YELLOW 不計 FAIL、誠實停 rc2=資料側、例外印類別+訊息;若仍 FAIL 貼回 `& "C:\Users\tonyk\envs\via_vdf_312\Scripts\python.exe" ".\functional modules\VDF\engine\VDF_ENG069_RevenueConsensusAnalysis_v0107.py" --selftest 2>&1 \| Select-Object -Last 25` | 未做(等實錄) | 操作員+AI | via-vtmra 列 + 尾段貼回 |
-| Z34 | TA-Lib 未裝(容器/工作站皆 ABSENT):上傳 VIA_TALib_OneEngine v1.0.0 已收容 _b519 + 正主橋 VDF_ENG083(`via-taone`);裝=你的手 `& C:\Users\tonyk\envs\via_vdf_312\Scripts\python.exe -m pip install "numpy>=1.26,<2.0" "pandas>=2.1,<2.2" "TA-Lib>=0.4.28,<0.5"`(收容件釘:NumPy<2 ↔ ta-lib<0.5;vdf 境若已是 numpy 2.x 要先降=先 via-envgov 看)→ 裝後 `via-taone selftest-engine`(360 筆合成 OHLCV 真跑)· `via-talib` 五數值檢 | 操作員的手 | 操作員 | 裝後貼回 via-taone |
+| Z33 | ENG069:工作站 v0107 仍 FAIL=② 每檔唯一最新月(同 (code,ym) 多列 JOIN 放大;LL38)→ **v0108** QUALIFY 去重 + 印重複列數 + 合成庫自測 ⑦;`via-vtmra` 再看 eng069 列 | 未做(等實錄) | 操作員+AI | via-vtmra 貼回 |
+| Z34 | TA-Lib 未裝:`via-taone` 印的 pip 令批519 沒加引號(PowerShell 把 > 當導向)→ v0101 逐項引號;裝=你的手 `& "C:\Users\tonyk\envs\via_vdf_312\Scripts\python.exe" -m pip install "numpy>=1.26,<2.0" "pandas>=2.1,<2.2" "TA-Lib>=0.4.28,<0.5"`(vdf 境若 numpy 2.x 要先降;先 `via-envgov` 看)→ 裝後 `via-taone selftest-engine` · `via-taone check-data` · `via-taone run` | 操作員的手 | 操作員 | 裝後貼回 |
 | Z35 | VDF 短缺口「逐日全市場」道(L37 ⑤):ENG054/064 只有逐檔道(一檔一請求;5 日≈16 分);TWSE MI_INDEX ALLBUT0999 / TPEX 日成交行情一日一請求可補 ≤10 日缺口 → ENG054 v0105 --lane bulk-day(anti-join 同律;同意閘不變) | 未做 | AI | 先量端點欄位(需你開閘試一次)再建 |
 | Z36 | VIA_Discussion_Reconstruction_Package_v1.6.1(61MB JSON 知識傾印;上傳 zip 內)不入倉:資料落資料家 `VIA System\via_database\nlp\`?由你裁;整理結果 md 已收 _b283 | 候 | 操作員 | 裁落點後我建 link 冊 |
 | Z37 | 工作站 via-vcgc 註冊稽核「中央冊 4836/4837 缺 1」=你樹上一件未編號元件(容器 4836 全齊)→ `via-vcgc registry-sync --apply` 在你機器跑一次(會改 SSOT 冊=先 git stash 再 pull 的流程要留意) | 操作員的手 | 操作員 | 跑後貼回 registry-sync 一行 |
@@ -1181,6 +1220,8 @@ via-ryg -Timeout 300              # ⑦ 五矩陣燈:紫=GATED(閘未開,不是�
 | Z40 | VRN_BatchFourEngine_v0100.py 第三次上傳(md5 同 b245/b383):它驅動的 VRNFourEngineSuite(four_engine_orchestrator.run_all_engines)**不在倉**→ 驅動器只收不掛;要用就上傳套件(或指出它在哪);docx→md 橋/批次/對帳已有正主(ENG075/匯流排/ENG074) | 候(由你) | 操作員 | 上傳套件或裁「不用」 |
 | Z41 | VETF_FINAL_SEAL(b242 同件)的 React/Vinext 網站原始碼與 Standalone HTML:React 要 npm(觸網、CDN 外鏈)=不掛線;Standalone_Current 可當收容靜態頁(U/I 契約列為收容件;不在 ui_support 不連)· VATETF 現役=冊上項 vdf_vetf_consensus + `via-vetf`(v0206 資料家優先) | 候 | 操作員 | 裁 Standalone 是否複製入 ui_support(零 CDN 檢過才收) |
 | Z42 | 工作流重組台 LIVE:頁面現只探 /api/console/status 判樞紐;「按下即跑」要 DeckServer 新端點(workflow_run 任務+權杖)——零彈窗/閘律下先不做,執行走 `via-workflow run <id>`;下批若要=Deck +workflow_run(net 依節點) | 候 | AI | 操作員點頭再做 |
+| Z43 | VATETF 實測:`via-vetf`(v0207 → ENG085 正主橋)在你機器跑 status/run:持股 asof 前最新日/價 45 日/共識分欄 → adapter candidate → audit.json;容器無 holdings_daily=NODATA 只能證合約,真結果等你貼 | 未做(等實錄) | 操作員+AI | `via-vetf status` + `via-vetf` 貼回 |
+| Z44 | 個股當沖表 tw_daytrade_stock(ENG055 L15;TWSE TWTB4U/TPEX dayTrade):雲端兩源 302/WAF;你機器 `via-bus one tw_daytrade_stock`(觸網要閘)看抓不抓得到;抓不到=量能指標全 NULL(L41 誠實),候源(openapi 只有市場級) | 未做(等實錄) | 操作員 | 貼回 `via-taone check-data` 覆蓋 % |
 | ~~W~~ | ~~8 件 FAIL_HIT 首頁件重抽~~ | 已結(批503) | — | 64/64 |
 
 
@@ -1197,10 +1238,10 @@ via-ryg -Timeout 300              # ⑦ 五矩陣燈:紫=GATED(閘未開,不是�
 
 ## 十二 · U/I 對接與工作流(批519;擁有者 CGC_MDL153 WorkflowComposer;中央只連結不重造;頁在=連、不在=ABSENT)
 
-- U/I 契約 OK · 2026-09-15T13:15:03 · 頁 66 · 家族 {'vdf': 6, 'central': 44, 'vrn': 7, 'vap': 9} · 新鮮 36 · 不在 0
+- U/I 契約 OK · 2026-09-15T13:41:24 · 頁 66 · 家族 {'vdf': 6, 'central': 44, 'vrn': 7, 'vap': 9} · 新鮮 36 · 不在 0
   - [GREEN] vdf · VIA_UI_ActiveETFHoldingsHistory_v0100.html · 擁有者 VDF_ENG078_ActiveETFHoldingsHistory_v0108.py · 再生 via-etfhist
   - [GREEN] central · VIA_UI_BaseTemplate_v0100.html · 擁有者 CGC_MDL089_UIBaseTemplate_v0100.py · 再生 -
-  - [GREEN] central · VIA_UI_CentralGovernanceConsole_v0100.html · 擁有者 CGC_MDL149_VeritasCentralGovernanceConsole_v0110.py · 再生 via-vcgc page --publish
+  - [GREEN] central · VIA_UI_CentralGovernanceConsole_v0100.html · 擁有者 CGC_MDL149_VeritasCentralGovernanceConsole_v0111.py · 再生 via-vcgc page --publish
   - [GREEN] central · VIA_UI_Charter_v0100.html · 擁有者 CGC_MDL091_CharterAudit_v0100.py · 再生 -
   - [GREEN] central · VIA_UI_CommandCenter_v0100.html · 擁有者 CGC_MDL114_CommandCenterBridge_v0100.py · 再生 -
   - [GREEN] central · VIA_UI_CommandDeck_v0100.html · 擁有者 CGC_MDL094_CommandDeck_v0100.py · 再生 VIA.ps1(DeckServer)
@@ -1223,7 +1264,7 @@ via-ryg -Timeout 300              # ⑦ 五矩陣燈:紫=GATED(閘未開,不是�
   - [YELLOW] vrn · VIA_UI_InputConsole_v0100.html · 擁有者 CGC_MDL139_InputConsole_v0108.py · 再生 via-console build
   - [GREEN] central · VIA_UI_IntakeRoster_v0100.html · 擁有者 CGC_MDL122_IntakeRoster_v0113.py · 再生 -
   - [YELLOW] central · VIA_UI_LifecycleRACI_v0100.html · 擁有者 CGC_MDL129_LifecycleRACI_v0101.py · 再生 -
-  - [GREEN] central · VIA_UI_MasterControl_v0100.html · 擁有者 VIA_SYSTEM_MANAGER_v0134.py · 再生 via-ui(Manager ui)
+  - [GREEN] central · VIA_UI_MasterControl_v0100.html · 擁有者 VIA_SYSTEM_MANAGER_v0135.py · 再生 via-ui(Manager ui)
   - [GREEN] vap · VIA_UI_PlotlyDashboard_EditableTemplate_v0100.html · 擁有者 - · 再生 -
   - [GREEN] central · VIA_UI_Portal_v0100.html · 擁有者 CGC_MDL097_PortalUI_v0100.py · 再生 -
   - [YELLOW] central · VIA_UI_ProductGate_v0100.html · 擁有者 CGC_MDL133_ProductGate_v0101.py · 再生 -
@@ -1231,7 +1272,7 @@ via-ryg -Timeout 300              # ⑦ 五矩陣燈:紫=GATED(閘未開,不是�
   - [GREEN] central · VIA_UI_PromptManager_v0100.html · 擁有者 CGC_MDL109_PromptManager_v0100.py · 再生 -
   - [GREEN] central · VIA_UI_PsAstRepair_v0100.html · 擁有者 CGC_MDL146_PsAstRepair_v0104.py · 再生 -
   - [GREEN] vrn · VIA_UI_ReportCards_v0100.html · 擁有者 CGC_MDL100_ReportCards_v0100.py · 再生 -
-  - [GREEN] vrn · VIA_UI_RevenueConsensusAnalysis_v0100.html · 擁有者 VDF_ENG069_RevenueConsensusAnalysis_v0107.py · 再生 via-vtmra(eng069 run)
+  - [GREEN] vrn · VIA_UI_RevenueConsensusAnalysis_v0100.html · 擁有者 VDF_ENG069_RevenueConsensusAnalysis_v0108.py · 再生 via-vtmra(eng069 run)
   - [GREEN] central · VIA_UI_SSOTRegexDict_v0100.html · 擁有者 CGC_MDL115_SSOTRegexDict_v0100.py · 再生 -
   - [YELLOW] central · VIA_UI_Shell_CGC_v0100.html · 擁有者 - · 再生 -
   - [YELLOW] central · VIA_UI_Shell_VAP_v0100.html · 擁有者 - · 再生 -
