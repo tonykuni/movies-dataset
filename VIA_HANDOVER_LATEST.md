@@ -1,6 +1,6 @@
-# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0105 · 批514)
+# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0106 · 批515)
 
-> 產生 2026-09-15 08:35:26 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
+> 產生 2026-09-15 09:29:59 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
 
 ## 〇 · 接手提示詞(給下一個 AI;來源 VIA_AI_Handover_Prompt_v0100.md)
 
@@ -128,6 +128,9 @@
 - **L30**(批512;架構)相似整合律(操作員令「類似參數功能引擎就整合優化」):同一判準、同一子行程環境、同一啟動邏輯、同一參數冊只寫一處(冊的擁有者),其餘轉呼叫;新件先找既有件,找到就整合優化不另起;撞名/同功能副本(檔名帶 (2)/(3)、new modules engines/*)一律去重或入收容冊
 - **L31**(批513;架構)彈性嫁接與自適應合約律(操作員令「未來所有引擎會因為不同需求彈性調配嫁接,interface 合約自適應式 connect sync 功能要強大完善」):引擎以冊綁定(id→尾版 glob/verb/params/outputs)不寫死路徑;合約追碼不追人(尾版一出,綁定合約自動追、漂移具名列示);換引擎(嫁接)前先驗旗標相容,只增候選、換不換由冊主/操作員;執行期模組對模組介面自湊走 via_iface_autosync;新引擎 I/O 走 VIA_Engine_Contract 封包
 - **L32**(批514;環境)子行程環境衛生律(Z15 根因:母殼帶 PYTHONHOME 指 uv 3.12,家族境 3.13 venv 子行程繼承=SRE module mismatch):PYTHONHOME 永不傳給 VIA 任何子行程(venv/base 各自從 python.exe 算 home);撤除只寫一律三處(bootstrap sitecustomize 起跑撤 · 匯流排 child_env · RunGate interp/probe/station),撤了什麼記 VIA_PYTHONHOME_SCRUBBED 並在閘的 [ENV] 行/次步講明;根治(殼層/profile/使用者環境變數)=操作員的手,程式不動殼層
+- **L33**(批515;工序)工序律(操作員令「TEST DEBUG OPTIMIZE TEST DEBUG CONSOLIDATE TEST DEBUG USER-TEST DEBUG ACTIVATE TEST DEBUG」):每件功能走 測→修→優化→測→修→整併(去重/歸位一處)→測→修→操作員實測→修→啟用→測→修;每一步的量測與判讀入交接,沒測過的不叫完成;判錯的紅燈(過時判準)與假綠同罪
+- **L34**(批515;架構)VATETF 應用端律(操作員令「VETF 改名為 VATETF;直接抓 VDF 擷取的資料庫來用,他是應用端」):VATETF(舊名 VETF,只增不減雙名)不自抓任何資料,只讀 VDF 擷取落的庫(ActiveTWETF.duckdb::holdings_daily · vdf_tw_market 價表等);擷取一律 VDF 的事
+- **L35**(批515;範圍)VDF 基金範圍律(操作員令「VDF 基金只抓主動式台股 ETF 其他基金不抓」):VDF 的基金/ETF 擷取只及主動式台股 ETF(ENG077 A 碼律宇宙 + ENG078 持股);被動 ETF 只到價格(批401),其他基金一律不抓、不建表
 
 **Lessons-learned**
 
@@ -154,17 +157,20 @@
 - LL21(批512)批511 併線時把本線 RunGate 的補丁切片用「下一個 def install_missing」當界,結果把中間 10 個既有函式一併複製進 v0103(_bridge/python_for/probe_libs 各兩份;自測仍綠=看不出來)。切片要以緊接的下一個 def 為界,併完 grep '^def ' 數重複
 - LL22(批514)批509–513 四輪診斷都在子行程/cwd/遮蔽檔層打轉,實錄一行 PYTHONHOME=…uv\python\cpython-3.12 才定案;而操作員 PS 視窗 $env:PYTHONHOME 曾印空、venv 手動直跑 13/13 過——同一台機器不同視窗/啟動路徑(via_core 啟動、profile)帶的環境不同。診斷要先量「跑閘的那個行程」自己的 os.environ/sys.executable/base_prefix,不是量另一個視窗
 - LL23(批514)操作員上傳的五件「中央管理系統」md5 與 new modules engines/ 內 (1)/(2)/(3)/(4) 副本 byte 全同——收件先算 md5 對全樹,再決定是新件還是歸位;「不足」常常不是缺程式而是缺登冊(Register/Deck/Grid/Manager/VCGC 皆無)與缺統一的閘/工作夾
+- LL24(批515)via-cgfamily 在工作站五成員全 MD5_DRIFT——不是檔案被改,是 Windows git autocrlf 簽出把 LF 換成 CRLF;冊裡的 md5 以 LF 正本算。凡以 md5 對冊,先把內容正規化(CRLF→LF、去 BOM)再算;位元組同≠內容同的反面也成立
+- LL25(批515)via-cgconsole 工作站 RED rc=1 192 秒,擁有者只印了尾四行=別家引擎的 SyntaxWarning(走 stderr),裁決理由一行都看不到。子行程尾行要 stdout 優先,RED 要把快照裡的 Gate FAIL/WARN(code/title/detail)列出來——沒有理由的紅燈等於沒量
+- LL26(批515)MDL139 自測 ①②⑥ 從批505 三大報表出貨(state SHIPPED)起就一直紅:判準還釘著 fin_statements=PLANNED、range 旗標定序、報告夾缺=NEED_DIR(批446 報告夾律已改成改指有件的夾)。過時的判準是判錯的紅燈,與假綠同罪;每次改律要 grep 全樹哪些自測釘著舊值
 
 ## 二 · 安裝核可(L19)與環境工具
 
-- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 157.3 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
+- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 158.2 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
 - 工具冊導入計畫:ABSENT · - · 件態 - · 風險 - · 段 - · 未路由 - · 白名單留置 -(TOOLS_PLAN_latest.json 不在(via-envtools))
 - 環境復原(L24):PLAN · 2026-09-15 05:30:50 · 還原 原本規劃(Baseline;無 LKGC 或 --baseline) · 段 16 · 單獨隔離境 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 借境封鎖 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 次序 RESTORE → CORE → LOW → MEDIUM → HIGH → EXTERNAL → VERIFY;安裝出問題=`via-envrecover`(①還原前次 ②順序裝 ③_M/_H 單獨隔離;-Execute -Approve 才跑,① 不受 L19,② 過 L19)
 - 裝件=操作員的手:`$env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve`(閘不代設;L19 未綠=BLOCKED_UNITEST)
 
 ## 三 · 邏輯庫 · 因子庫 · 資料庫
 
-- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 428 列 · 全庫同步 {'hash': 'd92bc7c81da1', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': 'e295eaf02577', 'root': '同', 'home': '缺'}
+- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 449 列 · 全庫同步 {'hash': 'd5c56da151c3', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '4563856b27bd', 'root': '同', 'home': '缺'}
 - 因子庫 OK:130 列 · {'SUP_MDL748:allinone 2.1.0': 77, 'SUP_MDL748:financial_data_standardization': 53} · 掛載 {'allinone': 'OK VIA_VRNLogic_AllInOne_v0201.py 2.1.0', 'fds': 'OK financial_data_standardization.py · 28 欄 · 合併損傷件(__main__ 示範缺 5 法,程式庫面可用)'}
 - 庫表冊 OK:54 表(批505)· 全庫表 4 · 庫 ['ActiveTWETF.duckdb', 'vdf_global_market.duckdb', 'vdf_tw_market.duckdb']
 - 資料家 ABSENT:VIA_Reports/datahome/DATAHOME_CATALOG_latest.json 不在(via-datahome catalog) · 庫 - · 表 - · 湖 -
@@ -172,9 +178,9 @@
 ## 四 · 引擎調度 · 多矩陣實測
 
 - 五矩陣 OK:2026-09-14T11:21:39 · profile run · 真跑 ['vdf'] · 項 43 · 態 {'GATED': 12, 'NODATA': 5, 'PLAN': 18, 'ABSENT': 2, 'GREEN': 6}
-- Deck 任務 68 · 規格項 44 · 格子站 219(在位 219)· Register 指令 118 · Manager 正式名稱 任務 69 / 引擎 83
+- Deck 任務 69 · 規格項 44 · 格子站 219(在位 219)· Register 指令 119 · Manager 正式名稱 任務 71 / 引擎 83
 
-## 五 · 指令與參數(不丟失;來源 Register-VIA-Commands-v0203.ps1)
+## 五 · 指令與參數(不丟失;來源 Register-VIA-Commands-v0204.ps1)
 
 - `via-gates`
 - `via-envpy`
@@ -252,6 +258,7 @@
 - `via-cgrouter`(別名 優先路由):via-cgrouter [--root R] [--ocr]   檔案優先序 L0/L1 唯讀掃描 → central_governance\priority
 - `via-cgdownward`(別名 下行控制):via-cgdownward [--commit --token T] [--strict-chain]   下行控制 dry-run;變更類能力要 --commit --token(你的手)
 - `via-samename`(別名 同名整併):via-samename [--commit --token T] [--diverged] [--root R]   同名整併只報告(pwsh 7);-Commit 只在權杖對上
+- `via-vdf-extra5`(別名 五額外)
 - `via-entry`:via-entry plan=一貼即用 11 步;via-entry roster=短令冊(母倉∪Grok 撞名冊);--scan 加跑 via-envgov 全景;--open 開矩陣頁(瀏覽器道零跳出);--console 帶起 Grok 網頁主控台(背景)
 - `via-env`:批383:via-env=環境治理正本(MDL135 via-envgov;Grok 版 39 行樁改名 via-env-grok 留冊);via-grok=Grok 短令冊(load 重載;matrix 開 WPF 右側板)
 - `via-grok`:批383:via-env=環境治理正本(MDL135 via-envgov;Grok 版 39 行樁改名 via-env-grok 留冊);via-grok=Grok 短令冊(load 重載;matrix 開 WPF 右側板)
@@ -284,7 +291,7 @@
 - `via-firstpage`(別名 首頁擷取):via-firstpage:首頁三法擷取器 ENG072 尾版直呼(-Force 忽略邏輯庫命中整批重抽;-RetryFailed 只重試 FAIL 件;-OcrBudget N 每件 OCR 預算秒;--in 檔/夾可重複)
 - `via-census`(別名 庫況/庫衛生):批485:via-census -Hygiene = 庫衛生唯讀審計(哨兵列 1900-01-01 數出來 + DELETE 只寫不跑;_repo_ 副本 vs 正庫 MAX 日期);零寫入
 - `via-boot`(別名 啟動層):批476:via-boot=啟動層實證:每個家族真的起一個子行程,印它看到的(加速器 | 網路件 | via_net 可 import | 同意閘)
-- `via-vetf`(別名 共識擴充):via-vetf -Factset <檔> -Yfinance <檔> -AsOf 2026-09-12 -Holdings <庫::表> -Prices <庫::表>
+- `via-vetf`(別名 via-vatetf/主動ETF應用/共識擴充):via-vetf -Factset <檔> -Yfinance <檔> -AsOf 2026-09-12 -Holdings <庫::表> -Prices <庫::表>
 - `via-twrev`(別名 月營收):via-twrev [selftest|demo|analyze|report|groups|breakout|fetch|run]   預設 selftest
 - `via-revphase`(別名 營收相位):via-revphase -SelfTest  合成 36 期自測(免庫免網路)
 - `via-etfhold`(別名 持股日更):via-etfhold             日更真跑:根=你的 output_hub\active_tw_etf(自 VIA_ROOT 推);觸網→只看同意閘,不代設
@@ -297,21 +304,21 @@
 
 ## 六 · 註冊稽核(所有引擎/模組/功能/工具/環境)
 
-- 中央自動編號冊 OK · ACTIVE 4799/4799 · **缺 0** · 類別 {'class': 91, 'engine': 77, 'environment': 43, 'function': 3989, 'feature': 76, 'module': 142, 'package': 250, 'system': 10, 'tool': 121}
+- 中央自動編號冊 OK · ACTIVE 4804/4804 · **缺 0** · 類別 {'class': 91, 'engine': 77, 'environment': 43, 'function': 3993, 'feature': 76, 'module': 142, 'package': 250, 'system': 10, 'tool': 122}
 - 尾版引擎/模組家族 228 · 中央冊已登 228 · **未登 0** · 操作介面有掛載 186 · 內部件無操作介面 42(誠實分列，不拿編號片段假命中)
 
 ## 七 · 自動編號註冊表(台帳)
 
-- 全域台帳 1049 筆 · 元件 147 · 更新 2026-09-15
-- 元件冊 OK · ACTIVE 4799 · RETIRED 1 · 更新 2026-09-15T08:33:12 · {'class': 91, 'engine': 77, 'environment': 43, 'function': 3989, 'feature': 76, 'module': 142, 'package': 250, 'system': 10, 'tool': 121}
+- 全域台帳 1050 筆 · 元件 147 · 更新 2026-09-15
+- 元件冊 OK · ACTIVE 4804 · RETIRED 1 · 更新 2026-09-15T09:26:41 · {'class': 91, 'engine': 77, 'environment': 43, 'function': 3993, 'feature': 76, 'module': 142, 'package': 250, 'system': 10, 'tool': 122}
 - 類別 current:系統 1 · 支援性工具 1 · 功能性工具 1 · 模組 1 · 引擎 19 · 函數庫 1 · 打包產品 8
 
-- 2026-09-15 05:46 批509 多 AI 交會律 L25 / RunGate v0102 解譯器探針 / MDL135 v0108 ENV_BROKEN_INTERP / 啟動層護欄
 - 2026-09-15 06:14 批510 PARTIAL_HIT(ENG082 v0109)/ ENG072 v0126 部分命中 / LL14
 - 2026-09-15 06:45 批511 併線 / 撞名四檔高版號另起 / 律冊聯集 / 孿生去重 45 / .via_envmanager 不入倉 / VCGC registry-sync
 - 2026-09-15 07:31 批512 RunGate v0104 整合匯流排 child_env / where / 引擎夾 cwd 試 / 探針失敗≠缺庫 / 同意閘;L30;L07 note
 - 2026-09-15 07:44 批513 L31 彈性嫁接/自適應合約律 + MDL054 v0102 綁定合約層 sync/connect/graft/status
 - 2026-09-15 08:34 批514 Z15 根因=母殼 PYTHONHOME(律 L32 子行程環境衛生)+ 中央治理家族入台(CGC_MDL150 擁有者)
+- 2026-09-15 09:28 批515 L33 工序律 / L34 VATETF 應用端律 / L35 VDF 基金範圍律 + TAB3 FIXED CONTENTS + 五額外試跑 + 家族擁有者實錄修
 
 ## 八 · 交接本文(來源 VIA_Handover_20260914_B498.md;逐批紀錄見該檔)
 
@@ -824,6 +831,46 @@ via-vcgc                                                    # v0105:第十一段
 
 ---
 
+### 一-r · 批515 · 你貼的批514 實錄 + 新令「將中央功能 VIA VDF VRN VETF 完成;VDF 擷取五個額外資料試跑即可;VRN 實測 TAB3;VETF 改名 VATETF 應用端;VDF 基金只抓主動式台股 ETF;TEST DEBUG…ACTIVATE;以 VIA 為中央管理全部 SSOT 化唯一接觸口」
+
+| 量到(批514 區塊) | 判讀 | 做了 |
+|---|------|------|
+| `via-rungate --family vdf`(v0105):`[ENV] 母行程 PYTHONHOME=…uv\cpython-3.12 → 子行程已撤` · `[INTERP] OK 3.13.7 re=C:\Python313\Lib\re` · 8 站 OK · **GREEN vdf 必要庫 4/4 引擎 8/8** | Z15 至閘結案:SRE mismatch 消失,站免疫;殼層仍帶 PYTHONHOME(根治=你的手,Z25) | Z15 劃線;`via-vcgc` 印 RunGate GREEN→**BLOCKED_UNITEST** 是因為只跑了 vdf(L19 要 VDF+VRN 兩族 24h 內綠)→ 這批區塊加 `via-rungate --family vrn` |
+| `via-iface connect -Need 首頁,ocr` → need `['首頁','ocr']` 命中 10 | v0103 寬收成立 | — |
+| `via-cgrouter` AMBER 進佇列 124 擋下 43,195 簽章異常 3 · **891 s** | OneDrive 樹 43k 檔逐檔讀 magic bytes(佔位檔觸發下載) | Z29(排除規則/預算) |
+| `via-cgconsole` **RED rc=1 192 s**,尾行只有別家引擎的 SyntaxWarning | 擁有者把 stderr 尾行當結果,RED 理由沒印(LL25) | **MDL150 v0101**:stdout 優先;status 列 Gate FAIL/WARN code/title/detail + 重複家族/解析失敗數;貼回即知(Z28) |
+| `via-cgfamily` 五成員全 **MD5_DRIFT** | 不是檔案被改:Windows git autocrlf 簽出 LF→CRLF(LL24) | MDL150 v0101 md5 內容正規化(CRLF→LF、去 BOM);10/10 |
+| `via-vcgc` v0105:律 32 · lessons 23 · Deck 68 · 格子 219 · Register 118 · 中央冊 4799/4800 缺 1 · 家族 PARTIAL | 台在位;缺 1=你樹上一件未同步元件(下次 `via-vcgc registry-sync --apply` 即補) | — |
+| Grid v0308:396 `SyntaxWarning invalid escape '\V'` 每次載入都印 | 文件字串非 raw | **Grid v0309** raw 文件字串(編譯零警告) |
+
+**新令怎麼落(每條=律或件,不是口號)**
+
+| 令 | 落點 |
+|---|---|
+| VDF 擷取五個額外資料試跑即可 | 五額外=冊上核心台股日交易/籌碼之外五組:`tw_revenue_codes`(月營收 ENG063)· `fin_statements`(三大報表 ENG082)· `etf_holdings_daily`(主動 ETF 持股 ENG078)· `macro_fred`(FRED ENG074)· `global_universe`(國際 11 類 ENG066)→ **Register v0204 `via-vdf-extra5`**(別名 五額外;匯流排 `matrix --apply-family vdf --ids … --profile run`;閘未開自動退 `-Test` 有界)· Deck v0145 `vdf_extra5`(釘 69)· Manager v0131;真抓=你的手(Z27) |
+| VRN 實測 TAB3:DATE FILENAME FIXED CONTENTS(修正識別 LAYOUT 去空格去斷行 分類別 自動換行 標註類型/次分類/頁數)/ SUMMARY | 擁有者兩處(L30):**ENG082 v0110 `fix_contents()`**(repair_text → 中文字任一側空白去除 → 段內斷行接回 → 類型/次分類(冊提示優先:首頁·標題帶/右資訊區/本文、財報頁·科目、指標、全文;無提示關鍵字自判 財務/評等/風險/展望/標題/本文)→ 每 40 字自動換行 → 段首【類型·次分類·p頁】;21/21)+ **MDL139 v0105** `vrn_tabs()` 每份報告把 sidecar 分區 + 財報頁列 + 指標列 + ENG075 全文 md 交給它,TAB3 欄序 **DATE · FILENAME · FIXED CONTENTS · SUMMARY**(舊欄照留;SUMMARY 空退四點文摘;欄 pre-wrap);新動詞 `via-console tab3 [--n 3]` 印前三列給你貼(Z26);自審:①②⑥ 從批505 起就紅(判準釘著 fin_statements=PLANNED;LL26)→ 判準追上,15/15 |
+| VETF 改名 VATETF;直接抓 VDF 擷取的資料庫來用,他是應用端 | **律 L34**;`via-vatetf`/`主動ETF應用` = 同一函式雙名(只增不減);契約 `VIA_Panorama_Contract` +`names` 鍵;VCGC v0106 十段/頁標題 VATETF(舊名 VETF) |
+| VDF 基金只抓主動式台股 ETF 其他基金不抓 | **律 L35**(ENG077 A 碼律宇宙 + ENG078 持股;被動 ETF 只到價格;其他基金不抓不建表) |
+| TEST DEBUG OPTIMIZE TEST DEBUG CONSOLIDATE TEST DEBUG USER-TEST DEBUG ACTIVATE TEST DEBUG | **律 L33 工序律**;本批照走:ENG082/MDL139/MDL150 各 測→修→整併→測,操作員實測=這批區塊 |
+| 以 VIA 為中央管理 全部 SSOT 化 唯一接觸口 | L20 已立;冊外寫死路徑件盤點=Z30(中央治理家族五件、VETF adapter、ENG075 OUTDIR) |
+
+沒做(誠實):五額外真抓與 TAB3 真報告實測都要你的手貼回;殼層 PYTHONHOME 我不動;`via-cgdownward`/`via-samename` 仍未在工作站跑過(pwsh 7);Z29/Z30 下一批。
+
+#### 一貼即用(批515)
+
+```powershell
+Set-Location 'C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics'
+git status --short | Select-Object -First 10; git stash push -m "b515 工作站樹快照"; git pull --ff-only origin claude/via-envmanager-governance-7cls8h; git stash list; git log --oneline -1   # 四行貼回
+. (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName   # 應為 v0204
+via-rungate --family vrn                                   # 兩族 24h 內都綠 → via-vcgc 才會 INSTALL_OK(L19)
+via-cgfamily                                               # v0101:MD5 應全 OK;console RED 的 [FAIL]/[WARN] 行貼回(Z28)
+via-console tab3 --n 3                                     # TAB3 = DATE / FILENAME / FIXED CONTENTS / SUMMARY 前三列貼回(Z26;0 份=先 via-vrnval)
+$env:VIA_NET_CONSENT='YES'; via-vdf-extra5                  # 五額外資料試跑(真抓=你的手;閘沒開會自動只跑 -Test 有界;Z27)
+via-vcgc                                                    # v0106:VATETF 名 · 律 35 / lessons 26 · 十一段
+```
+
+---
+
 ### 二 · 操作員機器實況(他貼的 EnvManager v0300 AUDIT,run ENV-20260914_112000;直接當量測)
 
 | 事實 | 影響 |
@@ -894,7 +941,7 @@ via-ryg -Timeout 300              # ⑦ 五矩陣燈:紫=GATED(閘未開,不是�
 # $env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve
 ```
 
-## 九 · 掉球清單(來源 VIA_DroppedBalls_B507.md;列 36 · 未結 34;只增不減,結案劃線)
+## 九 · 掉球清單(來源 VIA_DroppedBalls_B507.md;列 42 · 未結 39;只增不減,結案劃線)
 
 # VIA 掉球清單(漏球審計)· 批507(2026-09-14)· 涵蓋 批474–506
 
@@ -927,7 +974,7 @@ via-ryg -Timeout 300              # ⑦ 五矩陣燈:紫=GATED(閘未開,不是�
 | Z12 | MasterControl 總控頁未隨 Manager v0124–v0126 再生(容器再生會覆蓋真頁;L22) | 操作員的手 | — | 他機器 `via-manager` 再生一次 |
 | Z13 | 批508 環境復原(L24)真跑:你機器 `via-envrecover` → `-Execute -Approve`(① 還原)→ `via-rungate` → 再 `-Execute -Approve`(② 順序裝);容器只有唯讀計畫 | 操作員的手 | 操作員 | 貼回 `via-envrecover` 與 `via-vcgc` 二段 |
 | ~~Z14~~ | ~~操作員機器上的並行線不在遠端任何分支;要先推到側枝才能併~~ | **已結(批511)**:側枝 `local/parallel-b508-09151416` 已推、已併入本線(撞名者高版號另起;律/lessons 聯集;.via_envmanager 不入倉;孿生去重 45 件) | — | — |
-| Z15 | via_vdf_312/via_vrn_312/via_vap_312 解譯器壞(SRE module mismatch)→ **批514 根因定案**:RunGate 行程 PYTHONHOME=…\uv\python\cpython-3.12-windows-x86_64-none(母殼/via_core 啟動帶進來),家族境 3.13 venv 子行程繼承 → 載 3.12 標準庫;-E 即好、手動 venv 直跑 13/13 過=反證。已修:三處同律撤除(L32;bootstrap/Bus v0126/RunGate v0105)→ 站免疫 | 操作員的手 | 操作員 | 貼回 `via-rungate --family vdf`(v0105 [ENV] 行 + 真燈)與 Z15 根因四問(一-q 區塊);根治=殼層/profile/via_core Activate 拿掉 PYTHONHOME |
+| ~~Z15~~ | ~~via_vdf_312 解譯器壞(SRE module mismatch)~~ 已結(批515):根因=母殼 PYTHONHOME(批514 L32 三處撤除),實錄 `via-rungate --family vdf` GREEN 8/8 · [INTERP] OK 3.13.7 · 必要庫 4/4;殼層根治另立 Z25 | 已結(批515) | — | vrn 族同樣跑一次(`via-rungate --family vrn`;INSTALL_OK 要兩族 24h 內綠) |
 | Z16 | PARTIAL 16 件(Z1)自批510 起例行跑不再重燒 OCR(部分命中);要重抽=你機器 `via-firstpage -RetryFailed`(涵蓋 PARTIAL);矩陣 vrn_firstpage 應不再 600s TIMEOUT,貼回驗 | 操作員的手 | 操作員 | 貼回 `via-ryg vrn -Timeout 600` 的 vrn_firstpage 秒數 |
 | Z17 | 並行線 PANORAMA_HANDOVER-v0103「已列入下一輪」:Windows VRN 三站真實失敗斷言與 OCR runtime 自動收集、VETF 快照日期覆蓋 vs 持股完整性、gap plan 只代表查庫完成;`new modules engines/*` 另線收容件(檔名帶 (2)/(3))候裁入 references/intake | 未做 | AI | 下一批照該檔「已列入下一輪」逐項 |
 | Z18 | 批510 我把 vrn_firstpage 600s TIMEOUT 歸因給「16 件 PARTIAL 每跑重燒 OCR」——你的實錄證明那 16 件是數位 PDF(DUAL_ZONES,合計 30.89s);600s 是並行線 panorama 自己的 vrn_firstpage 跑法,不是本線;PARTIAL_HIT 仍有效但歸因改正 | 已在 一-n 更正 | AI | 無 |
@@ -937,12 +984,18 @@ via-ryg -Timeout 300              # ⑦ 五矩陣燈:紫=GATED(閘未開,不是�
 | Z22 | `supportive modules/_inbox_to_classify/_inbox_to_classify/` 六個與標準庫同名的檔(遮蔽地雷;現不在任何 sys.path 上);批514 證據(md5/大小):abc.py d016c5a4/1519B · inspect.py a210c663/3806B · json.py 954c5c0d/5660B · logging.py 49dd2df7/12737B · token.py 498b7001/6855B · traceback.py 2bac3313/36490B → 候裁:改名或入 intake | 候 | 操作員 | 裁「改名」或「入 intake」我就動 |
 | Z23 | 你的樹卡在批508(Grid v0302、RunGate v0101、Register v0200):`git pull --ff-only` 那行沒生效,多半是本機發佈頁被改動擋住;批513 區塊改 stash+pull 並要求貼 pull 輸出 | 已解(批513 stash+pull 後 HEAD 4728252d=批513) | — | 每批區塊仍帶 stash+pull |
 | Z24 | 中央治理家族深併候裁(L30):主控台 URN 發碼 vs VCGC registry-sync 元件編號冊(兩本冊、兩套代號);同名整併 ps1 vs L23 倉衛生流程;檔案優先序 vs MDL054 scan/匯流排 catalog;下行控制能力冊 vs Deck 任務冊/匯流排;詞彙引擎 v0100 vs CGC_MDL001 v0401 語料線 + VIA_SSOT_RegexDict。批514 先入台(擁有者 CGC_MDL150、十一段、dry-run),各對只留一處=下一批逐對比對 | 未做 | AI | 逐對出比對表(欄位/代號/輸出)再裁 |
+| Z25 | 殼層 PYTHONHOME 根治:你的視窗仍帶 PYTHONHOME=…uv\python\cpython-3.12(站已免疫,但手動跑/其他工具仍會中);一-q 四問(User/Machine 環境變數、$PROFILE、via_core Activate)貼回後決定拿掉哪一處 | 操作員的手 | 操作員 | 貼回四問;拿掉後 Register 載入不再印黃 |
+| Z26 | VRN 實測 TAB3(DATE/FILENAME/FIXED CONTENTS/SUMMARY):MDL139 v0105 已建,工作站尚未跑 `via-console`/`via-vrnval` 看真報告的 FIXED CONTENTS(sidecar 分區+財報頁列+全文 md 經 ENG082 fix_contents) | 未做(等實錄) | 操作員+AI | 貼回 TAB3 前三列;分類別規則照實錄再調 |
+| Z27 | VDF 五額外資料試跑(月營收/三大報表/主動ETF持股/FRED/國際宇宙):`via-vdf-extra5` 已登,真抓要你開閘;結果矩陣貼回 | 操作員的手 | 操作員 | `$env:VIA_NET_CONSENT='YES'; via-vdf-extra5` |
+| Z28 | via-cgconsole 工作站 RED(192s)理由未見(尾行被 SyntaxWarning 擠掉;LL25):MDL150 v0101 status 會列 Gate FAIL/WARN;貼回後判是真病(重複家族/契約不符/循環)還是閘門太嚴 | 未做(等實錄) | 操作員+AI | `via-cgfamily` 貼回 [FAIL]/[WARN] 行 |
+| Z29 | via-cgrouter 891 秒(OneDrive 樹 43,319 檔):路由器逐檔讀 magic bytes;OneDrive 佔位檔會觸發下載——下一批加排除規則(VIA_Reports/_governance/.git/envs)與 --budget-mb 預設調低,或改讀 file_index 快取 | 未做 | AI | 量 file_index.json 的擋下分類再定 |
+| Z30 | 「以 VIA 為中央管理 全部 SSOT 化 唯一接觸口」(L20 延伸):冊外仍有寫死路徑/自帶輸出夾的件(中央治理家族五件、VETF 封印包 adapter、ENG075 OUTDIR);逐件改成讀冊(Spec/DataHome/契約)=下一批盤點表 | 未做 | AI | 出「寫死路徑清單」再逐件改冊 |
 | ~~W~~ | ~~8 件 FAIL_HIT 首頁件重抽~~ | 已結(批503) | — | 64/64 |
 
 
 ## 十一 · 中央治理家族(批514;VIA-SYS-MGR-001 主控台 · VIA-GOV-ENG-001 詞彙引擎 · VIA-SYS-MGR-003 下行控制 · VIA-SYS-ENG-003 檔案優先序 · 同名整併;擁有者 CGC_MDL150;預設 dry-run)
 
-- 家族 PARTIAL · 2026-09-15T08:30:50 · 正位 VIA_CentralGovernanceFamily_b514 · 成員件 {'console': 'OK', 'engine': 'OK', 'downward': 'OK', 'router': 'OK', 'samename': 'OK'}
+- 家族 PARTIAL · 2026-09-15T09:29:58 · 正位 VIA_CentralGovernanceFamily_b514 · 成員件 {'console': 'OK', 'engine': 'OK', 'downward': 'OK', 'router': 'OK', 'samename': 'OK'}
   - console:ABSENT · 尚未跑 via-cgconsole(快照落 <root>/output/SYS)
   - downward:ABSENT · 尚未跑 via-cgdownward
   - router:ABSENT · 尚未跑 via-cgrouter

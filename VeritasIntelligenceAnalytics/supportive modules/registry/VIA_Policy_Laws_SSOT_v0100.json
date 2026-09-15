@@ -1,6 +1,6 @@
 {
  "schema": "VIA.PolicyLaws.SSOT.v1",
- "batch": "批514",
+ "batch": "批515",
  "ts": "2026-09-15",
  "purpose": "政策庫正本:操作員律 + 紀律 + lessons-learned(只增不減;ENG082 sync-db 攤平入 via_policy_factors;VCGC 唯一對接口讀此冊)",
  "laws": [
@@ -204,6 +204,24 @@
    "batch": "批514",
    "cat": "環境",
    "zh": "子行程環境衛生律(Z15 根因:母殼帶 PYTHONHOME 指 uv 3.12,家族境 3.13 venv 子行程繼承=SRE module mismatch):PYTHONHOME 永不傳給 VIA 任何子行程(venv/base 各自從 python.exe 算 home);撤除只寫一律三處(bootstrap sitecustomize 起跑撤 · 匯流排 child_env · RunGate interp/probe/station),撤了什麼記 VIA_PYTHONHOME_SCRUBBED 並在閘的 [ENV] 行/次步講明;根治(殼層/profile/使用者環境變數)=操作員的手,程式不動殼層"
+  },
+  {
+   "id": "L33",
+   "batch": "批515",
+   "cat": "工序",
+   "zh": "工序律(操作員令「TEST DEBUG OPTIMIZE TEST DEBUG CONSOLIDATE TEST DEBUG USER-TEST DEBUG ACTIVATE TEST DEBUG」):每件功能走 測→修→優化→測→修→整併(去重/歸位一處)→測→修→操作員實測→修→啟用→測→修;每一步的量測與判讀入交接,沒測過的不叫完成;判錯的紅燈(過時判準)與假綠同罪"
+  },
+  {
+   "id": "L34",
+   "batch": "批515",
+   "cat": "架構",
+   "zh": "VATETF 應用端律(操作員令「VETF 改名為 VATETF;直接抓 VDF 擷取的資料庫來用,他是應用端」):VATETF(舊名 VETF,只增不減雙名)不自抓任何資料,只讀 VDF 擷取落的庫(ActiveTWETF.duckdb::holdings_daily · vdf_tw_market 價表等);擷取一律 VDF 的事"
+  },
+  {
+   "id": "L35",
+   "batch": "批515",
+   "cat": "範圍",
+   "zh": "VDF 基金範圍律(操作員令「VDF 基金只抓主動式台股 ETF 其他基金不抓」):VDF 的基金/ETF 擷取只及主動式台股 ETF(ENG077 A 碼律宇宙 + ENG078 持股);被動 ETF 只到價格(批401),其他基金一律不抓、不建表"
   }
  ],
  "lessons": [
@@ -333,6 +351,21 @@
    "id": "LL23",
    "batch": "批514",
    "zh": "操作員上傳的五件「中央管理系統」md5 與 new modules engines/ 內 (1)/(2)/(3)/(4) 副本 byte 全同——收件先算 md5 對全樹,再決定是新件還是歸位;「不足」常常不是缺程式而是缺登冊(Register/Deck/Grid/Manager/VCGC 皆無)與缺統一的閘/工作夾"
+  },
+  {
+   "id": "LL24",
+   "batch": "批515",
+   "zh": "via-cgfamily 在工作站五成員全 MD5_DRIFT——不是檔案被改,是 Windows git autocrlf 簽出把 LF 換成 CRLF;冊裡的 md5 以 LF 正本算。凡以 md5 對冊,先把內容正規化(CRLF→LF、去 BOM)再算;位元組同≠內容同的反面也成立"
+  },
+  {
+   "id": "LL25",
+   "batch": "批515",
+   "zh": "via-cgconsole 工作站 RED rc=1 192 秒,擁有者只印了尾四行=別家引擎的 SyntaxWarning(走 stderr),裁決理由一行都看不到。子行程尾行要 stdout 優先,RED 要把快照裡的 Gate FAIL/WARN(code/title/detail)列出來——沒有理由的紅燈等於沒量"
+  },
+  {
+   "id": "LL26",
+   "batch": "批515",
+   "zh": "MDL139 自測 ①②⑥ 從批505 三大報表出貨(state SHIPPED)起就一直紅:判準還釘著 fin_statements=PLANNED、range 旗標定序、報告夾缺=NEED_DIR(批446 報告夾律已改成改指有件的夾)。過時的判準是判錯的紅燈,與假綠同罪;每次改律要 grep 全樹哪些自測釘著舊值"
   }
  ]
 }
