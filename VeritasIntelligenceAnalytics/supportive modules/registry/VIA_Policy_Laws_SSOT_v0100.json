@@ -1,6 +1,6 @@
 {
  "schema": "VIA.PolicyLaws.SSOT.v1",
- "batch": "批513",
+ "batch": "批514",
  "ts": "2026-09-15",
  "purpose": "政策庫正本:操作員律 + 紀律 + lessons-learned(只增不減;ENG082 sync-db 攤平入 via_policy_factors;VCGC 唯一對接口讀此冊)",
  "laws": [
@@ -198,6 +198,12 @@
    "batch": "批513",
    "cat": "架構",
    "zh": "彈性嫁接與自適應合約律(操作員令「未來所有引擎會因為不同需求彈性調配嫁接,interface 合約自適應式 connect sync 功能要強大完善」):引擎以冊綁定(id→尾版 glob/verb/params/outputs)不寫死路徑;合約追碼不追人(尾版一出,綁定合約自動追、漂移具名列示);換引擎(嫁接)前先驗旗標相容,只增候選、換不換由冊主/操作員;執行期模組對模組介面自湊走 via_iface_autosync;新引擎 I/O 走 VIA_Engine_Contract 封包"
+  },
+  {
+   "id": "L32",
+   "batch": "批514",
+   "cat": "環境",
+   "zh": "子行程環境衛生律(Z15 根因:母殼帶 PYTHONHOME 指 uv 3.12,家族境 3.13 venv 子行程繼承=SRE module mismatch):PYTHONHOME 永不傳給 VIA 任何子行程(venv/base 各自從 python.exe 算 home);撤除只寫一律三處(bootstrap sitecustomize 起跑撤 · 匯流排 child_env · RunGate interp/probe/station),撤了什麼記 VIA_PYTHONHOME_SCRUBBED 並在閘的 [ENV] 行/次步講明;根治(殼層/profile/使用者環境變數)=操作員的手,程式不動殼層"
   }
  ],
  "lessons": [
@@ -317,6 +323,16 @@
    "id": "LL21",
    "batch": "批512",
    "zh": "批511 併線時把本線 RunGate 的補丁切片用「下一個 def install_missing」當界,結果把中間 10 個既有函式一併複製進 v0103(_bridge/python_for/probe_libs 各兩份;自測仍綠=看不出來)。切片要以緊接的下一個 def 為界,併完 grep '^def ' 數重複"
+  },
+  {
+   "id": "LL22",
+   "batch": "批514",
+   "zh": "批509–513 四輪診斷都在子行程/cwd/遮蔽檔層打轉,實錄一行 PYTHONHOME=…uv\\python\\cpython-3.12 才定案;而操作員 PS 視窗 $env:PYTHONHOME 曾印空、venv 手動直跑 13/13 過——同一台機器不同視窗/啟動路徑(via_core 啟動、profile)帶的環境不同。診斷要先量「跑閘的那個行程」自己的 os.environ/sys.executable/base_prefix,不是量另一個視窗"
+  },
+  {
+   "id": "LL23",
+   "batch": "批514",
+   "zh": "操作員上傳的五件「中央管理系統」md5 與 new modules engines/ 內 (1)/(2)/(3)/(4) 副本 byte 全同——收件先算 md5 對全樹,再決定是新件還是歸位;「不足」常常不是缺程式而是缺登冊(Register/Deck/Grid/Manager/VCGC 皆無)與缺統一的閘/工作夾"
   }
  ]
 }

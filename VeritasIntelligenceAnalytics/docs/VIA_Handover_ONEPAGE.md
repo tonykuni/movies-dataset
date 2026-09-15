@@ -1,6 +1,6 @@
-# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0104 · 批511)
+# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0105 · 批514)
 
-> 產生 2026-09-15 07:44:46 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
+> 產生 2026-09-15 08:35:26 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
 
 ## 〇 · 接手提示詞(給下一個 AI;來源 VIA_AI_Handover_Prompt_v0100.md)
 
@@ -127,6 +127,7 @@
 - **L29**(批511 併線(並行線 批508 panorama-v0103);驗證)獨立失敗不阻斷其他診斷；保存完整斷言與未修原因；尚有待修或必要驗收缺席不得INSTALL_OK。
 - **L30**(批512;架構)相似整合律(操作員令「類似參數功能引擎就整合優化」):同一判準、同一子行程環境、同一啟動邏輯、同一參數冊只寫一處(冊的擁有者),其餘轉呼叫;新件先找既有件,找到就整合優化不另起;撞名/同功能副本(檔名帶 (2)/(3)、new modules engines/*)一律去重或入收容冊
 - **L31**(批513;架構)彈性嫁接與自適應合約律(操作員令「未來所有引擎會因為不同需求彈性調配嫁接,interface 合約自適應式 connect sync 功能要強大完善」):引擎以冊綁定(id→尾版 glob/verb/params/outputs)不寫死路徑;合約追碼不追人(尾版一出,綁定合約自動追、漂移具名列示);換引擎(嫁接)前先驗旗標相容,只增候選、換不換由冊主/操作員;執行期模組對模組介面自湊走 via_iface_autosync;新引擎 I/O 走 VIA_Engine_Contract 封包
+- **L32**(批514;環境)子行程環境衛生律(Z15 根因:母殼帶 PYTHONHOME 指 uv 3.12,家族境 3.13 venv 子行程繼承=SRE module mismatch):PYTHONHOME 永不傳給 VIA 任何子行程(venv/base 各自從 python.exe 算 home);撤除只寫一律三處(bootstrap sitecustomize 起跑撤 · 匯流排 child_env · RunGate interp/probe/station),撤了什麼記 VIA_PYTHONHOME_SCRUBBED 並在閘的 [ENV] 行/次步講明;根治(殼層/profile/使用者環境變數)=操作員的手,程式不動殼層
 
 **Lessons-learned**
 
@@ -151,17 +152,19 @@
 - LL19(批511)併線實錄:操作員機器上的線是 main(8071a062)+並行 commit,不是本分支;側枝推上來後量到 734 件新增,374 件與倉內 byte 同、48 件互為孿生、.via_envmanager 163MB 執行期狀態被 commit 進來;四個檔撞名(Register v0200/ENG072 v0126/RunGate v0102/MDL149 v0102)各自內容不同。併法:撞名者留並行線內容、本線改動移到更高版號並帶上對方功能(只增不減);律/lessons 取聯集保留 orig_id;執行期狀態 gitignore;孿生只刪未被引用者。兩條線各寫各的記憶=兩個腦,L25 交會律不是建議是必須
 - LL20(批512)Z15 實錄:PYTHONHOME 空、PYTHONPATH 只有 bootstrap、via_vdf_312 = C:\Python313 3.13.7 的 venv;RunGate 的 -c 探針 import re 過,站以檔案起跑卻 SRE module mismatch,而匯流排在同一 venv 跑 vap 引擎正常——差在站的子行程環境(cwd=引擎夾)與匯流排 child_env 不同一處;兩處各寫一套子行程環境=Hydra;整合成一處並把 traceback 的 File 路徑(where)印出來,病因才會自己說話
 - LL21(批512)批511 併線時把本線 RunGate 的補丁切片用「下一個 def install_missing」當界,結果把中間 10 個既有函式一併複製進 v0103(_bridge/python_for/probe_libs 各兩份;自測仍綠=看不出來)。切片要以緊接的下一個 def 為界,併完 grep '^def ' 數重複
+- LL22(批514)批509–513 四輪診斷都在子行程/cwd/遮蔽檔層打轉,實錄一行 PYTHONHOME=…uv\python\cpython-3.12 才定案;而操作員 PS 視窗 $env:PYTHONHOME 曾印空、venv 手動直跑 13/13 過——同一台機器不同視窗/啟動路徑(via_core 啟動、profile)帶的環境不同。診斷要先量「跑閘的那個行程」自己的 os.environ/sys.executable/base_prefix,不是量另一個視窗
+- LL23(批514)操作員上傳的五件「中央管理系統」md5 與 new modules engines/ 內 (1)/(2)/(3)/(4) 副本 byte 全同——收件先算 md5 對全樹,再決定是新件還是歸位;「不足」常常不是缺程式而是缺登冊(Register/Deck/Grid/Manager/VCGC 皆無)與缺統一的閘/工作夾
 
 ## 二 · 安裝核可(L19)與環境工具
 
-- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 156.5 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
+- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 157.3 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
 - 工具冊導入計畫:ABSENT · - · 件態 - · 風險 - · 段 - · 未路由 - · 白名單留置 -(TOOLS_PLAN_latest.json 不在(via-envtools))
 - 環境復原(L24):PLAN · 2026-09-15 05:30:50 · 還原 原本規劃(Baseline;無 LKGC 或 --baseline) · 段 16 · 單獨隔離境 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 借境封鎖 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 次序 RESTORE → CORE → LOW → MEDIUM → HIGH → EXTERNAL → VERIFY;安裝出問題=`via-envrecover`(①還原前次 ②順序裝 ③_M/_H 單獨隔離;-Execute -Approve 才跑,① 不受 L19,② 過 L19)
 - 裝件=操作員的手:`$env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve`(閘不代設;L19 未綠=BLOCKED_UNITEST)
 
 ## 三 · 邏輯庫 · 因子庫 · 資料庫
 
-- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 418 列 · 全庫同步 {'hash': 'be893082a969', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '9b0d6b39a997', 'root': '同', 'home': '缺'}
+- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 428 列 · 全庫同步 {'hash': 'd92bc7c81da1', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': 'e295eaf02577', 'root': '同', 'home': '缺'}
 - 因子庫 OK:130 列 · {'SUP_MDL748:allinone 2.1.0': 77, 'SUP_MDL748:financial_data_standardization': 53} · 掛載 {'allinone': 'OK VIA_VRNLogic_AllInOne_v0201.py 2.1.0', 'fds': 'OK financial_data_standardization.py · 28 欄 · 合併損傷件(__main__ 示範缺 5 法,程式庫面可用)'}
 - 庫表冊 OK:54 表(批505)· 全庫表 4 · 庫 ['ActiveTWETF.duckdb', 'vdf_global_market.duckdb', 'vdf_tw_market.duckdb']
 - 資料家 ABSENT:VIA_Reports/datahome/DATAHOME_CATALOG_latest.json 不在(via-datahome catalog) · 庫 - · 表 - · 湖 -
@@ -169,9 +172,9 @@
 ## 四 · 引擎調度 · 多矩陣實測
 
 - 五矩陣 OK:2026-09-14T11:21:39 · profile run · 真跑 ['vdf'] · 項 43 · 態 {'GATED': 12, 'NODATA': 5, 'PLAN': 18, 'ABSENT': 2, 'GREEN': 6}
-- Deck 任務 66 · 規格項 44 · 格子站 218(在位 218)· Register 指令 112 · Manager 正式名稱 任務 67 / 引擎 82
+- Deck 任務 68 · 規格項 44 · 格子站 219(在位 219)· Register 指令 118 · Manager 正式名稱 任務 69 / 引擎 83
 
-## 五 · 指令與參數(不丟失;來源 Register-VIA-Commands-v0202.ps1)
+## 五 · 指令與參數(不丟失;來源 Register-VIA-Commands-v0203.ps1)
 
 - `via-gates`
 - `via-envpy`
@@ -243,6 +246,12 @@
 - `via-envrecover`(別名 環境復原):via-envrecover [-Execute] [-Approve] [-ApproveRemove] [-Baseline] [-To LKGC_x.json] [-Env via_x] [--env-root P];plan 唯讀寫 VIA_Reports\env_governance\RECOVER_latest.json/.ps1
 - `via-panorama`(別名 全景修復)
 - `via-iface`(別名 合約):via-iface connect -Need a,b [-Family vdf]   嫁接候選(只列 argv);via-iface graft -Item ID -Engine GLOB [-Dir D] [-Apply]   換引擎前驗相容(只增候選);via-iface status
+- `via-cgfamily`(別名 中央治理家族):via-cgfamily [status|plan]        五成員最新快照 → FAMILY_latest.json(VCGC 十一段);plan=一貼即用
+- `via-cgconsole`(別名 中央主控台):via-cgconsole [--probe] [--commit] [--root R]   主控台複驗 dry-run(快照 <root>\output\SYS;--probe 動態載入模組頂層/--commit 發 URN 台帳=你的手)
+- `via-cgengine`(別名 詞彙引擎):via-cgengine [引擎旗標…]           預設 --selftest;--seed/--observe X/--normalize X 皆 dry-run;--commit=你的手
+- `via-cgrouter`(別名 優先路由):via-cgrouter [--root R] [--ocr]   檔案優先序 L0/L1 唯讀掃描 → central_governance\priority
+- `via-cgdownward`(別名 下行控制):via-cgdownward [--commit --token T] [--strict-chain]   下行控制 dry-run;變更類能力要 --commit --token(你的手)
+- `via-samename`(別名 同名整併):via-samename [--commit --token T] [--diverged] [--root R]   同名整併只報告(pwsh 7);-Commit 只在權杖對上
 - `via-entry`:via-entry plan=一貼即用 11 步;via-entry roster=短令冊(母倉∪Grok 撞名冊);--scan 加跑 via-envgov 全景;--open 開矩陣頁(瀏覽器道零跳出);--console 帶起 Grok 網頁主控台(背景)
 - `via-env`:批383:via-env=環境治理正本(MDL135 via-envgov;Grok 版 39 行樁改名 via-env-grok 留冊);via-grok=Grok 短令冊(load 重載;matrix 開 WPF 右側板)
 - `via-grok`:批383:via-env=環境治理正本(MDL135 via-envgov;Grok 版 39 行樁改名 via-env-grok 留冊);via-grok=Grok 短令冊(load 重載;matrix 開 WPF 右側板)
@@ -288,21 +297,21 @@
 
 ## 六 · 註冊稽核(所有引擎/模組/功能/工具/環境)
 
-- 中央自動編號冊 OK · ACTIVE 4749/4769 · **缺 20** · 類別 {'class': 91, 'engine': 77, 'environment': 43, 'function': 3947, 'feature': 76, 'module': 141, 'package': 250, 'system': 10, 'tool': 114}
-- 尾版引擎/模組家族 227 · 中央冊已登 227 · **未登 0** · 操作介面有掛載 185 · 內部件無操作介面 42(誠實分列，不拿編號片段假命中)
+- 中央自動編號冊 OK · ACTIVE 4799/4799 · **缺 0** · 類別 {'class': 91, 'engine': 77, 'environment': 43, 'function': 3989, 'feature': 76, 'module': 142, 'package': 250, 'system': 10, 'tool': 121}
+- 尾版引擎/模組家族 228 · 中央冊已登 228 · **未登 0** · 操作介面有掛載 186 · 內部件無操作介面 42(誠實分列，不拿編號片段假命中)
 
 ## 七 · 自動編號註冊表(台帳)
 
-- 全域台帳 1048 筆 · 元件 147 · 更新 2026-09-14
-- 元件冊 OK · ACTIVE 4749 · RETIRED 1 · 更新 2026-09-15T06:42:34 · {'class': 91, 'engine': 77, 'environment': 43, 'function': 3947, 'feature': 76, 'module': 141, 'package': 250, 'system': 10, 'tool': 114}
+- 全域台帳 1049 筆 · 元件 147 · 更新 2026-09-15
+- 元件冊 OK · ACTIVE 4799 · RETIRED 1 · 更新 2026-09-15T08:33:12 · {'class': 91, 'engine': 77, 'environment': 43, 'function': 3989, 'feature': 76, 'module': 142, 'package': 250, 'system': 10, 'tool': 121}
 - 類別 current:系統 1 · 支援性工具 1 · 功能性工具 1 · 模組 1 · 引擎 19 · 函數庫 1 · 打包產品 8
 
-- 2026-09-15 05:30 批508 環境復原律 L24 / recover 動詞 / _M 不借 alt / 順序安裝
 - 2026-09-15 05:46 批509 多 AI 交會律 L25 / RunGate v0102 解譯器探針 / MDL135 v0108 ENV_BROKEN_INTERP / 啟動層護欄
 - 2026-09-15 06:14 批510 PARTIAL_HIT(ENG082 v0109)/ ENG072 v0126 部分命中 / LL14
 - 2026-09-15 06:45 批511 併線 / 撞名四檔高版號另起 / 律冊聯集 / 孿生去重 45 / .via_envmanager 不入倉 / VCGC registry-sync
 - 2026-09-15 07:31 批512 RunGate v0104 整合匯流排 child_env / where / 引擎夾 cwd 試 / 探針失敗≠缺庫 / 同意閘;L30;L07 note
 - 2026-09-15 07:44 批513 L31 彈性嫁接/自適應合約律 + MDL054 v0102 綁定合約層 sync/connect/graft/status
+- 2026-09-15 08:34 批514 Z15 根因=母殼 PYTHONHOME(律 L32 子行程環境衛生)+ 中央治理家族入台(CGC_MDL150 擁有者)
 
 ## 八 · 交接本文(來源 VIA_Handover_20260914_B498.md;逐批紀錄見該檔)
 
@@ -787,6 +796,34 @@ via-iface connect -Need 首頁,ocr -Family vrn                                  
 
 ---
 
+### 一-q · 批514 · 「將中央管理系統不足的部分補上」+ 你貼的實錄([INTERP] STDLIB_MISMATCH · PYTHONHOME=…\uv\python\cpython-3.12 · 手動 venv 直跑 13/13 · connect need ['首頁 ocr'] 命中 0)
+
+| 量到 | 判讀 | 做了 |
+|---|------|------|
+| `via-rungate --family vdf`(v0104):`[INTERP] STDLIB_MISMATCH … -E 即好 · PYTHONHOME=C:\Users\tonyk\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none`;同視窗手動 `via_vdf_312\Scripts\python.exe vdf_input_matrix --selftest` 13/13 | **Z15 根因定案**:跑閘的那個 python 行程帶著 PYTHONHOME 指到 uv 的 3.12(母殼/via_core 啟動/profile 帶進來;側枝 .via_envmanager/env_report.json 也記到同一值 + VIRTUAL_ENV=via_core),家族境 3.13 venv 子行程繼承後載 3.12 標準庫 → `_sre.MAGIC` 不合;`-E` 即好=環境變數層;手動直跑過=那個殼當下沒帶。四輪(批509–513)都在子行程/cwd/遮蔽檔層打轉=LL22 | **律 L32 子行程環境衛生**:PYTHONHOME 永不傳給子行程,三處同律撤除——bootstrap `sitecustomize` 起跑撤(每支 VIA python 都生效)· 匯流排 **v0126** `child_env`(47/47)· RunGate **v0105** interp/probe/station(17/17;`[ENV]` 行 + `rep.host` + 次步講根治=你的手);撤了什麼記 `VIA_PYTHONHOME_SCRUBBED`;Register v0203 載入時母殼帶 PYTHONHOME 就印黃 |
+| `via-iface connect -Need 首頁,ocr` → need `['首頁 ocr']` 命中 0 | PowerShell 把 `首頁,ocr` 拆成陣列,Register 用空白合回 | MDL054 **v0103** `split_need()` 逗號/空白/分號/全形逗號/頓號皆可(9/9)+ Register v0203 `-Need` 以逗號合回 |
+| 你上傳五件「中央管理系統」(主控台 VIA-SYS-MGR-001 · 詞彙引擎 VIA-GOV-ENG-001 · 下行控制 VIA-SYS-MGR-003 · 檔案優先序 VIA-SYS-ENG-003 · 同名整併 ps1) | md5 與 `new modules engines/` 內 8 個 `(1)/(2)/(3)/(4)` 副本 **byte 全同**(批511 已列候歸位);冊上零登錄(Register/Deck/Grid/Manager/VCGC 皆無)、各自寫死根與輸出、變更類動作無統一閘=「不足」的實體 | 歸位一份 `supportive modules/VIA_Central_Governance/VIA_CentralGovernanceFamily_b514/`(原名零觸碰:套件內以檔名互呼;`MANIFEST_b514.json` md5 冊)、8 副本刪(`docs/VIA_RepoHygiene_B514`);擁有者 **CGC_MDL150 v0100**(status/plan/console/engine/router/downward/samename;工作夾 `VIA_Reports\central_governance\`;預設 dry-run;`--commit/--probe/--token/-Commit` 只在你明給才傳;子行程=匯流排 child_env;8/8);登冊七處:Register v0203 六令(`via-cgfamily/via-cgconsole/via-cgengine/via-cgrouter/via-cgdownward/via-samename`;別名 中央治理家族/中央主控台/詞彙引擎/優先路由/下行控制/同名整併)· Deck v0144 `cg_family_status/cg_router`(釘 68)· Manager v0130 · Grid v0308 +站 · VCGC **v0105** 十一段(15/15;registry-sync --apply 活元件 4799 新 50)· 台帳 1049 |
+| 容器內 dry-run:詞彙引擎 selftest PASS(0.1s)· 路由器 GREEN · 主控台 AMBER(13 閘 WARN 6 FAIL 0;registry 夾 704 檔 11.8s) | 五件離線可跑;主控台快照落 `<root>\output\SYS` + `<root>\configs`(.gitignore 收 `output/`、`configs/*.preview.json`、`system_parameters.json`;`--commit` 台帳可入倉) | 掉球 Z24:深併候裁(URN 發碼 vs VCGC 元件冊 · 同名整併 vs L23 · 路由器 vs MDL054/catalog · 下行能力冊 vs Deck · 詞彙引擎 v0100 vs CGC_MDL001 v0401) |
+
+沒做(誠實):根治(殼層/profile/via_core Activate/使用者環境變數的 PYTHONHOME)是你的手,程式不動殼層;`via-cgdownward`/`via-samename` 要 pwsh 7,容器只驗 argv 閘律;各對只留一處(Z24)下一批;`_inbox_to_classify` 六檔證據已列(Z22)候你裁。
+
+#### 一貼即用(批514)
+
+```powershell
+Set-Location 'C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics'
+git status --short | Select-Object -First 10; git stash push -m "b514 工作站樹快照"; git pull --ff-only origin claude/via-envmanager-governance-7cls8h; git stash list; git log --oneline -1   # 四行輸出貼回
+. (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName   # 應為 v0203;若印黃「母殼帶 PYTHONHOME」= 根因就在這個視窗
+$env:PYTHONHOME; [Environment]::GetEnvironmentVariable('PYTHONHOME','User'); [Environment]::GetEnvironmentVariable('PYTHONHOME','Machine'); Select-String -Path $PROFILE -Pattern 'PYTHONHOME' -ErrorAction SilentlyContinue; Get-Content C:\Users\tonyk\envs\via_core\pyvenv.cfg -ErrorAction SilentlyContinue   # Z15 根因四問,貼回
+Remove-Item Env:PYTHONHOME -ErrorAction SilentlyContinue   # 你的手:本窗先拿掉(v0105 站已免疫;這行讓手動跑也乾淨)
+via-rungate --family vdf                                   # v0105:[ENV] 行 + 真燈;只有「必要庫缺」才會列補庫令
+$env:VIA_NET_CONSENT='YES'; via-rungate --family vdf --approve-install   # 只在上一行列出必要庫缺時跑(你的手;批512 令「要用的閘就打開」)
+via-iface connect -Need 首頁,ocr -Family vrn                # v0103:need 應為 ['首頁','ocr']
+via-cgfamily plan; via-cgrouter; via-cgengine; via-cgconsole; via-cgfamily   # 中央治理家族 dry-run(via-cgdownward/via-samename 要 pwsh 7,先看 plan)
+via-vcgc                                                    # v0105:第十一段 中央治理家族
+```
+
+---
+
 ### 二 · 操作員機器實況(他貼的 EnvManager v0300 AUDIT,run ENV-20260914_112000;直接當量測)
 
 | 事實 | 影響 |
@@ -857,7 +894,7 @@ via-ryg -Timeout 300              # ⑦ 五矩陣燈:紫=GATED(閘未開,不是�
 # $env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve
 ```
 
-## 九 · 掉球清單(來源 VIA_DroppedBalls_B507.md;列 35 · 未結 33;只增不減,結案劃線)
+## 九 · 掉球清單(來源 VIA_DroppedBalls_B507.md;列 36 · 未結 34;只增不減,結案劃線)
 
 # VIA 掉球清單(漏球審計)· 批507(2026-09-14)· 涵蓋 批474–506
 
@@ -890,14 +927,25 @@ via-ryg -Timeout 300              # ⑦ 五矩陣燈:紫=GATED(閘未開,不是�
 | Z12 | MasterControl 總控頁未隨 Manager v0124–v0126 再生(容器再生會覆蓋真頁;L22) | 操作員的手 | — | 他機器 `via-manager` 再生一次 |
 | Z13 | 批508 環境復原(L24)真跑:你機器 `via-envrecover` → `-Execute -Approve`(① 還原)→ `via-rungate` → 再 `-Execute -Approve`(② 順序裝);容器只有唯讀計畫 | 操作員的手 | 操作員 | 貼回 `via-envrecover` 與 `via-vcgc` 二段 |
 | ~~Z14~~ | ~~操作員機器上的並行線不在遠端任何分支;要先推到側枝才能併~~ | **已結(批511)**:側枝 `local/parallel-b508-09151416` 已推、已併入本線(撞名者高版號另起;律/lessons 聯集;.via_envmanager 不入倉;孿生去重 45 件) | — | — |
-| Z15 | via_vdf_312/via_vrn_312/via_vap_312 解譯器壞(SRE module mismatch):已貼 PYTHONHOME 空 · PYTHONPATH=bootstrap · pyvenv.cfg home=C:\Python313 3.13.7(python -m venv);-c 探針過、以檔案起跑必炸、匯流排同 venv 跑 vap 正常 → 差在站的子行程環境/cwd 層;RunGate v0104 印 where(traceback File 路徑)+ 引擎夾 cwd 試 + re.__file__ | 等實錄 | 操作員 | 貼回 `via-rungate --family vdf` 的 [INTERP]/where 行與手動 traceback |
+| Z15 | via_vdf_312/via_vrn_312/via_vap_312 解譯器壞(SRE module mismatch)→ **批514 根因定案**:RunGate 行程 PYTHONHOME=…\uv\python\cpython-3.12-windows-x86_64-none(母殼/via_core 啟動帶進來),家族境 3.13 venv 子行程繼承 → 載 3.12 標準庫;-E 即好、手動 venv 直跑 13/13 過=反證。已修:三處同律撤除(L32;bootstrap/Bus v0126/RunGate v0105)→ 站免疫 | 操作員的手 | 操作員 | 貼回 `via-rungate --family vdf`(v0105 [ENV] 行 + 真燈)與 Z15 根因四問(一-q 區塊);根治=殼層/profile/via_core Activate 拿掉 PYTHONHOME |
 | Z16 | PARTIAL 16 件(Z1)自批510 起例行跑不再重燒 OCR(部分命中);要重抽=你機器 `via-firstpage -RetryFailed`(涵蓋 PARTIAL);矩陣 vrn_firstpage 應不再 600s TIMEOUT,貼回驗 | 操作員的手 | 操作員 | 貼回 `via-ryg vrn -Timeout 600` 的 vrn_firstpage 秒數 |
 | Z17 | 並行線 PANORAMA_HANDOVER-v0103「已列入下一輪」:Windows VRN 三站真實失敗斷言與 OCR runtime 自動收集、VETF 快照日期覆蓋 vs 持股完整性、gap plan 只代表查庫完成;`new modules engines/*` 另線收容件(檔名帶 (2)/(3))候裁入 references/intake | 未做 | AI | 下一批照該檔「已列入下一輪」逐項 |
 | Z18 | 批510 我把 vrn_firstpage 600s TIMEOUT 歸因給「16 件 PARTIAL 每跑重燒 OCR」——你的實錄證明那 16 件是數位 PDF(DUAL_ZONES,合計 30.89s);600s 是並行線 panorama 自己的 vrn_firstpage 跑法,不是本線;PARTIAL_HIT 仍有效但歸因改正 | 已在 一-n 更正 | AI | 無 |
 | Z19 | 並行線 `via-panorama` 的 policy_append/registry_sync 會自動寫律冊與元件冊;併線後冊已聯集(L26–L29 orig_id),它再跑可能重複追加 → 先不要跑;要對表(它的 id 判斷 vs 聯集後 id) | 未做 | AI | 批513 對表後放行 |
 | Z20 | 「類似參數功能引擎就整合優化」(L30)候選:RunGate 站環境→已改用匯流排 child_env(批512);VCGC panorama 動詞 vs MDL135 recover(還原/補抓);`new modules engines/*` 副本引擎 vs functional modules 正本;VIA_UI_* 多頁再生器 | 部分做 | AI | 逐對比對,只留一處 |
 | Z21 | L31 彈性嫁接/自適應合約 路線圖:①綁定合約層 sync/connect/graft(批513 做了;靜態 AST)②執行期 connect/sync 接 via_iface_autosync 五階段管道(mapping→connecting→syncing→testing→debugging)③新引擎 I/O 封包(VIA_Engine_Contract io_envelope+Pydantic)採用率量測 ④匯流排讀 contract 欄自動補未暴露旗標 | 部分做 | AI | 批514 起逐項 |
-| Z22 | `supportive modules/_inbox_to_classify/_inbox_to_classify/` 有 abc.py/inspect.py/json.py/logging.py/token.py/traceback.py 六個與標準庫同名的檔(遮蔽地雷;現不在任何 sys.path 上)→ 候裁:改名或入 intake | 未做 | AI+操作員 | 批514 列證據 |
-| Z23 | 你的樹卡在批508(Grid v0302、RunGate v0101、Register v0200):`git pull --ff-only` 那行沒生效,多半是本機發佈頁被改動擋住;批513 區塊改 stash+pull 並要求貼 pull 輸出 | 操作員的手 | 操作員 | 貼回 git pull 那幾行 |
+| Z22 | `supportive modules/_inbox_to_classify/_inbox_to_classify/` 六個與標準庫同名的檔(遮蔽地雷;現不在任何 sys.path 上);批514 證據(md5/大小):abc.py d016c5a4/1519B · inspect.py a210c663/3806B · json.py 954c5c0d/5660B · logging.py 49dd2df7/12737B · token.py 498b7001/6855B · traceback.py 2bac3313/36490B → 候裁:改名或入 intake | 候 | 操作員 | 裁「改名」或「入 intake」我就動 |
+| Z23 | 你的樹卡在批508(Grid v0302、RunGate v0101、Register v0200):`git pull --ff-only` 那行沒生效,多半是本機發佈頁被改動擋住;批513 區塊改 stash+pull 並要求貼 pull 輸出 | 已解(批513 stash+pull 後 HEAD 4728252d=批513) | — | 每批區塊仍帶 stash+pull |
+| Z24 | 中央治理家族深併候裁(L30):主控台 URN 發碼 vs VCGC registry-sync 元件編號冊(兩本冊、兩套代號);同名整併 ps1 vs L23 倉衛生流程;檔案優先序 vs MDL054 scan/匯流排 catalog;下行控制能力冊 vs Deck 任務冊/匯流排;詞彙引擎 v0100 vs CGC_MDL001 v0401 語料線 + VIA_SSOT_RegexDict。批514 先入台(擁有者 CGC_MDL150、十一段、dry-run),各對只留一處=下一批逐對比對 | 未做 | AI | 逐對出比對表(欄位/代號/輸出)再裁 |
 | ~~W~~ | ~~8 件 FAIL_HIT 首頁件重抽~~ | 已結(批503) | — | 64/64 |
 
+
+## 十一 · 中央治理家族(批514;VIA-SYS-MGR-001 主控台 · VIA-GOV-ENG-001 詞彙引擎 · VIA-SYS-MGR-003 下行控制 · VIA-SYS-ENG-003 檔案優先序 · 同名整併;擁有者 CGC_MDL150;預設 dry-run)
+
+- 家族 PARTIAL · 2026-09-15T08:30:50 · 正位 VIA_CentralGovernanceFamily_b514 · 成員件 {'console': 'OK', 'engine': 'OK', 'downward': 'OK', 'router': 'OK', 'samename': 'OK'}
+  - console:ABSENT · 尚未跑 via-cgconsole(快照落 <root>/output/SYS)
+  - downward:ABSENT · 尚未跑 via-cgdownward
+  - router:ABSENT · 尚未跑 via-cgrouter
+  - engine:ABSENT · 尚未跑 via-cgengine(--selftest 不落地;--seed --commit 才有 configs)
+  - samename:ABSENT · 尚未跑 via-samename(需 pwsh 7)
+- 一貼即用:`via-cgfamily plan`(router → engine --selftest → console → downward → samename;--commit/--probe/--token=你的手)
