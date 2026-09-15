@@ -1,6 +1,6 @@
 {
  "schema": "VIA.PolicyLaws.SSOT.v1",
- "batch": "批511",
+ "batch": "批512",
  "ts": "2026-09-15",
  "purpose": "政策庫正本:操作員律 + 紀律 + lessons-learned(只增不減;ENG082 sync-db 攤平入 via_policy_factors;VCGC 唯一對接口讀此冊)",
  "laws": [
@@ -44,7 +44,8 @@
    "id": "L07",
    "batch": "批478",
    "zh": "同意閘(VIA_NET_CONSENT / VIA_SCRAPE_CONSENT / 金鑰)一律操作員自設,我不代設;setdefault 只在未設時給預設;fail-closed",
-   "cat": "法遵"
+   "cat": "法遵",
+   "note_b512": "操作員令「要用的閘就打開」(2026-09-15):一貼即用區塊可直接列 $env:VIA_NET_CONSENT='YES' 與 --approve-install/-Approve 行(操作員貼=他的手);AI 端程式仍永不自設閘、永不自動裝"
   },
   {
    "id": "L08",
@@ -185,6 +186,12 @@
    "id": "L29",
    "batch": "批511 併線(並行線 批508 panorama-v0103)",
    "orig_id": "L27"
+  },
+  {
+   "id": "L30",
+   "batch": "批512",
+   "cat": "架構",
+   "zh": "相似整合律(操作員令「類似參數功能引擎就整合優化」):同一判準、同一子行程環境、同一啟動邏輯、同一參數冊只寫一處(冊的擁有者),其餘轉呼叫;新件先找既有件,找到就整合優化不另起;撞名/同功能副本(檔名帶 (2)/(3)、new modules engines/*)一律去重或入收容冊"
   }
  ],
  "lessons": [
@@ -294,6 +301,16 @@
    "id": "LL19",
    "batch": "批511",
    "zh": "併線實錄:操作員機器上的線是 main(8071a062)+並行 commit,不是本分支;側枝推上來後量到 734 件新增,374 件與倉內 byte 同、48 件互為孿生、.via_envmanager 163MB 執行期狀態被 commit 進來;四個檔撞名(Register v0200/ENG072 v0126/RunGate v0102/MDL149 v0102)各自內容不同。併法:撞名者留並行線內容、本線改動移到更高版號並帶上對方功能(只增不減);律/lessons 取聯集保留 orig_id;執行期狀態 gitignore;孿生只刪未被引用者。兩條線各寫各的記憶=兩個腦,L25 交會律不是建議是必須"
+  },
+  {
+   "id": "LL20",
+   "batch": "批512",
+   "zh": "Z15 實錄:PYTHONHOME 空、PYTHONPATH 只有 bootstrap、via_vdf_312 = C:\\Python313 3.13.7 的 venv;RunGate 的 -c 探針 import re 過,站以檔案起跑卻 SRE module mismatch,而匯流排在同一 venv 跑 vap 引擎正常——差在站的子行程環境(cwd=引擎夾)與匯流排 child_env 不同一處;兩處各寫一套子行程環境=Hydra;整合成一處並把 traceback 的 File 路徑(where)印出來,病因才會自己說話"
+  },
+  {
+   "id": "LL21",
+   "batch": "批512",
+   "zh": "批511 併線時把本線 RunGate 的補丁切片用「下一個 def install_missing」當界,結果把中間 10 個既有函式一併複製進 v0103(_bridge/python_for/probe_libs 各兩份;自測仍綠=看不出來)。切片要以緊接的下一個 def 為界,併完 grep '^def ' 數重複"
   }
  ]
 }
