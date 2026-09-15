@@ -1,6 +1,6 @@
 # VIA 一頁交接 · Veritas Central Governance Console(VCGC v0104 · 批511)
 
-> 產生 2026-09-15 07:31:10 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
+> 產生 2026-09-15 07:44:46 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
 
 ## 〇 · 接手提示詞(給下一個 AI;來源 VIA_AI_Handover_Prompt_v0100.md)
 
@@ -126,6 +126,7 @@
 - **L28**(批511 併線(並行線 批508 panorama-v0103);續傳)批次先存來源Parquet/UTF8-BOM CSV，再交易式入庫，成功才原子記帳；中斷先重播已存批次，失敗與空資料不得冒充完成。
 - **L29**(批511 併線(並行線 批508 panorama-v0103);驗證)獨立失敗不阻斷其他診斷；保存完整斷言與未修原因；尚有待修或必要驗收缺席不得INSTALL_OK。
 - **L30**(批512;架構)相似整合律(操作員令「類似參數功能引擎就整合優化」):同一判準、同一子行程環境、同一啟動邏輯、同一參數冊只寫一處(冊的擁有者),其餘轉呼叫;新件先找既有件,找到就整合優化不另起;撞名/同功能副本(檔名帶 (2)/(3)、new modules engines/*)一律去重或入收容冊
+- **L31**(批513;架構)彈性嫁接與自適應合約律(操作員令「未來所有引擎會因為不同需求彈性調配嫁接,interface 合約自適應式 connect sync 功能要強大完善」):引擎以冊綁定(id→尾版 glob/verb/params/outputs)不寫死路徑;合約追碼不追人(尾版一出,綁定合約自動追、漂移具名列示);換引擎(嫁接)前先驗旗標相容,只增候選、換不換由冊主/操作員;執行期模組對模組介面自湊走 via_iface_autosync;新引擎 I/O 走 VIA_Engine_Contract 封包
 
 **Lessons-learned**
 
@@ -153,14 +154,14 @@
 
 ## 二 · 安裝核可(L19)與環境工具
 
-- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 156.2 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
+- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 156.5 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
 - 工具冊導入計畫:ABSENT · - · 件態 - · 風險 - · 段 - · 未路由 - · 白名單留置 -(TOOLS_PLAN_latest.json 不在(via-envtools))
 - 環境復原(L24):PLAN · 2026-09-15 05:30:50 · 還原 原本規劃(Baseline;無 LKGC 或 --baseline) · 段 16 · 單獨隔離境 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 借境封鎖 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 次序 RESTORE → CORE → LOW → MEDIUM → HIGH → EXTERNAL → VERIFY;安裝出問題=`via-envrecover`(①還原前次 ②順序裝 ③_M/_H 單獨隔離;-Execute -Approve 才跑,① 不受 L19,② 過 L19)
 - 裝件=操作員的手:`$env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve`(閘不代設;L19 未綠=BLOCKED_UNITEST)
 
 ## 三 · 邏輯庫 · 因子庫 · 資料庫
 
-- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 414 列 · 全庫同步 {'hash': '3d89567d5b7c', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '6d3d7463298f', 'root': '同', 'home': '缺'}
+- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 418 列 · 全庫同步 {'hash': 'be893082a969', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '9b0d6b39a997', 'root': '同', 'home': '缺'}
 - 因子庫 OK:130 列 · {'SUP_MDL748:allinone 2.1.0': 77, 'SUP_MDL748:financial_data_standardization': 53} · 掛載 {'allinone': 'OK VIA_VRNLogic_AllInOne_v0201.py 2.1.0', 'fds': 'OK financial_data_standardization.py · 28 欄 · 合併損傷件(__main__ 示範缺 5 法,程式庫面可用)'}
 - 庫表冊 OK:54 表(批505)· 全庫表 4 · 庫 ['ActiveTWETF.duckdb', 'vdf_global_market.duckdb', 'vdf_tw_market.duckdb']
 - 資料家 ABSENT:VIA_Reports/datahome/DATAHOME_CATALOG_latest.json 不在(via-datahome catalog) · 庫 - · 表 - · 湖 -
@@ -168,9 +169,9 @@
 ## 四 · 引擎調度 · 多矩陣實測
 
 - 五矩陣 OK:2026-09-14T11:21:39 · profile run · 真跑 ['vdf'] · 項 43 · 態 {'GATED': 12, 'NODATA': 5, 'PLAN': 18, 'ABSENT': 2, 'GREEN': 6}
-- Deck 任務 65 · 規格項 44 · 格子站 217(在位 217)· Register 指令 111 · Manager 正式名稱 任務 66 / 引擎 81
+- Deck 任務 66 · 規格項 44 · 格子站 218(在位 218)· Register 指令 112 · Manager 正式名稱 任務 67 / 引擎 82
 
-## 五 · 指令與參數(不丟失;來源 Register-VIA-Commands-v0201.ps1)
+## 五 · 指令與參數(不丟失;來源 Register-VIA-Commands-v0202.ps1)
 
 - `via-gates`
 - `via-envpy`
@@ -241,6 +242,7 @@
 - `via-envtools`(別名 工具導入):via-envtools [-Apply] [-Approve] [-Env via_vrn_312] [--env-root P] ;讀工具冊 VIA_ToolRoster_SSOT_v*.json,逐境探針→修復/安裝/外部/驗證
 - `via-envrecover`(別名 環境復原):via-envrecover [-Execute] [-Approve] [-ApproveRemove] [-Baseline] [-To LKGC_x.json] [-Env via_x] [--env-root P];plan 唯讀寫 VIA_Reports\env_governance\RECOVER_latest.json/.ps1
 - `via-panorama`(別名 全景修復)
+- `via-iface`(別名 合約):via-iface connect -Need a,b [-Family vdf]   嫁接候選(只列 argv);via-iface graft -Item ID -Engine GLOB [-Dir D] [-Apply]   換引擎前驗相容(只增候選);via-iface status
 - `via-entry`:via-entry plan=一貼即用 11 步;via-entry roster=短令冊(母倉∪Grok 撞名冊);--scan 加跑 via-envgov 全景;--open 開矩陣頁(瀏覽器道零跳出);--console 帶起 Grok 網頁主控台(背景)
 - `via-env`:批383:via-env=環境治理正本(MDL135 via-envgov;Grok 版 39 行樁改名 via-env-grok 留冊);via-grok=Grok 短令冊(load 重載;matrix 開 WPF 右側板)
 - `via-grok`:批383:via-env=環境治理正本(MDL135 via-envgov;Grok 版 39 行樁改名 via-env-grok 留冊);via-grok=Grok 短令冊(load 重載;matrix 開 WPF 右側板)
@@ -286,21 +288,21 @@
 
 ## 六 · 註冊稽核(所有引擎/模組/功能/工具/環境)
 
-- 中央自動編號冊 OK · ACTIVE 4749/4753 · **缺 4** · 類別 {'class': 91, 'engine': 77, 'environment': 43, 'function': 3947, 'feature': 76, 'module': 141, 'package': 250, 'system': 10, 'tool': 114}
+- 中央自動編號冊 OK · ACTIVE 4749/4769 · **缺 20** · 類別 {'class': 91, 'engine': 77, 'environment': 43, 'function': 3947, 'feature': 76, 'module': 141, 'package': 250, 'system': 10, 'tool': 114}
 - 尾版引擎/模組家族 227 · 中央冊已登 227 · **未登 0** · 操作介面有掛載 185 · 內部件無操作介面 42(誠實分列，不拿編號片段假命中)
 
 ## 七 · 自動編號註冊表(台帳)
 
-- 全域台帳 1047 筆 · 元件 147 · 更新 2026-09-14
+- 全域台帳 1048 筆 · 元件 147 · 更新 2026-09-14
 - 元件冊 OK · ACTIVE 4749 · RETIRED 1 · 更新 2026-09-15T06:42:34 · {'class': 91, 'engine': 77, 'environment': 43, 'function': 3947, 'feature': 76, 'module': 141, 'package': 250, 'system': 10, 'tool': 114}
 - 類別 current:系統 1 · 支援性工具 1 · 功能性工具 1 · 模組 1 · 引擎 19 · 函數庫 1 · 打包產品 8
 
-- 2026-09-14 17:32 批507 AI 交接提示詞 / 固定格式 / 掉球清單 / VCGC 〇九段
 - 2026-09-15 05:30 批508 環境復原律 L24 / recover 動詞 / _M 不借 alt / 順序安裝
 - 2026-09-15 05:46 批509 多 AI 交會律 L25 / RunGate v0102 解譯器探針 / MDL135 v0108 ENV_BROKEN_INTERP / 啟動層護欄
 - 2026-09-15 06:14 批510 PARTIAL_HIT(ENG082 v0109)/ ENG072 v0126 部分命中 / LL14
 - 2026-09-15 06:45 批511 併線 / 撞名四檔高版號另起 / 律冊聯集 / 孿生去重 45 / .via_envmanager 不入倉 / VCGC registry-sync
 - 2026-09-15 07:31 批512 RunGate v0104 整合匯流排 child_env / where / 引擎夾 cwd 試 / 探針失敗≠缺庫 / 同意閘;L30;L07 note
+- 2026-09-15 07:44 批513 L31 彈性嫁接/自適應合約律 + MDL054 v0102 綁定合約層 sync/connect/graft/status
 
 ## 八 · 交接本文(來源 VIA_Handover_20260914_B498.md;逐批紀錄見該檔)
 
@@ -758,6 +760,31 @@ git ls-files --others "functional modules\VDF\engine" "functional modules\VRN" "
 #   $env:VIA_NET_CONSENT='YES'; via-rungate --family vdf --approve-install      # 補庫道(不受 L19;閘照你的令)
 ```
 
+
+### 一-p · 批513 · 「未來所有引擎會因為不同需求彈性調配嫁接,interface 合約自適應式 connect sync 功能要強大完善」+ 你貼的診斷(re 從 C:\Python313\Lib 載、無 zip、無未追蹤 .py)
+
+| 量到 | 判讀 | 做了 |
+|---|------|------|
+| `via-rungate` 仍印 Grid v0302、Register v0200、無 [INTERP] 行 | 你的樹卡在**批508**(RunGate v0101);批509–512 全沒拉,`git pull --ff-only` 那行沒生效(多半是本機發佈頁被改動擋住,你沒貼那段) | Z23;這批區塊改 `git stash` + `git pull --ff-only` + `git stash list`,並要求貼 pull 輸出 |
+| `-c` 模式 `re.__file__` = C:\Python313\Lib\re;sys.path 正常;無 python313.zip;引擎夾無未追蹤 .py | `-c` 過、以檔案起跑炸,環境變數/venv 本體/遮蔽檔三個嫌疑都排除 → 剩「站的子行程層」;RunGate v0104 的 where 行會直接印出是哪一份 re/_compiler.py | 拉到 v0104 再跑一次就有答案;手動 traceback 的路徑改對:`vdf_input_matrix_v0100.py` 在 `functional modules\VDF\`(不在 engine\) |
+| 新令:彈性嫁接 + 自適應合約 + connect/sync | 冊裡已有三件同題:MDL054 靜態合約(TOOL-041)、via_iface_autosync 執行期自湊(TOOL-089)、主控台冊=匯流排真正執行的綁定合約 → L30:不另起第四套,在冊的擁有者 MDL054 上加**綁定合約層** | **MDL054 v0102**:`sync`(冊 id→引擎 glob/verb/params × 尾版引擎 AST 旗標:VERB_DRIFT/PARAM_DRIFT/ENGINE_ABSENT/VERSION_BUMP/未暴露;`--apply` 只增 contract+contract_history,尾版一出合約自動追)· `connect --need`(嫁接候選只列 argv)· `graft --item --engine`(換引擎前驗旗標相容;`--apply` 只增候選,engine.glob 換不換=冊主)· `status`;八檢 8/8;律 **L31** |
+| 真跑 `sync`(唯讀) | 44 項綁定:OK 40 · DRIFT 4:vdf/tw_revenue_codes(VDF_ENG063_MonthlyRevenue_v0105.py:PARAM_DRIFT:冊 params 旗標不在引擎裡 codes→--ticker,codes→--tickers); vrn/vrn_fourpoint(VRN_ENG080_FourPointDigest_v0105.py:PARAM_DRIFT:冊 params 旗標不在引擎裡 codes→--tickers); vrn/vrn_pdfplus(VIA_PDFPlumberPlusEngine.py:PARAM_DRIFT:冊 params 旗標不在引擎裡 dir→--dir); vrn/vrn_unified(VIA_VRN_UnifiedReportEngine_v0100.py:VERB_DRIFT:冊 verb 旗標不在引擎裡 --selftest) | 這就是「合約追碼」第一次量到的漂移;要不要 `--apply` 入冊、要不要修引擎旗標=你定 |
+| 登冊 | Register v0202 `via-iface`(別名 合約;-Dry/-Apply/-Need/-Family/-Item/-Engine/-Dir)· Deck v0143 `iface_sync`(釘 66)· Manager v0129 · Grid v0307 +站 · 台帳 1048 | 七處 |
+
+沒做(誠實):執行期 connect/sync(模組對模組欄位自湊)仍是 via_iface_autosync 那站,尚未與綁定層接線(Z21 ②);I/O 封包採用率未量(Z21 ③);`_inbox_to_classify` 六個同名標準庫檔候裁(Z22)。
+
+#### 一貼即用(批513)
+
+```powershell
+Set-Location 'C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics'
+git status --short | Select-Object -First 10; git stash push -m "b513 工作站樹快照(發佈頁等)"; git pull --ff-only origin claude/via-envmanager-governance-7cls8h; git stash list; git log --oneline -1   # 這四行的輸出貼回
+. (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName   # 應為 v0202
+via-rungate --family vdf                                                       # v0104:[INTERP] re=… 與每站 where: 行
+& C:\Users\tonyk\envs\via_vdf_312\Scripts\python.exe "functional modules\VDF\vdf_input_matrix_v0100.py" --selftest 2>&1 | Select-Object -First 14
+via-iface sync                                                                 # 綁定合約:44 項 DRIFT 列出;要入冊再 via-iface sync -Apply
+via-iface connect -Need 首頁,ocr -Family vrn                                    # 嫁接候選(只列)
+```
+
 ---
 
 ### 二 · 操作員機器實況(他貼的 EnvManager v0300 AUDIT,run ENV-20260914_112000;直接當量測)
@@ -830,7 +857,7 @@ via-ryg -Timeout 300              # ⑦ 五矩陣燈:紫=GATED(閘未開,不是�
 # $env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve
 ```
 
-## 九 · 掉球清單(來源 VIA_DroppedBalls_B507.md;列 32 · 未結 30;只增不減,結案劃線)
+## 九 · 掉球清單(來源 VIA_DroppedBalls_B507.md;列 35 · 未結 33;只增不減,結案劃線)
 
 # VIA 掉球清單(漏球審計)· 批507(2026-09-14)· 涵蓋 批474–506
 
@@ -869,5 +896,8 @@ via-ryg -Timeout 300              # ⑦ 五矩陣燈:紫=GATED(閘未開,不是�
 | Z18 | 批510 我把 vrn_firstpage 600s TIMEOUT 歸因給「16 件 PARTIAL 每跑重燒 OCR」——你的實錄證明那 16 件是數位 PDF(DUAL_ZONES,合計 30.89s);600s 是並行線 panorama 自己的 vrn_firstpage 跑法,不是本線;PARTIAL_HIT 仍有效但歸因改正 | 已在 一-n 更正 | AI | 無 |
 | Z19 | 並行線 `via-panorama` 的 policy_append/registry_sync 會自動寫律冊與元件冊;併線後冊已聯集(L26–L29 orig_id),它再跑可能重複追加 → 先不要跑;要對表(它的 id 判斷 vs 聯集後 id) | 未做 | AI | 批513 對表後放行 |
 | Z20 | 「類似參數功能引擎就整合優化」(L30)候選:RunGate 站環境→已改用匯流排 child_env(批512);VCGC panorama 動詞 vs MDL135 recover(還原/補抓);`new modules engines/*` 副本引擎 vs functional modules 正本;VIA_UI_* 多頁再生器 | 部分做 | AI | 逐對比對,只留一處 |
+| Z21 | L31 彈性嫁接/自適應合約 路線圖:①綁定合約層 sync/connect/graft(批513 做了;靜態 AST)②執行期 connect/sync 接 via_iface_autosync 五階段管道(mapping→connecting→syncing→testing→debugging)③新引擎 I/O 封包(VIA_Engine_Contract io_envelope+Pydantic)採用率量測 ④匯流排讀 contract 欄自動補未暴露旗標 | 部分做 | AI | 批514 起逐項 |
+| Z22 | `supportive modules/_inbox_to_classify/_inbox_to_classify/` 有 abc.py/inspect.py/json.py/logging.py/token.py/traceback.py 六個與標準庫同名的檔(遮蔽地雷;現不在任何 sys.path 上)→ 候裁:改名或入 intake | 未做 | AI+操作員 | 批514 列證據 |
+| Z23 | 你的樹卡在批508(Grid v0302、RunGate v0101、Register v0200):`git pull --ff-only` 那行沒生效,多半是本機發佈頁被改動擋住;批513 區塊改 stash+pull 並要求貼 pull 輸出 | 操作員的手 | 操作員 | 貼回 git pull 那幾行 |
 | ~~W~~ | ~~8 件 FAIL_HIT 首頁件重抽~~ | 已結(批503) | — | 64/64 |
 
