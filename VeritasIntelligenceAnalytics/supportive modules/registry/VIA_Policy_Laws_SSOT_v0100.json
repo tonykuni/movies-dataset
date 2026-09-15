@@ -141,6 +141,34 @@
    "batch": "批506",
    "zh": "倉衛生律:只刪有證據的重複件(byte 同、BACKUP 孿生、__DUP__)與過時再生件;正本/收容件/UI 正本頁/唯一副本不刪;每次刪除附清單與 md5 證據(git 可回溯)",
    "cat": "倉"
+  },
+  {
+   "key": "panorama_ssot_route",
+   "zh": "全景修復與調度只由VCGC呼叫既有EngineBus及原引擎；不建立第二套擷取器、環境管理器或政策正本。",
+   "cat": "中央治理",
+   "id": "L24",
+   "batch": "panorama-v0103"
+  },
+  {
+   "key": "panorama_db_first",
+   "zh": "每次擷取前查正庫的日期、標的、欄位缺口；範圍預設最近兩個曆月且排除當日未完成資料。",
+   "cat": "增量",
+   "id": "L25",
+   "batch": "panorama-v0103"
+  },
+  {
+   "key": "panorama_journal",
+   "zh": "批次先存來源Parquet/UTF8-BOM CSV，再交易式入庫，成功才原子記帳；中斷先重播已存批次，失敗與空資料不得冒充完成。",
+   "cat": "續傳",
+   "id": "L26",
+   "batch": "panorama-v0103"
+  },
+  {
+   "key": "panorama_honest_matrix",
+   "zh": "獨立失敗不阻斷其他診斷；保存完整斷言與未修原因；尚有待修或必要驗收缺席不得INSTALL_OK。",
+   "cat": "驗證",
+   "id": "L27",
+   "batch": "panorama-v0103"
   }
  ],
  "lessons": [
@@ -193,6 +221,34 @@
    "id": "LL10",
    "batch": "批506",
    "zh": "倉 560MB pack:ICON_FORGE 1.5GB 含 __DUP__/_vN 孿生、BACKUP 939/944 與正本 byte 同、25MB 巨檔四份同本;刪只憑 md5 證據且不動被引用的檔名"
+  },
+  {
+   "key": "panorama_input_isolation",
+   "zh": "暫存輸出不等於輸入隔離；selftest須明示禁止掃入正式incoming。",
+   "cat": "測試",
+   "id": "LL11",
+   "batch": "panorama-v0103"
+  },
+  {
+   "key": "panorama_short_tail",
+   "zh": "截斷矩陣why會丟失失敗斷言；完整每站日誌與進度必须隨測試保存。",
+   "cat": "診斷",
+   "id": "LL12",
+   "batch": "panorama-v0103"
+  },
+  {
+   "key": "panorama_false_done",
+   "zh": "API空回或逾時不得加入done；以資料庫存在及欄位驗證為準，非checkpoint單方宣稱。",
+   "cat": "續傳",
+   "id": "LL13",
+   "batch": "panorama-v0103"
+  },
+  {
+   "key": "panorama_snapshot_atomic",
+   "zh": "ETF逐列autocommit會留下假完整快照；一日持股應同一交易提交，快照日期覆蓋與持股完整性分開。",
+   "cat": "資料品質",
+   "id": "LL14",
+   "batch": "panorama-v0103"
   }
  ]
 }

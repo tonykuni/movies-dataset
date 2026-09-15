@@ -1,0 +1,300 @@
+{
+  "schema": "VIA.Panorama.Contract.v1",
+  "version": "0103",
+  "date": "2026/09/15",
+  "scope": {
+    "tests": "現有 InputConsole 冊 VDF+VRN（其中 ETF 含 VETF 功能）全部有界站",
+    "live_fetch": "既有 tw_daily_prices 宇宙之缺日，以及已有ETF宇宙的 dated 持股缺日；最近兩個曆月",
+    "not_a_claim": "不等於所有金融資料390項已接線、所有族群方法或VRN新互動頁已完成"
+  },
+  "problem_types": [
+    {
+      "code": "INPUT_MISSING",
+      "name": "輸入或報告缺件",
+      "pattern": "無報告|no such file|file not found",
+      "solution": "Windows 選檔/拖曳；確認檔案存在後走既有收件道",
+      "auto": "列缺件，不造測試報告冒充"
+    },
+    {
+      "code": "ENV_RUNTIME",
+      "name": "家族環境或套件不相容",
+      "pattern": "ModuleNotFoundError|ImportError|DLL|BLOCKED_ENV",
+      "solution": "中央環境管理核對套件/架構/版本，修復後只重測影響站",
+      "auto": "不自動移除、升級或重建環境"
+    },
+    {
+      "code": "OCR_RUNTIME",
+      "name": "OCR 後端載入失敗",
+      "pattern": "paddle_static|NO_OCR|OCR.*載入失敗",
+      "solution": "先保留原生文字路徑；對失敗 OCR 後端做隔離能力測試，再由中央管理修復",
+      "auto": "完整記錄，不因 OCR 失敗宣稱全部文字失敗"
+    },
+    {
+      "code": "OCR_EMPTY",
+      "name": "掃描頁 OCR 空白",
+      "pattern": "OCR_EMPTY|NEEDS_OCR",
+      "solution": "檢查渲染墨量/語言模型/方向/頁面範圍；保留 NEEDS_OCR",
+      "auto": "不將空字串當成功"
+    },
+    {
+      "code": "LAYOUT_SENTENCE",
+      "name": "欄位/斷句/標題重建",
+      "pattern": "句|layout|sentence",
+      "solution": "用座標區域與頁面證據驗證，不把標題黏入正文",
+      "auto": "候原始失敗頁"
+    },
+    {
+      "code": "FINANCIAL_MAPPING",
+      "name": "財報科目/期間/單位不明",
+      "pattern": "UNKNOWN|UNIT_SCALE|period",
+      "solution": "沿用 Synonym/FinancialLogic SSOT；未知科目候註冊",
+      "auto": "不猜科目或单位"
+    },
+    {
+      "code": "DATA_CONFLICT",
+      "name": "來源值或配對矛盾",
+      "pattern": "DIVERGE|CONFLICT|MISMATCH",
+      "solution": "保留各源/單位/日期，驗證後才採信；不互相自證",
+      "auto": "矛盾批次不寫入"
+    },
+    {
+      "code": "TEST_ASSERTION",
+      "name": "自測斷言未過",
+      "pattern": "\\[FAIL\\]|selftest.*失敗",
+      "solution": "保留完整 stdout 與 failed_assertions，逐項定位",
+      "auto": "保持 RED，其他獨立站繼續"
+    },
+    {
+      "code": "INPUT_ISOLATION",
+      "name": "自測掃入正式輸入",
+      "pattern": "污染|incoming|selftest.*fixture",
+      "solution": "selftest 明示 no_incoming，正式輸入與暫存輸出分開驗證",
+      "auto": "已在 v0127/v0108 修正"
+    },
+    {
+      "code": "TRUNCATED_EVIDENCE",
+      "name": "失敗證據被截斷",
+      "pattern": "完整紀錄",
+      "solution": "每站保留完整日誌；矩陣列完整失敗斷言與路徑",
+      "auto": "已修正 Bus v0125"
+    },
+    {
+      "code": "DB_MISSING",
+      "name": "資料庫或表缺",
+      "pattern": "BLOCKED_DB|BLOCKED_SCHEMA|庫缺|表缺",
+      "solution": "中央資料家定位/既有建庫引擎；不建空白替代庫",
+      "auto": "只讀診斷"
+    },
+    {
+      "code": "DB_AMBIGUOUS",
+      "name": "多副本或錯資料家",
+      "pattern": "AMBIGUOUS_DB|副本",
+      "solution": "明示中央資料家或已選定的資料庫路徑",
+      "auto": "停止該庫寫入"
+    },
+    {
+      "code": "DB_LOCK",
+      "name": "庫鎖或寫入失敗",
+      "pattern": "lock|busy|庫忙|write interrupted",
+      "solution": "短交易，批次暫存；重啟先重播，持鎖等待由既有引擎控制",
+      "auto": "不殺使用者其他程序"
+    },
+    {
+      "code": "CHECKPOINT_FALSE_DONE",
+      "name": "斷點完成與庫不符",
+      "pattern": "斷點|checkpoint",
+      "solution": "每次回到正庫核對，失敗/空回不得記完成",
+      "auto": "已修正歷史價與ETF持股"
+    },
+    {
+      "code": "PARTIAL_BATCH",
+      "name": "批次中斷或重複鍵",
+      "pattern": "duplicate|STAGED|batch",
+      "solution": "先 Parquet/CSV，再 DB transaction，再 checkpoint；衝突重複拒收",
+      "auto": "新增批次可重播，舊原始列保留"
+    },
+    {
+      "code": "NETWORK_LIMIT",
+      "name": "限流/超時/暫斷",
+      "pattern": "429|timeout|SSL|retry",
+      "solution": "沿用 NetUnified 節流/退避/快取；失敗保留下一輪",
+      "auto": "不新增第二套下載器"
+    },
+    {
+      "code": "SOURCE_UNAVAILABLE",
+      "name": "歷史來源不可得",
+      "pattern": "NO_SOURCE|PENDING_SOURCE|EMPTY_UNCONFIRMED",
+      "solution": "僅呼已驗證 dated 車道；無源保留缺口，下輪可重試",
+      "auto": "不拿今日ETF持股填歷史"
+    },
+    {
+      "code": "CALENDAR_UNCERTAIN",
+      "name": "休市/上市/停牌判準不足",
+      "pattern": "WEEKDAY|LOWER_BOUND|calendar",
+      "solution": "平日只列候選；待官方交易日曆與上市日核實",
+      "auto": "不補造價格/成交量或假設已齊"
+    },
+    {
+      "code": "ADJ_DAYTRADE",
+      "name": "還原價/扣當沖口徑不完整",
+      "pattern": "EXISTING_FIELD_GAP|daytrade|adj_close",
+      "solution": "引擎輸入驗證調整價、扣當沖量值及同口徑單位；缺值不可補量",
+      "auto": "品質缺口列待修，不餵入分析"
+    },
+    {
+      "code": "GOVERNANCE_GATE",
+      "name": "註冊/實測/核可未完成",
+      "pattern": "GATED|BLOCKED|INSTALL",
+      "solution": "VCGC 編號及政策追加；L19 VDF+VRN 完整綠且24h內，仍有待修則阻擋",
+      "auto": "不降門檻或假 INSTALL_OK"
+    }
+  ],
+  "known_findings": [
+    {
+      "code": "VRN-3-RED",
+      "state": "PENDING_WORKSTATION",
+      "finding": "Windows ENG072/073/074 三站斷言失敗；現有摘要未含完整斷言",
+      "solution": "本機入口先自動讀 ENGINE_BUS_latest/progress 及 station_logs，再重測並把全文收進 ZIP"
+    },
+    {
+      "code": "VRN-OCR",
+      "state": "PENDING_WORKSTATION",
+      "finding": "原紀錄出現 paddle_static 載入錯誤；fx_report 同時成功擷取4582字",
+      "solution": "不能把三站全部歸因OCR；保留原生文字與OCR路由，待完整斷言定位"
+    },
+    {
+      "code": "BUS-EVIDENCE",
+      "state": "CODE_FIXED",
+      "finding": "原因只顯示前70字，路徑與斷言被截掉",
+      "solution": "v0125完整顯示並每站保存進度"
+    },
+    {
+      "code": "VDF-CKPT",
+      "state": "CODE_FIXED",
+      "finding": "legacy 回補 done 加入所有 batch，即使取用失敗",
+      "solution": "失敗不記done；新gap-mode每批正庫查缺"
+    },
+    {
+      "code": "VDF-DUPLICATE-FETCH",
+      "state": "CODE_FIXED",
+      "finding": "舊segment checkpoint無逐日/既有欄位查核",
+      "solution": "缺日請求合批；品質缺欄另列，不反覆抓已存在列"
+    },
+    {
+      "code": "VDF-RECOVERY",
+      "state": "CODE_FIXED",
+      "finding": "擷取與入庫之間中斷缺乏可重播原始批",
+      "solution": "STAGED Parquet/CSV journal→transaction→COMMITTED；新啟動先重播"
+    },
+    {
+      "code": "VETF-PARTIAL",
+      "state": "CODE_FIXED",
+      "finding": "逐列autocommit可能中斷在部分持股；同一回應重複ticker未加入have",
+      "solution": "整日交易＋同批去重；STAGED checkpoint保存來源列"
+    },
+    {
+      "code": "VETF-RANGE",
+      "state": "CODE_FIXED",
+      "finding": "未提供明確兩個月界線；STALE FILLED可能遮蔽庫缺",
+      "solution": "start/end scoped coverage；每筆查庫、每日期存checkpoint"
+    },
+    {
+      "code": "ANALYTICS-QUALITY",
+      "state": "DEFERRED",
+      "finding": "調整價、當沖淨量值、全歷史分類與成分完整性尚需真庫驗證",
+      "solution": "報表列出品質缺口；品質驗收前不啟動投資訊號分析"
+    },
+    {
+      "code": "VRN-TAB1",
+      "state": "DEFERRED",
+      "finding": "需求中的新去重選取矩陣及四欄逐件VALIDATED互動頁尚未完成",
+      "solution": "保留現有VRN頁；列下一輪，不當成本輪已實作"
+    },
+    {
+      "code": "VETF-TICKER-SUFFIX",
+      "state": "CODE_FIXED",
+      "finding": "旧持股入庫一律把四碼補 .TW，會把上櫃股票標錯交易所",
+      "solution": "由價格SSOT解析 .TW/.TWO 並快取；不明代號保留NULL，不猜交易所"
+    }
+  ],
+  "deferred_fetch": [
+    {
+      "id": "chips_tradingvalue_scope",
+      "why": "ENG056/057仍需日×市場完整性及明確日期界線；本輪只檢查自測，不用 --days 60 冒充最近兩個月全覆蓋。"
+    },
+    {
+      "id": "universe_calendar_quality",
+      "why": "須對中央正庫驗證最新股票宇宙、官方休市日曆、上市/停牌、adjusted price及扣當沖量值；目前僅以候選缺日補抓。"
+    },
+    {
+      "id": "other_vdf_sources",
+      "why": "月營收/財報/全球/法人/ETF分析等已列有界測試；尚未全部建立最近兩個月補抓契約，保留後續輪次。"
+    },
+    {
+      "id": "vrn_ui_validation",
+      "why": "新TAB1互動驗證頁與逐頁真實報告品質仍待工作站資料；不宣稱使用者驗收通過。"
+    }
+  ],
+  "laws": [
+    {
+      "key": "panorama_ssot_route",
+      "zh": "全景修復與調度只由VCGC呼叫既有EngineBus及原引擎；不建立第二套擷取器、環境管理器或政策正本。",
+      "cat": "中央治理"
+    },
+    {
+      "key": "panorama_db_first",
+      "zh": "每次擷取前查正庫的日期、標的、欄位缺口；範圍預設最近兩個曆月且排除當日未完成資料。",
+      "cat": "增量"
+    },
+    {
+      "key": "panorama_journal",
+      "zh": "批次先存來源Parquet/UTF8-BOM CSV，再交易式入庫，成功才原子記帳；中斷先重播已存批次，失敗與空資料不得冒充完成。",
+      "cat": "續傳"
+    },
+    {
+      "key": "panorama_honest_matrix",
+      "zh": "獨立失敗不阻斷其他診斷；保存完整斷言與未修原因；尚有待修或必要驗收缺席不得INSTALL_OK。",
+      "cat": "驗證"
+    }
+  ],
+  "lessons": [
+    {
+      "key": "panorama_input_isolation",
+      "zh": "暫存輸出不等於輸入隔離；selftest須明示禁止掃入正式incoming。",
+      "cat": "測試"
+    },
+    {
+      "key": "panorama_short_tail",
+      "zh": "截斷矩陣why會丟失失敗斷言；完整每站日誌與進度必须隨測試保存。",
+      "cat": "診斷"
+    },
+    {
+      "key": "panorama_false_done",
+      "zh": "API空回或逾時不得加入done；以資料庫存在及欄位驗證為準，非checkpoint單方宣稱。",
+      "cat": "續傳"
+    },
+    {
+      "key": "panorama_snapshot_atomic",
+      "zh": "ETF逐列autocommit會留下假完整快照；一日持股應同一交易提交，快照日期覆蓋與持股完整性分開。",
+      "cat": "資料品質"
+    }
+  ],
+  "engine_params": {
+    "tw_history": [
+      "gap-mode",
+      "start",
+      "end",
+      "db",
+      "batch-size",
+      "max-batches",
+      "report"
+    ],
+    "etf_holdings_daily": [
+      "gap-mode",
+      "start",
+      "end",
+      "max-days",
+      "report"
+    ]
+  }
+}
