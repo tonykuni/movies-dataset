@@ -30,4 +30,5 @@
 | Z13 | 批508 環境復原(L24)真跑:你機器 `via-envrecover` → `-Execute -Approve`(① 還原)→ `via-rungate` → 再 `-Execute -Approve`(② 順序裝);容器只有唯讀計畫 | 操作員的手 | 操作員 | 貼回 `via-envrecover` 與 `via-vcgc` 二段 |
 | Z14 | 操作員機器上的並行線(VCGC v0103 · Register v0200 無 via-envrecover · 律 27 · lessons 14 · 227/227 登冊 · 中央冊 4734)不在遠端任何分支;要先推到側枝 local/parallel-B508 才能併(L25) | 操作員的手 | 操作員→AI 併 | 貼回 git status/log;推側枝;AI 出 批510 併線 |
 | Z15 | via_vdf_312/via_vrn_312 解譯器壞(SRE module mismatch)根因未定:RunGate v0102 三試(-E/-S/-I)+ pyvenv.cfg + PYTHONHOME/PYTHONPATH 現值貼回才定;重建境=操作員的手 | 操作員的手 | 操作員 | 貼回 via-rungate(v0102)與診斷段 |
+| Z16 | PARTIAL 16 件(Z1)自批510 起例行跑不再重燒 OCR(部分命中);要重抽=你機器 `via-firstpage -RetryFailed`(涵蓋 PARTIAL);矩陣 vrn_firstpage 應不再 600s TIMEOUT,貼回驗 | 操作員的手 | 操作員 | 貼回 `via-ryg vrn -Timeout 600` 的 vrn_firstpage 秒數 |
 | ~~W~~ | ~~8 件 FAIL_HIT 首頁件重抽~~ | 已結(批503) | — | 64/64 |
