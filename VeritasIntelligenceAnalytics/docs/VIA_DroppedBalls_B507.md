@@ -40,9 +40,13 @@
 | Z23 | 你的樹卡在批508(Grid v0302、RunGate v0101、Register v0200):`git pull --ff-only` 那行沒生效,多半是本機發佈頁被改動擋住;批513 區塊改 stash+pull 並要求貼 pull 輸出 | 已解(批513 stash+pull 後 HEAD 4728252d=批513) | — | 每批區塊仍帶 stash+pull |
 | Z24 | 中央治理家族深併候裁(L30):主控台 URN 發碼 vs VCGC registry-sync 元件編號冊(兩本冊、兩套代號);同名整併 ps1 vs L23 倉衛生流程;檔案優先序 vs MDL054 scan/匯流排 catalog;下行控制能力冊 vs Deck 任務冊/匯流排;詞彙引擎 v0100 vs CGC_MDL001 v0401 語料線 + VIA_SSOT_RegexDict。批514 先入台(擁有者 CGC_MDL150、十一段、dry-run),各對只留一處=下一批逐對比對 | 未做 | AI | 逐對出比對表(欄位/代號/輸出)再裁 |
 | Z25 | 殼層 PYTHONHOME 根治:你的視窗仍帶 PYTHONHOME=…uv\python\cpython-3.12(站已免疫,但手動跑/其他工具仍會中);一-q 四問(User/Machine 環境變數、$PROFILE、via_core Activate)貼回後決定拿掉哪一處 | 操作員的手 | 操作員 | 貼回四問;拿掉後 Register 載入不再印黃 |
-| Z26 | VRN 實測 TAB3(DATE/FILENAME/FIXED CONTENTS/SUMMARY):MDL139 v0105 已建,工作站尚未跑 `via-console`/`via-vrnval` 看真報告的 FIXED CONTENTS(sidecar 分區+財報頁列+全文 md 經 ENG082 fix_contents) | 未做(等實錄) | 操作員+AI | 貼回 TAB3 前三列;分類別規則照實錄再調 |
-| Z27 | VDF 五額外資料試跑(月營收/三大報表/主動ETF持股/FRED/國際宇宙):`via-vdf-extra5` 已登,真抓要你開閘;結果矩陣貼回 | 操作員的手 | 操作員 | `$env:VIA_NET_CONSENT='YES'; via-vdf-extra5` |
-| Z28 | via-cgconsole 工作站 RED(192s)理由未見(尾行被 SyntaxWarning 擠掉;LL25):MDL150 v0101 status 會列 Gate FAIL/WARN;貼回後判是真病(重複家族/契約不符/循環)還是閘門太嚴 | 未做(等實錄) | 操作員+AI | `via-cgfamily` 貼回 [FAIL]/[WARN] 行 |
+| Z26 | VRN 實測 TAB3:工作站 `via-console tab3` 報告 0=主控台開錯庫(寫死主路徑;ENG073 寫在資料家那本;LL27)→ MDL139 v0106 主庫資料家優先 + `[庫解析]` 行;容器實跑 71 份 OK | 未做(等實錄) | 操作員+AI | 貼回 `via-console tab3 --n 3`(含 [庫解析] 行) |
+| Z27 | VDF 五額外試跑:實錄 GREEN 2(月營收/主動ETF持股)· GATED 3(macro_fred/fin_statements/global_universe 是**雙閘** NET+SCRAPE;FRED 另要 FRED_API_KEY)→ 區塊改雙閘 + `-Ids` 只跑三件 | 操作員的手 | 操作員 | `$env:VIA_NET_CONSENT='YES'; $env:VIA_SCRAPE_CONSENT='YES'; via-vdf-extra5 -Ids macro_fred,fin_statements,global_universe` |
+| Z28 | via-cgconsole 工作站 RED 理由:v0101 status 在工作站 TypeError(int/len;LL28)沒印到 → v0102 型別寬收;貼回 `via-cgfamily` 的 [FAIL]/[WARN] 行再判 | 未做(等實錄) | 操作員+AI | `via-cgfamily` 貼回 |
 | Z29 | via-cgrouter 891 秒(OneDrive 樹 43,319 檔):路由器逐檔讀 magic bytes;OneDrive 佔位檔會觸發下載——下一批加排除規則(VIA_Reports/_governance/.git/envs)與 --budget-mb 預設調低,或改讀 file_index 快取 | 未做 | AI | 量 file_index.json 的擋下分類再定 |
 | Z30 | 「以 VIA 為中央管理 全部 SSOT 化 唯一接觸口」(L20 延伸):冊外仍有寫死路徑/自帶輸出夾的件(中央治理家族五件、VETF 封印包 adapter、ENG075 OUTDIR);逐件改成讀冊(Spec/DataHome/契約)=下一批盤點表 | 未做 | AI | 出「寫死路徑清單」再逐件改冊 |
+| Z31 | VRN_MDL001_Converter v0121 自測太重:容器 82.7s、工作站 >180s TIMEOUT(渲染 A4 200/600 DPI 點陣頁 ×9 檢)→ Grid v0310 站逾時 600 先讓閘判真;候優化:自測改小頁(A6)或只算一次 pixmap | 未做 | AI | v0122 自測瘦身,量到 <30s |
+| Z32 | ~~摘要批跑器自測出網(Summarizer 取價器沒看閘)~~ 已結(批516):Summarizer v0102 閘 + digest v0115 VIA_SELFTEST=1;容器帶 VIA_NET_CONSENT=YES 跑自測零 404 | 已結(批516) | — | 工作站 `via-rungate --family vrn` 尾行不再有 HTTP 404 即證 |
+| Z33 | ENG069 RevenueConsensusAnalysis 自測依賴真庫(容器 2/6 FAIL:單庫 join/四象限/頁);VTMRA 閘在容器判 RED 是它;工作站有庫應過 → 若工作站也紅=自測要加「無庫=NODATA 誠實」 | 未做(等實錄) | 操作員+AI | 貼回 `via-vtmra` 矩陣的 eng069 列 |
+| Z34 | TA-Lib 未裝(容器/工作站皆 ABSENT 直到你裝):裝=你的手 `& C:\Users\tonyk\envs\via_vdf_312\Scripts\python.exe -m pip install TA-Lib`(0.5+ wheel 內含 C 庫)→ 再 `via-talib` 應 OK 五數值檢 | 操作員的手 | 操作員 | 裝後貼回 via-talib 一行 |
 | ~~W~~ | ~~8 件 FAIL_HIT 首頁件重抽~~ | 已結(批503) | — | 64/64 |
