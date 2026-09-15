@@ -1,0 +1,306 @@
+/* === Design Tokens === */
+:root, [data-theme="light"] {
+  --color-bg: #0d1117;
+  --color-surface: #161b22;
+  --color-surface-2: #1c2128;
+  --color-border: #30363d;
+  --color-text: #e6edf3;
+  --color-text-muted: #8b949e;
+  --color-text-faint: #484f58;
+  --color-accent: #58a6ff;
+  --color-accent-dim: #1f6feb;
+  --color-line: #58a6ff;
+  --color-area-top: rgba(88, 166, 255, 0.18);
+  --color-area-bottom: rgba(88, 166, 255, 0.0);
+  --color-grid: rgba(139, 148, 158, 0.08);
+  --color-annotation: #f0883e;
+  --color-annotation-bg: #1c2128;
+  --color-recession: rgba(248, 81, 73, 0.04);
+
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Instrument Serif', Georgia, serif;
+
+  --text-xs: clamp(0.6875rem, 0.65rem + 0.2vw, 0.75rem);
+  --text-sm: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --text-base: clamp(0.875rem, 0.85rem + 0.15vw, 1rem);
+  --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+  --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+
+  --transition-fast: 120ms ease;
+  --transition-base: 200ms ease;
+}
+
+/* === Reset & Base === */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-height: 100dvh;
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* === Chart Container === */
+#chart-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-6) var(--space-6) var(--space-2);
+  max-width: 100%;
+  overflow: hidden;
+}
+
+#chart {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+#chart svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* === Axis Styles === */
+.axis-x line,
+.axis-x path,
+.axis-y line,
+.axis-y path {
+  stroke: var(--color-border);
+  stroke-width: 0.5;
+}
+
+.axis-x text,
+.axis-y text {
+  fill: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.axis-y .tick line {
+  stroke: var(--color-grid);
+  stroke-width: 0.5;
+}
+
+.axis-x .domain,
+.axis-y .domain {
+  stroke: none;
+}
+
+/* === Rate Line === */
+.rate-line {
+  fill: none;
+  stroke: var(--color-line);
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.rate-area {
+  pointer-events: none;
+}
+
+/* === Crosshair & Tooltip === */
+.crosshair-line {
+  stroke: var(--color-text-faint);
+  stroke-width: 0.5;
+  stroke-dasharray: 3, 3;
+  pointer-events: none;
+}
+
+.crosshair-dot {
+  pointer-events: none;
+}
+
+.tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  z-index: 20;
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.tooltip.visible {
+  opacity: 1;
+}
+
+.tooltip-date {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-bottom: 2px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.tooltip-rate {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-accent);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.tooltip-rate span {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+/* === Annotation Markers === */
+.annotation-marker {
+  cursor: pointer;
+  transition: transform var(--transition-base);
+}
+
+.annotation-marker:hover .marker-ring {
+  r: 8;
+}
+
+.marker-dot {
+  fill: var(--color-annotation);
+  transition: r var(--transition-base);
+}
+
+.marker-ring {
+  fill: none;
+  stroke: var(--color-annotation);
+  stroke-width: 1.5;
+  opacity: 0.4;
+  transition: r var(--transition-base), opacity var(--transition-base);
+}
+
+.annotation-marker:hover .marker-ring {
+  opacity: 0.7;
+}
+
+.marker-stem {
+  stroke: var(--color-annotation);
+  stroke-width: 1;
+  opacity: 0.3;
+}
+
+/* === Annotation Tooltip === */
+.annotation-tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-annotation);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  max-width: 300px;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+  z-index: 30;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.annotation-tooltip.visible {
+  opacity: 1;
+}
+
+.annotation-tooltip-title {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-annotation);
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.annotation-tooltip-date {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.annotation-tooltip-body {
+  font-size: var(--text-xs);
+  color: var(--color-text);
+  line-height: 1.55;
+  opacity: 0.85;
+}
+
+/* === Recession Bands === */
+.recession-band {
+  fill: var(--color-recession);
+  pointer-events: none;
+}
+
+/* === Title === */
+.chart-title {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  fill: var(--color-text);
+  font-weight: 400;
+}
+
+.chart-subtitle {
+  font-size: var(--text-xs);
+  fill: var(--color-text-muted);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* === Footer === */
+footer {
+  padding: var(--space-3) var(--space-6);
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--color-text-faint);
+}
+
+footer a {
+  color: var(--color-text-muted);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+footer a:hover {
+  color: var(--color-accent);
+}
+
+footer .sep {
+  margin: 0 var(--space-2);
+  opacity: 0.4;
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+  #chart-container {
+    padding: var(--space-3) var(--space-2) var(--space-1);
+  }
+
+  .annotation-tooltip {
+    max-width: 220px;
+  }
+}

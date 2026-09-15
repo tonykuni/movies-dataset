@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VeritasAutoPlot™ T01 — Single Axis</title>
+<script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+<style>
+/* ═══ Notion × MUJI × Seaborn Design System ═══ */
+:root{
+  --sb-blue:#4C72B0;--sb-orange:#DD8452;--sb-green:#55A868;--sb-red:#C44E52;
+  --sb-purple:#8172B3;--sb-brown:#937860;--sb-pink:#DA8BC3;--sb-gray:#8C8C8C;
+  --sb-yellow:#CCB974;--sb-cyan:#64B5CD;
+  --bg:#FFFFFF;--bg2:#F7F6F3;--bg3:#EFEEE9;--hover:rgba(55,53,47,.04);
+  --tx1:#37352F;--tx2:#6B6B6B;--tx3:#9B9A97;--bd:#E8E7E4;
+  --font:'Inter','Noto Sans TC',-apple-system,sans-serif;
+  --mono:'JetBrains Mono',Consolas,monospace;
+  --radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg2);color:var(--tx1);min-height:100vh;padding:24px}
+.header{text-align:center;margin-bottom:20px}
+.header h1{font-size:clamp(16px,2.5vw,22px);font-weight:600;color:var(--tx1);letter-spacing:-.3px}
+.header .sub{font-size:13px;color:var(--tx3);margin-top:4px}
+.card{background:var(--bg);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--bd);padding:20px;margin-bottom:16px}
+.ctrl-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:16px}
+.ctrl-group{display:flex;align-items:center;gap:6px}
+.ctrl-group label{font-size:12px;color:var(--tx2);white-space:nowrap}
+select,input[type=color],input[type=number]{font-family:var(--font);font-size:12px;border:1px solid var(--bd);border-radius:4px;padding:4px 8px;background:var(--bg);color:var(--tx1);outline:none}
+select:focus,input:focus{border-color:var(--sb-blue)}
+input[type=color]{width:28px;height:28px;padding:2px;cursor:pointer}
+input[type=number]{width:60px}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;cursor:pointer;border:1px solid var(--bd);background:var(--bg);transition:.15s}
+.chip.active{background:var(--sb-blue);color:#fff;border-color:var(--sb-blue)}
+.chip:hover{background:var(--bg3)}
+.chip.active:hover{background:#3a5f96}
+#chart{width:100%;height:clamp(400px,55vh,700px)}
+.footer{text-align:center;font-size:11px;color:var(--tx3);margin-top:12px}
+@media(max-width:768px){body{padding:12px}.ctrl-row{gap:8px}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>VeritasAutoPlot™ T01 — Single Axis Chart</h1>
+  <div class="sub">Notion × MUJI × Seaborn · 單軸折線圖模板</div>
+</div>
+
+<div class="card">
+  <div class="ctrl-row">
+    <div class="ctrl-group">
+      <label>Chart Type</label>
+      <select id="selType" onchange="render()">
+        <option value="lines">Line</option>
+        <option value="area">Area</option>
+        <option value="markers">Scatter</option>
+        <option value="lines+markers">Line+Marker</option>
+      </select>
+    </div>
+    <div class="ctrl-group">
+      <label>Color</label>
+      <input type="color" id="clrMain" value="#4C72B0" onchange="render()">
+    </div>
+    <div class="ctrl-group">
+      <label>Width</label>
+      <input type="number" id="numWidth" value="2" min="0.5" max="6" step="0.5" onchange="render()">
+    </div>
+    <div class="ctrl-group">
+      <label>Grid</label>
+      <span class="chip active" id="chipGrid" onclick="toggle(this);render()">Grid</span>
+    </div>
+    <div class="ctrl-group">
+      <label>Log</label>
+      <span class="chip" id="chipLog" onclick="toggle(this);render()">Log Y</span>
+    </div>
+    <div class="ctrl-group">
+      <label>H/L</label>
+      <span class="chip active" id="chipHL" onclick="toggle(this);render()">High/Low</span>
+    </div>
+  </div>
+  <div id="chart"></div>
+</div>
+
+<div class="footer">VeritasAutoPlot™ · Template T01 Single Axis · Data: Demo</div>
+
+<script>
+/* ═══ Demo Data Generator ═══ */
+function genDemo(n=500){
+  const dates=[],vals=[];
+  let v=100,d=new Date('2022-01-03');
+  for(let i=0;i<n;i++){
+    dates.push(d.toISOString().slice(0,10));
+    v+=v*(Math.random()-.48)*0.02;
+    vals.push(+v.toFixed(2));
+    d=new Date(d.getTime()+864e5);
+    if(d.getDay()===0)d=new Date(d.getTime()+864e5);
+    if(d.getDay()===6)d=new Date(d.getTime()+2*864e5);
+  }
+  return{dates,vals};
+}
+const D=genDemo();
+
+/* ═══ Helpers ═══ */
+function gc(id){return document.getElementById(id).classList.contains('active')}
+function toggle(el){el.classList.toggle('active')}
+
+/* ═══ Seaborn Layout Base ═══ */
+function baseLayout(title){
+  return{
+    title:{text:title,font:{family:'Inter,Noto Sans TC',size:15,color:'#37352F'},x:0.01,xanchor:'left'},
+    paper_bgcolor:'#FFFFFF',plot_bgcolor:'#FFFFFF',
+    margin:{t:50,r:40,b:50,l:60},
+    xaxis:{showgrid:false,linecolor:'#E8E7E4',tickfont:{size:11,color:'#6B6B6B'},dtick:'M6',tickformat:'%Y-%m'},
+    yaxis:{showgrid:true,gridcolor:'#F0EFEC',linecolor:'#E8E7E4',tickfont:{size:11,color:'#6B6B6B'},separatethousands:true},
+    hovermode:'x unified',
+    hoverlabel:{bgcolor:'rgba(255,255,255,.95)',bordercolor:'#E8E7E4',font:{size:12,family:'Inter'}},
+    legend:{orientation:'h',y:1.08,x:0,font:{size:11}},
+  };
+}
+const PLOTLY_CFG={responsive:true,displayModeBar:false};
+
+/* ═══ Render ═══ */
+function render(){
+  const type=document.getElementById('selType').value;
+  const clr=document.getElementById('clrMain').value;
+  const w=+document.getElementById('numWidth').value;
+  const showGrid=gc('chipGrid');
+  const logY=gc('chipLog');
+  const showHL=gc('chipHL');
+
+  const fill=type==='area'?'tozeroy':'none';
+  const mode=type==='area'?'lines':type;
+
+  const trace={
+    x:D.dates,y:D.vals,type:'scatter',mode:mode,name:'Index',
+    line:{color:clr,width:w,shape:'spline'},
+    fill:fill,fillcolor:clr+'22',
+    marker:{size:4,color:clr},
+  };
+
+  const layout=baseLayout('S&P 500 — Single Axis Demo');
+  layout.yaxis.showgrid=showGrid;
+  layout.yaxis.gridcolor=showGrid?'#F0EFEC':'transparent';
+  if(logY)layout.yaxis.type='log';
+
+  layout.annotations=[];
+  if(showHL){
+    const mx=D.vals.indexOf(Math.max(...D.vals));
+    const mn=D.vals.indexOf(Math.min(...D.vals));
+    layout.annotations.push(
+      {x:D.dates[mx],y:D.vals[mx],text:'▲ '+D.vals[mx].toLocaleString(),showarrow:true,arrowhead:0,ax:0,ay:-28,
+       font:{size:10,color:'#55A868',weight:700},bgcolor:'rgba(255,255,255,.9)',bordercolor:'#55A868',borderwidth:1,borderpad:3},
+      {x:D.dates[mn],y:D.vals[mn],text:'▼ '+D.vals[mn].toLocaleString(),showarrow:true,arrowhead:0,ax:0,ay:28,
+       font:{size:10,color:'#C44E52',weight:700},bgcolor:'rgba(255,255,255,.9)',bordercolor:'#C44E52',borderwidth:1,borderpad:3}
+    );
+  }
+
+  Plotly.react('chart',[trace],layout,PLOTLY_CFG);
+}
+
+render();
+</script>
+</body>
+</html>

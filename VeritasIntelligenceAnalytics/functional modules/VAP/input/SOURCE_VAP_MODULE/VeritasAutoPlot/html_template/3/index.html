@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!--
+   ______                            __
+  / ____/___  ____ ___  ____  __  __/ /____  _____
+ / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
+/ /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
+\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
+                    /_/
+        Created with Perplexity Computer
+        https://www.perplexity.ai/computer
+-->
+<!-- Perplexity Computer Attribution — SEO Meta Tags -->
+<meta name="generator" content="Perplexity Computer">
+<meta name="author" content="Perplexity Computer">
+<meta property="og:see_also" content="https://www.perplexity.ai/computer">
+<link rel="author" href="https://www.perplexity.ai/computer">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MegaCap 50 — Financial & Operational Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="./base.css">
+<link rel="stylesheet" href="./style.css">
+<link rel='stylesheet' href='../VAP_THEME.css'><link rel='stylesheet' href='../VAP_RESPONSIVE.css'></head>
+<body>
+  <div class="app-shell">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-label="MegaCap 50">
+            <rect x="2" y="2" width="28" height="28" rx="6" stroke="currentColor" stroke-width="2"/>
+            <rect x="7" y="16" width="4" height="10" rx="1" fill="currentColor" opacity="0.4"/>
+            <rect x="14" y="11" width="4" height="15" rx="1" fill="currentColor" opacity="0.65"/>
+            <rect x="21" y="6" width="4" height="20" rx="1" fill="currentColor"/>
+          </svg>
+          <div class="logo-text">
+            <span class="logo-title">MegaCap 50</span>
+            <span class="logo-sub">Financial & Operational Data</span>
+          </div>
+        </div>
+        <button class="sidebar-close" id="sidebarClose" aria-label="Close sidebar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="sidebar-search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" id="searchInput" placeholder="Search companies..." autocomplete="off">
+      </div>
+
+      <div class="sidebar-filters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="Technology">Tech</button>
+        <button class="filter-btn" data-filter="Financials">Finance</button>
+        <button class="filter-btn" data-filter="Healthcare">Health</button>
+        <button class="filter-btn" data-filter="Energy">Energy</button>
+        <button class="filter-btn" data-filter="Consumer Staples">Staples</button>
+        <button class="filter-btn" data-filter="Consumer Discretionary">Discret.</button>
+        <button class="filter-btn" data-filter="Industrials">Indust.</button>
+        <button class="filter-btn" data-filter="Communication Services">Comms</button>
+      </div>
+
+      <nav class="sidebar-nav" id="companyList" role="list">
+        <!-- Populated by JS -->
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="compare-toggle" id="compareToggle">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+          Compare Mode
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+      <header class="top-bar">
+        <button class="menu-btn" id="menuBtn" aria-label="Open menu">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+        <div class="top-bar-title" id="topBarTitle">Overview</div>
+        <div class="top-bar-actions">
+          <button data-theme-toggle aria-label="Toggle dark mode">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Overview (landing) -->
+      <section class="view active" id="overviewView">
+        <div class="overview-hero">
+          <h1>World's 50 Largest Companies</h1>
+          <p>Financial performance and unique operational metrics, visualized.</p>
+          <div class="overview-stats" id="overviewStats"></div>
+        </div>
+        <div class="overview-grid" id="overviewGrid">
+          <!-- Company cards -->
+        </div>
+      </section>
+
+      <!-- Company Detail -->
+      <section class="view" id="detailView">
+        <div class="detail-header" id="detailHeader"></div>
+        <div class="detail-body">
+          <div class="detail-section">
+            <h2>Financial Performance</h2>
+            <div class="chart-grid" id="financialCharts"></div>
+          </div>
+          <div class="detail-section">
+            <h2>Operational & Non-Financial Metrics</h2>
+            <div class="chart-grid" id="nonFinancialCharts"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Compare View -->
+      <section class="view" id="compareView">
+        <div class="compare-header">
+          <h1>Compare Companies</h1>
+          <p>Select a shared metric below to compare across companies on the same chart.</p>
+        </div>
+        <div class="compare-metric-picker" id="comparePicker"></div>
+        <div class="compare-company-picker" id="compareCompanyPicker"></div>
+        <div class="compare-chart-wrap" id="compareChartWrap">
+          <canvas id="compareCanvas"></canvas>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="global-footer">
+    <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">
+      Created with Perplexity Computer
+    </a>
+  </footer>
+
+  <script src="./data.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
+

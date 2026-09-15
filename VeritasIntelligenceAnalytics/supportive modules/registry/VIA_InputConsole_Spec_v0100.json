@@ -70,7 +70,14 @@
         ]
        },
        "params": [
-        "range"
+        "range",
+        "gap-mode",
+        "start",
+        "end",
+        "db",
+        "batch-size",
+        "max-batches",
+        "report"
        ],
        "net": true,
        "note": "宇宙=價表既有票;checkpoint 段律;<2022-01-01 抬升(批212 終止段)",
@@ -330,16 +337,26 @@
      "items": [
       {
        "id": "fin_statements",
-       "zh": "三大報表(損益/資產負債/現金流;MOPS)",
-       "state": "PLANNED",
+       "zh": "三大報表(損益/資產負債/現金流;ENG082 收容件 yfinance 車道走 AegisNexus session;MOPS 探路候源)",
+       "state": "SHIPPED(批505)",
        "params": [
-        "period",
-        "years"
+        "only",
+        "years",
+        "limit"
        ],
-       "note": "誠實:母倉無現役財報擷取引擎(ENG073 冊註 tw_financial 群=PLANNED,MOPS t164sb04 候源;ENG050 financials 車道 VERIFY_PENDING);期別/年起迄先入冊(VDF_Input_Interface_Matrix TW_FIN),引擎上船即接",
+       "note": "批505 上船:雙閘 fail-closed(閘你開);yfinance 缺=缺件誠實停;tw_financial 派生層冪等 + mega/fin parquet;MOPS 解析=候(VERIFY_PENDING)",
        "outputs": [
-        "tw_financial(PLANNED)"
-       ]
+        "tw_financial",
+        "mega/fin/tw_financial_<ts>.parquet"
+       ],
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG082_FinStatements_v*.py",
+        "verb": [
+         "run"
+        ]
+       },
+       "net": true
       },
       {
        "id": "tw_revenue_codes",
@@ -465,7 +482,13 @@
          "daily"
         ]
        },
-       "params": [],
+       "params": [
+        "gap-mode",
+        "start",
+        "end",
+        "max-days",
+        "report"
+       ],
        "net": true,
        "outputs": [
         "ActiveTWETF.duckdb::holdings_daily"
@@ -862,6 +885,20 @@
        "engine": {
         "dir": "functional modules/VRN",
         "glob": "VRN_ENG082_ExtractionLogic_v*.py",
+        "verb": [
+         "--selftest"
+        ]
+       },
+       "params": [],
+       "net": false,
+       "outputs": []
+      },
+      {
+       "id": "fin_logic",
+       "zh": "⓪ 財務邏輯統轄橋 v0100 九檢(AllInOne 2.1.0 + FDS 28 欄;第二意見/評等正典/政策因子;批504)",
+       "engine": {
+        "dir": "supportive modules/70_VRN_Rules",
+        "glob": "SUP_MDL748_FinancialLogicHub_v*.py",
         "verb": [
          "--selftest"
         ]

@@ -263,10 +263,12 @@
   "ENV_ABSENT"
  ],
  "order": [
+  "RESTORE(批508 L24:安裝出問題先還原前次 LKGC lock/Baseline;via-envrecover)",
   "REPAIR(force-reinstall 半拆件)",
   "INSTALL(缺件;每境一段;torch 走 CPU index)",
   "EXTERNAL(本體/語言包/模型:只印令)",
-  "VERIFY(重探 + uv pip check)"
+  "VERIFY(重探 + uv pip check)",
+  "順序安裝律(批508 L24):段依境層級 CORE 白名單 → LOW 家族境 → MEDIUM 隔離境 → HIGH 隔離境;同境內 建境→修復→安裝→驗證"
  ],
  "note": "本冊只列工具與判準;不列版本鎖(鎖由 MDL135 LKGC lock 在真裝後產生);錯的鎖比沒鎖更傷",
  "sources": {
@@ -275,8 +277,8 @@
   "network": "VeritasAegisNexus 第三方相依(掃 import;requests/urllib3/joblib)→ 四家族境 + via_core"
  },
  "risk_policy": {
-  "HIGH": "Baseline 家族 target_env 尾 _H(deep_learning/browser/gis/compilers/stealth_proxy):直接拉出獨立境,相關工具一起隔離",
-  "MEDIUM": "尾 _M(ml_boost/web_api/webui/http_async):混合隔離境",
+  "HIGH": "Baseline 家族 target_env 尾 _H(deep_learning/browser/gis/compilers/stealth_proxy):直接拉出獨立境,相關工具一起隔離(批500/508:只認同名獨立境,不借 alt)",
+  "MEDIUM": "尾 _M(ml_boost/web_api/webui/http_async):單獨隔離境(批508 律 L24:中高風險一律單獨隔離,_M 比照 _H 只認同名獨立境,不借 alt 境 via_vap_312/via_ml/via_vdf/via_core)",
   "LOW": "家族境(via_vdf_312/via_vrn_312/via_vap_312/via_html_312/via_nlp/via_tools_312)或 via_core",
   "SPECIAL": "hydra.watch_diverge 樞紐件(numpy 等):多環境多版本搭配多 Python=允許;tools 動詞印樞紐矩陣(境×版本)只作 INFO,不強制對齊"
  },
@@ -306,5 +308,6 @@
    "via_vdf": "38 件 登錄 profile(numpy 1.26.4 黃金釘;py 3.12)——引擎實跑的是 via_vdf_312(未登錄 advisory);誰是正典要操作員裁",
    "via_core": "14 件白名單境(PASS);EnvManager profile 缺 ruff"
   }
- }
+ },
+ "recover_law": "L24 環境復原律(批508):via-envrecover = ①還原前次 ②順序裝全部工具 ③_M/_H 單獨隔離;plan 唯讀;-Execute -Approve 才跑;① 不受 L19,② 過 L19;存證 VIA_Reports/env_governance/RECOVER_latest.json/.ps1"
 }

@@ -20,6 +20,9 @@ VIA 啟動層 bootstrap(批476 立;操作員令「所有 PY 檔案都要加上�
      **同意閘一個字都不碰**:gate_state 是操作員設的就是操作員設的;沒設就 fail-closed。
      也**不 monkeypatch requests**——靜靜改變別人行為,正是這套系統最恨的那種病。
   ③ 預設零輸出。VIA_BOOT_VERBOSE=1 才在 stderr 印一行。VIA_BOOT=0 整個關掉。
+  ⑤ PYTHONHOME 撤除(批514 律 L32 子行程環境衛生):母殼帶著 PYTHONHOME(操作員實錄 …\uv\python\cpython-3.12-…)時,本行程起得來
+     但它生的家族境子行程(C:\Python313 3.13 venv)一律載到 3.12 標準庫="SRE module mismatch"。PYTHONHOME 對 VIA 任何子行程都無正當用途
+     (venv/base 各自從 python.exe 算 home),起跑就撤、記 VIA_PYTHONHOME_SCRUBBED(誠實存證);VIA_KEEP_PYTHONHOME=1 可保留。根治=操作員的手。
 
 怎麼證明有綁上:`python3 CGC_MDL148_EngineBus_v*.py boot` 起一個子行程回報它看到的。
 """
@@ -105,6 +108,22 @@ class _LazyTool(_types.ModuleType):
             return []
 
 
+_NEVER_APPLY = frozenset({"PATH", "PYTHONHOME", "PYTHONPATH", "PYTHONSTARTUP", "PYTHONEXECUTABLE", "PYTHONUSERBASE", "VIRTUAL_ENV", "CONDA_PREFIX", "HOME", "USERPROFILE"})
+
+
+def _scrub_pythonhome(note):
+    r"""批514 Z15 根因:母殼(PowerShell 視窗/profile/via_core 啟動)帶著 PYTHONHOME=…\uv\python\cpython-3.12-…;
+    本行程(base/via_core 3.12)起得來,它生的家族境子行程(C:\Python313 3.13 venv)卻一律載 3.12 標準庫 → "SRE module mismatch"。
+    PYTHONHOME 對 VIA 的任何子行程都沒有正當用途(venv/base 各自從自己的 python.exe 算 home),所以起跑就從本行程環境撤掉
+    (本行程自己早已用完它),子行程永不繼承;撤了什麼寫在 VIA_PYTHONHOME_SCRUBBED(誠實存證,RunGate/VCGC 讀得到)。
+    VIA_KEEP_PYTHONHOME=1 可保留(嵌入式、自知在做什麼的人)。根治=操作員的手:殼層/profile/使用者環境變數把它拿掉。"""
+    ph = os.environ.get("PYTHONHOME")
+    if ph and os.environ.get("VIA_KEEP_PYTHONHOME") != "1":
+        os.environ.pop("PYTHONHOME", None)
+        os.environ["VIA_PYTHONHOME_SCRUBBED"] = ph
+        note.append("PYTHONHOME 撤(子行程不繼承):" + ph[:70])
+
+
 def _boot():
     if os.environ.get("VIA_BOOT", "1") == "0":
         return
@@ -114,6 +133,10 @@ def _boot():
     root = _via_root()
     fam = (os.environ.get("VIA_FAMILY") or "").lower()
     note = []
+    try:
+        _scrub_pythonhome(note)
+    except Exception:
+        pass
     # ① 加速器——批487 改**快取優先**(操作員實錄:via-boot 每次動不了)。
     #   量過:載 Celeritas 一次要拉進 numpy/pandas/duckdb/pyarrow 共 95 個模組,容器(11 個庫)+190ms,
     #   操作員機器(88 件冊全裝)是每支 python 指令前面一大段空白。加速的**效果**其實只是那 17 個
@@ -137,8 +160,10 @@ def _boot():
                 with open(cache, "r", encoding="utf-8") as fh:
                     r = json.load(fh)
                 n = 0
+                # 批509 護欄:快取只准套執行緒預算類變數;PYTHON*/PATH/VIRTUAL_ENV/CONDA_PREFIX 永不從快取套(套錯版 PYTHONHOME/PYTHONPATH=
+                #   子行程家族境 python 起跑就 "SRE module mismatch";操作員實錄 via_vdf_312/via_vrn_312 全站同病)
                 for k, v in (r.get("applied") or {}).items():
-                    if isinstance(k, str) and k.isupper() and v is not None and k not in os.environ:
+                    if isinstance(k, str) and k.isupper() and v is not None and k not in os.environ and not k.startswith("PYTHON") and k not in _NEVER_APPLY:
                         os.environ[k] = str(v); n += 1
                 os.environ["VIA_ACCEL_BOOT"] = f"cache:{r.get('libs_available', 0)}/{r.get('libs_total', 0)}:{n}env"
             else:
