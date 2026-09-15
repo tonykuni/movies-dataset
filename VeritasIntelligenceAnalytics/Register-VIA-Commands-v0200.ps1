@@ -1,4 +1,5 @@
-﻿# =====================================================================
+# =====================================================================
+# Register-VIA-Commands-v0200.ps1 — 批508:via-rungate 預設只驗 vdf,vrn；via-ryg 預設有界 selftest，-Full 才走 production 動詞；其餘沿用 v0199。
 # Register-VIA-Commands-v0179.ps1 — VIA 短指令唯一定義處(批394 續章 操作員令「重新把我要在電腦跑的指令整合成一個 PS 指令含進入環境,一個指令跑完全部,把我還沒做的整合到這裡」→ +via-oneshot(Invoke-VIA-OneShot 尾版;九段:S1 解卡(委派 Unstick;本副本缺該件即自 origin 取單檔繞 bootstrap 死結)→ S2 點源尾版冊+via-pin → S3 進入 via_core 虛境(在位才進)+via-envgov 唯讀計畫 → S4 via-accel-import --apply --approve → S5 via-rungate --fast → S6 via-price/via-chip/via-align/via-fred(鑰在位才跑,只判在位不讀不印)→ S7 via-psrepair-ast+via-pstest → S8 via-selftest 207 站 → S9 via-productgate+via-projects+誠實三態總表;每段獨立計時與三態、任一段不擋後段、逾時 kill 不卡斷、邊跑邊吐進度與心跳、段 rc 回報(rc≠0 必紅=不假綠);-DryRun/-SkipAccel/-SkipData/-SkipMatrix;別名 一鍵)。本件三枚自犯錯皆真跑才現形並已修:Start-Job 是新工作階段故段內短令必 not recognized(改 job 內先點源尾版冊)、輸出緩衝到結束才吐=長跑段畫面全白(改邊跑邊收+心跳)、早期判定式抓不到 python 缺檔錯誤而 0.7s 回 OK=假綠(改 rc+缺件樣式+錯誤樣式三者合判)。批394 續章 操作員實錄(他不在電腦前要我代跑):副本卡「合併進行中+兩件連字號版號族 Register 衝突」,該副本拉齊醫生尾版僅 v0101(只認底線版號)→ 連字號族必判 MANUAL 而停=bootstrap 死結(要解倉庫才拿得到新醫生,而新醫生就在解不開的倉庫裡);更深一層:那輪 merge 起於舊 origin commit,解完後還要再 merge 當日新 commit,同兩件第二輪又衝突 → 解一次不夠,必須迴圈至 UP_TO_DATE。故 +via-unstick(Invoke-VIA-Unstick 尾版:醫生 >= v0102 即委派 sync --apply 零重造,否則走最小迴圈——台帳交醫生 ledger_union 聯集(append-only,絕不取單邊)、其餘衝突取遠端版(先發先得律)、完成合併後再拉,迴圈收斂;殘留 stash 衝突亦按律裁決;零 force 零刪除;-DryRun 只診斷;解完自動點源尾版冊)。雲端腳手架端到端真測 PASS:兩輪收斂、台帳聯集 4 筆、髒檔與未追蹤件零遺失、升版 v0174→v0177、點源後新令在位。批394 操作員令「啟動 PowerShell 指令語法多輪並行安全修正引擎(AST 雙模錨點+錯誤分流+並行安全修正+沙盒啟動驗證),test debug optimize test debug till they work」→ +via-psrepair-ast(CGC_MDL146:T1 AST Parser/T2 PSScriptAnalyzer(缺=SKIP 不代裝)/T3 Command-Param Inspector;F1 行尾註解截斷續行=Parallel-Fixable 真修(續接運算子上提本行末+註解搬續行末,token 零變更,此法即主線 PSRepair v0102→v0103 的真修法,pwsh 實測驗證「只搬註解」不足以解),R1 硬寫磁碟機代號/R2 Join-Path 空值=Report-Only 只列不改;修正一律 version-forward 且目標版號已存在即拒寫(Hydra 守衛),正本零觸碰零刪除零 force;尾版必綠、封存版壞=WARN 凍結不改;寫前沙盒解析+寫後複驗,任一不過即放棄該檔;收斂即停 VIA_AST_ROUNDS;預設唯讀,--apply 才修;別名 語法修)。雲端實測:尾版 ParseError 0 · 解析綠 158 · 封存版紅 4(全為已被 v0103 取代的 Invoke-VIA-PSRepair-v0102.ps1=凍結不改)=WARN 誠實態;批391 我方指令寫死版號之錯(給 v0175 而該副本只有 v0174=必然 not recognized)→ via-copies 產出指令一律尾版 glob、+--heal 明令自癒;批389 操作員令「test debug by yourself till it works perfectly」→ +via-pstest(MDL145 PowerShell 真測閘:AST 解析閘(尾版必綠/封存版壞=WARN)+真分叉自癒功能閘+具名參數回歸閘;pwsh 缺=SKIP);批387 工作站實錄:PS C:\Users\tonyk> via-vdffetch → not recognized,因 profile 載的是 Downloads\movies-dataset-b381 舊副本的短令冊 → +via-copies(MDL144 副本醫生:掃同機所有副本×Register 尾版×動詞在位×分歧/未合併,判誰最新並印立即可用與一勞永逸指令;全唯讀);批386 工作站實錄:merge --abort 後本地 main 與 origin/main 分叉→ via-reload 只會 --ff-only 永遠拉不動(Not possible to fast-forward)→ via-reload 分叉時自動委派 MDL143 拉齊醫生(merge --no-ff + 按律解衝突;零 force 零刪除);+via-medic 直呼;批385 工作站實錄:工作副本卡未完成合併(UU/AA)→ via-reload 只印「拉齊失敗」不指路、新短令永不到 → via-reload 偵測未合併態並印精準解法;+--resolve-theirs 明令解(衝突檔取 origin/<分支> 版+台帳聯集;零刪除零 force);批384 操作員令「將所有加速器依照 via_envmanager 規定導入 via_core via_ 相關環境」→ +via-accel-import(MDL142 加速器套件導入閘:Celeritas 88 件冊 × MDL135 路由 → via_core/via_vdf/via_vrn/via_vap;plan 唯讀,--apply --approve 才裝,base 零觸碰);批384 工作站實錄修:via-vdffetch 陣列潑灑 @a 把 "-Year" 當位置參數傳成年份值(畫面 [FAIL] -Year 需四位數年份,收到:-Year)→ 改雜湊潑灑 @p(具名參數);批383 操作員令「用一個 powershell 啟動 vdf 包含進入環境」→ via-vdffetch 改薄包裝委派 Invoke-VIA-VdfFetch-v*.ps1(唯一正本:自找根/自進環境/家族境 python 批384/同意閘不覆蓋 批408);批381→合流:+via-vdffetch [年份](預設 2023;單一指令:年份旗標→20 加速器→Hydra 哨兵→十一步資料鏈十道並行→存證;零跳出零互動不卡斷);批423 操作員令「卡斷 加入20個加速器 不卡斷 動態進度條」:+via-allgreen(尾版律起 Invoke-VIA-AllGreen-v*.ps1;別名 統包)。工作站實錄 via-go 停在「── ① TEST(自測矩陣)──」不動=看起來死機,根因兩條皆在 AllGreen v0100:①`$out = & `$PY @Argv 2>&1 | Out-String` 把子行程輸出緩衝到結束才吐(200 站期間畫面全白)②`$StageTimeoutSec` 宣告了但**全檔從未使用**=任一站真卡住就永遠等。v0101 改 Start-Process+邊跑邊 tail、逾時 Kill 記 TIMEOUT、Write-Progress 進度列、開跑點 20 加速器名;格子 v0262 補動態進度條/SELFTEST_PROGRESS.json 心跳/Ctrl+C 安全落檔(rc=130)。via-go 是操作員自己 PATH 上的檔(批358 讓位律),短令冊不佔該名,改登錄 via-allgreen;批421 操作員令「REGISTER AND IMPLEMENT THESE TWO SYSTEMS AS SUPPORTIVE MODULES TO SUPPORT VRN」:+via-gle(SUP_MDL743 GLE 全後端統轄橋;status|probe|route;別名 版面橋)+via-nlp(SUP_MDL744 NLP 應用系統統轄橋;status|roster|delta|demo;別名 語意橋)。GLE v2.1.0 上傳包對在庫 b245 逐檔比對 16/18 位元相同,installer 唯一差異是 ${ExitCode}: 改成 $ExitCode:(PowerShell 會把冒號誤讀成限定符=上傳版反而是回歸,不採),另一枚 dist whl 是原始碼建置產物=**不重複收容**,改把在庫收容件升格為全樹可用支援服務;NLP 確為新版,VIA_NLP_Application_System v1.8.0 68 檔入收容夾。兩橋修同一個真缺口:ENG072 v0106/ENG073 v0113 把 NLP 收容夾**寫死** VIA_NLP_OneEngine_v1.1.0(18 模組),v1.5.0/v1.8.0(39 模組,含 table_ops/layout_analysis/content_roles)收容了也永遠掛不上=尾版律破口;現由橋統一解析,橋缺席則原樣退回直掛=零回歸;批408 同意閘不覆蓋律:六個短令(via-fred/via-revfill/via-etfhist/via-etfuniv/via-chip/via-price)自 批360/368/374/375/394 起每次呼叫都寫死 $env:VIA_NET_CONSENT="YES";$env:VIA_SCRAPE_CONSENT="YES"——覆寫式;但閘二的包內法遵 def_validate_consent 只認 I_ACCEPT_RESPONSIBLE_SCRAPING,字串 "YES" 永遠 BLOCK,且因為每呼必覆寫,操作員就算自己設了正確 token 也會被短令蓋掉=爬蟲道永遠不可達(批407 掛上的 scrape 道等於死路);改法=Set-VIAGateDefaults:只在「該閘未設」時才補預設值,已設者一律尊重(不移除既有預設行為=既有六令零行為變更;亦不代操作員設任何新意圖);批400 八流程並進:via-entry 動詞白名單 +deadends(MDL136 短令死路掃描器)+ via-deadends 別名;收尾閘登錄樞紐任務 closeout(Deck v0134/Manager v0121);批398 操作員令「將 VRN VAL 收個尾吧」:+via-closeout [vrn|vap|all] [--run] [--dir 夾](MDL141 收尾閘:VRN 驗證逐份五段鏈+核對態 DONE|FAIL|PENDING;VAP 逐圖驗;CLOSEOUT_latest.md)+ via-vrnval/via-vapval 別名;批397 雙副本律:工作站實錄 新視窗 profile 點源 Github 母副本(main c14d428c;v0148)→ via-reload 分支感知拉 origin/main=拉不到 PR #30 未併的批381–396 → via-famui/via-console 不認;b381 副本(claude/… v0161)只在該夾啟動的視窗生效 → +via-pin(把 profile 點源行換成本窗副本;--show 只看;只改 profile 一行,兩副本檔案零觸碰)+ via-reload 雙副本提示;批396 工作站實錄修:+via-rebuild(MDL050 多環境隔離重建/旁建零破壞;via-envgov digest「下一指令」指路的 via-rebuild --env 在冊內從未登錄=死路;無參數=--offline 唯讀計畫);via-entry 次序文字 15 步→16 步含 console/handover;批394 工作站實錄修:+via-chip(ENG056 籌碼增量)/via-price(ENG054 價格增量;別名 via-tw-backfill)——ENG081/ENG056 docstring 指路的 via-chip 從未登錄=死路;籌碼止 08-25 根因=日更鏈 ③ 跑時價表尚無 08-26 後交易日(ENG064 回補在後才補齊),現在重跑即補;批393 工作站實錄修:+via-bg 背景引擎進程唯讀一覽(誰持 DuckDB 單寫者鎖一看便知;絕不 Stop-Process;實錄:[FAIL] 庫忙曾指路 via-status 但那是同步頁不是進程表);via-align 基準日律/持鎖者解析在引擎側 ENG081;批392 操作員令「參數最小化;台股除財報外抓全部;國際資訊勾選放右面板;啟動跑一切;VRN TAB2/3/4;起始統一 2023-01-01;VAP 規格與圖;VIA Central Console=超詳細系統狀態如 handover reports 一頁堆疊矩陣可轉 MD 接棒」→ +via-handover(MDL140 接棒狀態台:build|status|md;--open;別名 接棒/接棒LIVE);via-console 頁改 批392 版(整類起始日遮罩輸入/國際資訊右面板勾選/VRN 單鍵啟動/TAB BASIC INFO·SUMMARY·FINANCIAL DATA 核對 VDF 為主/VAP 規格與圖/跑成功?);批391 工作站實錄「start http://127.0.0.1:8765/console 被 VIA_NO_OPEN 抑制;via-align update --apply 撞單寫者鎖 traceback」→ via-open 認 http(s):// URL(只走瀏覽器 exe;別名 LIVE/主控台LIVE=樞紐 /console)+via-console --open 樞紐在線=開 LIVE 網址、離線=開快照頁;ENG081 讓庫律;批390 操作員令「左面板輸入/右面板矩陣;VDF 查詢標的分類細項(總體經濟 PMI/通膨/就業;台股 TWSE/TPEX 可新增代碼);起始日個別可改;財報當季/累計/年度年起迄;DEFAULT 最新;庫狀況;日交易×籌碼數量對齊更新清單;parquet 增量 DuckDB;右側矩陣篩選/大到小;Windows U/I 下拉/勾選/全選/全不選;VRN 資料夾拖曳/啟動/動畫/整體跑況 BASIC INFO/SUMMARY/FINANCIAL DATA;VAP 簡輸入」→ +via-console(MDL139 輸入主控台:build 頁|status|set k=v|argv|run --item;--open 走 via-open 主控台;樞紐在線 http://127.0.0.1:8765/console 可啟動)+via-align(VDF_ENG081 台股日交易×籌碼數量對齊 check|update --apply|status;vdf 境 python)+via-open 別名 主控台/輸入;批388 操作員令「若能跑 vdf vrn 的 u/i」→ via-famui vdf|vrn|vap|all [--open](MDL138 家族 U/I 再生閘:家族境 python 真跑頁面產生器→頁新鮮/零 CDN 判準→FAMILY_UI 索引頁;via-vdfui/via-vrnui 別名;via-open 別名 VDF/VRN/四點/家族);批387 工作站實錄「Windows autocrlf 工作副本 CRLF → Grok CmdMatrix 尾段 via-enter | Out-Null 未去除,載入即 cd 到主 clone」→ 去尾段 regex 容 \r;via-rungate --family vrn 誤判動詞/via_vrn_312 無 duckdb → MDL137 動詞白名單+--approve-install 補庫;批386 Grok 主控台 VRN 契約接回母倉:via-vrn4=一題四點文摘(VRN_ENG080;潛在上漲空間=目標價除權息調整後 vs 最新 adj close;K2 稀釋 EPS n～n+3 YoY;K3/K4 首頁其餘;K5 風險可空;quote-or-abstain 不發明不平均;via_vrn_312 python);批385 工作站實錄「via-reload 在 b381 worktree(claude/… 分支)固定拉 origin/main → ff 失敗 HEAD 8be0780 不動 → via-entry/via-vdfdb/via-vapone/via-rungate 永遠 not recognized;舊版 MDL135 不識 --only-kind 卻靜默照跑全段」→ via-reload 分支感知(當前分支≠main 即拉 origin/<分支>;印分支與 HEAD 前後)+MDL135 旗標白名單誠實停+via-envgov conflicts 衝突明細;批384 操作員令「以此為中央控管將 session_01R2d69oa1AGvnPVwjSUdSv5(VIA系統後續工作;claude/via-system-followup-tz7k9t@c14d428=main=本分支基底)整合完畢;vdf vrn 能跑」→ VDF/VRN/VAP 引擎短令一律以家族境 python 啟動(Get-VIAEnvPython vdf|vrn|vap;境缺=base 退路)+via-rungate(MDL137 能跑閘:家族境 python 真跑引擎自測;--fast/--all;status)+via-py <family> <script> 通用家族啟動器;批383 操作員令「將 river-beam-aurora-acorn 裡面的檔案接回做為整合為一入口」+「單一入口與這個(SYSTEM MANAGER MATRIX v0700)整合;vap 補充;vdf vrn 要弄到實際能跑;vdf 要將資料庫存入;之前有的資料庫整理好抓過的不必再抓」→ +via-entry(唯一入口燈板/plan/roster;--scan/--open/--console)+via-env(→via-envgov 正本)+via-grok(Grok 短令冊;matrix 右側板)+via-webconsole(Grok 網頁主控台 8080;同意閘)+via-vapone(VAP ONE 72 檢)+via-vdfdb(本機三庫整併 DuckDB;抓過不再抓)+via-envpy/Get-VIAEnvPython(家族境 python 解析;功能件住 via_ 境=啟動器指對 python)+載入即接 Grok CmdMatrix(去尾段自動執行;撞名母倉先發先得)+via-open 別名 矩陣/入口;批381 操作員令「依照已成功地建構布局向上新增;最壞還原成原本規劃;base 只放該有的工具;其他放在 via_core 及 via_ 開頭的環境」→ +via-envgov(CGC_MDL135 環境治理統一引擎:全景式分析 base/via_core/via_* → uv 毫秒快篩 → base 該有冊閉包 → 衝突立拔家族路由 → Zero-Hydra 分流拓撲三輪 → LKGC/rollback → 四分區 UI Matrix;預設 run --offline 唯讀;apply --approve 才動;base 移除另 --approve-remove)+via-envgov-auto(Invoke-VIA-EnvGovernance 單一 PowerShell 一貼即用;-Background 非阻塞);批380 操作員令「用一個 PowerShell 完成所有動作 不影響系統健康 不可造成九頭龍風險 20 的加速器 不卡斷」→ via-autorun 四閘版:①20 加速器點亮 ②Hydra 哨兵 H1–H6 先行(H3/H5 阻擋=誠實停) ③全程零跳出零 TTY 等待 ④逾時 kill 不卡斷;批379 操作員在電腦前「自動完成所有動作 不要打開 VS Code 我不知道要怎麼辦」→ +via-autorun 一鍵全自動(雙擊 via-autorun.cmd 即可;結束停窗)+git 永不開編輯器 env;批378 操作員令「不要一直開啟 VS Code,全自動完成一切」→ 載入即全域 VIA_NO_OPEN=1(所有短令零跳出;看頁只走 via-open 瀏覽器道;VIA_OPEN_PAGES=1 可解);批377 +via-lanes 十道並行安全編排(MDL134;Hydra 哨兵)+via-mobile --lanes;批376 +via-productgate 產品資格閘九閘(MDL133);via-mobile 末段 +productgate digest;批375 +via-etfhist 每日持股史深;批374 +via-etfuniv 主動 ETF 宇宙日更;批373 +via-etfrev 主動 ETF×月營收合流;批371 via-ves→MDL132 橋(尾版鏡像+安全種子+雙跑;--raw 直通原件);批370 +via-ves 唯讀 E3 標準化掃描;批368 +via-projects 四專案完工矩陣;+via-revfill 月營收史深;批367 via-reload 同名雙物大寫原件復位;批366 via-mobile 零跳出 VIA_NO_OPEN=1;批362 via-fred 無動詞=run;批360/361 +via-fred/via-vdfarch;批254 立;批260 +via-all;批316 +via-pipeline;批323 +via-accel/via-accel-check;批325 +via-rotation/via-repo-optimize;批327 +via-vapstack;批328 +via-reload;批330 +via-plotlaw;批331 via-reload 先拉齊;批332 +via-system/via-api;批333 +via-master;批335 +via-complete;批336 +via-intake-roster;批337 via-reload 拉齊誠實+產出頁自動讓位;批338 可編輯模板排除;批339 短令清單動態;批340 +via-datahome/via-complete 分離啟動器;批342 +via-six 六流程 Zero-Hydra 編排;批344 via-complete watch/stop;批345 +via-bridge-sweep)
 # =====================================================================
 # 批254 摩擦修:舊制=Register-Profile 把函式全文塞 $PROFILE(要跑 via
@@ -355,28 +356,6 @@ function global:via-envtools {
 }
 Set-Alias -Name 工具導入 -Value via-envtools -Scope Global -Force
 
-# 批508 操作員令「環境安裝出了問題可以先還原原本前次環境然後把所有工具順序安裝上 中高風險一律單獨隔離」→ MDL135 v0107 recover 動詞(律 L24 環境復原律)
-#   via-envrecover [-Execute] [-Approve] [-ApproveRemove] [-Baseline] [-To LKGC_x.json] [-Env via_x] [--env-root P];plan 唯讀寫 VIA_Reports\env_governance\RECOVER_latest.json/.ps1
-#   ①還原前次(LKGC lock 逐境;無則 Baseline 原本規劃;sync 破壞段只在 -ApproveRemove)②順序裝全部工具(core→LOW 家族→MEDIUM 隔離→HIGH 隔離→外部→驗證)③_M/_H 一律同名獨立境不借 alt
-#   -Execute -Approve 才跑,且要 $env:VIA_NET_CONSENT='YES'(不代設);① 不受 L19 擋(LKGC 本身曾 GREEN),② 新裝段過 L19(via-rungate GREEN 24h 內)否則 RESTORED_BLOCKED_UNITEST 誠實停
-function global:via-envrecover {
-    $a = @("recover")
-    $i = 0
-    while ($i -lt $args.Count) {
-        $x = "" + $args[$i]
-        if ($x -eq "-Execute") { $a += "--execute" }
-        elseif ($x -eq "-Approve") { $a += "--approve" }
-        elseif ($x -eq "-ApproveRemove") { $a += "--approve-remove" }
-        elseif ($x -eq "-Baseline") { $a += "--baseline" }
-        elseif ($x -eq "-To" -and $i + 1 -lt $args.Count) { $a += @("--to", ("" + $args[$i + 1])); $i++ }
-        elseif ($x -eq "-Env" -and $i + 1 -lt $args.Count) { $a += @("--tool-env", ("" + $args[$i + 1])); $i++ }
-        else { $a += $x }
-        $i++
-    }
-    Invoke-VIAPython (Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL135_EnvGovernance_v*.py") @a
-}
-Set-Alias -Name 環境復原 -Value via-envrecover -Scope Global -Force
-
 # 批383:單一入口(操作員令「單一入口與這個(SYSTEM MANAGER MATRIX v0700)整合」):via-entry=母倉唯一入口燈板(GitHub/Mother/Data/Env/PATH/EnvGov/VDF-DB/VAP/Matrix/Console/Grok;零網路;落 VIA_Reports/entry)
 # via-entry plan=一貼即用 11 步;via-entry roster=短令冊(母倉∪Grok 撞名冊);--scan 加跑 via-envgov 全景;--open 開矩陣頁(瀏覽器道零跳出);--console 帶起 Grok 網頁主控台(背景)
 function global:via-entry { $a = @($args); if ($a.Count -gt 0 -and ($a[0] -in @("plan", "roster", "status", "envpy", "deadends"))) { Invoke-VIAPython (Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL136_EntryBridge_v*.py") @a; return }
@@ -402,8 +381,8 @@ function global:via-webconsole { $dir = "$VIA\supportive modules\references\inta
 function global:via-vapone { $py = Get-VIAEnvPython "vap"; Invoke-VIAPython -Python $py (Get-VIANewest "$VIA\functional modules\VAP\engine" "VAP_ENG016_AutoplotOne_v*.py") $(if ($args) { $args } else { "--selftest" }) }
 # 批383:via-vdfdb=本機三庫整併入正典 DuckDB(VDF_ENG079;C:\新增資料夾\新增資料夾\VIA_db_part1_prices/part2_chips/part3_rest;COPY_ONLY anti-join 只補缺鍵;檔冊 sha 已入=跳過;ckpt=ENG064 checkpoint 重建=抓過不再抓;need=缺口清單);無參數=scan 唯讀;run --apply 才寫
 function global:via-vdfdb { $py = Get-VIAEnvPython "vdf"; Invoke-VIAPython -Python $py (Get-VIANewest "$VIA\functional modules\VDF\engine" "VDF_ENG079_LocalDbConsolidate_v*.py") $(if ($args) { $args } else { "scan" }) }
-# 批384:via-rungate=VDF/VRN/VAP 能跑閘(MDL137):家族境 python 逐庫 import + SelftestGrid 家族站真跑(--fast 每族 3 站;預設 8;--all 全站;--family vdf,vrn,vap;status 看上次);via-py <family> <script.py> [args]=通用家族啟動器
-function global:via-rungate { Invoke-VIAPython (Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL137_RunGate_v*.py") $(if ($args) { $args } else { "run" }) }
+# 批508:via-rungate 無參數=VDF+VRN 各 3 站有界驗收；明帶參數仍完整直通(--all/--family vap/--approve-install 等不丟)。
+function global:via-rungate { Invoke-VIAPython (Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL137_RunGate_v*.py") $(if ($args) { $args } else { @("run", "--fast", "--family", "vdf,vrn") }) }
 function global:via-py { if ($args.Count -ge 1) { $env:VIA_FAMILY = ("" + $args[0]).ToLower() }; if ($args.Count -lt 2) { Write-Host "  用法:via-py <vdf|vrn|vap|core|ocr|table> <script.py> [args](家族境 python 啟動;境缺=base 退路)" -ForegroundColor Yellow; return }; $py = Get-VIAEnvPython ("" + $args[0]); Write-Host ("  [via-py] " + $args[0] + " → " + $py) -ForegroundColor DarkCyan; Invoke-VIAPython -Python $py @($args | Select-Object -Skip 1) }
 # 批386:via-vrn4=研報一題四點文摘+潛在上漲空間(VRN_ENG080;目標價除權息同口徑後向因子鏈;最新 adj close;quote-or-abstain);無參數=run;show <ticker|report_file>;--ticker/--limit
 function global:via-vrn4 { $py = Get-VIAEnvPython "vrn"; Invoke-VIAPython -Python $py (Get-VIANewest "$VIA\functional modules\VRN" "VRN_ENG080_FourPointDigest_v*.py") $(if ($args) { $args } else { "run" }) }
@@ -484,8 +463,9 @@ function global:via-busui { $p = Join-Path $VIA "VIA_Reports\engine_bus\ENGINE_B
 # 操作員令(B):「一頁式矩陣報告…紅黃綠燈…自動跳出來」。
 # 零彈窗律(批378 VIA_NO_OPEN=1)管的是「**沒人要求就別跳**」;
 # 這一令是操作員親手打的,**打了就該跳**——兩條律不衝突,分界線是「誰要求的」。
-#   via-ryg                真跑 vrn+vap,其餘家族只解析;產五矩陣頁;**自動開**
-#   via-ryg vrn            只真跑 vrn
+#   via-ryg                VDF+VRN 有界 selftest(不跑全量回補);產五矩陣頁;**自動開**
+#   via-ryg vrn            只驗 vrn
+#   via-ryg vdf,vrn -Full  明示 production 模式(保留冊上動詞與全部參數；網路/寫庫閘照舊)
 #   via-ryg -NoOpen        不開(給自動化鏈路用)
 #   via-ryg -DryAll        一支都不真跑(只要那張圖)
 #   via-ryg -Timeout 300   逐項逾時秒數(批474 v0108:預設 900;有心跳,畫面不再白)
@@ -518,23 +498,26 @@ function global:via-ryg {
     $a = @(ConvertTo-VIACleanArgs $args)
     $noOpen = ($a -contains "-NoOpen") -or ($a -contains "--no-open")
     $dryAll = ($a -contains "-DryAll") -or ($a -contains "--dry")
+    $full = ($a -contains "-Full") -or ($a -contains "--full")
     $tmo = 0; $ti = [array]::IndexOf($a, "-Timeout")
     if ($ti -ge 0) {
         $v = if ($ti + 1 -lt $a.Count) { "$($a[$ti + 1])" } else { "" }
-        if (-not [int]::TryParse($v, [ref]$tmo) -or $tmo -le 0) { Write-Host ("  [via-ryg] 誠實停:-Timeout 要正整數秒,收到「{0}」。用法:via-ryg [vdf|vrn|vap[,…]] [-Timeout 300] [-NoOpen] [-DryAll]" -f $v) -ForegroundColor Yellow; return }
+        if (-not [int]::TryParse($v, [ref]$tmo) -or $tmo -le 0) { Write-Host ("  [via-ryg] 誠實停:-Timeout 要正整數秒,收到「{0}」。用法:via-ryg [vdf|vrn|vap[,…]] [-Timeout 300] [-NoOpen] [-DryAll] [-Full]" -f $v) -ForegroundColor Yellow; return }
     }
     # 批488 自犯錯(v0184 起就在):沒給 -Timeout 時 $ti=-1,$ti+1=0 → 第一個位置參數永遠被跳過,
     # `via-ryg vrn` 其實一直跑的是預設 vrn,vap。守衛加上 $ti -ge 0。
     $pos = @(); for ($i = 0; $i -lt $a.Count; $i++) { if ($ti -ge 0 -and ($i -eq $ti -or $i -eq $ti + 1)) { continue }; if ($a[$i] -notmatch '^-') { $pos += $a[$i] } }
-    $fam = if ($pos.Count) { ($pos -join ',') } else { "vrn,vap" }   # 位置參數全收(vrn,vap 會被 PowerShell 拆成兩個)
+    $fam = if ($pos.Count) { ($pos -join ',') } else { "vdf,vrn" }   # 結案閘預設只要求 VDF+VRN；位置參數全收
     $bad = @(($fam -split ',') | ForEach-Object { $_.Trim().ToLower() } | Where-Object { $_ -notin @("vdf", "vrn", "vap") })
-    if ($bad.Count) { Write-Host ("  [via-ryg] 誠實停:家族只認 vdf / vrn / vap(可逗號合寫),收到「{0}」。用法:via-ryg [vdf|vrn|vap[,…]] [-Timeout 300] [-NoOpen] [-DryAll]" -f ($bad -join ',')) -ForegroundColor Yellow; return }
-    $extra = @(); if ($tmo -gt 0) { $extra = @("--timeout", "$tmo") }
+    if ($bad.Count) { Write-Host ("  [via-ryg] 誠實停:家族只認 vdf / vrn / vap(可逗號合寫),收到「{0}」。用法:via-ryg [vdf|vrn|vap[,…]] [-Timeout 300] [-NoOpen] [-DryAll] [-Full]" -f ($bad -join ',')) -ForegroundColor Yellow; return }
+    $profile = if ($full) { "run" } else { "test" }
+    $extra = @("--profile", $profile); if ($tmo -gt 0) { $extra += @("--timeout", "$tmo") }
     $py = Get-VIAEnvPython "vrn"
     Write-Host ""
     Write-Host "=== VIA 一頁式紅黃綠燈矩陣(五矩陣;零 CDN)===" -ForegroundColor Cyan
-    if ($dryAll) { Write-Host "  模式 : 全解析(一支都不真跑)" }
-    else         { Write-Host ("  模式 : 真跑 {0};其餘家族只解析(寫庫動詞永不代跑)" -f $fam) }
+    if ($dryAll) { Write-Host ("  模式 : 全解析(profile={0};一支都不真跑)" -f $profile) }
+    elseif ($full) { Write-Host ("  模式 : **明示 Full** production 真跑 {0};寫庫動詞仍須 --ids 明點" -f $fam) -ForegroundColor Yellow }
+    else { Write-Host ("  模式 : 有界 selftest 驗收 {0};production 動詞/參數只留契約、不執行" -f $fam) }
     Write-Host   ("  引擎 : {0}" -f (Split-Path -Leaf $eng))
     Write-Host ""
     if ($dryAll) { Invoke-VIAPython -Python $py $eng matrix --html @extra }
@@ -546,6 +529,7 @@ function global:via-ryg {
     if ($noOpen) { Write-Host ("  頁 : {0}(-NoOpen 故不開)" -f $p) -ForegroundColor Cyan }
     else { Write-Host ("  頁 : {0}" -f $p) -ForegroundColor Cyan; via-open $p }
     if ($rc -ne 0) { Write-Host ("  [via-ryg] 調度回 rc={0}=有項目沒過,頁上紅黃格即是" -f $rc) -ForegroundColor Yellow }
+    $global:LASTEXITCODE = $rc
 }
 Set-Alias -Name 紅黃綠 -Value via-ryg -Scope Global -Force
 Set-Alias -Name 燈板 -Value via-ryg -Scope Global -Force
@@ -601,11 +585,11 @@ function global:via-finstat {
 }
 Set-Alias -Name 三大報表 -Value via-finstat -Scope Global -Force
 # ── 批506 Veritas Central Governance Console(CGC_MDL149;律 L20 唯一對接口:政策庫/邏輯庫/因子庫/資料庫/引擎調度/多矩陣/環境工具/註冊表/交接)
-#   via-vcgc [status|page|onepage|audit|register-plan|check] [--publish] | -SelfTest ;page/onepage 落 VIA_Reports\vcgc(--publish 才入倉三處);check=L19 安裝核可(RunGate GREEN 24h 內)
+#   via-vcgc [status|page|onepage|audit|register-plan|registry-sync|check] [-Publish|-Apply] | -SelfTest ;registry-sync 預設計畫、-Apply 才寫 append-only 元件編號冊；check=VDF+VRN 完整 GREEN 24h 內
 function global:via-vcgc {
     $eng = Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL149_VeritasCentralGovernanceConsole_v*.py"
     if (-not $eng) { Write-Host "  [via-vcgc] FAIL:CGC_MDL149_VeritasCentralGovernanceConsole_v*.py 缺" -ForegroundColor Red; return }
-    $a = @($args | ForEach-Object { if ($_ -eq "-SelfTest") { "--selftest" } elseif ($_ -eq "-Publish") { "--publish" } else { $_ } })
+    $a = @($args | ForEach-Object { if ($_ -eq "-SelfTest") { "--selftest" } elseif ($_ -eq "-Publish") { "--publish" } elseif ($_ -eq "-Apply") { "--apply" } else { $_ } })
     if (-not $a) { $a = @("status") }
     Invoke-VIAPython -Family "vrn" $eng @a
     if (($a -contains "page") -and (Test-Path "$VIA\VIA_Reports\vcgc\VIA_UI_CentralGovernanceConsole_v0100.html")) { via-open "$VIA\VIA_Reports\vcgc\VIA_UI_CentralGovernanceConsole_v0100.html" }

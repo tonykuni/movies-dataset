@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VeritasAutoPlot™ T05 — Vertical Stack</title>
+<script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+<style>
+:root{
+  --sb-blue:#4C72B0;--sb-orange:#DD8452;--sb-green:#55A868;--sb-red:#C44E52;
+  --sb-purple:#8172B3;--sb-brown:#937860;--sb-pink:#DA8BC3;--sb-gray:#8C8C8C;
+  --sb-yellow:#CCB974;--sb-cyan:#64B5CD;
+  --up:#55A868;--dn:#C44E52;
+  --bg:#FFFFFF;--bg2:#F7F6F3;--bg3:#EFEEE9;
+  --tx1:#37352F;--tx2:#6B6B6B;--tx3:#9B9A97;--bd:#E8E7E4;
+  --font:'Inter','Noto Sans TC',-apple-system,sans-serif;
+  --radius:6px;--shadow:0 1px 3px rgba(0,0,0,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg2);color:var(--tx1);padding:24px}
+.header{text-align:center;margin-bottom:16px}
+.header h1{font-size:clamp(15px,2.4vw,21px);font-weight:600;letter-spacing:-.3px}
+.header .sub{font-size:13px;color:var(--tx3);margin-top:4px}
+.card{background:var(--bg);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--bd);padding:18px;margin-bottom:14px}
+.ctrl-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.ctrl-group{display:flex;align-items:center;gap:4px}
+.ctrl-group label{font-size:11px;color:var(--tx2);white-space:nowrap}
+select,input[type=color]{font-family:var(--font);font-size:11px;border:1px solid var(--bd);border-radius:4px;padding:3px 6px;background:var(--bg);color:var(--tx1);outline:none}
+input[type=color]{width:26px;height:26px;padding:1px;cursor:pointer}
+.chip{display:inline-flex;align-items:center;padding:3px 9px;border-radius:18px;font-size:10px;cursor:pointer;border:1px solid var(--bd);background:var(--bg);transition:.15s;user-select:none}
+.chip.active{background:var(--sb-blue);color:#fff;border-color:var(--sb-blue)}
+.chip:hover{background:var(--bg3)}.chip.active:hover{background:#3a5f96}
+.sep{width:1px;height:20px;background:var(--bd);flex-shrink:0}
+#chart{width:100%;height:clamp(600px,82vh,960px)}
+.footer{text-align:center;font-size:11px;color:var(--tx3);margin-top:10px}
+@media(max-width:768px){body{padding:10px}#chart{height:75vh}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>VeritasAutoPlot™ T05 — Vertical Stack (Multi-Panel)</h1>
+  <div class="sub">Price+MA / Volume / MACD / RSI / KD — 共用同步 X 軸 · 面板可開關</div>
+</div>
+
+<div class="card">
+  <div class="ctrl-row">
+    <label style="font-size:11px;color:var(--tx2)">Panels:</label>
+    <span class="chip active" id="pVol" onclick="toggle(this);render()">Volume</span>
+    <span class="chip active" id="pMACD" onclick="toggle(this);render()">MACD</span>
+    <span class="chip active" id="pRSI" onclick="toggle(this);render()">RSI</span>
+    <span class="chip" id="pKD" onclick="toggle(this);render()">KD</span>
+    <div class="sep"></div>
+    <label style="font-size:11px;color:var(--tx2)">MA:</label>
+    <span class="chip active" id="sma5" onclick="toggle(this);render()">5</span>
+    <span class="chip active" id="sma20" onclick="toggle(this);render()">20</span>
+    <span class="chip" id="sma60" onclick="toggle(this);render()">60</span>
+    <span class="chip active" id="cBB" onclick="toggle(this);render()">BB</span>
+    <div class="sep"></div>
+    <span class="chip active" id="cHL" onclick="toggle(this);render()">H/L</span>
+    <span class="chip" id="cCrisis" onclick="toggle(this);render()">Crisis</span>
+  </div>
+  <div id="chart"></div>
+</div>
+
+<div class="footer">VeritasAutoPlot™ · T05 Vertical Stack · Synchronized X-Axis · Up to 5 panels</div>
+
+<script>
+/* ═══ Demo OHLCV ═══ */
+function genOHLCV(n=300){
+  const dates=[],open=[],high=[],low=[],close=[],vol=[];
+  let c=600,d=new Date('2023-04-01');
+  for(let i=0;i<n;i++){
+    const o=c+c*(Math.random()-.5)*0.008;
+    const chg=c*(Math.random()-.48)*0.022;
+    const cl=o+chg;
+    const h=Math.max(o,cl)+Math.abs(chg)*Math.random()*0.6;
+    const l=Math.min(o,cl)-Math.abs(chg)*Math.random()*0.6;
+    dates.push(d.toISOString().slice(0,10));
+    open.push(+o.toFixed(2));high.push(+h.toFixed(2));low.push(+l.toFixed(2));close.push(+cl.toFixed(2));
+    vol.push(Math.round(4e6+Math.random()*1e7));
+    c=cl;d=new Date(d.getTime()+864e5);
+    if(d.getDay()===0)d=new Date(d.getTime()+864e5);
+    if(d.getDay()===6)d=new Date(d.getTime()+2*864e5);
+  }
+  return{dates,open,high,low,close,vol};
+}
+const D=genOHLCV();
+
+/* ═══ Indicators ═══ */
+function sma(a,p){return a.map((_,i)=>i<p-1?null:a.slice(i-p+1,i+1).reduce((s,v)=>s+v,0)/p);}
+function ema(a,p){const k=2/(p+1);const r=[a[0]];for(let i=1;i<a.length;i++)r.push(a[i]*k+r[i-1]*(1-k));return r;}
+function bb(a,p,s){const m=sma(a,p);const u=[],l=[];for(let i=0;i<a.length;i++){if(m[i]===null){u.push(null);l.push(null);continue;}const sl=a.slice(Math.max(0,i-p+1),i+1);const avg=sl.reduce((s,v)=>s+v,0)/sl.length;const sd=Math.sqrt(sl.reduce((s,v)=>s+(v-avg)**2,0)/sl.length);u.push(+(m[i]+s*sd).toFixed(2));l.push(+(m[i]-s*sd).toFixed(2));}return{mid:m,upper:u,lower:l};}
+function rsi(a,p=14){const g=[0],l=[0];for(let i=1;i<a.length;i++){const d=a[i]-a[i-1];g.push(d>0?d:0);l.push(d<0?-d:0);}let ag=g.slice(1,p+1).reduce((s,v)=>s+v,0)/p;let al=l.slice(1,p+1).reduce((s,v)=>s+v,0)/p;const r=Array(p).fill(null);r.push(al===0?100:+(100-100/(1+ag/al)).toFixed(2));for(let i=p+1;i<a.length;i++){ag=(ag*(p-1)+g[i])/p;al=(al*(p-1)+l[i])/p;r.push(al===0?100:+(100-100/(1+ag/al)).toFixed(2));}return r;}
+function macd(a,f=12,s=26,sig=9){const ef=ema(a,f),es=ema(a,s);const line=ef.map((v,i)=>+(v-es[i]).toFixed(4));const signal=ema(line,sig);const hist=line.map((v,i)=>+(v-signal[i]).toFixed(4));return{line,signal,hist};}
+function kd(h,l,c,p=9,sk=3,sd=3){const rsv=[];for(let i=0;i<c.length;i++){if(i<p-1){rsv.push(50);continue;}const hh=Math.max(...h.slice(i-p+1,i+1)),ll=Math.min(...l.slice(i-p+1,i+1));rsv.push(hh===ll?50:(c[i]-ll)/(hh-ll)*100);}const K=[50],Dv=[50];for(let i=1;i<rsv.length;i++){K.push((K[K.length-1]*2+rsv[i])/3);Dv.push((Dv[Dv.length-1]*2+K[K.length-1])/3);}return{k:K,d:Dv};}
+
+function gc(id){return document.getElementById(id).classList.contains('active')}
+function toggle(el){el.classList.toggle('active')}
+const SB={bl:'#4C72B0',or:'#DD8452',gn:'#55A868',rd:'#C44E52',pu:'#8172B3',br:'#937860',pk:'#DA8BC3',gy:'#8C8C8C',yl:'#CCB974',cy:'#64B5CD'};
+const CFG={responsive:true,displayModeBar:false};
+const CRISES=[{name:'Correction',s:'2024-01-10',e:'2024-03-15',color:'#7f7f7f'}];
+
+function render(){
+  const showVol=gc('pVol'),showMACD=gc('pMACD'),showRSI=gc('pRSI'),showKD=gc('pKD');
+  const showBB=gc('cBB'),showHL=gc('cHL'),showCrisis=gc('cCrisis');
+
+  /* ═══ Dynamic domain allocation ═══ */
+  const panels=[{id:'main',ratio:5}];
+  if(showVol)panels.push({id:'vol',ratio:1.5});
+  if(showMACD)panels.push({id:'macd',ratio:1.5});
+  if(showRSI)panels.push({id:'rsi',ratio:1.2});
+  if(showKD)panels.push({id:'kd',ratio:1.2});
+  const totalRatio=panels.reduce((s,p)=>s+p.ratio,0);
+  const gap=0.025;
+  let cursor=0;
+  const domains={};
+  panels.forEach((p,i)=>{
+    const h=p.ratio/totalRatio*(1-gap*(panels.length-1));
+    domains[p.id]=[cursor,cursor+h];
+    cursor+=h+gap;
+  });
+
+  const traces=[];
+  let yIdx=1;
+
+  /* ═══ Panel 1: Price + MA + BB ═══ */
+  traces.push({type:'candlestick',x:D.dates,open:D.open,high:D.high,low:D.low,close:D.close,
+    name:'OHLC',yaxis:'y',increasing:{line:{color:SB.gn},fillcolor:SB.gn},decreasing:{line:{color:SB.rd},fillcolor:SB.rd}});
+
+  const maColors={5:SB.or,20:SB.bl,60:SB.pu};
+  [5,20,60].forEach(p=>{if(gc('sma'+p)){const v=sma(D.close,p);traces.push({type:'scatter',mode:'lines',x:D.dates,y:v,name:'SMA'+p,yaxis:'y',line:{color:maColors[p],width:1.2},connectgaps:true});}});
+
+  if(showBB){const b=bb(D.close,20,2);
+    traces.push({type:'scatter',mode:'lines',x:D.dates,y:b.upper,name:'BB Up',yaxis:'y',line:{color:SB.gy,width:.7,dash:'dash'},showlegend:false});
+    traces.push({type:'scatter',mode:'lines',x:D.dates,y:b.lower,name:'BB Dn',yaxis:'y',line:{color:SB.gy,width:.7,dash:'dash'},fill:'tonexty',fillcolor:'rgba(140,140,140,.06)',showlegend:false});
+    traces.push({type:'scatter',mode:'lines',x:D.dates,y:b.mid,name:'BB(20,2)',yaxis:'y',line:{color:SB.gy,width:.9}});}
+
+  /* ═══ Panel 2: Volume ═══ */
+  if(showVol){yIdx++;
+    const vc=D.close.map((c,i)=>c>=D.open[i]?SB.gn+'88':SB.rd+'88');
+    traces.push({type:'bar',x:D.dates,y:D.vol,name:'Volume',yaxis:'y'+yIdx,marker:{color:vc},showlegend:false});}
+
+  /* ═══ Panel 3: MACD ═══ */
+  if(showMACD){yIdx++;const m=macd(D.close);const yi='y'+yIdx;
+    const hc=m.hist.map(v=>v>=0?SB.gn+'99':SB.rd+'99');
+    traces.push({type:'bar',x:D.dates,y:m.hist,name:'MACD Hist',yaxis:yi,marker:{color:hc},showlegend:false});
+    traces.push({type:'scatter',mode:'lines',x:D.dates,y:m.line,name:'MACD',yaxis:yi,line:{color:SB.bl,width:1.2}});
+    traces.push({type:'scatter',mode:'lines',x:D.dates,y:m.signal,name:'Signal',yaxis:yi,line:{color:SB.or,width:1,dash:'dash'}});}
+
+  /* ═══ Panel 4: RSI ═══ */
+  if(showRSI){yIdx++;const rv=rsi(D.close);const yi='y'+yIdx;
+    traces.push({type:'scatter',mode:'lines',x:D.dates,y:rv,name:'RSI(14)',yaxis:yi,line:{color:SB.pu,width:1.3}});}
+
+  /* ═══ Panel 5: KD ═══ */
+  if(showKD){yIdx++;const kv=kd(D.high,D.low,D.close);const yi='y'+yIdx;
+    traces.push({type:'scatter',mode:'lines',x:D.dates,y:kv.k,name:'K',yaxis:yi,line:{color:SB.bl,width:1.2}});
+    traces.push({type:'scatter',mode:'lines',x:D.dates,y:kv.d,name:'D',yaxis:yi,line:{color:SB.or,width:1,dash:'dash'}});}
+
+  /* ═══ Layout ═══ */
+  const layout={
+    title:{text:'Vertical Stack — Multi-Panel Synchronized',font:{family:'Inter,Noto Sans TC',size:14,color:'#37352F'},x:0.01,xanchor:'left'},
+    paper_bgcolor:'#FFF',plot_bgcolor:'#FFF',
+    margin:{t:50,r:45,b:45,l:55},
+    hovermode:'x unified',hoverlabel:{bgcolor:'rgba(255,255,255,.95)',bordercolor:'#E8E7E4',font:{size:11}},
+    legend:{orientation:'h',y:1.08,x:0,font:{size:10}},
+    shapes:[],annotations:[],
+    /* Shared X axis at bottom panel */
+    xaxis:{showgrid:false,linecolor:'#E8E7E4',tickfont:{size:10,color:'#6B6B6B'},rangeslider:{visible:false},dtick:'M2',tickformat:'%Y-%m',anchor:'y'+(panels.length>1?yIdx:1)},
+  };
+
+  /* Build Y axes dynamically */
+  const panelIds=['main'];
+  if(showVol)panelIds.push('vol');if(showMACD)panelIds.push('macd');if(showRSI)panelIds.push('rsi');if(showKD)panelIds.push('kd');
+
+  panelIds.forEach((pid,i)=>{
+    const axKey=i===0?'yaxis':'yaxis'+(i+1);
+    const dm=domains[pid];
+    const ax={domain:dm,showgrid:true,gridcolor:'#F0EFEC',linecolor:'#E8E7E4',tickfont:{size:9,color:'#6B6B6B'},separatethousands:true};
+    if(pid==='main'){ax.title={text:'Price',font:{size:10}};}
+    if(pid==='vol'){ax.title={text:'Vol',font:{size:9,color:SB.gy}};}
+    if(pid==='macd'){ax.title={text:'MACD',font:{size:9,color:SB.bl}};}
+    if(pid==='rsi'){ax.range=[0,100];ax.title={text:'RSI',font:{size:9,color:SB.pu}};
+      layout.shapes.push({type:'line',xref:'paper',yref:axKey.replace('axis',''),x0:0,x1:1,y0:70,y1:70,line:{color:SB.rd,width:0.8,dash:'dot'}});
+      layout.shapes.push({type:'line',xref:'paper',yref:axKey.replace('axis',''),x0:0,x1:1,y0:30,y1:30,line:{color:SB.gn,width:0.8,dash:'dot'}});}
+    if(pid==='kd'){ax.range=[0,100];ax.title={text:'KD',font:{size:9,color:SB.bl}};
+      layout.shapes.push({type:'line',xref:'paper',yref:axKey.replace('axis',''),x0:0,x1:1,y0:80,y1:80,line:{color:SB.rd,width:0.8,dash:'dot'}});
+      layout.shapes.push({type:'line',xref:'paper',yref:axKey.replace('axis',''),x0:0,x1:1,y0:20,y1:20,line:{color:SB.gn,width:0.8,dash:'dot'}});}
+    if(i>0)ax.anchor='free';
+    layout[axKey]=ax;
+  });
+
+  /* Crisis shading */
+  if(showCrisis){CRISES.forEach(cr=>{
+    layout.shapes.push({type:'rect',xref:'x',yref:'paper',x0:cr.s,x1:cr.e,y0:0,y1:1,fillcolor:cr.color,opacity:0.12,line:{width:0}});
+    layout.annotations.push({x:cr.s,y:1.02,xref:'x',yref:'paper',text:cr.name,showarrow:false,font:{size:9,color:cr.color},xanchor:'left'});
+  });}
+
+  /* H/L */
+  if(showHL){
+    const mx=D.high.indexOf(Math.max(...D.high)),mn=D.low.indexOf(Math.min(...D.low));
+    layout.annotations.push(
+      {x:D.dates[mx],y:D.high[mx],text:'▲ '+D.high[mx].toLocaleString(),showarrow:true,arrowhead:0,ax:0,ay:-25,font:{size:9,color:SB.gn,weight:700},bgcolor:'rgba(255,255,255,.9)',bordercolor:SB.gn,borderwidth:1,borderpad:2},
+      {x:D.dates[mn],y:D.low[mn],text:'▼ '+D.low[mn].toLocaleString(),showarrow:true,arrowhead:0,ax:0,ay:25,font:{size:9,color:SB.rd,weight:700},bgcolor:'rgba(255,255,255,.9)',bordercolor:SB.rd,borderwidth:1,borderpad:2}
+    );
+  }
+
+  Plotly.react('chart',traces,layout,CFG);
+}
+
+render();
+</script>
+</body>
+</html>

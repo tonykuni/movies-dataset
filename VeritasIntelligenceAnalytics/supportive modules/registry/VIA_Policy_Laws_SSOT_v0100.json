@@ -1,6 +1,6 @@
 {
  "schema": "VIA.PolicyLaws.SSOT.v1",
- "batch": "批510",
+ "batch": "批511",
  "ts": "2026-09-15",
  "purpose": "政策庫正本:操作員律 + 紀律 + lessons-learned(只增不減;ENG082 sync-db 攤平入 via_policy_factors;VCGC 唯一對接口讀此冊)",
  "laws": [
@@ -153,6 +153,38 @@
    "batch": "批509",
    "cat": "交接",
    "zh": "多 AI 交會律:每個工作階段第一步 git fetch + git status + git log HEAD..origin 比對;落後就先 pull --ff-only 再造件;本機/另一 AI 的並行線一律先 commit 到側枝並 push(local/parallel-B<批>),再把工作分支對齊遠端;只由一隻手併(併時只增不減:版本檔名撞名者高版號另起,律/台帳/掉球清單取聯集);永不在陳舊樹上造件、永不 force push"
+  },
+  {
+   "key": "panorama_ssot_route",
+   "zh": "全景修復與調度只由VCGC呼叫既有EngineBus及原引擎；不建立第二套擷取器、環境管理器或政策正本。",
+   "cat": "中央治理",
+   "id": "L26",
+   "batch": "批511 併線(並行線 批508 panorama-v0103)",
+   "orig_id": "L24"
+  },
+  {
+   "key": "panorama_db_first",
+   "zh": "每次擷取前查正庫的日期、標的、欄位缺口；範圍預設最近兩個曆月且排除當日未完成資料。",
+   "cat": "增量",
+   "id": "L27",
+   "batch": "批511 併線(並行線 批508 panorama-v0103)",
+   "orig_id": "L25"
+  },
+  {
+   "key": "panorama_journal",
+   "zh": "批次先存來源Parquet/UTF8-BOM CSV，再交易式入庫，成功才原子記帳；中斷先重播已存批次，失敗與空資料不得冒充完成。",
+   "cat": "續傳",
+   "id": "L28",
+   "batch": "批511 併線(並行線 批508 panorama-v0103)",
+   "orig_id": "L26"
+  },
+  {
+   "key": "panorama_honest_matrix",
+   "zh": "獨立失敗不阻斷其他診斷；保存完整斷言與未修原因；尚有待修或必要驗收缺席不得INSTALL_OK。",
+   "cat": "驗證",
+   "id": "L29",
+   "batch": "批511 併線(並行線 批508 panorama-v0103)",
+   "orig_id": "L27"
   }
  ],
  "lessons": [
@@ -225,6 +257,43 @@
    "id": "LL14",
    "batch": "批510",
    "zh": "矩陣 vrn_firstpage 每跑 600s TIMEOUT,螢幕停著 PPP「OCR 引擎載入失敗…paddle_static」讓操作員以為沒有 OCR 引擎——其實 tesseract 直道在做工;燒時間的是 16 件 PARTIAL 每跑都重燒整條 OCR 階梯(命中律只認 SUCCESS/FAIL)。命中律要涵蓋 PARTIAL(TTL 內不重燒;--retry-failed 才重抽);最後一行不等於病因"
+  },
+  {
+   "key": "panorama_input_isolation",
+   "zh": "暫存輸出不等於輸入隔離；selftest須明示禁止掃入正式incoming。",
+   "cat": "測試",
+   "id": "LL15",
+   "batch": "批511 併線(並行線 批508 panorama-v0103)",
+   "orig_id": "LL11"
+  },
+  {
+   "key": "panorama_short_tail",
+   "zh": "截斷矩陣why會丟失失敗斷言；完整每站日誌與進度必须隨測試保存。",
+   "cat": "診斷",
+   "id": "LL16",
+   "batch": "批511 併線(並行線 批508 panorama-v0103)",
+   "orig_id": "LL12"
+  },
+  {
+   "key": "panorama_false_done",
+   "zh": "API空回或逾時不得加入done；以資料庫存在及欄位驗證為準，非checkpoint單方宣稱。",
+   "cat": "續傳",
+   "id": "LL17",
+   "batch": "批511 併線(並行線 批508 panorama-v0103)",
+   "orig_id": "LL13"
+  },
+  {
+   "key": "panorama_snapshot_atomic",
+   "zh": "ETF逐列autocommit會留下假完整快照；一日持股應同一交易提交，快照日期覆蓋與持股完整性分開。",
+   "cat": "資料品質",
+   "id": "LL18",
+   "batch": "批511 併線(並行線 批508 panorama-v0103)",
+   "orig_id": "LL14"
+  },
+  {
+   "id": "LL19",
+   "batch": "批511",
+   "zh": "併線實錄:操作員機器上的線是 main(8071a062)+並行 commit,不是本分支;側枝推上來後量到 734 件新增,374 件與倉內 byte 同、48 件互為孿生、.via_envmanager 163MB 執行期狀態被 commit 進來;四個檔撞名(Register v0200/ENG072 v0126/RunGate v0102/MDL149 v0102)各自內容不同。併法:撞名者留並行線內容、本線改動移到更高版號並帶上對方功能(只增不減);律/lessons 取聯集保留 orig_id;執行期狀態 gitignore;孿生只刪未被引用者。兩條線各寫各的記憶=兩個腦,L25 交會律不是建議是必須"
   }
  ]
 }

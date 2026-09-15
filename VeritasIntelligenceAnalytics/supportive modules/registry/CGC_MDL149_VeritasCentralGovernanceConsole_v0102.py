@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 r"""
-CGC_MDL149_VeritasCentralGovernanceConsole v0101 — Veritas Central Governance Console(VCGC;批506;v0101 批507)
-v0101→v0102(批508 操作員令「環境安裝出了問題可以先還原原本前次環境然後把所有工具順序安裝上 中高風險一律單獨隔離」→ 律 L24):二段 +環境復原(RECOVER_latest.json;MDL135 v0107 recover)· 頁卡 · status 行。
+CGC_MDL149_VeritasCentralGovernanceConsole v0102 — Veritas Central Governance Console(VCGC;批508)
+v0101→v0102(批508 結案):① INSTALL_OK 強制 VDF+VRN 兩族同時在位、家族境/必要庫/自測站全綠且 24h 內；
+  零站、SKIP、只跑一族都 BLOCKED_UNITEST。② VCGC 成為元件自動編號冊唯一寫入口：registry-sync 預設只列，
+  --apply 才把尾版引擎/模組/類別/函數/功能/短令/工具套件/環境以穩定編號寫入 append-only SSOT。
+  ③ 註冊稽核分開呈現「中央編號冊覆蓋」與「操作介面掛載」，不再用 ENG/MDL 編號片段模糊命中假裝已登。
 v0100→v0101(批507 操作員問「多 AI 寫作要怎麼接手不掉球、格式如何、長久使用」):一頁交接 +〇 接手提示詞(docs/VIA_AI_Handover_Prompt_v*.md 尾版全文嵌入)
   +九 掉球清單(docs/VIA_DroppedBalls_*.md 尾版);格子 PYCODE/自指站標「特殊」不當缺;十二檢。
 ====================================================================
@@ -10,7 +13,8 @@ v0100→v0101(批507 操作員問「多 AI 寫作要怎麼接手不掉球、格�
 控管 政策庫 · 邏輯庫 · 因子庫 · 資料庫 · VIA 引擎調度 · 多矩陣實測結果;不要丟失參數及指令;
 所有引擎/模組/功能/工具/環境都要註冊;lesson-learned;環境統一測式無誤後才可核可安裝;
 詳細 handover report 整合成同一頁 + 環境工具管理 + 自動編號註冊表。」(律 L20)
-Zero-Hydra:本台**只讀不造**——各庫各冊各引擎的正主不變,這裡是唯一對接口(讀它們的冊/台帳/報告、印一頁、稽核註冊)。
+Zero-Hydra:本台**預設只讀**——各庫各冊各引擎的正主不變；唯一例外是明示
+`registry-sync --apply` 原子寫中央元件編號冊，與 `page --publish` 發布同頁交接。
   政策庫  VIA_Policy_Laws_SSOT_v*.json(律+lessons)+ ENG082 policy_factors()(攤平入 via_policy_factors)
   邏輯庫  ENG082 LOGIC_latest.json(件/法/後端健康)+ sync_state(全庫同步對帳)
   因子庫  SUP_MDL748 policy_rows()(AllInOne + FDS 兩本冊)
@@ -18,16 +22,16 @@ Zero-Hydra:本台**只讀不造**——各庫各冊各引擎的正主不變,這�
   引擎調度 CGC_MDL095 Deck 任務冊 + VIA_InputConsole_Spec 項 + CGC_MDL064 格子站 + Register-VIA-Commands 指令(含用法/參數)
   多矩陣  ENGINE_BUS_latest.json(五矩陣)+ RUNGATE_latest.json(環境統一測式)
   環境工具 TOOLS_PLAN_latest.json(MDL135 tools)
-  環境復原 RECOVER_latest.json(MDL135 recover;律 L24 還原前次→順序裝→_M/_H 單獨隔離)
   註冊表  VIA_AutoCode_Registry(自動編號類別 current + 台帳尾)
-  註冊稽核 硬碟上的引擎家族(尾版)× 七處登冊(規格/Deck/格子/Register/Manager)→ 未登冊清單(誠實)
-  安裝核可 L19:RunGate 判定 GREEN 且 24h 內 → INSTALL_OK;否則 BLOCKED_UNITEST
-用法:python3 CGC_MDL149_VeritasCentralGovernanceConsole_v0101.py [status|page|onepage|audit|register-plan|check] [--publish] | --selftest
+  註冊稽核 尾版家族×中央元件編號冊；顯式操作介面(規格/Deck/格子/Register/Manager)另列缺口，不模糊命中
+  安裝核可 L19:RunGate 24h 內 VDF+VRN 兩族完整 GREEN → INSTALL_OK;否則 BLOCKED_UNITEST
+用法:python3 CGC_MDL149_VeritasCentralGovernanceConsole_v0102.py [status|page|onepage|audit|register-plan|registry-sync|check] [--publish|--apply] | --selftest
   page/onepage 預設落 VIA_Reports/vcgc/(不入 git、不弄髒工作樹);--publish 才複製到 ui_support 頁與 docs/VIA_Handover_ONEPAGE.md + 倉根 VIA_HANDOVER_LATEST.md(我 commit 時的手)
-律:零 CDN;零彈窗;零網路;只讀;誠實 ABSENT(報告不在=講不在,不編)。
+律:零 CDN;零彈窗;零網路;預設只讀；只有 page --publish 與 registry-sync --apply 明示寫入；誠實 ABSENT(報告不在=講不在,不編)。
 """
 from __future__ import annotations
 
+import ast
 import html
 import importlib.util
 import json
@@ -45,6 +49,8 @@ OUTDIR = REPORTS / "vcgc"
 VERSION = "0102"
 BATCH = 508
 UNITEST_MAX_AGE_H = 24.0
+INSTALL_REQUIRED_FAMILIES = ("vdf", "vrn")
+COMPONENT_REGISTRY = HERE / "VIA_Component_Inventory_SSOT_v0100.json"
 
 
 def _newest(root: Path, pat: str) -> Path | None:
@@ -74,6 +80,15 @@ def _age_h(ts: str) -> float | None:
         except Exception:
             pass
     return None
+
+
+def _nat(value) -> int:
+    """報告計數的 fail-closed 轉換；壞值/負值不得因相等而假綠。"""
+    try:
+        value = int(value)
+        return value if value >= 0 else -1
+    except (TypeError, ValueError):
+        return -1
 
 
 # ────────────────────────── 讀各庫各冊(只讀) ──────────────────────────
@@ -243,24 +258,51 @@ def tools_plan() -> dict:
             "unrouted": len(j.get("unrouted", [])), "hold": len(j.get("whitelist_hold", [])), "envs": [(e.get("name"), e.get("state")) for e in j.get("envs", [])][:24]}
 
 
-def recover_plan() -> dict:
-    """批508 律 L24:環境復原計畫(MDL135 recover;plan 唯讀;--execute --approve 才跑)。"""
-    j = _json(REPORTS / "env_governance" / "RECOVER_latest.json")
-    if not j:
-        return {"state": "ABSENT", "why": "RECOVER_latest.json 不在(via-envrecover;L24 安裝出問題先還原前次再順序裝)"}
-    return {"state": j.get("state", "?"), "ts": j.get("ts"), "restore": (j.get("restore") or {}).get("mode"), "stages": len((j.get("install") or {}).get("stages") or []),
-            "exclusive": (j.get("isolation") or {}).get("exclusive", []), "borrow_blocked": j.get("borrow_blocked", []),
-            "order": [x.split("(")[0] for x in (j.get("order") or [])]}
-
-
 def rungate() -> dict:
     p = Path(os.environ.get("VIA_RUNGATE_LATEST") or (REPORTS / "rungate" / "RUNGATE_latest.json"))
     j = _json(p)
     if not j:
         return {"state": "ABSENT", "why": f"{p.name} 不在(via-rungate 先跑)", "install": "BLOCKED_UNITEST"}
     age = _age_h(j.get("ts", ""))
-    ok = j.get("verdict") == "GREEN" and age is not None and age <= UNITEST_MAX_AGE_H
-    return {"state": j.get("verdict", "?"), "ts": j.get("ts"), "age_h": (round(age, 1) if age is not None else None), "families": list((j.get("families") or {}).keys()),
+    families = j.get("families") or {}
+    # L19 必驗族是政策常數，不允許以環境變數縮成單族繞門。
+    required = list(INSTALL_REQUIRED_FAMILIES)
+    reasons = []
+    if j.get("verdict") != "GREEN":
+        reasons.append(f"總燈={j.get('verdict', '?')}≠GREEN")
+    if age is None or not 0 <= age <= UNITEST_MAX_AGE_H:
+        reasons.append("RunGate 時間缺/來自未來/逾 24h")
+    coverage = {}
+    for fam in required:
+        f = families.get(fam)
+        if not isinstance(f, dict):
+            coverage[fam] = {"ok": False, "why": "家族未測"}
+            reasons.append(f"{fam} 家族未測")
+            continue
+        sm = f.get("summary") or {}
+        py_ok = (f.get("python") or {}).get("state") == "OK"
+        required_ok = _nat(sm.get("required_ok"))
+        required_n = _nat(sm.get("required_n"))
+        libs_ok = required_n > 0 and required_ok == required_n
+        engines_n = _nat(sm.get("engines_n"))
+        engines_ok = _nat(sm.get("engines_ok"))
+        tests_ok = engines_n > 0 and engines_ok == engines_n
+        fam_ok = f.get("verdict") == "GREEN" and py_ok and libs_ok and tests_ok
+        why = []
+        if f.get("verdict") != "GREEN": why.append(f"燈={f.get('verdict', '?')}")
+        if not py_ok: why.append("家族境非 OK")
+        if not libs_ok: why.append(f"必要庫 {sm.get('required_ok', 0)}/{sm.get('required_n', 0)}")
+        if not tests_ok: why.append(f"自測站 {engines_ok}/{engines_n}")
+        coverage[fam] = {"ok": fam_ok, "why": "、".join(why) or "完整 GREEN",
+                         "required_ok": required_ok, "required_n": required_n,
+                         "engines_ok": engines_ok, "engines_n": engines_n}
+        if not fam_ok:
+            reasons.append(f"{fam}:" + coverage[fam]["why"])
+    ok = not reasons
+    return {"state": j.get("verdict", "?"), "ts": j.get("ts"),
+            "age_h": (round(age, 1) if age is not None else None),
+            "families": list(families), "required_families": required,
+            "coverage": coverage, "reasons": reasons,
             "install": "INSTALL_OK" if ok else "BLOCKED_UNITEST"}
 
 
@@ -273,7 +315,8 @@ def bus() -> dict:
     for r in res:
         by[r.get("state", "?")] = by.get(r.get("state", "?"), 0) + 1
     reds = [(r.get("id") or r.get("item"), (r.get("why") or "")[:90]) for r in res if r.get("state") in ("RED", "TIMEOUT")]
-    return {"state": "OK", "ts": j.get("ts"), "apply_families": j.get("apply_families"), "n": len(res), "counts": by or j.get("counts", {}), "reds": reds[:12],
+    return {"state": "OK", "ts": j.get("ts"), "profile": j.get("profile", "run"),
+            "apply_families": j.get("apply_families"), "n": len(res), "counts": by or j.get("counts", {}), "reds": reds[:12],
             "html": str(REPORTS / "engine_bus" / "ENGINE_BUS_MATRIX.html")}
 
 
@@ -318,6 +361,169 @@ ENGINE_GLOBS = [("functional modules/VDF/engine", "*_v????.py"), ("functional mo
                 ("supportive modules/registry", "CGC_*_v????.py"), ("supportive modules/70_VRN_Rules", "SUP_*_v????.py"), ("supportive modules/network", "SUP_*_v????.py"),
                 ("supportive modules/VIA_Central_Governance", "CGC_*_v????.py"), (".", "VIA_SYSTEM_MANAGER_v????.py")]
 
+COMPONENT_PREFIX = {"system": "SYS", "engine": "ENG", "module": "MDL", "class": "CLS",
+                    "function": "FNC", "feature": "FNT", "tool": "TOOL",
+                    "package": "PKG", "environment": "ENV"}
+
+
+def _tail_files() -> dict[str, Path]:
+    """受治理範圍的尾版家族。版本變動不重發元件號。"""
+    fams: dict[str, Path] = {}
+    for d, g in ENGINE_GLOBS:
+        for q in (VIA / d).glob(g):
+            if "references" in q.parts or "_superseded" in str(q):
+                continue
+            stem = re.sub(r"_v\d{4}\.py$", "", q.name)
+            if stem not in fams or q.name > fams[stem].name:
+                fams[stem] = q
+    return fams
+
+
+def live_components() -> dict:
+    """建立可重現的活元件清單；不寫檔。
+
+    掃描界線刻意固定：受治理尾版 PY、其 AST 類別/函數、InputConsole 功能項、
+    Register 短令、ToolRoster/Baseline 工具套件與環境。references 收容件除非已被
+    規格冊掛成正式功能，否則不把整個封存倉當現役元件。
+    """
+    rows: dict[str, dict] = {}
+    parse_errors = []
+
+    def add(category: str, identity: str, source: str, line: int | None = None):
+        identity = str(identity).strip()
+        if not identity:
+            return
+        key = f"{category}|{identity}"
+        row = {"key": key, "category": category, "identity": identity, "source": source}
+        if line:
+            row["line"] = int(line)
+        rows.setdefault(key, row)
+
+    tails = _tail_files()
+    for stem, q in sorted(tails.items()):
+        rel = q.relative_to(VIA).as_posix()
+        cat = "engine" if re.search(r"_ENG\d+", stem) else ("module" if re.search(r"_MDL\d+", stem) else "system")
+        add(cat, stem, rel)
+        try:
+            tree = ast.parse(q.read_text(encoding="utf-8", errors="replace"), filename=str(q))
+        except Exception as exc:
+            parse_errors.append({"file": rel, "why": f"{type(exc).__name__}:{str(exc)[:100]}"})
+            continue
+
+        class Visitor(ast.NodeVisitor):
+            def __init__(self):
+                self.stack: list[str] = []
+
+            def visit_ClassDef(self, node):
+                qual = ".".join(self.stack + [node.name])
+                add("class", f"{stem}:{qual}", rel, node.lineno)
+                self.stack.append(node.name); self.generic_visit(node); self.stack.pop()
+
+            def _function(self, node):
+                qual = ".".join(self.stack + [node.name])
+                add("function", f"{stem}:{qual}", rel, node.lineno)
+                self.stack.append(node.name); self.generic_visit(node); self.stack.pop()
+
+            visit_FunctionDef = _function
+            visit_AsyncFunctionDef = _function
+
+        Visitor().visit(tree)
+
+    for it in spec_items().get("items", []):
+        add("feature", f"{it.get('family')}/{it.get('id')}", "VIA_InputConsole_Spec")
+    for c in register_cmds().get("cmds", []):
+        add("tool", c.get("cmd"), "Register-VIA-Commands")
+
+    baseline = _json(HERE / "VIA_EnvGovernance_Baseline_v0100.json") or {}
+    envs = {"base"}
+    for name, cfg in (baseline.get("env_layout") or {}).items():
+        if isinstance(cfg, dict):
+            envs.add(str(name)); envs.update(str(x) for x in cfg.get("aliases", []) if x)
+    for fam, cfg in (baseline.get("families") or {}).items():
+        if not isinstance(cfg, dict):
+            continue
+        envs.add(str(cfg.get("target_env") or "")); envs.update(str(x) for x in cfg.get("alt_envs", []) if x)
+        for pkg in cfg.get("members", []):
+            add("package", str(pkg).lower(), f"EnvBaseline:{fam}")
+    roster = _json(HERE / "VIA_ToolRoster_SSOT_v0100.json") or {}
+    for env, cfg in (roster.get("envs") or {}).items():
+        envs.add(str(env)); envs.update(str(x) for x in cfg.get("aliases", []) if x)
+        for tool in cfg.get("tools", []):
+            if isinstance(tool, dict):
+                add("package", str(tool.get("pip") or tool.get("imp") or "").lower(), f"ToolRoster:{env}")
+    runtime = _json(REPORTS / "env_governance" / "TOOLS_PLAN_latest.json") or {}
+    for e in runtime.get("envs", []):
+        if isinstance(e, dict): envs.add(str(e.get("name") or ""))
+    for env in sorted(x for x in envs if x):
+        add("environment", env, "EnvGovernance")
+    counts: dict[str, int] = {}
+    for r in rows.values():
+        counts[r["category"]] = counts.get(r["category"], 0) + 1
+    return {"rows": [rows[k] for k in sorted(rows)], "counts": counts,
+            "parse_errors": parse_errors, "tails": len(tails)}
+
+
+def component_registry() -> dict:
+    j = _json(COMPONENT_REGISTRY)
+    if not j:
+        return {"state": "ABSENT", "path": str(COMPONENT_REGISTRY), "n": 0,
+                "active": 0, "retired": 0, "counts": {}, "records": []}
+    rec = j.get("records") or []
+    active = [r for r in rec if r.get("state", "ACTIVE") == "ACTIVE"]
+    counts: dict[str, int] = {}
+    for r in active:
+        counts[r.get("category", "?")] = counts.get(r.get("category", "?"), 0) + 1
+    return {"state": "OK", "path": str(COMPONENT_REGISTRY), "n": len(rec),
+            "active": len(active), "retired": len(rec) - len(active), "counts": counts,
+            "updated_at": j.get("updated_at"), "records": rec, "counters": j.get("counters", {})}
+
+
+def registry_sync(apply: bool = False, path: Path = COMPONENT_REGISTRY) -> dict:
+    """VCGC 唯一寫入口；穩定號只增不減，消失件標 RETIRED、不刪號。"""
+    live = live_components()
+    old = _json(path) or {"schema": "VIA.ComponentInventory.v1", "append_only": True,
+                          "writer": "VCGC registry-sync --apply", "counters": {}, "records": []}
+    counters = {k: int(v) for k, v in (old.get("counters") or {}).items()}
+    records = [dict(r) for r in (old.get("records") or [])]
+    by_key = {r.get("key"): r for r in records if r.get("key")}
+    live_by = {r["key"]: r for r in live["rows"]}
+    new_keys = sorted(set(live_by) - set(by_key))
+    stale_keys = sorted(k for k, r in by_key.items() if r.get("state", "ACTIVE") == "ACTIVE" and k not in live_by)
+    tracked_fields = ("category", "identity", "source", "line")
+    changed_keys = sorted(
+        key for key in set(live_by) & set(by_key)
+        if by_key[key].get("state") != "ACTIVE"
+        or any(by_key[key].get(k) != live_by[key].get(k) for k in tracked_fields)
+    )
+    now = datetime.now().isoformat(timespec="seconds")
+    if apply:
+        for key in new_keys:
+            r = live_by[key]
+            prefix = COMPONENT_PREFIX[r["category"]]
+            counters[prefix] = counters.get(prefix, 0) + 1
+            records.append({**r, "code": f"VIA-{prefix}-{counters[prefix]:04d}",
+                            "state": "ACTIVE", "first_seen": now})
+        for key in changed_keys:
+            cur, src = by_key[key], live_by[key]
+            cur.update(src); cur["state"] = "ACTIVE"; cur.pop("retired_at", None)
+            cur["changed_at"] = now
+        for key in stale_keys:
+            by_key[key]["state"] = "RETIRED"; by_key[key]["retired_at"] = now
+        dirty = bool(new_keys or stale_keys or changed_keys or not path.exists())
+        if dirty:
+            out = {**old, "schema": "VIA.ComponentInventory.v1", "append_only": True,
+                   "writer": "VCGC registry-sync --apply", "batch": BATCH,
+                   "updated_at": now, "counters": counters,
+                   "records": sorted(records, key=lambda r: r.get("code", ""))}
+            path.parent.mkdir(parents=True, exist_ok=True)
+            tmp = path.with_suffix(path.suffix + ".tmp")
+            tmp.write_text(json.dumps(out, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+            os.replace(tmp, path)
+    return {"state": "APPLIED" if apply else "PLAN", "path": str(path),
+            "expected": len(live_by), "counts": live["counts"], "parse_errors": live["parse_errors"],
+            "new": len(new_keys), "new_keys": new_keys, "stale": len(stale_keys),
+            "stale_keys": stale_keys, "changed": len(changed_keys)}
+
 
 def audit(deck=None, spec=None, grid=None, reg=None, man=None) -> dict:
     deck = deck if deck is not None else deck_tasks()
@@ -329,29 +535,44 @@ def audit(deck=None, spec=None, grid=None, reg=None, man=None) -> dict:
     p = _newest(VIA, "Register-VIA-Commands-v*.ps1")
     if p:
         reg_text = p.read_text(encoding="utf-8", errors="replace")
-    hay = "\n".join([json.dumps(deck.get("tasks"), ensure_ascii=False), json.dumps(spec.get("items"), ensure_ascii=False),
-                     "\n".join(s["path"] + " " + s["name"] for s in grid.get("stations", [])), reg_text, json.dumps(man, ensure_ascii=False)])
-    fams: dict = {}
-    for d, g in ENGINE_GLOBS:
-        for q in (VIA / d).glob(g):
-            if "references" in q.parts or "_superseded" in str(q):
-                continue
-            stem = re.sub(r"_v\d{4}\.py$", "", q.name)
-            if stem not in fams or q.name > fams[stem]["newest"]:
-                fams[stem] = {"newest": q.name, "dir": d}
+    surface_text = {
+        "Deck": json.dumps(deck.get("tasks"), ensure_ascii=False),
+        "Spec": json.dumps(spec.get("items"), ensure_ascii=False),
+        "Grid": "\n".join(s["path"] + " " + s["name"] for s in grid.get("stations", [])),
+        "Register": reg_text,
+        "Manager": json.dumps(man, ensure_ascii=False),
+    }
+    fams = {stem: {"newest": q.name, "dir": q.parent.relative_to(VIA).as_posix()}
+            for stem, q in _tail_files().items()}
+    inv = component_registry()
+    inv_active = {r.get("key") for r in inv.get("records", []) if r.get("state", "ACTIVE") == "ACTIVE"}
     rows = []
     for stem, v in sorted(fams.items()):
-        key = stem.split("_")[0] + "_" + stem.split("_")[1] if stem.count("_") >= 1 else stem      # 例 VRN_ENG082 / CGC_MDL149
-        registered = (stem in hay) or (key in hay and key.count("_") == 1 and len(key) > 6)
-        rows.append({"family": stem, "newest": v["newest"], "dir": v["dir"], "registered": bool(registered)})
+        cat = "engine" if re.search(r"_ENG\d+", stem) else ("module" if re.search(r"_MDL\d+", stem) else "system")
+        registered = f"{cat}|{stem}" in inv_active
+        surfaces = [name for name, text in surface_text.items() if stem in text]
+        rows.append({"family": stem, "newest": v["newest"], "dir": v["dir"],
+                     "registered": registered, "surfaces": surfaces,
+                     "interface_registered": bool(surfaces)})
     unreg = [r for r in rows if not r["registered"]]
-    return {"families": len(rows), "registered": len(rows) - len(unreg), "unregistered": unreg, "rows": rows}
+    interface_gaps = [r for r in rows if not r["interface_registered"]]
+    live = live_components()
+    live_keys = {r["key"] for r in live["rows"]}
+    missing_all = sorted(live_keys - inv_active)
+    return {"families": len(rows), "registered": len(rows) - len(unreg),
+            "unregistered": unreg, "rows": rows, "interface_registered": len(rows) - len(interface_gaps),
+            "interface_gaps": interface_gaps, "inventory_state": inv.get("state"),
+            "inventory_active": inv.get("active", 0), "inventory_expected": len(live_keys),
+            "inventory_missing": missing_all, "inventory_counts": inv.get("counts", {}),
+            "parse_errors": live.get("parse_errors", [])}
 
 
 def check() -> dict:
-    """L19 安裝核可:RunGate GREEN 且 24h 內。"""
+    """L19 安裝核可:VDF+VRN 完整 RunGate GREEN 且 24h 內。"""
     r = rungate()
-    return {"install": r.get("install"), "rungate": r.get("state"), "age_h": r.get("age_h"), "law": "L19 環境統一測式無誤後才可核可安裝"}
+    return {"install": r.get("install"), "rungate": r.get("state"), "age_h": r.get("age_h"),
+            "required_families": r.get("required_families"), "coverage": r.get("coverage"),
+            "reasons": r.get("reasons"), "law": "L19 環境統一測式(VDF+VRN 完整覆蓋)無誤後才可核可安裝"}
 
 
 # ────────────────────────── 一頁交接 + 頁 ──────────────────────────
@@ -359,12 +580,12 @@ def snapshot() -> dict:
     deck, spec, grid, reg, man = deck_tasks(), spec_items(), grid_stations(), register_cmds(), manager_names()
     return {"ts": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "version": VERSION, "batch": BATCH, "laws": laws(), "ledger": ledger(), "deck": deck, "spec": spec,
             "grid": grid, "register": reg, "manager": man, "db_sheet": db_sheet(), "datahome": datahome(), "logic": logic(), "factors": factors(),
-            "tools": tools_plan(), "recover": recover_plan(), "rungate": rungate(), "bus": bus(), "handover": handover_src(), "audit": audit(deck, spec, grid, reg, man),
-            "prompt": prompt_doc(), "balls": dropped_balls()}
+            "tools": tools_plan(), "rungate": rungate(), "bus": bus(), "handover": handover_src(), "audit": audit(deck, spec, grid, reg, man),
+            "inventory": component_registry(), "prompt": prompt_doc(), "balls": dropped_balls()}
 
 
 def onepage_md(s: dict) -> str:
-    L, lg, dk, sp, gr, rg, mn, db, dh, lo, fa, tp, ru, bu, ho, au = (s[k] for k in ("laws", "ledger", "deck", "spec", "grid", "register", "manager", "db_sheet", "datahome", "logic", "factors", "tools", "rungate", "bus", "handover", "audit"))
+    L, lg, dk, sp, gr, rg, mn, db, dh, lo, fa, tp, ru, bu, ho, au, inv = (s[k] for k in ("laws", "ledger", "deck", "spec", "grid", "register", "manager", "db_sheet", "datahome", "logic", "factors", "tools", "rungate", "bus", "handover", "audit", "inventory"))
     o = [f"# VIA 一頁交接 · Veritas Central Governance Console(VCGC v{VERSION} · 批{BATCH})", "",
          f"> 產生 {s['ts']} · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。", ""]
     pr, bl = s.get("prompt", {}), s.get("balls", {})
@@ -373,36 +594,47 @@ def onepage_md(s: dict) -> str:
     for x in L["laws"]:
         o.append(f"- **{x['id']}**({x['batch']};{x['cat']}){x['zh']}")
     o += ["", "**Lessons-learned**", ""] + [f"- {x['id']}({x['batch']}){x['zh']}" for x in L["lessons"]]
-    rv = s.get("recover") or {}
     o += ["", "## 二 · 安裝核可(L19)與環境工具", "",
-          f"- RunGate:{ru.get('state')} · {ru.get('ts') or '-'} · 齡 {ru.get('age_h')} h → **{ru.get('install')}**" + (f"({ru.get('why')})" if ru.get("why") else ""),
-          f"- 工具冊導入計畫:{tp.get('state')} · {tp.get('ts') or '-'} · 件態 {tp.get('counts')} · 風險 {tp.get('risk')} · 段 {tp.get('stages')} · 未路由 {tp.get('unrouted')} · 白名單留置 {tp.get('hold')}" + (f"({tp.get('why')})" if tp.get("why") else ""),
-          f"- 環境復原(L24):{rv.get('state')} · {rv.get('ts') or '-'} · 還原 {rv.get('restore') or '-'} · 段 {rv.get('stages')} · 單獨隔離境 {rv.get('exclusive')} · 借境封鎖 {rv.get('borrow_blocked')} · 次序 {' → '.join(rv.get('order') or []) or '-'}" + (f"({rv.get('why')})" if rv.get("why") else ""),
-          "- 裝件=操作員的手:`$env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve`(閘不代設;L19 未綠=BLOCKED_UNITEST);安裝出問題=`via-envrecover`(L24:①還原前次 ②順序裝 ③_M/_H 單獨隔離;-Execute -Approve 才跑,① 不受 L19,② 過 L19)", ""]
+          f"- RunGate:{ru.get('state')} · {ru.get('ts') or '-'} · 齡 {ru.get('age_h')} h · 必驗 {ru.get('required_families')} · 覆蓋 {ru.get('coverage')} → **{ru.get('install')}**" + (f" · 原因 {ru.get('reasons')}" if ru.get("reasons") else ""),
+          f"- 工具冊導入計畫:{tp.get('state')} · {tp.get('ts') or '-'} · 件態 {tp.get('counts') if tp.get('counts') is not None else '-'} · 風險 {tp.get('risk') if tp.get('risk') is not None else '-'} · 段 {tp.get('stages') if tp.get('stages') is not None else '-'} · 未路由 {tp.get('unrouted') if tp.get('unrouted') is not None else '-'} · 白名單留置 {tp.get('hold') if tp.get('hold') is not None else '-'}" + (f"({tp.get('why')})" if tp.get("why") else ""),
+          "- 裝件=操作員的手:`$env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve`(閘不代設;L19 未綠=BLOCKED_UNITEST)", ""]
     o += ["## 三 · 邏輯庫 · 因子庫 · 資料庫", "",
           f"- 邏輯庫 {lo.get('state')}:件 {lo.get('files')} · 判準 {lo.get('verdicts')} · 壞後端 {lo.get('broken')} · 政策因子 {lo.get('policy_rows')} 列 · 全庫同步 {lo.get('sync')} · 交接三處 {lo.get('handover')}",
           f"- 因子庫 {fa.get('state')}:{fa.get('rows')} 列 · {fa.get('by_source')} · 掛載 {fa.get('mounts')}",
           f"- 庫表冊 {db.get('state')}:{db.get('n')} 表({db.get('batch')})· 全庫表 {db.get('all_home')} · 庫 {db.get('dbs')}",
-          f"- 資料家 {dh.get('state')}:{dh.get('home') or dh.get('why')} · 庫 {dh.get('dbs')} · 表 {dh.get('tables')} · 湖 {dh.get('lakes')}", ""]
+          f"- 資料家 {dh.get('state')}:{dh.get('home') or dh.get('why')} · 庫 {dh.get('dbs') if dh.get('dbs') is not None else '-'} · 表 {dh.get('tables') if dh.get('tables') is not None else '-'} · 湖 {dh.get('lakes') if dh.get('lakes') is not None else '-'}", ""]
     o += ["## 四 · 引擎調度 · 多矩陣實測", "",
-          f"- 五矩陣 {bu.get('state')}:{bu.get('ts') or bu.get('why')} · 真跑 {bu.get('apply_families')} · 項 {bu.get('n')} · 態 {bu.get('counts')}"]
+          f"- 五矩陣 {bu.get('state')}:{bu.get('ts') or bu.get('why')} · profile {bu.get('profile')} · 真跑 {bu.get('apply_families')} · 項 {bu.get('n')} · 態 {bu.get('counts')}"]
     for rid, why in (bu.get("reds") or []):
         o.append(f"  - RED {rid}:{why}")
     o += [f"- Deck 任務 {len(dk.get('tasks', {}))} · 規格項 {len(sp.get('items', []))} · 格子站 {len(gr.get('stations', []))}(在位 {sum(1 for x in gr.get('stations', []) if x['present'])})· Register 指令 {len(rg.get('cmds', []))} · Manager 正式名稱 任務 {len(mn.get('tasks', {}))} / 引擎 {len(mn.get('engines', {}))}", ""]
     o += ["## 五 · 指令與參數(不丟失;來源 " + str(rg.get("src")) + ")", ""] + [f"- `{c['cmd']}`" + (f"(別名 {'/'.join(c['aliases'])})" if c["aliases"] else "") + (f":{c['usage']}" if c["usage"] else "") for c in rg.get("cmds", [])]
-    o += ["", "## 六 · 註冊稽核(所有引擎/模組/工具都要註冊)", "",
-          f"- 引擎家族(尾版){au['families']} · 已登冊 {au['registered']} · **未登冊 {len(au['unregistered'])}**"] + [f"  - {r['newest']}({r['dir']})" for r in au["unregistered"][:60]]
-    o += ["", "## 七 · 自動編號註冊表(台帳)", "", f"- 台帳 {lg.get('n')} 筆 · 元件 {lg.get('components')} · 更新 {lg.get('updated_at')}",
+    o += ["", "## 六 · 註冊稽核(所有引擎/模組/功能/工具/環境)", "",
+          f"- 中央自動編號冊 {au.get('inventory_state')} · ACTIVE {au.get('inventory_active')}/{au.get('inventory_expected')} · **缺 {len(au.get('inventory_missing', []))}** · 類別 {au.get('inventory_counts')}",
+          f"- 尾版引擎/模組家族 {au['families']} · 中央冊已登 {au['registered']} · **未登 {len(au['unregistered'])}** · 操作介面有掛載 {au.get('interface_registered')} · 內部件無操作介面 {len(au.get('interface_gaps', []))}(誠實分列，不拿編號片段假命中)"] + [f"  - 未登 {r['newest']}({r['dir']})" for r in au["unregistered"][:60]]
+    o += ["", "## 七 · 自動編號註冊表(台帳)", "", f"- 全域台帳 {lg.get('n')} 筆 · 元件 {lg.get('components')} · 更新 {lg.get('updated_at')}",
+          f"- 元件冊 {inv.get('state')} · ACTIVE {inv.get('active')} · RETIRED {inv.get('retired')} · 更新 {inv.get('updated_at')} · {inv.get('counts')}",
           "- 類別 current:" + " · ".join(f"{k} {v}" for k, v in (lg.get("categories") or {}).items() if v), ""]
     for e in (lg.get("tail") or [])[-6:]:
-        o.append(f"- {e.get('ts')} {str(e.get('kind'))[:90]}")
-    secs = ho.get("sections") or {}
+        detail = e.get("kind") or " ".join(
+            str(x) for x in (e.get("op"), e.get("category"), e.get("component"), e.get("code")) if x
+        )
+        o.append(f"- {e.get('ts')} {detail[:90]}")
     o += ["", f"## 八 · 交接本文(來源 {ho.get('src')};逐批紀錄見該檔)", ""]
+    # 批508：舊版只挑名稱寫死的「三 還掛／四 紀律／五 一貼」三節；
+    # 新固定格式 〇–八 因此整段空白。交接不能靠標題碰巧同名，尾版全文才是
+    # 唯一記憶。嵌入時只把標題降一級，維持 ONEPAGE 九個主段不被打散。
+    handover_lines = []
+    for i, line in enumerate((ho.get("text") or "").splitlines()):
+        if i == 0 and line.startswith("# "):
+            continue
+        if line.startswith("### "):
+            line = "#### " + line[4:]
+        elif line.startswith("## "):
+            line = "### " + line[3:]
+        handover_lines.append(line)
+    o += handover_lines or ["(逐批交接本文缺)"]
     o_tail = ["", f"## 九 · 掉球清單(來源 {bl.get('src') or 'ABSENT'};列 {bl.get('n')} · 未結 {bl.get('open')};只增不減,結案劃線)", "", (bl.get("text") or "(缺)").strip(), ""]
-    for key in ("三 · 還掛著的事", "四 · 紀律(每條都付過代價)", "五 · 一貼即用(操作員工作站)"):
-        for k, v in secs.items():
-            if k.startswith(key.split("(")[0]):
-                o += [f"### {k}", "", v, ""]
     o += o_tail
     return "\n".join(o) + "\n"
 
@@ -417,32 +649,31 @@ def page_html(s: dict) -> str:
             h += "<tr>" + "".join(f"<td>{esc(r.get(c, ''))}</td>" for c in cols) + "</tr>"
         return h + "</table>"
     lamp = {"OK": "#16a34a", "GREEN": "#16a34a", "INSTALL_OK": "#16a34a", "ABSENT": "#6b7280", "BLOCKED_UNITEST": "#f59e0b", "RED": "#dc2626", "PLAN": "#2563eb"}
-    ru, bu, tp, lo, fa, db, dh, au, rg, lg, L = (s[k] for k in ("rungate", "bus", "tools", "logic", "factors", "db_sheet", "datahome", "audit", "register", "ledger", "laws"))
-    rv = s.get("recover") or {}
+    ru, bu, tp, lo, fa, db, dh, au, rg, lg, L, inv = (s[k] for k in ("rungate", "bus", "tools", "logic", "factors", "db_sheet", "datahome", "audit", "register", "ledger", "laws", "inventory"))
 
     def chip(t):
         return f'<span class="chip" style="background:{lamp.get(str(t).split(" ")[0], "#6b7280")}">{esc(t)}</span>'
     parts = [f"<!doctype html><html lang='zh-Hant'><head><meta charset='utf-8'><title>Veritas Central Governance Console v{VERSION}</title>",
              "<style>body{font-family:'Segoe UI',system-ui,sans-serif;margin:0;background:#0f172a;color:#e5e7eb}header{padding:18px 28px;background:#111827;border-bottom:1px solid #334155}h1{margin:0;font-size:20px}h2{font-size:15px;margin:22px 0 8px;color:#93c5fd}section{padding:6px 28px}table{border-collapse:collapse;font-size:12px;width:100%}th,td{border:1px solid #334155;padding:4px 6px;text-align:left;vertical-align:top}th{background:#1f2937}.chip{display:inline-block;padding:2px 8px;border-radius:10px;color:#fff;font-size:12px;margin-right:6px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}.card{background:#111827;border:1px solid #334155;border-radius:8px;padding:10px 12px;font-size:13px}code{background:#1f2937;padding:1px 4px;border-radius:4px}small{color:#9ca3af}</style></head><body>",
-             f"<header><h1>Veritas Central Governance Console <small>v{VERSION} · 批{BATCH} · {esc(s['ts'])} · 唯一對接口(L20)· 零 CDN · 只讀</small></h1></header>",
+             f"<header><h1>Veritas Central Governance Console <small>v{VERSION} · 批{BATCH} · {esc(s['ts'])} · 唯一對接口(L20)· 零 CDN · 預設只讀</small></h1></header>",
              "<section><div class='grid'>",
-             f"<div class='card'><b>安裝核可 L19</b><br>{chip(ru.get('install'))} RunGate {chip(ru.get('state'))} {esc(ru.get('ts') or ru.get('why') or '')} 齡 {esc(ru.get('age_h'))} h</div>",
-             f"<div class='card'><b>五矩陣</b><br>{chip(bu.get('state'))} {esc(bu.get('ts') or bu.get('why') or '')}<br>{esc(bu.get('counts'))}</div>",
-             f"<div class='card'><b>環境工具計畫</b><br>{chip(tp.get('state'))} {esc(tp.get('ts') or tp.get('why') or '')}<br>{esc(tp.get('counts'))} · 風險 {esc(tp.get('risk'))}</div>",
-             f"<div class='card'><b>環境復原(L24)</b><br>{chip(rv.get('state'))} {esc(rv.get('ts') or rv.get('why') or '')}<br>還原 {esc(rv.get('restore') or '-')} · 段 {esc(rv.get('stages'))} · 隔離境 {esc(len(rv.get('exclusive') or []))}</div>",
+             f"<div class='card'><b>安裝核可 L19</b><br>{chip(ru.get('install'))} RunGate {chip(ru.get('state'))} {esc(ru.get('ts') or ru.get('why') or '')} 齡 {esc(ru.get('age_h'))} h<br>必驗 {esc(ru.get('required_families'))} · {esc(ru.get('coverage'))}<br>{esc(ru.get('reasons'))}</div>",
+             f"<div class='card'><b>五矩陣</b><br>{chip(bu.get('state'))} {esc(bu.get('ts') or bu.get('why') or '')} · profile {esc(bu.get('profile'))}<br>{esc(bu.get('counts'))}</div>",
+             f"<div class='card'><b>環境工具計畫</b><br>{chip(tp.get('state'))} {esc(tp.get('ts') or tp.get('why') or '')}<br>{esc(tp.get('counts') if tp.get('counts') is not None else '-')} · 風險 {esc(tp.get('risk') if tp.get('risk') is not None else '-')}</div>",
              f"<div class='card'><b>邏輯庫</b><br>{chip(lo.get('state'))} 件 {esc(lo.get('files'))} · {esc(lo.get('verdicts'))}<br>壞後端 {esc(lo.get('broken'))}<br>同步 {esc(lo.get('sync'))}</div>",
              f"<div class='card'><b>因子庫</b><br>{chip(fa.get('state'))} {esc(fa.get('rows'))} 列 · {esc(fa.get('by_source'))}</div>",
-             f"<div class='card'><b>資料庫</b><br>庫表冊 {esc(db.get('n'))} 表({esc(db.get('batch'))})· 資料家 {chip(dh.get('state'))} {esc(dh.get('home') or dh.get('why'))} · 庫 {esc(dh.get('dbs'))} 湖 {esc(dh.get('lakes'))}</div>",
-             f"<div class='card'><b>註冊稽核</b><br>家族 {au['families']} · 已登 {au['registered']} · 未登 {len(au['unregistered'])}</div>",
+             f"<div class='card'><b>資料庫</b><br>庫表冊 {esc(db.get('n'))} 表({esc(db.get('batch'))})· 資料家 {chip(dh.get('state'))} {esc(dh.get('home') or dh.get('why'))} · 庫 {esc(dh.get('dbs') if dh.get('dbs') is not None else '-')} 湖 {esc(dh.get('lakes') if dh.get('lakes') is not None else '-')}</div>",
+             f"<div class='card'><b>註冊稽核</b><br>中央冊 {esc(au.get('inventory_active'))}/{esc(au.get('inventory_expected'))} · 缺 {len(au.get('inventory_missing', []))}<br>尾版家族 {au['families']} · 已登 {au['registered']} · 未登 {len(au['unregistered'])} · 介面掛載 {esc(au.get('interface_registered'))}</div>",
              f"<div class='card'><b>掉球清單</b><br>{esc(s.get('balls', {}).get('src') or 'ABSENT')} · 列 {esc(s.get('balls', {}).get('n'))} · 未結 {esc(s.get('balls', {}).get('open'))}<br><small>接手提示詞:{esc(s.get('prompt', {}).get('src') or 'ABSENT')}</small></div>",
-             f"<div class='card'><b>自動編號註冊表</b><br>台帳 {esc(lg.get('n'))} 筆 · 元件 {esc(lg.get('components'))}<br>{esc({k: v for k, v in (lg.get('categories') or {}).items() if v})}</div>",
+             f"<div class='card'><b>自動編號註冊表</b><br>全域台帳 {esc(lg.get('n'))} 筆 · 舊元件 {esc(lg.get('components'))}<br>元件冊 ACTIVE {esc(inv.get('active'))} · RETIRED {esc(inv.get('retired'))}<br>{esc(inv.get('counts'))}</div>",
              "</div></section>",
              "<section><h2>政策庫 · 律</h2>" + table(L["laws"], ["id", "batch", "cat", "zh"]) + "<h2>Lessons-learned</h2>" + table(L["lessons"], ["id", "batch", "zh"]) + "</section>",
              "<section><h2>指令與參數(不丟失)</h2>" + table([{"cmd": c["cmd"], "aliases": "/".join(c["aliases"]), "usage": c["usage"]} for c in rg.get("cmds", [])], ["cmd", "aliases", "usage"]) + "</section>",
              "<section><h2>Deck 任務冊</h2>" + table([{"task": k, "zh": v["zh"], "net": v["net"], "argv": " ".join(Path(a).name if "/" in a or "\\" in a else a for a in v["argv"])} for k, v in s["deck"].get("tasks", {}).items()], ["task", "zh", "net", "argv"]) + "</section>",
              "<section><h2>主控台規格項</h2>" + table(s["spec"].get("items", []), ["family", "id", "zh", "glob", "verb", "params", "net", "state"]) + "</section>",
              "<section><h2>格子站</h2>" + table(s["grid"].get("stations", []), ["name", "present", "path"]) + "</section>",
-             "<section><h2>未登冊引擎家族(誠實)</h2>" + table(au["unregistered"], ["family", "newest", "dir"]) + "</section>",
+             "<section><h2>未登中央編號冊的引擎家族(誠實)</h2>" + table(au["unregistered"], ["family", "newest", "dir", "surfaces"]) + "</section>",
+             "<section><h2>中央冊完整但未設操作介面的內部家族(不是未註冊)</h2>" + table(au.get("interface_gaps", []), ["family", "newest", "dir"]) + "</section>",
              "<section><h2>紅項(五矩陣)</h2>" + table([{"id": i, "why": w} for i, w in (bu.get("reds") or [])], ["id", "why"]) + "</section>",
              "<section><h2>台帳尾</h2>" + table(lg.get("tail") or [], ["ts", "kind"]) + "</section>",
              "</body></html>"]
@@ -472,10 +703,9 @@ def status() -> int:
     print(f"  因子庫 {s['factors'].get('state')}:{s['factors'].get('rows')} 列 {s['factors'].get('by_source')}")
     print(f"  資料庫:庫表冊 {s['db_sheet'].get('n')} 表 · 資料家 {s['datahome'].get('state')} {s['datahome'].get('home') or s['datahome'].get('why')}")
     print(f"  引擎調度:Deck {len(s['deck'].get('tasks', {}))} 任務 · 規格 {len(s['spec'].get('items', []))} 項 · 格子 {len(s['grid'].get('stations', []))} 站 · Register {len(s['register'].get('cmds', []))} 指令")
-    print(f"  多矩陣 {s['bus'].get('state')}:{s['bus'].get('counts') or s['bus'].get('why')} · RunGate {s['rungate'].get('state')} → {s['rungate'].get('install')}")
+    print(f"  多矩陣 {s['bus'].get('state')}:{s['bus'].get('counts') or s['bus'].get('why')} · profile {s['bus'].get('profile')} · RunGate {s['rungate'].get('state')} → {s['rungate'].get('install')}")
     print(f"  環境工具 {s['tools'].get('state')}:{s['tools'].get('counts') or s['tools'].get('why')}")
-    print(f"  環境復原 {s['recover'].get('state')}:{s['recover'].get('restore') or s['recover'].get('why')} · 隔離境 {len(s['recover'].get('exclusive') or [])}(L24)")
-    print(f"  註冊稽核:家族 {s['audit']['families']} · 已登 {s['audit']['registered']} · 未登 {len(s['audit']['unregistered'])}" + (":" + ", ".join(r['newest'] for r in s['audit']['unregistered'][:8]) if s['audit']['unregistered'] else ""))
+    print(f"  註冊稽核:中央冊 {s['audit'].get('inventory_active')}/{s['audit'].get('inventory_expected')} 缺 {len(s['audit'].get('inventory_missing', []))} · 家族 {s['audit']['families']} 已登 {s['audit']['registered']} 未登 {len(s['audit']['unregistered'])} · 操作介面 {s['audit'].get('interface_registered')}" + (":" + ", ".join(r['newest'] for r in s['audit']['unregistered'][:8]) if s['audit']['unregistered'] else ""))
     print(f"  台帳 {s['ledger'].get('n')} 筆 · 交接源 {s['handover'].get('src')} · 頁/一頁:via-vcgc page|onepage(落 VIA_Reports/vcgc;--publish 才入倉)")
     return 0
 
@@ -504,46 +734,102 @@ def selftest() -> int:
     mn = manager_names()
     chk("⑦ Manager 正式名稱只讀(任務 ≥50 · 引擎 ≥30)", mn["state"] == "OK" and len(mn["tasks"]) >= 50 and len(mn["engines"]) >= 30, f"({len(mn['tasks'])}/{len(mn['engines'])})")
     au = audit(dk, sp, gr, rg, mn)
-    chk("⑧ 註冊稽核:家族 ≥80;本批引擎(CGC_MDL149/VDF_ENG082/SUP_MDL748/VRN_ENG082)皆已登冊;未登冊清單誠實列出",
+    chk("⑧ 註冊稽核:家族 ≥80;本批引擎(CGC_MDL149/VDF_ENG082/SUP_MDL748/VRN_ENG082)皆在中央自動編號冊;操作介面覆蓋另列不模糊命中",
         au["families"] >= 80 and all(any(r["family"].startswith(k) and r["registered"] for r in au["rows"]) for k in ("VDF_ENG082_FinStatements", "SUP_MDL748_FinancialLogicHub", "VRN_ENG082_ExtractionLogic")),
-        f"(家族 {au['families']} · 已登 {au['registered']} · 未登 {len(au['unregistered'])})")
+        f"(家族 {au['families']} · 中央冊 {au['registered']} · 未登 {len(au['unregistered'])} · 介面 {au.get('interface_registered')})")
     sv = os.environ.get("VIA_RUNGATE_LATEST")
+    sr = os.environ.get("VIA_INSTALL_REQUIRED_FAMILIES")
     with tempfile.TemporaryDirectory() as td:
         os.environ["VIA_RUNGATE_LATEST"] = str(Path(td) / "none.json")
         c0 = check()
-        Path(td, "g.json").write_text(json.dumps({"verdict": "GREEN", "ts": datetime.now().strftime("%Y-%m-%dT%H:%M:%S"), "families": {"vrn": {}}}), encoding="utf-8")
-        os.environ["VIA_RUNGATE_LATEST"] = str(Path(td) / "g.json")
+        good_family = {"verdict": "GREEN", "python": {"state": "OK"},
+                       "summary": {"required_ok": 3, "required_n": 3, "engines_ok": 3, "engines_n": 3}}
+        Path(td, "one.json").write_text(json.dumps({"verdict": "GREEN", "ts": datetime.now().strftime("%Y-%m-%dT%H:%M:%S"), "families": {"vrn": good_family}}), encoding="utf-8")
+        os.environ["VIA_RUNGATE_LATEST"] = str(Path(td) / "one.json")
+        os.environ["VIA_INSTALL_REQUIRED_FAMILIES"] = "vrn"  # 舊繞門形：不得縮減 L19 必驗族
         c1 = check()
+        incomplete = {**good_family, "summary": {**good_family["summary"], "engines_ok": 0, "engines_n": 0}}
+        Path(td, "zero.json").write_text(json.dumps({"verdict": "GREEN", "ts": datetime.now().strftime("%Y-%m-%dT%H:%M:%S"), "families": {"vdf": incomplete, "vrn": good_family}}), encoding="utf-8")
+        os.environ["VIA_RUNGATE_LATEST"] = str(Path(td) / "zero.json")
+        c2 = check()
+        Path(td, "both.json").write_text(json.dumps({"verdict": "GREEN", "ts": datetime.now().strftime("%Y-%m-%dT%H:%M:%S"), "families": {"vdf": good_family, "vrn": good_family}}), encoding="utf-8")
+        os.environ["VIA_RUNGATE_LATEST"] = str(Path(td) / "both.json")
+        c3 = check()
+        no_libs = {**good_family, "summary": {**good_family["summary"], "required_ok": 0, "required_n": 0}}
+        Path(td, "nolibs.json").write_text(json.dumps({"verdict": "GREEN", "ts": datetime.now().strftime("%Y-%m-%dT%H:%M:%S"), "families": {"vdf": no_libs, "vrn": good_family}}), encoding="utf-8")
+        os.environ["VIA_RUNGATE_LATEST"] = str(Path(td) / "nolibs.json")
+        c_libs = check()
+        malformed = {**good_family, "summary": {**good_family["summary"], "required_ok": "broken"}}
+        Path(td, "malformed.json").write_text(json.dumps({"verdict": "GREEN", "ts": datetime.now().strftime("%Y-%m-%dT%H:%M:%S"), "families": {"vdf": malformed, "vrn": good_family}}), encoding="utf-8")
+        os.environ["VIA_RUNGATE_LATEST"] = str(Path(td) / "malformed.json")
+        c_bad = check()
+        Path(td, "future.json").write_text(json.dumps({"verdict": "GREEN", "ts": "2099-01-01T00:00:00", "families": {"vdf": good_family, "vrn": good_family}}), encoding="utf-8")
+        os.environ["VIA_RUNGATE_LATEST"] = str(Path(td) / "future.json")
+        c_future = check()
         Path(td, "old.json").write_text(json.dumps({"verdict": "GREEN", "ts": "2020-01-01T00:00:00"}), encoding="utf-8")
         os.environ["VIA_RUNGATE_LATEST"] = str(Path(td) / "old.json")
-        c2 = check()
+        c4 = check()
         if sv is None:
             os.environ.pop("VIA_RUNGATE_LATEST", None)
         else:
             os.environ["VIA_RUNGATE_LATEST"] = sv
-        chk("⑨ 安裝核可 L19:RunGate 缺=BLOCKED_UNITEST;GREEN 且 24h 內=INSTALL_OK;GREEN 但過期=BLOCKED_UNITEST", c0["install"] == "BLOCKED_UNITEST" and c1["install"] == "INSTALL_OK" and c2["install"] == "BLOCKED_UNITEST", f"({c0['install']}/{c1['install']}/{c2['install']})")
+        if sr is None:
+            os.environ.pop("VIA_INSTALL_REQUIRED_FAMILIES", None)
+        else:
+            os.environ["VIA_INSTALL_REQUIRED_FAMILIES"] = sr
+        chk("⑨ 安裝核可 L19:缺報告/單族繞閘/零測站/零必要庫/壞計數/未來或過期皆 BLOCKED；VDF+VRN 完整 GREEN 且 24h 內才 INSTALL_OK",
+            all(c["install"] == "BLOCKED_UNITEST" for c in (c0, c1, c2, c_libs, c_bad, c_future, c4))
+            and set(c1["coverage"]) == {"vdf", "vrn"}
+            and c3["install"] == "INSTALL_OK" and set(c3["coverage"]) == {"vdf", "vrn"},
+            f"(缺={c0['install']} / 單族={c1['install']} / 零站={c2['install']} / 零庫={c_libs['install']} / 壞值={c_bad['install']} / 未來={c_future['install']} / 雙族={c3['install']} / 舊={c4['install']})")
         s = snapshot()
         res = write_outputs(s, Path(td) / "out", publish=False)
         md = (Path(td) / "out" / "VIA_Handover_ONEPAGE.md").read_text(encoding="utf-8")
         pg = (Path(td) / "out" / "VIA_UI_CentralGovernanceConsole_v0100.html").read_text(encoding="utf-8")
-        chk("⑩ 一頁交接 + 頁(零 CDN;八段齊;預設落暫存夾不入倉;--publish 才入倉)", not res["published"] and all(k in md for k in ("## 一 · 政策庫", "## 二 · 安裝核可", "## 五 · 指令與參數", "## 六 · 註冊稽核", "## 七 · 自動編號註冊表", "## 八 · 交接本文"))
+        chk("⑩ 一頁交接 + 頁(零 CDN;九主段齊;尾版詳細 handover 全文在八段;預設落暫存夾不入倉;--publish 才入倉)", not res["published"] and all(k in md for k in ("## 一 · 政策庫", "## 二 · 安裝核可", "## 五 · 指令與參數", "## 六 · 註冊稽核", "## 七 · 自動編號註冊表", "## 八 · 交接本文", "## 九 · 掉球清單"))
+            and "### 七 · 操作員最後一棒（一貼即用）" in md and "VDF+VRN bounded matrix 已 38/38 GREEN" in md
             and "<script src" not in pg and "<link rel" not in pg and "Veritas Central Governance Console" in pg, f"({len(md)} 字 · 頁 {len(pg)//1024} KB)")
     code = Path(__file__).read_text(encoding="utf-8").split("def selftest", 1)[0]     # 不讀自測本身的字串(LL 自我引用)
-    chk("⑪ 零網路 · 只讀(無 import requests/httpx/duckdb;不寫任何冊/庫;只寫 VIA_Reports/vcgc 或 --publish 三處)", all(("import " + k) not in code for k in ("requests", "httpx", "duckdb")) and "CREATE " not in code)
+    chk("⑪ 零網路 · 預設只讀(無 requests/httpx/duckdb/SQL；元件冊只在 registry-sync --apply 明示後原子寫)",
+        all(("import " + k) not in code for k in ("requests", "httpx", "duckdb")) and "CREATE " not in code
+        and "registry-sync" in code and "if apply:" in code and "os.replace" in code)
     pr, bl = prompt_doc(), dropped_balls()
     gs = grid_stations()
-    chk("⑫ 批507:接手提示詞(docs 尾版;含 A 開場/B 收尾/C 格式)與掉球清單(≥12 列)嵌入一頁交接 〇/九 段;格子 PYCODE/自指站標「特殊」不當缺",
+    chk("⑫ 批508:接手提示詞(docs 尾版;含 A 開場/B 收尾/C 格式)與掉球清單(≥12 列)嵌入一頁交接 〇/九 段;格子 PYCODE/自指站標「特殊」不當缺",
         pr["state"] == "OK" and all(k in pr["text"] for k in ("## A", "## B", "## C")) and bl["state"] == "OK" and bl["n"] >= 12
         and "## 〇 · 接手提示詞" in md and "## 九 · 掉球清單" in md and not any(x["present"] is False for x in gs["stations"] if x["path"] in ("", "PYCODE")),
         f"({pr.get('src')} · {bl.get('src')} 列 {bl.get('n')} 未結 {bl.get('open')} · 格子在位 {sum(1 for x in gs['stations'] if x['present'] is True)} 特殊 {sum(1 for x in gs['stations'] if x['present'] == '特殊')})")
-    print(f"  [計] 十二檢 OK {12 - len(fails)} · FAIL {len(fails)}")
+    inv = component_registry()
+    live = live_components()
+    chk("⑬ 元件自動編號冊完整覆蓋尾版引擎/模組/類別/函數/功能/短令/套件/環境；AST 零解析錯；代號穩定且只增不減",
+        inv["state"] == "OK" and inv["active"] == len(live["rows"]) and not live["parse_errors"]
+        and not au.get("inventory_missing") and {"engine", "module", "function", "feature", "tool", "package", "environment"} <= set(inv["counts"]),
+        f"(ACTIVE {inv.get('active')}/{len(live['rows'])} · {inv.get('counts')} · parse_error {len(live['parse_errors'])})")
+    with tempfile.TemporaryDirectory() as td:
+        rp = Path(td) / "inventory.json"
+        p0 = registry_sync(False, rp)
+        plan_wrote = rp.exists()
+        p1 = registry_sync(True, rp)
+        codes1 = {r["key"]: r["code"] for r in (_json(rp) or {}).get("records", [])}
+        p2 = registry_sync(True, rp)
+        codes2 = {r["key"]: r["code"] for r in (_json(rp) or {}).get("records", [])}
+        tampered = _json(rp)
+        tampered["records"][0]["source"] = "selftest/tampered"
+        rp.write_text(json.dumps(tampered, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        before = rp.read_bytes()
+        p3 = registry_sync(False, rp)
+        chk("⑭ registry-sync 預設 PLAN 零寫且如實列變更；--apply 才建冊；第二次同步 new=0 且既有代號完全不變",
+            p0["state"] == "PLAN" and not plan_wrote and p1["new"] == p1["expected"]
+            and p2["new"] == 0 and codes1 == codes2 and len(codes1) == p1["expected"]
+            and p3["changed"] == 1 and rp.read_bytes() == before)
+    print(f"  [計] 十四檢 OK {14 - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 
 
 def main() -> int:
     a = sys.argv[1:]
     if "--selftest" in a:
-        print(f"=== Veritas Central Governance Console(CGC_MDL149 v{VERSION})· 十二檢自測(零網路;只讀)===")
+        print(f"=== Veritas Central Governance Console(CGC_MDL149 v{VERSION})· 十四檢自測(零網路;預設只讀)===")
         return selftest()
     verb = a[0] if a else "status"
     if verb == "status":
@@ -555,16 +841,18 @@ def main() -> int:
         return 0
     if verb == "audit":
         au = audit()
-        print(f"[VCGC 註冊稽核] 家族 {au['families']} · 已登冊 {au['registered']} · 未登冊 {len(au['unregistered'])}")
+        print(f"[VCGC 註冊稽核] 中央冊 ACTIVE {au['inventory_active']}/{au['inventory_expected']} · 全類缺 {len(au['inventory_missing'])} · 家族 {au['families']} 已登 {au['registered']} 未登 {len(au['unregistered'])} · 操作介面掛載 {au['interface_registered']}")
         for r in au["unregistered"]:
             print(f"  未登 {r['newest']}({r['dir']})")
+        if au["interface_gaps"]:
+            print(f"  [介面分列] {len(au['interface_gaps'])} 個內部家族已在中央冊、未設操作介面(非未註冊；via-vcgc register-plan 看清單)")
         return 0
     if verb == "register-plan":
-        # 律 L18/L02:未登冊家族 → 列出建議登冊(格子站行 + Deck 任務樁),只列不寫;操作員核准後另批登冊
+        # 中央編號冊由 registry-sync 管；此處只列尚無操作介面的內部家族，不混為「未註冊」。
         au = audit()
         OUTDIR.mkdir(parents=True, exist_ok=True)
-        lines = [f"# VCGC 登冊建議 {datetime.now():%Y-%m-%d %H:%M} · 未登冊家族 {len(au['unregistered'])}(只列不寫;核准後另批登冊)", ""]
-        for r in au["unregistered"]:
+        lines = [f"# VCGC 操作介面掛載建議 {datetime.now():%Y-%m-%d %H:%M} · 中央冊已覆蓋；無操作介面家族 {len(au['interface_gaps'])}(只列不寫)", ""]
+        for r in au["interface_gaps"]:
             q = VIA / r["dir"] / r["newest"]
             has_st = False
             try:
@@ -575,12 +863,22 @@ def main() -> int:
         (OUTDIR / "REGISTER_PLAN.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
         print("\n".join(lines[:30]) + (f"\n… 共 {len(lines) - 2} 條 → {OUTDIR / 'REGISTER_PLAN.md'}" if len(lines) > 30 else ""))
         return 0
+    if verb == "registry-sync":
+        r = registry_sync(apply="--apply" in a)
+        print(f"[VCGC 元件自動編號冊] {r['state']} · 活元件 {r['expected']} · 新 {r['new']} · 變更 {r['changed']} · 退役 {r['stale']} · AST錯 {len(r['parse_errors'])} · {r['counts']}")
+        if r["state"] == "PLAN":
+            print("  預設零寫；確認後才用 via-vcgc registry-sync --apply")
+        if r["parse_errors"]:
+            for e in r["parse_errors"][:10]: print(f"  [AST錯] {e['file']}:{e['why']}")
+        return 0 if not r["parse_errors"] else 2
     if verb == "check":
         c = check()
-        print(f"[VCGC 安裝核可] {c['install']} · RunGate {c['rungate']} · 齡 {c['age_h']} h · {c['law']}")
+        print(f"[VCGC 安裝核可] {c['install']} · RunGate {c['rungate']} · 齡 {c['age_h']} h · 必驗 {c['required_families']} · {c['law']}")
+        for fam, v in (c.get("coverage") or {}).items(): print(f"  [{fam}] {'GREEN' if v.get('ok') else 'BLOCK'} · {v.get('why')}")
+        for why in c.get("reasons") or []: print(f"  [阻擋] {why}")
         return 0 if c["install"] == "INSTALL_OK" else 2
     print(__doc__)
-    return 0
+    return 2
 
 
 if __name__ == "__main__":

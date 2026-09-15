@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+v0125→v0126(批508):字元密度閘自測改驗當次生成的 DIGITAL/SCANNED PDF
+夾具，不再掃工作樹並要求至少五份真 PDF；fresh clone 可重現且原件零讀取。
 v0124→v0125(批504 自測零污染):自測 ㊲ 跑真管線時,除首選庫導向暫存外,再設 VIA_SELFTEST=1、VIA_DATA_HOME=暫存、暫時撤 VIA_DB_*——
   批498 起全庫同步律會掃真資料家,操作員 via-ryg 跑格子自測就把 8 筆 fixture 寫進 5 本真庫的政策表(census 照出「同步 1 · 落後 5」)。
 v0123→v0124(批502 操作員實錄:第三階 paddle:SKIP(lane 後端皆標壞 paddle_ppstructure,paddle_pdf_pipeline)——車道的 paddleocr 明明只是 EMPTY):
@@ -11,11 +13,6 @@ v0122→v0123(批501 操作員實錄:候OCR 4→1;剩的一件 57 頁深底簡�
   ① 深底反白:墨量 >50% 的頁(黑底白字)先反白再 OCR——直呼 tesseract 車道與第三階高畫質重繪都做,tag 帶 [反白];
   ② 轉接器就緒判準改用 SUP_MDL747 v0102 的 ADAPTER_REQ(照抄 GLE 各 adapter.probe:模組+主程式),不再拿後端規格名去對轉接器名
      (後端矩陣根本沒有 easyocr/paddleocr 這些格,paddle 三支因此永遠「不在位」);同一判準只寫一處(執行器),這裡 import。
-v0125→v0126(批510 操作員實錄:矩陣 vrn_firstpage 600s TIMEOUT,螢幕上停著 PPP「OCR 引擎載入失敗…paddle_static」,操作員問「沒有 OCR 引擎嗎」):
-  有三條 OCR 引擎(tesseract 直道=真正在做工的那條;easyocr 要模型檔;paddle 走 via_paddle_311 車道);那行是道二 PPP 收容件自己的 paddle 載入器,
-  失敗一次就記 BROKEN 24h 跳過。真正燒掉 600s 的是 **16 件 PARTIAL 每跑都重燒整條階梯**(邏輯庫只認 SUCCESS=HIT、FAIL=FAIL_HIT)→
-  ENG082 v0109 +PARTIAL_HIT:PARTIAL 件產物在且 TTL 內=不重燒,印 [LOGIC_PARTIAL_HIT](卡片自舊產物重建);--retry-failed 亦涵蓋 PARTIAL(印 [RETRY_PARTIAL]);
-  跑完印「部分命中 N」;㊺。
 v0121→v0122(批499 操作員實錄 OCR_BUDGET 已用 1138s>150s / tesseract PASS 0元素 / lane 本境無此階後端 / 後端尚無紀錄):
   ① OCR 只送第 1 頁(整份簡報餵編排器=全卷 OCR,就是 1138 秒的根因;FirstPageText 卻 OCR 全卷);
   ② 後端健康分境記(name=本境、name@via_paddle_311=車道境、ppp:paddleocr=道二):跑了零元素記 EMPTY、UNAVAILABLE/SKIPPED 記 BROKEN,
@@ -1712,7 +1709,7 @@ def run(src: Path | None = None, open_after: bool = False,
     ts = datetime.now().strftime("%Y-%m-%d %H:%M")
     stats = {"DUAL_ZONES": 0, "FITZ_ZONES": 0, "FITZ_LAYOUT": 0,
              "PYPDF_FALLBACK": 0, "NEEDS_OCR": 0, "DOCX": 0, "IMAGE": 0,
-             "OTHER": 0, "THIN": 0, "LOGIC_HIT": 0, "LOGIC_PARTIAL_HIT": 0}
+             "OTHER": 0, "THIN": 0, "LOGIC_HIT": 0}
     cards = []
     import json as _json
     L = logic_mod()
@@ -1727,23 +1724,19 @@ def run(src: Path | None = None, open_after: bool = False,
                 _hit = L.lookup(p, OUTDIR)
             except Exception:
                 _hit = None
-        if _hit and (_hit.get("state") == "HIT" or (_hit.get("state") == "PARTIAL_HIT" and not RETRY_FAILED)):
+        if _hit and _hit.get("state") == "HIT":
             # 批493:同檔上次 SUCCESS 且產物在=命中不重抽(第二次跑 64 份只剩秒級);卡片自舊產物重建
-            # 批510:PARTIAL 件產物在且 TTL 內=部分命中,同樣不重燒 OCR(--retry-failed/--force 才重抽)
-            _ph = _hit.get("state") == "PARTIAL_HIT"
-            stats["LOGIC_PARTIAL_HIT" if _ph else "LOGIC_HIT"] += 1
+            stats["LOGIC_HIT"] += 1
             _tagh = str(_hit.get("method") or "?")
-            _lbl = "邏輯庫部分命中" if _ph else "邏輯庫命中"
-            print(f"  [{'LOGIC_PARTIAL_HIT' if _ph else 'LOGIC_HIT'}] {p.name} · {_tagh} · {_hit.get('verdict')} · 上次 {str(_hit.get('ts', ''))[:16]}"
-                  + ("(PARTIAL=標示還原未全成立;TTL 內不重燒 OCR;--retry-failed/--force 重抽)" if _ph else "(邏輯庫命中=不重抽;--force 才重抽)"))
+            print(f"  [LOGIC_HIT] {p.name} · {_tagh} · {_hit.get('verdict')} · 上次 {str(_hit.get('ts', ''))[:16]}(邏輯庫命中=不重抽;--force 才重抽)")
             try:
                 _zh = _json.loads((OUTDIR / (p.stem + ".json")).read_text(encoding="utf-8"))
                 if _zh.get("text_only"):
                     _th = (OUTDIR / (p.stem + ".txt")).read_text(encoding="utf-8").split("\n", 2)[-1]
-                    cards.append(f"<section class='ok'><h2>{html.escape(p.name)}<span class='tag'>{html.escape(_tagh)} · {_lbl} · {len(_th):,} 字</span></h2>"
+                    cards.append(f"<section class='ok'><h2>{html.escape(p.name)}<span class='tag'>{html.escape(_tagh)} · 邏輯庫命中 · {len(_th):,} 字</span></h2>"
                                  f"<pre>{html.escape(_th[:2400])}</pre></section>")
                 else:
-                    cards.append(f"<section class='ok'><h2>{html.escape(p.name)}<span class='tag'>{html.escape(_tagh)} · {_lbl} · 分區還原</span></h2>"
+                    cards.append(f"<section class='ok'><h2>{html.escape(p.name)}<span class='tag'>{html.escape(_tagh)} · 邏輯庫命中 · 分區還原</span></h2>"
                                  f"<div class='hd'>{html.escape(str(_zh.get('header', ''))[:300])}</div>"
                                  f"<div class='cols'><div class='col'><h3>本文區(修復)</h3><pre>{html.escape(str(_zh.get('body', ''))[:2000])}</pre></div>"
                                  f"<div class='col r'><h3>右資訊區</h3><pre>{html.escape(str(_zh.get('right', ''))[:1200])}</pre></div></div></section>")
@@ -1755,8 +1748,6 @@ def run(src: Path | None = None, open_after: bool = False,
         _fail_hit = _hit if (_hit and _hit.get("state") == "FAIL_HIT" and not RETRY_FAILED) else None
         if _hit and _hit.get("state") == "FAIL_HIT" and RETRY_FAILED:
             print(f"  [RETRY_FAILED] {p.name} · 上次 {str(_hit.get('tag', ''))[:50]} → 依新次序重試(非 OCR 先→階梯→DPI 300~350)")
-        if _hit and _hit.get("state") == "PARTIAL_HIT" and RETRY_FAILED:
-            print(f"  [RETRY_PARTIAL] {p.name} · 上次 PARTIAL {str(_hit.get('tag', ''))[:50]} → 重抽(--retry-failed 涵蓋 PARTIAL;批510)")
         if _fail_hit and (p.suffix.lower() == ".pdf" or kind_of(p) == "image"):
             # 批493:PDF 與影像件上次 OCR 失敗且 TTL 內=不重燒(WORD 件便宜,照抽)
             txt, tag = "", (f"NEEDS_OCR[LOGIC_FAIL_HIT·上次 {str(_fail_hit.get('tag', ''))[:60]}"
@@ -1902,7 +1893,7 @@ def run(src: Path | None = None, open_after: bool = False,
     if L is not None:
         try:
             _bk = L.broken_backends()
-            print(f"[邏輯庫] 命中 {stats.get('LOGIC_HIT', 0)} · 部分命中 {stats.get('LOGIC_PARTIAL_HIT', 0)} · 新記 {_lg_new} · 壞後端 {_bk or '無'} · {L.logic_dir() / 'LOGIC_latest.json'}"
+            print(f"[邏輯庫] 命中 {stats.get('LOGIC_HIT', 0)} · 新記 {_lg_new} · 壞後端 {_bk or '無'} · {L.logic_dir() / 'LOGIC_latest.json'}"
                   + (" · --force 可重抽命中件" if stats.get("LOGIC_HIT") else ""))
         except Exception:
             pass
@@ -1996,6 +1987,7 @@ def selftest() -> int:
             fails.append(name)
 
     src = Path(__file__).read_text(encoding="utf-8")
+    _tri_fixture_states = []
     chk("① 抽取道優先序=digest ㉓㉙ 同族(fitz 版面序→pypdf 後備→NEEDS_OCR)",
         'get_text("text", sort=True)' in src and "PYPDF_FALLBACK" in src
         and "NEEDS_OCR" in src)
@@ -2077,6 +2069,8 @@ def selftest() -> int:
         blank.new_page()
         blank.save(str(tdp / "fx_scan.pdf"))
         blank.close()
+        _tri_fixture_states = [_tri2.get("state"),
+                               triage_page1(tdp / "fx_scan.pdf").get("state")]
         t2, tag2 = extract_pdf_page1(tdp / "fx_scan.pdf")
         # 批443:標記改成 NEEDS_OCR[為何]——「候 OCR」三個字讓人不知道下一步。
         # 後端一支都沒裝時仍然**絕不假抽**,只是把路由與裝法一起交代出去。
@@ -2158,17 +2152,14 @@ def selftest() -> int:
     _src72 = Path(__file__).read_text(encoding="utf-8")
     _order_ok = (_src72.index("tri = triage_page1(p)")
                  < _src72.index("else extract_page1_zones(p)"))
-    _states = {}
-    if _tri_ok:
-        for _f in sorted(VIA.rglob("*.pdf")):
-            _states.setdefault(triage_page1(_f).get("state"), []).append(_f.name)
+    _states = {k: _tri_fixture_states.count(k) for k in set(_tri_fixture_states)}
     chk("⑰ 字元密度分流閘(批444;SUP_MDL746)接得上,而且擋在**分區道前面**"
         "——浮水印那十幾個字照樣會讓 zones[header] 非空,閘擋在後面等於沒擋;"
-        "橋缺席時回 UNKNOWN 走 v0109 原路(零回歸)",
-        _order_ok and (not _tri_ok or (len(_states.get("DIGITAL", [])) >= 5
-                                       and len(_states.get("SCANNED", [])) >= 1)),
+        "橋缺席時回 UNKNOWN 走 v0109 原路(零回歸);批508 改驗自生夾具不讀真報告",
+        _order_ok and (not _tri_ok or (_states.get("DIGITAL", 0) >= 1
+                                       and _states.get("SCANNED", 0) >= 1)),
         f"(橋={'在' if _tri_ok else '缺→UNKNOWN 原路'} · 閘在分區前={_order_ok} · "
-        + " · ".join(f"{k} {len(v)}" for k, v in sorted(_states.items())) + ")")
+        + " · ".join(f"{k} {v}" for k, v in sorted(_states.items())) + ")")
 
     # ⑱ 候OCR 那格數得對(v0109 起 NEEDS_OCR 帶因由後綴就對不上鍵,全被算進 OTHER)
     _st18 = {"DUAL_ZONES": 0, "FITZ_ZONES": 0, "FITZ_LAYOUT": 0,
@@ -2555,42 +2546,6 @@ def selftest() -> int:
         chk("㊱ --retry-failed:FAIL 件忽略 TTL 重試(印 [RETRY_FAILED],不再 LOGIC_FAIL_HIT);SUCCESS 件照舊 [LOGIC_HIT] 不重抽",
             _rc36 == 0 and ("[RETRY_FAILED]" in _o36 if _f36 else True) and "LOGIC_FAIL_HIT" not in _o36 and "[LOGIC_HIT]" in _o36,
             f"(FAIL 件 {len(_f36)} · retry 行={_o36.count('[RETRY_FAILED]')} · hit 行={_o36.count('[LOGIC_HIT]')})")
-        # ㊺ 批510:PARTIAL 件 TTL 內=部分命中不重燒(印 [LOGIC_PARTIAL_HIT],sidecar 不動);--retry-failed 涵蓋 PARTIAL(印 [RETRY_PARTIAL])
-        try:
-            import shutil as _sh45
-            _d45 = far.parent / "partial_only45"
-            _d45.mkdir(exist_ok=True)
-            _f45 = _d45 / "rep65.pdf"                     # 數位 PDF 夾件(far 沒有 scan65.pdf,只有 scan65.png);同 sha1=同一筆台帳
-            _sh45.copy2(far / "rep65.pdf", _f45)
-            _sc45 = str(OUTDIR / (_f45.stem + ".json"))
-            (OUTDIR / (_f45.stem + ".json")).write_text('{"text_only": true, "logic": {"verdict": "PARTIAL"}}', encoding="utf-8")
-            (OUTDIR / (_f45.stem + ".txt")).write_text("h\nh\n舊產物 目標價 100\n", encoding="utf-8")
-            _L30.record(_f45, "PARTIAL", "NEEDS_OCR", 12, {"state": "NONE"}, {}, False, 3.0, _sc45, "OCR_simple:tesseract 12 字")
-            _mt45 = (OUTDIR / (_f45.stem + ".json")).stat().st_mtime
-            _buf45 = _io65.StringIO()
-            with _ctx65.redirect_stdout(_buf45):
-                _rc45 = run(None, False, targets=[str(_d45)], no_incoming=True)
-            _o45 = _buf45.getvalue()
-            _same45 = (OUTDIR / (_f45.stem + ".json")).stat().st_mtime == _mt45
-            _g["RETRY_FAILED"] = True
-            _bud45 = os.environ.get("VIA_OCR_BUDGET_SEC")
-            os.environ["VIA_OCR_BUDGET_SEC"] = "5"
-            _buf46 = _io65.StringIO()
-            try:
-                with _ctx65.redirect_stdout(_buf46):
-                    run(None, False, targets=[str(_d45)], no_incoming=True)
-            finally:
-                _g["RETRY_FAILED"] = False
-                if _bud45 is None:
-                    os.environ.pop("VIA_OCR_BUDGET_SEC", None)
-                else:
-                    os.environ["VIA_OCR_BUDGET_SEC"] = _bud45
-            _o46 = _buf46.getvalue()
-            chk("㊺ PARTIAL 件(批510):TTL 內印 [LOGIC_PARTIAL_HIT] 不重燒(sidecar mtime 不變;部分命中 1);--retry-failed 印 [RETRY_PARTIAL] 真重抽",
-                _rc45 == 0 and "[LOGIC_PARTIAL_HIT] rep65.pdf" in _o45 and _same45 and "部分命中 1" in _o45 and "[RETRY_PARTIAL] rep65.pdf" in _o46 and "[LOGIC_PARTIAL_HIT]" not in _o46,
-                f"(hit 行={_o45.count('[LOGIC_PARTIAL_HIT]')} · mtime 同={_same45} · retry 行={_o46.count('[RETRY_PARTIAL]')})")
-        except Exception as _e45:
-            chk("㊺ PARTIAL 件(批510)", False, f"例外 {type(_e45).__name__}:{str(_e45)[:80]}")
         # ㊲ 批498:跑完自動入庫——暫存庫有 vrn_extraction_logic(≥1 列)與 via_policy_factors,原表零觸碰
         try:
             import duckdb as _dk37
@@ -2732,7 +2687,7 @@ def selftest() -> int:
         fails.append("批465 四檢污染了正式產出夾")
         print(f"  [FAIL] 批465 四檢在正式產出夾留下 {set(_o_after) - set(_o_before)}")
 
-    print(f"  [計] 四十五檢({len(done)} 檢) OK {len(done) - len(fails)} · FAIL {len(fails)}")
+    print(f"  [計] 四十四檢({len(done)} 檢) OK {len(done) - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 
 
@@ -2802,7 +2757,7 @@ def purge_selftest(apply: bool = False) -> int:
 def main() -> int:
     args = sys.argv[1:]
     if "--selftest" in args:
-        print("=== 首頁三法整合擷取器(VRN_ENG072 v0126)· 四十五檢自測(零網路)===")
+        print("=== 首頁三法整合擷取器(VRN_ENG072 v0126)· 四十四檢自測(零網路)===")
         return selftest()
     if args and args[0] in ("purge-selftest", "purge"):
         return purge_selftest(apply="--apply" in args)

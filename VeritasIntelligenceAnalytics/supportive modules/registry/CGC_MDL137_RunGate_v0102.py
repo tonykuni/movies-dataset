@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-v0101→v0102(批509 操作員實錄:via_vdf_312/via_vrn_312 全站 0.2s 就 `assert _sre.MAGIC == MAGIC, "SRE module mismatch"`,
-  v0101 卻判「必要庫缺:duckdb,pandas,numpy,pyarrow」並開補庫令——**判錯的紅燈**:import re 都不行,補庫是錯藥。
-  +interp_check(先於庫探針):家族境 python -c "import re,json,sys" 失敗=解譯器壞(STDLIB_MISMATCH/STDLIB_MISSING/STARTUP_FAIL/NOT_FOUND),
-  再以 -E/-S/-I 三試分辨病因(環境變數 PYTHONHOME/PYTHONPATH 帶錯版 · site 層 .pth/sitecustomize · venv 本體錯配 pyvenv.cfg home),
-  存證 pyvenv.cfg 與 PYTHONHOME/PYTHONPATH 現值;判定 RED 理由=解譯器壞(不列缺庫);補庫 SKIP;不探庫不跑站(同因必敗,省時間);
-  次步=診斷句 + 重建境(候裁=操作員的手;via-envrecover 印令),不是 pip install。十二檢(+⑪ 探針三試 ⑫ 判定/補庫/次步)。
+CGC_MDL137_RunGate v0102 — VDF/VRN/VAP 能跑閘(批508)
+v0101→v0102(批508 結案驗收):修掉兩種假綠——家族零自測站、站檔缺席(SKIP)以前都能判 GREEN。
+  run/fast/all 現在要求每個受測家族至少一站且每站 OK；probe 仍只驗套件，不偽稱跑過引擎。
 v0100→v0101(批476 操作員令「所有 PY 檔案都要加上加速器」):
   run_station 的子行程 env 前置 <VIA>/supportive modules/bootstrap(sitecustomize.py),
   每一站起跑就綁加速器;VIA_FAMILY 只在站上有講時才設。同意閘照舊不設。
@@ -30,7 +27,7 @@ claude/via-system-followup-tz7k9t @ c14d428 = main = 本分支基底;0 未併)�
     零網路(引擎自測皆零觸網站;VIA_NET_CONSENT 不設);尾版律(glob 尾版,嚴禁寫死版號)。
   ⑥ 補庫(批387):家族境在而必要庫缺 → 印 uv pip install --python <家族境> <缺件>(import 名→pip 名對映 fitz→pymupdf 等);
      --approve-install 才裝(觸網;只增不減;只裝進家族境,base 退路一律不裝功能件)→ 裝後重探
-用法:python3 CGC_MDL137_RunGate_v0102.py run [--fast|--all] [--family vdf,vrn,vap] [--approve-install] [--json] [--quiet]
+用法:python3 CGC_MDL137_RunGate_v0101.py run [--fast|--all] [--family vdf,vrn,vap] [--approve-install] [--json] [--quiet]
       | probe [--family …] | status | --selftest
 批387 工作站實錄:via-rungate --family vrn 把 vrn 當動詞印用法(旗標值誤判動詞)→ 動詞白名單;via_vrn_312 無 duckdb → VRN 引擎
 ModuleNotFoundError → --approve-install 補庫道
@@ -84,65 +81,6 @@ PROBE_SRC = ("import importlib, json, sys\n"
              "    except Exception as e:\n"
              "        out[n] = None\n"
              "print(json.dumps(out))\n")
-
-INTERP_SRC = ("import re, json, sys, os\n"
-              "print('@@INTERP@@' + json.dumps({'version': sys.version.split()[0], 'exe': sys.executable, 'prefix': sys.prefix, "
-              "'base_prefix': getattr(sys, 'base_prefix', ''), 'path': sys.path[:4]}))\n")
-
-
-def interp_check(py: str, timeout: int = 30, environ: dict | None = None) -> dict:
-    """批509:解譯器健康(先於庫探針)。import re 都不行=解譯器壞(標準庫錯配),不是缺庫;-E/-S/-I 三試分辨病因。"""
-    env = dict(environ if environ is not None else os.environ)
-    env["PYTHONUTF8"] = "1"
-    env.pop("VIA_NET_CONSENT", None)
-
-    def _run(extra):
-        try:
-            r = subprocess.run([py, *extra, "-c", INTERP_SRC], capture_output=True, text=True, timeout=timeout, stdin=subprocess.DEVNULL, env=env,
-                               encoding="utf-8", errors="replace")
-            return r.returncode, (r.stdout or ""), (r.stderr or "")
-        except Exception as exc:
-            return -1, "", f"{type(exc).__name__}:{str(exc)[:120]}"
-    rc, out, err = _run([])
-    info = {"state": "OK", "kind": "", "cause": "", "trials": {}, "err": "",
-            "env": {k: (env.get(k) or "")[:160] for k in ("PYTHONHOME", "PYTHONPATH") if env.get(k)}, "pyvenv": {}, "pyvenv_path": ""}
-    line = next((l for l in out.splitlines() if l.startswith("@@INTERP@@")), "")
-    if rc == 0 and line:
-        try:
-            info.update(json.loads(line[len("@@INTERP@@"):]))
-        except Exception:
-            pass
-        return info
-    tail = "\n".join([l for l in (err or out).strip().splitlines() if l.strip()][-3:])[:400]
-    info.update(state="BROKEN", err=tail)
-    low = tail.lower()
-    info["kind"] = ("STDLIB_MISMATCH" if ("sre module mismatch" in low or "magic" in low)
-                    else "STDLIB_MISSING" if ("no module named" in low or "encodings" in low)
-                    else "NOT_FOUND" if rc == -1 else "STARTUP_FAIL")
-    for flag in ("-E", "-S", "-I"):
-        rc2, o2, _e2 = _run([flag])
-        info["trials"][flag] = bool(rc2 == 0 and "@@INTERP@@" in o2)
-    tr = info["trials"]
-    if tr.get("-E"):
-        info["cause"] = "環境變數帶錯版標準庫(PYTHONHOME/PYTHONPATH;-E 即好)"
-    elif tr.get("-S"):
-        info["cause"] = "site 層帶錯版(.pth/sitecustomize/usercustomize;-S 即好)"
-    elif tr.get("-I"):
-        info["cause"] = "環境變數+site 皆有嫌疑(-I 才好)"
-    else:
-        info["cause"] = "venv 本體錯配(pyvenv.cfg home 指到被換掉/升級的 Python;三試皆壞)→ 重建境(候裁,你的手)"
-    try:
-        cfg = Path(py).resolve().parent.parent / "pyvenv.cfg"
-        if cfg.exists():
-            info["pyvenv_path"] = str(cfg)
-            for l in cfg.read_text(encoding="utf-8", errors="replace").splitlines():
-                if "=" in l:
-                    k, v = l.split("=", 1)
-                    info["pyvenv"][k.strip()] = v.strip()[:160]
-    except Exception:
-        pass
-    return info
-
 
 
 def _ts() -> str:
@@ -249,8 +187,6 @@ def install_missing(fam: str, pyinfo: dict, missing: list, approve: bool, timeou
     """家族境補庫(批387):uv pip install --python <家族境> <缺件>;無 uv 退 pip;--approve-install 才裝;base 退路不裝功能件"""
     if not missing:
         return {"state": "NONE"}
-    if (pyinfo.get("interp") or {}).get("state") == "BROKEN":       # 批509:解譯器壞=補庫是錯藥
-        return {"state": "SKIP", "note": f"{fam} 境解譯器壞({(pyinfo.get('interp') or {}).get('kind')}):不補庫(import re 都不行);先修解譯器(見次步)"}
     if pyinfo.get("state") != "OK":
         return {"state": "SKIP", "note": f"{fam} 家族境未見=不往 base 裝功能件(建境:via-envgov apply --approve;或設 VIA_PY_{fam.upper()})"}
     pkgs = [PIP_NAMES.get(n, n) for n in missing]
@@ -336,17 +272,21 @@ def run_station(py: str, st: dict) -> dict:
 
 
 # ---------------------------------------------------------------- ④ 判定/報告
-def verdict_for(pyinfo: dict, libs: dict, required: list, results: list) -> tuple[str, list]:
+def verdict_for(pyinfo: dict, libs: dict, required: list, results: list,
+                require_results: bool = True) -> tuple[str, list]:
+    """判家族能跑燈。
+
+    run 模式的「沒有測到」不能等同「全部通過」：零站或 SKIP 都是證據缺口，
+    必須 RED。probe 模式明示 ``require_results=False``，只回答套件探針。
+    """
     reasons = []
-    it = pyinfo.get("interp") or {}
-    if it.get("state") == "BROKEN":                        # 批509:解譯器壞=RED,理由是解譯器不是缺庫(判錯的紅燈與假綠同罪)
-        reasons.append(f"解譯器壞({it.get('kind')}):{it.get('cause')}")
-        fails = [r["file"] for r in results if r["state"] in ("FAIL", "TIMEOUT")]
-        if fails:
-            reasons.append("引擎自測 FAIL/TIMEOUT(同因):" + ",".join(fails))
-        return "RED", reasons
-    if any(r["state"] in ("FAIL", "TIMEOUT") for r in results):
-        reasons.append("引擎自測 FAIL/TIMEOUT:" + ",".join(r["file"] for r in results if r["state"] in ("FAIL", "TIMEOUT")))
+    bad = [r for r in results if r.get("state") != "OK"]
+    if require_results and not results:
+        reasons.append("家族自測站為 0=沒有通過證據")
+        v = "RED"
+    elif bad:
+        reasons.append("引擎自測非 OK:" + ",".join(
+            f"{r.get('file', '?')}({r.get('state', '?')})" for r in bad))
         v = "RED"
     else:
         v = "GREEN"
@@ -396,7 +336,7 @@ def render_html(rep: dict) -> str:
 
 
 def run(families: list | None = None, mode: str = "default", do_print: bool = True, quiet: bool = False, reports: Path = OUT,
-        battery: list | None = None, python_fn=None, probe_fn=None, run_fn=None, chains_fn=None, approve_install: bool = False, install_fn=None, interp_fn=None) -> dict:
+        battery: list | None = None, python_fn=None, probe_fn=None, run_fn=None, chains_fn=None, approve_install: bool = False, install_fn=None) -> dict:
     q = quiet or not do_print
     families = families or list(FAMILY_DIRS)
     limit = {"fast": FAST_N, "default": DEFAULT_N, "all": None}.get(mode, DEFAULT_N)
@@ -413,26 +353,22 @@ def run(families: list | None = None, mode: str = "default", do_print: bool = Tr
     for fam in families:
         pyinfo = python_fn(fam)
         spec = FAMILY_LIBS.get(fam, {"required": [], "optional": []})
-        interp = (interp_fn or interp_check)(pyinfo["python"]) if pyinfo.get("python") else {"state": "SKIP"}
-        pyinfo["interp"] = interp
-        broken = interp.get("state") == "BROKEN"
-        if broken:
-            _say(f"  [INTERP ] {fam} 解譯器壞({interp.get('kind')}):{interp.get('cause')} · 三試 {interp.get('trials')} · {str(interp.get('err', ''))[-100:]}", q)
-        libs = probe_fn(pyinfo["python"], spec["required"] + spec["optional"]) if not broken else {n: None for n in spec["required"] + spec["optional"]}
-        inst = {"state": "NONE"} if not broken else {"state": "SKIP", "note": "解譯器壞:不補庫"}
+        libs = probe_fn(pyinfo["python"], spec["required"] + spec["optional"])
+        inst = {"state": "NONE"}
         missing_req = [n for n in spec["required"] if libs.get(n) is None]
-        if missing_req and not broken:
+        if missing_req:
             inst = install_fn(fam, pyinfo, missing_req, approve_install)
             _say(f"  [{inst['state']:<5}] {fam} 補庫 {','.join(PIP_NAMES.get(n, n) for n in missing_req)}:{inst.get('cmd', '')} {inst.get('note', '')} {' | '.join(inst.get('tail') or [])}"[:220], q)
             if inst["state"] == "OK":
                 libs = probe_fn(pyinfo["python"], spec["required"] + spec["optional"])
-        sts = family_stations(battery, fam, limit) if (mode != "probe" and not broken) else []
+        sts = family_stations(battery, fam, limit) if mode != "probe" else []
         results = []
         for st in sts:
             r = run_fn(pyinfo["python"], st)
             results.append(r)
             _say(f"  [{r['state']:<7}] {fam} {r['file']} · {r.get('secs', 0)}s · {' | '.join(r.get('tail') or []) or r.get('note', '')}"[:200], q)
-        v, reasons = verdict_for(pyinfo, libs, spec["required"], results)
+        v, reasons = verdict_for(pyinfo, libs, spec["required"], results,
+                                 require_results=(mode != "probe"))
         worst = max(worst, order[v])
         req = sum(1 for n in spec["required"] if libs.get(n))
         opt = sum(1 for n in spec["optional"] if libs.get(n))
@@ -448,11 +384,6 @@ def run(families: list | None = None, mode: str = "default", do_print: bool = Tr
     rep["verdict"] = ["GREEN", "YELLOW", "RED"][worst]
     rep["next"] = []
     for fam, f in rep["families"].items():
-        it = f["python"].get("interp") or {}
-        if it.get("state") == "BROKEN":
-            rep["next"].append(f"{fam} 境解譯器壞({it.get('kind')};{it.get('cause')}):不補庫;查 $env:PYTHONHOME/$env:PYTHONPATH(現值 {it.get('env') or '無'})、"
-                               f"{it.get('pyvenv_path') or 'pyvenv.cfg'}(home={(it.get('pyvenv') or {}).get('home')})、三試 {it.get('trials')};重建境=你的手(via-envrecover 印令)")
-            continue
         if f["python"]["state"] != "OK":
             rep["next"].append(f"建 {fam} 境:via-envgov apply --approve(ENSURE_ENV via_{fam}_312)或 uv venv <境根>\\via_{fam}_312 --python 3.12 → uv pip install {' '.join(PIP_NAMES.get(n, n) for n in f['required'])}")
         miss = [n for n in f["required"] if f["libs"].get(n) is None]
@@ -536,10 +467,12 @@ def selftest() -> int:
             [r["state"] for r in res] == ["OK", "FAIL", "TIMEOUT", "SKIP"] and res[0]["tail"] == ["OK 1/1"] and res[1]["tail"] == ["FAIL 0/1"])
         ok_info = {"state": "OK", "python": "x", "env": "via_vdf_312"}
         fb_info = {"state": "BASE_FALLBACK", "python": sys.executable, "env": ""}
-        chk("⑥ 判定律(FAIL=RED;必要庫缺=YELLOW;base 退路=YELLOW;全綠=GREEN;RED 優先)",
+        chk("⑥ 判定律(FAIL/TIMEOUT/SKIP/零站=RED;必要庫缺=YELLOW;base 退路=YELLOW;全綠=GREEN;probe 可明示只驗套件)",
             verdict_for(ok_info, {"duckdb": "1"}, ["duckdb"], [{"state": "OK", "file": "a"}])[0] == "GREEN"
             and verdict_for(ok_info, {"duckdb": None}, ["duckdb"], [{"state": "OK", "file": "a"}])[0] == "YELLOW"
-            and verdict_for(fb_info, {"duckdb": "1"}, ["duckdb"], [])[0] == "YELLOW"
+            and verdict_for(ok_info, {"duckdb": "1"}, ["duckdb"], [])[0] == "RED"
+            and verdict_for(ok_info, {"duckdb": "1"}, ["duckdb"], [{"state": "SKIP", "file": "a"}])[0] == "RED"
+            and verdict_for(fb_info, {"duckdb": "1"}, ["duckdb"], [], require_results=False)[0] == "YELLOW"
             and verdict_for(fb_info, {"duckdb": None}, ["duckdb"], [{"state": "FAIL", "file": "a"}])[0] == "RED")
         reports = root / "reports"
 
@@ -567,35 +500,7 @@ def selftest() -> int:
     skip = install_missing("vrn", {"state": "BASE_FALLBACK", "python": sys.executable}, ["duckdb"], approve=False)
     chk("⑩ 補庫道(PLAN 印 uv/pip 令且 import 名→pip 名 fitz→pymupdf;base 退路 SKIP 不裝功能件;缺件空=NONE;未授權零執行)",
         plan["state"] == "PLAN" and "pymupdf" in plan["cmd"] and "duckdb" in plan["cmd"] and skip["state"] == "SKIP" and install_missing("vrn", okpy, [], False)["state"] == "NONE")
-    ok_i = interp_check(sys.executable)
-    with tempfile.TemporaryDirectory() as td2:
-        sh = Path(td2) / "re"
-        sh.mkdir()
-        (sh / "__init__.py").write_text("raise AssertionError('SRE module mismatch')\n", encoding="utf-8")
-        env2 = dict(os.environ)
-        env2["PYTHONPATH"] = td2 + (os.pathsep + env2["PYTHONPATH"] if env2.get("PYTHONPATH") else "")
-        bad_i = interp_check(sys.executable, environ=env2)
-    chk("⑪ 解譯器探針(批509):本解譯器 OK 帶版本;假 re 遮蔽(PYTHONPATH)→ BROKEN/STDLIB_MISMATCH · -E ok -I ok -S fail → 病因=環境變數;存證 env/pyvenv",
-        ok_i["state"] == "OK" and bool(ok_i.get("version")) and bad_i["state"] == "BROKEN" and bad_i["kind"] == "STDLIB_MISMATCH"
-        and bad_i["trials"]["-E"] and bad_i["trials"]["-I"] and not bad_i["trials"]["-S"] and "環境變數" in bad_i["cause"] and "PYTHONPATH" in bad_i["env"],
-        f"({bad_i.get('kind')} · {bad_i.get('cause')} · 三試 {bad_i.get('trials')})")
-    calls = []
-
-    def cnt_probe(py, libs):
-        calls.append(py)
-        return {n: "1.0" for n in libs}
-
-    def fake_interp(py):
-        return {"state": "BROKEN", "kind": "STDLIB_MISMATCH", "cause": "測", "trials": {"-E": True, "-S": False, "-I": True}, "err": "SRE module mismatch", "env": {}, "pyvenv": {}}
-    bi = {"state": "OK", "python": "x", "env": "via_vdf_312", "interp": fake_interp("x")}
-    v12, r12 = verdict_for(bi, {"duckdb": None}, ["duckdb"], [{"state": "FAIL", "file": "a"}])
-    with tempfile.TemporaryDirectory() as td3:
-        rep12 = run(["vdf"], "probe", do_print=False, reports=Path(td3), battery=[], python_fn=fake_py, probe_fn=cnt_probe, run_fn=fake_run,
-                    chains_fn=lambda: [], interp_fn=fake_interp)
-    chk("⑫ 解譯器壞=RED 且理由是解譯器不是缺庫(判錯的紅燈=假綠同罪);補庫 SKIP;run 不探庫不跑站;次步=診斷+重建境(候裁),不是 pip install",
-        v12 == "RED" and r12[0].startswith("解譯器壞") and not any("必要庫缺" in r for r in r12) and install_missing("vdf", bi, ["duckdb"], False)["state"] == "SKIP"
-        and rep12["families"]["vdf"]["verdict"] == "RED" and calls == [] and any("解譯器壞" in n for n in rep12["next"]) and not any("pip install" in n for n in rep12["next"]))
-    print(f"  [計] 十二檢 OK {12 - len(fails)} · FAIL {len(fails)}")
+    print(f"  [計] 十檢 OK {10 - len(fails)} · FAIL {len(fails)}")
     return 1 if fails else 0
 
 
@@ -610,10 +515,22 @@ def _arg(a: list, flag: str, default=None):
 def main() -> int:
     a = sys.argv[1:]
     if "--selftest" in a:
-        print("=== VDF/VRN/VAP 能跑閘(CGC_MDL137_RunGate)· 十二檢自測(零網路)===")
+        print("=== VDF/VRN/VAP 能跑閘(CGC_MDL137_RunGate v0102)· 十檢自測(零網路)===")
         return selftest()
     verb = pick_verb(a)
-    fams = [x.strip() for x in (_arg(a, "--family") or "").split(",") if x.strip()] or None
+    raw_families = _arg(a, "--family")
+    if "--family" in a and (raw_families is None or not raw_families.strip()):
+        print("  [FAIL] --family 後要給 vdf,vrn,vap 之一或逗號合寫")
+        return 2
+    fams = list(dict.fromkeys(
+        x.strip().lower() for x in (raw_families or "").split(",") if x.strip())) or None
+    bad_families = [x for x in (fams or []) if x not in FAMILY_DIRS]
+    if bad_families:
+        print(f"  [FAIL] --family 只收 vdf|vrn|vap，不收 {','.join(bad_families)}")
+        return 2
+    if "--fast" in a and "--all" in a:
+        print("  [FAIL] --fast 與 --all 不可同時使用")
+        return 2
     as_json, quiet = "--json" in a, "--quiet" in a
     try:
         if verb in ("run", "probe"):
