@@ -197,6 +197,58 @@
         "VIA_Reports/vdf/local_db/NEED_latest.json"
        ],
        "note": "全部票(批392 台股抓全部);月粒度只列缺的"
+      },
+      {
+       "id": "tw_daytrade_stock",
+       "zh": "個股當沖成交量值(ENG055 L15;TWSE TWTB4U + TPEX dayTrade;WAF 擋=誠實 FAIL;批520 L41 扣當沖量值之源)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG055_OmniFetch_v*.py",
+        "verb": [
+         "run",
+         "--lane",
+         "L15"
+        ]
+       },
+       "params": [],
+       "net": true,
+       "outputs": [
+        "tw_daytrade_stock"
+       ]
+      },
+      {
+       "id": "tw_daytrade_files",
+       "zh": "個股當沖量值—檔案收容道(ENG055 L15 --from-file;瀏覽器存的 TWSE/TPEX CSV/JSON → tw_daytrade_stock;只收不掛線 L45)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG055_OmniFetch_v*.py",
+        "verb": [
+         "run",
+         "--lane",
+         "L15"
+        ]
+       },
+       "params": [
+        "from_file",
+        "date",
+        "market"
+       ],
+       "param_flags": {
+        "from_file": "--from-file",
+        "date": "--date",
+        "market": "--market"
+       },
+       "net": false,
+       "outputs": [
+        "tw_daytrade_stock"
+       ],
+       "test": {
+        "verb": [
+         "--selftest"
+        ],
+        "expect": "rc0"
+       },
+       "timeout": 900
       }
      ]
     },
@@ -512,18 +564,19 @@
       },
       {
        "id": "vdf_vetf_consensus",
-       "zh": "VETF 持股×Consensus 擴充(Forward P/E fail-closed;候選沙盒)",
+       "zh": "VATETF 持股×Consensus 擴充(ENG085 正主橋:對接口合約自適應→收容件 adapter candidate 沙盒;Forward P/E fail-closed;批520)",
        "engine": {
-        "dir": "functional modules/VDF/references/intake/VETF_FINAL_SEAL_b242/01_ENGINES/Consensus_Enrichment_Adapter",
-        "glob": "VETF_ConsensusEnrichment_Adapter_v*.py",
-        "verb": []
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG085_VatetfBridge_v*.py",
+        "verb": [
+         "run"
+        ]
        },
-       "params": [
-        "vetf"
-       ],
+       "params": [],
        "net": false,
        "outputs": [
-        "VIA_Reports/vetf_consensus/asof=*/manifest.json"
+        "VIA_Reports/vatetf/out/asof=*/audit.json",
+        "VIA_Reports/vatetf/RUN_latest.json"
        ]
       }
      ]
@@ -658,6 +711,39 @@
         "tw_rest_daily",
         "正典表(協定檔)"
        ]
+      },
+      {
+       "id": "vdf_talib_one",
+       "zh": "TA-Lib OneEngine 正主橋(ENG083;收容件 self-test 家族境真跑;TA-Lib 缺=ABSENT 不代裝;批519)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG083_TALibOneBridge_v*.py",
+        "verb": [
+         "selftest-engine"
+        ]
+       },
+       "params": [],
+       "net": false,
+       "outputs": [
+        "VIA_Reports/talib_one/SELFTEST_ENGINE_latest.json"
+       ]
+      },
+      {
+       "id": "vdf_talib_vap",
+       "zh": "TA-Lib 特徵 → VAP ONE 堆疊圖(ENG083 vap:每檔 features.parquet + config → VAP_ENG016 svg/html;L42;批521)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG083_TALibOneBridge_v*.py",
+        "verb": [
+         "vap"
+        ]
+       },
+       "params": [],
+       "net": false,
+       "outputs": [
+        "VIA_Reports/talib_one/vap/<檔>/",
+        "VIA_Reports/talib_one/VAP_latest.json"
+       ]
       }
      ]
     }
@@ -732,7 +818,34 @@
        "net": false,
        "outputs": [
         "VIA_Reports/first_page_text/<stem>.json"
-       ]
+       ],
+       "timeout": 1500
+      },
+      {
+       "id": "vrn_firstpage_logic",
+       "zh": "①b 第一頁邏輯補缺(ENG086;讀 ENG072 sidecar → .logic86.json:代碼階梯/券商/評等/目標價/檔名×首頁互核;append-only)",
+       "engine": {
+        "dir": "functional modules/VRN",
+        "glob": "VRN_ENG086_FirstPageLogicBridge_v*.py",
+        "verb": [
+         "enrich"
+        ]
+       },
+       "params": [
+        "limit"
+       ],
+       "net": false,
+       "outputs": [
+        "VIA_Reports/first_page_logic/LOGIC86_latest.json",
+        "VIA_Reports/first_page_logic/<stem>.logic86.json"
+       ],
+       "test": {
+        "verb": [
+         "--selftest"
+        ],
+        "expect": "rc0"
+       },
+       "timeout": 600
       },
       {
        "id": "vrn_structdb",
@@ -901,6 +1014,20 @@
         "glob": "SUP_MDL748_FinancialLogicHub_v*.py",
         "verb": [
          "--selftest"
+        ]
+       },
+       "params": [],
+       "net": false,
+       "outputs": []
+      },
+      {
+       "id": "vrn_nlp",
+       "zh": "NLP 工具導入(批517 操作員令「VRN 實測 NLP 工具要導入」;正主 SUP_MDL744 NLP 應用系統統轄橋 demo:尾版 v1.8.0 切段/表格/版面/摘要真跑;零網路)",
+       "engine": {
+        "dir": "supportive modules/70_VRN_Rules",
+        "glob": "SUP_MDL744_NLPApplicationHub_v*.py",
+        "verb": [
+         "demo"
         ]
        },
        "params": [],
