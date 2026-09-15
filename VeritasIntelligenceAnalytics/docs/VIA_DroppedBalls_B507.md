@@ -47,6 +47,9 @@
 | Z30 | 「以 VIA 為中央管理 全部 SSOT 化 唯一接觸口」(L20 延伸):冊外仍有寫死路徑/自帶輸出夾的件(中央治理家族五件、VETF 封印包 adapter、ENG075 OUTDIR);逐件改成讀冊(Spec/DataHome/契約)=下一批盤點表 | 未做 | AI | 出「寫死路徑清單」再逐件改冊 |
 | Z31 | VRN_MDL001_Converter v0121 自測太重:容器 82.7s、工作站 >180s TIMEOUT(渲染 A4 200/600 DPI 點陣頁 ×9 檢)→ Grid v0310 站逾時 600 先讓閘判真;候優化:自測改小頁(A6)或只算一次 pixmap | 未做 | AI | v0122 自測瘦身,量到 <30s |
 | Z32 | ~~摘要批跑器自測出網(Summarizer 取價器沒看閘)~~ 已結(批516):Summarizer v0102 閘 + digest v0115 VIA_SELFTEST=1;容器帶 VIA_NET_CONSENT=YES 跑自測零 404 | 已結(批516) | — | 工作站 `via-rungate --family vrn` 尾行不再有 HTTP 404 即證 |
-| Z33 | ENG069 RevenueConsensusAnalysis 自測依賴真庫(容器 2/6 FAIL:單庫 join/四象限/頁);VTMRA 閘在容器判 RED 是它;工作站有庫應過 → 若工作站也紅=自測要加「無庫=NODATA 誠實」 | 未做(等實錄) | 操作員+AI | 貼回 `via-vtmra` 矩陣的 eng069 列 |
+| Z33 | ENG069 月營收×共識 FAIL(工作站 rc=1 同容器):DB_TW 寫死主路徑(LL30)→ **v0106** 主庫資料家優先 + 表在零列=誠實缺料 rc2;工作站再跑 `via-vtmra` 看 eng069 列(缺料=先 via-revenue + 共識入庫) | 未做(等實錄) | 操作員+AI | 貼回 `via-vtmra` eng069 列 |
 | Z34 | TA-Lib 未裝(容器/工作站皆 ABSENT 直到你裝):裝=你的手 `& C:\Users\tonyk\envs\via_vdf_312\Scripts\python.exe -m pip install TA-Lib`(0.5+ wheel 內含 C 庫)→ 再 `via-talib` 應 OK 五數值檢 | 操作員的手 | 操作員 | 裝後貼回 via-talib 一行 |
+| Z35 | VDF 短缺口「逐日全市場」道(L37 ⑤):ENG054/064 只有逐檔道(一檔一請求;5 日≈16 分);TWSE MI_INDEX ALLBUT0999 / TPEX 日成交行情一日一請求可補 ≤10 日缺口 → ENG054 v0105 --lane bulk-day(anti-join 同律;同意閘不變) | 未做 | AI | 先量端點欄位(需你開閘試一次)再建 |
+| Z36 | VIA_Discussion_Reconstruction_Package_v1.6.1(61MB JSON 知識傾印;上傳 zip 內)不入倉:資料落資料家 `VIA System\via_database\nlp\`?由你裁;整理結果 md 已收 _b283 | 候 | 操作員 | 裁落點後我建 link 冊 |
+| Z37 | 工作站 via-vcgc 註冊稽核「中央冊 4836/4837 缺 1」=你樹上一件未編號元件(容器 4836 全齊)→ `via-vcgc registry-sync --apply` 在你機器跑一次(會改 SSOT 冊=先 git stash 再 pull 的流程要留意) | 操作員的手 | 操作員 | 跑後貼回 registry-sync 一行 |
 | ~~W~~ | ~~8 件 FAIL_HIT 首頁件重抽~~ | 已結(批503) | — | 64/64 |
