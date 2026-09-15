@@ -15,6 +15,8 @@
 工作根 VeritasIntelligenceAnalytics/。操作員用中文;工作站 C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics。
 
 先做(不准跳過,任何造件之前):
+0. 對齊遠端(L25 多 AI 交會律):git fetch origin claude/via-envmanager-governance-7cls8h; git status --short; git log --oneline HEAD...origin/claude/via-envmanager-governance-7cls8h
+   落後→ git pull --ff-only;本機有別的線(未推的 commit/未追蹤的新版號檔)→ 先 commit 到側枝 local/parallel-B<批> 並 push,再對齊;永不在陳舊樹上造件。
 1. 讀倉根 VIA_HANDOVER_LATEST.md(一頁交接:〇 接手提示 · 一 政策庫 · 二 安裝核可/環境工具 · 三 邏輯/因子/資料庫 ·
    四 引擎調度/多矩陣 · 五 指令與參數 · 六 註冊稽核 · 七 自動編號註冊表 · 八 交接本文 · 九 掉球清單)。
 2. 讀 docs/ 最新 VIA_Handover_*_B*.md 的「三 還掛著的事」與最後兩批段落。
@@ -49,6 +51,8 @@
 ```
 
 ## B · 給交接者(離場 AI)——收尾清單(每一條都要有證據路徑)
+
+0. push 前 git fetch 再比對(HEAD...origin 無分歧);新版號檔要先看遠端有沒有同名(撞名=另一條線在跑,見 L25/LL13)。
 
 | # | 收尾 | 證據 |
 |---|------|------|

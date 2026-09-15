@@ -105,6 +105,9 @@ class _LazyTool(_types.ModuleType):
             return []
 
 
+_NEVER_APPLY = frozenset({"PATH", "PYTHONHOME", "PYTHONPATH", "PYTHONSTARTUP", "PYTHONEXECUTABLE", "PYTHONUSERBASE", "VIRTUAL_ENV", "CONDA_PREFIX", "HOME", "USERPROFILE"})
+
+
 def _boot():
     if os.environ.get("VIA_BOOT", "1") == "0":
         return
@@ -137,8 +140,10 @@ def _boot():
                 with open(cache, "r", encoding="utf-8") as fh:
                     r = json.load(fh)
                 n = 0
+                # 批509 護欄:快取只准套執行緒預算類變數;PYTHON*/PATH/VIRTUAL_ENV/CONDA_PREFIX 永不從快取套(套錯版 PYTHONHOME/PYTHONPATH=
+                #   子行程家族境 python 起跑就 "SRE module mismatch";操作員實錄 via_vdf_312/via_vrn_312 全站同病)
                 for k, v in (r.get("applied") or {}).items():
-                    if isinstance(k, str) and k.isupper() and v is not None and k not in os.environ:
+                    if isinstance(k, str) and k.isupper() and v is not None and k not in os.environ and not k.startswith("PYTHON") and k not in _NEVER_APPLY:
                         os.environ[k] = str(v); n += 1
                 os.environ["VIA_ACCEL_BOOT"] = f"cache:{r.get('libs_available', 0)}/{r.get('libs_total', 0)}:{n}env"
             else:
