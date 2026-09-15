@@ -1,6 +1,6 @@
 {
  "schema": "VIA.Workflow.SSOT.v1",
- "batch": "批521",
+ "batch": "批522",
  "note": "工作流=冊上項(VIA_InputConsole_Spec 家族項)依序重組;執行只經匯流排 call --item(閘不變:net 項要操作員同意閘);L40 工作流重組律",
  "workflows": [
   {
@@ -90,6 +90,25 @@
     "vap_dashboard",
     "vap_std_dashboard",
     "vap_stack"
+   ]
+  },
+  {
+   "id": "vrn_firstpage_logic_chain",
+   "zh": "首頁擷取→第一頁邏輯補缺(ENG072 sidecar → ENG086 .logic86.json;代碼階梯/券商/評等/目標價/檔名×首頁互核;批522)",
+   "profile": "run",
+   "nodes": [
+    "vrn_firstpage",
+    "vrn_firstpage_logic"
+   ]
+  },
+  {
+   "id": "vdf_daytrade_file_chain",
+   "zh": "當沖檔案收容→TA-Lib 扣當沖特徵→VAP(瀏覽器存的 CSV 進庫後重算量能指標;L41/L45;批522)",
+   "profile": "run",
+   "nodes": [
+    "tw_daytrade_files",
+    "vdf_talib_one",
+    "vdf_talib_vap"
    ]
   }
  ]

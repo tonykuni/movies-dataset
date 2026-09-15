@@ -215,6 +215,40 @@
        "outputs": [
         "tw_daytrade_stock"
        ]
+      },
+      {
+       "id": "tw_daytrade_files",
+       "zh": "個股當沖量值—檔案收容道(ENG055 L15 --from-file;瀏覽器存的 TWSE/TPEX CSV/JSON → tw_daytrade_stock;只收不掛線 L45)",
+       "engine": {
+        "dir": "functional modules/VDF/engine",
+        "glob": "VDF_ENG055_OmniFetch_v*.py",
+        "verb": [
+         "run",
+         "--lane",
+         "L15"
+        ]
+       },
+       "params": [
+        "from_file",
+        "date",
+        "market"
+       ],
+       "param_flags": {
+        "from_file": "--from-file",
+        "date": "--date",
+        "market": "--market"
+       },
+       "net": false,
+       "outputs": [
+        "tw_daytrade_stock"
+       ],
+       "test": {
+        "verb": [
+         "--selftest"
+        ],
+        "expect": "rc0"
+       },
+       "timeout": 900
       }
      ]
     },
@@ -786,6 +820,32 @@
         "VIA_Reports/first_page_text/<stem>.json"
        ],
        "timeout": 1500
+      },
+      {
+       "id": "vrn_firstpage_logic",
+       "zh": "①b 第一頁邏輯補缺(ENG086;讀 ENG072 sidecar → .logic86.json:代碼階梯/券商/評等/目標價/檔名×首頁互核;append-only)",
+       "engine": {
+        "dir": "functional modules/VRN",
+        "glob": "VRN_ENG086_FirstPageLogicBridge_v*.py",
+        "verb": [
+         "enrich"
+        ]
+       },
+       "params": [
+        "limit"
+       ],
+       "net": false,
+       "outputs": [
+        "VIA_Reports/first_page_logic/LOGIC86_latest.json",
+        "VIA_Reports/first_page_logic/<stem>.logic86.json"
+       ],
+       "test": {
+        "verb": [
+         "--selftest"
+        ],
+        "expect": "rc0"
+       },
+       "timeout": 600
       },
       {
        "id": "vrn_structdb",

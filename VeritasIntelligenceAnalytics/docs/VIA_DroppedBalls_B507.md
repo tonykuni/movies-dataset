@@ -57,8 +57,11 @@
 | Z40 | VRN_BatchFourEngine_v0100.py 第三次上傳(md5 同 b245/b383):它驅動的 VRNFourEngineSuite(four_engine_orchestrator.run_all_engines)**不在倉**→ 驅動器只收不掛;要用就上傳套件(或指出它在哪);docx→md 橋/批次/對帳已有正主(ENG075/匯流排/ENG074) | 候(由你) | 操作員 | 上傳套件或裁「不用」 |
 | Z41 | VETF_FINAL_SEAL(b242 同件)的 React/Vinext 網站原始碼與 Standalone HTML:React 要 npm(觸網、CDN 外鏈)=不掛線;Standalone_Current 可當收容靜態頁(U/I 契約列為收容件;不在 ui_support 不連)· VATETF 現役=冊上項 vdf_vetf_consensus + `via-vetf`(v0206 資料家優先) | 候 | 操作員 | 裁 Standalone 是否複製入 ui_support(零 CDN 檢過才收) |
 | Z42 | 工作流重組台 LIVE:頁面現只探 /api/console/status 判樞紐;「按下即跑」要 DeckServer 新端點(workflow_run 任務+權杖)——零彈窗/閘律下先不做,執行走 `via-workflow run <id>`;下批若要=Deck +workflow_run(net 依節點) | 候 | AI | 操作員點頭再做 |
-| Z43 | VATETF 實測:`via-vetf` 工作站 **OK 40 筆(PASS 2/REVIEW 38)**;但 eps/forward_pe 覆蓋 0% → ENG085 v0102/v0103 FactSet 稀釋 EPS 兩期碎片(L43)→ 再跑看 coverage_pct.factset_eps_n/forward_pe_n | 未做(等實錄) | 操作員+AI | via-vetf 貼回 |
-| Z44 | 個股當沖表:工作站 `via-bus one tw_daytrade_stock` RED(TWSE rwd 回安全頁非 JSON;TPEX rwd 讀逾時)→ ENG055 v0110 L15 改 openapi TWTB4U 優先(同一支已能抓標的冊;量值鍵名防禦對映並印回)→ 再跑貼 note(若 openapi 無量值鍵=候源,量能指標 NULL 誠實) | 未做(等實錄) | 操作員+AI | `via-bus one tw_daytrade_stock` 貼回 note |
+| Z43 | VATETF EPS/forward P/E 覆蓋:批521 v0103 只給 FactSet 稀釋 EPS,但工作站 via-vetf 假綠(adapter APPEND_ONLY_CONFLICT 一字未寫)→ v0104 每跑一夾 RUN_<ts>(L44);FactSet 目標價只 4/40 檔 → forward P/E 覆蓋上限 10% 誠實 | 候 | 操作員 | via-vetf 重跑貼回 [audit] coverage_pct |
+| Z44 | 個股當沖量值來源:openapi TWTB4U=標的冊(無量值;鍵 Date/Code/Name/Suspension)· rwd/TPEX 對 python 客戶端 WAF 安全導向(容器再證 swagger 都擋)→ ENG055 v0111 檔案收容道(L45):瀏覽器存 CSV → daytrade_files 夾或 via-daytrade --from-file | 候 | 操作員 | 存 CSV → via-daytrade --from-file → via-taone check-data |
 | Z45 | 持股史深:工作站 holdings_daily 只有 1 檔 ETF/40 列(2026-09-07);全景 etf_holdings_daily fetch RED「ETF 23 檔 · 缺快照 1034 日格」→ VATETF 只算得到那一檔;補料=`via-etfhist backfill`(觸網;車道 VERIFIED 才呼)| 未做 | 操作員 | via-etfhist 貼回 |
 | Z46 | tw_daily_prices min(date)=1900-01-01 哨兵列(via-census -Hygiene 早知)→ TA-Lib/VAP 讀價一律 date≥2020 或以 tw_prices_adj 為源;清哨兵=你的手(census DELETE 只寫不跑) | 候 | 操作員 | — |
+| Z47 | OCR 車道 via_paddle_311 境壞:python 不在(FileNotFoundError)/pyvenv.cfg 缺(rc=106)→ ENG072 v0129 預檢 SKIP 誠實(L47);重建=你的手 `via-rebuild --env via_paddle_311` → `via-vrnlogic reset-backends` | 候 | 操作員 | via-ryg vrn ㉜/㊷ |
+| Z48 | vrn 境無 opencc → OCR 道簡→繁直通(㉙);裝=你的手 `<vrn python> -m pip install opencc-python-reimplemented`;裝前 tag 標 [未繁化:樞紐無 opencc] | 候 | 操作員 | via-ryg vrn ㉙ |
+| Z49 | 第一頁邏輯收容件的 Layout 字級階層/公司名 與 TableGeometry 隱藏格線表格重建要 chars 幾何;ENG072 sidecar 無 chars → 未接線(候);財務容差帶候接 ENG074/ENG080 | 候 | AI | 下一批看 ENG072 能否留 chars 幾何 sidecar |
 | ~~W~~ | ~~8 件 FAIL_HIT 首頁件重抽~~ | 已結(批503) | — | 64/64 |

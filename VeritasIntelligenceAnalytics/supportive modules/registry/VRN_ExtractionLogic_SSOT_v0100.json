@@ -63,5 +63,84 @@
   "② 驗證失敗 → OCR 階梯 輕量(tesseract)→ 雙引擎(+easyocr)→ 重型(paddle 三支);共用 budget_s",
   "③ 都失敗 → PDF 畫質提升:DPI 拉到 hq_dpi 帶(300~350;MDL001 auto_dpi)重繪首頁,再跑同一條階梯;自有 hq_budget_s,不受 ② 用盡影響",
   "④ 成功/失敗與方法逐件入中央邏輯庫;同檔再跑命中不重抽"
- ]
+ ],
+ "firstpage_logic": {
+  "owner": "VRN_ENG086_FirstPageLogicBridge",
+  "intake": "VIA_VRN_FirstPageEngine_v0101_b522(零觸碰)",
+  "batch": "批522",
+  "law": [
+   "L46"
+  ],
+  "ticker_ladder": [
+   "FILE_SUFFIX(1234.TW/1234 TT)",
+   "FILE_BARE(四碼;年段 2021–2030 不收)",
+   "SECTOR_FILE(產業/類股/族群/策略/展望)",
+   "TITLE_SUFFIX",
+   "TITLE_SYNONYM(名冊 tw_listings 名→碼)",
+   "BODY_SUFFIX",
+   "SECTOR_TITLE",
+   "RECLAIM(年段回收:名冊有或三碼互證)",
+   "BODY_BARE(前 600 字)",
+   "NONE"
+  ],
+  "broker": {
+   "dict": "收容件 16 家 + VIA 補冊 30 家(兆豐/國泰/永豐/玉山/元富/華南/日盛/康和/宏遠/台新/第一金/合庫/新光/國票/亞東/大昌/福邦/德信/匯豐/法巴/瑞信/巴克萊/Jefferies/海通/中金/瑞穗/日興/Bernstein/小摩/大摩)",
+   "guard": "CJK 子字串;拉丁詞界;≤3 字拉丁須大寫獨立詞;泛用英文字(capital/president/first/oriental/concord/mega)須跟 securities/invest;最長別名優先"
+  },
+  "rating": {
+   "classes": [
+    "BUY",
+    "HOLD",
+    "SELL",
+    "ADD"
+   ],
+   "guard": "線索詞(評等/建議/Rating)優先 → 獨立短行(≤8 字)→ 拉丁長詞詞界;add 不單獨算;多公司摘要(晨會/早報/週報/摘要/盤勢/策略/展望 且代碼法弱)不取"
+  },
+  "target_price": {
+   "cues": [
+    "目標價[^\\d]{0,14}?(數)",
+    "Target Price|Price Target|TP|PT(詞界)"
+   ],
+   "fallback": "收容件 NT$ 正則(標弱)",
+   "guard": "至少兩位數或帶小數;等於解析代碼或名冊內文中出現的四碼=不算;多公司摘要不取"
+  },
+  "date": [
+   "8 碼西元",
+   "6 碼 yymmdd",
+   "民國 7 碼(1140822)"
+  ],
+  "xcheck": [
+   "filename_vs_page(ticker/broker/date 三欄同=PASS;缺欄 None 不判)",
+   "zone_presence(資訊區=目標價/評等/券商;本文區=句)"
+  ],
+  "outputs": "VIA_Reports/first_page_logic/<stem>.logic86.json + LOGIC86_latest.json + BENCH_latest.json(append-only)",
+  "bench_b522": {
+   "files": 76,
+   "ticker": "54/57(3 漏=舊真值把年份當代碼)",
+   "broker": "50/50",
+   "date": "64/75(真值日期另源)"
+  },
+  "enrich_b522_container": {
+   "sidecars": 71,
+   "methods": {
+    "FILE_BARE": 46,
+    "BODY_BARE": 5,
+    "NONE": 14,
+    "BODY_SUFFIX": 2,
+    "FILE_SUFFIX": 1,
+    "SECTOR_FILE": 3
+   },
+   "ticker_agree": "45/71",
+   "broker": "41/71",
+   "rating": "26/71",
+   "target_price": "39/71"
+  },
+  "not_wired": [
+   "Layout 字級階層/公司名(要 chars 幾何)",
+   "TableGeometry 隱藏格線表格(要 chars)",
+   "FinancialValidation 容差帶(候接 ENG074/ENG080)",
+   "NLPRepair(ENG072 ⑭ 已有)"
+  ]
+ },
+ "batch": "批522"
 }
