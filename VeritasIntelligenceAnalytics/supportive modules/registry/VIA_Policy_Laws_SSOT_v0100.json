@@ -1,7 +1,7 @@
 {
  "schema": "VIA.PolicyLaws.SSOT.v1",
- "batch": "批520",
- "ts": "2026-09-15",
+ "batch": "批521",
+ "ts": "2026-09-15 14:26",
  "purpose": "政策庫正本:操作員律 + 紀律 + lessons-learned(只增不減;ENG082 sync-db 攤平入 via_policy_factors;VCGC 唯一對接口讀此冊)",
  "laws": [
   {
@@ -258,6 +258,18 @@
    "batch": "批520",
    "cat": "指標",
    "zh": "TA-Lib 量值政策律(操作員令「TA-LIB 只取用股票的 ADJ 價格;成交量值要有扣除當沖交易量值跟沒扣除,但計算指標一律使用扣除後」):①價=ADJUSTED_PRICE_ONLY(tw_prices_adj 的 adj_open/high/low/close;缺則由 tw_daily_prices 以 adj_close/close 因子還原;不拿 raw OHLC 算指標)②量值四欄同時保留:volume_raw/volume_ex_daytrade/turnover_raw/turnover_ex_daytrade ③指標一律以扣當沖後量值計(display_mode/indicator_volume_bases=ex_daytrade)④當日無當沖資料 → ex 欄 NULL、該日量能指標 NULL 並警告,不拿 raw 冒充 ⑤扣法:ex_volume=成交股數−當沖成交股數(TWSE 當沖股數=買賣兩腿平均);ex_turnover=成交金額−(當沖買進金額+當沖賣出金額)/2 ⑥源:價 ENG060 tw_prices_adj · 值 ENG057 tw_trading_daily · 當沖 ENG055 L15 tw_daytrade_stock(WAF 擋=誠實缺);政策 config=functional modules/TALib/VIA_TALib_OneEngine.via.config.json(收容件 config 零觸碰)"
+  },
+  {
+   "id": "L42",
+   "batch": "批521",
+   "cat": "指標",
+   "zh": "TA-Lib→VAP 交接律(操作員令「全面性解決 TA-LIB 輸入為 VDF 產出的資料庫,未來輸出給 VAP 或其他專題繪圖」):①輸入只從 VDF 庫(tw_prices_adj/tw_daily_prices · tw_trading_daily · tw_daytrade_stock)經正主橋 --query 進引擎,引擎不自抓 ②交接物=特徵表 features parquet(date×ticker 寬表:adj_* · volume_raw/ex_daytrade · turnover_raw/ex_daytrade · ta__<函數>__<參數>__<輸出>)+ 訊號表 + VAP Catalog(VIA-VDF-VAP-CONNECTION-MANIFEST/1.0);VAP/專題繪圖只讀特徵表,不重算指標 ③圖規走 VAP ONE 堆疊 config(還原價 K 線+扣當沖量;量缺=raw 誠實標;SMA20 雙軸;RSI14)由橋生成,VAP_ENG016 --render 出 svg/html(零 CDN)④收容件 JSON/啟動邊界的毛病由橋墊片吸收,收容件零觸碰"
+  },
+  {
+   "id": "L43",
+   "batch": "批521",
+   "cat": "共識",
+   "zh": "共識 EPS 律(操作員令「CONSENSUS EPS SHOULD BE DILUTED EPS ONLY IN FACTSET CONSENSUS」):Forward P/E 用的共識 EPS 只取 FactSet 共識(consensus_daily source=CNYES_FACTSET:鉅亨 FactSet estimateProfit 年度 feMean=稀釋 EPS 共識均值)的 N/N+1 兩期;YFinance(YAHOO_QS)與其他來源只給目標價(Low/Mean/Median/High 分欄,不跨源平均),不給 EPS;碎片帶 eps_basis 欄標示來源與稀釋基礎;EPS 缺=Forward P/E fail-closed 不編"
   }
  ],
  "lessons": [
@@ -462,6 +474,31 @@
    "id": "LL38",
    "batch": "批520",
    "zh": "ENG069 ② 每檔唯一最新月 FAIL:工作站 monthly_revenue_analysis 同 (code,ym) 多列(多來源/重跑殘留),latest 子查詢只鎖 ym 沒鎖列 → JOIN 放大;容器空庫判不到。修=QUALIFY ROW_NUMBER() 去重 + 印重複列數(庫零觸碰)+ 合成庫自測證 join 不放大(容器也能跑)。凡 JOIN 到「每檔一列」的視圖,兩側都要鎖唯一"
+  },
+  {
+   "id": "LL39",
+   "batch": "批521",
+   "zh": "via-taone 印的裝法 numpy<2 在工作站 pip 從原始碼編譯失敗(Meson/clang):via_vdf_312 實為 Python 3.13 venv,numpy 1.26 沒有 3.13 wheel;收容件 requirements 的釘版是 numpy<2 世界的。裝法要依境選:numpy≥2 或 Python≥3.13 → TA-Lib≥0.6(wheel 自帶 C 庫;容器 0.8.0+numpy 2.4.6 self-test PASS);probe 先印 python/numpy 版本再給令"
+  },
+  {
+   "id": "LL40",
+   "batch": "批521",
+   "zh": "via-taone run --codes 2330,2317 到引擎變成 IN ('2330 2317'):PowerShell 把逗號拆陣列、Register 再以空白合回(批514 split_need 同病)。凡吃清單的旗標,引擎端一律逗號/空白/分號/全形逗號/頓號皆分隔,不能只 split(',')"
+  },
+  {
+   "id": "LL41",
+   "batch": "批521",
+   "zh": "五矩陣 3 紅具名:vrn_firstpage=ENG072 二十二檢含 OCR 階梯逾 600s(慢≠壞 → 冊項 timeout 1500,匯流排 v0127 認冊上逾時);vrn_structdb ㉞/vrn_finpages ⑯=自測用 str(Path('/tmp/_d_')) 比對,Windows 印反斜線永遠不等=判錯的紅燈(as_posix 比對)。容器(Linux)看不到這兩紅,工作站才看得到——判準要對兩個作業系統都成立"
+  },
+  {
+   "id": "LL42",
+   "batch": "批521",
+   "zh": "TA-Lib 收容件把 talib.__ta_version__(bytes)寫進 manifest → json.dumps 炸「無法 JSON 序列化:bytes」;容器裝上 TA-Lib 才跑得到這一步(工作站沒裝=看不到)。收容件零觸碰:橋以 -c 墊片載入模組、補 json_default(bytes→str)再呼 main;凡收容件的 JSON/啟動邊界毛病都在橋吸收"
+  },
+  {
+   "id": "LL43",
+   "batch": "批521",
+   "zh": "收容件 main() 跑完但部分函數缺量基時回 status=YELLOW 且 rc=2(不是 0):判讀器以 status 為準(rc 0/2 + YELLOW=誠實黃),不以 rc≠0 一律判 FAIL;因由行要先濾掉 pandas PerformanceWarning 等噪音,否則假紅的理由是一行警告。容器證:run 1240 → YELLOW 31 列/577 欄/覆蓋 0.93/MissingActivityBasis 34 → latest → vap OK 圖 3"
   }
  ]
 }

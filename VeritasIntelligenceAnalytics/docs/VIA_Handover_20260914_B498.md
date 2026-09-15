@@ -744,6 +744,43 @@ via-vcgc page --publish                                    # v0111(批號讀政�
 
 ---
 
+## 一-x · 批521 · 你貼回批520 區塊 + VCGC 頁 + 令「全面性解決 TA-LIB 輸入為 VDF 產出的資料庫,未來輸出給 VAP 或其他專題繪圖;完成 VIA VRN VDF」+「CONSENSUS EPS SHOULD BE DILUTED EPS ONLY IN FACTSET CONSENSUS」
+
+**你貼回 → 判讀 → 做了**
+
+| 量到 | 判讀 | 做了 |
+|---|---|---|
+| `via-vtmra` YELLOW:eng069 **v0108 OK** | 去重生效(LL38 收) | — |
+| `via-vetf` OK 40 筆(PASS 2 · REVIEW 38)但 **eps/forward_pe 覆蓋 0%** | 橋只餵目標價欄,adapter 的 EPS 碎片(period n/n1、fiscal_year、eps_mean)沒餵 → forward P/E 算不出;你令「共識 EPS 只用 FactSet 稀釋 EPS」 | **ENG085 v0102** 餵 EPS 碎片 → **v0103** 只有 `source LIKE '%factset%'` 的列給 eps(n=eps_fy0/n1=eps_fy1;`eps_basis=FACTSET_DILUTED_EPS`;cnyes estimateProfit feMean 年度均值),YAHOO/EXTERNAL 只給目標價不給 EPS;10/10 → **律 L43** |
+| `via-taone` ABSENT;貼的 pip 令 `numpy<2` 在 **3.13 境編譯失敗**(clang/Meson) | via_vdf_312 其實是 Python 3.13 venv + numpy 2.x;收容件釘版(numpy<2)是舊境藥方 | **ENG083 v0103** `probe` 讀 python/numpy 版 → 依境印令:3.13 或 numpy 2 → `"TA-Lib>=0.6"`(wheel 內含 C 庫,**不降 numpy**;容器證 talib 0.8.0 + numpy 2.4.6 self-test PASS);舊境才印釘版 → **LL39**;`functional modules/TALib/VIA_TALib_requirements.via.txt` |
+| `run --codes 2330,2317` 被併成一字串 | PowerShell 把逗號串當一個 arg | `split_codes`(逗號/空白/分號/全形逗號/頓號)→ **LL40** |
+| `via-bus one tw_daytrade_stock` **RED**(TWSE rwd 非 JSON / TPEX 逾時);`check-data` 當沖表 ABSENT | rwd 端點有 WAF;openapi `TWTB4U` 在你機器可達(批517 資格清單走過) | **ENG055 v0110** L15 openapi 優先(鍵名子字串比對 Code/成交股數/買進/賣出;民國日轉西元;**無量欄=印鍵名貼回**)+ rwd/TPEX 備援;9/9;Z44 |
+| VCGC 頁五矩陣 **3 紅**:`vrn_firstpage` TIMEOUT · `vrn_structdb` ㉞ · `vrn_finpages` ⑯ | ㉞/⑯ 是 Windows `\` vs `/` 路徑字串比對=**自測假紅**(LL41);firstpage 600s 不夠 OCR 派送 | **ENG073 v0126 / ENG074 v0109** `as_posix()` 比對(36/36 · 19/19);冊項 `vrn_firstpage.timeout=1500` + **Bus v0127** `call()` 讀冊項逾時(48/48) |
+| 令「TA-LIB 輸入=VDF 庫 → 輸出給 VAP」 | 鏈要在容器整條證過才算 | **ENG083 v0103** `-c` 墊片載收容件(補 `json_default` bytes→str;零觸碰;LL42)+ `latest`(manifest 摘要/function_errors/L41 註)+ `vap`(每檔 parquet → VAP ONE:K 線 adj + 量基(扣當沖有料才用,缺=raw 誠實標)+ SMA20 雙軸 + RSI14;圖規過 ENG016 驗證)+ 引擎 YELLOW rc=2 認黃(LL43);16/16;冊項 `vdf_talib_vap`;工作流 `vdf_talib_features` 四站 |
+
+**容器全鏈證(批521)**:`probe` OK(3.11/numpy 2.4.6/talib 0.8.0)→ `selftest-engine` OK coverage=1.0 rows=360 → `run --since 2026-08-01 --codes 1240` **YELLOW** 31 列 · 577 欄 · 覆蓋 0.93 · 函數錯誤 34 全是 `MissingActivityBasis`(容器無當沖表 → 量能函數 NULL,L41 不冒充)→ `latest` 印 parquet/csv 路徑 → `vap --codes 1240` **OK** 圖 3(`vap_one.svg/html`,量基 volume_raw 誠實標)。`via-vetf status` 容器 NODATA(holdings 缺)誠實;`validate vdf_talib_features` GATED(觸網項等你開閘)。
+
+### 一貼即用(批521)
+
+```powershell
+Set-Location 'C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics'
+git status --short | Select-Object -First 10; git stash push -m "b521 工作站樹快照"; git pull --ff-only origin claude/via-envmanager-governance-7cls8h; git stash list; git log --oneline -1   # 四行貼回
+. (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName   # v0207
+via-taone probe                                            # vdf 境 python/numpy/talib(不裝);ABSENT 印的令已依境
+& "C:\Users\tonyk\envs\via_vdf_312\Scripts\python.exe" -m pip install "TA-Lib>=0.6"   # 你的手(wheel 內含 C 庫;不降 numpy;LL39)
+via-taone selftest-engine                                  # 360 筆合成 OHLCV → OK coverage=1.0
+via-taone run --since 2026-06-01 --codes 2330,2317         # adj 價+扣當沖量值;當沖表缺 → YELLOW(量能函數 NULL 誠實)
+via-taone latest                                           # 列/檔/日期範圍/函數錯誤分類/parquet 路徑
+via-taone vap                                              # 特徵 → VAP ONE:VIA_Reports\talib_one\vap\<code>\RUN_*\vap_one.html(貼回 [OK]/[FAIL] 行)
+via-vetf                                                   # ENG085 v0103:FactSet 稀釋 EPS 專用 → 貼回 [audit] eps/forward_pe 覆蓋
+$env:VIA_NET_CONSENT='YES'; $env:VIA_SCRAPE_CONSENT='YES'; via-bus one tw_daytrade_stock   # ENG055 v0110 openapi 優先;印「鍵名」就整段貼回
+via-taone check-data                                       # 當沖表覆蓋 %(有料後重跑 via-taone run → 量能函數應有值)
+via-ryg vrn                                                # 三紅應消(㉞/⑯ 路徑比對;firstpage 逾時 1500s 冊定)
+via-vcgc page --publish
+```
+
+---
+
 ## 二 · 操作員機器實況(他貼的 EnvManager v0300 AUDIT,run ENV-20260914_112000;直接當量測)
 
 | 事實 | 影響 |
