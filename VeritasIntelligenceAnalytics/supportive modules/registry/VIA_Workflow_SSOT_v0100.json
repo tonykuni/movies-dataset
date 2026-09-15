@@ -1,0 +1,15 @@
+{
+ "schema": "VIA.Workflow.SSOT.v1",
+ "batch": "批519",
+ "note": "工作流=冊上項(VIA_InputConsole_Spec 家族項)依序重組;執行只經匯流排 call --item(閘不變:net 項要操作員同意閘);L40 工作流重組律",
+ "workflows": [
+  {"id": "vrn_report_chain", "zh": "VRN 研報鏈(首頁擷取→基本資訊入庫→財報頁→一題四點→頁面再生)", "profile": "run", "nodes": ["vrn_firstpage", "vrn_structdb", "vrn_finpages", "vrn_fourpoint", "vrn_ui"]},
+  {"id": "vrn_logic_nlp", "zh": "VRN 邏輯庫×財務邏輯×NLP 摘要(零網路;小數量實測)", "profile": "test", "nodes": ["vrn_logic", "fin_logic", "vrn_nlp"]},
+  {"id": "vdf_daily_update", "zh": "VDF 日更(價量增量→籌碼→成交值→對齊核對→架構矩陣)", "profile": "run", "nodes": ["tw_prices_inc", "tw_chips", "tw_trading_value", "tw_align", "db_arch"]},
+  {"id": "vatetf_pipeline", "zh": "VATETF 主動 ETF 應用(宇宙→持股史深→ETF×營收動能→持股×Consensus)", "profile": "run", "nodes": ["etf_universe", "etf_holdings_daily", "etf_revenue", "vdf_vetf_consensus"]},
+  {"id": "vtmra_family", "zh": "VTMRA 月營收家族(月營收→史深→ETF 營收動能→TWREV→族群相位)", "profile": "run", "nodes": ["tw_revenue_codes", "tw_revenue_backfill", "etf_revenue", "vdf_twrev", "vdf_revphase"]},
+  {"id": "vdf_db_governance", "zh": "VDF 資料庫治理(三庫盤點→覆蓋摘要→缺口清單→架構矩陣;零網路)", "profile": "run", "nodes": ["db_localdb_scan", "db_coverage", "tw_need", "db_arch"]},
+  {"id": "vdf_talib_features", "zh": "技術指標特徵(架構矩陣→TA-Lib OneEngine 正主橋;TA-Lib 缺=ABSENT)", "profile": "test", "nodes": ["db_arch", "vdf_talib_one"]},
+  {"id": "vap_charts", "zh": "VAP 圖表(儀表板→標準儀表板→Seaborn 垂直圖組)", "profile": "run", "nodes": ["vap_dashboard", "vap_std_dashboard", "vap_stack"]}
+ ]
+}
