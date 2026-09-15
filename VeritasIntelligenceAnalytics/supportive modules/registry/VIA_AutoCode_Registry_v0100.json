@@ -7767,6 +7767,12 @@
    "kind": "批520 ENG069 v0108 去重 + VDF_ENG085 VatetfBridge v0100(對接口合約自適應)+ ENG083 v0101(L41 扣當沖查詢/政策 config/check-data/policy)+ VIA_TALib_OneEngine.via.config + VIA_TALib_Policy + 冊項 tw_daytrade_stock/vdf_vetf_consensus→ENG085 + Grid v0313/Deck v0149/Manager v0135/Register v0207 + 律 L41 + LL37/LL38",
    "ts": "2026-09-15 13:39",
    "name": "判讀:eng069 ②=同 (code,ym) 多列 JOIN 放大(LL38)→ v0108 QUALIFY 去重+合成庫自測 ⑦;via-vetf FAIL_CLOSED=adapter 別名對不上 VDF 正本欄(LL37)→ ENG085 暫存輸入庫(持股取 asof 前最新日/代碼去尾綴/價 45 日/共識依 source 分 FactSet|其他)→ adapter candidate 沙盒 → audit 摘要(8/8);TA-Lib 政策 L41:VIA config display/bases=ex_daytrade、缺當沖格 NULL;run 走 --query(adj ⟕ 成交金額 ⟕ 當沖)+ check-data(容器:價 575,295 列、值 2,660 列、當沖表 ABSENT → YELLOW 誠實);pip 令逐項引號。"
+  },
+  {
+   "code": "批520a 容器實跑修(commit 後補測出兩紅:via-vetf run FAIL「暫存輸入庫建不起來:^」· via-taone run FAIL 只印「}」)",
+   "kind": "批520a ENG085 v0101(持股表缺先誠實 NODATA;錯誤行取有意義那行)+ ENG083 v0102(stderr JSON 判讀;「輸入資料為空」=NODATA 資料側;扣當沖查詢 duckdb 真算自測)",
+   "ts": "2026-09-15 13:45",
+   "name": "容器再跑:via-vetf run → NODATA holdings_daily ABSENT(誠實);via-taone run --codes 2330 → NODATA 查詢零列(容器樣本無 2330);--codes 1240 → ABSENT 本境無 TA-Lib(鏈通到 TA-Lib 匯入為止)。教訓:commit 前先跑一次真跑(不只自測)。"
   }
  ],
  "updated_at": "2026-09-15"

@@ -1,6 +1,6 @@
 # VIA 一頁交接 · Veritas Central Governance Console(VCGC v0111 · 批520)
 
-> 產生 2026-09-15 13:41:24 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
+> 產生 2026-09-15 13:46:28 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
 
 ## 〇 · 接手提示詞(給下一個 AI;來源 VIA_AI_Handover_Prompt_v0100.md)
 
@@ -181,14 +181,14 @@
 
 ## 二 · 安裝核可(L19)與環境工具
 
-- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 162.4 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
+- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 162.5 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
 - 工具冊導入計畫:ABSENT · - · 件態 - · 風險 - · 段 - · 未路由 - · 白名單留置 -(TOOLS_PLAN_latest.json 不在(via-envtools))
 - 環境復原(L24):PLAN · 2026-09-15 05:30:50 · 還原 原本規劃(Baseline;無 LKGC 或 --baseline) · 段 16 · 單獨隔離境 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 借境封鎖 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 次序 RESTORE → CORE → LOW → MEDIUM → HIGH → EXTERNAL → VERIFY;安裝出問題=`via-envrecover`(①還原前次 ②順序裝 ③_M/_H 單獨隔離;-Execute -Approve 才跑,① 不受 L19,② 過 L19)
 - 裝件=操作員的手:`$env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve`(閘不代設;L19 未綠=BLOCKED_UNITEST)
 
 ## 三 · 邏輯庫 · 因子庫 · 資料庫
 
-- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 509 列 · 全庫同步 {'hash': '043542e1ce9f', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '9f5dec3a8618', 'root': '同', 'home': '缺'}
+- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 509 列 · 全庫同步 {'hash': '043542e1ce9f', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': 'a6390143a737', 'root': '同', 'home': '缺'}
 - 因子庫 OK:130 列 · {'SUP_MDL748:allinone 2.1.0': 77, 'SUP_MDL748:financial_data_standardization': 53} · 掛載 {'allinone': 'OK VIA_VRNLogic_AllInOne_v0201.py 2.1.0', 'fds': 'OK financial_data_standardization.py · 28 欄 · 合併損傷件(__main__ 示範缺 5 法,程式庫面可用)'}
 - 庫表冊 OK:54 表(批505)· 全庫表 4 · 庫 ['ActiveTWETF.duckdb', 'vdf_global_market.duckdb', 'vdf_tw_market.duckdb']
 - 資料家 ABSENT:VIA_Reports/datahome/DATAHOME_CATALOG_latest.json 不在(via-datahome catalog) · 庫 - · 表 - · 湖 -
@@ -327,21 +327,21 @@
 
 ## 六 · 註冊稽核(所有引擎/模組/功能/工具/環境)
 
-- 中央自動編號冊 OK · ACTIVE 4920/4920 · **缺 0** · 類別 {'class': 91, 'engine': 79, 'environment': 43, 'function': 4096, 'feature': 79, 'module': 145, 'package': 251, 'system': 10, 'tool': 126}
+- 中央自動編號冊 OK · ACTIVE 4921/4921 · **缺 0** · 類別 {'class': 91, 'engine': 79, 'environment': 43, 'function': 4097, 'feature': 79, 'module': 145, 'package': 251, 'system': 10, 'tool': 126}
 - 尾版引擎/模組家族 233 · 中央冊已登 233 · **未登 0** · 操作介面有掛載 191 · 內部件無操作介面 42(誠實分列，不拿編號片段假命中)
 
 ## 七 · 自動編號註冊表(台帳)
 
-- 全域台帳 1055 筆 · 元件 147 · 更新 2026-09-15
-- 元件冊 OK · ACTIVE 4920 · RETIRED 1 · 更新 2026-09-15T13:41:06 · {'class': 91, 'engine': 79, 'environment': 43, 'function': 4096, 'feature': 79, 'module': 145, 'package': 251, 'system': 10, 'tool': 126}
+- 全域台帳 1056 筆 · 元件 147 · 更新 2026-09-15
+- 元件冊 OK · ACTIVE 4921 · RETIRED 1 · 更新 2026-09-15T13:46:10 · {'class': 91, 'engine': 79, 'environment': 43, 'function': 4097, 'feature': 79, 'module': 145, 'package': 251, 'system': 10, 'tool': 126}
 - 類別 current:系統 1 · 支援性工具 1 · 功能性工具 1 · 模組 1 · 引擎 19 · 函數庫 1 · 打包產品 8
 
-- 2026-09-15 09:28 批515 L33 工序律 / L34 VATETF 應用端律 / L35 VDF 基金範圍律 + TAB3 FIXED CONTENTS + 五額外試跑 + 家族擁有者實錄修
 - 2026-09-15 10:12 批516 除錯五修 + VTMRA 家族測試閘 CGC_MDL152 + TA-Lib 閘 CGC_MDL151 + 律 L36/LL27/LL28
 - 2026-09-15 10:46 批517 律 L37 VDF 擷取範圍律 + ENG069 v0106 + VCGC v0108 + NLP 正主 SUP_MDL744 v0102 summarize + MDL
 - 2026-09-15 11:51 批518 MDL139 v0108 status 印「更新到哪一天」+ MDL150 v0103 cycles(G17 對回檔名分區)+ VCGC v0109 十一段循環判讀 + 
 - 2026-09-15 13:12 批519 CGC_MDL153 WorkflowComposer v0100(工作流重組台+U/I 對接契約+庫分類歸納+實測面板)+ VDF_ENG083 TALibOneBri
 - 2026-09-15 13:39 批520 ENG069 v0108 去重 + VDF_ENG085 VatetfBridge v0100(對接口合約自適應)+ ENG083 v0101(L41 扣當沖查詢/政策 
+- 2026-09-15 13:45 批520a ENG085 v0101(持股表缺先誠實 NODATA;錯誤行取有意義那行)+ ENG083 v0102(stderr JSON 判讀;「輸入資料為空」=NODATA 
 
 ## 八 · 交接本文(來源 VIA_Handover_20260914_B498.md;逐批紀錄見該檔)
 
@@ -1067,6 +1067,7 @@ via-vetf                                                   # VATETF 應用端(v0
 **令 → 律 L41(TA-Lib 量值政策)**:①價只用 adj(tw_prices_adj;缺則因子還原)②量值四欄同留(raw/ex_daytrade × volume/turnover)③指標一律以扣當沖量值算(display_mode/indicator_volume_bases=ex_daytrade)④無當沖日=NULL 不冒充 ⑤扣法 ex_volume=成交股數−當沖股數、ex_turnover=成交金額−(買+賣)/2 ⑥源:ENG060 價 · ENG057 值 · ENG055 L15 當沖(TWSE/TPEX;WAF 擋=誠實缺)。
 落實:`functional modules/TALib/VIA_TALib_OneEngine.via.config.json`(收容件 config 副本+覆寫;原檔零觸碰)+ `VIA_TALib_Policy_v0100.json`;**ENG083 v0101** `run` 改 `--query`(adj ⟕ 成交金額 ⟕ 當沖;表缺哪張就少哪欄)+ `check-data`(三表覆蓋;容器:價 575,295 列 · 值 2,660 列 · 當沖 ABSENT → YELLOW 誠實)+ `policy`;冊 +`tw_daytrade_stock`(ENG055 L15;觸網)· 工作流 `vdf_talib_features` = 當沖→架構→TA-Lib。
 登冊:Grid v0313 · Deck v0149(+vatetf_app;76)· Manager v0135 · Register v0207 · VCGC v0111(批號改讀政策庫)。
+**批520a(容器真跑補測)**:`via-vetf run` 先盤點持股表,缺=NODATA 誠實(ENG085 v0101);`via-taone run` 引擎錯誤 JSON 在 stderr、「輸入資料為空」=NODATA 資料側(ENG083 v0102);容器:`--codes 1240` 鏈通到 TA-Lib 匯入=ABSENT 誠實。
 
 #### 一貼即用(批520)
 
