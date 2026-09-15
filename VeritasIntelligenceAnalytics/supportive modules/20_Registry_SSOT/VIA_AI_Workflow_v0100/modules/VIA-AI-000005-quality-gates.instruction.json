@@ -1,0 +1,30 @@
+{
+  "module_id": "VIA-AI-000005",
+  "version": "0100",
+  "layer": "QA",
+  "slug": "quality-gates",
+  "title": "VIA reproducible quality gates",
+  "status": "validated",
+  "owner": "VIA",
+  "purpose": "Run reproducible static, AST, unit, contract, sandbox, integration, regression and user tests with fail-closed evidence.",
+  "dependencies": ["VIA-AI-000001", "VIA-AI-000002", "VIA-AI-000003"],
+  "inputs": [
+    {"name": "test_plan", "type": "json", "required": true},
+    {"name": "implementation_delta", "type": "source", "required": true}
+  ],
+  "outputs": [
+    {"name": "gate_matrix", "type": "json", "required": true},
+    {"name": "summary_evidence", "type": "markdown", "required": true}
+  ],
+  "owned_paths": [],
+  "owned_symbols": [],
+  "steps": [
+    {"step_id": "S01", "action": "Run static and AST validation before runtime tests.", "on_failure": "stop"},
+    {"step_id": "S02", "action": "Run unit and contract tests with deterministic fixtures.", "on_failure": "stop"},
+    {"step_id": "S03", "action": "Run sandbox, integration and regression tests without production mutation.", "on_failure": "stop"},
+    {"step_id": "S04", "action": "Run user-path validation and summarize evidence without uploading full logs.", "on_failure": "stop"}
+  ],
+  "gates": ["STATIC", "AST", "CONTRACT", "UNIT", "SANDBOX", "INTEGRATION", "REGRESSION", "USER_TEST"],
+  "metadata": {"stage": 5, "three_repair_rounds_max": 3}
+}
+

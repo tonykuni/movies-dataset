@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://veritas.local/schemas/system_capsule.schema.json",
+  "title": "VIA System Capsule",
+  "type": "object",
+  "required": ["capsule_id", "version", "system_name", "mode", "layers", "canonical_anchors", "required_gates", "promotion", "context_policy", "github_policy"],
+  "properties": {
+    "capsule_id": {"type": "string"},
+    "version": {"type": "string"},
+    "system_name": {"const": "Veritas Intelligence Analytics"},
+    "mode": {"const": "fail_closed"},
+    "layers": {"type": "array", "minItems": 6, "maxItems": 6, "uniqueItems": true},
+    "canonical_anchors": {"type": "object"},
+    "canonical_selection_order": {"type": "array"},
+    "required_gates": {"type": "array", "minItems": 1, "uniqueItems": true},
+    "promotion": {"type": "object"},
+    "context_policy": {"type": "object"},
+    "github_policy": {"type": "object"}
+  }
+}

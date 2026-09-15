@@ -1,0 +1,30 @@
+{
+  "module_id": "VIA-AI-000002",
+  "version": "0100",
+  "layer": "DATA",
+  "slug": "data-contract",
+  "title": "VIA database and data contract",
+  "status": "validated",
+  "owner": "VIA",
+  "purpose": "Connect modules to local DuckDB and Parquet data through explicit schema, grain, lineage, incremental and checkpoint contracts.",
+  "dependencies": ["VIA-AI-000001"],
+  "inputs": [
+    {"name": "data_catalog", "type": "json", "required": true},
+    {"name": "schema_fingerprint", "type": "string", "required": true}
+  ],
+  "outputs": [
+    {"name": "query_contract", "type": "json", "required": true},
+    {"name": "lineage_summary", "type": "json", "required": true}
+  ],
+  "owned_paths": [],
+  "owned_symbols": [],
+  "steps": [
+    {"step_id": "S01", "action": "Inspect existing local data and checkpoint before any network fetch.", "on_failure": "stop"},
+    {"step_id": "S02", "action": "Validate source, grain, primary key, schema, unit, timezone and adjusted-price semantics.", "on_failure": "stop"},
+    {"step_id": "S03", "action": "Plan incremental append, deduplication and atomic checkpoint update.", "on_failure": "stop"},
+    {"step_id": "S04", "action": "Expose original and net-of-day-trade Taiwan volume views without overwriting raw data.", "on_failure": "review_required"}
+  ],
+  "gates": ["CONTRACT", "SANDBOX", "INTEGRATION"],
+  "metadata": {"stage": 2, "github_data_upload": false}
+}
+
