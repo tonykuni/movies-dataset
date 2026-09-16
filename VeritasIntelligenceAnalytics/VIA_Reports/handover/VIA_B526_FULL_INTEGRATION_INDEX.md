@@ -6,4 +6,4 @@
 
 判定：VRN 288/288 compile/import GREEN、PDF dual-engine GREEN、VIA/VDF central lists GREEN、VDF DuckDB integrity PASS、ENG073 36/36 PASS；整體因 64 份 Windows 原始 PDF/DOCX 未掛載而為 `PARTIAL_BLOCKED`。
 
-最新重跑：2026-09-16 16:25（Asia/Taipei）；13/14 gates PASS，唯一阻擋仍為原始 Windows 樣本不可讀。最新重跑輸出：`evidence_b526_full_integration/real_acceptance_rerun_latest.txt`。
+最新重跑：2026-09-16 16:30（Asia/Taipei）；13/14 gates PASS，唯一阻擋仍為原始 Windows 樣本不可讀。最新重跑輸出：`evidence_b526_full_integration/real_acceptance_rerun_latest.txt`。本次同步並修正 SQL 結果的 Markdown 顯示格式。

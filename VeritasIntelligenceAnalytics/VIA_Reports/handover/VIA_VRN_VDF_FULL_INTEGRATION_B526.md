@@ -1,6 +1,6 @@
 # VIA／VRN／VDF B526 完整串接驗收報告
 
-**驗收時間：** 2026-09-16T08:25:55.608950+00:00  
+**驗收時間：** 2026-09-16T08:30:49.269952+00:00  
 **整體判定：** **PARTIAL_BLOCKED**
 
 ## 一、判定摘要
@@ -23,23 +23,23 @@ VIA 中央清單、VDF 實體 DuckDB、VRN active tree、VRN/PDF regression 與 
 
 | 項目 | 結果 |
 |---|---|
-| `tw_listings_industry` rows | [[1979]] |
-| `tw_daily_prices` rows | [[208848]] |
-| price range | [['2024-01-02', '2026-09-15', 655, 319]] |
-| required-field nulls | [[0]]; price=[[0]] |
-| duplicate keys | listing=[[0]]; price=[[0]] |
+| `tw_listings_industry` rows | 1979 |
+| `tw_daily_prices` rows | 208848 |
+| price range | ['2024-01-02', '2026-09-15', 655, 319] |
+| required-field nulls | 0; price=0 |
+| duplicate keys | listing=0; price=0 |
 
 主動式 ETF 資料庫實體檢查結果如下：
 
 | 項目 | 結果 |
 |---|---|
-| registry rows | [[30]] |
-| daily-required count | [[22]] |
-| holdings rows | [[1122]] |
-| holdings range | [['2026-09-15', '2026-09-15', 1, 22, 241]] |
-| holdings nulls | [[0]] |
-| holdings duplicate keys | [[0]] |
-| fetch failures | [[0]] |
+| registry rows | 30 |
+| daily-required count | 22 |
+| holdings rows | 1122 |
+| holdings range | ['2026-09-15', '2026-09-15', 1, 22, 241] |
+| holdings nulls | 0 |
+| holdings duplicate keys | 0 |
+| fetch failures | 0 |
 
 ## 三、VRN 與資料庫串接
 
