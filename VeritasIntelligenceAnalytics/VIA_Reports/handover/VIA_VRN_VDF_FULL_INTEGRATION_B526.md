@@ -1,6 +1,6 @@
 # VIA／VRN／VDF B526 完整串接驗收報告
 
-**驗收時間：** 2026-09-16T08:30:49.269952+00:00  
+**驗收時間：** 2026-09-16T08:45:51.473247+00:00
 **整體判定：** **PARTIAL_BLOCKED**
 
 ## 一、判定摘要
@@ -51,9 +51,9 @@ VRN active tree 已達 288/288 compile 與 288/288 import。VRN/PDF 驗收使用
 
 ## 五、證據檔案
 
-機器可讀報告：`/home/ubuntu/work/full_integration_b526/VIA_VRN_VDF_FULL_INTEGRATION_B526.json`  
-既有 VRN/PDF 證據：`/home/ubuntu/work/vrn_pdf_validation_b524.json`  
-既有 ENG073 36/36 證據：`/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/handover/evidence_b524/vrn073.txt`  
+機器可讀報告：`/home/ubuntu/work/full_integration_b526/VIA_VRN_VDF_FULL_INTEGRATION_B526.json`
+既有 VRN/PDF 證據：`/home/ubuntu/work/vrn_pdf_validation_b524.json`
+既有 ENG073 36/36 證據：`/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/handover/evidence_b524/vrn073.txt`
 Windows 樣本狀態：`/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/handover/VIA_WINDOWS_SAMPLE_ACCEPTANCE_STATUS_B526.json`
 
 ## 接手結論

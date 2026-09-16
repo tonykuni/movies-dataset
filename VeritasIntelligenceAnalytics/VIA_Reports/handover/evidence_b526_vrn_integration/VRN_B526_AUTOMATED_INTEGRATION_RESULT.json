@@ -1,0 +1,851 @@
+{
+  "schema": "VIA.VRN.B526.AutomatedIntegrationTest.v1",
+  "started_at": "2026-09-16T08:38:52.796428+00:00",
+  "finished_at": "2026-09-16T08:45:51.489717+00:00",
+  "software_verdict": "GREEN",
+  "full_chain_verdict": "PARTIAL_BLOCKED",
+  "module_selftests": {
+    "vrn_072": {
+      "output_file": "/home/ubuntu/work/vrn_b526_automated_integration_latest/vrn_072.txt",
+      "rc": 0,
+      "passed": true,
+      "summary_tail": "SENT(主程式不在 PATH) · 字 0)\n  [OK] ㊶ 轉接器就緒判準(批501):執行器 ADAPTER_REQ 一處定義;paddle 三支/easyocr/tesseract 回 bool+因由(缺 …);未知名回 None 退回後端矩陣 ({'paddleocr': (False, '缺 paddleocr,paddle'), 'paddle_ppstructure': (False, '缺 paddleocr,paddle'), 'paddle_pdf_pipeline': (False, '缺 paddleocr,paddle'), 'easyocr': (False, '缺 easyocr,torch'), 'tesseract': (False, '缺 pytesseract,tesseract('), 'definitely_not_a_backend_x': (None, '轉接器表無此名')})\n  [OK] ㊷ 車道候選不吃本境標壞鍵(批502):本境 paddleocr 標壞、車道 paddle_ppstructure 標壞 → 派車道名單=paddleocr+paddle_pdf_pipeline(paddleocr 仍在;ppstructure 被車道鍵濾掉) (OCR_RUN_FAIL(lane=via_paddle_311:本境無此階後端:paddleocr(缺 paddleocr,paddle),paddle_pdf_pipeline(缺 paddleocr,paddle))\n  [OK] ㊸ 直呼 tesseract psm 階梯(批502):零字再試 --psm 11 → --psm 6;全白頁 tag 帶 psm=3→11→6 與「影像近空白」(主程式不在=ABSENT 誠實) (tesseract_direct:ABSENT(主程式不在 PATH))\n  [OK] ㊹ 自測零污染(批504):VIA_SELFTEST=1 + 資料家指暫存 → ENG082 入庫目標只有暫存那一本,永不碰真家/真 VIA_DB_* (['/via_logic_vbjw7qkp/vdf_tw_market.duckdb'])\n  [OK] ㊻ 批522 車道境預檢:venv 佈局無 pyvenv.cfg → SKIP(境壞;重建 via-rebuild;reset-backends),不當 OCR_RUN_FAIL;python 缺→缺;好境→'' (SKIP(lane=via_paddle_311 境壞:pyvenv.cfg 缺(/tmp/tmp735kmehz/envs46/via_paddle_311/pyvenv.cfg);重建 via-r)\n  [計] 四十六檢(46 檢) OK 46 · FAIL 0\nRC=0\n"
+    },
+    "vrn_073": {
+      "output_file": "/home/ubuntu/work/vrn_b526_automated_integration_latest/vrn_073.txt",
+      "rc": 0,
+      "passed": true,
+      "summary_tail": "8.0 服務 6/6;正主='台積電 的的的營收' vs stdlib='台積電  的的的營收')\n[旗標] --dir 後面沒有值=忽略(誠實提示,不當作預設)\n  [OK] ㉞ CLI 旗標真的接到 run()(批425:v0114 以前 main() 是光禿禿的 `return run()`,--dir/--db 從不解析,傳了不生效也不吭聲;兄弟引擎 ENG072 認 --dir、ENG074 認 --db,只有本器兩個都不認=無法把鏈指向別的報告夾或別的庫。缺值時誠實忽略,不得 IndexError) (dir=/tmp/_d_ db=/tmp/_b_.duckdb;缺值→None)\n  [OK] ㉟ 檔名層綁首頁全能引擎的公開契約(批442 操作員令「兩邊工具都要一致化,邏輯一致化」。**先量再改**:庫內 64 份跑完入庫再與首頁引擎逐檔比對,型別不一致 38/64、代號不一致 37/64。根因不是啟發式微調,是**兩個引擎讀不同的名冊表**——首頁走 NameReconciler 階梯到 tw_listings_industry(1978 檔,6873 在),本檔寫死 tw_listings(891 檔,6873 不在);代號查不到→型別掉成「其他」→BASIC INFO 整片是空的。零九頭龍:不抄一份過去,綁 filename_facts() 公開契約。綁完 64/64 型別/代號/券商/報告日**四項全一致**。橋缺席就退本檔原邏輯並印因由) (綁 VIA_VRN_FirstPageEngine_v0124.py filename_facts · 名冊 1979 檔(冊在 1979 檔) · 6873→6873/個股 · 研討會→研討會/無代號)\n  [OK] ㊱ 契約給的是**一對**就整對收——一對錯的值不得互相作證(批447 工作站實錄:批446 讓鏈終於跑完整,而 MS-2308 入庫仍是 TP=38 P=28、JP-3653 仍是 26/60、MS-8210 仍是 18/7,批445 修對的值一個都沒進來。根因是兩道守衛**互相擋住對方**:新目標價拿**舊現價**比、新現價再拿**舊目標價**比;而這三份的舊值剛好一起錯得自洽(38/28=1.36、26/60=0.43、18/7=2.57 全落在合理帶 0.30–3.2 之內),於是 1288÷28=46 判荒謬踢掉、932 再拿 38÷932=0.04 判荒謬踢掉。批239 的配對律沒錯,錯在拿它去比**混搭的一對**) (真的驗過 3/3 份 · MS-2308 :契約對/舊守衛會踢/舊值自洽 · JP-3653 :契約對/舊守衛會踢/舊值自洽 · MS-8210 :契約對/舊守衛會踢/舊值自洽)\n  [計] 三十六檢(36 檢) OK 36 · FAIL 0\nRC=0\n"
+    },
+    "vrn_074": {
+      "output_file": "/home/ubuntu/work/vrn_b526_automated_integration_latest/vrn_074.txt",
+      "rc": 0,
+      "passed": true,
+      "summary_tail": "4=2.40 對表格 2.40=AGREE;2025 首頁 9.90 對表格 3.10=DIVERGE) {'2023': 'ONLY_TABLE', '2024': 'AGREE', '2025': 'DIVERGE'}\n  [OK] ⑬ 表格獨有科目 ONLY_TABLE + 檔名↔財報頁 ticker + 報告日 vs 期間 ('TICKER_NOT_ON_FIN_PAGE',) ('DATE_CONSISTENT', '表格已報 2024 ≤ 報告日 2024')\n  [OK] ⑭ 對照冪等(派生層重算不倍增) \n  [OK] ⑮ ENG073 兩表缺=誠實略過不 crash(指路先跑 ENG073) \n  [OK] ⑯ run 動詞的 --db 真的接到 run()(批425:v0102 是 run(d, None, ...),db 那格寫死 None,`run --db X` 永遠寫進預設庫;--db 只有 --crosscheck 分支解析得到=更難察覺。實跑證據:ENG074 印「對照 28 列」而收尾讀 X 是「已對照 0/5」) (src=/tmp/_d_ db=/tmp/_b_.duckdb cross=True)\n  [OK] ⑰ 收件三類(批466 實測:①站 ENG072 收得下的 docx 與影像,到本站**連被看見都沒有**——v0105 的閘是 `d.glob(\"*.pdf\")`,同一個夾直接回「無 PDF」rc=2。判準綁 ENG072 尾版的 kind_of,不另抄一份;橋缺席退回 PDF-only=零回歸) (v0105 閘=0 件 · v0106 閘=2 件)\n  [OK] ⑱ WORD 財報表零相依讀法(.docx 本來就是 zip,`<w:tbl>` 就是表)。**Zero-Hydra:不另造解析器**——每個 <w:tr> 併成一行交回本檔既有的 parse_header/parse_data_row/_syn,所以同一份報告換成 Word 出的值與 PDF 道一致。WORD 無頁界 → page 記 0 並在 raw_text 標「WORD 表N」,不假裝有頁碼 (9 值 · 科目 ['eps', 'gross_margin', 'revenue'] · EPS2024=(45.25, 'REPORT_STATED') · EPS2026=(59.8, 'ESTIMATE') · page 全 0=True)\n  [OK] ⑲ 第二意見(批504):SSOT 未命中「資產總計」→ canonical 仍空(不硬套),alt 帶 total_assets@allinone(候 register) (alt=total_assets@allinone)\n  [計] 十九檢 OK 19 · FAIL 0\nRC=0\n"
+    },
+    "vrn_080": {
+      "output_file": "/home/ubuntu/work/vrn_b526_automated_integration_latest/vrn_080.txt",
+      "rc": 0,
+      "passed": true,
+      "summary_tail": "同 report_file 重寫;3 列)+JSON/HTML 零 CDN \n  [OK] ⑩ 報告日缺=不除權息調整(目標價照列;誠實註記) \n  [OK] ⑪ 多值目標價列示不平均(78;128 只列,不取均) \n  [OK] ⑫ 紀律宣告(只增不減/原件零觸碰/誠實三態/零網路/尾版律/quote-or-abstain/ACCEL-BRIDGE) \n  [OK] ⑬ 目標價合理性閘(批419:工作站真跑 37 份,三份的 TP/價 比是 0.020(MS-2308)、0.019(MS-8210)、0.005(JP-3653)——目標價只有股價的 1/50 到 1/200,那是抽錯的數。把它印成「潛在上漲空間 -98.0%」比不印更糟,讀的人會以為那是預測。閘只 flag 不丟棄:我們不知道哪個數字才對,丟棄等於替操作員決定) (2308 0.020 · 3665 1.245)\n  [OK] ⑭ 價格基準日律(批419:37 份全部拿 2026-09-07 的價比,但 Daiwa-1319 是 2023-10-11 的報告=距今 1062 天。拿三年後的價算三年前報告的「潛在上漲空間」,算出來的不是上漲空間,是事後看圖。逾 180 天即非當期:改把「報告時上漲」放頭,今日比值降為參考) (1319 1062天=STALE_BASIS · 3665 111天=CURRENT)\n  [OK] ⑮ 閘門診斷值不算新數字(批419b 我自己造的回歸:批419 的 K1 會印比值 0.020 與合理帶界 0.2/5.0,那是關於擷取的後設說明,不是報告裡的宣稱;拿 novel numbers 查它們等於要求判準本身也要出現在正文裡。工作站實錄 MS-2308/MS-8210/JP-3653 三份因此 QC 紅、vrn_fourpoint rc=1——整段鏈被自己的診斷訊息判死) (帶診斷值 [] · 不帶 ['2026', '-09', '-07'])\n  [OK] ⑯ 票號查**正典冊**不盲試(批470 全景分析:v0103 只查 tw_listings——那張表只有 891 列且**不含 2330/2454/3008/1101**,權值股一律查不到 yf_ticker,只能退到盲試 .TW/.TWO。盲試的成本不是慢,是**看不出來**:它不報錯,只是價表對不上,最後顯示成「adj —@— 上漲未算」,看起來像沒有價格資料,其實是票號從一開始就沒查對)。綁 MDL142(含 yf_ticker 與 market);冊缺席退回原本直查=零回歸;盲試保留為最終退路,去重但保序 (2330 候選 ['2330.TW', '2330.TWO'] · 去重=True · 殘缺表有 2330?1 · 冊=在)\n  [計] 十六檢 OK 16 · FAIL 0\nRC=0\n"
+    },
+    "vrn_082": {
+      "output_file": "/home/ubuntu/work/vrn_b526_automated_integration_latest/vrn_082.txt",
+      "rc": 0,
+      "passed": true,
+      "summary_tail": "且 fail_ttl 內=PARTIAL_HIT(不重燒 OCR);過期=None \n  [OK] ⑫ 真目錄零觸碰(自測全在 VIA_LOGIC_DIR 暫存夾) \n  [OK] ⑬ 次序修正(批496):hq_budget_s 自有預算 >0;hq_dpi 帶 300~350;非 OCR 失敗判準 FAIL/DISAGREE=真,PARTIAL/AGREE=假 (hq_budget 120.0s · dpi 300~350)\n  [OK] ⑭ 入庫:台帳→vrn_extraction_logic、律冊→via_policy_factors(擷取邏輯/工具冊/資料家/基線 hydra 四源);dry-run 不寫;其餘表零觸碰 (logic 1 · policy 598 · 源 8)\n  [OK] ⑮ 全庫同步(批499):資料家兩本庫皆入四張表(含 via_handover 交接)、同一 hash、對帳單在;資料家根有 VIA_HANDOVER_LATEST.md;沙盒庫零觸碰;後端健康入政策因子;status 對帳「同步 2」 (targets 2 · OK ok 2 · hash 1 · 沙盒 ['keep_me'])\n  [OK] ⑰ 自測零污染律(批504):VIA_SELFTEST=1 → 入庫目標只有 env 首選那一本;不帶旗才掃家 + VIA_DB_*(3 本) (全掃 3 · 自測 ['prim.duckdb'])\n  [OK] ⑱ 財務邏輯橋兩本冊入政策因子(批504):SUP_MDL748 列 ≥ 80(券商/評等/科目同義/單位倍率/28 欄/正則);橋缺=1 列 ABSENT 誠實 (130 列)\n  [OK] ⑲ 自測隔離(批505):自測期間 os.environ 無任何 VIA_DB_*(操作員 bootstrap 匯出的真庫鍵已撤)且 VIA_SELFTEST=1(各檢結束自復原) ([])\n  [OK] ⑯ 交接三處(批499):docs 尾版在;母檔案夾(倉根)VIA_HANDOVER_LATEST.md 與 docs 同一份 sha(舊=commit 時沒同步,要修) ({'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '32d5ffa0e303', 'root': '同', 'home': '缺'})\n  [OK] ㉑ 批515 fix_contents(TAB3 FIXED CONTENTS):中文字間空白去除+斷行接回(中文直接接/英文補空白)+冊提示優先/關鍵字自判類型+每 wrap 字換行+【類型·次分類·p頁】;空段跳過 ('台積電2026年營收預估\\n年增20%,達3兆元。' · 【財務·YoY·p3】)\n  [計] 二十一檢 OK 21 · FAIL 0\nRC=0\n"
+    },
+    "vrn_086": {
+      "output_file": "/home/ubuntu/work/vrn_b526_automated_integration_latest/vrn_086.txt",
+      "rc": 0,
+      "passed": true,
+      "summary_tail": "VIA 補冊「國泰證期」) (FILE_SUFFIX 2025-08-22 CATHAY)\n  [OK] ④ 階梯:FILE_BARE 6873 · 年段 2025 不當代碼→TITLE_SUFFIX 2330 · 產業檔=SECTOR · 名→碼 TITLE_SYNONYM 2330 · 民國 7 碼 1140822→2025-08-22 · 兆豐=MEGA (FILE_BARE TITLE_SUFFIX SECTOR_FILE TITLE_SYNONYM 2025-08-22)\n  [OK] ⑤ 券商防呆(收容件 broker_normalize 子字串撞詞;橋側詞界):earnings guidance→None(收容件會說 GOLDMAN)· 凱基投顧→KGI · Goldman Sachs→GOLDMAN · 獨立 MS→MORGANSTANLEY · terms→None · capital expenditure→None \n  [OK] ⑥ 評等防呆:buyback 計畫→None(收容件會說 BUY)· 評等:買進→BUY · Rating: Overweight→BUY · holdings 30%→None · 維持中立(線索)→HOLD · 獨立短行「賣出」→SELL \n  [OK] ⑦ 目標價:線索詞優先(目標價/Target Price/TP/PT 詞界)1250/1300;無線索退收容件弱正則(營收 NT$ 會誤中=標「弱」)· 目標價旁四碼=代碼不算 · 單碼不算 · HTTP 不算 · 合理性 TP=PER×EPS PASS · 上漲 25% sane (1250.0 1300.0 弱=12345.0 代碼旁=None 單碼=None HTTP=None)\n  [OK] ⑧ 互核:三欄同=PASS · 代碼異=FAIL(缺欄=None 不判)· 區在不在 PASS \n  [OK] ⑨ enrich:ENG072 sidecar → .logic86.json(代碼 2330 FILE_BARE · 券商 KGI · 評等 BUY · 目標價 1250 · email 驗 KGI 網域 · 檔名×首頁 PASS)· 壞件計 errors 不炸 · 來源 sidecar 位元零變(append-only) (1 件 · 代碼法 {'FILE_BARE': 1} · 檔名×首頁代碼一致 1/1 · 券商 1/1 · 評等 1/1 · 目標價 1/1)\n  [OK] ⑩ 律:零網路 · 收容件零觸碰(橋內無對收容件路徑的寫入)· 產物夾與 ENG072 分開(first_page_logic)· 名冊只讀(read_only=True)· 檔名 .logic86.json \n  [計] 十檢 OK 10 · FAIL 0\nRC=0\n"
+    },
+    "nlp_744": {
+      "output_file": "/home/ubuntu/work/vrn_b526_automated_integration_latest/nlp_744.txt",
+      "rc": 0,
+      "passed": true,
+      "summary_tail": "=== nlp_744 ===\n=== SUP_MDL744 NLPApplicationHub · 十二檢自測(零網路;含尾版律/字母序陷阱/缺席對照組;+證據型摘要)===\n  [OK] ① 收容件在位且掛的就是尾版(非 MOUNTED_STALE) (VERIFIED;夾=VIA_NLP_Application_System_v1.8.0;版=1.8.0;無異)\n  [OK] ② 尾版律跨兩家族(對照組:字母序取 OneEngine 系,語意序取 Application_System v1.8.0) (候選 5;字母序=VIA_NLP_OneEngine_v1.6.1;語意序=VIA_NLP_Application_System_v1.8.0)\n  [OK] ③ 語意版號不踩字母序陷阱(v1.10.0 > v1.9.0) ((1, 10, 0) > (1, 9, 0);字串比較則相反)\n  [OK] ④ 模組冊 41 支且 __main__ 被排除(它 import 即跑 argparse 會中斷宿主) (共 41;可載入 39)\n  [OK] ⑤ 升版實得(對 v1.1.0 淨增 21 支且六項研報服務全在位;舊版一支不少) (v1.1.0 18 支 → 尾版 39 支;研報服務 6/6)\n  [OK] ⑥ TextProcessor 正掛且 nfkc 真走正主(判別輸入:連續空白 stdlib 不併、正主會併;並驗載入檔就在尾版夾內) (正主='台積電 的的的營收' vs stdlib='台積電  的的的營收';載自 via_nlp_engine)\n  [OK] ⑦ 表格服務抽得出研報要件(管線表 稀釋EPS 三期值 + key:value 目標價/評等) (2 張;md 列 1;kv 列 2)\n  [OK] ⑧ 逐格照抄不補值(cell_policy=verbatim_only_no_silent_fill) \n  [OK] ⑨ 版面分塊在位且完整覆蓋(每字元歸屬一塊;table 塊被認出) (3 塊;['paragraph', 'table', 'paragraph'])\n  [OK] ⑩ 收容缺席=ABSENT 說得出為何,且表格退空清單、切段退整篇一段(誠實無表,絕不編表) \n  [OK] ⑪ 紀律宣告(只增不減/收容件原地不動/尾版律/雙掛防制/零網路 在檔) \n  [OK] ⑫ 批517 證據型摘要(尾版 summarization):點數 ≤ 3、每點帶 source_span 且切回原文相符(evidence_spans_valid);模組缺=ABSENT 誠實 (OK · 3 點 · '台積電 2026 年營收預估年增 20%,達 3 兆元。')\n  [計] 十二檢 OK 12 · FAIL 0\nRC=0\n"
+    }
+  },
+  "vrn_panorama": {
+    "state": "GREEN",
+    "scope": "functional modules/VRN active tree; references/intake excluded",
+    "active_python_files": 288,
+    "latest_family_files": 115,
+    "all_compile_ok": true,
+    "all_import_ok": true,
+    "compile_ok": 288,
+    "import_ok": 288,
+    "compile_failures": [],
+    "import_failures": [],
+    "latest_import_failures": []
+  },
+  "pdf_dual_engine": {
+    "pdf": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/PDFRegressionEvidence_v1.0.0_b245/PDFRegressionEvidence_v1.0.0/synthetic_financial_report.pdf",
+    "exists": true,
+    "sha256": "aa6b5d116fc825bbcc059c9ee2e10b9861d81330d50e78e8f37ac5d0f77176de",
+    "expected": {
+      "pages": 2,
+      "layout_elements": 32,
+      "text_characters": 684,
+      "tables": 1,
+      "table_cells": 12
+    },
+    "manifest_files": {
+      "01_repair/pdf_repair_manifest.json": {
+        "exists": true,
+        "sha256": "96514c8729540270e2c13df9160e2a0449a54fb3a2c7f727e2c49e1258d24bf9",
+        "bytes": 3693
+      },
+      "02_layout/layout_document.json": {
+        "exists": true,
+        "sha256": "899e6279368add41e8441f06538943292e544d694da511a4c7e35ae8abb6b690",
+        "bytes": 50554
+      },
+      "02_layout/layout_elements.csv": {
+        "exists": true,
+        "sha256": "f3de779fb489aefde0a790a3ec4e48c4bdf390615fb00f139934ce1e101f48f8",
+        "bytes": 13646
+      },
+      "03_text/backend/multi_engine_run.json": {
+        "exists": true,
+        "sha256": "ae3c9dbd67bd7b02df7441a5cf1caa7ccc1aba7149be9bd2dca90730ca70e1a1",
+        "bytes": 13192
+      },
+      "03_text/raw_text.txt": {
+        "exists": true,
+        "sha256": "12b7b559fb57d48f8c2d6bf0141311a04a4caceb16918a086aa31a2a54f9a179",
+        "bytes": 689
+      },
+      "04_table/backend/multi_engine_run.json": {
+        "exists": true,
+        "sha256": "3f01396f4e69280080a66206a1eb0f22e8de86300e6014e9cac9af52834c356e",
+        "bytes": 18575
+      },
+      "04_table/table_cells.jsonl": {
+        "exists": true,
+        "sha256": "10ec093a70f5017d534f83e62dfc5dd0e2474067382ecf233390fa1974a4645f",
+        "bytes": 1953
+      },
+      "four_engine_manifest.json": {
+        "exists": true,
+        "sha256": "5fb13f53cc44ddc873fd2d7dc2b86aff92dac67a985b62977f583900ef1f83f7",
+        "bytes": 6370
+      },
+      "EXECUTION_SUMMARY.md": {
+        "exists": true,
+        "sha256": "476e56267ca364ed559b4f19021824ded3530bae95f0fe4bb23992a2b3494e72",
+        "bytes": 634
+      }
+    },
+    "fitz": {
+      "state": "PASS",
+      "pages": 2,
+      "text_characters": 677,
+      "page_characters": [
+        443,
+        234
+      ]
+    },
+    "pdfplumber": {
+      "state": "PASS",
+      "pages": 2,
+      "text_characters": 675,
+      "tables": 1,
+      "nonempty_cells": 12
+    },
+    "artifact_checks": {
+      "layout_elements_rows": 32,
+      "table_cells_rows": 12,
+      "raw_text_bytes": 689
+    },
+    "cross_engine": {
+      "pages_agree": true,
+      "text_nonempty_both": true,
+      "artifact_manifest_present": true
+    },
+    "state": "GREEN"
+  },
+  "via_vrn_vdf_full_integration": {
+    "schema": "VIA.VRN.VDF.FullIntegrationAcceptance.B526.v1",
+    "generated_at": "2026-09-16T08:45:51.473247+00:00",
+    "verdict": "PARTIAL_BLOCKED",
+    "checks": {
+      "vrn_active_compile_288_288": true,
+      "vrn_active_import_288_288": true,
+      "vrn_state_green": true,
+      "pdf_dual_engine_green": true,
+      "central_market_lists_green": true,
+      "stock_duckdb_integrity": true,
+      "stock_required_fields_zero": true,
+      "stock_duplicate_keys_zero": true,
+      "stock_price_required_zero": true,
+      "etf_duckdb_integrity": true,
+      "etf_fetch_failures_zero": true,
+      "eng073_structured_db_36_36": true,
+      "first_page_artifacts_present": true,
+      "original_windows_samples_available": false
+    },
+    "software_gate": {
+      "vrn": {
+        "state": "GREEN",
+        "scope": "functional modules/VRN active tree; references/intake excluded",
+        "active_python_files": 288,
+        "latest_family_files": 115,
+        "all_compile_ok": true,
+        "all_import_ok": true,
+        "compile_ok": 288,
+        "import_ok": 288,
+        "compile_failures": [],
+        "import_failures": [],
+        "latest_import_failures": []
+      },
+      "pdf": {
+        "pdf": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/PDFRegressionEvidence_v1.0.0_b245/PDFRegressionEvidence_v1.0.0/synthetic_financial_report.pdf",
+        "exists": true,
+        "sha256": "aa6b5d116fc825bbcc059c9ee2e10b9861d81330d50e78e8f37ac5d0f77176de",
+        "expected": {
+          "pages": 2,
+          "layout_elements": 32,
+          "text_characters": 684,
+          "tables": 1,
+          "table_cells": 12
+        },
+        "manifest_files": {
+          "01_repair/pdf_repair_manifest.json": {
+            "exists": true,
+            "sha256": "96514c8729540270e2c13df9160e2a0449a54fb3a2c7f727e2c49e1258d24bf9",
+            "bytes": 3693
+          },
+          "02_layout/layout_document.json": {
+            "exists": true,
+            "sha256": "899e6279368add41e8441f06538943292e544d694da511a4c7e35ae8abb6b690",
+            "bytes": 50554
+          },
+          "02_layout/layout_elements.csv": {
+            "exists": true,
+            "sha256": "f3de779fb489aefde0a790a3ec4e48c4bdf390615fb00f139934ce1e101f48f8",
+            "bytes": 13646
+          },
+          "03_text/backend/multi_engine_run.json": {
+            "exists": true,
+            "sha256": "ae3c9dbd67bd7b02df7441a5cf1caa7ccc1aba7149be9bd2dca90730ca70e1a1",
+            "bytes": 13192
+          },
+          "03_text/raw_text.txt": {
+            "exists": true,
+            "sha256": "12b7b559fb57d48f8c2d6bf0141311a04a4caceb16918a086aa31a2a54f9a179",
+            "bytes": 689
+          },
+          "04_table/backend/multi_engine_run.json": {
+            "exists": true,
+            "sha256": "3f01396f4e69280080a66206a1eb0f22e8de86300e6014e9cac9af52834c356e",
+            "bytes": 18575
+          },
+          "04_table/table_cells.jsonl": {
+            "exists": true,
+            "sha256": "10ec093a70f5017d534f83e62dfc5dd0e2474067382ecf233390fa1974a4645f",
+            "bytes": 1953
+          },
+          "four_engine_manifest.json": {
+            "exists": true,
+            "sha256": "5fb13f53cc44ddc873fd2d7dc2b86aff92dac67a985b62977f583900ef1f83f7",
+            "bytes": 6370
+          },
+          "EXECUTION_SUMMARY.md": {
+            "exists": true,
+            "sha256": "476e56267ca364ed559b4f19021824ded3530bae95f0fe4bb23992a2b3494e72",
+            "bytes": 634
+          }
+        },
+        "fitz": {
+          "state": "PASS",
+          "pages": 2,
+          "text_characters": 677,
+          "page_characters": [
+            443,
+            234
+          ]
+        },
+        "pdfplumber": {
+          "state": "PASS",
+          "pages": 2,
+          "text_characters": 675,
+          "tables": 1,
+          "nonempty_cells": 12
+        },
+        "artifact_checks": {
+          "layout_elements_rows": 32,
+          "table_cells_rows": 12,
+          "raw_text_bytes": 689
+        },
+        "cross_engine": {
+          "pages_agree": true,
+          "text_nonempty_both": true,
+          "artifact_manifest_present": true
+        },
+        "state": "GREEN"
+      },
+      "import_repair_status": {
+        "schema": "VIA.VRN.B526.ImportRepairStatus.v1",
+        "as_of": "2026-09-16T07:05:00Z",
+        "scope": "functional modules/VRN active tree; references/intake excluded",
+        "verdict": "GREEN",
+        "active_python_files": 288,
+        "compile_ok": 288,
+        "import_ok": 288,
+        "compile_failures": 0,
+        "import_failures": 0,
+        "latest_family_files": 115,
+        "latest_import_failures": 0,
+        "pdf_regression": {
+          "verdict": "GREEN",
+          "pages_fitz": 2,
+          "pages_pdfplumber": 2,
+          "tables_pdfplumber": 1,
+          "nonempty_table_cells": 12,
+          "artifact_manifest_present": true
+        },
+        "repair": {
+          "files_modified": 10,
+          "categories": [
+            "entrypoint_import_safe_and_legacy_mdl_loader",
+            "pip_editable_legacy_private_api_fallback",
+            "resolvelib_reporter_bare_file_fallback",
+            "rich_table_absolute_fallback",
+            "webscraping_classifier_path_bootstrap"
+          ],
+          "rich_environment": "quantguard_venv rich>=13,<15"
+        },
+        "backup": {
+          "path": "/home/ubuntu/work/vrn_import_repair_b526_backup_20260916T1454/VRN_active_tree_before_fix.tar.gz",
+          "sha256": "0fe1693d1f7f26c10321338193926a0596581bbae9d1566d0878571005a56d25"
+        },
+        "after_sha256_manifest": {
+          "path": "/home/ubuntu/work/vrn_import_repair_b526_after_sha256.txt",
+          "sha256": "1d6db512f4b4de5532f7e42b353f41b90587a1b29234ed0c500b62a3bb788812",
+          "python_file_count": 510
+        },
+        "limitations": [
+          "HardGate capability is not claimed online; import probe used /tmp/fake_ssot and reported 0/7 capable.",
+          "Entrypoint runtime fixtures under /home/claude/work/test_pdfs are not mounted in this sandbox.",
+          "User Windows PDF/DOCX originals remain unavailable for content-level validation."
+        ],
+        "machine_evidence": "/home/ubuntu/work/vrn_pdf_validation_b524.json",
+        "handover": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/handover/VIA_VRN_B526_IMPORT_REPAIR_HANDOVER.md"
+      }
+    },
+    "database_gate": {
+      "central_market_lists": {
+        "schema": "VIA.VDF.CentralMarketLists.v1",
+        "engine": "VDF_ENG087_MarketListGovernance_v0100",
+        "ts": "2026-09-16T08:43:23+00:00",
+        "start_required": "2023-01-01",
+        "verdict": "GREEN",
+        "policy": {
+          "dispatcher_only": true,
+          "network_default": "OFF_BY_DEFAULT",
+          "stock_update_engine": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0104.py",
+          "active_etf_update_engine": "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0100.py",
+          "active_etf_history_engine": "functional modules/VDF/engine/VDF_ENG078_ActiveETFHoldingsHistory_v0108.py",
+          "story_group_engine": "supportive modules/references/intake/VIA_StoryGroupRotation_b325/VIA_TW_Story_Group_Rotation_v0500/engine/via_hierarchical_group_index_engine.py",
+          "turnover_key": [
+            "date",
+            "ticker"
+          ],
+          "cross_group_overlap": "allowed",
+          "central_registry": "VCGC registry-sync"
+        },
+        "lists": {
+          "tw_stock_universe": {
+            "engine": "functional modules/VDF/engine/VDF_ENG054_TWDailyBackfill_v0104.py",
+            "db": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+            "state": "GREEN",
+            "table": "tw_listings_industry",
+            "columns": [
+              "code",
+              "name",
+              "market",
+              "external_ticker",
+              "industry_code",
+              "industry_name",
+              "us_industry",
+              "us_industry_source",
+              "classification_level",
+              "isin"
+            ],
+            "mapping": {
+              "code": "code",
+              "name": "name",
+              "exchange": "market",
+              "external_ticker": "external_ticker",
+              "taiwan_industry": "industry_name",
+              "us_industry": "us_industry"
+            },
+            "rows": 1979,
+            "missing_fields": [],
+            "why": "股票代號、名稱、交易所與雙產業分類均在位",
+            "prices": {
+              "state": "OK",
+              "column": "date",
+              "min": "2024-01-02",
+              "max": "2026-09-15",
+              "rows": 208848
+            }
+          },
+          "active_tw_etf": {
+            "engine": "functional modules/VDF/engine/VDF_ENG077_ActiveETFUniverse_v0100.py",
+            "history_engine": "functional modules/VDF/engine/VDF_ENG078_ActiveETFHoldingsHistory_v0108.py",
+            "db": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/output_hub/active_tw_etf/active_tw_etf_holdings/ActiveTWETF.duckdb",
+            "state": "GREEN",
+            "mapping": {
+              "registry_ticker": "ticker",
+              "registry_name": "name",
+              "issuer": "issuer",
+              "daily_required": "daily_required",
+              "holding_ticker": "holding_ticker",
+              "portfolio_date": "portfolio_date"
+            },
+            "registry_rows": 30,
+            "holdings_rows": 1122,
+            "missing_fields": [],
+            "duplicate_registry": 0,
+            "daily_required_count": 22,
+            "why": "A 碼 registry 與持股資料表在位；逐日缺口交由 ENG078 coverage 驗證",
+            "holdings_dates": {
+              "state": "OK",
+              "column": "portfolio_date",
+              "min": "2026-09-15",
+              "max": "2026-09-15",
+              "rows": 1122
+            }
+          },
+          "hot_story_groups": {
+            "state": "GREEN",
+            "path": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/supportive modules/registry/VDF_StoryGroup_Registry_v0101.json",
+            "groups": 33,
+            "membership_rows": 197,
+            "distinct_tickers": 165,
+            "cross_group_overlap_tickers": 32,
+            "overlap_sample": {
+              "2317": [
+                "02",
+                "32"
+              ],
+              "2324": [
+                "02",
+                "35"
+              ],
+              "2356": [
+                "02",
+                "32"
+              ],
+              "2376": [
+                "02",
+                "35"
+              ],
+              "2382": [
+                "02",
+                "32"
+              ],
+              "3231": [
+                "02",
+                "32"
+              ],
+              "3706": [
+                "02",
+                "32"
+              ],
+              "4938": [
+                "02",
+                "35"
+              ],
+              "5274": [
+                "02",
+                "34"
+              ],
+              "6669": [
+                "02",
+                "32"
+              ],
+              "8210": [
+                "02",
+                "33"
+              ],
+              "3006": [
+                "07",
+                "15"
+              ],
+              "8299": [
+                "07",
+                "15"
+              ],
+              "2449": [
+                "08",
+                "14"
+              ],
+              "3583": [
+                "08",
+                "11"
+              ],
+              "3711": [
+                "08",
+                "14"
+              ],
+              "6187": [
+                "08",
+                "11"
+              ],
+              "6239": [
+                "08",
+                "14"
+              ],
+              "2313": [
+                "10",
+                "36"
+              ],
+              "2367": [
+                "10",
+                "36"
+              ]
+            },
+            "invalid_groups": [],
+            "why": "跨族群重複允許；跨族群成交值彙總必須以 (date,ticker) 去重"
+          }
+        },
+        "result_rule": "只有結果檔存在且 verdict=GREEN 才算此橋驗收通過；ABSENT/NODATA/RED 不得假綠"
+      },
+      "stock_db": {
+        "path": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb",
+        "exists": true,
+        "checks": [
+          {
+            "name": "listing_rows",
+            "sql": "select count(*) from tw_listings_industry",
+            "result": [
+              [
+                1979
+              ]
+            ],
+            "ok": true
+          },
+          {
+            "name": "listing_null_required",
+            "sql": "select count(*) from tw_listings_industry where code is null or name is null or market is null or external_ticker is null or industry_name is null or us_industry is null",
+            "result": [
+              [
+                0
+              ]
+            ],
+            "ok": true
+          },
+          {
+            "name": "listing_duplicate_code",
+            "sql": "select count(*) from (select code from tw_listings_industry group by code having count(*) > 1)",
+            "result": [
+              [
+                0
+              ]
+            ],
+            "ok": true
+          },
+          {
+            "name": "listing_bad_code",
+            "sql": "select count(*) from tw_listings_industry where not regexp_matches(code, '^[0-9]{4}$')",
+            "result": [
+              [
+                0
+              ]
+            ],
+            "ok": true
+          },
+          {
+            "name": "listing_market_counts",
+            "sql": "select market, count(*) from tw_listings_industry group by market order by market",
+            "result": [
+              [
+                "TPEX",
+                891
+              ],
+              [
+                "TWSE",
+                1088
+              ]
+            ],
+            "ok": true
+          },
+          {
+            "name": "listing_industry_counts",
+            "sql": "select count(distinct industry_code), count(distinct industry_name), count(distinct us_industry) from tw_listings_industry",
+            "result": [
+              [
+                35,
+                35,
+                3
+              ]
+            ],
+            "ok": true
+          },
+          {
+            "name": "price_rows",
+            "sql": "select count(*) from tw_daily_prices",
+            "result": [
+              [
+                208848
+              ]
+            ],
+            "ok": true
+          },
+          {
+            "name": "price_range",
+            "sql": "select min(date), max(date), count(distinct date), count(distinct ticker) from tw_daily_prices",
+            "result": [
+              [
+                "2024-01-02",
+                "2026-09-15",
+                655,
+                319
+              ]
+            ],
+            "ok": true
+          },
+          {
+            "name": "price_null_required",
+            "sql": "select count(*) from tw_daily_prices where ticker is null or date is null or close is null",
+            "result": [
+              [
+                0
+              ]
+            ],
+            "ok": true
+          },
+          {
+            "name": "price_duplicate_key",
+            "sql": "select count(*) from (select ticker, date from tw_daily_prices group by ticker, date having count(*) > 1)",
+            "result": [
+              [
+                0
+              ]
+            ],
+            "ok": true
+          }
+        ],
+        "tables": [
+          "tw_daily_prices",
+          "tw_listings",
+          "tw_listings_industry"
+        ]
+      },
+      "etf_db": {
+        "path": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/output_hub/active_tw_etf/active_tw_etf_holdings/ActiveTWETF.duckdb",
+        "exists": true,
+        "checks": [
+          {
+            "name": "registry_rows",
+            "sql": "select count(*) from active_tw_etf_registry",
+            "result": [
+              [
+                30
+              ]
+            ],
+            "ok": true
+          },
+          {
+            "name": "registry_duplicate_ticker",
+            "sql": "select count(*) from (select ticker from active_tw_etf_registry group by ticker having count(*) > 1)",
+            "result": [
+              [
+                0
+              ]
+            ],
+            "ok": true
+          },
+          {
+            "name": "daily_required_count",
+            "sql": "select count(*) from active_tw_etf_registry where daily_required=true",
+            "result": [
+              [
+                22
+              ]
+            ],
+            "ok": true
+          },
+          {
+            "name": "holdings_rows",
+            "sql": "select count(*) from holdings_daily",
+            "result": [
+              [
+                1122
+              ]
+            ],
+            "ok": true
+          },
+          {
+            "name": "holdings_range",
+            "sql": "select min(portfolio_date), max(portfolio_date), count(distinct portfolio_date), count(distinct etf_ticker), count(distinct holding_ticker) from holdings_daily",
+            "result": [
+              [
+                "2026-09-15",
+                "2026-09-15",
+                1,
+                22,
+                241
+              ]
+            ],
+            "ok": true
+          },
+          {
+            "name": "holdings_null_required",
+            "sql": "select count(*) from holdings_daily where portfolio_date is null or etf_ticker is null or holding_ticker is null",
+            "result": [
+              [
+                0
+              ]
+            ],
+            "ok": true
+          },
+          {
+            "name": "holdings_duplicate_key",
+            "sql": "select count(*) from (select portfolio_date, etf_ticker, holding_ticker from holdings_daily group by portfolio_date, etf_ticker, holding_ticker having count(*) > 1)",
+            "result": [
+              [
+                0
+              ]
+            ],
+            "ok": true
+          },
+          {
+            "name": "fetch_status_counts",
+            "sql": "select status, count(*) from fetch_status group by status order by status",
+            "result": [
+              [
+                "PASS",
+                22
+              ]
+            ],
+            "ok": true
+          },
+          {
+            "name": "fetch_failures",
+            "sql": "select count(*) from fetch_status where status <> 'PASS'",
+            "result": [
+              [
+                0
+              ]
+            ],
+            "ok": true
+          }
+        ],
+        "tables": [
+          "active_etf_holdings_coverage",
+          "active_tw_etf_registry",
+          "active_tw_etf_universe",
+          "fetch_status",
+          "holdings_changes",
+          "holdings_daily"
+        ]
+      },
+      "eng073_structured_db": {
+        "evidence_file": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/handover/evidence_b524/vrn073.txt",
+        "exists": true,
+        "checks_total": 36,
+        "checks_ok": 36,
+        "checks_fail": 0,
+        "rc0": true
+      }
+    },
+    "first_page_gate": {
+      "bench_file": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/first_page_logic/BENCH_latest.json",
+      "bench_exists": true,
+      "logic_file": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/vrn/extraction_logic/LOGIC_latest.json",
+      "logic_exists": true,
+      "bench_verdict": "OK",
+      "logic_verdict": null
+    },
+    "sample_gate": {
+      "schema": "VIA.WindowsSampleAcceptance.B526.v1",
+      "checked_at": "2026-09-16T07:14:19Z",
+      "manifest": "/home/ubuntu/work/user_sample_manifest_b526.txt",
+      "provided_files": 64,
+      "formats": {
+        "pdf": 60,
+        "docx": 4
+      },
+      "groups": {
+        "華南": 11,
+        "凱基": 9,
+        "兆豐": 6,
+        "其他": 38
+      },
+      "mounted_readable_files": 0,
+      "content_parsed_files": 0,
+      "vrn_content_acceptance": "BLOCKED_NO_ORIGINAL_FILES",
+      "group_status": {
+        "華南投顧": {
+          "listed": 11,
+          "readable": 0,
+          "parsed": 0,
+          "accepted": 0
+        },
+        "凱基投顧": {
+          "listed": 9,
+          "readable": 0,
+          "parsed": 0,
+          "accepted": 0
+        },
+        "兆豐": {
+          "listed": 6,
+          "readable": 0,
+          "parsed": 0,
+          "accepted": 0
+        },
+        "其他": {
+          "listed": 38,
+          "readable": 0,
+          "parsed": 0,
+          "accepted": 0
+        }
+      },
+      "available_fixture_status": {
+        "synthetic_financial_report_pdf": "GREEN",
+        "pages_fitz": 2,
+        "pages_pdfplumber": 2,
+        "tables_pdfplumber": 1,
+        "nonempty_table_cells": 12
+      },
+      "reason": "Only Windows paths were provided; C:\\測試樣本報告 is not mounted in the current sandbox.",
+      "next_gate": "Upload the original PDF/DOCX files or provide a sandbox-readable directory, then run VRN intake, first-page extraction, structured DB write, and dual-engine verification."
+    },
+    "rerun_commands": {
+      "real_acceptance": {
+        "cmd": [
+          "/home/ubuntu/work/quantguard_venv/bin/python",
+          "/home/ubuntu/work/run_real_acceptance_b526.py"
+        ],
+        "returncode": 0,
+        "output_file": "/home/ubuntu/work/full_integration_b526/real_acceptance_rerun.txt",
+        "tail": "warning: The `fitz` API is deprecated and will be removed in future. Use `import pymupdf` instead.\n{\n  \"report\": \"/home/ubuntu/work/real_acceptance_b526/REAL_ACCEPTANCE_B526.json\",\n  \"verdict\": \"PARTIAL_BLOCKED\",\n  \"checks\": {\n    \"stock_db_real_integrity\": true,\n    \"stock_required_fields_zero\": true,\n    \"stock_duplicate_keys_zero\": true,\n    \"stock_price_required_zero\": true,\n    \"etf_db_real_integrity\": true,\n    \"etf_fetch_failures_zero\": true,\n    \"central_eng087_real_status_rc0\": true,\n    \"vrn_pdf_pdf_green\": true,\n    \"user_original_samples_available\": false\n  },\n  \"sample_names\": 64,\n  \"mounted_matches\": 0\n}\n"
+      }
+    },
+    "limitations": [
+      "The 64 original Windows PDF/DOCX files are not mounted in the sandbox; no content-level pass is claimed.",
+      "The two historical runtime entrypoints require /home/claude/work/test_pdfs, which is not mounted.",
+      "The retained ENG073 evidence is a verified prior zero-network 36/36 run and is reported separately from current original-file intake."
+    ]
+  },
+  "runner_commands": {
+    "selftests": {
+      "command": [
+        "bash",
+        "/home/ubuntu/work/run_vrn_selftests_b524.sh"
+      ],
+      "returncode": 0,
+      "output_file": "/home/ubuntu/work/vrn_b526_automated_integration_latest/vrn_selftests.txt",
+      "tail": "=== vrn_072 ===\nRC=0\n=== vrn_073 ===\nRC=0\n=== vrn_074 ===\nRC=0\n=== vrn_080 ===\nRC=0\n=== vrn_082 ===\nRC=0\n=== vrn_086 ===\nRC=0\n=== nlp_744 ===\nRC=0\n=== SUMMARY ===\nnlp_744.txt              === SUP_MDL744 NLPApplicationHub · 十二檢自測(零網路;含尾版律/字母序陷阱/缺席對照組;+證據型摘要)===   [計] 十二檢 OK 12 · FAIL 0 RC=0 \nvrn_072.txt              [計] 3 件 · 雙法 0 · 分區 0 · fitz 0 · pypdf 0 · 候OCR 1 · 稀薄 0 · docx 1 · 影像 1 · 總覽 /tmp/tmpjs_fmfl9/_out/FIRSTPAGE_SUMMARY.html   [計] 四十六檢(46 檢) OK 46 · FAIL 0 RC=0 \nvrn_073.txt              === 報告結構化入庫引擎(VRN_ENG073 v0125)· 三十六檢自測(零網路)===   [計] 三十六檢(36 檢) OK 36 · FAIL 0 RC=0 \nvrn_073_after_pydantic.txt === 報告結構化入庫引擎(VRN_ENG073 v0125)· 三十六檢自測(零網路)===   [計] 三十六檢(36 檢) OK 36 · FAIL 0 \nvrn_074.txt              === 財報頁表格擷取器(VRN_ENG074 v0107)· 十九檢自測(零網路)===   [計] 十九檢 OK 19 · FAIL 0 RC=0 \nvrn_080.txt              === VRN 一題四點文摘(VRN_ENG080_FourPointDigest)· 十五檢自測(零網路;臨時庫)===   [計] 十六檢 OK 16 · FAIL 0 RC=0 \nvrn_082.txt              === VRN 擷取中央邏輯庫(VRN_ENG082 v0110)· 二十一檢自測(零網路;暫存夾;批506 政策庫冊入因子)===   [計] 二十一檢 OK 21 · FAIL 0 RC=0 \nvrn_086.txt              === 第一頁邏輯補缺正主橋(VRN_ENG086 v0100)· 十檢自測(零網路;收容件 FirstPageEngine v0101 _b522)===   [計] 十檢 OK 10 · FAIL 0 RC=0 \n"
+    },
+    "pdf": {
+      "command": [
+        "/home/ubuntu/work/quantguard_venv/bin/python",
+        "/home/ubuntu/work/run_vrn_pdf_validation_b524.py"
+      ],
+      "returncode": 0,
+      "output_file": "/home/ubuntu/work/vrn_b526_automated_integration_latest/vrn_pdf_validation.txt",
+      "tail": "warning: The `fitz` API is deprecated and will be removed in future. Use `import pymupdf` instead.\n{\"out\": \"/home/ubuntu/work/vrn_pdf_validation_b524.json\", \"vrn\": \"GREEN\", \"vrn_compile\": \"288/288\", \"pdf\": \"GREEN\"}\n"
+    },
+    "full_integration": {
+      "command": [
+        "/home/ubuntu/work/quantguard_venv/bin/python",
+        "/home/ubuntu/work/run_via_vrn_full_integration_b526.py"
+      ],
+      "returncode": 0,
+      "output_file": "/home/ubuntu/work/vrn_b526_automated_integration_latest/via_vrn_vdf_full_integration.txt",
+      "tail": "{\n  \"report_json\": \"/home/ubuntu/work/full_integration_b526/VIA_VRN_VDF_FULL_INTEGRATION_B526.json\",\n  \"report_md\": \"/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/handover/VIA_VRN_VDF_FULL_INTEGRATION_B526.md\",\n  \"verdict\": \"PARTIAL_BLOCKED\",\n  \"checks\": {\n    \"vrn_active_compile_288_288\": true,\n    \"vrn_active_import_288_288\": true,\n    \"vrn_state_green\": true,\n    \"pdf_dual_engine_green\": true,\n    \"central_market_lists_green\": true,\n    \"stock_duckdb_integrity\": true,\n    \"stock_required_fields_zero\": true,\n    \"stock_duplicate_keys_zero\": true,\n    \"stock_price_required_zero\": true,\n    \"etf_duckdb_integrity\": true,\n    \"etf_fetch_failures_zero\": true,\n    \"eng073_structured_db_36_36\": true,\n    \"first_page_artifacts_present\": true,\n    \"original_windows_samples_available\": false\n  }\n}\n"
+    }
+  },
+  "limitations": [
+    "The VRN active-tree gate excludes references/intake by policy.",
+    "The 64 original Windows PDF/DOCX files are not mounted; no original-file content-level pass is claimed.",
+    "PDF dual-engine result uses the retained synthetic regression fixture."
+  ]
+}

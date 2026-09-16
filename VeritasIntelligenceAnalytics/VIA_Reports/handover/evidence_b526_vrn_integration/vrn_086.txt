@@ -1,0 +1,14 @@
+=== vrn_086 ===
+=== 第一頁邏輯補缺正主橋(VRN_ENG086 v0100)· 十檢自測(零網路;收容件 FirstPageEngine v0101 _b522)===
+  [OK] ① 收容件在位(尾版 glob)且 md5 對冊(零觸碰) (VIA_VRN_FirstPageEngine_v0101_b522 md5 d4cdaedf=d4cdaedf)
+  [OK] ② importlib 載入收容件:TickerFilename/BrokerRatingDict/FieldValidation/CrossValidation/FinancialValidation/FirstPageEngine 齊
+  [OK] ③ 真檔名:代碼 3706(FILE_SUFFIX 「3706 TT」)· 日期 2025-08-22 · 券商 CATHAY(VIA 補冊「國泰證期」) (FILE_SUFFIX 2025-08-22 CATHAY)
+  [OK] ④ 階梯:FILE_BARE 6873 · 年段 2025 不當代碼→TITLE_SUFFIX 2330 · 產業檔=SECTOR · 名→碼 TITLE_SYNONYM 2330 · 民國 7 碼 1140822→2025-08-22 · 兆豐=MEGA (FILE_BARE TITLE_SUFFIX SECTOR_FILE TITLE_SYNONYM 2025-08-22)
+  [OK] ⑤ 券商防呆(收容件 broker_normalize 子字串撞詞;橋側詞界):earnings guidance→None(收容件會說 GOLDMAN)· 凱基投顧→KGI · Goldman Sachs→GOLDMAN · 獨立 MS→MORGANSTANLEY · terms→None · capital expenditure→None
+  [OK] ⑥ 評等防呆:buyback 計畫→None(收容件會說 BUY)· 評等:買進→BUY · Rating: Overweight→BUY · holdings 30%→None · 維持中立(線索)→HOLD · 獨立短行「賣出」→SELL
+  [OK] ⑦ 目標價:線索詞優先(目標價/Target Price/TP/PT 詞界)1250/1300;無線索退收容件弱正則(營收 NT$ 會誤中=標「弱」)· 目標價旁四碼=代碼不算 · 單碼不算 · HTTP 不算 · 合理性 TP=PER×EPS PASS · 上漲 25% sane (1250.0 1300.0 弱=12345.0 代碼旁=None 單碼=None HTTP=None)
+  [OK] ⑧ 互核:三欄同=PASS · 代碼異=FAIL(缺欄=None 不判)· 區在不在 PASS
+  [OK] ⑨ enrich:ENG072 sidecar → .logic86.json(代碼 2330 FILE_BARE · 券商 KGI · 評等 BUY · 目標價 1250 · email 驗 KGI 網域 · 檔名×首頁 PASS)· 壞件計 errors 不炸 · 來源 sidecar 位元零變(append-only) (1 件 · 代碼法 {'FILE_BARE': 1} · 檔名×首頁代碼一致 1/1 · 券商 1/1 · 評等 1/1 · 目標價 1/1)
+  [OK] ⑩ 律:零網路 · 收容件零觸碰(橋內無對收容件路徑的寫入)· 產物夾與 ENG072 分開(first_page_logic)· 名冊只讀(read_only=True)· 檔名 .logic86.json
+  [計] 十檢 OK 10 · FAIL 0
+RC=0

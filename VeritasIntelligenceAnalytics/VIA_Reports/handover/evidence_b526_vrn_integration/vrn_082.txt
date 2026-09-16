@@ -1,0 +1,25 @@
+=== vrn_082 ===
+=== VRN 擷取中央邏輯庫(VRN_ENG082 v0110)· 二十一檢自測(零網路;暫存夾;批506 政策庫冊入因子)===
+  [OK] ① sha1/lookup:沒記過=None(不發明命中)
+  [OK] ② record SUCCESS → 產物不在=不命中(不拿台帳冒充產物);產物在=HIT
+  [OK] ③ FAIL 件 fail_ttl 內=FAIL_HIT(不重燒 OCR);過期=None(該再試)
+  [OK] ④ 後端健康:BROKEN 進跳過名單;抽到字=OK 解除;過 TTL 自動解除
+  [OK] ⑤ 互核:同文 AGREE;同字不同序 ORDER_ONLY;不同 DISAGREE;單邊 SINGLE ({'bag': 1.0, 'seq': 1.0, 'state': 'AGREE'} ORDER_ONLY DISAGREE)
+  [OK] ⑥ 文字修復:零寬去、全形英數→半形、中文斷行接回、多空白收斂;中文標點「，。」保留 ({'zw': 1, 'fullwidth': 11, 'joins': 1, 'spaces': 1})
+  [OK] ⑦ 判準:分區件要標示還原+互核非 DISAGREE 才 SUCCESS;文字件互核非 DISAGREE 即 SUCCESS;<min_chars=FAIL
+  [OK] ⑧ 階梯自冊(尾版律):simple(tesseract)→dual(+easyocr)→paddle(三支);預算/TTL 讀得到 (冊 VRN_ExtractionLogic_SSOT_v0100.json)
+  [OK] ⑨ PaddleOCR 3.x 相容墊片:2.x 鍵 show_log/use_gpu 自動剔除、use_angle_cls→use_textline_orientation 後重試成功(正本零觸碰) (paddleocr 相容墊片就位(1 類;2.x 鍵 show_log/use_)
+  [OK] ⑩ 台帳只增:jsonl 兩筆(SUCCESS+FAIL)逐行可讀;摘要 LOGIC_latest.json 在
+  [OK] ⑪ status 印得出件數/法/後端;批503 同法不同參數歸一行(OCR_simple:tesseract_direct 不帶 dpi/墨量/秒)
+  [OK] ⑳ PARTIAL 件(批510):產物缺=None(該重抽);產物在且 fail_ttl 內=PARTIAL_HIT(不重燒 OCR);過期=None
+  [OK] ⑫ 真目錄零觸碰(自測全在 VIA_LOGIC_DIR 暫存夾)
+  [OK] ⑬ 次序修正(批496):hq_budget_s 自有預算 >0;hq_dpi 帶 300~350;非 OCR 失敗判準 FAIL/DISAGREE=真,PARTIAL/AGREE=假 (hq_budget 120.0s · dpi 300~350)
+  [OK] ⑭ 入庫:台帳→vrn_extraction_logic、律冊→via_policy_factors(擷取邏輯/工具冊/資料家/基線 hydra 四源);dry-run 不寫;其餘表零觸碰 (logic 1 · policy 598 · 源 8)
+  [OK] ⑮ 全庫同步(批499):資料家兩本庫皆入四張表(含 via_handover 交接)、同一 hash、對帳單在;資料家根有 VIA_HANDOVER_LATEST.md;沙盒庫零觸碰;後端健康入政策因子;status 對帳「同步 2」 (targets 2 · OK ok 2 · hash 1 · 沙盒 ['keep_me'])
+  [OK] ⑰ 自測零污染律(批504):VIA_SELFTEST=1 → 入庫目標只有 env 首選那一本;不帶旗才掃家 + VIA_DB_*(3 本) (全掃 3 · 自測 ['prim.duckdb'])
+  [OK] ⑱ 財務邏輯橋兩本冊入政策因子(批504):SUP_MDL748 列 ≥ 80(券商/評等/科目同義/單位倍率/28 欄/正則);橋缺=1 列 ABSENT 誠實 (130 列)
+  [OK] ⑲ 自測隔離(批505):自測期間 os.environ 無任何 VIA_DB_*(操作員 bootstrap 匯出的真庫鍵已撤)且 VIA_SELFTEST=1(各檢結束自復原) ([])
+  [OK] ⑯ 交接三處(批499):docs 尾版在;母檔案夾(倉根)VIA_HANDOVER_LATEST.md 與 docs 同一份 sha(舊=commit 時沒同步,要修) ({'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '32d5ffa0e303', 'root': '同', 'home': '缺'})
+  [OK] ㉑ 批515 fix_contents(TAB3 FIXED CONTENTS):中文字間空白去除+斷行接回(中文直接接/英文補空白)+冊提示優先/關鍵字自判類型+每 wrap 字換行+【類型·次分類·p頁】;空段跳過 ('台積電2026年營收預估\n年增20%,達3兆元。' · 【財務·YoY·p3】)
+  [計] 二十一檢 OK 21 · FAIL 0
+RC=0

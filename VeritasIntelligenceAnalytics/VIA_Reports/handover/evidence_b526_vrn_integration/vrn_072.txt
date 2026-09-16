@@ -1,0 +1,85 @@
+=== vrn_072 ===
+=== 首頁三法整合擷取器(VRN_ENG072 v0129)· 四十六檢自測(零網路)===
+  [OK] ① 抽取道優先序=digest ㉓㉙ 同族(fitz 版面序→pypdf 後備→NEEDS_OCR)
+warning: The `fitz` API is deprecated and will be removed in future. Use `import pymupdf` instead.
+  [OK] ② 首頁抽取實測(fixture 2 頁 PDF 僅取第 1 頁;批444 起 fixture 加厚成像一頁真報告——38 字的一頁和只有浮水印的掃描頁本來就分不出來) (標記=FITZ_LAYOUT · 分流=DIGITAL 2194字)
+  [OK] ⑪ 法B pdfplumber 同判準分區+雙法對照(body/right AGREE)
+  [OK] ⑫ 對照三態機制(DIVERGE 誠實判離+BOTH_EMPTY)
+  [OK] ⑨ 分區還原(批236:左本文/右資訊卡切開零交錯)
+  [OK] ⑩ 本文斷行修復+標題階層+頁尾雜訊帶
+  [OK] ⑬ 法C GLE 掛載(批243:九宮分區標+字重階層+後端矩陣;缺席=誠實 absent)
+  [OK] ⑭ 句級修復(批243:一句一資料;句界切分;標題不經句道)
+  [OK] ③ 掃描版誠實(零文字=NEEDS_OCR 不假抽;批443 起附帶為何)
+[OCR 未就緒] 道一 GLE 路由 7 支全未裝(tesseract, paddleocr, paddle_ppstructure, paddle_pdf_pipeline, easyocr, ocrmypdf, transkribus_core) · 道二 PPP 缺 paddleocr
+   掃描影像 PDF 會誠實停在 NEEDS_OCR(不假抽)。要開通擇一:
+   pip install paddleocr paddlepaddle   # CJK 最佳,操作員指名的那一系
+        或 pip install pytesseract 並裝 Tesseract-OCR 本體(含 chi_tra 語言包)
+        或 pip install easyocr
+[首頁擷取] 夾律=冊 VIA_InputConsole_Spec_v0100.json;incoming 未併(--no-incoming);取件 3 份 · tmpzs_4julo=3 件
+  [DUAL_ZONES] fx_report.pdf · 4,582 字
+  [NEEDS_OCR[simple:SKIP(本階新增後端 tesseract 本境不就緒且 OCR 境缺;via-envtools)|dual:SKIP(本階新增後端 easyocr 本境不就緒且 OCR 境缺;via-envtools)|paddle:SKIP(本階新增後端 paddleocr,paddle_ppstructure,paddle_pdf_pipeline 本境不就緒且 OCR 境缺;via-envtools)|PPP_OCR_ABSENT(缺 paddleocr)|耗時(ppp 0s)|HQ_SKIP(第二階不是「跑了但零字」而是後端不在位,升階是白跑)]] fx_scan.pdf · 0 字
+  [DUAL_ZONES] fx_twocol.pdf · 463 字
+[邏輯庫] 命中 0 · 部分命中 0 · 新記 3 · 壞後端 無 · /tmp/via_logic_vbjw7qkp/LOGIC_latest.json
+[入庫] OK · /tmp/via_logic_vbjw7qkp/vdf_tw_market.duckdb · vrn_extraction_logic 3 列 · via_policy_factors 598 列 · hash cadbd1b9685a
+[交接] 資料家根 ← VIA_Handover_ONEPAGE.md · /tmp/via_logic_vbjw7qkp/VIA_HANDOVER_LATEST.md
+[計] 3 件 · 雙法 2 · 分區 0 · fitz 0 · pypdf 0 · 候OCR 1 · 稀薄 0 · docx 0 · 影像 0 · 總覽 /tmp/tmpzs_4julo/_out/FIRSTPAGE_SUMMARY.html
+  [OK] ④ 逐件 .txt+總覽 HTML 產出(一頁堆疊)
+[OCR 未就緒] 道一 GLE 路由 7 支全未裝(tesseract, paddleocr, paddle_ppstructure, paddle_pdf_pipeline, easyocr, ocrmypdf, transkribus_core) · 道二 PPP 缺 paddleocr
+   掃描影像 PDF 會誠實停在 NEEDS_OCR(不假抽)。要開通擇一:
+   pip install paddleocr paddlepaddle   # CJK 最佳,操作員指名的那一系
+        或 pip install pytesseract 並裝 Tesseract-OCR 本體(含 chi_tra 語言包)
+        或 pip install easyocr
+[首頁擷取] 無報告件(誠實;缺件搜集器先跑)· 夾律=冊 VIA_InputConsole_Spec_v0100.json;incoming 未併(--no-incoming)
+   · /tmp/tmpzs_4julo/nothing_x → 夾不存在(換路徑)
+  [OK] ⑤ 空夾誠實 rc2(缺件先搜集)
+  [OK] ⑮ 自測零污染正式產出夾(批410:本次跑完 VIA_Reports/first_page_text/ 零新增;fixture 不得外流成假報告被 ENG073 收進正本庫) (本次新增 0)
+  [OK] ⑥ docx 道誠實(無頁界=前段近似標 DOCX_HEAD;缺庫誠實提示)
+  [OK] ⑦ 紅線宣告(抽取物不入 git;原件僅本機)
+  [OK] ⑧ 零網路+加速橋(純本地抽取)
+  [OK] ⑯ 兩收容件改由支援模組統轄(批421;SUP_MDL743 GLE + SUP_MDL744 NLP)——真走橋、NLP 是尾版 v1.8.0 非寫死 v1.1.0、且橋缺席仍有直掛退路 (GLE=SUP_MDL743_GenericLayoutHub_v0100.py→GenericLayoutEngine_AllEngines_v2.1.0_b245/GenericLayoutEngine(VERIFIED) · NLP=SUP_MDL744_NLPApplicationHub_v0102.py→VIA_NLP_Application_System_v1.8.0(VERIFIED) · 正主='台積電 的的的營收' vs stdlib='台積電  的的的營收' · 後端 5/19 · 退路=在)
+  [OK] ⑰ 字元密度分流閘(批444;SUP_MDL746)接得上,而且擋在**分區道前面**——浮水印那十幾個字照樣會讓 zones[header] 非空,閘擋在後面等於沒擋;橋缺席時回 UNKNOWN 走 v0109 原路(零回歸);批508 改驗自生夾具不讀真報告 (橋=在 · 閘在分區前=True · DIGITAL 1 · SCANNED 1)
+  [OK] ⑱ 候OCR/稀薄兩格數得對——批443 起 NEEDS_OCR 帶了因由後綴,v0109 的 `tag if tag in stats` 對不上鍵,整批被算進 OTHER,候OCR 那格一直報 0;改取「[」前的基名 (候OCR 1 · 雙法 1 · 稀薄 1 · docx 1 · 其他 0)
+  [OK] ⑲ 三階梯(批449 操作員令「先用非 OCR 法,再用 OCR 法,最後還抓不到再調高畫質 OCR 法」):① 非 OCR(fitz→pypdf,密度閘守門)② 原畫質 OCR(GLE 七支→PPP 補位)③ **高畫質 OCR**(用 MDL001 批448 的 auto_dpi 把第 1 頁重繪到 300–350 帶內,再餵**同一條** OCR 車道——變因只有解析度一個,才說得清是不是解析度的問題)。升階條件是「**跑了但零字**」不是「沒裝」:後端根本不在位時升階是白跑,誠實跳過並講明 (階序正確=True · 跑了但零字→升階=True · 後端不在位→升階=False(應為 False) · 第三階 DPI=350)
+  [OK] ⑳ 第三階**不另寫一條 OCR 路由**——重繪完就交回 ocr_page1(同一組後端、同一套路由);暫存 PDF 走 TemporaryDirectory 跑完即刪,不落地污染 (交回 ocr_page1=True · 暫存自刪=True · 未自建路由=True)
+  [OK] ㉑ 不准編造「跑了」(批450:v0111 的 `used = run.route **or usable**` 在 route 空掉時拿「矩陣說裝了的那些」去填,再宣稱它們跑過——工作站實錄裡同一行既說 GLE 的 paddleocr 跑過、又說 PPP「缺 paddleocr」,兩句不可能都真。而真正的因由**早就在 run.adapter_results 裡**:GLE 的 tesseract 轉接器自己會寫 `missing Tesseract languages: …; using …`,我卻把整包丟掉再掰一句「影像可能不可辨」——批419e 那一課的最深一層:捕捉到卻不顯示,還編一個代替它)。且升階判準改成具名函式:標記格式從 `OCR_EMPTY(` 改成 `OCR_EMPTY[` 之後,舊的 `"_EMPTY(" in tag` 會**永遠為假**,第三階從此靜靜不升階而沒有一行會說 (逐支因由照抄=True · 跑了但零字→升階=True · 路由空→不升=True · 不在位→不升=True)
+  [OK] ㉒ 診斷對了不等於看得下去,而且「在位」不等於「跑得動」(批451 工作站實錄:批450 的逐支因由**答對了**——`tesseract:FAIL 錯=RuntimeError: none of the requested Tesseract languages are installed`;查 GLE 才知道它還有一層退路(請求的語言全不在時只要 eng 在就退 eng),會拋這個錯=**連 eng 都不在**,也就是 tessdata 一個語言檔都沒有,所以正解不是補 chi_tra 是先確認 tessdata。但同一貼也照出兩個我造的問題:① 第三階原樣複述第二階整包因由,一行 1,200 字×8 份,終端讀不下去——診斷對了,呈現把它埋掉;兩階一字不差時只寫「同第二階」。② 矩陣說 tesseract「在位 1/7」而它每一份都 FAIL——**在位不等於跑得動**,燈只有兩態就講不出這件事;補第三態「在位但不可用」並印出正解) (第三階去重=True · 本境 tesseract 語言=無(tesseract 主程式不在 PATH) · 第三態在檔=True)
+  [OK] ㉓ 受理三類 WORD/PDF/IMAGE(批465 操作員令)。v0113 的收件閘寫死 `glob("*.pdf")+glob("*.docx")`,影像件**從頭到尾沒被當成一件**——不是抽失敗,是看不見(實測:三件料的夾只取到兩件)。改由冊 input.intake 宣告三類,舊鍵 extensions 一字不動(只增不減) (v0113 閘=['rep65.pdf', 'word65.docx'] · v0114 閘=['rep65.pdf', 'scan65.png', 'word65.docx'])
+  [OK] ㉔ WORD 零相依退路(.docx 本來就是 zip,word/document.xml 的 <w:t> 就是字)。v0113 在 python-docx 缺席時交白卷=0 字(實測 DOCX_LIB_MISSING);退路接在 ImportError 分支裡,裝了 python-docx 的機器行為一字不變 (零相依抽到 43 字 · 接在 ImportError 分支=True)
+[OCR 未就緒] 道一 GLE 路由 7 支全未裝(tesseract, paddleocr, paddle_ppstructure, paddle_pdf_pipeline, easyocr, ocrmypdf, transkribus_core) · 道二 PPP 缺 paddleocr
+   掃描影像 PDF 會誠實停在 NEEDS_OCR(不假抽)。要開通擇一:
+   pip install paddleocr paddlepaddle   # CJK 最佳,操作員指名的那一系
+        或 pip install pytesseract 並裝 Tesseract-OCR 本體(含 chi_tra 語言包)
+        或 pip install easyocr
+[首頁擷取] 夾律=顯式輸入=零指定位置(Windows I/O/拖曳/--in);取件 3 份 · 操作員隨手放的夾=3 件
+  [非OCR驗證失敗] rep65.pdf · FAIL/AGREE · 本文 28 字 → 轉 OCR 階梯
+  [NEEDS_OCR[simple:SKIP(本階新增後端 tesseract 本境不就緒且 OCR 境缺;via-envtools)|dual:SKIP(本階新增後端 easyocr 本境不就緒且 OCR 境缺;via-envtools)|paddle:SKIP(本階新增後端 paddleocr,paddle_ppstructure,paddle_pdf_pipeline 本境不就緒且 OCR 境缺;via-envtools)|PPP_OCR_ABSENT(缺 paddleocr)|耗時(ppp 0s)|HQ_SKIP(第二階不是「跑了但零字」而是後端不在位,升階是白跑)·密度閘:字數 29 < 300 且密度 5.79e-05 < 2e-04=浮水印/戳章那種假文字層,判掃描頁]] rep65.pdf · 0 字
+  [IMAGE_NEEDS_OCR(simple:SKIP(本階新增後端 tesseract 本境不就緒且 OCR 境缺;via-envtools)|dual:SKIP(本階新增後端 easyocr 本境不就緒且 OCR 境缺;via-envtools)|paddle:SKIP(本階新增後端 paddleocr,paddle_ppstructure,paddle_pdf_pipeline 本境不就緒且 OCR 境缺;via-envtools)|PPP_OCR_ABSENT(缺 paddleocr)|耗時(ppp 0s)|HQ310_EMPTY(同第二階;MDL001 auto_dpi:原生 300 DPI 落在帶內→取 310(進位到 10)))] scan65.png · 0 字
+  [DOCX_ZIP_FALLBACK(無 python-docx;直讀 word/document.xml)] word65.docx · 43 字
+[邏輯庫] 命中 0 · 部分命中 0 · 新記 3 · 壞後端 無 · /tmp/via_logic_vbjw7qkp/LOGIC_latest.json
+[入庫] OK · /tmp/via_logic_vbjw7qkp/vdf_tw_market.duckdb · vrn_extraction_logic 6 列 · via_policy_factors 598 列 · hash 245fcc8dac7a
+[交接] 資料家根 已同 · /tmp/via_logic_vbjw7qkp/VIA_HANDOVER_LATEST.md
+[計] 3 件 · 雙法 0 · 分區 0 · fitz 0 · pypdf 0 · 候OCR 1 · 稀薄 0 · docx 1 · 影像 1 · 總覽 /tmp/tmpjs_fmfl9/_out/FIRSTPAGE_SUMMARY.html
+  [OK] ㉕ 輸入位置解放:--in 收下系統**任何位置**的真實路徑(Windows I/O 選檔器/拖曳/參數都只交出真實路徑,這裡一視同仁),顯式輸入時整個不碰指定位置。舊的 --dir > 冊 user.vrn_dir > 冊 dir_default 三層律原封不動=零回歸 (rc=0 · 產出 ['rep65.txt', 'scan65.txt', 'word65.txt'])
+  [OK] ㉖ `incoming 一律併入` 是 v0107「報告就在旁邊那個夾」的解方,留著;但顯式輸入時併入=多收了操作員沒指的件,故 --no-incoming 可單獨關,targets 車道則整條不走夾律 (預設 2 夾 · 關後 1 夾)
+  [OK] ㉙ **OCR 道**簡→繁正字收斂(批469:把 chi_tra/chi_sim 裝進 tessdata 後同一張圖重跑,「台積電」從 `ARs` 變成讀得出來——引擎側證明是對的;但輸出**簡繁混雜**(`台积电`/`报告`),因為 tesseract 兩本都在時逐行挑哪一本由它自己決定。下游拿這種字對名冊會時中時不中,而且錯得沒有規律最難查)。Zero-Hydra:交給 ENG066 樞紐的 normalize()——ENG067 收斂「联发科→聯發科」用的同一支,不另寫轉換表。**只對 OCR 道**:PDF 文字層是文件自己的字,不改寫。樞紐缺席=原樣輸出並在 tag 標明沒繁化,不假裝做過 (樞紐=在·無 opencc(誠實直通;裝=你的手) · OCR 道→'2330 台积电 研究 报告 预估 'ented] · 非 OCR 道未動=True)
+  [OK] ㉘ **收得進來 ≠ 進得了庫**(批466 實測:v0114 只有分區道寫 .json,WORD/IMAGE/OCR/pypdf 各道只寫 .txt;下游 ENG073 的收件閘是 `zdir.glob("*.json")`,於是新收的 docx 與 png 一件都沒進庫——入庫計 67 檔全是舊 sidecar)。每一件都留 sidecar,而且沒有版面幾何的件**不編造分區**:header/right 留空、body 放全文、標 text_only (sidecar 3 件 vs txt 3 件 · word65 text_only=True · 幾何未編造=True)
+  [OK] ㉗ **抽到字 ≠ 抽到對的字**(批465 實測:本境 tesseract 只有 eng/osd,中文報告掃描圖 OCR 回 180 字,數字 2330/1,250/1,065/EPS 59.8 全對,但「台積電」變 "ARs"、「買進」變 "Bié";tag 寫 IMAGE_OCR 讀起來像成功,下游入庫就把亂碼當公司名收進正本庫)。無中文語言檔且輸出近零中日韓字→ tag 掛第三態;真有中文出來、或根本不是 OCR 道的件,一律不加 (本境中文語言檔=False · 拉丁亂碼→[無中文語言檔:數字可信、中文字形八成全錯] · 真中文→無警語=True · 非 OCR 道→不加=True)
+  [OK] ㉚ 中央邏輯庫命中:同一批再跑,上次 SUCCESS 且產物在的件全印 [LOGIC_HIT] 不重抽(sidecar mtime 不變);上次 FAIL 的件 TTL 內標 LOGIC_FAIL_HIT 不重燒 OCR;台帳 LOGIC_latest.json 在暫存夾 (rc=0 · SUCCESS 件 1 全命中=True · FAIL 件 2 不重燒=True · 台帳件 6)
+  [OK] ㉛ 每件 sidecar 都有 logic{method, xcheck.state, repair, labels_ok, verdict}:分區件互核 fitz×pdfplumber,純文字件 SINGLE;判準 SUCCESS/PARTIAL/FAIL 亮在檔裡(不埋) ({'rep65': ('FAIL', 'NONE'), 'scan65': ('FAIL', 'NONE'), 'word65': ('SUCCESS', 'SINGLE')})
+  [OK] ㉜ 後端健康閘:標壞的後端整階 SKIP、paddleocr 標壞則 PPP 車道跳過;零假抽且 tag 講明重裝後 reset-backends (simple:SKIP(後端皆標壞 tesseract;重裝後 via-vrnlogic reset-backends)|dual:SKIP(後端皆標壞 tesseract,eas)
+  [OK] ㉝ OCR 境派送(批495):本境缺這一階後端 → 找到 via_paddle_311 → SUP_MDL747 執行器在該境跑,結果 JSON 回主行程,tag 帶 lane=;零假抽 (OCR_RUN_FAIL(lane=via_paddle_311:本境無此階後端:definitely_not_a_backend_x(後端矩陣:不在位)(在位:無);))
+  [OK] ㉞ 都失敗才畫質提升,而且**一定升**:第二階預算燒光仍走第三階(自有 hq_budget_s,時鐘重起);第三階抽到字即回 (calls=[('l2', 150), ('hq', 120)] tag=HQ350_OCR_tesseract)
+  [OK] ㉟ DPI 釘在 300~350 帶;非 OCR 失敗判準:FAIL/DISAGREE 才轉 OCR,PARTIAL(標示未還原)不轉;轉 OCR 時跳過文字層 (dpi=350 · auto_dpi 失敗 FileNotFoundError→退帶頂 350)
+  [OK] ㊱ --retry-failed:FAIL 件忽略 TTL 重試(印 [RETRY_FAILED],不再 LOGIC_FAIL_HIT);SUCCESS 件照舊 [LOGIC_HIT] 不重抽 (FAIL 件 2 · retry 行=2 · hit 行=1)
+  [OK] ㊺ PARTIAL 件(批510):TTL 內印 [LOGIC_PARTIAL_HIT] 不重燒(sidecar mtime 不變;部分命中 1);--retry-failed 印 [RETRY_PARTIAL] 真重抽 (hit 行=1 · mtime 同=True · retry 行=1)
+  [OK] ㊲ 邏輯因子政策入庫(批498):跑完自動 sync → vrn_extraction_logic 有列、via_policy_factors 有列;既有表零觸碰;庫按名找(env VIA_DB_VDF_TW_MARKET) (logic 6 · policy 599)
+  [OK] ㊳ OCR 只送第 1 頁(批499):三頁 PDF → 一頁暫存(頁1/3;同檔只切一次);單頁檔原檔照回 (頁1/3 · 1 頁 · 單頁 頁1/1)
+  [OK] ㊴ 分境健康鍵:本境 broken 只含本境件(easyocr),車道境鍵 paddleocr@via_paddle_311 只進車道名單,ppp: 另計;EMPTY 不算壞;直呼 tesseract 車道 tag 帶 dpi/語言/墨量/秒(讀得到合成頁的 2330;主程式不在=ABSENT 誠實) (local ['easyocr'] · lane ['paddleocr'] · tesseract_direct:ABSENT(主程式不在 PATH) · 字 0)
+  [OK] ㊵ 深底反白(批501):墨量 >50% 的頁先反白再 OCR;黑底白字合成頁 tag 帶 [反白] 且讀得到 7788(主程式不在=ABSENT 誠實) (tesseract_direct:ABSENT(主程式不在 PATH) · 字 0)
+  [OK] ㊶ 轉接器就緒判準(批501):執行器 ADAPTER_REQ 一處定義;paddle 三支/easyocr/tesseract 回 bool+因由(缺 …);未知名回 None 退回後端矩陣 ({'paddleocr': (False, '缺 paddleocr,paddle'), 'paddle_ppstructure': (False, '缺 paddleocr,paddle'), 'paddle_pdf_pipeline': (False, '缺 paddleocr,paddle'), 'easyocr': (False, '缺 easyocr,torch'), 'tesseract': (False, '缺 pytesseract,tesseract('), 'definitely_not_a_backend_x': (None, '轉接器表無此名')})
+  [OK] ㊷ 車道候選不吃本境標壞鍵(批502):本境 paddleocr 標壞、車道 paddle_ppstructure 標壞 → 派車道名單=paddleocr+paddle_pdf_pipeline(paddleocr 仍在;ppstructure 被車道鍵濾掉) (OCR_RUN_FAIL(lane=via_paddle_311:本境無此階後端:paddleocr(缺 paddleocr,paddle),paddle_pdf_pipeline(缺 paddleocr,paddle))
+  [OK] ㊸ 直呼 tesseract psm 階梯(批502):零字再試 --psm 11 → --psm 6;全白頁 tag 帶 psm=3→11→6 與「影像近空白」(主程式不在=ABSENT 誠實) (tesseract_direct:ABSENT(主程式不在 PATH))
+  [OK] ㊹ 自測零污染(批504):VIA_SELFTEST=1 + 資料家指暫存 → ENG082 入庫目標只有暫存那一本,永不碰真家/真 VIA_DB_* (['/via_logic_vbjw7qkp/vdf_tw_market.duckdb'])
+  [OK] ㊻ 批522 車道境預檢:venv 佈局無 pyvenv.cfg → SKIP(境壞;重建 via-rebuild;reset-backends),不當 OCR_RUN_FAIL;python 缺→缺;好境→'' (SKIP(lane=via_paddle_311 境壞:pyvenv.cfg 缺(/tmp/tmp735kmehz/envs46/via_paddle_311/pyvenv.cfg);重建 via-r)
+  [計] 四十六檢(46 檢) OK 46 · FAIL 0
+RC=0
