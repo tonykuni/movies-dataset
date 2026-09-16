@@ -1,0 +1,51 @@
+{
+  "schema": "VIA.VDF.QuantGuard.v1",
+  "engine": "VDF_ENG086_QuantGuardOneBridge",
+  "version": "v0100",
+  "state": "GREEN",
+  "source_rows": 360,
+  "feature_rows": 360,
+  "composite_rows": 360,
+  "composite_complete_rows": 242,
+  "source_sha256": "9ea0143634371713c0c63a58d3e89035bd553ad828b34a5ad97ddcc758c4bfe3",
+  "price_basis": "adj_close",
+  "volume_basis": "non_day_trade_volume",
+  "execution_policy": "signal_t_execute_t_plus_1",
+  "legacy_indicator_library": "FORBIDDEN_NOT_USED",
+  "data_flow": {
+    "direction": "VDF_DUCKDB_TO_QUANTGUARD",
+    "source_owner": "VDF canonical frames and VDF-owned DuckDB/Parquet read surfaces",
+    "source_mutation": "FORBIDDEN",
+    "write_scope": "QuantGuard feature/factor/SSOT/evidence outputs only",
+    "network_fetch": "FORBIDDEN",
+    "reverse_edges_forbidden": [
+      "QuantGuard -> VDF source overwrite",
+      "QuantGuard -> database schema mutation",
+      "QuantGuard -> network fetch",
+      "QuantGuard -> silent consent"
+    ]
+  },
+  "source_read_only": true,
+  "source_frame_hash_before": "9ea0143634371713c0c63a58d3e89035bd553ad828b34a5ad97ddcc758c4bfe3",
+  "source_frame_hash_after": "9ea0143634371713c0c63a58d3e89035bd553ad828b34a5ad97ddcc758c4bfe3",
+  "source_frame_unchanged": true,
+  "accelerator": "VIA_SuperAccel_AVAILABLE",
+  "tool_mounts": {
+    "celeritas": {
+      "path": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/references/intake/VIA_QuantGuard_v20260916/mounts/VeritasCeleritas.py",
+      "sha256": "e9951cdf3bedd2442a8d84a9c3b6a176533ebe3dd5f0c32a37b719ebfa634e62"
+    },
+    "aegis_nexus": {
+      "path": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/references/intake/VIA_QuantGuard_v20260916/mounts/VeritasAegisNexus.py",
+      "sha256": "25973bfd1e8bf88c5b4a7ab2e316d247e79d3d581d98cf4e15bec5bba24d7d12"
+    },
+    "network_gate": "OFF_BY_DEFAULT"
+  },
+  "package_root": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/references/intake/VIA_QuantGuard_v20260916",
+  "outputs": [
+    "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/vdf/quantguard/selftest/FEATURES_latest.parquet",
+    "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/vdf/quantguard/selftest/FACTOR_COMPOSITE_latest.parquet"
+  ],
+  "ssot_version": "TW-QUANT-ENGINE-SSOT/0.3.0",
+  "policy_version": "TW-QUANT-POLICY/0.3.0"
+}

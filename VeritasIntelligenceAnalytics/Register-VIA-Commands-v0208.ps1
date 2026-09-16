@@ -842,6 +842,32 @@ function global:via-nlpvrn {
 }
 Set-Alias -Name NLP研報 -Value via-nlpvrn -Scope Global -Force
 Set-Alias -Name NLP串接 -Value via-nlpvrn -Scope Global -Force
+# ── 批532:via-nlpunified —— SUP_MDL866 統一 NLP 控制入口(Hub→VRN→VDF；附件只走受控 intake)
+#   -Text/-File/-Points 對應離線 NLP；-SelfTest/-Status 只讀；不啟動 AKShare、排程、安裝或 auto-fix
+function global:via-nlpunified {
+    $eng = Get-VIANewest "$VIA\supportive modules\70_VRN_Rules" "SUP_MDL866_VIAUnifiedNLPOrchestrator_v*.py"
+    if (-not $eng) { Write-Host "  [via-nlpunified] FAIL:SUP_MDL866_VIAUnifiedNLPOrchestrator_v*.py 缺" -ForegroundColor Red; return }
+    $a = @($args | ForEach-Object {
+        if ($_ -eq "-Text") { "--text" }
+        elseif ($_ -eq "-File") { "--file" }
+        elseif ($_ -eq "-In") { "--in" }
+        elseif ($_ -eq "-DB") { "--db" }
+        elseif ($_ -eq "-Out") { "--out" }
+        elseif ($_ -eq "-Points") { "--points" }
+        elseif ($_ -eq "-Force") { "--force" }
+        elseif ($_ -eq "-SelfTest") { "selftest" }
+        elseif ($_ -eq "-Status") { "status" }
+        elseif ($_ -eq "-RunText") { "text" }
+        elseif ($_ -eq "-Pipeline") { "pipeline" }
+        else { $_ }
+    })
+    if (-not $a) { $a = @("status") }
+    if (-not ($a | Where-Object { $_ -in @("status", "selftest", "text", "pipeline") })) { $a = @("text") + $a }
+    $env:VIA_FAMILY = "vrn"
+    Invoke-VIAPython -Family "vrn" $eng @a
+}
+Set-Alias -Name NLP統一 -Value via-nlpunified -Scope Global -Force
+Set-Alias -Name via-nlp-unified -Value via-nlpunified -Scope Global -Force
 # ── 批522:via-daytrade —— 個股當沖量值(VDF_ENG055 L15;線上三源誠實 + 檔案收容道 L45:via-daytrade --from-file A.csv,B.csv --date 2026-09-12 [--market TWSE|TPEX];收容夾 functional modules\VDF\references\intake\daytrade_files;觸網項=你開閘)
 function global:via-daytrade { $env:VIA_FAMILY = "vdf"; Invoke-VIAPython (Get-VIANewest "$VIA\functional modules\VDF\engine" "VDF_ENG055_OmniFetch_v*.py") (@("run", "--lane", "L15") + @($args)) }
 Set-Alias -Name 當沖量值 -Value via-daytrade -Scope Global -Force

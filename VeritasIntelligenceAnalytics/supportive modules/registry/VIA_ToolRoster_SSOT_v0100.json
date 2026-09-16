@@ -536,5 +536,26 @@
     "network": false
    }
   ]
+ },
+ "unified_nlp": {
+  "engine": "SUP_MDL866_VIAUnifiedNLPOrchestrator",
+  "version": "v0100",
+  "source": "supportive modules/70_VRN_Rules/SUP_MDL866_VIAUnifiedNLPOrchestrator_v0100.py",
+  "provider": "supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0102.py",
+  "vrn_bridge": "functional modules/VRN/VRN_ENG087_NLPTextSummaryBridge_v0100.py",
+  "attachment_manifest": "supportive modules/registry/VIA_UnifiedNLP_Attachment_Manifest_v0100.json",
+  "execution": "offline_text_and_file_only",
+  "network_default": "OFF",
+  "ta_policy": "QuantGuard-only; TA-Lib forbidden_not_used",
+  "supported_services": [
+   "normalization",
+   "segmentation",
+   "table_extraction",
+   "layout_analysis",
+   "content_roles",
+   "evidence_summarization"
+  ],
+  "adapter_policy": "intake_only_until_individually approved; no silent network, install, schedule, overwrite, or auto-fix",
+  "quantguard_data_flow": "VDF/DuckDB read -> QuantGuard -> features/factors/evidence; no reverse source edge"
  }
 }

@@ -97,6 +97,8 @@ def runtime_checks() -> list[dict[str, Any]]:
         check("network is OFF by default in roster", '"network_default": "OFF"' in read(ROSTER_JSON), "fail-closed"),
         check("central registries mention accelerator control", "via_accelerator_control" in reg_text or "CGC_MDL156" in reg_text, "central registry references"),
         check("QuantGuard-only active policy is registered", POLICY_SSOT.is_file() and '"status": "ACTIVE"' in read(POLICY_SSOT) and '"legacy_indicator_library": "FORBIDDEN_NOT_USED"' in read(POLICY_SSOT), "policy SSOT"),
+        check("QuantGuard data flow is VDF/DuckDB -> QuantGuard", '"direction": "VDF_DUCKDB_TO_QUANTGUARD"' in read(POLICY_SSOT) and '"source_mutation": "FORBIDDEN"' in read(POLICY_SSOT), "one-way policy SSOT"),
+        check("QuantGuard bridge declares one-way source guard", '"direction": "VDF_DUCKDB_TO_QUANTGUARD"' in read(QUANTGUARD) and '"source_read_only": True' in read(QUANTGUARD), "ENG086 bridge"),
     ]
     # TA-Lib is permanently prohibited. Scan only canonical active mounts;
     # retired/reference material is intentionally not treated as an active path.

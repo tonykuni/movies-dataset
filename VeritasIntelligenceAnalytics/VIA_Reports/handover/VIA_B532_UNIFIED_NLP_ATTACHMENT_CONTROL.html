@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VIA B532 Unified NLP Control</title>
+<style>
+:root{--ink:#263238;--muted:#607d8b;--bg:#f7f9f8;--panel:#fff;--line:#d9e1df;--green:#2e7d32;--amber:#a15c00;--red:#b3261e;--blue:#1565c0}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 system-ui,-apple-system,"Noto Sans CJK TC",sans-serif}main{max-width:1180px;margin:0 auto;padding:28px}h1{margin:0 0 4px;font-size:28px}h2{margin:28px 0 12px;font-size:19px}.sub{color:var(--muted);margin:0 0 20px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}.label{color:var(--muted);font-size:12px}.value{font-size:25px;font-weight:700;margin-top:3px}.green{color:var(--green)}.amber{color:var(--amber)}.red{color:var(--red)}.blue{color:var(--blue)}table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}th{background:#eef3f1;font-weight:700}tr:last-child td{border-bottom:0}.pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:700;background:#edf4ee;color:var(--green)}.pill.amber{background:#fff3df;color:var(--amber)}.pill.blue{background:#e7f0ff;color:var(--blue)}.note{background:#fff8e8;border-left:4px solid #e0a228;padding:12px 14px;margin-top:14px}.mono{font:12px ui-monospace,SFMono-Regular,Consolas,monospace;word-break:break-word}footer{color:var(--muted);margin-top:26px;font-size:12px}@media(max-width:800px){.grid{grid-template-columns:repeat(2,1fr)}main{padding:16px}}@media(max-width:480px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body><main>
+<h1>VIA B532 · Unified NLP Control</h1>
+<p class="sub">SUP_MDL866 → SUP_MDL744 → VRN_ENG087 → ENG072/ENG073/VDF · 2026-09-16</p>
+<section class="grid">
+<div class="card"><div class="label">NLP control</div><div class="value green">GREEN</div><div>SUP_MDL866 10/10</div></div>
+<div class="card"><div class="label">NLP provider</div><div class="value green">12/12</div><div>SUP_MDL744</div></div>
+<div class="card"><div class="label">Accelerator gate</div><div class="value green">23/23</div><div>25 roster · CGC156</div></div>
+<div class="card"><div class="label">File pipeline</div><div class="value amber">YELLOW</div><div>VDF coverage gate</div></div>
+</section>
+<h2>Core verification</h2>
+<table><thead><tr><th>Route</th><th>Result</th><th>Observed evidence</th></tr></thead><tbody>
+<tr><td>Text route</td><td><span class="pill">PASS</span></td><td>Normalization, one table, three layout blocks, three evidence points.</td></tr>
+<tr><td>DOCX fixture route</td><td><span class="pill amber">YELLOW</span></td><td>NLP 1/1; ENG073 test DB GREEN with five tables; VDF historical coverage gate false, so downstream rc=2 is retained.</td></tr>
+<tr><td>Central registration</td><td><span class="pill">PASS</span></td><td>InputConsole, Workflow, ToolRoster, Engine Catalog, Component Inventory, Interface <span class="mono">VIA-IFACE-4014</span>, Naming <span class="mono">SUP_MDL866</span>.</td></tr>
+<tr><td>QuantGuard data flow</td><td><span class="pill">ONE-WAY</span></td><td><span class="mono">VDF/DuckDB read → QuantGuard → features/factors/evidence</span>. Source overwrite, schema mutation, network fetch, and silent consent are forbidden.</td></tr>
+<tr><td>Network / adapters</td><td><span class="pill blue">OFF</span></td><td>AKShare not executed; VES/VCAF/CGE intake-only. No install, schedule, overwrite, or silent consent.</td></tr>
+</tbody></table>
+<h2>Attachment classification</h2>
+<table><thead><tr><th>Attachment</th><th>Central role</th><th>State</th><th>Decision</th></tr></thead><tbody>
+<tr><td>AKShare PS/Python</td><td>VDF data adapter</td><td><span class="pill blue">COLLECTED_NOT_RUN</span></td><td>Not NLP. Offline scan blocked by missing akshare; no installation.</td></tr>
+<tr><td>VES launcher/Python/protocol</td><td>Read-only governance and AI handoff</td><td><span class="pill">103/103</span></td><td>Support lane, not NLP provider.</td></tr>
+<tr><td>VCAF</td><td>Governance auto-fix candidate</td><td><span class="pill blue">DRY-RUN</span></td><td>Temporary fixture only; source tree unchanged.</td></tr>
+<tr><td>CGE Adaptive</td><td>Interface governance candidate</td><td><span class="pill">25/25</span></td><td>Temporary fixture only; not NLP capability.</td></tr>
+</tbody></table>
+<div class="note"><strong>Important:</strong> The 60 PDFs and 4 DOCX files in <span class="mono">C:\測試樣本報告</span> were not mounted in the sandbox. This page reports fixture verification only and does not claim user-file content parsing.</div>
+<h2>Known limitations</h2>
+<table><thead><tr><th>Item</th><th>State</th></tr></thead><tbody>
+<tr><td>PowerShell runtime</td><td><span class="pill amber">PENDING</span> Sandbox has no pwsh, powershell, or PSScriptAnalyzer. Pull latest branch and rerun the Windows probe.</td></tr>
+<tr><td>VRN_ENG078 legacy selftest</td><td><span class="pill amber">4/6</span> Hard-coded v1.5.0; active unified route uses SUP_MDL744 v1.8.0 and does not use this legacy route.</td></tr>
+<tr><td>Global interface registry</td><td><span class="pill amber">50 OK / 6 DRIFT / 1 BUMP</span> Six historical contract drifts were preserved rather than silently rewritten.</td></tr>
+</tbody></table>
+<footer>Evidence: VIA_B532_UNIFIED_NLP_ATTACHMENT_HANDOVER.md · VIA_B532_UNIFIED_NLP_ATTACHMENT_STATUS.json · VIA_UnifiedNLP_Attachment_Manifest_v0100.json</footer>
+</main></body></html>

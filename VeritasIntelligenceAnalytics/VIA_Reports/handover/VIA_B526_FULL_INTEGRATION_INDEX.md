@@ -51,3 +51,14 @@ Windows 一貼式 probe：`VIA_B531_25_ACCELERATOR_CONTROL.ps1`
 B531 的 CGC156 離線控制面實測 **GREEN 21/21、`READY_FOR_25`**；SSOT 與 PowerShell roster 均為 ID `01..25`。`sitecustomize.py` 實際將 25-roster 與 CGC156 identity 注入 VIA 啟動的 Python；VDF probe 顯示 `VIA_ACCEL_BOOT=cache:9/88:17env`、`via_net=True`、Celeritas/Aegis lazy mount。QuantGuard selftest 8/8 PASS；新增 `VIA_QuantGuard_TA_Lib_Policy_v0100.json` 與政策法 L50，指定 QuantGuard 為唯一活動技術分析／因子路徑，TA-Lib/talib 不得安裝、import、載入、復活、路由或作活動 benchmark；歷史 L36/L41/L42 標記 SUPERSEDED。canonical active mounts 掃描無禁用接線。SuperAccel 為 88 catalogued／9 available／79 missing-or-stub，誠實保留缺件，不把 25 roster 說成 25 套獨立演算法已安裝。
 
 中央同步 8 站中 7 站 exit 0；`iface_sync=1` 僅代表 6 個既有 InputConsole contract drift，未被盲改或假稱已解。VCGC ACTIVE 4,996/4,996、家族 237/237、AST errors 0。Windows 首次 probe 實際發現 dot-source scope 導致 25 項回退為 20 項，已改為 global canonical state，需 pull 最新修正後重跑；sandbox 仍無 PowerShell parser。Windows `C:\測試樣本報告` 原始 PDF/DOCX 仍未掛載，資料補庫仍停止。
+
+## B532 Unified NLP 與附件受控整合
+
+交接報告：`VIA_B532_UNIFIED_NLP_ATTACHMENT_HANDOVER.md`
+機器狀態：`VIA_B532_UNIFIED_NLP_ATTACHMENT_STATUS.json`
+HTML 狀態矩陣：`VIA_B532_UNIFIED_NLP_ATTACHMENT_CONTROL.html`
+Windows 一貼式驗證：`VIA_B532_UNIFIED_NLP_TEST.ps1`
+附件 manifest：`../../supportive modules/registry/VIA_UnifiedNLP_Attachment_Manifest_v0100.json`
+Unified NLP 證據：`../nlp_unified/VIA_UNIFIED_NLP_latest.json`
+
+B532 新增 `SUP_MDL866_VIAUnifiedNLPOrchestrator`，以 `SUP_MDL744` 為 NLP 正主，並將 PDF/DOCX/影像輸入統一轉派既有 `VRN_ENG087`；核心 selftest 10/10、SUP_MDL744 12/12、VRN_ENG087 11/11、CGC156 21/21。倉內 synthetic DOCX 檔案鏈實測 NLP 1/1、ENG073 DuckDB GREEN，因 VDF 覆蓋閘未達 2023 起始要求而保留 YELLOW。7 個附件均已收容至 manifest；AKShare 未執行，VES/VCAF/CGE 均不成為未授權 NLP 或網路執行路徑。Windows 真實 `C:\測試樣本報告` 仍待掛載，PowerShell runtime 仍待使用者 pull 後重跑。
