@@ -1,0 +1,14 @@
+=== Windows operator probe · first run ===
+Timestamp: 2026-09-16 21:31 Asia/Taipei
+Result: FAIL, real PowerShell scope defect discovered.
+
+VIA_ACCEL20=20
+VIA_ACCEL25=0
+Get-VIAAccelRoster=20
+RosterIDs=01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20
+Exception: VIA_B531_25_ACCELERATOR_CONTROL.ps1 line 27
+PowerShell roster is not exactly 01..25
+
+Root cause: VIA_ACCEL25 was not exposed as global canonical state after dot-sourcing the module; the runtime fell back to the legacy 20-item view.
+Remediation: use global VIA_ACCEL20/VIA_ACCEL25 state, rebuild when Count is not exactly 20/25, and fail closed from Get-VIAAccelRoster when Count is not 25.
+Windows rerun: pending after pulling the remediation commit.

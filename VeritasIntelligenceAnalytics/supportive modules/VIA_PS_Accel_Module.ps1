@@ -8,9 +8,12 @@
 $VIAPSAccelRoster = Join-Path $PSScriptRoot "registry\VIA_PS_Accelerators_25_Roster_v0100.ps1"
 if (Test-Path -LiteralPath $VIAPSAccelRoster) { . $VIAPSAccelRoster }
 
-if (-not (Get-Variable -Name VIA_ACCEL20 -Scope Script -ErrorAction SilentlyContinue)) {
+$__VIA_PS25 = Get-Variable -Name VIA_PS_ACCELERATORS_25 -ValueOnly -ErrorAction SilentlyContinue
 
-$script:VIA_ACCEL20 = [ordered]@{
+$__VIA_ACCEL20 = Get-Variable -Name VIA_ACCEL20 -Scope Global -ValueOnly -ErrorAction SilentlyContinue
+if (-not $__VIA_ACCEL20 -or $__VIA_ACCEL20.Count -ne 20) {
+
+$global:VIA_ACCEL20 = [ordered]@{
     '01' = 'AST 精準解析(PS Parser::ParseFile / py ast.parse)'
     '02' = '多語言語意(同義字冊+finlex 承接)'
     '03' = '九頭龍風險預測(fan-in 偵測)'
@@ -34,17 +37,19 @@ $script:VIA_ACCEL20 = [ordered]@{
 }
 
 # B531：新增 21–25；舊 VIA_ACCEL20 保留，避免既有命令與模組破壞。
-if (-not (Get-Variable -Name VIA_ACCEL25 -Scope Script -ErrorAction SilentlyContinue)) {
-    $script:VIA_ACCEL25 = [ordered]@{}
-    if (Get-Variable -Name VIA_PS_ACCELERATORS_25 -Scope Script -ErrorAction SilentlyContinue) {
-        foreach ($kv in $VIA_PS_ACCELERATORS_25.GetEnumerator()) { $script:VIA_ACCEL25[$kv.Key] = $kv.Value }
+# 以 Count 判定而非只判變數是否存在，修復 Windows profile 重載時的空表／舊表殘留。
+$__VIA_ACCEL25 = Get-Variable -Name VIA_ACCEL25 -Scope Global -ValueOnly -ErrorAction SilentlyContinue
+if (-not $__VIA_ACCEL25 -or $__VIA_ACCEL25.Count -ne 25) {
+    $global:VIA_ACCEL25 = [ordered]@{}
+    if ($__VIA_PS25 -and $__VIA_PS25.Count -eq 25) {
+        foreach ($kv in $__VIA_PS25.GetEnumerator()) { $global:VIA_ACCEL25[$kv.Key] = $kv.Value }
     } else {
-        foreach ($kv in $script:VIA_ACCEL20.GetEnumerator()) { $script:VIA_ACCEL25[$kv.Key] = $kv.Value }
-        $script:VIA_ACCEL25['21'] = '資源預算與自動節流(Resource Budget & Adaptive Throttle)'
-        $script:VIA_ACCEL25['22'] = '快取、去重與斷點續跑(Cache, Dedup & Checkpoint)'
-        $script:VIA_ACCEL25['23'] = '網路同意閘與斷路器(Network Consent Gate & Circuit Breaker)'
-        $script:VIA_ACCEL25['24'] = '輸入輸出契約與 Schema 驗證(I/O Contract & Schema Validation)'
-        $script:VIA_ACCEL25['25'] = '證據雜湊與 HTML/JSON 矩陣(Evidence Hash & Matrix Export)'
+        foreach ($kv in $global:VIA_ACCEL20.GetEnumerator()) { $global:VIA_ACCEL25[$kv.Key] = $kv.Value }
+        $global:VIA_ACCEL25['21'] = '資源預算與自動節流(Resource Budget & Adaptive Throttle)'
+        $global:VIA_ACCEL25['22'] = '快取、去重與斷點續跑(Cache, Dedup & Checkpoint)'
+        $global:VIA_ACCEL25['23'] = '網路同意閘與斷路器(Network Consent Gate & Circuit Breaker)'
+        $global:VIA_ACCEL25['24'] = '輸入輸出契約與 Schema 驗證(I/O Contract & Schema Validation)'
+        $global:VIA_ACCEL25['25'] = '證據雜湊與 HTML/JSON 矩陣(Evidence Hash & Matrix Export)'
     }
 }
 
@@ -81,7 +86,12 @@ function Invoke-VIAParallel {
     $Items | ForEach-Object -Parallel $Body -ThrottleLimit $Throttle
 }
 
-function Get-VIAAccelRoster { $script:VIA_ACCEL25 }
+function Get-VIAAccelRoster {
+    if (-not $global:VIA_ACCEL25 -or $global:VIA_ACCEL25.Count -ne 25) {
+        throw "VIA_ACCEL25 roster invalid: expected 25, got $($global:VIA_ACCEL25.Count)"
+    }
+    return $global:VIA_ACCEL25
+}
 
 # 批366 零跳出閘(PS 側):VIA_NO_OPEN=1 時 Start-Process/Invoke-Item 之頁面目標(.html/.htm/.url/http)靜默略過;
 # 其餘目標(python 工人/exe)全參數直通=ProxyCommand 產生之代理(保留原 cmdlet 全部參數集);缺席/失敗=graceful 不裝

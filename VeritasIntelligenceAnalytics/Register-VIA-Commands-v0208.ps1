@@ -29,7 +29,7 @@ try {
 } catch { }
 # ===== [VIA:PS-ACCEL:END] =====
 $VIA = Split-Path -Parent $MyInvocation.MyCommand.Path
-# 批486:所有 py 指令統一走 Invoke-VIAPython(20 加速器點亮一次 + 動態進度條 + 邊跑邊轉播 + 逾時不卡斷;stdout 走 pipeline,上游捕捉照舊)
+# 批486/B531:所有 py 指令統一走 Invoke-VIAPython(25 加速器控制面 + 動態進度條 + 邊跑邊轉播 + 逾時不卡斷;stdout 走 pipeline,上游捕捉照舊)
 $viaPyProg = Join-Path $VIA "supportive modules\VIA_PS_PyProgress_Module.ps1"; if (Test-Path -LiteralPath $viaPyProg) { . $viaPyProg } else { Write-Host "  [VIA] VIA_PS_PyProgress_Module.ps1 缺(誠實;短令改回直呼)" -ForegroundColor Yellow; function global:Invoke-VIAPython { param([string]$Family="",[string]$Python="",[int]$TimeoutSec=0,[Parameter(ValueFromRemainingArguments=$true)][object[]]$Rest) $exe = if ($Python) { $Python } else { Get-VIAEnvPython $Family }; & $exe @Rest } }
 $global:VIARegisterPath = $MyInvocation.MyCommand.Path   # 批383:撞名守衛掃描本冊用
 
@@ -313,7 +313,7 @@ function global:via-etfhist { Set-VIAGateDefaults; Invoke-VIAPython -Family "vdf
 function global:via-etfuniv { Set-VIAGateDefaults; Invoke-VIAPython -Family "vdf" (Get-VIANewest "$VIA\functional modules\VDF\engine" "VDF_ENG077_ActiveETFUniverse_v*.py") $(if ($args) { $args } else { "run" }) }
 # 批373:主動 ETF 持股×月營收動能(ENG076;兩專案合流層;零網路;加權 yoy/重疊榜;頁 VIA_UI_ETFRevenueMomentum);via-etfrev [run|status]
 function global:via-etfrev { Invoke-VIAPython -Family "vdf" (Get-VIANewest "$VIA\functional modules\VDF\engine" "VDF_ENG076_ETFRevenueMomentum_v*.py") $(if ($args) { $args } else { "run" }) }
-# 批379/380:via-autorun=一鍵全自動四閘版:①via-accel --activate(20 加速器)②via-lanes plan(Hydra 哨兵 H1–H6;H3/H5 FAIL=誠實停)③via-mobile --lanes(拉齊→六流程→十道並行→矩陣→產品閘)④lanes digest;零跳出、零 TTY 等待(VIA_FRED_PROMPT=0)、逾時 kill 不卡斷;雙擊 via-autorun.cmd 同效且結束停窗
+# 批379/380/B531:via-autorun=一鍵全自動四閘版:①via-accel --activate(25 加速器控制面)②via-lanes plan(Hydra 哨兵 H1–H6;H3/H5 FAIL=誠實停)③via-mobile --lanes(拉齊→六流程→十道並行→矩陣→產品閘)④lanes digest;零跳出、零 TTY 等待(VIA_FRED_PROMPT=0)、逾時 kill 不卡斷;雙擊 via-autorun.cmd 同效且結束停窗
 function global:via-autorun { $env:VIA_NO_OPEN = "1"; $env:VIA_FRED_PROMPT = "0"; $env:GIT_EDITOR = "true"; $env:PYTHONUTF8 = "1"
     Write-Host "=== [via-autorun] 一鍵全自動(單一 PowerShell;零跳出;不卡斷;約 20–60 分鐘)===" -ForegroundColor Cyan
     Write-Host "--- ① 25 加速器點亮與中央線控(CGC_MDL156;缺席=誠實 SKIP 零影響)---" -ForegroundColor Cyan; try { via-accel --activate } catch { Write-Host ("  [加速器] " + $_.Exception.Message) -ForegroundColor Yellow }

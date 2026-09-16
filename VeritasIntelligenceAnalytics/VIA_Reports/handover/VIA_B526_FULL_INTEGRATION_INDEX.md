@@ -50,4 +50,4 @@ Windows 一貼式 probe：`VIA_B531_25_ACCELERATOR_CONTROL.ps1`
 
 B531 的 CGC156 離線控制面實測 **GREEN 20/20、`READY_FOR_25`**；SSOT 與 PowerShell roster 均為 ID `01..25`。`sitecustomize.py` 實際將 25-roster 與 CGC156 identity 注入 VIA 啟動的 Python；VDF probe 顯示 `VIA_ACCEL_BOOT=cache:9/88:17env`、`via_net=True`、Celeritas/Aegis lazy mount。QuantGuard selftest 8/8 PASS；TA-Lib 為永久禁用，canonical active mounts 掃描無禁用接線。SuperAccel 為 88 catalogued／9 available／79 missing-or-stub，誠實保留缺件，不把 25 roster 說成 25 套獨立演算法已安裝。
 
-中央同步 8 站中 7 站 exit 0；`iface_sync=1` 僅代表 6 個既有 InputConsole contract drift，未被盲改或假稱已解。VCGC ACTIVE 4,996/4,996、家族 237/237、AST errors 0。sandbox 無 PowerShell parser，Windows runtime probe 待工作站實跑；Windows `C:\測試樣本報告` 原始 PDF/DOCX 仍未掛載，資料補庫仍停止。
+中央同步 8 站中 7 站 exit 0；`iface_sync=1` 僅代表 6 個既有 InputConsole contract drift，未被盲改或假稱已解。VCGC ACTIVE 4,996/4,996、家族 237/237、AST errors 0。Windows 首次 probe 實際發現 dot-source scope 導致 25 項回退為 20 項，已改為 global canonical state，需 pull 最新修正後重跑；sandbox 仍無 PowerShell parser。Windows `C:\測試樣本報告` 原始 PDF/DOCX 仍未掛載，資料補庫仍停止。

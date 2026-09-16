@@ -21,7 +21,7 @@ B531 的整體中央同步摘要為 8 站中 **7 站通過、1 站保留既有�
 | CGC156 25 項控制面 | 20/20 | **GREEN** |
 | SSOT roster | ID `01..25`、數量 25 | **PASS** |
 | PowerShell roster 靜態計數 | 25 entries | **PASS** |
-| PS 相容 runtime | `VIA_ACCEL20` 保留；`VIA_ACCEL25`、`Get-VIAAccelRoster` 在位 | **PASS（靜態；sandbox 無 pwsh）** |
+| PS 相容 runtime | 靜態 roster 25；Windows 首次 probe 發現 scope 回退 20，已修正 global state | **待 Windows 重跑** |
 | Python active tree | 3,111 files receive bootstrap path contract | **PASS（控制面檢查）** |
 | Python bootstrap probe | roster `:25`、CGC156 identity、`VIA_NET_BOOT=1`、Celeritas/Aegis lazy mount | **PASS，RC=0** |
 | SuperAccel activation | 88 libraries catalogued；9 available；79 missing/stub；17 thread-budget env applied | **PASS／誠實列缺件** |
@@ -58,6 +58,8 @@ PowerShell 正本為 `VIA_PS_Accelerators_25_Roster_v0100.ps1`，由 `VIA_PS_Acc
 ## 五、未完成與限制
 
 第一，sandbox 沒有 `pwsh`、`powershell` 或 PSScriptAnalyzer，因此 PowerShell 本體 parser／Windows runtime 尚未在本環境實測；目前已完成檔案級 roster 計數、入口靜態檢查與 Python 控制面驗證。請在 Windows pull 後執行附帶的一貼式 probe。
+
+第一次 Windows probe 已實際發現並修正一個 PowerShell dot-source scope 問題：舊版模組雖讀到 25 項檔案，卻未把 `$VIA_ACCEL25` 公開到工作站全域，導致 `Get-VIAAccelRoster` 回傳前 20 項。修正版改用 global canonical state、以 `Count` 強制重建，並在 roster 非 25 項時立即停止。Windows 端需重新 pull 最新 commit 後再跑 probe；在重跑前不宣稱 PowerShell runtime GREEN。
 
 第二，InputConsole contract sync 留下 6 個歷史 drift：`vdf/tw_daytrade_files`、`vdf/tw_revenue_codes`、`vrn/vrn_fourpoint`、`vrn/vrn_pdfplus`、`vrn/vrn_unified`、`central/via_ssot_autocode`。其中包含參數旗標與 verb 差異；若要修正，必須逐引擎確認真實 CLI 後再 version-forward，不可在本批盲改。
 
