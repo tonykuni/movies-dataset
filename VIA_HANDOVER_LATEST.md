@@ -1,6 +1,6 @@
 # VIA 一頁交接 · Veritas Central Governance Console(VCGC v0111 · 批537)
 
-> 產生 2026-09-16 19:42:23 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
+> 產生 2026-09-16 20:30:41 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
 
 ## 〇 · 接手提示詞(給下一個 AI;來源 VIA_AI_Handover_Prompt_v0100.md)
 
@@ -152,6 +152,7 @@
 - **L56**(批535;全景稽核)自動修三態律:① 純增量、零行為變更、可冪等(加速器橋、網路工具橋、自測動詞等價轉換)=**可同時修**(以檔為單位平行,一檔一工人,互不交疊)② 會動到 main/parse_args 等入口=**順序修** ③ 會改行為或需判斷(硬相依搬家、釘死版號改 glob、裸 sys.executable 改家族境)=**只報位置不自動改**,附建議修法等操作員令。每次修改前後都 ast.parse,失敗即整檔回滾。
 - **L57**(批537;誠實四態)誠實分母律:任何『N/M』都要先把 M 分乾淨——① 這份文件本來就不該有這一欄(產業/晨會報告沒有單一目標價、單一評等)② 文件自己寫了不適用(Daiwa「Target price: n.a.」)③ 我們手上的文字裡根本沒有這一欄(外資側欄沒被修復出來)④ 有線索卻抓不到=**真 RED**。只有第四種算紅燈;把前三種算進分母,就是自己造一盞判錯的紅燈,和假綠一樣傷。
 - **L58**(批537;來源證據)證據分級律:欄位判定要留下『憑什麼』。券商=文內 > 檔名 > 電郵網域(弱);每一列帶 how。分不出級的『全中』看起來漂亮,卻藏得住假綠——批537 就是因為有了分級,才看見 64/64 裡有三份是靠合資體的信箱網域判錯家的。
+- **L59**(批537;已修複驗)已修複驗律:『修過了』不是一句話,是一條可複驗的憑據。每一筆修進**已修冊**(VIA_PanoramaFixed_SSOT),冊上帶 class_zero / coverage_pct / tail_contains 三種憑據之一;稽核器每跑一次就拿活樹重量一次——冊說修好、現在也還是修好=GREEN;冊說修好、現在又量到=**RED(回歸)**,且回歸要把總裁決拉成 RED,不准被 YELLOW 蓋過去;量不了=ABSENT,誠實講量不了,不當綠。沒有複驗的『已修』就是功勞簿,不是治理。
 
 **Lessons-learned**
 
@@ -223,17 +224,20 @@
 - LL66(批537)分析師信箱/網址不是券商證據:Daiwa 三份報告唯一的『cathay』出自 `…@daiwacm-cathay.com.tw`(大和國泰合資體網域),而 cathay(6 字)比 daiwa(5 字)長,最長別名優先就把日系報告判成國泰。判券商前先把 email/URL 挖掉,再退回來當最弱一層。
 - LL67(批537)標的公司名不是券商證據:金控名與券商同源(中信/台新/元大/富邦/凱基)。`凱基投顧_2891 中信金_…` 內文只有『中信金』,結果判成 CTBC。要用與代碼相鄰的兩條鐵證把標的名讀出來否決掉——`公司名(代碼)` 與 `代碼_公司名`;**不能靠庫**,本境 tw_listings 只有 892 檔、2891 不在內(LL49),靠庫的否決在工作站有效、在這裡失效,那就是留下假綠。
 - LL68(批537)評等字彙要收本土券商自己的尺度:凱基三份個股報告全寫『增加持股』(Outperform),收容件的 RATING 冊沒有這個詞,於是三份都掛零。補『增加持股/減少持股/優於大盤/劣於大盤/同步大盤/區間操作』,而且只看前段——內文的『外資持有』『增持庫藏股』不是評等。
+- LL69(批537)稽核頁只列『還沒修的』會讓人以為什麼都沒做:乾跑時 TAB③『已修』印一句「本次未套用」,整張 AST 頁看起來就只有 129 個問題。修法是兩張表——本次(乾跑就誠實標「乾跑(未寫檔)」,不印 OK)與歷批已修冊(逐筆活樹複驗)。
+- LL70(批537)摘要要讓四個數字各有出處:『問題 129 · 自動修 0』看不出 129 是什麼、也看不出修過什麼。改成按 L56 三態拆(可同時修/順序修/只報位置待令)+ 真 RED 單列 + 已修冊複驗 + 實測綠燈數,而且主控台、頁首、TAB①、Markdown 四處同一句(summary_line 一個出處),不會各講各的。
+- LL71(批537)尾版律下最容易掉的是『修沒帶進新版』:批536 的 HARDIMP 修寫進了 VDF_ENG051 的**無版號檔**,而活樹尾版是 _v0102(那一版本來就乾淨,所以沒出事)。tail_contains 憑據就是為這件事設的——它量的是**尾版**有沒有那個修,不是某個檔曾經有過。
 
 ## 二 · 安裝核可(L19)與環境工具
 
-- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 192.4 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
+- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 193.2 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
 - 工具冊導入計畫:ABSENT · - · 件態 - · 風險 - · 段 - · 未路由 - · 白名單留置 -(TOOLS_PLAN_latest.json 不在(via-envtools))
 - 環境復原(L24):PLAN · 2026-09-15 05:30:50 · 還原 原本規劃(Baseline;無 LKGC 或 --baseline) · 段 16 · 單獨隔離境 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 借境封鎖 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 次序 RESTORE → CORE → LOW → MEDIUM → HIGH → EXTERNAL → VERIFY;安裝出問題=`via-envrecover`(①還原前次 ②順序裝 ③_M/_H 單獨隔離;-Execute -Approve 才跑,① 不受 L19,② 過 L19)
 - 裝件=操作員的手:`$env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve`(閘不代設;L19 未綠=BLOCKED_UNITEST)
 
 ## 三 · 邏輯庫 · 因子庫 · 資料庫
 
-- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 703 列 · 全庫同步 {'hash': 'eae4a39e7378', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '2bd2a680a956', 'root': '同', 'home': '缺'}
+- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 716 列 · 全庫同步 {'hash': '4c3a156d378a', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '1ff838f00eab', 'root': '同', 'home': '缺'}
 - 因子庫 OK:130 列 · {'SUP_MDL748:allinone 2.1.0': 77, 'SUP_MDL748:financial_data_standardization': 53} · 掛載 {'allinone': 'OK VIA_VRNLogic_AllInOne_v0201.py 2.1.0', 'fds': 'OK financial_data_standardization.py · 28 欄 · 合併損傷件(__main__ 示範缺 5 法,程式庫面可用)'}
 - 庫表冊 OK:54 表(批505)· 全庫表 4 · 庫 ['ActiveTWETF.duckdb', 'vdf_global_market.duckdb', 'vdf_tw_market.duckdb']
 - 資料家 ABSENT:VIA_Reports/datahome/DATAHOME_CATALOG_latest.json 不在(via-datahome catalog) · 庫 - · 表 - · 湖 -
@@ -382,21 +386,21 @@
 
 ## 六 · 註冊稽核(所有引擎/模組/功能/工具/環境)
 
-- 中央自動編號冊 OK · ACTIVE 5107/5107 · **缺 0** · 類別 {'class': 91, 'engine': 81, 'environment': 43, 'function': 4251, 'feature': 95, 'module': 150, 'package': 252, 'system': 10, 'tool': 134}
+- 中央自動編號冊 OK · ACTIVE 5113/5113 · **缺 0** · 類別 {'class': 91, 'engine': 81, 'environment': 43, 'function': 4257, 'feature': 95, 'module': 150, 'package': 252, 'system': 10, 'tool': 134}
 - 尾版引擎/模組家族 240 · 中央冊已登 240 · **未登 0** · 操作介面有掛載 198 · 內部件無操作介面 42(誠實分列，不拿編號片段假命中)
 
 ## 七 · 自動編號註冊表(台帳)
 
-- 全域台帳 1064 筆 · 元件 149 · 更新 2026-09-16T10:08:00Z
-- 元件冊 OK · ACTIVE 5107 · RETIRED 115 · 更新 2026-09-16T19:42:04 · {'class': 91, 'engine': 81, 'environment': 43, 'function': 4251, 'feature': 95, 'module': 150, 'package': 252, 'system': 10, 'tool': 134}
+- 全域台帳 1065 筆 · 元件 149 · 更新 2026-09-16T10:08:00Z
+- 元件冊 OK · ACTIVE 5113 · RETIRED 115 · 更新 2026-09-16T20:30:23 · {'class': 91, 'engine': 81, 'environment': 43, 'function': 4257, 'feature': 95, 'module': 150, 'package': 252, 'system': 10, 'tool': 134}
 - 類別 current:系統 1 · 支援性工具 2 · 功能性工具 1 · 模組 1 · 引擎 19 · 函數庫 1 · 打包產品 8
 
-- 2026-09-16T10:03:28 ASSIGN 支援性工具 VIA_AutoCodeGenerator_v0100 SPT-002
 - 2026-09-16 16:22 批534 CGC_MDL157 v0101(命令冊尾版 glob·家族境派送·誠實四態·旗標等價;21/21)+ VDF_ENG086 v0101(polars 探針式載入=缺件 
 - 2026-09-16 18:39 批535 CGC_MDL158_VIAPanoramaAuditRepair v0100(全景稽核修復正主;AST 七類定位·活樹尾版過濾·平行/順序純增量修·多 TAB 報告;1
 - 2026-09-16 19:07 批536 CGC_MDL158 v0101(判準精準化:自跑自己≠跨家族派送、自測/探針函式的假冊名≠釘死版號、候選夾/打包副本不是活樹;15/15)+ 真問題逐檔修:VDF_EN
 - 2026-09-16 19:20 批536b VRN_ENG086 v0101:+corpus 動詞(收容件 AttachmentFixedOutput 64 份真研報修復文字;唯讀)+ 文件類型分類(該不該有代碼
 - 2026-09-16 19:37 批537 VRN_ENG086 v0102:① 券商證據分級(文內>檔名>電郵網域弱;先挖掉 email/URL)——Daiwa 三份不再被合資體信箱網域判成 CATHAY ② 標
+- 2026-09-16 20:28 批537 CGC_MDL158 v0102:① 新 SSOT VIA_PanoramaFixed_SSOT_v0100(已修冊;本器擁有)+ 逐筆活樹複驗(class_zero/c
 
 ## 八 · 交接本文(來源 VIA_Handover_20260914_B498.md;逐批紀錄見該檔)
 
@@ -1516,6 +1520,38 @@ via-ryg -Timeout 300              # ⑦ 五矩陣燈:紫=GATED(閘未開,不是�
 你的機器:`via-fplogic corpus`(尾版律自動吃 v0102)。
 
 **還沒做、等你的手**:GS/MQ 那 16 份要真的補出目標價,得回到原 PDF 的側欄(修復文字沒有那一塊)=Z49 第一頁版面/表格幾何那一條。
+
+---
+
+### 一-ae|批537 AST 頁與摘要:把「修過的」放進去(CGC_MDL158 v0102)
+
+你說「FIXED CONTENT IN THE AST PAGE AND SUMMARY」。查了頁,毛病是真的:
+
+- **TAB③「已修」在乾跑時只印一句「本次未套用」**。整張 AST 頁於是只講「還沒修的 129 個問題」,看不出批535–537 到底修過什麼。
+- **摘要只有「問題 129 · 自動修 0」**。129 是什麼?可以自動修的幾個、要等你下令的幾個、真紅燈幾個?一個都看不出來。
+
+**修法一:已修冊 + 活樹複驗(新律 L59)。**
+新 SSOT `supportive modules/registry/VIA_PanoramaFixed_SSOT_v0100.json`(擁有者 CGC_MDL158)。每一筆修都帶可複驗的憑據,三種:
+`class_zero`(該範疇活樹件數必須為 0)、`coverage_pct`(覆蓋率欄位 ≥ 門檻)、`tail_contains`(該族**尾版**檔必須含某些字、且不得含某些字)。
+稽核器每跑一次就拿活樹重量一次——**冊說修好、現在也還是修好=GREEN;冊說修好、現在又量到=RED(回歸),而且回歸會把總裁決拉成 RED,不准被 YELLOW 蓋過去;量不了=ABSENT,誠實講量不了,不當綠。**
+`tail_contains` 是特意設的:尾版律下最容易掉的就是「修沒帶進新版」(LL71——批536 的 HARDIMP 修寫進了 `VDF_ENG051` 的無版號檔,活樹尾版其實是 `_v0102`;那一版本來就乾淨所以沒出事,但下次不一定)。
+
+**修法二:摘要四處同一句。** 主控台、頁首、TAB①、Markdown 全部走同一個 `summary_line()`,不會各講各的:
+
+```
+問題 129(可同時修 0 · 順序修 6 · 只報位置待令 123 · 真 RED 0)
+· 已修冊 7 筆複驗 GREEN 7 / 回歸 0 / 待驗 0 · 本次自動修 0 處 · 實測 17/17 綠
+```
+
+**修法三:乾跑不印 OK。** TAB③ 改名「本次修復」,乾跑時結果欄誠實寫「乾跑(未寫檔)」配灰燈,不再印成綠色 OK。
+
+**頁現在九個分頁**:① 總覽 ② 問題明細 ③ 本次修復 ④ **已修冊複驗**(新)⑤ 實測結果 ⑥ 中央派送 ⑦ 覆蓋率 ⑧ JSON ⑨ Markdown。
+
+**這一跑量到的**(`via-panorama all`,尾版自動吃 v0102):總裁決 YELLOW · 掃 1516 檔 · 問題 129(順序修 6 · 待令 123 · 真 RED 0)· 已修冊 7 筆全 GREEN、回歸 0 · 實測 17/17 綠 · 加速器橋 100% · VDF 網路工具 100%。
+
+**順帶量出來的一件事**:第一次跑 v0102 時總裁決是 RED,因為 VCGC ⑬ 元件冊少了 6 個元件(就是我剛加的那幾個函數)——`registry-sync --apply` 之後回綠。這正是這張頁該有的樣子:新東西沒登記,它就報紅,不會替我圓場。
+
+CGC_MDL158 v0102 十八檢自測 18/18(⑭ 複驗三態 · ⑮a 摘要四處同句 · ⑮b 冊在位且本器擁有)。Grid v0317 把站名的「十三檢」改成「十八檢」。
 
 ## 九 · 掉球清單(來源 VIA_DroppedBalls_B507.md;列 68 · 未結 64;只增不減,結案劃線)
 
