@@ -148,8 +148,11 @@ def classify(rp: str) -> str:
 
 
 def _live_set(root: Path):
-    """批538:活樹判準只有一個出處=CGC_MDL158(L30/L55)。回 (set|None, how)。"""
+    """批538:活樹判準只有一個出處=CGC_MDL158(L30/L55)。回 (set|None, how)。
+    只在量**真樹**時套用;自測的沙盒根不是真樹,套上去會把沙盒件全判成非活樹=自己把自己的自測弄啞。"""
     import importlib.util as _il
+    if Path(root).resolve() != VIA.resolve():
+        return None, "沙盒(全範圍;活樹判準只在真樹適用)"
     hits = sorted((VIA / "supportive modules" / "registry").glob("CGC_MDL158_VIAPanoramaAuditRepair_v*.py"))
     if not hits:
         return None, "fallback(CGC_MDL158 不在;範圍=舊判準,非活樹)"
