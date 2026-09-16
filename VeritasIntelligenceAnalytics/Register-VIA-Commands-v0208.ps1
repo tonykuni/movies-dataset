@@ -728,6 +728,16 @@ function global:via-functional-acceptance {
 }
 Set-Alias -Name VIA功能驗收 -Value via-functional-acceptance -Scope Global -Force
 Set-Alias -Name 功能級驗收 -Value via-functional-acceptance -Scope Global -Force
+# ── CGC_MDL155:統一 SSOT／Regex 同義字／附件自動編碼受控驗收(中央唯一入口) ──
+#   via-ssot [selftest|status|manifest|routes|classify <text>]；不執行收容模組、不開網路。
+function global:via-ssot {
+    $eng = Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL155_VIAUnifiedSSOTAutoCode_v*.py"
+    if (-not $eng) { Write-Host "  [via-ssot] FAIL:CGC_MDL155_VIAUnifiedSSOTAutoCode_v*.py 缺" -ForegroundColor Red; return }
+    $a = @($args)
+    if (-not $a) { $a = @("status") }
+    Invoke-VIAPython -Family "vrn" $eng @a
+}
+Set-Alias -Name SSOT治理 -Value via-ssot -Scope Global -Force
 # via-firstpage:首頁三法擷取器 ENG072 尾版直呼(-Force 忽略邏輯庫命中整批重抽;-RetryFailed 只重試 FAIL 件;-OcrBudget N 每件 OCR 預算秒;--in 檔/夾可重複)
 function global:via-firstpage {
     $eng = Get-VIANewest "$VIA\functional modules\VRN" "VRN_ENG072_FirstPageText_v*.py"

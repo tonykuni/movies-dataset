@@ -1,0 +1,86 @@
+{
+  "schema": "VIA.B527.SSOTAutoCodeIntegrationStatus.v1",
+  "as_of": "2026-09-16T10:17:00Z",
+  "batch": "B527",
+  "verdict": "YELLOW",
+  "verdict_reason": "functional modules/VRN/db/vrn_reports.duckdb is absent; no empty database was fabricated",
+  "central_engine": {
+    "id": "CGC_MDL155_VIAUnifiedSSOTAutoCode_v0100",
+    "selftest": "PASS",
+    "checks": "9/9",
+    "network": "OFF",
+    "quarantine_execution": "FORBIDDEN"
+  },
+  "source_inventory": {
+    "regex_synonym": "5/5",
+    "logic": "2/2",
+    "parameters": "4/4",
+    "factors": "3/3",
+    "databases": "2/3",
+    "modules": "8/8",
+    "states": "3/3",
+    "quarantine": "2/2"
+  },
+  "regex_synonym": {
+    "regex_count": 12,
+    "synonym_count": 310,
+    "unresolved_conflicts": 0,
+    "semantic_merges": 35,
+    "sample": {
+      "input": "合理價",
+      "canonical": "TARGET_PRICE",
+      "source_count": 3
+    }
+  },
+  "protocol_test": {
+    "codechain": "VIA-VRN-MDL001-FNC001-VIA_CENTRAL-V1.0",
+    "kno": "KNO-TA-TW-MOMENTUM-RSI-VIA-D-V1-0001",
+    "index": "IDX-TW-TW-EQUITY-2330-TWSE-D-V1-0001",
+    "product": "PRD-EQUITY-TW-STOCK-2330-TWSE-D-V1-0001",
+    "link": "LNK-0001",
+    "health": "GREEN",
+    "issues": []
+  },
+  "states": {
+    "system": "GREEN",
+    "engine": "GREEN",
+    "VRN": "GREEN",
+    "VDF": "GREEN",
+    "VAP": "GREEN",
+    "CGC": "GREEN",
+    "data": "YELLOW",
+    "missing_data_sources": ["vrn_report_db"],
+    "quarantine": "GREEN/FORBIDDEN_EXECUTION"
+  },
+  "central_registration": {
+    "autocode_registry": "SPT-002",
+    "ssot_namespace": "CGC-SSOT-001",
+    "CGC155_interface": "VIA-IFACE-3753",
+    "autocode_interface": "VIA-IFACE-3754",
+    "CGC155_canonical": "CGC_MDL182_CGCMDL155VIAUnifiedSSOTAutoCode",
+    "autocode_canonical": "CGC_MDL183_AutoCodeGenerator",
+    "input_console": "via_ssot_autocode",
+    "workflow": "via_ssot_autocode_governance",
+    "powershell": ["via-ssot", "SSOT治理"],
+    "interface_scan": "0 new / 0 drift / 2780 stable / 1 syntax skipped honestly",
+    "component_sync": "4953 active / 0 new / 0 changed / 0 retired / 0 AST errors"
+  },
+  "central_selftests": {
+    "VCGC": "19/19 PASS",
+    "CentralGovernanceFamily": "12/12 PASS",
+    "WorkflowComposer": "12/12 PASS"
+  },
+  "artifacts": {
+    "manifest_json": "VIA_Reports/ssot_autocode/VIA_SSOT_AUTOCODE_latest.json",
+    "manifest_html": "VIA_Reports/ssot_autocode/VIA_SSOT_AUTOCODE_latest.html",
+    "handover_md": "VIA_Reports/handover/VIA_B527_SSOT_AUTOCODE_INTEGRATION_HANDOVER.md",
+    "status_json": "VIA_Reports/handover/VIA_B527_SSOT_AUTOCODE_INTEGRATION_STATUS.json"
+  },
+  "policy": {
+    "append_only": true,
+    "physical_rename": false,
+    "existing_via_numbering_is_canonical": true,
+    "TA_Lib": "not used",
+    "network": "off by default"
+  }
+}

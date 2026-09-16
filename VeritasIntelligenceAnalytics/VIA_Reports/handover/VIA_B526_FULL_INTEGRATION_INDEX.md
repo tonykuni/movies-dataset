@@ -13,3 +13,12 @@
 VRN B526 自動化整合測試：`evidence_b526_vrn_integration/VIA_VRN_B526_AUTOMATED_INTEGRATION_TEST.md`；VRN 軟體 gate GREEN，7 個正主/NLP selftest 全部 RC=0，active tree 288/288 compile/import。
 
 本批功能補強交接：`VIA_CGC154_FUNCTIONAL_ACCEPTANCE_B526.md`。新增 CGC154 已接入 PowerShell Register、InputConsole、Workflow SSOT、Interface Contract Registry 與 VCGC Component Inventory；VDF ENG087 v0101 已加入 2023 起始日實際覆蓋閘，避免市場清單假綠。
+
+## B527 統一 SSOT／自動編碼整合
+
+交接報告：`VIA_B527_SSOT_AUTOCODE_INTEGRATION_HANDOVER.md`
+機器狀態：`VIA_B527_SSOT_AUTOCODE_INTEGRATION_STATUS.json`
+機器 manifest：`../ssot_autocode/VIA_SSOT_AUTOCODE_latest.json`
+HTML 狀態頁：`../ssot_autocode/VIA_SSOT_AUTOCODE_latest.html`
+
+CGC155 自測 9/9、VCGC 19/19、中央治理家族 12/12、Workflow Composer 12/12；介面掃描 0 新編／0 漂移／2780 穩定；中央元件冊 4953 active、0 AST 錯。總裁決為 `YELLOW`，唯一缺口是尚不存在的 `functional modules/VRN/db/vrn_reports.duckdb`，不得用空資料庫偽造 GREEN。
