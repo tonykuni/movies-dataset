@@ -1,7 +1,8 @@
-﻿# Register-VIA-Commands-v0208.ps1 — 批522:+via-fplogic(別名 首頁邏輯;VRN_ENG086 第一頁邏輯補缺正主橋:status/gap/bench/enrich;收容件 FirstPageEngine _b522 零觸碰;產物 VIA_Reports\first_page_logic\*.logic86.json append-only)+ via-daytrade(別名 當沖量值;VDF_ENG055 run --lane L15 [--from-file A,B] [--date] [--market];L45 檔案收容道:瀏覽器存的 TWSE/TPEX CSV 進 tw_daytrade_stock);via-vetf→ENG085 v0104(每跑一夾/假綠修)、via-firstpage→ENG072 v0129 尾版;其餘沿用 v0207。
-# Register-VIA-Commands-v0207.ps1 — 批520:via-vetf 改走正主橋 VDF_ENG085 VatetfBridge(對接口合約自適應:VDF 正本欄→adapter 別名、代碼去尾綴、持股/價/共識暫存輸入庫;status|run [--asof]);via-taone 走 v0101(L41 扣當沖查詢/政策 config/check-data/policy);其餘沿用 v0206。
-# Register-VIA-Commands-v0206.ps1 — 批519:+via-taone(別名 技術指標引擎;VDF_ENG083 TA-Lib OneEngine 正主橋:probe/selftest-engine/catalog/run;收容件 _b519;TA-Lib 缺=ABSENT 不代裝)+ via-workflow(別名 工作流;CGC_MDL153 工作流重組台:catalog/validate/run/ui-contract/db-summary/page)· via-vetf 找庫改資料家優先(LL35:output_hub 舊路徑第五次「庫就在那裡」);其餘沿用 v0205。
-# Register-VIA-Commands-v0205.ps1 — 批516:+via-vtmra(別名 月營收分析;VTMRA=Veritas Taiwan Monthly Revenue Analysis 家族測試閘 CGC_MDL152:ENG063/075/069/076·TWREV·CrossGroupPhase·TA-Lib 以家族境真跑自測成矩陣)+ via-talib(別名 技術指標;CGC_MDL151 TA-Lib 閘:probe 數值檢對手算;ABSENT 印補庫令不代裝);其餘沿用 v0204。
+﻿# Register-VIA-Commands-v0208.ps1 — 批523:QuantGuard ENG086、SuperAccel、Celeritas/Aegis mounts 已註冊；舊技術指標生產接線移除；網路閘預設關閉。
+# VIA command registry: central EngineBus / InputConsole / Workflow SSOT are the source of truth.
+# Python engines must carry the standard ACCEL-BRIDGE and use the registered family environment.
+# Historical command aliases are not retained in the active command book.
+# QuantGuard commands: via-quantguard / 量化技術引擎 / 技術指標引擎 / 技術指標。
 # Register-VIA-Commands-v0204.ps1 — 批515:+via-vdf-extra5(別名 五額外;VDF 五個額外資料試跑=匯流排 matrix --ids 月營收/三大報表/主動ETF持股/FRED宏觀/國際宇宙;觸網=你的手 $env:VIA_NET_CONSENT)+ via-vatetf(VETF 改名 VATETF;應用端:直接讀 VDF 擷取庫);其餘沿用 v0203。
 # Register-VIA-Commands-v0203.ps1 — 批514:+中央治理家族六令 via-cgfamily/via-cgconsole/via-cgengine/via-cgrouter/via-cgdownward/via-samename(CGC_MDL150 擁有者;預設 dry-run;閘/權杖=你的手)+ via-iface -Need 陣列以逗號合回(實錄 need ['首頁 ocr'] 命中 0)+ Set-VIABoot 母殼帶 PYTHONHOME 誠實印黃(L32;根治=你的手);其餘沿用 v0202。
 # Register-VIA-Commands-v0202.ps1 — 批513:+via-iface(MDL054 v0102 綁定合約層 sync/connect/graft/status;別名 合約);其餘沿用 v0201。
@@ -462,17 +463,20 @@ Set-Alias -Name 主動ETF應用 -Value via-vetf -Scope Global -Force
 
 # 批516 操作員令「除錯成功後才 Veritas Taiwan Monthly Revenue Analysis VTMRA · TA-LIB 確認測試無誤」
 #   via-vtmra [test|status] [--timeout 600] [--json]   VTMRA 家族測試閘(CGC_MDL152;家族境 vdf 真跑七成員自測;零網路;落 VIA_Reports\vtmra)
-#   via-talib [probe] [--json]                          TA-Lib 閘(CGC_MDL151;ABSENT=未裝不是壞;裝=你的手:uv pip install --python <境> TA-Lib)
 function global:via-vtmra { Invoke-VIAPython (Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL152_VtmraGate_v*.py") $(if ($args) { $args } else { @("test") }) }
-function global:via-talib { Invoke-VIAPython -Family "vdf" (Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL151_TaLibGate_v*.py") $(if ($args) { $args } else { @("probe") }) }
-# ── 批519:via-taone —— TA-Lib OneEngine 正主橋(VDF_ENG083;收容件 functional modules\TALib\references\intake\VIA_TALib_OneEngine_v0100_b519;橋自己解析 vdf 境 python;TA-Lib 缺=ABSENT 印 pip 令=你的手)
-function global:via-taone { Invoke-VIAPython (Get-VIANewest "$VIA\functional modules\VDF\engine" "VDF_ENG083_TALibOneBridge_v*.py") $(if ($args) { $args } else { @("probe") }) }
-Set-Alias -Name 技術指標引擎 -Value via-taone -Scope Global -Force
+# ── 批523:via-quantguard —— QuantGuard ENG086 正主橋(Polars 技術分析/因子/PIT;SuperAccel bridge;Celeritas+Aegis intake mounts;network gate OFF)
+function global:via-quantguard { $env:VIA_FAMILY = "vdf"; Invoke-VIAPython -Family "vdf" (Get-VIANewest "$VIA\functional modules\VDF\engine" "VDF_ENG086_QuantGuardOneBridge_v*.py") $(if ($args) { $args } else { @("status") }) }
+Set-Alias -Name 量化技術引擎 -Value via-quantguard -Scope Global -Force
+Set-Alias -Name 技術指標引擎 -Value via-quantguard -Scope Global -Force
+Set-Alias -Name 技術指標 -Value via-quantguard -Scope Global -Force
+# ── 批524:via-market-lists —— VDF_ENG087 中央市場清單治理(股票全集/主動ETF/熱門族群去重;離線可驗收;結果檔非GREEN不得假綠)
+function global:via-market-lists { $env:VIA_FAMILY = "vdf"; Invoke-VIAPython -Family "vdf" (Get-VIANewest "$VIA\functional modules\VDF\engine" "VDF_ENG087_MarketListGovernance_v*.py") $(if ($args) { $args } else { @("status") }) }
+Set-Alias -Name 市場清單驗收 -Value via-market-lists -Scope Global -Force
+Set-Alias -Name 台股清單 -Value via-market-lists -Scope Global -Force
 # ── 批519:via-workflow —— 工作流重組台(CGC_MDL153;catalog | validate <id> | run <id> [--profile test|run] [--continue] | ui-contract [--apply] | db-summary | page [--publish];零彈窗:頁用 via-open 開)
 function global:via-workflow { Invoke-VIAPython (Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL153_WorkflowComposer_v*.py") $(if ($args) { $args } else { @("status") }) }
 Set-Alias -Name 工作流 -Value via-workflow -Scope Global -Force
 Set-Alias -Name 月營收分析 -Value via-vtmra -Scope Global -Force
-Set-Alias -Name 技術指標 -Value via-talib -Scope Global -Force
 
 # 批383:單一入口(操作員令「單一入口與這個(SYSTEM MANAGER MATRIX v0700)整合」):via-entry=母倉唯一入口燈板(GitHub/Mother/Data/Env/PATH/EnvGov/VDF-DB/VAP/Matrix/Console/Grok;零網路;落 VIA_Reports/entry)
 # via-entry plan=一貼即用 11 步;via-entry roster=短令冊(母倉∪Grok 撞名冊);--scan 加跑 via-envgov 全景;--open 開矩陣頁(瀏覽器道零跳出);--console 帶起 Grok 網頁主控台(背景)

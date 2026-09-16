@@ -193,12 +193,6 @@
      "pip": "duckdb",
      "imp": "duckdb",
      "role": "庫"
-    },
-    {
-     "pip": "TA-Lib",
-     "imp": "talib",
-     "role": "技術指標庫(批516 操作員令 TA-LIB 確認測試無誤;VTMRA/VAP 指標;0.5+ wheel 內含 C 庫;閘=CGC_MDL151 via-talib)",
-     "risk": "LOW"
     }
    ],
    "python_measured": "3.13.7(EnvManager v0300 AUDIT 2026-09-14;冊原定 3.12,既有健康境不動只增)"
@@ -250,13 +244,41 @@
      "role": "AegisNexus 網路核心相依"
     },
     {
-     "pip": "TA-Lib",
-     "imp": "talib",
-     "role": "技術指標庫(批516 操作員令 TA-LIB 確認測試無誤;VTMRA/VAP 指標;0.5+ wheel 內含 C 庫;閘=CGC_MDL151 via-talib)",
+     "pip": "VIA QuantGuard intake",
+     "imp": "quant_engine",
+     "role": "Polars-first 技術分析、因子、風險與 PIT 回測核心(不使用禁用舊指標庫)",
+     "health": [
+      "ssot_manifest",
+      "pytest_regression",
+      "anti_lookahead"
+     ],
      "risk": "LOW"
+    },
+    {
+     "pip": "VDF_ENG087_MarketListGovernance",
+     "imp": "VDF_ENG087_MarketListGovernance_v0100",
+     "role": "中央市場清單治理橋：股票全集/主動ETF/熱門族群去重驗收；不重造抓取器",
+     "optional": true
     }
    ],
-   "python_measured": "3.13.7(EnvManager v0300 AUDIT 2026-09-14;冊原定 3.12,既有健康境不動只增)"
+   "python_measured": "3.13.7(EnvManager v0300 AUDIT 2026-09-14;冊原定 3.12,既有健康境不動只增)",
+   "external_mounts": [
+    {
+     "name": "VeritasCeleritas",
+     "path": "functional modules/VDF/references/intake/VIA_QuantGuard_v20260916/mounts/VeritasCeleritas.py",
+     "sha256": "ecb06be4badb7ce648e275a4c35a1ac44759f155ab39a137f9fbbbb7a536a1d0",
+     "role": "VIA 加速器掛載",
+     "activation": "VIA_SuperAccel bridge; graceful fallback"
+    },
+    {
+     "name": "VeritasAegisNexus",
+     "path": "functional modules/VDF/references/intake/VIA_QuantGuard_v20260916/mounts/VeritasAegisNexus.py",
+     "sha256": "4a9443686a8f5de076a9f69d4cd00fab9576180d17f9fe03f9ff59a526be4d7d",
+     "role": "VIA 網路工具掛載",
+     "activation": "network gate OFF by default; no network in QuantGuard selftest"
+    }
+   ],
+   "mount_policy": "Celeritas/Aegis mounted for registry traceability; QuantGuard calculation is offline and network-gated."
   }
  },
  "health_checks": {
@@ -322,5 +344,5 @@
   }
  },
  "recover_law": "L24 環境復原律(批508):via-envrecover = ①還原前次 ②順序裝全部工具 ③_M/_H 單獨隔離;plan 唯讀;-Execute -Approve 才跑;① 不受 L19,② 過 L19;存證 VIA_Reports/env_governance/RECOVER_latest.json/.ps1",
- "note_b516": "TA-Lib 入冊 via_vdf_312/via_vap_312(LOW;官方 wheel);裝=操作員的手 via-envtools -Apply -Approve 或 uv pip install --python <境> TA-Lib;驗=via-talib(CGC_MDL151 數值檢對手算)"
+ "note_b523": "QuantGuard ENG086 已取代舊技術指標生產接線；計算只允許 adjusted price + non-day-trade volume，網路閘預設關閉；Celeritas/Aegis 以 intake mount 雜湊登錄。"
 }

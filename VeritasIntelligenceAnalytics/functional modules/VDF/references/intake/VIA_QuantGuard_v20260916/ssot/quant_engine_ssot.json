@@ -1,0 +1,444 @@
+{
+  "factor_library": {
+    "FACTOR_CAPITAL_FLOW": {
+      "direction": "confirmation",
+      "inputs": [
+        "institutional_amount_ratio",
+        "toca_z_score"
+      ],
+      "name_zh": "籌碼流量因子",
+      "requires": [
+        "non_day_trade_turnover",
+        "available_at"
+      ]
+    },
+    "FACTOR_MARKET_RELATIVE": {
+      "direction": "relative",
+      "inputs": [
+        "rolling_beta",
+        "rolling_corr",
+        "residual_return_60"
+      ],
+      "name_zh": "相對市場因子",
+      "requires": [
+        "adj_close",
+        "benchmark_adj_close"
+      ]
+    },
+    "FACTOR_MOMENTUM": {
+      "direction": "context_dependent",
+      "inputs": [
+        "momentum_score",
+        "roc_14",
+        "return_autocorr_20"
+      ],
+      "name_zh": "動能因子",
+      "requires": [
+        "adj_close"
+      ]
+    },
+    "FACTOR_RISK_ADJUSTED": {
+      "direction": "higher_is_better_except_tail_risk",
+      "inputs": [
+        "rolling_sharpe",
+        "rolling_sortino",
+        "rolling_calmar",
+        "rolling_var",
+        "rolling_cvar"
+      ],
+      "name_zh": "風險調整因子",
+      "requires": [
+        "strategy_return_or_asset_return",
+        "risk_free_rate_policy"
+      ]
+    },
+    "FACTOR_TREND": {
+      "direction": "higher_is_stronger",
+      "inputs": [
+        "ema_spread_20_60",
+        "adx_14",
+        "price_vs_ema_60"
+      ],
+      "name_zh": "趨勢因子",
+      "requires": [
+        "adj_close"
+      ]
+    },
+    "FACTOR_VOLATILITY": {
+      "direction": "risk_not_alpha",
+      "inputs": [
+        "atr_pct",
+        "return_vol_20",
+        "bb_width_20"
+      ],
+      "name_zh": "波動因子",
+      "requires": [
+        "adj_close"
+      ]
+    },
+    "FACTOR_VOLUME_CONFIRMATION": {
+      "direction": "confirmation",
+      "inputs": [
+        "volume_ratio_20",
+        "cmf_20",
+        "return_volume_corr_20"
+      ],
+      "name_zh": "量價確認因子",
+      "requires": [
+        "non_day_trade_volume"
+      ]
+    }
+  },
+  "global_invariants": {
+    "cross_market_policy": "timezone_aware_close_utc_asof",
+    "execution_policy": "signal_t_execute_t_plus_1",
+    "htf_policy": "confirmed_only",
+    "missing_price_policy": "NA_NEVER_ZERO_FILL",
+    "missing_volume_policy": "NA_NEVER_ZERO_FILL",
+    "price_basis": "adj_close_only",
+    "raw_turnover_allowed_in_analysis": false,
+    "raw_volume_allowed_in_analysis": false,
+    "risk_policy": {
+      "calmar_equity_basis": "cumulative_product_of_one_plus_return",
+      "cvar_tail": "loss_greater_or_equal_var",
+      "return_basis": "completed_bar_return",
+      "risk_free_rate_conversion": "annual_compound_to_periodic",
+      "sharpe_std_ddof": 1,
+      "var_interpolation": "linear",
+      "var_loss_sign": "loss=-return"
+    },
+    "volume_basis": "non_day_trade_only"
+  },
+  "indicator_logic_library": {
+    "ADL": {
+      "category": "VOLUME_FLOW",
+      "formula": "cumsum(((2*close-high-low)/(high-low))*non_day_trade_volume)",
+      "source": "adjusted_ohlc_and_non_day_trade_volume",
+      "warmup": "seed_zero_or_null"
+    },
+    "ATR": {
+      "category": "VOLATILITY",
+      "formula": "RMA(TR,n)",
+      "source": "adjusted_ohlc",
+      "warmup": "rma_seed_required"
+    },
+    "AUTOCORRELATION": {
+      "category": "STATISTICAL_STRUCTURE",
+      "formula": "corr(return[t],return[t-lag])",
+      "source": "ordered_returns",
+      "warmup": "lag_plus_window"
+    },
+    "BETA": {
+      "category": "RISK",
+      "formula": "cov(asset_ret,benchmark_ret)/var(benchmark_ret)",
+      "source": "aligned_adjusted_returns",
+      "warmup": "min_samples"
+    },
+    "BOLLINGER": {
+      "category": "VOLATILITY",
+      "formula": "SMA(source,n)+/-k*rolling_std(source,n)",
+      "source": "adj_close",
+      "warmup": "null_until_n"
+    },
+    "CALMAR": {
+      "category": "RISK",
+      "formula": "CAGR/abs(max_drawdown)",
+      "source": "equity_curve",
+      "warmup": "window_and_nonzero_drawdown"
+    },
+    "CCI": {
+      "category": "MOMENTUM",
+      "formula": "(hlc3-SMA(hlc3,n))/(0.015*mean_absolute_deviation)",
+      "source": "adjusted_ohlc",
+      "warmup": "null_until_n"
+    },
+    "CMF": {
+      "category": "VOLUME_FLOW",
+      "formula": "sum(mfm*non_day_trade_volume)/sum(non_day_trade_volume)",
+      "source": "adjusted_ohlc_and_non_day_trade_volume",
+      "warmup": "null_until_n"
+    },
+    "CORRELATION": {
+      "category": "STATISTICAL_STRUCTURE",
+      "formula": "cov(x,y)/(std(x)*std(y))",
+      "source": "aligned_returns",
+      "warmup": "min_samples_and_nonzero_std"
+    },
+    "CVAR": {
+      "category": "RISK",
+      "formula": "mean(loss[loss>=VaR_alpha])",
+      "source": "loss_series",
+      "warmup": "tail_sample_required"
+    },
+    "DONCHIAN": {
+      "category": "VOLATILITY",
+      "formula": "upper=max(high,n); lower=min(low,n)",
+      "source": "adjusted_ohlc",
+      "warmup": "null_until_n"
+    },
+    "DRAWDOWN": {
+      "category": "RISK",
+      "formula": "equity/cumulative_peak-1",
+      "source": "equity_curve",
+      "warmup": "first_equity_seed"
+    },
+    "EMA": {
+      "category": "TREND",
+      "formula": "alpha*source[t]+(1-alpha)*ema[t-1]",
+      "source": "adj_close",
+      "warmup": "seed_policy_required"
+    },
+    "KELTNER": {
+      "category": "VOLATILITY",
+      "formula": "EMA(source,basis_n)+/-multiplier*RMA(TR,atr_n)",
+      "source": "adjusted_ohlc",
+      "warmup": "basis_and_atr_warmup"
+    },
+    "KURTOSIS": {
+      "category": "STATISTICAL_STRUCTURE",
+      "formula": "fourth_central_moment/std^4[-3 if excess]",
+      "source": "ordered_returns",
+      "warmup": "min_samples"
+    },
+    "MACD": {
+      "category": "TREND",
+      "formula": "EMA(fast)-EMA(slow); signal=EMA(macd)",
+      "source": "adj_close",
+      "warmup": "slow_plus_signal"
+    },
+    "MFI": {
+      "category": "VOLUME_FLOW",
+      "formula": "100-100/(1+positive_mf/negative_mf)",
+      "source": "adjusted_ohlc_and_non_day_trade_volume",
+      "warmup": "null_until_n"
+    },
+    "OBV": {
+      "category": "VOLUME_FLOW",
+      "formula": "cumsum(sign(adj_close-prev_adj_close)*non_day_trade_volume)",
+      "source": "adj_close_and_non_day_trade_volume",
+      "warmup": "seed_zero_or_null"
+    },
+    "R2": {
+      "category": "STATISTICAL_STRUCTURE",
+      "formula": "1-SSE/SST",
+      "source": "rolling_regression",
+      "warmup": "min_samples_and_nonzero_sst"
+    },
+    "ROC": {
+      "category": "MOMENTUM",
+      "formula": "100*(adj_close/adj_close[n]-1)",
+      "source": "adj_close",
+      "warmup": "null_until_n"
+    },
+    "RSI": {
+      "category": "MOMENTUM",
+      "formula": "100-100/(1+RMA(gain,n)/RMA(loss,n))",
+      "source": "adj_close",
+      "warmup": "null_until_rma_seed"
+    },
+    "SHARPE": {
+      "category": "RISK",
+      "formula": "mean(excess_ret)/sample_std(excess_ret)*sqrt(annualization)",
+      "source": "aligned_strategy_returns_and_rf",
+      "warmup": "min_samples"
+    },
+    "SKEWNESS": {
+      "category": "STATISTICAL_STRUCTURE",
+      "formula": "third_central_moment/std^3",
+      "source": "ordered_returns",
+      "warmup": "min_samples"
+    },
+    "SMA": {
+      "category": "TREND",
+      "formula": "mean(source[t-n+1:t])",
+      "source": "adj_close",
+      "warmup": "null_until_n"
+    },
+    "SORTINO": {
+      "category": "RISK",
+      "formula": "mean(excess_ret)/downside_deviation",
+      "source": "aligned_strategy_returns_and_rf",
+      "warmup": "min_samples"
+    },
+    "STOCHASTIC": {
+      "category": "MOMENTUM",
+      "formula": "100*(close-lowest(low,n))/(highest(high,n)-lowest(low,n)) then SMA smooth",
+      "source": "adjusted_ohlc",
+      "warmup": "null_until_n_and_smoothing"
+    },
+    "TR": {
+      "category": "VOLATILITY",
+      "formula": "max(high-low,abs(high-prev_close),abs(low-prev_close))",
+      "source": "adjusted_ohlc",
+      "warmup": "first_bar_high_low"
+    },
+    "VAR": {
+      "category": "RISK",
+      "formula": "rolling_loss_quantile(alpha)",
+      "source": "loss_series",
+      "warmup": "min_samples"
+    },
+    "VWAP": {
+      "category": "VOLUME_FLOW",
+      "formula": "sum(hlc3*non_day_trade_volume)/sum(non_day_trade_volume)",
+      "source": "adjusted_ohlc_and_non_day_trade_volume",
+      "warmup": "session_reset"
+    },
+    "WILLIAMS_R": {
+      "category": "MOMENTUM",
+      "formula": "-100*(highest(high,n)-close)/(highest(high,n)-lowest(low,n))",
+      "source": "adjusted_ohlc",
+      "warmup": "null_until_n"
+    }
+  },
+  "market_policies": {
+    "TW": {
+      "default_session_label": "TWSE_TPEX_DAY",
+      "execution_rule": "signal_t_execute_t_plus_1",
+      "market_code": "TW",
+      "price_basis": "adj_close",
+      "signal_available_at": "close_confirmed",
+      "timezone": "Asia/Taipei",
+      "volume_basis": "non_day_trade"
+    },
+    "US": {
+      "default_session_label": "NYSE_NASDAQ_REGULAR",
+      "execution_rule": "signal_t_execute_t_plus_1",
+      "market_code": "US",
+      "price_basis": "adj_close",
+      "signal_available_at": "close_confirmed",
+      "timezone": "America/New_York",
+      "volume_basis": "non_day_trade"
+    }
+  },
+  "parameter_policies": [
+    {
+      "category_code": "DATA_GOVERNANCE",
+      "code": "GOV_PRICE_BASIS",
+      "default": "adj_close",
+      "description": "所有價格線、報酬與技術面只使用 adjusted price",
+      "name_zh": "價格基準",
+      "unit": "enum",
+      "validation": "must_equal_adj_close"
+    },
+    {
+      "category_code": "DATA_GOVERNANCE",
+      "code": "GOV_VOLUME_BASIS",
+      "default": "non_day_trade",
+      "description": "成交量與成交值先扣除當沖，不得同時輸入 raw 與 ex-day-trade volume",
+      "name_zh": "成交量基準",
+      "unit": "enum",
+      "validation": "must_equal_non_day_trade"
+    },
+    {
+      "category_code": "DATA_GOVERNANCE",
+      "code": "GOV_TZ",
+      "default": "market_specific",
+      "description": "以 IANA 時區與交易所 session 日曆處理跨市場資料",
+      "name_zh": "市場時區",
+      "unit": "IANA_timezone",
+      "validation": "must_be_iana_timezone"
+    },
+    {
+      "category_code": "DATA_GOVERNANCE",
+      "code": "GOV_CALENDAR",
+      "default": "official_exchange",
+      "description": "區分 open、closed、settlement_only 與 early_close",
+      "name_zh": "交易日曆",
+      "unit": "versioned_table",
+      "validation": "must_have_market_date_status"
+    },
+    {
+      "category_code": "DATA_GOVERNANCE",
+      "code": "GOV_CONFIRMATION",
+      "default": "confirmed_only",
+      "description": "訊號只能使用已確認 bar，HTF 只能使用已完成資料",
+      "name_zh": "資料確認狀態",
+      "unit": "enum",
+      "validation": "must_be_confirmed"
+    },
+    {
+      "category_code": "DATA_GOVERNANCE",
+      "code": "GOV_LAG",
+      "default": 1,
+      "description": "當來源收盤晚於台灣收盤，移至下一個台灣交易日可用",
+      "name_zh": "跨市場資料滯後",
+      "unit": "trading_sessions",
+      "validation": "must_not_be_negative"
+    },
+    {
+      "category_code": "DATA_GOVERNANCE",
+      "code": "GOV_MISSING",
+      "default": "NA_NEVER_ZERO_FILL",
+      "description": "休市與缺資料不得轉成零報酬或零成交量",
+      "name_zh": "缺值政策",
+      "unit": "enum",
+      "validation": "must_preserve_null"
+    },
+    {
+      "category_code": "DATA_GOVERNANCE",
+      "code": "GOV_EXECUTION",
+      "default": "T_PLUS_1",
+      "description": "t 日收盤產生訊號，最早 t+1 執行",
+      "name_zh": "執行日規則",
+      "unit": "enum",
+      "validation": "must_equal_t_plus_1"
+    },
+    {
+      "category_code": "RISK",
+      "code": "RISK_WINDOW",
+      "default": 60,
+      "description": "Sharpe、Sortino、VaR 與 CVaR 的尾端觀察窗",
+      "name_zh": "風險 rolling 週期",
+      "unit": "trading_days",
+      "validation": "must_be_ge_min_samples"
+    },
+    {
+      "category_code": "RISK",
+      "code": "RISK_MIN_SAMPLES",
+      "default": 30,
+      "description": "風險統計的最小有效觀測數",
+      "name_zh": "風險最小樣本",
+      "unit": "observations",
+      "validation": "must_be_ge_2_and_le_window"
+    },
+    {
+      "category_code": "RISK",
+      "code": "RISK_PERIODS_PER_YEAR",
+      "default": 252,
+      "description": "將日頻風險統計年化的週期數",
+      "name_zh": "年化週期",
+      "unit": "periods",
+      "validation": "must_be_positive"
+    },
+    {
+      "category_code": "RISK",
+      "code": "RISK_RF_ANNUAL",
+      "default": 0.0,
+      "description": "Sharpe/Sortino 超額報酬的年化無風險率",
+      "name_zh": "年化無風險率",
+      "unit": "decimal_return",
+      "validation": "must_be_greater_than_minus_one"
+    },
+    {
+      "category_code": "RISK",
+      "code": "RISK_MAR_ANNUAL",
+      "default": 0.0,
+      "description": "Sortino 下行報酬的最低可接受年化報酬",
+      "name_zh": "年化 MAR",
+      "unit": "decimal_return",
+      "validation": "must_be_greater_than_minus_one"
+    },
+    {
+      "category_code": "RISK",
+      "code": "RISK_VAR_CONFIDENCE",
+      "default": 0.95,
+      "description": "歷史 VaR/CVaR 的損失分位數",
+      "name_zh": "VaR 信賴水準",
+      "unit": "probability",
+      "validation": "must_be_between_zero_and_one"
+    }
+  ],
+  "policy_version": "TW-QUANT-POLICY/0.3.0",
+  "ssot_version": "TW-QUANT-ENGINE-SSOT/0.3.0"
+}

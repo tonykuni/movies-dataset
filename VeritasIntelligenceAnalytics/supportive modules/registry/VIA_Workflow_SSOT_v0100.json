@@ -72,14 +72,12 @@
    ]
   },
   {
-   "id": "vdf_talib_features",
-   "zh": "技術指標特徵鏈(個股當沖量值→架構矩陣→TA-Lib OneEngine 正主橋→VAP ONE 堆疊圖;L41/L42;TA-Lib 缺=ABSENT)",
+   "id": "vdf_quantguard_features",
+   "zh": "QuantGuard 技術指標特徵鏈(資料架構→ENG086 Polars 技術分析與因子;零網路；當沖輸入另走收容鏈)",
    "profile": "test",
    "nodes": [
-    "tw_daytrade_stock",
     "db_arch",
-    "vdf_talib_one",
-    "vdf_talib_vap"
+    "vdf_quantguard_one"
    ]
   },
   {
@@ -103,12 +101,20 @@
   },
   {
    "id": "vdf_daytrade_file_chain",
-   "zh": "當沖檔案收容→TA-Lib 扣當沖特徵→VAP(瀏覽器存的 CSV 進庫後重算量能指標;L41/L45;批522)",
+   "zh": "當沖檔案收容→資料架構重建→QuantGuard 狀態檢查(真實計算另走 vdf_quantguard_run 並明給 --in)",
    "profile": "run",
    "nodes": [
     "tw_daytrade_files",
-    "vdf_talib_one",
-    "vdf_talib_vap"
+    "db_arch",
+    "vdf_quantguard_status"
+   ]
+  },
+  {
+   "id": "vdf_market_lists_acceptance",
+   "zh": "VDF 中央市場清單驗收(股票全集/主動 ETF/熱門族群去重；2023-01-01 起；離線可驗收)",
+   "profile": "test",
+   "nodes": [
+    "vdf_market_lists"
    ]
   }
  ]

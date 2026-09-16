@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>台股量化引擎驗證矩陣</title>
+<style>
+body{font-family:"Noto Sans CJK TC",system-ui,sans-serif;background:#f6f8fb;color:#172033;margin:32px;line-height:1.55}main{max-width:1120px;margin:auto;background:white;border:1px solid #dce3ee;border-radius:12px;padding:28px;box-shadow:0 8px 24px #17203314}h1{margin-top:0}table{border-collapse:collapse;width:100%;margin:18px 0}th,td{border-bottom:1px solid #e5eaf1;padding:10px;text-align:left;vertical-align:top}th{background:#eef3f9}.ok{color:#087443;font-weight:700}.note{background:#fff8e7;border-left:4px solid #d69300;padding:12px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.card{background:#f1f5fa;border-radius:8px;padding:14px}.value{font-size:1.5rem;font-weight:700}.small{color:#52627a;font-size:.9rem}@media(max-width:760px){.grid{grid-template-columns:1fr 1fr}body{margin:12px}}
+</style>
+</head>
+<body><main>
+<h1>台股自建量化與技術分析引擎</h1>
+<p class="small">SSOT：TW-QUANT-ENGINE-SSOT/0.3.0　資料口徑：ADJ-only、non-day-trade-only、confirmed-only</p>
+<div class="grid">
+<div class="card"><div class="value ok">37 passed</div><div class="small">VIA QuantGuard + DuckDB CLI; PostgreSQL skipped locally</div></div>
+<div class="card"><div class="value ok">8</div><div class="small">指標分類</div></div>
+<div class="card"><div class="value ok">5</div><div class="small">風險輸出</div></div>
+<div class="card"><div class="value ok">1</div><div class="small">中央 SSOT</div></div>
+</div>
+<table><thead><tr><th>階段</th><th>模組</th><th>狀態</th><th>驗證重點</th></tr></thead><tbody>
+<tr><td>資料治理</td><td>governance.py</td><td class="ok">完成</td><td>adj_close、non_day_trade_volume、non_day_trade_turnover、IANA 時區、close_utc as-of、缺值不補零。</td></tr>
+<tr><td>技術面</td><td>core.py technical_indicators</td><td class="ok">完成</td><td>SMA/EMA/MACD/ADX/DMI、RSI/KD/ROC/Williams/CCI、TR/ATR/BB/Keltner/Donchian、OBV/MFI/CMF/ADL/VWAP。</td></tr>
+<tr><td>統計面</td><td>statistics.py</td><td class="ok">完成</td><td>自相關、量價相關、R²、偏度、超額峰度；rolling 僅含當列與歷史列。</td></tr>
+<tr><td>風險面</td><td>risk.py</td><td class="ok">完成</td><td>Beta、Sharpe、Sortino、Calmar、VaR、CVaR、最大回撤；明確年化與尾部政策。</td></tr>
+<tr><td>跨市場</td><td>align_confirmed_closes</td><td class="ok">完成</td><td>台灣／美國以市場本地 session、UTC 收盤與 backward as-of 對齊；不把美股晚收盤灌回台股當日。</td></tr>
+<tr><td>PIT 回放</td><td>replay.py</td><td class="ok">完成</td><td>revision as-of、confirmed-only／initial-release、future append invariance、未來列防護與 replay manifest。</td></tr>
+<tr><td>數值回歸</td><td>test_quantguard_regression.py</td><td class="ok">完成</td><td>固定 golden fixture 驗證 Sharpe、Max Drawdown、SMA、EMA、多因子 composite 與 flash-crash／volatility／缺值 stress；欄位級 tolerance。</td></tr>
+<tr><td>DuckDB 回測</td><td>run_backtest_with_duckdb.py</td><td class="ok">完成</td><td>PIT revision load、Factor Composite、next-bar return、風險輸出、manifest 與 summary smoke test。</td></tr>
+<tr><td>系統接回</td><td>build_feature_matrix</td><td class="ok">完成</td><td>風險欄位預設接回，可用 include_risk_metrics=False 關閉；法人／TOCA 仍按 PIT lag join。</td></tr>
+</tbody></table>
+<div class="note"><strong>尚未宣稱 production-ready：</strong>官方 TWSE/TPEX fetcher、年度交易日曆下載、TradingView 逐棒 fixture 校準、資料 revision/upsert 與正式回測執行器仍需接線。這些屬於資料供應與驗證層，不應由公式模組默默假設。</div>
+</main></body></html>

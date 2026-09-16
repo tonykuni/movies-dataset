@@ -15,7 +15,7 @@ VAP_ENG005_TemplateRunner — 圖表模板跑器(批123;via-vaptpl)
   ④ 渲染分派 — dual/series/stack/panels → ENG001 Autoplot 最新版
      (SVG 理印,複用 --sql/--transform/--bands 全能力);
      corrheat → seaborn(圖規鎖:diverging·center 0);
-     ta_overlay → ENG004 TA 工廠家族+matplotlib;
+     ta_overlay → VDF_ENG086 QuantGuard+matplotlib;
      map → leaflet 自足 HTML(adv/map 型)。
 用法:
   via-vaptpl --list
@@ -47,6 +47,8 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
+
+import pandas as pd
 
 HERE = Path(__file__).resolve().parent          # VAP/engine
 VAP = HERE.parent
@@ -187,36 +189,28 @@ def render_corrheat(tpl: dict, out_dir: Path) -> tuple[str, str]:
     return "OK", f"{out.name}({out.stat().st_size // 1024}KB · {len(cols)}×{len(cols)})"
 
 
-def _load_ta_module():
-    eng = latest_engine("VAP_ENG004_TAFactory_v*.py")
-    if eng is None:
-        return None
-    spec = importlib.util.spec_from_file_location("vap_ta_dyn", eng)
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod
-
-
 def render_ta_overlay(tpl: dict, out_dir: Path) -> tuple[str, str]:
     import matplotlib
     matplotlib.use("Agg")
     _setup_cjk_font()
     import matplotlib.pyplot as plt
-    ta = _load_ta_module()
-    if ta is None:
-        return "FAIL", "ENG004 TA 工廠缺"
     prm = tpl["params"]
     df = load_frame(tpl)
     col = prm["instrument"]
     if col not in df.columns:
         return "FAIL", f"欄缺 {col}"
     px = df[col].ffill().tail(int(prm.get("lookback", 720)))
-    sma = ta.close_family()["SMA"]
+    core = VIA / "functional modules" / "VAP" / "input" / "SOURCE_VAP_MODULE" / "core"
+    if str(core) not in sys.path:
+        sys.path.insert(0, str(core))
+    from vap_indicators import VAPIndicatorEngine
+    source = pd.DataFrame({"date": px.index, "adj_close": px.to_numpy()})
+    quant = VAPIndicatorEngine(source).compute_sma(prm.get("periods", [20, 60, 240]))
     fig, ax = plt.subplots(figsize=(12, 5.4))
     ax.plot(px.index, px.values, lw=1.4, label=col, zorder=3)
     for n in prm.get("periods", [20, 60, 240]):
-        line = sma(px, int(n))
-        ax.plot(line.index, line.values, lw=0.9, alpha=0.85, label=f"SMA{n}")
+        line = quant[f"SMA_{int(n)}"]
+        ax.plot(px.index, line.to_numpy(), lw=0.9, alpha=0.85, label=f"SMA{n}")
     ax.legend(loc="upper left", fontsize=9, ncols=4)
     ax.grid(alpha=0.25)
     ax.set_title(f"{tpl.get('zh', tpl['name'])} · 週期輪 {prm.get('periods')}", fontsize=11)
@@ -369,10 +363,10 @@ def selftest() -> int:
         rc = render(["macro_corrheat"], [], None, out_root=sand / "r6")
         pngs = list((sand / "r6").rglob("*.png"))
         chk("⑥ 相關熱力圖 png", rc == 0 and pngs and pngs[0].stat().st_size > 10000)
-        # ⑦ ta_overlay(ENG004 SMA 週期輪)
+        # ⑦ ta_overlay(QuantGuard SMA 週期輪)
         rc = render(["twii_ta_overlay"], [], None, out_root=sand / "r7")
         pngs = list((sand / "r7").rglob("*.png"))
-        chk("⑦ TA 疊圖 png(ENG004 家族)", rc == 0 and pngs and pngs[0].stat().st_size > 10000)
+        chk("⑦ QuantGuard 疊圖 png", rc == 0 and pngs and pngs[0].stat().st_size > 10000)
         # ⑧ map(leaflet 標記數)
         rc = render(["world_indices_map"], [], None, out_root=sand / "r8")
         hts = list((sand / "r8").rglob("*.html"))

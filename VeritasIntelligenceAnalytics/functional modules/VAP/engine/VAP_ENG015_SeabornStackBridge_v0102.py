@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 VAP_ENG015_SeabornStackBridge v0102 — Seaborn 垂直圖組產生器 v2.3.1 橋接(批327;批329 K線疊加;批330 資料律)
-批330 操作員嚴令「TA-LIB 及所有繪圖 價格一律取調整後價格 成交量一定要採扣除當沖交易成交量」:
+批330 操作員嚴令「QuantGuard 與所有繪圖價格一律取調整後價格 成交量一定要採扣除當沖交易成交量」:
   取數改走 CGC_MDL118 PlotDataLaw(glob 尾版):價=還原(PriceSource 旗標);量=扣當沖三階來源律
   (個股→市場比→無料缺值 NaN),VolumeRaw 保留對照;圖題/索引頁印 stamp(覆蓋日數)=誠實;v0101 零觸碰。
 [VIA:PLOTDATA-LAW:v0100]

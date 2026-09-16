@@ -5,7 +5,7 @@
 ║  APM-000: vap_config.py - VeritasAutoPlot System Configuration             ║
 ║  Module ID: APM-000 | Version: 4.0.0 | Date: 2026-02-15                   ║
 ║  Description: Global defaults, locked patterns, color palettes,            ║
-║               TA-Lib indicator registry, adj close priority logic          ║
+║               QuantGuard feature registry, adj close priority logic          ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 """
 

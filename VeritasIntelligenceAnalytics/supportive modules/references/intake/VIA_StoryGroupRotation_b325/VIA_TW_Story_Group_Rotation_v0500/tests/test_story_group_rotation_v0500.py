@@ -99,7 +99,10 @@ from engine.via_validation_consensus_engine import (
 
 HERE = Path(__file__).resolve()
 GROUP_INDEX_ROOT = HERE.parents[2]
-CANDIDATE49 = GROUP_INDEX_ROOT / "flow_simulation_v0400" / "data" / "input" / "candidate_membership_v21.csv"
+_INTAKE_CANDIDATE49 = GROUP_INDEX_ROOT / "flow_simulation_v0400" / "data" / "input" / "candidate_membership_v21.csv"
+_CANONICAL_CANDIDATE49 = HERE.parents[6] / "functional modules" / "GroupIndex" / "flow_simulation_v0400" / "data" / "input" / "candidate_membership_v21.csv"
+# The fixture is a shared GroupIndex input, not a second copy owned by the intake package.
+CANDIDATE49 = _CANONICAL_CANDIDATE49 if _CANONICAL_CANDIDATE49.exists() else _INTAKE_CANDIDATE49
 
 
 def _official_risk_free(dates: pd.DatetimeIndex) -> pd.DataFrame:

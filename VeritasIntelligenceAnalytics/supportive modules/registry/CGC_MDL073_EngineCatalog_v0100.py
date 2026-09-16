@@ -58,6 +58,10 @@ def build() -> dict:
         if it["kind"] != "ENG":
             continue
         newest_rel = sorted(it["members"])[-1]
+        # Naming Registry is append-only; deleted/retired families remain as
+        # history but must not be presented as executable active engines.
+        if not (VIA / newest_rel).exists():
+            continue
         c = by_rel.get(newest_rel, {}).get("contract", {})
         desc = (by_rel.get(newest_rel, {}).get("desc") or "").strip()
         fns = [{"name": f.get("name"), "args": f.get("args", [])}
@@ -153,7 +157,10 @@ def selftest() -> int:
     print("=== 引擎總目錄 v0100 · 完整性四檢 ===")
     cat = build()
     reg = json.loads(NAMEREG.read_text(encoding="utf-8"))
-    n_eng = sum(1 for it in reg["items"].values() if it["kind"] == "ENG")
+    n_eng = sum(
+        1 for it in reg["items"].values()
+        if it["kind"] == "ENG" and (VIA / sorted(it["members"])[-1]).exists()
+    )
     with_desc = sum(1 for e in cat["engines"] if not e["desc"].startswith("("))
     checks = [("全 ENG 覆蓋(冊=目)", cat["n"] == n_eng),
               ("逐支詳目非空", all(e["canonical"] and e["family"] for e in cat["engines"])),

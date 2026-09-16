@@ -87,3 +87,11 @@ PY
 ```
 
 **接手結論：** VRN active tree import gate 已完成 GREEN；下一階段應處理 HardGate capability 實體掛載與原始 PDF/DOCX 掛載，不應重做本輪 288 檔 import 修復。
+
+## Windows 測試樣本進度查核（2026-09-16 15:14）
+
+目前使用者提供的 Windows 路徑清單共 64 份：60 份 PDF、4 份 DOCX。按名稱分組為華南投顧 11 份、凱基投顧 9 份、兆豐 6 份、其他 38 份。沙盒實際掛載與可讀檔案為 **0/64**，因此原始報告的 VRN 內容解析、首頁欄位擷取、結構化資料入庫與雙引擎內容互核均為 **BLOCKED_NO_ORIGINAL_FILES**，不能宣稱已驗收。
+
+目前唯一完成的 PDF 內容級 regression 是倉內 synthetic fixture：fitz 與 pdfplumber 均解析 2 頁，pdfplumber 發現 1 張表與 12 個非空儲存格，狀態 GREEN。這不代表華南、凱基、兆豐或其他使用者原始報告已解析。
+
+機器可讀樣本進度：`VIA_Reports/handover/VIA_WINDOWS_SAMPLE_ACCEPTANCE_STATUS_B526.json`。
