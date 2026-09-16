@@ -67,6 +67,7 @@ B532 新增 `SUP_MDL866_VIAUnifiedNLPOrchestrator`，以 `SUP_MDL744` 為 NLP �
 
 交接報告：`VIA_B533_VIA_UNIQUE_ENTRY_HANDOVER.md`
 機器狀態：`VIA_B533_VIA_UNIQUE_ENTRY_STATUS.json`
+Windows 一貼式最終驗證：`VIA_B533_WINDOWS_FINAL_VALIDATION.ps1`
 唯一入口控制 JSON/HTML：`../entry/VIA_UNIQUE_ENTRY_CONTROL_latest.json`、`../entry/VIA_UNIQUE_ENTRY_CONTROL_latest.html`
 全路由 dispatch：`../entry/VIA_UNIQUE_ENTRY_DISPATCH_latest.json`
 介面同步：`../iface_runs/BINDING_SYNC_latest.json`

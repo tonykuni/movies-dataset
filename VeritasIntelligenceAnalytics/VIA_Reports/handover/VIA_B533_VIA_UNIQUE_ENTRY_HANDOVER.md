@@ -45,6 +45,8 @@ QuantGuard 是唯一活動技術分析與因子路徑。TA-Lib/talib 不得安�
 
 在 Windows PowerShell 7 從 VIA 根目錄 pull 最新分支後，可執行：
 
+完整一貼式驗證腳本：`VIA_B533_WINDOWS_FINAL_VALIDATION.ps1`。它會檢查分支與遠端 HEAD，拒絕覆蓋已追蹤的本地修改，載入最新 command book，執行 25 項 roster probe、CGC157、VRN、VDF、QuantGuard 及 CGC054 唯讀同步，並產生 transcript。
+
 ```powershell
 . .\Register-VIA-Commands-v0208.ps1
 via-unique-check
