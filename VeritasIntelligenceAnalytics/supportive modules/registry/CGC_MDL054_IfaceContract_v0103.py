@@ -251,7 +251,7 @@ def param_flags(kind: str, spec: dict) -> list:
     fl = _FLAG_RX.findall(txt)
     if fl:
         return sorted(set(fl))
-    if kind in ("code", "codes"):
+    if kind in ("code", "codes", "text_positional"):
         return []                                  # 位置參數/代碼冊:不以旗標驗
     return [f"--{kind}"]
 

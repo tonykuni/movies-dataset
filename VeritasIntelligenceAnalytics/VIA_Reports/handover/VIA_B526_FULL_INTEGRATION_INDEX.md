@@ -62,3 +62,13 @@ Windows 一貼式驗證：`VIA_B532_UNIFIED_NLP_TEST.ps1`
 Unified NLP 證據：`../nlp_unified/VIA_UNIFIED_NLP_latest.json`
 
 B532 新增 `SUP_MDL866_VIAUnifiedNLPOrchestrator`，以 `SUP_MDL744` 為 NLP 正主，並將 PDF/DOCX/影像輸入統一轉派既有 `VRN_ENG087`；核心 selftest 10/10、SUP_MDL744 12/12、VRN_ENG087 11/11、CGC156 21/21。倉內 synthetic DOCX 檔案鏈實測 NLP 1/1、ENG073 DuckDB GREEN，因 VDF 覆蓋閘未達 2023 起始要求而保留 YELLOW。7 個附件均已收容至 manifest；AKShare 未執行，VES/VCAF/CGE 均不成為未授權 NLP 或網路執行路徑。Windows 真實 `C:\測試樣本報告` 仍待掛載，PowerShell runtime 仍待使用者 pull 後重跑。
+
+## B533 VIA 唯一接觸口與 VRN／VDF／QuantGuard 中央實測
+
+交接報告：`VIA_B533_VIA_UNIQUE_ENTRY_HANDOVER.md`
+機器狀態：`VIA_B533_VIA_UNIQUE_ENTRY_STATUS.json`
+唯一入口控制 JSON/HTML：`../entry/VIA_UNIQUE_ENTRY_CONTROL_latest.json`、`../entry/VIA_UNIQUE_ENTRY_CONTROL_latest.html`
+全路由 dispatch：`../entry/VIA_UNIQUE_ENTRY_DISPATCH_latest.json`
+介面同步：`../iface_runs/BINDING_SYNC_latest.json`
+
+B533 新增 `CGC_MDL157_VIAUniqueEntryControl`，要求 VRN、VDF 與 QuantGuard 先通過唯一入口，再經固定 VIA 路由執行。CGC157 實測 **18/18 GREEN**；全路由 dispatch 的 VRN `11/11`、VDF DataArchitecture `9/9`、VDF MarketListGovernance `10/10`、QuantGuard `8/8` 均 return code `0`。CGC156 重跑為 **23/23 GREEN、25 項 roster**。CGC054 介面 binding 第二次驗證為 **58/58 OK、DRIFT=0、BUMP=0**；VCGC registry-sync 為 active 5,027、new 1、changed 8、AST errors 0。六項歷史 contract drift 已以正主 CLI 旗標或位置參數精確收斂，沒有啟動資料補庫或網路抓取。PowerShell runtime 與 Windows 真實 PDF/DOCX 內容解析仍待使用者工作站重跑。

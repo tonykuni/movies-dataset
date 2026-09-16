@@ -1,0 +1,74 @@
+{
+  "schema": "VIA.B533.UniqueEntryControlHandover.v1",
+  "batch": "B533",
+  "timestamp": "2026-09-16T15:19:44Z",
+  "verdict": "GREEN_CENTRAL_DISPATCH",
+  "control_plane": {
+    "engine": "CGC_MDL157_VIAUniqueEntryControl_v0100",
+    "state": "ONLY_VIA_ENTRY",
+    "selftest": {"passed": 18, "total": 18, "rc": 0},
+    "dispatch_report": "VIA_Reports/entry/VIA_UNIQUE_ENTRY_DISPATCH_latest.json"
+  },
+  "central_dispatch": {
+    "family": "all",
+    "gate_verdict": "GREEN",
+    "network_default": "OFF",
+    "operator_consent": "OFF",
+    "silent_network_open": false,
+    "data_flow": "VDF_DUCKDB_TO_QUANTGUARD",
+    "routes": [
+      {"family": "vrn", "engine": "VRN_ENG087_NLPTextSummaryBridge_v0100", "passed": 11, "total": 11, "rc": 0, "state": "GREEN"},
+      {"family": "vdf", "engine": "VDF_ENG073_DataArchitecture_v0100", "passed": 9, "total": 9, "rc": 0, "state": "GREEN"},
+      {"family": "vdf", "engine": "VDF_ENG087_MarketListGovernance_v0101", "passed": 10, "total": 10, "rc": 0, "state": "GREEN"},
+      {"family": "quantguard", "engine": "VDF_ENG086_QuantGuardOneBridge_v0100", "passed": 8, "total": 8, "rc": 0, "state": "GREEN"}
+    ]
+  },
+  "central_registration": {
+    "inputconsole": "via_unique_entry_control",
+    "workflow": "via_unique_entry_control",
+    "toolroster": "unique_entry_control",
+    "component_inventory": {"active": 5027, "new": 1, "changed": 8, "retired": 0, "ast_errors": 0},
+    "interface_binding": {"items": 58, "ok": 58, "drift": 0, "bump": 0, "rc": 0},
+    "vcgc_registry_sync": {"active": 5027, "new": 1, "changed": 8, "retired": 0, "ast_errors": 0, "rc": 0}
+  },
+  "accelerator_control": {
+    "engine": "CGC_MDL156_VIAAcceleratorControl_v0100",
+    "state": "GREEN",
+    "passed": 23,
+    "total": 23,
+    "roster_count": 25,
+    "roster_ids": "01..25",
+    "network_default": "OFF",
+    "approved_mounts": ["VeritasCeleritas", "VeritasAegisNexus"]
+  },
+  "quantguard_policy": {
+    "active_path": "QuantGuard-only",
+    "talib": "FORBIDDEN_NOT_USED",
+    "source_mutation": "FORBIDDEN",
+    "direction": "VDF_DUCKDB_TO_QUANTGUARD",
+    "network_fetch": "FORBIDDEN_WITHOUT_OPERATOR_CONSENT"
+  },
+  "bootstrap_identity": {
+    "roster": "VIA_PS_Accelerators_25_Roster_v0100:25",
+    "accelerator_control": "CGC_MDL156_VIAAcceleratorControl_v0100",
+    "entry_control": "CGC_MDL157_VIAUniqueEntryControl_v0100",
+    "superaccel_previous_evidence": "cache:9/88:17env",
+    "approved_mounts_lazy": true
+  },
+  "limits": [
+    "PowerShell runtime parser is pending because sandbox lacks pwsh, powershell, and PSScriptAnalyzer.",
+    "Windows C:\\測試樣本報告 source files are not mounted; no real PDF/DOCX content claim is made.",
+    "VDF historical data replenishment remains stopped by operator instruction.",
+    "9/88 optional SuperAccel libraries were available in the prior activation evidence; roster_count=25 is not a claim that 25 independent algorithms are installed."
+  ],
+  "evidence": {
+    "handover": "VIA_Reports/handover/VIA_B533_VIA_UNIQUE_ENTRY_HANDOVER.md",
+    "control_json": "VIA_Reports/entry/VIA_UNIQUE_ENTRY_CONTROL_latest.json",
+    "control_html": "VIA_Reports/entry/VIA_UNIQUE_ENTRY_CONTROL_latest.html",
+    "dispatch_json": "VIA_Reports/entry/VIA_UNIQUE_ENTRY_DISPATCH_latest.json",
+    "interface_sync": "VIA_Reports/iface_runs/BINDING_SYNC_latest.json",
+    "accelerator_control": "VIA_Reports/accelerator/VIA_ACCELERATOR_CONTROL_latest.json",
+    "bundle": "VIA_Reports/handover/evidence_b533_unique_entry/",
+    "runtime_text": "/home/ubuntu/work/via_central_dispatch_b533_final.txt"
+  }
+}

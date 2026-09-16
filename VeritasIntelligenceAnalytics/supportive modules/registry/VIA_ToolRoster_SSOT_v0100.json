@@ -557,5 +557,17 @@
   ],
   "adapter_policy": "intake_only_until_individually approved; no silent network, install, schedule, overwrite, or auto-fix",
   "quantguard_data_flow": "VDF/DuckDB read -> QuantGuard -> features/factors/evidence; no reverse source edge"
+ },
+ "unique_entry_control": {
+  "engine": "CGC_MDL157_VIAUniqueEntryControl_v0100",
+  "source": "supportive modules/registry/CGC_MDL157_VIAUniqueEntryControl_v0100.py",
+  "command_book": "Register-VIA-Commands-v0208.ps1",
+  "powershell_dispatch": "via-central",
+  "python_dispatch": "Invoke-VIAPython",
+  "bootstrap": "supportive modules/bootstrap/sitecustomize.py",
+  "families": ["vrn", "vdf", "quantguard"],
+  "network_default": "OFF",
+  "gate": "CGC157 GREEN before child dispatch",
+  "direct_child_execution": "FORBIDDEN_AS_VIA_CLAIM"
  }
 }

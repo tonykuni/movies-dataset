@@ -30,7 +30,7 @@ try {
 # ===== [VIA:PS-ACCEL:END] =====
 $VIA = Split-Path -Parent $MyInvocation.MyCommand.Path
 # 批486/B531:所有 py 指令統一走 Invoke-VIAPython(25 加速器控制面 + 動態進度條 + 邊跑邊轉播 + 逾時不卡斷;stdout 走 pipeline,上游捕捉照舊)
-$viaPyProg = Join-Path $VIA "supportive modules\VIA_PS_PyProgress_Module.ps1"; if (Test-Path -LiteralPath $viaPyProg) { . $viaPyProg } else { Write-Host "  [VIA] VIA_PS_PyProgress_Module.ps1 缺(誠實;短令改回直呼)" -ForegroundColor Yellow; function global:Invoke-VIAPython { param([string]$Family="",[string]$Python="",[int]$TimeoutSec=0,[Parameter(ValueFromRemainingArguments=$true)][object[]]$Rest) $exe = if ($Python) { $Python } else { Get-VIAEnvPython $Family }; & $exe @Rest } }
+$viaPyProg = Join-Path $VIA "supportive modules\VIA_PS_PyProgress_Module.ps1"; if (Test-Path -LiteralPath $viaPyProg) { . $viaPyProg } else { Write-Host "  [VIA] VIA_PS_PyProgress_Module.ps1 缺(中央唯一入口不可用;已 fail-closed 停止)" -ForegroundColor Red; function global:Invoke-VIAPython { param([string]$Family="",[string]$Python="",[int]$TimeoutSec=0,[Parameter(ValueFromRemainingArguments=$true)][object[]]$Rest) Write-Host "  [Invoke-VIAPython] 中央 helper 缺失;禁止繞過 VIA 直呼 Python" -ForegroundColor Red; $global:LASTEXITCODE = 2 } }
 $global:VIARegisterPath = $MyInvocation.MyCommand.Path   # 批383:撞名守衛掃描本冊用
 
 # 批378:全域零跳出律——.html 預設程式=VS Code,任何 --open 皆會彈 VS Code(批366 只管 via-mobile 不夠)。載入短令冊即設 VIA_NO_OPEN=1:
@@ -43,14 +43,14 @@ function global:Get-VIANewest([string]$Dir, [string]$Pat) {
     (Get-ChildItem -Path $Dir -Filter $Pat -File -ErrorAction SilentlyContinue |
      Sort-Object Name | Select-Object -Last 1).FullName
 }
-# 批408:同意閘不覆蓋律。舊寫法 `$env:VIA_NET_CONSENT = "YES"; $env:VIA_SCRAPE_CONSENT = "YES"`
+# 批408/B533:同意閘不覆蓋且 fail-closed。未明確設置時固定為 OFF；VIA 絕不代操作員開網路。
 # 每次呼叫都覆寫,操作員自設的值永遠被蓋掉;閘二包內法遵只認 I_ACCEPT_RESPONSIBLE_SCRAPING
 # (見 functional modules/VRN/webscraping_dualengine_*/VIA_WebScraping_Compliance_SSOT.json 的
 # required_consent_token),"YES" 過不了 def_validate_consent → check_url 一律 DENY → 爬蟲道不可達。
 # 本函式只在「未設」時補預設值(既有六令行為零變更),已設者尊重;仍不代操作員設任何新意圖。
 function global:Set-VIAGateDefaults {
-    if (-not $env:VIA_NET_CONSENT)    { $env:VIA_NET_CONSENT = "YES" }
-    if (-not $env:VIA_SCRAPE_CONSENT) { $env:VIA_SCRAPE_CONSENT = "YES" }
+    if (-not $env:VIA_NET_CONSENT)    { $env:VIA_NET_CONSENT = "OFF" }
+    if (-not $env:VIA_SCRAPE_CONSENT) { $env:VIA_SCRAPE_CONSENT = "OFF" }
 }
 # 批408:閘態一覽(唯讀;絕不印原值,只報是否等於期望 token)
 function global:via-gates {
@@ -868,6 +868,40 @@ function global:via-nlpunified {
 }
 Set-Alias -Name NLP統一 -Value via-nlpunified -Scope Global -Force
 Set-Alias -Name via-nlp-unified -Value via-nlpunified -Scope Global -Force
+# ── 批533:via-central —— VIA 唯一接觸口；先過 CGC157，再由 VIA 子入口 dispatch
+#   via-central status                         唯一入口/registry/bootstrap/network gate 自測
+#   via-central vrn -SelfTest                  VIA→VRN_ENG087 實測
+#   via-central vdf -Status                    VIA→VDF architecture/status 實測
+#   via-central quantguard -SelfTest           VIA→VDF_ENG086 QuantGuard 實測
+#   子系統不得繞過此門直接宣稱已完成 VIA 驗收；網路同意仍由操作員明確設定。
+function global:via-central {
+    param(
+        [ValidateSet("status", "vrn", "vdf", "quantguard")][string]$Family = "status",
+        [Parameter(ValueFromRemainingArguments = $true)][object[]]$Rest
+    )
+    $ctl = Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL157_VIAUniqueEntryControl_v*.py"
+    if (-not $ctl) { Write-Host "  [via-central] FAIL:CGC_MDL157 唯一接觸口控制面缺失" -ForegroundColor Red; $global:LASTEXITCODE = 2; return }
+    $env:VIA_CENTRAL_ENTRY = "1"; $env:VIA_ENTRY_CONTROL = "CGC_MDL157_VIAUniqueEntryControl_v0100"
+    Invoke-VIAPython -Family "core" $ctl selftest
+    if ($global:LASTEXITCODE -ne 0) { Write-Host "  [via-central] STOP:CGC157 未 GREEN，不派送子系統" -ForegroundColor Red; return }
+    $r = @($Rest)
+    if ($r.Count -eq 0) { $r = @("-SelfTest") }
+    switch ($Family) {
+        "status" { return }
+        "vrn" { via-nlpvrn @r; return }
+        "vdf" {
+            if ($r -contains "-Status") { via-vdfarch "--selftest" } elseif ($r -contains "-SelfTest") { via-vdfarch "--selftest" } else { via-vdfarch @r }
+            return
+        }
+        "quantguard" {
+            $q = @($r | ForEach-Object { if ($_ -eq "-SelfTest") { "selftest" } elseif ($_ -eq "-Status") { "status" } else { $_ } })
+            via-quantguard @q; return
+        }
+    }
+}
+function global:via-unique-check { via-central status @args }
+Set-Alias -Name VIA中央 -Value via-central -Scope Global -Force
+Set-Alias -Name via-unique -Value via-unique-check -Scope Global -Force
 # ── 批522:via-daytrade —— 個股當沖量值(VDF_ENG055 L15;線上三源誠實 + 檔案收容道 L45:via-daytrade --from-file A.csv,B.csv --date 2026-09-12 [--market TWSE|TPEX];收容夾 functional modules\VDF\references\intake\daytrade_files;觸網項=你開閘)
 function global:via-daytrade { $env:VIA_FAMILY = "vdf"; Invoke-VIAPython (Get-VIANewest "$VIA\functional modules\VDF\engine" "VDF_ENG055_OmniFetch_v*.py") (@("run", "--lane", "L15") + @($args)) }
 Set-Alias -Name 當沖量值 -Value via-daytrade -Scope Global -Force
