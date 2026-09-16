@@ -18,7 +18,7 @@
 #     在後=後定義勝)
 #   ③當場生效:. "<本檔路徑>"(不用新視窗不用 via)
 # =====================================================================
-# ===== [VIA:PS-ACCEL:v0100] PS 20 加速器橋(批255 全樹導入;graceful 缺席零影響) =====
+# ===== [VIA:PS-ACCEL:v0101] PS 25 加速器橋(B531 全樹導入;graceful 缺席零影響) =====
 try {
     $VIAPSAccelProbe = $PSScriptRoot
     while ($VIAPSAccelProbe -and (Split-Path $VIAPSAccelProbe -Parent)) {
@@ -158,14 +158,34 @@ function global:via-health { Invoke-VIAPython (Get-VIANewest "$VIA\supportive mo
 function global:via-tpn { Invoke-VIAPython -Family "vap" (Get-VIANewest "$VIA\functional modules\VAP\engine" "VAP_ENG011_TemplateRegistry_v*.py") @args }
 function global:via-psrepair { pwsh -NoProfile -ExecutionPolicy Bypass -File (Get-VIANewest $VIA "Invoke-VIA-PSRepair-v*.ps1") @args }
 function global:via-all { pwsh -NoProfile -ExecutionPolicy Bypass -File (Get-VIANewest $VIA "Invoke-VIA-All-v*.ps1") @args }
-# 批323:加速器啟動報告(SUP_MDL737 尾版 --activate/--libs)+覆蓋×啟動稽核(CGC_MDL117)
-function global:via-accel { Invoke-VIAPython (Get-VIANewest "$VIA\supportive modules" "SUP_MDL737_SuperAccelModule_v*.py") $(if ($args) { $args } else { "--activate" }) }
+# 批323/B531:25 項加速器唯一入口。--activate 先點亮 SUP_MDL737，再由 CGC_MDL156 驗收。
+# PS roster→PS runtime→Python sitecustomize→SuperAccel/Celeritas/Aegis mount 全部 GREEN 才算 READY。
+function global:via-accel {
+    $a = @($args)
+    $control = Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL156_VIAAcceleratorControl_v*.py"
+    $super = Get-VIANewest "$VIA\supportive modules" "SUP_MDL737_SuperAccelModule_v*.py"
+    if (-not $a) { $a = @("selftest") }
+    if ($a -contains "--activate") {
+        Invoke-VIAPython $super "--activate"
+        Invoke-VIAPython $control "selftest"
+    } elseif ($a[0] -in @("status", "selftest", "manifest", "routes")) {
+        Invoke-VIAPython $control $a
+    } elseif ($a[0] -in @("--status", "--selftest", "--manifest", "--routes")) {
+        Invoke-VIAPython $control (($a[0] -replace '^--', ''))
+    } else {
+        Invoke-VIAPython $super $a
+        Invoke-VIAPython $control "status"
+    }
+}
 # 批384:加速器套件導入閘(MDL142;冊=Celeritas 尾版 _LIB_MAP 88 件;路由=MDL135 尾版 core_whitelist/high_risk/purpose_hints;
 #   境=via_core/via_vdf/via_vrn/via_vap(別名序);探針 find_spec 零副作用;GPU 無卡/需系統二進位/平台不符=誠實不列計畫;
 #   base 零觸碰(除 --include-base);--apply --approve 才裝(uv 優先退 pip);同意閘未開=拒裝)
 #   via-accel-import [--env-root <envs 根>] [--apply --approve] [--include-base] [--timeout N] [digest]
 function global:via-accel-import { Set-VIAGateDefaults; Invoke-VIAPython (Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL142_AccelImport_v*.py") @args }
-function global:via-accel-check { Invoke-VIAPython (Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL117_AccelCoverage_v*.py") run }
+function global:via-accel-check {
+    Invoke-VIAPython (Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL117_AccelCoverage_v*.py") run
+    Invoke-VIAPython (Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL156_VIAAcceleratorControl_v*.py") selftest
+}
 # 批325:故事族群輪動橋接(ENG072 尾版;run 預設,可帶 export/preflight/--pkgtest)+repo 衛生一鍵(只宜工作站)
 function global:via-rotation { Invoke-VIAPython -Family "vdf" (Get-VIANewest "$VIA\functional modules\VDF\engine" "VDF_ENG072_StoryRotationBridge_v*.py") $(if ($args) { $args } else { "run" }) }
 function global:via-repo-optimize { $ps = if (Get-Command pwsh -ErrorAction SilentlyContinue) { "pwsh" } else { "powershell" }; & $ps -NoProfile -ExecutionPolicy Bypass -File (Get-VIANewest $VIA "Invoke-VIA-RepoOptimizer-v*.ps1") @args }
@@ -296,7 +316,7 @@ function global:via-etfrev { Invoke-VIAPython -Family "vdf" (Get-VIANewest "$VIA
 # 批379/380:via-autorun=一鍵全自動四閘版:①via-accel --activate(20 加速器)②via-lanes plan(Hydra 哨兵 H1–H6;H3/H5 FAIL=誠實停)③via-mobile --lanes(拉齊→六流程→十道並行→矩陣→產品閘)④lanes digest;零跳出、零 TTY 等待(VIA_FRED_PROMPT=0)、逾時 kill 不卡斷;雙擊 via-autorun.cmd 同效且結束停窗
 function global:via-autorun { $env:VIA_NO_OPEN = "1"; $env:VIA_FRED_PROMPT = "0"; $env:GIT_EDITOR = "true"; $env:PYTHONUTF8 = "1"
     Write-Host "=== [via-autorun] 一鍵全自動(單一 PowerShell;零跳出;不卡斷;約 20–60 分鐘)===" -ForegroundColor Cyan
-    Write-Host "--- ① 20 加速器點亮(SUP_MDL737 --activate;缺席=誠實 SKIP 零影響)---" -ForegroundColor Cyan; try { via-accel --activate } catch { Write-Host ("  [加速器] " + $_.Exception.Message) -ForegroundColor Yellow }
+    Write-Host "--- ① 25 加速器點亮與中央線控(CGC_MDL156;缺席=誠實 SKIP 零影響)---" -ForegroundColor Cyan; try { via-accel --activate } catch { Write-Host ("  [加速器] " + $_.Exception.Message) -ForegroundColor Yellow }
     Write-Host "--- ② 九頭龍哨兵 H1–H6(唯讀;H3 進程雙頭/H5 尾版律 FAIL=誠實停,不跑)---" -ForegroundColor Cyan; $plan = (via-lanes plan 2>&1 | Out-String); Write-Host $plan
     if ($plan -match "H3 FAIL|H5 FAIL") { Write-Host "=== [via-autorun] 九頭龍風險(見上 H3/H5)=停;請先關閉另一條在跑的補齊鏈或修尾版後重試 ===" -ForegroundColor Red; return }
     Write-Host "--- ③ 全自動主鏈(拉齊→六流程 dry-run→十道並行補齊→四專案矩陣→產品閘)---" -ForegroundColor Cyan; via-mobile --lanes

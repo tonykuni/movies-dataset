@@ -39,3 +39,15 @@ CGC155 自測 9/9、VCGC 19/19、中央治理家族 12/12、Workflow Composer 12
 Windows PowerShell：`VIA_NLP_VRN_VDF_B529.ps1`
 
 B529 最後 Run `B529-20260916T105325-68faf473` 實測 2 個倉內 PDF/DOCX 夾具：ENG072 2/2、NLP 2/2、證據摘要 2/2、ENG073 rc=0、DuckDB GREEN（`vrn_nlp_text_summary=2`、`vrn_pipeline_runs=4`）；三頁報告會自動開啟並同時輸出 HTML/JSON/Markdown。總裁決 `YELLOW`，VDF 唯一阻擋仍是股票價格資料最早 2024-01-02，未達 2023-01-01。新中央節點 `vrn_nlp_vrn_vdf_pipeline`、工作流 `vrn_nlp_vdf_pipeline` 已登錄；Workflow 12/12、VCGC 19/19。
+
+## B531 25 項 PowerShell 加速器與 Python 單點掛載
+
+交接報告：`VIA_B531_25_ACCELERATOR_CONTROL_HANDOVER.md`
+機器狀態：`VIA_B531_25_ACCELERATOR_CONTROL_STATUS.json`
+三頁狀態頁：`VIA_B531_25_ACCELERATOR_CONTROL.html`
+Windows 一貼式 probe：`VIA_B531_25_ACCELERATOR_CONTROL.ps1`
+證據包：`evidence_b531_accelerator_control/`
+
+B531 的 CGC156 離線控制面實測 **GREEN 20/20、`READY_FOR_25`**；SSOT 與 PowerShell roster 均為 ID `01..25`。`sitecustomize.py` 實際將 25-roster 與 CGC156 identity 注入 VIA 啟動的 Python；VDF probe 顯示 `VIA_ACCEL_BOOT=cache:9/88:17env`、`via_net=True`、Celeritas/Aegis lazy mount。QuantGuard selftest 8/8 PASS；TA-Lib 為永久禁用，canonical active mounts 掃描無禁用接線。SuperAccel 為 88 catalogued／9 available／79 missing-or-stub，誠實保留缺件，不把 25 roster 說成 25 套獨立演算法已安裝。
+
+中央同步 8 站中 7 站 exit 0；`iface_sync=1` 僅代表 6 個既有 InputConsole contract drift，未被盲改或假稱已解。VCGC ACTIVE 4,996/4,996、家族 237/237、AST errors 0。sandbox 無 PowerShell parser，Windows runtime probe 待工作站實跑；Windows `C:\測試樣本報告` 原始 PDF/DOCX 仍未掛載，資料補庫仍停止。

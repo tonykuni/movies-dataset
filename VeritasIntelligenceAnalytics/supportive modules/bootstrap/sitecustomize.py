@@ -131,6 +131,10 @@ def _boot():
     # 已設 VIA_ACCEL_BOOT,第一版在這裡整段 return,連 vdf 該掛的網路件都跳掉;子行程印的還是父行程的值。
     # 改:每個行程都各做各的(環境變數本來就 setdefault、網路件本來就依 VIA_FAMILY),不靠「父做過就跳」。
     root = _via_root()
+    # B531：所有 Python 家族共用同一個 25 項 roster 與中央線控識別；
+    # 只寫入啟動環境，不逐檔改寫引擎，也不繞過 SuperAccel/Celeritas/Aegis 閘。
+    os.environ.setdefault("VIA_ACCELERATOR_ROSTER", "VIA_PS_Accelerators_25_Roster_v0100:25")
+    os.environ.setdefault("VIA_ACCELERATOR_CONTROL", "CGC_MDL156_VIAAcceleratorControl_v0100")
     fam = (os.environ.get("VIA_FAMILY") or "").lower()
     note = []
     try:
