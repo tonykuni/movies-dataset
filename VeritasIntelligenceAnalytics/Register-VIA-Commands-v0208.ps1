@@ -789,6 +789,39 @@ Set-Alias -Name 共識擴充 -Value via-vetf -Scope Global -Force
 # ── 批522:via-fplogic —— 第一頁邏輯補缺正主橋(VRN_ENG086;收容件 functional modules\VRN\references\intake\VIA_VRN_FirstPageEngine_v0101_b522 零觸碰;status|gap|bench [--limit N]|enrich [--in DIR] [--limit N];vrn 境 python)
 function global:via-fplogic { $env:VIA_FAMILY = "vrn"; Invoke-VIAPython (Get-VIANewest "$VIA\functional modules\VRN" "VRN_ENG086_FirstPageLogicBridge_v*.py") $(if ($args) { $args } else { @("status") }) }
 Set-Alias -Name 首頁邏輯 -Value via-fplogic -Scope Global -Force
+# ── 批529:via-nlpvrn —— NLP文字修復+證據型摘要→VRN ENG072/ENG073→VDF ENG087 唯讀狀態
+#   單一入口;輸入可重複 -In <PDF/DOCX/夾>;預設寫 functional modules\VRN\db\vrn_reports.duckdb
+#   NLP 輸出 vrn_nlp_text_summary(保留 normalized_text/source hash/evidence span)；不覆寫 ENG073 canonical 欄位
+#   -DB/-Out/-Points/-Force 映射到 Python；網路預設關閉，VDF RED 會誠實回報資料覆蓋缺口，不假綠
+function global:via-nlpvrn {
+    $eng = Get-VIANewest "$VIA\functional modules\VRN" "VRN_ENG087_NLPTextSummaryBridge_v*.py"
+    if (-not $eng) { Write-Host "  [via-nlpvrn] FAIL:VRN_ENG087_NLPTextSummaryBridge_v*.py 缺" -ForegroundColor Red; return }
+    $a = @($args | ForEach-Object {
+        if ($_ -eq "-In") { "--in" }
+        elseif ($_ -eq "-DB") { "--db" }
+        elseif ($_ -eq "-Out") { "--out" }
+        elseif ($_ -eq "-Points") { "--points" }
+        elseif ($_ -eq "-Force") { "--force" }
+        elseif ($_ -eq "-SelfTest") { "selftest" }
+        elseif ($_ -eq "-Status") { "status" }
+        else { $_ }
+    })
+    if (-not $a) { $a = @("status") }
+    if (-not ($a | Where-Object { $_ -in @("run", "status", "selftest") })) { $a = @("run") + $a }
+    if (($a -contains "run") -and -not ($a -contains "--db")) { $a += @("--db", "$VIA\functional modules\VRN\db\vrn_reports.duckdb") }
+    if (($a -contains "run") -and -not ($a -contains "--out")) { $a += @("--out", "$VIA\VIA_Reports\vrn\nlp_pipeline") }
+    $env:VIA_FAMILY = "vrn"
+    Invoke-VIAPython -Family "vrn" $eng @a
+    if ($a -contains "run") {
+        $html = "$VIA\VIA_Reports\vrn\nlp_pipeline\NLP_VRN_VDF_latest.html"
+        if (Test-Path -LiteralPath $html) {
+            Write-Host "  [via-nlpvrn] 三頁 HTML 矩陣：$html" -ForegroundColor Cyan
+            Start-Process -FilePath $html
+        }
+    }
+}
+Set-Alias -Name NLP研報 -Value via-nlpvrn -Scope Global -Force
+Set-Alias -Name NLP串接 -Value via-nlpvrn -Scope Global -Force
 # ── 批522:via-daytrade —— 個股當沖量值(VDF_ENG055 L15;線上三源誠實 + 檔案收容道 L45:via-daytrade --from-file A.csv,B.csv --date 2026-09-12 [--market TWSE|TPEX];收容夾 functional modules\VDF\references\intake\daytrade_files;觸網項=你開閘)
 function global:via-daytrade { $env:VIA_FAMILY = "vdf"; Invoke-VIAPython (Get-VIANewest "$VIA\functional modules\VDF\engine" "VDF_ENG055_OmniFetch_v*.py") (@("run", "--lane", "L15") + @($args)) }
 Set-Alias -Name 當沖量值 -Value via-daytrade -Scope Global -Force

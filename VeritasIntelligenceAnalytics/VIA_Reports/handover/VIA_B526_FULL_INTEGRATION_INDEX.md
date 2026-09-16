@@ -28,3 +28,14 @@ CGC155 自測 9/9、VCGC 19/19、中央治理家族 12/12、Workflow Composer 12
 交接報告：`VIA_B528_VRN_DATABASE_ACCEPTANCE_HANDOVER.md`
 機器狀態：`VIA_B528_VRN_DATABASE_ACCEPTANCE_STATUS.json`
 裁決：**GREEN**（ENG073 36/36 PASS；指定庫 status PASS；只讀 SQL PASS）。使用者 Windows 64 份原始樣本仍待掛載，未被本批假稱已解析。
+
+## B529 NLP→VRN→VDF 三頁矩陣鏈
+
+交接報告：`VIA_B529_NLP_VRN_VDF_MATRIX_HANDOVER.md`
+機器狀態：`VIA_B529_NLP_VRN_VDF_MATRIX_STATUS.json`
+最新 HTML：`../vrn/nlp_pipeline/NLP_VRN_VDF_latest.html`
+最新 JSON：`../vrn/nlp_pipeline/NLP_VRN_VDF_latest.json`
+最新 Markdown：`../vrn/nlp_pipeline/NLP_VRN_VDF_latest.md`
+Windows PowerShell：`VIA_NLP_VRN_VDF_B529.ps1`
+
+B529 最後 Run `B529-20260916T105325-68faf473` 實測 2 個倉內 PDF/DOCX 夾具：ENG072 2/2、NLP 2/2、證據摘要 2/2、ENG073 rc=0、DuckDB GREEN（`vrn_nlp_text_summary=2`、`vrn_pipeline_runs=4`）；三頁報告會自動開啟並同時輸出 HTML/JSON/Markdown。總裁決 `YELLOW`，VDF 唯一阻擋仍是股票價格資料最早 2024-01-02，未達 2023-01-01。新中央節點 `vrn_nlp_vrn_vdf_pipeline`、工作流 `vrn_nlp_vdf_pipeline` 已登錄；Workflow 12/12、VCGC 19/19。

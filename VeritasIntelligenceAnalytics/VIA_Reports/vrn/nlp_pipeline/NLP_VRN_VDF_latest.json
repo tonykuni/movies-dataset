@@ -1,0 +1,342 @@
+{
+  "schema": "VIA.VRN.NLP.VDF.Pipeline.v1",
+  "engine": "VRN_ENG087_NLPTextSummaryBridge",
+  "version": "v0100",
+  "run_id": "B529-20260916T105325-68faf473",
+  "verdict": "YELLOW",
+  "input_paths": [
+    "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/PDFRegressionEvidence_v1.0.0_b245/PDFRegressionEvidence_v1.0.0/synthetic_financial_report.pdf",
+    "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/Veritas_OmniFormat_Intelligence_Engine_v0140_FINAL_b245/Veritas_OmniFormat_Intelligence_Engine_v0140/examples/output/VOFIE_v0140_SYSTEM_Final/Veritas_VOFIE_Reconstructed.docx"
+  ],
+  "input_count": 2,
+  "inputs": [
+    "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/PDFRegressionEvidence_v1.0.0_b245/PDFRegressionEvidence_v1.0.0/synthetic_financial_report.pdf",
+    "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/Veritas_OmniFormat_Intelligence_Engine_v0140_FINAL_b245/Veritas_OmniFormat_Intelligence_Engine_v0140/examples/output/VOFIE_v0140_SYSTEM_Final/Veritas_VOFIE_Reconstructed.docx"
+  ],
+  "sidecar_count": 2,
+  "missing_sidecars": [],
+  "engines": {
+    "eng072": {
+      "argv": [
+        "/home/ubuntu/work/quantguard_venv/bin/python",
+        "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG072_FirstPageText_v0129.py",
+        "run",
+        "--in",
+        "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/PDFRegressionEvidence_v1.0.0_b245/PDFRegressionEvidence_v1.0.0/synthetic_financial_report.pdf",
+        "--in",
+        "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/Veritas_OmniFormat_Intelligence_Engine_v0140_FINAL_b245/Veritas_OmniFormat_Intelligence_Engine_v0140/examples/output/VOFIE_v0140_SYSTEM_Final/Veritas_VOFIE_Reconstructed.docx",
+        "--force"
+      ],
+      "returncode": 0,
+      "stdout": "[OCR 未就緒] 道一 GLE 路由 7 支全未裝(tesseract, paddleocr, paddle_ppstructure, paddle_pdf_pipeline, easyocr, ocrmypdf, transkribus_core) · 道二 PPP 缺 paddleocr\n   掃描影像 PDF 會誠實停在 NEEDS_OCR(不假抽)。要開通擇一:\n   pip install paddleocr paddlepaddle   # CJK 最佳,操作員指名的那一系\n        或 pip install pytesseract 並裝 Tesseract-OCR 本體(含 chi_tra 語言包)\n        或 pip install easyocr\n[首頁擷取] 夾律=顯式輸入=零指定位置(Windows I/O/拖曳/--in);取件 2 份 · synthetic_financial_report.pdf=1 件 · Veritas_VOFIE_Reconstructed.docx=1 件\nwarning: The `fitz` API is deprecated and will be removed in future. Use `import pymupdf` instead.\n  [DUAL_ZONES] synthetic_financial_report.pdf · 1,133 字\n  [DOCX_ZIP_FALLBACK(無 python-docx;直讀 word/document.xml)] Veritas_VOFIE_Reconstructed.docx · 991 字\n[邏輯庫] 命中 0 · 部分命中 0 · 新記 2 · 壞後端 無 · /home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/vrn/extraction_logic/LOGIC_latest.json\n[入庫] OK · /home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/output_hub/mega/vdf_tw_market.duckdb · vrn_extraction_logic 2 列 · via_policy_factors 598 列 · hash 3c844ab6a9f5\n[計] 2 件 · 雙法 1 · 分區 0 · fitz 0 · pypdf 0 · 候OCR 0 · 稀薄 0 · docx 1 · 影像 0 · 總覽 /home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/first_page_text/FIRSTPAGE_SUMMARY.html\n",
+      "stderr": ""
+    },
+    "eng073": {
+      "argv": [
+        "/home/ubuntu/work/quantguard_venv/bin/python",
+        "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/VRN_ENG073_ReportStructuredDB_v0127.py",
+        "run",
+        "--dir",
+        "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/vrn/nlp_pipeline/B529-20260916T105325-68faf473/sidecars",
+        "--db",
+        "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/db/vrn_reports.duckdb"
+      ],
+      "returncode": 0,
+      "stdout": "  [代號驗證冊] 1993 檔 ← MDL142 CGC_MDL142_TWNameBook_v0101.py\n  [MISSING_SOURCE]  ?  TP=None P=None 庫P=None() 升幅 報告=None 算=None 庫算=None\n  [MISSING_SOURCE]  ?  TP=None P=None 庫P=None() 升幅 報告=None 算=None 庫算=None\n[檔名層] 綁 VIA_VRN_FirstPageEngine_v0124.py filename_facts · 名冊 1979 檔(冊在 1979 檔)\n[入庫計] 檔 2 · 入 2 · 略過 0 · basic +2(庫 2)· metrics +0(庫 0)· 官方名冊命中=在庫\n  [SSOT 正規化] 券商正典鍵 0/2 · 評等正典鍵 0/2(原始評等字串 0 筆=抽取階段就沒有,非正規化問題)· 分析師 +0(庫 0)· 金融機構 SSOT 在位\n  [NLP 掛載] 路徑=HUB · 橋=SUP_MDL744_NLPApplicationHub_v0102.py → VIA_NLP_Application_System_v1.8.0(VERIFIED) · 研報服務 6/6\n  [報告型別] 未分類 2\n  [SSOT 診斷] 券商正典鍵零命中——逐項取樣(非猜測,實跑同一支函式):\n    · Veritas_VOFIE_Reconstructed                token=(抽不到券商 token) → key=(空) src=(空)\n    · synthetic_financial_report                 token=(抽不到券商 token) → key=(空) src=(空)\n    · 疊加層/正典模組:/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/supportive modules/ssot/VIA_FinancialInstitution_Overlay_v0101.py\n    · 疊加層計數 stats()={'deny_keys': 20, 'broker_alias_add': 23, 'broker_add': 5, 'rating_alias_add': 102, 'filename_keys': 16, 'canon': '在位'}\n    · 疊加層資料檔:/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/supportive modules/ssot/VIA_FinancialInstitution_Overlay_v0100.json · 存在=True\n    · resolve_broker_filename 可呼叫=True · resolve_broker 可呼叫=True\n",
+      "stderr": ""
+    },
+    "vdf087": {
+      "argv": [
+        "/home/ubuntu/work/quantguard_venv/bin/python",
+        "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/engine/VDF_ENG087_MarketListGovernance_v0101.py"
+      ],
+      "returncode": 2,
+      "stdout": "[VDF_ENG087] RED · 股票 RED · 主動ETF GREEN · 熱門族群 GREEN\n  結果: /home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/vdf/central_lists/MARKET_LISTS_latest.json\n  [tw_stock_universe] 價格資料最早日 2024-01-02 晚於要求起始日 2023-01-01；需補齊 2023 起資料\n  [active_tw_etf] A 碼 registry 與持股資料表在位；逐日缺口交由 ENG078 coverage 驗證\n  [hot_story_groups] 跨族群重複允許；跨族群成交值彙總必須以 (date,ticker) 去重\n",
+      "stderr": ""
+    }
+  },
+  "nlp": {
+    "hub": {
+      "module": "SUP_MDL744",
+      "hub": "NLPApplicationHub",
+      "version": "v0101",
+      "mount": {
+        "state": "VERIFIED",
+        "dir": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/VIA_NLP_Application_System_v1.8.0",
+        "dir_name": "VIA_NLP_Application_System_v1.8.0",
+        "version": "1.8.0",
+        "requested": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/VIA_NLP_Application_System_v1.8.0",
+        "mounted_from": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/references/intake/VIA_NLP_Application_System_v1.8.0/src",
+        "preoccupied_by": null,
+        "why": ""
+      },
+      "modules": 41,
+      "loadable": 39,
+      "roles_why": "尚未呼叫",
+      "report_services": [
+        "content_roles",
+        "context_reconstruction",
+        "function_classifier",
+        "layout_analysis",
+        "summarization",
+        "table_ops"
+      ],
+      "report_services_missing": [],
+      "candidates": [
+        "VIA_NLP_OneEngine_v1.1.0",
+        "VIA_NLP_OneEngine_b283/VIA_NLP_OneEngine_v1.1.0",
+        "VIA_NLP_OneEngine_b283/VIA_NLP_OneEngine_v1.5.0",
+        "VIA_NLP_OneEngine_b283/VIA_NLP_OneEngine_v1.6.1",
+        "VIA_NLP_Application_System_v1.8.0"
+      ],
+      "state": "VERIFIED",
+      "path": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/supportive modules/70_VRN_Rules/SUP_MDL744_NLPApplicationHub_v0102.py",
+      "sha256": "8f6dfeaeb3e6ec8e5f59c971716e6486fb3d7221059e091eea364e2dd0798a30"
+    },
+    "processed": 2,
+    "summary_ok": 2,
+    "errors": []
+  },
+  "vdf_gate": {
+    "verdict": "RED",
+    "report": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/vdf/central_lists/MARKET_LISTS_latest.json",
+    "blockers": [
+      {
+        "list": "tw_stock_universe",
+        "state": "RED",
+        "why": "價格資料最早日 2024-01-02 晚於要求起始日 2023-01-01；需補齊 2023 起資料"
+      }
+    ]
+  },
+  "database": {
+    "state": "GREEN",
+    "path": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/db/vrn_reports.duckdb",
+    "tables": [
+      "vrn_nlp_text_summary",
+      "vrn_pipeline_runs",
+      "vrn_report_analyst",
+      "vrn_report_basic",
+      "vrn_report_metrics"
+    ],
+    "counts": {
+      "vrn_report_basic": 2,
+      "vrn_report_metrics": 0,
+      "vrn_report_analyst": 0,
+      "vrn_nlp_text_summary": 2,
+      "vrn_pipeline_runs": 4
+    }
+  },
+  "accelerator": "VIA_SuperAccel_AVAILABLE",
+  "tool_mounts": {
+    "celeritas": {
+      "path": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/references/intake/VIA_QuantGuard_v20260916/mounts/VeritasCeleritas.py",
+      "sha256": "efd574c65969be2ffd7cec9858fb0b0a5bc4b94d3ee53b7bb5ebc57af855ff99"
+    },
+    "aegis_nexus": {
+      "path": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VDF/references/intake/VIA_QuantGuard_v20260916/mounts/VeritasAegisNexus.py",
+      "sha256": "25973bfd1e8bf88c5b4a7ab2e316d247e79d3d581d98cf4e15bec5bba24d7d12"
+    },
+    "network_gate": "OFF_BY_DEFAULT",
+    "execution_mode": "OFFLINE_FILE_INPUT"
+  },
+  "network_mode": "OFFLINE_FILE_INPUT",
+  "started_at": "2026-09-16T10:53:25.558358+00:00",
+  "finished_at": "2026-09-16T10:53:29.926519+00:00",
+  "output_dir": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/vrn/nlp_pipeline/B529-20260916T105325-68faf473",
+  "database_path": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional modules/VRN/db/vrn_reports.duckdb",
+  "rows": [
+    {
+      "report_file": "synthetic_financial_report",
+      "sidecar": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/vrn/nlp_pipeline/B529-20260916T105325-68faf473/sidecars/synthetic_financial_report.json",
+      "source_sha256": "b39ceba00ebb827f857e68233da291062e20ddd903a52cd02b1aaa713eb60a85",
+      "raw_char_count": 441,
+      "normalized_sha256": "46d8095fce5bec259c8054ef53702632d93438bf9fbb8ccbd7c7c31d19284618",
+      "normalized_char_count": 441,
+      "text_processor_state": "VERIFIED",
+      "summary": {
+        "state": "OK",
+        "points": [
+          {
+            "text": "Generic Layout Engine Test Annual Research Report 1.",
+            "source_span": {
+              "start": 5,
+              "end": 58
+            },
+            "chunk_id": "SUMMARY-CHUNK-00001",
+            "score": 1.83389506
+          },
+          {
+            "text": "Executive Overview This is the main body paragraph used to establish the body font size.",
+            "source_span": {
+              "start": 58,
+              "end": 147
+            },
+            "chunk_id": "SUMMARY-CHUNK-00001",
+            "score": 2.83914493
+          },
+          {
+            "text": "A second body line confirms paragraph-level classification.",
+            "source_span": {
+              "start": 147,
+              "end": 207
+            },
+            "chunk_id": "SUMMARY-CHUNK-00001",
+            "score": 1.98083306
+          },
+          {
+            "text": "1.1 Key Observation The document contains a table and one figure for layout testing.",
+            "source_span": {
+              "start": 207,
+              "end": 292
+            },
+            "chunk_id": "SUMMARY-CHUNK-00001",
+            "score": 2.07944154
+          },
+          {
+            "text": "Table 1: Quarterly Data Metric Q1 Q2 Q3 Revenue 100 120 150 Profit 20 25 31 Source: Synthetic data Figure 1: Trend Overview Source: Generated locally",
+            "source_span": {
+              "start": 292,
+              "end": 441
+            },
+            "chunk_id": "SUMMARY-CHUNK-00001",
+            "score": 3.61477934
+          }
+        ],
+        "n_chunks": 1,
+        "evidence_spans_valid": true,
+        "key_points": [
+          "Generic Layout Engine Test Annual Research Report 1.",
+          "Executive Overview This is the main body paragraph used to establish the body font size.",
+          "A second body line confirms paragraph-level classification.",
+          "1.1 Key Observation The document contains a table and one figure for layout testing.",
+          "Table 1: Quarterly Data Metric Q1 Q2 Q3 Revenue 100 120 150 Profit 20 25 31 Source: Synthetic data Figure 1: Trend Overview Source: Generated locally"
+        ]
+      },
+      "segment_count": 1,
+      "table_count": 0,
+      "layout_block_count": 1,
+      "role_count": 5,
+      "roles_why": "",
+      "logic": {
+        "method": "DUAL_ZONES",
+        "kind": "pdf_zones",
+        "xcheck": {
+          "bag": 0.962,
+          "seq": 0.964,
+          "state": "AGREE"
+        },
+        "repair": {
+          "zw": 0,
+          "fullwidth": 0,
+          "joins": 0,
+          "spaces": 0
+        },
+        "labels_ok": false,
+        "verdict": "PARTIAL"
+      },
+      "tag": ""
+    },
+    {
+      "report_file": "Veritas_VOFIE_Reconstructed",
+      "sidecar": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/vrn/nlp_pipeline/B529-20260916T105325-68faf473/sidecars/Veritas_VOFIE_Reconstructed.json",
+      "source_sha256": "33f3200703dec2e74ce0257e1871c1251135bb8ef6a8a20d9921d318d9bd5feb",
+      "raw_char_count": 996,
+      "normalized_sha256": "ae5eff4fe57269e2c90d4523edfb0c6d2c23e054e4cc42d938b93acc33b64735",
+      "normalized_char_count": 998,
+      "text_processor_state": "VERIFIED",
+      "summary": {
+        "state": "OK",
+        "points": [
+          {
+            "text": "VOFIE_Sample_Input · 全格式讀取、主題重構與模板生成報告",
+            "source_span": {
+              "start": 75,
+              "end": 114
+            },
+            "chunk_id": "SUMMARY-CHUNK-00001",
+            "score": 1.71614907
+          },
+          {
+            "text": "AI candidates never auto-apply / 來源唯讀;",
+            "source_span": {
+              "start": 357,
+              "end": 396
+            },
+            "chunk_id": "SUMMARY-CHUNK-00001",
+            "score": 1.73125372
+          },
+          {
+            "text": "VOFIE_Sample_Input.md — markdown, 724 bytes, d5e4960d8292a363.",
+            "source_span": {
+              "start": 418,
+              "end": 481
+            },
+            "chunk_id": "SUMMARY-CHUNK-00001",
+            "score": 1.73125372
+          },
+          {
+            "text": "完整來源內容、重複主題、行號與雜湊仍保留在後續章節與 Component Specs JSON。",
+            "source_span": {
+              "start": 507,
+              "end": 556
+            },
+            "chunk_id": "SUMMARY-CHUNK-00001",
+            "score": 1.96051629
+          },
+          {
+            "text": "policy=STRUCTURAL_CANDIDATE_ONLY;",
+            "source_span": {
+              "start": 869,
+              "end": 902
+            },
+            "chunk_id": "SUMMARY-CHUNK-00001",
+            "score": 1.75709434
+          }
+        ],
+        "n_chunks": 1,
+        "evidence_spans_valid": true,
+        "key_points": [
+          "VOFIE_Sample_Input · 全格式讀取、主題重構與模板生成報告",
+          "AI candidates never auto-apply / 來源唯讀;",
+          "VOFIE_Sample_Input.md — markdown, 724 bytes, d5e4960d8292a363.",
+          "完整來源內容、重複主題、行號與雜湊仍保留在後續章節與 Component Specs JSON。",
+          "policy=STRUCTURAL_CANDIDATE_ONLY;"
+        ]
+      },
+      "segment_count": 1,
+      "table_count": 0,
+      "layout_block_count": 1,
+      "role_count": 29,
+      "roles_why": "",
+      "logic": {
+        "method": "DOCX_ZIP_FALLBACK(無 python-docx;直讀 word/document.xml)",
+        "kind": "word",
+        "xcheck": {
+          "state": "SINGLE",
+          "bag": 0.0,
+          "seq": 0.0
+        },
+        "repair": {
+          "zw": 0,
+          "fullwidth": 3,
+          "joins": 2,
+          "spaces": 0
+        },
+        "labels_ok": false,
+        "verdict": "SUCCESS"
+      },
+      "tag": "DOCX_ZIP_FALLBACK(無 python-docx;直讀 word/document.xml)"
+    }
+  ],
+  "policy": "文字與摘要均保留 source hash/evidence span；缺席或失敗不假綠；ENG073 canonical 欄位不被 NLP 覆寫",
+  "report_artifacts": {
+    "html": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/vrn/nlp_pipeline/B529-20260916T105325-68faf473/NLP_VRN_VDF_MATRIX.html",
+    "markdown": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/vrn/nlp_pipeline/B529-20260916T105325-68faf473/NLP_VRN_VDF_RESULT.md",
+    "json": "/home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/vrn/nlp_pipeline/B529-20260916T105325-68faf473/NLP_VRN_VDF_RESULT.json",
+    "pages": [
+      "overview",
+      "test_matrix",
+      "sequential_results"
+    ]
+  }
+}
