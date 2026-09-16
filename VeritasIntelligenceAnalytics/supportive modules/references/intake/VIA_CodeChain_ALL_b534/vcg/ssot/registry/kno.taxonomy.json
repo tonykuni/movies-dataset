@@ -1,0 +1,60 @@
+{
+  "schema": "VIA.SSOT.KNO.TAXONOMY.v1.0",
+  "protocol": "KNO-Unified Protocol v1.0",
+  "domains": ["MACRO", "LABOR", "CB", "TA", "STAT", "ML", "RISK", "OTHER"],
+  "countries": ["US", "CN", "JP", "TW", "EU", "GLOBAL"],
+  "stateless_domains": ["TA", "STAT", "ML"],
+  "sources": {
+    "official": ["BLS", "BEA", "NBS", "NSO", "CB", "MOF", "FED", "ATLANTA", "TWSE", "TPEX"],
+    "semiofficial": ["ISM", "SPGLOBAL", "OECD", "IMF", "MARKIT"],
+    "private": ["ADP", "UOM", "CONF"],
+    "bank": ["GS", "MS", "JPM", "BOA"],
+    "internal": ["VIA"]
+  },
+  "freqs": ["M", "Q", "W", "D", "T", "A"],
+  "versions": {
+    "V1": "RAW",
+    "V2": "CLEANED",
+    "V3": "SEASONAL_ADJUSTED",
+    "V4": "FORECAST",
+    "V5": "ENHANCED"
+  },
+  "categories": {
+    "MACRO": ["PMI", "CPI", "INFLATION", "GDP", "UNEMP", "SENTIMENT", "HOUSING", "TRADE", "INDUSTRIAL"],
+    "LABOR": ["NFP", "ADP"],
+    "CB": ["RATES", "BALANCE", "POLICY"],
+    "TA": ["TREND", "MOMENTUM", "VOLATILITY", "PATTERN"],
+    "STAT": ["TEST", "REG", "TS"],
+    "ML": ["MODEL", "FEATURE", "LOSS"],
+    "RISK": ["VAR", "ES", "STRESS"],
+    "OTHER": ["MISC"]
+  },
+  "types": {
+    "PMI": ["HEAD", "NEWORD", "PROD", "EMP", "SUPDEL", "INV", "PRICE", "BACKLOG", "EXPORT", "IMPORT", "BIZACT"],
+    "CPI": ["CPI", "CORE_CPI", "FOOD", "ENERGY", "HOUSING"],
+    "INFLATION": ["CPI", "CORE_CPI", "PCE", "CORE_PCE"],
+    "GDP": ["GDP_YOY", "GDP_QOQ", "GDP_NOM"],
+    "UNEMP": ["RATE", "CLAIMS"],
+    "NFP": ["HEAD", "WAGE", "PARTIC"],
+    "ADP": ["HEAD"],
+    "RATES": ["POLICY", "EFFR", "YIELD"],
+    "TREND": ["SMA", "EMA", "MACD"],
+    "MOMENTUM": ["RSI", "STOCH"],
+    "VOLATILITY": ["ATR", "BBANDS"],
+    "PATTERN": ["ENGULF", "DOJI"],
+    "TEST": ["TTEST", "ANOVA"],
+    "REG": ["OLS", "LOGIT"],
+    "TS": ["ARIMA", "VAR", "GARCH"],
+    "MODEL": ["XGBOOST", "RF", "CNN", "RNN"],
+    "FEATURE": ["PCA", "TSNE"],
+    "LOSS": ["MSE", "MAE"],
+    "VAR": ["HIST", "PARAM", "MC"],
+    "ES": ["HIST", "PARAM"],
+    "STRESS": ["HIST", "HYPO"]
+  },
+  "index_markets": ["EQ", "FI", "FX", "CMDTY", "CRYPTO"],
+  "index_families": ["BENCHMARK", "SECTOR", "FACTOR", "VOL", "BOND"],
+  "product_assets": ["EQ", "ETF", "FUT", "OPT", "CMDTY", "FX", "BOND"],
+  "product_families": ["ENERGY", "METAL", "AGRI", "EQUITY", "RATES", "CREDIT"],
+  "link_roles": ["MEASURES", "COMPUTES", "PRICES", "HEDGES", "FEEDS"]
+}

@@ -823,6 +823,55 @@ via-vcgc page --publish
 
 ---
 
+## 一-z · 批534 · 接手 B533(另一 AI 的四份交接檔)+ 令「TAKE OVER TEST DEBUG OPTIMIZE TEST DEBUG CONSOLIDATE TEST DEBUG USER」+ 上傳 VIA_CodeChain_ALL_1.zip「導入」
+
+**先對帳(L25 多 AI 交會律)**:`git fetch` → 遠端比本地多 **19 個 commit**(B526→B533,作者 Manus AI),ff-only 併入。他就地改寫了 `Register-VIA-Commands-v0208.ps1`(同名不同容),我批522 的 via-fplogic/via-daytrade 仍在=他有併不是覆蓋;往前出 **v0209**,不回頭改他的檔(LL53)。
+
+**他宣稱 → 我在本境逐項重跑 → 真實結果**
+
+| B533 宣稱 | 我的容器實測 | 判讀 |
+|---|---|---|
+| CGC157 唯一接觸口 18/18 GREEN | **18/18 GREEN**(但只認位置動詞 `selftest`;`--selftest` rc=2) | 真;動詞契約與全樹不一致 |
+| CGC156 加速器控制面 23/23、roster 25 | **23/23 GREEN** | 真 |
+| VRN_ENG087 NLP 橋 11/11 | **11/11**(同樣只認位置動詞) | 真 |
+| VDF_ENG073 資料架構 9/9 · VDF_ENG087 市場清單 10/10 | **9/9 · 10/10**(`--selftest` 可) | 真 |
+| VDF_ENG086 QuantGuard 8/8 | **rc=1 Traceback:`ModuleNotFoundError: No module named 'polars'`** | **他境的綠**;裝了 polars 1.44.2 後才 8/8(LL50) |
+| 中央 dispatch 全路由 GREEN | **RED**(quantguard 那條 traceback) | 至少沒假綠;但缺件被判成 RED=假紅 |
+
+**拆到四條根因(都在中央控制面,不在子系統)**
+
+| 根因 | 症狀 | 修 |
+|---|---|---|
+| ① 派送不分家族境:`subprocess.run([sys.executable, ...])` | 中央用哪個 python 起、子系統就被迫用哪個境 → 工作站上 VRN 路由跑在非 vrn 境 → 缺件 → **母機三紅** | **CGC157 v0101**:每條路由走匯流排 `python_for(family)`(退路 `VIA_PY_<FAM>`),子行程環境走 `child_env`(PYTHONHOME 清洗)→ **律 L51** |
+| ② 判讀只有 GREEN/RED | 本境缺 polars = RED(假紅);判錯的紅燈和假綠一樣傷 | v0101 **誠實四態**:ABSENT(缺件)/NODATA(缺料)/TIMEOUT/RED,總裁決 GREEN/YELLOW/RED → **律 L52** |
+| ③ 版號釘死 | 命令冊釘 `v0208`、QuantGuard 釘 `v0100`:照尾版律出新版,中央永遠跑舊的還說 GREEN | v0101 全改 **newest-glob** → **律 L54** |
+| ④ 動詞契約分歧 | 新引擎只認位置 `selftest`,全樹格子站/匯流排/Deck 用 `--selftest` | 五支引擎(CGC156/157、CGC155、VRN087、SUP_MDL866、VDF086)加**旗標=位置動詞等價轉換** → **律 L53** |
+
+**另修**:`VDF_ENG086 v0101` 把 `import polars` 從模組頂搬進探針——缺 polars 印 ABSENT + pip 令(你的手,不代裝)、rc=3;新增 `probe` 動詞列 polars/numpy/duckdb/收容件在不在(LL51)。TA-Lib 三支橋在 B526 被直接刪除、沒進退役夾也沒冊 → 補退役冊 `docs/VIA_Retired_TALib_B534.json`(L50 禁復活,故不還原程式,只記可自 commit `fd51913f` 稽核取回;LL54)。
+
+**再測(修完)**:CGC157 **21/21**(18+新三檢)· CGC156 23/23 · VRN087 11/11 · VDF086 8/8 · VDF087 10/10 · VDF073 9/9 · CGC155 rc0 · SUP_MDL866 rc0;`dispatch --family all` **GREEN 4/4**,且逐路由印出家族境 python 與實際版號(全部尾版:VRN087 v0101 / VDF086 v0101 / VDF087 v0101)。
+
+**整併(CONSOLIDATE)**:B526–B533 的八支新引擎**一支都沒進格子站/Deck/Manager**(只進了 InputConsole 冊)→ 補齊:**Grid v0315**(+7 站,全部 `--selftest`;CGC154 是資料驗收閘不是自測站,不進格子避免假紅)· **Deck v0151**(+unique_entry/accel_control/quantguard/nlp_unified/func_acceptance;釘 77→**80**)· **Manager v0137**(5 正式名稱 + 5 引擎名;總控頁再生 80 項;契約測試 **19 passed**)· **Register v0209**(`via-central dispatch` 一令跑完三家族;控制面身分不再釘死 v0100)。
+
+**收容**:`VIA_CodeChain_ALL_1.zip`(md5 f39ffbdd…)→ `supportive modules/references/intake/VIA_CodeChain_ALL_b534/` 39 檔逐檔 md5 冊;對倉內既有 `registry/vcg`:**8 檔不同、31 檔倉內沒有**(多 kno.lexicon/codechain/index/product/governance registry、versions/、kno_classifier 訓練集、ledger、兩份 SPEC、AutoCodeGenerator 與倉內 v0100 md5 不同)。**本批只收不接線**(正本零觸碰);要接哪一塊等你說。
+
+### 一貼即用(批534)
+
+```powershell
+Set-Location 'C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics'
+git status --short | Select-Object -First 10; git stash push -m "b534 工作站樹快照"; git pull --ff-only origin claude/via-envmanager-governance-7cls8h; git stash list; git log --oneline -1   # 四行貼回
+. (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName   # v0209
+via-quantguard probe                                       # polars/numpy/duckdb 在不在(缺=ABSENT 印裝法,不代裝)
+& "C:\Users\tonyk\envs\via_vdf_312\Scripts\python.exe" -m pip install "polars>=1.21,<2"   # 你的手(QuantGuard 唯一活動技術指標路徑靠它;容器證 1.44.2 → 8/8)
+via-unique-check                                           # CGC157 v0101 閘:應 GREEN 21/21
+via-central dispatch                                       # 批534 新令:三家族一次跑完(家族境 python·誠實四態)→ 貼回最後那幾行
+via-central vrn -SelfTest ; via-central vdf -SelfTest ; via-central quantguard -SelfTest
+via-ryg vrn                                                # 批522 三紅是否消(㉙ 要先裝 opencc;㉜/㊷ 要先 via-rebuild --env via_paddle_311)
+via-vcgc page --publish
+```
+
+---
+
 ## 二 · 操作員機器實況(他貼的 EnvManager v0300 AUDIT,run ENV-20260914_112000;直接當量測)
 
 | 事實 | 影響 |

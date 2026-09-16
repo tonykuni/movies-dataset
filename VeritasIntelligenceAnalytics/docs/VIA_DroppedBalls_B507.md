@@ -64,4 +64,8 @@
 | Z47 | OCR 車道 via_paddle_311 境壞:python 不在(FileNotFoundError)/pyvenv.cfg 缺(rc=106)→ ENG072 v0129 預檢 SKIP 誠實(L47);重建=你的手 `via-rebuild --env via_paddle_311` → `via-vrnlogic reset-backends` | 候 | 操作員 | via-ryg vrn ㉜/㊷ |
 | Z48 | vrn 境無 opencc → OCR 道簡→繁直通(㉙);裝=你的手 `<vrn python> -m pip install opencc-python-reimplemented`;裝前 tag 標 [未繁化:樞紐無 opencc] | 候 | 操作員 | via-ryg vrn ㉙ |
 | Z49 | 第一頁邏輯收容件的 Layout 字級階層/公司名 與 TableGeometry 隱藏格線表格重建要 chars 幾何;ENG072 sidecar 無 chars → 未接線(候);財務容差帶候接 ENG074/ENG080 | 候 | AI | 下一批看 ENG072 能否留 chars 幾何 sidecar |
+| Z50 | QuantGuard 唯一活動技術指標路徑(L50)靠 polars:工作站 via_vdf_312 要裝 `pip install "polars>=1.21,<2"`(容器已證 1.44.2 → 8/8);沒裝=ABSENT 誠實不報紅(ENG086 v0101) | 候 | 操作員 | via-quantguard probe 貼回 |
+| Z51 | Windows `C:\測試樣本報告` 60 份 PDF + 4 份 DOCX 未掛載到任何 AI 境;B526–B533 的 NLP/VRN 實測都只跑倉內夾具,不等於真檔已解析 | 候 | 操作員 | `NLP統一 -Pipeline -In 'C:\測試樣本報告'` 貼回 |
+| Z52 | VDF 價格資料最早 2024-01-02,未達要求的 2023-01-01;補庫按你的指示停止中 → CGC154 功能驗收與 VDF 覆蓋閘會誠實非綠,不是引擎壞 | 候(你喊停) | 操作員 | 要恢復補庫再說 |
+| Z53 | TA-Lib 橋 ENG083 v0100–v0103 於 commit fd51913f 被直接刪除(未進退役夾、無退役冊);L50 禁復活故不還原程式,已在退役冊補記可自 git 歷史取回 | 已記 | AI | docs/VIA_Retired_TALib_B534.json |
 | ~~W~~ | ~~8 件 FAIL_HIT 首頁件重抽~~ | 已結(批503) | — | 64/64 |

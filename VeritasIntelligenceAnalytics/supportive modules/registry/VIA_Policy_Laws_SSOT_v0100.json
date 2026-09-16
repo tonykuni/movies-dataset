@@ -1,7 +1,7 @@
 {
  "schema": "VIA.PolicyLaws.SSOT.v1",
- "batch": "批522",
- "ts": "2026-09-15 15:31",
+ "batch": "批534",
+ "ts": "2026-09-16 16:22",
  "purpose": "政策庫正本:操作員律 + 紀律 + lessons-learned(只增不減;ENG082 sync-db 攤平入 via_policy_factors;VCGC 唯一對接口讀此冊)",
  "laws": [
   {
@@ -305,13 +305,37 @@
    "zh": "車道境預檢律:OCR 車道派送前先預檢車道 python:檔在、venv 佈局(Scripts)要有 pyvenv.cfg、cfg 的 home 基底解譯器在;壞=逐支 name@境 記 BROKEN 並 SKIP(境壞;重建 via-rebuild --env;重建後 via-vrnlogic reset-backends),不當 OCR_RUN_FAIL(那是 OCR 壞的訊號)。子行程 FileNotFoundError/rc=106 同判。"
   },
   {
-    "id": "L50",
-    "batch": "B531",
-    "cat": "指標",
-    "zh": "QuantGuard-only 活動路徑覆蓋律：QuantGuard 是 VIA/VDF/VAP/VRN 唯一活動技術分析與因子路徑；TA-Lib/talib 永久禁止安裝、import、載入、復活、路由與活動基準測試。歷史 L41/L42、退休件與收容件只保留 append-only 稽核，不得接回活動調度。",
-    "policy_ref": "supportive modules/registry/VIA_QuantGuard_TA_Lib_Policy_v0100.json",
-    "enforcement": "CGC_MDL156_VIAAcceleratorControl_v0100 + VDF_ENG086_QuantGuardOneBridge_v0100",
-    "status": "ACTIVE"
+   "id": "L50",
+   "batch": "B531",
+   "cat": "指標",
+   "zh": "QuantGuard-only 活動路徑覆蓋律：QuantGuard 是 VIA/VDF/VAP/VRN 唯一活動技術分析與因子路徑；TA-Lib/talib 永久禁止安裝、import、載入、復活、路由與活動基準測試。歷史 L41/L42、退休件與收容件只保留 append-only 稽核，不得接回活動調度。",
+   "policy_ref": "supportive modules/registry/VIA_QuantGuard_TA_Lib_Policy_v0100.json",
+   "enforcement": "CGC_MDL156_VIAAcceleratorControl_v0100 + VDF_ENG086_QuantGuardOneBridge_v0100",
+   "status": "ACTIVE"
+  },
+  {
+   "id": "L51",
+   "batch": "批534",
+   "cat": "中央派送",
+   "zh": "中央派送家族境律:唯一接觸口(CGC_MDL157)派子路由一律以**家族境 python** 執行(正主=匯流排 CGC_MDL148 python_for;退路 VIA_PY_<FAM>),子行程環境走匯流排 child_env(PYTHONHOME 清洗 L32)。不得一律 sys.executable——中央用哪個 python 起、子系統就被迫用哪個境,是「母機三紅」最常見的根因。"
+  },
+  {
+   "id": "L52",
+   "batch": "批534",
+   "cat": "中央派送",
+   "zh": "中央派送誠實四態律:子路由 rc=3 或輸出帶 ModuleNotFoundError/[ABSENT] = **ABSENT(本境缺件,不是壞)**;rc=2 或 [NODATA]/[NEED_INPUT] = NODATA(資料側);逾時 = TIMEOUT;其餘非 0 才是 RED。總裁決 GREEN(全綠)/YELLOW(只有缺件或缺料)/RED(有真紅或逾時)。判錯的紅燈和假綠一樣傷。"
+  },
+  {
+   "id": "L53",
+   "batch": "批534",
+   "cat": "對接契約",
+   "zh": "自測動詞統一律:全樹以 `--selftest` 呼叫自測(格子站/匯流排/Deck/總控頁契約);新引擎若採位置動詞,必須在 main 前做旗標→位置動詞等價轉換(只增不減,不改既有呼叫方)。同理 `--status/--manifest/--routes`。"
+  },
+  {
+   "id": "L54",
+   "batch": "批534",
+   "cat": "尾版律",
+   "zh": "中央路由尾版律:控制面與命令冊一律 newest-glob(`Register-VIA-Commands-v*.ps1`、`VDF_ENG086_QuantGuardOneBridge_v*.py`…),不得在程式內釘死版號;釘死=照尾版律出的新版永遠不被中央呼叫(假閘/假派送)。"
   }
  ],
  "lessons": [
@@ -571,6 +595,31 @@
    "id": "LL49",
    "batch": "批522",
    "zh": "容器跑 Grid 全站自測(CGC_MDL064 --selftest 無 --fast)會讓各站把冊/頁在沙盒空庫上再生:6 本 registry JSON + 22 張 ui_support 頁全被改。commit 前 git status 逐檔對:不是這批的手改就 git checkout 還原(只留 Manager 再生的總控頁與 VCGC 三面);要驗新站只跑該站 --selftest。"
+  },
+  {
+   "id": "LL50",
+   "batch": "批534",
+   "zh": "接手另一 AI 的 GREEN,第一件事是在本境逐項重跑,不是讀報告就信:B533 宣稱 QuantGuard 8/8,本境 polars 缺 → Traceback rc=1。他的 GREEN 是他境的 GREEN;交接報告要連『在哪個境量的』一起讀。"
+  },
+  {
+   "id": "LL51",
+   "batch": "批534",
+   "zh": "模組頂 `import polars` 讓『本境沒裝』變成 Traceback,中央派送判 RED=假紅。硬相依一律探針式延後載入:缺=ABSENT 誠實 + 印 pip 令(你的手),rc 用 3 與 FAIL(1)/NODATA(2) 分開。"
+  },
+  {
+   "id": "LL52",
+   "batch": "批534",
+   "zh": "中央路由把引擎版號釘死(VDF_ENG086_v0100.py)、把命令冊釘死(Register-VIA-Commands-v0208.ps1):照尾版律出了 v0101/v0209,中央還在跑舊的,且自己還說 GREEN。中央的每一條路徑都要 newest-glob。"
+  },
+  {
+   "id": "LL53",
+   "batch": "批534",
+   "zh": "多 AI 交會實況:B533 就地改寫了 v0208 命令冊(同名不同容),我的批522 短令仍在=他有併不是覆蓋。交會後第一步 git fetch + 逐檔比對;往前出新版號(v0209),不回頭改他的檔,不追究。"
+  },
+  {
+   "id": "LL54",
+   "batch": "批534",
+   "zh": "TA-Lib 三支引擎(ENG083 橋 v0100–v0103)在 B526 被直接 delete,沒進退役夾也沒退役冊。L50 禁『復活』,所以不還原程式;但只增不減要有帳:退役冊補記『刪於 commit fd51913f,可自 git 歷史取回,禁掛活動路由』。"
   }
  ]
 }
