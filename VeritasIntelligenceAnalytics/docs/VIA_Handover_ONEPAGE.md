@@ -1,6 +1,6 @@
 # VIA 一頁交接 · Veritas Central Governance Console(VCGC v0111 · 批535)
 
-> 產生 2026-09-16 18:49:30 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
+> 產生 2026-09-16 18:56:22 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
 
 ## 〇 · 接手提示詞(給下一個 AI;來源 VIA_AI_Handover_Prompt_v0100.md)
 
@@ -215,14 +215,14 @@
 
 ## 二 · 安裝核可(L19)與環境工具
 
-- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 191.5 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
+- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 191.6 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
 - 工具冊導入計畫:ABSENT · - · 件態 - · 風險 - · 段 - · 未路由 - · 白名單留置 -(TOOLS_PLAN_latest.json 不在(via-envtools))
 - 環境復原(L24):PLAN · 2026-09-15 05:30:50 · 還原 原本規劃(Baseline;無 LKGC 或 --baseline) · 段 16 · 單獨隔離境 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 借境封鎖 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 次序 RESTORE → CORE → LOW → MEDIUM → HIGH → EXTERNAL → VERIFY;安裝出問題=`via-envrecover`(①還原前次 ②順序裝 ③_M/_H 單獨隔離;-Execute -Approve 才跑,① 不受 L19,② 過 L19)
 - 裝件=操作員的手:`$env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve`(閘不代設;L19 未綠=BLOCKED_UNITEST)
 
 ## 三 · 邏輯庫 · 因子庫 · 資料庫
 
-- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 668 列 · 全庫同步 {'hash': '4b351de12d3a', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '16e16fe2ab32', 'root': '同', 'home': '缺'}
+- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 668 列 · 全庫同步 {'hash': '4b351de12d3a', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': 'f781b8d39111', 'root': '同', 'home': '缺'}
 - 因子庫 OK:130 列 · {'SUP_MDL748:allinone 2.1.0': 77, 'SUP_MDL748:financial_data_standardization': 53} · 掛載 {'allinone': 'OK VIA_VRNLogic_AllInOne_v0201.py 2.1.0', 'fds': 'OK financial_data_standardization.py · 28 欄 · 合併損傷件(__main__ 示範缺 5 法,程式庫面可用)'}
 - 庫表冊 OK:54 表(批505)· 全庫表 4 · 庫 ['ActiveTWETF.duckdb', 'vdf_global_market.duckdb', 'vdf_tw_market.duckdb']
 - 資料家 ABSENT:VIA_Reports/datahome/DATAHOME_CATALOG_latest.json 不在(via-datahome catalog) · 庫 - · 表 - · 湖 -
@@ -231,7 +231,7 @@
 
 - 五矩陣 OK:2026-09-14T11:21:39 · profile run · 真跑 ['vdf'] · 項 43 · 態 {'GATED': 12, 'NODATA': 5, 'PLAN': 18, 'ABSENT': 2, 'GREEN': 6}
 - VTMRA 家族測試閘(批516;台股月營收分析七成員):RED · 2026-09-15T10:08:56 · 成員 {'eng063': 'OK', 'eng075': 'OK', 'eng069': 'FAIL', 'eng076': 'OK', 'twrev': 'OK', 'revphase': 'OK', 'talib': 'ABSENT'} · 成員自測非 OK:eng069(FAIL); TA-Lib 未裝(不是壞;裝=你的手 via-talib 印令)
-- Deck 任務 81 · 規格項 59 · 格子站 233(在位 233)· Register 指令 133 · Manager 正式名稱 任務 83 / 引擎 95
+- Deck 任務 81 · 規格項 62 · 格子站 233(在位 233)· Register 指令 133 · Manager 正式名稱 任務 83 / 引擎 95
 
 ## 五 · 指令與參數(不丟失;來源 Register-VIA-Commands-v0210.ps1)
 
@@ -371,13 +371,13 @@
 
 ## 六 · 註冊稽核(所有引擎/模組/功能/工具/環境)
 
-- 中央自動編號冊 OK · ACTIVE 5076/5076 · **缺 0** · 類別 {'class': 91, 'engine': 81, 'environment': 43, 'function': 4224, 'feature': 91, 'module': 150, 'package': 252, 'system': 10, 'tool': 134}
+- 中央自動編號冊 OK · ACTIVE 5079/5079 · **缺 0** · 類別 {'class': 91, 'engine': 81, 'environment': 43, 'function': 4224, 'feature': 94, 'module': 150, 'package': 252, 'system': 10, 'tool': 134}
 - 尾版引擎/模組家族 240 · 中央冊已登 240 · **未登 0** · 操作介面有掛載 198 · 內部件無操作介面 42(誠實分列，不拿編號片段假命中)
 
 ## 七 · 自動編號註冊表(台帳)
 
 - 全域台帳 1061 筆 · 元件 149 · 更新 2026-09-16T10:08:00Z
-- 元件冊 OK · ACTIVE 5076 · RETIRED 115 · 更新 2026-09-16T18:39:48 · {'class': 91, 'engine': 81, 'environment': 43, 'function': 4224, 'feature': 91, 'module': 150, 'package': 252, 'system': 10, 'tool': 134}
+- 元件冊 OK · ACTIVE 5079 · RETIRED 115 · 更新 2026-09-16T18:55:58 · {'class': 91, 'engine': 81, 'environment': 43, 'function': 4224, 'feature': 94, 'module': 150, 'package': 252, 'system': 10, 'tool': 134}
 - 類別 current:系統 1 · 支援性工具 2 · 功能性工具 1 · 模組 1 · 引擎 19 · 函數庫 1 · 打包產品 8
 
 - 2026-09-15 13:45 批520a ENG085 v0101(持股表缺先誠實 NODATA;錯誤行取有意義那行)+ ENG083 v0102(stderr JSON 判讀;「輸入資料為空」=NODATA 
