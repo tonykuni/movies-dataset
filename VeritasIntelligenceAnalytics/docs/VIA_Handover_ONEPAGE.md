@@ -1,6 +1,6 @@
-# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0111 · 批534)
+# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0111 · 批535)
 
-> 產生 2026-09-16 16:23:56 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
+> 產生 2026-09-16 18:49:30 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
 
 ## 〇 · 接手提示詞(給下一個 AI;來源 VIA_AI_Handover_Prompt_v0100.md)
 
@@ -148,6 +148,8 @@
 - **L52**(批534;中央派送)中央派送誠實四態律:子路由 rc=3 或輸出帶 ModuleNotFoundError/[ABSENT] = **ABSENT(本境缺件,不是壞)**;rc=2 或 [NODATA]/[NEED_INPUT] = NODATA(資料側);逾時 = TIMEOUT;其餘非 0 才是 RED。總裁決 GREEN(全綠)/YELLOW(只有缺件或缺料)/RED(有真紅或逾時)。判錯的紅燈和假綠一樣傷。
 - **L53**(批534;對接契約)自測動詞統一律:全樹以 `--selftest` 呼叫自測(格子站/匯流排/Deck/總控頁契約);新引擎若採位置動詞,必須在 main 前做旗標→位置動詞等價轉換(只增不減,不改既有呼叫方)。同理 `--status/--manifest/--routes`。
 - **L54**(批534;尾版律)中央路由尾版律:控制面與命令冊一律 newest-glob(`Register-VIA-Commands-v*.ps1`、`VDF_ENG086_QuantGuardOneBridge_v*.py`…),不得在程式內釘死版號;釘死=照尾版律出的新版永遠不被中央呼叫(假閘/假派送)。
+- **L55**(批535;全景稽核)全景稽核活樹律:稽核與亮燈只算**活樹**(同 stem 只取尾版;凍結副本 _sha…/(1)/copy/備份不算;收容件、退役夾、__pycache__、VIA_Reports、vcg 一律不掃不修)。對舊版本檔報紅=假紅,和假綠一樣傷。全樹件數仍記在報告裡(誠實)。
+- **L56**(批535;全景稽核)自動修三態律:① 純增量、零行為變更、可冪等(加速器橋、網路工具橋、自測動詞等價轉換)=**可同時修**(以檔為單位平行,一檔一工人,互不交疊)② 會動到 main/parse_args 等入口=**順序修** ③ 會改行為或需判斷(硬相依搬家、釘死版號改 glob、裸 sys.executable 改家族境)=**只報位置不自動改**,附建議修法等操作員令。每次修改前後都 ast.parse,失敗即整檔回滾。
 
 **Lessons-learned**
 
@@ -205,17 +207,22 @@
 - LL52(批534)中央路由把引擎版號釘死(VDF_ENG086_v0100.py)、把命令冊釘死(Register-VIA-Commands-v0208.ps1):照尾版律出了 v0101/v0209,中央還在跑舊的,且自己還說 GREEN。中央的每一條路徑都要 newest-glob。
 - LL53(批534)多 AI 交會實況:B533 就地改寫了 v0208 命令冊(同名不同容),我的批522 短令仍在=他有併不是覆蓋。交會後第一步 git fetch + 逐檔比對;往前出新版號(v0209),不回頭改他的檔,不追究。
 - LL54(批534)TA-Lib 三支引擎(ENG083 橋 v0100–v0103)在 B526 被直接 delete,沒進退役夾也沒退役冊。L50 禁『復活』,所以不還原程式;但只增不減要有帳:退役冊補記『刪於 commit fd51913f,可自 git 歷史取回,禁掛活動路由』。
+- LL55(批535)第一版全景掃描報 1426 問題,其中八成落在舊版本檔(v0101…v0136)與 _sha 凍結副本——那些不是活樹。加活樹過濾後剩 397 項,才是真正要處理的。稽核器自己也會製造假紅:掃描範圍先定義對,再談判準。
+- LL56(批535)釘死版號與 sys.executable 這兩類,直接用字面比對會把「報告文字/說明字串」和「自跑自己」也算進去。要看**用途**:字串是否真的拿去開檔/執行/組路徑;子行程是否真的派到別支引擎。判準要看語境,不是看字面。
+- LL57(批535)自動修要敢改也要敢不改:8 個 VERB 目標的 main/parse_args 形狀不合我的樣板,寧可誠實 skip「不猜改」,也不要硬套模板改壞別人的 CLI。修不動的列進報告等令,比修壞了再回滾便宜。
+- LL58(批535)f-string 內巢狀引號/括號在 Python 3.11 會直接 SyntaxError(3.12 才放寬):我自己的報告渲染器踩一次(`{{}}` 被當集合 → unhashable),全樹掃描又在別人的 bundle 檔抓到同型一次(f-string 裡 `replace("'", "''")` 的雙引號提前收掉字串)。修法一律相同:先把值算進變數,再帶進 f-string。寫 f-string 前先問:裡面有沒有引號或大括號。
+- LL59(批535)**報告夾名也是九頭龍的頭**:我把新稽核器的產物寫進 VIA_Reports/panorama,而那是 CGC_MDL135/CGC_MDL149 L19 安裝核可閘在讀的檔名;schema 不同 → 那道閘把每一種情境都判 BLOCKED_PANORAMA,VCGC 自測 ⑨ 由 19/19 掉成 18/19。新引擎開產物夾前先 grep 全樹有沒有人在讀同一個路徑;讓名字比改別人便宜。已改 VIA_Reports/panorama_audit/PANORAMA_AUDIT_latest.*,並在自測 ⑬a 釘死不准回頭碰。
 
 ## 二 · 安裝核可(L19)與環境工具
 
-- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 189.1 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
+- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 191.5 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
 - 工具冊導入計畫:ABSENT · - · 件態 - · 風險 - · 段 - · 未路由 - · 白名單留置 -(TOOLS_PLAN_latest.json 不在(via-envtools))
 - 環境復原(L24):PLAN · 2026-09-15 05:30:50 · 還原 原本規劃(Baseline;無 LKGC 或 --baseline) · 段 16 · 單獨隔離境 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 借境封鎖 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 次序 RESTORE → CORE → LOW → MEDIUM → HIGH → EXTERNAL → VERIFY;安裝出問題=`via-envrecover`(①還原前次 ②順序裝 ③_M/_H 單獨隔離;-Execute -Approve 才跑,① 不受 L19,② 過 L19)
 - 裝件=操作員的手:`$env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve`(閘不代設;L19 未綠=BLOCKED_UNITEST)
 
 ## 三 · 邏輯庫 · 因子庫 · 資料庫
 
-- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 645 列 · 全庫同步 {'hash': '6a6352b35e65', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '32d5ffa0e303', 'root': '同', 'home': '缺'}
+- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 668 列 · 全庫同步 {'hash': '4b351de12d3a', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '16e16fe2ab32', 'root': '同', 'home': '缺'}
 - 因子庫 OK:130 列 · {'SUP_MDL748:allinone 2.1.0': 77, 'SUP_MDL748:financial_data_standardization': 53} · 掛載 {'allinone': 'OK VIA_VRNLogic_AllInOne_v0201.py 2.1.0', 'fds': 'OK financial_data_standardization.py · 28 欄 · 合併損傷件(__main__ 示範缺 5 法,程式庫面可用)'}
 - 庫表冊 OK:54 表(批505)· 全庫表 4 · 庫 ['ActiveTWETF.duckdb', 'vdf_global_market.duckdb', 'vdf_tw_market.duckdb']
 - 資料家 ABSENT:VIA_Reports/datahome/DATAHOME_CATALOG_latest.json 不在(via-datahome catalog) · 庫 - · 表 - · 湖 -
@@ -224,9 +231,9 @@
 
 - 五矩陣 OK:2026-09-14T11:21:39 · profile run · 真跑 ['vdf'] · 項 43 · 態 {'GATED': 12, 'NODATA': 5, 'PLAN': 18, 'ABSENT': 2, 'GREEN': 6}
 - VTMRA 家族測試閘(批516;台股月營收分析七成員):RED · 2026-09-15T10:08:56 · 成員 {'eng063': 'OK', 'eng075': 'OK', 'eng069': 'FAIL', 'eng076': 'OK', 'twrev': 'OK', 'revphase': 'OK', 'talib': 'ABSENT'} · 成員自測非 OK:eng069(FAIL); TA-Lib 未裝(不是壞;裝=你的手 via-talib 印令)
-- Deck 任務 80 · 規格項 58 · 格子站 232(在位 232)· Register 指令 131 · Manager 正式名稱 任務 82 / 引擎 94
+- Deck 任務 81 · 規格項 59 · 格子站 233(在位 233)· Register 指令 133 · Manager 正式名稱 任務 83 / 引擎 95
 
-## 五 · 指令與參數(不丟失;來源 Register-VIA-Commands-v0209.ps1)
+## 五 · 指令與參數(不丟失;來源 Register-VIA-Commands-v0210.ps1)
 
 - `via-gates`
 - `via-envpy`
@@ -296,7 +303,7 @@
 - `via-envgov-auto`
 - `via-envtools`(別名 工具導入):via-envtools [-Apply] [-Approve] [-Env via_vrn_312] [--env-root P] ;讀工具冊 VIA_ToolRoster_SSOT_v*.json,逐境探針→修復/安裝/外部/驗證
 - `via-envrecover`(別名 環境復原):via-envrecover [-Execute] [-Approve] [-ApproveRemove] [-Baseline] [-To LKGC_x.json] [-Env via_x] [--env-root P];plan 唯讀寫 VIA_Reports\env_governance\RECOVER_latest.json/.ps1
-- `via-panorama`(別名 全景修復)
+- `via-panorama`(別名 全景修復/全景修復)
 - `via-iface`(別名 合約):via-iface connect -Need a,b [-Family vdf]   嫁接候選(只列 argv);via-iface graft -Item ID -Engine GLOB [-Dir D] [-Apply]   換引擎前驗相容(只增候選);via-iface status
 - `via-cgfamily`(別名 中央治理家族):via-cgfamily [status|plan]        五成員最新快照 → FAMILY_latest.json(VCGC 十一段);plan=一貼即用
 - `via-cgconsole`(別名 中央主控台):via-cgconsole [--probe] [--commit] [--root R]   主控台複驗 dry-run(快照 <root>\output\SYS;--probe 動態載入模組頂層/--commit 發 URN 台帳=你的手)
@@ -350,6 +357,8 @@
 - `via-central`(別名 VIA中央):via-central quantguard -SelfTest           VIA→VDF_ENG086 QuantGuard 實測
 - `via-unique-check`(別名 via-unique)
 - `via-daytrade`(別名 當沖量值):── 批522:via-daytrade —— 個股當沖量值(VDF_ENG055 L15;線上三源誠實 + 檔案收容道 L45:via-daytrade --from-file A.csv,B.csv --date 2026-09-12 [--market TWSE|TPEX];收容夾 functional modules\VDF\references\intake\daytrade_files;觸網項=你開閘)
+- `via-panorama`(別名 全景修復/全景修復):── 批535:via-panorama —— 全景稽核修復正主(CGC_MDL158;scan|fix|tests|report|all;--apply 才寫檔;收容件/退役夾零觸碰)
+- `via-panorama-all`(別名 全景一貼):── 批535:via-panorama-all —— 一貼式(進環境→25 加速器→全景分析→修→測→多 TAB 報告自動跳出)
 - `via-twrev`(別名 月營收):via-twrev [selftest|demo|analyze|report|groups|breakout|fetch|run]   預設 selftest
 - `via-revphase`(別名 營收相位):via-revphase -SelfTest  合成 36 期自測(免庫免網路)
 - `via-etfhold`(別名 持股日更):via-etfhold             日更真跑:根=你的 output_hub\active_tw_etf(自 VIA_ROOT 推);觸網→只看同意閘,不代設
@@ -362,21 +371,21 @@
 
 ## 六 · 註冊稽核(所有引擎/模組/功能/工具/環境)
 
-- 中央自動編號冊 OK · ACTIVE 5043/5043 · **缺 0** · 類別 {'class': 91, 'engine': 81, 'environment': 43, 'function': 4194, 'feature': 90, 'module': 149, 'package': 252, 'system': 10, 'tool': 133}
-- 尾版引擎/模組家族 239 · 中央冊已登 239 · **未登 0** · 操作介面有掛載 197 · 內部件無操作介面 42(誠實分列，不拿編號片段假命中)
+- 中央自動編號冊 OK · ACTIVE 5076/5076 · **缺 0** · 類別 {'class': 91, 'engine': 81, 'environment': 43, 'function': 4224, 'feature': 91, 'module': 150, 'package': 252, 'system': 10, 'tool': 134}
+- 尾版引擎/模組家族 240 · 中央冊已登 240 · **未登 0** · 操作介面有掛載 198 · 內部件無操作介面 42(誠實分列，不拿編號片段假命中)
 
 ## 七 · 自動編號註冊表(台帳)
 
-- 全域台帳 1060 筆 · 元件 149 · 更新 2026-09-16T10:08:00Z
-- 元件冊 OK · ACTIVE 5043 · RETIRED 115 · 更新 2026-09-16T16:23:34 · {'class': 91, 'engine': 81, 'environment': 43, 'function': 4194, 'feature': 90, 'module': 149, 'package': 252, 'system': 10, 'tool': 133}
+- 全域台帳 1061 筆 · 元件 149 · 更新 2026-09-16T10:08:00Z
+- 元件冊 OK · ACTIVE 5076 · RETIRED 115 · 更新 2026-09-16T18:39:48 · {'class': 91, 'engine': 81, 'environment': 43, 'function': 4224, 'feature': 91, 'module': 150, 'package': 252, 'system': 10, 'tool': 134}
 - 類別 current:系統 1 · 支援性工具 2 · 功能性工具 1 · 模組 1 · 引擎 19 · 函數庫 1 · 打包產品 8
 
-- 2026-09-15 13:39 批520 ENG069 v0108 去重 + VDF_ENG085 VatetfBridge v0100(對接口合約自適應)+ ENG083 v0101(L41 扣當沖查詢/政策 
 - 2026-09-15 13:45 批520a ENG085 v0101(持股表缺先誠實 NODATA;錯誤行取有意義那行)+ ENG083 v0102(stderr JSON 判讀;「輸入資料為空」=NODATA 
 - 2026-09-15 14:16 批521 ENG083 v0103(啟動墊片/裝法依境/codes 分隔/latest/vap → VAP ONE)+ ENG085 v0102/v0103(FactSet 稀釋 
 - 2026-09-15 15:28 批522 VRN_ENG086 FirstPageLogicBridge v0100(收容件 _b522 零觸碰;橋側防呆;enrich/bench/gap;10/10)+ ENG
 - 2026-09-16T10:03:28 ASSIGN 支援性工具 VIA_AutoCodeGenerator_v0100 SPT-002
 - 2026-09-16 16:22 批534 CGC_MDL157 v0101(命令冊尾版 glob·家族境派送·誠實四態·旗標等價;21/21)+ VDF_ENG086 v0101(polars 探針式載入=缺件 
+- 2026-09-16 18:39 批535 CGC_MDL158_VIAPanoramaAuditRepair v0100(全景稽核修復正主;AST 七類定位·活樹尾版過濾·平行/順序純增量修·多 TAB 報告;1
 
 ## 八 · 交接本文(來源 VIA_Handover_20260914_B498.md;逐批紀錄見該檔)
 
@@ -1253,6 +1262,54 @@ via-vcgc page --publish
 
 ---
 
+### 一-aa · 批535 · 令「整成一個 PowerShell 全包:進環境→全景式分析→AST 精準/彈性定位→列出所有問題類型與位置→不傷系統不生九頭龍下,能同時修的同時修、不能同時修的順序修→25 加速器→動態進度條→自動跳出多 TAB 矩陣報告(TAB1 給 AI 與我、內附 JSON/MD;TAB2 起逐項測試結果)→紅黃綠燈、分系統分範疇;所有 PY 檔加指令加速器;VDF 引擎加網路工具」+「授權自動修正測試無誤」
+
+**交付兩件**
+
+| 件 | 是什麼 |
+|---|---|
+| `VIA_B535_PANORAMA_ALL_IN_ONE.ps1` | 一貼式:進環境(切目錄/尾版命令冊/家族境 python)→ 25 加速器名冊(CGC_MDL156)→ 跑正主 → **Write-Progress 動態進度條**(解析引擎的 `@@PROGRESS|pct|msg`)→ 終端印紅黃綠總表 → **自動跳出多 TAB HTML**;`-Apply` 才寫檔,不加就是乾跑 |
+| `CGC_MDL158_VIAPanoramaAuditRepair_v0100.py` | 全景稽核修復**正主**(一功能一主 L30):AST 精準定位七類問題 → 分類分系統紅黃綠 → 平行/順序修 → 多 TAB 報告 HTML/JSON/MD。自測 **13/13** |
+
+**七類問題(AST 精準,彈性退路)**
+
+| 類 | 處置 | 判準(避免假紅) |
+|---|---|---|
+| ACCEL 加速器橋缺席 | **自動修(平行)** | 無 `[VIA:ACCEL-BRIDGE]` 標記 |
+| NET VDF 網路工具橋缺席 | **自動修(平行)** | VDF engine 夾內無 `[VIA:NET-BRIDGE]`;惰性載入=import 時零網路 |
+| VERB 自測動詞契約不齊 | **自動修(順序)** | argparse 有 `selftest` 位置動詞但不吃 `--selftest`;**形狀不合就誠實 skip 不猜改** |
+| HARDIMP 模組頂硬相依重庫 | 報位置 | 只算不在 try/探針內的重庫(polars/talib/paddle…);家族基底 pandas/numpy 不算 |
+| PINVER 釘死版號 | 報位置 | **只有真的當路徑/執行目標用**才算;報告文字、docstring 不算 |
+| SYSEXE 裸 sys.executable 派送 | 報位置 | **只有派到別支引擎**才算;自跑自己不算 |
+| SYNTAX 語法錯 | 報位置 | compile 失敗;本器不猜改 |
+
+**活樹律(新 L55)**:第一次掃描報 1426 項,**八成落在舊版本檔(v0101…v0136)與 `_sha…` 凍結副本**——那些不是活樹,對它們報紅就是假紅。加上「同 stem 只取尾版、凍結副本不算、收容件/退役夾/pycache/VIA_Reports/vcg 不掃」之後:**活樹 1576 檔 / 397 問題**,才是真正要處理的(LL55)。
+
+**自動修三態(新 L56)**:純增量零行為變更且冪等 → 可同時修(以檔為單位平行,一檔一工人,互不交疊);動到 main/parse_args 入口 → 順序修;會改行為或需判斷 → 只報位置等令。每次修改前後都 `ast.parse`,失敗整檔回滾;語法本來就壞的檔**拒修**。
+
+**本批實修結果**:加速器橋 **+125 檔**、VDF 網路工具橋 **+5 檔**,共 **127 檔改動、全部 compile 通過**;VERB 8 個目標形狀不合樣板 → 誠實 skip 列入報告(LL57)。覆蓋率:指令加速器橋、VDF 網路工具橋(逐檔數字見報告 TAB⑥)。
+
+**登冊**:Grid v0316(+全景站)· Deck v0152(+panorama_audit;釘 81)· Manager v0138(正式名稱+引擎名;總控頁 81;契約測試 19 passed)· Register v0210(`via-panorama` / 別名 全景修復、`via-panorama-all` / 別名 全景一貼)· 冊項 `via_panorama_audit` · 工作流 `via_panorama_chain` · 律 L55/L56 · 教訓 LL55–LL57。
+
+#### 一貼即用(批535)
+
+```powershell
+Set-Location 'C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics'
+git pull --ff-only origin claude/via-envmanager-governance-7cls8h
+.\VIA_B535_PANORAMA_ALL_IN_ONE.ps1                  # 乾跑:先看問題(不寫檔)
+.\VIA_B535_PANORAMA_ALL_IN_ONE.ps1 -Apply           # 實修 + 實測 + 自動跳出多 TAB 報告
+# 或載入命令冊後用短令:
+. (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName   # v0210
+全景一貼 -Apply                                      # = via-panorama-all -Apply
+全景修復 scan                                        # = via-panorama scan(只看問題)
+```
+
+報告在 `VIA_Reports\panorama_audit\PANORAMA_AUDIT_latest.html`(同夾另有 `.json` / `.md` 給 AI 直接吃)。
+
+**本批自己踩到的九頭龍(已修,值得記)**:第一版把產物寫進 `VIA_Reports\panorama`,那是 L19 安裝核可閘在讀的檔名;schema 不同 → 那道閘把每種情境都判 BLOCKED_PANORAMA,VCGC 自測從 19/19 掉到 18/19。讓出名字改 `panorama_audit`,VCGC 回 19/19,並在稽核器自測 ⑬a 釘死不准再碰(LL59)。另外同一批兩次踩到 f-string 巢狀引號/括號在 Python 3.11 會炸——我的報告渲染器一次、別人 bundle 檔一次(兩處都修好,後者原本整支不能 import;LL58)。
+
+---
+
 ### 二 · 操作員機器實況(他貼的 EnvManager v0300 AUDIT,run ENV-20260914_112000;直接當量測)
 
 | 事實 | 影響 |
@@ -1357,7 +1414,7 @@ via-ryg -Timeout 300              # ⑦ 五矩陣燈:紫=GATED(閘未開,不是�
 
 **還掛著(你的手)**:Z34 收 · Z43 VATETF EPS(v0104 重跑貼回)· Z44 當沖檔案收容(瀏覽器存 CSV)· Z45 持股史 · Z46 哨兵列 · Z47 via_paddle_311 境壞(重建)· Z48 vrn 境裝 opencc · Z49 第一頁版面/表格幾何(候)。
 
-## 九 · 掉球清單(來源 VIA_DroppedBalls_B507.md;列 65 · 未結 61;只增不減,結案劃線)
+## 九 · 掉球清單(來源 VIA_DroppedBalls_B507.md;列 67 · 未結 63;只增不減,結案劃線)
 
 # VIA 掉球清單(漏球審計)· 批507(2026-09-14)· 涵蓋 批474–506
 
@@ -1429,6 +1486,8 @@ via-ryg -Timeout 300              # ⑦ 五矩陣燈:紫=GATED(閘未開,不是�
 | Z51 | Windows `C:\測試樣本報告` 60 份 PDF + 4 份 DOCX 未掛載到任何 AI 境;B526–B533 的 NLP/VRN 實測都只跑倉內夾具,不等於真檔已解析 | 候 | 操作員 | `NLP統一 -Pipeline -In 'C:\測試樣本報告'` 貼回 |
 | Z52 | VDF 價格資料最早 2024-01-02,未達要求的 2023-01-01;補庫按你的指示停止中 → CGC154 功能驗收與 VDF 覆蓋閘會誠實非綠,不是引擎壞 | 候(你喊停) | 操作員 | 要恢復補庫再說 |
 | Z53 | TA-Lib 橋 ENG083 v0100–v0103 於 commit fd51913f 被直接刪除(未進退役夾、無退役冊);L50 禁復活故不還原程式,已在退役冊補記可自 git 歷史取回 | 已記 | AI | docs/VIA_Retired_TALib_B534.json |
+| Z54 | 全景掃描報位置待令三類(活樹):PINVER 150(釘死版號當路徑用)· HARDIMP 106(模組頂硬相依重庫,缺件會 Traceback=假紅)· SYSEXE 2(裸 sys.executable 派別支引擎)。會改行為,本器不自動改;逐檔逐行在 PANORAMA 報告 TAB② | 候令 | 操作員 | 說要修哪一類我就分批修 |
+| Z55 | VERB 9 件的 main/parse_args 形狀不合樣板(CLI 套件與舊引擎),誠實 skip 不猜改;要統一動詞契約需逐檔手改 | 候令 | AI | 下批可逐檔處理 |
 | ~~W~~ | ~~8 件 FAIL_HIT 首頁件重抽~~ | 已結(批503) | — | 64/64 |
 
 

@@ -872,6 +872,54 @@ via-vcgc page --publish
 
 ---
 
+## 一-aa · 批535 · 令「整成一個 PowerShell 全包:進環境→全景式分析→AST 精準/彈性定位→列出所有問題類型與位置→不傷系統不生九頭龍下,能同時修的同時修、不能同時修的順序修→25 加速器→動態進度條→自動跳出多 TAB 矩陣報告(TAB1 給 AI 與我、內附 JSON/MD;TAB2 起逐項測試結果)→紅黃綠燈、分系統分範疇;所有 PY 檔加指令加速器;VDF 引擎加網路工具」+「授權自動修正測試無誤」
+
+**交付兩件**
+
+| 件 | 是什麼 |
+|---|---|
+| `VIA_B535_PANORAMA_ALL_IN_ONE.ps1` | 一貼式:進環境(切目錄/尾版命令冊/家族境 python)→ 25 加速器名冊(CGC_MDL156)→ 跑正主 → **Write-Progress 動態進度條**(解析引擎的 `@@PROGRESS|pct|msg`)→ 終端印紅黃綠總表 → **自動跳出多 TAB HTML**;`-Apply` 才寫檔,不加就是乾跑 |
+| `CGC_MDL158_VIAPanoramaAuditRepair_v0100.py` | 全景稽核修復**正主**(一功能一主 L30):AST 精準定位七類問題 → 分類分系統紅黃綠 → 平行/順序修 → 多 TAB 報告 HTML/JSON/MD。自測 **13/13** |
+
+**七類問題(AST 精準,彈性退路)**
+
+| 類 | 處置 | 判準(避免假紅) |
+|---|---|---|
+| ACCEL 加速器橋缺席 | **自動修(平行)** | 無 `[VIA:ACCEL-BRIDGE]` 標記 |
+| NET VDF 網路工具橋缺席 | **自動修(平行)** | VDF engine 夾內無 `[VIA:NET-BRIDGE]`;惰性載入=import 時零網路 |
+| VERB 自測動詞契約不齊 | **自動修(順序)** | argparse 有 `selftest` 位置動詞但不吃 `--selftest`;**形狀不合就誠實 skip 不猜改** |
+| HARDIMP 模組頂硬相依重庫 | 報位置 | 只算不在 try/探針內的重庫(polars/talib/paddle…);家族基底 pandas/numpy 不算 |
+| PINVER 釘死版號 | 報位置 | **只有真的當路徑/執行目標用**才算;報告文字、docstring 不算 |
+| SYSEXE 裸 sys.executable 派送 | 報位置 | **只有派到別支引擎**才算;自跑自己不算 |
+| SYNTAX 語法錯 | 報位置 | compile 失敗;本器不猜改 |
+
+**活樹律(新 L55)**:第一次掃描報 1426 項,**八成落在舊版本檔(v0101…v0136)與 `_sha…` 凍結副本**——那些不是活樹,對它們報紅就是假紅。加上「同 stem 只取尾版、凍結副本不算、收容件/退役夾/pycache/VIA_Reports/vcg 不掃」之後:**活樹 1576 檔 / 397 問題**,才是真正要處理的(LL55)。
+
+**自動修三態(新 L56)**:純增量零行為變更且冪等 → 可同時修(以檔為單位平行,一檔一工人,互不交疊);動到 main/parse_args 入口 → 順序修;會改行為或需判斷 → 只報位置等令。每次修改前後都 `ast.parse`,失敗整檔回滾;語法本來就壞的檔**拒修**。
+
+**本批實修結果**:加速器橋 **+125 檔**、VDF 網路工具橋 **+5 檔**,共 **127 檔改動、全部 compile 通過**;VERB 8 個目標形狀不合樣板 → 誠實 skip 列入報告(LL57)。覆蓋率:指令加速器橋、VDF 網路工具橋(逐檔數字見報告 TAB⑥)。
+
+**登冊**:Grid v0316(+全景站)· Deck v0152(+panorama_audit;釘 81)· Manager v0138(正式名稱+引擎名;總控頁 81;契約測試 19 passed)· Register v0210(`via-panorama` / 別名 全景修復、`via-panorama-all` / 別名 全景一貼)· 冊項 `via_panorama_audit` · 工作流 `via_panorama_chain` · 律 L55/L56 · 教訓 LL55–LL57。
+
+### 一貼即用(批535)
+
+```powershell
+Set-Location 'C:\Users\tonyk\OneDrive\Documents\movies-dataset\VeritasIntelligenceAnalytics'
+git pull --ff-only origin claude/via-envmanager-governance-7cls8h
+.\VIA_B535_PANORAMA_ALL_IN_ONE.ps1                  # 乾跑:先看問題(不寫檔)
+.\VIA_B535_PANORAMA_ALL_IN_ONE.ps1 -Apply           # 實修 + 實測 + 自動跳出多 TAB 報告
+# 或載入命令冊後用短令:
+. (Get-ChildItem .\Register-VIA-Commands-v*.ps1 | Sort-Object Name | Select-Object -Last 1).FullName   # v0210
+全景一貼 -Apply                                      # = via-panorama-all -Apply
+全景修復 scan                                        # = via-panorama scan(只看問題)
+```
+
+報告在 `VIA_Reports\panorama_audit\PANORAMA_AUDIT_latest.html`(同夾另有 `.json` / `.md` 給 AI 直接吃)。
+
+**本批自己踩到的九頭龍(已修,值得記)**:第一版把產物寫進 `VIA_Reports\panorama`,那是 L19 安裝核可閘在讀的檔名;schema 不同 → 那道閘把每種情境都判 BLOCKED_PANORAMA,VCGC 自測從 19/19 掉到 18/19。讓出名字改 `panorama_audit`,VCGC 回 19/19,並在稽核器自測 ⑬a 釘死不准再碰(LL59)。另外同一批兩次踩到 f-string 巢狀引號/括號在 Python 3.11 會炸——我的報告渲染器一次、別人 bundle 檔一次(兩處都修好,後者原本整支不能 import;LL58)。
+
+---
+
 ## 二 · 操作員機器實況(他貼的 EnvManager v0300 AUDIT,run ENV-20260914_112000;直接當量測)
 
 | 事實 | 影響 |
