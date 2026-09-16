@@ -1,9 +1,9 @@
 {
   "schema": "VIA.B527.SSOTAutoCodeIntegrationStatus.v1",
-  "as_of": "2026-09-16T10:17:00Z",
+  "as_of": "2026-09-16T10:31:14.544639+00:00",
   "batch": "B527",
-  "verdict": "YELLOW",
-  "verdict_reason": "functional modules/VRN/db/vrn_reports.duckdb is absent; no empty database was fabricated",
+  "verdict": "GREEN",
+  "verdict_reason": "VRN ENG073 structured report database was created from two readable repository intake fixtures and verified by specified-DB status plus read-only SQL.",
   "central_engine": {
     "id": "CGC_MDL155_VIAUnifiedSSOTAutoCode_v0100",
     "selftest": "PASS",
@@ -48,8 +48,8 @@
     "VDF": "GREEN",
     "VAP": "GREEN",
     "CGC": "GREEN",
-    "data": "YELLOW",
-    "missing_data_sources": ["vrn_report_db"],
+    "data": "GREEN",
+    "missing_data_sources": [],
     "quarantine": "GREEN/FORBIDDEN_EXECUTION"
   },
   "central_registration": {
@@ -61,9 +61,12 @@
     "autocode_canonical": "CGC_MDL183_AutoCodeGenerator",
     "input_console": "via_ssot_autocode",
     "workflow": "via_ssot_autocode_governance",
-    "powershell": ["via-ssot", "SSOT治理"],
+    "powershell": [
+      "via-ssot",
+      "SSOT治理"
+    ],
     "interface_scan": "0 new / 0 drift / 2780 stable / 1 syntax skipped honestly",
-    "component_sync": "4953 active / 0 new / 0 changed / 0 retired / 0 AST errors"
+    "component_sync": "4953 active / 0 new / 42 changed / 0 retired / 0 AST errors"
   },
   "central_selftests": {
     "VCGC": "19/19 PASS",
@@ -74,7 +77,11 @@
     "manifest_json": "VIA_Reports/ssot_autocode/VIA_SSOT_AUTOCODE_latest.json",
     "manifest_html": "VIA_Reports/ssot_autocode/VIA_SSOT_AUTOCODE_latest.html",
     "handover_md": "VIA_Reports/handover/VIA_B527_SSOT_AUTOCODE_INTEGRATION_HANDOVER.md",
-    "status_json": "VIA_Reports/handover/VIA_B527_SSOT_AUTOCODE_INTEGRATION_STATUS.json"
+    "status_json": "VIA_Reports/handover/VIA_B527_SSOT_AUTOCODE_INTEGRATION_STATUS.json",
+    "vrn_database": "functional modules/VRN/db/vrn_reports.duckdb",
+    "vrn_database_evidence": "VIA_Reports/handover/evidence_b528_vrn_db",
+    "visualization_html": "VIA_Reports/handover/b528_visuals/B528_ACCEPTANCE_DASHBOARD.html",
+    "visualization_png": "VIA_Reports/handover/b528_visuals/B528_PASS_AND_COMPONENTS.png"
   },
   "policy": {
     "append_only": true,
@@ -82,5 +89,27 @@
     "existing_via_numbering_is_canonical": true,
     "TA_Lib": "not used",
     "network": "off by default"
+  },
+  "vrn_database_acceptance": {
+    "verdict": "GREEN",
+    "database": "functional modules/VRN/db/vrn_reports.duckdb",
+    "tables": [
+      "vrn_report_basic",
+      "vrn_report_metrics",
+      "vrn_report_analyst"
+    ],
+    "row_counts": {
+      "vrn_report_basic": 2,
+      "vrn_report_metrics": 0,
+      "vrn_report_analyst": 0
+    },
+    "sidecars": 2,
+    "eng072": "rc0; 2/2 sidecars produced",
+    "eng073": "rc0; 2/2 rows inserted",
+    "eng073_selftest": "36/36 PASS",
+    "specified_db_status": "rc0; basic=2, metrics=0",
+    "read_only_sql_verification": "PASS",
+    "sample_scope": "repository_intake_fixtures",
+    "user_windows_samples": "not_mounted"
   }
 }

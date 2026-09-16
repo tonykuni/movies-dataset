@@ -100,3 +100,24 @@ SSOT治理 manifest
 [5]: file:///home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/supportive%20modules/registry/VIA_InputConsole_Spec_v0100.json "VIA InputConsole 中央輸入契約"
 
 [6]: file:///home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/supportive%20modules/registry/VIA_Workflow_SSOT_v0100.json "VIA Workflow SSOT"
+
+
+## B528 附錄：VRN 報告資料庫已建立並驗收 GREEN
+
+B527 原先記錄的唯一 YELLOW 缺口是 `functional modules/VRN/db/vrn_reports.duckdb` 尚不存在。B528 已透過 ENG072→ENG073 實際處理兩個倉內可讀取的收容樣本，建立實體 DuckDB 並寫入 2 筆 `vrn_report_basic`。指定資料庫 `--status`、只讀 SQL 與 ENG073 自測均已驗證，ENG073 自測為 **36/36 PASS**。因此 B527 機器狀態已更新為 **GREEN**。
+
+本次 GREEN 只代表 VRN 報告資料庫的存在性、結構、可讀取性、可重跑性與自測驗收已通過。使用者提供的 Windows 路徑清單共 64 份原始 PDF/DOCX 尚未掛載到本 Linux 沙盒，因此華南投顧、凱基投顧等原始檔的內容級驗收仍標記為 `PENDING_MOUNT`，沒有被本批假稱已完成。
+
+B528 完整交接：`VIA_B528_VRN_DATABASE_ACCEPTANCE_HANDOVER.md`。機器狀態：`VIA_B528_VRN_DATABASE_ACCEPTANCE_STATUS.json`。
+
+## References
+
+[7]: file:///home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/handover/VIA_B528_VRN_DATABASE_ACCEPTANCE_HANDOVER.md "B528 VRN 報告資料庫驗收交接"
+
+[8]: file:///home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/handover/VIA_B528_VRN_DATABASE_ACCEPTANCE_STATUS.json "B528 VRN 報告資料庫機器狀態"
+
+[9]: file:///home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/functional%20modules/VRN/db/vrn_reports.duckdb "VRN 報告結構化 DuckDB"
+
+[10]: file:///home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/handover/b528_visuals/B528_PASS_AND_COMPONENTS.png "B528 PASS 與中央元件冊圖表"
+
+[11]: file:///home/ubuntu/work/movies-dataset/VeritasIntelligenceAnalytics/VIA_Reports/handover/b528_visuals/B528_ACCEPTANCE_DASHBOARD.html "B528 離線驗收儀表板"

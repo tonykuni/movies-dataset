@@ -22,3 +22,9 @@ VRN B526 自動化整合測試：`evidence_b526_vrn_integration/VIA_VRN_B526_AUT
 HTML 狀態頁：`../ssot_autocode/VIA_SSOT_AUTOCODE_latest.html`
 
 CGC155 自測 9/9、VCGC 19/19、中央治理家族 12/12、Workflow Composer 12/12；介面掃描 0 新編／0 漂移／2780 穩定；中央元件冊 4953 active、0 AST 錯。總裁決為 `YELLOW`，唯一缺口是尚不存在的 `functional modules/VRN/db/vrn_reports.duckdb`，不得用空資料庫偽造 GREEN。
+
+## B528 VRN 報告資料庫驗收
+
+交接報告：`VIA_B528_VRN_DATABASE_ACCEPTANCE_HANDOVER.md`
+機器狀態：`VIA_B528_VRN_DATABASE_ACCEPTANCE_STATUS.json`
+裁決：**GREEN**（ENG073 36/36 PASS；指定庫 status PASS；只讀 SQL PASS）。使用者 Windows 64 份原始樣本仍待掛載，未被本批假稱已解析。
