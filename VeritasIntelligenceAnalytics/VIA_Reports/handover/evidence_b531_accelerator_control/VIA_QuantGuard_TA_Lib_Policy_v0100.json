@@ -1,0 +1,39 @@
+{
+  "schema": "VIA.QuantGuardOnlyPolicy.SSOT.v1",
+  "batch": "B531",
+  "version": "VIA_QuantGuard_TA_Lib_Policy_v0100",
+  "status": "ACTIVE",
+  "owner": "VIA Central Governance",
+  "effective_at": "2026-09-16T21:45:58+08:00",
+  "scope": ["VDF", "VAP", "VRN", "VIA technical-analysis and factor routes"],
+  "active_technical_analysis": {
+    "engine": "VDF_ENG086_QuantGuardOneBridge_v0100",
+    "package_root": "functional modules/VDF/references/intake/VIA_QuantGuard_v20260916",
+    "calculation_policy": "QuantGuard-only; adjusted-price and ex-day-trade-volume governed inputs",
+    "allowed": ["QuantGuard", "pure-Python deterministic fallback owned by QuantGuard"],
+    "legacy_indicator_library": "FORBIDDEN_NOT_USED"
+  },
+  "forbidden": {
+    "libraries": ["TA-Lib", "talib"],
+    "actions": ["install", "import", "load", "revive", "route", "benchmark_as_active"],
+    "active_import_patterns": ["import talib", "from talib import", "_si(\"talib\")", "_si('talib')"]
+  },
+  "supersedes_for_active_execution": [
+    "VIA_Policy_Laws_SSOT_v0100.json#L41",
+    "VIA_Policy_Laws_SSOT_v0100.json#L42",
+    "functional modules/TALib/VIA_TALibEngine.py",
+    "functional modules/VIA_RetiredEngines",
+    "functional modules/VDF/engine/VDF_ENG083_TALibOneBridge_v*.py"
+  ],
+  "historical_retention": {
+    "policy": "Historical laws, retired engines and intake references remain append-only for audit; they are not active routes.",
+    "active_route_rule": "Only QuantGuard may be selected by current VIA/VDF/VAP technical-analysis and factor dispatch."
+  },
+  "enforcement": {
+    "central_gate": "CGC_MDL156_VIAAcceleratorControl_v0100",
+    "runtime_gate": "VDF_ENG086_QuantGuardOneBridge_v0100 selftest",
+    "mount_scan": "canonical active mounts must contain zero forbidden TA-Lib import/path hits",
+    "failure_state": "RED_DO_NOT_ROUTE_LEGACY_INDICATOR",
+    "network": "unchanged; operator consent remains fail-closed and network_default=OFF"
+  }
+}

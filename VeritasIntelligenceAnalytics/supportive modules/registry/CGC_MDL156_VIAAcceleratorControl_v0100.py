@@ -27,6 +27,7 @@ SUPERACC = ROOT / "supportive modules" / "VIA_SuperAccel_Module.py"
 CELERITAS = ROOT / "supportive modules" / "accelerator" / "VeritasCeleritas.py"
 AEGIS = ROOT / "supportive modules" / "network" / "VeritasAegisNexus.py"
 QUANTGUARD = ROOT / "functional modules" / "VDF" / "engine" / "VDF_ENG086_QuantGuardOneBridge_v0100.py"
+POLICY_SSOT = ROOT / "supportive modules" / "registry" / "VIA_QuantGuard_TA_Lib_Policy_v0100.json"
 REPORT_DIR = ROOT / "VIA_Reports" / "accelerator"
 LATEST_JSON = REPORT_DIR / "VIA_ACCELERATOR_CONTROL_latest.json"
 LATEST_HTML = REPORT_DIR / "VIA_ACCELERATOR_CONTROL_latest.html"
@@ -38,6 +39,7 @@ REGISTRIES = [
     ROOT / "supportive modules" / "registry" / "VIA_Naming_Registry_v0100.json",
     ROOT / "supportive modules" / "registry" / "VIA_Component_Inventory_SSOT_v0100.json",
     ROOT / "supportive modules" / "registry" / "VIA_ToolRoster_SSOT_v0100.json",
+    ROOT / "supportive modules" / "registry" / "VIA_QuantGuard_TA_Lib_Policy_v0100.json",
 ]
 
 
@@ -94,6 +96,7 @@ def runtime_checks() -> list[dict[str, Any]]:
         check("Aegis canonical mount exists", AEGIS.is_file(), str(AEGIS)),
         check("network is OFF by default in roster", '"network_default": "OFF"' in read(ROSTER_JSON), "fail-closed"),
         check("central registries mention accelerator control", "via_accelerator_control" in reg_text or "CGC_MDL156" in reg_text, "central registry references"),
+        check("QuantGuard-only active policy is registered", POLICY_SSOT.is_file() and '"status": "ACTIVE"' in read(POLICY_SSOT) and '"legacy_indicator_library": "FORBIDDEN_NOT_USED"' in read(POLICY_SSOT), "policy SSOT"),
     ]
     # TA-Lib is permanently prohibited. Scan only canonical active mounts;
     # retired/reference material is intentionally not treated as an active path.

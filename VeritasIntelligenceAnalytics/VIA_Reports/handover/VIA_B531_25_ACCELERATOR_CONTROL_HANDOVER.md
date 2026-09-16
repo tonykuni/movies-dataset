@@ -8,9 +8,9 @@
 
 ## 一、裁決
 
-B531 已完成 **25 項加速器控制面、PowerShell roster、Python bootstrap 身份、SuperAccel/Celeritas/Aegis 掛載、QuantGuard 禁用政策與中央冊註冊**。離線控制面實測為 **GREEN 20/20，`READY_FOR_25`**；25 項是中央治理、路由與證據 roster，不代表已安裝 25 套獨立第三方演算法。
+B531 已完成 **25 項加速器控制面、PowerShell roster、Python bootstrap 身份、SuperAccel/Celeritas/Aegis 掛載、QuantGuard 禁用政策與中央冊註冊**。離線控制面實測為 **GREEN 21/21，`READY_FOR_25`**；25 項是中央治理、路由與證據 roster，不代表已安裝 25 套獨立第三方演算法。
 
-**QuantGuard 是唯一活動技術分析／因子路徑；TA-Lib 永久禁用。** Canonical Celeritas 與 QuantGuard bridge 已移除 TA-Lib 可選載入與同名 fallback，改由 QuantGuard／純 Python deterministic fallback 承接。`VIA_RetiredEngines`、`functional modules/TALib` 與歷史 intake 仍保留為封存／參考材料，沒有被本批重新接回活動路由。
+**QuantGuard 是唯一活動技術分析／因子路徑；TA-Lib 永久禁用。** 新增政策 SSOT `VIA_QuantGuard_TA_Lib_Policy_v0100.json` 與現行政策法 L50；歷史 L36/L41/L42 已標示 `SUPERSEDED`，不得作為活動政策或路由。Canonical Celeritas 與 QuantGuard bridge 已移除 TA-Lib 可選載入與同名 fallback，改由 QuantGuard／純 Python deterministic fallback 承接。`VIA_RetiredEngines`、`functional modules/TALib` 與歷史 intake 仍保留為封存／參考材料，沒有被本批重新接回活動路由。
 
 B531 的整體中央同步摘要為 8 站中 **7 站通過、1 站保留既有歷史介面漂移**。`iface_sync=1` 不是 CGC156 25 項控制面失敗，而是 InputConsole 內 6 個既有引擎 contract drift；本批沒有盲改它們，也沒有宣稱全樹零漂移。
 
@@ -18,7 +18,7 @@ B531 的整體中央同步摘要為 8 站中 **7 站通過、1 站保留既有�
 
 | 測試項目 | 實際結果 | 裁決 |
 |---|---:|---|
-| CGC156 25 項控制面 | 20/20 | **GREEN** |
+| CGC156 25 項控制面 | 21/21 | **GREEN** |
 | SSOT roster | ID `01..25`、數量 25 | **PASS** |
 | PowerShell roster 靜態計數 | 25 entries | **PASS** |
 | PS 相容 runtime | 靜態 roster 25；Windows 首次 probe 發現 scope 回退 20，已修正 global state | **待 Windows 重跑** |
