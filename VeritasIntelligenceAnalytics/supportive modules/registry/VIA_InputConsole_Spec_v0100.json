@@ -497,18 +497,19 @@
        },
        "params": [],
        "net": true,
-       "note": "只調度既有 ENG054/077/078/StoryGroup；離線 status/selftest 可跑；run 需操作員自行開雙同意閘；成交值跨族群按(date,ticker)去重；起始驗收日 2023-01-01。",
+       "note": "只調度既有 ENG054/077/078/StoryGroup；離線 status/selftest 可跑；run 需操作員自行開雙同意閘；成交值跨族群按(date,ticker)去重；起始驗收日 2023-01-01，價格未達起始日明確 RED。",
        "outputs": [
         "VIA_Reports/vdf/central_lists/MARKET_LISTS_latest.json"
        ],
        "contract_history": [],
        "contract": {
-        "engine_file": "VDF_ENG087_MarketListGovernance_v0100.py",
+        "engine_file": "VDF_ENG087_MarketListGovernance_v0101.py",
         "flags": [
          "--selftest",
-         "--status"
+         "--status",
+         "status"
         ],
-        "ts": "20260915_202955",
+        "ts": "20260916_1708",
         "state": "OK",
         "drift": [],
         "unexposed": [
@@ -2410,6 +2411,50 @@
     "VIA_Reports/vap_stack/output",
     "VIA_Reports/vap_stack"
    ]
+  },
+  "central": {
+   "zh": "中央功能驗收與證據閘",
+   "python": "quantguard",
+   "groups": [
+    {
+     "id": "acceptance",
+     "zh": "功能級整合驗收(只讀；禁止 false-green)",
+     "items": [
+      {
+       "id": "via_functional_acceptance",
+       "zh": "VIA 功能級整合驗收(CGC_MDL154)",
+       "engine": {
+        "dir": "supportive modules/registry",
+        "glob": "CGC_MDL154_VIAFunctionalAcceptance_v*.py",
+        "verb": [
+         "run",
+         "status"
+        ]
+       },
+       "params": [
+        "timeout"
+       ],
+       "net": false,
+       "outputs": [
+        "VIA_Reports/acceptance/VIA_FUNCTIONAL_ACCEPTANCE_latest.json",
+        "VIA_Reports/acceptance/VIA_FUNCTIONAL_ACCEPTANCE_latest.html"
+       ],
+       "contract_history": [],
+       "contract": {
+        "engine_file": "CGC_MDL154_VIAFunctionalAcceptance_v0100.py",
+        "flags": [
+         "--selftest",
+         "--timeout",
+         "run",
+         "status"
+        ],
+        "state": "OK",
+        "note": "所有子站必有 rc/裁決燈/輸出尾端；PARTIAL_BLOCKED 不得假綠"
+       }
+      }
+     ]
+    }
+   ]
   }
  },
  "user": {
@@ -2440,5 +2485,5 @@
   "changelog": [],
   "group_starts": {}
  },
- "contract_sync_ts": "20260915_202955"
+ "contract_sync_ts": "20260916_1702"
 }

@@ -717,6 +717,17 @@ function global:via-vcgc {
     if (($a -contains "page") -and (Test-Path "$VIA\VIA_Reports\vcgc\VIA_UI_CentralGovernanceConsole_v0100.html")) { via-open "$VIA\VIA_Reports\vcgc\VIA_UI_CentralGovernanceConsole_v0100.html" }
 }
 Set-Alias -Name 中央控管 -Value via-vcgc -Scope Global -Force
+# ── 批525:via-functional-acceptance —— CGC_MDL154 單一功能級整合驗收 gate
+#   僅執行既有中央/VRN/VDF/VAP selftest 與資料證據核驗；輸出 JSON/HTML；RED 或 PARTIAL_BLOCKED 不得假綠。
+function global:via-functional-acceptance {
+    $eng = Get-VIANewest "$VIA\supportive modules\registry" "CGC_MDL154_VIAFunctionalAcceptance_v*.py"
+    if (-not $eng) { Write-Host "  [via-functional-acceptance] FAIL:CGC_MDL154_VIAFunctionalAcceptance_v*.py 缺" -ForegroundColor Red; return }
+    $a = @($args | ForEach-Object { if ($_ -eq "-SelfTest") { "--selftest" } else { $_ } })
+    if (-not $a) { $a = @("run") }
+    Invoke-VIAPython -Family "vrn" $eng @a
+}
+Set-Alias -Name VIA功能驗收 -Value via-functional-acceptance -Scope Global -Force
+Set-Alias -Name 功能級驗收 -Value via-functional-acceptance -Scope Global -Force
 # via-firstpage:首頁三法擷取器 ENG072 尾版直呼(-Force 忽略邏輯庫命中整批重抽;-RetryFailed 只重試 FAIL 件;-OcrBudget N 每件 OCR 預算秒;--in 檔/夾可重複)
 function global:via-firstpage {
     $eng = Get-VIANewest "$VIA\functional modules\VRN" "VRN_ENG072_FirstPageText_v*.py"
