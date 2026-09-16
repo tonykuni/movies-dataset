@@ -1,6 +1,6 @@
-# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0111 · 批536)
+# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0111 · 批537)
 
-> 產生 2026-09-16 19:21:47 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
+> 產生 2026-09-16 19:42:23 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
 
 ## 〇 · 接手提示詞(給下一個 AI;來源 VIA_AI_Handover_Prompt_v0100.md)
 
@@ -150,6 +150,8 @@
 - **L54**(批534;尾版律)中央路由尾版律:控制面與命令冊一律 newest-glob(`Register-VIA-Commands-v*.ps1`、`VDF_ENG086_QuantGuardOneBridge_v*.py`…),不得在程式內釘死版號;釘死=照尾版律出的新版永遠不被中央呼叫(假閘/假派送)。
 - **L55**(批535;全景稽核)全景稽核活樹律:稽核與亮燈只算**活樹**(同 stem 只取尾版;凍結副本 _sha…/(1)/copy/備份不算;收容件、退役夾、__pycache__、VIA_Reports、vcg 一律不掃不修)。對舊版本檔報紅=假紅,和假綠一樣傷。全樹件數仍記在報告裡(誠實)。
 - **L56**(批535;全景稽核)自動修三態律:① 純增量、零行為變更、可冪等(加速器橋、網路工具橋、自測動詞等價轉換)=**可同時修**(以檔為單位平行,一檔一工人,互不交疊)② 會動到 main/parse_args 等入口=**順序修** ③ 會改行為或需判斷(硬相依搬家、釘死版號改 glob、裸 sys.executable 改家族境)=**只報位置不自動改**,附建議修法等操作員令。每次修改前後都 ast.parse,失敗即整檔回滾。
+- **L57**(批537;誠實四態)誠實分母律:任何『N/M』都要先把 M 分乾淨——① 這份文件本來就不該有這一欄(產業/晨會報告沒有單一目標價、單一評等)② 文件自己寫了不適用(Daiwa「Target price: n.a.」)③ 我們手上的文字裡根本沒有這一欄(外資側欄沒被修復出來)④ 有線索卻抓不到=**真 RED**。只有第四種算紅燈;把前三種算進分母,就是自己造一盞判錯的紅燈,和假綠一樣傷。
+- **L58**(批537;來源證據)證據分級律:欄位判定要留下『憑什麼』。券商=文內 > 檔名 > 電郵網域(弱);每一列帶 how。分不出級的『全中』看起來漂亮,卻藏得住假綠——批537 就是因為有了分級,才看見 64/64 裡有三份是靠合資體的信箱網域判錯家的。
 
 **Lessons-learned**
 
@@ -218,17 +220,20 @@
 - LL63(批536)券商同義字的正本是 VRN_BROKER_LIST_v01.json(20 家 97 別名,SUP_MDL015 管),不是我手寫的清單。接上正本後 64 份真報告券商命中由 38/64 → 64/64;正典名也要跟正本(兆豐=MEGABANK、高盛=GOLDMANSACHS),我的補冊只補正本沒有的,別名撞上就讓位——否則同一家會有兩個正典名(九頭龍)。
 - LL64(批536)備用倉 tonykuni/via-vdf-vrn 對同一批 64 份報告已經踩過的坑,直接拿來用:①「目標價」與「潛在上漲空間」是兩個欄位,混在一起會把 23% 當成價格 ②真報告多半寫「目標價145」沒有冒號,硬要求冒號會整片抽不到。接手前先看別人對同一批資料學過什麼,比自己重踩便宜。
 - LL65(批536)『沒抓到』要先分清楚是漏抓還是本來就沒有:64 份裡 22 份是產業/晨會/市場/策略類,本來就沒有單一個股代碼;26 份文中根本沒有評等字樣。把這兩類從分母拿掉,個股報告代碼才看得出真實的 42/42;不然永遠像有一半沒抓到。
+- LL66(批537)分析師信箱/網址不是券商證據:Daiwa 三份報告唯一的『cathay』出自 `…@daiwacm-cathay.com.tw`(大和國泰合資體網域),而 cathay(6 字)比 daiwa(5 字)長,最長別名優先就把日系報告判成國泰。判券商前先把 email/URL 挖掉,再退回來當最弱一層。
+- LL67(批537)標的公司名不是券商證據:金控名與券商同源(中信/台新/元大/富邦/凱基)。`凱基投顧_2891 中信金_…` 內文只有『中信金』,結果判成 CTBC。要用與代碼相鄰的兩條鐵證把標的名讀出來否決掉——`公司名(代碼)` 與 `代碼_公司名`;**不能靠庫**,本境 tw_listings 只有 892 檔、2891 不在內(LL49),靠庫的否決在工作站有效、在這裡失效,那就是留下假綠。
+- LL68(批537)評等字彙要收本土券商自己的尺度:凱基三份個股報告全寫『增加持股』(Outperform),收容件的 RATING 冊沒有這個詞,於是三份都掛零。補『增加持股/減少持股/優於大盤/劣於大盤/同步大盤/區間操作』,而且只看前段——內文的『外資持有』『增持庫藏股』不是評等。
 
 ## 二 · 安裝核可(L19)與環境工具
 
-- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 192.1 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
+- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 192.4 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
 - 工具冊導入計畫:ABSENT · - · 件態 - · 風險 - · 段 - · 未路由 - · 白名單留置 -(TOOLS_PLAN_latest.json 不在(via-envtools))
 - 環境復原(L24):PLAN · 2026-09-15 05:30:50 · 還原 原本規劃(Baseline;無 LKGC 或 --baseline) · 段 16 · 單獨隔離境 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 借境封鎖 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 次序 RESTORE → CORE → LOW → MEDIUM → HIGH → EXTERNAL → VERIFY;安裝出問題=`via-envrecover`(①還原前次 ②順序裝 ③_M/_H 單獨隔離;-Execute -Approve 才跑,① 不受 L19,② 過 L19)
 - 裝件=操作員的手:`$env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve`(閘不代設;L19 未綠=BLOCKED_UNITEST)
 
 ## 三 · 邏輯庫 · 因子庫 · 資料庫
 
-- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 686 列 · 全庫同步 {'hash': '62ab05ae13ee', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': 'dcb10af06d06', 'root': '同', 'home': '缺'}
+- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 703 列 · 全庫同步 {'hash': 'eae4a39e7378', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '2bd2a680a956', 'root': '同', 'home': '缺'}
 - 因子庫 OK:130 列 · {'SUP_MDL748:allinone 2.1.0': 77, 'SUP_MDL748:financial_data_standardization': 53} · 掛載 {'allinone': 'OK VIA_VRNLogic_AllInOne_v0201.py 2.1.0', 'fds': 'OK financial_data_standardization.py · 28 欄 · 合併損傷件(__main__ 示範缺 5 法,程式庫面可用)'}
 - 庫表冊 OK:54 表(批505)· 全庫表 4 · 庫 ['ActiveTWETF.duckdb', 'vdf_global_market.duckdb', 'vdf_tw_market.duckdb']
 - 資料家 ABSENT:VIA_Reports/datahome/DATAHOME_CATALOG_latest.json 不在(via-datahome catalog) · 庫 - · 表 - · 湖 -
@@ -237,7 +242,7 @@
 
 - 五矩陣 OK:2026-09-14T11:21:39 · profile run · 真跑 ['vdf'] · 項 43 · 態 {'GATED': 12, 'NODATA': 5, 'PLAN': 18, 'ABSENT': 2, 'GREEN': 6}
 - VTMRA 家族測試閘(批516;台股月營收分析七成員):RED · 2026-09-15T10:08:56 · 成員 {'eng063': 'OK', 'eng075': 'OK', 'eng069': 'FAIL', 'eng076': 'OK', 'twrev': 'OK', 'revphase': 'OK', 'talib': 'ABSENT'} · 成員自測非 OK:eng069(FAIL); TA-Lib 未裝(不是壞;裝=你的手 via-talib 印令)
-- Deck 任務 81 · 規格項 63 · 格子站 233(在位 233)· Register 指令 133 · Manager 正式名稱 任務 83 / 引擎 95
+- Deck 任務 81 · 規格項 63 · 格子站 233(在位 233)· Register 指令 133 · Manager 正式名稱 任務 81 / 引擎 95
 
 ## 五 · 指令與參數(不丟失;來源 Register-VIA-Commands-v0210.ps1)
 
@@ -377,21 +382,21 @@
 
 ## 六 · 註冊稽核(所有引擎/模組/功能/工具/環境)
 
-- 中央自動編號冊 OK · ACTIVE 5098/5098 · **缺 0** · 類別 {'class': 91, 'engine': 81, 'environment': 43, 'function': 4242, 'feature': 95, 'module': 150, 'package': 252, 'system': 10, 'tool': 134}
+- 中央自動編號冊 OK · ACTIVE 5107/5107 · **缺 0** · 類別 {'class': 91, 'engine': 81, 'environment': 43, 'function': 4251, 'feature': 95, 'module': 150, 'package': 252, 'system': 10, 'tool': 134}
 - 尾版引擎/模組家族 240 · 中央冊已登 240 · **未登 0** · 操作介面有掛載 198 · 內部件無操作介面 42(誠實分列，不拿編號片段假命中)
 
 ## 七 · 自動編號註冊表(台帳)
 
-- 全域台帳 1063 筆 · 元件 149 · 更新 2026-09-16T10:08:00Z
-- 元件冊 OK · ACTIVE 5098 · RETIRED 115 · 更新 2026-09-16T19:21:28 · {'class': 91, 'engine': 81, 'environment': 43, 'function': 4242, 'feature': 95, 'module': 150, 'package': 252, 'system': 10, 'tool': 134}
+- 全域台帳 1064 筆 · 元件 149 · 更新 2026-09-16T10:08:00Z
+- 元件冊 OK · ACTIVE 5107 · RETIRED 115 · 更新 2026-09-16T19:42:04 · {'class': 91, 'engine': 81, 'environment': 43, 'function': 4251, 'feature': 95, 'module': 150, 'package': 252, 'system': 10, 'tool': 134}
 - 類別 current:系統 1 · 支援性工具 2 · 功能性工具 1 · 模組 1 · 引擎 19 · 函數庫 1 · 打包產品 8
 
-- 2026-09-15 15:28 批522 VRN_ENG086 FirstPageLogicBridge v0100(收容件 _b522 零觸碰;橋側防呆;enrich/bench/gap;10/10)+ ENG
 - 2026-09-16T10:03:28 ASSIGN 支援性工具 VIA_AutoCodeGenerator_v0100 SPT-002
 - 2026-09-16 16:22 批534 CGC_MDL157 v0101(命令冊尾版 glob·家族境派送·誠實四態·旗標等價;21/21)+ VDF_ENG086 v0101(polars 探針式載入=缺件 
 - 2026-09-16 18:39 批535 CGC_MDL158_VIAPanoramaAuditRepair v0100(全景稽核修復正主;AST 七類定位·活樹尾版過濾·平行/順序純增量修·多 TAB 報告;1
 - 2026-09-16 19:07 批536 CGC_MDL158 v0101(判準精準化:自跑自己≠跨家族派送、自測/探針函式的假冊名≠釘死版號、候選夾/打包副本不是活樹;15/15)+ 真問題逐檔修:VDF_EN
 - 2026-09-16 19:20 批536b VRN_ENG086 v0101:+corpus 動詞(收容件 AttachmentFixedOutput 64 份真研報修復文字;唯讀)+ 文件類型分類(該不該有代碼
+- 2026-09-16 19:37 批537 VRN_ENG086 v0102:① 券商證據分級(文內>檔名>電郵網域弱;先挖掉 email/URL)——Daiwa 三份不再被合資體信箱網域判成 CATHAY ② 標
 
 ## 八 · 交接本文(來源 VIA_Handover_20260914_B498.md;逐批紀錄見該檔)
 
@@ -1478,7 +1483,41 @@ via-ryg -Timeout 300              # ⑦ 五矩陣燈:紫=GATED(閘未開,不是�
 
 **還掛著(你的手)**:Z34 收 · Z43 VATETF EPS(v0104 重跑貼回)· Z44 當沖檔案收容(瀏覽器存 CSV)· Z45 持股史 · Z46 哨兵列 · Z47 via_paddle_311 境壞(重建)· Z48 vrn 境裝 opencc · Z49 第一頁版面/表格幾何(候)。
 
-## 九 · 掉球清單(來源 VIA_DroppedBalls_B507.md;列 67 · 未結 63;只增不減,結案劃線)
+---
+
+### 一-ad|批537 VRN 真報告第二輪:券商假綠拆掉、誠實分母立起來(VRN_ENG086 v0102)
+
+批536b 那張成績單是「64/64 券商、33/38 評等、30/64 目標價」。好看,但**逐列查過就知道有三處不誠實**——這一批把它們拆開。
+
+**① 券商 64/64 裡有四份判錯家(假綠)。**
+`Daiwa-3653 / Daiwa-6278 / Daiwa-PCB` 被判成 CATHAY。文內唯一的 `cathay` 出自分析師信箱 `…@daiwacm-cathay.com.tw`(大和國泰合資體的網域),而 `cathay`(6 字)比 `daiwa`(5 字)長,最長別名優先就讓它贏。
+`凱基投顧_2891 中信金_施志鴻_20260519.pdf` 被判成 CTBC:內文只有標的公司名「中信金」,真正的券商「凱基投顧」寫在檔名上。
+修法兩條:
+- **證據分級**(L58):判券商前先把 email/URL 挖掉 → 文內 > 檔名 > 電郵網域(弱)。每一列帶 `broker_how`,以後假綠看得見。
+- **標的公司名否決**(LL67):用與代碼相鄰的兩條鐵證把標的名讀出來——文內 `台灣中信金(2891.TW/2891 TT)` 的括號前、檔名 `…_2891 中信金_…` 的代碼後。**不靠庫**:本境 tw_listings 只有 892 檔、2891 不在內(LL49),靠庫的否決在你的工作站有效、在這裡失效,那等於留著假綠。
+
+**② 評等 5 份掛零,其中 3 份是我們的字彙不夠。**
+凱基三份個股報告全寫「增加持股」(Outperform),收容件的 RATING 冊沒有這個詞。補上本土券商自己的尺度(增加持股/減少持股/優於大盤/劣於大盤/同步大盤/區間操作),而且**只看前段**——內文的「外資持有」「增持庫藏股」不是評等(LL68)。另外兩份是 MS 產業報告與 UBS 市場分析,本來就沒有單一評等。
+
+**③ 分母不誠實=自己造判錯的紅燈(L57)。**「目標價 30/64」看起來漏了 34 份,實際上:2 份是報告自己寫 `Target price: n.a.`(Daiwa),16 份是**我們手上的修復文字裡根本沒有目標價欄**(GS/MQ 的側欄沒被修復出來),16 份是產業/晨會類不需要。真正「有線索卻抓不到」= **0**。判錯的紅燈和假綠一樣傷,所以四態各自列清楚。
+
+**這一批量到的(64 份真研報 · 修復文字 · 原 PDF 不在本境)**
+
+| 欄 | 誠實分態 |
+|---|---|
+| 個股代碼 | 42/42(另 22 份產業/晨會/市場/策略類本來就無單一代碼) |
+| 券商 | 64/64 · 證據:文內 36 · 檔名 28 · 電郵網域(弱) 0 |
+| 評等 | 命中 36 · 文中無評等字樣 8 · 非個股(不需) 20 · **有字樣抓不到(RED) 0** |
+| 目標價 | 命中 30 · 報告自述 n.a. 2 · 文字無此欄 16 · 非個股(不需) 16 · **有線索抓不到(RED) 0** |
+| 檔名日期 | 命中 61 · 檔名無日期 3 · **有數字解不出(RED) 0** |
+
+`VRN_ENG086_FirstPageLogicBridge_v0102.py` 十五檢自測 15/15(⑪ 電郵網域 · ⑫ 目標價四態 · ⑬ 日期三態 · ⑭ 標的否決(空名冊也要成立)+ 本土尺度 · ⑮ 評等四態)。
+產物:`VIA_Reports\first_page_logic\CORPUS_latest.json` / `.md`(表多了「證據 / 等態 / 價態 / 期態」四欄,逐列可查)。
+你的機器:`via-fplogic corpus`(尾版律自動吃 v0102)。
+
+**還沒做、等你的手**:GS/MQ 那 16 份要真的補出目標價,得回到原 PDF 的側欄(修復文字沒有那一塊)=Z49 第一頁版面/表格幾何那一條。
+
+## 九 · 掉球清單(來源 VIA_DroppedBalls_B507.md;列 68 · 未結 64;只增不減,結案劃線)
 
 # VIA 掉球清單(漏球審計)· 批507(2026-09-14)· 涵蓋 批474–506
 
@@ -1552,6 +1591,7 @@ via-ryg -Timeout 300              # ⑦ 五矩陣燈:紫=GATED(閘未開,不是�
 | Z53 | TA-Lib 橋 ENG083 v0100–v0103 於 commit fd51913f 被直接刪除(未進退役夾、無退役冊);L50 禁復活故不還原程式,已在退役冊補記可自 git 歷史取回 | 已記 | AI | docs/VIA_Retired_TALib_B534.json |
 | Z54 | 全景掃描報位置待令三類(活樹):PINVER 150(釘死版號當路徑用)· HARDIMP 106(模組頂硬相依重庫,缺件會 Traceback=假紅)· SYSEXE 2(裸 sys.executable 派別支引擎)。會改行為,本器不自動改;逐檔逐行在 PANORAMA 報告 TAB② | 候令 | 操作員 | 說要修哪一類我就分批修 |
 | Z55 | VERB 9 件的 main/parse_args 形狀不合樣板(CLI 套件與舊引擎),誠實 skip 不猜改;要統一動詞契約需逐檔手改 | 候令 | AI | 下批可逐檔處理 |
+| Z56 | 外資報告目標價在側欄,修復文字沒有那一塊(批537 量出):GS 五份 · MQ 一份 · Daiwa-PCB · AMAX-KY · 華南四份 Memo · 瑞基 NR,共 16 份個股報告通篇無「目標價/Target Price/TP/PT」線索詞 → 不是抓漏,是我們手上的文字沒有這一欄(誠實四態記 `ABSENT_IN_TEXT`);要補得回原 PDF 側欄/表格幾何,與 Z49 同一條路 | 候 | 操作員 | 原 PDF 在 `C:\測試樣本報告`,本境沒有 |
 | ~~W~~ | ~~8 件 FAIL_HIT 首頁件重抽~~ | 已結(批503) | — | 64/64 |
 
 
