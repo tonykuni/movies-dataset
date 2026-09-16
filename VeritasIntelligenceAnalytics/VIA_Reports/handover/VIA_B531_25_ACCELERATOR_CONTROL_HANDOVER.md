@@ -59,7 +59,7 @@ PowerShell 正本為 `VIA_PS_Accelerators_25_Roster_v0100.ps1`，由 `VIA_PS_Acc
 
 第一，sandbox 沒有 `pwsh`、`powershell` 或 PSScriptAnalyzer，因此 PowerShell 本體 parser／Windows runtime 尚未在本環境實測；目前已完成檔案級 roster 計數、入口靜態檢查與 Python 控制面驗證。請在 Windows pull 後執行附帶的一貼式 probe。
 
-第一次 Windows probe 已實際發現並修正一個 PowerShell dot-source scope 問題：舊版模組雖讀到 25 項檔案，卻未把 `$VIA_ACCEL25` 公開到工作站全域，導致 `Get-VIAAccelRoster` 回傳前 20 項。修正版改用 global canonical state、以 `Count` 強制重建，並在 roster 非 25 項時立即停止。Windows 端需重新 pull 最新 commit 後再跑 probe；在重跑前不宣稱 PowerShell runtime GREEN。
+第一次 Windows probe 已實際發現並修正一個 PowerShell dot-source scope 問題：舊版模組雖讀到 25 項檔案，卻未把 `$VIA_ACCEL25` 公開到工作站全域，導致 `Get-VIAAccelRoster` 回傳前 20 項。修正版改用 global canonical state、以 `Count` 強制重建、以 unary comma 保持 Hashtable scalar 不被 pipeline 展開，並在 roster 非 25 項時立即停止。Windows 端需重新 pull 最新 commit 後再跑 probe；在重跑前不宣稱 PowerShell runtime GREEN。
 
 第二，InputConsole contract sync 留下 6 個歷史 drift：`vdf/tw_daytrade_files`、`vdf/tw_revenue_codes`、`vrn/vrn_fourpoint`、`vrn/vrn_pdfplus`、`vrn/vrn_unified`、`central/via_ssot_autocode`。其中包含參數旗標與 verb 差異；若要修正，必須逐引擎確認真實 CLI 後再 version-forward，不可在本批盲改。
 

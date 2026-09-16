@@ -90,7 +90,10 @@ function Get-VIAAccelRoster {
     if (-not $global:VIA_ACCEL25 -or $global:VIA_ACCEL25.Count -ne 25) {
         throw "VIA_ACCEL25 roster invalid: expected 25, got $($global:VIA_ACCEL25.Count)"
     }
-    return $global:VIA_ACCEL25
+    # Unary comma keeps the ordered hashtable scalar when a caller assigns the
+    # function result; without it PowerShell enumerates the 25 DictionaryEntry
+    # objects through the pipeline and loses the .Keys contract.
+    return ,$global:VIA_ACCEL25
 }
 
 # 批366 零跳出閘(PS 側):VIA_NO_OPEN=1 時 Start-Process/Invoke-Item 之頁面目標(.html/.htm/.url/http)靜默略過;
