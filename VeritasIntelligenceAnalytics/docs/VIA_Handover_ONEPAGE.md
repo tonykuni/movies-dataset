@@ -1,6 +1,6 @@
 # VIA 一頁交接 · Veritas Central Governance Console(VCGC v0111 · 批536)
 
-> 產生 2026-09-16 19:08:40 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
+> 產生 2026-09-16 19:21:47 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
 
 ## 〇 · 接手提示詞(給下一個 AI;來源 VIA_AI_Handover_Prompt_v0100.md)
 
@@ -214,17 +214,21 @@
 - LL59(批535)**報告夾名也是九頭龍的頭**:我把新稽核器的產物寫進 VIA_Reports/panorama,而那是 CGC_MDL135/CGC_MDL149 L19 安裝核可閘在讀的檔名;schema 不同 → 那道閘把每一種情境都判 BLOCKED_PANORAMA,VCGC 自測 ⑨ 由 19/19 掉成 18/19。新引擎開產物夾前先 grep 全樹有沒有人在讀同一個路徑;讓名字比改別人便宜。已改 VIA_Reports/panorama_audit/PANORAMA_AUDIT_latest.*,並在自測 ⑬a 釘死不准回頭碰。
 - LL60(批536)稽核器的判準要能分辨「正式路由」與「自測夾具」:批535 報的 PINVER 151 件裡有 122 件是自測段/探針函式在暫存夾寫的假冊名(Register-VIA-Commands-v0174.ps1 之類)、或 X_ENG001_A_v0100.py 這種假引擎名;SYSEXE 報的 2 件全是「自己跑自己」(subprocess 帶 Path(__file__))。加上『所在函式是自測/探針就不算』與『自跑自己不算跨家族』之後:PINVER 151→23、SYSEXE 2→0。誤報清掉才看得見真問題。
 - LL61(批536)自測用 `src.split("def selftest")[0]` 取「自測段之前的原始碼」來驗律,結果我在 v0101 的文件字串裡寫了『def selftest 之後』,切點提前 → 兩檢無故變紅。切點要唯一(改用 `\ndef selftest() -> int:`),或改用 AST 取函式範圍。
+- LL62(批536)NLP 樞紐的 normalize()(ENG064 normalizer,preserve_newlines=False)會把換行整個吃掉:整段丟進去做簡繁正規化,行結構就沒了,逐行判準(標題行評等、獨立短行評等)全失效——實測評等由 33/38 掉到 29/38。要逐行正規化再接回去。用別人的正主工具前,先確認它對輸入做了什麼。
+- LL63(批536)券商同義字的正本是 VRN_BROKER_LIST_v01.json(20 家 97 別名,SUP_MDL015 管),不是我手寫的清單。接上正本後 64 份真報告券商命中由 38/64 → 64/64;正典名也要跟正本(兆豐=MEGABANK、高盛=GOLDMANSACHS),我的補冊只補正本沒有的,別名撞上就讓位——否則同一家會有兩個正典名(九頭龍)。
+- LL64(批536)備用倉 tonykuni/via-vdf-vrn 對同一批 64 份報告已經踩過的坑,直接拿來用:①「目標價」與「潛在上漲空間」是兩個欄位,混在一起會把 23% 當成價格 ②真報告多半寫「目標價145」沒有冒號,硬要求冒號會整片抽不到。接手前先看別人對同一批資料學過什麼,比自己重踩便宜。
+- LL65(批536)『沒抓到』要先分清楚是漏抓還是本來就沒有:64 份裡 22 份是產業/晨會/市場/策略類,本來就沒有單一個股代碼;26 份文中根本沒有評等字樣。把這兩類從分母拿掉,個股報告代碼才看得出真實的 42/42;不然永遠像有一半沒抓到。
 
 ## 二 · 安裝核可(L19)與環境工具
 
-- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 191.9 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
+- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 192.1 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
 - 工具冊導入計畫:ABSENT · - · 件態 - · 風險 - · 段 - · 未路由 - · 白名單留置 -(TOOLS_PLAN_latest.json 不在(via-envtools))
 - 環境復原(L24):PLAN · 2026-09-15 05:30:50 · 還原 原本規劃(Baseline;無 LKGC 或 --baseline) · 段 16 · 單獨隔離境 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 借境封鎖 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 次序 RESTORE → CORE → LOW → MEDIUM → HIGH → EXTERNAL → VERIFY;安裝出問題=`via-envrecover`(①還原前次 ②順序裝 ③_M/_H 單獨隔離;-Execute -Approve 才跑,① 不受 L19,② 過 L19)
 - 裝件=操作員的手:`$env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve`(閘不代設;L19 未綠=BLOCKED_UNITEST)
 
 ## 三 · 邏輯庫 · 因子庫 · 資料庫
 
-- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 674 列 · 全庫同步 {'hash': '274f352469bf', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': 'baa98a637044', 'root': '同', 'home': '缺'}
+- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 686 列 · 全庫同步 {'hash': '62ab05ae13ee', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': 'dcb10af06d06', 'root': '同', 'home': '缺'}
 - 因子庫 OK:130 列 · {'SUP_MDL748:allinone 2.1.0': 77, 'SUP_MDL748:financial_data_standardization': 53} · 掛載 {'allinone': 'OK VIA_VRNLogic_AllInOne_v0201.py 2.1.0', 'fds': 'OK financial_data_standardization.py · 28 欄 · 合併損傷件(__main__ 示範缺 5 法,程式庫面可用)'}
 - 庫表冊 OK:54 表(批505)· 全庫表 4 · 庫 ['ActiveTWETF.duckdb', 'vdf_global_market.duckdb', 'vdf_tw_market.duckdb']
 - 資料家 ABSENT:VIA_Reports/datahome/DATAHOME_CATALOG_latest.json 不在(via-datahome catalog) · 庫 - · 表 - · 湖 -
@@ -233,7 +237,7 @@
 
 - 五矩陣 OK:2026-09-14T11:21:39 · profile run · 真跑 ['vdf'] · 項 43 · 態 {'GATED': 12, 'NODATA': 5, 'PLAN': 18, 'ABSENT': 2, 'GREEN': 6}
 - VTMRA 家族測試閘(批516;台股月營收分析七成員):RED · 2026-09-15T10:08:56 · 成員 {'eng063': 'OK', 'eng075': 'OK', 'eng069': 'FAIL', 'eng076': 'OK', 'twrev': 'OK', 'revphase': 'OK', 'talib': 'ABSENT'} · 成員自測非 OK:eng069(FAIL); TA-Lib 未裝(不是壞;裝=你的手 via-talib 印令)
-- Deck 任務 81 · 規格項 62 · 格子站 233(在位 233)· Register 指令 133 · Manager 正式名稱 任務 83 / 引擎 95
+- Deck 任務 81 · 規格項 63 · 格子站 233(在位 233)· Register 指令 133 · Manager 正式名稱 任務 83 / 引擎 95
 
 ## 五 · 指令與參數(不丟失;來源 Register-VIA-Commands-v0210.ps1)
 
@@ -373,21 +377,21 @@
 
 ## 六 · 註冊稽核(所有引擎/模組/功能/工具/環境)
 
-- 中央自動編號冊 OK · ACTIVE 5081/5081 · **缺 0** · 類別 {'class': 91, 'engine': 81, 'environment': 43, 'function': 4226, 'feature': 94, 'module': 150, 'package': 252, 'system': 10, 'tool': 134}
+- 中央自動編號冊 OK · ACTIVE 5098/5098 · **缺 0** · 類別 {'class': 91, 'engine': 81, 'environment': 43, 'function': 4242, 'feature': 95, 'module': 150, 'package': 252, 'system': 10, 'tool': 134}
 - 尾版引擎/模組家族 240 · 中央冊已登 240 · **未登 0** · 操作介面有掛載 198 · 內部件無操作介面 42(誠實分列，不拿編號片段假命中)
 
 ## 七 · 自動編號註冊表(台帳)
 
-- 全域台帳 1062 筆 · 元件 149 · 更新 2026-09-16T10:08:00Z
-- 元件冊 OK · ACTIVE 5081 · RETIRED 115 · 更新 2026-09-16T19:07:54 · {'class': 91, 'engine': 81, 'environment': 43, 'function': 4226, 'feature': 94, 'module': 150, 'package': 252, 'system': 10, 'tool': 134}
+- 全域台帳 1063 筆 · 元件 149 · 更新 2026-09-16T10:08:00Z
+- 元件冊 OK · ACTIVE 5098 · RETIRED 115 · 更新 2026-09-16T19:21:28 · {'class': 91, 'engine': 81, 'environment': 43, 'function': 4242, 'feature': 95, 'module': 150, 'package': 252, 'system': 10, 'tool': 134}
 - 類別 current:系統 1 · 支援性工具 2 · 功能性工具 1 · 模組 1 · 引擎 19 · 函數庫 1 · 打包產品 8
 
-- 2026-09-15 14:16 批521 ENG083 v0103(啟動墊片/裝法依境/codes 分隔/latest/vap → VAP ONE)+ ENG085 v0102/v0103(FactSet 稀釋 
 - 2026-09-15 15:28 批522 VRN_ENG086 FirstPageLogicBridge v0100(收容件 _b522 零觸碰;橋側防呆;enrich/bench/gap;10/10)+ ENG
 - 2026-09-16T10:03:28 ASSIGN 支援性工具 VIA_AutoCodeGenerator_v0100 SPT-002
 - 2026-09-16 16:22 批534 CGC_MDL157 v0101(命令冊尾版 glob·家族境派送·誠實四態·旗標等價;21/21)+ VDF_ENG086 v0101(polars 探針式載入=缺件 
 - 2026-09-16 18:39 批535 CGC_MDL158_VIAPanoramaAuditRepair v0100(全景稽核修復正主;AST 七類定位·活樹尾版過濾·平行/順序純增量修·多 TAB 報告;1
 - 2026-09-16 19:07 批536 CGC_MDL158 v0101(判準精準化:自跑自己≠跨家族派送、自測/探針函式的假冊名≠釘死版號、候選夾/打包副本不是活樹;15/15)+ 真問題逐檔修:VDF_EN
+- 2026-09-16 19:20 批536b VRN_ENG086 v0101:+corpus 動詞(收容件 AttachmentFixedOutput 64 份真研報修復文字;唯讀)+ 文件類型分類(該不該有代碼
 
 ## 八 · 交接本文(來源 VIA_Handover_20260914_B498.md;逐批紀錄見該檔)
 
@@ -1339,6 +1343,34 @@ git pull --ff-only origin claude/via-envmanager-governance-7cls8h
 **核心回歸**:CGC157 21/21 · 匯流排 48/48 · CGC156 23/23 · VCGC 19/19 · ENG087 10/10 · 稽核器 15/15 · registry-sync 5081。
 
 **我自己又學到兩件**(已入教訓庫):稽核器的判準要能分辨「正式路由」與「自測夾具」,否則誤報會蓋住真問題(LL60);自測用字串切點取原始碼,切點必須唯一——我在文件字串裡寫了同一句話,把切點提前,害兩檢無故變紅(LL61)。
+
+---
+
+### 一-ac · 批536b · 令「先完成 VIA 上傳,再透過 VIA 跑修正實測 VRN」+「用同義字去抓 SSOT/檔名拆解法」+「NLP 工具 LAYOUT 工具」+「邏輯方法查備用引擎或 via-vdf-vrn」
+
+**你貼的 64 份 `C:\測試樣本報告`**:原 PDF 不在本境,但收容件 `AttachmentFixedOutput_v1.0.0_b245` 裡有**同一批 64 份的修復文字**(`01_repair/documents/`)與**版面元素**(`02_layout/logical_layout.json` 232 元素)。所以這批是**內容級真測**,不是夾具。
+
+**ENG086 v0101 新增 `corpus` 動詞**(收容件唯讀零觸碰),並照你的令接三件正主工具:
+
+| 工具 | 接到哪 | 實際 |
+|---|---|---|
+| 券商同義字 SSOT | `VRN_BROKER_LIST_v01.json`(SUP_MDL015 管的正本) | 20 家 · 97 別名;正典名跟正本(兆豐=MEGABANK、高盛=GOLDMANSACHS),我的補冊只補正本沒有的,別名撞上就讓位 |
+| LAYOUT 工具 | 收容件 `02_layout/logical_layout.json` | 64 檔 · 232 元素;有版面用版面標題**加上**前段文字(相加,不是二選一) |
+| NLP 工具 | `VRN_ENG066` 樞紐 normalize | 簡→繁可轉;**逐行**做(整段做會把換行吃掉,逐行判準全失效) |
+
+**64 份真研報實測(修前 → 修後)**
+
+| 指標 | 修前 | 修後 | 說明 |
+|---|---:|---:|---|
+| 個股報告代碼 | 47/64 | **42/42** | 另 22 份是產業/晨會/市場/策略類,**本來就沒有**單一個股代碼(先分類再算,分母才對) |
+| 券商 | 38/64 | **64/64** | 接上 SSOT 正本 + 頁面認不出就用檔名 |
+| 評等 | 17/64 | **33/38** | 五法:線索詞(容得下「調降至」)/標題行(外資 `…; Buy (on CL)`)/引號內(`維持「持有」評等`)/前段獨立行/檔名;明示「未評等」記 NR。另 26 份文中根本沒有評等字樣=誠實 N/A |
+| 個股目標價 | — | **28/42** | 文中沒有目標價線索就不給值(原本弱正則把 MS-Thermal 的 17382 當目標價=假資料) |
+| 檔名日期 | — | **61/64** | |
+
+**備用倉 `tonykuni/via-vdf-vrn` 查到的現成教訓**(同一批語料踩過的坑,直接用):①「目標價」與「潛在上漲空間」是兩個欄位,混在一起會把 23% 當價格 ②真報告多半寫「目標價145」沒有冒號,硬要求冒號會整片抽不到。兩點都已進 ENG086。
+
+**登冊**:冊項 `vrn_firstpage_corpus` · 教訓 LL62–LL65 · 台帳 1063。產物 `VIA_Reports\first_page_logic\CORPUS_latest.json/.md`(逐檔一列,可直接對照)。
 
 ---
 
