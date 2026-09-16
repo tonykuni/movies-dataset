@@ -1,6 +1,6 @@
-# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0111 · 批535)
+# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0111 · 批536)
 
-> 產生 2026-09-16 18:56:22 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
+> 產生 2026-09-16 19:08:40 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
 
 ## 〇 · 接手提示詞(給下一個 AI;來源 VIA_AI_Handover_Prompt_v0100.md)
 
@@ -212,17 +212,19 @@
 - LL57(批535)自動修要敢改也要敢不改:8 個 VERB 目標的 main/parse_args 形狀不合我的樣板,寧可誠實 skip「不猜改」,也不要硬套模板改壞別人的 CLI。修不動的列進報告等令,比修壞了再回滾便宜。
 - LL58(批535)f-string 內巢狀引號/括號在 Python 3.11 會直接 SyntaxError(3.12 才放寬):我自己的報告渲染器踩一次(`{{}}` 被當集合 → unhashable),全樹掃描又在別人的 bundle 檔抓到同型一次(f-string 裡 `replace("'", "''")` 的雙引號提前收掉字串)。修法一律相同:先把值算進變數,再帶進 f-string。寫 f-string 前先問:裡面有沒有引號或大括號。
 - LL59(批535)**報告夾名也是九頭龍的頭**:我把新稽核器的產物寫進 VIA_Reports/panorama,而那是 CGC_MDL135/CGC_MDL149 L19 安裝核可閘在讀的檔名;schema 不同 → 那道閘把每一種情境都判 BLOCKED_PANORAMA,VCGC 自測 ⑨ 由 19/19 掉成 18/19。新引擎開產物夾前先 grep 全樹有沒有人在讀同一個路徑;讓名字比改別人便宜。已改 VIA_Reports/panorama_audit/PANORAMA_AUDIT_latest.*,並在自測 ⑬a 釘死不准回頭碰。
+- LL60(批536)稽核器的判準要能分辨「正式路由」與「自測夾具」:批535 報的 PINVER 151 件裡有 122 件是自測段/探針函式在暫存夾寫的假冊名(Register-VIA-Commands-v0174.ps1 之類)、或 X_ENG001_A_v0100.py 這種假引擎名;SYSEXE 報的 2 件全是「自己跑自己」(subprocess 帶 Path(__file__))。加上『所在函式是自測/探針就不算』與『自跑自己不算跨家族』之後:PINVER 151→23、SYSEXE 2→0。誤報清掉才看得見真問題。
+- LL61(批536)自測用 `src.split("def selftest")[0]` 取「自測段之前的原始碼」來驗律,結果我在 v0101 的文件字串裡寫了『def selftest 之後』,切點提前 → 兩檢無故變紅。切點要唯一(改用 `\ndef selftest() -> int:`),或改用 AST 取函式範圍。
 
 ## 二 · 安裝核可(L19)與環境工具
 
-- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 191.6 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
+- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 191.9 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
 - 工具冊導入計畫:ABSENT · - · 件態 - · 風險 - · 段 - · 未路由 - · 白名單留置 -(TOOLS_PLAN_latest.json 不在(via-envtools))
 - 環境復原(L24):PLAN · 2026-09-15 05:30:50 · 還原 原本規劃(Baseline;無 LKGC 或 --baseline) · 段 16 · 單獨隔離境 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 借境封鎖 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 次序 RESTORE → CORE → LOW → MEDIUM → HIGH → EXTERNAL → VERIFY;安裝出問題=`via-envrecover`(①還原前次 ②順序裝 ③_M/_H 單獨隔離;-Execute -Approve 才跑,① 不受 L19,② 過 L19)
 - 裝件=操作員的手:`$env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve`(閘不代設;L19 未綠=BLOCKED_UNITEST)
 
 ## 三 · 邏輯庫 · 因子庫 · 資料庫
 
-- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 668 列 · 全庫同步 {'hash': '4b351de12d3a', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': 'f781b8d39111', 'root': '同', 'home': '缺'}
+- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 674 列 · 全庫同步 {'hash': '274f352469bf', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': 'baa98a637044', 'root': '同', 'home': '缺'}
 - 因子庫 OK:130 列 · {'SUP_MDL748:allinone 2.1.0': 77, 'SUP_MDL748:financial_data_standardization': 53} · 掛載 {'allinone': 'OK VIA_VRNLogic_AllInOne_v0201.py 2.1.0', 'fds': 'OK financial_data_standardization.py · 28 欄 · 合併損傷件(__main__ 示範缺 5 法,程式庫面可用)'}
 - 庫表冊 OK:54 表(批505)· 全庫表 4 · 庫 ['ActiveTWETF.duckdb', 'vdf_global_market.duckdb', 'vdf_tw_market.duckdb']
 - 資料家 ABSENT:VIA_Reports/datahome/DATAHOME_CATALOG_latest.json 不在(via-datahome catalog) · 庫 - · 表 - · 湖 -
@@ -371,21 +373,21 @@
 
 ## 六 · 註冊稽核(所有引擎/模組/功能/工具/環境)
 
-- 中央自動編號冊 OK · ACTIVE 5079/5079 · **缺 0** · 類別 {'class': 91, 'engine': 81, 'environment': 43, 'function': 4224, 'feature': 94, 'module': 150, 'package': 252, 'system': 10, 'tool': 134}
+- 中央自動編號冊 OK · ACTIVE 5081/5081 · **缺 0** · 類別 {'class': 91, 'engine': 81, 'environment': 43, 'function': 4226, 'feature': 94, 'module': 150, 'package': 252, 'system': 10, 'tool': 134}
 - 尾版引擎/模組家族 240 · 中央冊已登 240 · **未登 0** · 操作介面有掛載 198 · 內部件無操作介面 42(誠實分列，不拿編號片段假命中)
 
 ## 七 · 自動編號註冊表(台帳)
 
-- 全域台帳 1061 筆 · 元件 149 · 更新 2026-09-16T10:08:00Z
-- 元件冊 OK · ACTIVE 5079 · RETIRED 115 · 更新 2026-09-16T18:55:58 · {'class': 91, 'engine': 81, 'environment': 43, 'function': 4224, 'feature': 94, 'module': 150, 'package': 252, 'system': 10, 'tool': 134}
+- 全域台帳 1062 筆 · 元件 149 · 更新 2026-09-16T10:08:00Z
+- 元件冊 OK · ACTIVE 5081 · RETIRED 115 · 更新 2026-09-16T19:07:54 · {'class': 91, 'engine': 81, 'environment': 43, 'function': 4226, 'feature': 94, 'module': 150, 'package': 252, 'system': 10, 'tool': 134}
 - 類別 current:系統 1 · 支援性工具 2 · 功能性工具 1 · 模組 1 · 引擎 19 · 函數庫 1 · 打包產品 8
 
-- 2026-09-15 13:45 批520a ENG085 v0101(持股表缺先誠實 NODATA;錯誤行取有意義那行)+ ENG083 v0102(stderr JSON 判讀;「輸入資料為空」=NODATA 
 - 2026-09-15 14:16 批521 ENG083 v0103(啟動墊片/裝法依境/codes 分隔/latest/vap → VAP ONE)+ ENG085 v0102/v0103(FactSet 稀釋 
 - 2026-09-15 15:28 批522 VRN_ENG086 FirstPageLogicBridge v0100(收容件 _b522 零觸碰;橋側防呆;enrich/bench/gap;10/10)+ ENG
 - 2026-09-16T10:03:28 ASSIGN 支援性工具 VIA_AutoCodeGenerator_v0100 SPT-002
 - 2026-09-16 16:22 批534 CGC_MDL157 v0101(命令冊尾版 glob·家族境派送·誠實四態·旗標等價;21/21)+ VDF_ENG086 v0101(polars 探針式載入=缺件 
 - 2026-09-16 18:39 批535 CGC_MDL158_VIAPanoramaAuditRepair v0100(全景稽核修復正主;AST 七類定位·活樹尾版過濾·平行/順序純增量修·多 TAB 報告;1
+- 2026-09-16 19:07 批536 CGC_MDL158 v0101(判準精準化:自跑自己≠跨家族派送、自測/探針函式的假冊名≠釘死版號、候選夾/打包副本不是活樹;15/15)+ 真問題逐檔修:VDF_EN
 
 ## 八 · 交接本文(來源 VIA_Handover_20260914_B498.md;逐批紀錄見該檔)
 
@@ -1307,6 +1309,36 @@ git pull --ff-only origin claude/via-envmanager-governance-7cls8h
 報告在 `VIA_Reports\panorama_audit\PANORAMA_AUDIT_latest.html`(同夾另有 `.json` / `.md` 給 AI 直接吃)。
 
 **本批自己踩到的九頭龍(已修,值得記)**:第一版把產物寫進 `VIA_Reports\panorama`,那是 L19 安裝核可閘在讀的檔名;schema 不同 → 那道閘把每種情境都判 BLOCKED_PANORAMA,VCGC 自測從 19/19 掉到 18/19。讓出名字改 `panorama_audit`,VCGC 回 19/19,並在稽核器自測 ⑬a 釘死不准再碰(LL59)。另外同一批兩次踩到 f-string 巢狀引號/括號在 Python 3.11 會炸——我的報告渲染器一次、別人 bundle 檔一次(兩處都修好,後者原本整支不能 import;LL58)。
+
+---
+
+### 一-ab · 批536 · 令「再同步修正一次,不必生成 PowerShell,自主完成全部並上傳」(+ 授權自動完成)
+
+**先對帳**:遠端無他人更動(3ca5863f = 本地)。
+
+**一、判準精準化(CGC_MDL158 v0101;15/15)**——批535 報的 267 項裡有一半是稽核器自己的誤報:
+
+| 誤報型 | 為什麼是誤報 | 修法 |
+|---|---|---|
+| SYSEXE 2 件 | 兩件都是 `subprocess.run([sys.executable, Path(__file__)…])`=**引擎自測跑自己**,不是跨家族派送 | 自跑自己不算 → SYSEXE **真數 0** |
+| PINVER 122 件 | 自測段/探針函式在暫存夾寫的假命令冊(`Register-VIA-Commands-v0174.ps1`)、假引擎名(`X_ENG001_A_v0100.py`) | 所在函式是自測/探針就不算 → PINVER 151→**23** |
+| 候選夾/打包副本 | `candidates/`、`bundle/`、`launchers/panorama_tests/` 不是活樹 | 併入非活樹 |
+
+**二、逐檔修真問題**(每支改後都跑自測驗)
+
+| 檔 | 問題 | 修法 | 驗 |
+|---|---|---|---|
+| VDF_ENG087 → **v0102** | 五條引擎路徑釘死版號 | `_newest_rel()` 尾版 glob(L54) | 10/10 |
+| CGC_MDL156 → **v0102** | QuantGuard 與 25-roster 路徑釘死 | 尾版 glob(v0101 起 QuantGuard 是 polars 探針版,釘 v0100 會指到舊的) | GREEN 23/23 |
+| SUP_MDL115 控制塔 | 5 個「特定版號存在」燈 | 改 `glob(…_v*.py)`,新版上線燈才不會誤熄 | compile OK |
+| VDF_ENG051 | 模組頂 `import requests/bs4`=缺件即 Traceback(假紅) | 探針式載入 + `_require_net_libs()` 誠實 ABSENT 印裝法(不代裝) | compile OK |
+| VAP_ENG003 → **v0101** · CGC_MDL055 → **v0101** | 只認位置動詞 | `--selftest` 等價轉換(L53) | 8 PASS/2 SKIP · 3/3(兩種寫法都通) |
+
+**結果**:全景問題 **267 → 140(精準化)→ 129(逐檔修)**;SYSEXE 歸零。剩下的 HARDIMP 100 / PINVER 23 / VERB 6 都在非核心區(VeritasPulse、GroupIndex、CLI 套件、new modules engines),會改行為,依 L56 **報位置待令**,逐檔逐行在報告 TAB②。
+
+**核心回歸**:CGC157 21/21 · 匯流排 48/48 · CGC156 23/23 · VCGC 19/19 · ENG087 10/10 · 稽核器 15/15 · registry-sync 5081。
+
+**我自己又學到兩件**(已入教訓庫):稽核器的判準要能分辨「正式路由」與「自測夾具」,否則誤報會蓋住真問題(LL60);自測用字串切點取原始碼,切點必須唯一——我在文件字串裡寫了同一句話,把切點提前,害兩檢無故變紅(LL61)。
 
 ---
 

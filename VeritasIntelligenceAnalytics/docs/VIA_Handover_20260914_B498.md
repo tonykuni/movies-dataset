@@ -920,6 +920,36 @@ git pull --ff-only origin claude/via-envmanager-governance-7cls8h
 
 ---
 
+## 一-ab · 批536 · 令「再同步修正一次,不必生成 PowerShell,自主完成全部並上傳」(+ 授權自動完成)
+
+**先對帳**:遠端無他人更動(3ca5863f = 本地)。
+
+**一、判準精準化(CGC_MDL158 v0101;15/15)**——批535 報的 267 項裡有一半是稽核器自己的誤報:
+
+| 誤報型 | 為什麼是誤報 | 修法 |
+|---|---|---|
+| SYSEXE 2 件 | 兩件都是 `subprocess.run([sys.executable, Path(__file__)…])`=**引擎自測跑自己**,不是跨家族派送 | 自跑自己不算 → SYSEXE **真數 0** |
+| PINVER 122 件 | 自測段/探針函式在暫存夾寫的假命令冊(`Register-VIA-Commands-v0174.ps1`)、假引擎名(`X_ENG001_A_v0100.py`) | 所在函式是自測/探針就不算 → PINVER 151→**23** |
+| 候選夾/打包副本 | `candidates/`、`bundle/`、`launchers/panorama_tests/` 不是活樹 | 併入非活樹 |
+
+**二、逐檔修真問題**(每支改後都跑自測驗)
+
+| 檔 | 問題 | 修法 | 驗 |
+|---|---|---|---|
+| VDF_ENG087 → **v0102** | 五條引擎路徑釘死版號 | `_newest_rel()` 尾版 glob(L54) | 10/10 |
+| CGC_MDL156 → **v0102** | QuantGuard 與 25-roster 路徑釘死 | 尾版 glob(v0101 起 QuantGuard 是 polars 探針版,釘 v0100 會指到舊的) | GREEN 23/23 |
+| SUP_MDL115 控制塔 | 5 個「特定版號存在」燈 | 改 `glob(…_v*.py)`,新版上線燈才不會誤熄 | compile OK |
+| VDF_ENG051 | 模組頂 `import requests/bs4`=缺件即 Traceback(假紅) | 探針式載入 + `_require_net_libs()` 誠實 ABSENT 印裝法(不代裝) | compile OK |
+| VAP_ENG003 → **v0101** · CGC_MDL055 → **v0101** | 只認位置動詞 | `--selftest` 等價轉換(L53) | 8 PASS/2 SKIP · 3/3(兩種寫法都通) |
+
+**結果**:全景問題 **267 → 140(精準化)→ 129(逐檔修)**;SYSEXE 歸零。剩下的 HARDIMP 100 / PINVER 23 / VERB 6 都在非核心區(VeritasPulse、GroupIndex、CLI 套件、new modules engines),會改行為,依 L56 **報位置待令**,逐檔逐行在報告 TAB②。
+
+**核心回歸**:CGC157 21/21 · 匯流排 48/48 · CGC156 23/23 · VCGC 19/19 · ENG087 10/10 · 稽核器 15/15 · registry-sync 5081。
+
+**我自己又學到兩件**(已入教訓庫):稽核器的判準要能分辨「正式路由」與「自測夾具」,否則誤報會蓋住真問題(LL60);自測用字串切點取原始碼,切點必須唯一——我在文件字串裡寫了同一句話,把切點提前,害兩檢無故變紅(LL61)。
+
+---
+
 ## 二 · 操作員機器實況(他貼的 EnvManager v0300 AUDIT,run ENV-20260914_112000;直接當量測)
 
 | 事實 | 影響 |

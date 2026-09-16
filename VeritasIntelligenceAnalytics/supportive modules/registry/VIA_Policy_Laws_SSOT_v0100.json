@@ -1,7 +1,7 @@
 {
  "schema": "VIA.PolicyLaws.SSOT.v1",
- "batch": "批535",
- "ts": "2026-09-16 18:47",
+ "batch": "批536",
+ "ts": "2026-09-16 19:07",
  "purpose": "政策庫正本:操作員律 + 紀律 + lessons-learned(只增不減;ENG082 sync-db 攤平入 via_policy_factors;VCGC 唯一對接口讀此冊)",
  "laws": [
   {
@@ -657,6 +657,16 @@
    "id": "LL59",
    "batch": "批535",
    "zh": "**報告夾名也是九頭龍的頭**:我把新稽核器的產物寫進 VIA_Reports/panorama,而那是 CGC_MDL135/CGC_MDL149 L19 安裝核可閘在讀的檔名;schema 不同 → 那道閘把每一種情境都判 BLOCKED_PANORAMA,VCGC 自測 ⑨ 由 19/19 掉成 18/19。新引擎開產物夾前先 grep 全樹有沒有人在讀同一個路徑;讓名字比改別人便宜。已改 VIA_Reports/panorama_audit/PANORAMA_AUDIT_latest.*,並在自測 ⑬a 釘死不准回頭碰。"
+  },
+  {
+   "id": "LL60",
+   "batch": "批536",
+   "zh": "稽核器的判準要能分辨「正式路由」與「自測夾具」:批535 報的 PINVER 151 件裡有 122 件是自測段/探針函式在暫存夾寫的假冊名(Register-VIA-Commands-v0174.ps1 之類)、或 X_ENG001_A_v0100.py 這種假引擎名;SYSEXE 報的 2 件全是「自己跑自己」(subprocess 帶 Path(__file__))。加上『所在函式是自測/探針就不算』與『自跑自己不算跨家族』之後:PINVER 151→23、SYSEXE 2→0。誤報清掉才看得見真問題。"
+  },
+  {
+   "id": "LL61",
+   "batch": "批536",
+   "zh": "自測用 `src.split(\"def selftest\")[0]` 取「自測段之前的原始碼」來驗律,結果我在 v0101 的文件字串裡寫了『def selftest 之後』,切點提前 → 兩檢無故變紅。切點要唯一(改用 `\\ndef selftest() -> int:`),或改用 AST 取函式範圍。"
   }
  ]
 }
