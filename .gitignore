@@ -351,3 +351,7 @@ VeritasIntelligenceAnalytics/output/
 VeritasIntelligenceAnalytics/configs/*.preview.json
 VeritasIntelligenceAnalytics/configs/system_parameters.json
 VeritasIntelligenceAnalytics/_governance/
+# 批560:治理家族的成員自己會在**自己旁邊**產 _governance/ 輸出(實測:via-cgrouter 跑一次就在
+# supportive modules/VIA_Central_Governance/VIA_CentralGovernanceFamily_b514/ 底下生五個檔)。
+# 上一行只擋根目錄那一個,擋不住巢狀的 → 跑一次家族就會把執行產物混進正本夾(正本零觸碰破口)。
+VeritasIntelligenceAnalytics/**/_governance/
