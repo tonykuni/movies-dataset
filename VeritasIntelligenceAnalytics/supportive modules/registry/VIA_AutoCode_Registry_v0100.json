@@ -8091,8 +8091,17 @@
    "code": "批565 CI 實錄:PR #39 test_11_committed_page_matches_generator FAIL",
    "kind": "**同一類漏,兩批內第二次。**批563 新增 VDF_ENG088 讓現役引擎族 98→99,但我沒再生總控頁——tracked 的 MasterControl 還印 98,CI 的 test_11 逐字比對「committed 頁 vs 正主管理器輸出」當場 FAIL(`<b>98</b>` != `<b>99</b>`,訊息就寫著『tracked MasterControl 與正主管理器輸出不同步』)。批564 漏的是七處裡的「短令+梭」,批565 漏的是「總控頁再生」——**新增一支引擎會改變的東西比我記得的多**。修:跑 VIA_SYSTEM_MANAGER_v0140.py --no-open 再生,diff 剛好 4 行(時戳 + 98→99 兩處 + 引擎表多一列),沒有夾帶。推之前先在本境把那支合約測跑過:**19/19 OK**(先重現紅、再證明綠,不是推上去碰運氣)。這一次守衛本來就在(CI test_11),我漏的是**推之前沒跑它**",
    "batch": 565
+  },
+  {
+   "ts": "2026-09-17 16:50",
+   "op": "ADD",
+   "category": "一鍵統包",
+   "component": "Invoke-VIA-OneShot-v0103.ps1(24 段 · 25 加速器 · 動態進度條)",
+   "code": "批566 操作員令「INTEGRATE ALL INTO ONE POWERSHELL CODE TO HANDLE ALL WITH 25 ACCELERATORS · 動態進度條」",
+   "kind": "**不另開一支,升 OneShot 尾版**(Zero-Hydra:一鍵統包已經有正主 v0102,再寫一支就是第二顆頭)。v0102→v0103 三件:① **25 加速器真點名**——點源 VIA_PS_Accel_Module.ps1,開跑印 25 盞;缺席誠實說缺(v0102 只在文字裡提加速器,從沒真的點過名)。② **動態進度條**——走模組的 Write-VIAProgress(不另寫第二條);非 TTY 退單行 `[####....] 48%`,**不靜默**(批423:畫面全白看起來就是死機)。③ **把散在外面的收進來**:S10a/b 共識融合橋(批563/564)· S11a VTMRA · S11b 中央治理家族 cycles · S11c 家族 U/I · S12a 庫況 · S12b 規則落差 · S13 四態燈。9 段 → **24 段**。三條紀律寫進檔頭,因為它們最容易在『一鍵跑完』裡被偷偷破掉:**不代設同意閘**(VIA_NET_CONSENT/VIA_SCRAPE_CONSENT 只讀不寫;未開=觸網段標新態 **GATED** 並印出要貼哪兩行,GATED 不是 SKIP 也不是 FAIL)· **不代裝套件**(via-envgov apply --approve 只在 -ApproveInstall 時才跑;預設安全還不夠,要沒說就不做)· **不卡斷**(逐段逾時 kill + 邊跑邊吐)。另加 -FullMatrix(預設 --fast)與 -Only(只跑點名段)。**自己抓到自己兩件**:① 進度條分母我寫 21(去數 Invoke-Stage 次數),第一次真跑我加的『分母對帳』檢當場印「實跑 24 段而分母寫 21」——因為有四列是段外直接 Add-Row 的;改成分子分母**數同一件事**(都數列),對帳檢留著當守衛。② 照 LL110 在推之前驗:本檔叫到的 19 個短令**全部在冊上**(0 個 ghost)。照 LL111 驗:跑總控頁再生,diff 只有時戳=引擎族數沒變(.ps1 啟動器不進引擎表)→ 回退該檔;合約測 19/19 OK。pwsh AST 零解析錯;-Only 兩段真跑過(共識橋 NODATA · 規則落差 66 詞)",
+   "batch": 566
   }
  ],
- "updated_at": "2026-09-17 16:20",
- "batch": 565
+ "updated_at": "2026-09-17 16:50",
+ "batch": 566
 }
