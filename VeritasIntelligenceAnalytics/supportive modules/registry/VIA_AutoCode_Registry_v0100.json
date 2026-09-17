@@ -8253,8 +8253,26 @@
    "code": "批573 全格子回歸 232 站:OK 228 · FAIL 2 —— 兩紅都查到根因並修掉",
    "kind": "**全格子回歸抓到兩紅,其中一紅是我自己的。**① `自動總跑器六檢` 的雙橋稽核判「外呼 51 · **網路缺 1**」,那一支就是我批570 寫的 ENG090:`macro --probe` 裡有 `import akshare as ak`。我當時想「只做 hasattr、沒抓資料」——**但稽核器是對的**:它抓的是行首 `import (…|akshare|…)`,而律(網路只認 AegisNexus)管的正是「網路庫不得在引擎行程內就地匯入」。**沒有去掛 NET-BRIDGE 標記把它消音**(那是為了好看而說謊),而是真的不匯入:probe 改開子行程問「介面在不在」回 JSON,結果一樣、稽核乾淨、子行程死了不帶走本引擎。網路缺 1 → **0**,該站轉綠;舊 v0101 退役到 `VIA_RetiredEngines/batch573_net_import/`(只增不減)。並在自測裡**用稽核器的同一條 regex 驗自己**。② `VCGC ⑬` 元件冊落後(加了 MDL163),`registry-sync --apply` 後 20/20。另六個平行紅經第二段序跑全部轉綠(duckdb 鎖撞=假紅,讓庫律)。教訓 LL126",
    "batch": 573
+  },
+  {
+   "ts": "2026-09-17 21:40",
+   "op": "NEW",
+   "category": "中央治理",
+   "component": "CGC_MDL164_GovernanceCompletenessAudit_v0100.py(13 檢)+ 短令 via-govaudit / 制度稽核",
+   "code": "批574 制度健全度稽核:14 庫 + 3 機制,逐本判「冊在 / 有料 / 有活讀者」",
+   "kind": "操作員給十四庫三機制藍圖問「制度健全了嗎 不足補之」。不掃檔案存不存在了事——三條件逐本判,零活讀者判 ORPHAN(不是紅燈,但也沒在治理)。實測 **17/17 GREEN · ORPHAN 0**,深度指標另報 **單一讀者 3 本**(參數庫 via_params_central · 因子庫 VDF_ENG061 · 外部端點庫 via_net_injector)與 **多冊並存 7 處**(同義字管理庫主冊 12 筆,比它名義上治理的 VRN_FieldRules 還薄)。哪一本是正本 = 操作員裁定(LL90),引擎只點名不改字。開發中自抓一紅:PARTIAL 原本比檔數不比逐 glob 命中,已修。教訓 LL128",
+   "batch": 574
+  },
+  {
+   "ts": "2026-09-17 21:40",
+   "op": "UPGRADE",
+   "category": "畫面統一",
+   "component": "CGC_MDL160_UIUnifyGate_v0101.py(15 檢;新增 TARGET 級 + header 動詞)",
+   "code": "批574 Veritas 統一表頭立為第四級 TARGET —— 永不判燈,只報覆蓋率",
+   "kind": "操作員給了 Veritas 統一表頭完整規格(三行 13/26/13px、#8C99A6/#F0F4F8/#737D87、六子系統定位)。先量再定級:本境 106 活頁 `vh_struct 0/106 · vh_three 0/106 · vh_ink 0/106`(vh_brand 40/106),判 LAW 會生 106 假紅、判 UNIFY 會生 106 黃,兩者都會淹掉真正該修的 **43 紅**。故加第四級 TARGET(已立契約尚未施工、不判燈),新增 `header` 動詞印正典規格供施工者抄。上一版釘「三級」的第③檢因此轉紅——修尺不關尺。教訓 LL129",
+   "batch": 574
   }
  ],
- "updated_at": "2026-09-17 20:55",
- "batch": 573
+ "updated_at": "2026-09-17 21:40",
+ "batch": 574
 }
