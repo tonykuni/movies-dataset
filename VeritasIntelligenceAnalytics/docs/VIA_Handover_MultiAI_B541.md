@@ -347,7 +347,7 @@ via-unified             # 批544 統一主控台(TAB1 給 AI · TAB2 兩頁合�
 | 1 | 引擎本體 | `*_vNNNN.py` + `--selftest` 自己會報 n/n | |
 | 2 | **短令冊 + 梭** | `Register-VIA-Commands-v*.ps1`(**在 VIA 根,不在 `supportive modules\`**)+ `via-xxx.cmd` | **批564 漏,`via-consensus` 不認得,連兩次** |
 | 3 | 自測格站 | `supportive modules\registry\CGC_MDL064_SelftestGrid_v*.py` | 批563 改名改到隔壁站(regex 先撞到別人) |
-| 4 | **正主管理器正式名稱 + 總控頁再生** | `VIA_SYSTEM_MANAGER_v*.py --no-open` → `VIA_UI_MasterControl_v0100.html` | **批565 漏,頁還印 98 而引擎族已 99,CI `test_11` 當場紅** |
+| 4 | **正主管理器正式名稱 + 總控頁再生**(**兩件事,做一半等於沒做**) | `TASK_FORMAL_NAMES` 加一行 **＋** `VIA_SYSTEM_MANAGER_v*.py --no-open` → `VIA_UI_MasterControl_v0100.html` | **批565 漏後半**(頁還印 98 而引擎族已 99,CI `test_11` 紅)· **批568 漏前半**(只再生頁沒補名稱,管理器 ⑥ 判 81≠82,CI 也會紅) |
 | 5 | 主控台任務 | `CGC_MDL095_DeckServer_v*.py` / Console `GOV-NN` | |
 | 6 | 政策 / 動詞 SSOT | `VIA_Policy_Laws_SSOT_v0100.json` 等 | |
 | 7 | 台帳 | `supportive modules\registry\VIA_AutoCode_Registry_v0100.json`(`append_only`) | |
@@ -360,6 +360,7 @@ via-unified             # 批544 統一主控台(TAB1 給 AI · TAB2 兩頁合�
 | **總控頁同步** | 跑 `VIA_SYSTEM_MANAGER --no-open`。diff 只有時戳=引擎族數沒變 → **回退該檔**;有變 → 把再生的頁一起帶上,並在本境先跑合約測 | LL111(批565);CI `test_11` |
 | **分母對帳** | 任何 `n/N` 的顯示,分子與分母必須來自同一個計數來源;做不到就加一條跑完對帳,讓不一致自己講出來 | LL112(批566) |
 | **敗站不截斷** | 判為 FAIL 的站,原因行 / 例外全文 / 主控台 / 落檔四處都要原物;綠站與 SKIP 維持短切 | **L62 · LL113(批567)** |
+| **全格子回歸(推之前)** | `via-go` / 格子 `--fast` 全跑一次再推。跑完**一定** `git status` 逐檔回退空沙盒庫再生的 U/I 頁與名冊(LL49) | **LL117(批568)**;peis 少了正式名稱,是推完才被全格子抓到,而那一檢 CI 會跑 |
 | **合成檢關沙盒** | 合成檢只准驗自己合成的東西。引擎有幾個資料來源,自測就要把**每一個**都關進暫存夾——少關一個,那盞燈就是在看機器臉色 | **LL114(批567)**;VCGC ⑨ 曾因機器上一份 2.2h 前的真報告而假紅 |
 | **來源閘(列舉靠機器)** | 「每一個」不能靠記性:用 AST 掃該條路,列出所有 `REPORTS / …` 磁碟來源與 `VIA_*` 覆寫鍵,**沒配鍵的、沒關沙盒的逐一指名報紅** | **L63 · LL115(批568)**;批567 我只關一個,同一個檢在兩台機器紅成兩種樣子 |
 | **順手跑別人的自測** | 改完別只跑自己那支。誤傷與**舊傷**都是這樣照出來的 | LL114;⑨ 那一紅不是這批造成的,但不跑就永遠看不到 |
