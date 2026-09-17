@@ -1489,3 +1489,63 @@ via-vrnrules selftest    十檢自測(含候選閘門負控)
 (這正是 LL89——一個永遠會過的檢查跟假綠燈沒兩樣。)
 
 新教訓 **LL91**:「跑太慢」的時候,先把秒數拆開再決定加什麼。量不出來就不要加。
+
+---
+
+## 批543 —— `via-pyprog` 叫不出來:七處只做了六處,而且不只我漏
+
+操作員實錄:
+```
+via-pyprog: 無法將 'via-pyprog' 字詞辨識為 Cmdlet、函式、指令檔或可執行程式的名稱。
+```
+
+### 一、根因不是短令寫錯
+
+`Register-VIA-Commands-v0212.ps1` 裡 `function global:via-pyprog` 定義得好好的,
+本境點源 v0212 之後 `Get-Command via-pyprog` 也回 True。缺的是**同名 `.cmd` 直通梭**。
+
+批266 就記過這個陷阱:操作員的殼常常是 cmd,而 **PS global 函式在 cmd 永遠看不見**;
+就算在 PowerShell,新加的短令也要人記得重新點源冊。治本是每個短令配一支同名 `.cmd`。
+
+### 二、查下去才發現不是只有我漏的那兩個
+
+| | 數 |
+|---|---:|
+| 冊上 `function global:via-*` | **133** |
+| 有同名 `.cmd` 梭 | **93** |
+| **缺** | **40** |
+
+缺的名單裡有 `via-vcgc`、`via-panorama`、`via-ryg`、`via-bus`、`via-boot`、`via-fplogic`、`via-vrnrules`
+——**都是天天在用的**。也就是說:這些短令在 cmd 殼裡一直叫不出來,只是沒人特地去試。
+
+### 三、補齊 + 釘住
+
+- 依既有樣板(批324 `VIA-Verb-Shim v0100` + 批340 `VIA_NO_OPEN` 零跳出律)**補齊 40 個梭,現在零缺**。
+  編碼沿用既有慣例(UTF-8 no-BOM + CRLF,跟 `via-accel-check.cmd` 完全一致——那支在工作站已經跑了 200+ 批)。
+- `CGC_MDL157` v0102(二十一檢 → **二十四檢**)加三檢:
+  ① 冊上每個 `function global:via-*` 必有同名 `.cmd`
+  ② 沒有梭可以**把版號釘死**(尾版律;釘死那天升版就指向舊檔或空氣)
+  ③ **負控** —— 證明上面兩檢真的咬得住
+- **實測負控**:把 `via-pyprog.cmd` 拿掉 → **RED 23/24**;放回去 → **GREEN 24/24**。
+
+### 四、我自己量錯兩次,寫在這裡
+
+這一批我寫的判準改了三版,前兩版都是我造的假紅燈:
+
+| 版 | 我要求 | 被冤枉的 | 為什麼錯 |
+|---|---|---|---|
+| ① | 每個梭都要走「點源冊尾版 + `%~n0`」樣板 | `VIA-ALL` `VIA-ROOTCHECK` `VIA-TOWER-RESET` `via-pipeline` `via-ppp` `via-repo-optimize` | 它們是**獨立啟動器**(git 自癒、清埠、各自 glob 自己的 ps1),用另一條路到達,一樣到得了 |
+| ② | 至少要有動態 glob | `via-vrnin` | 我的正則只認 `-v*.ps1`,漏掉 `VIA_WinIO_InputPicker_v*.ps1` 這種**底線**接 v 的寫法 |
+| ③ | **只留:版號不得釘死** | — | 這才是真的會咬人的那一條 |
+
+兩次都是同一種錯:**我把自己熟悉的形狀當成正確的定義**。
+量「到得了嗎」,不要量「長得像不像」。
+
+### 五、順手記一筆(本批不動)
+
+`supportive modules/bootstrap/sitecustomize.py:156` 仍寫
+`VIA_ENTRY_CONTROL = "CGC_MDL157_VIAUniqueEntryControl_v0100"` —— 已經跟尾版脫節。
+MDL157 那一檢是版號無關的,所以**不是紅燈**;但這是一個會慢慢漂的標籤。
+改 bootstrap 的影響面太大,本批不碰,記在這裡備查。
+
+新教訓 **LL92**(七處少一處=那個功能在操作員手上等於不存在)· **LL93**(量「到得了嗎」不要量「長得像不像」)。

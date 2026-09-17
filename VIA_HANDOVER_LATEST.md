@@ -1,6 +1,6 @@
-# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0111 · 批542)
+# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0111 · 批543)
 
-> 產生 2026-09-17 09:05:58 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
+> 產生 2026-09-17 09:14:42 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
 
 ## 〇 · 接手提示詞(給下一個 AI;來源 VIA_AI_Handover_Prompt_v0100.md)
 
@@ -249,17 +249,19 @@
 - LL89(批541)濾網修到「真語料端出 0 條」之後,那個 0 本身就變得可疑——一個永遠回 0 的濾網跟一盞假綠燈沒有兩樣(LL77 的同族)。每一道濾網都要配一個負控:合成一組資料,假的要擋掉、真的要放得出來,兩邊都對才算這道濾網在工作。斷言只寫「沒有壞東西」的檢查,擋不住「什麼都沒看」。
 - LL90(批541)同一件事的規則散在多處時,「同義」的裁定權在操作員不在我:冊上把 CLSA 與 CLST 分成兩家、把 CTBC 與中信分開看,都是冊自己的說法;操作員一句「clsa = clst」「CTBC 中信」就是正本。我該做的是照裁定併冊(原文保留在 merged_ 鍵下,只增不減)並當場量回歸,不是拿冊去反駁人。
 - LL91(批542)「跑太慢」的時候,先把秒數拆開再決定加什麼。操作員說慢、要我再加 25 個 PS 加速器——量完才知道:25 個加速器早就在冊(MDL156 accelerators=25),活樹 797 支 py 的加速器橋也早就 100%(via-sweep accel_miss 0)。慢的不是加速器,是**每一道 py 指令都要穿過的那件外套**:python 側 `-c pass` 只要 20ms,外套收 279ms,開視窗第一道再多付 1137ms——而那 1137ms 裡有 625ms 是「每格睡 25ms」的純動畫,快取模式根本沒有東西要等。照著要求再加 25 個,只會讓已經 100% 的東西變成 100%,慢照樣慢。加東西之前先量哪一段在花時間;量不出來就不要加。
+- LL92(批543)「叫不出來」幾乎都不是短令寫錯,是**七處只做了六處**。操作員打 `via-pyprog` 得到「無法將…辨識為 Cmdlet」,查下去是冊上有 function、身邊沒有同名 .cmd 梭;再查才發現冊上 133 個短令只有 93 個有梭,缺 40 個(via-vcgc / via-panorama / via-ryg / via-bus / via-boot 全在內),不是只有我新加的兩個。新加一個短令時,冊上定義、同名梭、自測站、台帳、docs、SSOT、總控頁——七處要一次做完;少一處的代價不是難看,是那個功能在操作員手上等於不存在。
+- LL93(批543)寫檢查的時候,量「到得了嗎」不要量「長得像不像」。我第一版要求每個 .cmd 都走『點源冊尾版 + %~n0』的樣板,六個檔當場判紅——查完全是獨立啟動器(VIA-ALL 做 git 自癒、VIA-TOWER-RESET 清埠、via-pipeline 各自 glob 自己的 ps1),它們用另一條路到達,一樣到得了。第二版把條件放寬成『要有動態解析』,正則卻只寫 `-v*.ps1`,漏掉 `_v*.ps1`,又冤枉了 via-vrnin。兩次都是同一種錯:我把自己熟悉的形狀當成正確的定義。最後只留一條真的會咬人的——**版號不得釘死**(尾版律),其餘形狀不是我該管的。
 
 ## 二 · 安裝核可(L19)與環境工具
 
-- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 205.8 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
+- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 206.0 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
 - 工具冊導入計畫:ABSENT · - · 件態 - · 風險 - · 段 - · 未路由 - · 白名單留置 -(TOOLS_PLAN_latest.json 不在(via-envtools))
 - 環境復原(L24):PLAN · 2026-09-15 05:30:50 · 還原 原本規劃(Baseline;無 LKGC 或 --baseline) · 段 16 · 單獨隔離境 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 借境封鎖 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 次序 RESTORE → CORE → LOW → MEDIUM → HIGH → EXTERNAL → VERIFY;安裝出問題=`via-envrecover`(①還原前次 ②順序裝 ③_M/_H 單獨隔離;-Execute -Approve 才跑,① 不受 L19,② 過 L19)
 - 裝件=操作員的手:`$env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve`(閘不代設;L19 未綠=BLOCKED_UNITEST)
 
 ## 三 · 邏輯庫 · 因子庫 · 資料庫
 
-- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 784 列 · 全庫同步 {'hash': 'dd147e333718', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '90e6f3ae7fa9', 'root': '同', 'home': '缺'}
+- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 790 列 · 全庫同步 {'hash': 'e7d24e71e08e', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': 'cb273c1bca5f', 'root': '同', 'home': '缺'}
 - 因子庫 OK:130 列 · {'SUP_MDL748:allinone 2.1.0': 77, 'SUP_MDL748:financial_data_standardization': 53} · 掛載 {'allinone': 'OK VIA_VRNLogic_AllInOne_v0201.py 2.1.0', 'fds': 'OK financial_data_standardization.py · 28 欄 · 合併損傷件(__main__ 示範缺 5 法,程式庫面可用)'}
 - 庫表冊 OK:54 表(批505)· 全庫表 4 · 庫 ['ActiveTWETF.duckdb', 'vdf_global_market.duckdb', 'vdf_tw_market.duckdb']
 - 資料家 ABSENT:VIA_Reports/datahome/DATAHOME_CATALOG_latest.json 不在(via-datahome catalog) · 庫 - · 表 - · 湖 -
@@ -415,16 +417,16 @@
 
 ## 七 · 自動編號註冊表(台帳)
 
-- 全域台帳 1074 筆 · 元件 149 · 更新 2026-09-17 08:20
-- 元件冊 OK · ACTIVE 5146 · RETIRED 115 · 更新 2026-09-17T09:05:57 · {'class': 91, 'engine': 81, 'environment': 43, 'function': 4287, 'feature': 95, 'module': 151, 'package': 252, 'system': 10, 'tool': 136}
+- 全域台帳 1075 筆 · 元件 149 · 更新 2026-09-17 08:55
+- 元件冊 OK · ACTIVE 5146 · RETIRED 115 · 更新 2026-09-17T09:14:42 · {'class': 91, 'engine': 81, 'environment': 43, 'function': 4287, 'feature': 95, 'module': 151, 'package': 252, 'system': 10, 'tool': 136}
 - 類別 current:系統 1 · 支援性工具 2 · 功能性工具 1 · 模組 1 · 引擎 19 · 函數庫 1 · 打包產品 8
 
-- 2026-09-16 21:17 批538 收尾四件。① VAP_ENG005 v0101:⑥⑩ 走 seaborn corrheat,本境沒裝就報紅;改誠實 SKIP + pip 行(不代裝),並把計數改成 OK
 - 2026-09-17 05:24 批539 六處拔線 + 本境卸載。批534 只刪了檔,接線還指著已不存在的 CGC_MDL151 / VDF_ENG083 / VAP_ENG004_TAFactory / VDF
 - 2026-09-17 06:47 批540 VRN 規則收斂第一步(零改線)。量出硬落差:同一套評等詞彙在四支現役引擎各有各的版本——ENG086 38/38(正本,64 份真研報驗過)· ENG073 17/38
 - 2026-09-17 07:45 批541 VRN 規則收斂第二步(仍零改線,只多了兩個量尺與一個裁定)。① 去衝突:合併收容件字典×SSOT 正本×橋側補冊三張券商表,掃出 17 個原始撞名、合併後仍有 2 個活
 - 2026-09-17 07:58 批540 立了 SUP_MDL749 規則正本樞紐卻**沒給短令**——七處少一處,等於你在工作站叫不出它。補 via-vrnrules(status|drift|conflict
 - 2026-09-17 08:20 先量再說,量出來兩件已完成、一件是真的:① 25 個 PS 加速器**早就在冊**——VIA_Accelerator_Roster_SSOT accelerators=25、VIA
+- 2026-09-17 08:55 根因不是短令寫錯,是功能註冊七處只做了六處:冊上有 function global:via-pyprog,身邊沒有同名 .cmd 梭。而且不是只有我新加的兩個——量完是冊上 133
 
 ## 八 · 交接本文(來源 VIA_Handover_20260914_B498.md;逐批紀錄見該檔)
 
@@ -1918,6 +1920,66 @@ via-vrnrules selftest    十檢自測(含候選閘門負控)
 (這正是 LL89——一個永遠會過的檢查跟假綠燈沒兩樣。)
 
 新教訓 **LL91**:「跑太慢」的時候,先把秒數拆開再決定加什麼。量不出來就不要加。
+
+---
+
+### 批543 —— `via-pyprog` 叫不出來:七處只做了六處,而且不只我漏
+
+操作員實錄:
+```
+via-pyprog: 無法將 'via-pyprog' 字詞辨識為 Cmdlet、函式、指令檔或可執行程式的名稱。
+```
+
+#### 一、根因不是短令寫錯
+
+`Register-VIA-Commands-v0212.ps1` 裡 `function global:via-pyprog` 定義得好好的,
+本境點源 v0212 之後 `Get-Command via-pyprog` 也回 True。缺的是**同名 `.cmd` 直通梭**。
+
+批266 就記過這個陷阱:操作員的殼常常是 cmd,而 **PS global 函式在 cmd 永遠看不見**;
+就算在 PowerShell,新加的短令也要人記得重新點源冊。治本是每個短令配一支同名 `.cmd`。
+
+#### 二、查下去才發現不是只有我漏的那兩個
+
+| | 數 |
+|---|---:|
+| 冊上 `function global:via-*` | **133** |
+| 有同名 `.cmd` 梭 | **93** |
+| **缺** | **40** |
+
+缺的名單裡有 `via-vcgc`、`via-panorama`、`via-ryg`、`via-bus`、`via-boot`、`via-fplogic`、`via-vrnrules`
+——**都是天天在用的**。也就是說:這些短令在 cmd 殼裡一直叫不出來,只是沒人特地去試。
+
+#### 三、補齊 + 釘住
+
+- 依既有樣板(批324 `VIA-Verb-Shim v0100` + 批340 `VIA_NO_OPEN` 零跳出律)**補齊 40 個梭,現在零缺**。
+  編碼沿用既有慣例(UTF-8 no-BOM + CRLF,跟 `via-accel-check.cmd` 完全一致——那支在工作站已經跑了 200+ 批)。
+- `CGC_MDL157` v0102(二十一檢 → **二十四檢**)加三檢:
+  ① 冊上每個 `function global:via-*` 必有同名 `.cmd`
+  ② 沒有梭可以**把版號釘死**(尾版律;釘死那天升版就指向舊檔或空氣)
+  ③ **負控** —— 證明上面兩檢真的咬得住
+- **實測負控**:把 `via-pyprog.cmd` 拿掉 → **RED 23/24**;放回去 → **GREEN 24/24**。
+
+#### 四、我自己量錯兩次,寫在這裡
+
+這一批我寫的判準改了三版,前兩版都是我造的假紅燈:
+
+| 版 | 我要求 | 被冤枉的 | 為什麼錯 |
+|---|---|---|---|
+| ① | 每個梭都要走「點源冊尾版 + `%~n0`」樣板 | `VIA-ALL` `VIA-ROOTCHECK` `VIA-TOWER-RESET` `via-pipeline` `via-ppp` `via-repo-optimize` | 它們是**獨立啟動器**(git 自癒、清埠、各自 glob 自己的 ps1),用另一條路到達,一樣到得了 |
+| ② | 至少要有動態 glob | `via-vrnin` | 我的正則只認 `-v*.ps1`,漏掉 `VIA_WinIO_InputPicker_v*.ps1` 這種**底線**接 v 的寫法 |
+| ③ | **只留:版號不得釘死** | — | 這才是真的會咬人的那一條 |
+
+兩次都是同一種錯:**我把自己熟悉的形狀當成正確的定義**。
+量「到得了嗎」,不要量「長得像不像」。
+
+#### 五、順手記一筆(本批不動)
+
+`supportive modules/bootstrap/sitecustomize.py:156` 仍寫
+`VIA_ENTRY_CONTROL = "CGC_MDL157_VIAUniqueEntryControl_v0100"` —— 已經跟尾版脫節。
+MDL157 那一檢是版號無關的,所以**不是紅燈**;但這是一個會慢慢漂的標籤。
+改 bootstrap 的影響面太大,本批不碰,記在這裡備查。
+
+新教訓 **LL92**(七處少一處=那個功能在操作員手上等於不存在)· **LL93**(量「到得了嗎」不要量「長得像不像」)。
 
 ## 九 · 掉球清單(來源 VIA_DroppedBalls_B507.md;列 68 · 未結 64;只增不減,結案劃線)
 

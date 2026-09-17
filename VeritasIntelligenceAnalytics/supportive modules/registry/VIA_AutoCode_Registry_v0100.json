@@ -7931,8 +7931,16 @@
    "component": "VIA_PS_PyProgress_Module(中央 py 外套)+ VIA_PS_PyProgress_Selftest_v0100 + CGC_MDL156 v0103 + Grid v0322 + Register v0212",
    "code": "批542 操作員實錄「前一個指令跑太慢 請加入25個PS加速器 請確認所有PY指令都有加入加速器」",
    "kind": "先量再說,量出來兩件已完成、一件是真的:① 25 個 PS 加速器**早就在冊**——VIA_Accelerator_Roster_SSOT accelerators=25、VIA_PS_Accelerators_25_Roster_v0100.ps1 25 條、$global:VIA_ACCEL25 由它生成、MDL156 二十三檢 GREEN。② 所有 py 指令**早就掛上加速器**——via-sweep --audit:活樹 797 支 accel_have 797 / accel_miss 0(100%),網路橋 50/50;非活樹 66 支是舊版號檔、6 支在凍結產出夾(L55 活樹律,對它們報缺是假紅)。短令側:Register 第 24~33 行就是 [VIA:PS-ACCEL] 橋,且所有 py 一律走 Invoke-VIAPython 中央唯一入口。③ 真的問題在**外套**:python 側 `-c pass` 約 20ms,Invoke-VIAPython 收 279ms;開視窗第一道再多付 1137ms。拆開是三筆:快取模式點燈每格 Start-Sleep 25ms × 25 格 = 625ms 純動畫(快取模式沒有東西要等)· 固定 250ms 輪詢(平均多付 125ms 才發現早就跑完)· Write-Progress 每 250ms 無條件重繪(Windows 重繪整條橫幅很貴)。改:快取點燈零睡眠 · 10ms 起跳倍增到 250ms 的自適應輪詢 · 進度條只在秒數/狀態變了才畫、400ms 內免橫幅。實測(同一棵樹同一條快取路徑):首發 1137→280ms(−75%)· 後續每道 279→37ms(−87%);七道一組的區塊省約 2.7 秒。行為零變更,由新增的 VIA_PS_PyProgress_Selftest 六檢釘住:stdout 一行不少 · rc 不吞 · stderr 不混進 pipeline · 長跑邊跑邊轉播仍收齊 · 逾時 rc 124 不卡斷。改前改後同一組六檢都 FAIL 0。MDL156 v0103 加四道「別改回去」閘(二十三→二十八檢),並做過負控:把外套改回舊版 → RED 25/28,還原 → GREEN 28/28。新短令 via-pyprog(別名 啟動器自測;-Bench 印耗時)。教訓 LL91:『跑太慢』先把秒數拆開再決定加什麼。"
+  },
+  {
+   "ts": "2026-09-17 08:55",
+   "op": "ASSIGN",
+   "category": "短令",
+   "component": "40 個 .cmd 直通梭 + CGC_MDL157 v0102(二十一→二十四檢)+ Grid v0323",
+   "code": "批543 操作員實錄:`via-pyprog` 無法將字詞辨識為 Cmdlet、函式、指令檔或可執行程式的名稱",
+   "kind": "根因不是短令寫錯,是功能註冊七處只做了六處:冊上有 function global:via-pyprog,身邊沒有同名 .cmd 梭。而且不是只有我新加的兩個——量完是冊上 133 個短令只有 93 個有梭,**缺 40 個**,via-vcgc / via-panorama / via-ryg / via-bus / via-boot / via-fplogic / via-vrnrules 全在缺的名單裡。① 依既有樣板(批324 VIA-Verb-Shim v0100 + 批340 VIA_NO_OPEN 零跳出律)補齊 40 個梭,現在零缺;編碼沿用既有慣例(UTF-8 no-BOM + CRLF,跟 via-accel-check.cmd 一致,那支在工作站已跑 200+ 批)。② CGC_MDL157 v0102 加三檢釘住:冊上每個 function global:via-* 必有同名 .cmd(大小寫不計)· 沒有梭可以把版號釘死(尾版律)· 負控證明前兩檢真的咬得住。③ 實測負控:把 via-pyprog.cmd 拿掉 → RED 23/24;放回去 → GREEN 24/24。④ 過程中我自己量錯兩次(都寫進 MDL157 的註解與 LL93):第一版拿『樣板長相』當判準,把 VIA-ALL / VIA-ROOTCHECK / VIA-TOWER-RESET / via-pipeline / via-ppp / via-repo-optimize 六個**獨立啟動器**判成紅;第二版正則只認 `-v*.ps1`,漏掉 `VIA_WinIO_InputPicker_v*.ps1` 這種底線接 v 的寫法,冤枉 via-vrnin。最後只留一條真的會咬人的:版號不得釘死。注:supportive modules/bootstrap/sitecustomize.py 第 156 行仍寫 VIA_ENTRY_CONTROL=..._v0100(已與尾版脫節);MDL157 那一檢是版號無關的,所以不是紅燈,但這是一個會慢慢漂的標籤,本批不動它(改 bootstrap 影響面太大),記在此備查。教訓 LL92 七處少一處=那個功能在操作員手上等於不存在 · LL93 量『到得了嗎』不要量『長得像不像』。"
   }
  ],
- "updated_at": "2026-09-17 08:20",
- "batch": "批542"
+ "updated_at": "2026-09-17 08:55",
+ "batch": "批543"
 }
