@@ -1966,3 +1966,50 @@ f"OCR_RUN_FAIL(lane={envname}:{type(exc).__name__}:{str(exc)[:60]})"
 
 新教訓 **LL104**:同一個症狀查第二次還查不出來,就**停下來檢查觀測本身**——
 訊息有沒有被截斷、例外有沒有被吞、log 有沒有被覆蓋。不要再猜一個根因。
+
+---
+
+## 批551 —— 眼罩有兩層,第二層也是我自己蒙的
+
+你開了 `VIA_OCR_TRACE=1` 再跑一次,㉜ 那行**還是切在同一個字**:
+
+```
+(simple:OCR_RUN_FAIL(lane=via_paddle_311:FileNotFoundError:[Errno 2] No such file or direct)
+```
+
+切它的不是例外格式化(那一層我批550 拆了),是 **㉜ 自己的註記**:
+
+```python
+chk("㉜ …", 條件, f"({_g32[:90]})")
+```
+
+數一下那句話**正好 90 字**。我拆了一層,底下還有一層,**兩層都是我設的**。
+
+### v0133
+
+自測註記一律走 `_note()`——預設仍切(一行一檢不能爆版),`VIA_OCR_TRACE=1` 時給全文;
+㉜ / ㉝ / ㊷ / ㊻ 四處一併改。加 **㊿** 用那句真話當夾具釘住:
+
+```
+關 = 90 字,看不到檔名
+開 = 157 字,看得到 inference.pdiparams
+```
+
+**五十檢 50/50。㉜ 本身仍未解**,但開關這次是真的一路開到底了。
+
+### 順帶記兩行(列為觀察,未證實)
+
+你那一跑的 log 裡有:
+
+```
+[VIA_PDFPlumberPlusEngine] PP-Structure 不可用,改用 PaddleOCR:ImportError
+[VIA_PDFPlumberPlusEngine] OCR 引擎載入失敗:RuntimeError: Engine 'paddle_static' is unavailable
+                            because dependency 'paddlepaddle' is not installed.
+```
+
+後面那句跟 `find_spec('paddle') = True` 看似矛盾(`paddle` 模組在,但 `paddlepaddle` 發行版可能沒裝齊)。
+**列為觀察,不入結論** —— 我這次不猜。
+
+新教訓 **LL105**:觀測開關要**一路開到底**,開一半跟沒開一樣。
+一條訊息從產生到印出來會經過好幾道關,每一道都可能切它;
+驗收要用「看得到那個關鍵字」當判準,不是用「字數變多了」。

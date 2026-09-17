@@ -7995,8 +7995,16 @@
    "component": "VRN_ENG072_FirstPageText_v0132 + Grid v0329",
    "code": "批550 ㉜ 查不下去的原因是我自己把診斷資訊截掉了(str(exc)[:60])",
    "kind": "操作員機器實測:v0131 把 ㊷ 修好了(48 檢 OK 47 / FAIL 1,只剩 ㉜)。ㄍ㉜ 追了三批,每次拿到同一句 `FileNotFoundError:[Errno 2] No such file or direct`——因為 tag 用 str(exc)[:60],而 `[Errno 2] No such file or directory: 'C:\\…'` 缺的檔名剛好在第 60 字之後。我三次猜根因(ACCEL-BRIDGE 注入 · pyvenv.cfg home 指到家目錄 · 只剩 638 那條路)全錯,卻沒發現自己戴著眼罩,還一直在那句被切斷的話上面推理。v0132 三件:① VIA_OCR_TRACE=1 給完整訊息 + 完整 traceback(預設行為零變更,tag 不爆版);② _page1_pdf 本來在 try 之外,包進去並另給 LANE_PAGE1_FAIL 字樣——「切頁失敗(還沒派工)」與「派工失敗」要分得出來,否則兩種病共用一個名字;③ ㊾ 驗這個開關真的有用:關=60 字看不到檔名 · 開=450 字含完整路徑與 traceback。四十九檢 49/49。**㉜ 本身仍未解**,這一批只是把眼罩拿掉。教訓 LL104。"
+  },
+  {
+   "ts": "2026-09-17 14:25",
+   "op": "ASSIGN",
+   "category": "功能性引擎",
+   "component": "VRN_ENG072_FirstPageText_v0133 + Grid v0330",
+   "code": "批551 操作員開了 VIA_OCR_TRACE=1 再跑,同一個位置還是被切斷",
+   "kind": "眼罩有兩層,第二層也是我自己蒙的。批550 拆掉例外格式化的 str(exc)[:60],操作員開追蹤再跑一次拿到的還是同一句話——切它的是 ㉜ 自己的註記 `f\"({_g32[:90]})\"`,那句正好 90 字。v0133:自測註記一律走 _note()(預設仍切,一行一檢不能爆版;VIA_OCR_TRACE=1 給全文),㉜/㉝/㊷/㊻ 四處註記切片一併改;加 ㊿ 用那句真話當夾具釘住(關=90 字看不到檔名 · 開=157 字看得到 inference.pdiparams)。五十檢 50/50。**㉜ 本身仍未解**——但這次開關是真的一路開到底了。順帶,操作員那一跑的 log 有兩行值得記:『PP-Structure 不可用,改用 PaddleOCR:ImportError』與『Engine paddle_static is unavailable because dependency paddlepaddle is not installed』——後者與 find_spec('paddle')=True 看似矛盾(paddle 模組在,但 paddlepaddle 發行版沒裝齊),**列為觀察,未證實,不入結論**。教訓 LL105。"
   }
  ],
- "updated_at": "2026-09-17 13:50",
- "batch": "批550"
+ "updated_at": "2026-09-17 14:25",
+ "batch": "批551"
 }

@@ -1,6 +1,6 @@
-# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0111 · 批550)
+# VIA 一頁交接 · Veritas Central Governance Console(VCGC v0111 · 批551)
 
-> 產生 2026-09-17 11:43:35 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
+> 產生 2026-09-17 12:15:58 · 唯一對接口(律 L20):政策庫 · 邏輯庫 · 因子庫 · 資料庫 · 引擎調度 · 多矩陣 · 環境工具 · 註冊表 · 交接。動態段(矩陣/RunGate/工具計畫/資料家)以**你機器上最新一次 `via-vcgc onepage`** 為準;倉內這份是 commit 時的快照。
 
 ## 〇 · 接手提示詞(給下一個 AI;來源 VIA_AI_Handover_Prompt_v0100.md)
 
@@ -262,17 +262,18 @@
 - LL102(批548)我連續三次拿自己的產物當證據:批544 拿『629B 跟 612B 很接近』當 ACCEL-BRIDGE 注入的證明;批546 才發現那是 CRLF;批547 又拿一個賦值失敗的 PowerShell 變數($HOME 唯讀,保留家目錄值)當 pyvenv.cfg 的內容,寫出一整批的錯誤根因。共通形狀是:**我先有了一個解釋,然後把手邊任何數字往上套**,而不是先問「這個數字是誰產生的、它可信嗎」。守則三條:① 診斷工具自己要先驗證——腳本報了 WriteError 就代表那一段的輸出不可信,不可以跳過錯誤繼續讀數字;② 近似不是證據(629≈612 不是等於);③ 任何根因在寫進台帳前,要能講出「哪一行程式、在什麼條件下、產生了這個字串」——講不出來就只是假設,要標成假設。
 - LL103(批549)最陰險的一種判錯紅燈:**只有在那個東西不存在時才會過的檢查**。㊷ 的斷言找的是「名稱**(**」,而那個左括號只在模組缺席時才出現(`paddleocr(缺 paddleocr,paddle)`);操作員把 paddleocr 裝好之後,tag 變成 `paddleocr:SKIPPED_POLICY/0元素`,沒有左括號,於是判 FAIL——**裝好了反而亮紅,方向剛好相反**。而它自己宣稱要驗的「派車道名單」在他機器上明明成立。根因是我拿**本境當時的輸出字串**當判準,而那個字串的形狀會隨「在不在位」改變;我把呈現差別誤當成名單差別。守則:斷言要對著**它宣稱要驗的那件事**,不是對著你當時看到的那一行字;而且要用兩種狀態(有/沒有)各跑一次當負控——一個只在缺席時為真的判準,等於把「功能裝好」判成故障。
 - LL104(批550)診斷不下去的時候,先問「我把什麼資訊丟掉了」,不要再猜一個根因。㉜ 那盞紅燈我追了三批、猜了三個根因(ACCEL-BRIDGE 注入 · pyvenv.cfg home 指到家目錄 · 只剩 638 那條路),每一個都錯。真正的原因是**我自己在 tag 裡寫了 `str(exc)[:60]`**,而 `[Errno 2] No such file or directory: 'C:\…'` 缺的那個檔名剛好落在第 60 字之後——我每次拿到的都是同一句沒有資訊量的話,卻沒發現自己戴著眼罩,還一直在那句話上面推理。守則:① 同一個症狀查第二次還查不出來,就停下來檢查觀測本身(訊息有沒有被截斷、例外有沒有被吞、log 有沒有被覆蓋);② 截斷是為了版面,那就給一個開關(VIA_OCR_TRACE=1)把全文放出來,預設行為零變更;③ 把「還沒開始做」與「做了失敗」分成不同字樣(_page1_pdf 切頁失敗 vs 派工失敗),否則兩種病共用一個名字,永遠分不出來。
+- LL105(批551)觀測開關要**一路開到底**,開一半跟沒開一樣。批550 我拆掉例外格式化的 `str(exc)[:60]`,操作員開了 VIA_OCR_TRACE=1 再跑一次,拿到的**還是同一句被切斷的話**——因為切它的不是例外格式化,是 ㉜ 自己的註記 `f"({_g32[:90]})"`,而那句話正好 90 字。一條訊息從產生到印出來會經過好幾道關,每一道都可能切它;拆了第一道不代表看得到。守則:① 要加追蹤模式時,先把那條訊息**從源頭到螢幕**的每一道切片列出來,一次全部改成受開關控制;② 驗收要用「看得到那個關鍵字」當判準(例:開了之後要看得到 inference.pdiparams),不是用「字數變多了」;③ 這一批加的 ㊿ 就是拿那句真話當夾具,關=90 字看不到檔名、開=157 字看得到。
 
 ## 二 · 安裝核可(L19)與環境工具
 
-- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 208.4 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
+- RunGate:YELLOW · 2026-09-08T19:17:29 · 齡 209.0 h · 必驗 ['vdf', 'vrn'] · 覆蓋 {'vdf': {'ok': False, 'why': '燈=YELLOW、家族境非 OK', 'required_ok': 4, 'required_n': 4, 'engines_ok': 8, 'engines_n': 8}, 'vrn': {'ok': False, 'why': '家族未測'}} → **BLOCKED_UNITEST** · 原因 ['總燈=YELLOW≠GREEN', 'RunGate 時間缺/來自未來/逾 24h', 'vdf:燈=YELLOW、家族境非 OK', 'vrn 家族未測']
 - 工具冊導入計畫:ABSENT · - · 件態 - · 風險 - · 段 - · 未路由 - · 白名單留置 -(TOOLS_PLAN_latest.json 不在(via-envtools))
 - 環境復原(L24):PLAN · 2026-09-15 05:30:50 · 還原 原本規劃(Baseline;無 LKGC 或 --baseline) · 段 16 · 單獨隔離境 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 借境封鎖 ['via_mix_ds_np2_M', 'via_mix_http_M', 'via_iso_ml_cuda_H'] · 次序 RESTORE → CORE → LOW → MEDIUM → HIGH → EXTERNAL → VERIFY;安裝出問題=`via-envrecover`(①還原前次 ②順序裝 ③_M/_H 單獨隔離;-Execute -Approve 才跑,① 不受 L19,② 過 L19)
 - 裝件=操作員的手:`$env:VIA_NET_CONSENT='YES'; via-envtools -Apply -Approve`(閘不代設;L19 未綠=BLOCKED_UNITEST)
 
 ## 三 · 邏輯庫 · 因子庫 · 資料庫
 
-- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 823 列 · 全庫同步 {'hash': '7b0de866bdfe', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '85ab97bf1031', 'root': '同', 'home': '缺'}
+- 邏輯庫 OK:件 2 · 判準 {'SUCCESS': 2} · 壞後端 [] · 政策因子 826 列 · 全庫同步 {'hash': '4d9bea4ed375', 'counts': {'未入': 1}, 'dbs': 1} · 交接三處 {'doc': 'VIA_Handover_ONEPAGE.md', 'sha': '4f19d6dd8a54', 'root': '同', 'home': '缺'}
 - 因子庫 OK:130 列 · {'SUP_MDL748:allinone 2.1.0': 77, 'SUP_MDL748:financial_data_standardization': 53} · 掛載 {'allinone': 'OK VIA_VRNLogic_AllInOne_v0201.py 2.1.0', 'fds': 'OK financial_data_standardization.py · 28 欄 · 合併損傷件(__main__ 示範缺 5 法,程式庫面可用)'}
 - 庫表冊 OK:54 表(批505)· 全庫表 4 · 庫 ['ActiveTWETF.duckdb', 'vdf_global_market.duckdb', 'vdf_tw_market.duckdb']
 - 資料家 ABSENT:VIA_Reports/datahome/DATAHOME_CATALOG_latest.json 不在(via-datahome catalog) · 庫 - · 表 - · 湖 -
@@ -424,21 +425,21 @@
 
 ## 六 · 註冊稽核(所有引擎/模組/功能/工具/環境)
 
-- 中央自動編號冊 OK · ACTIVE 5167/5167 · **缺 0** · 類別 {'class': 91, 'engine': 81, 'environment': 43, 'function': 4306, 'feature': 95, 'module': 152, 'package': 252, 'system': 10, 'tool': 137}
+- 中央自動編號冊 OK · ACTIVE 5168/5168 · **缺 0** · 類別 {'class': 91, 'engine': 81, 'environment': 43, 'function': 4307, 'feature': 95, 'module': 152, 'package': 252, 'system': 10, 'tool': 137}
 - 尾版引擎/模組家族 242 · 中央冊已登 242 · **未登 0** · 操作介面有掛載 200 · 內部件無操作介面 42(誠實分列，不拿編號片段假命中)
 
 ## 七 · 自動編號註冊表(台帳)
 
-- 全域台帳 1082 筆 · 元件 149 · 更新 2026-09-17 13:50
-- 元件冊 OK · ACTIVE 5167 · RETIRED 115 · 更新 2026-09-17T11:43:34 · {'class': 91, 'engine': 81, 'environment': 43, 'function': 4306, 'feature': 95, 'module': 152, 'package': 252, 'system': 10, 'tool': 137}
+- 全域台帳 1083 筆 · 元件 149 · 更新 2026-09-17 14:25
+- 元件冊 OK · ACTIVE 5168 · RETIRED 115 · 更新 2026-09-17T12:15:58 · {'class': 91, 'engine': 81, 'environment': 43, 'function': 4307, 'feature': 95, 'module': 152, 'package': 252, 'system': 10, 'tool': 137}
 - 類別 current:系統 1 · 支援性工具 2 · 功能性工具 1 · 模組 1 · 引擎 19 · 函數庫 1 · 打包產品 8
 
-- 2026-09-17 10:20 救法沒救到,因為紅燈點名的是**資料夾**不是那個檔。根因在選檔方式:intake_engine_file() = sorted(home.glob('VIA_VRN_FirstP
 - 2026-09-17 11:05 **這是一筆更正,不是新功能。** 操作員照批545 的診斷列了收容件夾,只有一個檔、沒有入侵者。把倉庫那份(LF · 30,115B · d4cdaedf)逐位元轉成 CRLF 
 - 2026-09-17 11:50 操作員的環境證據把根因指出來了:那個境的 pyvenv.cfg 在,但 home 指到家目錄。Windows 的 venv 啟動器照 cfg 去那裡找 python.exe → F
 - 2026-09-17 12:30 **這是一筆更正。** 操作員逐條量:pyvenv.cfg home = C:\Python313(正確的 venv,不是家目錄)· Scripts\python.exe 在且跑得
 - 2026-09-17 13:10 操作員直接跑 SUP_MDL747,回的 JSON 乾淨:err 空、paddleocr status=SKIPPED_POLICY、probe binary_available=
 - 2026-09-17 13:50 操作員機器實測:v0131 把 ㊷ 修好了(48 檢 OK 47 / FAIL 1,只剩 ㉜)。ㄍ㉜ 追了三批,每次拿到同一句 `FileNotFoundError:[Errno 
+- 2026-09-17 14:25 眼罩有兩層,第二層也是我自己蒙的。批550 拆掉例外格式化的 str(exc)[:60],操作員開追蹤再跑一次拿到的還是同一句話——切它的是 ㉜ 自己的註記 `f"({_g32[:
 
 ## 八 · 交接本文(來源 VIA_Handover_20260914_B498.md;逐批紀錄見該檔)
 
@@ -2409,6 +2410,53 @@ f"OCR_RUN_FAIL(lane={envname}:{type(exc).__name__}:{str(exc)[:60]})"
 
 新教訓 **LL104**:同一個症狀查第二次還查不出來,就**停下來檢查觀測本身**——
 訊息有沒有被截斷、例外有沒有被吞、log 有沒有被覆蓋。不要再猜一個根因。
+
+---
+
+### 批551 —— 眼罩有兩層,第二層也是我自己蒙的
+
+你開了 `VIA_OCR_TRACE=1` 再跑一次,㉜ 那行**還是切在同一個字**:
+
+```
+(simple:OCR_RUN_FAIL(lane=via_paddle_311:FileNotFoundError:[Errno 2] No such file or direct)
+```
+
+切它的不是例外格式化(那一層我批550 拆了),是 **㉜ 自己的註記**:
+
+```python
+chk("㉜ …", 條件, f"({_g32[:90]})")
+```
+
+數一下那句話**正好 90 字**。我拆了一層,底下還有一層,**兩層都是我設的**。
+
+#### v0133
+
+自測註記一律走 `_note()`——預設仍切(一行一檢不能爆版),`VIA_OCR_TRACE=1` 時給全文;
+㉜ / ㉝ / ㊷ / ㊻ 四處一併改。加 **㊿** 用那句真話當夾具釘住:
+
+```
+關 = 90 字,看不到檔名
+開 = 157 字,看得到 inference.pdiparams
+```
+
+**五十檢 50/50。㉜ 本身仍未解**,但開關這次是真的一路開到底了。
+
+#### 順帶記兩行(列為觀察,未證實)
+
+你那一跑的 log 裡有:
+
+```
+[VIA_PDFPlumberPlusEngine] PP-Structure 不可用,改用 PaddleOCR:ImportError
+[VIA_PDFPlumberPlusEngine] OCR 引擎載入失敗:RuntimeError: Engine 'paddle_static' is unavailable
+                            because dependency 'paddlepaddle' is not installed.
+```
+
+後面那句跟 `find_spec('paddle') = True` 看似矛盾(`paddle` 模組在,但 `paddlepaddle` 發行版可能沒裝齊)。
+**列為觀察,不入結論** —— 我這次不猜。
+
+新教訓 **LL105**:觀測開關要**一路開到底**,開一半跟沒開一樣。
+一條訊息從產生到印出來會經過好幾道關,每一道都可能切它;
+驗收要用「看得到那個關鍵字」當判準,不是用「字數變多了」。
 
 ## 九 · 掉球清單(來源 VIA_DroppedBalls_B507.md;列 68 · 未結 64;只增不減,結案劃線)
 
