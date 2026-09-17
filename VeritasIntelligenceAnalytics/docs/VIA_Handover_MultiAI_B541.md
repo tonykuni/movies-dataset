@@ -1,4 +1,4 @@
-# VIA 交接報告 · 多 AI 協作版(批541 立 · **批554 更新** · 2026-09-17)
+# VIA 交接報告 · 多 AI 協作版(批541 立 · **批567 更新** · 2026-09-17)
 
 > 這一份是**給下一個接手的人或 AI 看的**,不是給機器讀的。
 > 目的只有一個:讓你在**不問任何人**的情況下,知道東西在哪、規矩是什麼、現在卡在哪。
@@ -155,6 +155,9 @@ python .\supportive` modules\registry\CGC_MDL064_SelftestGrid_v0321.py   # 230 �
 | **不代設** | 不替操作員設任何同意閘(`VIA_NET_CONSENT` 等)、不代裝套件。要裝要開,是**他的手** |
 | **誠實四態** | rc 0=GREEN · 1=RED · 2=NODATA · 3=ABSENT。**判錯的紅燈和假綠一樣傷** |
 | **零九頭龍** | 同一件事不准有第二套實作。要整合就收斂到一處,不是再長一顆頭 |
+
+> 這張表是**六句口訣**。完整的流程與政策(一批怎麼跑 · 功能註冊七處 · 推之前必跑 ·
+> 不代做的四件 · 誠實五態)在 **[十、流程與政策](#十流程與政策批567-立)** —— 接手的人請把那一節讀完再動手。
 
 ---
 
@@ -313,8 +316,86 @@ VRN 那兩盞 **ABSENT 是誠實的缺件,不是壞掉**:
 ```powershell
 Set-Location 'D:\OneDrive\文件\GitHub\movies-dataset\VeritasIntelligenceAnalytics'
 git pull origin claude/via-envmanager-governance-7cls8h
-. (Get-ChildItem 'supportive modules\Register-VIA-Commands-v*.ps1' | Sort-Object Name | Select-Object -Last 1).FullName
+. (Get-ChildItem 'Register-VIA-Commands-v*.ps1' | Sort-Object Name | Select-Object -Last 1).FullName   # 冊在 VIA 根
 via-vrnrules drift      # 誰還沒收斂
 via-ryg vrn             # VRN 四態燈
 via-unified             # 批544 統一主控台(TAB1 給 AI · TAB2 兩頁合一)
+```
+---
+
+## 十、流程與政策(批567 立)
+
+> 操作員令「交接報告加入流程或政策」。
+> 底下每一條都是**被燒出來才寫的**,括號裡是實錄批次,不是紙上規劃。
+
+### 10.1 一批怎麼跑(七步,沒有例外)
+
+```
+① 量   —— 先量現況,不要先有解釋再湊數字(LL102/106/107)
+② 判   —— 量出來若與指令的前提不符,誠實說「這件已經成立」,不假裝再做一次(批567)
+③ 做   —— 引擎改行為=開新版號檔 _vNNNN;未版號檔才就地改(尾版律)
+④ 證   —— 本境真跑:舊版 vs 新版同一輸入的前後對照,不是只跑新版看它綠
+⑤ 登錄 —— 功能註冊七處(10.2),少一處等於沒上線
+⑥ 推前驗 —— 10.3 三條必跑
+⑦ 推   —— commit 批NNN:… + push,再回報操作員(「每一個進度就上傳 GITHUB」)
+```
+
+### 10.2 功能註冊七處(新引擎 / 新短令,少一處就等於沒上線)
+
+| # | 處 | 檔 | 漏過沒 |
+|---|---|---|---|
+| 1 | 引擎本體 | `*_vNNNN.py` + `--selftest` 自己會報 n/n | |
+| 2 | **短令冊 + 梭** | `Register-VIA-Commands-v*.ps1`(**在 VIA 根,不在 `supportive modules\`**)+ `via-xxx.cmd` | **批564 漏,`via-consensus` 不認得,連兩次** |
+| 3 | 自測格站 | `supportive modules\registry\CGC_MDL064_SelftestGrid_v*.py` | 批563 改名改到隔壁站(regex 先撞到別人) |
+| 4 | **正主管理器正式名稱 + 總控頁再生** | `VIA_SYSTEM_MANAGER_v*.py --no-open` → `VIA_UI_MasterControl_v0100.html` | **批565 漏,頁還印 98 而引擎族已 99,CI `test_11` 當場紅** |
+| 5 | 主控台任務 | `CGC_MDL095_DeckServer_v*.py` / Console `GOV-NN` | |
+| 6 | 政策 / 動詞 SSOT | `VIA_Policy_Laws_SSOT_v0100.json` 等 | |
+| 7 | 台帳 | `supportive modules\registry\VIA_AutoCode_Registry_v0100.json`(`append_only`) | |
+
+### 10.3 推之前必跑(三條半,都是被燒出來的)
+
+| 驗 | 怎麼跑 | 出處 |
+|---|---|---|
+| **短令零 ghost** | 本批新寫的每一個 `via-*` 都要在冊上;PS 一貼即用區塊裡叫到的也算 | LL110(批564);守衛已寫進 `CGC_MDL157 v0103` |
+| **總控頁同步** | 跑 `VIA_SYSTEM_MANAGER --no-open`。diff 只有時戳=引擎族數沒變 → **回退該檔**;有變 → 把再生的頁一起帶上,並在本境先跑合約測 | LL111(批565);CI `test_11` |
+| **分母對帳** | 任何 `n/N` 的顯示,分子與分母必須來自同一個計數來源;做不到就加一條跑完對帳,讓不一致自己講出來 | LL112(批566) |
+| **敗站不截斷** | 判為 FAIL 的站,原因行 / 例外全文 / 主控台 / 落檔四處都要原物;綠站與 SKIP 維持短切 | **L62 · LL113(批567)** |
+| **合成檢關沙盒** | 合成檢只准驗自己合成的東西。引擎有幾個資料來源,自測就要把**每一個**都關進暫存夾——少關一個,那盞燈就是在看機器臉色 | **LL114(批567)**;VCGC ⑨ 曾因機器上一份 2.2h 前的真報告而假紅 |
+| **順手跑別人的自測** | 改完別只跑自己那支。誤傷與**舊傷**都是這樣照出來的 | LL114;⑨ 那一紅不是這批造成的,但不跑就永遠看不到 |
+
+### 10.4 不代做的四件(這是界線,不是客氣)
+
+| 不代做 | 為什麼 | 我改成做什麼 |
+|---|---|---|
+| 設同意閘(`VIA_NET_CONSENT` / `VIA_SCRAPE_CONSENT` / API key) | 觸網與付費是操作員的決定,不是我的 | 把要貼的那兩行**列出來給他貼**;該段標誠實態 **GATED** |
+| 裝套件 / `conda remove` / `Stop-Process` / `Remove-Item` 動他的環境 | 那是他的機器,壞了我修不回來 | 給 `via-envgov apply --approve` 這類指令,**他的手**貼。容器沙盒裡為了自證而裝,不在此限 |
+| force push / 併 PR / 核可 PR | 歷史與審查不是我的權 | 只推分支;PR 他開他併。`--approve-remove` 只在他明令時才帶 |
+| 往正典冊裡寫同義字 | **裁定權在操作員**(LL90) | 候選一律標 `PENDING_OPERATOR`,附證據與衝突列表 |
+
+### 10.5 誠實五態(混在一起,操作員就不知道該去補什麼)
+
+| 態 | rc | 意思 | 不要混成 |
+|---|---|---|---|
+| **GREEN** | 0 | 真跑過,真的對 | — |
+| **RED** | 1 | 壞了 | 判錯的紅燈和假綠一樣傷 |
+| **NODATA** | 2 | 跑得動,但庫裡沒料 | 不是 RED |
+| **ABSENT** | 3 | 引擎/檔根本不在 | 不是 NODATA |
+| **GATED** | — | 閘未開(批566 新增) | **不是 SKIP(缺件),不是 FAIL(壞了)** |
+
+### 10.6 本境 ≠ 工作站(LL49;最容易踩,踩下去會污染正本)
+
+- 本境沙盒庫是**空的**。用它再生出來的頁與名冊**不准 commit** —— 那會拿假資料覆蓋正本。
+  跑完 grid / manager 之後,先 `git status` 看有沒有 UI 頁與名冊的雜訊,有就回退。
+- 網路**只認 AegisNexus**,`SUP_MDL740` 留作橋;收容件 `references/intake/` **只收不掛線**。
+- **自測零網路**:任何 `--selftest` 不得觸網,否則在沒網的機器上就是假紅。
+
+### 10.7 收尾一貼即用
+
+```powershell
+Set-Location 'D:\OneDrive\文件\GitHub\movies-dataset\VeritasIntelligenceAnalytics'
+git pull origin claude/via-envmanager-governance-7cls8h
+. (Get-ChildItem 'Register-VIA-Commands-v*.ps1' | Sort-Object Name | Select-Object -Last 1).FullName   # 冊在 VIA 根
+via-oneshot            # 批566 一鍵統包:24 段 · 25 加速器 · 動態進度條 · 觸網段標 GATED
+via-ryg                # 四態燈
+via-vrnrules drift     # 規則收斂落差
 ```
