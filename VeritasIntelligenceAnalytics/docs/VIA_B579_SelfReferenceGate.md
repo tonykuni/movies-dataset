@@ -73,3 +73,10 @@ via-govaudit             # 14 庫 3 機制
 `CGC_MDL158_VIAPanoramaAuditRepair` · `via_bridge_sweeper` · `via_central_gov`
 
 逐支改是後續的事;**棘輪先把線守住**,不會再變多。
+
+再往下看一層(這一層是**線索,不是判定**):15 支裡有 3 支
+(`CGC_MDL153_WorkflowComposer` · `CGC_MDL158_VIAPanoramaAuditRepair` · `via_bridge_sweeper`)
+的原始碼裡有**自己的家族名字面 + 豁免機制**(例如 `via_bridge_sweeper` 的 `EXEMPT_SELF` 名單裡
+就寫了自己)—— 它們**很可能早就是安全的**,只是用名單而不是家族比對,偵測器認不出來。
+先別急著改它們;逐支看的時候從這 3 支開始確認,省下的力氣拿去修真正的 12 支。
+**不把「偵測器認不出來」當成「它壞了」** —— 那又是一種判錯。
